@@ -1,31 +1,3 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Layer.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
-//	Description:	Class used for rendering to the frame buffer. One layer per 
-//					view on screen and also for window decorators
-//  
-//------------------------------------------------------------------------------
 #ifndef _LAYER_H_
 #define _LAYER_H_
 
@@ -36,75 +8,55 @@
 #include <String.h>
 #include <OS.h>
 #include <Locker.h>
-#include "LayerData.h"
-#include "TokenHandler.h"
+#include "RGBColor.h"
 
 class ServerWindow;
-class PortLink;
 class RootLayer;
-class WinBorder;
-class Screen;
-class ServerCursor;
+//class MyDriver;
 class DisplayDriver;
-class Desktop;
-class Workspace;
+class LayerData;
 
-/*!
-	\class Layer Layer.h
-	\brief Shadow BView class
-	
-	Layers provide all sorts of functionality. They are the shadow class for BViews, 
-	but they also provide the base class for other classes which handle drawing to 
-	the frame buffer, like RootLayer and WinBorder.
-*/
 class Layer
 {
 public:
 								Layer(BRect frame, const char *name, int32 token, uint32 resize, 
-										uint32 flags, ServerWindow *win);
+										uint32 flags, DisplayDriver *driver);
 	virtual						~Layer(void);
 
-			void				AddChild(Layer *child, RootLayer *rootLayer);
+			void				AddChild(Layer *child, RootLayer *rootLayer = NULL);
 			void				RemoveChild(Layer *child);
 			void				RemoveSelf();
-			bool				HasChild(Layer* layer) const;
-			RootLayer*			GetRootLayer() const;
+			bool				HasChild(Layer* layer);
+			RootLayer*			GetRootLayer() const { return fRootLayer; }
 
 			uint32				CountChildren(void) const;
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(const BPoint &pt);
 
-	virtual	Layer*				TopLayer() const { return _topchild; }
-	virtual	Layer*				LowerSibling() const { return _lowersibling; }
-	virtual	Layer*				UpperSibling() const { return _uppersibling; }
-	virtual	Layer*				BottomLayer() const { return _bottomchild; }
-
-	virtual	Layer*				VirtualTopChild() const{ return _topchild; }
-	virtual	Layer*				VirtualLowerSibling() const{ return _lowersibling; }
-	virtual	Layer*				VirtualUpperSibling() const{ return _uppersibling; }
-	virtual	Layer*				VirtualBottomChild() const{ return _bottomchild; }
-
+	virtual	Layer*				VirtualTopChild() const;
+	virtual	Layer*				VirtualLowerSibling() const;
+	virtual	Layer*				VirtualUpperSibling() const;
+	virtual	Layer*				VirtualBottomChild() const;
 
 			const char*			GetName(void) const { return (_name)?_name->String():NULL; }
-			LayerData*			GetLayerData(void) const { return _layerdata; }
 	
-			void				SetLayerCursor(ServerCursor *csr);
-			ServerCursor*		GetLayerCursor(void) const;
-	virtual	void				MouseTransit(uint32 transit);
-
-			void				Invalidate(const BRect &rect);
+			void				FullInvalidate(const BRect &rect);
+			void				FullInvalidate(const BRegion &region);
 			void				Invalidate(const BRegion &region);
-			void				DoInvalidate(const BRegion &reg, Layer *start);
-			
-	virtual	void				RebuildRegions( const BRect& r );
-			void				RebuildChildRegions( const BRect &r, Layer* startFrom );
+
 			void				RebuildFullRegion(void);
-			void				MoveRegionsBy(float x, float y);
-			void				ResizeRegionsBy(float x, float y);
-	
-			void				RequestClientUpdate(const BRect &rect);
-			void				RequestDraw(const BRect &r);
+			void				StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt);
+			void				RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset);
+			uint32				ResizeOthers(float x, float y,  BPoint coords[], BPoint *ptOffset);
+
+			void				Redraw(const BRegion& reg, Layer *startFrom=NULL);
+
+			void				EmptyGlobals();
+
 	virtual	void				Draw(const BRect &r);
+
+			void				SendViewMovedMsg();
+			void				SendViewResizedMsg();
 
 	virtual	void				Show(void);
 	virtual	void				Hide(void);
@@ -125,6 +77,8 @@ public:
 			BRegion				ConvertFromTop(BRegion *reg);
 			BRect				ConvertFromTop(BRect rect);
 
+			DisplayDriver*		GetDisplayDriver() const { return fDriver; }
+
 			void				PruneTree(void);
 
 			void				PrintToStream(void);
@@ -132,7 +86,14 @@ public:
 			void				PrintTree();
 
 	// server "private" - should not be used
-			void				SetRootLayer(RootLayer* rl);
+			void				SetRootLayer(RootLayer* rl){ fRootLayer = rl; }
+			void				SetServerWindow(ServerWindow *win);
+
+private:
+			void				RequestClientUpdate(const BRegion &reg, Layer *startFrom);
+			void				RequestDraw(const BRegion &reg, Layer *startFrom, bool redraw=false);
+			ServerWindow*		SearchForServerWindow() const;
+
 protected:
 	friend class RootLayer;
 	friend class WinBorder;
@@ -140,7 +101,7 @@ protected:
 	friend class ServerWindow;
 	friend class Desktop;
 	friend class Workspace;
-	
+
 			BRect				_frame;
 			BPoint				_boundsLeftTop;
 			Layer				*_parent,
@@ -149,9 +110,12 @@ protected:
 								*_topchild,
 								*_bottomchild;
 
+	mutable	Layer				*fCurrent;
+
 			BRegion				_visible,
 								_fullVisible,
-								_full;
+								_full,
+								fUpdateReg;
 
 			BRegion				*clipToPicture;
 			bool				clipToPictureInverse;
@@ -164,15 +128,13 @@ protected:
 			uint32				_resize_mode;
 			bool				_hidden;
 			bool				_is_updating;
+			
+//			MyDriver			*fDriver;
+			DisplayDriver		*fDriver;
 			LayerData			*_layerdata;
-			ServerCursor		*_cursor;
-			DisplayDriver*		fDriver;
+			RGBColor			fBackColor;
+
 			RootLayer*			fRootLayer;
 };
 
 #endif
-/*
- @log
- 	* added a new member, BPoint _boundsLeftTop. Beside other uses, (DW don't forget!)it will be needed in redraw code.
- 	* _flags is now declared as uint32
-*/

@@ -1,50 +1,16 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Layer.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
-//	Description:	Class used for rendering to the frame buffer. One layer per 
-//					view on screen and also for window decorators
-//  
-//------------------------------------------------------------------------------
-#include <OS.h>
 #include <View.h>
 #include <Message.h>
 #include <AppDefs.h>
 #include <Region.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "Layer.h"
-#include "RectUtils.h"
 #include "ServerWindow.h"
-#include "ServerApp.h"
-#include "PortLink.h"
-#include "ServerCursor.h"
-#include "CursorManager.h"
-#include "TokenHandler.h"
-#include "RootLayer.h"
-#include "DisplayDriver.h"
-#include "Desktop.h"
 #include "RGBColor.h"
+//#include "MyDriver.h"
+#include "DisplayDriver.h"
+#include "LayerData.h"
 
 //#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
@@ -54,16 +20,21 @@
 #	define STRACE(x) ;
 #endif
 
-/*!
-	\brief Constructor
-	\param frame Size and placement of the Layer
-	\param name Name of the layer
-	\param resize Resizing flags as defined in View.h
-	\param flags BView flags as defined in View.h
-	\param win ServerWindow to which the Layer belongs
-*/
+BRect		SCREENBOUNDS;
+
+BRegion		gRedrawReg;
+BList		gCopyRegList;
+BList		gCopyList;
+enum{
+	B_LAYER_NONE		= 0x00001000UL,
+	B_LAYER_MOVE		= 0x00002000UL,
+	B_LAYER_SIMPLE_MOVE	= 0x00004000UL,
+	B_LAYER_RESIZE		= 0x00008000UL,
+	B_LAYER_MASK_RESIZE	= 0x00010000UL,
+};
+
 Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
-				uint32 flags, ServerWindow *win)
+				uint32 flags, DisplayDriver *driver)
 {
 	// frame is in _parent coordinates
 	if(frame.IsValid())
@@ -75,6 +46,13 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	_boundsLeftTop.Set( 0.0f, 0.0f );
 
 	_name			= new BString(name);
+	_layerdata		= new LayerData();
+	fBackColor.SetColor(rand()%256, rand()%256, rand()%256);
+
+	// driver init
+	if (!driver)
+		debugger("You MUST have a valid driver to init a Layer object\n");
+	fDriver			= driver;
 
 	// Layer does not start out as a part of the tree
 	_parent			= NULL;
@@ -82,38 +60,48 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	_lowersibling	= NULL;
 	_topchild		= NULL;
 	_bottomchild	= NULL;
+	
+	fCurrent		= NULL;
 	fRootLayer		= NULL;
 
-	/* NOW all regions (_visible, _fullVisible, _full) are empty */
-	
 	_flags			= flags;
 	_resize_mode	= resize;
 	_hidden			= false;
 	_is_updating	= false;
 	_level			= 0;
 	_view_token		= token;
-	_layerdata		= new LayerData;
 	
-	_serverwin		= win;
-	_cursor			= NULL;
+	_serverwin		= NULL;
 	clipToPicture	= NULL;
-// TODO: modify!
-	fDriver			= desktop->GetDisplayDriver();
+
+	/* NOW all regions (_visible, _fullVisible, _full) are empty */
+	RebuildFullRegion();
+// TODO: remove!
+	if (token == 21)
+		SCREENBOUNDS	= frame;
 }
 
 //! Destructor frees all allocated heap space
 Layer::~Layer(void)
 {
-	if(_name)
-	{
-		delete _name;
-		_name = NULL;
-	}
 	if(_layerdata)
 	{
 		delete _layerdata;
 		_layerdata = NULL;
 	}
+
+	if(_name)
+	{
+		delete _name;
+		_name = NULL;
+	}
+
+// TODO: uncomment!
+	//PruneTree();
+
+//	_serverwin->RemoveChild(fDriver);
+//	delete fDriver;
+
 	if (clipToPicture)
 	{
 		delete clipToPicture;
@@ -122,25 +110,13 @@ Layer::~Layer(void)
 	}
 }
 
-/*!
-	\brief Adds a child to the back of the a layer's child stack.
-	\param layer The layer to add as a child
-	\param before Add the child in front of this layer
-	\param rebuild Flag to fully rebuild all visibility regions
-*/
 void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 {
+printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 	if( layer->_parent != NULL ) {
 		printf("ERROR: AddChild(): Layer already has a _parent\n");
 		return;
 	}
-
-	if (layer->GetRootLayer()){
-		printf("Error: Layer already belongs to a RootLayer!\n");
-		return;
-	}
-	
-	layer->fRootLayer	= rootLayer;
 
 		// attach layer to the tree structure
 	layer->_parent		= this;
@@ -151,30 +127,54 @@ void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 	else{
 		_topchild		= layer;
 	}
-	_bottomchild	= layer;
+	_bottomchild		= layer;
 
-
+	layer->SetRootLayer(fRootLayer);
+	layer->SetServerWindow(this->SearchForServerWindow());
 	layer->RebuildFullRegion();
 
-	if ( !(layer->_hidden) ){
-			// _layer->_full.Frame() is the maximum(layer's PoV), yet minimum(parent's PoV)
-			// region to be rebuilt.
-		RebuildChildRegions( layer->_full.Frame(), layer );
+	Layer		*c = layer->_topchild; //c = short for: current
+	Layer		*stop = layer;
 
-			// REDRAWING CODE:
+	if( c != NULL )
+		while( true ){
+			// action block
+			{
+				c->SetRootLayer(fRootLayer);
+				c->SetServerWindow(this->SearchForServerWindow());
+				c->RebuildFullRegion();
+			}
 
-			// RebuildChildRegion gave us a valid visible region.
-		if (layer->_visible.CountRects() > 0){
-			layer->Invalidate( layer->_visible );
+			// tree parsing algorithm
+				// go deep
+			if(	c->_topchild ){
+				c = c->_topchild;
+			}
+				// go right or up
+			else
+					// go right
+				if( c->_lowersibling ){
+					c = c->_lowersibling;
+				}
+					// go up
+				else{
+					while( !c->_parent->_lowersibling && c->_parent != stop ){
+						c = c->_parent;
+					}
+						// that enough! We've reached this view.
+					if( c->_parent == stop )
+						break;
+						
+					c = c->_parent->_lowersibling;
+				}
 		}
+	
+	if ( !(layer->IsHidden()) && layer->fRootLayer){
+		FullInvalidate( layer->_full );
 	}
+printf("Layer(%s)::AddChild(%s) ENDED\n", GetName(), layer->GetName());
 }
 
-/*!
-	\brief Removes a layer from the child stack
-	\param layer The layer to remove
-	\param rebuild Flag to rebuild all visibility regions
-*/
 void Layer::RemoveChild(Layer *layer)
 {
 	if( layer->_parent == NULL ){
@@ -185,11 +185,6 @@ void Layer::RemoveChild(Layer *layer)
 		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
 		return;
 	}
-
-	fRootLayer	= NULL;
-
-		// cache some things. The rebuilding/redrawing process will need those.
-	Layer*		cachedUpperSibling	= layer->_uppersibling;
 
 	// Take care of _parent
 	layer->_parent		= NULL;
@@ -206,30 +201,55 @@ void Layer::RemoveChild(Layer *layer)
 	layer->_uppersibling	= NULL;
 	layer->_lowersibling	= NULL;
 
-		// eliminate layer's full visible region
-	if ( !(layer->_hidden) )
-	{
-		bool		invalidate = false;
-		BRect		invalidRect;
+	Layer		*c = layer->_topchild; //c = short for: current
+	Layer		*stop = layer;
 
-		if (layer->_fullVisible.CountRects() > 0){
-			invalidate		= true;
-			invalidRect		= layer->_fullVisible.Frame();
-			RebuildChildRegions( layer->_fullVisible.Frame(), cachedUpperSibling );
+	if( c != NULL )
+		while( true ){
+			// action block
+			{
+				c->SetRootLayer(NULL);
+				c->_full.MakeEmpty();
+				c->_fullVisible.MakeEmpty();
+				c->_visible.MakeEmpty();
+			}
+
+			// tree parsing algorithm
+				// go deep
+			if(	c->_topchild ){
+				c = c->_topchild;
+			}
+				// go right or up
+			else
+					// go right
+				if( c->_lowersibling ){
+					c = c->_lowersibling;
+				}
+					// go up
+				else{
+					while( !c->_parent->_lowersibling && c->_parent != stop ){
+						c = c->_parent;
+					}
+						// that enough! We've reached this view.
+					if( c->_parent == stop )
+						break;
+						
+					c = c->_parent->_lowersibling;
+				}
 		}
 
-			// REDRAWING CODE:
-
-		if (invalidate){
-			DoInvalidate( BRegion(invalidRect), cachedUpperSibling );
-		}
+	if ( !(layer->IsHidden()) && layer->fRootLayer){
+		PrintTree();
+		FullInvalidate( layer->_fullVisible );
 	}
+
+	layer->fRootLayer	= NULL;
+	layer->_full.MakeEmpty();
+	layer->_fullVisible.MakeEmpty();
+	layer->_visible.MakeEmpty();
+
 }
 
-/*!
-	\brief Removes the layer from its parent's child stack
-	\param rebuild Flag to rebuild visibility regions
-*/
 void Layer::RemoveSelf()
 {
 	// A Layer removes itself from the tree (duh)
@@ -240,22 +260,14 @@ void Layer::RemoveSelf()
 	_parent->RemoveChild(this);
 }
 
-bool Layer::HasChild(Layer* layer) const{
-	for(Layer *lay = VirtualTopChild(); lay; lay = lay->VirtualLowerSibling()){
+bool Layer::HasChild(Layer* layer){
+	for(Layer *lay = VirtualTopChild(); lay; lay = VirtualLowerSibling()){
 		if(lay == layer)
 			return true;
 	}
 	return false;
 }
 
-/*!
-	\brief Finds the first child at a given point.
-	\param pt Point to look for a child
-	\return non-NULL if found, NULL if not
-
-	Find out which child gets hit if we click at a certain spot. Returns NULL
-	if there are no _visible children or if the click does not hit a child layer
-*/
 Layer* Layer::LayerAt(const BPoint &pt)
 {
 	if (_visible.Contains(pt)){
@@ -264,7 +276,7 @@ Layer* Layer::LayerAt(const BPoint &pt)
 
 	if (_fullVisible.Contains(pt)){
 		Layer		*lay = NULL;
-		for ( Layer* child = _bottomchild; child != NULL; child = child->_uppersibling ){
+		for ( Layer* child = VirtualBottomChild(); child; child = VirtualUpperSibling() ){
 			if ( (lay = child->LayerAt( pt )) )
 				return lay;
 		}
@@ -273,10 +285,6 @@ Layer* Layer::LayerAt(const BPoint &pt)
 	return NULL;
 }
 
-/*!
-	\brief Returns the size of the layer
-	\return the size of the layer
-*/
 BRect Layer::Bounds(void) const
 {
 	BRect		r(_frame);
@@ -284,20 +292,11 @@ BRect Layer::Bounds(void) const
 	return r;
 }
 
-/*!
-	\brief Returns the layer's size and position in its parent coordinates
-	\return The layer's size and position in its parent coordinates
-*/
 BRect Layer::Frame(void) const
 {
 	return _frame;
 }
 
-/*!
-	\brief recursively deletes all children (and grandchildren, etc) of the layer
-
-	This is mostly used for server shutdown or deleting a workspace
-*/
 void Layer::PruneTree(void)
 {
 	Layer		*lay,
@@ -320,10 +319,6 @@ void Layer::PruneTree(void)
 	// Man, this thing is short. Elegant, ain't it? :P
 }
 
-/*!
-	\brief Finds a layer based on its token ID
-	\return non-NULL if found, NULL if not
-*/
 Layer* Layer::FindLayer(const int32 token)
 {
 	// recursive search for a layer based on its view token
@@ -331,14 +326,14 @@ Layer* Layer::FindLayer(const int32 token)
 				*trylay;
 
 	// Search child layers first
-	for(lay = _topchild; lay != NULL; lay = lay->_lowersibling)
+	for(lay = VirtualTopChild(); lay; lay = VirtualLowerSibling())
 	{
 		if(lay->_view_token == token)
 			return lay;
 	}
 	
 	// Hmmm... not in this layer's children. Try lower descendants
-	for(lay = _topchild; lay != NULL; lay = lay->_lowersibling)
+	for(lay = VirtualTopChild(); lay != NULL; lay = VirtualLowerSibling())
 	{
 		trylay		= lay->FindLayer(token);
 		if(trylay)
@@ -349,525 +344,170 @@ Layer* Layer::FindLayer(const int32 token)
 	return NULL;
 }
 
-/*!
-	\brief Sets the layer's personal cursor. See BView::SetViewCursor
-	\return The cursor associated with this layer.
-		
-*/
-void Layer::SetLayerCursor(ServerCursor *csr)
+void Layer::SetServerWindow(ServerWindow *win){
+	_serverwin		= win;
+}
+
+ServerWindow* Layer::SearchForServerWindow() const {
+	if (_serverwin)
+		return _serverwin;
+
+	if(_parent)
+		return _parent->SearchForServerWindow();
+
+	return NULL;
+}
+
+void Layer::FullInvalidate(const BRect &rect)
 {
-	_cursor		= csr;
+	FullInvalidate( BRegion(rect) );
 }
 
-/*!
-	\brief Returns the layer's personal cursor. See BView::SetViewCursor
-	\return The cursor associated with this layer.
-	
-*/
-ServerCursor *Layer::GetLayerCursor(void) const
+void Layer::FullInvalidate(const BRegion& region)
 {
-	return _cursor;
+printf("Layer(%s)::FullInvalidate():\n", GetName());
+region.PrintToStream();
+printf("\n");
+
+	BPoint		pt(0,0);
+	StartRebuildRegions(region, NULL,/* B_LAYER_INVALIDATE, pt); */B_LAYER_NONE, pt);
+
+	Redraw(gRedrawReg);
+
+	EmptyGlobals();
 }
 
-/*!
-	\brief Hook function for handling pointer transitions, much like BView::MouseMoved
-	\param transit The type of event which occurred.
-
-	The default version of this function changes the cursor to the view's cursor, if there 
-	is one. If there isn't one, the default cursor is chosen
-*/
-void Layer::MouseTransit(uint32 transit)
-{
-	if(transit == B_ENTERED_VIEW)
-	{
-		if(_cursor)
-			cursormanager->SetCursor(_cursor->ID());
-		else
-		{
-			if(_serverwin)
-				_serverwin->App()->SetAppCursor();
-			else
-				cursormanager->SetCursor(B_CURSOR_DEFAULT);
-		}
-	}
-}
-
-void Layer::DoInvalidate(const BRegion &reg, Layer *start){
-//TODO: REMOVE this! For Test purposes only!
-	STRACE(("**********Layer::DoInvalidate()\n"));
-	if (GetRootLayer())
-		GetRootLayer()->Draw(GetRootLayer()->Bounds());
-	else{
-		if(dynamic_cast<RootLayer*>(this))
-			Draw(Bounds());
-	}
-	return;
-//----------------
-
-	if (_hidden || !(_fullVisible.Intersects(reg.Frame())) ){
-		printf("SERVER: WARNING: Layer(%s)::DoInvalidate() 1 \n\n", _name->String());
-		return;
-	}
-
-	// we're here! that means that our view is not hidden, HAS a valid '_fullVisible' region,
-	// AND, of course, it intersects the update region.
-
-		// redraw one of our regions if needed.
-	if ( _visible.CountRects() > 0 ){
-		BRegion			iReg(_visible);
-
-		iReg.IntersectWith( &reg );
-		if ( iReg.CountRects() > 0 ){
-			if (_serverwin){
-				RequestClientUpdate( iReg.Frame() );
-			}
-			else{
-				RequestDraw( iReg.Frame() );
-			}
-		}
-	}
-
-	if (start == NULL){
-		printf("SERVER: WARNING: Layer(%s)::DoInvalidate() 2 \n\n", _name->String());
-		return;
-	}
-
-		// redraw parts of our children, if needed.
-	bool			redraw = false;
-
-		// Redraw regions for children... if needed!
-	for(Layer *lay = _bottomchild; lay != NULL; lay = lay->_uppersibling)
-	{
-			// for layers in front of 'start' no redraw is needed.
-			// so avoid unnecessary CPU cycles.
-		if ( lay == start && redraw == false)
-			redraw = true;
-
-		if ( redraw && !(lay->_hidden) && (lay->_fullVisible.CountRects() > 0) ){
-			BRegion			layReg(lay->_fullVisible);
-
-			layReg.IntersectWith( &reg );
-			if ( layReg.CountRects() > 0 ){
-				if (lay->_serverwin){
-					lay->RequestClientUpdate( layReg.Frame() );
-				}
-				else{
-					lay->RequestDraw( layReg.Frame() );
-				}
-			}
-		}
-	}
-}
-
-/*!
-	\brief Sets a region as invalid and, thus, needing to be drawn
-	\param The region to invalidate
-	
-	All children of the layer also receive this call, so only 1 Invalidate call is 
-	needed to set a section as invalid on the screen.
-*/
 void Layer::Invalidate(const BRegion& region)
 {
-	if (_parent){
-		_parent->DoInvalidate(region, this);
-	}
-	else{
-		DoInvalidate(region, _topchild);
-	}
+printf("Layer(%s)::Invalidate():\n", GetName());
+region.PrintToStream();
+printf("\n");
+
+	gRedrawReg	= region;
+
+	Redraw(gRedrawReg);
+
+	EmptyGlobals();
 }
 
-/*!
-	\brief Sets a rectangle as invalid and, thus, needing to be drawn
-	\param The rectangle to invalidate
-	
-	All children of the layer also receive this call, so only 1 Invalidate call is 
-	needed to set a section as invalid on the screen.
-*/
-void Layer::Invalidate(const BRect &rect)
+void Layer::Redraw(const BRegion& reg, Layer *startFrom)
 {
-	Invalidate( BRegion(rect) );
+	BRegion		*pReg = const_cast<BRegion*>(&reg);
+
+	if(_serverwin){
+		if (pReg->CountRects() > 0){
+			RequestClientUpdate(reg, startFrom);
+		}
+	}
+		// call Draw() for all server layers
+	else{
+		if (pReg->CountRects() > 0){
+			RequestDraw(reg, startFrom);
+		}
+	}
+printf("Layer::Redraw ENDED\n");
 }
 
-/*!
-	\brief Sends update requests to client(BViews)
-	\param The rectangle into witch the client so draw
-	
-	All children of the layer also receive this call.
-*/
-void Layer::RequestClientUpdate(const BRect &rect){
-
-	if (_hidden){
+void Layer::RequestClientUpdate(const BRegion &reg, Layer *startFrom){
+	if (IsHidden()){
 		// this layer has nothing visible on screen, so bail out.
 		return;
 	}
+// TODO: use startFrom!
 
-		// this method assumes _fullVisible.CountRects() is positive !!!!!!!!!!!!!
-
+// TODO: Do that! here? or after a message sent by the client just before calling BView::Draw(r)
 		// clear the area in the low color
 		// only the visible area is cleared, because DisplayDriver does the clipping to it.
 		// draw background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
-	if ( !(_layerdata->viewcolor == RGBColor(B_TRANSPARENT_COLOR)) ) {
-		RGBColor tempColor(B_TRANSPARENT_COLOR);
-		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
-
-		fDriver->StrokeRect(rect, tempColor);
-	}
 
 	BMessage		msg;
 
 	msg.what		= _UPDATE_;
 	msg.AddInt32("_token", _view_token);
-	msg.AddRect("_rect", ConvertFromTop(rect) );
+	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
+		// for test purposes only!
+	msg.AddRect("_rect2", reg.Frame());
 
 	_serverwin->SendMessageToClient( &msg );
-
-	// This layer's BView counterpart will tell its children to redraw.
 }
 
-/*!
-	\brief Ask internal server layers to do their drawing
-	\param r The area that needs to be drawn. In SCREEN COORDINATES!!!
-*/
-void Layer::RequestDraw(const BRect &r)
+void Layer::RequestDraw(const BRegion &reg, Layer *startFrom, bool redraw)
 {
+printf("Layer(%s)::RequestDraw()\n", GetName());
+	if (_visible.CountRects() > 0 && !IsHidden()){
+		fUpdateReg		= _visible;
+		fUpdateReg.IntersectWith(&reg);
 
-	if (_visible.CountRects() > 0){
-		RGBColor tempColor(B_TRANSPARENT_COLOR);
-		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
-
-		fDriver->StrokeRect(r, tempColor);
+			// NOTE: do not clear background for internal server layers!
 
 			// draw itself.
-		Draw(r);
+		if (fUpdateReg.CountRects() > 0){
+			Draw(fUpdateReg.Frame());
+		}
+
+		fUpdateReg.MakeEmpty();
 	}
 
-		// tell children to draw.
-	for (Layer *lay = _topchild; lay != NULL; lay = lay->_lowersibling){
-		if ( !(lay->_hidden) && r.Intersects(lay->_fullVisible.Frame()) ){
-			BRect		newRect = (r & lay->_fullVisible.Frame());
-			lay->RequestDraw( newRect );
+		// tell children to draw. YES, it's OK - if we're hidden don't tell children to draw
+	if (!IsHidden())
+	for (Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling()){
+		if (!redraw && startFrom && lay == startFrom)
+			redraw = true;
+
+		if ((startFrom && redraw) || !startFrom){
+			if ( !(lay->IsHidden()) ){
+				lay->RequestDraw( reg, startFrom, redraw );
+			}
 		}
 	}
 }
 
-/*!
-	\brief Ask the layer to draw itself
-	\param r The area that needs to be drawn
-*/
 void Layer::Draw(const BRect &r)
 {
+printf("Layer::Draw() Called\n");
+//	RGBColor	col(152,102,51);
+//	DRIVER->FillRect_(r, 1, col, &fUpdateReg);
+//snooze(1000000);
+//	DRIVER->FillRect_(r, 1, fBackColor, &fUpdateReg);
+
 	// empty HOOK function.
 }
 
-//! Show the layer. Operates just like the BView call with the same name
+
 void Layer::Show(void)
 {
-	if( !_hidden )
+printf("Layer(%s)::Show()\n", GetName());
+	if( !IsHidden() )
 		return;
 	
 	_hidden		= false;
 
-//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-STRACE(("**********Layer::Show()\n"));
-		DoInvalidate(BRegion(Bounds()), NULL);
-	return;
-//----------------
-
-		// rebuild layer visible region based on its parent's and those supplied by user
-	if (_parent){
-		_parent->RebuildChildRegions( _full.Frame(), this );
-	}
-	else{
-		RebuildRegions( _full.Frame() );
-	}
-
-		// REDRAWING CODE:
-
-	if (_fullVisible.CountRects() > 0)
-		Invalidate( _fullVisible );
+	if(_parent)
+		_parent->FullInvalidate(_full);
+	else
+		FullInvalidate( _full );
 }
 
-//! Hide the layer. Operates just like the BView call with the same name
 void Layer::Hide(void)
 {
-	if ( _hidden )
+printf("\n\nLayer(%s)::Hide()\n", GetName());
+	if ( IsHidden() )
 		return;
 
 	_hidden			= true;
 
-//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-STRACE(("**********Layer::Hide()\n"));
-		DoInvalidate(BRegion(Bounds()), NULL);
-	return;
-//----------------
-
-	if (_fullVisible.CountRects() > 0){
-
-		BRegion			cachedFullVisible = _fullVisible;
-
-		if (_parent){
-			_parent->RebuildChildRegions( _fullVisible.Frame(), this );
-		}
-		else{
-			RebuildRegions( _full.Frame() );
-		}
-
-		// REDRAWING CODE:
-
-		Invalidate( cachedFullVisible );
-	}
-}
-
-/*!
-	\brief Determines whether the layer is hidden or not
-	\return true if hidden, false if not.
-*/
-bool Layer::IsHidden(void) const
-{
-	return _hidden;
-}
-
-/*!
-	\brief Counts the number of children the layer has
-	\return the number of children the layer has, not including grandchildren
-*/
-uint32 Layer::CountChildren(void) const
-{
-	uint32 i=0;
-	Layer *lay=_topchild;
-	while(lay!=NULL)
-	{
-		lay=lay->_lowersibling;
-		i++;
-	}
-	return i;
-}
-
-void Layer::MoveRegionsBy(float x, float y){
-
-		// currently just the full region needs to be moved.
-	_full.OffsetBy(x, y);
-			
-	for (Layer *lay = _topchild; lay != NULL; lay = lay->_lowersibling){
-		lay->MoveRegionsBy(x, y);
-	}
-}
-
-/*!
-	\brief Moves a layer in its parent coordinate space
-	\param x X offset
-	\param y Y offset
-*/
-void Layer::MoveBy(float x, float y)
-{
-	BRegion		oldFullVisible( _fullVisible );
-//	BPoint		oldFullVisibleOrigin( _fullVisible.Frame().LeftTop() );
-
-	_frame.OffsetBy(x, y);
-
-	MoveRegionsBy(x, y);
-
-	if (_parent){
-		if ( !_hidden ){
-				// to clear the area occupied on its parent _visible
-			if (_fullVisible.CountRects() > 0){
-				_hidden		= true;
-				_parent->RebuildChildRegions( _fullVisible.Frame(), this );
-				_hidden		= false;
-			}
-			_parent->RebuildChildRegions( _full.Frame(), this );
-		}
-	}
-	else{
-		if ( !_hidden )	{
-			RebuildRegions( _full.Frame() );
-		}
-	}
-
-		// send a message to client if requested.
-	if(_flags & B_FRAME_EVENTS && _serverwin){
-		BMessage		msg;
-			// no locking?
-		msg.what		= B_VIEW_MOVED;
-		msg.AddInt64( "when", real_time_clock_usecs() );
-		msg.AddInt32( "_token", _view_token );
-		msg.AddPoint( "where", _frame.LeftTop() );
-		
-		_serverwin->SendMessageToClient( &msg );
-	}
-
-		// REDRAWING CODE:
-
-	if ( !(_hidden) )
-	{
-			/* The region(on screen) that will be invalidated.
-			 *	It is composed by:
-			 *		the regions that were visible, and now they aren't +
-			 *		the regions that are now visible, and they were not visible before.
-			 *	(oldFullVisible - _fullVisible) + (_fullVisible - oldFullVisible)
-			 */
-		BRegion			clipReg;
-
-			// first offset the old region so we can do the correct operations.
-		oldFullVisible.OffsetBy(x, y);
-
-			// + (oldFullVisible - _fullVisible)
-		if ( oldFullVisible.CountRects() > 0 ){
-			BRegion		tempReg( oldFullVisible );
-			tempReg.Exclude( &_fullVisible );
-
-			if (tempReg.CountRects() > 0){
-				clipReg.Include( &tempReg );
-			}
-		}
-
-			// + (_fullVisible - oldFullVisible)
-		if ( _fullVisible.CountRects() > 0 ){
-			BRegion		tempReg( _fullVisible );
-			tempReg.Exclude( &oldFullVisible );
-
-			if (tempReg.CountRects() > 0){
-				clipReg.Include( &tempReg );
-			}
-		}
-
-			// there is no point in redrawing what already is visible. So just copy
-			// on-screen pixels to layer's new location.
-		if ( (oldFullVisible.CountRects() > 0) && (_fullVisible.CountRects() > 0) ){
-			BRegion		tempReg( oldFullVisible );
-			tempReg.IntersectWith( &_fullVisible );
-
-			if (tempReg.CountRects() > 0){
-// TODO: when you have such a method in DisplayDriver/Clipper, uncomment!
-				//fDriver->CopyBits( &tempReg, oldFullVisibleOrigin, oldFullVisibleOrigin.OffsetByCopy(x,y) );
-			}
-		}
-
-			// invalidate 'clipReg' so we can see the results of this move.
-		if (clipReg.CountRects() > 0){
-			Invalidate( clipReg );
-		}
-	}
-}
-
-void Layer::ResizeRegionsBy(float x, float y){
-	_frame.right		= _frame.right + x;
-	_frame.bottom		= _frame.bottom + y;
-
-	RebuildFullRegion();
-
-		/* Send messages to BViews only if this Layer belongs to a
-		 *	ServerWindow object
-		 */
-	BMessage		msg;
-	if( _serverwin )
-	{
-		msg.what		= B_VIEW_RESIZED;
-		msg.AddInt64( "when", real_time_clock_usecs() );
-		msg.AddInt32( "_token", _view_token );
-		msg.AddFloat( "width", _frame.Width() );
-		msg.AddFloat( "height", _frame.Height() );
-			// no need for that... it's here because of backward compatibility
-		msg.AddPoint( "where", _frame.LeftTop() );
-		
-		_serverwin->SendMessageToClient( &msg );
-		msg.MakeEmpty();
-	}
-
 	Layer		*c = _topchild; //c = short for: current
+	Layer		*stop = this;
 
 	if( c != NULL )
 		while( true ){
 			// action block
 			{
-				bool		sendMovedToMsg		= false;
-				bool		sendResizedToMsg	= false;
-
-				{
-					BRect		newFrame	= c->_frame;
-					uint32		rmask		= c->_resize_mode;
-					if (rmask == B_FOLLOW_NONE)
-						rmask		= B_FOLLOW_LEFT | B_FOLLOW_TOP;
-
-						// resize/move horizontaly
-					if (rmask & B_FOLLOW_LEFT){
-						// nothing to do
-					}
-					else if (rmask & B_FOLLOW_RIGHT){
-							newFrame.OffsetBy(x, 0.0f);
-							sendMovedToMsg		= true;
-						}
-						else if (rmask & B_FOLLOW_LEFT_RIGHT){
-								newFrame.SetRightBottom( BPoint(newFrame.right + x, newFrame.bottom) );
-								sendResizedToMsg	= true;
-							}
-							else if (rmask & B_FOLLOW_H_CENTER){
-									newFrame.OffsetBy(x/2, 0.0f);
-									sendMovedToMsg		= true;
-								}
-								else { // illegal flag. Do nothing.
-								}
-
-						// resize/move verticaly
-					if (rmask & B_FOLLOW_TOP){
-						// nothing to do
-					}
-					else if (rmask & B_FOLLOW_BOTTOM){
-							newFrame.OffsetBy(0.0f, y);
-							sendMovedToMsg		= true;
-						}
-						else if (rmask & B_FOLLOW_TOP_BOTTOM){
-								newFrame.SetRightBottom( BPoint(newFrame.right, newFrame.bottom + y) );
-								sendResizedToMsg	= true;
-							}
-							else if (rmask & B_FOLLOW_V_CENTER){
-									newFrame.OffsetBy(0.0f, y/2);
-									sendMovedToMsg		= true;
-								}
-								else { // illegal flag. Do nothing.
-								}
-
-					if (sendMovedToMsg && !sendResizedToMsg){
-						c->_full.OffsetBy(	(newFrame.left - c->_frame.left),
-											(newFrame.top - c->_frame.top) );
-					}
-
-					c->_frame		= newFrame;
-
-					if (sendResizedToMsg){
-						c->RebuildFullRegion();
-					}
-				}
-
-					// send message to client it requested (flags & B_FRAME_EVENTS)
-				if ( c->_serverwin ){
-					if ( sendMovedToMsg && (c->_flags & B_FRAME_EVENTS) ) {
-						msg.what		= B_VIEW_MOVED;
-						msg.AddInt64( "when", real_time_clock_usecs() );
-						msg.AddInt32( "_token", c->_view_token );
-						msg.AddPoint( "where", c->_frame.LeftTop() );
-						
-						c->_serverwin->SendMessageToClient( &msg );
-						msg.MakeEmpty();
-					}
-
-					if ( sendResizedToMsg && (c->_flags & B_FRAME_EVENTS) ){
-						msg.what		= B_VIEW_RESIZED;
-						msg.AddInt64( "when", real_time_clock_usecs() );
-						msg.AddInt32( "_token", c->_view_token );
-						msg.AddFloat( "width", c->_frame.Width() );
-						msg.AddFloat( "height", c->_frame.Height() );
-							// no need for that... it's here because of backward compatibility
-						msg.AddPoint( "where", c->_frame.LeftTop() );
-			
-						c->_serverwin->SendMessageToClient( &msg );
-						msg.MakeEmpty();
-					}
-				}
+				c->_fullVisible.MakeEmpty();
+				c->_visible.MakeEmpty();
 			}
 
 			// tree parsing algorithm
-
 				// go deep
 			if(	c->_topchild ){
 				c = c->_topchild;
@@ -880,162 +520,58 @@ void Layer::ResizeRegionsBy(float x, float y){
 				}
 					// go up
 				else{
-					while( !c->_parent->_lowersibling && c->_parent != this ){
+					while( !c->_parent->_lowersibling && c->_parent != stop ){
 						c = c->_parent;
 					}
 						// that enough! We've reached this view.
-					if( c->_parent == this )
+					if( c->_parent == stop )
 						break;
 						
 					c = c->_parent->_lowersibling;
 				}
 		}
+
+	if(_parent)
+		_parent->FullInvalidate( _fullVisible );
+	else
+		FullInvalidate( _fullVisible );
+
+	_fullVisible.MakeEmpty();
+	_visible.MakeEmpty();
 }
 
-/*!
-	\brief Resizes the layer.
-	\param x X offset
-	\param y Y offset
-	
-	This resizes the layer itself and resizes any children based on their resize
-	flags.
-*/
-void Layer::ResizeBy(float x, float y)
+bool Layer::IsHidden(void) const
 {
-	BRegion		oldFullVisible( _fullVisible );
+	if (_hidden)
+		return true;
+	else
+		if (_parent)
+			return _parent->IsHidden();
 
-	ResizeRegionsBy(x, y);
-
-	if (_parent){
-		if ( !_hidden ){
-			_parent->RebuildChildRegions( _full.Frame(), this );
-		}
-	}
-	else{
-		if ( !_hidden ){
-			RebuildRegions( _full.Frame() );
-		}
-	}
-
-		// REDRAWING CODE:
-
-	if ( !(_hidden) )
-	{
-			/* The region(on screen) that will be invalidated.
-			 *	It is composed by:
-			 *		the regions that were visible, and now they aren't +
-			 *		the regions that are now visible, and they were not visible before.
-			 *	(oldFullVisible - _fullVisible) + (_fullVisible - oldFullVisible)
-			 */
-		BRegion			clipReg;
-
-			// + (oldFullVisible - _fullVisible)
-		if ( oldFullVisible.CountRects() > 0 ){
-			BRegion		tempReg( oldFullVisible );
-			tempReg.Exclude( &_fullVisible );
-
-			if (tempReg.CountRects() > 0){
-				clipReg.Include( &tempReg );
-			}
-		}
-
-			// + (_fullVisible - oldFullVisible)
-		if ( _fullVisible.CountRects() > 0 ){
-			BRegion		tempReg( _fullVisible );
-			tempReg.Exclude( &oldFullVisible );
-
-			if (tempReg.CountRects() > 0){
-				clipReg.Include( &tempReg );
-			}
-		}
-
-			// invalidate 'clipReg' so we can see the results of this resize operation.
-		if (clipReg.CountRects() > 0){
-			Invalidate( clipReg );
-		}
-	}
+	return false;
 }
 
-void Layer::RebuildChildRegions( const BRect &r, Layer* startFrom ){
-		// just in case something goes wrong.
-	if ( _hidden ){
-		printf("\nSERVER PANIC: Layer(%s)::RebuildChildRegions() - This should NOT happen.\n\n", _name->String());
-		return;
-	}
-
-		// here is the actual start of this method. :-))
-	bool			rebuild = false;
-
-	_visible		= _fullVisible;
-
-		// Rebuild regions for children... if needed!
-	for(Layer *lay = _bottomchild; lay != NULL; lay = lay->_uppersibling)
-	{
-			// for layers in front of 'startLayer' no region rebuild is needed.
-			// so avoid unnecessary CPU cycles.
-		if ( lay == startFrom && rebuild == false)
-			rebuild = true;
-
-		if ( !(lay->_hidden) ){
-			if ( !rebuild ){
-				// do not rebuild, but exclude lay's FULL visible region from its parent v.r.
-				_visible.Exclude( &(lay->_fullVisible) );
-			}
-			else{
-				lay->RebuildRegions( r );
-			}
-		}
-	}
-}
-/*!
-	\brief Rebuilds visibility regions for this and child layers
-	\param include_children Flag to rebuild all children and subchildren
-*/
-void Layer::RebuildRegions( const BRect& r )
+uint32 Layer::CountChildren(void) const
 {
-		// if we're in the rebuild area, rebuild our v.r.
-	if ( _full.Intersects( r ) ){
-		_visible			= _full;
-
-		if (_parent){
-			_visible.IntersectWith( &(_parent->_visible) );
-				// exclude from parent's visible area.
-			if ( !(_hidden) )
-				_parent->_visible.Exclude( &(_visible) );
-		}
-
-		_fullVisible		= _visible;
-	}
-	else{
-			// our visible region will stay the same
-
-			// exclude our FULL visible region from parent's visible region.
-		if ( !(_hidden) && _parent )
-			_parent->_visible.Exclude( &(_fullVisible) );
-
-			// we're not in the rebuild area so our children's v.r.s are OK. 
-		return;
-	}
-
-		// Rebuild regions for children...
-	for(Layer *lay = _bottomchild; lay != NULL; lay = lay->_uppersibling)
+	uint32		i = 0;
+	Layer		*lay = VirtualTopChild();
+	while(lay != NULL)
 	{
-		if ( !(lay->_hidden) ){
-			lay->RebuildRegions( r );
-		}
+		lay		= VirtualLowerSibling();
+		i++;
 	}
+	return i;
 }
 
 void Layer::RebuildFullRegion( ){
-// TODO: temporary patch?
-	if (_parent && dynamic_cast<RootLayer*>(_parent) ){
-	}
-	else{
+
+	if (_parent)
+		_full.Set( _parent->ConvertToTop( _frame ) );
+	else
 		_full.Set( ConvertToTop( _frame ) );
-	}
 
+// TODO: Convert to screen coordinates!
 	LayerData		*ld;
-
 	ld			= _layerdata;
 	do{
 			// clip to user region
@@ -1053,7 +589,370 @@ void Layer::RebuildFullRegion( ){
 		}
 }
 
-//! Prints all relevant layer data to stdout
+void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset)
+{
+//NOTE: this method must be executed as fast as possible.
+	// Currently SendView[Moved/Resized]Msg() simply constructs a message and calls
+	//		ServerWindow::SendMessageToClient()
+	//   this involves the alternative use of kernel and this code in the CPU, so, a lot
+	//   of context switches. This is NOT good at all!
+	// One alternative would be the use of a BMessageQueue per ServerWindows OR only
+	//   one for app_server which will be emptied as soon as this critical operation ended.
+	// Talk to DW, Gabe.
+
+	BRegion		oldRegion;
+	uint32		newAction	= action;
+	BPoint		newPt		= pt;
+	BPoint		newOffset	= ptOffset; // used for resizing only
+	
+	BPoint		dummyNewLocation;
+
+	RRLabel1:
+	switch(action){
+		case B_LAYER_NONE:{
+printf("1) Action B_LAYER_NONE\n");
+			oldRegion		= _visible;
+			break;
+		}
+		case B_LAYER_MOVE:{
+printf("1) Action B_LAYER_MOVE\n");
+			oldRegion	= _fullVisible;
+			_frame.OffsetBy(pt.x, pt.y);
+			_full.OffsetBy(pt.x, pt.y);
+// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+			//SendViewMovedMsg();
+
+			newAction	= B_LAYER_SIMPLE_MOVE;
+			break;
+		}
+		case B_LAYER_SIMPLE_MOVE:{
+printf("1) Action B_LAYER_SIMPLE_MOVE\n");
+			_full.OffsetBy(pt.x, pt.y);
+
+			break;
+		}
+		case B_LAYER_RESIZE:{
+printf("1) Action B_LAYER_RESIZE\n");
+			oldRegion	= _visible;
+
+			_frame.right	+= pt.x;
+			_frame.bottom	+= pt.y;
+			RebuildFullRegion();
+// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+			//SendViewResizedMsg();
+
+			newAction	= B_LAYER_MASK_RESIZE;
+			break;
+		}
+		case B_LAYER_MASK_RESIZE:{
+printf("1) Action B_LAYER_MASK_RESIZE\n");
+			oldRegion	= _visible;
+
+			BPoint		offset, rSize;
+			BPoint		coords[2];
+
+			ResizeOthers(pt.x, pt.y, coords, NULL);
+			offset		= coords[0];
+			rSize		= coords[1];
+			newOffset	= offset + ptOffset;
+
+			if(!(rSize.x == 0.0f && rSize.y == 0.0f)){
+				_frame.OffsetBy(offset);
+				_frame.right	+= rSize.x;
+				_frame.bottom	+= rSize.y;
+				RebuildFullRegion();
+// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+				//SendViewResizedMsg();
+				
+				newAction	= B_LAYER_MASK_RESIZE;
+				newPt		= rSize;
+				dummyNewLocation = newOffset;
+			}
+			else if (!(offset.x == 0.0f && offset.y == 0.0f)){
+				pt			= newOffset;
+				action		= B_LAYER_MOVE;
+				newPt		= pt;
+				goto RRLabel1;
+			}
+			else{
+				pt			= ptOffset;
+				action		= B_LAYER_MOVE;
+				newPt		= pt;
+				goto RRLabel1;
+			}
+			break;
+		}
+	}
+
+	if (!IsHidden()){
+		_visible			= _full;
+		if (_parent){
+			_visible.IntersectWith( &(_parent->_visible) );
+				// exclude from parent's visible area.
+			if ( !IsHidden() && _visible.CountRects() > 0)
+				_parent->_visible.Exclude( &(_visible) );
+		}
+		_fullVisible		= _visible;
+	}
+
+		// Rebuild regions for children...
+	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	{
+			lay->RebuildRegions(reg, newAction, newPt, newOffset);
+	}
+
+	if(!IsHidden())
+	switch(action){
+		case B_LAYER_NONE:{
+			BRegion		r(_visible);
+			if (oldRegion.CountRects() > 0)
+				r.Exclude(&oldRegion);
+
+			if(r.CountRects() > 0){
+				gRedrawReg.Include(&r);
+			}
+			break;
+		}
+		case B_LAYER_MOVE:{
+			BRegion		redrawReg;
+			BRegion		*copyReg = new BRegion();
+			BRegion		screenReg(SCREENBOUNDS);
+
+			oldRegion.OffsetBy(pt.x, pt.y);
+			oldRegion.IntersectWith(&_fullVisible);
+
+			*copyReg	= oldRegion;
+			copyReg->IntersectWith(&screenReg);
+			if(copyReg->CountRects() > 0 && !(pt.x == 0.0f && pt.y == 0.0f) ){
+				copyReg->OffsetBy(-pt.x, -pt.y);
+				BPoint		*point = new BPoint(pt);
+				gCopyRegList.AddItem(copyReg);
+				gCopyList.AddItem(point);
+			}
+			else{
+				delete copyReg;
+			}
+
+			redrawReg	= _fullVisible;
+			redrawReg.Exclude(&oldRegion);
+			if(redrawReg.CountRects() > 0 && !(pt.x == 0.0f && pt.y == 0.0f) ){
+				gRedrawReg.Include(&redrawReg);
+			}
+
+			break;
+		}
+		case B_LAYER_RESIZE:{
+			BRegion		redrawReg;
+			
+			redrawReg	= _visible;
+			redrawReg.Exclude(&oldRegion);
+			if(redrawReg.CountRects() > 0){
+				gRedrawReg.Include(&redrawReg);
+			}
+
+			break;
+		}
+		case B_LAYER_MASK_RESIZE:{
+			BRegion		redrawReg;
+			BRegion		*copyReg = new BRegion();
+
+			oldRegion.OffsetBy(dummyNewLocation.x, dummyNewLocation.y);
+
+			redrawReg	= _visible;
+			redrawReg.Exclude(&oldRegion);
+			if(redrawReg.CountRects() > 0)
+			{
+				gRedrawReg.Include(&redrawReg);
+			}
+
+			*copyReg	= _visible;
+			copyReg->IntersectWith(&oldRegion);
+			copyReg->OffsetBy(-dummyNewLocation.x, -dummyNewLocation.y);
+			if(copyReg->CountRects() > 0
+				&& !(dummyNewLocation.x == 0.0f && dummyNewLocation.y == 0.0f))
+			{
+				gCopyRegList.AddItem(copyReg);
+				gCopyList.AddItem(new BPoint(dummyNewLocation));
+			}
+
+			break;
+		}
+		default:{
+		}
+	}
+//if (IsHidden()){
+//	_fullVisible.MakeEmpty();
+//	_visible.MakeEmpty();
+//}
+printf("\n ======= Layer(%s)::RR finals ======\n", GetName());
+oldRegion.PrintToStream();
+_full.PrintToStream();
+_fullVisible.PrintToStream();
+_visible.PrintToStream();
+printf("==========RedrawReg===========\n");
+gRedrawReg.PrintToStream();
+printf("=====================\n");
+}
+
+void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt)
+{
+printf("Layer(%s)::StartRebuildRegions()\n", GetName());
+	if(!_parent)
+		_fullVisible	= _full;
+
+	BRegion		oldVisible = _visible;
+
+	_visible		= _fullVisible;
+
+		// Rebuild regions for children...
+	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	{
+		if (lay == target){
+			lay->RebuildRegions(reg, action, pt, BPoint(0.0f, 0.0f));
+		}
+		else{
+			lay->RebuildRegions(reg, B_LAYER_NONE, pt, BPoint(0.0f, 0.0f));
+		}
+	}
+
+printf("\n ===!=== Layer(%s)::SRR finals ===!===\n", GetName());
+_full.PrintToStream();
+_fullVisible.PrintToStream();
+_visible.PrintToStream();
+oldVisible.PrintToStream();
+printf("=====================\n");
+gRedrawReg.PrintToStream();
+
+	BRegion		redrawReg(_visible);
+		// if this is the first time
+	if (oldVisible.CountRects() > 0){
+printf("YES, it happens\n");
+		redrawReg.Exclude(&oldVisible);
+	}
+	gRedrawReg.Include(&redrawReg);
+
+	printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());
+	gRedrawReg.PrintToStream();
+	printf("\n");
+	printf("Layer(%s)::StartRebuildREgions() ended! Copy Region:\n", GetName());
+	for(int32 k=0; k<gCopyRegList.CountItems(); k++){
+		((BRegion*)(gCopyRegList.ItemAt(k)))->PrintToStream();
+		((BPoint*)(gCopyList.ItemAt(k)))->PrintToStream();
+	}
+	printf("\n");
+}
+
+void Layer::MoveBy(float x, float y)
+{
+	if(!_parent){
+		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
+		return;
+	}
+
+	BPoint		pt(x,y);	
+	BRect		rect(_full.Frame().OffsetByCopy(pt));
+
+	_parent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
+	
+	fDriver->CopyRegionList(&gCopyRegList, &gCopyList, gCopyRegList.CountItems(), &_fullVisible);
+
+	_parent->Redraw(gRedrawReg, this);
+
+	EmptyGlobals();
+}
+
+void Layer::EmptyGlobals(){
+	void	*item;
+
+	gRedrawReg.MakeEmpty();
+	while((item = gCopyRegList.RemoveItem((int32)0))){
+		delete (BRegion*)item;
+	}
+
+	while((item = gCopyList.RemoveItem((int32)0))){
+		delete (BPoint*)item;
+	}
+}
+
+uint32 Layer::ResizeOthers(float x, float y, BPoint coords[], BPoint *ptOffset){
+printf("Layer(%s): x=%f y=%f\n", GetName(), x, y);
+	uint32		rmask		= _resize_mode;
+		// offset
+	coords[0].x		= 0.0f;
+	coords[0].y		= 0.0f;
+		// resize by width/height
+	coords[1].x		= 0.0f;
+	coords[1].y		= 0.0f;
+
+	if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_
+			&& (rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_)
+	{
+printf("Layer(%s) - step 1\n", GetName());
+		coords[1].x		= x;
+	}
+	else if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_){
+printf("Layer(%s) - step 2\n", GetName());
+	}
+	else if ((rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_){
+printf("Layer(%s) - step 3\n", GetName());
+		coords[0].x		= x;
+	}
+	else if ((rmask & 0x00000f00UL)>>8 == _VIEW_CENTER_){
+printf("Layer(%s) - step 4\n", GetName());
+		coords[0].x		= x/2;
+	}
+	else { // illegal flag. Do nothing.
+printf("Layer(%s) - step 5\n", GetName());
+	}
+
+
+	if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_
+			&& (rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_)
+	{
+		coords[1].y		= y;
+printf("Layer(%s) - sstep 1\n", GetName());
+	}
+	else if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_){
+printf("Layer(%s) - sstep 2\n", GetName());
+	}
+	else if ((rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_){
+printf("Layer(%s) - sstep 3\n", GetName());
+		coords[0].y		= y;
+	}
+	else if ((rmask & 0x0000f000UL)>>12 == _VIEW_CENTER_){
+printf("Layer(%s) - sstep 4\n", GetName());
+		coords[0].y		= y/2;
+	}
+	else { // illegal flag. Do nothing.
+printf("Layer(%s) - sstep 5\n", GetName());
+	}
+
+printf("Layer(%s): coord[0].x=%f coord[0].y=%f\n", GetName(), coords[0].x, coords[0].y);
+printf("Layer(%s): coord[1].x=%f coord[1].y=%f\n", GetName(), coords[1].x, coords[1].y);
+	return 0UL;
+}
+
+void Layer::ResizeBy(float x, float y)
+{
+	if(!_parent){
+		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
+		return;
+	}
+
+	BPoint		pt(x,y);	
+	BRect		rect(_full.Frame());
+	rect.right	+= x;
+	rect.bottom	+= y;
+
+	_parent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
+	
+	fDriver->CopyRegionList(&gCopyRegList, &gCopyList, gCopyRegList.CountItems(), &_fullVisible);
+
+	_parent->Redraw(gRedrawReg, this);
+
+	EmptyGlobals();
+}
+
 void Layer::PrintToStream(void)
 {
 	printf("-----------\nLayer %s\n",_name->String());
@@ -1079,12 +978,12 @@ void Layer::PrintToStream(void)
 		printf("Bottom child: NULL\n");
 	printf("Frame: "); _frame.PrintToStream();
 	printf("Token: %ld\n",_view_token);
-	printf("Hide count: %s\n",_hidden?"true":"false");
+	printf("Hidden - direct: %s\n", _hidden?"true":"false");
+	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
 	printf("Visible Areas: "); _visible.PrintToStream();
 	printf("Is updating = %s\n",(_is_updating)?"yes":"no");
 }
 
-//! Prints hierarchy data to stdout
 void Layer::PrintNode(void)
 {
 	printf("-----------\nLayer %s\n",_name->String());
@@ -1111,64 +1010,20 @@ void Layer::PrintNode(void)
 	printf("Visible Areas: "); _visible.PrintToStream();
 }
 
-//! Prints the tree structure starting from this layer
 void Layer::PrintTree(){
-
-	int32		spaces = 2;
-	Layer		*c = _topchild; //c = short for: current
-	printf( "'%s' - token: %ld\n", _name->String(), _view_token );
-	if( c != NULL )
-		while( true ){
-			// action block
-			{
-				for( int i = 0; i < spaces; i++)
-					printf(" ");
-				
-					printf( "'%s' - token: %ld\n", c->_name->String(), c->_view_token );
-			}
-
-				// go deep
-			if(	c->_topchild ){
-				c = c->_topchild;
-				spaces += 2;
-			}
-				// go right or up
-			else
-					// go right
-				if( c->_lowersibling ){
-					c = c->_lowersibling;
-				}
-					// go up
-				else{
-					while( !c->_parent->_lowersibling && c->_parent != this ){
-						c = c->_parent;
-						spaces -= 2;
-					}
-						// that enough! We've reached this view.
-					if( c->_parent == this )
-						break;
-						
-					c = c->_parent->_lowersibling;
-					spaces -= 2;
-				}
-		}
+	printf("\n Tree structure:\n");
+	printf("\t%s\t%s\n", GetName(), IsHidden()? "Hidden": "NOT hidden");
+	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	{
+		printf("\t%s\t%s\n", lay->GetName(), lay->IsHidden()? "Hidden": "NOT hidden");
+	}
 }
 
-/*!
-	\brief Converts the rectangle to the layer's parent coordinates
-	\param the rectangle to convert
-	\return the converted rectangle
-*/
 BRect Layer::ConvertToParent(BRect rect)
 {
 	return (rect.OffsetByCopy(_frame.LeftTop()));
 }
 
-/*!
-	\brief Converts the region to the layer's parent coordinates
-	\param the region to convert
-	\return the converted region
-*/
 BRegion Layer::ConvertToParent(BRegion *reg)
 {
 	BRegion newreg;
@@ -1177,21 +1032,11 @@ BRegion Layer::ConvertToParent(BRegion *reg)
 	return newreg;
 }
 
-/*!
-	\brief Converts the rectangle from the layer's parent coordinates
-	\param the rectangle to convert
-	\return the converted rectangle
-*/
 BRect Layer::ConvertFromParent(BRect rect)
 {
 	return (rect.OffsetByCopy(_frame.left*-1,_frame.top*-1));
 }
 
-/*!
-	\brief Converts the region from the layer's parent coordinates
-	\param the region to convert
-	\return the converted region
-*/
 BRegion Layer::ConvertFromParent(BRegion *reg)
 {
 	BRegion newreg;
@@ -1200,11 +1045,6 @@ BRegion Layer::ConvertFromParent(BRegion *reg)
 	return newreg;
 }
 
-/*!
-	\brief Converts the region to screen coordinates
-	\param the region to convert
-	\return the converted region
-*/
 BRegion Layer::ConvertToTop(BRegion *reg)
 {
 	BRegion newreg;
@@ -1213,11 +1053,6 @@ BRegion Layer::ConvertToTop(BRegion *reg)
 	return newreg;
 }
 
-/*!
-	\brief Converts the rectangle to screen coordinates
-	\param the rectangle to convert
-	\return the converted rectangle
-*/
 BRect Layer::ConvertToTop(BRect rect)
 {
 	if (_parent!=NULL)
@@ -1226,11 +1061,6 @@ BRect Layer::ConvertToTop(BRect rect)
 		return(rect);
 }
 
-/*!
-	\brief Converts the region from screen coordinates
-	\param the region to convert
-	\return the converted region
-*/
 BRegion Layer::ConvertFromTop(BRegion *reg)
 {
 	BRegion newreg;
@@ -1239,11 +1069,6 @@ BRegion Layer::ConvertFromTop(BRegion *reg)
 	return newreg;
 }
 
-/*!
-	\brief Converts the rectangle from screen coordinates
-	\param the rectangle to convert
-	\return the converted rectangle
-*/
 BRect Layer::ConvertFromTop(BRect rect)
 {
 	if (_parent!=NULL)
@@ -1253,15 +1078,51 @@ BRect Layer::ConvertFromTop(BRect rect)
 		return(rect);
 }
 
-RootLayer* Layer::GetRootLayer() const{
-	return fRootLayer;
+void Layer::SendViewResizedMsg(){
+	if( _serverwin && _flags & B_FRAME_EVENTS )
+	{
+		BMessage		msg;
+		msg.what		= B_VIEW_RESIZED;
+		msg.AddInt64( "when", real_time_clock_usecs() );
+		msg.AddInt32( "_token", _view_token );
+		msg.AddFloat( "width", _frame.Width() );
+		msg.AddFloat( "height", _frame.Height() );
+			// no need for that... it's here because of backward compatibility
+		msg.AddPoint( "where", _frame.LeftTop() );
+		
+		_serverwin->SendMessageToClient( &msg );
+	}
 }
 
-void Layer::SetRootLayer(RootLayer* rl){
-	fRootLayer	= rl;
+void Layer::SendViewMovedMsg(){
+	if( _serverwin && _flags & B_FRAME_EVENTS )
+	{
+		BMessage		msg;
+		msg.what		= B_VIEW_MOVED;
+		msg.AddInt64( "when", real_time_clock_usecs() );
+		msg.AddInt32( "_token", _view_token );
+		msg.AddPoint( "where", _frame.LeftTop() );
+						
+		_serverwin->SendMessageToClient( &msg );
+	}
 }
 
+Layer* Layer::VirtualTopChild() const{
+	fCurrent	= _topchild;
+	return fCurrent;
+}
 
-/*
- @log
-*/
+Layer* Layer::VirtualLowerSibling() const{
+	fCurrent	= fCurrent->_lowersibling;
+	return fCurrent;
+}
+
+Layer* Layer::VirtualUpperSibling() const{
+	fCurrent	= fCurrent->_uppersibling;
+	return fCurrent;
+}
+
+Layer* Layer::VirtualBottomChild() const{
+	fCurrent	= _bottomchild;
+	return fCurrent;
+}
