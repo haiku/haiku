@@ -156,19 +156,19 @@ public:
 template<typename Element>
 class DoublyLinkedListLinkImpl {
 private:
-	typedef DoublyLinkedListLink<Element> Link;
+	typedef DoublyLinkedListLink<Element> DLL_Link;
 
 public:
 	DoublyLinkedListLinkImpl() : fDoublyLinkedListLink() {}
 	~DoublyLinkedListLinkImpl() {}
 
-	Link *GetDoublyLinkedListLink()	
+	DLL_Link *GetDoublyLinkedListLink()	
 		{ return &fDoublyLinkedListLink; }
-	const Link *GetDoublyLinkedListLink() const
+	const DLL_Link *GetDoublyLinkedListLink() const
 		{ return &fDoublyLinkedListLink; }
 
 private:
-	Link	fDoublyLinkedListLink;
+	DLL_Link	fDoublyLinkedListLink;
 };
 
 // DoublyLinkedListStandardGetLink
