@@ -5,19 +5,10 @@
 #include <GraphicsDefs.h>
 #include <SupportDefs.h>
 
-//See if this takes care of some problems with closing the application
-//by clicking the windowtab
-//#define APP_SIGNATURE  "application/x-vnd.obos-stylededit"
-//application signature consistent with with the one in StyledEdit.rdef
-//seems to work, 021021
 #define APP_SIGNATURE  "application/x-vnd.obos.styled-edit"
 
-const float TEXT_INSET= 3.0;
+const float TEXT_INSET = 3.0;
 
-/*Messages for window registry with application*/
-const uint32 WINDOW_REGISTRY_ADD= 'WRad';
-const uint32 WINDOW_REGISTRY_SUB='WRsb';
-const uint32 WINDOW_REGISTRY_ADDED='WRdd';
 /*Messages for menu commands
 file menu*/
 const uint32 MENU_NEW					='MFnw';
