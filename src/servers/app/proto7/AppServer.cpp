@@ -41,8 +41,8 @@ AppServer::AppServer(void) : BApplication("application/x-vnd.obe-OBAppServer")
 	printf("AppServer()\n");
 #endif
 
-	mouseport=create_port(30,SERVER_INPUT_PORT);
-	messageport=create_port(20,SERVER_PORT_NAME);
+	mouseport=create_port(100,SERVER_INPUT_PORT);
+	messageport=create_port(100,SERVER_PORT_NAME);
 #ifdef DEBUG_APPSERVER_THREAD
 printf("Server message port: %ld\n",messageport);
 printf("Server input port: %ld\n",mouseport);
