@@ -3,6 +3,9 @@ SubDir OBOS_TOP src add-ons kernel drivers random ;
 KernelObjects 
 	<$(SOURCE_GRIST)>driver.c 
 	:
-	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
+	-fno-pic -D_KERNEL_MODE -Wno-missing-prototypes
 	;
+
+# CFLAGS was arch dependent:
+	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
 
