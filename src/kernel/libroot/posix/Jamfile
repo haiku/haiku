@@ -13,8 +13,13 @@ KernelMergeObject posix_main.o :
 	-fPIC -DPIC
 	;
 
+# extra kernel objects needed
+KernelObjects
+ 	<$(SOURCE_GRIST)>kerrno.c
+	;
+
 MergeObjectFromObjects kernel_posix_main.o :
- 	<$(SOURCE_GRIST)>errno.o
+ 	<$(SOURCE_GRIST)>kerrno.o
  	<$(SOURCE_GRIST)>poll.o
  	<$(SOURCE_GRIST)>utime.o
 	;

@@ -1,17 +1,20 @@
-/* errno.c
- *
- * Simple file to get errno defined!!
+/* 
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/* Provides user space storage for "errno", located in TLS
  */
 
 #include <errno.h>
 
-/* XXX - Fix this once TLS works */
+#include "support/TLS.h"
+#include "tls.h"
 
-static int errno_storage;
 
-int*
+int *
 _errnop(void)
 {
-	return &errno_storage;
+	return (int *)tls_address(TLS_ERRNO_SLOT);
 }
 
