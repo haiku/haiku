@@ -265,4 +265,14 @@ typedef struct {
 typedef struct {
 } cmd_nv4_dx6_multi_texture_triangle;/* nv10_dx6_multi_texture_triangle is identical? */
 
+
+/************ DMA command defines ***********/
+
+#define NV_GENERAL_DMAPUT			0x0040
+#define NV_GENERAL_DMAGET			0x0044
+#define NV_ROP5_SOLID_SETROP5		0x0300
+#define NV_IMAGE_PATTERN_SETSHAPE	0x0308
+#define NV_IMAGE_PATTERN_SETCOLOR0	0x030c
+#define NV_IMAGE_BLIT_SOURCEORG		0x0308
+
 #endif
