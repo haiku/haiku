@@ -56,7 +56,7 @@ static const uint32 kMsgPageSetup = 'pgsp';
 
 class IconView : public BView {
 	public:
-		IconView(BRect frame, entry_ref *ref, bool isDevice);
+		IconView(BRect frame, const entry_ref *ref, bool isDevice);
 		virtual ~IconView();
 
 		virtual void AttachedToWindow();
@@ -102,7 +102,7 @@ class PositionSlider : public BSlider {
 
 class HeaderView : public BView, public BInvoker {
 	public:
-		HeaderView(BRect frame, entry_ref *ref, DataEditor &editor);
+		HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor);
 		virtual ~HeaderView();
 
 		virtual void AttachedToWindow();
@@ -188,7 +188,7 @@ get_type_string(char *buffer, size_t bufferSize, type_code type)
 //	#pragma mark -
 
 
-IconView::IconView(BRect rect, entry_ref *ref, bool isDevice)
+IconView::IconView(BRect rect, const entry_ref *ref, bool isDevice)
 	: BView(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW),
 	fRef(*ref),
 	fIsDevice(isDevice),
@@ -397,7 +397,7 @@ PositionSlider::SetBlockSize(uint32 blockSize)
 //	#pragma mark -
 
 
-HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
+HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	: BView(frame, "probeHeader", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fAttribute(editor.Attribute()),
 	fFileSize(editor.FileSize()),
@@ -893,7 +893,7 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BM
 	}
 
 	rect = Bounds();
-	fHeaderView = new HeaderView(rect, ref, fEditor);
+	fHeaderView = new HeaderView(rect, &fEditor.Ref(), fEditor);
 	fHeaderView->ResizeToPreferred();
 	fHeaderView->SetBase((base_type)baseType);
 	AddChild(fHeaderView);
