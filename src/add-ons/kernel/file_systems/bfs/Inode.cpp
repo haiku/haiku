@@ -45,7 +45,8 @@ InodeAllocator::~InodeAllocator()
 {
 	if (fTransaction != NULL) {
 		if (fInode != NULL) {
-			fInode->Node()->flags &= ~INODE_IN_USE;
+			fInode->Node()->flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE | INODE_NOT_READY);
+				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(fTransaction);			
 		} else
 			fTransaction->GetVolume()->Free(fTransaction, fRun);
@@ -127,7 +128,7 @@ InodeAllocator::Keep()
 {
 	ASSERT(fInode != NULL && fTransaction != NULL);
 
-	fInode->Node()->flags &= ~INODE_NOT_READY;
+	fInode->Node()->flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_NOT_READY);
 	status_t status = fInode->WriteBack(fTransaction);
 
 	fTransaction = NULL;
@@ -143,7 +144,7 @@ InodeAllocator::Keep()
 status_t 
 bfs_inode::InitCheck(Volume *volume)
 {
-	if (flags & INODE_NOT_READY) {
+	if (Flags() & INODE_NOT_READY) {
 		// the other fields may not yet contain valid values
 		return B_BUSY;
 	}
@@ -1820,7 +1821,7 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	// You can't unlink a mounted or the VM file while it is being used - while
+	// You can't unlink a mounted image or the VM file while it is being used - while
 	// this is not really necessary, it copies the behaviour of the original BFS
 	// and let you and me feel a little bit safer
 	if (inode->Flags() & INODE_NO_CACHE)
