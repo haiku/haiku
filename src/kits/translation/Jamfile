@@ -11,3 +11,7 @@ SharedLibrary translation :
 LinkSharedOSLibs libtranslation.so :
 	be
 ;
+
+Package openbeos-translationkit-cvs :
+	libtranslation.so :
+	boot home config lib ;

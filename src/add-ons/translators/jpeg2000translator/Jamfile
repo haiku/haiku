@@ -58,3 +58,8 @@ Translator JPEG2000Translator :
 	;
 
 LinkSharedOSLibs JPEG2000Translator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	JPEG2000Translator :
+	boot home config add-ons Translators ;
+

@@ -40,3 +40,8 @@ Translator TIFFTranslator :
 	TIFFWindow.cpp ;
 
 LinkSharedOSLibs TIFFTranslator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	TIFFTranslator :
+	boot home config add-ons Translators ;
+

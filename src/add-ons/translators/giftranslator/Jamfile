@@ -16,3 +16,8 @@ Translator GIFTranslator :
  ;
 
 LinkSharedOSLibs GIFTranslator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	GIFTranslator :
+	boot home config add-ons Translators ;
+

@@ -52,3 +52,7 @@ Translator PNGTranslator :
 
 LinkSharedOSLibs PNGTranslator : be translation ;
 
+Package openbeos-translationkit-cvs :
+	PNGTranslator :
+	boot home config add-ons Translators ;
+

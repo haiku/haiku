@@ -3,3 +3,9 @@ SubDir OBOS_TOP src add-ons translators ppmtranslator ;
 Translator PPMTranslator : PPMMain.cpp PPMTranslator.cpp colorspace.cpp ;
 
 LinkSharedOSLibs PPMTranslator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	PPMTranslator :
+	boot home config add-ons Translators ;
+
+

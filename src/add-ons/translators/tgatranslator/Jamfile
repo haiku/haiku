@@ -3,3 +3,8 @@ SubDir OBOS_TOP src add-ons translators tgatranslator ;
 Translator TGATranslator : StreamBuffer.cpp TGATranslatorSettings.cpp TGAMain.cpp TGATranslator.cpp TGAView.cpp TGAWindow.cpp ;
 
 LinkSharedOSLibs TGATranslator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	TGATranslator :
+	boot home config add-ons Translators ;
+
