@@ -45,6 +45,7 @@ class MouseSettings {
 		~MouseSettings();
 
 		void Revert();
+		void Defaults();
 		void Dump();
 
 		BPoint WindowPosition() const { return fWindowPosition; }
@@ -62,8 +63,10 @@ class MouseSettings {
 		int32 AccelerationFactor() const { return fSettings.accel.accel_factor; }
 		void SetAccelerationFactor(int32 factor);
 
-		void Mapping(uint32 &first, uint32 &second, uint32 &third) const;
-		void SetMapping(uint32 first, uint32 second, uint32 third);
+		uint32 Mapping(int32 index) const;
+		void Mapping(mouse_map &map) const;
+		void SetMapping(int32 index, uint32 button);
+		void SetMapping(mouse_map &map);
 
 		mode_mouse MouseMode() const { return fMode; }
 		void SetMouseMode(mode_mouse mode);

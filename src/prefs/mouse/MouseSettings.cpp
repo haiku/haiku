@@ -15,15 +15,14 @@
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-#include <Application.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
-#include <String.h>
+#include <View.h>
+
 #include <stdio.h>
 
 #include "MouseSettings.h"
-#include "MouseMessages.h"
 
 
 // The R5 settings file differs from that of OpenBeOS;
@@ -31,6 +30,11 @@
 #define R5_COMPATIBLE 1
 
 static const char kMouseSettingsFile[] = "Mouse_settings";
+
+static const bigtime_t kDefaultClickSpeed = 500000;
+static const int32 kDefaultMouseSpeed = 65536;
+static const int32 kDefaultMouseType = 3;	// 3 button mouse
+static const int32 kDefaultAccelerationFactor = 65536;
 
 
 MouseSettings::MouseSettings()
@@ -165,6 +169,28 @@ MouseSettings::Dump()
 #endif
 
 
+/**	Resets the settings to the system defaults
+ */
+
+void
+MouseSettings::Defaults()
+{
+	SetClickSpeed(kDefaultClickSpeed);
+	SetMouseSpeed(kDefaultMouseSpeed);
+	SetMouseType(kDefaultMouseType);
+	SetAccelerationFactor(kDefaultAccelerationFactor);
+	SetMouseMode(B_NORMAL_MOUSE);
+
+	mouse_map map;
+	if (get_mouse_map(&map) == B_OK) {
+		map.button[0] = B_PRIMARY_MOUSE_BUTTON;
+		map.button[1] = B_SECONDARY_MOUSE_BUTTON;
+		map.button[2] = B_TERTIARY_MOUSE_BUTTON;
+		SetMapping(map);
+	}
+}
+
+
 /**	Reverts to the active settings at program startup
  */
 
@@ -230,26 +256,34 @@ MouseSettings::SetAccelerationFactor(int32 factor)
 }
 
 
-void 
-MouseSettings::Mapping(uint32 &first, uint32 &second, uint32 &third) const
+uint32
+MouseSettings::Mapping(int32 index) const
 {
-	first = fSettings.map.button[0];
-	second = fSettings.map.button[1];
-	third = fSettings.map.button[2];
+	return fSettings.map.button[index];
+}
+
+
+void 
+MouseSettings::Mapping(mouse_map &map) const
+{
+	map = fSettings.map;
+}
+
+
+void 
+MouseSettings::SetMapping(int32 index, uint32 button)
+{
+	fSettings.map.button[index] = button;
+	if (set_mouse_map(&fSettings.map) != B_OK)	// message better for syslog?
+		fprintf(stderr, "could not set mouse mapping\n");
 }
 
 
 void
-MouseSettings::SetMapping(uint32 first, uint32 second, uint32 third)
+MouseSettings::SetMapping(mouse_map &map)
 {
-	mouse_map map;
-	if (get_mouse_map(&map) == B_OK) {
-		map.button[0] = first;
-		map.button[1] = second;
-		map.button[2] = third;
-		if (set_mouse_map(&map) == B_OK)
-			fSettings.map = map;
-	}
+	if (set_mouse_map(&map) == B_OK)
+		fSettings.map = map;
 }
 
 
