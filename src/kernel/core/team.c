@@ -3,9 +3,7 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -27,8 +25,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRACE_TEAM 0
-#if TRACE_TEAM
+//#define TRACE_TEAM
+#ifdef TRACE_TEAM
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -506,7 +504,7 @@ team_create_team2(void *args)
 	t = thread_get_current_thread();
 	team = t->team;
 
-	dprintf("team_create_team2: entry thread %ld\n", t->id);
+	TRACE(("team_create_team2: entry thread %ld\n", t->id));
 
 	// create an initial primary stack region
 
@@ -533,7 +531,9 @@ team_create_team2(void *args)
 	uspa = (struct uspace_program_args *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
 	udest = (char  *)(uargs + teamArgs->argc + 1);
-//	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
+
+	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, totalSize = %lu\n",
+		t->user_stack_base, uargs, udest, totalSize));
 
 	for (arg_cnt = 0; arg_cnt < teamArgs->argc; arg_cnt++) {
 		uargs[arg_cnt] = udest;
@@ -544,7 +544,9 @@ team_create_team2(void *args)
 	team->user_env_base = t->user_stack_base + STACK_SIZE + TLS_SIZE;
 	uenv  = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
-//	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp);
+
+	TRACE(("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp));
+
 	for (env_cnt = 0; env_cnt < teamArgs->envc; env_cnt++) {
 		size_t length = strlen(teamArgs->envp[env_cnt]) + 1;
 		udest -= length;
@@ -566,7 +568,7 @@ team_create_team2(void *args)
 		kfree_strings_array(teamArgs->envp, teamArgs->envc);
 
 	path = teamArgs->path;
-	dprintf("team_create_team2: loading elf binary '%s'\n", path);
+	TRACE(("team_create_team2: loading elf binary '%s'\n", path));
 
 	err = elf_load_uspace("/boot/libexec/rld.so", team, 0, &entry);
 	if (err < 0){
@@ -578,7 +580,7 @@ team_create_team2(void *args)
 	free(teamArgs->path);
 	free(teamArgs);
 
-	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
+	TRACE(("team_create_team2: loaded elf. entry = 0x%lx\n", entry));
 
 	team->state = TEAM_STATE_NORMAL;
 
@@ -601,7 +603,8 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 //	int sem_retcode;
 	struct team_arg *teamArgs;
 
-	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
+	TRACE(("team_create_team: entry '%s', name '%s' args = %p argc = %d\n",
+		path, name, args, argc));
 
 	team = create_team_struct(name, false);
 	if (team == NULL)
@@ -854,7 +857,7 @@ sys_setenv(const char *name, const char *value, int overwrite)
 
 	// ToDo: please put me out of the kernel into libroot.so!
 
-	dprintf("sys_setenv: entry (name=%s, value=%s)\n", name, value);
+	TRACE(("sys_setenv: entry (name=%s, value=%s)\n", name, value));
 
 	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
 		return -1;
@@ -878,7 +881,8 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	if (!var_exists)
 		var_pos = envc;
 
-	dprintf("sys_setenv: variable does%s exist\n", var_exists ? "" : " not");
+	TRACE(("sys_setenv: variable does%s exist\n", var_exists ? "" : " not"));
+
 	if ((!var_exists) || (var_exists && overwrite)) {
 		// XXX- make a better allocator
 		if (var_exists) {
@@ -911,7 +915,7 @@ sys_setenv(const char *name, const char *value, int overwrite)
 			}
 		}
 	}
-	dprintf("sys_setenv: variable set.\n");
+	TRACE(("sys_setenv: variable set.\n"));
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);

@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 //#define TRACE_THREAD
-#if TRACE_THREAD
+#ifdef TRACE_THREAD
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -594,7 +594,7 @@ get_death_stack(void)
 		bit >>= 1;
 	}
 
-//	dprintf("get_death_stack: returning 0x%lx\n", death_stacks[i].address);
+	TRACE(("get_death_stack: returning 0x%lx\n", death_stacks[i].address));
 
 	return i;
 }
@@ -603,7 +603,7 @@ get_death_stack(void)
 static void
 put_death_stack_and_reschedule(unsigned int index)
 {
-//	dprintf("put_death_stack...: passed %d\n", index);
+	TRACE(("put_death_stack...: passed %d\n", index));
 
 	if (index >= num_death_stacks)
 		panic("put_death_stack: passed invalid stack index %d\n", index);
@@ -662,11 +662,13 @@ thread_exit2(void *_args)
 	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
 
 	// delete the old kernel stack region
-	TRACE(("thread_exit2: deleting old kernel stack id 0x%x for thread 0x%x\n", args.old_kernel_stack, args.t->id));
+	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
+		args.old_kernel_stack, args.t->id));
+
 	delete_area(args.old_kernel_stack);
 
 	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread 0x%x from global lists\n", args.t->id));
+	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.t->id));
 
 	disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -767,7 +769,7 @@ thread_exit(void)
 		vm_aspace_swap(team_get_kernel_team()->kaspace);
 		restore_interrupts(state);
 
-//		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
+		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", t->id));
 	}
 
 	// delete the team if we're its main thread
@@ -868,9 +870,9 @@ thread_atkernel_entry(void)
 	struct thread *t;
 	bigtime_t now;
 
-//	dprintf("thread_atkernel_entry: entry thread 0x%x\n", t->id);
-
 	t = thread_get_current_thread();
+
+	TRACE(("thread_atkernel_entry: entry thread 0x%lx\n", t->id));
 
 	state = disable_interrupts();
 
@@ -896,7 +898,7 @@ thread_atkernel_exit(void)
 	struct thread *t;
 	bigtime_t now;
 
-//	dprintf("thread_atkernel_exit: entry\n");
+	TRACE(("thread_atkernel_exit: entry\n"));
 
 	t = thread_get_current_thread();
 
@@ -994,7 +996,7 @@ thread_init(kernel_args *ka)
 	struct thread *t;
 	unsigned int i;
 
-//	dprintf("thread_init: entry\n");
+	TRACE(("thread_init: entry\n"));
 
 	// create the thread hash table
 	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
@@ -1476,8 +1478,8 @@ wait_for_thread(thread_id id, status_t *_returnCode)
 
 		if (_returnCode) {
 			t = thread_get_current_thread();
-			dprintf("wait_for_thread: thread %ld got return code 0x%x\n",
-				t->id, t->sem_deleted_retcode);
+			TRACE(("wait_for_thread: thread %ld got return code 0x%x\n",
+				t->id, t->sem_deleted_retcode));
 			*_returnCode = t->sem_deleted_retcode;
 		}
 	}
