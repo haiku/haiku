@@ -1,0 +1,89 @@
+<HTML>
+<!-- $Id: BPolygonUseCases.html,v 1.1 2002/10/28 02:50:08 jrand Exp $ -->
+<HEAD>
+<TITLE>BPolygon Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BPolygon Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BPolygon interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BPolygon Interface</A></LI>
+<LI><A HREF="#usecases">BPolygon Use Cases</A></LI>
+<LI><A HREF="#implement">BPolygon Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BPolygon Interface:</H2>
+
+<P>The BPolygon class is used to hold information about a shape composed of a series of straight
+lines (ie a polygon).  On its own, it just describes the shape and can only be drawn by passing
+it to a BView.  The best source of source of information for the BPolygon interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Interface%20Kit/Polygon.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BPolygon Use Cases:</H2>
+
+<P>The following use cases cover the BPolygon functionality:</P>
+
+<OL>
+<LI><P><B>Construction 1:</B> A BPolygon can be constructed without passing it any arguments.  When
+this is done, the polygon will have no points in it (ie no shape) until they are added through
+AddPoints().</P></LI>
+
+<LI><P><B>Construction 2:</B> A BPolygon can be constructed by passing it a pointer to an existing
+BPolygon (ie a copy constructor).  The resulting copy will have the exact same state as the 
+one passed in.  That means it will have the same number of points in the same locations resulting
+in the same shape.</P></LI>
+
+<LI><P><B>Construction 3:</B> A BPolygon can be constructed by passing it a pointer to an array of
+BPoints and an integer which describes the number of points in that array.  The BPolygon will be
+constructed such that it holds the shape described by that array of points.</P></LI>
+
+<LI><P><B>Destruction:</B> When a BPolygon is deconstructed any memory allocated in order to hold
+the state of the BPolygon is freed and the state of the polygon is lost.</P></LI>
+
+<LI><P><B>Add Points:</B> The AddPoints() member function appends a number of passed in points to
+the existing set of points already in the polygon.  It takes a pointer to an array of BPoints and
+an integer count of the number of points to append.  This is similar to the "Construction 3" use 
+case except in that case there is no existing points so the passed in points describe the entire
+polygon.</P></LI>
+
+<LI><P><B>Count Points:</B> The CountPoints() member function returns the number of points which
+describe the polygon.  The result is an integer.</P></LI>
+
+<LI><P><B>Frame:</B> The Frame() member function returns the smallest BRect which contains all of
+the points which describes the BPolygon.</P></LI>
+
+<LI><P><B>Map To:</B> The MapTo() member function applies a translation (ie move) and a scale (ie
+grow/shrink) operation to the existing polygon, adjusting all points according to the passed in
+rule.  The operation to apply depends on two passed in BRect's.  The translation and scale 
+adjustment which turns the first BRect into the second BRect is applied to all points in the
+BPolygon.</P></LI>
+
+<LI><P><B>Print To Stream:</B> The PrintToStream() member function sends the set of points which
+make up the BPolygon to standard output.  It does so by performing a PrintToStream() on the
+individual BPoint's which make up the polygon.  This member is generally used for debugging and
+the output is primarily human readable and not sensitive to changes which could risk backward
+compatibility.</P></LI>
+
+<LI><P><B>Assignment Operator</B> The operator=() operator is defined for BPolygon's.  It takes
+a source BPolygon and assigns it to another existing BPolygon target.  The state of the target
+BPolygon is lost and replaced with that of the source.  The source retains its state so the outcome
+is two BPolygons with the same state (ie set of points).</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BPolygon Implementation:</H2>
+
+<P>Internally, the BPolygon contains an array of BPoint's which it uses to track the shape it
+holds.  The implementation of BPolygon is fairly simple since it is a fairly basic container
+class for a set of points.</P>
+
+</BODY>
+</HTML>
