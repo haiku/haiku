@@ -274,7 +274,8 @@ void ServerApp::WindowBroadcast(int32 code)
 	for(int32 i=0; i<count; i++)
 	{
 		ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
-		sw->PostMessage(code);
+		BMessage		msg(B_QUIT_REQUESTED);
+		sw->SendMessageToClient(&msg);
 	}
 	desktop->fLayerLock.Unlock();
 }
@@ -517,7 +518,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<port_id>(&looperPort);
 			msg->ReadString(&title);
 			msg->Read<port_id>(&replyport);
-			
+
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port

@@ -39,6 +39,7 @@ class PortMessage;
 class BList;
 class DisplayDriver;
 class ServerCursor;
+class ServerBitmap;
 
 /*!
 	\class ServerApp ServerApp.h
@@ -81,7 +82,7 @@ protected:
 	friend class ServerWindow;
 	
 	void _DispatchMessage(PortMessage *msg);
-	ServerBitmap *_FindBitmap(int32 token);
+	ServerBitmap* _FindBitmap(int32 token);
 	
 	port_id	fClientAppPort,
 			fMessagePort,
