@@ -35,7 +35,17 @@ static void nv_acc_assert_fifo_dma(void);
 status_t nv_acc_wait_idle_dma()
 {
 	/* wait until engine completely idle */
-	//fixme: add dma buffer state checking stuff here..
+
+	/* wait until all upcoming commands are in execution at least */
+	while (NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
+			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])
+			!= (si->engine.dma.put << 2))
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100);
+	}
+
+	/* wait until execution completed */
 	while (ACCR(STATUS))
 	{
 		/* snooze a bit so I do not hammer the bus */
@@ -53,7 +63,10 @@ status_t nv_acc_init_dma()
 	//fixme: move to shared info:
 	uint32 max;
 
-//chk power-up cycle if probs
+	/* a hanging engine only recovers from a complete power-down/power-up cycle */
+	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	snooze(1000);
+	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
 	/* setup PTIMER: */
 	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
@@ -632,7 +645,8 @@ status_t nv_acc_init_dma()
 	/* initialize our local pointers */
 	nv_acc_assert_fifo_dma();
 
-	/* we have put no cmd's in the DMA buffer yet (the above one's execute instantly) */
+	/* we have issued no DMA cmd's to the engine yet: the above ones are still
+	 * awaiting execution start. */
 	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 16 */
 	si->engine.dma.current = 16;
@@ -649,6 +663,8 @@ status_t nv_acc_init_dma()
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
 	//       space in between both functions as errors might hang the engine!
 
+	/* tell the engine to fetch the commands in the DMA buffer that where not
+	 * executed before. */
 	nv_start_dma();
 
 	return B_OK;
@@ -675,7 +691,7 @@ static void nv_start_dma(void)
 			(si->engine.dma.put << 2);
 	}
 //test:
-for (dummy = 0; dummy < 10; dummy++)
+for (dummy = 0; dummy < 2; dummy++)
 {
 	LOG(4,("ACC_DMA: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
 		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
@@ -686,6 +702,10 @@ for (dummy = 0; dummy < 10; dummy++)
 
 static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 {
+	//fixme: implement buffer wraparounds.. (buffer resets when full)
+	//for now only executing the first commands issued and drop exec after;
+	//this offers testing options already (depending on how much windows are visible,
+	//exec remains going say 30 seconds to a few minutes if only blits are enabled.
 //	if (si->dma.free >= cmd_size) return B_OK;
 	if ((si->engine.dma.current + cmd_size) < 8191) return B_OK;
 
@@ -786,13 +806,18 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed. */
 	//fixme: testing..
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	if (nv_acc_fifofree_dma(4) != B_OK) return B_ERROR;
 
 	/* now setup blit (writing 4 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((ys << 16) | xs); /* SourceOrg */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((yd << 16) | xd); /* DestOrg */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = (((h + 1) << 16) | (w + 1)); /* HeightWidth */
+
+	/* tell the engine to fetch the commands in the DMA buffer that where not
+	 * executed before. At this time the setup done by nv_acc_setup_blit_dma() is
+	 * also executed on the first call of nv_acc_blit_dma(). */
+	nv_start_dma();
 
 	return B_OK;
 }
