@@ -342,6 +342,9 @@ BlockAllocator::Initialize(bool full)
 	if (!full)
 		return B_OK;
 
+	fLock.Lock();
+		// the lock will be released by the initialize() function
+
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::initialize,
 			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
 	if (id < B_OK)
@@ -401,7 +404,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 status_t 
 BlockAllocator::initialize(BlockAllocator *allocator)
 {
-	Locker lock(allocator->fLock);
+	// The lock must already be held at this point!
 
 	Volume *volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
@@ -409,8 +412,10 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 	off_t freeBlocks = 0;
 
 	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
-	if (buffer == NULL)
+	if (buffer == NULL) {
+		allocator->fLock.Unlock();
 		RETURN_ERROR(B_NO_MEMORY);
+	}
 
 	AllocationGroup *groups = allocator->fGroups;
 	off_t offset = 1;
@@ -470,6 +475,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 		volume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 	}
 
+	allocator->fLock.Unlock();
 	return B_OK;
 }
 
