@@ -3,6 +3,9 @@ SubDir OBOS_TOP src kits network libsocket ;
 UsePrivateHeaders net ;
 
 {
+	# Default libs include BeOS R5 libnet.so, something we don't want here!
+	LINKFLAGS on libsocket.so = [ on libsocket.so return $(LINKFLAGS) ] -nodefaultlibs ;
+
 	local defines ;
 	if $(BONE_VERSION) {
 		defines += BONE_VERSION ;
