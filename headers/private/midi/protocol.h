@@ -8,19 +8,19 @@
 #ifndef MIDI_PROTOCOL_H
 #define MIDI_PROTOCOL_H
 
-// MIME signature of the midi_server application. */
+// MIME signature of the midi_server application.
 #define MIDI_SERVER_SIGNATURE  "application/x-vnd.OpenBeOS.midi-server"
 
-// Timeout for delivering and responding to messages (microseconds). */
+// Timeout for delivering and responding to messages (microseconds).
 #define TIMEOUT  2000000
 
-// Received when a new app starts using the Midi Kit. */
+// Received when a new app starts using the Midi Kit.
 #define MSG_REGISTER_APP  'Mapp'
 
-// Sent when we have completed a "register app" request. */
+// Sent when we have completed a "register app" request.
 #define MSG_APP_REGISTERED  'mAPP'
 
-// Received when an app creates a new local endpoint. */
+// Received when an app creates a new local endpoint.
 #define MSG_CREATE_ENDPOINT  'Mnew'
 
 // Sent to all other applications when an app creates a 
@@ -28,7 +28,7 @@
 // with the midi_server (MSG_REGISTER_APP). 
 #define MSG_ENDPOINT_CREATED  'mNEW'
 
-// Received when an app deletes a local endpoint. */
+// Received when an app deletes a local endpoint.
 #define MSG_DELETE_ENDPOINT  'Mdel'
 
 // The midi_server sends this message to itself when an app 
