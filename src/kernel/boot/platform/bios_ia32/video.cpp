@@ -313,6 +313,10 @@ video_mode_menu()
 extern "C" void
 platform_switch_to_logo(void)
 {
+	// in debug mode, we'll never show the logo
+	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
+		return;
+
 	if (!sVesaCompatible || sMode == NULL)
 		// no logo for now...
 		return;
@@ -322,28 +326,34 @@ platform_switch_to_logo(void)
 
 	gKernelArgs.frame_buffer.enabled = 1;
 
-	if (gKernelArgs.frame_buffer.physical_buffer.start == 0) {
-		// the graphics memory has not been mapped yet!
-		struct vbe_mode_info modeInfo;
-		if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK) {
-			platform_switch_to_text_mode();
-			return;
-		}
+	struct vbe_mode_info modeInfo;
+	if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK) {
+		platform_switch_to_text_mode();
+		return;
+	}
 
-		gKernelArgs.frame_buffer.width = modeInfo.width;
-		gKernelArgs.frame_buffer.height = modeInfo.height;
-		gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
-		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
-			* gKernelArgs.frame_buffer.height * (gKernelArgs.frame_buffer.depth / 8);
-		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
+	addr_t lastBase = gKernelArgs.frame_buffer.physical_buffer.start;
+
+	gKernelArgs.frame_buffer.width = modeInfo.width;
+	gKernelArgs.frame_buffer.height = modeInfo.height;
+	gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
+	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+		* gKernelArgs.frame_buffer.height * (gKernelArgs.frame_buffer.depth / 8);
+	gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
+
+	// ToDo: we assume that physical base is constant through the different resolutions
+	// ToDo: this is broken - if the newly chosen video mode is larger than the old one
+	//	the boot loader will crash while trying to access unmapped memory
+	if (lastBase == 0) {
+		// the graphics memory has not been mapped yet!
 		sFrameBuffer = mmu_map_physical_memory(modeInfo.physical_base,
 							gKernelArgs.frame_buffer.physical_buffer.size, 0x03);
-
-		// clear the video memory
-		// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
-		//	at least booting with Qemu looks ugly when this is missing
-		memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 	}
+
+	// clear the video memory
+	// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
+	//	at least booting with Qemu looks ugly when this is missing
+	memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 
 	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
 		dprintf("set palette failed!\n");
