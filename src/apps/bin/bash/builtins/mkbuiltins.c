@@ -1148,7 +1148,7 @@ write_file_headers (structfile, externfile)
 	fprintf (structfile, "%s\n", structfile_header[i]);
 
       fprintf (structfile, "#include \"%s\"\n",
-	       extern_filename ? extern_filename : "builtext.h");
+	       /*extern_filename ? extern_filename : */"builtext.h");
       fprintf (structfile, "\nstruct builtin static_shell_builtins[] = {\n");
     }
 
