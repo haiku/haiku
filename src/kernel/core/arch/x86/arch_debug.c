@@ -1,19 +1,18 @@
 /* 
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
-#include <debug.h>
-#include <arch/debug.h>
 #include <Errors.h>
-
-#include <kernel.h>
-#include <thread.h>
 #include <debug.h>
+#include <thread.h>
 #include <elf.h>
 #include <arch/debug.h>
-#include <arch/x86/arch_cpu.h>
+
+#include <arch_cpu.h>
 
 
 #define NUM_PREVIOUS_LOCATIONS 16
@@ -61,8 +60,16 @@ dbg_stack_trace(int argc, char **argv)
 		dprintf("iframe %p %p %p\n", temp, temp + sizeof(struct iframe), temp + sizeof(struct iframe) - 8);
 	}
 
-	dprintf("stack trace for thread 0x%lx '%s'\n", t->id, t->name);
-	dprintf("frame      caller     <image>:function + offset\n");
+	dprintf("stack trace for thread 0x%lx \"%s\"\n", t->id, t->name);
+
+	dprintf("    kernel stack: %p to %p\n", 
+		(void *)t->kernel_stack_base, (void *)(t->kernel_stack_base + KSTACK_SIZE));
+	if (t->user_stack_base != 0) {
+		dprintf("      user stack: %p to %p\n", (void *)t->user_stack_base,
+			(void *)(t->user_stack_base + t->user_stack_size));
+	}
+
+	dprintf("frame            caller     <image>:function + offset\n");
 
 	read_ebp(ebp);
 	for (;;) {
@@ -79,21 +86,23 @@ dbg_stack_trace(int argc, char **argv)
 			struct iframe *frame = (struct iframe *)(ebp + 8);
 
 			dprintf("iframe at %p\n", frame);
-			dprintf(" eax\t0x%x\tebx\t0x%x\tecx\t0x%x\tedx\t0x%x\n", frame->eax, frame->ebx, frame->ecx, frame->edx);
-			dprintf(" esi\t0x%x\tedi\t0x%x\tebp\t0x%x\tesp\t0x%x\n", frame->esi, frame->edi, frame->ebp, frame->esp);
-			dprintf(" eip\t0x%x\teflags\t0x%x", frame->eip, frame->flags);
+			dprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n", frame->eax, frame->ebx, frame->ecx, frame->edx);
+			dprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n", frame->esi, frame->edi, frame->ebp, frame->esp);
+			dprintf(" eip 0x%-9x eflags 0x%-9x", frame->eip, frame->flags);
 			if ((frame->error_code & 0x4) != 0) {
 				// from user space
-				dprintf("\tuser esp\t0x%x", frame->user_esp);
+				dprintf("user esp 0x%x", frame->user_esp);
 			}
 			dprintf("\n");
-			dprintf(" vector\t0x%x\terror code\t0x%x\n", frame->vector, frame->error_code);
+			dprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
  			ebp = frame->ebp;
 		} else {
 			uint32 eip = *((uint32 *)ebp + 1);
 			const char *symbol, *image;
+			uint32 nextEbp = *(uint32 *)ebp;
 			addr_t baseAddress;
 			bool exactMatch;
+			uint32 diff = nextEbp - ebp;
 
 			if (eip == 0 || ebp == 0)
 				break;
@@ -101,16 +110,16 @@ dbg_stack_trace(int argc, char **argv)
 			if (elf_lookup_symbol_address(eip, &baseAddress, &symbol,
 					&image, &exactMatch) == B_OK) {
 				if (symbol != NULL) {
-					dprintf("%08lx   %08lx   <%s>:%s + 0x%04lx%s\n", ebp, eip,
+					dprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
 						image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
 				} else {
-					dprintf("%08lx   %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, eip,
+					dprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff, eip,
 						image, (void *)baseAddress, eip - baseAddress);
 				}
 			} else
 				dprintf("%08lx   %08lx\n", ebp, eip);
 
-			ebp = *(uint32 *)ebp;
+			ebp = nextEbp;
 		}
 
 		if (already_visited(previousLocations, &last, &num, ebp)) {
