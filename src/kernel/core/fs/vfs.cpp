@@ -28,7 +28,6 @@
 #include <file_cache.h>
 #include <khash.h>
 #include <lock.h>
-#include <kerrors.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
 #include <util/kernel_cpp.h>
@@ -4667,7 +4666,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		}
 
 		if (covered_vnode->mount->root_vnode == covered_vnode) {
-			err = ERR_VFS_ALREADY_MOUNTPOINT;
+			err = B_BUSY;
 			goto err5;
 		}
 
@@ -4750,7 +4749,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	if (mount->root_vnode != vnode) {
 		// not mountpoint
 		put_vnode(vnode);
-		return ERR_VFS_NOT_MOUNTPOINT;
+		return B_BAD_VALUE;
 	}
 
 	// if the volume is associated with a partition, lock the device of the
