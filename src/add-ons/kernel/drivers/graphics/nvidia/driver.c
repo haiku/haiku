@@ -120,7 +120,7 @@ static uint16 nvidia_device_list[] = {
 	0x00c0,	/* Nvidia unknown FX */
 	0x00c1,	/* Nvidia unknown FX */
 	0x00f8,	/* Nvidia Quadro FX 3400 PCIe(?) */
-	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe(?) */
+	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
 	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
 	0x00fb,	/* Nvidia GeForce PCX 5900 PCIe */
 	0x00fc,	/* Nvidia GeForce PCX 5300 PCIe */
