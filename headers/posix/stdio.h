@@ -104,6 +104,11 @@ extern fpos_t	_ftell(FILE *stream);
 
 extern void		rewind(FILE *stream);
 
+extern void		setbuf (FILE *file, char *buff);
+extern int		setvbuf(FILE *file, char *buff, int mode, size_t size);
+extern int		setbuffer(FILE *stream, char *buf, size_t size);
+extern int 	    	setlinebuf(FILE *stream);
+
 extern size_t	fwrite(const void *buffer, size_t size, size_t numItems, FILE *stream);
 extern size_t	fread(void *buffer, size_t size, size_t numItems, FILE *stream);
 
