@@ -327,10 +327,6 @@ get_boot_file_system(stage2_args *args)
 	Directory *fileSystem;
 	status_t status = partition->Mount(&fileSystem);
 	
-	gPartitions.Remove(partition);
-		// let's remove that partition, so that it is not scanned again
-		// in mount_file_systems()
-
 	if (status < B_OK) {
 		// this partition doesn't contain any known file system; we
 		// don't need it anymore
@@ -355,6 +351,10 @@ mount_file_systems(stage2_args *args)
 
 	Partition *partition = NULL;
 	while ((partition = (Partition *)iterator.Next()) != NULL) {
+		// don't scan known partitions again
+		if (partition->IsFileSystem())
+			continue;
+
 		// remove the partition if it doesn't contain a (known) file system
 		if (partition->Scan(true) != B_OK && !partition->IsFileSystem()) {
 			gPartitions.Remove(partition);
