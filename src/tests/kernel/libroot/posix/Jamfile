@@ -4,6 +4,12 @@ UsePrivateHeaders syslog_daemon ;
 
 SimpleTest SyslogTest
 	: SyslogTest.cpp syslog.cpp
+	: libroot.so
+	;
+
+SimpleTest flock_test
+	: flock_test.cpp
+	: libroot.so
 	;
 
 # Tell Jam where to find these sources
