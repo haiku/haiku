@@ -55,62 +55,62 @@ public:
 static property_info
 sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
+	{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
 		"otherwise." },
 	
 	{ "Enabled", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item." },
+	{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item." },
 	
 	{ "Label", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item." },
+	{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item." },
 	
 	{ "Label", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item." },
+	{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item." },
 	
 	{ "Mark", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
+	{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
 		"is marked; false otherwise." },
 	
 	{ "Mark", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem." },
+	{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem." },
 	
 	{ "Menu", { B_CREATE_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
 		"sent by the item)." },
 	
 	{ "Menu", { B_DELETE_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the selected menu or menus." },
 
 	{ "Menu", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack." },
 	
 	{ "MenuItem", { B_COUNT_PROPERTIES, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu." },
+	{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu." },
 	
 	{ "MenuItem", { B_CREATE_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
 		"sent by the item)." },
 	
 	{ "MenuItem", { B_DELETE_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the specified menu item from its parent menu." },
 	
 	{ "MenuItem", { B_EXECUTE_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Invokes the specified menu item." },
 	
 	{ "MenuItem", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack." },
-	{}
+	{0}
 };
 
 
@@ -430,8 +430,8 @@ BMenu::ItemAt(int32 index) const
 BMenu *
 BMenu::SubmenuAt(int32 index) const
 {
-	BMenuItem *tempItem=static_cast<BMenuItem *>(fItems.ItemAt(index));
-	return (tempItem) ? tempItem->Submenu() : NULL;
+	BMenuItem *item = static_cast<BMenuItem *>(fItems.ItemAt(index));
+	return (item != NULL) ? item->Submenu() : NULL;
 }
 
 
@@ -446,7 +446,7 @@ int32
 BMenu::IndexOf(BMenu *submenu) const
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++)
-		if (static_cast<BMenuItem *>(fItems.ItemAt(i))->Submenu() == submenu)
+		if (ItemAt(i)->Submenu() == submenu)
 			return i;
 
 	return -1;
@@ -501,7 +501,7 @@ status_t
 BMenu::SetTargetForItems(BHandler *handler)
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++)
-		if (static_cast<BMenuItem *>(fItems.ItemAt(i))->SetTarget(handler) != B_OK)
+		if (ItemAt(i)->SetTarget(handler) < B_OK)
 			return B_ERROR;
 
 	return B_OK;
@@ -511,8 +511,8 @@ BMenu::SetTargetForItems(BHandler *handler)
 status_t
 BMenu::SetTargetForItems(BMessenger messenger)
 {
-	for (int32 i = 0; i < fItems.CountItems (); i++)
-		if (ItemAt(i)->SetTarget(messenger) != B_OK)
+	for (int32 i = 0; i < fItems.CountItems(); i++)
+		if (ItemAt(i)->SetTarget(messenger) < B_OK)
 			return B_ERROR;
 
 	return B_OK;
@@ -1163,12 +1163,12 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 {
 	ASSERT(item != NULL);
 	
-	item->SetSuper(this);
-
 	bool err = fItems.AddItem(item, index);
 
 	if (!err)
 		return err;
+
+	item->SetSuper(this);
 
 	// Make sure we update the layout in case we are already attached.
 	if (Window() && fResizeToFit) {
