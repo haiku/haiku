@@ -34,7 +34,7 @@
 #include <Clipboard.h>
 
 // Local Includes --------------------------------------------------------------
-#include "MoreUTF8.h"
+#include "moreUTF8.h"
 #include "UndoBuffer.h"
 
 
