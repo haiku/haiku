@@ -127,8 +127,9 @@
 #ifndef _DEVICE_MANAGER_H
 #define _DEVICE_MANAGER_H
 
-#include <module.h>
+#include <TypeConstants.h>
 #include <Drivers.h>
+#include <module.h>
 
 
 // type of I/O resource
@@ -155,6 +156,26 @@ typedef struct {
 		// ISA DMA channel: must be 1
 } io_resource;
 
+// attribute of device node
+typedef struct {
+	const char		*name;
+	type_code		type;			// for supported types, see value
+	union {
+		uint8		ui8;			// B_UINT8_TYPE
+		uint16		ui16;			// B_UINT16_TYPE
+		uint32		ui32;			// B_UINT32_TYPE
+		uint64		ui64;			// B_UINT64_TYPE
+		const char	*string;		// B_STRING_TYPE
+		struct {					// B_RAW_TYPE
+			void	*data;
+			size_t	len;
+		} raw;
+	} value;
+} pnp_node_attr;
+
+
+// handle of PnP node
+typedef struct pnp_node_info *pnp_node_handle;
 
 // handle of acquired I/O resource
 typedef struct io_resource_info *io_resource_handle;
@@ -162,6 +183,8 @@ typedef struct io_resource_info *io_resource_handle;
 // handle of node attribute
 typedef struct pnp_node_attr_info *pnp_node_attr_handle;
 
+
+typedef struct pnp_driver_info pnp_driver_info;
 
 // interface of PnP manager
 typedef struct device_manager_info {
@@ -356,5 +379,228 @@ typedef struct device_manager_info {
 	
 // modulename of PnP manager
 #define DEVICE_MANAGER_MODULE_NAME "sys/device_manager/v1"
+
+
+// former pnp_driver.h
+/*
+	Copyright (c) 2003-04, Thomas Kurschel
+
+	Required interface of PnP drivers
+
+	In contrast to standard BeOS drivers, PnP drivers are normal modules
+	having the interface described below.
+
+	Every device is described by its driver via a PnP node with properties
+	described in PnP Node Attributes. Devices are organized in a hierarchy, 
+	e.g. a devfs device is a hard disk device that is connected to a 
+	controller, which is a PCI device, that is connected to a PCI bus.
+	Every device is connected to its lower-level device	via a parent link 
+	stored in its Node. The higher-level is called the consumer of the 
+	lower-level device. If the lower-level device gets removed, all its 
+	consumers are removed too.
+
+	In our example, the hierarchy is
+
+	  devfs device -> hard disk -> controller -> PCI device -> PCI bus
+
+	If the PCI bus is removed, everything up to including the devfs device
+	is removed too.
+
+	The driver hierarchy is constructed bottom-up, i.e. the lower-level
+	driver searches for a corresponding consumer, which in turns searches
+	for its consumer and so on. The lowest driver is usually something like
+	a PCI bus, the highest driver is normally a devfs entry (see pnp_devfs.h).
+	Registration of devices and the search for appropriate consumers is 
+	done via the pnp_manager (see pnp_manager.h).
+
+	When a potential consumer is found, it gets informed about the new
+	lower-level device and can either refuse its handling or accept it.
+	On accept, it has to create a new node with the	lower-level device 
+	node as its parent.
+
+	Loading of drivers is done on demand, i.e. if the consumer wants to
+	access its lower-level device, it explicitely loads the corresponding 
+	driver, and once it doesn't need it anymore, the lower-level driver
+	must be unloaded. Usually, this process happens recursively, i.e. in
+	our example, the hard disk driver loads the controller driver, which 
+	loads the PCI device driver which loads the PCI bus driver. The same
+	process applies to unloading.
+
+	Because of this dynamic loading, drivers must store persistent data
+	in the node of their devices. Please be aware that you cannot modify
+	a node once published.
+
+	If a device gets removed, you must unregister its node. As said, the
+	PnP manager will automatically unregister all consumers too. The 
+	corresponding drivers are notified to stop talking to their	lower-level 
+	devices and to terminate running requests. Normally, you want to use a 
+	dedicated variable that	is verified at each call to make sure that the 
+	parent is still there. The notification is done independantly of the
+	driver being loaded by its consumer(s) or not. If it isn't loaded,
+	the notification callback gets NULL as the device cookie; normally, the
+	driver returns immediately in this case. As soon as both the device
+	is removed and the driver is unloaded, device_cleanup gets called to
+	free resources that couldn't be safely removed in device_removed when
+	the driver was still loaded.
+
+	If a device has exactly one consumer, they often interact in some way.
+	To simplify that, the consumer can pass a user-cookie to its parent
+	during load. In this case, it's up to the parent driver to get a 
+	pointer to the interface of the consumer. Effectively, such consumers
+	have one interface for their consumers (base on pnp_driver_info), and 
+	a another for their parents (with a completely driver-specific 
+	structure).
+
+	In terms of synchronization, loading/unloading/remove-notifications
+	are executed synchroniously, i.e. if e.g. a device is to be unloaded 
+	but	the drive currently handles a remove-notification, the unloading 
+	is delayed until the nofication callback returns. If multiple consumers
+	load a driver, the driver gets initialized only once; subsequent load
+	requests increase an internal load count only and return immediately.
+	In turn, unloading only happens once the load count reaches zero.
+*/
+
+
+// interface of PnP driver
+struct pnp_driver_info {
+	module_info minfo;
+
+	status_t	(*init_device)(pnp_node_handle node, void *user_cookie, void **cookie);
+		// driver is loaded.
+		// node - node of device
+		// user_cookie - cookie passed by loading driver
+		// cookie - cookie issued by this driver
+
+	status_t	(*uninit_device)(void *cookie);
+		// driver gets unloaded.
+	
+	status_t	(*probe)(pnp_node_handle parent);
+		// parent was added or is rescanned.
+		// check whether this parent is supported and register 
+		// any consumer device. Dynamic consumers must return
+		// B_OK if they support this parent. All other return
+		// values are ignored.
+
+	void		(*device_removed)(pnp_node_handle node, void *cookie);
+		// a device node, registered by this driver, got removed.
+		// if the driver wasn't loaded when this happenes, no (un)init_device 
+		// is called and thus <cookie> is NULL;
+
+	void		(*device_cleanup)(pnp_node_handle node);
+		// a device node, registered by this driver, got removed and
+		// the driver got unloaded
+};
+
+
+// standard attributes:
+
+// module name of driver (required, string)
+#define PNP_DRIVER_DRIVER "driver"
+// type of driver (required, string)
+#define PNP_DRIVER_TYPE "type"
+// module name of fixed consumer - see pnp_manager.h (optional, string)
+// append "/0", "/1" etc. if there are multiple fixed consumers
+#define PNP_DRIVER_FIXED_CONSUMER "consumer/fixed"
+// dynamic consumers pattern - see pnp_manager.h (optional, string)
+// append "/0", "/1" etc. if there are multiple dynamic consumers
+#define PNP_DRIVER_DYNAMIC_CONSUMER "consumer/dynamic"
+
+// connection of parent the device is attached to (optional, string)
+// there can be only one device per connection
+#define PNP_DRIVER_CONNECTION "connection"
+// pattern device identifier (optional, string)
+// it is expanded and used to detect changed devices
+#define PNP_DRIVER_DEVICE_IDENTIFIER "device_identifier"
+// driver must not be loaded during rescan (optional, uint8)
+// if != 0, driver must not be loaded during rescan 
+//          nor can rescan be started when driver is loaded
+// if the device uses I/O resources, you _must_ set this
+// flag as the rescan would always fail if the driver is loaded
+// due to resource contention
+#define PNP_DRIVER_NO_LIVE_RESCAN "no_live_rescan"
+// never rescan this device (optional, uint8)
+// if != 0, device is never checked during rescan
+#define PNP_DRIVER_NEVER_RESCAN "never_rescan"
+// keep driver loaded loaded (optional, uint8)
+// if != 0, the driver is loaded automatically whenever the node
+// is registered and unloaded whenever the node is unregistered.
+// if = 1, driver is temporarily unloaded during rescan
+// if = 2, driver is not unloaded during rescan
+// avoid the second case (2) as this makes replacing the driver
+// impossible without a reboot. 
+#define PNP_DRIVER_ALWAYS_LOADED "always_loaded"
+
+
+// former pnp_bus.h
+/*
+	Copyright (c) 2003-04, Thomas Kurschel
+
+	Required interface of PnP bus drivers
+
+	Busses consist of two node layers: the lower layer defines the bus,
+	the upper layer defines the abstract devices connected to the bus. 
+	Both layers are handled by a bus manager. Actual device nodes are 
+	on top of abstract device nodes.
+
+	E.g. if we have a PCI bus with an IDE controller on it, we get
+
+	IDE controller -> PCI device -> PCI bus
+
+	with:
+		IDE controller = actual device node
+		PCI device = abstract device node
+		PCI bus = bus node
+
+	The PCI bus manager establishes both the PCI devices and the PCI busses.
+
+	Abstract device nodes act as a gateway between actual device nodes
+	and the corresponding bus node. They are constructed by the bus 
+	node driver via	its rescan() hook. To identify a bus node, define
+	PNP_BUS_IS_BUS as an attribute of it. As a result, the PnP manager
+	will call the rescan() method of the bus driver whenever the
+	bus is to be rescanned. Afterwards, all possible dynamic consumers
+	are informed as done for normal nodes.
+
+	Normally, potential device drivers are notified immediately when 
+	rescan() registers a new abstract device node. But sometimes, device
+	drivers need to know _all_ devices connected to the bus for correct
+	detection. To ensure this, the bus node must define 
+	PNP_BUS_NOTIFY_CONSUMERS_AFTER_RESCAN. In this case, scanning for
+	consumers is postponed until rescan() has finished.
+
+	If hot-plugging of devices can be detected automatically (e.g. USB), 
+	you should define PNP_DRIVER_ALWAYS_LOADED, so the bus driver is 
+	always loaded and thus capable of handling hot-plug events generated 
+	by the bus controller hardware.
+*/
+
+
+// interface of PnP bus
+typedef struct pnp_bus_info {
+	pnp_driver_info	dinfo;
+	
+	// (re)scan bus and register all devices.
+	// driver is always loaded during this call, but other hooks may
+	// be called concurrently
+	status_t (*rescan) ( void *cookie );
+} pnp_bus_info;
+
+
+// standard attributes:
+
+// PnP bus identification (required, uint8)
+// define this to let the PnP manager know that this is a PnP bus
+// the actual content is ignored
+#define PNP_BUS_IS_BUS "bus/is_bus"
+
+// defer searching for consumers (optional, uint8)
+// if != 0, probe() of consumers is called after rescan() of bus
+//    else, probe() of consumers is called during rescan() of bus
+// normally, consumers are informed about a new device as soon as
+// it is registered by rescan(), i.e. not all devices may have been
+// detected and registered yet;
+// with this flag, detection of consumers is postponed until 
+// rescan() has finished, i.e. when all devices are registered
+#define PNP_BUS_DEFER_PROBE "bus/defer_probe"
 
 #endif	/* _DEVICE_MANAGER_H */
