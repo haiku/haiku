@@ -14,4 +14,4 @@ struct real_time_data {
 	uint32	system_time_conversion_factor;
 };
 
-#endif	/* _KRENEL_REAL_TIME_DATA_H */
+#endif	/* _KERNEL_REAL_TIME_DATA_H */
