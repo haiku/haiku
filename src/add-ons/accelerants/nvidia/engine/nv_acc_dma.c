@@ -31,6 +31,7 @@ blit
 static void nv_start_dma(void);
 static status_t nv_acc_fifofree_dma(uint16 cmd_size);
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size);
+static void nv_acc_set_ch_dma(uint16 ch, uint32 handle);
 
 /* used to track engine DMA stalls */
 static uint8 err;
@@ -78,7 +79,7 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
-	uint32 surf_depth, patt_depth, bmap_depth;
+	uint32 surf_depth, cmd_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
 
@@ -702,55 +703,30 @@ status_t nv_acc_init_dma()
 	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
 	/*** init FIFO via DMA command buffer. ***/
-	/* note:
-	 * we know there's space enough in the command buffer to issue these commands,
-	 * so no need to wait for room in there. */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH0 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[0]); /* Raster OPeration */
+	/* wait for room in fifo for new FIFO assigment cmds if needed: */
+	nv_acc_fifofree_dma(16);
 
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH1 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[1]); /* Clip */
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH2 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH3 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[3]); /* 2D Surface */
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH4 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[4]); /* Blit */
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH5 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH6 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+	/* program new FIFO assignments */
+	/* Raster OPeration: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH0, si->engine.fifo.handle[0]);
+	/* Clip: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH1, si->engine.fifo.handle[1]);
+	/* Pattern: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH2, si->engine.fifo.handle[2]);
+	/* 2D Surface: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH3, si->engine.fifo.handle[3]);
+	/* Blit: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
+	/* Bitmap: */
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
+	/* Line: (not used or 3D only?) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-//		(0x80000000 | si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
-		(0x80000000 | si->engine.fifo.handle[0]);
-
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-		(NV_GENERAL_FIFO_CH7 | (1 << 18));
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+//	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[0]);
+	/* Textured Triangle: (3D only) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-//		(0x80000000 | si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
-		(0x80000000 | si->engine.fifo.handle[0]);
-
-	/* update the current free space we have left in the DMA buffer */
-	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+//	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
+	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[0]);
 
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
 	//       space in between both functions as errors might hang the engine!
@@ -759,26 +735,25 @@ status_t nv_acc_init_dma()
 	{
 	case B_CMAP8:
 		surf_depth = 0x00000001;
-		patt_depth = 0x00000003;
-		bmap_depth = 0x00000003;
+		cmd_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
 	case B_RGB16_LITTLE:
 		surf_depth = 0x00000004;
-		patt_depth = 0x00000001;
-		bmap_depth = 0x00000001;
+		cmd_depth = 0x00000001;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
 		surf_depth = 0x00000006;
-		patt_depth = 0x00000003;
-		bmap_depth = 0x00000003;
+		cmd_depth = 0x00000003;
 		break;
 	default:
 		LOG(8,("ACC_DMA: init, invalid bit depth\n"));
 		return B_ERROR;
 	}
 
+	/* wait for room in fifo for surface setup cmd if needed */
+	nv_acc_fifofree_dma(5);
 	/* now setup 2D surface (writing 5 32bit words) */
 	nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 4);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = surf_depth; /* Format */
@@ -791,13 +766,17 @@ status_t nv_acc_init_dma()
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
 
+	/* wait for room in fifo for pattern colordepth setup cmd if needed */
+	nv_acc_fifofree_dma(2);
 	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
+	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
+	nv_acc_fifofree_dma(2);
 	/* set bitmap colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = bmap_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
@@ -836,44 +815,37 @@ for (dummy = 0; dummy < 2; dummy++)
 }
 }
 
+/* this routine does not check the engine's internal hardware FIFO, but the DMA
+ * command buffer. You can see this as a FIFO as well, that feeds the hardware FIFO.
+ * The hardware FIFO state is checked by the DMA hardware automatically. */
 static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 {
 	//test:
 	uint32 dummy;
 
+	/* check if the DMA buffer has enough room for the command */
 	if (si->engine.dma.free < cmd_size)
 	{
 		//test:
 		LOG(4,("ACC_FIFOFREE: level 1; free $%08x, max $%08x, current $%08x\n",
 			si->engine.dma.free, si->engine.dma.max, si->engine.dma.current ));
 
-		/* update to actual current situation (free is 'cached') */
-//		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
-		/* check again if we have enough space */
-//		if (si->engine.dma.free < cmd_size)
-		{
-			//test:
-			LOG(4,("ACC_FIFOFREE: level 2\n"));
+		/* not enough room left, so instruct DMA engine to reset the buffer when
+		 * it's done */
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
 
-			/* nope, so instruct DMA engine to reset the buffer when it's done */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
+		/* reset our buffer pointer, so new commands will be placed at the
+		 * beginning of the buffer. */
+		si->engine.dma.current = 0;
+		/* tell the engine to fetch the remaining command(s) in the DMA buffer
+		 * that where not executed before. */
+		nv_start_dma();
+		/* fixme if needed:
+		 * we are assuming here that a large part in the beginning of the DMA
+		 * cmd buffer is already processed. If this is not true, we need to wait
+		 * here until the engine becomes idle or so... */
 
-			/* reset our buffer pointer, so new commands will be placed at the
-			 * beginning of the buffer. */
-			si->engine.dma.current = 0;
-			/* tell the engine to fetch the remaining command(s) in the DMA buffer
-			 * that where not executed before. */
-			nv_start_dma();
-			/* fixme if needed:
-			 * we are assuming here that a large part in the beginning of the DMA
-			 * cmd buffer is already processed. If this is not true, we need to wait
-			 * here until the engine becomes idle or so... */
 //test:
-//nv_acc_wait_idle_dma();
-//	{
-		/* snooze a bit so I do not hammer the bus */
-//		snooze (100);
-//	}
 for (dummy = 0; dummy < 2; dummy++)
 {
 	LOG(4,("ACC_DMA_WRAP: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
@@ -881,9 +853,8 @@ for (dummy = 0; dummy < 2; dummy++)
 	LOG(4,("ACC_DMA_WRAP: put $%08x\n", (si->engine.dma.put << 2)));
 }
 
-			/* update the current free space we have left in the DMA buffer */
-			si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
-		}
+		/* update the current free space we have left in the DMA buffer */
+		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 	}
 
 	return B_OK;
@@ -906,8 +877,19 @@ static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
 		((si->engine.fifo.ch_ptr[cmd] + offset) & 0x0000fffc));
 
-	/* space left after issuing the current command is the cmd AND it's data less */
+	/* space left after issuing the current command is the cmd AND it's arguments less */
 	si->engine.dma.free -= (size + 1);
+}
+
+static void nv_acc_set_ch_dma(uint16 ch, uint32 handle)
+{
+	/* issue FIFO channel assign cmd */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((1 << 18) | ch);
+	/* set new assignment */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = (0x80000000 | handle);
+
+	/* space left after issuing the current command is the cmd AND it's arguments less */
+	si->engine.dma.free -= 2;
 }
 
 /* fixme? (check this out..)
@@ -962,38 +944,18 @@ void nv_acc_assert_fifo_dma(void)
 		nv_acc_fifofree_dma(12);
 
 		/* program new FIFO assignments */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH0 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[0]); /* Raster OPeration */
-
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH1 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[1]); /* Clip */
-
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH2 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
-
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH3 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[3]); /* 2D Surface */
-
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH4 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[4]); /* Blit */
-
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(NV_GENERAL_FIFO_CH5 | (1 << 18));
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
-
-		/* update the current free space we have left in the DMA buffer */
-		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+		/* Raster OPeration: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH0, si->engine.fifo.handle[0]);
+		/* Clip: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH1, si->engine.fifo.handle[1]);
+		/* Pattern: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH2, si->engine.fifo.handle[2]);
+		/* 2D Surface: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH3, si->engine.fifo.handle[3]);
+		/* Blit: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
+		/* Bitmap: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
 
 		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 		nv_start_dma();
