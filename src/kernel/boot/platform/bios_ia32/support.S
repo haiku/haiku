@@ -4,14 +4,15 @@
 */
 
 
+#define FUNCTION(x) .global x; .type x,@function; x
+
+
 /* uint64 rdtsc() */
-.global rdtsc
-rdtsc:
+FUNCTION(rdtsc):
 	rdtsc
 	ret
 
-.global execute_n_instructions
-execute_n_instructions:
+FUNCTION(execute_n_instructions):
 	movl	4(%esp), %ecx
 	shrl	$4, %ecx
 .again:
@@ -34,8 +35,7 @@ execute_n_instructions:
 	loop	.again
 	ret
 
-.global system_time
-system_time:
+FUNCTION(system_time):
    	/* load 64-bit factor into %eax (low), %edx (high) */
    	/* hand-assemble rdtsc -- read time stamp counter */
 	rdtsc		/* time in %edx,%eax */
@@ -54,8 +54,7 @@ system_time:
 	popl	%ebx
 	ret
 
-.global cpuid
-cpuid:
+FUNCTION(cpuid):
  	pushl	%ebx
  	pushl	%edi
  	movl	12(%esp),%eax
@@ -69,16 +68,23 @@ cpuid:
  	popl	%ebx
  	ret
 
-.global get_eflags
-get_eflags:
+FUNCTION(get_eflags):
  	pushfl
  	popl	%eax
  	ret
 
-.global set_eflags
-set_eflags:
+FUNCTION(set_eflags):
  	pushl	4(%esp)
  	popfl
 	ret
 
+null_idt_descr:
+	.word	0
+	.word	0,0
+		
+FUNCTION(reboot):
+	lidt	null_idt_descr
+	int		$0
+done:
+	jmp		done
 
