@@ -383,9 +383,9 @@ inline void
 CachedBlock::KDumpMe()
 {
 	kprintf("CachedBlock {\n");
-	kprintf("fVolume = 0x%08lx\n", fVolume);
+	kprintf("fVolume = 0x%08lx\n", (uint32)fVolume);
 	kprintf("fBlockNumber = 0x%16Lx\n", fBlockNumber);
-	kprintf("fBlock = 0x%08lx\n", fBlock);
+	kprintf("fBlock = 0x%08lx\n", (uint32)fBlock);
 	kprintf("}\n");
 }
 

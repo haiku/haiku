@@ -178,6 +178,9 @@ Inode::Inode(Volume *volume, vnode_id id, bool empty, uint8 reenter)
 	fTree(NULL),
 	fLock()
 {
+#ifdef DEBUG
+	kprintf("Inode::Inode(0x%08lx, %Ld, %s, %s) @ 0x%08lx\n", (uint32)volume, id, empty?"t":"f", reenter?"t":"f", (uint32)this);
+#endif
 	Initialize();
 }
 
@@ -187,12 +190,18 @@ Inode::Inode(CachedBlock *cached)
 	fTree(NULL),
 	fLock()
 {
+#ifdef DEBUG
+	kprintf("Inode::Inode(0x%08lx) @ 0x%08lx\n", (uint32)cached, (uint32)this);
+#endif
 	Initialize();
 }
 
 
 Inode::~Inode()
 {
+#ifdef DEBUG
+	kprintf("Inode::~Inode() @ 0x%08lx\n", (uint32)this);
+#endif
 	delete fTree;
 }
 
@@ -2052,8 +2061,8 @@ Inode::KDumpMe()
 {
 	kprintf("Inode {\n");
 	CachedBlock::KDumpMe();
-	kprintf("fTree = 0x%08lx\n", fTree);
-	kprintf("fAttributes = 0x%08lx\n", fAttributes);
+	kprintf("fTree = 0x%08lx\n", (uint32)fTree);
+	kprintf("fAttributes = 0x%08lx\n", (uint32)fAttributes);
 	kprintf("fLock {}\n");
 	kprintf("fOldSize = 0x%16Lx\n", fOldSize);
 	kprintf("fOldLastModified = 0x%16Lx\n", fOldLastModified);
