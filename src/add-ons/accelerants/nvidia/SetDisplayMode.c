@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-10/2003
+	Rudolf Cornelissen 11/2002-12/2003
 */
 
 #define MODULE_BIT 0x00200000
@@ -88,7 +88,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //	if (si->ps.secondary_head) g400_crtc2_dpms(0,0,0);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
-	startadd = si->fbc.frame_buffer - si->framebuffer;
+	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	/* calculate and set new mode bytes_per_row */
 	nv_general_validate_pic_size (&target, &si->fbc.bytes_per_row);
@@ -480,7 +480,7 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	//fixme: seperate both heads: we need a secondary si->fbc!
 	startadd = v_display_start * si->fbc.bytes_per_row;
 	startadd += h_display_start * (colour_depth >> 3);
-	startadd += si->fbc.frame_buffer - si->framebuffer;
+	startadd += (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 	startadd_right = startadd + si->dm.timing.h_display * (colour_depth >> 3);
 
 	/* account for switched CRTC's */

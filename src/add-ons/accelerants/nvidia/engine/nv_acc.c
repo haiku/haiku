@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-10/2003.
+   Rudolf Cornelissen 8/2003-12/2003.
 
    This code was possible thanks to the Linux NV driver.
 */
@@ -516,12 +516,12 @@ status_t nv_acc_init()
 	case NV04A:
 	case NV10A:
 		/* location of active screen in framebuffer */
-		ACCW(OFFSET0, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(OFFSET1, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(OFFSET2, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(OFFSET3, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(OFFSET4, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(OFFSET5, (si->fbc.frame_buffer - si->framebuffer));
+		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET2, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET3, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET4, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET5, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 
 		/* setup buffer pitch */
 		ACCW(PITCH0, (si->fbc.bytes_per_row & 0x0000ffff));
@@ -533,10 +533,10 @@ status_t nv_acc_init()
 	case NV20A:
 	case NV30A:
 		/* location of active screen in framebuffer */
-		ACCW(NV20_OFFSET0, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(NV20_OFFSET1, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(NV20_OFFSET2, (si->fbc.frame_buffer - si->framebuffer));
-		ACCW(NV20_OFFSET3, (si->fbc.frame_buffer - si->framebuffer));
+		ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(NV20_OFFSET2, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(NV20_OFFSET3, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 
 		/* setup buffer pitch */
 		ACCW(NV20_PITCH0, (si->fbc.bytes_per_row & 0x0000ffff));

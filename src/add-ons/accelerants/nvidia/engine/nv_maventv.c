@@ -1,6 +1,6 @@
 /* Authors:
    Mark Watson 2000,
-   Rudolf Cornelissen 1/2003-3/2003
+   Rudolf Cornelissen 1/2003-12/2003
 
    Thanx to Petr Vandrovec for writing matroxfb.
 */
@@ -19,6 +19,11 @@ typedef struct {
 	uint32 v_total;
 	float chroma_subcarrier;
 } gx50_maven_timing;
+
+void gxx0_maventv_PAL_init(uint8* buffer);
+void gxx0_maventv_NTSC_init(uint8* buffer);
+void gx50_maventv_PAL_timing(gx50_maven_timing *m_timing);
+void gx50_maventv_NTSC_timing(gx50_maven_timing *m_timing);
 
 //fixme: setup fixed CRTC2 modes for all modes and block other modes:
 // 		- 640x480, 800x600, 1024x768 NTSC and PAL overscan compensated modes (desktop)

@@ -9,7 +9,7 @@
 #include "nv_std.h"
 //apsed #include "memory"
 
-status_t test_ram();
+status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
 static status_t nv_general_bios_to_powergraphics(void);
 

@@ -9,12 +9,23 @@
  *
  * Other authors:
  * Mark Watson 6/2000,
- * Rudolf Cornelissen 12/2002
+ * Rudolf Cornelissen 12/2002-12/2003
  */
 
 #define MODULE_BIT 0x00004000
 
 #include "nv_std.h"
+
+int i2c_set_lines(int clock, int data);
+int i2c_get_data(void);
+void i2c_start(void);
+void i2c_stop(void);
+void i2c_high(void);
+void i2c_low(void);
+int i2c_get_ack(void);
+void i2c_send_ack(void);
+int i2c_sendbyte(unsigned char data);
+unsigned char i2c_readbyte(int ack_required);
 
 /*which device on the bus is the MAVEN?*/
 #define MAVEN_WRITE (0x1B<<1)

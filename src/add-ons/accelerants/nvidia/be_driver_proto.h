@@ -47,9 +47,9 @@ status_t SYNC_TO_TOKEN(sync_token *st);
 
 void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count);
 void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
-
 void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
 
 /* video_overlay */
