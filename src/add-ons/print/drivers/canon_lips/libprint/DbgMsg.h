@@ -6,7 +6,7 @@
 #ifndef __DBGMSG_H
 #define __DBGMSG_H
 
-//#define DBG
+// #define DBG
 
 #ifdef DBG
 	void write_debug_stream(const char *, ...);
