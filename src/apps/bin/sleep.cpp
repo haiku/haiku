@@ -30,114 +30,52 @@
 #include <unistd.h>
 #include <OS.h>
 
-#define UINT64_MAX (18446744073709551615LL)
+const bigtime_t microsPerSecond=1000000;
 
-static	uint64	process_arg(char *fromString);
+static	bigtime_t	process_arg(char *fromString);
 static	void	warn_invalid(char *invalidArg);
-static	void	suggest_help(void);
-static	void	go_sleep(uint64 sleepTotal);
 static	void	usage(void);
 static	void	version(void);
 
 char *progName;
 
-
-void
-go_sleep(uint64 sleepTotal)
-{
-	snooze(sleepTotal);
-}
-
-
-static uint64
+static bigtime_t
 process_arg(char *fromString)
 {
-	long double processed;
-	uint64 total;
-	char lastChar;
-	bool invalidChars = false;
-	bool microseconds = false;
-	bool milliseconds = false;
-	int i, length;
-
-	length = strlen(fromString);
-	lastChar = fromString[length - 1];
-
-	processed = atol(fromString);
-
-	if ( processed > INT_MAX )
-		processed = INT_MAX;
-	
-	if ( processed == 0 ) {
-		warn_invalid(fromString);
-		suggest_help();
-		exit(1);
-	}
-	
-	switch(lastChar) {
-		case 'u':
-		case 'U':
-			microseconds = true;
-			break;
-		case 'i':
-		case 'I':
-			milliseconds = true;
-			break;
-		case 's':
-		case 'S':
-			break;
-		case 'm':
-		case 'M':
-			processed *= 60;
-			break;
-		case 'h':
-		case 'H':
-			processed *= 3600;
-			break;
-		case 'd':
-		case 'D':
-			processed *= 86400;
-			break;
-		default: {
-			for (i=0; i < length; i++) {
-				if (! (fromString[i] >= '0' && fromString[i] <= '9'))
-					invalidChars = true;
-			}
-			if (invalidChars) {
-				warn_invalid(fromString);
-				suggest_help();
-				exit(1);
-			}
+	bigtime_t microSeconds=0;
+	bool endOfString=false;
+	int i=0;
+	while (i<20 && !endOfString) // Any more than 5 digits is ridiculous, but 20 is possible...
+		switch (fromString[i++]) {
+			case '0': microSeconds*=10;break;
+			case '1': microSeconds=10*microSeconds+1;break;
+			case '2': microSeconds=10*microSeconds+2;break;
+			case '3': microSeconds=10*microSeconds+3;break;
+			case '4': microSeconds=10*microSeconds+4;break;
+			case '5': microSeconds=10*microSeconds+5;break;
+			case '6': microSeconds=10*microSeconds+6;break;
+			case '7': microSeconds=10*microSeconds+7;break;
+			case '8': microSeconds=10*microSeconds+8;break;
+			case '9': microSeconds=10*microSeconds+9;break;
+			case 'u': case 'U': endOfString=true; break;
+			case 'i': case 'I': microSeconds*=1000; endOfString=true;break;
+			case 's': case 'S': case '\0': microSeconds*=microsPerSecond; endOfString=true; break; 
+			case 'm': case 'M': microSeconds*= (60*microsPerSecond);endOfString=true; break; 
+			case 'h': case 'H': microSeconds*= (3600*microsPerSecond);endOfString=true; break; 
+			case 'd': case 'D': microSeconds*= (86400*microsPerSecond);endOfString=true; break; 
 		}
-	}
-	total = (uint64) processed;
-	if (microseconds)
-		total *= 1;
-	else if (milliseconds)
-		total *= 1000;
-	else
-		total *= 1000000;
-
-	if (total > UINT64_MAX ) {
-		total = UINT64_MAX;
-	}
-	return(total);
+	if (fromString[i-1]!='\0' && fromString[i]!='\0') 
+		warn_invalid(fromString);
+	return (microSeconds);
 }
-
-
+	
 static void
 warn_invalid(char *invalidArg)
 {
 	fprintf(stderr, "%s: invalid time interval `%s'\n", progName, invalidArg);
-}
-
-
-static void
-suggest_help(void)
-{
 	fprintf(stdout, "Try `%s --help' for more information.\n", progName);
+	exit(1);
 }
-
 
 void
 usage(void)
@@ -178,53 +116,42 @@ main(int argc, char *argv[])
 	int argOption;
 	int indexptr = 0;
 	char * const * optargv = argv;
-	int i;
-	uint64 sleepTime = 0;
-	uint64 sleepTotal = 0; // in microseconds actually. 
-
-	struct option helpOption = { "help", no_argument, 0, 1 } ;
-	struct option versionOption = { "version", no_argument, 0, 2 } ;
+	bigtime_t sleepTotal = 0; // in microseconds actually. 
 
 	struct option options[] = {
-	helpOption, versionOption, {0}
+	{ "help", no_argument, NULL, 1 },
+	{ "version", no_argument, NULL, 2 },
+	{ NULL,0,NULL,0}
 	};
 
-	progName = argv[0]; // don't put this before or between structs! werrry bad things happen. ;)
+	progName = argv[0]; 
 
 	while ((argOption = getopt_long(argc, optargv, "", options, &indexptr)) != -1) {
-	
 		switch (argOption) { 
-			default:
-				switch (options[indexptr].val) {
-					case 1: // help
-						usage();
-						exit(0);
-					case 2: // version
-						version();
-						exit(0);
-					default:
-						suggest_help();
-						exit(1);
-				}
+			case 1: // help
+				usage();
 				break;
-		}
+			case 2: // version
+				version();
+				break;
+			default: // Should not be possible to get here!
+				fprintf (stderr,"HUGE problems with getopt_long!\n");
+				exit(1);
+				break;
+			}
+	exit(0);
 	}
 
-	if (argc - optind > 0) {
-		for ( i=1; i<argc; i++ ) {
-			if ((argv[i][0] >= '0') && (argv[i][0] <= '9')) {
-				sleepTime = process_arg(argv[i]);
-				sleepTotal += sleepTime;
-			} else {
+	if (argc - optind > 0)  {
+		for ( int i=optind; i<argc; i++ ) 
+			if ((argv[i][0] >= '0') && (argv[i][0] <= '9')) 
+				sleepTotal += process_arg(argv[i]);
+			else 
 				warn_invalid(argv[optind]);
-				suggest_help();
-				exit(1);
-			}
+		snooze(sleepTotal);
 		}
-		go_sleep(sleepTotal);
-	} else {
+	else 
 		usage();
-	}
 	
 	return B_NO_ERROR;
 }
