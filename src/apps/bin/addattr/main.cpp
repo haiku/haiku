@@ -121,14 +121,14 @@ main(int argc, char *argv[])
 
 	type_code attrType = B_STRING_TYPE;
 
-	int32 i = 2;
+	int32 i = 1;
 
 	if (!strcmp(argv[1], "-t")) {
 		// Get the attribute type
 		if (typeForString(argv[2], &attrType) != B_OK)
 			invalidAttrType(argv[2]);
 
-		i++;
+		i += 2;
 	}
 
 	const char *attrName = argv[i++];
