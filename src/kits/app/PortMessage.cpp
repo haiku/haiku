@@ -41,6 +41,7 @@ PortMessage::PortMessage(void)
 	_code=0;
 	_buffer=NULL;
 	_buffersize=0;
+	_index=NULL;
 }
 
 PortMessage::~PortMessage(void)
@@ -55,6 +56,7 @@ status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout
 	if(_buffersize>0 && _buffer!=NULL)
 		delete _buffer;
 	_buffer=NULL;
+	_index=NULL;
 	_buffersize=0;
 
 	if(timeout==B_INFINITE_TIMEOUT)
@@ -78,6 +80,7 @@ status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout
 			_buffer=new uint8[_buffersize];
 		read_port(port, &_code, _buffer, _buffersize);
 	}
+	_index=_buffer;
 	
 	return B_OK;
 }
@@ -96,6 +99,7 @@ status_t PortMessage::WriteToPort(const port_id &port)
 		delete _buffer;
 		_buffersize=0;
 		_buffer=NULL;
+		_index=NULL;
 	}
 	return B_OK;
 }
@@ -126,6 +130,7 @@ void PortMessage::SetBuffer(const void *buffer, const ssize_t &size, const bool 
 		_buffersize=size;
 		_buffer=(uint8 *)buffer;
 	}
+	_index=_buffer;
 }
 
 status_t PortMessage::Read(void *data, ssize_t size)
