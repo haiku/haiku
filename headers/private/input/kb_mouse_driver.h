@@ -104,15 +104,15 @@ typedef struct {
 #define mouse_settings_file "Mouse_settings"
 
 typedef struct {
-	int             serial_cookie;
-	int             buttons;
-	int             xdelta;
-	int             ydelta;
-	int32           clicks;
-	int32           modifiers;
-	bigtime_t       time;
-	int             wheel_delta;
-} mouse_pos;
+  int32 	cookie;
+  uint32 	buttons;
+  int32 	xdelta;
+  int32 	ydelta;
+  int32 	clicks;
+  int32 	modifiers;
+  bigtime_t timestamp;
+  int32 	wheel_delta;
+} mouse_movement;
 
 
 // On the Mac, the I-squared C bus is controlled by the Cuda microcontroller,
