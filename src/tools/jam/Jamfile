@@ -188,6 +188,7 @@ if $(OS) = BEOS {
 		CompileResources StatCacheServer.rsrc : StatCacheServer.rdef ;
 		AddResources StatCacheServer : StatCacheServer.rsrc ;
 	}
+	if $(BINDIR) 	{ InstallBin $(BINDIR) : StatCacheServer ; }
 }
 #
 ### LOCAL CHANGE
