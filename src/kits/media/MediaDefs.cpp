@@ -679,7 +679,7 @@ media_format::operator=(const media_format &clone)
 {
 	memcpy(this, &clone, sizeof(*this));
 	// these things only happen when a meta_data_area is defined:
-	if (meta_data_area != B_BAD_VALUE) {
+	if (meta_data_area > 0) {
 		thread_id thread = find_thread(NULL);
 		if (thread != B_NAME_NOT_FOUND) {
 			thread_info info;
