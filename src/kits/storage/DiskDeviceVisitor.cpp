@@ -42,6 +42,7 @@ BDiskDeviceVisitor::~BDiskDeviceVisitor()
 	Overridden by derived classes.
 	This class' version does nothing and it returns \c false.
 
+	\param device The visited disk device.
 	\return \c true, if the iteration shall be terminated at this point,
 			\c false otherwise.
 */
@@ -60,11 +61,13 @@ BDiskDeviceVisitor::Visit(BDiskDevice *device)
 	Overridden by derived classes.
 	This class' version does nothing and it returns \c false.
 
+	\param partition The visited partition.
+	\param level The level of the partition in the partition tree.
 	\return \c true, if the iteration shall be terminated at this point,
 			\c false otherwise.
 */
 bool
-BDiskDeviceVisitor::Visit(BPartition *partition)
+BDiskDeviceVisitor::Visit(BPartition *partition, int32 level)
 {
 	return false;
 }

@@ -25,8 +25,6 @@ public:
 
 	virtual status_t GetPath(BPath *path) const;
 
-	virtual BPartition *VisitEachDescendent(BDiskDeviceVisitor *visitor);
-	
 	bool IsModified() const;
 	status_t PrepareModifications();
 	status_t CommitModifications(bool synchronously = true,
@@ -38,8 +36,10 @@ private:
 	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;
 
-	status_t SetTo(partition_id id, size_t neededSize = 0);
-	status_t SetTo(user_disk_device_data *data);
+	status_t _SetTo(partition_id id, size_t neededSize = 0);
+	status_t _SetTo(user_disk_device_data *data);
+
+	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
 
 	user_disk_device_data	*fDeviceData;
 };

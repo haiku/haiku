@@ -181,17 +181,6 @@ BDiskDevice::GetPath(BPath *path) const
 	return path->SetTo(fDeviceData->path);
 }
 
-// VisitEachDescendent
-BPartition *
-BDiskDevice::VisitEachDescendent(BDiskDeviceVisitor *visitor)
-{
-	if (!visitor)
-		return NULL;
-	if (visitor->Visit(this))
-		return this;
-	return BPartition::VisitEachDescendent(visitor);
-}
-
 // IsModified
 bool
 BDiskDevice::IsModified() const
@@ -226,9 +215,9 @@ BDiskDevice::CancelModifications()
 	return B_ERROR;
 }
 
-// SetTo
+// _SetTo
 status_t
-BDiskDevice::SetTo(partition_id id, size_t neededSize)
+BDiskDevice::_SetTo(partition_id id, size_t neededSize)
 {
 	Unset();
 	// get the device data
@@ -259,31 +248,38 @@ BDiskDevice::SetTo(partition_id id, size_t neededSize)
 	} while (error == B_BUFFER_OVERFLOW);
 	// set the data
 	if (error == B_OK)
-		error = SetTo((user_disk_device_data*)buffer);
+		error = _SetTo((user_disk_device_data*)buffer);
 	// cleanup on error
 	if (error != B_OK)
 		free(buffer);
 	return error;
 }
 
-// SetTo
+// _SetTo
 status_t
-BDiskDevice::SetTo(user_disk_device_data *data)
+BDiskDevice::_SetTo(user_disk_device_data *data)
 {
 	Unset();
 	if (!data)
 		return B_BAD_VALUE;
 	fDeviceData = data;
-	status_t error = BPartition::SetTo(this, NULL,
-									   &fDeviceData->device_partition_data);
+	status_t error = BPartition::_SetTo(this, NULL,
+										&fDeviceData->device_partition_data);
 	if (error != B_OK) {
-		// Don't call Unset() here. If SetTo() fails, the caller retains
+		// Don't call Unset() here. If _SetTo() fails, the caller retains
 		// ownership of the supplied data.
 		// TODO: Maybe introduce a _Unset() to avoid potential future
 		// problems.
 		fDeviceData = NULL;
 	}
 	return error;
+}
+
+// _AcceptVisitor
+bool
+BDiskDevice::_AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level)
+{
+	return visitor->Visit(this);
 }
 
 

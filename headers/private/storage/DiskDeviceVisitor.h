@@ -6,6 +6,8 @@
 #ifndef _DISK_DEVICE_VISITOR_H
 #define _DISK_DEVICE_VISITOR_H
 
+#include <SupportDefs.h>
+
 class BDiskDevice;
 class BPartition;
 
@@ -17,7 +19,7 @@ public:
 
 	// return true to abort iteration
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BPartition *partition);
+	virtual bool Visit(BPartition *partition, int32 level);
 };
 
 #endif _DISK_DEVICE_VISITOR_H

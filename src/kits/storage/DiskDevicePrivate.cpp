@@ -27,10 +27,10 @@ PartitionFilterVisitor::Visit(BDiskDevice *device)
 
 // Visit
 bool
-PartitionFilterVisitor::Visit(BPartition *partition)
+PartitionFilterVisitor::Visit(BPartition *partition, int32 level)
 {
-	if (fFilter->Filter(partition))
-		return fVisitor->Visit(partition);
+	if (fFilter->Filter(partition, level))
+		return fVisitor->Visit(partition, level);
 	return false;
 }
 
@@ -53,7 +53,7 @@ IDFinderVisitor::Visit(BDiskDevice *device)
 
 // Visit
 bool
-IDFinderVisitor::Visit(BPartition *partition)
+IDFinderVisitor::Visit(BPartition *partition, int32 level)
 {
 	return (partition->UniqueID() == fID);
 }

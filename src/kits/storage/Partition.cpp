@@ -37,7 +37,7 @@ BPartition::BPartition()
 */
 BPartition::~BPartition()
 {
-	Unset();
+	_Unset();
 }
 
 // Offset
@@ -362,35 +362,30 @@ BPartition *
 BPartition::VisitEachChild(BDiskDeviceVisitor *visitor)
 {
 	if (visitor) {
+		int32 level = _Level();
 		for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
-			if (visitor->Visit(child))
+			if (child->_AcceptVisitor(visitor, level))
 				return child;
 		}
 	}
 	return NULL;
 }
 
-// VisitEachDescendent
+// VisitEachDescendant
 BPartition *
-BPartition::VisitEachDescendent(BDiskDeviceVisitor *visitor)
+BPartition::VisitEachDescendant(BDiskDeviceVisitor *visitor)
 {
-	if (visitor) {
-		if (visitor->Visit(this))
-			return this;
-		for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
-			if (BPartition *result = child->VisitEachDescendent(visitor))
-				return result;
-		}
-	}
+	if (visitor)
+		return _VisitEachDescendant(visitor);
 	return NULL;
 }
 
-// SetTo
+// _SetTo
 status_t
-BPartition::SetTo(BDiskDevice *device, BPartition *parent,
-				  user_partition_data *data)
+BPartition::_SetTo(BDiskDevice *device, BPartition *parent,
+				   user_partition_data *data)
 {
-	Unset();
+	_Unset();
 	if (!device || !data)
 		return B_BAD_VALUE;
 	fPartitionData = data;
@@ -402,7 +397,7 @@ BPartition::SetTo(BDiskDevice *device, BPartition *parent,
 	for (int32 i = 0; error == B_OK && i < fPartitionData->child_count; i++) {
 		BPartition *child = new(nothrow) BPartition;
 		if (child) {
-			error = child->SetTo(fDevice, this, fPartitionData->children[i]);
+			error = child->_SetTo(fDevice, this, fPartitionData->children[i]);
 			if (error != B_OK)
 				delete child;
 		} else
@@ -410,13 +405,13 @@ BPartition::SetTo(BDiskDevice *device, BPartition *parent,
 	}
 	// cleanup on error
 	if (error != B_OK)
-		Unset();
+		_Unset();
 	return error;
 }
 
-// Unset
+// _Unset
 void
-BPartition::Unset()
+BPartition::_Unset()
 {
 	// delete children
 	if (fPartitionData) {
@@ -429,6 +424,41 @@ BPartition::Unset()
 	fDevice = NULL;
 	fParent = NULL;
 	fPartitionData = NULL;
+}
+
+// _Level
+int32
+BPartition::_Level() const
+{
+	int32 level = 0;
+	const BPartition *ancestor = this;
+	while ((ancestor = ancestor->Parent()))
+		level++;
+	return level;
+}
+
+// _AcceptVisitor
+bool
+BPartition::_AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level)
+{
+	return visitor->Visit(this, level);
+}
+
+// _VisitEachDescendant
+BPartition *
+BPartition::_VisitEachDescendant(BDiskDeviceVisitor *visitor, int32 level)
+{
+	if (level < 0)
+		level = _Level();
+	if (_AcceptVisitor(visitor, level))
+		return this;
+	for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
+		if (BPartition *result = child->_VisitEachDescendant(visitor,
+															 level + 1)) {
+			return result;
+		}
+	}
+	return NULL;
 }
 
 

@@ -64,7 +64,7 @@ public:
 	status_t GetPartitioningInfo(BPartitioningInfo *info) const;
 	
 	BPartition *VisitEachChild(BDiskDeviceVisitor *visitor);
-	virtual BPartition *VisitEachDescendent(BDiskDeviceVisitor *visitor);
+	virtual BPartition *VisitEachDescendant(BDiskDeviceVisitor *visitor);
 
 	// Self Modification
 
@@ -113,9 +113,14 @@ private:
 	BPartition(const Partition &);
 	virtual ~BPartition();
 
-	status_t SetTo(BDiskDevice *device, BPartition *parent,
-				   user_partition_data *data);
-	void Unset();
+	status_t _SetTo(BDiskDevice *device, BPartition *parent,
+					user_partition_data *data);
+	void _Unset();
+
+	int32 _Level() const;
+	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
+	BPartition *_VisitEachDescendant(BDiskDeviceVisitor *visitor,
+									 int32 level = -1);
 
 	friend class BDiskDevice;
 

@@ -32,37 +32,45 @@ public:
 		else
 			pathString = strerror(error);
 		printf("device %ld: `%s'\n", device->UniqueID(), pathString);
-		printf("  removable:     %d\n", device->IsRemovable());
-		printf("  has media:     %d\n", device->HasMedia());
+		printf("  removable:      %d\n", device->IsRemovable());
+		printf("  has media:      %d\n", device->HasMedia());
+		printf("  ---\n");
+		Visit(device, 0);
 		return false;
 	}
 	
-	virtual bool Visit(BPartition *partition)
+	virtual bool Visit(BPartition *partition, int32 level)
 	{
-		BPath path;
-		status_t error = partition->GetPath(&path);
-		const char *pathString = NULL;
-		if (error == B_OK)
-			pathString = path.Path();
-		else
-			pathString = strerror(error);
-		printf("    partition %ld: `%s'\n", partition->UniqueID(), pathString);
-		printf("      offset:         %lld\n", partition->Offset());
-		printf("      size:           %lld\n", partition->Size());
-		printf("      block size:     %lu\n", partition->BlockSize());
-		printf("      index:          %ld\n", partition->Index());
-		printf("      status:         %lu\n", partition->Status());
-		printf("      file system:    %d\n", partition->ContainsFileSystem());
-		printf("      part. system:   %d\n",
+		char prefix[128];
+		sprintf(prefix, "%*s", 2 * (int)level, "");
+		if (level > 0) {
+			BPath path;
+			status_t error = partition->GetPath(&path);
+			const char *pathString = NULL;
+			if (error == B_OK)
+				pathString = path.Path();
+			else
+				pathString = strerror(error);
+			printf("%spartition %ld: `%s'\n", prefix, partition->UniqueID(),
+				   pathString);
+		}
+		printf("%s  offset:         %lld\n", prefix, partition->Offset());
+		printf("%s  size:           %lld\n", prefix, partition->Size());
+		printf("%s  block size:     %lu\n", prefix, partition->BlockSize());
+		printf("%s  index:          %ld\n", prefix, partition->Index());
+		printf("%s  status:         %lu\n", prefix, partition->Status());
+		printf("%s  file system:    %d\n", prefix,
+			   partition->ContainsFileSystem());
+		printf("%s  part. system:   %d\n", prefix,
 			   partition->ContainsPartitioningSystem());
-		printf("      device:         %d\n", partition->IsDevice());
-		printf("      read only:      %d\n", partition->IsReadOnly());
-		printf("      mounted:        %d\n", partition->IsMounted());
-		printf("      flags:          %lx\n", partition->Flags());
-		printf("      name:           `%s'\n", partition->Name());
-		printf("      content name:   `%s'\n", partition->ContentName());
-		printf("      type:           `%s'\n", partition->Type());
-		printf("      content type:   `%s'\n", partition->ContentType());
+		printf("%s  device:         %d\n", prefix, partition->IsDevice());
+		printf("%s  read only:      %d\n", prefix, partition->IsReadOnly());
+		printf("%s  mounted:        %d\n", prefix, partition->IsMounted());
+		printf("%s  flags:          %lx\n", prefix, partition->Flags());
+		printf("%s  name:           `%s'\n", prefix, partition->Name());
+		printf("%s  content name:   `%s'\n", prefix, partition->ContentName());
+		printf("%s  type:           `%s'\n", prefix, partition->Type());
+		printf("%s  content type:   `%s'\n", prefix, partition->ContentType());
 		// volume, icon,...
 		return false;
 	}

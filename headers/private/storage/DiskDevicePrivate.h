@@ -16,7 +16,7 @@ namespace BPrivate {
 // PartitionFilter
 class PartitionFilter {
 public:
-	virtual bool Filter(BPartition *partition) = 0;
+	virtual bool Filter(BPartition *partition, int32 level) = 0;
 };
 
 // PartitionFilterVisitor
@@ -26,7 +26,7 @@ public:
 						   PartitionFilter *filter);
 
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BPartition *partition);
+	virtual bool Visit(BPartition *partition, int32 level);
 
 private:
 	BDiskDeviceVisitor	*fVisitor;
@@ -39,7 +39,7 @@ public:
 	IDFinderVisitor(partition_id id);
 
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BPartition *partition);
+	virtual bool Visit(BPartition *partition, int32 level);
 
 private:
 	partition_id		fID;

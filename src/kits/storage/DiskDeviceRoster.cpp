@@ -82,7 +82,7 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 	partition_id id = _kern_get_next_disk_device_id(&fCookie, &neededSize);
 	if (id < 0)
 		return id;
-	return device->SetTo(id, neededSize);
+	return device->_SetTo(id, neededSize);
 }
 
 // RewindDevices
@@ -214,8 +214,8 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
 		BPartition *foundPartition = NULL;
 		while (!foundPartition && GetNextDevice(useDevice) == B_OK)
-			foundPartition = useDevice->VisitEachDescendent(visitor);
-			// TODO: That probably not correct. VisitEachDescendent()
+			foundPartition = useDevice->VisitEachDescendant(visitor);
+			// TODO: That probably not correct. VisitEachDescendant()
 			// should also invoke Visit(BDiskDevice*).
 		fCookie = oldCookie;
 		if (!terminatedEarly)
@@ -247,7 +247,7 @@ BDiskDeviceRoster::VisitAll(BDiskDeviceVisitor *visitor)
 		fCookie = 0;
 		BDiskDevice device;
 		while (!terminatedEarly && GetNextDevice(&device) == B_OK)
-			terminatedEarly = device.VisitEachDescendent(visitor);
+			terminatedEarly = device.VisitEachDescendant(visitor);
 		fCookie = oldCookie;
 	}
 	return terminatedEarly;
@@ -279,7 +279,7 @@ BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 	bool terminatedEarly = false;
 	if (visitor) {
 		struct MountedPartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32)
 				{ return partition->IsMounted(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
@@ -315,7 +315,7 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 	bool terminatedEarly = false;
 	if (visitor) {
 		struct MountablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32)
 				{ return partition->ContainsFileSystem(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
@@ -351,7 +351,7 @@ BDiskDeviceRoster::VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
 /*	bool terminatedEarly = false;
 	if (visitor) {
 		struct InitializablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32)
 				{ return !partition->CanInitialize(NULL); }
 				// TODO: ???
 		} filter;
@@ -375,7 +375,7 @@ BDiskDeviceRoster::VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
 	bool terminatedEarly = false;
 	if (visitor) {
 		struct PartitionablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32)
 				{ return partition->ContainsPartitioningSystem(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
