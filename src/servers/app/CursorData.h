@@ -1,6 +1,8 @@
 #ifndef CURSORDATA_H_
 #define CURSORDATA_H_
 
+#include <SupportDefs.h>
+
 extern int8 default_cursor_data[];
 extern int8 default_text_data[];
 extern int8 default_move_data[];

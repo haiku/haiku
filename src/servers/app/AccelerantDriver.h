@@ -29,22 +29,24 @@
 #define _ACCELERANTDRIVER_H_
 
 #include <Accelerant.h>
-#include "DisplayDriver.h"
+
 #include "PatternHandler.h"
 #include "FontServer.h"
 #include "LayerData.h"
 
+#include "DisplayDriverImpl.h"
+
 class ServerBitmap;
 class ServerCursor;
 
-class AccelerantDriver : public DisplayDriver
+class AccelerantDriver : public DisplayDriverImpl
 {
 public:
-	AccelerantDriver(void);
-	~AccelerantDriver(void);
+	AccelerantDriver();
+	~AccelerantDriver();
 
-	bool Initialize(void);
-	void Shutdown(void);
+	bool Initialize();
+	void Shutdown();
 	
 	virtual void InvertRect(const BRect &r);
 	virtual void SetMode(const int32 &mode);
@@ -54,8 +56,8 @@ public:
 
 /*
 	virtual status_t SetDPMSMode(const uint32 &state);
-	virtual uint32 DPMSMode(void) const;
-	virtual uint32 DPMSCapabilities(void) const;
+	virtual uint32 DPMSMode() const;
+	virtual uint32 DPMSCapabilities() const;
 	virtual status_t GetDeviceInfo(accelerant_device_info *info);
 	virtual status_t GetModeList(display_mode **mode_list, uint32 *count);
 	virtual status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);

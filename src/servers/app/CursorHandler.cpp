@@ -36,6 +36,7 @@ CursorHandler::CursorHandler(DisplayDriver *driver)
 	fSavedData(NULL),
 	fCursor(NULL),
 	fHideLevel(0),
+	fDrawData(),
 	fDriverHidden(false),
 	fIsObscured(false),
 	fValidSaveData(false)
@@ -92,28 +93,34 @@ void CursorHandler::SetCursor(ServerCursor *cursor)
 	
 	This function fails if asked to move the cursor outside the screen boundaries
 */
-void CursorHandler::MoveTo(const BPoint &pt)
+void CursorHandler::MoveTo(BPoint pt)
 {
-	if(pt.x<0 || pt.y<0 || (pt.x>fDriver->fDisplayMode.virtual_width-1) ||
-			(pt.y>fDriver->fDisplayMode.virtual_height-1))
-		return;
+	pt.x = max_c(pt.x, 0.0);
+	pt.y = max_c(pt.y, 0.0);
+	pt.x = min_c(pt.x, fDriver->DisplayMode()->virtual_width - 1);
+	pt.y = min_c(pt.y, fDriver->DisplayMode()->virtual_height - 1);
+
+	if (fCursorPos != pt) {
 	
-	fCursorPos=pt;
-if (!fSavedData)
-	debugger("NULL savedata\n");
-	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&(fDriver->fDrawData));
-	fPosition.OffsetTo(fCursorPos.x-fCursor->GetHotSpot().x,
-			fCursorPos.y-fCursor->GetHotSpot().y);
-	fDriver->CopyToBitmap(fSavedData,fPosition);
-	
-	fDriver->fDrawData.draw_mode=B_OP_ALPHA;
-	fDriver->CopyBitmap(fCursor,fCursor->Bounds(),fPosition,&(fDriver->fDrawData));
-	fDriver->fDrawData.draw_mode=B_OP_COPY;
-	
-	fDriver->Invalidate(fOldPosition);
-	fOldPosition=fPosition;
-	
-	fDriver->Invalidate(fPosition);
+		fCursorPos=pt;
+
+		if (!fSavedData)
+			debugger("NULL savedata\n");
+
+		fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&fDrawData);
+		fPosition.OffsetTo(fCursorPos.x-fCursor->GetHotSpot().x,
+				fCursorPos.y-fCursor->GetHotSpot().y);
+		fDriver->CopyToBitmap(fSavedData,fPosition);
+		
+		fDrawData.draw_mode=B_OP_ALPHA;
+		fDriver->CopyBitmap(fCursor,fCursor->Bounds(),fPosition,&fDrawData);
+		fDrawData.draw_mode=B_OP_COPY;
+		
+		fDriver->Invalidate(fOldPosition);
+		fOldPosition=fPosition;
+		
+		fDriver->Invalidate(fPosition);
+	}
 }
 
 //! Shows the cursor. Unlike BView, calls are not cumulative
@@ -121,31 +128,32 @@ void CursorHandler::Show(void)
 {
 	// This call is pretty simple -- save the area underneath the cursor and draw the thing
 	
-	if(fHideLevel==0)
+	if (fHideLevel == 0)
 		return;
 	
-	fIsObscured=false;
+	fIsObscured = false;
 	fHideLevel--;
 	
-	if(fHideLevel>0)
+	if (fHideLevel > 0)
 		return;
 	
-	fOldPosition=fPosition;
+	fOldPosition = fPosition;
 	
-	if(!fCursor)
+	if (!fCursor)
 		return;
 	
-	fValidSaveData=true;
+	fValidSaveData = true;
 	
-	if(!fSavedData)
-		fSavedData=new UtilityBitmap(fCursor->Bounds(),(color_space)fDriver->fDisplayMode.space,0);
+	if (!fSavedData)
+		fSavedData = new UtilityBitmap(fCursor->Bounds(),
+									   (color_space)fDriver->DisplayMode()->space, 0);
 	
-	fDriver->CopyToBitmap(fSavedData,fPosition);
+	fDriver->CopyToBitmap(fSavedData, fPosition);
 	
 	// Draw the data to the buffer
-	fDriver->fDrawData.draw_mode=B_OP_ALPHA;
-	fDriver->CopyBitmap(fCursor,fCursor->Bounds(),fPosition,&(fDriver->fDrawData));
-	fDriver->fDrawData.draw_mode=B_OP_COPY;
+	fDrawData.draw_mode = B_OP_ALPHA;
+	fDriver->CopyBitmap(fCursor, fCursor->Bounds(), fPosition, &fDrawData);
+	fDrawData.draw_mode = B_OP_COPY;
 	fDriver->Invalidate(fPosition);
 }
 
@@ -172,7 +180,7 @@ void CursorHandler::Hide(void)
 	if(!fSavedData)
 		fSavedData=new UtilityBitmap(fCursor);
 	
-	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&(fDriver->fDrawData));
+	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&fDrawData);
 	fDriver->Invalidate(fPosition);
 }
 
@@ -193,7 +201,7 @@ void CursorHandler::Obscure(void)
 		return;
 	}
 	
-	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&(fDriver->fDrawData));
+	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&fDrawData);
 	fDriver->Invalidate(fPosition);
 }
 
@@ -210,7 +218,7 @@ void CursorHandler::DriverHide(void)
 	if(!fSavedData)
 		fSavedData=new UtilityBitmap(fCursor);
 	
-	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&(fDriver->fDrawData));
+	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&fDrawData);
 	fDriver->Invalidate(fPosition);
 }
 
@@ -229,13 +237,13 @@ void CursorHandler::DriverShow(void)
 	fValidSaveData=true;
 	
 	if(!fSavedData)
-		fSavedData=new UtilityBitmap(fCursor->Bounds(),(color_space)fDriver->fDisplayMode.space,0);
+		fSavedData=new UtilityBitmap(fCursor->Bounds(),(color_space)fDriver->DisplayMode()->space,0);
 	
 	fDriver->CopyToBitmap(fSavedData,fPosition);
 	
 	// Draw the data to the buffer
-	fDriver->fDrawData.draw_mode=B_OP_ALPHA;
-	fDriver->CopyBitmap(fCursor,fCursor->Bounds(),fPosition,&(fDriver->fDrawData));
-	fDriver->fDrawData.draw_mode=B_OP_COPY;
+	fDrawData.draw_mode=B_OP_ALPHA;
+	fDriver->CopyBitmap(fCursor,fCursor->Bounds(),fPosition,&fDrawData);
+	fDrawData.draw_mode=B_OP_COPY;
 	fDriver->Invalidate(fPosition);
 }

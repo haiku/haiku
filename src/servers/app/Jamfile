@@ -17,6 +17,7 @@ SharedLibrary appserver :
 	CursorHandler.cpp
 	Decorator.cpp
 	DisplayDriver.cpp
+	DisplayDriverImpl.cpp
 	DisplaySupport.cpp
 	FontFamily.cpp
 	GraphicsBuffer.cpp

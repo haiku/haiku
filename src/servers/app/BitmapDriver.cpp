@@ -52,7 +52,11 @@ extern RGBColor workspace_default_color;	// defined in AppServer.cpp
 	Subclasses should follow DisplayDriver's lead and use this function mostly
 	for initializing data members.
 */
-BitmapDriver::BitmapDriver(void) : DisplayDriver()
+BitmapDriver::BitmapDriver()
+	: DisplayDriverImpl(),
+	  // NOTE: fLineThickness appeared to be never
+	  // initialized in DisplayDriver
+	  fLineThickness(1)
 {
 	fTarget=NULL;
 	fGraphicsBuffer=NULL;
@@ -64,32 +68,8 @@ BitmapDriver::BitmapDriver(void) : DisplayDriver()
 	
 	Subclasses should use the destructor mostly for freeing allocated heap space.
 */
-BitmapDriver::~BitmapDriver(void)
+BitmapDriver::~BitmapDriver()
 {
-}
-
-/*!
-	\brief Initializes the driver object.
-	\return true if successful, false if not
-	
-	Initialize sets up the driver for display, including the initial clearing
-	of the screen. If things do not go as they should, false should be returned.
-*/
-bool BitmapDriver::Initialize(void)
-{
-	// Nothing is needed because of SetTarget taking care of the work for us.
-	return true;
-}
-
-/*!
-	\brief Shuts down the driver's video subsystem
-	
-	Any work done by Initialize() should be undone here. Note that Shutdown() is
-	called even if Initialize() was unsuccessful.
-*/
-void BitmapDriver::Shutdown(void)
-{
-	// Nothing is needed here
 }
 
 void BitmapDriver::SetTarget(ServerBitmap *target)
@@ -669,7 +649,7 @@ bool BitmapDriver::AcquireBuffer(FBBitmap *fbmp)
 	return true;
 }
 
-void BitmapDriver::ReleaseBuffer(void)
+void BitmapDriver::ReleaseBuffer()
 {
 }
 

@@ -36,8 +36,9 @@
 #include <Message.h>
 #include <Region.h>
 #include <Font.h>
-#include "DisplayDriver.h"
 #include "FontServer.h"
+
+#include "DisplayDriverImpl.h"
 
 class BBitmap;
 class BPortLink;
@@ -48,8 +49,8 @@ class VDView : public BView
 {
 public:
 	VDView(BRect bounds);
-	~VDView(void);
-	void AttachedToWindow(void);
+	~VDView();
+	void AttachedToWindow();
 	void Draw(BRect rect);
 	void MouseDown(BPoint pt);
 	void MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
@@ -70,9 +71,9 @@ class VDWindow : public BWindow
 {
 public:
 	VDWindow(BRect frame);
-	~VDWindow(void);
+	~VDWindow();
 	void MessageReceived(BMessage *msg);
-	bool QuitRequested(void);
+	bool QuitRequested();
 	void WindowActivated(bool active);
 	
 	VDView *view;
@@ -96,14 +97,14 @@ public:
 	VDWindow - does most of the work.
 	VDView - doesn't do all that much except display the rendered bitmap
 */
-class ViewDriver : public DisplayDriver
+class ViewDriver : public DisplayDriverImpl
 {
 public:
-	ViewDriver(void);
-	~ViewDriver(void);
+	ViewDriver();
+	~ViewDriver();
 
-	virtual	bool				Initialize(void); // Sets the driver
-	virtual	void				Shutdown(void); // You never know when you'll need this
+	virtual	bool				Initialize(); // Sets the driver
+	virtual	void				Shutdown(); // You never know when you'll need this
 	
 	// Drawing functions
 //	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
@@ -120,8 +121,8 @@ public:
 			VDWindow			*screenwin;
 
 	virtual	status_t			SetDPMSMode(const uint32 &state);
-	virtual	uint32				DPMSMode(void) const;
-	virtual	uint32				DPMSCapabilities(void) const;
+	virtual	uint32				DPMSMode() const;
+	virtual	uint32				DPMSCapabilities() const;
 	virtual	status_t			GetDeviceInfo(accelerant_device_info *info);
 	virtual	status_t			GetModeList(display_mode **mode_list, uint32 *count);
 	virtual	status_t			GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
@@ -146,7 +147,7 @@ protected:
 
 
 	virtual	bool				AcquireBuffer(FBBitmap *bmp);
-	virtual	void				ReleaseBuffer(void);
+	virtual	void				ReleaseBuffer();
 	virtual	void				Invalidate(const BRect &r);
 	
 //	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);

@@ -102,7 +102,8 @@ extern RGBColor workspace_default_color;
 	by a couple orders of magnitude
 --------------------------------------------------------------------------------------- */
 
-DirectDriver::DirectDriver(void)
+DirectDriver::DirectDriver()
+	: DisplayDriverImpl()
 {
 	ATRACE(("DirectDriver::DirectDriver\n"));
 	
@@ -133,7 +134,7 @@ DirectDriver::DirectDriver(void)
 #endif
 }
 
-DirectDriver::~DirectDriver(void)
+DirectDriver::~DirectDriver()
 {
 	ATRACE(("DirectDriver::~DirectDriver\n"));
 	Lock();
@@ -143,20 +144,25 @@ DirectDriver::~DirectDriver(void)
 	Unlock();
 }
 
-bool DirectDriver::Initialize(void)
+bool DirectDriver::Initialize()
 {
-	ATRACE(("DirectDriver::Initialize\n"));
-	screenwin=new DDWindow(640,480,B_RGB32,this);
-	while(find_thread("drawing_thread")==B_NAME_NOT_FOUND)
-	{
-		ATRACE(("\tWaiting for the drawing thread to spawn\n"));
-		snooze(100);
+	if (DisplayDriver::Initialize()) {
+		ATRACE(("DirectDriver::Initialize\n"));
+		screenwin=new DDWindow(640,480,B_RGB32,this);
+		while(find_thread("drawing_thread")==B_NAME_NOT_FOUND)
+		{
+			ATRACE(("\tWaiting for the drawing thread to spawn\n"));
+			snooze(100);
+		}
+		return true;
 	}
-	return true;
+	return false;
 }
 
-void DirectDriver::Shutdown(void)
+void DirectDriver::Shutdown()
 {
+	DisplayDriver::Shutdown();
+
 	ATRACE(("DirectDriver::Shutdown\n"));
 	screenwin->PostMessage(B_QUIT_REQUESTED);
 
@@ -433,14 +439,14 @@ status_t DirectDriver::SetDPMSMode(const uint32 &state)
 	return BScreen().SetDPMS(state);
 }
 
-uint32 DirectDriver::DPMSMode(void) const
+uint32 DirectDriver::DPMSMode() const
 {
 	STRACE(("DirectDriver::DPMSMode\n"));
 	// This is a hack, but should do enough to be ok for our purposes
 	return BScreen().DPMSState();
 }
 
-uint32 DirectDriver::DPMSCapabilities(void) const
+uint32 DirectDriver::DPMSCapabilities() const
 {
 	STRACE(("DirectDriver::DPMSCapabilities\n"));
 	
@@ -1039,7 +1045,7 @@ DDWindow::DDWindow(uint16 width, uint16 height, color_space space, DirectDriver 
 	Show();
 }
 
-DDWindow::~DDWindow(void)
+DDWindow::~DDWindow()
 {
 	int32 result;
 	
@@ -1097,7 +1103,7 @@ void DDWindow::DirectConnected(direct_buffer_info *info)
 	locker.Unlock();
 }
 
-bool DDWindow::QuitRequested(void)
+bool DDWindow::QuitRequested()
 {
 	port_id serverport=find_port(SERVER_PORT_NAME);
 
@@ -1296,12 +1302,12 @@ int32 DDWindow::DrawingThread(void *data)
 	return 0;
 }
 
-RectPipe::RectPipe(void)
+RectPipe::RectPipe()
 {
 	list.MakeEmpty();
 }
 
-RectPipe::~RectPipe(void)
+RectPipe::~RectPipe()
 {
 	lock.Lock();
 	clipping_rect *rect;
@@ -1357,7 +1363,7 @@ bool RectPipe::GetRect(clipping_rect *rect)
 	return false;
 }
 
-bool RectPipe::HasRects(void)
+bool RectPipe::HasRects()
 {
 	lock.Lock();
 	bool value=has_rects;

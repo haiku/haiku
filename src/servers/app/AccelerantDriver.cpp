@@ -47,7 +47,8 @@
 	\brief Sets up internal variables needed by AccelerantDriver
 	
 */
-AccelerantDriver::AccelerantDriver(void) : DisplayDriver()
+AccelerantDriver::AccelerantDriver()
+	: DisplayDriverImpl()
 {
 	cursor=NULL;
 	under_cursor=NULL;
@@ -63,7 +64,7 @@ AccelerantDriver::AccelerantDriver(void) : DisplayDriver()
 	\brief Deletes the heap memory used by the AccelerantDriver
 	
 */
-AccelerantDriver::~AccelerantDriver(void)
+AccelerantDriver::~AccelerantDriver()
 {
 	if (cursor)
 		delete cursor;
@@ -80,7 +81,7 @@ AccelerantDriver::~AccelerantDriver(void)
 	Initialize sets up the driver for display, including the initial clearing
 	of the screen. If things do not go as they should, false should be returned.
 */
-bool AccelerantDriver::Initialize(void)
+bool AccelerantDriver::Initialize()
 {
 	int i;
 	char signature[1024];
@@ -181,8 +182,8 @@ bool AccelerantDriver::Initialize(void)
 	RGBColor blue(0,0,255,0);
 	FillRect(BRect(0,0,1024,768),blue);
 #endif
-
-	return true;
+	
+	return DisplayDriver::Initialize();
 }
 
 /*!
@@ -191,8 +192,10 @@ bool AccelerantDriver::Initialize(void)
 	Any work done by Initialize() should be undone here. Note that Shutdown() is
 	called even if Initialize() was unsuccessful.
 */
-void AccelerantDriver::Shutdown(void)
+void AccelerantDriver::Shutdown()
 {
+	DisplayDriver::Shutdown();
+
 #ifdef RUN_UNDER_R5
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	if ( SetDisplayMode )

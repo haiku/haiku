@@ -37,10 +37,12 @@
 #include <Region.h>	// for clipping_rect definition
 #include <Bitmap.h>
 #include <OS.h>
-#include "DisplayDriver.h"
+
 #include "FontServer.h"
 #include "GraphicsBuffer.h"
 #include "PixelRenderer.h"
+
+#include "DisplayDriverImpl.h"
 
 class ServerCursor;
 class ServerBitmap;
@@ -60,17 +62,14 @@ class PatternHandler;
 	Usage: Allocate and call SetTarget on the desired ServerBitmap and start calling 
 	graphics methods. All ServerBitmap memory belongs to the BitmapManager.
 */
-class BitmapDriver : public DisplayDriver
+class BitmapDriver : public DisplayDriverImpl
 {
 public:
-	BitmapDriver(void);
-	~BitmapDriver(void);
-
-	bool Initialize(void);
-	void Shutdown(void);
+	BitmapDriver();
+	~BitmapDriver();
 
 	void SetTarget(ServerBitmap *target);
-	ServerBitmap *GetTarget(void) const { return fTarget; }
+	ServerBitmap *GetTarget() const { return fTarget; }
 	
 	// Settings functions
 //	virtual void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
@@ -80,7 +79,7 @@ public:
 	virtual void InvertRect(const BRect &rect);
 protected:
 	virtual bool AcquireBuffer(FBBitmap *bmp);
-	virtual void ReleaseBuffer(void);
+	virtual void ReleaseBuffer();
 
 	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
 	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
@@ -102,6 +101,10 @@ protected:
 	ServerBitmap *fTarget;
 	GraphicsBuffer *fGraphicsBuffer;
 	PixelRenderer *fPixelRenderer;
+
+	// NOTE: completely outdated?
+	int fLineThickness;
+	PatternHandler fDrawPattern;
 };
 
 #endif

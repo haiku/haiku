@@ -34,10 +34,11 @@
 #include <Region.h>	// for clipping_rect definition
 #include <GraphicsCard.h>
 #include <Message.h>
-#include "DisplayDriver.h"
 #include "PortLink.h"
 #include <DirectWindow.h>
 #include "PatternHandler.h"
+
+#include "DisplayDriverImpl.h"
 
 class UtilityBitmap;
 class SDWindow;
@@ -51,14 +52,14 @@ class DirectDriver;
 class RectPipe
 {
 public:
-	RectPipe(void);
-	~RectPipe(void);
+	RectPipe();
+	~RectPipe();
 
 	void PutRect(const BRect &rect);
 	void PutRect(const clipping_rect &rect);
 	bool GetRect(clipping_rect *rect);
-	bool HasRects(void);
-	int32 CountRects(void) const { return list.CountItems(); }
+	bool HasRects();
+	int32 CountRects() const { return list.CountItems(); }
 protected:
 	BList list;
 	BLocker lock;
@@ -81,9 +82,9 @@ class DDWindow : public BDirectWindow
 {
 public:
 	DDWindow(uint16 width, uint16 height, color_space space, DirectDriver *owner);
-	~DDWindow(void);
+	~DDWindow();
 
-	virtual bool QuitRequested(void);
+	virtual bool QuitRequested();
 	virtual void DirectConnected(direct_buffer_info *info);
 	virtual void WindowActivated(bool active);
 	static int32 DrawingThread(void *data);
@@ -114,14 +115,14 @@ public:
 	the video display. An updater thread simply locks access to this bitmap, copies data to
 	the framebuffer, and releases access. Derived DisplayDriver functions operate on this bitmap.
 */
-class DirectDriver : public DisplayDriver
+class DirectDriver : public DisplayDriverImpl
 {
 public:
-	DirectDriver(void);
-	~DirectDriver(void);
+	DirectDriver();
+	~DirectDriver();
 
-	virtual	bool Initialize(void);
-	virtual	void Shutdown(void);
+	virtual	bool Initialize();
+	virtual	void Shutdown();
 	
 //	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
@@ -134,8 +135,8 @@ public:
 	virtual	bool DumpToFile(const char *path);
 
 	virtual	status_t SetDPMSMode(const uint32 &state);
-	virtual	uint32 DPMSMode(void) const;
-	virtual	uint32 DPMSCapabilities(void) const;
+	virtual	uint32 DPMSMode() const;
+	virtual	uint32 DPMSCapabilities() const;
 	virtual	status_t GetDeviceInfo(accelerant_device_info *info);
 	virtual	status_t GetModeList(display_mode **mode_list, uint32 *count);
 	virtual	status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);

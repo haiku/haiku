@@ -110,7 +110,7 @@ VDView::VDView(BRect bounds)
 	oldcursorframe=cursor->Bounds();
 }
 
-VDView::~VDView(void)
+VDView::~VDView()
 {
 	delete serverlink;
 	delete cursor;
@@ -119,7 +119,7 @@ VDView::~VDView(void)
 	delete viewbmp;
 }
 
-void VDView::AttachedToWindow(void)
+void VDView::AttachedToWindow()
 {
 }
 
@@ -243,7 +243,7 @@ VDWindow::VDWindow(BRect frame)
 	AddChild(view);
 }
 
-VDWindow::~VDWindow(void)
+VDWindow::~VDWindow()
 {
 }
 
@@ -441,7 +441,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 	}
 }
 
-bool VDWindow::QuitRequested(void)
+bool VDWindow::QuitRequested()
 {
 	port_id serverport=find_port(SERVER_PORT_NAME);
 
@@ -483,7 +483,8 @@ void VDWindow::WindowActivated(bool active)
 //-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 
-ViewDriver::ViewDriver(void)
+ViewDriver::ViewDriver()
+	: DisplayDriverImpl()
 {
 	fDisplayMode.virtual_width=640;
 	fDisplayMode.virtual_height=480;
@@ -500,7 +501,7 @@ ViewDriver::ViewDriver(void)
 	framebuffer->Unlock();
 }
 
-ViewDriver::~ViewDriver(void)
+ViewDriver::~ViewDriver()
 {
 	if(is_initialized)
 	{
@@ -510,7 +511,8 @@ ViewDriver::~ViewDriver(void)
 	}
 }
 
-bool ViewDriver::Initialize(void)
+bool
+ViewDriver::Initialize()
 {
 	Lock();
 
@@ -531,11 +533,14 @@ bool ViewDriver::Initialize(void)
 	// because the window is locked until Show() is first called
 	screenwin->Show();
 	Unlock();
-	return true;
+
+	return DisplayDriver::Initialize();
 }
 
-void ViewDriver::Shutdown(void)
+void ViewDriver::Shutdown()
 {
+	DisplayDriver::Shutdown();
+
 	Lock();
 	is_initialized=false;
 	Unlock();
@@ -916,13 +921,13 @@ status_t ViewDriver::SetDPMSMode(const uint32 &state)
 	return BScreen().SetDPMS(state);
 }
 
-uint32 ViewDriver::DPMSMode(void) const
+uint32 ViewDriver::DPMSMode() const
 {
 	// See note for SetDPMSMode if there are questions
 	return BScreen().DPMSState();
 }
 
-uint32 ViewDriver::DPMSCapabilities(void) const
+uint32 ViewDriver::DPMSCapabilities() const
 {
 	// See note for SetDPMSMode if there are questions
 	return BScreen().DPMSCapabilites();
@@ -1205,7 +1210,7 @@ bool ViewDriver::AcquireBuffer(FBBitmap *bmp)
 	return true;
 }
 
-void ViewDriver::ReleaseBuffer(void)
+void ViewDriver::ReleaseBuffer()
 {
 	if(!is_initialized)
 		return;
