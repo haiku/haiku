@@ -2462,6 +2462,14 @@ common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
 
 	put_vnode(vnode);
 
+	// null terminate the result
+	if (status >= 0 && bufferSize > 0) {
+		if (status < (int)bufferSize)
+			buffer[status] = '\0';
+		else
+			buffer[bufferSize - 1] = '\0';
+	}
+
 	return status;
 }
 
@@ -4399,9 +4407,11 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		if (!IS_USER_ADDRESS(leaf))
 			return B_BAD_ADDRESS;
 
-		status = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
-		if (status != B_OK)
-			return status;
+		int len = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
+		if (len < 0)
+			return len;
+		if (len >= B_FILE_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
 		leaf = stackLeaf;
 
 		// filter invalid leaf names
@@ -4435,7 +4445,12 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		}
 	}
 
-	return user_strlcpy(userPath, path, pathLength);
+	int len = user_strlcpy(userPath, path, pathLength);
+	if (len < 0)
+		return len;
+	if (len >= (int)pathLength)
+		return B_BUFFER_OVERFLOW;
+	return B_OK;
 }
 
 
@@ -4538,8 +4553,13 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 	if (status != B_OK)
 		return status;
 
-	status = user_strlcpy(userName, name, nameLength);
-	return (status == B_OK ? fdCloser.Detach() : status);
+	int len = user_strlcpy(userName, name, nameLength);
+	if (len < 0)
+		return len;
+	if (len >= (int)nameLength)
+		return B_BUFFER_OVERFLOW;
+
+	return fdCloser.Detach();
 }
 
 
@@ -4677,11 +4697,10 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSiz
 	if (status < B_OK)
 		return status;
 
-	// ToDo: think about buffer length and the return value at read_link()
 	status = user_strlcpy(userBuffer, buffer, bufferSize);
-	if (status >= 0)
-		status = B_OK;
-	return status;
+	if (status < 0)
+		return status;
+	return (status >= (int)bufferSize ? bufferSize : status + 1);
 }
 
 
@@ -4840,9 +4859,13 @@ _user_read_stat(int fd, const char *userPath, bool traverseLink,
 	if (userPath) {
 		// path given: get the stat of the node referred to by (fd, path)
 		char path[SYS_MAX_PATH_LEN + 1];
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		int len = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
+		if (len < 0)
+			return len;
+		if (len >= SYS_MAX_PATH_LEN)
+			return B_NAME_TOO_LONG;
 
 		status = common_path_read_stat(fd, path, traverseLink, &stat, false);
 	} else {
@@ -4889,9 +4912,13 @@ _user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
 
 	if (userPath) {
 		// path given: write the stat of the node referred to by (fd, path)
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		int len = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
+		if (len < 0)
+			return len;
+		if (len >= SYS_MAX_PATH_LEN)
+			return B_NAME_TOO_LONG;
 
 		status = common_path_write_stat(fd, path, traverseLeafLink, &stat,
 			statMask, false);
