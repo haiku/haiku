@@ -14,11 +14,13 @@
 int
 pipe(int streams[2])
 {
-	static int32 counter = 0;
-		// ToDo: a way without this variable would be even cooler
-
+	bigtime_t timestamp = system_time();
 	char pipeName[64];
-	sprintf(pipeName, "/pipe/%03lx-%03ld", find_thread(NULL), atomic_add(&counter, 1));
+	
+	while (system_time() <= timestamp)	// ensure we get an unused timestamp
+		;
+		
+	sprintf(pipeName, "/pipe/%03lx-%Ld", find_thread(NULL), system_time());
 
 	streams[0] = open(pipeName, O_CREAT | O_RDONLY, 0777);
 	if (streams[0] < 0)
