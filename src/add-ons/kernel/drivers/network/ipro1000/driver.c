@@ -21,7 +21,7 @@ pci_module_info *gPci;
 char* gDevNameList[MAX_CARDS + 1];
 pci_info *gDevList[MAX_CARDS];
 
-const char *
+static const char *
 identify_device(const pci_info *info)
 {
 	if (info->vendor_id != 0x8086)

@@ -30,10 +30,8 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 {
 	ipro1000_device *device;
 	char *deviceName;
-	uint32 val;
 	int dev_id;
 	int mask;
-	int i;
 	
 	TRACE("ipro1000_open()\n");
 
@@ -154,7 +152,7 @@ retry:
 	len = mb->m_len;
 	if (len < 0)
 		len = 0;
-	if (len > *num_bytes)
+	if (len > (int)*num_bytes)
 		len = *num_bytes;
 
 	memcpy(buf, mtod(mb, uint8 *), len); // XXX this is broken for jumbo frames

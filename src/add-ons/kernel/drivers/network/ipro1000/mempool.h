@@ -5,10 +5,10 @@
 #define __MEMPOOL_H
 
 int mempool_init(int count);
-void mempool_exit();
+void mempool_exit(void);
 
-void *mbuf_pool_get();
-void *chunk_pool_get();
+void *mbuf_pool_get(void);
+void *chunk_pool_get(void);
 
 void chunk_pool_put(void *p);
 void mbuf_pool_put(void *p);

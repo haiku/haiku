@@ -3,6 +3,7 @@
  */
 #include "if_em_osdep.h"
 #include "debug.h"
+#include "util.h"
 
 #undef malloc
 #undef free
@@ -34,7 +35,7 @@ contigfree(void *p, int p1, int p2)
 	delete_area(area_for(p));
 }
 
-int32 
+static int32 
 timer_dispatch_hook(timer *t)
 {
 	struct callout_handle *h = (struct callout_handle *)t;

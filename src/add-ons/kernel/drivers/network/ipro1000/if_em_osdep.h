@@ -73,8 +73,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #define splx(s)
 #define splimp() 0
 
-#define bzero(d,c)		memset(d,0,c)
-#define bcopy(s,d,c)    memmove(d,s,c)
+#ifndef bzero
+  #define bzero(d,c)		memset((d), (0), (c))
+#endif
+#ifndef bcopy
+  #define bcopy(s,d,c)		memmove((d), (s), (c))
+#endif
+#ifndef bcmp
+  #define bcmp(p1, p2, s)	memcmp((p1), (p2), (s)) // XXX correct order?
+#endif
 
 #define TUNABLE_INT(a, b)	/* ignored */
 
@@ -141,7 +148,7 @@ static inline unsigned long vtophys(unsigned long virtual_addr)
 {
 	physical_entry pe;
 	if (get_memory_map((void *)virtual_addr, 2048, &pe, 1) < 0) {
-		TRACE("get_memory_map failed for %p\n", virtual_addr);
+		TRACE("get_memory_map failed for %p\n", (void *)virtual_addr);
 		return 0;
 	}
 	return (unsigned long) pe.address;
@@ -193,9 +200,10 @@ void bus_teardown_intr(device_t dev, struct resource *res, void *tag);
 void *driver_malloc(int size, int p2, int p3);
 void  driver_free(void *p, int p2);
 
-				  			   
+/* GCC will always emit a read opcode when reading from */
+/* a volatile poitner, even if the result is unused */
 #define E1000_WRITE_FLUSH(a) \
-	do { volatile uint32 dummy = E1000_READ_REG(a, STATUS); } while (0)
+	E1000_READ_REG(a, STATUS)
 
 /* Read from an absolute offset in the adapter's memory space */
 #define E1000_READ_OFFSET(hw, offset) \

@@ -10,7 +10,7 @@
 spinlock	mbuf_lock = 0;
 
 struct mbuf *
-m_alloc()
+m_gethdr(int how, int type)
 {
 	struct mbuf *m = mbuf_pool_get();
 	if (!m)
@@ -18,12 +18,6 @@ m_alloc()
 	memset(m, 0, sizeof(m));
 	m->m_flags = M_PKTHDR;
 	return m;
-}
-
-struct mbuf *
-m_gethdr(int how, int type)
-{
-	return m_alloc();
 }
 
 void 
@@ -40,7 +34,7 @@ m_clget(struct mbuf * m, int how)
 void
 m_adj(struct mbuf *mp, int bytes)
 {
-	mp->m_data += bytes;
+	mp->m_data = (char *)mp->m_data + bytes;
 }
 
 void
@@ -58,7 +52,7 @@ m_freem(struct mbuf *mp)
 	}
 }
 
-void
+static void
 ether_input(struct ifnet *ifp, struct mbuf *m)
 {
 /*

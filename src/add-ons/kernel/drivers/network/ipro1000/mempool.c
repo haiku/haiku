@@ -15,7 +15,7 @@ void *chunk_pool = 0;
 void *mbuf_head = 0;
 void *chunk_head = 0;
 
-void *
+static void *
 area_malloc(int size)
 {
 	void *p;
@@ -26,7 +26,7 @@ area_malloc(int size)
 	return p;
 }
 
-void
+static void
 area_free(void *p)
 {
 	delete_area(area_for(p));
@@ -74,14 +74,14 @@ mempool_init(int count)
 }
 
 void
-mempool_exit()
+mempool_exit(void)
 {
 	area_free(chunk_pool);
 	area_free(mbuf_pool);
 }
 
 void *
-mbuf_pool_get()
+mbuf_pool_get(void)
 {
 	void *p;
 	cpu_status s;
@@ -112,7 +112,7 @@ mbuf_pool_put(void *p)
 }
 
 void *
-chunk_pool_get()
+chunk_pool_get(void)
 {
 	void *p;
 	cpu_status s;

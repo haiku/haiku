@@ -1914,7 +1914,7 @@ em_initialize_transmit_unit(struct adapter * adapter)
 	E1000_WRITE_REG(&adapter->hw, TDT, 0);
 
 
-	HW_DEBUGOUT2("Base = %x, Length = %x\n", 
+	HW_DEBUGOUT2("Base = %lx, Length = %lx\n", 
 		     E1000_READ_REG(&adapter->hw, TDBAL),
 		     E1000_READ_REG(&adapter->hw, TDLEN));
 
@@ -2846,10 +2846,10 @@ em_print_debug_info(struct adapter *adapter)
 	uint8_t *hw_addr = adapter->hw.hw_addr;
 
 	printf("em%d: Adapter hardware address = %p \n", unit, hw_addr);
-	printf("em%d:tx_int_delay = %d, tx_abs_int_delay = %d\n", unit, 
+	printf("em%d:tx_int_delay = %ld, tx_abs_int_delay = %ld\n", unit, 
 	       E1000_READ_REG(&adapter->hw, TIDV),
 	       E1000_READ_REG(&adapter->hw, TADV));
-	printf("em%d:rx_int_delay = %d, rx_abs_int_delay = %d\n", unit, 
+	printf("em%d:rx_int_delay = %ld, rx_abs_int_delay = %ld\n", unit, 
 	       E1000_READ_REG(&adapter->hw, RDTR),
 	       E1000_READ_REG(&adapter->hw, RADV));
 #ifdef DBG_STATS
@@ -2861,7 +2861,7 @@ em_print_debug_info(struct adapter *adapter)
 	printf("em%d: fifo workaround = %lld, fifo_reset = %lld\n", unit, 
 	       (long long)adapter->tx_fifo_wrk, 
 	       (long long)adapter->tx_fifo_reset);
-	printf("em%d: hw tdh = %d, hw tdt = %d\n", unit,
+	printf("em%d: hw tdh = %ld, hw tdt = %ld\n", unit,
 	       E1000_READ_REG(&adapter->hw, TDH), 
 	       E1000_READ_REG(&adapter->hw, TDT));
 	printf("em%d: Num Tx descriptors avail = %d\n", unit,
