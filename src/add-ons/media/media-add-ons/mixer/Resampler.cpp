@@ -101,7 +101,7 @@ Resampler::float_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 			*(float *)dst = *(const float *)src * gain;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -110,16 +110,11 @@ Resampler::float_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		// downsample
 		while (count--) {
 			*(float *)dst = *(const float *)src * gain;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -152,7 +147,7 @@ Resampler::int32_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 			*(float *)dst = *(const int32 *)src * gain;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -161,16 +156,11 @@ Resampler::int32_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		// downsample
 		while (count--) {
 			*(float *)dst = *(const int32 *)src * gain;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -203,7 +193,7 @@ Resampler::int16_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 			*(float *)dst = *(const int16 *)src * gain;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -212,16 +202,11 @@ Resampler::int16_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		// downsample
 		while (count--) {
 			*(float *)dst = *(const int16 *)src * gain;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -254,7 +239,7 @@ Resampler::int8_to_float(const void *_src, int32 src_sample_offset, int32 src_sa
 			*(float *)dst = *(const int8 *)src * gain;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -263,16 +248,11 @@ Resampler::int8_to_float(const void *_src, int32 src_sample_offset, int32 src_sa
 		// downsample
 		while (count--) {
 			*(float *)dst = *(const int8 *)src * gain;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -305,7 +285,7 @@ Resampler::uint8_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 			*(float *)dst = (((int32) *(const uint8 *)src) - 128) * gain;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -314,16 +294,11 @@ Resampler::uint8_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		// downsample
 		while (count--) {
 			*(float *)dst = (((int32) *(const uint8 *)src) - 128) * gain;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -368,7 +343,7 @@ Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_s
 				*(int32 *)dst = (int32)sample;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -383,16 +358,11 @@ Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_s
 				*(int32 *)dst = -2147483647L;
 			else
 				*(int32 *)dst = (int32)sample;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -437,7 +407,7 @@ Resampler::float_to_int16(const void *_src, int32 src_sample_offset, int32 src_s
 				*(int16 *)dst = (int16)sample;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -452,16 +422,11 @@ Resampler::float_to_int16(const void *_src, int32 src_sample_offset, int32 src_s
 				*(int16 *)dst = -32767;
 			else
 				*(int16 *)dst = (int16)sample;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -506,7 +471,7 @@ Resampler::float_to_int8(const void *_src, int32 src_sample_offset, int32 src_sa
 				*(int8 *)dst = (int8)sample;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -521,16 +486,11 @@ Resampler::float_to_int8(const void *_src, int32 src_sample_offset, int32 src_sa
 				*(int8 *)dst = -127;
 			else
 				*(int8 *)dst = (int8)sample;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
@@ -575,7 +535,7 @@ Resampler::float_to_uint8(const void *_src, int32 src_sample_offset, int32 src_s
 				*(uint8 *)dst = (uint8)sample;
 			dst += dst_sample_offset;
 			current += delta;
-			if (current > 1.0f) {
+			if (current >= 1.0f) {
 				current -= 1.0f;
 				src += src_sample_offset;
 			}
@@ -590,18 +550,11 @@ Resampler::float_to_uint8(const void *_src, int32 src_sample_offset, int32 src_s
 				*(uint8 *)dst = 1;
 			else
 				*(uint8 *)dst = (uint8)sample;
-			src += src_sample_offset;
-			current += delta; // delta is always > 1.0
-			if (current < 2.0f) {
-				current -= 1.0f;
-				dst += dst_sample_offset;
-			} else {
-				int32 inc_count = (int32) current;
-				current -= (float) inc_count;
-				dst += inc_count * dst_sample_offset;
-			}
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
 		}
 	}
 }
-
-
