@@ -37,7 +37,7 @@ protected:
 	bool is_connected;
 	PortLink *serverlink;
 	BPoint mousepos;
-	int32 buttons;
+	uint32 buttons;
 };
 
 class ScreenDriver : public DisplayDriver
@@ -88,7 +88,7 @@ public:
 protected:
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
-	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect);
+	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);

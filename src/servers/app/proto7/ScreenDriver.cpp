@@ -59,7 +59,7 @@ FrameBuffer::FrameBuffer(const char *title, uint32 space, status_t *st,bool debu
 	port_id serverport=find_port(SERVER_INPUT_PORT);
 	serverlink=new PortLink(serverport);
 	mousepos.Set(0,0);
-	buttons = 0;
+	buttons=0;
 #ifdef DEBUG_SERVER_EMU
 printf("ScreenDriver:: app_server input port: %ld\n",serverlink->GetPort());
 #endif
@@ -93,6 +93,54 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 
 			switch(key)
 			{
+				case 0x4c:	// Z key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_TERTIARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_DOWN);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+				}
+				case 0x4d:	// X key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_SECONDARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_DOWN);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+				}
+				case 0x4e:	// C key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_PRIMARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_DOWN);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+				}
 				case 0x47:	// Enter key
 				{
 					port_id serverport=find_port(SERVER_PORT_NAME);
@@ -105,7 +153,8 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 				{
 					printf("Launching test app\n");
 					status_t value;
-					BEntry entry("/boot/home/Desktop/openbeos/sources/proto6/OBApplication/OBApplication");
+//					BEntry entry("/boot/home/Desktop/openbeos/sources/proto6/OBApplication/OBApplication");
+					BEntry entry("/boot/home/Desktop/openbeos/sources/proto7/OBApplication/OBApplication");
 					entry_ref ref;
 					entry.GetRef(&ref);
 					value=be_roster->Launch(&ref);
@@ -278,7 +327,68 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 				default:
 					break;
 			}
+		}
+		case B_KEY_UP:
+		{
+#ifndef DISABLE_SERVER_EMU
+			int32 key,modifiers;
+			msg->FindInt32("key",&key);
+			msg->FindInt32("modifiers",&modifiers);
 
+			switch(key)
+			{
+				case 0x4c:	// Z key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_TERTIARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_UP);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+				}
+				case 0x4d:	// X key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_SECONDARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_UP);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+					break;
+				}
+				case 0x4e:	// C key on American QWERTY keymap
+				{
+					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+					int64 time=(int64)real_time_clock();
+					buttons=B_PRIMARY_MOUSE_BUTTON;
+					
+					serverlink->SetOpCode(B_MOUSE_UP);
+					serverlink->Attach(&time, sizeof(int64));
+					serverlink->Attach(&mousepos.x,sizeof(float));
+					serverlink->Attach(&mousepos.y,sizeof(float));
+					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&buttons, sizeof(uint32));
+					serverlink->Attach(&clicks, sizeof(uint32));
+					serverlink->Flush();
+					break;
+				}
+			}
+#endif
+			break;
 		}
 		default:
 			BWindowScreen::MessageReceived(msg);
@@ -302,10 +412,8 @@ ScreenDriver::ScreenDriver(void) : DisplayDriver()
 
 	drawmode = DRAW_COPY;
 
-	// We start without a cursor
 	cursor=NULL;
 	under_cursor=NULL;
-
 	cursorframe.Set(0,0,0,0);
 }
 
@@ -319,19 +427,13 @@ ScreenDriver::~ScreenDriver(void)
 
 bool ScreenDriver::Initialize(void)
 {
-	int8 cross[] = { 16,1,5,5,
-	14,0,4,0,4,0,4,0,128,32,241,224,128,32,4,0,
-	4,0,4,0,14,0,0,0,0,0,0,0,0,0,0,0,
-	14,0,4,0,4,0,4,0,128,32,245,224,128,32,4,0,
-	4,0,4,0,14,0,0,0,0,0,0,0,0,0,0,0 };
-	ServerBitmap *crosscursor;
 	fbuffer->Show();
 
 	// wait 1 sec for the window to show...
 	snooze(500000);
-	crosscursor = new ServerBitmap(cross);
-	SetCursor(crosscursor,BPoint(5,5));
-	delete crosscursor;
+
+	// we start out without a cursor shown because otherwise we get glitches in the
+	// upper left corner. init_desktop *always* sets a cursor, so this shouldn't be a problem
 	return true;
 }
 
@@ -1298,7 +1400,7 @@ printf("ScreenDriver::HideCursor\n");
 	{
 		SetCursorHidden(true);
 		if(CursorStateChanged())
-			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
 	}
 	Unlock();
@@ -1311,13 +1413,13 @@ printf("ScreenDriver::MoveCursorTo(%f,%f)\n",x,y);
 #endif
 	Lock();
 	if(!IsCursorHidden())
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
 	cursorframe.OffsetTo(x,y);
 	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
 	if(!IsCursorHidden())
-		BlitBitmap(cursor,cursor->Bounds(),cursorframe);
+		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	
 	Unlock();
 }
@@ -1332,7 +1434,7 @@ printf("ScreenDriver::ShowCursor\n");
 	{
 		SetCursorHidden(false);
 		if(CursorStateChanged())
-			BlitBitmap(cursor,cursor->Bounds(),cursorframe);
+			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	}
 	Unlock();
 }
@@ -1345,7 +1447,7 @@ printf("ScreenDriver::ObscureCursor\n");
 	Lock();
 	SetCursorObscured(true);
 	if(!IsCursorHidden() && fbuffer->IsConnected())
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 	Unlock();
 }
 
@@ -1361,7 +1463,7 @@ printf("ScreenDriver::SetCursor\n");
 
 	// erase old if visible
 	if(!IsCursorHidden() && under_cursor)
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
 	if(cursor)
 		delete cursor;
@@ -1382,7 +1484,7 @@ printf("ScreenDriver::SetCursor\n");
 	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
 	if(!IsCursorHidden())
-		BlitBitmap(cursor,cursor->Bounds(),cursorframe);
+		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	
 	Unlock();
 }
@@ -1391,7 +1493,7 @@ void ScreenDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)
 {
 	// Internal function called from others in the driver
 	
-	// TODO: Implment and substitute Line() calls with HLine calls as appropriate
+	// TODO: Implement and substitute Line() calls with HLine calls as appropriate
 	// elsewhere in the driver
 	
 	switch(fbuffer->gcinfo.bits_per_pixel)
@@ -1460,7 +1562,10 @@ printf("HLine(%u,%u,length %u,%u)\n",x,y,length,col);
 	memset(pcolor,col,bytes);
 }
 
-void ScreenDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect destrect)
+// This function is intended to eventually take care of most of the heavy lifting for
+// DrawBitmap in 32-bit mode, with others coming later. Right now, it is *just* used for
+// the 
+void ScreenDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
 {
 	// Another internal function called from other functions.
 	
@@ -1538,19 +1643,64 @@ printf("ScreenDriver::BlitBitmap(): Incompatible bitmap pixel depth\n");
 	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
 	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
 
-	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
-	{ 
-		memcpy(dest_bits,src_bits,line_length);
-
-		// Increment offsets
-   		src_bits += src_width;
-   		dest_bits += dest_width;
+	switch(mode)
+	{
+		case B_OP_OVER:
+		{
+			uint32 srow_pixels=src_width>>2;
+			uint8 *srow_index, *drow_index;
+			
+			
+			// This could later be optimized to use uint32's for faster copying
+			for (uint32 pos_y=0; pos_y!=lines; pos_y++)
+			{
+				
+				srow_index=src_bits;
+				drow_index=dest_bits;
+				
+				for(uint32 pos_x=0; pos_x!=srow_pixels;pos_x++)
+				{
+					// 32-bit RGBA32 mode byte order is BGRA
+					if(srow_index[3]>127)
+					{
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						// we don't copy the alpha channel
+						drow_index++; srow_index++;
+					}
+					else
+					{
+						srow_index+=4;
+						drow_index+=4;
+					}
+				}
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
+		default:	// B_OP_COPY
+		{
+			for (uint32 pos_y = 0; pos_y != lines; pos_y++)
+			{
+				memcpy(dest_bits,src_bits,line_length);
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
 	}
 }
 
 void ScreenDriver::ExtractToBitmap(ServerBitmap *destbmp,BRect destrect, BRect sourcerect)
 {
-	// Another internal function called from other functions.
+	// Another internal function called from other functions. Extracts data from
+	// the framebuffer to a target ServerBitmap
 
 	if(!destbmp)
 	{
@@ -1694,7 +1844,10 @@ float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	FontStyle *style=font->Style();
 
 	if(!style)
+	{
+		Unlock();
 		return 0.0;
+	}
 
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -1708,6 +1861,7 @@ float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	if(error)
 	{
 		printf("Couldn't create face object\n");
+		Unlock();
 		return 0.0;
 	}
 
@@ -1719,6 +1873,7 @@ float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	if(error)
 	{
 		printf("Couldn't set character size - error 0x%x\n",error);
+		Unlock();
 		return 0.0;
 	}
 
@@ -1746,11 +1901,11 @@ float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 		pen.x+=slot->advance.x;
 		previous=glyph_index;
 	}
-	Unlock();
 
 	FT_Done_Face(face);
 
 	returnval=pen.x>>6;
+	Unlock();
 	return returnval;
 }
 
@@ -1764,7 +1919,10 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	FontStyle *style=font->Style();
 
 	if(!style)
+	{
+		Unlock();
 		return 0.0;
+	}
 
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -1776,6 +1934,7 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	if(error)
 	{
 		printf("Couldn't create face object\n");
+		Unlock();
 		return 0.0;
 	}
 
@@ -1785,6 +1944,7 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	if(error)
 	{
 		printf("Couldn't set character size - error 0x%x\n",error);
+		Unlock();
 		return 0.0;
 	}
 
@@ -1807,6 +1967,7 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	FT_Done_Face(face);
 
 	returnval=ascent+descent;
+	Unlock();
 	return returnval;
 }
 
@@ -1815,13 +1976,18 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	if(!string || !d || !d->font)
 		return;
 
+	Lock();
+
 	pt.y--;	// because of Be's backward compatibility hack
 
 	ServerFont *font=d->font;
 	FontStyle *style=font->Style();
 
 	if(!style)
+	{
+		Unlock();
 		return;
+	}
 
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -1852,6 +2018,7 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	if(error)
 	{
 		printf("Couldn't create face object\n");
+		Unlock();
 		return;
 	}
 
@@ -1863,18 +2030,13 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	if(error)
 	{
 		printf("Couldn't set character size - error 0x%x\n",error);
+		Unlock();
 		return;
 	}
 
 	// if we do any transformation, we do a call to FT_Set_Transform() here
 	
 	// First, rotate
-        /*
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
-        */
 	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
 	rmatrix.xy = (FT_Fixed)( rotation.Sine()*0x10000); 
 	rmatrix.yx = (FT_Fixed)(-rotation.Sine()*0x10000); 
@@ -1953,6 +2115,7 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 		previous=glyph_index;
 	}
 	FT_Done_Face(face);
+	Unlock();
 }
 
 void ScreenDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
@@ -2253,5 +2416,6 @@ rgb_color ScreenDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d
 			break;
 		}
 	}
+	Unlock();
 	return returncolor;
 }

@@ -510,6 +510,7 @@ void AppServer::Poller(void)
 				// onto the active application. Eventually, we will pass them onto
 				// the window which is currently under the cursor.
 				case B_MOUSE_DOWN:
+				{
 					if(!msgbuffer)
 					{
 #ifdef DEBUG_POLLER_THREAD
@@ -518,6 +519,13 @@ printf("Poller: MouseDown() - Empty buffer\n");
 						ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
 						break;
 					}
+
+#ifdef DEBUG_POLLER_THREAD
+printf("Poller: MouseDown\n");
+#endif
+					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					break;
+				}
 				case B_MOUSE_UP:
 				{
 					if(!msgbuffer)
@@ -534,7 +542,7 @@ printf("Poller: MouseUp() - Empty buffer\n");
 					active_lock->Unlock();
 */
 #ifdef DEBUG_POLLER_THREAD
-printf("Poller: MouseDown/MouseUp\n");
+printf("Poller: MouseUp\n");
 #endif
 					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
 					break;
