@@ -387,30 +387,56 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 status_t nv_dac_sys_pll_find(
 	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result, uint8* p_result, uint8 test)
 {
-	int m = 0, n = 0, p = 0/*, m_max*/;
+	int m = 0, n = 0, p = 0;
 	float error, error_best = 999999999;
-	int best[3]; 
-	float f_vco;
+	int best[3];
+	float f_vco, discr_low, discr_high;
 
 	/* determine the max. reference-frequency postscaler setting for the 
-	 * current card (see G100, G200 and G400 specs). */
-/*	switch(si->ps.card_type)
+	 * current requested clock */
+	switch (si->ps.card_arch)
 	{
-	case G100:
-		LOG(4,("DAC: G100 restrictions apply\n"));
-		m_max = 7;
-		break;
-	case G200:
-		LOG(4,("DAC: G200 restrictions apply\n"));
-		m_max = 7;
+	case NV04A:
+		LOG(4,("DAC: NV04 restrictions apply\n"));
+		/* set phase-discriminator frequency range  (Mhz) */
+		/* (verified) */
+		discr_low = 1.0;
+		discr_high = 2.0;
 		break;
 	default:
-		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
-		m_max = 32;
+		LOG(4,("DAC: NV10/NV20/NV30 restrictions apply\n"));
+		/* apparantly we would get distortions on high PLL output frequencies if
+		 * we use the phase-discriminator at low frequencies */
+		/* (low discriminator specs are verified) */
+		if (req_sclk > 340.0)
+		{
+			/* Fpll > 340Mhz */
+			discr_low = 6.74;
+		}
+		else
+		{
+			if (req_sclk > 250.0)
+			{
+				/* 250Mhz < Fpll <= 340Mhz */
+				discr_low = 2.24;
+			}
+			else
+			{
+				/* Fpll < 250Mhz */
+				discr_low = 1.0;
+			}
+		}
+		/* (additional verified restriction on NV36) */
+		if (si->ps.card_type == NV36)
+		{
+			if (discr_low < 3.2) discr_low = 3.2;
+		}
+		/* (high discriminator spec is failsafe) */
+		discr_high = 14.0;
 		break;
 	}
-*/
-	LOG(4,("DAC: NV4/NV10/NV20 restrictions apply\n"));
+	LOG(4,("DAC: PLL discriminator input frequency range is %2.2fMhz - %2.2fMhz\n",
+		discr_low, discr_high));
 
 	/* Make sure the requested clock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
@@ -441,24 +467,17 @@ status_t nv_dac_sys_pll_find(
 			if (si->ps.ext_pll) f_vco /= 4;
 
 			/* iterate trough all valid reference-frequency postscaler settings */
-			for (m = 7; m <= 14; m++)
+			for (m = 1; m <= 14; m++)
 			{
 				/* check if phase-discriminator will be within operational limits */
-				//fixme: PLL calcs will be resetup/splitup/updated...
-				if (si->ps.card_type == NV36)
-				{
-					if (((si->ps.f_ref / m) < 3.2) || ((si->ps.f_ref / m) > 6.4)) continue;
-				}
-				else
-				{
-					if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
-				}
+				if (((si->ps.f_ref / m) < discr_low) || ((si->ps.f_ref / m) > discr_high))
+					continue;
 
 				/* calculate VCO postscaler setting for current setup.. */
 				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
 
 				/* ..and check for validity */
-				if ((n < 1) || (n > 255))	continue;
+				if ((n < 1) || (n > 255)) continue;
 
 				/* find error in frequency this setting gives */
 				if (si->ps.ext_pll)
