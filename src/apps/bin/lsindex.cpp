@@ -16,12 +16,14 @@
 
 void	print_help	(void);
 void	print_index_stat (const index_info * const a_index_info);
+void	print_index_type (const index_info * const a_index_info);
 
 int	main (int32 argc, char **argv)
 {
 	dev_t		vol_device			=	dev_for_path(".");
 	DIR		*	dev_index_dir		=	NULL;
 	bool		verbose				=	false;
+	bool		mkindex_output			=	false; /* mkindexi-ready output */
 	
 	for (int i = 1;  i < argc;  i++)
 	{
@@ -35,6 +37,8 @@ int	main (int32 argc, char **argv)
 		{
 			if 	(! strcmp(argv[i], "--verbose"))
 				verbose =	true;
+			else if 	(! strcmp(argv[i], "--mkindex"))
+				mkindex_output =	true;
 			else
 			{	
 				fprintf(stderr, "%s: option %s is not understood (use --help for help)\n", argv[0], argv[i]);
@@ -82,15 +86,8 @@ int	main (int32 argc, char **argv)
 		}
 
 
-		if (verbose)
+		if (verbose || mkindex_output)
 		{
-			printf("%s", index_entry->d_name);
-			
-			if (strlen(index_entry->d_name) < 8)
-				printf("  ");
-			
-			printf("\t");
-			
 			index_info	i_info;
 			status_t	status	=	B_OK;
 			
@@ -101,8 +98,20 @@ int	main (int32 argc, char **argv)
 				printf("%s: fs_stat_index(): (%d) %s\n", argv[0], errno, strerror(errno));
 				return (errno);
 			}
-			
-			print_index_stat (& i_info);
+			if (verbose) {
+				printf("%s", index_entry->d_name);
+
+				if (strlen(index_entry->d_name) < 8)
+					printf("  ");
+
+				printf("\t");
+				print_index_stat (& i_info);
+
+			} else { /* mkindex_output */
+				printf("mkindex -t ");
+				print_index_type(& i_info);
+				printf(" '%s'\n", index_entry->d_name);
+			}	
 		}
 		else
 		{
@@ -118,8 +127,35 @@ int	main (int32 argc, char **argv)
 void print_help (void)
 {
 	fprintf (stderr, 
-		"Usage: lsindex [--help | --verbose] [volume path]\n"
+		"Usage: lsindex [--help | --verbose | --mkindex] [volume path]\n"
+		"   --verbose gives index type, dates and owner,\n"
+		"   --mkindex outputs mkindex commands to recreate all the indices,\n"
 		"   If no volume is specified, the volume of the current directory is assumed.\n");
+}
+
+void print_index_type (const index_info * const a_index_info)
+{
+	// type
+	switch (a_index_info->type)
+	{
+		case B_INT32_TYPE:
+			printf("int");
+			break;
+		case B_INT64_TYPE:
+			printf("llong");
+			break;
+		case B_STRING_TYPE:
+			printf("string");
+			break;
+		case B_FLOAT_TYPE:
+			printf("float");
+			break;
+		case B_DOUBLE_TYPE:
+			printf("double");
+			break;
+		default:
+			printf("0x%08lx", (unsigned) a_index_info->type);
+	}
 }
 
 void print_index_stat (const index_info * const a_index_info)
@@ -134,7 +170,7 @@ void print_index_stat (const index_info * const a_index_info)
 		case B_BOOL_TYPE:					printf("B_BOOL_TYPE");					break;
 		case B_CHAR_TYPE:					printf("B_CHAR_TYPE");					break;
 		case B_COLOR_8_BIT_TYPE:			printf("B_COLOR_8_BIT_TYPE");			break;
-		case B_DOUBLE_TYPE :				printf("B_DOUBLE_TYPE");				break;
+		case B_DOUBLE_TYPE:				printf("B_DOUBLE_TYPE");				break;
 		case B_FLOAT_TYPE:					printf("B_FLOAT_TYPE");					break;
 		case B_GRAYSCALE_8_BIT_TYPE:		printf("B_GRAYSCALE_8_BIT_TYPE");		break;
 		case B_INT64_TYPE:					printf("B_INT64_TYPE");					break;
