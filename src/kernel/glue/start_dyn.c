@@ -22,6 +22,9 @@ extern char **argv_save;
 extern thread_id __main_thread_id;
 extern char **environ;
 
+extern char **__libc_argv;
+extern int __libc_argc;
+
 
 /* The argument list is redundant, but that is for keeping BeOS compatibility.
  * BeOS doesn't have the last pointer, though.
