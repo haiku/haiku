@@ -28,8 +28,6 @@
 #include <AppServerLink.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
-#include <PortLink.h>
-#include <PortMessage.h>
 #include <ServerProtocol.h>
 #include <Screen.h>
 #include <Roster.h>
@@ -54,11 +52,11 @@ _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 res, bool stick)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_SCREEN_MODE);
-	link.Attach<int32>(index);
-	link.Attach<int32>((int32)res);
-	link.Attach<bool>(stick);
-	link.Flush();
+	link.WriteInt32(AS_SET_SCREEN_MODE);
+	link.WriteInt32(index);
+	link.WriteInt32((int32)res);
+	link.WriteBool(stick);
+	link.Sync();
 
 	//TODO: Read back the status from the app_server's reply
 	return B_OK;
@@ -68,14 +66,14 @@ set_screen_space(int32 index, uint32 res, bool stick)
 _IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
 {
-	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_SET_SCROLLBAR_INFO);
-	link.Attach(info, sizeof(scroll_bar_info));
-	link.FlushWithReply(&msg);
+	if(!info)
+		return B_ERROR;
 	
-	//TODO: Read back the status from the app_server's reply
-	msg.Read(info,sizeof(scroll_bar_info));
+	BAppServerLink link;
+	link.WriteInt32(AS_SET_SCROLLBAR_INFO);
+	link.WriteData(info, sizeof(scroll_bar_info));
+	link.Sync();
+	link.ReadData(info,sizeof(scroll_bar_info));
 	return B_OK;
 }
 
@@ -251,15 +249,12 @@ keyboard_navigation_color()
 _IMPEXP_BE int32
 count_workspaces()
 {
-	PortLink::ReplyData replydata;
 	int32 count;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_COUNT_WORKSPACES);
-	link.FlushWithReply(&replydata);
-	
-	count=*((int32*)replydata.buffer);
-	
+	link.WriteInt32(AS_COUNT_WORKSPACES);
+	link.Sync();
+	link.ReadInt32(&count);
 	return count;
 }
 
@@ -268,24 +263,21 @@ _IMPEXP_BE void
 set_workspace_count(int32 count)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_WORKSPACE_COUNT);
-	link.Attach<int32>(count);
-	link.Flush();
-
+	link.WriteInt32(AS_SET_WORKSPACE_COUNT);
+	link.WriteInt32(count);
+	link.Sync();
 }
 
 
 _IMPEXP_BE int32
 current_workspace()
 {
-	PortLink::ReplyData replydata;
 	int32 index;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_CURRENT_WORKSPACE);
-	link.FlushWithReply(&replydata);
-	
-	index=*((int32*)replydata.buffer);
+	link.WriteInt32(AS_CURRENT_WORKSPACE);
+	link.Sync();
+	link.ReadInt32(&index);
 	
 	return index;
 }
@@ -295,23 +287,21 @@ _IMPEXP_BE void
 activate_workspace(int32 workspace)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_ACTIVATE_WORKSPACE);
-	link.Attach<int32>(workspace);
-	link.Flush();
+	link.WriteInt32(AS_ACTIVATE_WORKSPACE);
+	link.WriteInt32(workspace);
+	link.Sync();
 }
 
 
 _IMPEXP_BE bigtime_t
 idle_time()
 {
-	PortLink::ReplyData replydata;
 	bigtime_t idletime;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_IDLE_TIME);
-	link.FlushWithReply(&replydata);
-	
-	idletime=*((bigtime_t*)replydata.buffer);
+	link.WriteInt32(AS_IDLE_TIME);
+	link.Sync();
+	link.ReadInt64(&idletime);
 	
 	return idletime;
 }
@@ -346,24 +336,21 @@ _IMPEXP_BE void
 set_focus_follows_mouse(bool follow)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
-	link.Attach<bool>(follow);
-	link.Flush();
+	link.WriteInt32(AS_SET_FOCUS_FOLLOWS_MOUSE);
+	link.WriteBool(follow);
+	link.Sync();
 }
 
 
 _IMPEXP_BE bool
 focus_follows_mouse()
 {
-	PortMessage pmsg;
+	bool ffm;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
-	link.FlushWithReply(&pmsg);
-	
-	bool ffm;
-	pmsg.Read<bool>(&ffm);
-
+	link.WriteInt32(AS_FOCUS_FOLLOWS_MOUSE);
+	link.Sync();
+	link.ReadBool(&ffm);
 	return ffm;
 }
 
@@ -372,24 +359,21 @@ _IMPEXP_BE void
 set_mouse_mode(mode_mouse mode)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_MOUSE_MODE);
-	link.Attach(&mode,sizeof(mode_mouse));
-	link.Flush();
+	link.WriteInt32(AS_SET_MOUSE_MODE);
+	link.WriteData(&mode,sizeof(mode_mouse));
+	link.Sync();
 }
 
 
 _IMPEXP_BE mode_mouse
 mouse_mode()
 {
-	PortLink::ReplyData replydata;
 	mode_mouse mode;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_GET_MOUSE_MODE);
-	link.FlushWithReply(&replydata);
-	
-	mode=*((mode_mouse*)replydata.buffer);
-	
+	link.WriteInt32(AS_GET_MOUSE_MODE);
+	link.Sync();
+	link.ReadData(&mode,sizeof(mode_mouse));
 	return mode;
 }
 
@@ -397,16 +381,13 @@ mouse_mode()
 _IMPEXP_BE rgb_color
 ui_color(color_which which)
 {
-	PortLink::ReplyData replydata;
 	rgb_color color;
 	
 	BAppServerLink link;
-	link.SetOpCode(AS_GET_UI_COLOR);
-	link.Attach(&which, sizeof(which));
-	link.FlushWithReply(&replydata);
-	
-	color=*((rgb_color*)replydata.buffer);
-	
+	link.WriteInt32(AS_GET_UI_COLOR);
+	link.WriteData(&which, sizeof(which));
+	link.Sync();
+	link.ReadData(&color,sizeof(rgb_color));
 	return color;
 }
 
@@ -467,7 +448,7 @@ bitmaps_support_space(color_space space, uint32 * support_flags)
 void __set_window_decor(int32 theme)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_R5_SET_DECORATOR);
-	link.Attach(theme);
-	link.Flush();
+	link.WriteInt32(AS_R5_SET_DECORATOR);
+	link.WriteInt32(theme);
+	link.Sync();
 }
