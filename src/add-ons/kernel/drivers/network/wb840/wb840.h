@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * This file has been adapted to BeOS by Stefano Ceccherini
+ * This file has been adapted for BeOS by Stefano Ceccherini
  */
  
 #ifndef __WB840_H
@@ -43,28 +43,29 @@
  * Winbond register definitions.
  */
 enum registers {
-	WB_BUSCTL = 0x00,			/* bus control */
-	WB_TXSTART = 0x04,			/* tx start demand */
-	WB_RXSTART = 0x08,			/* rx start demand */
-	WB_RXADDR = 0x0C,			/* rx descriptor list start addr */
-	WB_TXADDR = 0x10,			/* tx descriptor list start addr */
-	WB_ISR = 0x14,				/* interrupt status register */
-	WB_NETCFG = 0x18,			/* network config register */
-	WB_IMR = 0x1C,				/* interrupt mask */
-	WB_FRAMESDISCARDED = 0x20,	/* # of discarded frames */
-	WB_SIO = 0x24,				/* MII and ROM/EEPROM access */
-	WB_BOOTROMADDR = 0x28,
-	WB_TIMER = 0x2C,			/* general timer */
-	WB_CURRXCTL = 0x30,			/* current RX descriptor */
-	WB_CURRXBUF = 0x34,			/* current RX buffer */
-	WB_MAR0 = 0x38,				/* multicast filter 0 */
-	WB_MAR1 = 0x3C,				/* multicast filter 1 */
-	WB_NODE0 = 0x40,			/* physical address 0 */
-	WB_NODE1 = 0x44,			/* physical address 1 */
-	WB_BOOTROMSIZE = 0x48,		/* boot ROM size */
-	WB_CURTXCTL = 0x4C,			/* current TX descriptor */
-	WB_CURTXBUF = 0x50,			/* current TX buffer */
+	WB_BUSCTL 			= 0x00,	/* bus control */
+	WB_TXSTART 			= 0x04,	/* tx start demand */
+	WB_RXSTART 			= 0x08,	/* rx start demand */
+	WB_RXADDR 			= 0x0C,	/* rx descriptor list start addr */
+	WB_TXADDR 			= 0x10,	/* tx descriptor list start addr */
+	WB_ISR 				= 0x14,	/* interrupt status register */
+	WB_NETCFG 			= 0x18,	/* network config register */
+	WB_IMR 				= 0x1C,	/* interrupt mask */
+	WB_FRAMESDISCARDED	= 0x20,	/* # of discarded frames */
+	WB_SIO 				= 0x24,	/* MII and ROM/EEPROM access */
+	WB_BOOTROMADDR 		= 0x28,
+	WB_TIMER 			= 0x2C,	/* general timer */
+	WB_CURRXCTL 		= 0x30,	/* current RX descriptor */
+	WB_CURRXBUF 		= 0x34,	/* current RX buffer */
+	WB_MAR0 			= 0x38,	/* multicast filter 0 */
+	WB_MAR1 			= 0x3C,	/* multicast filter 1 */
+	WB_NODE0 			= 0x40,	/* physical address 0 */
+	WB_NODE1 			= 0x44,	/* physical address 1 */
+	WB_BOOTROMSIZE 		= 0x48,	/* boot ROM size */
+	WB_CURTXCTL	 		= 0x4C,	/* current TX descriptor */
+	WB_CURTXBUF 		= 0x50,	/* current TX buffer */
 };
+
 /*
  * Bus control bits.
  */
@@ -124,6 +125,7 @@ enum InterruptStatusBits {
 	WB_ISR_TX_STATE = 0x00700000,
 	WB_ISR_BUSERRTYPE = 0x03800000,
 };
+
 /*
  * The RX_STATE and TX_STATE fields are not described anywhere in the
  * Winbond datasheet, however it appears that the Winbond chip is an
@@ -132,44 +134,44 @@ enum InterruptStatusBits {
  * the tulip documentation.
  */
 enum rxState {
-	WB_RXSTATE_STOPPED = 0x00000000,	/* 000 - Stopped */
-	WB_RXSTATE_FETCH = 0x00020000,		/* 001 - Fetching descriptor */
-	WB_RXSTATE_ENDCHECK = 0x00040000,	/* 010 - check for rx end */
-	WB_RXSTATE_WAIT = 0x00060000,		/* 011 - waiting for packet */
-	WB_RXSTATE_SUSPEND = 0x00080000,	/* 100 - suspend rx */
-	WB_RXSTATE_CLOSE = 0x000A0000,		/* 101 - close tx desc */
-	WB_RXSTATE_FLUSH = 0x000C0000,		/* 110 - flush from FIFO */
-	WB_RXSTATE_DEQUEUE = 0x000E0000,	/* 111 - dequeue from FIFO */
+	WB_RXSTATE_STOPPED 	= 0x00000000, 	/* 000 - Stopped */
+	WB_RXSTATE_FETCH 	= 0x00020000,	/* 001 - Fetching descriptor */
+	WB_RXSTATE_ENDCHECK	= 0x00040000,	/* 010 - check for rx end */
+	WB_RXSTATE_WAIT 	= 0x00060000,	/* 011 - waiting for packet */
+	WB_RXSTATE_SUSPEND 	= 0x00080000,	/* 100 - suspend rx */
+	WB_RXSTATE_CLOSE 	= 0x000A0000,	/* 101 - close tx desc */
+	WB_RXSTATE_FLUSH 	= 0x000C0000,	/* 110 - flush from FIFO */
+	WB_RXSTATE_DEQUEUE 	= 0x000E0000,	/* 111 - dequeue from FIFO */
 };
 
 enum txState {
-	 WB_TXSTATE_RESET = 0x00000000,		/* 000 - reset */
-	 WB_TXSTATE_FETCH = 0x00100000,		/* 001 - fetching descriptor */
+	 WB_TXSTATE_RESET 	= 0x00000000,	/* 000 - reset */
+	 WB_TXSTATE_FETCH 	= 0x00100000,	/* 001 - fetching descriptor */
 	 WB_TXSTATE_WAITEND = 0x00200000,	/* 010 - wait for tx end */
 	 WB_TXSTATE_READING = 0x00300000,	/* 011 - read and enqueue */
-	 WB_TXSTATE_RSVD = 0x00400000,		/* 100 - reserved */
-	 WB_TXSTATE_SETUP = 0x00500000,		/* 101 - setup packet */
+	 WB_TXSTATE_RSVD 	= 0x00400000,	/* 100 - reserved */
+	 WB_TXSTATE_SETUP 	= 0x00500000,	/* 101 - setup packet */
 	 WB_TXSTATE_SUSPEND = 0x00600000,	/* 110 - suspend tx */
-	 WB_TXSTATE_CLOSE = 0x00700000,		/* 111 - close tx desc */
+	 WB_TXSTATE_CLOSE 	= 0x00700000,	/* 111 - close tx desc */
 };
 /*
  * Network config bits.
  */
 enum networkConfigBits {
-	WB_NETCFG_RX_ON = 0x00000002,
-	WB_NETCFG_RX_ALLPHYS = 0x00000008,
-	WB_NETCFG_RX_MULTI = 0x00000010,
-	WB_NETCFG_RX_BROAD = 0x00000020,
-	WB_NETCFG_RX_RUNT = 0x00000040,
-	WB_NETCFG_RX_ERR = 0x00000080,
-	WB_NETCFG_FULLDUPLEX = 0x00000200,
-	WB_NETCFG_LOOPBACK = 0x00000C00,
-	WB_NETCFG_TX_ON = 0x00002000,
-	WB_NETCFG_TX_THRESH = 0x001FC000,
-	WB_NETCFG_RX_EARLYTHRSH = 0x1FE00000,
-	WB_NETCFG_100MBPS = 0x20000000,
-	WB_NETCFG_TX_EARLY_ON = 0x40000000,
-	WB_NETCFG_RX_EARLY_ON = 0x80000000,
+	WB_NETCFG_RX_ON 		= 0x00000002,
+	WB_NETCFG_RX_ALLPHYS 	= 0x00000008,
+	WB_NETCFG_RX_MULTI 		= 0x00000010,
+	WB_NETCFG_RX_BROAD 		= 0x00000020,
+	WB_NETCFG_RX_RUNT 		= 0x00000040,
+	WB_NETCFG_RX_ERR 		= 0x00000080,
+	WB_NETCFG_FULLDUPLEX 	= 0x00000200,
+	WB_NETCFG_LOOPBACK 		= 0x00000C00,
+	WB_NETCFG_TX_ON 		= 0x00002000,
+	WB_NETCFG_TX_THRESH		= 0x001FC000,
+	WB_NETCFG_RX_EARLYTHRSH	= 0x1FE00000,
+	WB_NETCFG_100MBPS 		= 0x20000000,
+	WB_NETCFG_TX_EARLY_ON 	= 0x40000000,
+	WB_NETCFG_RX_EARLY_ON 	= 0x80000000,
 };
 /*
  * The tx threshold can be adjusted in increments of 32 bytes.
@@ -182,47 +184,47 @@ enum networkConfigBits {
  * Interrupt mask bits.
  */
 enum interruptMaskBits {
-	WB_IMR_TX_OK = 0x00000001,
-	WB_IMR_TX_IDLE = 0x00000002,
-	WB_IMR_TX_NOBUF = 0x00000004,
-	WB_IMR_TX_UNDERRUN = 0x00000020,
-	WB_IMR_TX_EARLY = 0x00000400,
-	WB_IMR_RX_EARLY = 0x00000008,
-	WB_IMR_RX_ERR = 0x00000010,
-	WB_IMR_RX_OK = 0x00000040,
-	WB_IMR_RX_NOBUF = 0x00000080,
-	WB_IMR_RX_IDLE = 0x00000100,
-	WB_IMR_TIMER_EXPIRED = 0x00000800,
-	WB_IMR_BUS_ERR = 0x00002000,
-	WB_IMR_ABNORMAL = 0x00008000,
-	WB_IMR_NORMAL = 0x00010000,
+	WB_IMR_TX_OK 			= 0x00000001,
+	WB_IMR_TX_IDLE 			= 0x00000002,
+	WB_IMR_TX_NOBUF 		= 0x00000004,
+	WB_IMR_TX_UNDERRUN 		= 0x00000020,
+	WB_IMR_TX_EARLY 		= 0x00000400,
+	WB_IMR_RX_EARLY 		= 0x00000008,
+	WB_IMR_RX_ERR 			= 0x00000010,
+	WB_IMR_RX_OK 			= 0x00000040,
+	WB_IMR_RX_NOBUF			= 0x00000080,
+	WB_IMR_RX_IDLE			= 0x00000100,
+	WB_IMR_TIMER_EXPIRED	= 0x00000800,
+	WB_IMR_BUS_ERR 			= 0x00002000,
+	WB_IMR_ABNORMAL 		= 0x00008000,
+	WB_IMR_NORMAL 			= 0x00010000,
 };
 
 #define WB_INTRS	\
-	(WB_IMR_RX_OK|WB_IMR_RX_IDLE|WB_IMR_RX_ERR|WB_IMR_TX_OK| \
-	WB_IMR_RX_NOBUF|WB_IMR_RX_ERR|WB_IMR_RX_EARLY|	\
-	WB_IMR_TX_NOBUF|WB_IMR_TX_UNDERRUN|WB_IMR_BUS_ERR|		\
-	WB_IMR_ABNORMAL|WB_IMR_NORMAL|WB_IMR_TX_EARLY)
+	(WB_IMR_RX_OK|WB_IMR_RX_IDLE|WB_IMR_RX_ERR|WB_IMR_RX_NOBUF \
+	|WB_IMR_RX_EARLY|WB_IMR_TX_OK|WB_IMR_TX_EARLY|WB_IMR_TX_NOBUF \
+	|WB_IMR_TX_UNDERRUN|WB_IMR_TX_IDLE|WB_IMR_BUS_ERR \
+	|WB_IMR_ABNORMAL|WB_IMR_NORMAL|WB_IMR_TIMER_EXPIRED)
 
 /*
  * Serial I/O (EEPROM/ROM) bits.
  */
 enum EEpromBits {
-	WB_SIO_EE_CS = 0x00000001,			/* EEPROM chip select */
-	WB_SIO_EE_CLK = 0x00000002,			/* EEPROM clock */
-	WB_SIO_EE_DATAIN = 0x00000004,		/* EEPROM data output */
-	WB_SIO_EE_DATAOUT = 0x00000008,		/* EEPROM data input */
-	WB_SIO_ROMDATA4 = 0x00000010,
-	WB_SIO_ROMDATA5 = 0x00000020,
-	WB_SIO_ROMDATA6 = 0x00000040,
-	WB_SIO_ROMDATA7 = 0x00000080,
-	WB_SIO_ROMCTL_WRITE = 0x00000200,
-	WB_SIO_ROMCTL_READ = 0x00000400,
-	WB_SIO_EESEL = 0x00000800,
-	WB_SIO_MII_CLK = 0x00010000,		/* MDIO clock */
-	WB_SIO_MII_DATAIN = 0x00020000,		/* MDIO data out */
-	WB_SIO_MII_DIR = 0x00040000,		/* MDIO dir */
-	WB_SIO_MII_DATAOUT = 0x00080000,	/* MDIO data in */
+	WB_SIO_EE_CS 		= 0x00000001,			/* EEPROM chip select */
+	WB_SIO_EE_CLK 		= 0x00000002,			/* EEPROM clock */
+	WB_SIO_EE_DATAIN 	= 0x00000004,		/* EEPROM data output */
+	WB_SIO_EE_DATAOUT 	= 0x00000008,		/* EEPROM data input */
+	WB_SIO_ROMDATA4 	= 0x00000010,
+	WB_SIO_ROMDATA5 	= 0x00000020,
+	WB_SIO_ROMDATA6 	= 0x00000040,
+	WB_SIO_ROMDATA7		= 0x00000080,
+	WB_SIO_ROMCTL_WRITE	= 0x00000200,
+	WB_SIO_ROMCTL_READ 	= 0x00000400,
+	WB_SIO_EESEL 		= 0x00000800,
+	WB_SIO_MII_CLK 		= 0x00010000,		/* MDIO clock */
+	WB_SIO_MII_DATAIN 	= 0x00020000,		/* MDIO data out */
+	WB_SIO_MII_DIR 		= 0x00040000,		/* MDIO dir */
+	WB_SIO_MII_DATAOUT 	= 0x00080000,	/* MDIO data in */
 };
 
 enum EEpromCmd {
@@ -243,51 +245,60 @@ struct wb_desc {
 	uint32		wb_next;
 };
 
-#define WB_RXSTAT_CRCERR	0x00000002
-#define WB_RXSTAT_DRIBBLE	0x00000004
-#define WB_RXSTAT_MIIERR	0x00000008
-#define WB_RXSTAT_LATEEVENT	0x00000040
-#define WB_RXSTAT_GIANT		0x00000080
-#define WB_RXSTAT_LASTFRAG	0x00000100
-#define WB_RXSTAT_FIRSTFRAG	0x00000200
-#define WB_RXSTAT_MULTICAST	0x00000400
-#define WB_RXSTAT_RUNT		0x00000800
-#define WB_RXSTAT_RXTYPE	0x00003000
-#define WB_RXSTAT_RXERR		0x00008000
-#define WB_RXSTAT_RXLEN		0x3FFF0000
-#define WB_RXSTAT_RXCMP		0x40000000
-#define WB_RXSTAT_OWN		0x80000000
+enum rxStatusBits {
+	WB_RXSTAT_CRCERR  	= 0x00000002,
+	WB_RXSTAT_DRIBBLE 	= 0x00000004,
+ 	WB_RXSTAT_MIIERR  	= 0x00000008,
+ 	WB_RXSTAT_LATEEVENT = 0x00000040,
+ 	WB_RXSTAT_GIANT 	= 0x00000080,
+ 	WB_RXSTAT_LASTFRAG 	= 0x00000100,
+ 	WB_RXSTAT_FIRSTFRAG = 0x00000200,
+ 	WB_RXSTAT_MULTICAST = 0x00000400,
+ 	WB_RXSTAT_RUNT 		= 0x00000800,
+ 	WB_RXSTAT_RXTYPE 	= 0x00003000,
+ 	WB_RXSTAT_RXERR 	= 0x00008000,
+ 	WB_RXSTAT_RXLEN		= 0x3FFF0000,
+	WB_RXSTAT_RXCMP		= 0x40000000,
+	WB_RXSTAT_OWN		= 0x80000000
+};
 
 #define WB_RXBYTES(x)		((x & WB_RXSTAT_RXLEN) >> 16)
 #define WB_RXSTAT (WB_RXSTAT_FIRSTFRAG|WB_RXSTAT_LASTFRAG|WB_RXSTAT_OWN)
 
-#define WB_RXCTL_BUFLEN1	0x00000FFF
-#define WB_RXCTL_BUFLEN2	0x00FFF000
-#define WB_RXCTL_RLINK		0x01000000
-#define WB_RXCTL_RLAST		0x02000000
+enum rxControlBits {
+	WB_RXCTL_BUFLEN1	= 0x00000FFF,
+ 	WB_RXCTL_BUFLEN2	= 0x00FFF000,
+ 	WB_RXCTL_RLINK 		= 0x01000000,
+ 	WB_RXCTL_RLAST		= 0x02000000
+};
 
-#define WB_TXSTAT_DEFER		0x00000001
-#define WB_TXSTAT_UNDERRUN	0x00000002
-#define WB_TXSTAT_COLLCNT	0x00000078
-#define WB_TXSTAT_SQE		0x00000080
-#define WB_TXSTAT_ABORT		0x00000100
-#define WB_TXSTAT_LATECOLL	0x00000200
-#define WB_TXSTAT_NOCARRIER	0x00000400
-#define WB_TXSTAT_CARRLOST	0x00000800
-#define WB_TXSTAT_TXERR		0x00001000
-#define WB_TXSTAT_OWN		0x80000000
 
-#define WB_TXCTL_BUFLEN1	0x000007FF
-#define WB_TXCTL_BUFLEN2	0x003FF800
-#define WB_TXCTL_PAD		0x00800000
-#define WB_TXCTL_TLINK		0x01000000
-#define WB_TXCTL_TLAST		0x02000000
-#define WB_TXCTL_NOCRC		0x08000000
-#define WB_TXCTL_FIRSTFRAG	0x20000000
-#define WB_TXCTL_LASTFRAG	0x40000000
-#define WB_TXCTL_FINT		0x80000000
+enum txStatusBits {
+	WB_TXSTAT_DEFER		= 0x00000001,
+ 	WB_TXSTAT_UNDERRUN	= 0x00000002,
+ 	WB_TXSTAT_COLLCNT	= 0x00000078,
+ 	WB_TXSTAT_SQE		= 0x00000080,
+ 	WB_TXSTAT_ABORT		= 0x00000100,
+ 	WB_TXSTAT_LATECOLL	= 0x00000200,
+ 	WB_TXSTAT_NOCARRIER	= 0x00000400,
+ 	WB_TXSTAT_CARRLOST	= 0x00000800,
+ 	WB_TXSTAT_TXERR		= 0x00001000,
+ 	WB_TXSTAT_OWN		= 0x80000000
+};
 
-#define WB_MAXFRAGS		16
+enum txControlBits {
+	WB_TXCTL_BUFLEN1 	= 0x000007FF,
+	WB_TXCTL_BUFLEN2 	= 0x003FF800,
+	WB_TXCTL_PAD		= 0x00800000,
+	WB_TXCTL_TLINK		= 0x01000000,
+	WB_TXCTL_TLAST		= 0x02000000,
+	WB_TXCTL_NOCRC		= 0x08000000,
+	WB_TXCTL_FIRSTFRAG	= 0x20000000,
+	WB_TXCTL_LASTFRAG	= 0x40000000,
+	WB_TXCTL_FINT		= 0x80000000
+};
+
+#define WB_MAXFRAGS			16
 #define WB_RX_LIST_CNT		64
 #define WB_TX_LIST_CNT		64
 #define WB_RX_CNT_MASK		(WB_RX_LIST_CNT - 1)
@@ -322,7 +333,6 @@ struct wb_mii_frame {
 #define WB_MII_TURNAROUND	0x02
 
 typedef struct wb_device wb_device;
-
 struct wb_device {
 	timer		timer;
 	int32		devId;
@@ -360,7 +370,7 @@ struct wb_device {
 	uint16 fixedMode;
 	
 	volatile int32 blockFlag;
-	ether_address_t myaddr;
+	ether_address_t MAC_Address;
 	
 	spinlock intLock;
 	const char* deviceName;
@@ -377,6 +387,7 @@ struct mii_phy {
 	uint16	address;
 	uint8	types;
 };
+
 
 // taken from Axel's Sis900 driver
 enum MII_address {
@@ -471,25 +482,31 @@ enum link_modes {
 #define WB_CLRBIT(reg, x) write32(reg, read32(reg) & ~x)
 
 // Prototypes
-extern int32 wb_interrupt(void *arg);
-extern status_t wb_create_semaphores(wb_device *device);
-extern status_t wb_create_rings(wb_device *device);
-extern void wb_delete_rings(wb_device *device);
+extern int32	wb_interrupt(void *arg);
 
-extern void wb_init(wb_device *device);
-extern void wb_reset(wb_device *device);
+extern status_t	wb_create_semaphores(wb_device *device);
+extern void		wb_delete_semaphores(wb_device *device);
+
+extern status_t	wb_create_rings(wb_device *device);
+extern void		wb_delete_rings(wb_device *device);
+
+extern void		wb_init(wb_device *device);
+extern void		wb_reset(wb_device *device);
+extern status_t wb_stop(wb_device *device);
 
 extern status_t wb_initPHYs(wb_device *device);
 
-extern void wb_disable_interrupts(wb_device *device);
-extern void wb_enable_interrupts(wb_device *device);
+extern void		wb_disable_interrupts(wb_device *device);
+extern void		wb_enable_interrupts(wb_device *device);
 
-extern void wb_set_mode(wb_device *device, int mode);
-extern int32 wb_read_mode(wb_device *device);
+extern void		wb_set_mode(wb_device *device, int mode);
+extern int32	wb_read_mode(wb_device *device);
 
-extern int32 wb_tick(timer *arg);
-extern void wb_put_rx_descriptor(wb_desc *desc);
+extern void		wb_set_rx_filter(wb_device *device);
 
-extern void print_address(ether_address_t *addr);
+extern int32	wb_tick(timer *arg);
+extern void		wb_put_rx_descriptor(volatile wb_desc *desc);
+
+extern void		print_address(ether_address_t *addr);
 
 #endif //__WB840_H

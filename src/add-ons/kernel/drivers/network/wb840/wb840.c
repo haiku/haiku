@@ -66,10 +66,10 @@ physicalAddress(volatile void *addr, uint32 length)
 
 // Prepares a RX descriptor to be used by the chip
 void
-wb_put_rx_descriptor(wb_desc *descriptor)
+wb_put_rx_descriptor(volatile wb_desc *descriptor)
 {
 	descriptor->wb_status = WB_RXSTAT_OWN;
-	descriptor->wb_ctl = WB_MAX_FRAMELEN | WB_RXCTL_RLINK;
+	descriptor->wb_ctl |= WB_MAX_FRAMELEN | WB_RXCTL_RLINK;
 }
 
 
@@ -188,14 +188,9 @@ wb_init(wb_device *device)
 	
 	write32(device->reg_base + WB_BUSCTL_SKIPLEN, WB_SKIPLEN_4LONG);
 	
-	// Enable early TX/RX interrupt
-	WB_SETBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
-		
-	//Disable promiscuos mode
-	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_ALLPHYS);
-		
-	//Disable capture broadcast
-	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_BROAD);
+	// Disable early TX/RX interrupt, as we can't take advantage
+	// from them, at least for now.
+	WB_CLRBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
 }
 
 
@@ -224,6 +219,29 @@ wb_reset(wb_device *device)
 					
 	/* Wait a bit while the chip reorders his toughts */
 	snooze(1000);
+}
+
+
+status_t
+wb_stop(wb_device *device)
+{
+	uint32 cfgAddress = (uint32)device->reg_base + WB_NETCFG;
+	int32 i = 0;
+	
+	if (read32(cfgAddress) & (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON)) {
+		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON));
+
+		for (i = 0; i < WB_TIMEOUT; i++) {
+			if ((read32(device->reg_base + WB_ISR) & WB_ISR_TX_IDLE) &&
+				(read32(device->reg_base + WB_ISR) & WB_ISR_RX_IDLE))
+				break;
+		}
+	}
+	
+	if (i < WB_TIMEOUT)
+		return B_OK;
+		
+	return B_ERROR;
 }
 
 
@@ -264,6 +282,20 @@ wb_tick(timer *arg)
 	wb_updateLink(device);
 	
 	return B_OK;
+}
+
+
+/*
+ * Program the rx filter.
+ */
+void
+wb_set_rx_filter(wb_device *device)
+{
+	// TODO: Basically we just config the filter to accept broadcasts
+	// packets. We'll need also to configure it to multicast.
+	int32 rxFilter = read32(device->reg_base + WB_NETCFG);
+
+	write32(device->reg_base + WB_NETCFG, rxFilter | WB_NETCFG_RX_BROAD);
 }
 
 
@@ -350,9 +382,10 @@ wb_interrupt(void *arg)
 	struct wb_device *device = (wb_device*)arg;
 	int32 retval = B_UNHANDLED_INTERRUPT;
 	uint32 status;
+	
+	//TODO: Handle others interrupts
 		
 	acquire_spinlock(&device->intLock);
-	wb_disable_interrupts(device);
 	
 	status = read32(device->reg_base + WB_ISR);
 		
@@ -391,8 +424,13 @@ wb_interrupt(void *arg)
 			// ???
 		}
 		
-		if (status & (WB_ISR_TX_NOBUF | WB_ISR_TX_EARLY)) {
-			LOG(("WB_ISR_TX_NOBUF/TX_EARLY\n"));
+		if (status & WB_ISR_TX_EARLY) {
+			LOG(("WB_ISR_TX_EARLY\n"));
+			
+		}
+		
+		if (status & WB_ISR_TX_NOBUF) {
+			LOG(("WB_ISR_TX_NOBUF\n"));
 			retval = wb_tx_nobuf(device);
 		}
 		
@@ -421,7 +459,6 @@ wb_interrupt(void *arg)
 		}
 	}
 	
-	wb_enable_interrupts(device);
 	release_spinlock(&device->intLock);
 	
 	return retval;
@@ -471,6 +508,16 @@ wb_create_semaphores(struct wb_device *device)
 }
 
 
+void
+wb_delete_semaphores(wb_device *device)
+{
+	if (device->rxSem >= 0)
+		delete_sem(device->rxSem);
+	if (device->txSem >= 0)
+		delete_sem(device->txSem);
+}
+
+
 status_t
 wb_create_rings(struct wb_device *device)
 {
@@ -486,13 +533,15 @@ wb_create_rings(struct wb_device *device)
 		device->rxBuffer[i] = (void *)(((uint32)device->rxBuffer[0]) + (i * WB_BUFBYTES));
 
 	for (i = 0; i < WB_RX_LIST_CNT; i++) {
+		device->rxDescriptor[i].wb_status = 0;
+		device->rxDescriptor[i].wb_ctl = WB_RXCTL_RLINK;
 		wb_put_rx_descriptor(&device->rxDescriptor[i]);
 		device->rxDescriptor[i].wb_data = physicalAddress(device->rxBuffer[i], WB_BUFBYTES);
-		device->rxDescriptor[i].wb_next = physicalAddress(&device->rxDescriptor[(i + 1)
-											& WB_RX_CNT_MASK], sizeof(struct wb_desc));
+		device->rxDescriptor[i].wb_next = physicalAddress(&device->rxDescriptor[(i + 1) & WB_RX_CNT_MASK],
+			sizeof(struct wb_desc));
 	}
+	
 	device->rxFree = WB_RX_LIST_CNT;
-	device->rxDescriptor[WB_RX_LIST_CNT - 1].wb_ctl |= WB_RXCTL_RLAST;
 	
 	device->txArea = create_area("wb840 tx buffer", (void **)&device->txBuffer[0],
 			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_TX_LIST_CNT),
@@ -509,21 +558,16 @@ wb_create_rings(struct wb_device *device)
 		device->txDescriptor[i].wb_status = 0;
 		device->txDescriptor[i].wb_ctl = WB_TXCTL_TLINK;
 		device->txDescriptor[i].wb_data = physicalAddress(device->txBuffer[i], WB_BUFBYTES);
-		device->txDescriptor[i].wb_next = physicalAddress(&device->txDescriptor[(i + 1)
-												& WB_TX_CNT_MASK], sizeof(struct wb_desc));
+		device->txDescriptor[i].wb_next = physicalAddress(&device->txDescriptor[(i + 1) & WB_TX_CNT_MASK],
+			sizeof(struct wb_desc));
 	}
 	
-	device->txDescriptor[WB_TX_LIST_CNT - 1].wb_ctl |= WB_TXCTL_TLAST;
-	
-	/* Load the address of the RX list */
-	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_ON);
-	write32(device->reg_base + WB_RXADDR, physicalAddress(&device->rxDescriptor[0],
-													sizeof(struct wb_desc)));
-	
-	/* Load the address of the TX list */
-	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_TX_ON);
-	write32(device->reg_base + WB_TXADDR, physicalAddress(&device->txDescriptor[0],
-													sizeof(struct wb_desc)));
+	if (wb_stop(device) == B_OK) {
+		write32(device->reg_base + WB_RXADDR,
+			physicalAddress(&device->rxDescriptor[0], sizeof(struct wb_desc)));
+		write32(device->reg_base + WB_TXADDR,
+			physicalAddress(&device->txDescriptor[0], sizeof(struct wb_desc)));
+	}
 		
 	return B_OK;
 }
@@ -545,7 +589,7 @@ wb_read_mode(wb_device *info)
 
 	uint16 status = mii_readstatus(info);
 	if (!(status & MII_STATUS_LINK)) {
-		dprintf(DEVICE_NAME ": no link detected (status = %x)\n", status);
+		LOG((DEVICE_NAME ": no link detected (status = %x)\n", status));
 		return 0;
 	}
 
@@ -559,9 +603,9 @@ wb_read_mode(wb_device *info)
 	
 	info->autoNegotiationComplete = true;
 
-	dprintf(DEVICE_NAME ": linked, 10%s MBit, %s duplex\n",
+	LOG((DEVICE_NAME ": linked, 10%s MBit, %s duplex\n",
 				speed == LINK_SPEED_100_MBIT ? "0" : "",
-				duplex == LINK_FULL_DUPLEX ? "full" : "half");
+				duplex == LINK_FULL_DUPLEX ? "full" : "half"));
 
 	return speed | duplex;
 }
@@ -573,25 +617,10 @@ wb_set_mode(wb_device *info, int mode)
 	uint32 cfgAddress = (uint32)info->reg_base + WB_NETCFG;
 	int32 speed = mode & LINK_SPEED_MASK;
 	uint32 configFlags = 0;
+	status_t status;
 	
-	bool restart = false;
-	int32 i = 0;
-	
-	// Stop TX and RX queue.
-	if (read32(cfgAddress) & (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON)) {
-		restart = true;
-		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON));
-
-		for (i = 0; i < WB_TIMEOUT; i++) {
-			if ((read32(info->reg_base + WB_ISR) & WB_ISR_TX_IDLE) &&
-				(read32(info->reg_base + WB_ISR) & WB_ISR_RX_IDLE))
-				break;
-		}
-
-		if (i == WB_TIMEOUT)
-			dprintf(DEVICE_NAME" Failed to put RX and TX in idle state\n");			
-	}
-	
+	status = wb_stop(info);
+		
 	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX)
 		configFlags |= WB_NETCFG_FULLDUPLEX;			
 	
@@ -600,6 +629,6 @@ wb_set_mode(wb_device *info, int mode)
 
 	write32(cfgAddress, configFlags);
 	
-	if (restart)
+	if (status == B_OK)
 		WB_SETBIT(cfgAddress, WB_NETCFG_TX_ON|WB_NETCFG_RX_ON);	
 }

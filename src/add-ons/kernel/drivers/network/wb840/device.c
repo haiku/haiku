@@ -24,6 +24,7 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	int32 i;
 	int32 mask;
 	struct wb_device *data;
+	status_t status;
 	
 	LOG((DEVICE_NAME ": open()\n"));
 	
@@ -39,9 +40,8 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	
 	/* There can be only one access at time */
 	mask = 1L << i;
-	if (atomic_or(&gOpenMask, mask) & mask) {
+	if (atomic_or(&gOpenMask, mask) & mask)
 		return B_BUSY;
-	}
 	
 	/* Allocate a wb_device structure */
 	if (!(data = (wb_device *)malloc(sizeof(wb_device)))) {
@@ -61,45 +61,73 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	data->pciInfo = gDevList[i];
 	data->deviceName = gDevNameList[i];
 	data->blockFlag = 0;
-	
-	/* Let's map card registers to host's memory */
 	data->reg_base = data->pciInfo->u.h0.base_registers[0];	
-	LOG(("wb840: reg_base=%x\n", (int)data->reg_base));
-		
-	wb_read_eeprom(data, &data->myaddr, 0, 3, 0);
-	
 	data->wb_cachesize = gPci->read_pci_config(data->pciInfo->bus, data->pciInfo->device,
 			data->pciInfo->function, PCI_line_size, sizeof (PCI_line_size)) & 0xff;
 		
-	if (wb_create_semaphores(data) == B_OK) {		
-		wb_initPHYs(data);
-		wb_init(data);
-		
-		/* Setup interrupts */
-		data->irq = data->pciInfo->u.h0.interrupt_line;
-		install_io_interrupt_handler(data->irq, wb_interrupt, data, 0);
-		LOG(("Interrupts installed at irq line %x\n", data->irq));
-		
-		wb_enable_interrupts(data);	
-		wb_create_rings(data);		
-		
-		WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_RX_ON);
-		write32(data->reg_base + WB_RXSTART, 0xFFFFFFFF);
-		WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_TX_ON);
-		
-		add_timer(&data->timer, wb_tick, 1000000LL, B_PERIODIC_TIMER);
-		
-		return B_OK; // Everything after this line is an error
-		
-	} else
+	wb_read_eeprom(data, &data->MAC_Address, 0, 3, 0);
+	
+	status = wb_create_semaphores(data);
+	if (status < B_OK) {
 		LOG((DEVICE_NAME ": Couldn't create semaphores\n"));
+		goto err;
+	}
+		
+	status = wb_stop(data);
+	if (status < B_OK) {
+		LOG((DEVICE_NAME": Can't stop device\n"));
+		goto err1;
+	}
 			
+	status = wb_initPHYs(data);
+	if (status < B_OK) {
+		LOG((DEVICE_NAME": Can't init PHYs\n"));
+		goto err1;
+	}
+		
+	wb_init(data);
+		
+	/* Setup interrupts */
+	data->irq = data->pciInfo->u.h0.interrupt_line;
+	status = install_io_interrupt_handler(data->irq, wb_interrupt, data, 0);
+	if (status < B_OK) {
+		LOG((DEVICE_NAME
+			" can't install interrupt handler: %s\n", strerror(status)));
+		goto err1;		
+	}
+	
+	LOG(("Interrupts installed at irq line %x\n", data->irq));
+		
+	status = wb_create_rings(data);
+	if (status < B_OK) {
+		LOG((DEVICE_NAME": can't create ring buffers\n"));
+		goto err2;
+	}
+	
+	wb_enable_interrupts(data);	
+	wb_set_rx_filter(data);
+	
+	WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_RX_ON);
+	write32(data->reg_base + WB_RXSTART, 0xFFFFFFFF);
+	WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_TX_ON);
+	
+	add_timer(&data->timer, wb_tick, 1000000LL, B_PERIODIC_TIMER);
+		
+	return B_OK; // Everything after this line is an error
+		
+err2:
+	remove_io_interrupt_handler(data->irq, wb_interrupt, data);
+	
+err1:
+	wb_delete_semaphores(data);
+	
+err:			
 	gOpenMask &= ~(1L << i);
 	
 	free(data);	
 	LOG(("wb840: Open Failed\n"));
 	
-	return B_ERROR;
+	return status;
 }
 
 
@@ -121,8 +149,8 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 		*num_bytes = 0;
 		return B_ERROR;
 	}
-		
-	if ((status = acquire_sem_etc(device->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_OK) {
+	
+	if ((status = acquire_sem_etc(device->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) < B_OK) {
 		atomic_and(&device->rxLock, 0);
 		*num_bytes = 0;
 		return status;
@@ -143,9 +171,9 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	} else {
 		size = WB_RXBYTES(check);
 		size -= CRC_SIZE;
-		LOG((DEVICE_NAME": received %d bytes\n", (int)size));
+		LOG((DEVICE_NAME": received %ld bytes\n", size));
 		if (size > WB_MAX_FRAMELEN || size > *num_bytes) {
-			LOG(("ERROR: Bad frame size: %d", (int)size));
+			LOG(("ERROR: Bad frame size: %ld", size));
 			size = *num_bytes;
 		}
 		*num_bytes = size;
@@ -194,14 +222,13 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(device->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_OK) {
 		write32(device->reg_base + WB_TXSTART, 0xFFFFFFFF);
-		LOG(("write: acquiring sem failed: %d, %s\n", (int)status, strerror(status)));
+		LOG(("write: acquiring sem failed: %ld, %s\n", status, strerror(status)));
 		atomic_add(&device->txLock, -1);
 		*num_bytes = 0;
 		return status;
 	}
 	
 	check = device->txDescriptor[current].wb_status;
-	
 	if (check & WB_TXSTAT_OWN) {
 		// descriptor is still in use
 		dprintf(DEVICE_NAME ": card owns buffer %d\n", (int)current);
@@ -219,7 +246,8 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 		former = disable_interrupts();
 		acquire_spinlock(&device->txSpinlock);
 		
-		device->txDescriptor[current].wb_ctl |= frameSize | WB_TXCTL_FIRSTFRAG | WB_TXCTL_LASTFRAG;
+		device->txDescriptor[current].wb_ctl = WB_TXCTL_TLINK | frameSize;
+		device->txDescriptor[current].wb_ctl |= WB_TXCTL_FIRSTFRAG | WB_TXCTL_LASTFRAG;
 		device->txDescriptor[current].wb_status = WB_TXSTAT_OWN;
 		device->txSent++;
 
@@ -249,7 +277,7 @@ wb840_control (void *cookie, uint32 op, void *arg, size_t len)
 		
 		case ETHER_GETADDR:
 			LOG(("%s: ETHER_GETADDR\n", data->deviceName));
-			memcpy(arg, &data->myaddr, sizeof(data->myaddr));
+			memcpy(arg, &data->MAC_Address, sizeof(data->MAC_Address));
 			print_address(arg);
 			return B_OK;
 			
@@ -293,8 +321,7 @@ wb840_close(void* cookie)
 	
 	cancel_timer(&device->timer);
 		
-	// disable the transmitter's and receiver's state machine
-	WB_CLRBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_RX_ON|WB_NETCFG_TX_ON));
+	wb_stop(device);
 	
 	write32(device->reg_base + WB_TXADDR, 0x00000000);
 	write32(device->reg_base + WB_RXADDR, 0x00000000);
