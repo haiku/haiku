@@ -102,14 +102,16 @@ typedef enum {
 	rt_rs200,		// IGP 330M/340M/350M
 	rt_r200,		// Radeon 8500/9100
 	rt_rv250,		// Radeon 9000
-	rt_rv280,		// Radeon 9200
 	rt_m9,			// mobile Radeon 9000
+	rt_rv280,		// Radeon 9200
+	rt_m9plus,		// mobile Radeon 9200
 	
 	// from here on, r300 and up must be located as ATI modified the PLL
 	// with r300 and the code only tests for >= rt_r300
 	rt_r300,		// Radeon 9700
 	rt_r300_4p,		// Radeon 9500
 	rt_rv350,		// Radeon 9600
+	rt_m10,			// mobile Radeon 9600
 	rt_rv360,		// Radeon 9600
 	rt_r350,		// Radeon 9800
 	rt_r360			// Radeon 9800
@@ -118,13 +120,15 @@ typedef enum {
 
 // TV standard
 typedef enum {
+	ts_off,
 	ts_ntsc,
-	ts_pal,
-	ts_palm,
-	ts_palcn,
+	ts_pal_bdghi,
+	ts_pal_m,
+	ts_pal_nc,
 	ts_scart_pal,
-	ts_pal60
-} tv_standard;
+	ts_pal_60,
+	ts_max = ts_pal_60
+} tv_standard_e;
 
 
 // type of TV-Chip
@@ -151,13 +155,6 @@ typedef struct {
 } cursor_info;
 
 
-// head as seen by accelerant
-typedef struct {
-	int			physical_head;	// idx of physical head
-	uint32		rel_x, rel_y;	// relative position in multi-monitor mode
-} virtual_head;
-
-
 // info about flat panel connected to LVDS or DVI port
 typedef struct {
 	uint panel_pwr_delay;
@@ -175,16 +172,18 @@ typedef struct {
 } fp_info;
 
 
-// physical head
+// crtc info
 typedef struct {
-	bool		is_crtc2;			// true, if connected to crtc2
-	display_device_e active_displays; // currently driven displays
-	display_device_e chosen_displays;	// displays to be driven by next mode switch
-	sem_id		vblank;				// vertical blank interrupt semaphore
-	bool		cursor_on_screen;	// cursor is visible on this head
-	display_mode mode;				// display mode of this head
+	//bool		is_crtc2;			// true, if crtc2
 	int8		flatpanel_port;		// linked flat panel port (-1 if none)
-} physical_head;
+	bool		cursor_on_screen;	// cursor is visible on this head
+	int			crtc_idx;			// index of CRTC
+	display_device_e active_displays; // currently driven displays
+	display_device_e chosen_displays; // displays to be driven after next mode switch
+	sem_id		vblank;				// vertical blank interrupt semaphore
+	uint32		rel_x, rel_y;	// relative position in multi-monitor mode
+	display_mode mode;				// display mode of this head
+} crtc_info;
 
 
 // info about PLLs on graphics card as retrieved from BIOS
@@ -220,146 +219,6 @@ typedef struct {
 } pll_info;
 
 
-// PLL divider values
-typedef struct {
-	uint32 post_code;			// code for post divider
-	uint32 post;				// value of post divider
-	uint32 extra_post_code;		// code for extra post divider
-	uint32 extra_post;			// value of extra post divider
-	uint32 ref;					// reference divider
-	uint32 feedback;			// feedback divider
-	uint32 freq;				// resulting frequency
-} pll_dividers;
-
-
-// TV-Out parameters
-typedef struct {
-	uint16 y_accum_init;
-	uint16 uv_accum_init;
-	uint16 uv_inc;
-	uint16 h_inc;
-	uint32 tv_clocks_to_active;
-	
-	uint16 f_restart;
-	uint16 v_restart;
-	uint16 h_restart;
-	bool mode888;
-	
-	uint16 y_saw_tooth_slope;
-	uint16 y_saw_tooth_amp;
-	uint16 y_rise_accum_init;
-	uint16 y_fall_accum_init;
-	bool y_coeff_enable;
-	uint8 y_coeff_value;
-	
-	pll_dividers	tv_dividers;
-	pll_dividers	crt_dividers;
-} tv_params;
-
-
-// TV-timing
-typedef struct {
-	uint32 freq;				// TV sub carrier frequency x12
-    uint16 h_total;
-    uint16 h_sync_len;
-    uint16 h_genclk_delay;
-    uint16 h_setup_delay;
-    uint16 h_active_delay;
-    uint16 h_active_len;
-    uint16 v_total;
-    uint16 v_active_lines;
-    uint16 v_field_total;
-    uint16 v_fields;
-    uint16 f_total;
-    uint16 frame_size_adjust;
-    uint32 scale;
-} tv_timing;
-
-
-// list of register content (used for mode changes)
-typedef struct {
-	// CRTC regs
-	uint32		crtc_h_total_disp;
-	uint32		crtc_h_sync_strt_wid;
-	uint32		crtc_v_total_disp;
-	uint32		crtc_v_sync_strt_wid;
-	uint32		crtc_pitch;
-	uint32		crtc_gen_cntl;
-	uint32		crtc_ext_cntl;
-	uint32		crtc_offset_cntl;
-	
-	// RMX registers
-	uint32		fp_horz_stretch;
-    uint32		fp_vert_stretch;
-    
-    // Flat panel regs
-	uint32		fp_gen_cntl;
-	uint32		fp_panel_cntl;
-    uint32		lvds_gen_cntl;
-	uint32		fp_h_sync_strt_wid;
-	uint32		fp_v_sync_strt_wid;
-	uint32		fp2_gen_cntl;
-    
-    uint32		fp2_h_sync_strt_wid;
-	uint32		fp2_v_sync_strt_wid;
-
-	// DAC regs
-	uint32		dac_cntl2;
-	uint32		dac_cntl;
-	uint32		disp_hw_debug;
-	
-	// PLL regs
-	uint32 		ppll_div_3;
-	uint32		ppll_ref_div;
-	uint32		htotal_cntl;
-	
-	// pure information
-	uint32		dot_clock_freq;	// in 10 kHz
-    uint32		pll_output_freq;// in 10 kHz
-    int			feedback_div;
-    int			post_div;
-    
-   	// Common regs
-	uint32		surface_cntl;
-	uint32		disp_output_cntl;
-	
-	// TV-Out registers
-	uint32		tv_ftotal;
-	uint32		tv_vscaler_cntl1;
-	uint32		tv_y_saw_tooth_cntl;
-	uint32		tv_y_fall_cntl;
-	uint32		tv_y_rise_cntl;
-	uint32		tv_vscaler_cntl2;
-	uint32 		tv_hrestart;
-	uint32 		tv_vrestart;
-	uint32 		tv_frestart;
-	uint32		tv_tv_pll_cntl;
-	uint32 		tv_crt_pll_cntl;
-	uint32		tv_clock_sel_cntl;
-	uint32 		tv_clkout_cntl;
-	uint32		tv_htotal;
-	uint32 		tv_hsize;
-	uint32		tv_hdisp;
-	uint32		tv_hstart;
-	uint32		tv_vtotal;
-	uint32		tv_vdisp;
-	uint32		tv_sync_size;
-	uint32		tv_timing_cntl;
-	uint32		tv_dac_cntl;		// affects CRT connected to TV-DAC
-	uint32		tv_modulator_cntl1;
-	uint32		tv_modulator_cntl2;
-	uint32		tv_data_delay_a;
-	uint32		tv_data_delay_b;
-	uint32		tv_frame_lock_cntl;
-	uint32		tv_pll_cntl1;
-	uint32		tv_rgb_cntl;
-	uint32		tv_pre_dac_mux_cntl;
-	uint32		tv_master_cntl;
-	uint32		tv_uv_adr;
-	uint32		tv_pll_fine_cntl;
-} port_regs;
-
-
 // one overlay buffer
 typedef struct overlay_buffer_node {
 	struct overlay_buffer_node *next, *prev;
@@ -382,7 +241,7 @@ typedef struct {
 	
 	overlay_buffer_node *on;	// current buffer
 	overlay_buffer_node *prev_on; // previous buffer (for temporal deinterlace, currently unused)
-	int8			head;		// physical head where the overlay is shown on
+	int				crtc_idx;	// crtc where the overlay is shown on
 	uint32			rel_offset;	// offset of overlay source due to clipping
 } overlay_info;
 
@@ -393,8 +252,11 @@ typedef struct {
 typedef struct {
 	uint32		id;				// identifier used to know which card the 2D accelerator
 								// is prepared for (we use area_id of this structure)
-	virtual_head heads[2];		// heads assigned to virtual card
-	uint8		num_heads;		// number of heads assigned to virtual card
+	bool		assigned_crtc[2];	// mask of heads assigned to virtual card
+	bool		used_crtc[2];	// mask of heads assigned to virtual card
+	
+	display_device_e controlled_displays; // displays devices controlled byvc
+	display_device_e connected_displays; // bit-field of connected displays
 	
 	int8		independant_heads;	// number of heads to be programmed independantly
 	int8		different_heads;	// number of heads showing different parts of framebuffer
@@ -410,9 +272,12 @@ typedef struct {
 
 	cursor_info	cursor;
 
-	multi_mode_e	wanted_multi_mode;	// multi monitor mode as requested by user
-
 	bool		swap_displays;	// true to swap monitors
+	bool		use_laptop_panel; // true to always use laptop panel
+	tv_standard_e tv_standard;	// standard to use for TV Out
+	bool		enforce_mode_change; // set to make sure next display mode change 
+								// is executed even if display mode seems to be
+								// still the same
 
 	frame_buffer_config fbc;	// data for direct frame buffer access
 
@@ -528,6 +393,7 @@ typedef struct {
 	radeon_type	asic;		// ASIC version
 	bool		is_mobility; // mobility version
 	tv_chip_type tv_chip;	// type of TV-Out encoder
+	bool		new_pll;	// r300 style PLL
 	
 	uint8		theatre_channel;	// VIP channel of Rage Theatre (if applicable)
 		
@@ -539,11 +405,9 @@ typedef struct {
 	void		*framebuffer_pci;	// physical address of frame buffer (aka local memory)
 								// this is a hack needed by BeOS
 
-	physical_head heads[2];		// physical heads
-	uint8		num_heads;		// number of physical heads
+	crtc_info	crtc[2];		// info about each crtc
+	uint8		num_crtc;		// number of physical heads
 	
-	display_device_e connected_displays; // bit-field of connected displays
-
 	fp_info		flatpanels[2];	// info about connected flat panels (if any)
 
 	memory_type_info	memory[mt_last];	// info about memory types
@@ -618,6 +482,7 @@ typedef struct {
 	uint 			channel;	// channel, i.e. device
 	uint 			address;	// address
 	uint32 			data;		// read data
+	bool			lock;		// true, if CP lock must be acquired
 } radeon_vip_read;
 
 // write VIP register
@@ -626,6 +491,7 @@ typedef struct {
 	uint 			channel;	// channel, i.e. device
 	uint 			address;	// address
 	uint32 			data;		// data to write
+	bool			lock;		// true, if CP lock must be acquired
 } radeon_vip_write;
 
 // find channel of device with given ID

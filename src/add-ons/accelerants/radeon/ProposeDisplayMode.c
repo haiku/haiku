@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -14,6 +14,7 @@
 
 #include "crtc_regs.h"
 #include "utils.h"
+#include "set_mode.h"
 
 // standard mode list
 // all drivers contain this list - this should really be moved to
@@ -24,8 +25,10 @@
 //#define MODE_COUNT (sizeof (mode_list) / sizeof (display_mode))
 
 static const display_mode base_mode_list[] = {
-// PAL
+// test for PAL
 //{ { 25175, 640, 656, 752, 816, 480, 490, 492, 625, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
+// test for NTSC
+//{ { 43956, 800, 824, 952, 992, 600, 632, 635, 740, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) */
 
 { { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
 { { 27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
@@ -35,6 +38,14 @@ static const display_mode base_mode_list[] = {
 { { 36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
 { { 25175, 640, 656, 752, 800, 400, 412, 414, 449, B_POSITIVE_VSYNC}, B_CMAP8, 640, 400, 0, 0, MODE_FLAGS}, /* 640x400 - www.epanorama.net/documents/pc/vga_timing.html) */
 { { 25175, 640, 656, 752, 800, 350, 387, 389, 449, B_POSITIVE_HSYNC}, B_CMAP8, 640, 350, 0, 0, MODE_FLAGS}, /* 640x350 - www.epanorama.net/documents/pc/vga_timing.html) */
+
+// NTSC non-isometric resolution (isometric resolution is 640x480)
+{ { 26720, 720, 736, 808, 896, 480, 481, 484, 497, B_POSITIVE_VSYNC}, B_CMAP8, 720, 480, 0, 0, MODE_FLAGS},	/* 720x480@60Hz according to GMTF */
+
+// PAL resolutions
+{ { 26570, 720, 736, 808, 896, 576, 577, 580, 593, B_POSITIVE_VSYNC}, B_CMAP8, 720, 576, 0, 0, MODE_FLAGS},	/* 720x576@50Hz according to GMTF */
+{ { 28460, 768, 784, 864, 960, 576, 577, 580, 593, B_POSITIVE_VSYNC}, B_CMAP8, 768, 576, 0, 0, MODE_FLAGS},	/* 768x576@50Hz according to GMTF */
+
 { { 38100, 800, 832, 960, 1088, 600, 602, 606, 620, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* SVGA_800X600X56HzNI */
 { { 40000, 800, 840, 968, 1056, 600, 601, 605, 628, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) */
 { { 49500, 800, 816, 896, 1056, 600, 601, 604, 625, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(800X600X8.Z1) */
@@ -47,6 +58,10 @@ static const display_mode base_mode_list[] = {
 { { 94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 { { 108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) */
 { { 121500, 1152, 1216, 1344, 1568, 864, 865, 868, 911, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1152X864X8.Z1) */
+
+{ { 108000, 1280, 1376, 1488, 1800, 960, 961, 964, 1000, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X960X8.Z1) - not in Be's list */
+{ { 148500, 1280, 1344, 1504, 1728, 960, 961, 964, 1011, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1280X960X8.Z1) - not in Be's list */
+
 { { 108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X1024X8.Z1) */
 { { 135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1280X1024X8.Z1) */
 { { 157500, 1280, 1344, 1504, 1728, 1024, 1025, 1028, 1072, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1280X1024X8.Z1) */
@@ -59,7 +74,7 @@ static const display_mode base_mode_list[] = {
 };
 
 
-// convert Be colour space in Radeon data type
+// convert Be colour space to Radeon data type
 // returns true, if supported colour space
 //	space - Be colour space
 //	format - (out) Radeon data type
@@ -105,7 +120,8 @@ bool Radeon_GetFormat( int space, int *format, int *bpp )
 	 return B_BAD_VALUE.
 	If the mode is both valid AND falls within the limits, return B_OK.
 */
-status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head, 
+status_t Radeon_ProposeDisplayMode( 
+	shared_info *si, crtc_info *crtc, 
 	general_pll_info *pll, display_mode *target, 
 	const display_mode *low, const display_mode *high )
 {
@@ -116,7 +132,7 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head,
 	int format, bpp;
 	uint32 row_bytes;
 	int eff_virtual_width;
-	fp_info *flatpanel = &si->flatpanels[head->flatpanel_port];
+	fp_info *flatpanel = &si->flatpanels[crtc->flatpanel_port];
 
 	// save refresh rate - we want to leave this (artifical) value untouched
 	// don't use floating point, we are in kernel mode
@@ -133,7 +149,7 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head,
 	// for flat panels, check maximum resolution;
 	// all the other tricks (like fixed resolution and resulting scaling)
 	// are done automagically by set_display_mode
-    if( (head->chosen_displays & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
+    if( (crtc->chosen_displays & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
 		if( target->timing.h_display > flatpanel->panel_xres )
 			target->timing.h_display = flatpanel->panel_xres;
 		
@@ -141,6 +157,7 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head,
 			target->timing.v_display = flatpanel->panel_yres;
 	}
 
+/*
 	// the TV-Out encoder can "only" handle up to 1024x768
 	if( (head->chosen_displays & (dd_ctv | dd_stv)) != 0 ) {
 		if( target->timing.h_display > 1024 )
@@ -149,13 +166,14 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head,
 		if(	target->timing.v_display > 768 )
 			target->timing.v_display = 768;
 	}
+*/
 				
 	// validate horizontal timings
 	{
 		int h_sync_fudge, h_display, h_sync_start, h_sync_wid, h_total;
 			
 		h_display = target->timing.h_display;
-		h_sync_fudge = Radeon_GetHSyncFudge( head, format );
+		h_sync_fudge = Radeon_GetHSyncFudge( crtc, format );
 		h_sync_start = target->timing.h_sync_start;
 		h_sync_wid = target->timing.h_sync_end - target->timing.h_sync_start;
 		h_total = target->timing.h_total;
@@ -431,7 +449,7 @@ static void checkAndAddMode( accelerator_info *ai, const display_mode *mode, boo
 		*dst = *mode;
 		dst->space = low.space = high.space = spaces[i];
 
-		if( Radeon_ProposeDisplayMode( si, &si->heads[0], 
+		if( Radeon_ProposeDisplayMode( si, &si->crtc[0], 
 			&si->pll, dst, &low, &high ) == B_OK ) 
 		{
 			si->mode_count++;
@@ -442,7 +460,7 @@ static void checkAndAddMode( accelerator_info *ai, const display_mode *mode, boo
 			*dst = *mode;
 			dst->space = spaces[i];
 			
-			if( Radeon_ProposeDisplayMode( si, &si->heads[1],
+			if( Radeon_ProposeDisplayMode( si, &si->crtc[1],
 				&si->pll, dst, &low, &high ) == B_OK )
 			{
 				si->mode_count++;
@@ -480,11 +498,13 @@ static void checkAndAddMultiMode( accelerator_info *ai, const display_mode *mode
 }
 
 // add display mode of flat panel to official list
-static void addFPMode( shared_info *si )
+static void addFPMode( accelerator_info *ai )
 {
+	shared_info *si = ai->si;
+	
 	fp_info *fp_info = &si->flatpanels[0];
 	
-    if( (si->connected_displays & (dd_dvi | dd_lvds)) != 0 ) {
+    if( (ai->vc->connected_displays & (dd_dvi | dd_lvds)) != 0 ) {
     	display_mode mode;
     	
 		mode.virtual_width = mode.timing.h_display = fp_info->panel_xres;
@@ -555,7 +575,7 @@ status_t Radeon_CreateModeList( shared_info *si )
 		checkAndAddMultiMode( ai, &base_mode_list[i], false );
 
 	// plus fp mode
-	addFPMode( si );
+	addFPMode( ai );
 
 	// as we've created the list ourself, we don't clone it
 	ai->mode_list_area = si->mode_list_area;
@@ -596,7 +616,8 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 	// via successive Propose_Display_Mode; though this doesn't do any _real_ harm
 	// it leads to annoying distortions on screen!!
 	Radeon_DetectDisplays( ai);
-	Radeon_SetupDefaultMonitorRouting( ai, Radeon_DifferentPorts( &tmp_target ) );
+	Radeon_SetupDefaultMonitorRouting( 
+		ai, Radeon_DifferentPorts( &tmp_target ), vc->use_laptop_panel );
 
 	// transform to multi-screen mode first
 	Radeon_DetectMultiMode( vc, target );
@@ -613,7 +634,7 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 	
 	// we must assure that each ProposeMode call doesn't tweak the mode in
 	// a way that it cannot be handled by the other port anymore
-	result1 = Radeon_ProposeDisplayMode( si, &si->heads[vc->heads[0].physical_head], 
+	result1 = Radeon_ProposeDisplayMode( si, &si->crtc[0], 
 		&si->pll, target, low, high );
 		
 	if( result1 == B_ERROR )
@@ -621,7 +642,7 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 		
 	if( Radeon_NeedsSecondPort( target )) {
 		// if both ports are used, make sure both can handle mode
-		result2 = Radeon_ProposeDisplayMode( si, &si->heads[vc->heads[1].physical_head],
+		result2 = Radeon_ProposeDisplayMode( si, &si->crtc[1],
 			&si->pll, target, low, high );
 			
 		if( result2 == B_ERROR )

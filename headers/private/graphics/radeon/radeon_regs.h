@@ -250,12 +250,10 @@
 #define RADEON_TRAIL_X                      0x1618
 #define RADEON_TRAIL_X_SUB                  0x1620
 
-#define RADEON_VCLK_ECP_CNTL                0x0008 /* PLL */
-#define RADEON_VGA_DDA_CONFIG               0x02e8
+#define RADEON_VGA_DDA_CONFIG               0x02e8	// Rage 128 reg
 #define RADEON_VGA_DDA_ON_OFF               0x02ec
 #define RADEON_VID_BUFFER_CONTROL           0x0900
 #define RADEON_VIDEOMUX_CNTL                0x0190
-#define RADEON_VIPH_CONTROL                 0x0c40 /* ? */
 
 #define RADEON_OVR_CLR                      0x0230
 #define RADEON_OVR_WID_LEFT_RIGHT           0x0234

@@ -122,7 +122,7 @@ void Radeon_FreeIndirectBuffers( accelerator_info *ai )
 
 // wait until an indirect buffer becomes available;
 // lock must be hold
-void Radeon_WaitForFreeIndirectBuffers( accelerator_info *ai )
+static void Radeon_WaitForFreeIndirectBuffers( accelerator_info *ai )
 {
 	bigtime_t start_time;
 	CP_info *cp = &ai->si->cp;

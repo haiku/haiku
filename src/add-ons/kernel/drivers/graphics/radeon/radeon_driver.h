@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon kernel driver
@@ -106,11 +106,12 @@ typedef struct device_info {
 	vuint8		*regs;
 
 	radeon_type	asic;
-	uint8 		num_heads;
+	uint8 		num_crtc;
 	tv_chip_type tv_chip;
 	bool		is_mobility;
-	bool		is_igp;
+	bool		new_pll;
 	bool		has_vip;
+	bool		is_igp;
 	//display_type_e disp_type[2];
 	fp_info		fp_info;
 	
@@ -202,7 +203,7 @@ void Radeon_CleanupIRQ( device_info *di );
 
 
 // agp.c
-void Radeon_Fix_AGP();
+void Radeon_Fix_AGP(void);
 
 
 // mem_controller.c
@@ -218,8 +219,8 @@ void Radeon_UninitCP( device_info *di );
 
 
 // vip.c
-bool Radeon_VIPRead( device_info *di, uint channel, uint address, uint32 *data );
-bool Radeon_VIPWrite( device_info *di, uint8 channel, uint address, uint32 data );
+bool Radeon_VIPRead( device_info *di, uint channel, uint address, uint32 *data, bool lock );
+bool Radeon_VIPWrite( device_info *di, uint8 channel, uint address, uint32 data, bool lock );
 int Radeon_FindVIPDevice( device_info *di, uint32 device_id );
 
 

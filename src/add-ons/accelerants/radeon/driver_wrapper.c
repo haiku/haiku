@@ -39,6 +39,7 @@ status_t Radeon_VIPRead( accelerator_info *ai, uint channel, uint address, uint3
 	vr.magic = RADEON_PRIVATE_DATA_MAGIC;
 	vr.channel = channel;
 	vr.address = address;
+	vr.lock = false;
 	
 	res = ioctl( ai->fd, RADEON_VIPREAD, &vr, sizeof( vr ));
 	
@@ -57,6 +58,7 @@ status_t Radeon_VIPWrite( accelerator_info *ai, uint8 channel, uint address, uin
 	vw.channel = channel;
 	vw.address = address;
 	vw.data = data;
+	vw.lock = false;
 	
 	return ioctl( ai->fd, RADEON_VIPWRITE, &vw, sizeof( vw ));
 }

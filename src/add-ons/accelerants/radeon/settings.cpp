@@ -30,13 +30,9 @@ void Radeon_ReadSettings( virtual_card *vc )
 	BPath path;
 	int32 tmp;
 
-	// per default we enable combine mode;
-	// if actual mode isn't combine mode, we fall back to clone mode	
-	vc->wanted_multi_mode = mm_combine;
 	vc->swap_displays = false;
-	
-	// per default, show overlay on first port
-	//vc->whished_overlay_port = 0;
+	vc->use_laptop_panel = false;
+	vc->tv_standard = ts_ntsc;
 	
 	// this is problematic during boot: if there is	multi-user support,
 	// you don't have a user when app_server gets launched;
@@ -56,27 +52,12 @@ void Radeon_ReadSettings( virtual_card *vc )
 	if( settings.Unflatten( &file ) != B_OK )
 		return;
 	
-	if( settings.FindBool( "SwapDisplays", &vc->swap_displays ) != B_OK )
-		vc->swap_displays = false;
-
-	if( settings.FindInt32( "MultiMonitorMode", &tmp ) != B_OK )
-		tmp = mm_combine;
-		
-	switch( tmp ) {
-	case mm_none:
-	case mm_mirror:
-	case mm_combine:
-	case mm_clone:
-		vc->wanted_multi_mode = (multi_mode_e) tmp;
-		break;
-	default:
-		vc->wanted_multi_mode = mm_combine;
-	}
+	settings.FindBool( "SwapDisplays", &vc->swap_displays );
+	settings.FindBool( "UseLaptopPanel", &vc->use_laptop_panel );
+	settings.FindInt32( "TVStandard", &tmp );
 	
-	if( settings.FindInt32( "OverlayPort", &tmp ) != B_OK )
-		tmp = 0;
-		
-	//vc->whished_overlay_port = tmp;
+	if( tmp >= 0 && tmp <= ts_max )
+		vc->tv_standard = (tv_standard_e)tmp;
 }
 
 void Radeon_WriteSettings( virtual_card *vc )
@@ -100,10 +81,9 @@ void Radeon_WriteSettings( virtual_card *vc )
 	BMessage settings;
 	
 	settings.AddBool( "SwapDisplays", vc->swap_displays );
-	tmp = vc->wanted_multi_mode;
-	settings.AddInt32( "MultiMonitorMode", tmp );
-	/*tmp = vc->whished_overlay_port;
-	settings.AddInt32( "OverlayPort", tmp );*/
+	settings.AddBool( "UseLaptopPanel", vc->use_laptop_panel );
+	tmp = vc->tv_standard;
+	settings.AddInt32( "TVStandard", tmp );
 	
 	settings.Flatten( &file );
 }

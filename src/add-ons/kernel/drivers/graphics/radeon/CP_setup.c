@@ -217,7 +217,7 @@ void Radeon_ResetEngine( device_info *di )
 	// cannot be read out)
 	// -> this is a very bad idea, especially when it comes to laptops
 	// I comment it out for now, let's hope noone takes notice
-    if( di->num_heads > 1 ) {
+    if( di->num_crtc > 1 ) {
 		Radeon_OUTPLLP( regs, di->asic, RADEON_SCLK_CNTL, 
 			RADEON_CP_MAX_DYN_STOP_LAT |
 			RADEON_SCLK_FORCEON_MASK,
@@ -342,6 +342,16 @@ static void loadMicroEngineRAMData( device_info *di )
 
 	Radeon_WaitForIdle( di, false, false );
 
+/*	
+	// HACK start
+	Radeon_ResetEngine( di );
+	OUTREG( di->regs, 0x30, 0x5133a3a0 );	// bus_cntl
+	OUTREGP( di->regs, 0xf0c, 0xff00, ~0xff );	// latency
+	Radeon_WaitForIdle( di, false, false );
+	Radeon_ResetEngine( di );
+	// HACK end
+*/
+
 	OUTREG( di->regs, RADEON_CP_ME_RAM_ADDR, 0 );
 	
 	for ( i = 0 ; i < 256 ; i++ ) {
@@ -401,7 +411,7 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 	OUTREG( regs, RADEON_CP_RB_WPTR, 0 );
 	//*cp->ring.head = 0;
 	cp->ring.tail = 0;
-	
+
 	return B_OK;
 }
 
@@ -457,7 +467,7 @@ static status_t initCPFeedback( device_info *di )
 	*(uint32 *)MEM2CPU( cp->feedback.mem_type, cp->feedback.head_mem_offset) = 0;
 	memset( MEM2CPU( cp->feedback.mem_type, cp->feedback.scratch_mem_offset), 0, 0x40 );
 	//*cp->ring.head = 0;
-	
+
 	return B_OK;
 }
 

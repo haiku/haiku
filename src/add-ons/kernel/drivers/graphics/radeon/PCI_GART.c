@@ -167,7 +167,7 @@ static status_t initGATT( GART_info *gart )
 	
 	// temporary area where we fill in the memory map (deleted below)
 	map_area = create_area("pci_gart_map_area", (void **)&map, B_ANY_ADDRESS, map_area_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
-	dprintf("pci_gart_map_area: %d\n", map_area);
+	dprintf("pci_gart_map_area: %ld\n", map_area);
 	
 	get_memory_map( gart->buffer.ptr, gart->buffer.size, map, map_count );
 	

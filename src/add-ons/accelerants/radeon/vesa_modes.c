@@ -1,0 +1,61 @@
+#include "radeon_accelerant.h"
+
+#define	T_POSITIVE_SYNC	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
+
+// these are the official VESA modes
+// interestingly, they completely differ from the modes generated via GMTF
+const display_timing vesa_mode_list[] = {
+{ 31500, 640, 672, 736, 832, 350, 382, 385, 445, B_POSITIVE_HSYNC}, /* Vesa_Monitor_@85Hz_(640X350X8.Z1) */
+
+{ 31500, 640, 672, 736, 832, 400, 401, 404, 445, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@85Hz_(640X400X8.Z1) */
+
+{ 35500, 720, 756, 828, 936, 400, 401, 404, 446, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@85Hz_(720X400X8.Z1) */
+
+{ 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
+{ 31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, /* Vesa_Monitor_@72Hz_(640X480X8.Z1) */
+{ 31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
+{ 36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
+
+{ 36000, 800, 824, 896, 1024, 600, 601, 603, 625, T_POSITIVE_SYNC}, /* Vesa_Monitor_800X600X56Hz - this is different to Be's mode! */
+{ 40000, 800, 840, 968, 1056, 600, 601, 605, 628, T_POSITIVE_SYNC}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) */
+{ 50000, 800, 856, 976, 1040, 600, 637, 643, 666, T_POSITIVE_SYNC}, /* Vesa_Monitor_@72Hz_(800X600X8.Z1) */
+{ 49500, 800, 816, 896, 1056, 600, 601, 604, 625, T_POSITIVE_SYNC}, /* Vesa_Monitor_@75Hz_(800X600X8.Z1) */
+{ 56250, 800, 832, 896, 1048, 600, 601, 604, 631, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(800X600X8.Z1) */
+
+{ 65000, 1024, 1048, 1184, 1344, 768, 771, 777, 806, 0}, /* Vesa_Monitor_@60Hz_(1024X768X8.Z1) */
+{ 75000, 1024, 1048, 1184, 1328, 768, 771, 777, 806, 0}, /* Vesa_Monitor_@70_(1024X768X8.Z1) */
+{ 78750, 1024, 1040, 1136, 1312, 768, 769, 772, 800, T_POSITIVE_SYNC}, /* Vesa_Monitor_@75Hz_(1024X768X8.Z1) */
+{ 94500, 1024, 1072, 1168, 1376, 768, 769, 772, 808, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(1024X768X8.Z1) */
+
+{ 94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, T_POSITIVE_SYNC}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) - is this really Vesa? */
+{ 108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, T_POSITIVE_SYNC}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) */
+{ 121500, 1152, 1216, 1344, 1568, 864, 865, 868, 911, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(1152X864X8.Z1) - is this really Vesa?*/
+
+{ 108000, 1280, 1376, 1488, 1800, 960, 961, 964, 1000, T_POSITIVE_SYNC}, /* Vesa_Monitor_@60Hz_(1280X960X8.Z1) - not in Be's list */
+{ 148500, 1280, 1344, 1504, 1728, 960, 961, 964, 1011, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(1280X960X8.Z1) - not in Be's list */
+
+{ 108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, /* Vesa_Monitor_@60Hz_(1280X1024X8.Z1) */
+{ 135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, /* Vesa_Monitor_@75Hz_(1280X1024X8.Z1) */
+{ 157500, 1280, 1344, 1504, 1728, 1024, 1025, 1028, 1072, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(1280X1024X8.Z1) */
+
+{ 162000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@60Hz_(1600X1200X8.Z1) */
+{ 175500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@65Hz_(1600X1200X8.Z1) */
+{ 189000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@70Hz_(1600X1200X8.Z1) */
+{ 202500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@75Hz_(1600X1200X8.Z1) */
+{ 216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) - is this really Vesa? */
+{ 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) */
+
+// the following modes weren't defined in Be's code (they are strange anyway - perhaps HDTV?)
+{ 204800, 1792, 1920, 2120, 2448, 1344, 1345, 1348, 1394, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@60Hz_(1792X1344X8.Z1) */
+{ 261000, 1792, 1888, 2104, 2456, 1344, 1345, 1348, 1417, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@75Hz_(1792X1344X8.Z1) */
+
+{ 218300, 1856, 1952, 2176, 2528, 1392, 1393, 1396, 1439, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@60Hz_(1856X1392X8.Z1) */
+{ 288000, 1856, 1984, 2208, 2560, 1392, 1393, 1396, 1500, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@75Hz_(1856X1392X8.Z1) */
+
+{ 234000, 1920, 2048, 2256, 2600, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@60Hz_(1920X1440X8.Z1) */
+{ 297000, 1920, 2064, 2288, 2640, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, /* Vesa_Monitor_@75Hz_(1920X1440X8.Z1) */
+};
+
+
+// number of VESA modes
+const size_t vesa_mode_list_count = sizeof( vesa_mode_list ) / sizeof( vesa_mode_list[0] );

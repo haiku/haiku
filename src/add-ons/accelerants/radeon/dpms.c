@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -13,6 +13,8 @@
 #include "fp_regs.h"
 #include "pll_regs.h"
 #include "pll_access.h"
+#include "tv_out_regs.h"
+#include "theatre_regs.h"
 #include "GlobalData.h"
 
 
@@ -20,15 +22,14 @@
 status_t SET_DPMS_MODE(uint32 dpms_flags) 
 {
 	virtual_card *vc = ai->vc;
-	shared_info *si = ai->si;
-	status_t result1, result2;
-	
-	result1 = Radeon_SetDPMS( ai, &si->heads[vc->heads[0].physical_head], dpms_flags );
-	
-	if( vc->independant_heads > 1 )
-		result2 = Radeon_SetDPMS( ai, &si->heads[vc->heads[1].physical_head], dpms_flags );
-	else
+	status_t 
+		result1 = B_OK, 
 		result2 = B_OK;
+	
+	if( vc->used_crtc[0] )
+		result1 = Radeon_SetDPMS( ai, 0, dpms_flags );
+	if( vc->used_crtc[0] )
+		result1 = Radeon_SetDPMS( ai, 0, dpms_flags );
 
 	if( result1 == B_OK && result2 == B_OK )
 		return B_OK;
@@ -46,8 +47,8 @@ uint32 DPMS_CAPABILITIES(void)
 // public function: get current DPMS mode
 uint32 DPMS_MODE(void) 
 {
-	// we just ask the primary head what status it is in
-	return Radeon_GetDPMS( ai, &ai->si->heads[ai->vc->heads[0].physical_head] );
+	// we just ask the primary virtual head what status it is in
+	return Radeon_GetDPMS( ai, ai->vc->used_crtc[0] ? 0 : 1 );
 }
 
 
@@ -137,14 +138,56 @@ static void Radeon_SetDPMS_FP2( accelerator_info *ai, int mode )
 }
 
 
-// set DPMS mode for first port
+// set DPMS mode for CRT DAC.
+// warning: the CRTC-DAC only obbeys this setting if
+// connected to CRTC1, else it collides with TV-DAC
+static void Radeon_SetDPMS_CRT( accelerator_info *ai, int mode )
+{
+	vuint8 *regs = ai->regs;
+	
+	switch( mode ) {
+	case B_DPMS_ON:
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, 0, ~RADEON_CRTC_DISPLAY_DIS );
+		break;
+		
+	case B_DPMS_STAND_BY:
+	case B_DPMS_SUSPEND:
+	case B_DPMS_OFF:
+		OUTREGP( regs, RADEON_CRTC_EXT_CNTL,
+			RADEON_CRTC_DISPLAY_DIS, ~RADEON_CRTC_DISPLAY_DIS );
+		break;
+	}
+}
+
+
+// set DPMS mode for TV-DAC in CRT mode
+// warning: if the CRT-DAC is connected to CRTC2, it is
+// affected by this setting too
+static void Radeon_SetDPMS_TVCRT( accelerator_info *ai, int mode )
+{
+	vuint8 *regs = ai->regs;
+	
+	switch( mode ) {
+	case B_DPMS_ON:
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, ~RADEON_CRTC2_DISP_DIS );
+		break;
+		
+	case B_DPMS_STAND_BY:
+	case B_DPMS_SUSPEND:
+	case B_DPMS_OFF:
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
+			RADEON_CRTC2_DISP_DIS, ~RADEON_CRTC2_DISP_DIS );
+		break;
+	}
+}
+
+
+// set DPMS mode for first CRTC
 static void Radeon_SetDPMS_CRTC1( accelerator_info *ai, int mode )
 {
 	vuint8 *regs = ai->regs;
 	
-	int mask = RADEON_CRTC_DISPLAY_DIS
-		| RADEON_CRTC_HSYNC_DIS
-		| RADEON_CRTC_VSYNC_DIS;
+	uint32 mask = RADEON_CRTC_HSYNC_DIS | RADEON_CRTC_VSYNC_DIS;
 		
 	switch( mode ) {
 	case B_DPMS_ON:
@@ -154,29 +197,42 @@ static void Radeon_SetDPMS_CRTC1( accelerator_info *ai, int mode )
 	case B_DPMS_STAND_BY:
 		/* Screen: Off; HSync: Off, VSync: On */
 		OUTREGP( regs, RADEON_CRTC_EXT_CNTL,
-			RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_HSYNC_DIS, ~mask );
+			RADEON_CRTC_HSYNC_DIS, ~mask );
 		break;
 	case B_DPMS_SUSPEND:
 		/* Screen: Off; HSync: On, VSync: Off */
 		OUTREGP( regs, RADEON_CRTC_EXT_CNTL,
-			RADEON_CRTC_DISPLAY_DIS | RADEON_CRTC_VSYNC_DIS, ~mask );
+			RADEON_CRTC_VSYNC_DIS, ~mask );
 		break;
 	case B_DPMS_OFF:
 		/* Screen: Off; HSync: Off, VSync: Off */
 		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, mask, ~mask );
 		break;
 	}
+	
+	// disable/enable memory requests and cursor
+	switch( mode ) {
+	case B_DPMS_ON:
+		/* Screen: On; HSync: On, VSync: On */
+		OUTREGP( regs, RADEON_CRTC_GEN_CNTL, 0, ~RADEON_CRTC_DISP_REQ_EN_B );
+		Radeon_ShowCursor( ai, 0 );
+		break;
+	case B_DPMS_STAND_BY:
+	case B_DPMS_SUSPEND:
+	case B_DPMS_OFF:
+		OUTREGP( regs, RADEON_CRTC_GEN_CNTL, RADEON_CRTC_DISP_REQ_EN_B, 
+			~(RADEON_CRTC_DISP_REQ_EN_B | RADEON_CRTC_CUR_EN) );
+		break;
+	}
 }
 
 
-// set DPMS mode of second port
-static void Radeon_SetDPMS_CRTC2( accelerator_info *di, int mode )
+// set DPMS mode of second CRTC
+static void Radeon_SetDPMS_CRTC2( accelerator_info *ai, int mode )
 {
-	vuint8 *regs = di->regs;
+	vuint8 *regs = ai->regs;
 	
-	int mask = RADEON_CRTC2_DISP_DIS
-		| RADEON_CRTC2_HSYNC_DIS
-		| RADEON_CRTC2_VSYNC_DIS;
+	int mask = RADEON_CRTC2_HSYNC_DIS | RADEON_CRTC2_VSYNC_DIS;
 		
 	switch( mode ) {
 	case B_DPMS_ON:
@@ -186,36 +242,54 @@ static void Radeon_SetDPMS_CRTC2( accelerator_info *di, int mode )
 	case B_DPMS_STAND_BY:
 		/* Screen: Off; HSync: Off, VSync: On */
 		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
-			RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_HSYNC_DIS, ~mask );
+			RADEON_CRTC2_HSYNC_DIS, ~mask );
 		break;
 	case B_DPMS_SUSPEND:
 		/* Screen: Off; HSync: On, VSync: Off */
 		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL,
-			RADEON_CRTC2_DISP_DIS | RADEON_CRTC2_VSYNC_DIS, ~mask );
+			RADEON_CRTC2_VSYNC_DIS, ~mask );
 		break;
 	case B_DPMS_OFF:
 		/* Screen: Off; HSync: Off, VSync: Off */
 		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, mask, ~mask );
 		break;
 	}
+	
+	switch( mode ) {
+	case B_DPMS_ON:
+		/* Screen: On; HSync: On, VSync: On */
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, 0, ~RADEON_CRTC2_DISP_REQ_EN_B );
+		Radeon_ShowCursor( ai, 1 );
+		break;
+	case B_DPMS_STAND_BY:
+	case B_DPMS_SUSPEND:
+	case B_DPMS_OFF:
+		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, RADEON_CRTC2_DISP_REQ_EN_B, 
+			~(RADEON_CRTC2_DISP_REQ_EN_B | RADEON_CRTC2_CUR_EN) );
+		break;
+	}
 }
 
 
+// set DPMS mode of TV-out
+static void Radeon_SetDPMS_TVOUT( accelerator_info *ai, int mode )
+{
+	// we set to gain either to 0 for blank or 1 for normal operation
+	if( IS_INTERNAL_TV_OUT( ai->si->tv_chip )) {
+		OUTREG( ai->regs, RADEON_TV_LINEAR_GAIN_SETTINGS,
+			mode == B_DPMS_ON ? 0x01000100 : 0 );
+	} else {
+		Radeon_VIPWrite( ai, ai->si->theatre_channel, RADEON_TV_LINEAR_GAIN_SETTINGS, 
+			mode == B_DPMS_ON ? 0x01000100 : 0 );
+	}
+}
+
 // set DPMS mode of one port
 // engine lock is assumed to be hold
-status_t Radeon_SetDPMS( accelerator_info *ai, physical_head *head, int mode )
+status_t Radeon_SetDPMS( accelerator_info *ai, int crtc_idx, int mode )
 {
-/*	// if we have a laptop panel
-	// and we have a second screen connected
-	// and they both show the same content, 
-	// then switch the laptop display always off
-	if( ai->si->ports[port->physical_port].disp_type == dt_lvds &&
-		ai->vc->independant_ports > 1 && 
-		ai->vc->different_ports == 1 )
-	{
-		mode = B_DPMS_OFF;
-	}*/
-
+	crtc_info *crtc = &ai->si->crtc[crtc_idx];
+	
 	// test validity of mode once and for all	
 	switch( mode ) {
 	case B_DPMS_ON:
@@ -227,18 +301,34 @@ status_t Radeon_SetDPMS( accelerator_info *ai, physical_head *head, int mode )
 		return B_BAD_VALUE;
 	}
 
-	if( head->is_crtc2 )
-		Radeon_SetDPMS_CRTC2( ai, mode );
-	else
+	if( crtc_idx == 0 )
 		Radeon_SetDPMS_CRTC1( ai, mode );
-	
-	if( (head->active_displays & dd_lvds) != 0 )
+	else
+		Radeon_SetDPMS_CRTC2( ai, mode );
+
+	// possible ASIC bug: if CRT-DAC is connected to CRTC1, it obbeys 
+	// RADEON_CRTC_DISPLAY_DIS; if it is connected to CRTC2, to
+	// RADEON_CRTC2_DISP_DIS - i.e. it follows the CRTC;
+	// but the TV-DAC always listens to RADEON_CRTC2_DISP_DIS, independant
+	// of the CRTC it gets its signal from;
+	// this is a guarantee that two virtual cards will collide!
+	if( crtc_idx == 0 || 1/* && (crtc->active_displays & dd_crt) != 0 */)
+		Radeon_SetDPMS_CRT( ai, mode );
+
+	if( crtc_idx == 1 || (crtc->active_displays & (dd_tv_crt | dd_ctv | dd_stv)) != 0 )
+		Radeon_SetDPMS_TVCRT( ai, mode );
+
+	// TV-Out ignores DPMS completely, including the blank-screen trick		
+	if( (crtc->active_displays & (dd_ctv | dd_stv)) != 0 )
+		Radeon_SetDPMS_TVOUT( ai, mode );
+
+	if( (crtc->active_displays & dd_lvds) != 0 )
 		Radeon_SetDPMS_LVDS( ai, mode );
 
-	if( (head->active_displays & dd_dvi) != 0 )
+	if( (crtc->active_displays & dd_dvi) != 0 )
 		Radeon_SetDPMS_DVI( ai, mode );
 		
-	if( (head->active_displays & dd_dvi_ext) != 0 )
+	if( (crtc->active_displays & dd_dvi_ext) != 0 )
 		Radeon_SetDPMS_FP2( ai, mode );
 		
 	return B_OK;
@@ -246,7 +336,7 @@ status_t Radeon_SetDPMS( accelerator_info *ai, physical_head *head, int mode )
 
 
 // get DPMS mode of first port
-uint32 Radeon_GetDPMS_CRTC1( accelerator_info *di )
+static uint32 Radeon_GetDPMS_CRTC1( accelerator_info *di )
 {
 	uint32 tmp;
 	
@@ -266,7 +356,7 @@ uint32 Radeon_GetDPMS_CRTC1( accelerator_info *di )
 
 
 // get DPMS mode of second port
-uint32 Radeon_GetDPMS_CRTC2( accelerator_info *di )
+static uint32 Radeon_GetDPMS_CRTC2( accelerator_info *di )
 {
 	uint32 tmp;
 	
@@ -286,10 +376,10 @@ uint32 Radeon_GetDPMS_CRTC2( accelerator_info *di )
 
 
 // get DPMS mode of one port
-uint32 Radeon_GetDPMS( accelerator_info *ai, physical_head *head )
+uint32 Radeon_GetDPMS( accelerator_info *ai, int crtc_idx )
 {
-	if( head->is_crtc2 )
-		return Radeon_GetDPMS_CRTC2( ai );
-	else
+	if( crtc_idx == 0 )
 		return Radeon_GetDPMS_CRTC1( ai );
+	else
+		return Radeon_GetDPMS_CRTC2( ai );
 }

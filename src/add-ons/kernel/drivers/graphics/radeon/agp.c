@@ -37,6 +37,7 @@
 
 #define PCI_agp_status			4	/* Status register */
 #define PCI_agp_status_rq_mask	0xff000000	/* Maximum number of requests - 1 */
+#define PCI_agp_status_rq_shift	24
 #define PCI_agp_status_sba		0x0200	/* Sideband addressing supported */
 #define PCI_agp_status_64bit	0x0020	/* 64-bit addressing supported */
 #define PCI_agp_status_fw		0x0010	/* FW transfers supported */
@@ -46,6 +47,7 @@
 
 #define PCI_agp_command			8	/* Control register */
 #define PCI_agp_command_rq_mask 0xff000000  /* Master: Maximum number of requests */
+#define PCI_agp_command_rq_shift 24
 #define PCI_agp_command_sba		0x0200	/* Sideband addressing enabled */
 #define PCI_agp_command_agp		0x0100	/* Allow processing of AGP transactions */
 #define PCI_agp_command_64bit	0x0020 	/* Allow processing of 64-bit addresses */
@@ -64,7 +66,8 @@
 // show AGP capabilities
 static void show_agp_status( uint32 status )
 {
-	SHOW_FLOW( 3, "Status (%08lx): %s%s%s%s%s%s", status,
+	SHOW_FLOW( 3, "Status (%08lx): Max Queue Depth=%ld %s%s%s%s%s%s", status,
+		(status & PCI_agp_status_rq_mask) >> PCI_agp_status_rq_shift,
 		(status & PCI_agp_status_sba) != 0 ? "Sideband addressing " : "",
 		(status & PCI_agp_status_64bit) != 0 ? "64-bit " : "",
 		(status & PCI_agp_status_fw) != 0 ? "FastWrite " : "",
@@ -77,7 +80,8 @@ static void show_agp_status( uint32 status )
 // show AGP settings
 static void show_agp_command( uint32 command )
 {
-	SHOW_FLOW( 3, "Command (%08lx): %s%s%s%s%s%s%s", command,
+	SHOW_FLOW( 3, "Command (%08lx): Queue Depth=%ld %s%s%s%s%s%s%s", command,
+		(command & PCI_agp_command_rq_mask) >> PCI_agp_command_rq_shift,
 		(command & PCI_agp_command_sba) != 0 ? "Sideband addressing " : "",
 		(command & PCI_agp_command_agp) != 0 ? "AGP-Enabled " : "AGP-Disabled ",
 		(command & PCI_agp_command_64bit) != 0 ? "64-bit " : "",
@@ -142,11 +146,12 @@ int find_capability( pci_info *pcii, uint8 capability )
 
 
 // fix invalid AGP settings
-void Radeon_Fix_AGP()
+void Radeon_Fix_AGP(void)
 {
 	long pci_index;
 	pci_info pci_data, *pcii;
 	
+	// start with all features enabled, queue depth bits must be 0
 	uint32 common_caps = 
 		PCI_agp_status_sba | PCI_agp_status_64bit | PCI_agp_status_fw |
 		PCI_agp_status_rate4 | PCI_agp_status_rate2 | PCI_agp_status_rate1;
@@ -164,9 +169,9 @@ void Radeon_Fix_AGP()
 	{
 		int offset;
 
-		SHOW_FLOW( 3, "Checking bus %d, device %d, function %d (vendor_id=%04x, device_id=%04x):", 
+		/*SHOW_FLOW( 3, "Checking bus %d, device %d, function %d (vendor_id=%04x, device_id=%04x):", 
 			pcii->bus, pcii->device, pcii->function,
-			pcii->vendor_id, pcii->device_id );
+			pcii->vendor_id, pcii->device_id );*/
 		
 		offset = find_capability( pcii, PCI_cap_id_agp );
 		
@@ -186,6 +191,20 @@ void Radeon_Fix_AGP()
 			read_queue_depth = min( read_queue_depth, agp_status & PCI_agp_status_rq_mask );
 		}
 	}
+	
+	// explicitely enable AGP - it's not part of status register
+	common_caps |= PCI_agp_command_agp;
+
+	// choose fastest transmission speed and disable lower ones	
+	if( (common_caps & PCI_agp_status_rate4) != 0 )
+		common_caps &= ~(PCI_agp_status_rate2 | PCI_agp_status_rate1);
+	else if( (common_caps & PCI_agp_status_rate2) != 0 )
+		common_caps &= ~PCI_agp_status_rate1;
+	else if( (common_caps & PCI_agp_status_rate1) == 0 )
+		// no speed found - disable AGP
+		common_caps &= ~PCI_agp_command_agp;
+	
+	common_caps |= read_queue_depth;
 
 	SHOW_FLOW0( 3, "Combined:" );
 	show_agp_command( common_caps );
@@ -204,7 +223,7 @@ void Radeon_Fix_AGP()
 				pcii->bus, pcii->device, pcii->function,
 				pcii->vendor_id, pcii->device_id );
 
-			set_pci( offset + PCI_agp_command, 4, common_caps | read_queue_depth );
+			set_pci( offset + PCI_agp_command, 4, common_caps );
 		}
 	}
 }

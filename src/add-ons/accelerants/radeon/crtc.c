@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2005, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -10,37 +10,35 @@
 #include "radeon_accelerant.h"
 #include "mmio.h"
 #include "crtc_regs.h"
-#include "dac_regs.h"
 #include "GlobalData.h"
-
-
-// read old CRTC register content
-void Radeon_ReadCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	port_regs *values )
-{
-	vuint8 *regs = ai->regs;
-
-	// only CRTC_EXT_CNTL is programmed by someone else (namely the monitor
-	// router); if more registers are affected, you must read them here too!
-	if( !head->is_crtc2 ) {
-		values->crtc_ext_cntl = INREG( regs, RADEON_CRTC_EXT_CNTL );
-	}
-}
+#include "set_mode.h"
 
 
 // hammer CRTC registers
-void Radeon_ProgramCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	port_regs *values )
+void Radeon_ProgramCRTCRegisters( accelerator_info *ai, int crtc_idx, 
+	crtc_regs *values )
 {
 	vuint8 *regs = ai->regs;
 	
 	SHOW_FLOW0( 2, "" );
 
-	if( head->is_crtc2 ) {
+	if( crtc_idx == 0 ) {
+		OUTREGP( regs, RADEON_CRTC_GEN_CNTL, values->crtc_gen_cntl,
+			RADEON_CRTC_EXT_DISP_EN );
+		
+		OUTREG( regs, RADEON_CRTC_H_TOTAL_DISP, values->crtc_h_total_disp );
+		OUTREG( regs, RADEON_CRTC_H_SYNC_STRT_WID, values->crtc_h_sync_strt_wid );
+		OUTREG( regs, RADEON_CRTC_V_TOTAL_DISP, values->crtc_v_total_disp );
+		OUTREG( regs, RADEON_CRTC_V_SYNC_STRT_WID, values->crtc_v_sync_strt_wid );
+		OUTREG( regs, RADEON_CRTC_OFFSET_CNTL, values->crtc_offset_cntl );
+		OUTREG( regs, RADEON_CRTC_PITCH, values->crtc_pitch );
+
+	} else {
 		OUTREGP( regs, RADEON_CRTC2_GEN_CNTL, values->crtc_gen_cntl,
 			RADEON_CRTC2_VSYNC_DIS |
 			RADEON_CRTC2_HSYNC_DIS |
-			RADEON_CRTC2_DISP_DIS );
+			RADEON_CRTC2_DISP_DIS |
+			RADEON_CRTC2_CRT2_ON );
 
 		OUTREG( regs, RADEON_CRTC2_H_TOTAL_DISP, values->crtc_h_total_disp );
 		OUTREG( regs, RADEON_CRTC2_H_SYNC_STRT_WID, values->crtc_h_sync_strt_wid );
@@ -48,37 +46,18 @@ void Radeon_ProgramCRTCRegisters( accelerator_info *ai, physical_head *head,
 		OUTREG( regs, RADEON_CRTC2_V_SYNC_STRT_WID, values->crtc_v_sync_strt_wid );
 		OUTREG( regs, RADEON_CRTC2_OFFSET_CNTL, values->crtc_offset_cntl );
 		OUTREG( regs, RADEON_CRTC2_PITCH, values->crtc_pitch );
-		
-	} else {	
-		OUTREG( regs, RADEON_CRTC_GEN_CNTL, values->crtc_gen_cntl );
-		
-		OUTREGP( regs, RADEON_CRTC_EXT_CNTL, values->crtc_ext_cntl,
-			RADEON_CRTC_VSYNC_DIS |
-			RADEON_CRTC_HSYNC_DIS |
-			RADEON_CRTC_DISPLAY_DIS | 
-			RADEON_CRTC_CRT_ON );
-			
-		OUTREGP( regs, RADEON_DAC_CNTL, values->dac_cntl,
-			RADEON_DAC_RANGE_CNTL_MASK | RADEON_DAC_BLANKING );
-			
-		OUTREG( regs, RADEON_CRTC_H_TOTAL_DISP, values->crtc_h_total_disp );
-		OUTREG( regs, RADEON_CRTC_H_SYNC_STRT_WID, values->crtc_h_sync_strt_wid );
-		OUTREG( regs, RADEON_CRTC_V_TOTAL_DISP, values->crtc_v_total_disp );
-		OUTREG( regs, RADEON_CRTC_V_SYNC_STRT_WID, values->crtc_v_sync_strt_wid );
-		OUTREG( regs, RADEON_CRTC_OFFSET_CNTL, values->crtc_offset_cntl );
-		OUTREG( regs, RADEON_CRTC_PITCH, values->crtc_pitch );
 	}
 }
 
 
 // get required hsync delay depending on bit depth and output device
-uint16 Radeon_GetHSyncFudge( physical_head *head, int datatype )
+uint16 Radeon_GetHSyncFudge( crtc_info *crtc, int datatype )
 {
 	static int hsync_fudge_default[] = { 0x00, 0x12, 0x09, 0x09, 0x06, 0x05 };
 	static int hsync_fudge_fp[]      = { 0x02, 0x02, 0x00, 0x00, 0x05, 0x05 };
 	
 	// there is an sync delay which depends on colour-depth and output device
-	if( (head->chosen_displays & (dd_dvi | dd_dvi_ext | dd_lvds )) != 0 )
+	if( (crtc->chosen_displays & (dd_dvi | dd_dvi_ext | dd_lvds )) != 0 )
 		return hsync_fudge_fp[datatype - 1];
     else               
     	return hsync_fudge_default[datatype - 1];	
@@ -86,8 +65,8 @@ uint16 Radeon_GetHSyncFudge( physical_head *head, int datatype )
 
 
 // calculate CRTC register content
-void Radeon_CalcCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	display_mode *mode, port_regs *values )
+void Radeon_CalcCRTCRegisters( accelerator_info *ai, crtc_info *crtc, 
+	display_mode *mode, crtc_regs *values )
 {
 	virtual_card *vc = ai->vc;
     int    hsync_start;
@@ -95,29 +74,21 @@ void Radeon_CalcCRTCRegisters( accelerator_info *ai, physical_head *head,
     int    hsync_fudge;
     int    vsync_wid;
 
-	hsync_fudge = Radeon_GetHSyncFudge( head, vc->datatype );
+	hsync_fudge = Radeon_GetHSyncFudge( crtc, vc->datatype );
 
-	if( head->is_crtc2 ) {
-		values->crtc_gen_cntl = (RADEON_CRTC2_EN
-			| RADEON_CRTC2_CRT2_ON
+	if( crtc->crtc_idx == 0 ) {
+		// here, we should set interlace/double scan mode
+		// but we don't support them (anyone missing them?)
+	    values->crtc_gen_cntl = 
+			RADEON_CRTC_EN
+			| (vc->datatype << 8);
+
+	} else {
+		values->crtc_gen_cntl = RADEON_CRTC2_EN
 			| (vc->datatype << 8)
 			| (0/*doublescan*/ ? RADEON_CRTC2_DBL_SCAN_EN	: 0)
 			| ((mode->timing.flags & B_TIMING_INTERLACED)
-				? RADEON_CRTC2_INTERLACE_EN	: 0));
-	} else {
-		// here, we should set interlace/double scan mode
-		// but we don't support them (anyone missing them?)
-	    values->crtc_gen_cntl = (RADEON_CRTC_EXT_DISP_EN
-			| RADEON_CRTC_EN
-			| (vc->datatype << 8));
-
-		values->crtc_ext_cntl = 
-	    	RADEON_VGA_ATI_LINEAR | 
-			RADEON_XCRT_CNT_EN;
-
-		values->dac_cntl = RADEON_DAC_MASK_ALL
-			| RADEON_DAC_VGA_ADR_EN
-			| RADEON_DAC_8BIT_EN;
+				? RADEON_CRTC2_INTERLACE_EN	: 0);
 	}
 	
     values->crtc_h_total_disp = 
@@ -156,19 +127,19 @@ void Radeon_CalcCRTCRegisters( accelerator_info *ai, physical_head *head,
 
 
 // update shown are of one port
-static void moveOneDisplay( accelerator_info *ai, virtual_head *virtual_head )
+static void moveOneDisplay( accelerator_info *ai, crtc_info *crtc )
 {
 	virtual_card *vc = ai->vc;
 	uint32 offset;
 	
-	offset = (vc->mode.v_display_start + virtual_head->rel_y) * vc->pitch + 
-		(vc->mode.h_display_start + virtual_head->rel_x) * vc->bpp + 
+	offset = (vc->mode.v_display_start + crtc->rel_y) * vc->pitch + 
+		(vc->mode.h_display_start + crtc->rel_x) * vc->bpp + 
 		vc->fb_offset;
 	
 	SHOW_FLOW( 3, "Setting address %x on port %d", 
-		offset,	virtual_head->physical_head );
+		offset,	crtc->crtc_idx );
 	
-	OUTREG( ai->regs, virtual_head->physical_head ? RADEON_CRTC2_OFFSET : RADEON_CRTC_OFFSET, offset );
+	OUTREG( ai->regs, crtc->crtc_idx == 0 ? RADEON_CRTC_OFFSET : RADEON_CRTC2_OFFSET, offset );
 }
 
 // internal function: pan display
@@ -189,10 +160,10 @@ status_t Radeon_MoveDisplay( accelerator_info *ai, uint16 h_display_start, uint1
 	vc->mode.v_display_start = v_display_start;
 
 	// do it
-	moveOneDisplay( ai, &vc->heads[0] );
-
-	if( vc->independant_heads > 1 )
-		moveOneDisplay( ai, &vc->heads[1] );
+	if( vc->used_crtc[0] )
+		moveOneDisplay( ai, &ai->si->crtc[0] );
+	if( vc->used_crtc[1] )
+		moveOneDisplay( ai, &ai->si->crtc[1] );
 		
 	// overlay position must be adjusted 
 	Radeon_UpdateOverlay( ai );

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002-04, Thomas Kurschel
+	Copyright (c) 2002-05, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -25,7 +25,8 @@ static bool Radeon_VIPWaitForIdle( device_info *di );
 
 // read data from VIP
 // CP lock must be hold
-static bool do_VIPRead( device_info *di, uint channel, uint address, uint32 *data )
+static bool do_VIPRead( 
+	device_info *di, uint channel, uint address, uint32 *data )
 {
 	vuint8 *regs = di->regs;
 
@@ -74,21 +75,28 @@ static bool do_VIPRead( device_info *di, uint channel, uint address, uint32 *dat
 }
 
 // public function: read data from VIP
-bool Radeon_VIPRead( device_info *di, uint channel, uint address, uint32 *data )
+bool Radeon_VIPRead( 
+	device_info *di, uint channel, uint address, uint32 *data, bool lock )
 {
 	bool res;
-	
-	ACQUIRE_BEN( di->si->cp.lock );
+
+	if( lock )
+		ACQUIRE_BEN( di->si->cp.lock );
 	
 	res = do_VIPRead( di, channel, address, data );
 	
-	RELEASE_BEN( di->si->cp.lock );
+	if( lock )
+		RELEASE_BEN( di->si->cp.lock );
+		
+	//SHOW_FLOW( 2, "address=%x, data=%lx, lock=%d", address, *data, lock );
+
 	return res;
 }
 
 // write data to VIP
-// not must be hold
-static bool do_VIPWrite( device_info *di, uint8 channel, uint address, uint32 data )
+// CP must be hold
+static bool do_VIPWrite( 
+	device_info *di, uint8 channel, uint address, uint32 data )
 {
 	vuint8 *regs = di->regs;
 	bool res;
@@ -110,25 +118,33 @@ static bool do_VIPWrite( device_info *di, uint8 channel, uint address, uint32 da
 }
 
 // public function: write data to VIP
-bool Radeon_VIPWrite( device_info *di, uint8 channel, uint address, uint32 data )
+bool Radeon_VIPWrite( 
+	device_info *di, uint8 channel, uint address, uint32 data, bool lock )
 {
 	bool res;
-	
-	ACQUIRE_BEN( di->si->cp.lock );
+
+	//SHOW_FLOW( 2, "address=%x, data=%lx, lock=%d", address, data, lock );
+
+	if( lock )
+		ACQUIRE_BEN( di->si->cp.lock );
 	
 	res = do_VIPWrite( di, channel, address, data );
 	
-	RELEASE_BEN( di->si->cp.lock );
+	if( lock )
+		RELEASE_BEN( di->si->cp.lock );
+	
 	return res;
 }
 
 
 // reset VIP
-static void VIPReset( device_info *di )
+static void VIPReset( 
+	device_info *di, bool lock )
 {
 	vuint8 *regs = di->regs;
 
-	ACQUIRE_BEN( di->si->cp.lock );
+	if( lock )
+		ACQUIRE_BEN( di->si->cp.lock );
 
 	Radeon_WaitForFifo( di, 5 );
 	OUTREG( regs, RADEON_VIPH_CONTROL, 
@@ -151,44 +167,15 @@ static void VIPReset( device_info *di )
 		(1 << RADEON_VIPH_DMA_CHUNK_VIPH_CH3_CHUNK_SHIFT));
 	OUTREGP( regs, RADEON_TEST_DEBUG_CNTL, 0, ~RADEON_TEST_DEBUG_CNTL_OUT_EN );
 
-	RELEASE_BEN( di->si->cp.lock );
-}
-
-
-// find VIP channel of a device
-// return:	>= 0 channel of device
-//			< 0 no device found
-int Radeon_FindVIPDevice( device_info *di, uint32 device_id )
-{
-	uint channel;
-	uint32 cur_device_id;
-	
-	// if card has no VIP port, let hardware detection fail;
-	// in this case, noone will bother us again
-	if( !di->has_vip )
-		return -1;
-	
-	VIPReset( di );
-
-	// there are up to 4 devices, connected to one of 4 channels	
-	for( channel = 0; channel < 4; ++channel ) {
-		// read device id
-		if( !Radeon_VIPRead( di, channel, RADEON_VIP_VENDOR_DEVICE_ID, &cur_device_id ))
-			continue;
-		
-		// compare device id directly
-		if( cur_device_id == device_id )
-			return channel;
-	}
-	
-	// couldn't find device
-	return -1;
+	if( lock )
+		RELEASE_BEN( di->si->cp.lock );
 }
 
 
 // check whether VIP host is idle
 // lock must be hold
-static status_t Radeon_VIPIdle( device_info *di )
+static status_t Radeon_VIPIdle( 
+	device_info *di )
 {
 	vuint8 *regs = di->regs;
 	uint32 timeout;
@@ -218,7 +205,8 @@ static status_t Radeon_VIPIdle( device_info *di )
 
 // wait until VIP host is idle
 // lock must be hold
-static bool Radeon_VIPWaitForIdle( device_info *di )
+static bool Radeon_VIPWaitForIdle( 
+	device_info *di )
 {
 	int i;
 	
@@ -238,4 +226,43 @@ static bool Radeon_VIPWaitForIdle( device_info *di )
 	}
 	
 	return false;
+}
+
+
+// find VIP channel of a device
+// return:	>= 0 channel of device
+//			< 0 no device found
+int Radeon_FindVIPDevice( 
+	device_info *di, uint32 device_id )
+{
+	uint channel;
+	uint32 cur_device_id;
+	
+	// if card has no VIP port, let hardware detection fail;
+	// in this case, noone will bother us again
+	if( !di->has_vip )
+		return -1;
+	
+	ACQUIRE_BEN( di->si->cp.lock );
+
+	VIPReset( di, false );
+
+	// there are up to 4 devices, connected to one of 4 channels	
+	for( channel = 0; channel < 4; ++channel ) {
+		// read device id
+		if( !Radeon_VIPRead( di, channel, RADEON_VIP_VENDOR_DEVICE_ID, &cur_device_id, false ))
+			continue;
+		
+		// compare device id directly
+		if( cur_device_id == device_id ) {
+			RELEASE_BEN( di->si->cp.lock );
+			
+			return channel;
+		}
+	}
+	
+	RELEASE_BEN( di->si->cp.lock );
+	
+	// couldn't find device
+	return -1;
 }

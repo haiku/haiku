@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002/03, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -14,9 +14,11 @@
 #include "pll_access.h"
 #include "utils.h"
 #include <stdlib.h>
+#include "set_mode.h"
 
 
-static void Radeon_PLLWaitForReadUpdateComplete( accelerator_info *ai, physical_head *head )
+static void Radeon_PLLWaitForReadUpdateComplete( 
+	accelerator_info *ai, int crtc_idx )
 {
 	int i;
 	
@@ -24,18 +26,19 @@ static void Radeon_PLLWaitForReadUpdateComplete( accelerator_info *ai, physical_
 	// 1. this is unsafe
 	// 2. some r300 loop forever (reported by XFree86)
 	for( i = 0; i < 10000; ++i ) {
-		if( (Radeon_INPLL( ai->regs, ai->si->asic, head->is_crtc2 ? RADEON_P2PLL_REF_DIV : RADEON_PPLL_REF_DIV ) 
+		if( (Radeon_INPLL( ai->regs, ai->si->asic, crtc_idx == 0 ? RADEON_PPLL_REF_DIV : RADEON_P2PLL_REF_DIV ) 
 			& RADEON_PPLL_ATOMIC_UPDATE_R) == 0 )
 			return;
 	}
 }
 
-static void Radeon_PLLWriteUpdate( accelerator_info *ai, physical_head *head )
+static void Radeon_PLLWriteUpdate( 
+	accelerator_info *ai, int crtc_idx )
 {
-	Radeon_PLLWaitForReadUpdateComplete( ai, head );
+	Radeon_PLLWaitForReadUpdateComplete( ai, crtc_idx );
 	
     Radeon_OUTPLLP( ai->regs, ai->si->asic, 
-    	head->is_crtc2 ? RADEON_P2PLL_REF_DIV : RADEON_PPLL_REF_DIV,
+    	crtc_idx == 0 ? RADEON_PPLL_REF_DIV : RADEON_P2PLL_REF_DIV,
     	RADEON_PPLL_ATOMIC_UPDATE_W, 
     	~RADEON_PPLL_ATOMIC_UPDATE_W );
 }
@@ -45,7 +48,8 @@ static void Radeon_PLLWriteUpdate( accelerator_info *ai, physical_head *head )
 // freq - whished frequency in Hz
 // fixed_post_div - if != 0, fixed divider to be used
 // dividers - filled with proper dividers
-void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_div, pll_dividers *dividers )
+void Radeon_CalcPLLDividers( 
+	const pll_info *pll, uint32 freq, uint fixed_post_div, pll_dividers *dividers )
 {
 	// the PLL gets the reference
 	//		pll_in = ref_freq / ref_div
@@ -71,8 +75,9 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 		best_post_div_idx, best_extra_post_div_idx;
 		
 	uint32
-		best_ref_div, best_feedback_div, 
-		best_freq, best_error, best_vco_dev;
+		best_ref_div, best_feedback_div, best_freq;
+	int32
+		best_error, best_vco_dev;
 		
 	best_error = 999999999;
 	
@@ -127,7 +132,8 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 			// we can either iterate through feedback or reference dividers;
 			// usually, there are fewer possible reference dividers, so I picked them
 			for( ref_div = pll->min_ref_div; ref_div <= pll->max_ref_div; ++ref_div ) {
-				uint32 feedback_div, cur_freq, error, vco_dev;
+				uint32 feedback_div, cur_freq;
+				int32 error, vco_dev;
 				
 				// this implies the frequency of the lock unit
 				uint32 pll_in = pll->ref_freq / ref_div;
@@ -144,17 +150,17 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 				if( feedback_div < pll->min_feedback_div ||
 					feedback_div > pll->max_feedback_div )
 					continue;
-
+					
 				// let's see what we've got
 				cur_freq = RoundDiv64( 
 					(int64)pll->ref_freq * 10000 * feedback_div * pll->extra_feedback_div, 
 					ref_div * post_div );
-
+					
 				// absolute error in terms of output clock					
 				error = abs( cur_freq - freq );
 				// deviation from perfect VCO clock
 				vco_dev = abs( vco - pll->best_vco );
-					
+				
 				// if there is no optimal VCO frequency, choose setting with less error;
 				// if there is an optimal VCO frequency, choose new settings if
 				// - error is reduced significantly (100 Hz or more), or
@@ -165,6 +171,7 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 					 (error < best_error - 100 ||
 					 (abs( error - best_error ) < 100 && vco_dev < best_vco_dev ))))
 				{
+					//SHOW_FLOW( 2, "got freq=%d, best_freq=%d", freq, cur_freq );
 					best_post_div_idx = post_div_idx;
 					best_extra_post_div_idx = extra_post_div_idx;
 					best_ref_div = ref_div;
@@ -184,6 +191,10 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 	dividers->ref = best_ref_div;
 	dividers->feedback = best_feedback_div;
 	dividers->freq = best_freq;
+
+	/*SHOW_FLOW( 2, "post_code=%d, post=%d, extra_post_code=%d, extra_post=%d, ref=%d, feedback=%d, freq=%d",
+		dividers->post_code, dividers->post, dividers->extra_post_code, 
+		dividers->extra_post, dividers->ref, dividers->feedback, dividers->freq );*/
 }
 
 
@@ -193,7 +204,7 @@ void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_d
 // with precisely the same frame rate; the solution is to tweak the CRT
 // image a bit by making it wider/taller/smaller until the frame rate
 // drift is under a given threshold; 
-// we follows two aims:
+// we follow two aims:
 // 	- primary, keep frame rate in sync
 //  - secondary, only tweak as much as unavoidable
 void Radeon_MatchCRTPLL( 
@@ -267,7 +278,7 @@ void Radeon_MatchCRTPLL(
 					// if drift is within threshold, we take this setting and stop
 					// searching (later iteration will increasingly tweak screen size,
 					// and we don't really want that)
-					if( frame_rate_drift < max_frame_rate_drift ) {
+					if( frame_rate_drift <= max_frame_rate_drift ) {
 						SHOW_INFO( 2, "frame_rate_drift=%d, crt_freq=%d, v_total=%d, h_total=%d", 
 							frame_rate_drift, crt_freq, v_total, h_total );
 						
@@ -348,7 +359,7 @@ void Radeon_GetTVPLLConfiguration( const general_pll_info *general_pll, pll_info
 	// in the original code, they set it to 330kHz if PAL is requested and
 	// quartz is 27 MHz, but I don't see how these circumstances can effect the
 	// mimimal PLL input frequency
-	pll->pll_in_min = 40;
+	pll->pll_in_min = 20;//40;
 	// in the original code, they don't define an upper limit
 	pll->pll_in_max = 100;
 	pll->extra_feedback_div = 1;
@@ -391,47 +402,46 @@ void Radeon_GetTVCRTPLLConfiguration( const general_pll_info *general_pll, pll_i
 }
 
 
+// calc PLL dividers for CRT
+// mode->timing.pixel_clock must be in Hz because required accuracy in TV-Out mode
+void Radeon_CalcCRTPLLDividers( 
+	const general_pll_info *general_pll, const display_mode *mode, pll_dividers *dividers )
+{
+	pll_info pll;	
+	
+	pll.post_divs = post_divs;
+	pll.extra_post_divs = extra_post_divs;
+	pll.ref_freq = general_pll->ref_freq;
+	pll.vco_min = general_pll->min_pll_freq;
+	pll.vco_max = general_pll->max_pll_freq;
+	pll.min_ref_div = 2;
+	pll.max_ref_div = 0x3ff;
+	pll.pll_in_min = 40;
+	pll.pll_in_max = 100;
+	pll.extra_feedback_div = 1;
+	pll.min_feedback_div = 4;
+	pll.max_feedback_div = 0x7ff;
+	pll.best_vco = 0;
+
+	SHOW_FLOW( 2, "freq=%ld", mode->timing.pixel_clock );
+
+	Radeon_CalcPLLDividers( &pll, mode->timing.pixel_clock, 0, dividers );
+}
+
+
 // calculate PLL registers 
 // mode->timing.pixel_clock must be in Hz because required accuracy in TV-Out mode
 // (old: freq is in 10kHz)
-// fixed_dividers - if non-NULL, you can force a pre-calculated divider (used for TV-Out)
-void Radeon_CalcPLLRegisters( general_pll_info *general_pll, 
-	const display_mode *mode, pll_dividers *fixed_dividers, port_regs *values )
+void Radeon_CalcPLLRegisters( 
+	const display_mode *mode, const pll_dividers *dividers, pll_regs *values )
 {
-	pll_dividers dividers;
+	values->dot_clock_freq = dividers->freq;
+	values->feedback_div   = dividers->feedback;
+	values->post_div       = dividers->post;
+	values->pll_output_freq = dividers->freq * dividers->post;
 	
-	if( fixed_dividers == NULL ) {
-		pll_info pll;	
-		
-		pll.post_divs = post_divs;
-		pll.extra_post_divs = extra_post_divs;
-		pll.ref_freq = general_pll->ref_freq;
-		pll.vco_min = general_pll->min_pll_freq;
-		pll.vco_max = general_pll->max_pll_freq;
-		pll.min_ref_div = 2;
-		pll.max_ref_div = 0x3ff;
-		pll.pll_in_min = 40;
-		pll.pll_in_max = 100;
-		pll.extra_feedback_div = 1;
-		pll.min_feedback_div = 4;
-		pll.max_feedback_div = 0x7ff;
-		pll.best_vco = 0;
-	
-		SHOW_FLOW( 2, "freq=%ld", mode->timing.pixel_clock/*freq * 10000*/ );
-	
-		Radeon_CalcPLLDividers( &pll, mode->timing.pixel_clock /*freq * 10000*/, 0, &dividers );
-	} else {
-		// dividers are precalculated, so use them
-		dividers = *fixed_dividers;
-	}
-			
-	values->dot_clock_freq = dividers.freq;
-	values->feedback_div   = dividers.feedback;
-	values->post_div       = dividers.post;
-	values->pll_output_freq = dividers.freq * dividers.post;
-	
-	values->ppll_ref_div   = dividers.ref;
-	values->ppll_div_3     = (dividers.feedback | (dividers.post_code << 16));
+	values->ppll_ref_div   = dividers->ref;
+	values->ppll_div_3     = (dividers->feedback | (dividers->post_code << 16));
 	// this is mad: the PLL controls the horizontal length in sub-byte precision!
 	values->htotal_cntl    = mode->timing.h_total & 7;
 
@@ -441,7 +451,8 @@ void Radeon_CalcPLLRegisters( general_pll_info *general_pll,
 }
 
 // write values into PLL registers
-void Radeon_ProgramPLL( accelerator_info *ai, physical_head *head, port_regs *values )
+void Radeon_ProgramPLL( 
+	accelerator_info *ai, int crtc_idx, pll_regs *values )
 {
 	vuint8 *regs = ai->regs;
 	radeon_type asic = ai->si->asic;
@@ -450,11 +461,11 @@ void Radeon_ProgramPLL( accelerator_info *ai, physical_head *head, port_regs *va
 	
 	// use some other PLL for pixel clock source to not fiddling with PLL
 	// while somebody is using it
-    Radeon_OUTPLLP( regs, asic, head->is_crtc2 ? RADEON_PIXCLKS_CNTL : RADEON_VCLK_ECP_CNTL, 
+    Radeon_OUTPLLP( regs, asic, crtc_idx == 0 ? RADEON_VCLK_ECP_CNTL : RADEON_PIXCLKS_CNTL, 
     	RADEON_VCLK_SRC_CPU_CLK, ~RADEON_VCLK_SRC_SEL_MASK );
 
     Radeon_OUTPLLP( regs, asic,
-	    head->is_crtc2 ? RADEON_P2PLL_CNTL : RADEON_PPLL_CNTL,
+		crtc_idx == 0 ? RADEON_PPLL_CNTL : RADEON_P2PLL_CNTL,
 	    RADEON_PPLL_RESET
 	    | RADEON_PPLL_ATOMIC_UPDATE_EN
 	    | RADEON_PPLL_VGA_ATOMIC_UPDATE_EN,
@@ -467,40 +478,40 @@ void Radeon_ProgramPLL( accelerator_info *ai, physical_head *head, port_regs *va
 	    RADEON_PLL_DIV_SEL_DIV3,
 	    ~RADEON_PLL_DIV_SEL_MASK );
 
-	if( ai->si->asic >= rt_r300 && !head->is_crtc2 ) {
-		// with r300, the reference divider of the first PLL was moved
-		// to another bit position; at the old location, you only find
-		// the "BIOS suggested divider"; no clue why they did that
+	if( ai->si->new_pll && crtc_idx == 0 ) {
+		// starting with r300, the reference divider of the first PLL was 
+		// moved to another bit position; at the old location, you only 
+		// find the "BIOS suggested divider"; no clue why they did that
 		Radeon_OUTPLLP( regs, asic,
     		RADEON_PPLL_REF_DIV, 
     		values->ppll_ref_div << RADEON_PPLL_REF_DIV_ACC_SHIFT, 
     		~RADEON_PPLL_REF_DIV_ACC_MASK );
 	} else {
 	    Radeon_OUTPLLP( regs, asic,
-    		head->is_crtc2 ? RADEON_P2PLL_REF_DIV : RADEON_PPLL_REF_DIV, 
+    		crtc_idx == 0 ? RADEON_PPLL_REF_DIV : RADEON_P2PLL_REF_DIV, 
     		values->ppll_ref_div, 
     		~RADEON_PPLL_REF_DIV_MASK );
     }
     
     Radeon_OUTPLLP( regs, asic,
-    	head->is_crtc2 ? RADEON_P2PLL_DIV_0 : RADEON_PPLL_DIV_3, 
+    	crtc_idx == 0 ? RADEON_PPLL_DIV_3 : RADEON_P2PLL_DIV_0, 
     	values->ppll_div_3, 
     	~RADEON_PPLL_FB3_DIV_MASK );
 
     Radeon_OUTPLLP( regs, asic,
-    	head->is_crtc2 ? RADEON_P2PLL_DIV_0 : RADEON_PPLL_DIV_3, 
+    	crtc_idx == 0 ? RADEON_PPLL_DIV_3 : RADEON_P2PLL_DIV_0, 
     	values->ppll_div_3, 
     	~RADEON_PPLL_POST3_DIV_MASK );
 
-    Radeon_PLLWriteUpdate( ai, head );
-    Radeon_PLLWaitForReadUpdateComplete( ai, head );
+    Radeon_PLLWriteUpdate( ai, crtc_idx );
+    Radeon_PLLWaitForReadUpdateComplete( ai, crtc_idx );
     
     Radeon_OUTPLL( regs, asic,
-    	head->is_crtc2 ? RADEON_HTOTAL2_CNTL : RADEON_HTOTAL_CNTL, 
+    	crtc_idx == 0 ? RADEON_HTOTAL_CNTL : RADEON_HTOTAL2_CNTL, 
     	values->htotal_cntl );
 
 	Radeon_OUTPLLP( regs, asic, 
-		head->is_crtc2 ? RADEON_P2PLL_CNTL : RADEON_PPLL_CNTL, 0, 
+		crtc_idx == 0 ? RADEON_PPLL_CNTL : RADEON_P2PLL_CNTL, 0, 
 		~(RADEON_PPLL_RESET
 		| RADEON_PPLL_SLEEP
 		| RADEON_PPLL_ATOMIC_UPDATE_EN
@@ -511,6 +522,6 @@ void Radeon_ProgramPLL( accelerator_info *ai, physical_head *head, port_regs *va
 
 	// use PLL for pixel clock again
     Radeon_OUTPLLP( regs, asic,
-    	head->is_crtc2 ? RADEON_PIXCLKS_CNTL : RADEON_VCLK_ECP_CNTL, 
+    	crtc_idx == 0 ? RADEON_VCLK_ECP_CNTL : RADEON_PIXCLKS_CNTL, 
     	RADEON_VCLK_SRC_PPLL_CLK, ~RADEON_VCLK_SRC_SEL_MASK );
 }

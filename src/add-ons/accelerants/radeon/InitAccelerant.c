@@ -30,7 +30,7 @@ static status_t init_common( int the_fd, bool accelerant_is_clone )
 	radeon_get_private_data gpd;
 	
 	SHOW_FLOW0( 3, "" );
-	
+
 	ai = malloc( sizeof( *ai ));
 	if( ai == NULL )
 		return B_NO_MEMORY;
@@ -151,7 +151,7 @@ status_t INIT_ACCELERANT( int the_fd )
 	result = init_common( the_fd, 0 );
 	if (result != B_OK) 
 		goto err;
-	
+
 	si = ai->si;
 	vc = ai->vc;
 
@@ -189,8 +189,8 @@ status_t INIT_ACCELERANT( int the_fd )
 	si->overlay_mgr.inuse = 0;
 	
 	// mark overlay as inactive
-	si->active_overlay.head = -1;
-	si->pending_overlay.head = -1;
+	si->active_overlay.crtc_idx = -1;
+	si->pending_overlay.crtc_idx = -1;
 	
 	// reset list of allocated overlays
 	vc->overlay_buffers = NULL;

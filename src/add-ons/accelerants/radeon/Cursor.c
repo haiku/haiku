@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -14,20 +14,19 @@
 #include "mmio.h"
 #include "crtc_regs.h"
 
-static void doShowCursor( accelerator_info *ai, physical_head *head );
-static void moveOneCursor( accelerator_info *ai, virtual_head *virtual_head, int x, int y );
+static void moveOneCursor( accelerator_info *ai, int crtc_idx, int x, int y );
 
 // set standard foreground/background colours
-void Radeon_SetCursorColors( accelerator_info *ai, physical_head *head ) 
+void Radeon_SetCursorColors( accelerator_info *ai, int crtc_idx ) 
 {
 	SHOW_FLOW0( 3, "" );
 	
-	if( head->is_crtc2 ) {
-		OUTREG( ai->regs, RADEON_CUR2_CLR0, 0xffffff );
-		OUTREG( ai->regs, RADEON_CUR2_CLR1, 0 );
-	} else {
+	if( crtc_idx == 0 ) {
 		OUTREG( ai->regs, RADEON_CUR_CLR0, 0xffffff );
 		OUTREG( ai->regs, RADEON_CUR_CLR1, 0 );
+	} else {
+		OUTREG( ai->regs, RADEON_CUR2_CLR0, 0xffffff );
+		OUTREG( ai->regs, RADEON_CUR2_CLR1, 0 );
 	}
 }
 
@@ -115,9 +114,10 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	y -= vds;
 
 	// go
-	moveOneCursor( ai, &vc->heads[0], x, y );
-	if( vc->independant_heads > 1 )
-		moveOneCursor( ai, &vc->heads[1], x, y );
+	if( vc->used_crtc[0] )
+		moveOneCursor( ai, 0, x, y );
+	if( vc->used_crtc[1] )
+		moveOneCursor( ai, 1, x, y );
 			
 	RELEASE_BEN( ai->si->engine.lock );
 }
@@ -137,9 +137,10 @@ void SHOW_CURSOR( bool is_visible )
 	
 	// the following functions take also care to not
 	// show the cursor if it's on the other port
-	doShowCursor( ai, &ai->si->heads[vc->heads[0].physical_head] );
-	if( vc->independant_heads > 1 )
-		doShowCursor( ai, &ai->si->heads[vc->heads[1].physical_head] );
+	if( vc->used_crtc[0] )
+		Radeon_ShowCursor( ai, 0 );
+	if( vc->used_crtc[1] )
+		Radeon_ShowCursor( ai, 1 );
 	
 	RELEASE_BEN( ai->si->engine.lock );
 }
@@ -147,38 +148,38 @@ void SHOW_CURSOR( bool is_visible )
 
 // move cursor on one port
 //	main_port - common data is stored here
-void moveOneCursor( accelerator_info *ai, virtual_head *virtual_head, int x, int y )
+void moveOneCursor( accelerator_info *ai, int crtc_idx, int x, int y )
 {
 	virtual_card *vc = ai->vc;
-	physical_head *head = &ai->si->heads[virtual_head->physical_head];
+	crtc_info *crtc = &ai->si->crtc[crtc_idx];
 	int xorigin, yorigin;
 	bool prev_state;
 
 	// adjust according to relative screen position	
-	x -= virtual_head->rel_x;
-	y -= virtual_head->rel_y;
+	x -= crtc->rel_x;
+	y -= crtc->rel_y;
 	
 	// and to hot spot
 	x -= vc->cursor.hot_x;
 	y -= vc->cursor.hot_y;
 
 	// check whether the cursor is (partially) visible on this screen
-   	prev_state = head->cursor_on_screen;
-	head->cursor_on_screen = true;
+   	prev_state = crtc->cursor_on_screen;
+	crtc->cursor_on_screen = true;
 
 	// in theory, cursor can be up to 64 pixels off screen, 
 	// but there were display errors
-	if( y > head->mode.timing.v_display ||
-		x > head->mode.timing.h_display ||
+	if( y > crtc->mode.timing.v_display ||
+		x > crtc->mode.timing.h_display ||
 		x <= -16 || y <= -16 )
 	{
-		head->cursor_on_screen = false;
+		crtc->cursor_on_screen = false;
 	}
 	
-	if( prev_state != head->cursor_on_screen ) 
-		doShowCursor( ai, head );
+	if( prev_state != crtc->cursor_on_screen ) 
+		Radeon_ShowCursor( ai, crtc_idx );
 
-	if( !head->cursor_on_screen )
+	if( !crtc->cursor_on_screen )
 		return;
 
 	// if upper-left corner of cursor is outside of
@@ -192,17 +193,7 @@ void moveOneCursor( accelerator_info *ai, virtual_head *virtual_head, int x, int
     if( y < 0 ) 
     	yorigin = -y;
 
-	if( head->is_crtc2 )	{
-		OUTREG( ai->regs, RADEON_CUR2_HORZ_VERT_OFF, RADEON_CUR2_LOCK
-			| (xorigin << 16)
-			| yorigin );
-		OUTREG( ai->regs, RADEON_CUR2_HORZ_VERT_POSN, RADEON_CUR2_LOCK
-			| ((xorigin ? 0 : x) << 16)
-			| (yorigin ? 0 : y) );
-		OUTREG( ai->regs, RADEON_CUR2_OFFSET, 
-			vc->cursor.fb_offset + xorigin + yorigin * 16 );
-			
-	} else {
+	if( crtc_idx == 0 )	{
 		OUTREG( ai->regs, RADEON_CUR_HORZ_VERT_OFF, RADEON_CUR_LOCK
 			| (xorigin << 16)
 			| yorigin );
@@ -211,36 +202,46 @@ void moveOneCursor( accelerator_info *ai, virtual_head *virtual_head, int x, int
 			| (yorigin ? 0 : y) );
 		OUTREG( ai->regs, RADEON_CUR_OFFSET, 
 			vc->cursor.fb_offset + xorigin + yorigin * 16 );
+	} else {
+		OUTREG( ai->regs, RADEON_CUR2_HORZ_VERT_OFF, RADEON_CUR2_LOCK
+			| (xorigin << 16)
+			| yorigin );
+		OUTREG( ai->regs, RADEON_CUR2_HORZ_VERT_POSN, RADEON_CUR2_LOCK
+			| ((xorigin ? 0 : x) << 16)
+			| (yorigin ? 0 : y) );
+		OUTREG( ai->regs, RADEON_CUR2_OFFSET, 
+			vc->cursor.fb_offset + xorigin + yorigin * 16 );
 	}
 }
 
 
 // show cursor on one port, depending on official whishes and whether
 // cursor is located on this subscreen
-void doShowCursor( accelerator_info *ai, physical_head *head )
+void Radeon_ShowCursor( accelerator_info *ai, int crtc_idx )
 {
 	virtual_card *vc = ai->vc;
+	crtc_info *crtc = &ai->si->crtc[crtc_idx];
 	uint32 tmp;
 
-	if( head->is_crtc2 ) {
-		tmp = INREG( ai->regs, RADEON_CRTC2_GEN_CNTL );
-	
-		if( vc->cursor.is_visible && head->cursor_on_screen )
-			tmp |= RADEON_CRTC2_CUR_EN;
-		else
-			tmp &= ~RADEON_CRTC2_CUR_EN;
-
-		OUTREG( ai->regs, RADEON_CRTC2_GEN_CNTL, tmp );
-		
-	} else {
+	if( crtc_idx == 0 ) {
 		tmp = INREG( ai->regs, RADEON_CRTC_GEN_CNTL );
 		
-		if( vc->cursor.is_visible && head->cursor_on_screen ) {
+		if( vc->cursor.is_visible && crtc->cursor_on_screen ) {
 			tmp |= RADEON_CRTC_CUR_EN;
 		} else {
 			tmp &= ~RADEON_CRTC_CUR_EN;
 		}
 
 		OUTREG( ai->regs, RADEON_CRTC_GEN_CNTL, tmp );
+		
+	} else {
+		tmp = INREG( ai->regs, RADEON_CRTC2_GEN_CNTL );
+	
+		if( vc->cursor.is_visible && crtc->cursor_on_screen )
+			tmp |= RADEON_CRTC2_CUR_EN;
+		else
+			tmp &= ~RADEON_CRTC2_CUR_EN;
+
+		OUTREG( ai->regs, RADEON_CRTC2_GEN_CNTL, tmp );
 	}
 }

@@ -66,10 +66,13 @@
 #define DEVICE_ID_RADEON_Lf     0x4c66
 #define DEVICE_ID_RADEON_Lg     0x4c67
 
+// M9+
+#define DEVICE_ID_RADEON_5c61   0x5c61
+
 // RV280
-#define DEVICE_ID_RADEON_Ya_	0x5960
-#define DEVICE_ID_RADEON_Ya		0x5961
-#define DEVICE_ID_RADEON_Yd		0x5964
+#define DEVICE_ID_RADEON_Zprea	0x5960
+#define DEVICE_ID_RADEON_Za		0x5961
+#define DEVICE_ID_RADEON_Zd		0x5964
 
 // r300
 #define DEVICE_ID_RADEON_ND     0x4e44
@@ -86,8 +89,11 @@
 // rv350
 #define DEVICE_ID_RADEON_AP		0x4150
 #define DEVICE_ID_RADEON_AQ		0x4151
-#define DEVICE_ID_RADEON_NO		0x4e50
-#define DEVICE_ID_RADEON_NS		0x4e54
+
+// m10
+#define DEVICE_ID_RADEON_NP		0x4e50
+// Mobility Fire GL T2 - any idea about the chip?
+#define DEVICE_ID_RADEON_NT		0x4e54
 
 // rv360
 #define DEVICE_ID_RADEON_AR		0x4152
@@ -96,9 +102,6 @@
 #define DEVICE_ID_RADEON_AH		0x4148
 #define DEVICE_ID_RADEON_NH		0x4e48
 #define DEVICE_ID_RADEON_NI		0x4e49
-
-// Mobility Fire GL T2 - any idea about the chip?
-#define DEVICE_ID_RADEON_NT		0x4e54
 
 // r360
 #define DEVICE_ID_RADEON_NJ		0x4e4a
@@ -131,8 +134,6 @@ RadeonDevice radeon_device_list[] = {
 	// mobility version of original Radeon (based on VE), now called M6
 	{ DEVICE_ID_RADEON_LY,	rt_m6,		"Radeon Mobility" },
 	{ DEVICE_ID_RADEON_LZ,	rt_m6, 		"Radeon Mobility M6 LZ" },
-	// not sure about that: ROM signature is "RADEON" which means r100
-	{ DEVICE_ID_RADEON_NT,	rt_m6,		"Radeon Mobility FireGL T2" },
 	
 	// rs100 (integrated Radeon, seems to be a Radeon VE)
 	{ DEVICE_ID_IGP320M,	rt_rs100,	"IGP320M" },
@@ -159,7 +160,7 @@ RadeonDevice radeon_device_list[] = {
 	{ DEVICE_ID_RADEON_Qk,	rt_r200,	"Radeon 8500 Qk" },
 	{ DEVICE_ID_RADEON_BB,	rt_r200,	"ALL-IN-Wonder Radeon 8500 DV" },
 
-	// RV250 (cut-down R200)
+	// RV250 (cut-down R200 with integrated TV-Out)
 	{ DEVICE_ID_RADEON_Id,  rt_rv250,	"Radeon 9000 Id" },
 	{ DEVICE_ID_RADEON_Ie,  rt_rv250,	"Radeon 9000 Ie" },
 	{ DEVICE_ID_RADEON_If,  rt_rv250,	"Radeon 9000" },
@@ -171,11 +172,14 @@ RadeonDevice radeon_device_list[] = {
 	{ DEVICE_ID_RADEON_Lf,	rt_m9,		"Radeon Mobility 9000 Lf" },
 	{ DEVICE_ID_RADEON_Lg,	rt_m9,		"Radeon Mobility 9000 Lg" },
 	
-	// RV280
-	// the naming scheme can't properly handle this id
-	{ DEVICE_ID_RADEON_Ya_, rt_rv280,	"Radeon 9200" },
-	{ DEVICE_ID_RADEON_Ya,	rt_rv280,	"Radeon 9200" },
-	{ DEVICE_ID_RADEON_Yd,	rt_rv280,	"Radeon 9200 SE" },
+	// RV280 (rv250 with higher frequency)
+	// this entry violates naming scheme, so it's probably wrong
+	{ DEVICE_ID_RADEON_Zprea, rt_rv280,	"Radeon 9200" },
+	{ DEVICE_ID_RADEON_Za,	rt_rv280,	"Radeon 9200" },
+	{ DEVICE_ID_RADEON_Zd,	rt_rv280,	"Radeon 9200 SE" },
+	
+	// M9+ (based on rv280)
+	{ DEVICE_ID_RADEON_5c61,rt_m9plus,	"Radeon Mobility 9200" },
 
 	// R300
 	{ DEVICE_ID_RADEON_ND,	rt_r300,	"Radeon 9700 ND" },
@@ -187,13 +191,16 @@ RadeonDevice radeon_device_list[] = {
 	{ DEVICE_ID_RADEON_AE,	rt_r300,	"Radeon 9700 AE" },
 	{ DEVICE_ID_RADEON_AF,	rt_r300,	"Radeon 9700 AF" },
 	{ DEVICE_ID_RADEON_AG,	rt_r300,	"Radeon 9700 AG" },
-	
+
 	// RV350
 	{ DEVICE_ID_RADEON_AP, 	rt_rv350,	"Radeon 9600 AP" },
 	{ DEVICE_ID_RADEON_AQ, 	rt_rv350,	"Radeon 9600 AQ" },
-	{ DEVICE_ID_RADEON_NO,	rt_rv350,	"Radeon 9600 Pro" },
-	{ DEVICE_ID_RADEON_NS,	rt_rv350,	"Mobility FireGL T2" },
 	
+	// M10 (based on rv350)
+	{ DEVICE_ID_RADEON_NP,	rt_m10,		"Radeon Mobility 9600 NP" },
+	// not sure about that: ROM signature is "RADEON" which means r100
+	{ DEVICE_ID_RADEON_NT,	rt_m10,		"Radeon Mobility FireGL T2" },
+
 	// RV360 (probably minor revision of rv350)
 	{ DEVICE_ID_RADEON_AR, 	rt_rv360,	"Radeon 9600 AR" },
 
@@ -205,10 +212,10 @@ RadeonDevice radeon_device_list[] = {
 	// R360 (probably minor revision of r350)
 	{ DEVICE_ID_RADEON_NJ, 	rt_r360,	"Radeon 9800 XT" },
 
-	// rs100 (aka IGP)
+	// rs100 (aka IGP 320)
 	{ DEVICE_ID_IGP320M, 	rt_rs100,	"Radeon IGP 320M" },
 	
-	// rs200 (aka IGP)
+	// rs200 (aka IGP 340)
 	{ DEVICE_ID_RADEON_C7,	rt_rs200,	"IGP330M/340M/350M (U2) 4337" },
 	{ DEVICE_ID_RADEON_A7,	rt_rs200,	"IGP 340" },
 	
@@ -278,26 +285,29 @@ static struct {
 	bool 			has_crtc2;		// has second CRTC
 	bool			is_mobility;	// mobility chip
 	bool			has_vip;		// has VIP/I2C
+	bool			new_pll;		// reference divider of PPLL moved to other location
 	bool			is_igp;			// integrated graphics
 } asic_properties[] =
 {
-	{ "r100",	tc_external_rt1,	false,	false,	true,	false },	// only original Radeons have one crtc only
-	{ "ve",		tc_internal_rt1, 	true,	false,	true,	false },
-	{ "m6",		tc_internal_rt1, 	true,	true,	false,	false },
-	{ "rs100",	tc_internal_rt1,	true,	true,	false,	true },
-	{ "rv200",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "m7",		tc_internal_rt1, 	true,	true,	false,	false },
-	{ "rs200",	tc_internal_rt1, 	true,	true,	false,	true },
-	{ "r200",	tc_external_rt1, 	true,	false,	true,	false },	// r200 has external TV-Out encoder
-	{ "rv250",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "rv280",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "m9",		tc_internal_rt2, 	true,	true,	true,	false },
-	{ "r300",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "r300_4p",tc_internal_rt2, 	true,	false,	true,	false },
-	{ "rv350",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "rv360",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "r350",	tc_internal_rt2, 	true,	false,	true,	false },
-	{ "r360",	tc_internal_rt2, 	true,	false,	true,	false }
+	{ "r100",	tc_external_rt1,	false,	false,	true,	false,	false },	// only original Radeons have one crtc only
+	{ "ve",		tc_internal_rt1, 	true,	false,	true,	false,	false },
+	{ "m6",		tc_internal_rt1, 	true,	true,	false,	false,	false },
+	{ "rs100",	tc_internal_rt1,	true,	true,	false,	false,	true },
+	{ "rv200",	tc_internal_rt2, 	true,	false,	true,	false,	false },
+	{ "m7",		tc_internal_rt1, 	true,	true,	false,	false,	false },
+	{ "rs200",	tc_internal_rt1, 	true,	true,	false,	false,	true },
+	{ "r200",	tc_external_rt1, 	true,	false,	true,	false,	false },	// r200 has external TV-Out encoder
+	{ "rv250",	tc_internal_rt2, 	true,	false,	true,	false,	false },
+	{ "m9",		tc_internal_rt2, 	true,	true,	false,	false,	false },
+	{ "rv280",	tc_internal_rt2, 	true,	false,	true,	false,	false },
+	{ "m9plus",	tc_internal_rt2, 	true,	true,	false,	false,	false },
+	{ "r300",	tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "r300_4p",tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "rv350",	tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "m10",	tc_internal_rt2, 	true,	true,	false,	true,	false },
+	{ "rv360",	tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "r350",	tc_internal_rt2, 	true,	false,	true,	true,	false },
+	{ "r360",	tc_internal_rt2, 	true,	false,	true,	true,	false }
 };
 
 
@@ -318,11 +328,12 @@ static bool probeDevice( device_info *di )
 			if (device->device_id != di->pcii.device_id ) 
 				continue;
 			
-			di->num_heads = asic_properties[device->asic].has_crtc2 ? 2 : 1;
+			di->num_crtc = asic_properties[device->asic].has_crtc2 ? 2 : 1;
 			di->tv_chip = asic_properties[device->asic].tv_chip;
 			di->asic = device->asic;
 			di->is_mobility = asic_properties[device->asic].is_mobility;
 			di->has_vip = asic_properties[device->asic].has_vip;
+			di->new_pll = asic_properties[device->asic].new_pll;
 			di->is_igp = asic_properties[device->asic].is_igp;
 			
 			if( Radeon_MapBIOS( &di->pcii, &di->rom ) != B_OK )

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 
 
 	Part of Radeon kernel driver
@@ -32,27 +32,27 @@ Radeon_ThreadInterruptWork( vuint8 *regs, device_info *di, uint32 int_status )
 	uint32 handled = B_HANDLED_INTERRUPT;
 
 	if( (int_status & RADEON_CRTC_VBLANK_STAT) != 0 &&
-		si->heads[0].vblank >= 0 ) 
+		si->crtc[0].vblank >= 0 ) 
 	{
 		int32 blocked;
 
 		++di->vbi_count[0];
 		
-		if( (get_sem_count( si->heads[0].vblank, &blocked ) == B_OK) && (blocked < 0) ) {
-			release_sem_etc( si->heads[0].vblank, -blocked, B_DO_NOT_RESCHEDULE );
+		if( (get_sem_count( si->crtc[0].vblank, &blocked ) == B_OK) && (blocked < 0) ) {
+			release_sem_etc( si->crtc[0].vblank, -blocked, B_DO_NOT_RESCHEDULE );
 			handled = B_INVOKE_SCHEDULER;
 		}
 	}
 	
 	if( (int_status & RADEON_CRTC2_VBLANK_STAT) != 0 &&
-		si->heads[1].vblank >= 0 ) 
+		si->crtc[1].vblank >= 0 ) 
 	{
 		int32 blocked;
 	
 		++di->vbi_count[1];	
 		
-		if( (get_sem_count( si->heads[1].vblank, &blocked ) == B_OK) && (blocked < 0) ) {
-			release_sem_etc( si->heads[1].vblank, -blocked, B_DO_NOT_RESCHEDULE );
+		if( (get_sem_count( si->crtc[1].vblank, &blocked ) == B_OK) && (blocked < 0) ) {
+			release_sem_etc( si->crtc[1].vblank, -blocked, B_DO_NOT_RESCHEDULE );
 			handled = B_INVOKE_SCHEDULER;
 		}
 	}
@@ -166,7 +166,7 @@ static int32 timer_interrupt_func( timer *te )
 			/* do the things we do when we notice a vertical retrace */
 			result = Radeon_ThreadInterruptWork( regs, di, 
 				RADEON_CRTC_VBLANK_STAT | 
-				(di->num_heads > 1 ? RADEON_CRTC2_VBLANK_STAT : 0 ));
+				(di->num_crtc > 1 ? RADEON_CRTC2_VBLANK_STAT : 0 ));
 		}
 
 		/* pick the "other" timer */
@@ -198,21 +198,21 @@ Radeon_SetupIRQ( device_info *di, char *buffer )
 	sprintf( buffer, "%04X_%04X_%02X%02X%02X VBI 1",
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function );		
-	si->heads[0].vblank = create_sem( 0, buffer );
-	if( si->heads[0].vblank < 0 ) {
-		result = si->heads[0].vblank;
+	si->crtc[0].vblank = create_sem( 0, buffer );
+	if( si->crtc[0].vblank < 0 ) {
+		result = si->crtc[0].vblank;
 		goto err1;
 	}
 
-	si->heads[1].vblank = 0;
+	si->crtc[1].vblank = 0;
 	
-	if( di->num_heads > 1 ) {
+	if( di->num_crtc > 1 ) {
 		sprintf( buffer, "%04X_%04X_%02X%02X%02X VBI 2",
 			di->pcii.vendor_id, di->pcii.device_id,
 			di->pcii.bus, di->pcii.device, di->pcii.function );		
-		si->heads[1].vblank = create_sem( 0, buffer );
-		if( si->heads[1].vblank < 0 ) {
-			result = si->heads[1].vblank;
+		si->crtc[1].vblank = create_sem( 0, buffer );
+		if( si->crtc[1].vblank < 0 ) {
+			result = si->crtc[1].vblank;
 			goto err2;
 		}
 	}
@@ -241,9 +241,9 @@ Radeon_SetupIRQ( device_info *di, char *buffer )
     /* this is required because apps can't aquire kernel semaphores */
     thid = find_thread(NULL);
 	get_thread_info(thid, &thinfo);
-	set_sem_owner(si->heads[0].vblank, thinfo.team);
-	if( di->num_heads > 1 )
-		set_sem_owner(si->heads[1].vblank, thinfo.team);
+	set_sem_owner(si->crtc[0].vblank, thinfo.team);
+	if( di->num_crtc > 1 )
+		set_sem_owner(si->crtc[1].vblank, thinfo.team);
 	//set_sem_owner(di->cap_sem, thinfo.team);
 
     /* disable all interrupts */
@@ -283,10 +283,10 @@ err5:
 err4:
 	delete_sem( di->cap_sem );
 err3:
-	if( di->num_heads > 1 )
-		delete_sem( si->heads[1].vblank );
+	if( di->num_crtc > 1 )
+		delete_sem( si->crtc[1].vblank );
 err2:
-	delete_sem( si->heads[0].vblank );
+	delete_sem( si->crtc[0].vblank );
 err1:
 	return result;
 }
@@ -313,13 +313,13 @@ Radeon_CleanupIRQ( device_info *di )
         remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, Radeon_Interrupt, di);
     }
 
-	delete_sem( si->heads[0].vblank );
+	delete_sem( si->crtc[0].vblank );
 	
-	if( di->num_heads > 1 )
-	    delete_sem( si->heads[1].vblank );
+	if( di->num_crtc > 1 )
+	    delete_sem( si->crtc[1].vblank );
 	    
 	delete_sem( di->cap_sem );
 	delete_sem( di->dma_sem );
 
-	di->cap_sem = si->heads[1].vblank = si->heads[0].vblank = 0;
+	di->cap_sem = si->crtc[1].vblank = si->crtc[0].vblank = 0;
 }

@@ -80,10 +80,15 @@ sem_id ACCELERANT_RETRACE_SEMAPHORE(void)
 	// with multi-monitor mode, we have two vertical blanks!
 	// until we find a better solution, we always return virtual port 0,
 	// which may be either physical port 0 or 1
-	int physical_head = vc->heads[0].physical_head;
+	int crtc_idx;
+	
+	if( vc->used_crtc[0] )
+		crtc_idx = 0;
+	else
+		crtc_idx = 1;
 	
 	//SHOW_INFO( 3, "semaphore: %x", ai->si->ports[physical_port].vblank );
 	
-	return ai->si->heads[physical_head].vblank;
+	return ai->si->crtc[crtc_idx].vblank;
 	//return B_ERROR;
 }

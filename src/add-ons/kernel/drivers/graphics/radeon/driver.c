@@ -289,8 +289,8 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 			if( vr->magic != RADEON_PRIVATE_DATA_MAGIC )
 				break;
 				
-			result = Radeon_VIPRead( di, vr->channel, vr->address, &vr->data ) ?
-				B_OK : B_ERROR;
+			result = Radeon_VIPRead( di, vr->channel, vr->address, &vr->data,
+				vr->lock ) ? B_OK : B_ERROR;
 		} break;
 		
 		case RADEON_VIPWRITE: {
@@ -299,8 +299,8 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 			if( vw->magic != RADEON_PRIVATE_DATA_MAGIC )
 				break;
 				
-			result = Radeon_VIPWrite( di, vw->channel, vw->address, vw->data ) ?
-				B_OK : B_ERROR;
+			result = Radeon_VIPWrite( di, vw->channel, vw->address, vw->data,
+				vw->lock ) ? B_OK : B_ERROR;
 		} break;
 		
 		case RADEON_FINDVIPDEVICE: {

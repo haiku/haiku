@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -16,16 +16,19 @@
 #include "crtc_regs.h"
 #include <GraphicsDefs.h>
 
+#include "crtc_regs.h"
 #include "overlay_regs.h"
-#include "capture_regs.h"
 #include "rbbm_regs.h"
 #include "dac_regs.h"
+
+#include "set_mode.h"
 
 #include <string.h>
 
 
 // round virtual width up to next valid size
-uint32 Radeon_RoundVWidth( int virtual_width, int bpp )
+uint32 Radeon_RoundVWidth( 
+	int virtual_width, int bpp )
 {
 	// we have to make both the CRTC and the accelerator happy:
 	// - the CRTC wants virtual width in pixels to be a multiple of 8
@@ -58,26 +61,37 @@ static struct {
 	{ RADEON_OVR_CLR, 0 },	
 	{ RADEON_OVR_WID_LEFT_RIGHT, 0 },
 	{ RADEON_OVR_WID_TOP_BOTTOM, 0 },
-	{ RADEON_OV0_SCALE_CNTL, 0 },
+	{ RADEON_OV0_SCALE_CNTL, 0 },		// disable overlay
 	{ RADEON_SUBPIC_CNTL, 0 },
-	{ RADEON_VIPH_CONTROL, 0 },
 	{ RADEON_I2C_CNTL_1, 0 },
-	//{ RADEON_GEN_INT_CNTL, 0 },	// VBI irqs are handled seperately
-	//{ RADEON_CAP0_TRIG_CNTL, 0 },	// leave capturing on during mode switch
 };
 
-static void Radeon_InitCommonRegs( accelerator_info *ai )
+
+static void Radeon_InitCommonRegs( 
+	accelerator_info *ai )
 {
 	vuint8 *regs = ai->regs;
 	uint i;
 	
 	for( i = 0; i < sizeof( common_regs) / sizeof( common_regs[0] ); ++i )
 		OUTREG( regs, common_regs[i].reg, common_regs[i].val );
+		
+	// enable extended display modes
+	OUTREGP( regs, RADEON_CRTC_GEN_CNTL, 
+		RADEON_CRTC_EXT_DISP_EN, ~RADEON_CRTC_EXT_DISP_EN );
+		
+	// disable flat panel auto-centering 
+	// (if we have a CRT on CRTC1, this must be disabled;
+	//  if we have a flat panel on CRTC1, we setup CRTC manually, not
+	//  using the auto-centre, automatic-sync-override magic)
+	OUTREG( regs, RADEON_CRTC_MORE_CNTL, 0 );
 }
+
 
 // set display mode of one head;
 // port restrictions, like fixed-sync TFTs connected to it, are taken care of
-void Radeon_SetMode( accelerator_info *ai, physical_head *head, display_mode *mode )
+void Radeon_SetMode( 
+	accelerator_info *ai, crtc_info *crtc, display_mode *mode, impactv_params *tv_params )
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
@@ -86,24 +100,28 @@ void Radeon_SetMode( accelerator_info *ai, physical_head *head, display_mode *mo
 	int    bpp;
 	display_device_e disp_devices;
 	fp_info *fp_info;
-	port_regs values;
-	tv_params tv_params;
-	tv_standard tv_format = ts_ntsc;
-	tv_timing *tv_timing = &Radeon_std_tv_timing[tv_format];
-	bool internal_tv_encoder;
 	
-	head->mode = *mode;
+	crtc_regs		crtc_values;
+	pll_regs		pll_values;
+	fp_regs			fp_values;
+	impactv_regs	impactv_values;
+	uint32			surface_cntl;
+	
+	bool internal_tv_encoder;
+	pll_dividers dividers;
+	
+	crtc->mode = *mode;
 	
 	// don't destroy passed values, use our copy instead
-	mode = &head->mode;
+	mode = &crtc->mode;
 	
-	disp_devices = head->chosen_displays;
-	fp_info = &si->flatpanels[head->flatpanel_port];
+	disp_devices = crtc->chosen_displays;
+	fp_info = &si->flatpanels[crtc->flatpanel_port];
 	
 	// if using an flat panel or LCD, maximum resolution
 	// is determined by the physical resolution; 
 	// also, all timing is fixed
-	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext )) != 0 ) {
+	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
 		if( mode->timing.h_display > fp_info->panel_xres )
 			mode->timing.h_display = fp_info->panel_xres;
 		if(	mode->timing.v_display > fp_info->panel_yres )
@@ -118,18 +136,29 @@ void Radeon_SetMode( accelerator_info *ai, physical_head *head, display_mode *mo
 		
 		mode->timing.pixel_clock = fp_info->dot_clock;
 	}
+	
+	// TV-out supports at most 1024x768
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
+		if( mode->timing.h_display > 1024 )
+			mode->timing.h_display = 1024;
+			
+		if( mode->timing.v_display > 768 )
+			mode->timing.v_display = 768;
+	}
 
 	// if using TV-Out, the timing of the source signal must be tweaked to
 	// get proper timing
-	internal_tv_encoder = si->tv_chip != tc_external_rt1;
+	internal_tv_encoder = IS_INTERNAL_TV_OUT( si->tv_chip );
 	
-	// we need higher accuracy then Be thought of;
+	// we need higher accuracy then Be thought of
 	mode->timing.pixel_clock *= 1000;
 
+	// TV stuff must be done first as it tweaks the display mode
 	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
 		display_mode tweaked_mode;
 		
-		Radeon_CalcTVParams( &si->pll, &tv_params, tv_timing, internal_tv_encoder, 
+		Radeon_CalcImpacTVParams( 
+			&si->pll, tv_params, vc->tv_standard, internal_tv_encoder, 
 			mode, &tweaked_mode );
 			
 		*mode = tweaked_mode;
@@ -143,90 +172,92 @@ void Radeon_SetMode( accelerator_info *ai, physical_head *head, display_mode *mo
 	// time to read original register content
 	// lock hardware so noone bothers us
 	Radeon_WaitForIdle( ai, true );
-	
-	Radeon_ReadCRTCRegisters( ai, head, &values );
-	Radeon_ReadMonitorRoutingRegs( ai, head, &values );
-	
+		
 	if( (disp_devices & (dd_dvi | dd_lvds | dd_dvi_ext)) != 0 ) {
-		if( !head->is_crtc2 )
-			Radeon_ReadRMXRegisters( ai, &values );
+		if( crtc->crtc_idx == 0 )
+			Radeon_ReadRMXRegisters( ai, &fp_values );
 			
-		Radeon_ReadFPRegisters( ai, &values );
+		Radeon_ReadFPRegisters( ai, &fp_values );
 	}
-
-	// calculate all hardware register values
-	Radeon_CalcCRTCRegisters( ai, head, mode, &values );
-
-	values.surface_cntl = RADEON_SURF_TRANSLATION_DIS;
-
-	// for flat panels, we may not have pixel clock if DDC data is missing;
-	// as we don't change effective resolution we can leave it as set by BIOS
-	if( mode->timing.pixel_clock ) {
-		Radeon_CalcPLLRegisters( &si->pll, mode/*->timing.pixel_clock / 10*/, 
-			(/*(disp_devices & (dd_stv | dd_ctv)) != 0 ? &tv_params.crt_dividers : */NULL),
-			&values );
-	}
-	
-	// for first CRTC1, we need to setup RMX properly
-	if( !head->is_crtc2 )
-		Radeon_CalcRMXRegisters( fp_info, mode, 
-			(disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0,
-			&values );
-			
-	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 )
-		Radeon_CalcFPRegisters( ai, head, fp_info, &values );
 
 	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
-		Radeon_CalcTVRegisters( ai, mode, tv_timing, &tv_params, &values, 
-			head, internal_tv_encoder, tv_format );
+		// some register's content isn't created from scratch but
+		// only modified, so we need the original content first
+		if( internal_tv_encoder )
+			Radeon_InternalTVOutReadRegisters( ai, &impactv_values );
+		else
+			Radeon_TheatreReadTVRegisters( ai, &impactv_values );
 	}
 
-	Radeon_CalcMonitorRouting( ai, head, &values );
+
+	// calculate all hardware register values
+	Radeon_CalcCRTCRegisters( ai, crtc, mode, &crtc_values );
+
+	surface_cntl = RADEON_SURF_TRANSLATION_DIS;
+
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
+		Radeon_CalcImpacTVRegisters( ai, mode, tv_params, &impactv_values, 
+			crtc->crtc_idx, internal_tv_encoder, vc->tv_standard, disp_devices );
+	}
+
+	if( (disp_devices & (dd_stv | dd_ctv)) == 0 )
+		Radeon_CalcCRTPLLDividers( &si->pll, mode, &dividers );
+	else
+		dividers = tv_params->crt_dividers;
+	
+	Radeon_CalcPLLRegisters( mode, &dividers, &pll_values );
+	
+	// for first CRTC1, we need to setup RMX properly
+	if( crtc->crtc_idx == 0 )
+		Radeon_CalcRMXRegisters( fp_info, mode, 
+			(disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0,
+			&fp_values );
+			
+	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 )
+		Radeon_CalcFPRegisters( ai, crtc, fp_info, &crtc_values, &fp_values );
 	
 	// we don't use pixel clock anymore, so it can be reset to Be's kHz
 	mode->timing.pixel_clock /= 1000;
 	
 	// write values to registers
-	// we first switch off all output, so the monitor(s) won't get invalid signals
-	Radeon_SetDPMS( ai, head, B_DPMS_SUSPEND );
 	
 	Radeon_InitCommonRegs( ai );
-		
-	Radeon_ProgramCRTCRegisters( ai, head, &values );
+	
+	Radeon_ProgramCRTCRegisters( ai, crtc->crtc_idx, &crtc_values );
+	
+	OUTREG( regs, RADEON_SURFACE_CNTL, surface_cntl );
 
-	OUTREG( regs, RADEON_SURFACE_CNTL, values.surface_cntl );
-
-	if( !head->is_crtc2 )
-		Radeon_ProgramRMXRegisters( ai, &values );
+	if( crtc->crtc_idx == 0 )
+		Radeon_ProgramRMXRegisters( ai, &fp_values );
 
 	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 )
-		Radeon_ProgramFPRegisters( ai, head, fp_info, &values );
-
+		Radeon_ProgramFPRegisters( ai, crtc, fp_info, &fp_values );
+		
 	//if( mode->timing.pixel_clock )
-	Radeon_ProgramPLL( ai, head, &values );
-		
-	if( (disp_devices & (dd_ctv | dd_stv)) != 0 )
-		Radeon_ProgramTVRegisters( ai, &values, internal_tv_encoder );
-		
-	Radeon_ProgramMonitorRouting( ai, head, &values );
+	Radeon_ProgramPLL( ai, crtc->crtc_idx, &pll_values );
 	
-	head->active_displays = disp_devices;
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
+		if( internal_tv_encoder )
+			Radeon_InternalTVOutProgramRegisters( ai, &impactv_values );
+		else
+			Radeon_TheatreProgramTVRegisters( ai, &impactv_values );
+	}
+
+	crtc->active_displays = disp_devices;
 	
 	// programming is over, so hardware can be used again
 	RELEASE_BEN( si->cp.lock );
 	
-	// well done - switch display(s) on
-	Radeon_SetDPMS( ai, head, B_DPMS_ON );
-	
 	// overlay must be setup again after modeswitch (whoever was using it)
 	// TBD: this won't work if another virtual card was using it,
 	// but currently, virtual cards don't work anyway...
-	si->active_overlay.head = -1;
+	si->active_overlay.crtc_idx = -1;
 }
 
 
 // enable or disable VBlank interrupts
-void Radeon_EnableIRQ( accelerator_info *ai, bool enable )
+void Radeon_EnableIRQ( 
+	accelerator_info *ai, bool enable )
 {
 	shared_info *si = ai->si;
 	uint32 int_cntl, int_mask;
@@ -234,7 +265,7 @@ void Radeon_EnableIRQ( accelerator_info *ai, bool enable )
 	int_cntl = INREG( ai->regs, RADEON_GEN_INT_CNTL );
 	int_mask = 
 		RADEON_CRTC_VBLANK_MASK
-		| (si->num_heads > 1 ? RADEON_CRTC2_VBLANK_MASK : 0);
+		| (si->num_crtc > 1 ? RADEON_CRTC2_VBLANK_MASK : 0);
 		
 	if( enable )
 		int_cntl |= int_mask;
@@ -254,7 +285,8 @@ void Radeon_EnableIRQ( accelerator_info *ai, bool enable )
 
 
 // public function: set display mode
-status_t SET_DISPLAY_MODE( display_mode *mode_in ) 
+status_t SET_DISPLAY_MODE( 
+	display_mode *mode_in ) 
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
@@ -281,10 +313,15 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	
 	// mode switches can take quite long and are visible, 
 	// so avoid them if possible
-	if( memcmp( &mode, &vc->mode, sizeof( display_mode )) == 0 ) {
+	if( memcmp( &mode, &vc->mode, sizeof( display_mode )) == 0 &&
+		!vc->enforce_mode_change ) {
 		RELEASE_BEN( si->engine.lock );
 		return B_OK;
 	}
+	
+	// this flag was set when some internal parameter has changed that
+	// affects effective display mode
+	vc->enforce_mode_change = false;
 	
 	// make sure, we don't get disturbed
 	//Radeon_Finish( ai );
@@ -318,9 +355,14 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	Radeon_VerifyMultiMode( vc, si, &mode );
 
 	// set main flags	
-	vc->independant_heads = Radeon_NeedsSecondPort( &mode ) ? 2 : 1;
+	vc->independant_heads = vc->assigned_crtc[0] && si->crtc[0].chosen_displays != dd_none;
+	
+	if( si->num_crtc > 1 )
+		vc->independant_heads += vc->assigned_crtc[1] && si->crtc[1].chosen_displays != dd_none;
+		
 	vc->different_heads = Radeon_DifferentPorts( &mode );
-	SHOW_FLOW( 2, "independant heads: %d", vc->independant_heads );
+	SHOW_FLOW( 2, "independant heads: %d, different heads: %d", 
+		vc->independant_heads, vc->different_heads );
 	vc->scroll = mode.flags & B_SCROLL;
 	SHOW_FLOW( 2, "scrolling %s", vc->scroll ? "enabled" : "disabled" );
 
@@ -372,14 +414,50 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	}
 	
 	// multi-screen stuff
-	Radeon_InitMultiModeVars( vc, &mode );
+	Radeon_InitMultiModeVars( ai, &mode );
 	
 	// GO!	
-	Radeon_SetMode( ai, &si->heads[vc->heads[0].physical_head], &mode );
+
+	{
+		routing_regs routing_values;
+		impactv_params tv_params;
 	
-	if( vc->independant_heads > 1 )
-		Radeon_SetMode( ai, &si->heads[vc->heads[1].physical_head], &mode );
-   	
+		// we first switch off all output, so the monitor(s) won't get invalid signals
+		if( vc->assigned_crtc[0] ) {
+			// overwrite list of active displays to switch off displays 
+			// someone else turned on
+			si->crtc[0].active_displays = vc->controlled_displays;
+			Radeon_SetDPMS( ai, 0, B_DPMS_SUSPEND );
+		}
+		if( vc->assigned_crtc[1] ) {
+			si->crtc[1].active_displays = vc->controlled_displays;
+			Radeon_SetDPMS( ai, 1, B_DPMS_SUSPEND );
+		}
+		
+		// mark crtc that will be used from now on
+		vc->used_crtc[0] = vc->assigned_crtc[0] && si->crtc[0].chosen_displays != dd_none;
+		vc->used_crtc[1] = vc->assigned_crtc[1] && si->crtc[1].chosen_displays != dd_none;
+	
+		// then change the mode
+		if( vc->used_crtc[0] )
+			Radeon_SetMode( ai, &si->crtc[0], &mode, &tv_params );
+		if( vc->used_crtc[1] )
+			Radeon_SetMode( ai, &si->crtc[1], &mode, &tv_params );
+			
+		// setup signal routing
+		Radeon_ReadMonitorRoutingRegs( ai, &routing_values );
+		Radeon_CalcMonitorRouting( ai, &tv_params, &routing_values );
+		Radeon_ProgramMonitorRouting( ai, &routing_values );
+	   	
+		// finally, switch display(s) on
+		if( vc->used_crtc[0] )
+			Radeon_SetDPMS( ai, 0, B_DPMS_ON );
+		if( vc->used_crtc[1] )
+			Radeon_SetDPMS( ai, 1, B_DPMS_ON );
+			
+		OUTREGP( ai->regs, RADEON_CRTC_EXT_CNTL, 0, ~RADEON_CRTC_DISPLAY_DIS );
+	}
+	
    	SHOW_FLOW( 3, "pitch=%ld", vc->pitch );
    	
    	// we'll modify bits of this reg, so save it for async access
@@ -399,18 +477,18 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	Radeon_MoveDisplay( ai, mode.h_display_start, mode.v_display_start );
 
 	// set standard palette in direct-colour modes
-	Radeon_InitPalette( ai, &si->heads[vc->heads[0].physical_head] );
-	if( vc->independant_heads > 1 )
-		Radeon_InitPalette( ai, &si->heads[vc->heads[1].physical_head] );
+	if( vc->used_crtc[0] )
+		Radeon_InitPalette( ai, 0 );
+	if( vc->used_crtc[1] )
+		Radeon_InitPalette( ai, 1 );
 	
 	// initialize cursor data
-	Radeon_SetCursorColors( ai, &si->heads[vc->heads[0].physical_head] );
-	if( vc->independant_heads > 1 )
-		Radeon_SetCursorColors( ai, &si->heads[vc->heads[1].physical_head] );
+	if( vc->used_crtc[0] )
+		Radeon_SetCursorColors( ai, 0 );
+	if( vc->used_crtc[1] )
+		Radeon_SetCursorColors( ai, 1 );
 		
 	// sync should be settled now, so we can reenable IRQs
-	// TBD: IRQ handling doesn't work correctly and doesn't make sense with two 
-	// displays connected, so let's leave them disabled for now
 	Radeon_EnableIRQ( ai, true );
 		
 	RELEASE_BEN( si->engine.lock );

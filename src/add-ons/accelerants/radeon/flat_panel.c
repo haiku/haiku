@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -10,12 +10,13 @@
 #include "radeon_accelerant.h"
 #include "mmio.h"
 #include "fp_regs.h"
+#include "memcntrl_regs.h"
 #include "utils.h"
-#include "crtc_regs.h"
-#include "pll_regs.h"
+#include "set_mode.h"
 
 
-void Radeon_ReadRMXRegisters( accelerator_info *ai, port_regs *values )
+void Radeon_ReadRMXRegisters( 
+	accelerator_info *ai, fp_regs *values )
 {
 	vuint8 *regs = ai->regs;
 
@@ -23,7 +24,8 @@ void Radeon_ReadRMXRegisters( accelerator_info *ai, port_regs *values )
 	values->fp_vert_stretch = INREG( regs, RADEON_FP_VERT_STRETCH );
 }
 
-void Radeon_CalcRMXRegisters( fp_info *flatpanel, display_mode *mode, bool use_rmx, port_regs *values )
+void Radeon_CalcRMXRegisters( 
+	fp_info *flatpanel, display_mode *mode, bool use_rmx, fp_regs *values )
 {
 	uint xres = mode->timing.h_display;
 	uint yres = mode->timing.v_display;
@@ -100,7 +102,8 @@ void Radeon_CalcRMXRegisters( fp_info *flatpanel, display_mode *mode, bool use_r
 }
 
 // write RMX registers
-void Radeon_ProgramRMXRegisters( accelerator_info *ai, port_regs *values )
+void Radeon_ProgramRMXRegisters( 
+	accelerator_info *ai, fp_regs *values )
 {
 	vuint8 *regs = ai->regs;
 
@@ -109,7 +112,8 @@ void Radeon_ProgramRMXRegisters( accelerator_info *ai, port_regs *values )
 }
 
 
-void Radeon_ReadFPRegisters( accelerator_info *ai, port_regs *values )
+void Radeon_ReadFPRegisters( 
+	accelerator_info *ai, fp_regs *values )
 {
 	vuint8 *regs = ai->regs;
 
@@ -128,18 +132,19 @@ void Radeon_ReadFPRegisters( accelerator_info *ai, port_regs *values )
 
 // calculcate flat panel crtc registers;
 // must be called after normal CRTC registers are determined
-void Radeon_CalcFPRegisters( accelerator_info *ai, physical_head *head, 
-	fp_info *fp_port, port_regs *values )
+void Radeon_CalcFPRegisters( 
+	accelerator_info *ai, crtc_info *crtc, 
+	fp_info *fp_port, crtc_regs *crtc_values, fp_regs *values )
 {
 	// setup synchronization position
 	// (most values are ignored according to fp_gen_cntl, but at least polarity
 	//  and pixel precise horizontal sync position are always used)
 	if( fp_port->is_fp2 ) {
-		values->fp2_h_sync_strt_wid = values->crtc_h_sync_strt_wid;
-		values->fp2_v_sync_strt_wid = values->crtc_v_sync_strt_wid;
+		values->fp2_h_sync_strt_wid = crtc_values->crtc_h_sync_strt_wid;
+		values->fp2_v_sync_strt_wid = crtc_values->crtc_v_sync_strt_wid;
 	} else {
-		values->fp_h_sync_strt_wid = values->crtc_h_sync_strt_wid;
-		values->fp_v_sync_strt_wid = values->crtc_v_sync_strt_wid;
+		values->fp_h_sync_strt_wid = crtc_values->crtc_h_sync_strt_wid;
+		values->fp_v_sync_strt_wid = crtc_values->crtc_v_sync_strt_wid;
 	}
 
 	if( fp_port->is_fp2 )
@@ -147,8 +152,7 @@ void Radeon_CalcFPRegisters( accelerator_info *ai, physical_head *head,
 	else {
 		// setup magic CRTC shadowing 	
 		values->fp_gen_cntl &= 
-			~(RADEON_FP_SEL_CRTC2 |
-			  RADEON_FP_RMX_HVSYNC_CONTROL_EN |
+			~(RADEON_FP_RMX_HVSYNC_CONTROL_EN |
 			  RADEON_FP_DFP_SYNC_SEL |	
 			  RADEON_FP_CRT_SYNC_SEL | 
 			  RADEON_FP_CRTC_LOCK_8DOT |
@@ -161,7 +165,7 @@ void Radeon_CalcFPRegisters( accelerator_info *ai, physical_head *head,
 	}
 	
 	// enable proper transmitter	
-	if( (head->chosen_displays & dd_lvds) != 0 ) {
+	if( (crtc->chosen_displays & dd_lvds) != 0 ) {
 		// using LVDS means there cannot be a DVI monitor
 		values->lvds_gen_cntl |= (RADEON_LVDS_ON | RADEON_LVDS_BLON);
 		values->fp_gen_cntl &= ~(RADEON_FP_FPON | RADEON_FP_TMDS_EN);
@@ -188,18 +192,20 @@ void Radeon_CalcFPRegisters( accelerator_info *ai, physical_head *head,
 
 
 // write flat panel registers
-void Radeon_ProgramFPRegisters( accelerator_info *ai, physical_head *head,
-	fp_info *fp_port, port_regs *values )
+void Radeon_ProgramFPRegisters( 
+	accelerator_info *ai, crtc_info *crtc,
+	fp_info *fp_port, fp_regs *values )
 {
 	shared_info *si = ai->si;
 	vuint8 *regs = ai->regs;
 		
 	SHOW_FLOW0( 2, "" );
 	
-	OUTREG( regs, RADEON_FP_GEN_CNTL, values->fp_gen_cntl );
+	OUTREGP( regs, RADEON_FP_GEN_CNTL, values->fp_gen_cntl, RADEON_FP_SEL_CRTC2 );
 
 	if( fp_port->is_fp2 ) {
-		OUTREG( regs, RADEON_FP2_GEN_CNTL, values->fp2_gen_cntl );
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, values->fp2_gen_cntl, 
+			RADEON_FP2_SOURCE_SEL_CRTC2 | RADEON_FP2_SRC_SEL_CRTC2 );
 		OUTREG( regs, RADEON_FP_H2_SYNC_STRT_WID, values->fp2_h_sync_strt_wid );
 		OUTREG( regs, RADEON_FP_V2_SYNC_STRT_WID, values->fp2_v_sync_strt_wid );
 	} else {
@@ -209,18 +215,13 @@ void Radeon_ProgramFPRegisters( accelerator_info *ai, physical_head *head,
 	
 	// workaround for old AIW Radeon having display buffer underflow 
 	// in conjunction with DVI
-	if( si->num_heads == 1 ) {
+	if( si->asic == rt_r100 ) {
 		OUTREG( regs, RADEON_GRPH_BUFFER_CNTL, 
 			INREG( regs, RADEON_GRPH_BUFFER_CNTL) & ~0x7f0000);
 	}
 	
-	if( (head->chosen_displays & dd_lvds) != 0 ) {
+	if( (crtc->chosen_displays & dd_lvds) != 0 ) {
 		OUTREGP( regs, RADEON_LVDS_GEN_CNTL, values->lvds_gen_cntl, 
 			RADEON_LVDS_ON | RADEON_LVDS_BLON );
 	}
-	
-	// disable auto-centering 
-	// (we setup everything ourself, and if we switch from flat panel to CRT
-	//  on CRTC1, we don't need this stuff anyway)
-	OUTREG( regs, RADEON_CRTC_MORE_CNTL, 0 );
 }

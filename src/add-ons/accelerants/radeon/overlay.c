@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -51,7 +51,8 @@ static struct {
 
 
 // setup overlay unit before first use
-void Radeon_InitOverlay( accelerator_info *ai, physical_head *head )
+void Radeon_InitOverlay( 
+	accelerator_info *ai, int crtc_idx )
 {
 	vuint8 *regs = ai->regs;
 	shared_info *si = ai->si;
@@ -93,7 +94,7 @@ void Radeon_InitOverlay( accelerator_info *ai, physical_head *head )
 	
 	// overlay unit can only handle up to 175 MHz, if pixel clock is higher,
 	// only every second pixel is handled
-	if( head->mode.timing.pixel_clock < 175000 )
+	if( si->crtc[crtc_idx].mode.timing.pixel_clock < 175000 )
 		ecp_div = 0;
 	else
 		ecp_div = 1;
@@ -101,7 +102,7 @@ void Radeon_InitOverlay( accelerator_info *ai, physical_head *head )
 	Radeon_OUTPLLP( regs, si->asic, RADEON_VCLK_ECP_CNTL, 
 		ecp_div << RADEON_ECP_DIV_SHIFT, ~RADEON_ECP_DIV_MASK );
 
-	si->active_overlay.head = si->pending_overlay.head;
+	si->active_overlay.crtc_idx = si->pending_overlay.crtc_idx;
 	
 	// invalidate active colour space
 	si->active_overlay.ob.space = -1;
@@ -140,7 +141,8 @@ space_transform trans_rgb =
 
 
 // set overlay colour space transformation matrix
-static void Radeon_SetTransform( accelerator_info *ai,
+static void Radeon_SetTransform( 
+	accelerator_info *ai,
 	float	    bright,
 	float	    cont,
 	float	    sat, 
@@ -263,7 +265,8 @@ static void Radeon_SetTransform( accelerator_info *ai,
 
 
 // convert Be colour key to rgb value
-static uint32 colourKey2RGB32( uint32 space, uint8 red, uint8 green, uint8 blue ) 
+static uint32 colourKey2RGB32( 
+	uint32 space, uint8 red, uint8 green, uint8 blue ) 
 {
 	uint32 res;
 	
@@ -300,7 +303,8 @@ static uint32 colourKey2RGB32( uint32 space, uint8 red, uint8 green, uint8 blue 
 
 
 // set colour key of overlay
-static void Radeon_SetColourKey( accelerator_info *ai, const overlay_window *ow )
+static void Radeon_SetColourKey( 
+	accelerator_info *ai, const overlay_window *ow )
 {
 	virtual_card *vc = ai->vc;
 	vuint8 *regs = ai->regs;
@@ -437,7 +441,8 @@ static space_params space_params_table[16] = {
 };
 
 // get appropriate scaling/filter parameters
-static hscale_factor *getHScaleFactor( space_params *params, 
+static hscale_factor *getHScaleFactor( 
+	space_params *params, 
 	uint32 src_left, uint32 src_right, uint32 *h_inc )
 {
 	uint words_per_p1_line, words_per_p23_line, max_words_per_line;
@@ -511,14 +516,15 @@ static hscale_factor *getHScaleFactor( space_params *params,
 
 
 // show overlay on screen
-static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_head )
+static status_t Radeon_ShowOverlay( 
+	accelerator_info *ai, int crtc_idx )
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
 	vuint8 *regs = ai->regs;
 	overlay_info *overlay = &si->pending_overlay;
 	overlay_buffer_node *node = overlay->on;
-	physical_head *head = &si->heads[virtual_head->physical_head];
+	crtc_info *crtc = &si->crtc[crtc_idx];
 
 	uint32 ecp_div;
 	uint32 v_inc, h_inc;
@@ -547,7 +553,7 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 	// only every second pixel is handled
 	// (this devider is gets written into PLL by InitOverlay,
 	//  so we don't need to do it ourself)
-	if( head->mode.timing.pixel_clock < 175000 )
+	if( crtc->mode.timing.pixel_clock < 175000 )
 		ecp_div = 0;
 	else
 		ecp_div = 1;
@@ -595,10 +601,10 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 
 	
 	// apply virtual screen
-	dest_left -= vc->mode.h_display_start + virtual_head->rel_x;
-	dest_top -= vc->mode.v_display_start + virtual_head->rel_y;
-	dest_right -= vc->mode.h_display_start + virtual_head->rel_x;
-	dest_bottom -= vc->mode.v_display_start + virtual_head->rel_y;
+	dest_left -= vc->mode.h_display_start + crtc->rel_x;
+	dest_top -= vc->mode.v_display_start + crtc->rel_y;
+	dest_right -= vc->mode.h_display_start + crtc->rel_x;
+	dest_bottom -= vc->mode.v_display_start + crtc->rel_y;
 
 	
 	// clip to visible area
@@ -612,12 +618,12 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 	}
 	
 	SHOW_FLOW( 3, "mode: w=%d, h=%d", 
-		head->mode.timing.h_display, head->mode.timing.v_display );
+		crtc->mode.timing.h_display, crtc->mode.timing.v_display );
 	
-	if( dest_right > head->mode.timing.h_display )
-		dest_right = head->mode.timing.h_display;
-	if( dest_bottom > head->mode.timing.v_display )
-		dest_bottom = head->mode.timing.v_display;
+	if( dest_right > crtc->mode.timing.h_display )
+		dest_right = crtc->mode.timing.h_display;
+	if( dest_bottom > crtc->mode.timing.v_display )
+		dest_bottom = crtc->mode.timing.v_display;
 
 	SHOW_FLOW( 3, "src=(%d, %d, %d, %d)", 
 		src_left, src_top, src_right, src_bottom );
@@ -718,16 +724,13 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 	// TBD: there is no description at all concerning this, so v_accum_init may
 	//      need to be initialized based on original value
 	{
-		display_device_e disp_devices;
-		
-		disp_devices = head->active_displays;
-		if( (disp_devices & (dd_lvds | dd_dvi)) != 0 ) {
+		if( (crtc->active_displays & (dd_lvds | dd_dvi)) != 0 ) {
 			uint64 v_ratio;
 			
 			// convert 32.32 format to 16.16 format; else we 
 			// cannot multiply two fixed point values without
 			// overflow
-			v_ratio = si->flatpanels[head->flatpanel_port].v_ratio >> (FIX_SHIFT - 16);
+			v_ratio = si->flatpanels[crtc->flatpanel_port].v_ratio >> (FIX_SHIFT - 16);
 			
 			v_inc = (v_inc * v_ratio) >> 16;
 		}
@@ -846,10 +849,10 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 	OUTREG( regs, RADEON_OV0_V_INC, v_inc );
 	
 	OUTREG( regs,
-		head->is_crtc2 ? RADEON_OV1_Y_X_START : RADEON_OV0_Y_X_START, 
+		crtc->crtc_idx == 0 ? RADEON_OV0_Y_X_START : RADEON_OV1_Y_X_START, 
 		(dest_left) | (dest_top << 16) );
 	OUTREG( regs, 
-		head->is_crtc2 ? RADEON_OV1_Y_X_END : RADEON_OV0_Y_X_END,
+		crtc->crtc_idx == 0 ? RADEON_OV0_Y_X_END : RADEON_OV1_Y_X_END,
 		(dest_right - 1) | ((dest_bottom - 1) << 16) );
 
 	OUTREG( regs, RADEON_OV0_P1_BLANK_LINES_AT_TOP, 
@@ -873,7 +876,7 @@ static status_t Radeon_ShowOverlay( accelerator_info *ai, virtual_head *virtual_
 		RADEON_SCALER_DOUBLE_BUFFER | 
 		(node->ati_space << 8) | 
 		/*RADEON_SCALER_ADAPTIVE_DEINT |*/ 
-		(head->is_crtc2 ? RADEON_SCALER_CRTC_SEL : 0 ));
+		(crtc->crtc_idx == 0 ? 0 : RADEON_SCALER_CRTC_SEL ));
 	
 	si->overlay_mgr.auto_flip_reg ^= RADEON_OV0_SOFT_EOF_TOGGLE;
 	
@@ -895,7 +898,8 @@ done:
 
 
 // hide overlay, but not permanently
-void Radeon_TempHideOverlay( accelerator_info *ai )
+void Radeon_TempHideOverlay( 
+	accelerator_info *ai )
 {
 	SHOW_FLOW0( 3, "" );
 
@@ -904,7 +908,8 @@ void Radeon_TempHideOverlay( accelerator_info *ai )
 
 
 // hide overlay (can be called even if there is none visible)
-void Radeon_HideOverlay( accelerator_info *ai )
+void Radeon_HideOverlay( 
+	accelerator_info *ai )
 {
 	shared_info *si = ai->si;
 	
@@ -917,12 +922,13 @@ void Radeon_HideOverlay( accelerator_info *ai )
 	
 	// invalidate active head so it will be setup again once
 	// a new overlay is shown
-	si->active_overlay.head = -1;
+	si->active_overlay.crtc_idx = -1;
 }
 
 
 // show new overlay buffer with same parameters as last one
-static void Radeon_ReplaceOverlayBuffer( accelerator_info *ai )
+static void Radeon_ReplaceOverlayBuffer( 
+	accelerator_info *ai )
 {
 #if 0
 	shared_info *si = ai->si;
@@ -984,14 +990,14 @@ static void Radeon_ReplaceOverlayBuffer( accelerator_info *ai )
 
 
 // get number of pixels of overlay shown on virtual port
-static int getIntersectArea( accelerator_info *ai, overlay_window *ow, virtual_head *virtual_head )
+static int getIntersectArea( 
+	accelerator_info *ai, overlay_window *ow, crtc_info *crtc )
 {
 	virtual_card *vc = ai->vc;
-	physical_head *head = &ai->si->heads[virtual_head->physical_head];
 	int left, top, right, bottom;
 	
-	left = ow->h_start - (vc->mode.h_display_start + virtual_head->rel_x);
-	top = ow->v_start - (vc->mode.v_display_start + virtual_head->rel_y);
+	left = ow->h_start - (vc->mode.h_display_start + crtc->rel_x);
+	top = ow->v_start - (vc->mode.v_display_start + crtc->rel_y);
 	right = left + ow->width;
 	bottom = top + ow->height;
 	
@@ -999,10 +1005,10 @@ static int getIntersectArea( accelerator_info *ai, overlay_window *ow, virtual_h
 		left = 0;
 	if( top < 0 )
 		top = 0;
-	if( right > head->mode.timing.h_display )
-		right = head->mode.timing.h_display;
-	if( bottom > head->mode.timing.v_display )
-		bottom = head->mode.timing.v_display;
+	if( right > crtc->mode.timing.h_display )
+		right = crtc->mode.timing.h_display;
+	if( bottom > crtc->mode.timing.v_display )
+		bottom = crtc->mode.timing.v_display;
 		
 	if( right < left || bottom < top )
 		return 0;
@@ -1013,12 +1019,12 @@ static int getIntersectArea( accelerator_info *ai, overlay_window *ow, virtual_h
 
 // update overlay, to be called whenever something in terms of 
 // overlay have or can have been changed
-status_t Radeon_UpdateOverlay( accelerator_info *ai )
+status_t Radeon_UpdateOverlay( 
+	accelerator_info *ai )
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
-	virtual_head *virtual_head;
-	physical_head *physical_head;
+	int crtc_idx;
 	
 	float brightness = 0.0f;
 	float contrast = 1.0f;
@@ -1040,38 +1046,40 @@ status_t Radeon_UpdateOverlay( accelerator_info *ai )
 	if( (uint32)si->pending_overlay.ot != si->overlay_mgr.token )
 		return B_BAD_VALUE;
 		
-/*	SHOW_FLOW( 3, "num_ports=%d, whished_overlay_port=%d", 
-		vc->num_ports, vc->whished_overlay_port );*/
-
 	if( vc->different_heads > 1 ) {
 		int area0, area1;
 
 		// determine on which port most of the overlay is shown
-		area0 = getIntersectArea( ai, &si->pending_overlay.ow, &vc->heads[0] );
-		area1 = getIntersectArea( ai, &si->pending_overlay.ow, &vc->heads[1] );
+		area0 = getIntersectArea( ai, &si->pending_overlay.ow, &si->crtc[0] );
+		area1 = getIntersectArea( ai, &si->pending_overlay.ow, &si->crtc[0] );
 		
 		SHOW_FLOW( 3, "area0=%d, area1=%d", area0, area1 );
 		
 		if( area0 >= area1 )
-			virtual_head = &vc->heads[0];
+			crtc_idx = 0;
 		else
-			virtual_head = &vc->heads[1];
-	} else {
+			crtc_idx = 1;
+			
+	} else if( vc->independant_heads > 1 ) {
 		// both ports show the same, use "swap displays" to decide
 		// where to show the overlay (to be improved as this flag isn't
 		// really designed for that)
-		if( vc->independant_heads > 1 && vc->swap_displays )
-			virtual_head = &vc->heads[1];
+		if( vc->swap_displays )
+			crtc_idx = 1;
 		else
-			virtual_head = &vc->heads[0];
+			crtc_idx = 0;
+			
+	} else {
+	
+		// one crtc used only - pick the one that we use
+		crtc_idx = vc->used_crtc[0] ? 0 : 1;
 	}
 	
-	si->pending_overlay.head = virtual_head->physical_head;
-	physical_head = &si->heads[virtual_head->physical_head];
+	si->pending_overlay.crtc_idx = crtc_idx;
 
 	// only update registers that have been changed to minimize work
-	if( si->active_overlay.head != si->pending_overlay.head ) {
-		Radeon_InitOverlay( ai, physical_head );		
+	if( si->active_overlay.crtc_idx != si->pending_overlay.crtc_idx ) {
+		Radeon_InitOverlay( ai, crtc_idx );
 	} 
 	
 	if( si->active_overlay.ob.space != si->pending_overlay.ob.space ) {
@@ -1085,7 +1093,7 @@ status_t Radeon_UpdateOverlay( accelerator_info *ai )
 		si->active_overlay.ob.width != si->pending_overlay.ob.width ||
 		si->active_overlay.ob.height != si->pending_overlay.ob.height ||
 		si->active_overlay.ob.bytes_per_row != si->pending_overlay.ob.bytes_per_row )
-		Radeon_ShowOverlay( ai, virtual_head );
+		Radeon_ShowOverlay( ai, crtc_idx );
 		
 	else if( si->active_overlay.on != si->pending_overlay.on )
 		Radeon_ReplaceOverlayBuffer( ai );

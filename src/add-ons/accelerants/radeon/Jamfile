@@ -20,6 +20,8 @@ Addon radeon.accelerant : accelerants :
 	dpms.c
 	driver_wrapper.c
 	flat_panel.c
+	impactv.c
+	internal_tv_out.c
 	monitor_detection.c
 	monitor_routing.c
 	multimon.c
@@ -28,12 +30,13 @@ Addon radeon.accelerant : accelerants :
 	palette.c
 	pll.c
 	settings.cpp
-	tv_out.c
+	theatre_out.c
+	vesa_modes.c
 	: false
-	: libaccelerantscommon.a libgraphicscommon.a libradeon.a
+	: libaccelerantscommon.a libradeon.a
 ;
 
-LinkSharedOSLibs radeon.accelerant : root be ;
+LinkSharedOSLibs radeon.accelerant : be ;
 
 Package haiku-radeon-cvs :
 	radeon.accelerant : 

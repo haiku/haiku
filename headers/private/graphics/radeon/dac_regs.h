@@ -17,6 +17,7 @@
 #		define RADEON_DAC_CMP_EN			(1 <<  3)
 #		define RADEON_DAC_CMP_OUTPUT		(1 <<  7)
 #       define RADEON_DAC_8BIT_EN           (1 <<  8)
+#       define RADEON_DAC_TVO_EN           (1 << 10)
 #       define RADEON_DAC_VGA_ADR_EN        (1 << 13)
 #       define RADEON_DAC_PDWN              (1 << 15)
 #       define RADEON_DAC_MASK_ALL          (0xff << 24)
@@ -57,12 +58,40 @@
 #define RADEON_DAC_W_INDEX                  0x03c8 /* VGA */
 
 #define RADEON_DISP_OUTPUT_CNTL             0x0d64
-#       define RADEON_DISP_DAC_SOURCE_MASK  0x03
-#       define RADEON_DISP_DAC_SOURCE_CRTC1	0x00
-#       define RADEON_DISP_DAC_SOURCE_CRTC2	0x01
-#       define RADEON_DISP_DAC_SOURCE_RMX	0x02
-#       define RADEON_DISP_TVDAC_SOURCE_MASK  0x0c
-#       define RADEON_DISP_TVDAC_SOURCE_CRTC2 0x04
+#       define RADEON_DISP_DAC_SOURCE_MASK  3
+#       define RADEON_DISP_DAC_SOURCE_CRTC1	0
+#       define RADEON_DISP_DAC_SOURCE_CRTC2	1
+#       define RADEON_DISP_DAC_SOURCE_RMX	2
+#       define RADEON_DISP_TVDAC_SOURCE_MASK  (3 << 2)
+#       define RADEON_DISP_TVDAC_SOURCE_CRTC2 (1 << 2)
+#       define RADEON_DISP_TV_SOURCE		(1 << 16)
+#       define RADEON_DISP_TV_MODE_MASK		(3 << 17)
+#       define RADEON_DISP_TV_MODE_888		(0 << 17)
+#       define RADEON_DISP_TV_MODE_565		(1 << 17)
+#       define RADEON_DISP_TV_YG_DITH_EN	(1 << 19)
+#       define RADEON_DISP_TV_CBB_CRR_DITH_EN	(1 << 20)
+#       define RADEON_DISP_TV_BIT_WIDTH			(1 << 21)
+#       define RADEON_DISP_TV_SYNC_MODE_SHIFT 	22
+#       define RADEON_DISP_TV_SYNC_MODE_MASK 	(3 << 22)
+#       define RADEON_DISP_TV_SYNC_COLOR_MASK	(3 << 25)
+
+#define	RADEON_DISP_TV_OUT_CNTL						0x0d6c
+#		define RADEON_DISP_TV_OUT_YG_FILTER_MASK	(3 << 0)
+#		define RADEON_DISP_TV_OUT_YG_SAMPLE 		(1 << 2)
+#		define RADEON_DISP_TV_OUT_CrR_FILTER_MASK	(3 << 4)
+#		define RADEON_DISP_TV_OUT_CrR_SAMPLE 		(1 << 6)
+#		define RADEON_DISP_TV_OUT_CbB_FILTER_MASK	(3 << 8)
+#		define RADEON_DISP_TV_OUT_CbB_SAMPLE		(1 << 10)
+#		define RADEON_DISP_TV_SUBSAMPLE_CNTL_MASK	(3 << 12)
+#		define RADEON_DISP_TV_H_DOWNSCALE			(1 << 15)
+#		define RADEON_DISP_TV_PATH_SRC				(1 << 16)
+#		define RADEON_DISP_TV_COLOR_SPACE			(1 << 17)
+#		define RADEON_DISP_TV_DITH_MODE				(1 << 18)
+#		define RADEON_DISP_TV_DATA_ZERO_SEL			(1 << 19)
+#		define RADEON_DISP_TV_CLKO_SEL				(1 << 20)
+#		define RADEON_DISP_TV_CLKO_OUT_EN			(1 << 21)
+#		define RADEON_DISP_TV_DOWNSCALE_CNTL		(3 << 24)
+
 
 #define RADEON_DISP_HW_DEBUG				0x0d14
 #		define RADEON_CRT2_DISP1_SEL		(1 << 5)

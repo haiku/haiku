@@ -47,12 +47,14 @@
 #       define RADEON_VCLK_SRC_PSCAN_CLK    (1 << 0)
 #       define RADEON_VCLK_SRC_BYTE_CLK     (2 << 0)
 #       define RADEON_VCLK_SRC_PPLL_CLK     (3 << 0)
+#		define RADEON_PIXCLK_ALWAYS_ONb		(1 << 6)	// negated
+#		define RADEON_PIXCLK_DAC_ALWAYS_ONb	(1 << 7)	// negated
 #       define RADEON_ECP_DIV_SHIFT         8
 #       define RADEON_ECP_DIV_MASK          (3 << 8)
 #       define RADEON_ECP_DIV_VCLK          (0 << 8)
 #       define RADEON_ECP_DIV_VCLK_2        (1 << 8)
-#		define RADEON_PIXCLK_ALWAYS_ONb		(1 << 6)	// negated
-#		define RADEON_PIXCLK_DAC_ALWAYS_ONb	(1 << 7)	// negated
+#		define RADEON_VCLK_ECP_CNTL_BYTE_CLK_POST_DIV_SHIFT 16
+#		define RADEON_VCLK_ECP_CNTL_BYTE_CLK_POST_DIV_MASK (3 << 16)
 #define RADEON_HTOTAL_CNTL                  0x0009
 #define RADEON_SCLK_CNTL                    0x000d
 #       define RADEON_DYN_STOP_LAT_MASK     0x00007ff8

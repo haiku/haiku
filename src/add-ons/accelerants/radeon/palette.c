@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002/03, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -18,20 +18,21 @@
 
 // Radeon's DACs share same public registers, this function
 // selects the DAC you'll talk to
-#define selectPalette( head ) \
+#define selectPalette( crtc_idx ) \
 	WRITE_IB_REG( RADEON_DAC_CNTL2, \
-		((head)->is_crtc2 ? RADEON_DAC2_PALETTE_ACC_CTL : 0) | \
+		(crtc_idx == 0 ? 0 : RADEON_DAC2_PALETTE_ACC_CTL) | \
 		(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
 
 
 // set standard colour palette (needed for non-palette modes)
-void Radeon_InitPalette( accelerator_info *ai, physical_head *head )
+void Radeon_InitPalette( 
+	accelerator_info *ai, int crtc_idx )
 {
 	int i;
 	
 	START_IB();
 	
-	selectPalette( head );
+	selectPalette( crtc_idx );
 	
 	WRITE_IB_REG( RADEON_PALETTE_INDEX, 0 );
 	
@@ -41,14 +42,15 @@ void Radeon_InitPalette( accelerator_info *ai, physical_head *head )
 	SUBMIT_IB();
 }
 
-static void setPalette( accelerator_info *ai, physical_head *head, 
+static void setPalette( 
+	accelerator_info *ai, int crtc_idx, 
 	uint count, uint8 first, uint8 *color_data );
 
 // public function: set colour palette
-void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags) 
+void SET_INDEXED_COLORS(
+	uint count, uint8 first, uint8 *color_data, uint32 flags )
 {
 	virtual_card *vc = ai->vc;
-	shared_info *si = ai->si;
 	
 	(void)flags;
 
@@ -58,23 +60,24 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		SHOW_ERROR0( 2, "Tried to set palette in non-palette mode" );
 		return;
 	} 
-	
-	setPalette( ai, &si->heads[vc->heads[0].physical_head], count, first, color_data );
-	
-	if( vc->independant_heads > 1 )
-		setPalette( ai, &si->heads[vc->heads[1].physical_head], count, first, color_data );
+
+	if( vc->used_crtc[0] )
+		setPalette( ai, 0, count, first, color_data );
+	if( vc->used_crtc[1] )
+		setPalette( ai, 1, count, first, color_data );
 }
 
 
 // set palette of one DAC
-static void setPalette( accelerator_info *ai, physical_head *head, 
+static void setPalette( 
+	accelerator_info *ai, int crtc_idx, 
 	uint count, uint8 first, uint8 *color_data )
 {
 	uint i;
 	
 	START_IB();
 	
-	selectPalette( head );
+	selectPalette( crtc_idx );
 	
 	WRITE_IB_REG( RADEON_PALETTE_INDEX, first );
 	

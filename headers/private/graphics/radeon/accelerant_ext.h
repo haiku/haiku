@@ -15,8 +15,6 @@
 // additional timing flags for GetMode/SetMode
 enum {
 	RADEON_MODE_STANDARD = 0 << 16,
-	RADEON_MODE_MIRROR = 1 << 16,
-	RADEON_MODE_CLONE = 2 << 16,
 	RADEON_MODE_COMBINE = 3 << 16,
 	
 	RADEON_MODE_MASK = 7 << 16,
@@ -32,8 +30,9 @@ enum {
 
 // operation codes tunneled via ProposeDisplayMode
 typedef enum {
-	ms_swap,
-	ms_overlay_port
+	ms_swap 			= 'sw',
+	ms_use_laptop_panel	= 'up',
+	ms_tv_standard		= 'tv'
 } multi_mon_settings;
 
 

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
+	Copyright (c) 2002-2004, Thomas Kurschel
 
 
 	Part of Radeon kernel driver
@@ -213,9 +213,9 @@ status_t Radeon_FirstOpen( device_info *di )
 	memset( di->si, 0, sizeof( *di->si ));
 	
 	si = di->si;
-	
+
 #ifdef ENABLE_LOGGING
-#ifdef LOG_INCLUDE_STARTUP
+#ifdef LOG_INCLUDE_STARTUP	
 	si->log = log_init( 1000000 );
 #endif
 #endif
@@ -228,6 +228,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->asic = di->asic;
 	si->is_mobility = di->is_mobility;
 	si->tv_chip = di->tv_chip;
+	si->new_pll = di->new_pll;
 	
 	// detecting theatre channel in kernel would lead to code duplication,
 	// so we let the first accelerant take care of it
@@ -235,11 +236,11 @@ status_t Radeon_FirstOpen( device_info *di )
 	
 /*	si->ports[0].disp_type = di->disp_type[0];
 	si->ports[1].disp_type = di->disp_type[1];*/
-	si->heads[0].is_crtc2 = false;
-	si->heads[0].flatpanel_port = 0;
-	si->heads[1].is_crtc2 = true;
-	si->heads[1].flatpanel_port = 1;
-	si->num_heads = di->num_heads;
+	si->crtc[0].crtc_idx = 0;
+	si->crtc[0].flatpanel_port = 0;
+	si->crtc[1].crtc_idx = 1;
+	si->crtc[1].flatpanel_port = 1;
+	si->num_crtc = di->num_crtc;
 	
 	si->flatpanels[0] = di->fp_info;
 	si->pll = di->pll;
@@ -264,10 +265,11 @@ status_t Radeon_FirstOpen( device_info *di )
 	}
 
 	// currently, we assign fixed ports to this virtual card
-	di->vc->num_heads = si->num_heads;
-	di->vc->heads[0].physical_head = 0;	
-	di->vc->heads[1].physical_head = 1;
-		
+	di->vc->assigned_crtc[0] = true;
+	di->vc->assigned_crtc[1] = si->num_crtc > 1;
+	di->vc->controlled_displays = 
+		dd_tv_crt | dd_crt | dd_lvds | dd_dvi | dd_ctv | dd_stv;
+
 	di->vc->fb_mem_handle = 0;
 	di->vc->cursor.mem_handle = 0;
 	
@@ -324,6 +326,10 @@ status_t Radeon_FirstOpen( device_info *di )
 
 	// no AGP support	
 	di->memmgr[mt_AGP] = NULL;
+	
+	// fix AGP settings for IGP chipset
+	if( di->asic == rt_rs100 || di->asic == rt_rs200 )
+		Radeon_Fix_AGP();
 
 	// time to init Command Processor
 	result = Radeon_InitCP( di );
@@ -334,8 +340,6 @@ status_t Radeon_FirstOpen( device_info *di )
 	if( result != B_OK )
 		goto err0;
 	
-	//Radeon_Fix_AGP();
-
 //	mem_alloc( di->local_memmgr, 0x100000, (void *)-1, &dma_block, &dma_offset );
 /*	dma_offset = 15 * 1024 * 1024;
 	
@@ -391,7 +395,7 @@ void Radeon_LastClose( device_info *di )
 	Radeon_UnmapDevice(di);
 	
 #ifdef ENABLE_LOGGING
-#ifdef LOG_INCLUDE_STARTUP
+#ifdef LOG_INCLUDE_STARTUP	
 	log_exit( di->si->log );
 #endif
 #endif

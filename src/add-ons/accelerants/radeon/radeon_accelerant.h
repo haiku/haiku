@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2002/03, Thomas Kurschel
+	Copyright (c) 2002-2005, Thomas Kurschel
 	
 
 	Part of Radeon accelerant
@@ -18,12 +18,10 @@
 extern "C" {
 #endif
 
-#ifndef __HAIKU__
-void    _kdprintf_(const char *format, ...);
-#define dprintf		_kdprintf_
-#else
-#define dprintf		_sPrintf
-#endif
+void    _sPrintf(const char *format, ...);
+//bool    set_dprintf_enabled(bool);	/* returns old enable flag */
+
+#define dprintf _sPrintf
 
 extern int debug_level_flow;
 extern int debug_level_info;
@@ -32,7 +30,7 @@ extern int debug_level_error;
 /*#define DEBUG_WAIT_ON_MSG 1000000
 #define DEBUG_WAIT_ON_ERROR 1000000*/
 
-#define DEBUG_MSG_PREFIX "Radeon Acc - "
+#define DEBUG_MSG_PREFIX "Radeon - "
 
 #define DEBUG_MAX_LEVEL_FLOW 2
 
@@ -41,9 +39,11 @@ extern int debug_level_error;
 
 // info about this accelerant
 typedef struct accelerator_info {
+	shared_info *si;			// info shared between accelerants
 	virtual_card *vc;			// associated virtual card
 	vuint8 *regs;				// pointer to mapped registers
 								// !! dont't make it vuint32, access macros rely on 8 bits !!
+
 	area_id shared_info_area;	// info shared between accelerants
 	area_id regs_area;			// MM I/O registers
 	area_id virtual_card_area;	// info about virtual card
@@ -64,30 +64,27 @@ typedef struct accelerator_info {
 	
 	area_id mode_list_area;		// cloned list of standard display modes
 	display_mode *mode_list;	// list of standard display modes
-	shared_info *si;			// info shared between accelerants
 } accelerator_info;
 
+
+#define IS_INTERNAL_TV_OUT( tv_chip ) \
+	( (tv_chip) == tc_internal_rt1 || (tv_chip) == tc_internal_rt2 )
+
+
+// vesa_modes.c
+extern const display_timing vesa_mode_list[];
+extern const size_t vesa_mode_list_count;
 
 // SetDisplayMode.c
 uint32 Radeon_RoundVWidth( int virtual_width, int bpp );
 status_t Radeon_MoveDisplay( accelerator_info *ai, uint16 h_display_start, uint16 v_display_start );
 
 
-// crtc.c
-void Radeon_ReadCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	port_regs *values );
-uint16 Radeon_GetHSyncFudge( physical_head *head, int datatype );
-void Radeon_CalcCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	display_mode *mode, port_regs *values );
-void Radeon_ProgramCRTCRegisters( accelerator_info *ai, physical_head *head, 
-	port_regs *values );
-
-
 // multimon.c
 void Radeon_HideMultiMode( virtual_card *vc, display_mode *mode );
 void Radeon_DetectMultiMode( virtual_card *vc, display_mode *mode );
 void Radeon_VerifyMultiMode( virtual_card *vc, shared_info *si, display_mode *mode );
-void Radeon_InitMultiModeVars( virtual_card *vc, display_mode *mode );
+void Radeon_InitMultiModeVars( accelerator_info *ai, display_mode *mode );
 status_t Radeon_CheckMultiMonTunnel( virtual_card *vc, display_mode *mode, 
 	const display_mode *low, const display_mode *high, bool *isTunnel );
 bool Radeon_NeedsSecondPort( display_mode *mode );
@@ -99,42 +96,14 @@ bool Radeon_GetFormat( int space, int *format, int *bpp );
 status_t Radeon_CreateModeList( shared_info *si );
 
 	
-// pll.c	
-void Radeon_CalcPLLRegisters( general_pll_info *pll, const display_mode *mode, pll_dividers *fixed_dividers, port_regs *values );
-void Radeon_ProgramPLL( accelerator_info *ai, physical_head *head, port_regs *values );
-void Radeon_CalcPLLDividers( const pll_info *pll, uint32 freq, uint fixed_post_div, pll_dividers *dividers );
-void Radeon_MatchCRTPLL( 
-	const pll_info *pll, 
-	uint32 tv_v_total, uint32 tv_h_total, uint32 tv_frame_size_adjust, uint32 freq, 
-	const display_mode *mode, uint32 max_v_tweak, uint32 max_h_tweak, 
-	uint32 max_frame_rate_drift, uint32 fixed_post_div, 
-	pll_dividers *dividers,
-	display_mode *tweaked_mode );
-void Radeon_GetTVPLLConfiguration( const general_pll_info *general_pll, pll_info *pll, 
-	bool internal_encoder );
-void Radeon_GetTVCRTPLLConfiguration( const general_pll_info *general_pll, pll_info *pll,
-	bool internal_tv_encoder );
-
-
-// flat_panel.c
-void Radeon_ReadRMXRegisters( accelerator_info *ai, port_regs *values );
-void Radeon_CalcRMXRegisters( fp_info *flatpanel, display_mode *mode, bool use_rmx, port_regs *values );
-void Radeon_ProgramRMXRegisters( accelerator_info *ai, port_regs *values );
-
-void Radeon_ReadFPRegisters( accelerator_info *ai, port_regs *values );
-void Radeon_CalcFPRegisters( accelerator_info *ai, physical_head *head, 
-	fp_info *fp_port, port_regs *values );
-void Radeon_ProgramFPRegisters( accelerator_info *ai, physical_head *head,
-	fp_info *fp_port, port_regs *values );
-
-
 // dpms.c
-status_t Radeon_SetDPMS( accelerator_info *ai, physical_head *head, int mode );
-uint32 Radeon_GetDPMS( accelerator_info *ai, physical_head *head );
+status_t Radeon_SetDPMS( accelerator_info *ai, int crtc_idx, int mode );
+uint32 Radeon_GetDPMS( accelerator_info *ai, int crtc_idx );
 
 
 // Cursor.c
-void Radeon_SetCursorColors( accelerator_info *ai, physical_head *head );
+void Radeon_SetCursorColors( accelerator_info *ai, int crtc_idx );
+void Radeon_ShowCursor( accelerator_info *ai, int crtc_idx );
 
 
 // Acceleration.c
@@ -171,32 +140,13 @@ void Radeon_Spin( uint32 delay );
 void Radeon_DetectDisplays( accelerator_info *ai );
 
 
-// tv_out.c
-void Radeon_DetectTVOut( accelerator_info *ai );
-void Radeon_CalcTVParams( const general_pll_info *general_pll, tv_params *params, 
-	const tv_timing *tv_timing, bool internal_encoder, 
-	const display_mode *mode, display_mode *tweaked_mode );
-void Radeon_CalcTVRegisters( accelerator_info *ai, display_mode *mode, tv_timing *timing, 
-	tv_params *params, port_regs *values, physical_head *head, 
-	bool internal_encoder, tv_standard tv_format );
-void Radeon_ProgramTVRegisters( accelerator_info *ai, port_regs *values, bool internal_encoder );
-void Radeon_ReadTVRegisters( accelerator_info *ai, port_regs *values, bool internal_encoder );
-
-extern tv_timing Radeon_std_tv_timing[6];
-
-
 // palette.c
-void Radeon_InitPalette( accelerator_info *ai, physical_head *head );
+void Radeon_InitPalette( accelerator_info *ai, int crtc_idx );
 
 
-// monitor_routing.h
-void Radeon_ReadMonitorRoutingRegs( accelerator_info *ai, physical_head *head, 
-	port_regs *values );
-void Radeon_CalcMonitorRouting( accelerator_info *ai, physical_head *head, 
-	port_regs *values );
-void Radeon_ProgramMonitorRouting( accelerator_info *ai, physical_head *head, port_regs *values );
-void Radeon_SetupDefaultMonitorRouting( accelerator_info *ai, int whished_num_heads );
-	
+// theatre_out.c
+void Radeon_DetectTVOut( accelerator_info *ai );
+
 
 #ifdef __cplusplus
 }

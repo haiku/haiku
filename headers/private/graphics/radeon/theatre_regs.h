@@ -58,6 +58,9 @@
 #define THEATRE_VIP_Y_FALL_CNTL                      0x01cc
 #define THEATRE_VIP_Y_RISE_CNTL                      0x01d0
 #define THEATRE_VIP_Y_SAW_TOOTH_CNTL                 0x01d4
+#define THEATRE_VIP_UPSAMP_AND_GAIN_CNTL             0x01e0
+#define THEATRE_VIP_GAIN_LIMIT_SETTINGS              0x01e4
+#define THEATRE_VIP_LINEAR_GAIN_SETTINGS             0x01e8
 #define THEATRE_VIP_MODULATOR_CNTL1                  0x0200
 #define THEATRE_VIP_MODULATOR_CNTL2                  0x0204
 #define THEATRE_VIP_PRE_DAC_MUX_CNTL                 0x0240
@@ -67,6 +70,21 @@
 #define THEATRE_VIP_VBI_20BIT_CNTL                   0x02d0
 #define THEATRE_VIP_VBI_LEVEL_CNTL                   0x02d8
 #define THEATRE_VIP_UV_ADR                           0x0300
+#define THEATRE_VIP_UPSAMP_COEFF0_0                  0x0340
+#define THEATRE_VIP_UPSAMP_COEFF0_1                  0x0344
+#define THEATRE_VIP_UPSAMP_COEFF0_2                  0x0348
+#define THEATRE_VIP_UPSAMP_COEFF1_0                  0x034c
+#define THEATRE_VIP_UPSAMP_COEFF1_1                  0x0350
+#define THEATRE_VIP_UPSAMP_COEFF1_2                  0x0354
+#define THEATRE_VIP_UPSAMP_COEFF2_0                  0x0358
+#define THEATRE_VIP_UPSAMP_COEFF2_1                  0x035c
+#define THEATRE_VIP_UPSAMP_COEFF2_2                  0x0360
+#define THEATRE_VIP_UPSAMP_COEFF3_0                  0x0364
+#define THEATRE_VIP_UPSAMP_COEFF3_1                  0x0368
+#define THEATRE_VIP_UPSAMP_COEFF3_2                  0x036c
+#define THEATRE_VIP_UPSAMP_COEFF4_0                  0x0370
+#define THEATRE_VIP_UPSAMP_COEFF4_1                  0x0374
+#define THEATRE_VIP_UPSAMP_COEFF4_2                  0x0378
 #define THEATRE_VIP_HSCALER_CONTROL                  0x0600
 #define THEATRE_VIP_VSCALER_CONTROL                  0x0604
 

@@ -466,7 +466,7 @@ static void Radeon_GetFPData( device_info *di )
 }
 
 // detect amount of graphics memory
-void Radeon_DetectRAM( device_info *di )
+static void Radeon_DetectRAM( device_info *di )
 {
 	vuint8 *regs = di->regs;
 

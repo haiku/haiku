@@ -95,7 +95,7 @@ static status_t Radeon_PrepareDMA(
 				
 				cur_size = min( contig_size, RADEON_DMA_DESC_MAX_SIZE );
 				
-				if( ++num_desc > di->dma_desc_max_num ) {
+				if( ++num_desc > (int)di->dma_desc_max_num ) {
 					SHOW_ERROR( 2, "Overflow of DMA descriptors, %ld bytes left", size );
 					res = B_BAD_VALUE;
 					goto err;
