@@ -41,7 +41,7 @@ static const char *testType3
 	= "application/x-vnd.obos.app-file-info-test3";
 static const char *testType4
 	= "application/x-vnd.obos.app-file-info-test4";
-static const char *invalidTestType	= "invalid-mime-type";
+static const char *invalidTestType	= "invalid/mime/type";
 static const char *tooLongTestType	=
 "0123456789012345678901234567890123456789012345678901234567890123456789"
 "0123456789012345678901234567890123456789012345678901234567890123456789"
@@ -1669,6 +1669,30 @@ AppFileInfoTest::SupportedTypesTest()
 		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
 		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
 	}
+	// * types contains invalid MIME types
+// R5: doesn't fail
+#ifndef TEST_R5
+	NextSubTest();
+	{
+		// init
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		// set
+		BMessage invalidTestTypes;
+		CHK(invalidTestTypes.AddString("types", invalidTestType) == B_OK);
+		CHK(appFileInfo.SetSupportedTypes(NULL, true) == B_OK);
+		CHK(appFileInfo.SetSupportedTypes(&invalidTestTypes, false)
+			== B_BAD_VALUE);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(invalidTestType) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+	}
+#endif
 
 	// bool IsSupportedType(const char *type) const;
 	// bool Supports(BMimeType *type) const;
@@ -2562,25 +2586,21 @@ AppFileInfoTest::IconForTypeTest()
 		BAppFileInfo appFileInfo;
 		CHK(appFileInfo.SetTo(&file) == B_OK);
 		CHK(appFileInfo.SetIconForType(invalidTestType, fIconM1, B_MINI_ICON)
-			== B_OK);
+			== B_BAD_VALUE);
 		CHK(appFileInfo.SetIconForType(invalidTestType, fIconL1, B_LARGE_ICON)
-			== B_OK);
+			== B_BAD_VALUE);
 		// get mini
 		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
 		CHK(appFileInfo.GetIconForType(invalidTestType, &icon, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		CheckIconForTypeAttr(file, invalidTestType, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, invalidTestType, fIconM1);
+			== B_BAD_VALUE);
+		CheckNoIconForTypeAttr(file, invalidTestType, B_LARGE_ICON);
+		CheckNoIconForTypeResource(file, invalidTestType, B_LARGE_ICON);
 		// get large
 		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
 		CHK(appFileInfo.GetIconForType(invalidTestType, &icon3, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL1, &icon3));
-		CheckIconForTypeAttr(file, invalidTestType, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, invalidTestType, fIconL1);
+			== B_BAD_VALUE);
+		CheckNoIconForTypeAttr(file, invalidTestType, B_MINI_ICON);
+		CheckNoIconForTypeResource(file, invalidTestType, B_MINI_ICON);
 	}
 	// * too long type => B_BAD_VALUE
 	NextSubTest();
