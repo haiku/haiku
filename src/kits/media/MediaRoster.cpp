@@ -12,7 +12,7 @@
 #include <String.h>
 #include <TimeSource.h>
 #include "debug.h"
-#include "TList.h"
+#include "MediaRosterEx.h"
 #include "MediaMisc.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
@@ -22,37 +22,30 @@
 #include "TimeSourceObjectManager.h"
 
 namespace BPrivate { namespace media {
-	extern team_id team;
-} } // BPrivate::media
 
+	// the BMediaRoster destructor is private,
+	// but _DefaultDeleter is a friend class of
+	// the BMediaRoster an thus can delete it
+	class DefaultDeleter
+	{
+	public:
+		~DefaultDeleter()
+		{
+			if (BMediaRoster::_sDefault) {
+				BMediaRoster::_sDefault->Lock();
+				BMediaRoster::_sDefault->Quit();
+			}
+		}
+	};
+
+} } // BPrivate::media
 using namespace BPrivate::media;
 
-// the BMediaRoster destructor is private,
-// but _DefaultDeleter is a friend class of
-// the BMediaRoster an thus can delete it
-class _DefaultDeleter
-{
-public:
-	~_DefaultDeleter()
-	{
-		if (BMediaRoster::_sDefault) {
-			BMediaRoster::_sDefault->Lock();
-			BMediaRoster::_sDefault->Quit();
-		}
-	}
-} _deleter;
-
-namespace BPrivate { namespace media { namespace mediaroster {
-
-status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
-status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);
-status_t GetAllOutputs(const media_node & node, List<media_output> *list);
-status_t GetAllInputs(const media_node & node, List<media_input> *list);
-status_t PublishOutputs(const media_node & node, List<media_output> *list);
-status_t PublishInputs(const media_node & node, List<media_input> *list);
+// DefaultDeleter will delete the BMediaRoster object in it's destructor.
+DefaultDeleter _deleter;
 
 status_t
-GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
+BMediaRosterEx::GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
 {
 	if (out_node == NULL)
 		return B_BAD_VALUE;
@@ -76,7 +69,7 @@ GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * o
 }
 
 status_t
-SetNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
+BMediaRosterEx::SetNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
 {
 	server_set_node_request request;
 	server_set_node_reply reply;
@@ -96,7 +89,7 @@ SetNode(node_type type, const media_node *node, const dormant_node_info *info, c
 }
 
 status_t
-GetAllOutputs(const media_node & node, List<media_output> *list)
+BMediaRosterEx::GetAllOutputs(const media_node & node, List<media_output> *list)
 {
 	int32 cookie;
 	status_t rv;
@@ -127,7 +120,7 @@ GetAllOutputs(const media_node & node, List<media_output> *list)
 }
 
 status_t
-GetAllInputs(const media_node & node, List<media_input> *list)
+BMediaRosterEx::GetAllInputs(const media_node & node, List<media_input> *list)
 {
 	int32 cookie;
 	status_t rv;
@@ -158,7 +151,7 @@ GetAllInputs(const media_node & node, List<media_input> *list)
 }
 
 status_t
-PublishOutputs(const media_node & node, List<media_output> *list)
+BMediaRosterEx::PublishOutputs(const media_node & node, List<media_output> *list)
 {
 	server_publish_outputs_request request;
 	server_publish_outputs_reply reply;
@@ -203,7 +196,7 @@ PublishOutputs(const media_node & node, List<media_output> *list)
 }
 
 status_t
-PublishInputs(const media_node & node, List<media_input> *list)
+BMediaRosterEx::PublishInputs(const media_node & node, List<media_input> *list)
 {
 	server_publish_inputs_request request;
 	server_publish_inputs_reply reply;
@@ -247,10 +240,6 @@ PublishInputs(const media_node & node, List<media_input> *list)
 	return rv;
 }
 
-} } } // namespace BPrivate::media::mediaroster
-
-using namespace BPrivate::media::mediaroster;
-
 /*************************************************************
  * public BMediaRoster
  *************************************************************/
@@ -259,7 +248,7 @@ status_t
 BMediaRoster::GetVideoInput(media_node * out_node)
 {
 	CALLED();
-	return GetNode(VIDEO_INPUT, out_node);
+	return MediaRosterEx(this)->GetNode(VIDEO_INPUT, out_node);
 }
 
 
@@ -267,7 +256,7 @@ status_t
 BMediaRoster::GetAudioInput(media_node * out_node)
 {
 	CALLED();
-	return GetNode(AUDIO_INPUT, out_node);
+	return MediaRosterEx(this)->GetNode(AUDIO_INPUT, out_node);
 }
 
 
@@ -275,7 +264,7 @@ status_t
 BMediaRoster::GetVideoOutput(media_node * out_node)
 {
 	CALLED();
-	return GetNode(VIDEO_OUTPUT, out_node);
+	return MediaRosterEx(this)->GetNode(VIDEO_OUTPUT, out_node);
 }
 
 
@@ -283,7 +272,7 @@ status_t
 BMediaRoster::GetAudioMixer(media_node * out_node)
 {
 	CALLED();
-	return GetNode(AUDIO_MIXER, out_node);
+	return MediaRosterEx(this)->GetNode(AUDIO_MIXER, out_node);
 }
 
 
@@ -291,7 +280,7 @@ status_t
 BMediaRoster::GetAudioOutput(media_node * out_node)
 {
 	CALLED();
-	return GetNode(AUDIO_OUTPUT, out_node);
+	return MediaRosterEx(this)->GetNode(AUDIO_OUTPUT, out_node);
 }
 
 
@@ -301,7 +290,7 @@ BMediaRoster::GetAudioOutput(media_node * out_node,
 							 BString * out_input_name)
 {
 	CALLED();
-	return GetNode(AUDIO_OUTPUT_EX, out_node, out_input_id, out_input_name);
+	return MediaRosterEx(this)->GetNode(AUDIO_OUTPUT_EX, out_node, out_input_id, out_input_name);
 }
 
 							 
@@ -309,7 +298,7 @@ status_t
 BMediaRoster::GetTimeSource(media_node * out_node)
 {
 	CALLED();
-	return GetNode(TIME_SOURCE, out_node);
+	return MediaRosterEx(this)->GetNode(TIME_SOURCE, out_node);
 }
 
 
@@ -317,7 +306,7 @@ status_t
 BMediaRoster::SetVideoInput(const media_node & producer)
 {
 	CALLED();
-	return SetNode(VIDEO_INPUT, &producer);
+	return MediaRosterEx(this)->SetNode(VIDEO_INPUT, &producer);
 }
 
 
@@ -325,7 +314,7 @@ status_t
 BMediaRoster::SetVideoInput(const dormant_node_info & producer)
 {
 	CALLED();
-	return SetNode(VIDEO_INPUT, NULL, &producer);
+	return MediaRosterEx(this)->SetNode(VIDEO_INPUT, NULL, &producer);
 }
 
 
@@ -333,7 +322,7 @@ status_t
 BMediaRoster::SetAudioInput(const media_node & producer)
 {
 	CALLED();
-	return SetNode(AUDIO_INPUT, &producer);
+	return MediaRosterEx(this)->SetNode(AUDIO_INPUT, &producer);
 }
 
 
@@ -341,7 +330,7 @@ status_t
 BMediaRoster::SetAudioInput(const dormant_node_info & producer)
 {
 	CALLED();
-	return SetNode(AUDIO_INPUT, NULL, &producer);
+	return MediaRosterEx(this)->SetNode(AUDIO_INPUT, NULL, &producer);
 }
 
 
@@ -349,7 +338,7 @@ status_t
 BMediaRoster::SetVideoOutput(const media_node & consumer)
 {
 	CALLED();
-	return SetNode(VIDEO_OUTPUT, &consumer);
+	return MediaRosterEx(this)->SetNode(VIDEO_OUTPUT, &consumer);
 }
 
 
@@ -357,7 +346,7 @@ status_t
 BMediaRoster::SetVideoOutput(const dormant_node_info & consumer)
 {
 	CALLED();
-	return SetNode(VIDEO_OUTPUT, NULL, &consumer);
+	return MediaRosterEx(this)->SetNode(VIDEO_OUTPUT, NULL, &consumer);
 }
 
 
@@ -365,7 +354,7 @@ status_t
 BMediaRoster::SetAudioOutput(const media_node & consumer)
 {
 	CALLED();
-	return SetNode(AUDIO_OUTPUT, &consumer);
+	return MediaRosterEx(this)->SetNode(AUDIO_OUTPUT, &consumer);
 }
 
 
@@ -373,7 +362,7 @@ status_t
 BMediaRoster::SetAudioOutput(const media_input & input_to_output)
 {
 	CALLED();
-	return SetNode(AUDIO_OUTPUT, NULL, NULL, &input_to_output);
+	return MediaRosterEx(this)->SetNode(AUDIO_OUTPUT, NULL, NULL, &input_to_output);
 }
 
 
@@ -381,7 +370,7 @@ status_t
 BMediaRoster::SetAudioOutput(const dormant_node_info & consumer)
 {
 	CALLED();
-	return SetNode(AUDIO_OUTPUT, NULL, &consumer);
+	return MediaRosterEx(this)->SetNode(AUDIO_OUTPUT, NULL, &consumer);
 }
 
 
@@ -415,7 +404,7 @@ status_t
 BMediaRoster::GetSystemTimeSource(media_node * clone)
 {
 	CALLED();
-	return GetNode(SYSTEM_TIME_SOURCE, clone);
+	return MediaRosterEx(this)->GetNode(SYSTEM_TIME_SOURCE, clone);
 }
 
 
@@ -596,10 +585,10 @@ BMediaRoster::Connect(const media_source & from,
 	// XXX we should just send a notification, instead of republishing all endpoints
 	List<media_output> outlist;
 	List<media_input> inlist;
-	if (B_OK == GetAllOutputs(out_output->node , &outlist))
-		PublishOutputs(out_output->node , &outlist);
-	if (B_OK == GetAllInputs(out_input->node , &inlist))
-		PublishInputs(out_input->node, &inlist);
+	if (B_OK == MediaRosterEx(this)->GetAllOutputs(out_output->node , &outlist))
+		MediaRosterEx(this)->PublishOutputs(out_output->node , &outlist);
+	if (B_OK == MediaRosterEx(this)->GetAllInputs(out_input->node , &inlist))
+		MediaRosterEx(this)->PublishInputs(out_input->node, &inlist);
 
 
 	// XXX if (mute) BBufferProducer::EnableOutput(false)
@@ -661,13 +650,13 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 	media_node sourcenode; 
 	media_node destnode;
 	if (B_OK == GetNodeFor(source_nodeid, &sourcenode)) {
-		if (B_OK == GetAllOutputs(sourcenode , &outlist))
-			PublishOutputs(sourcenode , &outlist);
+		if (B_OK == MediaRosterEx(this)->GetAllOutputs(sourcenode , &outlist))
+			MediaRosterEx(this)->PublishOutputs(sourcenode , &outlist);
 		ReleaseNode(sourcenode);
 	} else FATAL("BMediaRoster::Disconnect: source GetNodeFor failed\n");
 	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
-		if (B_OK == GetAllInputs(destnode , &inlist))
-			PublishInputs(destnode, &inlist);
+		if (B_OK == MediaRosterEx(this)->GetAllInputs(destnode , &inlist))
+			MediaRosterEx(this)->PublishInputs(destnode, &inlist);
 		ReleaseNode(destnode);
 	} else FATAL("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
 	
@@ -1016,7 +1005,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1033,7 +1022,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &list);
+	MediaRosterEx(this)->PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1056,7 +1045,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1071,7 +1060,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &list);
+	MediaRosterEx(this)->PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1094,7 +1083,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1107,7 +1096,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &list);
+	MediaRosterEx(this)->PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1131,7 +1120,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1148,7 +1137,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &list);
+	MediaRosterEx(this)->PublishOutputs(node, &list);
 	return B_OK;
 }
 
@@ -1171,7 +1160,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1186,7 +1175,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &list);
+	MediaRosterEx(this)->PublishOutputs(node, &list);
 	return B_OK;
 }
 
@@ -1209,7 +1198,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &list);
+	rv = MediaRosterEx(this)->GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
@@ -1222,7 +1211,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &list);
+	MediaRosterEx(this)->PublishOutputs(node, &list);
 	return B_OK;
 }
 
@@ -1346,7 +1335,7 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	request.port = node->ControlPort();
 	request.team = team;
 
-	TRACE("BMediaRoster::RegisterNode: sending SERVER_REGISTER_NODE: port %ld, kinds %#Lx, team %ld, name '%s'\n", request.port, request.kinds, request.team, request.name);
+	TRACE("BMediaRoster::RegisterNode: sending SERVER_REGISTER_NODE: port %ld, kinds 0x%Lx, team %ld, name '%s'\n", request.port, request.kinds, request.team, request.name);
 	
 	rv = QueryServer(SERVER_REGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
@@ -1354,7 +1343,7 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 		return rv;
 	}
 	
-	// we are a friend class of BMediaNode and initilize this member variable
+	// we are a friend class of BMediaNode and initialize this member variable
 	node->fNodeID = reply.nodeid;
 	ASSERT(reply.nodeid == node->Node().node);
 	ASSERT(reply.nodeid == node->ID());
@@ -1408,11 +1397,11 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		return B_BAD_VALUE;
 	
 	if (node->fRefCount != 0) {
-		FATAL("BMediaRoster::UnregisterNode: Warning node name '%s' has local reference count of %ld\n", node->Name(), node->fRefCount);
+		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' has local reference count of %ld\n", node->ID(), node->Name(), node->fRefCount);
 		// no return here, we continue and unregister!
 	}
-	if (node->ID() == -2) {
-		FATAL("BMediaRoster::UnregisterNode: Warning node name '%s' already unregistered\n", node->Name());
+	if (node->ID() == NODE_UNREGISTERED_ID) {
+		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' already unregistered\n", node->ID(), node->Name());
 		return B_OK;
 	}
 		
@@ -1428,15 +1417,17 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 
 	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		FATAL("BMediaRoster::UnregisterNode: failed to unregister node name '%s' (error %#lx)\n", node->Name(), rv);
+		FATAL("BMediaRoster::UnregisterNode: failed to unregister node id %ld, name '%s' (error %#lx)\n", node->ID(), node->Name(), rv);
 		return rv;
 	}
 	
-	if (reply.addon_id != -1)
+	if (reply.addon_id != -1) {
 		_DormantNodeManager->PutAddon(reply.addon_id);
+		// XXX do "possible_count" increment in the server.
+	}
 
 	// we are a friend class of BMediaNode and invalidate this member variable
-	node->fNodeID = -2;
+	node->fNodeID = NODE_UNREGISTERED_ID;
 	
 	return B_OK;
 }
@@ -1449,7 +1440,7 @@ BMediaRoster::Roster(status_t* out_error)
 	static BLocker locker("BMediaRoster::Roster locker");
 	locker.Lock();
 	if (_sDefault == NULL) {
-		_sDefault = new BMediaRoster();
+		_sDefault = new BMediaRosterEx();
 		if (out_error != NULL)
 			*out_error = B_OK;
 	} else {
@@ -1594,61 +1585,15 @@ BMediaRoster::GetDormantNodes(dormant_node_info * out_info,
 	return reply.result;
 }
 
-
-status_t 
-BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
-									 media_node * out_node,
-									 uint32 flags /* currently B_FLAVOR_IS_GLOBAL or B_FLAVOR_IS_LOCAL */ )
+/* This function is used to do the real work of instantiating a dormant node. It is either
+ * called by the media_addon_server to instantiate a global node, or it gets called from
+ * BMediaRoster::InstantiateDormantNode() to create a local one.
+ *
+ * Checks concerning global/local are not done here.
+ */
+status_t
+BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, media_node *out_node)
 {
-	CALLED();
-	if ((flags & (B_FLAVOR_IS_GLOBAL | B_FLAVOR_IS_LOCAL)) == 0) {
-		FATAL("Error: BMediaRoster::InstantiateDormantNode called without valid flags\n");
-		return B_BAD_VALUE;
-	}
-	if (out_node == 0)
-		return B_BAD_VALUE;
-		
-	// XXX we should not trust the values passed in by the user, 
-	// XXX and ask the server to determine where to insta
-	
-	
-// XXX SOMETHING IS VERY WRONG HERE
-//	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) == 0 && (flags & B_FLAVOR_IS_LOCAL)) {
-	if (flags & B_FLAVOR_IS_LOCAL) {
-		return InstantiateDormantNode(in_info,out_node);
-	}
-
-// XXX SOMETHING IS VERY WRONG HERE
-//	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) || (flags & B_FLAVOR_IS_GLOBAL)) {
-	if (flags & B_FLAVOR_IS_GLOBAL) {
-		// forward this request into the media_addon_server,
-		// which in turn will call InstantiateDormantNode()
-		// to create it there localy
-		addonserver_instantiate_dormant_node_request request;
-		addonserver_instantiate_dormant_node_reply reply;
-		status_t rv;
-		
-		request.info = in_info;
-		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request, sizeof(request), &reply, sizeof(reply));
-		if (rv == B_OK) {
-			*out_node = reply.node;
-		}
-		return rv;
-	}
-
-// XXX SOMETHING IS VERY WRONG HERE
-	FATAL("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", (int)in_info.addon, (int)in_info.flavor_id, flags);
-
-	return B_ERROR;
-}
-
-									 
-status_t 
-BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
-									 media_node * out_node)
-{
-	CALLED();
-
 	// to instantiate a dormant node in the current address space, we need to
 	// either load the add-on from file and create a new BMediaAddOn class, or
 	// reuse the cached BMediaAddOn from a previous call
@@ -1658,44 +1603,151 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	// if B_FLAVOR_IS_GLOBAL, we need to use the BMediaAddOn object that
 	// resides in the media_addon_server
 
-	// RegisterNode() is called automatically for nodes instantiated from add-ons
+	// RegisterNode() must be called for nodes instantiated from add-ons,
+	// since the media kit warrants that it's done automatically.
 
-	//XXX TEST!
-	BMediaAddOn *addon;
-	BMediaNode *node;
-	BMessage config;
-	status_t out_error;
+	// dormant_node_info::addon			Indicates the ID number of the media add-on in which the node resides.
+	// dormant_node_info::flavor_id		Indicates the internal ID number that the add-on uses to identify the flavor,
+	//									this is the number that was published by BMediaAddOn::GetFlavorAt() int the
+	//									flavor_info::internal_id field.
+
+	printf("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld\n", addonid, flavorid);
+
+	// Get flavor_info from the server
+	dormant_flavor_info node_info;
 	status_t rv;
-	addon = _DormantNodeManager->GetAddon(in_info.addon);
-	if (!addon) {
-		FATAL("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
+	rv = GetDormantFlavorInfo(addonid, flavorid, &node_info);	
+	if (rv != B_OK) {
+		FATAL("BMediaRosterEx::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavour-id %ld\n", addonid, flavorid);
 		return B_ERROR;
 	}
-	flavor_info temp; // XXX fix this!
-	temp.name = "XXX flavor_info name";
-	temp.info = "XXX flavor_info info";
-	temp.internal_id = in_info.flavor_id;
-	node = addon->InstantiateNodeFor(&temp, &config, &out_error);
+	
+	ASSERT(node_info.internal_id == flavorid);
+
+	// load the BMediaAddOn object
+	BMediaAddOn *addon;
+	addon = _DormantNodeManager->GetAddon(addonid);
+	if (!addon) {
+		FATAL("BMediaRosterEx::InstantiateDormantNode: GetAddon failed\n");
+		return B_ERROR;
+	}
+	
+	BMessage config;
+	// XXX get configuration from server and do "possible_count" decrement in the server.
+
+	BMediaNode *node;
+	status_t out_error;
+	
+	node = addon->InstantiateNodeFor(&node_info, &config, &out_error);
 	if (!node) {
-		FATAL("BMediaRoster::InstantiateDormantNode: InstantiateNodeFor failed\n");
-		_DormantNodeManager->PutAddon(in_info.addon);
+		FATAL("BMediaRosterEx::InstantiateDormantNode: InstantiateNodeFor failed\n");
+		// XXX do "possible_count" increment in the server.
+		_DormantNodeManager->PutAddon(addonid);
 		return B_ERROR;
 	}
 	rv = RegisterNode(node);
 	if (rv != B_OK) {
-		FATAL("BMediaRoster::InstantiateDormantNode: RegisterNode failed\n");
+		FATAL("BMediaRosterEx::InstantiateDormantNode: RegisterNode failed\n");
 		delete node;
-		_DormantNodeManager->PutAddon(in_info.addon);
+		// XXX do "possible_count" increment in the server.
+		_DormantNodeManager->PutAddon(addonid);
 		return B_ERROR;
 	}
 	
 	// XXX we must remember in_info.addon and call
 	// XXX _DormantNodeManager->PutAddon when the
 	// XXX node is unregistered
-	// should be handled by RegisterNode() and UnegisterNode() now
-	
+	// should be handled by RegisterNode() and UnregisterNode() now
+
 	*out_node = node->Node();
 	return B_OK;
+}
+
+
+status_t 
+BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
+									 media_node * out_node,
+									 uint32 flags /* currently 0 or B_FLAVOR_IS_GLOBAL or B_FLAVOR_IS_LOCAL */ )
+{
+	CALLED();
+	if (out_node == 0)
+		return B_BAD_VALUE;
+	if (in_info.addon <= 0) {
+		FATAL("BMediaRoster::InstantiateDormantNode error: addon-id %ld invalid.\n", in_info.addon);
+		return B_BAD_VALUE;
+	}
+
+	printf("BMediaRoster::InstantiateDormantNode: addon-id %ld, flavor_id %ld, flags 0x%X\n", in_info.addon, in_info.flavor_id, flags);
+
+	// Get flavor_info from the server
+	// XXX this is a little overhead, as we get the full blown dormant_flavor_info,
+	// XXX but only need the flags.
+	dormant_flavor_info node_info;
+	status_t rv;
+	rv = MediaRosterEx(this)->GetDormantFlavorInfo(in_info.addon, in_info.flavor_id, &node_info);	
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavour-id %ld\n", in_info.addon, in_info.flavor_id);
+		return B_ERROR;
+	}
+
+	ASSERT(node_info.internal_id == in_info.flavor_id);
+
+	printf("BMediaRoster::InstantiateDormantNode: name \"%s\", info \"%s\", flavor_flags 0x%X, internal_id %ld, possible_count %ld\n",
+		node_info.name, node_info.info, node_info.flavor_flags, node_info.internal_id, node_info.possible_count);
+
+	#if DEBUG
+		if (flags & B_FLAVOR_IS_LOCAL)
+			printf("BMediaRoster::InstantiateDormantNode: caller requested B_FLAVOR_IS_LOCAL\n");
+		if (flags & B_FLAVOR_IS_GLOBAL)
+			printf("BMediaRoster::InstantiateDormantNode: caller requested B_FLAVOR_IS_GLOBAL\n");
+		if (node_info.flavor_flags & B_FLAVOR_IS_LOCAL)
+			printf("BMediaRoster::InstantiateDormantNode: node requires B_FLAVOR_IS_LOCAL\n");
+		if (node_info.flavor_flags & B_FLAVOR_IS_GLOBAL)
+			printf("BMediaRoster::InstantiateDormantNode: node requires B_FLAVOR_IS_GLOBAL\n");
+	#endif
+
+	// Make sure that flags demanded by the dormant node and those requested
+	// by the caller are not incompatible.
+	if ((node_info.flavor_flags & B_FLAVOR_IS_GLOBAL) && (flags & B_FLAVOR_IS_LOCAL)) {
+		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_LOCAL, but dormant node has B_FLAVOR_IS_GLOBAL\n");
+		return B_BAD_VALUE;
+	}
+	if ((node_info.flavor_flags & B_FLAVOR_IS_LOCAL) && (flags & B_FLAVOR_IS_GLOBAL)) {
+		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_GLOBAL, but dormant node has B_FLAVOR_IS_LOCAL\n");
+		return B_BAD_VALUE;
+	}
+
+	// If either the node, or the caller requested to make the instance global
+	// we will do it by forwarding this request into the media_addon_server, which
+	// in turn will call BMediaRosterEx::InstantiateDormantNode to create the node
+	// there and make it globally available.
+	if ((node_info.flavor_flags & B_FLAVOR_IS_GLOBAL) || (flags & B_FLAVOR_IS_GLOBAL)) {
+
+		addonserver_instantiate_dormant_node_request request;
+		addonserver_instantiate_dormant_node_reply reply;
+		status_t rv;
+		request.addonid = in_info.addon;
+		request.flavorid = in_info.flavor_id;
+		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request, sizeof(request), &reply, sizeof(reply));
+		if (rv == B_OK) {
+			*out_node = reply.node;
+		} else {
+			*out_node = media_node::null;
+		}
+		return rv;
+
+	} else {
+	
+		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
+	}
+}
+
+									 
+status_t 
+BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
+									 media_node * out_node)
+{
+	return InstantiateDormantNode(in_info, out_node, 0);
 }
 
 
@@ -1723,9 +1775,9 @@ BMediaRoster::GetDormantNodeFor(const media_node & node,
 	return B_OK;
 }
 
-
 status_t 
-BMediaRoster::GetDormantFlavorInfoFor(const dormant_node_info & in_dormant,
+BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonid,
+									  int32 flavorid,
 									  dormant_flavor_info * out_flavor)
 {
 	CALLED();
@@ -1744,8 +1796,8 @@ BMediaRoster::GetDormantFlavorInfoFor(const dormant_node_info & in_dormant,
 	if (reply == 0)
 		return B_ERROR;
 	
-	msg.addon 		= in_dormant.addon;
-	msg.flavor_id 	= in_dormant.flavor_id;
+	msg.addon 		= addonid;
+	msg.flavor_id 	= flavorid;
 	msg.reply_port 	= _PortPool->GetPort();
 	rv = write_port(port, SERVER_GET_DORMANT_FLAVOR_INFO, &msg, sizeof(msg));
 	if (rv != B_OK) {
@@ -1770,6 +1822,12 @@ BMediaRoster::GetDormantFlavorInfoFor(const dormant_node_info & in_dormant,
 	return rv;
 }
 
+status_t 
+BMediaRoster::GetDormantFlavorInfoFor(const dormant_node_info & in_dormant,
+									  dormant_flavor_info * out_flavor)
+{
+	return MediaRosterEx(this)->GetDormantFlavorInfo(in_dormant.addon, in_dormant.flavor_id, out_flavor);
+}
 
 status_t 
 BMediaRoster::GetLatencyFor(const media_node & producer,
