@@ -14,6 +14,10 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+namespace BPrivate { namespace media {
+	class BMediaRosterEx;
+}}
+
 class _buffer_id_cache;
 
 class BBufferConsumer :
@@ -187,9 +191,10 @@ virtual		status_t _Reserved_BufferConsumer_13(void *);
 virtual		status_t _Reserved_BufferConsumer_14(void *);
 virtual		status_t _Reserved_BufferConsumer_15(void *);
 
-	friend class BMediaRoster;
 	friend class BMediaNode;
 	friend class BBufferProducer;
+	friend class BMediaRoster;
+	friend class BPrivate::media::BMediaRosterEx;
 
 		media_type fConsumerType;
 		_buffer_id_cache * fBufferCache;

@@ -14,6 +14,10 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+namespace BPrivate { namespace media {
+	class BMediaRosterEx;
+}}
+
 
 class BBufferProducer :
 	public virtual BMediaNode
@@ -189,9 +193,10 @@ virtual	void LatencyChanged(					//	used to be Reserved 1
 
 private:
 
-	friend class BMediaRoster;
 	friend class BBufferConsumer;
 	friend class BMediaNode;
+	friend class BMediaRoster;
+	friend class BPrivate::media::BMediaRosterEx;
 
 		BBufferProducer();	/* private unimplemented */
 		BBufferProducer(
