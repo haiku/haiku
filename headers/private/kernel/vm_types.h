@@ -20,7 +20,7 @@ typedef struct vm_page {
 	addr_t				ppn; // physical page number
 	off_t				offset;
 
-	struct vm_cache_ref	*cache_ref;
+	struct vm_cache		*cache;
 
 	struct vm_page		*cache_prev;
 	struct vm_page		*cache_next;

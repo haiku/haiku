@@ -53,15 +53,17 @@ region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address
 region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
 	addr size, int lock, int mapping, const char *path, off_t offset);
 region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr size);
+area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
+			uint32 protection, area_id sourceID);
 region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 	region_id source_region, int mapping, int lock);
-int vm_delete_region(aspace_id aid, region_id id);
+status_t vm_delete_region(aspace_id aid, region_id id);
 region_id vm_find_region_by_name(aspace_id aid, const char *name);
 status_t vm_create_vnode_cache(void *vnode, void **_cache);
 
-int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
-int vm_get_physical_page(addr paddr, addr *vaddr, int flags);
-int vm_put_physical_page(addr vaddr);
+status_t vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
+status_t vm_get_physical_page(addr paddr, addr *vaddr, int flags);
+status_t vm_put_physical_page(addr vaddr);
 
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
