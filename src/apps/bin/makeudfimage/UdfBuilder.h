@@ -194,7 +194,7 @@ UdfBuilder::_WriteFileEntry(FileEntry *icb, uint8 fileType, uint16 linkCount,
 	if (!error) {
 		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing icb");
 		// write icb
-		_OutputFile().Seek(icbExtent.location() << _BlockShift(), SEEK_SET);
+		_OutputFile().Seek(off_t(icbExtent.location()) << _BlockShift(), SEEK_SET);
 		PRINT(("position, icbsize: %Ld, %ld\n", _OutputFile().Position(), sizeof(icb)));
 		ssize_t bytes = _OutputFile().Write(icb, _BlockSize());
 		PRINT(("position: %Ld\n", _OutputFile().Position()));

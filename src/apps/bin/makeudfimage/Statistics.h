@@ -33,8 +33,8 @@ public:
 	void AddSymlink() { fSymlinks++; }
 	void AddAttribute() { fAttributes++; }
 	
-	void AddDirectoryBytes(uint32 count) { fDirectoryBytes += count; }
-	void AddFileBytes(uint32 count) { fFileBytes += count; }
+	void AddDirectoryBytes(uint64 count) { fDirectoryBytes += count; }
+	void AddFileBytes(uint64 count) { fFileBytes += count; }
 
 	void SetImageSize(uint64 size) { fImageSize = size; }
 

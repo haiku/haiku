@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "UdfDebug.h"
 
 SimulatedStream::SimulatedStream(DataStream &stream)
 	: fPosition(0)
@@ -154,6 +155,7 @@ SimulatedStream::WriteAt(off_t pos, const void *_buffer, size_t size)
 ssize_t
 SimulatedStream::Write(BDataIO &data, size_t size)
 {
+	DEBUG_INIT_ETC("SimulatedStream", ("size: %ld", size));
 	status_t error = B_OK;
 	ssize_t bytesTotal = 0;
 	while (error == B_OK && size > 0) {
@@ -161,6 +163,7 @@ SimulatedStream::Write(BDataIO &data, size_t size)
 		error = _GetExtent(fPosition, size, extent);
 		if (!error) {
 			if (extent.size > 0) {
+				PRINT(("writing to underlying stream (offset: %llu, size: %ld)\n", extent.offset, extent.size));
 				ssize_t bytes = fStream.WriteAt(extent.offset, data, extent.size);
 				if (bytes >= 0) {
 					size -= bytes;
@@ -175,7 +178,7 @@ SimulatedStream::Write(BDataIO &data, size_t size)
 			}
 		}		
 	}
-	return !error ? bytesTotal : ssize_t(error);
+	RETURN(!error ? bytesTotal : ssize_t(error));
 }
 
 /*! \brief Writes \a size bytes worth of data from \a data at position

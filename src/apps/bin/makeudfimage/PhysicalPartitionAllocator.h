@@ -27,7 +27,7 @@ public:
 	status_t GetNextBlock(uint32 &block, uint32 &physicalBlock);
 	status_t GetNextExtent(uint32 length, bool contiguous, Udf::long_address &extent,
 	                       Udf::extent_address &physicalExtent = dummyExtent);                
-	status_t GetNextExtents(uint32 length, std::list<Udf::long_address> &extents,
+	status_t GetNextExtents(off_t length, std::list<Udf::long_address> &extents,
 	                        std::list<Udf::extent_address> &physicalExtents);
 	                       
 	                       

@@ -81,7 +81,7 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
                        const char *isoVolumeName, const char *rootDirectory,
                        const ProgressListener &listener)
 	: fInitStatus(B_NO_INIT)
-	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE)
+	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE)// | B_ERASE_FILE)
 	, fOutputFilename(outputFile)
 	, fBlockSize(blockSize)
 	, fBlockShift(0)
@@ -335,11 +335,11 @@ UdfBuilder::Build()
 		// reserve primary vds (min length = 16 blocks, which is plenty for us)
 		if (!error) {
 			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for primary vds");
-			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, primaryVdsExtent);
+			error = _Allocator().GetNextExtent(off_t(16) << _BlockShift(), true, primaryVdsExtent);
 			if (!error) {
 				_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
 				             primaryVdsExtent.location(), primaryVdsExtent.length());
-				ssize_t bytes = _OutputFile().ZeroAt(primaryVdsExtent.location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().ZeroAt(off_t(primaryVdsExtent.location()) << _BlockShift(),
 				                                   primaryVdsExtent.length());
 				error = check_size_error(bytes, primaryVdsExtent.length());
 			}
@@ -351,14 +351,14 @@ UdfBuilder::Build()
 		if (!error) {
 			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for reserve vds");
 			reserveVdsExtent.set_location(256-16);
-			reserveVdsExtent.set_length(16 << _BlockShift());
+			reserveVdsExtent.set_length(off_t(16) << _BlockShift());
 			error = _Allocator().GetExtent(reserveVdsExtent);
 			if (error)
-				error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveVdsExtent);
+				error = _Allocator().GetNextExtent(off_t(16) << _BlockShift(), true, reserveVdsExtent);
 			if (!error) {
 				_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
 				             reserveVdsExtent.location(), reserveVdsExtent.length());
-				ssize_t bytes = _OutputFile().ZeroAt(reserveVdsExtent.location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().ZeroAt(off_t(reserveVdsExtent.location()) << _BlockShift(),
 				                                   reserveVdsExtent.length());
 				error = check_size_error(bytes, reserveVdsExtent.length());
 			}
@@ -373,7 +373,7 @@ UdfBuilder::Build()
 			tag.set_serial_number(0);
 			tag.set_location(256);
 			tag.set_checksums(anchor256);
-			_OutputFile().Seek(256 << _BlockShift(), SEEK_SET);
+			_OutputFile().Seek(off_t(256) << _BlockShift(), SEEK_SET);
 			ssize_t bytes = _OutputFile().Write(&anchor256, sizeof(anchor256));
 			error = check_size_error(bytes, sizeof(anchor256));
 			if (!error && bytes < ssize_t(_BlockSize())) {
@@ -439,12 +439,12 @@ UdfBuilder::Build()
 			// write primary_vd to primary vds
 			primary.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			primary.tag().set_checksums(primary);
-			ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(primary.tag().location()) << _BlockShift(),
 			                              &primary, sizeof(primary));
 			error = check_size_error(bytes, sizeof(primary));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((primary.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(primary.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -452,12 +452,12 @@ UdfBuilder::Build()
 			if (!error) {
 				primary.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				primary.tag().set_checksums(primary);
-				ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(primary.tag().location()) << _BlockShift(),
 	        			                              &primary, sizeof(primary));
 				error = check_size_error(bytes, sizeof(primary));                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((primary.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt(off_t((primary.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -499,12 +499,12 @@ UdfBuilder::Build()
 			// write partition descriptor to primary vds
 			partition.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			partition.tag().set_checksums(partition);
-			ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(partition.tag().location()) << _BlockShift(),
 			                              &partition, sizeof(partition));
 			error = check_size_error(bytes, sizeof(partition));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(partition.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -512,12 +512,12 @@ UdfBuilder::Build()
 			if (!error) {
 				partition.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				partition.tag().set_checksums(partition);
-				ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(partition.tag().location()) << _BlockShift(),
 	        			                              &partition, sizeof(partition));
 				error = check_size_error(bytes, sizeof(partition));                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt((off_t(partition.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -542,12 +542,12 @@ UdfBuilder::Build()
 			// write freespace descriptor to primary vds
 			freespace.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			freespace.tag().set_checksums(freespace);
-			ssize_t bytes = _OutputFile().WriteAt(freespace.tag().location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(freespace.tag().location()) << _BlockShift(),
 			                              &freespace, sizeof(freespace));
 			error = check_size_error(bytes, sizeof(freespace));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((freespace.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(freespace.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -555,12 +555,12 @@ UdfBuilder::Build()
 			if (!error) {
 				freespace.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				freespace.tag().set_checksums(freespace);
-				ssize_t bytes = _OutputFile().WriteAt(freespace.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(freespace.tag().location()) << _BlockShift(),
 	        			                              &freespace, sizeof(freespace));
 				error = check_size_error(bytes, sizeof(freespace));                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((freespace.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt((off_t(freespace.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -631,12 +631,12 @@ UdfBuilder::Build()
 				uint32 logicalSize = Udf::kLogicalVolumeDescriptorBaseSize + sizeof(map);
 				logical.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 				logical.tag().set_checksums(logical, logicalSize);
-				ssize_t bytes = _OutputFile().WriteAt(logical.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(logical.tag().location()) << _BlockShift(),
 				                              &logical, logicalSize);
 				error = check_size_error(bytes, logicalSize);                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((logical.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt((off_t(logical.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -644,12 +644,12 @@ UdfBuilder::Build()
 				if (!error) {
 					logical.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 					logical.tag().set_checksums(logical, logicalSize);
-					ssize_t bytes = _OutputFile().WriteAt(logical.tag().location() << _BlockShift(),
+					ssize_t bytes = _OutputFile().WriteAt(off_t(logical.tag().location()) << _BlockShift(),
 		        			                              &logical, sizeof(logical));
 					error = check_size_error(bytes, sizeof(logical));                              
 					if (!error && bytes < ssize_t(_BlockSize())) {
 						ssize_t bytesLeft = _BlockSize() - bytes;
-						bytes = _OutputFile().ZeroAt((logical.tag().location() << _BlockShift())
+						bytes = _OutputFile().ZeroAt((off_t(logical.tag().location()) << _BlockShift())
 						                             + bytes, bytesLeft);
 						error = check_size_error(bytes, bytesLeft);			                             
 					}
@@ -707,13 +707,13 @@ UdfBuilder::Build()
 				// write implementationUse descriptor to primary vds
 				implementationUse.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 				implementationUse.tag().set_checksums(implementationUse);
-				bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
+				bytes = _OutputFile().WriteAt(off_t(implementationUse.tag().location()) << _BlockShift(),
 				                              &implementationUse, sizeof(implementationUse));
 				error = check_size_error(bytes, sizeof(implementationUse));
 			}
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((implementationUse.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(implementationUse.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -721,12 +721,12 @@ UdfBuilder::Build()
 			if (!error) {
 				implementationUse.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				implementationUse.tag().set_checksums(implementationUse);
-				ssize_t bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(implementationUse.tag().location()) << _BlockShift(),
 	        			                              &implementationUse, sizeof(implementationUse));
 				error = check_size_error(bytes, sizeof(implementationUse));                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((implementationUse.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt((off_t(implementationUse.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -746,12 +746,12 @@ UdfBuilder::Build()
 			// write terminator to primary vds
 			terminator.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			terminator.tag().set_checksums(terminator);
-			ssize_t bytes = _OutputFile().WriteAt(terminator.tag().location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(terminator.tag().location()) << _BlockShift(),
 			                              &terminator, sizeof(terminator));
 			error = check_size_error(bytes, sizeof(terminator));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((terminator.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(terminator.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -759,12 +759,12 @@ UdfBuilder::Build()
 			if (!error) {
 				terminator.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				terminator.tag().set_checksums(terminator);
-				ssize_t bytes = _OutputFile().WriteAt(terminator.tag().location() << _BlockShift(),
+				ssize_t bytes = _OutputFile().WriteAt(off_t(terminator.tag().location()) << _BlockShift(),
 	        			                              &terminator, sizeof(terminator));
 				error = check_size_error(bytes, sizeof(terminator));                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((terminator.tag().location() << _BlockShift())
+					bytes = _OutputFile().ZeroAt((off_t(terminator.tag().location()) << _BlockShift())
 					                             + bytes, bytesLeft);
 					error = check_size_error(bytes, bytesLeft);			                             
 				}
@@ -815,12 +815,12 @@ UdfBuilder::Build()
 		fileset.tag().set_checksums(fileset);
 		DUMP(fileset);
 		// write fsd				                             
-		ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
+		ssize_t bytes = _OutputFile().WriteAt(off_t(filesetExtent.location()) << _BlockShift(),
        			                              &fileset, sizeof(fileset));
 		error = check_size_error(bytes, sizeof(fileset));                              
 		if (!error && bytes < ssize_t(_BlockSize())) {
 			ssize_t bytesLeft = _BlockSize() - bytes;
-			bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
+			bytes = _OutputFile().ZeroAt((off_t(filesetExtent.location()) << _BlockShift())
 			                             + bytes, bytesLeft);
 			error = check_size_error(bytes, bytesLeft);			                             
 		}
@@ -845,12 +845,12 @@ UdfBuilder::Build()
 		fileset.tag().set_checksums(fileset);
 		DUMP(fileset);
 		// write fsd				                             
-		ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
+		ssize_t bytes = _OutputFile().WriteAt(off_t(filesetExtent.location()) << _BlockShift(),
        			                              &fileset, sizeof(fileset));
 		error = check_size_error(bytes, sizeof(fileset));                              
 		if (!error && bytes < ssize_t(_BlockSize())) {
 			ssize_t bytesLeft = _BlockSize() - bytes;
-			bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
+			bytes = _OutputFile().ZeroAt((off_t(filesetExtent.location()) << _BlockShift())
 			                             + bytes, bytesLeft);
 			error = check_size_error(bytes, bytesLeft);			                             
 		}
@@ -864,12 +864,12 @@ UdfBuilder::Build()
 		// write partition descriptor to primary vds
 		partition.tag().set_location(primaryVdsExtent.location()+partition.vds_number());
 		partition.tag().set_checksums(partition);
-		ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
+		ssize_t bytes = _OutputFile().WriteAt(off_t(partition.tag().location()) << _BlockShift(),
 		                              &partition, sizeof(partition));
 		error = check_size_error(bytes, sizeof(partition));                              
 		if (!error && bytes < ssize_t(_BlockSize())) {
 			ssize_t bytesLeft = _BlockSize() - bytes;
-			bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
+			bytes = _OutputFile().ZeroAt((off_t(partition.tag().location()) << _BlockShift())
 			                             + bytes, bytesLeft);
 			error = check_size_error(bytes, bytesLeft);			                             
 		}
@@ -877,12 +877,12 @@ UdfBuilder::Build()
 		if (!error) {
 			partition.tag().set_location(reserveVdsExtent.location()+partition.vds_number());
 			partition.tag().set_checksums(partition);
-			ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(partition.tag().location()) << _BlockShift(),
         			                              &partition, sizeof(partition));
 			error = check_size_error(bytes, sizeof(partition));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
+				bytes = _OutputFile().ZeroAt((off_t(partition.tag().location()) << _BlockShift())
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
@@ -929,7 +929,7 @@ UdfBuilder::Build()
 			lvid->tag().set_checksums(*lvid, lvid->descriptor_size());
 			PDUMP(lvid);
 			// write lvid				                             
-			ssize_t bytes = _OutputFile().WriteAt(integrityExtent.location() << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t(integrityExtent.location()) << _BlockShift(),
 	       			                              lvid, _BlockSize());
 			error = check_size_error(bytes, _BlockSize());
 		}
@@ -945,7 +945,7 @@ UdfBuilder::Build()
 			terminator->tag().set_checksums(*terminator);
 			PDUMP(terminator);
 			// write terminator				                             
-			ssize_t bytes = _OutputFile().WriteAt((integrityExtent.location()+1) << _BlockShift(),
+			ssize_t bytes = _OutputFile().WriteAt(off_t((integrityExtent.location()+1)) << _BlockShift(),
 	       			                              terminator, _BlockSize());
 			error = check_size_error(bytes, _BlockSize());
 		}
@@ -969,7 +969,7 @@ UdfBuilder::Build()
 			tag.set_serial_number(0);
 			tag.set_location(blockN);
 			tag.set_checksums(anchorN);
-			_OutputFile().Seek(blockN << _BlockShift(), SEEK_SET);
+			_OutputFile().Seek(off_t(blockN) << _BlockShift(), SEEK_SET);
 			ssize_t bytes = _OutputFile().Write(&anchorN, sizeof(anchorN));
 			error = check_size_error(bytes, sizeof(anchorN));
 			if (!error && bytes < ssize_t(_BlockSize())) {
@@ -1427,10 +1427,10 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("path: `%s'", path));
 	status_t error = entry.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
-	uint32 udfDataLength = stats.st_size;
-	if (!error && stats.st_size > ULONG_MAX) {
-		_PrintError("File `%s' too large (filesize: %Lu bytes, max: %lu bytes)",
-		            path, stats.st_size, ULONG_MAX);
+	off_t udfDataLength = stats.st_size;
+	if (udfDataLength > ULONG_MAX && _DoIso()) {
+		_PrintError("File `%s' too large for iso9660 filesystem (filesize: %Lu bytes, max: %lu bytes)",
+		            path, udfDataLength, ULONG_MAX);
 		error = B_ERROR;	            
 	}
 	if (!error) {
@@ -1476,7 +1476,7 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 				} else {
 					// Udf can handle multiple extents if necessary
 					error = _PartitionAllocator().GetNextExtents(udfDataLength, udfDataAddresses,
-				                                            udfDataExtents);
+				                                                 udfDataExtents);
 				}				                                            
 				if (!error) {
 					int extents = udfDataAddresses.size();
@@ -1549,7 +1549,7 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 		
 	if (!error) {
 		_Stats().AddFile();
-		uint32 totalLength = udfDataLength + _BlockSize();
+		off_t totalLength = udfDataLength + _BlockSize();
 		_Stats().AddFileBytes(totalLength);
 	}
 	RETURN(error);

@@ -40,7 +40,7 @@ public:
 	uint32 BlockSize() const { return fBlockSize; }
 	uint32 BlockShift() const { return fBlockShift; }
 	
-	uint32 BlocksFor(uint32 bytes);
+	uint32 BlocksFor(off_t bytes);
 private:
 	list<Udf::extent_address> fChunkList;
 	uint32 fLength;	//!< Length of allocation so far, in blocks.

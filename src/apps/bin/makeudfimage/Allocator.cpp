@@ -102,7 +102,7 @@ Allocator::GetExtent(Udf::extent_address extent)
 					return B_OK;
 				}
 			}
-			// No matching chunk found, we're SOL.
+			// No matching chunk found, we're SOL.			
 			error = B_ERROR;
 		}		
 	}
@@ -157,9 +157,11 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
                          Udf::extent_address &extent,
 	                     uint32 minimumStartingBlock)
 {
+	DEBUG_INIT_ETC("Allocator", ("length: %lld, contiguous: %d", _length, contiguous));
 	uint32 length = BlocksFor(_length);
 	bool isPartial = false;
 	status_t error = InitCheck();
+	PRINT(("allocation length: %lu\n", Length()));
 	if (!error) {
 		for (list<Udf::extent_address>::iterator i = fChunkList.begin();
 		       i != fChunkList.end();
@@ -213,7 +215,9 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 			}			 
 		}
 		// No sufficient chunk found, so try to allocate from the tail
-		uint32 maxLength = BlocksFor(ULONG_MAX)-Length();
+		PRINT(("ULONG_MAX: %lu\n", ULONG_MAX));
+		uint32 maxLength = ULONG_MAX-Length();
+		PRINT(("maxLength: %lu\n", maxLength));
 		error = maxLength > 0 ? B_OK : B_DEVICE_FULL;
 		if (!error) {
 			if (minimumStartingBlock > Tail())
@@ -243,16 +247,26 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 	given number of bytes.
 */
 uint32
-Allocator::BlocksFor(uint32 bytes)
+Allocator::BlocksFor(off_t bytes)
 {
 	if (BlockSize() == 0) {
 		DEBUG_INIT_ETC("Allocator", ("bytes: %ld\n", bytes));
 		PRINT(("WARNING: Allocator::BlockSize() == 0!\n")); 
 		return 0;
 	} else {
-		uint32 blocks = bytes / BlockSize();
+		off_t blocks = bytes >> BlockShift();
 		if (bytes % BlockSize() != 0)
 			blocks++;
+		uint64 mask = 0xffffffff;
+		mask <<= 32;
+		if (blocks & mask) {
+			// ToDo: Convert this to actually signal an error
+			DEBUG_INIT_ETC("Allocator", ("bytes: %ld\n", bytes));
+			PRINT(("WARNING: bytes argument too large for corresponding number "
+			       "of blocks to be specified with a uint32! (bytes: %Ld, blocks: %Ld, "
+			       "maxblocks: %ld).\n", bytes, blocks, ULONG_MAX));
+			blocks = 0;
+		}					
 		return blocks;
 	}
 }

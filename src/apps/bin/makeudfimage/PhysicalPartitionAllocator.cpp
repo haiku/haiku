@@ -96,9 +96,10 @@ PhysicalPartitionAllocator::GetNextExtent(uint32 length,
 	- error code: Failure.
 */
 status_t
-PhysicalPartitionAllocator::GetNextExtents(uint32 length, std::list<Udf::long_address> &extents,
+PhysicalPartitionAllocator::GetNextExtents(off_t length, std::list<Udf::long_address> &extents,
 	                                       std::list<Udf::extent_address> &physicalExtents)
 {
+	DEBUG_INIT_ETC("PhysicalPartitionAllocator", ("length: %lld", length));
 	extents.empty();
 	physicalExtents.empty();
 	
@@ -107,20 +108,28 @@ PhysicalPartitionAllocator::GetNextExtents(uint32 length, std::list<Udf::long_ad
 	while (error == B_OK) {
 		Udf::long_address extent;
 		Udf::extent_address physicalExtent;
-		error = GetNextExtent(length, false, extent, physicalExtent);
+		uint32 chunkLength = length <= ULONG_MAX ? uint32(length) : ULONG_MAX; 
+		error = GetNextExtent(chunkLength, false, extent, physicalExtent);
 		if (!error) {
 			extents.push_back(extent);
 			physicalExtents.push_back(physicalExtent);
-			if (physicalExtent.length() >= length) {
-				// All done
-				break;
+			if (physicalExtent.length() > chunkLength) {
+				// This should never happen, but just to be safe
+				PRINT(("ERROR: allocated extent length longer than requested "
+				       " extent length (allocated: %ld, requested: %ld)\n",
+				       physicalExtent.length(), chunkLength));
+				error = B_ERROR;
 			} else {
-				// More to go
+				// ToDo: Might want to add some checks for 0 length allocations here
 				length -= physicalExtent.length();
+				if (length == 0) {
+					// All done
+					break;
+				}
 			}
 		}
 	}
-	return error;
+	RETURN(error);
 }
 
 /*! \brief Returns the length of the partition in blocks.
