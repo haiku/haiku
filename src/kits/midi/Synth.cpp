@@ -23,11 +23,14 @@
 #include "debug.h"
 #include "Synth.h"
 
+BSynth *be_synth = 0;
+
 //------------------------------------------------------------------------------
 
 BSynth::BSynth()
 {
 	UNIMPLEMENTED
+	be_synth = this;
 }
 
 //------------------------------------------------------------------------------
@@ -35,6 +38,7 @@ BSynth::BSynth()
 BSynth::BSynth(synth_mode synth)
 {
 	UNIMPLEMENTED
+	be_synth = this;
 }
 
 //------------------------------------------------------------------------------
@@ -42,6 +46,7 @@ BSynth::BSynth(synth_mode synth)
 BSynth::~BSynth()
 {
 	UNIMPLEMENTED
+	be_synth = 0;
 }
 
 //------------------------------------------------------------------------------
