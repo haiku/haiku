@@ -293,7 +293,7 @@ status_t _control_input_server_(BMessage *command, BMessage *reply)
 	if (err != B_OK)
 		return err;
 
-	if (reply->FindInt32("status", err) != B_OK)
+	if (reply->FindInt32("status", &err) != B_OK)
 		return B_ERROR;
 
 	return err;
