@@ -169,3 +169,8 @@ void PrintJobReader::GetResolution(int32 *xdpi, int32 *ydpi) const {
 	fJobSettings.FindInt32("yres", ydpi);
 }
 
+float PrintJobReader::GetScale() const {
+	float scale = 1.0;
+	fJobSettings.FindFloat("scale", &scale);
+	return scale;
+}

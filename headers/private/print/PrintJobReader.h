@@ -74,6 +74,7 @@ public:
 	BRect PaperRect() const;
 	BRect PrintableRect() const;
 	void GetResolution(int32 *xdpi, int32 *ydpi) const;
+	float GetScale() const;
 		
 		// retrieve page
 	status_t GetPage(int no, PrintJobPage& pjp);
