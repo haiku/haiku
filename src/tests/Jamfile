@@ -18,3 +18,4 @@ UnitTest UnitTester
 
 SubInclude OBOS_TOP src tests add-ons ;
 SubInclude OBOS_TOP src tests kits ;
+SubInclude OBOS_TOP src tests servers ;

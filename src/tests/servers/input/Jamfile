@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tests servers input ;
+
+SubInclude OBOS_TOP src tests servers input msgspy ;
+SubInclude OBOS_TOP src tests servers input portspy ;

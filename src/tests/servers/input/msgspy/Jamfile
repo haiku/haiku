@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src tests servers input msgspy ;
+
+Addon MsgSpy : input_server filters : MsgSpy.cpp ;
+LinkSharedOSLibs MsgSpy : be /system/servers/input_server ;
+
