@@ -10,7 +10,8 @@
  *
  */
 
-#include <OS.h> 
+#include <OS.h>
+#include <KernelExport.h>
 #include "audio_module.h"
 
 

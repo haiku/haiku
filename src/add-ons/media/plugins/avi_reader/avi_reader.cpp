@@ -228,10 +228,12 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		size_t size;
 		const void *data = fFile->AudioFormat(cookie->stream, &size);
 		format->SetMetaData(data, size);
-		
+
+#ifdef TRACE_AVI_READER
 		uint8 *p = 18 + (uint8 *)data;
 		TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
 			size - 18, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+#endif
 	
 		return B_OK;
 	}
