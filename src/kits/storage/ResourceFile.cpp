@@ -53,6 +53,11 @@ const char *kFileTypeNames[] = {
 	"empty file",
 };
 
+// debugging
+//#define DBG(x) x
+#define DBG(x)
+#define OUT	printf
+
 
 // helper functions/classes
 
