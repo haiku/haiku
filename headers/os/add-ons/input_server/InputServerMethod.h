@@ -17,7 +17,8 @@
 
 
 class _BMethodAddOn_;
-
+class AddOnManager;
+class InputServer;
 
 class BInputServerMethod : public BInputServerFilter {
 public:
@@ -33,8 +34,12 @@ public:
 	status_t				SetIcon(const uchar *icon);
 	status_t				SetMenu(const BMenu *menu, const BMessenger target);
 
-	_BMethodAddOn_*			fOwner;
 private:
+	_BMethodAddOn_*			fOwner;
+	
+	friend class AddOnManager;
+	friend class InputServer;
+	
 	virtual void			_ReservedInputServerMethod1();
 	virtual void			_ReservedInputServerMethod2();
 	virtual void			_ReservedInputServerMethod3();
