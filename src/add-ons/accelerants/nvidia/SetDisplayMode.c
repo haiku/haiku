@@ -124,6 +124,16 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*set the colour depth for CRTC1 and the DAC */
 		switch(target.space)
 		{
+		case B_CMAP8:
+			colour_depth1 =  8;
+			nv_dac_mode(BPP8, 1.0);
+			nv_crtc_depth(BPP8);
+			break;
+		case B_RGB15_LITTLE:
+			colour_depth1 = 16;
+			nv_dac_mode(BPP15, 1.0);
+			nv_crtc_depth(BPP15);
+			break;
 		case B_RGB16_LITTLE:
 			colour_depth1 = 16;
 			nv_dac_mode(BPP16, 1.0);
@@ -138,6 +148,16 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*set the colour depth for CRTC2 and DAC2 */
 		switch(target2.space)
 		{
+		case B_CMAP8:
+			colour_depth2 =  8;
+			nv_dac2_mode(BPP8, 1.0);
+			nv_crtc2_depth(BPP8);
+			break;
+		case B_RGB15_LITTLE:
+			colour_depth2 = 16;
+			nv_dac2_mode(BPP15, 1.0);
+			nv_crtc2_depth(BPP15);
+			break;
 		case B_RGB16_LITTLE:
 			colour_depth2 = 16;
 			nv_dac2_mode(BPP16, 1.0);

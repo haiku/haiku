@@ -335,20 +335,14 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 
 	/* set DUALHEAD_CAPABLE if suitable */
 	//fixme: update for independant secondary head use! (reserve fixed memory then)
-	if (si->ps.secondary_head &&
-	 	((target->space == B_RGB16_LITTLE) || (target->space == B_RGB32_LITTLE)) &&
-	 	(target->timing.pixel_clock <= (max_vclk * 1000)))
+	if (si->ps.secondary_head && (target->timing.pixel_clock <= (max_vclk * 1000)))
 	{
-		/* extra line for G400 MAVEN vblank design fault workaround needed! */
-		uint16 vblank_fix = 0;
-		if (si->ps.card_type == G550) vblank_fix = 1;
-
 		switch (target->flags & DUALHEAD_BITS)
 		{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
 			if ((((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
-					(row_bytes * (target->virtual_height + vblank_fix))) &&
+					(row_bytes * target->virtual_height)) &&
 			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
@@ -356,14 +350,14 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			break;
 		case DUALHEAD_CLONE:
 			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
-					(row_bytes * (target->virtual_height + vblank_fix)))
+					(row_bytes * target->virtual_height))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
 			}
 			break;
 		case DUALHEAD_OFF:
 			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
-					(row_bytes * (target->virtual_height + vblank_fix) * 2))
+					(row_bytes * target->virtual_height * 2))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
 			}
