@@ -9,6 +9,10 @@
 
 #define _SYS_NAMELEN 256
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct utsname {
 	char sysname[_SYS_NAMELEN];	/* Name of the OS */
 	char nodename[_SYS_NAMELEN];	/* Name of this node (network related) */
@@ -18,6 +22,10 @@ struct utsname {
 };
 
 int uname(struct utsname *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
