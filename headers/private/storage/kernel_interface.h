@@ -332,6 +332,9 @@ status_t rename(const char *oldPath, const char *newPath);
 /*! Removes path from the filesystem. */
 status_t remove(const char *path);
 
+//! Sets the name of a volume.
+status_t set_volume_name(dev_t device, const char *name);
+
 };	// namespace Storage
 };	// namespace BPrivate
 
