@@ -11,6 +11,8 @@
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
 
+const char *kTestFileDevice = "/boot/home/tmp/test-file-device";
+
 // main
 int
 main()
@@ -18,7 +20,7 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	manager->InitialDeviceScan();
-	status_t error = manager->CreateFileDevice("/tmp/test-file-device");
+	status_t error = manager->CreateFileDevice(kTestFileDevice);
 	if (error != B_OK)
 		printf("creating the file device failed: %s\n", strerror(error));
 	if (manager->Lock()) {
@@ -28,6 +30,12 @@ main()
 		}
 		manager->Unlock();
 	}
+
+//	error = manager->DeleteFileDevice(kTestFileDevice);
+//	if (error != B_OK)
+//		printf("deleting the file device failed: %s\n", strerror(error));
+
+
 	KDiskDeviceManager::DeleteDefault();
 	return 0;
 }
