@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src tests add-ons kernel disk_scanner session ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner session ] ;
+
+UsePrivateHeaders $(DOT) ;
+
+{
+	local defines = [ FDefines USERLAND ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+# cdrom
+
+Addon <userland>cdrom : userland disk_scanner session :
+	cdrom.c
+;
+LinkSharedOSLibs <userland>cdrom : <installed>DiskScannerTest ;
