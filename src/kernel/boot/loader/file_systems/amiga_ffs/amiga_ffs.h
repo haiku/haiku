@@ -131,18 +131,11 @@ class FileBlock : public NodeBlock {
 		int32 BlockCount() const { return Offset(2); }
 		int32 FirstData() const { return Offset(4); }
 		int32 Size() const { return BackOffset(47); }
-		int32 Extension() const { return BackOffset(2); }
-};
-
-class ExtensionBlock : public BaseBlock {
-	public:
-		ExtensionBlock(int32 blockSize) : BaseBlock(blockSize) {}
-
-		int32 HeaderKey() const { return Offset(1); }
-		int32 BlockCount() const { return Offset(2); }
-		
-		int32 Parent() const { return BackOffset(3); }
 		int32 NextExtension() const { return BackOffset(2); }
+			// The extension block is handled by this class as well
+
+		int32 DataBlock(int32 index) const { return BackOffset(51 + index); }
+		int32 NumDataBlocks() const { return LongWords() - 56; }
 };
 
 class HashIterator {
