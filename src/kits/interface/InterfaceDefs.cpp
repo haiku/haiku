@@ -32,7 +32,6 @@
 #include <ServerProtocol.h>
 #include <ScrollBar.h>
 #include <Screen.h>
-#include <PortMessage.h>
 #include <Roster.h>
 #include <Menu.h>
 #include <stdlib.h>
@@ -75,7 +74,7 @@ set_screen_space(int32 index, uint32 res, bool stick)
 }
 
 
-status_t
+_IMPEXP_BE status_t
 get_scroll_bar_info(scroll_bar_info *info)
 {
 	if (info == NULL)
@@ -139,7 +138,7 @@ get_mouse_map(mouse_map *map)
 	BMessage command(IS_GET_MOUSE_MAP);
 	BMessage reply;
 	const void *data = 0;
-	int32 count;
+	ssize_t count;
 	
 	_control_input_server_(&command, &reply);
 	
@@ -312,7 +311,8 @@ get_key_info(key_info *info)
 	BMessage command(IS_GET_KEY_INFO);
 	BMessage reply;
 	const void *data = 0;
-	int32 count, err;
+	int32 err;
+	ssize_t count;
 	
 	_control_input_server_(&command, &reply);
 	
@@ -332,7 +332,7 @@ get_key_map(key_map **map, char **key_buffer)
 {
 	BMessage command(IS_GET_KEY_MAP);
 	BMessage reply;
-	int32 map_count, key_count;
+	ssize_t map_count, key_count;
 	const void *map_array = 0, *key_array = 0;
 	
 	_control_input_server_(&command, &reply);
