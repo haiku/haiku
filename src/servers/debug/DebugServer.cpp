@@ -13,7 +13,7 @@
 
 #include <Application.h>
 #include <Invoker.h>
-#include <debugger.h>
+#include <debug_support.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -162,8 +162,34 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 				message->Data().exception_occurred.exception, buffer,
 				sizeof(buffer));
 			break;
+
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-			// TODO: Display the debugger message!
+		{
+			// get the debugger() message
+			void *messageAddress = message->Data().debugger_call.message;
+			char messageBuffer[128];
+			debug_context context;
+			status_t error = init_debug_context(&context,
+				message->Data().origin.nub_port);
+			if (error == B_OK) {
+				ssize_t bytesRead = debug_read_string(&context, messageAddress,
+					messageBuffer, sizeof(messageBuffer));
+				if (bytesRead < 0)
+					error = bytesRead;
+
+				destroy_debug_context(&context);
+			}
+
+			if (error == B_OK) {
+				sprintf(buffer, "Debugger call: `%s'", messageBuffer);
+			} else {
+				snprintf(buffer, sizeof(buffer), "Debugger call: %p "
+					"(Failed to read message: %s)", messageAddress,
+					strerror(error));
+			}
+			break;
+		}
+
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:

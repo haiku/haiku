@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src servers debug ;
 
+UsePrivateHeaders debug ;
 UsePrivateHeaders kernel ;
 
 AddResources debug_server : debug_server.rdef ;
@@ -10,5 +11,6 @@ Server debug_server
 	:
 	libroot.so	# Haiku libroot
 	libbe.so	# Haiku libbe
+	libdebug.so
 	stdc++.r4
 ;
