@@ -28,6 +28,10 @@
 #	define __out dprintf
 #endif
 
+#include "cpp.h"
+
+class DebugHelper;
+
 int32 _get_debug_indent_level();
 
 /*! \brief Categories specifiable via the categoryFlags parameter to DEBUG_INIT()
@@ -48,20 +52,25 @@ enum _DebugCategoryFlags {
 	
 	// Misc categories
 	CF_HIGH_VOLUME		= 0x00000200,	//!< often-called functions
+	CF_DEBUGGING		= 0x00000400,	//!< internal debugging functions
+	CF_DUMP				= 0x00000800,	//!< dump() functions
 	
 	//-------------------------------
 	
 	// Handy combinations
 	CF_ALL				= 0xffffffff,
-	CF_ALL_VISIBILITIES = 0x00000007,
-	CF_ALL_OPS			= 0x000001f8,
 	CF_ALL_LOW_VOLUME	= ~CF_HIGH_VOLUME,
+
+	CF_ANY_VISIBILITY 	= 0x00000007,
+	CF_ANY_OP			= 0x000001f8,
+	CF_ALL_STANDARD     = CF_ANY_VISIBILITY | CF_ANY_OP,
 };
 
 /*! \def CATEGORY_FILTER
 	\brief Bitmask of currently enabled debugging categories.
 */
 #define CATEGORY_FILTER	CF_ALL
+//#define CATEGORY_FILTER	CF_ALL_STANDARD
 //#define CATEGORY_FILTER	CF_ENTRY
 //#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC)
 //#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC | CF_PRIVATE)
@@ -72,18 +81,20 @@ enum _DebugCategoryFlags {
 	current indentation level by 1; on destruction, it decreases
 	it by 1.
 */
-class _DebugHelper
+class DebugHelper
 {
 public:
-	_DebugHelper(uint32 categoryFlags);
-	~_DebugHelper();
+	DebugHelper(uint32 categoryFlags, const char *className = NULL, uint8 tabCount = 1);
+	~DebugHelper();
 	
-	uint32 CategoryFlags() { return fCategoryFlags; }
+	uint32 CategoryFlags() const { return fCategoryFlags; }
+	const char* ClassName() const { return fClassName; }
 	
 private:
 	uint32 fCategoryFlags;
+	uint8 fTabCount;
+	char *fClassName;
 };
-
 
 //----------------------------------------------------------------------
 // NOTE: See UdfDebug.cpp for complete descriptions of the following
@@ -105,41 +116,83 @@ private:
 // DEBUG-dependent macros
 //----------------------------------------------------------------------
 #ifdef DEBUG
-	#define DEBUG_INIT(categoryFlags)					\
-		_DebugHelper _debug_helper((categoryFlags));	\
-		PRINT(("\n"));
+	#define DEBUG_INIT_SILENT(categoryFlags, className)	\
+		DebugHelper _debugHelper((categoryFlags), className, 2);			
 
-	#define PRINT(x) { 													\
-		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)			\
-		       == _debug_helper.CategoryFlags()) 						\
+	#define DEBUG_INIT(categoryFlags, className)		\
+		DEBUG_INIT_SILENT(categoryFlags, className);	\
+		PRINT(("\n"));
+		
+	#define DEBUG_INIT_ETC(categoryFlags, className, arguments)				\
+		DEBUG_INIT_SILENT(categoryFlags, className)							\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)				\
+		       == _debugHelper.CategoryFlags()) 							\
+		{																	\
+			PRINT_INDENT();													\
+			if (_debugHelper.ClassName()) {									\
+				__out("udf(%ld): %s::%s(", find_thread(NULL),				\
+				      _debugHelper.ClassName(), __FUNCTION__);				\
+			} else 	{														\
+				__out("udf(%ld): %s(", find_thread(NULL), __FUNCTION__);	\
+			}																\
+			__out arguments;												\
+			__out("):\n");													\
+		}
+		
+	#define DUMP_INIT(categoryFlags, className)	\
+		DEBUG_INIT_SILENT(categoryFlags, className);	
+				
+	#define DUMP_PRINT(x) { 											\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)			\
+		       == _debugHelper.CategoryFlags()) 						\
 		{																\
 			PRINT_INDENT();												\
-			__out("udf(%ld): %s(): ", find_thread(NULL), __FUNCTION__);	\
 			__out x; 													\
 		} 																\
+	}		
+
+	#define PRINT(x) { 														\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)				\
+		       == _debugHelper.CategoryFlags()) 							\
+		{																	\
+			PRINT_INDENT();													\
+			if (_debugHelper.ClassName()) {									\
+				__out("udf(%ld): %s::%s(): ", find_thread(NULL),			\
+				      _debugHelper.ClassName(), __FUNCTION__);				\
+			} else 	{														\
+				__out("udf(%ld): %s(): ", find_thread(NULL), __FUNCTION__);	\
+			}																\
+			__out x; 														\
+		} 																	\
 	}
 
-	#define LPRINT(x) { 																	\
-		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)								\
-		       == _debug_helper.CategoryFlags()) 											\
-		{																					\
-			PRINT_INDENT();																	\
-			__out("udf(%ld): %s(): line %d: ", find_thread(NULL), __FUNCTION__, __LINE__);	\
-			__out x;																		\
-		} 																					\
+	#define LPRINT(x) { 													\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)				\
+		       == _debugHelper.CategoryFlags()) 							\
+		{																	\
+			PRINT_INDENT();													\
+			if (_debugHelper.ClassName()) {									\
+				__out("udf(%ld): %s::%s(): line %d: ", find_thread(NULL),	\
+				      _debugHelper.ClassName(), __FUNCTION__, __LINE__);	\
+			} else {														\
+				__out("udf(%ld): %s(): line %d: ", find_thread(NULL),		\
+				      __FUNCTION__, __LINE__);								\
+			}																\
+			__out x;														\
+		} 																	\
 	}
 
 	#define SIMPLE_PRINT(x) { 									\
-		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)	\
-		       == _debug_helper.CategoryFlags()) 				\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debugHelper.CategoryFlags()) 				\
 		{														\
 			__out x; 											\
 		} 														\
 	}
 
 	#define PRINT_INDENT() { 									\
-		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)	\
-		       == _debug_helper.CategoryFlags()) 				\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debugHelper.CategoryFlags()) 				\
 		{														\
 			int32 _level = _get_debug_indent_level();			\
 			for (int32 i = 0; i < _level-1; i++) {				\
@@ -147,6 +200,10 @@ private:
 			}													\
 		}														\
 	}
+	
+	#define PRINT_DIVIDER()	\
+		PRINT_INDENT(); 	\
+		SIMPLE_PRINT(("------------------------------------------------------------\n"));
 	
 	#define REPORT_ERROR(err) {											\
 		LPRINT(("returning error 0x%lx, `%s'\n", err, strerror(err)));	\
@@ -175,7 +232,7 @@ private:
 		PRINT(("fatal error: ")); SIMPLE_PRINT(x);	\
 	}
 	
-	#define DBG(x) x ;					
+	#define DBG(x) x ;
 	
 #else	// ifdef DEBUG
 	#define DEBUG_INIT(x) ;
@@ -188,6 +245,7 @@ private:
 	#define RETURN(status) return status;
 	#define FATAL(x) { __out("udf: fatal error: "); __out x; }
 	#define DBG(x) ;
+	#define DUMP(x) ;
 #endif	// ifdef DEBUG else
 
 #endif	// DEBUG_H 

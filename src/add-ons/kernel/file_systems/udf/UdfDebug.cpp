@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------
 /*! \def DEBUG_INIT(categoryFilter)
 	\brief Increases the indentation level, prints out the enclosing function's
-	name, and creates a \c _DebugHelper object on the stack to automatically
+	name, and creates a \c DebugHelper object on the stack to automatically
 	decrease the indentation level upon function exit.
 	
 	This macro should be called at the very beginning of any function in
@@ -182,8 +182,8 @@
 // declarations
 //----------------------------------------------------------------------
 
-static void indent();
-static void unindent();
+static void indent(uint8 tabCount);
+static void unindent(uint8 tabCount);
 #ifdef USER
 	static int32 get_tls_handle();
 #endif
@@ -228,10 +228,10 @@ _get_debug_indent_level()
 	the current thread by 1.
 */
 void
-indent()
+indent(uint8 tabCount)
 {
 #ifdef USER
-	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()+1));
+	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()+tabCount));
 #endif
 }
 
@@ -239,10 +239,10 @@ indent()
 	the current thread by 1.
 */
 void
-unindent()
+unindent(uint8 tabCount)
 {
 #ifdef USER
-	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()-1));
+	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()-tabCount));
 #endif
 }
 
@@ -273,23 +273,31 @@ get_tls_handle()
 #endif
 
 //----------------------------------------------------------------------
-// _DebugHelper
+// DebugHelper
 //----------------------------------------------------------------------
 
 /*! \brief Increases the current indentation level.
 */
-_DebugHelper::_DebugHelper(uint32 categoryFlags)
+DebugHelper::DebugHelper(uint32 categoryFlags, const char *className, uint8 tabCount)
 	: fCategoryFlags(categoryFlags)
+	, fTabCount(tabCount)
+	, fClassName(NULL)
 {
 	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
-		indent();
+		indent(fTabCount);
+	if (className) {
+		fClassName = (char*)malloc(strlen(className)+1);
+		if (fClassName)
+			strcpy(fClassName, className);
+	}
 }
 
 /*! \brief Decreases the current indentation level.
 */
-_DebugHelper::~_DebugHelper()
+DebugHelper::~DebugHelper()
 {
 	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
-		unindent();
+		unindent(fTabCount);
+	free(fClassName);
 }
 
