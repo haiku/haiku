@@ -21,6 +21,7 @@
 #include <string>
 #include <sys/stat.h>
 
+#include "DString.h"
 #include "ExtentStream.h"
 #include "MemoryChunk.h"
 #include "MemoryStream.h"
@@ -196,11 +197,12 @@ UdfBuilder::Build()
 	// Udf variables
 	uint16 partitionNumber = 0;
 	Udf::anchor_volume_descriptor anchor256;
-//	Udf::anchor_volume_descriptor anchorN;
+	Udf::anchor_volume_descriptor anchorN;
 	Udf::extent_address primaryVdsExtent;
 	Udf::extent_address reserveVdsExtent;
 	Udf::primary_volume_descriptor primary;
 	Udf::partition_descriptor partition;
+	Udf::unallocated_space_descriptor freespace;
 	Udf::logical_volume_descriptor logical;
 	Udf::long_address filesetAddress;
 	Udf::extent_address filesetExtent;
@@ -376,18 +378,17 @@ UdfBuilder::Build()
 			primary.set_vds_number(vdsNumber);
 			primary.set_primary_volume_descriptor_number(0);
 			uint32 nameLength = _UdfVolumeName().Cs0Length();
-			if (nameLength > 32) {
+			if (nameLength > primary.volume_identifier().size()-1) {
 				_PrintWarning("udf: Truncating volume name as stored in primary "
-				              "volume descriptor to 32 byte limit. This shouldn't matter, "
+				              "volume descriptor to 31 byte limit. This shouldn't matter, "
 				              "as the complete name is %d bytes long, which is short enough "
 				              "to fit completely in the logical volume descriptor.",
 				              nameLength);
-				nameLength = 32;
 			}
-			memset(primary.volume_identifier().data, 0,
-			       primary.volume_identifier().size());			
-			memcpy(primary.volume_identifier().data, _UdfVolumeName().Cs0(),
-			       nameLength);
+			Udf::DString volumeIdField(_UdfVolumeName(),
+			                           primary.volume_identifier().size());
+			memcpy(primary.volume_identifier().data, volumeIdField.String(),
+			       primary.volume_identifier().size());
 			primary.set_volume_sequence_number(1);
 			primary.set_max_volume_sequence_number(1);
 			primary.set_interchange_level(2);
@@ -400,11 +401,10 @@ UdfBuilder::Build()
 			sprintf(timestamp, "%08lX", _BuildTime());
 			std::string volumeSetId(timestamp);
 			volumeSetId = volumeSetId + "--------" + "(unnamed volume set)";
-			Udf::String Cs0VolumeSetId(volumeSetId.c_str());
-			memset(primary.volume_set_identifier().data, 0,
-			       primary.volume_set_identifier().size());			
-			memcpy(primary.volume_set_identifier().data, Cs0VolumeSetId.Cs0(),
-			       Cs0VolumeSetId.Cs0Length());
+			Udf::DString volumeSetIdField(volumeSetId.c_str(),
+			                              primary.volume_set_identifier().size());
+			memcpy(primary.volume_set_identifier().data, volumeSetIdField.String(),
+			       primary.volume_set_identifier().size());
 			primary.descriptor_character_set() = Udf::kCs0CharacterSet;
 			primary.explanatory_character_set() = Udf::kCs0CharacterSet;
 			primary.volume_abstract() = kNullExtent;
@@ -511,6 +511,49 @@ UdfBuilder::Build()
 			}
 		}
 
+		// write unallocated space descriptor
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing unallocated space descriptor");
+			// build freespace descriptor
+	 		vdsNumber++;
+			freespace.set_vds_number(vdsNumber);
+			freespace.set_allocation_descriptor_count(0);
+			freespace.tag().set_id(Udf::TAGID_UNALLOCATED_SPACE_DESCRIPTOR);
+			freespace.tag().set_version(3);
+			freespace.tag().set_serial_number(0);
+				// note that the checksums haven't been set yet, since the
+				// location is dependent on which sequence (primary or reserve)
+				// the descriptor is currently being written to. Thus we have to
+				// recalculate the checksums for each sequence.
+			DUMP(freespace);
+			// write freespace descriptor to primary vds
+			freespace.tag().set_location(primaryVdsExtent.location()+vdsNumber);
+			freespace.tag().set_checksums(freespace);
+			ssize_t bytes = _OutputFile().WriteAt(freespace.tag().location() << _BlockShift(),
+			                              &freespace, sizeof(freespace));
+			error = check_size_error(bytes, sizeof(freespace));                              
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				ssize_t bytesLeft = _BlockSize() - bytes;
+				bytes = _OutputFile().ZeroAt((freespace.tag().location() << _BlockShift())
+				                             + bytes, bytesLeft);
+				error = check_size_error(bytes, bytesLeft);			                             
+			}
+			// write freespace descriptor to reserve vds				                             
+			if (!error) {
+				freespace.tag().set_location(reserveVdsExtent.location()+vdsNumber);
+				freespace.tag().set_checksums(freespace);
+				ssize_t bytes = _OutputFile().WriteAt(freespace.tag().location() << _BlockShift(),
+	        			                              &freespace, sizeof(freespace));
+				error = check_size_error(bytes, sizeof(freespace));                              
+				if (!error && bytes < ssize_t(_BlockSize())) {
+					ssize_t bytesLeft = _BlockSize() - bytes;
+					bytes = _OutputFile().ZeroAt((freespace.tag().location() << _BlockShift())
+					                             + bytes, bytesLeft);
+					error = check_size_error(bytes, bytesLeft);			                             
+				}
+			}
+		}
+
 		// write logical_vd
 		if (!error) {
 			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing logical volume descriptor");
@@ -524,10 +567,10 @@ UdfBuilder::Build()
 	 			// We check the length in the constructor, so this should never
 	 			// trigger an error, but just to be safe...
 	 		if (!error) { 
-				memset(logical.logical_volume_identifier().data, 0,
-				       logical.logical_volume_identifier().size());			
-				memcpy(logical.logical_volume_identifier().data,
-				       _UdfVolumeName().Cs0(), _UdfVolumeName().Cs0Length());
+				Udf::DString volumeIdField(_UdfVolumeName(),
+				                           logical.logical_volume_identifier().size());
+				memcpy(logical.logical_volume_identifier().data, volumeIdField.String(),
+				       logical.logical_volume_identifier().size());
 				logical.set_logical_block_size(_BlockSize());
 				logical.domain_id() = kDomainId;
 				memset(logical.logical_volume_contents_use().data, 0,
@@ -576,8 +619,8 @@ UdfBuilder::Build()
 				logical.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 				logical.tag().set_checksums(logical, logicalSize);
 				ssize_t bytes = _OutputFile().WriteAt(logical.tag().location() << _BlockShift(),
-				                              &logical, sizeof(logical));
-				error = check_size_error(bytes, sizeof(logical));                              
+				                              &logical, logicalSize);
+				error = check_size_error(bytes, logicalSize);                              
 				if (!error && bytes < ssize_t(_BlockSize())) {
 					ssize_t bytesLeft = _BlockSize() - bytes;
 					bytes = _OutputFile().ZeroAt((logical.tag().location() << _BlockShift())
@@ -601,6 +644,44 @@ UdfBuilder::Build()
 			}		
 		}
 		
+		// write terminating descriptor
+		if (!error) {
+	 		vdsNumber++;
+			Udf::terminating_descriptor terminator;
+			terminator.tag().set_id(Udf::TAGID_TERMINATING_DESCRIPTOR);
+			terminator.tag().set_version(3);
+			terminator.tag().set_serial_number(0);
+			terminator.tag().set_location(integrityExtent.location()+1);
+			terminator.tag().set_checksums(terminator);
+			DUMP(terminator);
+			// write terminator to primary vds
+			terminator.tag().set_location(primaryVdsExtent.location()+vdsNumber);
+			terminator.tag().set_checksums(terminator);
+			ssize_t bytes = _OutputFile().WriteAt(terminator.tag().location() << _BlockShift(),
+			                              &terminator, sizeof(terminator));
+			error = check_size_error(bytes, sizeof(terminator));                              
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				ssize_t bytesLeft = _BlockSize() - bytes;
+				bytes = _OutputFile().ZeroAt((terminator.tag().location() << _BlockShift())
+				                             + bytes, bytesLeft);
+				error = check_size_error(bytes, bytesLeft);			                             
+			}
+			// write terminator to reserve vds				                             
+			if (!error) {
+				terminator.tag().set_location(reserveVdsExtent.location()+vdsNumber);
+				terminator.tag().set_checksums(terminator);
+				ssize_t bytes = _OutputFile().WriteAt(terminator.tag().location() << _BlockShift(),
+	        			                              &terminator, sizeof(terminator));
+				error = check_size_error(bytes, sizeof(terminator));                              
+				if (!error && bytes < ssize_t(_BlockSize())) {
+					ssize_t bytesLeft = _BlockSize() - bytes;
+					bytes = _OutputFile().ZeroAt((terminator.tag().location() << _BlockShift())
+					                             + bytes, bytesLeft);
+					error = check_size_error(bytes, bytesLeft);			                             
+				}
+			}
+		}
+
 		// Error check
 		if (error) {				 
 			_PrintError("Error writing udf vds: 0x%lx, `%s'",
@@ -619,17 +700,15 @@ UdfBuilder::Build()
 		fileset.set_file_set_number(0);
 		fileset.set_file_set_descriptor_number(0);
 		fileset.logical_volume_id_character_set() = Udf::kCs0CharacterSet;
-		memset(fileset.logical_volume_id().data, 0,
-		       fileset.logical_volume_id().size());			
-		memcpy(fileset.logical_volume_id().data,
-		       _UdfVolumeName().Cs0(), _UdfVolumeName().Cs0Length());
-		memset(fileset.file_set_id().data, 0,
-		       fileset.file_set_id().size());
-		uint32 copyLength = _UdfVolumeName().Cs0Length() > fileset.file_set_id().size()
-		                    ? fileset.file_set_id().size() : _UdfVolumeName().Cs0Length();
+		Udf::DString volumeIdField(_UdfVolumeName(),
+		                           fileset.logical_volume_id().size());
+		memcpy(fileset.logical_volume_id().data, volumeIdField.String(),
+		       fileset.logical_volume_id().size());
 		fileset.file_set_id_character_set() = Udf::kCs0CharacterSet;
-		memcpy(fileset.file_set_id().data,
-		       _UdfVolumeName().Cs0(), copyLength);
+		Udf::DString filesetIdField(_UdfVolumeName(),
+		                           fileset.file_set_id().size());
+		memcpy(fileset.file_set_id().data, filesetIdField.String(),
+		       fileset.file_set_id().size());
 		memset(fileset.copyright_file_id().data, 0,
 		       fileset.copyright_file_id().size());
 		memset(fileset.abstract_file_id().data, 0,
@@ -757,7 +836,7 @@ UdfBuilder::Build()
 			lvid->tag().set_version(3);
 			lvid->tag().set_serial_number(0);
 			lvid->tag().set_location(integrityExtent.location());
-			lvid->tag().set_checksums(*lvid);
+			lvid->tag().set_checksums(*lvid, lvid->descriptor_size());
 			PDUMP(lvid);
 			// write lvid				                             
 			ssize_t bytes = _OutputFile().WriteAt(integrityExtent.location() << _BlockShift(),
@@ -781,6 +860,38 @@ UdfBuilder::Build()
 			error = check_size_error(bytes, _BlockSize());
 		}
 	}
+		
+	// reserve and write anchorN
+	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing anchorN");
+		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for anchorN");
+		uint32 blockN = _Allocator().Tail();
+		error = _Allocator().GetBlock(blockN);
+		if (!error) 
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             blockN, _BlockSize());
+		if (!error) {
+			anchorN.main_vds() = primaryVdsExtent;
+			anchorN.reserve_vds() = reserveVdsExtent;
+			Udf::descriptor_tag &tag = anchorN.tag();
+			tag.set_id(Udf::TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER);
+			tag.set_version(3);
+			tag.set_serial_number(0);
+			tag.set_location(blockN);
+			tag.set_checksums(anchorN);
+			_OutputFile().Seek(blockN << _BlockShift(), SEEK_SET);
+			ssize_t bytes = _OutputFile().Write(&anchorN, sizeof(anchorN));
+			error = check_size_error(bytes, sizeof(anchorN));
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				bytes = _OutputFile().Zero(_BlockSize()-sizeof(anchorN));
+				error = check_size_error(bytes, _BlockSize()-sizeof(anchorN));
+			}
+		}
+	}
+	
+	// NOTE: After this point, no more blocks may be allocated without jacking
+	// up anchorN's position as the last block in the volume. So don't allocate
+	// any, damn it.
 	
 	// Pad the end of the file to an even multiple of the block
 	// size, if necessary
@@ -791,14 +902,6 @@ UdfBuilder::Build()
 			uint32 padding = _BlockSize() - tail;
 			ssize_t bytes = _OutputFile().Zero(padding);
 			error = check_size_error(bytes, padding);
-		}
-		// Pad with an extra 256 blocks, since burners seem to
-		// sometimes have trouble writing the last few blocks of
-		// an image
-		if (!error) {
-			uint32 size = _BlockSize() * 256;
-			ssize_t bytes = _OutputFile().Zero(size);
-			error = check_size_error(bytes, size);
 		}
 		if (!error)
 			_Stats().SetImageSize(_OutputFile().Position());
@@ -1207,6 +1310,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 //				icb->set_information_length(0);
 //				icb->set_logical_blocks_recorded(0);
 				icb->set_information_length(udfDataLength);
+				icb->set_object_size(udfDataLength);
 				icb->set_logical_blocks_recorded(_Allocator().BlocksFor(udfDataLength));
 				icb->access_date_and_time() = Udf::timestamp(stats.st_atime);
 				icb->modification_date_and_time() = Udf::timestamp(stats.st_mtime);
@@ -1227,7 +1331,6 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 				icb->tag().set_version(3);
 				icb->tag().set_serial_number(0);
 				icb->tag().set_location(icbAddress.block());
-				icb->tag().set_checksums(*icb);
 
 				// write allocation descriptors
 				std::list<Udf::long_address>::iterator a;
@@ -1246,6 +1349,8 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 						error = check_size_error(bytes, sizeof(address));			                             
 		 			}
 		 		}
+
+				icb->tag().set_checksums(*icb, icb->descriptor_size());
 
 				PDUMP(icb);
 			}
@@ -1396,6 +1501,7 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 //				icb->set_information_length(0);
 //				icb->set_logical_blocks_recorded(0);
 				icb->set_information_length(udfDataLength);
+				icb->set_object_size(udfDataLength);
 				icb->set_logical_blocks_recorded(_Allocator().BlocksFor(udfDataLength));
 				icb->access_date_and_time() = Udf::timestamp(stats.st_atime);
 				icb->modification_date_and_time() = Udf::timestamp(stats.st_mtime);
@@ -1416,7 +1522,6 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 				icb->tag().set_version(3);
 				icb->tag().set_serial_number(0);
 				icb->tag().set_location(icbAddress.block());
-				icb->tag().set_checksums(*icb);
 
 				// write allocation descriptors
 				std::list<Udf::long_address>::iterator a;
@@ -1435,6 +1540,8 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 						error = check_size_error(bytes, sizeof(address));			                             
 		 			}
 		 		}
+
+				icb->tag().set_checksums(*icb, icb->descriptor_size());
 
 				PDUMP(icb);
 			}
