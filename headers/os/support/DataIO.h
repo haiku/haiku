@@ -147,8 +147,6 @@ virtual	void		_ReservedMallocIO2();
 					BMallocIO(const BMallocIO &);
 		BMallocIO	&operator=(const BMallocIO &);
 
-		status_t	_Resize(off_t size);
-
 		size_t		fBlockSize;
 		size_t		fMallocSize;
 		size_t		fLength;

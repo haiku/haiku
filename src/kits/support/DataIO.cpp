@@ -176,7 +176,7 @@ BMemoryIO::BMemoryIO(void *p, size_t len)
 
 BMemoryIO::BMemoryIO(const void *p, size_t len)
 		:fReadOnly(true),
-		fBuf((char*)p),
+		fBuf(const_cast<char*>(static_cast<const char*>(p))),
 		fLen(len),
 		fPhys(len),
 		fPos(0)
@@ -340,7 +340,7 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		return B_BAD_VALUE;
 		
 	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
-	status_t error = _Resize(newSize);	
+	status_t error = SetSize(newSize);	
 	if (error == B_OK)
 		memcpy(fData + pos, buffer, size);
 	return (error != B_OK ? error : size);
@@ -380,9 +380,28 @@ BMallocIO::Position() const
 status_t
 BMallocIO::SetSize(off_t size)
 {
-	status_t error = (size >= 0 ? B_OK : B_BAD_VALUE );
-	if (error == B_OK)
-		error = _Resize(size);
+	status_t error = B_OK;
+	if (size <= 0) {
+		// size == 0, free the memory
+		free(fData);
+		fData = NULL;
+	} else {
+		// size != 0, see, if necessary to resize
+		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
+		if (newSize != fMallocSize) {
+			// we need to resize
+			if (char *newData = static_cast<char*>(realloc(fData, newSize))) {
+				// set the new area to 0
+				if (newSize > fMallocSize)
+					memset(newData + fMallocSize, 0, newSize - fMallocSize);
+				fData = newData;
+				fMallocSize = newSize;
+				fLength = newSize;
+			} else	// couldn't alloc the memory
+				error = B_NO_MEMORY;
+		}
+	}
+			
 	return error;
 }
 
@@ -393,10 +412,8 @@ BMallocIO::SetBlockSize(size_t blockSize)
 {
 	if (blockSize == 0)
 		blockSize = 1;
-	if (blockSize != fBlockSize) {
+	if (blockSize != fBlockSize)
 		fBlockSize = blockSize;
-		_Resize(fLength);
-	}
 }
 
 
@@ -416,44 +433,6 @@ BMallocIO::BufferLength() const
 }
 
 
-// _Resize
-status_t
-BMallocIO::_Resize(off_t size)
-{
-	status_t error = (size >= 0 ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		if (size == 0) {
-			// size == 0, free the memory
-			free(fData);
-			fData = NULL;
-		} else {
-			// size != 0, see, if necessary to resize
-			size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
-			if (newSize != fMallocSize) {
-				// we need to resize
-				if (char *newData = (char*)realloc(fData, newSize)) {
-					// set the new area to 0
-					if (fMallocSize < newSize)
-						memset(newData + fMallocSize, 0,
-							newSize - fMallocSize);
-					fData = newData;
-					fMallocSize = newSize;
-				} else	// couldn't alloc the memory
-					error = B_NO_MEMORY;
-			}
-		}
-	}
-	if (error == B_OK)
-		fLength = size;
-	return error;
-}
-
-
-// FBC
-void BMallocIO::_ReservedMallocIO1() {}
-void BMallocIO::_ReservedMallocIO2() {}
-
-
 // Private or Reserved
 BMallocIO::BMallocIO(const BMallocIO &)
 {
@@ -467,6 +446,11 @@ BMallocIO::operator=(const BMallocIO &)
 	// copying not allowed...
 	return *this;
 }
+
+
+// FBC
+void BMallocIO::_ReservedMallocIO1() {}
+void BMallocIO::_ReservedMallocIO2() {}
 
 
 /*
