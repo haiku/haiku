@@ -94,19 +94,34 @@ bool MimeTypeForSender(BMessage* sender, BString& mime) {
 	return false;
 }
 
-bool AddFields(BMessage* to, const BMessage* from) {
+static bool InList(const char* list[], const char* name) {
+	for (int i = 0; list[i] != NULL; i ++) {
+		if (strcmp(list[i], name) == 0) return true;
+	}
+	return false;
+} 
+
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], const char* includeList[]) {
+	if (to == from) return;
 	char* name;
-	uint32 type;
+	type_code type;
 	int32 count;
 	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
+		if (excludeList && InList(excludeList, name)) continue;
+		if (includeList && !InList(includeList, name)) continue;
 		// replace existing data
 		to->RemoveName(name);
 		
 		const void* data;
 		ssize_t size;
-		for (int32 i = 0; i < count; i ++) {
-			if (from->FindData(name, type, i, &data, &size) == B_OK) {
-				to->AddData(name, type, data, size);
+		for (int32 j = 0; j < count; j ++) {
+			if (from->FindData(name, type, j, &data, &size) == B_OK) {
+				if (type == B_STRING_TYPE) to->AddString(name, (const char*)data);
+				else if (type == B_MESSAGE_TYPE) {
+					BMessage m;
+					from->FindMessage(name, j, &m);
+					to->AddMessage(name, &m);
+				} else to->AddData(name, type, data, size);
 			}
 		}
 	}
