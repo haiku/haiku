@@ -191,7 +191,7 @@ print_cache_descriptors(int32 cpu)
 		print_TLB(info.regs.ebx, info.regs.eax ? "4K-byte" : NULL);
 
 	print_level1_cache(info.regs.ecx, "L1 inst cache");
-	print_level2_cache(info.regs.edx, "L1 data cache");
+	print_level1_cache(info.regs.edx, "L1 data cache");
 
 	get_cpuid(&info, 0x80000006, cpu);
 	print_level2_cache(info.regs.ecx, "L2 cache");
