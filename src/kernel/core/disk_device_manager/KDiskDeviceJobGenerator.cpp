@@ -6,6 +6,7 @@
 #include "KDiskDeviceJobQueue.h"
 #include "KDiskDeviceJobGenerator.h"
 #include "KDiskDeviceUtils.h"
+#include "KDiskSystem.h"
 #include "KShadowPartition.h"
 
 // move_info
@@ -90,6 +91,12 @@ KDiskDeviceJobGenerator::GenerateJobs()
 	// Generate jobs that move and resize the remaining physical partitions
 	// to their final position/size.
 	error = _GeneratePlacementJobs(fDevice);
+	if (error != B_OK)
+		return error;
+	// Generate the remaining jobs in one run: initialization, creation of
+	// partitions, and changing of name, content name, type, parameters, and
+	// content parameters.
+	error = _GenerateRemainingJobs(NULL, fDevice->ShadowPartition());
 	if (error != B_OK)
 		return error;
 	return B_ERROR;
@@ -341,6 +348,124 @@ KDiskDeviceJobGenerator::_CollectContentsToMove(KPartition *partition)
 	// recurse
 	for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
 		status_t error = _CollectContentsToMove(child);
+		if (error != B_OK)
+			return error;
+	}
+	return B_OK;
+}
+
+// _GenerateRemainingJobs
+status_t
+KDiskDeviceJobGenerator::_GenerateRemainingJobs(KShadowPartition *parent,
+												KShadowPartition *partition)
+{
+	KPhysicalPartition *physicalPartition = partition->PhysicalPartition();
+	// get correct ID of partition and parent partition
+	partition_id partitionID = (physicalPartition ? physicalPartition->ID()
+												  : partition->ID());
+	partition_id parentID = -1;
+	if (parent) {
+		parentID = (parent->PhysicalPartition()
+					? parent->PhysicalPartition()->ID() : parent->ID());
+	}
+	// create the partition, if not existing yet
+	if (!physicalPartition) {
+		if (!parent)
+			return B_BAD_VALUE;
+		status_t error = _AddJob(fJobFactory->CreateCreateChildJob(
+			parentID, partitionID, partition->Offset(), partition->Size(),
+			partition->Type(), partition->Parameters()));
+		if (error != B_OK)
+			return error;
+	} else {
+		// partition already exists: set non-content properties
+		// name
+		if ((partition->ChangeFlags() & B_PARTITION_CHANGED_NAME)
+			|| compare_string(partition->Name(), physicalPartition->Name())) {
+			if (!parent)
+				return B_BAD_VALUE;
+			status_t error = _AddJob(fJobFactory->CreateSetNameJob(
+				parentID, partitionID, partition->Name()));
+			if (error != B_OK)
+				return error;
+		}
+		// type
+		if ((partition->ChangeFlags() & B_PARTITION_CHANGED_TYPE)
+			|| compare_string(partition->Type(), physicalPartition->Type())) {
+			if (!parent)
+				return B_BAD_VALUE;
+			status_t error = _AddJob(fJobFactory->CreateSetTypeJob(
+				parentID, partitionID, partition->Type()));
+			if (error != B_OK)
+				return error;
+		}
+		// parameters
+		if ((partition->ChangeFlags() & B_PARTITION_CHANGED_PARAMETERS)
+			|| compare_string(partition->Parameters(),
+							  physicalPartition->Parameters())) {
+			if (!parent)
+				return B_BAD_VALUE;
+			status_t error = _AddJob(fJobFactory->CreateSetParametersJob(
+				parentID, partitionID, partition->Parameters()));
+			if (error != B_OK)
+				return error;
+		}
+	}
+	if (partition->DiskSystem()) {
+		// initialize the partition, if required
+		if (partition->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION) {
+			status_t error = _AddJob(fJobFactory->CreateInitializeJob(
+				partitionID, partition->DiskSystem()->ID(),
+				partition->ContentName(), partition->ContentParameters()));
+			if (error != B_OK)
+				return error;
+		} else {
+			// partition not (re-)initialized, set content properties
+			// content name
+			if ((partition->ChangeFlags() & B_PARTITION_CHANGED_NAME)
+				|| compare_string(partition->ContentName(),
+								  physicalPartition->ContentName())) {
+				status_t error = _AddJob(fJobFactory->CreateSetContentNameJob(
+					partitionID, partition->ContentName()));
+				if (error != B_OK)
+					return error;
+			}
+			// content parameters
+			if ((partition->ChangeFlags() & B_PARTITION_CHANGED_PARAMETERS)
+				|| compare_string(partition->ContentParameters(),
+								  physicalPartition->ContentParameters())) {
+				status_t error = _AddJob(
+					fJobFactory->CreateSetContentParametersJob(
+						partitionID, partition->ContentParameters()));
+				if (error != B_OK)
+					return error;
+			}
+			// defragment
+			if (partition->ChangeFlags()
+				& B_PARTITION_CHANGED_DEFRAGMENTATION) {
+				status_t error = _AddJob(fJobFactory->CreateDefragmentJob(
+					partitionID));
+				if (error != B_OK)
+					return error;
+			}
+			// check / repair
+			bool repair = (partition->ChangeFlags()
+						   & B_PARTITION_CHANGED_REPAIR);
+			if ((partition->ChangeFlags() & B_PARTITION_CHANGED_CHECK)
+				|| repair) {
+				status_t error = _AddJob(fJobFactory->CreateRepairJob(
+					partitionID, repair));
+				if (error != B_OK)
+					return error;
+			}
+		}
+	}
+	// recurse
+	for (int32 i = 0; KPartition *_child = partition->ChildAt(i); i++) {
+		KShadowPartition *child = dynamic_cast<KShadowPartition *>(_child);
+		if (!child)
+			return B_BAD_VALUE;
+		status_t error = _GenerateRemainingJobs(partition, child);
 		if (error != B_OK)
 			return error;
 	}

@@ -41,6 +41,8 @@ private:
 	status_t _GenerateChildPlacementJobs(KPartition *partition);
 	status_t _GenerateMoveJob(KPartition *partition);
 	status_t _CollectContentsToMove(KPartition *partition);
+	status_t _GenerateRemainingJobs(KShadowPartition *parent,
+									KShadowPartition *partition);
 
 	void _PushPartitionID(partition_id id);
 	static int _CompareMoveInfoPosition(const void *_a, const void *_b);
