@@ -52,7 +52,7 @@ class TextOutput : public RTF::Worker {
 		virtual void Text(RTF::Text *text);
 
 	private:
-		void GetStyle(text_run *current) throw (status_t);
+		void PrepareTextRun(text_run *current) throw (status_t);
 
 		BDataIO				*fTarget;
 		int32				fOffset;
@@ -134,12 +134,43 @@ next_line(conversion_context &context, const char *prefix,
 
 
 static size_t
+write_unicode_char(conversion_context &context, uint32 c,
+	BDataIO *target) throw (status_t)
+{
+	size_t length = 1;
+	char bytes[4];
+
+	if (c < 0x80)
+		bytes[0] = c;
+	else if (c < 0x800) {
+		bytes[0] = 0xc0 | (c >> 6);
+		bytes[1] = 0x80 | (c & 0x3f);
+		length = 2;
+	} else if (c < 0x10000) {
+		bytes[0] = 0xe0 | (c >> 12);
+		bytes[1] = 0x80 | ((c >> 6) & 0x3f);
+		bytes[2] = 0x80 | (c & 0x3f);
+		length = 3;
+	} else if (c <= 0x10ffff) {
+		bytes[0] = 0xf0 | (c >> 18);
+		bytes[1] = 0x80 | ((c >> 12) & 0x3f);
+		bytes[2] = 0x80 | ((c >> 6) & 0x3f);
+		bytes[3] = 0x80 | (c & 0x3f);
+		length = 4;
+	}
+
+	write_text(context, bytes, length, target);
+	return length;
+}
+
+
+static size_t
 process_command(conversion_context &context, RTF::Command *command,
 	BDataIO *target) throw (status_t)
 {
 	const char *name = command->Name();
 
-	if (!strcmp(name, "par")) {
+	if (!strcmp(name, "par") || !strcmp(name, "line")) {
 		// paragraph ended
 		return next_line(context, "\n", target);
 	}
@@ -156,6 +187,10 @@ process_command(conversion_context &context, RTF::Command *command,
 	if (!strcmp(name, "tab")) {
 		return write_text(context, "\t", target);
 	}
+	if (!strcmp(name, "'")) {
+		return write_unicode_char(context, command->Option(), target);
+	}
+
 	if (!strcmp(name, "pard")) {
 		// reset paragraph
 		context.first_line_indent = 0;
@@ -213,6 +248,57 @@ set_font_face(BFont &font, uint16 face, bool on)
 	else
 		font.SetFace(font.Face() & ~face);
 }
+
+
+static bool
+text_runs_are_equal(text_run *a, text_run *b)
+{
+	if (a == NULL && b == NULL)
+		return true;
+
+	if (a == NULL || b == NULL)
+		return false;
+
+	return a->offset == b->offset
+		&& !memcmp(&a->color, &b->color, sizeof(rgb_color))
+		&& a->font == b->font;
+}
+
+
+static text_run *
+copy_text_run(text_run *run)
+{
+	static const rgb_color kBlack = {0, 0, 0, 255};
+
+	text_run *newRun = new text_run();
+	if (newRun == NULL)
+		throw (status_t)B_NO_MEMORY;
+
+	if (run != NULL) {
+		newRun->offset = run->offset;
+		newRun->font = run->font;
+		newRun->color = run->color;
+	} else {
+		newRun->offset = 0;
+		newRun->color = kBlack;
+	}
+
+	return newRun;
+}
+
+
+#if 0
+void
+dump_text_run(text_run *run)
+{
+	if (run == NULL)
+		return;
+
+	printf("run: offset = %ld, color = {%d,%d,%d}, font = ",
+		run->offset, run->color.red, run->color.green, run->color.blue);
+	run->font.PrintToStream();
+}
+#endif
 
 
 //	#pragma mark -
@@ -277,23 +363,12 @@ TextOutput::FlattenedRunArray(int32 &_size)
 
 
 void
-TextOutput::GetStyle(text_run *run) throw (status_t)
+TextOutput::PrepareTextRun(text_run *run) throw (status_t)
 {
-	static const rgb_color kBlack = {0, 0, 0, 255};
-
 	if (run != NULL && fOffset == run->offset)
 		return;
 
-	text_run *newRun = new text_run();
-	if (newRun == NULL)
-		throw (status_t)B_NO_MEMORY;
-
-	// take over previous styles
-	if (run != NULL) {
-		newRun->font = run->font;
-		newRun->color = run->color;
-	} else
-		newRun->color = kBlack;
+	text_run *newRun = copy_text_run(run);
 
 	newRun->offset = fOffset;
 
@@ -305,23 +380,51 @@ TextOutput::GetStyle(text_run *run) throw (status_t)
 void
 TextOutput::Group(RTF::Group *group)
 {
-	if (group->Destination() != RTF::TEXT_DESTINATION)
+	if (group->Destination() != RTF::TEXT_DESTINATION) {
 		Skip();
+		return;
+	}
 
-	fGroupStack.Push(fCurrentRun);
+	if (!fProcessRuns)
+		return;
+
+	// We only push a copy of the run on the stack because the current
+	// run may still be changed in the new group -- later, we'll just
+	// see if that was the case, and either use the copied one then,
+	// or throw it away
+	text_run *run = NULL;
+	if (fCurrentRun != NULL)
+		run = copy_text_run(fCurrentRun);
+
+	fGroupStack.Push(run);
 }
 
 
 void
 TextOutput::GroupEnd(RTF::Group *group)
 {
+	if (!fProcessRuns)
+		return;
+
 	text_run *last;
 	fGroupStack.Pop(&last);
 
 	// has the style been changed?
-	if (last != NULL && fCurrentRun != NULL
-		&& last->offset != fCurrentRun->offset)
-		GetStyle(last);
+	if (!text_runs_are_equal(last, fCurrentRun)) {
+		if (fCurrentRun != NULL && last != NULL
+			&& fCurrentRun->offset == fOffset) {
+			// replace the current one, we don't need it anymore
+			fCurrentRun->color = last->color;
+			fCurrentRun->font = last->font;
+			delete last;
+		} else if (last) {
+			// adopt the text_run from the previous group
+			last->offset = fOffset;
+			fRuns.AddItem(last);
+			fCurrentRun = last;
+		}
+	} else
+		delete last;
 }
 
 
@@ -337,28 +440,28 @@ TextOutput::Command(RTF::Command *command)
 
 	if (!strcmp(name, "cf")) {
 		// foreground color
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		fCurrentRun->color = Start().Color(command->Option());
 	} else if (!strcmp(name, "b")
 		|| !strcmp(name, "embo") || !strcmp(name, "impr")) {
 		// bold style ("emboss" and "engrave" are currently the same, too)
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_BOLD_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "i")) {
 		// bold style
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_ITALIC_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "ul")) {
 		// bold style
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		set_font_face(fCurrentRun->font, B_UNDERSCORE_FACE, command->Option() != 0);
 	} else if (!strcmp(name, "fs")) {
 		// font size in half points
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		fCurrentRun->font.SetSize(command->Option() / 2.0);
 	} else if (!strcmp(name, "plain")) {
 		// reset font to plain style
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		fCurrentRun->font = be_plain_font;
 	} else if (!strcmp(name, "f")) {
 		// font number
@@ -366,7 +469,7 @@ TextOutput::Command(RTF::Command *command)
 		if (fonts == NULL)
 			return;
 
-		GetStyle(fCurrentRun);
+		PrepareTextRun(fCurrentRun);
 		BFont font;
 			// missing font info will be replaced by the default font
 
