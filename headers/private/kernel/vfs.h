@@ -24,6 +24,7 @@
 
 
 struct kernel_args;
+struct vm_cache_ref;
 struct file_descriptor;
 struct selectsync;
 struct pollfd;
@@ -67,6 +68,7 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
 status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
+status_t vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 int vfs_put_vnode_ptr(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
@@ -74,7 +76,7 @@ status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
 bool vfs_can_page(void *vnode, void *cookie);
 status_t vfs_read_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_write_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
-status_t vfs_get_vnode_cache(void *vnode, void **_cache);
+status_t vfs_get_vnode_cache(void *vnode, struct vm_cache_ref **_cache);
 status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
 status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node);
 
