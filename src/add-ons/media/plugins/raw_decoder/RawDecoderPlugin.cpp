@@ -492,10 +492,10 @@ RawDecoderPlugin::RegisterDecoder()
 
 	// audio decoder
 
-	description.family = B_MISC_FORMAT_FAMILY;
+	description.family = B_BEOS_FORMAT_FAMILY;
 	description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-	format.type = B_MEDIA_ENCODED_AUDIO;
-	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+	format.type = B_MEDIA_RAW_AUDIO;
+	format.u.raw_audio = media_multi_audio_format::wildcard;
 
 	status_t status = formats.MakeFormatFor(&description, 1, &format);
 	if (status < B_OK)
@@ -504,8 +504,8 @@ RawDecoderPlugin::RegisterDecoder()
 	// video decoder
 
 	description.u.beos.format = B_BEOS_FORMAT_RAW_VIDEO;
-	format.type = B_MEDIA_ENCODED_VIDEO;
-	format.u.encoded_video = media_encoded_video_format::wildcard;
+	format.type = B_MEDIA_RAW_VIDEO;
+	format.u.raw_video = media_raw_video_format::wildcard;
 
 	return formats.MakeFormatFor(&description, 1, &format);
 }
