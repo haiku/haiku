@@ -1257,7 +1257,7 @@ void DisplayDriverPainter::Invalidate(const BRect &r)
 void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 {
 	if (Lock()) {
-		if (!region || !region->Frame().IsValid()) {
+		if (!region) { 
 //			BRegion empty;
 //			fPainter->ConstrainClipping(empty);
 			if (RenderingBuffer* buffer = fGraphicsCard->BackBuffer()) {
