@@ -6,11 +6,13 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        MouseWindow.h
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :   December 10, 2003
-// 
+//  File:			MouseWindow.h
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #ifndef MOUSE_WINDOW_H
 #define MOUSE_WINDOW_H
@@ -38,8 +40,5 @@ class MouseWindow : public BWindow {
 		BButton			*fRevertButton;
 		SettingsView	*fSettingsView;
 };
-
-#define kBorderSpace	10
-#define	kItemSpace		7
 
 #endif	/* MOUSE_WINDOW_H */

@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include "MouseWindow.h"
-#include "MouseMessages.h"
+#include "MouseConstants.h"
 #include "SettingsView.h"
 
 
@@ -83,20 +83,8 @@ MouseWindow::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case BUTTON_DEFAULTS: {
 			// reverts to default settings
-			fSettingsView->dcSpeedSlider->SetValue(500);
-			fSettingsView->dcSpeedSlider->Invoke();
-			fSettingsView->mouseSpeedSlider->SetValue(500);
-			fSettingsView->mouseSpeedSlider->Invoke();
-			fSettingsView->mouseAccSlider->SetValue(500);
-			fSettingsView->mouseAccSlider->Invoke();
-			fSettingsView->focusMenu->ItemAt(0)->SetMarked(true);
-			set_mouse_type(3);
-			fSettingsView->mouseTypeMenu->ItemAt(2)->SetMarked(true);
-			set_mouse_mode(B_NORMAL_MOUSE);
-			fSettingsView->fCurrentMouseMap.button[0] = B_PRIMARY_MOUSE_BUTTON;
-			fSettingsView->fCurrentMouseMap.button[1] = B_SECONDARY_MOUSE_BUTTON;
-			fSettingsView->fCurrentMouseMap.button[2] = B_TERTIARY_MOUSE_BUTTON;
-			set_mouse_map(&fSettingsView->fCurrentMouseMap);
+			fSettings.Defaults();
+			fSettingsView->UpdateFromSettings();
 
 			SetRevertable(true);
 			break;
@@ -104,88 +92,86 @@ MouseWindow::MessageReceived(BMessage *message)
 
 		case BUTTON_REVERT: {
 			// revert to last settings
-			fSettingsView->Init();
 			fSettings.Revert();
-			//fSettingsView->Update();
+			fSettingsView->UpdateFromSettings();
 
 			SetRevertable(false);
 			break;
 		}
 
-		case POPUP_MOUSE_TYPE: {
-			status_t err = set_mouse_type(fSettingsView->mouseTypeMenu->IndexOf(fSettingsView->mouseTypeMenu->FindMarked())+1);
-			if (err < B_OK)
-				printf("error while setting mouse type : %s\n", strerror(err));
-
-			SetRevertable(true);
-			break;
-		}
-
-		case POPUP_MOUSE_FOCUS: {
-			mode_mouse mouse_mode = B_NORMAL_MOUSE;
-			switch (fSettingsView->focusMenu->IndexOf(fSettingsView->focusMenu->FindMarked())) {
-				case 0: mouse_mode = B_NORMAL_MOUSE; break;
-				case 1: mouse_mode = B_FOCUS_FOLLOWS_MOUSE; break;
-				case 2: mouse_mode = B_WARP_MOUSE; break;
-				case 3: mouse_mode = B_INSTANT_WARP_MOUSE; break;
+		case POPUP_MOUSE_TYPE:
+		{
+			int32 type;
+			if (message->FindInt32("index", &type) == B_OK) {
+				fSettings.SetMouseType(++type);
+				fSettingsView->SetMouseType(type);
+				SetRevertable(true);
 			}
-			set_mouse_mode(mouse_mode);
-
-			SetRevertable(true);
 			break;
 		}
 
-		case SLIDER_DOUBLE_CLICK_SPEED: {
-			int32 value = fSettingsView->dcSpeedSlider->Value();
-			int32 click_speed;	// slow = 1000000, fast = 0
-			click_speed = (int32) (1000000 - value * 1000); 
-			status_t err = set_click_speed(click_speed);
-			if (err < B_OK)
-				printf("error while setting click speed : %s\n", strerror(err));
-
-			SetRevertable(true);
-			break;
-		}
-
-		case SLIDER_MOUSE_SPEED: {
-			int32 value = fSettingsView->mouseSpeedSlider->Value();
-			int32 mouse_speed;	// slow = 8192, fast = 524287
-			mouse_speed = (int32) pow(2, value * 6 / 1000) * 8192; 
-			status_t err = set_mouse_speed(mouse_speed);
-			if (err < B_OK)
-				printf("error while setting mouse speed : %s\n", strerror(err));
-
-			SetRevertable(true);
-			break;
-		}
-
-		case SLIDER_MOUSE_ACC: {
-			int32 value = fSettingsView->mouseAccSlider->Value();
-			int32 mouse_acc;	// slow = 0, fast = 262144
-			mouse_acc = (int32) pow(value * 4 / 1000, 2) * 16384;
-			status_t err = set_mouse_acceleration(mouse_acc);
-			if (err < B_OK)
-				printf("error while setting mouse acceleration : %s\n", strerror(err));
-
-			SetRevertable(true);
-			break;
-		}
-
-		case POPUP_MOUSE_MAP: {
-			int32 index = fSettingsView->mouseMapMenu->IndexOf(fSettingsView->mouseMapMenu->FindMarked());
-			int32 number = B_PRIMARY_MOUSE_BUTTON;
-			switch (index) {
-				case 0: number = B_PRIMARY_MOUSE_BUTTON; break;
-				case 1: number = B_SECONDARY_MOUSE_BUTTON; break;
-				case 2: number = B_TERTIARY_MOUSE_BUTTON; break;
+		case POPUP_MOUSE_FOCUS:
+		{
+			int32 mode;
+			if (message->FindInt32("mode", &mode) == B_OK) {
+				fSettings.SetMouseMode((mode_mouse)mode);
+				SetRevertable(true);
 			}
-			fSettingsView->fCurrentMouseMap.button[fSettingsView->fCurrentButton] = number;
-			status_t err = set_mouse_map(&fSettingsView->fCurrentMouseMap);
-			fSettingsView->fCurrentButton = -1;
-			if (err < B_OK)
-				printf("error while setting mouse map : %s\n", strerror(err));
+			break;
+		}
 
-			SetRevertable(true);
+		case SLIDER_DOUBLE_CLICK_SPEED:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) == B_OK) {
+				// slow = 1000000, fast = 0
+				fSettings.SetClickSpeed(value * 1000);
+				SetRevertable(true);
+			}
+			break;
+		}
+
+		case SLIDER_MOUSE_SPEED:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) == B_OK) {
+				// slow = 8192, fast = 524287
+				fSettings.SetMouseSpeed((int32)pow(2, value * 6 / 1000) * 8192);
+				SetRevertable(true);
+			}
+			break;
+		}
+
+		case SLIDER_MOUSE_ACC:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) == B_OK) {
+				// slow = 0, fast = 262144
+				fSettings.SetAccelerationFactor((int32)pow(value * 4 / 1000, 2) * 16384);
+				SetRevertable(true);
+			}
+			break;
+		}
+
+		case POPUP_MOUSE_MAP:
+		{
+			int32 index;
+			int32 button;
+			if (message->FindInt32("index", &index) == B_OK
+				&& message->FindInt32("button", &button) == B_OK) {
+				int32 mapping = B_PRIMARY_MOUSE_BUTTON;
+				switch (index) {
+					case 1:
+						mapping = B_SECONDARY_MOUSE_BUTTON;
+						break;
+					case 2:
+						mapping = B_TERTIARY_MOUSE_BUTTON;
+						break;
+				}
+
+				fSettings.SetMapping(button, mapping);
+				SetRevertable(true);
+			}
 			break;
 		}
 
