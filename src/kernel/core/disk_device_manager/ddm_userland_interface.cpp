@@ -10,6 +10,7 @@
 #include <KFileDiskDevice.h>
 #include <KShadowPartition.h>
 
+#include "KDiskDeviceJobGenerator.h"
 #include "UserDataWriter.h"
 
 // get_current_team
@@ -1214,8 +1215,30 @@ status_t
 _kern_commit_disk_device_modifications(partition_id deviceID, port_id port,
 									   int32 token, bool completeProgress)
 {
-	// not implemented
-	return B_ERROR;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the device
+	if (KDiskDevice *device = manager->RegisterDevice(deviceID, true)) {
+		PartitionRegistrar _(device, true);
+		if (DeviceWriteLocker locker = device) {
+			if (device->ShadowOwner() != get_current_team())
+				return B_BAD_VALUE;
+			// generate the jobs
+			KDiskDeviceJobGenerator generator(manager->JobFactory(), device);
+			status_t error = generator.GenerateJobs();
+			if (error != B_OK)
+				return error;
+			// add the jobs to the manager
+			if (ManagerLocker locker2 = manager) {
+				error = manager->AddJobQueue(generator.JobQueue());
+				if (error != B_OK)
+					return error;
+			} else
+				return B_ERROR;
+			// TODO: notification stuff
+			return device->DeleteShadowDevice();
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
 }
 
 // _kern_cancel_disk_device_modifications
