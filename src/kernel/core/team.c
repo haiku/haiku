@@ -11,21 +11,21 @@
 */
 
 #include <OS.h>
-#include <kernel.h>
-#include <thread.h>
-#include <thread_types.h>
+
+#include <team.h>
 #include <int.h>
 #include <khash.h>
-#include <malloc.h>
+#include <port.h>
+#include <sem.h>
 #include <user_runtime.h>
-#include <Errors.h>
 #include <kimage.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <elf.h>
 #include <syscalls.h>
 #include <tls.h>
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TRACE_TEAM 0
 #if TRACE_TEAM
@@ -71,6 +71,8 @@ _dump_team_info(struct team *p)
 	dprintf("id:          0x%lx\n", p->id);
 	dprintf("name:        '%s'\n", p->name);
 	dprintf("next:        %p\n", p->next);
+	dprintf("parent:      %p\n", p->parent);
+	dprintf("children:    %p\n", p->children);
 	dprintf("num_threads: %d\n", p->num_threads);
 	dprintf("state:       %d\n", p->state);
 	dprintf("pending_signals: 0x%x\n", p->pending_signals);
@@ -291,10 +293,56 @@ team_struct_hash(void *_p, const void *_key, uint32 range)
 }
 
 
-void
-team_remove_team_from_hash(struct team *team)
+static void
+insert_team_into_parent(struct team *parent, struct team *team)
 {
-	hash_remove(team_hash, team);
+	ASSERT(parent != NULL);
+
+	team->siblings_next = parent->children;
+	parent->children = team;
+	team->parent = parent;
+}
+
+
+/**	Note: must have TEAM lock held
+ */
+
+static void
+remove_team_from_parent(struct team *parent, struct team *team)
+{
+	struct team *child, *last = NULL;
+
+	for (child = parent->children; child != NULL; child = child->siblings_next) {
+		if (child == team) {
+			if (last == NULL)
+				parent->children = child->siblings_next;
+			else
+				last->siblings_next = child->siblings_next;
+
+			team->parent = NULL;
+			break;
+		}
+		last = child;
+	}
+}
+
+
+/**	Reparent each of our children
+ *	Note: must have TEAM lock held
+ */
+
+static void
+reparent_children(struct team *team)
+{
+	struct team *child = team->children;
+
+	while (child != NULL) {
+		// remove the child from the current proc and add to the parent
+		remove_team_from_parent(team, child);
+		insert_team_into_parent(team->parent, child);
+
+		child = team->children;
+	}
 }
 
 
@@ -360,6 +408,66 @@ error:
 static void
 delete_team_struct(struct team *team)
 {
+	free(team);
+}
+
+
+void
+team_remove_team(struct team *team)
+{
+	hash_remove(team_hash, team);
+	team->state = TEAM_STATE_DEATH;
+
+	// reparent each of the team's children
+	reparent_children(team);
+
+	// remove us from our parent 
+	remove_team_from_parent(team->parent, team);
+}
+
+
+void
+team_delete_team(struct team *team)
+{
+	if (team->num_threads > 0) {
+		// there are other threads still in this team,
+		// cycle through and signal kill on each of the threads
+		// XXX this can be optimized. There's got to be a better solution.
+		cpu_status state;
+		struct thread *temp_thread;
+		char death_sem_name[B_OS_NAME_LENGTH];
+
+		sprintf(death_sem_name, "team %ld death sem", team->id);
+		team->death_sem = create_sem(0, death_sem_name);
+		if (team->death_sem < 0)
+			panic("thread_exit: cannot init death sem for team %ld\n", team->id);
+
+		state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+		// we can safely walk the list because of the lock. no new threads can be created
+		// because of the TEAM_STATE_DEATH flag on the team
+		temp_thread = team->thread_list;
+		while (temp_thread) {
+			struct thread *next = temp_thread->team_next;
+			thread_kill_thread_nowait(temp_thread->id);
+			temp_thread = next;
+		}
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		// wait until all threads in team are dead.
+		acquire_sem_etc(team->death_sem, team->num_threads, 0, 0);
+		delete_sem(team->death_sem);
+	}
+
+	// free team resources
+	vm_put_aspace(team->aspace);
+	vm_delete_aspace(team->_aspace_id);
+	delete_owned_ports(team->id);
+	sem_delete_owned_sems(team->id);
+	remove_images(team);
+	vfs_free_io_context(team->io_context);
+
 	free(team);
 }
 
@@ -485,7 +593,7 @@ team_create_team2(void *args)
 team_id
 team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
-	struct team *team;
+	struct team *team, *parent;
 	thread_id tid;
 	team_id pid;
 	int err;
@@ -497,25 +605,29 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 
 	team = create_team_struct(name, false);
 	if (team == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	pid = team->id;
+	parent = thread_get_current_thread()->team;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
+
 	hash_insert(team_hash, team);
+	insert_team_into_parent(parent, team);
+
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	// copy the args over
 	teamArgs = (struct team_arg *)malloc(sizeof(struct team_arg));
 	if (teamArgs == NULL){
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err1;
 	}
 	teamArgs->path = strdup(path);
 	if (teamArgs->path == NULL){
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err2;
 	}
 	teamArgs->argc = argc;
@@ -562,7 +674,10 @@ err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
+
+	remove_team_from_parent(parent, team);
 	hash_remove(team_hash, team);
+
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	delete_team_struct(team);
