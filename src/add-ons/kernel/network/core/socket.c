@@ -358,10 +358,11 @@ int socket_shutdown(struct socket *so, int how)
 {
 	struct protosw *pr = so->so_proto;
 	
+	/* adjust value so the first two bits define RECV and SEND */
 	how++;
-	if (how & SHUT_RD)
+	if (how & SHUTDOWN_RECV)
 		sorflush(so);
-	if (how & SHUT_WR)
+	if (how & SHUTDOWN_SEND)
 		return pr->pr_userreq(so, PRU_SHUTDOWN, NULL, NULL, NULL);
 	return 0;
 }
