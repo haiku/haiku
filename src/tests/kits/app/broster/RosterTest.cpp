@@ -3,6 +3,7 @@
 #include "GetAppInfoTester.h"
 #include "GetAppListTester.h"
 #include "IsRunningTester.h"
+#include "LaunchTester.h"
 #include "TeamForTester.h"
 
 CppUnit::Test* RosterTestSuite()
@@ -13,6 +14,7 @@ CppUnit::Test* RosterTestSuite()
 	testSuite->addTest(GetAppInfoTester::Suite());
 	testSuite->addTest(GetAppListTester::Suite());
 	testSuite->addTest(IsRunningTester::Suite());
+	testSuite->addTest(LaunchTester::Suite());
 	testSuite->addTest(TeamForTester::Suite());
 
 	return testSuite;
