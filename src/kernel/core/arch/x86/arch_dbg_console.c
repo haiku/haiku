@@ -1,7 +1,11 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 /*
 ** Modified 2001/09/05 by Rob Judd<judd@ob-wan.com>
 ** Modified 2002/09/28 by Marcus Overhagen <marcus@overhagen.de>
@@ -26,27 +30,6 @@
 #define USE_COM1 1
 
 static const int dbg_baud_rate = 115200;
-
-
-int
-arch_dbg_con_init(kernel_args *ka)
-{
-	short divisor = 115200 / dbg_baud_rate;
-
-#if USE_COM1
-	out8(0x80, 0x3fb);	/* set up to load divisor latch	*/
-	out8(divisor & 0xf, 0x3f8);		/* LSB */
-	out8(divisor >> 8, 0x3f9);		/* MSB */
-	out8(3, 0x3fb);		/* 8N1 */
-#else // COM2
-	out8(0x80, 0x2fb);	/* set up to load divisor latch	*/
-	out8(divisor & 0xf, 0x2f8);		/* LSB */
-	out8(divisor >> 8, 0x2f9);		/* MSB */
-	out8(3, 0x2fb);		/* 8N1 */
-#endif
-
-	return 0;
-}
 
 
 char
@@ -148,5 +131,36 @@ arch_dbg_con_puts(const char *s)
 		arch_dbg_con_putch(*s);
 		s++;
 	}
+}
+
+
+void
+arch_dbg_con_early_boot_message(const char *string)
+{
+	// this function will only be called in fatal situations
+	// ToDo: also enable output via text console?!
+	arch_dbg_con_init(NULL);
+	arch_dbg_con_puts(string);
+}
+
+
+status_t
+arch_dbg_con_init(kernel_args *args)
+{
+	short divisor = 115200 / dbg_baud_rate;
+
+#if USE_COM1
+	out8(0x80, 0x3fb);	/* set up to load divisor latch	*/
+	out8(divisor & 0xf, 0x3f8);		/* LSB */
+	out8(divisor >> 8, 0x3f9);		/* MSB */
+	out8(3, 0x3fb);		/* 8N1 */
+#else // COM2
+	out8(0x80, 0x2fb);	/* set up to load divisor latch	*/
+	out8(divisor & 0xf, 0x2f8);		/* LSB */
+	out8(divisor >> 8, 0x2f9);		/* MSB */
+	out8(3, 0x2fb);		/* 8N1 */
+#endif
+
+	return 0;
 }
 
