@@ -39,6 +39,7 @@ extern status_t platform_init_video(void);
 extern void platform_switch_to_logo(void);
 extern void platform_switch_to_text_mode(void);
 extern void platform_start_kernel(void);
+extern void platform_exit(void);
 
 #ifdef __cplusplus
 }
