@@ -24,7 +24,7 @@
 //	Description:	Class for low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
-#include <stdlib.h>
+#include <malloc.h>
 
 #include <ServerProtocol.h>
 #include "PortLink.h"
@@ -131,6 +131,7 @@ status_t PortLink::FlushToSession(){
 // !!!!!!!!!!!!!!!!!!!
 	ses.CopyToSendBuffer(fSendBuffer, fSendPosition - 8);
 	ses.Sync();
+	return B_OK;
 }
 
 status_t PortLink::Attach(const void *data, size_t size)
