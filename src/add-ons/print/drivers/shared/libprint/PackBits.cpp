@@ -9,6 +9,7 @@
 #include <fstream>
 #endif
 
+#include <stdio.h>
 #include <string.h>
 #include "PackBits.h"
 
@@ -29,100 +30,120 @@ enum STATUS {
 	MATCHED
 };
 
-int pack_bits(unsigned char *pOut, unsigned char *pIn, int n)
-{
-	int i;
-	unsigned char *control;
-	unsigned char *runbuf;
-	unsigned char thisbyte;
-	unsigned char runbyte;
-	STATUS status;
+#define WRITE_TO_RUN_BUF(byte) { if (write) *runbuf ++ = byte; else runbuf ++; }
+#define WRITE_CONTROL(byte) { if (write) *control = byte; }
 
-	i = 0;
-	status  = INITIAL;
-	control = runbuf = pOut;
-	runbyte = *pIn++;
-
-	while (--n) {
-		thisbyte = *pIn++;
-		switch (status) {
-		case INITIAL:
-			control   = runbuf++;
-			*runbuf++ = runbyte;
-			if (thisbyte == runbyte) {
-				status = UNDECIDED;
-			} else {
-				runbyte = thisbyte;
-				status  = UNMATCHED;
-			}
-			i = 1;
-			break;
-
-		case UNDECIDED:
-			if (i == MAXINBYTES) {
-				*control  = CONTROL2(i);
-				*runbuf++ = runbyte;
-				runbyte   = thisbyte;
-				status    = INITIAL;
-			} else if (thisbyte == runbyte) {
-				if (i > 1) {
-					*control = CONTROL2(i - 2);
-					control  = runbuf - 1;
-				}
-				i = 2;
-				status = MATCHED;
-			} else {
-				*runbuf++ = runbyte;
-				runbyte   = thisbyte;
-				status    = UNMATCHED;
-				i++;
-			}
-			break;
-
-		case UNMATCHED:
-			if (i == MAXINBYTES) {
-				*control = CONTROL2(i);
-				status   = INITIAL;
-			} else {
+template <bool write>
+class PackBits {
+public:
+	static int doIt(unsigned char *pOut, const unsigned char *pIn, int n)
+	{
+		int i;
+		unsigned char *control;
+		unsigned char *runbuf;
+		unsigned char thisbyte;
+		unsigned char runbyte;
+		STATUS status;
+	
+		i = 0;
+		status  = INITIAL;
+		control = runbuf = pOut;
+		runbyte = *pIn++;
+	
+		while (--n) {
+			thisbyte = *pIn++;
+			switch (status) {
+			case INITIAL:
+				control   = runbuf++;
+				WRITE_TO_RUN_BUF(runbyte);
 				if (thisbyte == runbyte) {
 					status = UNDECIDED;
+				} else {
+					runbyte = thisbyte;
+					status  = UNMATCHED;
 				}
-				i++;
-			}
-			*runbuf++ = runbyte;
-			runbyte   = thisbyte;
-			break;
-
-		case MATCHED:
-			if ((thisbyte != runbyte) || (i == MAXINBYTES)) {
-				runbuf    = control;
-				*runbuf++ = CONTROL1(i);
-				*runbuf++ = runbyte;
+				i = 1;
+				break;
+	
+			case UNDECIDED:
+				if (i == MAXINBYTES) {
+					WRITE_CONTROL(CONTROL2(i));
+					WRITE_TO_RUN_BUF(runbyte);
+					runbyte   = thisbyte;
+					status    = INITIAL;
+				} else if (thisbyte == runbyte) {
+					if (i > 1) {
+						WRITE_CONTROL(CONTROL2(i - 2));
+						control  = runbuf - 1;
+					}
+					i = 2;
+					status = MATCHED;
+				} else {
+					WRITE_TO_RUN_BUF(runbyte);
+					runbyte   = thisbyte;
+					status    = UNMATCHED;
+					i++;
+				}
+				break;
+	
+			case UNMATCHED:
+				if (i == MAXINBYTES) {
+					WRITE_CONTROL(CONTROL2(i));
+					status   = INITIAL;
+				} else {
+					if (thisbyte == runbyte) {
+						status = UNDECIDED;
+					}
+					i++;
+				}
+				WRITE_TO_RUN_BUF(runbyte);
 				runbyte   = thisbyte;
-				status    = INITIAL;
-			} else {
-				i++;
+				break;
+	
+			case MATCHED:
+				if ((thisbyte != runbyte) || (i == MAXINBYTES)) {
+					runbuf    = control;
+					WRITE_TO_RUN_BUF(CONTROL1(i));
+					WRITE_TO_RUN_BUF(runbyte);
+					runbyte   = thisbyte;
+					status    = INITIAL;
+				} else {
+					i++;
+				}
+				break;
 			}
+		}
+	
+		switch (status) {
+		case INITIAL:
+			WRITE_TO_RUN_BUF(CONTROL2(1));
+			break;
+		case UNDECIDED:
+		case UNMATCHED:
+			WRITE_CONTROL(CONTROL2(i));
+			break;
+		case MATCHED:
+			runbuf    = control;
+			WRITE_TO_RUN_BUF(CONTROL1(i));
 			break;
 		}
+		WRITE_TO_RUN_BUF(runbyte);
+	
+		return runbuf - pOut;
 	}
+};
 
-	switch (status) {
-	case INITIAL:
-		*runbuf++ = CONTROL2(1);
-		break;
-	case UNDECIDED:
-	case UNMATCHED:
-		*control  = CONTROL2(i);
-		break;
-	case MATCHED:
-		runbuf    = control;
-		*runbuf++ = CONTROL1(i);
-		break;
-	}
-	*runbuf++ = runbyte;
 
-	return runbuf - pOut;
+int pack_bits_size(const unsigned char *pIn, int n)
+{
+	PackBits<false> calculateSize;
+	return calculateSize.doIt(NULL, pIn, n);
+}
+
+int pack_bits(unsigned char *pOut, const unsigned char *pIn, int n)
+{
+	PackBits<true> compress;
+	return compress.doIt(pOut, pIn, n);
 }
 
 #ifdef DBG_CON_STREAM
@@ -132,24 +153,35 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	ifstream ifs(*++argv, ios::binary | ios::nocreate);
-	if (!ifs) {
+	FILE *input = fopen(*++argv, "rb");
+	if (input == NULL) {
 		return -1;
 	}
 
-	ifs.seekg(0, ios::end);
-	long size = ifs.tellg();
-	ifs.seekg(0, ios::beg);
+	FILE *output = fopen("rle.out", "wb");
+	if (output == NULL) {
+		fclose(input);
+		return -1;
+	}
+
+	fseek(input, 0, SEEK_END);
+	long size = ftell(input);
+	fseek(input, 0, SEEK_SET);
 
 	unsigned char *pIn  = new unsigned char[size];
-	unsigned char *pOut = new unsigned char[size * 3];
+	fread(pIn, size, 1, input);
 
-	ifs.read(pIn, size);
+	long outSize = pack_bits_size(pIn, size);
+	printf("input size: %d\noutput size: %d\n", (int)size, (int)outSize);
 
-	int cnt = PackBits(pOut, pIn, size);
+	unsigned char *pOut = new unsigned char[outSize];
 
-	ofstream ofs("test.bin", ios::binary);
-	ofs.write(pOut, cnt);
+	int cnt = pack_bits(pOut, pIn, size);
+
+	fwrite(pOut, cnt, 1, output);
+
+	fclose(input);
+	fclose(output);
 
 	delete [] pIn;
 	delete [] pOut;
