@@ -30,6 +30,8 @@
 
 #include "TextViewSupportBuffer.h"
 
+class BFont; // forward declaration
+
 // TODO: enable this as soon as we are sure opentracker works
 // with our libraries, since using a BFont here (as Dano does) is much better,
 // as fonts can be classified also by spacing mode and other attributes.
