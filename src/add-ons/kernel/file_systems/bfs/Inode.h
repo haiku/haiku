@@ -319,8 +319,8 @@ inline
 CachedBlock::CachedBlock(CachedBlock *cached)
 	:
 	fVolume(cached->fVolume),
-	fBlock(cached->fBlock),
-	fBlockNumber(cached->BlockNumber())
+	fBlockNumber(cached->BlockNumber()),
+	fBlock(cached->fBlock)
 {
 	cached->Keep();
 }
