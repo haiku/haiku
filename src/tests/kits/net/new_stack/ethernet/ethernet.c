@@ -27,7 +27,6 @@ enum {
 typedef struct ethernet_interface {
 	ifnet_t ifnet;
 	int 	fd;
-	int		mtu;
 } ethernet_interface;
 
 #define	ETHER_ADDR_LEN	6	/* Ethernet address length		*/
@@ -44,7 +43,6 @@ typedef struct        ether_addr {
         uint8 byte[ETHER_ADDR_LEN]; 
 } ether_addr_t; 
 
-	
 status_t	lookup_devices(char *root, void *cookie);
 status_t 	std_ops(int32 op, ...);
 
@@ -89,7 +87,6 @@ status_t send(ifnet_t *iface, net_data *data)
 	if (!data)
 		return B_ERROR;
 
-		
 	return B_OK;
 }
 
@@ -100,7 +97,7 @@ status_t receive(ifnet_t *iface, net_data **data)
 	net_data *nd;
 	void *frame;
 	size_t len;
-	status_t status;
+	ssize_t sz;
 	
 	len = iface->if_mtu;
 	frame = malloc(len);
@@ -113,16 +110,16 @@ status_t receive(ifnet_t *iface, net_data **data)
 		return B_NO_MEMORY;
 	};
 		
-	status = read(ei->fd, frame, len);
-	if (status >= B_OK) {
-		g_stack->append_data(nd, frame, status, free);
+	sz = read(ei->fd, frame, len);
+	if (sz >= B_OK) {
+		g_stack->append_data(nd, frame, sz, (data_node_free_func) free);
 		*data = nd;
-		return status;
+		return sz;
 	};
 	
 	free(frame);
 	g_stack->delete_data(nd, false);
-	return status;
+	return sz;
 }
 	
 status_t control(ifnet_t *iface, int opcode, void *arg) { return -1; }
@@ -222,11 +219,13 @@ status_t lookup_devices(char *root, void *cookie)
 			
 
 
-			iface = (ifnet_t *) malloc(sizeof(*iface));
-			if (!iface)
+			ei = (ethernet_interface *) malloc(sizeof(*ei));
+			if (!ei)
 				break;		
 
-			ei = (ethernet_interface *) iface;
+			ei->fd = fd;
+
+			iface = &ei->ifnet;
 
 			iface->if_name 	= strdup(path);
 			iface->if_flags = (IFF_BROADCAST|IFF_SIMPLEX|IFF_MULTICAST);
@@ -234,14 +233,13 @@ status_t lookup_devices(char *root, void *cookie)
 			iface->if_mtu 	= frame_size;
 			
 			iface->module = &nimi;
-			ei->fd = fd;
 			
 			status = g_stack->register_interface(iface);
 		};
 	};
 	
 	closedir(dir);
-		                
+	
 	return status;
 }
 
