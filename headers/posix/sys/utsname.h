@@ -7,7 +7,11 @@
 #ifndef _SYS_UTSNAME_H
 #define _SYS_UTSNAME_H
 
+#ifdef __HAIKU__
 #define _SYS_NAMELEN 256
+#else
+#define _SYS_NAMELEN 32		// R5 compatibility
+#endif
 
 #ifdef __cplusplus
 extern "C" {
