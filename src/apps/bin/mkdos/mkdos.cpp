@@ -613,6 +613,8 @@ void CreateVolumeLabel(void *sector, const char *label)
 void PrintUsage()
 {
 	printf("\n");
+	printf("(c) 2002 by Marcus Overhagen\n");
+	printf("\n");
 	printf("usage: mkdos [-n] [-t] [-f 12|16|32] device [volume_label]\n");
 	printf("       -n, --noprompt  do not prompt before writing\n");
 	printf("       -t, --test      enable test mode (will not write to disk)\n");
