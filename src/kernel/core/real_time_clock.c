@@ -97,6 +97,22 @@ set_real_time_clock(uint32 currentTime)
 }
 
 
+uint32
+real_time_clock(void)
+{
+	// ToDo: implement me - they might be used directly from libroot/os/time.c
+	return (sBootTime + system_time()) / 1000000;
+}
+
+
+bigtime_t
+real_time_clock_usecs(void)
+{
+	// ToDo: implement me - they might be used directly from libroot/os/time.c
+	return sBootTime + system_time();
+}
+
+
 //	#pragma mark -
 //	public userland API
 
