@@ -40,7 +40,7 @@
  * This code is large and complicated...
  */
 
-#include <ktypes.h>
+#include <sys/types.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,9 +48,9 @@
 #include <errno.h>
 
 #ifdef __STDC__
-#include <stdarg.h>
+#	include <stdarg.h>
 #else
-#include <varargs.h>
+#	include <varargs.h>
 #endif
 
 #include "local.h"  
@@ -65,33 +65,31 @@ static int __grow_type_table (unsigned char **typetable,
  * Flush out all the vectors defined by the given uio,
  * then reset it so that it can be reused.
  */
+
 static int
-__sprint(fp, uio)
-	FILE *fp;
-	register struct __suio *uio;
+__sprint(FILE *fp, register struct __suio *uio)
 {
 	register int err;
 
 	if (uio->uio_resid == 0) {
 		uio->uio_iovcnt = 0;
-		return (0);
+		return 0;
 	}
 	err = __sfvwrite(fp, uio);
 	uio->uio_resid = 0;
 	uio->uio_iovcnt = 0;
-	return (err);
+	return err;
 }
+
 
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
  * worries about ungetc buffers and so forth.
  */
+
 static int
-__sbprintf(fp, fmt, ap)
-	register FILE *fp;
-	const char *fmt;
-	va_list ap;
+__sbprintf(register FILE *fp, const char *fmt, va_list ap)
 {
 	int ret;
 	FILE fake;
@@ -155,11 +153,9 @@ static int exponent (char *, int, int);
 #define	SHORTINT	0x040		/* short integer */
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
+
 int
-vfprintf(fp, fmt0, ap)
-	FILE *fp;
-	const char *fmt0;
-	va_list ap;
+vfprintf(FILE *fp, const char *fmt0, va_list ap)
 {
 	register char *fmt;	/* format string */
 	register int ch;	/* character from fmt */
@@ -788,17 +784,16 @@ error:
 #define TP_CHAR		15
 #define TP_VOID		16
 
+
 /*
  * Find all arguments when a positional parameter is encountered.  Returns a
  * table, indexed by argument number, of pointers to each arguments.  The
  * initial argument table should be an array of STATIC_ARG_TBL_SIZE entries.
  * It will be replaces with a malloc-ed on if it overflows.
  */ 
+
 static void
-__find_arguments(fmt0, ap, argtable)
-	const char *fmt0;
-	va_list ap;
-	va_list **argtable;
+__find_arguments(const char *fmt0, va_list ap, va_list **argtable)
 {
 	register char *fmt;	/* format string */
 	register int ch;	/* character from fmt */
@@ -900,16 +895,21 @@ reswitch:	switch (ch) {
 				goto rflag;
 			}
 			goto reswitch;
-#ifdef FLOATING_POINT
 		case 'L':
-			flags |= LONGDBL;
-			goto rflag;
+			flags |= QUADINT
+#ifdef FLOATING_POINT
+			LONGDBL
 #endif
+			;
+			goto rflag;
 		case 'h':
 			flags |= SHORTINT;
 			goto rflag;
 		case 'l':
-			flags |= LONGINT;
+			if (flags & LONGINT)
+				flags |= QUADINT;
+			else
+				flags |= LONGINT;
 			goto rflag;
 		case 'q':
 			flags |= QUADINT;
@@ -1061,13 +1061,13 @@ done:
 		free(typetable);
 }
 
+
 /*
  * Increase the size of the type table.
  */
+
 static int
-__grow_type_table(typetable, tablesize)
-	unsigned char **typetable;
-	int *tablesize;
+__grow_type_table(unsigned char **typetable, int *tablesize)
 {
 	unsigned char *oldtable = *typetable;
 	int newsize = *tablesize * 2;
@@ -1094,10 +1094,7 @@ __grow_type_table(typetable, tablesize)
 extern char *__dtoa __P((double, int, int, int *, int *, char **));
 
 static char *
-cvt(value, ndigits, flags, sign, decpt, ch, length)
-	double value;
-	int ndigits, flags, *decpt, ch, *length;
-	char *sign;
+cvt(double value, int ndigits, int flags, char *sign, int *decpt, int ch, int *length)
 {
 	int mode, dsgn;
 	char *digits, *bp, *rve;
@@ -1137,10 +1134,9 @@ cvt(value, ndigits, flags, sign, decpt, ch, length)
 	return (digits);
 }
 
+
 static int
-exponent(p0, exp, fmtch)
-	char *p0;
-	int exp, fmtch;
+exponent(char *p0, int exp, int fmtch)
 {
 	register char *p, *t;
 	char expbuf[MAXEXP];
