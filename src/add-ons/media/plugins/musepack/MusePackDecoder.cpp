@@ -3,7 +3,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-
+#include <stdio.h>
 #include "MusePackDecoder.h"
 #include "mpc/in_mpc.h"
 
@@ -37,7 +37,7 @@ MusePackDecoder::Setup(media_format *ioEncodedFormat, const void *infoBuffer, in
 
 	fDecoder = (MPC_decoder *)infoBuffer;
 	fFrameRate = fDecoder->fInfo->simple.SampleFreq;
-	fStartTime = 0;
+	fFramePosition = 0;
 	return B_OK;
 }
 
@@ -52,7 +52,7 @@ MusePackDecoder::NegotiateOutputFormat(media_format *format)
 	format->u.raw_audio.channel_count = fDecoder->fInfo->simple.Channels;
 	format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	format->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	format->u.raw_audio.buffer_size = sizeof(MPC_SAMPLE_FORMAT) * FRAMELEN * 2 * 2;
+	format->u.raw_audio.buffer_size = sizeof(MPC_SAMPLE_FORMAT) * FRAMELEN * 2;
 		// the buffer size is hardcoded in the MPC engine...
 
 	if (format->u.raw_audio.channel_mask == 0) {
@@ -67,8 +67,8 @@ MusePackDecoder::NegotiateOutputFormat(media_format *format)
 status_t 
 MusePackDecoder::Seek(uint32 seekTo, int64 seekFrame, int64 *frame, bigtime_t seekTime, bigtime_t *time)
 {
-	fStartTime = 0;
-	return B_OK;
+	fFramePosition = 0;
+	return B_ERROR;
 }
 
 
@@ -77,15 +77,18 @@ MusePackDecoder::Decode(void *buffer, int64 *_frameCount, media_header *mediaHea
 {
 	// ToDo: add error checking (check for broken frames)
 
-	mediaHeader->start_time = fStartTime;
+	mediaHeader->start_time = (bigtime_t) ((1000 * fFramePosition) / (fFrameRate / 1000.0));
+
+//	printf("MusePackDecoder::Decode, start-time %.3f, played-frames %Ld\n", mediaHeader->start_time / 1000000.0, fFramePosition);
 
 	uint32 ring = fDecoder->Zaehler;
-	off_t frameCount = fDecoder->DECODE((MPC_SAMPLE_FORMAT *)buffer);
+	int frameCount = fDecoder->DECODE((MPC_SAMPLE_FORMAT *)buffer);
+	frameCount /= 2;
 	fDecoder->UpdateBuffer(ring);
 
-	fStartTime += bigtime_t(1000.0 * frameCount * FRAMELEN / (fFrameRate / 1000) + 0.5);
+	fFramePosition += frameCount;
 	*_frameCount = frameCount;
 
-	return B_OK;
+	return frameCount > 0 ? B_OK : B_LAST_BUFFER_ERROR;
 }
 
