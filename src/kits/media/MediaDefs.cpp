@@ -626,26 +626,23 @@ status_t
 media_format::SetMetaData(const void *data,
 						  size_t size)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	meta_data = data;
+	meta_data_size = size;
+	return B_OK;
 }
 
 
 const void *
 media_format::MetaData() const
 {
-	UNIMPLEMENTED();
-	return NULL;
+	return meta_data;
 }
 
 
 int32
 media_format::MetaDataSize() const
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	return meta_data_size;
 }
 
 // final
