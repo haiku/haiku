@@ -5,21 +5,21 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
-#include <Errors.h>
-#include <kerrors.h>
+
+#include <OS.h>
 #include <elf.h>
 #include <vfs.h>
 #include <vm.h>
 #include <thread.h>
 #include <debug.h>
-#include <malloc.h>
-#include <stdlib.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
 #include <elf_priv.h>
+#include <boot/elf.h>
 
+#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -46,8 +46,10 @@ static mutex image_lock;
 static mutex image_load_lock;
 static image_id next_image_id = 0;
 
+static status_t elf_unload_image(struct elf_image_info *image);
 
-int
+
+status_t
 elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
 {
 	struct elf_image_info **ptr;
@@ -107,11 +109,11 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 		if (baseAddress)
 			*baseAddress = found_sym->st_value + found_image->regions[0].delta;
 
-		rv = 0;
+		rv = B_OK;
 	} else {
 		PRINT(("symbol not found!\n"));
 		strlcpy(text, "symbol not found", length);
-		rv = -1;
+		rv = B_ENTRY_NOT_FOUND;
 	}
 
 	mutex_unlock(&image_lock);
@@ -221,13 +223,13 @@ create_image_struct()
 }
 
 
-static unsigned long
+static uint32
 elf_hash(const unsigned char *name)
 {
 	unsigned long hash = 0;
 	unsigned long temp;
 
-	while(*name) {
+	while (*name) {
 		hash = (hash << 4) + *name++;
 		if((temp = hash & 0xf0000000))
 			hash ^= temp >> 24;
@@ -298,7 +300,7 @@ elf_find_symbol(struct elf_image_info *image, const char *name)
 }
 
 
-addr
+addr_t
 elf_lookup_symbol(image_id id, const char *symbol)
 {
 	struct elf_image_info *image;
@@ -324,7 +326,7 @@ elf_lookup_symbol(image_id id, const char *symbol)
 }
 
 
-static int
+static status_t
 elf_parse_dynamic_section(struct elf_image_info *image)
 {
 	struct Elf32_Dyn *d;
@@ -339,7 +341,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 
 	d = (struct Elf32_Dyn *)image->dynamic_ptr;
 	if (!d)
-		return ERR_GENERAL;
+		return B_ERROR;
 
 	for (i = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
@@ -384,14 +386,14 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 
 	// lets make sure we found all the required sections
 	if (!image->symhash || !image->syms || !image->strtab)
-		return ERR_GENERAL;
+		return B_ERROR;
 
 	PRINT(("needed_offset = %d\n", needed_offset));
 
 	if (needed_offset >= 0)
 		image->needed = STRING(image, needed_offset);
 
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -400,7 +402,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
  *	XXX gross hack and needs to be done better
  */
 
-int
+status_t
 elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct elf_image_info *shared_image, const char *sym_prepend,addr *sym_addr)
 {
 	struct Elf32_Sym *sym2;
@@ -416,18 +418,18 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			sym2 = elf_find_symbol(shared_image, new_symname);
 			if (!sym2) {
 				dprintf("!sym2: elf_resolve_symbol: could not resolve symbol '%s'\n", new_symname);
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			// make sure they're the same type
 			if (ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
 				dprintf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", new_symname);
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
 				PRINT(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			*sym_addr = sym2->st_value + shared_image->regions[0].delta;
@@ -436,9 +438,9 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			*sym_addr = sym->st_value;
 			return B_NO_ERROR;
 		case SHN_COMMON:
-			// XXX finish this
+			// ToDo: finish this
 			PRINT(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
-			return ERR_NOT_IMPLEMENTED_YET;
+			return B_ERROR;
 		default:
 			// standard symbol
 			*sym_addr = sym->st_value + image->regions[0].delta;
@@ -490,22 +492,22 @@ static int
 verify_eheader(struct Elf32_Ehdr *eheader)
 {
 	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_ident[4] != ELFCLASS32)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_phoff == 0)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	return 0;
 }
 
 
-int
+status_t
 elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 {
 	struct Elf32_Ehdr eheader;
@@ -532,7 +534,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 
 	if (len != sizeof(eheader)) {
 		// short read
-		err = ERR_INVALID_BINARY;
+		err = B_NOT_AN_EXECUTABLE;
 		goto error;
 	}
 	err = verify_eheader(&eheader);
@@ -544,7 +546,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 	pheaders = (struct Elf32_Phdr *)malloc(eheader.e_phnum * eheader.e_phentsize);
 	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto error;
 	}
 
@@ -598,7 +600,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error allocating region!\n");
-				err = ERR_INVALID_BINARY;
+				err = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
 
@@ -627,7 +629,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 					B_EXACT_ADDRESS, bss_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (id < 0) {
 					dprintf("error allocating bss region: %s!\n", strerror(id));
-					err = ERR_INVALID_BINARY;
+					err = B_NOT_AN_EXECUTABLE;
 					goto error;
 				}
 			}
@@ -643,7 +645,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error mapping text!\n");
-				err = ERR_INVALID_BINARY;
+				err = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
 		}
@@ -653,7 +655,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 
 	*entry = eheader.e_entry;
 
-	err = 0;
+	err = B_OK;
 
 error:
 	if (pheaders)
@@ -702,7 +704,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 	eheader = (struct Elf32_Ehdr *)malloc(sizeof(*eheader));
 	if (!eheader) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto error;
 	}
 
@@ -713,7 +715,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	}
 	if (len != sizeof(*eheader)) {
 		// short read
-		err = ERR_INVALID_BINARY;
+		err = B_NOT_AN_EXECUTABLE;
 		goto error1;
 	}
 	err = verify_eheader(eheader);
@@ -722,7 +724,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 	image = create_image_struct();
 	if (!image) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto error1;
 	}
 	image->vnode = vnode;
@@ -732,7 +734,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	pheaders = (struct Elf32_Phdr *)malloc(eheader->e_phnum * eheader->e_phentsize);
 	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto error2;
 	}
 
@@ -803,7 +805,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 			image->regions[image_region].size, B_FULL_LOCK, protection);
 		if (image->regions[image_region].id < 0) {
 			dprintf("error allocating region!\n");
-			err = ERR_INVALID_BINARY;
+			err = B_NOT_AN_EXECUTABLE;
 			goto error3;
 		}
 		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
@@ -824,7 +826,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		&& image->regions[0].delta != image->regions[1].delta) {
 		dprintf("could not load binary, fix the region problem!\n");
 		dump_image_info(image);
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto error4;
 	}
 
@@ -873,7 +875,6 @@ error0:
 }
 
 
-static int elf_unload_image(struct elf_image_info *image);
 static int
 elf_unlink_relocs(struct elf_image_info *image)
 {
@@ -908,7 +909,7 @@ elf_unload_image_final(struct elf_image_info *image)
 }
 
 
-static int
+static status_t
 elf_unload_image(struct elf_image_info *image)
 {
 	if (atomic_add(&image->ref_count, -1) > 0)
@@ -921,7 +922,7 @@ elf_unload_image(struct elf_image_info *image)
 }
 
 
-int
+status_t
 elf_unload_kspace(const char *path)
 {
 	int fd;
@@ -942,7 +943,7 @@ elf_unload_kspace(const char *path)
 	image = find_image_by_vnode(vnode);
 	if (!image) {
 		dprintf("Tried to unload image that wasn't loaded (%s)\n", path);
-		err = ERR_NOT_FOUND;
+		err = B_ENTRY_NOT_FOUND;
 		goto error;
 	}
 	
@@ -959,15 +960,17 @@ error0:
 }
 
 
-int
+status_t
 elf_init(kernel_args *ka)
 {
 	area_info areaInfo;
+	struct preloaded_image *image;
 
 	mutex_init(&image_lock, "kimages_lock");
 	mutex_init(&image_load_lock, "kimages_load_lock");
 
-	// build a image structure for the kernel, which has already been loaded
+	// Build a image structure for the kernel, which has already been loaded.
+	// The VM has created areas for it under a known name already
 
 	kernel_image = create_image_struct();
 	kernel_image->name = strdup("kernel");
@@ -1001,8 +1004,16 @@ elf_init(kernel_args *ka)
 	kernel_images = NULL;
 	insert_image_in_list(kernel_image);
 
-	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
+	// Build image structures for all preloaded images.
+	// Again, the VM has already created areas for them.
+	// ToDo: not yet :)
+	for (image = ka->preloaded_images; image != NULL; image = image->next) {
+		//struct elf_image_info *info;
 
-	return 0;
+		dprintf("preloaded image: %s\n", image->name);
+	}
+
+	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
+	return B_OK;
 }
 
