@@ -37,10 +37,12 @@ status_t nv_acc_init()
 	uint16 cnt;
 
 	/* setup PTIMER: */
+	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
 	/* set timer numerator to 8 (in b0-15) */
 	ACCW(PT_NUMERATOR, 0x00000008);
 	/* set timer denominator to 3 (in b0-15) */
 	ACCW(PT_DENOMINATR, 0x00000003);
+
 	/* disable timer-alarm INT requests (b0) */
 	ACCW(PT_INTEN, 0x00000000);
 	/* reset timer-alarm INT status bit (b0) */
