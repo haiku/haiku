@@ -52,6 +52,7 @@ public:
 	void PrintToStream(void) const;
 	
 	uint8 GetColor8(void);
+	uint16 GetColor15(void);
 	uint16 GetColor16(void);
 	rgb_color GetColor32(void) const;
 	
@@ -71,8 +72,9 @@ public:
 protected:
 	rgb_color color32;
 	uint16 color16;
+	uint16 color15;
 	uint8 color8;
-	bool update8,update16;
+	bool update8,update15,update16;
 };
 
 #endif

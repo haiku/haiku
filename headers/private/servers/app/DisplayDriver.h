@@ -78,6 +78,31 @@ typedef struct
 
 #endif
 
+class AccLineCalc
+{
+public:
+	AccLineCalc();
+	AccLineCalc(const BPoint &pta, const BPoint &ptb);
+	void SetPoints(const BPoint &pta, const BPoint &ptb);
+	float GetX(float y);
+	float GetY(float x);
+	float Slope(void) { return slope; }
+	float Offset(void) { return offset; }
+	float MinX();
+	float MinY();
+	float MaxX();
+	float MaxY();
+	void Swap(AccLineCalc &from);
+private:
+	float slope;
+	float offset;
+	BPoint start, end;
+	float minx;
+	float miny;
+	float maxx;
+	float maxy;
+};
+
 /*!
 	\class DisplayDriver DisplayDriver.h
 	\brief Mostly abstract class which handles all graphics output for the server.
@@ -170,6 +195,10 @@ protected:
 	void _SetDPMSCapabilities(uint32 caps);
 	void _SetDPMSState(uint32 state);
 	ServerCursor *_GetCursor(void);
+	virtual void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
+	virtual void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
+	virtual void SetPixel(int x, int y, RGBColor col);
+	virtual void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
 
 private:
 	BLocker *_locker;
