@@ -256,8 +256,8 @@
 #define NM_2REG32(r_) ((vuint32 *)regs2)[(r_) >> 2]
 
 /* read and write to PCI config space */
-#define CFGR(A)   (mn_pci_access.offset=NMCFG_##A, ioctl(fd,MN_GET_PCI, &mn_pci_access,sizeof(mn_pci_access)), mn_pci_access.value)
-#define CFGW(A,B) (mn_pci_access.offset=NMCFG_##A, mn_pci_access.value = B, ioctl(fd,MN_SET_PCI,&mn_pci_access,sizeof(mn_pci_access)))
+#define CFGR(A)   (nm_pci_access.offset=NMCFG_##A, ioctl(fd,NM_GET_PCI, &nm_pci_access,sizeof(nm_pci_access)), nm_pci_access.value)
+#define CFGW(A,B) (nm_pci_access.offset=NMCFG_##A, nm_pci_access.value = B, ioctl(fd,NM_SET_PCI,&nm_pci_access,sizeof(nm_pci_access)))
 
 //old:
 /* read and write from the powergraphics registers */
@@ -271,10 +271,10 @@
 #define CR1W(A,B) (NM_REG32(NMCR1_##A) = (B))
 
 /* read and write from ISA I/O space */
-#define ISAWB(A,B)(mn_isa_access.adress=NMISA8_##A, mn_isa_access.data = (uint8)B, mn_isa_access.size = 1, ioctl(fd,MN_ISA_OUT, &mn_isa_access,sizeof(mn_isa_access)))
-#define ISAWW(A,B)(mn_isa_access.adress=NMISA16_##A, mn_isa_access.data = B, mn_isa_access.size = 2, ioctl(fd,MN_ISA_OUT, &mn_isa_access,sizeof(mn_isa_access)))
-#define ISARB(A)  (mn_isa_access.adress=NMISA8_##A, ioctl(fd,MN_ISA_IN, &mn_isa_access,sizeof(mn_isa_access)), (uint8)mn_isa_access.data)
-#define ISARW(A)  (mn_isa_access.adress=NMISA16_##A, ioctl(fd,MN_ISA_IN, &mn_isa_access,sizeof(mn_isa_access)), mn_isa_access.data)
+#define ISAWB(A,B)(nm_isa_access.adress=NMISA8_##A, nm_isa_access.data = (uint8)B, nm_isa_access.size = 1, ioctl(fd,NM_ISA_OUT, &nm_isa_access,sizeof(nm_isa_access)))
+#define ISAWW(A,B)(nm_isa_access.adress=NMISA16_##A, nm_isa_access.data = B, nm_isa_access.size = 2, ioctl(fd,NM_ISA_OUT, &nm_isa_access,sizeof(nm_isa_access)))
+#define ISARB(A)  (nm_isa_access.adress=NMISA8_##A, ioctl(fd,NM_ISA_IN, &nm_isa_access,sizeof(nm_isa_access)), (uint8)nm_isa_access.data)
+#define ISARW(A)  (nm_isa_access.adress=NMISA16_##A, ioctl(fd,NM_ISA_IN, &nm_isa_access,sizeof(nm_isa_access)), nm_isa_access.data)
 
 /* read and write from ISA CRTC indexed registers */
 #define ISACRTCW(A,B)(ISAWW(CRTCIND, ((NMCRTCX_##A) | ((B) << 8))))

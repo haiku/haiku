@@ -35,7 +35,7 @@ typedef struct {
 #define	DELETE_BEN(x)	delete_sem(x.sem);
 
 
-#define MN_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
+#define NM_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
 
 /*dualhead extensions to flags*/
 #define DUALHEAD_OFF (0<<6)
@@ -57,14 +57,14 @@ typedef struct {
 #define SKD_HANDLER_INSTALLED 0x80000000
 
 enum {
-	MN_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
-	MN_GET_PCI,
-	MN_SET_PCI,
-	MN_DEVICE_NAME,
-	MN_RUN_INTERRUPTS,
-	MN_ISA_OUT,
-	MN_ISA_IN,
-	MN_PGM_BES
+	NM_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
+	NM_GET_PCI,
+	NM_SET_PCI,
+	NM_DEVICE_NAME,
+	NM_RUN_INTERRUPTS,
+	NM_ISA_OUT,
+	NM_ISA_IN,
+	NM_PGM_BES
 };
 
 /* max. number of overlay buffers */
@@ -222,7 +222,7 @@ typedef struct {
 	uint32	offset;		/* Offset to read/write */
 	uint32	size;		/* Number of bytes to transfer */
 	uint32	value;		/* The value read or written */
-} mn_get_set_pci;
+} nm_get_set_pci;
 
 /* Read or write a value in ISA I/O space */
 typedef struct {
@@ -230,7 +230,7 @@ typedef struct {
 	uint16	adress;		/* Offset to read/write */
 	uint8	size;		/* Number of bytes to transfer */
 	uint16	data;		/* The value read or written */
-} mn_in_out_isa;
+} nm_in_out_isa;
 
 /* setup ISA BES registers for overlay on ISA cards */
 typedef struct {
@@ -252,26 +252,26 @@ typedef struct {
 	uint8	colkey_g;
 	uint8	colkey_b;
 	uint16	ob_width;
-} mn_bes_data;
+} nm_bes_data;
 
 /* Set some boolean condition (like enabling or disabling interrupts) */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	bool	do_it;		/* state to set */
-} mn_set_bool_state;
+} nm_set_bool_state;
 
 /* Retrieve the area_id of the kernel/accelerant shared info */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	area_id	shared_info_area;	/* area_id containing the shared information */
-} mn_get_private_data;
+} nm_get_private_data;
 
 /* Retrieve the device name.  Usefull for when we have a file handle, but want
 to know the device name (like when we are cloning the accelerant) */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	char	*name;		/* The name of the device, less the /dev root */
-} mn_device_name;
+} nm_device_name;
 
 enum {
 	
