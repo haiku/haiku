@@ -29,8 +29,6 @@ MouseApplication::MouseApplication()
 {
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
-	window->MoveTo(window->fSettings.WindowPosition());
-
 	window->Show();
 }
 
