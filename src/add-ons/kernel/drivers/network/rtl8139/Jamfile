@@ -1,16 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
 
-# set some additional defines
-{
-	local defines ;
-
-	if $(DEBUG) {
-		defines += DEBUG ;
-	}
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-}
+# set some additional flags
+SubDirCcFlags -Wall ;
 
 R5KernelAddon rtl8139 : [ FDirName kernel drivers network ] :
 	driver.c
