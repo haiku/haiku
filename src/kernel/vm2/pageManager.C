@@ -27,20 +27,26 @@ pageManager::pageManager(int pages)
 page *pageManager::getPage(void)
 	{
 	page *ret=NULL;
-//	printf ("Checking clean\n");
+	printf ("Checking clean\n");
+	printf ("clean = %d\n", &clean);
+	printf ("cleanCount = %d\n", clean.nodeCount);
 	if (clean.count())
 		{
+		printf ("locking clean\n");
 		acquire_sem(cleanLock);
+		printf ("locked clean\n");
 		ret=(page *)clean.next();
+		printf ("got next clean\n");
 		release_sem(cleanLock);
+		printf ("unlocked clean\n");
 		} // This could fail if someone swoops in and steal our page.
 	if (!ret && unused.count())
 		{
-//		printf ("Checking unused\n");
+		printf ("Checking unused\n");
 		acquire_sem(unusedLock);
 		ret=(page *)unused.next();
 		release_sem(unusedLock);
-//		printf ("ret = %x\n",ret);
+		printf ("ret = %x\n",ret);
 		if (ret)
 			ret->zero();
 		} // This could fail if someone swoops in and steal our page.

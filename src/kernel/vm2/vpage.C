@@ -1,17 +1,17 @@
 #include "vpage.h"
 
-	swapFileManager  *vpage::swapMan;
-	pageManager *vpage::pageMan;  
+	extern swapFileManager  swapMan;
+	extern pageManager pageMan;  
 
 void vpage::flush(void)
 	{
 	if (protection==writable && dirty)
-		swapMan->write_block(backingNode,physPage, PAGE_SIZE);
+		swapMan.write_block(backingNode,physPage, PAGE_SIZE);
 	}
 
 void vpage::refresh(void)
 	{
-		swapMan->read_block(backingNode,physPage, PAGE_SIZE);
+		swapMan.read_block(backingNode,physPage, PAGE_SIZE);
 	}
 
 vpage *vpage::clone(unsigned long address) // The calling method will have to create this...
@@ -29,12 +29,12 @@ vpage::vpage(unsigned long start,vnode backing, page *physMem,protectType prot,p
 	end_address=start+PAGE_SIZE-1;
 	protection=prot;
 	swappable=(state==NO_LOCK);
-	if (backing.fd=0)
-		backingNode=swapMan->findNode();
+	if (backing.fd==0)
+		backingNode=swapMan.findNode();
 	else
 		backingNode=backing; 
 	if (!physPage && (state!=LAZY) && (state!=NO_LOCK))
-		physPage=pageMan->getPage();
+		physPage=pageMan.getPage();
 	else
 		physPage=physMem;
 	}
@@ -47,6 +47,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
+	printf ("Inside fault; address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -54,33 +55,41 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			{
 			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
 				{
-				page *newPhysPage=pageMan->getPage();
+				page *newPhysPage=pageMan.getPage();
 				memcpy(newPhysPage,physPage,PAGE_SIZE);
 				physPage=newPhysPage;
 				protection=writable;
-				backingNode=swapMan->findNode(); // Need new backing store for this node, since it was copied, the original is no good...
+				backingNode=swapMan.findNode(); // Need new backing store for this node, since it was copied, the original is no good...
 				// Update the architecture specific stuff here...
 				}
 			return true; 
 			}
 		}
-	physPage=pageMan->getPage();
+	physPage=pageMan.getPage();
+	printf ("New page allocated! address = %s\n",physPage->getAddress());
 	// Update the architecture specific stuff here...
+	// This refresh is unneeded if the code was never written out...
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
+	printf ("Refreshed\n");
+
 	}
 
 char vpage::getByte(unsigned long address)
 	{
+	printf ("inside vpage::getByte; address = %d\n",address );
 	if (!physPage)
 		fault((void *)(address),false);
+	printf ("About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
 void vpage::setByte(unsigned long address,char value)
 	{
+	printf ("inside vpage::setByte; address = %d, value = %d\n",address, value);
 	if (!physPage)
-		fault((void *)(address),false);
+		fault((void *)(address),true);
 	*((char *)(address-start_address+physPage->getAddress()))=value;
+	printf ("inside vpage::setByte; physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
 	}
 
 int  vpage::getInt(unsigned long address)
@@ -93,7 +102,7 @@ int  vpage::getInt(unsigned long address)
 void  vpage::setInt(unsigned long address,int value)
 	{
 	if (!physPage)
-		fault((void *)(address),false);
+		fault((void *)(address),true);
 	*((int *)(address-start_address+physPage->getAddress()))=value;
 	}
 
@@ -111,7 +120,7 @@ void vpage::pager(int desperation)
 		default: return;break;
 		}
 	flush();
-	pageMan->freePage(physPage);
+	pageMan.freePage(physPage);
 	physPage=NULL;
 	}
 

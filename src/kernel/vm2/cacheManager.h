@@ -17,6 +17,7 @@ class cacheManager : public area
 		// While this very much mirrors the area's vpage list, it won't when it is a hash table...
 		void *findBlock (vnode *target,bool readOnly); 
 		void *createBlock (vnode *target,bool readOnly); 
+		sem_id myLock;
 	public:
 		// For these two, the VFS passes in the target vnode
 		// Return value is the address. Note that the paging daemon does the actual loading
@@ -25,4 +26,6 @@ class cacheManager : public area
 		void *writeBlock (vnode *target);
 		void pager(int desperation); // override, as we should blow away useless nodes, not just free blocks.
 		void saver(void); // Override - not sure why
+		void lock() {acquire_sem(myLock);}
+		void unlock() {release_sem(myLock);}
 };

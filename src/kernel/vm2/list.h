@@ -19,7 +19,7 @@ class list {
 			rock=newNode;
 			nodeCount++;
 			}
-		int count(void) {return nodeCount;}
+		int count(void) {printf ("About to return %d\n",nodeCount);return nodeCount;}
 		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return rock;} 
 		void remove(void *in)
 			{
@@ -39,7 +39,7 @@ class list {
 				}
 			}
 		struct node *rock;
-	private:
 		int nodeCount;
+	private:
 };
 #endif

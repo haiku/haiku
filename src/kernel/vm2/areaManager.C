@@ -3,6 +3,7 @@
 areaManager::areaManager(void)
 {
 	team=0; // should be proc_get_current_proc_id()
+	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
 }
 
 unsigned long areaManager::getNextAddress(int pages, unsigned long start)
@@ -39,9 +40,11 @@ area *areaManager::findArea(void *address)
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
+		printf ("Looking for %d\n",address);
 		if (myArea->contains(address))
 				return myArea;
 		}
+	printf ("findArea is giving up\n");
 	return NULL;
 }
 

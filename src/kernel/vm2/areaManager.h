@@ -5,6 +5,7 @@ class areaManager // One of these per process
 	private:
 		list areas;
 		team_id team;
+		sem_id myLock;
 	public:
 		areaManager ();
 		void addArea(area *newArea) {areas.add(newArea);}
@@ -16,6 +17,8 @@ class areaManager // One of these per process
 		area *findArea(area_id id);
 		void pager(int desperation);
 		void saver(void);
+		void lock() {acquire_sem(myLock);}
+		void unlock() {release_sem(myLock);}
 		
 		bool fault(void *fault_address, bool writeError); // true = OK, false = panic.
 

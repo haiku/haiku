@@ -2,6 +2,7 @@
 
 cacheManager::cacheManager(void) : area (NULL)
 {
+	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
 }
 
 void *cacheManager::findBlock(vnode *target,bool readOnly)
@@ -30,10 +31,12 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 				begin+=PAGE_SIZE;
 				prev=cur;
 				}
+	lock();
 	// Create a vnode here
 	vpage *newPage = new vpage(begin,*target,NULL,((readOnly)?readable:writable),NO_LOCK);
 	vpages.add(newPage); 
 	cacheMembers.add(newPage);
+	unlock();
 	// return address from this vnode
 	return (void *)begin;
 

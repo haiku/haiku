@@ -14,7 +14,7 @@ class vpage : public node
 		unsigned long end_address;
 	public:
 		bool isMapped(void) {return (physPage);}
-		bool contains(uint32 address) { return ((start_address>=address) && (end_address<=address)); }
+		bool contains(uint32 address) { return ((start_address<=address) && (end_address>=address)); }
 		void flush(void); // write page to vnode, if necessary
 		void refresh(void); // Read page back in from vnode
 		vpage *clone(unsigned long); // Make a new vpage that is exactly the same as this one. 
@@ -34,6 +34,4 @@ class vpage : public node
 		void setByte(unsigned long offset,char value); // This is for testing only
 		int getInt(unsigned long offset); // This is for testing only
 		void setInt(unsigned long offset,int value); // This is for testing only
-		static swapFileManager *swapMan;
-		static pageManager *pageMan;
 };

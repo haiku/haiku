@@ -9,6 +9,7 @@ area::area (areaManager *myManager)
 
 unsigned long area::mapAddressSpecToAddress(addressSpec type,unsigned long requested,int pageCount)
 {
+	// We will lock in the callers
 	unsigned long base;
 	switch (type)
 		{
@@ -33,6 +34,7 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,unsigned long reque
 
 status_t area::createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset)
 	{
+	manager->lock();
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	vpage *newPage;
@@ -45,36 +47,51 @@ status_t area::createAreaMappingFile(char *name, int pageCount,void **address, a
 		vpages.add(newPage);
 		}
 	state=inState;
+	start_address=base;
+	end_address=base+pageCount*PAGE_SIZE;
+	manager->unlock();
 	}
 
 status_t area::createArea(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
 	{
+	manager->lock();
+	printf ("Locked in createArea\n");
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
+	printf ("in area::createArea, base address = %d\n",base);
 	vpage *newPage;
 	vnode newVnode;
 	newVnode.fd=0;
 	newVnode.offset=0;
 	for (int i=0;i<pageCount;i++)
 		{
+		printf ("in area::createArea, creating page = %d\n",i);
 		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
 		}
 	state=inState;
+	start_address=base;
+	end_address=base+pageCount*PAGE_SIZE;
+	manager->unlock();
+	*address=(void *)base;
+	printf ("unlocked in createArea\n");
 	}
 
 void area::freeArea(void)
 	{
+	manager->lock();
 	for (struct node *cur=vpages.rock;cur;cur=cur->next)
 		{
 		vpage *page=(vpage *)cur;
 		page->flush();
 		delete page; // Probably need to add a destructor
 		}
+	manager->unlock();
 	}
 
 status_t area::getInfo(area_info *dest)
 	{
+	// no need to lock here...
 	strcpy(dest->name,name);
 	dest->size=end_address-start_address;
 	dest->lock=state;
@@ -98,8 +115,11 @@ status_t area::getInfo(area_info *dest)
 
 bool area::contains(void *address)
 	{
+	// no need to lock here...
 	unsigned long base=(unsigned long)(address); 
-	return ((start_address>=base) && (end_address<=base));
+	printf ("Inside contains; looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+					
+	return ((start_address<=base) && (end_address>=base));
 	}
 
 status_t area::resize(size_t newSize)
@@ -109,6 +129,7 @@ status_t area::resize(size_t newSize)
 		return B_OK;
 	if (newSize>oldSize)
 		{
+		manager->lock();
 		int pageCount = (newSize-oldSize) / PAGE_SIZE;
 		vpage *newPage;
 		vnode newVnode;
@@ -123,6 +144,7 @@ status_t area::resize(size_t newSize)
 		}
 	else
 		{
+		manager->lock();
 		int pageCount = (oldSize -newSize) / PAGE_SIZE;
 		vpage *oldPage;
 		struct node *cur;
@@ -133,20 +155,24 @@ status_t area::resize(size_t newSize)
 			delete oldPage;
 			}
 		}
+	manager->unlock();
 	}
 
 status_t area::setProtection(protectType prot)
 	{
+	manager->lock();
 	for (struct node *cur=vpages.rock;cur;cur=cur->next)
 		{
 		vpage *page=(vpage *)cur;
 		page->setProtection(prot);
 		}
 	protection=prot;
+	manager->unlock();
 	}
 
 vpage *area::findVPage(unsigned long address)
 	{
+	// No need to lock here...
 	for (struct node *cur=vpages.rock;cur;cur=cur->next)
 		{
 		vpage *page=(vpage *)cur;
@@ -158,6 +184,7 @@ vpage *area::findVPage(unsigned long address)
 
 bool area::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{
+	// No need to lock here...
 	vpage *page=findVPage((unsigned long)fault_address);
 	if (page)
 		return page->fault(fault_address,writeError);
@@ -167,6 +194,7 @@ bool area::fault(void *fault_address, bool writeError) // true = OK, false = pan
 
 char area::getByte(unsigned long address) // This is for testing only
 	{
+	// No need to lock here...
 	vpage *page=findVPage(address);
 	if (page)
 		return page->getByte(address);
@@ -176,6 +204,7 @@ char area::getByte(unsigned long address) // This is for testing only
 
 void area::setByte(unsigned long address,char value) // This is for testing only
 	{
+	// No need to lock here...
 	vpage *page=findVPage(address);
 	if (page)
 		page->setByte(address,value);
@@ -183,6 +212,7 @@ void area::setByte(unsigned long address,char value) // This is for testing only
 
 int area::getInt(unsigned long address) // This is for testing only
 	{
+	// No need to lock here...
 	vpage *page=findVPage(address);
 	if (page)
 		page->getInt(address);
@@ -190,6 +220,7 @@ int area::getInt(unsigned long address) // This is for testing only
 
 void area::setInt(unsigned long address,int value) // This is for testing only
 	{
+	// No need to lock here...
 	vpage *page=findVPage(address);
 	if (page)
 		page->setInt(address,value);
@@ -197,6 +228,7 @@ void area::setInt(unsigned long address,int value) // This is for testing only
 
 void area::pager(int desperation)
 	{
+	// No need to lock here...
 	for (struct node *cur=vpages.rock;cur;cur=cur->next)
 		{
 		vpage *page=(vpage *)cur;
@@ -206,6 +238,7 @@ void area::pager(int desperation)
 
 void area::saver(void)
 	{
+	// No need to lock here...
 	for (struct node *cur=vpages.rock;cur;cur=cur->next)
 		{
 		vpage *page=(vpage *)cur;

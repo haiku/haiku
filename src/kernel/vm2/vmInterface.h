@@ -1,14 +1,14 @@
 #include "vm.h"
 #include "pageManager.h"
+#include "areaManager.h"
 #include "swapFileManager.h"
 class vmInterface // This is the class that "owns" all of the managers.
 {
 	private:
-		swapFileManager swapMan;
-		pageManager pageMan;
 		int nextAreaID;
+		areaManager *getAM(void); // This is for testing only...
 	public:
-		vmInterface(int pages) : pageMan(pages) {nextAreaID=0;};
+		vmInterface(int pages) {nextAreaID=0;};
 		int createArea(char *AreaName,int pageCount,void **address,
 							addressSpec addType=ANY,	
 							pageState state=NO_LOCK,protectType protect=writable);
@@ -27,4 +27,8 @@ class vmInterface // This is the class that "owns" all of the managers.
 		void pager(void);
 		void saver(void);
 		void cleaner(void);
+		char getByte(unsigned long offset) {return getAM()->getByte(offset);} // This is for testing only
+		void setByte(unsigned long offset,char value) {getAM()->setByte(offset,value);} // This is for testing only
+		int getInt(unsigned long offset) {return getAM()->getInt(offset);} // This is for testing only
+		void setInt(unsigned long offset,int value) {getAM()->setByte(offset,value);} // This is for testing only
 };

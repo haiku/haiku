@@ -1,10 +1,12 @@
 #include "vmInterface.h"
-#include "areaManager.h"
+//#include "areaManager.h"
 #include "mman.h"
 		
 areaManager am;
+swapFileManager swapMan;
+pageManager pageMan(10); // Obviously this hard coded number is a hack...
 	
-areaManager *getAM(void)
+areaManager *vmInterface::getAM(void)
 	{
 	// Normally, we would go to the current user process to get this. Since there no such thing exists here...
 	return &am;
