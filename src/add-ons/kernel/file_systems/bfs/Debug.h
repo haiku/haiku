@@ -86,16 +86,21 @@
 	struct data_stream;
 	struct bfs_inode;
 	struct disk_super_block;
+	class Inode;
 	class Volume;
 	
 	// some structure dump functions
 	extern void dump_block_run(const char *prefix, block_run &run);
+	extern void dump_inode(Inode &inode);
 	extern void dump_super_block(disk_super_block *superBlock);
 	extern void dump_data_stream(data_stream *stream);
 	extern void dump_inode(bfs_inode *inode);
 	extern void dump_bplustree_header(bplustree_header *header);
 	extern void dump_bplustree_node(bplustree_node *node,bplustree_header *header = NULL,Volume *volume = NULL);
 	extern void dump_block(const char *buffer, int size);
+
+	extern void unregister_debugger_commands();
+	extern void register_debugger_commands();
 #endif
 
 #endif	/* DEBUG_H */

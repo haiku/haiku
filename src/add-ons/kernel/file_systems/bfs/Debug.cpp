@@ -9,6 +9,7 @@
 
 #include "Debug.h"
 #include "BPlusTree.h"
+#include "Inode.h"
 
 #include <KernelExport.h>
 
@@ -40,6 +41,21 @@ void
 dump_block_run(const char *prefix, block_run &run)
 {
 	Print("%s(%ld, %d, %d)\n", prefix, run.allocation_group, run.start, run.length);
+}
+
+
+void 
+dump_inode(Inode &inode)
+{
+	Print("Inode (%p) {\n", &inode);
+	Print("\tfVolume = %p\n", inode.fVolume);
+	Print("\tfBlockNumber = 0x%16Lx\n", inode.fBlockNumber);
+	Print("\tfNode = %p\n", inode.Node());
+	Print("\tfTree = %p\n", inode.fTree);
+	Print("\tfAttributes = %p\n", inode.fAttributes);
+	Print("\tfOldSize = 0x%16Lx\n", inode.fOldSize);
+	Print("\tfOldLastModified = 0x%16Lx\n", inode.fOldLastModified);
+	Print("}\n");
 }
 
 
@@ -239,3 +255,38 @@ dump_bplustree_node(bplustree_node *node,bplustree_header *header,Volume *volume
 		}
 	}
 }
+
+
+//	#pragma mark -
+
+
+//#warn Don't mount more than once... would register twice the debugger commands!
+
+static int
+dbg_inode(int argc, char **argv)
+{
+	if (argc < 2) {
+		kprintf("usage: obfsinode ptr-to-inode\n");
+		return 0;
+	}
+
+	Inode *inode = (Inode *)parse_expression(argv[1]);
+	dump_inode(*inode);
+
+	return B_OK;
+}
+
+
+void
+unregister_debugger_commands()
+{
+	remove_debugger_command("obfsinode", dbg_inode);
+}
+
+
+void
+register_debugger_commands()
+{
+	add_debugger_command("obfsinode", dbg_inode, "dump an Inode object");
+}
+
