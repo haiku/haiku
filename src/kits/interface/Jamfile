@@ -1,3 +1,3 @@
-SubDir OBOS_TOP sources os kits interface ;
+SubDir OBOS_TOP src kits interface ;
 
-#SubInclude OBOS_TOP sources os kits interface prefs ;
+#SubInclude OBOS_TOP src kits interface prefs ;
