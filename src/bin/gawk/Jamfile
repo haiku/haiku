@@ -22,12 +22,12 @@ Objects $(common_files) ;
 
 BinCommand gawk :
 	[ FGristFiles $(common_files:S=.o) ] eval.c profile.c
-	:  libintl.a
+	:  <gawk>libintl.a
 	: gawk.rsrc ;
 
 BinCommand pgawk :
 	[ FGristFiles $(common_files:S=.o) ] eval_p.c profile_p.c
-	:  libintl.a
+	:  <gawk>libintl.a
 	: gawk.rsrc ;
 
 MakeLocate awk : $(OBOS_BIN_DIR) ;

@@ -4,7 +4,7 @@ SubDirCcFlags -DLOCALEDIR='\"/share/locale\"' -DLOCALE_ALIAS_PATH='\"/share/loca
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-StaticLibrary intl : 
+StaticLibrary <gawk>intl : 
 	bindtextdom.c
 	dcgettext.c
 	dgettext.c
@@ -27,4 +27,5 @@ StaticLibrary intl :
 	log.c
 	osdep.c
 	intl-compat.c
+	: [ FCurrentObjectsDir ]
 ;
