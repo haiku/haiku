@@ -364,7 +364,7 @@ find_free_virtual_range(size_t size)
 
 
 extern "C" void *
-arch_mmu_alloc_at(void *virtualAddress, size_t size, uint8 protection)
+arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 {
 	// we only know page sizes
 	size = ROUNDUP(size, B_PAGE_SIZE);
@@ -406,10 +406,11 @@ printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress, physicalAddress, si
 }
 
 
-extern "C" void *
-arch_mmu_alloc(size_t size, uint8 protection)
+extern "C" status_t
+arch_mmu_free(void *address, size_t size)
 {
-	return arch_mmu_alloc_at(NULL, size, protection);
+	// ToDo: implement freeing a region!
+	return B_OK;
 }
 
 
