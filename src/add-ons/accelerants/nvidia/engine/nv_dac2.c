@@ -1,6 +1,6 @@
 /* program the secondary DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-1/2004
+   Rudolf Cornelissen 12/2003-2/2004
 */
 
 #define MODULE_BIT 0x00001000
@@ -286,7 +286,15 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 			for (m = 7; m <= 14; m++)
 			{
 				/* check if phase-discriminator will be within operational limits */
-				if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+				//fixme: PLL calcs will be resetup/splitup/updated...
+				if (si->ps.card_type == NV36)
+				{
+					if (((si->ps.f_ref / m) < 3.0) || ((si->ps.f_ref / m) > 9.0)) continue;
+				}
+				else
+				{
+					if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+				}
 
 				/* calculate VCO postscaler setting for current setup.. */
 				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
