@@ -62,6 +62,13 @@ static const char *kUsage =
 "                   ID."
 ;
 
+// terminal color escape sequences
+// (http://www.dee.ufcg.edu.br/~rrbrandt/tools/ansi.html)
+static const char *kTerminalTextNormal	= "\33[0m";
+static const char *kTerminalTextRed		= "\33[31m";
+static const char *kTerminalTextMagenta	= "\33[35m";
+
+
 // command line args
 static int sArgc;
 static const char *const *sArgv;
@@ -108,15 +115,74 @@ get_id(const char *str, int32 &id)
 	return true;
 }
 
+// find_program
+static
+status_t
+find_program(const char *programName, string &resolvedPath)
+{
+    // If the program name is absolute, then there's nothing to do.
+    // If the program name consists of more than one path element, then we
+    // consider it a relative path and don't search in PATH either.
+    if (*programName == '/' || strchr(programName, '/')) {
+        resolvedPath = programName;
+        return B_OK;
+    }
+
+    // get the PATH environment variable
+    const char *paths = getenv("PATH");
+    if (!paths)
+        return B_ENTRY_NOT_FOUND;
+
+    // iterate through the paths
+    do {
+        const char *pathEnd = strchr(paths, ':');
+        int pathLen = (pathEnd ? pathEnd - paths : strlen(paths));
+
+        // We skip empty paths.
+        if (pathLen > 0) {
+            // get the program path
+            string path(paths, pathLen);
+            path += "/";
+            path += programName;
+
+            // stat() the path to be sure, there is a file
+            struct stat st;
+            if (stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode)) {
+            	resolvedPath = path;
+                return B_OK;
+            }
+        }
+
+        paths = (pathEnd ? pathEnd + 1 : NULL);
+    } while (paths);
+
+    // not found in PATH
+    return B_ENTRY_NOT_FOUND;
+}
+
 // load_program
 thread_id
 load_program(const char *const *args, int32 argCount)
 {
-// TODO: We need to find the program in the PATH, if no absolute or relative
-// path has been given (i.e. only a name).
-	return load_image(argCount, (const char**)args, (const char**)environ);
-}
+	// clone the argument vector so that we can change it
+	const char **mutableArgs = new const char*[argCount];
+	for (int i = 0; i < argCount; i++)
+		mutableArgs[i] = args[i];
 
+	// resolve the program path
+	string programPath;
+	status_t error = find_program(args[0], programPath);
+	if (error != B_OK)
+		return error;
+	mutableArgs[0] = programPath.c_str();
+
+	// load the program
+	error = load_image(argCount, mutableArgs, (const char**)environ);
+
+	delete[] mutableArgs;
+
+	return error;
+}
 
 // set_team_debugging_flags
 static
@@ -258,12 +324,16 @@ print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 	bool printArguments, bool getContents, bool printReturnValue,
 	bool colorize)
 {
-// TODO: colorize support
 	int32 syscallNumber = message.syscall;
 	Syscall *syscall = sSyscallVector[syscallNumber];
 
 	// print syscall name
-	printf("[%6ld] %s(", message.thread, syscall->Name().c_str());
+	if (colorize) {
+		printf("[%6ld] %s%s%s(", message.thread, kTerminalTextRed,
+			syscall->Name().c_str(), kTerminalTextNormal);
+	} else {
+		printf("[%6ld] %s(", message.thread, syscall->Name().c_str());
+	}
 
 	// print arguments
 	if (printArguments) {
@@ -284,15 +354,29 @@ print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 
 	// print return value
 	if (printReturnValue) {
-		TypeHandler *handler = syscall->ReturnType()->Handler();
+		Type *returnType = syscall->ReturnType();
+		TypeHandler *handler = returnType->Handler();
 		string value = handler->GetReturnValue(message.return_value,
 			getContents, memoryReader);
-		if (value.length() > 0)
+		if (value.length() > 0) {
 			printf(" = %s", value.c_str());
-// TODO: If the return value is a status_t, print the error code.
+
+			// if the return type is status_t or ssize_t, print human-readable
+			// error codes
+			if (returnType->TypeName() == "status_t"
+				|| returnType->TypeName() == "ssize_t"
+					&& message.return_value < 0) {
+				printf(" %s", strerror(message.return_value));
+			}
+		}
 	}
 
-	printf(" (%lld us)\n", message.end_time - message.start_time);
+	if (colorize) {
+		printf(" %s(%lld us)%s\n", kTerminalTextMagenta,
+			message.end_time - message.start_time, kTerminalTextNormal);
+	} else {
+		printf(" (%lld us)\n", message.end_time - message.start_time);
+	}
 
 //for (int32 i = 0; i < 16; i++) {
 //	if (i % 4 == 0) {
@@ -359,6 +443,9 @@ main(int argc, const char *const *argv)
 
 	// initialize our syscalls vector and map
 	init_syscalls();
+
+	// don't colorize the output, if we don't have a terminal
+	colorize = colorize && isatty(STDOUT_FILENO);
 
 	// get thread/team to be debugged
 	thread_id thread = -1;
