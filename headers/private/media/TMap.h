@@ -38,6 +38,7 @@ public:
 	 		items[i]->k = other.items[i]->k;
 	 		items[i]->v = other.items[i]->v;
 	 	}
+	 	return *this;
 	}
 		
 	bool Insert(const key &k, const value &v)	

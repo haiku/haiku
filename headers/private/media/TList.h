@@ -36,6 +36,7 @@ public:
 	 		items[i] = new value;
 	 		*items[i] = *other.items[i];
 	 	}
+	 	return *this;
 	}
 		
 	bool Insert(const value &v)

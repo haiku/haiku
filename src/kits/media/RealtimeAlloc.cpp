@@ -78,7 +78,7 @@ status_t rtm_size_for(void * data)
 status_t rtm_phys_size_for(void * data)
 {
 	UNIMPLEMENTED();
-	TRACE("  ptr = %p\n",(int)data);
+	TRACE("  ptr = %p\n", data);
 	return 0;
 }
 
@@ -86,7 +86,7 @@ rtm_pool * rtm_default_pool()
 {
 	BROKEN();
 	/* Return the default pool, or NULL if not yet initialized */
-	TRACE("  returning pool = %p\n", 0x22229999);
+	TRACE("  returning pool = %p\n", (void *) 0x22229999);
 	return (rtm_pool *) 0x22229999;
 }
 

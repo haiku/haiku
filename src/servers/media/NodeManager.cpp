@@ -585,7 +585,7 @@ NodeManager::Dump()
 	printf("NodeManager: registered nodes map follows:\n");
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, team %ld, kinds %#08x, name \"%s\"\n",
+		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, team %ld, kinds %#08Lx, name \"%s\"\n",
 			rn->nodeid, rn->addon_id, rn->addon_flavor_id, rn->port, rn->team, rn->kinds, rn->name);
 		printf("    teams (refcount): ");
 		team_id *team;
@@ -613,7 +613,7 @@ NodeManager::Dump()
 	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&dfi); ) {
 		printf("  addon-id %ld, addon-flavor-id %ld, addon-name \"%s\"\n",
 			dfi->node_info.addon, dfi->node_info.flavor_id, dfi->node_info.name);
-		printf("    flavor-kinds %#08x, flavor_flags %#08x, internal_id %ld, possible_count %ld, in_format_count %ld, out_format_count %ld\n",
+		printf("    flavor-kinds %#08Lx, flavor_flags %#08lx, internal_id %ld, possible_count %ld, in_format_count %ld, out_format_count %ld\n",
 			 dfi->kinds, dfi->flavor_flags, dfi->internal_id, dfi->possible_count, dfi->in_format_count, dfi->out_format_count);
 		printf("    flavor-name \"%s\"\n", dfi->name);
 		printf("    flavor-info \"%s\"\n", dfi->info);

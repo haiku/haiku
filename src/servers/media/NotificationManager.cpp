@@ -259,7 +259,7 @@ NotificationManager::Dump()
 	printf("NotificationManager: list of subscribers follows:\n");
 	Notification *n;	
 	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
-		printf(" team %ld, what %#08x, node-id %ld, node-port %ld, messenger %svalid\n",
+		printf(" team %ld, what %#08lx, node-id %ld, node-port %ld, messenger %svalid\n",
 			n->team, n->what, n->node.node, n->node.port, n->messenger.IsValid() ? "" : "NOT ");
 	}
 	printf("NotificationManager: list end\n");
