@@ -36,6 +36,8 @@
 // System Includes -------------------------------------------------------------
 #include <String.h>
 
+// Temporary Includes
+#include "string_helper.h"
 
 /*---- Construction --------------------------------------------------------*/
 BString::BString()
@@ -629,6 +631,36 @@ BString::FindFirst(char c, int32 fromOffset) const
 
 
 int32
+BString::FindLast(const BString &string) const
+{
+	return _FindBefore(string.String(), Length(), -1);
+}
+
+
+int32
+BString::FindLast(const char *str) const
+{
+	return _FindBefore(str, Length(), -1);
+}
+
+
+int32
+BString::FindLast(const BString &string, int32 beforeOffset) const
+{
+	return _FindBefore(string.String(), beforeOffset, -1); 
+}
+
+
+int32
+BString::FindLast(char c) const
+{
+	char tmp[2] = { c, '\0' };
+	
+	return _FindBefore(tmp, Length(), -1);
+}
+
+
+int32
 BString::IFindFirst(const BString &string) const
 {
 	return _IFindAfter(string.String(), 0, -1);
@@ -653,6 +685,34 @@ int32
 BString::IFindFirst(const char *string, int32 fromOffset) const
 {
 	return _IFindAfter(string, fromOffset, -1);
+}
+
+
+int32
+BString::IFindLast(const BString &string) const
+{
+	return _IFindBefore(string.String(), Length(), -1);
+}
+
+
+int32
+BString::IFindLast(const char *string) const
+{
+	return _IFindBefore(string, Length(), -1);
+}
+
+
+int32
+BString::IFindLast(const BString &string, int32 beforeOffset) const
+{
+	return _IFindBefore(string.String(), beforeOffset, -1);
+}
+
+
+int32
+BString::IFindLast(const char *string, int32 beforeOffset) const
+{
+	return _IFindBefore(string, beforeOffset, -1);
 }
 
 
@@ -1163,23 +1223,53 @@ BString::_ShortFindAfter(const char *str, int32 ) const
 
 
 int32
-BString::_FindBefore(const char *str, int32 offset, int32 ) const
+BString::_FindBefore(const char *str, int32 offset, int32) const
 {
-	assert(str != NULL);
+	if (!str)
+		return 0;
+	
 	if (offset <= 0)
 		return B_ERROR;
 	
-	//TODO: Implement
+	int len2 = strlen(str);
+
+	if (len2 == 0)
+		return 0;
+		
+	char *ptr1 = _privateData + offset - len2;
 	
-	return B_ERROR;	
+	while (ptr1 >= _privateData) {
+		if (!memcmp(ptr1, str, len2))
+			return ptr1 - _privateData; 
+		ptr1--;
+	}
+	
+	return B_ERROR;
 }
 
 
 int32
-BString::_IFindBefore(const char *str, int32 , int32 ) const
+BString::_IFindBefore(const char *str, int32 offset, int32) const
 {
-	assert(str != NULL);
-	//TODO: Implement
+	if (!str)
+		return 0;
+	
+	if (offset <= 0)
+		return B_ERROR;
+	
+	int len2 = strlen(str);
+
+	if (len2 == 0)
+		return 0;
+		
+	char *ptr1 = _privateData + offset - len2;
+	
+	while (ptr1 >= _privateData) {
+		if (!strncasecmp(ptr1, str, len2))
+			return ptr1 - _privateData; 
+		ptr1--;
+	}
+	
 	return B_ERROR;
 }
 
@@ -1193,6 +1283,7 @@ BString::_SetLength(int32 length)
 
 #if DEBUG
 // TODO: Implement?
+// AFAIK, these are not implemented in BeOS R5
 BString::_SetUsingAsCString(bool) {}
 BString::_AssertNotUsingAsCString() {}
 #endif
