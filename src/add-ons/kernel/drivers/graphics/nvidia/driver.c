@@ -863,7 +863,6 @@ read_hook (void* dev, off_t pos, void* buf, size_t* len)
 	return B_NOT_ALLOWED;
 }
 
-
 /* ----------
 	write_hook - does nothing, gracefully
 ----- */
