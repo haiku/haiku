@@ -2261,8 +2261,8 @@ STRACE(("BuildTopView ended\n"));
 
 void BWindow::stopConnection(){
 	Lock();
-	session->WriteInt32( B_QUIT_REQUESTED );
-	session->Sync();
+	session->WriteInt32( AS_DELETE_WINDOW );
+//	session->Sync();
 	Unlock();
 }
 
