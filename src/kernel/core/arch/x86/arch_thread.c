@@ -78,7 +78,7 @@ i386_pop_iframe(struct thread *thread)
  *	from standard kernel threads.
  */
 
-static struct iframe *
+struct iframe *
 i386_get_current_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();

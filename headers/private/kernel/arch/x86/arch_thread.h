@@ -17,6 +17,7 @@ extern "C" {
 
 void i386_push_iframe(struct thread *t, struct iframe *frame);
 void i386_pop_iframe(struct thread *t);
+struct iframe *i386_get_current_iframe(void);
 
 void i386_return_from_signal();
 void i386_end_return_from_signal();
