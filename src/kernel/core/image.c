@@ -22,8 +22,6 @@
 #endif
 
 
-// ToDo: register kernel images as well
-
 struct image {
 	struct image	*next;
 	struct image	*prev;
