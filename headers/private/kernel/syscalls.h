@@ -115,6 +115,7 @@ extern int			_kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *nam
 extern int			_kern_open_dir(int fd, const char *path);
 extern int			_kern_open_parent_dir(int fd, char *name,
 						size_t nameLength);
+extern status_t		_kern_fcntl(int fd, int op, uint32 argument);
 extern status_t		_kern_fsync(int fd);
 extern off_t		_kern_seek(int fd, off_t pos, int seekType);
 extern int			_kern_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
