@@ -13,6 +13,8 @@
 #ifndef _PHYSICAL_PARTITION_ALLOCATOR_H
 #define _PHYSICAL_PARTITION_ALLOCATOR_H
 
+#include <list>
+
 #include "Allocator.h"
 #include "UdfStructures.h"
 
@@ -24,7 +26,9 @@ public:
 
 	status_t GetNextBlock(uint32 &block, uint32 &physicalBlock);
 	status_t GetNextExtent(uint32 length, bool contiguous, Udf::long_address &extent,
-	                       Udf::extent_address &physicalExtent = dummyExtent);
+	                       Udf::extent_address &physicalExtent = dummyExtent);                
+	status_t GetNextExtents(uint32 length, std::list<Udf::long_address> &extents,
+	                        std::list<Udf::extent_address> &physicalExtents);
 	                       
 	                       
 	uint16 PartitionNumber() const { return fNumber; }

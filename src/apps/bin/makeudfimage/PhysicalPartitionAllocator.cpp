@@ -82,6 +82,47 @@ PhysicalPartitionAllocator::GetNextExtent(uint32 length,
 	return error;
 }	                                      
 
+/*! \brief Allocates enough extents to add up to length bytes and stores said
+           extents in the given address lists.
+
+	\param length The desired length (in bytes) to be allocated.
+	\param extents Output parameter into which the extents as allocated
+	               in the partition are stored. 
+	\param physicalExtent Output parameter into which the extents as allocated
+	                      on the physical volume are stored. 
+
+	\return
+	- B_OK: Success.
+	- error code: Failure.
+*/
+status_t
+PhysicalPartitionAllocator::GetNextExtents(uint32 length, std::list<Udf::long_address> &extents,
+	                                       std::list<Udf::extent_address> &physicalExtents)
+{
+	extents.empty();
+	physicalExtents.empty();
+	
+	// Allocate extents until we're done or we hit an error
+	status_t error = B_OK;
+	while (error == B_OK) {
+		Udf::long_address extent;
+		Udf::extent_address physicalExtent;
+		error = GetNextExtent(length, false, extent, physicalExtent);
+		if (!error) {
+			extents.push_back(extent);
+			physicalExtents.push_back(physicalExtent);
+			if (physicalExtent.length() >= length) {
+				// All done
+				break;
+			} else {
+				// More to go
+				length -= physicalExtent.length();
+			}
+		}
+	}
+	return error;
+}
+
 /*! \brief Returns the length of the partition in blocks.
 */
 uint32
