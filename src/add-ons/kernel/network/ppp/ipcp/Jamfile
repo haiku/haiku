@@ -7,6 +7,11 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 
+{
+	SubDirC++Flags -fno-rtti ;
+}
+
+
 R5KernelAddon ipcp : kernel obos_network ppp :
 	# imported from libnet
 	inet_addr.c

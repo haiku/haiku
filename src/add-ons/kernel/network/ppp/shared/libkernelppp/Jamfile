@@ -6,6 +6,11 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 
+{
+	SubDirC++Flags -fno-rtti ;
+}
+
+
 R5KernelStaticLibrary kernelppp :
 	kernel_cpp.cpp
 	
