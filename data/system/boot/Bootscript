@@ -61,3 +61,8 @@ runprog beos/bin/clockconfig
 
 # Launch consoled
 launch beos/bin/consoled
+
+# Check for daily saving time
+# TODO to be launched when tracker and deskbar are launched
+#launch beos/bin/dstcheck
+
