@@ -1,8 +1,9 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <KernelExport.h>
@@ -21,9 +22,10 @@
 #	define TRACE(x)
 #endif
 
+
 static struct real_time_data *sRealTimeData;
 static bool sIsGMT = false;
-static char sTzFilename[B_PATH_NAME_LENGTH] = "";
+static char sTimezoneFilename[B_PATH_NAME_LENGTH] = "";
 static bigtime_t sTimezoneOffset = 0;
 static bool sDaylightSavingTime = false;
 
@@ -61,24 +63,17 @@ rtc_system_time_offset(void)
 }
 
 
-static void
-rtc_print(void)
-{
-	uint32 currentTime;
-
-	currentTime = (sRealTimeData->system_time_offset + system_time()) / 1000000;
-	dprintf("system_time:  %Ld\n", system_time());
-	dprintf("system_time_offset:    %Ld\n", sRealTimeData->system_time_offset);
-	dprintf("current_time: %lu\n", currentTime);
-}
-
-
 static int
 rtc_debug(int argc, char **argv)
 {
 	if (argc < 2) {
-		// If no arguments were given, output all usefull data.
-		rtc_print();
+		// If no arguments were given, output all useful data.
+		uint32 currentTime;
+	
+		currentTime = (sRealTimeData->system_time_offset + system_time()) / 1000000;
+		dprintf("system_time:  %Ld\n", system_time());
+		dprintf("system_time_offset:    %Ld\n", sRealTimeData->system_time_offset);
+		dprintf("current_time: %lu\n", currentTime);
 	} else {
 		// If there was an argument, reset the system and hw time.
 		set_real_time_clock(strtoul(argv[1], NULL, 10));
@@ -131,7 +126,7 @@ rtc_init(kernel_args *args)
 void
 set_real_time_clock(uint32 currentTime)
 {
-	sRealTimeData->system_time_offset = currentTime * 1000000LL - system_time();
+	atomic_set64(&sRealTimeData->system_time_offset, currentTime * 1000000LL - system_time());
 	rtc_system_to_hw();
 }
 
@@ -150,8 +145,16 @@ real_time_clock_usecs(void)
 	return sRealTimeData->system_time_offset + system_time();
 }
 
+
 //	#pragma mark -
 //	public userland API
+
+
+bigtime_t
+_user_system_time(void)
+{
+	return system_time();
+}
 
 
 status_t
@@ -166,52 +169,55 @@ _user_set_real_time_clock(uint32 time)
 
 
 status_t
-_user_set_tzspecs(int32 timezone_offset, bool dst_observed)
+_user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 {
+	bigtime_t offset = (bigtime_t)timezoneOffset * 1000000LL;
+
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
-	
+
 	TRACE(("old system_time_offset %Ld\n", sRealTimeData->system_time_offset));
-	
-	sRealTimeData->system_time_offset += sIsGMT ? 0 : sTimezoneOffset;
-	sTimezoneOffset = (bigtime_t)timezone_offset * 1000000;
-	sRealTimeData->system_time_offset -= sIsGMT ? 0 : sTimezoneOffset;
-	
+
+	// We only need to update our time offset if the hardware clock
+	// does not run in the local timezone.
+	// Since this is shared data, we need to update it atomically.
+	if (sIsGMT)
+		atomic_add64(&sRealTimeData->system_time_offset, sTimezoneOffset - offset);
+
+	sTimezoneOffset = offset;
+	sDaylightSavingTime = daylightSavingTime;
+
 	TRACE(("new system_time_offset %Ld\n", sRealTimeData->system_time_offset));
-	
-	sDaylightSavingTime = dst_observed;
+
 	return B_OK;
 }
 
 
 status_t
-_user_set_tzfilename(const char *filename, size_t length, bool is_gmt)
+_user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
+
 	if (!IS_USER_ADDRESS(filename)
 		|| filename == NULL
-		|| user_strlcpy(sTzFilename, filename, B_PATH_NAME_LENGTH) < B_OK)
+		|| user_strlcpy(sTimezoneFilename, filename, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	sIsGMT = is_gmt;
-	
+	// ToDo: Shouldn't this update the system_time_offset as well?
+	sIsGMT = isGMT;
 	return B_OK;
 }
 
 
 status_t
-_user_get_tzfilename(char *filename, size_t length, bool *is_gmt)
+_user_get_tzfilename(char *filename, size_t length, bool *_isGMT)
 {
-	if ((filename == NULL)
-		|| (!IS_USER_ADDRESS(filename))
-		|| (user_strlcpy(filename, sTzFilename, length) < B_OK))
+	if (filename == NULL || _isGMT == NULL
+		|| !IS_USER_ADDRESS(filename) || !IS_USER_ADDRESS(_isGMT)
+		|| user_strlcpy(filename, sTimezoneFilename, length) < B_OK
+		|| user_memcpy(_isGMT, &sIsGMT, sizeof(bool)) < B_OK)
 		return B_BAD_ADDRESS;
-		
-	if ((is_gmt == NULL)
-		|| (!IS_USER_ADDRESS(is_gmt))
-		|| (user_memcpy(is_gmt, &sIsGMT, sizeof(bool)) < B_OK))
-		return B_BAD_ADDRESS;
-		
+
 	return B_OK;
 }
