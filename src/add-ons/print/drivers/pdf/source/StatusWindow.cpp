@@ -49,6 +49,11 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 //	fPopyCount = 0;
 	fReportIndex = 0;
 	fCloseSem = -1;
+	int32 closeOption;
+
+	if (pd->JobMsg()->FindInt32("close_option", &closeOption) != B_OK) closeOption = kNever;
+	fCloseOption = (CloseOption)closeOption;
+	
 	BRect r(0, 0, Frame().Width(), Frame().Height());
 
 	// view for the background color
@@ -206,6 +211,17 @@ void StatusWindow::WaitForClose() {
 		fCancel->SetLabel("Close");
 		fCancel->SetEnabled(true);
 		UpdateReport();
+		
+		bool hasErrors = r->Count(kError);
+		bool hasErrorsOrWarnings = hasErrors || r->Count(kWarning);
+		bool hasErrorsWarningsOrInfo = hasErrorsOrWarnings || r->Count(kInfo);
+		
+		if (fCloseOption == kAlways || 
+			fCloseOption == kNoErrors && !hasErrors ||
+			fCloseOption == kNoErrorsOrWarnings && !hasErrorsOrWarnings ||
+			fCloseOption == kNoErrorsWarningsOrInfo && !hasErrorsWarningsOrInfo) {
+			PostMessage('cncl');
+		}
 	Unlock();
 	
 	acquire_sem(fCloseSem);

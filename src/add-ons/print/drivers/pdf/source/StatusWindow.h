@@ -56,6 +56,7 @@ private:
 	int32      fReportIndex;
 	BTextView* fReport;
 	sem_id     fCloseSem;
+	CloseOption fCloseOption;
 
 	void UpdateReport();
 public:

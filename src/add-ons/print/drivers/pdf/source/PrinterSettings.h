@@ -56,6 +56,7 @@ const bool CREATE_BOOKMARKS = false;
 const char BOOKMARK_DEFINITION_FILE[] = "";
 const bool CREATE_XREFS = false;
 const char XREFS_FILE[] = "";
+const int32 CLOSE_OPTION = 0;
 
 /**
  * Class

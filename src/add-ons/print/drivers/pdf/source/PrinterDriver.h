@@ -50,6 +50,16 @@ extern "C" {
 
 class StatusWindow;
 
+// close StatusWindow after pdf generation
+enum CloseOption {
+	kAlways,
+	kNoErrors,
+	kNoErrorsOrWarnings,
+	kNoErrorsWarningsOrInfo,
+	kNever,
+};
+	
+
 
 /**
  * Class PrinterDriver

@@ -32,6 +32,11 @@ THE SOFTWARE.
 #include <StorageKit.h>
 #include "AdvancedSettingsWindow.h"
 
+
+#define SETTINGS_PATH  "/boot/home/config/settings/PDF Writer/"
+#define BOOKMARKS_PATH SETTINGS_PATH "bookmarks/"
+#define XREFS_PATH     SETTINGS_PATH "xrefs/"
+
 static BMessage* BorderWidthMessage(uint32 what, float width)
 {
 	BMessage* m = new BMessage(what);
@@ -41,7 +46,7 @@ static BMessage* BorderWidthMessage(uint32 what, float width)
 
 // --------------------------------------------------
 AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
-	:	HWindow(BRect(0,0,400,220), "Advanced Settings", B_TITLED_WINDOW_LOOK,
+	:	HWindow(BRect(0,0,400,180), "Advanced Settings", B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
  			B_NOT_ZOOMABLE)
 {
@@ -63,34 +68,43 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	x = 5; y = 5; w = r.Width(); h = r.Height();
 
 	// web links
+	if (settings->FindBool("create_web_links", &fCreateLinks) != B_OK) fCreateLinks = false;
+/*
 	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_links", "Create links for URLs", new BMessage(CREATE_LINKS_MSG));
 	panel->AddChild(cb);
-	if (settings->FindBool("create_web_links", &fCreateLinks) != B_OK) fCreateLinks = false;
 	cb->SetValue(fCreateLinks ? B_CONTROL_ON : B_CONTROL_OFF);
 	y += cb->Bounds().Height() + 5;
+*/
 
 	BMenuItem* item;
 	if (settings->FindFloat("link_border_width", &fLinkBorderWidth)) fLinkBorderWidth = 1;
 	BPopUpMenu* m = new BPopUpMenu("link_border_width");
 	m->SetRadioMode(true);
-	m->AddItem(item = new BMenuItem("no border", BorderWidthMessage(LINK_BORDER_MSG, 0.0)));
-	if (fLinkBorderWidth == 0) item->SetMarked(true);
-	m->AddItem(item = new BMenuItem("normal",    BorderWidthMessage(LINK_BORDER_MSG, 1.0)));	
-	if (fLinkBorderWidth == 1) item->SetMarked(true);
-	m->AddItem(item = new BMenuItem("bold",      BorderWidthMessage(LINK_BORDER_MSG, 2.0)));		
-	if (fLinkBorderWidth == 2) item->SetMarked(true);
+	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_LINKS_MSG)));
+	item->SetMarked(!fCreateLinks);
+	m->AddSeparatorItem();
+	
+	m->AddItem(item = new BMenuItem("No Border", BorderWidthMessage(LINK_BORDER_MSG, 0.0)));
+	if (fCreateLinks && fLinkBorderWidth == 0) item->SetMarked(true);
+	m->AddItem(item = new BMenuItem("Normal Border",    BorderWidthMessage(LINK_BORDER_MSG, 1.0)));	
+	if (fCreateLinks && fLinkBorderWidth == 1) item->SetMarked(true);
+	m->AddItem(item = new BMenuItem("Bold Border",      BorderWidthMessage(LINK_BORDER_MSG, 2.0)));		
+	if (fCreateLinks && fLinkBorderWidth == 2) item->SetMarked(true);
 
-	mf = new BMenuField(BRect(x, y, x+w-10, y+14), "link_border_width_menu", "Link Border Width:", m);
+	mf = new BMenuField(BRect(x, y, x+w-10, y+14), "link_border_width_menu", "Link:", m);
 	mf->ResizeToPreferred();
 	panel->AddChild(mf);
 	y += mf->Bounds().Height() + 15;
 	
 	// bookmarks
+
 	if (settings->FindBool("create_bookmarks", &fCreateBookmarks) != B_OK) fCreateBookmarks = false;
+/*
 	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_bookmarks", "Create bookmarks", new BMessage(CREATE_BOOKMARKS_MSG));
 	cb->SetValue(fCreateBookmarks ? B_CONTROL_ON : B_CONTROL_OFF);
 	panel->AddChild(cb);
 	y += cb->Bounds().Height() + 5;
+*/
 
 	m = new BPopUpMenu("definition");
 	m->SetRadioMode(true);
@@ -100,45 +114,73 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 
 	if (settings->FindString("bookmark_definition_file", &fBookmarkDefinition) != B_OK) fBookmarkDefinition = "";
 
-	BDirectory	Folder;
+	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_BOOKMARKS_MSG)));
+	item->SetMarked(!fCreateBookmarks);
+	m->AddSeparatorItem();
+
+	BDirectory	folder;
 	BEntry		entry;
 	
 	// XXX: B_USER_SETTINGS_DIRECTORY
-	Folder.SetTo ("/boot/home/config/settings/PDF Writer/bookmarks/");
-	if (Folder.InitCheck() == B_OK) {	
-		while (Folder.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
+	folder.SetTo (BOOKMARKS_PATH);
+	if (folder.InitCheck() == B_OK) {	
+		while (folder.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) == B_NO_ERROR)
 				m->AddItem (item = new BMenuItem(name, new BMessage(DEFINITION_MSG)));
-				if (strcmp(name, fBookmarkDefinition.String()) == 0) item->SetMarked(true);
+				if (fCreateBookmarks && strcmp(name, fBookmarkDefinition.String()) == 0) item->SetMarked(true);
 		}
 	}	
 
 	// cross references
 	if (settings->FindBool("create_xrefs", &fCreateXRefs) != B_OK) fCreateXRefs = false;
-
+/*
 	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_xrefs", "Create cross references", new BMessage(CREATE_XREFS_MSG));
 	cb->SetValue(fCreateXRefs ? B_CONTROL_ON : B_CONTROL_OFF);
 	panel->AddChild(cb);
 	y += cb->Bounds().Height() + 5;
-
+*/
 	m = new BPopUpMenu("cross references");
 	m->SetRadioMode(true);
 	mf = new BMenuField(BRect(x, y, x+w-10, y+14), "xrefs_menu", "Cross References File:", m);
 	panel->AddChild(mf);
+	y += mf->Bounds().Height() + 15;
 
 	if (settings->FindString("xrefs_file", &fXRefs) != B_OK) fXRefs = "";
 
+	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_XREFS_MSG)));
+	item->SetMarked(!fCreateXRefs);
+	m->AddSeparatorItem();
+	
 	// XXX: B_USER_SETTINGS_DIRECTORY
-	Folder.SetTo ("/boot/home/config/settings/PDF Writer/xrefs/");
-	if (Folder.InitCheck() == B_OK) {	
-		while (Folder.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
+	folder.SetTo (XREFS_PATH);
+	if (folder.InitCheck() == B_OK) {	
+		while (folder.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) == B_NO_ERROR)
 				m->AddItem (item = new BMenuItem(name, new BMessage(XREFS_MSG)));
-				if (strcmp(name, fXRefs.String()) == 0) item->SetMarked(true);
+				if (fCreateXRefs && strcmp(name, fXRefs.String()) == 0) item->SetMarked(true);
 		}
 	}	
+
+	// close automatically status window after pdf generation
+	// - Never
+	// - No Errors
+	// - No Errors and Warnings
+	// - Always
+	m = new BPopUpMenu("close option");
+	m->SetRadioMode(true);
+	mf = new BMenuField(BRect(x, y, x+w-10, y+14), "close_option_menu", "Close status window when done:", m);
+	panel->AddChild(mf);
+
+	int32 closeOption;
+	if (settings->FindInt32("close_option", &closeOption) != B_OK) closeOption = kNever;
+	fCloseOption = (CloseOption)closeOption;
+	AddMenuItem(m, "Never", kNever);
+	AddMenuItem(m, "No Errors", kNoErrors);
+	AddMenuItem(m, "No Errors or Warnings", kNoErrorsOrWarnings);
+	AddMenuItem(m, "No Errors, Warnings or Info", kNoErrorsWarningsOrInfo);
+	AddMenuItem(m, "Always", kAlways);
 
 	// add a "OK" button, and make it default
 	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG), 
@@ -155,8 +197,19 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
-	button->MoveTo(x - w - 8, y);
+	x -= w + 8;
+	button->MoveTo(x, y);
 	panel->AddChild(button);
+	
+	// add a "Open Settings Folder" button
+	button 	= new BButton(r, NULL, "Open Settings Folder", new BMessage(OPEN_SETTINGS_FOLDER_MSG), 
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	button->GetPreferredSize(&w, &h);
+	button->ResizeToPreferred();
+	x = r.left + 8;
+	button->MoveTo(x, y);
+	panel->AddChild(button);
+	
 
 	// add a separator line...
 	BBox * line = new BBox(BRect(r.left, y - 9, r.right, y - 8), NULL,
@@ -207,6 +260,21 @@ AdvancedSettingsWindow::UpdateSettings()
 	} else {
 		fSettings->AddString("xrefs_file", fXRefs.String());
 	}
+	
+	if (fSettings->HasInt32("close_option")) {
+		fSettings->ReplaceInt32("close_option", fCloseOption);
+	} else {
+		fSettings->AddInt32("close_option", fCloseOption);
+	}
+}
+
+// --------------------------------------------------
+void AdvancedSettingsWindow::AddMenuItem(BPopUpMenu* menu, const char* label, CloseOption option) {
+	BMessage* msg = new BMessage(AUTO_CLOSE_MSG);
+	msg->AddInt32("close_option", option);
+	BMenuItem* item = new BMenuItem(label, msg);
+	menu->AddItem(item);
+	if (fCloseOption == option) item->SetMarked(true);
 }
 
 
@@ -216,6 +284,7 @@ AdvancedSettingsWindow::MessageReceived(BMessage *msg)
 {
 	float w;
 	void  *source;
+	int32 closeOption;
 
 	if (msg->FindPointer("source", &source) != B_OK) source = NULL;
 	
@@ -227,43 +296,50 @@ AdvancedSettingsWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case CREATE_LINKS_MSG:
-			if (source) {
-				BCheckBox* cb = (BCheckBox*)source;
-				fCreateLinks = cb->Value() == B_CONTROL_ON;
-			}
+			fCreateLinks = false;
 			break;
 			
 		case LINK_BORDER_MSG:
 			if (msg->FindFloat("width", &w) == B_OK) {
-				fLinkBorderWidth = w;				
+				fLinkBorderWidth = w;
+				fCreateLinks = true;
 			}
 			break;
 		
 		case CREATE_BOOKMARKS_MSG:
-			if (source) {
-				BCheckBox* cb = (BCheckBox*)source;
-				fCreateBookmarks = cb->Value() == B_CONTROL_ON;
-			}
+			fCreateBookmarks = false;
 			break;
 		
 		case DEFINITION_MSG:
 			if (source) {
 				BMenuItem* item = (BMenuItem*)source;
 				fBookmarkDefinition = item->Label();
+				fCreateBookmarks = true;
 			}
 			break;
 			
 		case CREATE_XREFS_MSG:
-			if (source) {
-				BCheckBox* cb = (BCheckBox*)source;
-				fCreateXRefs = cb->Value() == B_CONTROL_ON;
-			}
+			fCreateXRefs = false;
 			break;
 		
 		case XREFS_MSG:
 			if (source) {
 				BMenuItem* item = (BMenuItem*)source;
 				fXRefs = item->Label();
+				fCreateXRefs = true;
+			}
+			break;
+		
+		case AUTO_CLOSE_MSG:
+			if (msg->FindInt32("close_option", &closeOption) == B_OK) {
+				fCloseOption = (CloseOption)closeOption;
+			}
+			break;
+		
+		case OPEN_SETTINGS_FOLDER_MSG:
+			{
+				char* argv[] = { SETTINGS_PATH };
+				be_roster->Launch("application/x-vnd.Be-TRAK", 1, argv);
 			}
 			break;
 			

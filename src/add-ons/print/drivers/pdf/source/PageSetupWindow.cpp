@@ -435,6 +435,7 @@ PageSetupWindow::UpdateSetupMessage()
 	bool    b;
 	float   f;
 	BString s;
+	int32   i;
 	
 	if (fAdvancedSettings.FindBool("create_web_links", &b) == B_OK) {
 		if (fSetupMsg->HasBool("create_web_links")) {
@@ -481,6 +482,14 @@ PageSetupWindow::UpdateSetupMessage()
 			fSetupMsg->ReplaceString("xrefs_file", s.String());
 		} else {
 			fSetupMsg->AddString("xrefs_file", s.String());
+		}
+	}
+
+	if (fAdvancedSettings.FindInt32("close_option", &i) == B_OK) {
+		if (fSetupMsg->HasInt32("close_option")) {
+			fSetupMsg->ReplaceInt32("close_option", i);
+		} else {
+			fSetupMsg->AddInt32("close_option", i);
 		}
 	}
 

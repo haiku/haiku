@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include <Path.h>
 #include <String.h>
 #include "Utils.h"
+#include "PrinterDriver.h"
 
 class AdvancedSettingsWindow : public HWindow 
 {
@@ -60,6 +61,8 @@ public:
 		DEFINITION_MSG       = 'defi',
 		CREATE_XREFS_MSG     = 'cxrf',
 		XREFS_MSG            = 'xref',
+		AUTO_CLOSE_MSG       = 'acls',
+		OPEN_SETTINGS_FOLDER_MSG = 'opsf',
 	};
 			
 	// Virtual function overrides
@@ -67,6 +70,7 @@ public:
 	virtual void 			MessageReceived(BMessage *msg);
 
 private:
+
 	BMessage*               fSettings;
 
 	bool                    fCreateLinks;
@@ -75,8 +79,10 @@ private:
 	BString                 fBookmarkDefinition;
 	bool                    fCreateXRefs;
 	BString                 fXRefs;
+	CloseOption             fCloseOption;
 	
 	void                    UpdateSettings();
+	void                    AddMenuItem(BPopUpMenu* menu, const char* label, CloseOption option);
 };
 
 #endif

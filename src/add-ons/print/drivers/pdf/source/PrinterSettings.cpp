@@ -180,6 +180,7 @@ PrinterSettings::GetDefaults(BMessage *msg)
 		msg->AddString("bookmark_definition_file", BOOKMARK_DEFINITION_FILE);
 		msg->AddBool("create_xrefs", CREATE_XREFS);
 		msg->AddString("xrefs_file", XREFS_FILE);
+		msg->AddInt32("close_option", CLOSE_OPTION);
 		
 		// create pdf_printer_settings file
 		prefs->SaveSettings(msg);
@@ -253,6 +254,9 @@ PrinterSettings::Validate(const BMessage *msg)
 		return B_ERROR;
 	}
 	if (msg->FindString("xrefs_file", &s) != B_OK) {
+		return B_ERROR;
+	}
+	if (msg->FindInt32("close_option", &i32) != B_OK) {
 		return B_ERROR;
 	}
 	// message ok
