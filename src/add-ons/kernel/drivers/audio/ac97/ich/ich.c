@@ -663,31 +663,6 @@ init_driver(void)
 	/* calibrate the clock */
 	ich_clock_calibrate();
 	
-	LOG(("codec master output = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x02)));
-	LOG(("codec aux output    = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x04)));
-	LOG(("codec mono output   = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x06)));
-	LOG(("codec cd            = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x12)));
-	LOG(("codec pcm           = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x18)));
-
-	LOG(("writing codec registers\n"));
-	/* enable master output */
-	ac97_reg_update(config->ac97, 0x02, 0x0000);
-	/* enable aux output */
-	ac97_reg_update(config->ac97, 0x04, 0x0000);
-	/* enable mono output */
-	ac97_reg_update(config->ac97, 0x06, 0x0000);
-	
-	/* enable cd */
-	ac97_reg_update(config->ac97, 0x12, 0x0808);
-	/* enable pcm */
-	ac97_reg_update(config->ac97, 0x18, 0x0808);
-
-	LOG(("codec master output = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x02)));
-	LOG(("codec aux output    = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x04)));
-	LOG(("codec mono output   = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x06)));
-	LOG(("codec cd            = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x12)));
-	LOG(("codec pcm           = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x18)));
-
 	LOG(("init_driver finished!\n"));
 	return B_OK;
 }

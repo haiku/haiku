@@ -85,6 +85,7 @@ typedef struct
 
 void default_init(ac97_dev *dev);
 void ad1886_init(ac97_dev *dev);
+void alc650_init(ac97_dev *dev);
 
 void default_amp_enable(ac97_dev *dev, bool onoff);
 void cs4299_amp_enable(ac97_dev *dev, bool onoff);
@@ -94,6 +95,7 @@ bool default_reg_is_valid(ac97_dev *dev, uint8 reg);
 codec_ops default_ops = { default_init, default_amp_enable, default_reg_is_valid };
 codec_ops ad1886_ops = { ad1886_init, default_amp_enable, default_reg_is_valid };
 codec_ops cs4299_ops = { default_init, cs4299_amp_enable, default_reg_is_valid };
+codec_ops alc650_ops = { alc650_init, default_amp_enable, default_reg_is_valid };
 
 codec_table codecs[] = 
 {
@@ -144,14 +146,8 @@ codec_table codecs[] =
 	{ 0x41445372, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x414c4320, 0xfffffff0, &default_ops, "Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
 	{ 0x414c4730, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC101" },
-#if 0
-	{ 0x414c4710, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC200/ALC200A" }, /* datasheet says id2 = 4710 */
-	{ 0x414c4710, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC201/ALC201A" }, /* 4710 or 4720 */
-	{ 0x414c4720, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC650" }, /* datasheet says id2 = 4720 */
-#else
-	{ 0x414c4710, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC200/ALC200A or ALC201/ALC201A" },
-	{ 0x414c4720, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC650 or ALC201/ALC201A" },
-#endif
+	{ 0x414c4710, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC200/ALC200A, ALC201/ALC201A" }, /* 0x4710 = ALC201 */
+	{ 0x414c4720, 0xffffffff, &alc650_ops,	"Avance Logic (Realtek) ALC650" }, /* 0x4720 = ALC650 */
 	{ 0x414c4740, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC202/ALC202A" },
 	/* Vendors only: */
 	{ 0x41445300, 0xffffff00, &default_ops, "Analog Devices" },
@@ -205,13 +201,28 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	LOG(("codec reset\n"));
 	ac97_reg_uncached_write(dev, AC97_RESET, 0x0000);
 	snooze(50000); // 50 ms
+	
+
+	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
+	dev->capabilities = 0;
+
+	ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 1, 1); // enable variable rate audio
+
+	ac97_detect_capabilities(dev);
 
 	dev->init(dev);
 	dev->amp_enable(dev, true);
 	
-	ac97_reg_update_bits(dev, 0x2a, 1, 1); // enable VRA
-
-	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
+	/* set defaults, PCM-out and CD-out enabled */
+	ac97_reg_update(dev, AC97_CENTER_LFE_VOLUME, 0x0000); 	/* set LFE & center volume 0dB */
+	ac97_reg_update(dev, AC97_SURR_VOLUME, 0x0000); 		/* set surround volume 0dB */
+	ac97_reg_update(dev, AC97_MASTER_VOLUME, 0x0000); 		/* set master output 0dB */
+	ac97_reg_update(dev, AC97_AUX_OUT_VOLUME, 0x0000); 		/* set aux output 0dB */
+	ac97_reg_update(dev, AC97_MONO_VOLUME, 0x0000); 		/* set mono output 0dB */
+	ac97_reg_update(dev, AC97_CD_VOLUME, 0x0808); 			/* enable cd */
+	ac97_reg_update(dev, AC97_PCM_OUT_VOLUME, 0x0808); 		/* enable pcm */
+	
+	ac97_dump_capabilities(dev);
 }
 
 void
@@ -296,11 +307,18 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
 	uint32 value;
 	uint32 old;
-	value = (rate * dev->clock) / 48000;
-	LOG(("ac97_set_rate: clock = %d, rate = %d, value = %d\n",dev->clock, rate, value));
 
+	value = (uint32)((rate * (uint64)dev->clock) / 48000); /* use 64 bit calculation for rates 96000 or higher */
+
+	LOG(("ac97_set_rate: clock = %d, rate = %d, value = %d\n", dev->clock, rate, value));
+	
+	/* if double rate audio is currently enabled, divide value by 2 */
+	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
+		value /= 2;
+		
 	if (value > 0xffff)
 		return false;
+
 	old = ac97_reg_cached_read(dev, reg);
 	ac97_reg_cached_write(dev, reg, value);
 	if (value != ac97_reg_uncached_read(dev, reg)) {
@@ -312,14 +330,189 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 	return true;
 }
 
+bool
+ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
+{
+	uint32 value;
+	value = ac97_reg_cached_read(dev, reg);
+	if (value == 0)
+		return false;
+	*rate = (value * 48000) / dev->clock;
+	return true;
+}
+
 void
 ac97_set_clock(ac97_dev *dev, uint32 clock)
 {
 	LOG(("ac97_set_clock: clock = %d\n", clock));
 	dev->clock = clock;
+	ac97_detect_rates(dev);
+	ac97_dump_capabilities(dev);
 }
 
+void
+ac97_detect_capabilities(ac97_dev *dev)
+{
+	uint16 val;
+	
+	val = ac97_reg_cached_read(dev, AC97_RESET);
+	if (val & 0x0001)
+		dev->capabilities |= CAP_PCM_MIC;
+	if (val & 0x0004)
+		dev->capabilities |= CAP_BASS_TREBLE_CTRL;
+	if (val & 0x0008)
+		dev->capabilities |= CAP_SIMULATED_STEREO;
+	if (val & 0x0010)
+		dev->capabilities |= CAP_HEADPHONE_OUT;
+	if (val & 0x0020)
+		dev->capabilities |= CAP_LAUDNESS;
+	if (val & 0x0040)
+		dev->capabilities |= CAP_DAC_18BIT;
+	if (val & 0x0080)
+		dev->capabilities |= CAP_DAC_20BIT;
+	if (val & 0x0100)
+		dev->capabilities |= CAP_ADC_18BIT;
+	if (val & 0x0200)
+		dev->capabilities |= CAP_ADC_20BIT;
+	if (val & 0x7C00)
+		dev->capabilities |= CAP_3D_ENHANCEMENT;
 
+	val = ac97_reg_cached_read(dev, AC97_EXTENDED_ID);
+	if (val & EXID_VRA)
+		dev->capabilities |= CAP_VARIABLE_PCM;
+	if (val & EXID_DRA)
+		dev->capabilities |= CAP_DOUBLE_PCM;
+	if (val & EXID_SPDIF)
+		dev->capabilities |= CAP_SPDIF;
+	if (val & EXID_VRM)
+		dev->capabilities |= CAP_VARIABLE_MIC;
+	if (val & EXID_CDAC)
+		dev->capabilities |= CAP_CENTER_DAC;
+	if (val & EXID_SDAC)
+		dev->capabilities |= CAP_SURR_DAC;
+	if (val & EXID_LDAC)
+		dev->capabilities |= CAP_LFE_DAC;
+	if (val & EXID_AMAP)
+		dev->capabilities |= CAP_AMAP;
+	if (val & (EXID_REV0 | EXID_REV1) == 0)
+		dev->capabilities |= CAP_REV21;
+	if (val & (EXID_REV0 | EXID_REV1) == EXID_REV0)
+		dev->capabilities |= CAP_REV22;
+	if (val & (EXID_REV0 | EXID_REV1) == EXID_REV1)
+		dev->capabilities |= CAP_REV23;
+		
+	ac97_detect_rates(dev);
+}		
+
+void
+ac97_detect_rates(ac97_dev *dev)
+{
+	uint32 oldrate;
+	
+	dev->capabilities &= ~CAP_PCM_RATE_MASK;
+
+	if (!ac97_get_rate(dev, AC97_PCM_FRONT_DAC_RATE, &oldrate))
+		oldrate = 48000;
+	
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 20000))
+		dev->capabilities |= CAP_PCM_RATE_CONTINUOUS;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 8000))
+		dev->capabilities |= CAP_PCM_RATE_8000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 11025))
+		dev->capabilities |= CAP_PCM_RATE_11025;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 12000))
+		dev->capabilities |= CAP_PCM_RATE_12000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 16000))
+		dev->capabilities |= CAP_PCM_RATE_16000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 22050))
+		dev->capabilities |= CAP_PCM_RATE_22050;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 24000))
+		dev->capabilities |= CAP_PCM_RATE_24000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 32000))
+		dev->capabilities |= CAP_PCM_RATE_32000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 44100))
+		dev->capabilities |= CAP_PCM_RATE_44100;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 48000))
+		dev->capabilities |= CAP_PCM_RATE_48000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 48000))
+		dev->capabilities |= CAP_PCM_RATE_48000;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 88200))
+		dev->capabilities |= CAP_PCM_RATE_88200;
+	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 96000))
+		dev->capabilities |= CAP_PCM_RATE_96000;
+		
+	ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, oldrate);
+}
+
+void
+ac97_dump_capabilities(ac97_dev *dev)
+{
+	LOG(("AC97 capabilities:\n"));
+	if (dev->capabilities & CAP_PCM_MIC)
+		LOG(("CAP_PCM_MIC\n"));
+	if (dev->capabilities & CAP_BASS_TREBLE_CTRL)
+		LOG(("CAP_BASS_TREBLE_CTRL\n"));
+	if (dev->capabilities & CAP_SIMULATED_STEREO)
+		LOG(("CAP_SIMULATED_STEREO\n"));
+	if (dev->capabilities & CAP_HEADPHONE_OUT)
+		LOG(("CAP_HEADPHONE_OUT\n"));
+	if (dev->capabilities & CAP_LAUDNESS)
+		LOG(("CAP_LAUDNESS\n"));
+	if (dev->capabilities & CAP_DAC_18BIT)
+		LOG(("CAP_DAC_18BIT\n"));
+	if (dev->capabilities & CAP_DAC_20BIT)
+		LOG(("CAP_DAC_20BIT\n"));
+	if (dev->capabilities & CAP_ADC_18BIT)
+		LOG(("CAP_ADC_18BIT\n"));
+	if (dev->capabilities & CAP_ADC_20BIT)
+		LOG(("CAP_ADC_20BIT\n"));
+	if (dev->capabilities & CAP_3D_ENHANCEMENT)
+		LOG(("CAP_3D_ENHANCEMENT\n"));
+	if (dev->capabilities & CAP_VARIABLE_PCM)
+		LOG(("CAP_VARIABLE_PCM\n"));
+	if (dev->capabilities & CAP_DOUBLE_PCM)
+		LOG(("CAP_DOUBLE_PCM\n"));
+	if (dev->capabilities & CAP_VARIABLE_MIC)
+		LOG(("CAP_VARIABLE_MIC\n"));
+	if (dev->capabilities & CAP_CENTER_DAC)
+		LOG(("CAP_CENTER_DAC\n"));
+	if (dev->capabilities & CAP_SURR_DAC)
+		LOG(("CAP_SURR_DAC\n"));
+	if (dev->capabilities & CAP_LFE_DAC)
+		LOG(("CAP_LFE_DAC\n"));
+	if (dev->capabilities & CAP_AMAP)
+		LOG(("CAP_AMAP\n"));
+	if (dev->capabilities & CAP_REV21)
+		LOG(("CAP_REV21\n"));
+	if (dev->capabilities & CAP_REV22)
+		LOG(("CAP_REV22\n"));
+	if (dev->capabilities & CAP_REV23)
+		LOG(("CAP_REV23\n"));
+	if (dev->capabilities & CAP_PCM_RATE_CONTINUOUS)
+		LOG(("CAP_PCM_RATE_CONTINUOUS\n"));
+	if (dev->capabilities & CAP_PCM_RATE_8000)
+		LOG(("CAP_PCM_RATE_8000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_11025)
+		LOG(("CAP_PCM_RATE_11025\n"));
+	if (dev->capabilities & CAP_PCM_RATE_12000)
+		LOG(("CAP_PCM_RATE_12000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_16000)
+		LOG(("CAP_PCM_RATE_16000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_22050)
+		LOG(("CAP_PCM_RATE_22050\n"));
+	if (dev->capabilities & CAP_PCM_RATE_24000)
+		LOG(("CAP_PCM_RATE_24000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_32000)
+		LOG(("CAP_PCM_RATE_32000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_44100)
+		LOG(("CAP_PCM_RATE_44100\n"));
+	if (dev->capabilities & CAP_PCM_RATE_48000)
+		LOG(("CAP_PCM_RATE_48000\n"));
+	if (dev->capabilities & CAP_PCM_RATE_88200)
+		LOG(("CAP_PCM_RATE_88200\n"));
+	if (dev->capabilities & CAP_PCM_RATE_96000)
+		LOG(("CAP_PCM_RATE_96000\n"));
+}
 
 /*************************************************
  */
@@ -389,4 +582,14 @@ void cs4299_amp_enable(ac97_dev *dev, bool yesno)
 		ac97_reg_cached_write(dev, 0x68, 0x8004);
 	else
 		ac97_reg_cached_write(dev, 0x68, 0);
+}
+
+
+void alc650_init(ac97_dev *dev)
+{
+	LOG(("alc650_init\n"));
+	/* Surround, LFE and Center downmixed into Line-out,
+	 * Surround-out is duplicated Line-out.
+	 */
+	ac97_reg_cached_write(dev, AC97_ALC650_MULTI_CHAN_CTRL, 0x0007);
 }
