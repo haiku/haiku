@@ -75,6 +75,24 @@ status_t BRadioButton::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BRadioButton::Draw(BRect updateRect)
 {
+	font_height fh;
+	GetFontHeight(&fh);
+
+	// If the focus is changing, just redraw the focus indicator
+	if (IsFocusChanging())
+	{
+		float h = 8.0f + (float)ceil(fh.ascent / 2.0f) + 2.0f;
+
+		if (IsFocus())
+			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		else
+			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+		StrokeLine(BPoint(20.0f, h), BPoint(20.0f + StringWidth(Label()), h));
+
+		return;
+	}
+
 	// Placeholder until sBitmaps is filled in
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
@@ -143,11 +161,6 @@ void BRadioButton::Draw(BRect updateRect)
 			BPoint(rect.right - 1, rect.top + 1));
 
 		// Label
-		BFont font;
-		GetFont(&font);
-		font_height fh;
-		font.GetHeight(&fh);
-
 		SetHighColor(darkenmax);
 		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
 
@@ -205,11 +218,6 @@ void BRadioButton::Draw(BRect updateRect)
 			BPoint(rect.right - 1, rect.top + 1));
 
 		// Label
-		BFont font;
-		GetFont(&font);
-		font_height fh;
-		font.GetHeight(&fh);
-
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
 		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
 	}
@@ -283,9 +291,7 @@ void BRadioButton::GetPreferredSize(float *width, float *height)
 //------------------------------------------------------------------------------
 void BRadioButton::ResizeToPreferred()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
-	BControl::ResizeTo(width, height);
+	BControl::ResizeToPreferred();
 }
 //------------------------------------------------------------------------------
 status_t BRadioButton::Invoke(BMessage *message)
@@ -364,7 +370,7 @@ BHandler *BRadioButton::ResolveSpecifier(BMessage *message, int32 index,
 //------------------------------------------------------------------------------
 void BRadioButton::MakeFocus(bool focused)
 {
-	BControl::MakeFocus();
+	BControl::MakeFocus(focused);
 }
 //------------------------------------------------------------------------------
 void BRadioButton::AllAttached()

@@ -45,8 +45,12 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 	:	BControl(frame, name, label, message, resizingMode, flags),
 		fDrawAsDefault(false)
 {
-	if (Bounds().Height() < 24.0f)
-		ResizeTo(Bounds().Width(), 24.0f);
+	// Resize to minimum height if needed
+	font_height fh;
+	GetFontHeight(&fh);
+	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
 }
 //------------------------------------------------------------------------------
 BButton::~BButton()
@@ -56,11 +60,11 @@ BButton::~BButton()
 BButton::BButton(BMessage *archive)
 	:	BControl (archive)
 {
-	if ( archive->FindBool ( "_default", &fDrawAsDefault ) != B_OK )
+	if (archive->FindBool("_default", &fDrawAsDefault) != B_OK)
 		fDrawAsDefault = false;
 }
 //------------------------------------------------------------------------------
-BArchivable *BButton::Instantiate ( BMessage *archive )
+BArchivable *BButton::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BButton"))
 		return new BButton(archive);
@@ -83,8 +87,28 @@ status_t BButton::Archive(BMessage* archive, bool deep) const
 //------------------------------------------------------------------------------
 void BButton::Draw(BRect updateRect)
 {
-	BRect rect = Bounds();
-	
+	font_height fh;
+	GetFontHeight(&fh);
+
+	BRect bounds(Bounds());
+
+	// If the focus is changing, just redraw the focus indicator
+	if (IsFocusChanging())
+	{
+		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float y = bounds.bottom - fh.descent - (IsDefault() ? 6.0f : 3.0f);
+
+		if (IsFocus())
+			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		else
+			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+				B_LIGHTEN_1_TINT));
+
+		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
+
+		return;
+	}
+
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
@@ -92,6 +116,8 @@ void BButton::Draw(BRect updateRect)
 		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
 		darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
+
+	BRect rect(bounds);
 	
 	if (IsDefault())
 		rect = DrawDefault(rect, IsEnabled());
@@ -162,11 +188,8 @@ void BButton::Draw(BRect updateRect)
 		}
 
 		// Label
-		BFont font;
-		GetFont(&font);
-
-		float x = Bounds().Width() / 2 - StringWidth(Label()) / 2.0f;
-		float y = Bounds().Height() / 2.0f + (float)ceil(font.Size() / 2.0f);
+		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float y = bounds.bottom - fh.descent - (IsDefault() ? 8.0f : 5.0f);
 
 		if (Value())
 		{
@@ -184,9 +207,6 @@ void BButton::Draw(BRect updateRect)
 		// Focus
 		if (IsFocus())
 		{
-			font_height fh;
-			font.GetHeight(&fh);
-
 			y += 2.0f;
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
@@ -243,11 +263,8 @@ void BButton::Draw(BRect updateRect)
 		FillRect(rect);
 
 		// Label
-		BFont font;
-		GetFont(&font);
-
-		float x = Bounds().Width() / 2 - StringWidth(Label()) / 2.0f;
-		float y = Bounds().Height() / 2.0f + (float)ceil(font.Size() / 2.0f);
+		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float y = bounds.bottom - fh.descent - 5.0f;
 
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
 		SetLowColor(lighten2);
@@ -367,7 +384,7 @@ void BButton::MouseUp(BPoint point)
 			if ( Value() == B_CONTROL_ON)
 			{
 				SetValue(B_CONTROL_OFF);
-				BControl::Invoke();
+				Invoke();
 			}
 		}
 		
@@ -385,13 +402,12 @@ void BButton::SetValue(int32 value)
 	BControl::SetValue(value);
 }
 //------------------------------------------------------------------------------
-void BButton::GetPreferredSize (float *width, float *height)
+void BButton::GetPreferredSize(float *width, float *height)
 {
 	font_height fh;
-
 	GetFontHeight(&fh);
 
-	*height = (float)ceil(fh.ascent + fh.descent + fh.leading) + 12.0f;
+	*height = 12.0f + (float)ceil(fh.ascent + fh.descent);
 	*width = 20.0f + (float)ceil(StringWidth(Label()));
 	
 	if (*width < 75.0f)
@@ -527,10 +543,10 @@ BRect BButton::DrawDefault(BRect bounds, bool enabled)
 	return bounds;
 }
 //------------------------------------------------------------------------------
-status_t Execute()
+status_t BButton::Execute()
 {
-	// TODO:
-	return B_ERROR;
+	// TODO: Is there a use for this? Maybe visual feedback happens here?
+	return Invoke();
 }
 //------------------------------------------------------------------------------
 

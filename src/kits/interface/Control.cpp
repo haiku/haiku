@@ -176,8 +176,7 @@ status_t BControl::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BControl::WindowActivated(bool active)
 {
-	// Should we check this?
-	if (Window())
+	if (IsFocus())
 	{
 		Draw(Bounds());
 		Flush();
@@ -339,6 +338,9 @@ void BControl::DetachedFromWindow()
 //------------------------------------------------------------------------------
 void BControl::SetLabel(const char *string)
 {
+	if (strcmp(fLabel, string) == 0)
+		return;
+
 	if (fLabel)
 		free(fLabel);
 
