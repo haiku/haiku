@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -19,9 +19,9 @@
 
 using namespace boot;
 
-#define TRACE_VFS 0
-#if TRACE_VFS
-#	define TRACE(x) printf x
+//#define TRACE_VFS
+#ifdef TRACE_VFS
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -326,10 +326,11 @@ get_boot_file_system(stage2_args *args)
 
 	Directory *fileSystem;
 	status_t status = partition->Mount(&fileSystem);
-	
+
 	if (status < B_OK) {
 		// this partition doesn't contain any known file system; we
 		// don't need it anymore
+		gPartitions.Remove(partition);
 		delete partition;
 		return NULL;
 	}
@@ -393,6 +394,7 @@ mount_file_systems(stage2_args *args)
 	if (gPartitions.IsEmpty())
 		return B_ENTRY_NOT_FOUND;
 
+#if 0
 	void *cookie;
 	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
 		Directory *directory;
@@ -411,6 +413,8 @@ mount_file_systems(stage2_args *args)
 		}
 		gRoot->Close(cookie);
 	}
+#endif
+
 	return B_OK;
 }
 
