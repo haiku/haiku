@@ -3,6 +3,7 @@ SubDir OBOS_TOP src apps ;
 SubInclude OBOS_TOP src apps bin ;
 SubInclude OBOS_TOP src apps clock ;
 SubInclude OBOS_TOP src apps codycam ;
+SubInclude OBOS_TOP src apps diskprobe ;
 SubInclude OBOS_TOP src apps magnify ;
 SubInclude OBOS_TOP src apps mediaplayer ;
 SubInclude OBOS_TOP src apps people ;
