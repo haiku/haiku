@@ -758,6 +758,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			PortLink *link=new PortLink(fServerFrom);
 			link->SetOpCode(AS_CREATE_APP);
 			link->Attach((int32)fServerTo);
+			link->Attach(_get_object_token_(this));
 			link->Attach((char*)signature,strlen(signature));
 			status_t replyerr=link->FlushWithReply(&replydata);
 			if(replyerr==B_OK)

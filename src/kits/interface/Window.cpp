@@ -138,7 +138,7 @@ BWindow::BWindow(BRect frame,
 		//debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
 	}
-	
+	fTitle=NULL;
 	InitData( frame, title, look, feel, flags, workspace );
 
 	receive_port	= create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,
@@ -150,14 +150,14 @@ BWindow::BWindow(BRect frame,
 	
 
 		// let app_server to know that a window has been created.
-	serverLink		= new PortLink(be_app->fServerTo);
-
+	serverLink = new PortLink(be_app->fServerTo);
 	serverLink->SetOpCode(AS_CREATE_WINDOW);
 	serverLink->Attach(fFrame);
 	serverLink->Attach((int32)WindowLookToInteger(fLook));
 	serverLink->Attach((int32)WindowFeelToInteger(fFeel));
 	serverLink->Attach((int32)fFlags);
 	serverLink->Attach((int32)workspace);	
+	serverLink->Attach(_get_object_token_(this));
 	serverLink->Attach(&receive_port,sizeof(port_id));
 		// We add one so that the string will end up NULL-terminated.
 	serverLink->Attach( (char*)title, strlen(title)+1 );
@@ -1850,7 +1850,18 @@ void BWindow::InitData(	BRect frame,
 						uint32 workspace){
 
 	fFrame			= frame;
-	strcpy( fTitle, title );
+	
+	if(fTitle)
+	{
+		delete fTitle;
+		fTitle=NULL;
+	}
+
+	if(title)
+	{
+		fTitle=new char[strlen(title)];
+		strcpy( fTitle, title );
+	}
 	fFeel			= feel;
 	fLook			= look;
 	fFlags			= flags;
