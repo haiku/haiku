@@ -21,6 +21,7 @@
 //
 //	File Name:		Window.cpp
 //	Author:			John Hedditch (jhedditc@physics.adelaide.edu.au)
+//					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BWindow is the base class for all windows (graphic areas
 //					displayed on-screen).
 //	Needs serverlink and msglink PortLink variables declared, but not sure whether
@@ -65,12 +66,11 @@ BWindow::BWindow(BRect frame,
                 printf("BWindow: Couldn't create message port\n");
 
 	// Notify app that we exist
-         BWindow *win=this;
-         PortLink *link=new PortLink(be_app->fServerFrom);
-         link->SetOpCode(AS_CREATE_WINDOW);
-         link->Attach(&win,sizeof(BWindow*));
-         link->Flush();
-         delete link;
+	BWindow *win=this;
+	serverlink=new PortLink(be_app->fServerFrom);
+	serverlink->SetOpCode(AS_CREATE_WINDOW);
+	serverlink->Attach(&win,sizeof(BWindow*));
+	serverlink->Flush();
 	
 	 fUnused1 = true;	// Haven't been Show()n yet. Show() must UnLock().
 	 			// Knew I'd find a use for fUnused1 :)
@@ -79,21 +79,21 @@ BWindow::BWindow(BRect frame,
 
 	// We create our serverlink utilizing our application's server port
         // because the server's ServerApp will handle window creation
-	 link=new PortLink(be_app->fServerTo);
+	 serverlink->SetPort(be_app->fServerTo);
 
 	 // make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
 	 // OBApplication couldn't find the server
-         if(be_app->fServerTo!=B_NAME_NOT_FOUND)
+	if(be_app->fServerTo!=B_NAME_NOT_FOUND)
 	 {
 	   // Notify server of window's existence
-	   link->SetOpCode(AS_CREATE_WINDOW);
-	   link->Attach(fFrame);
-	   link->Attach((int32)fLook);
-	   link->Attach((int32)fFeel);
-	   link->Attach((int32)flags);
-	   link->Attach(&receive_port,sizeof(port_id));
-	   link->Attach((int32)workspace);
-	   link->Attach(fTitle,sizeof(fTitle));
+	   serverlink->SetOpCode(AS_CREATE_WINDOW);
+	   serverlink->Attach(fFrame);
+	   serverlink->Attach((int32)fLook);
+	   serverlink->Attach((int32)fFeel);
+	   serverlink->Attach((int32)flags);
+	   serverlink->Attach(&receive_port,sizeof(port_id));
+	   serverlink->Attach((int32)workspace);
+	   serverlink->Attach(fTitle,sizeof(fTitle));
 	   
          // Send and wait for ServerWindow port. Necessary here so we can respond to
 	 // messages as soon as Show() is called.
@@ -102,12 +102,11 @@ BWindow::BWindow(BRect frame,
 	   status_t replystat;
 	   ssize_t replysize;
 	   int8 *replybuffer;
-	   replybuffer=link->FlushWithReply(&replycode,&replystat,&replysize);
+	   replybuffer=serverlink->FlushWithReply(&replycode,&replystat,&replysize);
 	   send_port=*((port_id*)replybuffer);
-	   link->SetPort(send_port);
+	   serverlink->SetPort(send_port);
 	   delete replybuffer;
-	   link->Flush();
-	   delete link;
+	   serverlink->Flush();
       
 	   top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
 	   top_view->owner=this;
@@ -145,12 +144,11 @@ BWindow::BWindow(BRect frame,
                 printf("BWindow: Couldn't create message port\n");
 
 	// Notify app that we exist
-         BWindow *win=this;
-         PortLink *link=new PortLink(be_app->fServerFrom);
-         link->SetOpCode(AS_CREATE_WINDOW);
-         link->Attach(&win,sizeof(BWindow*));
-         link->Flush();
-         delete link;
+	BWindow *win=this;
+	serverlink=new PortLink(be_app->fServerFrom);
+	serverlink->SetOpCode(AS_CREATE_WINDOW);
+	serverlink->Attach(&win,sizeof(BWindow*));
+	serverlink->Flush();
 	
 	 fUnused1 = true;	// Haven't been Show()n yet. Show() must UnLock().
 	 			// Knew I'd find a use for fUnused1 :)
@@ -159,21 +157,21 @@ BWindow::BWindow(BRect frame,
 
 	// We create our serverlink utilizing our application's server port
         // because the server's ServerApp will handle window creation
-	 link=new PortLink(be_app->fServerTo);
+	 serverlink->SetPort(be_app->fServerTo);
 
 	 // make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
 	 // OBApplication couldn't find the server
-         if(be_app->fServerTo!=B_NAME_NOT_FOUND)
+     if(be_app->fServerTo!=B_NAME_NOT_FOUND)
 	 {
 	   // Notify server of window's existence
-	   link->SetOpCode(AS_CREATE_WINDOW);
-	   link->Attach(fFrame);
-	   link->Attach((int32)fLook);
-	   link->Attach((int32)fFeel);
-	   link->Attach((int32)flags);
-	   link->Attach(&receive_port,sizeof(port_id));
-	   link->Attach((int32)workspace);
-	   link->Attach(fTitle,sizeof(fTitle));
+	   serverlink->SetOpCode(AS_CREATE_WINDOW);
+	   serverlink->Attach(fFrame);
+	   serverlink->Attach((int32)fLook);
+	   serverlink->Attach((int32)fFeel);
+	   serverlink->Attach((int32)flags);
+	   serverlink->Attach(&receive_port,sizeof(port_id));
+	   serverlink->Attach((int32)workspace);
+	   serverlink->Attach(fTitle,sizeof(fTitle));
 	   
          // Send and wait for ServerWindow port. Necessary here so we can respond to
 	 // messages as soon as Show() is called.
@@ -182,12 +180,11 @@ BWindow::BWindow(BRect frame,
 	   status_t replystat;
 	   ssize_t replysize;
 	   int8 *replybuffer;
-	   replybuffer=link->FlushWithReply(&replycode,&replystat,&replysize);
+	   replybuffer=serverlink->FlushWithReply(&replycode,&replystat,&replysize);
 	   send_port=*((port_id*)replybuffer);
-	   link->SetPort(send_port);
+	   serverlink->SetPort(send_port);
 	   delete replybuffer;
-	   link->Flush();
-	   delete link;
+	   serverlink->Flush();
       
 	   top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
 	   top_view->owner=this;
@@ -218,22 +215,23 @@ BWindow::Quit()
 {
     
 	// Straight from DarkWyrm
-        // I hope this works. If it doesn't, we'll need to do a synchronous msg 
-        BWindow *win=this;
-        PortLink *link=new PortLink(be_app->fServerFrom);
-        link->SetOpCode(AS_DELETE_WINDOW);
-        link->Attach(&win,sizeof(BWindow *));
-        link->Flush();
-        delete link;
-        // Server will need to be notified of window destruction
-        PortLink *serverlink=new PortLink(be_app->fServerTo);        
-        serverlink->SetOpCode(AS_DELETE_WINDOW);
-        // serverlink->Attach(&ID,sizeof(int32));   XXX What is ID???
-        /* MAYBE */ serverlink->Attach(&win,sizeof(BWindow *));
-        serverlink->Flush();
-        delete serverlink;
-        // Quit our looper and delete our self :)
-        Quit();
+	// I hope this works. If it doesn't, we'll need to do a synchronous msg 
+	BWindow *win=this;
+	PortLink *link=new PortLink(be_app->fServerFrom);
+	link->SetOpCode(AS_DELETE_WINDOW);
+	link->Attach(&win,sizeof(BWindow *));
+	link->Flush();
+	delete link;
+	// Server will need to be notified of window destruction
+	serverlink->SetOpCode(AS_DELETE_WINDOW);
+	// serverlink->Attach(&ID,sizeof(int32));   XXX What is ID???
+	/* MAYBE */ 
+	serverlink->Attach(&win,sizeof(BWindow *));
+	serverlink->Flush();
+	delete serverlink;
+
+	// Quit our looper and delete our self :)
+	Quit();
 
 }
 //--------------------------------------------------------------------------------
@@ -241,7 +239,7 @@ BWindow::Quit()
 BArchivable*
 BWindow::Instantiate(BMessage* data)
 {
-        if ( validate_instantiation(data, "BWindow"))
+	if ( validate_instantiation(data, "BWindow"))
 	{
                 return new BWindow(data);
 	}
@@ -589,14 +587,12 @@ BWindow::Show()
 		Unlock();
 	}
 	fShowLevel++;		
-        if(fShowLevel>0)	// Transition between hidden and unhidden
-        {
-        	// Notify App_server that it should show the window
-        PortLink *serverlink= new PortLink(be_app->fServerTo);
-	    serverlink->SetOpCode(AS_SHOW_WINDOW);
-	    serverlink->Flush();
-	    delete serverlink;
-        }
+	if(fShowLevel>0)	// Transition between hidden and unhidden
+	{
+		// Notify App_server that it should show the window
+		serverlink->SetOpCode(AS_SHOW_WINDOW);
+		serverlink->Flush();
+	}
 }
 //--------------------------------------------------------------------------------
 /* Virtual */
@@ -606,11 +602,9 @@ BWindow::Hide()
 	fShowLevel--;	
 	if(fShowLevel==0)	// Transition between unhidden and hidden
 	{
-			// Notify App_server that it should hide this window
-            PortLink *serverlink= new PortLink(be_app->fServerTo);			
-		    serverlink->SetOpCode(AS_HIDE_WINDOW);
-	        serverlink->Flush();
-            delete serverlink;
+		// Notify App_server that it should hide this window
+		serverlink->SetOpCode(AS_HIDE_WINDOW);
+		serverlink->Flush();
 	}
 }
 //--------------------------------------------------------------------------------
