@@ -29,7 +29,7 @@
 	#include <socket.h>
 #endif
 
-#if POPSSL
+#if USESSL
 	#include <openssl/ssl.h>
 	#include <openssl/rand.h>
 	#include <openssl/md5.h>
@@ -49,7 +49,7 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 	fNumMessages(-1),
 	fMailDropSize(0)
 {
-    #ifdef POPSSL
+    #ifdef USESSL
 		use_ssl = (settings->FindInt32("flavor") == 1);
 	#endif
 	Init();
@@ -60,7 +60,7 @@ POP3Protocol::~POP3Protocol()
 {
 	SendCommand("QUIT" CRLF);
         
-#ifdef POPSSL
+#ifdef USESSL
 	if (use_ssl) {
 		SSL_shutdown(ssl);
 		SSL_CTX_free(ctx);
@@ -81,7 +81,7 @@ POP3Protocol::Open(const char *server, int port, int)
 	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Connecting to POP3 Server...","POP3サーバに接続しています..."));
         
 	if (port <= 0)
-		#ifdef POPSSL
+		#ifdef USESSL
 			port = use_ssl ? 995 : 110;
 		#else
 			port = 110;
@@ -133,7 +133,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_ERROR;
 	}
         
-    #ifdef POPSSL
+    #ifdef USESSL
 	if (use_ssl) {
 		SSL_library_init();
     	SSL_load_error_strings();
@@ -382,7 +382,7 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 	while (cont) {
                 int result = 0;
                 
-            #ifdef POPSSL
+            #ifdef USESSL
                 if ((use_ssl) && (SSL_pending(ssl)))
                     result = 1;
                 else
@@ -396,7 +396,7 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
-            #ifdef POPSSL
+            #ifdef USESSL
                 if (use_ssl)
                     amountReceived = SSL_read(ssl,buf + amountInBuffer, amountToReceive);
                 else
@@ -559,7 +559,7 @@ POP3Protocol::ReceiveLine(BString &line)
 	/* Set the socket in the mask. */ 
 	FD_SET(conn, &fds); 
 	int result = -1;
-    #ifdef POPSSL
+    #ifdef USESSL
         if ((use_ssl) && (SSL_pending(ssl)))
             result = 1;
         else
@@ -571,7 +571,7 @@ POP3Protocol::ReceiveLine(BString &line)
 	
 	if (result > 0) {
 		while (true) { // Hope there's an end of line out there else this gets stuck.
-                  #ifdef POPSSL
+                  #ifdef USESSL
 			if (use_ssl)
 				rcv = SSL_read(ssl,&c,1);
 			else
@@ -625,7 +625,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	/* Set the socket in the mask. */ 
 	FD_SET(conn, &fds);
         int result;
-        #ifdef POPSSL
+        #ifdef USESSL
                 if ((use_ssl) && (SSL_pending(ssl)))
                         result = 1;
                 else
@@ -635,7 +635,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	if (result > 0) {
 		int amountReceived;
 		char tempString [1025]; 
-            #ifdef POPSSL
+            #ifdef USESSL
                 if (use_ssl)
                         amountReceived = SSL_read(ssl,tempString, sizeof (tempString) - 1);
                 else
@@ -649,7 +649,7 @@ POP3Protocol::SendCommand(const char *cmd)
 		//if (amountReceived == 0)
 		//	break;
 	}
-#ifdef POPSSL
+#ifdef USESSL
 	if (use_ssl) {
 		SSL_write(ssl,cmd,::strlen(cmd));
 		//SSL_write(ssl,"\r\n",2);
@@ -690,7 +690,7 @@ void POP3Protocol::MD5Digest (unsigned char *in,char *ascii_digest)
 {	
         unsigned char digest[16];
     
-    #ifdef POPSSL
+    #ifdef USESSL
 	MD5(in, ::strlen((char*)in),digest);
     #else
 	MD5_CTX context;
@@ -715,11 +715,16 @@ BMailFilter *instantiate_mailfilter(BMessage *settings, BMailChainRunner *runner
 
 BView* instantiate_config_panel(BMessage *settings,BMessage *)
 {
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_FLAVORS | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME | B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER);
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME | B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
+	#if USESSL
+		| B_MAIL_PROTOCOL_HAS_FLAVORS);
+	#else
+		);
+	#endif
 	view->AddAuthMethod("Plain Text");
 	view->AddAuthMethod("APOP");
         
-        #if POPSSL
+        #if USESSL
             view->AddFlavor("Unencrypted");
             view->AddFlavor("SSL");
         #endif
