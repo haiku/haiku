@@ -513,9 +513,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 				int32 totalWorkspaces = count_workspaces();
 				fRevertButton->SetEnabled(false);
 				
-				for (int32 count = 1; count <= totalWorkspaces; count++) {
-					activate_workspace(count);
-					screen.SetMode(&mode, true);
+				for (int32 count = 0; count <= totalWorkspaces; count++) {
+					if (count != old) {
+						activate_workspace(count);
+						screen.SetMode(&mode, true);
+					}
 				}
 					
 				activate_workspace(old);
@@ -635,13 +637,14 @@ ScreenWindow::ApplyMode()
 		return;
 					
 	display_mode requested_mode;
+	screen.GetMode(&requested_mode); // start with current mode timings
 						
 	BString menuLabel = fResolutionMenu->FindMarked()->Label();
 	string_to_mode(menuLabel.String(),&requested_mode);
 	requested_mode.space = string_to_colorspace(fColorsMenu->FindMarked()->Label());
 	requested_mode.h_display_start = 0;
 	requested_mode.v_display_start = 0;
-	
+
 	display_mode * supported_mode = 0;
 	display_mode * mismatch_mode = 0;
 	for (uint32 c = 0; c < fTotalModes; c++) {			
@@ -658,17 +661,8 @@ ScreenWindow::ApplyMode()
 	}
 	if (supported_mode) {
 		requested_mode = *supported_mode;
-	} else {
-		display_mode proposed_mode = requested_mode;
-//		if (screen.ProposeMode(&proposed_mode,&proposed_mode,&proposed_mode) == B_ERROR) {
-		if (!mismatch_mode) {
-			BAlert * UnsupportedModeAlert = 
-				new BAlert("UnsupportedModeAlert", "This mode is not supported.",
-				           "Okay", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-			UnsupportedModeAlert->Go();
-			return;
-		}
-		proposed_mode = *mismatch_mode;
+	} else if (mismatch_mode) {
+		display_mode proposed_mode = *mismatch_mode;
 		BString string;
 		char str[256];
 		colorspace_to_string(requested_mode.space,str);
@@ -688,7 +682,35 @@ ScreenWindow::ApplyMode()
 			return;
 		}
 		requested_mode = proposed_mode;
-	}	
+	} else {
+		display_mode proposed_mode = requested_mode;
+		if (screen.ProposeMode(&proposed_mode,&requested_mode,&requested_mode) == B_ERROR) {
+			BAlert * UnsupportedModeAlert = 
+				new BAlert("UnsupportedModeAlert", "This mode is not supported.",
+				           "Okay", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			UnsupportedModeAlert->Go();
+			return;
+		}
+		BString string;
+		char str[256];
+		colorspace_to_string(requested_mode.space,str);
+		string << str;
+		mode_to_string(requested_mode,str);
+		string << " is not supported at " << str << ".  ";
+		string << "Use ";
+		colorspace_to_string(proposed_mode.space,str);
+		string << str;
+		mode_to_string(proposed_mode,str);
+		string << " at " << str << " instead?";
+		BAlert * BadModeAlert = 
+			new BAlert("BadModeAlert", string.String(),
+			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		int32 button = BadModeAlert->Go();
+		if (button == 1) {
+			return;
+		}
+		requested_mode = proposed_mode;
+	}
 
 	float refresh;
 	if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
