@@ -86,5 +86,6 @@ public:
 
 // mimetype from sender
 bool MimeTypeForSender(BMessage* sender, BString& mime);
+bool AddFields(BMessage* to, const BMessage* from);
 
 #endif

@@ -144,6 +144,11 @@ PrintServerApp::~PrintServerApp() {
 
 bool PrintServerApp::QuitRequested()
 {
+	BMessage* m = CurrentMessage();
+	bool shortcut;
+		// don't quit when user types Command+Q! 
+	if (m && m->FindBool("shortcut", &shortcut) == B_OK && shortcut) return false;
+		
 	bool rc = Inherited::QuitRequested();
 	if (rc) {		
 			// Find directory containing printer definition nodes
@@ -468,6 +473,8 @@ PrintServerApp::HandleSpooledJobs()
 	}
 }
 
+static const char* kPrinterData = "printer_data";
+
 // ---------------------------------------------------------------
 // RetrieveDefaultPrinter()
 //
@@ -483,22 +490,8 @@ PrintServerApp::HandleSpooledJobs()
 status_t
 PrintServerApp::RetrieveDefaultPrinter()
 {
-	printer_data_t prefs;
-	status_t rc = B_OK;
-	BPath path;
-
-	if ((rc=find_directory(B_USER_SETTINGS_DIRECTORY, &path, true)) == B_OK) {
-		BFile file;
-		
-		path.Append("printer_data");
-
-		if ((rc=file.SetTo(path.Path(), B_READ_ONLY)) == B_OK) {
-			file.ReadAt(0, &prefs, sizeof(prefs));
-			fDefaultPrinter = Printer::Find(prefs.defaultPrinterName);
-		}
-	}
-	
-	return rc;
+	fDefaultPrinter = Printer::Find(fSettings->DefaultPrinter());
+	return B_OK;
 }
 
 // ---------------------------------------------------------------
@@ -516,27 +509,11 @@ PrintServerApp::RetrieveDefaultPrinter()
 status_t
 PrintServerApp::StoreDefaultPrinter()
 {
-	printer_data_t prefs;
-	status_t rc = B_OK;
-	BPath path;
-
-	if ((rc=find_directory(B_USER_SETTINGS_DIRECTORY, &path, true)) == B_OK) {
-		BFile file;
-		
-		path.Append("printer_data");
-
-		if ((rc=file.SetTo(path.Path(), B_WRITE_ONLY)) == B_OK) {
-
-			if (fDefaultPrinter != NULL)
-				::strcpy(prefs.defaultPrinterName, fDefaultPrinter->Name());
-			else
-				prefs.defaultPrinterName[0] = '\0';
-
-			file.WriteAt(0, &prefs, sizeof(prefs));
-		}
-	}
-	
-	return rc;
+	if (fDefaultPrinter)
+		fSettings->SetDefaultPrinter(fDefaultPrinter->Name());
+	else
+		fSettings->SetDefaultPrinter("");
+	return B_OK;
 }
 
 // ---------------------------------------------------------------
@@ -595,17 +572,19 @@ PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 }
 
 
-bool PrintServerApp::OpenSettings(BFile& file, bool forReading) {
+bool PrintServerApp::OpenSettings(BFile& file, const char* name, bool forReading) {
 	BPath path;
 	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY;
 	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK &&
-		path.Append("print_server_settings") == B_OK &&
+		path.Append(name) == B_OK &&
 		file.SetTo(path.Path(), openMode) == B_OK;
 }
 
+static const char* kSettingsName = "print_server_settings";
+
 void PrintServerApp::LoadSettings() {
 	BFile file;
-	if (OpenSettings(file, true)) {
+	if (OpenSettings(file, kSettingsName, true)) {
 		fSettings->Load(&file);
 		fUseConfigWindow = fSettings->UseConfigWindow();
 	}
@@ -613,7 +592,7 @@ void PrintServerApp::LoadSettings() {
 
 void PrintServerApp::SaveSettings() {
 	BFile file;
-	if (OpenSettings(file, false)) {
+	if (OpenSettings(file, kSettingsName, false)) {
 		fSettings->SetUseConfigWindow(fUseConfigWindow);
 		fSettings->Save(&file);
 	}

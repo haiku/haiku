@@ -63,7 +63,7 @@ class PrintServerApp : public BApplication
 public:
 	PrintServerApp(status_t* err);
 	~PrintServerApp();
-	
+		
 	void Acquire();
 	void Release();
 	
@@ -78,7 +78,7 @@ public:
 	BHandler* ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 								int32 form, const char* prop);
 private:
-	bool OpenSettings(BFile& file, bool forReading);
+	bool OpenSettings(BFile& file, const char* name, bool forReading);
 	void LoadSettings();
 	void SaveSettings();
 

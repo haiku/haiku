@@ -118,6 +118,7 @@ void Settings::Save(BFile* file) {
 	
 	m.AddBool("UseConfigWindow", fUseConfigWindow);
 	m.AddRect("ConfigWindowFrame", fConfigWindowFrame);
+	m.AddString("DefaultPrinter", fDefaultPrinter);
 	m.Flatten(file);
 }
 
@@ -143,5 +144,8 @@ void Settings::Load(BFile* file) {
 		
 		if (m.FindRect("ConfigWindowFrame", &fConfigWindowFrame) != B_OK)
 			fConfigWindowFrame = BRect(kConfigWindowFrame);
+			
+		if (m.FindString("DefaultPrinter", &fDefaultPrinter) != B_OK)
+			fDefaultPrinter = "";
 	}
 }

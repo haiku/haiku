@@ -90,3 +90,21 @@ bool MimeTypeForSender(BMessage* sender, BString& mime) {
 	}
 	return false;
 }
+
+bool AddFields(BMessage* to, const BMessage* from) {
+	char* name;
+	uint32 type;
+	int32 count;
+	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
+		// replace existing data
+		to->RemoveName(name);
+		
+		const void* data;
+		ssize_t size;
+		for (int32 i = 0; i < count; i ++) {
+			if (from->FindData(name, type, i, &data, &size) == B_OK) {
+				to->AddData(name, type, data, size);
+			}
+		}
+	}
+}

@@ -33,6 +33,7 @@
 #include "Printer.h"
 #include "PrintServerApp.h"
 #include "ConfigWindow.h"
+#include "BeUtils.h"
 
 // posix
 #include <stdlib.h>
@@ -44,7 +45,7 @@
 #include <Window.h>
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), "Printer Setup", 
+	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup", 
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
@@ -55,40 +56,81 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	MimeTypeForSender(settings, fSenderMimeType);
 	PrinterForMimeType();
 
+	if (kind == kJobSetup) SetTitle("Print Setup");
+
 	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL, 
 					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 					B_PLAIN_BORDER);
 
 	AddChild(panel);
 	
-	float left = 10, top = 5;
+	float left = 10, top = 5, width;
 	BRect r(left, top, 160, 15);
 
-	BPopUpMenu* menu = new BPopUpMenu("PrinterMenu");
+		// print selection popup menu
+	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
 	SetupPrintersMenu(menu);
 
 	fPrinters = new BMenuField(r, "Printer", "Printer", menu);
-	fPrinters->SetDivider(60);
+	fPrinters->SetDivider(40);
 	panel->AddChild(fPrinters);
-	top += fPrinters->Bounds().Height() + 5;
+	top += fPrinters->Bounds().Height() + 10;
+	width = fPrinters->Bounds().Width();
 	
+		// page format button
 	r.OffsetTo(left, top);
-	fPageSetup = new BButton(r, "Page Setup", "Page Setup", new BMessage(MSG_PAGE_SETUP));
+	fPageSetup = new BButton(r, "Page Format", "Page Format", new BMessage(MSG_PAGE_SETUP));
 	panel->AddChild(fPageSetup);
 	fPageSetup->ResizeToPreferred();
 	top += fPageSetup->Bounds().Height() + 5;
+	if (fPageSetup->Bounds().Width() > width) width = fPageSetup->Bounds().Width();
 	
+		// page selection button
 	fJobSetup = NULL;
 	if (kind == kJobSetup) {
 		r.OffsetTo(left, top);
-		fJobSetup = new BButton(r, "Job Setup", "Job Setup", new BMessage(MSG_JOB_SETUP));
+		fJobSetup = new BButton(r, "Page Selection", "Page Selection", new BMessage(MSG_JOB_SETUP));
 		panel->AddChild(fJobSetup);
-		fJobSetup->SetEnabled(fKind == kJobSetup);	
 		fJobSetup->ResizeToPreferred();
 		top += fJobSetup->Bounds().Height() + 5;
+		if (fJobSetup->Bounds().Width() > width) width = fJobSetup->Bounds().Width();
 	}
+	top += 5;
 	
-	ResizeTo(Bounds().Width(), top);
+		// separator line
+	BRect line(Bounds());
+	line.OffsetTo(0, top);
+	line.bottom = line.top+1;
+	AddChild(new BBox(line, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP));
+	top += 10;
+	
+		// Cancel button
+	r.OffsetTo(left, top);
+	BButton* cancel = new BButton(r, "Cancel", "Cancel", new BMessage(B_QUIT_REQUESTED));
+	panel->AddChild(cancel);
+	cancel->ResizeToPreferred();
+	left = cancel->Frame().right + 10;
+	
+		// OK button
+	r.OffsetTo(left, top);
+	fOk = new BButton(r, "OK", "OK", new BMessage(MSG_OK));
+	panel->AddChild(fOk);
+	fOk->ResizeToPreferred();
+	top += fOk->Bounds().Height() + 10;
+
+		// resize buttons to equal width	
+	float height = fOk->Bounds().Height();
+	fPageSetup->ResizeTo(width, height);
+	if (fJobSetup) fJobSetup->ResizeTo(width, height);
+	
+		// resize window	
+	ResizeTo(fOk->Frame().right + 10, top);
+	
+	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
+	
+	SetDefaultButton(fOk);
+	
+	fPrinters->MakeFocus(true);
 	
 	UpdateSettings(true);
 }
@@ -125,10 +167,56 @@ void ConfigWindow::MessageReceived(BMessage* m) {
 				}
 			}
 			break;
+		case MSG_OK:
+			UpdateSettings(false);
+			fSender->SetReply(fKind == kPageSetup ? &fPageSettings : &fJobSettings);
+			Quit();
+			break;
+		case B_ABOUT_REQUESTED: AboutRequested();
+			break;
 		default:
 			inherited::MessageReceived(m);
 	}
 }
+
+static const char* 
+kAbout =
+"Printer Server\n"
+"© 2001, 2002 OpenBeOS\n"
+"\n"
+"\tIthamar R. Adema - Initial Implementation\n"
+"\tMichael Pfeiffer - Release 1 and beyond\n"
+;
+
+void
+ConfigWindow::AboutRequested()
+{
+	BAlert *about = new BAlert("About Printer Server", kAbout, "Cool");
+	BTextView *v = about->TextView();
+	if (v) {
+		rgb_color red = {255, 0, 51, 255};
+		rgb_color blue = {0, 102, 255, 255};
+
+		v->SetStylable(true);
+		char *text = (char*)v->Text();
+		char *s = text;
+		// set all Be in blue and red
+		while ((s = strstr(s, "Be")) != NULL) {
+			int32 i = s - text;
+			v->SetFontAndColor(i, i+1, NULL, 0, &blue);
+			v->SetFontAndColor(i+1, i+2, NULL, 0, &red);
+			s += 2;
+		}
+		// first text line 
+		s = strchr(text, '\n');
+		BFont font;
+		v->GetFontAndColor(0, &font);
+		font.SetSize(12);
+		v->SetFontAndColor(0, s-text+1, &font, B_FONT_SIZE);
+	};
+	about->Go();
+}
+
 
 void ConfigWindow::FrameMoved(BPoint p) {
 	BRect frame = GetWindowFrame();
@@ -215,32 +303,47 @@ void ConfigWindow::UpdateSettings(bool read) {
 			fPageSettings = *p->GetPageSettings();
 			fJobSettings = *p->GetJobSettings();
 		} else {
-			if (fJobSettings.IsEmpty()) fJobSettings = fPageSettings;
 			p->SetPageSettings(&fPageSettings);
 			p->SetJobSettings(&fJobSettings);
 		}
+	}
+	UpdateUI();
+}
+
+void ConfigWindow::UpdateUI() {
+	if (fCurrentPrinter == NULL) {
+		fPageSetup->SetEnabled(false);
+		if (fJobSetup) fJobSetup->SetEnabled(false);
+		fOk->SetEnabled(false);
+	} else {	
+		fPageSetup->SetEnabled(true);
+	
 		if (fJobSetup) {
 			fJobSetup->SetEnabled(fKind == kJobSetup && !fPageSettings.IsEmpty());
 		}
+		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
+			fKind == kPageSetup && !fPageSettings.IsEmpty());
 	}
 }
 
 void ConfigWindow::Setup(config_setup_kind kind) {
 	if (fCurrentPrinter) {
 		Hide();
-		UpdateSettings(true);
-		bool ok;
 		if (kind == kPageSetup) {
-			ok = fCurrentPrinter->ConfigurePage(fPageSettings) == B_OK;
+			BMessage settings = fPageSettings;			
+			if (fCurrentPrinter->ConfigurePage(settings) == B_OK) {
+				fPageSettings = settings;
+				if (!fJobSettings.IsEmpty()) AddFields(&fJobSettings, &fPageSettings);
+			}
 		} else {
-			ok = fCurrentPrinter->ConfigureJob(fJobSettings) == B_OK;
+			BMessage settings;			
+			if (fJobSettings.IsEmpty()) settings = fPageSettings;
+			else settings = fJobSettings;
+			
+			if (fCurrentPrinter->ConfigureJob(settings) == B_OK)
+				fJobSettings = settings;
 		}
-		if (ok) UpdateSettings(false);
-		if (ok && fKind == kind) {
-			fSender->SetReply(kind == kPageSetup ? &fPageSettings : &fJobSettings);
-			Quit();
-		} else {
-			Show();
-		}
+		UpdateUI();
+		Show();
 	}
 }

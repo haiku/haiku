@@ -83,17 +83,15 @@ status_t PrintServerApp::async_thread(void* data)
 		switch (msg->what) {
 				// Handle showing the page config dialog
 			case PSRV_SHOW_PAGE_SETUP: {
-				if (p->app->fUseConfigWindow) {
-					ConfigWindow* w = new ConfigWindow(kPageSetup, printer, msg, &sender);
-					w->Go();
-				} else if (printer != NULL) {
-						BMessage reply(*msg);
-						if (printer->ConfigurePage(reply) == B_OK) {
+					BMessage reply(*msg);
+					if (printer != NULL) {
+						if (p->app->fUseConfigWindow) {
+							ConfigWindow* w = new ConfigWindow(kPageSetup, printer, msg, &sender);
+							w->Go();
+						} else if (printer->ConfigurePage(reply) == B_OK) {
 							sender.SetReply(&reply);
-							break;
 						}
-					}
-					else {
+					} else {
 							// If no default printer, give user choice of aborting or setting up a printer
 						BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
 						if (alert->Go() == 1) {
@@ -105,14 +103,14 @@ status_t PrintServerApp::async_thread(void* data)
 	
 				// Handle showing the print config dialog
 			case PSRV_SHOW_PRINT_SETUP: {
+					if (printer == NULL) break;
 					if (p->app->fUseConfigWindow) {
 						ConfigWindow* w = new ConfigWindow(kJobSetup, printer, msg, &sender);
 						w->Go();
-					} else if (printer != NULL) {
+					} else {
 						BMessage reply(*msg);
 						if (printer->ConfigureJob(reply) == B_OK) {
 							sender.SetReply(&reply);
-							break;
 						}
 					}
 				}
@@ -190,8 +188,12 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 				if (msg->FindString("driver", &driverName) == B_OK &&
 					msg->FindString("transport", &transportName) == B_OK &&
 					msg->FindString("transport path", &transportPath) == B_OK &&
-					msg->FindString("printer name", &printerName) == B_OK &&
-					msg->FindString("connection", &connection) == B_OK) {
+					msg->FindString("printer name", &printerName) == B_OK
+					) {
+
+					if (msg->FindString("connection", &connection) != B_OK)
+						connection = "Local";
+
 						// then create the actual printer
 					if (CreatePrinter(printerName.String(), driverName.String(),
 						connection.String(),

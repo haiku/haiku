@@ -77,6 +77,7 @@ private:
 	BObjectList<PrinterSettings> fPrinters;
 	bool                         fUseConfigWindow;
 	BRect                        fConfigWindowFrame;
+	BString                      fDefaultPrinter;
 	
 	static Settings* fSingleton;
 	Settings();
@@ -97,10 +98,12 @@ public:
 	void RemovePrinterSettings(int i);
 	PrinterSettings* FindPrinterSettings(const char* printer);
 	
-	bool UseConfigWindow() const       { return fUseConfigWindow; }
-	void SetUseConfigWindow(bool b)    { fUseConfigWindow = b; }
-	BRect ConfigWindowFrame() const    { return fConfigWindowFrame; }
-	void SetConfigWindowFrame(BRect r) { fConfigWindowFrame = r; }	
+	bool UseConfigWindow() const          { return fUseConfigWindow; }
+	void SetUseConfigWindow(bool b)       { fUseConfigWindow = b; }
+	BRect ConfigWindowFrame() const       { return fConfigWindowFrame; }
+	void SetConfigWindowFrame(BRect r)    { fConfigWindowFrame = r; }	
+	const char* DefaultPrinter() const    { return fDefaultPrinter.String(); }
+	void SetDefaultPrinter(const char* n) { fDefaultPrinter = n; }	
 		
 	void Save(BFile* settings_file);
 	void Load(BFile* settings_file);

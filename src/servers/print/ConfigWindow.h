@@ -47,6 +47,8 @@ class ConfigWindow : public BWindow {
 		MSG_PAGE_SETUP       = 'cwps',
 		MSG_JOB_SETUP        = 'cwjs',
 		MSG_PRINTER_SELECTED = 'cwpr',
+		MSG_OK               = 'cwok',
+		MSG_CANCEL           = 'cwcl',
 	};
 	
 public:
@@ -55,7 +57,7 @@ public:
 	void Go();
 	
 	void MessageReceived(BMessage* m);
-
+	void AboutRequested();
 	void FrameMoved(BPoint p);
 
 	static BRect GetWindowFrame();
@@ -66,6 +68,7 @@ private:
 	void SetupPrintersMenu(BMenu* menu);
 	void UpdateAppSettings(const char* mime, const char* printer);
 	void UpdateSettings(bool read);
+	void UpdateUI();
 	void Setup(config_setup_kind);
 
 	config_setup_kind fKind;
@@ -84,6 +87,7 @@ private:
 	BMenuField* fPrinters;
 	BButton*    fPageSetup;
 	BButton*    fJobSetup;
+	BButton*    fOk;
 };
 
 #endif
