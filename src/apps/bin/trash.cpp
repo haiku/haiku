@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <app/Message.h>
+#include <app/Messenger.h>
 #include <kernel/fs_attr.h>
 #include <kernel/fs_info.h>
 #include <storage/Directory.h>
@@ -17,6 +19,7 @@
 #include <support/TypeConstants.h>
 
 static const char *kAttrOriginalPath = "_trk/original_path";
+static const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 
 int usage(int ret)
 {
@@ -114,8 +117,14 @@ int main(int argc, char **argv)
 		return usage(0);
 	if (!dountrash && !strcmp(argv[1], "--empty")) {
 		/* XXX: clean that */
-		if (system("hey Tracker delete Trash"))
+		BMessage msg(B_DELETE_PROPERTY);
+		msg.AddSpecifier("Trash");
+		BMessenger msgr(kTrackerSig);
+		err = msgr.SendMessage(&msg);
+		if (err < 0) {
+			fprintf(stderr, "Emptying Trash: %s\n", strerror(err));
 			return 1;
+		}
 		return 0;
 	}
 	if (dountrash && !strcmp(argv[1], "--all")) {
