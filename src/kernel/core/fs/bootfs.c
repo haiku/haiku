@@ -655,7 +655,7 @@ bootfs_fsync(fs_volume _fs, fs_vnode _v)
 }
 
 
-static ssize_t
+static status_t
 bootfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buffer, size_t *_length)
 {
 	struct bootfs *fs = _fs;
@@ -704,7 +704,7 @@ err:
 }
 
 
-static ssize_t
+static status_t
 bootfs_write(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buf, size_t *len)
 {
 	TRACE(("bootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));

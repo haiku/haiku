@@ -556,17 +556,20 @@ rootfs_fsync(fs_volume _fs, fs_vnode _v)
 }
 
 
-static ssize_t
-rootfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buf, size_t *len)
+static status_t
+rootfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, 
+	off_t pos, void *buffer, size_t *_length)
 {
 	return EINVAL;
 }
 
 
-static ssize_t
-rootfs_write(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buf, size_t *len)
+static status_t
+rootfs_write(fs_volume fs, fs_vnode vnode, fs_cookie cookie, 
+	off_t pos, const void *buffer, size_t *_length)
 {
-	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));
+	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", 
+		vnode, cookie, pos, *len));
 
 	return EPERM;
 }
