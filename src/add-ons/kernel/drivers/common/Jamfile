@@ -1,4 +1,10 @@
 SubDir OBOS_TOP src add-ons kernel drivers common ;
 
-KernelObjects null.c zero.c digit.c : -fno-pic ;
+KernelAddon null : kernel drivers dev :
+	null.c
+	;
+
+KernelAddon zero : kernel drivers dev :
+	zero.c
+	;
 
