@@ -418,12 +418,10 @@ MixerCore::MixThread()
 
 	if (!LockFromMixThread())
 		return;
-	latency = min(3600LL, bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)));
-	// XXX we might need to add scheduling latency
-	// latency += 0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio);
+	latency = max(3600LL, bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)));
 	
 	// XXX when the format changes while running, everything is wrong!
-	buffer_request_timeout = (3 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)) / 4;
+	buffer_request_timeout = buffer_duration(fOutput->MediaOutput().format.u.raw_audio) / 2;
 	
 	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld, buffer_request_timeout %Ld\n", start, latency, fDownstreamLatency, buffer_request_timeout);
 
@@ -459,9 +457,11 @@ MixerCore::MixThread()
 			continue;
 		if (rv != B_TIMED_OUT && rv < B_OK)
 			return;
-			
-		if (!LockWithTimeout(10000))
+		
+		if (!LockWithTimeout(10000)) {
+			ERROR("MixerCore: LockWithTimeout failed\n");
 			continue;
+		}
 		
 		// no inputs or output muted, skip further processing and just send an empty buffer
 		if (fInputs->IsEmpty() || fOutput->IsMuted()) {

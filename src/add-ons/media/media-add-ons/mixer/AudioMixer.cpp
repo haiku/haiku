@@ -22,7 +22,7 @@
 #include "MixerUtils.h"
 #include "debug.h"
 
-#define VERSION_STRING	"0.1 alpha 2"
+#define VERSION_STRING	"0.1 alpha 3"
 #define BUILD_STRING	__DATE__ " " __TIME__
 
 // the range of the gain sliders (in dB)
@@ -313,7 +313,7 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
 
-	//printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", *out_latency, *out_timesource);
+	printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", *out_latency, *out_timesource);
 
 	return B_OK;
 
@@ -509,13 +509,15 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = BufferDuration() + min(4500LL, bigtime_t(0.5 * BufferDuration()));
+	fInternalLatency = BufferDuration() + max(4500LL, bigtime_t(0.5 * BufferDuration()));
 	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
-	TRACE("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
-	SendLatencyChange(source, destination, EventLatency());
+	// we need to inform all connected *inputs* about *our* change in latency
+	PublishEventLatencyChange();
+	
+	// XXX we might need to create more buffers, to span a larger downstream latency
 
 	// apply latency change
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
@@ -605,23 +607,31 @@ void
 AudioMixer::LatencyChanged(const media_source & source, const media_destination & destination,
 						   bigtime_t new_latency, uint32 flags)
 {
-	TRACE("AudioMixer::LatencyChanged: downstream latency changed from %Ld to %Ld\n", fDownstreamLatency, new_latency);
+	if (source.port != ControlPort() || source.id != 0) {
+		ERROR("AudioMixer::LatencyChanged: received but has wrong source %ld/%ld\n", source.port, source.id);
+		return;
+	}
+
+	TRACE("AudioMixer::LatencyChanged: downstream latency from %ld/%ld to %ld/%ld changed from %Ld to %Ld\n",
+		source.port, source.id, destination.port, destination.id, fDownstreamLatency, new_latency);
+
+#if DEBUG
+	{
+		media_node_id id;
+		bigtime_t l;
+		FindLatencyFor(destination, &l, &id);
+		TRACE("AudioMixer: Reported downstream Latency is %Ld usecs\n", l);
+	}
+#endif
 
 	fDownstreamLatency = new_latency;
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
+
+	// XXX we might need to create more buffers, to span a larger downstream latency
 	
 	fCore->Lock();
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
-
-	MixerInput *input;	
-	for (int i = 0; (input = fCore->Input(i)) != 0; i++) {
-		TRACE("AudioMixer: SendLatencyChange from %ld/%ld to %ld/%ld event latency is now %Ld\n",
-			input->MediaInput().source.port, input->MediaInput().source.id,
-			input->MediaInput().destination.port, input->MediaInput().destination.id,
-			EventLatency());
-		SendLatencyChange(input->MediaInput().source, input->MediaInput().destination, EventLatency());
-	}
-
+	PublishEventLatencyChange();
 	fCore->Unlock();
 }
 
@@ -772,13 +782,13 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = BufferDuration() + min(4500LL, bigtime_t(0.5 * BufferDuration()));
+	fInternalLatency = BufferDuration() + max(4500LL, bigtime_t(0.5 * BufferDuration()));
 	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
-	TRACE("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
-	SendLatencyChange(source, dest, EventLatency());
+	// we need to inform all connected *inputs* about *our* change in latency
+	PublishEventLatencyChange();
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
@@ -868,9 +878,8 @@ AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, big
 
 			printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
 			SetEventLatency(fDownstreamLatency + fInternalLatency);
-		
-//			printf("AudioMixer: SendLatencyChange %Ld (2)\n", EventLatency());
-//			SendLatencyChange(source, dest, EventLatency());
+			
+			PublishEventLatencyChange();
 		}
 	}
 */
@@ -961,6 +970,28 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 //
 // AudioMixer methods
 //		
+
+void
+AudioMixer::PublishEventLatencyChange()
+{
+	// our event (processing + downstream) latency has changed,
+	// and we need tell all inputs about this
+	
+	TRACE("AudioMixer::PublishEventLatencyChange\n");
+
+	fCore->Lock();
+
+	MixerInput *input;	
+	for (int i = 0; (input = fCore->Input(i)) != 0; i++) {
+		TRACE("AudioMixer::PublishEventLatencyChange: SendLatencyChange, connection %ld/%ld to %ld/%ld event latency is now %Ld\n",
+			input->MediaInput().source.port, input->MediaInput().source.id,
+			input->MediaInput().destination.port, input->MediaInput().destination.id,
+			EventLatency());
+		SendLatencyChange(input->MediaInput().source, input->MediaInput().destination, EventLatency());
+	}
+
+	fCore->Unlock();
+}
 
 BBufferGroup *
 AudioMixer::CreateBufferGroup()

@@ -44,7 +44,7 @@ class AudioMixer :
 	
 		void				ApplySettings();
 
-					
+		void				PublishEventLatencyChange();					
 		void				UpdateParameterWeb();
 		
 		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
