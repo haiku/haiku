@@ -66,6 +66,7 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 	out_description->family = B_META_FORMAT_FAMILY;
 	switch (in_format.u.encoded_audio.encoding) {
 			
+		case B_WAV_FORMAT_FAMILY:
 		case B_MPEG_FORMAT_FAMILY:
 			strcpy(out_description->u.meta.description, "audiocodec/mpeg1layer3");
 			break;
