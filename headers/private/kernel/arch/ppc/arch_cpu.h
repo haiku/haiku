@@ -1,6 +1,6 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef _KERNEL_ARCH_PPC_CPU_H
 #define _KERNEL_ARCH_PPC_CPU_H
@@ -9,14 +9,8 @@
 #include <arch/ppc/thread_struct.h>
 #include <kernel.h>
 
+
 #define PAGE_SIZE 4096
-
-#define _BIG_ENDIAN 1
-#define _LITTLE_ENDIAN 0
-
-#define FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE	uint64
-
-#define ATOMIC64_FUNCS_ARE_SYSCALLS 1
 
 struct iframe {
 	uint32 srr0;
