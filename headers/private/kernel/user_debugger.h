@@ -40,6 +40,9 @@ struct team_debug_info {
 	thread_id	nub_thread;
 	port_id		nub_port;
 		// the port the nub thread is waiting on for commands from the debugger
+	sem_id		debugger_write_lock;
+		// synchronizes writes to the debugger port with the setting (but not
+		// clearing) of the B_TEAM_DEBUG_DEBUGGER_HANDOVER flag
 
 	struct arch_team_debug_info	arch_info;
 };
@@ -61,6 +64,7 @@ struct thread_debug_info {
 // team debugging flags (user-specifiable flags are in <debugger.h>)
 enum {
 	B_TEAM_DEBUG_DEBUGGER_INSTALLED	= 0x0001,
+	B_TEAM_DEBUG_DEBUGGER_HANDOVER	= 0x0002,
 
 	B_TEAM_DEBUG_KERNEL_FLAG_MASK	= 0xffff,
 
@@ -87,6 +91,7 @@ typedef enum {
 	B_DEBUGGED_THREAD_MESSAGE_CONTINUE	= 0,
 	B_DEBUGGED_THREAD_GET_WHY_STOPPED,
 	B_DEBUGGED_THREAD_SET_CPU_STATE,
+	B_DEBUGGED_THREAD_DEBUGGER_CHANGED,
 } debugged_thread_message;
 
 typedef struct {
@@ -107,6 +112,12 @@ typedef union {
 	debugged_thread_get_why_stopped	get_why_stopped;
 	debugged_thread_set_cpu_state	set_cpu_state;
 } debugged_thread_message_data;
+
+
+// internal messages sent to the nub thread
+typedef enum {
+	B_DEBUG_MESSAGE_HANDED_OVER		= -1,
+} debug_nub_kernel_message;
 
 
 #ifdef __cplusplus
