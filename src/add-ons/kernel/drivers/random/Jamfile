@@ -7,5 +7,5 @@ KernelObjects
 	;
 
 # CFLAGS was arch dependent:
-	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
+#	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
 
