@@ -36,6 +36,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define TRACE_VM 1
+#if TRACE_VM
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
@@ -623,7 +630,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		return ENOMEM;
 }
 
-region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int addr_type,
+region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int lock, addr phys_addr)
 {
 	vm_region *region;
@@ -632,9 +639,13 @@ region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int 
 	vm_store *store;
 	addr map_offset;
 	int err;
-
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
+
+	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %d,"
+		" size = %lu, lock = %d, phys = %p)\n",
+		aid, name, address, addr_type, size, lock, (void *)phys_addr));
+
+	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
 	// if the physical address is somewhat inside a page,
@@ -2239,52 +2250,85 @@ int user_memset(void *s, char c, size_t count)
 //	#pragma mark -
 
 
-area_id
-create_area_etc(struct team *team, char *name, void **address, uint32 addressSpec,
-	uint32 size, uint32 lock, uint32 protection)
+static status_t
+convertAddressSpec(uint32 *_spec)
 {
-	switch (addressSpec) {
+	switch (*_spec) {
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_ADDRESS:
-			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			*_spec = REGION_ADDR_ANY_ADDRESS;
 			break;
 		case B_EXACT_KERNEL_ADDRESS:
 		case B_EXACT_ADDRESS:
-			addressSpec = REGION_ADDR_EXACT_ADDRESS;
+			*_spec = REGION_ADDR_EXACT_ADDRESS;
 			break;
 		case B_BASE_ADDRESS:
 			dprintf("create_area: B_BASE_ADDRESS demanded (switch to B_ANY_ADDRESS)!\n");
-			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			*_spec = REGION_ADDR_ANY_ADDRESS;
 			break;
+
 		default:
 			dprintf("create_area: invalid address spec!\n");
 			return B_BAD_VALUE;
 	}
+	return B_OK;
+}
 
-	// create_area() "protection" is vm_create_anonymous_region() "lock"
-	protection = PROTECTION_TO_LOCK(protection);
 
-	// create_area() "lock" is vm_create_anonymous_region() "wiring"
-	switch (lock) {
+static status_t
+convertLockToWiring(uint32 *_lock)
+{
+	switch (*_lock) {
 		case B_ALREADY_WIRED:
-			lock = REGION_WIRING_WIRED_ALREADY;
+			*_lock = REGION_WIRING_WIRED_ALREADY;
 			break;
 		case B_LOMEM:
 			dprintf("create_area: asked for B_LOMEM - unsupported (switch to B_FULL_LOCK)!\n");
 		case B_FULL_LOCK:
 		case B_LAZY_LOCK:	// ToDo: lazy lock is not supported by the VM yet
-			lock = REGION_WIRING_WIRED;
+			*_lock = REGION_WIRING_WIRED;
 			break;
 		case B_CONTIGUOUS:
-			lock = REGION_WIRING_WIRED_CONTIG;
+			*_lock = REGION_WIRING_WIRED_CONTIG;
 			break;
 		case B_NO_LOCK:
-			lock = REGION_WIRING_WIRED_CONTIG;
+			*_lock = REGION_WIRING_WIRED_CONTIG;
 			break;
 		default:
 			dprintf("create_area: invalid locking mode!\n");
 			return B_BAD_VALUE;
 	}
+	return B_OK;
+}
+
+
+area_id
+map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
+	uint32 addressSpec, uint32 protection, void **_virtualAddress)
+{
+	if (convertAddressSpec(&addressSpec) < B_OK)
+		return B_BAD_VALUE;
+
+	protection = PROTECTION_TO_LOCK(protection) | LOCK_KERNEL;
+
+	return vm_map_physical_memory(vm_get_kernel_aspace_id(), name, _virtualAddress,
+		addressSpec, numBytes, protection, (addr)physicalAddress);
+}
+
+	
+area_id
+create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
+	uint32 size, uint32 lock, uint32 protection)
+{
+	if (convertAddressSpec(&addressSpec) < B_OK)
+		return B_BAD_VALUE;
+
+	// create_area() "protection" is vm_create_anonymous_region() "lock"
+	protection = PROTECTION_TO_LOCK(protection);
+
+	// create_area() "lock" is vm_create_anonymous_region() "wiring"
+	if (convertLockToWiring(&lock) < B_OK)
+		return B_BAD_VALUE;
 
 	return vm_create_anonymous_region(team->_aspace_id, (char *)name, address, 
 				addressSpec, size, lock, protection);
@@ -2297,59 +2341,29 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 {
 	aspace_id areaSpace;
 
+	// create_area() "protection" is vm_create_anonymous_region() "lock"
+	protection = PROTECTION_TO_LOCK(protection);
+
 	switch (addressSpec) {
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_EXACT_KERNEL_ADDRESS:
 			areaSpace = vm_get_kernel_aspace_id();
+			protection |= LOCK_KERNEL;
+				// That's required for BeOS compatibility...
+				// create_area_etc() doesn't do this, though
 			break;
 		default:
 			areaSpace = vm_get_current_user_aspace_id();
 			break;
 	}
-	switch (addressSpec) {
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_ADDRESS:
-			addressSpec = REGION_ADDR_ANY_ADDRESS;
-			break;
-		case B_EXACT_KERNEL_ADDRESS:
-		case B_EXACT_ADDRESS:
-			addressSpec = REGION_ADDR_EXACT_ADDRESS;
-			break;
-		case B_BASE_ADDRESS:
-			dprintf("create_area: B_BASE_ADDRESS demanded (switch to B_ANY_ADDRESS)!\n");
-			addressSpec = REGION_ADDR_ANY_ADDRESS;
-			break;
-		default:
-			dprintf("create_area: invalid address spec!\n");
-			return B_BAD_VALUE;
-	}
 
-	// create_area() "protection" is vm_create_anonymous_region() "lock"
-	protection = PROTECTION_TO_LOCK(protection);
+	if (convertAddressSpec(&addressSpec) < B_OK)
+		return B_BAD_VALUE;
 
 	// create_area() "lock" is vm_create_anonymous_region() "wiring"
-	switch (lock) {
-		case B_ALREADY_WIRED:
-			lock = REGION_WIRING_WIRED_ALREADY;
-			break;
-		case B_LOMEM:
-			dprintf("create_area: asked for B_LOMEM - unsupported (switch to B_FULL_LOCK)!\n");
-		case B_FULL_LOCK:
-		case B_LAZY_LOCK:	// ToDo: lazy lock is not supported by the VM yet
-			lock = REGION_WIRING_WIRED;
-			break;
-		case B_CONTIGUOUS:
-			lock = REGION_WIRING_WIRED_CONTIG;
-			break;
-		case B_NO_LOCK:
-			lock = REGION_WIRING_WIRED_CONTIG;
-			break;
-		default:
-			dprintf("create_area: invalid locking mode!\n");
-			return B_BAD_VALUE;
-	}
+	if (convertLockToWiring(&lock) < B_OK)
+		return B_BAD_VALUE;
 
 	return vm_create_anonymous_region(areaSpace, (char *)name, address, 
 				addressSpec, size, lock, protection);
@@ -2371,8 +2385,8 @@ delete_area(area_id area)
 
 
 area_id
-_user_create_area(const char *userName, void **userAddress, uint32 addressSpec, size_t size, uint32 lock,
-	uint32 protection)
+_user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
+	size_t size, uint32 lock, uint32 protection)
 {
 	char name[B_OS_NAME_LENGTH];
 	area_id area;
