@@ -769,8 +769,6 @@ sem_interrupt_thread(struct thread *t)
 	if (!(t->sem_flags & B_CAN_INTERRUPT))
 		return ERR_SEM_NOT_INTERRUPTABLE;
 
-//	t->next_state = B_THREAD_READY;
-	
 	slot = t->sem_blocking % MAX_SEMS;
 
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -819,7 +817,7 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 		t->sem_count -= delta;
 		if (t->sem_count <= 0) {
 			t = thread_dequeue(&sem->q);
-			t->state = B_THREAD_READY;
+			t->state = t->next_state = B_THREAD_READY;
 			thread_enqueue(t, queue);
 		}
 		sem->count -= delta;

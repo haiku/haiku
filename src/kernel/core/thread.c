@@ -515,7 +515,6 @@ dump_thread_info(int argc, char **argv)
 {
 	struct thread *t;
 	int id = -1;
-	unsigned long num;
 	struct hash_iterator i;
 
 	if (argc < 2) {
@@ -524,16 +523,10 @@ dump_thread_info(int argc, char **argv)
 	}
 
 	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		num = atoul(argv[1]);
-/*		if(num > vm_get_kernel_aspace()->virtual_map.base) {
-			// XXX semi-hack
-			_dump_thread_info((struct thread *)num);
-			return 0;
-		} else
-*/
-			id = num;
-	}
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x')
+		id = strtoul(argv[1], NULL, 16);
+	else
+		id = atoi(argv[1]);
 
 	// walk through the thread list, trying to match name or id
 	hash_open(thread_hash, &i);
@@ -1076,14 +1069,10 @@ thread_wait_on_thread(thread_id id, int *retcode)
 		rc = B_NO_ERROR;
 		
 		if (retcode) {
-			state = disable_interrupts();
-			GRAB_THREAD_LOCK();
 			t = thread_get_current_thread();
 			dprintf("thread_wait_on_thread: thread %ld got return code 0x%x\n",
 				t->id, t->sem_deleted_retcode);
 			*retcode = t->sem_deleted_retcode;
-			RELEASE_THREAD_LOCK();
-			restore_interrupts(state);
 		}
 	}
 
@@ -1521,10 +1510,12 @@ user_thread_wait_on_thread(thread_id id, int *uretcode)
 
 	rc = thread_wait_on_thread(id, &retcode);
 
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-	if (rc2 < 0)
-		return rc2;
-
+	if (uretcode) {
+		rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
+		if (rc2 < 0)
+			return rc2;
+	}
+	
 	return rc;
 }
 
