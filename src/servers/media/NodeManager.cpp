@@ -822,7 +822,23 @@ status_t
 NodeManager::SetDefaultNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
 {
 	BAutolock lock(fLocker);
-	return fDefaultManager->Set(type, node, info, input);
+	status_t err = B_BAD_VALUE;
+	if (node)
+		err = fDefaultManager->Set(node->node, NULL, 0, type);
+	else if (input)
+		err = fDefaultManager->Set(input->node.node, input->name, input->destination.id, type);
+	else if (info) {
+		media_node_id node_id;
+		int32 count = 1;
+		if ((err=GetInstances(&node_id, &count, count, info->addon, info->flavor_id))!=B_OK)
+			return err;
+		err = fDefaultManager->Set(node_id, NULL, 0, type);
+	}
+	if(err==B_OK && (type == VIDEO_INPUT || type == VIDEO_OUTPUT || type == AUDIO_OUTPUT || type == AUDIO_INPUT)) {
+		fDefaultManager->SaveState(this);
+		Dump();
+	}
+	return err;
 }
 
 status_t
@@ -920,7 +936,7 @@ status_t
 NodeManager::SaveState()
 {
 	BAutolock lock(fLocker);
-	return fDefaultManager->SaveState();
+	return fDefaultManager->SaveState(this);
 }
 
 /**********************************************************************

@@ -1,13 +1,19 @@
 /* 
- * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Copyright 2002, 2003 Marcus Overhagen, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <Application.h>
 #include <OS.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
 #include <TimeSource.h>
 #include <string.h>
+#include <storage/File.h>
+#include <storage/FindDirectory.h>
+#include <storage/Path.h>
 #include "DefaultManager.h"
+#include "DormantNodeManager.h"
+#include "NodeManager.h"
 #include "debug.h"
 
 /* no locking used in this file, we assume that the caller (NodeManager) does it.
@@ -15,6 +21,23 @@
 
 
 #define MAX_NODE_INFOS 10
+#define MAX_INPUT_INFOS 10
+
+const uint32 kMsgHeader = 'sepx';
+const uint32 kMsgTypeVideoIn = 0xffffffef;
+const uint32 kMsgTypeVideoOut = 0xffffffee;
+const uint32 kMsgTypeAudioIn = 0xfffffffe;
+const uint32 kMsgTypeAudioOut = 0xffffffff;
+
+const char *kDefaultManagerType 			= "be:_default";
+const char *kDefaultManagerAddon 			= "be:_addon_id";
+const char *kDefaultManagerFlavorId 		= "be:_internal_id";
+const char *kDefaultManagerFlavorName 		= "be:_flavor_name";
+const char *kDefaultManagerPath 			= "be:_path";
+const char *kDefaultManagerInput 			= "be:_input_id";
+
+const char *kDefaultManagerSettings			= "Media/MDefaultManager";
+
 
 DefaultManager::DefaultManager()
  :	fMixerConnected(false),
@@ -28,6 +51,12 @@ DefaultManager::DefaultManager()
 	fPhysicalAudioOutInputID(0)
 {
 	strcpy(fPhysicalAudioOutInputName, "default");
+	fBeginHeader[0] = 0xab00150b;
+	fBeginHeader[1] = 0x18723462;
+	fBeginHeader[2] = 0x00000002;
+	fEndHeader[0] = 0x7465726d;
+	fEndHeader[1] = 0x6d666c67;
+	fEndHeader[2] = 0x00000002;
 }
 
 DefaultManager::~DefaultManager()
@@ -38,33 +67,140 @@ DefaultManager::~DefaultManager()
 status_t
 DefaultManager::LoadState()
 {
+	CALLED();
+	status_t err = B_OK;
+	BPath path;
+	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
+		return err;
+		
+	path.Append(kDefaultManagerSettings);
+	
+	BFile file(path.Path(), B_READ_ONLY);
+		
+	uint32 category_count;
+    if (file.Read(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+		return B_ERROR;
+	TRACE("0x%08lx %ld\n", fBeginHeader[0], fBeginHeader[0]);
+	TRACE("0x%08lx %ld\n", fBeginHeader[1], fBeginHeader[1]);
+	TRACE("0x%08lx %ld\n", fBeginHeader[2], fBeginHeader[2]);
+	if (file.Read(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
+		return B_ERROR;
+	while (category_count--) {
+		BMessage settings;
+		uint32 msg_header;
+		uint32 default_type;
+		if (file.Read(&msg_header, sizeof(uint32)) < (int32)sizeof(uint32))
+			return B_ERROR;
+		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32))
+			return B_ERROR;
+		if(settings.Unflatten(&file)==B_OK) {
+			settings.PrintToStream();
+			fMsgList.AddItem(new BMessage(settings));
+		}
+	}
+	if (file.Read(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+		return B_ERROR;
 	return B_OK;
 }
 
 status_t
-DefaultManager::SaveState()
+DefaultManager::SaveState(NodeManager *node_manager)
 {
+	CALLED();
+	status_t err = B_OK;
+	BPath path;
+	BList list;
+	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
+		return err;
+		
+	path.Append(kDefaultManagerSettings);
+	
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+	
+	uint32 default_types[] = {kMsgTypeVideoIn, kMsgTypeVideoOut, kMsgTypeAudioIn, kMsgTypeAudioOut};
+	uint32 media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut, fPhysicalAudioIn, fPhysicalAudioOut};
+	for(uint32 i=0; i<sizeof(default_types)/sizeof(default_types[0]); i++) {
+		BMessage *settings = new BMessage();
+		settings->AddInt32(kDefaultManagerType, default_types[i]);
+		
+		// we call the node manager to have more infos about nodes
+		dormant_node_info info;
+		media_node node;
+		entry_ref ref;
+		if (node_manager->GetCloneForId(&node, media_node_ids[i], be_app->Team()) != B_OK)
+			continue;
+		if (node_manager->GetDormantNodeInfo(&info, node) != B_OK)
+			continue;
+		if (node_manager->DecrementGlobalRefCount(media_node_ids[i], be_app->Team()) != B_OK)
+			continue;
+		if (node_manager->GetAddonRef(&ref, info.addon)!=B_OK)
+			continue;
+
+		BPath path(&ref);
+		settings->AddInt32(kDefaultManagerAddon, info.addon);
+		settings->AddInt32(kDefaultManagerFlavorId, info.flavor_id);
+		settings->AddInt32(kDefaultManagerInput, default_types[i] == kMsgTypeAudioOut ? fPhysicalAudioOutInputID : 0);
+		settings->AddString(kDefaultManagerFlavorName, info.name);
+		settings->AddString(kDefaultManagerPath, path.Path());
+		
+		list.AddItem(settings);
+		TRACE("message %s added\n", info.name);
+	}
+	
+	if (file.Write(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+		return B_ERROR;
+	int32 category_count = list.CountItems();
+    if (file.Write(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
+		return B_ERROR;
+	
+	for (int32 i = 0; i < category_count; i++) {
+		BMessage *settings = (BMessage *)list.ItemAt(i);
+		uint32 default_type;
+		if (settings->FindInt32(kDefaultManagerType, (int32*)&default_type) < B_OK)
+			return B_ERROR;
+		if (file.Write(&kMsgHeader, sizeof(uint32)) < (int32)sizeof(uint32))
+			return B_ERROR;
+		if (file.Write(&default_type, sizeof(uint32)) < (int32)sizeof(uint32))
+			return B_ERROR;
+		if(settings->Flatten(&file) < B_OK)
+			return B_ERROR;
+		delete settings;
+	}
+	if (file.Write(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+		return B_ERROR;
+		
 	return B_OK;
 }
 
 status_t
-DefaultManager::Set(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
+DefaultManager::Set(media_node_id node_id, const char *input_name, int32 input_id, node_type type)
 {
+	CALLED();
+	TRACE("DefaultManager::Set type : %i, node : %li, input : %li\n", type, node_id, input_id);
 	switch (type) {
 		case VIDEO_INPUT:
+			fPhysicalVideoIn = node_id;
+			return B_OK;
 		case AUDIO_INPUT:
+			fPhysicalAudioIn = node_id;
+			return B_OK;
 		case VIDEO_OUTPUT:
+			fPhysicalVideoOut = node_id;
+			return B_OK;
 		case AUDIO_MIXER:
+			return B_ERROR;
 		case AUDIO_OUTPUT:
-		case AUDIO_OUTPUT_EX:
+			fPhysicalAudioOut = node_id;
+			fPhysicalAudioOutInputID = input_id;
+			strcpy(fPhysicalAudioOutInputName, input_name ? input_name : "<null>");
+			return B_OK;
 		case TIME_SOURCE:
 			return B_ERROR;
 		
 		case SYSTEM_TIME_SOURCE: //called by the media_server's ServerApp::StartSystemTimeSource()
 		{
 			ASSERT(fSystemTimeSource == -1);
-			ASSERT(node != 0);
-			fSystemTimeSource = node->node;
+			fSystemTimeSource = node_id;
 			return B_OK;
 		}
 		
@@ -79,6 +215,7 @@ DefaultManager::Set(node_type type, const media_node *node, const dormant_node_i
 status_t
 DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid, node_type type)
 {
+	CALLED();
 	switch (type) {
 		case VIDEO_INPUT: 		// output: nodeid
 			if (fPhysicalVideoIn == -1)
@@ -162,14 +299,18 @@ DefaultManager::RescanThread()
 	// it should already exist
 	ASSERT(fSystemTimeSource != -1);
 
-	if (fPhysicalVideoOut == -1)
-		FindPhysicalVideoOut();
-	if (fPhysicalVideoIn == -1)
-		FindPhysicalVideoIn();
+	if (fPhysicalVideoOut == -1) {
+		FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false, B_MEDIA_RAW_VIDEO);
+		FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false, B_MEDIA_ENCODED_VIDEO);
+	}		
+	if (fPhysicalVideoIn == -1) {
+		FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true, B_MEDIA_RAW_VIDEO);
+		FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true, B_MEDIA_ENCODED_VIDEO);
+	}
 	if (fPhysicalAudioOut == -1)
-		FindPhysicalAudioOut();
+		FindPhysical(&fPhysicalAudioOut, kMsgTypeAudioOut, false, B_MEDIA_RAW_AUDIO);
 	if (fPhysicalAudioIn == -1)
-		FindPhysicalAudioIn();
+		FindPhysical(&fPhysicalAudioIn, kMsgTypeAudioIn, true, B_MEDIA_RAW_AUDIO);
 	if (fAudioMixer == -1)
 		FindAudioMixer();
 
@@ -190,105 +331,101 @@ DefaultManager::RescanThread()
 	printf("DefaultManager::RescanThread() leave\n");
 }
 
-void
-DefaultManager::FindPhysicalVideoOut()
-{
-	live_node_info info;
-	media_format input; /* a physical video output has a logical data input */
-	int32 count;
-	status_t rv;
-
-	memset(&input, 0, sizeof(input));
-	input.type = B_MEDIA_RAW_VIDEO;
-	count = 1;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
-	if (rv != B_OK || count != 1) {
-		printf("Couldn't find physical video output node\n");
-		return;
-	}
-	printf("Default physical video output created!\n");
-	fPhysicalVideoOut = info.node.node;
-}
 
 void
-DefaultManager::FindPhysicalVideoIn()
-{
-	live_node_info info;
-	media_format output; /* a physical video input has a logical data output */
-	int32 count;
-	status_t rv;
-
-	memset(&output, 0, sizeof(output));
-	output.type = B_MEDIA_RAW_VIDEO;
-	count = 1;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
-	if (rv != B_OK || count != 1) {
-		printf("Couldn't find physical video input node\n");
-		return;
-	}
-	printf("Default physical video input created!\n");
-	fPhysicalVideoIn = info.node.node;
-}
-
-void
-DefaultManager::FindPhysicalAudioOut()
+DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type, bool isInput, media_type type)
 {
 	live_node_info info[MAX_NODE_INFOS];
-	media_format input; /* a physical audio output has a logical data input */
+	media_format format;
 	int32 count;
 	status_t rv;
+	BMessage *msg = NULL;
+	BPath msgPath;
+	dormant_node_info msgDninfo;
+	int32 input_id;
+	bool isAudio = type & B_MEDIA_RAW_AUDIO;
 
-	memset(&input, 0, sizeof(input));
-	input.type = B_MEDIA_RAW_AUDIO;
+	for(int32 i=0; i<fMsgList.CountItems(); i++) {
+		msg = (BMessage *)fMsgList.ItemAt(i);
+		int32 msgType;
+		if(msg->FindInt32(kDefaultManagerType, &msgType)==B_OK && ((uint32)msgType == default_type)) {
+			const char *name = NULL;
+			const char *path = NULL;
+			msg->FindInt32(kDefaultManagerAddon, &msgDninfo.addon);
+			msg->FindInt32(kDefaultManagerFlavorId, &msgDninfo.flavor_id);
+			msg->FindInt32(kDefaultManagerInput, &input_id);
+			msg->FindString(kDefaultManagerFlavorName, &name);
+			msg->FindString(kDefaultManagerPath, &path);
+			if(name)
+				strcpy(msgDninfo.name, name);
+			if(path)
+				msgPath = BPath(path);
+			break;
+		}
+	}
+
+	memset(&format, 0, sizeof(format));
+	format.type = type;
 	count = MAX_NODE_INFOS;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, 
+		isInput ? NULL : &format, isInput ? &format : NULL, NULL, 
+		isInput ? B_BUFFER_PRODUCER | B_PHYSICAL_INPUT : B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
 	if (rv != B_OK || count < 1) {
-		printf("Couldn't find physical audio output node\n");
+		ERROR("Couldn't find physical %s %s node\n", isAudio ? "audio" : "video", isInput ? "input" : "output");
 		return;
 	}
 	for (int i = 0; i < count; i++)
-		printf("info[%d].name %s\n", i, info[i].name);
+		TRACE("info[%d].name %s\n", i, info[i].name);
 	
 	for (int i = 0; i < count; i++) {
-		if (0 == strcmp(info[i].name, "None Out")) // skip the Null audio driver
-			continue;
-		if (0 == strcmp(info[i].name, "DV Output")) // skip the Firewire audio driver
-			continue;
-		printf("Default physical audio output \"%s\" created!\n", info[i].name);
-		fPhysicalAudioOut = info[i].node.node;
+		if (isAudio) {
+			if (isInput) {
+				if (0 == strcmp(info[i].name, "None In")) {
+					// we keep the Null audio driver if none else matchs
+					*id = info[i].node.node;
+					continue;
+				}
+				if (0 == strcmp(info[i].name, "DV Input")) // skip the Firewire audio driver
+					continue;
+			} else {
+				if (0 == strcmp(info[i].name, "None Out")) {
+					// we keep the Null audio driver if none else matchs
+					*id = info[i].node.node;
+					if(msg)
+						fPhysicalAudioOutInputID = input_id;
+					continue;
+				}
+				if (0 == strcmp(info[i].name, "DV Output")) // skip the Firewire audio driver
+					continue;
+			}
+		}	
+		if(msg) {	// we have a default info msg
+			dormant_node_info dninfo;
+			if(BMediaRoster::Roster()->GetDormantNodeFor(info[i].node, &dninfo) != B_OK) {
+				ERROR("Couldn't GetDormantNodeFor\n");
+				continue;
+			}
+			if(dninfo.flavor_id!=msgDninfo.flavor_id
+				|| strcmp(dninfo.name, msgDninfo.name)!=0) {
+				ERROR("Doesn't match flavor or name\n");
+				continue;
+			}
+			BPath path;
+			if((_DormantNodeManager->FindAddonPath(&path, dninfo.addon)!=B_OK) 
+				|| (path != msgPath)) {
+				ERROR("Doesn't match : path\n");
+				continue;
+			}
+		}
+		TRACE("Default physical %s %s \"%s\" created!\n", 
+			isAudio ? "audio" : "video", isInput ? "input" : "output", info[i].name);
+		*id = info[i].node.node;
+		if(msg && isAudio && !isInput)
+			fPhysicalAudioOutInputID = input_id;
 		return;
 	}
 }
 
-void
-DefaultManager::FindPhysicalAudioIn()
-{
-	live_node_info info[MAX_NODE_INFOS];
-	media_format output; /* a physical audio input has a logical data output */
-	int32 count;
-	status_t rv;
-
-	memset(&output, 0, sizeof(output));
-	output.type = B_MEDIA_RAW_AUDIO;
-	count = MAX_NODE_INFOS;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
-	if (rv != B_OK || count < 1) {
-		printf("Couldn't find physical audio input node\n");
-		return;
-	}
-	for (int i = 0; i < count; i++)
-		printf("info[%d].name %s\n", i, info[i].name);
-	
-	for (int i = 0; i < count; i++) {
-		if (0 == strcmp(info[i].name, "None In")) // skip the Null audio driver
-			continue;
-		if (0 != strstr(info[i].name, "DV Input")) // skip the Firewire audio driver
-			continue;
-		printf("Default physical audio input \"%s\" created!\n", info[i].name);
-		fPhysicalAudioIn = info[i].node.node;
-		return;
-	}
-}
 
 void
 DefaultManager::FindTimeSource()
@@ -369,6 +506,7 @@ DefaultManager::ConnectMixerToOutput()
 	media_node 			timesource;
 	media_node 			mixer;
 	media_node 			soundcard;
+	media_input			inputs[MAX_INPUT_INFOS];
 	media_input 		input;
 	media_output 		output;
 	media_input 		newinput;
@@ -381,7 +519,6 @@ DefaultManager::ConnectMixerToOutput()
 	
 	roster = BMediaRoster::Roster();
 
-	// XXX this connects to *any* physical output, but not it's default logical input
 	rv = roster->GetNodeFor(fPhysicalAudioOut, &soundcard);
 	if (rv != B_OK) {
 		printf("DefaultManager: failed to find soundcard (physical audio output)\n");
@@ -405,11 +542,17 @@ DefaultManager::ConnectMixerToOutput()
 		goto finish;
 	}
 
-	rv = roster->GetFreeInputsFor(soundcard, &input, 1, &count, B_MEDIA_RAW_AUDIO);
-	if (rv != B_OK || count != 1) {
-		printf("DefaultManager: can't find free soundcard input\n");
+	rv = roster->GetFreeInputsFor(soundcard, inputs, MAX_INPUT_INFOS, &count, B_MEDIA_RAW_AUDIO);
+	if (rv != B_OK || count < 1) {
+		printf("DefaultManager: can't find free soundcard inputs\n");
 		rv = B_ERROR;
 		goto finish;
+	}
+	
+	for (int32 i = 0; i < count; i++) {
+		input = inputs[i];
+		if(input.destination.id == fPhysicalAudioOutInputID)
+			break;
 	}
 	
 	for (int i = 0; i < 6; i++) {

@@ -85,8 +85,12 @@ MMediaFilesManager::LoadState()
 	BFile file(path.Path(), B_READ_ONLY);
 		
 	uint32 category_count;
-    if (file.Read(header, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+    if (file.Read(header, sizeof(uint32)*3) < (int32)sizeof(uint32)*3) {
+    	header[0] = 0xac00150c;
+		header[1] = 0x18723462;
+		header[2] = 0x00000001;
 		return B_ERROR;
+	}
 	TRACE("0x%08lx %ld\n", header[0], header[0]);
 	TRACE("0x%08lx %ld\n", header[1], header[1]);
 	TRACE("0x%08lx %ld\n", header[2], header[2]);
