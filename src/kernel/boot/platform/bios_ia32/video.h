@@ -6,6 +6,9 @@
 
 
 #ifdef __cplusplus
+class Menu;
+Menu *video_mode_menu();
+
 extern "C"
 #endif
 status_t video_init(void);

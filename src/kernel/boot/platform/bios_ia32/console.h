@@ -9,9 +9,36 @@
 #include <boot/vfs.h>
 #include <boot/stdio.h>
 
+
+enum console_color {
+	BLACK,
+	NAVY,
+	GREEN,
+	TEAL,
+	MAROON,
+	PURPLE,
+	OLIVE,
+	SILVER,
+	GREY,
+	BLUE,
+	LIME,
+	AQUA,
+	RED,
+	FUCHSIA,
+	YELLOW,
+	WHITE
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern void console_clear_screen(void);
+extern int32 console_width(void);
+extern int32 console_height(void);
+extern void console_set_cursor(int32 x, int32 y);
+extern void console_set_color(int32 foreground, int32 background);
 
 extern status_t console_init(void);
 

@@ -13,6 +13,7 @@
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
+#include <boot/menu.h>
 #include <boot/kernel_args.h>
 
 #include <string.h>
@@ -270,6 +271,34 @@ platform_switch_to_text_mode(void)
 
 
 //	#pragma mark -
+
+
+Menu *
+video_mode_menu()
+{
+	Menu *menu = new Menu(CHOICE_MENU);
+	MenuItem *item;
+
+	menu->AddItem(item = new MenuItem("Default"));
+	item->SetMarked(true);
+	item->Select(true);
+
+	menu->AddItem(new MenuItem("Standard VGA"));
+
+	if (sVesaCompatible) {
+		// add VESA modes
+		menu->AddItem(new MenuItem("1024x768 32bit"));
+		menu->AddItem(new MenuItem("800x600 16bit"));
+		menu->AddItem(new MenuItem("800x600 15bit"));
+		menu->AddItem(new MenuItem("800x600 8bit"));
+		menu->AddItem(new MenuItem("640x480 8bit"));
+	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new MenuItem("Return to main manu"));
+
+	return menu;
+}
 
 
 extern "C" status_t
