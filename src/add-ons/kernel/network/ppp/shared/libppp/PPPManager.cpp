@@ -133,12 +133,12 @@ PPPManager::InterfaceWithSettings(const driver_settings *settings) const
 	
 	interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
-	ppp_interface_info info;
+	ppp_interface_info_t info;
 	
 	for(int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaces[index]);
 		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
-				&& equal_driver_settings(settings, info.settings)) {
+				&& equal_driver_settings(settings, info.info.settings)) {
 			id = interface.ID();
 			break;
 		}
@@ -161,12 +161,12 @@ PPPManager::InterfaceWithUnit(int32 if_unit)
 	
 	interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
-	ppp_interface_info info;
+	ppp_interface_info_t info;
 	
 	for(int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaces[index]);
 		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
-				&& info.if_unit == if_unit) {
+				&& info.info.if_unit == if_unit) {
 			id = interface.ID();
 			break;
 		}

@@ -96,10 +96,16 @@ add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	PPPoEDevice *device;
 	bool success;
 	if(subInterface) {
+#if DEBUG
+		printf("PPPoE: add_to(): Adding to subInterface\n");
+#endif
 		device = new PPPoEDevice(*subInterface, settings);
 		success = subInterface->SetDevice(device);
-	} else
-		device = new PPPoEDevice(mainInterface, settings); {
+	} else {
+#if DEBUG
+		printf("PPPoE: add_to(): Adding to mainInterface\n");
+#endif
+		device = new PPPoEDevice(mainInterface, settings);
 		success = mainInterface.SetDevice(device);
 	}
 	

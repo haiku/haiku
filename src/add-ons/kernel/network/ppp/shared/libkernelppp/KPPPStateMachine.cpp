@@ -425,7 +425,7 @@ PPPStateMachine::UpFailedEvent()
 				Interface().Parent()->StateMachine().UpFailedEvent(Interface());
 			
 			NewPhase(PPP_DOWN_PHASE);
-				// tell DownEvent() that we do not need to redial
+				// tell DownEvent() that it should not create a connection-lost-report
 			
 			DownEvent();
 		break;

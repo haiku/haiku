@@ -52,7 +52,11 @@ PPPInterface::SetTo(interface_id ID)
 	
 	fID = ID;
 	
-	return Control(PPPC_GET_INTERFACE_INFO, &fInfo, sizeof(fInfo));
+	status_t error = Control(PPPC_GET_INTERFACE_INFO, &fInfo, sizeof(fInfo));
+	if(error != B_OK)
+		fID = PPP_UNDEFINED_INTERFACE_ID;
+	
+	return error;
 }
 
 
@@ -80,7 +84,7 @@ PPPInterface::Control(uint32 op, void *data, size_t length) const
 
 
 bool
-PPPInterface::GetInterfaceInfo(ppp_interface_info *info) const
+PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 {
 	if(InitCheck() != B_OK || !info)
 		return false;

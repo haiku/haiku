@@ -187,6 +187,12 @@ class PPPInterface : public PPPLayer {
 		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
 		
+		// these two methods are used by the open/close_event_threads
+		void CallOpenEvent()
+			{ StateMachine().OpenEvent(); }
+		void CallCloseEvent()
+			{ StateMachine().CloseEvent(); }
+		
 		void Redial(uint32 delay);
 		
 		// multilink methods
@@ -199,7 +205,7 @@ class PPPInterface : public PPPLayer {
 		driver_settings *fSettings;
 		struct ifnet *fIfnet;
 		
-		thread_id fUpThread;
+		thread_id fUpThread, fOpenEventThread, fCloseEventThread;
 		
 		thread_id fRedialThread;
 		uint32 fDialRetry, fDialRetriesLimit;

@@ -25,7 +25,7 @@ class PPPInterface {
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
 		
-		bool GetInterfaceInfo(ppp_interface_info *info) const;
+		bool GetInterfaceInfo(ppp_interface_info_t *info) const;
 		
 		bool Up() const;
 		bool Down() const;
@@ -43,7 +43,7 @@ class PPPInterface {
 		interface_id fID;
 		
 		int fFD;
-		ppp_interface_info fInfo;
+		ppp_interface_info_t fInfo;
 };
 
 

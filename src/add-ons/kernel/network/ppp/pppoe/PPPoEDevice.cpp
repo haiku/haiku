@@ -36,10 +36,6 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 	printf("PPPoEDevice: Constructor\n");
 	if(!settings || !settings->parameters)
 		printf("PPPoEDevice::ctor: No settings!\n");
-	else if(settings->parameter_count > 0 && settings->parameters[0].value_count > 0)
-		printf("PPPoEDevice::ctor: Value0: %s\n", settings->parameters[0].values[0]);
-	else
-		printf("PPPoEDevice::ctor: No values!\n");
 #endif
 	
 	memset(fPeer, 0xFF, sizeof(fPeer));
@@ -56,7 +52,8 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 	
 	ifnet *current = get_interfaces();
 	for(; current; current = current->if_next) {
-		if(current->if_name && !strcmp(current->if_name, interfaceName)) {
+		if(current->if_type == IFT_ETHER && current->if_name
+				&& !strcmp(current->if_name, interfaceName)) {
 #if DEBUG
 			printf("PPPoEDevice::ctor: found ethernet interface\n");
 #endif

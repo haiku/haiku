@@ -58,6 +58,8 @@ status_t redial_thread(void *data);
 
 // other functions
 status_t interface_deleter_thread(void *data);
+status_t call_open_event_thread(void *data);
+status_t call_close_event_thread(void *data);
 
 
 PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
@@ -67,6 +69,8 @@ PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
 	fSettings(dup_driver_settings(settings)),
 	fIfnet(NULL),
 	fUpThread(-1),
+	fOpenEventThread(-1),
+	fCloseEventThread(-1),
 	fRedialThread(-1),
 	fDialRetry(0),
 	fDialRetriesLimit(0),
@@ -182,11 +186,11 @@ PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
 
 PPPInterface::~PPPInterface()
 {
-	++fDeleteCounter;
-	
 #if DEBUG
 	printf("PPPInterface: Destructor\n");
 #endif
+	
+	++fDeleteCounter;
 	
 	// make sure we are not accessible by any thread before we continue
 	UnregisterInterface();
@@ -211,6 +215,8 @@ PPPInterface::~PPPInterface()
 	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
 		// tell thread that we are being destroyed (200ms timeout)
 	wait_for_thread(fRedialThread, &tmp);
+	wait_for_thread(fOpenEventThread, &tmp);
+	wait_for_thread(fCloseEventThread, &tmp);
 	
 	while(CountChildren())
 		delete ChildAt(0);
@@ -459,7 +465,7 @@ bool
 PPPInterface::SetDevice(PPPDevice *device)
 {
 #if DEBUG
-	printf("PPPInterface: SetDevice()\n");
+	printf("PPPInterface: SetDevice(%p)\n", device);
 #endif
 	
 	if(device && &device->Interface() != this)
@@ -715,7 +721,7 @@ PPPInterface::SetAutoRedial(bool autoRedial = true)
 	printf("PPPInterface: SetAutoRedial(%s)\n", autoRedial ? "true" : "false");
 #endif
 	
-	if(Mode() == PPP_CLIENT_MODE)
+	if(Mode() != PPP_CLIENT_MODE)
 		return;
 	
 	LockerHelper locker(fLock);
@@ -732,7 +738,6 @@ PPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 	
 #if DEBUG
 	printf("PPPInterface: SetDialOnDemand(%s)\n", dialOnDemand ? "true" : "false");
-	printf("PPPInterface::SetDialOnDemand(): %s\n", fDialOnDemand ? "true" : "false");
 #endif
 	
 	// Only clients support DialOnDemand.
@@ -748,10 +753,6 @@ PPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 	LockerHelper locker(fLock);
 	
 	fDialOnDemand = dialOnDemand;
-	
-#if DEBUG
-	printf("PPPInterface::SetDialOnDemand() done: %s\n", fDialOnDemand?"true":"false");
-#endif
 	
 	// Do not allow changes when we are disconnected (only main interfaces).
 	// This would make no sense because
@@ -810,22 +811,31 @@ PPPInterface::Up()
 	
 	// One thread has to do the real task while all other threads are observers.
 	// Lock needs timeout because destructor could have locked the interface.
-	while(!fLock.LockWithTimeout(100000) != B_NO_ERROR)
+	while(fLock.LockWithTimeout(100000) != B_NO_ERROR)
 		if(fDeleteCounter > 0)
 			return false;
 	if(fUpThread == -1)
 		fUpThread = me;
 	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
-	fLock.Unlock();
 	
-	// fUpThread tells the state machine to go up
-	if(me == fUpThread || me == fRedialThread)
-		StateMachine().OpenEvent();
+	// fUpThread/fRedialThread tells the state machine to go up (using a new thread
+	// because we might not receive report messages otherwise)
+	if(me == fUpThread || me == fRedialThread) {
+		if(fOpenEventThread != -1) {
+			int32 tmp;
+			wait_for_thread(fOpenEventThread, &tmp);
+		}
+		fOpenEventThread = spawn_thread(call_open_event_thread,
+			"PPPInterface: call_open_event_thread", B_NORMAL_PRIORITY, this);
+		resume_thread(fOpenEventThread);
+	}
+	fLock.Unlock();
 	
 	if(me == fRedialThread && me != fUpThread)
 		return true;
-			// the redial thread is doing a DialRetry in this case
+			// the redial thread is doing a DialRetry in this case (fUpThread
+			// is waiting for new reports)
 	
 	while(true) {
 		if(IsUp()) {
@@ -1004,12 +1014,18 @@ PPPInterface::Down()
 		return true;
 	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
-	locker.UnlockNow();
 	
 	thread_id sender;
 	ppp_report_packet report;
 	
-	StateMachine().CloseEvent();
+	if(fCloseEventThread != -1) {
+		int32 tmp;
+		wait_for_thread(fCloseEventThread, &tmp);
+	}
+	fCloseEventThread = spawn_thread(call_close_event_thread,
+		"PPPInterface: call_close_event_thread", B_NORMAL_PRIORITY, this);
+	resume_thread(fCloseEventThread);
+	locker.UnlockNow();
 	
 	while(true) {
 		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
@@ -1351,10 +1367,6 @@ PPPInterface::RegisterInterface()
 	
 	LockerHelper locker(fLock);
 	
-	if(InitCheck() != B_OK)
-		return false;
-			// we cannot register if something is wrong
-	
 	// only MainInterfaces get an ifnet
 	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
 		return true;
@@ -1583,14 +1595,56 @@ redial_thread(void *data)
 // which is only defined here (the real class is defined in the ppp interface module).
 class PPPManager {
 	public:
-		PPPManager(PPPInterface *interface)
-			{ if(interface) delete interface; }
+		PPPManager() {}
+		
+		void Delete(PPPInterface *interface)
+			{ delete interface; }
+		void CallOpenEvent(PPPInterface *interface)
+		{
+			while(interface->fLock.LockWithTimeout(100000) != B_NO_ERROR)
+				if(interface->fDeleteCounter > 0)
+					return;
+			interface->CallOpenEvent();
+			interface->fOpenEventThread = -1;
+			interface->fLock.Unlock();
+		}
+		void CallCloseEvent(PPPInterface *interface)
+		{
+			while(interface->fLock.LockWithTimeout(100000) != B_NO_ERROR)
+				if(interface->fDeleteCounter > 0)
+					return;
+			interface->CallCloseEvent();
+			interface->fCloseEventThread = -1;
+			interface->fLock.Unlock();
+		}
 };
+
 
 status_t
 interface_deleter_thread(void *data)
 {
-	PPPManager((PPPInterface*) data);
+	PPPManager manager;
+	manager.Delete((PPPInterface*) data);
+	
+	return B_OK;
+}
+
+
+status_t
+call_open_event_thread(void *data)
+{
+	PPPManager manager;
+	manager.CallOpenEvent((PPPInterface*) data);
+	
+	return B_OK;
+}
+
+
+status_t
+call_close_event_thread(void *data)
+{
+	PPPManager manager;
+	manager.CallCloseEvent((PPPInterface*) data);
 	
 	return B_OK;
 }
