@@ -367,10 +367,16 @@ void
 BSoundPlayer::SetVolume(float new_volume)
 {
 	CALLED();
-	_m_lock.Lock();
-	if (new_volume >= 0.0f)
+	if(_m_volumeSlider==NULL)
+		get_volume_slider();
+	if(_m_volumeSlider==NULL)
+		return;
+	
+	if (new_volume >= 0.0f && new_volume <= 1.0f) {
 		_m_volume = new_volume;
-	_m_lock.Unlock();
+		SetVolumeDB(_m_volumeSlider->MinValue() + 
+			_m_volume * (_m_volumeSlider->MaxValue() - _m_volumeSlider->MinValue()) );
+	}
 }
 
 
@@ -378,7 +384,17 @@ float
 BSoundPlayer::VolumeDB(bool forcePoll)
 {
 	CALLED();
-	return 20.0f * log10(_m_volume);
+	if(_m_volumeSlider==NULL)
+		get_volume_slider();
+	if(_m_volumeSlider==NULL)
+		return 0.0;
+	
+	float values[32];
+	size_t size = 32 * sizeof(float);
+	_m_volumeSlider->GetValue(&values, &size, &_m_perfTime);
+	
+	_m_volume = values[0];
+	return _m_volume;
 }
 
 
@@ -386,9 +402,17 @@ void
 BSoundPlayer::SetVolumeDB(float volume_dB)
 {
 	CALLED();
-	_m_lock.Lock();
-	_m_volume = pow(10.0f,volume_dB / 20.0f);
-	_m_lock.Unlock();
+	if(_m_volumeSlider==NULL)
+		get_volume_slider();
+	if(_m_volumeSlider==NULL)
+		return;
+	
+	_m_volume = volume_dB;
+	int32 count = _m_volumeSlider->CountChannels(); 
+	float values[count];
+	for(int32 i=0; i<count; i++)
+		values[i] = _m_volume;
+	_m_volumeSlider->SetValue(values, sizeof(float) * count, 0);
 }
 
 
@@ -398,12 +422,20 @@ BSoundPlayer::GetVolumeInfo(media_node *out_node,
 							float *out_min_dB,
 							float *out_max_dB)
 {
-	BROKEN();
+	CALLED();
+	if(_m_volumeSlider==NULL)
+		get_volume_slider();
+	if(_m_volumeSlider==NULL
+		|| out_node == NULL
+		|| out_parameter == NULL
+		|| out_min_dB == NULL
+		|| out_max_dB == NULL)
+		return B_ERROR;
 	
-	*out_node = m_output.node;
-	*out_parameter = -1; /* is the parameter ID for the volume control */
-	*out_min_dB = minDB;
-	*out_max_dB = maxDB;
+	*out_node = m_input.node;
+	*out_parameter = _m_volumeSlider->ID(); /* is the parameter ID for the volume control */
+	*out_min_dB = _m_volumeSlider->MinValue();
+	*out_max_dB = _m_volumeSlider->MaxValue();
 
 	return B_OK;
 }
@@ -488,7 +520,21 @@ BSoundPlayer::NotifySoundDone(play_id sound,
 void
 BSoundPlayer::get_volume_slider()
 {
-	UNIMPLEMENTED();
+	BMediaRoster *roster = BMediaRoster::CurrentRoster();
+	if(roster==NULL)
+		return;
+	BParameterWeb *web = NULL;
+	if(roster->GetParameterWebFor(m_input.node, &web) < B_OK)
+		return;
+	for(int32 i=0; i<web->CountParameters(); i++) {
+		BParameter *parameter = web->ParameterAt(i);
+		if(parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER
+			|| parameter->Kind() != B_GAIN
+			|| (parameter->ID() >> 16) != m_input.destination.id)
+			continue;
+		_m_volumeSlider = (BContinuousParameter*)parameter;
+		break;	
+	}
 }
 
 void 
