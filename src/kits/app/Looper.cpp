@@ -76,14 +76,19 @@ int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
 uint32			BLooper::sLooperID = B_ERROR;
 team_id			BLooper::sTeamID = B_ERROR;
 
+enum
+{
+	BLOOPER_PROCESS_INTERNALLY = 0,
+	BLOOPER_HANDLER_BY_INDEX
+};
+
 static property_info gLooperPropInfo[] =
 {
 	{
 		"Handler",
 			{},
 			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
-			// TODO: what is the extra_data for?
-			NULL, 1,
+			NULL, BLOOPER_HANDLER_BY_INDEX,
 			{},
 			{},
 			{}
@@ -92,7 +97,7 @@ static property_info gLooperPropInfo[] =
 		"Handlers",
 			{B_GET_PROPERTY},
 			{B_DIRECT_SPECIFIER},
-			NULL, 0,
+			NULL, BLOOPER_PROCESS_INTERNALLY,
 			{B_MESSENGER_TYPE},
 			{},
 			{}
@@ -101,7 +106,7 @@ static property_info gLooperPropInfo[] =
 		"Handler",
 			{B_COUNT_PROPERTIES},
 			{B_DIRECT_SPECIFIER},
-			NULL, 0,
+			NULL, BLOOPER_PROCESS_INTERNALLY,
 			{B_INT32_TYPE},
 			{},
 			{}
@@ -685,12 +690,35 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 			string comparisons -- which wouldn't tell the whole story anyway,
 			because of the same name being used for multiple properties.
  */
-	// Straight from the BeBook
 	BPropertyInfo PropertyInfo(gLooperPropInfo);
 	uint32 data;
 	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0)
 	{
-		return this;
+		switch (data)
+		{
+			case BLOOPER_PROCESS_INTERNALLY:
+				return this;
+
+			case BLOOPER_HANDLER_BY_INDEX:
+			{
+				int32 index = specifier->FindInt32("index");
+				if (form == B_REVERSE_INDEX_SPECIFIER)
+				{
+					index = CountHandlers() - index;
+				}
+				BHandler* target = HandlerAt(index);
+				if (target)
+				{
+					// Specifier has been fully handled
+					msg->PopSpecifier();
+					return target;
+				}
+				else
+				{
+					// TODO: test and implement
+				}
+			}
+		}
 	}
 	else
 	{
