@@ -120,14 +120,14 @@ bool SetupView::UpdateViewData()
 	if (*server->Text() && *queue->Text()) {
 		BNetEndpoint *ep = new BNetEndpoint(SOCK_STREAM);
 		if (ep->InitCheck() == B_NO_ERROR) {
-			int port = atoi(queue->Text());
+			uint16 port = atoi(queue->Text());
 			
 			if (! port)
 				port = 9100;
 			
 			if (ep->Connect(server->Text(), atoi(queue->Text())) != B_OK) {
 				BString text;
-				text << "Fail to connect to " << server->Text() << ":" << port << "!";  
+				text << "Fail to connect to " << server->Text() << ":" << (int) port << "!";  
 				BAlert *alert = new BAlert("", text.String(), "Damn");
 				alert->Go();
 				return false;
@@ -136,7 +136,7 @@ bool SetupView::UpdateViewData()
 			char str[256];
 			sprintf(str, "%s:%s", server->Text(), queue->Text());
 			dir->WriteAttr("hp_jetdirect:host", B_STRING_TYPE, 0, server->Text(), strlen(server->Text()) + 1);
-			dir->WriteAttr("hp_jetdirect:port", B_INT16_TYPE, 0, &port, 2);
+			dir->WriteAttr("hp_jetdirect:port", B_UINT16_TYPE, 0, &port, sizeof(port));
 			return true;
 		};
 	};
