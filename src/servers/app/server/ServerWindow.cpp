@@ -21,6 +21,7 @@
 //
 //	File Name:		ServerWindow.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@mymail.ro>
 //	Description:	Shadow BWindow class
 //  
 //------------------------------------------------------------------------------
@@ -152,34 +153,27 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	winLink.Attach<port_id>(fMessagePort);
 	winLink.Flush();
 
-	// Wait for top_view data and create ServerWindow's top most Layer
 	int32			vCode;
-	int32			vToken;
-	BRect			vFrame;
-	uint32			vResizeMode;
-	uint32			vFlags;
-	char*			vName = NULL;
 
+	// check the next 2 messages to make sure we receive top_view's attributes.
 	fSession->ReadInt32(&vCode);
 	if(vCode != AS_LAYER_CREATE_ROOT)
-		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received!\n");
-	fSession->ReadInt32(&vToken);
-	fSession->ReadRect(&vFrame);
-	fSession->ReadUInt32(&vResizeMode);
-	fSession->ReadUInt32(&vFlags);
-	vName		= fSession->ReadString();
+		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received! - 1\n");
 
-	// Create the top layer.
-	fTopLayer		= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, desktop->GetDisplayDriver());
+	fSession->ReadInt32(&vCode);
+	if(vCode != AS_LAYER_CREATE)
+		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received! - 2\n");
+
+	// start receiving top_view data. pass NULL as the parent view.
+	// This should be the *only* place where this happens.
+	fTopLayer		= CreateLayerTree(NULL);
 	fTopLayer->SetAsTopLayer(true);
+	cl = fTopLayer;
 
 	// Create a WindoBorder object for our ServerWindow.
 	fWinBorder		= new WinBorder( fFrame, fTitle.String(),
 									 wlook, wfeel, wflags,
 									 this, desktop->GetDisplayDriver());
-
-	delete vName;
-	cl = fTopLayer;
 
 	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
@@ -268,6 +262,7 @@ STRACE(("ServerWindow %s: Quit\n",fTitle.String()));
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
+// whaaat?
 	if(!fWinBorder->IsHidden())
 		return;
 
@@ -310,6 +305,8 @@ void ServerWindow::Show(void)
 		desktop->fGeneralLock.Unlock();
 		STRACE(("ServerWindow(%s)::Show() - General lock released\n", fWinBorder->GetName()));
 	}
+	snooze(1000000);
+	fWinBorder->MoveBy(100,100);
 }
 
 //! Hides the window's WinBorder
@@ -549,7 +546,7 @@ void ServerWindow::SetLayerFontState(Layer *layer){
 		//   in ServerFont class. DW, could you add one?
 		//layer->_layerdata->font->
 	}
-	
+
 	if (mask & B_FONT_SIZE){
 		float		size;
 		fSession->ReadFloat(&size);
@@ -591,7 +588,7 @@ void ServerWindow::SetLayerFontState(Layer *layer){
 		fSession->ReadUInt32(&flags); // uint32
 		layer->_layerdata->font.SetFlags(flags);
 	}
-STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",fTitle.String(), layer->_name->String()));
 }
 
 void ServerWindow::SetLayerState(Layer *layer){
@@ -642,13 +639,11 @@ void ServerWindow::SetLayerState(Layer *layer){
 			layer->_layerdata->clippReg = NULL;
 		}
 	}
-STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(), layer->_name->String()));
 }
 
-void ServerWindow::CreateLayerTree(Layer *localRoot){
+Layer* ServerWindow::CreateLayerTree(Layer *localRoot){
 STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
-	if(!localRoot)
-		debugger("ServerWindow(%s)::CreateLayerTree() - NO localRoot Layer specified!\n");
 
 	int32		token;
 	BRect		frame;
@@ -684,13 +679,14 @@ STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
 
 	//lastly, the BView's graphic state
 	fSession->ReadInt32(&dummyMsg);
-	if (dummyMsg == AS_LAYER_SET_FONT_STATE)
+	if (dummyMsg == AS_LAYER_SET_STATE)
 		SetLayerState(newLayer);
 	else
 		debugger("ServerWindow(%s) - AS_LAYER_SET_STATE Expected!\n");
 
 	// add the new Layer to the tree structure.
-	localRoot->AddChild(newLayer);
+	if (localRoot)
+		localRoot->AddChild(newLayer);
 			
 	// attach newLayer's children...
 	for(int i = 0; i < childCount; i++)
@@ -701,7 +697,8 @@ STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
 		else
 			debugger("ServerWindow(%s) - AS_LAYER_CREATE Expected!\n");
 	}
-STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), cl->_name->String(), name));
+STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), newLayer->_name->String(), name));
+	return newLayer;
 }
 
 void ServerWindow::DispatchMessage(int32 code)
