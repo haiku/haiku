@@ -17,6 +17,7 @@ StaticLibrary print :
 	JobSetupDlg.cpp
 	PackBits.cpp
 	PageSetupDlg.cpp
+	PagesView.cpp
 	Preview.cpp
 	PrinterData.cpp
 	PrinterDriver.cpp

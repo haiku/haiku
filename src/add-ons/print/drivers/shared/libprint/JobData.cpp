@@ -9,28 +9,30 @@
 #include "PrinterCap.h"
 #include "DbgMsg.h"
 
-const char *kJDXRes             = "xres";
-const char *kJDYRes             = "yres";
-const char *kJDCopies           = "copies";
-const char *kJDOrientation      = "orientation";
-const char *kJDScaling          = "scaling";
-const char *kJDPaperRect        = "paper_rect";
-const char *kJDPrintableRect    = "printable_rect";
-const char *kJDFirstPage        = "first_page";
-const char *kJDLastPage         = "last_page";
+static const char *kJDXRes                  = "xres";
+static const char *kJDYRes                  = "yres";
+static const char *kJDCopies                = "copies";
+static const char *kJDOrientation           = "orientation";
+static const char *kJDScaling               = "scale";
+static const char *kJDScaledPaperRect       = "paper_rect";
+static const char *kJDScaledPrintableRect   = "printable_rect";
+static const char *kJDFirstPage             = "first_page";
+static const char *kJDLastPage              = "last_page";
 
-const char *kJDPaper            = "JJJJ_paper";
-const char *kJDNup              = "JJJJ_nup";
-const char *kJDGamma            = "JJJJ_gamma";
-const char *kJDInkDensity       = "JJJJ_ink_density";
-const char *kJDPaperSource      = "JJJJ_paper_source";
-const char *kJDCollate          = "JJJJ_collate";
-const char *kJDReverse          = "JJJJ_reverse";
-const char *kJDPrintStyle       = "JJJJ_print_style";
-const char *kJDBindingLocation  = "JJJJ_binding_location";
-const char *kJDPageOrder        = "JJJJ_page_order";
-const char *kJDColor            = "JJJJ_color";
-const char *kJDDitherType       = "JJJJ_dither_type";
+static const char *kJDPaper                 = "JJJJ_paper";
+static const char *kJDNup                   = "JJJJ_nup";
+static const char *kJDGamma                 = "JJJJ_gamma";
+static const char *kJDInkDensity            = "JJJJ_ink_density";
+static const char *kJDPaperSource           = "JJJJ_paper_source";
+static const char *kJDCollate               = "JJJJ_collate";
+static const char *kJDReverse               = "JJJJ_reverse";
+static const char *kJDPrintStyle            = "JJJJ_print_style";
+static const char *kJDBindingLocation       = "JJJJ_binding_location";
+static const char *kJDPageOrder             = "JJJJ_page_order";
+static const char *kJDColor                 = "JJJJ_color";
+static const char *kJDDitherType            = "JJJJ_dither_type";
+static const char *kJDPaperRect             = "JJJJ_paper_rect";
+static const char* kJDPrintableRect         = "JJJJ_printable_rect";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
@@ -43,56 +45,60 @@ JobData::~JobData()
 
 JobData::JobData(const JobData &job_data)
 {
-	fPaper            = job_data.fPaper;
-	fXRes             = job_data.fXRes;
-	fYRes             = job_data.fYRes;
-	fOrientation      = job_data.fOrientation;
-	fScaling          = job_data.fScaling;
-	fPaperRect        = job_data.fPaperRect;
-	fPrintableRect    = job_data.fPrintableRect;
-	fNup              = job_data.fNup;
-	fFirstPage        = job_data.fFirstPage;
-	fLastPage         = job_data.fLastPage;
-	fGamma            = job_data.fGamma;
-	fInkDensity       = job_data.fInkDensity;
-	fPaperSource      = job_data.fPaperSource;
-	fCopies           = job_data.fCopies;
-	fCollate          = job_data.fCollate;
-	fReverse          = job_data.fReverse;
-	fPrintStyle       = job_data.fPrintStyle;
-	fBindingLocation  = job_data.fBindingLocation;
-	fPageOrder        = job_data.fPageOrder;
-	fSettings         = job_data.fSettings;
-	fMsg              = job_data.fMsg;
-	fColor            = job_data.fColor;
-	fDitherType       = job_data.fDitherType;
+	fPaper                 = job_data.fPaper;
+	fXRes                  = job_data.fXRes;
+	fYRes                  = job_data.fYRes;
+	fOrientation           = job_data.fOrientation;
+	fScaling               = job_data.fScaling;
+	fPaperRect             = job_data.fPaperRect;
+	fScaledPaperRect       = job_data.fScaledPaperRect;
+	fPrintableRect         = job_data.fPrintableRect;
+	fScaledPrintableRect   = job_data.fScaledPrintableRect;
+	fNup                   = job_data.fNup;
+	fFirstPage             = job_data.fFirstPage;
+	fLastPage              = job_data.fLastPage;
+	fGamma                 = job_data.fGamma;
+	fInkDensity            = job_data.fInkDensity;
+	fPaperSource           = job_data.fPaperSource;
+	fCopies                = job_data.fCopies;
+	fCollate               = job_data.fCollate;
+	fReverse               = job_data.fReverse;
+	fPrintStyle            = job_data.fPrintStyle;
+	fBindingLocation       = job_data.fBindingLocation;
+	fPageOrder             = job_data.fPageOrder;
+	fSettings              = job_data.fSettings;
+	fMsg                   = job_data.fMsg;
+	fColor                 = job_data.fColor;
+	fDitherType            = job_data.fDitherType;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
 {
-	fPaper            = job_data.fPaper;
-	fXRes             = job_data.fXRes;
-	fYRes             = job_data.fYRes;
-	fOrientation      = job_data.fOrientation;
-	fScaling          = job_data.fScaling;
-	fPaperRect        = job_data.fPaperRect;
-	fPrintableRect    = job_data.fPrintableRect;
-	fNup              = job_data.fNup;
-	fFirstPage        = job_data.fFirstPage;
-	fLastPage         = job_data.fLastPage;
-	fGamma            = job_data.fGamma;
-	fInkDensity       = job_data.fInkDensity;
-	fPaperSource      = job_data.fPaperSource;
-	fCopies           = job_data.fCopies;
-	fCollate          = job_data.fCollate;
-	fReverse          = job_data.fReverse;
-	fPrintStyle       = job_data.fPrintStyle;
-	fBindingLocation  = job_data.fBindingLocation;
-	fPageOrder        = job_data.fPageOrder;
-	fSettings         = job_data.fSettings;
-	fMsg              = job_data.fMsg;
-	fColor            = job_data.fColor;
-	fDitherType       = job_data.fDitherType;
+	fPaper                 = job_data.fPaper;
+	fXRes                  = job_data.fXRes;
+	fYRes                  = job_data.fYRes;
+	fOrientation           = job_data.fOrientation;
+	fScaling               = job_data.fScaling;
+	fPaperRect             = job_data.fPaperRect;
+	fScaledPaperRect       = job_data.fScaledPaperRect;
+	fPrintableRect         = job_data.fPrintableRect;
+	fScaledPrintableRect   = job_data.fScaledPrintableRect;
+	fNup                   = job_data.fNup;
+	fFirstPage             = job_data.fFirstPage;
+	fLastPage              = job_data.fLastPage;
+	fGamma                 = job_data.fGamma;
+	fInkDensity            = job_data.fInkDensity;
+	fPaperSource           = job_data.fPaperSource;
+	fCopies                = job_data.fCopies;
+	fCollate               = job_data.fCollate;
+	fReverse               = job_data.fReverse;
+	fPrintStyle            = job_data.fPrintStyle;
+	fBindingLocation       = job_data.fBindingLocation;
+	fPageOrder             = job_data.fPageOrder;
+	fSettings              = job_data.fSettings;
+	fMsg                   = job_data.fMsg;
+	fColor                 = job_data.fColor;
+	fDitherType            = job_data.fDitherType;
 	return *this;
 }
 
@@ -144,8 +150,16 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPaperRect = msg->FindRect(kJDPaperRect);
 	}
 
+	if (msg->HasRect(kJDScaledPaperRect)) {
+		fScaledPaperRect = msg->FindRect(kJDScaledPaperRect);
+	}
+
 	if (msg->HasRect(kJDPrintableRect)) {
 		fPrintableRect = msg->FindRect(kJDPrintableRect);
+	}
+
+	if (msg->HasRect(kJDScaledPrintableRect)) {
+		fScaledPrintableRect = msg->FindRect(kJDScaledPrintableRect);
 	}
 
 	if (msg->HasInt32(kJDFirstPage))
@@ -262,10 +276,20 @@ void JobData::save(BMessage *msg)
 	else
 		msg->AddRect(kJDPaperRect, fPaperRect);
 
+	if (msg->HasRect(kJDScaledPaperRect))
+		msg->ReplaceRect(kJDScaledPaperRect, fScaledPaperRect);
+	else
+		msg->AddRect(kJDScaledPaperRect, fScaledPaperRect);
+
 	if (msg->HasRect(kJDPrintableRect))
 		msg->ReplaceRect(kJDPrintableRect, fPrintableRect);
 	else
 		msg->AddRect(kJDPrintableRect, fPrintableRect);
+
+	if (msg->HasRect(kJDScaledPrintableRect))
+		msg->ReplaceRect(kJDScaledPrintableRect, fScaledPrintableRect);
+	else
+		msg->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
 
 	// page settings end here; don't store job settings in message
 	if (fSettings == kPageSettings) return;

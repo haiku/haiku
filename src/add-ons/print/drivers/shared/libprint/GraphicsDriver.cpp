@@ -147,7 +147,7 @@ void GraphicsDriver::cleanupBitmap()
 	fView   = NULL;
 }
 
-BPoint get_scale(JobData *org_job_data)
+static BPoint get_scale(JobData *org_job_data)
 {
 	float width;
 	float height;
@@ -224,11 +224,14 @@ BPoint get_scale(JobData *org_job_data)
 		break;
 	}
 
+	scale.x = scale.x * org_job_data->getScaling() / 100.0;
+	scale.y = scale.y * org_job_data->getScaling() / 100.0;
+
 	DBGMSG(("real scale = %f, %f\n", scale.x, scale.y));
 	return scale;
 }
 
-BPoint get_offset(
+static BPoint get_offset(
 	int index,
 	const BPoint *scale,
 	JobData *org_job_data)
@@ -237,8 +240,8 @@ BPoint get_offset(
 	offset.x = 0;
 	offset.y = 0;
 
-	float width  = org_job_data->getPrintableRect().Width();
-	float height = org_job_data->getPrintableRect().Height();
+	float width  = org_job_data->getScaledPrintableRect().Width();
+	float height = org_job_data->getScaledPrintableRect().Height();
 
 	switch (org_job_data->getNup()) {
 	case 1:
@@ -321,6 +324,7 @@ BPoint get_offset(
 	return offset;
 }
 
+// print the specified pages on a physical page
 bool GraphicsDriver::printPage(PageDataList *pages)
 {
 #ifndef USE_PREVIEW_FOR_DEBUG
@@ -333,11 +337,13 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 	}
 
 	do {
+		// clear the physical page
 		fView->SetScale(1.0);
 		fView->SetHighColor(255, 255, 255);
 		fView->ConstrainClippingRegion(NULL);
 		fView->FillRect(fView->Bounds());
 
+		
 		BPoint scale = get_scale(fOrgJobData);
 		float real_scale = min(scale.x, scale.y) * fOrgJobData->getXres() / 72.0f;
 		fView->SetScale(real_scale);
@@ -349,7 +355,7 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 			BPoint left_top(get_offset(page_index++, &scale, fOrgJobData));
 			left_top.x -= x;
 			left_top.y -= y;
-			BRect clip(fOrgJobData->getPrintableRect());
+			BRect clip(fOrgJobData->getScaledPrintableRect());
 			clip.OffsetTo(left_top);
 			BRegion *region = new BRegion();
 			region->Set(clip);
@@ -438,6 +444,7 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 		do {
 			DBGMSG(("page index = %d\n", page_index));
 
+			// collect the pages to be printed on the physical page
 			nup = fOrgJobData->getNup();
 			PageDataList pages;
 			do {
@@ -450,7 +457,8 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 				success = startPage(page_index);
 				if (!success)
 					break;
-			
+				
+				// print the pages on the physical page
 				fView->Window()->Lock();
 				success = printPage(&pages);
 				fView->Window()->Unlock();

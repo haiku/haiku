@@ -36,6 +36,7 @@
 #include "JobSetupDlg.h"
 #include "JobData.h"
 #include "JSDSlider.h"
+#include "PagesView.h"
 #include "PrinterData.h"
 #include "PrinterCap.h"
 #include "DbgMsg.h"
@@ -137,6 +138,11 @@ using namespace std;
 #define REVERSE_V			COLLATE_V + COLLATE_HEIGHT + 5
 #define REVERSE_WIDTH		PAPERFEED_WIDTH
 #define REVERSE_HEIGHT		16
+
+#define PAGES_H				PAPERFEED_H
+#define PAGES_V				REVERSE_V + COLLATE_HEIGHT + 5
+#define PAGES_WIDTH			PAPERFEED_WIDTH
+#define PAGES_HEIGHT		40
 
 #define PRINT_BUTTON_WIDTH	70
 #define PRINT_BUTTON_HEIGHT	20
@@ -251,6 +257,12 @@ const BRect reverse_rect(
 	REVERSE_H + REVERSE_WIDTH,
 	REVERSE_V + REVERSE_HEIGHT);
 
+const BRect pages_rect(
+	PAGES_H,
+	PAGES_V,
+	PAGES_H + PAGES_WIDTH,
+	PAGES_V + PAGES_HEIGHT);
+
 const BRect ok_rect(
 	PRINT_OK_BUTTON_H,
 	PRINT_OK_BUTTON_V,
@@ -330,6 +342,8 @@ enum {
 	kMsgCancel,
 	kMsgOK,
 	kMsgQuality,
+	kCollateChanged,
+	kReverseChanged,
 };
 
 JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
@@ -397,10 +411,10 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(bpp_rect, "", "Color", fColorType);
+	menufield = new BMenuField(bpp_rect, "", "Color:", fColorType);
 
 	box->AddChild(menufield);
-	width = StringWidth("Color") + 10;
+	width = StringWidth("Color:") + 10;
 	menufield->SetDivider(width);
 	fColorType->SetTargetForItems(this);
 	
@@ -422,10 +436,10 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(dither_rect, "", "Dithering", fDitherType);
+	menufield = new BMenuField(dither_rect, "", "Dithering:", fDitherType);
 
 	box->AddChild(menufield);
-	width = StringWidth("Dithering") + 10;
+	width = StringWidth("Dithering:") + 10;
 	menufield->SetDivider(width);
 	fDitherType->SetTargetForItems(this);
 	
@@ -527,9 +541,9 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(paperfeed_rect, "", "Paper Source", fPaperFeed);
+	menufield = new BMenuField(paperfeed_rect, "", "Paper Source:", fPaperFeed);
 	AddChild(menufield);
-	width = StringWidth("Number of Copies") + 7;
+	width = StringWidth("Number of Copies:") + 7;
 	menufield->SetDivider(width);
 
 	/* Page Per Sheet */
@@ -550,7 +564,7 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(nup_rect, "", "Page Per Sheet", fNup);
+	menufield = new BMenuField(nup_rect, "", "Page Per Sheet:", fNup);
 	menufield->SetDivider(width);
 	AddChild(menufield);
 
@@ -566,7 +580,7 @@ void JobSetupView::AttachedToWindow()
 
 	/* copies */
 
-	copies = new BTextControl(copies_rect, "", "Number of Copies", "", NULL);
+	copies = new BTextControl(copies_rect, "", "Number of Copies:", "", NULL);
 	AddChild(copies);
 	copies->SetDivider(width);
 
@@ -576,19 +590,28 @@ void JobSetupView::AttachedToWindow()
 
 	/* collate */
 
-	fCollate = new BCheckBox(collate_rect, "Collate", "Collate", NULL);
+	fCollate = new BCheckBox(collate_rect, "Collate", "Collate", new BMessage(kCollateChanged));
 	AddChild(fCollate);
 	if (fJobData->getCollate()) {
 		fCollate->SetValue(B_CONTROL_ON);
 	}
+	fCollate->SetTarget(this);
 
 	/* reverse */
 
-	fReverse = new BCheckBox(reverse_rect, "Reverse", "Reverse", NULL);
+	fReverse = new BCheckBox(reverse_rect, "Reverse", "Reverse", new BMessage(kReverseChanged));
 	AddChild(fReverse);
 	if (fJobData->getReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
 	}
+	fReverse->SetTarget(this);
+
+	/* pages view */
+
+	fPages = new PagesView(pages_rect, "Pages", B_FOLLOW_ALL, B_WILL_DRAW);
+	AddChild(fPages);
+	fPages->setCollate(fJobData->getCollate());
+	fPages->setReverse(fJobData->getReverse());
 
 	/* cancel */
 
@@ -623,6 +646,14 @@ void JobSetupView::MessageReceived(BMessage *msg)
 		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() == JobData::kColor); 
 		break;
 
+	case kCollateChanged:
+		fPages->setCollate(fCollate->Value() == B_CONTROL_ON);
+		break;
+	
+	case kReverseChanged:
+		fPages->setReverse(fReverse->Value() == B_CONTROL_ON);
+		break;
+	
 	}
 }
 
@@ -738,7 +769,7 @@ bool JobSetupView::UpdateJobData()
 
 //====================================================================
 
-filter_result PrintKeyFilter(BMessage *msg, BHandler **target, BMessageFilter *filter)
+static filter_result PrintKeyFilter(BMessage *msg, BHandler **target, BMessageFilter *filter)
 {
 
 	BWindow *window = (BWindow *)filter->Looper();
@@ -809,7 +840,7 @@ void JobSetupDlg::MessageReceived(BMessage *msg)
 	case kMsgCancel:
 		PostMessage(B_QUIT_REQUESTED);
 		break;
-	
+		
 	default:
 		DialogWindow::MessageReceived(msg);
 		break;

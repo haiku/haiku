@@ -24,6 +24,7 @@
 #include <PrintJob.h>
 #include <RadioButton.h>
 #include <Rect.h>
+#include <String.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -32,6 +33,7 @@
 #include "PrinterData.h"
 #include "PrinterCap.h"
 #include "DbgMsg.h"
+#include "BeUtils.h"
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
@@ -40,11 +42,12 @@ using namespace std;
 #endif
 
 #define	PAGESETUP_WIDTH		270
-#define PAGESETUP_HEIGHT	125
+#define PAGESETUP_HEIGHT	135
 
 #define	MENU_HEIGHT			16
 #define BUTTON_WIDTH		70
 #define BUTTON_HEIGHT		20
+#define TEXT_HEIGHT         16
 
 #define ORIENT_H			10
 #define ORIENT_V			10
@@ -57,13 +60,19 @@ using namespace std;
 #define PAPER_V				20
 #define PAPER_WIDTH			200
 #define PAPER_HEIGHT		MENU_HEIGHT
-#define PAPER_TEXT			"Paper Size"
+#define PAPER_TEXT			"Paper Size:"
 
 #define RES_H				PAPER_H
 #define RES_V				PAPER_V + 24
 #define RES_WIDTH			150
 #define RES_HEIGHT			MENU_HEIGHT
-#define RES_TEXT			"Resolution"
+#define RES_TEXT			"Resolution:"
+
+#define SCALE_H				PAPER_H
+#define SCALE_V				RES_V + 24
+#define SCALE_WIDTH			100
+#define SCALE_HEIGHT		TEXT_HEIGHT
+#define SCALE_TEXT			"Scale [%]:"
 
 #define OK_H				(PAGESETUP_WIDTH  - BUTTON_WIDTH  - 11)
 #define OK_V				(PAGESETUP_HEIGHT - BUTTON_HEIGHT - 11)
@@ -95,6 +104,12 @@ const BRect RESOLUTION_RECT(
 	RES_V,
 	RES_H + RES_WIDTH,
 	RES_V + RES_HEIGHT);
+
+const BRect SCALE_RECT(
+	SCALE_H,
+	SCALE_V,
+	SCALE_H + SCALE_WIDTH,
+	SCALE_V + SCALE_HEIGHT);
 
 const BRect OK_RECT(
 	OK_H,
@@ -195,6 +210,24 @@ void PageSetupView::AttachedToWindow()
 	AddChild(menufield);
 	menufield->SetDivider(width);
 
+	/* scale */
+	BString scale;
+	scale << (int)fJobData->getScaling();
+	fScaling = new BTextControl(SCALE_RECT, "scale", "Scale [%]:", 
+									scale.String(),
+	                                NULL, B_FOLLOW_RIGHT);
+	int num;
+	for (num = 0; num <= 255; num++) {
+		fScaling->TextView()->DisallowChar(num);
+	}
+	for (num = 0; num <= 9; num++) {
+		fScaling->TextView()->AllowChar('0' + num);
+	}
+	fScaling->TextView()->SetMaxBytes(3);
+	fScaling->SetDivider(width);
+
+	AddChild(fScaling);		
+
 	/* cancel */
 
 	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(kMsgCancel));
@@ -259,9 +292,21 @@ bool PageSetupView::UpdateJobData()
 		swap(&printable_rect.right, &printable_rect.bottom);
 	}
 
-	fJobData->setScaling(100.0);
+	float scaling = atoi(fScaling->Text());
+	if (scaling <= 0.0) { // sanity check
+		scaling = 100.0;
+	}
+	if (scaling > 1000.0) {
+		scaling = 1000.0;
+	}
+
+	float scalingR = 100.0 / scaling;
+
+	fJobData->setScaling(scaling);
 	fJobData->setPaperRect(paper_rect);
+	fJobData->setScaledPaperRect(ScaleRect(paper_rect, scalingR));
 	fJobData->setPrintableRect(printable_rect);
+	fJobData->setScaledPrintableRect(ScaleRect(printable_rect, scalingR));
 
 	fJobData->save();
 	return true;
