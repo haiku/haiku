@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src kernel core fs ;
 
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel fs ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
 
 KernelMergeObject kernel_fs.o : 
@@ -13,6 +16,7 @@ KernelMergeObject kernel_fs.o :
 	message.c
 	node_monitor.c
 	IOScheduler.cpp
+	KPath.cpp
 
 	: -fno-pic -Wno-unused -D_KERNEL_MODE
 	;
