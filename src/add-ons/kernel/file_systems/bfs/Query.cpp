@@ -383,7 +383,7 @@ matchString(char *pattern, char *string)
 					invert = true;
 					pattern++;
 				}
-				
+
 				if (!pattern[0] || pattern[0] == ']')
 					return MATCH_BAD_PATTERN;
 
@@ -957,9 +957,18 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 		}
 
 		if (keySize == 0) {
-			if (fType == B_STRING_TYPE)
+			// B_STRING_TYPE doesn't have a fixed length, so it was set
+			// to 0 before - we compute the correct value here
+			if (fType == B_STRING_TYPE) {
 				keySize = strlen(fValue.String);
-			else
+
+				// The empty string is a special case - we normally don't check
+				// for the trailing null byte, in the case for the empty string
+				// we do it explicitly, because there can't be keys in the B+tree
+				// with a length of zero
+				if (keySize == 0)
+					keySize = 1;
+			} else
 				RETURN_ERROR(B_ENTRY_NOT_FOUND);
 		}
 
@@ -970,7 +979,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 			if (status == B_ENTRY_NOT_FOUND)
 				return B_OK;
 		} else {
-			status = (*iterator)->Find(Value(),keySize);
+			status = (*iterator)->Find(Value(), keySize);
 			if (fOp == OP_EQUAL && !fIsPattern)
 				return status;
 			else if (status == B_ENTRY_NOT_FOUND
