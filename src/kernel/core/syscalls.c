@@ -23,6 +23,7 @@
 #include <sysctl.h>
 #include <ksocket.h>
 #include <kimage.h>
+#include <ksignal.h>
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 
@@ -183,8 +184,8 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
 			break;
-		case SYSCALL_SNOOZE_UNTIL:
-			*call_ret = snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, B_CAN_INTERRUPT);
+		case SYSCALL_SNOOZE_ETC:
+			*call_ret = user_snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, (int32)arg3);
 			break;
 		case SYSCALL_SEM_CREATE:
 			*call_ret = user_create_sem((int)arg0, (const char *)arg1);
@@ -208,17 +209,17 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = thread_get_current_thread_id();
 			break;
 		case SYSCALL_EXIT_THREAD:
-			sys_exit_thread((status_t)arg0);
+			user_exit_thread((status_t)arg0);
 			*call_ret = 0;
 			break;
 		case SYSCALL_CREATE_TEAM:
 			*call_ret = user_team_create_team((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
 			break;
 		case SYSCALL_WAIT_ON_THREAD:
-			*call_ret = user_thread_wait_on_thread((thread_id)arg0, (int *)arg1);
+			*call_ret = user_wait_for_thread((thread_id)arg0, (status_t *)arg1);
 			break;
 		case SYSCALL_WAIT_ON_TEAM:
-			*call_ret = user_team_wait_on_team((team_id)arg0, (int *)arg1);
+			*call_ret = user_wait_for_team((team_id)arg0, (status_t *)arg1);
 			break;
 		case SYSCALL_VM_CREATE_ANONYMOUS_REGION:
 			*call_ret = user_vm_create_anonymous_region(
@@ -246,17 +247,19 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_vm_get_region_info((region_id)arg0, (vm_region_info *)arg1);
 			break;
 		case SYSCALL_SPAWN_THREAD:
-			*call_ret = user_thread_create_user_thread((addr)arg0, thread_get_current_thread()->team->id, 
-			                                           (const char*)arg1, (int)arg2, (void *)arg3);
+			*call_ret = user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3);
+			break;
+		case SYSCALL_SET_THREAD_PRIORITY:
+			*call_ret = user_set_thread_priority((thread_id)arg0, (int32)arg1);
 			break;
 		case SYSCALL_KILL_THREAD:
 			*call_ret = thread_kill_thread((thread_id)arg0);
 			break;
 		case SYSCALL_SUSPEND_THREAD:
-			*call_ret = thread_suspend_thread((thread_id)arg0);
+			*call_ret = user_suspend_thread((thread_id)arg0);
 			break;
 		case SYSCALL_RESUME_THREAD:
-			*call_ret = thread_resume_thread((thread_id)arg0);
+			*call_ret = user_resume_thread((thread_id)arg0);
 			break;
 		case SYSCALL_SEND_DATA:
 			*call_ret = user_send_data((thread_id)arg0, (int32)arg1, (const void *)arg2, (size_t)arg3);
@@ -265,7 +268,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_receive_data((thread_id *)arg0, (void *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_HAS_DATA:
-			*call_ret = has_data((thread_id)arg0);
+			*call_ret = user_has_data((thread_id)arg0);
 			break;
 		case SYSCALL_KILL_TEAM:
 			*call_ret = team_kill_team((team_id)arg0);
@@ -427,10 +430,10 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_sigaction((int)arg0, (const struct sigaction *)arg1, (struct sigaction *)arg2);
 			break;
 		case SYSCALL_SEND_SIGNAL:
-			*call_ret = send_signal_etc((pid_t)arg0, (uint)arg1, B_DO_NOT_RESCHEDULE);
+			*call_ret = user_send_signal((pid_t)arg0, (uint)arg1);
 			break;
 		case SYSCALL_SET_ALARM:
-			*call_ret = sys_set_alarm((bigtime_t)INT32TOINT64(arg0, arg1), (uint32)arg2);
+			*call_ret = user_set_alarm((bigtime_t)INT32TOINT64(arg0, arg1), (uint32)arg2);
 			break;
 		default:
 			*call_ret = -1;
