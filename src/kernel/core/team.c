@@ -19,8 +19,10 @@
 #include <kimage.h>
 #include <elf.h>
 #include <syscalls.h>
+#include <syscall_process_info.h>
 #include <tls.h>
 
+#include <sys/wait.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +56,7 @@ struct fork_arg {
 	struct arch_fork_arg arch_info;
 };
 
+
 // team list
 static void *team_hash = NULL;
 static team_id next_team_id = 1;
@@ -61,6 +64,10 @@ static struct team *kernel_team = NULL;
 
 spinlock team_spinlock = 0;
 
+static void insert_group_into_session(struct process_session *session, struct process_group *group);
+static void insert_team_into_group(struct process_group *group, struct team *team);
+static struct process_session *create_process_session(pid_t id);
+static struct process_group *create_process_group(pid_t id);
 static struct team *create_team_struct(const char *name, bool kernel);
 static void delete_team_struct(struct team *p);
 static int team_struct_compare(void *_p, const void *_key);
@@ -133,9 +140,24 @@ dump_team_info(int argc, char **argv)
 int
 team_init(kernel_args *ka)
 {
+	struct process_session *session;
+	struct process_group *group;
+
 	// create the team hash table
 	team_hash = hash_init(15, (addr)&kernel_team->next - (addr)kernel_team,
 		&team_struct_compare, &team_struct_hash);
+
+	// create initial session and process groups
+
+	session = create_process_session(1);
+	if (session == NULL)
+		panic("Could not create initial session.\n");
+
+	group = create_process_group(1);
+	if (group == NULL)
+		panic("Could not create initial process group.\n");
+
+	insert_group_into_session(session, group);
 
 	// create the kernel team
 	kernel_team = create_team_struct("kernel_team", true);
@@ -143,11 +165,11 @@ team_init(kernel_args *ka)
 		panic("could not create kernel team!\n");
 	kernel_team->state = TEAM_STATE_NORMAL;
 
+	insert_team_into_group(group, kernel_team);
+
 	kernel_team->io_context = vfs_new_io_context(NULL);
 	if (kernel_team->io_context == NULL)
 		panic("could not create io_context for kernel team!\n");
-
-	//XXX should initialize kernel_team->path here. Set it to "/"?
 
 	// stick it in the team hash
 	hash_insert(team_hash, kernel_team);
@@ -346,6 +368,163 @@ reparent_children(struct team *team)
 }
 
 
+static bool
+is_process_group_leader(struct team *team)
+{
+	return team->group_id == team->main_thread->id;
+}
+
+
+static void
+insert_group_into_session(struct process_session *session, struct process_group *group)
+{
+	if (group == NULL)
+		return;
+
+	group->session = session;
+	list_add_link_to_tail(&session->groups, group);
+}
+
+
+static void
+insert_team_into_group(struct process_group *group, struct team *team)
+{
+	team->group = group;
+	team->group_id = group->id;
+	team->session_id = group->session->id;
+
+	team->group_next = group->teams;
+	group->teams = team;
+}
+
+
+/** Removes a group from a session, and puts the session object
+ *	back into the session cache, if it's not used anymore.
+ *	You must hold the team lock when calling this function.
+ */
+
+static void
+remove_group_from_session(struct process_group *group)
+{
+	struct process_session *session = group->session;
+
+	// the group must be in any session to let this function have any effect
+	if (session == NULL)
+		return;
+
+	list_remove_link(group);
+
+	// we cannot free the resource here, so we're keeping the group link
+	// around - this way it'll be freed by free_process_group()
+	if (!list_is_empty(&session->groups))
+		group->session = NULL;
+}
+
+
+void
+team_delete_process_group(struct process_group *group)
+{
+	if (group == NULL)
+		return;
+
+	TRACE(("team_delete_process_group(id = %ld)\n", group->id));
+
+	delete_sem(group->dead_child_sem);
+
+	// remove_group_from_session() keeps this pointer around
+	// only if the session can be freed as well
+	if (group->session) {
+		TRACE(("team_delete_process_group(): frees session %ld\n", group->session->id));
+		free(group->session);
+	}
+
+	free(group);
+}
+
+
+/**	Removes the team from the group. If that group becomes therefore
+ *	unused, it will set \a _freeGroup to point to the group - otherwise
+ *	it will be \c NULL.
+ *	It cannot be freed here because this function has to be called
+ *	with having the team lock held.
+ *
+ *	\param team the team that'll be removed from it's group
+ *	\param _freeGroup points to the group to be freed or NULL
+ */
+
+static void
+remove_team_from_group(struct team *team, struct process_group **_freeGroup)
+{
+	struct process_group *group = team->group;
+	struct team *current, *last = NULL;
+
+	*_freeGroup = NULL;
+
+	// the team must be in any team to let this function have any effect
+	if  (group == NULL)
+		return;
+
+	for (current = group->teams; current != NULL; current = current->group_next) {
+		if (current == team) {
+			if (last == NULL)
+				group->teams = current->group_next;
+			else
+				last->group_next = current->group_next;
+
+			team->group = NULL;
+			break;
+		}
+		last = current;
+	}
+
+	team->group = NULL;
+	team->group_next = NULL;
+
+	if (group->teams != NULL)
+		return;
+
+	// we can remove this group as it is no longer used
+
+	remove_group_from_session(group);
+	*_freeGroup = group;
+}
+
+
+static struct process_group *
+create_process_group(pid_t id)
+{
+	struct process_group *group = (struct process_group *)malloc(sizeof(struct process_group));
+	if (group == NULL)
+		return NULL;
+
+	group->dead_child_sem = create_sem(0, "dead group children");
+	if (group->dead_child_sem < B_OK) {
+		free(group);
+		return NULL;
+	}
+
+	group->id = id;
+	group->session = NULL;
+	group->teams = NULL;
+
+	return group;
+}
+
+
+static struct process_session *
+create_process_session(pid_t id)
+{
+	struct process_session *session = (struct process_session *)malloc(sizeof(struct process_session));
+	if (session == NULL)
+		return NULL;
+
+	session->id = id;
+	list_init(&session->groups);
+
+	return session;
+}
+
+
 struct team *
 team_get_kernel_team(void)
 {
@@ -425,14 +604,24 @@ create_team_struct(const char *name, bool kernel)
 	team->pending_signals = 0;
 	team->death_sem = -1;
 	team->user_env_base = 0;
+
+	list_init(&team->dead_children.list);
+	team->dead_children.count = 0;
+	team->dead_children.wait_for_any = 0;
+	team->dead_children.sem = create_sem(0, "dead children");
+	if (team->dead_children.sem < B_OK)
+		goto error1;
+
 	list_init(&team->image_list);
 
 	if (arch_team_init_team_struct(team, kernel) < 0)
-		goto error;
+		goto error2;
 
 	return team;
 
-error:
+error2:
+	delete_sem(team->dead_children.sem);
+error1:
 	free(team);
 	return NULL;
 }
@@ -441,18 +630,35 @@ error:
 static void
 delete_team_struct(struct team *team)
 {
+	struct death_entry *death = NULL;
+
+	delete_sem(team->dead_children.sem);
+
+	while ((death = list_get_next_item(&team->dead_children.list, death)) != NULL)
+		free(death);
+
 	free(team);
 }
 
 
+/**	Removes the specified team from the global team hash, and from its parent.
+ *	It also moves all of its children up to the parent.
+ *	You must hold the team lock when you call this function.
+ *	If \a _freeGroup is set to a value other than \c NULL, it must be freed
+ *	from the calling function.
+ */
+
 void
-team_remove_team(struct team *team)
+team_remove_team(struct team *team, struct process_group **_freeGroup)
 {
 	hash_remove(team_hash, team);
 	team->state = TEAM_STATE_DEATH;
 
 	// reparent each of the team's children
 	reparent_children(team);
+
+	// remove us from our process group
+	remove_team_from_group(team, _freeGroup);
 
 	// remove us from our parent 
 	remove_team_from_parent(team->parent, team);
@@ -465,10 +671,10 @@ team_delete_team(struct team *team)
 	if (team->num_threads > 0) {
 		// there are other threads still in this team,
 		// cycle through and signal kill on each of the threads
-		// XXX this can be optimized. There's got to be a better solution.
-		cpu_status state;
+		// ToDo: this can be optimized. There's got to be a better solution.
 		struct thread *temp_thread;
 		char death_sem_name[B_OS_NAME_LENGTH];
+		cpu_status state;
 
 		sprintf(death_sem_name, "team %ld death sem", team->id);
 		team->death_sem = create_sem(0, death_sem_name);
@@ -667,6 +873,7 @@ team_create_thread_start(void *args)
 team_id
 team_create_team(const char *path, const char *name, char **args, int argc, char **env, int envCount, int priority)
 {
+	struct process_group *group;
 	struct team *team, *parent;
 	const char *threadName;
 	thread_id tid;
@@ -690,6 +897,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 
 	hash_insert(team_hash, team);
 	insert_team_into_parent(parent, team);
+	insert_team_into_group(parent->group, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -742,11 +950,14 @@ err1:
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
+	remove_team_from_group(team, &group);
 	remove_team_from_parent(parent, team);
 	hash_remove(team_hash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
+
+	team_delete_process_group(group);
 	delete_team_struct(team);
 
 	return err;
@@ -947,6 +1158,36 @@ err1:
 }
 
 
+static status_t
+get_death_entry(struct team *team, thread_id child, struct death_entry *death)
+{
+	struct death_entry *entry = NULL;
+
+	// find matching death entry structure
+	
+	while ((entry = list_get_next_item(&team->dead_children.list, entry)) != NULL) {
+		if (child != -1 && entry->thread != child)
+			continue;
+
+		// we found one
+
+		*death = *entry;
+
+		// only remove the death entry if there aren't any other interested parties
+		if ((child == -1 && atomic_add(&team->dead_children.wait_for_any, -1) == 1)
+			|| (child != -1 && team->dead_children.wait_for_any == 0)) {
+			list_remove_link(entry);
+			team->dead_children.count--;
+			free(entry);
+		}
+
+		return B_OK;
+	}
+
+	return child > 0 ? B_BAD_THREAD_ID : B_WOULD_BLOCK;
+}
+
+
 /** This is the kernel backend for waitpid(). It is a bit more powerful when it comes
  *	to the reason why a thread has died than waitpid() can be.
  */
@@ -955,21 +1196,65 @@ err1:
 static thread_id
 wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode)
 {
-	// ToDo: implement me! We need to store the death of children in the team structure!
+	struct team *team = thread_get_current_thread()->team;
+	struct death_entry death;
+	status_t status = B_OK;
+	cpu_status state;
 
-	dprintf("wait_for_child(child = %ld, flags = %lu) is not yet implemented\n", child, flags);
+	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
 
-	if (child > 0) {
-		// wait for the specified child
-	} else if (child == -1) {
-		// wait for any children of this team to die
-	} else if (child == 0) {
-		// wait for any children of this process group to die
-	} else {
-		// wait for any children with progress group of the absolute value of "child"
+	if (child == 0 || child < -1) {
+		dprintf("wait_for_child() process group ID waiting not yet implemented!\n");
+		return EOPNOTSUPP;
 	}
 
-	return B_ERROR;
+	if (child == -1) {
+		// we need to make sure the death entries won't get deleted too soon
+		atomic_add(&team->dead_children.wait_for_any, 1);
+	}
+
+	while (true) {
+		if (child > 0) {
+			// wait for the specified child
+
+			if (thread_get_thread_struct(child) != NULL) {
+				// team is still running, so we would need to block
+				return B_WOULD_BLOCK;
+			}
+		} else if (child == -1) {
+			// wait for any children of this team to die
+		} else if (child == 0) {
+			// wait for any children of this process group to die
+		} else {
+			// wait for any children with progress group of the absolute value of "child"
+		}
+
+		// see if there is any death entry for us already
+
+		state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+
+		status = get_death_entry(team, child, &death);
+
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		if (status == B_BAD_THREAD_ID)
+			return B_BAD_THREAD_ID;
+
+		if ((flags & WNOHANG) != 0)
+			return B_WOULD_BLOCK;
+
+		status = acquire_sem(team->dead_children.sem);
+		if (status == B_INTERRUPTED)
+			return B_INTERRUPTED;
+	}
+
+	// when we got here, we have a valid death entry
+	*_returnCode = death.status;
+	*_reason = death.reason;
+
+	return death.thread;
 }
 
 
@@ -1122,6 +1407,84 @@ err:
 
 	return status;
 }
+
+
+pid_t
+getpid(void)
+{
+	return thread_get_current_thread()->team->main_thread->id;
+}
+
+
+pid_t
+getppid(void)
+{
+	struct team *team = thread_get_current_thread()->team;
+	cpu_status state;
+	pid_t parent;
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	parent = team->parent->main_thread->id;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	return parent;
+}
+
+
+pid_t
+getpgid(pid_t process)
+{
+	struct thread *thread;
+	pid_t result = -1;
+	cpu_status state;
+
+	if (process == 0)
+		process = thread_get_current_thread()->team->main_thread->id;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	thread = thread_get_thread_struct_locked(process);
+	if (thread != NULL)
+		result = thread->team->group_id;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return thread != NULL ? result : B_BAD_VALUE;
+}
+
+
+pid_t
+getsid(pid_t process)
+{
+	struct thread *thread;
+	pid_t result = -1;
+	cpu_status state;
+
+	if (process == 0)
+		process = thread_get_current_thread()->team->main_thread->id;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	thread = thread_get_thread_struct_locked(process);
+	if (thread != NULL)
+		result = thread->team->session_id;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return thread != NULL ? result : B_BAD_VALUE;
+}
+
+
+//	#pragma mark -
+//	syscalls
 
 
 int
@@ -1307,6 +1670,182 @@ _user_wait_for_child(thread_id child, uint32 flags, int32 *_userReason, status_t
 	}
 
 	return deadChild;
+}
+
+
+pid_t
+_user_process_info(pid_t process, int32 which)
+{
+	// we only allow to return the parent of the current process
+	if (which == PARENT_ID
+		&& process != 0 && process != thread_get_current_thread()->team->main_thread->id)
+		return B_BAD_VALUE;
+
+	switch (which) {
+		case SESSION_ID:
+			return getsid(process);
+		case GROUP_ID:
+			return getpgid(process);
+		case PARENT_ID:
+			return getppid();
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+pid_t
+_user_setpgid(pid_t processID, pid_t groupID)
+{
+	struct team *currentTeam = thread_get_current_thread()->team;
+	struct process_group *group = NULL, *freeGroup = NULL;
+	struct thread *thread;
+	struct team *team;
+	cpu_status state;
+	team_id teamID = -1;
+	status_t status = B_OK;
+
+	if (groupID < 0)
+		return B_BAD_VALUE;
+
+	if (processID == 0) {
+		// get our own process ID
+		processID = currentTeam->main_thread->id;
+		teamID = currentTeam->id;
+
+		// we must not change our process group ID if we're a group leader
+		if (is_process_group_leader(currentTeam))
+			return B_NOT_ALLOWED;
+
+		status = B_OK;
+	} else {
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(processID);
+
+		// the thread must be the team's main thread, as that
+		// determines its process ID
+		if (thread != NULL && thread == thread->team->main_thread) {
+			// check if the thread is in a child team of the calling team and
+			// if it's already a process group leader and in the same session
+			if (thread->team->parent != currentTeam
+				|| is_process_group_leader(thread->team)
+				|| thread->team->session_id != currentTeam->session_id)
+				status = B_NOT_ALLOWED;
+			else
+				teamID = thread->team->id;
+		} else
+			status = B_BAD_THREAD_ID;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+
+	if (status != B_OK)
+		return status;
+
+	// if the group ID is not specified, a new group should be created
+	if (groupID == 0)
+		groupID = processID;
+
+	if (groupID == processID) {
+		// We need to create a new process group for this team
+		group = create_process_group(groupID);
+		if (group == NULL)
+			return B_NO_MEMORY;
+	}
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(teamID);
+	if (team != NULL) {
+		if (processID == groupID) {
+			// we created a new process group, let us insert it into the team's session
+			insert_group_into_session(team->group->session, group);
+			remove_team_from_group(team, &freeGroup);
+			insert_team_into_group(group, team);
+		} else {
+			struct process_session *session = team->group->session;
+			struct process_group *group = NULL;
+
+			// check if this team can have the group ID; there must be one matching
+			// process ID in the team's session
+
+			while ((group = list_get_next_item(&session->groups, group)) != NULL) {
+				if (group->id == groupID)
+					break;
+			}
+
+			if (group) {
+				// we got a group, let's move the team there
+				remove_team_from_group(team, &freeGroup);
+				insert_team_into_group(group, team);
+			} else
+				status = B_NOT_ALLOWED;
+		}
+	} else
+		status = B_NOT_ALLOWED;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (status != B_OK && group != NULL)
+		team_delete_process_group(group);
+
+	team_delete_process_group(freeGroup);
+
+	return status == B_OK ? groupID : status;
+}
+
+
+pid_t
+_user_setsid(void)
+{
+	struct team *team = thread_get_current_thread()->team;
+	struct process_session *session;
+	struct process_group *group, *freeGroup = NULL;
+	cpu_status state;
+	bool failed = false;
+
+	// the team must not already be a process group leader
+	if (is_process_group_leader(team))
+		return B_NOT_ALLOWED;
+
+	group = create_process_group(team->main_thread->id);
+	if (group == NULL)
+		return B_NO_MEMORY;
+
+	session = create_process_session(group->id);
+	if (session == NULL) {
+		team_delete_process_group(group);
+		return B_NO_MEMORY;
+	}
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	// this may have changed since the check above
+	if (!is_process_group_leader(team)) {
+		remove_team_from_group(team, &freeGroup);
+
+		insert_group_into_session(session, group);
+		insert_team_into_group(group, team);
+	} else
+		failed = true;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (failed) {
+		team_delete_process_group(group);
+		free(session);
+		return B_NOT_ALLOWED;
+	} else
+		team_delete_process_group(freeGroup);
+
+	return team->group_id;
 }
 
 

@@ -1,12 +1,12 @@
-/* Threading routines */
-
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+/* Threading routines */
 
 #include <OS.h>
 
@@ -75,6 +75,10 @@ static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
 
 
+/**	Inserts a thread into a team.
+ *	You must hold the team lock when you call this function.
+ */
+
 static void
 insert_thread_into_team(struct team *p, struct thread *t)
 {
@@ -88,6 +92,10 @@ insert_thread_into_team(struct team *p, struct thread *t)
 	t->team = p;
 }
 
+
+/**	Removes a thread from a team.
+ *	You must hold the team lock when you call this function.
+ */
 
 static void
 remove_thread_from_team(struct team *p, struct thread *t)
@@ -430,7 +438,7 @@ _dump_thread_info(struct thread *t)
 	dprintf("name:        '%s'\n", t->name);
 	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
 		t->all_next, t->team_next, t->queue_next);
-	dprintf("priority:    0x%x\n", t->priority);
+	dprintf("priority:    0x%lx\n", t->priority);
 	dprintf("state:       %s\n", state_to_text(t->state));
 	dprintf("next_state:  %s\n", state_to_text(t->next_state));
 	dprintf("cpu:         %p ", t->cpu);
@@ -441,9 +449,9 @@ _dump_thread_info(struct thread *t)
 	dprintf("sig_pending:  0x%lx\n", t->sig_pending);
 	dprintf("in_kernel:    %d\n", t->in_kernel);
 	dprintf("sem.blocking: 0x%lx\n", t->sem.blocking);
-	dprintf("sem.count:    0x%x\n", t->sem.count);
-	dprintf("sem.acquire_status: 0x%x\n", t->sem.acquire_status);
-	dprintf("sem.flags:    0x%x\n", t->sem.flags);
+	dprintf("sem.count:    0x%lx\n", t->sem.count);
+	dprintf("sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
+	dprintf("sem.flags:    0x%lx\n", t->sem.flags);
 	dprintf("fault_handler: %p\n", (void *)t->fault_handler);
 	dprintf("args:         %p %p\n", t->args1, t->args2);
 	dprintf("entry:        %p\n", (void *)t->entry);
@@ -710,11 +718,13 @@ thread_exit(void)
 {
 	cpu_status state;
 	struct thread *thread = thread_get_current_thread();
+	struct process_group *freeGroup = NULL;
 	struct team *team = thread->team;
+	struct death_entry *death = NULL;
 	thread_id mainParentThread = -1;
 	bool deleteTeam = false;
 	uint32 death_stack;
-	sem_id cached_death_sem;
+	sem_id cachedDeathSem, parentDeadSem = -1, groupDeadSem = -1;
 	status_t status;
 
 	if (!are_interrupts_enabled())
@@ -755,6 +765,20 @@ thread_exit(void)
 	}
 
 	if (team != team_get_kernel_team()) {
+		if (team->main_thread == thread) {
+			// this was the main thread in this team, so we will delete that as well
+			deleteTeam = true;
+
+			// put a death entry into the dead children list of our parent
+			death = (struct death_entry *)malloc(sizeof(struct death_entry));
+			if (death != NULL) {
+				death->team = team->id;
+				death->thread = thread->id;
+				death->status = thread->exit.status;
+				death->reason = thread->exit.reason;
+			}
+		}
+
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
@@ -763,14 +787,27 @@ thread_exit(void)
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(team_get_kernel_team(), thread);
 
-		if (team->main_thread == thread) {
-			// this was main thread in this team
-			deleteTeam = true;
+		if (deleteTeam) {
+			struct team *parent = team->parent;
 
 			// remember who our parent was so we can send a signal
-			mainParentThread = team->parent->main_thread->id;
+			mainParentThread = parent->main_thread->id;
 
-			team_remove_team(team);
+			if (death != NULL) {
+				// insert death entry into the parent's list
+
+				list_add_link_to_tail(&parent->dead_children.list, death);
+				if (++parent->dead_children.count > MAX_DEAD_CHILDREN) {
+					death = list_remove_head_item(&parent->dead_children.list);
+					parent->dead_children.count--;
+				} else
+					death = NULL;
+
+				parentDeadSem = parent->dead_children.sem;
+				groupDeadSem = team->group->dead_child_sem;
+			}
+
+			team_remove_team(team, &freeGroup);
 		}
 		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
@@ -782,17 +819,26 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
+		// notify listeners that a new death entry is available
+		// ToDo: should that be moved to handle_signal() (for SIGCHLD)?
+		release_sem_etc(parentDeadSem, 0, B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
+		release_sem_etc(groupDeadSem, 0, B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
+
+		team_delete_process_group(freeGroup);
 		team_delete_team(team);
 
+		// we need to remove any death entry that made it to here
+		if (death != NULL)
+			free(death);
+
 		send_signal_etc(mainParentThread, SIGCHLD, B_DO_NOT_RESCHEDULE);
-		cached_death_sem = -1;
+		cachedDeathSem = -1;
 	} else
-		cached_death_sem = team->death_sem;
+		cachedDeathSem = team->death_sem;
 
 	// fill all death entries and delete the sem that others will use to wait on us
 	{
 		sem_id cachedExitSem = thread->exit.sem;
-		struct death_entry *death = NULL;
 		cpu_status state;
 
 		state = disable_interrupts();
@@ -802,6 +848,7 @@ thread_exit(void)
 		thread->exit.sem = -1;
 
 		// fill all death entries
+		death = NULL;
 		while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
 			death->status = thread->exit.status;
 			death->reason = thread->exit.reason;
@@ -822,7 +869,7 @@ thread_exit(void)
 		args.thread = thread;
 		args.old_kernel_stack = thread->kernel_stack_region_id;
 		args.death_stack = death_stack;
-		args.death_sem = cached_death_sem;
+		args.death_sem = cachedDeathSem;
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
