@@ -201,19 +201,37 @@ BGameSound::Perform(int32 selector,
 	return B_ERROR;
 }
 
-/*
+
 void *
 BGameSound::operator new(size_t size)
 {
-	return NULL;
+	return ::operator new(size);
+}
+
+
+void *
+BGameSound::operator new(size_t size, const nothrow_t &nt) throw()
+{
+	return ::operator new(size, nt);
 }
 
 
 void
 BGameSound::operator delete(void *ptr)
 {
+	::operator delete(ptr);
 }
-*/
+
+
+#if !__MWERKS__
+//	there's a bug in MWCC under R4.1 and earlier
+void
+BGameSound::operator delete(void *ptr, const nothrow_t &nt) throw()
+{
+	::operator delete(ptr, nt);
+}
+#endif
+
 
 status_t
 BGameSound::SetMemoryPoolSize(size_t in_poolSize)
