@@ -1,17 +1,13 @@
 /*
- *  Copyright (c) 2002, OpenBeOS Project.
- *  All rights reserved.
- *  Distributed under the terms of the OpenBeOS license. 
- *
- *
- *  exit.c:
- *  implements the standard C library functions:
- *    abort, atexit, exit
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
+** Author(s): Daniel Reinhold (danielre@users.sf.net)
+**
+*/
+
+/* implements the standard C library functions:
+ * abort, atexit, exit
  */
 
 
@@ -66,6 +62,6 @@ exit(int status)
 	_IO_cleanup();
 
 	// exit with status code
-	sys_exit(status);
+	_kern_exit(status);
 }
 
