@@ -2,6 +2,7 @@
 #include <Box.h>
 #include <MessageRunner.h>
 #include <Bitmap.h>
+#include <StringView.h>
 
 class BScreenSaver;
 
@@ -31,6 +32,8 @@ private:
 	bool deleteSaver;
 	bool removePreviewArea;
 	bool unloadAddon;
+	bool noPreview;
+	BStringView *noPreviewView;
 	
 }; // end class PreviewView
 

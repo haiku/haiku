@@ -68,7 +68,8 @@ PreviewView::PreviewView(BRect frame, const char *name)
   removeConfigView (false),
   deleteSaver (false),
   removePreviewArea (false),
-  unloadAddon (false)
+  unloadAddon (false),
+  noPreview (false)
 {
    SetViewColor(216,216,216);
    AddChild(previewArea=new BView (scale2(1,8,1,2,Bounds()),"sampleScreen",B_FOLLOW_NONE,B_WILL_DRAW));
@@ -152,6 +153,7 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 		snooze( saver->TickSize() );
 		kill_thread( previewData.previewThreadId );
 		previewData.stopMe = false;
+		previewData.previewThreadId = 0;
 	}
 	
 	status_t lastOpStatus;
@@ -184,6 +186,12 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 		delete configView;
 		settingsBoxPtr->Draw(settingsBoxPtr->Bounds());
 		removeConfigView = false;
+	}
+	
+	if (noPreview)
+	{
+		noPreviewView->RemoveSelf();
+		delete noPreviewView;
 	}
 	
 	if (removePreviewArea)
@@ -240,9 +248,15 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 	
 	lastOpStatus = saver->StartSaver(previewArea, true);
 	if ( lastOpStatus != B_OK )
+	{
 	 	std::cout << "StartSaver() said no go, returned " << lastOpStatus << '\n';
-	else 
+	 	noPreview = true;
+	}
+	else
+	{
 		stopSaver = true;
+		noPreview = false;
+	}
 	
 	// make config view
 	BRect configViewBounds = settingsBoxPtr->Bounds();
@@ -254,10 +268,21 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 	stopConfigView = true;
 	removeConfigView = true;
 
-	previewData.previewThreadId = spawn_thread( previewThread, "preview_thread", 50, NULL );
-	resume_thread( previewData.previewThreadId );
-	
-	removePreviewArea = true;
+	if ( noPreview )
+	{
+		noPreviewView = new BStringView(previewArea->Bounds(), "no_preview", "NO PREVIEW AVAILABLE");
+		rgb_color white = { 255, 255, 255, 0};
+		noPreviewView->SetHighColor(white);
+		noPreviewView->SetAlignment(B_ALIGN_CENTER);
+		noPreviewView->Draw(previewArea->Bounds());
+		previewArea->AddChild(noPreviewView);
+	}
+	else
+	{
+		previewData.previewThreadId = spawn_thread( previewThread, "preview_thread", 50, NULL );
+		resume_thread( previewData.previewThreadId );
+		removePreviewArea = true;
+	}
 		
 } // end PreviewView::LoadNewAddon()
 
