@@ -227,10 +227,6 @@ bfs_start:
 	push	%ds
 	pop		%es
 
-	xor		%ax, %ax		// set up stack at 0x0000:0x9000
-	mov		%ax, %ss
-	mov		$0x9000, %sp
-
 	.code32					// save knowledge from the BFS boot block for later use
 	.byte	0x67
 	movb	%dl, gBootDriveID - 0x10000
@@ -238,6 +234,10 @@ bfs_start:
 	.byte	0x66
 	movl	%eax, gBootPartitionOffset - 0x10000
 	.code16
+
+	xor		%ax, %ax		// set up stack at 0x0000:0x9000
+	mov		%ax, %ss
+	mov		$0x9000, %sp
 
 	cli						// no interrupts please
 	call	enable_a20		// enable a20 gate
