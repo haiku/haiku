@@ -93,7 +93,7 @@ bool NestedString::HasChildren() const {
 void NestedString::PrintToStream(int indentation) {
 	for (int j = 0; j < indentation; j++)
 			printf("\t");
-	printf("%d items:\n",CountItems());
+	printf("%ld items:\n",CountItems());
 	/*if (CountItems() == 1) {
 		for (int j = 0; j < indentation; j++)
 			printf("\t");
@@ -105,7 +105,7 @@ void NestedString::PrintToStream(int indentation) {
 		if ((*this)[i].HasChildren())
 			(*this)[i].PrintToStream(indentation+1);
 		else
-			printf("%d: %s\n",i,(*this)[i]());
+			printf("%ld: %s\n",i,(*this)[i]());
 	}
 }
 
