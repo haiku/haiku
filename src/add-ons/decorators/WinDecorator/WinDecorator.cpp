@@ -46,7 +46,7 @@ click_type WinDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 printf("WinDecorator():Clicked() - Close\n");
 #endif
 
-		return CLICK_CLOSE;
+		return DEC_CLOSE;
 	}
 
 	if(_zoomrect.Contains(pt))
@@ -56,7 +56,7 @@ printf("WinDecorator():Clicked() - Close\n");
 printf("WinDecorator():Clicked() - Zoom\n");
 #endif
 
-		return CLICK_ZOOM;
+		return DEC_ZOOM;
 	}
 	
 	// Clicking in the tab?
@@ -64,8 +64,8 @@ printf("WinDecorator():Clicked() - Zoom\n");
 	{
 		// Here's part of our window management stuff
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-			return CLICK_MOVETOFRONT;
-		return CLICK_DRAG;
+			return DEC_MOVETOFRONT;
+		return DEC_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
@@ -77,14 +77,14 @@ printf("WinDecorator():Clicked() - Zoom\n");
 #ifdef DEBUG_DECOR
 printf("WinDecorator():Clicked() - Resize\n");
 #endif		
-		return CLICK_RESIZE;
+		return DEC_RESIZE;
 	}
 
 	// Guess user didn't click anything
 #ifdef DEBUG_DECOR
 printf("WinDecorator():Clicked()\n");
 #endif
-	return CLICK_NONE;
+	return DEC_NONE;
 }
 
 void WinDecorator::_DoLayout(void)

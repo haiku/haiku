@@ -52,7 +52,7 @@ click_type MacDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 printf("MacDecorator():Clicked() - Close\n");
 #endif
 
-		return CLICK_CLOSE;
+		return DEC_CLOSE;
 	}
 
 	if(_zoomrect.Contains(pt))
@@ -62,7 +62,7 @@ printf("MacDecorator():Clicked() - Close\n");
 printf("MacDecorator():Clicked() - Zoom\n");
 #endif
 
-		return CLICK_ZOOM;
+		return DEC_ZOOM;
 	}
 	
 	// Clicking in the tab?
@@ -70,8 +70,8 @@ printf("MacDecorator():Clicked() - Zoom\n");
 	{
 		// Here's part of our window management stuff
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-			return CLICK_MOVETOFRONT;
-		return CLICK_DRAG;
+			return DEC_MOVETOFRONT;
+		return DEC_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
@@ -83,14 +83,14 @@ printf("MacDecorator():Clicked() - Zoom\n");
 #ifdef DEBUG_DECOR
 printf("MacDecorator():Clicked() - Resize\n");
 #endif		
-		return CLICK_RESIZE;
+		return DEC_RESIZE;
 	}
 
 	// Guess user didn't click anything
 #ifdef DEBUG_DECOR
 printf("MacDecorator():Clicked()\n");
 #endif
-	return CLICK_NONE;
+	return DEC_NONE;
 }
 
 void MacDecorator::_DoLayout(void)
