@@ -27,7 +27,7 @@ public:
 	status_t InitCheck() const;
 	Err* GetErr() const;
 	
-	bool Sniff(BPositionIO *data) const;
+	bool Sniff(BPositionIO *data, bool caseInsensitive) const;
 private:
 	Range fRange;
 	Pattern *fPattern;

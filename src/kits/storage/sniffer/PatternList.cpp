@@ -16,7 +16,8 @@
 using namespace Sniffer;
 
 PatternList::PatternList(Range range)
-	: fRange(range)
+	: DisjList()
+	, fRange(range)
 {
 }
 
@@ -49,7 +50,7 @@ PatternList::Sniff(BPositionIO *data) const {
 		std::vector<Pattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
 			if (*i)
-				result |= (*i)->Sniff(fRange, data);
+				result |= (*i)->Sniff(fRange, data, fCaseInsensitive);
 		}
 		return result;
 	}

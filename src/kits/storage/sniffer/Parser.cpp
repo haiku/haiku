@@ -7,7 +7,6 @@
 	MIME sniffer rule parser implementation
 */
 
-//#include <sniffer/Expr.h>
 #include <sniffer/Parser.h>
 #include <sniffer/Pattern.h>
 #include <sniffer/PatternList.h>
@@ -374,6 +373,7 @@ TokenStream::SetTo(const std::string &string) {
 					case '+':	
 					case '-':
 						charStr = ch;
+						lastChar = ch;
 						state = tsssLonelyMinusOrPlus;
 						break;
 						
@@ -570,6 +570,9 @@ TokenStream::SetTo(const std::string &string) {
 				} else if (ch == '.') {
 					charStr += ch;
 					state = tsssLonelyDecimalPoint;					
+				} else if (ch == 'i' && lastChar == '-') {
+					AddToken(CaseInsensitiveFlag, startPos);
+					state = tsssStart;				
 				} else
 					throw new Err(std::string("Sniffer pattern error: incomplete signed number"), pos);
 				break;
@@ -615,8 +618,6 @@ TokenStream::SetTo(const std::string &string) {
 					AddString(charStr, startPos);
 					stream.Unget();				// In case it's punctuation, let tsssStart handle it
 					state = tsssStart;
-				} else if (ch == '\'' || ch == '"') {
-					throw new Err(std::string("Sniffer pattern error: illegal unquoted character '") + ch + "'", pos);
 				} else if (ch == 0x3 && stream.IsEmpty()) {
 					AddString(charStr, startPos);
 					keepLooping = false;
@@ -976,6 +977,9 @@ Sniffer::tokenTypeToString(TokenType type) {
 		case Ampersand:
 			return "Ampersand";
 			break;
+		case CaseInsensitiveFlag:
+			return "CaseInsensitiveFlag";
+			break;
 		case CharacterString:
 			return "CharacterString";
 			break;
@@ -1048,8 +1052,8 @@ Parser::ParseRule(Rule *result) {
 
 	// Priority
 	double priority = ParsePriority();
-	// Expression List	
-	std::vector<Expr*>* list = ParseExprList();
+	// Conjunction List	
+	std::vector<DisjList*>* list = ParseConjList();
 	
 	result->SetTo(priority, list);	
 }
@@ -1069,16 +1073,16 @@ Parser::ParsePriority() {
 		throw new Err("Sniffer pattern error: match level expected", t->Pos());	// Same as R5 
 }
 
-std::vector<Expr*>*
-Parser::ParseExprList() {
-	std::vector<Expr*> *list = new(nothrow) std::vector<Expr*>;
+std::vector<DisjList*>*
+Parser::ParseConjList() {
+	std::vector<DisjList*> *list = new(nothrow) std::vector<DisjList*>;
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());		
 	try {
-		// Expr+
+		// DisjList+
 		int count = 0;
 		while (true) {
-			Expr* expr = ParseExpr();
+			DisjList* expr = ParseDisjList();
 			if (!expr)
 				break;
 			else {
@@ -1095,10 +1099,10 @@ Parser::ParseExprList() {
 	return list;
 }
 
-Expr*
-Parser::ParseExpr() {
+DisjList*
+Parser::ParseDisjList() {
 	// If we've run out of tokens right now, it's okay, but
-	// we need to let ParseExprList() know what's up
+	// we need to let ParseConjList() know what's up
 	if (stream.IsEmpty())
 		return NULL;
 
@@ -1109,10 +1113,14 @@ Parser::ParseExpr() {
 	// PatternList | RangeList
 	if (t1->Type() == LeftParen) {
 		const Token *t2 = stream.Get();
+		// Skip the case-insensitive flag, if there is one
+		const Token *tokenOfInterest = (t2->Type() == CaseInsensitiveFlag) ? stream.Get() : t2;
+		if (t2 != tokenOfInterest)
+			stream.Unget();	// We called Get() three times
 		stream.Unget();
 		stream.Unget();
 		// RangeList
-		if (t2->Type() == LeftBracket) {
+		if (tokenOfInterest->Type() == LeftBracket) {
 			return ParseRPatternList();
 		// PatternList
 		} else {
@@ -1175,7 +1183,7 @@ Parser::ParseRange() {
 		throw range.GetErr();
 }
 
-Expr*
+DisjList*
 Parser::ParsePatternList(Range range) {
 	PatternList *list = new(nothrow) PatternList(range);
 	if (!list)
@@ -1183,9 +1191,12 @@ Parser::ParsePatternList(Range range) {
 	try {		
 		// LeftParen
 		stream.Read(LeftParen);
-		// Pattern, (Divider, Pattern)*
+		// [Flag] Pattern, (Divider, [Flag] Pattern)*
 		bool keepLooping = true;
 		while (true) {
+			// [Flag]
+			if (stream.CondRead(CaseInsensitiveFlag))
+				list->SetCaseInsensitive(true);		
 			// Pattern
 			list->Add(ParsePattern());
 			// [Divider]
@@ -1203,7 +1214,7 @@ Parser::ParsePatternList(Range range) {
 	return list;
 }
 
-Expr*
+DisjList*
 Parser::ParseRPatternList() {
 	RPatternList *list = new(nothrow) RPatternList();
 	if (!list)
@@ -1211,9 +1222,12 @@ Parser::ParseRPatternList() {
 	try {
 		// LeftParen
 		stream.Read(LeftParen);
-		// RPattern, (Divider, RPattern)*
+		// [Flag] RPattern, (Divider, [Flag] RPattern)*
 		bool keepLooping = true;
 		while (true) {
+			// [Flag]
+			if (stream.CondRead(CaseInsensitiveFlag))
+				list->SetCaseInsensitive(true);		
 			// RPattern
 			list->Add(ParseRPattern());
 			// [Divider]

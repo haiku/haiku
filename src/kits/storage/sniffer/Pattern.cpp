@@ -80,17 +80,14 @@ Pattern::SetTo(const std::string &string, const std::string &mask) {
 	false if not.
 */
 bool
-Pattern::Sniff(Range range, BPositionIO *data) const {
-	// If our range contains negative values relative to the end of
-	// the file, convert them to positive values relative to the
-	// beginning of the file.
+Pattern::Sniff(Range range, BPositionIO *data, bool caseInsensitive) const {
 	int32 start = range.Start();
 	int32 end = range.End();
 	off_t size = data->Seek(0, SEEK_END);
 	if (end >= size)
-		end = size-1;	
+		end = size-1;	// Don't bother searching beyond the end of the stream
 	for (int i = start; i <= end; i++) {
-		if (Sniff(i, size, data))
+		if (Sniff(i, size, data, caseInsensitive))
 			return true;
 	}
 	return false;
@@ -99,12 +96,12 @@ Pattern::Sniff(Range range, BPositionIO *data) const {
 // Assumes the BPositionIO object is in the correct
 // position from which to sniff
 bool
-Pattern::Sniff(off_t start, off_t size, BPositionIO *data) const {
+Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const {
 	off_t len = fString.length();
 	char *buffer = new(nothrow) char[len+1];
 	if (buffer) {
 		ssize_t bytesRead = data->ReadAt(start, buffer, len);
-		// /todo If there are fewer bytes left in the data stream
+		// \todo If there are fewer bytes left in the data stream
 		// from the given position than the length of our data
 		// string, should we just return false (which is what we're
 		// doing now), or should we compare as many bytes as we
@@ -113,10 +110,28 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data) const {
 			return false;
 		else {
 			bool result = true;
-			for (int i = 0; i < len; i++) {
-				if ((fString[i] & fMask[i]) != (buffer[i] & fMask[i])) {
-					result = false;
-					break;
+			if (caseInsensitive) {
+				for (int i = 0; i < len; i++) {
+					char secondChar;
+					if ('A' <= fString[i] && fString[i] <= 'Z')
+						secondChar = 'a' + (fString[i] - 'A');	// Also check lowercase
+					else if ('a' <= fString[i] && fString[i] <= 'z')
+						secondChar = 'A' + (fString[i] - 'a');	// Also check uppercase
+					else
+						secondChar = fString[i]; // Check the same char twice as punishment for doing a case insensitive search ;-)
+					if (((fString[i] & fMask[i]) != (buffer[i] & fMask[i]))
+					     && ((secondChar & fMask[i]) != (buffer[i] & fMask[i])))
+					{
+						result = false;
+						break;
+					}
+				}
+			} else {
+				for (int i = 0; i < len; i++) {
+					if ((fString[i] & fMask[i]) != (buffer[i] & fMask[i])) {
+						result = false;
+						break;
+					}
 				}
 			}
 			return result;

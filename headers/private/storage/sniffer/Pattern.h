@@ -30,11 +30,11 @@ public:
 	status_t InitCheck() const;
 	Err* GetErr() const;
 	
-	bool Sniff(Range range, BPositionIO *data) const;
+	bool Sniff(Range range, BPositionIO *data, bool caseInsensitive) const;
 	
 	status_t SetTo(const std::string &string, const std::string &mask);
 private:
-	bool Sniff(off_t start, off_t size, BPositionIO *data) const;
+	bool Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const;
 	
 	void SetStatus(status_t status, const char *msg = NULL);
 	void SetErrorMessage(const char *msg);

@@ -8,7 +8,7 @@
 */
 
 #include <sniffer/Err.h>
-#include <sniffer/Expr.h>
+#include <sniffer/DisjList.h>
 #include <sniffer/Rule.h>
 #include <DataIO.h>
 
@@ -16,7 +16,7 @@ using namespace Sniffer;
 
 Rule::Rule()
 	: fPriority(0.0)
-	, fExprList(NULL)
+	, fConjList(NULL)
 {
 }
 
@@ -26,7 +26,7 @@ Rule::~Rule() {
 
 status_t
 Rule::InitCheck() const {
-	return fExprList ? B_OK : B_NO_INIT;
+	return fConjList ? B_OK : B_NO_INIT;
 }
 
 //! Returns the priority of the rule. 0.0 <= priority <= 1.0.
@@ -42,8 +42,8 @@ Rule::Sniff(BPositionIO *data) const {
 		return false;
 	else {
 		bool result = true;
-		std::vector<Expr*>::const_iterator i;
-		for (i = fExprList->begin(); i != fExprList->end(); i++) {
+		std::vector<DisjList*>::const_iterator i;
+		for (i = fConjList->begin(); i != fConjList->end(); i++) {
 			if (*i)
 				result &= (*i)->Sniff(data);		
 		}
@@ -53,21 +53,21 @@ Rule::Sniff(BPositionIO *data) const {
 
 void
 Rule::Unset() {
- 	if (fExprList){
-		delete fExprList;
-		fExprList = NULL;
+ 	if (fConjList){
+		delete fConjList;
+		fConjList = NULL;
 	}
 }
 
 //! Called by Parser::Parse() after successfully parsing a sniffer rule.
 void
-Rule::SetTo(double priority, std::vector<Expr*>* list) {
+Rule::SetTo(double priority, std::vector<DisjList*>* list) {
 	Unset();
 	if (0.0 <= priority && priority <= 1.0)
 		fPriority = priority;
 	else
 		throw new Err("Sniffer pattern error: invalid priority", -1);
-	fExprList = list;
+	fConjList = list;
 }
 
 

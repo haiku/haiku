@@ -9,7 +9,7 @@
 #ifndef _sk_sniffer_pattern_list_h_
 #define _sk_sniffer_pattern_list_h_
 
-#include <sniffer/Expr.h>
+#include <sniffer/DisjList.h>
 #include <sniffer/Range.h>
 #include <vector>
 
@@ -20,8 +20,10 @@ namespace Sniffer {
 class Err;
 class Pattern;
 
-//! A list of patterns, all of which are to be searched over the same range.
-class PatternList : public Expr {
+/*! \brief A list of patterns, one of which must match for the list to match, all
+	of which are to be searched over the same range.
+*/
+class PatternList : public DisjList {
 public:
 	PatternList(Range range);
 	virtual ~PatternList();

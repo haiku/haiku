@@ -9,7 +9,7 @@
 #ifndef _sk_sniffer_r_pattern_list_h_
 #define _sk_sniffer_r_pattern_list_h_
 
-#include <sniffer/Expr.h>
+#include <sniffer/DisjList.h>
 #include <vector>
 
 class BPositionIO;
@@ -20,7 +20,7 @@ class Err;
 class RPattern;
 
 //! A list of patterns, each of which is to be searched over its own specified range.
-class RPatternList : public Expr {
+class RPatternList : public DisjList {
 public:
 	RPatternList();
 	virtual ~RPatternList();

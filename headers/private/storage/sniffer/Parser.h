@@ -23,7 +23,7 @@ class BString;
 namespace Sniffer {
 
 class Rule;
-class Expr;
+class DisjList;
 class RPattern;
 class Pattern;
 
@@ -77,6 +77,7 @@ typedef enum TokenType {
 	Colon,
 	Divider,
 	Ampersand,
+	CaseInsensitiveFlag,
 	CharacterString,
 	Integer,
 	FloatingPoint
@@ -192,6 +193,106 @@ private:
 };
 
 //! Handles parsing a sniffer rule, yielding either a parsed rule or a descriptive error message.
+/*! A MIME sniffer rule is valid if it is well-formed with respect to the
+	following grammar and fulfills some further conditions listed thereafter:
+	
+	<code>
+	Rule			::= LWS Priority LWS ConjList LWS	
+	ConjList		::= DisjList (LWS DisjList)*	
+	DisjList		::= "(" LWS PatternList LWS ")"										
+						| "(" LWS RPatternList LWS ")"									
+						| Range LWS "(" LWS PatternList LWS ")"						
+	RPatternList	::= [Flag LWS] RPattern (LWS "|" LWS [Flag LWS] RPattern)*	
+	PatternList		::= [Flag LWS] Pattern (LWS "|" LWS [Flag LWS] Pattern)*
+	
+	RPattern		::= LWS Range LWS Pattern
+	Pattern			::= PString [ LWS "&" LWS Mask ]
+	Range			::=	"[" LWS SDecimal [LWS ":" LWS SDecimal] LWS "]"
+
+	Priority		::= Float
+	Mask			::= PString
+	PString			::= HexLiteral | QuotedString | UnquotedString
+
+	HexLiteral		::= "0x" HexPair HexPair*
+	HexPair			::= HexChar HexChar
+	
+	QuotedString	::= SingleQuotedString | DoubleQuotedString
+	SQuotedString	:= "'" SQChar+ "'"
+	DQuotedString	:= '"' DQChar+ '"'
+
+	UnquotedString	::= EscapedChar UChar*
+	EscapedChar		::= OctalEscape | HexEscape | "\" Char
+	OctalEscape		::= "\" [[OctHiChar] OctChar] OctChar
+	HexEscape		::= "\x" HexPair
+
+	Flag			::= "-i"
+
+	SDecimal		::= [Sign] Decimal
+	Decimal			::= DecChar DecChar*
+	Float			::= Fixed [("E" | "e") SDecimal]
+	Fixed			::= SDecimal ["." [Decimal]] | [Sign] "." Decimal
+	Sign			::= "+" | "-"
+
+	PunctuationChar	::= "(" | ")" | "[" | "]" | "|" | "&" | ":"
+	OctHiChar		::= "0" | "1" | "2" | "3" 
+	OctChar			::= OctHiChar | "4" | "5" | "6" | "7"
+	DecChar			::= OctChar | "8" | "9"
+	HexChar			::= DecChar | "a" | "b" | "c" | "d" | "e" | "f" | "A" | "B" | "C"
+						| "D" | "E" | "F"
+
+	Char			:: <any character>
+	SQChar			::= <Char except "\", "'"> | EscapedChar
+	DQChar			::= <Char except "\", '"'> | EscapedChar
+	UChar			::= <Char except "\", LWSChar,  and PunctuationChar> | EscapedChar
+
+	LWS				::= LWSChar*
+	LWSChar			::= " " | TAB | LF
+	</code>
+
+	Conditions:
+	- If a mask is specified for a pattern, this mask must have the same
+	  length as the pattern string.
+	- 0.0 <= Priority <= 1.0
+	- 0 <= Range begin <= Range end
+	
+	Notes:
+	- If a case-insensitive flag ("-i") appears in front of any Pattern or RPattern
+	  in a DisjList, case-insensitivity is applied to the entire DisjList.
+
+	Examples:
+	- 1.0 ('ABCD')
+	  The file must start with the string "ABCD". The priority of the rule
+	  is 1.0 (maximal).
+	- 0.8 [0:3] ('ABCD' | 'abcd')
+	  The file must contain the string "ABCD" or "abcd" starting somewhere in
+	  the first four bytes. The rule priority is 0.8.
+	- 0.5 ([0:3] 'ABCD' | [0:3] 'abcd' | [13] 'EFGH')
+	  The file must contain the string "ABCD" or "abcd" starting somewhere in
+	  the first four bytes or the string "EFGH" at position 13. The rule
+	  priority is 0.5.
+	- 0.8 [0:3] ('ABCD' & 0xff00ffff | 'abcd' & 0xffff00ff)
+	  The file must contain the string "A.CD" or "ab.d" (whereas "." is an
+	  arbitrary character) starting somewhere in the first four bytes. The
+	  rule priority is 0.8.
+	- 0.3 [10] ('mnop') ('abc') [20] ('xyz')
+	  The file must contain the string 'abc' at the beginning of the file,
+	  the string 'mnop' starting at position 10, and the string 'xyz'
+	  starting at position 20. The rule priority is 0.3.
+	- 200e-3 (-i 'ab')
+	  The file must contain the string 'ab', 'aB', 'Ab', or 'AB' at the
+	  beginning of the file. The rule priority is 0.2.
+
+	Real examples:
+	- 0.20 ([0]"//" | [0]"/\*" | [0:32]"#include" | [0:32]"#ifndef"
+	        | [0:32]"#ifdef")
+	  text/x-source-code
+	- 0.70 ("8BPS  \000\000\000\000" & 0xffffffff0000ffffffff )
+	  image/x-photoshop
+	- 0.40 [0:64]( -i "&lt;HTML" | "&lt;HEAD" | "&lt;TITLE" | "&lt;BODY"
+			| "&lt;TABLE" | "&lt;!--" | "&lt;META" | "&lt;CENTER")
+	  text/html
+	  
+*/
 class Parser {
 public:
 	Parser();
@@ -209,11 +310,11 @@ private:
 	// Parsing functions
 	void ParseRule(Rule *result);
 	double ParsePriority();
-	std::vector<Expr*>* ParseExprList();
-	Expr* ParseExpr();
+	std::vector<DisjList*>* ParseConjList();
+	DisjList* ParseDisjList();
 	Range ParseRange();
-	Expr* ParsePatternList(Range range);
-	Expr* ParseRPatternList();
+	DisjList* ParsePatternList(Range range);
+	DisjList* ParseRPatternList();
 	RPattern* ParseRPattern();
 	Pattern* ParsePattern();
 	

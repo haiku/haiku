@@ -53,9 +53,9 @@ RPattern::~RPattern() {
 
 //! Sniffs the given data stream over the object's range for the object's pattern
 bool
-RPattern::Sniff(BPositionIO *data) const {
+RPattern::Sniff(BPositionIO *data, bool caseInsensitive) const {
 	if (!data || InitCheck() != B_OK)
 		return false;
 	else 
-		return fPattern->Sniff(fRange, data);
+		return fPattern->Sniff(fRange, data, caseInsensitive);
 }

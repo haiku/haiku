@@ -16,6 +16,7 @@
 using namespace Sniffer;
 
 RPatternList::RPatternList()
+	: DisjList()
 {
 }
 
@@ -49,7 +50,7 @@ RPatternList::Sniff(BPositionIO *data) const {
 		std::vector<RPattern*>::const_iterator i;
 		for (i = fList.begin(); i != fList.end(); i++) {
 			if (*i)
-				result |= (*i)->Sniff(data);
+				result |= (*i)->Sniff(data, fCaseInsensitive);
 		}
 		return result;
 	}

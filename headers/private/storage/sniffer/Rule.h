@@ -16,7 +16,7 @@ class BPositionIO;
 
 namespace Sniffer {
 
-class Expr;
+class DisjList;
 
 /*! \brief A priority and a list of expressions to be used for sniffing out the
 	type of an untyped file.
@@ -34,10 +34,10 @@ private:
 	friend class Parser;
 
 	void Unset();
-	void SetTo(double priority, std::vector<Expr*>* list);
+	void SetTo(double priority, std::vector<DisjList*>* list);
 
 	double fPriority;
-	std::vector<Expr*> *fExprList;
+	std::vector<DisjList*> *fConjList;	// A list of DisjLists to be ANDed
 };
 
 }
