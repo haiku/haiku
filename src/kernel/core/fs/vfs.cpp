@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -132,38 +132,38 @@ typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
 static mutex sFileSystemsMutex;
 
 /**	\brief Guards sMountsTable.
-
-	The holder is allowed to read/write access the sMountsTable.
-	Manipulation of the fs_mount structures themselves
-	(and their destruction) requires different locks though.
-*/
+ *
+ *	The holder is allowed to read/write access the sMountsTable.
+ *	Manipulation of the fs_mount structures themselves
+ *	(and their destruction) requires different locks though.
+ */
 static mutex sMountMutex;
 
 /**	\brief Guards mount/unmount operations.
-
-	The fs_mount() and fs_unmount() hold the lock during their whole operation.
-	That is locking the lock ensures that no FS is mounted/unmounted. In
-	particular this means that
-	- sMountsTable will not be modified,
-	- the fields immutable after initialization of the fs_mount structures in
-	  sMountsTable will not be modified,
-	- vnode::covered_by of any vnode in sVnodeTable will not be modified,
-	
-	The thread trying to lock the lock must not hold sVnodeMutex or
-	sMountMutex.
-*/
+ *
+ *	The fs_mount() and fs_unmount() hold the lock during their whole operation.
+ *	That is locking the lock ensures that no FS is mounted/unmounted. In
+ *	particular this means that
+ *	- sMountsTable will not be modified,
+ *	- the fields immutable after initialization of the fs_mount structures in
+ *	  sMountsTable will not be modified,
+ *	- vnode::covered_by of any vnode in sVnodeTable will not be modified,
+ *	
+ *	The thread trying to lock the lock must not hold sVnodeMutex or
+ *	sMountMutex.
+ */
 static recursive_lock sMountOpLock;
 
 /**	\brief Guards sVnodeTable.
-
-	The holder is allowed to read/write access sVnodeTable and to
-	to any unbusy vnode in that table, save
-	to the immutable fields (device, id, private_node, mount) to which
-	only read-only access is allowed, and to the field covered_by, which is
-	guarded by sMountOpLock.
-
-	The thread trying to lock the mutex must not hold sMountMutex.
-*/
+ *
+ *	The holder is allowed to read/write access sVnodeTable and to
+ *	to any unbusy vnode in that table, save
+ *	to the immutable fields (device, id, private_node, mount) to which
+ *	only read-only access is allowed, and to the field covered_by, which is
+ *	guarded by sMountOpLock.
+ *
+ *	The thread trying to lock the mutex must not hold sMountMutex.
+ */
 static mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -686,12 +686,13 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 
 /**	\brief Increments the reference counter of the given vnode.
+ *
+ *	The caller must either already have a reference to the vnode or hold
+ *	the sVnodeMutex.
+ *
+ *	\param vnode the vnode.
+ */
 
-	The caller must either already have a reference to the vnode or hold
-	the sVnodeMutex.
-
-	\param vnode the vnode.
-*/
 static void
 inc_vnode_ref_count(struct vnode *vnode)
 {
@@ -809,14 +810,15 @@ err:
 
 
 /**	\brief Decrements the reference counter of the given vnode and deletes it,
-	if the counter dropped to 0.
+ *	if the counter dropped to 0.
+ *
+ *	The caller must, of course, own a reference to the vnode to call this
+ *	function.
+ *	The caller must not hold the sVnodeMutex or the sMountMutex.
+ * 
+ *	\param vnode the vnode.
+ */
 
-	The caller must, of course, own a reference to the vnode to call this
-	function.
-	The caller must not hold the sVnodeMutex or the sMountMutex.
-
-	\param vnode the vnode.
-*/
 static inline void
 put_vnode(struct vnode *vnode)
 {
@@ -825,18 +827,18 @@ put_vnode(struct vnode *vnode)
 
 
 /**	\brief Resolves a mount point vnode to the volume root vnode it is covered
-		   by.
+ *		   by.
+ *
+ *	Given an arbitrary vnode, the function checks, whether the node is covered
+ *	by the root of a volume. If it is the function obtains a reference to the
+ *	volume root node and returns it.
+ *
+ *	\param vnode The vnode in question.
+ *	\return The volume root vnode the vnode cover is covered by, if it is
+ *			indeed a mount point, or \c NULL otherwise.
+ */
 
-	Given an arbitrary vnode, the function checks, whether the node is covered
-	by the root of a volume. If it is the function obtains a reference to the
-	volume root node and returns it.
-
-	\param vnode The vnode in question.
-	\return The volume root vnode the vnode cover is covered by, if it is
-			indeed a mount point, or \c NULL otherwise.
-*/
-static
-struct vnode*
+static struct vnode *
 resolve_mount_point_to_volume_root(struct vnode *vnode)
 {
 	if (!vnode)
@@ -854,18 +856,19 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
 	return volumeRoot;
 }
 
+
 /**	\brief Resolves a volume root vnode to the underlying mount point vnode.
+ *
+ *	Given an arbitrary vnode, the function checks, whether the node is the
+ *	root of a volume. If it is (and if it is not "/"), the function obtains
+ *	a reference to the underlying mount point node and returns it.
+ *
+ *	\param vnode The vnode in question.
+ *	\return The mount point vnode the vnode covers, if it is indeed a volume
+ *			root and not "/", or \c NULL otherwise.
+ */
 
-	Given an arbitrary vnode, the function checks, whether the node is the
-	root of a volume. If it is (and if it is not "/"), the function obtains
-	a reference to the underlying mount point node and returns it.
-
-	\param vnode The vnode in question.
-	\return The mount point vnode the vnode covers, if it is indeed a volume
-			root and not "/", or \c NULL otherwise.
-*/
-static
-struct vnode*
+static struct vnode *
 resolve_volume_root_to_mount_point(struct vnode *vnode)
 {
 	if (!vnode)
@@ -1219,8 +1222,13 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 		return FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,
 			vnode->private_node, name, nameSize);
 	}
+
 	// The FS doesn't support getting the name of a vnode. So we search the
-	// parent directory for the vnode.
+	// parent directory for the vnode, if the caller let us.
+
+	if (parent == NULL)
+		return EOPNOTSUPP;
+
 	fs_cookie cookie;
 
 	status_t status = FS_CALL(parent, open_dir)(parent->mount->cookie,
@@ -1290,7 +1298,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 	}
 
 	path[--insert] = '\0';
-	
+
 	while (true) {
 		// the name buffer is also used for fs_read_dir()
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
@@ -1307,7 +1315,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		mutex_lock(&sVnodeMutex);
 		parentVnode = lookup_vnode(vnode->device, parentID);
 		mutex_unlock(&sVnodeMutex);
-		
+
 		if (parentVnode == NULL) {
 			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, parentID);
 			status = B_ENTRY_NOT_FOUND;
@@ -2502,16 +2510,16 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
  */
 
 static int
-open_vnode(struct vnode *vnode, int omode, bool kernel)
+open_vnode(struct vnode *vnode, int openMode, bool kernel)
 {
 	fs_cookie cookie;
 	int status;
 
-	status = FS_CALL(vnode, open)(vnode->mount->cookie, vnode->private_node, omode, &cookie);
+	status = FS_CALL(vnode, open)(vnode->mount->cookie, vnode->private_node, openMode, &cookie);
 	if (status < 0)
 		return status;
 
-	status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, omode, kernel);
+	status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel);
 	if (status < 0) {
 		FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
 		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -2642,12 +2650,13 @@ file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, in
 
 
 static int
-file_open(int fd, char *path, int omode, bool kernel)
+file_open(int fd, char *path, int openMode, bool kernel)
 {
 	int status = B_OK;
-	bool traverse = ((omode & O_NOTRAVERSE) == 0);
+	bool traverse = ((openMode & O_NOTRAVERSE) == 0);
 
-	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n", fd, path, omode, kernel));
+	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n",
+		fd, path, openMode, kernel));
 
 	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
@@ -2656,11 +2665,11 @@ file_open(int fd, char *path, int omode, bool kernel)
 		return status;
 
 	// open the vnode
-	status = open_vnode(vnode, omode, kernel);
+	status = open_vnode(vnode, openMode, kernel);
 	// put only on error -- otherwise our reference was transferred to the FD
 	if (status < B_OK)
 		put_vnode(vnode);
-		
+
 	return status;
 }
 
@@ -4632,12 +4641,12 @@ _kern_next_device(int32 *_cookie)
 
 
 int
-_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
+_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode)
 {
 	char nameCopy[B_FILE_NAME_LENGTH];
 	strlcpy(nameCopy, name, sizeof(nameCopy));
 
-	return file_open_entry_ref(device, inode, nameCopy, omode, true);
+	return file_open_entry_ref(device, inode, nameCopy, openMode, true);
 }
 
 
@@ -4651,18 +4660,18 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
  *
  *	\param fd The FD. May be < 0.
  *	\param path The absolute or relative path. May be \c NULL.
- *	\param omode The open mode.
+ *	\param openMode The open mode.
  *	\return A FD referring to the newly opened node, or an error code,
  *			if an error occurs.
  */
 
 int
-_kern_open(int fd, const char *path, int omode)
+_kern_open(int fd, const char *path, int openMode)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
 
-	return file_open(fd, pathBuffer, omode, true);
+	return file_open(fd, pathBuffer, openMode, true);
 }
 
 
@@ -4745,19 +4754,20 @@ _kern_unlock_node(int fd)
 
 
 int
-_kern_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int perms)
+_kern_create_entry_ref(dev_t device, ino_t inode, const char *name,
+	int openMode, int perms)
 {
-	return file_create_entry_ref(device, inode, name, omode, perms, true);
+	return file_create_entry_ref(device, inode, name, openMode, perms, true);
 }
 
 
 int
-_kern_create(const char *path, int omode, int perms)
+_kern_create(const char *path, int openMode, int perms)
 {
 	char buffer[B_PATH_NAME_LENGTH + 1];
 	strlcpy(buffer, path, B_PATH_NAME_LENGTH);
 
-	return file_create(buffer, omode, perms, true);
+	return file_create(buffer, openMode, perms, true);
 }
 
 
@@ -4768,21 +4778,21 @@ _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perm
 }
 
 
-
 /**	\brief Creates a directory specified by a FD + path pair.
+ *
+ *	\a path must always be specified (it contains the name of the new directory
+ *	at least). If only a path is given, this path identifies the location at
+ *	which the directory shall be created. If both \a fd and \a path are given and
+ *	the path is absolute, \a fd is ignored; a relative path is reckoned off
+ *	of the directory (!) identified by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. Must not be \c NULL.
+ *	\param perms The access permissions the new directory shall have.
+ *	\return \c B_OK, if the directory has been created successfully, another
+ *			error code otherwise.
+ */
 
-	\a path must always be specified (it contains the name of the new directory
-	at least). If only a path is given, this path identifies the location at
-	which the directory shall be created. If both \a fd and \a path are given and
-	the path is absolute, \a fd is ignored; a relative path is reckoned off
-	of the directory (!) identified by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
-	\param perms The access permissions the new directory shall have.
-	\return \c B_OK, if the directory has been created successfully, another
-			error code otherwise.
-*/
 status_t
 _kern_create_dir(int fd, const char *path, int perms)
 {
@@ -4860,19 +4870,20 @@ _kern_write_link(const char *path, const char *toPath)
 
 
 /**	\brief Creates a symlink specified by a FD + path pair.
+ *
+ *	\a path must always be specified (it contains the name of the new symlink
+ *	at least). If only a path is given, this path identifies the location at
+ *	which the symlink shall be created. If both \a fd and \a path are given and
+ *	the path is absolute, \a fd is ignored; a relative path is reckoned off
+ *	of the directory (!) identified by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param toPath The absolute or relative path. Must not be \c NULL.
+ *	\param mode The access permissions the new symlink shall have.
+ *	\return \c B_OK, if the symlink has been created successfully, another
+ *			error code otherwise.
+ */
 
-	\a path must always be specified (it contains the name of the new symlink
-	at least). If only a path is given, this path identifies the location at
-	which the symlink shall be created. If both \a fd and \a path are given and
-	the path is absolute, \a fd is ignored; a relative path is reckoned off
-	of the directory (!) identified by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param toPath The absolute or relative path. Must not be \c NULL.
-	\param mode The access permissions the new symlink shall have.
-	\return \c B_OK, if the symlink has been created successfully, another
-			error code otherwise.
-*/
 status_t
 _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 {
@@ -4905,18 +4916,19 @@ _kern_create_link(const char *path, const char *toPath)
 
 
 /**	\brief Removes an entry specified by a FD + path pair from its directory.
+ *
+ *	\a path must always be specified (it contains at least the name of the entry
+ *	to be deleted). If only a path is given, this path identifies the entry
+ *	directly. If both \a fd and \a path are given and the path is absolute,
+ *	\a fd is ignored; a relative path is reckoned off of the directory (!)
+ *	identified by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. Must not be \c NULL.
+ *	\return \c B_OK, if the entry has been removed successfully, another
+ *			error code otherwise.
+ */
 
-	\a path must always be specified (it contains at least the name of the entry
-	to be deleted). If only a path is given, this path identifies the entry
-	directly. If both \a fd and \a path are given and the path is absolute,
-	\a fd is ignored; a relative path is reckoned off of the directory (!)
-	identified by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
-	\return \c B_OK, if the entry has been removed successfully, another
-			error code otherwise.
-*/
 status_t
 _kern_unlink(int fd, const char *path)
 {
@@ -4928,23 +4940,24 @@ _kern_unlink(int fd, const char *path)
 
 
 /**	\brief Moves an entry specified by a FD + path pair to a an entry specified
-		   by another FD + path pair.
+ *		   by another FD + path pair.
+ *
+ *	\a oldPath and \a newPath must always be specified (they contain at least
+ *	the name of the entry). If only a path is given, this path identifies the
+ *	entry directly. If both a FD and a path are given and the path is absolute,
+ *	the FD is ignored; a relative path is reckoned off of the directory (!)
+ *	identified by the respective FD.
+ *
+ *	\param oldFD The FD of the old location. May be < 0.
+ *	\param oldPath The absolute or relative path of the old location. Must not
+ *		   be \c NULL.
+ *	\param newFD The FD of the new location. May be < 0.
+ *	\param newPath The absolute or relative path of the new location. Must not
+ *		   be \c NULL.
+ *	\return \c B_OK, if the entry has been moved successfully, another
+ *			error code otherwise.
+ */
 
-	\a oldPath and \a newPath must always be specified (they contain at least
-	the name of the entry). If only a path is given, this path identifies the
-	entry directly. If both a FD and a path are given and the path is absolute,
-	the FD is ignored; a relative path is reckoned off of the directory (!)
-	identified by the respective FD.
-
-	\param oldFD The FD of the old location. May be < 0.
-	\param oldPath The absolute or relative path of the old location. Must not
-		   be \c NULL.
-	\param newFD The FD of the new location. May be < 0.
-	\param newPath The absolute or relative path of the new location. Must not
-		   be \c NULL.
-	\return \c B_OK, if the entry has been moved successfully, another
-			error code otherwise.
-*/
 status_t
 _kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 {
@@ -4969,24 +4982,25 @@ _kern_access(const char *path, int mode)
 
 
 /**	\brief Reads stat data of an entity specified by a FD + path pair.
+ *
+ *	If only \a fd is given, the stat operation associated with the type
+ *	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
+ *	given, this path identifies the entry for whose node to retrieve the
+ *	stat data. If both \a fd and \a path are given and the path is absolute,
+ *	\a fd is ignored; a relative path is reckoned off of the directory (!)
+ *	identified by \a fd and specifies the entry whose stat data shall be
+ *	retrieved.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. Must not be \c NULL.
+ *	\param traverseLeafLink If \a path is given, \c true specifies that the
+ *		   function shall not stick to symlinks, but traverse them.
+ *	\param stat The buffer the stat data shall be written into.
+ *	\param statSize The size of the supplied stat buffer.
+ *	\return \c B_OK, if the the stat data have been read successfully, another
+ *			error code otherwise.
+ */
 
-	If only \a fd is given, the stat operation associated with the type
-	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
-	given, this path identifies the entry for whose node to retrieve the
-	stat data. If both \a fd and \a path are given and the path is absolute,
-	\a fd is ignored; a relative path is reckoned off of the directory (!)
-	identified by \a fd and specifies the entry whose stat data shall be
-	retrieved.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
-	\param traverseLeafLink If \a path is given, \c true specifies that the
-		   function shall not stick to symlinks, but traverse them.
-	\param stat The buffer the stat data shall be written into.
-	\param statSize The size of the supplied stat buffer.
-	\return \c B_OK, if the the stat data have been read successfully, another
-			error code otherwise.
-*/
 status_t
 _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 	struct stat *stat, size_t statSize)
@@ -5034,26 +5048,27 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 
 
 /**	\brief Writes stat data of an entity specified by a FD + path pair.
+ *
+ *	If only \a fd is given, the stat operation associated with the type
+ *	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
+ *	given, this path identifies the entry for whose node to write the
+ *	stat data. If both \a fd and \a path are given and the path is absolute,
+ *	\a fd is ignored; a relative path is reckoned off of the directory (!)
+ *	identified by \a fd and specifies the entry whose stat data shall be
+ *	written.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. Must not be \c NULL.
+ *	\param traverseLeafLink If \a path is given, \c true specifies that the
+ *		   function shall not stick to symlinks, but traverse them.
+ *	\param stat The buffer containing the stat data to be written.
+ *	\param statSize The size of the supplied stat buffer.
+ *	\param statMask A mask specifying which parts of the stat data shall be
+ *		   written.
+ *	\return \c B_OK, if the the stat data have been written successfully,
+ *			another error code otherwise.
+ */
 
-	If only \a fd is given, the stat operation associated with the type
-	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
-	given, this path identifies the entry for whose node to write the
-	stat data. If both \a fd and \a path are given and the path is absolute,
-	\a fd is ignored; a relative path is reckoned off of the directory (!)
-	identified by \a fd and specifies the entry whose stat data shall be
-	written.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
-	\param traverseLeafLink If \a path is given, \c true specifies that the
-		   function shall not stick to symlinks, but traverse them.
-	\param stat The buffer containing the stat data to be written.
-	\param statSize The size of the supplied stat buffer.
-	\param statMask A mask specifying which parts of the stat data shall be
-		   written.
-	\return \c B_OK, if the the stat data have been written successfully,
-			another error code otherwise.
-*/
 status_t
 _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 	const struct stat *stat, size_t statSize, int statMask)
@@ -5413,7 +5428,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 
 
 int
-_user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
+_user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
@@ -5425,12 +5440,12 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 	if (status < B_OK)
 		return status;
 
-	return file_open_entry_ref(device, inode, name, omode, false);
+	return file_open_entry_ref(device, inode, name, openMode, false);
 }
 
 
 int
-_user_open(int fd, const char *userPath, int omode)
+_user_open(int fd, const char *userPath, int openMode)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	int status;
@@ -5442,7 +5457,7 @@ _user_open(int fd, const char *userPath, int omode)
 	if (status < 0)
 		return status;
 
-	return file_open(-1, path, omode, false);
+	return file_open(-1, path, openMode, false);
 }
 
 
@@ -5483,22 +5498,23 @@ _user_open_dir(int fd, const char *userPath)
 
 
 /**	\brief Opens a directory's parent directory and returns the entry name
-		   of the former.
+ *		   of the former.
+ *
+ *	Aside from that is returns the directory's entry name, this method is
+ *	equivalent to \code _user_open_dir(fd, "..") \endcode. It really is
+ *	equivalent, if \a userName is \c NULL.
+ *
+ *	If a name buffer is supplied and the name does not fit the buffer, the
+ *	function fails. A buffer of size \c B_FILE_NAME_LENGTH should be safe.
+ *
+ *	\param fd A FD referring to a directory.
+ *	\param userName Buffer the directory's entry name shall be written into.
+ *		   May be \c NULL.
+ *	\param nameLength Size of the name buffer.
+ *	\return The file descriptor of the opened parent directory, if everything
+ *			went fine, an error code otherwise.
+ */
 
-	Aside from that is returns the directory's entry name, this method is
-	equivalent to \code _user_open_dir(fd, "..") \endcode. It really is
-	equivalent, if \a userName is \c NULL.
-
-	If a name buffer is supplied and the name does not fit the buffer, the
-	function fails. A buffer of size \c B_FILE_NAME_LENGTH should be safe.
-
-	\param fd A FD referring to a directory.
-	\param userName Buffer the directory's entry name shall be written into.
-		   May be \c NULL.
-	\param nameLength Size of the name buffer.
-	\return The file descriptor of the opened parent directory, if everything
-			went fine, an error code otherwise.
-*/
 int
 _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 {
