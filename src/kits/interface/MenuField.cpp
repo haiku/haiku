@@ -485,7 +485,7 @@ void BMenuField::InitObject(const char *label)
 {
 	fLabel = NULL;
 	fMenu = NULL;
-	fMenuBar;
+	fMenuBar = NULL;
 	fAlign = B_ALIGN_LEFT;
 	fStringWidth = 0;
 	fEnabled = true;
@@ -553,7 +553,6 @@ void BMenuField::InitMenu(BMenu *menu)
 //------------------------------------------------------------------------------
 long BMenuField::MenuTask(void *arg)
 {
-	BRect rect;
 	BMenuField *menuField = (BMenuField*)arg;
 
 	if (!menuField->LockLooper())
