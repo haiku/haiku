@@ -55,7 +55,7 @@ FilterThread::FilterThread(Filter* filter, int32 i, int32 n, bool runInCurrentTh
 
 FilterThread::~FilterThread()
 {
-	fFilter->Done();
+	fFilter->FilterThreadDone();
 }
 
 status_t 
@@ -69,8 +69,13 @@ status_t
 FilterThread::Run()
 {
 	if (fI == 0) {
+		BBitmap* bm;
 		// create destination image in first thread
-		fFilter->GetBitmap();
+		bm = fFilter->GetBitmap();
+		if (bm == NULL) {
+			fFilter->FilterThreadInitFailed();
+			return B_ERROR;
+		}
 		// and start other filter threads
 		for (int32 i = fI + 1; i < fN; i ++) {
 			new FilterThread(fFilter, i, fN);
@@ -92,22 +97,10 @@ Filter::Filter(BBitmap* image, BMessenger listener, uint32 what)
 	, fNumberOfThreads(0)
 	, fIsRunning(false)
 	, fSrcImage(image)
+	, fDestImageInitialized(false)
 	, fDestImage(NULL)
 {
-	// get the number of active CPUs
-	int count;
-	system_info info;
-	get_system_info(&info);
-	count = info.cpu_count;
-	fCPUCount = 0;
-	for (int i = 0; i < count; i ++) {
-		if (_kget_cpu_state_(i)) {
-			fCPUCount ++;
-		}
-	}
-	if (fCPUCount == 0) {
-		fCPUCount = 1;
-	}
+	fCPUCount = NumberOfActiveCPUs();
 	
 	fWaitForThreads = create_sem(0, "wait_for_threads");
 	
@@ -125,7 +118,8 @@ Filter::~Filter()
 BBitmap*
 Filter::GetBitmap()
 {
-	if (fDestImage == NULL) {
+	if (!fDestImageInitialized) {
+		fDestImageInitialized = true;
 		fDestImage = CreateDestImage(fSrcImage);
 	}
 	return fDestImage;
@@ -180,8 +174,19 @@ Filter::Stop()
 	Wait();
 }
 
+bool
+Filter::IsRunning() const
+{
+	return fIsRunning;
+}
+
 void
-Filter::Done()
+Filter::Completed()
+{
+}
+
+void
+Filter::FilterThreadDone()
 {
 	if (atomic_add(&fNumberOfThreads, -1) == 1) {
 		#if TIME_FILTER
@@ -196,15 +201,20 @@ Filter::Done()
 	release_sem(fWaitForThreads);
 }
 
-bool
-Filter::IsRunning() const
+void
+Filter::FilterThreadInitFailed()
 {
-	return fIsRunning;
+	ASSERT(fNumberOfThreads == fN);
+	fNumberOfThreads = 0;
+	Completed();
+	fIsRunning = false;
+	release_sem_etc(fWaitForThreads, fN, 0);
 }
 
-void
-Filter::Completed()
+bool
+Filter::IsBitmapValid(BBitmap* bitmap) const
 {
+	return bitmap != NULL && bitmap->InitCheck() == B_OK && bitmap->IsValid();
 }
 
 int32
@@ -233,6 +243,25 @@ Filter::GetDestImage()
 	return fDestImage;
 }
 
+int32
+Filter::NumberOfActiveCPUs() const
+{
+	int count;
+	system_info info;
+	get_system_info(&info);
+	count = info.cpu_count;
+	int32 CPUCount = 0;
+	for (int i = 0; i < count; i ++) {
+		if (_kget_cpu_state_(i)) {
+			CPUCount ++;
+		}
+	}
+	if (CPUCount == 0) {
+		CPUCount = 1;
+	}
+	return CPUCount;
+}
+
 // Implementation of (bilinear) Scaler
 Scaler::Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what, bool dither)
 	: Filter(image, listener, what)
@@ -253,14 +282,28 @@ BBitmap*
 Scaler::CreateDestImage(BBitmap* srcImage)
 {
 	if (srcImage == NULL || srcImage->ColorSpace() != B_RGB32 && srcImage->ColorSpace() !=B_RGBA32) return NULL;
+
 	BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 	BBitmap* destImage = new BBitmap(dest, fDither ? B_CMAP8 : srcImage->ColorSpace());
+	
+	if (!IsBitmapValid(destImage)) {
+		delete destImage;
+		return NULL;
+	}
+	
 	if (fDither) {
 		BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 		fScaledImage = new BBitmap(dest, srcImage->ColorSpace());
+		if (!IsBitmapValid(fScaledImage)) {
+			delete destImage;
+			delete fScaledImage; 
+			fScaledImage = NULL;
+			return NULL;
+		}
 	} else {
 		fScaledImage = destImage;
 	}
+
 	return destImage;
 }
 
@@ -906,7 +949,10 @@ ImageProcessor::CreateDestImage(BBitmap* srcImage)
 	}
 	
 	bm = new BBitmap(rect, cs);
-	if (bm == NULL) return NULL;
+	if (!IsBitmapValid(bm)) {
+		delete bm;
+		return NULL;
+	}
 	
 	fSrcBPR = GetSrcImage()->BytesPerRow();
 	fDestBPR = bm->BytesPerRow();

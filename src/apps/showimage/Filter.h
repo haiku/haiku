@@ -69,9 +69,10 @@ public:
 private:
 	status_t Run();
 	static status_t worker_thread(void* data);
+	
 	Filter* fFilter;
-	int32 fI;
-	int32 fN;
+	int32   fI;
+	int32   fN;
 };
 
 class Filter {
@@ -125,7 +126,10 @@ public:
 	virtual void Completed();
 
 	// Used by FilterThread only!
-	void Done();
+	void FilterThreadDone();
+	void FilterThreadInitFailed();
+
+	bool IsBitmapValid(BBitmap* bitmap) const;
 
 protected:
 	// Number of threads to be used to perform the operation
@@ -134,21 +138,23 @@ protected:
 	BBitmap* GetDestImage();
 
 private:
+	int32 NumberOfActiveCPUs() const;
 	// Returns the number of active CPUs
 	int32 CPUCount() const { return fCPUCount; }
 
-	BMessenger fListener;
-	uint32 fWhat;
-	int32 fCPUCount; // the number of active CPUs
-	bool fStarted; // has Start() been called?
-	sem_id fWaitForThreads; // to exit
-	int32 fN; // the number of used filter threads
+	BMessenger     fListener;
+	uint32         fWhat;
+	int32          fCPUCount; // the number of active CPUs
+	bool           fStarted; // has Start() been called?
+	sem_id         fWaitForThreads; // to exit
+	int32          fN; // the number of used filter threads
 	volatile int32 fNumberOfThreads; // the current number of FilterThreads
-	volatile bool fIsRunning; // FilterThreads should process data as long as it is true
-	BBitmap* fSrcImage;
-	BBitmap* fDestImage;		
+	volatile bool  fIsRunning; // FilterThreads should process data as long as it is true
+	BBitmap*       fSrcImage;
+	bool           fDestImageInitialized;
+	BBitmap*       fDestImage;		
 #if TIME_FILTER
-	BStopWatch* fStopWatch;
+	BStopWatch*    fStopWatch;
 #endif
 };
 
@@ -201,8 +207,10 @@ private:
 
 	enum operation fOp;
 	int32 fBPP;
-	int32 fWidth, fHeight;
-	int32 fSrcBPR, fDestBPR;
+	int32 fWidth;
+	int32 fHeight;
+	int32 fSrcBPR;
+	int32 fDestBPR;
 };
 
 #endif

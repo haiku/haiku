@@ -1945,6 +1945,10 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	ImageProcessor imageProcessor(op, fBitmap, msgr, 0);
 	imageProcessor.Start(false);
 	BBitmap* bm = imageProcessor.DetachBitmap();
+	if (bm == NULL) {
+		// operation failed
+		return;	
+	}
 	
 	// update orientation state
 	if (op != ImageProcessor::kInvert) {
