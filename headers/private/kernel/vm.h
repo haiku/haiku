@@ -20,12 +20,13 @@ extern "C" {
 #endif
 
 //void vm_dump_areas(vm_address_space *aspace);
-int vm_init(kernel_args *ka);
-int vm_init_postsem(struct kernel_args *ka);
-int vm_init_postthread(struct kernel_args *ka);
+status_t vm_init(kernel_args *ka);
+status_t vm_init_postsem(struct kernel_args *ka);
+status_t vm_init_postthread(struct kernel_args *ka);
 
 aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel);
-int vm_delete_aspace(aspace_id);
+status_t vm_delete_aspace(aspace_id);
+status_t vm_delete_areas(struct vm_address_space *aspace);
 vm_address_space *vm_get_kernel_aspace(void);
 aspace_id vm_get_kernel_aspace_id(void);
 vm_address_space *vm_get_current_user_aspace(void);
