@@ -116,9 +116,7 @@ status_t
 BMediaFormats::GetFormatFor(const media_format_description & desc,
 							media_format * out_format)
 {
-	// set to wildcard, as MakeFormatFor wants an in/out format...
-	memset(out_format, 0, sizeof(*out_format));
-	return MakeFormatFor(&desc, 1, out_format);
+	return _get_format_for_description(out_format, desc);
 }
 
 
