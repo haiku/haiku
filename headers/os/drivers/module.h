@@ -10,10 +10,9 @@
 #include <OS.h>
 
 
-/* module info structure
- * Every module exports it - modules are identified
- * by the name given in this structure.
- * It exports the functions that the module support.
+/* Every module exports a list of module_info structures.
+ * It defines the interface of the module and the name
+ * that is used to access the interface.
  */
 
 typedef struct module_info {
@@ -28,6 +27,17 @@ typedef struct module_info {
 
 /* module flags */
 #define	B_KEEP_LOADED	0x00000001
+
+
+/* Use the module_dependency structure to let the
+ * kernel automatically load modules yet depend on
+ * before B_MODULE_INIT is called.
+ */
+
+typedef struct module_dependency {
+	const char	*name;
+	module_info	**info;
+} module_dependency;
 
 
 #ifdef __cplusplus
