@@ -405,8 +405,30 @@ ui_color(color_which which)
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {
-	// Internally calculates the color
-	// TODO: Implement
+	rgb_color result;
+
+	#define LIGHTEN(x) ((uint8)(255.0f - (255.0f - x) * tint))
+	#define DARKEN(x)  ((uint8)(x * (2 - tint)))
+
+	if (tint < 1.0f)
+	{
+		result.red   = LIGHTEN(color.red);
+		result.green = LIGHTEN(color.green);
+		result.blue  = LIGHTEN(color.blue);
+		result.alpha = color.alpha;
+	}
+	else
+	{
+		result.red   = DARKEN(color.red);
+		result.green = DARKEN(color.green);
+		result.blue  = DARKEN(color.blue);
+		result.alpha = color.alpha;
+	}
+
+	#undef LIGHTEN
+	#undef DARKEN
+
+	return result;
 }
 
 
