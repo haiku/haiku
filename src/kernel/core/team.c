@@ -1091,6 +1091,7 @@ fork_team(void)
 {
 	struct team *parentTeam = thread_get_current_thread()->team, *team;
 	struct thread *parentThread = thread_get_current_thread();
+	struct process_group *group = NULL;
 	struct fork_arg *forkArgs;
 	struct area_info info;
 	thread_id threadID;
@@ -1115,6 +1116,7 @@ fork_team(void)
 
 	hash_insert(team_hash, team);
 	insert_team_into_parent(parentTeam, team);
+	insert_team_into_group(parentTeam->group, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -1188,11 +1190,14 @@ err1:
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
+	remove_team_from_group(team, &group);
 	remove_team_from_parent(parentTeam, team);
 	hash_remove(team_hash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
+
+	team_delete_process_group(group);
 	delete_team_struct(team);
 
 	return status;
