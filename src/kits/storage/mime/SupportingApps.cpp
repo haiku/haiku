@@ -141,7 +141,9 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 		// each type.
 		newTypes.clear();
 		const char *type;
-		for (int32 i = 0; types->FindString(kTypesField, &type) == B_OK; i++) {
+		for (int32 i = 0;
+			 types->FindString(kTypesField, i, &type) == B_OK;
+			 i++) {
 			newTypes.insert(type);
 			AddSupportingApp(type, app);
 		}
