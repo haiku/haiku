@@ -28,7 +28,7 @@
  */
 
 /* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
+char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
 
 #include <MediaRoster.h>
 #include <Locker.h>
@@ -1885,7 +1885,7 @@ BMediaRoster::GetParameterWebFor(const media_node & node,
 			// we got a flattened parameter web!
 			*out_web = new BParameterWeb();
 			
-			printf("BMediaRoster::GetParameterWebFor Unflattening %ld bytes, 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",
+			printf("BMediaRoster::GetParameterWebFor Unflattening %ld bytes, 0x%08lx, 0x%08lx, 0x%08lx, 0x%08lx\n",
 				reply.size, ((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2], ((uint32*)data)[3]);
 			
 			rv = (*out_web)->Unflatten(reply.code, data, reply.size);
@@ -2124,7 +2124,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		return B_BAD_VALUE;
 	}
 
-	printf("BMediaRoster::InstantiateDormantNode: addon-id %ld, flavor_id %ld, flags 0x%X\n", in_info.addon, in_info.flavor_id, flags);
+	printf("BMediaRoster::InstantiateDormantNode: addon-id %ld, flavor_id %ld, flags 0x%lX\n", in_info.addon, in_info.flavor_id, flags);
 
 	// Get flavor_info from the server
 	// XXX this is a little overhead, as we get the full blown dormant_flavor_info,
@@ -2139,7 +2139,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 
 	ASSERT(node_info.internal_id == in_info.flavor_id);
 
-	printf("BMediaRoster::InstantiateDormantNode: name \"%s\", info \"%s\", flavor_flags 0x%X, internal_id %ld, possible_count %ld\n",
+	printf("BMediaRoster::InstantiateDormantNode: name \"%s\", info \"%s\", flavor_flags 0x%lX, internal_id %ld, possible_count %ld\n",
 		node_info.name, node_info.info, node_info.flavor_flags, node_info.internal_id, node_info.possible_count);
 
 	#if DEBUG

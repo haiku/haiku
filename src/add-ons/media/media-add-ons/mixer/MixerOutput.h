@@ -28,7 +28,7 @@ public:
 	void ChangeFormat(const media_multi_audio_format &format);
 	
 	// The physical output channels
-	uint32	GetOutputChannelCount();
+	int		GetOutputChannelCount();
 	int		GetOutputChannelType(int channel);
 	void	SetOutputChannelGain(int channel, float gain);
 	float	GetOutputChannelGain(int channel);
@@ -47,7 +47,7 @@ public:
 	// Only for use by MixerCore:
 
 	// For iteration of a channel's sources
-	uint32	GetOutputChannelSourceCount(int channel);
+	int		GetOutputChannelSourceCount(int channel);
 	void	GetOutputChannelSourceInfoAt(int channel, int source_index, int *source_type, float *source_gain);
 
 	// To swap byteorder in a buffer is that is needed
@@ -79,14 +79,14 @@ private:
 	MixerCore 			*fCore;
 	media_output 		fOutput;
 	
-	uint32				fOutputChannelCount;
+	int					fOutputChannelCount;
 	output_chan_info 	*fOutputChannelInfo; //array
 	ByteSwap			*fOutputByteSwap;
 	
 	bool				fMuted;
 };
 
-inline uint32 MixerOutput::GetOutputChannelCount()
+inline int MixerOutput::GetOutputChannelCount()
 {
 	return fOutputChannelCount;
 }
@@ -98,7 +98,7 @@ inline float MixerOutput::GetOutputChannelGain(int channel)
 	return fOutputChannelInfo[channel].channel_gain;
 }
 
-inline uint32 MixerOutput::GetOutputChannelSourceCount(int channel)
+inline int MixerOutput::GetOutputChannelSourceCount(int channel)
 {
 	ASSERT(channel >= 0 && channel < fOutputChannelCount);
 	return fOutputChannelInfo[channel].source_count;

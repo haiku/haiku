@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 #include <MediaAddOn.h>
 #include <string.h>
 #include <malloc.h>

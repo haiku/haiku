@@ -15,14 +15,14 @@ public:
 	MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount);
 	~MixerInput();
 	
-	int32 ID();
+	int32	ID();
 	
-	void BufferReceived(BBuffer *buffer);
+	void	BufferReceived(BBuffer *buffer);
 	
 	media_input & MediaInput();
 
 	// The physical input channels
-	uint32	GetInputChannelCount();
+	int		GetInputChannelCount();
 	int		GetInputChannelType(int channel);
 	void	SetInputChannelGain(int channel, float gain);
 	float	GetInputChannelGain(int channel);
@@ -36,16 +36,16 @@ public:
 	int 	GetInputChannelForDestination(int destination_type); // returns -1 if not found
 	
 	// The virtual mixer channels that are generated from destinations
-	uint32 GetMixerChannelCount();
+	int		GetMixerChannelCount();
 	void 	SetMixerChannelGain(int mixer_channel, float gain);
 	float	GetMixerChannelGain(int mixer_channel);
 	int		GetMixerChannelType(int mixer_channel);
 	
-	void SetEnabled(bool yesno);
-	bool IsEnabled();
+	void	SetEnabled(bool yesno);
+	bool	IsEnabled();
 
 	// only for use by MixerCore
-	bool GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
+	bool	GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 
 protected:
 	friend class MixerCore;
@@ -57,12 +57,12 @@ private:
 
 private:
 	struct input_chan_info {
-		float *buffer_base;
-		uint32 destination_mask;	// multiple or no bits sets
-		float gain;
+		float	*buffer_base;
+		uint32	destination_mask;	// multiple or no bits sets
+		float	gain;
 	};	
 	struct mixer_chan_info {
-		float *buffer_base;
+		float	*buffer_base;
 		int		destination_type;
 		float	destination_gain;
 	};
@@ -77,16 +77,16 @@ private:
 	bool			fEnabled;
 
 	input_chan_info *fInputChannelInfo; // array
-	uint32			fInputChannelCount;
+	int				fInputChannelCount;
 	uint32			fInputChannelMask;
 
 	mixer_chan_info *fMixerChannelInfo; // array
-	uint32			fMixerChannelCount;
+	int				fMixerChannelCount;
 
 	float 			*fMixBuffer;
 	
 	int32 			fMixBufferFrameRate;
-	uint32			fMixBufferFrameCount;
+	int				fMixBufferFrameCount;
 	
 	bigtime_t		fLastDataAvailableTime;
 	
@@ -98,7 +98,7 @@ private:
 	int32			debugMixBufferFrames;
 };
 
-inline uint32
+inline int
 MixerInput::GetMixerChannelCount()
 {
 	return fMixerChannelCount;

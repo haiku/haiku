@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 /*
  * The undocumented BTrackReader class,
  * used by BSound and the GameSound classes

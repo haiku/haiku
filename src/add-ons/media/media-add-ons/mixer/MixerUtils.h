@@ -2,7 +2,7 @@
 #define _MIXER_UTILS_H
 
 #if DEBUG > 0
-	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; StringForChannelMask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08X %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
+	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; StringForChannelMask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08lX %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
 #else
 	#define PRINT_CHANNEL_MASK(fmt) ((void)0)
 #endif

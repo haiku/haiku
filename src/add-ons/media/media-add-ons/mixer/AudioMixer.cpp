@@ -615,7 +615,7 @@ AudioMixer::LatencyChanged(const media_source & source, const media_destination 
 
 	MixerInput *input;	
 	for (int i = 0; (input = fCore->Input(i)) != 0; i++) {
-		TRACE("AudioMixer: SendLatencyChange from %d/%d to %d/%d event latency is now %Ld\n",
+		TRACE("AudioMixer: SendLatencyChange from %ld/%ld to %ld/%ld event latency is now %Ld\n",
 			input->MediaInput().source.port, input->MediaInput().source.id,
 			input->MediaInput().destination.port, input->MediaInput().destination.id,
 			EventLatency());
@@ -1066,7 +1066,7 @@ status_t
 AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
 							  void *value, size_t *ioSize)
 {
-	TRACE("GetParameterValue: id 0x%08x, ioSize %ld\n", id, *ioSize);
+	TRACE("GetParameterValue: id 0x%08lx, ioSize %ld\n", id, *ioSize);
 	int param = PARAM(id);
 	fCore->Lock();
 	if (PARAM_IS_ETC(id)) {
@@ -1253,7 +1253,7 @@ void
 AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
 							  const void *value, size_t size)
 {
-	TRACE("SetParameterValue: id 0x%08x, size %ld\n", id, size);
+	TRACE("SetParameterValue: id 0x%08lx, size %ld\n", id, size);
 	bool update = false;
 	int param = PARAM(id);
 	fCore->Lock();
@@ -1498,7 +1498,6 @@ AudioMixer::UpdateParameterWeb()
 	BParameterGroup *group;
 	BParameterGroup *subgroup;
 	BParameterGroup *subsubgroup;
-	BParameterGroup *subsubsubgroup;
 	BDiscreteParameter *dp;
 	MixerInput *in;
 	MixerOutput *out;

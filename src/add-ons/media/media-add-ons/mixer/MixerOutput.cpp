@@ -65,7 +65,7 @@ void
 MixerOutput::UpdateOutputChannels()
 {
 	output_chan_info *oldInfo = fOutputChannelInfo;
-	uint32 oldCount = fOutputChannelCount;
+	int oldCount = fOutputChannelCount;
 
 	fOutputChannelCount = fOutput.format.u.raw_audio.channel_count;
 	fOutputChannelInfo = new output_chan_info[fOutputChannelCount];
@@ -87,11 +87,11 @@ MixerOutput::UpdateOutputChannels()
 		for (int i = 0; i < fOutputChannelCount; i++) {
 			for (int j = 0; j < oldCount; j++) {
 				if (fOutputChannelInfo[i].channel_type == oldInfo[j].channel_type) {
-					fOutputChannelInfo[i].channel_gain == oldInfo[j].channel_gain;
-					fOutputChannelInfo[i].source_count == oldInfo[j].source_count;
+					fOutputChannelInfo[i].channel_gain = oldInfo[j].channel_gain;
+					fOutputChannelInfo[i].source_count = oldInfo[j].source_count;
 					for (int k = 0; k < fOutputChannelInfo[i].source_count; k++) {
-						fOutputChannelInfo[i].source_gain[k] == oldInfo[j].source_gain[k];
-						fOutputChannelInfo[i].source_type[k] == oldInfo[j].source_type[k];
+						fOutputChannelInfo[i].source_gain[k] = oldInfo[j].source_gain[k];
+						fOutputChannelInfo[i].source_type[k] = oldInfo[j].source_type[k];
 					}
 					// also copy the old gain cache
 					for (int k = 0; k < MAX_CHANNEL_TYPES; k++)
@@ -111,7 +111,7 @@ void
 MixerOutput::AssignDefaultSources()
 {
 	uint32 mask = fOutput.format.u.raw_audio.channel_mask;
-	uint32 count = fOutputChannelCount;
+	int count = fOutputChannelCount;
 	
 	// assign default sources for a few known setups,
 	// everything else is left unchanged (it already is 1:1)

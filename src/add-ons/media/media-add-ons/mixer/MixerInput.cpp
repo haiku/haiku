@@ -106,7 +106,7 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	if (fInputByteSwap)
 		fInputByteSwap->Swap(data, size);
 
-	int32 offset = frames_for_duration(fMixBufferFrameRate, start) % fMixBufferFrameCount;
+	int offset = frames_for_duration(fMixBufferFrameRate, start) % fMixBufferFrameCount;
 
 	PRINT(4, "MixerInput::BufferReceived: buffer start %10Ld, offset %6d\n", start, offset);
 
@@ -183,7 +183,7 @@ MixerInput::ID()
 	return fInput.destination.id;
 }
 
-uint32
+int
 MixerInput::GetInputChannelCount()
 {
 	return fInputChannelCount;
@@ -327,7 +327,7 @@ MixerInput::UpdateInputChannelDestinationMask()
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateInputChannelDestinationMask: input channel %d, destination_mask 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateInputChannelDestinationMask: input channel %d, destination_mask 0x%08lX, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 
 	TRACE("UpdateInputChannelDestinationMask: leave\n");
 }
@@ -335,24 +335,24 @@ MixerInput::UpdateInputChannelDestinationMask()
 void
 MixerInput::UpdateInputChannelDestinations()
 {
-	uint32 channel_count;
+	int channel_count;
 	uint32 all_bits;
 	uint32 mask;
 	
 	TRACE("UpdateInputChannelDestinations: enter\n");
 	
 	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateInputChannelDestinations: input channel %d, destination_mask 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateInputChannelDestinations: input channel %d, destination_mask 0x%08lX, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 	
 	all_bits = 0;
 	for (int i = 0; i < fInputChannelCount; i++)
 		all_bits |= fInputChannelInfo[i].destination_mask;
 
-	TRACE("UpdateInputChannelDestinations: all_bits = %08x\n", all_bits);
+	TRACE("UpdateInputChannelDestinations: all_bits = %08lx\n", all_bits);
 	
 	channel_count = count_nonzero_bits(all_bits);
 		
-	TRACE("UpdateInputChannelDestinations: %ld input channels, %ld mixer channels (%ld old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
+	TRACE("UpdateInputChannelDestinations: %d input channels, %d mixer channels (%d old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
 
 	if (channel_count != fMixerChannelCount) {
 		delete [] fMixerChannelInfo;
@@ -362,7 +362,8 @@ MixerInput::UpdateInputChannelDestinations()
 		
 	// assign each mixer channel one type
 	// and the gain from the fChannelTypeGain[]
-	for (int i  = 0, mask = 1; i < fMixerChannelCount; i++) {
+	mask = 1;
+	for (int i = 0; i < fMixerChannelCount; i++) {
 		while (mask != 0 && (all_bits & mask) == 0)
 			mask <<= 1;
 		fMixerChannelInfo[i].destination_type = ChannelMaskToChannelType(mask);
@@ -371,7 +372,7 @@ MixerInput::UpdateInputChannelDestinations()
 	}
 
 	// assign buffer_base pointer for each mixer channel
-	for (int i  = 0; i < fMixerChannelCount; i++) {
+	for (int i = 0; i < fMixerChannelCount; i++) {
 		int j;
 		for (j = 0; j < fInputChannelCount; j++) {
 			if (fInputChannelInfo[j].destination_mask & ChannelTypeToChannelMask(fMixerChannelInfo[i].destination_type)) {
@@ -502,7 +503,7 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	TRACE("  inputBufferLength  %10Ld\n", inputBufferLength);
 	TRACE("  outputBufferLength %10Ld\n", outputBufferLength);
 	TRACE("  mixerBufferLength  %10Ld\n", mixerBufferLength);
-	TRACE("  fMixBufferFrameCount   %10ld\n", fMixBufferFrameCount);
+	TRACE("  fMixBufferFrameCount   %10d\n", fMixBufferFrameCount);
 	
 	ASSERT((fMixBufferFrameCount % frames) == 0);
 	

@@ -251,9 +251,11 @@ MessageFilter::FilterFor(BView *view, BParameter &parameter)
 
 		case BParameter::B_DISCRETE_PARAMETER:
 			return new DiscreteMessageFilter(control, static_cast<BDiscreteParameter &>(parameter));
+			
+		case BParameter::B_NULL_PARAMETER: /* fall through */
+		default:
+			return NULL;
 	}
-
-	return NULL;
 }
 
 
@@ -519,7 +521,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 	
 	rect.right = rect.left + 50;
 	rect.bottom = rect.top + 10;
-	float lastHeight;
+	float lastHeight = 0;
 
 	for (int32 i = 0; i < group.CountGroups(); i++) {
 		BParameterGroup *subGroup = group.GroupAt(i);

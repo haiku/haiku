@@ -13,7 +13,7 @@
 #define SAVE_DELAY		5000000		// delay saving of settings for 5s
 #define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity
 
-#define SETTINGS_VERSION 0x94251601
+#define SETTINGS_VERSION ((int32)0x94251601)
 
 MixerSettings::MixerSettings()
  :	fLocker(new BLocker),
@@ -360,7 +360,6 @@ MixerSettings::Save()
 	for (int i = 0; i < MAX_INPUT_SETTINGS; i++)
 		msg.AddMessage("input", &fInputSetting[i]);
 		
-	size_t size;
 	char *buffer;
     size_t length; 
     

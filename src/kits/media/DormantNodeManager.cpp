@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 /* This is a management class for dormant media nodes.
  * It is private to the media kit and only accessed by the BMediaRoster class
  * and the media_addon_server.

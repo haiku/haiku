@@ -136,11 +136,11 @@ const char * const B_SIMPLE_TRANSPORT	 = "SimpleTransport";
 
 // Flattened data
 
-static const int32 kParameterWebMagic = 0x01030506;
 static const int32 kCurrentParameterWebVersion = 1;
-static const int32 kBufferGroupMagic = 0x03040509;
-static const int32 kBufferGroupMagicNoFlags = 0x03040507;
-static const int32 kParameterMagic = 0x02040607;
+static const uint32 kParameterWebMagic = 0x01030506;
+static const uint32 kBufferGroupMagic = 0x03040509;
+static const uint32 kBufferGroupMagicNoFlags = 0x03040507;
+static const uint32 kParameterMagic = 0x02040607;
 
 static const ssize_t kAdditionalParameterGroupSize = 12;
 static const ssize_t kAdditionalParameterSize = 35;
@@ -581,7 +581,7 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	const void *bufferStart = buffer;
 
-	int32 magic = read_from_buffer<int32>(&buffer);
+	uint32 magic = read_from_buffer<uint32>(&buffer);
 	bool isSwapped = false;
 
 	if (magic == B_SWAP_INT32(kParameterWebMagic)) {
@@ -964,9 +964,6 @@ BParameterGroup::Flatten(void *buffer, ssize_t size) const
 		return B_NO_INIT;
 	}
 
-	void *bufferStart = buffer;
-		// used to compute the rest length of the buffer when needed
-
 	// NOTICE: It is important that this value is the size returned by
 	// BParameterGroup::FlattenedSize, not by a descendent's override of this method.
 	ssize_t actualSize = BParameterGroup::FlattenedSize();
@@ -1071,7 +1068,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 	const void *bufferStart = buffer;
 		// used to compute the rest length of the buffer when needed
 
-	int32 magic = read_from_buffer<int32>(&buffer);
+	uint32 magic = read_from_buffer<uint32>(&buffer);
 	bool isSwapped = false;
 
 	if (magic == B_SWAP_INT32(kBufferGroupMagic)
@@ -1701,7 +1698,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	// check magic
 
-	int32 magic = read_from_buffer<int32>(&buffer);
+	uint32 magic = read_from_buffer<uint32>(&buffer);
 	if (magic == B_SWAP_INT32(kParameterMagic))
 		mSwapDetected = true;
 	else if (magic == kParameterMagic)
@@ -2294,7 +2291,7 @@ BDiscreteParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 		if (read_string_from_buffer(&buffer, &name, size_left(size, bufferStart, buffer)) < B_OK)
 			return B_BAD_DATA;
 
-		if (size_left(size, bufferStart, buffer) < sizeof(int32))
+		if (size_left(size, bufferStart, buffer) < (int)sizeof(int32))
 			return B_BAD_DATA;
 
 		int32 value = read_from_buffer_swap32<int32>(&buffer, SwapOnUnflatten());

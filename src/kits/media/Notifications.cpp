@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 /* This is a interface class for media kit notifications.
  * It is private to the media kit which uses it to pass
  * notifications up to the media_server which will broadcast

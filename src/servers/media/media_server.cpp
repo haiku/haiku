@@ -28,7 +28,7 @@
  */
 
 /* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
+char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
 
 #include <Application.h>
 #include <stdio.h>
@@ -576,7 +576,7 @@ ServerApp::controlthread(void *arg)
 
 void ServerApp::MessageReceived(BMessage *msg)
 {
-	TRACE("ServerApp::MessageReceived %x enter\n", msg->what);
+	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
@@ -585,7 +585,7 @@ void ServerApp::MessageReceived(BMessage *msg)
 			printf("\nnew media server: unknown message received\n");
 			msg->PrintToStream();
 	}
-	TRACE("ServerApp::MessageReceived %x leave\n", msg->what);
+	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
 }
 
 int main()

@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 #include <OS.h>
 #include <Entry.h>
 #include <Message.h>
@@ -189,7 +186,9 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 		}
 	}
 	*count -= 1;
-	int32 debug_count = *count;
+	#if DEBUG >= 2
+		int32 debug_count = *count;
+	#endif
 	if (*count == 0) {
 		b = rn->teamrefcount.Remove(team);
 		ASSERT(b);
@@ -469,7 +468,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	registered_node *rn;
 	int namelen;
 	
-	TRACE("NodeManager::GetLiveNodes: maxcount %d, in-format %p, out-format %p, name %s, require_kinds 0x%x\n",
+	TRACE("NodeManager::GetLiveNodes: maxcount %ld, in-format %p, out-format %p, name %s, require_kinds 0x%Lx\n",
 		  maxcount, inputformat, outputformat, (name ? name : "NULL"), require_kinds);
 
 	// determine the count of byte to compare when checking for a name with(out) wildcard

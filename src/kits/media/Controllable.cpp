@@ -27,9 +27,6 @@
  *
  */
 
-/* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
-
 #include <OS.h>
 #include <Controllable.h>
 #include <ParameterWeb.h>
@@ -214,7 +211,7 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 					if (rv != B_OK) {
 						ERROR("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB Flatten failed\n");
 					} else {
-						printf("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB %ld bytes, 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",
+						printf("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB %ld bytes, 0x%08lx, 0x%08lx, 0x%08lx, 0x%08lx\n",
 							reply.size, ((uint32*)buffer)[0], ((uint32*)buffer)[1], ((uint32*)buffer)[2], ((uint32*)buffer)[3]);
 					}
 					delete_area(area);

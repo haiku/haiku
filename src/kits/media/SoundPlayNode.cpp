@@ -626,7 +626,7 @@ _SoundPlayNode::HandleDataStatus(
 						bigtime_t lateness,
 						bool realTimeEvent = false)
 {
-	TRACE("_SoundPlayNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness);
+	TRACE("_SoundPlayNode::HandleDataStatus status: %li, lateness: %Li\n", event->data, lateness);
 	switch(event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;

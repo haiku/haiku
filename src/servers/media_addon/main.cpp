@@ -28,7 +28,7 @@
  */
 
 /* to comply with the license above, do not remove the following line */
-static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
+char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
 
 #define BUILDING_MEDIA_ADDON 1
 #include <Application.h>
