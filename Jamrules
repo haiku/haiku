@@ -633,12 +633,12 @@ rule MergeObjectFromObjects
 {
 	# MergeObjectFromObjects <name> : <objects> ;
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
-	MakeLocateObjects $(2) ;
 	Depends $(<) : $(>) ;
 	LINK on $(1) = ld ;
+	MergeObjectFromObjects1 $(1) : [ FGristFiles $(2) ] ;
 }
 
-actions MergeObjectFromObjects
+actions MergeObjectFromObjects1
 {
 	$(LINK) -r $(2) -o $(1) ;
 }
