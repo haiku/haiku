@@ -13,12 +13,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 	SubDirC++Flags -DECHO_BEOS -DECHO24_FAMILY -fno-rtti ;
 }
 
-R5KernelAddon echo24 : kernel drivers bin :
-	kernel_cpp.cpp
-	debug.c
-	echo.cpp
-	multi.cpp
-	util.c
+local echo_files =
 	CChannelMask.cpp
 	CDaffyDuck.cpp
 	CDspCommObject.cpp
@@ -41,32 +36,20 @@ R5KernelAddon echo24 : kernel drivers bin :
 	CMonaDspCommObject.cpp
 	CMonitorCtrl.cpp
 	CPipeOutCtrl.cpp
+	;
+
+R5KernelAddon echo24 : kernel drivers bin :
+	kernel_cpp.cpp
+	debug.c
+	echo.cpp
+	multi.cpp
+	util.c
+	$(echo_files)
 	OsSupportBeOS.cpp
 ;
 
 SEARCH on [ FGristFiles
-	CChannelMask.cpp
-	CDaffyDuck.cpp
-	CDspCommObject.cpp
-	CEchoGals.cpp
-	CEchoGals_info.cpp
-	CEchoGals_midi.cpp
-	CEchoGals_mixer.cpp
-	CEchoGals_power.cpp
-	CEchoGals_transport.cpp
-	CEchoGals_WDM.cpp
-	CGina24.cpp
-	CGina24DspCommObject.cpp
-	CLayla24.cpp
-	CLayla24DspCommObject.cpp
-	CLineLevel.cpp
-	CMia.cpp
-	CMiaDspCommObject.cpp
-	CMidiInQ.cpp
-	CMona.cpp
-	CMonaDspCommObject.cpp
-	CMonitorCtrl.cpp
-	CPipeOutCtrl.cpp
+	$(echo_files)
 	OsSupportBeOS.cpp
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo generic ] ;
 
