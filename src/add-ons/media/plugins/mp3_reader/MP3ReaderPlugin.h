@@ -50,6 +50,7 @@ private:
 	void		ParseXingVbrHeader(int64 pos);
 	void		ParseFraunhoferVbrHeader(int64 pos);
 	
+	int64		XingSeekPoint(float percent);
 	
 private:
 	BPositionIO *	fSeekableSource;
@@ -58,8 +59,11 @@ private:
 	int64			fDataStart;
 	int64			fDataSize;
 	
-	uint8 *			fXingVbrHeader;
-	uint8 *			fFraunhoferVbrHeader;
+	struct xing_vbr_info;
+	struct fhg_vbr_info;
+	
+	xing_vbr_info *	fXingVbrInfo;
+	fhg_vbr_info *	fFhgVbrInfo;
 };
 
 
