@@ -20,13 +20,14 @@ struct the_test {
 static int counter_thread(void *data)
 {
 	struct the_test *tt = (struct the_test*)data;
-	free(data);
 		
 	acquire_sem(tt->the_lock);
 	
 	*(tt->current_val) *= tt->thread_mult;
 	
 	release_sem(tt->the_lock);
+	
+	free(data);
 }
 
 int main(int argc, char **argv)
