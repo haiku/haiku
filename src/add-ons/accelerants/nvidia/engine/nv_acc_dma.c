@@ -792,7 +792,7 @@ static void nv_start_dma(void)
 	{
 		si->engine.dma.put = si->engine.dma.current;
 		/* fixme: is this actually needed? (force some flush somewhere) */
-		ISAWB(0x03d0, 0x00);
+//		ISAWB(0x03d0, 0x00);
 		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
 		 * we know for sure the DMA command buffer received all data. */
 		dummy = *((char *)(si->framebuffer));
@@ -813,20 +813,12 @@ static void nv_start_dma(void)
  * The hardware FIFO state is checked by the DMA hardware automatically. */
 static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 {
-	//test:
-	uint32 dummy;
-
 	/* check if the DMA buffer has enough room for the command */
 	if (si->engine.dma.free < cmd_size)
 	{
-		//test:
-		LOG(4,("ACC_FIFOFREE: free $%08x, max $%08x, current $%08x\n",
-			si->engine.dma.free, si->engine.dma.max, si->engine.dma.current ));
-
 		/* not enough room left, so instruct DMA engine to reset the buffer when
 		 * it's done */
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
-
 		/* reset our buffer pointer, so new commands will be placed at the
 		 * beginning of the buffer. */
 		si->engine.dma.current = 0;
@@ -837,14 +829,6 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 		 * we are assuming here that a large part in the beginning of the DMA
 		 * cmd buffer is already processed. If this is not true, we need to wait
 		 * here until the engine becomes idle or so... */
-
-//test:
-for (dummy = 0; dummy < 2; dummy++)
-{
-	LOG(4,("ACC_DMA_WRAP: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
-		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
-	LOG(4,("ACC_DMA_WRAP: put $%08x\n", (si->engine.dma.put << 2)));
-}
 
 		/* update the current free space we have left in the DMA buffer */
 		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
