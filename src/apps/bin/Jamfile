@@ -10,6 +10,8 @@ StdBinCommands
 	eject.c
 	finddir.c
 	hd.c
+	ideinfo.c
+	idestatus.c
 	isvolume.cpp
 	listarea.c
 	listimage.c
