@@ -95,7 +95,7 @@ static struct PageFormat
 
 static void GetPageFormat(float w, float h, BString& label) {
 	w = floor(w + 0.5); h = floor(h + 0.5);
-	for (int i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
+	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
 		struct PageFormat& pf = pageFormat[i];
 		if (pf.width == w && pf.height == h || pf.width == h && pf.height == w) {
 			label = pf.label; return;
@@ -128,7 +128,6 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	
 	float left = 10, top = 5;
 	BRect r(left, top, 160, 15);
-	BStringView* string;
 
 		// print selection popup menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
@@ -368,7 +367,6 @@ void ConfigWindow::SetupPrintersMenu(BMenu* menu) {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		BString n;
-		Printer* p;
 		BMessage* m;
 		BMenuItem* item;
 		for (int i = 0; i < Printer::CountPrinters(); i ++) {
@@ -448,7 +446,7 @@ void ConfigWindow::UpdateUI() {
 			// display information about job
 		if (fKind == kJobSetup) {
 			BString job;
-			int32 first, last, copies;
+			int32 first, last;
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
 				if (first >= 1 && first <= last && last != INT_MAX) { 

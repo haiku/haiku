@@ -162,6 +162,8 @@ status_t PrintServerApp::async_thread(void* data)
 	}
 
 	delete p;
+
+	return B_OK;
 }
 
 
