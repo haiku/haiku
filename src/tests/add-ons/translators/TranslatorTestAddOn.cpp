@@ -182,13 +182,13 @@ TestBTranslator(BTestCase *ptest, BTranslator *ptran,
 		
 		int32 incount = 0;
 		const translation_format *pins = ptran->InputFormats(&incount);
-		CPPUNIT_ASSERT(incount == nExpectedIns);
+		CPPUNIT_ASSERT((unsigned)incount == nExpectedIns);
 		CPPUNIT_ASSERT(pins);
 		
 		memset(matches, 0, sizeof(uint8) * nExpectedIns);
 		for (int32 i = 0; i < incount; i++) {
 			bool bmatch = false;
-			for (int32 k = 0; bmatch == false && k < nExpectedIns; k++) {
+			for (uint32 k = 0; bmatch == false && k < nExpectedIns; k++) {
 				bmatch = CompareTranslationFormat(pins + i, pExpectedIns + k);
 				if (bmatch)
 					matches[k] = 1;
@@ -209,13 +209,13 @@ TestBTranslator(BTestCase *ptest, BTranslator *ptran,
 		
 		int32 outcount = 0;
 		const translation_format *pouts = ptran->OutputFormats(&outcount);
-		CPPUNIT_ASSERT(outcount == nExpectedOuts);
+		CPPUNIT_ASSERT((unsigned)outcount == nExpectedOuts);
 		CPPUNIT_ASSERT(pouts);
 		
 		memset(matches, 0, sizeof(uint8) * nExpectedOuts);
 		for (int32 i = 0; i < outcount; i++) {
 			bool bmatch = false;
-			for (int32 k = 0; bmatch == false && k < nExpectedOuts; k++) {
+			for (uint32 k = 0; bmatch == false && k < nExpectedOuts; k++) {
 				bmatch = CompareTranslationFormat(pouts + i, pExpectedOuts + k);
 				if (bmatch)
 					matches[k] = 1;

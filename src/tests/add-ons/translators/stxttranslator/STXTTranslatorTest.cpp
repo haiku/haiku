@@ -386,7 +386,6 @@ STXTTranslatorTest::ConfigMessageTest()
 {
 	// Init
 	NextSubTest();
-	status_t result = B_ERROR;
 	BTranslatorRoster *proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster);
 	CPPUNIT_ASSERT(proster->AddTranslators(
