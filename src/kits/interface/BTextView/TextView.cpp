@@ -35,7 +35,6 @@
 // to refresh only changed parts of text (currently we often redraw the whole text)
 
 // Known Bugs:
-// - some issues when alignment is different than B_ALIGN_LEFT.
 // - visual artifacts appears when you highlight some text which spans between
 // multiple lines and with mixed sizes/styles (could be something in GetTextRegion())
 
@@ -3648,6 +3647,10 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	long maxLine = fLines->NumLines() - 1;
 	startLine = (startLine < 0) ? 0 : startLine;
 	endLine = (endLine > maxLine) ? maxLine : endLine;
+
+	// TODO: See if we can avoid this
+	if (fAlignment != B_ALIGN_LEFT)
+		erase = true;
 
 	BRect eraseRect = clipRect;
 	long startEraseLine = startLine;
