@@ -147,7 +147,9 @@ int
 main()
 {
 //	const char *deviceName = "/dev/disk/virtual/0/raw";
-	const char *deviceName = "/dev/disk/ide/ata/0/master/0/raw";
+//	const char *deviceName = "/dev/disk/ide/ata/0/master/0/raw";
+	const char *deviceName = "/dev/disk/ide/atapi/1/master/0/raw";
+
 	int device = open(deviceName, 0);
 	if (device >= 0) {
 		printf("device: `%s'\n", deviceName);
