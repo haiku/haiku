@@ -1618,10 +1618,6 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 		return B_NO_MORE_FDS;
 	}
 
-	// index directories and queries don't have a vnode but a mount structure attached
-	if (vnode != NULL)
-		cache_node_opened(vnode->cache, vnode->device, vnode->id);
-
 	return fd;
 }
 
@@ -2099,6 +2095,31 @@ vfs_get_file_map(void *_vnode, off_t offset, size_t size, file_io_vec *vecs, siz
 	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, offset %Ld, size = %lu\n", vnode, vecs, offset, size));
 
 	return FS_CALL(vnode, get_file_map)(vnode->mount->cookie, vnode->private_node, offset, size, vecs, _count);
+}
+
+
+status_t
+vfs_stat_vnode(void *_vnode, struct stat *stat)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+		vnode->private_node, stat);
+
+	// fill in the st_dev and st_ino fields
+	if (status == B_OK) {
+		stat->st_dev = vnode->device;
+		stat->st_ino = vnode->id;
+	}
+
+	return status;
+}
+
+
+status_t
+vfs_get_vnode_name(void *_vnode, char *name, size_t nameSize)
+{
+	return get_vnode_name((struct vnode *)_vnode, NULL, name, nameSize);
 }
 
 
@@ -2674,6 +2695,7 @@ file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, in
 	if (status < B_OK)
 		put_vnode(vnode);
 
+	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, mountID, directoryID, vnode->id, name);
 	return status;
 }
 
@@ -2699,6 +2721,7 @@ file_open(int fd, char *path, int openMode, bool kernel)
 	if (status < B_OK)
 		put_vnode(vnode);
 
+	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, vnode->device, -1, vnode->id, NULL);
 	return status;
 }
 
@@ -2710,6 +2733,7 @@ file_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("file_close(descriptor = %p)\n", descriptor));
 
+	cache_node_closed(vnode, FDTYPE_FILE, vnode->cache, vnode->device, vnode->id);
 	if (FS_CALL(vnode, close))
 		return FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 
@@ -2836,8 +2860,6 @@ dir_create(int fd, char *path, int perms, bool kernel)
 	if (status < 0)
 		return status;
 
-
-
 	if (FS_CALL(vnode, create_dir))
 		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
 	else
@@ -2871,6 +2893,7 @@ dir_open_entry_ref(mount_id mountID, vnode_id parentID, const char *name, bool k
 	if (status < B_OK)
 		put_vnode(vnode);
 
+	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, mountID, parentID, vnode->id, name);
 	return status;
 }
 
@@ -2893,6 +2916,7 @@ dir_open(int fd, char *path, bool kernel)
 	if (status < B_OK)
 		put_vnode(vnode);
 
+	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, vnode->device, -1, vnode->id, NULL);
 	return status;
 }
 
@@ -2904,6 +2928,7 @@ dir_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
 
+	cache_node_closed(vnode, FDTYPE_DIR, vnode->cache, vnode->device, vnode->id);
 	if (FS_CALL(vnode, close_dir))
 		return FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 
@@ -4670,12 +4695,12 @@ _kern_next_device(int32 *_cookie)
 
 
 int
-_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode)
+_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms)
 {
-	char nameCopy[B_FILE_NAME_LENGTH];
-	strlcpy(nameCopy, name, sizeof(nameCopy));
+	if (openMode & O_CREAT)
+		return file_create_entry_ref(device, inode, name, openMode, perms, true);
 
-	return file_open_entry_ref(device, inode, nameCopy, openMode, true);
+	return file_open_entry_ref(device, inode, name, openMode, true);
 }
 
 
@@ -4695,10 +4720,13 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode)
  */
 
 int
-_kern_open(int fd, const char *path, int openMode)
+_kern_open(int fd, const char *path, int openMode, int perms)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+
+	if (openMode & O_CREAT)
+		return file_create(pathBuffer, openMode, perms, true);
 
 	return file_open(fd, pathBuffer, openMode, true);
 }
@@ -4779,24 +4807,6 @@ status_t
 _kern_unlock_node(int fd)
 {
 	return common_unlock_node(fd, true);
-}
-
-
-int
-_kern_create_entry_ref(dev_t device, ino_t inode, const char *name,
-	int openMode, int perms)
-{
-	return file_create_entry_ref(device, inode, name, openMode, perms, true);
-}
-
-
-int
-_kern_create(const char *path, int openMode, int perms)
-{
-	char buffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(buffer, path, B_PATH_NAME_LENGTH);
-
-	return file_create(buffer, openMode, perms, true);
 }
 
 
@@ -5457,7 +5467,8 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 
 
 int
-_user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode)
+_user_open_entry_ref(dev_t device, ino_t inode, const char *userName,
+	int openMode, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
@@ -5469,12 +5480,15 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int openMo
 	if (status < B_OK)
 		return status;
 
+	if (openMode & O_CREAT)
+		return file_create_entry_ref(device, inode, name, openMode, perms, false);
+
 	return file_open_entry_ref(device, inode, name, openMode, false);
 }
 
 
 int
-_user_open(int fd, const char *userPath, int openMode)
+_user_open(int fd, const char *userPath, int openMode, int perms)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	int status;
@@ -5485,6 +5499,9 @@ _user_open(int fd, const char *userPath, int openMode)
 	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
 	if (status < 0)
 		return status;
+
+	if (openMode & O_CREAT)
+		return file_create(path, openMode, perms, false);
 
 	return file_open(fd, path, openMode, false);
 }
@@ -5611,40 +5628,6 @@ status_t
 _user_unlock_node(int fd)
 {
 	return common_unlock_node(fd, false);
-}
-
-
-int
-_user_create_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode, int perms)
-{
-	char name[B_FILE_NAME_LENGTH];
-	int status;
-
-	if (!IS_USER_ADDRESS(userName))
-		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(name, userName, sizeof(name));
-	if (status < 0)
-		return status;
-
-	return file_create_entry_ref(device, inode, name, openMode, perms, false);
-}
-
-
-int
-_user_create(const char *userPath, int openMode, int perms)
-{
-	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
-
-	if (!IS_USER_ADDRESS(userPath))
-		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	return file_create(path, openMode, perms, false);
 }
 
 

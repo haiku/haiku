@@ -1014,7 +1014,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 
 	TRACE(("elf_load: entry path '%s', team %p\n", path, p));
 
-	fd = _kern_open(-1, path, 0);
+	fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
 
@@ -1185,7 +1185,7 @@ load_kernel_add_on(const char *path)
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
-	fd = _kern_open(-1, path, 0);
+	fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
 
