@@ -349,9 +349,9 @@ rule Addon
 	LINKFLAGS on $(1) += -nostart -Xlinker -soname=\"$(1)\" ;
 }
 
-rule KernelAddon
+rule R5KernelAddon
 {
-	# KernelAddon <name> : <relpath> : <sources> ;	
+	# R5KernelAddon <name> : <relpath> : <sources> ;	
 
 	local sources = $(3) ;
 
