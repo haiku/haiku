@@ -38,7 +38,9 @@ PortLink::PortLink(port_id port)
 
 	fSendCode=0;
 	fSendBuffer=new char[4096];
-	fSendPosition=4;
+	fSendPosition=8;
+	fDataSize=(int32*)fSendBuffer+sizeof(int32);
+	*fDataSize=0;
 }
 
 PortLink::PortLink( const PortLink &link )
@@ -50,7 +52,9 @@ PortLink::PortLink( const PortLink &link )
 	
 	fSendCode			= 0;
 	fSendBuffer=new char[4096];
-	fSendPosition		= 4;
+	fSendPosition		= 8;
+	fDataSize=(int32*)fSendBuffer+sizeof(int32);
+	*fDataSize=0;
 }
 
 PortLink::~PortLink(void)
@@ -86,12 +90,13 @@ status_t PortLink::Flush(bigtime_t timeout=B_INFINITE_TIMEOUT)
 		return B_BAD_VALUE;
 	
 	if(timeout!=B_INFINITE_TIMEOUT)
-		write_stat=write_port_etc(fSendPort, fSendCode, fSendBuffer,
+		write_stat=write_port_etc(fSendPort, AS_SERVER_PORTLINK, fSendBuffer,
 									fSendPosition, B_TIMEOUT, timeout);
 	else
-		write_stat=write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
+		write_stat=write_port(fSendPort, AS_SERVER_PORTLINK, fSendBuffer, fSendPosition);
 	
-	fSendPosition=4;
+	fSendPosition=8;
+	*fDataSize=0;
 
 	return write_stat;
 }
@@ -105,30 +110,12 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE
 	Attach<int32>(fReceivePort);
 
 	// Flush the thing....FOOSH! :P
-	write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
-	fSendPosition	= 4;
+	write_port(fSendPort, AS_SERVER_PORTLINK, fSendBuffer, fSendPosition);
+	fSendPosition	= 8;
+	*fDataSize=0;
 	
 	// Now we wait for the reply
-	ssize_t	rbuffersize;
-	int8 *rbuffer = NULL;
-	int32 rcode;
-	
-	if( timeout == B_INFINITE_TIMEOUT )
-		rbuffersize	= port_buffer_size(fReceivePort);
-	else
-	{
-		rbuffersize	= port_buffer_size_etc( fReceivePort, 0, timeout);
-		if( rbuffersize == B_TIMED_OUT )
-			return B_TIMED_OUT;
-	}
-
-	if( rbuffersize > 0 )
-		rbuffer	= new int8[rbuffersize];
-	read_port( fReceivePort, &rcode, rbuffer, rbuffersize);
-
-	// We got this far, so we apparently have some data
-	msg->SetCode(rcode);
-	msg->SetBuffer(rbuffer,rbuffersize,false);
+	msg->ReadFromPort(fReceivePort,timeout);
 	
 	return B_OK;
 }
@@ -138,9 +125,11 @@ status_t PortLink::Attach(const void *data, size_t size)
 	if (size <= 0)
 		return B_ERROR;
   
-	if (4096 - fSendPosition > (int32)size){
+	if (4096 - fSendPosition > (int32)size)
+	{
 		memcpy(fSendBuffer + fSendPosition, data, size);
 		fSendPosition += size;
+		*fDataSize+=size;
 		return B_OK;
 	}
 	return B_NO_MEMORY;
@@ -156,6 +145,7 @@ status_t PortLink::AttachString(const char *string)
 
 void PortLink::MakeEmpty()
 {
-	fSendPosition=4;
+	fSendPosition=8;
+	*fDataSize=0;
 }
 

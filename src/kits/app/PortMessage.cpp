@@ -36,12 +36,14 @@ PortMessage::PortMessage(const int32 &code, const void *buffer, const ssize_t &b
 		const bool &copy)
 {
 	_code=code;
+	_protocol=AS_SERVER_PORTLINK;
 	SetBuffer(buffer,buffersize,copy);
 }
 
 PortMessage::PortMessage(void)
 {
 	_code=0;
+	_protocol=AS_SERVER_PORTLINK;
 	_buffer=NULL;
 	_buffersize=0;
 	_index=NULL;
@@ -77,9 +79,11 @@ status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout
 
 	if(_buffersize>0)
 		_buffer=new uint8[_buffersize];
-	read_port(port, &_code, _buffer, _buffersize);
+	read_port(port, &_protocol, _buffer, _buffersize);
+	if(_buffer)
+		_code=*((int32*)_buffer);
 
-	_index=_buffer+4;
+	_index=_buffer+8;
 	
 	return B_OK;
 }
@@ -94,7 +98,7 @@ status_t PortMessage::WriteToPort(const port_id &port)
 	int32 *cast=(int32*)_buffer;
 	*cast=_code;
 	
-	write_port(port,_code, _buffer, _buffersize);
+	write_port(port, AS_SERVER_PORTLINK, _buffer, _buffersize);
 	
 	if(_buffer && _buffersize>0)
 	{
@@ -132,7 +136,7 @@ void PortMessage::SetBuffer(const void *buffer, const ssize_t &size, const bool 
 		_buffersize=size;
 		_buffer=(uint8 *)buffer;
 	}
-	_index=_buffer+4;
+	_index=_buffer+8;
 }
 
 status_t PortMessage::Read(void *data, ssize_t size)
@@ -152,7 +156,7 @@ status_t PortMessage::Read(void *data, ssize_t size)
 
 void PortMessage::Rewind(void)
 {
-	_index=_buffer+4;
+	_index=_buffer+8;
 }
 
 status_t PortMessage::ReadString(char **string)

@@ -60,7 +60,7 @@
 // Local Defines ---------------------------------------------------------------
 
 // Uncomment this to run without the registrar - used only for app_server development!
-//#define RUN_WITHOUT_REGISTRAR
+#define RUN_WITHOUT_REGISTRAR
 
 
 // Globals ---------------------------------------------------------------------

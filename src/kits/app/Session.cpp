@@ -54,7 +54,10 @@ void BSession::SetRecvPort( port_id port ){
 }
 //------------------------------------------------------------------------------
 bool BSession::DropInputBuffer(void){
-	// TODO: Implement
+	// doesn't matter their value, they just need to be equal.
+	fReceiveSize		= 1024;
+	fReceivePosition	= 1024;
+	return true;
 }
 //------------------------------------------------------------------------------
 void BSession::SetMsgCode(int32 code){
