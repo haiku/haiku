@@ -158,7 +158,7 @@ typedef struct _nspace
 
 	int		fs_flags;				// flags for this mount
 
-	lock	vlock;
+	lock	vlock;					// volume lock
 
 	// vcache state
 	struct {

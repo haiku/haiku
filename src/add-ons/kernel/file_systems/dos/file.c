@@ -278,6 +278,7 @@ int dosfs_open(void *_vol, void *_node, int omode, void **_cookie)
 		(node->mode & FAT_READ_ONLY) ||
 		(node->disk_image != 0) ||
 		// allow opening directories for ioctl() calls
+		// and to let BVolume to work
 		(node->mode & FAT_SUBDIR)) {
 		omode = (omode & ~O_RWMASK) | O_RDONLY;
 	}
@@ -337,12 +338,14 @@ int dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 	if (check_nspace_magic((nspace *)vol, "dosfs_read") ||
 		check_vnode_magic(node, "dosfs_read") ||
 		check_filecookie_magic(cookie, "dosfs_read")) {
+		*len = 0;
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_read called on subdirectory %Lx\n", node->vnid));
+		*len = 0;
 		UNLOCK_VOL(vol);
 		return EISDIR;
 	}
@@ -1205,12 +1208,12 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 	if (file->filename) strcpy(file->filename, newname);
 #endif
 
-	// update MIME information
-	if(!(file->mode & FAT_SUBDIR))
-		set_mime_type(file, newname);
-
 	notify_listener(B_ENTRY_MOVED, vol->id, odir->vnid, ndir->vnid, file->vnid, newname);
-	notify_listener(B_ATTR_CHANGED, vol->id, 0, 0, file->vnid, "BEOS:TYPE");
+	// update MIME information
+	if(!(file->mode & FAT_SUBDIR)) {
+		set_mime_type(file, newname);
+		notify_listener(B_ATTR_CHANGED, vol->id, 0, 0, file->vnid, "BEOS:TYPE");
+	}
 
 	result = 0;
 	
