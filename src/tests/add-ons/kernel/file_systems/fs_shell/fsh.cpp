@@ -1996,8 +1996,8 @@ static cmd_entry builtin_commands[] =
     { "rm",      do_rm, "remove the named file" },
     { "rmall",   do_rmall, "remove all the files. if no dirname, use '.'" },
     { "rmdir",   do_rmdir, "remove the named directory" },
-    { "cp",      do_copy, "copy a file to/from myfs. prefix a ':' for host filenames" },
-    { "copy",    do_copy, "same as cp" },
+    { "cp",	     do_xcp, "similar to shell cp, can copy in, out, within, and outside the FS, supports attributes." },
+    { "copy",    do_xcp, "same as cp" },
     { "trunc",   do_trunc, "truncate a file to the size specified" },
     { "seek",    do_seek, "seek to the position specified" },
     { "mv",      do_rename, "rename a file or directory" },
@@ -2024,7 +2024,6 @@ static cmd_entry builtin_commands[] =
     { "stattest", do_stattest, "does an \"early\"/\"late\" stat test for files that are created or deleted" },
     { "link", do_link, "creates the specified [sym]link on the device" },
     { "ln", do_link, "creates the specified [sym]link on the device" },
-    { "xcp",	 do_xcp, "similar to shell cp, can copy in, out, within, and outside the FS, supports attributes." },
 
     { NULL, NULL }
 };
