@@ -11,16 +11,17 @@
 #include <agg_renderer_primitives.h>
 #include <agg_renderer_scanline.h>
 #include <agg_scanline_bin.h>
-#include <agg_scanline_p.h>
-//#include <agg_scanline_u.h>
+//#include <agg_scanline_p.h>
+#include <agg_scanline_u.h>
 #include <agg_rendering_buffer.h>
 
+//#include "_for_reference_.h"
 #include "forwarding_pixfmt.h"
 
 #define ALIASED_DRAWING 0
 
 //	typedef agg::pixfmt_bgra32									pixfmt;
-	typedef agg::forwarding_pixel_format<agg::order_bgra32>		pixfmt;
+	typedef forwarding_pixel_format<agg::order_bgra32>			pixfmt;
 	typedef agg::renderer_mclip<pixfmt>							renderer_base;
 
 #if ALIASED_DRAWING
@@ -34,7 +35,7 @@
 	typedef agg::renderer_outline_aa<renderer_base>				outline_renderer_type;
 	typedef agg::rasterizer_outline_aa<outline_renderer_type>	outline_rasterizer_type;
 
-	typedef agg::scanline_p8									scanline_type;
+	typedef agg::scanline_u8									scanline_type;
 	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 	typedef agg::renderer_scanline_aa_solid<renderer_base>		renderer_type;
 #endif
