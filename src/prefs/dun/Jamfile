@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src prefs dun ;
+
+AddResources DialUpNetworking : DUN.rsrc ;
+
+Preference DialUpNetworking : DUN.cpp DUNView.cpp ModemWindow.cpp DUNWindow.cpp ;
+
+LinkSharedOSLibs DialUpNetworking : be tracker ;

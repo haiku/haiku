@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src prefs virtualmemory ;
+
+AddResources VirtualMemory : Resource.rsrc ;
+
+Preference VirtualMemory : main.cpp MainWindow.cpp VMSettings.cpp ;
+
+LinkSharedOSLibs VirtualMemory : be root ;

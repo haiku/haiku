@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src prefs fonts ;
+
+AddResources Fonts : Resource.rsrc ;
+
+Preference Fonts :
+	ButtonView.cpp
+	FontSelectionView.cpp
+	FontView.cpp
+	main.cpp
+	MainWindow.cpp
+	CacheView.cpp ;
+
+LinkSharedOSLibs Fonts : be ;

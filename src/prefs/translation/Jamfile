@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src prefs translation ;
+
+AddResources DataTranslations2 : DataTranslations.FileTypes.rsrc ;
+
+Preference DataTranslations2 :
+	LView.cpp
+	transwin.cpp
+	datatrans.cpp ;
+
+LinkSharedOSLibs DataTranslations2 : be translation ;

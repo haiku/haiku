@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src prefs print ;
+
+UsePrivateHeaders interface ;
+
+AddResources Printers : Printers.FileTypes.rsrc ;
+
+Preference Printers :
+	Printers.cpp
+	PrintersWindow.cpp
+	PrinterListView.cpp
+	Globals.cpp ;
+
+LinkSharedOSLibs Printers : be ;

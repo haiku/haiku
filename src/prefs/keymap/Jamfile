@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src prefs keymap ;
+
+AddResources Keymap : Resource.rsrc ;
+
+Preference Keymap :
+	main.cpp
+	KeymapApplication.cpp
+	KeymapWindow.cpp
+	KeymapListItem.cpp ;
+
+LinkSharedOSLibs Keymap : be ;

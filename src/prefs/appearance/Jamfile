@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src prefs appearance ;
+
+Preference Appearance : APRMain.cpp APRView.cpp APRWindow.cpp PortLink.cpp ;
+
+LinkSharedOSLibs Appearance : be ;

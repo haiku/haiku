@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src prefs datatranslations ;
+
+AddResources DataTranslations : DataTranslations.rsrc ;
+
+Preference DataTranslations :
+	DataTranslations.cpp
+	DataTranslationsWindow.cpp
+	DataTranslationsView.cpp
+	DataTranslationsSettings.cpp ;
+
+LinkSharedOSLibs DataTranslations : be translation ;

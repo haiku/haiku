@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src prefs screensaver ;
+
+Preference ScreenSaver :
+	OBOSScreenSaverPreferences.cpp
+	ScreenSaver.cpp
+	pwWindow.cpp
+	PreviewView.cpp
+	MouseAreaView.cpp ;
+
+LinkSharedOSLibs ScreenSaver : be stdc++.r4 ;
