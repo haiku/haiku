@@ -8,7 +8,6 @@
 #include <boot/stage2.h>
 #include <ktypes.h>
 
-extern void _start(uint32 mem, int in_vesa, uint32 vesa_ptr);
 extern void clearscreen(void);
 extern void kputs(const char *str);
 extern int dprintf(const char *fmt, ...);
