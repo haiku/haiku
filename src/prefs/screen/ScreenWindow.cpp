@@ -136,16 +136,35 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fControlsBox->AddChild(fResolutionField);
 	
 	fColorsMenu = new BPopUpMenu("8 Bits/Pixel", true, true);
-	fColorsMenu->AddItem(new BMenuItem("8 Bits/Pixel", new BMessage(POP_COLORS_MSG)));
-	fColorsMenu->AddItem(new BMenuItem("15 Bits/Pixel", new BMessage(POP_COLORS_MSG)));
-	fColorsMenu->AddItem(new BMenuItem("16 Bits/Pixel", new BMessage(POP_COLORS_MSG)));
-	fColorsMenu->AddItem(new BMenuItem("32 Bits/Pixel", new BMessage(POP_COLORS_MSG)));
+	
+	// Get the supported colorspaces
+	for (uint32 c = 0; c < fTotalModes; c++) {
+		BString colorSpace;
+		switch (fSupportedModes[c].space) {
+			case B_CMAP8:
+				colorSpace = "8 Bits/Pixel";
+				break;
+			case B_RGB15:
+				colorSpace = "15 Bits/Pixel";
+				break;
+			case B_RGB16:
+				colorSpace = "16 Bits/Pixel";
+				break;
+			case B_RGB32:
+				colorSpace = "32 Bits/Pixel";
+				break;
+		}
+		if (!fColorsMenu->FindItem(colorSpace.String()))
+			fColorsMenu->AddItem(new BMenuItem(colorSpace.String(),
+				new BMessage(POP_COLORS_MSG)));
+		
+	}
 	
 	ControlMenuRect.Set(50.0, 58.0, 171.0, 76.0);
 	
 	fColorsField = new BMenuField(ControlMenuRect, "ColorsMenu", "Colors:", fColorsMenu, true);
 	
-	Marked = fColorsMenu->FindItem("8 Bits/Pixel");
+	Marked = fColorsMenu->ItemAt(0);
 	Marked->SetMarked(true);
 	
 	fColorsField->SetDivider(38.0);
@@ -159,7 +178,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fRefreshMenu->AddItem(new BMenuItem("72 Hz", new BMessage(POP_REFRESH_MSG)));
 	fRefreshMenu->AddItem(new BMenuItem("75 Hz", new BMessage(POP_REFRESH_MSG)));
 	fRefreshMenu->AddItem(new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG)));
-	
+		
 	ControlMenuRect.Set(19.0, 86.0, 171.0, 104.0);
 	
 	fRefreshField = new BMenuField(ControlMenuRect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
@@ -239,27 +258,29 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	String << fInitialRefreshN << " Hz";
 	
 	Marked = fRefreshMenu->FindItem(String.String());
-	if (Marked != NULL)
-	{
-		Marked->SetMarked(true);
-		
+	
+	if (Marked != NULL)	{
+	
+		Marked->SetMarked(true);	
 		fInitialRefresh = Marked;
-	} else {
-		BMenuItem *Other = fRefreshMenu->FindItem("Other...");
 		
+	} else 	{
+		
+		BMenuItem *Other = fRefreshMenu->FindItem("Other...");	
 		String.Truncate(0);
 	
 		String << fInitialRefreshN;
 		
-		int32 point = String.FindFirst(' ');
-		String.Truncate(4);
+		int32 point = String.FindFirst('.');
+		String.Truncate(point + 2);
 		
 		String << " Hz/Other...";
 	
 		Other->SetLabel(String.String());
 		Other->SetMarked(true);
 		
-		String.Truncate(7);
+		point = String.FindFirst('/');
+		String.Truncate(point);
 		
 		fRefreshMenu->Superitem()->SetLabel(String.String());
 		
@@ -328,8 +349,7 @@ ScreenWindow::CheckApplyEnabled()
 	else
 		equals--;
 		
-	if(equals != 3)
-	{
+	if(equals != 3)	{
 		fApplyButton->SetEnabled(true);
 		fRevertButton->SetEnabled(true);
 	} else {
@@ -522,8 +542,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces"))
 			{			
-				BAlert *WorkspacesAlert = new BAlert("WorkspacesAlert", "Change all workspaces? 
-					This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				BAlert *WorkspacesAlert = new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
  				
  				int32 button = WorkspacesAlert->Go();
  				
@@ -536,7 +555,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 				for (int32 count = 0; count < totalWorkspaces; count ++)
 				{
 					activate_workspace(count);
-					screen.SetMode(mode);
+					screen.SetMode(mode, true);
 				}
 				
 				activate_workspace(old);
@@ -551,8 +570,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			Rect.right = Rect.left + 300.0;
 			Rect.bottom = Rect.top + 93.0;
 			
-			new AlertWindow(Rect);
-			
+		 	new AlertWindow(Rect);
+									
 			fApplyButton->SetEnabled(false);
 			
 			break;
@@ -597,6 +616,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 				
 			display_mode mode;					
 			screen.GetMode(&mode);
+			screen.SetMode(&mode, true);
 		
 			fInitialRefreshN = fCustomRefresh;
 			fInitialResolution = fResolutionMenu->FindMarked();
