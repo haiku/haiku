@@ -206,7 +206,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	if (!error) {
 		MemoryChunk chunk(logicalVolumeDescriptor.file_set_address().length());
 	
-		status_t error = chunk.InitCheck();
+		error = chunk.InitCheck();
 
 		if (!error) {
 			off_t address;
@@ -218,7 +218,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			if (!error) {
 				ssize_t bytesRead = read_pos(device, address, chunk.Data(),
 				                             blockSize);
-				if (bytesRead != (ssize_t)blockSize) {
+				if (bytesRead != ssize_t(blockSize)) {
 					error = B_IO_ERROR;
 					PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n",
 					       address, blockSize, bytesRead));
@@ -228,10 +228,15 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			if (!error) {
 				file_set_descriptor *fileSet =
 				 	reinterpret_cast<file_set_descriptor*>(chunk.Data());
-				fileSet->tag().init_check(0);
-				PDUMP(fileSet);
-				fRootIcb = new Icb(this, fileSet->root_directory_icb());
-				error = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
+				error = fileSet->tag().id() == TAGID_FILE_SET_DESCRIPTOR
+				        ? B_OK : B_ERROR;
+				if (!error) 
+					error = fileSet->tag().init_check(0);
+				if (!error) {
+					PDUMP(fileSet);
+					fRootIcb = new Icb(this, fileSet->root_directory_icb());
+					error = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
+				}
 				if (!error) {
 					error = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
 					if (error) {
@@ -291,6 +296,7 @@ Volume::MapBlock(long_address address, off_t *mappedBlock)
 void
 Volume::_Unset()
 {
+	DEBUG_INIT("Volume");
 	fId = 0;
 	fDevice = 0;
 	fMounted = false;
