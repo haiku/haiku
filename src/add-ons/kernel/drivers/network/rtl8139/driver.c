@@ -846,7 +846,8 @@ static status_t
 close_hook (void* cookie)
 {
 	rtl8139_properties_t * data = (rtl8139_properties_t *) cookie;
-	m_pcimodule->write_io_8( data->reg_base + Command , Reset );
+	//Stop Rx and Tx process
+	m_pcimodule->write_io_8( data->reg_base + Command , 0 );
 	m_pcimodule->write_io_16( data->reg_base + IMR , 0 );
 	return B_OK;
 }
@@ -859,6 +860,28 @@ close_hook (void* cookie)
 static status_t
 rtl8139_free (void* cookie)
 {
+	rtl8139_properties_t *data = (rtl8139_properties_t *) cookie;
+
+	dprintf( "rtl8139_nielx free_hook()\n" );
+	
+	//Remove interrupt handler
+	remove_io_interrupt_handler( data->pcii->u.h0.interrupt_line , 
+	                             rtl8139_interrupt , cookie );
+	
+	//Free Rx and Tx buffers
+	delete_area( data->receivebuffer );
+	delete_area( data->transmitbuffer[0] );
+	delete_area( data->transmitbuffer[2] );
+	
+	//Finally, free the cookie
+	free( data );
+	
+	//Put the pci module
+	put_module( B_PCI_MODULE_NAME );
+	
+	//To conclude: set the status of the device to closed
+	m_isopen = 0;
+	
 	return B_OK;
 }
 

@@ -1,6 +1,4 @@
 - A major code cleanup
 - Confirm to the Opentracker coding guidelines
-- Implement the free_hook
 - Support other card types
 - Implement support for more than one card
-- Fix strange slowness
