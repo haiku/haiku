@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src tests kits net netperf ;
+
+SimpleTest netperf : 
+	netperf.c
+	netsh.c
+	netlib.c
+	nettest_bsd.c
+	nettest_dlpi.c
+	nettest_unix.c
+	nettest_xti.c
+	nettest_ipv6.c
+	nettest_dns.c
+	: net
+	;
