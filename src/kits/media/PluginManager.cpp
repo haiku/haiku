@@ -1,3 +1,9 @@
+/* 
+** Copyright 2004, Marcus Overhagen. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
 #include <Path.h>
 #include <image.h>
 #include <string.h>
@@ -8,18 +14,18 @@
 
 PluginManager _plugin_manager;
 
+
 status_t
 _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
 {
 	printf("_CreateReader enter\n");
-	
+
 	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
-	
 	if (seekable_source == 0) {
 		printf("_CreateReader: non-seekable sources not supported yet\n");
 		return B_ERROR;
 	}
-	
+
 	// get list of available readers from, the server
 	server_get_readers_request request;
 	server_get_readers_reply reply;
@@ -27,7 +33,7 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 		printf("_CreateReader: can't get list of readers\n");
 		return B_ERROR;
 	}
-	
+
 	// try each reader by calling it's Sniff function...
 	for (int32 i = 0; i < reply.count; i++) {
 		entry_ref ref = reply.ref[i];
@@ -36,24 +42,24 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 			printf("_CreateReader: GetPlugin failed\n");
 			return B_ERROR;
 		}
-	
-		ReaderPlugin *readerplugin = dynamic_cast<ReaderPlugin *>(plugin);
-		if (!readerplugin) {
+
+		ReaderPlugin *readerPlugin = dynamic_cast<ReaderPlugin *>(plugin);
+		if (!readerPlugin) {
 			printf("_CreateReader: dynamic_cast failed\n");
 			return B_ERROR;
 		}
-	
-		*reader = readerplugin->NewReader();
+
+		*reader = readerPlugin->NewReader();
 		if (! *reader) {
 			printf("_CreateReader: NewReader failed\n");
 			return B_ERROR;
 		}
-	
+
 		seekable_source->Seek(0, SEEK_SET);
 		(*reader)->Setup(seekable_source);
-	
+
 		if (B_OK == (*reader)->Sniff(streamCount)) {
-			printf("_CreateReader: Sniff success\n");
+			printf("_CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
 			return B_OK;
 		}
@@ -67,8 +73,9 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 	return B_MEDIA_NO_HANDLER;
 }
 
+
 status_t
-_CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *format)
+_CreateDecoder(Decoder **_decoder, media_codec_info *codecInfo, const media_format *format)
 {
 	printf("_CreateDecoder enter\n");
 
@@ -81,32 +88,28 @@ _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *for
 		return B_ERROR;
 	}
 
-	MediaPlugin *plugin;
-	DecoderPlugin *decoderplugin;
-	
-	plugin = _plugin_manager.GetPlugin(reply.ref);
+	MediaPlugin *plugin = _plugin_manager.GetPlugin(reply.ref);
 	if (!plugin) {
 		printf("_CreateDecoder: GetPlugin failed\n");
 		return B_ERROR;
 	}
 	
-	decoderplugin = dynamic_cast<DecoderPlugin *>(plugin);
-	if (!decoderplugin) {
+	DecoderPlugin *decoderPlugin = dynamic_cast<DecoderPlugin *>(plugin);
+	if (!decoderPlugin) {
 		printf("_CreateDecoder: dynamic_cast failed\n");
 		return B_ERROR;
 	}
 	
-	*decoder = decoderplugin->NewDecoder();
-	if (! *decoder) {
-		printf("_CreateDecoder: NewReader failed\n");
+	*_decoder = decoderPlugin->NewDecoder();
+	if (*_decoder == NULL) {
+		printf("_CreateDecoder: NewDecoder() failed\n");
 		return B_ERROR;
 	}
-	
-	strcpy(mci->short_name,  " mci short_name");
-	strcpy(mci->pretty_name, " mci pretty_name");
-	
+
+	(*_decoder)->GetCodecInfo(*codecInfo);
+
 	printf("_CreateDecoder leave\n");
-	
+
 	return B_OK;
 }
 
@@ -114,14 +117,20 @@ _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *for
 void
 _DestroyReader(Reader *reader)
 {
+	// ToDo: must call put plugin
 	delete reader;
 }
+
 
 void
 _DestroyDecoder(Decoder *decoder)
 {
+	// ToDo: must call put plugin
 	delete decoder;
 }
+
+
+//	#pragma mark -
 
 
 PluginManager::PluginManager()
