@@ -19,6 +19,8 @@ for subdir in $(subdirs) {
 }
 
 UsePrivateHeaders shared app [ FDirName servers app ] ;
+UsePrivateHeaders kernel ;
+	# for syscalls.h
 
 # Add subsubdirs to the SEARCH_SOURCE.
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
