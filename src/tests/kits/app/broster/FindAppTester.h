@@ -11,6 +11,7 @@
 // System Includes -------------------------------------------------------------
 
 // Project Includes ------------------------------------------------------------
+#include <TestCase.h>
 
 // Local Includes --------------------------------------------------------------
 #include "../common.h"
@@ -19,11 +20,11 @@
 
 // Globals ---------------------------------------------------------------------
 
-class FindAppTester : public TestCase
+class FindAppTester : public BTestCase
 {
 	public:
 		FindAppTester() {;}
-		FindAppTester(std::string name) : TestCase(name) {;}
+		FindAppTester(std::string name) : BTestCase(name) {;}
 
 		void setUp();
 		void tearDown();
@@ -31,20 +32,17 @@ class FindAppTester : public TestCase
 		void FindAppTestA1();
 		void FindAppTestA2();
 		void FindAppTestA3();
-		void FindAppTestA4();
-		void FindAppTestA5();
-		void FindAppTestA6();
-		void FindAppTestA7();
-		void FindAppTestA8();
-		void FindAppTestA9();
-		void FindAppTestA10();
-		void FindAppTestA11();
-		void FindAppTestA12();
-		void FindAppTestA13();
-		void FindAppTestA14();
-		void FindAppTestA15();
 
 		void FindAppTestB1();
+		void FindAppTestB2();
+		void FindAppTestB3();
+		void FindAppTestB4();
+		void FindAppTestB5();
+		void FindAppTestB6();
+		void FindAppTestB7();
+		void FindAppTestB8();
+		void FindAppTestB9();
+		void FindAppTestB10();
 
 		static Test* Suite();
 
