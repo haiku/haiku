@@ -5,6 +5,7 @@ UsePrivateHeaders shared ;
 
 # standard commands that don't need any additional library
 StdBinCommands
+	catattr.cpp
 	chop.c
 	clear.c
 	clockconfig.c
@@ -80,7 +81,6 @@ StdBinCommands
 
 # standard commands that need libbe.so, libstdc++.r4.so
 StdBinCommands
-	catattr.cpp
 	roster.cpp
 	: be stdc++.r4
 	;
