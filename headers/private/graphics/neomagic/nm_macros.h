@@ -201,6 +201,7 @@
 /* NeoMagic PCI acceleration registers */
 #define NMACC_STATUS			0x0000
 #define NMACC_BLTCNTL			0x0004
+#define NMACC_FGCOLOR			0x000c
 #define NMACC_SRCSTARTOFF		0x0024
 #define NMACC_DSTSTARTOFF		0x002c
 #define NMACC_XYEXT				0x0030

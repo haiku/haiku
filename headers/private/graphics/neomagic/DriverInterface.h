@@ -154,6 +154,7 @@ typedef struct {
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
 		uint32		control;	/* colordepth, memory pitch and other config stuff */
+		uint8		depth;		/* bytes per pixel used */
 	} engine;
 
   /* card info - information gathered from PINS (and other sources) */
