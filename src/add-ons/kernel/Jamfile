@@ -2,6 +2,7 @@ SubDir OBOS_TOP src add-ons kernel ;
 
 SubInclude OBOS_TOP src add-ons kernel bus_managers ;
 SubInclude OBOS_TOP src add-ons kernel busses ;
+SubInclude OBOS_TOP src add-ons kernel console ;
 SubInclude OBOS_TOP src add-ons kernel disk_scanner ;
 SubInclude OBOS_TOP src add-ons kernel drivers ;
 SubInclude OBOS_TOP src add-ons kernel file_systems ;
