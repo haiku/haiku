@@ -26,6 +26,7 @@ public:
 	//------------------------------------------------------------
 #if !TEST_R5
 	void BTranslatorBasicTest();
+	void BTranslatorIdentifyErrorTest();
 	void BTranslatorIdentifyTest();
 #endif
 
