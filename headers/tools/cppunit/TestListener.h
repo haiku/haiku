@@ -2,6 +2,7 @@
 #define _beos_test_listener_h_
 
 #include <cppunit/TestListener.h>
+#include <SupportDefs.h>
 
 class CppUnit::Test;
 class CppUnit::TestFailure;
@@ -21,7 +22,9 @@ public:
 	virtual void addFailure( const CppUnit::TestFailure &failure );
     virtual void endTest( CppUnit::Test *test );
 protected:
+	void printTime(bigtime_t time);
 	bool fOkay;
+	bigtime_t startTime;
 };
 
 #endif // _beos_test_listener_h_
