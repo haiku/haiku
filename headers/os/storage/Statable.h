@@ -22,7 +22,7 @@ namespace OpenBeOS {
   class BVolume;
   
 
-	//! BStatable - A nice C++ wrapper to <code>\sa stat()</code>
+	//! BStatable - A nice C++ wrapper to <code>stat()</code>
 	/*! A purly abstract class which provieds an expenive, but convenet 
 	 * C++ wrapper to the posix <code>\sa stat()</code> command. 
 	 *
