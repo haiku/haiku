@@ -37,8 +37,6 @@ static kernel_args ka;
 
 static int main2(void *);
 
-int net_init(kernel_args *ka);
-
 int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
 int _start(kernel_args *oldka, int cpu_num)
 {
@@ -121,13 +119,11 @@ static int main2(void *unused)
 	// bootstrap all the filesystems
 	vfs_bootstrap_all_filesystems();
 
-	//net_init(&ka);
 	dev_init(&ka);
 	module_init(&ka, NULL);
 	bus_init(&ka);
 	devs_init(&ka);
 	con_init(&ka);
-	net_init(&ka);
 	
 	//net_init_postdev(&ka);
 
