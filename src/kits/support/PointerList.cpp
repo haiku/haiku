@@ -1,7 +1,7 @@
 /* 
 ** Copyright 2003-2004, Stefano Ceccherini (burton666@libero.it). All rights reserved.
 **           2004, Michael Pfeiffer (laplace@users.sourceforge.net).
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 **
 ** History
 ** 2003-2004  Initial implementation by Stefano Ceccerini.
@@ -53,8 +53,7 @@ protected:
 };
 #endif
 
-class AbstractPointerListHelper 
-{
+class AbstractPointerListHelper {
 public:
 	AbstractPointerListHelper() {};
 	
@@ -104,7 +103,8 @@ private:
 };
 
 
-void AbstractPointerListHelper::Swap(void **items, int32 i, int32 j)
+void
+AbstractPointerListHelper::Swap(void **items, int32 i, int32 j)
 {
 	void *swap = items[i];
 	items[i] = items[j];
@@ -112,7 +112,8 @@ void AbstractPointerListHelper::Swap(void **items, int32 i, int32 j)
 }
 
 
-int32 AbstractPointerListHelper::BinarySearchIndex(const void* key, const BList *list)
+int32
+AbstractPointerListHelper::BinarySearchIndex(const void *key, const BList *list)
 {
 	int32 index;
 	const void **items = static_cast<const void**>(list->Items());
@@ -121,7 +122,8 @@ int32 AbstractPointerListHelper::BinarySearchIndex(const void* key, const BList 
 }
 
 
-void* AbstractPointerListHelper::BinarySearch(const void* key, const BList *list)
+void *
+AbstractPointerListHelper::BinarySearch(const void *key, const BList *list)
 {
 	int32 index;
 	const void **items = static_cast<const void**>(list->Items());
@@ -129,14 +131,16 @@ void* AbstractPointerListHelper::BinarySearch(const void* key, const BList *list
 }
 
 
-void AbstractPointerListHelper::SortItems(BList *list)
+void
+AbstractPointerListHelper::SortItems(BList *list)
 {
 	void **items = static_cast<void**>(list->Items());
 	QuickSort(items, 0, list->CountItems()-1);
 }
 
 
-void AbstractPointerListHelper::HSortItems(BList *list)
+void
+AbstractPointerListHelper::HSortItems(BList *list)
 {
 	void **items = static_cast<void**>(list->Items());
 	int32 numItems = list->CountItems();
@@ -149,15 +153,17 @@ void AbstractPointerListHelper::HSortItems(BList *list)
 }
 
 
-void* AbstractPointerListHelper::BinarySearch(const void* key, const void** items, int32 numItems, int32& index)
+void *
+AbstractPointerListHelper::BinarySearch(const void *key, const void **items, int32 numItems, int32 &index)
 {
 	int32 low = 0;
 	int32 high = numItems-1;
 	int result = 0;
 	index = 0;
+
 	while (low <= high) {
 		index = (low + high) / 2;
-		const void* item = items[index];
+		const void *item = items[index];
 		result = Compare(key, item);
 		if (result < 0) {
 			// key < item
@@ -182,10 +188,11 @@ void* AbstractPointerListHelper::BinarySearch(const void* key, const void** item
 }
 
 
-int32 AbstractPointerListHelper::ChoosePivot(void **items, int32 low, int32 high)
+int32
+AbstractPointerListHelper::ChoosePivot(void **items, int32 low, int32 high)
 {
-	if (kPivotThreshold <= kQuickSortThreshold || 
-		high - low > kPivotThreshold) {
+	if (kPivotThreshold <= kQuickSortThreshold
+		|| high - low > kPivotThreshold) {
 		assert(high - low > kPivotThreshold);
 		// choose the middle item of three items
  		int32 mid = (low + high) / 2;
@@ -227,7 +234,8 @@ int32 AbstractPointerListHelper::ChoosePivot(void **items, int32 low, int32 high
 }
 
 
-int32 AbstractPointerListHelper::Partition(void **items, int32 low, int32 high, bool& isSorted)
+int32
+AbstractPointerListHelper::Partition(void **items, int32 low, int32 high, bool &isSorted)
 {
 	assert(low < high);
 	int32 left  = low; 
@@ -256,10 +264,9 @@ int32 AbstractPointerListHelper::Partition(void **items, int32 low, int32 high, 
 	isSorted = false;
 
 	// pivot element has to be first element in list
-	if (low != pivot) {
+	if (low != pivot)
 		Swap(items, low, pivot);
-	}
-	
+
 	// now partion the array in a left part where item <= pivotItem
 	// and a right part where item > pivotItem
 	do {
@@ -286,7 +293,8 @@ int32 AbstractPointerListHelper::Partition(void **items, int32 low, int32 high, 
 }
 
 
-void AbstractPointerListHelper::InsertionSort(void **items, int32 numItems)
+void
+AbstractPointerListHelper::InsertionSort(void **items, int32 numItems)
 {
 	for (int32 i = 1; i < numItems; i ++) {
 		// treat list[0 .. i-1] as sorted
@@ -305,13 +313,15 @@ void AbstractPointerListHelper::InsertionSort(void **items, int32 numItems)
 }
 
 
-void AbstractPointerListHelper::InsertionSort(void **items, int32 low, int32 high)
+void
+AbstractPointerListHelper::InsertionSort(void **items, int32 low, int32 high)
 {
 	InsertionSort(&items[low], high - low + 1);
 }
 
 
-void AbstractPointerListHelper::QuickSort(void **items, int32 low, int32 high)
+void
+AbstractPointerListHelper::QuickSort(void **items, int32 low, int32 high)
 {
 	if (low < high) {
 		if (high - low < kQuickSortThreshold) {
@@ -328,8 +338,7 @@ void AbstractPointerListHelper::QuickSort(void **items, int32 low, int32 high)
 }
 
 
-class PointerListHelper : public AbstractPointerListHelper
-{
+class PointerListHelper : public AbstractPointerListHelper {
 public:
 	PointerListHelper(_PointerList_::GenericCompareFunction compareFunc)
 		: fCompareFunc(compareFunc)
@@ -337,7 +346,8 @@ public:
 		// nothing to do
 	}
 	
-	int Compare(const void *a, const void *b) {
+	int Compare(const void *a, const void *b)
+	{
 		return fCompareFunc(a, b);
 	}
 	
@@ -358,7 +368,8 @@ public:
 		// nothing to do
 	}
 
-	int Compare(const void *a, const void *b) {
+	int Compare(const void *a, const void *b)
+	{
 		return fCompareFunc(a, b, fState);
 	}
 
@@ -378,7 +389,8 @@ public:
 		// nothing to do
 	}
 
-	int Compare(const void *arg, const void *item) {
+	int Compare(const void *arg, const void *item)
+	{
 		// need to adapt arguments and return value
 		return -fPredicate(item, const_cast<void *>(arg));
 	}
