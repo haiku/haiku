@@ -24,6 +24,7 @@ extern "C" {
 #include "cpp.h"
 #include "UdfDebug.h"
 
+#include "CS0String.h"
 #include "DiskStructures.h"
 #include "PartitionMap.h"
 
@@ -49,6 +50,8 @@ public:
 	off_t Length() const { return fLength; }
 	
 	uint32 BlockSize() const { return fBlockSize; }
+	uint32 BlockShift() const { return fBlockShift; }
+	
 	off_t AddressForRelativeBlock(off_t block) { return (Start() + block) * BlockSize(); }
 	off_t RelativeAddress(off_t address) { return Start() * BlockSize() + address; }
 		
@@ -60,6 +63,11 @@ public:
 		ssize_t Read(AddressType address, ssize_t length, void *data);
 		
 	Icb* RootIcb() { return fRootIcb; }
+
+	status_t MapAddress(udf_long_address address, off_t *mappedAddress);
+	off_t MapAddress(udf_extent_address address);
+	status_t MapBlock(udf_long_address address, off_t *mappedBlock);
+	off_t MapAddress(udf_short_address address);
 private:
 	Volume();						// unimplemented
 	Volume(const Volume &ref);		// unimplemented
@@ -75,10 +83,6 @@ private:
 		B_INITIALIZED = B_OK,
 	};
 	
-	off_t _MapAddress(udf_extent_address address);
-	status_t _MapBlock(udf_long_address address, off_t *mappedBlock);
-	status_t _MapAddress(udf_long_address address, off_t *mappedAddress);
-	off_t _MapAddress(udf_short_address address);
 	
 	// Called by Mount(), either directly or indirectly
 	status_t _Identify();
@@ -95,12 +99,14 @@ private:
 	off_t fStart;	//!< Starting block of the volume on the given device
 	off_t fLength;	//!< Block length of volume on the given device
 	uint32 fBlockSize;
+	uint32 fBlockShift;
 
 	status_t fInitStatus;
 	
 	udf_logical_descriptor fLogicalVD;
 	PartitionMap fPartitionMap;
 	Icb *fRootIcb;	// Destroyed by vfs via callback to udf_release_node()
+	CS0String fName;
 };
 
 //----------------------------------------------------------------------
@@ -116,7 +122,7 @@ Volume::Read(AddressType address, ssize_t length, void *data)
 	off_t mappedAddress;
 	status_t err = data ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = _MapAddress(address, &mappedAddress);
+		err = MapAddress(address, &mappedAddress);
 	if (!err) {
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
 		if (bytesRead != (ssize_t)BlockSize()) {

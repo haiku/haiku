@@ -25,6 +25,7 @@ Volume::Volume(nspace_id id)
 	, fReadOnly(false)
 	, fStart(0)
 	, fBlockSize(0)
+	, fBlockShift(0)
 	, fInitStatus(B_UNINITIALIZED)
 	, fRootIcb(NULL)
 {
@@ -52,7 +53,23 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 	if (_InitStatus() == B_INITIALIZED)
 		RETURN_ERROR(B_BUSY);
 			// Already mounted, thank you for asking
-		
+
+	// Check the block size
+	uint32 bitCount = 0;
+	for (int i = 0; i < 32; i++) {
+		// Zero out all bits except bit i
+		uint32 block = blockSize & (uint32(1) << i);
+		if (block) {
+			if (++bitCount > 1) {
+				PRINT(("Block size must be a power of two! (blockSize = %ld)\n", blockSize));
+				RETURN(B_BAD_VALUE);
+			} else {
+				fBlockShift = i;
+				PRINT(("BlockShift() = %ld\n", BlockShift()));
+			}			
+		}
+	}
+	
 	fReadOnly = flags & B_READ_ONLY;
 	fStart = volumeStart;
 	fLength = volumeLength;	
@@ -82,20 +99,37 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 		fInitStatus = B_DEVICE_INITIALIZED;
 	}
 	
-	// Now identify the volume
-	if (!err)
+	err = init_cache_for_device(Device(), Length());
+	if (!err) {
+		// Now identify the volume
 		err = _Identify();
-		
-	// Success, create a vnode for the root
-	if (!err)
-		err = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
+		if (!err) {
+			// Success, create a vnode for the root
+			err = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
+			if (err) {
+				PRINT(("Error create vnode for root icb! error = 0x%lx, `%s'\n",
+				       err, strerror(err)));
+			}
+		} else {
+			PRINT(("Error identifying a valid Udf volume! error = 0x%lx, `%s'\n",
+				   err, strerror(err)));
+		}	
+	} else {
+		PRINT(("Error initializing buffer cache! error = 0x%lx, `%s'\n",
+		       err, strerror(err)));
+	}
 
+	
 	RETURN(err);
 }
-
+ 
+const char*
+Volume::Name() const {
+	return fName.String();
+}
 
 off_t
-Volume::_MapAddress(udf_extent_address address)
+Volume::MapAddress(udf_extent_address address)
 {
 	return address.location() * BlockSize();	
 }
@@ -104,7 +138,7 @@ Volume::_MapAddress(udf_extent_address address)
 /*! \brief Maps the given \c udf_long_address to an absolute block address.
 */
 status_t
-Volume::_MapBlock(udf_long_address address, off_t *mappedBlock)
+Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 {
 	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume", ("long_address(block: %ld, partition: %d), %p",
 		address.block(), address.partition(), mappedBlock));
@@ -121,17 +155,17 @@ Volume::_MapBlock(udf_long_address address, off_t *mappedBlock)
 			PRINT(("mapped to block %lld\n", *mappedBlock));
 		}
 	}
-	RETURN_ERROR(err);
+	RETURN(err);
 }
 
 /*! \brief Maps the given \c udf_long_address to an absolute byte address.
 */
 status_t
-Volume::_MapAddress(udf_long_address address, off_t *mappedAddress)
+Volume::MapAddress(udf_long_address address, off_t *mappedAddress)
 {
 	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume", ("long_address(block: %ld, partition: %d), %p",
 		address.block(), address.partition(), mappedAddress));
-	status_t err = _MapBlock(address, mappedAddress);
+	status_t err = MapBlock(address, mappedAddress);
 	if (!err)
 		*mappedAddress = *mappedAddress * BlockSize();
 	if (!err) {
@@ -141,7 +175,7 @@ Volume::_MapAddress(udf_long_address address, off_t *mappedAddress)
 }
 
 off_t
-Volume::_MapAddress(udf_short_address address)
+Volume::MapAddress(udf_short_address address)
 {
 	return 0;
 }
@@ -150,7 +184,7 @@ Volume::_MapAddress(udf_short_address address)
 Volume::_Read(udf_extent_address address, ssize_t length, void *data)
 {
 	DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Volume");
-	off_t mappedAddress = _MapAddress(address);
+	off_t mappedAddress = MapAddress(address);
 	status_t err = data ? B_OK : B_BAD_VALUE;
 	if (!err) {
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
@@ -172,7 +206,7 @@ Volume::_Read(AddressType address, ssize_t length, void *data)
 	off_t mappedAddress;
 	status_t err = data ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = _MapAddress(address, &mappedAddress);
+		err = MapAddress(address, &mappedAddress);
 	if (!err) {
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
 		if (bytesRead != (ssize_t)BlockSize()) {
@@ -213,6 +247,7 @@ Volume::_Identify()
 	// the logical volume descriptor
 	if (!err) {
 		fInitStatus = B_LOGICAL_VOLUME_INITIALIZED;
+		fName.SetTo(fLogicalVD.logical_volume_identifier());
 		err = _InitFileSetDescriptor();
 	}
 	
