@@ -428,15 +428,17 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 	success = true;
 	page_index = 0;
 	if (fPrinterCap->isSupport(PrinterCap::kCopyCommand)) {
+		// let the printer perform the copy operation
 		copies = 1;
 	} else {
+		// send the page multiple times to the printer
 		copies = fRealJobData->getCopies();
 	}
 	if (spool_data->startEnum()) {
-		nup = fOrgJobData->getNup();
 		do {
 			DBGMSG(("page index = %d\n", page_index));
 
+			nup = fOrgJobData->getNup();
 			PageDataList pages;
 			do {
 				more = spool_data->enumObject(&page_data);
