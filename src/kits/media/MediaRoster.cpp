@@ -39,6 +39,8 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
 #include <String.h>
 #include <TimeSource.h>
 #include <ParameterWeb.h>
+#include <BufferProducer.h>
+#include <BufferConsumer.h>
 #include "debug.h"
 #include "MediaRosterEx.h"
 #include "MediaMisc.h"
@@ -219,6 +221,34 @@ BMediaRosterEx::GetAllOutputs(const media_node & node, List<media_output> *list)
 }
 
 status_t
+BMediaRosterEx::GetAllOutputs(BBufferProducer *node, List<media_output> *list)
+{
+	int32 cookie;
+	status_t result;
+	
+	PRINT(4, "BMediaRosterEx::GetAllOutputs() (by pointer) node %ld, port %ld\n", node->ID(), node->ControlPort());
+	
+	result = B_OK;
+	cookie = 0;
+	list->MakeEmpty();
+	for (;;) {
+		media_output output;
+		if (B_OK != node->GetNextOutput(&cookie, &output))
+			break;
+		if (!list->Insert(output)) {
+			ERROR("GetAllOutputs: list->Insert failed\n");
+			result = B_ERROR;
+		}
+		#if DEBUG >= 3
+			PRINT(3," next cookie %ld, ", cookie);
+			PRINT_OUTPUT("output ", output);
+		#endif
+	}
+	node->DisposeOutputCookie(cookie);
+	return result;
+}
+
+status_t
 BMediaRosterEx::GetAllInputs(const media_node & node, List<media_input> *list)
 {
 	int32 cookie;
@@ -252,6 +282,34 @@ BMediaRosterEx::GetAllInputs(const media_node & node, List<media_input> *list)
 	consumer_dispose_input_cookie_reply reply;
 	QueryPort(node.port, CONSUMER_DISPOSE_INPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
 	
+	return result;
+}
+
+status_t
+BMediaRosterEx::GetAllInputs(BBufferConsumer *node, List<media_input> *list)
+{
+	int32 cookie;
+	status_t result;
+	
+	PRINT(4, "BMediaRosterEx::GetAllInputs() (by pointer) node %ld, port %ld\n", node->ID(), node->ControlPort());
+	
+	result = B_OK;
+	cookie = 0;
+	list->MakeEmpty();
+	for (;;) {
+		media_input input;
+		if (B_OK != node->GetNextInput(&cookie, &input))
+			break;
+		if (!list->Insert(input)) {
+			ERROR("GetAllInputs: list->Insert failed\n");
+			result = B_ERROR;
+		}
+		#if DEBUG >= 3
+			PRINT(3," next cookie %ld, ", cookie);
+			PRINT_INPUT("input ", input);
+		#endif
+	}
+	node->DisposeInputCookie(cookie);
 	return result;
 }
 
@@ -1668,16 +1726,27 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
 	// with created, but unconnected nodes.
+	// The node control loop might not be running, or might deadlock
+	// if we send a message and wait for a reply here.
+	// We have a pointer to the node, and thus call the functions directly
 
 	if (node->Kinds() & B_BUFFER_PRODUCER) {
-		List<media_output> list;
-		if (B_OK == GetAllOutputs(node->Node(), &list))
-			PublishOutputs(node->Node(), &list);
+		BBufferProducer *bp;
+		bp = dynamic_cast<BBufferProducer *>(node);
+		if (bp) {
+			List<media_output> list;
+			if (B_OK == GetAllOutputs(bp, &list))
+				PublishOutputs(node->Node(), &list);
+		}
 	}
 	if (node->Kinds() & B_BUFFER_CONSUMER) {
-		List<media_input> list;
-		if (B_OK == GetAllInputs(node->Node(), &list))
-			PublishInputs(node->Node(), &list);
+		BBufferConsumer *bc;
+		bc = dynamic_cast<BBufferConsumer *>(node);
+		if (bc) {
+			List<media_input> list;
+			if (B_OK == GetAllInputs(bc, &list))
+				PublishInputs(node->Node(), &list);
+		}
 	}
 
 	TRACE("BMediaRoster::RegisterNode: sending NodesCreated\n");
@@ -2026,7 +2095,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 	
 	//ASSERT(node_info.internal_id == flavorid);
 	if (node_info.internal_id != flavorid) {
-		ERROR("BMediaRosterEx::InstantiateDormantNode failed: ID mismatch for addon-id %ld, flavor-id %ld, node_info.internal_id %ld, node_info.name %s\n", addonid, flavorid, node_info.internal_id, node_info.name);
+		ERROR("############# BMediaRosterEx::InstantiateDormantNode failed: ID mismatch for addon-id %ld, flavor-id %ld, node_info.internal_id %ld, node_info.name %s\n", addonid, flavorid, node_info.internal_id, node_info.name);
 		return B_ERROR;
 	}
 
