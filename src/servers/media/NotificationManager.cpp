@@ -4,10 +4,9 @@
 #include <Messenger.h>
 #include <MediaNode.h>
 #include <Debug.h>
-#include "NotificationManager.h"
-#include "NotificationProcessor.h"
-#include "ServerInterface.h"
 #include "DataExchange.h"
+#include "Notifications.h"
+#include "NotificationManager.h"
 #include "Queue.h"
 
 #define NOTIFICATION_THREAD_PRIORITY 19
@@ -20,16 +19,16 @@ struct RegisteredHandler
 	team_id team;
 };
 
-NotificationProcessor::NotificationProcessor()
+NotificationManager::NotificationManager()
  :	fNotificationQueue(new Queue),
 	fNotificationThreadId(-1),
 	fLocker(new BLocker)
 {
-	fNotificationThreadId = spawn_thread(NotificationProcessor::worker_thread, "notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);
+	fNotificationThreadId = spawn_thread(NotificationManager::worker_thread, "notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);
 	resume_thread(fNotificationThreadId);
 }
 
-NotificationProcessor::~NotificationProcessor()
+NotificationManager::~NotificationManager()
 {
 	// properly terminate the queue and wait until the worker thread has finished
 	status_t dummy;
@@ -40,63 +39,63 @@ NotificationProcessor::~NotificationProcessor()
 }
 
 void
-NotificationProcessor::EnqueueMessage(BMessage *msg)
+NotificationManager::EnqueueMessage(BMessage *msg)
 {
 	// queue a copy of the message to be processed later
 	fNotificationQueue->AddItem(new BMessage(*msg));
 }
 
 void
-NotificationProcessor::RequestNotifications(BMessage *msg)
+NotificationManager::RequestNotifications(BMessage *msg)
 {
 	BMessenger messenger;
 	const media_node *node;
 	ssize_t nodesize;
 	team_id team;
-	int32 mask;
+	int32 what;
 
 	msg->FindMessenger(NOTIFICATION_PARAM_MESSENGER, &messenger);
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
-	msg->FindInt32(NOTIFICATION_PARAM_MASK, &mask);
+	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
 	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
 	ASSERT(nodesize == sizeof(node));
 
 }
 
 void
-NotificationProcessor::CancelNotifications(BMessage *msg)
+NotificationManager::CancelNotifications(BMessage *msg)
 {
 	BMessenger messenger;
 	const media_node *node;
 	ssize_t nodesize;
 	team_id team;
-	int32 mask;
+	int32 what;
 
 	msg->FindMessenger(NOTIFICATION_PARAM_MESSENGER, &messenger);
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
-	msg->FindInt32(NOTIFICATION_PARAM_MASK, &mask);
+	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
 	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
 	ASSERT(nodesize == sizeof(node));
 
 }
 
 void
-NotificationProcessor::SendNotifications(BMessage *msg)
+NotificationManager::SendNotifications(BMessage *msg)
 {
 }
 	
 void
-NotificationProcessor::CleanupTeam(team_id team)
+NotificationManager::CleanupTeam(team_id team)
 {
 }
 
 void
-NotificationProcessor::BroadcastMessages(BMessage *msg)
+NotificationManager::BroadcastMessages(BMessage *msg)
 {
 }
 
 void
-NotificationProcessor::WorkerThread()
+NotificationManager::WorkerThread()
 {
 	BMessage *msg;
 	while (NULL != (msg = static_cast<BMessage *>(fNotificationQueue->RemoveItem()))) {
@@ -118,8 +117,8 @@ NotificationProcessor::WorkerThread()
 }
 
 int32
-NotificationProcessor::worker_thread(void *arg)
+NotificationManager::worker_thread(void *arg)
 {
-	static_cast<NotificationProcessor *>(arg)->WorkerThread();
+	static_cast<NotificationManager *>(arg)->WorkerThread();
 	return 0;
 }

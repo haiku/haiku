@@ -1,11 +1,11 @@
 
 class Queue;
 
-class NotificationProcessor
+class NotificationManager
 {
 public:
-	NotificationProcessor();
-	~NotificationProcessor();
+	NotificationManager();
+	~NotificationManager();
 	
 	void EnqueueMessage(BMessage *msg);
 

@@ -4,7 +4,7 @@
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Autolock.h>
-#include "NotificationProcessor.h"
+#include "NotificationManager.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
 #include "BufferManager.h"
@@ -107,7 +107,7 @@ private:
 	port_id		control_port;
 	thread_id	control_thread;
 
-	NotificationProcessor *fNotificationProcessor;
+	NotificationManager *fNotificationManager;
 	BufferManager *fBufferManager;
 	AppManager *fAppManager;
 	NodeManager *fNodeManager;
@@ -122,7 +122,7 @@ private:
 
 ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
- 	fNotificationProcessor(new NotificationProcessor),
+ 	fNotificationManager(new NotificationManager),
  	fBufferManager(new BufferManager),
 	fAppManager(new AppManager),
 	fNodeManager(new NodeManager),
@@ -140,7 +140,7 @@ ServerApp::ServerApp()
 
 ServerApp::~ServerApp()
 {
-	delete fNotificationProcessor;
+	delete fNotificationManager;
 	delete fBufferManager;
 	delete fAppManager;
 	delete fNodeManager;
@@ -548,9 +548,9 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_GET_SHARED_BUFFER_AREA: GetSharedBufferArea(msg); break;
 		case MEDIA_SERVER_REGISTER_BUFFER: RegisterBuffer(msg); break;
 		case MEDIA_SERVER_UNREGISTER_BUFFER: UnregisterBuffer(msg); break;
-		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
 	
 	
 		case MEDIA_SERVER_GET_NODE_ID: GetNodeID(msg); break;
