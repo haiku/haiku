@@ -171,6 +171,26 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		return result;
 	}
 
+	/* check if panel(s) can display the requested mode (if connected) */
+	if (si->ps.tmds1_active)
+	{
+		if ((target->timing.h_display > si->ps.p1_timing.h_display) ||
+			(target->timing.v_display > si->ps.p1_timing.v_display))
+		{
+			LOG(4, ("PROPOSEMODE: panel1 can't display requested mode, aborted.\n"));
+			return B_ERROR;
+		}
+	}
+	if (si->ps.tmds2_active)
+	{
+		if ((target->timing.h_display > si->ps.p2_timing.h_display) ||
+			(target->timing.v_display > si->ps.p2_timing.v_display))
+		{
+			LOG(4, ("PROPOSEMODE: panel2 can't display requested mode, aborted.\n"));
+			return B_ERROR;
+		}
+	}
+
 	/* validate display vs. virtual */
 	if ((target->timing.h_display > target->virtual_width) || want_same_width)
 		target->virtual_width = target->timing.h_display;
