@@ -12,7 +12,7 @@
 
 #include "cpp.h"
 
-namespace UDF {
+namespace Udf {
 
 /*! Simple class to encapsulate the boring details of allocating
 	and deallocating a chunk of memory.
@@ -56,6 +56,17 @@ private:
 	bool fOwnsData;
 };
 
-};	// namespace UDF
+template <uint32 size>
+class StaticMemoryChunk {
+public:
+	uint32 Size() { return size; }	
+	void* Data() { return reinterpret_cast<void*>(fData); }
+	status_t InitCheck() { return B_OK; }
+
+private:
+	uint8 fData[size];
+};
+
+};	// namespace Udf
 
 #endif	// _UDF_MEMORY_CHUNK_H
