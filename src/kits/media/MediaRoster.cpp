@@ -1765,7 +1765,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 	status_t rv;
 	rv = GetDormantFlavorInfo(addonid, flavorid, &node_info);	
 	if (rv != B_OK) {
-		FATAL("BMediaRosterEx::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavour-id %ld\n", addonid, flavorid);
+		FATAL("BMediaRosterEx::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavor-id %ld\n", addonid, flavorid);
 		return B_ERROR;
 	}
 	
@@ -1784,7 +1784,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 	// flavor is limited.
 	rv = IncrementAddonFlavorInstancesCount(addonid, flavorid);
 	if (rv != B_OK) {
-		FATAL("BMediaRosterEx::InstantiateDormantNode error: can't create more nodes for addon-id %ld, flavour-id %ld\n", addonid, flavorid);
+		FATAL("BMediaRosterEx::InstantiateDormantNode error: can't create more nodes for addon-id %ld, flavor-id %ld\n", addonid, flavorid);
 		// Put the addon back into the pool
 		_DormantNodeManager->PutAddon(addonid);
 		return B_ERROR;
@@ -1874,8 +1874,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	status_t rv;
 	rv = MediaRosterEx(this)->GetDormantFlavorInfo(in_info.addon, in_info.flavor_id, &node_info);	
 	if (rv != B_OK) {
-		FATAL("BMediaRoster::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavour-id %ld\n", in_info.addon, in_info.flavor_id);
-		return B_ERROR;
+		FATAL("BMediaRoster::InstantiateDormantNode error: failed to get dormant_flavor_info for addon-id %ld, flavor-id %ld\n", in_info.addon, in_info.flavor_id);
+		return B_NAME_NOT_FOUND;
 	}
 
 	ASSERT(node_info.internal_id == in_info.flavor_id);
@@ -1898,11 +1898,11 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	// by the caller are not incompatible.
 	if ((node_info.flavor_flags & B_FLAVOR_IS_GLOBAL) && (flags & B_FLAVOR_IS_LOCAL)) {
 		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_LOCAL, but dormant node has B_FLAVOR_IS_GLOBAL\n");
-		return B_BAD_VALUE;
+		return B_NAME_NOT_FOUND;
 	}
 	if ((node_info.flavor_flags & B_FLAVOR_IS_LOCAL) && (flags & B_FLAVOR_IS_GLOBAL)) {
 		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_GLOBAL, but dormant node has B_FLAVOR_IS_LOCAL\n");
-		return B_BAD_VALUE;
+		return B_NAME_NOT_FOUND;
 	}
 
 	// If either the node, or the caller requested to make the instance global
@@ -1915,23 +1915,25 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 
 		addonserver_instantiate_dormant_node_request request;
 		addonserver_instantiate_dormant_node_reply reply;
-		status_t rv;
 		request.addonid = in_info.addon;
 		request.flavorid = in_info.flavor_id;
 		request.creator_team = team; // creator team is allowed to also release global nodes
 		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request, sizeof(request), &reply, sizeof(reply));
 		if (rv == B_OK) {
 			*out_node = reply.node;
-		} else {
-			*out_node = media_node::null;
 		}
-		return rv;
 
 	} else {
-	
+
 		// creator team = -1, as this is a local node
-		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, -1, out_node);
+		rv = MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, -1, out_node);
+
 	}
+	if (rv != B_OK) {
+		*out_node = media_node::null;
+		return B_NAME_NOT_FOUND;
+	}
+	return B_OK;
 }
 
 									 

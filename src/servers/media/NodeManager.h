@@ -6,7 +6,6 @@
 #include "TMap.h"
 #include "TStack.h"
 #include "DataExchange.h"
-#include "DefaultManager.h"
 
 struct registered_node
 {
@@ -24,6 +23,21 @@ struct registered_node
 	List<media_output> outputlist;
 };
 
+struct dormant_addon_flavor_info
+{
+	media_addon_id AddonID;
+	int32 AddonFlavorID;	
+
+	int32 MaxInstancesCount;
+	int32 GlobalInstancesCount;
+	
+	Map<team_id, int32> TeamInstancesCount;
+
+	bool InfoValid;
+	dormant_flavor_info Info;
+};
+
+class DefaultManager;
 class BufferManager;
 
 class NodeManager
@@ -31,19 +45,7 @@ class NodeManager
 public:
 	NodeManager();
 	~NodeManager();
-	status_t RegisterNode(BMessenger, media_node &, char const *, long *, char const *, long, char const *, long, media_type, media_type);
-	status_t UnregisterNode(long);
-	status_t GetNodes(BMessage &, char const *);
-	status_t GetLiveNode(BMessage &, char const *, long);
-	status_t GetLiveNodes(BMessage &, char const *, media_format const *, media_format const *, char const *, unsigned long);
-	status_t FindNode(long, media_node &);
-	status_t FindSaveInfo(long, char const **, long *, long *, char const **);
-	status_t FindDormantNodeFor(long, dormant_node_info *);
-	status_t FindNodesFor(long, long, BMessage &, char const *);
-	status_t FindNodesForPort(long, BMessage &, char const *);
-	status_t UnregisterTeamNodes(long, BMessage &, char const *, long *, BufferManager *);
-	status_t DumpGlobalReferences(BMessage &, char const *);
-	status_t BroadcastMessage(long, void *, long, long long);
+
 	status_t LoadState();
 	status_t SaveState();
 	
@@ -76,12 +78,18 @@ public:
 	 * int32 "media_node_id" (multiple items)
 	 */
 	status_t GetLiveNodes(BMessage *msg);
-	
-	void AddDormantFlavorInfo(const dormant_flavor_info &dfi);	
-	void RemoveDormantFlavorInfo(media_addon_id id);
-	void CleanupDormantFlavorInfos();
+
 	void RegisterAddon(const entry_ref &ref, media_addon_id *newid);
 	void UnregisterAddon(media_addon_id id);
+	
+	void AddDormantFlavorInfo(const dormant_flavor_info &dfi);	
+	void InvalidateDormantFlavorInfo(media_addon_id id);
+	void RemoveDormantFlavorInfo(media_addon_id id);
+	void CleanupDormantFlavorInfos();
+
+	status_t IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid, team_id team);
+	status_t DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid, team_id team);
+
 	status_t GetAddonRef(entry_ref *ref, media_addon_id id);
 	status_t GetDormantNodes(dormant_node_info * out_info,
 							  int32 * io_count,
@@ -102,7 +110,7 @@ private:
 	media_node_id fNextNodeID;
 	
 	BLocker *fLocker;
-	List<dormant_flavor_info> *fDormantFlavorList;
+	List<dormant_addon_flavor_info> *fDormantAddonFlavorList;
 	Map<media_addon_id,entry_ref> *fAddonPathMap;
 	Map<media_node_id,registered_node> *fRegisteredNodeMap;
 	DefaultManager *fDefaultManager;

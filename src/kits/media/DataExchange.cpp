@@ -11,7 +11,7 @@
 #include "DataExchange.h"
 #include "ServerInterface.h" // NEW_MEDIA_SERVER_SIGNATURE
 
-#define TIMEOUT 5000000 // 5 seconds timeout!
+#define TIMEOUT 15000000 // 15 seconds timeout!
 
 namespace BPrivate {
 namespace media {

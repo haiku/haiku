@@ -35,8 +35,8 @@ public:
 	status_t SaveNodeConfiguration(BMediaNode *node);
 	status_t LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BMessage *out_msg);
 
-	status_t IncrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid);
-	status_t DecrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid);
+	status_t IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid);
+	status_t DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid);
 	
 	status_t SetNodeCreator(media_node_id node, team_id creator);
 	

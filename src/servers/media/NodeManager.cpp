@@ -13,6 +13,7 @@
 #include <MediaAddOn.h>
 #include "debug.h"
 #include "NodeManager.h"
+#include "DefaultManager.h"
 #include "AppManager.h"
 
 extern AppManager *gAppManager;
@@ -23,7 +24,7 @@ NodeManager::NodeManager() :
 	fNextAddOnID(1),
 	fNextNodeID(1),
 	fLocker(new BLocker("node manager locker")),
-	fDormantFlavorList(new List<dormant_flavor_info>),
+	fDormantAddonFlavorList(new List<dormant_addon_flavor_info>),
 	fAddonPathMap(new Map<media_addon_id, entry_ref>),
 	fRegisteredNodeMap(new Map<media_node_id, registered_node>),
 	fDefaultManager(new DefaultManager)
@@ -34,12 +35,15 @@ NodeManager::NodeManager() :
 NodeManager::~NodeManager()
 {
 	delete fLocker;
-	delete fDormantFlavorList;
+	delete fDormantAddonFlavorList;
 	delete fAddonPathMap;
 	delete fRegisteredNodeMap;
 	delete fDefaultManager;
 }
 
+/**********************************************************************
+ * Live node management
+ **********************************************************************/
 
 status_t
 NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team)
@@ -366,6 +370,30 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 	return B_ERROR;
 }
 
+status_t
+NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node)
+{
+	BAutolock lock(fLocker);
+	// XXX not sure if this is correct
+	registered_node *rn;
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
+		if (rn->nodeid == node.node) {
+			if (rn->addon_id == -1) { // This function must return an error if the node is application owned
+				TRACE("NodeManager::GetDormantNodeInfo NODE IS APPLICATION OWNED! node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
+				return B_ERROR;
+			}
+			ASSERT(node.port == rn->port);
+			ASSERT(node.kind == rn->kinds);
+			node_info->addon = rn->addon_id;
+			node_info->flavor_id = rn->addon_flavor_id;
+			strcpy(node_info->name, rn->name);
+			TRACE("NodeManager::GetDormantNodeInfo node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
+			return B_OK;
+		}
+	}
+	FATAL("!!! NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
+	return B_ERROR;
+}
 
 status_t
 NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
@@ -469,34 +497,6 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	return B_OK;
 }
 
-
-
-status_t
-NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node)
-{
-	BAutolock lock(fLocker);
-	// XXX not sure if this is correct
-	registered_node *rn;
-	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		if (rn->nodeid == node.node) {
-			if (rn->addon_id == -1) { // This function must return an error if the node is application owned
-				TRACE("NodeManager::GetDormantNodeInfo NODE IS APPLICATION OWNED! node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
-				return B_ERROR;
-			}
-			ASSERT(node.port == rn->port);
-			ASSERT(node.kind == rn->kinds);
-			node_info->addon = rn->addon_id;
-			node_info->flavor_id = rn->addon_flavor_id;
-			strcpy(node_info->name, rn->name);
-			TRACE("NodeManager::GetDormantNodeInfo node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
-			return B_OK;
-		}
-	}
-	FATAL("!!! NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
-	return B_ERROR;
-}
-
-
 /* Add media_node_id of all live nodes to the message
  * int32 "media_node_id" (multiple items)
  */
@@ -510,6 +510,10 @@ NodeManager::GetLiveNodes(BMessage *msg)
 	}
 	return B_OK;
 }
+
+/**********************************************************************
+ * Registration of BMediaAddOns
+ **********************************************************************/
 
 void 
 NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
@@ -536,42 +540,6 @@ NodeManager::UnregisterAddon(media_addon_id id)
 	fAddonPathMap->Remove(id);
 }
 
-// this function is only called (indirectly) by the media_addon_server
-void
-NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
-{
-	BAutolock lock(fLocker);
-	
-	printf("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dfi.node_info.addon, dfi.node_info.flavor_id, dfi.node_info.name, dfi.name, dfi.info);
-
-	fDormantFlavorList->Insert(dfi);
-}
-
-// this function is only called (indirectly) by the media_addon_server
-void
-NodeManager::RemoveDormantFlavorInfo(media_addon_id id)
-{
-	BAutolock lock(fLocker);
-	dormant_flavor_info *flavor;
-	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&flavor); ) {
-		if (flavor->node_info.addon == id) {
-			printf("NodeManager::RemoveDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", flavor->node_info.addon, flavor->node_info.flavor_id, flavor->node_info.name, flavor->name, flavor->info);
-			fDormantFlavorList->RemoveCurrent();
-		}
-	}
-}
-
-// this function is called when the media_addon_server has crashed
-void
-NodeManager::CleanupDormantFlavorInfos()
-{
-	BAutolock lock(fLocker);
-	printf("NodeManager::CleanupDormantFlavorInfos\n");
-	fDormantFlavorList->MakeEmpty();
-	printf("NodeManager::CleanupDormantFlavorInfos done\n");
-	// XXX FlavorsChanged(media_addon_id addonid, int32 newcount, int32 gonecount)
-}
-
 status_t
 NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
 {
@@ -586,6 +554,151 @@ NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
 	return B_ERROR;
 }
 
+/**********************************************************************
+ * Registration of node flavors, published by BMediaAddOns
+ **********************************************************************/
+
+// this function is only called (indirectly) by the media_addon_server
+void
+NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
+{
+	BAutolock lock(fLocker);
+	
+	printf("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dfi.node_info.addon, dfi.node_info.flavor_id, dfi.node_info.name, dfi.name, dfi.info);
+
+	// Try to find the addon-id/flavor-id in the list.
+	// If it already exists, update the Info, but don't
+	// change the GlobalInstancesCount
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID != dfi.node_info.addon || dafi->AddonFlavorID != dfi.node_info.flavor_id)
+			continue;
+		if (dafi->InfoValid) {
+			FATAL("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld does already exist\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id);
+		}
+		TRACE("NodeManager::AddDormantFlavorInfo, updating addon-id %ld, flavor-id %ld\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id);
+		dafi->MaxInstancesCount = dfi.possible_count > 0 ? dfi.possible_count : 0x7fffffff;
+		// do NOT modify dafi.GlobalInstancesCount
+		dafi->InfoValid = true;
+		dafi->Info = dfi;
+		return;
+	}
+
+	// Insert information into the list
+	{
+		dormant_addon_flavor_info dafi;
+		dafi.AddonID = dfi.node_info.addon;
+		dafi.AddonFlavorID = dfi.node_info.flavor_id;
+		dafi.MaxInstancesCount = dfi.possible_count > 0 ? dfi.possible_count : 0x7fffffff;
+		dafi.GlobalInstancesCount = 0;
+		dafi.InfoValid = true;
+		dafi.Info = dfi;
+		fDormantAddonFlavorList->Insert(dafi);
+	}
+}
+
+// this function is only called (indirectly) by the media_addon_server
+void
+NodeManager::InvalidateDormantFlavorInfo(media_addon_id id)
+{
+	BAutolock lock(fLocker);
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID == id && dafi->InfoValid == true) {
+			printf("NodeManager::InvalidateDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id, dafi->Info.node_info.name, dafi->Info.name, dafi->Info.info);
+			dormant_flavor_info dfi_null;
+			dafi->Info = dfi_null;
+			dafi->InfoValid = false;
+		}
+	}
+}
+
+// this function is only called by clean up after gone add-ons
+void
+NodeManager::RemoveDormantFlavorInfo(media_addon_id id)
+{
+	BAutolock lock(fLocker);
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID == id) {
+			printf("NodeManager::RemoveDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id, dafi->Info.node_info.name, dafi->Info.name, dafi->Info.info);
+			fDormantAddonFlavorList->RemoveCurrent();
+		}
+	}
+}
+
+status_t
+NodeManager::IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid, team_id team)
+{
+	BAutolock lock(fLocker);
+
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID != addonid || dafi->AddonFlavorID != flavorid)
+			continue;
+
+		if (dafi->GlobalInstancesCount >= dafi->MaxInstancesCount) {
+			FATAL("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld maximum (or more) instances already exist\n", addonid, flavorid);
+			return B_ERROR; // maximum (or more) instances already exist
+		}
+			
+		bool b;		
+		int32 *count;
+		b = dafi->TeamInstancesCount.Get(team, &count);
+		if (b) {
+			*count += 1;
+		} else {
+			b = dafi->TeamInstancesCount.Insert(team, 1);
+			ASSERT(b);
+		}
+		dafi->GlobalInstancesCount += 1;
+		return B_OK;
+	}
+	FATAL("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
+	return B_ERROR;
+}
+
+status_t
+NodeManager::DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid, team_id team)
+{
+	BAutolock lock(fLocker);
+
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID != addonid || dafi->AddonFlavorID != flavorid)
+			continue;
+
+		bool b;	
+		int32 *count;
+		b = dafi->TeamInstancesCount.Get(team, &count);
+		if (!b) {
+			FATAL("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld team %ld has no references\n", addonid, flavorid, team);
+			return B_ERROR;
+		}
+		*count -= 1;
+		if (*count == 0) {
+			b = dafi->TeamInstancesCount.Remove(team);
+			ASSERT(b);
+		}
+		if (dafi->GlobalInstancesCount > 0)		// avoid underflow
+			dafi->GlobalInstancesCount -= 1;
+		return B_OK;
+	}
+	FATAL("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
+	return B_ERROR;
+}
+
+// this function is called when the media_addon_server has crashed
+void
+NodeManager::CleanupDormantFlavorInfos()
+{
+	BAutolock lock(fLocker);
+	printf("NodeManager::CleanupDormantFlavorInfos\n");
+	fDormantAddonFlavorList->MakeEmpty();
+	printf("NodeManager::CleanupDormantFlavorInfos done\n");
+	// XXX FlavorsChanged(media_addon_id addonid, int32 newcount, int32 gonecount)
+}
+
 status_t 
 NodeManager::GetDormantNodes(dormant_node_info * out_info,
 							  int32 * io_count,
@@ -596,8 +709,8 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 							  uint64 deny_kinds /* = NULL */)
 {
 	BAutolock lock(fLocker);
+	dormant_addon_flavor_info *dafi;
 	int32 maxcount;
-	dormant_flavor_info *dfi;
 	int namelen;
 
 	// determine the count of byte to compare when checking for a name with(out) wildcard
@@ -612,7 +725,13 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 
 	maxcount = *io_count;	
 	*io_count = 0;
-	for (fDormantFlavorList->Rewind(); (*io_count < maxcount) && fDormantFlavorList->GetNext(&dfi); ) {
+	for (fDormantAddonFlavorList->Rewind(); (*io_count < maxcount) && fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (!dafi->InfoValid)
+			continue;
+
+		dormant_flavor_info *dfi;
+		dfi = &dafi->Info;
+
 		if ((dfi->kinds & require_kinds) != require_kinds)
 			continue;
 		if ((dfi->kinds & deny_kinds) != 0)
@@ -655,15 +774,19 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 									 dormant_flavor_info *outFlavor)
 {
 	BAutolock lock(fLocker);
-	dormant_flavor_info *flavor;
-	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&flavor); ) {
-		if (flavor->node_info.addon == addon && flavor->node_info.flavor_id == flavor_id) {
-			*outFlavor = *flavor;
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		if (dafi->AddonID == addon && dafi->AddonFlavorID == flavor_id && dafi->InfoValid == true) {
+			*outFlavor = dafi->Info;
 			return B_OK;
 		}	
 	}
 	return B_ERROR;
 }
+
+/**********************************************************************
+ * Default node management
+ **********************************************************************/
 
 status_t
 NodeManager::SetDefaultNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
@@ -686,6 +809,10 @@ NodeManager::RescanDefaultNodes()
 	return fDefaultManager->Rescan();
 }
 
+/**********************************************************************
+ * Cleanup of dead teams
+ **********************************************************************/
+
 void
 NodeManager::CleanupTeam(team_id team)
 {
@@ -697,9 +824,12 @@ NodeManager::CleanupTeam(team_id team)
 
 	// XXX send notifications after removing nodes
 	
+	// Cleanup node references
+	
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		// if the gone team was the creator of some global dormant node instance, we now invalidate that
+		// we may want to remove that global node, but I'm not sure
 		if (rn->creator == team) {
 			rn->creator = -1;
 			// fall through
@@ -727,7 +857,27 @@ NodeManager::CleanupTeam(team_id team)
 			fRegisteredNodeMap->RemoveCurrent();
 		}
 	}
+	
+	// Cleanup addon references
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		bool b;	
+		int32 *count;
+		b = dafi->TeamInstancesCount.Get(team, &count);
+		if (b) {
+			FATAL("NodeManager::CleanupTeam: removing %ld instances from addon %ld, flavor %ld\n", *count, dafi->AddonID, dafi->AddonFlavorID);
+			dafi->GlobalInstancesCount -= *count;
+			if (dafi->GlobalInstancesCount < 0)		// avoid underflow
+				dafi->GlobalInstancesCount = 0;
+			b = dafi->TeamInstancesCount.Remove(team);
+			ASSERT(b);
+		}
+	}
 }
+
+/**********************************************************************
+ * State saving/loading
+ **********************************************************************/
 
 status_t
 NodeManager::LoadState()
@@ -743,11 +893,18 @@ NodeManager::SaveState()
 	return fDefaultManager->SaveState();
 }
 
+/**********************************************************************
+ * Debugging
+ **********************************************************************/
+
 void
 NodeManager::Dump()
 {
 	BAutolock lock(fLocker);
 	printf("\n");
+	
+	/* for each addon-id, the addon path map contians an entry_ref
+	 */
 	printf("NodeManager: addon path map follows:\n");
 	entry_ref *ref;
 	media_addon_id *id;
@@ -758,11 +915,14 @@ NodeManager::Dump()
 	}
 	printf("NodeManager: list end\n");
 	printf("\n");
+
+	/* for each node-id, the registered node map contians information about source of the node, users, etc.
+	 */
 	printf("NodeManager: registered nodes map follows:\n");
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, team %ld, kinds %#08Lx, name \"%s\"\n",
-			rn->nodeid, rn->addon_id, rn->addon_flavor_id, rn->port, rn->team, rn->kinds, rn->name);
+		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, creator %ld, team %ld, kinds %#08Lx, name \"%s\"\n",
+			rn->nodeid, rn->addon_id, rn->addon_flavor_id, rn->port, rn->creator, rn->team, rn->kinds, rn->name);
 		printf("    teams (refcount): ");
 		team_id *team;
 		int32 *refcount;
@@ -784,15 +944,22 @@ NodeManager::Dump()
 	}
 	printf("NodeManager: list end\n");
 	printf("\n");
+
+	/* 
+	 */
 	printf("NodeManager: dormant flavor list follows:\n");
-	dormant_flavor_info *dfi;
-	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&dfi); ) {
-		printf("  addon-id %ld, addon-flavor-id %ld, addon-name \"%s\"\n",
-			dfi->node_info.addon, dfi->node_info.flavor_id, dfi->node_info.name);
+	dormant_addon_flavor_info *dafi;
+	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
+		printf("  AddonID %ld, AddonFlavorID %ld, MaxInstancesCount %ld, GlobalInstancesCount %ld, InfoValid %s\n",
+			dafi->AddonID, dafi->AddonFlavorID, dafi->MaxInstancesCount, dafi->GlobalInstancesCount, dafi->InfoValid ? "yes" : "no");
+		if (!dafi->InfoValid)
+			continue;
+		printf("    addon-id %ld, addon-flavor-id %ld, addon-name \"%s\"\n",
+			dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id, dafi->Info.node_info.name);
 		printf("    flavor-kinds %#08Lx, flavor_flags %#08lx, internal_id %ld, possible_count %ld, in_format_count %ld, out_format_count %ld\n",
-			 dfi->kinds, dfi->flavor_flags, dfi->internal_id, dfi->possible_count, dfi->in_format_count, dfi->out_format_count);
-		printf("    flavor-name \"%s\"\n", dfi->name);
-		printf("    flavor-info \"%s\"\n", dfi->info);
+			 dafi->Info.kinds, dafi->Info.flavor_flags, dafi->Info.internal_id, dafi->Info.possible_count, dafi->Info.in_format_count, dafi->Info.out_format_count);
+		printf("    flavor-name \"%s\"\n", dafi->Info.name);
+		printf("    flavor-info \"%s\"\n", dafi->Info.info);
 	}
 	printf("NodeManager: list end\n");
 	fDefaultManager->Dump();

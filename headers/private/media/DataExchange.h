@@ -98,7 +98,7 @@ enum {
 	SERVER_UNREGISTER_BUFFER,
 	SERVER_RESCAN_DEFAULTS,
 	SERVER_SET_NODE_CREATOR,
-	SERVER_CHANGE_DORMANT_NODE_USECOUNT,
+	SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -210,14 +210,14 @@ enum node_type
 // used by SERVER_PUBLISH_INPUTS and SERVER_PUBLISH_OUTPUTS
 enum
 {
-	MAX_OUTPUTS = 48,
-	MAX_INPUTS = 48,
+	MAX_OUTPUTS = 8,
+	MAX_INPUTS = 8,
 };
 
 // used by SERVER_GET_LIVE_NODES
 enum
 {
-	MAX_LIVE_INFO = 62,
+	MAX_LIVE_INFO = 16,
 };
 
 // used by SERVER_GET_INSTANCES_FOR
@@ -317,22 +317,6 @@ struct producer_disconnect_request : public request_data
 struct producer_disconnect_reply : public reply_data
 {
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 struct producer_format_suggestion_requested_request : public request_data
 {
@@ -437,36 +421,6 @@ struct producer_late_notice_received_command : public command_data
 	bigtime_t performance_time;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 struct consumer_accept_format_request : public request_data
 {
 	media_destination dest;
@@ -568,22 +522,6 @@ struct consumer_disconnected_reply : public reply_data
 {
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 struct consumer_buffer_received_command : public command_data
 {
 	media_buffer_id buffer;
@@ -634,12 +572,6 @@ struct consumer_seek_tag_requested_reply : public reply_data
 	uint32 flags;
 };
 
-
-
-
-
-
-
 struct server_register_addonserver_request : public request_data
 {
 	team_id team;
@@ -678,14 +610,15 @@ struct server_set_node_creator_reply : public reply_data
 {
 };
 
-struct server_change_dormant_node_usecount_request : public request_data
+struct server_change_addon_flavor_instances_count_request : public request_data
 {
-	media_addon_id addon_id;
-	int32 addon_flavor_id;
-	int32 delta;
+	media_addon_id addonid;
+	int32 flavorid;
+	int32 delta; // must be +1 or -1
+	team_id team;
 };
 
-struct server_change_dormant_node_usecount_reply : public reply_data
+struct server_change_addon_flavor_instances_count_reply : public reply_data
 {
 };
 
@@ -803,9 +736,6 @@ struct server_get_instances_for_reply : public reply_data
 struct server_rescan_defaults_command : public command_data
 {
 };
-
-
-
 
 struct addonserver_rescan_mediaaddon_flavors_command : public command_data
 {

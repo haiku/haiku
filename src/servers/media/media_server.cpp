@@ -175,6 +175,19 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 	status_t rv;
 	INFO("ServerApp::HandleMessage %#lx\n", code);
 	switch (code) {
+		case SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT:
+		{
+			const server_change_addon_flavor_instances_count_request *request = reinterpret_cast<const server_change_addon_flavor_instances_count_request *>(data);
+			server_change_addon_flavor_instances_count_reply reply;
+			ASSERT(request->delta == 1 || request->delta == -1);
+			if (request->delta == 1)
+				rv = gNodeManager->IncrementAddonFlavorInstancesCount(request->addonid,	request->flavorid, request->team);
+			else
+				rv = gNodeManager->DecrementAddonFlavorInstancesCount(request->addonid,	request->flavorid, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
 		case SERVER_RESCAN_DEFAULTS:
 		{
 			gNodeManager->RescanDefaultNodes();
@@ -415,7 +428,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			xfer_server_register_dormant_node *msg = (xfer_server_register_dormant_node *)data;
 			dormant_flavor_info dfi;
 			if (msg->purge_id > 0)
-				gNodeManager->RemoveDormantFlavorInfo(msg->purge_id);
+				gNodeManager->InvalidateDormantFlavorInfo(msg->purge_id);
 			rv = dfi.Unflatten(msg->dfi_type, &(msg->dfi), msg->dfi_size);
 			ASSERT(rv == B_OK);
 			gNodeManager->AddDormantFlavorInfo(dfi);	
