@@ -18,8 +18,9 @@ int team_init(kernel_args *ka);
 team_id team_create_team(const char *path, const char *name, char **args, int argc,
 			char **envp, int envc, int priority);
 status_t wait_for_team(team_id id, status_t *returnCode);
-void team_remove_team(struct team *team);
+void team_remove_team(struct team *team, struct process_group **_freeGroup);
 void team_delete_team(struct team *team);
+void team_delete_process_group(struct process_group *group);
 struct team *team_get_kernel_team(void);
 team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
@@ -37,6 +38,9 @@ thread_id _user_wait_for_child(thread_id child, uint32 flags, int32 *_reason, st
 status_t _user_exec(const char *path, int32 argc, char * const *argv, int32 envCount, char * const *environment);
 thread_id _user_fork(void);
 team_id _user_get_current_team(void);
+pid_t _user_process_info(pid_t process, int32 which);
+pid_t _user_setpgid(pid_t process, pid_t group);
+pid_t _user_setsid(void);
 
 status_t _user_get_team_info(team_id id, team_info *info);
 status_t _user_get_next_team_info(int32 *cookie, team_info *info);
