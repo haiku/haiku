@@ -716,6 +716,7 @@ static void log_pll(uint32 reg)
 static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 {
 	uint32 ram_cfg, data;
+	uint8 cnt;
 
 	/* set MRS = 256 */
 	NV_REG32(NV32_PFB_DEBUG_0) &= 0xffffffef;
@@ -775,7 +776,20 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	NV_REG32(NV32_PFB_CONFIG_1) = data;
 	/* ... followed by b0 = 1(?) */
 	NV_REG32(NV32_PFB_CONFIG_1) = (data | 0x00000001);
-	//fixme?: do RAM width test
+
+	/* do RAM width test to confirm RAM width set to be correct */
+	/* write testpattern to first 128 bits of graphics memory... */
+	data = 0x4e563541;
+	for (cnt = 0; cnt < 4; cnt++)
+		((uint32 *)si->framebuffer)[cnt] = data;
+	/* ... if second 64 bits does not contain the testpattern we are apparantly
+	 * set to 128bits width while we should be set to 64bits width, so correct. */
+	if (((uint32 *)si->framebuffer)[3] != data)
+	{
+		LOG(8,("INFO: ---RAM width tested: width is 64bits, correcting settings\n"));
+		NV_REG32(NV32_NV4STRAPINFO) &= ~0x00000004;
+	}
+
 	//fixme?: do RAM size test
 }
 
