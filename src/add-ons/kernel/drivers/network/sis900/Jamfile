@@ -3,12 +3,22 @@ SubDir OBOS_TOP src add-ons kernel drivers network sis900 ;
 # set some additional flags
 SubDirCcFlags -Wall ;
 
-R5KernelAddon sis900 : [ FDirName kernel drivers network ] :
+R5KernelAddon sis900 : kernel drivers bin :
 	driver.c
 	device.c
 	interface.c
 	sis900.c
 	;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>sis900 ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : sis900 ;
+}
+
 
 rule InstallSiS900
 {
@@ -21,3 +31,15 @@ actions ignore InstallSiS900
 }
 
 #InstallSiS900 install : sis900 ;
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+	sis900 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>sis900 : 
+	installed-symlink 
+;
+

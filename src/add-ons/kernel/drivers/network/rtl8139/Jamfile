@@ -3,10 +3,21 @@ SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
 # set some additional flags
 SubDirCcFlags -Wall ;
 
-R5KernelAddon rtl8139 : [ FDirName kernel drivers network ] :
+R5KernelAddon rtl8139 : kernel drivers bin :
 	driver.c
 	util.c
 	;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>rtl8139 ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : rtl8139 ;
+}
+
+
 
 rule InstallRTL8139
 {
@@ -19,3 +30,16 @@ actions ignore InstallRTL8139
 }
 
 #InstallRTL8139 install : rtl8139 ;
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+	rtl8139 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>rtl8139 : 
+	installed-symlink 
+;
+
+
