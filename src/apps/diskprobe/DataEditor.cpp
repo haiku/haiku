@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <errno.h>
 
 
@@ -112,6 +113,19 @@ dump_block(const uint8 *buffer, int size, const char *prefix)
 	}
 }
 #endif	// TRACE_DATA_EDITOR
+
+
+static int
+CompareCaseInsensitive(const uint8 *a, const uint8 *b, size_t size)
+{
+	for (size_t i = 0; i < size; i++) {
+		uint8 diff = tolower(a[i]) - tolower(b[i]);
+		if (diff)
+			return diff;
+	}
+
+	return 0;
+}
 
 
 static int
@@ -969,7 +983,8 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 
 off_t 
 DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
-	bool cyclic, BMessenger progressMonitor, volatile bool *stop)
+	bool caseInsensitive, bool cyclic, BMessenger progressMonitor,
+	volatile bool *stop)
 {
 	if (data == NULL || dataSize == 0)
 		return B_BAD_VALUE;
@@ -978,6 +993,13 @@ DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 		startPosition = 0;
 
 	BAutolock locker(this);
+
+	typedef int (*compare_func)(const uint8 *a, const uint8 *b, size_t size);
+	compare_func compareFunc;
+	if (caseInsensitive)
+		compareFunc = CompareCaseInsensitive;
+	else
+		compareFunc = (compare_func)memcmp;
 
 	bool savedIsReadOnly = fIsReadOnly;
 	fIsReadOnly = true;
@@ -1027,7 +1049,7 @@ DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 		if (matchLastOffset != 0) {
 			// we had a partial match in the previous block, let's
 			// check if it is a whole match
-			if (!memcmp(fView, data + matchLastOffset, dataSize - matchLastOffset)) {
+			if (!compareFunc(fView, data + matchLastOffset, dataSize - matchLastOffset)) {
 				matchLastOffset = 0;
 				break;
 			}
@@ -1040,7 +1062,7 @@ DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 			if (position + i + dataSize > fSize)
 				break;
 
-			if (fView[i] == data[0]) {
+			if (!compareFunc(fView + i, data, 1)) {
 				// one byte matches, compare the rest
 				size_t size = dataSize - 1;
 				size_t offset = i + 1;
@@ -1048,7 +1070,7 @@ DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
 				if (offset + size > fRealViewSize)
 					size = fRealViewSize - offset;
 
-				if (size == 0 || !memcmp(fView + offset, data + 1, size)) {
+				if (size == 0 || !compareFunc(fView + offset, data + 1, size)) {
 					foundAt = position + i;
 
 					if (size != dataSize - 1) {

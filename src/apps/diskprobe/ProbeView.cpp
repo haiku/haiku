@@ -169,7 +169,8 @@ class EditorLooper : public BLooper {
 		virtual void MessageReceived(BMessage *message);
 
 		bool FindIsRunning() const { return !fQuitFind; }
-		void Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger progressMonitor);
+		void Find(off_t startAt, const uint8 *data, size_t dataSize,
+				bool caseInsensitive, BMessenger progressMonitor);
 		void QuitFind();
 
 	private:
@@ -932,10 +933,12 @@ EditorLooper::MessageReceived(BMessage *message)
 			off_t startAt = 0;
 			message->FindInt64("start", &startAt);
 
+			bool caseInsensitive = !message->FindBool("case_sensitive");
+
 			ssize_t dataSize;
 			const uint8 *data;
 			if (message->FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) == B_OK)
-				Find(startAt, data, dataSize, progressMonitor);
+				Find(startAt, data, dataSize, caseInsensitive, progressMonitor);
 		}
 
 		default:
@@ -946,7 +949,8 @@ EditorLooper::MessageReceived(BMessage *message)
 
 
 void
-EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger progressMonitor)
+EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
+	bool caseInsensitive, BMessenger progressMonitor)
 {
 	fQuitFind = false;
 
@@ -954,7 +958,8 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger
 
 	bigtime_t startTime = system_time();
 
-	off_t foundAt = fEditor.Find(startAt, data, dataSize, true, progressMonitor, &fQuitFind);
+	off_t foundAt = fEditor.Find(startAt, data, dataSize, caseInsensitive,
+						true, progressMonitor, &fQuitFind);
 	if (foundAt >= B_OK) {
 		fEditor.SetViewOffset(foundAt);
 

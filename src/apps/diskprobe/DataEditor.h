@@ -73,7 +73,8 @@ class DataEditor : public BLocker {
 		void StopWatching(BMessenger target);
 		void StopWatching(BHandler *handler, BLooper *looper = NULL);
 
-		off_t Find(off_t startPosition, const uint8 *data, size_t dataSize, bool cyclic,
+		off_t Find(off_t startPosition, const uint8 *data, size_t dataSize,
+					bool caseInsensitive, bool cyclic,
 					BMessenger progressMessenger, volatile bool *stop = NULL);
 
 		BFile &File() { return fFile; }

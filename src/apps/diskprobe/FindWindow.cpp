@@ -414,8 +414,10 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 							NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top - 5 - fCaseCheckBox->Bounds().Height());
-	fCaseCheckBox->SetValue(previous.FindBool("case_sensitive"));
-	fCaseCheckBox->SetEnabled(mode == kAsciiMode);
+	bool caseSensitive;
+	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK)
+		caseSensitive = true;
+	fCaseCheckBox->SetValue(caseSensitive);
 	view->AddChild(fCaseCheckBox);
 
 	// and now those inbetween
@@ -459,10 +461,7 @@ FindWindow::MessageReceived(BMessage *message)
 			if (message->FindInt8("mode", &mode) != B_OK)
 				break;
 
-			if (fTextView->SetMode((find_mode)mode) == B_OK) {
-				// the "case sensitive" check box is only for ASCII mode
-				fCaseCheckBox->SetEnabled(mode == kAsciiMode);
-			} else {
+			if (fTextView->SetMode((find_mode)mode) != B_OK) {
 				// activate other item
 				fMenu->ItemAt(mode == kAsciiMode ? 1 : 0)->SetMarked(true);
 				beep();
