@@ -917,6 +917,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			click_type		action;
 			bool			invalidate;
 			bool			sendMessage = true;
+			WinBorder		*exActive = ActiveWinBorder();
 			WinBorder		*exFocus = FocusWinBorder();
 			WinBorder		*target = fLastMouseMoved->fOwner?
 										fLastMouseMoved->fOwner:
@@ -941,6 +942,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			}
 
 			draw_window_tab(exFocus, FocusWinBorder());
+
+			winborder_activation(exActive);
 
 			if (action == DEC_DRAG)
 			{
@@ -1672,9 +1675,10 @@ void RootLayer::PrintToStream()
 
 void RootLayer::show_winBorder(WinBorder *winBorder)
 {
-	bool	invalidate = false;
-	bool	invalid;
+	bool		invalidate = false;
+	bool		invalid;
 	WinBorder	*exFocus = FocusWinBorder();
+	WinBorder	*exActive = ActiveWinBorder();
 
 	winBorder->Show(false);
 
@@ -1708,6 +1712,8 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 		invalidate_layer(this, fFull);
 
 		draw_window_tab(exFocus, FocusWinBorder());
+
+		winborder_activation(exActive);
 	}
 }
 
@@ -1716,6 +1722,7 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 	bool		invalidate = false;
 	bool		invalid;
 	WinBorder	*exFocus = FocusWinBorder();
+	WinBorder	*exActive = ActiveWinBorder();
 
 	winBorder->Hide(false);
 
@@ -1739,6 +1746,8 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 		invalidate_layer(this, fFull);
 
 		draw_window_tab(exFocus, FocusWinBorder());
+
+		winborder_activation(exActive);
 	}
 }
 
@@ -1833,5 +1842,23 @@ void RootLayer::empty_visible_regions(Layer *layer)
 	{
 		empty_visible_regions(child);
 		child = layer->VirtualUpperSibling();
+	}
+}
+
+inline
+void RootLayer::winborder_activation(WinBorder* exActive)
+{
+	if (exActive && (FocusWinBorder() != exActive || FrontWinBorder() != exActive))
+	{
+		BMessage	msg(B_WINDOW_ACTIVATED);
+		msg.AddBool("active", false);
+		exActive->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	}
+	if (FocusWinBorder() == FrontWinBorder()
+		&& FrontWinBorder() != NULL && FrontWinBorder() != exActive)
+	{
+		BMessage	msg(B_WINDOW_ACTIVATED);
+		msg.AddBool("active", true);
+		FrontWinBorder()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
 }
