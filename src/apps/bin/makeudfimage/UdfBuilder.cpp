@@ -43,6 +43,40 @@ static const Udf::logical_block_address kNullLogicalBlock(0, 0);
 static const Udf::extent_address kNullExtent(0, 0);
 static const Udf::long_address kNullAddress(0, 0, 0, 0);
 
+/*! \brief Returns the number of the block in which the byte offset specified
+	by \a pos resides in the data space specified by the extents in \a dataSpace.
+	
+	Used to figure out the value for Udf::file_id_descriptor::tag::location fields.
+	
+	\param block Output parameter into which the block number of interest is stored.
+*/
+static
+status_t
+block_for_offset(off_t pos, std::list<Udf::long_address> &dataSpace, uint32 blockSize,
+                 uint32 &block)
+{
+	status_t error = pos >= 0 ? B_OK : B_BAD_VALUE;
+	if (!error) {
+		off_t streamPos = 0;
+		for (std::list<Udf::long_address>::const_iterator i = dataSpace.begin();
+		       i != dataSpace.end();
+		         i++)
+		{
+			if (streamPos <= pos && pos < streamPos+i->length()) {
+				// Found it
+				off_t difference = pos - streamPos;
+				block = i->block() + difference / blockSize;
+				return B_OK;
+			} else {
+				streamPos += i->length();
+			}
+		}
+		// Didn't find it, so pos is past the end of the data space
+		error = B_ERROR;
+	}
+	return error;
+}
+
 /*! \brief Creates a new UdfBuilder object.
 */
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
@@ -932,7 +966,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 					}
 				}
 				if (!error) {
-					udfData = new ExtentStream(_OutputFile(), udfDataExtents, _BlockSize());
+					udfData = new(nothrow) ExtentStream(_OutputFile(), udfDataExtents, _BlockSize());
 					error = udfData ? B_OK : B_NO_MEMORY;
 				}
 			}
@@ -966,7 +1000,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 					parent->tag().set_version(3);
 					parent->tag().set_serial_number(0);
 					uint32 block;
-					error = Udf::block_for_offset(udfData->Position(), udfDataAddresses,
+					error = block_for_offset(udfData->Position(), udfDataAddresses,
 					                              _BlockSize(), block);
 					if (!error) {
 						parent->tag().set_location(block);
@@ -1048,7 +1082,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 								id->tag().set_version(3);
 								id->tag().set_serial_number(0);
 								uint32 block;
-								error = Udf::block_for_offset(udfData->Position(), udfDataAddresses,
+								error = block_for_offset(udfData->Position(), udfDataAddresses,
 								                              _BlockSize(), block);
 								if (!error) {
 									id->tag().set_location(block);
@@ -1239,7 +1273,7 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 					}
 				}
 				if (!error) {
-					udfData = new ExtentStream(_OutputFile(), udfDataExtents, _BlockSize());
+					udfData = new(nothrow) ExtentStream(_OutputFile(), udfDataExtents, _BlockSize());
 					error = udfData ? B_OK : B_NO_MEMORY;
 				}
 			}

@@ -146,7 +146,7 @@ Udf::check_size_error(ssize_t bytesReturned, ssize_t bytesExpected)
 {
 	return bytesReturned == bytesExpected
 	       ? B_OK
-	       : (bytesReturned >= 0 ? B_ERROR : status_t(bytesReturned));
+	       : (bytesReturned >= 0 ? B_IO_ERROR : status_t(bytesReturned));
 }
 
 /*! \brief Calculates the UDF crc checksum for the given byte stream.
@@ -167,39 +167,6 @@ Udf::calculate_crc(uint8 *data, uint16 length)
 			crc = Udf::kCrcTable[(crc >> 8 ^ *data) & 0xff] ^ (crc << 8);
 	}
 	return crc;
-}
-
-/*! \brief Returns the number of the block in which the byte offset specified
-	by \a pos resides in the data space specified by the extents in \a dataSpace.
-	
-	Used to figure out the value for Udf::file_id_descriptor::tag::location fields.
-	
-	\param block Output parameter into which the block number of interest is stored.
-*/
-status_t
-Udf::block_for_offset(off_t pos, std::list<Udf::long_address> &dataSpace, uint32 blockSize,
-                      uint32 &block)
-{
-	status_t error = pos >= 0 ? B_OK : B_BAD_VALUE;
-	if (!error) {
-		off_t streamPos = 0;
-		for (std::list<Udf::long_address>::const_iterator i = dataSpace.begin();
-		       i != dataSpace.end();
-		         i++)
-		{
-			if (streamPos <= pos && pos < streamPos+i->length()) {
-				// Found it
-				off_t difference = pos - streamPos;
-				block = i->block() + difference / blockSize;
-				return B_OK;
-			} else {
-				streamPos += i->length();
-			}
-		}
-		// Didn't find it, so pos is past the end of the data space
-		error = B_ERROR;
-	}
-	return error;
 }
 
 } // namespace Udf

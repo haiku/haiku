@@ -20,8 +20,6 @@ extern "C" {
 	#include <fsproto.h>
 }
 
-#include <list>
-
 #include "UdfStructures.h"
 
 namespace Udf {
@@ -39,9 +37,6 @@ const char* bool_to_string(bool value);
 status_t check_size_error(ssize_t bytesReturned, ssize_t bytesExpected);
 
 uint16 calculate_crc(uint8 *data, uint16 length);
-
-status_t block_for_offset(off_t pos, std::list<Udf::long_address> &dataSpace,
-                          uint32 blockSize, uint32 &block);
 
 } // namespace Udf
 
