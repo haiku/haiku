@@ -581,6 +581,8 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				toClear = image->regions[i].vmsize
 					- PAGE_OFFSET(image->regions[i].start)
 					- image->regions[i].size;
+
+				TRACE(("cleared 0x%lx and the following 0x%lx bytes\n", startClearing, toClear));
 				memset((void *)startClearing, 0, toClear);
 			}
 		}
@@ -903,8 +905,8 @@ load_dependencies(image_t *image)
 				sprintf(path, "/boot/beos/system/lib/%s", STRING(image, needed_offset));
 				image->needed[j] = load_container(path, STRING(image, needed_offset), B_LIBRARY_IMAGE);
 				j += 1;
-
 				break;
+
 			default:
 				/*
 				 * ignore any other tag
