@@ -1,0 +1,20 @@
+/*
+** uhci.rdef
+**
+*/
+
+/* BEOS:APP_SIG :
+   application:/x-vnd.obos.app-name
+*/
+
+resource app_signature "application/x-vnd.Be-elfexecutable";
+
+resource app_version {
+	major  = 0,
+	middle = 0,
+	minor  = 1,
+	variety = 0,
+	internal = 0,
+	short_info = "UHCI host controller driver",
+	long_info = "OpenBeOS - This driver is (c) 2003-2004 Niels Sascha Reedijk"
+};
