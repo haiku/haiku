@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-11, Rudolf)</h1></p>
+<p><h1>head (0.06-12, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
@@ -18,7 +18,8 @@
 	<li>Updated workspace virtualsize restrictions for accelerated modes. Confirmed that the MagicGraph series (pre NM2200) engines can do upto and including 1600x1024 resolution except NM2070 which can do upto and including 1024x1024. Assuming MagicMedia series (NM2200 and later) can do upto and including 1600x2048 for now. Modes above these resolutions are unaccelerated;
 	<li>Removed register area cloning bug in accelerant that prevented it from working with NM2070, NM2090 and NM2093 cards at all!
 	<li>Added various fixes to get Dell Latitude XPi (NM2070) working on it's panel, probably fixes various faults on other cards as well;
-	<li>Updated pixelPLL restrictions for NM2070 so external output refresh is OK.
+	<li>Updated pixelPLL restrictions for NM2070 so external output refresh is OK;
+	<li>Added fixed sync polarity programming if flatpanel in use: needed to make sure centering actually works.
 </ul>
 Note:<br>
 Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
@@ -47,10 +48,9 @@ Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
-	<li>updates needed for LCD centering support;
 	<li>fix for trouble with booting into modes above 800x600 resolution on some cards (please report this behaviour!);
-	<li>shadowregister programming needed for 'full' KB switch BIOS support;
-	<li>2D acceleration;
+	<li>shadowregister programming needed for 'full' KB switch BIOS support(?);
+	<li>2D acceleration (in progress);
 	<li>MagicMedia series overlay update: still contains errors apparantly.
 </ul>
 </p>
