@@ -308,7 +308,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	/* unlock head's registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	/* disable RMA as it's not used */
+	/* disable RMA as it's not used yet */
 	/* (RMA is the cmd register for the 32bit port in the GPU to access 32bit registers
 	 *  and framebuffer via legacy ISA I/O space.) */
 	CRTCW(RMA, 0x00);
@@ -334,7 +334,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	/* execute all BIOS coldstart script(s) */
 	if (tabs.InitScriptTablePtr)
 	{
-		//fixme: size still needed?
+		/* size is nolonger used, keeping it anyway for testing purposes :) */
 		int16 size = 32767;
 		uint16 index = tabs.InitScriptTablePtr;
 	
@@ -380,7 +380,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	status_t result = B_OK;
 	bool end = false;
 	bool exec = true;
-	uint8 index, byte, safe;
+	uint8 index, byte;//, safe;
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
@@ -506,10 +506,17 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				reg, and_out, or_in));
 			if (exec)
 			{
-				byte = ISARB(reg);
+//				byte = ISARB(reg);
+//test:
+				translate_ISA_PCI(&reg);
+				byte = NV_REG8(reg);
+//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				ISAWB(reg, byte);
+//				ISAWB(reg, byte);
+//test:
+				NV_REG8(reg) = byte;
+//end test
 			}
 			break;
 		case 0x6d:
@@ -687,13 +694,21 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				index, reg, and_out, or_in));
 			if (exec)
 			{
-				safe = ISARB(reg);
-				ISAWB(reg, index);
-				byte = ISARB(reg + 1);
+//				safe = ISARB(reg);
+//				ISAWB(reg, index);
+//				byte = ISARB(reg + 1);
+//test:
+				translate_ISA_PCI(&reg);
+				NV_REG8(reg) = index;
+				byte = NV_REG8(reg + 1);
+//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				ISAWB((reg + 1), byte);
-				ISAWB(reg, safe);
+//				ISAWB((reg + 1), byte);
+//				ISAWB(reg, safe);
+//test:
+				NV_REG8(reg + 1) = byte;
+//end test
 			}
 			break;
 		case 0x79:
@@ -890,7 +905,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 {
 	status_t result = B_OK;
 	bool end = false;
-	uint8 index, byte, byte2, shift;//, safe;
+	uint8 index, byte, byte2, shift;
 	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, or_in2, safe32, offset32, size32;
 
 	while (!end)
@@ -931,15 +946,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
 			if (*exec && reg2)
 			{
-//				safe = ISARB(reg);
-//				ISAWB(reg, index);
-//				byte = ISARB(reg + 1);
-//				ISAWB(reg, safe);
-//test:
 				translate_ISA_PCI(&reg);
 				NV_REG8(reg) = index;
 				byte = NV_REG8(reg + 1);
-//end test
 				byte &= (uint8)and_out;
 				byte >>= byte2;
 				offset32 = (byte << 2);
@@ -1003,15 +1012,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			reg2 = *((uint32*)(&(rom[*adress])));
 			*adress += 4;
-//			safe = ISARB(reg);
-//			ISAWB(reg, index);
-//			byte = ISARB(reg + 1);
-//			ISAWB(reg, safe);
-//test:
 			translate_ISA_PCI(&reg);
 			NV_REG8(reg) = index;
 			byte = NV_REG8(reg + 1);
-//end test
 			byte &= (uint8)and_out;
 			data = (byte >> shift);
 			data <<= 1;
@@ -1091,21 +1094,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 					data <<= (0x0100 - byte2);
 				}
 				data &= and_out;
-//				safe = ISARB(reg2);
-//				ISAWB(reg2, index);
-//				byte = ISARB(reg2 + 1);
-//test:
 				translate_ISA_PCI(&reg2);
 				NV_REG8(reg2) = index;
 				byte = NV_REG8(reg2 + 1);
-//end test
 				byte &= (uint8)and_out2;
 				byte |= (uint8)data;
-//				ISAWB((reg2 + 1), byte);
-//				ISAWB(reg2, safe);
-//test:
 				NV_REG8(reg2 + 1) = byte;
-//end test
 			}
 			break;
 		case 0x38: /* new */
@@ -1220,13 +1214,8 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'WR idx ISA reg $%02x via $%04x = $%02x'\n", index, reg, byte));
 			if (*exec)
 			{
-//				safe = ISARB(reg);
-//				ISAWW(reg, ((((uint16)byte) << 8) | index));
-//				ISAWB(reg, safe);
-//test:
 				translate_ISA_PCI(&reg);
 				NV_REG16(reg) = ((((uint16)byte) << 8) | index);
-//end test
 			}
 			break;
 		case 0x63: /* new setup compared to pre-NV10 version */
@@ -1295,17 +1284,11 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				reg, and_out, or_in));
 			if (*exec)
 			{
-//				byte = ISARB(reg);
-//test:
 				translate_ISA_PCI(&reg);
 				byte = NV_REG8(reg);
-//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-//				ISAWB(reg, byte);
-//test:
 				NV_REG8(reg) = byte;
-//end test
 			}
 			break;
 		case 0x6b: /* new */
@@ -1399,7 +1382,6 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				}
 			}
 			break;
-		//fixme? this is correct on NV11, but how about newer cards???
 		case 0x36: /* new */
 		case 0x66: /* new */
 		case 0x67: /* new */
@@ -1500,15 +1482,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			index = *((uint8*)(&(rom[(data + 2)])));
 			and_out = *((uint8*)(&(rom[(data + 3)])));
 			byte2 = *((uint8*)(&(rom[(data + 4)])));
-//			safe = ISARB(reg);
-//			ISAWB(reg, index);
-//			byte = ISARB(reg + 1);
-//			ISAWB(reg, safe);
-//test:
-				translate_ISA_PCI(&reg);
-				NV_REG8(reg) = index;
-				byte = NV_REG8(reg + 1);
-//end test
+			translate_ISA_PCI(&reg);
+			NV_REG8(reg) = index;
+			byte = NV_REG8(reg + 1);
 			byte &= (uint8)and_out;
 			LOG(8,("cmd 'CHK bits AND-out $%02x idx ISA reg $%02x via $%04x for $%02x'\n",
 				and_out, index, reg, byte2));
@@ -1546,21 +1522,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				index, reg, and_out, or_in));
 			if (*exec)
 			{
-//				safe = ISARB(reg);
-//				ISAWB(reg, index);
-//				byte = ISARB(reg + 1);
-//test:
 				translate_ISA_PCI(&reg);
 				NV_REG8(reg) = index;
 				byte = NV_REG8(reg + 1);
-//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-//				ISAWB((reg + 1), byte);
-//				ISAWB(reg, safe);
-//test:
 				NV_REG8(reg + 1) = byte;
-//end test
 			}
 			break;
 		case 0x79:
@@ -1637,15 +1604,9 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	offset32 = *((uint16*)(&(rom[data + 5])));
 	and_out2 = *((uint8*)(&(rom[(data + 7)])));
 	byte2 = *((uint8*)(&(rom[(data + 8)])));
-//	safe = ISARB(reg);
-//	ISAWB(reg, index);
-//	byte = ISARB(reg + 1);
-//	ISAWB(reg, safe);
-//test:
 	translate_ISA_PCI(&reg);
 	NV_REG8(reg) = index;
 	byte = NV_REG8(reg + 1);
-//end test
 	byte &= (uint8)and_out;
 	offset32 += (byte >> shift);
 	safe = byte = *((uint8*)(&(rom[offset32])));
@@ -1747,24 +1708,33 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
  * RAM starts at 'offset' $80000000 */
 static void write_RMA(uint32 reg, uint32 data)
 {
-	uint8 safe;
+//	uint8 safe;
 
 	/* save old CRTC index register */
-	safe = ISARB(0x03d4);
+//	safe = ISARB(0x03d4);
 	/* select RMA port 'set adress' mode */
-	ISAWW(0x03d4, 0x0338);
+//	ISAWW(0x03d4, 0x0338);
+//test:
+	CRTCW(RMA, 0x03);
+//end test
 	/* set adress in RMA port */
 	ISAWW(0x03d0, (reg & 0x0000ffff));
 	ISAWW(0x03d2, (reg >> 16));
 	/* select RMA port 'write data' mode */
-	ISAWW(0x03d4, 0x0738);
+//	ISAWW(0x03d4, 0x0738);
+//test:
+	CRTCW(RMA, 0x07);
+//end test
 	/* send data through RMA port */
 	ISAWW(0x03d0, (data & 0x0000ffff));
 	ISAWW(0x03d2, (data >> 16));
 	/* re-select RMA port 'set adress' mode (just to be sure) */
-	ISAWW(0x03d4, 0x0338);
+//	ISAWW(0x03d4, 0x0338);
+//test:
+	CRTCW(RMA, 0x03);
+//end test
 	/* restore old CRTC index register */
-	ISAWB(0x03d4, safe);
+//	ISAWB(0x03d4, safe);
 }
 
 /* this function is very handy for RAM size testing (doesn't need mapping) */
@@ -1773,25 +1743,34 @@ static void write_RMA(uint32 reg, uint32 data)
  * RAM starts at 'offset' $80000000 */
 static uint32 read_RMA(uint32 reg)
 {
-	uint8 safe;
+//	uint8 safe;
 	uint32 data;
 
 	/* save old CRTC index register */
-	safe = ISARB(0x03d4);
+//	safe = ISARB(0x03d4);
 	/* select RMA port 'set adress' mode */
-	ISAWW(0x03d4, 0x0338);
+//	ISAWW(0x03d4, 0x0338);
+//test:
+	CRTCW(RMA, 0x03);
+//end test
 	/* set adress in RMA port */
 	ISAWW(0x03d0, (reg & 0x0000ffff));
 	ISAWW(0x03d2, (reg >> 16));
 	/* select RMA port 'read data' mode */
-	ISAWW(0x03d4, 0x0538);
+//	ISAWW(0x03d4, 0x0538);
+//test:
+	CRTCW(RMA, 0x05);
+//end test
 	/* read data from RMA port */
 	data = ISARW(0x03d0);
 	data |= ((ISARW(0x03d2)) << 16);
 	/* re-select RMA port 'set adress' mode (just to be sure) */
-	ISAWW(0x03d4, 0x0338);
+//	ISAWW(0x03d4, 0x0338);
+//test:
+	CRTCW(RMA, 0x03);
+//end test
 	/* restore old CRTC index register */
-	ISAWB(0x03d4, safe);
+//	ISAWB(0x03d4, safe);
 }
 
 static status_t translate_ISA_PCI(uint32* reg)
