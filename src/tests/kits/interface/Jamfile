@@ -20,6 +20,7 @@ CommonTestLib libinterfacetest.so
 		DeskbarTest.cpp
 		DeskbarGetItemTest.cpp
 		DeskbarLocationTest.cpp
+		DeskbarAddItemTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
