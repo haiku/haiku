@@ -25,7 +25,11 @@ class TargetTester : public TestCase
 		TargetTester() {;}
 		TargetTester(std::string name) : TestCase(name) {;}
 
-		void Test1();
+		void IsTargetLocalTest1();
+		void IsTargetLocalTest2();
+		void IsTargetLocalTest3();
+		void IsTargetLocalTest4();
+		void IsTargetLocalTest5();
 
 		static Test* Suite();
 };

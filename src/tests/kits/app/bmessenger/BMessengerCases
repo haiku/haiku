@@ -59,3 +59,16 @@ case 2:	from is properly initialized to a local target =>
 BMessenger(const char *signature, team_id team, status_t *result)
 TODO
 
+bool IsTargetLocal() const
+case 1:	this is uninitialized =>
+		should return false.
+case 2:	this is initialized to local target with preferred handler =>
+		should return true.
+case 3:	this is initialized to local target with specific handler =>
+		should return true.
+case 4:	this is initialized to local target with preferred handler =>
+		should return false.
+case 5:	this is initialized to remote target with specific handler =>
+		should return false.
+
+
