@@ -76,6 +76,7 @@ should be binary compatible in no time!
 	class BFoo {
 	    public:
 	        BFoo();
+	        ~BFoo();
 	        void SomeFunc();
 	    private:
 	        int32 fBar;
@@ -117,7 +118,7 @@ should be binary compatible in no time!
 		<code>int32</code>s worth of data: <code>fNewData1</code> through
 		<code>fNewData4</code>.  The original implementation of BFoo has two extra
 		<code>int32</code>s which we can use, but that leaves us two <code>int32</code>s
-		short.  What to do?  The easiest thing to do is create a data structure to hold
+		short.  What to do?  The easiest thing is to create a data structure to hold
 		your new data and convert one of the <code>fUnused</code> items into a pointer
 		to that structure:
 		<code>
@@ -155,8 +156,12 @@ should be binary compatible in no time!
 	}
 		</pre>
 		</code>
-		Voila!  More data without making the class bigger.  Notice the added
-		destructor; make sure you're cleaning up your new (dynamically allocated) data.
+		Voila!  More data without making the class bigger.  Make sure you're cleaning up
+		your new (dynamically allocated) data in the destructor. <b>NOTE:</b> this trick
+		will only work if the class originally had a destructor!  Adding a destructor
+		after the fact won't work for existing apps (since they won't call it), leading
+		to memory leaks.  Fortunately, there are very few instances in the BeAPI where a
+		class doesn't have a destructor already declared.
 	</li>
 </ol>
 
