@@ -59,6 +59,7 @@ Desktop::Desktop(void)
 	fActiveRootLayer	= NULL;
 	fFrontWinBorder		= NULL;
 	fFocusWinBorder		= NULL;
+	fMouseTarget		= NULL;
 	fActiveScreen		= NULL;
 	fScreenShotIndex	= 1;
 }
@@ -395,6 +396,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 				ws->SearchAndSetNewFront(target);
 				ws->SetFocusLayer(target);
 				
+				fMouseTarget		= target;
 				target->MouseDown(pt,buttons,mod);
 				
 				rl->fMainLock.Unlock();
@@ -419,9 +421,15 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			msg->Read<float>(&pt.y);
 			msg->Read<int32>(&mod);
 			
-			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
-			if(target)
-				target->MouseUp(pt,mod);
+			if (fMouseTarget){
+				fMouseTarget->MouseUp(pt, mod);
+				fMouseTarget		= NULL;				
+			}
+			else{
+				WinBorder *target	= ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
+				if(target)
+					target->MouseUp(pt, mod);
+			}
 			
 //			printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
 
@@ -443,14 +451,20 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			msg->Read<float>(&y);
 			msg->Read<int32>(&buttons);
 			
+			BPoint pt(x, y);
+			if (fMouseTarget){
+				fMouseTarget->MouseMoved(pt, buttons);
+			}
+			else{
+				WinBorder *target	= ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
+				if(target)
+					target->MouseMoved(pt, buttons);
+			}
+
 			// We need this so that we can see the cursor on the screen
 			if(fActiveScreen)
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
-			
-			BPoint pt;
-			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
-			if(target)
-				target->MouseMoved(pt,buttons);
+
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:

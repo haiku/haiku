@@ -115,6 +115,7 @@ private:
 	RootLayer* fActiveRootLayer;
 	WinBorder* fFrontWinBorder;
 	WinBorder* fFocusWinBorder;
+	WinBorder* fMouseTarget;
 	
 	BList fScreenList;
 
