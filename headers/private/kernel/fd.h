@@ -90,9 +90,9 @@ static struct io_context *get_current_io_context(bool kernel);
 static __inline struct io_context *get_current_io_context(bool kernel)
 {
 	if (kernel)
-		return team_get_kernel_team()->ioctx;
+		return team_get_kernel_team()->io_context;
 
-	return thread_get_current_thread()->team->ioctx;
+	return thread_get_current_thread()->team->io_context;
 }
 
 #endif /* _FD_H */

@@ -1,0 +1,133 @@
+/* Thread definition and structures
+** 
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+#ifndef _KERNEL_THREAD_TYPES_H
+#define _KERNEL_THREAD_TYPES_H
+
+#include <stage2.h>
+#include <ktypes.h>
+#include <cbuf.h>
+#include <vm.h>
+#include <smp.h>
+#include <signal.h>
+#include <timer.h>
+#include <arch/thread_struct.h>
+
+
+extern spinlock thread_spinlock;
+#define GRAB_THREAD_LOCK()    acquire_spinlock(&thread_spinlock)
+#define RELEASE_THREAD_LOCK() release_spinlock(&thread_spinlock)
+
+extern struct thread_queue dead_q;
+
+extern spinlock team_spinlock;
+	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
+	// but not the other way (to avoid deadlock)
+#define GRAB_TEAM_LOCK()    acquire_spinlock(&team_spinlock)
+#define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
+
+enum additional_thread_state {
+//	THREAD_STATE_READY = 0,   // ready to run
+//	THREAD_STATE_RUNNING, // running right now somewhere
+//	THREAD_STATE_WAITING, // blocked on something
+//	THREAD_STATE_SUSPENDED, // suspended, not in queue
+	THREAD_STATE_FREE_ON_RESCHED = 7, // free the thread structure upon reschedule
+//	THREAD_STATE_BIRTH	// thread is being created
+};
+
+enum team_state {
+	TEAM_STATE_NORMAL,	// normal state
+	TEAM_STATE_BIRTH,	// being contructed
+	TEAM_STATE_DEATH	// being killed
+};
+
+
+#define THREAD_RETURN_EXIT			0x1
+#define THREAD_RETURN_INTERRUPTED	0x2
+
+
+struct team {
+	struct team		*next;			/* next team in the hash */
+	team_id			id;
+	char			name[SYS_MAX_OS_NAME_LEN];
+	int				num_threads;	/* number of threads in this team */
+	int				state;			/* current team state, see above */
+	int				pending_signals;
+	void			*io_context;
+	sem_id			death_sem;		/* semaphore to wait on for dying threads */
+	aspace_id		_aspace_id;		/* address space pointer */
+	vm_address_space *aspace;
+	vm_address_space *kaspace;
+	addr			user_env_base;
+	struct thread	*main_thread;
+	struct thread	*thread_list;
+	struct arch_team arch_info;
+};
+
+struct thread {
+	struct thread	*all_next;
+	struct thread	*team_next;
+	struct thread	*q_next;
+	timer			alarm;
+	thread_id		id;
+	char			name[SYS_MAX_OS_NAME_LEN];
+	int				priority;
+	int				state;
+	int				next_state;
+	union cpu_ent	*cpu;
+
+	sigset_t		sig_pending;
+	sigset_t		sig_block_mask;
+	struct sigaction sig_action[32];
+
+	bool			in_kernel;
+
+	sem_id			sem_blocking;
+	int				sem_count;
+	int				sem_acquire_count;
+	int				sem_deleted_retcode;
+	int				sem_errcode;
+	int				sem_flags;
+
+	struct {
+		sem_id		write_sem;
+		sem_id		read_sem;
+		thread_id	sender;
+		int32		code;
+		size_t		size;
+		cbuf		*buffer;
+	} msg;
+
+	addr			fault_handler;
+	int32			page_faults_allowed;
+		/* this field may only stay in debug builds in the future*/
+
+	addr			entry;
+	void			*args;
+	struct team		*team;
+	status_t		return_code;
+	sem_id			return_code_sem;
+	int				return_flags;
+
+	// stack
+	region_id		kernel_stack_region_id;
+	addr			kernel_stack_base;
+	region_id		user_stack_region_id;
+	addr			user_stack_base;
+
+	bigtime_t		user_time;
+	bigtime_t		kernel_time;
+	bigtime_t		last_time;
+
+	// architecture dependant section
+	struct arch_thread arch_info;
+};
+
+struct thread_queue {
+	struct thread *head;
+	struct thread *tail;
+};
+
+#endif	/* _KERNEL_THREAD_TYPES_H */
