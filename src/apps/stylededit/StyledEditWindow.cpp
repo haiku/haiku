@@ -770,6 +770,8 @@ StyledEditWindow::QuitRequested()
 	saveAlert= new BAlert("savealert",alertText.String(), "Cancel", "Don't save","Save",
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 	saveAlert->SetShortcut(0, B_ESCAPE);
+	saveAlert->SetShortcut(1,'d');
+	saveAlert->SetShortcut(2,'s');
 	buttonIndex= saveAlert->Go();
 	
 	if (buttonIndex==0) { 		//"cancel": dont save, dont close the window
@@ -1021,6 +1023,7 @@ StyledEditWindow::RevertToSaved()
 	revertAlert= new BAlert("revertAlert",alertText.String(), "Cancel", "OK", 0,
 		B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 	revertAlert->SetShortcut(0, B_ESCAPE);
+	revertAlert->SetShortcut(1, 'o');
 	buttonIndex= revertAlert->Go();
 	
 	if (buttonIndex!=1) { 		// some sort of cancel, don't revert

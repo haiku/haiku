@@ -4,6 +4,8 @@
 #include <MenuItem.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
+#include <Alert.h>
+#include <stdio.h>
 #include "Constants.h"
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
@@ -155,14 +157,23 @@ StyledEditApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 			path.SetTo(cwd,argv[i]);
 		}
 		if (path.InitCheck() != B_OK) {
-			continue; // TODO: alert the user?
+			printf("path.InitCheck failed: \"");
+			if (argv[i][0] == '/') {
+				printf("%s",argv[i]);
+			} else {
+				printf("%s/%s",cwd,argv[i]);
+			}
+			printf("\".\n");
+			continue;
 		}
 		
 		entry_ref ref;
 		if (get_ref_for_path(path.Path(), &ref) != B_OK) {
-			continue; // TODO: alert the user?
+			printf("get_ref_for_path failed: \"");
+			printf("%s",path.Path());
+			printf("\".\n");
+			continue;
 		}
-		
 		OpenDocument(&ref);
 	}
 }
