@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "FileWindow.h"
@@ -13,6 +13,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <Directory.h>
 #include <Volume.h>
 #include <be_apps/Tracker/RecentItems.h>
 
@@ -28,11 +29,15 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 		BPath path(ref);
 		SetTitle(path.Path());
 	} else if (entry.IsDirectory()) {
-		BVolume volume(stat.st_dev);
-		if (volume.InitCheck() == B_OK) {
-			char name[B_FILE_NAME_LENGTH];
-			if (volume.GetName(name) == B_OK)
-				SetTitle(name);
+		BDirectory directory(&entry);
+		if (directory.InitCheck() == B_OK && directory.IsRootDirectory()) {
+			// use the volume name for root directories
+			BVolume volume(stat.st_dev);
+			if (volume.InitCheck() == B_OK) {
+				char name[B_FILE_NAME_LENGTH];
+				if (volume.GetName(name) == B_OK)
+					SetTitle(name);
+			}
 		}
 	}
 
