@@ -654,21 +654,66 @@ void alc650_init(ac97_dev *dev)
 void stac9708_init(ac97_dev *dev)
 {
 	LOG(("stac9708_init\n"));
+	/* ALSA initializes some registers that according to the
+	 * documentation for this codec do not exist. If the
+	 * following doesn't work, we may need to do that, too.
+	 */
+	/* The Analog Special reg is at 0x6C, other codecs have it at 0x6E */
+	/* Set Analog Special to default (DAC/ADC -6dB disabled) */
+	ac97_reg_cached_write(dev, 0x6C, 0x0000);
+	/* Set Multi Channel to default */
+	ac97_reg_cached_write(dev, 0x74, 0x0000);
 }
 
 void stac9721_init(ac97_dev *dev)
 {
 	LOG(("stac9721_init\n"));
+	/* Set Analog Special to default (DAC/ADC -6dB disabled) */
+	ac97_reg_cached_write(dev, 0x6E, 0x0000);
+	/* Enable register 0x72 */
+	ac97_reg_cached_write(dev, 0x70, 0xabba);
+	/* Set Analog Current to -50% */
+	ac97_reg_cached_write(dev, 0x72, 0x0002);
+	/* Set Multi Channel to default */
+	ac97_reg_cached_write(dev, 0x74, 0x0000);
+	/* Enable register 0x78 */
+	ac97_reg_cached_write(dev, 0x76, 0xabba);
+	/* Set Clock Access to default */
+	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
 void stac9744_init(ac97_dev *dev)
 {
 	LOG(("stac9744_init\n"));
+	/* Set Analog Special to default (DAC/ADC -6dB disabled) */
+	ac97_reg_cached_write(dev, 0x6E, 0x0000);
+	/* Enable register 0x72 */
+	ac97_reg_cached_write(dev, 0x70, 0xabba);
+	/* Set Analog Current to -50% */
+	ac97_reg_cached_write(dev, 0x72, 0x0002);
+	/* Set Multi Channel to default */
+	ac97_reg_cached_write(dev, 0x74, 0x0000);
+	/* Enable register 0x78 */
+	ac97_reg_cached_write(dev, 0x76, 0xabba);
+	/* Set Clock Access to default */
+	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
 void stac9756_init(ac97_dev *dev)
 {
 	LOG(("stac9756_init\n"));
+	/* Set Analog Special to default (AC97 all-mix, DAC/ADC -6dB disabled) */
+	ac97_reg_cached_write(dev, 0x6E, 0x1000);
+	/* Enable register 0x72 */
+	ac97_reg_cached_write(dev, 0x70, 0xabba);
+	/* Set Analog Current to -50% */
+	ac97_reg_cached_write(dev, 0x72, 0x0002);
+	/* Set Multi Channel to default */
+	ac97_reg_cached_write(dev, 0x74, 0x0000);
+	/* Enable register 0x78 */
+	ac97_reg_cached_write(dev, 0x76, 0xabba);
+	/* Set Clock Access to default */
+	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
 void tr28028_init(ac97_dev *dev)
