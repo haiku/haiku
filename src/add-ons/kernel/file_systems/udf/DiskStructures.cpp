@@ -12,6 +12,8 @@
 
 #include "DiskStructures.h"
 
+#include <string.h>
+
 using namespace UDF;
 
 //----------------------------------------------------------------------
@@ -23,6 +25,27 @@ const charspec kCS0Charspec = { character_set_type: 0,
                                                     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
                                                     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
                               };
+                              
+// Volume structure descriptor ids 
+const char* UDF::kVSDID_BEA 			= "BEA01";
+const char* UDF::kVSDID_TEA 			= "TEA01";
+const char* UDF::kVSDID_BOOT 		= "BOOT2";
+const char* UDF::kVSDID_ISO 			= "CD001";
+const char* UDF::kVSDID_ECMA167_2 	= "NSR02";
+const char* UDF::kVSDID_ECMA167_3 	= "NSR03";
+const char* UDF::kVSDID_ECMA168		= "CDW02";
+
+//----------------------------------------------------------------------
+// volume_structure_descriptor_header
+//----------------------------------------------------------------------
+
+/*! \brief Returns true if the given \a id matches the header's id.
+*/
+bool
+volume_structure_descriptor_header::id_matches(const char *id)
+{
+	return strncmp(this->id, id, 5) == 0;
+}
 
 //----------------------------------------------------------------------
 // udf_tag

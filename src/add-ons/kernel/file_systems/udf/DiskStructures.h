@@ -113,21 +113,23 @@ struct entity_id {
 
 	See also: ECMA 167 2/9.1
 */	
-struct vsd_header {
+struct volume_structure_descriptor_header {
 	uint8 type;
-	char id[4];
+	char id[5];
 	uint8 version;
+	
+	bool id_matches(const char *id);
 } __attribute__((packed));
 
 
 // Volume structure descriptor ids 
-const char* kVSDID_BEA 			= "BEA01";
-const char* kVSDID_TEA 			= "TEA01";
-const char* kVSDID_BOOT 		= "BOOT2";
-const char* kVSDID_ISO 			= "CD001";
-const char* kVSDID_ECMA167_2 	= "NSR02";
-const char* kVSDID_ECMA167_3 	= "NSR03";
-const char* kVSDID_ECMA168		= "CDW02";
+extern const char* kVSDID_BEA;
+extern const char* kVSDID_TEA;
+extern const char* kVSDID_BOOT;
+extern const char* kVSDID_ISO;
+extern const char* kVSDID_ECMA167_2;
+extern const char* kVSDID_ECMA167_3;
+extern const char* kVSDID_ECMA168;
 
 
 //----------------------------------------------------------------------
@@ -184,7 +186,7 @@ struct descriptor_tag {
 
 /*! \c descriptor_tag::id values
 */
-enum {
+enum tag_id {
 	TAGID_UNDEFINED	= 0,
 
 	// ECMA 167, PART 3
@@ -213,7 +215,7 @@ enum {
 	TAGID_SPACE_BITMAP_DESCRIPTOR,
 	TAGID_PARTITION_INTEGRITY_ENTRY,
 	TAGID_EXTENDED_FILE_ENTRY,
-} tag_id;
+};
 
 
 /*! \brief Primary volume descriptor
@@ -828,7 +830,7 @@ struct extended_file_icb_entry {
 	
 		The id of the root directory of a file set shall be 0.
 		
-		\todo Detail the system specific requirements for unique ids from UDF-2.01
+		\todo Detail the system specific requirements for unique ids from UDF-2.01 3.2.1.1
 	*/
 	uint64 unique_id;
 	uint32 extended_attributes_length;
