@@ -2169,6 +2169,9 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
+#ifdef UNSAFE_GET_VNODE
+		RecursiveLocker locker(volume->Lock());
+#endif
 		if (get_vnode(volume->ID(), volume->ToVnode(fInode->Attributes()),
 				(void **)&fAttributes) != 0
 			|| fAttributes == NULL) {

@@ -238,8 +238,11 @@ class Vnode {
 		}
 
 		status_t Get(Inode **inode)
-		{ 
+		{
 			// should we check inode against NULL here? it should not be necessary
+#ifdef UNSAFE_GET_VNODE
+			RecursiveLocker locker(fVolume->Lock());
+#endif
 			return get_vnode(fVolume->ID(), fID, (void **)inode);
 		}
 

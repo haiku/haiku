@@ -7,6 +7,7 @@ oldOPTIM = $(OPTIM) ;
 {
 	local defines =
 		KEEP_WRONG_DIRENT_RECLEN
+		UNSAFE_GET_VNODE
 		#BFS_BIG_ENDIAN_ONLY
 		;
 

@@ -1035,8 +1035,9 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			continue;
 		}
 
+		Vnode vnode(volume, offset);
 		Inode *inode;
-		if ((status = get_vnode(volume->ID(), offset, (void **)&inode)) != B_OK) {
+		if ((status = vnode.Get(&inode)) != B_OK) {
 			REPORT_ERROR(status);
 			FATAL(("could not get inode %Ld in index \"%s\"!\n", offset, fAttribute));
 			// try with next
@@ -1103,8 +1104,6 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
 #endif
 		}
-
-		put_vnode(volume->ID(), inode->ID());
 
 		if (status == MATCH_OK)
 			return B_OK;

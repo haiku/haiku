@@ -83,15 +83,16 @@ Index::SetTo(const char *name)
 	if (status != B_OK)
 		return status;
 
-	if (get_vnode(fVolume->ID(), id, (void **)&fNode) != B_OK)
+	Vnode vnode(fVolume, id);
+	if (vnode.Get(&fNode) != B_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	if (fNode == NULL) {
 		FATAL(("fatal error at Index::InitCheck(), get_vnode() returned NULL pointer\n"));
-		put_vnode(fVolume->ID(), id);
 		return B_ERROR;
 	}
 
+	vnode.Keep();
 	return B_OK;
 }
 

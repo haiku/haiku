@@ -869,6 +869,9 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// get iterator for the next directory
 
+#ifdef UNSAFE_GET_VNODE
+			RecursiveLocker locker(fVolume->Lock());
+#endif
 			Vnode vnode(fVolume, cookie->current);
 			Inode *inode;
 			if (vnode.Get(&inode) < B_OK) {
