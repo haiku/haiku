@@ -44,7 +44,7 @@ class Volume;
 class Inode;
 struct dir_cookie;
 
-class ReadRequest {
+class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 	public:
 		ReadRequest(void *buffer, size_t bufferSize);
 		~ReadRequest();
@@ -61,7 +61,8 @@ class ReadRequest {
 		size_t		BytesRead() const { return fBytesRead; }
 		team_id		Team() const { return fTeam; }
 
-		DoublyLinked::Link	fLink;
+		bool		IsQueued() const { return fIsQueued; }
+		void		SetQueued(bool queued);
 
 	private:
 		sem_id		fLock;
@@ -69,8 +70,10 @@ class ReadRequest {
 		void		*fBuffer;
 		size_t		fBufferSize;
 		size_t		fBytesRead;
+		bool		fIsQueued;
 };
 
+typedef DoublyLinkedList<ReadRequest> RequestList;
 
 class Volume {
 	public:
@@ -140,7 +143,7 @@ class Inode {
 		void		SetNext(Inode *inode) { fNext = inode; }
 
 		benaphore	*RequestLock() { return &fRequestLock; }
-		DoublyLinked::List<ReadRequest> &Requests() { return fRequests; }
+		RequestList	&Requests() { return fRequests; }
 
 		status_t	WriteBufferToChain(const void **_buffer, size_t *_bytesLeft, bool nonBlocking);
 //		status_t	ReadBufferFromChain(void *buffer, size_t *_bufferSize);
@@ -174,8 +177,7 @@ class Inode {
 
 		cbuf		*fBufferChain;
 
-		DoublyLinked::List<ReadRequest>	fRequests;
-		DoublyLinked::List<ReadRequest>	fDoneRequests;
+		RequestList	fRequests;
 
 		benaphore	fRequestLock;
 		sem_id		fWriteLock;
@@ -583,7 +585,7 @@ Inode::FillPendingRequests()
 	TRACE(("Inode::FillPendingRequests(): bytesLeft = %lu\n", bytesLeft));
 
 	ReadRequest *request;
-	DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
+	RequestList::Iterator iterator = fRequests.GetIterator();
 	while (bytesLeft != 0 && (request = iterator.Next()) != NULL) {
 		// notify the request, so that it can be filled
 		size_t space = request->SpaceLeft();
@@ -614,7 +616,7 @@ Inode::FillPendingRequests(const void **_buffer, size_t *_bytesLeft)
 	TRACE(("Inode::FillPendingRequests(buffer = %p, bytes = %lu)\n", *_buffer, *_bytesLeft));
 
 	ReadRequest *request;
-	DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
+	RequestList::Iterator iterator = fRequests.GetIterator();
 	while (*_bytesLeft != 0 && (request = iterator.Next()) != NULL) {
 		// try to fill this request
 		size_t bytesRead;
@@ -650,10 +652,11 @@ Inode::AddRequest(ReadRequest &request)
 		return B_ERROR;
 
 	if (BytesInChain() > 0 && request.PutBufferChain(fBufferChain) == B_OK) {
-		fDoneRequests.Add(&request);
 		MayReleaseWriter();
-	} else
+	} else {
 		fRequests.Add(&request);
+		request.SetQueued(true);
+	}
 
 	benaphore_unlock(&fRequestLock);
 	return B_OK;
@@ -678,7 +681,8 @@ Inode::RemoveRequest(ReadRequest &request)
 	if (BytesInChain() > 0 && request.PutBufferChain(fBufferChain) == B_OK)
 		release_sem(fWriteLock);
 
-	DoublyLinked::List<ReadRequest>::Remove(&request);
+	if (request.IsQueued())
+		fRequests.Remove(&request);
 
 	benaphore_unlock(&fRequestLock);
 	return B_OK;
@@ -710,7 +714,7 @@ Inode::Close(int openMode)
 
 		if (cbuf_get_length(fBufferChain) == 0) {
 			ReadRequest *request;
-			DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
+			RequestList::Iterator iterator = fRequests.GetIterator();
 			while ((request = iterator.Next()) != NULL)
 				request->Abort();
 		}
@@ -764,7 +768,8 @@ ReadRequest::ReadRequest(void *buffer, size_t bufferSize)
 	:
 	fBuffer(buffer),
 	fBufferSize(bufferSize),
-	fBytesRead(0)
+	fBytesRead(0),
+	fIsQueued(false)
 {
 	fLock = create_sem(0, "request lock");
 	fTeam = team_get_current_team_id();
@@ -780,7 +785,8 @@ ReadRequest::~ReadRequest()
 status_t 
 ReadRequest::Wait(bool nonBlocking)
 {
-	TRACE(("pipefs: request@%p waits for data (%sblocking), thread 0x%lx\n", this, nonBlocking ? "non" : "", find_thread(NULL)));
+	TRACE(("pipefs: request@%p waits for data (%sblocking), thread 0x%lx\n",
+		this, nonBlocking ? "non" : "", find_thread(NULL)));
 	return acquire_sem_etc(fLock, 1, (nonBlocking ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
 }
 
@@ -797,6 +803,13 @@ ReadRequest::Abort()
 {
 	fBuffer = NULL;
 	release_sem(fLock);
+}
+
+
+void
+ReadRequest::SetQueued(bool queued)
+{
+	fIsQueued = queued;
 }
 
 
@@ -1193,7 +1206,8 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 	status_t status = request.Wait((cookie->open_mode & O_NONBLOCK) != 0);
 	inode->RemoveRequest(request);
 
-	if ((status == B_TIMED_OUT || status == B_INTERRUPTED) && request.BytesRead() > 0)
+	if ((status == B_TIMED_OUT || status == B_INTERRUPTED || status == B_WOULD_BLOCK)
+		&& request.BytesRead() > 0)
 		status = B_OK;
 
 	if (status == B_OK)
