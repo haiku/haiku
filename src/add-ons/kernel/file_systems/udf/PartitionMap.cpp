@@ -18,21 +18,15 @@ PartitionMap::dump()
 	PRINT(("fCount: %ld\n", fCount));
 	PRINT(("fList:\n"));
 
-	SLList<udf_partition_descriptor>::Iterator i;
-	fList.GetIterator(&i);
-	if (i.GetCurrent()) {
-		for (udf_partition_descriptor* partition = NULL;
-		       (partition = i.GetCurrent());
-		         i.GetNext())
-		{
-			PRINT(("  partition #%d: start: %ld, length: %ld\n", partition->partition_number(),
-			      partition->start(), partition->length()));
-		}
-	
+	SinglyLinkedList<Udf::udf_partition_descriptor>::Iterator i = fList.Begin();
+	if (i != fList.End()) {
+		for ( ; i != fList.End(); ++i) {
+			PRINT(("  partition #%d: start: %ld, length: %ld\n", i->partition_number(),
+			      i->start(), i->length()));
+		}	
 	} else {
 		PRINT(("  (empty)\n"));
-	}
-	
+	}	
 }
 
 
@@ -45,11 +39,11 @@ PartitionMap::Add(const udf_partition_descriptor* partition)
 {
 	status_t err = partition ? B_OK : B_BAD_VALUE;
 	if (!err) {
-		udf_partition_descriptor *temp = Find(partition->partition_number());
+		udf_partition_descriptor *temp = const_cast<udf_partition_descriptor*>(Find(partition->partition_number()));
 		if (temp) {
 			*temp = *partition;
 		} else {
-			err = fList.Insert(*partition) ? B_OK : B_ERROR;
+			err = fList.PushBack(*partition) ? B_OK : B_ERROR;
 		}
 	}
 	return err;
@@ -58,21 +52,19 @@ PartitionMap::Add(const udf_partition_descriptor* partition)
 /*! \brief Returns a pointer to the partition in the list with the
 	given number, or NULL if no such partition exists.
 */ 
-udf_partition_descriptor*
+const udf_partition_descriptor*
 PartitionMap::Find(uint32 partitionNumber) const
 {
-	udf_partition_descriptor *partition;
-	SLList<udf_partition_descriptor>::Iterator i;
-	fList.GetIterator(&i);	
-	while ((partition = i.GetCurrent())
-	         && partition->partition_number() != partitionNumber)
-	{
-		i.GetNext();
+	SinglyLinkedList<Udf::udf_partition_descriptor>::ConstIterator i;
+	for (i = fList.Begin(); i != fList.End(); ++i) {
+		if (i->partition_number() == partitionNumber) {
+			return &(*i);
+		}
 	}
-	return partition;
+	return NULL;
 }
 
-udf_partition_descriptor*
+const udf_partition_descriptor*
 PartitionMap::operator[](uint32 partitionNumber) const
 {
 	return Find(partitionNumber);

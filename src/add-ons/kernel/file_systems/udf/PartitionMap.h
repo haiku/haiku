@@ -14,7 +14,7 @@
 #include "UdfDebug.h"
 #include "DiskStructures.h"
 
-#include "SLList.h"
+#include "SinglyLinkedList.h"
 
 namespace Udf {
 
@@ -23,12 +23,12 @@ public:
 	PartitionMap();
 
 	status_t Add(const udf_partition_descriptor* partition);
-	udf_partition_descriptor* Find(uint32 partitionNumber) const;
-	udf_partition_descriptor* operator[](uint32 partitionNumber) const;
+	const udf_partition_descriptor* Find(uint32 partitionNumber) const;
+	const udf_partition_descriptor* operator[](uint32 partitionNumber) const;
 	
 	void dump();
 private:
-	SLList<Udf::udf_partition_descriptor> fList;
+	SinglyLinkedList<Udf::udf_partition_descriptor> fList;
 	uint32 fCount;
 };
 
