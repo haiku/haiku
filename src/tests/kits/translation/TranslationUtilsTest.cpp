@@ -37,6 +37,8 @@
 #include <TranslatorRoster.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <BitmapStream.h>
+#include <Entry.h>
 #include <OS.h>
 
 /* cppunit framework */
@@ -76,22 +78,87 @@ TranslationUtilsTest::Suite()
 }
 
 void
-TranslationUtilsTest::GetBitmapTest()
+CheckBitmap(BBitmap *pbits)
 {
-	// Open a PNG image file using GetBitmap without specifying
-	// a BTranslatorRoster
-	NextSubTest();
-	BApplication app(
-		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
-	BBitmap *pbits = NULL;
-	pbits = BTranslationUtils::GetBitmap(
-		"../src/tests/kits/translation/data/images/image.png");
 	CPPUNIT_ASSERT(pbits);
 	CPPUNIT_ASSERT(pbits->Bits());
 	CPPUNIT_ASSERT(pbits->BitsLength() == 443904);
 	CPPUNIT_ASSERT(pbits->BytesPerRow() == 1536);
 	CPPUNIT_ASSERT(pbits->Bounds().IntegerWidth() == 383);
 	CPPUNIT_ASSERT(pbits->Bounds().IntegerHeight() == 288);
+}
+
+void
+TranslationUtilsTest::GetBitmapTest()
+{
+	// File
+	NextSubTest();
+	BApplication app(
+		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+	BBitmap *pbits = NULL;
+	pbits = BTranslationUtils::GetBitmap(
+		"../src/tests/kits/translation/data/images/image.png");
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// File (GetBitmapFile)
+	NextSubTest();
+	pbits = BTranslationUtils::GetBitmapFile(
+		"../src/tests/kits/translation/data/images/image.png");
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// File (entry_ref)
+	NextSubTest();
+	entry_ref ref;
+	BEntry bent(
+		"../src/tests/kits/translation/data/images/image.png");
+	CPPUNIT_ASSERT(bent.InitCheck() == B_OK);
+	CPPUNIT_ASSERT(bent.GetRef(&ref) == B_OK);
+	pbits = BTranslationUtils::GetBitmap(&ref);
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// Resource
+	NextSubTest();
+	pbits = BTranslationUtils::GetBitmap("res_image");
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// Resource by Type & Id
+	NextSubTest();
+	pbits = BTranslationUtils::GetBitmap(
+		B_TRANSLATOR_BITMAP, 246);
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// Resource by Type & Name
+	NextSubTest();
+	pbits = BTranslationUtils::GetBitmap(
+		B_TRANSLATOR_BITMAP, "res_image");
+	CheckBitmap(pbits);
+	delete pbits;
+	pbits = NULL;
+	
+	// Stream (open file, translate to BBitmapStream,
+	// pass that BBitmapStream to GetBitmap)
+	NextSubTest();
+	BFile imgfile(
+		"../src/tests/kits/translation/data/images/image.png",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(imgfile.InitCheck() == B_OK);
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster);
+	BBitmapStream stream;
+	CPPUNIT_ASSERT(proster->Translate(&imgfile, NULL, NULL,
+		&stream, B_TRANSLATOR_BITMAP) == B_OK);
+	pbits = BTranslationUtils::GetBitmap(&stream);
+	CheckBitmap(pbits);
 	delete pbits;
 	pbits = NULL;
 }
