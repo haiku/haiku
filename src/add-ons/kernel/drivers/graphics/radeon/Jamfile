@@ -1,0 +1,37 @@
+SubDir OBOS_TOP src add-ons kernel drivers graphics radeon ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+
+R5KernelAddon radeon.driver : kernel drivers bin :
+	driver.c
+	agp.c
+	bios.c
+	detect.c
+	dma.c
+	global_data.c
+	init.c
+	irq.c
+	memmgr.c
+;
+
+#Package openbeos-radeon-cvs :
+#	README.html UPDATE.html ;
+Package openbeos-radeon-cvs :
+	radeon.driver : 
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-radeon-cvs :
+	<kernel!drivers!dev!graphics>radeon.driver :
+	boot home config add-ons kernel drivers dev graphics ;
+#Package openbeos-radeon-cvs :
+#	radeon.settings :
+#	boot home config settings kernel drivers ;
+
+# Link to kernel/drivers/dev/graphics
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
+	local instDriver = <kernel!drivers!dev!graphics>radeon.driver ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : radeon.driver ;
+}
+
