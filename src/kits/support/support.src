@@ -1,6 +1,7 @@
 SUPPORT_KIT_SOURCE =
 	Archivable.cpp
 	BlockCache.cpp
+	ByteOrder.cpp
 	DataIO.cpp
 	BufferIO.cpp
 	Flattenable.cpp
