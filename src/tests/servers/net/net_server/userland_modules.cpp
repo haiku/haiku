@@ -87,6 +87,7 @@ static int32 g_next_module_id = 1;
 _EXPORT status_t get_module(const char * name, module_info ** mi)
 {
 	module * m;
+	status_t status;
 	
 	printf("get_module(%s)\n", name);
 	
@@ -97,16 +98,20 @@ _EXPORT status_t get_module(const char * name, module_info ** mi)
 	if (!m)
 		return B_NAME_NOT_FOUND;
 	
+	status = B_OK;
 	*mi = m->info;
 	
 	if (m->addon) // built-in modules don't comes from addon...
 		atomic_add(&m->addon->ref_count, 1);
 
-	if (atomic_add(&m->ref_count, 1) == 0)
+	if (atomic_add(&m->ref_count, 1) == 0) {
 		// first time we reference this module, so let's init it:
-		return init_module(m);
+		status = init_module(m);
+		if (status != B_OK && m->addon != NULL)
+			unload_module_addon(m->addon);
+	};
 		
-	return B_OK;
+	return status;
 }
 
 _EXPORT status_t put_module(const char * name)
@@ -297,7 +302,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 					return read_next_module_name(cookie, buf, bufsize);
 				};
 				
-				if (entry.IsFile()) {
+				if (entry.IsFile() || entry.IsSymLink()) {
 					mlc->ma = load_module_addon(path.Path());
 		            if (!mlc->ma)
 		            	// Oh-oh, not a loadable module addon!?
@@ -376,7 +381,7 @@ _EXPORT void kprintf(const char *fmt, ...)
 }
 
 
-_EXPORT status_t load_driver_symbols(const char *driver_name)
+_EXPORT int load_driver_symbols(const char *driver_name)
 {
 	// Userland debugger will extract symbols itself...
 	return B_OK;
@@ -627,7 +632,7 @@ static module * search_module(const char * name)
 		while(path != addons_path) {
 			printf("  %s ?\n", path.Path());
 			entry.SetTo(path.Path());
-			if (entry.IsFile()) {
+			if (entry.IsFile() || entry.IsSymLink()) {
 				module_addon * ma;
 			
 				// try to load the module addon	
@@ -639,7 +644,7 @@ static module * search_module(const char * name)
 
 					unload_module_addon(ma);
 				};	// if (ma)
-			};	// if (entry.IsFile())
+			};	// if (entry.IsFile() || entry.IsSymLink())
 
 			// okay, remove the current path leaf and try again...
 			path.GetParent(&path);
