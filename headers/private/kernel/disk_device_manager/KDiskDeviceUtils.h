@@ -174,6 +174,17 @@ public:
 		_Unlock();
 	}
 
+	inline void Unlock()
+	{
+		_Unlock();
+	}
+
+	inline void Detach()
+	{
+		fLockable = NULL;
+		fLocked = false;
+	}
+
 	inline AutoLocker<Lockable, Locking> &operator=(Lockable *lockable)
 	{
 		SetTo(lockable);
