@@ -15,15 +15,16 @@ struct stat {
 	uid_t			st_uid;			/* user id of the owner of this file */
 	gid_t			st_gid;			/* group id of the owner of this file */
 	off_t			st_size;		/* size in bytes of this file */
-	// ToDo: st_type is new for OpenBeOS - it replaces the unused st_rdev field
-	//	we might also define special types for files and TTYs
-	unsigned int	st_type;		/* attribute/index type */
-	//dev_t			st_rdev;		/* device type (not used) */
+	dev_t			st_rdev;		/* device type (not used) */
 	size_t			st_blksize;		/* preferred block size for i/o */
 	time_t			st_atime;		/* last access time */
 	time_t			st_mtime;		/* last modification time */
 	time_t			st_ctime;		/* last change time, not creation time */
 	time_t			st_crtime;		/* creation time */
+
+	// OpenBeOS extensions:
+	// ToDo: we might also define special types for files and TTYs
+	unsigned int	st_type;		/* attribute/index type */
 };
 
 /* extended file types */
@@ -93,12 +94,17 @@ extern "C" {
 
 extern int    chmod(const char *path, mode_t mode);
 extern int 	  fchmod(int fd, mode_t mode);
-extern int    stat(const char *path, struct stat *buf);
-extern int    fstat(int fd, struct stat *buf);
-extern int    lstat(const char *path, struct stat *st);
+extern int    _stat(const char *path, struct stat *st, size_t statSize);
+extern int    _fstat(int fd, struct stat *st, size_t statSize);
+extern int    _lstat(const char *path, struct stat *st, size_t statSize);
 extern int    mkdir(const char *path, mode_t mode);
 extern int    mkfifo(const char *path, mode_t mode);
 extern mode_t umask(mode_t cmask);
+
+// This achieves backwards compatibility with R5
+#define stat(fd, st) _stat(fd, st, sizeof(struct stat))
+#define fstat(fd, st) _fstat(fd, st, sizeof(struct stat))
+#define lstat(fd, st) _lstat(fd, st, sizeof(struct stat))
 
 #ifdef __cplusplus
 }
