@@ -74,6 +74,7 @@ status_t _user_get_thread_info(thread_id id, thread_info *info);
 status_t _user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
 
 // ToDo: these don't belong here
+struct rlimit;
 int _user_getrlimit(int resource, struct rlimit * rlp);
 int _user_setrlimit(int resource, const struct rlimit * rlp);
 

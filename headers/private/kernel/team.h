@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TEAM_H
@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-status_t team_init(kernel_args *args);
+status_t team_init(struct kernel_args *args);
 team_id team_create_team(const char *path, const char *name, char **args, int argc,
 			char **envp, int envc, int priority);
 status_t wait_for_team(team_id id, status_t *returnCode);

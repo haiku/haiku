@@ -1,7 +1,10 @@
-/* 
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
@@ -9,21 +12,16 @@
 #include <OS.h>
 #include <debug.h>
 
-
 typedef struct recursive_lock {
 	sem_id		sem;
 	thread_id	holder;
 	int			recursion;
 } recursive_lock;
 
-#define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
-
 typedef struct mutex {
 	sem_id		sem;
 	thread_id	holder;
 } mutex;
-
-#define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 
 typedef struct benaphore {
 	sem_id	sem;
@@ -40,6 +38,12 @@ typedef struct rw_lock {
 } rw_lock;
 
 #define RW_MAX_READERS 1000000
+
+#ifdef DEBUG
+#	include <thread.h>
+#endif
+#define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
+#define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 
 
 #ifdef __cplusplus

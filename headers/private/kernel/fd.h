@@ -6,16 +6,16 @@
 #define _FD_H
 
 
+#include <vfs.h>
 #include <team.h>
 #include <thread.h>
-
-#include <sys/stat.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct file_descriptor;
 struct select_sync;
 
 struct fd_ops {

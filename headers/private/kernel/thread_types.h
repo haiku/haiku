@@ -1,4 +1,5 @@
-/* Copyright 2004, Haiku Inc.
+/*
+ * Copyright 2004, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -8,7 +9,6 @@
 
 
 #include <cbuf.h>
-#include <vm.h>
 #include <smp.h>
 #include <signal.h>
 #include <timer.h>
