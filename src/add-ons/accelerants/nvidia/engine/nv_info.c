@@ -296,7 +296,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 4;
 			or_in = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'RD 32b REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
+			LOG(8,("cmd 'RD 32bit REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (exec)
 			{
@@ -316,6 +316,43 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				LOG(8,("script size error!\n\n"));
 				result = B_ERROR;
 			}
+			break;
+		case 0x74:
+			*size -= 3;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			LOG(8,("cmd 'SNOOZE for %d ($%04x) microSeconds'\n", data, data));
+			if (exec) snooze(data);
+			break;
+		case 0x77:
+			*size -= 7;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x (b31-16 = '0', b15-0 = data)\n",
+				reg, data));
+			if (exec) NV_REG32(reg) = data;
 			break;
 		case 0x78:
 			*size -= 6;
@@ -337,7 +374,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8b idx REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD 8bit indexed REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
 			if (exec)
 			{
@@ -380,7 +417,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 4;
 			data = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32b REG' $%08x = $%08x\n", reg, data));
+			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x\n", reg, data));
 			if (exec) NV_REG32(reg) = data;
 			break;
 		default:
