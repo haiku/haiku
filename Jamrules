@@ -316,16 +316,28 @@ rule LinkSharedOSLibs
 {
 	# LinkSharedOSLibs <name> : <libs> ;
 	# Valid elements for <libs> are e.g. "be" or "libopenbeos.so" or
-	# "/boot/.../libfoo.so". If the basename starts with "lib", it is added
-	# to the NEEDLIBS variable (i.e. the file will be bound!), otherwise it is
-	# prefixed "-l" and added to LINKLIBS.
+	# "/boot/.../libfoo.so". If the basename starts with "lib" or the thingy
+	# has a dirname or grist, it is added to the NEEDLIBS variable (i.e. the
+	# file will be bound!), otherwise it is prefixed "-l" and added to
+	# LINKLIBS.
 	
 	for i in $(>)
 	{
-		switch $(i:B)
-		{
-			case lib*	: NEEDLIBS on $(1) += $(i) ; DEPENDS $(1) : $(i) ;
-			case *		: LINKLIBS on $(1) += -l$(i) ;
+		local isfile = ;
+		if $(i:D) || $(i:G) {
+			isfile = true ;
+		} else {
+			switch $(i:B)
+			{
+				case lib*	: isfile = true ;
+				case *		: isfile = ;
+			}
+		}
+		if $(isfile) {
+			NEEDLIBS on $(1) += $(i) ;
+			DEPENDS $(1) : $(i) ;
+		} else {
+			LINKLIBS on $(1) += -l$(i) ;
 		}
 	}
 }
