@@ -565,7 +565,7 @@ do_rmall(int argc, char **argv)
     if (err != 0) {
         printf("readdir failed on: %s\n", dent->d_name);
     }
-	printf("%ld files removed!n",count);
+	printf("%ld files removed!\n", count);
 
     sys_closedir(1, dirfd);
 }
