@@ -1,3 +1,31 @@
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//  Copyright (c) 2002, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        shutdown.cpp
+//  Author:      Francois Revol (mmu_man@users.sf.net)
+//  Description: shuts down the system, either halting or rebooting.
+//
+//  Notes:
+//  This program behaves identically as the BeOS R5 version, with these 
+//  added arguments:
+//  
+//  -a alert user while counting down
+//  -c cancels any running shutdown
+//
+//  There seem to be a race condition (sometimes crashes on quit with 
+//  "the looper must be locked"), if you find it, tell me,
+//  tried 3 hours to find it.
+//  Some code from Shard's Archiver from BeBits (was BSD/MIT too :).
+//
+//  Compile with: LDFLAGS="-lbe" make
+//
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
@@ -13,8 +41,6 @@
 #include <unistd.h>
 #include <View.h>
 #include <Window.h>
-
-// LDFLAGS="-lbe" make
 
 //from bdb-ing /bin/shutdown:
 #define B_SYSTEM_SHUTDOWN 0x12d
@@ -164,7 +190,6 @@ SView::SView(BRect frame)
 		*fTitleStr << "Rebooting in " << (int32)fTimeLeft << " seconds !";
 	else
 		*fTitleStr << "Shutting down in " << (int32)fTimeLeft << " seconds !";
-//	fTitle = new BStringView(BRect( fLeftMargin, fTopMargin, fLeftMargin, fTopMargin), "", fTitleStr->String());
 	fTitle = new BStringView(BRect(55, 10, 260, 35), "", fTitleStr->String());
 	fButton = new BButton(BRect(159, 42, 259, 66), "quit", "Cancel", new BMessage('_QRQ'));
 	fButton->MakeDefault(true);
@@ -206,7 +231,6 @@ SView::Draw(BRect updateRect)
 	SetHighColor(tint_color(ViewColor(), B_HIGHLIGHT_BACKGROUND_TINT));
 	FillRect(BRect(0, 0, B_LARGE_ICON, bounds.bottom));
 	
-	// fIcon if any
 	if(fIcon != NULL)
 	{
 		DrawBitmap(fIcon, BPoint( (B_LARGE_ICON / 2), fTopMargin));
@@ -283,6 +307,8 @@ int32 app_thread(void *arg)
 
 /***************************/
 
+// we get here when shutdown is cancelled.
+// then sleep() returns
 void handle_usr1(int sig)
 {
 	while (0);
@@ -347,7 +373,7 @@ int main(int argc, char **argv)
 		signal(SIGUSR1, handle_usr1);
 
 		if (alert) {
-			puts("shutting down");
+			// BApplication::Run() blocks
 			BApp_thread = spawn_thread(app_thread, "BApplication", B_NORMAL_PRIORITY, (void *)find_thread(NULL));
 			resume_thread(BApp_thread);
 		}
