@@ -156,16 +156,21 @@ void CursorManager::DeleteCursor(int32 token)
 void CursorManager::RemoveAppCursors(team_id team)
 {
 	Lock();
-
-	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList->CountItems();i++)
+	
+	int32 i=0;
+	ServerCursor *temp=(ServerCursor*)fCursorList->ItemAt(i);
+	while(temp)
 	{
-		temp=(ServerCursor*)fCursorList->ItemAt(i);
 		if(temp && temp->OwningTeam()==team)
 		{
 			fCursorList->RemoveItem(i);
 			delete temp;
 		}
+		else
+		{
+			i++;
+		}
+		temp=(ServerCursor*)fCursorList->ItemAt(i);
 	}
 	Unlock();
 }

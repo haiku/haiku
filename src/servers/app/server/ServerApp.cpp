@@ -153,9 +153,11 @@ ServerApp::~ServerApp(void)
 	
 	delete fMsgSender;
 	fMsgSender=NULL;
-	
-	if(fAppCursor)
-		delete fAppCursor;
+
+	// This shouldn't be necessary -- all cursors owned by the app
+	// should be cleaned up by RemoveAppCursors	
+//	if(fAppCursor)
+//		delete fAppCursor;
 
 	cursormanager->RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
