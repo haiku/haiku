@@ -27,7 +27,7 @@ struct TRefFuncPolicy
 		return msg.AddRef(name, &val);
 	}
 	static status_t AddData(BMessage& msg, const char* name, type_code type,
-							entry_ref* data, ssize_t size);
+							entry_ref* data, ssize_t size, bool);
 	static status_t Find(BMessage& msg, const char* name, int32 index,
 						 entry_ref* val)
 	{
@@ -50,7 +50,7 @@ struct TRefFuncPolicy
 		static entry_ref sRef;
 };
 status_t TRefFuncPolicy::AddData(BMessage& msg, const char* name, type_code type,
-								 entry_ref* data, ssize_t size)
+								 entry_ref* data, ssize_t size, bool)
 {
 	BPath Path(data);
 	status_t err = Path.InitCheck();

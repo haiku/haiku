@@ -31,7 +31,7 @@ struct TBStringFuncPolicy
 	static status_t Replace(BMessage& msg, const char* name, int32 index,
 						 BString& data);
 	static status_t AddData(BMessage& msg, const char* name, type_code type,
-						 const BString* data, ssize_t size);
+						 const BString* data, ssize_t size, bool);
 	static status_t FindData(BMessage& msg, const char* name, type_code type,
 						  int32 index, const void** data, ssize_t* size);
 
@@ -74,7 +74,7 @@ status_t TBStringFuncPolicy::Replace(BMessage& msg, const char* name,
 //------------------------------------------------------------------------------
 status_t TBStringFuncPolicy::AddData(BMessage& msg, const char* name,
 										 type_code type, const BString* data,
-										 ssize_t size)
+										 ssize_t size, bool)
 {
 	return msg.AddData(name, type, (const void*)data->String(), size,
 					   false);

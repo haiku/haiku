@@ -65,6 +65,18 @@ struct ArrayTypeBase
 	static SizeType Size(ArrayType& array) { return array.size(); }
 };
 //------------------------------------------------------------------------------
+template<class Type>
+struct TypePolicy
+{
+	typedef Type* TypePtr;
+	enum { FixedSize = true };
+	inline Type& Dereference(TypePtr p)
+	{
+		return *p;
+	}
+	inline TypePtr AddressOf(Type& t) { return &t; }
+};
+//------------------------------------------------------------------------------
 template
 <
 	typename Type,
@@ -78,16 +90,16 @@ template
 	status_t (BMessage::*FindDataFunc)(const char*, type_code, int32,
 									   const void**, ssize_t*) const = &BMessage::FindData
 >
-struct TMessageItemFuncPolicy
+struct TMessageItemFuncPolicy : public TypePolicy<Type>
 {
 	static status_t Add(BMessage& msg, const char* name, Type& val)
 	{
 		return (msg.*AddFunc)(name, val);
 	}
 	static status_t AddData(BMessage& msg, const char* name, type_code type,
-							Type* val, ssize_t size)
+							TypePtr val, ssize_t size, bool fixedSize = true)
 	{
-		return (msg.*AddDataFunc)(name, type, (const void*)val, size);
+		return (msg.*AddDataFunc)(name, type, (const void*)val, size, fixedSize);
 	}
 	static status_t Find(BMessage& msg, const char* name, int32 index, Type* val)
 	{
@@ -150,7 +162,7 @@ template
 	class ComparePolicy		// bool Compare(const Type& lhs, const Type& rhs)
 		= TMessageItemComparePolicy<Type>
 >
-class TMessageItemTest : public TestCase
+class TMessageItemTest : public TestCase, public TypePolicy<Type>
 {
 	public:
 		TMessageItemTest() {;}
@@ -199,8 +211,6 @@ MessageItemTest1()
 	CPPUNIT_ASSERT(ptr == NULL);
 }
 //------------------------------------------------------------------------------
-//	R5 segfaults on the find data portion of this test for entry_refs
-//	TODO: test R5 for entry_ref & BMessage
 template
 <
 	class Type,
@@ -222,16 +232,15 @@ MessageItemTest2()
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0), in));
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
-	Type* pout = NULL;
+	TypePtr pout = NULL;
 	ssize_t size;
 	status_t err = FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size);
 	CPPUNIT_ASSERT(err == B_OK);
-	CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in));
-	CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+	CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in));
+	CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 }
 //------------------------------------------------------------------------------
-//	TODO: test R5 for entry_ref & BMessage
 template
 <
 	class Type,
@@ -256,12 +265,12 @@ MessageItemTest3()
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in2));
 	out = InitPolicy::Zero();
-	Type* pout;
+	TypePtr pout;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size) == B_OK);
-	CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in2));
-	CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+	CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in2));
+	CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 }
 //------------------------------------------------------------------------------
 template
@@ -291,7 +300,6 @@ MessageItemTest4()
 	CPPUNIT_ASSERT(ptr == NULL);
 }
 //------------------------------------------------------------------------------
-//	TODO: test R5 for entry_ref & BMessage
 template
 <
 	class Type,
@@ -308,7 +316,7 @@ MessageItemTest5()
 	BMessage msg;
 	ArrayType in = InitPolicy::Array();
 	Type out = InitPolicy::Zero();
-	Type* pout;
+	TypePtr pout;
 	ssize_t size;
 	
 	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
@@ -325,12 +333,11 @@ MessageItemTest5()
 		CPPUNIT_ASSERT(ComparePolicy::Compare(out, in[i]));
 		CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, i,
 											(const void**)&pout, &size) == B_OK);
-		CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in[i]));
-		CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+		CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in[i]));
+		CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 	}
 }
 //------------------------------------------------------------------------------
-//	TODO: test R5 for entry_ref & BMessage
 template
 <
 	class Type,
@@ -362,15 +369,14 @@ MessageItemTest6()
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", rIndex, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in2));
 	out = InitPolicy::Zero();
-	Type* pout;
+	TypePtr pout;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, rIndex,
 										(const void**)&pout, &size) == B_OK);
-	CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in2));
-	CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+	CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in2));
+	CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 }
 //------------------------------------------------------------------------------
-//	TODO: test R5 for entry_ref & BMessage
 template
 <
 	class Type,
@@ -387,21 +393,23 @@ MessageItemTest7()
 	BMessage msg;
 	Type in = InitPolicy::Test1();
 	Type out = InitPolicy::Zero();
-	CPPUNIT_ASSERT(FuncPolicy::AddData(msg, "item", TypeCode, &in,
-									   InitPolicy::SizeOf(in)) == B_OK);
+	CPPUNIT_ASSERT(FuncPolicy::AddData(msg, "item", TypeCode, AddressOf(in),
+									   InitPolicy::SizeOf(in),
+									   TypePolicy<Type>::FixedSize) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", 0));
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0),
 										  in));
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
-	Type* pout = NULL;
+	TypePtr pout = NULL;
 	ssize_t size;
 	CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, 0, 
 										(const void**)&pout, &size) == B_OK);
-	CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in));
-	CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+	CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in));
+	CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 }
 //------------------------------------------------------------------------------
+#include <stdio.h>
 template
 <
 	class Type,
@@ -418,13 +426,13 @@ MessageItemTest8()
 	BMessage msg;
 	ArrayType in = InitPolicy::Array();
 	Type out = InitPolicy::Zero();
-	Type* pout;
+	TypePtr pout;
 	ssize_t size;
-	
 	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::AddData(msg, "item", TypeCode,
-					   &in[i], InitPolicy::SizeOf(in[i])) == B_OK);
+					   AddressOf(in[i]), InitPolicy::SizeOf(in[i]),
+					   TypePolicy<Type>::FixedSize) == B_OK);
 	}
 
 	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
@@ -436,8 +444,8 @@ MessageItemTest8()
 		CPPUNIT_ASSERT(ComparePolicy::Compare(out, in[i]));
 		CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, i,
 											(const void**)&pout, &size) == B_OK);
-		CPPUNIT_ASSERT(ComparePolicy::Compare(*pout, in[i]));
-		CPPUNIT_ASSERT(AssertPolicy::Size(size, *pout));
+		CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in[i]));
+		CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
 	}
 }
 //------------------------------------------------------------------------------

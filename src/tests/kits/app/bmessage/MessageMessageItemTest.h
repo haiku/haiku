@@ -25,7 +25,7 @@ struct TMessageFuncPolicy
 {
 	static status_t Add(BMessage& msg, const char* name, BMessage& val);
 	static status_t AddData(BMessage& msg, const char* name, type_code type,
-							BMessage* data, ssize_t size);
+							BMessage* data, ssize_t size, bool);
 	static status_t Find(BMessage& msg, const char* name, int32 index,
 						 BMessage* val);
 	static BMessage QuickFind(BMessage& msg, const char* name, int32 index);
@@ -48,7 +48,7 @@ status_t TMessageFuncPolicy::Add(BMessage& msg, const char* name,
 //------------------------------------------------------------------------------
 status_t TMessageFuncPolicy::AddData(BMessage& msg, const char* name,
 									 type_code type, BMessage* data,
-									 ssize_t size)
+									 ssize_t size, bool)
 {
 	char* buf = new char[size];
 	status_t err = data->Flatten(buf, size);
