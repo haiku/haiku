@@ -183,6 +183,10 @@ void BMidiLocalConsumer::Data(
 						{
 							SystemExclusive(data + 1, length - 2, time);
 						}
+						else // sysex-end is not required
+						{
+							SystemExclusive(data + 1, length - 1, time);
+						}
 						break;
 					}
 
