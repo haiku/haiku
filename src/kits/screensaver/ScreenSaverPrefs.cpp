@@ -58,6 +58,7 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 	neverBlank=(arrowDirection)temp;
 	setOnValue(msg,"lockdelay",passwordTime);
 
+	msg->FindRect("windowframe",&windowFrame);
 	msg->FindBool("lockenable",&lockenable);
 	msg->FindString("lockmethod",&strPtr);
 	isNetworkPWD=(strcmp("custom",strPtr));
@@ -78,12 +79,16 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 		}
 	else {
 		msg->FindString("lockpassword",&strPtr);
-		strcpy(password,strPtr);
+		if (strPtr)
+			strncpy(password,strPtr,B_PATH_NAME_LENGTH-1);
 		}
 		
 	if (B_OK != msg->FindString("modulename",&strPtr)) 
 		blankTime=-1; // If the module doesn't exist, never blank.
-	strcpy(moduleName,strPtr);
+	if (strPtr)
+		strncpy(moduleName,strPtr,B_PATH_NAME_LENGTH-1);
+	else
+		strcpy(moduleName,"Blackness");
 	BString stateMsgName("modulesettings_");
 	stateMsgName+=moduleName;
 	msg->FindMessage(stateMsgName.String(),&stateMsg); // Doesn't matter if it fails - stateMsg would just continue to be empty
