@@ -149,6 +149,8 @@ static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t 
 static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
+static status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
+	bool traverseLeafLink, int count, struct vnode **_vnode, int *_type);
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
 static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 	struct vnode **_vnode, bool kernel);
@@ -693,38 +695,18 @@ get_dir_path_and_leaf(char *path, char *filename)
 static status_t
 entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, struct vnode **_vnode)
 {
-// TODO: This function should deal with mount points properly. Just as
-// vnode_path_to_vnode() does. In doubt just use that function.
+	char clonedName[B_FILE_NAME_LENGTH + 1];
+	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
+		return B_NAME_TOO_LONG;
 
-	struct vnode *directory, *vnode;
-	vnode_id id;
-	int status;
-	int type;
+	// get the directory vnode and let vnode_path_to_vnode() do the rest
+	struct vnode *directory;
 
-	status = get_vnode(mountID, directoryID, &directory, false);
+	status_t status = get_vnode(mountID, directoryID, &directory, false);
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(directory, lookup)(directory->mount->cookie,
-		directory->private_node, name, &id, &type);
-	put_vnode(directory);
-
-	if (status < 0)
-		return status;
-
-	mutex_lock(&sVnodeMutex);
-	vnode = lookup_vnode(mountID, id);
-	mutex_unlock(&sVnodeMutex);
-
-	if (vnode == NULL) {
-		// fs_lookup() should have left the vnode referenced, so chances
-		// are good that this will never happen
-		panic("entry_ref_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", mountID, id);
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	*_vnode = vnode;
-	return B_OK;
+	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL);
 }
 
 
