@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-4/2004.
+	Rudolf Cornelissen 5/2002-6/2004.
 */
 
 /* standard kernel driver stuff */
@@ -953,12 +953,12 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	KISAGRPHW(BUF1ORGL, (bes->a1orgv & 0xff));
 	KISAGRPHW(BUF1ORGM, ((bes->a1orgv >> 8) & 0xff));
 	KISAGRPHW(BUF1ORGH, ((bes->a1orgv >> 16) & 0xff));
-	/* b2 = 0: don't use horizontal mirroring (NM2160) */
-	/* other bits do ??? */
-	KISAGRPHW(0xbf, 0x02);
 	/* ??? */
 	KISAGRPHW(0xbd, 0x02);
 	KISAGRPHW(0xbe, 0x00);
+	/* b2 = 0: don't use horizontal mirroring (NM2160) */
+	/* other bits do ??? */
+	KISAGRPHW(0xbf, 0x02);
 	/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
 	 * so we do 'pixel precise' left clipping via modification of buffer
 	 * startadress above instead.
