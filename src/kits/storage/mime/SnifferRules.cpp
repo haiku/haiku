@@ -129,9 +129,8 @@ SnifferRules::~SnifferRules()
 /*!	\brief Guesses a MIME type for the supplied entry_ref.
 
 	Only the data in the given entry is considered, not the filename or
-	its extension.
-	
-	Please see GuessMimeType(BPositionIO*, BString*) for more details.
+	its extension. Please see GuessMimeType(BPositionIO*, BString*) for
+	more details.
 
 	\param ref The entry to sniff
 	\param type Pointer to a pre-allocated BString which is set to the
@@ -145,57 +144,38 @@ status_t
 SnifferRules::GuessMimeType(const entry_ref *ref, BString *type)
 {
 	status_t err = ref && type ? B_OK : B_BAD_VALUE;
-
 	ssize_t bytes = 0;
 	char *buffer = NULL;
-	// See if we have a directory, a symlink, or a vanilla file
-	BNode node;
-	struct stat statData;
-	if (!err)
-		err = node.SetTo(ref);
-	if (!err)
-		err = node.GetStat(&statData);
+	BFile file;
+
+	// First find out the max number of bytes we need to read
+	// from the file to fully accomodate all of our currently
+	// installed sniffer rules
 	if (!err) {
-		if (S_ISDIR(statData.st_mode)) {
-			// Directory
-			type->SetTo(kDirectoryType);		
-		} else if (S_ISLNK(statData.st_mode)) {
-			// Symlink
-			type->SetTo(kSymlinkType);		
-		} else if (S_ISREG(statData.st_mode)) {
-			// Regular file		
-			BFile file;
-			// First find out the max number of bytes we need to read
-			// from the file to fully accomodate all of our currently
-			// installed sniffer rules
-			if (!err) {
-				bytes = MaxBytesNeeded();
-				if (bytes < 0)
-					err = bytes;
-			}
-			// Next read that many bytes (or fewer, if the file isn't
-			// that long) into a buffer
-			if (!err) {
-				buffer = new(nothrow) char[bytes];
-				if (!buffer)
-					err = B_NO_MEMORY;
-			}		
-			if (!err)
-				err = file.SetTo(ref, B_READ_ONLY);
-			if (!err) {
-				bytes = file.Read(buffer, bytes);
-				if (bytes < 0)
-					err = bytes;
-			}
-			// Now sniff the buffer
-			if (!err) {
-				BMemoryIO data(buffer, bytes);
-				err = GuessMimeType(&data, type);
-			}
-		} else {
-			// ?????
-			err = B_FILE_ERROR;
-		}	
+		bytes = MaxBytesNeeded();
+		if (bytes < 0)
+			err = bytes;
+	}
+	
+	// Next read that many bytes (or fewer, if the file isn't
+	// that long) into a buffer
+	if (!err) {
+		buffer = new(nothrow) char[bytes];
+		if (!buffer)
+			err = B_NO_MEMORY;
+	}		
+	if (!err)
+		err = file.SetTo(ref, B_READ_ONLY);
+	if (!err) {
+		bytes = file.Read(buffer, bytes);
+		if (bytes < 0)
+			err = bytes;
+	}
+	
+	// Now sniff the buffer
+	if (!err) {
+		BMemoryIO data(buffer, bytes);
+		err = GuessMimeType(&data, type);
 	}
 	
 	return err;	
