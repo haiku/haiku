@@ -722,9 +722,11 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 
 
 static status_t
-vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, struct vnode **_vnode, int count)
+vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
+	int count, struct vnode **_vnode, int *_type)
 {
 	status_t status = 0;
+	int type = 0;
 
 	FUNCTION(("vnode_path_to_vnode(path = %s)\n", path));
 
@@ -735,7 +737,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 		struct vnode *nextVnode;
 		vnode_id vnodeID;
 		char *nextPath;
-		int type;
 
 		PRINT(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
 
@@ -839,7 +840,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 				inc_vnode_ref_count(vnode);
 			}
 
-			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, &nextVnode, count + 1);
+			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1, &nextVnode, _type);
 
 			free(buffer);
 
@@ -865,11 +866,14 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 	}
 
 	*_vnode = vnode;
+	if (_type)
+		*_type = type;
+
 	return B_OK;
 }
 
 
-static int
+static status_t
 path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 {
 	struct vnode *start;
@@ -894,7 +898,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 		mutex_unlock(&context->io_mutex);
 	}
 
-	return vnode_path_to_vnode(start, path, traverseLink, _vnode, 0);
+	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, NULL);
 }
 
 
@@ -903,10 +907,11 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
  *	The path buffer must be able to store at least one additional character.
  */
 
-static int
+static status_t
 path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel)
 {
 	char *p = strrchr(path, '/');
+		// '/' are not allowed in file names!
 
 	FUNCTION(("path_to_dir_vnode(path = %s)\n", path));
 
@@ -1385,6 +1390,85 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 		*_vnode = vnode;
 
 	return err;
+}
+
+
+status_t
+vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer,
+	size_t bufferSize)
+{
+	struct vnode *dir, *file;
+	status_t status;
+	size_t length;
+	char *path;
+
+	if (strlcpy(pathBuffer, basePath, bufferSize) > bufferSize)
+		return B_BUFFER_OVERFLOW;
+
+	status = path_to_vnode(pathBuffer, true, &dir, true);
+	if (status < B_OK)
+		return status;
+
+	length = strlen(pathBuffer);
+	if (pathBuffer[length - 1] != '/') {
+		// ToDo: bufferSize race condition
+		pathBuffer[length] = '/';
+		length++;
+	}
+
+	path = pathBuffer + length;
+	bufferSize -= length;
+
+	while (moduleName) {
+		int type;
+
+		char *nextPath = strchr(moduleName, '/');
+		if (nextPath == NULL)
+			length = strlen(moduleName);
+		else
+			length = nextPath - moduleName;
+
+		if (length + 1>= bufferSize) {
+			status = B_BUFFER_OVERFLOW;
+			goto err;
+		}
+
+		memcpy(path, moduleName, length);
+		path[length] = '\0';
+		moduleName = nextPath;
+
+		status = vnode_path_to_vnode(dir, path, true, 0, &file, &type);
+		if (status < B_OK)
+			goto err;
+
+		put_vnode(dir);
+
+		if (S_ISDIR(type)) {
+			// goto the next directory
+			path[length] = '/';
+			path[length + 1] = '\0';
+			path += length + 1;
+
+			dir = file;
+		} else if (S_ISREG(type)) {
+			// it's a file so it should be what we've searched for
+			put_vnode(file);
+
+			return B_OK;
+		} else {
+			PRINT(("vfs_get_module_path(): something is strange here...\n"));
+			status = B_ERROR;
+			goto err;
+		}
+	}
+
+	// if we got here, the moduleName just pointed to a directory, not to
+	// a real module - what should we do in this case?
+	status = B_ENTRY_NOT_FOUND;
+
+err:
+	put_vnode(dir);
+	return status;
 }
 
 
