@@ -80,6 +80,7 @@ public:
 	
 	int32 GetWorkspaceIndex(void) { return _workspace_index; }
 	Workspace *GetWorkspace(void) { return _workspace; }
+	void SetWorkspace(Workspace *wkspc);
 
 protected:	
 	friend ServerApp;

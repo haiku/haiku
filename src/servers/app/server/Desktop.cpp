@@ -302,22 +302,54 @@ DisplayDriver *GetGfxDriver(screen_id screen=B_MAIN_SCREEN_ID)
 	\param index The workspace to change
 	\param res Resolution constant from GraphicsDefs.h
 	\param stick If false, resolution will revert to its old value on next boot
-	\param screen ID of the screen to change
+	\param screen ID of the screen to change. Currently unused.
 	\return B_OK if successful, B_ERROR if not.
 	
 	Because of the lack of outside multimonitor support, the screen ID is ignored for now.
 */
 status_t SetSpace(int32 index, int32 res, bool stick=true, screen_id screen=B_MAIN_SCREEN_ID)
 {
-	return B_ERROR;
+	desktop_private::workspacelock.Lock();
+	status_t stat=desktop_private::activescreen->SetSpace(index,res,stick);
+	desktop_private::workspacelock.Unlock();
+	return stat;
 }
 
+/*!
+	\brief Adds a window to the desktop so that it will be displayed
+	\param win Window to add
+	\param workspace index of the workspace to add the window to
+	\param screen Optional screen specifier. Currently unused.
+*/
 void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID)
 {
+	// Workspace() will be non-NULL if it has already been added to the desktop
+	if(!win || win->GetWorkspace())
+		return;
+	
+	desktop_private::workspacelock.Lock();
+	desktop_private::layerlock.Lock();
+
+	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
+	win->SetWorkspace(w);
+	
+	desktop_private::layerlock.Unlock();
+	desktop_private::workspacelock.Unlock();
 }
 
+/*!
+	\brief Removes a window from the desktop
+	\param win Window to remove
+*/
 void RemoveWindowFromDesktop(ServerWindow *win)
 {
+	desktop_private::workspacelock.Lock();
+	desktop_private::layerlock.Lock();
+	
+	win->SetWorkspace(NULL);
+	
+	desktop_private::layerlock.Unlock();
+	desktop_private::workspacelock.Unlock();
 }
 
 /*!

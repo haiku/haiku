@@ -91,6 +91,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 		resume_thread(_monitorthread);
 
 	_workspace_index=index;
+	_workspace=NULL;
 
 	AddWindowToDesktop(this,index);
 }
@@ -445,6 +446,10 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 }
 
 void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
+{
+}
+
+void ServerWindow::SetWorkspace(Workspace *wkspc)
 {
 }
 
