@@ -146,7 +146,8 @@ IconView::UpdateIcon()
 
 
 Slider::Slider(BRect rect, const char *name)
-	: BSlider(rect, name, NULL, NULL, 0, 0x10000000, B_HORIZONTAL, B_TRIANGLE_THUMB)
+	: BSlider(rect, name, NULL, NULL, 0, 0x10000000, B_HORIZONTAL,
+		B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT)
 {
 }
 
@@ -170,7 +171,7 @@ Slider::DrawBar()
 		// ToDo: the color should probably be retrieved from one of the ui colors
 	view->FillRect(frame);
 
-	frame.left = frame.right;
+	frame.left = frame.right + 1;
 	frame.right = barFrame.right - 1;
 	view->SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	view->FillRect(frame);
