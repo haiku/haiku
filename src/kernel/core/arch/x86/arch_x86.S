@@ -121,7 +121,8 @@ _copy_more:
 	movl	%edx,-8(%ebx)	// args2
 	movl	%ebx,-12(%ebx)	// fake return address to copied exit stub
 	sub		$12,%ebx
-
+	xorl	%ebp, %ebp		// this is the last stack frame - we don't need one on return
+							// (%ebp marks the beginning of this stack frame)
 	pushl	$USER_DATA_SEG	// user data segment
 	pushl	%ebx			// user stack
 	pushl	$(1 << 9) | 2	// user flags
@@ -176,7 +177,7 @@ FUNCTION(arch_dbg_save_registers):
 
 	pushfl
 	popl	%eax
-	mov	%eax, 36(%esi)
+	movl	%eax, 36(%esi)
 
 	movl	%cs, 40(%esi)
 	movl	%ss, 44(%esi)
