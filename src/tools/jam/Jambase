@@ -73,6 +73,8 @@
 # Library lib : source ;		archive library from compiled sources
 # LibraryFromObjects lib : objects ;	archive library from objects
 # LinkLibraries images : libraries ;	bag libraries onto Mains
+# LocalClean target : deps ;	a conditional Clean
+# LocalDepends target : deps ;	a conditional Depends
 # Main image : source ;			link executable from compiled sources
 # MainFromObjects image : objects ;	link executable from objects
 # MkDir dir ;				make a directory, if not there
@@ -101,6 +103,7 @@
 # FGrist d1 d2 ... ;			return d1!d2!...
 # FGristFiles value ;			return $(value:G=$(SOURCE_GRIST))
 # FGristSourceFiles value ;		return $(value:G=$(SOURCE_GRIST))
+# FIsPrefix a : b ;				return whether or not a is a prefix of b
 # FRelPath d1 : d2 ;			return rel path from d1 to d2
 # FSubDir d1 d2 ... ;			return path to root
 #
@@ -642,7 +645,7 @@ rule Chmod
 
 rule File
 {
-	Depends files : $(<) ;
+	LocalDepends files : $(<) ;
 	Depends $(<) : $(>) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
 	MODE on $(<) = $(FILEMODE) ;
@@ -660,7 +663,7 @@ rule GenFile
 	local _s = [ FAppendSuffix $(>[1]) : $(SUFEXE) ] ;
 	Depends $(_t) : $(_s) $(>[2-]) ;
 	GenFile1 $(_t) : $(_s) $(>[2-]) ;
-	Clean clean : $(_t) ;
+	LocalClean clean : $(_t) ;
 }
 
 rule GenFile1
@@ -671,7 +674,7 @@ rule GenFile1
 
 rule HardLink
 {
-	Depends files : $(<) ;
+	LocalDepends files : $(<) ;
 	Depends $(<) : $(>) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
 }
@@ -717,8 +720,8 @@ rule InstallInto
 	# sources are in SEARCH_SOURCE
 	# targets are in dir
 
-	Depends install : $(t) ;
-	Clean uninstall : $(t) ;
+	LocalDepends install : $(t) ;
+	LocalClean uninstall : $(t) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
 	MakeLocate $(t) : $(<) ;
 
@@ -802,7 +805,7 @@ rule Lex
 	LexMv $(<) : $(>) ;
 	Depends $(<) : $(>) ;
 	MakeLocate $(<) : $(LOCATE_SOURCE) ;
-	Clean clean : $(<) ;
+	LocalClean clean : $(<) ;
 }
 
 rule Library
@@ -824,11 +827,11 @@ rule LibraryFromObjects
 
 	if $(KEEPOBJS)
 	{
-	    Depends obj : $(_s) ;
+	    LocalDepends obj : $(_s) ;
 	}
 	else
 	{
-	    Depends lib : $(_l) ;
+	    LocalDepends lib : $(_l) ;
 	}
 
 	# Set LOCATE for the library and its contents.  The bound
@@ -863,7 +866,7 @@ rule LibraryFromObjects
 	    }
 	}
 
-	Clean clean : $(_l) ;
+	LocalClean clean : $(_l) ;
 
 	if $(CRELIB) { CreLib $(_l) : $(_s[1]) ; }
 
@@ -893,6 +896,28 @@ rule LinkLibraries
 	NEEDLIBS on $(_t) += $(>:S=$(SUFLIB)) ;
 }
 
+rule LocalClean
+{
+	# LocalClean <targets> : <deps> ;
+	# Like Clean, but has only effect in a Jamfile in the
+	# directory or any of its subdirectories where jam has been invoked.
+
+	if [ FIsPrefix $(INVOCATION_SUBDIR) : $(SUBDIR_TOKENS) ] {
+		Clean $(1) : $(2) ;
+	}
+}
+
+rule LocalDepends
+{
+	# LocalDepends <targets> : <deps> ;
+	# Like Depends, but has only effect in a Jamfile in the
+	# directory or any of its subdirectories where jam has been invoked.
+
+	if [ FIsPrefix $(INVOCATION_SUBDIR) : $(SUBDIR_TOKENS) ] {
+		Depends $(1) : $(2) ;
+	}
+}
+
 rule Main
 {
 	MainFromObjects $(<) : $(>:S=$(SUFOBJ)) ;
@@ -919,11 +944,11 @@ rule MainFromObjects
 
 	# make compiled sources a dependency of target
 
-	Depends exe : $(_t) ;
+	LocalDepends exe : $(_t) ;
 	Depends $(_t) : $(_s) ;
 	MakeLocate $(_t) : $(LOCATE_TARGET) ;
 
-	Clean clean : $(_t) ;
+	LocalClean clean : $(_t) ;
 
 	Link $(_t) : $(_s) ;
 }
@@ -955,7 +980,7 @@ rule MkDir
 
 	    $(<)-mkdir = true ;
 	    MkDir1 $(<) ;
-	    Depends dirs : $(<) ;
+	    LocalDepends dirs : $(<) ;
 
 	    # Recursively make parent directories.
 	    # $(<:P) = $(<)'s parent, & we recurse until root
@@ -988,7 +1013,7 @@ rule Object
 {
 	# locate object and search for source, if wanted
 
-	Clean clean : $(<) ;
+	LocalClean clean : $(<) ;
 
 	MakeLocate $(<) : $(LOCATE_TARGET) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
@@ -1081,7 +1106,7 @@ rule Objects
 	for _i in [ FGristFiles $(<) ]
 	{
 		Object $(_i:S=$(SUFOBJ)) : $(_i) ;
-		Depends obj : $(_i:S=$(SUFOBJ)) ;
+		LocalDepends obj : $(_i:S=$(SUFOBJ)) ;
 	}
 }
 
@@ -1097,20 +1122,20 @@ rule Setuid
 
 rule Shell
 {
-	Depends shell : $(<) ;
+	LocalDepends shell : $(<) ;
 	Depends $(<) : $(>) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
 	MODE on $(<) = $(SHELLMODE) ;
-	Clean clean : $(<) ;
+	LocalClean clean : $(<) ;
 	Chmod $(<) ;
 }
 
 rule SoftLink
 {
-	Depends files : $(<) ;
+	LocalDepends files : $(<) ;
 	Depends $(<) : $(>) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
-	Clean clean : $(<) ;
+	LocalClean clean : $(<) ;
 }
 
 rule SubDir
@@ -1140,6 +1165,18 @@ rule SubDir
 	    }
 
 	    $(_top) = [ FSubDir $(<[2-]) ] ;
+	}
+
+	# If we are the first Jamfile, include the top Jamfile and stop processing
+	# this file any further.
+	#
+	if ! $(INVOCATION_SUBDIR_SET) {
+		INVOCATION_SUBDIR_SET = true ;
+		INVOCATION_SUBDIR = $(<[2-]) ;
+		if $(INVOCATION_SUBDIR) {
+			SubInclude $(_top) ;
+			jumptoeof ;
+		}
 	}
 
 	#
@@ -1240,7 +1277,7 @@ rule Yacc
 	    Depends $(<) $(_h) : $(>) ;
 	    Yacc1 $(<) $(_h) : $(>) ;
 	    YaccMv $(<) $(_h) : $(>) ;
-	    Clean clean : $(<) $(_h) ;
+	    LocalClean clean : $(<) $(_h) ;
 	}
 
 	# make sure someone includes $(_h) else it will be
@@ -1290,6 +1327,25 @@ rule FGristSourceFiles
 	    }
 
 	    return $(_o) ;
+	}
+}
+
+rule FIsPrefix
+{
+	# FIsPrefix <a> : <b> ;
+	# Returns true, if list <a> is a prefix (a proper one or equal) of
+	# list <b>, an empty list otherwise.
+	local a = $(1) ;
+	local b = $(2) ;
+	while $(a) && $(a[1]) = $(b[1]) {
+		a = $(a[2-]) ;
+		b = $(b[2-]) ;
+	}
+
+	if $(a) {
+		return ;
+	} else {
+		return true ;
 	}
 }
 
