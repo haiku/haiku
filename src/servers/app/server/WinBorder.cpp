@@ -380,9 +380,7 @@ void WinBorder::MouseWheel(PointerEvent& evt, BPoint& ptWhere)
 		wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
 		wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
 
-		Window()->Lock();
 		Window()->SendMessageToClient(&wheelmsg);
-		Window()->Unlock();
 	}
 }
 

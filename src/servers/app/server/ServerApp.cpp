@@ -400,10 +400,8 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->Lock();
 				win->fWinBorder->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
-				win->Unlock();
 			}
 */			break;
 		}
@@ -419,10 +417,8 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->Lock();
 				win->fWinBorder->UpdateFont();
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
-				win->Unlock();
 			}
 */			break;
 		}

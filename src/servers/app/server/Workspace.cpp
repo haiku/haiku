@@ -1166,9 +1166,7 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 			BMessage inactive(B_WINDOW_ACTIVATED);
 			inactive.AddInt64("when",system_time());
 			inactive.AddBool("active",false);
-			oldItem->layerPtr->Window()->Lock();
 			oldItem->layerPtr->Window()->SendMessageToClient(&inactive);
-			oldItem->layerPtr->Window()->Unlock();
 		}
 		
 		fFocusItem=item;
@@ -1181,9 +1179,7 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 			active.AddInt64("when",system_time());
 			active.AddBool("active",true);
 			
-			fFocusItem->layerPtr->Window()->Lock();
 			fFocusItem->layerPtr->Window()->SendMessageToClient(&active);
-			fFocusItem->layerPtr->Window()->Unlock();
 		}
 	}
 }
