@@ -1,10 +1,11 @@
-/* Launches an application/document from the shell
-**
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <InterfaceDefs.h>
+/* Launches an application/document from the shell */
+
+
 #include <Roster.h>
 #include <Entry.h>
 #include <String.h>
@@ -15,11 +16,15 @@
 #include <errno.h>
 
 
+const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
+
+
 int
 main(int argc, char **argv)
 {
+	const char *openWith = kTrackerSignature;
+
 	char *progName = argv[0];
-	char *openWith = "application/x-vnd.Be-TRAK";
 	if (strrchr(progName, '/'))
 		progName = strrchr(progName, '/') + 1;
 
@@ -29,11 +34,11 @@ main(int argc, char **argv)
 	BRoster roster;
 
 	while (*++argv) {
-		status_t rc = B_OK;
+		status_t status = B_OK;
 		argc--;
 
 		BEntry entry(*argv);
-		if ((rc = entry.InitCheck()) == B_OK && entry.Exists()) {
+		if ((status = entry.InitCheck()) == B_OK && entry.Exists()) {
 			entry_ref ref;
 			entry.GetRef(&ref);
 
@@ -41,41 +46,40 @@ main(int argc, char **argv)
 			if (target.IsValid()) {
 				BMessage message(B_REFS_RECEIVED);
 				message.AddRef("refs", &ref);
-				/* tell the app to open the file */
-				rc = target.SendMessage(&message);
+				// tell the app to open the file
+				status = target.SendMessage(&message);
 			} else
-				rc = roster.Launch(&ref);
+				status = roster.Launch(&ref);
 		} else if (!strncasecmp("application/", *argv, 12)) {
 			// maybe it's an application-mimetype?
 			
 			// subsequent files are open with that app
 			openWith = *argv;
-			
+
 			// in the case the app is already started, 
 			// don't start it twice if we have other args
 			BList teams;
-			if (argc > 1) {
+			if (argc > 1)
 				roster.GetAppList(*argv, &teams);
-				rc = B_OK;
-			}
-			if (teams.IsEmpty())
-				rc = roster.Launch(*argv);
-		} else if (strstr(*argv, ":")) {
-			BString mimetype = "application/x-vnd.Be.URL.";
-			BString arg(*argv);
-			if (strstr(*argv, "://"))
-				mimetype.Append(arg, arg.FindFirst("://"));
-			else
-				mimetype.Append(arg, arg.FindFirst(":"));
-			char *args[2] = { *argv, NULL };
-			rc = roster.Launch(mimetype.String(), 1, args);
-			if (rc == B_ALREADY_RUNNING)
-				rc = B_OK;
-		} else if (rc == B_OK)
-			rc = B_ENTRY_NOT_FOUND;
 
-		if (rc != B_OK)
-			fprintf(stderr, "%s: \"%s\": %s\n", progName, *argv, strerror(rc));
+			if (teams.IsEmpty())
+				status = roster.Launch(*argv);
+		} else if (strchr(*argv, ':')) {
+			// try to open it as an URI
+			BString mimeType = "application/x-vnd.Be.URL.";
+			BString arg(*argv);
+			if (arg.FindFirst("://") >= 0)
+				mimeType.Append(arg, arg.FindFirst("://"));
+			else
+				mimeType.Append(arg, arg.FindFirst(":"));
+
+			char *args[2] = { *argv, NULL };
+			status = roster.Launch(mimeType.String(), 1, args);
+		} else
+			status = B_ENTRY_NOT_FOUND;
+
+		if (status != B_OK && status != B_ALREADY_RUNNING)
+			fprintf(stderr, "%s: \"%s\": %s\n", progName, *argv, strerror(status));
 	}
 
 	return 0;
