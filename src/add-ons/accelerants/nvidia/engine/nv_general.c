@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.19 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.20 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1133,7 +1133,8 @@ static status_t nv_general_bios_to_powergraphics()
 	 * Note:
 	 * This may only be done when no transfers are in progress on the bus, so now
 	 * is probably a good time.. */
-	nv_agp_setup();
+//fixme: implement route through kerneldriver to access AGP busmanager: in progress...
+//	nv_agp_setup();
 
 	/* turn screen one on */
 	head1_dpms(true, true, true);
