@@ -1,8 +1,15 @@
 /*
-	$Id: PropertyConstructionTest.cpp,v 1.1 2002/08/18 03:44:20 jrand Exp $
+	$Id: PropertyConstructionTest.cpp,v 1.2 2002/08/18 04:14:22 jrand Exp $
 	
 	This file implements the construction test for the OpenBeOS BPropertyInfo
-	code.
+	code.  This class tests the following usecases:
+	  - Construction 1 to 4
+	  - Destruction
+	  - Properties
+	  - Values
+	  - Count Properties
+	  - Count Values
+	  - Unflatten
 	
 	*/
 

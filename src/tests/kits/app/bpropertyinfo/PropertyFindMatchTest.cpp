@@ -1,8 +1,9 @@
 /*
-	$Id: PropertyFindMatchTest.cpp,v 1.1 2002/08/18 03:44:21 jrand Exp $
+	$Id: PropertyFindMatchTest.cpp,v 1.2 2002/08/18 04:14:22 jrand Exp $
 	
 	This file implements the FindMatch test for the OpenBeOS BPropertyInfo
-	code.
+	code.  This class tests the following usecases:
+	  - Find Match
 	
 	*/
 
