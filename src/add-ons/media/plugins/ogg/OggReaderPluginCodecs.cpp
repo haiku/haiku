@@ -147,24 +147,24 @@ GetVorbisCodecStreamInfo(std::vector<ogg_packet> * packets,
 
 
 // http://www.speex.org/manual/node7.html#SECTION00073000000000000000
-typedef struct speex_header
-{
-	char speex_string[8];
-	char speex_version[20];
-	int32 speex_version_id;
-	int32 header_size;
-	int32 rate;
-	int32 mode;
-	int32 mode_bitstream_version;
-	int32 nb_channels;
-	int32 bitrate;
-	int32 frame_size;
-	int32 vbr;
-	int32 frames_per_packet;
-	int32 extra_headers;
-	int32 reserved1;
-	int32 reserved2;
-} speex_header;
+// libspeex/speex_header.h
+typedef struct SpeexHeader {
+   char speex_string[8];       /**< Identifies a Speex bit-stream, always set to "Speex   " */
+   char speex_version[20];     /**< Speex version */
+   int speex_version_id;       /**< Version for Speex (for checking compatibility) */
+   int header_size;            /**< Total size of the header ( sizeof(SpeexHeader) ) */
+   int rate;                   /**< Sampling rate used */
+   int mode;                   /**< Mode used (0 for narrowband, 1 for wideband) */
+   int mode_bitstream_version; /**< Version ID of the bit-stream */
+   int nb_channels;            /**< Number of channels encoded */
+   int bitrate;                /**< Bit-rate used */
+   int frame_size;             /**< Size of frames */
+   int vbr;                    /**< 1 for a VBR encoding, 0 otherwise */
+   int frames_per_packet;      /**< Number of frames stored per Ogg packet */
+   int extra_headers;          /**< Number of additional headers after the comments */
+   int reserved1;              /**< Reserved for future use, must be zero */
+   int reserved2;              /**< Reserved for future use, must be zero */
+} SpeexHeader;
 
 static bool
 isSpeexPacket(ogg_packet * packet)
@@ -175,7 +175,12 @@ isSpeexPacket(ogg_packet * packet)
 static int
 GetSpeexExtraHeaderPacketCount(ogg_packet * packet)
 {
-	return 1;
+	if (packet->bytes < (signed)sizeof(SpeexHeader)) {
+		return -1;
+	}
+	void * data = &(packet->packet[0]);
+	SpeexHeader * header = (SpeexHeader *)data;
+	return 1 + header->extra_headers;
 }
 
 static status_t
@@ -184,11 +189,11 @@ GetSpeexCodecStreamInfo(std::vector<ogg_packet> * packets,
                          media_format *format)
 {
 	ogg_packet * packet = &((*packets)[0]);
-	if (packet->bytes < (signed)sizeof(speex_header)) {
+	if (packet->bytes < (signed)sizeof(SpeexHeader)) {
 		return B_ERROR;
 	}
 	void * data = &(packet->packet[0]);
-	speex_header * header = (speex_header *)data;
+	SpeexHeader * header = (SpeexHeader *)data;
 
 	format->type = B_MEDIA_ENCODED_AUDIO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
@@ -200,7 +205,6 @@ GetSpeexCodecStreamInfo(std::vector<ogg_packet> * packets,
 	} else {
 		// TODO: manually compute it where possible
 	}
-	format->u.encoded_audio.frame_size = header->frame_size;
 	if (header->nb_channels == 1) {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
 	} else {
