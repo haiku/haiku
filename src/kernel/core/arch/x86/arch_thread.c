@@ -178,19 +178,19 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	if (t_to->user_local_storage != NULL)
 		set_tls_context(t_to);
 
-	if (t_from->team->_aspace_id >= 0 && t_to->team->_aspace_id >= 0) {
+	if (t_from->team->aspace != NULL && t_to->team->aspace != NULL) {
 		// they are both uspace threads
-		if (t_from->team->_aspace_id == t_to->team->_aspace_id) {
+		if (t_from->team == t_to->team) {
 			// dont change the pgdir, same address space
 			new_pgdir = NULL;
 		} else {
 			// switching to a new address space
 			new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 		}
-	} else if (t_from->team->_aspace_id < 0 && t_to->team->_aspace_id < 0) {
+	} else if (t_from->team->aspace == NULL && t_to->team->aspace == NULL) {
 		// they must both be kspace threads
 		new_pgdir = NULL;
-	} else if (t_to->team->_aspace_id < 0) {
+	} else if (t_to->team->aspace == NULL) {
 		// the one we're switching to is kspace
 		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
 	} else {

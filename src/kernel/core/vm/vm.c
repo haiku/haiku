@@ -2486,7 +2486,7 @@ area_id
 create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection)
 {
-	return vm_create_anonymous_region(team->_aspace_id, (char *)name, address, 
+	return vm_create_anonymous_region(team->aspace->id, (char *)name, address, 
 				addressSpec, size, lock, protection);
 }
 
@@ -2522,7 +2522,7 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 status_t
 delete_area_etc(struct team *team, area_id area)
 {
-	return vm_delete_region(team->_aspace_id, area);
+	return vm_delete_region(team->aspace->id, area);
 }
 
 

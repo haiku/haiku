@@ -158,10 +158,31 @@ aspace_hash(void *_a, const void *key, uint32 range)
 	vm_address_space *aspace = _a;
 	const aspace_id *id = key;
 
-	if(aspace != NULL)
-		return (aspace->id % range);
-	else
-		return (*id % range);
+	if (aspace != NULL)
+		return aspace->id % range;
+
+	return *id % range;
+}
+
+
+static void
+delete_address_space(vm_address_space *aspace)
+{
+	TRACE(("vm_delete_aspace: called on aspace 0x%lx\n", aspace->id));
+
+	// put this aspace in the deletion state
+	// this guarantees that no one else will add regions to the list
+	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
+	aspace->state = VM_ASPACE_STATE_DELETION;
+
+	vm_delete_areas(aspace);
+
+	(*aspace->translation_map.ops->destroy)(&aspace->translation_map);
+
+	free(aspace->name);
+	delete_sem(aspace->virtual_map.sem);
+	free(aspace);
 }
 
 
@@ -211,10 +232,10 @@ vm_get_current_user_aspace(void)
 aspace_id
 vm_get_current_user_aspace_id(void)
 {
-	struct thread *t = thread_get_current_thread();
+	struct thread *thread = thread_get_current_thread();
 
-	if (t)
-		return t->team->_aspace_id;
+	if (thread)
+		return thread->team->aspace->id;
 
 	return -1;
 }
@@ -241,36 +262,26 @@ vm_put_aspace(vm_address_space *aspace)
 	if (aspace == kernel_aspace)
 		panic("vm_put_aspace: tried to delete the kernel aspace!\n");
 
-	if (aspace->virtual_map.region_list)
-		panic("vm_put_aspace: aspace at %p has zero ref count, but region list isn't empty!\n", aspace);
-
-	(*aspace->translation_map.ops->destroy)(&aspace->translation_map);
-
-	free(aspace->name);
-	delete_sem(aspace->virtual_map.sem);
-	free(aspace);
-
-	return;
+	delete_address_space(aspace);
 }
 
 
-aspace_id
-vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel)
+status_t
+vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_address_space **_aspace)
 {
 	vm_address_space *aspace;
-	int err;
-
+	status_t err;
 
 	aspace = (vm_address_space *)malloc(sizeof(vm_address_space));
 	if (aspace == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	TRACE(("vm_create_aspace: %s: %lx bytes starting at 0x%lx => %p\n", name, size, base, aspace));
 
 	aspace->name = (char *)malloc(strlen(name) + 1);
 	if (aspace->name == NULL ) {
 		free(aspace);
-		return ENOMEM;
+		return B_NO_MEMORY;
 	}
 	strcpy(aspace->name, name);
 
@@ -286,7 +297,7 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel)
 
 	// initialize the corresponding translation map
 	err = vm_translation_map_create(&aspace->translation_map, kernel);
-	if (err < 0) {
+	if (err < B_OK) {
 		free(aspace->name);
 		free(aspace);
 		return err;
@@ -306,42 +317,8 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel)
 	hash_insert(aspace_table, aspace);
 	release_sem_etc(aspace_hash_sem, WRITE_COUNT, 0);
 
-	return aspace->id;
-}
-
-
-status_t
-vm_delete_aspace(aspace_id aid)
-{
-	vm_address_space *aspace;
-
-	aspace = vm_get_aspace_by_id(aid);
-	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
-
-	TRACE(("vm_delete_aspace: called on aspace 0x%lx\n", aid));
-
-	// put this aspace in the deletion state
-	// this guarantees that no one else will add regions to the list
-	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
-	if (aspace->state == VM_ASPACE_STATE_DELETION) {
-		// abort, someone else is already deleting this aspace
-		release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
-		vm_put_aspace(aspace);
-		return B_NO_ERROR;
-	}
-	aspace->state = VM_ASPACE_STATE_DELETION;
-
-	vm_delete_areas(aspace);
-
-	// unlock
-	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
-
-	// release two refs on the address space
-	vm_put_aspace(aspace);
-	vm_put_aspace(aspace);
-
-	return B_NO_ERROR;
+	*_aspace = aspace;
+	return B_OK;
 }
 
 
@@ -385,14 +362,8 @@ vm_aspace_init(void)
 	kernel_aspace = NULL;
 
 	// create the initial kernel address space
-	{
-		aspace_id aid;
-		aid = vm_create_aspace("kernel_land", KERNEL_BASE, KERNEL_SIZE, true);
-		if (aid < 0)
-			panic("vm_init: error creating kernel address space!\n");
-		kernel_aspace = vm_get_aspace_by_id(aid);
-		vm_put_aspace(kernel_aspace);
-	}
+	if (vm_create_aspace("kernel_land", KERNEL_BASE, KERNEL_SIZE, true, &kernel_aspace) != B_OK)
+		panic("vm_init: error creating kernel address space!\n");
 
 	add_debugger_command("aspaces", &dump_aspace_list, "Dump a list of all address spaces");
 	add_debugger_command("aspace", &dump_aspace, "Dump info about a particular address space");

@@ -68,7 +68,6 @@ struct team {
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		/* semaphore to wait on for dying threads */
-	aspace_id		_aspace_id;		/* address space pointer */
 	vm_address_space *aspace;
 	vm_address_space *kaspace;
 	addr_t			user_env_base;
