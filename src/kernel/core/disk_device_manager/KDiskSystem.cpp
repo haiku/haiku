@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
 #include "ddm_userland_interface.h"
