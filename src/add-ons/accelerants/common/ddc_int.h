@@ -8,10 +8,10 @@
 */
 
 // no dprintf in user space, but if you know the trick ;)
-void    _kdprintf_(const char *format, ...);
+void    _sPrintf(const char *format, ...);
 //bool    set_dprintf_enabled(bool);	/* returns old enable flag */
 
-#define dprintf _kdprintf_
+#define dprintf _sPrintf
 
 // don't use variables here as this is a static library
 // and thus the variables will collide with the main program
