@@ -77,14 +77,6 @@ load_kernel(stage2_args *args, Directory *volume)
 
 	gKernelEntry = image.elf_header.e_entry;
 
-/*	void *cookie;
-	if (volume->Open(&cookie, O_RDONLY) == B_OK) {
-		char name[B_FILE_NAME_LENGTH];
-		while (volume->GetNextEntry(cookie, name, sizeof(name)) == B_OK)
-			printf("\t%s\n", name);
-
-		volume->Close(cookie);
-	}*/
 	return B_OK;
 }
 
@@ -92,7 +84,7 @@ load_kernel(stage2_args *args, Directory *volume)
 static status_t
 load_modules_from(Directory *volume, const char *path)
 {
-	// we don't have readdir() & co. yet...
+	// we don't have readdir() & co. (yet?)...
 
 	int fd = open_from(volume, path, O_RDONLY);
 	if (fd < B_OK)
