@@ -23,9 +23,12 @@ BDiskScannerPartitionAddOn::~BDiskScannerPartitionAddOn()
 }
 
 /*!	\fn virtual const char *BDiskScannerPartitionAddOn::ShortName() = 0;
-	\brief Returns a user-readable short name for the add-on.
+	\brief Returns a short name for the add-on.
 
 	To be implemented by derived classes.
+
+	The returned string identifies the respective partition kernel module is
+	passed to partition_session().
 
 	\return A short name for the add-on.
 */
@@ -36,16 +39,6 @@ BDiskScannerPartitionAddOn::~BDiskScannerPartitionAddOn()
 	To be implemented by derived classes.
 
 	\return A long name for the add-on.
-*/
-
-/*!	\fn virtual const char *BDiskScannerPartitionAddOn::Identifier() = 0;
-	\brief Returns a string identifying the respective kernel module.
-
-	To be implemented by derived classes.
-
-	The returned identifier is passed to partition_session().
-
-	\return A string identifying the respective kernel module.
 */
 
 /*!	\fn virtual BDiskScannerPartitionAddOn::BDiskScannerParameterEditor *
@@ -87,9 +80,12 @@ BDiskScannerFSAddOn::~BDiskScannerFSAddOn()
 }
 
 /*!	\fn virtual const char *BDiskScannerFSAddOn::ShortName() = 0;
-	\brief Returns a user-readable short name for the add-on.
+	\brief Returns a short name for the add-on.
 
 	To be implemented by derived classes.
+
+	The returned name identifies the file system (the kernel add-on) and is
+	passed to initialize_volume().
 
 	\return A short name for the add-on.
 */
@@ -100,16 +96,6 @@ BDiskScannerFSAddOn::~BDiskScannerFSAddOn()
 	To be implemented by derived classes.
 
 	\return A long name for the add-on.
-*/
-
-/*!	\fn virtual const char *BDiskScannerFSAddOn::FileSystem() = 0;
-	\brief Returns a string identifying the respective kernel FS add-on.
-
-	To be implemented by derived classes.
-
-	The returned name is passed to initialize_volume().
-
-	\return A string identifying the respective kernel add-on.
 */
 
 /*!	\fn virtual BDiskScannerFSAddOn::BDiskScannerParameterEditor *CreateEditor(

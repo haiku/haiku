@@ -21,7 +21,6 @@ public:
 
 	virtual const char *ShortName() = 0;
 	virtual const char *LongName() = 0;
-	virtual const char *Identifier() = 0;
 
 	virtual BDiskScannerParameterEditor *CreateEditor(
 		const session_info *sessionInfo, const char *parameters) = 0;
@@ -44,7 +43,6 @@ public:
 
 	virtual const char *ShortName() = 0;
 	virtual const char *LongName() = 0;
-	virtual const char *FileSystem() = 0;
 
 	virtual BDiskScannerParameterEditor *CreateEditor(
 		const partition_info *partitionInfo, const char *parameters) = 0;
