@@ -8,6 +8,7 @@
 
 #include <Autolock.h>
 #include <DataIO.h>
+#include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <OS.h>
 #include <TokenSpace.h>
@@ -417,8 +418,8 @@ MessageDeliverer::_PutTargetPort(TargetPort *port)
 status_t
 MessageDeliverer::_SendMessage(Message *message, port_id portID, int32 token)
 {
-// TODO: Implement!
-	return B_ERROR;
+	return BMessage::Private::SendFlattenedMessage(message->Data(),
+		message->DataSize(), portID, token, (token < 0), 0);
 }
 
 // _DelivererThreadEntry
