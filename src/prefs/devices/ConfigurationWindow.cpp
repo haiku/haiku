@@ -1,15 +1,15 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//	Copyright (c) 2003-2004, OpenBeOS
+//	Copyright (c) 2003-2004, Haiku
 //
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
 //
 //
 //  File:        ConfigurationWindow.cpp
 //  Author:      Jérôme Duval
 //  Description: Devices Preferences
-//  Created :    April 22, 2003
+//  Created :    April 22, 2004
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -139,13 +139,14 @@ RangeConfItem::Compare(const void *firstArg, const void *secondArg)
 
 // ConfigurationWindow - Constructor
 ConfigurationWindow::ConfigurationWindow(BRect frame, DeviceItem *item) 
-	: BWindow (frame, item->GetInfo()->GetName(), B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL , 
+	: BWindow (frame, item->GetInfo()->GetCardName(), B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL , 
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE|B_NOT_RESIZABLE),
 	fItem(item)	
 {
 	CenterWindowOnScreen(this);
 	fItem->SetWindow(this);	
 	InitWindow();
+	
 	Show();
 }
 // -------------------------------------------------------------------------------------------------- //
@@ -374,7 +375,24 @@ ConfigurationWindow::InitWindow(void)
 	BBox *info = new BBox(rlist, "info", 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER);
 		
-	BRect labelRect(1, 10, 122, 30);
+	bool isISAPnP = false;
+	BString compatibleIDString;
+	
+	if (devicesInfo->GetInfo()->bus == B_ISA_BUS) {
+			uint32 id = devicesInfo->GetInfo()->id[0];
+			if ((id >> 24 == 'P') 
+				&& (((id >> 16) & 0xff) == 'n') 
+				&& (((id >> 8) & 0xff) == 'P')) {
+				isISAPnP = true;
+				
+				char string[255];
+				sprintf(string, "Compatible ID #%ld:", 
+						devicesInfo->GetInfo()->id[3]);
+				compatibleIDString = string;
+			}
+	} 
+		
+	BRect labelRect(1, 10, 132, 30);
 	BStringView *label = new BStringView(labelRect, "Card Name", "Card Name:");
 	label->SetAlignment(B_ALIGN_RIGHT);
 	info->AddChild(label);
@@ -402,6 +420,16 @@ ConfigurationWindow::InitWindow(void)
 	label = new BStringView(labelRect, "Card ID", "Card ID:");
 	label->SetAlignment(B_ALIGN_RIGHT);
 	info->AddChild(label);
+	if (isISAPnP) {
+		labelRect.OffsetBy(0, 18);
+		label = new BStringView(labelRect, "Logical Device ID", "Logical Device ID:");
+		label->SetAlignment(B_ALIGN_RIGHT);
+		info->AddChild(label);
+		labelRect.OffsetBy(0, 18);
+		label = new BStringView(labelRect, "Compatible ID#", compatibleIDString.String());
+		label->SetAlignment(B_ALIGN_RIGHT);
+		info->AddChild(label);
+	}	
 	labelRect.OffsetBy(0, 18);
 	label = new BStringView(labelRect, "Current State", "Current State:");
 	label->SetAlignment(B_ALIGN_RIGHT);
@@ -438,22 +466,54 @@ ConfigurationWindow::InitWindow(void)
 	BString vendorString = "<Unknown>";
 	BString cardID = "";
 	BString resourceConflicts = "None";
+	BString logicalString;
 	
 	switch (devicesInfo->GetInfo()->bus) {
 		case B_ISA_BUS:	
 			{
 				char string[255];
-				uint32 id = devicesInfo->GetInfo()->id[2];
-				sprintf(string, "%c%c%c  Product: %x%x  Revision: %x", 
-					((uint8)(id >> 2) & 0x1f) + 'A' - 1,
-					((uint8)(id & 0x3) << 3) + ((uint8)(id >> 13) & 0x7) + 'A' - 1,
-					(uint8)(id >> 8) & 0x1f + 'A' - 1,
-					(uint8)(id >> 16) & 0xf,
-					(uint8)(id >> 20) & 0xf,
-					(uint8)((id >> 24) & 0xff));
-				vendor = string;
+				if (isISAPnP) {
+					uint32 id = devicesInfo->GetInfo()->id[1];
+					sprintf(string, "%c%c%c  Product: %x%x%x  Revision: %d", 
+						((uint8)(id >> 2) & 0x1f) + 'A' - 1,
+						((uint8)(id & 0x3) << 3) + ((uint8)(id >> 13) & 0x7) + 'A' - 1,
+						(uint8)(id >> 8) & 0x1f + 'A' - 1,
+						(uint8)(id >> 20) & 0xf,
+						(uint8)(id >> 16) & 0xf,
+						(uint8)(id >> 28) & 0xf,
+						(uint8)((id >> 24) & 0xf));
+					vendor = string;
 										
-				cardID = "0"; 
+					sprintf(string, "%08lx", devicesInfo->GetInfo()->id[2]);
+					cardID = string;
+					
+					id = devicesInfo->GetInfo()->id[3];
+					sprintf(string, "%c%c%c  Product: %x%x%x  Revision: %d", 
+						((uint8)(id >> 2) & 0x1f) + 'A' - 1,
+						((uint8)(id & 0x3) << 3) + ((uint8)(id >> 13) & 0x7) + 'A' - 1,
+						(uint8)(id >> 8) & 0x1f + 'A' - 1,
+						(uint8)(id >> 20) & 0xf,
+						(uint8)(id >> 16) & 0xf,
+						(uint8)(id >> 28) & 0xf,
+						(uint8)((id >> 24) & 0xf));
+					logicalString = string;
+					
+					cardName = devicesInfo->GetCardName();
+					
+				} else {
+					uint32 id = devicesInfo->GetInfo()->id[2];
+					sprintf(string, "%c%c%c  Product: %x%x  Revision: %d", 
+						((uint8)(id >> 2) & 0x1f) + 'A' - 1,
+						((uint8)(id & 0x3) << 3) + ((uint8)(id >> 13) & 0x7) + 'A' - 1,
+						(uint8)(id >> 8) & 0x1f + 'A' - 1,
+						(uint8)(id >> 16) & 0xf,
+						(uint8)(id >> 20) & 0xf,
+						(uint8)((id >> 24) & 0xff));
+					vendor = string;			
+					
+					cardID = "0";
+				} 
+				
 			}
 			break;
 		case B_PCI_BUS:
@@ -483,11 +543,11 @@ ConfigurationWindow::InitWindow(void)
 			default: 						state = "Disabled for Unknown Reason"; break;
 		}
 	
-	labelRect = BRect(127, 10, 400, 30);
+	labelRect = BRect(137, 10, 400, 30);
 	label = new BStringView(labelRect, "Card Name", cardName.String());
 	info->AddChild(label);
 	labelRect.OffsetBy(0, 18);
-	label = new BStringView(labelRect, "Device Name", devicesInfo->GetName());
+	label = new BStringView(labelRect, "Device Name", devicesInfo->GetDeviceName());
 	info->AddChild(label);
 	labelRect.OffsetBy(0, 18);
 	label = new BStringView(labelRect, "Logical Device Name", logicalDeviceName.String());
@@ -507,6 +567,14 @@ ConfigurationWindow::InitWindow(void)
 	labelRect.OffsetBy(0, 18);
 	label = new BStringView(labelRect, "Card ID", cardID.String());
 	info->AddChild(label);
+	if (isISAPnP) {
+		labelRect.OffsetBy(0, 18);
+		label = new BStringView(labelRect, "Logical Device ID", logicalString.String());
+		info->AddChild(label);
+		labelRect.OffsetBy(0, 18);
+		label = new BStringView(labelRect, "Compatible ID", logicalString.String());
+		info->AddChild(label);
+	}
 	labelRect.OffsetBy(0, 18);
 	label = new BStringView(labelRect, "Current State", state.String());
 	info->AddChild(label);

@@ -55,7 +55,7 @@ resource mini_icon
 	$"FFFF00000E0F0F0F0FFFFFFF000F0FFF"
 };
 
-resource(1, "BEOS:FILE_TYPES") message;
+resource file_types message;
 
 resource app_signature "application/x-vnd.OBOS.Devices";
 

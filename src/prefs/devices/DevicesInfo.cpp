@@ -1,9 +1,9 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//	Copyright (c) 2004, OpenBeOS
+//	Copyright (c) 2004, Haiku
 //
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
 //
 //
 //  File:        DevicesInfo.cpp
@@ -19,6 +19,7 @@
 #include <View.h>
 #include "DevicesInfo.h"
 #include <stdio.h>
+#include "isapnpids.h"
 
 const char *base_desc[] = {
 	"Legacy",
@@ -108,10 +109,34 @@ DevicesInfo::DevicesInfo(struct device_info *info,
 			s++;
 		}
 	}
-		
-	fName = strdup((info->devtype.base < 13) 
-			? ( (s && s->name) ? s->name : base_desc[info->devtype.base]) 
-			: "Unknown");
+	
+	fDeviceName = strdup((info->devtype.base < 13) 
+		? ( (s && s->name) ? s->name : base_desc[info->devtype.base]) 
+		: "Unknown");
+	
+	fCardName = fDeviceName;
+	if (fInfo->bus == B_ISA_BUS) {
+			uint32 id = fInfo->id[0];
+			if ((id >> 24 == 'P') 
+				&& (((id >> 16) & 0xff) == 'n') 
+				&& (((id >> 8) & 0xff) == 'P')) {
+			id = fInfo->id[3];
+			char string[255];
+			sprintf(string, "%c%c%c%x%x%x%x", 
+				((uint8)(id >> 2) & 0x1f) + 'A' - 1,
+				((uint8)(id & 0x3) << 3) + ((uint8)(id >> 13) & 0x7) + 'A' - 1,
+				(uint8)(id >> 8) & 0x1f + 'A' - 1,
+				(uint8)(id >> 20) & 0xf,
+				(uint8)(id >> 16) & 0xf,
+				(uint8)(id >> 28) & 0xf,
+				(uint8)((id >> 24) & 0xf));
+			for (uint32 i=0; i<ISA_DEVTABLE_LEN; i++)
+				if (stricmp(isapnp_devids[i].id, string)==0) {
+					fCardName = isapnp_devids[i].devname;
+				}
+		}
+	}
+	
 	fBaseString = strdup((info->devtype.base < 13) ? base_desc[info->devtype.base] : "Unknown");
 	fSubTypeString = strdup((s && s->name) ? s->name : "Unknown");	
 }
@@ -122,10 +147,11 @@ DevicesInfo::~DevicesInfo()
 	delete fInfo;
 	delete fCurrent;
 	delete fPossible;
-	delete fName;
+	delete fDeviceName;
 	delete fBaseString;
 	delete fSubTypeString;
 }
+
 
 DeviceItem::DeviceItem(DevicesInfo *info, const char* name)
 	: BListItem(),

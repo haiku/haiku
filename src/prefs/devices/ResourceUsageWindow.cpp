@@ -270,7 +270,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 							&r, sizeof(resource_descriptor));
 					
 					if (mask & r.d.m.mask) {
-						IRQListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetName()));					
+						IRQListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));					
 						first = false;
 					}
 				}
@@ -300,7 +300,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 							&r, sizeof(resource_descriptor));
 					
 					if (mask & r.d.m.mask) {
-						DMAListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetName()));					
+						DMAListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));					
 						first = false;
 					}
 				}
@@ -325,7 +325,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 						&r, sizeof(resource_descriptor));
 				
 				IORangeListView->AddItem(new RangeItem(r.d.r.minbase, 
-					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
+					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetCardName()));
 			}
 		}
 	
@@ -345,7 +345,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 						&r, sizeof(resource_descriptor));
 				
 				memoryListView->AddItem(new RangeItem(r.d.r.minbase, 
-					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
+					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetCardName()));
 			}
 		}
 	

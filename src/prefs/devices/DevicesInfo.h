@@ -1,9 +1,9 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//	Copyright (c) 2004, OpenBeOS
+//	Copyright (c) 2004, Haiku
 //
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
 //
 //
 //  File:        DevicesInfo.h
@@ -28,15 +28,17 @@ class DevicesInfo
     		struct possible_device_configurations *possible);
 	    ~DevicesInfo();
 		struct device_info * GetInfo() { return fInfo;}
-		char * GetName() const { return fName; }
+		char * GetDeviceName() const { return fDeviceName; }
+		char * GetCardName() const { return fCardName; }
 		char * GetBaseString() const { return fBaseString; }
 		char * GetSubTypeString() const { return fSubTypeString; }
 		struct device_configuration * GetCurrent() { return fCurrent;}
+		char * GetISAName() const;
 	private:
 		struct device_info *fInfo;
 		struct device_configuration *fCurrent; 
 		struct possible_device_configurations *fPossible;
-		char* fName, *fBaseString, *fSubTypeString;
+		char* fDeviceName, *fCardName, *fBaseString, *fSubTypeString;
 };
 
 class DeviceItem : public BListItem

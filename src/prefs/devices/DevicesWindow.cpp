@@ -91,12 +91,19 @@ DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "Devices", B_TITLED_
 		DevicesInfo *deviceInfo = (DevicesInfo *) fList.ItemAt(i);
 		struct device_info *info = deviceInfo->GetInfo();
 		BListItem *item = systemMenu;
-		if (info->bus == B_ISA_BUS)
-			item = systemMenu;
-		else if (info->bus == B_PCI_BUS)
+		if (info->bus == B_ISA_BUS) {
+			uint32 id = info->id[0];
+			if ((id >> 24 == 'P') 
+				&& (((id >> 16) & 0xff) == 'n') 
+				&& (((id >> 8) & 0xff) == 'P')) {
+				item = isaMenu;
+			} else {
+				item = systemMenu;
+			}
+		} else if (info->bus == B_PCI_BUS)
 			item = pciMenu;
 		
-		outline->AddUnder(new DeviceItem(deviceInfo, deviceInfo->GetName()), item);
+		outline->AddUnder(new DeviceItem(deviceInfo, deviceInfo->GetCardName()), item);
 	}
 	
 	if (outline->CountItemsUnder(jumperedMenu, true)==0)
