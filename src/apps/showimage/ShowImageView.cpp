@@ -42,6 +42,7 @@
 #include <Rect.h>
 #include <SupportDefs.h>
 #include <Directory.h>
+#include <Entry.h>
 #include <Application.h>
 #include <Roster.h>
 #include <NodeInfo.h>
@@ -225,10 +226,31 @@ ShowImageView::~ShowImageView()
 	DeleteBitmap();
 }
 
+// returns B_ERROR if problems reading ref
+// B_OK if ref is not a directory
+// B_OK + 1 if ref is a directory
+status_t
+ent_is_dir(const entry_ref *ref)
+{
+	BEntry ent(ref);
+	if (ent.InitCheck() != B_OK)
+		return B_ERROR;
+		
+	struct stat st;
+	if (ent.GetStat(&st) != B_OK)
+		return B_ERROR;
+	
+	return S_ISDIR(st.st_mode) ? (B_OK + 1) : B_OK;
+}
+
 bool
 ShowImageView::IsImage(const entry_ref *pref)
 {
 	if (!pref)
+		return false;
+		
+	if (ent_is_dir(pref) != B_OK)
+		// if ref is erroneous or a directory, return false
 		return false;
 
 	BFile file(pref, B_READ_ONLY);
@@ -320,6 +342,11 @@ ShowImageView::SetImage(const entry_ref *pref)
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
 		return B_ERROR;
+
+	if (ent_is_dir(pref) != B_OK)
+		// if ref is erroneous or a directory, return error
+		return B_ERROR;
+
 	BFile file(&ref, B_READ_ONLY);
 	translator_info info;
 	memset(&info, 0, sizeof(translator_info));
