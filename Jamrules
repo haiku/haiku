@@ -2077,7 +2077,7 @@ rule Package
 		} else {
 			local packagefile = $(file:G=_packages!$(packagename)) ;
 			MakeLocate $(packagefile) : $(packagedir) ;
-			Copy $(packagefile) : $(file) ;
+			Copy $(packagefile) : [ FGristFiles $(file) ] ;
 			Clean cleanPackages : $(packagefile) ;
 			Depends $(packagezip) : $(packagefile) ;
 		}
