@@ -16,10 +16,18 @@ static struct rld_export const *sRuntimeLinker;
 
 
 thread_id
-load_image(int32 argc, const char **argv, const char **environ)
+load_image(int32 argCount, const char **args, const char **environ)
 {
-	// ToDo: implement this!
-	return B_ERROR;
+	int32 envCount = 0;
+
+	if (argCount < 1 || environ == NULL)
+		return B_BAD_VALUE;
+
+	// count environment variables
+	while (environ[envCount] != NULL)
+		envCount++;
+
+	return _kern_load_image(argCount, args, envCount, environ, B_NORMAL_PRIORITY);
 }
 
 
