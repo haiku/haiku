@@ -72,8 +72,7 @@ VDWIN_SETCURSOR,
 
 extern RGBColor workspace_default_color;
 
-bool is_initialized=false;
-
+bool is_initialized = false;
 
 VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
@@ -1234,19 +1233,19 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 }
 
-bool ViewDriver::AcquireBuffer(FBBitmap *fbmp)
+bool ViewDriver::AcquireBuffer(FBBitmap *bmp)
 {
-	if(!fbmp || !is_initialized)
+	if(!bmp || !is_initialized)
 		return false;
 	
 	screenwin->Lock();
 	framebuffer->Lock();
 
-	fbmp->SetBytesPerRow(framebuffer->BytesPerRow());
-	fbmp->SetSpace(framebuffer->ColorSpace());
-	fbmp->SetSize(framebuffer->Bounds().IntegerWidth(), framebuffer->Bounds().IntegerHeight());
-	fbmp->SetBuffer(framebuffer->Bits());
-	fbmp->SetBitsPerPixel(framebuffer->ColorSpace(),framebuffer->BytesPerRow());
+	bmp->SetBytesPerRow(framebuffer->BytesPerRow());
+	bmp->SetSpace(framebuffer->ColorSpace());
+	bmp->SetSize(framebuffer->Bounds().IntegerWidth(), framebuffer->Bounds().IntegerHeight());
+	bmp->SetBuffer(framebuffer->Bits());
+	bmp->SetBitsPerPixel(framebuffer->ColorSpace(),framebuffer->BytesPerRow());
 
 	return true;
 }

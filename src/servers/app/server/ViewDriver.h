@@ -102,31 +102,32 @@ public:
 	ViewDriver(void);
 	~ViewDriver(void);
 
-	bool Initialize(void);		// Sets the driver
-	void Shutdown(void);		// You never know when you'll need this
+	virtual	bool				Initialize(void); // Sets the driver
+	virtual	void				Shutdown(void); // You never know when you'll need this
 	
 	// Drawing functions
 	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
-	void InvertRect(const BRect &r);
+	virtual	void				InvertRect(const BRect &r);
 
-	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
+	virtual void				StrokeLineArray(BPoint *pts, const int32 &numlines,
+									const DrawData *d, RGBColor *colors);
 
-	void SetMode(const display_mode &mode);
+	virtual	void				SetMode(const display_mode &mode);
 	
-	bool DumpToFile(const char *path);
+	virtual	bool				DumpToFile(const char *path);
 
-	VDWindow *screenwin;
+			VDWindow			*screenwin;
 
-	virtual status_t SetDPMSMode(const uint32 &state);
-	virtual uint32 DPMSMode(void) const;
-	virtual uint32 DPMSCapabilities(void) const;
-	virtual status_t GetDeviceInfo(accelerant_device_info *info);
-	virtual status_t GetModeList(display_mode **mode_list, uint32 *count);
-	virtual status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
-	virtual status_t GetTimingConstraints(display_timing_constraints *dtc);
-	virtual status_t ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high);
-	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
+	virtual	status_t			SetDPMSMode(const uint32 &state);
+	virtual	uint32				DPMSMode(void) const;
+	virtual	uint32				DPMSCapabilities(void) const;
+	virtual	status_t			GetDeviceInfo(accelerant_device_info *info);
+	virtual	status_t			GetModeList(display_mode **mode_list, uint32 *count);
+	virtual	status_t			GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
+	virtual	status_t			GetTimingConstraints(display_timing_constraints *dtc);
+	virtual	status_t			ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high);
+	virtual	status_t			WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
 
 protected:
 	void FillSolidRect(const BRect &rect, RGBColor &color);
@@ -138,9 +139,9 @@ protected:
 	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	void CopyToBitmap(ServerBitmap *target, const BRect &source);
 	
-	bool AcquireBuffer(FBBitmap *fbmp);
-	void ReleaseBuffer(void);
-	void Invalidate(const BRect &r);
+	virtual	bool				AcquireBuffer(FBBitmap *bmp);
+	virtual	void				ReleaseBuffer(void);
+	virtual	void				Invalidate(const BRect &r);
 	
 //	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
 //	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
