@@ -1,0 +1,11 @@
+Conrad Parker <conrad@metadecks.org>
+        - Design, general implementation
+ 
+Silvia Pfeiffer <Silvia.Pfeiffer@CSIRO.AU>
+        - Design, MS Windows porting
+ 
+Andre Pang <ozone@algorithm.com.au>
+        - Design, Mac OS X porting
+ 
+Zentaro Kavanagh <zen@illiminable.com>
+        - MS Windows Porting and packaging. Windows specific bugfixes.

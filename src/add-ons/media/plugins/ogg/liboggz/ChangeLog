@@ -1,0 +1,17 @@
+Fri May 21 16:48:34 EST 2004 Conrad Parker <conrad@annodex.net>
+
+	* Version 0.8.3
+	* fixes for win32 build procedure
+	* improved API documentation for seeking, OGGZ_AUTO and OggzIO
+
+Thu Mar 11 11:00:00 EST 2004 Silvia Pfeiffer <silvia.pfeiffer@csiro.au>
+	* Version 0.8.2
+	* fixed up the Makefiles to not include the CVS subdirectories
+	
+Sun Mar 07 16:00:00 EST 2004 Silvia Pfeiffer <silvia.pfeiffer@csiro.au>
+	* Version 0.8.1
+	* includes Windows port with Makefile & VC6 workspace & .NET solution
+	
+Thu Oct 16 21:55:07 EST 2003 Conrad Parker <conrad@annodex.net>
+
+	* split liboggz out from libannodex sources, started ChangeLog

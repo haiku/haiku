@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons media plugins ogg liboggz ;
+
+SubDirHdrs [ FDirName $(SUBDIR) .. libogg ] ;
+SubDirCcFlags -Wno-missing-prototypes ;
+
+StaticLibrary oggz :
+	oggz.c
+	oggz_auto.c
+	oggz_io.c
+	oggz_read.c
+	oggz_table.c
+	oggz_vector.c
+	oggz_write.c
+;
