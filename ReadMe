@@ -1,3 +1,16 @@
+NOTE: the information in this file is severly outdated.
+The preferred method to build Haiku (currently only possible on a BeOS machine)
+is this (when you're in the "current" directory):
+	$ configure
+	$ makehdimage /Haiku
+
+Where /Haiku is the (mounted) partition of where you want to install Haiku on.
+If the parameter is omitted, the makehdimage script needs the Userland FS Server
+from Ingo Weinhold (see that script for more information), and will create
+a file named haiku.image that contains a working image of Haiku.
+Go bug us to update this file for real!
+
+
 Building
 --------
 
