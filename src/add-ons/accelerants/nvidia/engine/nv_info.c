@@ -519,7 +519,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit indexed ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD 8bit idx ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
 			//fixme? this is for ISA I/O registers. Looks like they are in mapped range
 			//       as well (confirm or update code!)
