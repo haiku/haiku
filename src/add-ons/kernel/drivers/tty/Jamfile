@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons kernel drivers tty ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon tty : kernel drivers dev :
+KernelAddon <driver>tty : kernel drivers dev :
 	driver.cpp
 	tty.cpp
 	line_buffer.cpp
