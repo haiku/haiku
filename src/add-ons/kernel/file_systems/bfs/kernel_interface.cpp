@@ -1174,21 +1174,25 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	if (status == B_OK)
 		transaction.Done();
 
-	// periodically notify if the file size has changed
-	// ToDo: should we better test for a change in the last_modified time only?
-	if (cookie->last_size != inode->Size()
-		&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
-		notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
-		cookie->last_size = inode->Size();
-		cookie->last_notification = system_time();
-	}
+	if ((inode->Flags() & INODE_NO_CACHE) == 0) {
+		// uncached files don't cause notifications during access, and
+		// never want to write back any cached blocks
 
-	// This will flush the dirty blocks to disk from time to time.
-	// It's done here and not in Inode::WriteAt() so that it won't
-	// add to the duration of a transaction - it might even be a
-	// good idea to offload those calls to another thread
-	if ((inode->Flags() & INODE_NO_CACHE) == 0)
+		// periodically notify if the file size has changed
+		// ToDo: should we better test for a change in the last_modified time only?
+		if (cookie->last_size != inode->Size()
+			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
+			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+			cookie->last_size = inode->Size();
+			cookie->last_notification = system_time();
+		}
+	
+		// This will flush the dirty blocks to disk from time to time.
+		// It's done here and not in Inode::WriteAt() so that it won't
+		// add to the duration of a transaction - it might even be a
+		// good idea to offload those calls to another thread
 		volume->WriteCachedBlocksIfNecessary();
+	}
 
 	return status;
 }
