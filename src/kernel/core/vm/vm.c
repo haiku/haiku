@@ -176,7 +176,7 @@ _vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring
 
 
 static status_t
-find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area)
+find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area)
 {
 	vm_area *next, *last = NULL;
 
@@ -253,7 +253,8 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_area *ar
 // must be called with this address space's virtual_map.sem held
 
 static status_t
-find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, uint32 addressSpec, vm_area *area)
+find_and_insert_area_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end,
+	uint32 addressSpec, vm_area *area)
 {
 	vm_area *last = NULL;
 	vm_area *next;
@@ -263,12 +264,14 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 		map, start, size, end, addressSpec, area));
 
 	// do some sanity checking
-	if (start < map->base || size == 0 || (end - 1) > (map->base + (map->size - 1)) || start + size > end)
+	if (start < map->base || size == 0
+		|| (end - 1) > (map->base + (map->size - 1))
+		|| start + size > end)
 		return B_BAD_ADDRESS;
 
 	if (addressSpec == B_EXACT_ADDRESS) {
 		// search for a reserved area
-		status_t status = find_reserved_region(map, start, size, area);
+		status_t status = find_reserved_area(map, start, size, area);
 		if (status == B_OK || status == ERR_VM_NO_REGION_SLOT)
 			return status;
 
@@ -277,6 +280,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 	}
 
 	// walk up to the spot where we should start searching
+second_chance:
 	next = map->areas;
 	while (next) {
 		if (next->base >= start + size) {
@@ -287,17 +291,10 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 		next = next->aspace_next;
 	}
 
-#if 0
-	dprintf("last 0x%x, next 0x%x\n", last, next);
-	if(last) dprintf("last->base 0x%x, last->size 0x%x\n", last->base, last->size);
-	if(next) dprintf("next->base 0x%x, next->size 0x%x\n", next->base, next->size);
-#endif
-
 	switch (addressSpec) {
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
-		case B_BASE_ADDRESS:
 			// find a hole big enough for a new area
 			if (!last) {
 				// see if we can build it at the beginning of the virtual map
@@ -312,21 +309,59 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 			// keep walking
 			while (next) {
 				if (next->base >= last->base + last->size + size) {
-					// we found a spot
-					foundspot = true;
-					area->base = last->base + last->size;
+					// we found a spot (it'll be filled up below)
 					break;
 				}
 				last = next;
 				next = next->aspace_next;
 			}
+
 			if ((map->base + (map->size - 1)) >= (last->base + last->size + (size - 1))) {
-				// found a spot
+				// got a spot
 				foundspot = true;
 				area->base = last->base + last->size;
 				break;
 			}
 			break;
+
+		case B_BASE_ADDRESS:
+			// find a hole big enough for a new area beginning with "start"
+			if (!last) {
+				// see if we can build it at the beginning of the specified start
+				if (!next || (next->base >= start + size)) {
+					foundspot = true;
+					area->base = start;
+					break;
+				}
+				last = next;
+				next = next->aspace_next;
+			}
+			// keep walking
+			while (next) {
+				if (next->base >= last->base + last->size + size) {
+					// we found a spot (it'll be filled up below)
+					break;
+				}
+				last = next;
+				next = next->aspace_next;
+			}
+
+			if ((map->base + (map->size - 1)) >= (last->base + last->size + (size - 1))) {
+				// got a spot
+				foundspot = true;
+				if (last->base + last->size <= start)
+					area->base = start;
+				else
+					area->base = last->base + last->size;
+				break;
+			}
+			// we didn't find a free spot in the requested range, so we'll
+			// try again without any restrictions
+			start = map->base;
+			addressSpec = B_ANY_ADDRESS;
+			last = NULL;
+			goto second_chance;
+
 		case B_EXACT_ADDRESS:
 			// see if we can create it exactly here
 			if (!last) {
@@ -406,7 +441,7 @@ insert_area(vm_address_space *addressSpace, void **_address,
 			return B_BAD_VALUE;
 	}
 
-	status = find_and_insert_region_slot(&addressSpace->virtual_map, searchBase, size,
+	status = find_and_insert_area_slot(&addressSpace->virtual_map, searchBase, size,
 				searchEnd, addressSpec, area);
 	if (status == B_OK)
 		// ToDo: do we have to do anything about B_ANY_KERNEL_ADDRESS
