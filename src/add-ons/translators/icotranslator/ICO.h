@@ -10,6 +10,8 @@
 #include <BufferIO.h>
 #include <TranslatorFormats.h>
 
+class BMessage;
+
 
 namespace ICO {
 
@@ -77,9 +79,10 @@ struct rgba32_color {
 };
 
 
-extern status_t identify(BPositionIO &stream, int32 &bitsPerPixel);
-extern status_t convert_ico_to_bits(BPositionIO &source, BPositionIO &target);
-extern status_t convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPositionIO &target);
+extern status_t identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel);
+extern status_t convert_ico_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &target);
+extern status_t convert_bits_to_ico(BMessage *settings, BPositionIO &source,
+					TranslatorBitmap &bitsHeader, BPositionIO &target);
 
 }	// namespace ICO
 

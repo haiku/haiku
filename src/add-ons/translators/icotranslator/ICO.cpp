@@ -5,7 +5,9 @@
 
 // ToDo: This definitely needs to be worked over for endian issues
 
-#include <ICO.h>
+#include "ICO.h"
+#include "ICOTranslator.h"
+
 #include <ByteOrder.h>
 
 #include <stdio.h>
@@ -481,7 +483,7 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 
 
 status_t
-ICO::identify(BPositionIO &stream, int32 &bitsPerPixel)
+ICO::identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel)
 {
 	// read in the header
 
@@ -495,6 +497,23 @@ ICO::identify(BPositionIO &stream, int32 &bitsPerPixel)
 
 	if (!header.IsValid())
 		return B_BAD_VALUE;
+
+	int32 iconIndex = 0;
+
+	if (settings) {
+		// Add page count to ioExtension
+		settings->RemoveName(kDocumentCount);
+		settings->AddInt32(kDocumentCount, header.entry_count);
+
+		// Check if a document index has been specified	
+		if (settings->FindInt32(kDocumentIndex, &iconIndex) == B_OK)
+			iconIndex--;
+		else
+			iconIndex = 0;
+
+		if (iconIndex < 0 || iconIndex >= header.entry_count)
+			return B_NO_TRANSLATOR;
+	}
 
 	// read in directory entries
 
@@ -522,7 +541,8 @@ ICO::identify(BPositionIO &stream, int32 &bitsPerPixel)
 		if (!bitmapHeader.IsValid())
 			return B_BAD_VALUE;
 
-		bitsPerPixel = bitmapHeader.bits_per_pixel;
+		if ((uint32)iconIndex == i)
+			bitsPerPixel = bitmapHeader.bits_per_pixel;
 	}
 
 	return B_OK;
@@ -533,7 +553,7 @@ ICO::identify(BPositionIO &stream, int32 &bitsPerPixel)
  */
 
 status_t
-ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
+ICO::convert_ico_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &target)
 {
 	ico_header header;
 	if (source.Read(&header, sizeof(ico_header)) != (ssize_t)sizeof(ico_header))
@@ -546,19 +566,33 @@ ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 	if (!header.IsValid())
 		return B_BAD_VALUE;
 
-	// read in first entry
+	int32 iconIndex = 0;
+
+	if (settings) {
+		// Check if a document index has been specified	
+		if (settings->FindInt32(kDocumentIndex, &iconIndex) == B_OK)
+			iconIndex--;
+		else
+			iconIndex = 0;
+
+		if (iconIndex < 0 || iconIndex >= header.entry_count)
+			return B_BAD_VALUE;
+	}
+
+	// read in selected entry
 
 	ico_dir_entry entry;
-	if (source.Read(&entry, sizeof(ico_dir_entry)) != (ssize_t)sizeof(ico_dir_entry))
+	if (source.ReadAt(sizeof(ico_header) + sizeof(ico_dir_entry) * iconIndex,
+			&entry, sizeof(ico_dir_entry)) != (ssize_t)sizeof(ico_dir_entry))
 		return B_BAD_VALUE;
 
+	entry.SwapToHost();
 	source.Seek(entry.offset, SEEK_SET);
 
 	ico_bitmap_header bitmapHeader;
 	if (source.Read(&bitmapHeader, sizeof(ico_bitmap_header)) != (ssize_t)sizeof(ico_bitmap_header))
 		return B_BAD_VALUE;
 
-	entry.SwapToHost();
 	bitmapHeader.SwapToHost();
 
 	if (!bitmapHeader.IsValid())
@@ -609,7 +643,8 @@ ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 
 
 status_t
-ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPositionIO &target)
+ICO::convert_bits_to_ico(BMessage *settings, BPositionIO &source,
+	TranslatorBitmap &bitsHeader, BPositionIO &target)
 {
 	int32 width = bitsHeader.bounds.IntegerWidth() + 1;
 	int32 height = bitsHeader.bounds.IntegerHeight() + 1;

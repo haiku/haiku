@@ -18,7 +18,7 @@
 #include <ByteOrder.h>
 
 
-#define ICO_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0, 1, 0)
+#define ICO_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0, 3, 0)
 #define ICO_IMAGE_FORMAT	'ICO '
 
 #define ICO_IN_QUALITY		0.5
@@ -54,5 +54,9 @@ class ICOTranslator : public BaseTranslator {
 
 	private:
 };
+
+// Extensions that ShowImage supports
+extern const char *kDocumentCount;
+extern const char *kDocumentIndex;
 
 #endif	/* ICO_TRANSLATOR_H */

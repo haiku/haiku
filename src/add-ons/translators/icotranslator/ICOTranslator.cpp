@@ -13,8 +13,8 @@
 #include <string.h>
 
 
-#define READ_BUFFER_SIZE 2048
-#define DATA_BUFFER_SIZE 64
+const char *kDocumentCount = "/documentCount";
+const char *kDocumentIndex = "/documentIndex";
 
 
 // The input formats that this translator supports.
@@ -96,7 +96,7 @@ ICOTranslator::DerivedIdentify(BPositionIO *stream,
 		return B_NO_TRANSLATOR;
 
 	int32 bitsPerPixel;
-	if (ICO::identify(*stream, bitsPerPixel) != B_OK)
+	if (ICO::identify(ioExtension, *stream, bitsPerPixel) != B_OK)
 		return B_NO_TRANSLATOR;
 
 	info->type = ICO_IMAGE_FORMAT;
@@ -133,7 +133,7 @@ ICOTranslator::DerivedTranslate(BPositionIO *source,
 			if (status != B_OK)
 				return status;
 
-			return ICO::convert_bits_to_ico(*source, bitsHeader, *target);
+			return ICO::convert_bits_to_ico(ioExtension, *source, bitsHeader, *target);
 		}
 
 		case 0:
@@ -142,7 +142,7 @@ ICOTranslator::DerivedTranslate(BPositionIO *source,
 			if (outType != B_TRANSLATOR_BITMAP)
 				return B_NO_TRANSLATOR;
 
-			return ICO::convert_ico_to_bits(*source, *target);
+			return ICO::convert_ico_to_bits(ioExtension, *source, *target);
 		}
 
 		default:
