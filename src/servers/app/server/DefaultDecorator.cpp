@@ -61,8 +61,6 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	
 	// This flag is used to determine whether or not we're moving the tab
 	slidetab=false;
-	solidhigh=0xFFFFFFFFFFFFFFFFLL;
-	solidlow=0;
 
 //	tab_highcol=_colors->window_tab;
 //	tab_lowcol=_colors->window_tab;
@@ -339,7 +337,7 @@ printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,up
 	_layerdata.highcolor=_colors->document_background;
 
 	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect & update,&_layerdata,(int8*)&solidhigh);
+		_driver->FillRect(_borderrect & update,&_layerdata,pat_solidhigh);
 	
 	_DrawFrame(update);
 
@@ -353,7 +351,7 @@ void DefaultDecorator::Draw(void)
 	// Draw the top view's client area - just a hack :)
 //	_layerdata.highcolor=_colors->document_background;
 
-//	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+//	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
 	DrawFrame();
 
@@ -386,9 +384,9 @@ void DefaultDecorator::_DrawTab(BRect r)
 		return;
 	
 	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
-	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_tabrect,&_layerdata,pat_solidhigh);
 	_layerdata.highcolor=framecolors[3];
-	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,pat_solidhigh);
 
 	_DrawTitle(_tabrect);
 
@@ -442,7 +440,7 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 			uint8(startcol.blue-(i*bstep)));
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),&_layerdata,(int8*)&solidhigh);
+			BPoint(r.left+i,r.top),&_layerdata,pat_solidhigh);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
@@ -450,14 +448,14 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);
+			BPoint(r.left+i,r.top+steps),&_layerdata,pat_solidhigh);
 
 	}
 
 //	_layerdata.highcolor=startcol;
-//	_driver->FillRect(r,&_layerdata,(int8*)&solidhigh);
+//	_driver->FillRect(r,&_layerdata,pat_solidhigh);
 	_layerdata.highcolor=framecolors[3];
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 }
 
 void DefaultDecorator::_DrawFrame(BRect invalid)
@@ -467,7 +465,7 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 	#endif
 
 	if(!borderwidth)
@@ -744,8 +742,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
-		pattern_union highcolor;
-		highcolor.type64=0xffffffffffffffffLL;
 		r=_resizerect;
 
 //		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
@@ -756,17 +752,18 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 			r.right-=4;
 			r.bottom-=4;
 			_layerdata.highcolor=framecolors[2];
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,highcolor.type8);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,highcolor.type8);
+
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,pat_solidhigh);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,pat_solidhigh);
 
 			r.OffsetBy(1,1);
 			_layerdata.highcolor=framecolors[0];
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,highcolor.type8);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,highcolor.type8);
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,pat_solidhigh);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,pat_solidhigh);
 			
 			r.OffsetBy(1,1);
 			_layerdata.highcolor=framecolors[1];
-			_driver->FillRect(r,&_layerdata,highcolor.type8);
+			_driver->FillRect(r,&_layerdata,pat_solidhigh);
 			
 /*			r.left+=2;
 			r.top+=2;
@@ -802,25 +799,25 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 					uint8(startcol.blue-(i*bstep)));
 				
 				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),&_layerdata,(int8*)&solidhigh);
+					BPoint(r.left+i,r.top),&_layerdata,pat_solidhigh);
 		
 				_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
 					uint8(halfcol.blue-(i*bstep)));
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);			
+					BPoint(r.left+i,r.top+steps),&_layerdata,pat_solidhigh);			
 			}
 			_driver->Unlock();
 //			_layerdata.highcolor=framecolors[4];
-//			_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+//			_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 		}
 		else
 		{
 			_layerdata.highcolor=framecolors[4];
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				&_layerdata,(int8*)&solidhigh);
+				&_layerdata,pat_solidhigh);
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				&_layerdata,(int8*)&solidhigh);
+				&_layerdata,pat_solidhigh);
 		}
 	}
 

@@ -789,28 +789,28 @@ bool ViewDriver::DumpToFile(const char *path)
 	return true;
 }
 
-void ViewDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void ViewDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillArc(r,angle,span,*((pattern*)pat));
+	drawview->FillArc(r,angle,span,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void ViewDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillBezier(pts,*((pattern*)pat));
+	drawview->FillBezier(pts,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	
 	// Invalidate the whole view until I get around to adding in the invalid rect calc code
@@ -819,56 +819,56 @@ void ViewDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
+void ViewDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillEllipse(r,*((pattern*)pat));
+	drawview->FillEllipse(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
+void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillPolygon(ptlist,numpts,rect,*((pattern*)pat));
+	drawview->FillPolygon(ptlist,numpts,rect,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(rect);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void ViewDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillRect(r,*((pattern*)pat));
+	drawview->FillRect(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillRoundRect(r,xrad,yrad,*((pattern*)pat));
+	drawview->FillRoundRect(r,xrad,yrad,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -876,15 +876,15 @@ void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, in
 
 }
 
-void ViewDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void ViewDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	BPoint first=pts[0],second=pts[1],third=pts[2];
 	SetLayerData(d);
-	drawview->FillTriangle(first,second,third,r,*((pattern*)pat));
+	drawview->FillTriangle(first,second,third,r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -977,14 +977,14 @@ void ViewDriver::ShowCursor(void)
 
 }
 
-void ViewDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void ViewDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeArc(r,angle,span,*((pattern*)pat));
+	drawview->StrokeArc(r,angle,span,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -992,14 +992,14 @@ void ViewDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 
 
 }
 
-void ViewDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void ViewDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeBezier(pts,*((pattern*)pat));
+	drawview->StrokeBezier(pts,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	
 	// Invalidate the whole view until I get around to adding in the invalid rect calc code
@@ -1009,14 +1009,14 @@ void ViewDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 
 }
 
-void ViewDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
+void ViewDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeEllipse(r,*((pattern*)pat));
+	drawview->StrokeEllipse(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -1024,14 +1024,14 @@ void ViewDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 
 }
 
-void ViewDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void ViewDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeLine(start,end,*((pattern*)pat));
+	drawview->StrokeLine(start,end,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(BRect(start,end));
 	framebuffer->Unlock();
@@ -1076,9 +1076,9 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, 
 
 }
 
-void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
+void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
-	if(!pat || !ptlist)
+	if(!ptlist)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1107,28 +1107,28 @@ void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerDa
 
 }
 
-void ViewDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void ViewDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeRect(r,*((pattern*)pat));
+	drawview->StrokeRect(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern*)pat));
+	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -1136,15 +1136,15 @@ void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, 
 
 }
 
-void ViewDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void ViewDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts || !d)
+	if(!pts || !d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	BPoint first=pts[0],second=pts[1],third=pts[2];
 	SetLayerData(d);
-	drawview->StrokeTriangle(first,second,third,r,*((pattern*)pat));
+	drawview->StrokeTriangle(first,second,third,r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();

@@ -70,8 +70,6 @@ void RootLayer::RequestDraw(void)
 {
 	if(!_is_dirty)
 		return;
-	pattern_union low;
-	low.type64=0LL;
 	
 	// Redraw the base
 	if(_invalid)
@@ -79,7 +77,7 @@ void RootLayer::RequestDraw(void)
 		for(int32 i=0; _invalid->CountRects();i++)
 		{
 			if(_invalid->RectAt(i).IsValid())
-				_driver->FillRect(_invalid->RectAt(i),_layerdata, (int8*)low.type8);
+				_driver->FillRect(_invalid->RectAt(i),_layerdata, pat_solidlow);
 			else
 				break;
 		}

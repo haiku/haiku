@@ -37,8 +37,6 @@
 #include <Region.h>
 #include <Font.h>
 #include "DisplayDriver.h"
-//#include <ft2build.h>
-//#include FT_FREETYPE_H
 #include "FontServer.h"
 
 class BBitmap;
@@ -115,14 +113,14 @@ public:
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
 	void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
-	void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
-	void FillBezier(BPoint *pts, LayerData *d, int8 *pat);
-	void FillEllipse(BRect r, LayerData *d, int8 *pat);
-	void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat);
-	void FillRect(BRect r, LayerData *d, int8 *pat);
-	void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat);
-//	void FillShape(SShape *sh, LayerData *d, int8 *pat);
-	void FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
+	void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
+	void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
+	void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
+	void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
+	void FillRect(BRect r, LayerData *d, const Pattern &pat);
+	void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+//	void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
+	void FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 
 	void HideCursor(void);
 	void InvertRect(BRect r);
@@ -137,16 +135,16 @@ public:
 //	void SetDrawingMode(drawing_mode mode);
 	void ShowCursor(void);
 
-	void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
-	void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
-	void StrokeEllipse(BRect r, LayerData *d, int8 *pat);
-	void StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat);
+	void StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
+	void StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat);
+	void StrokeEllipse(BRect r, LayerData *d, const Pattern &pat);
+	void StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
 	void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
-	void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true);
-	void StrokeRect(BRect r, LayerData *d, int8 *pat);
-	void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat);
-//	void StrokeShape(SShape *sh, LayerData *d, int8 *pat);
-	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
+	void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
+	void StrokeRect(BRect r, LayerData *d, const Pattern &pat);
+	void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+//	void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
+	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 	void SetMode(int32 mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);

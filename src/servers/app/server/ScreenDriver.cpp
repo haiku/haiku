@@ -516,28 +516,28 @@ bool ScreenDriver::DumpToFile(const char *path)
 	return true;
 }
 
-void ScreenDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void ScreenDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillArc(r,angle,span,*((pattern*)pat));
+	drawview->FillArc(r,angle,span,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ScreenDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void ScreenDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillBezier(pts,*((pattern*)pat));
+	drawview->FillBezier(pts,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	
 	// Invalidate the whole view until I get around to adding in the invalid rect calc code
@@ -546,56 +546,56 @@ void ScreenDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	screenwin->Unlock();
 }
 
-void ScreenDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillEllipse(r,*((pattern*)pat));
+	drawview->FillEllipse(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ScreenDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
+void ScreenDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillPolygon(ptlist,numpts,rect,*((pattern*)pat));
+	drawview->FillPolygon(ptlist,numpts,rect,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(rect);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ScreenDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillRect(r,*((pattern*)pat));
+	drawview->FillRect(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ScreenDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void ScreenDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->FillRoundRect(r,xrad,yrad,*((pattern*)pat));
+	drawview->FillRoundRect(r,xrad,yrad,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -603,15 +603,15 @@ void ScreenDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, 
 
 }
 
-void ScreenDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	BPoint first=pts[0],second=pts[1],third=pts[2];
 	SetLayerData(d);
-	drawview->FillTriangle(first,second,third,r,*((pattern*)pat));
+	drawview->FillTriangle(first,second,third,r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -707,14 +707,14 @@ void ScreenDriver::ShowCursor(void)
 
 }
 
-void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeArc(r,angle,span,*((pattern*)pat));
+	drawview->StrokeArc(r,angle,span,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -722,14 +722,14 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 
 }
 
-void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts)
+	if(!pts)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeBezier(pts,*((pattern*)pat));
+	drawview->StrokeBezier(pts,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	
 	// Invalidate the whole view until I get around to adding in the invalid rect calc code
@@ -739,14 +739,14 @@ void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 
 }
 
-void ScreenDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeEllipse(r,*((pattern*)pat));
+	drawview->StrokeEllipse(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -754,14 +754,14 @@ void ScreenDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 
 }
 
-void ScreenDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeLine(start,end,*((pattern*)pat));
+	drawview->StrokeLine(start,end,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(BRect(start,end));
 	framebuffer->Unlock();
@@ -775,9 +775,9 @@ printf("ScreenDriver:: StrokeLineArray unimplemented\n");
 #endif
 }
 
-void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
+void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
-	if(!pat || !ptlist)
+	if(!ptlist)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -806,28 +806,28 @@ void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Layer
 
 }
 
-void ScreenDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeRect(r,*((pattern*)pat));
+	drawview->StrokeRect(r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ScreenDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !d)
+	if(!d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern*)pat));
+	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();
@@ -835,15 +835,15 @@ void ScreenDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d
 
 }
 
-void ScreenDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void ScreenDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pat || !pts || !d)
+	if(!pts || !d)
 		return;
 	screenwin->Lock();
 	framebuffer->Lock();
 	BPoint first=pts[0],second=pts[1],third=pts[2];
 	SetLayerData(d);
-	drawview->StrokeTriangle(first,second,third,r,*((pattern*)pat));
+	drawview->StrokeTriangle(first,second,third,r,*((pattern*)pat.GetInt8()));
 	drawview->Sync();
 	screenwin->view->Invalidate(r);
 	framebuffer->Unlock();

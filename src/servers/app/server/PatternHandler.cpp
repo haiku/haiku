@@ -27,6 +27,10 @@
 #include <Point.h>
 #include "PatternHandler.h"
 
+const Pattern pat_solidhigh(0xFFFFFFFFFFFFFFFFLL);
+const Pattern pat_solidlow((uint64)0);
+const Pattern pat_mixedcolors(0xAAAAAAAAAAAAAAAALL);
+
 /*!
 	\brief Void constructor
 	
@@ -35,7 +39,7 @@
 */
 PatternHandler::PatternHandler(void)
 {
-	_pat.type64=0xFFFFFFFFLL;
+	_pat=0xFFFFFFFFFFFFFFFFLL;
 	_high=new RGBColor(0,0,0,255);
 	_low=new RGBColor(255,255,255,255);
 }
@@ -50,10 +54,31 @@ PatternHandler::PatternHandler(void)
 PatternHandler::PatternHandler(int8 *pat)
 {
 	if(pat)
-		_pat.type64=*((uint64*)pat);
+		_pat.Set(pat);
 	else
-		_pat.type64=0xFFFFFFFFLL;
+		_pat=0xFFFFFFFFFFFFFFFFLL;
 
+	_high=new RGBColor(0,0,0,255);
+	_low=new RGBColor(255,255,255,255);
+}
+
+/*!
+	\brief Constructor initializes to given pattern
+	\param pat Pattern to use.
+	
+	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
+	is NULL. High color is set to black, and low color is set to white.
+*/
+PatternHandler::PatternHandler(const uint64 &pat)
+{
+	_pat=pat;
+	_high=new RGBColor(0,0,0,255);
+	_low=new RGBColor(255,255,255,255);
+}
+
+PatternHandler::PatternHandler(const Pattern &pat)
+{
+	_pat=pat;
 	_high=new RGBColor(0,0,0,255);
 	_low=new RGBColor(255,255,255,255);
 }
@@ -75,9 +100,27 @@ PatternHandler::~PatternHandler(void)
 void PatternHandler::SetTarget(int8 *pat)
 {
 	if(pat)
-		_pat.type64=*((uint64*)pat);
+		_pat.Set(pat);
 	else
-		_pat.type64=0xFFFFFFFFLL;
+		_pat=0xFFFFFFFFFFFFFFFFLL;
+}
+
+/*!
+	\brief Sets the pattern for the handler to the one given
+	\param pat Pattern to use.
+*/
+void PatternHandler::SetTarget(const uint64 &pat)
+{
+	_pat=pat;
+}
+
+/*!
+	\brief Sets the pattern for the handler to the one given
+	\param pat Pattern to use.
+*/
+void PatternHandler::SetTarget(const Pattern &pat)
+{
+	_pat=pat;
 }
 
 /*!
@@ -109,7 +152,8 @@ RGBColor PatternHandler::GetColor(const BPoint &pt)
 */
 RGBColor PatternHandler::GetColor(const float &x, const float &y)
 {
-	int32 value=_pat.type8[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
+	const int8 *ptr=_pat.GetInt8();
+	int32 value=ptr[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
 
 	return (value==0)?*_low:*_high;
 }
@@ -122,7 +166,8 @@ RGBColor PatternHandler::GetColor(const float &x, const float &y)
 */
 bool PatternHandler::GetValue(const float &x, const float &y)
 {
-	int32 value=_pat.type8[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
+	const int8 *ptr=_pat.GetInt8();
+	int32 value=ptr[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
 
 	return (value==0)?false:true;
 }

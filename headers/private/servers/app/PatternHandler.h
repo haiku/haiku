@@ -25,15 +25,43 @@
 //  
 //------------------------------------------------------------------------------
 #ifndef PATTERNHADLER_H
+#define PATTERNHADLER_H
 
 #include <SupportDefs.h>
 #include "RGBColor.h"
 
-typedef union
+class Pattern
 {
-	uint64 type64;
-	int8 type8[8];
-} pattern_union;
+public:
+
+	Pattern(void) {} 
+
+	Pattern(const uint64 &pat) { _pat.type64=pat; }
+
+	Pattern(int8 *pat) { _pat.type64=*((uint64*)pat); }
+	
+	Pattern(const Pattern &src) { _pat.type64=src._pat.type64; }
+
+	const int8 *GetInt8(void) const { return _pat.type8; }
+
+	uint64 GetInt64(void) const { return _pat.type64; }
+
+	void Set(int8 *pat) { _pat.type64=*((uint64*)pat); }
+
+	void Set(const uint64 &pat) { _pat.type64=pat; }
+
+	Pattern & operator=(const Pattern &from) { _pat.type64=from._pat.type64; return *this; }
+	Pattern & operator=(const int64 &from) { _pat.type64=from; return *this; }
+private:
+
+	typedef union
+	{
+		uint64 type64;
+		int8 type8[8];
+	} pattern_union;
+
+	pattern_union _pat;
+};
 
 /*!
 	\brief Class for easy calculation and use of patterns
@@ -48,16 +76,24 @@ class PatternHandler
 public:
 	PatternHandler(void);
 	PatternHandler(int8 *pat);
+	PatternHandler(const uint64 &pat);
+	PatternHandler(const Pattern &pat);
 	~PatternHandler(void);
 	void SetTarget(int8 *pat);
+	void SetTarget(const uint64 &pat);
+	void SetTarget(const Pattern &pat);
 	void SetColors(const RGBColor &high, const RGBColor &low);
 	RGBColor GetColor(const BPoint &pt);
 	RGBColor GetColor(const float &x, const float &y);
 	bool GetValue(const float &x, const float &y);
 	bool GetValue(const BPoint &pt);
 private:
-	pattern_union _pat;
+	Pattern _pat;
 	RGBColor *_high,*_low;
 };
+
+extern const Pattern pat_solidhigh;
+extern const Pattern pat_solidlow;
+extern const Pattern pat_mixedcolors;
 
 #endif

@@ -143,12 +143,12 @@ void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, Laye
 	\param angle Starting angle for the arc in degrees
 	\param span Span of the arc in degrees. Ending angle = angle+span.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
 */
-void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -157,11 +157,11 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
 */
-void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -169,12 +169,12 @@ void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void DisplayDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -184,12 +184,12 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 	\param numpts Number of points in the BPoint array.
 	\param rect Rectangle which contains the polygon
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -197,10 +197,10 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerD
 	\brief Called for all BView::FillRect calls
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -208,12 +208,12 @@ void DisplayDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	\brief Convenience function for server use
 	\param r BRegion to be filled
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::FillRegion(BRegion *r, LayerData *d, int8 *pat)
+void DisplayDriver::FillRegion(BRegion *r, LayerData *d, const Pattern &pat)
 {
-	if(!r || !d || !pat)
+	if(!r || !d)
 		return;
 		
 	Lock();
@@ -230,16 +230,16 @@ void DisplayDriver::FillRegion(BRegion *r, LayerData *d, int8 *pat)
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 }
 
-//void DisplayDriver::FillShape(SShape *sh, LayerData *d, int8 *pat)
+//void DisplayDriver::FillShape(SShape *sh, LayerData *d, const Pattern &pat)
 //{
 //}
 
@@ -249,12 +249,12 @@ void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d,
 	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
 	it may not be within the frame buffer's bounds.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -364,12 +364,12 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	\param angle Starting angle for the arc in degrees
 	\param span Span of the arc in degrees. Ending angle = angle+span.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
 */
-void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -378,11 +378,11 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, in
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
 */
-void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -390,12 +390,12 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	\brief Called for all BView::StrokeEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -404,12 +404,12 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 	\param start Starting point
 	\param end Ending point
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 	
 	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
 	a thickness greater than 1 will need to be done.
 */
-void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -419,12 +419,12 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat
 	\param numpts Number of points in the BPoint array.
 	\param rect Rectangle which contains the polygon
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
 }
 
@@ -432,10 +432,10 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Laye
 	\brief Called for all BView::StrokeRect calls
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -443,12 +443,12 @@ void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	\brief Convenience function for server use
 	\param r BRegion to be stroked
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, const Pattern &pat)
 {
-	if(!r || !d || !pat)
+	if(!r || !d)
 		return;
 		
 	Lock();
@@ -465,16 +465,16 @@ void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, int8 *pat)
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 }
 
-//void DisplayDriver::StrokeShape(SShape *sh, LayerData *d, int8 *pat)
+//void DisplayDriver::StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
 //{
 //}
 
@@ -484,12 +484,12 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *
 	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
 	it may not be within the frame buffer's bounds.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 }
 

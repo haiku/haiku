@@ -507,7 +507,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
 */
-void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1050,7 +1050,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	I am not sure if this correctly handles cases where the curve backtracks along the diagonal
 	line.  I should probably investigate how the be code handles that, but it is a low priority.
 */
-void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
@@ -1129,7 +1129,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1216,7 +1216,7 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
+void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
 	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
 	   the y-value of a point not in the segment, split the segment into 2 segments.
@@ -1349,9 +1349,10 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
-void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::FillRect(BRect r, LayerData *d, const Pattern &pattern)
 {
 	Lock();
+	const int8 *pat=pattern.GetInt8();
 #ifndef DISABLE_HARDWARE_ACCELERATION
 	if ( accFillRect && AcquireEngine && (((uint8)*pat == 0xFF) || (*pat == 0)) )
 	{
@@ -1431,8 +1432,8 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	}
 #endif
 
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
+	PatternHandler pathandler(pattern);
+	pathandler.SetColors(d->highcolor, d->lowcolor);
 
 	switch (mDisplayMode.space)
 	{
@@ -1445,7 +1446,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 				{
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						fb[x] = pattern.GetColor(x,y).GetColor8();
+						fb[x] = pathandler.GetColor(x,y).GetColor8();
 					}
 					fb += mFrameBufferConfig.bytes_per_row;
 				}
@@ -1463,7 +1464,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 				{
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						fb[x] = pattern.GetColor(x,y).GetColor16();
+						fb[x] = pathandler.GetColor(x,y).GetColor16();
 					}
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
@@ -1480,7 +1481,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 				{
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						color = pattern.GetColor(x,y).GetColor32();
+						color = pathandler.GetColor(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
@@ -1504,7 +1505,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	float arc_x;
 	float yrad2 = yrad*yrad;
@@ -1530,7 +1531,7 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	Unlock();
 }
 
-//void AccelerantDriver::FillShape(SShape *sh, LayerData *d, int8 *pat)
+//void AccelerantDriver::FillShape(SShape *sh, LayerData *d, const Pattern &pat)
 //{
 //}
 
@@ -1545,9 +1546,9 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pts || !d || !pat)
+	if(!pts || !d)
 		return;
 
 	Lock();
@@ -1927,7 +1928,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
-*/void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+*/void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -2094,7 +2095,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 
 	Bounds checking must be done in this call.
 */
-void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
@@ -2162,7 +2163,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -2244,7 +2245,7 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 	a thickness greater than 1 will need to be done.
 	This is capable of handling lines with invalid points.
 */
-void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
 	int x1 = ROUND(start.x);
 	int y1 = ROUND(start.y);
@@ -2292,7 +2293,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
+void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
 	/* Bounds checking is handled by StrokeLine and the functions it uses */
 	Lock();
@@ -2310,7 +2311,7 @@ void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, L
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
-void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
 	Lock();
 	int thick = (int)d->pensize;
@@ -2335,7 +2336,7 @@ void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	float hLeft, hRight;
 	float vTop, vBottom;
@@ -2367,7 +2368,7 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	Unlock();
 }
 
-//void AccelerantDriver::StrokeShape(SShape *sh, LayerData *d, int8 *pat)
+//void AccelerantDriver::StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
 //{
 //}
 
@@ -2382,7 +2383,7 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 	/* Bounds checking is handled by StrokeLine and the functions it calls */
 	Lock();

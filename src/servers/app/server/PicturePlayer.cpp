@@ -35,7 +35,7 @@ PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
  : fData(data, size)
 {
 	fdriver=d;
-	pat.type64=0xFFFFFFFFFFFFFFFFLL;
+	pat=0xFFFFFFFFFFFFFFFFLL;
 }
 
 PicturePlayer::~PicturePlayer()
@@ -148,47 +148,47 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				BPoint start = GetCoord();
 				BPoint end = GetCoord();
-				fdriver->StrokeLine(start,end,&fldata,pat.type8);
+				fdriver->StrokeLine(start,end,&fldata,pat);
 				break;
 			}
 			case B_PIC_STROKE_RECT:
 			{
 				BRect rect = GetRect();
-				fdriver->StrokeRect(rect,&fldata,pat.type8);
+				fdriver->StrokeRect(rect,&fldata,pat);
 				break;
 			}
 			case B_PIC_FILL_RECT:
 			{
 				BRect rect = GetRect();
-				fdriver->FillRect(rect,&fldata,pat.type8);
+				fdriver->FillRect(rect,&fldata,pat);
 				break;
 			}
 			case B_PIC_STROKE_ROUND_RECT:
 			{
 				BRect rect = GetRect();
 				BPoint radii = GetCoord();
-				fdriver->StrokeRoundRect(rect,radii.x,radii.y,&fldata,pat.type8);
+				fdriver->StrokeRoundRect(rect,radii.x,radii.y,&fldata,pat);
 				break;
 			}
 			case B_PIC_FILL_ROUND_RECT:
 			{
 				BRect rect = GetRect();
 				BPoint radii = GetCoord();
-				fdriver->FillRoundRect(rect,radii.x,radii.y,&fldata,pat.type8);
+				fdriver->FillRoundRect(rect,radii.x,radii.y,&fldata,pat);
 				break;
 			}
 			case B_PIC_STROKE_BEZIER:
 			{
 				BPoint control[4];
 				GetData(control, sizeof(control));
-				fdriver->StrokeBezier(control,&fldata,pat.type8);
+				fdriver->StrokeBezier(control,&fldata,pat);
 				break;
 			}
 			case B_PIC_FILL_BEZIER:
 			{
 				BPoint control[4];
 				GetData(control, sizeof(control));
-				fdriver->FillBezier(control,&fldata,pat.type8);
+				fdriver->FillBezier(control,&fldata,pat);
 				break;
 			}
 			case B_PIC_STROKE_POLYGON:
@@ -197,7 +197,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
 				bool isClosed = GetBool();
-				fdriver->StrokePolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat.type8,isClosed);
+				fdriver->StrokePolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat,isClosed);
 				delete points;
 				break;
 			}
@@ -206,7 +206,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				int32 numPoints = GetInt32();
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
-				fdriver->FillPolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat.type8);
+				fdriver->FillPolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat);
 				delete points;
 				break;
 			}
@@ -260,7 +260,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				float startTheta = GetFloat();
 				float arcTheta = GetFloat();
 				fdriver->StrokeArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata,pat.type8);
+						center.y+radii.y),startTheta, arcTheta, &fldata,pat);
 				break;
 			}
 			case B_PIC_FILL_ARC:
@@ -270,7 +270,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				float startTheta = GetFloat();
 				float arcTheta = GetFloat();
 				fdriver->FillArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata,pat.type8);
+						center.y+radii.y),startTheta, arcTheta, &fldata,pat);
 				break;
 			}
 			case B_PIC_STROKE_ELLIPSE:
@@ -279,7 +279,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 				center = rect.LeftTop() + radii;
-				fdriver->StrokeEllipse(rect,&fldata,pat.type8);
+				fdriver->StrokeEllipse(rect,&fldata,pat);
 				break;
 			}
 			case B_PIC_FILL_ELLIPSE:
@@ -288,7 +288,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 				center = rect.LeftTop() + radii;
-				fdriver->FillEllipse(rect,&fldata,pat.type8);
+				fdriver->FillEllipse(rect,&fldata,pat);
 				break;
 			}
 			case B_PIC_ENTER_STATE_CHANGE:
@@ -375,7 +375,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				pattern p;
 				GetData(&p, sizeof(p));
-				pat.type64=*((uint64*)p.data);
+				pat=*((uint64*)p.data);
 				break;
 			}
 			case B_PIC_ENTER_FONT_STATE:

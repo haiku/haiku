@@ -205,7 +205,7 @@ void BitmapDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, La
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
 */
-void BitmapDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void BitmapDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -218,7 +218,7 @@ void BitmapDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 
 
 	Bounds checking must be done in this call.
 */
-void BitmapDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void BitmapDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 }
 
@@ -231,7 +231,7 @@ void BitmapDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
+void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 {
 // Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
 // to support our API
@@ -326,7 +326,7 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
-void BitmapDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void BitmapDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 {
 	Lock();
 	if(_target)
@@ -350,7 +350,7 @@ void BitmapDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	printf("BitmapDriver::FillRoundRect unimplemented\n");
 	StrokeRoundRect(r,xrad,yrad,d,pat);
@@ -367,9 +367,9 @@ void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
-	if(!pts || !d || !pat)
+	if(!pts || !d)
 		return;
 
 	Lock();
@@ -622,7 +622,7 @@ void BitmapDriver::SetMode(int32 space)
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
 */
-void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 // TODO: Add pattern support
 	float xc = (r.left+r.right)/2;
@@ -783,7 +783,7 @@ void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 
 	Bounds checking must be done in this call.
 */
-void BitmapDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 // TODO: Add pattern support
 	double Ax, Bx, Cx, Dx;
@@ -846,7 +846,7 @@ void BitmapDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
 */
-void BitmapDriver::StrokeEllipse(BRect r, LayerData *ldata, int8 *pat)
+void BitmapDriver::StrokeEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 {
 // Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
 // to support our API
@@ -951,7 +951,7 @@ void BitmapDriver::StrokeEllipse(BRect r, LayerData *ldata, int8 *pat)
 	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
 	a thickness greater than 1 will need to be done.
 */
-void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
 	Lock();
 	if(_target)
@@ -1008,7 +1008,7 @@ void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
+void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
 	Lock();
 	if(_target)
@@ -1029,7 +1029,7 @@ void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Layer
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
-void BitmapDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
 	Lock();
 	if(_target)
@@ -1053,7 +1053,7 @@ void BitmapDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
 */
-void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	float hLeft, hRight;
 	float vTop, vBottom;
@@ -1095,7 +1095,7 @@ void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
 */
-void BitmapDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void BitmapDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 	Lock();
 	if(_target)
@@ -1151,7 +1151,7 @@ void BitmapDriver::SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternin
 	}
 }
 
-void BitmapDriver::Line(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void BitmapDriver::Line(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
 	// Internal function which is called from within other functions
 	

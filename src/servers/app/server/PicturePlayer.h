@@ -88,7 +88,7 @@ private:
 	DisplayDriver *fdriver;
 	LayerData fldata;
 	BPoint forigin;
-	pattern_union pat;
+	Pattern pat;
 };
 
 #endif
