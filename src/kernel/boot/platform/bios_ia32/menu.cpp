@@ -18,14 +18,25 @@
 // position
 static const int32 kFirstLine = 8;
 static const int32 kOffsetX = 10;
-static const int32 kHelpLines = 2;
+static const int32 kHelpLines = 3;
 
 // colors
-static const console_color kItemColor = SILVER;
-static const console_color kSelectedItemColor = WHITE;
 static const console_color kBackgroundColor = BLACK;
-static const console_color kSelectedBackgroundColor = SILVER;
-static const console_color kDisabledColor = GREY;
+static const console_color kTextColor = WHITE;
+static const console_color kCopyrightColor = CYAN;
+static const console_color kTitleColor = WHITE;
+static const console_color kTitleBackgroundColor = RED;
+static const console_color kHelpTextColor = WHITE;
+
+static const console_color kItemColor = GRAY;
+static const console_color kSelectedItemColor = WHITE;
+static const console_color kItemBackgroundColor = kBackgroundColor;
+static const console_color kSelectedItemBackgroundColor = GRAY;
+static const console_color kDisabledColor = DARK_GRAY;
+
+static const console_color kSliderColor = GRAY;
+static const console_color kSliderBackgroundColor = CYAN;
+static const console_color kArrowColor = WHITE;
 
 static int32 sMenuOffset = 0;
 
@@ -65,7 +76,7 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 	if (line < 0 || line >= menu_height())
 		return;
 
-	console_color background = selected ? kSelectedBackgroundColor : kBackgroundColor;
+	console_color background = selected ? kSelectedItemBackgroundColor : kItemBackgroundColor;
 	console_color foreground = selected ? kSelectedItemColor : kItemColor;
 
 	if (!item->IsEnabled())
@@ -77,11 +88,11 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 	size_t length = strlen(item->Label()) + 1;
 
 	if (item->Type() == MENU_ITEM_MARKABLE) {
-		console_set_color(GREY, background);
+		console_set_color(DARK_GRAY, background);
 		printf(" [");
 		console_set_color(foreground, background);
 		printf("%c", item->IsMarked() ? 'x' : ' ');
-		console_set_color(GREY, background);
+		console_set_color(DARK_GRAY, background);
 		printf("] ");
 		console_set_color(foreground, background);
 
@@ -109,7 +120,7 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 		text = subItem != NULL ? subItem->Label() : "None";
 		length += strlen(text);
 
-		console_set_color(selected ? GREY : WHITE, background);
+		console_set_color(selected ? DARK_GRAY : WHITE, background);
 
 		printf(text);
 
@@ -124,7 +135,7 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 		return;
 
 	console_set_cursor(0, console_height() - kHelpLines);
-	console_set_color(WHITE, BLACK);
+	console_set_color(kHelpTextColor, kBackgroundColor);
 
 	if (clearHelp) {
 		// clear help text area
@@ -189,20 +200,18 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 static void
 draw_menu(Menu *menu)
 {
+	console_set_color(kTextColor, kBackgroundColor);
 	console_clear_screen();
 
-	console_set_color(WHITE, BLACK);
 	print_centered(1, "Welcome To The");
-
-	console_set_color(WHITE, BLACK);
 	print_centered(2, "Haiku Boot Loader");
 
-	console_set_color(GREEN, BLACK);
+	console_set_color(kCopyrightColor, kBackgroundColor);
 	print_centered(4, "Copyright 2004 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
-		console_set_color(WHITE, GREY);
+		console_set_color(kTitleColor, kTitleBackgroundColor);
 
 		printf(" %s", menu->Title());
 		print_spacing(console_width() - 1 - strlen(menu->Title()) - 2*kOffsetX);
@@ -226,7 +235,7 @@ draw_menu(Menu *menu)
 	if (menu->CountItems() >= height) {
 		int32 x = console_width() - kOffsetX;
 		console_set_cursor(x, kFirstLine);
-		console_set_color(YELLOW, BLACK);
+		console_set_color(kArrowColor, kBackgroundColor);
 		putchar(30/*24*/);
 		height--;
 
@@ -236,15 +245,15 @@ draw_menu(Menu *menu)
 		for (i = 1; i < height; i++) {
 			console_set_cursor(x, kFirstLine + i);
 			if (i >= start && i <= end)
-				console_set_color(WHITE, YELLOW);
+				console_set_color(WHITE, kSliderColor);
 			else
-				console_set_color(WHITE, GREY);
+				console_set_color(WHITE, kSliderBackgroundColor);
 
 			putchar(' ');
 		}
 
 		console_set_cursor(x, kFirstLine + i);
-		console_set_color(YELLOW, BLACK);
+		console_set_color(kArrowColor, kBackgroundColor);
 		putchar(31/*25*/);
 	}
 }
