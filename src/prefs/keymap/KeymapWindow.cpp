@@ -12,7 +12,21 @@
 #include "KeymapWindow.h"
 #include "KeymapListItem.h"
 #include "KeymapApplication.h"
-#include "messages.h"
+
+#define MENU_FILE_OPEN		'mMFO'
+#define MENU_FILE_SAVE		'mMFS'
+#define MENU_FILE_SAVE_AS	'mMFA'
+#define MENU_EDIT_UNDO		'mMEU'
+#define MENU_EDIT_CUT		'mMEX'
+#define MENU_EDIT_COPY		'mMEC'
+#define MENU_EDIT_PASTE		'mMEV'
+#define MENU_EDIT_CLEAR		'mMEL'
+#define MENU_EDIT_SELECT_ALL 'mMEA'
+#define MENU_FONT_CHANGED	'mMFC'
+#define SYSTEM_MAP_SELECTED	'SmST'
+#define USER_MAP_SELECTED	'UmST'
+#define	USE_KEYMAP			'UkyM'
+#define REVERT				'Rvrt'
 
 KeymapWindow::KeymapWindow( BRect frame )
 	:	BWindow( frame, WINDOW_TITLE, B_TITLED_WINDOW,
@@ -53,9 +67,8 @@ KeymapWindow::KeymapWindow( BRect frame )
 
 	fMapView = new MapView(BRect(149,29,601,209), "mapView");
 	AddChild(fMapView);
-	
-	SetPulseRate(10000);
 }
+
 
 
 BMenuBar *
@@ -261,6 +274,37 @@ KeymapWindow::MessageReceived( BMessage* message )
 		case REVERT:	// do nothing, just like the original
 			break;
 
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED: {
+			key_info info;
+			const uint8 *states;
+			ssize_t size;
+			bool need_update = false;
+			
+			if ((message->FindData("states", 'UBYT', (const void **)&states, &size)==B_OK)
+				&& (message->FindInt32("modifiers", (int32 *)&info.modifiers) == B_OK)) {
+				if (fMapView->fOldKeyInfo.modifiers != info.modifiers) {
+					need_update = true;
+				}
+				
+				for (int8 i=0; i<16; i++)
+					if (fMapView->fOldKeyInfo.key_states[i] != states[i]) {
+						need_update = true;
+						break;
+					}
+					
+				if (need_update) {
+					fMapView->fOldKeyInfo.modifiers = info.modifiers;
+					for (int8 j=0; j<16; j++) 
+						fMapView->fOldKeyInfo.key_states[j] = states[j];
+					fMapView->Invalidate();
+				}
+			}
+			break;
+		}
 		default:	
 			BWindow::MessageReceived( message );
 			break;
@@ -331,9 +375,16 @@ KeymapWindow::UseKeymap()
 
 
 MapView::MapView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW | B_PULSE_NEEDED)
+	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
 {
 
+}
+
+
+void
+MapView::AttachedToWindow()
+{
+	SetEventMask(B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
@@ -845,7 +896,7 @@ MapView::DrawKey(BRect rect, bool pressed, bool vertical)
 	SetHighColor(0,0,0);
 	StrokeRect(r);
 	
-	if(!pressed) {
+	if (!pressed) {
 		r.InsetBySelf(1,1);
 		SetHighColor(64,64,64);
 		StrokeRect(r);
@@ -886,7 +937,7 @@ MapView::DrawKey(BRect rect, bool pressed, bool vertical)
 		r.bottom -= 1;
 		BRect fillRect = r;
 			
-		if(!vertical) {
+		if (!vertical) {
 			int32 w1 = 4;
 			int32 w2 = 3;
 			if(rect.Width() > 20) {
@@ -959,27 +1010,58 @@ MapView::DrawBorder(BRect borderRect)
 	StrokeLine(BPoint(borderRect.right, borderRect.top + 1));
 }
 
-void
-MapView::Pulse()
-{
-	key_info info;
-	bool need_update = false;
-	get_key_info(&info);
 
-	if (fOldKeyInfo.modifiers != info.modifiers) {
-		need_update = true;
-	}
-		
-	for (int8 i=0; i<16; i++)
-		if (fOldKeyInfo.key_states[i] != info.key_states[i]) {
-			need_update = true;
+void
+MapView::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED: {
+			key_info info;
+			const uint8 *states;
+			ssize_t size;
+			bool need_update = false;
+			
+			if ((msg->FindData("states", 'UBYT', (const void **)&states, &size)==B_OK)
+				&& (msg->FindInt32("modifiers", (int32 *)&info.modifiers) == B_OK)) {
+				if (fOldKeyInfo.modifiers != info.modifiers) {
+					need_update = true;
+				}
+				
+				for (int8 i=0; i<16; i++)
+					if (fOldKeyInfo.key_states[i] != states[i]) {
+						need_update = true;
+						break;
+					}
+					
+				if (need_update) {
+					fOldKeyInfo.modifiers = info.modifiers;
+					for (int8 j=0; j<16; j++) 
+						fOldKeyInfo.key_states[j] = states[j];
+					Invalidate();
+				}
+			}
 			break;
 		}
-		
-	if (need_update) {
-		fOldKeyInfo.modifiers = info.modifiers;
-		for (int8 j=0; j<16; j++) 
-			fOldKeyInfo.key_states[j] = info.key_states[j];
-		Invalidate();
-	}	
+		default:
+			BView::MessageReceived(msg);
+	}
+	
+}
+
+
+void
+MapView::KeyDown(const char* bytes, int32 numBytes)
+{
+	MessageReceived(Window()->CurrentMessage());
+}
+
+
+void
+MapView::KeyUp(const char* bytes, int32 numBytes)
+{
+	MessageReceived(Window()->CurrentMessage());
 }

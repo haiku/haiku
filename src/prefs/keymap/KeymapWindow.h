@@ -1,11 +1,9 @@
 #ifndef OBOS_KEYMAP_WINDOW_H
 #define OBOS_KEYMAP_WINDOW_H
 
-
 #include <interface/Window.h>
 #include <support/List.h>
 #include <interface/MenuBar.h>
-
 
 #if !DEBUG
 	#define WINDOW_TITLE				"Keymap"
@@ -25,8 +23,12 @@ public:
 	void Draw(BRect rect);
 	void DrawKey(BRect rect, bool pressed, bool vertical = false);
 	void DrawBorder(BRect borderRect);
-	void Pulse();
-
+	//void Pulse();
+	void AttachedToWindow();
+	void KeyDown(const char* bytes, int32 numBytes);
+	void KeyUp(const char* bytes, int32 numBytes);
+	void MessageReceived(BMessage *msg);
+	
 	key_info fOldKeyInfo;
 };
 
@@ -36,6 +38,7 @@ public:
 			KeymapWindow( BRect frame );
 	bool	QuitRequested();
 	void	MessageReceived( BMessage* message );
+	//void 	AllAttached();
 
 protected:
 	KeymapApplication	*fApplication;
