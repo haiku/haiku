@@ -6,7 +6,11 @@
 */
 
 #include "MainWindow.h"
+#include "Pref_Utils.h"
 
+#include <String.h>
+
+const char *kRequestStr = "Requested swap file size: ";
 /**
  * Constructor.
  * @param frame The size to make the window.
@@ -16,107 +20,111 @@
  * @param maxSwapVal The maximum value of the swap file.
  */	
 MainWindow::MainWindow(BRect frame, int physMemVal, int currSwapVal, int minVal, int maxSwapVal, VMSettings *Settings)
-			:BWindow(frame, "Virtual Memory", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE){
+	:BWindow(frame, "VirtualMemory", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE){
 
-	BStringView *physMem;
-	BStringView *currSwap;
-	BButton *defaultButton;
-	BBox *topLevelView;
-	BBox *boxView;
-	
 	fSettings = Settings;
 	
 	/**
 	 * Sets the fill color for the "used" portion of the slider.
 	 */
-	rgb_color fillColor;
-	fillColor.red = 0;
-	fillColor.blue = 152;
-	fillColor.green = 102;
-	
+	rgb_color fillColor = { 0, 102, 152, 255 };
+
 	/**
 	 * Set up variables to help handle font sensitivity
 	 */
-	font_height fontHeightStruct;
-	be_plain_font->GetHeight(&fontHeightStruct);
-	float fontheight=fontHeightStruct.ascent+fontHeightStruct.descent+fontHeightStruct.leading;
+	float fontheight = FontHeight(true, NULL);
 	
 	/**
-	 * This var sets the size of the visible box around the string views and
+	 * boxRect sets the size of the visible box around the string views and
 	 * the slider.
 	 */
-	BRect boxRect=Bounds();
-	boxRect.left=boxRect.left+10;
-	boxRect.top=boxRect.top+10;
-	boxRect.bottom=boxRect.bottom-45;
-	boxRect.right=boxRect.right-10;
-	char labels[50];
-	char sliderMinLabel[10];
-	char sliderMaxLabel[10];
+	BRect boxRect = Bounds();
+	boxRect.InsetBy(11, 11);
+	boxRect.bottom -= 25;
 	
-	origMemSize = currSwapVal;
-	minSwapVal = minVal;
+	BString labels;
+	forigMemSize = currSwapVal;
+	fminSwapVal = minVal;
 	
-	BRect rect(10,10,210,10+fontheight+2);
-	
+	BRect rect(0.0, 0.0, boxRect.Width() -20.0, fontheight);
+	rect.OffsetTo(10.0, 10.0);
 	/**
 	 * Set up the "Physical Memory" label.
 	 */
-	sprintf(labels, "Physical Memory: %d MB", physMemVal);
-	physMem = new BStringView(rect, "PhysicalMemory", labels, B_FOLLOW_ALL, B_WILL_DRAW);
+	BStringView *physMem;
+	 labels << "Physical memory: " << physMemVal << " MB";
+	physMem = new BStringView(rect, "PhysicalMemory", labels.String(), B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	/**
 	 * Set up the "Current Swap File Size" label.
 	 */
-	rect.OffsetBy(0,rect.Height());
-	sprintf(labels, "Current Swap File Size: %d MB", currSwapVal);
-	currSwap = new BStringView(rect, "CurrentSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
+	BStringView *currSwap;
+	rect.OffsetBy(0, rect.Height() +5);
+	labels = "Current swap file size: ";
+	labels << currSwapVal << " MB";
+	currSwap = new BStringView(rect, "CurrentSwapSize", labels.String(), B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	/**
 	 * Set up the "Requested Swap File Size" label.
 	 */
-	rect.OffsetBy(0,rect.Height());
-	sprintf(labels, "Requested Swap File Size: %d MB", currSwapVal);
-	reqSwap = new BStringView(rect, "RequestedSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
-	
+	rect.OffsetBy(0, rect.Height() +5);
+	labels = kRequestStr;
+	labels << currSwapVal << " MB";
 	/**
 	 * Set up the slider.
 	 */
-	sprintf(sliderMinLabel, "%d MB", minSwapVal);
-	sprintf(sliderMaxLabel, "%d MB", maxSwapVal);
-	reqSizeSlider = new BSlider(*(new BRect(10, 51, 240, 75)), "ReqSwapSizeSlider", "", new BMessage(MEMORY_SLIDER_MSG), minSwapVal, maxSwapVal, B_TRIANGLE_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW);
-	reqSizeSlider->SetLimitLabels(sliderMinLabel, sliderMaxLabel);
-	reqSizeSlider->UseFillColor(TRUE, &fillColor);
-	reqSizeSlider->SetModificationMessage(new BMessage(SLIDER_UPDATE_MSG));
+	BString sliderMinLabel;
+	BString sliderMaxLabel;
+		sliderMinLabel << fminSwapVal << " MB";
+		sliderMaxLabel << maxSwapVal << " MB";
+
+	rect.bottom = rect.top+2;
+	freqSizeSlider = new BSlider(rect, "ReqSwapSizeSlider", labels.String(), 
+		new BMessage(MEMORY_SLIDER_MSG), fminSwapVal, maxSwapVal, B_TRIANGLE_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW);
+
+	freqSizeSlider->SetLimitLabels(sliderMinLabel.String(), sliderMaxLabel.String());
+	freqSizeSlider->UseFillColor(true, &fillColor);
+	freqSizeSlider->SetModificationMessage(new BMessage(SLIDER_UPDATE_MSG));
 	
-	reqSizeSlider->SetValue(currSwapVal);
+	freqSizeSlider->SetValue(currSwapVal);
 	
 	/**
 	 * Initializes the restart notice view.
 	 */
-	restart = new BStringView(*(new BRect(40, 100, 210, 110)), "RestartMessage", "", B_FOLLOW_ALL, B_WILL_DRAW);
+	 rect = freqSizeSlider->Frame();
+	rect.top = rect.bottom +2;
+	rect.bottom = rect.top +fontheight;
+	frestart = new BStringView(rect, "RestartMessage", B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW);
+	frestart->SetAlignment(B_ALIGN_CENTER);
 	
 	/**
 	 * This view holds the three labels and the slider.
 	 */
+
+	BBox *boxView;
 	boxView = new BBox(boxRect, "BoxView", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
-	boxView->AddChild(reqSizeSlider);
+	boxView->AddChild(freqSizeSlider);
 	boxView->AddChild(physMem);
 	boxView->AddChild(currSwap);
-	boxView->AddChild(reqSwap);
-	boxView->AddChild(restart);
-		
-	defaultButton = new BButton(*(new BRect(10, 138, 85, 158)), "DefaultButton", "Default", new BMessage(DEFAULT_BUTTON_MSG), B_FOLLOW_ALL, B_WILL_DRAW);
-	revertButton = new BButton(*(new BRect(95, 138, 170, 158)), "RevertButton", "Revert", new BMessage(REVERT_BUTTON_MSG), B_FOLLOW_ALL, B_WILL_DRAW);
-	revertButton->SetEnabled(false);
+	boxView->AddChild(frestart);
 	
+	rect.Set(0.0, 0.0, 75.0, 20.0);
+	BButton *defaultButton;
+	rect.OffsetTo(10, boxRect.bottom +5);
+	defaultButton = new BButton(rect, "DefaultButton", "Default", 
+		new BMessage(DEFAULT_BUTTON_MSG), B_FOLLOW_ALL, B_WILL_DRAW);
+	rect.OffsetBy(85, 0);
+	frevertButton = new BButton(rect, "RevertButton", "Revert", 
+		new BMessage(REVERT_BUTTON_MSG), B_FOLLOW_ALL, B_WILL_DRAW);
+	frevertButton->SetEnabled(false);
+	
+	BBox *topLevelView;
 	topLevelView = new BBox(Bounds(), "TopLevelView", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
 	topLevelView->AddChild(boxView);
 	topLevelView->AddChild(defaultButton);
-	topLevelView->AddChild(revertButton);
+	topLevelView->AddChild(frevertButton);
 	
 	AddChild(topLevelView);
-	
 }
 
 /**
@@ -124,21 +132,16 @@ MainWindow::MainWindow(BRect frame, int physMemVal, int currSwapVal, int minVal,
  * @param setTo If true, displays the message  If false, un-displays it.
  */	
 void MainWindow::toggleChangedMessage(bool setTo){
+	
+	BString message = B_EMPTY_STRING;
+	if (setTo) {
+		frevertButton->SetEnabled(true);
+		message << "Changes will take effect on restart.";
+	} else {
+		frevertButton->SetEnabled(false);
+	}
 
-	char msg[100];
-	if(setTo){
-	
-		revertButton->SetEnabled(true);
-		sprintf(msg, "Changes will take effect on restart.");
-		restart->SetText(msg);
-	
-	}//if
-	else{
-	
-		restart->SetText("");
-		
-	}//else
-
+	frestart->SetText(message.String());
 }//toggleChangedMessage
 
 /**
@@ -147,58 +150,44 @@ void MainWindow::toggleChangedMessage(bool setTo){
  */	
 void MainWindow::MessageReceived(BMessage *message){
 
-	char msg[100];
-	
 	switch(message->what){
-	
-		int currVal;
-		
+
 		/**
 		 * Updates the requested swap file size during a drag.
 		 */
 		case SLIDER_UPDATE_MSG:
+		{
+			int32 currVal = freqSizeSlider->Value();
+			BString label(kRequestStr);
+			label << currVal << " MB";
+			freqSizeSlider->SetLabel(label.String());
 			
-			currVal = int(reqSizeSlider->Value());
-			sprintf(msg, "Requested Swap File Size: %d MB", currVal);
-			reqSwap->SetText(msg);
-			
-			if(currVal != origMemSize){
-			
+			if (currVal != forigMemSize) 
 				toggleChangedMessage(true);
-				
-			}//if
-			else{
-				
-				revertButton->SetEnabled(false);
+			else 
 				toggleChangedMessage(false);
-				
-			}//else
-			
+
 			break;
+		}	
 		
 		/**
 		 * Case where the slider was moved.
 		 * Resets the "Requested Swap File Size" label to the new value.
 		 */
 		case MEMORY_SLIDER_MSG:
-		
-			currVal = int(reqSizeSlider->Value());
-			sprintf(msg, "Requested Swap File Size: %d MB", currVal);
-			reqSwap->SetText(msg);
+		{
+			int32 currVal = freqSizeSlider->Value();
+			BString label(kRequestStr);
+			label << currVal << " MB";
+			freqSizeSlider->SetLabel(label.String());
 			
-			if(currVal != origMemSize){
-			
+			if (currVal != forigMemSize)
 				toggleChangedMessage(true);
-				
-			}//if
-			else{
-				
-				revertButton->SetEnabled(false);
+			else
 				toggleChangedMessage(false);
-				
-			}//else
 			
 			break;
+		}	
 			
 		/**
 		 * Case where the default button was pressed.
@@ -207,46 +196,41 @@ void MainWindow::MessageReceived(BMessage *message){
 		 * do that).
 		 */
 		case DEFAULT_BUTTON_MSG:
-		
-			reqSizeSlider->SetValue(minSwapVal);
-			sprintf(msg, "Requested Swap File Size: %d MB", minSwapVal);
-			reqSwap->SetText(msg);
-			if(minSwapVal != origMemSize){
-			
-				toggleChangedMessage(true);
-				
-			}//if
-			else{
-				
-				revertButton->SetEnabled(false);
+		{
+			freqSizeSlider->SetValue(fminSwapVal);
+			BString label(kRequestStr);
+			label << fminSwapVal << " MB";
+			freqSizeSlider->SetLabel(label.String());
+
+			if(fminSwapVal != forigMemSize)
+				toggleChangedMessage(true);				
+			else
 				toggleChangedMessage(false);
 				
-			}//else
 			break;
-			
+		}	
 		/**
 		 * Case where the revert button was pressed.
 		 * Returns things to the way they were when the app was started, 
 		 * which is not necessarily the default size.
 		 */
 		case REVERT_BUTTON_MSG:
-		
-			revertButton->SetEnabled(false);
-			sprintf(msg, "Requested Swap File Size: %d MB", origMemSize);
-			reqSwap->SetText(msg);
-			reqSizeSlider->SetValue(origMemSize);
+		{
+			frevertButton->SetEnabled(false);
+			BString label(kRequestStr);
+			label << forigMemSize << " MB";
+			freqSizeSlider->SetLabel(label.String());
+			freqSizeSlider->SetValue(forigMemSize);
 			toggleChangedMessage(false);
-			break;
 			
+			break;
+		}	
 		/**
 		 * Unhandled messages get passed to BWindow.
 		 */
 		default:
-		
 			BWindow::MessageReceived(message);
-	
 	}
-	
 }
 
 /**
@@ -256,19 +240,20 @@ void MainWindow::MessageReceived(BMessage *message){
  */	
 bool MainWindow::QuitRequested(){
 
-    FILE *settingsFile =
-    	fopen("/boot/home/config/settings/kernel/drivers/virtual_memory", "w");
-    fprintf(settingsFile, "vm on\n");
-    fprintf(settingsFile, "swap_size %d\n", (int(reqSizeSlider->Value()) * 1048576));
-    fclose(settingsFile);
+	if (freqSizeSlider->Value() != forigMemSize) {
+		FILE *settingsFile = fopen("/boot/home/config/settings/kernel/drivers/virtual_memory", "w");
+		fprintf(settingsFile, "vm on\n");
+		fprintf(settingsFile, "swap_size %d\n", (int(freqSizeSlider->Value()) * 1048576));
+		fclose(settingsFile);
+	}
 	
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(true);
+	return true;
 	
 }
 
 void MainWindow::FrameMoved(BPoint origin)
-{//MainWindow::FrameMoved
+{
 	fSettings->SetWindowPosition(Frame());
-}//MainWindow::FrameMoved
+}
 

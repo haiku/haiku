@@ -1,8 +1,8 @@
 #ifndef VM_SETTINGS_H_
 #define VM_SETTINGS_H_
 
-#include <SupportDefs.h>
 #include <Screen.h>
+#include <SupportDefs.h>
 
 class VMSettings{
 public :
