@@ -1,6 +1,9 @@
 /*
 
-DUN Header by Sikosis (beos@gravity24hr.com)
+DUN Header - DialUp Networking Header
+
+Authors: Sikosis (beos@gravity24hr.com)
+		 Misza (misza@ihug.com.au) 
 
 (C) 2002 OpenBeOS under MIT license
 
@@ -10,6 +13,7 @@ DUN Header by Sikosis (beos@gravity24hr.com)
 #define __DUN_H__
 
 #include "DUNWindow.h"
+#include <iostream>
 
 extern const char *APP_SIGNATURE;
 

@@ -1,15 +1,18 @@
 /*
 
-DUN by Sikosis (beos@gravity24hr.com)
+DUN - DialUp Networking Preference Application
+
+Authors: Sikosis (beos@gravity24hr.com)
+		 Misza (misza@ihug.com.au) 
 
 (C) 2002 OpenBeOS under MIT license
 
 */
 
-#include "app/Application.h"
+#include <Application.h>
 #include <Alert.h>
-#include "interface/Window.h"
-#include "interface/View.h"
+#include <Window.h>
+#include <View.h>
 #include <stdio.h>
 
 #include "DUN.h"
@@ -40,31 +43,29 @@ float FormHeightState2 = 282;
 
 BRect windowRect(FormTopDefault,FormLeftDefault,FormLeftDefault+FormWidthDefault,FormTopDefault+FormHeightDefault);
 
-const uint32 MENU_CON_NEW = 'MCNu';
+
 
 // DUN -- constructor for DUN Class
 DUN::DUN() : BApplication (APP_SIGNATURE) {
-   dunWindow = new DUNWindow(windowRect);
+    dunWindow = new DUNWindow(windowRect);
 }
 // ------------------------------------------------------------------------------- //
 
+
 // DUN::MessageReceived -- handles incoming messages
 void DUN::MessageReceived (BMessage *message) {
-   switch(message->what) {
-	   case MENU_CON_NEW:
- 		 (new BAlert("","New Connection Window","Coming Soon"))->Go(); 	
-   	     break;	
-      default:
-         BApplication::MessageReceived(message); // pass it along ... 
-         break;
-   }
+	switch(message->what) {
+    	default:
+        	BApplication::MessageReceived(message); // pass it along ... 
+         	break;
+	}
 }
 // ------------------------------------------------------------------------------- //
 
 // DUN Main
 int main(void) {
-   DUN theApp;
-   theApp.Run();
-   return 0;
+	DUN theApp;
+	theApp.Run();
+	return 0;
 }
 // end

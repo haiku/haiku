@@ -1,6 +1,9 @@
 /*
 
-DUNView by Sikosis (beos@gravity24hr.com)
+DUNView Header - DialUp Networking View Header
+
+Authors: Sikosis (beos@gravity24hr.com)
+		 Misza (misza@ihug.com.au) 
 
 (C) 2002 OpenBeOS under MIT license
 
@@ -19,4 +22,8 @@ public:
    ModemView(BRect frame);
 };
 
+class SettingsView : public BView {
+public:
+	SettingsView(BRect frame);
+};
 #endif
