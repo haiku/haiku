@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps bemail ;
 
 UsePrivateHeaders mail ;
+UsePrivateHeaders textencoding ;
 
 AddResources BeMail : versioning.rdef pictures.rdef  ;
 App BeMail : 
@@ -21,7 +22,7 @@ App BeMail :
 	Words.cpp
 	KUndoBuffer.cpp ;
 
-LinkSharedOSLibs BeMail : be tracker stdc++.r4 libmail.so ;
+LinkSharedOSLibs BeMail : be tracker stdc++.r4 libmail.so libtextencoding.so ;
 
 Package haiku-maildaemon-cvs :
 	BeMail : 

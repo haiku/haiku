@@ -56,6 +56,12 @@ All rights reserved.
 #include <MailSettings.h>
 #include <MailMessage.h>
 
+#include <String.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+
+using namespace BPrivate;
+
 #include "Mail.h"
 #include "Header.h"
 #include "Utilities.h"
@@ -154,27 +160,52 @@ THeaderView::THeaderView (
 	// (because the adjacent pop-up menu can't resize dynamically due to a BeOS
 	// bug).
 
-	bool marked;
-	float widestCharacterSet;
+	float widestCharacterSet = 0;
+	bool marked_charset = false;
+	BMenuItem * item;
 
 	fEncodingMenu = new BPopUpMenu (B_EMPTY_STRING);
-	marked = false;
-	widestCharacterSet = 0;
-	for (int32 i = 0; true; i++) {
-		if (kEncodings[i].flavor == B_MAIL_NULL_CONVERSION && (resending || !fIncoming))
-			break; // Composing a new message, don't display last "Automatic" item.
-		msg = new BMessage(kMsgEncoding);
-		msg->AddInt32 ("charset", kEncodings[i].flavor);
-		BMenuItem *item = new BMenuItem (kEncodings[i].name, msg);
-		if (kEncodings[i].flavor == fCharacterSetUserSees && !marked) {
-			item->SetMarked (true);
-			marked = true;
+
+	BCharacterSetRoster roster;
+	BCharacterSet charset;
+	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+		BString name(charset.GetPrintName());
+		const char * mime = charset.GetMIMEName();
+		if (mime) {
+			name.Append(" (");
+			name.Append(mime);
+			name.Append(")");
 		}
-		fEncodingMenu->AddItem (item);
-		if (font.StringWidth (kEncodings[i].name) > widestCharacterSet)
-			widestCharacterSet = font.StringWidth (kEncodings[i].name);
-		if (kEncodings[i].flavor == B_MAIL_NULL_CONVERSION)
-			break; // No more character set choices after this one, stop.
+		msg = new BMessage(kMsgEncoding);
+		if ((mime == 0) || (strcmp(mime, "UTF-8") != 0)) {
+			msg->AddInt32("charset", charset.GetConversionID());
+		} else {
+			msg->AddInt32("charset", B_MAIL_UTF8_CONVERSION);
+		}
+		fEncodingMenu->AddItem(item = new BMenuItem(name.String(), msg));
+		if (charset.GetConversionID() == fCharacterSetUserSees && !marked_charset) {
+			item->SetMarked(true);
+			marked_charset = true;
+		}
+		if (font.StringWidth(name.String()) > widestCharacterSet)
+			widestCharacterSet = font.StringWidth(name.String());
+	}
+
+	msg = new BMessage(kMsgEncoding);
+	msg->AddInt32("charset", B_MAIL_US_ASCII_CONVERSION);
+	fEncodingMenu->AddItem(item = new BMenuItem("US-ASCII", msg));
+	if (fCharacterSetUserSees == B_MAIL_US_ASCII_CONVERSION && !marked_charset) {
+		item->SetMarked(true);
+		marked_charset = true;
+	}
+
+	if (!resending && fIncoming) {
+		// reading a message, display the Automatic item
+		fEncodingMenu->AddSeparatorItem();
+		msg = new BMessage(kMsgEncoding);
+		msg->AddInt32("charset", B_MAIL_NULL_CONVERSION);
+		fEncodingMenu->AddItem(item = new BMenuItem("Automatic", msg));
+		item->SetMarked(true);
 	}
 
 	// First line of the header, From for reading e-mails (includes the
@@ -254,7 +285,7 @@ THeaderView::THeaderView (
 		BList chains;
 		if (GetOutboundMailChains(&chains) >= B_OK)
 		{
-			marked = false;
+			bool marked = false;
 			for (int32 i = 0;i < chains.CountItems();i++)
 			{
 				BMailChain *chain = (BMailChain *)chains.ItemAt(i);

@@ -66,6 +66,10 @@ All rights reserved.
 #include <mail_util.h>
 #include <MDRLanguage.h>
 
+#include <CharacterSetRoster.h>
+
+using namespace BPrivate ;
+
 #ifndef BONE
 #	include <netdb.h>
 #endif
@@ -241,7 +245,7 @@ TMailApp::AboutRequested()
 	(new BAlert("",
 		"BeMail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Mail.cpp $Revision: 1.3 $\n"
+		"Mail.cpp $Revision: 1.4 $\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
 		"Close"))->Go();
 }
@@ -927,13 +931,10 @@ TMailApp::LoadSavePrefs(bool loadThem)
 		}
 
 		prefsFile.Read(&gMailCharacterSet, sizeof(int32));
-		for (uint32 index = 0; true; index++) {
-			if (kEncodings[index].flavor == B_MAIL_NULL_CONVERSION) {
-				gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-				break;
-			}
-			if (kEncodings[index].flavor == gMailCharacterSet)
-				break;
+		if ((gMailCharacterSet != B_MAIL_UTF8_CONVERSION) &&
+		    (gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION) &&
+		    (BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)) {
+			gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
 		}
 
 		if (prefsFile.Read(&len, sizeof(int32)) > 0)
@@ -1072,13 +1073,10 @@ TMailApp::LoadSavePrefs(bool loadThem)
 	if (loadThem) {
 		if (settingsMsg.FindInt32(fieldName, &tempInt32) == B_OK)
 			gMailCharacterSet = tempInt32;
-		for (uint32 index = 0; true; index++) {
-			if (kEncodings[index].flavor == B_MAIL_NULL_CONVERSION) {
-				gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-				break; // Don't use unknown character sets.
-			}
-			if (kEncodings[index].flavor == gMailCharacterSet)
-				break;
+		if ((gMailCharacterSet != B_MAIL_UTF8_CONVERSION) &&
+		    (gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION) &&
+		    (BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)) {
+			gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
 		}
 	} else if (errorCode == B_OK)
 		errorCode = settingsMsg.AddInt32(fieldName, gMailCharacterSet);

@@ -50,6 +50,12 @@ All rights reserved.
 #include <mail_encoding.h>
 #include <MDRLanguage.h>
 
+#include <String.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+
+using namespace BPrivate;
+
 #include "Mail.h"
 #include "Prefs.h"
 
@@ -97,41 +103,6 @@ enum	P_MESSAGES			{P_OK = 128, P_CANCEL, P_REVERT, P_FONT,
 
 
 extern BPoint	prefs_window;
-
-const EncodingItem kEncodings[] =
-{
-	// B_MS_WINDOWS is a superset of B_ISO1, MS mailers lie and send Windows
-	// chars as ISO-1 we still don't want to pretend we would use the Windows
-	// 1252 codetable; this should only be done at decoding stage, axeld.
-	// {"ISO-8859-1", B_MS_WINDOWS_CONVERSION},
-	{"ISO-8859-1 (Latin-1)", B_ISO1_CONVERSION},
-	{"ISO-8859-2", B_ISO2_CONVERSION},
-	{"ISO-8859-3", B_ISO3_CONVERSION},
-	{"ISO-8859-4", B_ISO4_CONVERSION},
-	{"ISO-8859-5", B_ISO5_CONVERSION},
-	{"ISO-8859-6", B_ISO6_CONVERSION},
-	{"ISO-8859-7", B_ISO7_CONVERSION},
-	{"ISO-8859-8", B_ISO8_CONVERSION},
-	{"ISO-8859-9", B_ISO9_CONVERSION},
-	{"ISO-8859-10", B_ISO10_CONVERSION},
-	{"ISO-8859-13", B_ISO13_CONVERSION},
-	{"ISO-8859-14", B_ISO14_CONVERSION},
-	{"ISO-8859-15", B_ISO15_CONVERSION},
-	{"SHIFT-JIS (obsolete)", B_SJIS_CONVERSION},
-	{"ISO-2022-JP", B_JIS_CONVERSION},
-	{"EUC-JP (obsolete)", B_EUC_CONVERSION},
-	{"EUC-KR",      B_EUC_KR_CONVERSION},
-	{"KOI8-R",      B_KOI8R_CONVERSION},
-	{"Windows-1251",B_MS_WINDOWS_1251_CONVERSION},
-	{"Windows-1252 (\"ANSI\")",B_MS_WINDOWS_CONVERSION},
-	{"DOS-437 (common)", B_MS_DOS_CONVERSION},
-	{"DOS-866 (rarer)", B_MS_DOS_866_CONVERSION},
-	{"Macintosh Roman", B_MAC_ROMAN_CONVERSION},
-	{"US-ASCII", B_MAIL_US_ASCII_CONVERSION},
-	{"UTF-8 (BeOS)", B_MAIL_UTF8_CONVERSION},
-
-	{"Automatic", B_MAIL_NULL_CONVERSION /* marks end of list, only visible when decoding */}
-};
 
 #define  ATTRIBUTE_ON_TEXT MDR_DIALECT_CHOICE ("Include BeOS Attributes in Attachments", "BeOSの属性を付ける")
 #define  ATTRIBUTE_OFF_TEXT MDR_DIALECT_CHOICE ("No BeOS Attributes, just Plain Data", "BeOSの属性を付けない（データのみ）")
@@ -470,13 +441,16 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 				if (item)
 					item->SetMarked(true);
 
-				for (uint32 index = 0; kEncodings[index].flavor != B_MAIL_NULL_CONVERSION; index++)
-				{
-					if (kEncodings[index].flavor == *fNewEncoding)
-					{
-						item = fEncodingMenu->FindItem(kEncodings[index].name);
-						if (item)
-							item->SetMarked(true);
+				uint32 index = 0;
+				while ((item = fEncodingMenu->ItemAt(index++)) != NULL) {
+					BMessage * message = item->Message();
+					if (message == NULL) {
+						continue;
+					}
+					int32 encoding;
+					if ((message->FindInt32("encoding", &encoding) == B_OK) &&
+					    ((uint32)encoding == *fNewEncoding)) {
+						item->SetMarked(true);
 						break;
 					}
 				}
@@ -905,19 +879,41 @@ TPrefsWindow::BuildColoredQuotesMenu(bool quote)
 BPopUpMenu *
 TPrefsWindow::BuildEncodingMenu(uint32 encoding)
 {
-	uint32		loop;
 	BMenuItem	*item;
 	BMessage	*msg;
 	BPopUpMenu	*menu;
 
 	menu = new BPopUpMenu("");
-	for (loop = 0; kEncodings[loop].flavor != B_MAIL_NULL_CONVERSION; loop++) {
+
+	BCharacterSetRoster roster;
+	BCharacterSet charset;
+	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+		BString name(charset.GetPrintName());
+		const char * mime = charset.GetMIMEName();
+		if (mime) {
+			name.Append(" (");
+			name.Append(mime);
+			name.Append(")");
+		}
 		msg = new BMessage(P_ENC);
-		msg->AddInt32("encoding", kEncodings[loop].flavor);
-		menu->AddItem(item = new BMenuItem(kEncodings[loop].name, msg));
-		if (encoding == kEncodings[loop].flavor)
+		if ((mime == 0) || (strcmp(mime, "UTF-8") != 0)) {
+			msg->AddInt32("encoding", charset.GetConversionID());
+		} else {
+			msg->AddInt32("encoding", B_MAIL_UTF8_CONVERSION);
+		}
+		menu->AddItem(item = new BMenuItem(name.String(), msg));
+		if (charset.GetConversionID() == encoding) {
 			item->SetMarked(true);
+		}
 	}
+
+	msg = new BMessage(P_ENC);
+	msg->AddInt32("encoding", B_MAIL_US_ASCII_CONVERSION);
+	menu->AddItem(item = new BMenuItem("US-ASCII", msg));
+	if (encoding == B_MAIL_US_ASCII_CONVERSION) {
+		item->SetMarked(true);
+	}
+
 	return menu;
 }
 
