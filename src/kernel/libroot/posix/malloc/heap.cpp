@@ -20,7 +20,6 @@
 #include "config.h"
 
 #include "heap.h"
-#define NEED_LG
 #include "processheap.h"
 #include "superblock.h"
 
@@ -98,6 +97,31 @@ size_t hoardHeap::_threshold[hoardHeap::SIZE_CLASSES] = {
 #else
 #	error "Undefined size class base."
 #endif
+
+
+int hoardHeap::_numProcessors;
+int hoardHeap::_numProcessorsMask;
+
+
+// Return ceil(log_2(num)).
+// num must be positive.
+
+static int
+lg(int num)
+{
+	assert(num > 0);
+	int power = 0;
+	int n = 1;
+	// Invariant: 2^power == n.
+	while (n < num) {
+		n <<= 1;
+		power++;
+	}
+	return power;
+}
+
+
+//	#pragma mark -
 
 
 hoardHeap::hoardHeap(void)
@@ -420,16 +444,17 @@ hoardHeap::freeBlock(block * &b, superblock * &sb,
 	return 0;
 }
 
-// Static initialization of the number of processors (and a mask).
 
-int hoardHeap::_numProcessors;
-int hoardHeap::_numProcessorsMask;
-
-hoardHeap::_initNumProcs::_initNumProcs(void)
+void
+hoardHeap::initNumProcs(void)
 {
-	hoardHeap::_numProcessors = hoardGetNumProcessors();
+	system_info info;
+	if (get_system_info(&info) != B_OK)
+		hoardHeap::_numProcessors = 1;
+	else
+		hoardHeap::_numProcessors = info.cpu_count;
+
 	hoardHeap::_numProcessorsMask =
-		(1 << (lg(hoardGetNumProcessors()) + 1)) - 1;
+		(1 << (lg(hoardHeap::_numProcessors) + 1)) - 1;
 }
 
-static hoardHeap::_initNumProcs initProcs;

@@ -37,20 +37,7 @@ operator new(size_t, void *_P)
 	return _P;
 }
 
-typedef thread_id hoardThreadType;
-
 namespace BPrivate {
-///// Thread-related wrappers.
-
-void hoardCreateThread(hoardThreadType &t,
-		void *(*function)(void *), void *arg);
-void hoardJoinThread(hoardThreadType &t);
-void hoardSetConcurrency(int n);
-
-// Return a thread identifier appropriate for hashing:
-// if the system doesn't produce consecutive thread id's,
-// some hackery may be necessary.
-int	hoardGetThreadID(void);
 
 ///// Lock-related wrappers.
 
@@ -60,16 +47,12 @@ void hoardUnlock(hoardLockType &lock);
 
 ///// Memory-related wrapper.
 
-int	hoardGetPageSize(void);
 void *hoardSbrk(long size);
 void hoardUnsbrk(void *ptr, long size);
 
 ///// Other.
 
 void hoardYield(void);
-int	hoardGetNumProcessors(void);
-unsigned long hoardInterlockedExchange(unsigned long *oldval,
-		unsigned long newval);
 
 }	// namespace BPrivate
 

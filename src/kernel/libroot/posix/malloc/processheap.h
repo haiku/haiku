@@ -183,24 +183,6 @@ processHeap::getLog(int i)
 #endif
 
 
-#ifdef NEED_LG
-// Return ceil(log_2(num)).
-// num must be positive.
-static int
-lg(int num)
-{
-	assert(num > 0);
-	int power = 0;
-	int n = 1;
-	// Invariant: 2^power == n.
-	while (n < num) {
-		n <<= 1;
-		power++;
-	}
-	return power;
-}
-#endif /* NEED_LG */
-
 // Hash out the thread id to a heap and return an index to that heap.
 
 int
@@ -209,7 +191,7 @@ processHeap::getHeapIndex(void)
 	// Here we use the number of processors as the maximum number of heaps.
 	// In fact, for efficiency, we just round up to the highest power of two,
 	// times two.
-	int tid = hoardGetThreadID() & _numProcessorsMask;
+	int tid = find_thread(NULL) & _numProcessorsMask;
 	assert(tid < MAX_HEAPS);
 	return tid;
 }

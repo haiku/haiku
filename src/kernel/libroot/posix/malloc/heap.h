@@ -211,13 +211,7 @@ class hoardHeap {
 		static size_t _threshold[SIZE_CLASSES];
 
 	public:
-		// A little helper class that we use to define some statics.
-		class _initNumProcs {
-			public:
-				_initNumProcs(void);
-		};
-
-		friend class _initNumProcs;
+		static void initNumProcs(void);
 
 	protected:
 		// number of CPUs, cached

@@ -48,12 +48,15 @@ static free_chunk *sFreeChunks;
 extern "C" status_t
 __init_heap(void)
 {
-	sHeapAreaSize = kInitialHeapSize;
-	sHeapBase = 0x10000000;
-		// let the heap start at 256 MB for now
+	hoardHeap::initNumProcs();
 
+	sHeapAreaSize = kInitialHeapSize;
 	// ToDo: add a VM call that instructs other areas to avoid the space after the heap when possible
 	//	(and if not, create it at the end of that range, so that the heap can grow as much as possible)
+	//	Then, move the heap back to 256 or 512 MB
+	sHeapBase = 0x30000000;
+		// let the heap start at 3*256 MB for now
+
 	sHeapArea = create_area("heap", (void **)&sHeapBase, B_BASE_ADDRESS,
 		sHeapAreaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
@@ -142,39 +145,6 @@ hoardUnsbrk(void *ptr, long size)
 
 
 void
-hoardCreateThread(hoardThreadType &thread,
-	void *(*function)(void *), void *arg)
-{
-	thread = spawn_thread((int32 (*)(void *))function, "hoard thread",
-		B_NORMAL_PRIORITY, arg);
-	if (thread < B_OK)
-		debugger("spawn_thread() failed!");
-
-	resume_thread(thread);
-}
-
-
-void
-hoardJoinThread(hoardThreadType &thread)
-{
-	wait_for_thread(thread, NULL);
-}
-
-
-void
-hoardSetConcurrency(int)
-{
-}
-
-
-int
-hoardGetThreadID(void)
-{
-	return find_thread(NULL);
-}
-
-
-void
 hoardLockInit(hoardLockType &lock, const char *name)
 {
 	lock.ben = 0;
@@ -198,39 +168,9 @@ hoardUnlock(hoardLockType &lock)
 }
 
 
-int
-hoardGetPageSize(void)
-{
-	return B_PAGE_SIZE;
-}
-
-
-int
-hoardGetNumProcessors(void)
-{
-	system_info info;
-	if (get_system_info(&info) != B_OK)
-		return 1;
-
-	return info.cpu_count;
-}
-
-
 void
 hoardYield(void)
 {
-}
-
-
-unsigned long
-hoardInterlockedExchange(unsigned long *oldval,
-	unsigned long newval)
-{
-	// This *should* be made atomic.  It's never used in the BeOS
-	// version, so this is included strictly for completeness.
-	unsigned long o = *oldval;
-	*oldval = newval;
-	return o;
 }
 
 }	// namespace BPrivate

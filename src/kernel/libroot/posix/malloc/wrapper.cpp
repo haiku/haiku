@@ -115,7 +115,7 @@ memalign(size_t alignment, size_t size)
 extern "C" void *
 valloc(size_t size)
 {
-  return memalign(hoardGetPageSize(), size);
+	return memalign(B_PAGE_SIZE, size);
 }
 
 
