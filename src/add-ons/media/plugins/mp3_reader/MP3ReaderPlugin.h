@@ -1,11 +1,15 @@
-#include "ReaderPlugin.h"
-#include "wav.h"
+#ifndef _MP3_READER_PLUGIN_H
+#define _MP3_READER_PLUGIN_H
 
-class WavReader : public Reader
+#include "ReaderPlugin.h"
+
+namespace BPrivate { namespace media {
+
+class mp3Reader : public Reader
 {
 public:
-				WavReader();
-				~WavReader();
+				mp3Reader();
+				~mp3Reader();
 	
 	const char *Copyright();
 	
@@ -30,14 +34,17 @@ public:
 private:
 	BPositionIO *	fSource;
 	uint64			fDataSize;
-	wave_header 	fRawHeader;
 };
 
 
-class WavReaderPlugin : public ReaderPlugin
+class mp3ReaderPlugin : public ReaderPlugin
 {
 public:
 	Reader *NewReader();
 };
 
-MediaPlugin *instantiate_plugin();
+} } // namespace BPrivate::media
+
+using namespace BPrivate::media;
+
+#endif

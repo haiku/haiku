@@ -35,7 +35,6 @@ struct wavdata
 WavReader::WavReader()
 {
 	TRACE("WavReader::WavReader\n");
-	fSource = dynamic_cast<BPositionIO *>(Reader::Source());
 }
 
 WavReader::~WavReader()
@@ -53,6 +52,8 @@ status_t
 WavReader::Sniff(int32 *streamCount)
 {
 	TRACE("WavReader::Sniff\n");
+
+	fSource = dynamic_cast<BPositionIO *>(Reader::Source());
 
 	fDataSize = Source()->Seek(0, SEEK_END);
 	if (fDataSize < sizeof(fRawHeader)) {
@@ -126,6 +127,9 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT; // XXX fixme
 	data->format.u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
 	data->format.u.raw_audio.buffer_size = data->buffersize;
+	
+	// store the cookie
+	*cookie = data;
 	return B_OK;
 }
 
@@ -160,20 +164,24 @@ WavReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 
 status_t
 WavReader::Seek(void *cookie,
-				media_seek_type seekTo,
+				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
 	uint64 pos;
-	
-	if (frame) {
+
+	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
 		pos = *frame * data->framesize;
+		*time = (pos * 1000000LL) / data->fps;
 		TRACE("WavReader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
-	} else if (time) {
+		TRACE("WavReader::Seek newtime %Ld\n", *time);
+	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		pos = (*time * data->fps) / 1000000LL;
 		TRACE("WavReader::Seek to time %Ld, pos %Ld\n", *time, pos);
 		*time = (pos * 1000000LL) / data->fps;
+		*frame = pos / data->framesize;
 		TRACE("WavReader::Seek newtime %Ld\n", *time);
+		TRACE("WavReader::Seek newframe %Ld\n", *frame);
 	} else {
 		return B_ERROR;
 	}

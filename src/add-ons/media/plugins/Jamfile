@@ -1,4 +1,6 @@
 SubDir OBOS_TOP src add-ons media plugins ;
 
+SubInclude OBOS_TOP src add-ons media plugins mp3_reader ;
 SubInclude OBOS_TOP src add-ons media plugins wav_reader ;
+
 SubInclude OBOS_TOP src add-ons media plugins raw_decoder ;
