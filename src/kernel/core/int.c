@@ -42,11 +42,11 @@ int_init(kernel_args *ka)
 int
 int_init2(kernel_args *ka) 
 { 
-	io_vectors = (struct io_vector *)kmalloc(sizeof(struct io_vectors *) * NUM_IO_VECTORS); 
+	io_vectors = (struct io_vector *)kmalloc(sizeof(struct io_vector) * NUM_IO_VECTORS); 
 	if (io_vectors == NULL) 
 		panic("int_init2: could not create io vector table!\n"); 
 
-	memset(io_vectors, 0, sizeof(struct io_vector *) * NUM_IO_VECTORS); 
+	memset(io_vectors, 0, sizeof(struct io_vector) * NUM_IO_VECTORS); 
 
 	return arch_int_init2(ka); 
 } 
