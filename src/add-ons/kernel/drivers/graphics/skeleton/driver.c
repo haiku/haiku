@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-9/2004.
+	Rudolf Cornelissen 3/2002-11/2004.
 */
 
 /* standard kernel driver stuff */
@@ -143,33 +143,34 @@ static void dumprom (void *rom, uint32 size)
 /* return 1 if vblank interrupt has occured */
 static int caused_vbi(vuint32 * regs)
 {
-	return (ENG_RG32(RG32_CRTC_INTS) & 0x00000001);
+//	return (ENG_RG32(RG32_CRTC_INTS) & 0x00000001);
+return 0;
 }
 
 /* clear the vblank interrupt */
 static void clear_vbi(vuint32 * regs)
 {
-	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
+//	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 }
 
 static void enable_vbi(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
-	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
+//	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 	/* enable nVidia interrupt source vblank */
-	ENG_RG32(RG32_CRTC_INTE) |= 0x00000001;
+//	ENG_RG32(RG32_CRTC_INTE) |= 0x00000001;
 	/* enable nVidia interrupt system hardware (b0-1) */
-	ENG_RG32(RG32_MAIN_INTE) = 0x00000001;
+//	ENG_RG32(RG32_MAIN_INTE) = 0x00000001;
 }
 
 static void disable_vbi(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
-	ENG_RG32(RG32_CRTC_INTE) &= 0xfffffffe;
+//	ENG_RG32(RG32_CRTC_INTE) &= 0xfffffffe;
 	/* clear the vblank interrupt */
-	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
+//	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 	/* disable nVidia interrupt system hardware (b0-1) */
-	ENG_RG32(RG32_MAIN_INTE) = 0x00000000;
+//	ENG_RG32(RG32_MAIN_INTE) = 0x00000000;
 }
 
 /*
