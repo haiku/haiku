@@ -15,8 +15,8 @@ extern "C"
 #define ENOERR          0
 #define EOK 			ENOERR  /* some code assumes EOK exists */
 
-/* XXX - Fix this once TLS works */
-extern int errno;
+extern int *_errnop(void);
+#define errno (*(_errnop()))
 
 #ifdef __cplusplus
 } /* "C" */
