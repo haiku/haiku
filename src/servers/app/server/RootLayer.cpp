@@ -59,10 +59,8 @@ RootLayer::~RootLayer()
 */
 void RootLayer::RequestDraw(const BRect &r)
 {
-  /*
-     1) call the display driver's FillRect on the rectangle, filling with the layer's background color
-2) recurse through each child and call its RequestDraw() function if it intersects the child's frame
-*/
+	Invalidate(r);
+	RequestDraw();
 }
 
 /*!
@@ -225,6 +223,7 @@ void RootLayer::ResizeBy(BPoint pt)
 */
 void RootLayer::SetDriver(DisplayDriver *driver)
 {
+	_driver=driver;
 }
 
 /*!
@@ -233,9 +232,10 @@ void RootLayer::SetDriver(DisplayDriver *driver)
 */
 void RootLayer::RebuildRegions(bool recursive)
 {
-  /*
-     1) get the frame
-2) set full and visible regions to frame
-3) iterate through each child and exclude its full region from the visible region if the child is visible.
-     */
+	// Unlike the other layers, RootLayers can't depend on their parent layer to reset its
+	// visible region, so we have to do it itself.
+	_visible->MakeEmpty();
+	_visible->Include(_full);
+
+	Layer::RebuildRegions(recursive);
 }

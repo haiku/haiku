@@ -57,7 +57,7 @@ public:
 private:
 	DisplayDriver *_driver;
 	RGBColor *_bgcolor;
-	bool _visible;
+	bool _isvisible;
 };
 
 #endif
