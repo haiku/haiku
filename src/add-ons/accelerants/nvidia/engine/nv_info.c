@@ -278,6 +278,48 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 
 			adress += 13;
 			break;
+		case 0x66: /* new on NV11 */
+			LOG(8,("NV11+ xxx cmd, skipping...\n"));
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 1;
+			break;
+		case 0x67: /* new on NV11 */
+			LOG(8,("NV11+ xxx cmd, skipping...\n"));
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 1;
+			break;
+		case 0x68: /* new on NV11 */
+			LOG(8,("NV11+ xxx cmd, skipping...\n"));
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 1;
+			break;
 		case 0x6e:
 			*size -= 13;
 			if (*size < 0)
