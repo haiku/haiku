@@ -1322,6 +1322,9 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t bufferSize)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (inode->Flags() & INODE_LONG_SYMLINK) {
+		if (inode->Size() > bufferSize)
+			return B_BUFFER_OVERFLOW;
+
 		status_t status = inode->ReadAt(0, (uint8 *)buffer, &bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
@@ -1329,12 +1332,8 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t bufferSize)
 		return B_OK;
 	}
 
-	size_t numBytes = strlen((char *)&inode->Node()->short_symlink);
-	uint32 bytes = numBytes;
-	if (bytes > bufferSize)
-		bytes = bufferSize;
-
-	memcpy(buffer, inode->Node()->short_symlink, bytes);
+	if (strlcpy(buffer, inode->Node()->short_symlink, bufferSize) > bufferSize)
+		return B_BUFFER_OVERFLOW;
 
 	return B_OK;
 }
