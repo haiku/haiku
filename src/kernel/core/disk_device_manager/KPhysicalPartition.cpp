@@ -42,7 +42,7 @@ KPhysicalPartition::PrepareForRemoval()
 {
 	bool result = KPartition::PrepareForRemoval();
 	if (result) {
-		DeleteShadowPartition();
+		UnsetShadowPartition(false);
 		UnpublishDevice();
 	}
 	return result;
@@ -179,29 +179,31 @@ KPhysicalPartition::CreateShadowPartition()
 		// cleanup on error
 		if (error != B_OK) {
 			for (int32 k = 0; k <= i; i++)
-				ChildAt(k)->DeleteShadowPartition();
-			DeleteShadowPartition();
+				ChildAt(k)->UnsetShadowPartition(true);
+			UnsetShadowPartition(true);
 			return error;
 		}
 	}
 	return B_OK;
 }
 
-// DeleteShadowPartition
+// UnsetShadowPartition
 void
-KPhysicalPartition::DeleteShadowPartition()
+KPhysicalPartition::UnsetShadowPartition(bool doDelete)
 {
 	if (!fShadowPartition)
 		return;
-	// delete children's shadows
+	// unset children's shadows
 	for (int32 i = 0; KPartition *child = ChildAt(i); i++)
-		child->DeleteShadowPartition();
-	// delete the thing
+		child->UnsetShadowPartition(false);
+	// unset the thing
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		fShadowPartition->UnsetPhysicalPartition();
-		PartitionRegistrar _(fShadowPartition);
-		manager->PartitionRemoved(fShadowPartition);
+		if (doDelete) {
+			PartitionRegistrar _(fShadowPartition);
+			manager->PartitionRemoved(fShadowPartition);
+		}
 		fShadowPartition = NULL;
 	}
 }

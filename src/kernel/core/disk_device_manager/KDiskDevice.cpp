@@ -161,6 +161,15 @@ KDiskDevice::IsWriteLocked()
 	return fLocker.IsWriteLocked();
 }
 
+// PrepareForRemoval
+bool
+KDiskDevice::PrepareForRemoval()
+{
+	if (ShadowOwner() >= 0)
+		DeleteShadowDevice();
+	return KPhysicalPartition::PrepareForRemoval();
+}
+
 // SetID
 void
 KDiskDevice::SetID(partition_id id)
@@ -282,6 +291,30 @@ const disk_device_data *
 KDiskDevice::DeviceData() const
 {
 	return &fDeviceData;
+}
+
+// CreateShadowDevice
+status_t
+KDiskDevice::CreateShadowDevice(team_id team)
+{
+	if (fShadowOwner >= 0 || team < 0 || !HasMedia())
+		return B_BAD_VALUE;
+	// create the shadow partitions
+	status_t error = CreateShadowPartition();
+	if (error == B_OK)
+		SetShadowOwner(team);
+	return error;
+}
+
+// DeleteShadowDevice
+status_t
+KDiskDevice::DeleteShadowDevice()
+{
+	if (fShadowOwner < 0)
+		return B_BAD_VALUE;
+	UnsetShadowPartition(true);
+	SetShadowOwner(-1);
+	return B_OK;
 }
 
 // SetShadowOwner

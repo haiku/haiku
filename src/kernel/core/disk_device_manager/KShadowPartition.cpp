@@ -10,6 +10,7 @@
 #include <Drivers.h>
 #include <Errors.h>
 
+#include "ddm_userland_interface.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
@@ -105,6 +106,20 @@ KShadowPartition::SyncWithPhysicalPartition()
 	SetContentName(fPhysicalPartition->ContentName());
 	SetParameters(fPhysicalPartition->Parameters());
 	SetContentParameters(fPhysicalPartition->ContentParameters());
+}
+
+// WriteUserData
+void
+KShadowPartition::WriteUserData(UserDataWriter &writer,
+								user_partition_data *data)
+{
+	KPartition::WriteUserData(writer, data);
+	// fix the ID in the user data
+	if (data) {
+		if (fPhysicalPartition)
+			data->id = fPhysicalPartition->ID();
+		data->shadow_id = ID();
+	}
 }
 
 // Dump

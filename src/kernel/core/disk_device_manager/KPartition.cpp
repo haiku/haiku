@@ -658,9 +658,9 @@ KPartition::CreateShadowPartition()
 	return B_ERROR;
 }
 
-// DeleteShadowPartition
+// UnsetShadowPartition
 void
-KPartition::DeleteShadowPartition()
+KPartition::UnsetShadowPartition(bool doDelete)
 {
 	// implemented by derived classes
 }
@@ -743,6 +743,7 @@ KPartition::WriteUserData(UserDataWriter &writer, user_partition_data *data)
 	// fill in data
 	if (data) {
 		data->id = ID();
+		data->shadow_id = -1;
 		data->offset = Offset();
 		data->size = Size();
 		data->block_size = BlockSize();

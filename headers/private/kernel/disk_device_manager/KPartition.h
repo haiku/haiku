@@ -133,7 +133,7 @@ public:
 	// Shadow Partition
 
 	virtual status_t CreateShadowPartition();	// creates a complete tree
-	virtual void DeleteShadowPartition();		// deletes ...
+	virtual void UnsetShadowPartition(bool doDelete);
 	virtual KShadowPartition *ShadowPartition() const = 0;
 	virtual bool IsShadowPartition() const = 0;
 	virtual KPhysicalPartition *PhysicalPartition() const = 0;
@@ -153,7 +153,8 @@ public:
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
 
-	void WriteUserData(UserDataWriter &writer, user_partition_data *data);
+	virtual void WriteUserData(UserDataWriter &writer,
+							   user_partition_data *data);
 
 	virtual void Dump(bool deep, int32 level);
 

@@ -36,6 +36,8 @@ public:
 	void WriteUnlock();
 	bool IsWriteLocked();
 
+	virtual bool PrepareForRemoval();
+
 	virtual void SetID(partition_id id);
 
 	virtual status_t PublishDevice();
@@ -63,6 +65,8 @@ public:
 	disk_device_data *DeviceData();
 	const disk_device_data *DeviceData() const;
 
+	status_t CreateShadowDevice(team_id team);
+	status_t DeleteShadowDevice();
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;
 

@@ -29,6 +29,9 @@ public:
 
 	void SyncWithPhysicalPartition();
 
+	virtual void WriteUserData(UserDataWriter &writer,
+							   user_partition_data *data);
+
 	virtual void Dump(bool deep, int32 level);
 
 protected:
