@@ -1,229 +1,237 @@
-//	df - for OpenBeOS
+//	df - for Haiku
 //
 //	authors, in order of contribution:
 //	jonas.sundstrom@kirilla.com
+//	axeld@pinc-software.de
 //
 
-#include <stdio.h>
-#include <string.h>
-
-#include <String.h>
-#include <fs_info.h>
-#include <fs_index.h>
 
 #include <Volume.h>
 #include <Directory.h>
 #include <Path.h>
 
+#include <fs_info.h>
 
-void	PrintUsageInfo	(void);
-void	PrintFlagSupport (uint32 dev_flags, uint32 test_flag, char * flag_descr, bool verbose);
-void	PrintMountPoint (dev_t dev_num, bool verbose);
-void	PrintType (const char * fsh_name);
-void	PrintBlocks (int64 blocks, int64 blocksize, bool human);
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
 
-int	main (int32 argc, char **argv)
+
+void
+PrintFlag(uint32 deviceFlags, uint32 testFlag, char *yes, char *no)
 {
-	bool verbose	=	false;
-	bool human	=	false;
+	printf(deviceFlags & testFlag ? yes : no);
+}
 
-	if (argc > 1)	
-	{
-		BString option	=	argv[1];
-		option.ToLower();
-		
-		if (option == "--help")
-		{
-			PrintUsageInfo();
-			return (0);
-		}
-		
-		if (option == "--verbose")
-		{
-			verbose	=	true;
-		}
-		
-		if (option == "--human" || option == "-h")
-		{
-			human =		true;
-		}
+
+void
+PrintMountPoint(dev_t device, bool verbose)
+{
+	char mount[B_PATH_NAME_LENGTH];
+	mount[0] = '\0';
+
+	BVolume	volume(device);
+	BDirectory root;
+	if (volume.GetRootDirectory(&root) == B_OK) {
+		BPath path(&root, NULL);
+		strlcpy(mount, path.Path(), sizeof(mount));
 	}
 
-	if (! verbose)
-	{
-		printf( "Mount            Type     Total    Free     Flags   Device\n"
-				"---------------- -------- -------- -------- ------- --------------------------\n");
+	if (verbose)
+		printf("   Mounted at: %s\n", mount);
+	else {
+		printf("%-15s ", mount);
+		if (strlen(mount) > 15)
+			printf("\n%15s ", "");
 	}
-	
-	dev_t		device_num	=	0;
-	int32		cookie		=	0;
-	fs_info		info;
+}
 
-	while (1)
-	{
-		device_num =	next_dev(& cookie);
-		
-		if (device_num != B_BAD_VALUE)
-		{	
-			if(fs_stat_dev(device_num, &info) == B_OK)
-			{
-				if (verbose)
-				{
-					PrintMountPoint (info.dev, verbose);
-					
-					printf("device: %ld\n",			info.dev);
-					printf("volume_name: %s\n",		info.volume_name);
-					printf("fsh_name: %s\n",		info.fsh_name);
-					printf("device_name: %s\n",		info.device_name);
-					printf("flags: %lu\n",			info.flags);
 
-					PrintFlagSupport (info.flags, B_FS_HAS_MIME, "mimetypes:", verbose);
-					PrintFlagSupport (info.flags, B_FS_HAS_ATTR, "attributes:", verbose);
-					PrintFlagSupport (info.flags, B_FS_HAS_QUERY, "queries:", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_READONLY, "readonly:", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_REMOVABLE, "removable:", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_PERSISTENT, "persistent:", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_SHARED, "shared:", verbose);
-					
-					printf("block_size: %Ld\n",		info.block_size);
-					printf("io_size: %Ld\n",		info.io_size);
-					printf("total_blocks: %Ld\n",	info.total_blocks);
-					printf("free_blocks: %Ld\n",	info.free_blocks);
-					printf("total_nodes: %Ld\n",	info.total_nodes);
-					printf("free_nodes: %Ld\n",		info.free_nodes);
-					printf("root inode: %Ld\n",		info.root);	
-					
-					
-					printf("--------------------------------\n");
-				}
-				else // compact, default mode
-				{
-					PrintMountPoint (info.dev, verbose);
-					PrintType(info.fsh_name);
-					PrintBlocks(info.total_blocks, info.block_size, human);
-					PrintBlocks(info.free_blocks, info.block_size, human);
+void
+PrintType(const char *fileSystem)
+{
+	char type[10];
+	strlcpy(type, fileSystem, sizeof(type));
 
-					PrintFlagSupport (info.flags, B_FS_HAS_QUERY, "Q", verbose);
-					PrintFlagSupport (info.flags, B_FS_HAS_ATTR, "A", verbose);
-					PrintFlagSupport (info.flags, B_FS_HAS_MIME, "M", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_SHARED, "S", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_PERSISTENT, "P", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_REMOVABLE, "R", verbose);
-					PrintFlagSupport (info.flags, B_FS_IS_READONLY, NULL, verbose);
+	printf("%-8s", type);
+}
 
-					printf(" ");
-					printf("%s\n",		info.device_name);
-					
+
+const char *
+ByteString(int64 numBlocks, int64 blockSize)
+{
+	double blocks = 1. * numBlocks * blockSize;
+	static char string[64];
+
+	if (blocks < 1024)
+		sprintf(string, "%Ld", numBlocks * blockSize);
+	else {
+		char *units[] = {"K", "M", "G", NULL};
+		int32 i = -1;
+
+		do {
+			blocks /= 1024.0;
+			i++;
+		} while (blocks >= 1024 && units[i + 1]);
+
+		sprintf(string, "%.1f%s", blocks, units[i]);
+	}
+
+	return string;
+}
+
+
+void
+PrintBlocks(int64 blocks, int64 blockSize, bool showBlocks)
+{
+	char temp[1024];
+
+	if (showBlocks)
+		sprintf(temp, "%Ld", blocks * (blockSize / 1024));
+	else
+		strcpy(temp, ByteString(blocks, blockSize));
+
+	printf("%10s", temp);
+}
+
+
+void
+PrintVerbose(dev_t device)
+{
+	fs_info info;
+	if (fs_stat_dev(device, &info) != B_OK) {
+		fprintf(stderr, "Could not stat fs: %s\n", strerror(errno));
+		return;
+	}
+
+	printf("   Device No.: %ld\n", info.dev);
+	PrintMountPoint(info.dev, true);
+	printf("  Volume Name: \"%s\"\n", info.volume_name);
+	printf("  File System: %s\n", info.fsh_name);
+	printf("       Device: %s\n", info.device_name);
+
+	printf("        Flags: ");
+	PrintFlag(info.flags, B_FS_HAS_QUERY, "Q", "-");
+	PrintFlag(info.flags, B_FS_HAS_ATTR, "A", "-");
+	PrintFlag(info.flags, B_FS_HAS_MIME, "M", "-");
+	PrintFlag(info.flags, B_FS_IS_SHARED, "S", "-");
+	PrintFlag(info.flags, B_FS_IS_PERSISTENT, "P", "-");
+	PrintFlag(info.flags, B_FS_IS_REMOVABLE, "R", "-");
+	PrintFlag(info.flags, B_FS_IS_READONLY, "-", "W");
+
+	printf("\n     I/O Size: %10s (%Ld byte)\n", ByteString(info.io_size, 1), info.io_size);
+	printf("   Block Size: %10s (%Ld byte)\n", ByteString(info.block_size, 1), info.block_size);
+	printf(" Total Blocks: %10s (%Ld blocks)\n", ByteString(info.total_blocks, info.block_size), info.total_blocks);
+	printf("  Free Blocks: %10s (%Ld blocks)\n", ByteString(info.free_blocks, info.block_size), info.free_blocks);
+	printf("  Total Nodes: %Ld\n", info.total_nodes);
+	printf("   Free Nodes: %Ld\n", info.free_nodes);
+	printf("   Root Inode: %Ld\n", info.root);	
+}
+
+
+void
+PrintCompact(dev_t device, bool showBlocks, bool all)
+{
+	fs_info info;
+	if (fs_stat_dev(device, &info) != B_OK)
+		return;
+
+	if (!all && (info.flags & B_FS_IS_PERSISTENT) == 0)
+		return;
+
+	PrintMountPoint(info.dev, false);
+	PrintType(info.fsh_name);
+	PrintBlocks(info.total_blocks, info.block_size, showBlocks);
+	PrintBlocks(info.free_blocks, info.block_size, showBlocks);
+
+	printf(" ");
+	PrintFlag(info.flags, B_FS_HAS_QUERY, "Q", "-");
+	PrintFlag(info.flags, B_FS_HAS_ATTR, "A", "-");
+	PrintFlag(info.flags, B_FS_HAS_MIME, "M", "-");
+	PrintFlag(info.flags, B_FS_IS_SHARED, "S", "-");
+	PrintFlag(info.flags, B_FS_IS_PERSISTENT, "P", "-");
+	PrintFlag(info.flags, B_FS_IS_REMOVABLE, "R", "-");
+	PrintFlag(info.flags, B_FS_IS_READONLY, "-", "W");
+
+	printf(" %s\n", info.device_name);
+}
+
+
+void
+ShowUsage(const char *programName)
+{
+	printf("usage: %s [--help | --blocks, -b | -all, -a] [<path-to-device>]\n"
+		"  -a, --all\tinclude all file systems, also those not visible from Tracker\n"
+		"  -b, --blocks\tshow device size in blocks of 1024 bytes\n"
+		"If <path-to-device> is used, detailed info for that device only will be listed.\n"
+		"Flags:\n"
+		"   Q: has query\n"
+		"   A: has attribute\n"
+		"   M: has mime\n"
+		"   S: is shared\n"
+		"   P: is persistent (visible in Tracker)\n"
+		"   R: is removable\n"
+		"   W: is writable\n", programName);
+	exit(0);
+}
+
+
+int
+main(int32 argc, char **argv)
+{
+	char *programName = argv[0];
+	if (strrchr(programName, '/'))
+		programName = strrchr(programName, '/') + 1;
+
+	bool showBlocks = false;
+	bool all = false;
+	dev_t device = -1;
+
+	while (*++argv) {
+		char *arg = *argv;
+		if (*arg == '-') {
+			while (*++arg && isalpha(*arg)) {
+				switch (arg[0]) {
+					case 'a':
+						all = true;
+						break;
+					case 'b':
+						showBlocks = true;
+						break;
+					default:
+						ShowUsage(programName);
 				}
 			}
-		}
-		else
+			if (arg[0] == '-') {
+				arg++;
+				if (!strcmp(arg, "all"))
+					all = true;
+				else if (!strcmp(arg, "blocks"))
+					showBlocks = true;
+				else
+					ShowUsage(programName);
+			}
+		} else
 			break;
 	}
 
-	return (0);
-}
+	// Do we already have a device? Then let's print out detailed info about that
 
-void PrintUsageInfo (void)
-{
-	printf ("usage: df [--verbose | --help | --human | -h]\n"
-			"  -h = --human = human readable (KB by default)\n"
-			"  flags:\n"
-			"   Q: has query\n"
-			"   A: has attribute\n"
-			"   M: has mime\n"
-			"   S: is shared\n"
-			"   R: is removable\n"
-			"   W: is writable\n"
-			);
-}
-
-void PrintFlagSupport (uint32 dev_flags, uint32 test_flag, char * flag_descr, bool verbose)
-{
-	if (verbose)
-	{
-		if	(dev_flags & test_flag)
-			printf("%s yes\n", flag_descr);
-		else
-			printf("%s no\n", flag_descr);
+	if (argv[0] != NULL) {
+		PrintVerbose(dev_for_path(argv[0]));
+		return 0;
 	}
-	else
-	{
-		if (test_flag == B_FS_IS_READONLY)
-		{
-			if	(dev_flags & test_flag)
-				printf("-");
-			else
-				printf("W");
-			return;
-		}
-	
-		if	(dev_flags & test_flag)
-			printf("%s", flag_descr);
-		else
-			printf("-");
+
+	// If not, then just iterate over all devices and give a compact summary
+
+	printf("Mount           Type      Total     Free     Flags   Device\n"
+		"--------------- -------- --------- --------- ------- --------------------------\n");
+
+	int32 cookie = 0;
+	while ((device = next_dev(&cookie)) >= B_OK) {
+		PrintCompact(device, showBlocks, all);
 	}
+
+	return 0;
 }
-
-void PrintMountPoint (dev_t dev_num, bool verbose)
-{
-	BString		mounted_at	=	"                 ";
-	BVolume		volume (dev_num);
-	BDirectory	vol_dir;
-	volume.GetRootDirectory(& vol_dir);
-	BPath	path	(& vol_dir, NULL);
-	mounted_at.Insert(path.Path(), 0);
-
-	if (verbose)
-	{
-		printf("Mounted at: %s\n", mounted_at.String());
-	}
-	else
-	{
-		mounted_at.Truncate(17);
-		printf("%s", mounted_at.String());
-	}
-}
-
-void PrintType (const char * fsh_name)
-{
-	BString		type	=	"         ";
-	type.Insert(fsh_name, 0);
-
-	type.Truncate(9);
-	printf("%s", type.String());
-}
-
-void PrintBlocks (int64 blocks, int64 blocksize, bool human)
-{
-	char * temp	=	new char [1024];
-	if (!human)
-		sprintf(temp, "%lld", blocks * (blocksize / 1024));
-	else {
-		if (blocks < 1024) {
-			sprintf(temp, "%lld" /*" B"*/, blocks);
-		} else {
-			double fblocks = ((double)blocks) * (blocksize / 1024);
-			if (fblocks < 1024) {
-				sprintf(temp, "%.1fK", fblocks);
-			} else {
-				fblocks = (((double)blocks) / 1024) * (blocksize / 1024);;
-				if (fblocks < 1024) {
-					sprintf(temp, "%.1fM", fblocks);
-				} else {
-					fblocks = (((double)blocks) / (1024*1024)) * (blocksize / 1024);
-					sprintf(temp, "%.1fG", fblocks);
-				}
-			}
-		}
-	}
-	
-	BString		type	=	"         ";
-	type.Insert(temp, 8 - strlen(temp));
-
-	type.Truncate(9);
-	printf("%s", type.String());
-
-	delete [] temp;
-}
-
