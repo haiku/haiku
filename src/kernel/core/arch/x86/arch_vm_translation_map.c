@@ -676,8 +676,6 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 int
 vm_translation_map_module_init(kernel_args *ka)
 {
-	int i;
-
 	TRACE(("vm_translation_map_module_init: entry\n"));
 
 	// page hole set up in stage2
@@ -723,6 +721,7 @@ vm_translation_map_module_init(kernel_args *ka)
 		addr phys_pgtable;
 		addr virt_pgtable;
 		pdentry *e;
+		int i;
 
 		virt_pgtable = (addr)iospace_pgtables;
 		for (i = 0; i < (IOSPACE_SIZE / (PAGE_SIZE * 1024)); i++, virt_pgtable += PAGE_SIZE) {
@@ -749,7 +748,7 @@ vm_translation_map_module_init_post_sem(kernel_args *ka)
 int
 vm_translation_map_module_init2(kernel_args *ka)
 {
-	// now that the vm is initialized, create an region that represents
+	// now that the vm is initialized, create a region that represents
 	// the page hole
 	void *temp;
 
