@@ -416,14 +416,6 @@ bool format_is_compatible(const media_format & a, const media_format & b)	/* a i
 	return a.Matches(&b);
 }
 
-/* those come from
- * strings /system/lib/libmedia.so | grep 'o;'
- */
-static const char *_string_fmt_raw_audio = "raw_audio;%g;%d;%x;%d;%x";
-static const char *_string_fmt_raw_video = "raw_video;%g;%d;%d;%d;%s;%d;%d;%d;%d;%d;%d;%d;%d";
-static const char *_string_fmt_caudio = "caudio;%s;%g;%d;(%g;%d;%x;%d;%x)";
-static const char *_string_fmt_cvideo = "cvideo;%s;%g;%g;%d;(%g;%x;%d;%d;%d;%d;%s;%d;%d)";
-
 bool string_for_format(const media_format & f, char * buf, size_t size)
 {
 	char encoding[10]; /* maybe Be wanted to use some 4CCs ? */
@@ -434,20 +426,23 @@ bool string_for_format(const media_format & f, char * buf, size_t size)
 	switch (f.type) {
 	case B_MEDIA_RAW_AUDIO:
 		snprintf(buf, size, 
-				_string_fmt_raw_audio, 
+				"raw_audio;%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x", 
 				f.u.raw_audio.frame_rate, 
 				f.u.raw_audio.channel_count, 
 				f.u.raw_audio.format, 
 				f.u.raw_audio.byte_order, 
-				f.u.raw_audio.buffer_size);
+				f.u.raw_audio.buffer_size,
+				f.u.raw_audio.channel_mask,
+				f.u.raw_audio.valid_bits,
+				f.u.raw_audio.matrix_mask);
 		return true;
 	case B_MEDIA_RAW_VIDEO:
 		if (f.u.raw_video.orientation == B_VIDEO_TOP_LEFT_RIGHT)
 			video_orientation = "TopLR";
 		else if (f.u.raw_video.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
 			video_orientation = "BotLR";
-		snprintf(buf, size, 
-				_string_fmt_raw_video, 
+		//snprintf(buf, size, "raw_video;%g;%ld;%ld;%ld;%s;%d;%d;%d;%d;%d;%d;%d;%d",
+		snprintf(buf, size, "raw_video;%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d",
 				f.u.raw_video.field_rate,
 				f.u.raw_video.display.format,
 				f.u.raw_video.interlace,
@@ -461,7 +456,7 @@ bool string_for_format(const media_format & f, char * buf, size_t size)
 	case B_MEDIA_ENCODED_AUDIO:
 		snprintf(encoding, 10, "%d", f.u.encoded_audio.encoding);
 		snprintf(buf, size, 
-				_string_fmt_caudio, 
+				"caudio;%s;%g;%ld;(%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x)", 
 				encoding, // f.u.encoded_audio.encoding, 
 				f.u.encoded_audio.bit_rate, 
 				f.u.encoded_audio.frame_size, 
@@ -470,7 +465,10 @@ bool string_for_format(const media_format & f, char * buf, size_t size)
 				f.u.encoded_audio.output.channel_count, 
 				f.u.encoded_audio.output.format, 
 				f.u.encoded_audio.output.byte_order, 
-				f.u.encoded_audio.output.buffer_size);
+				f.u.encoded_audio.output.buffer_size,
+				f.u.encoded_audio.multi_info.channel_mask,
+				f.u.encoded_audio.multi_info.valid_bits,
+				f.u.encoded_audio.multi_info.matrix_mask);
 				// )
 		return true;
 	case B_MEDIA_ENCODED_VIDEO:
@@ -480,7 +478,7 @@ bool string_for_format(const media_format & f, char * buf, size_t size)
 		else if (f.u.encoded_video.output.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
 			video_orientation = "BotLR";
 		snprintf(buf, size, 
-				_string_fmt_cvideo,
+				"cvideo;%s;%g;%g;%ld;(%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d)",
 				encoding, 
 				f.u.encoded_video.avg_bit_rate, 
 				f.u.encoded_video.max_bit_rate, 
