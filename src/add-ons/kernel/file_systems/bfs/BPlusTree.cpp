@@ -22,6 +22,27 @@
 #include <stdio.h>
 
 
+#ifdef DEBUG
+class NodeChecker {
+	public:
+		NodeChecker(bplustree_node *node, int32 nodeSize)
+			:
+			fNode(node),
+			fSize(nodeSize)
+		{
+		}
+
+		~NodeChecker()
+		{
+			fNode->CheckIntegrity(fSize);
+		}
+
+	private:
+		bplustree_node *fNode;
+		int32	fSize;
+};
+#endif
+
 // Node Caching for the BPlusTree class
 //
 // With write support, there is the need for a function that allocates new
@@ -1075,6 +1096,9 @@ BPlusTree::Insert(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 
 	CachedNode cached(this);
 	while (stack.Pop(&nodeAndKey) && (node = cached.SetTo(nodeAndKey.nodeOffset)) != NULL) {
+#ifdef DEBUG
+		NodeChecker checker(node, fNodeSize);
+#endif
 		if (node->IsLeaf())	{
 			// first round, check for duplicate entries
 			status_t status = FindKey(node,key,keyLength,&nodeAndKey.keyIndex);
@@ -1424,6 +1448,9 @@ BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, 
 	CachedNode cached(this);
 	while (stack.Pop(&nodeAndKey) && (node = cached.SetTo(nodeAndKey.nodeOffset)) != NULL)
 	{
+#ifdef DEBUG
+		NodeChecker checker(node, fNodeSize);
+#endif
 		if (node->IsLeaf())	// first round, check for duplicate entries
 		{
 			status_t status = FindKey(node,key,keyLength,&nodeAndKey.keyIndex);
@@ -1577,15 +1604,26 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 	CachedNode cached(this);
 	bplustree_node *node;
 
+#ifdef DEBUG
+	int32 levels = 0;
+#endif
+
 	while ((node = cached.SetTo(nodeOffset)) != NULL) {
 		uint16 keyIndex = 0;
 		off_t nextOffset;
 		status_t status = FindKey(node, key, keyLength, &keyIndex, &nextOffset);
 
+#ifdef DEBUG
+		levels++;
+#endif
 		if (node->overflow_link == BPLUSTREE_NULL) {
 			if (status == B_OK && _value != NULL)
 				*_value = node->Values()[keyIndex];
 
+#ifdef DEBUG
+			if (levels != fHeader->max_number_of_levels)
+				DEBUGGER(("levels don't match"));
+#endif
 			return status;
 		} else if (nextOffset == nodeOffset)
 			RETURN_ERROR(B_ERROR);
@@ -1989,6 +2027,24 @@ bplustree_node::FragmentsUsed(uint32 nodeSize)
 	}
 	return used;
 }
+
+
+#ifdef DEBUG
+void 
+bplustree_node::CheckIntegrity(uint32 nodeSize)
+{
+	if (all_key_count > nodeSize || all_key_length > nodeSize)
+		DEBUGGER(("invalid node: key/length count"));
+
+	for (int32 i = 0; i < all_key_count; i++) {
+		uint16 length;
+		uint8 *key = KeyAt(i, &length);
+		if (key + length + sizeof(off_t) + sizeof(uint16) > (uint8 *)this + nodeSize
+			|| length > BPLUSTREE_MAX_KEY_LENGTH)
+			DEBUGGER(("invalid node: keys corrupted"));
+	}
+}
+#endif
 
 
 //	#pragma mark -

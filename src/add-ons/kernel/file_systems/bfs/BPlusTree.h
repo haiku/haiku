@@ -77,6 +77,10 @@ struct bplustree_node {
 	static inline bool IsDuplicate(off_t link);
 	static inline off_t FragmentOffset(off_t link);
 	static inline uint32 FragmentIndex(off_t link);
+
+#ifdef DEBUG
+	void CheckIntegrity(uint32 nodeSize);
+#endif
 };
 
 //#define BPLUSTREE_NODE 0
