@@ -819,7 +819,7 @@ BPositionIO *outDestination, color_space fromspace, MSInfoHeader &msheader)
 					if (fromspace == B_RGB16)
 						val = bitspixel[0] + (bitspixel[1] << 8);
 					else
-						val = bitspixel[1] + (bitspixel[1] << 8);
+						val = bitspixel[1] + (bitspixel[0] << 8);
 					bmppixel[0] =
 						((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
 					bmppixel[1] =
