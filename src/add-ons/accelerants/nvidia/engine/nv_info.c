@@ -209,6 +209,8 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 {
 	status_t result = B_OK;
 	bool end = false;
+	bool exec = true;
+	uint32 reg, data, and_out, or_in;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
 
@@ -276,8 +278,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 13;
 			break;
 		case 0x6e:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 13;
 			if (*size < 0)
 			{
@@ -287,10 +287,26 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 13;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			and_out = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			or_in = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'RD 32b REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
+				reg, and_out, or_in));
+			if (exec)
+			{
+				data = NV_REG32(reg);
+				data &= and_out;
+				data |= or_in;
+				NV_REG32(reg) = data;
+			}
 			break;
 		case 0x71:
-			LOG(8,("END cmd, execution completed.\n\n"));
+			LOG(8,("cmd 'END', execution completed.\n\n"));
 			end = true;
 
 			*size -= 1;
@@ -329,8 +345,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 7;
 			break;
 		case 0x7a:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 9;
 			if (*size < 0)
 			{
@@ -340,7 +354,14 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 9;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'WR 32b REG' $%08x = $%08x\n", reg, data));
+			if (exec) NV_REG32(reg) = data;
 			break;
 		default:
 			LOG(8,("unknown cmd, aborting!\n\n"));
