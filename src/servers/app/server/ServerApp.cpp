@@ -41,11 +41,12 @@
 #include "ServerWindow.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
+#include "ServerPicture.h"
 #include "ServerConfig.h"
 #include "LayerData.h"
 #include "Utils.h"
 
-#define DEBUG_SERVERAPP
+//#define DEBUG_SERVERAPP
 
 /*!
 	\brief Constructor
@@ -80,6 +81,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 
 	_winlist=new BList(0);
 	_bmplist=new BList(0);
+	_piclist=new BList(0);
 	_isactive=false;
 
 	ServerCursor *defaultc=cursormanager->GetCursor(B_CURSOR_DEFAULT);
@@ -124,6 +126,16 @@ printf("ServerApp %s:~ServerApp()\n",_signature.String());
 	}
 	_bmplist->MakeEmpty();
 	delete _bmplist;
+
+	ServerPicture *temppic;
+	for(i=0;i<_piclist->CountItems();i++)
+	{
+		temppic=(ServerPicture*)_piclist->ItemAt(i);
+		if(temppic)
+			delete temppic;
+	}
+	_piclist->MakeEmpty();
+	delete _piclist;
 
 	delete _applink;
 	_applink=NULL;
@@ -448,6 +460,22 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			else
 				write_port(replyport,SERVER_FALSE,NULL,0);
 			
+			break;
+		}
+		case AS_CREATE_PICTURE:
+		{
+			break;
+		}
+		case AS_DELETE_PICTURE:
+		{
+			break;
+		}
+		case AS_CLONE_PICTURE:
+		{
+			break;
+		}
+		case AS_DOWNLOAD_PICTURE:
+		{
 			break;
 		}
 		case AS_SET_SCREEN_MODE:

@@ -79,7 +79,7 @@ protected:
 	thread_id _monitor_thread;
 	team_id _target_id;
 	PortLink *_applink;
-	BList *_winlist, *_bmplist;
+	BList *_winlist, *_bmplist, *_piclist;
 	DisplayDriver *_driver;
 	ServerCursor *_appcursor;
 	sem_id _lock;

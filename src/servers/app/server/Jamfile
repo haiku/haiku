@@ -46,6 +46,7 @@ Server app_server :
 	ScreenDriver.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
+	ServerPicture.cpp
 	ViewDriver.cpp
 	WinBorder.cpp
 ;
