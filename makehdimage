@@ -8,7 +8,8 @@
 # You need the Userland FS Server package from Ingo Weinhold to successfully
 # create the image, and you also need to have the UserlandFSServer running
 # in the background when you start the script (as long as you don't use
-# the target directory mode).
+# the target directory mode). The package is available here:
+#   http://tfs.cs.tu-berlin.de/~bonefish/download/userlandfs.zip
 #
 # If you don't specify the image, $sourceDir/haiku.image will be used. In
 # the current default configuration, you have to start this script in the
