@@ -382,7 +382,6 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 {
 	monitor_listener *listener;
 	node_monitor *monitor;
-	status_t status = B_OK;
 
 	TRACE(("notify_listener(op = %d, device = %ld, node = %Ld, parent = %Ld, toParent = %Ld"
 		", name = \"%s\"\n", op, device, node, parentNode, toParentNode, name));
