@@ -2192,10 +2192,18 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 
 		// Ask the server (via our owning application) to create a bitmap.
 
-		// AS_CREATE_BITMAP:
-		
-		// Attached Data: 
-		//		None
+		// Attach Data: 
+		// 1) BRect bounds
+		// 2) color_space space
+		// 3) int32 bitmap_flags
+		// 4) int32 bytes_per_row
+		// 5) int32 screen_id::id
+		link->SetOpCode(AS_CREATE_BITMAP);
+		link->Attach(bounds);
+		link->Attach(&colorSpace, sizeof(color_space));
+		link->Attach((int32)flags);
+		link->Attach(bytesPerRow);
+		link->Attach(screenID.id);
 		
 		// Reply Code: SERVER_TRUE
 		// Reply Data:
@@ -2207,9 +2215,6 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// Reply Code: SERVER_FALSE
 		// Reply Data:
 		//		None
-		
-		link->SetOpCode(AS_CREATE_BITMAP);
-		
 		error=link->FlushWithReply(&replydata);
 		
 		// We shouldn't ever have to execute this block, but just in case...
