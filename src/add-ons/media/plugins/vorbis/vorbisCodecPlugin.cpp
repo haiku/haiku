@@ -184,18 +184,17 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		}
 		// reduce samples to the amount of samples we will actually consume
 		samples = min_c(samples,out_bytes_needed/fFrameSize);
-		int bytes = samples*fFrameSize;
 		for (int sample = 0; sample < samples ; sample++) {
 			for (int channel = 0; channel < fInfo.channels; channel++) {
-				memcpy(out_buffer,&pcm[channel][sample],sizeof(float));
+				*((float*)out_buffer) = pcm[channel][sample];
 				out_buffer += sizeof(float);
-				out_bytes_needed -= sizeof(float);
 			}
-		}				
+		}
+		out_bytes_needed -= samples * fInfo.channels * sizeof(float);
 		// report back how many samples we consumed
 		vorbis_synthesis_read(&fDspState,samples);
 		
-		fStartTime += (1000000LL * (bytes / fFrameSize)) / fInfo.rate;
+		fStartTime += (1000000LL * samples) / fInfo.rate;
 		//TRACE("vorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
