@@ -224,6 +224,8 @@ mp3Decoder::DecodeNextChunk()
 
 	// resync after a seek		
 	if (fNeedSync) {
+		if (chunkSize > 4 && GetFrameLength(chunkBuffer) > 0) {
+		} else
 		if (chunkSize > 5200) { // mp3 reader always delivers synced frames smaller than 5200 bytes
 			// wav reader and others don't do that
 			while (chunkSize > 100) {
