@@ -282,7 +282,7 @@ DefaultManager::FindPhysicalAudioIn()
 	for (int i = 0; i < count; i++) {
 		if (0 == strcmp(info[i].name, "None In")) // skip the Null audio driver
 			continue;
-		if (0 == strcmp(info[i].name, "DV Input")) // skip the Firewire audio driver
+		if (0 != strstr(info[i].name, "DV Input")) // skip the Firewire audio driver
 			continue;
 		printf("Default physical audio input \"%s\" created!\n", info[i].name);
 		fPhysicalAudioIn = info[i].node.node;
@@ -331,7 +331,7 @@ DefaultManager::FindTimeSource()
 			// The BeOS R5 None Out node pretend to be a physical time source, that is pretty dumb
 			if (0 == strcmp(info[i].name, "None Out")) // skip the Null audio driver
 				continue;
-			if (0 == strcmp(info[i].name, "DV Output")) // skip the Firewire audio driver
+			if (0 != strstr(info[i].name, "DV Output")) // skip the Firewire audio driver
 				continue;
 			printf("Default DAC timesource \"%s\" created!\n", info[i].name);
 			fTimeSource = info[i].node.node;
