@@ -534,7 +534,7 @@ private:
 	friend class BShelf;
 	friend class BTabView;
 
-//	virtual	void			_ReservedView2();
+	virtual	void			_ReservedView2();
 	virtual	void			_ReservedView3();
 	virtual	void			_ReservedView4();
 	virtual	void			_ReservedView5();
