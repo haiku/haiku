@@ -21,7 +21,7 @@ rule MkKeymapComp
 
 actions MkKeymapComp1
 {
-	$(2[1]) -o $(1) -c $(2[2-]) ;
+	$(2[1]) -o "$(1)" -c "$(2[2-])" ;
 }
 
 local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
