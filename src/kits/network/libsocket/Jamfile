@@ -1,0 +1,29 @@
+SubDir OBOS_TOP src kits network libsocket ;
+
+UsePrivateHeaders net ;
+
+{
+	local defines ;
+	if $(BONE_VERSION) {
+		defines += BONE_VERSION ;
+	}
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+SharedLibrary socket :
+	socket.c
+	select.c 
+;
+
+# Installation -- in the test directory for the time being
+OBOSInstallRelSymLink install-networking
+	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
+	: libsocket.so
+	: installed-networking-test ;
+
+Package openbeos-networkingkit-cvs :
+	libsocket.so :
+#	boot home config lib ;
+	boot home Desktop openbeos-networkingkit lib ;
