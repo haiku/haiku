@@ -427,6 +427,8 @@
 #define NV32_PFB_CONFIG_1	0x00100204
 #define NV32_NV10STRAPINFO	0x0010020c
 #define NV32_NVSTRAPINFO2	0x00101000
+#define NV32_FB_MRS1		0x001002c0
+#define NV32_FB_MRS2		0x001002c8
 
 /* registers needed for 'coldstart' */
 #define NV32_PFB_DEBUG_0	0x00100080
