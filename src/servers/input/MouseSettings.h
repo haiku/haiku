@@ -20,23 +20,7 @@
 
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
-
-
-// ToDo: these should be defined somewhere else; the mouse
-//		input driver or add-on must read them as well
-
-typedef struct {
-        bool    enabled;        // Acceleration on / off
-        int32   accel_factor;   // accel factor: 256 = step by 1, 128 = step by 1/2
-        int32   speed;          // speed accelerator (1=1X, 2 = 2x)...
-} mouse_accel;
-
-typedef struct {
-        int32		    type;
-        mouse_map       map;
-        mouse_accel     accel;
-        bigtime_t       click_speed;
-} mouse_settings;
+#include <kb_mouse_settings.h>
 
 
 class MouseSettings {

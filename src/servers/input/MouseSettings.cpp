@@ -24,8 +24,6 @@
 
 #include "MouseSettings.h"
 
-static const char kMouseSettingsFile[] = "Mouse_settings";
-
 static const bigtime_t kDefaultClickSpeed = 500000;
 static const int32 kDefaultMouseSpeed = 65536;
 static const int32 kDefaultMouseType = 3;	// 3 button mouse
@@ -54,7 +52,7 @@ MouseSettings::GetSettingsPath(BPath &path)
 	if (status < B_OK)
 		return status;
 
-	path.Append(kMouseSettingsFile);
+	path.Append(mouse_settings_file);
 	return B_OK;
 }
 
