@@ -81,6 +81,8 @@ vga_enable_bright_background_colors(void)
 static status_t
 vesa_get_mode_info(uint16 mode, struct vbe_mode_info *modeInfo)
 {
+	memset(modeInfo, 0, sizeof(vbe_mode_info));
+
 	struct bios_regs regs;
 	regs.eax = 0x4f01;
 	regs.ecx = mode;
@@ -88,7 +90,8 @@ vesa_get_mode_info(uint16 mode, struct vbe_mode_info *modeInfo)
 	regs.edi = ADDRESS_OFFSET(modeInfo);
 	call_bios(0x10, &regs);
 
-	if ((regs.eax & 0xffff) != 0x4f)
+	// %ah contains the error code
+	if ((regs.eax & 0xff00) != 0)
 		return B_ENTRY_NOT_FOUND;
 
 	return B_OK;
@@ -107,7 +110,8 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 	regs.edi = ADDRESS_OFFSET(info);
 	call_bios(0x10, &regs);
 
-	if ((regs.eax & 0xffff) != 0x4f)
+	// %ah contains the error code
+	if ((regs.eax & 0xff00) != 0)
 		return B_ERROR;
 
 	if (info->signature != VESA_SIGNATURE)
@@ -138,9 +142,8 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 
 	video_mode *standardMode = NULL;
 
-	int32 i = 0;
-	while (true) {
-		uint16 mode = ((uint16 *)info->mode_list)[i++];
+	for (int32 i = 0; true; i++) {
+		uint16 mode = ((uint16 *)info->mode_list)[i];
 		if (mode == 0xffff)
 			break;
 
@@ -381,6 +384,15 @@ out:
 }
 
 
+static void
+set_text_mode(void)
+{
+	bios_regs regs;
+	regs.eax = 3;
+	call_bios(0x10, &regs);
+}
+
+
 //	#pragma mark -
 
 
@@ -467,9 +479,7 @@ platform_switch_to_text_mode(void)
 		return;
 	}
 
-	bios_regs regs;
-	regs.eax = 3;
-	call_bios(0x10, &regs);
+	set_text_mode();
 	gKernelArgs.frame_buffer.enabled = 0;
 
 	vga_enable_bright_background_colors();
@@ -481,6 +491,13 @@ platform_init_video(void)
 {
 	gKernelArgs.frame_buffer.enabled = 0;
 	list_init(&sModeList);
+
+	set_text_mode();
+		// You may wonder why we do this here:
+		// Obviously, some graphics card BIOS implementations don't
+		// report all available modes unless you've done this before
+		// getting the VESA information.
+		// One example of those is the SiS 630 chipset on my laptop.
 
 	sVesaCompatible = vesa_init(&sInfo, &sMode) == B_OK;
 	if (!sVesaCompatible) {
