@@ -141,7 +141,7 @@ status_t nv_acc_init_dma()
 	else
 	{
 		/* (first set) */
-		ACCW(HT_HANDL_00, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
+		ACCW(HT_HANDL_00, (0x80000000 | NV4_SURFACE)); /* 32bit handle */
 		ACCW(HT_VALUE_00, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
@@ -212,8 +212,8 @@ status_t nv_acc_init_dma()
 		/* setup set '6' for cmd NV10_CONTEXT_SURFACES_2D */
 		ACCW(PR_CTX0_A, 0x02080062); /* NVclass $062, nv10+: little endian */
 		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_6, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
+		ACCW(PR_CTX2_A, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_A, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
 		ACCW(PR_CTX0_B, 0x00000000); /* extra */
 		ACCW(PR_CTX1_B, 0x00000000); /* extra */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
@@ -229,7 +229,62 @@ status_t nv_acc_init_dma()
 	}
 	else
 	{
-		//fixme: setup...
+		/* setup a DMA define for use by command defines below. */
+		ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
+									  * DMA target node is NVM (non-volatile memory?)
+									  * (instead of doing PCI or AGP transfers) */
+		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit */
+		ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
+		ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
+		/* setup set '0' for cmd NV_ROP5_SOLID */
+		ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_0, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
+		/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
+		ACCW(PR_CTX0_2, 0x01008019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_2, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
+		/* setup set '2' for cmd NV_IMAGE_PATTERN */
+		ACCW(PR_CTX0_4, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_4, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
+		ACCW(PR_CTX2_4, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
+		/* setup set '4' for cmd NV_IMAGE_BLIT */
+		ACCW(PR_CTX0_6, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_6, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_6, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
+		/* setup set '5' for cmd NV3_GDI_RECTANGLE_TEXT */
+		ACCW(PR_CTX0_8, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_8, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
+		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
+		/* setup set '6' for ... */
+		if(si->ps.card_arch >= NV10A)
+		{
+			/* ... cmd NV10_CONTEXT_SURFACES_2D */
+			ACCW(PR_CTX0_A, 0x01008062); /* NVclass $062, nv10+: little endian */
+		}
+		else
+		{
+			/* ... cmd NV4_SURFACE */
+			ACCW(PR_CTX0_A, 0x01008042); /* NVclass $042, nv10+: little endian */
+		}
+		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_A, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_A, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
+		/* setup DMA set pointed at by PF_CACH1_DMAI */
+		ACCW(PR_CTX0_C, 0x00003002); /* DMA page table present and of linear type;
+									  * DMA class is $002 (b0-11);
+									  * DMA target node is NVM (non-volatile memory?)
+									  * (instead of doing PCI or AGP transfers) */
+		ACCW(PR_CTX1_C, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+		ACCW(PR_CTX2_C, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
+									 /* DMA access type is READ_AND_WRITE;
+									  * table is located at end of cardRAM (b12-31):
+									  * It's adress needs to be at a 4kb boundary! */
 	}
 
 	if (si->ps.card_arch == NV04A)
