@@ -17,7 +17,6 @@
 #include <DataIO.h>
 #include <Errors.h>
 #include <OS.h>
-#include "../../../../add-ons/translators/tifftranslator/TIFFTranslator.h"
 
 // Suite
 CppUnit::Test *
