@@ -6,6 +6,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bautolock ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blocker ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmemoryio ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bstring ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bblockcache ] ;
 
 CommonTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
@@ -65,6 +66,11 @@ CommonTestLib libsupporttest.so
 		StringCharAccessTest.cpp
 		StringSearchTest.cpp
 		StringReplaceTest.cpp
+
+		#BBlockCache
+		BlockCacheTest.cpp
+		BlockCacheExerciseTest.cpp
+		BlockCacheConcurrencyTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
