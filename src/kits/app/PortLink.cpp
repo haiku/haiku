@@ -344,7 +344,11 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 	{
 		data->buffersize=port_buffer_size(replyport);
 		if(data->buffersize>0)
+		{
+			if(data->buffer)
+				delete data->buffer;
 			data->buffer=(int8*)new int8[data->buffersize];
+		}
 		read_port(replyport,&(data->code),data->buffer, data->buffersize);
 	}
 	else
@@ -354,7 +358,9 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 			return B_TIMED_OUT;
 
 		if(data->buffersize>0)
+		{
 			data->buffer=(int8*)new int8[data->buffersize];
+		}
 		read_port(replyport,&(data->code),data->buffer, data->buffersize);
 	}
 
