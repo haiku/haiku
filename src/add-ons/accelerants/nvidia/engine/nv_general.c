@@ -32,7 +32,7 @@ static void nv_dump_configuration_space (void)
 	DUMP_CFG (BASE7,	0);
 	DUMP_CFG (SUBSYSID1,0);
 	DUMP_CFG (ROMBASE,	0);
-	DUMP_CFG (CFG_0,	0);
+	DUMP_CFG (CAPPTR,	0);
 	DUMP_CFG (CFG_1,	0);
 	DUMP_CFG (INTERRUPT,0);
 	DUMP_CFG (SUBSYSID2,0);
@@ -50,9 +50,9 @@ static void nv_dump_configuration_space (void)
 	DUMP_CFG (CFG_15,	0);
 	DUMP_CFG (CFG_16,	0);
 	DUMP_CFG (CFG_17,	0);
-	DUMP_CFG (GF2IGPU,	0);
+	DUMP_CFG (CFG_18,	0);
 	DUMP_CFG (CFG_19,	0);
-	DUMP_CFG (GF4MXIGPU,0);
+	DUMP_CFG (CFG_19,	0);
 	DUMP_CFG (CFG_21,	0);
 	DUMP_CFG (CFG_22,	0);
 	DUMP_CFG (CFG_23,	0);
@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.21 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.22 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;

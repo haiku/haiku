@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-6/2004
+   Rudolf Cornelissen 7/2003-7/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -1051,14 +1051,10 @@ static void getstrap_arch_nv10_20_30(void)
 	switch (dev_manID)
 	{
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
-		//fixme: need kerneldriver function to readout other device PCI config space!?!
-		//linux: int amt = pciReadLong(pciTag(0, 0, 1), 0x7C);
-		si->ps.memory_size = (((CFGR(GF2IGPU) & 0x000007c0) >> 6) + 1);
-		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
-		//fixme: need kerneldriver function to readout other device PCI config space!?!
-		//linux: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
-		si->ps.memory_size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
+		/* the kerneldriver already determined the amount of RAM these cards have at
+		 * their disposal (UMA, values read from PCI config space in other device) */
+		LOG(8,("INFO: nVidia GPU with UMA detected\n"));
 		break;
 	default:
 		LOG(8,("INFO: (Memory detection) Strapinfo value is: $%08x\n", strapinfo));
