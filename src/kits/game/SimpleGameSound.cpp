@@ -107,6 +107,14 @@ BSimpleGameSound::Clone() const
 	return clone;		
 }
 
+
+/* virtual */ status_t 
+BSimpleGameSound::Perform(int32 selector, void * data)
+{
+	return B_ERROR;
+}
+
+
 status_t
 BSimpleGameSound::SetIsLooping(bool looping)
 {
