@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests add-ons kernel drivers ;
+
+SubInclude OBOS_TOP src tests add-ons kernel drivers tty ;

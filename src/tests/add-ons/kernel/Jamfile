@@ -29,5 +29,6 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 # SubInclude OBOS_TOP src tests add-ons kernel disk_scanner ;
+SubInclude OBOS_TOP src tests add-ons kernel drivers ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems ;
 SubInclude OBOS_TOP src tests add-ons kernel network ;
