@@ -159,6 +159,7 @@ Keymap::IsModifierKey(uint32 keyCode)
 {
 	if ((keyCode == fKeys.caps_key)
 		|| (keyCode == fKeys.num_key)
+		|| (keyCode == fKeys.scroll_key)
 		|| (keyCode == fKeys.left_shift_key)
 		|| (keyCode == fKeys.right_shift_key)
 		|| (keyCode == fKeys.left_command_key)
