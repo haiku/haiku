@@ -1,8 +1,8 @@
 /* Team functions */
 
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -700,6 +700,31 @@ err1:
 
 //	#pragma mark -
 // public team API
+
+
+/** This is the kernel backend for waitpid(). It is a bit more powerful when it comes
+ *	to the reason why a thread has died than waitpid() can be.
+ */
+
+#if 0
+team_id
+wait_for_child(thread_id child, uint32 flags, thread_id *_deadChild, int32 *_reason, status_t *_returnCode)
+{
+	// ToDo: implement me! We need to store the death of children in the team structure!
+
+	if (child > 0) {
+		// wait for the specified child
+	} else if (child == -1) {
+		// wait for any children of this team to die
+	} else if (child == 0) {
+		// wait for any children of this process group to die
+	} else {
+		// wait for any children with progress group of the absolute value of "child"
+	}
+
+	return B_ERROR;
+}
+#endif
 
 
 status_t
