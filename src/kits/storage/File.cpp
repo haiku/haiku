@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file File.cpp
@@ -15,6 +15,11 @@
 #include <fs_interface.h>
 
 #include <syscalls.h>
+
+
+extern mode_t __gUmask;
+	// declared in sys/umask.c
+
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -158,7 +163,7 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 	openMode |= O_CLOEXEC;
 
 	int fd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
-		openMode);
+		openMode, DEFFILEMODE & ~__gUmask);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;
@@ -200,7 +205,8 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 
 	openMode |= O_CLOEXEC;
 
-	int fd = _kern_open(entry->fDirFd, entry->fName, openMode | O_CLOEXEC);
+	int fd = _kern_open(entry->fDirFd, entry->fName, openMode | O_CLOEXEC,
+		DEFFILEMODE & ~__gUmask);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;
@@ -238,7 +244,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 
 	openMode |= O_CLOEXEC;
 
-	int fd = _kern_open(-1, path, openMode);
+	int fd = _kern_open(-1, path, openMode, DEFFILEMODE & ~__gUmask);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;
@@ -280,7 +286,7 @@ BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 
 	openMode |= O_CLOEXEC;
 
-	int fd = _kern_open(dir->fDirFd, path, openMode);
+	int fd = _kern_open(dir->fDirFd, path, openMode, DEFFILEMODE & ~__gUmask);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;

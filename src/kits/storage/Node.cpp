@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //----------------------------------------------------------------------
 /*!
 	\file Node.cpp
@@ -700,10 +700,10 @@ BNode::_SetTo(int fd, const char *path, bool traverse)
 	status_t error = (fd >= 0 || path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
-		fFd = _kern_open(fd, path, O_RDWR | O_CLOEXEC | traverseFlag);
+		fFd = _kern_open(fd, path, O_RDWR | O_CLOEXEC | traverseFlag, 0);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
 			// opening read-write failed, re-try read-only
-			fFd = _kern_open(fd, path, O_RDONLY | O_CLOEXEC | traverseFlag);
+			fFd = _kern_open(fd, path, O_RDONLY | O_CLOEXEC | traverseFlag, 0);
 		}
 		if (fFd < 0)
 			error = fFd;
@@ -734,11 +734,11 @@ BNode::_SetTo(const entry_ref *ref, bool traverse)
 	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
-			O_RDWR | O_CLOEXEC | traverseFlag);
+			O_RDWR | O_CLOEXEC | traverseFlag, 0);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
 			// opening read-write failed, re-try read-only
 			fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
-				O_RDONLY | O_CLOEXEC | traverseFlag);
+				O_RDONLY | O_CLOEXEC | traverseFlag, 0);
 		}
 		if (fFd < 0)
 			error = fFd;
