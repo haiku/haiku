@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel bus_managers usb ;
+
+UsePrivateHeaders kernel ;
+
+R5KernelAddon usb : [ FDirName kernel bus_managers ] :
+	usb.cpp
+	Stack.cpp
+	;

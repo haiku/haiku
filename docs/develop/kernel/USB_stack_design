@@ -1,0 +1,33 @@
+THE USB STACK
+==========
+The USB stack will follow the same design as the BeOS R5 stack. This implies that:
+- There's a bus manager called the 'usb' manager - this file also contains the usb module
+- This usb module will control other modules that implement the communication with the host controller
+- These modules are the UHCI, EHCI and OHCI modules
+- There will be support for RAW usb device handling in later stages of development
+- The public API (for drivers) will be compatible with the API of BeOS R5
+
+THE CORE OF THE MATTER: THE USB BUS MODULE
+==============================
+I'm a little confused whether or not to make the internals of the USB stack in C++, but eventually
+I decided to do that, because it makes the whole thing clearer. This does mean that there still needs
+to be some C-glue between the modules of the stack, because the OBOS kernel doesn't support
+dynamic libraries. The core data of the USB stack is stored in a class called 'Stack'. On init of the
+stack one global variable is created with the name 'data'. 
+	The data struct is protected by one master lock called 'master'. This lock should be gained by
+every thread that reads or writes in the 'data' struct. 
+	The USB stack will support only host controller. The USB specification says this is enough, however, there will possibly systems with more controllers. If needed, I'll implement support for multiple host controllers, however, that's currently not the idea. Between the usb core and the host controller driver (essentially another module), is a private api (that will be documented for future additions of host controllers). 
+
+THE INITIALISATION PHASE
+As soon as a device driver calls the usb module, and the module isn't loaded before, a single instance
+of the stack class is made. The constructor initialises the object, and it starts the search for host
+controllers. All the host controller modules are called, and if there is no hardware present, or the 
+hardware corresponding to that host controller is malfunctioning, the controller returns B_ERROR. If
+there is no controller that works, the USB module will fail to initialise.
+	If a controller succeeds in initialising the hardware, and the module initialisation succeeds, the 
+USB Stack class will call the hw_start() call. In this call it supplies a structure with some pointers to
+functions that the host controller needs.
+
+THE UHCI CONTROLLER
+==============
+BASIC THEORY OF OPERATION

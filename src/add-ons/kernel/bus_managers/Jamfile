@@ -19,4 +19,5 @@ KernelLd
 	:
 	addons/kernel/config_manager
 	;
+SubInclude OBOS_TOP src add-ons kernel bus_managers usb ;
 
