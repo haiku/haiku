@@ -23,6 +23,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <string.h>
+#include <stdio.h>
 #include "matroska_util.h"
 
 
@@ -64,16 +65,29 @@ get_frame_count_by_default_duration(uint64 duration, uint64 default_duration)
 }
 
 
-uint16
-get_pixel_width_aspect(unsigned int pixel_width, unsigned int display_width)
+void
+get_pixel_aspect_ratio(uint16 *width_aspect_ratio, uint16 *height_aspect_ratio,
+					   unsigned int pixel_width, unsigned int pixel_height,
+					   unsigned int display_width,  unsigned int display_height)
 {
-	return 1;
+	printf("get_pixel_aspect_ratio: pixel_width %u, pixel_height %u, display_width %u, display_height %u\n",
+			pixel_width, pixel_height, display_width, display_height);
+			
+	if (pixel_width == display_width && pixel_height == display_height) {
+		*width_aspect_ratio = 1;
+		*height_aspect_ratio = 1;
+		return;
+	}
+	
+	double w_aspect = display_width / (double)pixel_width;
+	double h_aspect = display_height / (double)pixel_height;
+	w_aspect /= h_aspect;
+	h_aspect = 1;
+	
+	printf("w_aspect %.6f, h_aspect %.6f\n", w_aspect, h_aspect);
+
+	*width_aspect_ratio = uint16(w_aspect * 10000 + 0.5);
+	*height_aspect_ratio = 10000;
+
+	printf("w_aspect %.6f, h_aspect %.6f, ratio %u:%u\n", w_aspect, h_aspect, *width_aspect_ratio, *height_aspect_ratio);
 }
-
-
-uint16
-get_pixel_height_aspect(unsigned int pixel_height, unsigned int display_height)
-{
-	return 1;
-}
-

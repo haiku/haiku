@@ -235,6 +235,14 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 		TRACE("mkvReader::SetupVideoCookie: codec not recognized\n");
 		return B_ERROR;
 	}
+	
+	uint16 width_aspect_ratio;
+	uint16 height_aspect_ratio;
+	get_pixel_aspect_ratio(&width_aspect_ratio, &height_aspect_ratio,
+						   cookie->track_info->Video.PixelWidth,
+						   cookie->track_info->Video.PixelHeight,
+						   cookie->track_info->Video.DisplayWidth,
+						   cookie->track_info->Video.DisplayHeight);
 
 //	cookie->format.u.encoded_video.max_bit_rate = 
 //	cookie->format.u.encoded_video.avg_bit_rate = 
@@ -243,8 +251,8 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	cookie->format.u.encoded_video.output.first_active = 0;
 	cookie->format.u.encoded_video.output.last_active = cookie->line_count - 1;
 	cookie->format.u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-	cookie->format.u.encoded_video.output.pixel_width_aspect = get_pixel_width_aspect(cookie->track_info->Video.PixelWidth, cookie->track_info->Video.DisplayWidth);
-	cookie->format.u.encoded_video.output.pixel_height_aspect = get_pixel_height_aspect(cookie->track_info->Video.PixelHeight, cookie->track_info->Video.DisplayHeight);
+	cookie->format.u.encoded_video.output.pixel_width_aspect = width_aspect_ratio;
+	cookie->format.u.encoded_video.output.pixel_height_aspect = height_aspect_ratio;
 	// cookie->format.u.encoded_video.output.display.format = 0;
 	cookie->format.u.encoded_video.output.display.line_width = cookie->track_info->Video.PixelWidth;
 	cookie->format.u.encoded_video.output.display.line_count = cookie->track_info->Video.PixelHeight;
