@@ -13,6 +13,10 @@ SimpleTest mediaFormats :
 	mediaFormats.cpp
 	: media ;
 
+SimpleTest mediaDescriptions :
+	mediaDescriptions.cpp
+	: media ;
+
 SubInclude OBOS_TOP src tests kits media media_decoder ;
 SubInclude OBOS_TOP src tests kits media notificationtest ;
 SubInclude OBOS_TOP src tests kits media nodetest ;
