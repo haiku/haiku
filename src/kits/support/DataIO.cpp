@@ -198,7 +198,7 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 		return B_BAD_VALUE;
 		
 	ssize_t sizeRead = 0;
-	if (pos >= 0 && pos < fLen) {
+	if (pos < fLen) {
 		sizeRead = min(static_cast<off_t>(size), fLen - pos);
 		memcpy(buffer, fBuf + pos, sizeRead);
 	}
@@ -217,7 +217,7 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		return B_BAD_VALUE;
 		
 	ssize_t sizeWritten = 0;	
-	if (pos >= 0 && pos < fPhys) {
+	if (pos < fPhys) {
 		sizeWritten = min(static_cast<off_t>(size), fPhys - pos);
 		memcpy(fBuf + pos, buffer, sizeWritten);
 	}
@@ -262,11 +262,12 @@ BMemoryIO::Position() const
 status_t
 BMemoryIO::SetSize(off_t size)
 {
+	status_t err = B_ERROR;
+	
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
 	
-	status_t err = B_ERROR;	
-	if (size >= 0 && size <= fPhys) {	
+	if (size <= fPhys) {
 		err = B_OK;
 		fLen = size;
 	}
@@ -324,7 +325,7 @@ BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
 		return B_BAD_VALUE;
 	
 	ssize_t sizeRead = 0;
-	if (pos >= 0 && pos < fLength) {
+	if (pos < fLength) {
 		sizeRead = min(static_cast<off_t>(size), fLength - pos);
 		memcpy(buffer, fData + pos, sizeRead);
 	}
@@ -342,7 +343,7 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
 	
 	status_t error = B_OK;
-	
+
 	if (newSize > fMallocSize)
 		error = SetSize(newSize);
 			
@@ -390,10 +391,11 @@ status_t
 BMallocIO::SetSize(off_t size)
 {
 	status_t error = B_OK;
-	if (size <= 0) {
+	if (size == 0) {
 		// size == 0, free the memory
 		free(fData);
 		fData = NULL;
+		fLength = 0;
 	} else {
 		// size != 0, see, if necessary to resize
 		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
@@ -403,6 +405,8 @@ BMallocIO::SetSize(off_t size)
 				// set the new area to 0
 				if (newSize > fMallocSize)
 					memset(newData + fMallocSize, 0, newSize - fMallocSize);
+				if (fLength > newSize)
+					fLength = newSize;
 				fData = newData;
 				fMallocSize = newSize;
 			} else	// couldn't alloc the memory
