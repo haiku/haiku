@@ -70,6 +70,9 @@ GCC_VERSION = ;
 # Save the platform default headers.
 PLATFORM_DEFAULT_HEADERS = $(HDRS) ;
 
+# Add some grist to the libgcc objects
+LIBGCC_OBJECTS = $(LIBGCC_OBJECTS:G=libgcc) ;
+
 # We do not include any local BeOS system headers by default
 CCFLAGS += -nostdinc ;
 C++FLAGS += -nostdinc ;
@@ -1510,6 +1513,22 @@ actions Bison1
 {
 	bison $(YACCFLAGS) -o $(1[1]) $(2)
 	[ -f $(1[1]).h ] && mv $(1[1]).h $(1[2]) || true
+}
+
+rule UnarchiveObjects
+{
+	# UnarchiveObjects <target objects> : <static object>
+
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	Depends $(2) : $(1) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+}
+
+actions UnarchiveObjects
+{
+	cd `dirname $(1[1])`
+	ar -x "$(2)" $(1)
+	cd -
 }
 
 # BeOS specific rules
