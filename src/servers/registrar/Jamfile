@@ -2,6 +2,7 @@ SubDir OBOS_TOP src servers registrar ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
