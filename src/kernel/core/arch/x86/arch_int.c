@@ -267,7 +267,7 @@ i386_handle_trap(struct iframe frame)
 	if (ret == B_INVOKE_SCHEDULER) {
 		int state = disable_interrupts();
 		GRAB_THREAD_LOCK();
-		resched();
+		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	}
