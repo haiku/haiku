@@ -1,9 +1,0 @@
-SubDir OBOS_TOP src servers app proto6 router ;
-
-SubDirHdrs [ FDirName $(OBOS_TOP) src servers app proto6 ] ;
-
-Addon router : input_server :
-	<src!servers!app!proto6>../PortLink.cpp
-	router.cpp
-;
-LinkSharedOSLibs router : be root /system/servers/input_server ;

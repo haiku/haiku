@@ -1,3 +1,0 @@
-Write server-side Add/Remove View code
-Figure out a good screen update protocol
-Flesh out OBWindow::MessageReceived()
