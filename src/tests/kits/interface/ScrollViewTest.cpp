@@ -10,6 +10,11 @@
 #include <Window.h>
 #include <Box.h>
 
+#include <stdio.h>
+
+
+#define TESTS
+
 
 class Window : public BWindow {
 	public:
@@ -49,8 +54,33 @@ Window::Window()
 			scroller->SetBorderHighlighted(true);
 		box->AddChild(scroller);
 
+#ifdef TESTS
+		if (i == 7) {
+			BMessage archive;
+			if (scroller->Archive(&archive/*, false*/) == B_OK) {
+				puts("BScrollView archived:");
+				archive.PrintToStream();
+			} else
+				puts("archiving failed!");
+
+			BScrollView *second = (BScrollView *)BScrollView::Instantiate(&archive);
+			archive.MakeEmpty();
+			if (second != NULL && second->Archive(&archive) == B_OK) {
+				puts("2. BScrollView archived:");
+				archive.PrintToStream();
+			}
+		}
+
+		if (i % 4 == 3)
+			scroller->SetBorder(B_FANCY_BORDER);
+#endif
+
 		rect.OffsetBy(120, 0);
 	}
+
+#ifdef TESTS
+	printf("sizeof = %lu\n", sizeof(BScrollView));
+#endif
 }
 
 
