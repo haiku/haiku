@@ -55,8 +55,10 @@ ipro1000_read_settings(ipro1000_device *device)
 	
 	param = get_driver_parameter(handle, "mtu", "0", "0");
 	mtu = atoi(param);
-	if (mtu >= 64 && mtu <= 1500)
-		device->mtu = mtu;
+	if (mtu >= 50 && mtu <= 1500)
+		device->maxframesize = mtu + ENET_HEADER_SIZE;
+	else
+		dprintf("ipro1000: unsupported mtu setting '%s' ignored\n", param);
 
 	unload_driver_settings(handle);
 }
@@ -103,7 +105,7 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	device->pciDev	= device->pciInfo->device;
 	device->pciFunc	= device->pciInfo->function;
 	device->adapter = 0;
-	device->mtu		= 1500; // XXX is MAXIMUM_ETHERNET_FRAME_SIZE = 1518 too much?
+	device->maxframesize = 1514; // XXX is MAXIMUM_ETHERNET_FRAME_SIZE = 1518 too much?
 	
 	ipro1000_read_settings(device);
 
@@ -328,8 +330,8 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 		case ETHER_GETFRAMESIZE:
-			TRACE("ipro1000_control() ETHER_GETFRAMESIZE, MTU = %d\n", device->mtu);
-			*(uint32*)arg = device->mtu;
+			TRACE("ipro1000_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)\n", device->maxframesize,  device->maxframesize - ENET_HEADER_SIZE);
+			*(uint32*)arg = device->maxframesize;
 			return B_OK;
 			
 		default:

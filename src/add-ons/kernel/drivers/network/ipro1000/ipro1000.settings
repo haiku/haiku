@@ -1,0 +1,14 @@
+# Sample settings file for the ipro1000 driver
+#
+# This file should be moved to the directory ~/config/settings/kernel/drivers/
+# and must be RENAMED into "ipro1000" 
+
+# Currently supported settings are:
+#
+# mtu <value>
+#
+# where value can be in the range 50 to 1500
+#
+# to fix upload problems with DSL, use 
+#
+# mtu 1492
