@@ -290,33 +290,37 @@ MediaWindow::InitMedia(bool first)
 	int32 outputID;
 	BString outputName;
 		
-	roster->GetAudioInput(&default_node);
-	roster->GetDormantNodeFor(default_node, &node_info);
-	item = FindMediaListItem(&node_info);
-	if(item)
-		item->SetDefault(true, true);
-	mAudioView->SetDefault(node_info, true);
+	if(roster->GetAudioInput(&default_node)==B_OK) {
+		roster->GetDormantNodeFor(default_node, &node_info);
+		item = FindMediaListItem(&node_info);
+		if(item)
+			item->SetDefault(true, true);
+		mAudioView->SetDefault(node_info, true);
+	}
 		
-	roster->GetAudioOutput(&default_node, &outputID, &outputName);
-	roster->GetDormantNodeFor(default_node, &node_info);
-	item = FindMediaListItem(&node_info);
-	if(item)
-		item->SetDefault(true, false);
-	mAudioView->SetDefault(node_info, false, outputID);
+	if(roster->GetAudioOutput(&default_node, &outputID, &outputName)==B_OK) {
+		roster->GetDormantNodeFor(default_node, &node_info);
+		item = FindMediaListItem(&node_info);
+		if(item)
+			item->SetDefault(true, false);
+		mAudioView->SetDefault(node_info, false, outputID);
+	}
 	
-	roster->GetVideoInput(&default_node);
-	roster->GetDormantNodeFor(default_node, &node_info);
-	item = FindMediaListItem(&node_info);
-	if(item)
-		item->SetDefault(true, true);
-	mVideoView->SetDefault(node_info, true);
+	if(roster->GetVideoInput(&default_node)==B_OK) {
+		roster->GetDormantNodeFor(default_node, &node_info);
+		item = FindMediaListItem(&node_info);
+		if(item)
+			item->SetDefault(true, true);
+		mVideoView->SetDefault(node_info, true);
+	}
 	
-	roster->GetVideoOutput(&default_node);
-	roster->GetDormantNodeFor(default_node, &node_info);
-	item = FindMediaListItem(&node_info);
-	if(item)
-		item->SetDefault(true, false);
-	mVideoView->SetDefault(node_info, false);
+	if(roster->GetVideoOutput(&default_node)==B_OK) {
+		roster->GetDormantNodeFor(default_node, &node_info);
+		item = FindMediaListItem(&node_info);
+		if(item)
+			item->SetDefault(true, false);
+		mVideoView->SetDefault(node_info, false);
+	}
 	
 	if(first) {
 		mListView->Select(mListView->IndexOf(mixer));
@@ -389,6 +393,21 @@ MediaWindow::MessageReceived (BMessage *message)
 			InitMedia(false);
 			break;
 		case ML_DEFAULTOUTPUT_CHANGE:
+			{
+				int32 index;
+				if(message->FindInt32("index", &index)!=B_OK)
+					break;
+				Settings2Item *item = static_cast<Settings2Item *>(mAudioView->mMenu3->ItemAt(index));
+				
+				if(item) {
+					BMediaRoster *roster = BMediaRoster::Roster();
+					roster->SetAudioOutput(*item->mInput);
+					
+					if(mAudioView->mRestartTextView->IsHidden())
+						mAudioView->mRestartTextView->Show();	
+				} else 
+					fprintf(stderr, "Settings2Item not found\n");
+			}
 			break;		
 		case ML_DEFAULT_CHANGE:
 			{
@@ -416,8 +435,10 @@ MediaWindow::MessageReceived (BMessage *message)
 					} else {
 						if(isInput)
 							roster->SetAudioInput(*item->mInfo);
-						else
+						else {
 							roster->SetAudioOutput(*item->mInfo);
+							mAudioView->SetDefault(*item->mInfo, false, 0);
+						}
 					}
 					
 					MediaListItem *oldListItem = NULL;

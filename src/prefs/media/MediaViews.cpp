@@ -68,7 +68,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	AddChild(defaultsBox);
 	
 	BRect defaultRect(20, 22, 250, 40);
-	mMenu1 = new BPopUpMenu("menu1");
+	mMenu1 = new BPopUpMenu("<none>");
 	mMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1", 
 		mIsVideo ? "Video Input:" : "Audio Input:", mMenu1);
@@ -76,7 +76,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	menuField1->SetDivider(75);
 	
 	defaultRect.OffsetBy(0, 26);
-	mMenu2 = new BPopUpMenu("menu2");
+	mMenu2 = new BPopUpMenu("<none>");
 	mMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2", 
 		mIsVideo ? "Video Output:" : "Audio Output:", mMenu2);
@@ -85,7 +85,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	
 	if(!mIsVideo) {
 		defaultRect.OffsetBy(186, 0);
-		mMenu3 = new BPopUpMenu("menu3");
+		mMenu3 = new BPopUpMenu("<none>");
 		mMenu3->SetLabelFromMarked(true);
 		BMenuField *mMenuField3 = new BMenuField(defaultRect, "menuField3", 
 			"Channel:", mMenu3);
