@@ -38,6 +38,10 @@ if ! $(INVOCATION_SUBDIR_SET) {
 	include $(buildConfig) ;
 }
 
+# We do not include any local BeOS system headers by default
+CCFLAGS += " -nostdinc" ;
+C++FLAGS += " -nostdinc" ;
+
 # Determine if we're building on PPC or x86
 # Determine mimetype of executable
 # Cross compiling can come later
@@ -66,9 +70,9 @@ if $(WARNINGS) {
 	# -Wundef			(dito)
 	# -Wconversion		(gets you many warnings about implicit conversions)
 	# -W				(gets you even more warnigs)
-	CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes" ;
+	CCFLAGS += "-Wall -Wno-multichar -Wmissing-prototypes" ;
 	CCFLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
-	C++FLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual" ;
+	C++FLAGS += "-Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual" ;
 	C++FLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
 }
 
@@ -141,9 +145,24 @@ OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
 
 rule SetupIncludes
 {
-	OBOS_INCLUDES ?= . add-ons app be_apps device drivers game interface kernel mail media midi midi2 net opengl storage support translation ;
-	UsePublicHeaders $(OBOS_INCLUDES) ;
-    UsePosixHeaders ;
+	# XXX add "mail" and "opengl" later
+	OS_INCLUDES ?= . add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
+
+	# include the local directory
+	UseHeaders . ;
+
+	# Use headers directory, to allow to do things like include <posix/string.h>
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers ] ;
+
+	# Use posix headers directory
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+
+	# Use public OS header directories
+	UseHeaders [ PublicHeaders $(OS_INCLUDES) ] ;
+
+	# Used as a fallback, the R5 header directories (we should remove this as soon as possible)
+	UseHeaders /boot/develop/headers/posix ;
+	UseHeaders /boot/develop/headers/cpp ;
 }
 
 #-------------------------------------------------------------------------------
@@ -179,6 +198,7 @@ actions C++
 rule App
 {
 	# App <name> : <sources> ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(<) : $(>) ;
 	MakeLocate $(<) : $(OBOS_APPS_DIR) ;
@@ -187,6 +207,7 @@ rule App
 rule BinCommand
 {
 	# BinCommand <name> : <sources> : <libraries> ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(1) : $(2) ;
 	MakeLocate $(1) : $(OBOS_BIN_DIR) ;
@@ -196,20 +217,26 @@ rule BinCommand
 rule StdBinCommands
 {
 	# StdBinCommands <sources> : <libs> ;
+	SetupIncludes ;
+	SetupObjectsDir ;
 	local libs = $(2) ;
 	local source ;
 	for source in $(1)
 	{
 		local target = $(source:S=) ;
 		target = [ FGristFiles $(target) ] ;
-		BinCommand $(target) : $(source) : $(libs) ;
+
+		Main $(target) : $(source) ;
+		MakeLocate $(target) : $(OBOS_BIN_DIR) ;
+		LinkSharedOSLibs $(target) : $(libs) ;
+		# BinCommand $(target) : $(source) : $(libs) ;
 	}
 }
 
 rule Preference
 {
 	# Preference <name> : <sources> ;
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(<) : $(>) ;
 	MakeLocate $(<) : $(OBOS_PREFS_DIR) ;
@@ -219,7 +246,7 @@ rule Server
 {
 	# Server <name> : <sources> ;
 	
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(<) : $(>) ;
 	MakeLocate $(<) : $(OBOS_SERVER_DIR) ;
@@ -487,7 +514,7 @@ rule SimpleTest
 		OPTIM = ;
 	}
 
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
@@ -516,7 +543,7 @@ rule Addon
 
 	local isExecutable = $(4) ;
 	
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(1) : $(3) ;
 
@@ -550,6 +577,7 @@ rule R5KernelAddon
 rule Translator
 {
 	# Translator <name> : <sources> ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(1) : $(2) ;
 
@@ -559,7 +587,7 @@ rule Translator
 	MakeLocate $(1) : $(targetdir) ;
 }
 
-rule MakeLocateObjects
+ rule MakeLocateObjects
 {
 	# MakeLocateObjects <sources_or_objects> ;
 	
@@ -580,7 +608,7 @@ rule StaticLibrary
 {
 	# StaticLibrary <name> : <sources> ;
 	
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Library lib$(<).a : $(>) ;
@@ -600,7 +628,7 @@ rule SharedLibraryFromObjects
 rule SharedLibrary
 {
 	# SharedLibrary <name> : <sources> ;
-#	SetupIncludes ;
+	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Objects $(2) ;
@@ -697,13 +725,7 @@ rule ArchHeaders
 
 rule UsePublicHeaders
 {
-	# UsePublicHeaders <group list> ;
-	#
-	# Adds the public C header dirs given by <group list> to the header search
-	# dirs of the subdirectory.
-	# NOTE: This rule must be invoked *before* the rule that builds the objects.
-
-	UseHeaders [ PublicHeaders $(1) ] ;
+	# XXX changed to do nothing
 }
 
 rule UsePublicObjectHeaders
@@ -797,13 +819,7 @@ rule UseArchObjectHeaders
 
 rule UsePosixHeaders
 {
-	# UsePrivateHeaders <group list> ;
-	#
-	# Adds the POSIX header dir to the header search
-	# dirs of the subdirectory.
-	# NOTE: This rule must be invoked *before* the rule that builds the objects.
-
-	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+	# XXX changed to do nothing
 }
 
 rule UsePosixObjectHeaders
@@ -1068,10 +1084,19 @@ rule SetupKernel
 
 	local _objs = $(1:S=$(SUFOBJ)) ;
 
-	UsePublicHeaders kernel support drivers ;
-	UsePublicHeaders [ FDirName os kernel ] ;
+	# XXX add "mail" and "opengl" later
+	OS_INCLUDES ?= . add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
+
+	# include current directory
+	UseHeaders . ;
+
+	# Use posix headers directory
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+
+	# Use public OS header directories
+	UseHeaders [ PublicHeaders $(OS_INCLUDES) ] ;
+
 	UsePrivateHeaders kernel ;
-	UsePosixHeaders ;
 	UseArchHeaders $(OBOS_ARCH) ;
 
 	SetupObjectsDir ;
@@ -1323,6 +1348,8 @@ FT2_LIB     = freetype ;
 rule UseFreeTypeHeaders
 {
 	SubDirHdrs $(FT2_INCLUDE) ;
+
+	SetupIncludes ;
 }
 
 rule UseFreeTypeObjectHeaders
