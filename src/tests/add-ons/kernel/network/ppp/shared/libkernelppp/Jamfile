@@ -2,6 +2,7 @@ SubDir OBOS_TOP src tests add-ons kernel network ppp shared libkernelppp ;
 
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
@@ -27,9 +28,9 @@ StaticLibrary <userland>kernelppp :
 	_KPPPPFCHandler.cpp
 	
 	# for driver_settings
+	strlcat.c
 	driver_settings.c
-	_libppputils.cpp
 ;
 
-SEARCH on [ FGristFiles _libppputils.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp ] ;
+SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;

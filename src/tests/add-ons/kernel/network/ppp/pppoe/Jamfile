@@ -2,7 +2,6 @@ SubDir OBOS_TOP src tests add-ons kernel network ppp pppoe ;
 
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ;
 
