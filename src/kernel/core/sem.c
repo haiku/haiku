@@ -157,25 +157,19 @@ sem_id create_sem_etc(int count, const char *name, team_id owner)
 	int state;
 	sem_id retval = B_NO_MORE_SEMS;
 	char *temp_name;
+	int name_len;
 
 	if (sems_active == false)
 		return B_NO_MORE_SEMS;
+		
+	if (name == NULL)
+		name = "default_sem_name";
 
-	if (name) {
-		int name_len = strlen(name);
-
-		temp_name = (char *)kmalloc(min(name_len + 1, SYS_MAX_OS_NAME_LEN));
-		if (temp_name == NULL)
-			return ENOMEM;
-		strncpy(temp_name, name, SYS_MAX_OS_NAME_LEN-1);
-		temp_name[SYS_MAX_OS_NAME_LEN-1] = 0;
-	}
-	else {
-		temp_name = (char *)kmalloc(sizeof("default_sem_name")+1);
-		if (temp_name == NULL)
-			return ENOMEM;
-		strcpy(temp_name, "default_sem_name");
-	}
+	name_len = min(strlen(name) + 1, SYS_MAX_OS_NAME_LEN);
+	temp_name = (char *)kmalloc(name_len);
+	if (temp_name == NULL)
+		return ENOMEM;
+	strlcpy(temp_name, name, name_len);
 
 	state = disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
