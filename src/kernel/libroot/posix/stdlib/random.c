@@ -256,7 +256,7 @@ static inline long good_rand(long x)
  * for default usage relies on values produced by this routine.
  */
 void
-srandom(unsigned long x)
+srandom(unsigned int x)
 {
 	long i;
 
@@ -467,7 +467,7 @@ setstate(arg_state)
  *
  * Returns a 31-bit random number.
  */
-long
+int
 random(void)
 {
 	long i;
