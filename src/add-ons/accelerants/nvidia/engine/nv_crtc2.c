@@ -134,7 +134,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 
 		target.timing.v_total =
 			((uint16)((si->ps.p2_timing.v_total / ((float)si->ps.p2_timing.v_display)) *
-			target.timing.v_display));
+			target.timing.v_display)) - 1;
 
 		if (target.timing.v_sync_start == target.timing.v_display)
 			target.timing.v_sync_start += 1;
@@ -344,7 +344,8 @@ status_t nv_crtc2_set_timing(display_mode target)
 			/* BTW: known widescreen panels:
 			 * 1280 x  800 (1.60),
 			 * 1440 x  900 (1.60),
-			 * 1680 x 1050 (1.60). */
+			 * 1680 x 1050 (1.60),
+			 * 1920 x 1200 (1.60). */
 			/* known 4:3 aspect non-standard resolution panels:
 			 * 1400 x 1050 (1.33). */
 			/* NOTE:
