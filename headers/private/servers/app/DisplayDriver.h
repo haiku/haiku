@@ -41,6 +41,7 @@
 #include "RGBColor.h"
 #include <Region.h>
 #include "PatternHandler.h"
+#include "DisplaySupport.h"
 #include "LayerData.h"
 #include "ServerBitmap.h"
 #include <ft2build.h>
@@ -89,57 +90,6 @@ typedef void (DisplayDriver::* SetPixelFuncType)(int x, int y);
 typedef void (DisplayDriver::* SetHorizontalLineFuncType)(int xstart, int xend, int y);
 typedef void (DisplayDriver::* SetVerticalLineFuncType)(int x, int ystart, int yend);
 typedef void (DisplayDriver::* SetRectangleFuncType)(int left, int top, int right, int bottom);
-
-class LineCalc
-{
-public:
-	LineCalc();
-	LineCalc(const BPoint &pta, const BPoint &ptb);
-	void SetPoints(const BPoint &pta, const BPoint &ptb);
-	float GetX(float y);
-	float GetY(float x);
-	float Slope(void) { return slope; }
-	float Offset(void) { return offset; }
-	float MinX() { return minx; }
-	float MinY() { return miny; }
-	float MaxX() { return maxx; }
-	float MaxY() { return maxy; }
-	void Swap(LineCalc &from);
-	bool ClipToRect(const BRect &rect);
-	BPoint GetStart() { return start; }
-	BPoint GetEnd() { return end; }
-private:
-	float slope;
-	float offset;
-	BPoint start, end;
-	float minx;
-	float miny;
-	float maxx;
-	float maxy;
-};
-
-/*!
-	\class FBBitmap DisplayDriver.h
-	\brief Class used for easily passing around information about the framebuffer
-*/
-class FBBitmap : public ServerBitmap
-{
-public:
-	FBBitmap(void) : ServerBitmap(BRect(0,0,0,0),B_NO_COLOR_SPACE,0) { }
-	~FBBitmap(void) { }
-	void SetBytesPerRow(const int32 &bpr) { _bytesperrow=bpr; }
-	void SetSpace(const color_space &space) { _space=space; }
-	
-	// WARNING: - for some reason ServerBitmap adds 1 to the width and height. We do that also.
-	void SetSize(const int32 &w, const int32 &h) { _width=w+1; _height=h+1; }
-	void SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
-	void SetBitsPerPixel(color_space space,int32 bytesperline) { _HandleSpace(space,bytesperline); }
-	void ShallowCopy(const FBBitmap *from)
-	{
-		ServerBitmap::ShallowCopy((ServerBitmap*)from);
-		SetBuffer(from->Bits());
-	}
-};
 
 /*!
 	\class DisplayDriver DisplayDriver.h
