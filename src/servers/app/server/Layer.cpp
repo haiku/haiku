@@ -60,6 +60,12 @@ BRegion	gRedrawReg;
 BList gCopyRegList;
 BList gCopyList;
 
+enum {
+	B_LAYER_ACTION_NONE = 0,
+	B_LAYER_ACTION_MOVE,
+	B_LAYER_ACTION_RESIZE
+};
+
 Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 				uint32 flags, DisplayDriver *driver)
 {
@@ -93,6 +99,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fFlags			= flags;
 	fAdFlags		= 0;
 	fClassID		= AS_LAYER_CLASS;
+	fFrameAction	= B_LAYER_ACTION_NONE;
 	fResizeMode		= resize;
 	fHidden			= false;
 	
@@ -553,7 +560,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 				// calculate the minimum region/rectangle to be updated with
 				// a single message to the client.
 				fUpdateReg = fFullVisible;
-				if (fFlags & B_FULL_UPDATE_ON_RESIZE)
+				if (fFlags & B_FULL_UPDATE_ON_RESIZE
+					&& fFrameAction	== B_LAYER_ACTION_RESIZE)
 				{
 					// do nothing
 				}
@@ -573,7 +581,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 
 			// calculate the update region, then...
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE)
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE
+				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
 			{
 				// do nothing
 			}
@@ -596,7 +605,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			// No IPC is needed so this is done in place.
 			
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE)
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE
+				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
 			{
 				// do nothing
 			}
@@ -1148,7 +1158,9 @@ void Layer::MoveBy(float x, float y)
 		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-	
+
+	fFrameAction	= B_LAYER_ACTION_MOVE;
+
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
@@ -1157,7 +1169,9 @@ void Layer::MoveBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
-	
+
+	fFrameAction	= B_LAYER_ACTION_NONE;	
+
 	STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
 }
 
@@ -1250,7 +1264,9 @@ void Layer::ResizeBy(float x, float y)
 		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-	
+
+	fFrameAction	= B_LAYER_ACTION_RESIZE;
+
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame());
 	rect.right += x;
@@ -1262,7 +1278,9 @@ void Layer::ResizeBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
-	
+
+	fFrameAction	= B_LAYER_ACTION_NONE;
+
 	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
