@@ -28,6 +28,7 @@ do_chkbfs(int argc, char **argv)
 	}
 
 	memset(&result, 0, sizeof(result));
+	result.magic = BFS_IOCTL_CHECK_MAGIC;
 	result.flags = argc > 1 ? BFS_FIX_BITMAP_ERRORS : 0;
 	if (argc > 2) {
 		printf("will fix any severe errors!\n");

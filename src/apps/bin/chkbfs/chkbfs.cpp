@@ -122,6 +122,7 @@ main(int argc, char **argv)
 		return -1;
 	}
 
+	control.magic = BFS_IOCTL_CHECK_MAGIC;
 	control.flags = BFS_FIX_BITMAP_ERRORS;
 
 	while (*++argv)
