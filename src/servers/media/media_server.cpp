@@ -306,7 +306,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_unregister_node_request *request = reinterpret_cast<const server_unregister_node_request *>(data);
 			server_unregister_node_reply reply;
-			rv = gNodeManager->UnregisterNode(&reply.addon_id, request->nodeid, request->team);
+			rv = gNodeManager->UnregisterNode(&reply.addonid, &reply.flavorid, request->nodeid, request->team);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
@@ -468,6 +468,15 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				write_port(msg->reply_port, 0, reply, replysize);
 				free(reply);
 			}
+			break;
+		}
+
+		case SERVER_SET_NODE_CREATOR:
+		{
+			const server_set_node_creator_request *request = reinterpret_cast<const server_set_node_creator_request *>(data);
+			server_set_node_creator_reply reply;
+			rv = gNodeManager->SetNodeCreator(request->node, request->creator);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 

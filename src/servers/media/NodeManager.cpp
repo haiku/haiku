@@ -13,6 +13,9 @@
 #include <MediaAddOn.h>
 #include "debug.h"
 #include "NodeManager.h"
+#include "AppManager.h"
+
+extern AppManager *gAppManager;
 
 const char *get_node_type(node_type t);
 
@@ -51,6 +54,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	rn.kinds = kinds;
 	rn.port = port;
 	rn.team = team;
+	rn.creator = -1; // will be set later
 	rn.globalrefcount = 1;
 	rn.teamrefcount.Insert(team, 1);
 	
@@ -64,7 +68,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 
 
 status_t
-NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team)
+NodeManager::UnregisterNode(media_addon_id *addonid, int32 *flavorid, media_node_id nodeid, team_id team)
 {
 	BAutolock lock(fLocker);
 	bool b;
@@ -83,10 +87,11 @@ NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team
 		FATAL("!!! NodeManager::UnregisterNode: Error: node %ld, team %ld, globalrefcount %ld\n", nodeid, team, rn->globalrefcount);
 		//return B_ERROR;
 	}
-	*addon_id = rn->addon_id;
+	*addonid = rn->addon_id;
+	*flavorid = rn->addon_flavor_id;
 	b = fRegisteredNodeMap->Remove(nodeid);
 	ASSERT(b);
-	TRACE("NodeManager::UnregisterNode leave: node %ld, addon_id %ld, team %ld\n", nodeid, *addon_id, team);
+	TRACE("NodeManager::UnregisterNode leave: node %ld, addon_id %ld, flavor_id %ld team %ld\n", nodeid, *addonid, *flavorid, team);
 	return B_OK;
 }
 
@@ -135,8 +140,20 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 	int32 *count;
 	b = rn->teamrefcount.Get(team, &count);
 	if (!b) {
-		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
-		return B_ERROR;
+		// Normally it is an error to release a node in another team. But we make one
+		// exception. If the node is global, and the creator team tries to release it,
+		// we will release it in the the media_addon_server.
+		team_id addon_server_team;
+		addon_server_team = gAppManager->AddonServer();
+		if (rn->creator == team && rn->teamrefcount.Get(addon_server_team, &count)) {
+			printf("!!! NodeManager::DecrementGlobalRefCount doing global release!\n");
+			rn->creator = -1; //invalidate!
+			team = addon_server_team; //redirect!
+			// the count variable was already redirected in if() statement above.
+		} else {
+			FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
+			return B_ERROR;
+		}
 	}
 	*count -= 1;
 	int32 debug_count = *count;
@@ -155,6 +172,30 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 	return B_OK;
 }
 
+status_t
+NodeManager::SetNodeCreator(media_node_id nodeid, team_id creator)
+{
+	BAutolock lock(fLocker);
+	registered_node *rn;
+	bool b;
+	status_t rv;
+
+	TRACE("NodeManager::SetNodeCreator node %ld, creator %ld\n", nodeid, creator);
+
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
+	if (!b) {
+		FATAL("NodeManager::SetNodeCreator: Error: node %ld not found\n", nodeid);
+		return B_ERROR;
+	}
+	
+	if (rn->creator != -1) {
+		FATAL("NodeManager::SetNodeCreator: Error: node %ld is already assigned creator %ld\n", nodeid, rn->creator);
+		return B_ERROR;
+	}
+	
+	rn->creator = creator;
+	return B_OK;
+}
 
 void
 NodeManager::FinalReleaseNode(media_node_id nodeid)
@@ -658,6 +699,11 @@ NodeManager::CleanupTeam(team_id team)
 	
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
+		// if the gone team was the creator of some global dormant node instance, we now invalidate that
+		if (rn->creator == team) {
+			rn->creator = -1;
+			// fall through
+		}
 		// if the team hosting this node is gone, remove node from database
 		if (rn->team == team) {
 			FATAL("NodeManager::CleanupTeam: removing node id %ld, team %ld\n", rn->nodeid, team);

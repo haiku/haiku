@@ -19,6 +19,7 @@
 class _BSlaveNodeStorageP;
 
 namespace BPrivate { namespace media {
+	class BMediaRosterEx;
 	class TimeSourceObject;
 	class SystemTimeSourceObject;
 	struct TimeSourceTransmit;
@@ -100,12 +101,9 @@ virtual	status_t TimeSourceOp(
 
 private:
 
-	friend class _BMediaRosterP;
-	friend class _BTimeSourceP;
-	friend class _SysTimeSource;
 	friend class BMediaNode;
 	friend class BMediaRoster;
-	friend class _ServerApp;
+	friend class BPrivate::media::BMediaRosterEx;
 	friend class BPrivate::media::TimeSourceObject;
 	friend class BPrivate::media::SystemTimeSourceObject;
 

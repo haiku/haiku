@@ -45,6 +45,57 @@ using namespace BPrivate::media;
 DefaultDeleter _deleter;
 
 status_t
+BMediaRosterEx::SaveNodeConfiguration(BMediaNode *node)
+{
+	BMediaAddOn *addon;
+	media_addon_id addonid;
+	int32 flavorid;
+	addon = node->AddOn(&flavorid);
+	if (!addon) {
+		FATAL("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated from BMediaAddOn!\n");
+		return B_ERROR;
+	}
+	addonid = addon->AddonID();
+	
+	// XXX fix this
+	printf("### BMediaRosterEx::SaveNodeConfiguration should save addon-id %ld, flavor-id %ld config NOW!\n", addonid, flavorid);
+	return B_OK;
+}
+
+status_t
+BMediaRosterEx::LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BMessage *out_msg)
+{
+	// XXX fix this
+	out_msg->MakeEmpty(); // to be fully R5 compliant
+	printf("### BMediaRosterEx::LoadNodeConfiguration should load addon-id %ld, flavor-id %ld config NOW!\n", addonid, flavorid);
+	return B_OK;
+}
+
+status_t
+BMediaRosterEx::IncrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid)
+{
+	//perhaps rename all this from dormantnode into addon-flavor or instance
+	return B_OK;
+}
+
+status_t
+BMediaRosterEx::DecrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid)
+{
+	return B_OK;
+}
+	
+status_t
+BMediaRosterEx::SetNodeCreator(media_node_id node, team_id creator)
+{
+	server_set_node_creator_request request;
+	server_set_node_creator_reply reply;
+	
+	request.node = node;
+	request.creator = creator;
+	return QueryServer(SERVER_SET_NODE_CREATOR, &request, sizeof(request), &reply, sizeof(reply));
+}
+
+status_t
 BMediaRosterEx::GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
 {
 	if (out_node == NULL)
@@ -1354,25 +1405,39 @@ BMediaRoster::StopWatching(const BMessenger & where,
 status_t 
 BMediaRoster::RegisterNode(BMediaNode * node)
 {
-	printf("BMediaRoster::RegisterNode %p\n", node);
+	CALLED();
+	// addon-id = -1 (unused), addon-flavor-id = 0 (unused, too)
+	return MediaRosterEx(this)->RegisterNode(node, -1, 0);
+}
+
+
+status_t
+BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 flavorid)
+{
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
 		
-	status_t rv;
-	BMediaAddOn *addon;
-	int32 addon_flavor_id;
-	media_addon_id addon_id;
+	// some sanity check
+	// I'm not sure if the media kit warrants to call BMediaNode::AddOn() here.
+	// Perhaps we don't need it.
+	{
+		BMediaAddOn *addon;
+		int32 addon_flavor_id;
+		media_addon_id addon_id;
+		addon_flavor_id = 0;
+		addon = node->AddOn(&addon_flavor_id);
+		addon_id = addon ? addon->AddonID() : -1;
+		ASSERT(addonid == addon_id);
+		ASSERT(flavorid == addon_flavor_id);
+	}
 	
-	addon_flavor_id = 0;
-	addon = node->AddOn(&addon_flavor_id);
-	addon_id = addon ? addon->AddonID() : -1;
-
+	status_t rv;
 	server_register_node_request request;
 	server_register_node_reply reply;
 	
-	request.addon_id = addon_id;
-	request.addon_flavor_id = addon_flavor_id;
+	request.addon_id = addonid;
+	request.addon_flavor_id = flavorid;
 	strcpy(request.name, node->Name());
 	request.kinds = node->Kinds();
 	request.port = node->ControlPort();
@@ -1444,16 +1509,20 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		printf("BMediaRoster::UnregisterNode, trying to unregister reference counting disabled timesource, node %ld, port %ld, team %ld\n", node->ID(), node->ControlPort(), team);
 		return B_OK;
 	}
-	
-	if (node->fRefCount != 0) {
-		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' has local reference count of %ld\n", node->ID(), node->Name(), node->fRefCount);
-		// no return here, we continue and unregister!
-	}
 	if (node->ID() == NODE_UNREGISTERED_ID) {
 		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' already unregistered\n", node->ID(), node->Name());
 		return B_OK;
 	}
-		
+	if (node->fRefCount != 0) {
+		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' has local reference count of %ld\n", node->ID(), node->Name(), node->fRefCount);
+		// no return here, we continue and unregister!
+	}
+	
+	// Calling BMediaAddOn::GetConfigurationFor(BMediaNode *node, BMessage *config)
+	// if this node was instanciated by an add-on needs to be done *somewhere*
+	// We can't do it here because it is already to late (destructor of the node
+	// might have been called).
+			
 	server_unregister_node_request request;
 	server_unregister_node_reply reply;
 	status_t rv;
@@ -1470,13 +1539,19 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		return rv;
 	}
 	
-	if (reply.addon_id != -1) {
-		// XXX This is a real big problem!
-		// XXX UnregisterNode is called by a dormant node itself, but UnregisterNode will
-		// XXX unload the dormant node image from memory when calling PutAddon
-//		_DormantNodeManager->PutAddon(reply.addon_id);
+	if (reply.addonid != -1) {
+		// Small problem here, we can't use DormantNodeManager::PutAddon(), as
+		// UnregisterNode() is called by a dormant node itself (by the destructor).
+		// The add-on that contains the node needs to remain in memory until the
+		// destructor execution is finished.
+		// DormantNodeManager::PutAddonDelayed() will delay unloading.
+		_DormantNodeManager->PutAddonDelayed(reply.addonid);
 
-		// XXX do "possible_count" increment in the server.
+		rv = MediaRosterEx(this)->DecrementDormantNodeUseCount(reply.addonid, reply.flavorid);
+		if (rv != B_OK) {
+			FATAL("BMediaRoster::UnregisterNode: DecrementDormantNodeUseCount failed\n");
+			// this is really a problem, but we can't fail now
+		}
 	}
 
 	// we are a friend class of BMediaNode and invalidate this member variable
@@ -1651,25 +1726,25 @@ BMediaRoster::GetDormantNodes(dormant_node_info * out_info,
  * Checks concerning global/local are not done here.
  */
 status_t
-BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, media_node *out_node)
+BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, team_id creator, media_node *out_node)
 {
-	// to instantiate a dormant node in the current address space, we need to
-	// either load the add-on from file and create a new BMediaAddOn class, or
-	// reuse the cached BMediaAddOn from a previous call
-	// call BMediaAddOn::InstantiateNodeFor()
-	// and cache the BMediaAddOn after that for later reuse.
-	// BeOS R5 does not seem to delete it when the application quits
+	// This function is always called from the correct context, if the node
+	// is supposed to be global, it is called from the media_addon_server.
+
 	// if B_FLAVOR_IS_GLOBAL, we need to use the BMediaAddOn object that
 	// resides in the media_addon_server
 
 	// RegisterNode() must be called for nodes instantiated from add-ons,
 	// since the media kit warrants that it's done automatically.
 
-	// dormant_node_info::addon			Indicates the ID number of the media add-on in which the node resides.
-	// dormant_node_info::flavor_id		Indicates the internal ID number that the add-on uses to identify the flavor,
-	//									this is the number that was published by BMediaAddOn::GetFlavorAt() int the
-	//									flavor_info::internal_id field.
-
+	// addonid		Indicates the ID number of the media add-on in which the node resides.
+	// flavorid		Indicates the internal ID number that the add-on uses to identify the flavor,
+	//				this is the number that was published by BMediaAddOn::GetFlavorAt() in the
+	//				flavor_info::internal_id field.
+	// creator		The creator team is -1 if nodes are created locally. If created globally,
+	//				it will contain (while called in media_addon_server context) the team-id of
+	// 				the team that requested the instantiation.
+	
 	printf("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld\n", addonid, flavorid);
 
 	// Get flavor_info from the server
@@ -1691,32 +1766,70 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, m
 		return B_ERROR;
 	}
 	
+	// Now we need to try to increment the use count of this addon flavor
+	// in the server. This can fail if the total number instances of this
+	// flavor is limited.
+	rv = IncrementDormantNodeUseCount(addonid, flavorid);
+	if (rv != B_OK) {
+		FATAL("BMediaRosterEx::InstantiateDormantNode error: can't create more nodes for addon-id %ld, flavour-id %ld\n", addonid, flavorid);
+		// Put the addon back into the pool
+		_DormantNodeManager->PutAddon(addonid);
+		return B_ERROR;
+	}
+
 	BMessage config;
-	// XXX get configuration from server and do "possible_count" decrement in the server.
+	rv = LoadNodeConfiguration(addonid, flavorid, &config);
+	if (rv != B_OK) {
+		FATAL("BMediaRosterEx::InstantiateDormantNode: couldn't load configuration for addon-id %ld, flavor-id %ld\n", addonid, flavorid);
+		// do not return, this is a minor problem, not a reason to fail
+	}
 
 	BMediaNode *node;
 	status_t out_error;
 	
+	out_error = B_OK;
 	node = addon->InstantiateNodeFor(&node_info, &config, &out_error);
 	if (!node) {
 		FATAL("BMediaRosterEx::InstantiateDormantNode: InstantiateNodeFor failed\n");
-		// XXX do "possible_count" increment in the server.
+		// Put the addon back into the pool
 		_DormantNodeManager->PutAddon(addonid);
-		return B_ERROR;
+		// We must decrement the use count of this addon flavor in the
+		// server to compensate the increment done in the beginning.
+		rv = DecrementDormantNodeUseCount(addonid, flavorid);
+		if (rv != B_OK) {
+			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementDormantNodeUseCount failed\n");
+		}
+		return (out_error != B_OK) ? out_error : B_ERROR;
 	}
-	rv = RegisterNode(node);
+
+	rv = RegisterNode(node, addonid, flavorid);
 	if (rv != B_OK) {
 		FATAL("BMediaRosterEx::InstantiateDormantNode: RegisterNode failed\n");
 		delete node;
-		// XXX do "possible_count" increment in the server.
+		// Put the addon back into the pool
 		_DormantNodeManager->PutAddon(addonid);
+		// We must decrement the use count of this addon flavor in the
+		// server to compensate the increment done in the beginning.
+		rv = DecrementDormantNodeUseCount(addonid, flavorid);
+		if (rv != B_OK) {
+			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementDormantNodeUseCount failed\n");
+		}
 		return B_ERROR;
 	}
 	
-	// XXX we must remember in_info.addon and call
-	// XXX _DormantNodeManager->PutAddon when the
-	// XXX node is unregistered
-	// should be handled by RegisterNode() and UnregisterNode() now
+	if (creator != -1) {
+		// send a message to the server to assign team "creator" as creator of node "node->ID()"
+		printf("!!! BMediaRosterEx::InstantiateDormantNode assigning team %ld as creator of node %ld\n", creator, node->ID());
+		rv = MediaRosterEx(this)->SetNodeCreator(node->ID(), creator);
+		if (rv != B_OK) {
+			FATAL("BMediaRosterEx::InstantiateDormantNode failed to assign team %ld as creator of node %ld\n", creator, node->ID());
+			// do not return, this is a minor problem, not a reason to fail
+		}
+	}
+	
+	// RegisterNode() does remember the add-on id in the server
+	// and UnregisterNode() will call DormantNodeManager::PutAddon()
+	// when the node is unregistered.
 
 	*out_node = node->Node();
 
@@ -1778,7 +1891,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_GLOBAL, but dormant node has B_FLAVOR_IS_LOCAL\n");
 		return B_BAD_VALUE;
 	}
-//#if 0
+
 	// If either the node, or the caller requested to make the instance global
 	// we will do it by forwarding this request into the media_addon_server, which
 	// in turn will call BMediaRosterEx::InstantiateDormantNode to create the node
@@ -1792,6 +1905,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		status_t rv;
 		request.addonid = in_info.addon;
 		request.flavorid = in_info.flavor_id;
+		request.creator_team = team; // creator team is allowed to also release global nodes
 		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request, sizeof(request), &reply, sizeof(reply));
 		if (rv == B_OK) {
 			*out_node = reply.node;
@@ -1802,10 +1916,9 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 
 	} else {
 	
-		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
+		// creator team = -1, as this is a local node
+		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, -1, out_node);
 	}
-//#endif
-//	return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
 }
 
 									 
@@ -2175,8 +2288,10 @@ BMediaRoster::MessageReceived(BMessage * message)
 			BMediaNode *node;
 			message->FindPointer("node", reinterpret_cast<void **>(&node));
 
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing node %p\n", node);
+			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE saving node %ld configuration\n", node->ID());
+			MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(node);
 
+			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing node %ld\n", node->ID());
 			node->DeleteHook(node); // we don't call Release(), see above!
 			return;
 		}

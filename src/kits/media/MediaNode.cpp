@@ -12,6 +12,7 @@
 #include <FileInterface.h>
 #include <string.h>
 #include "debug.h"
+#include "MediaRosterEx.h"
 #include "DataExchange.h"
 #include "ServerInterface.h"
 #include "Notifications.h"
@@ -106,6 +107,7 @@ BMediaNode::~BMediaNode()
 	if (fTimeSource) {
 		fTimeSource->RemoveMe(this);
 		fTimeSource->Release();
+		fTimeSource = NULL;
 	}
 
 	// Attention! We do not unregister TimeSourceObject nodes,
@@ -136,7 +138,9 @@ BMediaNode *
 BMediaNode::Release()
 {
 	CALLED();
-	if (atomic_add(&fRefCount,-1) == 1) {
+	if (atomic_add(&fRefCount, -1) == 1) {
+		TRACE("BMediaNode::Release() saving node %ld configuration\n", fNodeID);
+		MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(this);
 		if (DeleteHook(this) != B_OK) {
 			FATAL("BMediaNode::Release(): DeleteHook failed\n");
 			return Acquire();
@@ -203,8 +207,8 @@ BMediaNode::TimeSource() const
 	// If the node hasn't been assigned a time source
 	// so far, we assign the system time source. This
 	// can't be done in the BMediaNode constructor, since
-	// a BTimeSource is also a BMediaNode that would be
-	// a infinite loop... loop... loop... loop...
+	// a BTimeSource is also a BMediaNode and that would be
+	// an infinite loop... loop... loop... loop...
 	
 	BMediaRoster *roster = BMediaRoster::Roster();
 	status_t rv;

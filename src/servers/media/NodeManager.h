@@ -16,7 +16,8 @@ struct registered_node
 	char name[B_MEDIA_NAME_LENGTH];
 	uint64 kinds;
 	port_id port;
-	team_id team;
+	team_id creator;	// team that created the node
+	team_id team;		// team that contains the node object
 	int32 globalrefcount;
 	Map<team_id, int32> teamrefcount;
 	List<media_input> inputlist;
@@ -55,7 +56,7 @@ public:
 
 	/* Management of live nodes */
 	status_t RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team);
-	status_t UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team);
+	status_t UnregisterNode(media_addon_id *addonid, int32 *flavorid, media_node_id nodeid, team_id team);
 	status_t GetCloneForId(media_node *node, media_node_id nodeid, team_id team);
 	status_t GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team);
 	status_t ReleaseNode(const media_node &node, team_id team);
@@ -68,6 +69,7 @@ public:
 	status_t GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node);
 	status_t IncrementGlobalRefCount(media_node_id nodeid, team_id team);
 	status_t DecrementGlobalRefCount(media_node_id nodeid, team_id team);
+	status_t SetNodeCreator(media_node_id nodeid, team_id creator);
 	void FinalReleaseNode(media_node_id nodeid);
 
 	/* Add media_node_id of all live nodes to the message

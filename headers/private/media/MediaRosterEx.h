@@ -32,7 +32,16 @@ namespace BPrivate { namespace media {
 class BMediaRosterEx : public BMediaRoster
 {
 public:
-	status_t InstantiateDormantNode(media_addon_id addonid, int32 flavorid, media_node *out_node);
+	status_t SaveNodeConfiguration(BMediaNode *node);
+	status_t LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BMessage *out_msg);
+
+	status_t IncrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid);
+	status_t DecrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid);
+	
+	status_t SetNodeCreator(media_node_id node, team_id creator);
+	
+	status_t RegisterNode(BMediaNode * node, media_addon_id addonid, int32 flavorid);
+	status_t InstantiateDormantNode(media_addon_id addonid, int32 flavorid, team_id creator, media_node *out_node);
 	status_t GetDormantFlavorInfo(media_addon_id addonid, int32 flavorid, dormant_flavor_info *out_flavor);
 	status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
 	status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);

@@ -217,6 +217,13 @@ void AppManager::TerminateAddonServer()
 	}
 }
 
+team_id
+AppManager::AddonServer()
+{
+	// XXX not sure about locking
+	return fAddonServer;
+}
+
 void AppManager::Dump()
 {
 	BAutolock lock(fLocker);

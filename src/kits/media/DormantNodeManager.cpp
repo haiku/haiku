@@ -130,6 +130,15 @@ DormantNodeManager::GetAddon(media_addon_id id)
 	return addon;
 }
 
+void
+DormantNodeManager::PutAddonDelayed(media_addon_id id)
+{
+	// Called from a node destructor of the loaded media-add-on.
+	// We must make sure that the media-add-on stays in memory
+	// a couple of seconds longer.
+
+	UNIMPLEMENTED();	
+}
 
 void
 DormantNodeManager::PutAddon(media_addon_id id)

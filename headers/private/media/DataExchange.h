@@ -97,6 +97,8 @@ enum {
 	SERVER_REGISTER_BUFFER,
 	SERVER_UNREGISTER_BUFFER,
 	SERVER_RESCAN_DEFAULTS,
+	SERVER_SET_NODE_CREATOR,
+	SERVER_CHANGE_DORMANT_NODE_USECOUNT,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -228,6 +230,7 @@ struct addonserver_instantiate_dormant_node_request : public request_data
 {
 	media_addon_id addonid;
 	int32 flavorid;
+	team_id creator_team;
 };
 
 struct addonserver_instantiate_dormant_node_reply : public reply_data
@@ -665,7 +668,26 @@ struct server_unregister_app_reply : public reply_data
 {
 };
 
+struct server_set_node_creator_request : public request_data
+{
+	media_node_id node;
+	team_id creator;
+};
 
+struct server_set_node_creator_reply : public reply_data
+{
+};
+
+struct server_change_dormant_node_usecount_request : public request_data
+{
+	media_addon_id addon_id;
+	int32 addon_flavor_id;
+	int32 delta;
+};
+
+struct server_change_dormant_node_usecount_reply : public reply_data
+{
+};
 
 struct server_register_node_request : public request_data
 {
@@ -690,7 +712,8 @@ struct server_unregister_node_request : public request_data
 
 struct server_unregister_node_reply : public reply_data
 {
-	media_addon_id addon_id;
+	media_addon_id addonid;
+	int32 flavorid;
 };
 
 struct server_get_live_node_info_request : public request_data

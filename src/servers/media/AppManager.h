@@ -17,6 +17,7 @@ public:
 	bool HasTeam(team_id);
 	void StartAddonServer();
 	void TerminateAddonServer();
+	team_id AddonServer();
 	
 	void Dump();	
 	

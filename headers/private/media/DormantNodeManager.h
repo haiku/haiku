@@ -11,17 +11,27 @@
 namespace BPrivate {
 namespace media {
 
+// To instantiate a dormant node in the current address space, we need to
+// either load the add-on from file and create a new BMediaAddOn class and
+// cache the BMediaAddOn after that for later reuse, or reuse the cached
+// BMediaAddOn if we already have one.
+// This is handled by the DormantNodeManager.
+//
+// GetAddon() will provide a ready to use BMediaAddOn, while
+// PutAddonDelayed() will unload it when it's no longer needed,
+// but will delay the unloading slightly, because it is called
+// from a node destructor of the loaded add-on.
+
 class DormantNodeManager
 {
 public:
 	DormantNodeManager();
 	~DormantNodeManager();
 
-//	InstantiateDormantNode(const dormant_node_info & in_info, bool global, media_node * out_node);
-
-	// Be careful, GetAddon and PutAddon must be balanced.
+	// Be careful, GetAddon and PutAddon[Delayed] must be balanced.
 	BMediaAddOn *GetAddon(media_addon_id id);
 	void PutAddon(media_addon_id id);
+	void PutAddonDelayed(media_addon_id id);
 
 	// For use by media_addon_server only
 	media_addon_id RegisterAddon(const char *path);
