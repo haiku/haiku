@@ -76,6 +76,7 @@ public:
 	
 	bool ShowsFirstPage() const;
 	bool ShowsLastPage() const;
+	int CurrentPage() const { return fPage + 1; }
 	int NumberOfPages() const;
 	void ShowNextPage();
 	void ShowPrevPage();
@@ -88,6 +89,7 @@ public:
 
 class PreviewWindow : public BlockingWindow {
 	BButton *fNext, *fPrev, *fZoomIn, *fZoomOut;
+	BStringView* fPageText;
 	PreviewView* fPreview;
 	BScrollView* fPreviewScroller;
 	float fButtonBarHeight;

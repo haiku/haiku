@@ -28,6 +28,7 @@ THE SOFTWARE.
 */
 
 #include <Debug.h>
+#include <String.h>
 
 #include "Preview.h"
 
@@ -174,15 +175,15 @@ void PreviewView::DrawPage(BRect rect)
 	// draw page contents
 	PushState();
 	
+	// print job coordinates are relative to the printable rect
 	BRect printRect = fReader.PrintableRect();
 	SetOrigin(kPreviewLeftMargin + printRect.left*ZoomFactor(), 
 		kPreviewTopMargin + printRect.top*ZoomFactor() );
 	
-	SetScale(ZoomFactor());
+	SetScale(ZoomFactor() * fReader.GetScale());
 	fCachedPage->Draw(this);
 	PopState();
 }
-
 
 void PreviewView::Draw(BRect rect) {
 	if (fReader.InitCheck() == B_OK) {
@@ -280,6 +281,9 @@ void PreviewView::FixScrollbars() {
 PreviewWindow::PreviewWindow(BFile* jobFile) 
 	: BlockingWindow(BRect(20, 24, 400, 600), "Preview", B_DOCUMENT_WINDOW, 0)
 {
+	const float kButtonDistance = 30;
+	const float kPageTextDistance = 15;
+	
 	float top = 7;
 	float left = 20;
 	float width, height;
@@ -294,17 +298,32 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 	fPrev->ResizeToPreferred();
 	width = fPrev->Bounds().Width()+1;
 	height = fPrev->Bounds().Height()+1;
-	left = fPrev->Frame().right + 30;
+	left = fPrev->Frame().right + kButtonDistance;
 	
 	fNext = new BButton(BRect(left, top, left+10, top+10), "Next", "Next Page", new BMessage(MSG_NEXT_PAGE));
 	AddChild(fNext);
 	fNext->ResizeTo(width, height);
-	left = fNext->Frame().right + 70;
+	left = fNext->Frame().right + kPageTextDistance;
+	
+	fPageText = new BStringView(BRect(left, top, left + 100, top + 15), "pageText", "");
+	fPageText->SetAlignment(B_ALIGN_CENTER);
+	AddChild(fPageText);
+		// estimate max. width
+	float pageTextWidth = fPageText->StringWidth("Page 99999 of 99999 Pages");
+		// estimate height
+	BFont font;
+	fPageText->GetFont(&font);
+	float pageTextHeight = font.Size() + 2;
+		// resize to estimated size
+	fPageText->ResizeTo(pageTextWidth, pageTextHeight);
+	left += pageTextWidth + kPageTextDistance;
+	fPageText->MoveBy(0, (height - font.Size()) / 2);
+	
 	
 	fZoomIn = new BButton(BRect(left, top, left+10, top+10), "ZoomIn", "Zoom In", new BMessage(MSG_ZOOM_IN));
 	AddChild(fZoomIn);
 	fZoomIn->ResizeTo(width, height);
-	left = fZoomIn->Frame().right + 30;
+	left = fZoomIn->Frame().right + kButtonDistance;
 	
 	fZoomOut = new BButton(BRect(left, top, left+10, top+10), "ZoomOut", "Zoom Out", new BMessage(MSG_ZOOM_OUT));
 	AddChild(fZoomOut);
@@ -363,6 +382,17 @@ void PreviewWindow::UpdateControls() {
 	fNext->SetEnabled(!fPreview->ShowsLastPage());
 	fZoomIn->SetEnabled(fPreview->CanZoomIn());
 	fZoomOut->SetEnabled(fPreview->CanZoomOut());
+	
+	BString text("Page ");
+	text << fPreview->CurrentPage() 
+		<< " of " 
+		<< fPreview->NumberOfPages();
+	if (fPreview->NumberOfPages() == 1) {
+		text << " Page";
+	} else {
+		text << " Pages";
+	}
+	fPageText->SetText(text.String());
 }
 
 void PreviewWindow::MessageReceived(BMessage* m) {

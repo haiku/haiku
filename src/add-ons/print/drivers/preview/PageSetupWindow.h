@@ -68,6 +68,7 @@ private:
 	BMessage *				fSetupMsg;
 	BMenuField *			fPageSizeMenu;
 	BMenuField *			fOrientationMenu;
+	BTextControl *          fScaleControl;
 		
 	void					UpdateSetupMessage();
 

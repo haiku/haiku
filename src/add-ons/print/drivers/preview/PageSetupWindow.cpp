@@ -29,6 +29,8 @@ THE SOFTWARE.
 
 */
 
+#include <stdlib.h>
+
 #include <InterfaceKit.h>
 #include <SupportKit.h>
 #include "PrinterDriver.h"
@@ -196,8 +198,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	mf->MenuItem()->SetLabel(item->Label());
 
 	// add orientation menu
-	y += h + kMargin;
-	 
+	y += h + kMargin;	 
 	m = new BPopUpMenu("orientation");
 	m->SetRadioMode(true);
 	
@@ -231,6 +232,28 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 ///////////////////
 	item->SetMarked(true);
 	mf->MenuItem()->SetLabel(item->Label());
+	
+	// add scale text control
+	y += h + kMargin;	 
+	BString scale;
+	float scale0;
+	if (fSetupMsg->FindFloat("scale", &scale0) == B_OK) {
+		scale << (int)(100.0 * scale0);
+	} else {
+		scale = "100";
+	}
+	fScaleControl = new BTextControl(BRect(x, y, x + 100, y + 20), "scale", "Scale [%]:", 
+									scale.String(),
+	                                NULL, B_FOLLOW_RIGHT);
+	int num;
+	for (num = 0; num <= 255; num++) {
+		fScaleControl->TextView()->DisallowChar(num);
+	}
+	for (num = 0; num <= 9; num++) {
+		fScaleControl->TextView()->AllowChar('0' + num);
+	}
+
+	panel->AddChild(fScaleControl);	
 
 	// add a "OK" button, and make it default
 	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG), 
@@ -318,6 +341,17 @@ PageSetupWindow::UpdateSetupMessage()
 		} else {
 			fSetupMsg->AddInt32("units", units);
 		}	
+	}
+	
+	// scaling factor
+	float scale = atoi(fScaleControl->Text()) / 100.0;
+	if (scale <= 0.0) { // sanity check
+		scale = 1.0;
+	}
+	if (fSetupMsg->HasFloat("scale")) {
+		fSetupMsg->ReplaceFloat("scale", scale);
+	} else {
+		fSetupMsg->AddFloat("scale", scale);
 	}
 }
 
