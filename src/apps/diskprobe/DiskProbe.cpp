@@ -243,11 +243,22 @@ DiskProbe::Probe(entry_ref &ref, const char *attribute)
 		probeWindows++;
 	}
 
-	// Does the file really exists?
-	BFile file;
-	status_t status = file.SetTo(&ref, B_READ_ONLY);
+	// Does the file really exist?
+	BEntry entry;
+	status_t status = entry.SetTo(&ref, true);
 	if (status < B_OK)
 		return status;
+	if (!entry.Exists())
+		return B_ENTRY_NOT_FOUND;
+
+	entry.GetRef(&ref);
+
+	// If it's a directory, we won't handle it, but we would accept a volume
+	if (entry.IsDirectory()) {
+		BDirectory directory(&entry);
+		if (directory.InitCheck() != B_OK || !directory.IsRootDirectory())
+			return B_IS_A_DIRECTORY;
+	}
 
 	// cascade window
 	BRect rect = fWindowFrame;
@@ -275,7 +286,18 @@ DiskProbe::RefsReceived(BMessage *message)
 		const char *attribute = NULL;
 		message->FindString("attributes", index - 1, &attribute);
 
-		Probe(ref, attribute);
+		status_t status = Probe(ref, attribute);
+		if (status != B_OK) {
+			char buffer[1024];
+			snprintf(buffer, sizeof(buffer),
+				"Could not open \"%s\":\n"
+				"%s",
+				ref.name, strerror(status));
+
+			(new BAlert("DiskProbe request",
+				buffer, "Ok", NULL, NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		}
 	}
 }
 
@@ -358,15 +380,15 @@ DiskProbe::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2004, OpenBeOS.\n\n\n"
-		"original Be version by Robert Polic\n\n", "Ok");
+		"\tCopyright 2004, OpenBeOS.\n\n"
+		"original Be version by Robert Polic\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
 
 	view->GetFont(&font);
-	font.SetSize(24);
+	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE); 			
 	view->SetFontAndColor(0, 9, &font);
 
