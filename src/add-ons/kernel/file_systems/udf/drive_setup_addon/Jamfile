@@ -6,8 +6,6 @@ oldOPTIM = $(OPTIM) ;
 # set some additional defines
 {
 	local defines =
-		KEEP_WRONG_DIRENT_RECLEN
-		USER
 		DRIVE_SETUP_ADDON
 		;
 
