@@ -1,0 +1,31 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+//----------------------------------------------------------------------
+
+/*! \file ProgressListener.h
+
+	Interface for receiving progress information updates from an
+	executing UdfBuilder object.
+*/
+
+#ifndef _PROGRESS_LISTENER_H
+#define _PROGRESS_LISTENER_H
+
+enum VerbosityLevel {
+	VERBOSITY_NONE,
+	VERBOSITY_LOW,
+	VERBOSITY_HIGH,
+};
+
+class ProgressListener {
+public:
+	virtual void OnError(const char *message) const = 0;
+	virtual void OnWarning(const char *message) const = 0;
+	virtual void OnUpdate(VerbosityLevel level, const char *message) const = 0;
+	virtual void OnCompletion(bool successful, const char *message) const = 0;		
+};
+
+#endif	// _PROGRESS_LISTENER_H
