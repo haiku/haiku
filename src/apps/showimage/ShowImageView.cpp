@@ -1322,10 +1322,6 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 				}
 				ClearSelection();
 				break;
-			case 'T':
-			case 't':
-				SetIcon(*bytes == 't');
-				break;
 		}	
 	}
 }
