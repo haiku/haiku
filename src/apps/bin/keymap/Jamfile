@@ -4,3 +4,31 @@ BinCommand keymap :
 	key_map.cpp
 	Keymap.cpp
 	: be ;
+
+rule MkKeymapComp
+{
+	local binary = $(1) ;
+	local source = $(2) ;
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	MakeLocate $(binary) : [ FDirName $(OBOS_ETC_DIR) Keymap ] ;
+
+	Depends files : $(binary) ;
+	Depends $(binary) : $(source) keymap ;
+	MkKeymapComp1 $(binary) : keymap $(source) ;
+	LocalClean clean : $(binary) ;
+}
+
+actions MkKeymapComp1
+{
+	$(2[1]) -o $(1) -c $(2[2-]) ;
+}
+
+local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
+
+# generate the binary file for the keymap files
+local keymapFile ;
+for keymapFile in [ FGristFiles $(keymapFiles) ] {
+	local binary = $(keymapFile:B) ;
+	MkKeymapComp $(binary) : $(keymapFile) ;
+}
