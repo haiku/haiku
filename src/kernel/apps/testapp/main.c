@@ -12,9 +12,9 @@
 #include <OS.h>
 
 static void port_test(void);
-static int port_test_thread_func(void* arg);
+static int32 port_test_thread_func(void* arg);
 
-static int test_thread(void *args)
+static int32 test_thread(void *args)
 {
 	int i = (int)args;
 
@@ -25,18 +25,18 @@ static int test_thread(void *args)
 	return 0;
 }
 
-static int dummy_thread(void *args)
+static int32 dummy_thread(void *args)
 {
 	return 1;
 }
 
-static int cpu_eater_thread(void *args)
+static int32 cpu_eater_thread(void *args)
 {
 	for(;;)
 		;
 }
 
-static int fpu_cruncher_thread(void *args)
+static int32 fpu_cruncher_thread(void *args)
 {
 	double y = *(double *)args;
 	double z;
@@ -480,7 +480,7 @@ static void port_test(void)
 	printf("porttest: end test main thread\n");
 }
 
-static int port_test_thread_func(void* arg)
+static int32 port_test_thread_func(void* arg)
 {
 	int msg_code;
 	int n;
