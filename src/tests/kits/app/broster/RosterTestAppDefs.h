@@ -14,6 +14,10 @@ enum {
 	MSG_MESSAGE_RECEIVED	= 'mesg',	// "message": B_MESSAGE_TYPE
 	MSG_QUIT_REQUESTED		= 'quit',	//
 	MSG_READY_TO_RUN		= 'redy',	//
+	MSG_1					= 'msg1',	//
+	MSG_2					= 'msg2',	//
+	MSG_3					= 'msg3',	//
+	MSG_REPLY				= 'rply',	//
 };
 
 // Argh, a macro! But that way, we avoid a compiler warning.
