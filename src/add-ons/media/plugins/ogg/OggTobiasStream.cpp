@@ -168,11 +168,11 @@ OggTobiasStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	}
 	*chunkBuffer = fChunkPacket.packet;
 	*chunkSize = fChunkPacket.bytes;
-//	bool keyframe = fChunkPacket.packet[0] & (1 << 3); // ??
-	if (mediaHeader->type == B_MEDIA_ENCODED_VIDEO) {
+	bool keyframe = fChunkPacket.packet[0] & (1 << 3); // ??
+	if (fMediaFormat.type == B_MEDIA_ENCODED_VIDEO) {
 		mediaHeader->type = fMediaFormat.type;
 		mediaHeader->start_time = fCurrentTime;
-//		mediaHeader->u.encoded_video.field_flags = (keyframe ? B_MEDIA_KEY_FRAME : 0);
+		mediaHeader->u.encoded_video.field_flags = (keyframe ? B_MEDIA_KEY_FRAME : 0);
 		mediaHeader->u.encoded_video.first_active_line
 		   = fMediaFormat.u.encoded_video.output.first_active;
 		mediaHeader->u.encoded_video.line_count
