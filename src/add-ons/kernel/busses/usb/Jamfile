@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel busses usb ;
 
+AddResources uhci : uhci.rdef ;
+
 R5KernelAddon uhci : [ FDirName kernel busses usb ] :
 	uhci.c
 	;

@@ -40,6 +40,8 @@ void silent( const char * , ... ) {}
 static status_t init_hardware(void);
 static status_t submit_packet( usb_packet_t *packet );
 static status_t rh_submit_packet( usb_packet_t *packet );
+static void     rh_update_port_status(void);
+//static int32    uhci_interrupt( void *d );
 
 /* ++++++++++
 This is the implementation of the UHCI controller for the OpenBeOS USB stack
@@ -92,6 +94,7 @@ typedef struct uhci_properties
 	
 	//Root hub:
 	uint8		rh_address;		// the address of the root hub
+	usb_port_status port_status[2]; // the port status (maximum of two)
 } uhci_properties_t;
 
 static pci_module_info 	*m_pcimodule = 0;
@@ -189,12 +192,23 @@ init_hardware(void)
 		return ENODEV;
 	}
 	
+	// Poll the status of the two ports
+	rh_update_port_status();
+	TRACE( "USB UHCI: init_hardware(): port1: %x port2: %x\n",
+	       m_data->port_status[0].status , m_data->port_status[1].status );
+
 	//Set up the frame list
-	m_data->framearea = map_physical_memory( "uhci framelist" , m_data->framelist_phy ,
+	/*m_data->framearea = map_physical_memory( "uhci framelist" , m_data->framelist_phy ,
 	                                         4096 , B_ANY_KERNEL_BLOCK_ADDRESS ,
 	                                         B_WRITE_AREA , m_data->framelist );
 	                                         
 	//!!!!!!!!!!!!!! Check the area
+	*/
+	
+	// Install the interrupt handler
+	//install_io_interrupt_handler( m_data->pcii->h0.interrupt_line ,
+	//							  uhci_interrupt , m_data , NULL ); 
+	//m_pcimodule->write_io_16( m_data->reg_base + USBINTR ,    
 	
 	//This is enough for now, the most time consuming hardware tasks have been done now
 	return B_OK;
@@ -271,20 +285,53 @@ usb_endpoint_descriptor uhci_endd =
 	USB_REQTYPE_DEVICE_IN | 1, //1 from freebsd driver
 	0x3 ,					// Interrupt
 	8 ,						// Max packet size
-	0xFF					// Interval
+	0xFF					// Interval 256
 };
 
+usb_hub_descriptor uhci_hubd =
+{
+	0x09 ,					//Including deprecated powerctrlmask
+	USB_DESCRIPTOR_HUB,
+	1,						//Number of ports
+	0x02 | 0x01 ,			//Hub characteristics FIXME
+	50 ,					//Power on to power good
+	0,						// Current
+	0x00					//Both ports are removable
+};
 
-
-status_t rh_submit_packet( usb_packet_t *packet )
+status_t 
+rh_submit_packet( usb_packet_t *packet )
 {
 	usb_request_data *request = (usb_request_data *)packet->requestdata;
 	status_t retval;
 	
-	TRACE( "USB UHCI: rh_submit_packet called\n" );
+	uint16 port; //used in RH_CLEAR/SET_FEATURE
+	
+	TRACE( "USB UHCI: rh_submit_packet called. Request: %u\n" , request->Request );
 	
 	switch( request->Request )
 	{
+	case RH_GET_STATUS:
+		if ( request->Index == 0 )
+		{
+			//Get the hub status -- everything as 0 means that it is all-rigth
+			memset( packet->buffer , NULL , sizeof(get_status_buffer) );
+			retval = B_OK;
+			break;
+		}
+		else if (request->Index > uhci_hubd.bNbrPorts )
+		{
+			//This port doesn't exist
+			retval = EINVAL;
+			break;
+		}
+		//Get port status
+		rh_update_port_status();
+		memcpy( packet->buffer , (void *)&(m_data->port_status[request->Index - 1]) , packet->bufferlength );
+		*(packet->actual_length) = packet->bufferlength;
+		retval = B_OK;
+		break;
+
 	case RH_SET_ADDRESS:
 		if ( request->Value >= 128 )
 		{
@@ -295,6 +342,7 @@ status_t rh_submit_packet( usb_packet_t *packet )
 		m_data->rh_address = request->Value;
 		retval = B_OK;
 		break;
+	
 	case RH_GET_DESCRIPTOR:
 		{
 			TRACE( "USB UHCI: rh_submit_packet GET_DESC: %d\n" , request->Value );
@@ -310,7 +358,19 @@ status_t rh_submit_packet( usb_packet_t *packet )
 				*(packet->actual_length) = packet->bufferlength;
 				retval =  B_OK;
 				break;
-			case RH_SET_CONFIG:
+			case RH_INTERFACE_DESCRIPTOR:
+				memcpy( packet->buffer , (void *)&uhci_intd , packet->bufferlength );
+				*(packet->actual_length) = packet->bufferlength;
+				retval = B_OK ;
+				break;
+			case RH_ENDPOINT_DESCRIPTOR:
+				memcpy( packet->buffer , (void *)&uhci_endd , packet->bufferlength );
+				*(packet->actual_length) = packet->bufferlength;
+				retval = B_OK ;
+				break;
+			case RH_HUB_DESCRIPTOR:
+				memcpy( packet->buffer , (void *)&uhci_hubd , packet->bufferlength );
+				*(packet->actual_length) = packet->bufferlength;
 				retval = B_OK;
 				break;
 			default:
@@ -319,6 +379,44 @@ status_t rh_submit_packet( usb_packet_t *packet )
 			}
 			break;
 		}
+
+	case RH_SET_CONFIG:
+		retval = B_OK;
+		break;
+
+	case RH_CLEAR_FEATURE:
+		if ( request->Index == 0 )
+		{
+			//We don't support any hub changes
+			TRACE( "UHCI: RH_CLEAR_FEATURE no hub changes!\n" );
+			retval = EINVAL;
+			break;
+		}
+		else if ( request->Index > uhci_hubd.bNbrPorts )
+		{
+			//Invalid port number
+			TRACE( "UHCI: RH_CLEAR_FEATURE invalid port!\n" );
+			retval = EINVAL;
+			break;
+		}
+		
+		TRACE("UHCI: RH_CLEAR_FEATURE called. Feature: %u!\n" , request->Value );
+		switch( request->Value )
+		{
+		case C_PORT_CONNECTION:
+			port = m_pcimodule->read_io_16( m_data->reg_base + UHCI_PORTSC1 + (request->Index - 1 ) * 2 );
+			port = port & UHCI_PORTSC_DATAMASK;
+			port |= UHCI_PORTSC_STATCHA;
+			TRACE( "UHCI rh: port: %x\n" , port );
+			m_pcimodule->write_io_16( m_data->reg_base + UHCI_PORTSC1 + (request->Index - 1 ) * 2 , port );
+			retval = B_OK;
+			break;
+		default:
+			retval = EINVAL;
+			break;
+		} //switch( packet->value) 
+		break;
+		
 	default: 
 		retval = EINVAL;
 		break;
@@ -327,4 +425,45 @@ status_t rh_submit_packet( usb_packet_t *packet )
 	return retval;
 } 	
 
+void
+rh_update_port_status(void)
+{
+	int i;
+	for ( i = 0; i <= 1 ; i++ )
+	{
+		uint16 newstatus = 0;
+		uint16 newchange = 0;
+		
+		uint16 portsc = m_pcimodule->read_io_16( m_data->reg_base + UHCI_PORTSC1 + i * 2 );
+		dprintf( "USB UHCI: port status: 0x%x\n" , portsc );
+		//Set all individual bits
+		if ( portsc & UHCI_PORTSC_CURSTAT )
+			newstatus |= PORT_STATUS_CONNECTION;
 
+		if ( portsc & UHCI_PORTSC_STATCHA )
+			newchange |= PORT_STATUS_CONNECTION;
+		
+		if ( portsc & UHCI_PORTSC_ENABLED )
+			newstatus |= PORT_STATUS_ENABLE;
+		
+		if ( portsc & UHCI_PORTSC_ENABCHA )
+			newchange |= PORT_STATUS_ENABLE;
+			
+		// TODO: work out suspended/resume
+		
+		if ( portsc & UHCI_PORTSC_RESET )
+			newstatus |= PORT_STATUS_RESET;
+		
+		//TODO: work out reset change...
+		
+		//The port is automagically powered on
+		newstatus |= PORT_POWER;
+		
+		if ( portsc & UHCI_PORTSC_LOWSPEED )
+			newstatus |= PORT_LOW_SPEED;
+			
+		//Update the stored port status
+		m_data->port_status[i].status = newstatus;
+		m_data->port_status[i].change = newchange;
+	}
+}

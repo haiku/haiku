@@ -66,9 +66,18 @@
 #define UHCI_USBINTR_SHORT 0x8	// Short packet interrupt enable
 
 //PORTSC
-#define UHCI_PORTSC_CURSTAT 0x1	// Current connect status
-#define UHCI_PORTSC_STATCHA 0x2 // Current connect status change
-#define UHCI_PORTSC_ENABLED 0x4 // Port enabled/disabled
+#define UHCI_PORTSC_CURSTAT  0x1  // Current connect status
+#define UHCI_PORTSC_STATCHA  0x2  // Current connect status change
+#define UHCI_PORTSC_ENABLED  0x4  // Port enabled/disabled
+#define UHCI_PORTSC_ENABCHA  0x8  // Change in enabled/disabled
+#define UHCI_PORTSC_LINE_0   0x10 // The status of D+ /D-
+#define UHCI_PORTSC_LINE_1   0x20
+#define UHCI_PORTSC_RESUME   0x40 // Something with the suspend state ???
+#define UHCI_PORTSC_LOWSPEED 0x100// Low speed device attached?
+#define UHCI_PORTSC_RESET    0x200// Port is in reset
+#define UHCI_PORTSC_SUSPEND  0x1000//Set port in suspend state
+
+#define UHCI_PORTSC_DATAMASK 0x13F5 //Mask that excludes the change bits of portsc
 
 /************************************************************
  * Hardware structs                                         *
@@ -95,12 +104,25 @@ struct uhci_qh
 /************************************************************
  * Roothub Emulation                                        *
  ************************************************************/
-#define RH_GET_DESCRIPTOR 6
+#define RH_GET_STATUS 0
+#define RH_CLEAR_FEATURE 1
+#define RH_SET_FEATURE 3
 #define RH_SET_ADDRESS 5
+#define RH_GET_DESCRIPTOR 6
 #define RH_SET_CONFIG 9
 
 //Descriptors (in usb_request_data->Value)
 #define RH_DEVICE_DESCRIPTOR ( 1 << 8 )
 #define RH_CONFIG_DESCRIPTOR ( 2 << 8 )
+#define RH_INTERFACE_DESCRIPTOR ( 4 << 8 )
+#define RH_ENDPOINT_DESCRIPTOR ( 5 << 8 )
+#define RH_HUB_DESCRIPTOR ( 0x29 << 8 )
+
+//Hub/Portstatus buffer
+typedef struct
+{
+	uint16 status;
+	uint16 change;
+} get_status_buffer;
 
 #endif
