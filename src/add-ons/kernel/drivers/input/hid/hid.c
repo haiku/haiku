@@ -42,7 +42,7 @@ const char *mouse_base_name = "input/mouse/usb/";
 
 my_device_info *
 create_device(const usb_device *dev, const usb_interface_info *ii,
-	bool is_keyboard)
+	uint16 ifno, bool is_keyboard)
 {
 	my_device_info *my_dev = NULL;
 	int number;
@@ -94,6 +94,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 
 	sprintf(my_dev->name, "%s%d", base_name, number);
 	my_dev->dev = dev;
+	my_dev->ifno = ifno;
 	my_dev->open = 0;
 	my_dev->open_fds = NULL;
 	my_dev->active = true;
@@ -369,6 +370,9 @@ const uint32 key_table[] = {
 	
 };
 
+// here we don't need to follow a report descriptor for typical keyboards
+// TODO : but we should for keypads for example because they aren't boot keyboard devices !
+// see hidparse.c
 static void
 interpret_kb_buffer(my_device_info *my_dev)
 {
@@ -435,6 +439,33 @@ interpret_kb_buffer(my_device_info *my_dev)
 			break;
 			
 }
+
+
+// TODO : here we don't follow a report descriptor but we actually should
+// see hidparse.c
+static void
+set_leds(my_device_info *my_dev, uint8* data)
+{
+	status_t st;
+	size_t actual = 1;
+	uint8 leds = 0;
+	int report_id = 0;
+	if (data[0] == 1)
+		leds |= (1 << 0); 
+	if (data[1] == 1)
+		leds |= (1 << 1); 
+	if (data[2] == 1)
+		leds |= (1 << 2);
+	
+	st = usb->send_request (my_dev->dev, 
+		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
+		0x09,
+		0x200 | report_id, my_dev->ifno, actual, 
+		&leds, actual, &actual);
+	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, st=%d, len=%d\n", 
+		leds, (int) st, (int)actual));
+}
+
 
 /*
 	callback: got a report, issue next request
@@ -610,7 +641,7 @@ kb_device_added(const usb_device *dev, void **cookie)
 
 	is_keyboard = memcmp (rep_desc, "\x05\x01\x09\x06", 4) == 0;
 
-	if ((my_dev = create_device (dev, intf, is_keyboard)) == NULL) {
+	if ((my_dev = create_device (dev, intf, ifno, is_keyboard)) == NULL) {
 		free (rep_desc);
 		return B_ERROR;
 	}
@@ -655,7 +686,7 @@ kb_device_added(const usb_device *dev, void **cookie)
 	my_dev->timestamp = system_time ();
 
 	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)my_dev->buffer)), *(((uint32*)my_dev->buffer)+1), *(((uint32*)my_dev->buffer)+2)));
-		
+	
 	/* issue interrupt transfer */
 
 	my_dev->ept = &intf->endpoint [0];		/* interrupt IN */
@@ -785,24 +816,28 @@ my_device_control(driver_cookie *cookie, uint32 op,
 	if (!my_dev->active)
 		return B_ERROR;		/* already unplugged */
 
-	switch (op) {
-		case 0x270f:
-    		err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-    		if (err != B_OK)
+	if (my_dev->is_keyboard) {
+		switch (op) {
+			case 0x270f:
+	    		err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
+	    		if (err != B_OK)
+					return err;
+				cbuf_getn(my_dev->cbuf, arg, sizeof(raw_key_info));
 				return err;
-			cbuf_getn(my_dev->cbuf, arg, sizeof(raw_key_info));
-			return err;
-			break;
-    
-		case 0x2711:
-		
-			break; 
+				break;
+	    
+			case 0x2711:
+				set_leds(my_dev, (uint8 *)arg);
+				break; 
+	
+			default:
+				/* not implemented */
+				break;
+		}
 
-		default:
-			/* not implemented */
-			break;
+	} else {
+	
 	}
-
 	return err;
 }
 

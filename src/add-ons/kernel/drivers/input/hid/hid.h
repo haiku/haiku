@@ -118,6 +118,7 @@ typedef struct my_device_info
 	
 	uint8 last_buffer[32];
 	const usb_device *dev;
+	uint16 ifno;
 	char name[30];
 	
 	cbuffer *cbuf;
@@ -140,17 +141,15 @@ typedef struct my_device_info
 	bool is_keyboard;
 } my_device_info;
 
-/* driver.c */
+/* hid.c */
 
 extern usb_module_info *usb;
 extern const char *my_driver_name;
 extern const char *keyboard_base_name;
 extern const char *mouse_base_name;
 
-/* devmgmt.c */
-
 my_device_info *
-create_device (const usb_device *dev, const usb_interface_info *ii, bool is_keyboard);
+create_device (const usb_device *dev, const usb_interface_info *ii, uint16 ifno, bool is_keyboard);
 
 void 
 remove_device (my_device_info *my_dev);
