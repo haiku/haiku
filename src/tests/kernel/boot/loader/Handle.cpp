@@ -13,6 +13,12 @@
 #include <unistd.h>
 
 
+#ifndef HAVE_READ_POS
+#	define read_pos(fd, pos, buffer, size) pread(fd, buffer, size, pos)
+#	define write_pos(fd, pos, buffer, size) pwrite(fd, buffer, size, pos)
+#endif
+
+
 Handle::Handle(int handle, bool takeOwnership)
 	:
 	fHandle(handle),
@@ -49,14 +55,14 @@ Handle::SetHandle(int handle, bool takeOwnership)
 ssize_t
 Handle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	return pread(fHandle, buffer, bufferSize, pos);
+	return read_pos(fHandle, pos, buffer, bufferSize);
 }
 
 
 ssize_t
 Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
-	return pwrite(fHandle, buffer, bufferSize, pos);
+	return write_pos(fHandle, pos, buffer, bufferSize);
 }
 
 

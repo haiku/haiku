@@ -23,7 +23,8 @@ ObjectDefines
 if $(OS) = "LINUX" {
 #	SubDirC++Flags -include /usr/include/stdio.h ;
 } else {
-	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
+#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
+	SubDirC++Flags -DHAVE_READ_POS=1 ;
 }
 
 SimpleTest BootLoaderTest :
