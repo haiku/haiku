@@ -6,6 +6,7 @@ KernelMergeObject posix_sys.o :
 	<$(SOURCE_GRIST)>mkdir.c
  	<$(SOURCE_GRIST)>select.c
  	<$(SOURCE_GRIST)>sysctl.c
+ 	<$(SOURCE_GRIST)>gettimeofday.c
 	:
 	-fPIC -DPIC
 	;
@@ -15,4 +16,5 @@ MergeObjectFromObjects kernel_posix_sys.o :
 	<$(SOURCE_GRIST)>stat.o
 	<$(SOURCE_GRIST)>mkdir.o
  	<$(SOURCE_GRIST)>select.o
+ 	<$(SOURCE_GRIST)>gettimeofday.o
 	;
