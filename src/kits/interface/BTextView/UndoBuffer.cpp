@@ -264,7 +264,8 @@ _BTypingUndoBuffer_::_BTypingUndoBuffer_(BTextView *textView)
 	_BUndoBuffer_(textView, B_UNDO_TYPING),
 	fTypedText(NULL),
 	fTypedStart(fStart),
-	fNumBytes(0)
+	fTypedEnd(fEnd),
+	fUndone(0)
 {
 }
 
@@ -278,14 +279,18 @@ _BTypingUndoBuffer_::~_BTypingUndoBuffer_()
 void
 _BTypingUndoBuffer_::UndoSelf(BClipboard *clipboard)
 {
+	int32 len = fTypedEnd - fTypedStart;
+	
 	free(fTypedText);
-	fTypedText = (char *)malloc(fNumBytes);
-	memcpy(fTypedText, fTextView->Text() + fTypedStart, fNumBytes);
+	fTypedText = NULL;
+	fTypedText = (char *)malloc(len);
+	memcpy(fTypedText, fTextView->Text() + fTypedStart, len);
 	
 	fTextView->Select(fTypedStart, fTypedStart);
-	fTextView->Delete(fTypedStart, fTypedStart + fNumBytes);
+	fTextView->Delete(fTypedStart, fTypedEnd);
 	fTextView->Insert(fTextData, fTextLength);
 	fTextView->Select(fStart, fEnd);
+	fUndone++;
 }
 
 
@@ -294,7 +299,8 @@ _BTypingUndoBuffer_::RedoSelf(BClipboard *clipboard)
 {	
 	fTextView->Select(fTypedStart, fTypedStart);
 	fTextView->Delete(fTypedStart, fTypedStart + fTextLength);
-	fTextView->Insert(fTypedText, fNumBytes);
+	fTextView->Insert(fTypedText, fTypedEnd - fTypedStart);
+	fUndone--;
 }
 
 
@@ -304,22 +310,22 @@ _BTypingUndoBuffer_::InputCharacter(int32 len)
 	int32 start, end;
 	fTextView->GetSelection(&start, &end);
 	
-	int32 currentPos = fTypedStart + fNumBytes;
-	if (start != currentPos)
+	if (start != fTypedEnd || end != fTypedEnd)
 		Reset();
 		
-	fNumBytes += len;
+	fTypedEnd += len;
 }
 
 
 void
 _BTypingUndoBuffer_::Reset()
 {
+	printf("Reset\n");
 	free(fTextData);
 	fTextView->GetSelection(&fStart, &fEnd);
 	fTextLength = fEnd - fStart;
 	fTypedStart = fStart;
-	fNumBytes = 0;
+	fTypedEnd = fStart;
 	
 	fTextData = (char *)malloc(fTextLength);
 	memcpy(fTextData, fTextView->Text() + fStart, fTextLength);
@@ -327,36 +333,93 @@ _BTypingUndoBuffer_::Reset()
 	free(fTypedText);
 	fTypedText = NULL;
 	fRedo = false;
+	fUndone = 0;
 }
 
 
-void
-_BTypingUndoBuffer_::ForwardErase()
+
+// TODO: This isn't completely safe and it's even slower than parsing byte
+// by byte, but I'll change it later.
+static inline int32
+UTF8_char_len(uchar c)
 {
-	//TODO: Fix this. Currently, it just resets the
-	//undobuffer every time DELETE is pressed, while
-	//it should reset it just the first time it's pressed.
-	//Moreover, it doesn't work with multi-byte characters.
-	int32 start, end;
-	fTextView->GetSelection(&start, &end);
-	
-	int32 currentPos = fTypedStart + fNumBytes;
-	if (start != currentPos)
-		Reset();
+	return ((0xE5000000 >> ((c >> 3) & 0x1E)) & 3) + 1;
 }
 
 
 void
 _BTypingUndoBuffer_::BackwardErase()
 {
-	//TODO: Fix this. Currently, it just resets the
-	//undobuffer every time BACKSPACE is pressed, while
-	//it should reset it just the first time it's pressed.
-	//Moreover, it doesn't work with multi-byte characters.
 	int32 start, end;
 	fTextView->GetSelection(&start, &end);
 	
-	int32 currentPos = fTypedStart + fNumBytes;
-	if (start != currentPos)
+	int32 charLen = UTF8_char_len(fTextView->ByteAt(start - 1));
+	printf("Char Len: %d\n", charLen);
+
+	if (start != fTypedEnd || end != fTypedEnd) {
 		Reset();
+		// if we've got a selection, we're already done
+		if (start != end)
+			return;
+	} 
+	
+	char *buffer = (char *)malloc(fTextLength + charLen);
+	memcpy(buffer + charLen, fTextData, fTextLength);
+	
+	fTypedStart = start - charLen;
+	start = fTypedStart;
+	for (int32 x = 0; x < charLen; x++)
+		buffer[x] = fTextView->ByteAt(start + x);
+	free(fTextData);
+	fTextData = buffer;
+	
+	fTextLength += charLen;
+	fTypedEnd -= charLen;
+}
+
+
+void
+_BTypingUndoBuffer_::ForwardErase()
+{
+	int32 start, end;
+
+	fTextView->GetSelection(&start, &end);
+
+	int32 charLen = UTF8_char_len(fTextView->ByteAt(start));	
+	printf("Char Len: %d\n", charLen);
+
+	if (start != fTypedEnd || end != fTypedEnd || fUndone > 0) {
+		Reset();
+		// if we've got a selection, we're already done
+		if (fStart == fEnd) {
+			free(fTextData);
+			fTextLength = charLen;
+			fTextData = (char *)malloc(fTextLength);
+			
+			// store the erased character
+			for (int32 x = 0; x < charLen; x++)
+				fTextData[x] = fTextView->ByteAt(start + x);
+		}
+	} else {	
+		// Here we need to store the erased text, so we get the text that it's 
+		// already in the buffer, and we add the erased character.
+		// a realloc + memmove would maybe be cleaner, but that way we spare a
+		// copy (malloc + memcpy vs realloc + memmove).
+		
+		int32 newLength = fTextLength + charLen;
+		char *buffer = (char *)malloc(newLength);
+		
+		// copy the already stored data
+		memcpy(buffer, fTextData, fTextLength);
+		
+		if (fTextLength < newLength) {
+			// store the erased character
+			for (int32 x = 0; x < charLen; x++)
+				buffer[fTextLength] = fTextView->ByteAt(start + x);
+		}
+
+		fTextLength = newLength;
+		free(fTextData);
+		fTextData = buffer;
+	}
 }

@@ -56,6 +56,7 @@ protected:
 	
 	bool fRedo;
 private:
+	
 	undo_state fState;
 };
 
@@ -137,7 +138,8 @@ private:
 	
 	char *fTypedText;
 	int32 fTypedStart;
-	int32 fNumBytes;
+	int32 fTypedEnd;
+	int32 fUndone;
 };
 
 #endif //__UNDOBUFFER_H

@@ -47,6 +47,7 @@
 #include "StyleBuffer.h"
 #include "TextGapBuffer.h"
 #include "UndoBuffer.h"
+#include "WidthBuffer.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -141,8 +142,12 @@ prop_list[] =
 	{ 0 }
 };
 
-sem_id BTextView::sWidthSem = B_BAD_SEM_ID; // Created/deleted by init/fini_interface_kit
-int32 BTextView::sWidthAtom = 0; 
+
+// Initialized/finalized by init/fini_interface_kit ?
+_BWidthBuffer_* BTextView::sWidths = NULL;
+sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
+int32 BTextView::sWidthAtom = 0;
+
 
 //------------------------------------------------------------------------------
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -285,6 +290,7 @@ BTextView::~BTextView()
 	delete fStyles;
 	delete fDisallowedChars;
 	delete fUndo;
+	delete fOffscreen;
 }
 //------------------------------------------------------------------------------
 BArchivable *
@@ -387,7 +393,8 @@ BTextView::MouseDown(BPoint where)
 		BPoint	loc;
 		ulong	buttons;
 		GetMouse(&loc, &buttons);
-		// was the secondary button clicked?
+		// TODO: here we shouldn't check for B_SECONDARY_MOUSE_BUTTON,
+		// since dragging works also with the primary button.
 		if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 			// was the click within the selection range?
 			if ((mouseOffset >= fSelStart) && (mouseOffset <= fSelEnd)) {
@@ -559,6 +566,7 @@ BTextView::WindowActivated(bool state)
 void
 BTextView::KeyDown(const char *bytes, int32 numBytes)
 {
+	//TODO: Remove this and move it to specific key handlers ?
 	if (!fEditable)
 		return;
 	
@@ -1072,7 +1080,7 @@ BTextView::Copy(BClipboard *clipboard)
 				fSelEnd - fSelStart);
 			
 			int32 size;
-			if (IsStylable()) {
+			if (fStylable) {
 				text_run_array *runArray = RunArray(fSelStart, fSelEnd, &size);
 				clip->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 					runArray, size);
@@ -1099,7 +1107,7 @@ BTextView::Paste(BClipboard *clipboard)
 				text_run_array *runArray = NULL;
 				ssize_t runLen = 0;
 				
-				if (IsStylable())
+				if (fStylable)
 					clip->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 						(const void **)&runArray, &runLen);
 
@@ -1458,10 +1466,10 @@ BTextView::OffsetAt(BPoint point) const
 {
 	// should we even bother?
 	if (point.y >= fTextRect.bottom)
-		return (fText->Length());
+		return fText->Length();
 	else {
 		if (point.y < fTextRect.top)
-			return (0);
+			return 0;
 	}
 
 	int32		lineNum = LineAt(point);
@@ -1942,7 +1950,8 @@ BTextView::SetAlignment(alignment flag)
 	fAlignment = flag;
 }
 //------------------------------------------------------------------------------
-alignment BTextView::Alignment() const
+alignment
+BTextView::Alignment() const
 {
 	return fAlignment;
 }
@@ -2004,6 +2013,8 @@ BTextView::DoesUndo() const
 void
 BTextView::HideTyping(bool enabled)
 {
+	//TODO: Implement ?
+	//fText->SetPasswordMode(enabled);
 }
 //------------------------------------------------------------------------------
 bool
@@ -2248,14 +2259,6 @@ BTextView::InitObject(BRect textRect, const BFont *initialFont,
 void
 BTextView::HandleBackspace()
 {
-	if (fSelStart == fSelEnd) {
-		if (fSelStart == 0)
-			return;
-		else 
-			fSelStart--;
-	}
-	else
-		Highlight(fSelStart, fSelEnd);
 
 	if (fUndo) {
 		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
@@ -2265,6 +2268,14 @@ BTextView::HandleBackspace()
 		}
 		undoBuffer->BackwardErase();
 	}
+	
+	if (fSelStart == fSelEnd) {
+		if (fSelStart == 0)
+			return;
+		else 
+			fSelStart = PreviousInitialByte(fSelStart);
+	} else
+		Highlight(fSelStart, fSelEnd);
 	
 	DeleteText(fSelStart, fSelEnd);
 	fSelEnd = fSelStart;
@@ -2354,15 +2365,6 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 void
 BTextView::HandleDelete()
 {
-	if (fSelStart == fSelEnd) {
-		if (fSelEnd == fText->Length())
-			return;
-		else 
-			fSelEnd = NextInitialByte(fSelEnd);
-	}
-	else
-		Highlight(fSelStart, fSelEnd);
-	
 	if (fUndo) {
 		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
 		if (!undoBuffer) {
@@ -2371,6 +2373,15 @@ BTextView::HandleDelete()
 		}
 		undoBuffer->ForwardErase();
 	}	
+	
+	if (fSelStart == fSelEnd) {
+		if (fSelEnd == fText->Length())
+			return;
+		else 
+			fSelEnd = NextInitialByte(fSelEnd);
+	}
+	else
+		Highlight(fSelStart, fSelEnd);
 	
 	DeleteText(fSelStart, fSelEnd);
 	
@@ -2404,8 +2415,6 @@ BTextView::HandlePageKey(uint32 inPageKey)
 void
 BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 {
-	bool refresh = fSelStart != fText->Length();
-	
 	if (fUndo) {
 		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
 		if (!undoBuffer) {
@@ -2414,7 +2423,9 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 		}
 		undoBuffer->InputCharacter(numBytes);
 	}
-	
+
+	bool refresh = fSelStart != fText->Length();
+
 	if (fSelStart != fSelEnd) {
 		Highlight(fSelStart, fSelEnd);
 		DeleteText(fSelStart, fSelEnd);
@@ -2627,10 +2638,10 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 		offset = (offset < limit) ? offset + 1 : limit;
 		
 		// iterate through the style runs
-		int32 		length = offset;
-		int32 		startOffset = fromOffset;
+		int32 length = offset;
+		int32 startOffset = fromOffset;
 		int32 numChars;
-		while ((numChars = fStyles->Iterate(startOffset, length, NULL, NULL, &ascent, &descent) != 0)) {
+		while ((numChars = fStyles->Iterate(startOffset, length, NULL, NULL, &ascent, &descent)) != 0) {
 			*outAscent = (ascent > *outAscent) ? ascent : *outAscent;
 			*outDescent = (descent > *outDescent) ? descent : *outDescent;
 			
@@ -2775,7 +2786,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 	// iterate through the style runs
 	const BFont *font = NULL;
 	int32 numChars;
-	while ((numChars = fStyles->Iterate(fromOffset, length, &font, NULL, &ascent, &descent) != 0)) {		
+	while ((numChars = fStyles->Iterate(fromOffset, length, &font, NULL, &ascent, &descent)) != 0) {		
 		maxAscent = (ascent > maxAscent) ? ascent : maxAscent;
 		maxDescent = (descent > maxDescent) ? descent : maxDescent;
 		
@@ -2884,7 +2895,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			const BFont *font = NULL;
 			const rgb_color *color = NULL;
 			int32 numChars;
-			while ((numChars = fStyles->Iterate(offset, length, &font, &color) != 0)) {
+			while ((numChars = fStyles->Iterate(offset, length, &font, &color)) != 0) {
 				SetFont(font);
 				SetHighColor(*color);
 				
@@ -3042,7 +3053,7 @@ BTextView::InitiateDrag()
 			dragRect = bounds & dragRect;
 			
 		DragMessage(drag, dragRect, dragHandler);
-	}	
+	}
 }
 //------------------------------------------------------------------------------
 bool
@@ -3077,7 +3088,7 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 		
 		text_run_array *runArray = NULL;
 		ssize_t runLen = 0;
-		if (IsStylable())
+		if (fStylable)
 			inMessage->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 					(const void **)&runArray, &runLen);
 		

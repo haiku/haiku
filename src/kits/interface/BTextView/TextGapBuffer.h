@@ -23,6 +23,8 @@
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	Text storage used by BTextView
 //------------------------------------------------------------------------------
+#ifndef __TEXTGAPBUFFER_H
+#define __TEXTGAPBUFFER_H
 
 // Standard Includes -----------------------------------------------------------
 
@@ -92,6 +94,8 @@ _BTextGapBuffer_::operator[](long index) const
 {
 	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
 }
+
+#endif //__TEXTGAPBUFFER_H
 /*
  * $Log $
  *
