@@ -31,6 +31,9 @@
 // R/WC -- Read/Write Clear
 // ** -- Only writable with words!
 
+// PCI register
+#define PCI_LEGSUP 0xC0
+#define PCI_LEGSUP_USBPIRQDEN 0x2000
 
 // Registers
 #define UHCI_USBCMD 0x0 		// USB Command - word - R/W
@@ -58,6 +61,7 @@
 #define UHCI_USBSTS_HOSTERR 0x8	// Host System Error
 #define UHCI_USBSTS_HCPRERR 0x10// Host Controller Process error
 #define UHCI_USBSTS_HCHALT 0x20	// HCHalted
+#define UHCI_INTERRUPT_MASK 0x1F //Mask for all the interrupts
 
 //USBINTR
 #define UHCI_USBINTR_CRC 0x1	// Timeout/ CRC interrupt enable
@@ -96,11 +100,21 @@ typedef struct
 	addr_t link_phy;		// Link to the next TD/QH
 	uint32 status;			// Status field
 	uint32 token;			// Contains the packet header (where it needs to be sent)
-	addr_t buffer_phy;		// A pointer to the buffer with the actual packet
+	void * buffer_phy;		// A pointer to the buffer with the actual packet
 	// Software part
+	addr_t this_phy;		// A physical pointer to this address
 	void * link_log;		// Link to the next logical TD/QT
 	void * buffer_log;		// Link to the buffer
 } uhci_td;
+
+#define TD_STATUS_LOWSPEED ( 1 << 26 )
+#define TD_STATUS_IOS      ( 1 << 25 )
+#define TD_STATUS_IOC      ( 1 << 24 )
+#define TD_STATUS_ACTIVE   ( 1 << 23 )
+#define TD_TOKEN_DATA1     ( 1 << 19 )
+#define TD_TOKEN_NULL      (0x7FF << 21 ) 
+#define TD_DEPTH_FIRST     0x4
+#define TD_TERMINATE       0x1
 
 //Represents a Queue Head (QH)
 

@@ -92,13 +92,13 @@ UHCIRootHub::UHCIRootHub( UHCI *uhci , int8 devicenum )
 	m_uhci = uhci;
 }
 
-status_t UHCIRootHub::SubmitTransfer( Transfer &t )
+status_t UHCIRootHub::SubmitTransfer( Transfer *t )
 {
 	status_t retval;
-	usb_request_data *request = t.GetRequestData();
+	usb_request_data *request = t->GetRequestData();
 	uint16 port; //used in RH_CLEAR/SET_FEATURE
 	
-	TRACE( "USB UHCI: rh_submit_packet called. Request: %u\n" , t.GetRequestData()->Request );
+	TRACE( "USB UHCI: rh_submit_packet called. Request: %u\n" , t->GetRequestData()->Request );
 	
 	switch( request->Request )
 	{
@@ -106,7 +106,7 @@ status_t UHCIRootHub::SubmitTransfer( Transfer &t )
 		if ( request->Index == 0 )
 		{
 			//Get the hub status -- everything as 0 means that it is all-rigth
-			memset( t.GetBuffer() , NULL , sizeof(get_status_buffer) );
+			memset( t->GetBuffer() , NULL , sizeof(get_status_buffer) );
 			retval = B_OK;
 			break;
 		}
@@ -118,8 +118,8 @@ status_t UHCIRootHub::SubmitTransfer( Transfer &t )
 		}
 		//Get port status
 		UpdatePortStatus();
-		memcpy( t.GetBuffer() , (void *)&(m_hw_port_status[request->Index - 1]) , t.GetBufferLength());
-		*(t.GetActualLength()) = t.GetBufferLength();
+		memcpy( t->GetBuffer() , (void *)&(m_hw_port_status[request->Index - 1]) , t->GetBufferLength());
+		*(t->GetActualLength()) = t->GetBufferLength();
 		retval = B_OK;
 		break;
 
@@ -139,28 +139,28 @@ status_t UHCIRootHub::SubmitTransfer( Transfer &t )
 			switch ( request->Value )
 			{
 			case RH_DEVICE_DESCRIPTOR:
-				memcpy( t.GetBuffer() , (void *)&uhci_devd , t.GetBufferLength());
-				*(t.GetActualLength()) = t.GetBufferLength(); 
+				memcpy( t->GetBuffer() , (void *)&uhci_devd , t->GetBufferLength());
+				*(t->GetActualLength()) = t->GetBufferLength(); 
 				retval = B_OK;
 				break;
 			case RH_CONFIG_DESCRIPTOR:
-				memcpy( t.GetBuffer() , (void *)&uhci_confd , t.GetBufferLength());
-				*(t.GetActualLength()) = t.GetBufferLength();
+				memcpy( t->GetBuffer() , (void *)&uhci_confd , t->GetBufferLength());
+				*(t->GetActualLength()) = t->GetBufferLength();
 				retval =  B_OK;
 				break;
 			case RH_INTERFACE_DESCRIPTOR:
-				memcpy( t.GetBuffer() , (void *)&uhci_intd , t.GetBufferLength());
-				*(t.GetActualLength()) = t.GetBufferLength();
+				memcpy( t->GetBuffer() , (void *)&uhci_intd , t->GetBufferLength());
+				*(t->GetActualLength()) = t->GetBufferLength();
 				retval = B_OK ;
 				break;
 			case RH_ENDPOINT_DESCRIPTOR:
-				memcpy( t.GetBuffer() , (void *)&uhci_endd , t.GetBufferLength());
-				*(t.GetActualLength()) = t.GetBufferLength();
+				memcpy( t->GetBuffer() , (void *)&uhci_endd , t->GetBufferLength());
+				*(t->GetActualLength()) = t->GetBufferLength();
 				retval = B_OK ;
 				break;
 			case RH_HUB_DESCRIPTOR:
-				memcpy( t.GetBuffer() , (void *)&uhci_hubd , t.GetBufferLength());
-				*(t.GetActualLength()) = t.GetBufferLength();
+				memcpy( t->GetBuffer() , (void *)&uhci_hubd , t->GetBufferLength());
+				*(t->GetActualLength()) = t->GetBufferLength();
 				retval = B_OK;
 				break;
 			default:
@@ -209,13 +209,17 @@ status_t UHCIRootHub::SubmitTransfer( Transfer &t )
 		default:
 			retval = EINVAL;
 			break;
-		} //switch( t.value) 
+		} //switch( t->value) 
 		break;
 		
 	default: 
 		retval = EINVAL;
 		break;
 	}
+	
+	// Clean up the transfer - we own it, so we clean it up
+	t->Finish();
+	delete t;
 	
 	return retval;
 }
@@ -254,7 +258,7 @@ void UHCIRootHub::UpdatePortStatus(void)
 		newstatus |= PORT_POWER;
 		
 		if ( portsc & UHCI_PORTSC_LOWSPEED )
-			newstatus |= PORT_LOW_SPEED;
+			newstatus |= PORT_STATUS_LOW_SPEED;
 			
 		//Update the stored port status
 		m_hw_port_status[i].status = newstatus;

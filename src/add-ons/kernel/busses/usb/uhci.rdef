@@ -12,5 +12,5 @@ resource app_version {
 	variety = 0,
 	internal = 0,
 	short_info = "UHCI host controller driver",
-	long_info = "OpenBeOS - This driver is (c) 2003-2004 Niels Sascha Reedijk"
+	long_info = "OpenBeOS - This driver is (c) 2003-2005 Niels Sascha Reedijk"
 };

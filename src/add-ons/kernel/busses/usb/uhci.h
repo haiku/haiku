@@ -32,11 +32,13 @@ class UHCIRootHub;
 class UHCI : public BusManager
 {
 	friend class UHCIRootHub;
+	friend int32 uhci_interrupt_handler( void *data );
 public:
 	UHCI( pci_info *info , Stack *stack );
 	
 	//Override from BusManager
-	status_t SubmitTransfer( Transfer &t );
+	status_t Start();
+	status_t SubmitTransfer( Transfer *t );
 	
 	// Global data for the module.
 	static pci_module_info *pci_module; 
@@ -44,6 +46,10 @@ private:
 	//Utility functions
 	void GlobalReset();
 	status_t Reset();
+	int32 Interrupt();
+	
+	//Functions for the actual functioning of transfers
+	status_t InsertControl( Transfer *t );
 
 	uint32		m_reg_base;		//Base address of the registers
 	pci_info 	*m_pcii;		//pci-info struct
@@ -69,6 +75,9 @@ private:
 #define m_qh_bulk          m_qh_virtual[10]
 #define m_qh_terminate     m_qh_virtual[11]
 	
+	//Maintain a list of transfers
+	Vector<Transfer *>     m_transfers;
+	
 	//Root hub:
 	UHCIRootHub *m_rh;				// the root hub
 	uint8		m_rh_address;		// the address of the root hub
@@ -78,11 +87,18 @@ class UHCIRootHub : public Hub
 {
 public:
 	UHCIRootHub( UHCI *uhci , int8 devicenum );
-	status_t SubmitTransfer( Transfer &t );
+	status_t SubmitTransfer( Transfer *t );
 	void UpdatePortStatus();
 private:
 	usb_port_status m_hw_port_status[2]; // the port status (maximum of two)
 	UHCI *m_uhci;					// needed because of internal data
+};
+
+struct hostcontroller_priv
+{
+	uhci_qh		*topqh;
+	uhci_td		*firsttd;
+	uhci_td		*lasttd;
 };
 
 #define UHCI_DEBUG
