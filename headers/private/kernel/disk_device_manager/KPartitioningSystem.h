@@ -8,15 +8,12 @@
 namespace BPrivate {
 namespace DiskDevice {
 
-class KPartitioningSystem {
+class KPartitioningSystem : public KDiskSystem {
+public:
 	KPartitioningSystem(const char *name);
 	virtual ~KPartitioningSystem();
 
 	virtual bool IsFileSystem() const;
-
-	virtual status_t Load();		// load/unload -- can be nested
-	virtual status_t Unload();		//
-	virtual bool IsLoaded() const;
 
 	// Scanning
 
@@ -30,7 +27,6 @@ class KPartitioningSystem {
 
 	virtual bool SupportsRepairing(KPartition *partition, bool checkOnly,
 								   bool *whileMounted);
-		// Does that makes sense for partitioning systems?
 	virtual bool SupportsResizing(KPartition *partition, bool *whileMounted);
 	virtual bool SupportsResizingChild(KPartition *child);
 	virtual bool SupportsMoving(KPartition *partition, bool *whileMounted);
@@ -50,9 +46,11 @@ class KPartitioningSystem {
 									   const char *parameters);
 	virtual bool ValidateSetContentParameters(KPartition *child,
 											  const char *parameters);
+	virtual int32 CountPartitionableSpaces(KPartition *partition);
 	virtual bool GetPartitionableSpaces(KPartition *partition,
-										partitionable_space_data **spaces,
-										int32 *count);
+										partitionable_space_data *spaces,
+										int32 count,
+										int32 *actualCount = NULL);
 
 	// Writing
 
@@ -80,6 +78,13 @@ class KPartitioningSystem {
 	virtual status_t SetContentParameters(KPartition *partition,
 										  const char *parameters,
 										  KDiskDeviceJob *job);
+
+protected:
+	virtual status_t LoadModule();
+	virtual void UnloadModule();
+
+private:
+	partition_module_info	*fModule;
 };
 
 } // namespace DiskDevice
