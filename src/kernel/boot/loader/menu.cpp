@@ -6,6 +6,7 @@
 
 #include "menu.h"
 #include "loader.h"
+#include "RootFileSystem.h"
 
 #include <OS.h>
 
