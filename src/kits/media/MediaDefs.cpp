@@ -196,7 +196,7 @@ media_format::Matches(const media_format *otherFormat) const
 {
 	UNIMPLEMENTED();
 
-	return false;
+	return true;
 }
 
 
