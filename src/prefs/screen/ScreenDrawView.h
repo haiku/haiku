@@ -14,7 +14,6 @@ public:
 	virtual void		MouseDown(BPoint point);
 
 private:
-	BScreen				*fScreen;
 	rgb_color			desktopColor;
 	int32				fResolution;
 };

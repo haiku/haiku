@@ -12,17 +12,16 @@
 #include "Utility.h"
 
 ScreenDrawView::ScreenDrawView(BRect rect, char *name)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
-	fScreen(new BScreen(B_MAIN_SCREEN_ID))
-	
+	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)	
 {
-	if (!fScreen->IsValid())
+	BScreen screen(B_MAIN_SCREEN_ID);
+	if (!screen->IsValid())
 		; //Debugger() ?
 		
-	desktopColor = fScreen->DesktopColor(current_workspace());
+	desktopColor = screen->DesktopColor(current_workspace());
 
 	display_mode mode;	
-	fScreen->GetMode(&mode);
+	screen->GetMode(&mode);
 
 	fResolution = mode.virtual_width;
 }
@@ -217,7 +216,11 @@ ScreenDrawView::MessageReceived(BMessage* message)
 	
 		case UPDATE_DESKTOP_COLOR_MSG:
 		{
-			desktopColor = fScreen->DesktopColor(current_workspace());
+			BScreen screen;
+			if (!screen.IsValid())
+				break;
+
+			desktopColor = screen->DesktopColor(current_workspace());
 			
 			Invalidate();
 		}
