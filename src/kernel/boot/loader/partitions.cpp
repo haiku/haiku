@@ -59,6 +59,10 @@ extern list gPartitions;
 
 namespace boot {
 
+/** A convenience class to automatically close a
+ *	file descriptor upon deconstruction.
+ */
+
 class NodeOpener {
 	public:
 		NodeOpener(Node *node, int mode)
@@ -247,13 +251,19 @@ Partition::Scan()
 status_t
 add_partitions_for(int fd)
 {
-	Partition partition(fd);
+	Partition *partition = new Partition(fd);
 
 	// set some magic/default values
-	partition.block_size = 512;
-	partition.size = partition.Size();
+	partition->block_size = 512;
+	partition->size = partition->Size();
 
-	return partition.Scan();
+	if (partition->Scan() == B_OK && partition->IsFileSystem()) {
+		list_add_item(&gPartitions, partition);
+		return B_OK;
+	}
+
+	delete partition;
+	return B_OK;
 }
 
 
