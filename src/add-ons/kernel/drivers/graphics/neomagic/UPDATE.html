@@ -4,13 +4,14 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-1, Rudolf)</h1></p>
+<p><h1>head (0.06-2, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
 	<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
 	<li>BWindowScreen R3-style function update for acceleration (once setup) and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants;
-	<li>Updated acceleration engine management code.
+	<li>Updated acceleration engine management code;
+	<li>Added partial acceleration for NM2097 and NM2160 (screen_to_screen blit).
 </ul>
 <p><h1>nm_driver 0.05 (Rudolf)</h1></p>
 <ul> 
