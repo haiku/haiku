@@ -1,6 +1,8 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers isa ;
 
 UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 
 KernelAddon isa : kernel bus_managers :
 	isa.c
