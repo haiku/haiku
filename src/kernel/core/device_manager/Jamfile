@@ -5,12 +5,10 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_device_manager.o : 
 	attributes.c
-#	boot_hack.c
 	device_manager.c
 	driver_loader.c
 	id_generator.c
 	io_resources.c
-#	module_loader.c
 	nodes.c
 	notifications.c
 	patterns.c
