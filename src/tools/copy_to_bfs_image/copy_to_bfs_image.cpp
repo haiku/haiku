@@ -12,7 +12,7 @@
 
 
 static status_t
-copy_file(const char *from, const char *to)
+copy_file(const char *from, const struct stat &fromStat, const char *to)
 {
     size_t bufferSize = 4 * 1024;
     char buffer[bufferSize];
@@ -23,10 +23,10 @@ copy_file(const char *from, const char *to)
 		return fd;
 	}
 
-	int bfd = sys_open(1, -1, to, O_RDWR | O_CREAT, S_IFREG | S_IRWXU, 0);
+	int bfd = sys_open(1, -1, to, O_RDWR | O_CREAT | O_TRUNC, S_IFREG | fromStat.st_mode, 0);
 	if (bfd < 0) {
         close(fd);
-        printf("error opening: %s\n", to);
+        printf("error opening \"%s\": %s\n", to, strerror(bfd));
         return bfd;
     }
 
@@ -77,7 +77,7 @@ copy_file(const char *from, const char *to)
 		err = sys_write(1, bfd, buffer, amount);
 
 	if (err < 0)
-		printf("write error: err == %ld, amount == %ld\n", err, amount);
+		printf("write error: %s, amount == %ld\n", strerror(err), amount);
 
 	sys_close(1, bfd);
 	close(fd);
@@ -127,7 +127,7 @@ copy_dir(const char *fromPath, const char *toPath)
 			else
 				printf("Could not create directory %s: (%s)\n", path, strerror(err));
 		} else {
-			copy_file(fromName, path);
+			copy_file(fromName, st, path);
 		}
 	}
 	closedir(from);
@@ -169,7 +169,7 @@ copy(const char *from, const char *to)
 	} else {
 		if (S_ISREG(toStat.st_mode)) {
 			// overwrite target file
-			return copy_file(from, toPath);
+			return copy_file(from, fromStat, toPath);
 		} else {
 			// copy into target directory
 			strlcat(toPath, "/", B_PATH_NAME_LENGTH);
@@ -182,7 +182,7 @@ copy(const char *from, const char *to)
 
 			strlcat(toPath, fileName, B_PATH_NAME_LENGTH);
 
-			return copy_file(from, toPath);
+			return copy_file(from, fromStat, toPath);
 		}
 	}
 }
