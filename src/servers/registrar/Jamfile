@@ -4,9 +4,12 @@ UsePublicHeaders app ;
 UsePrivateHeaders app ;
 
 Server obos_registrar :
+	AppInfoList.cpp
 	ClipboardHandler.cpp
 	MIMEManager.cpp
 	Registrar.cpp
+	RosterAppInfo.cpp
+	TRoster.cpp
 ;
 LinkSharedOSLibs obos_registrar :
 	<boot!home!config!lib>libopenbeos.so
