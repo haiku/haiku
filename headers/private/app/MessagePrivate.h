@@ -52,7 +52,14 @@ class BMessage::Private
 		{
 			return fMessage->fPreferred;
 		}
-		
+
+		static inline status_t SendFlattenedMessage(void *data, int32 size,
+			port_id port, int32 token, bool preferred, bigtime_t timeout)
+		{
+			return BMessage::_SendFlattenedMessage(data, size, port, token,
+				preferred, timeout);
+		}
+
 	private:
 		BMessage*	fMessage;
 };
