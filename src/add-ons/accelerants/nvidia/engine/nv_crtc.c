@@ -7,7 +7,7 @@
 
 #include "nv_std.h"
 
-/*Adjust passed parameters to a valid mode line*/
+/* Adjust passed parameters to a valid mode line */
 status_t nv_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
