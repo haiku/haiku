@@ -864,9 +864,9 @@ vm_translation_map_quick_query(addr va, addr *out_physical)
 }
 
 
-addr
-vm_translation_map_get_pgdir(vm_translation_map *map)
+void *
+i386_translation_map_get_pgdir(vm_translation_map *map)
 {
-	return (addr)map->arch_data->pgdir_phys;
+	return map->arch_data->pgdir_phys;
 }
 

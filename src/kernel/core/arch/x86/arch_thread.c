@@ -3,6 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <kernel.h>
 #include <boot/stage2.h>
 #include <debug.h>
@@ -152,7 +153,7 @@ arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*fun
 void
 arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
-	addr new_pgdir;
+	void *new_pgdir;
 
 #if 0
 	int i;
@@ -181,23 +182,23 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 			new_pgdir = NULL;
 		} else {
 			// switching to a new address space
-			new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
+			new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 		}
 	} else if (t_from->team->_aspace_id < 0 && t_to->team->_aspace_id < 0) {
 		// they must both be kspace threads
 		new_pgdir = NULL;
 	} else if (t_to->team->_aspace_id < 0) {
 		// the one we're switching to is kspace
-		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
+		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
 	} else {
-		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
+		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 	}
 
-	if ((new_pgdir % PAGE_SIZE) != 0)
+	if (((uint32)new_pgdir % PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
-	i386_context_switch(&t_from->arch_info, &t_to->arch_info, new_pgdir);
+	i386_context_switch(&t_from->arch_info, &t_to->arch_info, (addr)new_pgdir);
 }
 
 
@@ -253,18 +254,18 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 	
 	if (frame->orig_eax >= 0) {
 		// we're coming from a syscall
-		if ((frame->eax == EINTR) && (sa->sa_flags & SA_RESTART)) {
+		if (((status_t)frame->eax == EINTR) && (sa->sa_flags & SA_RESTART)) {
 			dprintf("### restarting syscall %d after signal %d\n", frame->orig_eax, sig);
 			frame->eax = frame->orig_eax;
 			frame->edx = frame->orig_edx;
 			frame->eip -= 2;
 		}
 	}
-	
+
 	stack_ptr -= 192;
 	code_ptr = stack_ptr + 32;
 	regs_ptr = stack_ptr + 64;
-	
+
 	stack_ptr[0] = (uint32)code_ptr;	// return address when sa_handler done
 	stack_ptr[1] = sig;					// first argument to sa_handler
 	stack_ptr[2] = (uint32)sa->sa_userdata;// second argument to sa_handler
@@ -272,9 +273,10 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 
 	stack_ptr[4] = sig_mask;			// Old signal mask to restore
 	stack_ptr[5] = (uint32)regs_ptr;	// Int frame + extra regs to restore
-	
-	memcpy(code_ptr, i386_return_from_signal, (i386_end_return_from_signal - i386_return_from_signal));
-	
+
+	memcpy(code_ptr, i386_return_from_signal,
+		((uint32)i386_end_return_from_signal - (uint32)i386_return_from_signal));
+
 	regs = (struct vregs *)regs_ptr;
 	regs->eip = frame->eip;
 	regs->eflags = frame->flags;
@@ -287,7 +289,7 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 	regs->_reserved_2[1] = frame->esi;
 	regs->_reserved_2[2] = frame->ebp;
 	i386_fsave((void *)(&regs->xregs));
-	
+
 	frame->user_esp = (uint32)stack_ptr;
 	frame->eip = (uint32)sa->sa_handler;
 }
@@ -334,8 +336,8 @@ void
 arch_check_syscall_restart(struct thread *t)
 {
 	struct iframe *frame = t->arch_info.current_iframe;
-	
-	if ((frame->orig_eax >= 0) && (frame->eax == EINTR)) {
+
+	if (((status_t)frame->orig_eax >= 0) && ((status_t)frame->eax == EINTR)) {
 		frame->eax = frame->orig_eax;
 		frame->edx = frame->orig_edx;
 		frame->eip -= 2;
