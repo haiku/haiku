@@ -2,13 +2,17 @@ SubDir OBOS_TOP src tests kernel core disk_device_manager ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager jobs ] ;
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core fs ] ;
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 	# DiskDeviceTypes.cpp
 
 #UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel fs ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders kernel ;
@@ -38,6 +42,9 @@ SharedLibrary disk_device_manager :
 	KPhysicalPartition.cpp
 	KShadowPartition.cpp
 	UserDataWriter.cpp
+
+	# fs
+	KPath.cpp
 
 	# jobs
 	KCreateChildJob.cpp
