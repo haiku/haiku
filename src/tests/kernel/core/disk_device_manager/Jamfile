@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src tests kernel core disk_device_manager ;
+
+#UsePrivateHeaders $(DOT) ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+
+SimpleTest DiskDeviceManagerTest
+	: DiskDeviceManagerTest.cpp
+
+	: <boot!home!config!lib>libdisk_device_manager.so be
+;
+
+AbsSymLink <boot!home!config!lib>libdisk_device_manager.so
+	: libdisk_device_manager.so : /boot/home/config/lib ;
+
+Depends DiskDeviceManagerTest : <boot!home!config!lib>libkernelland_emu.so ;
+
+# Also build all modules:
+Depends DiskDeviceManagerTest :
+	<boot!home!config!lib>libkernelland_emu.so
+	<partitioning_system>intel
+;
