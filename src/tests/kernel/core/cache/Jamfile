@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src tests kernel core cache ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core cache ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core ] ;
+
+UsePrivateHeaders kernel ;
+UseHeaders [ FDirName $(OBOS_TOP) src kernel core cache ] ;
+
+SimpleTest BlockMapTest :
+	BlockMapTest.cpp
+	BlockMap.cpp
+	khash.c
+	: libkernelland_emu.so
+	;
+

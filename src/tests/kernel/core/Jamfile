@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src tests kernel core ;
 
+SubInclude OBOS_TOP src tests kernel core cache ;
 SubInclude OBOS_TOP src tests kernel core disk_device_manager ;
 SubInclude OBOS_TOP src tests kernel core util ;
