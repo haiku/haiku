@@ -844,14 +844,14 @@ AudioMixer::CreateBufferGroup()
 // BControllable methods
 //
 
-#define PARAM_INPUT(a)		(10*(a) + 0)
-#define PARAM_FORMAT(a) 	(10*(a) + 1)
-#define PARAM_MUTE(a)		(10*(a) + 2)
-#define PARAM_GAIN(a)		(10*(a) + 3)
-#define PARAM_OUTPUT(a)		(10*(a) + 4)
-#define PARAM(a)			((a) / 10)
-#define PARAM_IS_MUTE(a)	((a) % 10 == 2)
-#define PARAM_IS_GAIN(a)	((a) % 10 == 3)
+#define PARAM_INPUT(a)		(((a) << 16) + 0)
+#define PARAM_FORMAT(a) 	(((a) << 16) + 1)
+#define PARAM_MUTE(a)		(((a) << 16) + 2)
+#define PARAM_GAIN(a)		(((a) << 16) + 3)
+#define PARAM_OUTPUT(a)		(((a) << 16) + 4)
+#define PARAM(a)			((a) >> 16)
+#define PARAM_IS_MUTE(a)	(((a) & 0xffff) == 2)
+#define PARAM_IS_GAIN(a)	(((a) & 0xffff) == 3)
 #define DB_TO_GAIN(_db)		(20.0 * log10(_db))
 #define GAIN_TO_DB(_gain)	(pow(10.0, (_gain) / 20.0))
 
