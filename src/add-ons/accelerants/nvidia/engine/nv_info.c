@@ -380,7 +380,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	status_t result = B_OK;
 	bool end = false;
 	bool exec = true;
-	uint8 index, byte;//, safe;
+	uint8 index, byte;
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
@@ -506,17 +506,11 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				reg, and_out, or_in));
 			if (exec)
 			{
-//				byte = ISARB(reg);
-//test:
 				translate_ISA_PCI(&reg);
 				byte = NV_REG8(reg);
-//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-//				ISAWB(reg, byte);
-//test:
 				NV_REG8(reg) = byte;
-//end test
 			}
 			break;
 		case 0x6d:
@@ -694,21 +688,12 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				index, reg, and_out, or_in));
 			if (exec)
 			{
-//				safe = ISARB(reg);
-//				ISAWB(reg, index);
-//				byte = ISARB(reg + 1);
-//test:
 				translate_ISA_PCI(&reg);
 				NV_REG8(reg) = index;
 				byte = NV_REG8(reg + 1);
-//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-//				ISAWB((reg + 1), byte);
-//				ISAWB(reg, safe);
-//test:
 				NV_REG8(reg + 1) = byte;
-//end test
 			}
 			break;
 		case 0x79:
@@ -1628,6 +1613,7 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	}
 }
 
+//fixme: it looks like NV28 (at least) needs a different setup version!
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 {
 	uint32 data;
@@ -1706,71 +1692,50 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 /* RMA is a port that allows access to all of the cards 32bit registers and all
  * of the cards RAM from old ISA I/O space via the GPU.
  * RAM starts at 'offset' $80000000 */
+/* Note:
+ * RMA is a ISA-only function */
+//fixme: fix access as secondary card or translate to PCI version somehow...
 static void write_RMA(uint32 reg, uint32 data)
 {
-//	uint8 safe;
-
-	/* save old CRTC index register */
-//	safe = ISARB(0x03d4);
 	/* select RMA port 'set adress' mode */
-//	ISAWW(0x03d4, 0x0338);
-//test:
-	CRTCW(RMA, 0x03);
-//end test
+	ISAWW(0x03d4, 0x0338);
 	/* set adress in RMA port */
 	ISAWW(0x03d0, (reg & 0x0000ffff));
 	ISAWW(0x03d2, (reg >> 16));
 	/* select RMA port 'write data' mode */
-//	ISAWW(0x03d4, 0x0738);
-//test:
-	CRTCW(RMA, 0x07);
-//end test
+	ISAWW(0x03d4, 0x0738);
 	/* send data through RMA port */
 	ISAWW(0x03d0, (data & 0x0000ffff));
 	ISAWW(0x03d2, (data >> 16));
 	/* re-select RMA port 'set adress' mode (just to be sure) */
-//	ISAWW(0x03d4, 0x0338);
-//test:
-	CRTCW(RMA, 0x03);
-//end test
-	/* restore old CRTC index register */
-//	ISAWB(0x03d4, safe);
+	ISAWW(0x03d4, 0x0338);
 }
 
 /* this function is very handy for RAM size testing (doesn't need mapping) */
 /* RMA is a port that allows access to all of the cards 32bit registers and all
  * of the cards RAM from old ISA I/O space via the GPU.
  * RAM starts at 'offset' $80000000 */
+/* Note:
+ * RMA is a ISA-only function */
+//fixme: fix access as secondary card or translate to PCI version somehow...
 static uint32 read_RMA(uint32 reg)
 {
-//	uint8 safe;
 	uint32 data;
 
-	/* save old CRTC index register */
-//	safe = ISARB(0x03d4);
 	/* select RMA port 'set adress' mode */
-//	ISAWW(0x03d4, 0x0338);
-//test:
-	CRTCW(RMA, 0x03);
-//end test
+	ISAWW(0x03d4, 0x0338);
 	/* set adress in RMA port */
 	ISAWW(0x03d0, (reg & 0x0000ffff));
 	ISAWW(0x03d2, (reg >> 16));
 	/* select RMA port 'read data' mode */
-//	ISAWW(0x03d4, 0x0538);
-//test:
-	CRTCW(RMA, 0x05);
-//end test
+	ISAWW(0x03d4, 0x0538);
 	/* read data from RMA port */
 	data = ISARW(0x03d0);
 	data |= ((ISARW(0x03d2)) << 16);
 	/* re-select RMA port 'set adress' mode (just to be sure) */
-//	ISAWW(0x03d4, 0x0338);
-//test:
-	CRTCW(RMA, 0x03);
-//end test
-	/* restore old CRTC index register */
-//	ISAWB(0x03d4, safe);
+	ISAWW(0x03d4, 0x0338);
+
+	return data;
 }
 
 static status_t translate_ISA_PCI(uint32* reg)
