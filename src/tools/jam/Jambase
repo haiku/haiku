@@ -369,30 +369,38 @@ else if $(MAC)
 else if $(OS) = BEOS && $(METROWERKS)
 {
 	AR		?= mwld -xml -o ;
-	BINDIR		?= /boot/apps ;
+	BINDIR		?= /boot/home/config/bin ;
 	CC		?= mwcc ;
 	CCFLAGS		?= -nosyspath ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= -nosyspath ;
+	CHMOD		?= chmod ;
+	CHGRP		?= chgrp ;
+	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LIBDIR		?= /boot/develop/libraries ;
+	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= mwld ;
 	LINKFLAGS	?= "" ;
-	MANDIR		?= /boot/documentation/"Shell Tools"/HTML ;
+	MANDIR		?= /boot/home/config/man ;
 	NOARSCAN	?= true ;
 	STDHDRS		?= /boot/develop/headers/posix ;
+	YACC		?= bison -y ;
+	YACCGEN		?= .c ;
+	YACCFILES	?= y.tab ;
+	YACCFLAGS	?= -d ;
 }
 else if $(OS) = BEOS 
 {
-	BINDIR		?= /boot/apps ;
+	BINDIR		?= /boot/home/config/bin ;
 	CC		?= gcc ;
 	C++		?= $(CC) ;
 	CHMOD		?= chmod ;
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LIBDIR		?= /boot/develop/libraries ;
+	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= gcc ;
+	MANDIR		?= /boot/home/config/man ;
 	NOARSCAN	?= true ;
 	RANLIB		?= ranlib ;
 	STDHDRS		?= /boot/develop/headers/posix ;
