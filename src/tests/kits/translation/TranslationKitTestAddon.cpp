@@ -34,10 +34,12 @@
 #include <TestSuiteAddon.h>
 #include "TranslatorRosterTest.h"
 #include "BitmapStreamTest.h"
+#include "TranslationUtilsTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Translation");
 	suite->addTest("TranslatorRosterTest", TranslatorRosterTest::Suite());
 	suite->addTest("BitmapStreamTest", BitmapStreamTest::Suite());
+	suite->addTest("TranslationUtilsTest", TranslationUtilsTest::Suite());
 	return suite;
 }
