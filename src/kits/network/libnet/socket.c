@@ -29,7 +29,7 @@ struct beosr5_sockaddr_in {
 	char sin_zero[4];
 };
 
-static char *	get_stack_driver_path(void);
+static char *	stack_driver_path(void);
 static void 	convert_from_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
 static void 	convert_to_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
 static void		convert_from_beos_r5_sockopt(int *level, int *optnum);
@@ -41,7 +41,7 @@ _EXPORT int socket(int family, int type, int protocol)
 	int rv;
 	struct stack_driver_args args;
 
-	sock = open(get_stack_driver_path(), O_RDWR);
+	sock = open(stack_driver_path(), O_RDWR);
 	if (sock < 0)
 		return sock;
 
@@ -172,7 +172,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	int new_sock;
 	void *cookie;
 	
-	new_sock = open(get_stack_driver_path(), O_RDWR);
+	new_sock = open(stack_driver_path(), O_RDWR);
 	if (new_sock < 0)
 		return new_sock;
 	
@@ -444,7 +444,7 @@ _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp,
  * ----------------
  */
 
-static char * get_stack_driver_path(void) {
+static char * stack_driver_path(void) {
   char * path;
 
   // user-defined stack driver path?

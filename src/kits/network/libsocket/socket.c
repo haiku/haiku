@@ -20,7 +20,7 @@
 // Forward declaration of sysctl.h, because it's currently declared under headers/private/kernel/sysctl.h
 int sysctl(int *, uint, void *, size_t *, void *, size_t);
 
-static char *	get_stack_driver_path(void);
+static char *	stack_driver_path(void);
 
 
 _EXPORT int socket(int family, int type, int protocol)
@@ -29,7 +29,7 @@ _EXPORT int socket(int family, int type, int protocol)
 	int rv;
 	struct stack_driver_args args;
 	
-	sock = open(get_stack_driver_path(), O_RDWR);
+	sock = open(stack_driver_path(), O_RDWR);
 	if (sock < 0)
 		return sock;
 	
@@ -96,7 +96,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	int new_sock;
 	void *cookie;
 	
-	new_sock = open(get_stack_driver_path(), O_RDWR);
+	new_sock = open(stack_driver_path(), O_RDWR);
 	if (new_sock < 0)
 		return new_sock;
 	
@@ -317,7 +317,7 @@ _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp,
  * ----------------
  */
 
-static char * get_stack_driver_path(void) {
+static char * stack_driver_path(void) {
   char * path;
 
   // user-defined stack driver path?
