@@ -4,6 +4,8 @@ UsePrivateHeaders app ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bapplication ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bclipboard ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bcursor ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
@@ -23,6 +25,17 @@ CommonTestLib libapptest.so
 		AppQuitTester.cpp
 		AppRunTester.cpp
 		BApplicationTester.cpp
+
+		# BClipboard
+		BClipboardTester.cpp
+		ClipboardTest.cpp
+		CountTester.cpp
+		LockTester.cpp
+		ReadWriteTester.cpp
+
+		# BCursor
+		BCursorTester.cpp
+		CursorTest.cpp
 
 		# BHandler
 		HandlerTest.cpp
@@ -123,6 +136,8 @@ CommonTestLib libapptest.so
 ;
 
 SubInclude OBOS_TOP src tests kits app bapplication ;
+SubInclude OBOS_TOP src tests kits app bclipboard ;
+SubInclude OBOS_TOP src tests kits app bcursor ;
 #SubInclude OBOS_TOP src tests kits app bhandler ;
 #SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;

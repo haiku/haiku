@@ -1,0 +1,31 @@
+BCursor(const void *cursorData)
+case 1:	cursorData is NULL =>
+	empty cursor object (useless)
+case 2: cursorData points to valid data =>
+	valid cursor object
+case 3: cursorData points to invalid data =>
+	empty cursor object (useless)
+
+BCursor(BMessage *archive)
+case 1: archive is NULL =>
+	empty cursor object (useless)
+case 2: archive points to a valid archive =>
+	empty cursor object (useless, R5 does not support archiving)
+
+static BArchivable *Instantiate(BMessage *archive)
+case 1: archive is NULL =>
+	returns NULL
+case 2: archive points to a valid archive =>
+	returns NULL (R5 does not support archiving)
+
+status_t Archive(BMessage* into, bool deep = true)
+case 1: into is NULL =>
+	returns B_OK
+case 2: into is a valid message =>
+	returns B_OK (archiving not implemented in R5)
+
+status_t Perform(perform_code d, void* arg)
+case 1: arg is NULL =>
+	returns B_OK
+case 2: arg points to something =>
+	returns B_OK

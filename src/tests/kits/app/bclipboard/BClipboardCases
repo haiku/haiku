@@ -1,0 +1,94 @@
+BClipboard(const char *name, bool transient = false)
+case 1:	name is NULL =>
+	(Note: R5 segfaults)
+        create system clipboard
+	Name() returns "system"
+case 2: name points to valid string =>
+	Name() returns a copy of name
+
+status_t Clear(void)
+case 1: BClipboard not locked =>
+	return B_ERROR
+case 2: BClipboard is locked =>
+	return B_OK
+	Data() returns an empty message
+
+status_t Commit(void)
+case 1: BClipboard not locked =>
+	return B_ERROR
+case 2: BClipboard is locked =>
+	return B_OK
+	data is uploaded to system
+
+status_t Revert(void)
+case 1: BClipboard not locked =>
+	return B_ERROR
+case 2: BClipboard is locked =>
+	return B_OK
+	message returned by Data() is reset to value acquired on Lock()
+
+BMessage *Data(void) const
+case 1: BClipboard not locked =>
+	return NULL
+case 2: BClipboard is locked =>
+	returns a BMessage containing correct data
+
+BMessenger DataSource(void) const
+case 1: clipboard has never been written =>
+	returns an invalid BMessenger
+case 2: BClipboard has never been locked =>
+	returns an invalid BMessenger
+case 3: BClipboard has been locked at some point =>
+  	returns BMessenger that wrote the data acquired in the last Lock()
+
+uint32 LocalCount(void) const
+case 1: BClipboard has not been read or written =>
+	return 0
+case 2: BClipboard "A" writes once, no other BClipboards write =>
+	return 1
+case 3: BClipboard "B" writes once, BClipboard "A" reads =>
+	return 1 for both BClipboards
+case 4: BClipboard "B" writes, BClipboard "A" reads, BClipboard "B" writes =>
+	return 1 for BClipboard "A", return 2 for BClipboard "B"
+case 5: BClipboard "A" writes, BClipboard "B" writes =>
+	return 1 for BClipboard "A", return 2 for BClipboard "B"
+case 6: BClipboard "A" writes to system clipboard "A", BClipboard "B" reads from system clipboard "B" =>
+	return 1 for BClipboard "A", return 0 for BClipboard "B"
+
+uint32 SystemCount(void) const
+case 1: clipboard has never been written by any BClipboards =>
+	return 0
+case 2: BClipboard "A" writes, BClipboard "B" neither reads nor writes =>
+	return 1 for both
+case 3: BClipboard "A" writes to system clipboard "A", BClipboard "B" is attached to system clipboard "B" =>
+	return 1 for BClipboard "A", return 0 for BClipboard "B"
+
+bool Lock(void)
+case 1: BClipboard is not locked by any threads =>
+	return true
+	data is downloaded from system
+case 2: BClipboard is deleted while Lock() is blocked =>
+	return false
+
+bool IsLocked(void)
+case 1: BClipboard is not locked =>
+	return false
+case 2: BClipboard is locked =>
+	return true
+
+void Lock(void)
+case 1: BClipboard is locked =>
+	unlocks clipboard (IsLocked returns false)
+
+const char *Name(void) const
+covered by constructor test cases
+
+status_t StartWatching(BMessenger target)
+case 1: =>
+	return B_OK, target is notified when clipboard is written
+
+status_t StopWatching(BMessenger target)
+case 1: target is watching the BClipboard =>
+	return B_OK
+case 2: target is not watching the BClipboard =>
+	return B_BAD_VALUE
