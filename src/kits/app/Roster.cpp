@@ -41,6 +41,7 @@
 #include <fs_info.h>
 #include <image.h>
 #include <List.h>
+#include <MessengerPrivate.h>
 #include <Mime.h>
 #include <Node.h>
 #include <NodeInfo.h>
@@ -2145,7 +2146,8 @@ BRoster::send_to_running(team_id team, int argc, const char *const *args,
 	app_info info;
 	error = GetRunningAppInfo(team, &info);
 	if (error == B_OK) {
-		BMessenger messenger(team, info.port, 0, true);
+		BMessenger messenger;
+		BMessenger::Private(messenger).SetTo(team, info.port, 0, true);
 		// send messages from the list
 		if (messageList) {
 			for (int32 i = 0;
@@ -2186,7 +2188,7 @@ DBG(OUT("BRoster::InitMessengers()\n"));
 	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
 DBG(OUT("  found roster port\n"));
 		// ask for the MIME messenger
-		fMess = BMessenger(info.team, rosterPort, 0, true);
+		BMessenger::Private(fMess).SetTo(info.team, rosterPort, 0, true);
 		BMessage reply;
 		status_t error = fMess.SendMessage(B_REG_GET_MIME_MESSENGER, &reply);
 		if (error == B_OK && reply.what == B_REG_SUCCESS) {

@@ -45,6 +45,7 @@
 #include <Errors.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <MessengerPrivate.h>
 #include <String.h>
 
 //#include <CRTDBG.H>
@@ -329,8 +330,10 @@ BMessenger BMessage::ReturnAddress() const
 {
 	if (WasDelivered())
 	{
-		return BMessenger(fReplyTo.team, fReplyTo.port, fReplyTo.target,
-						  fReplyTo.preferred);
+		BMessenger messenger;
+		BMessenger::Private(messenger).SetTo(fReplyTo.team, fReplyTo.port,
+			fReplyTo.target, fReplyTo.preferred);
+		return messenger;
 	}
 
 	return BMessenger();
@@ -457,9 +460,11 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
 							 bigtime_t timeout)
 {
 	// TODO: test
-	BMessenger messenger(fReplyTo.team, fReplyTo.port,
-						 fReplyTo.target,
-						 fReplyTo.preferred);
+	BMessenger messenger;
+	
+	BMessenger::Private messengerPrivate(messenger);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
+		fReplyTo.preferred);
 	if (fReplyRequired)
 	{
 		if (fReplyDone)
@@ -472,9 +477,9 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
 		the_reply->fIsReply = false;
 		if (err)
 		{
-			if (set_port_owner(messenger.fPort, messenger.fTeam) == B_BAD_TEAM_ID)
-			{
-				delete_port(messenger.fPort);
+			if (set_port_owner(messengerPrivate.Port(),
+				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
+				delete_port(messengerPrivate.Port());
 			}
 		}
 		return err;
@@ -526,9 +531,10 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
 							 bigtime_t send_timeout, bigtime_t reply_timeout)
 {
 	// TODO: test
-	BMessenger messenger(fReplyTo.team, fReplyTo.port,
-						 fReplyTo.target,
-						 fReplyTo.preferred);
+	BMessenger messenger;
+	BMessenger::Private messengerPrivate(messenger);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
+		fReplyTo.preferred);
 	if (fReplyRequired)
 	{
 		if (fReplyDone)
@@ -542,9 +548,9 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
 		the_reply->fIsReply = false;
 		if (err)
 		{
-			if (set_port_owner(messenger.fPort, messenger.fTeam) == B_BAD_TEAM_ID)
-			{
-				delete_port(messenger.fPort);
+			if (set_port_owner(messengerPrivate.Port(),
+				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
+				delete_port(messengerPrivate.Port());
 			}
 		}
 		return err;
@@ -1792,14 +1798,15 @@ PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 	tmp_msg.fReplyTo       = fReplyTo;
 
 	BMessage* self = const_cast<BMessage*>(this);
+	BMessenger::Private replyToPrivate(reply_to);
 	self->fPreferred         = preferred;
 	self->fTarget            = token;
 	self->fReplyRequired     = reply_required;
-	self->fReplyTo.team      = reply_to.fTeam;
-	self->fReplyTo.port      = reply_to.fPort;
-	self->fReplyTo.target    = (reply_to.fPreferredTarget
-								? B_PREFERRED_TOKEN : reply_to.fHandlerToken);
-	self->fReplyTo.preferred = reply_to.fPreferredTarget;
+	self->fReplyTo.team      = replyToPrivate.Team();
+	self->fReplyTo.port      = replyToPrivate.Port();
+	self->fReplyTo.target    = (replyToPrivate.IsPreferredTarget()
+								? B_PREFERRED_TOKEN : replyToPrivate.Token());
+	self->fReplyTo.preferred = replyToPrivate.IsPreferredTarget();
 
 	char tmp[0x800];
 	ssize_t size;
@@ -1863,7 +1870,9 @@ status_t BMessage::send_message(port_id port, team_id port_owner, int32 token,
 		goto error;
 
 	{
-		BMessenger messenger(team, reply_port, B_PREFERRED_TOKEN, false);
+		BMessenger messenger;
+		BMessenger::Private(messenger).SetTo(team, reply_port,
+			B_PREFERRED_TOKEN, false);
 		err = _send_(port, token, preferred, send_timeout, true, messenger);
 	}
 	if (err)

@@ -14,6 +14,7 @@
 #include <Entry.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <MessengerPrivate.h>
 #include <SupportDefs.h>
 
 // Project Includes ------------------------------------------------------------
@@ -62,10 +63,11 @@ inline
 void
 _set_message_reply_(BMessage *message, BMessenger messenger)
 {
-	message->fReplyTo.port = messenger.fPort;
-	message->fReplyTo.target = messenger.fHandlerToken;
-	message->fReplyTo.team = messenger.fTeam;
-	message->fReplyTo.preferred = messenger.fPreferredTarget;
+	BMessenger::Private messengerPrivate(messenger);
+	message->fReplyTo.port = messengerPrivate.Port();
+	message->fReplyTo.target = messengerPrivate.Token();
+	message->fReplyTo.team = messengerPrivate.Team();
+	message->fReplyTo.preferred = messengerPrivate.IsPreferredTarget();
 }
 //------------------------------------------------------------------------------
 inline int32 _get_message_target_(BMessage *msg)

@@ -6,6 +6,7 @@
 
 #include <ByteOrder.h>
 #include <Messenger.h>
+#include <MessengerPrivate.h>
 
 
 status_t
@@ -108,10 +109,13 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 			BMessenger *end = (BMessenger *)((addr_t)_data + length);
 
 			while (messenger < end) {
+				BMessenger::Private messengerPrivate(messenger);
 				// ToDo: if the additional fields change, this function has to be updated!
-				messenger->fPort = __swap_int32(messenger->fPort);
-				messenger->fHandlerToken = __swap_int32(messenger->fHandlerToken);
-				messenger->fTeam = __swap_int32(messenger->fTeam);
+				messengerPrivate.SetTo(
+					__swap_int32(messengerPrivate.Team()),
+					__swap_int32(messengerPrivate.Port()),
+					__swap_int32(messengerPrivate.Token()),
+					messengerPrivate.IsPreferredTarget());
 				messenger++;
 			}
 			break;
