@@ -544,7 +544,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (count <= 0)
+	if (count <= 0 && (flags & B_RELEASE_ALL) == 0)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
