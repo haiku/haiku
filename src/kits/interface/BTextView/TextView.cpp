@@ -3048,19 +3048,47 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			} else
 				Select(fClickOffset, fClickOffset);
 			break;
+		
+		// TODO: Clean up this mess
+		case B_PAGE_UP:
+		{
+			int32 currentOffset = OffsetAt(fClickOffset);
+			float delta = Bounds().Height();
+				
+			if (ScrollBar(B_VERTICAL) != NULL)
+				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() - delta);
 			
-		case B_PAGE_UP: 
+			int32 newOffset = OffsetAt(LineAt(PointAt(currentOffset - delta)));
+			
+			if (shiftDown) {
+				if (newOffset <= fSelStart)
+					Select(newOffset, fSelEnd);
+				else
+					Select(fSelStart, newOffset);
+			} else
+				Select(newOffset, newOffset);
+			
+			break;
+		}
+		
 		case B_PAGE_DOWN:
 		{
 			int32 currentOffset = OffsetAt(fClickOffset);
 			float delta = Bounds().Height();
-			delta = (inPageKey == B_PAGE_UP) ? -delta : delta;
 				
 			if (ScrollBar(B_VERTICAL) != NULL)
 				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() + delta);
 			
-			// TODO: Selection
-			GoToLine(LineAt(PointAt(currentOffset + delta)));
+			int32 newOffset = OffsetAt(LineAt(PointAt(currentOffset + delta)));
+			
+			if (shiftDown) {
+				if (newOffset >= fSelEnd)
+					Select(fSelStart, newOffset);
+				else
+					Select(newOffset, fSelEnd);
+			} else
+				Select(newOffset, newOffset);
+
 			
 			break;
 		}
