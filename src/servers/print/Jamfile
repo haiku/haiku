@@ -3,6 +3,12 @@ SubDir OBOS_TOP src servers print ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders shared ;
 
+AddResources
+	print_server
+	:
+	PrintServer.FileTypes.rsrc
+	;
+
 Server 
 	print_server 
 	:
@@ -19,10 +25,4 @@ LinkSharedOSLibs
 	: 
 	be 
 	root 
-	;
-
-XRes
-	print_server
-	:
-	PrintServer.FileTypes.rsrc
 	;
