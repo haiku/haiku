@@ -30,6 +30,8 @@ static const uint32 kHexByteWidth = 3;
  *	accepted.
  */
 
+// ToDo: a valid UTF-8 string would be nicer...
+
 bool
 is_valid_ascii(uint8 *data, size_t size)
 {
@@ -895,6 +897,45 @@ DataView::FrameResized(float width, float height)
 }
 
 
+void
+DataView::InitiateDrag(view_focus focus)
+{
+	BMessage *drag = new BMessage(B_MIME_DATA);
+
+	// Add originator and action
+	drag->AddPointer("be:originator", this);
+	//drag->AddString("be:clip_name", "Byte Clipping");
+	//drag->AddInt32("be_actions", B_TRASH_TARGET);
+
+	// Add data (just like in Copy())
+	uint8 *data = fData + fStart;
+	size_t length = fEnd + 1 - fStart;
+
+	drag->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
+	if (is_valid_ascii(data, length))
+		drag->AddData("text/plain", B_MIME_TYPE, data, length);
+
+	// get a frame that contains the whole selection - SelectionFrame()
+	// only spans a rectangle between the start and the end point, so
+	// we have to pass it the correct input values
+
+	BRect frame;
+	const int32 width = kBlockSize - 1;
+	int32 first = fStart & ~width;
+	int32 last = ((fEnd + width) & ~width) - 1;
+	if (first == (last & ~width))
+		frame = SelectionFrame(focus, fStart, fEnd);
+	else
+		frame = SelectionFrame(focus, first, last);
+
+	BRect bounds = Bounds();
+	if (!bounds.Contains(frame))
+		frame = bounds & frame;
+
+	DragMessage(drag, frame, NULL);
+}
+
+
 void 
 DataView::MouseDown(BPoint where)
 {
@@ -902,14 +943,24 @@ DataView::MouseDown(BPoint where)
 
 	BMessage *message = Looper()->CurrentMessage();
 	int32 buttons;
-	if (message == NULL || message->FindInt32("buttons", &buttons) != B_OK
-		|| (buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
+	if (message == NULL || message->FindInt32("buttons", &buttons) != B_OK)
+		return;
+
+	view_focus newFocus;
+	int32 position = PositionAt(kNoFocus, where, &newFocus);
+
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
+		&& position >= fStart && position <= fEnd) {
+		InitiateDrag(newFocus);
+		return;
+	}
+
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
 		return;
 
 	int32 modifiers = message->FindInt32("modifiers");
 
-	view_focus newFocus;
-	fMouseSelectionStart = PositionAt(kNoFocus, where, &newFocus);
+	fMouseSelectionStart = position;
 	if (fMouseSelectionStart == -1) {
 		// "where" is outside the valid frame
 		return;

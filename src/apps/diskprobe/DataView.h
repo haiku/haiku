@@ -77,6 +77,7 @@ class DataView : public BView {
 		void UpdateFromEditor(BMessage *message = NULL);
 		void ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size);
 
+		void InitiateDrag(view_focus focus);
 		void Copy();
 		void Paste();
 
