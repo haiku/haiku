@@ -346,7 +346,21 @@ rule Addon
 	targetdir = [ FDirName $(OBOS_ADDON_DIR) $(2) ] ;
 
 	MakeLocate $(1) : $(targetdir) ;
-	LINKFLAGS on $(1) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(1)\" ;
+	LINKFLAGS on $(1) += -nostart -Xlinker -soname=\"$(1)\" ;
+}
+
+rule KernelAddon
+{
+	# KernelAddon <name> : <relpath> : <sources> ;	
+
+	local sources = $(3) ;
+
+	Addon $(1) : $(2) : $(3) ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
+								-fno-exceptions -fno-rtti ;
+	LINKFLAGS on $(1) += -nostdlib ;
+	LinkSharedOSLibs $(1) : /boot/develop/lib/x86/_KERNEL_ ;
 }
 
 rule MakeLocateObjects
@@ -387,7 +401,7 @@ rule SharedLibrary
 	MakeLocateObjects $(2) ;
 	Main $(_lib) : $(2) ;
 	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
-	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
+	LINKFLAGS on $(_lib) += -nostart -Xlinker -soname=\"$(_lib)\" ;
 }
 
 rule LinkSharedOSLibs
