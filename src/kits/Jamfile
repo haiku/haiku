@@ -39,4 +39,4 @@ SubInclude OBOS_TOP src kits support ;
 SubInclude OBOS_TOP src kits translation ;
 SubInclude OBOS_TOP src kits device ;
 SubInclude OBOS_TOP src kits game ;
-# SubInclude OBOS_TOP src kits net ;
+SubInclude OBOS_TOP src kits net ;

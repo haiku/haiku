@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src kits net ;
+
+SubInclude OBOS_TOP src kits net libnet ;
+SubInclude OBOS_TOP src kits net libnetapi ;
