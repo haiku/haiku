@@ -141,7 +141,7 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array {
 	$"FFFFFFFFFFFFFF0000000EFF00000EFF"
 };
 
-resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.Be-SHEL";
+resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.obos.terminal";
 
 resource(2, "BEOS:TYPE") (#'MIMS') "application/x-vnd.Be-elfexecutable";
 

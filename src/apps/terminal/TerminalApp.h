@@ -24,6 +24,7 @@ public:
 			void	CloseTerminal();
 	
 private:
+			void	PrintUsage(const char * execname);
 	int32			fWindowCount;
 	int32			fNext_Terminal_Window;
 		
