@@ -130,9 +130,10 @@ KernelLd libroot.so :
 	posix_math_arch_$(OBOS_ARCH).o
 	posix_signal.o
 	posix_stdio.o
-	posix_gnu_getopt.o
+	posix_gnu_ext.o
 	posix_gnu_libio.o
 	posix_gnu_stdio.o
+	posix_gnu_wcsmbs.o
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
