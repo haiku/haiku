@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003-2005, Haiku, Inc.
+//	Copyright (c) 2003-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -30,15 +30,18 @@
 #include <Window.h>
 
 class BMenu;
+class BMenuScroller;
+
 class BMenuWindow : public BWindow {
 public:
-	BMenuWindow(BMenu *menu);
+	BMenuWindow(const char *name);
 	virtual ~BMenuWindow();
-
-	virtual void WindowActivated(bool active);
+	
+	void UpdateScrollers();
 
 private:
-	BMenu *fMenu;
+	BMenuScroller *fUpperScroller;
+	BMenuScroller *fLowerScroller;
 };
 
 #endif
