@@ -5,7 +5,6 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-#include <be_setup.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -199,7 +198,9 @@ struct winsize {                    /* for the TIOCGWINSZ ioctl */
 #define TCGB_DCD		0x08
 
 
-__extern_c_start
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define  tcgetattr(f, t) ioctl(f, TCGETA, (char *)t)
 
@@ -242,6 +243,8 @@ int   tcflush(int fd, int queue_selector);
 int   tcsetpgrp(int fd, pid_t pgrpid);
 pid_t tcgetpgrp(int fd);
 
-__extern_c_end
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TERMIOS_H_ */
