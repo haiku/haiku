@@ -731,3 +731,138 @@ error reply fields:
 
 -----------------------------------------------------------------------
 
+
+Clipboard Handler Requests
+--------------------------
+
+add new clipboard to system (BClipboard::BClipboard())
+
+target:		clipboard handler
+message:	B_REG_ADD_CLIPBOARD
+			"name":					B_STRING_TYPE
+reply:		standard general result
+
+message fields:
+- "name": Name used to identify the particular clipboard to add
+
+reply fields:
+- "result":
+  - B_OK: B
+  - B_BAD_VALUE: name field was not specified in message
+
+-----------------------------------------------------------------------
+
+get clipboard write count (BClipboard::GetSystemCount())
+
+target:		clipboard handler
+message:	B_REG_GET_CLIPBOARD_COUNT
+			"name":					B_STRING_TYPE
+reply:		standard general result
+			"count":				B_INT32_TYPE
+
+message fields:
+- "name": Name used to identify the particular clipboard
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_BAD_VALUE: no name / no valid name specified in message
+- "count":
+  - number of times this clipboard has been written to
+
+-----------------------------------------------------------------------
+
+start watching clipboard (BClipboard::StartWatching())
+
+target:		clipboard handler
+message:	B_REG_CLIPBOARD_START_WATCHING
+			"name":					B_STRING_TYPE
+			"target":				B_MESSENGER_TYPE
+reply:		standard general result
+
+message fields:
+- "name": Name used to identify the particular clipboard
+- "target": Messenger pointing to the target to notify
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_BAD_VALUE: no name / no valid name specified in message
+  		 no target specified
+
+-----------------------------------------------------------------------
+
+stop watching clipboard (BClipboard::StopWatching())
+
+target:		clipboard handler
+message:	B_REG_CLIPBOARD_STOP_WATCHING
+			"name":					B_STRING_TYPE
+			"target":				B_MESSENGER_TYPE
+reply:		standard general result
+
+message fields:
+- "name": Name used to identify the particular clipboard
+- "target": Messenger pointing to the target to remove from the notify list
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_BAD_VALUE: no name / no valid name specified in message
+  		 no target specified
+
+-----------------------------------------------------------------------
+
+download clipboard data (BClipboard::DownloadFromSystem())
+
+target:		clipboard handler
+message:	B_REG_DOWNLOAD_CLIPBOARD
+			"name":					B_STRING_TYPE
+reply:		standard general result
+			"data":					B_MESSAGE_TYPE
+			"data source":				B_MESSENGER_TYPE
+			"count":				B_INT32_TYPE
+
+message fields:
+- "name": Name used to identify the particular clipboard
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_BAD_VALUE: no name / no valid name specified in message
+  		 no target specified
+- "data":
+  - message with Data fields containing the contents of the clipboard
+- "data source":
+  - messenger to the be_app_messenger of the application which last wrote data
+- "count":
+  - number of times this clipboard has been written to
+
+-----------------------------------------------------------------------
+
+upload clipboard data (BClipboard::UploadToSystem())
+
+target:		clipboard handler
+message:	B_REG_UPLOAD_CLIPBOARD
+			"name":					B_STRING_TYPE
+			"data":					B_MESSAGE_TYPE
+			"data source":				B_MESSENGER_TYPE
+reply:		standard general result
+			"count":				B_INT32_TYPE
+
+message fields:
+- "name": Name used to identify the particular clipboard
+- "data":
+  - message with Data fields containing the contents of the clipboard
+- "data source":
+  - messenger to the be_app_messenger of the application which last wrote data
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_BAD_VALUE: no name / no valid name specified in message
+  		 no target specified
+- "count":
+  - number of times this clipboard has been written to
+
+-----------------------------------------------------------------------
+
