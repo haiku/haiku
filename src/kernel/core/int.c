@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved. 
 ** Distributed under the terms of the NewOS License. 
 */ 
+
 #include <kernel.h> 
 #include <int.h> 
 #include <debug.h> 
@@ -143,4 +144,5 @@ int int_io_interrupt_handler(int vector)
         release_spinlock(&io_vectors[vector].vector_lock); 
 
         return ret; 
-} 
+}
+
