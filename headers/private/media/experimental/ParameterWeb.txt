@@ -1,0 +1,78 @@
+This file contains extensions to the standard set of parameter web constants.
+
+/* constants for extractors */
+
+extern _IMPEXP_MEDIA const char * const B_DURATION; 
+  // Output only: Selects the duration of the stream.
+  //
+  // This is the playing time of the stream, which may be
+  // different from some or all of the durations for the
+  // individual streams.  Return a negative number if the
+  // duration is not a useful number. (like streaming audio)
+  // This duration may be an estimate because determining
+  // the exact duration may require parsing an entire file.
+  // This duration may also be updated over time.  For
+  // example, a file being read may also be being written to
+  // by someone else.
+
+extern _IMPEXP_MEDIA const char * const B_MEDIA_COPYRIGHT;
+  // Output only: Selects the copyright notice of the stream.
+  //
+  // This is a string with a copyright notice.  The
+  // string belongs to the extractor, so don't delete
+  // or change it.
+
+extern _IMPEXP_MEDIA const char * const B_MEDIA_TRACK_COUNT;
+  // Output only: Selects the count of the
+  // number of tracks in the stream.
+  //
+  // This is the current number of tracks in the stream.
+
+extern _IMPEXP_MEDIA const char * const B_MEDIA_FRAME_COUNT;
+  // Output only: Selects the count of the
+  // number of frames in the stream.
+  //
+  // This is the current number of frames in the stream.
+  // See BMediaTrack::CountFrames()
+  
+extern _IMPEXP_MEDIA const char * const B_MEDIA_CURRENT_FRAME_INDEX;
+  // Output only: Selects the index of the
+  // current frame in the stream.
+  //
+  // This is the current frame in the stream.
+  // See BMediaTrack::CurrentFrame()
+
+extern _IMPEXP_MEDIA const char * const B_MEDIA_CURRENT_TIME;
+  // Output only: Selects the current time of the stream.
+  //
+  // This is the time at the current position of the stream.
+  // See BMediaTrack::CurrentTime()
+
+extern _IMPEXP_MEDIA const char * const B_MEDIA_ENCODED_FORMAT;
+  // Output only: Selects the native encoded format of the streams data.
+  //
+  // See BMediaTrack::EncodedFormat()
+  
+extern _IMPEXP_MEDIA const char * const B_MEDIA_TRACK_CODEC_INFO;
+  // Output only: Selects the codec information for this stream
+  //
+  // See BMediaTrack::GetCodecInfo()
+  
+extern _IMPEXP_MEDIA const char * const B_MEDIA_QUALITY;
+  // Input/output: Selects the quality rating for this stream
+  //
+  // See BMediaTrack::GetQuality and BMediaTrack::SetQuality
+
+// Used for extractor-based seek:
+extern _IMPEXP_MEDIA const char * const B_MEDIA_SEEK_STREAM_NUMBER;
+  // Input/Output: Selects the stream to be selected for seeking.
+  //
+  // When the extractor is asked to seek, it will seek on
+  // this stream, and then seek the other streams depending
+  // on where it ends up on the first stream.  A typical
+  // value for this corresponds to a video stream.  In this
+  // case the video stream will be seeked to the closest key
+  // frame for example, and then any other streams will be
+  // seeked to that time.  Only 'open' streams will be
+  // seeked.
+
