@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src apps showimage ;
+
+AddResources ShowImage : ShowImage.rsrc ;
+
+App ShowImage : ShowImageApp.cpp
+	ShowImageConstants.cpp
+	ShowImageStatusView.cpp
+	ShowImageView.cpp
+	ShowImageWindow.cpp ;
+
+LinkSharedOSLibs ShowImage : be tracker translation ;
+
