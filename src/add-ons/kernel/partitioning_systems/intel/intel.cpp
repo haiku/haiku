@@ -299,13 +299,14 @@ static void pm_free_identify_partition_cookie(partition_data *partition,
 static void pm_free_partition_cookie(partition_data *partition);
 static void pm_free_partition_content_cookie(partition_data *partition);
 
+#ifndef _BOOT_MODE
 // querying
 static bool pm_supports_resizing_child(partition_data *partition,
 									   partition_data *child);
 
 static bool pm_validate_resize_child(partition_data *partition,
 									 partition_data *child, off_t *size);
-
+#endif
 
 #ifdef _BOOT_MODE
 partition_module_info gIntelPartitionMapModule = {
