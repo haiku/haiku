@@ -158,7 +158,6 @@ class Inode {
 		DoublyLinked::List<ReadRequest>	fDoneRequests;
 
 		benaphore	fRequestLock;
-		sem_id		fReadLock;
 		sem_id		fWriteLock;
 };
 
@@ -423,7 +422,6 @@ Inode::Inode(Volume *volume, const char *name, int32 type)
 	fType = type;
 
 	if (type == S_IFIFO) {
-		fReadLock = create_sem(0, "pipe read");
 		fWriteLock = create_sem(1, "pipe write");
 		benaphore_init(&fRequestLock, "pipe request");
 	}
@@ -434,8 +432,7 @@ Inode::~Inode()
 {
 	free(const_cast<char *>(fName));
 
-	if (fType == S_IFIFO) {	
-		delete_sem(fReadLock);
+	if (fType == S_IFIFO) {
 		delete_sem(fWriteLock);
 		benaphore_destroy(&fRequestLock);
 	}
@@ -496,10 +493,6 @@ Inode::WriteBufferToChain(const void *buffer, size_t *_bufferSize, bool nonBlock
 	// join this chain with our already existing chain (if any)
 
 	chain = cbuf_merge_chains(fBufferChain, chain);
-
-	// let waiting readers go on
-//	if (fBufferChain == NULL)
-//		release_sem(ReadLock());
 
 	fBufferChain = chain;
 	*_bufferSize = bufferSize;
