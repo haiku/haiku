@@ -248,6 +248,8 @@ DataEditor::AddChange(DataChange *change)
 	if (change == NULL)
 		return;
 
+	RemoveRedos();
+
 	fChanges.AddItem(change);
 	fLastChange = change;
 }
@@ -299,7 +301,10 @@ DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 void 
 DataEditor::ApplyChanges()
 {
-	int32 count = fChanges.CountItems();
+	if (fLastChange == NULL)
+		return;
+
+	int32 count = fChanges.IndexOf(fLastChange) + 1;
 
 	for (int32 i = 0; i < count; i++) {
 		DataChange *change = fChanges.ItemAt(i);
@@ -308,15 +313,32 @@ DataEditor::ApplyChanges()
 }
 
 
+/** This method will be called by DataEditor::AddChange()
+ *	immediately before a change is applied.
+ *	It removes all pending redo nodes from the list that would
+ *	come after the current change.
+ */
+
 void 
 DataEditor::RemoveRedos()
 {
+	if (fLastChange == NULL)
+		return;
+
+	int32 start = fChanges.IndexOf(fLastChange) + 1;
+
+	for (int32 i = fChanges.CountItems(); i-- > start; ) {
+		DataChange *change = fChanges.RemoveItemAt(i);
+		delete change;
+	}
 }
 
 
 status_t 
 DataEditor::Undo()
 {
+	BAutolock locker(fLock);
+
 	if (!CanUndo())
 		return B_ERROR;
 
@@ -335,6 +357,17 @@ DataEditor::Undo()
 status_t 
 DataEditor::Redo()
 {
+	BAutolock locker(fLock);
+
+	if (!CanRedo())
+		return B_ERROR;
+
+	int32 index = fChanges.IndexOf(fLastChange);
+	fLastChange = fChanges.ItemAt(index + 1);
+
+	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
+
+	return B_OK;
 }
 
 
@@ -348,7 +381,7 @@ DataEditor::CanUndo() const
 bool 
 DataEditor::CanRedo() const
 {
-	return fLastChange != NULL && fChanges.IndexOf(fLastChange) < fChanges.CountItems() - 1;
+	return fChanges.IndexOf(fLastChange) < fChanges.CountItems() - 1;
 }
 
 

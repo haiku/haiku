@@ -131,6 +131,29 @@ DiskProbe::DiskProbe()
 	if (printBlock(editor, "undo (location 0):") < B_OK)
 		return;
 
+	status = editor.Redo();
+	if (status < B_OK)
+		fprintf(stderr, "Could not redo: %s\n", strerror(status));
+	if (printBlock(editor, "redo (location 0):") < B_OK)
+		return;
+
+	status = editor.Redo();
+	editor.SetViewOffset(700);
+	if (status < B_OK)
+		fprintf(stderr, "Could not redo: %s\n", strerror(status));
+	if (printBlock(editor, "redo (location 700):") < B_OK)
+		return;
+
+	status = editor.Redo();
+	if (status == B_OK)
+		fprintf(stderr, "Could apply redo (non-expected behaviour)!\n");
+
+	status = editor.Undo();
+	if (status < B_OK)
+		fprintf(stderr, "Could not undo: %s\n", strerror(status));
+	if (printBlock(editor, "undo (location 700):") < B_OK)
+		return;
+
 	PostMessage(B_QUIT_REQUESTED);
 }
 
