@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003, OpenBeOS
+//	Copyright (c) 2003-2004, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -46,16 +46,16 @@ const int32 kMaxVerticalExtent = 0x10000000;
 
 
 #define TRACE_REGION 0
+#define ARGS (const char *, ...)
 #if TRACE_REGION
-	#define RTRACE printf
-	#define CALLED() RTRACE("%s\n", __PRETTY_FUNCTION__)
+	#define RTRACE(ARGS) printf ARGS
+	#define CALLED() printf("%s\n", __PRETTY_FUNCTION__)
 #else
-	#define RTRACE (void)
+	#define RTRACE(ARGS) ;
  	#define CALLED()
 #endif
 
 using namespace std;
-
 
 /*!	\brief zeroes the given region, setting its rect count to 0,
 	and invalidating its bound rectangle.
@@ -84,7 +84,7 @@ BRegion::Support::ClearRegion(BRegion *region)
 	CALLED();
 
 	// XXX: What is it used for ?
-	// Can be that a cleared region represents an infinite one ?
+	// Could be that a cleared region represents an infinite one ?
 	
 	region->count = 0;
 	region->bound.left = 0xfffffff;
@@ -265,11 +265,11 @@ BRegion::Support::CleanupRegionVertical(BRegion *region)
 {
 	CALLED();
 	
-	clipping_rect testRect = { 1, 1, -1, -2 };
+	clipping_rect testRect = { 1, 1, -1, -2 };	
 	long newCount = -1;
 		
 	for (long x = 0; x < region->count; x++) {
-		clipping_rect rect = region->data[x];
+		clipping_rect &rect = region->data[x];
 					
 		if (rect.left == testRect.left && rect.right == testRect.right
 				&& rect.top == testRect.bottom + 1) {
@@ -299,7 +299,8 @@ BRegion::Support::CleanupRegionHorizontal(BRegion *region)
 	long newCount = -1;
 
 	for (long x = 0; x < region->count; x++) {
-		clipping_rect rect = region->data[x];
+		clipping_rect &rect = region->data[x];
+		
 		if (rect.top == testRect.top && rect.bottom == testRect.bottom
 					&& rect.left == testRect.right + 1) {
 			
@@ -316,6 +317,17 @@ BRegion::Support::CleanupRegionHorizontal(BRegion *region)
 }
 
 
+// Helper method to swap two rects
+static inline void
+SwapRects(clipping_rect &rect, clipping_rect &anotherRect)
+{
+	clipping_rect tmpRect;
+	tmpRect = rect;
+	rect = anotherRect;
+	anotherRect = tmpRect;
+}
+
+
 /*!	\brief Sorts the given rects by their top value.
 	\param rects A pointer to an array of clipping_rects.
 	\param count The number of rectangles in the array.
@@ -328,24 +340,36 @@ BRegion::Support::SortRects(clipping_rect *rects, long count)
 	bool again; //flag that tells we changed rects positions
 			
 	if (count == 2) {
-		if (rects[0].top > rects[1].top) {
-			clipping_rect tmp = rects[0];
-			rects[0] = rects[1];
-			rects[1] = tmp;
-		}
+		if (rects[0].top > rects[1].top)
+			SwapRects(rects[0], rects[1]);
+		
 	} else if (count > 2) {
 		do {
 			again = false;
 			for (long c = 1; c < count; c++) {
 				if (rects[c - 1].top > rects[c].top) {
-					clipping_rect tmp = rects[c - 1];
-					rects[c - 1] = rects[c];
-					rects[c] = tmp;
+					SwapRects(rects[c - 1], rects[c]);
 					again = true;
 				}
 			}
 		} while (again); 
 	}
+}
+
+
+// Helper methods to swap transition points in two given arrays
+static inline void
+SwapTrans(long *leftPoints, long *rightPoints, long index1, long index2)
+{
+	// First, swap the left points
+	long tmp = leftPoints[index1];
+	leftPoints[index1] = leftPoints[index2];
+	leftPoints[index2] = tmp;
+	
+	// then the right points
+	tmp = rightPoints[index1];
+	rightPoints[index1] = rightPoints[index2];
+	rightPoints[index2] = tmp;	
 }
 
 
@@ -357,31 +381,19 @@ BRegion::Support::SortTrans(long *lptr1, long *lptr2, long count)
 	bool again; //flag that tells we changed trans positions
 			
 	if (count == 2) {
-		if (lptr1[0] > lptr1[1]) {
-			int32 tmp = lptr1[0];
-			lptr1[0] = lptr1[1];
-			lptr1[1] = tmp;
-			
-			tmp = lptr2[0];
-			lptr2[0] = lptr2[1];
-			lptr2[1] = tmp;
-		}
+		if (lptr1[0] > lptr1[1])
+			SwapTrans(lptr1, lptr2, 0, 1);
+		
 	} else if (count > 2) {
 		do {
 			again = false;
 			for (long c = 1; c < count; c++) {
 				if (lptr1[c - 1] > lptr1[c]) {
-					int32 tmp = lptr1[c - 1];
-					lptr1[c - 1] = lptr1[c];
-					lptr1[c] = tmp;
-					
-					tmp = lptr2[c - 1];
-					lptr2[c - 1] = lptr2[c];
-					lptr2[c] = tmp;
+					SwapTrans(lptr1, lptr2, c - 1, c);
 					again = true;
 				}
 			}
-		} while (again); 
+		} while (again);	
 	}
 }
 
@@ -529,8 +541,8 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 	int32 maxCount = first->count - i1 + second->count - i2;
 	
 	if (maxCount > kMaxPoints) {
-		RTRACE("Stack space isn't sufficient. Allocating %d bytes on the heap...\n",
-				2 * maxCount);
+		RTRACE(("Stack space isn't sufficient. Allocating %ld bytes on the heap...\n",
+				2 * maxCount));
 		lefts = allocatedBuffer = new(nothrow) int32[2 * maxCount];
 		if (!allocatedBuffer)
 			return;
@@ -600,7 +612,7 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 	}
 	
 	if (allocatedBuffer) {
-		RTRACE("Freeing heap...\n");
+		RTRACE(("Freeing heap...\n"));
 		delete[] allocatedBuffer;
 	}
 }
@@ -813,8 +825,8 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	int32 maxCountB = second->count - i2;
 	
 	if (maxCountA + maxCountB > kMaxPoints) {
-		RTRACE("Stack space isn't sufficient. Allocating %d bytes on the heap...\n",
-				2 * (maxCountA + maxCountB));
+		RTRACE(("Stack space isn't sufficient. Allocating %ld bytes on the heap...\n",
+				2 * (maxCountA + maxCountB)));
 		leftsA = allocatedBuffer = new(nothrow) int32[2 * (maxCountA + maxCountB)];
 		if (!allocatedBuffer)
 			return;
@@ -937,7 +949,7 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	}
 
 	if (allocatedBuffer) {
-		RTRACE("Freeing heap...\n");
+		RTRACE(("Freeing heap...\n"));
 		delete[] allocatedBuffer;
 	}
 }
