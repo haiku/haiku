@@ -182,12 +182,8 @@ family_to_string(media_format_family family)
 			return "AIFF";
 		case B_AVR_FORMAT_FAMILY:
 			return "AVR";
-		case B_OGG_FORMAT_FAMILY:
-			return "OGG";
 		case B_MISC_FORMAT_FAMILY:
 			return "misc";
-		case B_META_FORMAT_FAMILY:
-			return "meta";
 		default:
 			return "unknown";
 	}
@@ -234,14 +230,8 @@ string_for_description(const media_format_description &desc, char *string, size_
 		case B_AVR_FORMAT_FAMILY:
 			snprintf(string, length, "AVR format, id 0x%lx", desc.u.avr.id);
 			break;
-		case B_OGG_FORMAT_FAMILY:
-			snprintf(string, length, "OGG format");
-			break;
 		case B_MISC_FORMAT_FAMILY:
 			snprintf(string, length, "misc format, file-format id 0x%lx, codec id 0x%lx", desc.u.misc.file_format, desc.u.misc.codec);
-			break;
-		case B_META_FORMAT_FAMILY:
-			snprintf(string, length, "meta format, description %s", desc.u.meta.description);
 			break;
 		default:
 			snprintf(string, length, "unknown format");
