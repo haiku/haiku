@@ -27,6 +27,7 @@
 #include <bus.h>
 #include <kmodule.h>
 #include <int.h>
+#include <kernel_daemon.h>
 
 #include <string.h>
 
@@ -101,6 +102,7 @@ _start(kernel_args *oldka, int cpu_num)
 		team_init(&ka);
 		thread_init(&ka);
 		port_init(&ka);
+		kernel_daemon_init();
 
 		vm_init_postthread(&ka);
 		elf_init(&ka);

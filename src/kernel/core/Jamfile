@@ -13,6 +13,7 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>heap.c 
 	<$(SOURCE_GRIST)>image.c 
 	<$(SOURCE_GRIST)>int.c 
+	<$(SOURCE_GRIST)>kernel_daemon.c 
 	<$(SOURCE_GRIST)>khash.c 
 	<$(SOURCE_GRIST)>linkhack.c 
 	<$(SOURCE_GRIST)>list.c 
