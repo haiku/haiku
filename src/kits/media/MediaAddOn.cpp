@@ -547,6 +547,7 @@ BMediaAddOn::AddonID()
 status_t
 BMediaAddOn::NotifyFlavorChange()
 {
+	CALLED();
 	if (fAddon == 0)
 		return B_ERROR;
 	

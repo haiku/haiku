@@ -17,6 +17,8 @@
 #include "ServerInterface.h"
 #include "DormantNodeManager.h"
 
+#define USER_ADDON_PATH "/boot/home/Develop/OpenBeOS/current/distro/x86.R1/beos/system/add-ons/media"
+
 void DumpFlavorInfo(const flavor_info *info);
 
 class MediaAddonServer : BApplication
@@ -125,7 +127,11 @@ MediaAddonServer::ReadyToRun()
 	DirNodeSystem = nref.node;
 	WatchDir(&e);
 
+#ifdef USER_ADDON_PATH
+	BEntry e2(USER_ADDON_PATH);
+#else
 	BEntry e2("/boot/home/config/add-ons/media");
+#endif
 	e2.GetNodeRef(&nref);
 	DirNodeUser = nref.node;
 	WatchDir(&e2);
@@ -216,7 +222,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
-		printf("failed to get add-on\n");
+		printf("MediaAddonServer::AddOnAdded: failed to get add-on\n");
 		_DormantNodeManager->UnregisterAddon(id);
 		return;
 	}

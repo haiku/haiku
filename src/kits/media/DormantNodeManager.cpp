@@ -52,7 +52,7 @@ DormantNodeManager::~DormantNodeManager()
 	// force unloading all currently loaded images
 	loaded_addon_info *info;
 	for (int32 index = 0; fAddonmap->GetPointerAt(index,&info); index++) {
-		printf("Forcing unload of add-on %d with usecount %d\n",info->addon, info->usecount);
+		printf("Forcing unload of add-on id %d with usecount %d\n",info->addon->AddonID(), info->usecount);
 		UnloadAddon(info->addon, info->image);
 	}
 	
@@ -140,7 +140,6 @@ DormantNodeManager::PutAddon(media_addon_id id)
 	bool unload;
 
 	printf("DormantNodeManager::PutAddon, id %d\n",id);
-
 	
 	fLock->Lock();
 	if (!fAddonmap->GetPointer(id, &info)) {
@@ -291,7 +290,7 @@ void
 DormantNodeManager::UnloadAddon(BMediaAddOn *addon, image_id image)
 {
 	ASSERT(addon);
-	ASSERT(addon->Image() == image); // if this failes, something bad happends to the add-on
+	ASSERT(addon->Image() == image); // if this failes, something bad happened to the add-on
 	delete addon;
 	unload_add_on(image);
 }

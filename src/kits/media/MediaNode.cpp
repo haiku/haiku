@@ -686,7 +686,7 @@ BMediaNode::BMediaNode(const char *name,
 		strncpy(fName,name,B_MEDIA_NAME_LENGTH - 1);
 		fName[B_MEDIA_NAME_LENGTH - 1] = 0;
 	}
-	TRACE("Media node name is: %s\n",fName);
+	TRACE("BMediaNode::BMediaNode: node name is: %s\n",fName);
 
 	// create control port
 	fControlPort = create_port(64,fName);

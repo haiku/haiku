@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
+#include "DormantNodeManager.h"
 
 static BMessenger *ServerMessenger = 0;
 static team_id team;
@@ -1094,7 +1095,7 @@ status_t
 BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 									 media_node * out_node)
 {
-	UNIMPLEMENTED();
+	CALLED();
 
 	// to instantiate a dormant node in the current address space, we need to
 	// either load the add-on from file and create a new BMediaAddOn class, or
@@ -1107,7 +1108,26 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 
 	// RegisterNode() is called automatically for nodes instantiated from add-ons
 
-	return B_ERROR;
+	//XXX TEST!
+	BMediaAddOn *addon;
+	BMediaNode *node;
+	BMessage config;
+	status_t out_error;
+	addon = _DormantNodeManager->GetAddon(in_info.addon);
+	if (!addon) {
+		printf("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
+		return B_ERROR;
+	}
+	flavor_info temp;
+	temp.internal_id = in_info.flavor_id;
+	node = addon->InstantiateNodeFor(&temp, &config, &out_error);
+	if (!node) {
+		printf("BMediaRoster::InstantiateDormantNode: InstantiateNodeFor failed\n");
+		_DormantNodeManager->PutAddon(in_info.addon);
+		return B_ERROR;
+	}
+	*out_node = node->Node();
+	return B_OK;
 }
 
 
