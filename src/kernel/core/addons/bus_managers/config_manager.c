@@ -1,7 +1,8 @@
-/* config_manager.c
- * 
- * Module that provides access to driver modules and busses
- */
+/* Config Manager
+** provides access to device configurations
+**
+** Distributed under the terms of the OpenBeOS License.
+*/
 
 #include <ktypes.h> 
 #include <config_manager.h>
@@ -14,31 +15,99 @@
 #include <memheap.h>
 #include <KernelExport.h>
 
-static pci_module_info *pcim = NULL;
+static pci_module_info *gPCI = NULL;
 
 #define B_CONFIG_MANAGER_FOR_BUS_MODULE_NAME "bus_managers/config_manager/bus/v1"
 
-static status_t cfdm_get_next_device_info(bus_type bus, uint64 *cookie,
-                                          struct device_info *info, uint32 len)
+#define FUNCTION(x...) dprintf(__FUNCTION__ x)
+#define TRACE(x) dprintf x
+
+
+//	#pragma mark -
+//	Driver module API
+
+
+static status_t
+driver_get_next_device_info(bus_type bus, uint64 *cookie, struct device_info *info, uint32 size)
 {
-	dprintf("get_next_device_info(bus = %d, cookie = %lld)\n",
-	        bus, *cookie);
-	return 0;
+	FUNCTION("(bus = %d, cookie = %lld)\n", bus, *cookie);
+	return B_ENTRY_NOT_FOUND;
 }
-	
-/* device_modules */
-static int32 cfdm_std_ops(int32 op, ...)
+
+
+static status_t
+driver_get_device_info_for(uint64 id, struct device_info *info, uint32 size)
 {
-	switch(op) {
+	FUNCTION("(id = %Ld)\n", id);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_get_size_of_current_configuration_for(uint64 id)
+{
+	FUNCTION("(id = %Ld)\n", id);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_get_current_configuration_for(uint64 id, struct device_configuration *current, uint32 size)
+{
+	FUNCTION("(id = %Ld, current = %p, size = %lu)\n", id, current, size);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_get_size_of_possible_configurations_for(uint64 id)
+{
+	FUNCTION("(id = %Ld)\n", id);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_get_possible_configurations_for(uint64 id, struct possible_device_configurations *possible, uint32 size)
+{
+	FUNCTION("(id = %Ld, possible = %p, size = %lu)\n", id, possible, size);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_count_resource_descriptors_of_type(const struct device_configuration *config, resource_type type)
+{
+	FUNCTION("(config = %p, type = %d)\n", config, type);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+driver_get_nth_resource_descriptor_of_type(const struct device_configuration *config, uint32 num,
+	resource_type type, resource_descriptor *descr, uint32 size)
+{
+	FUNCTION("(config = %p, num = %ld)\n", config, num);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static int32
+driver_std_ops(int32 op, ...)
+{
+	switch (op) {
 		case B_MODULE_INIT:
-			dprintf( "config_manager: device modules: init\n" );
-			if (get_module(B_PCI_MODULE_NAME, (module_info**)&pcim) != 0) {
-				dprintf("config_manager: failed to load PCI module\n");
+			TRACE(("config_manager: driver module: init\n"));
+
+			// ToDo: should not do this! Instead, iterate through all busses/config_manager/
+			//	modules and get them
+			if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI) != 0) {
+				TRACE(("config_manager: failed to load PCI module\n"));
 				return -1;
 			}
 			break;
 		case B_MODULE_UNINIT:
-			dprintf( "config_manager: device modules: uninit\n" );
+			TRACE(("config_manager: driver module: uninit\n"));
 			break;
 		default:
 			return EINVAL;
@@ -46,15 +115,20 @@ static int32 cfdm_std_ops(int32 op, ...)
 	return B_OK;
 }
 
-/* bus_modules */
-static int32 cfbm_std_ops(int32 op, ...)
+
+//	#pragma mark -
+//	Bus module API
+
+
+static int32
+bus_std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			dprintf( "config_manager: bus modules: init\n" );
+			TRACE(("config_manager: bus module: init\n"));
 			break;
 		case B_MODULE_UNINIT:
-			dprintf( "config_manager: bus modules: uninit\n" );
+			TRACE(("config_manager: bus module: uninit\n"));
 			break;
 		default:
 			return EINVAL;
@@ -62,46 +136,37 @@ static int32 cfbm_std_ops(int32 op, ...)
 	return B_OK;
 }
 
-/* cfdm = configuration_manager_device_modules */
-struct config_manager_for_driver_module_info cfdm = {
+
+struct config_manager_for_driver_module_info gDriverModuleInfo = {
 	{
 		B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME,
 		B_KEEP_LOADED,
-		cfdm_std_ops
+		driver_std_ops
 	},
+
+	&driver_get_next_device_info,
+	&driver_get_device_info_for,
+	&driver_get_size_of_current_configuration_for,
+	&driver_get_current_configuration_for,
+	&driver_get_size_of_possible_configurations_for,
+	&driver_get_possible_configurations_for,
 	
-	&cfdm_get_next_device_info, /* get_next_device_info */
-	NULL, /* get_device_info_for */
-	NULL, /* get_size_of_current_configuration_for */
-	NULL, /* get_current_configuration_for */
-	NULL, /* get_size_of_possible_configurations */
-	NULL, /* get_possible_configurations_for */
-	
-	NULL, /* count_resource_descriptors_of_type */
-	NULL, /* get_nth_resource_descriptor_of_type */
+	&driver_count_resource_descriptors_of_type,
+	&driver_get_nth_resource_descriptor_of_type,
 };
 
-/* cfbm = configuration_manager_bus_modules */
-struct config_manager_for_driver_module_info cfbm = {
-	{
+struct module_info gBusModuleInfo = {
+	//{
 		B_CONFIG_MANAGER_FOR_BUS_MODULE_NAME,
 		B_KEEP_LOADED,
-		cfbm_std_ops
-	},
-	
-	NULL, /* get_next_device_info */
-	NULL, /* get_device_info_for */
-	NULL, /* get_size_of_current_configuration_for */
-	NULL, /* get_current_configuration_for */
-	NULL, /* get_size_of_possible_configurations */
-	NULL, /* get_possible_configurations_for */
-	
-	NULL, /* count_resource_descriptors_of_type */
-	NULL, /* get_nth_resource_descriptor_of_type */
+		bus_std_ops
+	//},
+
+	// ToDo: find out what's in here!
 };
 
 module_info *modules[] = {
-	(module_info*)&cfdm,
-	(module_info*)&cfbm,
+	(module_info *)&gDriverModuleInfo,
+	(module_info *)&gBusModuleInfo,
 	NULL
 };
