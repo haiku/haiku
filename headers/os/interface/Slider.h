@@ -175,7 +175,11 @@ virtual void				SetBarThickness(float thickness);
 
 virtual void				SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 
+#ifdef BEOS_R5_COMPATIBLE
+virtual	void				_ReservedSlider4();
+#else
 virtual void				SetLimits(int32 minimum, int32 maximum); // Was _ReservedSlider4()
+#endif
 /*----- Private or reserved -----------------------------------------*/
 private:
 		void				_DrawBlockThumb();
