@@ -38,6 +38,9 @@ class MenuItem {
 		void SetType(menu_item_type type);
 		menu_item_type Type() const { return fType; }
 
+		void SetData(void *data);
+		void *Data() const { return fData; }
+
 		const char *Label() const { return fLabel; }
 		Menu *Submenu() const { return fSubMenu; }
 
@@ -53,6 +56,7 @@ class MenuItem {
 		bool			fIsSelected;
 		menu_item_type	fType;
 		Menu			*fMenu, *fSubMenu;
+		void			*fData;
 };
 
 typedef DoublyLinked::List<MenuItem> MenuItemList;
