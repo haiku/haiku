@@ -322,14 +322,6 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		int bit_depth, color_type, interlace_type;
 		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
 			&interlace_type, int_p_NULL, int_p_NULL);
-
-		if ((color_type == PNG_COLOR_TYPE_GRAY ||
-			color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && bit_depth < 8) {
-			// libpng's gray to RGB conversion is not implemented
-			// for bit depths less than 8
-			result = B_NO_TRANSLATOR;
-			break;
-		}
 		
 		// Setup image transformations to make converting it easier
 		bool balpha = false;
@@ -341,6 +333,11 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 			
 		if (color_type == PNG_COLOR_TYPE_PALETTE)
 			png_set_palette_to_rgb(ppng);
+			
+		if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
+			// In order to convert from low-depth gray images to RGB,
+			// I first need to convert them to grayscale, 8 bpp
+			png_set_gray_1_2_4_to_8(ppng);
 			
 		if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
 			// if there is transparency data in the
