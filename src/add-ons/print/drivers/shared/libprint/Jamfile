@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons print drivers shared libprint ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
+
+StaticLibrary print :
+	AboutBox.cpp
+	DbgMsg.cpp
+	GraphicsDriver.cpp
+	Halftone.cpp
+	JobData.cpp
+	JobSetupDlg.cpp
+	PackBits.cpp
+	PageSetupDlg.cpp
+	Preview.cpp
+	PrinterData.cpp
+	PrinterCap.cpp
+	PrintProcess.cpp
+	SpoolMetaData.cpp
+	Transport.cpp
+	UIDriver.cpp
+	ValidRect.cpp
+;
+
