@@ -12,5 +12,6 @@ int RLD_STARTUP(void *args)
 	sys_close(1); open("/dev/console", 0); /* stdout  */
 	sys_close(2); open("/dev/console", 0); /* stderr  */
 #endif
-	rldmain(args);
+	return rldmain(args);
 }
+
