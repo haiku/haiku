@@ -15,12 +15,11 @@
 
 
 #ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS
-{
+namespace OpenBeOS {
 #endif
 
-/*----------------------------------------------------------------*/
-/*----- BStringItem class ----------------------------------------*/
+
+//----- BStringItem class ----------------------------------------
 
 class BStringItem : public BListItem
 {
@@ -41,11 +40,15 @@ public:
 	virtual status_t	Perform(perform_code code, void *arg);
 
 private:
+	virtual	void		_ReservedStringItem1();
+	virtual	void		_ReservedStringItem2();
+
 	BStringItem(const BStringItem &);
 	BStringItem& operator=(const BStringItem &);
 
 	char	*fText;
 	float	fBaselineOffset;
+	uint32	_reserved[2];
 };
 
 #ifdef USE_OPENBEOS_NAMESPACE
