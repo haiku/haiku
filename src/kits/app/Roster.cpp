@@ -742,19 +742,7 @@ BRoster::StopWatching(BMessenger target) const
 status_t
 BRoster::ActivateApp(team_id team) const
 {
-	status_t error = (team >= 0 ? B_OK : B_BAD_TEAM_ID);
-	// compose the request message
-	BMessage request(B_REG_ACTIVATE_APP);
-	if (error == B_OK)
-		error = request.AddInt32("team", team);
-	// send the request
-	BMessage reply;
-	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
-	// evaluate the reply
-	if (error == B_OK && reply.what != B_REG_SUCCESS)
-		reply.FindInt32("error", &error);
-	return error;
+	return B_ERROR;	// not implemented
 }
 
 // Launch
@@ -1744,10 +1732,32 @@ DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error)
 }
 
 // UpdateActiveApp
+/*!	\brief Tells the registrar that a certain team is active now.
+
+	It doesn't matter, if the application is already active. In that case,
+	the registrar does nothing. Otherwise, the previously active application
+	is notified, that it is no longer active now, the now active application
+	is notified, that it is active now, and all watchers are notified, too.
+
+	\param team The app's team ID.
+	\return \c true, if everything went fine, \c false, if an error occured.
+*/
 bool
 BRoster::UpdateActiveApp(team_id team) const
 {
-	return false; // not implemented
+	status_t error = (team >= 0 ? B_OK : B_BAD_TEAM_ID);
+	// compose the request message
+	BMessage request(B_REG_ACTIVATE_APP);
+	if (error == B_OK)
+		error = request.AddInt32("team", team);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return (error == B_OK);
 }
 
 // SetAppFlags
