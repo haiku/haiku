@@ -251,6 +251,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	for (num = 0; num <= 9; num++) {
 		fScaleControl->TextView()->AllowChar('0' + num);
 	}
+	fScaleControl->TextView()->SetMaxBytes(3);
 
 	panel->AddChild(fScaleControl);	
 
@@ -301,6 +302,9 @@ PageSetupWindow::UpdateSetupMessage()
 	float scale = atoi(fScaleControl->Text());
 	if (scale <= 0.0) { // sanity check
 		scale = 100.0;
+	}
+	if (scale > 1000.0) {
+		scale = 1000.0;
 	}
 	SetFloat(fSetupMsg, "scale", scale);
 
