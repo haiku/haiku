@@ -22,20 +22,17 @@ struct request_data;
 status_t SendToServer(BMessage *msg);
 status_t QueryServer(BMessage *request, BMessage *reply);
 
-// BMessage based data exchange with the media_addon_server
-status_t SendToAddonServer(BMessage *msg);
-
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, void *msg, int size);
-status_t QueryServer(int32 msgcode, const request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // Raw data based data exchange with the media_addon_server
 status_t SendToAddonServer(int32 msgcode, void *msg, int size);
-status_t QueryAddonServer(int32 msgcode, const request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // Raw data based data exchange with the media_server
 status_t SendToPort(port_id sendport, int32 msgcode, void *msg, int size);
-status_t QueryPort(port_id requestport, int32 msgcode, const request_data *request, int requestsize, reply_data *reply, int replysize);
+status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // The base struct used for all raw requests
 struct request_data

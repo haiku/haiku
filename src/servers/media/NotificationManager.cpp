@@ -4,25 +4,23 @@
 #include <Messenger.h>
 #include <MediaNode.h>
 #include <Debug.h>
+#include "NodeManager.h"
 #include "DataExchange.h"
 #include "Notifications.h"
 #include "NotificationManager.h"
 #include "Queue.h"
 
-#define NOTIFICATION_THREAD_PRIORITY 19
+extern NodeManager *gNodeManager;
 
-struct RegisteredHandler
-{
-	BMessenger messenger;
-	media_node_id nodeid;
-	int32 mask;
-	team_id team;
-};
+
+#define NOTIFICATION_THREAD_PRIORITY 19
+#define TIMEOUT 100000
 
 NotificationManager::NotificationManager()
  :	fNotificationQueue(new Queue),
 	fNotificationThreadId(-1),
-	fLocker(new BLocker)
+	fLocker(new BLocker),
+	fNotificationList(new List<Notification>)
 {
 	fNotificationThreadId = spawn_thread(NotificationManager::worker_thread, "notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);
 	resume_thread(fNotificationThreadId);
@@ -36,6 +34,7 @@ NotificationManager::~NotificationManager()
 	wait_for_thread(fNotificationThreadId, &dummy);
 	delete fNotificationQueue;
 	delete fLocker;
+	delete fNotificationList;
 }
 
 void
@@ -58,8 +57,23 @@ NotificationManager::RequestNotifications(BMessage *msg)
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
 	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
 	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
-	ASSERT(nodesize == sizeof(node));
+	ASSERT(nodesize == sizeof(media_node));
 
+	Notification n;
+	n.messenger = messenger;
+	n.node = *node;
+	n.what = what;
+	n.team = team;
+
+	fLocker->Lock();
+	fNotificationList->Insert(n);
+	fLocker->Unlock();
+
+	// send the initial B_MEDIA_NODE_CREATED containing all existing live nodes
+	BMessage initmsg(B_MEDIA_NODE_CREATED);
+	if (B_OK == gNodeManager->GetLiveNodes(&initmsg)) {
+		messenger.SendMessage(&initmsg, static_cast<BHandler *>(NULL), TIMEOUT);
+	}
 }
 
 void
@@ -75,23 +89,122 @@ NotificationManager::CancelNotifications(BMessage *msg)
 	msg->FindInt32(NOTIFICATION_PARAM_TEAM, &team);
 	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
 	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
-	ASSERT(nodesize == sizeof(node));
+	ASSERT(nodesize == sizeof(media_node));
+	
+	/* if 		what == B_MEDIA_WILDCARD && node == media_node::null
+	 *		=> delete all notifications for the matching team & messenger 
+	 * else if 	what != B_MEDIA_WILDCARD && node == media_node::null
+	 *		=> delete all notifications for the matching what & team & messenger 
+	 * else if 	what == B_MEDIA_WILDCARD && node != media_node::null
+	 *		=> delete all notifications for the matching team & messenger & node
+	 * else if 	what != B_MEDIA_WILDCARD && node != media_node::null
+	 *		=> delete all notifications for the matching what & team & messenger & node
+	 */
+	 
+	fLocker->Lock();
 
+	Notification n;
+	for (int32 index = 0; fNotificationList->GetAt(index, &n); index++) {
+		bool remove;
+		if (what == B_MEDIA_WILDCARD && *node == media_node::null && team == n.team && messenger == n.messenger)
+			remove = true;
+		else if (what != B_MEDIA_WILDCARD && *node == media_node::null && what == n.what && team == n.team && messenger == n.messenger)
+			remove = true;
+		else if (what == B_MEDIA_WILDCARD && *node != media_node::null && team == n.team && messenger == n.messenger && n.node == *node)
+			remove = true;
+		else if (what != B_MEDIA_WILDCARD && *node != media_node::null && what == n.what && team == n.team && messenger == n.messenger && n.node == *node)
+			remove = true;
+		else
+			remove = false;
+		if (remove) {
+			if (fNotificationList->Remove(index)) {
+				index--;
+			} else {
+				ASSERT(false);
+			}
+		}
+	}
+
+	fLocker->Unlock();
 }
 
 void
 NotificationManager::SendNotifications(BMessage *msg)
 {
+	const media_source *source;
+	const media_destination *destination;
+	const media_node *node;
+	ssize_t size;
+	int32 what;
+
+	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
+	msg->RemoveName(NOTIFICATION_PARAM_WHAT);
+	msg->what = what;
+
+	fLocker->Lock();
+
+	Notification n;
+	for (int32 index = 0; fNotificationList->GetAt(index, &n); index++) {
+		if (n.what != B_MEDIA_WILDCARD && n.what != what)
+			continue;
+		
+		switch (what) {
+			case B_MEDIA_NODE_CREATED:
+			case B_MEDIA_NODE_DELETED:
+			case B_MEDIA_CONNECTION_MADE:
+			case B_MEDIA_CONNECTION_BROKEN:
+			case B_MEDIA_BUFFER_CREATED:
+			case B_MEDIA_BUFFER_DELETED:
+			case B_MEDIA_TRANSPORT_STATE:
+			case B_MEDIA_DEFAULT_CHANGED:
+			case B_MEDIA_FLAVORS_CHANGED:
+				if (n.node != media_node::null)
+					continue;
+				break;
+
+			case B_MEDIA_NEW_PARAMETER_VALUE:
+			case B_MEDIA_PARAMETER_CHANGED:
+			case B_MEDIA_NODE_STOPPED:
+			case B_MEDIA_WEB_CHANGED:
+				msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &size);
+				ASSERT(size == sizeof(media_node));
+				if (n.node != *node)
+					continue;
+				break;
+
+			case B_MEDIA_FORMAT_CHANGED:
+				msg->FindData("source", B_RAW_TYPE, reinterpret_cast<const void **>(&source), &size);
+				ASSERT(size == sizeof(media_source));
+				msg->FindData("destination", B_RAW_TYPE, reinterpret_cast<const void **>(&destination), &size);
+				ASSERT(size == sizeof(media_destination));
+				if (n.node.port != source->port && n.node.port != destination->port)
+					continue;
+				break;
+		}
+
+		n.messenger.SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
+	}
+
+	fLocker->Unlock();
 }
 	
 void
 NotificationManager::CleanupTeam(team_id team)
 {
-}
+	fLocker->Lock();
 
-void
-NotificationManager::BroadcastMessages(BMessage *msg)
-{
+	Notification n;
+	for (int32 index = 0; fNotificationList->GetAt(index, &n); index++) {
+		if (n.team == team) {
+			if (fNotificationList->Remove(index)) {
+				index--;
+			} else {
+				ASSERT(false);
+			}
+		}
+	}
+
+	fLocker->Unlock();
 }
 
 void

@@ -31,6 +31,11 @@
  *
  */
 
+NotificationManager *gNotificationManager;
+BufferManager *gBufferManager;
+AppManager *gAppManager;
+NodeManager *gNodeManager;
+
 
 #define REPLY_TIMEOUT ((bigtime_t)500000)
 
@@ -107,10 +112,6 @@ private:
 	port_id		control_port;
 	thread_id	control_thread;
 
-	NotificationManager *fNotificationManager;
-	BufferManager *fBufferManager;
-	AppManager *fAppManager;
-	NodeManager *fNodeManager;
 	BLocker *fLocker;
 	
 	float fVolumeLeft;
@@ -122,10 +123,6 @@ private:
 
 ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
- 	fNotificationManager(new NotificationManager),
- 	fBufferManager(new BufferManager),
-	fAppManager(new AppManager),
-	fNodeManager(new NodeManager),
 	fLocker(new BLocker("server locker")),
 	fVolumeLeft(0.0),
 	fVolumeRight(0.0)
@@ -133,6 +130,12 @@ ServerApp::ServerApp()
 	//load volume settings from config file
 	//mVolumeLeft = ???;
 	//mVolumeRight = ???;
+
+ 	gNotificationManager = new NotificationManager;
+ 	gBufferManager = new BufferManager;
+	gAppManager = new AppManager;
+	gNodeManager = new NodeManager;
+
 	control_port = create_port(64,"media_server port");
 	control_thread = spawn_thread(controlthread,"media_server control",12,this);
 	resume_thread(control_thread);
@@ -140,10 +143,10 @@ ServerApp::ServerApp()
 
 ServerApp::~ServerApp()
 {
-	delete fNotificationManager;
-	delete fBufferManager;
-	delete fAppManager;
-	delete fNodeManager;
+	delete gNotificationManager;
+	delete gBufferManager;
+	delete gAppManager;
+	delete gNodeManager;
 	delete fLocker;
 	delete_port(control_port);
 	status_t err;
@@ -160,7 +163,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			xfer_server_get_mediaaddon_ref *msg = (xfer_server_get_mediaaddon_ref *)data;
 			xfer_server_get_mediaaddon_ref_reply reply;
 			entry_ref tempref;
-			reply.result = fNodeManager->GetAddonRef(&tempref, msg->addonid);
+			reply.result = gNodeManager->GetAddonRef(&tempref, msg->addonid);
 			reply.ref = tempref;
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
@@ -188,7 +191,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			xfer_server_register_mediaaddon *msg = (xfer_server_register_mediaaddon *)data;
 			xfer_server_register_mediaaddon_reply reply;
-			fNodeManager->RegisterAddon(msg->ref, &reply.addonid);
+			gNodeManager->RegisterAddon(msg->ref, &reply.addonid);
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
 		}
@@ -196,7 +199,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		case SERVER_UNREGISTER_MEDIAADDON:
 		{
 			xfer_server_unregister_mediaaddon *msg = (xfer_server_unregister_mediaaddon *)data;
-			fNodeManager->UnregisterAddon(msg->addonid);
+			gNodeManager->UnregisterAddon(msg->addonid);
 			break;
 		}
 		
@@ -205,10 +208,10 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			xfer_server_register_dormant_node *msg = (xfer_server_register_dormant_node *)data;
 			dormant_flavor_info dfi;
 			if (msg->purge_id > 0)
-				fNodeManager->RemoveDormantFlavorInfo(msg->purge_id);
+				gNodeManager->RemoveDormantFlavorInfo(msg->purge_id);
 			rv = dfi.Unflatten(msg->dfi_type, &(msg->dfi), msg->dfi_size);
 			ASSERT(rv == B_OK);
-			fNodeManager->AddDormantFlavorInfo(dfi);	
+			gNodeManager->AddDormantFlavorInfo(dfi);	
 			break;
 		}
 		
@@ -218,7 +221,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			xfer_server_get_dormant_nodes_reply reply;
 			dormant_node_info * infos = new dormant_node_info[msg->maxcount];
 			reply.count = msg->maxcount;
-			reply.result = fNodeManager->GetDormantNodes(
+			reply.result = gNodeManager->GetDormantNodes(
 				infos, 
 				&reply.count,
 				msg->has_input ? &msg->inputformat : NULL,
@@ -241,7 +244,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			dormant_flavor_info dfi;
 			status_t rv;
 
-			rv = fNodeManager->GetDormantFlavorInfoFor(msg->addon, msg->flavor_id, &dfi);
+			rv = gNodeManager->GetDormantFlavorInfoFor(msg->addon, msg->flavor_id, &dfi);
 			if (rv != B_OK) {
 				xfer_server_get_dormant_flavor_info_reply reply;
 				reply.result = rv;
@@ -285,7 +288,7 @@ void
 ServerApp::GetSharedBufferArea(BMessage *msg)
 {
 	BMessage reply(B_OK);
-	reply.AddInt32("area",fBufferManager->SharedBufferListID());
+	reply.AddInt32("area",gBufferManager->SharedBufferListID());
 	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
 }
 
@@ -312,9 +315,9 @@ ServerApp::RegisterBuffer(BMessage *msg)
 	//TRACE("ServerApp::RegisterBuffer team = 0x%08x, areaid = 0x%08x, offset = 0x%08x, size = 0x%08x, flags = 0x%08x, buffer = 0x%08x\n",(int)teamid,(int)area,(int)offset,(int)size,(int)flags,(int)bufferid);
 
 	if (bufferid == 0)
-		status = fBufferManager->RegisterBuffer(teamid, size, flags, offset, area, &bufferid);
+		status = gBufferManager->RegisterBuffer(teamid, size, flags, offset, area, &bufferid);
 	else
-		status = fBufferManager->RegisterBuffer(teamid, bufferid, &size, &flags, &offset, &area);
+		status = gBufferManager->RegisterBuffer(teamid, bufferid, &size, &flags, &offset, &area);
 
 	BMessage reply(status);
 	reply.AddInt32("buffer",bufferid);
@@ -336,7 +339,7 @@ ServerApp::UnregisterBuffer(BMessage *msg)
 	teamid = msg->FindInt32("team");
 	bufferid = msg->FindInt32("buffer");
 	
-	status = fBufferManager->UnregisterBuffer(teamid, bufferid);
+	status = gBufferManager->UnregisterBuffer(teamid, bufferid);
 
 	BMessage reply(status);
 	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
@@ -412,7 +415,7 @@ void ServerApp::RegisterApp(BMessage *msg)
 {
 	team_id team;
 	msg->FindInt32("team", &team);
-	fAppManager->RegisterTeam(team, msg->ReturnAddress());
+	gAppManager->RegisterTeam(team, msg->ReturnAddress());
 
 	BMessage reply(B_OK);
 	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
@@ -423,7 +426,7 @@ void ServerApp::UnregisterApp(BMessage *msg)
 {
 	team_id team;
 	msg->FindInt32("team", &team);
-	fAppManager->UnregisterTeam(team);
+	gAppManager->UnregisterTeam(team);
 
 	BMessage reply(B_OK);
 	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
@@ -548,9 +551,9 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_GET_SHARED_BUFFER_AREA: GetSharedBufferArea(msg); break;
 		case MEDIA_SERVER_REGISTER_BUFFER: RegisterBuffer(msg); break;
 		case MEDIA_SERVER_UNREGISTER_BUFFER: UnregisterBuffer(msg); break;
-		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationManager->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 	
 	
 		case MEDIA_SERVER_GET_NODE_ID: GetNodeID(msg); break;

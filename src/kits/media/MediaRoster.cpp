@@ -32,7 +32,7 @@ namespace BPrivate { namespace media {
 class _DefaultDeleter
 {
 public:
-	void Delete() { delete BMediaRoster::_sDefault; }
+	~_DefaultDeleter() { delete BMediaRoster::_sDefault; }
 };
 
 _DefaultDeleter _deleter;
