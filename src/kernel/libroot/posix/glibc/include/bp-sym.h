@@ -1,5 +1,7 @@
-/* Copyright (C) 1991, 1994, 1996, 1997 Free Software Foundation, Inc.
+/* Bounded-pointer symbol modifier.
+   Copyright (C) 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
+   Contributed by Greg McGary <greg@mcgary.org>
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -15,6 +17,10 @@
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-#include_next <errno.h>
 
-#define __set_errno(val) errno = (val)
+#define BP_SYM(name) _BP_SYM (name)
+#if __BOUNDED_POINTERS__
+# define _BP_SYM(name) __BP_##name
+#else
+# define _BP_SYM(name) name
+#endif
