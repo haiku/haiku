@@ -18,220 +18,61 @@
 #define B_BEOS_VERSION		B_BEOS_VERSION_5
 #define B_BEOS_VERSION_MAUI B_BEOS_VERSION_5
 
-#if defined(__powerc) || defined(powerc)
-	#define _PR2_COMPATIBLE_ 1
-	#define _PR3_COMPATIBLE_ 1
-	#define _R4_COMPATIBLE_ 1
-	#define _R4_5_COMPATIBLE_ 1
-#else
+#if defined(__POWERPC__)
+	// the PowerPC build is using GCC now (BeOS R5 used to use the Metrowerks
+	// compiler), so it is not compatible to any BeOS version on that platform
+	// before. However, that wouldn't rule out source compatibility, which
+	// we do here (for now).
+	#define _PR2_COMPATIBLE_ 0
+	#define _PR3_COMPATIBLE_ 0
+	#define _R4_COMPATIBLE_ 0
+	#define _R4_5_COMPATIBLE_ 0
+#elif defined(__INTEL__)
 	#define _PR2_COMPATIBLE_ 0
 	#define _PR3_COMPATIBLE_ 0
 	#define _R4_COMPATIBLE_ 1
 	#define _R4_5_COMPATIBLE_ 1
+#else
+#	error Configure BeBuild.h for your platform
 #endif
 
-
 #if __MWERKS__
-#define _UNUSED(x)
-#define _PACKED
+#	define _UNUSED(x)
+#	define _PACKED
 #endif
 
 #if __GNUC__
-#define _UNUSED(x) x
-#define _PACKED	__attribute__((packed))
+#	define _UNUSED(x) x
+#	define _PACKED	__attribute__((packed))
 #endif
 
-#if _STATIC_LINKING
+#if defined(__INTEL__) || defined(__POWERPC__)
 
-#define _EXPORT
-#define _IMPORT
-#define _IMPEXP_KERNEL
-#define	_IMPEXP_GL
-#define	_IMPEXP_ROOT
-#define	_IMPEXP_NET
-#define	_IMPEXP_NETDEV
-#define	_IMPEXP_ATALK
-#define	_IMPEXP_BE
-#define	_IMPEXP_TRACKER
-#define	_IMPEXP_MAIL
-#define	_IMPEXP_DEVICE
-#define	_IMPEXP_MEDIA
-#define	_IMPEXP_MIDI
-#define _IMPEXP_MIDI2
-#define _IMPEXP_GAME
-#define _IMPEXP_GSOUND
-#define _IMPEXP_TRANSLATION
-#define _IMPEXP_TEXTENCODING
-#define _IMPEXP_INPUT
+//	This is the standard import/export definitions used for
+//	the ELF binary format - this should be usable by all flavors
+//	of OpenBeOS.
 
-#else
+#	define _EXPORT
+#	define _IMPORT
 
-#if __INTEL__
-
-#define	_EXPORT			__declspec(dllexport)
-#define	_IMPORT			__declspec(dllimport)
-
-#if _BUILDING_kernel
-#define	_IMPEXP_KERNEL	__declspec(dllexport)
-#else
-#define	_IMPEXP_KERNEL	__declspec(dllimport)
-#endif
-
-#if _BUILDING_root
-#define	_IMPEXP_ROOT	__declspec(dllexport)
-#else
-#define	_IMPEXP_ROOT	__declspec(dllimport)
-#endif
-
-#if _BUILDING_net
-#define	_IMPEXP_NET		__declspec(dllexport)
-#else
-#define	_IMPEXP_NET		__declspec(dllimport)
-#endif
-
-#if _BUILDING_netdev
-#define	_IMPEXP_NETDEV	__declspec(dllexport)
-#else
-#define	_IMPEXP_NETDEV	__declspec(dllimport)
-#endif
-
-#if _BUILDING_atalk
-#define	_IMPEXP_ATALK	__declspec(dllexport)
-#else
-#define	_IMPEXP_ATALK	__declspec(dllimport)
-#endif
-
-#if _BUILDING_be
-#define	_IMPEXP_BE		__declspec(dllexport)
-#else
-#define	_IMPEXP_BE		__declspec(dllimport)
-#endif
-
-#if _BUILDING_gl
-#define	_IMPEXP_GL		__declspec(dllexport)
-#else
-#define	_IMPEXP_GL		__declspec(dllimport)
-#endif
-
-#if _BUILDING_tracker
-#define	_IMPEXP_TRACKER	__declspec(dllexport)
-#else
-#define	_IMPEXP_TRACKER	__declspec(dllimport)
-#endif
-
-#if _BUILDING_mail
-#define	_IMPEXP_MAIL	__declspec(dllexport)
-#else
-#define	_IMPEXP_MAIL	__declspec(dllimport)
-#endif
-
-#if _BUILDING_device
-#define	_IMPEXP_DEVICE	__declspec(dllexport)
-#else
-#define	_IMPEXP_DEVICE	__declspec(dllimport)
-#endif
-
-#if _BUILDING_media
-#define	_IMPEXP_MEDIA	__declspec(dllexport)
-#else
-#define	_IMPEXP_MEDIA	__declspec(dllimport)
-#endif
-
-#if _BUILDING_midi2
-#define	_IMPEXP_MIDI2	__declspec(dllexport)
-#else
-#define	_IMPEXP_MIDI2	__declspec(dllimport)
-#endif
-
-#if _BUILDING_midi
-#define	_IMPEXP_MIDI	__declspec(dllexport)
-#else
-#define	_IMPEXP_MIDI	__declspec(dllimport)
-#endif
-
-#if _BUILDING_game
-#define	_IMPEXP_GAME	__declspec(dllexport)
-#else
-#define	_IMPEXP_GAME	__declspec(dllimport)
-#endif
-
-#if _BUILDING_gsound
-#define	_IMPEXP_GSOUND	__declspec(dllexport)
-#else
-#define	_IMPEXP_GSOUND	__declspec(dllimport)
-#endif
-
-#if _BUILDING_translation
-#define _IMPEXP_TRANSLATION	__declspec(dllexport)
-#else
-#define _IMPEXP_TRANSLATION	__declspec(dllimport)
-#endif
-
-#if _BUILDING_textencoding
-#define _IMPEXP_TEXTENCODING	__declspec(dllexport)
-#else
-#define _IMPEXP_TEXTENCODING	__declspec(dllimport)
-#endif
-
-#if _BUILDING_input
-#define _IMPEXP_INPUT	__declspec(dllexport)
-#else
-#define _IMPEXP_INPUT	__declspec(dllimport)
-#endif
-
-#endif /* __INTEL__ */
-
-#if __POWERPC__
-
-#define	_EXPORT                 __declspec(dllexport)
-#define	_IMPORT					__declspec(dllimport)
-
-#define _IMPEXP_KERNEL
-#define	_IMPEXP_GL
-#define	_IMPEXP_ROOT
-#define	_IMPEXP_NET
-#define	_IMPEXP_NETDEV
-#define	_IMPEXP_ATALK
-#define	_IMPEXP_BE
-#define	_IMPEXP_TRACKER
-#define	_IMPEXP_MAIL
-#define	_IMPEXP_DEVICE
-#define	_IMPEXP_MEDIA
-#define	_IMPEXP_MIDI
-#define _IMPEXP_MIDI2
-#define	_IMPEXP_GAME
-#define _IMPEXP_GSOUND
-#define _IMPEXP_TRANSLATION
-#define _IMPEXP_TEXTENCODING
-#define _IMPEXP_INPUT
-
-#endif
-
-#if __SH__
-
-#define	_EXPORT
-#define	_IMPORT
-
-#define _IMPEXP_KERNEL
-#define	_IMPEXP_GL
-#define	_IMPEXP_ROOT
-#define	_IMPEXP_NET
-#define	_IMPEXP_NETDEV
-#define	_IMPEXP_ATALK
-#define	_IMPEXP_BE
-#define	_IMPEXP_TRACKER
-#define	_IMPEXP_MAIL
-#define	_IMPEXP_DEVICE
-#define	_IMPEXP_MEDIA
-#define	_IMPEXP_MIDI
-#define	_IMPEXP_GAME
-#define	_IMPEXP_GSOUND
-#define _IMPEXP_TRANSLATION
-#define _IMPEXP_TEXTENCODING
-#define _IMPEXP_INPUT
-
-#endif
-
+#	define _IMPEXP_KERNEL
+#	define	_IMPEXP_GL
+#	define	_IMPEXP_ROOT
+#	define	_IMPEXP_NET
+#	define	_IMPEXP_NETDEV
+#	define	_IMPEXP_ATALK
+#	define	_IMPEXP_BE
+#	define	_IMPEXP_TRACKER
+#	define	_IMPEXP_MAIL
+#	define	_IMPEXP_DEVICE
+#	define	_IMPEXP_MEDIA
+#	define	_IMPEXP_MIDI
+#	define _IMPEXP_MIDI2
+#	define _IMPEXP_GAME
+#	define _IMPEXP_GSOUND
+#	define _IMPEXP_TRANSLATION
+#	define _IMPEXP_TEXTENCODING
+#	define _IMPEXP_INPUT
 #endif
 
 
@@ -516,7 +357,6 @@ struct _IMPEXP_TRANSLATION	translator_info;
 /* GL */
 class _IMPEXP_GL BGLView;
 class _IMPEXP_GL BGLScreen;
-#ifdef __cplusplus
 class _IMPEXP_GL GLUnurbs;
 class _IMPEXP_GL GLUquadric;
 class _IMPEXP_GL GLUtesselator;
@@ -526,7 +366,13 @@ typedef class _IMPEXP_GL GLUquadric GLUquadricObj;
 typedef class _IMPEXP_GL GLUtesselator GLUtesselatorObj;
 typedef class _IMPEXP_GL GLUtesselator GLUtriangulatorObj;
 
-#else
+/* input_server */
+class _IMPEXP_INPUT	BInputServerDevice;
+class _IMPEXP_INPUT BInputServerFilter;
+class _IMPEXP_INPUT BInputServerMethod;
+
+#else	/* __cplusplus */
+
 typedef struct _IMPEXP_GL GLUnurbs GLUnurbs;
 typedef struct _IMPEXP_GL GLUquadric GLUquadric;
 typedef struct _IMPEXP_GL GLUtesselator GLUtesselator;
@@ -535,13 +381,7 @@ typedef struct _IMPEXP_GL GLUnurbs GLUnurbsObj;
 typedef struct _IMPEXP_GL GLUquadric GLUquadricObj;
 typedef struct _IMPEXP_GL GLUtesselator GLUtesselatorObj;
 typedef struct _IMPEXP_GL GLUtesselator GLUtriangulatorObj;
-#endif
 
-/* input_server */
-class _IMPEXP_INPUT	BInputServerDevice;
-class _IMPEXP_INPUT BInputServerFilter;
-class _IMPEXP_INPUT BInputServerMethod;
+#endif	/* __cplusplus */
 
-#endif		/* __cplusplus */
-
-#endif
+#endif	/* _BE_BUILD_H */
