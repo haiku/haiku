@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -23,43 +26,46 @@
 #endif
 
 
-int
-arch_vm_init(kernel_args *ka)
+status_t
+arch_vm_init(kernel_args *args)
 {
 	TRACE(("arch_vm_init: entry\n"));
 	return 0;
 }
 
 
-int
-arch_vm_init2(kernel_args *ka)
+status_t
+arch_vm_init_post_area(kernel_args *args)
 {
+	void *dmaAddress;
+	area_id id;
+
 	TRACE(("arch_vm_init2: entry\n"));
 
 	// account for DMA area and mark the pages unusable
-	vm_mark_page_range_inuse(0x0, 0xa0000 / PAGE_SIZE);
-
-	return 0;
-}
-
-
-int
-arch_vm_init_endvm(kernel_args *ka)
-{
-	region_id id;
-	void *ptr;
-
-	TRACE(("arch_vm_init_endvm: entry\n"));
+	vm_mark_page_range_inuse(0x0, 0xa0000 / B_PAGE_SIZE);
 
 	// map 0 - 0xa0000 directly
 	id = map_physical_memory("dma_region", (void *)0x0, 0xa0000,
-		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &ptr);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &dmaAddress);
 	if (id < 0) {
-		panic("arch_vm_init_endvm: unable to map dma region\n");
+		panic("arch_vm_init_post_areas: unable to map dma region\n");
 		return B_NO_MEMORY;
 	}
 
-	return 0;
+	return B_OK;
+}
+
+
+status_t
+arch_vm_init_end(kernel_args *args)
+{
+	TRACE(("arch_vm_init_endvm: entry\n"));
+
+	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
+	vm_free_unused_boot_loader_range(KERNEL_BASE, 0x400000 * args->arch_args.num_pgtables);
+
+	return B_OK;
 }
 
 
