@@ -287,7 +287,7 @@ status_t nm_configure_bes
 		bi.hsrcendv = (((uint32)((my_ov.h_start + my_ov.width) - 1)) << 16);
 	}
 	/* AND below required by hardware */
-	bi.hsrcendv &= 0x03fffffc;
+	bi.hsrcendv &= 0x03ffffff;
 	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", bi.hsrcendv / (float)65536));
 
 
@@ -463,18 +463,30 @@ status_t nm_configure_bes
 		{
 			bi.a1orgv >>= 1;
 			/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
-			/* (horizontal source end minimizes used bandwidth) */
-			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 7) & ~8) / 8) - 1));
+			/* notes:
+			 * - correctly programming horizontal source end minimizes used bandwidth;
+			 * - adding 9 below is in fact:
+			 *   - adding 1 to round-up to the nearest whole source-end value
+			       (making SURE we NEVER are a (tiny) bit too low);
+			     - adding 1 to convert 'last used position' to 'number of used pixels';
+			     - adding 7 to round-up to the nearest higher (or equal) valid register
+			       value (needed because of it's 8-pixel granularity). */
+			PCIGRPHW(0xbc, ((((bi.hsrcendv >> 16) + 9) >> 3) - 1));
 		}
 		else
 		{
 			/* NM2200 and later cards use bytes to define buffer pitch */
 			buf_pitch <<= 1;
 			/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
-			/* (horizontal source end minimizes used bandwidth) */
-			//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
-			//fixme? check if overlaybuffer width should also have granularity of 16 now!
-			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 15) & ~16) / 16) - 1));
+			/* notes:
+			 * - programming this register just a tiny bit too low messes up vertical
+			 *   scaling badly (also distortion stripes and flickering are reported)!
+			 * - not programming this register correctly will mess-up the picture when
+			 *   it's partly clipping on the right side of the screen...
+			 * - make absolutely sure the engine can fetch the last pixel needed from
+			 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+			 *   (see remarks for < NM2200 cards regarding programming this register) */
+			PCIGRPHW(0xbc, ((((bi.hsrcendv >> 16) + 17) >> 4) - 1));
 		}
 		PCIGRPHW(BUF1ORGL, (bi.a1orgv & 0xff));
 		PCIGRPHW(BUF1ORGM, ((bi.a1orgv >> 8) & 0xff));

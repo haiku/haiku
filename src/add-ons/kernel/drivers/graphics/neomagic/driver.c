@@ -944,18 +944,30 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	{
 		bes->a1orgv >>= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
-		/* (horizontal source end minimizes used bandwidth) */
-		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 7) & ~8) / 8) - 1));
+		/* notes:
+		 * - correctly programming horizontal source end minimizes used bandwidth;
+		 * - adding 9 below is in fact:
+		 *   - adding 1 to round-up to the nearest whole source-end value
+		       (making SURE we NEVER are a (tiny) bit too low);
+		     - adding 1 to convert 'last used position' to 'number of used pixels';
+		     - adding 7 to round-up to the nearest higher (or equal) valid register
+		       value (needed because of it's 8-pixel granularity). */
+		KISAGRPHW(0xbc, ((((bes->hsrcendv >> 16) + 9) >> 3) - 1));
 	}
 	else
 	{
 		/* NM2200 and later cards use bytes to define buffer pitch */
 		buf_pitch <<= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
-		/* (horizontal source end minimizes used bandwidth) */
-		//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
-		//fixme? check if overlaybuffer width should also have granularity of 16 now!
-		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 15) & ~16) / 16) - 1));
+		/* notes:
+		 * - programming this register just a tiny bit too low messes up vertical
+		 *   scaling badly (also distortion stripes and flickering are reported)!
+		 * - not programming this register correctly will mess-up the picture when
+		 *   it's partly clipping on the right side of the screen...
+		 * - make absolutely sure the engine can fetch the last pixel needed from
+		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+		 *   (see remarks for < NM2200 cards regarding programming this register) */
+		KISAGRPHW(0xbc, ((((bes->hsrcendv >> 16) + 17) >> 4) - 1));
 	}
 	KISAGRPHW(BUF1ORGL, (bes->a1orgv & 0xff));
 	KISAGRPHW(BUF1ORGM, ((bes->a1orgv >> 8) & 0xff));
