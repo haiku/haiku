@@ -100,6 +100,7 @@ status_t nv_agp_setup(void)
 	}
 
 	/* abort if specified by user in nv.settings */
+	//fixme: should probably be removed now... or updated to work via the busmanager.
 	if (si->settings.force_pci)
 	{
 		/* user specified not to use AGP */
