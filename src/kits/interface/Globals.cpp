@@ -28,11 +28,14 @@
 #include <AppServerLink.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
+#include <Menu.h>
 #include <ServerProtocol.h>
 #include <Screen.h>
 #include <PortMessage.h>
 #include <Roster.h>
+#include <TextView.h>
 
+//#include <WidthBuffer.h>
 
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
@@ -40,8 +43,8 @@ extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
 
-// InterfaceDefs.h
 
+// InterfaceDefs.h
 _IMPEXP_BE const color_map *
 system_colors()
 {
@@ -410,14 +413,29 @@ tint_color(rgb_color color, float tint)
 extern "C" status_t
 _init_interface_kit_()
 {
-	// TODO: Find out what this does and when it's called
+	sem_id widthSem = create_sem(1, "TextView WidthBuffer Sem");
+	if (widthSem < 0)
+		return widthSem;
+	BTextView::sWidthSem = widthSem;
+	BTextView::sWidthAtom = 0;
+	//sWidthBuffer = BTextView::sWidths = new _BWidthBuffer_;
+		
+	status_t result = get_menu_info(&BMenu::sMenuInfo);
+	if (result != B_OK)  
+		return result;
+	
+	//TODO: fill the other static members
+		
+	return B_OK;
 }
 
 
 extern "C" status_t
 _fini_interface_kit_()
 {
-	// TODO: Find out what this does and when it's called
+	//TODO: Implement ?
+	
+	return B_OK;
 }
 
 
