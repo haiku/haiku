@@ -1,38 +1,60 @@
 SubDir OBOS_TOP src apps bin vim runtime ;
 
-local VIMDIR = [ FDirName $(OBOS_ETC_DIR) vim vim63 ] ;
+# rules difference and glob-tree come from boost project
+#  (C) Copyright David Abrahams and Carlos Pinto Coelho 2001. Permission to 
+#  copy, use, modify, sell and distribute this software is granted provided this 
+#  copyright notice appears in all copies. This software is provided "as is" 
+#  without express or implied warranty, and with no claim as to its suitability 
+#  for any purpose. 
 
-rule RuntimeFiles 
+# difference listB : listA 
+# returns the elements of B that are not in A 
+rule difference 
+{ 
+    local result = ; 
+    local element ; 
+    for element in $(<) 
+    { 
+        if ! ( $(element) in $(>) ) 
+        { 
+            result += $(element) ; 
+        } 
+    } 
+    return $(result) ; 
+} 
+
+# Recursive version of GLOB. Builds the glob of files while 
+# also searching in the subdirectories of the given root. 
+# 
+rule glob-tree
+{ 
+    local e ; 
+    local f = [ GLOB $(<) : $(>) ] ; 
+    local files ; 
+    for e in $(f) 
+    { 
+        if $(e:D=) != CVS { files += $(e) ; } 
+    } 
+    local d = [ difference [ GLOB $(<) : * ] : $(files) ] ; 
+    for e in $(d) 
+    { 
+        if ! ( $(e:D=) in . .. ) { files += [ glob-tree $(e) : $(>) ] ; } 
+    } 
+    return $(files) ; 
+} 
+
+local VIMDIR = $(OBOS_ETC_DIR) vim vim63 ;
+local vimRuntimeFiles = [ glob-tree $(SUBDIR) : *.vim *.txt *.info *.ps ] ;
+
+for file in [ FGristFiles $(vimRuntimeFiles) ]
 {
-
-	local vimRuntimeFiles = [ GLOB $(<) : *.vim *.txt *.info *.ps ] ;
-	
-	for file in $(vimRuntimeFiles:D=)
-	{
-		MakeLocate <etc>$(file) : [ FDirName $(VIMDIR) $(<) ] ;
-		File <etc>$(file) : $(file) ;
-		LocalClean clean : <etc>$(file) ;
-	}
-	
-	SEARCH on $(vimRuntimeFiles:D=) = $(<) ; 
-
+	local dir = [ SplitPath $(file:D) ] ;
+	local sdir = [ SplitPath $(SUBDIR) ] ;
+	FStripCommon dir : sdir ;
+	local grist = [ FGrist etc vim vim63 $(dir) $(file:B) ] ;
+	local destfile = $(file:D=:G=$(grist)) ;   
+	MakeLocate $(destfile) : [ FDirName $(VIMDIR) $(dir) ] ;
+	File $(destfile) : $(file) ;
+	LocalClean clean : $(destfile) ;
+	SEARCH on $(file) = $(SEARCH_SOURCE) [ FDirName $(SUBDIR) $dir) ] ;
 }
-
-RuntimeFiles $(SUBDIR) ;
-RuntimeFiles [ FDirName $(SUBDIR) colors ] ;
-RuntimeFiles [ FDirName $(SUBDIR) compiler ] ;
-RuntimeFiles [ FDirName $(SUBDIR) doc ] ;
-RuntimeFiles [ FDirName $(SUBDIR) ftplugin ] ;
-RuntimeFiles [ FDirName $(SUBDIR) indent ] ;
-RuntimeFiles [ FDirName $(SUBDIR) keymap ] ;
-#RuntimeFiles [ FDirName $(SUBDIR) lang ] ;
-RuntimeFiles [ FDirName $(SUBDIR) macros ] ;
-RuntimeFiles [ FDirName $(SUBDIR) macros hanoi ] ;
-RuntimeFiles [ FDirName $(SUBDIR) macros life ] ;
-RuntimeFiles [ FDirName $(SUBDIR) macros maze ] ;
-RuntimeFiles [ FDirName $(SUBDIR) macros urm ] ;
-RuntimeFiles [ FDirName $(SUBDIR) plugin ] ;
-RuntimeFiles [ FDirName $(SUBDIR) print ] ;
-RuntimeFiles [ FDirName $(SUBDIR) syntax ] ;
-RuntimeFiles [ FDirName $(SUBDIR) tools ] ;
-RuntimeFiles [ FDirName $(SUBDIR) tutor ] ;
