@@ -120,7 +120,7 @@ MixerOutput::AssignDefaultSources()
 		// we have only one phycial output channel, and use it as a mix of
 		// left, right, rear-left, rear-right, center and sub
 		TRACE("AssignDefaultSources: 1 channel setup\n");
-		fOutputChannelInfo[0].source_count = 1;
+		fOutputChannelInfo[0].source_count = 7;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
 		fOutputChannelInfo[0].source_gain[1] = 1.0;
