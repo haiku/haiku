@@ -443,7 +443,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 
 
 static status_t
-cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool doWrite)
+cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWrite)
 {
 	if (_cacheRef == NULL)
 		panic("cache_io() called with NULL ref!\n");
@@ -453,7 +453,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	off_t fileSize = cache->cache->virtual_size;
 
 	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
-		ref, offset, (void *)bufferBase, *_size, doWrite ? "write" : "read"));
+		ref, offset, (void *)buffer, *_size, doWrite ? "write" : "read"));
 
 	// out of bounds access?
 	if (offset >= fileSize || offset < 0) {
@@ -471,8 +471,13 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 		*_size = size;
 	}
 
+	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
+	// the "last*" variables always point to the end of the last
+	// satisfied request part
+
 	size_t bytesLeft = size, lastLeft = size;
-	addr_t buffer = bufferBase;
+	int32 lastPageOffset = pageOffset;
+	addr_t lastBuffer = buffer;
 	off_t lastOffset = offset;
 
 	mutex_lock(&cache->lock);
@@ -490,70 +495,66 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 			goto restart;
 		}
 
-		TRACE(("lookup page from offset %Ld: %p\n", offset, page));
+		size_t bytesInPage = min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft);
+
+		TRACE(("lookup page from offset %Ld: %p, size = %lu, pageOffset = %lu\n", offset, page, bytesLeft, pageOffset));
 		if (page != NULL
 			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE,
 					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
 			// it is, so let's satisfy the first part of the request, if we have to
-			if (bufferBase != buffer) {
-				size_t requestSize = buffer - bufferBase;
+			if (lastBuffer != buffer) {
+				size_t requestSize = buffer - lastBuffer;
 				status_t status;
 				if (doWrite) {
-					status = write_to_cache(ref, lastOffset + pageOffset,
-						requestSize, bufferBase, requestSize);
+					status = write_to_cache(ref, lastOffset + lastPageOffset,
+						requestSize, lastBuffer, requestSize);
 				} else {
-					status = read_into_cache(ref, lastOffset + pageOffset,
-						requestSize, bufferBase, requestSize);
+					status = read_into_cache(ref, lastOffset + lastPageOffset,
+						requestSize, lastBuffer, requestSize);
 				}
 				if (status != B_OK) {
 					vm_put_physical_page(virtualAddress);
 					mutex_unlock(&cache->lock);
 					return B_IO_ERROR;
 				}
-				bufferBase += requestSize;
 			}
 
 			// and copy the contents of the page already in memory
-			if (doWrite) {
-				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer,
-					min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft));
-			} else {
-				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset),
-					min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft));
-			}
+			if (doWrite)
+				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, bytesInPage);
+			else
+				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), bytesInPage);
 
 			vm_put_physical_page(virtualAddress);
 
-			bufferBase += B_PAGE_SIZE - pageOffset;
-			pageOffset = 0;
-
-			if (bytesLeft <= B_PAGE_SIZE) {
+			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
 				mutex_unlock(&cache->lock);
 				return B_OK;
 			}
 
 			// prepare a potential gap request
+			lastBuffer = buffer + bytesInPage;
+			lastLeft = bytesLeft - bytesInPage;
 			lastOffset = offset + B_PAGE_SIZE;
-			lastLeft = bytesLeft - B_PAGE_SIZE;
+			lastPageOffset = 0;
 		}
 
-		if (bytesLeft <= B_PAGE_SIZE)
+		if (bytesLeft <= bytesInPage)
 			break;
 
-		buffer += B_PAGE_SIZE;
-		bytesLeft -= B_PAGE_SIZE;
+		buffer += bytesInPage;
+		bytesLeft -= bytesInPage;
+		pageOffset = 0;
 	}
 
-	// fill the last remainding bytes of the request (either write or read)
-
-	lastOffset += pageOffset;
+	// fill the last remaining bytes of the request (either write or read)
 
 	status_t status;
 	if (doWrite)
-		status = write_to_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+		status = write_to_cache(ref, lastOffset + lastPageOffset, lastLeft, lastBuffer, lastLeft);
 	else
-		status = read_into_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+		status = read_into_cache(ref, lastOffset + lastPageOffset, lastLeft, lastBuffer, lastLeft);
 
 	mutex_unlock(&cache->lock);
 	return status;
