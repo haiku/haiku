@@ -687,30 +687,33 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 	BFile file;
 	status_t fileinit;
 	
-	fileinit= file.SetTo(ref, B_READ_ONLY);
+	fileinit = file.SetTo(ref, B_READ_ONLY);
 	
 	if (fileinit == B_OK){
 		status_t result;
 		result = fTextView->GetStyledText(&file); //he he he :)
-		
 		if (result == B_OK) {
-			be_roster->AddToRecentDocuments(ref,APP_SIGNATURE);
-			fSaveMessage= new BMessage(B_SAVE_REQUESTED);
-			if(fSaveMessage){
-				BEntry entry(ref, true);
-				BEntry parent;
-				entry_ref parentRef;
-				char name[B_FILE_NAME_LENGTH];
-					
-				entry.GetParent(&parent);
-				entry.GetName(name);
-				parent.GetRef(&parentRef);
-				fSaveMessage->AddRef("directory",&parentRef);
-				fSaveMessage->AddString("name", name);
-				SetTitle(name);
-			}	
+			// TODO: notify user?
 		}
-	}				
+	} else {
+		fSaveItem->SetEnabled(true); // allow saving new files
+	}
+
+	be_roster->AddToRecentDocuments(ref,APP_SIGNATURE);
+	fSaveMessage = new BMessage(B_SAVE_REQUESTED);
+	if(fSaveMessage){
+		BEntry entry(ref, true);
+		BEntry parent;
+		entry_ref parentRef;
+		char name[B_FILE_NAME_LENGTH];
+			
+		entry.GetParent(&parent);
+		entry.GetName(name);
+		parent.GetRef(&parentRef);
+		fSaveMessage->AddRef("directory",&parentRef);
+		fSaveMessage->AddString("name", name);
+		SetTitle(name);
+	}
 }/*** StyledEditWindow::OpenFile() ***/
 
 void

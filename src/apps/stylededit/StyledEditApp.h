@@ -14,8 +14,11 @@ class StyledEditApp
 public:
 					StyledEditApp();
 	virtual void 	MessageReceived(BMessage *message);
+	virtual	void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
+
+	virtual	void DispatchMessage(BMessage *an_event, BHandler *handler);
 
 			int32	NumberOfWindows();
 			void	OpenDocument();

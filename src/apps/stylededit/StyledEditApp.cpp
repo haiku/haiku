@@ -1,5 +1,6 @@
 
 #include <Autolock.h>
+#include <Path.h>
 #include "Constants.h"
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
@@ -24,6 +25,29 @@ StyledEditApp::StyledEditApp()
 	fNext_Untitled_Window= 1;
 	styled_edit_app = this;
 } /***StyledEditApp::StyledEditApp()***/
+
+void StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
+{
+	if ( msg->what == B_ARGV_RECEIVED ) {
+		int32 argc;
+		if (msg->FindInt32("argc",&argc) != B_OK) {
+			argc=0;
+		}
+		const char ** argv = new (const char*)[argc];
+		for (int arg = 0; (arg < argc) ; arg++) {
+			if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
+				argv[arg] = "";
+			}
+		}
+		const char * cwd;
+		if (msg->FindString("cwd",&cwd) != B_OK) {
+			cwd = "";
+		}
+		ArgvReceived(argc, argv, cwd);
+	} else {
+		BApplication::DispatchMessage(msg,handler);
+	}
+}
 
 
 void
@@ -78,14 +102,38 @@ StyledEditApp::RefsReceived(BMessage *message)
 	entry_ref	ref;
 	status_t	err;
 	
-	refNum=0;
+	refNum = 0;
 	do {
-		if((err= message->FindRef("refs", refNum, &ref)) != B_OK)
+		err = message->FindRef("refs", refNum, &ref);
+		if (err != B_OK)
 			return;
 		OpenDocument(&ref);
 		refNum++;
-	} while(1);		
+	} while (true);
 } /***StyledEditApp::RefsReceived();***/
+
+void
+StyledEditApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
+{
+	for (int i = 1 ; (i < argc) ; i++) {
+		BPath path;
+		if (argv[i][0] == '/') {
+			path.SetTo(argv[i]);
+		} else {
+			path.SetTo(cwd,argv[i]);
+		}
+		if (path.InitCheck() != B_OK) {
+			continue; // TODO: alert the user?
+		}
+		
+		entry_ref ref;
+		if (get_ref_for_path(path.Path(), &ref) != B_OK) {
+			continue; // TODO: alert the user?
+		}
+		
+		OpenDocument(&ref);
+	}
+}
 
 void 
 StyledEditApp::ReadyToRun() 
