@@ -4,11 +4,12 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-7/2004.
+	Rudolf Cornelissen 3/2002-8/2004.
 */
 
 /* standard kernel driver stuff */
 #include <KernelExport.h>
+#include <ISA.h>
 #include <PCI.h>
 #include <OS.h>
 #include <driver_settings.h>
@@ -78,6 +79,7 @@ static void probe_devices(void);
 static int32 nv_interrupt(void *data);
 
 static DeviceData		*pd;
+static isa_module_info	*isa_bus = NULL;
 static pci_module_info	*pci_bus = NULL;
 static agp_module_info	*agp_bus = NULL;
 static device_hooks graphics_device_hooks = {
@@ -332,6 +334,13 @@ init_hardware(void) {
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
 
+	/* choke if we can't find the ISA bus */
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
+	{
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
 		int vendor = 0;
@@ -405,6 +414,13 @@ init_driver(void) {
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
 
+	/* get a handle for the isa bus */
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
+	{
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+
 	/* get a handle for the agp bus if it exists */
 	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
 
@@ -448,6 +464,7 @@ void uninit_driver(void) {
 
 	/* put the pci module away */
 	put_module(B_PCI_MODULE_NAME);
+	put_module(B_ISA_MODULE_NAME);
 
 	/* put the agp module away if it's there */
 	if (agp_bus) put_module(B_AGP_MODULE_NAME);
@@ -960,6 +977,7 @@ static status_t
 control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 	device_info *di = (device_info *)dev;
 	status_t result = B_DEV_INVALID_IOCTL;
+	uint32 tmpUlong;
 
 	switch (msg) {
 		/* the only PUBLIC ioctl */
@@ -1038,6 +1056,62 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				}
 				result = B_OK;
 			}
+		} break;
+		case NV_ISA_OUT: {
+			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
+			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+				pci_info *pcii = &(di->pcii);
+
+				/* lock the driver */
+				AQUIRE_BEN(pd->kernel);
+
+				/* enable ISA I/O access */
+				tmpUlong = get_pci(PCI_command, 2);
+				tmpUlong |= PCI_command_io;
+				set_pci(PCI_command, 2, tmpUlong);
+
+				if (io_isa->size == 1)
+  					isa_bus->write_io_8(io_isa->adress, (uint8)io_isa->data);
+   				else
+   					isa_bus->write_io_16(io_isa->adress, io_isa->data);
+  				result = B_OK;
+
+				/* disable ISA I/O access */
+				tmpUlong = get_pci(PCI_command, 2);
+				tmpUlong &= ~PCI_command_io;
+				set_pci(PCI_command, 2, tmpUlong);
+
+				/* end of critical section */
+				RELEASE_BEN(pd->kernel);
+   			}
+		} break;
+		case NV_ISA_IN: {
+			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
+			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+				pci_info *pcii = &(di->pcii);
+
+				/* lock the driver */
+				AQUIRE_BEN(pd->kernel);
+
+				/* enable ISA I/O access */
+				tmpUlong = get_pci(PCI_command, 2);
+				tmpUlong |= PCI_command_io;
+				set_pci(PCI_command, 2, tmpUlong);
+
+				if (io_isa->size == 1)
+	   				io_isa->data = isa_bus->read_io_8(io_isa->adress);
+	   			else
+	   				io_isa->data = isa_bus->read_io_16(io_isa->adress);
+   				result = B_OK;
+
+				/* disable ISA I/O access */
+				tmpUlong = get_pci(PCI_command, 2);
+				tmpUlong &= ~PCI_command_io;
+				set_pci(PCI_command, 2, tmpUlong);
+
+				/* end of critical section */
+				RELEASE_BEN(pd->kernel);
+   			}
 		} break;
 	}
 	return result;
