@@ -159,8 +159,8 @@ MediaListItem::Update(BView *owner, const BFont *finfo)
 int 
 MediaListItem::Compare(const void *firstArg, const void *secondArg)
 {
-	MediaListItem *item1 = *static_cast<MediaListItem **>(firstArg);
-	MediaListItem *item2 = *static_cast<MediaListItem **>(secondArg);
+	const MediaListItem *item1 = *static_cast<const MediaListItem * const *>(firstArg);
+	const MediaListItem *item2 = *static_cast<const MediaListItem * const *>(secondArg);
 	if(item1->mIsVideo != item2->mIsVideo)
 		return item1->mIsVideo ? 1 : -1;
 	if(item1->OutlineLevel()!=item2->OutlineLevel())
