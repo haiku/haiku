@@ -10,6 +10,38 @@
 #include <disk_device_manager.h>
 
 
+namespace boot {
+
+class Partition : public partition_data, public Node {
+	public:
+		Partition(int deviceFD);
+		virtual ~Partition();
+
+		virtual ssize_t ReadAt(void *cookie, off_t offset, void *buffer, size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t offset, const void *buffer, size_t bufferSize);
+
+		virtual off_t Size() const;
+		virtual int32 Type() const;
+
+		Partition *AddChild();
+		status_t Scan();
+
+		Partition *Parent() const { return fParent; }
+		bool IsFileSystem() const { return fIsFileSystem; }
+
+		static size_t LinkOffset() { return sizeof(partition_data); }
+
+	private:
+		void SetParent(Partition *parent) { fParent = parent; }
+
+		int			fFD;
+		list		fChildren;
+		Partition	*fParent;
+		bool		fIsFileSystem;
+};
+
+}	// namespace boot
+
 // DiskDeviceTypes we need/support in the boot loader
 #define kPartitionTypeAmiga		"Amiga RDB"
 #define kPartitionTypeIntel		"Intel"
@@ -40,7 +72,7 @@ extern partition_module_info gApplePartitionModule;
 
 struct file_system_module_info {
 	const char	*pretty_name;
-	status_t	(*get_file_system)(Node *device, Directory **_root);
+	status_t	(*get_file_system)(boot::Partition *device, Directory **_root);
 };
 
 extern file_system_module_info gBFSFileSystemModule;
