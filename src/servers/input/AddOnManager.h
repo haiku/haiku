@@ -20,7 +20,7 @@
 
 class AddOnManager {
 	public:
-		AddOnManager();
+		AddOnManager(bool safeMode);
 		~AddOnManager();
 
 		void		LoadState();
@@ -60,6 +60,8 @@ class AddOnManager {
 
 		AddOnMonitorHandler	*fHandler;
 		AddOnMonitor		*fAddOnMonitor;
+
+		bool fSafeMode;
 };
 
 #endif // _ADD_ON_MANAGER_H

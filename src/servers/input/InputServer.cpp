@@ -109,7 +109,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	
 	InitKeyboardMouseStates();
 	
-	fAddOnManager = new AddOnManager();
+	fAddOnManager = new AddOnManager(SafeMode());
 	fAddOnManager->LoadState();
 }
 

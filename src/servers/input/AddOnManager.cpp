@@ -22,9 +22,9 @@
 #include "InputServer.h"
 
 
-AddOnManager::AddOnManager()
-	:
- 	fLock("add-on manager")
+AddOnManager::AddOnManager(bool safeMode)
+	: fLock("add-on manager"),
+		fSafeMode(safeMode)
 {
 }
 
@@ -266,8 +266,11 @@ AddOnManager::RegisterAddOns()
 	node_ref nref;
 	BDirectory directory;
 	BPath path;
-	for (uint i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++)
-		for (uint j = 0 ; j < sizeof(subDirectories) / sizeof(char[24]) ; j++) {
+	uint i = 0;
+	if (fSafeMode)	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
+		i = 2;
+	for (i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++)
+		for (uint32 j = 0 ; j < sizeof(subDirectories) / sizeof(char[24]) ; j++) {
 			if ((find_directory(directories[i], &path) == B_OK)
 				&& (path.Append(subDirectories[j]) == B_OK)
 				&& (directory.SetTo(path.Path()) == B_OK) 
