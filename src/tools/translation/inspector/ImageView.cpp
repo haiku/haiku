@@ -319,12 +319,27 @@ char_format(uint32 num)
 	return str;
 }
 
+void
+dump_translation_formats(BString &bstr, const translation_format *pfmts,
+	int32 nfmts)
+{
+	for (int i = 0; i < nfmts; i++) {
+		bstr << "\nType: '" << char_format(pfmts[i].type) << "' (" <<
+			hex_format(pfmts[i].type) << ")\n";
+		bstr << "Group: '" << char_format(pfmts[i].group) << "' (" <<
+			hex_format(pfmts[i].group) << ")\n";
+		bstr << "Quality: " << pfmts[i].quality << "\n";
+		bstr << "Capability: " << pfmts[i].capability << "\n";
+		bstr << "MIME Type: " << pfmts[i].MIME << "\n";
+		bstr << "Name: " << pfmts[i].name << "\n";
+	}
+}
+
 // Send information about the currently open image to the
 // BApplication object so it can send it to the InfoWindow
 void
 ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
-	const translator_info &tinfo, const char *tranname, const char *traninfo,
-	int32 tranversion)
+	const translator_info &tinfo, BTranslatorRoster *proster)
 {
 	BMessage msg(M_INFO_WINDOW_TEXT);
 	BString bstr;
@@ -344,7 +359,7 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 	bstr << "ID String: " << tinfo.name << "\n";
 	bstr << "MIME Type: " << tinfo.MIME << "\n";
 	bstr << "Type: '" << char_format(tinfo.type) << "' (" <<
-		hex_format(tinfo.type) <<")\n";
+		hex_format(tinfo.type) << ")\n";
 	bstr << "Translator ID: " << tinfo.translator << "\n";
 	bstr << "Group: '" << char_format(tinfo.group) << "' (" <<
 		hex_format(tinfo.group) << ")\n";
@@ -358,13 +373,31 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 		bstr << "Number of Documents: " << document_count << "\n";
 	if (ioExtension.FindInt32("/documentIndex", &document_index) == B_OK)
 		bstr << "Selected Document: " << document_index << "\n";
-		
 	
 	// Translator Info
-	bstr << "\nTranslator Used:\n";
-	bstr << "Name: " << tranname << "\n";
-	bstr << "Info: " << traninfo << "\n";
-	bstr << "Version: " << tranversion << "\n";
+	const char *tranname = NULL, *traninfo = NULL;
+	int32 tranversion = 0;
+	if (proster->GetTranslatorInfo(tinfo.translator, &tranname, &traninfo,
+		&tranversion) == B_OK) {
+		bstr << "\nTranslator Used:\n";
+		bstr << "Name: " << tranname << "\n";
+		bstr << "Info: " << traninfo << "\n";
+		bstr << "Version: " << tranversion << "\n";
+	}
+		
+	// Translator Input / Output Formats
+	int32 nins = 0, nouts = 0;
+	const translation_format *pins = NULL, *pouts = NULL;
+	if (proster->GetInputFormats(tinfo.translator, &pins, &nins) == B_OK) {
+		bstr << "\nInput Formats:";
+		dump_translation_formats(bstr, pins, nins);
+		pins = NULL;
+	}
+	if (proster->GetOutputFormats(tinfo.translator, &pouts, &nouts) == B_OK) {
+		bstr << "\nOutput Formats:";
+		dump_translation_formats(bstr, pouts, nouts);
+		pouts = NULL;
+	}
 	
 	msg.AddString("text", bstr);
 	be_app->PostMessage(&msg);
@@ -432,12 +465,6 @@ ImageView::SetImage(BMessage *pmsg)
 		chk = proster->Identify(&file, &ioExtension, &tinfo, 0, NULL,
 			B_TRANSLATOR_BITMAP);
 			
-		// get the name and info about the translator
-		const char *tranname = NULL, *traninfo = NULL;
-		int32 tranversion = 0;
-		chk = proster->GetTranslatorInfo(tinfo.translator, &tranname,
-			&traninfo, &tranversion);
-			
 		// perform the actual translation
 		BBitmapStream outstream;
 		chk = proster->Translate(&file, &tinfo, &ioExtension, &outstream,
@@ -468,7 +495,7 @@ ImageView::SetImage(BMessage *pmsg)
 		} else
 			pwin->SetTitle(IMAGEWINDOW_TITLE);
 			
-		UpdateInfoWindow(path, ioExtension, tinfo, tranname, traninfo, tranversion);
+		UpdateInfoWindow(path, ioExtension, tinfo, proster);
 		
 		// Resize parent window and set size limits to 
 		// reflect the size of the new bitmap

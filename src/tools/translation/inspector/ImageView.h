@@ -62,8 +62,7 @@ public:
 	
 private:
 	void UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
-		const translator_info &info, const char *tranname, const char *traninfo,
-		int32 tranversion);
+		const translator_info &info, BTranslatorRoster *proster);
 	void ReDraw();
 	void AdjustScrollBars();
 	void SaveImageAtDropLocation(BMessage *pmsg);
