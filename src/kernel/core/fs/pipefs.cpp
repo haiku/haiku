@@ -14,6 +14,7 @@
 #include <khash.h>
 #include <lock.h>
 #include <vm.h>
+#include <thread.h>
 
 #include <malloc.h>
 #include <string.h>
@@ -46,6 +47,7 @@ struct read_request {
 	void			*buffer;
 	size_t			buffer_size;
 	size_t			bytes_read;
+	team_id			team;
 
 	size_t SpaceLeft() const { return buffer_size - bytes_read; }
 	void Fill(Inode *inode);
@@ -564,6 +566,10 @@ read_request::Fill(Inode *inode)
 }
 
 
+/** Copies the specified buffer into the request. This function currently
+ *	only works for the local address space.
+ */
+
 status_t
 read_request::PutBuffer(const void **_buffer, size_t *_bufferSize)
 {
@@ -575,8 +581,6 @@ read_request::PutBuffer(const void **_buffer, size_t *_bufferSize)
 
 	uint8 *source = (uint8 *)*_buffer;
 
-	// ToDo: how is that supposed to work if the addresses are in
-	//	different address spaces?
 	if (user_memcpy((uint8 *)buffer + bytes_read, source, bytes) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -934,13 +938,9 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 	read_request request;
 	request.buffer = buffer;
-		// ToDo: what the hell? How is this supposed to work with applications
-		//	that have a different address space? At least read_request::PutBuffer()
-		//	is problematic - it should only do something if the buffer is either
-		//	local, or large enough so that mirroring/copying the other address
-		//	space is faster than the buffer chain.
 	request.buffer_size = *_length;
 	request.bytes_read = 0;
+	request.team = team_get_current_team_id();
 
 	ReadRequests &requests = volume->GetReadRequests();
 
@@ -984,6 +984,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	file_cookie *cookie = (file_cookie *)_cookie;
 	Volume *volume = (Volume *)_volume;
 	Inode *inode = (Inode *)_node;
+	team_id team = team_get_current_team_id();
 
 	TRACE(("pipefs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", _node, cookie, pos, *_length));
 
@@ -1004,7 +1005,13 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 			// fill this request
 
 			request->Fill(inode);
-			if (request->SpaceLeft() > 0) {
+			if (request->SpaceLeft() > 0
+				&& (team == B_SYSTEM_TEAM || request->team == team)) {
+				// ToDo: This is something where we can optimize the buffer
+				//	hand-shaking considerably: we should have a function
+				//	that copies the data to another address space - either
+				//	remapping copy on write or a direct copy.
+
 				// place our data into that buffer
 				request->PutBuffer(&buffer, &bytesLeft);
 				if (bytesLeft == 0) {
@@ -1019,8 +1026,8 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 	status_t status;
 
-	if (request == NULL) {
-		// there is no read request pending, so we have to put
+	if (request == NULL && bytesLeft > 0) {
+		// there is no read matching request pending, so we have to put
 		// our data in a temporary buffer
 
 		status = inode->WriteBufferToChain(buffer, bytesLeft);
