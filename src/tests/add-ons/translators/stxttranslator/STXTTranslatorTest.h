@@ -29,6 +29,7 @@ public:
 #endif
 	void IdentifyTest();
 	void TranslateTest();
+	void ConfigMessageTest();
 };
 
 #endif	// STXT_TRANSLATOR_TEST_H

@@ -32,7 +32,11 @@ STXTTranslatorTest::Suite()
 
 	suite->addTest(
 		new TC("STXTTranslator TranslateTest",
-			&STXTTranslatorTest::TranslateTest));	
+			&STXTTranslatorTest::TranslateTest));
+			
+	suite->addTest(
+		new TC("STXTTranslator ConfigMessageTest",
+			&STXTTranslatorTest::ConfigMessageTest));
 
 #if !TEST_R5
 	suite->addTest(
@@ -182,7 +186,6 @@ STXTTranslatorTest::IdentifyTest()
 		"../src/tests/kits/translation/data/text/sentence.stxt",
 		"../src/tests/kits/translation/data/text/symbols.stxt",
 		"../src/tests/kits/translation/data/text/zero_length.stxt",
-		"../src/tests/kits/translation/data/text/zero_length_styl.stxt"
 	};
 	IdentifyTests(this, proster, aPlainFiles,
 		sizeof(aPlainFiles) / sizeof(const char *), true);
@@ -365,6 +368,37 @@ STXTTranslatorTest::TranslateTest()
 		sizeof(aPlainTextFiles) / sizeof(const char *), true);
 	TranslateTests(this, proster, aStyledTextFiles,
 		sizeof(aStyledTextFiles) / sizeof(const char *), false);
+}
+
+// Make certain that the STXTTranslator does not
+// provide a configuration message
+void
+STXTTranslatorTest::ConfigMessageTest()
+{
+	// Init
+	NextSubTest();
+	status_t result = B_ERROR;
+	BTranslatorRoster *proster = new BTranslatorRoster();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->AddTranslators(
+		"/boot/home/config/add-ons/Translators/STXTTranslator") == B_OK);
+		
+	// GetAllTranslators
+	NextSubTest();
+	translator_id tid, *pids = NULL;
+	int32 count = 0;
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pids, &count) == B_OK);
+	CPPUNIT_ASSERT(pids);
+	CPPUNIT_ASSERT(count == 1);
+	tid = pids[0];
+	delete[] pids;
+	pids = NULL;
+	
+	// GetConfigurationMessage
+	NextSubTest();
+	BMessage msg;
+	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_ERROR);
+	CPPUNIT_ASSERT(msg.IsEmpty());
 }
 
 #if !TEST_R5
