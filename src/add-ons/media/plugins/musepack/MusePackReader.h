@@ -9,6 +9,8 @@
 #include "ReaderPlugin.h"
 #include <MediaFormats.h>
 
+#include "mpc/in_mpc.h"
+
 
 class MusePackReader : public Reader {
 	public:
@@ -34,6 +36,7 @@ class MusePackReader : public Reader {
 					media_header *mediaHeader);
 
 	private:
+		StreamInfo	fInfo;
 };
 
 #endif	/* MUSEPACK_READER_H */
