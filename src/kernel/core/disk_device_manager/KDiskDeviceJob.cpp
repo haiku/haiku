@@ -1,9 +1,16 @@
 // KDiskDeviceJob.cpp
 
+#include <stdio.h>
+
 #include "ddm_userland_interface.h"
 
-#include "KDiskDeviceJob.h"
-#include "KDiskDeviceUtils.h"
+#include <KDiskDeviceJob.h>
+#include <KDiskDeviceUtils.h>
+
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
 
 // constructor
 KDiskDeviceJob::KDiskDeviceJob(uint32 type, partition_id partitionID,
@@ -15,6 +22,7 @@ KDiskDeviceJob::KDiskDeviceJob(uint32 type, partition_id partitionID,
 	  fPartitionID(partitionID),
 	  fScopeID(scopeID),
 	  fDescription(NULL),
+	  fErrorMessage(NULL),
 	  fTaskCount(1),
 	  fCompletedTasks(0),
 	  fInterruptProperties(0),
@@ -99,6 +107,20 @@ partition_id
 KDiskDeviceJob::ScopeID() const
 {
 	return fScopeID;
+}
+
+// SetErrorMessage
+status_t
+KDiskDeviceJob::SetErrorMessage(const char *message)
+{
+	return set_string(fErrorMessage, message);
+}
+
+// ErrorMessage
+const char *
+KDiskDeviceJob::ErrorMessage() const
+{
+	return fErrorMessage;
 }
 
 // SetTaskCount

@@ -34,6 +34,9 @@ public:
 	partition_id PartitionID() const;
 	partition_id ScopeID() const;
 
+	status_t SetErrorMessage(const char *message);
+	const char *ErrorMessage() const;
+
 	void SetTaskCount(int32 count);
 	int32 TaskCount() const;
 
@@ -66,6 +69,7 @@ private:
 	partition_id		fPartitionID;
 	partition_id		fScopeID;
 	char				*fDescription;
+	char				*fErrorMessage;
 	int32				fTaskCount;
 	int32				fCompletedTasks;
 	uint32				fInterruptProperties;
