@@ -704,8 +704,10 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 	
 			msg->FindFloat("width", &width);
 			msg->FindFloat("height", &height);
-	
-			ResizeTo(width,height);
+
+			fFrame.right	= fFrame.left + width;
+			fFrame.bottom	= fFrame.top + height;
+
 			FrameResized(width,height);
 			break;
 		}
@@ -714,8 +716,9 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			BPoint			origin;
 	
 			msg->FindPoint("where", &origin);
-	
-			MoveTo( origin );
+
+			fFrame.OffsetTo(origin);
+
 			FrameMoved( origin );
 			break;
 		}
