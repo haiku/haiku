@@ -10,13 +10,10 @@
 /*! \file DirectoryIterator.h
 */
 
-extern "C" {
-	#ifndef _IMPEXP_KERNEL
-	#	define _IMPEXP_KERNEL
-	#endif
-	
-	#include <fsproto.h>
-}
+#ifndef _IMPEXP_KERNEL
+#	define _IMPEXP_KERNEL
+#endif
+#include <fsproto.h>
 
 #include "kernel_cpp.h"
 #include "UdfDebug.h"
