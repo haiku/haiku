@@ -208,7 +208,7 @@ STRACE(("DefaultDecorator: Do Layout\n"));
 	if(strlen(GetTitle())>1)
 	{
 		if(_driver)
-			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_drawdata);
 		else
 			titlepixelwidth=10;
 		
@@ -329,8 +329,8 @@ void DefaultDecorator::_DrawTitle(BRect r)
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-	_layerdata.highcolor=_colors->window_tab_text;
-	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_drawdata.highcolor=_colors->window_tab_text;
+	_drawdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 
 	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
 	BString titlestr( GetTitle() );
@@ -346,10 +346,10 @@ void DefaultDecorator::_DrawTitle(BRect r)
 	// is a little different. If it isn't moved, title placement looks really funky
 	if(_look==B_FLOATING_WINDOW_LOOK)
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_drawdata);
 	else	
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom),&_drawdata);
 }
 
 void DefaultDecorator::_SetFocus(void)
@@ -452,34 +452,13 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 {
 	// This bad boy is used to draw a rectangle with a gradient.
 	// Note that it is not part of the Decorator API - it's specific
-	// to just the DefaultDecorator. Called by DrawZoom and DrawClose
+	// to just the BeDecorator. Called by DrawZoom and DrawClose
 
-	RGBColor temprgbcol(175,123,0);
-	_driver->StrokeLine( r.LeftTop(),
-						 BPoint( r.left, r.bottom - 1 ),
-						 temprgbcol);
-	_driver->StrokeLine( r.LeftTop(),
-						 BPoint( r.right - 1, r.top ),
-						 temprgbcol);
-	_driver->StrokeLine( BPoint( r.right - 1, r.top + 2),
-						 BPoint( r.right - 1, r.bottom - 1),
-						 temprgbcol);
-	_driver->StrokeLine( BPoint( r.left + 2, r.bottom -1),
-						 BPoint( r.right - 2, r.bottom - 1),
-						 temprgbcol);
-
-	temprgbcol.SetColor(255,255,0);
-	_driver->StrokeRect( BRect( r.left + 1, r.top + 1,
-								r.right, r.bottom),
-						 temprgbcol);
-	
-	r.InsetBy( 2, 2 );
-	
-	
+	// Actually just draws a blended square
 	int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-
+	
+	RGBColor temprgbcol;
 	rgb_color halfcol, startcol, endcol;
-//	rgb_color tmpcol;
 	float rstep,gstep,bstep,i;
 
 	int steps=(w<h)?w:h;
@@ -503,11 +482,6 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 
 	for(i=0;i<=steps; i++)
 	{
-/*		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
-			uint8(startcol.green-(i*gstep)),
-			uint8(startcol.blue-(i*bstep)));
-		_layerdata.highcolor=tmpcol;
-*/
 		temprgbcol.SetColor(uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
@@ -515,11 +489,6 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 		_driver->StrokeLine(BPoint(r.left,r.top+i),
 			BPoint(r.left+i,r.top),temprgbcol);
 
-/*		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
-			uint8(halfcol.green-(i*gstep)),
-			uint8(halfcol.blue-(i*bstep)));
-		_layerdata.highcolor=tmpcol;
-*/
 		temprgbcol.SetColor(uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)));
@@ -527,6 +496,10 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
 			BPoint(r.left+i,r.top+steps),temprgbcol);
 	}
+
+//	_layerdata.highcolor=startcol;
+//	_driver->FillRect(r,&_layerdata,pat_solidhigh);
+	_driver->StrokeRect(r,framecolors[3]);
 }
 
 void DefaultDecorator::_DrawFrame(BRect invalid)
@@ -537,8 +510,8 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-		_layerdata.highcolor = RGBColor( 192, 192, 192 );	
-		_driver->FillRect(_frame,_layerdata.highcolor);
+		_drawdata.highcolor = RGBColor( 192, 192, 192 );	
+		_driver->FillRect(_frame,_drawdata.highcolor);
 	#endif
 
 	if(_look == B_NO_BORDER_WINDOW_LOOK)
@@ -810,7 +783,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 		//do(draw) nothing!
 	}
 	else{
-		_driver->StrokeLineArray(points,numlines,&_layerdata,colors);
+		_driver->StrokeLineArray(points,numlines,&_drawdata,colors);
 	}
 	
 	delete rightindices;

@@ -31,6 +31,7 @@
 #include "FontFamily.h"
 #include <stdio.h>
 #include "DisplayDriver.h"
+#include "RectUtils.h"
 #include "ServerCursor.h"
 
 // TODO: Major cleanup is left.  Public functions should be repsonsible for locking.
@@ -315,6 +316,16 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect 
 {
 }
 
+void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, RGBColor &color, escapement_delta *delta)
+{
+	DrawData d;
+	d.highcolor=color;
+	
+	if(delta)
+		d.edelta=*delta;
+	DrawString(string,length,pt,&d);
+}
+
 /*!
 	\brief Utilizes the font engine to draw a string to the frame buffer
 	\param string String to be drawn. Always non-NULL.
@@ -482,16 +493,23 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 
 void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
 {
-/*	rgb_color color=d->highcolor.GetColor32();
+	rgb_color color=d->highcolor.GetColor32();
 	
 	// pointers to the top left corner of the area to be copied in each bitmap
 	uint8 *srcbuffer, *destbuffer;
+	FBBitmap framebuffer;
+	
+	if(!AcquireBuffer(&framebuffer))
+	{
+		printf("ERROR: Couldn't acquire framebuffer in BlitMono2RGB32\n");
+		return;
+	}
 	
 	// index pointers which are incremented during the course of the blit
 	uint8 *srcindex, *destindex, *rowptr, value;
 	
 	// increment values for the index pointers
-	int32 srcinc=src->pitch, destinc=framebuffer->BytesPerRow();
+	int32 srcinc=src->pitch, destinc=framebuffer.BytesPerRow();
 	
 	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
 	int32 x=(int32)pt.x,y=(int32)pt.y;
@@ -508,18 +526,18 @@ void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		destbuffer+=destinc * (0-y);
 	}
 
-	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
+	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
 	{
 		if(y>pt.y)
 			y--;
-		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
+		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
 	}
 
-	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
+	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
 	{
 		if(x>pt.x)
 			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
+		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
 	}
 	
 	if(x<0)
@@ -532,7 +550,7 @@ void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 	}
 	
 	// starting point in destination bitmap
-	destbuffer=(uint8*)framebuffer->Bits()+int32( (pt.y*framebuffer->BytesPerRow())+(pt.x*4) );
+	destbuffer=(uint8*)framebuffer.Bits()+int32( (pt.y*framebuffer.BytesPerRow())+(pt.x*4) );
 
 	srcindex=srcbuffer;
 	destindex=destbuffer;
@@ -562,13 +580,21 @@ void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		srcindex+=srcinc;
 		destindex+=destinc;
 	}
-*/
+	Invalidate(BRect(0,0,srcwidth,srcheight));
+	ReleaseBuffer();
 }
 
 void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
 {
-/*	// pointers to the top left corner of the area to be copied in each bitmap
+	// pointers to the top left corner of the area to be copied in each bitmap
 	uint8 *srcbuffer=NULL, *destbuffer=NULL;
+	FBBitmap framebuffer;
+	
+	if(!AcquireBuffer(&framebuffer))
+	{
+		printf("Couldn't acquire framebuffer in DisplayDriver::BlitGray2RGB32");
+		return;
+	}
 	
 	// index pointers which are incremented during the course of the blit
 	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
@@ -585,7 +611,7 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		y=(int32)pt.y,
 		srcinc=src->pitch,
 //		destinc=dest->BytesPerRow(),
-		destinc=framebuffer->BytesPerRow(),
+		destinc=framebuffer.BytesPerRow(),
 		srcwidth=src->width,
 		srcheight=src->rows,
 		incval=0;
@@ -596,8 +622,7 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 	srcbuffer=(uint8*)src->buffer;
 
 	// starting point in destination bitmap
-//	destbuffer=(uint8*)dest->Bits()+(y*dest->BytesPerRow()+(x*4));
-	destbuffer=(uint8*)framebuffer->Bits()+(y*framebuffer->BytesPerRow()+(x*4));
+	destbuffer=(uint8*)framebuffer.Bits()+(y*framebuffer.BytesPerRow()+(x*4));
 
 
 	if(y<0)
@@ -612,18 +637,18 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		destbuffer+=incval * destinc;
 	}
 
-	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
+	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
 	{
 		if(y>pt.y)
 			y--;
-		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
+		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
 	}
 
-	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
+	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
 	{
 		if(x>pt.x)
 			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
+		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
 	}
 	
 	if(x<0)
@@ -677,7 +702,8 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		srcindex+=srcinc;
 		destindex+=destinc;
 	}
-*/
+	Invalidate(BRect(0,0,srcwidth,srcheight));
+	ReleaseBuffer();
 }
 
 bool DisplayDriver::AcquireBuffer(FBBitmap *bmp)
@@ -686,6 +712,10 @@ bool DisplayDriver::AcquireBuffer(FBBitmap *bmp)
 }
 
 void DisplayDriver::ReleaseBuffer(void)
+{
+}
+
+void DisplayDriver::Invalidate(const BRect &r)
 {
 }
 
@@ -1679,6 +1709,12 @@ void DisplayDriver::InvertRect(const BRect &r)
 */
 void DisplayDriver::ShowCursor(void)
 {
+	if(!_cursor)
+	{
+		printf("ERROR: Call to ShowCursor and driver has no defined cursor\n");
+		return;
+	}
+	
 	Lock();
 	
 	_is_cursor_hidden=false;
@@ -2359,7 +2395,72 @@ ServerBitmap *DisplayDriver::DumpToBitmap(void)
 */
 float DisplayDriver::StringWidth(const char *string, int32 length, const DrawData *d)
 {
-	return 0.0;
+	if(!string || !d)
+		return 0.0;
+	Lock();
+
+	const ServerFont *font=&(d->font);
+	FontStyle *style=font->Style();
+
+	if(!style)
+		return 0.0;
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_UInt glyph_index=0, previous=0;
+	FT_Vector pen,delta;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		Unlock();
+		return 0.0;
+	}
+
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=0;
+	
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+		}
+
+		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		previous=glyph_index;
+	}
+
+	FT_Done_Face(face);
+	Unlock();
+
+	returnval=pen.x>>6;
+	return returnval;
 }
 
 /*!
@@ -2376,7 +2477,61 @@ float DisplayDriver::StringWidth(const char *string, int32 length, const DrawDat
 */
 float DisplayDriver::StringHeight(const char *string, int32 length, const DrawData *d)
 {
-	return 0.0;
+	if(!string || !d)
+		return 0.0;
+	Lock();
+
+	const ServerFont *font=&(d->font);
+	FontStyle *style=font->Style();
+
+	if(!style)
+	{
+		Unlock();
+		return 0.0;
+	}
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval=0.0,ascent=0.0,descent=0.0;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
+		if(slot->metrics.horiBearingY<slot->metrics.height)
+			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
+		else
+			ascent=MAX(slot->bitmap.rows,ascent);
+	}
+
+	FT_Done_Face(face);
+
+	Unlock();
+	returnval=ascent+descent;
+	return returnval;
 }
 
 /*!
@@ -2710,6 +2865,7 @@ void DisplayDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 void DisplayDriver::VLinePatternThick(int32 x1, int32 x2, int32 y)
 {
 }
+
 /*
 void DisplayDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
 {

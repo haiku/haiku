@@ -138,8 +138,12 @@ protected:
 	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	void CopyToBitmap(ServerBitmap *target, const BRect &source);
 	
-	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
-	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
+	bool AcquireBuffer(FBBitmap *fbmp);
+	void ReleaseBuffer(void);
+	void Invalidate(const BRect &r);
+	
+//	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
+//	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high=true);
 	int hide_cursor;
 	bool obscure_cursor;

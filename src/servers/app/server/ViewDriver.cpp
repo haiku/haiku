@@ -416,78 +416,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			view->serverlink->Flush();
 			break;
 		}
-/*		case VDWIN_SHOWCURSOR:
-		{
-			if(view->hide_cursor>0)
-				view->hide_cursor--;
-
-			if(view->hide_cursor==0)
-				view->Invalidate(view->cursorframe);
-
-			break;
-		}
-		case VDWIN_HIDECURSOR:
-		{
-			view->hide_cursor++;
-			if(view->hide_cursor==1)
-				view->Invalidate(view->cursorframe);
-			break;
-		}
-		case VDWIN_OBSCURECURSOR:
-		{
-			view->obscure_cursor=true;
-			view->Invalidate(view->cursorframe);
-			break;
-		}
-		case VDWIN_MOVECURSOR:
-		{
-			float x,y;
-			msg->FindFloat("x",&x);
-			msg->FindFloat("y",&y);
-
-			// this was changed because an extra message was
-			// sent even though the mouse was never moved
-			if(view->cursorframe.left!=x || view->cursorframe.top!=y)
-			{
-				if(view->obscure_cursor)
-					view->obscure_cursor=false;
-	
-				view->oldcursorframe=view->cursorframe;
-				view->cursorframe.OffsetTo(x,y);
-			}
-
-			if(view->hide_cursor==0)
-				view->Invalidate(view->oldcursorframe);
-			break;
-		}
-		case VDWIN_SETCURSOR:
-		{
-			ServerBitmap *cdata;
-			msg->FindPointer("SCursor",(void**)&cdata);
-
-			if(cdata!=NULL)
-			{
-				BBitmap *bmp=new BBitmap(cdata->Bounds(), B_RGBA32);
-
-				// Copy the server bitmap in the cursor to a BBitmap
-				uint8	*sbmppos=(uint8*)cdata->Bits(),
-						*bbmppos=(uint8*)bmp->Bits();
-
-				int32 bytes=cdata->BytesPerRow(),
-					bbytes=bmp->BytesPerRow();
-
-				for(int i=0;i<cdata->Bounds().IntegerHeight();i++)
-					memcpy(bbmppos+(i*bbytes), sbmppos+(i*bytes), bytes);
-
-				// Replace the bitmap
-				delete view->cursor;
-				view->cursor=bmp;
-				view->Invalidate(view->cursorframe);
-				break;
-			}
-			break;
-		}
-*/		default:
+		default:
 			BWindow::MessageReceived(msg);
 			break;
 	}
@@ -940,487 +869,6 @@ void ViewDriver::SetDrawData(const DrawData *d, bool set_font_data)
 		framebuffer->Unlock();
 }
 
-/*
-float ViewDriver::StringWidth(const char *string, int32 length, DrawData *d)
-{
-	if(!string || !d || !is_initialized)
-		return 0.0;
-	screenwin->Lock();
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-		return 0.0;
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval;
-
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-	{
-		screenwin->Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		screenwin->Unlock();
-		return 0.0;
-	}
-
-	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=0;
-	
-	slot=face->glyph;
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-		}
-
-		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
-
-		// increment pen position
-		pen.x+=slot->advance.x;
-		previous=glyph_index;
-	}
-	screenwin->Unlock();
-
-	FT_Done_Face(face);
-
-	returnval=pen.x>>6;
-	return returnval;
-}
-
-float ViewDriver::StringHeight(const char *string, int32 length, DrawData *d)
-{
-	if(!string || !d || !is_initialized)
-		return 0.0;
-	screenwin->Lock();
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		screenwin->Unlock();
-		return 0.0;
-	}
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval=0.0,ascent=0.0,descent=0.0;
-
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-		return 0.0;
-
-	slot=face->glyph;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		screenwin->Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
-		if(slot->metrics.horiBearingY<slot->metrics.height)
-			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
-		else
-			ascent=MAX(slot->bitmap.rows,ascent);
-	}
-	screenwin->Unlock();
-
-	FT_Done_Face(face);
-
-	returnval=ascent+descent;
-	return returnval;
-}
-*/
-/*
-void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, DrawData *d, escapement_delta *edelta)
-{
-	if(!is_initialized)
-		return;
-		
-	if(!string || !d )
-		return;
-	screenwin->Lock();
-
-	pt.y--;	// because of Be's backward compatibility hack
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-		return;
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_Matrix rmatrix,smatrix;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta,space,nonspace;
-	int16 error=0;
-	int32 strlength,i;
-	Angle rotation(font->Rotation()), shear(font->Shear());
-
-//	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
-//		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
-
-	bool antialias=(font->Flags()& B_DISABLE_ANTIALIASING==1)?false:true;
-
-	// Originally, I thought to do this shear checking here, but it really should be
-	// done in BFont::SetShear()
-	float shearangle=shear.Value();
-	if(shearangle>135)
-		shearangle=135;
-	if(shearangle<45)
-		shearangle=45;
-
-	if(shearangle>90)
-		shear=90+((180-shearangle)*2);
-	else
-		shear=90-(90-shearangle)*2;
-	
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-		return;
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-		return;
-
-	// if we do any transformation, we do a call to FT_Set_Transform() here
-	
-	// First, rotate
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	
-	// Next, shear
-	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
-	smatrix.yx = (FT_Fixed)(0); 
-	smatrix.yy = (FT_Fixed)(0x10000); 
-
-	FT_Matrix_Multiply(&rmatrix,&smatrix);
-	
-	// Set up the increment value for escapement padding
-	space.x=int32(d->edelta.space * rotation.Cosine()*64);
-	space.y=int32(d->edelta.space * rotation.Sine()*64);
-	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
-	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
-	
-	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=(int32)pt.x * 64;
-	pen.y=(int32)pt.y * 64;
-	
-	slot=face->glyph;
-
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Set_Transform(face,&smatrix,&pen);
-
-		// Handle escapement padding option
-		if((uint8)string[i]<=0x20)
-		{
-			pen.x+=space.x;
-			pen.y+=space.y;
-		}
-		else
-		{
-			pen.x+=nonspace.x;
-			pen.y+=nonspace.y;
-		}
-
-	
-		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-			pen.y+=delta.y;
-		}
-
-		error=FT_Load_Char(face,string[i],
-			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
-
-		if(!error)
-		{
-			if(antialias)
-				BlitGray2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
-			else
-				BlitMono2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
-		}
-
-		// increment pen position
-		pen.x+=slot->advance.x;
-		pen.y+=slot->advance.y;
-		previous=glyph_index;
-	}
-
-	// TODO: implement properly
-	// calculate the invalid rectangle
-	BRect r;
-	r.left=MIN(pt.x,pen.x>>6);
-	r.right=MAX(pt.x,pen.x>>6);
-	r.top=pt.y-face->height;
-	r.bottom=pt.y+face->height;
-
-	screenwin->view->Invalidate(r);
-	screenwin->Unlock();
-
-	FT_Done_Face(face);
-}
-*/
-
-void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d)
-{
-	if(!is_initialized)
-		return;
-		
-	rgb_color color=d->highcolor.GetColor32();
-	
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer, *destbuffer;
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex, *destindex, *rowptr, value;
-	
-	// increment values for the index pointers
-	int32 srcinc=src->pitch, destinc=framebuffer->BytesPerRow();
-	
-	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
-	int32 x=(int32)pt.x,y=(int32)pt.y;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		srcbuffer+=srcinc * (0-y);
-		srcheight-=srcinc;
-		destbuffer+=destinc * (0-y);
-	}
-
-	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
-	}
-
-	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		srcbuffer+=(0-x)>>3;
-		srcwidth-=0-x;
-		destbuffer+=(0-x)*4;
-	}
-	
-	// starting point in destination bitmap
-	destbuffer=(uint8*)framebuffer->Bits()+int32( (pt.y*framebuffer->BytesPerRow())+(pt.x*4) );
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			for(k=0; k<8; k++)
-			{
-				value=*(srcindex+j) & (1 << (7-k));
-				if(value)
-				{
-					rowptr[0]=color.blue;
-					rowptr[1]=color.green;
-					rowptr[2]=color.red;
-					rowptr[3]=color.alpha;
-				}
-
-				rowptr+=4;
-			}
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-
-}
-
-void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d)
-{
-	if(!is_initialized)
-		return;
-		
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer=NULL, *destbuffer=NULL;
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
-	
-	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
-
-	rstep=float(highcolor.red-lowcolor.red)/255.0;
-	gstep=float(highcolor.green-lowcolor.green)/255.0;
-	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
-	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
-	
-	// increment values for the index pointers
-	int32 x=(int32)pt.x,
-		y=(int32)pt.y,
-		srcinc=src->pitch,
-//		destinc=dest->BytesPerRow(),
-		destinc=framebuffer->BytesPerRow(),
-		srcwidth=src->width,
-		srcheight=src->rows,
-		incval=0;
-	
-	int16 i,j;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	// starting point in destination bitmap
-//	destbuffer=(uint8*)dest->Bits()+(y*dest->BytesPerRow()+(x*4));
-	destbuffer=(uint8*)framebuffer->Bits()+(y*framebuffer->BytesPerRow()+(x*4));
-
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		
-		incval=0-y;
-		
-		srcbuffer+=incval * srcinc;
-		srcheight-=incval;
-		destbuffer+=incval * destinc;
-	}
-
-	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
-	}
-
-	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		incval=0-x;
-		srcbuffer+=incval;
-		srcwidth-=incval;
-		destbuffer+=incval*4;
-	}
-
-	int32 value;
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			value=*(srcindex+j) ^ 255;
-
-			if(value!=255)
-			{
-				if(d->draw_mode==B_OP_COPY)
-				{
-					rowptr[0]=uint8(highcolor.blue-(value*bstep));
-					rowptr[1]=uint8(highcolor.green-(value*gstep));
-					rowptr[2]=uint8(highcolor.red-(value*rstep));
-					rowptr[3]=255;
-				}
-				else
-					if(d->draw_mode==B_OP_OVER)
-					{
-						if(highcolor.alpha>127)
-						{
-							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
-							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
-							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
-							rowptr[3]=255;
-						}
-					}
-			}
-			rowptr+=4;
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-}
-
 rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
@@ -1701,9 +1149,6 @@ void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRe
 
 void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 {
-	// TODO: BUG: CRASH: There is a crash on memcpy whenever the cursor is saved and it
-	// is clipped to the bottom edge of the screen.
-	
 	if(!is_initialized || !destbmp)
 	{
 		printf("CopyToBitmap returned - not init or NULL bitmap\n");
@@ -1729,14 +1174,11 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 	
 
 	// Second, check rectangle bounds against their own bitmaps
-	BRect work_rect;
-
-	work_rect.Set(	destbmp->Bounds().left,
-					destbmp->Bounds().top,
-					destbmp->Bounds().right,
-					destbmp->Bounds().bottom	);
+	BRect work_rect(destbmp->Bounds());
+	
 	if( !(work_rect.Contains(destrect)) )
-	{	// something in selection must be clipped
+	{
+		// something in selection must be clipped
 		if(destrect.left < 0)
 			destrect.left = 0;
 		if(destrect.right > work_rect.right)
@@ -1749,8 +1191,12 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
 
+	if(!work_rect.Contains(sourcerect))
+		return;
+
 	if( !(work_rect.Contains(source)) )
-	{	// something in selection must be clipped
+	{
+		// something in selection must be clipped
 		if(source.left < 0)
 			source.left = 0;
 		if(source.right > work_rect.right)
@@ -1772,10 +1218,11 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 	// Offset bitmap pointers to proper spot in each bitmap
 	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );
 	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
-
-	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
-	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
 	
+	
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (source.bottom-source.top+1);
+
 	for (uint32 pos_y=0; pos_y<lines; pos_y++)
 	{
 		memcpy(dest_bits,src_bits,line_length);
@@ -1785,4 +1232,39 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
  		dest_bits += dest_width;
 	}
 
+}
+
+bool ViewDriver::AcquireBuffer(FBBitmap *fbmp)
+{
+	if(!fbmp || !is_initialized)
+		return false;
+	
+	screenwin->Lock();
+	framebuffer->Lock();
+
+	fbmp->SetBytesPerRow(framebuffer->BytesPerRow());
+	fbmp->SetSpace(framebuffer->ColorSpace());
+	fbmp->SetSize(framebuffer->Bounds().IntegerWidth(), framebuffer->Bounds().IntegerHeight());
+	fbmp->SetBuffer(framebuffer->Bits());
+	fbmp->SetBitsPerPixel(framebuffer->ColorSpace(),framebuffer->BytesPerRow());
+
+	return true;
+}
+
+void ViewDriver::ReleaseBuffer(void)
+{
+	if(!is_initialized)
+		return;
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::Invalidate(const BRect &r)
+{
+	if(!is_initialized)
+		return;
+	
+	screenwin->Lock();
+	screenwin->view->Invalidate();
+	screenwin->Unlock();
 }

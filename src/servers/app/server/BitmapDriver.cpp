@@ -118,212 +118,6 @@ void BitmapDriver::SetMode(const display_mode &mode)
 	// No need to reset a bitmap's color space
 }
 
-// This function is intended to eventually take care of most of the heavy lifting for
-// DrawBitmap in 32-bit mode, with others coming later. Right now, it is *just* used for
-// the 
-void BitmapDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect destrect, drawing_mode mode)
-{
-	// Another internal function called from other functions.
-	
-	if(!sourcebmp)
-		return;
-
-	if(sourcebmp->BitsPerPixel() != _target->BitsPerPixel())
-		return;
-
-	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
-	// First, clip source rect to destination
-	if(sourcerect.Width() > destrect.Width())
-		sourcerect.right=sourcerect.left+destrect.Width();
-	
-
-	if(sourcerect.Height() > destrect.Height())
-		sourcerect.bottom=sourcerect.top+destrect.Height();
-	
-
-	// Second, check rectangle bounds against their own bitmaps
-	BRect work_rect;
-
-	work_rect=sourcebmp->Bounds();
-	
-	if( !(work_rect.Contains(sourcerect)) )
-	{	// something in selection must be clipped
-		if(sourcerect.left < 0)
-			sourcerect.left = 0;
-		if(sourcerect.right > work_rect.right)
-			sourcerect.right = work_rect.right;
-		if(sourcerect.top < 0)
-			sourcerect.top = 0;
-		if(sourcerect.bottom > work_rect.bottom)
-			sourcerect.bottom = work_rect.bottom;
-	}
-
-	work_rect.Set(0,0,_target->Width()-1,_target->Height()-1);
-
-	// Check to see if we actually need to copy anything
-	if( (destrect.right<work_rect.left) || (destrect.left>work_rect.right) ||
-			(destrect.bottom<work_rect.top) || (destrect.top>work_rect.bottom) )
-		return;
-
-	// something in selection must be clipped
-	if(destrect.left < 0)
-		destrect.left = 0;
-	if(destrect.right > work_rect.right)
-		destrect.right = work_rect.right;
-	if(destrect.top < 0)
-		destrect.top = 0;
-	if(destrect.bottom > work_rect.bottom)
-		destrect.bottom = work_rect.bottom;
-
-	// Set pointers to the actual data
-	uint8 *src_bits  = (uint8*) sourcebmp->Bits();	
-	uint8 *dest_bits = (uint8*) _target->Bits();
-
-	// Get row widths for offset looping
-	uint32 src_width  = uint32 (sourcebmp->BytesPerRow());
-	uint32 dest_width = uint32 (_target->BytesPerRow());
-
-	// Offset bitmap pointers to proper spot in each bitmap
-	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
-	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
-
-	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
-	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
-
-	switch(mode)
-	{
-		case B_OP_OVER:
-		{
-//			uint32 srow_pixels=src_width>>2;
-			uint32 srow_pixels=((destrect.IntegerWidth()>=sourcerect.IntegerWidth())?src_width:destrect.IntegerWidth()+1)>>2;
-			uint8 *srow_index, *drow_index;
-			
-			
-			// This could later be optimized to use uint32's for faster copying
-			for (uint32 pos_y=0; pos_y!=lines; pos_y++)
-			{
-				
-				srow_index=src_bits;
-				drow_index=dest_bits;
-				
-				for(uint32 pos_x=0; pos_x!=srow_pixels;pos_x++)
-				{
-					// 32-bit RGBA32 mode byte order is BGRA
-					if(srow_index[3]>127)
-					{
-						*drow_index=*srow_index; drow_index++; srow_index++;
-						*drow_index=*srow_index; drow_index++; srow_index++;
-						*drow_index=*srow_index; drow_index++; srow_index++;
-						// we don't copy the alpha channel
-						drow_index++; srow_index++;
-					}
-					else
-					{
-						srow_index+=4;
-						drow_index+=4;
-					}
-				}
-		
-				// Increment offsets
-		   		src_bits += src_width;
-		   		dest_bits += dest_width;
-			}
-			break;
-		}
-		default:	// B_OP_COPY
-		{
-			for (uint32 pos_y = 0; pos_y != lines; pos_y++)
-			{
-				memcpy(dest_bits,src_bits,line_length);
-		
-				// Increment offsets
-		   		src_bits += src_width;
-		   		dest_bits += dest_width;
-			}
-			break;
-		}
-	}
-}
-
-void BitmapDriver::ExtractToBitmap(ServerBitmap *destbmp,BRect destrect, BRect sourcerect)
-{
-	// Another internal function called from other functions. Extracts data from
-	// the framebuffer to a target ServerBitmap
-
-	if(!destbmp)
-		return;
-
-	if(destbmp->BitsPerPixel() != _target->BitsPerPixel())
-		return;
-
-	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
-	// First, clip source rect to destination
-	if(sourcerect.Width() > destrect.Width())
-		sourcerect.right=sourcerect.left+destrect.Width();
-	
-
-	if(sourcerect.Height() > destrect.Height())
-		sourcerect.bottom=sourcerect.top+destrect.Height();
-	
-
-	// Second, check rectangle bounds against their own bitmaps
-	BRect work_rect;
-
-	work_rect.Set(	destbmp->Bounds().left,
-					destbmp->Bounds().top,
-					destbmp->Bounds().right,
-					destbmp->Bounds().bottom	);
-	if( !(work_rect.Contains(destrect)) )
-	{	// something in selection must be clipped
-		if(destrect.left < 0)
-			destrect.left = 0;
-		if(destrect.right > work_rect.right)
-			destrect.right = work_rect.right;
-		if(destrect.top < 0)
-			destrect.top = 0;
-		if(destrect.bottom > work_rect.bottom)
-			destrect.bottom = work_rect.bottom;
-	}
-
-	work_rect.Set(	0,0,_target->Width()-1,_target->Height()-1);
-
-	if( !(work_rect.Contains(sourcerect)) )
-	{	// something in selection must be clipped
-		if(sourcerect.left < 0)
-			sourcerect.left = 0;
-		if(sourcerect.right > work_rect.right)
-			sourcerect.right = work_rect.right;
-		if(sourcerect.top < 0)
-			sourcerect.top = 0;
-		if(sourcerect.bottom > work_rect.bottom)
-			sourcerect.bottom = work_rect.bottom;
-	}
-
-	// Set pointers to the actual data
-	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
-	uint8 *src_bits = (uint8*) _target->Bits();
-
-	// Get row widths for offset looping
-	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
-	uint32 src_width = uint32 (_target->BytesPerRow());
-
-	// Offset bitmap pointers to proper spot in each bitmap
-	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
-	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
-
-	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
-	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
-
-	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
-	{ 
-		memcpy(dest_bits,src_bits,line_length);
-
-		// Increment offsets
-   		src_bits += src_width;
-   		dest_bits += dest_width;
-	}
-}
-
 void BitmapDriver::InvertRect(const BRect &r)
 {
 	Lock();
@@ -373,207 +167,6 @@ void BitmapDriver::InvertRect(const BRect &r)
 	}
 	Unlock();
 }
-
-/*
-void BitmapDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
-{
-	rgb_color color=d->highcolor.GetColor32();
-	
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer, *destbuffer;
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex, *destindex, *rowptr, value;
-	
-	// increment values for the index pointers
-	int32 srcinc=src->pitch, destinc=_target->BytesPerRow();
-	
-	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
-	int32 x=(int32)pt.x,y=(int32)pt.y;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		srcbuffer+=srcinc * (0-y);
-		srcheight-=srcinc;
-		destbuffer+=destinc * (0-y);
-	}
-
-	if(y+srcheight>_target->Height())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-_target->Height();
-	}
-
-	if(x+srcwidth>_target->Width())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-_target->Width();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		srcbuffer+=(0-x)>>3;
-		srcwidth-=0-x;
-		destbuffer+=(0-x)*4;
-	}
-	
-	// starting point in destination bitmap
-	destbuffer=(uint8*)_target->Bits()+int32( (pt.y*_target->BytesPerRow())+(pt.x*4) );
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			for(k=0; k<8; k++)
-			{
-				value=*(srcindex+j) & (1 << (7-k));
-				if(value)
-				{
-					rowptr[0]=color.blue;
-					rowptr[1]=color.green;
-					rowptr[2]=color.red;
-					rowptr[3]=color.alpha;
-				}
-
-				rowptr+=4;
-			}
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-
-}
-
-void BitmapDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
-{
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer=NULL, *destbuffer=NULL;
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
-	
-	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
-
-	rstep=float(highcolor.red-lowcolor.red)/255.0;
-	gstep=float(highcolor.green-lowcolor.green)/255.0;
-	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
-	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
-	
-	// increment values for the index pointers
-	int32 x=(int32)pt.x,
-		y=(int32)pt.y,
-		srcinc=src->pitch,
-//		destinc=dest->BytesPerRow(),
-		destinc=_target->BytesPerRow(),
-		srcwidth=src->width,
-		srcheight=src->rows,
-		incval=0;
-	
-	int16 i,j;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	// starting point in destination bitmap
-//	destbuffer=(uint8*)dest->Bits()+(y*dest->BytesPerRow()+(x*4));
-	destbuffer=(uint8*)_target->Bits()+(y*_target->BytesPerRow()+(x*4));
-
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		
-		incval=0-y;
-		
-		srcbuffer+=incval * srcinc;
-		srcheight-=incval;
-		destbuffer+=incval * destinc;
-	}
-
-	if(y+srcheight>_target->Height())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-_target->Height();
-	}
-
-	if(x+srcwidth>_target->Width())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-_target->Width();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		incval=0-x;
-		srcbuffer+=incval;
-		srcwidth-=incval;
-		destbuffer+=incval*4;
-	}
-
-	int32 value;
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			value=*(srcindex+j) ^ 255;
-
-			if(value!=255)
-			{
-				if(d->draw_mode==B_OP_COPY)
-				{
-					rowptr[0]=uint8(highcolor.blue-(value*bstep));
-					rowptr[1]=uint8(highcolor.green-(value*gstep));
-					rowptr[2]=uint8(highcolor.red-(value*rstep));
-					rowptr[3]=255;
-				}
-				else
-					if(d->draw_mode==B_OP_OVER)
-					{
-						if(highcolor.alpha>127)
-						{
-							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
-							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
-							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
-							rowptr[3]=255;
-						}
-					}
-			}
-			rowptr+=4;
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-}
-*/
 
 rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high)
 {
@@ -1010,7 +603,261 @@ void BitmapDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bot
 }
 */
 
-void BitmapDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, DrawData *d)
+void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source, 
+	const BRect &dest, DrawData *d)
 {
+	// Another internal function called from other functions.
+	
+	if(!sourcebmp | !d)
+		return;
+
+	if(sourcebmp->BitsPerPixel() != _target->BitsPerPixel())
+		return;
+
+	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
+	
+	BRect sourcerect(source),destrect(dest);
+	
+	// First, clip source rect to destination
+	if(sourcerect.Width() > destrect.Width())
+		sourcerect.right=sourcerect.left+destrect.Width();
+	
+
+	if(sourcerect.Height() > destrect.Height())
+		sourcerect.bottom=sourcerect.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect;
+
+	work_rect=sourcebmp->Bounds();
+	
+	if( !(work_rect.Contains(sourcerect)) )
+	{	// something in selection must be clipped
+		if(sourcerect.left < 0)
+			sourcerect.left = 0;
+		if(sourcerect.right > work_rect.right)
+			sourcerect.right = work_rect.right;
+		if(sourcerect.top < 0)
+			sourcerect.top = 0;
+		if(sourcerect.bottom > work_rect.bottom)
+			sourcerect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,_target->Width()-1,_target->Height()-1);
+
+	// Check to see if we actually need to copy anything
+	if( (destrect.right<work_rect.left) || (destrect.left>work_rect.right) ||
+			(destrect.bottom<work_rect.top) || (destrect.top>work_rect.bottom) )
+		return;
+
+	// something in selection must be clipped
+	if(destrect.left < 0)
+		destrect.left = 0;
+	if(destrect.right > work_rect.right)
+		destrect.right = work_rect.right;
+	if(destrect.top < 0)
+		destrect.top = 0;
+	if(destrect.bottom > work_rect.bottom)
+		destrect.bottom = work_rect.bottom;
+
+	// Set pointers to the actual data
+	uint8 *src_bits  = (uint8*) sourcebmp->Bits();	
+	uint8 *dest_bits = (uint8*) _target->Bits();
+
+	// Get row widths for offset looping
+	uint32 src_width  = uint32 (sourcebmp->BytesPerRow());
+	uint32 dest_width = uint32 (_target->BytesPerRow());
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
+
+	switch(d->draw_mode)
+	{
+		case B_OP_OVER:
+		{
+//			uint32 srow_pixels=src_width>>2;
+			uint32 srow_pixels=((destrect.IntegerWidth()>=sourcerect.IntegerWidth())?src_width:destrect.IntegerWidth()+1)>>2;
+			uint8 *srow_index, *drow_index;
+			
+			
+			// This could later be optimized to use uint32's for faster copying
+			for (uint32 pos_y=0; pos_y!=lines; pos_y++)
+			{
+				
+				srow_index=src_bits;
+				drow_index=dest_bits;
+				
+				for(uint32 pos_x=0; pos_x!=srow_pixels;pos_x++)
+				{
+					// 32-bit RGBA32 mode byte order is BGRA
+					if(srow_index[3]>127)
+					{
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						// we don't copy the alpha channel
+						drow_index++; srow_index++;
+					}
+					else
+					{
+						srow_index+=4;
+						drow_index+=4;
+					}
+				}
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
+		default:	// B_OP_COPY
+		{
+			for (uint32 pos_y = 0; pos_y != lines; pos_y++)
+			{
+				memcpy(dest_bits,src_bits,line_length);
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
+	}
+}
+
+
+bool BitmapDriver::AcquireBuffer(FBBitmap *fbmp)
+{
+	if(!fbmp)
+		return false;
+	
+	fbmp->ServerBitmap::ShallowCopy(_target);
+
+	return true;
+}
+
+void BitmapDriver::ReleaseBuffer(void)
+{
+}
+
+void BitmapDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
+{
+}
+
+void BitmapDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+{
+}
+
+void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
+{
+}
+
+void BitmapDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+{
+}
+
+void BitmapDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+{
+}
+
+void BitmapDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+{
+}
+
+void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+{
+}
+
+void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
+{
+	if(!destbmp)
+	{
+		printf("CopyToBitmap returned - not init or NULL bitmap\n");
+		return;
+	}
+	
+	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	{
+		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
+		return;
+	}
+	
+	BRect destrect(destbmp->Bounds()), source(sourcerect);
+	
+	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
+	
+	// First, clip source rect to destination
+	if(source.Width() > destrect.Width())
+		source.right=source.left+destrect.Width();
+	
+	if(source.Height() > destrect.Height())
+		source.bottom=source.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect(destbmp->Bounds());
+	
+	if( !(work_rect.Contains(destrect)) )
+	{
+		// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+
+	if(!work_rect.Contains(sourcerect))
+		return;
+
+	if( !(work_rect.Contains(source)) )
+	{
+		// something in selection must be clipped
+		if(source.left < 0)
+			source.left = 0;
+		if(source.right > work_rect.right)
+			source.right = work_rect.right;
+		if(source.top < 0)
+			source.top = 0;
+		if(source.bottom > work_rect.bottom)
+			source.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
+	uint8 *src_bits = (uint8*) _target->Bits();
+
+	// Get row widths for offset looping
+	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
+	uint32 src_width = uint32 (_target->BytesPerRow());
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+	
+	
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (source.bottom-source.top+1);
+
+	for (uint32 pos_y=0; pos_y<lines; pos_y++)
+	{
+		memcpy(dest_bits,src_bits,line_length);
+
+		// Increment offsets
+ 		src_bits += src_width;
+ 		dest_bits += dest_width;
+	}
+
 }
 

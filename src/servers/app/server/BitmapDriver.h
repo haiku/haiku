@@ -77,7 +77,18 @@ public:
 	virtual void SetMode(const display_mode &mode);
 	virtual void InvertRect(const BRect &rect);
 protected:
-	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
+	virtual bool AcquireBuffer(FBBitmap *bmp);
+	virtual void ReleaseBuffer(void);
+
+	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
+	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
+	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
+	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
+	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
+	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
+	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source);
+
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high=true);
 	void HLinePatternThick(int32 x1, int32 x2, int32 y);

@@ -178,7 +178,7 @@ void Decorator::SetFont(ServerFont *font)
 	if(!font)
 		return;
 
-	_layerdata.font		= *font;
+	_drawdata.font		= *font;
 }
 
 /*!
@@ -307,7 +307,7 @@ int32 Decorator::_ClipTitle(float width)
 	if(_driver)
 	{
 		int32 strlength=_title_string->CountChars();
-		float pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
+		float pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_drawdata);
 
 		while(strlength>=0)
 		{
@@ -315,7 +315,7 @@ int32 Decorator::_ClipTitle(float width)
 				return strlength;
 
 			strlength--;
-			pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
+			pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_drawdata);
 		}
 	}
 	return 0;
