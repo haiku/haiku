@@ -198,8 +198,8 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 	uint32 runs = height / 2;
 	for (uint32 i = 0; i < runs; i++) {
 
-		uint8 *pi1Even = i * pi1Inc2 + pi1Base;
-		uint8 *pi1Odd = pi1Inc + pi1Even;
+		uint16 *pi1Even = (uint16 *) (i * pi1Inc2 + pi1Base);
+		uint16 *pi1Odd = (uint16 *) (pi1Inc + (uint8 *)pi1Even);
 		uint8 *pi2 = i * pi2Inc + pi2Base;
 		uint8 *pi3 = i *pi3Inc + pi3Base;
 
@@ -210,51 +210,49 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 
 			B = - 128 + *(pi2++);
 			R = - 128 + *(pi3++);
-			Cr_R = R * 52298;
-			Cr_G = R * -26640;
 			Cb_G = B * -12845;
 			Cb_B = B * 66493;
+			Cr_R = R * 52298;
+			Cr_G = R * -26640;
 
-			G = *(uint16 *)pi1Even;
-			pi1Even += 2;
+			G = *(pi1Even++);
 			Y0 = ((G & 0x000000ff) - 16) * 38142;
 			Y1 = (((G & 0x0000ff00) >> 8) - 16) * 38142;
 			
 			R = (Y0 + Cr_R) >> 15;
-			SATURATE(R);
 			G = (Y0 + Cr_G + Cb_G) >> 15;
-			SATURATE(G);
 			B = (Y0 + Cb_B) >> 15;
+			SATURATE(R);
 			SATURATE(B);
+			SATURATE(G);
 			poutEven[j] = (R << 16) | (G << 8) | B;
 			
 			R = (Y1 + Cr_R) >> 15;
-			SATURATE(R);
 			G = (Y1 + Cr_G + Cb_G) >> 15;
-			SATURATE(G);
 			B = (Y1 + Cb_B) >> 15;
+			SATURATE(R);
 			SATURATE(B);
+			SATURATE(G);
 			poutEven[j + 1] = (R << 16) | (G << 8) | B;
 
-			G = *(uint16 *)pi1Odd;
-			pi1Odd += 2;
+			G = *(pi1Odd++);
 			Y0 = ((G & 0x000000ff) - 16) * 38142;
 			Y1 = (((G & 0x0000ff00) >> 8) - 16) * 38142;
 
 			R = (Y0 + Cr_R) >> 15;
-			SATURATE(R);
 			G = (Y0 + Cr_G + Cb_G) >> 15;
-			SATURATE(G);
 			B = (Y0 + Cb_B) >> 15;
+			SATURATE(R);
 			SATURATE(B);
+			SATURATE(G);
 			poutOdd[j] = (R << 16) | (G << 8) | B;
 			
 			R = (Y1 + Cr_R) >> 15;
-			SATURATE(R);
 			G = (Y1 + Cr_G + Cb_G) >> 15;
-			SATURATE(G);
 			B = (Y1 + Cb_B) >> 15;
+			SATURATE(R);
 			SATURATE(B);
+			SATURATE(G);
 			poutOdd[j + 1] = (R << 16) | (G << 8) | B;
 		}
 		poutEven = (uint32 *)(poutInc + (uint8 *)poutEven);
