@@ -70,7 +70,7 @@ BBlockCache::BBlockCache(uint32 blockCount,
 		blockCount = 1;
 		
 	// create blocks and put them into the free list
-	for (int32 i = 0; i < (int32)blockCount; i++) {
+	while (blockCount--) {
 		_FreeBlock *block = reinterpret_cast<_FreeBlock *>(fAlloc(blockSize));
 		if (!block)
 			break;
