@@ -1612,6 +1612,31 @@ vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 }
 
 
+extern "C" status_t
+vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node)
+{
+	char buffer[SYS_MAX_PATH_LEN + 1];
+	struct vnode *vnode;
+	status_t status;
+
+	PRINT(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n", mountID, path, kernel));
+
+	strlcpy(buffer, path, sizeof(buffer));
+	status = path_to_vnode(buffer, true, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (vnode->device != mountID) {
+		// wrong mount ID - must not gain access on foreign file system nodes
+		put_vnode(vnode);
+		return B_BAD_VALUE;
+	}
+
+	*_node = vnode->private_node;
+	return B_OK;
+}
+
+
 status_t
 vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer,
 	size_t bufferSize)
@@ -2053,19 +2078,20 @@ vfs_mount_boot_file_system()
 	// make the boot partition (and probably others) available
 	KDiskDeviceManager::CreateDefault();
 
+	status_t status;
 #if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
-	status_t status = manager->InitialDeviceScan();
-	if (status != B_OK)
-		panic("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
-
-	// ToDo: do this for real... (no hacks allowed :))
-	for (;;) {
-		snooze(500000);
-		if (manager->CountJobs() == 0)
-			break;
-	}
+	status = manager->InitialDeviceScan();
+	if (status == B_OK) {
+		// ToDo: do this for real... (no hacks allowed :))
+		for (;;) {
+			snooze(500000);
+			if (manager->CountJobs() == 0)
+				break;
+		}
+	} else
+		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 #endif
 
 	file_system_info *bootfs;

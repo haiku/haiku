@@ -38,14 +38,8 @@
 
 
 struct devfs_part_map {
-	off_t offset;
-	off_t size;
-	uint32 logical_block_size;
-	struct devfs_vnode *raw_vnode;
-	
-	// following info could be recreated on the fly, but it's not worth it
-	uint32 session;
-	uint32 partition;
+	struct devfs_vnode *raw_device;
+	partition_info info;
 };
 
 struct devfs_stream {
@@ -188,7 +182,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 	if (S_ISCHR(vnode->stream.type)) {
 		// for partitions, we have to release the raw device
 		if (vnode->stream.u.dev.part_map)
-			put_vnode(fs->id, vnode->stream.u.dev.part_map->raw_vnode->id);
+			put_vnode(fs->id, vnode->stream.u.dev.part_map->raw_device->id);
 
 		// remove API conversion from old to new drivers
 		if (vnode->stream.u.dev.node == NULL)
@@ -316,43 +310,30 @@ devfs_is_dir_empty(struct devfs_vnode *dir)
 
 
 static status_t
-devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v, 
-	struct devfs_cookie *cookie, void *buf, size_t len)
+devfs_get_partition_info(struct devfs *fs, struct devfs_vnode *v, 
+	struct devfs_cookie *cookie, void *buffer, size_t length)
 {
-	// ToDo: make me userspace safe!
+	struct devfs_part_map *map = v->stream.u.dev.part_map;
 
-	partition_info *info = (partition_info *)buf;
-	struct devfs_part_map *part_map = v->stream.u.dev.part_map;
+	if (!S_ISCHR(v->stream.type) || map == NULL || length != sizeof(partition_info))
+		return B_BAD_VALUE;
 
-	if (!S_ISCHR(v->stream.type) || part_map == NULL)
-		return EINVAL;
-
-	info->offset = part_map->offset;
-	info->size = part_map->size;
-	info->logical_block_size = part_map->logical_block_size;
-	info->session = part_map->session;
-	info->partition = part_map->partition;
-
-	// XXX: todo - create raw device name out of raw_vnode 
-	//             we need vfs support for that (see vfs_get_cwd)
-	strcpy(info->device, "something_raw");
-	
-	return B_NO_ERROR;
+	return user_memcpy(buffer, &map->info, sizeof(partition_info));
 }
 
 
 static status_t
-devfs_set_partition(struct devfs *fs, struct devfs_vnode *vnode,
-	struct devfs_cookie *cookie, partition_info &info, size_t length)
+add_partition(struct devfs *fs, struct devfs_vnode *device,
+	const char *name, const partition_info &info)
 {
-	struct devfs_vnode *part_node;
+	struct devfs_vnode *partition;
 	status_t status;
 
-	if (length != sizeof(partition_info) || !S_ISCHR(vnode->stream.type))
+	if (!S_ISCHR(device->stream.type))
 		return B_BAD_VALUE;
 
 	// we don't support nested partitions
-	if (vnode->stream.u.dev.part_map)
+	if (device->stream.u.dev.part_map)
 		return B_BAD_VALUE;
 
 	// reduce checks to a minimum - things like negative offsets could be useful
@@ -360,23 +341,16 @@ devfs_set_partition(struct devfs *fs, struct devfs_vnode *vnode,
 		return B_BAD_VALUE;
 
 	// create partition map
-	struct devfs_part_map *part_map = (struct devfs_part_map *)malloc(sizeof(*part_map));
-	if (part_map == NULL)
+	struct devfs_part_map *map = (struct devfs_part_map *)malloc(sizeof(struct devfs_part_map));
+	if (map == NULL)
 		return B_NO_MEMORY;
 
-	part_map->offset = info.offset;
-	part_map->size = info.size;
-	part_map->logical_block_size = info.logical_block_size;
-	part_map->session = info.session;
-	part_map->partition = info.partition;
+	memcpy(&map->info, &info, sizeof(partition_info));
 
-	char name[30];
-	sprintf(name, "%li_%li", info.session, info.partition);
-
-	mutex_lock(&sDeviceFileSystem->lock);
+	mutex_lock(&fs->lock);
 
 	// you cannot change a partition once set
-	if (devfs_find_in_dir(vnode->parent, name)) {
+	if (devfs_find_in_dir(device->parent, name)) {
 		status = B_BAD_VALUE;
 		goto err1;
 	}
@@ -384,44 +358,44 @@ devfs_set_partition(struct devfs *fs, struct devfs_vnode *vnode,
 	// increase reference count of raw device - 
 	// the partition device really needs it 
 	// (at least to resolve its name on GET_PARTITION_INFO)
-	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&part_map->raw_vnode);
+	status = get_vnode(fs->id, device->id, (fs_vnode *)&map->raw_device);
 	if (status < B_OK)
 		goto err1;
 
 	// now create the partition vnode
-	part_node = devfs_create_vnode(fs, vnode->parent, name);
-	if (part_node == NULL) {
+	partition = devfs_create_vnode(fs, device->parent, name);
+	if (partition == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;
 	}
 
-	part_node->stream.type = vnode->stream.type;
-	part_node->stream.u.dev.node = vnode->stream.u.dev.node;
-	part_node->stream.u.dev.info = vnode->stream.u.dev.info;
-	part_node->stream.u.dev.ops = vnode->stream.u.dev.ops;
-	part_node->stream.u.dev.part_map = part_map;
-	part_node->stream.u.dev.scheduler = vnode->stream.u.dev.scheduler;
+	partition->stream.type = device->stream.type;
+	partition->stream.u.dev.node = device->stream.u.dev.node;
+	partition->stream.u.dev.info = device->stream.u.dev.info;
+	partition->stream.u.dev.ops = device->stream.u.dev.ops;
+	partition->stream.u.dev.part_map = map;
+	partition->stream.u.dev.scheduler = device->stream.u.dev.scheduler;
 
-	hash_insert(fs->vnode_list_hash, part_node);
+	hash_insert(fs->vnode_list_hash, partition);
 
-	devfs_insert_in_dir(vnode->parent, part_node);
+	devfs_insert_in_dir(device->parent, partition);
 
-	mutex_unlock(&sDeviceFileSystem->lock);
+	mutex_unlock(&fs->lock);
 
 	TRACE(("SET_PARTITION: Added partition\n"));
 	return B_OK;
 
 err1:
-	mutex_unlock(&sDeviceFileSystem->lock);
+	mutex_unlock(&fs->lock);
 
-	free(part_map);
+	free(map);
 	return status;
-		
-err2:
-	mutex_unlock(&sDeviceFileSystem->lock);
 
-	put_vnode(fs->id, vnode->id);
-	free(part_map);
+err2:
+	mutex_unlock(&fs->lock);
+
+	put_vnode(fs->id, device->id);
+	free(map);
 	return status;
 }
 
@@ -432,13 +406,13 @@ translate_partition_access(devfs_part_map *map, off_t &offset, size_t &size)
 	if (offset < 0)
 		offset = 0;
 
-	if (offset > map->size) {
+	if (offset > map->info.size) {
 		size = 0;
 		return;
 	}
 
-	size = min_c(size, map->size - offset);
-	offset += map->offset;
+	size = min_c(size, map->info.size - offset);
+	offset += map->info.offset;
 }
 
 
@@ -466,6 +440,13 @@ create_new_driver_info(device_hooks *ops)
 		// old devices can't know to do physical page access
 
 	return info;
+}
+
+
+static status_t
+get_node_for_path(const char *path, struct devfs_vnode **_node)
+{
+	return vfs_get_fs_node_from_path(sDeviceFileSystem->id, path, true, (void **)_node);
 }
 
 
@@ -1128,7 +1109,7 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *b
 				return devfs_get_partition_info(fs, vnode, cookie, (partition_info *)buffer, length);
 
 			case B_SET_PARTITION:
-				return devfs_set_partition(fs, vnode, cookie, *(partition_info *)buffer, length);
+				return B_NOT_ALLOWED;
 		}
 
 		return vnode->stream.u.dev.info->control(cookie->u.dev.dcookie, op, buffer, length);
@@ -1280,7 +1261,7 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 
 		// if it's a real block device, then let's report a useful size
 		if (vnode->stream.u.dev.part_map != NULL) {
-			stat->st_size = vnode->stream.u.dev.part_map->size;
+			stat->st_size = vnode->stream.u.dev.part_map->info.size;
 #if 0
 		} else if (vnode->stream.u.dev.info->control(cookie->u.dev.dcookie,
 					B_GET_GEOMETRY, &geometry, sizeof(struct device_geometry)) >= B_OK) {
@@ -1584,11 +1565,29 @@ devfs_unpublish_partition(const char *path)
 extern "C" status_t
 devfs_publish_partition(const char *path, const partition_info *info)
 {
-	if (info == NULL)
+	if (path == NULL || info == NULL)
 		return B_BAD_VALUE;
 
-	dprintf("publish partition: %s (device \"%s\", offset %Ld, size %Ld)\n", path, info->device, info->offset, info->size);
-	return B_OK;
+	TRACE(("publish partition: %s (device \"%s\", offset %Ld, size %Ld)\n",
+		path, info->device, info->offset, info->size));
+
+	// the partition and device paths must be the same until the leaves
+	const char *lastPath = strrchr(path, '/');
+	const char *lastDevice = strrchr(info->device, '/');
+	if (lastPath == NULL || lastDevice == NULL
+		|| lastPath - path != lastDevice - info->device
+		|| strncmp(path, info->device, lastPath - path))
+		return B_BAD_VALUE;
+
+	devfs_vnode *device;
+	status_t status = get_node_for_path(info->device, &device);
+	if (status != B_OK)
+		return status;
+
+	status = add_partition(sDeviceFileSystem, device, lastPath + 1, *info);
+
+	put_vnode(sDeviceFileSystem->id, device->id);
+	return status;
 }
 
 
