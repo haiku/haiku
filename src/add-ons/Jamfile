@@ -108,7 +108,6 @@ KernelLd
 SubInclude OBOS_TOP src add-ons input_server ;
 SubInclude OBOS_TOP src add-ons kernel ;
 SubInclude OBOS_TOP src add-ons media ;
-SubInclude OBOS_TOP src add-ons net ;
 SubInclude OBOS_TOP src add-ons print ;
 SubInclude OBOS_TOP src add-ons translators ;
 SubInclude OBOS_TOP src add-ons decorators ;
