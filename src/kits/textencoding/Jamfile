@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kits textencoding ;
 
 UsePrivateHeaders textencoding ;
+SubDirHdrs [ FDirName $(SUBDIR) libiconv ] ;
 
 SharedLibrary textencoding :
 	CharacterSet.cpp
