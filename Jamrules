@@ -206,6 +206,16 @@ if $(DEBUG) != 0 {
 # To disable for the tests OPTIM and DEBUG are overridden, set the environment
 # variable NO_TEST_DEBUG.
 
+# If the environment variable DEBUG_PRINTF is defined we define an equally
+# named macro to the variable value. Some components use the macro to allow
+# another function than printf() to print the debug output. The variable should
+# be set to the name of the alternative function.
+#
+if $(DEBUG_PRINTF) {
+	CCFLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
+	C++FLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
+}
+
 # Instructs the Library rule to not make its object files temporary.
 # This is needed as some objects are used in a static library and for an
 # executable.
@@ -1816,7 +1826,7 @@ rule KernelAddon
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
-	LinkSharedOSLibs $(1) : $(4) $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
+	LinkSharedOSLibs $(1) : $(4) <nogrist>kernel.so ;
 		# ToDo this has to be changed!
 	SetupKernel $(sources) ;
 }
