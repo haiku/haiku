@@ -6,7 +6,9 @@ UsePrivateHeaders media ;
 SubDirHdrs [ FDirName $(SUBDIR) libMatroskaParser ] ;
 
 Addon matroska : media plugins :
+	matroska_codecs.cpp
 	matroska_reader.cpp
+	matroska_util.cpp
 	:
 	false
 	:

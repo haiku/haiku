@@ -31,6 +31,8 @@
 #include <MediaFormats.h>
 #include "RawFormats.h"
 #include "matroska_reader.h"
+#include "matroska_codecs.h"
+#include "matroska_util.h"
 
 #define TRACE_MKV_READER
 #ifdef TRACE_MKV_READER
@@ -57,9 +59,11 @@ struct mkv_cookie
 	
 	const TrackInfo	*track_info;
 
+	float		frame_rate;
 	int64		frame_count;
 	bigtime_t 	duration;
 	media_format format;
+
 /*
 	bool		audio;
 
@@ -206,7 +210,20 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	TRACE("video DisplayHeight: %d\n", cookie->track_info->Video.DisplayHeight); 
 	TRACE("video ColourSpace: %d\n", cookie->track_info->Video.ColourSpace); 
 	TRACE("video GammaValue: %.4f\n", cookie->track_info->Video.GammaValue); 
-	TRACE("video Interlaced: %d\n", cookie->track_info->Video.Interlaced); 
+
+	TRACE("video Interlaced: %d\n", cookie->track_info->Video.Interlaced);
+	
+	cookie->frame_rate = get_frame_rate(cookie->track_info->DefaultDuration);
+	cookie->duration = get_duration_in_us(fFileInfo->Duration);
+	cookie->frame_count = get_frame_count_by_default_duration(fFileInfo->Duration, cookie->track_info->DefaultDuration);
+
+	TRACE("mkvReader::Sniff: TimecodeScale %Ld\n", fFileInfo->TimecodeScale);
+	TRACE("mkvReader::Sniff: Duration %Ld\n", fFileInfo->Duration);
+
+	TRACE("frame_rate: %.6f\n", cookie->frame_rate); 
+	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
+	TRACE("frame_count: %Ld\n", cookie->frame_count); 
+
 }
 
 
@@ -217,6 +234,16 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 	TRACE("audio OutputSamplingFreq: %.3f\n", cookie->track_info->Audio.OutputSamplingFreq); 
 	TRACE("audio Channels: %d\n", cookie->track_info->Audio.Channels); 
 	TRACE("audio BitDepth: %d\n", cookie->track_info->Audio.BitDepth);
+
+	TRACE("CodecID: %s\n", cookie->track_info->CodecID); 
+
+	cookie->frame_rate = cookie->track_info->Audio.SamplingFreq;
+	cookie->duration = get_duration_in_us(fFileInfo->Duration);
+	cookie->frame_count = get_frame_count_by_frame_rate(fFileInfo->Duration, cookie->track_info->Audio.SamplingFreq);
+
+	TRACE("frame_rate: %.6f\n", cookie->frame_rate); 
+	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
+	TRACE("frame_count: %Ld\n", cookie->frame_count); 
 }
 
 
