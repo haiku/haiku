@@ -149,6 +149,19 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			error << ":" << port;
 		error << ": Host not found.";
 		runner->ShowError(error.String());
+	#ifdef USESSL
+		if (use_ssl) {
+			if (ssl)
+				SSL_shutdown(ssl);
+			if (ctx)
+				SSL_CTX_free(ctx);
+		}
+	#endif
+	#ifdef BONE
+		close(net);
+	#else
+		closesocket(net);
+	#endif
 		net = -1;
 		runner->Stop();
 		return;
@@ -167,11 +180,19 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(net, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-#ifdef BONE
+		#ifdef USESSL
+			if (use_ssl) {
+				if (ssl)
+					SSL_shutdown(ssl);
+				if (ctx)
+					SSL_CTX_free(ctx);
+			}
+		#endif
+		#ifdef BONE
 			close(net);
-#else
+		#else
 			closesocket(net);
-#endif
+		#endif
 			net = -1;
 			BString error;
 			error << "Could not connect to IMAP server " << settings->FindString("server");
@@ -271,32 +292,33 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		runner->GetMessages(&to_dl,-1);
 }
 
-IMAP4Client::~IMAP4Client() {	
+IMAP4Client::~IMAP4Client() {
 	if (net > 0) { 
 		if (selected_mb != "")
 			SendCommand("CLOSE");
 		SendCommand("LOGOUT");
-	}
 	
+	#ifdef USESSL
+		if (use_ssl)  {
+			if (ssl)
+				SSL_shutdown(ssl);
+			if (ctx)
+				SSL_CTX_free(ctx);
+		}
+	#endif
+		
+	#ifdef BONE
+		close(net);
+	#else
+		closesocket(net);
+	#endif
+
+	}
+
 	for (int32 i = 0; i < box_info.CountItems(); i++)
 		delete (struct mailbox_info *)(box_info.ItemAt(i));
 	
 	delete noop;
-	
-#ifdef USESSL
-	if (use_ssl) {
-		if (ssl)
-			SSL_shutdown(ssl);
-		if (ctx)
-			SSL_CTX_free(ctx);
-	}
-#endif
-	
-#ifdef BONE
-	close(net);
-#else
-	closesocket(net);
-#endif
 }
 
 void IMAP4Client::InitializeMailboxes() {
@@ -638,6 +660,9 @@ status_t IMAP4Client::Close() {
 }
 
 status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messages, bool noop, bool no_command, bool ignore_forced_reselect) {
+	if (net < 0)
+		return B_NO_INIT;
+	
 	if (force_reselect && !ignore_forced_reselect) {
 		reselect = true;
 		force_reselect = false;
@@ -947,6 +972,19 @@ IMAP4Client::ReceiveLine(BString &out)
 			if(r <= 0) {
 				BString error;
 					error << "Connection to " << settings->FindString("server") << " lost.";
+			#ifdef USESSL
+				if (use_ssl) {
+					if (ssl)
+						SSL_shutdown(ssl);
+					if (ctx)
+						SSL_CTX_free(ctx);
+				}
+			#endif
+			#ifdef BONE
+				close(net);
+			#else
+				closesocket(net);
+			#endif
 				net = -1;
 				runner->Stop();
 				runner->ShowError(error.String());
@@ -1018,6 +1056,19 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 			if(r <= 0) {
 				BString error;
 				error << "Connection to " << settings->FindString("server") << " lost.";
+			#ifdef USESSL
+				if (use_ssl) {
+					if (ssl)
+						SSL_shutdown(ssl);
+					if (ctx)
+						SSL_CTX_free(ctx);
+				}
+			#endif
+			#ifdef BONE
+				close(net);
+			#else
+				closesocket(net);
+			#endif
 				net = -1;
 				runner->Stop();
 				runner->ShowError(error.String());
