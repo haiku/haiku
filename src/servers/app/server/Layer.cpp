@@ -84,6 +84,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fDriver			= driver;
 
 	// Layer does not start out as a part of the tree
+	fOwner			= NULL;
 	fParent			= NULL;
 	fUpperSibling	= NULL;
 	fLowerSibling	= NULL;
@@ -98,8 +99,10 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fClassID		= AS_LAYER_CLASS;
 	fFrameAction	= B_LAYER_ACTION_NONE;
 	fResizeMode		= resize;
-	fHidden			= false;
 	
+	fHidden			= false;
+	fEventMask		= 0UL;
+	fEventOptions	= 0UL;
 	fInUpdate		= false;
 	fIsTopLayer		= false;
 	fLevel			= -100;

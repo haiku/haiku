@@ -82,9 +82,9 @@ public:
 	void SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight);
 
 	click_type TellWhat(PointerEvent& evt) const;
-	void MouseDown(PointerEvent& evt, bool sendMessage);
-	void MouseMoved(PointerEvent& evt);
-	void MouseUp(PointerEvent& evt);
+	void MouseDown(click_type action);
+	void MouseMoved(click_type action);
+	void MouseUp(click_type action);
 	void MouseWheel(PointerEvent& evt, BPoint& ptWhere);
 	
 	void UpdateColors(void);
@@ -94,7 +94,7 @@ public:
 	
 	virtual bool HasClient(void) { return false; }
 	Decorator *GetDecorator(void) const { return fDecorator; }
-	
+
 	void HighlightDecorator(const bool &active);
 	
 	bool HasPoint(const BPoint &pt) const;

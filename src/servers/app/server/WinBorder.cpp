@@ -92,6 +92,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fTopLayer		= NULL;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
+	fEventMask		= B_POINTER_EVENTS;
 
 	fIsClosing		= false;
 	fIsMinimizing	= false;
@@ -161,15 +162,9 @@ click_type WinBorder::TellWhat(PointerEvent& evt) const
 	or frame. If it is not, the message is passed on to the appropriate view in the client
 	BWindow. If the WinBorder is the target, then the proper action flag is set.
 */
-void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
+void WinBorder::MouseDown(click_type action)
 {
-	// user clicked on WinBorder's full visible region,
-	// find out if the user clicked the decorator.
-
-	click_type action;
-
 	// find out where user clicked in Decorator
-	action = fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
 	switch(action)
 	{
 		case DEC_CLOSE:
@@ -196,42 +191,12 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 			STRACE_CLICK(("===> DEC_MINIMIZE\n"));
 			break;
 		}
-		case DEC_RESIZE:
-		case DEC_DRAG:
-		case DEC_MOVETOBACK:
-		{
-			// do nothing - RootLayer takes care of that
-			STRACE_CLICK(("===> DEC_RESIZE || DEC_DRAG || DEC_MOVETOBACK \n"));
-			break;
-		}
-		case DEC_NONE:
-		{
-			Window()->Lock();
-			// TODO: you can improve performance by doing this search client-side!
-			Layer	*target = LayerAt(evt.where);
-			if (sendMessage && target && target != fTopLayer)
-			{
-				BMessage msg;
-				msg.what = B_MOUSE_DOWN;
-				msg.AddInt64("when", evt.when);
-				msg.AddPoint("where", evt.where);
-				msg.AddInt32("modifiers", evt.modifiers);
-				msg.AddInt32("buttons", evt.buttons);
-				msg.AddInt32("clicks", evt.clicks);
-
-				Window()->SendMessageToClient(&msg, target->fViewToken, false);
-			}
-			Window()->Unlock();
-			break;
-		}
 		default:
 		{
-			debugger("WinBorder::MouseDown - Decorator returned UNKNOWN code\n");
+			debugger("WinBorder::MouseDown - default case - not allowed!\n");
 			break;
 		}
 	}
-
-	fLastMousePosition = evt.where;
 }
 
 /*!
@@ -242,47 +207,25 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 	or check to see if the user clicked on a tab button (close, zoom, etc.) and then moused
 	away to prevent the operation from occurring
 */
-void WinBorder::MouseMoved(PointerEvent& evt)
+void WinBorder::MouseMoved(click_type action)
 {
-	// Do a click test only if we have to, which would be now. :)
-	click_type location=fDecorator->Clicked(evt.where, evt.buttons,fKeyModifiers);
-		
-	if (fIsZooming && location!=DEC_ZOOM)
+	if (fIsZooming && action!=DEC_ZOOM)
 	{
 		fDecorator->SetZoom(false);
 		fDecorator->DrawZoom();
 	}
 	else
-	if (fIsClosing && location!=DEC_CLOSE)
+	if (fIsClosing && action!=DEC_CLOSE)
 	{
 		fDecorator->SetClose(false);
 		fDecorator->DrawClose();
 	}
 	else
-	if(fIsMinimizing && location!=DEC_MINIMIZE)
+	if(fIsMinimizing && action!=DEC_MINIMIZE)
 	{
 		fDecorator->SetMinimize(false);
 		fDecorator->DrawMinimize();
 	}
-
-	if (fTopLayer->fFullVisible.Contains(evt.where))
-	{
-		Window()->Lock();
-		// TODO: you can improve performance by doing this search client-side!
-		Layer	*target = LayerAt(evt.where);
-		if (target)
-		{
-			BMessage movemsg(B_MOUSE_MOVED);
-			movemsg.AddInt64("when",evt.when);
-			movemsg.AddPoint("where",evt.where);
-			movemsg.AddInt32("buttons",evt.buttons);
-			
-			Window()->SendMessageToClient(&movemsg);
-		}
-		Window()->Unlock();
-	}
-
-	fLastMousePosition = evt.where;
 }
 
 /*!
@@ -293,13 +236,8 @@ void WinBorder::MouseMoved(PointerEvent& evt)
 	button click flag, takes the appropriate action (i.e. clearing the close button flag also
 	takes steps to close the window).
 */
-void WinBorder::MouseUp(PointerEvent& evt)
+void WinBorder::MouseUp(click_type action)
 {
-	click_type action;
-
-	// find out where user clicked in Decorator
-	action = fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
-
 	if (fIsZooming)
 	{
 		fIsZooming	= false;
@@ -327,23 +265,6 @@ void WinBorder::MouseUp(PointerEvent& evt)
 		if(action==DEC_MINIMIZE)
 			Window()->Minimize(true);
 		return;
-	}
-
-	if (action == DEC_NONE)
-	{
-		Window()->Lock();
-		// TODO: you can improve performance by doing this search client-side!
-		Layer	*target = LayerAt(evt.where);
-		if (target && target != fTopLayer)
-		{
-			BMessage upmsg(B_MOUSE_UP);
-			upmsg.AddInt64("when",evt.when);
-			upmsg.AddPoint("where",evt.where);
-			upmsg.AddInt32("modifiers",evt.modifiers);
-
-			Window()->SendMessageToClient(&upmsg, target->fViewToken, false);
-		}
-		Window()->Unlock();
 	}
 }
 

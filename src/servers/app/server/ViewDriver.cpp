@@ -178,6 +178,8 @@ void VDView::MouseDown(BPoint pt)
 
 void VDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
+	if (!(transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW))
+		return;
 #ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click

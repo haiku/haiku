@@ -131,6 +131,8 @@ public:
 	virtual bool HasClient(void) { return true; }
 	bool IsServerLayer() const;
 	int32 Level() const { return fLevel; }
+	uint32 EventMask(void) const { return fEventMask; }
+	uint32 EventOptions(void) const { return fEventOptions; }
 
 	void PruneTree(void);
 	
@@ -163,6 +165,7 @@ protected:
 
 	BRect fFrame;
 	BPoint fBoundsLeftTop;
+	WinBorder *fOwner;
 	Layer *fParent;
 	Layer *fUpperSibling;
 	Layer *fLowerSibling;
@@ -186,6 +189,8 @@ protected:
 	int32 fLevel;
 	uint32 fFlags;
 	uint32 fResizeMode;
+	uint32 fEventMask;
+	uint32 fEventOptions;
 	bool fHidden;
 	bool fInUpdate;
 	bool fIsTopLayer;

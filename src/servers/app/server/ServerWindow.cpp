@@ -566,6 +566,8 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	int32 token;
 	BRect frame;
 	uint32 resizeMask;
+	uint32 eventMask;
+	uint32 eventOptions;
 	uint32 flags;
 	bool hidden;
 	int32 childCount;
@@ -575,6 +577,8 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	link.ReadString(&name);
 	link.Read<BRect>(&frame);
 	link.Read<uint32>(&resizeMask);
+	link.Read<uint32>(&eventMask);
+	link.Read<uint32>(&eventOptions);
 	link.Read<uint32>(&flags);
 	link.Read<bool>(&hidden);
 	link.Read<int32>(&childCount);
@@ -588,7 +592,10 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 		free(name);
 
 	// there is no way of setting this, other than manually :-)
-	newLayer->fHidden = hidden;
+	newLayer->fHidden		= hidden;
+	newLayer->fEventMask	= eventMask;
+	newLayer->fEventOptions	= eventOptions;
+	newLayer->fOwner		= fWinBorder;
 
 	// add the new Layer to the tree structure.
 	if(localRoot)

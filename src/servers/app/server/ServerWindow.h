@@ -109,7 +109,7 @@ public:
 
 	// to who we belong. who do we own. our title.
 	ServerApp *App(void) const { return fServerApp; }
-	WinBorder *GetWinBorder(void) const { return fWinBorder; }
+	const WinBorder *GetWinBorder(void) const { return fWinBorder; }
 	const char *Title(void) const { return fTitle.String(); }
 
 	// related thread/team_id(s).

@@ -79,7 +79,9 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	fMovingWindow		= false;
 	fResizingWindow		= false;
-	fMouseTarget		= NULL;
+	fLastMouseMoved		= this;
+	fViewAction			= B_ENTERED_VIEW;
+	fEventMaskLayer		= NULL;
 	fDragMessage		= NULL;
 	fScreenShotIndex	= 1;
 
@@ -905,53 +907,83 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&evt.modifiers);
 			msg.Read<int32>(&evt.buttons);
 			msg.Read<int32>(&evt.clicks);
+
+			if (fLastMousePossition.x != evt.where.x || fLastMousePossition.y != evt.where.y)
+				debugger("RootLayer: MouseDown position not the same as last mouse position.\n");
 			
-			WinBorder	*target = WinBorderAt(evt.where);
-			if (target)
-			{
-				click_type		action;
-				bool			invalidate;
-				bool			sendMessage = true;
-				WinBorder		*exFocus = FocusWinBorder();
+			if (fLastMouseMoved == NULL)
+				debugger("RootLayer: fLastMouseMoved is null!\n");
 
-				action			= target->TellWhat(evt);
+			if (fLastMouseMoved == this)
+				break;
 
-				if (action == DEC_MOVETOBACK)
-					invalidate		= ActiveWorkspace()->MoveToBack(target);
-				else
-					invalidate		= ActiveWorkspace()->MoveToFront(target);
+			// we are clicking a WinBorder
+
+			click_type		action;
+			bool			invalidate;
+			bool			sendMessage = true;
+			WinBorder		*exFocus = FocusWinBorder();
+			WinBorder		*target = fLastMouseMoved->fOwner?
+										fLastMouseMoved->fOwner:
+										(WinBorder*)fLastMouseMoved;
+
+			action			= target->TellWhat(evt);
+
+			if (action == DEC_MOVETOBACK)
+				invalidate		= ActiveWorkspace()->MoveToBack(target);
+			else
+				invalidate		= ActiveWorkspace()->MoveToFront(target);
 				
-				if (invalidate)
-				{
-					get_workspace_windows();
+			if (invalidate)
+			{
+				get_workspace_windows();
 					
-					// TODO: should it be improved by calling with region of hidden windows
-					//       plus the full regions of new windows???
-					invalidate_layer(this, fFull);
-				}
+				// TODO: should it be improved by calling with region of hidden windows
+				//       plus the full regions of new windows???
+				invalidate_layer(this, fFull);
+			}
 
-				draw_window_tab(exFocus, FocusWinBorder());
+			draw_window_tab(exFocus, FocusWinBorder());
 
-				if (action == DEC_DRAG)
+			if (action == DEC_DRAG)
+			{
+				fMovingWindow = true;
+			}
+			else if (action == DEC_RESIZE)
+			{
+				fResizingWindow = true;
+			}
+			else if (action != DEC_NONE)
+			{
+				target->MouseDown(action);
+			}
+			else
+			{
+				// we are inside WinBorder
+
+				if (target != FocusWinBorder())
+					sendMessage = false;
+				else if (exFocus != FocusWinBorder()
+						 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+					sendMessage = false;
+
+				if (sendMessage && fLastMouseMoved != target->fTopLayer)
 				{
-					fMovingWindow = true;
-				}
-				else if (action == DEC_RESIZE)
-				{
-					fResizingWindow = true;
-				}
-				else
-				{
-					if (target != FocusWinBorder())
-						sendMessage = false;
-					else if (exFocus != FocusWinBorder()
-							 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
-						sendMessage = false;
+					BMessage msg;
+					msg.what = B_MOUSE_DOWN;
+					msg.AddInt64("when", evt.when);
+					msg.AddPoint("where", evt.where);
+					msg.AddInt32("modifiers", evt.modifiers);
+					msg.AddInt32("buttons", evt.buttons);
+					msg.AddInt32("clicks", evt.clicks);
 
-					target->MouseDown(evt, sendMessage);
+					Window()->SendMessageToClient(&msg, target->fViewToken, false);
 				}
+			}
 
-				fMouseTarget = target;
+			if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS)
+			{
+				fEventMaskLayer = target;
 			}
 
 			// We'll need this so that GetMouse can query for which buttons
@@ -975,12 +1007,45 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
 
-			// currently mouse up goes to the same window which received mouse down
-			if (fMouseTarget)
+			// TODO: what if 'fEventMaskLayer' is deleted in the mean time.
+			if (fEventMaskLayer)
 			{
-				if (fMouseTarget == FocusWinBorder())
-					fMouseTarget->MouseUp(evt);
-				fMouseTarget = NULL;
+				// if this is a regular Layer, sent message to counterpart BView.
+				if (fEventMaskLayer->fOwner)
+				{
+					BMessage upmsg(B_MOUSE_UP);
+					upmsg.AddInt64("when",evt.when);
+					upmsg.AddPoint("where",evt.where);
+					upmsg.AddInt32("modifiers",evt.modifiers);
+
+					fEventMaskLayer->Window()->SendMessageToClient(&upmsg, fEventMaskLayer->fViewToken, false);
+				}
+				// this surely is a WinBorder
+				else
+				{
+					((WinBorder*)fEventMaskLayer)->MouseUp(((WinBorder*)fEventMaskLayer)->TellWhat(evt));
+				}
+
+				fEventMaskLayer	= NULL;	
+			}
+			else
+			{
+				if (fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
+				{
+					// send B_MOUSE_UP for regular Layers/BViews
+					BMessage upmsg(B_MOUSE_UP);
+					upmsg.AddInt64("when",evt.when);
+					upmsg.AddPoint("where",evt.where);
+					upmsg.AddInt32("modifiers",evt.modifiers);
+
+					fLastMouseMoved->Window()->SendMessageToClient(&upmsg, fLastMouseMoved->fViewToken, false);
+				}
+				else
+				{
+					// WinBorders don't need _UP_ messages unless they received _DOWN_ messages,
+					// and that case is threated above - WinBorders use Layer::fEventMask to
+					// capture the mouse.
+				}
 			}
 
 			fMovingWindow	= false;
@@ -1007,40 +1072,123 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 
 			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 
-			if (fMouseTarget)
+// TODO: lock here!
+			Layer		*target = LayerAt(evt.where);
+			if (target == NULL)
+				debugger("RooLayer::MouseEventHandler: 'target' can't be null.\n");
+			WinBorder	*winBorderUnder = NULL;
+
+			// fEventMaskLayer is always != this
+			if (fEventMaskLayer)
+			{
+				if (fEventMaskLayer == target)
+				{
+					if (target == fLastMouseMoved)
+					{
+						fViewAction = B_INSIDE_VIEW;
+					}
+					else
+					{
+						fViewAction = B_ENTERED_VIEW;
+					}
+				}
+				else if (fEventMaskLayer == fLastMouseMoved)
+				{
+					fViewAction = B_EXITED_VIEW;
+				}
+				else
+				{
+					fViewAction = B_OUTSIDE_VIEW;
+				}
+
+				if (fEventMaskLayer->fOwner)
+				{
+					// top layer does not have B_POINTER_EVENTS in its event mask
+					BMessage movemsg(B_MOUSE_MOVED);
+					movemsg.AddInt64("when",evt.when);
+					movemsg.AddPoint("where",evt.where);
+					movemsg.AddInt32("buttons",evt.buttons);
+					movemsg.AddInt32("transit", fViewAction);
+
+					fEventMaskLayer->Window()->SendMessageToClient(&movemsg, fEventMaskLayer->fViewToken, false);
+				}
+				else
+				{
+					winBorderUnder	= (WinBorder*)fEventMaskLayer;
+				}
+			}
+			else
+			{
+				if (fLastMouseMoved != target)
+				{
+					fViewAction = B_EXITED_VIEW;
+					if (fLastMouseMoved->fOwner)
+					{
+						if (fLastMouseMoved != fLastMouseMoved->fOwner->fTopLayer)
+						{
+							BMessage movemsg(B_MOUSE_MOVED);
+							movemsg.AddInt64("when",evt.when);
+							movemsg.AddPoint("where",evt.where);
+							movemsg.AddInt32("buttons",evt.buttons);
+							movemsg.AddInt32("transit",fViewAction);
+							fLastMouseMoved->Window()->SendMessageToClient(&movemsg, fLastMouseMoved->fViewToken, false);
+						}
+					}
+					else if (fLastMouseMoved != this)
+						((WinBorder*)fLastMouseMoved)->MouseMoved(DEC_NONE);
+
+					fViewAction = B_ENTERED_VIEW;
+				}
+				else
+				{
+					fViewAction = B_INSIDE_VIEW;
+				}
+
+				if (target->fOwner)
+				{
+					if (target != target->fOwner->fTopLayer)
+					{
+						BMessage movemsg(B_MOUSE_MOVED);
+						movemsg.AddInt64("when",evt.when);
+						movemsg.AddPoint("where",evt.where);
+						movemsg.AddInt32("buttons",evt.buttons);
+						movemsg.AddInt32("transit",fViewAction);
+						target->Window()->SendMessageToClient(&movemsg, target->fViewToken, false);
+					}
+				}
+				else if (target != this)
+				{
+					winBorderUnder	= (WinBorder*)target;
+				}
+			}
+
+			if (winBorderUnder)
 			{
 				BPoint		pt = evt.where;
 				pt			-= fLastMousePossition;
 
 				if (fMovingWindow)
 				{
-					if(fMouseTarget->fDecorator)
-						fMouseTarget->fDecorator->MoveBy(pt.x, pt.y);
+					if(winBorderUnder->fDecorator)
+						winBorderUnder->fDecorator->MoveBy(pt.x, pt.y);
 
-					fMouseTarget->move_layer(pt.x, pt.y);
+					winBorderUnder->move_layer(pt.x, pt.y);
 				}
 				else if (fResizingWindow)
 				{
-					if(fMouseTarget->fDecorator)
-						fMouseTarget->fDecorator->ResizeBy(pt.x, pt.y);
+					if(winBorderUnder->fDecorator)
+						winBorderUnder->fDecorator->ResizeBy(pt.x, pt.y);
 
-					fMouseTarget->resize_layer(pt.x, pt.y);
+					winBorderUnder->resize_layer(pt.x, pt.y);
 				}
 				else
 				{
-					fMouseTarget->MouseMoved(evt);
-				}
-			}
-			else
-			{
-				WinBorder	*target = WinBorderAt(evt.where);
-				if (target)
-				{
-					target->MouseMoved(evt);
+					winBorderUnder->MouseMoved(winBorderUnder->TellWhat(evt));
 				}
 			}
 
-			fLastMousePossition = evt.where;
+			fLastMouseMoved		= target;
+			fLastMousePossition	= evt.where;
 
 			break;
 		}

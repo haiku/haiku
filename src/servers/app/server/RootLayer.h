@@ -143,37 +143,39 @@ friend class Desktop;
 	void MouseEventHandler(int32 code, BPortLink& link);
 	void KeyboardEventHandler(int32 code, BPortLink& link);
 
-	Desktop *fDesktop;
-	BMessage *fDragMessage;
-	WinBorder *fMouseTarget;
-	CursorManager fCursorManager;
-	BLocker		fAllRegionsLock;
+			Desktop			*fDesktop;
+			BMessage		*fDragMessage;
+			Layer			*fLastMouseMoved;
+			int32			fViewAction;
+			Layer			*fEventMaskLayer;
+			CursorManager	fCursorManager;
+			BLocker			fAllRegionsLock;
 
-	thread_id fThreadID;
-	port_id fListenPort;
+			thread_id		fThreadID;
+			port_id			fListenPort;
 
-	BList fScreenPtrList;
-	int32 fRows;
-	int32 fColumns;
-	int32 fScreenXResolution;
-	int32 fScreenYResolution;
-	uint32 fColorSpace;
-	int32 fButtons;
-	BPoint			fLastMousePossition;
-	bool			fMovingWindow;
-	bool			fResizingWindow;
+			BList			fScreenPtrList;
+			int32			fRows;
+			int32			fColumns;
+			int32			fScreenXResolution;
+			int32			fScreenYResolution;
+			uint32			fColorSpace;
+			int32			fButtons;
+			BPoint			fLastMousePossition;
+			bool			fMovingWindow;
+			bool			fResizingWindow;
 	
-	int32			fActiveWksIndex;
-	int32			fWsCount;
-	Workspace*		fWorkspace[32];
-	WinBorder**		fWinBorderList2;
-	WinBorder**		fWinBorderList;
-	int32			fWinBorderCount;
+			int32			fActiveWksIndex;
+			int32			fWsCount;
+			Workspace*		fWorkspace[32];
+			WinBorder**		fWinBorderList2;
+			WinBorder**		fWinBorderList;
+			int32			fWinBorderCount;
 	mutable int32			fWinBorderIndex;
 			int32			fWinBorderListLength;
 
-	int32 fScreenShotIndex;
-	bool fQuiting;
+			int32			fScreenShotIndex;
+			bool			fQuiting;
 };
 
 #endif
