@@ -1,9 +1,11 @@
 SubDir OBOS_TOP src kernel libroot posix pthread ;
 
+UsePrivateHeaders libroot ;
+
 KernelMergeObject posix_pthread.o :
- 	<$(SOURCE_GRIST)>pthread_mutex.c
- 	<$(SOURCE_GRIST)>pthread_mutexattr.c
- 	:
-	-fPIC -DPIC
+	pthread_atfork.c
+	pthread_mutex.c
+	pthread_mutexattr.c
+ 	: -fPIC -DPIC
 	;
 
