@@ -306,6 +306,52 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 }
 
 
+static status_t
+bfs_can_page(fs_volume _fs, fs_vnode _v)
+{
+	return 0;
+}
+
+
+static ssize_t
+bfs_read_pages(fs_volume _fs, fs_vnode _node, iovecs *vecs, off_t pos)
+{
+	Inode *inode = (Inode *)_node;
+
+	if (!inode->HasUserAccessableStream())
+		RETURN_ERROR(B_BAD_VALUE);
+
+	ReadLocked locked(inode->Lock());
+
+	for (uint32 i = 0; i < vecs->num; i++) {
+		if (pos >= inode->Size()) {
+			memset(vecs->vec[i].iov_base, 0, vecs->vec[i].iov_len);
+			pos += vecs->vec[i].iov_len;
+		} else {
+			uint32 length = vecs->vec[i].iov_len;
+			if (length > inode->Size() - pos)
+				length = inode->Size() - pos;
+
+			inode->ReadAt(pos, (uint8 *)vecs->vec[i].iov_base, &length);
+
+			if (length < vecs->vec[i].iov_len)
+				memset((char *)vecs->vec[i].iov_base + length, 0, vecs->vec[i].iov_len - length);
+
+			pos += vecs->vec[i].iov_len;
+		}
+	}
+
+	return B_OK;
+}
+
+
+static ssize_t
+bfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+{
+	return EPERM;
+}
+
+
 //	#pragma mark -
 
 
@@ -1952,9 +1998,9 @@ static file_system_info sBeFileSystem = {
 	&bfs_remove_vnode,			// remove_vnode
 
 	/* VM file access */
-	NULL,
-	NULL,
-	NULL,
+	&bfs_can_page,
+	&bfs_read_pages,
+	&bfs_write_pages,
 
 	&bfs_ioctl,					// ioctl
 	&bfs_fsync,					// sync
