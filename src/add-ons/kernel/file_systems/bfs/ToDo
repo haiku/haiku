@@ -1,4 +1,4 @@
-BFS - ToDo, August 12th, 2002
+BFS - ToDo, September 7th, 2002
 -----
 
 BlockAllocator
@@ -11,9 +11,8 @@ BlockAllocator
 
 DataStream
 
- - growing/shrinking the stream size is not implemented for the double indirect range
  - only files are trimmed back (in bfs_close()), but every inode has a preallocated stream...
- - merging of block_runs doesn't work between range/block boundaries
+ - Inode::GrowStream(): merging of block_runs doesn't work between range/block boundaries
 
 
 Queries

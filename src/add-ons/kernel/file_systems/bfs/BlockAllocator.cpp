@@ -162,8 +162,8 @@ AllocationGroup::AllocationGroup()
 void 
 AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 {
-	D(if (blocks > 512)
-		PRINT(("range of %ld blocks starting at %ld\n",blocks,start)));
+	//D(if (blocks > 512)
+	//	PRINT(("range of %ld blocks starting at %ld\n",blocks,start)));
 
 	if (fFirstFree == -1)
 		fFirstFree = start;
@@ -205,7 +205,7 @@ BlockAllocator::Initialize()
 	fGroups = new AllocationGroup[fNumGroups];
 	if (fGroups == NULL)
 		return B_NO_MEMORY;
-	
+
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::initialize,"bfs block allocator",B_LOW_PRIORITY,(void *)this);
 	if (id < B_OK)
 		return initialize(this);
@@ -279,6 +279,9 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 status_t
 BlockAllocator::AllocateBlocks(Transaction *transaction,int32 group,uint16 start,uint16 maximum,uint16 minimum, block_run &run)
 {
+	if (maximum == 0)
+		return B_BAD_VALUE;
+
 	AllocationBlock cached(fVolume);
 	Locker lock(fLock);
 
@@ -319,7 +322,7 @@ BlockAllocator::AllocateBlocks(Transaction *transaction,int32 group,uint16 start
 		int32 range = 0, rangeStart = 0,rangeBlock = 0;
 
 		for (;block < fBlocksPerGroup;block++) {
-			if (cached.SetTo(fGroups[group],block) < B_OK)
+			if (cached.SetTo(fGroups[group], block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
 			// find a block large enough to hold the allocation
@@ -358,15 +361,15 @@ BlockAllocator::AllocateBlocks(Transaction *transaction,int32 group,uint16 start
 
 				if (block != rangeBlock) {
 					// allocate the part that's in the current block
-					cached.Allocate(0,(rangeStart + numBlocks) % cached.NumBlockBits());
+					cached.Allocate(0, (rangeStart + numBlocks) % cached.NumBlockBits());
 					if (cached.WriteBack(transaction) < B_OK)
 						RETURN_ERROR(B_ERROR);
 
 					// set the blocks in the previous block
-					if (cached.SetTo(fGroups[group],block - 1) < B_OK)
-						cached.Allocate(rangeStart);
-					else
+					if (cached.SetTo(fGroups[group], block - 1) < B_OK)
 						RETURN_ERROR(B_ERROR);
+
+					cached.Allocate(rangeStart);
 				} else {
 					// just allocate the bits in the current block
 					cached.Allocate(rangeStart,numBlocks);
@@ -420,12 +423,24 @@ BlockAllocator::Allocate(Transaction *transaction,const Inode *inode, off_t numB
 	if (numBlocks > fGroups[0].fNumBits)
 		numBlocks = fGroups[0].fNumBits;
 
+	// since block_run.length is uint16, the largest number of blocks that
+	// can be covered by a block_run is 65535
+	// ToDo: if we drop compatibility, couldn't we do this any better?
+	// There are basically two possibilities:
+	// a) since a length of zero doesn't have any sense, take that for 65536 -
+	//    but that could cause many problems (bugs) in other areas
+	// b) reduce the maximum amount of blocks per block_run, so that the remaining
+	//    number of free blocks can be used in a useful manner (like 4 blocks) -
+	//    but that would also reduce the maximum file size
+	if (numBlocks == 65536)
+		numBlocks = 65535;
+
 	// apply some allocation policies here (AllocateBlocks() will break them
 	// if necessary)
 	uint16 group = inode->BlockRun().allocation_group;
 	uint16 start = 0;
 
-	// are there already allocated blocks? (then just allocate near the last)
+	// are there already allocated blocks? (then just try to allocate near the last one)
 	if (inode->Size() > 0) {
 		data_stream *data = &inode->Node()->data;
 		// we currently don't care for when the data stream is
@@ -449,7 +464,7 @@ BlockAllocator::Allocate(Transaction *transaction,const Inode *inode, off_t numB
 		group = inode->BlockRun().allocation_group + 1;
 	}
 
-	return AllocateBlocks(transaction,group,start,numBlocks,minimum,run);
+	return AllocateBlocks(transaction, group, start, numBlocks, minimum, run);
 }
 
 

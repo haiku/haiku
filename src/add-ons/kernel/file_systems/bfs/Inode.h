@@ -84,7 +84,7 @@ class CachedBlock {
 				release_block(fVolume->Device(),fBlockNumber);
 		}
 
-		uint8 *SetTo(off_t block,bool empty = false)
+		uint8 *SetTo(off_t block, bool empty = false)
 		{
 			Unset();
 			fBlockNumber = block;
@@ -92,7 +92,7 @@ class CachedBlock {
 								  : (uint8 *)get_block(fVolume->Device(),block,fVolume->BlockSize());
 		}
 
-		uint8 *SetTo(block_run run,bool empty = false)
+		uint8 *SetTo(block_run run, bool empty = false)
 		{
 			return SetTo(fVolume->ToBlock(run),empty);
 		}
