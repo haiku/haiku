@@ -160,8 +160,8 @@ cd $sourceDir
 cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
 cp data/etc/profile $targetDir/beos/etc/
 cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
-cp -R distro/x86.R1/beos/etc /haiku/beos/
-ln -sf /boot/beos/etc/timezones/Europe/Paris /haiku/home/config/settings/timezone
+cp -R distro/x86.R1/beos/etc $targetDir//beos/
+ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir//home/config/settings/timezone
 
 # boot loader
 cd $targetDir/beos/system
