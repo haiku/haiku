@@ -2,7 +2,9 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
+#include <vfs.h>
 #include <debug.h>
 #include <lock.h>
 
@@ -19,27 +21,28 @@
  *
  * If you want to include the header for more information, you'll need to
  *   1) get a copy of pcihdr.h from http://www.yourvote.com/pci/ and modify it
- *      or get pcihdr.h.zip from http://beos.jetnet.co.uk/kernel/
  *   2) copy it into the pci directory (ie here)
  *   3) change the define of USE_PCIHDR from 0 to 1
  *   4) rebuild
  */
 #define USE_PCIHDR 0
 #if USE_PCIHDR
-#include "pcihdr.h"
+#	include "pcihdr.h"
 #endif
 
 int pci_scan_all();
 
 struct pci_fs {
-	fs_id id;
+	mount_id id;
 	mutex lock;
 	void *covered_vnode;
 	void *redir_vnode;
 	int root_vnode;              /* just a placeholder to return a pointer to */
 };
 
-static unsigned int pci_read_data(uint8 bus, uint8 unit, uint8 function, int reg, int bytes)
+
+static unsigned int
+pci_read_data(uint8 bus, uint8 unit, uint8 function, int reg, int bytes)
 {
 	struct pci_config_address addr;
 	addr.enable = 1;
@@ -62,7 +65,9 @@ static unsigned int pci_read_data(uint8 bus, uint8 unit, uint8 function, int reg
 	}
 }
 
-static void pci_write_data(uint8 bus, uint8 unit, uint8 function, int reg, uint32 data, int bytes)
+
+static void
+pci_write_data(uint8 bus, uint8 unit, uint8 function, int reg, uint32 data, int bytes)
 {
 	struct pci_config_address addr;
 	addr.enable = 1;
@@ -87,7 +92,9 @@ static void pci_write_data(uint8 bus, uint8 unit, uint8 function, int reg, uint3
 	return;
 }
 
-static int pci_read_config(uint8 bus, uint8 unit, uint8 func, struct pci_cfg *cfg)
+
+static int
+pci_read_config(uint8 bus, uint8 unit, uint8 func, struct pci_cfg *cfg)
 {
 	union {
 		struct pci_cfg cfg;
@@ -95,10 +102,10 @@ static int pci_read_config(uint8 bus, uint8 unit, uint8 func, struct pci_cfg *cf
 	} u;
 	int i;
 
-	for(i=0; i<4; i++) {
+	for (i = 0; i<4; i++) {
 		u.word[i] = pci_read_data(bus, unit, func, 4*i, 4);
 	}
-	if(u.cfg.vendor_id == 0xffff)
+	if (u.cfg.vendor_id == 0xffff)
 		return -1;
 
 	// move over to the passed in config structure
@@ -107,44 +114,46 @@ static int pci_read_config(uint8 bus, uint8 unit, uint8 func, struct pci_cfg *cf
 	cfg->unit = unit;
 	cfg->func = func;
 
-	switch(cfg->header_type & 0x7f) {
-	case 0: { // normal device
-		uint32 v;
-		for(i=0; i<6; i++) {
-			v = pci_read_data(bus, unit, func, i*4 + 0x10, 4);
-			if(v) {
-				int v2;
-				pci_write_data(bus, unit, func, i*4 + 0x10, 0xffffffff, 4);
-				v2 = pci_read_data(bus, unit, func, i*4 + 0x10, 4) & 0xfffffff0;
-				pci_write_data(bus, unit, func, i*4 + 0x10, v, 4);
-				v2 = 1 + ~v2;
-				if(v & 1) {
-					cfg->base[i] = v & 0xfff0;
-					cfg->size[i] = v2 & 0xffff;
+	switch (cfg->header_type & 0x7f) {
+		case 0: { // normal device
+			uint32 v;
+			for(i=0; i<6; i++) {
+				v = pci_read_data(bus, unit, func, i*4 + 0x10, 4);
+				if(v) {
+					int v2;
+					pci_write_data(bus, unit, func, i*4 + 0x10, 0xffffffff, 4);
+					v2 = pci_read_data(bus, unit, func, i*4 + 0x10, 4) & 0xfffffff0;
+					pci_write_data(bus, unit, func, i*4 + 0x10, v, 4);
+					v2 = 1 + ~v2;
+					if(v & 1) {
+						cfg->base[i] = v & 0xfff0;
+						cfg->size[i] = v2 & 0xffff;
+					} else {
+						cfg->base[i] = v & 0xfffffff0;
+						cfg->size[i] = v2;
+					}
 				} else {
-					cfg->base[i] = v & 0xfffffff0;
-					cfg->size[i] = v2;
+					cfg->base[i] = 0;
+					cfg->size[i] = 0;
 				}
-			} else {
-				cfg->base[i] = 0;
-				cfg->size[i] = 0;
 			}
+			v = pci_read_data(bus, unit, func, 0x3c, 1);
+			cfg->irq = (v == 0xff ? 0 : v);
+			break;
 		}
-		v = pci_read_data(bus, unit, func, 0x3c, 1);
-		cfg->irq = (v == 0xff ? 0 : v);
-		break;
-	}
-	case 1: //  PCI <-> PCI bridge
-		break;
-	default:
-		break;
+		case 1: //  PCI <-> PCI bridge
+			break;
+		default:
+			break;
 	}
 	return 0;
 }
 
-static const char *pci_class_to_string(uint8 base_class)
+
+static const char *
+pci_class_to_string(uint8 base_class)
 {
-	switch(base_class) {
+	switch (base_class) {
 		case 0x00: return "legacy";
 		case 0x01: return "mass storage";
 		case 0x02: return "network";
@@ -167,7 +176,9 @@ static const char *pci_class_to_string(uint8 base_class)
 	}
 }
 
-static const char *pci_subclass_to_string(uint8 base_class, uint8 sub_class)
+
+static const char *
+pci_subclass_to_string(uint8 base_class, uint8 sub_class)
 {
 	switch(base_class) {
 		case 0: // legacy
@@ -215,7 +226,9 @@ static const char *pci_subclass_to_string(uint8 base_class, uint8 sub_class)
 	}
 }
 
-void dump_pci_config(struct pci_cfg *cfg)
+
+void
+dump_pci_config(struct pci_cfg *cfg)
 {
 	int i;
 
@@ -239,20 +252,22 @@ void dump_pci_config(struct pci_cfg *cfg)
 
 	dprintf("\tirq: %d\n", cfg->irq);
 
-	for(i=0; i<6; i++) {
-		dprintf("\tbase[%d] = 0x%x\n", i, cfg->base[i]);
-		dprintf("\tsize[%d] = 0x%x\n", i, cfg->size[i]);
+	for (i = 0; i < 6; i++) {
+		dprintf("\tbase[%d] = 0x%lx\n", i, cfg->base[i]);
+		dprintf("\tsize[%d] = 0x%lx\n", i, cfg->size[i]);
 	}
 }
 
-static void dump_short_pci_config(struct pci_cfg *cfg)
+
+static void
+dump_short_pci_config(struct pci_cfg *cfg)
 {
 #if !USE_PCIHDR
 	dprintf("PCI: vendor id %d, device id %d ", cfg->vendor_id, cfg->device_id);
 	dprintf(", base class: %d '%s'\n", cfg->base_class, pci_class_to_string(cfg->base_class));
 #else
 	int i,j;
-	for (i=0; i < PCI_VENTABLE_LEN; i++) {
+	for (i = 0; i < PCI_VENTABLE_LEN; i++) {
 		if (PciVenTable[i].VenId == cfg->vendor_id) {
 			dprintf("PCI: %s: ", PciVenTable[i].VenFull);
 			for (j=0; j < PCI_DEVTABLE_LEN; j++) {
@@ -266,25 +281,27 @@ static void dump_short_pci_config(struct pci_cfg *cfg)
 #endif
 }
 
-int pci_probe(uint8 bus, uint8 unit, uint8 function, struct pci_cfg *cfg)
+
+int
+pci_probe(uint8 bus, uint8 unit, uint8 function, struct pci_cfg *cfg)
 {
-	if(function > 0) {
+	if (function > 0) {
 		struct pci_cfg cfg1;
 
 		// read info about the first unit
-		if(pci_probe(bus, unit, 0, &cfg1) < 0)
+		if (pci_probe(bus, unit, 0, &cfg1) < 0)
 			return -1;
 
-		if(!(cfg1.header_type & 0x80)) {
+		if (!(cfg1.header_type & 0x80)) {
 			// no multiple functions for this dev
 			return -1;
 		}
 	}
 
-	if(pci_read_data(bus, unit, function, 0, 2) == 0xffff)
+	if (pci_read_data(bus, unit, function, 0, 2) == 0xffff)
 		return -1;
 
-	if(pci_read_config(bus, unit, function, cfg) < 0)
+	if (pci_read_config(bus, unit, function, cfg) < 0)
 		return -1;
 
 	dump_short_pci_config(cfg);
@@ -294,7 +311,8 @@ int pci_probe(uint8 bus, uint8 unit, uint8 function, struct pci_cfg *cfg)
 
 #if 0
 
-int pci_scan_all()
+int
+pci_scan_all()
 {
 	int bus;
 	int unit;
@@ -302,20 +320,20 @@ int pci_scan_all()
 
 	dprintf("pci_scan_all: entry\n");
 
-	for(bus = 0; bus < 255; bus++) {
-		for(unit = 0; unit < 32; unit++) {
-			for(function = 0; function < 8; function++) {
+	for (bus = 0; bus < 255; bus++) {
+		for (unit = 0; unit < 32; unit++) {
+			for (function = 0; function < 8; function++) {
 				struct pci_cfg cfg;
 
-				if(pci_read_data(bus, unit, function, 0, 2) == 0xffff)
+				if (pci_read_data(bus, unit, function, 0, 2) == 0xffff)
 					break;
 
-				if(pci_read_config(bus, unit, function, &cfg) < 0)
+				if (pci_read_config(bus, unit, function, &cfg) < 0)
 					break;
 
 				dump_short_pci_config(&cfg);
 
-				if(!(cfg.header_type & 0x80)) {
+				if (!(cfg.header_type & 0x80)) {
 					// no multiple functions
 					break;
 				}
