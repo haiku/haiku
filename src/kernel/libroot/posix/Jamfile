@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel libroot posix ;
 
+UsePrivateHeaders [ FDirName syslog_daemon ] ;
+
 KernelMergeObject posix_main.o :
  	<$(SOURCE_GRIST)>dlfcn.c
  	<$(SOURCE_GRIST)>errno.c
@@ -8,6 +10,7 @@ KernelMergeObject posix_main.o :
  	<$(SOURCE_GRIST)>poll.c
  	<$(SOURCE_GRIST)>pwd.c
  	<$(SOURCE_GRIST)>rlimit.c
+ 	<$(SOURCE_GRIST)>syslog.cpp
  	<$(SOURCE_GRIST)>utime.c
  	:
 	-fPIC -DPIC
@@ -35,3 +38,5 @@ SubInclude OBOS_TOP src kernel libroot posix sys ;
 SubInclude OBOS_TOP src kernel libroot posix termios ;
 SubInclude OBOS_TOP src kernel libroot posix time ;
 SubInclude OBOS_TOP src kernel libroot posix unistd ;
+
+#SubInclude OBOS_TOP src kernel libroot posix glibc ;
