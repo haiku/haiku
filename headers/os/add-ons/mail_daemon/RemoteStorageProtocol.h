@@ -8,10 +8,10 @@
 #include <MailProtocol.h>
 #include <StringList.h>
 
-class BMailRemoteStorageProtocol : public BMailProtocol {
+class BRemoteMailStorageProtocol : public BMailProtocol {
 	public:
-		BMailRemoteStorageProtocol(BMessage *settings, BMailChainRunner *runner);
-		virtual ~BMailRemoteStorageProtocol();
+		BRemoteMailStorageProtocol(BMessage *settings, BMailChainRunner *runner);
+		virtual ~BRemoteMailStorageProtocol();
 		
 		virtual status_t GetMessage(const char *mailbox, const char *message, BPositionIO **, BMessage *headers) = 0;
 		virtual status_t AddMessage(const char *mailbox, BPositionIO *data, BString *id) = 0;

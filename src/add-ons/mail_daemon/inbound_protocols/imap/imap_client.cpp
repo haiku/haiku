@@ -47,7 +47,7 @@ struct mailbox_info {
 	BString server_mb_name;
 };
 
-class IMAP4Client : public BMailRemoteStorageProtocol {
+class IMAP4Client : public BRemoteMailStorageProtocol {
 	public:
 		IMAP4Client(BMessage *settings, BMailChainRunner *run);
 		virtual ~IMAP4Client();
@@ -118,7 +118,7 @@ class NoopWorker : public BHandler {
 		time_t last_run;
 };
 
-IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemoteStorageProtocol(settings,run), noop(NULL), commandCount(0), net(-1), selected_mb(""), force_reselect(false) {
+IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMailStorageProtocol(settings,run), noop(NULL), commandCount(0), net(-1), selected_mb(""), force_reselect(false) {
 	err = B_OK;
 	
 	mb_root = settings->FindString("root");

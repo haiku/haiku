@@ -8,7 +8,7 @@
 
 #include <map>
 
-class _EXPORT BMailRemoteStorageProtocol;
+class _EXPORT BRemoteMailStorageProtocol;
 
 #include <RemoteStorageProtocol.h>
 #include <ChainRunner.h>
@@ -19,7 +19,7 @@ void GetSubFolders(BDirectory *of, BStringList *folders, const char *prepend = "
 
 class UpdateHandler : public BHandler {
 	public:
-		UpdateHandler(BMailRemoteStorageProtocol *prot, const char *dest) : _prot(prot), _dest(dest) {
+		UpdateHandler(BRemoteMailStorageProtocol *prot, const char *dest) : _prot(prot), _dest(dest) {
 			node_ref ref;
 			_dest.GetNodeRef(&ref);
 			dest_node = ref.node;
@@ -231,7 +231,7 @@ class UpdateHandler : public BHandler {
 						
 
 	private:
-		BMailRemoteStorageProtocol *_prot;
+		BRemoteMailStorageProtocol *_prot;
 		BDirectory _dest;
 		
 		map<int64, const char *> nodes;
@@ -258,19 +258,19 @@ void GetSubFolders(BDirectory *of, BStringList *folders, const char *prepend) {
 	}
 }
 
-BMailRemoteStorageProtocol::BMailRemoteStorageProtocol(BMessage *settings, BMailChainRunner *runner) : BMailProtocol(settings,runner) {
+BRemoteMailStorageProtocol::BRemoteMailStorageProtocol(BMessage *settings, BMailChainRunner *runner) : BMailProtocol(settings,runner) {
 	handler = new UpdateHandler(this,runner->Chain()->MetaData()->FindString("path"));
 	runner->AddHandler(handler);
 	runner->PostMessage('INIT',handler);
 }
 
-BMailRemoteStorageProtocol::~BMailRemoteStorageProtocol() {
+BRemoteMailStorageProtocol::~BRemoteMailStorageProtocol() {
 	delete handler;
 }
 }
 
 //----BMailProtocol stuff
-status_t BMailRemoteStorageProtocol::GetMessage(
+status_t BRemoteMailStorageProtocol::GetMessage(
 	const char* uid,
 	BPositionIO** out_file, BMessage* out_headers,
 	BPath* out_folder_location) {
@@ -285,7 +285,7 @@ status_t BMailRemoteStorageProtocol::GetMessage(
 		return GetMessage(folder.String(),id.String(),out_file,out_headers);
 	}
 	
-status_t BMailRemoteStorageProtocol::DeleteMessage(const char* uid) {
+status_t BRemoteMailStorageProtocol::DeleteMessage(const char* uid) {
 	BString folder(uid), id;
 	{
 		BString raw(uid);
@@ -302,7 +302,7 @@ status_t BMailRemoteStorageProtocol::DeleteMessage(const char* uid) {
 	return B_OK;
 }
 
-void BMailRemoteStorageProtocol::SyncMailbox(const char *mailbox) {
+void BRemoteMailStorageProtocol::SyncMailbox(const char *mailbox) {
 	BPath path(runner->Chain()->MetaData()->FindString("path"));
 	path.Append(mailbox);
 	
@@ -360,7 +360,7 @@ void BMailRemoteStorageProtocol::SyncMailbox(const char *mailbox) {
 	}
 }
 
-/*status_t BMailRemoteStorageProtocol::MoveMessage(const char *mailbox, const char *to_mailbox, BString *message) {
+/*status_t BRemoteMailStorageProtocol::MoveMessage(const char *mailbox, const char *to_mailbox, BString *message) {
 	BString new_id(*message);
 	status_t err;
 	if ((err = CopyMessage(mailbox,to_mailbox,&new_id)) < B_OK)
