@@ -56,10 +56,10 @@ typedef struct {
 extern _IMPEXP_ROOT thread_id	load_image(int32 argc, const char **argv,
 									const char **envp);
 extern _IMPEXP_ROOT image_id	load_add_on(const char *path);
-extern _IMPEXP_ROOT status_t	unload_add_on(image_id imid);
+extern _IMPEXP_ROOT status_t	unload_add_on(image_id imageID);
 
 /* private; use the macros, below */
-extern _IMPEXP_ROOT status_t	_get_image_info (image_id image,
+extern _IMPEXP_ROOT status_t	_get_image_info (image_id imageID,
 									image_info *info, size_t size);
 extern _IMPEXP_ROOT status_t	_get_next_image_info (team_id team, int32 *cookie,
 									image_info *info, size_t size);
