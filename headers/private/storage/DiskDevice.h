@@ -7,7 +7,6 @@
 #define _DISK_DEVICE_H
 
 #include <DiskDeviceVisitor.h>
-#include <Messenger.h>
 #include <ObjectList.h>
 
 class BPartition;
@@ -64,6 +63,7 @@ private:
 	bool _AddSession(BSession *session);
 
 private:
+	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;
 
 	BObjectList<BSession>	fSessions;

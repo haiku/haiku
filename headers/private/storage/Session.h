@@ -71,6 +71,7 @@ private:
 
 private:
 	friend class BDiskDevice;
+	friend class BDiskDeviceList;
 
 	BDiskDevice				*fDevice;
 	BObjectList<BPartition>	fPartitions;

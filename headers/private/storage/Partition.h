@@ -79,6 +79,7 @@ private:
 	void _SetSession(BSession *session);
 
 private:
+	friend class BDiskDeviceList;
 	friend class BSession;
 
 	BSession				*fSession;
