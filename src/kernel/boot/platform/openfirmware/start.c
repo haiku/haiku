@@ -15,7 +15,7 @@
 
 void _start(uint32 _unused1, uint32 _unused2, void *openFirmwareEntry);
 void start(void *openFirmwareEntry);
-int boot(stage2_args *args);
+int main(stage2_args *args);
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -62,10 +62,9 @@ start(void *openFirmwareEntry)
 	of_init(openFirmwareEntry);
 	console_init();
 
-	boot(NULL);
-		// if everything wents fine, boot() never returns
+	main(NULL);
+		// if everything wents fine, main() never returns
 
 	of_exit();
 }
-
 
