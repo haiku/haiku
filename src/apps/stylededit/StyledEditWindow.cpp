@@ -90,7 +90,7 @@ StyledEditWindow::InitWindow()
 	
 	viewFrame.top = fMenuBar->Bounds().Height()+1; //021021
 	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
-	viewFrame.left = B_V_SCROLL_BAR_WIDTH-15; //021021
+	viewFrame.left = 0; //021021
 	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 	
 	

@@ -4,7 +4,7 @@
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
 
-BRect windowRect(7,25,599,399);
+BRect windowRect(7,26,507,426);
 
 StyledEditApp * styled_edit_app;
 
@@ -38,7 +38,7 @@ void
 StyledEditApp::OpenDocument()
 {
 	new StyledEditWindow(windowRect,fNext_Untitled_Window++);
-	windowRect.OffsetBy(20,20); // todo: wrap around screen
+	windowRect.OffsetBy(15,15); // todo: wrap around screen
 	fWindowCount++;
 }
 
@@ -46,7 +46,7 @@ void
 StyledEditApp::OpenDocument(entry_ref * ref)
 {
 	new StyledEditWindow(windowRect,ref);
-	windowRect.OffsetBy(20,20); // todo: wrap around screen
+	windowRect.OffsetBy(15,15); // todo: wrap around screen
 	fWindowCount++;
 }
 
