@@ -63,7 +63,7 @@ dbg_stack_trace(int argc, char **argv)
 	dprintf("stack trace for thread 0x%lx \"%s\"\n", t->id, t->name);
 
 	dprintf("    kernel stack: %p to %p\n", 
-		(void *)t->kernel_stack_base, (void *)(t->kernel_stack_base + KSTACK_SIZE));
+		(void *)t->kernel_stack_base, (void *)(t->kernel_stack_base + KERNEL_STACK_SIZE));
 	if (t->user_stack_base != 0) {
 		dprintf("      user stack: %p to %p\n", (void *)t->user_stack_base,
 			(void *)(t->user_stack_base + t->user_stack_size));

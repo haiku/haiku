@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <thread.h>
 #include <arch/thread.h>
@@ -121,15 +122,23 @@ status_t
 arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t kstack_size = KSTACK_SIZE;
-	addr_t *kstack_top = kstack + kstack_size / sizeof(addr_t);
+	addr_t *kstack_top = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
 	int i;
 
 	TRACE(("arch_thread_initialize_kthread_stack: kstack 0x%p, start_func 0x%p, entry_func 0x%p\n",
 		kstack, start_func, entry_func));
 
 	// clear the kernel stack
-	memset(kstack, 0, kstack_size);
+#ifdef DEBUG_KERNEL_STACKS
+#	ifdef STACK_GROWS_DOWNWARDS
+	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
+		KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+#	else
+	memset(kstack, 0, KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+#	endif
+#else
+	memset(kstack, 0, KERNEL_STACK_SIZE);
+#endif
 
 	// set the final return address to be thread_kthread_exit
 	kstack_top--;
@@ -172,7 +181,7 @@ arch_thread_init_tls(struct thread *thread)
 {
 	uint32 *tls;
 
-	thread->user_local_storage = thread->user_stack_base + STACK_SIZE;
+	thread->user_local_storage = thread->user_stack_base + thread->user_stack_size;
 	tls = (uint32 *)thread->user_local_storage;
 
 	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
@@ -206,7 +215,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	for (i = 0; i < 11; i++)
 		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
 #endif
-	i386_set_tss_and_kstack(t_to->kernel_stack_base + KSTACK_SIZE);
+	i386_set_tss_and_kstack(t_to->kernel_stack_base + KERNEL_STACK_SIZE);
 
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
@@ -269,7 +278,7 @@ arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args
 
 	disable_interrupts();
 
-	i386_set_tss_and_kstack(t->kernel_stack_base + KSTACK_SIZE);
+	i386_set_tss_and_kstack(t->kernel_stack_base + KERNEL_STACK_SIZE);
 
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
@@ -434,7 +443,7 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 
 	disable_interrupts();
 
-	i386_set_tss_and_kstack(thread->kernel_stack_base + KSTACK_SIZE);
+	i386_set_tss_and_kstack(thread->kernel_stack_base + KERNEL_STACK_SIZE);
 
 	// set the CPU dependent GDT entry for TLS (set the current %fs register)
 	set_tls_context(thread);
