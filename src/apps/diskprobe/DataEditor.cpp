@@ -215,7 +215,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		}
 		close(device);
 
-		fSize = geometry.head_count * geometry.cylinder_count * geometry.sectors_per_track;
+		fSize = 1LL * geometry.head_count * geometry.cylinder_count
+			* geometry.sectors_per_track * geometry.bytes_per_sector;
 		fBlockSize = geometry.bytes_per_sector;
 	} else if (IsAttribute()) {
 		// ToDo: add support for attributes!
