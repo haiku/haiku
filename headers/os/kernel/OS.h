@@ -421,7 +421,19 @@ typedef enum cpu_types {
 	B_CPU_AMD_ATHLON_XP 				= 0x1166,
 	B_CPU_AMD_ATHLON_XP_MODEL2,
 	B_CPU_AMD_ATHLON_XP_MODEL3,
-	B_CPU_AMD_ATHLON_XP_MODEL_BARTON 	= 0x116A,
+	B_CPU_AMD_ATHLON_XP_MODEL_BARTON        = 0x116A,
+
+	/* According to "Revision guide for AMD Athlon 64 
+	and AMD Opteron Processors" (25759.pdf) */
+
+	B_CPU_AMD_ATHLON_64                 = 0x11F4,
+	B_CPU_AMD_OPTERON,
+	B_CPU_AMD_ATHLON_64_MODEL2          = 0x11F7,
+	B_CPU_AMD_ATHLON_64_MODEL3,
+	B_CPU_AMD_ATHLON_64_MODEL4          = 0x11FB,
+	B_CPU_AMD_ATHLON_64_MODEL5,
+	B_CPU_AMD_ATHLON_64_MODEL6          = 0x11FE,
+	B_CPU_AMD_ATHLON_64_MODEL7,
 #endif
 	
 	/* VIA */
