@@ -116,7 +116,7 @@ resource file_types message
 	"types" = "application/x-vnd.Be-kmap"
 };
 
-resource app_signature "application/x-vnd.haiku-Keymap";
+resource app_signature "application/x-vnd.haiku.Keymap";
 
 resource app_version
 {
@@ -125,3 +125,4 @@ resource app_version
 };
 
 resource app_flags B_SINGLE_LAUNCH;
+
