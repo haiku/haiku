@@ -55,10 +55,9 @@ typedef struct {
 		volatile int	intRxCurrentCount;
 		volatile int	intTxCurrentCount;
 		volatile int	intTimerCurrentCount;
+		timer_id		timer;
 	#endif // PROFILING
 
-	timer_id			timer;
-	
 	spinlock			txSpinlock;
 	sem_id				txFreeSem;
 	volatile int32		txNextIndex;	// next descriptor that will be used for writing
