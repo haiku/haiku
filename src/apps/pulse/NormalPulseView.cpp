@@ -185,10 +185,12 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
 			strcpy(processor, "Pentium III");
 			break;
+#ifdef OBOS_CPU_TYPES
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL2:
 			strcpy(processor, "Pentium IV");
 			break;
+#endif
 		case B_CPU_AMD_K5_MODEL0:
 		case B_CPU_AMD_K5_MODEL1:
 		case B_CPU_AMD_K5_MODEL2:
@@ -203,10 +205,13 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 			strcpy(processor, "K6-2");
 			break;
 		case B_CPU_AMD_K6_III:
+#ifdef OBOS_CPU_TYPES
 		case B_CPU_AMD_K6_III_MODEL2:
+#endif
 			strcpy(processor, "K6-III");
 			break;
 		case B_CPU_AMD_ATHLON_MODEL1:
+#ifdef OBOS_CPU_TYPES
 		case B_CPU_AMD_ATHLON_MODEL2:
 		case B_CPU_AMD_ATHLON_THUNDERBIRD:
 			strcpy(processor, "Athlon");
@@ -219,6 +224,7 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 		case B_CPU_AMD_DURON:
 			strcpy(processor, "Duron");
 			break;
+#endif
 		case B_CPU_CYRIX_GXm:
 			strcpy(processor, "GXm");
 			break;
@@ -234,6 +240,11 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 		case B_CPU_RISE_mP6:
 			strcpy(processor, "mP6");
 			break;
+#ifdef OBOS_CPU_TYPES
+		case B_CPU_NATIONAL_GEODE_GX1:
+			strcpy(processor, "Geode GX1");
+			break;
+#endif
 #endif
 		default:
 			strcpy(processor, "Unknown");
