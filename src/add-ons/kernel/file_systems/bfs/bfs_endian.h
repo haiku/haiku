@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef BFS_ENDIAN_H
 #define BFS_ENDIAN_H
 
@@ -18,6 +18,7 @@
 #if defined(BFS_LITTLE_ENDIAN_ONLY) && B_HOST_IS_LENDIAN \
 	|| defined(BFS_BIG_ENDIAN_ONLY) && B_HOST_IS_BENDIAN
 		/* host is BFS endian */
+#	define BFS_NATIVE_ENDIAN
 #	define BFS_ENDIAN_TO_HOST_INT16(value) value
 #	define BFS_ENDIAN_TO_HOST_INT32(value) value
 #	define BFS_ENDIAN_TO_HOST_INT64(value) value
