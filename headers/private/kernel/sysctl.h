@@ -103,21 +103,19 @@ struct ctlname {
 	{ "diskcount", CTLTYPE_INT }, \
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef _KERNEL_MODE
-  typedef int (sysctlfn)(int *, uint, void *, size_t *, void *, size_t);
-
-  int sys_sysctl(int *, uint, void *, size_t *, void *, size_t);
-  int hw_sysctl(int *, uint, void *, size_t *, void *, size_t);
-  int sysctl_int (void *, size_t *, void *, size_t, int *);
-  int sysctl_rdint (void *, size_t *, void *, int);
-  int sysctl_tstring(void *, size_t *, void *, size_t, char *, int);
-  int sysctl__string(void *, size_t *, void *, size_t, char *, int, int);
-  int sysctl_rdstring(void *, size_t *, void *, char *);
-  int user_sysctl(int *, uint, void *, size_t *, void *, size_t);
+int user_sysctl(int *, uint, void *, size_t *, void *, size_t);
 #endif
 
 int sysctl(int *, uint, void *, size_t *, void *, size_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYS_SYSCTL_H */
 
