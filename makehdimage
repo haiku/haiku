@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Usage: makehdimage [image path/target dir]
+# Usage: makehdimage [-i includeFile] [image path/target dir]
 #
 # This script will compile all files needed to create a bootable Haiku image,
 # create such an image, and copy the files to the correct location.
@@ -11,6 +11,9 @@
 #
 # If you specify a target directory, no image is going to be created at
 # all.
+#
+# If you pass `-i includeFile', the file is sourced before unmounting the
+# image.
 #
 # The image is populated using the bfs_shell which is created from the sources.
 # The bfs_shell emulates a mini-kernel evironment with a mounted BFS. The
@@ -41,6 +44,21 @@
 sourceDir=.
 alreadyMounted=
 targetDir=/haiku
+includeFile=
+
+# check whether there's a file to be included
+if [ $# \> 0 ]; then
+	if [ "$1" = "-i" ]; then
+		shift
+		if [ $# \> 0 ]; then
+			includeFile="$1"
+			shift
+		else
+			echo "Error: Option \`-i' requires a parameter!"
+			exit 1
+		fi
+	fi
+fi
 
 # disk image path, size in MB
 if [ -d "$1" ]; then
@@ -384,6 +402,11 @@ for inSuperFile in $mimeDBSource/*.super; do
 	done
 done
 
+
+# source the include file, if any
+if [ "$includeFile" != "" ]; then
+	. $includeFile
+fi
 
 cd $previousDir
 sync
