@@ -1,0 +1,39 @@
+SubDir OBOS_TOP src tests add-ons kernel network ;
+
+UsePrivateHeaders net ;
+
+# the network stack tester app
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+SimpleTest net_stack_tester : 
+	net_stack_tester.cpp 
+	userland_ipc.c
+	userland_modules.cpp
+	: be 
+;
+LOCATE on <installed>net_stack_tester = [ on net_stack_tester return $(LOCATE) ] ;
+Depends <installed>net_stack_tester : net_stack_tester ;
+
+# for convenience: this target builds all userland modules
+
+NotFile userland_network_modules ;
+Depends userland_network_modules :
+	# the stack main module
+	<userland>core
+
+	# interfaces modules
+	<userland>loopback
+	<userland>ethernet
+	# <userland>ppp
+
+	# protocols modules
+	<userland>raw
+	<userland>ipv4
+	<userland>icmp
+	<userland>udp
+	<userland>tcp
+;
+
+SubInclude OBOS_TOP src tests add-ons kernel network core ;
+SubInclude OBOS_TOP src tests add-ons kernel network interfaces ;
+SubInclude OBOS_TOP src tests add-ons kernel network protocols ;

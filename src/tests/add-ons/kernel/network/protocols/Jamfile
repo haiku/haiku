@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols ;
+
+SubInclude OBOS_TOP src tests add-ons kernel network protocols icmp ;
+SubInclude OBOS_TOP src tests add-ons kernel network protocols ipv4 ;
+SubInclude OBOS_TOP src tests add-ons kernel network protocols raw ;
+SubInclude OBOS_TOP src tests add-ons kernel network protocols udp ;
+SubInclude OBOS_TOP src tests add-ons kernel network protocols tcp ;
+

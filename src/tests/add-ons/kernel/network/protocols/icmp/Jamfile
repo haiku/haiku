@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols icmp ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols icmp ] ;
+
+Addon <userland>icmp : userland network protocols : 
+	icmp.c
+;
+
+LinkSharedOSLibs <userland>icmp : root <installed>net_stack_tester ;

@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src tests add-ons kernel network interfaces loopback ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces loopback ] ;
+
+Addon <userland>loopback : userland network interfaces : 
+	loopback.c
+;
+
+LinkSharedOSLibs <userland>loopback : root <installed>net_stack_tester ;
+

@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols ipv4 ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols ipv4 ] ;
+
+Addon <userland>ipv4 : userland network protocols : 
+	ipv4.c
+;
+
+LinkSharedOSLibs <userland>ipv4 : root <installed>net_stack_tester ;

@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols tcp ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols tcp ] ;
+
+Addon <userland>tcp : userland network protocols : 
+	tcp.c
+	tcp_debug.c
+	tcp_input.c
+	tcp_output.c
+	tcp_timer.c
+	arc4random.c
+;
+
+LinkSharedOSLibs <userland>tcp : root <installed>net_stack_tester ;

@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src tests add-ons kernel network interfaces ethernet ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces ethernet ] ;
+
+Addon <userland>ethernet : userland network interfaces : 
+	ethernet.c
+;
+
+LinkSharedOSLibs <userland>ethernet : root <installed>net_stack_tester ;
+

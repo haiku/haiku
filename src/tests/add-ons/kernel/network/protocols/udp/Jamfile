@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols udp ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols udp ] ;
+
+Addon <userland>udp : userland network protocols : 
+	udp.c
+;
+
+LinkSharedOSLibs <userland>udp : root <installed>net_stack_tester ;
