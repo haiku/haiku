@@ -31,7 +31,7 @@ bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 
 // used in syscalls.c
-team_id _user_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
+thread_id _user_load_image(int32 argCount, const char **args, int32 envCount, const char **envp, int32 priority);
 status_t _user_wait_for_team(team_id id, status_t *_returnCode);
 status_t _user_kill_team(thread_id thread);
 thread_id _user_wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode);
