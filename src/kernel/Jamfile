@@ -59,7 +59,6 @@ KernelLd kernel :
 	kernel_disk_device_manager.o
 	kernel_util.o
 
-	libbus.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
 
@@ -77,8 +76,6 @@ KernelLd kernel :
 	;
 
 KernelLd kernel.so :
-	# ToDo: remove kernel.so completely and make the drivers/modules
-	#	linkable against the kernel itself
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
@@ -87,7 +84,6 @@ KernelLd kernel.so :
 	kernel_disk_device_manager.o
 	kernel_util.o
 
-	libbus.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
 
@@ -413,6 +409,9 @@ WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
 KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
+
+Depends kernel.so : kernel ;
+	# kernel.so will be rebuilt with the kernel
 
 Depends boot_floppy : $(OBOS_FLOPPY) ;
 NotFile boot_floppy ;
