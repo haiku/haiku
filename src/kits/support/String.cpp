@@ -636,8 +636,8 @@ BString::FindFirst(const BString &string) const
 int32
 BString::FindFirst(const char *string) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _ShortFindAfter(string, strlen(string));
 }
 
@@ -652,8 +652,8 @@ BString::FindFirst(const BString &string, int32 fromOffset) const
 int32
 BString::FindFirst(const char *string, int32 fromOffset) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _FindAfter(string, fromOffset, strlen(string));
 }
 
@@ -686,8 +686,8 @@ BString::FindLast(const BString &string) const
 int32
 BString::FindLast(const char *str) const
 {
-	if (str == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _FindBefore(str, Length(), strlen(str));
 }
 
@@ -702,8 +702,8 @@ BString::FindLast(const BString &string, int32 beforeOffset) const
 int32
 BString::FindLast(const char *str, int32 beforeOffset) const
 {
-	if (str == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _FindBefore(str, beforeOffset, strlen(str));
 }
 
@@ -736,8 +736,8 @@ BString::IFindFirst(const BString &string) const
 int32
 BString::IFindFirst(const char *string) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _IFindAfter(string, 0, strlen(string));
 }
 
@@ -752,8 +752,8 @@ BString::IFindFirst(const BString &string, int32 fromOffset) const
 int32
 BString::IFindFirst(const char *string, int32 fromOffset) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _IFindAfter(string, fromOffset, strlen(string));
 }
 
@@ -768,8 +768,8 @@ BString::IFindLast(const BString &string) const
 int32
 BString::IFindLast(const char *string) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _IFindBefore(string, Length(), strlen(string));
 }
 
@@ -784,8 +784,8 @@ BString::IFindLast(const BString &string, int32 beforeOffset) const
 int32
 BString::IFindLast(const char *string, int32 beforeOffset) const
 {
-	if (string == NULL)
-		return 0;
+	//if (string == NULL)
+	//	return 0;	TODO: Do something smart
 	return _IFindBefore(string, beforeOffset, strlen(string));
 }
 
@@ -1505,7 +1505,7 @@ BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
 	char *ptr = strstr(String() + offset, str);
 
 	if (ptr != NULL)
-		return ptr - (String() + offset);
+		return ptr - String();
 	
 	return B_ERROR;
 }
@@ -1522,7 +1522,7 @@ BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
 	char *ptr = strcasestr(String() + offset, str);
 
 	if (ptr != NULL)
-		return ptr - (String() + offset);
+		return ptr - String();
 
 	return B_ERROR;
 }
