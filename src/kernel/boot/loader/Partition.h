@@ -12,6 +12,8 @@
 #include <stddef.h>
 
 
+namespace boot {
+
 class Partition : public partition_data, public Node {
 	public:
 		Partition(int deviceFD);
@@ -19,6 +21,9 @@ class Partition : public partition_data, public Node {
 
 		virtual ssize_t ReadAt(void *cookie, off_t offset, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t offset, const void *buffer, size_t bufferSize);
+
+		virtual off_t Size() const;
+		virtual int32 Type() const;
 
 		Partition *AddChild();
 		status_t Scan();
@@ -36,5 +41,7 @@ class Partition : public partition_data, public Node {
 		Partition	*fParent;
 		bool		fIsFileSystem;
 };
+
+}	// namespace boot
 
 #endif	/* PARTITION_H */
