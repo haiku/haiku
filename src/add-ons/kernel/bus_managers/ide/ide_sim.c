@@ -629,7 +629,7 @@ ide_sim_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
 		}
 	} else {
 		// I am not sure if it's a problem of the driver or the drive (probably the
-		// former), but we're generally disable command queueing in case of PIO
+		// former), but we're generally disabling command queueing in case of PIO
 		// transfers. Since those should be rare on a real system (as is CQ support
 		// in the drive), it's not really worth investigating, though.
 		bus->can_CQ = false;
