@@ -11,7 +11,7 @@ struct partition_module_info;
 struct session_info;
 struct session_module_info;
 
-#define PARTSCAN_MODULE_NAME		"disk_scanner/disk_scanner/v1"
+#define DISK_SCANNER_MODULE_NAME		"disk_scanner/disk_scanner/v1"
 
 typedef status_t (*disk_scanner_get_session_module_hook)(int deviceFD,
 	off_t deviceSize, int32 blockSize,

@@ -16,8 +16,8 @@ static const char *kSessionModulePrefix		= "disk_scanner/session";
 static const char *kPartitionModulePrefix	= "disk_scanner/partition";
 static const char *kFSModulePrefix			= "disk_scanner/fs";
 
-#define TRACE(x)
-//#define TRACE(x) dprintf x
+//#define TRACE(x)
+#define TRACE(x) dprintf x
 
 // prototypes
 static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
@@ -284,12 +284,13 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 		while (read_next_module_name(list, moduleName, &bufferSize)
 			   == B_OK) {
 			fs_module_info *module = NULL;
-			if (get_module(moduleName, (module_info**)&module) == B_OK) {
-				if (module->identify(deviceFD, partitionInfo)) {
+			TRACE(("disk_scanner: trying fs module: `%s'\n", moduleName));
+			if (get_module(moduleName, (module_info**)&module) == B_OK && module) {
+				if (module->identify(deviceFD, partitionInfo)) 
 					error = B_OK;
-					break;
-				}
 				put_module(moduleName);
+				if (error == B_OK)
+					break;
 			}
 		}
 		close_module_list(list);
@@ -301,7 +302,7 @@ static disk_scanner_module_info disk_scanner_module =
 {
 	// module_info
 	{
-		PARTSCAN_MODULE_NAME,
+		DISK_SCANNER_MODULE_NAME,
 		0,	// better B_KEEP_LOADED?
 		std_ops
 	},
