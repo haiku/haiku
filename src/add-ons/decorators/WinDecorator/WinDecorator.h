@@ -28,14 +28,11 @@ protected:
 	void _DoLayout(void);
 	void _SetFocus(void);
 	void _SetColors(void);
-	void DrawBlendedRect(BRect r, bool down);
+	void DrawBeveledRect(BRect r, bool down);
 	uint32 taboffset;
 
 	RGBColor tab_highcol, tab_lowcol;
-	RGBColor button_highcol, button_lowcol;
-	RGBColor button_highercol, button_lowercol, button_midcol;
-	RGBColor frame_highcol, frame_midcol, frame_lowcol, frame_highercol,
-		frame_lowercol;
+	RGBColor frame_highcol, frame_midcol, frame_lowcol,	frame_lowercol;
 	RGBColor textcol;
 	uint64 solidhigh, solidlow;
 
