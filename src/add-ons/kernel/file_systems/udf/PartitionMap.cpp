@@ -55,9 +55,12 @@ PartitionMap::Add(const udf_partition_descriptor* partition)
 const udf_partition_descriptor*
 PartitionMap::Find(uint32 partitionNumber) const
 {
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_HELPER, "PartitionMap", ("partitionNumber: %ld", partitionNumber));
 	SinglyLinkedList<Udf::udf_partition_descriptor>::ConstIterator i;
 	for (i = fList.Begin(); i != fList.End(); ++i) {
 		if (i->partition_number() == partitionNumber) {
+			PRINT(("found partition #%ld\n", partitionNumber));
+			DUMP(*i);
 			return &(*i);
 		}
 	}
