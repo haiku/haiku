@@ -185,6 +185,7 @@ Index::Create(Transaction *transaction, const char *name, uint32 type)
 			mode = S_DOUBLE_INDEX;
 			break;
 		case B_STRING_TYPE:
+		case B_MIME_STRING_TYPE: // XXX Note Index::Type() will always return B_STRING_TYPE.  
 			mode = S_STR_INDEX;
 			break;
 		default:
