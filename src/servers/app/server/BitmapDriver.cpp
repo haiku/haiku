@@ -293,7 +293,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();;
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
 					fb += bytes_per_row;
 				}
 			} break;
@@ -482,126 +482,6 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 	}
 }
 
-/*
-void BitmapDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-	int bytes_per_row = _target->BytesPerRow();
-	switch(_target->BitsPerPixel())
-	{
-		case 8:
-			{
-				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
-				uint8 color8 = fDrawColor.GetColor8();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color8;
-					fb += bytes_per_row;
-				}
-			} break;
-		case 15:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				uint16 color15 = fDrawColor.GetColor15();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color15;
-					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		case 16:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				uint16 color16 = fDrawColor.GetColor16();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color16;
-					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		case 24:
-		case 32:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				rgb_color fill_color = fDrawColor.GetColor32();
-				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color32;
-					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-
-void BitmapDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-	int bytes_per_row = _target->BytesPerRow();
-	switch(_target->BitsPerPixel())
-	{
-		case 8:
-			{
-				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
-					fb += bytes_per_row;
-				}
-			} break;
-		case 15:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		case 16:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		case 24:
-		case 32:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
-				int x,y;
-				rgb_color color;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-					{
-						color = fDrawPattern.GetColor(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-*/
 
 void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source, 
 	const BRect &dest, DrawData *d)
@@ -752,10 +632,132 @@ void BitmapDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 
 void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
+	int bytes_per_row = _target->BytesPerRow();
+	int top = (int)rect.top;
+	int left = (int)rect.left;
+	int right = (int)rect.right;
+	int bottom = (int)rect.bottom;
+	RGBColor col(color);	// to avoid GetColor8/15/16() const issues
+
+	switch(_target->BitsPerPixel())
+	{
+		case 8:
+			{
+				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				uint8 color8 = col.GetColor8();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color8;
+					fb += bytes_per_row;
+				}
+			} break;
+		case 15:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 color15 = col.GetColor15();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color15;
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 16:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 color16 = col.GetColor16();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color16;
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 24:
+		case 32:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				rgb_color fill_color = color.GetColor32();
+				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color32;
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
 }
 
 void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
+	int bytes_per_row = _target->BytesPerRow();
+	int top = (int)rect.top;
+	int left = (int)rect.left;
+	int right = (int)rect.right;
+	int bottom = (int)rect.bottom;
+	
+	switch(_target->BitsPerPixel())
+	{
+		case 8:
+			{
+				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += bytes_per_row;
+				}
+			} break;
+		case 15:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 16:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 24:
+		case 32:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				rgb_color color;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
 }
 
 void BitmapDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
