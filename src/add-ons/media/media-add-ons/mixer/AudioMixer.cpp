@@ -465,19 +465,19 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	//printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
 	//SendLatencyChange(source, destination, EventLatency());
 
-	delete fBufferGroup;
-	fBufferGroup = CreateBufferGroup();
-	fCore->SetOutputBufferGroup(fBufferGroup);
-	
 	// apply latency change
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
 
 	// apply format change
 	fCore->OutputFormatChanged(io_format->u.raw_audio);
 
+	delete fBufferGroup;
+	fBufferGroup = CreateBufferGroup();
+	fCore->SetOutputBufferGroup(fBufferGroup);
+
 	fCore->Unlock();
 	return B_OK;
-
+	
 err:
 	fCore->Unlock();
 	return B_ERROR;

@@ -1,6 +1,8 @@
 #ifndef _MIXER_INPUT_H
 #define _MIXER_INPUT_H
 
+#include "debug.h"
+
 class MixerCore;
 class ByteSwap;
 class Resampler;
@@ -18,16 +20,20 @@ public:
 	media_input & MediaInput();
 	
 	uint32 GetMixerChannelCount();
-	void GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 	void SetMixerChannelGain(int channel, float gain);
 	float GetMixerChannelGain(int channel);
 	
+	uint32 GetInputChannelCount();
 	void AddInputChannelDesignation(int channel, uint32 des);
 	void RemoveInputChannelDesignation(int channel, uint32 des);
 	uint32 GetInputChannelDesignations(int channel);
 	uint32 GetInputChannelType(int channel);
 	void SetInputChannelGain(int channel, float gain);
 	float GetInputChannelGain(int channel);
+
+	// only for use by MixerCore
+	void GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain);
+	int GetMixerChannelType(int channel);
 
 protected:
 	friend class MixerCore;
@@ -73,5 +79,26 @@ private:
 	
 	int32			debugMixBufferFrames;
 };
+
+inline void
+MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain)
+{
+	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
+	ASSERT(channel >= 0 && channel < fMixerChannelCount);
+	int32 offset = framepos % fMixBufferFrameCount;
+	if (channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames - 1);
+	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
+	*sample_offset = sizeof(float) * fInputChannelCount;
+	*type = fMixerChannelInfo[channel].type;
+	*gain = fMixerChannelInfo[channel].gain;
+}
+
+inline int
+MixerInput::GetMixerChannelType(int channel)
+{
+	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
+	ASSERT(channel >= 0 && channel < fMixerChannelCount);
+	return fMixerChannelInfo[channel].type;
+}
 
 #endif

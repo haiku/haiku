@@ -189,6 +189,12 @@ MixerInput::ID()
 	return fInput.destination.id;
 }
 
+uint32
+MixerInput::GetInputChannelCount()
+{
+	return fInputChannelCount;
+}
+
 void
 MixerInput::AddInputChannelDesignation(int channel, uint32 des)
 {
@@ -383,19 +389,6 @@ uint32
 MixerInput::GetMixerChannelCount()
 {
 	return fMixerChannelCount;
-}
-
-void
-MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain)
-{
-	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
-	ASSERT(channel >= 0 && channel < fMixerChannelCount);
-	int32 offset = framepos % fMixBufferFrameCount;
-	if (channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames - 1);
-	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
-	*sample_offset = sizeof(float) * fInputChannelCount;
-	*type = fMixerChannelInfo[channel].type;
-	*gain = fMixerChannelInfo[channel].gain;
 }
 
 void

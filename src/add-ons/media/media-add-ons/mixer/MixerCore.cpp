@@ -204,7 +204,7 @@ MixerCore::ApplyOutputFormat()
 		
 	delete fMixBufferChannelTypes;
 
-	fMixBufferFrameRate = (int32)format.frame_rate;
+	fMixBufferFrameRate = (int32)(0.5 + format.frame_rate);
 	fMixBufferFrameCount = frames_per_buffer(format);
 	if (fDoubleRateMixing) {
 		fMixBufferFrameRate *= 2;
