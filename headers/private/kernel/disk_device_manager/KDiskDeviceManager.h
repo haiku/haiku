@@ -4,7 +4,6 @@
 #define _K_DISK_DEVICE_MANAGER_H
 
 #include "disk_device_manager.h"
-#include "List.h"
 #include "Locker.h"
 
 namespace BPrivate {
@@ -58,7 +57,7 @@ public:
 
 	// manager must be locked
 	int32 CountDevices();
-	KDiskDevice *DeviceAt(int32 index);
+	KDiskDevice *NextDevice(int32 *cookie);
 
 	bool PartitionAdded(KPartition *partition);		// implementation internal
 	bool PartitionRemoved(KPartition *partition);	//
@@ -82,7 +81,7 @@ public:
 	KDiskSystem *DiskSystemWithName(const char *name);
 	KDiskSystem *DiskSystemWithID(disk_system_id id);
 	int32 CountDiskSystems();
-	KDiskSystem *DiskSystemAt(int32 index);
+	KDiskSystem *NextDiskSystem(int32 *cookie);
 
 	KDiskSystem *LoadDiskSystem(disk_system_id id);
 	KDiskSystem *LoadNextDiskSystem(int32 *cookie);
@@ -106,11 +105,16 @@ private:
 	status_t _ScanDevice(KDiskDevice *device);
 	status_t _ScanPartition(KPartition *partition);
 
+	struct DeviceMap;
+	struct DiskSystemMap;
+	struct PartitionMap;
+	struct PartitionSet;
+
 	BLocker						fLock;
-	List<KDiskDevice*>			fDevices;				// TODO: Optimize!
-	List<KPartition*>			fPartitions;			//
-	List<KDiskSystem*>			fDiskSystems;			//
-	List<KPartition*>			fObsoletePartitions;	//
+	DeviceMap					*fDevices;
+	PartitionMap				*fPartitions;
+	DiskSystemMap				*fDiskSystems;
+	PartitionSet				*fObsoletePartitions;
 
 	static KDiskDeviceManager	*fDefaultManager;
 };

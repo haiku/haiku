@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests kernel core disk_device_manager ;
 #UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 
 SimpleTest DiskDeviceManagerTest

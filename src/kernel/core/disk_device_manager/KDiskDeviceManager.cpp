@@ -8,6 +8,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <VectorMap.h>
+#include <VectorSet.h>
+
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
@@ -30,14 +33,56 @@ using BPrivate::DiskDevice::KDiskDeviceJobQueue;
 static const char *kPartitioningSystemPrefix	= "partitioning_systems";
 static const char *kFileSystemPrefix			= "file_systems";
 
+// GetPartitionID
+struct GetPartitionID {
+	inline partition_id operator()(const KPartition *partition) const
+	{
+		return partition->ID();
+	}
+};
+
+// GetDiskSystemID
+struct GetDiskSystemID {
+	inline disk_system_id operator()(const KDiskSystem *system) const
+	{
+		return system->ID();
+	}
+};
+
+// PartitionMap
+struct KDiskDeviceManager::PartitionMap : VectorMap<partition_id, KPartition*,
+	VectorMapEntryStrategy::ImplicitKey<partition_id, KPartition*,
+		GetPartitionID> > {
+};
+	
+// DeviceMap
+struct KDiskDeviceManager::DeviceMap : VectorMap<partition_id, KDiskDevice*,
+	VectorMapEntryStrategy::ImplicitKey<partition_id, KDiskDevice*,
+		GetPartitionID> > {
+};
+	
+// DiskSystemMap
+struct KDiskDeviceManager::DiskSystemMap : VectorMap<disk_system_id,
+	KDiskSystem*,
+	VectorMapEntryStrategy::ImplicitKey<disk_system_id, KDiskSystem*,
+		GetDiskSystemID> > {
+};
+	
+// PartitionSet
+struct KDiskDeviceManager::PartitionSet : VectorSet<KPartition*> {
+};
+
+
 // constructor
 KDiskDeviceManager::KDiskDeviceManager()
 	: fLock("disk device manager"),
-	  fDevices(20),
-	  fPartitions(100),
-	  fDiskSystems(20),
-	  fObsoletePartitions(20)
+	  fDevices(new(nothrow) DeviceMap),
+	  fPartitions(new(nothrow) PartitionMap),
+	  fDiskSystems(new(nothrow) DiskSystemMap),
+	  fObsoletePartitions(new(nothrow) PartitionSet)
 {
+	if (InitCheck() != B_OK)
+		return;
 	// add partitioning systems
 	if (void *list = open_module_list(kPartitioningSystemPrefix)) {
 		char moduleName[B_PATH_NAME_LENGTH];
@@ -68,41 +113,44 @@ DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 KDiskDeviceManager::~KDiskDeviceManager()
 {
 	// remove all devices
-	int32 count = CountDevices();
-	for (int32 i = count - 1; i >= 0; i--) {
-		if (KDiskDevice *device = DeviceAt(i)) {
-			PartitionRegistrar _(device);
-			_RemoveDevice(device);
-		}
+	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
+		PartitionRegistrar _(device);
+		_RemoveDevice(device);
 	}
 	// some sanity checks
-	if (fPartitions.CountItems() > 0) {
+	if (fPartitions->Count() > 0) {
 		DBG(OUT("WARNING: There are still %ld unremoved partitions!\n",
-				fPartitions.CountItems()));
+				fPartitions->Count()));
 	}
-	if (fObsoletePartitions.CountItems() > 0) {
+	if (fObsoletePartitions->Count() > 0) {
 		DBG(OUT("WARNING: There are still %ld obsolete partitions!\n",
-				fObsoletePartitions.CountItems()));
+				fObsoletePartitions->Count()));
 	}
 	// remove all disk systems
-	count = CountDiskSystems();
-	for (int32 i = count - 1; i >= 0; i--) {
-		if (KDiskSystem *diskSystem = DiskSystemAt(i)) {
-			fDiskSystems.RemoveItem(i);
-			if (diskSystem->IsLoaded()) {
-				DBG(OUT("WARNING: Disk system `%s' (%ld) is still loaded!\n",
-						diskSystem->Name(), diskSystem->ID()));
-			} else
-				delete diskSystem;
-		}
+	for (int32 cookie = 0;
+		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
+		fDiskSystems->Remove(diskSystem->ID());
+		if (diskSystem->IsLoaded()) {
+			DBG(OUT("WARNING: Disk system `%s' (%ld) is still loaded!\n",
+					diskSystem->Name(), diskSystem->ID()));
+		} else
+			delete diskSystem;
 	}
+
+	// delete the containers
+	delete fPartitions;
+	delete fDevices;
+	delete fDiskSystems;
+	delete fObsoletePartitions;
 }
 
 // InitCheck
 status_t
 KDiskDeviceManager::InitCheck() const
 {
-	return B_OK;
+	if (!fPartitions || !fDevices || !fDiskSystems || !fObsoletePartitions)
+		return B_NO_MEMORY;
+	return (fLock.Sem() >= 0 ? B_OK : fLock.Sem());
 }
 
 // CreateDefault
@@ -158,7 +206,7 @@ KDiskDevice *
 KDiskDeviceManager::FindDevice(const char *path, bool noShadow)
 {
 // TODO: Handle shadows correctly!
-	for (int32 i = 0; KDiskDevice *device = fDevices.ItemAt(i); i++) {
+	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		if (device->Path() && !strcmp(path, device->Path()))
 			return device;
 	}
@@ -181,7 +229,10 @@ KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
 {
 // TODO: Handle shadows correctly!
 // TODO: Optimize!
-	for (int32 i = 0; KPartition *partition = fPartitions.ItemAt(i); i++) {
+	for (PartitionMap::Iterator it = fPartitions->Begin();
+		 it != fPartitions->End();
+		 ++it) {
+		KPartition *partition = it->Value();
 		char partitionPath[B_PATH_NAME_LENGTH];
 		if (partition->GetPath(partitionPath) == B_OK
 			&& !strcmp(path, partitionPath)) {
@@ -196,10 +247,9 @@ KPartition *
 KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
 {
 // TODO: Handle shadows correctly!
-	for (int32 i = 0; KPartition *partition = fPartitions.ItemAt(i); i++) {
-		if (partition->ID() == id)
-			return partition;
-	}
+	PartitionMap::Iterator it = fPartitions->Find(id);
+	if (it != fPartitions->End())
+		return it->Value();
 	return NULL;
 }
 
@@ -208,7 +258,7 @@ KFileDiskDevice *
 KDiskDeviceManager::FindFileDevice(const char *filePath, bool noShadow)
 {
 // TODO: Handle shadows correctly!
-	for (int32 i = 0; KDiskDevice *device = fDevices.ItemAt(i); i++) {
+	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		KFileDiskDevice *fileDevice = dynamic_cast<KFileDiskDevice*>(device);
 		if (fileDevice && fileDevice->FilePath()
 			&& !strcmp(filePath, fileDevice->FilePath())) {
@@ -253,14 +303,9 @@ KDiskDeviceManager::RegisterNextDevice(int32 *cookie)
 	if (!cookie)
 		return NULL;
 	if (ManagerLocker locker = this) {
-		// TODO: This loop assumes that the device list is ordered. Make sure
-		// that this is really the case.
-		for (int32 i = 0; KDiskDevice *device = fDevices.ItemAt(i); i++) {
-			if (device->ID() >= *cookie) {
-				device->Register();
-				*cookie = device->ID() + 1;
-				return device;
-			}
+		if (KDiskDevice *device = NextDevice(cookie)) {
+			device->Register();
+			return device;
 		}
 	}
 	return NULL;
@@ -361,25 +406,29 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 int32
 KDiskDeviceManager::CountDevices()
 {
-	if (ManagerLocker locker = this)
-		return fDevices.CountItems();
-	return 0;
+	return fDevices->Count();
 }
 
-// DiskAt
+// NextDevice
 KDiskDevice *
-KDiskDeviceManager::DeviceAt(int32 index)
+KDiskDeviceManager::NextDevice(int32 *cookie)
 {
-	if (ManagerLocker locker = this)
-		return fDevices.ItemAt(index);
-	return 0;
+	if (!cookie)
+		return NULL;
+	DeviceMap::Iterator it = fDevices->FindClose(*cookie, false);
+	if (it != fDevices->End()) {
+		KDiskDevice *device = it->Value();
+		*cookie = device->ID() + 1;
+		return device;
+	}
+	return NULL;
 }
 
 // PartitionAdded
 bool
 KDiskDeviceManager::PartitionAdded(KPartition *partition)
 {
-	return (partition && fPartitions.AddItem(partition));
+	return (partition && fPartitions->Put(partition->ID(), partition) == B_OK);
 }
 
 // PartitionRemoved
@@ -387,10 +436,10 @@ bool
 KDiskDeviceManager::PartitionRemoved(KPartition *partition)
 {
 	if (partition && partition->PrepareForRemoval()
-		&& fPartitions.RemoveItem(partition)) {
+		&& fPartitions->Remove(partition->ID())) {
 		// If adding the partition to the obsolete list fails (due to lack
 		// of memory), we can't do anything about it. We will leak memory then.
-		fObsoletePartitions.AddItem(partition);
+		fObsoletePartitions->Insert(partition);
 		partition->MarkObsolete();
 		return true;
 	}
@@ -404,7 +453,7 @@ KDiskDeviceManager::DeletePartition(KPartition *partition)
 	if (partition && partition->IsObsolete()
 		&& partition->CountReferences() == 0
 		&& partition->PrepareForDeletion()
-		&& fObsoletePartitions.RemoveItem(partition)) {
+		&& fObsoletePartitions->Remove(partition)) {
 		delete partition;
 		return true;
 	}
@@ -463,7 +512,8 @@ KDiskDeviceManager::JobQueueAt(int32 index)
 KDiskSystem *
 KDiskDeviceManager::DiskSystemWithName(const char *name)
 {
-	for (int32 i = 0; KDiskSystem *diskSystem = fDiskSystems.ItemAt(i); i++) {
+	for (int32 cookie = 0;
+		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
 		if (!strcmp(name, diskSystem->Name()))
 			return diskSystem;
 	}
@@ -474,10 +524,9 @@ KDiskDeviceManager::DiskSystemWithName(const char *name)
 KDiskSystem *
 KDiskDeviceManager::DiskSystemWithID(disk_system_id id)
 {
-	for (int32 i = 0; KDiskSystem *diskSystem = fDiskSystems.ItemAt(i); i++) {
-		if (diskSystem->ID() == id)
-			return diskSystem;
-	}
+	DiskSystemMap::Iterator it = fDiskSystems->Find(id);
+	if (it != fDiskSystems->End())
+		return it->Value();
 	return NULL;
 }
 
@@ -485,14 +534,22 @@ KDiskDeviceManager::DiskSystemWithID(disk_system_id id)
 int32
 KDiskDeviceManager::CountDiskSystems()
 {
-	return fDiskSystems.CountItems();
+	return fDiskSystems->Count();
 }
 
-// DiskSystemAt
+// NextDiskSystem
 KDiskSystem *
-KDiskDeviceManager::DiskSystemAt(int32 index)
+KDiskDeviceManager::NextDiskSystem(int32 *cookie)
 {
-	return fDiskSystems.ItemAt(index);
+	if (!cookie)
+		return NULL;
+	DiskSystemMap::Iterator it = fDiskSystems->FindClose(*cookie, false);
+	if (it != fDiskSystems->End()) {
+		KDiskSystem *diskSystem = it->Value();
+		*cookie = diskSystem->ID() + 1;
+		return diskSystem;
+	}
+	return NULL;
 }
 
 // LoadDiskSystem
@@ -517,12 +574,10 @@ KDiskDeviceManager::LoadNextDiskSystem(int32 *cookie)
 	if (ManagerLocker locker = this) {
 		// TODO: This loop assumes that the disk system list is ordered.
 		// Make sure that this is really the case.
-		for (int32 i = 0; KDiskSystem *diskSystem = DiskSystemAt(i); i++) {
-			if (diskSystem->ID() >= *cookie) {
-				if (diskSystem->Load() == B_OK) {
-					*cookie = diskSystem->ID() + 1;
-					return diskSystem;
-				}
+		if (KDiskSystem *diskSystem = NextDiskSystem(cookie)) {
+			if (diskSystem->Load() == B_OK) {
+				*cookie = diskSystem->ID() + 1;
+				return diskSystem;
 			}
 		}
 	}
@@ -583,8 +638,8 @@ DBG(OUT("KDiskDeviceManager::_AddDiskSystem(%s)\n", diskSystem->Name()));
 	status_t error = diskSystem->Init();
 if (error != B_OK)
 DBG(OUT("  initialization failed: %s\n", strerror(error)));
-	if (error == B_OK && !fDiskSystems.AddItem(diskSystem))
-		error = B_NO_MEMORY;
+	if (error == B_OK)
+		error = fDiskSystems->Put(diskSystem->ID(), diskSystem);
 	if (error != B_OK)
 		delete diskSystem;
 DBG(OUT("KDiskDeviceManager::_AddDiskSystem() done: %s\n", strerror(error)));
@@ -597,7 +652,7 @@ KDiskDeviceManager::_AddDevice(KDiskDevice *device)
 {
 	if (!device || !PartitionAdded(device))
 		return false;
-	if (fDevices.AddItem(device))
+	if (fDevices->Put(device->ID(), device) == B_OK)
 		return true;
 	PartitionRemoved(device);
 	return false;
@@ -607,7 +662,8 @@ KDiskDeviceManager::_AddDevice(KDiskDevice *device)
 bool
 KDiskDeviceManager::_RemoveDevice(KDiskDevice *device)
 {
-	return (device && fDevices.RemoveItem(device) && PartitionRemoved(device));
+	return (device && fDevices->Remove(device->ID())
+			&& PartitionRemoved(device));
 }
 
 // _Scan

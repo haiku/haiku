@@ -3,8 +3,9 @@
 #ifndef _K_DISK_DEVICE_PARTITION_H
 #define _K_DISK_DEVICE_PARTITION_H
 
+#include <Vector.h>
+
 #include "disk_device_manager.h"
-#include "List.h"
 
 // partition flags
 // TODO: move to another header (must be accessible from userland API impl.)
@@ -164,8 +165,10 @@ private:
 	static int32 _NextID();
 
 protected:
+	typedef Vector<KPartition*> PartitionVector;
+
 	partition_data		fPartitionData;
-	List<KPartition*>	fChildren;
+	PartitionVector		fChildren;
 	KDiskDevice			*fDevice;
 	KPartition			*fParent;
 	KDiskSystem			*fDiskSystem;

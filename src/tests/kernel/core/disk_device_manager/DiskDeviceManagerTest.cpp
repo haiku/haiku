@@ -24,7 +24,8 @@ main()
 	if (error != B_OK)
 		printf("creating the file device failed: %s\n", strerror(error));
 	if (manager->Lock()) {
-		for (int32 i = 0; KDiskDevice *device = manager->DeviceAt(i); i++) {
+		for (int32 cookie = 0;
+			 KDiskDevice *device = manager->NextDevice(&cookie); ) {
 			device->Dump();
 			printf("\n");
 		}

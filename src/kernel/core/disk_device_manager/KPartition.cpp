@@ -562,10 +562,11 @@ KPartition::AddChild(KPartition *partition, int32 index)
 	// add partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (!fChildren.AddItem(partition, index))
-			return B_NO_MEMORY;
+		status_t error = fChildren.Insert(partition, index);
+		if (error != B_OK)
+			return error;
 		if (!manager->PartitionAdded(partition)) {
-			fChildren.RemoveItem(index);
+			fChildren.Erase(index);
 			return B_NO_MEMORY;
 		}
 		partition->SetIndex(index);
@@ -609,10 +610,10 @@ KPartition::RemoveChild(int32 index)
 		return false;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		KPartition *partition = fChildren.ItemAt(index);
+		KPartition *partition = fChildren.ElementAt(index);
 		PartitionRegistrar _(partition);
 		if (!partition || !manager->PartitionRemoved(partition)
-			|| !fChildren.RemoveItem(index)) {
+			|| !fChildren.Erase(index)) {
 			return false;
 		}
 		_UpdateChildIndices(index + 1);
@@ -653,7 +654,8 @@ KPartition::RemoveAllChildren()
 KPartition *
 KPartition::ChildAt(int32 index) const
 {
-	return fChildren.ItemAt(index);
+	return (index >= 0 && index < fChildren.Count()
+			? fChildren.ElementAt(index) : NULL);
 }
 
 // CountChildren
@@ -789,8 +791,8 @@ KPartition::Dump(bool deep, int32 level)
 void
 KPartition::_UpdateChildIndices(int32 index)
 {
-	for (int32 i = index; KPartition *child = fChildren.ItemAt(i); i++)
-		child->SetIndex(index);
+	for (int32 i = index; i < fChildren.Count(); i++)
+		fChildren.ElementAt(i)->SetIndex(i);
 }
 
 // _NextID
