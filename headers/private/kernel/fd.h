@@ -76,12 +76,13 @@ static struct io_context *get_current_io_context(bool kernel);
 
 /* Inlines */
 
-static __inline struct io_context *get_current_io_context(bool kernel)
+static inline struct io_context *
+get_current_io_context(bool kernel)
 {
 	if (kernel)
-		return team_get_kernel_team()->io_context;
+		return (struct io_context *)team_get_kernel_team()->io_context;
 
-	return thread_get_current_thread()->team->io_context;
+	return (struct io_context *)thread_get_current_thread()->team->io_context;
 }
 
 #endif /* _FD_H */
