@@ -10,28 +10,17 @@ BinCommand mkbuiltins : mkbuiltins.c ;
 
 MakeLocate mkbuiltins : $(LOCATE_TARGET) ;
 
-rule UserObject
-{
-	switch $(2)
-	{
-	case *.S    : assemble $(1) : $(2) ;
-	case *.o    : return ;
-	case *.def 	: {
-			Depends $(<) : builtext.h ;
-			Cc $(<) : $(<:S=.c) ;
-			MkBuiltinsComp $(<:S=.c) : $(>) ;
-			}
-	case *      : ECHO "unknown suffix on" $(2) ;
-	}
-}
-
 rule MkBuiltinsComp
 {
-	MakeLocate $(<) : $(LOCATE_SOURCE) ;
+	local source = $(1) ;
+	local defFile = $(2) ;
 
-	Depends $(<) : $(>) mkbuiltins ;
-	MkBuiltinsComp1 $(<) : mkbuiltins $(>) ;
-	LocalClean clean : $(<) ;
+	SEARCH on $(defFile) = $(SEARCH_SOURCE) ;
+	MakeLocate $(source) : $(LOCATE_SOURCE) ;
+
+	Depends $(source) : $(defFile) mkbuiltins ;
+	MkBuiltinsComp1 $(source) : mkbuiltins $(defFile) ;
+	LocalClean clean : $(source) ;
 }
 
 actions MkBuiltinsComp1
@@ -41,12 +30,15 @@ actions MkBuiltinsComp1
 
 rule MkBuiltinsExt
 {
-	MakeLocate $(<) : $(LOCATE_SOURCE) ;
-	SEARCH on $(>) = $(SEARCH_SOURCE) ;
+	local sources = $(1) ;
+	local defFiles = [ FGristFiles $(2) ] ;
+
+	MakeLocate $(sources) : $(LOCATE_SOURCE) ;
+	SEARCH on $(defFiles) = $(SEARCH_SOURCE) ;
 	
-	Depends $(<) : $(>) mkbuiltins ;
-	MkBuiltinsExt1 $(<) : mkbuiltins $(>) ;
-	LocalClean clean : $(<) ;
+	Depends $(sources) : $(defFiles) mkbuiltins ;
+	MkBuiltinsExt1 $(sources) : mkbuiltins $(defFiles) ;
+	LocalClean clean : $(sources) ;
 }
 
 actions MkBuiltinsExt1
@@ -54,25 +46,32 @@ actions MkBuiltinsExt1
 	$(2[1]) -externfile $(1[1]) -structfile $(1[2]) -noproduction $(2[2-]) ;
 }
 
-MkBuiltinsExt builtext.h <src!apps!bin!bash!builtins>builtins.c : 
-	alias.def bind.def 
-	break.def builtin.def cd.def colon.def command.def
-	declare.def echo.def enable.def eval.def exec.def
-	exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def
-	pushd.def read.def return.def set.def setattr.def shift.def source.def
-	suspend.def test.def times.def trap.def type.def ulimit.def umask.def
-	wait.def getopts.def shopt.def printf.def complete.def
+local bashDefFiles =
+	alias.def bind.def break.def builtin.def cd.def colon.def command.def
+	declare.def echo.def enable.def eval.def exec.def exit.def fc.def fg_bg.def
+	hash.def help.def history.def jobs.def kill.def let.def pushd.def read.def
+	return.def set.def setattr.def shift.def source.def suspend.def test.def
+	times.def trap.def type.def ulimit.def umask.def wait.def getopts.def
+	shopt.def printf.def complete.def
 ;
 
-StaticLibrary builtins :
-	alias.def bind.def 
-	break.def builtin.def cd.def colon.def command.def
-	common.c declare.def echo.def enable.def eval.def evalfile.c
-	evalstring.c exec.def
-	exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def
-	pushd.def read.def return.def set.def setattr.def shift.def source.def
-	suspend.def test.def times.def trap.def type.def ulimit.def umask.def
-	wait.def getopts.def shopt.def printf.def getopt.c bashgetopt.c complete.def
-	builtins.c
+# generate the source file for the .def files
+local bashDefFile ;
+for bashDefFile in [ FGristFiles $(bashDefFiles) ] {
+	local source = $(bashDefFile:S=.c) ;
+	Includes $(cFile) : <bash>builtext.h ;
+	Depends $(cFile:S=$(SUFOBJ)) : <bash>builtext.h ;
+	MkBuiltinsComp $(source) : $(bashDefFile) ;
+}
+
+# generate builtext.h and builtins.c
+MkBuiltinsExt <bash>builtext.h [ FGristFiles builtins.c ] : $(bashDefFiles) ;
+
+# generate the builtins library
+StaticLibrary builtins
+	: common.c evalfile.c evalstring.c getopt.c bashgetopt.c builtins.c
+	  [ FGristFiles $(bashDefFiles:S=.c) ]
 ;
 
+# common.c includes builtext.h
+Includes [ FGristFiles common.c ] : <bash>builtext.h ;
