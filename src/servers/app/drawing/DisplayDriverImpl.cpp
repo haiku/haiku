@@ -2591,124 +2591,103 @@ void DisplayDriverImpl::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const D
 	ReleaseBuffer();
 }
 
-void DisplayDriverImpl::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
+void
+DisplayDriverImpl::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
 {
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer=NULL, *destbuffer=NULL;
 	FBBitmap framebuffer;
-	
-	if(!AcquireBuffer(&framebuffer))
-	{
+	if(!AcquireBuffer(&framebuffer)) {
 		printf("Couldn't acquire framebuffer in DisplayDriverImpl::BlitGray2RGB32\n");
 		return;
 	}
 	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
+	rgb_color highcolor = d->highcolor.GetColor32();
+	rgb_color lowcolor = d->lowcolor.GetColor32();
 	
-	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
-
-	rstep=float(highcolor.red-lowcolor.red)/255.0;
-	gstep=float(highcolor.green-lowcolor.green)/255.0;
-	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
-	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
+	float rstep, gstep, bstep, astep;
+	rstep = float(highcolor.red - lowcolor.red) / 255.0;
+	gstep = float(highcolor.green - lowcolor.green) / 255.0;
+	bstep = float(highcolor.blue - lowcolor.blue) / 255.0;
+	astep = float(highcolor.alpha - lowcolor.alpha) / 255.0;
 	
 	// increment values for the index pointers
-	int32 x=(int32)pt.x,
-		y=(int32)pt.y,
-		srcinc=src->pitch,
-//		destinc=dest->BytesPerRow(),
-		destinc=framebuffer.BytesPerRow(),
-		srcwidth=src->width,
-		srcheight=src->rows,
-		incval=0;
+	int32 x = (int32)pt.x;
+	int32 y = (int32)pt.y;
+	int32 srcinc = src->pitch;
+	int32 destinc = framebuffer.BytesPerRow();
+	int32 srcwidth = src->width;
+	int32 srcheight = src->rows;
+	int32 incval=0;
 	
-	int16 i,j;
+	// pointers to the top left corner of the area to be copied in each bitmap
+	uint8 *srcbuffer = (uint8 *)src->buffer;
+	uint8 *destbuffer= (uint8 *)framebuffer.Bits() + (y * framebuffer.BytesPerRow() + (x * 4));
 	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	// starting point in destination bitmap
-	destbuffer=(uint8*)framebuffer.Bits()+(y*framebuffer.BytesPerRow()+(x*4));
-
-
-	if(y<0)
-	{
-		if(y<pt.y)
+	if (y < 0) {
+		if (y < pt.y)
 			y++;
 		
-		incval=0-y;
+		incval = 0 - y;
 		
-		srcbuffer+=incval * srcinc;
-		srcheight-=incval;
-		destbuffer+=incval * destinc;
-	}
-
-	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
-	}
-
-	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
+		srcbuffer += incval * srcinc;
+		srcheight -= incval;
+		destbuffer += incval * destinc;
 	}
 	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		incval=0-x;
-		srcbuffer+=incval;
-		srcwidth-=incval;
-		destbuffer+=incval*4;
+	if (y + srcheight > framebuffer.Bounds().IntegerHeight()) {
+		if(y > pt.y)
+			y--;
+		srcheight -= (y + srcheight - 1) - framebuffer.Bounds().IntegerHeight();
 	}
-
+	
+	if (x + srcwidth > framebuffer.Bounds().IntegerWidth()) {
+		if(x > pt.x)
+			x--;
+		srcwidth -= (x + srcwidth - 1) - framebuffer.Bounds().IntegerWidth();
+	}
+	
+	if (x < 0) {
+		if(x < pt.x)
+			x++;
+		incval = 0 - x;
+		srcbuffer += incval;
+		srcwidth -= incval;
+		destbuffer += incval * 4;
+	}
+	
+	// index pointers which are incremented during the course of the blit
+	uint8 *srcindex = srcbuffer;
+	uint8 *destindex = destbuffer;
+	uint8 *rowptr = NULL;
 	int32 value;
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			value=*(srcindex+j) ^ 255;
-
-			if(value!=255)
-			{
-				if(d->draw_mode==B_OP_COPY)
-				{
-					rowptr[0]=uint8(highcolor.blue-(value*bstep));
-					rowptr[1]=uint8(highcolor.green-(value*gstep));
-					rowptr[2]=uint8(highcolor.red-(value*rstep));
-					rowptr[3]=255;
-				}
-				else
-					if(d->draw_mode==B_OP_OVER)
-					{
-						if(highcolor.alpha>127)
-						{
-							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
-							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
-							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
-							rowptr[3]=255;
-						}
+	
+	for (int32 i = 0; i < srcheight; i++) {
+		rowptr = destindex;
+		
+		for(int32 j = 0; j < srcwidth; j++) {
+			value = *(srcindex + j) ^ 255;
+			
+			if (value != 255) {
+				if(d->draw_mode == B_OP_COPY) {
+					rowptr[0] = uint8(highcolor.blue - (value * bstep));
+					rowptr[1] = uint8(highcolor.green - (value * gstep));
+					rowptr[2] = uint8(highcolor.red - (value * rstep));
+					rowptr[3] = 255;
+				} else if (d->draw_mode == B_OP_OVER) {
+					if(highcolor.alpha>127) {
+						rowptr[0] = uint8(highcolor.blue - (value * (float(highcolor.blue - rowptr[0]) / 255.0)));
+						rowptr[1] = uint8(highcolor.green - (value * (float(highcolor.green - rowptr[1]) / 255.0)));
+						rowptr[2] = uint8(highcolor.red - (value * (float(highcolor.red - rowptr[2]) / 255.0)));
+						rowptr[3] = 255;
 					}
+				}
 			}
-			rowptr+=4;
-
+			rowptr += 4;
 		}
 		
-		srcindex+=srcinc;
-		destindex+=destinc;
+		srcindex += srcinc;
+		destindex += destinc;
 	}
+	
 	ReleaseBuffer();
 }
 
