@@ -3,8 +3,8 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <bootdir.h>
-#include <stage2.h>
+#include <boot/bootdir.h>
+#include <boot/stage2.h>
 #include "arch/x86/stage2_priv.h"
 #include "arch/x86/descriptors.h"
 #include "vesa.h"

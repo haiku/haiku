@@ -4,7 +4,7 @@
 */
 
 
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <arch/x86/stage2_priv.h>
 #include <arch/x86/smp_apic.h>
 
@@ -270,7 +270,7 @@ smp_setup_apic(kernel_args *ka)
 	config = apic_read(APIC_SIVR) & 0xfffffc00;
 	config |= APIC_ENABLE | 0xff;
 	apic_write(APIC_SIVR, config);
-#if 0
+#if 1
 	/* setup LINT0 as ExtINT */
 	config = (apic_read(APIC_LINT0) & 0xffff1c00);
 	config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
