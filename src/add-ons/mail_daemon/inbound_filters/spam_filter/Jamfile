@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons mail_daemon inbound_filters spam_filter ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+Addon Spam\ Filter : mail_daemon inbound_filters :
+	SpamFilterConfig.cpp
+	SpamFilter.cpp ;
+
+LinkSharedOSLibs Spam\ Filter :
+	 be libmail.so ;
+
+Package haiku-maildaemon-cvs :
+	Spam\ Filter : 
+	boot home config add-ons mail_daemon inbound_filters ;
