@@ -1,7 +1,7 @@
 /* net_stack_driver.c
  *
  * This file implements a very simple socket driver that is intended to
- * act as an interface to the new networking stack.
+ * act as an interface to the networking stack.
  */
 
 #ifndef _KERNEL_MODE
@@ -11,27 +11,20 @@
 #else
 
 // Public/system includes
+#include <stdlib.h>
+#include <string.h>
+
 #include <drivers/Drivers.h>
 #include <drivers/KernelExport.h>
 #include <drivers/driver_settings.h>
 #include <drivers/module.h>		// For get_module()/put_module()
 
-#include <net_stack_driver.h>
 #include <netinet/in_var.h>
 
-#include <stdlib.h>
-#include <string.h>
-
 // Private includes
+#include <net_stack_driver.h>
 #include <sys/protosw.h>
 #include <core_module.h>
-
-/* these are missing from KernelExport.h ... */
-#define  B_SELECT_READ       1 
-#define  B_SELECT_WRITE      2 
-#define  B_SELECT_EXCEPTION  3 
-
-extern void notify_select_event(selectsync * sync, uint32 ref);
 
 #define SHOW_INSANE_DEBUGGING   (1)
 #define SERIAL_DEBUGGING        (0)
@@ -59,7 +52,11 @@ extern void notify_select_event(selectsync * sync, uint32 ref);
 #define ERR "ERROR: "
 #endif
 
-typedef void (*notify_select_event_function)(selectsync * sync, uint32 ref);
+#ifdef COMPILE_FOR_R5
+	typedef status_t (*notify_select_event_function)(selectsync * sync, uint32 ref);
+#else
+	typedef status_t (*notify_select_event_function)(selectsync * sync, uint32 ref, uint8 event);
+#endif
 
 struct socket; /* forward declaration */
 
@@ -86,7 +83,7 @@ typedef struct {
 	/* to unload the driver, simply write UNLOAD_CMD to him:
 	 * $ echo stop > /dev/net/stack
 	 * As soon as last app, via libnet.so, stop using it, it will unload,
-	 * and in turn stop the stack and unload all kernel modules...
+	 * and in turn stop the stack and unload all network kernel modules...
 	 */
 	#define UNLOAD_CMD	"stop"
 #endif
@@ -105,7 +102,7 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync);
 
 /* Privates prototypes */
 static void on_socket_event(void * socket, uint32 event, void * cookie);
-static void r5_notify_select_event(selectsync * sync, uint32 ref);
+static status_t r5_notify_select_event(selectsync * sync, uint32 ref, uint8 event);
 
 #if STAY_LOADED
 static status_t	keep_driver_loaded();
@@ -455,13 +452,13 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 			case B_SET_BLOCKING_IO: {
 				int off = false;
 				nsc->open_flags &= ~O_NONBLOCK;
-				return core->socket_ioctl(nsc->socket, FIONBIO, &off);
+				return core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &off);
 			}
 	
 			case B_SET_NONBLOCKING_IO: {
 				int on = true;
 				nsc->open_flags |= O_NONBLOCK;
-				return core->socket_ioctl(nsc->socket, FIONBIO, &on);
+				return core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &on);
 			}
 	
 			case NET_STACK_SELECT:
@@ -685,11 +682,15 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	s = nsc->selecters;
 	while (s) {
 		if (s->event == event)
+			// notify this selecter (thread/event pair)
+#ifdef COMPILRE_FOR_R5
 			s->notify(s->sync, s->ref);
-				// notify this selecter (thread/event pair)
+#else
+			s->notify(s->sync, s->ref, event);
+#endif
 		s = s->next;
 	};
-	
+
 	// unlock the selecters list
 	release_sem(nsc->selecters_lock);
 	return;
@@ -701,14 +702,14 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	So, here is our own notify_select_event() implementation, the driver-side pair
 	of the our libnet.so select() implementation...
 */
-static void r5_notify_select_event(selectsync * sync, uint32 ref)
+static status_t r5_notify_select_event(selectsync * sync, uint32 ref, uint8 event)
 {
 	area_id	area;
 	struct r5_selectsync *	rss;
 	int fd;
 
 #if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "r5_notify_select_event(%p, %ld)\n", sync, ref);
+	dprintf(LOGID "r5_notify_select_event(%p, %ld, %d)\n", sync, ref, event);
 #endif
 
 	rss = NULL;
@@ -718,7 +719,7 @@ static void r5_notify_select_event(selectsync * sync, uint32 ref)
 #if SHOW_INSANE_DEBUGGING
 		dprintf(LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (int) sync, (int) area);
 #endif
-		return;
+		return area;
 	};
 	
 #if SHOW_INSANE_DEBUGGING
@@ -732,14 +733,14 @@ static void r5_notify_select_event(selectsync * sync, uint32 ref)
 		goto error;
 	
 	fd = ref >> 8;
-	switch (ref & 0xFF) {
+	switch (ref & 0xFF) {	// event == ref & 0xFF
 	case B_SELECT_READ:
 		FD_SET(fd, &rss->rbits);
 		break;
 	case B_SELECT_WRITE:
 		FD_SET(fd, &rss->wbits);
 		break;
-	case B_SELECT_EXCEPTION:
+	case B_SELECT_ERROR:
 		FD_SET(fd, &rss->ebits);
 		break;
 	};
@@ -747,10 +748,12 @@ static void r5_notify_select_event(selectsync * sync, uint32 ref)
 	// wakeup select()
 	release_sem(rss->wakeup);
 		
-	release_sem(rss->lock);	
+	release_sem(rss->lock);
+	return B_OK;
 	
 error:
 	delete_area(area);
+	return B_ERROR;
 }
 
 

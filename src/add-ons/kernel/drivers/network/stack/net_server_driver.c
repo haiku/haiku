@@ -15,13 +15,13 @@
 #else
 
 // Public includes
+#include <stdlib.h>
+#include <string.h>
+
 #include <drivers/Drivers.h>
 #include <drivers/KernelExport.h>
 #include <driver_settings.h>
 
-// Posix includes
-#include <malloc.h>
-#include <string.h>
 #include <netinet/in_var.h>
 
 // Private includes
@@ -29,13 +29,6 @@
 // #include <PPPControl.h>		// for NET_STACK_CONTROL_NET_MODULE PPP support...
 #include <userland_ipc.h>
 #include <sys/sockio.h>
-
-/* these are missing from KernelExport.h ... */
-#define  B_SELECT_READ       1 
-#define  B_SELECT_WRITE      2 
-#define  B_SELECT_EXCEPTION  3 
-
-extern void notify_select_event(selectsync * sync, uint32 ref);
 
 //*****************************************************/
 // Debug output
@@ -79,7 +72,12 @@ extern void notify_select_event(selectsync * sync, uint32 ref);
 /* wait one second when waiting on the stack */
 #define STACK_TIMEOUT 1000000LL
 
-typedef void (*notify_select_event_function)(selectsync * sync, uint32 ref);
+#ifdef COMPILE_FOR_R5
+	typedef status_t (*notify_select_event_function)(selectsync * sync, uint32 ref);
+#else
+	typedef status_t (*notify_select_event_function)(selectsync * sync, uint32 ref, uint8 event);
+#endif
+
 
 // this struct will store one select() event to monitor per thread
 typedef struct selecter {
@@ -127,7 +125,7 @@ static status_t net_server_deselect(void *cookie, uint8 event, selectsync *sync)
 /* select() support */
 static int32 socket_event_listener(void *data);
 static void on_socket_event(void *socket, uint32 event, void *cookie);
-static void r5_notify_select_event(selectsync *sync, uint32 ref);
+static status_t r5_notify_select_event(selectsync *sync, uint32 ref, uint8 event);
 
 /* command queue */
 static status_t init_connection(void **cookie);
@@ -517,7 +515,11 @@ static void on_socket_event(void *socket, uint32 event, void *cookie)
 	while (s) {
 		if (s->event == event)
 			// notify this selecter (thread/event pair)
+#ifdef COMPILE_FOR_R5
 			g_nse(s->sync, s->ref);
+#else
+			g_nse(s->sync, s->ref, (uint8) event);
+#endif
 		s = s->next;
 	};
 	
@@ -533,7 +535,7 @@ static void on_socket_event(void *socket, uint32 event, void *cookie)
 	So, here is our own notify_select_event() implementation, the driver-side pair
 	of the our libnet.so select() implementation...
 */
-static void r5_notify_select_event(selectsync *sync, uint32 ref)
+static status_t r5_notify_select_event(selectsync *sync, uint32 ref, uint8 event)
 {
 	area_id	area;
 	struct r5_selectsync *rss;
@@ -548,7 +550,7 @@ static void r5_notify_select_event(selectsync *sync, uint32 ref)
 #if SHOW_INSANE_DEBUGGING
 		dprintf(LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (area_id) sync, area);
 #endif
-		return;
+		return area;
 	};
 	
 #if SHOW_INSANE_DEBUGGING
@@ -562,14 +564,14 @@ static void r5_notify_select_event(selectsync *sync, uint32 ref)
 		goto error;
 	
 	fd = ref >> 8;
-	switch (ref & 0xFF) {
+	switch (ref & 0xFF) {	// event == ref & 0xFF !
 	case B_SELECT_READ:
 		FD_SET(fd, &rss->rbits);
 		break;
 	case B_SELECT_WRITE:
 		FD_SET(fd, &rss->wbits);
 		break;
-	case B_SELECT_EXCEPTION:
+	case B_SELECT_ERROR:
 		FD_SET(fd, &rss->ebits);
 		break;
 	};
@@ -581,6 +583,7 @@ static void r5_notify_select_event(selectsync *sync, uint32 ref)
 	
 error:
 	delete_area(area);
+	return B_ERROR;
 }
 
 
