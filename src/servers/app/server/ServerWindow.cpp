@@ -32,6 +32,7 @@
 #include <Message.h>
 #include <GraphicsDefs.h>
 #include <PortLink.h>
+#include <Session.h>
 #include "AppServer.h"
 #include "Layer.h"
 #include "RootLayer.h"

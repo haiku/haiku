@@ -26,7 +26,6 @@
 //------------------------------------------------------------------------------
 #include "ServerCursor.h"
 #include <stdio.h>
-#include <string.h>
 /*!
 	\brief Constructor
 	\param r Size of the cursor
@@ -41,7 +40,6 @@ ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hots
 {
 	_hotspot=hotspot;
 	_hotspot.ConstrainTo(Bounds());
-	_app_signature=NULL;
 
 	_AllocateBuffer();
 }
@@ -103,7 +101,6 @@ ServerCursor::ServerCursor(int8 *data)
 		_bytesperrow=0;
 		_space=B_NO_COLOR_SPACE;
 	}
-	_app_signature=NULL;
 }
 
 /*!
@@ -115,7 +112,6 @@ ServerCursor::ServerCursor(const ServerCursor *cursor)
 {
 	_AllocateBuffer();
 	_initialized=true;
-	_app_signature=NULL;
 
 	if(cursor)
 	{	
@@ -129,8 +125,6 @@ ServerCursor::ServerCursor(const ServerCursor *cursor)
 ServerCursor::~ServerCursor(void)
 {
 	_FreeBuffer();
-	if(_app_signature)
-		delete _app_signature;
 }
 
 /*!
@@ -145,12 +139,5 @@ void ServerCursor::SetHotSpot(BPoint pt)
 
 void ServerCursor::SetAppSignature(const char *signature)
 {
-	if(_app_signature)
-		delete _app_signature;
-
-	if(signature)
-	{
-		_app_signature=new char[strlen(signature)];
-		strcpy(_app_signature, signature);
-	}
+	_app_signature.SetTo( (signature)?signature:"" );
 }

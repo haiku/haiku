@@ -28,6 +28,8 @@
 #include <List.h>
 #include <String.h>
 #include <PortLink.h>
+#include <PortMessage.h>
+#include <PortQueue.h>
 #include <SysCursor.h>
 
 #include <Session.h>
@@ -143,10 +145,6 @@ ServerApp::~ServerApp(void)
 	_piclist->MakeEmpty();
 	delete _piclist;
 
-// ADI:
-	delete	ses;
-	ses		= NULL;
-
 	delete _applink;
 	_applink=NULL;
 	if(_appcursor)
@@ -248,70 +246,80 @@ void ServerApp::SetAppCursor(void)
 */
 int32 ServerApp::MonitorApp(void *data)
 {
-	ServerApp *app=(ServerApp *)data;
-
 	// Message-dispatching loop for the ServerApp
-	int32			msgCode;
-	
-	app->ses=new BSession( app->_receiver, 0L );
+
+	ServerApp *app=(ServerApp *)data;
+	PortQueue msgqueue(app->_receiver);
+	PortMessage *msg;
 	
 	for(;;)
 	{
-		if(app->ses->ReadInt32(&msgCode)!= B_BAD_PORT_ID ){
-			switch (msgCode){
-				case AS_QUIT_APP:
+		if(!msgqueue.MessagesWaiting())
+			msgqueue.GetMessagesFromPort(true);
+		else
+			msgqueue.GetMessagesFromPort(false);
+
+		msg=msgqueue.GetMessageFromQueue();
+		if(!msg)
+			continue;
+					
+		switch(msg->Code())
+		{
+			case AS_QUIT_APP:
+			{
+				STRACE(("ServerApp %s:Server shutdown notification received\n",app->_signature.String()));
+				// If we are using the real, accelerated version of the
+				// DisplayDriver, we do NOT want the user to be able shut down
+				// the server. The results would NOT be pretty
+				if(DISPLAYDRIVER!=HWDRIVER)
 				{
-					STRACE(("ServerApp %s:Server shutdown notification received\n",app->_signature.String()));
-					// If we are using the real, accelerated version of the
-					// DisplayDriver, we do NOT want the user to be able shut down
-					// the server. The results would NOT be pretty
-					if(DISPLAYDRIVER!=HWDRIVER)
-					{
-						// This message is received from the app_server thread
-						// because the server was asked to quit. Thus, we
-						// ask all apps to quit. This is NOT the same as system
-						// shutdown and will happen only in testing
-						
-						// For now, it seems that we can't seem to try to play nice and tell
-						// an application to quit, so we'll just have to go postal. XD
+					// This message is received from the app_server thread
+					// because the server was asked to quit. Thus, we
+					// ask all apps to quit. This is NOT the same as system
+					// shutdown and will happen only in testing
+					
+					// For now, it seems that we can't seem to try to play nice and tell
+					// an application to quit, so we'll just have to go postal. XD
 
 //						BMessage *shutdown=new BMessage(_QUIT_);
 //						SendMessage(app->_sender,shutdown);
 
-						// DIE! DIE! DIE! :P
-						port_info pi;
-						get_port_info(app->_sender,&pi);
-						kill_team(pi.team);
-						app->PostMessage(B_QUIT_REQUESTED);
-					}
-					break;
+					// DIE! DIE! DIE! :P
+					port_info pi;
+					get_port_info(app->_sender,&pi);
+					kill_team(pi.team);
+					app->PostMessage(B_QUIT_REQUESTED);
 				}
-				
-				case B_QUIT_REQUESTED:
+				break;
+			}
+			
+			case B_QUIT_REQUESTED:
+			{
+				// Our BApplication sent us this message when it quit.
+				// We need to ask the app_server to delete our monitor
+				port_id serverport=find_port(SERVER_PORT_NAME);
+				if(serverport==B_NAME_NOT_FOUND)
 				{
-					// Our BApplication sent us this message when it quit.
-					// We need to ask the app_server to delete our monitor
-					port_id serverport=find_port(SERVER_PORT_NAME);
-					if(serverport==B_NAME_NOT_FOUND)
-					{
-						printf("PANIC: ServerApp %s could not find the app_server port!\n",app->_signature.String());
-						break;
-					}
-					app->_applink->SetPort(serverport);
-					app->_applink->SetOpCode(AS_DELETE_APP);
-					app->_applink->Attach(&app->_monitor_thread,sizeof(thread_id));
-					app->_applink->Flush();
+					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->_signature.String());
 					break;
 				}
-				default:
-				{
-					STRACE(("ServerApp %s: Got a Message to dispatch\n",app->_signature.String()));
-					app->_DispatchMessage(msgCode);
-					break;
-				}
-			} // switch
-		} // if 
-	} // for 
+				app->_applink->SetPort(serverport);
+				app->_applink->SetOpCode(AS_DELETE_APP);
+				app->_applink->Attach(&app->_monitor_thread,sizeof(thread_id));
+				app->_applink->Flush();
+				break;
+			}
+			default:
+			{
+				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->_signature.String()));
+				app->_DispatchMessage(msg);
+				break;
+			}
+		}
+
+		delete msg;
+		
+	} // end for 
 
 	exit_thread(0);
 	return 0;
@@ -326,11 +334,10 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::_DispatchMessage(int32 code)
+void ServerApp::_DispatchMessage(PortMessage *msg)
 {
 	LayerData ld;
-
-	switch(code)
+	switch(msg->Code())
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
@@ -365,22 +372,23 @@ void ServerApp::_DispatchMessage(int32 code)
 			port_id		looperPort;
 			char		*title;
 			
-			ses->ReadRect( &frame );
-			ses->ReadInt32( (int32*)&look );
-			ses->ReadInt32( (int32*)&feel );
-			ses->ReadInt32( (int32*)&flags );
-			ses->ReadInt32( (int32*)&wkspaces );
-			ses->ReadInt32( &token );
-			ses->ReadData( &sendPort, sizeof(port_id) );
-			ses->ReadData( &looperPort, sizeof(port_id) );
-			title		= ses->ReadString();
+			msg->Read<BRect>( &frame );
+			msg->Read<int32>( (int32*)&look );
+			msg->Read<int32>( (int32*)&feel );
+			msg->Read<int32>( (int32*)&flags );
+			msg->Read<int32>( (int32*)&wkspaces );
+			msg->Read<int32>( &token );
+			msg->Read<port_id>( &sendPort );
+			msg->Read<port_id>( &looperPort );
+			msg->ReadString( &title );
 
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
 					_signature.String()));
 
-				// ServerWindow constructor will reply with port_id of a newly created port
-			ServerWindow *newwin	= new ServerWindow( frame, title,
+			// ServerWindow constructor will reply with port_id of a newly created port
+			ServerWindow *newwin = new ServerWindow( frame, title,
 				look, feel, flags, this, sendPort, looperPort, wkspaces, token);
+			
 			_winlist->AddItem( newwin );
 			//AddWindowToDesktop( newwin, workspace, ActiveScreen() );
 			
@@ -388,7 +396,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			STRACE(("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
-			delete	title;
+			delete title;
 
 			break;
 		}
@@ -400,7 +408,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// 1) uint32  ServerWindow ID token
 			ServerWindow *w;
 			uint32 winid;
-			ses->ReadUInt32(&winid);
+			msg->Read<uint32>(&winid);
 
 			for(int32 i=0;i<_winlist->CountItems();i++)
 			{
@@ -417,6 +425,7 @@ void ServerApp::_DispatchMessage(int32 code)
 		}
 		case AS_CREATE_BITMAP:
 		{
+debugger("");
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
@@ -440,12 +449,12 @@ void ServerApp::_DispatchMessage(int32 code)
 			int32 f,bpr;
 			screen_id s;
 
-			ses->ReadRect(&r);
-			ses->ReadData(&cs,sizeof(color_space));
-			ses->ReadInt32(&f);
-			ses->ReadInt32(&bpr);
-			ses->ReadData(&s,sizeof(screen_id));
-			ses->ReadInt32(&replyport);
+			msg->Read<BRect>(&r);
+			msg->Read<color_space>(&cs);
+			msg->Read<int32>(&f);
+			msg->Read<int32>(&bpr);
+			msg->Read<screen_id>(&s);
+			msg->Read<int32>(&replyport);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
 
@@ -454,18 +463,17 @@ void ServerApp::_DispatchMessage(int32 code)
 
 			if(sbmp)
 			{
-				// list for doing faster lookups for a bitmap than what the BitmapManager
-				// can do.
-				BSession replysession(0,replyport);
-				replysession.WriteInt32(sbmp->Token());
-				replysession.WriteInt32(sbmp->Area());
-				replysession.WriteInt32(sbmp->AreaOffset());
-				replysession.Sync();
+				PortLink replylink(replyport);
+				replylink.Attach<int32>(sbmp->Token());
+				replylink.Attach<int32>(sbmp->Area());
+				replylink.Attach<int32>(sbmp->AreaOffset());
+				replylink.Flush();
 			}
 			else
 			{
 				// alternatively, if something went wrong, we reply with SERVER_FALSE
-				write_port(replyport,SERVER_FALSE,NULL,0);
+				int32 code=SERVER_FALSE;
+				write_port(replyport,SERVER_FALSE,&code,sizeof(int32));
 			}
 			
 			break;
@@ -483,8 +491,8 @@ void ServerApp::_DispatchMessage(int32 code)
 			port_id replyport;
 			int32 bmp_id;
 			
-			ses->ReadInt32(&bmp_id);
-			ses->ReadInt32(&replyport);
+			msg->Read<int32>(&bmp_id);
+			msg->Read<int32>(&replyport);
 			
 			ServerBitmap *sbmp=_FindBitmap(bmp_id);
 			if(sbmp)
@@ -537,9 +545,9 @@ void ServerApp::_DispatchMessage(int32 code)
 			int32 workspace;
 			uint32 mode;
 			bool stick;
-			ses->ReadInt32(&workspace);
-			ses->ReadUInt32(&mode);
-			ses->ReadBool(&stick);
+			msg->Read<int32>(&workspace);
+			msg->Read<uint32>(&mode);
+			msg->Read<bool>(&stick);
 			
 			SetSpace(workspace,mode,ActiveScreen(),stick);
 
@@ -552,7 +560,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
-			ses->ReadInt32(&workspace);
+			msg->Read<int32>(&workspace);
 			SetWorkspace(workspace);
 			break;
 		}
@@ -581,7 +589,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached data
 			// 1) int32 port to reply to
 			int32 replyport;
-			ses->ReadInt32(&replyport);
+			msg->Read<int32>(&replyport);
 			
 			write_port(replyport,(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
 			break;
@@ -591,7 +599,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached data: 68 bytes of _appcursor data
 			
 			int8 cdata[68];
-			ses->ReadData(cdata,68);
+			msg->Read(cdata,68);
 			
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
@@ -616,10 +624,10 @@ void ServerApp::_DispatchMessage(int32 code)
 			int32 ctoken;
 			port_id replyport;
 			
-			ses->ReadBool(&sync);
-			ses->ReadInt32(&ctoken);
+			msg->Read<bool>(&sync);
+			msg->Read<int32>(&ctoken);
 			if(sync)
-				ses->ReadInt32(&replyport);
+				msg->Read<int32>(&replyport);
 			
 			cursormanager->SetCursor(ctoken);
 			
@@ -627,7 +635,8 @@ void ServerApp::_DispatchMessage(int32 code)
 			{
 				// the application is expecting a reply, but plans to do literally nothing
 				// with the data, so we'll just reuse the cursor token variable
-				write_port(replyport,AS_SERVER_SESSION, &ctoken, sizeof(int32));
+				ctoken=AS_SET_CURSOR_BCURSOR;
+				write_port(replyport,ctoken, &ctoken, sizeof(int32));
 			}
 			break;
 		}
@@ -640,17 +649,17 @@ void ServerApp::_DispatchMessage(int32 code)
 			port_id replyport;
 			int8 cdata[68];
 
-			ses->ReadData(cdata,68);
-			ses->ReadInt32(&replyport);
+			msg->Read(cdata,68);
+			msg->Read<int32>(&replyport);
 
 			_appcursor=new ServerCursor(cdata);
 			_appcursor->SetAppSignature(_signature.String());
 			cursormanager->AddCursor(_appcursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			PortLink link(replyport);
-			link.Attach<int32>(_appcursor->ID());
-			link.Flush();
+			BSession s(0,replyport);
+			s.WriteInt32(_appcursor->ID());
+			s.Sync();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
@@ -658,7 +667,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
 			int32 ctoken;
-			ses->ReadInt32(&ctoken);
+			msg->Read<int32>(&ctoken);
 			
 			if(_appcursor && _appcursor->ID()==ctoken)
 				_appcursor=NULL;
@@ -673,7 +682,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			scroll_bar_info sbi=GetScrollBarInfo();
 
 			port_id replyport;
-			ses->ReadInt32(&replyport);
+			msg->Read<int32>(&replyport);
 			
 			BSession replysession(0,replyport);
 			replysession.WriteData(&sbi,sizeof(scroll_bar_info));
@@ -685,7 +694,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
-			ses->ReadData(&sbi,sizeof(scroll_bar_info));
+			msg->Read<scroll_bar_info>(&sbi);
 			SetScrollBarInfo(sbi);
 			break;
 		}
@@ -695,7 +704,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// 1) port_id reply port - synchronous message
 
 			port_id replyport;
-			ses->ReadInt32(&replyport);
+			msg->Read<int32>(&replyport);
 
 			BSession replysession(0,replyport);
 			replysession.WriteBool(GetFFMouse());
@@ -707,7 +716,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
-			ses->ReadData(&sbi,sizeof(scroll_bar_info));
+			msg->Read<scroll_bar_info>(&sbi);
 			SetScrollBarInfo(sbi);
 			break;
 		}
@@ -716,7 +725,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
-			ses->ReadData(&mmode,sizeof(mode_mouse));
+			msg->Read<mode_mouse>(&mmode);
 			SetFFMouseMode(mmode);
 			break;
 		}
@@ -727,7 +736,7 @@ void ServerApp::_DispatchMessage(int32 code)
 			mode_mouse mmode=GetFFMouseMode();
 			
 			port_id replyport;
-			ses->ReadInt32(&replyport);
+			msg->Read<int32>(&replyport);
 			
 			BSession replysession(0,replyport);
 			replysession.WriteData(&mmode,sizeof(mode_mouse));
@@ -736,7 +745,7 @@ void ServerApp::_DispatchMessage(int32 code)
 		}
 		default:
 		{
-			STRACE(("ServerApp %s received unhandled message code offset %s\n",_signature.String(),MsgCodeToString(code)));
+			STRACE(("ServerApp %s received unhandled message code offset %s\n",_signature.String(),MsgCodeToString(msg->Code())));
 
 			break;
 		}

@@ -163,8 +163,8 @@ void CursorManager::RemoveAppCursors(const char *signature)
 	for(int32 i=0; i<_cursorlist->CountItems();i++)
 	{
 		temp=(ServerCursor*)_cursorlist->ItemAt(i);
-		if(temp && temp->_app_signature && 
-			strcmp(signature, temp->_app_signature)==0)
+		if(temp && temp->GetAppSignature() && 
+			strcmp(signature, temp->GetAppSignature())==0)
 		{
 			_cursorlist->RemoveItem(i);
 			delete temp;
@@ -486,11 +486,9 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_defaultcsr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
+
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -501,11 +499,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_textcsr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -516,11 +511,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_movecsr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -531,11 +523,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_dragcsr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -546,11 +535,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_resizecsr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -561,11 +547,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_resize_nwse_csr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -576,11 +559,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_resize_nesw_csr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -591,11 +571,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_resize_ns_csr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}
@@ -606,11 +583,8 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			_resize_ew_csr=cursor;
 
-			if(cursor->_app_signature)
-			{
-				delete cursor->_app_signature;
-				cursor->_app_signature=NULL;
-			}
+			if(cursor->GetAppSignature())
+				cursor->SetAppSignature("");
 			_cursorlist->RemoveItem(cursor);
 			break;
 		}

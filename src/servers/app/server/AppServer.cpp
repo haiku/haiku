@@ -242,12 +242,11 @@ int32 AppServer::PollerThread(void *data)
 				// 3) float - y coordinate of mouse click
 				// 4) int32 - buttons down
 				
-				// We're using
 				index=(int8*)msg->Buffer();
 				if(!index)
 					break;
 				
-				// Skip past the message code packaged in the BSession-style message
+				// Skip past the message code
 				index += sizeof(int32);
 				
 				// Time sent is not necessary for cursor processing.
@@ -654,18 +653,13 @@ void AppServer::Broadcast(int32 code)
 	int32 i;
 	ServerApp *app;
 	
-	int32		buffer[2];
-	buffer[0]	= 8; // 4 for buffer size + 4 for our message
-	buffer[1]	= AS_QUIT_APP;
-
 	acquire_sem(_applist_lock);
 	for(i=0;i<_applist->CountItems(); i++)
 	{
 		app=(ServerApp*)_applist->ItemAt(i);
 		if(!app)
 			continue;
-		//app->PostMessage(code);
-		app->PostMessage(AS_SERVER_SESSION, 2*sizeof(int32), (int8*)&buffer);
+		app->PostMessage(code, sizeof(int32), (int8*)&code);
 	}
 	release_sem(_applist_lock);
 }
