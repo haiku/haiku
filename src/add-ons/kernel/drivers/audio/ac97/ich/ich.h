@@ -31,7 +31,7 @@
 #include "debug.h"
 #include "hardware.h"
 
-#define VERSION_NUMBER "1.6d"
+#define VERSION_NUMBER "1.7"
 
 #if DEBUG
 	#define VERSION_DEBUG " (DEBUG)"
