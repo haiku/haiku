@@ -20,7 +20,6 @@
 #include <cbuf.h>
 #include <Errors.h>
 #include <int.h>
-#include <kerrors.h>
 #include <string.h>
 #include <stdlib.h>
 

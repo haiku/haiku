@@ -19,7 +19,6 @@
 #include <malloc.h>
 #include <user_runtime.h>
 #include <Errors.h>
-#include <kerrors.h>
 #include <kimage.h>
 #include <string.h>
 #include <stdio.h>
@@ -247,7 +246,7 @@ wait_for_team(team_id id, status_t *_returnCode)
 	if (team && team->main_thread)
 		thread = team->main_thread->id;
 	else
-		thread = ERR_INVALID_HANDLE;
+		thread = B_BAD_THREAD_ID;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -616,7 +615,7 @@ team_kill_team(team_id id)
 	if (team != NULL)
 		tid = team->main_thread->id;
 	else
-		retval = ERR_INVALID_HANDLE;
+		retval = B_BAD_THREAD_ID;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
