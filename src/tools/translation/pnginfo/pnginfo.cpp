@@ -83,7 +83,7 @@ pngcb_flush_data(png_structp ppng)
 void
 PrintPNGInfo(const char *path)
 {
-	printf("\n\n--- %s ---\n", path);
+	printf("\n--- %s ---\n", path);
 	
 	BFile *pfile;
 	pfile = new BFile(path, B_READ_ONLY);
@@ -101,10 +101,10 @@ PrintPNGInfo(const char *path)
 	}
 	if (!png_check_sig(buf, kSigSize)) {
 		// if first 8 bytes of stream don't match PNG signature bail
-		printf("File doesn't begin with PNG signature\n");
+		printf("Error: file doesn't begin with PNG signature\n");
 		return;
 	}
-	
+
 	// use libpng to get info about the file
 	png_structp ppng = NULL;
 	png_infop pinfo = NULL;
@@ -118,11 +118,13 @@ PrintPNGInfo(const char *path)
 		if (!pinfo)
 			break;
 		// set error handling
-		if (setjmp(png_jmpbuf(ppng)))
+		if (setjmp(png_jmpbuf(ppng))) {
 			// When an error occurs in libpng, it uses
 			// the longjmp function to continue execution
 			// from this point
+			printf("Error: error in libpng function\n");
 			break;
+		}
 		
 		// set read callback function
 		png_set_read_fn(ppng, static_cast<void *>(pio), pngcb_read_data);
@@ -130,12 +132,12 @@ PrintPNGInfo(const char *path)
 		// Read in PNG image info
 		png_set_sig_bytes(ppng, 8);
 		png_read_info(ppng, pinfo);
-			
+
 		png_uint_32 width, height;
 		int bit_depth, color_type, interlace_type, compression_type, filter_type;
 		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
 			&interlace_type, &compression_type, &filter_type);
-			
+
 		printf("                   width: %u\n", width);
 		printf("                  height: %u\n", height);
 		printf("               row bytes: %u\n", pinfo->rowbytes);
