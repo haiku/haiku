@@ -682,10 +682,21 @@ BTranslationUtils::WriteStyledEditFile(BTextView *fromView, BFile *intoFile)
 	if (kpTextData == NULL && textLength != 0)
 		return B_ERROR;
 	
+	// move to the start of the file if not already there
+	status_t result = B_OK;
+	result = intoFile->Seek(0,SEEK_SET);
+	if (result != B_OK)
+		return result;	
+	
 	// Write plain text data to file
 	ssize_t amtWritten = intoFile->Write(kpTextData, textLength);
 	if (amtWritten != textLength)
 		return B_ERROR;
+		
+	// truncate any extra text
+	result = intoFile->SetSize(textLength);
+	if (result != B_OK)
+		return result;
 	
 	// Write attributes
 	// BEOS:TYPE
