@@ -113,7 +113,7 @@ BEOS_APPS="MiniTerminal"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so \
-	libtextencoding.so libz.so libfreetype.so libpng.so"
+	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so"
 
 BEOS_SYSTEM_SERVERS="registrar debug_server syslog_daemon media_server \
 	media_addon_server input_server app_server"
