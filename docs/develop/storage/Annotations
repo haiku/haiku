@@ -442,3 +442,33 @@ Description: This code:
                if (!error)
                  error = mime.GetSupportingApps(&msg);
 
+
+OS:          BeOS R5
+Module:      BNodeInfo
+Location:    {Set,Get}AppHint()
+Description: The file attribute the path of the "app hint" application
+             ("BEOS:PPATH") is of type B_MIME_STRING_TYPE instead of
+             B_STRING_TYPE.
+             
+
+OS:          BeOS R5
+Module:      BNodeInfo
+Location:    GetType()
+Description: When the string stored in the "BEOS:TYPE" attribute is longer
+             than B_MIME_TYPE_LENGTH, the returned string is one character
+             shorter than the actual string.
+             
+
+OS:          BeOS R5
+Module:      BNodeInfo
+Location:    GetIcon()
+Description: Crashes when passing a NULL BBitmap.
+             
+
+OS:          BeOS R5
+Module:      BNodeInfo
+Location:    GetIcon()
+Description: Crashes when getting B_LARGE_ICON and passing a BBitmap with
+             B_RGB32 color space. B_MINI_ICON works just fine.
+             
+
