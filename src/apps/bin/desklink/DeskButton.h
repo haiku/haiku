@@ -24,7 +24,7 @@ class DeskButton : public BView {
 public:
 	DeskButton(BRect frame, entry_ref *ref, const char *name, BList &titleList, BList &actionList,
 		uint32 resizeMask = B_FOLLOW_ALL, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED);
+		uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 		
 	DeskButton(BMessage *);
 		// BMessage * based constructor needed to support archiving

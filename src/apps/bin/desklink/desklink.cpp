@@ -59,7 +59,7 @@ class MediaReplicant : public BView {
 public:
 	MediaReplicant(BRect frame, const char *name,
 		uint32 resizeMask = B_FOLLOW_ALL, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED);
+		uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 		
 	MediaReplicant(BMessage *);
 		// BMessage * based constructor needed to support archiving
@@ -419,7 +419,7 @@ main(int, char **argv)
 		entry.GetRef(&ref);
 		
 		status_t err;
-		err = BDeskbar().AddItem(new DeskButton(BRect(0, 0, 16, 16), &ref, "DeskButton",
+		err = BDeskbar().AddItem(new DeskButton(BRect(0, 0, 15, 15), &ref, "DeskButton",
 			titleList, actionList));
 	
 		if(err!=B_OK) {
