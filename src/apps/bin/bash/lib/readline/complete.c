@@ -137,7 +137,7 @@ int _rl_complete_mark_directories = 1;
    readline-4.2a is disabled, and symlinks that point to directories have
    a slash appended (subject to the value of _rl_complete_mark_directories).
    This is user-settable via the mark-symlinked-directories variable. */
-int _rl_complete_mark_symlink_dirs = 0;
+int _rl_complete_mark_symlink_dirs = 1;
 
 /* If non-zero, completions are printed horizontally in alphabetical order,
    like `ls -x'. */
