@@ -74,7 +74,7 @@ draw_menu(Menu *menu)
 
 	MenuItemIterator iterator = menu->ItemIterator();
 	MenuItem *item;
-	int32 i = 0, selected = -1;
+	int32 i = 0;
 
 	while ((item = iterator.Next()) != NULL) {
 		if (item->Type() == MENU_ITEM_SEPARATOR) {
@@ -83,12 +83,11 @@ draw_menu(Menu *menu)
 			continue;
 		}
 
-		if (item->IsSelected())
-			selected = i;
-
 		print_item_at(i++, item, false);
 	}
 
+	int32 selected = -1;
+	menu->FindSelected(&selected);
 	printf("\n[%ld]? ", selected);
 }
 
@@ -170,6 +169,7 @@ platform_run_menu(Menu *menu)
 			selected = atoi(buffer);
 
 		item = menu->ItemAt(selected);
+		item->Select(true);
 
 		// leave the menu
 		if (item->Submenu() != NULL) {
