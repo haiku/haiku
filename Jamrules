@@ -2003,3 +2003,127 @@ rule FT2_LinkLibrary
 	SharedLibraryFromObjects $(1) : $(objects) ;
 }
 
+#-------------------------------------------------------------------------------
+# Packages for OBOS alpha/beta testers
+#-------------------------------------------------------------------------------
+
+rule Copy
+{
+	LocalDepends $(<) : $(>) ;
+	SEARCH on $(>) = $(SEARCH_SOURCE) ;
+}
+
+actions Copy
+{
+	cp -dp $(>) $(<) ;
+    if [ -f $(>) ] ; then copyattr $(>) $(<) ; fi ;
+}
+
+rule Packages
+{
+	local packagenames = $(1) ;
+	local packagefiles = $(2) ;
+	local path = $(3) ;
+	for name in $(packagenames) {
+		Package $(name) : $(packagefiles) : $(path) ;
+    }
+}
+
+OBOS_PACKAGE_DIR ?= [ FDirName $(OBOS_TOP) packages $(OBOS_TARGET) ] ;
+OBOS_PACKAGE_OBJECT_DIR ?= [ FDirName $(OBOS_OBJECT_TARGET) packages ] ;
+
+rule Package
+{
+	local packagename = $(1) ;
+    local packagefiles = $(2) ;
+	local path = $(3) ;
+
+	NotFile $(packagename) ;
+	Depends packages : $(packagename) ;
+
+	local packagezip = $(packagename).zip ;
+	MakeLocate $(packagezip) : $(OBOS_PACKAGE_DIR) ;
+
+	local packagedir = [ FDirName $(OBOS_PACKAGE_DIR) $(packagename) ] ;
+
+    local installscript = install.sh ;
+	local packageinstallscript = $(installscript:G=$(packagedir)) ;
+	MakeLocate $(packageinstallscript) : $(packagedir) ;
+
+    local installzip = install.zip ;
+	local packageinstallzip = $(installzip:G=$(packagedir)) ;
+	MakeLocate $(packageinstallzip) : $(packagedir) ;
+
+    local packageobjectdir = [ FDirName $(OBOS_PACKAGE_OBJECT_DIR) $(packagename) ] ;
+	local packagefiledir =  [ FDirName $(packageobjectdir) $(path) ] ;
+    local packagefileinstallzip = $(installzip:G=$(packageobjectdir)) ;
+	MakeLocate $(packagefileinstallzip) : $(packageobjectdir) ;
+    for file in $(packagefiles) {
+		if $(3[0]) = "boot" {
+			local packagefile = $(file:G=$(packagefiledir)) ;
+			MakeLocate $(packagefile) : $(packagefiledir) ;
+			Copy $(packagefile) : $(file) ;
+			Clean cleanPackages : $(packagefile) ;
+			PackageInstallZip $(packagefileinstallzip) : $(packagefile) ;
+		} else {
+			local packagefile = $(file:G=$(packagedir)) ;
+			MakeLocate $(packagefile) : $(packagedir) ;
+			Copy $(packagefile) : $(file) ;
+			Clean cleanPackages : $(packagefile) ;
+			Depends $(packagezip) : $(packagefile) ;
+		}
+	}
+	PackageInstallScript $(packageinstallscript) : $(packagedir) ;
+	LinkInstallZip $(packageinstallzip) : $(packagefileinstallzip) ;
+	Depends $(packagename) : $(packagezip) ;
+	PackageZip $(packagezip) :
+		$(packagedir) $(packageinstallscript) $(packageinstallzip) ;
+}
+
+rule PackageZip
+{
+	Depends $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together PackageZip {
+	cd $(OBOS_PACKAGE_DIR) ;
+	zip -rq $(1:BS) $(2[1]:BS) ;
+}
+
+rule PackageInstallScript
+{
+	MakeLocate $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together PackageInstallScript
+{
+	
+	echo "#!/bin/sh" > $(1) ;
+    echo "unzip -d / install.zip" >> $(1) ;
+	chmod 755 $(1) ;
+}
+
+rule PackageInstallZip
+{
+	Depends $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together PackageInstallZip
+{
+	cd $(1:P) ;
+	zip -rq $(1:BS) boot ;
+}
+
+rule LinkInstallZip
+{
+	Depends $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together LinkInstallZip
+{
+	ln -sf `pwd`/$(2) $(1) ;
+}
