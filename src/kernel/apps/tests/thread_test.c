@@ -1,3 +1,9 @@
+/*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -17,7 +23,9 @@ struct the_test {
 	sem_id the_lock;	
 };
 
-static int32 counter_thread(void *data)
+
+static int32
+counter_thread(void *data)
 {
 	struct the_test *tt = (struct the_test*)data;
 		
@@ -32,11 +40,12 @@ static int32 counter_thread(void *data)
 }
 
 
-static int32 priority_test(void *data)
+static int32
+priority_test(void *data)
 {
 	int i;
 	
-	for (i=0; i<6; i++) {
+	for (i = 0; i < 6; i++) {
 		printf("%s: %d\n", (char *)data, i);
 //		sys_snooze(1000);
 	}
@@ -44,14 +53,15 @@ static int32 priority_test(void *data)
 }
 
 
-static int32 communication_test(void *data)
+static int32
+communication_test(void *data)
 {
 	int times = (int)data;
 	int i, code;
 	char buffer[1024];
 	thread_id sender;
 	
-	for (i=0; i<times; i++) {
+	for (i = 0; i < times; i++) {
 		code = receive_data(&sender, (void *)buffer, sizeof(buffer));
 		printf(" -> received (%d): \"%s\"\n", code, buffer);
 	}
@@ -59,7 +69,8 @@ static int32 communication_test(void *data)
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	thread_id t[THREADS];
 	sem_id lock;
@@ -75,8 +86,8 @@ int main(int argc, char **argv)
 	       "=============================\n");
 
 	lock = create_sem(1, "test_lock");
-	
-	for (i=0;i<THREADS;i++) {		
+
+	for (i = 0; i < THREADS; i++) {		
 		struct the_test *my_test = (struct the_test*)malloc(sizeof(struct the_test));
 		my_test->the_lock = lock;
 		my_test->current_val = &current_val;
@@ -89,7 +100,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	sys_wait_on_thread(t[THREADS - 1], NULL);
+	wait_for_thread(t[THREADS - 1], NULL);
 	
 	printf("Test value = %d vs expected of %d\n", current_val, expected);
 	
@@ -105,24 +116,24 @@ int main(int argc, char **argv)
 	printf("Snoozing...\n");
 	snooze(100000);
 	printf("Waiting for threads...");
-	sys_wait_on_thread(t[0], NULL);
+	wait_for_thread(t[0], NULL);
 	printf("1, ");
-	sys_wait_on_thread(t[1], NULL);
+	wait_for_thread(t[1], NULL);
 	printf("2, ");
-	sys_wait_on_thread(t[2], NULL);
-	
+	wait_for_thread(t[2], NULL);
+
 	printf("3.\nDone. Spawning commthread...\n");
 	t[0] = spawn_thread(communication_test, "commthread", B_NORMAL_PRIORITY, (void *)5);
 	printf("Spawned. Starting communication...\n");
 	resume_thread(t[0]);
 	
-	for (i=0; i<5; i++) {
+	for (i = 0; i < 5; i++) {
 		printf("sending");
 		send_data(t[0], i, comm_test[i], strlen(comm_test[i]) + 1);
 		// Give time to the commthread to display info
 		snooze(10000);
 	}
-	sys_wait_on_thread(t[0], NULL);
-	
+	wait_for_thread(t[0], NULL);
+
 	return 0;
 }

@@ -26,40 +26,38 @@ main(void)
 	}
 
 	rc = fstat(fd, &stat);
-	if(rc < 0) {
+	if (rc < 0) {
 		printf("Cookie monster was here!!!\n");
-		sys_exit(1);
+		exit(1);
 	}
 
-	buf= malloc(stat.st_size + 1);
+	buf = malloc(stat.st_size + 1);
 	
 	read(fd, buf, stat.st_size);
-	buf[stat.st_size]= 0;
+	buf[stat.st_size] = 0;
 	close(fd);
 
-	found= 0;
-	for(i= 0; i< stat.st_size; i++) {
-		if(strncmp(buf+i, "#@#", 3)== 0) {
-			found+= 1;
-		}
+	found = 0;
+	for (i = 0; i < stat.st_size; i++) {
+		if (!strncmp(buf + i, "#@#", 3))
+			found += 1;
 	}
 
-	found = 1 + (sys_system_time() % found);
+	found = 1 + (system_time() % found);
 
-	for(i = 0; i < stat.st_size; i++) {
-		if(strncmp(buf+i, "#@#", 3)== 0) {
-			found-= 1;
-		}
-		if(found== 0) {
+	for (i = 0; i < stat.st_size; i++) {
+		if (!strncmp(buf + i, "#@#", 3))
+			found -= 1;
+
+		if (found == 0) {
 			unsigned j;
 
-			for(j= i+1; j< stat.st_size; j++) {
-				if(strncmp(buf+j, "#@#", 3)== 0) {
-					buf[j]= 0;
-				}
+			for (j = i + 1; j < stat.st_size; j++) {
+				if (!strncmp(buf + j, "#@#", 3))
+					buf[j] = 0;
 			}
 
-			printf("%s\n", buf+i+3);
+			printf("%s\n", buf + i + 3);
 			break;
 		}
 	}
