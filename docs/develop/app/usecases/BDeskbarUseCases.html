@@ -1,5 +1,5 @@
 <HTML>
-<!-- $Id: BDeskbarUseCases.html,v 1.1 2002/09/07 03:05:55 jrand Exp $ -->
+<!-- $Id: BDeskbarUseCases.html,v 1.2 2002/09/08 05:03:36 jrand Exp $ -->
 <HEAD>
 <TITLE>BDeskbar Use Cases and Implementation Details</TITLE>
 </HEAD>
@@ -56,23 +56,126 @@ persists.</P></LI>
 
 <LI><P><B>Get Item Info 2:</B> </P></LI>
 
-<LI><P><B>Frame:</B> </P></LI>
+<LI><P><B>Frame:</B> The Frame() member function returns a BRect which describes the location and
+size of the deskbar on the screen.</P></LI>
 
-<LI><P><B>Location:</B> </P></LI>
+<LI><P><B>Location:</B> The Location() member function returns one of B_DESKBAR_TOP,
+B_DESKBAR_BOTTOM, B_DESKBAR_LEFT_BOTTOM, B_DESKBAR_RIGHT_BOTTOM, B_DESKBAR_LEFT_TOP or
+B_DESKBAR_RIGHT_TOP.  The return value describes where the deskbar currently is located.  Also,
+the Location() member function takes an optional argument which is a pointer to a boolean.
+If supplied, the boolean which is pointed to is set to true if the deskbar is expanded and false
+otherwise.  A deskbar can only be contracted (ie not expanded) when in the left or right top
+position.</P></LI>
 
-<LI><P><B>Is Expanded:</B> </P></LI>
+<LI><P><B>Is Expanded:</B> The IsExpanded() member function returns true if the deskbar is
+expanded and false if it is contracted.  Note, the deskbar can only be contracted when in
+left or right top position.</P></LI>
 
-<LI><P><B>Set Location:</B> </P></LI>
+<LI><P><B>Set Location:</B> The SetLocation() member function takes the same values returned
+by the Location() member.  The value passed in the first argument sets the position of the deskbar.
+If the optional second argument is supplied, it is a boolean which indicates whether or not the
+deskbar is expanded (true) or contracted (false).  Note, the deskbar can only be contracted when in
+left or right top position.</P></LI>
 
-<LI><P><B>Expand:</B> </P></LI>
+<LI><P><B>Expand:</B> The Expand() member function takes a single boolean argument which sets the
+deskbar to expanded (true) or contracted (false) mode.  Note, the deskbar can only be contracted
+when in left or right top position.</P></LI>
 
 </OL>
 
 <A NAME="implement"></A><H2>BDeskbar Implementation:</H2>
 
-<P>Internally, the BDeskbar uses a BMessenger to communicate with the deskbar itself.  The
-actual messages used to perform its tasks will be documented here once they are determined.
-The source code from the OpenTracker project will be used as a reference for this effort.</P>
+<P>Internally, the BDeskbar uses a BMessenger to communicate with the deskbar itself.  
+The source code from the OpenTracker project will be used as a reference for this effort.
+You can find the deskbar source code here:</P>
+
+<BLOCKQUOTE>
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/">http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/</A>
+</BLOCKQUOTE>
+
+<P>Specifically, the code which handles communicating with the BDeskbar class can be found
+here:</P>
+
+<BLOCKQUOTE>
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&amp;content-type=text/vnd.viewcvs-markup</A>
+</BLOCKQUOTE>
+
+<P>The following describes the messages used to communicate between BDeskbar and the deskbar 
+itself.</P>
+
+
+<H3>Frame:</H3>
+
+<P>The Frame() member sends a standard scripting message to get the frame from the deskbar.  It
+sends a B_GET_PROPERTY message to the deskbar asking for the "Frame" property specifying the
+window by name.  The window name is "Deskbar".</P>
+
+<P>The response from deskbar has a what code of B_REPLY and a BRect describing the frame in a
+value called "result".  This is standard BeOS scripting.</P>
+
+
+<H3>Location:</H3>
+
+<P>The Location() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'gloc';    // This means get location
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'rply';                              // This means reply
+theMsg.AddInt32("location", DeskbarLocation());    // This is the number which represents the location of the deskbar
+theMsg.AddBool("expanded", Expanded());            // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+
+<H3>IsExpanded:</H3>
+
+<P>The IsExpanded() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'gexp';    // This means get expanded state
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'rply';                      // This means reply
+theMsg.AddBool("expanded", Expanded());    // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+
+<H3>SetLocation:</H3>
+
+<P>The SetLocation() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'sloc';                        // This means set location
+theMsg.AddInt32("location", newLocation);    // This is the number which represents the location of the deskbar
+theMsg.AddBool("expand", isExpanded);        // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+<P>The deskbar does not send a reply to this message.</P>
+
+
+<H3>Expand:</H3>
+
+<P>The Expand() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'sexp';                     // This means set expanded state
+theMsg.AddBool("expand", isExpanded);     // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+<P>The deskbar does not send a reply to this message.</P>
 
 </BODY>
 </HTML>
