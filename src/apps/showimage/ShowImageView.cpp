@@ -255,6 +255,7 @@ ShowImageView::Notify(const char* status)
 	if (status != NULL) {
 		msg.AddString("status", status);
 	}
+	msg.AddInt32("colors", fBitmap->ColorSpace());
 	BMessenger msgr(Window());
 	msgr.SendMessage(&msg);
 

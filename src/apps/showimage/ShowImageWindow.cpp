@@ -545,6 +545,13 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 					pcurItem->SetMarked(true);
 				}
 			}
+			
+			// Disable the Invert menu item if the bitmap color space
+			// is B_CMAP8. (B_CMAP8 is currently unsupported by the
+			// invert algorithm)
+			color_space colors = B_NO_COLOR_SPACE;
+			pmsg->FindInt32("colors", reinterpret_cast<int32 *>(&colors));
+			EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
 				
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
