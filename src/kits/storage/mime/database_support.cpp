@@ -251,7 +251,7 @@ status_t
 read_mime_attr_string(const char *type, const char *attr, BString *str)
 {
 	BNode node;
-	ssize_t err = (type && attr && str ? B_OK : B_BAD_VALUE);
+	status_t err = (type && attr && str ? B_OK : B_BAD_VALUE);
 	if (!err)
 		err = open_type(type, &node);	
 	if (!err) 
