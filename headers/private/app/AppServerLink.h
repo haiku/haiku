@@ -35,7 +35,8 @@
 // System Includes -------------------------------------------------------------
 
 // Project Includes ------------------------------------------------------------
-#include <PortLink.h>
+#include <Session.h>
+#include <OS.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -47,11 +48,13 @@
 
 namespace BPrivate {
 
-class BAppServerLink : public PortLink
+class BAppServerLink : public BSession
 {
 public:
 	BAppServerLink(void);
 	~BAppServerLink(void);
+private:
+	port_id receiver;
 };
 
 }	// namespace BPrivate

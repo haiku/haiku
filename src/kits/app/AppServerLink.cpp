@@ -44,16 +44,19 @@
 namespace BPrivate {
 
 BAppServerLink::BAppServerLink(void)
- : PortLink(0L)
+ : BSession(0L,0L)
 {
 	be_app->Lock();
-	SetPort(be_app->fServerFrom);
+	receiver=create_port(100,"AppServerLink reply port");
+	SetSendPort(be_app->fServerFrom);
+	SetRecvPort(receiver);
 }
 
 //------------------------------------------------------------------------------
 
 BAppServerLink::~BAppServerLink()
 {
+	delete_port(receiver);
 	be_app->Unlock();
 }
 

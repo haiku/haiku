@@ -62,12 +62,11 @@ BCursor::BCursor(const void *cursorData)
 	
 	// Send data directly to server
 	BPrivate::BAppServerLink serverlink;
-	PortMessage pmsg;
 	
-	serverlink.SetOpCode(AS_CREATE_BCURSOR);
-	serverlink.Attach((void *)cursorData,68);
-	serverlink.FlushWithReply(&pmsg);
-	pmsg.Read(&m_serverToken);
+	serverlink.WriteInt32(AS_CREATE_BCURSOR);
+	serverlink.WriteData(cursorData,68);
+	serverlink.Sync();
+	serverlink.ReadInt32(&m_serverToken);
 }
 //------------------------------------------------------------------------------
 // undefined on BeOS
@@ -80,9 +79,9 @@ BCursor::~BCursor()
 {
 	// Notify server to deallocate server-side objects for this cursor
 	BPrivate::BAppServerLink serverlink;
-	serverlink.SetOpCode(AS_DELETE_BCURSOR);
-	serverlink.Attach(m_serverToken);
-	serverlink.Flush();
+	serverlink.WriteInt32(AS_DELETE_BCURSOR);
+	serverlink.WriteInt32(m_serverToken);
+	serverlink.Sync();
 }
 //------------------------------------------------------------------------------
 // not implemented on BeOS
