@@ -27,4 +27,4 @@ LinkSharedOSLibs <userland>disk_scanner : <installed>DiskScannerTest ;
 
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
-#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
+SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
