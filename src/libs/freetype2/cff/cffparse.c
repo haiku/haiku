@@ -64,11 +64,11 @@
 
 
   FT_LOCAL_DEF( void )
-  CFF_Parser_Init( CFF_Parser  parser,
+  cff_parser_init( CFF_Parser  parser,
                    FT_UInt     code,
                    void*       object )
   {
-    FT_MEM_SET( parser, 0, sizeof ( *parser ) );
+    FT_MEM_ZERO( parser, sizeof ( *parser ) );
 
     parser->top         = parser->stack;
     parser->object_code = code;
@@ -244,7 +244,7 @@
       if ( exp_sign )
         exp = -exp;
 
-      power_ten += exp;
+      power_ten += (FT_Int)exp;
     }
 
     /* raise to power of ten if needed */
@@ -480,7 +480,7 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  CFF_Parser_Run( CFF_Parser  parser,
+  cff_parser_run( CFF_Parser  parser,
                   FT_Byte*    start,
                   FT_Byte*    limit )
   {
@@ -542,16 +542,15 @@
         const CFF_Field_Handler*  field;
 
 
-        /* first of all, a trivial check */
-        if ( num_args < 1 )
-          goto Stack_Underflow;
-
         *parser->top = p;
         code = v;
         if ( v == 12 )
         {
           /* two byte operator */
           p++;
+          if ( p >= limit )
+            goto Syntax_Error;
+
           code = 0x100 | p[0];
         }
         code = code | parser->object_code;
@@ -564,6 +563,11 @@
             FT_Long   val;
             FT_Byte*  q = (FT_Byte*)parser->object + field->offset;
 
+
+            /* check that we have enough arguments -- except for */
+            /* delta encoded arrays, which can be empty          */
+            if ( field->kind != cff_kind_delta && num_args < 1 )
+              goto Stack_Underflow;
 
             switch ( field->kind )
             {

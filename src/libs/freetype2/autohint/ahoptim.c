@@ -157,8 +157,8 @@
 
 
   static int
-  valid_stem_segments( AH_Segment*  seg1,
-                       AH_Segment*  seg2 )
+  valid_stem_segments( AH_Segment  seg1,
+                       AH_Segment  seg2 )
   {
     return seg1->serif == 0                   &&
            seg2                               &&
@@ -173,15 +173,15 @@
   static int
   optim_compute_stems( AH_Optimizer*  optimizer )
   {
-    AH_Outline*  outline = optimizer->outline;
-    FT_Fixed     scale;
-    FT_Memory    memory  = optimizer->memory;
-    FT_Error     error   = 0;
-    FT_Int       dimension;
-    AH_Edge*     edges;
-    AH_Edge*     edge_limit;
-    AH_Stem**    p_stems;
-    FT_Int*      p_num_stems;
+    AH_Outline  outline = optimizer->outline;
+    FT_Fixed    scale;
+    FT_Memory   memory  = optimizer->memory;
+    FT_Error    error   = 0;
+    FT_Int      dimension;
+    AH_Edge     edges;
+    AH_Edge     edge_limit;
+    AH_Stem**   p_stems;
+    FT_Int*     p_num_stems;
 
 
     edges      = outline->horz_edges;
@@ -195,13 +195,13 @@
     {
       AH_Stem*  stems     = 0;
       FT_Int    num_stems = 0;
-      AH_Edge*  edge;
+      AH_Edge   edge;
 
 
       /* first of all, count the number of stems in this direction */
       for ( edge = edges; edge < edge_limit; edge++ )
       {
-        AH_Segment*  seg = edge->first;
+        AH_Segment  seg = edge->first;
 
 
         do
@@ -226,8 +226,8 @@
         stem = stems;
         for ( edge = edges; edge < edge_limit; edge++ )
         {
-          AH_Segment*  seg = edge->first;
-          AH_Segment*  seg2;
+          AH_Segment  seg = edge->first;
+          AH_Segment  seg2;
 
 
           do
@@ -235,8 +235,8 @@
             seg2 = seg->link;
             if ( valid_stem_segments( seg, seg2 ) )
             {
-              AH_Edge*  edge1 = seg->edge;
-              AH_Edge*  edge2 = seg2->edge;
+              AH_Edge  edge1 = seg->edge;
+              AH_Edge  edge2 = seg2->edge;
 
 
               stem->edge1  = edge1;
@@ -721,8 +721,8 @@
       stem->edge1->pos = pos;
       stem->edge2->pos = pos + stem->width;
 
-      stem->edge1->flags |= ah_edge_done;
-      stem->edge2->flags |= ah_edge_done;
+      stem->edge1->flags |= AH_EDGE_DONE;
+      stem->edge2->flags |= AH_EDGE_DONE;
     }
   }
 
@@ -768,8 +768,8 @@
       stem->edge1->pos = pos;
       stem->edge2->pos = pos + stem->width;
 
-      stem->edge1->flags |= ah_edge_done;
-      stem->edge2->flags |= ah_edge_done;
+      stem->edge1->flags |= AH_EDGE_DONE;
+      stem->edge2->flags |= AH_EDGE_DONE;
     }
   }
 
@@ -808,13 +808,13 @@
   /* loads the outline into the optimizer */
   int
   AH_Optimizer_Init( AH_Optimizer*  optimizer,
-                     AH_Outline*    outline,
+                     AH_Outline     outline,
                      FT_Memory      memory )
   {
     FT_Error  error;
 
 
-    FT_MEM_SET( optimizer, 0, sizeof ( *optimizer ) );
+    FT_MEM_ZERO( optimizer, sizeof ( *optimizer ) );
     optimizer->outline = outline;
     optimizer->memory  = memory;
 

@@ -21,6 +21,7 @@
 
 
 #include <ft2build.h>
+#include FT_SYSTEM_H
 #include FT_INTERNAL_OBJECTS_H
 
 
@@ -387,7 +388,7 @@ FT_BEGIN_HEADER
   FT_BASE( void )
   FT_Stream_ReleaseFrame( FT_Stream  stream,
                           FT_Byte**  pbytes );
-             
+
   /* read a byte from an entered frame */
   FT_BASE( FT_Char )
   FT_Stream_GetChar( FT_Stream  stream );

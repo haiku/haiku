@@ -98,14 +98,14 @@
       tag   = FT_CURVE_TAG( tags[0] );
 
       /* A contour cannot start with a cubic control point! */
-      if ( tag == FT_Curve_Tag_Cubic )
+      if ( tag == FT_CURVE_TAG_CUBIC )
         goto Invalid_Outline;
 
       /* check first point to determine origin */
-      if ( tag == FT_Curve_Tag_Conic )
+      if ( tag == FT_CURVE_TAG_CONIC )
       {
         /* first point is conic control.  Yes, this happens. */
-        if ( FT_CURVE_TAG( outline->tags[last] ) == FT_Curve_Tag_On )
+        if ( FT_CURVE_TAG( outline->tags[last] ) == FT_CURVE_TAG_ON )
         {
           /* start at last point if it is on the curve */
           v_start = v_last;
@@ -137,7 +137,7 @@
         tag = FT_CURVE_TAG( tags[0] );
         switch ( tag )
         {
-        case FT_Curve_Tag_On:  /* emit a single line_to */
+        case FT_CURVE_TAG_ON:  /* emit a single line_to */
           {
             FT_Vector  vec;
 
@@ -151,7 +151,7 @@
             continue;
           }
 
-        case FT_Curve_Tag_Conic:  /* consume conic arcs */
+        case FT_CURVE_TAG_CONIC:  /* consume conic arcs */
           v_control.x = SCALED( point->x );
           v_control.y = SCALED( point->y );
 
@@ -169,7 +169,7 @@
             vec.x = SCALED( point->x );
             vec.y = SCALED( point->y );
 
-            if ( tag == FT_Curve_Tag_On )
+            if ( tag == FT_CURVE_TAG_ON )
             {
               error = func_interface->conic_to( &v_control, &vec, user );
               if ( error )
@@ -177,7 +177,7 @@
               continue;
             }
 
-            if ( tag != FT_Curve_Tag_Conic )
+            if ( tag != FT_CURVE_TAG_CONIC )
               goto Invalid_Outline;
 
             v_middle.x = ( v_control.x + vec.x ) / 2;
@@ -194,13 +194,13 @@
           error = func_interface->conic_to( &v_control, &v_start, user );
           goto Close;
 
-        default:  /* FT_Curve_Tag_Cubic */
+        default:  /* FT_CURVE_TAG_CUBIC */
           {
             FT_Vector  vec1, vec2;
 
 
             if ( point + 1 > limit                             ||
-                 FT_CURVE_TAG( tags[1] ) != FT_Curve_Tag_Cubic )
+                 FT_CURVE_TAG( tags[1] ) != FT_CURVE_TAG_CUBIC )
               goto Invalid_Outline;
 
             point += 2;
@@ -270,12 +270,12 @@
 
     anoutline->n_points    = (FT_UShort)numPoints;
     anoutline->n_contours  = (FT_Short)numContours;
-    anoutline->flags      |= ft_outline_owner;
+    anoutline->flags      |= FT_OUTLINE_OWNER;
 
     return FT_Err_Ok;
 
   Fail:
-    anoutline->flags |= ft_outline_owner;
+    anoutline->flags |= FT_OUTLINE_OWNER;
     FT_Outline_Done_Internal( memory, anoutline );
 
     return error;
@@ -334,7 +334,7 @@
       if ( end != n_points - 1 )
         goto Bad;
 
-      /* XXX: check the that array */
+      /* XXX: check the tags array */
       return 0;
     }
 
@@ -366,11 +366,11 @@
     FT_MEM_COPY( target->contours, source->contours,
                  source->n_contours * sizeof ( FT_Short ) );
 
-    /* copy all flags, except the `ft_outline_owner' one */
-    is_owner      = target->flags & ft_outline_owner;
+    /* copy all flags, except the `FT_OUTLINE_OWNER' one */
+    is_owner      = target->flags & FT_OUTLINE_OWNER;
     target->flags = source->flags;
 
-    target->flags &= ~ft_outline_owner;
+    target->flags &= ~FT_OUTLINE_OWNER;
     target->flags |= is_owner;
 
     return FT_Err_Ok;
@@ -383,7 +383,7 @@
   {
     if ( outline )
     {
-      if ( outline->flags & ft_outline_owner )
+      if ( outline->flags & FT_OUTLINE_OWNER )
       {
         FT_FREE( outline->points   );
         FT_FREE( outline->tags     );
@@ -535,7 +535,7 @@
       first = last + 1;
     }
 
-    outline->flags ^= ft_outline_reverse_fill;
+    outline->flags ^= FT_OUTLINE_REVERSE_FILL;
   }
 
 
@@ -576,7 +576,7 @@
 
       /* now, look for another renderer that supports the same */
       /* format                                                */
-      renderer = FT_Lookup_Renderer( library, ft_glyph_format_outline,
+      renderer = FT_Lookup_Renderer( library, FT_GLYPH_FORMAT_OUTLINE,
                                      &node );
       update   = 1;
     }
@@ -608,8 +608,10 @@
     params.target = abitmap;
     params.flags  = 0;
 
-    if ( abitmap->pixel_mode == ft_pixel_mode_grays )
-      params.flags |= ft_raster_flag_aa;
+    if ( abitmap->pixel_mode == FT_PIXEL_MODE_GRAY  ||
+         abitmap->pixel_mode == FT_PIXEL_MODE_LCD   ||
+         abitmap->pixel_mode == FT_PIXEL_MODE_LCD_V )
+      params.flags |= FT_RASTER_FLAG_AA;
 
     return FT_Outline_Render( library, outline, &params );
   }
@@ -628,9 +630,9 @@
       return;
 
     xz = FT_MulFix( vector->x, matrix->xx ) +
-         FT_MulFix( vector->y, matrix->yx );
+         FT_MulFix( vector->y, matrix->xy );
 
-    yz = FT_MulFix( vector->x, matrix->xy ) +
+    yz = FT_MulFix( vector->x, matrix->yx ) +
          FT_MulFix( vector->y, matrix->yy );
 
     vector->x = xz;

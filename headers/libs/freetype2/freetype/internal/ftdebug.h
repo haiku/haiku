@@ -13,6 +13,11 @@
 /*  this file you indicate that you have read the license and              */
 /*  understand and accept it fully.                                        */
 /*                                                                         */
+/*                                                                         */
+/*  IMPORTANT: A description of FreeType's debugging support can be        */
+/*             found in "docs/DEBUG.TXT".  Read it if you need to use or   */
+/*             understand this code.                                       */
+/*                                                                         */
 /***************************************************************************/
 
 
@@ -47,10 +52,10 @@ FT_BEGIN_HEADER
 
 #define FT_TRACE_DEF( x )  trace_ ## x ,
 
-  /* defining the enumeration */ 
+  /* defining the enumeration */
   typedef enum
   {
-#include FT_INTERNAL_TRACE_H  
+#include FT_INTERNAL_TRACE_H
     trace_count
 
   } FT_Trace;

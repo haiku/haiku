@@ -145,7 +145,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Note>                                                                */
   /*    You can typecast FT_Glyph to FT_BitmapGlyph if you have            */
-  /*    glyph->format == ft_glyph_format_bitmap.  This lets you access     */
+  /*    glyph->format == FT_GLYPH_FORMAT_BITMAP.  This lets you access     */
   /*    the bitmap's contents easily.                                      */
   /*                                                                       */
   /*    The corresponding pixel buffer is always owned by the BitmapGlyph  */
@@ -189,7 +189,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Note>                                                                */
   /*    You can typecast FT_Glyph to FT_OutlineGlyph if you have           */
-  /*    glyph->format == ft_glyph_format_outline.  This lets you access    */
+  /*    glyph->format == FT_GLYPH_FORMAT_OUTLINE.  This lets you access    */
   /*    the outline's content easily.                                      */
   /*                                                                       */
   /*    As the outline is extracted from a glyph slot, its coordinates are */
@@ -374,8 +374,8 @@ FT_BEGIN_HEADER
   /*    the_glyph   :: A pointer to a handle to the target glyph.          */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    render_mode :: A set of bit flags that describe how the data is    */
-  /*                                                                       */
+  /*    render_mode :: An enumeration that describe how the data is        */
+  /*                   rendered.                                           */
   /*                                                                       */
   /*    origin      :: A pointer to a vector used to translate the glyph   */
   /*                   image before rendering.  Can be 0 (if no            */
@@ -411,7 +411,7 @@ FT_BEGIN_HEADER
   /*        error = FT_Get_Glyph( face->glyph, &glyph );                   */
   /*                                                                       */
   /*        // convert to a bitmap (default render mode + destroy old)     */
-  /*        if ( glyph->format != ft_glyph_format_bitmap )                 */
+  /*        if ( glyph->format != FT_GLYPH_FORMAT_BITMAP )                 */
   /*        {                                                              */
   /*          error = FT_Glyph_To_Bitmap( &glyph, ft_render_mode_default,  */
   /*                                      0, 1 );                          */
@@ -434,10 +434,10 @@ FT_BEGIN_HEADER
   /*    scalable.                                                          */
   /*                                                                       */
   FT_EXPORT( FT_Error )
-  FT_Glyph_To_Bitmap( FT_Glyph*   the_glyph,
-                      FT_ULong    render_mode,
-                      FT_Vector*  origin,
-                      FT_Bool     destroy );
+  FT_Glyph_To_Bitmap( FT_Glyph*       the_glyph,
+                      FT_Render_Mode  render_mode,
+                      FT_Vector*      origin,
+                      FT_Bool         destroy );
 
 
   /*************************************************************************/

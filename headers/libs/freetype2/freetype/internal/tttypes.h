@@ -100,6 +100,8 @@ FT_BEGIN_HEADER
     FT_UShort  entry_selector;
     FT_UShort  range_shift;
 
+    FT_ULong   offset;  /* not in file */
+
   } SFNT_HeaderRec, *SFNT_Header;
 
 
@@ -1481,17 +1483,8 @@ FT_BEGIN_HEADER
     TT_OS2                os2;          /* TrueType OS/2 table            */
     TT_Postscript         postscript;   /* TrueType Postscript table      */
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
     FT_Byte*              cmap_table;   /* extracted 'cmap' table */
     FT_ULong              cmap_size;
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-    FT_Int                num_charmaps;
-    TT_CharMap            charmaps;     /* array of TT_CharMapRec */
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
     TT_Loader_GotoTableFunc   goto_table;
 
@@ -1525,10 +1518,10 @@ FT_BEGIN_HEADER
     TT_PCLT               pclt;
 
     /* embedded bitmaps support */
-    FT_Int                num_sbit_strikes;
+    FT_ULong              num_sbit_strikes;
     TT_SBit_Strike        sbit_strikes;
 
-    FT_Int                num_sbit_scales;
+    FT_ULong              num_sbit_scales;
     TT_SBit_Scale         sbit_scales;
 
     /* postscript names table */

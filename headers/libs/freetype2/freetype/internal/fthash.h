@@ -59,7 +59,19 @@ FT_BEGIN_HEADER
 
  /***********************************************************
   *
-  * @type: FT_Hash_CompareFunc
+  * @type: FT_HashLookup
+  *
+  * @description:
+  *   handle to a @FT_HashNode pointer. This is returned by
+  *   the @ft_hash_lookup function and can later be used by
+  *   @ft_hash_add or @ft_hash_remove
+  */
+  typedef FT_HashNode*     FT_HashLookup;
+
+
+ /***********************************************************
+  *
+  * @type: FT_Hash_EqualFunc
   *
   * @description:
   *   a function used to compare two nodes of the hash table
@@ -72,8 +84,8 @@ FT_BEGIN_HEADER
   *   1 iff the 'keys' in 'node1' and 'node2' are identical.
   *   0 otherwise.
   */
-  typedef FT_Int  (*FT_Hash_CompareFunc)( const FT_HashNode  node1,
-                                          const FT_HashNode  node2 );
+  typedef FT_Int  (*FT_Hash_EqualFunc)( FT_HashNode  node1,
+                                        FT_HashNode  node2 );
 
 
  /***********************************************************
@@ -106,18 +118,14 @@ FT_BEGIN_HEADER
   */
   typedef struct FT_HashRec_
   {
-    FT_Memory            memory;
     FT_HashNode*         buckets;
     FT_UInt              p;
     FT_UInt              mask;  /* really maxp-1 */
-    FT_UInt              slack;
+    FT_Long              slack;
+    FT_Hash_EqualFunc    node_equal;
+    FT_Memory            memory;
 
-
-    FT_UInt              node_size;
-    FT_Hash_CompareFunc  node_compare;
-    FT_Hash_ComputeFunc  node_hash;
-
-  } FT_HashRec, *FT_Hash;
+  } FT_HashRec;
 
 
  /***********************************************************
@@ -168,36 +176,39 @@ FT_BEGIN_HEADER
   *   initialize a dynamic hash table
   *
   * @input:
-  *   table   :: handle to target hash table structure
-  *   compare :: node comparison function
-  *   memory  :: memory manager handle used to allocate the
-  *              buckets array within the hash table
+  *   table      :: handle to target hash table structure
+  *   node_equal :: node comparison function
+  *   memory     :: memory manager handle used to allocate the
+  *                 buckets array within the hash table
+  *
+  * @return:
+  *   error code. 0 means success
   *
   * @note:
   *   the node comparison function should only compare node _keys_
   *   and ignore values !! with good hashing computation (which the
   *   user must perform itself), the comparison function should be
-  *   pretty selfom called.
+  *   pretty seldom called.
   *
   *   here is a simple example:
   *
   *   {
-  *     static int my_compare( const MyNode  node1,
-  *                            const MyNode  node2 )
+  *     static int my_equal( MyNode  node1,
+  *                          MyNode  node2 )
   *     {
   *       // compare keys of 'node1' and 'node2'
-  *       return strcmp( node1->key, node2->key );
+  *       return (strcmp( node1->key, node2->key ) == 0);
   *     }
   *
   *     ....
   *
-  *     ft_hash_init( &hash, (FT_Hash_CompareFunc) my_compare, memory );
+  *     ft_hash_init( &hash, (FT_Hash_EqualFunc) my_compare, memory );
   *     ....
   *   }
   */
-  FT_BASE( void )
+  FT_BASE( FT_Error )
   ft_hash_init( FT_Hash              table,
-                FT_Hash_CompareFunc  compare,
+                FT_Hash_EqualFunc  compare,
                 FT_Memory            memory );
 
 
@@ -257,9 +268,9 @@ FT_BEGIN_HEADER
   *     }
   *   }
   */
-  FT_BASE_DEF( FT_HashNode* )
+  FT_BASE_DEF( FT_HashLookup )
   ft_hash_lookup( FT_Hash      table,
-                  FT_HashNode  keynode )
+                  FT_HashNode  keynode );
 
 
  /****************************************************************
@@ -273,9 +284,12 @@ FT_BEGIN_HEADER
   *
   * @input:
   *   table    :: hash table handle
-  *   pnode    :: pointer-to-hash-node value returned by @ft_hash_lookup
+  *   lookup   :: pointer-to-hash-node value returned by @ft_hash_lookup
   *   new_node :: handle to new hash node. All its fields must be correctly
   *               set, including 'hash'.
+  *
+  * @return:
+  *   error code. 0 means success
   *
   * @note:
   *   this function should always be used _after_ a call to @ft_hash_lookup
@@ -308,18 +322,21 @@ FT_BEGIN_HEADER
   *
   *       // allocate a new node - and set it up
   *       node = (MyNode) malloc( sizeof(*node) );
+  *       if ( node == NULL ) .....
+  *
   *       node->hnode.hash = noderec.hnode.hash;
   *       node->key        = key;
   *       node->value      = value;
   *
   *       // add it to the hash table
-  *       ft_hash_add( table, pnode, node );
+  *       error = ft_hash_add( table, pnode, node );
+  *       if (error) ....
   *     }
   */
-  FT_BASE( void )
-  ft_hash_add( FT_Hash       table,
-               FT_HashNode*  pnode,
-               FT_HashNode   new_node );
+  FT_BASE( FT_Error )
+  ft_hash_add( FT_Hash        table,
+               FT_HashLookup  lookup,
+               FT_HashNode    new_node );
 
 
  /****************************************************************
@@ -332,7 +349,7 @@ FT_BEGIN_HEADER
   *
   * @input:
   *   table   :: hash table handle
-  *   pnode   :: pointer-to-hash-node value returned by @ft_hash_lookup
+  *   lookup  :: pointer-to-hash-node value returned by @ft_hash_lookup
   *
   * @note:
   *   this function doesn't free the node itself !! Here's an example:
@@ -354,15 +371,16 @@ FT_BEGIN_HEADER
   *       node  = *pnode;
   *       if ( node != NULL )
   *       {
-  *         ft_hash_remove( table, pnode );
-  *         free( node );
+  *         error = ft_hash_remove( table, pnode );
+  *         if ( !error )
+  *           free( node );
   *       }
   *     }
   *   }
   */
-  FT_BASE( void )
-  ft_hash_remove( FT_Hash       table,
-                  FT_HashNode*  pnode );
+  FT_BASE( FT_Error )
+  ft_hash_remove( FT_Hash        table,
+                  FT_HashLookup  lookup );
 
 
 

@@ -208,7 +208,7 @@ FT_BEGIN_HEADER
 #define T1_MAX_MM_DESIGNS     16
 
   /* maximum number of Multiple Masters axes, as defined in the spec */
-#define T1_MAX_MM_AXIS         4
+#define T1_MAX_MM_AXIS        4
 
   /* maximum number of elements in a design map */
 #define T1_MAX_MM_MAP_POINTS  20
@@ -243,6 +243,8 @@ FT_BEGIN_HEADER
     PS_Private       privates  [T1_MAX_MM_DESIGNS + 1];
 
     FT_ULong         blend_bitflags;
+
+    FT_BBox*         bboxes    [T1_MAX_MM_DESIGNS + 1];
 
   } PS_BlendRec, *PS_Blend;
 

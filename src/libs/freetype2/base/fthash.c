@@ -1,4 +1,6 @@
-#include "fthash.h"
+#include <ft2build.h>
+#include FT_TYPES_H
+#include FT_INTERNAL_HASH_H
 #include FT_INTERNAL_MEMORY_H
 #include FT_INTERNAL_DEBUG_H
 
@@ -27,7 +29,7 @@
       table->mask  = 0;
       table->slack = 0;
 
-      table->compare = NULL;
+      table->node_equal = NULL;
     }
   }
 
@@ -45,18 +47,22 @@
 
 
 
-  FT_BASE_DEF( void )
-  ft_hash_init( FT_Hash              table,
-                FT_Hash_CompareFunc  compare,
-                FT_Memory            memory )
+  FT_BASE_DEF( FT_Error )
+  ft_hash_init( FT_Hash            table,
+                FT_Hash_EqualFunc  equal,
+                FT_Memory          memory )
   {
-    hash->memory  = memory;
-    hash->compare = node_compare;
-    hash->p       = 0;
-    hash->mask    = FT_HASH_INITIAL_SIZE-1;
-    hash->slack   = FT_HASH_INITIAL_SIZE*FT_HASH_MAX_LOAD;
+    FT_Error  error;
 
-    FT_NEW_ARRAY( hash->buckets, FT_HASH_INITIAL_SIZE*2 );
+    table->memory     = memory;
+    table->p          = 0;
+    table->mask       = FT_HASH_INITIAL_SIZE-1;
+    table->slack      = FT_HASH_INITIAL_SIZE*FT_HASH_MAX_LOAD;
+    table->node_equal = equal;
+
+    (void)FT_NEW_ARRAY( table->buckets, FT_HASH_INITIAL_SIZE*2 );
+
+    return error;
   }
 
 
@@ -84,12 +90,13 @@
 
 
 
-  FT_BASE_DEF( FT_HashNode* )
+  FT_BASE_DEF( FT_HashLookup )
   ft_hash_lookup( FT_Hash      table,
                   FT_HashNode  keynode )
   {
-    FT_UInt    index;
-    FT_UInt23  hash = keynode->hash;
+    FT_UInt       index;
+    FT_UInt32     hash = keynode->hash;
+    FT_HashNode   node, *pnode;
 
     index = (FT_UInt)(hash & table->mask);
     if ( index < table->p )
@@ -102,7 +109,7 @@
       if ( node == NULL )
         break;
 
-      if ( node->hash == hash && table->compare( node, keynode ) )
+      if ( node->hash == hash && table->node_equal( node, keynode ) )
         break;
 
       pnode = &node->link;
@@ -114,20 +121,22 @@
 
 
 
-  FT_BASE_DEF( void )
-  ft_hash_add( FT_Hash       table,
-               FT_HashNode*  pnode,
-               FT_HashNode   new_node )
+  FT_BASE_DEF( FT_Error )
+  ft_hash_add( FT_Hash        table,
+               FT_HashLookup  lookup,
+               FT_HashNode    new_node )
   {
+    FT_Error     error = 0;
+
     /* add it to the hash table */
-    new_node->link = *pnode;
-    *pnode         = new_node;
+    new_node->link = *lookup;
+    *lookup        = new_node;
 
     if ( --table->slack < 0 )
     {
       FT_UInt       p     = table->p;
       FT_UInt       mask  = table->mask;
-      FT_HashNode   new_list;
+      FT_HashNode   new_list, node, *pnode;
 
       /* split a single bucket */
       new_list = NULL;
@@ -154,33 +163,41 @@
 
       if ( p >= mask )
       {
-        FT_RENEW_ARRAY( hash->buckets, (mask+1)*2, (mask+1)*4 );
+        FT_Memory  memory = table->memory;
+
+
+        if (FT_RENEW_ARRAY( table->buckets, (mask+1)*2, (mask+1)*4 ))
+          goto Exit;
+
         table->mask = 2*mask + 1;
         table->p    = 0;
       }
       else
         table->p = p + 1;
     }
+  Exit:
+    return error;
   }
 
 
 
-  FT_BASE_DEF( FT_Int )
-  ft_hash_remove( FT_Hash      table,
-                  FT_HashNode* pnode )
+  FT_BASE_DEF( FT_Error )
+  ft_hash_remove( FT_Hash        table,
+                  FT_HashLookup  lookup )
   {
     FT_HashNode  node;
     FT_UInt      num_buckets;
+    FT_Error     error = 0;
 
     FT_ASSERT( pnode != NULL && node != NULL );
 
-    node         = *pnode;
-    *pnode->link = node->link;
-    node->link   = NULL;
+    node       = *lookup;
+    *lookup    = node->link;
+    node->link = NULL;
 
     num_buckets = ( table->p + table->mask + 1) ;
 
-    if ( ++ table->slack > num_buckets*FT_HASH_SUB_LOAD )
+    if ( ++ table->slack > (FT_Long)num_buckets*FT_HASH_SUB_LOAD )
     {
       FT_UInt       p         = table->p;
       FT_UInt       mask      = table->mask;
@@ -189,14 +206,26 @@
       FT_HashNode*  pold;
 
       if ( old_index < FT_HASH_INITIAL_SIZE )
-        return;
+        goto Exit;
 
       if ( p == 0 )
       {
+        FT_Memory  memory = table->memory;
+
         table->mask >>= 1;
         p             = table->mask;
 
-        FT_RENEW_ARRAY( hash->buckets, (mask+1)*2, (mask) );
+        if ( FT_RENEW_ARRAY( table->buckets, (mask+1)*2, (mask+1) ) )
+        {
+          /* this should never happen normally, but who knows :-)   */
+          /* we need to re-inject the node in the hash table before */
+          /* returning there, since it's safer                      */
+          pnode      = table->buckets;
+          node->link = *pnode;
+          *pnode     = node;
+
+          goto Exit;
+        }
       }
       else
         p--;
@@ -212,4 +241,6 @@
       table->slack -= FT_HASH_MAX_LOAD;
       table->p      = p;
     }
+  Exit:
+    return error;
   }

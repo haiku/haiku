@@ -68,7 +68,7 @@ FT_BEGIN_HEADER
   (*FT_Slot_LoadFunc)( FT_GlyphSlot  slot,
                        FT_Size       size,
                        FT_UInt       glyph_index,
-                       FT_Int        load_flags );
+                       FT_Int32      load_flags );
 
 
   typedef FT_UInt
@@ -186,12 +186,10 @@ FT_BEGIN_HEADER
     FT_Size_ResetPixelsFunc   set_pixel_sizes;
 
     FT_Slot_LoadFunc          load_glyph;
-    FT_CharMap_CharIndexFunc  get_char_index;
 
     FT_Face_GetKerningFunc    get_kerning;
     FT_Face_AttachFunc        attach_file;
     FT_Face_GetAdvancesFunc   get_advances;
-    FT_CharMap_CharNextFunc   get_next_char;
 
   } FT_Driver_ClassRec, *FT_Driver_Class;
 

@@ -111,7 +111,7 @@ FT_BEGIN_HEADER
   typedef struct  FT_Module_Class_
   {
     FT_ULong               module_flags;
-    FT_Int                 module_size;
+    FT_Long                module_size;
     const FT_String*       module_name;
     FT_Fixed               module_version;
     FT_Fixed               module_requires;

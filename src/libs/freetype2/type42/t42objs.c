@@ -147,7 +147,7 @@
                  T42_Face       face,
                  FT_Int         face_index,
                  FT_Int         num_params,
-                 FT_Parameter*  params)
+                 FT_Parameter*  params )
   {
     FT_Error          error;
     PSNames_Service   psnames;
@@ -283,8 +283,6 @@
     if ( face->ttf_face->face_flags & FT_FACE_FLAG_VERTICAL )
       root->face_flags |= FT_FACE_FLAG_VERTICAL;
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
     {
       if ( psnames && psaux )
       {
@@ -298,7 +296,7 @@
         /* first of all, try to synthetize a Unicode charmap */
         charmap.platform_id = 3;
         charmap.encoding_id = 1;
-        charmap.encoding    = ft_encoding_unicode;
+        charmap.encoding    = FT_ENCODING_UNICODE;
 
         FT_CMap_New( cmap_classes->unicode, NULL, &charmap, NULL );
 
@@ -309,25 +307,25 @@
         switch ( face->type1.encoding_type )
         {
         case T1_ENCODING_TYPE_STANDARD:
-          charmap.encoding    = ft_encoding_adobe_standard;
+          charmap.encoding    = FT_ENCODING_ADOBE_STANDARD;
           charmap.encoding_id = 0;
           clazz               = cmap_classes->standard;
           break;
 
         case T1_ENCODING_TYPE_EXPERT:
-          charmap.encoding    = ft_encoding_adobe_expert;
+          charmap.encoding    = FT_ENCODING_ADOBE_EXPERT;
           charmap.encoding_id = 1;
           clazz               = cmap_classes->expert;
           break;
 
         case T1_ENCODING_TYPE_ARRAY:
-          charmap.encoding    = ft_encoding_adobe_custom;
+          charmap.encoding    = FT_ENCODING_ADOBE_CUSTOM;
           charmap.encoding_id = 2;
           clazz               = cmap_classes->custom;
           break;
 
         case T1_ENCODING_TYPE_ISOLATIN1:
-          charmap.encoding    = ft_encoding_latin_1;
+          charmap.encoding    = FT_ENCODING_ADOBE_LATIN_1;
           charmap.encoding_id = 3;
           clazz               = cmap_classes->unicode;
           break;
@@ -339,84 +337,13 @@
         if ( clazz )
           FT_CMap_New( clazz, NULL, &charmap, NULL );
 
+#if 0
         /* Select default charmap */
         if (root->num_charmaps)
           root->charmap = root->charmaps[0];
+#endif
       }
     }
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-    /* charmap support -- synthetize unicode charmap if possible */
-    {
-      FT_CharMap  charmap = face->charmaprecs;
-
-      
-      /* synthesize a Unicode charmap if there is support in the `PSNames' */
-      /* module                                                            */
-      if ( psnames && psnames->unicode_value )
-      {
-        error = psnames->build_unicodes( root->memory,
-                                         face->type1.num_glyphs,
-                                         (const char**)face->type1.glyph_names,
-                                         &face->unicode_map );
-        if ( !error )
-        {
-          root->charmap        = charmap;
-          charmap->face        = (FT_Face)face;
-          charmap->encoding    = ft_encoding_unicode;
-          charmap->platform_id = 3;
-          charmap->encoding_id = 1;
-          charmap++;
-        }
-        
-        /* XXX: Is the following code correct?  It is used in t1objs.c */
-        
-        /* simply clear the error in case of failure (which really) */
-        /* means that out of memory or no unicode glyph names       */
-        error = T42_Err_Ok;
-      }
-      
-      /* now, support either the standard, expert, or custom encoding */
-      charmap->face        = (FT_Face)face;
-      charmap->platform_id = 7;  /* a new platform id for Adobe fonts? */
-      
-      switch ( face->type1.encoding_type )
-      {
-      case T1_ENCODING_TYPE_STANDARD:
-        charmap->encoding    = ft_encoding_adobe_standard;
-        charmap->encoding_id = 0;
-        break;
-        
-      case T1_ENCODING_TYPE_EXPERT:
-        charmap->encoding    = ft_encoding_adobe_expert;
-        charmap->encoding_id = 1;
-        break;
-        
-      case T1_ENCODING_TYPE_ARRAY:
-        charmap->encoding    = ft_encoding_adobe_custom;
-        charmap->encoding_id = 2;
-        break;
-        
-      case T1_ENCODING_TYPE_ISOLATIN1:
-        charmap->encoding    = ft_encoding_latin_1;
-        charmap->encoding_id = 3;
-        break;
-        
-      default:
-        FT_ERROR(( "T42_Face_Init: invalid encoding\n" ));
-        error = T42_Err_Invalid_File_Format;
-        goto Exit;
-      }
-      
-      root->charmaps     = face->charmaps;
-      root->num_charmaps = charmap - face->charmaprecs + 1;
-      face->charmaps[0]  = &face->charmaprecs[0];
-      face->charmaps[1]  = &face->charmaprecs[1];
-    }
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
-
   Exit:
     return error;
   }
@@ -511,118 +438,6 @@
   }
 
 
-  FT_LOCAL_DEF( FT_UInt )
-  T42_CMap_CharIndex( FT_CharMap  charmap,
-                      FT_Long     charcode )
-  {
-    T42_Face         face;
-    FT_UInt          result = 0;
-    PSNames_Service  psnames;
-
-
-    face    = (T42_Face)charmap->face;
-    psnames = (PSNames_Service)face->psnames;
-    if (!psnames )
-      goto Exit;
-
-    switch ( charmap->encoding )
-    {
-      /*******************************************************************/
-      /*                                                                 */
-      /* Unicode encoding support                                        */
-      /*                                                                 */
-    case ft_encoding_unicode:
-      /* if this charmap is used, we ignore the encoding of the font and */
-      /* use the `PSNames' module to synthetize the Unicode charmap      */
-      result = psnames->lookup_unicode( &face->unicode_map,
-                                        (FT_ULong)charcode );
-
-      /* the function returns 0xFFFF if the Unicode charcode has */
-      /* no corresponding glyph                                  */
-      if ( result == 0xFFFFU )
-        result = 0;
-
-      /* The result returned is the index (position)in the CharStrings */
-      /* array.  This must be used now to get the value associated to  */
-      /* that glyph_name, which is the real index within the truetype  */
-      /* structure.                                                    */
-      result = ft_atoi( (const char*)face->type1.charstrings[result] );
-      goto Exit;
-
-      /*******************************************************************/
-      /*                                                                 */
-      /* ISOLatin1 encoding support                                      */
-      /*                                                                 */
-    case ft_encoding_latin_1:
-      /* ISOLatin1 is the first page of Unicode */
-      if ( charcode < 256 && psnames->unicode_value )
-      {
-        result = psnames->lookup_unicode( &face->unicode_map,
-                                          (FT_ULong)charcode );
-
-        /* the function returns 0xFFFF if the Unicode charcode has */
-        /* no corresponding glyph                                  */
-        if ( result == 0xFFFFU )
-          result = 0;
-      }
-      goto Exit;
-
-      /*******************************************************************/
-      /*                                                                 */
-      /* Custom Type 1 encoding                                          */
-      /*                                                                 */
-    case ft_encoding_adobe_custom:
-      {
-        T1_Encoding  encoding = &face->type1.encoding;
-
-
-        if ( charcode >= encoding->code_first &&
-             charcode <= encoding->code_last  )
-        {
-          FT_UInt idx = encoding->char_index[charcode];
-
-
-          result = ft_atoi( (const char *)face->type1.charstrings[idx] );
-        }
-        goto Exit;
-      }
-
-      /*******************************************************************/
-      /*                                                                 */
-      /* Adobe Standard & Expert encoding support                        */
-      /*                                                                 */
-    default:
-      if ( charcode < 256 )
-      {
-        FT_UInt      code;
-        FT_Int       n;
-        const char*  glyph_name;
-
-
-        code = psnames->adobe_std_encoding[charcode];
-        if ( charmap->encoding == ft_encoding_adobe_expert )
-          code = psnames->adobe_expert_encoding[charcode];
-
-        glyph_name = psnames->adobe_std_strings( code );
-        if ( !glyph_name )
-          break;
-
-        for ( n = 0; n < face->type1.num_glyphs; n++ )
-        {
-          const char*  gname = face->type1.glyph_names[n];
-
-          if ( gname && ( ft_strcmp( gname, glyph_name ) == 0 ) )
-          {
-            result = ft_atoi( (const char *)face->type1.charstrings[n] );
-            break;
-          }
-        }
-      }
-    }
-
-  Exit:
-    return result;
-  }
 
 
   FT_LOCAL_DEF( FT_Error )
@@ -718,7 +533,7 @@
 
 
     FT_Activate_Size(size->ttsize);
-    
+
     return FT_Set_Char_Size( t42face->ttf_face,
                              char_width,
                              char_height,
@@ -737,7 +552,7 @@
 
 
     FT_Activate_Size(size->ttsize);
-    
+
     return FT_Set_Pixel_Sizes( t42face->ttf_face,
                                pixel_width,
                                pixel_height );
@@ -769,7 +584,7 @@
     slot->control_data  = 0;
     slot->control_len   = 0;
     slot->other         = 0;
-    slot->format        = ft_glyph_format_none;
+    slot->format        = FT_GLYPH_FORMAT_NONE;
 
     slot->linearHoriAdvance = 0;
     slot->linearVertAdvance = 0;
@@ -780,7 +595,7 @@
   T42_GlyphSlot_Load( FT_GlyphSlot  glyph,
                       FT_Size       size,
                       FT_Int        glyph_index,
-                      FT_Int        load_flags )
+                      FT_Int32      load_flags )
   {
     FT_Error         error;
     T42_GlyphSlot    t42slot = (T42_GlyphSlot)glyph;
@@ -807,112 +622,15 @@
       glyph->bitmap      = t42slot->ttslot->bitmap;
       glyph->bitmap_left = t42slot->ttslot->bitmap_left;
       glyph->bitmap_top  = t42slot->ttslot->bitmap_top;
-      
+
       glyph->num_subglyphs = t42slot->ttslot->num_subglyphs;
       glyph->subglyphs     = t42slot->ttslot->subglyphs;
-      
+
       glyph->control_data  = t42slot->ttslot->control_data;
       glyph->control_len   = t42slot->ttslot->control_len;
     }
 
     return error;
-  }
-
-
-
-  FT_LOCAL_DEF( FT_Long )
-  T42_CMap_CharNext( FT_CharMap  charmap,
-                     FT_Long     charcode )
-  {
-    T42_Face         face;
-    PSNames_Service  psnames;
-
-
-    face    = (T42_Face)charmap->face;
-    psnames = (PSNames_Service)face->psnames;
-
-    if ( psnames )
-      switch ( charmap->encoding )
-      {
-        /*******************************************************************/
-        /*                                                                 */
-        /* Unicode encoding support                                        */
-        /*                                                                 */
-      case ft_encoding_unicode:
-        /* use the `PSNames' module to synthetize the Unicode charmap */
-        return psnames->next_unicode( &face->unicode_map,
-                                      (FT_ULong)charcode );
-
-        /*******************************************************************/
-        /*                                                                 */
-        /* ISOLatin1 encoding support                                      */
-        /*                                                                 */
-      case ft_encoding_latin_1:
-        {
-          FT_ULong code;
-
-
-          /* use the `PSNames' module to synthetize the Unicode charmap */
-          code = psnames->next_unicode( &face->unicode_map,
-                                        (FT_ULong)charcode );
-          if ( code < 256 )
-            return code;
-          break;
-        }
-
-        /*******************************************************************/
-        /*                                                                 */
-        /* Custom Type 1 encoding                                          */
-        /*                                                                 */
-      case ft_encoding_adobe_custom:
-        {
-          T1_Encoding  encoding = &face->type1.encoding;
-
-
-          charcode++;
-          if ( charcode < encoding->code_first )
-            charcode = encoding->code_first;
-          while ( charcode <= encoding->code_last  ) {
-            if ( encoding->char_index[charcode] )
-              return charcode;
-            charcode++;
-          }
-        }
-
-
-        /*******************************************************************/
-        /*                                                                 */
-        /* Adobe Standard & Expert encoding support                        */
-        /*                                                                 */
-      default:
-        while ( ++charcode < 256 )
-        {
-          FT_UInt      code;
-          FT_Int       n;
-          const char*  glyph_name;
-
-
-          code = psnames->adobe_std_encoding[charcode];
-          if ( charmap->encoding == ft_encoding_adobe_expert )
-            code = psnames->adobe_expert_encoding[charcode];
-
-          glyph_name = psnames->adobe_std_strings( code );
-          if ( !glyph_name )
-            continue;
-
-          for ( n = 0; n < face->type1.num_glyphs; n++ )
-          {
-            const char*  gname = face->type1.glyph_names[n];
-
-
-            if ( gname && gname[0] == glyph_name[0]  &&
-                 ft_strcmp( gname, glyph_name ) == 0 )
-              return charcode;
-          }
-        }
-      }
-
-    return 0;
   }
 
 

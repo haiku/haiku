@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType name ID definitions (specification only).                   */
 /*                                                                         */
-/*  Copyright 1996-2001 by                                                 */
+/*  Copyright 1996-2002 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -31,34 +31,134 @@ FT_BEGIN_HEADER
   /* Possible values for the `platform' identifier code in the name        */
   /* records of the TTF `name' table.                                      */
   /*                                                                       */
+  /*************************************************************************/
+
+
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_PLATFORM_XXX
+   *
+   * @description:
+   *   A list of valid values for the `platform_id' identifier code in
+   *   @FT_CharmapRec and @FT_SfntName structures.
+   *
+   * @values:
+   *   TT_PLATFORM_APPLE_UNICODE ::
+   *     Used by Apple to indicate a Unicode character map and/or name entry.
+   *     See @TT_APPLE_ID_XXX for corresponding `encoding_id' values.  Note
+   *     that name entries in this format are coded as big-endian UCS-2
+   *     character codes _only_.
+   *
+   *   TT_PLATFORM_MACINTOSH ::
+   *     Used by Apple to indicate a MacOS-specific charmap and/or name entry.
+   *     See @TT_MAC_ID_XXX for corresponding `encoding_id' values.  Note that
+   *     most TrueType fonts contain an Apple roman charmap to be usable on
+   *     MacOS systems (even if they contain a Microsoft charmap as well).
+   *
+   *   TT_PLATFORM_ISO ::
+   *     This value was used to specify Unicode charmaps.  It is however
+   *     now deprecated.  See @TT_ISO_ID_XXX for a list of corresponding
+   *     `encoding_id' values.
+   *
+   *   TT_PLATFORM_MICROSOFT ::
+   *     Used by Microsoft to indicate Windows-specific charmaps.  See
+   *     @TT_MS_ID_XXX for a list of corresponding `encoding_id' values.
+   *     Note that most fonts contain a Unicode charmap using
+   *     (@TT_PLATFORM_MICROSOFT, @TT_MS_ID_UNICODE_CS).
+   *
+   *   TT_PLATFORM_CUSTOM ::
+   *     Used to indicate application-specific charmaps.
+   *
+   *   TT_PLATFORM_ADOBE ::
+   *     This value isn't part of any font format specification, but is used
+   *     by FreeType to report Adobe-specific charmaps in an @FT_CharMapRec
+   *     structure.  See @TT_ADOBE_ID_XXX.
+   */
+
 #define TT_PLATFORM_APPLE_UNICODE  0
 #define TT_PLATFORM_MACINTOSH      1
 #define TT_PLATFORM_ISO            2 /* deprecated */
 #define TT_PLATFORM_MICROSOFT      3
 #define TT_PLATFORM_CUSTOM         4
-
-  /* artificial values defined ad-hoc by FreeType */
-#define TT_PLATFORM_ADOBE          7
+#define TT_PLATFORM_ADOBE          7 /* artificial */
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* Possible values of the platform specific encoding identifier field in */
-  /* the name records of the TTF `name' table if the `platform' identifier */
-  /* code is TT_PLATFORM_APPLE_UNICODE.                                    */
-  /*                                                                       */
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_APPLE_ID_XXX
+   *
+   * @description:
+   *   A list of valid values for the `encoding_id' for
+   *   @TT_PLATFORM_APPLE_UNICODE charmaps and name entries.
+   *
+   * @values:
+   *   TT_APPLE_ID_DEFAULT ::
+   *     Unicode version 1.0.
+   *   TT_APPLE_ID_UNICODE_1_1 ::
+   *     Unicode 1.1; specifies Hangul characters starting at U+34xx.
+   *   TT_APPLE_ID_ISO_10646 ::
+   *     Deprecated.
+   *   TT_APPLE_ID_UNICODE_2_0 ::
+   *     Unicode 2.0 and beyond (UTF-16 BMP only).
+   *   TT_APPLE_ID_UNICODE_32 ::
+   *     UTF-32 (Adobe proposal for OpenType).
+   */
+
 #define TT_APPLE_ID_DEFAULT      0 /* Unicode 1.0 */
 #define TT_APPLE_ID_UNICODE_1_1  1 /* specify Hangul at U+34xx */
 #define TT_APPLE_ID_ISO_10646    2 /* deprecated */
 #define TT_APPLE_ID_UNICODE_2_0  3 /* or later */
+#define TT_APPLE_ID_UNICODE_32   4 /* Adobe proposal */
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* Possible values of the platform specific encoding identifier field in */
-  /* the name records of the TTF `name' table if the `platform' identifier */
-  /* code is TT_PLATFORM_MACINTOSH.                                        */
-  /*                                                                       */
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_MAC_ID_XXX
+   *
+   * @description:
+   *   A list of valid values for the `encoding_id' for
+   *   @TT_PLATFORM_MACINTOSH charmaps and name entries.
+   *
+   * @values:
+   *   TT_MAC_ID_ROMAN ::
+   *   TT_MAC_ID_JAPANESE ::
+   *   TT_MAC_ID_TRADITIONAL_CHINESE ::
+   *   TT_MAC_ID_KOREAN ::
+   *   TT_MAC_ID_ARABIC ::
+   *   TT_MAC_ID_HEBREW ::
+   *   TT_MAC_ID_GREEK ::
+   *   TT_MAC_ID_RUSSIAN ::
+   *   TT_MAC_ID_RSYMBOL ::
+   *   TT_MAC_ID_DEVANAGARI ::
+   *   TT_MAC_ID_GURMUKHI ::
+   *   TT_MAC_ID_GUJARATI ::
+   *   TT_MAC_ID_ORIYA ::
+   *   TT_MAC_ID_BENGALI ::
+   *   TT_MAC_ID_TAMIL ::
+   *   TT_MAC_ID_TELUGU ::
+   *   TT_MAC_ID_KANNADA ::
+   *   TT_MAC_ID_MALAYALAM ::
+   *   TT_MAC_ID_SINHALESE ::
+   *   TT_MAC_ID_BURMESE ::
+   *   TT_MAC_ID_KHMER ::
+   *   TT_MAC_ID_THAI ::
+   *   TT_MAC_ID_LAOTIAN ::
+   *   TT_MAC_ID_GEORGIAN ::
+   *   TT_MAC_ID_ARMENIAN ::
+   *   TT_MAC_ID_MALDIVIAN ::
+   *   TT_MAC_ID_SIMPLIFIED_CHINESE ::
+   *   TT_MAC_ID_TIBETAN ::
+   *   TT_MAC_ID_MONGOLIAN ::
+   *   TT_MAC_ID_GEEZ ::
+   *   TT_MAC_ID_SLAVIC ::
+   *   TT_MAC_ID_VIETNAMESE ::
+   *   TT_MAC_ID_SINDHI ::
+   *   TT_MAC_ID_UNINTERP ::
+   */
+
 #define TT_MAC_ID_ROMAN                 0
 #define TT_MAC_ID_JAPANESE              1
 #define TT_MAC_ID_TRADITIONAL_CHINESE   2
@@ -95,25 +195,72 @@ FT_BEGIN_HEADER
 #define TT_MAC_ID_UNINTERP             32
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* Possible values of the platform specific encoding identifier field in */
-  /* the name records of the TTF `name' table if the `platform' identifier */
-  /* code is TT_PLATFORM_ISO.                                              */
-  /*                                                                       */
-  /* This use is now deprecated.                                           */
-  /*                                                                       */
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_ISO_ID_XXX
+   *
+   * @description:
+   *   A list of valid values for the `encoding_id' for
+   *   @TT_PLATFORM_ISO charmaps and name entries.
+   *
+   *   Their use is now deprecated.
+   *
+   * @values:
+   *   TT_ISO_ID_7BIT_ASCII ::
+   *     ASCII.
+   *   TT_ISO_ID_10646 ::
+   *     ISO/10646.
+   *   TT_ISO_ID_8859_1 ::
+   *     Also known as Latin-1.
+   */
+
 #define TT_ISO_ID_7BIT_ASCII  0
 #define TT_ISO_ID_10646       1
 #define TT_ISO_ID_8859_1      2
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* possible values of the platform specific encoding identifier field in */
-  /* the name records of the TTF `name' table if the `platform' identifier */
-  /* code is TT_PLATFORM_MICROSOFT.                                        */
-  /*                                                                       */
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_MS_ID_XXX
+   *
+   * @description:
+   *   A list of valid values for the `encoding_id' for
+   *   @TT_PLATFORM_MICROSOFT charmaps and name entries.
+   *
+   * @values:
+   *   TT_MS_ID_SYMBOL_CS ::
+   *     Corresponds to symbol encodings. see @FT_ENCODING_MS_SYMBOL.
+   *
+   *   TT_MS_ID_UNICODE_CS ::
+   *     Corresponds to a Microsoft WGL4 charmap, matching Unicode.  See
+   *     @FT_ENCODING_UNICODE.
+   *
+   *   TT_MS_ID_SJIS ::
+   *     Corresponds to Microsoft SJIS Japanese encoding.
+   *     See @FT_ENCODING_MS_SJIS.
+   *
+   *   TT_MS_ID_GB2312 ::
+   *     Corresponds to Microsoft Simplified Chinese as used in Mainland
+   *     China.  See @FT_ENCODING_MS_GB2312.
+   *
+   *   TT_MS_ID_BIG_5 ::
+   *     Corresponds to Microsoft Traditional Chinese as used in Taiwan and
+   *     Hong Kong.  See @FT_ENCODING_MS_BIG5.
+   *
+   *   TT_MS_ID_WANSUNG ::
+   *     Corresponds to Microsoft Korean Wansung encoding.  See
+   *     @FT_ENCODING_MS_WANSUNG.
+   *
+   *   TT_MS_ID_JOHAB ::
+   *     Corresponds to Microsoft Johab encoding.  See @FT_ENCODING_MS_JOHAB.
+   *
+   *   TT_MS_ID_UCS_4 ::
+   *     Corresponds to UCS-4 or UTF-32 charmaps.  This is a recent Adobe
+   *     proposal for OpenType.
+   */
+
 #define TT_MS_ID_SYMBOL_CS    0
 #define TT_MS_ID_UNICODE_CS   1
 #define TT_MS_ID_SJIS         2
@@ -124,14 +271,24 @@ FT_BEGIN_HEADER
 #define TT_MS_ID_UCS_4       10
 
 
-  /*************************************************************************/
-  /*                                                                       */
-  /* possible values of the platform specific encoding identifier field in */
-  /* the name records of the TTF `name' table if the `platform' identifier */
-  /* code is TT_PLATFORM_ADOBE.                                            */
-  /*                                                                       */
-  /* These are artificial values defined ad-hoc by FreeType.               */
-  /*                                                                       */
+  /***********************************************************************
+   *
+   * @enum:
+   *   TT_ADOBE_ID_XXX
+   *
+   * @description:
+   *   A list of valid values for the `encoding_id' for
+   *   @TT_PLATFORM_ADOBE charmaps.  This is a FreeType-specific extension!
+   *
+   * @values:
+   *   TT_ADOBE_ID_STANDARD ::
+   *     Adobe standard encoding.
+   *   TT_ADOBE_ID_EXPERT ::
+   *     Adobe expert encoding.
+   *   TT_ADOBE_ID_CUSTOM ::
+   *     Adobe custom encoding.
+   */
+
 #define TT_ADOBE_ID_STANDARD  0
 #define TT_ADOBE_ID_EXPERT    1
 #define TT_ADOBE_ID_CUSTOM    2
@@ -545,7 +702,7 @@ FT_BEGIN_HEADER
   /* sublanguage > 0x1F.                                         */
 #define TT_MS_LANGID_SPANISH_LATIN_AMERICA             0xE40a
 #define TT_MS_LANGID_FRENCH_NORTH_AFRICA               0xE40c
- 
+
 #define TT_MS_LANGID_FRENCH_MOROCCO                    0x380c
 #define TT_MS_LANGID_FRENCH_HAITI                      0x3c0c
 #define TT_MS_LANGID_BENGALI_BANGLADESH                0x0845

@@ -24,8 +24,6 @@
 #include "ftcerror.h"
 
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
-
 #define FTC_HASH_MAX_LOAD  2
 #define FTC_HASH_MIN_LOAD  1
 #define FTC_HASH_SUB_LOAD  ( FTC_HASH_MAX_LOAD - FTC_HASH_MIN_LOAD )
@@ -33,7 +31,6 @@
 /* this one _must_ be a power of 2! */
 #define FTC_HASH_INITIAL_SIZE  8
 
-#endif /* FTC_CACHE_USE_LINEAR_HASHING */
 
   /*************************************************************************/
   /*************************************************************************/
@@ -155,8 +152,6 @@
   }
 
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
-
   /* remove a node from its cache's hash table */
   static FT_Error
   ftc_node_hash_unlink( FTC_Node   node,
@@ -164,14 +159,14 @@
   {
     FT_Error   error = 0;
     FTC_Node  *pnode;
-    FT_UInt    index, num_buckets;
+    FT_UInt    idx, num_buckets;
 
-  
-    index = (FT_UInt)( node->hash & cache->mask );
-    if ( index < cache->p )
-      index = (FT_UInt)( node->hash & ( 2 * cache->mask + 1 ) );
 
-    pnode = cache->buckets + index;
+    idx = (FT_UInt)( node->hash & cache->mask );
+    if ( idx < cache->p )
+      idx = (FT_UInt)( node->hash & ( 2 * cache->mask + 1 ) );
+
+    pnode = cache->buckets + idx;
 
     for (;;)
     {
@@ -236,41 +231,7 @@
     return error;
   }
 
-#else /* !FTC_CACHE_USE_LINEAR_HASHING */
 
-  /* remove a node from its cache's hash table */
-  static void
-  ftc_node_hash_unlink( FTC_Node   node,
-                        FTC_Cache  cache )
-  {
-    FTC_Node  *pnode = cache->buckets + ( node->hash % cache->size );
-
-
-    for (;;)
-    {
-      if ( *pnode == NULL )
-      {
-        FT_ERROR(( "FreeType.cache.hash_unlink: unknown node!\n" ));
-        return;
-      }
-
-      if ( *pnode == node )
-      {
-        *pnode     = node->link;
-        node->link = NULL;
-
-        cache->nodes--;
-        return;
-      }
-
-      pnode = &(*pnode)->link;
-    }
-  }
-
-#endif /* !FTC_CACHE_USE_LINEAR_HASHING */
-
-
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
 
   /* add a node to the "top" of its cache's hash table */
   static FT_Error
@@ -278,15 +239,15 @@
                       FTC_Cache  cache )
   {
     FTC_Node  *pnode;
-    FT_UInt    index;
+    FT_UInt    idx;
     FT_Error   error = 0;
 
 
-    index = (FT_UInt)( node->hash & cache->mask );
-    if ( index < cache->p )
-      index = (FT_UInt)( node->hash & (2 * cache->mask + 1 ) );
+    idx = (FT_UInt)( node->hash & cache->mask );
+    if ( idx < cache->p )
+      idx = (FT_UInt)( node->hash & (2 * cache->mask + 1 ) );
 
-    pnode = cache->buckets + index;
+    pnode = cache->buckets + idx;
 
     node->link = *pnode;
     *pnode     = node;
@@ -345,23 +306,6 @@
     return error;
   }
 
-#else /* !FTC_CACHE_USE_LINEAR_HASHING */
-
-  /* add a node to the "top" of its cache's hash table */
-  static void
-  ftc_node_hash_link( FTC_Node   node,
-                      FTC_Cache  cache )
-  {
-    FTC_Node  *pnode = cache->buckets + ( node->hash % cache->size );
-
-
-    node->link = *pnode;
-    *pnode     = node;
-
-    cache->nodes++;
-  }
-
-#endif /* !FTC_CACHE_USE_LINEAR_HASHING */
 
 
 
@@ -476,125 +420,6 @@
   /*************************************************************************/
   /*************************************************************************/
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
-
-  /* nothing */
-
-#else /* !FTC_CACHE_USE_LINEAR_HASHING */
-
-#define FTC_PRIMES_MIN  7
-#define FTC_PRIMES_MAX  13845163
-
-  static const FT_UInt  ftc_primes[] =
-  {
-    7,
-    11,
-    19,
-    37,
-    73,
-    109,
-    163,
-    251,
-    367,
-    557,
-    823,
-    1237,
-    1861,
-    2777,
-    4177,
-    6247,
-    9371,
-    14057,
-    21089,
-    31627,
-    47431,
-    71143,
-    106721,
-    160073,
-    240101,
-    360163,
-    540217,
-    810343,
-    1215497,
-    1823231,
-    2734867,
-    4102283,
-    6153409,
-    9230113,
-    13845163,
-  };
-
-
-  static FT_UFast
-  ftc_prime_closest( FT_UFast  num )
-  {
-    FT_UInt  i;
-
-
-    for ( i = 0; i < sizeof ( ftc_primes ) / sizeof ( ftc_primes[0] ); i++ )
-      if ( ftc_primes[i] > num )
-        return ftc_primes[i];
-
-    return FTC_PRIMES_MAX;
-  }
-
-
-#define FTC_CACHE_RESIZE_TEST( c )       \
-          ( (c)->nodes*3 < (c)->size  || \
-            (c)->size*3  < (c)->nodes )
-
-
-  static void
-  ftc_cache_resize( FTC_Cache  cache )
-  {
-    FT_UFast  new_size;
-
-
-    new_size = ftc_prime_closest( cache->nodes );
-    if ( new_size != cache->size )
-    {
-      FT_Memory  memory = cache->memory;
-      FT_Error   error;
-      FTC_Node*  new_buckets ;
-      FT_ULong   i;
-
-
-      /* no need to report an error; we'll simply keep using the same */
-      /* buckets number / size                                        */
-      if ( FT_NEW_ARRAY( new_buckets, new_size ) )
-        return;
-
-      for ( i = 0; i < cache->size; i++ )
-      {
-        FTC_Node  node, next, *pnode;
-        FT_UFast  hash;
-
-
-        node = cache->buckets[i];
-        while ( node )
-        {
-          next  = node->link;
-          hash  = node->hash % new_size;
-          pnode = new_buckets + hash;
-
-          node->link = pnode[0];
-          pnode[0]   = node;
-
-          node = next;
-        }
-      }
-
-      if ( cache->buckets )
-        FT_FREE( cache->buckets );
-
-      cache->buckets = new_buckets;
-      cache->size    = new_size;
-
-      FT_UNUSED( error );
-    }
-  }
-
-#endif /* !FTC_CACHE_USE_LINEAR_HASHING */
 
 
   FT_EXPORT_DEF( FT_Error )
@@ -605,24 +430,12 @@
     FT_Error         error;
 
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
-
     cache->p     = 0;
     cache->mask  = FTC_HASH_INITIAL_SIZE - 1;
     cache->slack = FTC_HASH_INITIAL_SIZE * FTC_HASH_MAX_LOAD;
 
     if ( FT_NEW_ARRAY( cache->buckets, FTC_HASH_INITIAL_SIZE * 2 ) )
       goto Exit;
-
-#else /* !FTC_CACHE_USE_LINEAR_HASHING */
-
-    cache->nodes = 0;
-    cache->size  = FTC_PRIMES_MIN;
-
-    if ( FT_NEW_ARRAY( cache->buckets, cache->size ) )
-      goto Exit;
-
-#endif /* !FTC_CACHE_USE_LINEAR_HASHING */
 
     /* now, initialize the lru list of families for this cache */
     if ( clazz->family_size > 0 )
@@ -665,11 +478,7 @@
       FT_UFast         i;
       FT_UInt          count;
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
       count = cache->p + cache->mask + 1;
-#else
-      count = cache->size;
-#endif
 
       for ( i = 0; i < count; i++ )
       {
@@ -696,11 +505,8 @@
         cache->buckets[i] = NULL;
       }
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
       cache->p = 0;
-#else
-      cache->nodes = 0;
-#endif
+
       /* destroy the families */
       if ( cache->families )
         FT_LruList_Reset( cache->families );
@@ -719,12 +525,8 @@
       ftc_cache_clear( cache );
 
       FT_FREE( cache->buckets );
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
       cache->mask  = 0;
       cache->slack = 0;
-#else
-      cache->size = 0;
-#endif
 
       if ( cache->families )
       {
@@ -754,8 +556,6 @@
 
     query->hash   = 0;
     query->family = NULL;
-
-#if 1
 
     /* XXX: we break encapsulation for the sake of speed! */
     {
@@ -799,33 +599,18 @@
       ;
     }
 
-#else
-
-    error = FT_LruList_Lookup( cache->families, query, &lru );
-    if ( !error )
-
-#endif
     {
       FTC_Family  family = (FTC_Family) lru;
       FT_UFast    hash    = query->hash;
       FTC_Node*   bucket;
-
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
-
-      FT_UInt  index;
+      FT_UInt     idx;
 
 
-      index = hash & cache->mask;
-      if ( index < cache->p )
-        index = hash & ( cache->mask * 2 + 1 );
+      idx = hash & cache->mask;
+      if ( idx < cache->p )
+        idx = hash & ( cache->mask * 2 + 1 );
 
-      bucket  = cache->buckets + index;
-
-#else
-
-      bucket  = cache->buckets + (hash % cache->size);
-
-#endif
+      bucket  = cache->buckets + idx;
 
 
       if ( query->family     != family                        ||
@@ -897,7 +682,6 @@
           goto Exit;
         }
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
         error = ftc_node_hash_link( node, cache );
         if ( error )
         {
@@ -905,9 +689,6 @@
           FT_FREE( node );
           goto Exit;
         }
-#else
-        ftc_node_hash_link( node, cache );
-#endif
 
         ftc_node_mru_link( node, cache->manager );
 
@@ -920,12 +701,6 @@
           FTC_Manager_Compress( manager );
           node->ref_count--;
         }
-
-#ifndef FTC_CACHE_USE_LINEAR_HASHING
-        /* try to resize the hash table if appropriate */
-        if ( FTC_CACHE_RESIZE_TEST( cache ) )
-          ftc_cache_resize( cache );
-#endif
 
         *anode = node;
       }

@@ -108,10 +108,10 @@ FT_BEGIN_HEADER
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 
   FT_LOCAL( void )
-  TT_Done_GlyphZone( TT_GlyphZone  zone );
+  tt_glyphzone_done( TT_GlyphZone  zone );
 
   FT_LOCAL( FT_Error )
-  TT_New_GlyphZone( FT_Memory     memory,
+  tt_glyphzone_new( FT_Memory     memory,
                     FT_UShort     maxPoints,
                     FT_Short      maxContours,
                     TT_GlyphZone  zone );
@@ -379,14 +379,14 @@ FT_BEGIN_HEADER
   /* Face functions                                                        */
   /*                                                                       */
   FT_LOCAL( FT_Error )
-  TT_Face_Init( FT_Stream      stream,
+  tt_face_init( FT_Stream      stream,
                 TT_Face        face,
                 FT_Int         face_index,
                 FT_Int         num_params,
                 FT_Parameter*  params );
 
   FT_LOCAL( void )
-  TT_Face_Done( TT_Face  face );
+  tt_face_done( TT_Face  face );
 
 
   /*************************************************************************/
@@ -394,13 +394,13 @@ FT_BEGIN_HEADER
   /* Size functions                                                        */
   /*                                                                       */
   FT_LOCAL( FT_Error )
-  TT_Size_Init( TT_Size  size );
+  tt_size_init( TT_Size  size );
 
   FT_LOCAL( void )
-  TT_Size_Done( TT_Size  size );
+  tt_size_done( TT_Size  size );
 
   FT_LOCAL( FT_Error )
-  TT_Size_Reset( TT_Size  size );
+  tt_size_reset( TT_Size  size );
 
 
   /*************************************************************************/
@@ -408,10 +408,10 @@ FT_BEGIN_HEADER
   /* Driver functions                                                      */
   /*                                                                       */
   FT_LOCAL( FT_Error )
-  TT_Driver_Init( TT_Driver  driver );
+  tt_driver_init( TT_Driver  driver );
 
   FT_LOCAL( void )
-  TT_Driver_Done( TT_Driver  driver );
+  tt_driver_done( TT_Driver  driver );
 
 
 FT_END_HEADER

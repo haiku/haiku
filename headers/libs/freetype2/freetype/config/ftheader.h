@@ -361,6 +361,17 @@
   /*                                                                       */
 #define FT_BDF_H  <freetype/ftbdf.h>
 
+  /*************************************************************************/
+  /*                                                                       */
+  /* @macro:                                                               */
+  /*    FT_GZIP_H                                                          */
+  /*                                                                       */
+  /* @description:                                                         */
+  /*    A macro used in #include statements to name the file containing    */
+  /*    the definitions of an API to support for gzip-compressed files.    */
+  /*                                                                       */
+#define FT_GZIP_H  <freetype/ftgzip.h>
+
 
   /*************************************************************************/
   /*                                                                       */
@@ -487,6 +498,7 @@
   /* */
 
 #define FT_TRIGONOMETRY_H          <freetype/fttrigon.h>
+#define FT_STROKER_H               <freetype/ftstroker.h>
 #define FT_SYNTHESIS_H             <freetype/ftsynth.h>
 #define FT_ERROR_DEFINITIONS_H     <freetype/fterrdef.h>
 
@@ -497,6 +509,8 @@
 #define FT_CACHE_INTERNAL_CACHE_H  <freetype/cache/ftccache.h>
 
 #define FT_XFREE86_H               <freetype/ftxf86.h>
+
+#define FT_INCREMENTAL_H           <freetype/ftincrem.h>
 
   /* now include internal headers definitions from <freetype/internal/...> */
 

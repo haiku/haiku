@@ -42,7 +42,7 @@
   typedef struct  FTC_ImageQueryRec_
   {
     FTC_GlyphQueryRec  gquery;
-    FTC_ImageDesc      desc;
+    FTC_ImageTypeRec   type;
 
   } FTC_ImageQueryRec, *FTC_ImageQuery;
 
@@ -54,7 +54,7 @@
   typedef struct  FTC_ImageFamilyRec_
   {
     FTC_GlyphFamilyRec  gfam;
-    FTC_ImageDesc       desc;
+    FTC_ImageTypeRec    type;
 
   } FTC_ImageFamilyRec, *FTC_ImageFamily;
 
@@ -106,45 +106,18 @@
 
     /* we will now load the glyph image */
     error = FTC_Manager_Lookup_Size( FTC_FAMILY( ifam )->cache->manager,
-                                     &ifam->desc.font,
+                                     &ifam->type.font,
                                      &face, &size );
     if ( !error )
     {
-      FT_UInt  gindex     = FTC_GLYPH_NODE_GINDEX( inode );
-      FT_UInt  load_flags = FT_LOAD_DEFAULT;
-      FT_UInt  type       = ifam->desc.type;
+      FT_UInt  gindex = FTC_GLYPH_NODE_GINDEX( inode );
 
 
-      if ( FTC_IMAGE_FORMAT( type ) == ftc_image_format_bitmap )
-      {
-        load_flags |= FT_LOAD_RENDER;
-        if ( type & ftc_image_flag_monochrome )
-          load_flags |= FT_LOAD_MONOCHROME;
-
-        /* disable embedded bitmaps loading if necessary */
-        if ( type & ftc_image_flag_no_sbits )
-          load_flags |= FT_LOAD_NO_BITMAP;
-      }
-      else if ( FTC_IMAGE_FORMAT( type ) == ftc_image_format_outline )
-      {
-        /* disable embedded bitmaps loading */
-        load_flags |= FT_LOAD_NO_BITMAP;
-
-        if ( type & ftc_image_flag_unscaled )
-          load_flags |= FT_LOAD_NO_SCALE;
-      }
-
-      if ( type & ftc_image_flag_unhinted )
-        load_flags |= FT_LOAD_NO_HINTING;
-
-      if ( type & ftc_image_flag_autohinted )
-        load_flags |= FT_LOAD_FORCE_AUTOHINT;
-
-      error = FT_Load_Glyph( face, gindex, load_flags );
+      error = FT_Load_Glyph( face, gindex, ifam->type.flags );
       if ( !error )
       {
-        if ( face->glyph->format == ft_glyph_format_bitmap  ||
-             face->glyph->format == ft_glyph_format_outline )
+        if ( face->glyph->format == FT_GLYPH_FORMAT_BITMAP  ||
+             face->glyph->format == FT_GLYPH_FORMAT_OUTLINE )
         {
           /* ok, copy it */
           FT_Glyph  glyph;
@@ -179,7 +152,7 @@
 
     switch ( glyph->format )
     {
-    case ft_glyph_format_bitmap:
+    case FT_GLYPH_FORMAT_BITMAP:
       {
         FT_BitmapGlyph  bitg;
 
@@ -190,7 +163,7 @@
       }
       break;
 
-    case ft_glyph_format_outline:
+    case FT_GLYPH_FORMAT_OUTLINE:
       {
         FT_OutlineGlyph  outg;
 
@@ -231,16 +204,16 @@
     FT_Face      face;
 
 
-    ifam->desc = iquery->desc;
+    ifam->type = iquery->type;
 
     /* we need to compute "iquery.item_total" now */
     error = FTC_Manager_Lookup_Face( manager,
-                                     iquery->desc.font.face_id,
+                                     iquery->type.font.face_id,
                                      &face );
     if ( !error )
     {
       error = ftc_glyph_family_init( FTC_GLYPH_FAMILY( ifam ),
-                                     FTC_IMAGE_DESC_HASH( &ifam->desc ),
+                                     FTC_IMAGE_TYPE_HASH( &ifam->type ),
                                      1,
                                      face->num_glyphs,
                                      FTC_GLYPH_QUERY( iquery ),
@@ -258,7 +231,7 @@
     FT_Bool  result;
 
 
-    result = FT_BOOL( FTC_IMAGE_DESC_COMPARE( &ifam->desc, &iquery->desc ) );
+    result = FT_BOOL( FTC_IMAGE_TYPE_COMPARE( &ifam->type, &iquery->type ) );
     if ( result )
       FTC_GLYPH_FAMILY_FOUND( ifam, iquery );
 
@@ -314,7 +287,7 @@
 
   FT_EXPORT_DEF( FT_Error )
   FTC_ImageCache_Lookup( FTC_ImageCache  cache,
-                         FTC_ImageDesc*  desc,
+                         FTC_ImageType   type,
                          FT_UInt         gindex,
                          FT_Glyph       *aglyph,
                          FTC_Node       *anode )
@@ -332,7 +305,7 @@
       *anode  = NULL;
 
     iquery.gquery.gindex = gindex;
-    iquery.desc          = *desc;
+    iquery.type          = *type;
 
     error = ftc_cache_lookup( FTC_CACHE( cache ),
                               FTC_QUERY( &iquery ),
@@ -368,17 +341,55 @@
                           FT_UInt          gindex,
                           FT_Glyph        *aglyph )
   {
-    FTC_ImageDesc  desc0;
+    FTC_ImageTypeRec  type0;
 
 
     if ( !desc )
       return FTC_Err_Invalid_Argument;
 
-    desc0.font = desc->font;
-    desc0.type = (FT_UInt32)desc->image_type;
+    type0.font = desc->font;
+
+    /* convert image type flags to load flags */
+    {
+      FT_UInt  load_flags = FT_LOAD_DEFAULT;
+      FT_UInt  type       = desc->image_type;
+
+
+      /* determine load flags, depending on the font description's */
+      /* image type                                                */
+
+      if ( ftc_image_format( type ) == ftc_image_format_bitmap )
+      {
+        if ( type & ftc_image_flag_monochrome )
+          load_flags |= FT_LOAD_MONOCHROME;
+
+        /* disable embedded bitmaps loading if necessary */
+        if ( type & ftc_image_flag_no_sbits )
+          load_flags |= FT_LOAD_NO_BITMAP;
+      }
+      else
+      {
+        /* we want an outline, don't load embedded bitmaps */
+        load_flags |= FT_LOAD_NO_BITMAP;
+
+        if ( type & ftc_image_flag_unscaled )
+          load_flags |= FT_LOAD_NO_SCALE;
+      }
+
+      /* always render glyphs to bitmaps */
+      load_flags |= FT_LOAD_RENDER;
+
+      if ( type & ftc_image_flag_unhinted )
+        load_flags |= FT_LOAD_NO_HINTING;
+
+      if ( type & ftc_image_flag_autohinted )
+        load_flags |= FT_LOAD_FORCE_AUTOHINT;
+
+      type0.flags = load_flags;
+    }
 
     return FTC_ImageCache_Lookup( (FTC_ImageCache)icache,
-                                   &desc0,
+                                   &type0,
                                    gindex,
                                    aglyph,
                                    NULL );

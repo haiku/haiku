@@ -37,22 +37,22 @@ FT_BEGIN_HEADER
 
   typedef struct  AH_Stem_
   {
-    FT_Pos    pos;       /* current position        */
-    FT_Pos    velocity;  /* current velocity        */
-    FT_Pos    force;     /* sum of current forces   */
-    FT_Pos    width;     /* normalized width        */
+    FT_Pos   pos;       /* current position        */
+    FT_Pos   velocity;  /* current velocity        */
+    FT_Pos   force;     /* sum of current forces   */
+    FT_Pos   width;     /* normalized width        */
 
-    FT_Pos    min_pos;   /* minimum grid position */
-    FT_Pos    max_pos;   /* maximum grid position */
+    FT_Pos   min_pos;   /* minimum grid position */
+    FT_Pos   max_pos;   /* maximum grid position */
 
-    AH_Edge*  edge1;     /* left/bottom edge */
-    AH_Edge*  edge2;     /* right/top edge   */
+    AH_Edge  edge1;     /* left/bottom edge */
+    AH_Edge  edge2;     /* right/top edge   */
 
-    FT_Pos    opos;      /* original position */
-    FT_Pos    owidth;    /* original width    */
+    FT_Pos   opos;      /* original position */
+    FT_Pos   owidth;    /* original width    */
 
-    FT_Pos    min_coord; /* minimum coordinate */
-    FT_Pos    max_coord; /* maximum coordinate */
+    FT_Pos   min_coord; /* minimum coordinate */
+    FT_Pos   max_coord; /* maximum coordinate */
 
   } AH_Stem;
 
@@ -81,7 +81,7 @@ FT_BEGIN_HEADER
   typedef struct  AH_Optimizer_
   {
     FT_Memory         memory;
-    AH_Outline*       outline;
+    AH_Outline        outline;
 
     FT_Int            num_hstems;
     AH_Stem*          horz_stems;
@@ -115,7 +115,7 @@ FT_BEGIN_HEADER
   /* loads the outline into the optimizer */
   int
   AH_Optimizer_Init( AH_Optimizer*  optimizer,
-                     AH_Outline*    outline,
+                     AH_Outline     outline,
                      FT_Memory      memory );
 
 

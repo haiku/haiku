@@ -123,6 +123,7 @@ FT_BEGIN_HEADER
     FT_Fixed           blue_scale;
     FT_Int             blue_shift;
     FT_Int             blue_threshold;
+    FT_Int             blue_fuzz;
     FT_Bool            no_overshoots;
 
   } PSH_BluesRec, *PSH_Blues;

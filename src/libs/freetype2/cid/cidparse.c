@@ -49,7 +49,7 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  CID_New_Parser( CID_Parser*    parser,
+  cid_parser_new( CID_Parser*    parser,
                   FT_Stream      stream,
                   FT_Memory      memory,
                   PSAux_Service  psaux )
@@ -60,7 +60,7 @@
     FT_Int    buff_len;
 
 
-    FT_MEM_SET( parser, 0, sizeof ( *parser ) );
+    FT_MEM_ZERO( parser, sizeof ( *parser ) );
     psaux->ps_parser_funcs->init( &parser->root, 0, 0, memory );
 
     parser->stream = stream;
@@ -138,7 +138,7 @@
 
 
   FT_LOCAL_DEF( void )
-  CID_Done_Parser( CID_Parser*  parser )
+  cid_parser_done( CID_Parser*  parser )
   {
     /* always free the private dictionary */
     if ( parser->postscript )

@@ -25,15 +25,15 @@
 
 
 #ifdef  DEBUG_HINTER
-   extern AH_Hinter*  ah_debug_hinter       = NULL;
-   extern FT_Bool     ah_debug_disable_horz = 0;
-   extern FT_Bool     ah_debug_disable_vert = 0;
+   AH_Hinter  ah_debug_hinter       = NULL;
+   FT_Bool    ah_debug_disable_horz = 0;
+   FT_Bool    ah_debug_disable_vert = 0;
 #endif
 
   typedef struct  FT_AutoHinterRec_
   {
     FT_ModuleRec  root;
-    AH_Hinter*    hinter;
+    AH_Hinter     hinter;
 
   } FT_AutoHinterRec;
 
@@ -69,7 +69,7 @@
                             FT_GlyphSlot   slot,
                             FT_Size        size,
                             FT_UInt        glyph_index,
-                            FT_ULong       load_flags )
+                            FT_Int32       load_flags )
   {
     return ah_hinter_load_glyph( module->hinter,
                                  slot, size, glyph_index, load_flags );
@@ -83,7 +83,7 @@
     FT_UNUSED( module );
 
     if ( face->autohint.data )
-      ah_hinter_done_face_globals( (AH_Face_Globals*)(face->autohint.data) );
+      ah_hinter_done_face_globals( (AH_Face_Globals)(face->autohint.data) );
   }
 
 

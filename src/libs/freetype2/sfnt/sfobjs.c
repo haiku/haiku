@@ -86,7 +86,7 @@
 
     for ( n = 0; n < len; n++ )
     {
-      code = FT_NEXT_ULONG( read );
+      code = (FT_UInt)FT_NEXT_ULONG( read );
       if ( code < 32 || code > 127 )
         code = '?';
 
@@ -296,20 +296,20 @@
     static
     const TEncoding  tt_encodings[] =
     {
-      { TT_PLATFORM_ISO,           -1,                  ft_encoding_unicode },
+      { TT_PLATFORM_ISO,           -1,                  FT_ENCODING_UNICODE },
 
-      { TT_PLATFORM_APPLE_UNICODE, -1,                  ft_encoding_unicode },
+      { TT_PLATFORM_APPLE_UNICODE, -1,                  FT_ENCODING_UNICODE },
 
-      { TT_PLATFORM_MACINTOSH,     TT_MAC_ID_ROMAN,     ft_encoding_apple_roman },
+      { TT_PLATFORM_MACINTOSH,     TT_MAC_ID_ROMAN,     FT_ENCODING_APPLE_ROMAN },
 
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_SYMBOL_CS,  ft_encoding_symbol },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_UCS_4,      ft_encoding_unicode },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_UNICODE_CS, ft_encoding_unicode },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_SJIS,       ft_encoding_sjis },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_GB2312,     ft_encoding_gb2312 },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_BIG_5,      ft_encoding_big5 },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_WANSUNG,    ft_encoding_wansung },
-      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_JOHAB,      ft_encoding_johab }
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_SYMBOL_CS,  FT_ENCODING_MS_SYMBOL },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_UCS_4,      FT_ENCODING_UNICODE },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_UNICODE_CS, FT_ENCODING_UNICODE },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_SJIS,       FT_ENCODING_MS_SJIS },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_GB2312,     FT_ENCODING_MS_GB2312 },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_BIG_5,      FT_ENCODING_MS_BIG5 },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_WANSUNG,    FT_ENCODING_MS_WANSUNG },
+      { TT_PLATFORM_MICROSOFT,     TT_MS_ID_JOHAB,      FT_ENCODING_MS_JOHAB }
     };
 
     const TEncoding  *cur, *limit;
@@ -328,12 +328,12 @@
       }
     }
 
-    return ft_encoding_none;
+    return FT_ENCODING_NONE;
   }
 
 
   FT_LOCAL_DEF( FT_Error )
-  SFNT_Init_Face( FT_Stream      stream,
+  sfnt_init_face( FT_Stream      stream,
                   TT_Face        face,
                   FT_Int         face_index,
                   FT_Int         num_params,
@@ -397,7 +397,7 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  SFNT_Load_Face( FT_Stream      stream,
+  sfnt_load_face( FT_Stream      stream,
                   TT_Face        face,
                   FT_Int         face_index,
                   FT_Int         num_params,
@@ -432,8 +432,15 @@
     /*                                                             */
 
     /* do we have outlines in there? */
-    has_outline   = FT_BOOL( ( TT_LookUp_Table( face, TTAG_glyf ) != 0 ) ||
-                             ( TT_LookUp_Table( face, TTAG_CFF  ) != 0 ) );
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    has_outline   = FT_BOOL( face->root.internal->incremental_interface != 0 ||
+                             tt_face_lookup_table( face, TTAG_glyf ) != 0         ||
+                             tt_face_lookup_table( face, TTAG_CFF ) != 0          );
+#else
+    has_outline   = FT_BOOL( tt_face_lookup_table( face, TTAG_glyf ) != 0 ||
+                             tt_face_lookup_table( face, TTAG_CFF ) != 0  );
+#endif
+
     is_apple_sbit = 0;
 
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
@@ -508,8 +515,7 @@
     /* now set up root fields */
     {
       FT_Face    root = &face->root;
-      FT_Int     flags = 0;
-      FT_Int     n;
+      FT_Int32   flags = 0;
       FT_Memory  memory;
 
 
@@ -578,9 +584,8 @@
       /*   Try to set the charmap encoding according to the platform &     */
       /*   encoding ID of each charmap.                                    */
       /*                                                                   */
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
 
-      TT_Build_CMaps( face );  /* ignore errors */
+      tt_face_build_cmaps( face );  /* ignore errors */
 
 
       /* set the encoding fields */
@@ -596,56 +601,25 @@
           charmap->encoding = sfnt_find_encoding( charmap->platform_id,
                                                   charmap->encoding_id );
 
+#if 0
           if ( root->charmap     == NULL &&
-               charmap->encoding == ft_encoding_unicode )
+               charmap->encoding == FT_ENCODING_UNICODE )
           {
             /* set 'root->charmap' to the first Unicode encoding we find */
             root->charmap = charmap;
           }
+#endif
         }
       }
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-      {
-        TT_CharMap  charmap = face->charmaps;
-
-
-        charmap            = face->charmaps;
-        root->num_charmaps = face->num_charmaps;
-
-        /* allocate table of pointers */
-        if ( FT_NEW_ARRAY( root->charmaps, root->num_charmaps ) )
-          goto Exit;
-
-        for ( n = 0; n < root->num_charmaps; n++, charmap++ )
-        {
-          FT_Int  platform = charmap->cmap.platformID;
-          FT_Int  encoding = charmap->cmap.platformEncodingID;
-
-
-          charmap->root.face        = (FT_Face)face;
-          charmap->root.platform_id = (FT_UShort)platform;
-          charmap->root.encoding_id = (FT_UShort)encoding;
-          charmap->root.encoding    = sfnt_find_encoding( platform, encoding );
-
-          /* now, set root->charmap with a unicode charmap */
-          /* wherever available                            */
-          if ( !root->charmap                                &&
-               charmap->root.encoding == ft_encoding_unicode )
-            root->charmap = (FT_CharMap)charmap;
-
-          root->charmaps[n] = (FT_CharMap)charmap;
-        }
-      }
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
 
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
 
       if ( face->num_sbit_strikes )
       {
+        FT_ULong  n;
+
+
         root->face_flags |= FT_FACE_FLAG_FIXED_SIZES;
 
 #if 0
@@ -779,7 +753,7 @@
 
 
   FT_LOCAL_DEF( void )
-  SFNT_Done_Face( TT_Face  face )
+  sfnt_done_face( TT_Face  face )
   {
     FT_Memory     memory = face->root.memory;
     SFNT_Service  sfnt   = (SFNT_Service)face->sfnt;
@@ -808,8 +782,6 @@
     FT_FREE( face->dir_tables );
     face->num_tables = 0;
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
     {
       FT_Stream  stream = FT_FACE_STREAM( face );
 
@@ -818,27 +790,6 @@
       FT_FRAME_RELEASE( face->cmap_table );
       face->cmap_size = 0;
     }
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-    /* freeing the character mapping tables */
-    if ( sfnt && sfnt->load_charmaps )
-    {
-      FT_UShort  n;
-
-
-      for ( n = 0; n < face->num_charmaps; n++ )
-        sfnt->free_charmap( face, &face->charmaps[n].cmap );
-    }
-
-    FT_FREE( face->charmaps );
-    face->num_charmaps = 0;
-
-    FT_FREE( face->root.charmaps );
-    face->root.num_charmaps = 0;
-    face->root.charmap      = 0;
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
     /* freeing the horizontal metrics */
     FT_FREE( face->horizontal.long_metrics );

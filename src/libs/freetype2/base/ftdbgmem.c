@@ -202,7 +202,7 @@
       if ( new_buckets == NULL )
         return;
 
-      FT_MEM_SET( new_buckets, 0, sizeof ( FT_MemNode ) * new_size );
+      FT_MEM_ZERO( new_buckets, sizeof ( FT_MemNode ) * new_size );
 
       for ( i = 0; i < table->size; i++ )
       {
@@ -243,7 +243,7 @@
     if ( table == NULL )
       goto Exit;
 
-    FT_MEM_SET( table, 0, sizeof ( *table ) );
+    FT_MEM_ZERO( table, sizeof ( *table ) );
 
     table->size  = FT_MEM_SIZE_MIN;
     table->nodes = 0;
@@ -260,7 +260,7 @@
                      memory->alloc( memory,
                                     table->size * sizeof ( FT_MemNode ) );
     if ( table->buckets )
-      FT_MEM_SET( table->buckets, 0, sizeof ( FT_MemNode ) * table->size );
+      FT_MEM_ZERO( table->buckets, sizeof ( FT_MemNode ) * table->size );
     else
     {
       memory->free( memory, table );

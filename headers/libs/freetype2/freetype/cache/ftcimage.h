@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType Image cache (specification).                                */
 /*                                                                         */
-/*  Copyright 2000-2001 by                                                 */
+/*  Copyright 2000-2001, 2002 by                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -53,65 +53,43 @@ FT_BEGIN_HEADER
   /*************************************************************************/
 
 
-#define FTC_IMAGE_FORMAT( x )  ( (x) & 7 )
-
-
-#define ftc_image_format_bitmap    0x0000
-#define ftc_image_format_outline   0x0001
-
-#define ftc_image_format_mask      0x000F
-
-#define ftc_image_flag_monochrome  0x0010
-#define ftc_image_flag_unhinted    0x0020
-#define ftc_image_flag_autohinted  0x0040
-#define ftc_image_flag_unscaled    0x0080
-#define ftc_image_flag_no_sbits    0x0100
-
-  /* monochrome bitmap */
-#define ftc_image_mono             ftc_image_format_bitmap | \
-                                   ftc_image_flag_monochrome
-
-  /* anti-aliased bitmap */
-#define ftc_image_grays            ftc_image_format_bitmap
-
-  /* scaled outline */
-#define ftc_image_outline          ftc_image_format_outline
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* <Struct>                                                              */
-  /*    FTC_ImageDesc                                                      */
-  /*                                                                       */
-  /* <Description>                                                         */
-  /*    A simple structure used to describe a given glyph image category.  */
-  /*    Note that this is different from @FTC_Image_Desc.                  */
-  /*                                                                       */
-  /* <Fields>                                                              */
-  /*    size    :: An @FTC_SizeRec used to describe the glyph's face and   */
-  /*               size.                                                   */
-  /*                                                                       */
-  /*    type    :: The glyph image's type.  Note that it is a 32-bit uint. */
-  /*                                                                       */
-  /* <Note>                                                                */
-  /*    This type deprecates @FTC_Image_Desc.                              */
-  /*                                                                       */
-  typedef struct  FTC_ImageDesc_
+ /**************************************************************************
+  *
+  * @struct:
+  *   FTC_ImageTypeRec
+  *
+  * @description:
+  *   A simple structure used to describe the type of glyph image to be
+  *   loaded into the cache.
+  *
+  * @fields:
+  *   font  :: An @FTC_FontRec used to describe the glyph's face and size.
+  *
+  *   flags :: The load flags to be applied when loading the glyph; see
+  *            the @FT_LOAD_XXX constants for details.
+  *
+  * @note:
+  *   This type completely replaces the @FTC_Image_Desc structure which is
+  *   now obsolete.
+  */
+  typedef struct  FTC_ImageTypeRec_
   {
     FTC_FontRec  font;
-    FT_UInt32    type;
+    FT_Int32     flags;
 
-  } FTC_ImageDesc;
+  } FTC_ImageTypeRec;
+
+  typedef struct FTC_ImageTypeRec_*   FTC_ImageType;
 
  /* */
 
-#define FTC_IMAGE_DESC_COMPARE( d1, d2 )                    \
+#define FTC_IMAGE_TYPE_COMPARE( d1, d2 )                    \
           ( FTC_FONT_COMPARE( &(d1)->font, &(d2)->font ) && \
-            (d1)->type == (d2)->type                     )
+            (d1)->flags == (d2)->flags                   )
 
-#define FTC_IMAGE_DESC_HASH( d )                    \
+#define FTC_IMAGE_TYPE_HASH( d )                    \
           (FT_UFast)( FTC_FONT_HASH( &(d)->font ) ^ \
-                      ( (d)->type << 4 )          )
+                      ( (d)->flags << 4 )         )
 
 
   /*************************************************************************/
@@ -160,7 +138,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    cache  :: A handle to the source glyph image cache.                */
   /*                                                                       */
-  /*    desc   :: A pointer to a glyph image descriptor.                   */
+  /*    type   :: A pointer to a glyph image type descriptor.              */
   /*                                                                       */
   /*    gindex :: The glyph index to retrieve.                             */
   /*                                                                       */
@@ -193,13 +171,36 @@ FT_BEGIN_HEADER
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FTC_ImageCache_Lookup( FTC_ImageCache  cache,
-                         FTC_ImageDesc*  desc,
+                         FTC_ImageType   type,
                          FT_UInt         gindex,
                          FT_Glyph       *aglyph,
                          FTC_Node       *anode );
 
   /* */
 
+#define ftc_image_format( x )  ( (x) & 7 )
+
+
+#define ftc_image_format_bitmap    0x0000
+#define ftc_image_format_outline   0x0001
+
+#define ftc_image_format_mask      0x000F
+
+#define ftc_image_flag_monochrome  0x0010
+#define ftc_image_flag_unhinted    0x0020
+#define ftc_image_flag_autohinted  0x0040
+#define ftc_image_flag_unscaled    0x0080
+#define ftc_image_flag_no_sbits    0x0100
+
+  /* monochrome bitmap */
+#define ftc_image_mono             ftc_image_format_bitmap | \
+                                   ftc_image_flag_monochrome
+
+  /* anti-aliased bitmap */
+#define ftc_image_grays            ftc_image_format_bitmap
+
+  /* scaled outline */
+#define ftc_image_outline          ftc_image_format_outline
 
   /*************************************************************************/
   /*                                                                       */

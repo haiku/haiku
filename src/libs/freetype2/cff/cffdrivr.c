@@ -118,7 +118,7 @@
 
       while ( left <= right )
       {
-        FT_Int    middle = left + ( ( right - left ) >> 1 );
+        FT_Long   middle = left + ( ( right - left ) >> 1 );
         FT_ULong  cur_pair;
 
 
@@ -177,7 +177,7 @@
   Load_Glyph( CFF_GlyphSlot  slot,
               CFF_Size       size,
               FT_UShort      glyph_index,
-              FT_UInt        load_flags )
+              FT_Int32       load_flags )
   {
     FT_Error  error;
 
@@ -201,7 +201,7 @@
     }
 
     /* now load the glyph outline if necessary */
-    error = CFF_Load_Glyph( slot, size, glyph_index, load_flags );
+    error = cff_slot_load( slot, size, glyph_index, load_flags );
 
     /* force drop-out mode to 2 - irrelevant now */
     /* slot->outline.dropout_mode = 2; */
@@ -253,11 +253,11 @@
     sid = font->charset.sids[glyph_index];
 
     /* now, lookup the name itself */
-    gname = CFF_Get_String( &font->string_index, sid, psnames );
+    gname = cff_index_get_sid_string( &font->string_index, sid, psnames );
 
     if ( buffer_max > 0 )
     {
-      FT_UInt  len = ft_strlen( gname );
+      FT_UInt  len = (FT_UInt)ft_strlen( gname );
 
 
       if ( len >= buffer_max )
@@ -274,94 +274,6 @@
       return error;
   }
 
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* <Function>                                                            */
-  /*    cff_get_char_index                                                 */
-  /*                                                                       */
-  /* <Description>                                                         */
-  /*    Uses a charmap to return a given character code's glyph index.     */
-  /*                                                                       */
-  /* <Input>                                                               */
-  /*    charmap  :: A handle to the source charmap object.                 */
-  /*    charcode :: The character code.                                    */
-  /*                                                                       */
-  /* <Return>                                                              */
-  /*    Glyph index.  0 means `undefined character code'.                  */
-  /*                                                                       */
-  static FT_UInt
-  cff_get_char_index( TT_CharMap  charmap,
-                      FT_Long     charcode )
-  {
-    FT_Error      error;
-    CFF_Face      face;
-    TT_CMapTable  cmap;
-
-
-    cmap = &charmap->cmap;
-    face = (CFF_Face)charmap->root.face;
-
-    /* Load table if needed */
-    if ( !cmap->loaded )
-    {
-      SFNT_Service  sfnt = (SFNT_Service)face->sfnt;
-
-
-      error = sfnt->load_charmap( face, cmap, face->root.stream );
-      if ( error )
-        return 0;
-
-      cmap->loaded = TRUE;
-    }
-
-    return ( cmap->get_index ? cmap->get_index( cmap, charcode ) : 0 );
-  }
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* <Function>                                                            */
-  /*    cff_get_next_char                                                  */
-  /*                                                                       */
-  /* <Description>                                                         */
-  /*    Uses a charmap to return the next encoded charcode.                */
-  /*                                                                       */
-  /* <Input>                                                               */
-  /*    charmap  :: A handle to the source charmap object.                 */
-  /*    charcode :: The character code.                                    */
-  /*                                                                       */
-  /* <Return>                                                              */
-  /*    Char code.  0 means `no encoded chars above the given one'.        */
-  /*                                                                       */
-  static FT_Long
-  cff_get_next_char( TT_CharMap  charmap,
-                     FT_Long     charcode )
-  {
-    FT_Error      error;
-    CFF_Face      face;
-    TT_CMapTable  cmap;
-
-
-    cmap = &charmap->cmap;
-    face = (CFF_Face)charmap->root.face;
-
-    /* Load table if needed */
-    if ( !cmap->loaded )
-    {
-      SFNT_Service  sfnt = (SFNT_Service)face->sfnt;
-
-
-      error = sfnt->load_charmap( face, cmap, face->root.stream );
-      if ( error )
-        return 0;
-
-      cmap->loaded = TRUE;
-    }
-
-    return ( cmap->get_next_char ? cmap->get_next_char( cmap, charcode )
-                                 : 0 );
-  }
 
 
   /*************************************************************************/
@@ -406,7 +318,7 @@
       sid = charset->sids[i];
 
       if ( sid > 390 )
-        name = CFF_Get_Name( &cff->string_index, sid - 391 );
+        name = cff_index_get_name( &cff->string_index, sid - 391 );
       else
         name = (FT_String *)psnames->adobe_std_strings( sid );
 
@@ -469,7 +381,7 @@
       ft_module_font_driver       |
       ft_module_driver_scalable   |
       ft_module_driver_has_hinter,
-      
+
       sizeof( CFF_DriverRec ),
       "cff",
       0x10000L,
@@ -477,8 +389,8 @@
 
       0,   /* module-specific interface */
 
-      (FT_Module_Constructor)CFF_Driver_Init,
-      (FT_Module_Destructor) CFF_Driver_Done,
+      (FT_Module_Constructor)cff_driver_init,
+      (FT_Module_Destructor) cff_driver_done,
       (FT_Module_Requester)  cff_get_interface,
     },
 
@@ -487,24 +399,21 @@
     sizeof( FT_SizeRec ),
     sizeof( CFF_GlyphSlotRec ),
 
-    (FT_Face_InitFunc)        CFF_Face_Init,
-    (FT_Face_DoneFunc)        CFF_Face_Done,
-    (FT_Size_InitFunc)        CFF_Size_Init,
-    (FT_Size_DoneFunc)        CFF_Size_Done,
-    (FT_Slot_InitFunc)        CFF_GlyphSlot_Init,
-    (FT_Slot_DoneFunc)        CFF_GlyphSlot_Done,
+    (FT_Face_InitFunc)       cff_face_init,
+    (FT_Face_DoneFunc)       cff_face_done,
+    (FT_Size_InitFunc)       cff_size_init,
+    (FT_Size_DoneFunc)       cff_size_done,
+    (FT_Slot_InitFunc)       cff_slot_init,
+    (FT_Slot_DoneFunc)       cff_slot_done,
 
-    (FT_Size_ResetPointsFunc) CFF_Size_Reset,
-    (FT_Size_ResetPixelsFunc) CFF_Size_Reset,
+    (FT_Size_ResetPointsFunc)cff_size_reset,
+    (FT_Size_ResetPixelsFunc)cff_size_reset,
 
-    (FT_Slot_LoadFunc)        Load_Glyph,
-    (FT_CharMap_CharIndexFunc)cff_get_char_index,
+    (FT_Slot_LoadFunc)       Load_Glyph,
 
-    (FT_Face_GetKerningFunc)  Get_Kerning,
-    (FT_Face_AttachFunc)      0,
-    (FT_Face_GetAdvancesFunc) 0,
-    
-    (FT_CharMap_CharNextFunc) cff_get_next_char
+    (FT_Face_GetKerningFunc) Get_Kerning,
+    (FT_Face_AttachFunc)     0,
+    (FT_Face_GetAdvancesFunc)0,
   };
 
 

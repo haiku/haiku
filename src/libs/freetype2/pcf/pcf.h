@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include <ft2build.h>
 #include FT_INTERNAL_DRIVER_H
+#include FT_INTERNAL_STREAM_H
 
 
 FT_BEGIN_HEADER
@@ -134,6 +135,9 @@ FT_BEGIN_HEADER
   typedef struct  PCF_FaceRec_
   {
     FT_FaceRec     root;
+
+    FT_StreamRec   gzip_stream;
+    FT_Stream      gzip_source;
 
     char*          charset_encoding;
     char*          charset_registry;

@@ -25,8 +25,8 @@
 #define FT_COMPONENT  trace_pshalgo1
 
 #ifdef DEBUG_HINTER
-  extern PSH1_Hint_Table  ps1_debug_hint_table = 0;
-  extern PSH1_HintFunc    ps1_debug_hint_func  = 0;
+  PSH1_Hint_Table  ps1_debug_hint_table = 0;
+  PSH1_HintFunc    ps1_debug_hint_func  = 0;
 #endif
 
 
@@ -742,14 +742,17 @@
   /*************************************************************************/
 
   FT_Error
-  ps1_hints_apply( PS_Hints     ps_hints,
-                   FT_Outline*  outline,
-                   PSH_Globals  globals )
+  ps1_hints_apply( PS_Hints        ps_hints,
+                   FT_Outline*     outline,
+                   PSH_Globals     globals,
+                   FT_Render_Mode  hint_mode )
   {
     PSH1_Hint_TableRec  hints;
     FT_Error            error = 0;
     FT_Int              dimension;
 
+
+    FT_UNUSED( hint_mode );
 
     for ( dimension = 1; dimension >= 0; dimension-- )
     {
@@ -757,7 +760,7 @@
 
 
       /* initialize hints table */
-      ft_memset( &hints, 0, sizeof ( hints ) );
+      FT_MEM_ZERO( &hints, sizeof ( hints ) );
       error = psh1_hint_table_init( &hints,
                                     &dim->hints,
                                     &dim->masks,

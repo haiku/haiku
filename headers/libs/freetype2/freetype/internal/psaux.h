@@ -142,10 +142,10 @@ FT_BEGIN_HEADER
   typedef struct PS_ParserRec_*  PS_Parser;
 
   typedef struct T1_TokenRec_*   T1_Token;
-  
+
   typedef struct T1_FieldRec_*   T1_Field;
 
-  
+
   /* simple enumeration type used to identify token types */
   typedef enum  T1_TokenType_
   {
@@ -178,6 +178,7 @@ FT_BEGIN_HEADER
     T1_FIELD_TYPE_INTEGER,
     T1_FIELD_TYPE_FIXED,
     T1_FIELD_TYPE_STRING,
+    T1_FIELD_TYPE_BBOX,
     T1_FIELD_TYPE_INTEGER_ARRAY,
     T1_FIELD_TYPE_FIXED_ARRAY,
     T1_FIELD_TYPE_CALLBACK,
@@ -194,6 +195,7 @@ FT_BEGIN_HEADER
     T1_FIELD_LOCATION_FONT_DICT,
     T1_FIELD_LOCATION_FONT_INFO,
     T1_FIELD_LOCATION_PRIVATE,
+    T1_FIELD_LOCATION_BBOX,
 
     /* do not remove */
     T1_FIELD_LOCATION_MAX
@@ -270,6 +272,10 @@ FT_BEGIN_HEADER
 
 #define T1_FIELD_STRING( _ident, _fname )                             \
           T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_STRING, _fname )
+
+#define T1_FIELD_BBOX( _ident, _fname )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BBOX, _fname )
+
 
 #define T1_FIELD_NUM_TABLE( _ident, _fname, _fmax )                \
           T1_NEW_TABLE_FIELD( _ident, T1_FIELD_TYPE_INTEGER_ARRAY, \
@@ -388,7 +394,7 @@ FT_BEGIN_HEADER
     FT_Memory  memory;
 
     PS_Parser_FuncsRec  funcs;
-    
+
   } PS_ParserRec;
 
 
@@ -544,7 +550,7 @@ FT_BEGIN_HEADER
     void*           hints_globals;  /* hinter-specific */
 
     T1_Builder_FuncsRec  funcs;
-    
+
   } T1_BuilderRec;
 
 
@@ -604,6 +610,7 @@ FT_BEGIN_HEADER
              FT_Byte**            glyph_names,
              PS_Blend             blend,
              FT_Bool              hinting,
+             FT_Render_Mode       hint_mode,
              T1_Decoder_Callback  callback );
 
     void
@@ -613,7 +620,7 @@ FT_BEGIN_HEADER
     (*parse_charstrings)( T1_Decoder  decoder,
                           FT_Byte*    base,
                           FT_UInt     len );
-                          
+
   } T1_Decoder_FuncsRec;
 
 
@@ -645,9 +652,12 @@ FT_BEGIN_HEADER
 
     PS_Blend             blend;       /* for multiple master support */
 
+    FT_UInt32            hint_flags;
+    FT_Render_Mode       hint_mode;
+
     T1_Decoder_Callback  parse_callback;
     T1_Decoder_FuncsRec  funcs;
-    
+
   } T1_DecoderRec;
 
 
@@ -667,9 +677,9 @@ FT_BEGIN_HEADER
     FT_CMap_Class  expert;
     FT_CMap_Class  custom;
     FT_CMap_Class  unicode;
-  
+
   } T1_CMap_ClassesRec;
-  
+
 
   /*************************************************************************/
   /*************************************************************************/

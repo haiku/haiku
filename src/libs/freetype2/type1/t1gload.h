@@ -35,7 +35,7 @@ FT_BEGIN_HEADER
   T1_Load_Glyph( T1_GlyphSlot  glyph,
                  T1_Size       size,
                  FT_UInt       glyph_index,
-                 FT_Int        load_flags );
+                 FT_Int32      load_flags );
 
 
 FT_END_HEADER

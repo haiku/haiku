@@ -579,6 +579,12 @@
   /* Otherwise, a glyph index is taken from the glyph ids sub-array for    */
   /* the segment, and the value of `idDelta' is added to it.               */
   /*                                                                       */
+  /*                                                                       */
+  /* Finally, note that certain fonts contain invalid charmaps that        */
+  /* contain end=0xFFFF, start=0xFFFF, delta=0x0001, offset=0xFFFF at the  */
+  /* of their charmaps (e.g. opens___.ttf which comes with OpenOffice.org) */
+  /* we need special code to deal with them correctly...                   */
+  /*                                                                       */
 
 #ifdef TT_CONFIG_CMAP_FORMAT_4
 
@@ -592,8 +598,18 @@
     FT_UInt   num_segs;
 
 
-    if ( table + length > valid->limit || length < 16 )
+    /* in certain fonts, the `length' field is invalid and goes */
+    /* out of bound.  We try to correct this here...            */
+    if ( length < 16 )
       FT_INVALID_TOO_SHORT;
+
+    if ( table + length > valid->limit )
+    {
+      if ( valid->level >= FT_VALIDATE_TIGHT )
+        FT_INVALID_TOO_SHORT;
+
+      length = (FT_UInt)( valid->limit - table );
+    }
 
     p        = table + 6;
     num_segs = TT_NEXT_USHORT( p );   /* read segCountX2 */
@@ -680,7 +696,7 @@
             FT_INVALID_DATA;
         }
 
-        if ( offset )
+        if ( offset && offset != 0xFFFFU )
         {
           p += offset;  /* start of glyph id array */
 
@@ -692,10 +708,10 @@
           /* check glyph indices within the segment range */
           if ( valid->level >= FT_VALIDATE_TIGHT )
           {
-            FT_UInt  idx;
+            FT_UInt  i, idx;
 
 
-            for ( ; start < end; )
+            for ( i = start; i < end; i++ )
             {
               idx = FT_NEXT_USHORT( p );
               if ( idx != 0 )
@@ -707,6 +723,16 @@
               }
             }
           }
+        }
+        else if ( offset == 0xFFFFU )
+        {
+          /* Some fonts (erroneously?) use a range offset of 0xFFFF */
+          /* to mean missing glyph in cmap table                    */
+          /*                                                        */
+          if ( valid->level >= FT_VALIDATE_PARANOID                     ||
+               n != num_segs - 1                                        ||
+               !( start == 0xFFFFU && end == 0xFFFFU && delta == 0x1U ) )
+            FT_INVALID_DATA;
         }
 
         last = end;
@@ -769,6 +795,9 @@
             p += num_segs2;
             offset = TT_PEEK_USHORT( p );
 
+            if ( offset == 0xFFFFU )
+              goto Exit;
+
             if ( offset != 0 )
             {
               p  += offset + 2 * ( idx - start );
@@ -812,6 +841,9 @@
             delta = TT_PEEK_SHORT( p );
             p += num_segs2;
             offset = TT_PEEK_USHORT( p );
+
+            if ( offset == 0xFFFFU )
+              goto Exit;
 
             if ( offset != 0 )
             {
@@ -879,7 +911,7 @@
           p += num_segs2;
           offset = TT_PEEK_USHORT( p );
 
-          if ( offset != 0 )
+          if ( offset != 0 && offset != 0xFFFFU )
           {
             /* parse the glyph ids array for non-0 index */
             p += offset + ( code - start ) * 2;
@@ -894,6 +926,12 @@
               }
               code++;
             }
+          }
+          else if ( offset == 0xFFFFU )
+          {
+            /* an offset of 0xFFFF means an empty glyph in certain fonts! */
+            code = end;
+            break;
           }
           else
             gindex = (FT_UInt)( code + delta ) & 0xFFFFU;
@@ -912,7 +950,7 @@
 
       code++;
     }
-    return result;
+    return (FT_UInt)result;
 
   Exit:
     *pchar_code = result;
@@ -1253,7 +1291,7 @@
 
       if ( char_code <= end )
       {
-        result = start_id + char_code - start;
+        result = (FT_UInt)( start_id + char_code - start );
         break;
       }
     }
@@ -1271,12 +1309,12 @@
     FT_Byte*   table      = cmap->data;
     FT_Byte*   p          = table + 8204;
     FT_UInt32  num_groups = TT_NEXT_ULONG( p );
-    FT_UInt32  n, start, end, start_id;
+    FT_UInt32  start, end, start_id;
 
 
     p = table + 8208;
 
-    for ( n = 0; n < num_groups++; n++ )
+    for ( ; num_groups > 0; num_groups-- )
     {
       start    = TT_NEXT_ULONG( p );
       end      = TT_NEXT_ULONG( p );
@@ -1560,7 +1598,7 @@
 
       if ( char_code <= end )
       {
-        result = start_id + char_code - start;
+        result = (FT_UInt)( start_id + char_code - start );
         break;
       }
     }
@@ -1578,12 +1616,12 @@
     FT_UInt    gindex     = 0;
     FT_Byte*   p          = table + 12;
     FT_UInt32  num_groups = TT_NEXT_ULONG( p );
-    FT_UInt32  n, start, end, start_id;
+    FT_UInt32  start, end, start_id;
 
 
     p = table + 16;
 
-    for ( n = 0; n < num_groups++; n++ )
+    for ( ; num_groups > 0; num_groups-- )
     {
       start    = TT_NEXT_ULONG( p );
       end      = TT_NEXT_ULONG( p );
@@ -1628,8 +1666,6 @@
 #endif /* TT_CONFIG_CMAP_FORMAT_12 */
 
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
   static const TT_CMap_Class  tt_cmap_classes[] =
   {
 #ifdef TT_CONFIG_CMAP_FORMAT_0
@@ -1668,12 +1704,12 @@
   /* in the current face                                                */
   /*                                                                    */
   FT_LOCAL_DEF( FT_Error )
-  TT_Build_CMaps( TT_Face  face )
+  tt_face_build_cmaps( TT_Face  face )
   {
     FT_Byte*           table = face->cmap_table;
     FT_Byte*           limit = table + face->cmap_size;
-    volatile FT_UInt   num_cmaps;
-    volatile FT_Byte*  p     = table;
+    FT_UInt volatile   num_cmaps;
+    FT_Byte* volatile  p     = table;
 
 
     if ( p + 4 > limit )
@@ -1683,7 +1719,7 @@
     if ( TT_NEXT_USHORT( p ) != 0 )
     {
       p -= 2;
-      FT_ERROR(( "TT_Build_CMaps: unsupported `cmap' table format = %d\n",
+      FT_ERROR(( "tt_face_build_cmaps: unsupported `cmap' table format = %d\n",
                  TT_PEEK_USHORT( p ) ));
       return FT_Err_Invalid_Table;
     }
@@ -1699,14 +1735,14 @@
       charmap.platform_id = TT_NEXT_USHORT( p );
       charmap.encoding_id = TT_NEXT_USHORT( p );
       charmap.face        = FT_FACE( face );
-      charmap.encoding    = ft_encoding_none;  /* will be filled later */
+      charmap.encoding    = FT_ENCODING_NONE;  /* will be filled later */
       offset              = TT_NEXT_ULONG( p );
 
       if ( offset && table + offset + 2 < limit )
       {
         FT_Byte*                       cmap   = table + offset;
         FT_UInt                        format = TT_PEEK_USHORT( cmap );
-        volatile const TT_CMap_Class*  pclazz = tt_cmap_classes;
+        const TT_CMap_Class* volatile  pclazz = tt_cmap_classes;
         TT_CMap_Class                  clazz;
 
 
@@ -1721,7 +1757,7 @@
             ft_validator_init( FT_VALIDATOR( &valid ), cmap, limit,
                                FT_VALIDATE_DEFAULT );
 
-            valid.num_glyphs = face->root.num_glyphs;
+            valid.num_glyphs = (FT_UInt)face->root.num_glyphs;
 
             if ( ft_setjmp( FT_VALIDATOR( &valid )->jump_buffer ) == 0 )
             {
@@ -1733,7 +1769,7 @@
               (void)FT_CMap_New( (FT_CMap_Class)clazz, cmap, &charmap, NULL );
             else
             {
-              FT_ERROR(( "TT_Build_CMaps:" ));
+              FT_ERROR(( "tt_face_build_cmaps:" ));
               FT_ERROR(( " broken cmap sub-table ignored!\n" ));
             }
           }
@@ -1743,8 +1779,6 @@
 
     return 0;
   }
-
-#endif /* FT_CONFIG_OPTION_USE_CMAPS */
 
 
 /* END */

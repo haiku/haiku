@@ -32,13 +32,13 @@
 FT_BEGIN_HEADER
 
 
-#define AH_IS_TOP_BLUE( b )  ( (b) == ah_blue_capital_top || \
-                               (b) == ah_blue_small_top   )
+#define AH_IS_TOP_BLUE( b )  ( (b) == AH_BLUE_CAPITAL_TOP || \
+                               (b) == AH_BLUE_SMALL_TOP   )
 
 
   /* compute global metrics automatically */
   FT_LOCAL( FT_Error )
-  ah_hinter_compute_globals( AH_Hinter*  hinter );
+  ah_hinter_compute_globals( AH_Hinter  hinter );
 
 
 FT_END_HEADER

@@ -40,7 +40,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_Locations                                                  */
+  /*    tt_face_load_loca                                                  */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the locations table.                                         */
@@ -55,7 +55,7 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  TT_Load_Locations( TT_Face    face,
+  tt_face_load_loca( TT_Face    face,
                      FT_Stream  stream )
   {
     FT_Error   error;
@@ -129,7 +129,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_CVT                                                        */
+  /*    tt_face_load_cvt                                                   */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the control value table into a face object.                  */
@@ -144,8 +144,8 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  TT_Load_CVT( TT_Face    face,
-               FT_Stream  stream )
+  tt_face_load_cvt( TT_Face    face,
+                    FT_Stream  stream )
   {
     FT_Error   error;
     FT_Memory  memory = stream->memory;
@@ -194,7 +194,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Load_Progams                                                    */
+  /*    tt_face_load_fpgm                                                  */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Loads the font program and the cvt program.                        */
@@ -209,8 +209,8 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  TT_Load_Programs( TT_Face    face,
-                    FT_Stream  stream )
+  tt_face_load_fpgm( TT_Face    face,
+                     FT_Stream  stream )
   {
     FT_Error   error;
     FT_ULong   table_len;

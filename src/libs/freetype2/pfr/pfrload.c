@@ -52,7 +52,7 @@
     FT_Error  error = 0;
     FT_Byte*  p     = *pp;
     FT_UInt   num_items, item_type, item_size;
-    
+
 
     PFR_CHECK( 1 );
     num_items = PFR_NEXT_BYTE( p );
@@ -62,11 +62,11 @@
       PFR_CHECK( 2 );
       item_size = PFR_NEXT_BYTE( p );
       item_type = PFR_NEXT_BYTE( p );
-      
+
       PFR_CHECK( item_size );
 
       if ( item_list )
-      {      
+      {
         PFR_ExtraItem  extra = item_list;
 
 
@@ -76,19 +76,19 @@
           {
             error = extra->parser( p, p + item_size, item_data );
             if ( error ) goto Exit;
-            
+
             break;
           }
         }
       }
-      
+
       p += item_size;
     }
 
   Exit:
     *pp = p;
     return error;
-    
+
   Too_Short:
     FT_ERROR(( "pfr_extra_items_parse: invalid extra items table\n" ));
     error = PFR_Err_Invalid_Table;
@@ -204,23 +204,23 @@
     FT_Error   error;
     FT_UInt    count;
     FT_UInt    result = 0;
-    
+
 
     if ( FT_STREAM_SEEK( section_offset ) || FT_READ_USHORT( count ) )
       goto Exit;
-    
+
     result = count;
-    
+
   Exit:
     *acount = result;
     return error;
-  }                      
+  }
 
 
   FT_LOCAL_DEF( FT_Error )
   pfr_log_font_load( PFR_LogFont  log_font,
                      FT_Stream    stream,
-                     FT_UInt      index,
+                     FT_UInt      idx,
                      FT_UInt32    section_offset,
                      FT_Bool      size_increment )
   {
@@ -235,10 +235,10 @@
          FT_READ_USHORT( num_log_fonts )  )
       goto Exit;
 
-    if ( index >= num_log_fonts )
+    if ( idx >= num_log_fonts )
       return PFR_Err_Invalid_Argument;
 
-    if ( FT_STREAM_SKIP( index * 5 ) ||
+    if ( FT_STREAM_SKIP( idx * 5 ) ||
          FT_READ_USHORT( size )      ||
          FT_READ_UOFF3 ( offset )    )
       goto Exit;
@@ -252,30 +252,30 @@
       FT_Byte*  p;
       FT_Byte*  limit;
       FT_UInt   local;
-      
+
 
       if ( FT_STREAM_SEEK( offset ) || FT_FRAME_ENTER( size ) )
         goto Exit;
 
       p     = stream->cursor;
       limit = p + size;
-      
+
       PFR_CHECK(13);
-      
+
       log_font->matrix[0] = PFR_NEXT_LONG( p );
       log_font->matrix[1] = PFR_NEXT_LONG( p );
       log_font->matrix[2] = PFR_NEXT_LONG( p );
       log_font->matrix[3] = PFR_NEXT_LONG( p );
-      
+
       flags = PFR_NEXT_BYTE( p );
-      
+
       local = 0;
       if ( flags & PFR_LOG_STROKE )
       {
         local++;
         if ( flags & PFR_LOG_2BYTE_STROKE )
           local++;
-          
+
         if ( (flags & PFR_LINE_JOIN_MASK) == PFR_LINE_JOIN_MITER )
           local += 3;
       }
@@ -293,18 +293,18 @@
         log_font->stroke_thickness = ( flags & PFR_LOG_2BYTE_STROKE )
                                      ? PFR_NEXT_SHORT( p )
                                      : PFR_NEXT_BYTE( p );
-  
+
         if ( ( flags & PFR_LINE_JOIN_MASK ) == PFR_LINE_JOIN_MITER )
           log_font->miter_limit = PFR_NEXT_LONG( p );
       }
-  
+
       if ( flags & PFR_LOG_BOLD )
       {
         log_font->bold_thickness = ( flags & PFR_LOG_2BYTE_BOLD )
                                    ? PFR_NEXT_SHORT( p )
                                    : PFR_NEXT_BYTE( p );
       }
-  
+
       if ( flags & PFR_LOG_EXTRA_ITEMS )
       {
         error = pfr_extra_items_skip( &p, limit );
@@ -326,7 +326,7 @@
 
   Exit:
     return error;
-  
+
   Too_Short:
     FT_ERROR(( "pfr_log_font_load: invalid logical font table\n" ));
     error = PFR_Err_Invalid_Table;
@@ -355,7 +355,7 @@
     FT_UInt     n, count, size1;
     FT_Error    error = 0;
 
- 
+
     PFR_CHECK( 5 );
 
     p += 3;  /* skip bctSize */
@@ -366,12 +366,12 @@
     if ( phy_font->num_strikes + count > phy_font->max_strikes )
     {
       FT_UInt  new_max = (phy_font->num_strikes + count + 3) & -4;
-      
+
       if ( FT_RENEW_ARRAY( phy_font->strikes,
                            phy_font->num_strikes,
                            new_max ) )
         goto Exit;
-        
+
       phy_font->max_strikes = new_max;
     }
 
@@ -421,15 +421,15 @@
     }
 
     phy_font->num_strikes += count;
-    
+
   Exit:
     return error;
-    
+
   Too_Short:
     error = PFR_Err_Invalid_Table;
     FT_ERROR(( "pfr_extra_item_load_bitmap_info: invalid bitmap info table\n" ));
     goto Exit;
-  }                                  
+  }
 
 
   /* load font ID, i.e. name */
@@ -441,18 +441,18 @@
     FT_Error   error  = 0;
     FT_Memory  memory = phy_font->memory;
     FT_UInt    len    = (FT_UInt)( limit - p );
-    
+
 
     if ( phy_font->font_id != NULL )
       goto Exit;
-    
+
     if ( FT_ALLOC( phy_font->font_id, len+1 ) )
       goto Exit;
 
     /* copy font ID name, and terminate it for safety */
     FT_MEM_COPY( phy_font->font_id, p, len );
     phy_font->font_id[len] = 0;
-    
+
   Exit:
     return error;
   }
@@ -472,34 +472,36 @@
 
     if ( phy_font->vertical.stem_snaps != NULL )
       goto Exit;
-    
+
     PFR_CHECK( 1 );
     count = PFR_NEXT_BYTE( p );
-    
+
     num_vert = count & 15;
     num_horz = count >> 4;
     count    = num_vert + num_horz;
-    
+
     PFR_CHECK( count * 2 );
-    
+
     if ( FT_NEW_ARRAY( snaps, count ) )
       goto Exit;
-    
+
     phy_font->vertical.stem_snaps = snaps;
     phy_font->horizontal.stem_snaps = snaps + num_vert;
-    
+
     for ( ; count > 0; count--, snaps++ )
       *snaps = FT_NEXT_SHORT( p );
-    
+
   Exit:
     return error;
-  
+
   Too_Short:
     error = PFR_Err_Invalid_Table;
     FT_ERROR(( "pfr_exta_item_load_stem_snaps: invalid stem snaps table\n" ));
     goto Exit;
-  }                                 
+  }
 
+
+#if 0
 
   /* load kerning pair data */
   FT_CALLBACK_DEF( FT_Error )
@@ -516,24 +518,25 @@
     FT_Memory     memory = phy_font->memory;
 
 
+    /* allocate a new kerning item */
     /* XXX: there may be multiple extra items for kerning */
     if ( phy_font->kern_pairs != NULL )
       goto Exit;
 
     FT_TRACE2(( "pfr_extra_item_load_kerning_pairs()\n" ));
-    
+
     PFR_CHECK( 4 );
 
     num_pairs = PFR_NEXT_BYTE( p );
     base_adj  = PFR_NEXT_SHORT( p );
     flags     = PFR_NEXT_BYTE( p );
-    
+
 #ifndef PFR_CONFIG_NO_CHECKS
     count = 3;
-    
+
     if ( flags & PFR_KERN_2BYTE_CHAR )
       count += 2;
-    
+
     if ( flags & PFR_KERN_2BYTE_ADJ )
       count += 1;
 
@@ -542,10 +545,10 @@
 
     if ( FT_NEW_ARRAY( pairs, num_pairs ) )
       goto Exit;
-    
+
     phy_font->num_kern_pairs = num_pairs;
     phy_font->kern_pairs     = pairs;
-    
+
     for (count = num_pairs ; count > 0; count--, pairs++ )
     {
       if ( flags & PFR_KERN_2BYTE_CHAR )
@@ -558,7 +561,7 @@
         pairs->glyph1 = PFR_NEXT_BYTE( p );
         pairs->glyph2 = PFR_NEXT_BYTE( p );
       }
-     
+
       if ( flags & PFR_KERN_2BYTE_ADJ )
         pairs->kerning.x = base_adj + PFR_NEXT_SHORT( p );
       else
@@ -569,16 +572,115 @@
       FT_TRACE2(( "kerning %d <-> %d : %ld\n",
                    pairs->glyph1, pairs->glyph2, pairs->kerning.x ));
     }
-      
+
   Exit:
     return error;
-  
+
   Too_Short:
     error = PFR_Err_Invalid_Table;
     FT_ERROR(( "pfr_extra_item_load_kerning_pairs: "
                "invalid kerning pairs table\n" ));
     goto Exit;
-  }                                 
+  }
+
+#else /* 0 */
+
+  /* load kerning pair data */
+  FT_CALLBACK_DEF( FT_Error )
+  pfr_extra_item_load_kerning_pairs( FT_Byte*     p,
+                                     FT_Byte*     limit,
+                                     PFR_PhyFont  phy_font )
+  {
+    PFR_KernItem  item;
+    FT_Error      error  = 0;
+    FT_Memory     memory = phy_font->memory;
+
+
+    FT_TRACE2(( "pfr_extra_item_load_kerning_pairs()\n" ));
+
+    if ( FT_NEW( item ) )
+      goto Exit;
+
+    PFR_CHECK( 4 );
+
+    item->pair_count = PFR_NEXT_BYTE( p );
+    item->base_adj   = PFR_NEXT_SHORT( p );
+    item->flags      = PFR_NEXT_BYTE( p );
+    item->offset     = phy_font->offset + ( p - phy_font->cursor );
+
+#ifndef PFR_CONFIG_NO_CHECKS
+    item->pair_size = 3;
+
+    if ( item->flags & PFR_KERN_2BYTE_CHAR )
+      item->pair_size += 2;
+
+    if ( item->flags & PFR_KERN_2BYTE_ADJ )
+      item->pair_size += 1;
+
+    PFR_CHECK( item->pair_count * item->pair_size );
+#endif
+
+    /* load first and last pairs into the item to speed up */
+    /* lookup later...                                     */
+    if ( item->pair_count > 0 )
+    {
+      FT_UInt   char1, char2;
+      FT_Byte*  q;
+
+
+      if ( item->flags & PFR_KERN_2BYTE_CHAR )
+      {
+        q     = p;
+        char1 = PFR_NEXT_USHORT( q );
+        char2 = PFR_NEXT_USHORT( q );
+
+        item->pair1 = PFR_KERN_INDEX( char1, char2 );
+
+        q = p + item->pair_size * ( item->pair_count - 1 );
+        char1 = PFR_NEXT_USHORT( q );
+        char2 = PFR_NEXT_USHORT( q );
+
+        item->pair2 = PFR_KERN_INDEX( char1, char2 );
+      }
+      else
+      {
+        q     = p;
+        char1 = PFR_NEXT_BYTE( q );
+        char2 = PFR_NEXT_BYTE( q );
+
+        item->pair1 = PFR_KERN_INDEX( char1, char2 );
+
+        q = p + item->pair_size * ( item->pair_count - 1 );
+        char1 = PFR_NEXT_BYTE( q );
+        char2 = PFR_NEXT_BYTE( q );
+
+        item->pair2 = PFR_KERN_INDEX( char1, char2 );
+      }
+
+      /* add new item to the current list */
+      item->next                 = NULL;
+      *phy_font->kern_items_tail = item;
+      phy_font->kern_items_tail  = &item->next;
+      phy_font->num_kern_pairs  += item->pair_count;
+    }
+    else
+    {
+      /* empty item! */
+      FT_FREE( item );
+    }
+
+  Exit:
+    return error;
+
+  Too_Short:
+    FT_FREE( item );
+
+    error = PFR_Err_Invalid_Table;
+    FT_ERROR(( "pfr_extra_item_load_kerning_pairs: "
+               "invalid kerning pairs table\n" ));
+    goto Exit;
+  }
+#endif /* 0 */
 
 
   static const PFR_ExtraItemRec  pfr_phy_font_extra_items[] =
@@ -607,7 +709,7 @@
     FT_FREE( phy_font->strikes );
     phy_font->num_strikes = 0;
     phy_font->max_strikes = 0;
-  
+
     FT_FREE( phy_font->chars );
     phy_font->num_chars    = 0;
     phy_font->chars_offset = 0;
@@ -615,10 +717,24 @@
     FT_FREE( phy_font->blue_values );
     phy_font->num_blue_values = 0;
 
-    FT_FREE( phy_font->kern_pairs );
+    {
+      PFR_KernItem  item, next;
+
+
+      item = phy_font->kern_items;
+      while ( item )
+      {
+        next = item->next;
+        FT_FREE( item );
+        item = next;
+      }
+      phy_font->kern_items      = NULL;
+      phy_font->kern_items_tail = NULL;
+    }
+
     phy_font->num_kern_pairs = 0;
   }
-  
+
 
   FT_LOCAL_DEF( FT_Error )
   pfr_phy_font_load( PFR_PhyFont  phy_font,
@@ -636,8 +752,13 @@
     phy_font->memory = memory;
     phy_font->offset = offset;
 
+    phy_font->kern_items      = NULL;
+    phy_font->kern_items_tail = &phy_font->kern_items;
+
     if ( FT_STREAM_SEEK( offset ) || FT_FRAME_ENTER( size ) )
       goto Exit;
+
+    phy_font->cursor = stream->cursor;
 
     p     = stream->cursor;
     limit = p + size;
@@ -664,15 +785,15 @@
     {
       error =  pfr_extra_items_parse( &p, limit,
                                       pfr_phy_font_extra_items, phy_font );
-        
+
       if ( error )
         goto Fail;
     }
-    
+
     /* skip the aux bytes */
     PFR_CHECK( 3 );
     num_aux = PFR_NEXT_ULONG( p );
-    
+
     PFR_CHECK( num_aux );
     p += num_aux;
 
@@ -684,7 +805,7 @@
       phy_font->num_blue_values = count = PFR_NEXT_BYTE( p );
 
       PFR_CHECK( count * 2 );
-      
+
       if ( FT_NEW_ARRAY( phy_font->blue_values, count ) )
         goto Fail;
 
@@ -713,19 +834,19 @@
       Size = 1 + 1 + 2;
       if ( flags & PFR_PHY_2BYTE_CHARCODE )
         Size += 1;
-      
+
       if ( flags & PFR_PHY_PROPORTIONAL )
         Size += 2;
-      
+
       if ( flags & PFR_PHY_ASCII_CODE )
         Size += 1;
-        
+
       if ( flags & PFR_PHY_2BYTE_GPS_SIZE )
         Size += 1;
-        
+
       if ( flags & PFR_PHY_3BYTE_GPS_OFFSET )
         Size += 1;
-      
+
       PFR_CHECK( count * Size );
 
       for ( n = 0; n < count; n++ )
@@ -739,7 +860,7 @@
 
         cur->advance   = ( flags & PFR_PHY_PROPORTIONAL )
                          ? PFR_NEXT_SHORT( p )
-                         : phy_font->standard_advance;
+                         : (FT_Int) phy_font->standard_advance;
 
 #if 0
         cur->ascii     = ( flags & PFR_PHY_ASCII_CODE )
@@ -763,9 +884,13 @@
   Fail:
     FT_FRAME_EXIT();
 
+    /* save position of bitmap info */
+    phy_font->bct_offset = FT_STREAM_POS();
+    phy_font->cursor     = NULL;
+
   Exit:
     return error;
-  
+
   Too_Short:
     error = PFR_Err_Invalid_Table;
     FT_ERROR(( "pfr_phy_font_load: invalid physical font table\n" ));

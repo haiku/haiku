@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    A small-bitmap cache (specification).                                */
 /*                                                                         */
-/*  Copyright 2000-2001 by                                                 */
+/*  Copyright 2000-2001, 2002 by                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -72,7 +72,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    format    :: The format of the glyph bitmap (monochrome or gray).  */
   /*                                                                       */
-  /*    num_grays :: The number of gray levels.                            */
+  /*    max_grays :: Maximum gray level value (in the range 1 to 255).     */
   /*                                                                       */
   /*    pitch     :: The number of bytes per bitmap line.  May be positive */
   /*                 or negative.                                          */
@@ -91,8 +91,8 @@ FT_BEGIN_HEADER
     FT_Char   top;
 
     FT_Byte   format;
-    FT_Short  num_grays;    /* XXX: Should be FT_Byte.  See ftcsbits.c */
-    FT_Char   pitch;
+    FT_Byte   max_grays;
+    FT_Short  pitch;
     FT_Char   xadvance;
     FT_Char   yadvance;
 
@@ -113,7 +113,7 @@ FT_BEGIN_HEADER
   /*    implemented by @FTC_ImageCache.                                    */
   /*                                                                       */
   typedef struct FTC_SBitCacheRec_*  FTC_SBitCache;
-  
+
 
   /*************************************************************************/
   /*                                                                       */
@@ -160,7 +160,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    cache  :: A handle to the source sbit cache.                       */
   /*                                                                       */
-  /*    desc   :: A pointer to the glyph image descriptor.                 */
+  /*    type   :: A pointer to the glyph image type descriptor.            */
   /*                                                                       */
   /*    gindex :: The glyph index.                                         */
   /*                                                                       */
@@ -195,7 +195,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FTC_SBitCache_Lookup( FTC_SBitCache    cache,
-                        FTC_ImageDesc*   desc,
+                        FTC_ImageType    type,
                         FT_UInt          gindex,
                         FTC_SBit        *sbit,
                         FTC_Node        *anode );

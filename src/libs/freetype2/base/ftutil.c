@@ -64,7 +64,7 @@
 
         return FT_Err_Out_Of_Memory;
       }
-      FT_MEM_SET( *P, 0, size );
+      FT_MEM_ZERO( *P, size );
     }
     else
       *P = NULL;
@@ -106,7 +106,7 @@
       goto Fail;
 
     if ( size > current )
-      FT_MEM_SET( (char*)Q + current, 0, size - current );
+      FT_MEM_ZERO( (char*)Q + current, size - current );
 
     *P = Q;
     return FT_Err_Ok;

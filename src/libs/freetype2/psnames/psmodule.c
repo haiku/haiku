@@ -36,8 +36,8 @@
   /* we do deal with glyph variants by detecting a non-initial dot in    */
   /* the name, as in `A.swash' or `e.final', etc.                        */
   /*                                                                     */
-  static FT_ULong
-  PS_Unicode_Value( const char*  glyph_name )
+  static FT_UInt32
+  ps_unicode_value( const char*  glyph_name )
   {
     FT_Int  n;
     char    first = glyph_name[0];
@@ -139,7 +139,7 @@
 
   /* Builds a table that maps Unicode values to glyph indices */
   static FT_Error
-  PS_Build_Unicode_Table( FT_Memory     memory,
+  ps_build_unicode_table( FT_Memory     memory,
                           FT_UInt       num_glyphs,
                           const char**  glyph_names,
                           PS_Unicodes*  table )
@@ -156,7 +156,7 @@
       FT_UInt     n;
       FT_UInt     count;
       PS_UniMap*  map;
-      FT_ULong    uni_char;
+      FT_UInt32   uni_char;
 
 
       map = table->maps;
@@ -168,7 +168,7 @@
 
         if ( gname )
         {
-          uni_char = PS_Unicode_Value( gname );
+          uni_char = ps_unicode_value( gname );
 
           if ( uni_char != 0 && uni_char != 0xFFFF )
           {
@@ -205,7 +205,7 @@
 
 
   static FT_UInt
-  PS_Lookup_Unicode( PS_Unicodes*  table,
+  ps_lookup_unicode( PS_Unicodes*  table,
                      FT_ULong      unicode )
   {
     PS_UniMap  *min, *max, *mid;
@@ -236,7 +236,7 @@
 
 
   static FT_ULong
-  PS_Next_Unicode( PS_Unicodes*  table,
+  ps_next_unicode( PS_Unicodes*  table,
                    FT_ULong      unicode )
   {
     PS_UniMap  *min, *max, *mid;
@@ -265,7 +265,7 @@
 
     if ( max < table->maps )
       max = table->maps;
-    
+
     while ( max < table->maps + table->num_maps )
     {
       if ( unicode < max->unicode )
@@ -281,7 +281,7 @@
 
 
   static const char*
-  PS_Macintosh_Name( FT_UInt  name_index )
+  ps_get_macintosh_name( FT_UInt  name_index )
   {
     if ( name_index >= 258 )
       name_index = 0;
@@ -291,7 +291,7 @@
 
 
   static const char*
-  PS_Standard_Strings( FT_UInt  sid )
+  ps_get_standard_strings( FT_UInt  sid )
   {
     return ( sid < NUM_SID_GLYPHS ? sid_standard_names[sid] : 0 );
   }
@@ -302,9 +302,9 @@
   {
 #ifdef FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
 
-    (PS_Unicode_Value_Func)    PS_Unicode_Value,
-    (PS_Build_Unicodes_Func)   PS_Build_Unicode_Table,
-    (PS_Lookup_Unicode_Func)   PS_Lookup_Unicode,
+    (PS_Unicode_Value_Func)    ps_unicode_value,
+    (PS_Build_Unicodes_Func)   ps_build_unicode_table,
+    (PS_Lookup_Unicode_Func)   ps_lookup_unicode,
 
 #else
 
@@ -314,14 +314,14 @@
 
 #endif /* FT_CONFIG_OPTION_ADOBE_GLYPH_LIST */
 
-    (PS_Macintosh_Name_Func)   PS_Macintosh_Name,
-    (PS_Adobe_Std_Strings_Func)PS_Standard_Strings,
+    (PS_Macintosh_Name_Func)    ps_get_macintosh_name,
+    (PS_Adobe_Std_Strings_Func) ps_get_standard_strings,
 
     t1_standard_encoding,
     t1_expert_encoding,
 
 #ifdef FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
-    (PS_Next_Unicode_Func)     PS_Next_Unicode
+    (PS_Next_Unicode_Func)     ps_next_unicode
 #else
     0
 #endif /* FT_CONFIG_OPTION_ADOBE_GLYPH_LIST */

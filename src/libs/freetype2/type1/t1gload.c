@@ -53,21 +53,93 @@
   /*************************************************************************/
 
 
-  FT_CALLBACK_DEF( FT_Error )
-  T1_Parse_Glyph( T1_Decoder  decoder,
-                  FT_UInt     glyph_index )
+  FT_LOCAL_DEF( FT_Error )
+  T1_Parse_Glyph_And_Get_Char_String( T1_Decoder  decoder,
+                                      FT_UInt     glyph_index,
+                                      FT_Data*    char_string )
   {
-    T1_Face  face  = (T1_Face)decoder->builder.face;
-    T1_Font  type1 = &face->type1;
+    T1_Face   face  = (T1_Face)decoder->builder.face;
+    T1_Font   type1 = &face->type1;
+    FT_Error  error = 0;
 
 
     decoder->font_matrix = type1->font_matrix;
     decoder->font_offset = type1->font_offset;
 
-    return decoder->funcs.parse_charstrings(
-                      decoder,
-                      type1->charstrings    [glyph_index],
-                      type1->charstrings_len[glyph_index] );
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+
+    /* For incremental fonts get the character data using the */
+    /* callback function.                                     */
+    if ( face->root.internal->incremental_interface )
+      error = face->root.internal->incremental_interface->funcs->get_glyph_data(
+                face->root.internal->incremental_interface->object,
+                glyph_index, char_string );
+    else
+
+#endif
+
+    /* For ordinary fonts get the character data stored in the face record. */
+    {
+      char_string->pointer = type1->charstrings[glyph_index];
+      char_string->length  = type1->charstrings_len[glyph_index];
+    }
+
+    if ( !error )
+      error = decoder->funcs.parse_charstrings(
+                decoder, (FT_Byte*)char_string->pointer,
+                char_string->length );
+
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+
+    /* Incremental fonts can optionally override the metrics. */
+    if ( !error && face->root.internal->incremental_interface                 &&
+         face->root.internal->incremental_interface->funcs->get_glyph_metrics )
+    {
+      FT_Bool                    found = FALSE;
+      FT_Incremental_MetricsRec  metrics;
+
+
+      error = face->root.internal->incremental_interface->funcs->get_glyph_metrics(
+                face->root.internal->incremental_interface->object,
+                glyph_index, FALSE, &metrics, &found );
+      if ( found )
+      {
+        decoder->builder.left_bearing.x = metrics.bearing_x;
+        decoder->builder.left_bearing.y = metrics.bearing_y;
+        decoder->builder.advance.x      = metrics.advance;
+        decoder->builder.advance.y      = 0;
+      }
+    }
+
+#endif
+
+  return error;
+  }
+
+
+  FT_CALLBACK_DEF( FT_Error )
+  T1_Parse_Glyph( T1_Decoder  decoder,
+                  FT_UInt     glyph_index )
+  {
+    FT_Data   glyph_data;
+    FT_Error  error = T1_Parse_Glyph_And_Get_Char_String( 
+                        decoder, glyph_index, &glyph_data );
+
+
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    if ( !error )
+    {
+      T1_Face  face = (T1_Face)decoder->builder.face;
+
+
+	  if ( face->root.internal->incremental_interface )
+        face->root.internal->incremental_interface->funcs->free_glyph_data(
+          face->root.internal->incremental_interface->object,
+          &glyph_data );
+    }
+#endif
+
+    return error;
   }
 
 
@@ -92,6 +164,7 @@
                                            (FT_Byte**)type1->glyph_names,
                                            face->blend,
                                            0,
+                                           FT_RENDER_MODE_NORMAL,
                                            T1_Parse_Glyph );
     if ( error )
       return error;
@@ -142,7 +215,7 @@
   T1_Load_Glyph( T1_GlyphSlot  glyph,
                  T1_Size       size,
                  FT_UInt       glyph_index,
-                 FT_Int        load_flags )
+                 FT_Int32      load_flags )
   {
     FT_Error                error;
     T1_DecoderRec           decoder;
@@ -154,6 +227,8 @@
 
     FT_Matrix               font_matrix;
     FT_Vector               font_offset;
+    FT_Data                 glyph_data;
+    FT_Bool                 glyph_data_loaded = 0;
 
 
     if ( load_flags & FT_LOAD_NO_RECURSE )
@@ -168,7 +243,7 @@
     hinting = FT_BOOL( ( load_flags & FT_LOAD_NO_SCALE   ) == 0 &&
                        ( load_flags & FT_LOAD_NO_HINTING ) == 0 );
 
-    glyph->root.format = ft_glyph_format_outline;
+    glyph->root.format = FT_GLYPH_FORMAT_OUTLINE;
 
     error = decoder_funcs->init( &decoder,
                                  (FT_Face)face,
@@ -177,6 +252,7 @@
                                  (FT_Byte**)type1->glyph_names,
                                  face->blend,
                                  FT_BOOL( hinting ),
+                                 FT_LOAD_TARGET_MODE(load_flags),
                                  T1_Parse_Glyph );
     if ( error )
       goto Exit;
@@ -188,11 +264,12 @@
     decoder.subrs     = type1->subrs;
     decoder.subrs_len = type1->subrs_len;
 
-
     /* now load the unscaled outline */
-    error = T1_Parse_Glyph( &decoder, glyph_index );
+    error = T1_Parse_Glyph_And_Get_Char_String( &decoder, glyph_index,
+                                                &glyph_data );
     if ( error )
       goto Exit;
+    glyph_data_loaded = 1;
 
     font_matrix = decoder.font_matrix;
     font_offset = decoder.font_offset;
@@ -205,8 +282,8 @@
     /* bearing the yMax                                    */
     if ( !error )
     {
-      glyph->root.outline.flags &= ft_outline_owner;
-      glyph->root.outline.flags |= ft_outline_reverse_fill;
+      glyph->root.outline.flags &= FT_OUTLINE_OWNER;
+      glyph->root.outline.flags |= FT_OUTLINE_REVERSE_FILL;
 
       /* for composite glyphs, return only left side bearing and */
       /* advance width                                           */
@@ -239,10 +316,10 @@
 
         glyph->root.linearVertAdvance = 0;
 
-        glyph->root.format = ft_glyph_format_outline;
+        glyph->root.format = FT_GLYPH_FORMAT_OUTLINE;
 
         if ( size && size->root.metrics.y_ppem < 24 )
-          glyph->root.outline.flags |= ft_outline_high_precision;
+          glyph->root.outline.flags |= FT_OUTLINE_HIGH_PRECISION;
 
 #if 1
         /* apply the font matrix, if any */
@@ -311,11 +388,27 @@
 
       /* Set control data to the glyph charstrings.  Note that this is */
       /* _not_ zero-terminated.                                        */
-      glyph->root.control_data = type1->charstrings    [glyph_index];
-      glyph->root.control_len  = type1->charstrings_len[glyph_index];
+      glyph->root.control_data = (FT_Byte*)glyph_data.pointer;
+      glyph->root.control_len  = glyph_data.length;
     }
 
+
   Exit:
+
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    if ( glyph_data_loaded && face->root.internal->incremental_interface )
+    {
+      face->root.internal->incremental_interface->funcs->free_glyph_data(
+        face->root.internal->incremental_interface->object,
+        &glyph_data );
+
+      /* Set the control data to null - it is no longer available if   */
+      /* loaded incrementally.                                         */
+      glyph->root.control_data = 0;
+      glyph->root.control_len  = 0;
+    }
+#endif
+
     return error;
   }
 

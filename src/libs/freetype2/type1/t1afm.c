@@ -56,10 +56,10 @@
                 FT_Byte*   limit,
                 T1_Font    type1 )
   {
-    FT_Byte*  p = *start;
-    FT_Int    len;
-    FT_UInt   result = 0;
-    char      temp[64];
+    FT_Byte*    p = *start;
+    FT_PtrDist  len;
+    FT_UInt     result = 0;
+    char        temp[64];
 
 
     /* skip whitespace */
@@ -72,7 +72,7 @@
     while ( IS_ALPHANUM( *p ) && p < limit )
       p++;
 
-    len = (FT_Int)( p - *start );
+    len = p - *start;
 
     if ( len > 0 && len < 64 )
     {

@@ -50,12 +50,12 @@ FT_BEGIN_HEADER
 
 
   FT_LOCAL( void )
-  CFF_Parser_Init( CFF_Parser  parser,
+  cff_parser_init( CFF_Parser  parser,
                    FT_UInt     code,
                    void*       object );
 
   FT_LOCAL( FT_Error )
-  CFF_Parser_Run( CFF_Parser  parser,
+  cff_parser_run( CFF_Parser  parser,
                   FT_Byte*    start,
                   FT_Byte*    limit );
 

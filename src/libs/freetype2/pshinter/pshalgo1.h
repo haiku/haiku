@@ -86,9 +86,10 @@ FT_BEGIN_HEADER
 
 
   extern FT_Error
-  ps1_hints_apply( PS_Hints     ps_hints,
-                   FT_Outline*  outline,
-                   PSH_Globals  globals );
+  ps1_hints_apply( PS_Hints        ps_hints,
+                   FT_Outline*     outline,
+                   PSH_Globals     globals,
+                   FT_Render_Mode  hint_mode );
 
 
 #ifdef DEBUG_HINTER

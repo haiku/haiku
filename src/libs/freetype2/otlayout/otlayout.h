@@ -24,8 +24,12 @@ OTL_BEGIN_HEADER
   typedef int               OTL_Int;
   typedef unsigned int      OTL_UInt;
 
+  typedef long              OTL_Long;
+  typedef unsigned long     OTL_ULong;
+
   typedef short             OTL_Int16;
   typedef unsigned short    OTL_UInt16;
+
 
 #if OTL_SIZEOF_INT == 4
 
@@ -58,8 +62,37 @@ OTL_BEGIN_HEADER
     OTL_Err_InvalidFormat,
     OTL_Err_InvalidOffset,
 
+    OTL_Err_Max
+
   } OTL_Error;
 
+
+ /************************************************************************/
+ /************************************************************************/
+ /*****                                                              *****/
+ /*****                     MEMORY MANAGEMENT                        *****/
+ /*****                                                              *****/
+ /************************************************************************/
+ /************************************************************************/
+
+  typedef OTL_Pointer  (*OTL_AllocFunc)( OTL_ULong    size,
+                                         OTL_Pointer  data );
+
+  typedef OTL_Pointer  (*OTL_ReallocFunc)( OTL_Pointer   block,
+                                           OTL_ULong     size,
+                                           OTL_Pointer   data );
+
+  typedef void         (*OTL_FreeFunc)( OTL_Pointer  block,
+                                        OTL_Pointer  data );
+
+  typedef struct OTL_MemoryRec_
+  {
+    OTL_Pointer      mem_data;
+    OTL_AllocFunc    mem_alloc;
+    OTL_ReallocFunc  mem_realloc;
+    OTL_FreeFunc     mem_free;
+
+  } OTL_MemoryRec, *OTL_Memory;
 
  /************************************************************************/
  /************************************************************************/
@@ -69,11 +102,15 @@ OTL_BEGIN_HEADER
  /************************************************************************/
  /************************************************************************/
 
+/* re-define OTL_MAKE_TAG to something different if you're not */
+/* using an ASCII-based character set (Vaxes anyone ?)         */
+#ifndef  OTL_MAKE_TAG
 #define  OTL_MAKE_TAG(c1,c2,c3,c4)         \
            ( ( (OTL_UInt32)(c1) << 24 ) |  \
                (OTL_UInt32)(c2) << 16 ) |  \
                (OTL_UInt32)(c3) <<  8 ) |  \
                (OTL_UInt32)(c4)         )
+#endif
 
   typedef enum OTL_ScriptTag_
   {
@@ -153,8 +190,8 @@ OTL_BEGIN_HEADER
 
 #define  OTL_INVALID(e)  otl_validator_error( valid, e )
 
-#define  OTL_INVALID_TOO_SHORT  OTL_INVALID( OTL_Err_InvalidOffset );
-#define  OTL_INVALID_DATA       OTL_INVALID( OTL_Err_InvalidFormat );
+#define  OTL_INVALID_TOO_SHORT  OTL_INVALID( OTL_Err_InvalidOffset )
+#define  OTL_INVALID_DATA       OTL_INVALID( OTL_Err_InvalidFormat )
 
 #define  OTL_CHECK(_count)   OTL_BEGIN_STMNT                       \
                                if ( p + (_count) > valid->limit )  \

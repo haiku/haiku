@@ -103,19 +103,10 @@ FT_BEGIN_HEADER
   T42_GlyphSlot_Load( FT_GlyphSlot  glyph,
                       FT_Size       size,
                       FT_Int        glyph_index,
-                      FT_Int        load_flags );
+                      FT_Int32      load_flags );
 
   FT_LOCAL( void )
   T42_GlyphSlot_Done( T42_GlyphSlot slot );
-
-
-  FT_LOCAL( FT_UInt )
-  T42_CMap_CharIndex( FT_CharMap  charmap,
-                      FT_Long     charcode );
-
-  FT_LOCAL( FT_Long )
-  T42_CMap_CharNext( FT_CharMap  charmap,
-                     FT_Long     charcode );
 
 
   FT_LOCAL( FT_Error )

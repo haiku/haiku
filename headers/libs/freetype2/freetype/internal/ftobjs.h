@@ -34,6 +34,11 @@
 #include FT_INTERNAL_GLYPH_LOADER_H
 #include FT_INTERNAL_DRIVER_H
 #include FT_INTERNAL_AUTOHINT_H
+#include FT_INTERNAL_OBJECT_H
+
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+#include FT_INCREMENTAL_H
+#endif
 
 
 FT_BEGIN_HEADER
@@ -291,7 +296,18 @@ FT_BEGIN_HEADER
   /*    transform_flags  :: Some flags used to classify the transform.     */
   /*                        Only used by the convenience functions.        */
   /*                                                                       */
+  /*    hint_flags       :: Some flags used to change the hinters'         */
+  /*                        behaviour.  Only used for debugging for now.   */
+  /*                                                                       */
   /*    postscript_name  :: Postscript font name for this face.            */
+  /*                                                                       */
+  /*    incremental_interface ::                                           */
+  /*                        If non-null, the interface through             */
+  /*                        which glyph data and metrics are loaded        */
+  /*                        incrementally for faces that do not provide    */
+  /*                        all of this data when first opened.            */
+  /*                        This field exists only if                      */
+  /*                        @FT_CONFIG_OPTION_INCREMENTAL is defined.      */
   /*                                                                       */
   typedef struct  FT_Face_InternalRec_
   {
@@ -302,7 +318,13 @@ FT_BEGIN_HEADER
     FT_Vector    transform_delta;
     FT_Int       transform_flags;
 
+    FT_UInt32    hint_flags;
+
     const char*  postscript_name;
+
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    FT_Incremental_InterfaceRec*  incremental_interface;
+#endif
 
   } FT_Face_InternalRec;
 
@@ -534,14 +556,14 @@ FT_BEGIN_HEADER
 
   typedef struct  FT_RendererRec_
   {
-    FT_ModuleRec           root;
-    FT_Renderer_Class*     clazz;
-    FT_Glyph_Format        glyph_format;
-    FT_Glyph_Class         glyph_class;
+    FT_ModuleRec            root;
+    FT_Renderer_Class*      clazz;
+    FT_Glyph_Format         glyph_format;
+    FT_Glyph_Class          glyph_class;
 
-    FT_Raster              raster;
-    FT_Raster_Render_Func  raster_render;
-    FTRenderer_render      render;
+    FT_Raster               raster;
+    FT_Raster_Render_Func   raster_render;
+    FT_Renderer_RenderFunc  render;
 
   } FT_RendererRec;
 
@@ -656,7 +678,7 @@ FT_BEGIN_HEADER
   /*                        shortcut used to avoid parsing the list on     */
   /*                        each call to FT_Outline_Render().  It is a     */
   /*                        handle to the current renderer for the         */
-  /*                        ft_glyph_format_outline format.                */
+  /*                        FT_GLYPH_FORMAT_OUTLINE format.                */
   /*                                                                       */
   /*    auto_hinter      :: XXX                                            */
   /*                                                                       */
@@ -690,6 +712,8 @@ FT_BEGIN_HEADER
 
     FT_DebugHook_Func  debug_hooks[4];
 
+    FT_MetaClassRec    meta_class;
+
   } FT_LibraryRec;
 
 
@@ -699,9 +723,9 @@ FT_BEGIN_HEADER
                       FT_ListNode*     node );
 
   FT_BASE( FT_Error )
-  FT_Render_Glyph_Internal( FT_Library    library,
-                            FT_GlyphSlot  slot,
-                            FT_UInt       render_mode );
+  FT_Render_Glyph_Internal( FT_Library      library,
+                            FT_GlyphSlot    slot,
+                            FT_Render_Mode  render_mode );
 
   typedef const char*
   (*FT_Face_GetPostscriptNameFunc)( FT_Face  face );

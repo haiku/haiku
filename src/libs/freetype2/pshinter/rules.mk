@@ -30,7 +30,8 @@ PSHINTER_DRV_SRC := $(PSHINTER_DIR_)pshrec.c   \
                     $(PSHINTER_DIR_)pshglob.c  \
                     $(PSHINTER_DIR_)pshmod.c   \
                     $(PSHINTER_DIR_)pshalgo1.c \
-                    $(PSHINTER_DIR_)pshalgo2.c
+                    $(PSHINTER_DIR_)pshalgo2.c \
+                    $(PSHINTER_DIR_)pshalgo3.c
 
 
 # PSHINTER driver headers

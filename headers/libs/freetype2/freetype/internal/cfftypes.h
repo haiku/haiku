@@ -68,8 +68,9 @@ FT_BEGIN_HEADER
     FT_UInt     format;
     FT_ULong    offset;
 
-    FT_UShort*  sids;
-    FT_UShort*  codes;
+    FT_UInt     count;
+    FT_UShort   sids [256];  /* avoid dynamic allocations */
+    FT_UShort   codes[256];
 
   } CFF_EncodingRec, *CFF_Encoding;
 
@@ -240,6 +241,9 @@ FT_BEGIN_HEADER
 
     /* interface to PostScript hinter */
     void*            pshinter;
+
+    /* interface to Postscript Names service */
+    void*            psnames;
 
   } CFF_FontRec, *CFF_Font;
 

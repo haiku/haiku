@@ -45,14 +45,14 @@
   /*************************************************************************/
 
   FT_LOCAL_DEF( void )
-  CID_GlyphSlot_Done( CID_GlyphSlot  slot )
+  cid_slot_done( CID_GlyphSlot  slot )
   {
     slot->root.internal->glyph_hints = 0;
   }
 
 
   FT_LOCAL_DEF( FT_Error )
-  CID_GlyphSlot_Init( CID_GlyphSlot  slot )
+  cid_slot_init( CID_GlyphSlot  slot )
   {
     CID_Face          face;
     PSHinter_Service  pshinter;
@@ -90,7 +90,7 @@
 
 
   static PSH_Globals_Funcs
-  CID_Size_Get_Globals_Funcs( CID_Size  size )
+  cid_size_get_globals_funcs( CID_Size  size )
   {
     CID_Face          face     = (CID_Face)size->root.face;
     PSHinter_Service  pshinter = (PSHinter_Service)face->pshinter;
@@ -106,14 +106,14 @@
 
 
   FT_LOCAL_DEF( void )
-  CID_Size_Done( CID_Size  size )
+  cid_size_done( CID_Size  size )
   {
     if ( size->root.internal )
     {
       PSH_Globals_Funcs  funcs;
 
 
-      funcs = CID_Size_Get_Globals_Funcs( size );
+      funcs = cid_size_get_globals_funcs( size );
       if ( funcs )
         funcs->destroy( (PSH_Globals)size->root.internal );
 
@@ -123,10 +123,10 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  CID_Size_Init( CID_Size  size )
+  cid_size_init( CID_Size  size )
   {
     FT_Error           error = 0;
-    PSH_Globals_Funcs  funcs = CID_Size_Get_Globals_Funcs( size );
+    PSH_Globals_Funcs  funcs = cid_size_get_globals_funcs( size );
 
 
     if ( funcs )
@@ -147,9 +147,9 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  CID_Size_Reset( CID_Size  size )
+  cid_size_reset( CID_Size  size )
   {
-    PSH_Globals_Funcs  funcs = CID_Size_Get_Globals_Funcs( size );
+    PSH_Globals_Funcs  funcs = cid_size_get_globals_funcs( size );
     FT_Error           error = 0;
 
 
@@ -171,7 +171,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    CID_Face_Done                                                      */
+  /*    cid_face_done                                                      */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Finalizes a given face object.                                     */
@@ -180,7 +180,7 @@
   /*    face :: A pointer to the face object to destroy.                   */
   /*                                                                       */
   FT_LOCAL_DEF( void )
-  CID_Face_Done( CID_Face  face )
+  cid_face_done( CID_Face  face )
   {
     FT_Memory  memory;
 
@@ -239,7 +239,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    CID_Face_Init                                                      */
+  /*    cid_face_init                                                      */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Initializes a given CID face object.                               */
@@ -260,7 +260,7 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  CID_Face_Init( FT_Stream      stream,
+  cid_face_init( FT_Stream      stream,
                  CID_Face       face,
                  FT_Int         face_index,
                  FT_Int         num_params,
@@ -310,7 +310,7 @@
     if ( FT_STREAM_SEEK( 0 ) )
       goto Exit;
 
-    error = CID_Open_Face( face );
+    error = cid_face_open( face );
     if ( error )
       goto Exit;
 
@@ -321,7 +321,7 @@
     /* check the face index */
     if ( face_index != 0 )
     {
-      FT_ERROR(( "CID_Face_Init: invalid face index\n" ));
+      FT_ERROR(( "cid_face_init: invalid face index\n" ));
       error = CID_Err_Invalid_Argument;
       goto Exit;
     }
@@ -407,7 +407,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    CID_Driver_Init                                                    */
+  /*    cid_driver_init                                                    */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Initializes a given CID driver object.                             */
@@ -419,7 +419,7 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  CID_Driver_Init( CID_Driver  driver )
+  cid_driver_init( CID_Driver  driver )
   {
     FT_UNUSED( driver );
 
@@ -430,7 +430,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    CID_Driver_Done                                                    */
+  /*    cid_driver_done                                                    */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Finalizes a given CID driver.                                      */
@@ -439,7 +439,7 @@
   /*    driver :: A handle to the target CID driver.                       */
   /*                                                                       */
   FT_LOCAL_DEF( void )
-  CID_Driver_Done( CID_Driver  driver )
+  cid_driver_done( CID_Driver  driver )
   {
     FT_UNUSED( driver );
   }

@@ -22,17 +22,26 @@
 FT_BEGIN_HEADER
 
 /* define to choose hinting algorithm */
-#define PSH_ALGORITHM_2
+#define PSH_ALGORITHM_3
 
-#ifdef PSH_ALGORITHM_1
+#if defined(PSH_ALGORITHM_1)
 
-#include "pshalgo1.h"
-#define PS_HINTS_APPLY_FUNC  ps1_hints_apply
+#  include "pshalgo1.h"
+#  define PS_HINTS_APPLY_FUNC  ps1_hints_apply
+
+#elif defined(PSH_ALGORITHM_2)
+
+#  include "pshalgo2.h"
+#  define PS_HINTS_APPLY_FUNC  ps2_hints_apply
+
+#elif defined(PSH_ALGORITHM_3)
+
+#  include "pshalgo3.h"
+#  define PS_HINTS_APPLY_FUNC  ps3_hints_apply
 
 #else
 
-#include "pshalgo2.h"
-#define PS_HINTS_APPLY_FUNC  ps2_hints_apply
+#  error "invalid Postscript Hinter algorithm selection"
 
 #endif
 

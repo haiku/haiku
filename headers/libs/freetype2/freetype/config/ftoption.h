@@ -25,7 +25,6 @@
 
 FT_BEGIN_HEADER
 
-
   /*************************************************************************/
   /*                                                                       */
   /*                 USER-SELECTABLE CONFIGURATION MACROS                  */
@@ -78,68 +77,98 @@ FT_BEGIN_HEADER
 
   /*************************************************************************/
   /*                                                                       */
-  /* CMap support                                                          */
+  /* Many compilers provide a non-ANSI 64-bit data type that can be used   */
+  /* by FreeType to speed up some computations.  However, this will create */
+  /* some problems when compiling the library in strict ANSI mode.         */
   /*                                                                       */
-  /*   Define this if you want generic cmap support.                       */
+  /* For this reason, the use of 64-bit ints is normally disabled when     */
+  /* the __STDC__ macro is defined.  You can however disable this by       */
+  /* defining here the macro FT_CONFIG_OPTION_FORCE_INT64.                 */
   /*                                                                       */
-#define FT_CONFIG_OPTION_USE_CMAPS
+  /* For most compilers, this will only create compilation warnings        */
+  /* when building the library.                                            */
+  /*                                                                       */
+  /* ObNote: The compiler-specific 64-bit integers are detected in the     */
+  /*         file "ftconfig.h" either statically, or through Autoconf      */
+  /*         on platforms that support it.                                 */
+  /*                                                                       */
+#undef  FT_CONFIG_OPTION_FORCE_INT64
 
 
   /*************************************************************************/
   /*                                                                       */
-  /* Convenience functions support                                         */
+  /* Gzip-compressed file support.                                         */
   /*                                                                       */
-  /*   Some functions of the FreeType 2 API are provided as a convenience  */
-  /*   for client applications and developers. However,  they are not      */
-  /*   required to build and run the library itself.                       */
+  /*   FreeType now handles font files that have been compressed with the  */
+  /*   'gzip' program. This is mostly used to parse many of the PCF files  */
+  /*   that come with XFree86. The implementation uses 'zlib' to           */
+  /*   partially uncompress the file on the fly (see src/base/ftgzip.c).   */
   /*                                                                       */
-  /*   By defining this configuration macro, you'll disable the            */
-  /*   compilation of these functions at build time.  This can be useful   */
-  /*   to reduce the library's code size when you don't need any of        */
-  /*   these functions.                                                    */
+  /*   Define this macro if you want to enable this "feature". Note that   */
+  /*   this will however force you to link the zlib to any program that    */
+  /*   also uses FreeType.                                                 */
   /*                                                                       */
-  /*   All convenience functions are declared as such in their             */
-  /*   documentation.                                                      */
-  /*                                                                       */
-#undef FT_CONFIG_OPTION_NO_CONVENIENCE_FUNCS
+#define FT_CONFIG_OPTION_USE_ZLIB
 
 
   /*************************************************************************/
   /*                                                                       */
-  /* Module errors                                                         */
+  /* ZLib library selection                                                */
   /*                                                                       */
-  /*   If this macro is set (which is _not_ the default), the higher byte  */
-  /*   of an error code gives the module in which the error has occurred,  */
-  /*   while the lower byte is the real error code.                        */
+  /*   This macro is only used when FT_CONFIG_OPTION_USE_ZLIB is defined.  */
+  /*   It allows FreeType's "ftgzip" component to link to the system's     */
+  /*   installation of the ZLib library. This is useful on systems like    */
+  /*   Unix or VMS where it generally is already available.                */
   /*                                                                       */
-  /*   Setting this macro makes sense for debugging purposes only, since   */
-  /*   it would break source compatibility of certain programs that use    */
-  /*   FreeType 2.                                                         */
+  /*   If you let it undefined, the component will use its own copy        */
+  /*   of the zlib sources instead. These have been modified to be         */
+  /*   included directly within the component and *not* export external    */
+  /*   function names. This allows you to link any program with FreeType   */
+  /*   _and_ ZLib without linking conflicts.                               */
   /*                                                                       */
-  /*   More details can be found in the files ftmoderr.h and fterrors.h.   */
+  /*   do not #undef this macro here, since the build system might         */
+  /*   define for certain configurations                                   */
   /*                                                                       */
-#undef FT_CONFIG_OPTION_USE_MODULE_ERRORS
+/* #define  FT_CONFIG_OPTION_SYSTEM_ZLIB */
 
 
   /*************************************************************************/
   /*                                                                       */
-  /* Alternate Glyph Image Format support                                  */
+  /* DLL export compilation                                                */
   /*                                                                       */
-  /*   By default, the glyph images returned by the FreeType glyph loader  */
-  /*   can either be a pixmap or a vectorial outline defined through       */
-  /*   Bezier control points.  When defining the following configuration   */
-  /*   macro, some font drivers will be able to register alternate         */
-  /*   glyph image formats.                                                */
+  /*   When compiling FreeType as a DLL, some systems/compilers need a     */
+  /*   special keyword in front OR after the return type of function       */
+  /*   declarations.                                                       */
   /*                                                                       */
-  /*   Unset this macro if you are sure that you will never use a font     */
-  /*   driver with an alternate glyph format; this will reduce the size of */
-  /*   the base layer code.                                                */
+  /*   Two macros are used within the FreeType source code to define       */
+  /*   exported library functions: FT_EXPORT and FT_EXPORT_DEF.            */
   /*                                                                       */
-  /*   Note that a few Type 1 fonts, as well as Windows `vector' fonts     */
-  /*   use a vector `plotter' format that isn't supported when this        */
-  /*   macro is undefined.                                                 */
+  /*     FT_EXPORT( return_type )                                          */
   /*                                                                       */
-#define FT_CONFIG_OPTION_ALTERNATE_GLYPH_FORMATS
+  /*       is used in a function declaration, as in                        */
+  /*                                                                       */
+  /*         FT_EXPORT( FT_Error )                                         */
+  /*         FT_Init_FreeType( FT_Library*  alibrary );                    */
+  /*                                                                       */
+  /*                                                                       */
+  /*     FT_EXPORT_DEF( return_type )                                      */
+  /*                                                                       */
+  /*       is used in a function definition, as in                         */
+  /*                                                                       */
+  /*         FT_EXPORT_DEF( FT_Error )                                     */
+  /*         FT_Init_FreeType( FT_Library*  alibrary )                     */
+  /*         {                                                             */
+  /*           ... some code ...                                           */
+  /*           return FT_Err_Ok;                                           */
+  /*         }                                                             */
+  /*                                                                       */
+  /*   You can provide your own implementation of FT_EXPORT and            */
+  /*   FT_EXPORT_DEF here if you want.  If you leave them undefined, they  */
+  /*   will be later automatically defined as `extern return_type' to      */
+  /*   allow normal compilation.                                           */
+  /*                                                                       */
+/* #define  FT_EXPORT(x)       extern x */
+/* #define  FT_EXPORT_DEF(x)   x */
 
 
   /*************************************************************************/
@@ -187,93 +216,12 @@ FT_BEGIN_HEADER
 
   /*************************************************************************/
   /*                                                                       */
-  /* Many compilers provide a non-ANSI 64-bit data type that can be used   */
-  /* by FreeType to speed up some computations.  However, this will create */
-  /* some problems when compiling the library in strict ANSI mode.         */
+  /* Allow the use of FT_Incremental_Interface to load typefaces that      */
+  /* contain no glyph data, but supply it via a callback function.         */
+  /* This allows FreeType to be used with the PostScript language, using   */
+  /* the GhostScript interpreter.                                          */
   /*                                                                       */
-  /* For this reason, the use of 64-bit ints is normally disabled when     */
-  /* the __STDC__ macro is defined.  You can however disable this by       */
-  /* defining here the macro FT_CONFIG_OPTION_FORCE_INT64.                 */
-  /*                                                                       */
-  /* For most compilers, this will only create compilation warnings        */
-  /* when building the library.                                            */
-  /*                                                                       */
-  /* ObNote: The compiler-specific 64-bit integers are detected in the     */
-  /*         file "ftconfig.h" either statically, or through Autoconf      */
-  /*         on platforms that support it.                                 */
-  /*                                                                       */
-#undef FT_CONFIG_OPTION_FORCE_INT64
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* DLL export compilation                                                */
-  /*                                                                       */
-  /*   When compiling FreeType as a DLL, some systems/compilers need a     */
-  /*   special keyword in front OR after the return type of function       */
-  /*   declarations.                                                       */
-  /*                                                                       */
-  /*   Two macros are used within the FreeType source code to define       */
-  /*   exported library functions: FT_EXPORT and FT_EXPORT_DEF.            */
-  /*                                                                       */
-  /*     FT_EXPORT( return_type )                                          */
-  /*                                                                       */
-  /*       is used in a function declaration, as in                        */
-  /*                                                                       */
-  /*         FT_EXPORT( FT_Error )                                         */
-  /*         FT_Init_FreeType( FT_Library*  alibrary );                    */
-  /*                                                                       */
-  /*                                                                       */
-  /*     FT_EXPORT_DEF( return_type )                                      */
-  /*                                                                       */
-  /*       is used in a function definition, as in                         */
-  /*                                                                       */
-  /*         FT_EXPORT_DEF( FT_Error )                                     */
-  /*         FT_Init_FreeType( FT_Library*  alibrary )                     */
-  /*         {                                                             */
-  /*           ... some code ...                                           */
-  /*           return FT_Err_Ok;                                           */
-  /*         }                                                             */
-  /*                                                                       */
-  /*   You can provide your own implementation of FT_EXPORT and            */
-  /*   FT_EXPORT_DEF here if you want.  If you leave them undefined, they  */
-  /*   will be later automatically defined as `extern return_type' to      */
-  /*   allow normal compilation.                                           */
-  /*                                                                       */
-#undef FT_EXPORT
-#undef FT_EXPORT_DEF
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* Debug level                                                           */
-  /*                                                                       */
-  /*   FreeType can be compiled in debug or trace mode.  In debug mode,    */
-  /*   errors are reported through the `ftdebug' component.  In trace      */
-  /*   mode, additional messages are sent to the standard output during    */
-  /*   execution.                                                          */
-  /*                                                                       */
-  /*   Define FT_DEBUG_LEVEL_ERROR to build the library in debug mode.     */
-  /*   Define FT_DEBUG_LEVEL_TRACE to build it in trace mode.              */
-  /*                                                                       */
-  /*   Don't define any of these macros to compile in `release' mode!      */
-  /*                                                                       */
-#undef  FT_DEBUG_LEVEL_ERROR
-#undef  FT_DEBUG_LEVEL_TRACE
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* Memory Debugging                                                      */
-  /*                                                                       */
-  /*   FreeType now comes with an integrated memory debugger that is       */
-  /*   capable of detecting simple errors like memory leaks or double      */
-  /*   deletes.  To compile it within your build of the library, you       */
-  /*   should define FT_DEBUG_MEMORY here.                                 */
-  /*                                                                       */
-  /*   Note that the memory debugger is only activated at runtime when     */
-  /*   when the _environment_ variable "FT_DEBUG_MEMORY" is also defined!  */
-  /*                                                                       */
-#undef  FT_DEBUG_MEMORY
+/* #define  FT_CONFIG_OPTION_INCREMENTAL */
 
 
   /*************************************************************************/
@@ -291,9 +239,61 @@ FT_BEGIN_HEADER
   /* FT_MAX_MODULES                                                        */
   /*                                                                       */
   /*   The maximum number of modules that can be registered in a single    */
-  /*   FreeType library object.  16 is the default.                        */
+  /*   FreeType library object.  32 is the default.                        */
   /*                                                                       */
-#define FT_MAX_MODULES  16
+#define FT_MAX_MODULES  32
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Debug level                                                           */
+  /*                                                                       */
+  /*   FreeType can be compiled in debug or trace mode.  In debug mode,    */
+  /*   errors are reported through the `ftdebug' component.  In trace      */
+  /*   mode, additional messages are sent to the standard output during    */
+  /*   execution.                                                          */
+  /*                                                                       */
+  /*   Define FT_DEBUG_LEVEL_ERROR to build the library in debug mode.     */
+  /*   Define FT_DEBUG_LEVEL_TRACE to build it in trace mode.              */
+  /*                                                                       */
+  /*   Don't define any of these macros to compile in `release' mode!      */
+  /*                                                                       */
+/* #define  FT_DEBUG_LEVEL_ERROR */
+/* #define  FT_DEBUG_LEVEL_TRACE */
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Memory Debugging                                                      */
+  /*                                                                       */
+  /*   FreeType now comes with an integrated memory debugger that is       */
+  /*   capable of detecting simple errors like memory leaks or double      */
+  /*   deletes.  To compile it within your build of the library, you       */
+  /*   should define FT_DEBUG_MEMORY here.                                 */
+  /*                                                                       */
+  /*   Note that the memory debugger is only activated at runtime when     */
+  /*   when the _environment_ variable "FT_DEBUG_MEMORY" is also defined!  */
+  /*                                                                       */
+/* #define  FT_DEBUG_MEMORY */
+
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Module errors                                                         */
+  /*                                                                       */
+  /*   If this macro is set (which is _not_ the default), the higher byte  */
+  /*   of an error code gives the module in which the error has occurred,  */
+  /*   while the lower byte is the real error code.                        */
+  /*                                                                       */
+  /*   Setting this macro makes sense for debugging purposes only, since   */
+  /*   it would break source compatibility of certain programs that use    */
+  /*   FreeType 2.                                                         */
+  /*                                                                       */
+  /*   More details can be found in the files ftmoderr.h and fterrors.h.   */
+  /*                                                                       */
+#undef FT_CONFIG_OPTION_USE_MODULE_ERRORS
+
 
 
   /*************************************************************************/
@@ -375,7 +375,10 @@ FT_BEGIN_HEADER
   /* By undefining this, you will only compile the code necessary to load  */
   /* TrueType glyphs without hinting.                                      */
   /*                                                                       */
-#undef  TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+  /*   do not #undef this macro here, since the build system might         */
+  /*   define for certain configurations                                   */
+  /*                                                                       */
+/* #define  TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
 
 
   /*************************************************************************/
@@ -389,6 +392,25 @@ FT_BEGIN_HEADER
   /* this macro will generate faster, though larger, code.                 */
   /*                                                                       */
 #define TT_CONFIG_OPTION_INTERPRETER_SWITCH
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Define TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED to compile the        */
+  /* TrueType glyph loader to use Apple's definition of how to handle      */
+  /* component offsets in composite glyphs.                                */
+  /*                                                                       */
+  /* Apple and MS disagree on the default behavior of component offsets    */
+  /* in composites.  Apple says that they should be scaled by the scale    */
+  /* factors in the transformation matrix (roughly, it's more complex)     */
+  /* while MS says they should not.  OpenType defines two bits in the      */
+  /* composite flags array which can be used to disambiguate, but old      */
+  /* fonts will not have them.                                             */
+  /*                                                                       */
+  /*   http://partners.adobe.com/asn/developer/opentype/glyf.html          */
+  /*   http://fonts.apple.com/TTRefMan/RM06/Chap6glyf.html                 */
+  /*                                                                       */
+#undef TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED
 
 
   /*************************************************************************/
@@ -425,14 +447,6 @@ FT_BEGIN_HEADER
   /* The Chinese font MingTiEG-Medium (CNS 11643 character set) needs 256. */
   /*                                                                       */
 #define T1_MAX_CHARSTRINGS_OPERANDS  256
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* Define T1_CONFIG_OPTION_DISABLE_HINTER if you want to generate a      */
-  /* driver with no hinter.  This can be useful to debug the parser.       */
-  /*                                                                       */
-#undef T1_CONFIG_OPTION_DISABLE_HINTER
 
 
   /*************************************************************************/

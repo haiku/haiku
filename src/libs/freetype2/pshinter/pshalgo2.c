@@ -25,9 +25,9 @@
 #define FT_COMPONENT  trace_pshalgo2
 
 #ifdef DEBUG_HINTER
-  extern PSH2_Hint_Table  ps2_debug_hint_table = 0;
-  extern PSH2_HintFunc    ps2_debug_hint_func  = 0;
-  extern PSH2_Glyph       ps2_debug_glyph      = 0;
+  PSH2_Hint_Table  ps2_debug_hint_table = 0;
+  PSH2_HintFunc    ps2_debug_hint_func  = 0;
+  PSH2_Glyph       ps2_debug_glyph      = 0;
 #endif
 
 
@@ -861,7 +861,7 @@
 
 
     /* clear all fields */
-    ft_memset( glyph, 0, sizeof ( *glyph ) );
+    FT_MEM_ZERO( glyph, sizeof ( *glyph ) );
 
     memory = globals->memory;
 
@@ -927,7 +927,7 @@
         FT_Pos  dxi, dyi, dxo, dyo;
 
 
-        if ( !( outline->tags[n] & FT_Curve_Tag_On ) )
+        if ( !( outline->tags[n] & FT_CURVE_TAG_ON ) )
           point->flags = PSH2_POINT_OFF;
 
         dxi = vec[n].x - vec[n_prev].x;
@@ -1128,8 +1128,9 @@
 
 
       /* process secondary hints to "selected" points */
-      if ( num_masks > 1 )
+      if ( num_masks > 1 && glyph->num_points > 0 )
       {
+        first = mask->end_point;
         mask++;
         for ( ; num_masks > 1; num_masks--, mask++ )
         {
@@ -1491,9 +1492,10 @@
   /*************************************************************************/
 
   FT_Error
-  ps2_hints_apply( PS_Hints     ps_hints,
-                   FT_Outline*  outline,
-                   PSH_Globals  globals )
+  ps2_hints_apply( PS_Hints        ps_hints,
+                   FT_Outline*     outline,
+                   PSH_Globals     globals,
+                   FT_Render_Mode  hint_mode )
   {
     PSH2_GlyphRec  glyphrec;
     PSH2_Glyph     glyph = &glyphrec;
@@ -1503,6 +1505,7 @@
 #endif
     FT_Int         dimension;
 
+    FT_UNUSED( hint_mode );
 
 #ifdef DEBUG_HINTER
     memory = globals->memory;

@@ -46,7 +46,7 @@ FT_BEGIN_HEADER
                FT_UShort  seed );
 
   FT_LOCAL( FT_Error )
-  CID_Open_Face( CID_Face  face );
+  cid_face_open( CID_Face  face );
 
 
 FT_END_HEADER

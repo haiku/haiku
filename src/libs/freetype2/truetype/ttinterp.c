@@ -1175,15 +1175,15 @@
   {
     FT_Int32   m, s, hi;
     FT_UInt32  l, lo;
-    
+
 
     /* compute ax*bx as 64-bit value */
     l  = (FT_UInt32)( ( a & 0xFFFFU ) * b );
     m  = ( a >> 16 ) * b;
-    
+
     lo = l + (FT_UInt32)( m << 16 );
     hi = ( m >> 16 ) + ( (FT_Int32)l >> 31 ) + ( lo < l );
-    
+
     /* divide the result by 2^14 with rounding */
     s   = hi >> 31;
     l   = lo + (FT_UInt32)s;
@@ -1192,7 +1192,7 @@
 
     l   = lo + 0x2000U;
     hi += (l < lo);
-    
+
     return ( hi << 18 ) | ( l >> 14 );
   }
 
@@ -1206,26 +1206,26 @@
   {
     FT_Int32   m, s, hi1, hi2, hi;
     FT_UInt32  l, lo1, lo2, lo;
-    
+
 
     /* compute ax*bx as 64-bit value */
     l = (FT_UInt32)( ( ax & 0xFFFFU ) * bx );
     m = ( ax >> 16 ) * bx;
-    
+
     lo1 = l + (FT_UInt32)( m << 16 );
     hi1 = ( m >> 16 ) + ( (FT_Int32)l >> 31 ) + ( lo1 < l );
-    
+
     /* compute ay*by as 64-bit value */
     l = (FT_UInt32)( ( ay & 0xFFFFU ) * by );
     m = ( ay >> 16 ) * by;
-    
+
     lo2 = l + (FT_UInt32)( m << 16 );
     hi2 = ( m >> 16 ) + ( (FT_Int32)l >> 31 ) + ( lo2 < l );
-    
+
     /* add them */
     lo = lo1 + lo2;
     hi = hi1 + hi2 + ( lo < lo1 );
-    
+
     /* divide the result by 2^14 with rounding */
     s   = hi >> 31;
     l   = lo + (FT_UInt32)s;
@@ -1234,7 +1234,7 @@
 
     l   = lo + 0x2000U;
     hi += ( l < lo );
-    
+
     return ( hi << 18 ) | ( l >> 14 );
   }
 
@@ -1250,33 +1250,33 @@
     FT_Int32   m, hi1, hi2, hi;
     FT_UInt32  l, lo1, lo2, lo;
 
-    
+
     /* compute x*x as 64-bit value */
     lo = (FT_UInt32)( x & 0xFFFFU );
     hi = x >> 16;
-    
+
     l  = lo * lo;
     m  = hi * lo;
     hi = hi * hi;
-    
+
     lo1 = l + (FT_UInt32)( m << 17 );
     hi1 = hi + ( m >> 15 ) + ( lo1 < l );
-    
+
     /* compute y*y as 64-bit value */
     lo = (FT_UInt32)( y & 0xFFFFU );
     hi = y >> 16;
-    
+
     l  = lo * lo;
     m  = hi * lo;
     hi = hi * hi;
-    
+
     lo2 = l + (FT_UInt32)( m << 17 );
     hi2 = hi + ( m >> 15 ) + ( lo2 < l );
-    
+
     /* add them to get 'x*x+y*y' as 64-bit value */
     lo = lo1 + lo2;
     hi = hi1 + hi2 + ( lo < lo1 );
-    
+
     /* compute the square root of this value */
     {
       FT_UInt32  root, rem, test_div;
@@ -1303,13 +1303,13 @@
           }
         } while ( --count );
       }
-      
+
       return (FT_Int32)root;
     }
   }
 
 #else
- 
+
   /* this version uses FT_Vector_Length which computes the same value */
   /* much, much faster..                                              */
   /*                                                                  */
@@ -1325,7 +1325,7 @@
 
     return FT_Vector_Length( &v );
   }
-  
+
 #endif
 
 
@@ -1550,7 +1550,7 @@
 
 #endif
 
-      zone->tags[point] |= FT_Curve_Tag_Touch_X;
+      zone->tags[point] |= FT_CURVE_TAG_TOUCH_X;
     }
 
     v = CUR.GS.freeVector.y;
@@ -1571,7 +1571,7 @@
 
 #endif
 
-      zone->tags[point] |= FT_Curve_Tag_Touch_Y;
+      zone->tags[point] |= FT_CURVE_TAG_TOUCH_Y;
     }
   }
 
@@ -1594,7 +1594,7 @@
     FT_UNUSED_EXEC;
 
     zone->cur[point].x += distance;
-    zone->tags[point]  |= FT_Curve_Tag_Touch_X;
+    zone->tags[point]  |= FT_CURVE_TAG_TOUCH_X;
   }
 
 
@@ -1606,7 +1606,7 @@
     FT_UNUSED_EXEC;
 
     zone->cur[point].y += distance;
-    zone->tags[point]  |= FT_Curve_Tag_Touch_Y;
+    zone->tags[point]  |= FT_CURVE_TAG_TOUCH_Y;
   }
 
 
@@ -5023,7 +5023,7 @@
         }
       }
       else
-        CUR.pts.tags[point] ^= FT_Curve_Tag_On;
+        CUR.pts.tags[point] ^= FT_CURVE_TAG_ON;
 
       CUR.GS.loop--;
     }
@@ -5057,7 +5057,7 @@
     }
 
     for ( I = L; I <= K; I++ )
-      CUR.pts.tags[I] |= FT_Curve_Tag_On;
+      CUR.pts.tags[I] |= FT_CURVE_TAG_ON;
   }
 
 
@@ -5085,7 +5085,7 @@
     }
 
     for ( I = L; I <= K; I++ )
-      CUR.pts.tags[I] &= ~FT_Curve_Tag_On;
+      CUR.pts.tags[I] &= ~FT_CURVE_TAG_ON;
   }
 
 
@@ -5153,14 +5153,14 @@
     {
       CUR.zp2.cur[point].x += dx;
       if ( touch )
-        CUR.zp2.tags[point] |= FT_Curve_Tag_Touch_X;
+        CUR.zp2.tags[point] |= FT_CURVE_TAG_TOUCH_X;
     }
 
     if ( CUR.GS.freeVector.y != 0 )
     {
       CUR.zp2.cur[point].y += dy;
       if ( touch )
-        CUR.zp2.tags[point] |= FT_Curve_Tag_Touch_Y;
+        CUR.zp2.tags[point] |= FT_CURVE_TAG_TOUCH_Y;
     }
   }
 
@@ -5828,7 +5828,7 @@
     dx = CUR.zp0.cur[b0].x - CUR.zp1.cur[a0].x;
     dy = CUR.zp0.cur[b0].y - CUR.zp1.cur[a0].y;
 
-    CUR.zp2.tags[point] |= FT_Curve_Tag_Touch_Both;
+    CUR.zp2.tags[point] |= FT_CURVE_TAG_TOUCH_BOTH;
 
     discriminant = TT_MULDIV( dax, -dby, 0x40 ) +
                    TT_MULDIV( day, dbx, 0x40 );
@@ -6006,10 +6006,10 @@
     mask = 0xFF;
 
     if ( CUR.GS.freeVector.x != 0 )
-      mask &= ~FT_Curve_Tag_Touch_X;
+      mask &= ~FT_CURVE_TAG_TOUCH_X;
 
     if ( CUR.GS.freeVector.y != 0 )
-      mask &= ~FT_Curve_Tag_Touch_Y;
+      mask &= ~FT_CURVE_TAG_TOUCH_Y;
 
     CUR.zp0.tags[point] &= mask;
   }
@@ -6149,13 +6149,13 @@
 
     if ( CUR.opcode & 1 )
     {
-      mask   = FT_Curve_Tag_Touch_X;
+      mask   = FT_CURVE_TAG_TOUCH_X;
       V.orgs = CUR.pts.org;
       V.curs = CUR.pts.cur;
     }
     else
     {
-      mask   = FT_Curve_Tag_Touch_Y;
+      mask   = FT_CURVE_TAG_TOUCH_Y;
       V.orgs = (FT_Vector*)( (FT_Pos*)CUR.pts.org + 1 );
       V.curs = (FT_Vector*)( (FT_Pos*)CUR.pts.cur + 1 );
     }

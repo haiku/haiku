@@ -54,7 +54,7 @@ FT_BEGIN_HEADER
   {
     FT_ValidatorRec  validator;
     FT_UInt          num_glyphs;
-    
+
   } TT_ValidatorRec, *TT_Validator;
 
 
@@ -62,12 +62,8 @@ FT_BEGIN_HEADER
 #define TT_VALID_GLYPH_COUNT( x )  TT_VALIDATOR( x )->num_glyphs
 
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
   FT_LOCAL( FT_Error )
-  TT_Build_CMaps( TT_Face  face );
-
-#endif
+  tt_face_build_cmaps( TT_Face  face );
 
 
 FT_END_HEADER

@@ -261,11 +261,13 @@ FT_BEGIN_HEADER
   /*    been recorded.                                                     */
   /*                                                                       */
   /* @input:                                                               */
-  /*   hints   :: A handle to the Type 1 hints recorder.                   */
+  /*   hints      :: A handle to the Type 1 hints recorder.                */
   /*                                                                       */
-  /*   outline :: A pointer to the target outline descriptor.              */
+  /*   outline    :: A pointer to the target outline descriptor.           */
   /*                                                                       */
-  /*   globals :: The hinter globals for this font.                        */
+  /*   globals    :: The hinter globals for this font.                     */
+  /*                                                                       */
+  /*   hint_flags :: Hinter bit flags.                                     */
   /*                                                                       */
   /* @return:                                                              */
   /*   FreeType error code.  0 means success.                              */
@@ -278,9 +280,10 @@ FT_BEGIN_HEADER
   /*    which must correspond to the same font as the glyph.               */
   /*                                                                       */
   typedef FT_Error
-  (*T1_Hints_ApplyFunc)( T1_Hints     hints,
-                         FT_Outline*  outline,
-                         PSH_Globals  globals );
+  (*T1_Hints_ApplyFunc)( T1_Hints        hints,
+                         FT_Outline*     outline,
+                         PSH_Globals     globals,
+                         FT_Render_Mode  hint_mode );
 
 
   /*************************************************************************/
@@ -539,11 +542,13 @@ FT_BEGIN_HEADER
   /*    method.                                                            */
   /*                                                                       */
   /* @input:                                                               */
-  /*    hints   :: A handle to the Type 2 hints recorder.                  */
+  /*    hints      :: A handle to the Type 2 hints recorder.               */
   /*                                                                       */
-  /*    outline :: A pointer to the target outline descriptor.             */
+  /*    outline    :: A pointer to the target outline descriptor.          */
   /*                                                                       */
-  /*    globals :: The hinter globals for this font.                       */
+  /*    globals    :: The hinter globals for this font.                    */
+  /*                                                                       */
+  /*    hint_flags :: Hinter bit flags.                                    */
   /*                                                                       */
   /* @return:                                                              */
   /*   FreeType error code.  0 means success.                              */
@@ -556,9 +561,10 @@ FT_BEGIN_HEADER
   /*    which must correspond to the same font than the glyph.             */
   /*                                                                       */
   typedef FT_Error
-  (*T2_Hints_ApplyFunc)( T2_Hints     hints,
-                         FT_Outline*  outline,
-                         PSH_Globals  globals );
+  (*T2_Hints_ApplyFunc)( T2_Hints        hints,
+                         FT_Outline*     outline,
+                         PSH_Globals     globals,
+                         FT_Render_Mode  hint_mode );
 
 
   /*************************************************************************/

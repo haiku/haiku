@@ -146,10 +146,10 @@
     /* now, load the keyword data in the object's field(s) */
     if ( keyword->type == T1_FIELD_TYPE_INTEGER_ARRAY ||
          keyword->type == T1_FIELD_TYPE_FIXED_ARRAY   )
-      error = CID_Load_Field_Table( &loader->parser, keyword,
+      error = cid_parser_load_field_table( &loader->parser, keyword,
                                     &dummy_object );
     else
-      error = CID_Load_Field( &loader->parser, keyword, &dummy_object );
+      error = cid_parser_load_field( &loader->parser, keyword, &dummy_object );
   Exit:
     return error;
   }
@@ -163,7 +163,7 @@
     FT_BBox*  bbox = &face->cid.font_bbox;
 
 
-    (void)CID_ToFixedArray( parser, 4, temp, 0 );
+    (void)cid_parser_to_fixed_array( parser, 4, temp, 0 );
     bbox->xMin = FT_RoundFix( temp[0] );
     bbox->yMin = FT_RoundFix( temp[1] );
     bbox->xMax = FT_RoundFix( temp[2] );
@@ -192,7 +192,7 @@
       matrix = &dict->font_matrix;
       offset = &dict->font_offset;
 
-      (void)CID_ToFixedArray( parser, 6, temp, 3 );
+      (void)cid_parser_to_fixed_array( parser, 6, temp, 3 );
 
       temp_scale = ABS( temp[3] );
 
@@ -238,7 +238,7 @@
     FT_Long       num_dicts;
 
 
-    num_dicts = CID_ToInt( parser );
+    num_dicts = cid_parser_to_int( parser );
 
     if ( !cid->font_dicts )
     {
@@ -362,7 +362,7 @@
                 {
                   /* we found it - run the parsing callback */
                   parser->root.cursor = cur2;
-                  CID_Skip_Spaces( parser );
+                  cid_parser_skip_spaces( parser );
                   parser->root.error = cid_load_keyword( face,
                                                          loader,
                                                          keyword );
@@ -448,7 +448,7 @@
       /* set up pointers */
       for ( count = 1; count <= num_subrs; count++ )
       {
-        FT_UInt  len;
+        FT_ULong  len;
 
 
         len               = offsets[count] - offsets[count - 1];
@@ -460,7 +460,7 @@
       {
         for ( count = 0; count < num_subrs; count++ )
         {
-          FT_UInt  len;
+          FT_ULong  len;
 
 
           len = offsets[count + 1] - offsets[count];
@@ -497,7 +497,7 @@
   {
     FT_UNUSED( face );
 
-    FT_MEM_SET( loader, 0, sizeof ( *loader ) );
+    FT_MEM_ZERO( loader, sizeof ( *loader ) );
   }
 
 
@@ -508,12 +508,12 @@
 
 
     /* finalize parser */
-    CID_Done_Parser( parser );
+    cid_parser_done( parser );
   }
 
 
   FT_LOCAL_DEF( FT_Error )
-  CID_Open_Face( CID_Face  face )
+  cid_face_open( CID_Face  face )
   {
     CID_Loader   loader;
     CID_Parser*  parser;
@@ -523,7 +523,7 @@
     t1_init_loader( &loader, face );
 
     parser = &loader.parser;
-    error = CID_New_Parser( parser, face->root.stream, face->root.memory,
+    error = cid_parser_new( parser, face->root.stream, face->root.memory,
                             (PSAux_Service)face->psaux );
     if ( error )
       goto Exit;

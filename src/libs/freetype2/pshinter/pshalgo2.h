@@ -188,9 +188,10 @@ FT_BEGIN_HEADER
 
 
   extern FT_Error
-  ps2_hints_apply( PS_Hints     ps_hints,
-                   FT_Outline*  outline,
-                   PSH_Globals  globals );
+  ps2_hints_apply( PS_Hints        ps_hints,
+                   FT_Outline*     outline,
+                   PSH_Globals     globals,
+                   FT_Render_Mode  hint_mode );
 
 
 FT_END_HEADER

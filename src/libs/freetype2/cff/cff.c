@@ -24,6 +24,6 @@
 #include "cffload.c"
 #include "cffobjs.c"
 #include "cffgload.c"
-
+#include "cffcmap.c"
 
 /* END */

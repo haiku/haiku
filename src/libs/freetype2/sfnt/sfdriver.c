@@ -92,7 +92,7 @@
     FT_Error    error;
 
 
-    error = TT_Get_PS_Name( face, glyph_index, &gname );
+    error = tt_face_get_ps_name( face, glyph_index, &gname );
     if ( !error && buffer_max > 0 )
     {
       FT_UInt  len = (FT_UInt)( ft_strlen( gname ) );
@@ -220,7 +220,7 @@
 
 
   FT_CALLBACK_DEF( FT_Module_Interface )
-  SFNT_Get_Interface( FT_Module    module,
+  sfnt_get_interface( FT_Module    module,
                       const char*  module_interface )
   {
     FT_UNUSED( module );
@@ -243,44 +243,44 @@
   static
   const SFNT_Interface  sfnt_interface =
   {
-    TT_Goto_Table,
+    tt_face_goto_table,
 
-    SFNT_Init_Face,
-    SFNT_Load_Face,
-    SFNT_Done_Face,
-    SFNT_Get_Interface,
+    sfnt_init_face,
+    sfnt_load_face,
+    sfnt_done_face,
+    sfnt_get_interface,
 
-    TT_Load_Any,
-    TT_Load_SFNT_HeaderRec,
-    TT_Load_Directory,
+    tt_face_load_any,
+    tt_face_load_sfnt_header,
+    tt_face_load_directory,
 
-    TT_Load_Header,
-    TT_Load_Metrics_Header,
-    TT_Load_CMap,
-    TT_Load_MaxProfile,
-    TT_Load_OS2,
-    TT_Load_PostScript,
+    tt_face_load_header,
+    tt_face_load_metrics_header,
+    tt_face_load_cmap,
+    tt_face_load_max_profile,
+    tt_face_load_os2,
+    tt_face_load_postscript,
 
-    TT_Load_Names,
-    TT_Free_Names,
+    tt_face_load_names,
+    tt_face_free_names,
 
-    TT_Load_Hdmx,
-    TT_Free_Hdmx,
+    tt_face_load_hdmx,
+    tt_face_free_hdmx,
 
-    TT_Load_Kern,
-    TT_Load_Gasp,
-    TT_Load_PCLT,
+    tt_face_load_kern,
+    tt_face_load_gasp,
+    tt_face_load_pclt,
 
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
 
     /* see `ttload.h' */
-    TT_Load_Bitmap_Header,
+    tt_face_load_bitmap_header,
 
     /* see `ttsbit.h' */
-    TT_Set_SBit_Strike,
-    TT_Load_SBit_Strikes,
-    TT_Load_SBit_Image,
-    TT_Free_SBit_Strikes,
+    tt_face_set_sbit_strike,
+    tt_face_load_sbit_strikes,
+    tt_face_load_sbit_image,
+    tt_face_free_sbit_strikes,
 
 #else /* TT_CONFIG_OPTION_EMBEDDED_BITMAPS */
 
@@ -295,8 +295,8 @@
 #ifdef TT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
     /* see `ttpost.h' */
-    TT_Get_PS_Name,
-    TT_Free_Post_Names,
+    tt_face_get_ps_name,
+    tt_face_free_ps_names,
 
 #else /* TT_CONFIG_OPTION_POSTSCRIPT_NAMES */
 
@@ -306,8 +306,8 @@
 #endif /* TT_CONFIG_OPTION_POSTSCRIPT_NAMES */
 
     /* see `ttcmap.h' */
-    TT_CharMap_Load,
-    TT_CharMap_Free,
+    tt_face_load_charmap,
+    tt_face_free_charmap,
   };
 
 
@@ -325,7 +325,7 @@
 
     (FT_Module_Constructor)0,
     (FT_Module_Destructor) 0,
-    (FT_Module_Requester)  SFNT_Get_Interface
+    (FT_Module_Requester)  sfnt_get_interface
   };
 
 

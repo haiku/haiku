@@ -61,10 +61,10 @@
     {
       FT_UInt  len = (FT_UInt)( ft_strlen( gname ) );
 
-  
+
       if ( len >= buffer_max )
         len = buffer_max - 1;
-        
+
       FT_MEM_COPY( buffer, gname, len );
       ((FT_Byte*)buffer)[len] = 0;
     }
@@ -158,14 +158,11 @@
     (FT_Size_ResetPointsFunc) T42_Size_SetChars,
     (FT_Size_ResetPixelsFunc) T42_Size_SetPixels,
     (FT_Slot_LoadFunc)        T42_GlyphSlot_Load,
-    (FT_CharMap_CharIndexFunc)T42_CMap_CharIndex,
 
     (FT_Face_GetKerningFunc)  0,
     (FT_Face_AttachFunc)      0,
 
-    (FT_Face_GetAdvancesFunc) 0,
-
-    (FT_CharMap_CharNextFunc) T42_CMap_CharNext,
+    (FT_Face_GetAdvancesFunc) 0
   };
 
 

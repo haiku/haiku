@@ -176,6 +176,28 @@ FT_BEGIN_HEADER
   /*************************************************************************/
   /*                                                                       */
   /* @function:                                                            */
+  /*    FT_Angle_Diff                                                      */
+  /*                                                                       */
+  /* @description:                                                         */
+  /*    Return the difference between two angles.  The result is always    */
+  /*    constrained to the ]-PI..PI] interval.                             */
+  /*                                                                       */
+  /* @input:                                                               */
+  /*    angle1 :: First angle.                                             */
+  /*                                                                       */
+  /*    angle2 :: Second angle.                                            */
+  /*                                                                       */
+  /* @return:                                                              */
+  /*    Contrainted value of `value2-value1'.                              */
+  /*                                                                       */
+  FT_EXPORT( FT_Angle )
+  FT_Angle_Diff( FT_Angle  angle1,
+                 FT_Angle  angle2 );
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* @function:                                                            */
   /*    FT_Vector_Unit                                                     */
   /*                                                                       */
   /* @description:                                                         */
@@ -270,6 +292,28 @@ FT_BEGIN_HEADER
   FT_Vector_Polarize( FT_Vector*  vec,
                       FT_Fixed   *length,
                       FT_Angle   *angle );
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* @function:                                                            */
+  /*    FT_Vector_From_Polar                                               */
+  /*                                                                       */
+  /* @description:                                                         */
+  /*    Compute vector coordinates from a length and angle.                */
+  /*                                                                       */
+  /* @output:                                                              */
+  /*    vec    :: The address of source vector.                            */
+  /*                                                                       */
+  /* @input:                                                               */
+  /*    length :: The vector length.                                       */
+  /*    angle  :: The vector angle.                                        */
+  /*                                                                       */
+  FT_EXPORT( void )
+  FT_Vector_From_Polar( FT_Vector*  vec,
+                        FT_Fixed    length,
+                        FT_Angle    angle );
+
   /* */
 
 

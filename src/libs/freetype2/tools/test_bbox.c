@@ -46,10 +46,10 @@
 
   static char  dummy_tag_1[4] =
   {
-    FT_Curve_Tag_On,
-    FT_Curve_Tag_Cubic,
-    FT_Curve_Tag_Cubic,
-    FT_Curve_Tag_On
+    FT_CURVE_TAG_ON,
+    FT_CURVE_TAG_CUBIC,
+    FT_CURVE_TAG_CUBIC,
+    FT_CURVE_TAG_ON
   };
 
   static short  dummy_contour_1[1] =

@@ -310,7 +310,7 @@ FT_BEGIN_HEADER
   /*    outline :: A pointer to the target outline descriptor.             */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    This functions toggles the bit flag `ft_outline_reverse_fill' in   */
+  /*    This functions toggles the bit flag `FT_OUTLINE_REVERSE_FILL' in   */
   /*    the outline's `flags' field.                                       */
   /*                                                                       */
   /*    It shouldn't be used by a normal client application, unless it     */

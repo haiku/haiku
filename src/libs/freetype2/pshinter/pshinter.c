@@ -23,6 +23,7 @@
 #include "pshglob.c"
 #include "pshalgo1.c"
 #include "pshalgo2.c"
+#include "pshalgo3.c"
 #include "pshmod.c"
 
 

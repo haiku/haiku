@@ -964,7 +964,7 @@
   {
     FT_UNUSED( face );
 
-    FT_MEM_SET( loader, 0, sizeof ( *loader ) );
+    FT_MEM_ZERO( loader, sizeof ( *loader ) );
     loader->num_glyphs = 0;
     loader->num_chars  = 0;
 

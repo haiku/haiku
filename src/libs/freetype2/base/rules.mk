@@ -54,6 +54,7 @@ BASE_EXT_SRC := $(BASE_)ftglyph.c \
                 $(BASE_)ftbdf.c   \
                 $(BASE_)fttype1.c \
                 $(BASE_)ftxf86.c  \
+                $(BASE_)ftpfr.c   \
                 $(BASE_)ftbbox.c
 
 # Default extensions objects

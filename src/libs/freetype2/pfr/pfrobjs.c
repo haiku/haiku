@@ -20,6 +20,7 @@
 #include "pfrload.h"
 #include "pfrgload.h"
 #include "pfrcmap.h"
+#include "pfrsbit.h"
 #include FT_OUTLINE_H
 #include FT_INTERNAL_DEBUG_H
 
@@ -48,11 +49,16 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  pfr_face_init( FT_Stream  stream,
-                 PFR_Face   face,
-                 FT_Int     face_index )
+  pfr_face_init( FT_Stream      stream,
+                 PFR_Face       face,
+                 FT_Int         face_index,
+                 FT_Int         num_params,
+                 FT_Parameter*  params )
   {
     FT_Error  error;
+
+    FT_UNUSED( num_params );
+    FT_UNUSED( params );
 
 
     /* load the header and check it */
@@ -124,7 +130,11 @@
        else
          root->face_flags |= FT_FACE_FLAG_HORIZONTAL;
 
-       /* XXX: kerning and embedded bitmap support isn't there yet */
+       if ( phy_font->num_strikes > 0 )
+         root->face_flags |= FT_FACE_FLAG_FIXED_SIZES;
+
+       if ( phy_font->num_kern_pairs > 0 )
+         root->face_flags |= FT_FACE_FLAG_KERNING;
 
        root->family_name = phy_font->font_id;
        root->style_name  = NULL;  /* no style name in font file */
@@ -167,18 +177,20 @@
        /* create charmap */
        {
          FT_CharMapRec  charmap;
-         
+
 
          charmap.face        = root;
          charmap.platform_id = 3;
          charmap.encoding_id = 1;
-         charmap.encoding    = ft_encoding_unicode;
-         
+         charmap.encoding    = FT_ENCODING_UNICODE;
+
          FT_CMap_New( &pfr_cmap_class_rec, NULL, &charmap, NULL );
 
+#if 0
          /* Select default charmap */
          if (root->num_charmaps)
            root->charmap = root->charmaps[0];
+#endif
        }
 
        /* check whether we've loaded any kerning pairs */
@@ -221,7 +233,7 @@
   pfr_slot_load( PFR_Slot  slot,
                  PFR_Size  size,
                  FT_UInt   gindex,
-                 FT_Int    load_flags )
+                 FT_Int32  load_flags )
   {
     FT_Error     error;
     PFR_Face     face    = (PFR_Face)slot->root.face;
@@ -235,8 +247,16 @@
     /* check that the glyph index is correct */
     FT_ASSERT( gindex < face->phy_font.num_chars );
 
+    /* try to load an embedded bitmap */
+    if ( ( load_flags & ( FT_LOAD_NO_SCALE | FT_LOAD_NO_BITMAP ) ) == 0 )
+    {
+      error = pfr_slot_load_bitmap( slot, size, gindex );
+      if ( error == 0 )
+        goto Exit;
+    }
+
     gchar               = face->phy_font.chars + gindex;
-    slot->root.format   = ft_glyph_format_outline;
+    slot->root.format   = FT_GLYPH_FORMAT_OUTLINE;
     outline->n_points   = 0;
     outline->n_contours = 0;
     gps_offset          = face->header.gps_section_offset;
@@ -259,11 +279,11 @@
       /* copy outline data */
       *outline = slot->glyph.loader->base.outline;
 
-      outline->flags &= ~ft_outline_owner;
-      outline->flags |= ft_outline_reverse_fill;
+      outline->flags &= ~FT_OUTLINE_OWNER;
+      outline->flags |= FT_OUTLINE_REVERSE_FILL;
 
       if ( size && size->root.metrics.y_ppem < 24 )
-        outline->flags |= ft_outline_high_precision;
+        outline->flags |= FT_OUTLINE_HIGH_PRECISION;
 
       /* compute the advance vector */
       metrics->horiAdvance = 0;
@@ -277,9 +297,9 @@
         advance = FT_MulDiv( advance, em_outline, em_metrics );
 
       if ( face->phy_font.flags & PFR_PHY_VERTICAL )
-        metrics->vertAdvance = gchar->advance;
+        metrics->vertAdvance = advance;
       else
-        metrics->horiAdvance = gchar->advance;
+        metrics->horiAdvance = advance;
 
       slot->root.linearHoriAdvance = metrics->horiAdvance;
       slot->root.linearVertAdvance = metrics->vertAdvance;
@@ -318,6 +338,7 @@
       metrics->horiBearingY = cbox.yMax - metrics->height;
     }
 
+  Exit:
     return error;
   }
 
@@ -330,51 +351,84 @@
   /*************************************************************************/
   /*************************************************************************/
 
-  /* XXX: This relies on the font being spec-conformant, i.e., that the
-          kerning pairs are sorted.  We might want to sort it just to make
-          sure */
-
-#undef  PFR_KERN_INDEX
-#define PFR_KERN_INDEX( g1, g2 )  ( ( (FT_ULong)g1 << 16 ) | g2 )
-
-  /* find the kerning for a given glyph pair */
   FT_LOCAL_DEF( FT_Error )
   pfr_face_get_kerning( PFR_Face    face,
                         FT_UInt     glyph1,
                         FT_UInt     glyph2,
                         FT_Vector*  kerning )
   {
+    FT_Error      error;
     PFR_PhyFont   phy_font = &face->phy_font;
-    PFR_KernPair  min, mid, max;
-    FT_ULong      idx = PFR_KERN_INDEX( glyph1, glyph2 );
+    PFR_KernItem  item     = phy_font->kern_items;
+    FT_UInt32     idx      = PFR_KERN_INDEX( glyph1, glyph2 );
 
-
-    /* simple binary search */
-    min = phy_font->kern_pairs;
-    max = min + phy_font->num_kern_pairs;
-
-    while ( min < max )
-    {
-      FT_ULong  midi;
-
-
-      mid  = min + ( max - min ) / 2;
-      midi = PFR_KERN_INDEX( mid->glyph1, mid->glyph2 );
-
-      if ( midi == idx )
-      {
-        *kerning = mid->kerning;
-        goto Exit;
-      }
-
-      if ( midi < idx )
-        min = mid + 1;
-      else
-        max = mid;
-    }
 
     kerning->x = 0;
     kerning->y = 0;
+
+    /* find the kerning item containing our pair */
+    while ( item )
+    {
+      if ( item->pair1 <= idx && idx <= item->pair2 )
+        goto Found_Item;
+
+      item = item->next;
+    }
+
+    /* not found */
+    goto Exit;
+
+  Found_Item:
+    {
+      /* perform simply binary search within the item */
+      FT_UInt    min, mid, max;
+      FT_Stream  stream = face->root.stream;
+      FT_Byte*   p;
+
+
+      if ( FT_STREAM_SEEK( item->offset )                       ||
+           FT_FRAME_ENTER( item->pair_count * item->pair_size ) )
+        goto Exit;
+
+      min = 0;
+      max = item->pair_count;
+      while ( min < max )
+      {
+        FT_UInt  char1, char2, charcode;
+
+
+        mid = ( min + max ) >> 1;
+        p   = stream->cursor + mid*item->pair_size;
+
+        if ( item->flags & PFR_KERN_2BYTE_CHAR )
+        {
+          char1 = FT_NEXT_USHORT( p );
+          char2 = FT_NEXT_USHORT( p );
+        }
+        else
+        {
+          char1 = FT_NEXT_USHORT( p );
+          char2 = FT_NEXT_USHORT( p );
+        }
+        charcode = PFR_KERN_INDEX( char1, char2 );
+
+        if ( idx == charcode )
+        {
+          if ( item->flags & PFR_KERN_2BYTE_ADJ )
+            kerning->x = item->base_adj + FT_NEXT_SHORT( p );
+          else
+            kerning->x = item->base_adj + FT_NEXT_CHAR( p );
+
+          break;
+        }
+        if ( idx > charcode )
+          min = mid + 1;
+        else
+          max = mid;
+      }
+
+      FT_FRAME_EXIT();
+    }
 
   Exit:
     return 0;

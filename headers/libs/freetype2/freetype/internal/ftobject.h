@@ -140,14 +140,11 @@ FT_BEGIN_HEADER
   *   object    :: target object handle
   *   init_data :: optional pointer to initialization data
   *
-  * @throws: any
-  *
-  *   the object is _assumed_ to be reachable from the cleanup
-  *   stack when the constructor is called. This means that
-  *   any exception can be thrown safely in it.
+  * @return:
+  *   error code. 0 means success
   */
-  typedef void  (*FT_Object_InitFunc)( FT_Object   object,
-                                       FT_Pointer  init_data );
+  typedef FT_Error  (*FT_Object_InitFunc)( FT_Object   object,
+                                           FT_Pointer  init_data );
 
  /**************************************************************
   *
@@ -158,8 +155,6 @@ FT_BEGIN_HEADER
   *
   * @input:
   *   object    :: handle to target object
-  *
-  * @throws: *never* !!
   */
   typedef void  (*FT_Object_DoneFunc)( FT_Object   object );
 
@@ -179,11 +174,14 @@ FT_BEGIN_HEADER
   *               object sub-system.)
   *
   *   magic    :: a 32-bit magic number used for decoding
+  *   super    :: pointer to super class
   *   type     :: the @FT_Type descriptor of this class
   *   memory   :: the current memory manager handle
   *   library  :: the current library handle
   *   info     :: an opaque pointer to class-specific information
   *               managed by the FreeType object sub-system
+  *
+  *   class_done :: the class destructor function
   *
   *   obj_size :: size of class instances in bytes
   *   obj_init :: class instance constructor
@@ -193,10 +191,13 @@ FT_BEGIN_HEADER
   {
     FT_ObjectRec        object;
     FT_UInt32           magic;
+    FT_Class            super;
     FT_Type             type;
     FT_Memory           memory;
     FT_Library          library;
     FT_Pointer          info;
+
+    FT_Object_DoneFunc  class_done;
 
     FT_UInt             obj_size;
     FT_Object_InitFunc  obj_init;
@@ -287,14 +288,17 @@ FT_BEGIN_HEADER
   *
   * @note:
   *   if 'obj_init' is NULL, the class will use it's parent
-  *   constructor.
+  *   constructor, if any
   *
   *   if 'obj_done' is NULL, the class will use it's parent
-  *   finalizer.
+  *   finalizer, if any
   *
   *   the object sub-system allocates a new class, copies
   *   the content of its super-class into the new structure,
   *   _then_ calls 'clazz_init'.
+  *
+  *   'class_init' and 'class_done' can be NULL, in which case
+  *   the parent's class constructor and destructor wil be used
   */
   typedef struct FT_TypeRec_
   {
@@ -336,7 +340,7 @@ FT_BEGIN_HEADER
   * @return:
   *   1 iff the handle points to a valid object. 0 otherwise
   */
-  FT_BASE_DEF( FT_Int )
+  FT_BASE( FT_Int )
   ft_object_check( FT_Pointer  obj );
 
 
@@ -356,28 +360,9 @@ FT_BEGIN_HEADER
   *   1 iff the handle points to a valid 'clazz' instance. 0
   *   otherwise.
   */
-  FT_BASE_DEF( FT_Int )
+  FT_BASE( FT_Int )
   ft_object_is_a( FT_Pointer  obj,
                   FT_Class    clazz );
-
-
- /**************************************************************
-  *
-  * @function: ft_object_new
-  *
-  * @description:
-  *   create a new object (class instance)
-  *
-  * @input:
-  *   clazz     :: object's class pointer
-  *   init_data :: optional pointer to initialization data
-  *
-  * @return:
-  *   handle to new object. Cannot be NULL !
-  */
-  FT_BASE_DEF( FT_Object )
-  ft_object_new( FT_Class    clazz,
-                 FT_Pointer  init_data );
 
 
  /**************************************************************
@@ -385,58 +370,163 @@ FT_BEGIN_HEADER
   * @function: ft_object_create
   *
   * @description:
-  *   a variation of @ft_object_new that should be used when
-  *   creating a new object that is owned by another object
-  *   which is reachable from the cleanup stack.
-  *
-  *   this function is a bit more akward to use but completely
-  *   avoids push/pop pairs during object construction and is
-  *   therefore faster.
+  *   create a new object (class instance)
   *
   * @output:
-  *   pobject   :: new object handle
+  *   aobject   :: new object handle. NULL in case of error
   *
   * @input:
   *   clazz     :: object's class pointer
   *   init_data :: optional pointer to initialization data
-  *   push      :: boolean. If true, the new object is pushed
-  *                on top of the cleanup stack.
+  *
+  * @return:
+  *   error code. 0 means success
   */
-  FT_BASE_DEF( void )
-  ft_object_create( FT_Object  *pobject,
+  FT_BASE( FT_Error )
+  ft_object_create( FT_Object  *aobject,
                     FT_Class    clazz,
                     FT_Pointer  init_data );
 
- /* */
 
-  FT_BASE_DEF( FT_Class )
-  ft_class_find_by_type( FT_Type    type,
-                         FT_Memory  memory );
-
-  FT_BASE_DEF( FT_Class )
-  ft_class_find_by_name( FT_CString  class_name,
-                         FT_Memory   memory );
-
-  FT_BASE_DEF( FT_Object )
-  ft_object_new_from_type( FT_Type     type,
-                           FT_Pointer  data,
-                           FT_Memory   memory );
-
-  FT_BASE_DEF( void )
-  ft_object_create_from_type( FT_Object  *pobject,
+ /**************************************************************
+  *
+  * @function: ft_object_create_from_type
+  *
+  * @description:
+  *   create a new object (class instance) from a @FT_Type
+  *
+  * @output:
+  *   aobject   :: new object handle. NULL in case of error
+  *
+  * @input:
+  *   type      :: object's type descriptor
+  *   init_data :: optional pointer to initialization data
+  *
+  * @return:
+  *   error code. 0 means success
+  *
+  * @note:
+  *   this function is slower than @ft_object_create
+  *
+  *   this is equivalent to calling @ft_class_from_type followed by
+  *   @ft_object_create
+  */
+  FT_BASE( FT_Error )
+  ft_object_create_from_type( FT_Object  *aobject,
                               FT_Type     type,
                               FT_Pointer  init_data,
-                              FT_Memory   memory );
+                              FT_Library  library );
 
-  FT_BASE_DEF( void )
-  ft_object_push( FT_Object  object );
 
-  FT_BASE_DEF( void )
-  ft_object_pop( FT_Object  object );
 
-  FT_BASE_DEF( void )
-  ft_object_pop_destroy( FT_Object  object );
+ /**************************************************************
+  *
+  * @macro FT_OBJ_CREATE (object,class,init)
+  *
+  * @description:
+  *   a convenient macro used to create new objects. see
+  *   @ft_object_create for details
+  */
+#define  FT_OBJ_CREATE( _obj, _clazz, _init )   \
+               ft_object_create( FT_OBJECT_P(&(_obj)), _clazz, _init )
 
+
+ /**************************************************************
+  *
+  * @macro FT_CREATE (object,class,init)
+  *
+  * @description:
+  *   a convenient macro used to create new objects. It also
+  *   sets an _implicit_ local variable named "error" to the error
+  *   code returned by the object constructor.
+  */
+#define  FT_CREATE( _obj, _clazz, _init )  \
+             FT_SET_ERROR( FT_OBJ_CREATE( _obj, _clazz, _init ) )
+
+ /**************************************************************
+  *
+  * @macro FT_OBJ_CREATE_FROM_TYPE (object,type,init)
+  *
+  * @description:
+  *   a convenient macro used to create new objects. see
+  *   @ft_object_create_from_type for details
+  */
+#define  FT_OBJ_CREATE_FROM_TYPE( _obj, _type, _init, _lib )   \
+               ft_object_create_from_type( FT_OBJECT_P(&(_obj)), _type, _init, _lib )
+
+
+ /**************************************************************
+  *
+  * @macro FT_CREATE_FROM_TYPE (object,type,init)
+  *
+  * @description:
+  *   a convenient macro used to create new objects. It also
+  *   sets an _implicit_ local variable named "error" to the error
+  *   code returned by the object constructor.
+  */
+#define  FT_CREATE_FROM_TYPE( _obj, _type, _init, _lib )  \
+             FT_SET_ERROR( FT_OBJ_CREATE_FROM_TYPE( _obj, _type, _init, _lib ) )
+
+
+ /* */
+
+ /**************************************************************
+  *
+  * @function: ft_class_from_type
+  *
+  * @description:
+  *   retrieves the class object corresponding to a given type
+  *   descriptor. The class is created when needed
+  *
+  * @output:
+  *   aclass  :: handle to corresponding class object. NULL in
+  *              case of error
+  *
+  * @input:
+  *   type    :: type descriptor handle
+  *   library :: library handle
+  *
+  * @return:
+  *   error code. 0 means success
+  */
+  FT_BASE( FT_Error )
+  ft_class_from_type( FT_Class   *aclass,
+                      FT_Type     type,
+                      FT_Library  library );
+
+
+ /* */
+
+#include FT_INTERNAL_HASH_H
+
+  typedef struct FT_ClassHNodeRec_*  FT_ClassHNode;
+
+  typedef struct FT_ClassHNodeRec_
+  {
+    FT_HashNodeRec  hnode;
+    FT_Type         type;
+    FT_Class        clazz;
+
+  } FT_ClassHNodeRec;
+
+  typedef struct FT_MetaClassRec_
+  {
+    FT_ClassRec   clazz;         /* the meta-class is a class itself */
+    FT_HashRec    type_to_class; /* the type => class hash table */
+
+  } FT_MetaClassRec, *FT_MetaClass;
+
+
+ /* initialize meta class */
+  FT_BASE( FT_Error )
+  ft_metaclass_init( FT_MetaClass  meta,
+                     FT_Library    library );
+
+ /* finalize meta class - destroy all registered class objects */
+  FT_BASE( void )
+  ft_metaclass_done( FT_MetaClass  meta );
+
+ /* */
 
 FT_END_HEADER
 

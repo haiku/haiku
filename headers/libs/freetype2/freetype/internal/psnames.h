@@ -52,7 +52,7 @@ FT_BEGIN_HEADER
   /*    This function will not be compiled if the configuration macro      */
   /*    FT_CONFIG_OPTION_ADOBE_GLYPH_LIST is undefined.                    */
   /*                                                                       */
-  typedef FT_ULong
+  typedef FT_UInt32
   (*PS_Unicode_Value_Func)( const char*  glyph_name );
 
 

@@ -123,6 +123,7 @@
         /* allocate the blend `private' and `font_info' dictionaries */
         if ( FT_NEW_ARRAY( blend->font_infos[1], num_designs     ) ||
              FT_NEW_ARRAY( blend->privates[1], num_designs       ) ||
+             FT_NEW_ARRAY( blend->bboxes[1], num_designs         ) ||
              FT_NEW_ARRAY( blend->weight_vector, num_designs * 2 ) )
           goto Exit;
 
@@ -130,11 +131,13 @@
 
         blend->font_infos[0] = &face->type1.font_info;
         blend->privates  [0] = &face->type1.private_dict;
+        blend->bboxes    [0] = &face->type1.font_bbox;
 
         for ( nn = 2; nn <= num_designs; nn++ )
         {
           blend->privates[nn]   = blend->privates  [nn - 1] + 1;
           blend->font_infos[nn] = blend->font_infos[nn - 1] + 1;
+          blend->bboxes[nn]     = blend->bboxes    [nn - 1] + 1;
         }
 
         blend->num_designs   = num_designs;
@@ -347,11 +350,13 @@
       /* release blend `private' and `font info' dictionaries */
       FT_FREE( blend->privates[1] );
       FT_FREE( blend->font_infos[1] );
+      FT_FREE( blend->bboxes[1] );
 
       for ( n = 0; n < num_designs; n++ )
       {
         blend->privates  [n] = 0;
         blend->font_infos[n] = 0;
+        blend->bboxes    [n] = 0;
       }
 
       /* release weight vectors */
@@ -410,16 +415,16 @@
     /* each token is an immediate containing the name of the axis */
     for ( n = 0; n < num_axis; n++ )
     {
-      T1_Token  token = axis_tokens + n;
-      FT_Byte*  name;
-      FT_Int    len;
+      T1_Token    token = axis_tokens + n;
+      FT_Byte*    name;
+      FT_PtrDist  len;
 
 
       /* skip first slash, if any */
       if ( token->start[0] == '/' )
         token->start++;
 
-      len = (FT_Int)( token->limit - token->start );
+      len = token->limit - token->start;
       if ( len <= 0 )
       {
         error = T1_Err_Invalid_File_Format;
@@ -735,6 +740,18 @@
       }
       break;
 
+    case T1_FIELD_LOCATION_BBOX:
+      dummy_object = &face->type1.font_bbox;
+      objects      = &dummy_object;
+      max_objects  = 0;
+
+      if ( blend )
+      {
+        objects     = (void**)blend->bboxes;
+        max_objects = blend->num_designs;
+      }
+      break;
+
     default:
       dummy_object = &face->type1;
       objects      = &dummy_object;
@@ -777,7 +794,7 @@
 
   static int
   read_binary_data( T1_Parser  parser,
-                    FT_Int*    size,
+                    FT_Long*   size,
                     FT_Byte**  base )
   {
     FT_Byte*  cur;
@@ -821,13 +838,13 @@
   parse_font_name( T1_Face    face,
                    T1_Loader  loader )
   {
-    T1_Parser  parser = &loader->parser;
-    FT_Error   error;
-    FT_Memory  memory = parser->root.memory;
-    FT_Int     len;
-    FT_Byte*   cur;
-    FT_Byte*   cur2;
-    FT_Byte*   limit;
+    T1_Parser   parser = &loader->parser;
+    FT_Error    error;
+    FT_Memory   memory = parser->root.memory;
+    FT_PtrDist  len;
+    FT_Byte*    cur;
+    FT_Byte*    cur2;
+    FT_Byte*    limit;
 
 
     if ( face->type1.font_name )
@@ -847,7 +864,7 @@
     while ( cur2 < limit && is_alpha( *cur2 ) )
       cur2++;
 
-    len = (FT_Int)( cur2 - cur );
+    len = cur2 - cur;
     if ( len > 0 )
     {
       if ( FT_ALLOC( face->type1.font_name, len + 1 ) )
@@ -863,6 +880,7 @@
   }
 
 
+#if 0
   static void
   parse_font_bbox( T1_Face    face,
                    T1_Loader  loader )
@@ -878,6 +896,7 @@
     bbox->xMax = FT_RoundFix( temp[2] );
     bbox->yMax = FT_RoundFix( temp[3] );
   }
+#endif
 
 
   static void
@@ -968,7 +987,7 @@
         return;
 
       /* read the number of entries in the encoding, should be 256 */
-      count = T1_ToInt( parser );
+      count = (FT_Int)T1_ToInt( parser );
       if ( parser->root.error )
         return;
 
@@ -1036,7 +1055,7 @@
 
 
           parser->root.cursor = cur;
-          charcode = T1_ToInt( parser );
+          charcode = (FT_Int)T1_ToInt( parser );
           cur      = parser->root.cursor;
 
           /* skip whitespace */
@@ -1047,14 +1066,14 @@
           {
             /* bingo, we have an immediate name -- it must be a */
             /* character name                                   */
-            FT_Byte*  cur2 = cur + 1;
-            FT_Int    len;
+            FT_Byte*    cur2 = cur + 1;
+            FT_PtrDist  len;
 
 
             while ( cur2 < limit && is_alpha( *cur2 ) )
               cur2++;
 
-            len = (FT_Int)( cur2 - cur - 1 );
+            len = cur2 - cur - 1;
 
             parser->root.error = T1_Add_Table( char_table, charcode,
                                                cur + 1, len + 1 );
@@ -1114,7 +1133,7 @@
       /*  with synthetic fonts, it's possible we get here twice  */
       return;
 
-    loader->num_subrs = T1_ToInt( parser );
+    loader->num_subrs = (FT_Int)T1_ToInt( parser );
     if ( parser->root.error )
       return;
 
@@ -1134,7 +1153,7 @@
     /*                                                       */
     for ( n = 0; n < loader->num_subrs; n++ )
     {
-      FT_Int    idx, size;
+      FT_Long   idx, size;
       FT_Byte*  base;
 
 
@@ -1218,7 +1237,7 @@
       /*  with synthetic fonts, it's possible we get here twice  */
       return;
 
-    loader->num_glyphs = T1_ToInt( parser );
+    loader->num_glyphs = (FT_Int)T1_ToInt( parser );
     if ( parser->root.error )
       return;
 
@@ -1249,7 +1268,7 @@
 
     for (;;)
     {
-      FT_Int    size;
+      FT_Long   size;
       FT_Byte*  base;
 
 
@@ -1281,13 +1300,13 @@
         T1_Skip_Alpha( parser );
       else
       {
-        FT_Byte*  cur2 = cur + 1;
-        FT_Int    len;
+        FT_Byte*    cur2 = cur + 1;
+        FT_PtrDist  len;
 
 
         while ( cur2 < limit && is_alpha( *cur2 ) )
           cur2++;
-        len = (FT_Int)( cur2 - cur - 1 );
+        len = cur2 - cur - 1;
 
         error = T1_Add_Table( name_table, n, cur + 1, len + 1 );
         if ( error )
@@ -1464,7 +1483,9 @@
 
     /* now add the special functions... */
     T1_FIELD_CALLBACK( "FontName", parse_font_name )
+#if 0    
     T1_FIELD_CALLBACK( "FontBBox", parse_font_bbox )
+#endif    
     T1_FIELD_CALLBACK( "FontMatrix", parse_font_matrix )
     T1_FIELD_CALLBACK( "Encoding", parse_encoding )
     T1_FIELD_CALLBACK( "Subrs", parse_subrs )
@@ -1537,8 +1558,8 @@
         /* look for immediates */
         else if ( *cur == '/' && cur + 2 < limit )
         {
-          FT_Byte*  cur2;
-          FT_Int    len;
+          FT_Byte*    cur2;
+          FT_PtrDist  len;
 
 
           cur++;
@@ -1546,7 +1567,7 @@
           while ( cur2 < limit && is_alpha( *cur2 ) )
             cur2++;
 
-          len  = (FT_Int)( cur2 - cur );
+          len = cur2 - cur;
           if ( len > 0 && len < 22 )
           {
             {
@@ -1563,10 +1584,10 @@
                 if ( !name )
                   break;
 
-                if ( cur[0] == name[0]                             &&
-                     len == (FT_Int)ft_strlen( (const char*)name ) )
+                if ( cur[0] == name[0]                     &&
+                     len == ft_strlen( (const char*)name ) )
                 {
-                  FT_Int  n;
+                  FT_PtrDist  n;
 
 
                   for ( n = 1; n < len; n++ )
@@ -1605,7 +1626,7 @@
   {
     FT_UNUSED( face );
 
-    FT_MEM_SET( loader, 0, sizeof ( *loader ) );
+    FT_MEM_ZERO( loader, sizeof ( *loader ) );
     loader->num_glyphs = 0;
     loader->num_chars  = 0;
 
@@ -1653,6 +1674,9 @@
     /* default lenIV */
     type1->private_dict.lenIV = 4;
 
+    /* default blue fuzz, we put it there since 0 is a valid value */
+    type1->private_dict.blue_fuzz = 1;
+
     parser = &loader.parser;
     error  = T1_New_Parser( parser,
                             face->root.stream,
@@ -1687,11 +1711,14 @@
       type1->subrs_len   = loader.subrs.lengths;
     }
 
-    if ( !loader.charstrings.init )
-    {
-      FT_ERROR(( "T1_Open_Face: no charstrings array in face!\n" ));
-      error = T1_Err_Invalid_File_Format;
-    }
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    if ( !face->root.internal->incremental_interface )
+#endif
+      if ( !loader.charstrings.init )
+      {
+        FT_ERROR(( "T1_Open_Face: no charstrings array in face!\n" ));
+        error = T1_Err_Invalid_File_Format;
+      }
 
     loader.charstrings.init  = 0;
     type1->charstrings_block = loader.charstrings.block;

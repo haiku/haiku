@@ -69,5 +69,12 @@
   T1_FIELD_NUM( "FontType", font_type )
   T1_FIELD_NUM( "StrokeWidth", stroke_width )
 
+#undef  FT_STRUCTURE
+#define FT_STRUCTURE  FT_BBox
+#undef  T1CODE
+#define T1CODE        T1_FIELD_LOCATION_BBOX
+
+  T1_FIELD_BBOX("FontBBox", xMin )
+
 
 /* END */

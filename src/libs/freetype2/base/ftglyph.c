@@ -147,7 +147,7 @@
     FT_Memory   memory  = library->memory;
 
 
-    if ( slot->format != ft_glyph_format_bitmap )
+    if ( slot->format != FT_GLYPH_FORMAT_BITMAP )
     {
       error = FT_Err_Invalid_Glyph_Format;
       goto Exit;
@@ -209,14 +209,14 @@
   const FT_Glyph_Class  ft_bitmap_glyph_class =
   {
     sizeof( FT_BitmapGlyphRec ),
-    ft_glyph_format_bitmap,
+    FT_GLYPH_FORMAT_BITMAP,
 
-    (FT_Glyph_Init_Func)     ft_bitmap_glyph_init,
-    (FT_Glyph_Done_Func)     ft_bitmap_glyph_done,
-    (FT_Glyph_Copy_Func)     ft_bitmap_glyph_copy,
-    (FT_Glyph_Transform_Func)0,
-    (FT_Glyph_BBox_Func)     ft_bitmap_glyph_bbox,
-    (FT_Glyph_Prepare_Func)  0
+    (FT_Glyph_InitFunc)     ft_bitmap_glyph_init,
+    (FT_Glyph_DoneFunc)     ft_bitmap_glyph_done,
+    (FT_Glyph_CopyFunc)     ft_bitmap_glyph_copy,
+    (FT_Glyph_TransformFunc)0,
+    (FT_Glyph_GetBBoxFunc)  ft_bitmap_glyph_bbox,
+    (FT_Glyph_PrepareFunc)  0
   };
 
 
@@ -240,7 +240,7 @@
 
 
     /* check format in glyph slot */
-    if ( slot->format != ft_glyph_format_outline )
+    if ( slot->format != FT_GLYPH_FORMAT_OUTLINE )
     {
       error = FT_Err_Invalid_Glyph_Format;
       goto Exit;
@@ -262,8 +262,8 @@
     FT_MEM_COPY( target->contours, source->contours,
               source->n_contours * sizeof ( FT_Short ) );
 
-    /* copy all flags, except the `ft_outline_owner' one */
-    target->flags = source->flags | ft_outline_owner;
+    /* copy all flags, except the `FT_OUTLINE_OWNER' one */
+    target->flags = source->flags | FT_OUTLINE_OWNER;
 
   Exit:
     return error;
@@ -319,9 +319,9 @@
   ft_outline_glyph_prepare( FT_OutlineGlyph  glyph,
                             FT_GlyphSlot     slot )
   {
-    slot->format         = ft_glyph_format_outline;
+    slot->format         = FT_GLYPH_FORMAT_OUTLINE;
     slot->outline        = glyph->outline;
-    slot->outline.flags &= ~ft_outline_owner;
+    slot->outline.flags &= ~FT_OUTLINE_OWNER;
 
     return FT_Err_Ok;
   }
@@ -330,14 +330,14 @@
   const FT_Glyph_Class  ft_outline_glyph_class =
   {
     sizeof( FT_OutlineGlyphRec ),
-    ft_glyph_format_outline,
+    FT_GLYPH_FORMAT_OUTLINE,
 
-    (FT_Glyph_Init_Func)     ft_outline_glyph_init,
-    (FT_Glyph_Done_Func)     ft_outline_glyph_done,
-    (FT_Glyph_Copy_Func)     ft_outline_glyph_copy,
-    (FT_Glyph_Transform_Func)ft_outline_glyph_transform,
-    (FT_Glyph_BBox_Func)     ft_outline_glyph_bbox,
-    (FT_Glyph_Prepare_Func)  ft_outline_glyph_prepare
+    (FT_Glyph_InitFunc)     ft_outline_glyph_init,
+    (FT_Glyph_DoneFunc)     ft_outline_glyph_done,
+    (FT_Glyph_CopyFunc)     ft_outline_glyph_copy,
+    (FT_Glyph_TransformFunc)ft_outline_glyph_transform,
+    (FT_Glyph_GetBBoxFunc)  ft_outline_glyph_bbox,
+    (FT_Glyph_PrepareFunc)  ft_outline_glyph_prepare
   };
 
 
@@ -435,11 +435,11 @@
       return FT_Err_Invalid_Argument;
 
     /* if it is a bitmap, that's easy :-) */
-    if ( slot->format == ft_glyph_format_bitmap )
+    if ( slot->format == FT_GLYPH_FORMAT_BITMAP )
       clazz = &ft_bitmap_glyph_class;
 
     /* it it is an outline too */
-    else if ( slot->format == ft_glyph_format_outline )
+    else if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
       clazz = &ft_outline_glyph_class;
 
     else
@@ -566,13 +566,13 @@
   /* documentation is in ftglyph.h */
 
   FT_EXPORT_DEF( FT_Error )
-  FT_Glyph_To_Bitmap( FT_Glyph*   the_glyph,
-                      FT_ULong    render_mode,
-                      FT_Vector*  origin,
-                      FT_Bool     destroy )
+  FT_Glyph_To_Bitmap( FT_Glyph*       the_glyph,
+                      FT_Render_Mode  render_mode,
+                      FT_Vector*      origin,
+                      FT_Bool         destroy )
   {
     FT_GlyphSlotRec  dummy;
-    FT_Error         error;
+    FT_Error         error = FT_Err_Ok;
     FT_Glyph         glyph;
     FT_BitmapGlyph   bitmap = NULL;
 
@@ -591,10 +591,15 @@
       goto Bad;
 
     clazz = glyph->clazz;
+
+    /* when called with a bitmap glyph, do nothing and return succesfully */
+    if ( clazz == &ft_bitmap_glyph_class )
+      goto Exit;
+
     if ( !clazz || !clazz->glyph_prepare )
       goto Bad;
 
-    FT_MEM_SET( &dummy, 0, sizeof ( dummy ) );
+    FT_MEM_ZERO( &dummy, sizeof ( dummy ) );
     dummy.library = glyph->library;
     dummy.format  = clazz->glyph_format;
 

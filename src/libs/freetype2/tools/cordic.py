@@ -1,7 +1,7 @@
 # compute arctangent table for CORDIC computations in fttrigon.c
 import sys, math
 
-units  = 180*65536   # don't change !!
+units  = 64*65536.0   # don't change !!
 scale  = units/math.pi
 shrink = 1.0
 comma  = ""

@@ -86,7 +86,7 @@
                        FT_GlyphSlot  slot,
                        FT_BBox*      cbox )
   {
-    FT_MEM_SET( cbox, 0, sizeof ( *cbox ) );
+    FT_MEM_ZERO( cbox, sizeof ( *cbox ) );
 
     if ( slot->format == render->glyph_format )
       FT_Outline_Get_CBox( &slot->outline, cbox );
@@ -95,10 +95,10 @@
 
   /* convert a slot's glyph image into a bitmap */
   static FT_Error
-  ft_raster1_render( FT_Renderer   render,
-                     FT_GlyphSlot  slot,
-                     FT_UInt       mode,
-                     FT_Vector*    origin )
+  ft_raster1_render( FT_Renderer     render,
+                     FT_GlyphSlot    slot,
+                     FT_Render_Mode  mode,
+                     FT_Vector*      origin )
   {
     FT_Error     error;
     FT_Outline*  outline;
@@ -118,7 +118,7 @@
     }
 
     /* check rendering mode */
-    if ( mode != ft_render_mode_mono )
+    if ( mode != FT_RENDER_MODE_MONO )
     {
       /* raster1 is only capable of producing monochrome bitmaps */
       if ( render->clazz == &ft_raster1_renderer_class )
@@ -145,8 +145,8 @@
     cbox.xMax  = ( cbox.xMax + 63 ) & -64;
     cbox.yMax  = ( cbox.yMax + 63 ) & -64;
 
-    width  = ( cbox.xMax - cbox.xMin ) >> 6;
-    height = ( cbox.yMax - cbox.yMin ) >> 6;
+    width  = (FT_UInt)( ( cbox.xMax - cbox.xMin ) >> 6 );
+    height = (FT_UInt)( ( cbox.yMax - cbox.yMin ) >> 6 );
     bitmap = &slot->bitmap;
     memory = render->root.memory;
 
@@ -158,17 +158,17 @@
     }
 
     /* allocate new one, depends on pixel format */
-    if ( !( mode & ft_render_mode_mono ) )
+    if ( !( mode & FT_RENDER_MODE_MONO ) )
     {
       /* we pad to 32 bits, only for backwards compatibility with FT 1.x */
       pitch = ( width + 3 ) & -4;
-      bitmap->pixel_mode = ft_pixel_mode_grays;
+      bitmap->pixel_mode = FT_PIXEL_MODE_GRAY;
       bitmap->num_grays  = 256;
     }
     else
     {
       pitch = ( ( width + 15 ) >> 4 ) << 1;
-      bitmap->pixel_mode = ft_pixel_mode_mono;
+      bitmap->pixel_mode = FT_PIXEL_MODE_MONO;
     }
 
     bitmap->width = width;
@@ -188,8 +188,8 @@
     params.source = outline;
     params.flags  = 0;
 
-    if ( bitmap->pixel_mode == ft_pixel_mode_grays )
-      params.flags |= ft_raster_flag_aa;
+    if ( bitmap->pixel_mode == FT_PIXEL_MODE_GRAY )
+      params.flags |= FT_RASTER_FLAG_AA;
 
     /* render outline into the bitmap */
     error = render->raster_render( render->raster, &params );
@@ -199,9 +199,9 @@
     if ( error )
       goto Exit;
 
-    slot->format      = ft_glyph_format_bitmap;
-    slot->bitmap_left = cbox.xMin >> 6;
-    slot->bitmap_top  = cbox.yMax >> 6;
+    slot->format      = FT_GLYPH_FORMAT_BITMAP;
+    slot->bitmap_left = (FT_Int)( cbox.xMin >> 6 );
+    slot->bitmap_top  = (FT_Int)( cbox.yMax >> 6 );
 
   Exit:
     return error;
@@ -226,12 +226,12 @@
       (FT_Module_Requester)  0
     },
 
-    ft_glyph_format_outline,
+    FT_GLYPH_FORMAT_OUTLINE,
 
-    (FTRenderer_render)   ft_raster1_render,
-    (FTRenderer_transform)ft_raster1_transform,
-    (FTRenderer_getCBox)  ft_raster1_get_cbox,
-    (FTRenderer_setMode)  ft_raster1_set_mode,
+    (FT_Renderer_RenderFunc)   ft_raster1_render,
+    (FT_Renderer_TransformFunc)ft_raster1_transform,
+    (FT_Renderer_GetCBoxFunc)  ft_raster1_get_cbox,
+    (FT_Renderer_SetModeFunc)  ft_raster1_set_mode,
 
     (FT_Raster_Funcs*)    &ft_standard_raster
   };
@@ -259,12 +259,12 @@
       (FT_Module_Requester)  0
     },
 
-    ft_glyph_format_outline,
+    FT_GLYPH_FORMAT_OUTLINE,
 
-    (FTRenderer_render)   ft_raster1_render,
-    (FTRenderer_transform)ft_raster1_transform,
-    (FTRenderer_getCBox)  ft_raster1_get_cbox,
-    (FTRenderer_setMode)  ft_raster1_set_mode,
+    (FT_Renderer_RenderFunc)   ft_raster1_render,
+    (FT_Renderer_TransformFunc)ft_raster1_transform,
+    (FT_Renderer_GetCBoxFunc)  ft_raster1_get_cbox,
+    (FT_Renderer_SetModeFunc)  ft_raster1_set_mode,
 
     (FT_Raster_Funcs*)    &ft_standard_raster
   };

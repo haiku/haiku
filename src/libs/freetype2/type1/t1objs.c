@@ -427,8 +427,6 @@
       root->internal->max_contours = 0;
     }
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
     {
       FT_Face  root = &face->root;
 
@@ -445,7 +443,7 @@
         /* first of all, try to synthetize a Unicode charmap */
         charmap.platform_id = 3;
         charmap.encoding_id = 1;
-        charmap.encoding    = ft_encoding_unicode;
+        charmap.encoding    = FT_ENCODING_UNICODE;
 
         FT_CMap_New( cmap_classes->unicode, NULL, &charmap, NULL );
 
@@ -456,25 +454,25 @@
         switch ( face->type1.encoding_type )
         {
         case T1_ENCODING_TYPE_STANDARD:
-          charmap.encoding    = ft_encoding_adobe_standard;
+          charmap.encoding    = FT_ENCODING_ADOBE_STANDARD;
           charmap.encoding_id = 0;
           clazz               = cmap_classes->standard;
           break;
 
         case T1_ENCODING_TYPE_EXPERT:
-          charmap.encoding    = ft_encoding_adobe_expert;
+          charmap.encoding    = FT_ENCODING_ADOBE_EXPERT;
           charmap.encoding_id = 1;
           clazz               = cmap_classes->expert;
           break;
 
         case T1_ENCODING_TYPE_ARRAY:
-          charmap.encoding    = ft_encoding_adobe_custom;
+          charmap.encoding    = FT_ENCODING_ADOBE_CUSTOM;
           charmap.encoding_id = 2;
           clazz               = cmap_classes->custom;
           break;
 
         case T1_ENCODING_TYPE_ISOLATIN1:
-          charmap.encoding    = ft_encoding_latin_1;
+          charmap.encoding    = FT_ENCODING_ADOBE_LATIN_1;
           charmap.encoding_id = 3;
           clazz               = cmap_classes->unicode;
           break;
@@ -486,86 +484,13 @@
         if ( clazz )
           FT_CMap_New( clazz, NULL, &charmap, NULL );
 
+#if 0
         /* Select default charmap */
         if (root->num_charmaps)
           root->charmap = root->charmaps[0];
+#endif
       }
     }
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-    /* charmap support -- synthetize unicode charmap if possible */
-    {
-      FT_Face     root    = &face->root;
-      FT_CharMap  charmap = face->charmaprecs;
-
-
-      /* synthesize a Unicode charmap if there is support in the `PSNames' */
-      /* module                                                            */
-      if ( psnames )
-      {
-        if ( psnames->unicode_value )
-        {
-          error = psnames->build_unicodes(
-                    root->memory,
-                    face->type1.num_glyphs,
-                    (const char**)face->type1.glyph_names,
-                    &face->unicode_map );
-          if ( !error )
-          {
-            root->charmap        = charmap;
-            charmap->face        = (FT_Face)face;
-            charmap->encoding    = ft_encoding_unicode;
-            charmap->platform_id = 3;
-            charmap->encoding_id = 1;
-            charmap++;
-          }
-
-          /* simply clear the error in case of failure (which really) */
-          /* means that out of memory or no unicode glyph names       */
-          error = T1_Err_Ok;
-        }
-      }
-
-      /* now, support either the standard, expert, or custom encoding */
-      charmap->face        = (FT_Face)face;
-      charmap->platform_id = 7;  /* a new platform id for Adobe fonts? */
-
-      switch ( face->type1.encoding_type )
-      {
-      case T1_ENCODING_TYPE_STANDARD:
-        charmap->encoding    = ft_encoding_adobe_standard;
-        charmap->encoding_id = 0;
-        break;
-
-      case T1_ENCODING_TYPE_EXPERT:
-        charmap->encoding    = ft_encoding_adobe_expert;
-        charmap->encoding_id = 1;
-        break;
-
-      case T1_ENCODING_TYPE_ARRAY:
-        charmap->encoding    = ft_encoding_adobe_custom;
-        charmap->encoding_id = 2;
-        break;
-
-      case T1_ENCODING_TYPE_ISOLATIN1:
-        charmap->encoding    = ft_encoding_latin_1;
-        charmap->encoding_id = 3;
-        break;
-
-      default:
-        FT_ERROR(( "T1_Face_Init: invalid encoding\n" ));
-        error = T1_Err_Invalid_File_Format;
-        goto Exit;
-      }
-
-      root->charmaps     = face->charmaps;
-      root->num_charmaps = charmap - face->charmaprecs + 1;
-      face->charmaps[0]  = &face->charmaprecs[0];
-      face->charmaps[1]  = &face->charmaprecs[1];
-    }
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
   Exit:
     return error;

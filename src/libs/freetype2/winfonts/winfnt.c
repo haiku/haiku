@@ -310,8 +310,6 @@
   }
 
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
 
   typedef struct  FNT_CMapRec_
   {
@@ -392,57 +390,6 @@
 
   static FT_CMap_Class  fnt_cmap_class = &fnt_cmap_class_rec;
 
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-
-  static FT_UInt
-  FNT_Get_Char_Index( FT_CharMap  charmap,
-                      FT_Long     char_code )
-  {
-    FT_Long  result = char_code;
-
-
-    if ( charmap )
-    {
-      FNT_Font  font  = ((FNT_Face)charmap->face)->fonts;
-      FT_Long   first = font->header.first_char;
-      FT_Long   count = font->header.last_char - first + 1;
-
-
-      char_code -= first;
-      if ( char_code < count )
-        result = char_code + 1;
-      else
-        result = 0;
-    }
-
-    return result;
-  }
-
-
-  static FT_Long
-  FNT_Get_Next_Char( FT_CharMap  charmap,
-                     FT_Long     char_code )
-  {
-    char_code++;
-    if ( charmap )
-    {
-      FNT_Font  font  = ((FNT_Face)charmap->face)->fonts;
-      FT_Long   first = font->header.first_char;
-
-
-      if ( char_code < first )
-        char_code = first;
-      if ( char_code <= font->header.last_char )
-        return char_code;
-    }
-    else
-      return char_code;
-    return 0;
-  }
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
 
   static void
@@ -534,12 +481,10 @@
         }
       }
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
       {
         FT_CharMapRec  charmap;
 
-        charmap.encoding    = ft_encoding_unicode;
+        charmap.encoding    = FT_ENCODING_UNICODE;
         charmap.platform_id = 3;
         charmap.encoding_id = 1;
         charmap.face        = root;
@@ -555,23 +500,6 @@
         if ( root->num_charmaps )
           root->charmap = root->charmaps[0];
       }
-
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-      /* Setup the `charmaps' array */
-      root->charmaps     = &face->charmap_handle;
-      root->num_charmaps = 1;
-
-      face->charmap.encoding    = ft_encoding_unicode;
-      face->charmap.platform_id = 3;
-      face->charmap.encoding_id = 1;
-      face->charmap.face        = root;
-
-      face->charmap_handle = &face->charmap;
-
-      root->charmap = face->charmap_handle;
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
 
       /* setup remaining flags */
       root->num_glyphs = fonts->header.last_char -
@@ -635,7 +563,7 @@
   FNT_Load_Glyph( FT_GlyphSlot  slot,
                   FNT_Size      size,
                   FT_UInt       glyph_index,
-                  FT_Int        load_flags )
+                  FT_Int32      load_flags )
   {
     FNT_Font    font  = size->font;
     FT_Error    error = 0;
@@ -686,7 +614,7 @@
 
       bitmap->pitch      = pitch;
       bitmap->rows       = font->header.pixel_height;
-      bitmap->pixel_mode = ft_pixel_mode_mono;
+      bitmap->pixel_mode = FT_PIXEL_MODE_MONO;
 
       if ( FT_ALLOC( bitmap->buffer, pitch * bitmap->rows ) )
         goto Exit;
@@ -706,7 +634,7 @@
     slot->flags       = FT_GLYPH_OWN_BITMAP;
     slot->bitmap_left = 0;
     slot->bitmap_top  = font->header.ascent;
-    slot->format      = ft_glyph_format_bitmap;
+    slot->format      = FT_GLYPH_FORMAT_BITMAP;
 
     /* now set up metrics */
     slot->metrics.horiAdvance  = bitmap->width << 6;
@@ -714,7 +642,7 @@
     slot->metrics.horiBearingY = slot->bitmap_top << 6;
 
     slot->linearHoriAdvance    = (FT_Fixed)bitmap->width << 16;
-    slot->format               = ft_glyph_format_bitmap;
+    slot->format               = FT_GLYPH_FORMAT_BITMAP;
 
   Exit:
     return error;
@@ -754,22 +682,9 @@
     (FT_Size_ResetPixelsFunc) FNT_Size_Set_Pixels,
     (FT_Slot_LoadFunc)        FNT_Load_Glyph,
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-    (FT_CharMap_CharIndexFunc)0,
-#else
-    (FT_CharMap_CharIndexFunc)FNT_Get_Char_Index,
-#endif
-    
-
     (FT_Face_GetKerningFunc)  0,
     (FT_Face_AttachFunc)      0,
-    (FT_Face_GetAdvancesFunc) 0,
-
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-    (FT_CharMap_CharNextFunc) 0
-#else
-    (FT_CharMap_CharNextFunc) FNT_Get_Next_Char
-#endif    
+    (FT_Face_GetAdvancesFunc) 0
   };
 
 

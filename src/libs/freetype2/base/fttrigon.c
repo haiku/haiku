@@ -451,4 +451,35 @@
   }
 
 
+  /* documentation is in fttrigon.h */
+
+  FT_EXPORT_DEF( void )
+  FT_Vector_From_Polar( FT_Vector*  vec,
+                        FT_Fixed    length,
+                        FT_Angle    angle )
+  {
+    vec->x = length;
+    vec->y = 0;
+
+    FT_Vector_Rotate( vec, angle );
+  }
+
+
+  /* documentation is in fttrigon.h */
+
+  FT_EXPORT_DEF( FT_Angle )
+  FT_Angle_Diff( FT_Angle  angle1,
+                 FT_Angle  angle2 )
+  {
+    FT_Angle  delta = angle2 - angle1;
+
+    delta %= FT_ANGLE_2PI;
+
+    if ( delta > FT_ANGLE_PI )
+      delta -= FT_ANGLE_2PI;
+
+    return delta;
+  }
+
+
 /* END */

@@ -440,7 +440,7 @@
         }
 
         /* put a safeguard */
-        parser->private_len = (FT_Int)( write - parser->private_dict );
+        parser->private_len = write - parser->private_dict;
         *write++ = 0;
       }
     }

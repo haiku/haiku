@@ -23,7 +23,7 @@
 #include "pshglob.h"
 
 #ifdef DEBUG_HINTER
-  extern PSH_Globals  ps_debug_globals = 0;
+  PSH_Globals  ps_debug_globals = 0;
 #endif
 
 
@@ -534,10 +534,10 @@
     for ( ; count > 0; count--, zone++ )
     {
       delta = stem_top - zone->org_bottom;
-      if ( delta < 0 )
+      if ( delta < -blues->blue_fuzz )
         break;
 
-      if ( stem_top <= zone->org_top )
+      if ( stem_top <= zone->org_top + blues->blue_fuzz )
       {
         if ( no_shoots || delta <= blues->blue_threshold )
         {
@@ -556,10 +556,10 @@
     for ( ; count > 0; count--, zone-- )
     {
       delta = zone->org_top - stem_bot;
-      if ( delta < 0 )
+      if ( delta < -blues->blue_fuzz )
         break;
 
-      if ( stem_bot >= zone->org_bottom )
+      if ( stem_bot >= zone->org_bottom - blues->blue_fuzz )
       {
         if ( no_shoots || delta < blues->blue_shift )
         {
@@ -629,7 +629,7 @@
         PSH_Width      write = dim->stdw.widths;
 
 
-        write->org = priv->standard_width[1];
+        write->org = priv->standard_width[0];
         write++;
 
         read = priv->snap_widths;
@@ -649,9 +649,8 @@
         PSH_Width      write = dim->stdw.widths;
 
 
-        write->org = priv->standard_height[1];
-        write++;
-
+        write->org = priv->standard_height[0];
+        write++;                           
         read = priv->snap_heights;
         for ( count = priv->num_snap_heights; count > 0; count-- )
         {
@@ -679,6 +678,8 @@
       globals->blues.blue_shift = priv->blue_shift
                                   ? priv->blue_shift
                                   : 7;
+
+      globals->blues.blue_fuzz = priv->blue_fuzz;
 
       globals->dimension[0].scale_mult  = 0;
       globals->dimension[0].scale_delta = 0;

@@ -78,30 +78,16 @@
       family = (FTC_Family)lru;
       hash   = query->hash;
 
-#ifdef FTC_CACHE_USE_LINEAR_HASHING
       {
-        FT_UInt  index;
+        FT_UInt  idx;
 
 
-        index = hash & cache->mask;
-        if ( index < cache->p )
-          index = hash & ( cache->mask * 2 + 1 );
+        idx = hash & cache->mask;
+        if ( idx < cache->p )
+          idx = hash & ( cache->mask * 2 + 1 );
 
-        bucket  = cache->buckets + index;
+        bucket  = cache->buckets + idx;
       }
-#else
-      bucket  = cache->buckets + ( hash % cache->size );
-#endif
-
-#ifdef FT_DEBUG_LEVEL_ERROR
-      if ( query->family     != family                        ||
-           family->fam_index >= cache->manager->families.size )
-      {
-        FT_ERROR((
-          "ftc_cache_lookup: invalid query (bad 'family' field)\n" ));
-        return FTC_Err_Invalid_Argument;
-      }
-#endif
 
       pnode = bucket;
 

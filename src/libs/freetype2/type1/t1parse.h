@@ -64,10 +64,10 @@ FT_BEGIN_HEADER
     FT_Stream     stream;
 
     FT_Byte*      base_dict;
-    FT_Int        base_len;
+    FT_Long       base_len;
 
     FT_Byte*      private_dict;
-    FT_Int        private_len;
+    FT_Long       private_len;
 
     FT_Byte       in_pfb;
     FT_Byte       in_memory;

@@ -27,9 +27,9 @@
 #define FT_COMPONENT  trace_pshrec
 
 #ifdef DEBUG_HINTER
-  extern PS_Hints  ps_debug_hints         = 0;
-  extern int       ps_debug_no_horz_hints = 0;
-  extern int       ps_debug_no_vert_hints = 0;
+  PS_Hints  ps_debug_hints         = 0;
+  int       ps_debug_no_horz_hints = 0;
+  int       ps_debug_no_vert_hints = 0;
 #endif
 
 
@@ -797,7 +797,7 @@
   ps_hints_init( PS_Hints   hints,
                  FT_Memory  memory )
   {
-    ft_memset( hints, 0, sizeof ( *hints ) );
+    FT_MEM_ZERO( hints, sizeof ( *hints ) );
     hints->memory = memory;
     return 0;
   }
@@ -1132,7 +1132,7 @@
   FT_LOCAL_DEF( void )
   t1_hints_funcs_init( T1_Hints_FuncsRec*  funcs )
   {
-    ft_memset( (char*)funcs, 0, sizeof ( *funcs ) );
+    FT_MEM_ZERO( (char*)funcs, sizeof ( *funcs ) );
 
     funcs->open  = (T1_Hints_OpenFunc)    t1_hints_open;
     funcs->close = (T1_Hints_CloseFunc)   ps_hints_close;
@@ -1197,7 +1197,7 @@
   FT_LOCAL_DEF( void )
   t2_hints_funcs_init( T2_Hints_FuncsRec*  funcs )
   {
-    ft_memset( funcs, 0, sizeof ( *funcs ) );
+    FT_MEM_ZERO( funcs, sizeof ( *funcs ) );
 
     funcs->open    = (T2_Hints_OpenFunc)   t2_hints_open;
     funcs->close   = (T2_Hints_CloseFunc)  ps_hints_close;

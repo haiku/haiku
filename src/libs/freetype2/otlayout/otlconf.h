@@ -43,10 +43,10 @@
 
 #define  OTL_BEGIN_STMNT  do {
 #define  OTL_END_STMNT    } while (0)
-#define  OTL_DUMMY_STMNT  do { } while (0)
+#define  OTL_DUMMY_STMNT  OTL_BEGIN_STMNT OTL_END_STMNT
 
 #define  OTL_UNUSED( x )       (x)=(x)
-#define  OTL_UNUSED_CONST(x)  (void)(x)
+#define  OTL_UNUSED_CONST(x)   (void)(x)
 
 
 #include <limits.h>
@@ -67,6 +67,11 @@
 #else
 #  error  "unsupported number of bytes in 'long' type!"
 #endif
+
+#include <setjmp.h>
+#define  OTL_jmp_buf   jmp_buf
+#define  otl_setjmp    setjmp
+#define  otl_longjmp   longjmp
 
 /* */
 

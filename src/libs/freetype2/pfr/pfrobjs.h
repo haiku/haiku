@@ -25,9 +25,9 @@
 FT_BEGIN_HEADER
 
   typedef struct PFR_FaceRec_*  PFR_Face;
-  
+
   typedef struct PFR_SizeRec_*  PFR_Size;
-  
+
   typedef struct PFR_SlotRec_*  PFR_Slot;
 
 
@@ -44,7 +44,7 @@ FT_BEGIN_HEADER
   typedef struct  PFR_SizeRec_
   {
     FT_SizeRec  root;
-  
+
   } PFR_SizeRec;
 
 
@@ -52,14 +52,16 @@ FT_BEGIN_HEADER
   {
     FT_GlyphSlotRec  root;
     PFR_GlyphRec     glyph;
-    
+
   } PFR_SlotRec;
 
 
   FT_LOCAL( FT_Error )
-  pfr_face_init( FT_Stream  stream,
-                 PFR_Face   face,
-                 FT_Int     face_index );
+  pfr_face_init( FT_Stream      stream,
+                 PFR_Face       face,
+                 FT_Int         face_index,
+                 FT_Int         num_params,
+                 FT_Parameter*  params );
 
   FT_LOCAL( void )
   pfr_face_done( PFR_Face  face );
@@ -83,9 +85,12 @@ FT_BEGIN_HEADER
   pfr_slot_load( PFR_Slot  slot,
                  PFR_Size  size,
                  FT_UInt   gindex,
-                 FT_Int    load_flags );
+                 FT_Int32  load_flags );
 
 
 FT_END_HEADER
 
 #endif /* __PFROBJS_H__ */
+
+
+/* END */

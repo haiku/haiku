@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include FT_INTERNAL_DEBUG_H
 #include FT_INTERNAL_STREAM_H
 #include FT_INTERNAL_OBJECTS_H
+#include FT_GZIP_H
+#include FT_ERRORS_H
 
 #include "pcf.h"
 #include "pcfdriver.h"
@@ -40,8 +42,6 @@ THE SOFTWARE.
 #undef  FT_COMPONENT
 #define FT_COMPONENT  trace_pcfread
 
-
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
 
   typedef struct  PCF_CMapRec_
   {
@@ -164,77 +164,6 @@ THE SOFTWARE.
     (FT_CMap_CharNextFunc) pcf_cmap_char_next
   };
 
-#else /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-  static FT_UInt
-  PCF_Char_Get_Index( FT_CharMap  charmap,
-                      FT_Long     char_code )
-  {
-    PCF_Face      face     = (PCF_Face)charmap->face;
-    PCF_Encoding  en_table = face->encodings;
-    int           low, high, mid;
-
-
-    FT_TRACE4(( "get_char_index %ld\n", char_code ));
-
-    low = 0;
-    high = face->nencodings - 1;
-    while ( low <= high )
-    {
-      mid = ( low + high ) / 2;
-      if ( char_code < en_table[mid].enc )
-        high = mid - 1;
-      else if ( char_code > en_table[mid].enc )
-        low = mid + 1;
-      else
-        return en_table[mid].glyph + 1;
-    }
-
-    return 0;
-  }
-
-
-  static FT_Long
-  PCF_Char_Get_Next( FT_CharMap  charmap,
-                     FT_Long     char_code )
-  {
-    PCF_Face      face     = (PCF_Face)charmap->face;
-    PCF_Encoding  en_table = face->encodings;
-    int           low, high, mid;
-
-
-    FT_TRACE4(( "get_next_char %ld\n", char_code ));
-
-    char_code++;
-    low  = 0;
-    high = face->nencodings - 1;
-
-    while ( low <= high )
-    {
-      mid = ( low + high ) / 2;
-      if ( char_code < en_table[mid].enc )
-        high = mid - 1;
-      else if ( char_code > en_table[mid].enc )
-        low = mid + 1;
-      else
-        return char_code;
-    }
-
-    if ( high < 0 )
-      high = 0;
-
-    while ( high < face->nencodings )
-    {
-      if ( en_table[high].enc >= char_code )
-        return en_table[high].enc;
-      high++;
-    }
-
-    return 0;
-  }
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
-
 
   /*************************************************************************/
   /*                                                                       */
@@ -279,7 +208,14 @@ THE SOFTWARE.
     FT_FREE( face->charset_encoding );
     FT_FREE( face->charset_registry );
 
-    FT_TRACE4(( "DONE_FACE!!!\n" ));
+    FT_TRACE4(( "PCF_Face_Done: done face\n" ));
+
+    /* close gzip stream if any */
+    if ( face->root.stream == &face->gzip_stream )
+    {
+      FT_Stream_Close( &face->gzip_stream );
+      face->root.stream = face->gzip_source;
+    }
 
     return PCF_Err_Ok;
   }
@@ -301,7 +237,27 @@ THE SOFTWARE.
 
     error = pcf_load_font( stream, face );
     if ( error )
-      goto Fail;
+    {
+      FT_Error  error2;
+
+      /* this didn't work, try gzip support !! */
+      error2 = FT_Stream_OpenGzip( &face->gzip_stream, stream );
+      if ( error2 == FT_Err_Unimplemented_Feature )
+        goto Fail;
+
+      error = error2;
+      if ( error )
+        goto Fail;
+
+      face->gzip_source = stream;
+      face->root.stream = &face->gzip_stream;
+
+      stream = face->root.stream;
+
+      error = pcf_load_font( stream, face );
+      if ( error )
+        goto Fail;
+    }
 
     /* set-up charmap */
     {
@@ -321,54 +277,30 @@ THE SOFTWARE.
           unicode_charmap = 1;
       }
 
-#ifdef FT_CONFIG_OPTION_USE_CMAPS
-
       {
         FT_CharMapRec  charmap;
 
 
         charmap.face        = FT_FACE( face );
-        charmap.encoding    = ft_encoding_none;
+        charmap.encoding    = FT_ENCODING_NONE;
         charmap.platform_id = 0;
         charmap.encoding_id = 0;
 
         if ( unicode_charmap )
         {
-          charmap.encoding    = ft_encoding_unicode;
+          charmap.encoding    = FT_ENCODING_UNICODE;
           charmap.platform_id = 3;
           charmap.encoding_id = 1;
         }
 
         error = FT_CMap_New( &pcf_cmap_class, NULL, &charmap, NULL );
 
+#if 0
         /* Select default charmap */
         if (face->root.num_charmaps)
           face->root.charmap = face->root.charmaps[0];
+#endif
       }
-
-#else  /* !FT_CONFIG_OPTION_USE_CMAPS */
-
-      /* XXX: charmaps.  For now, report unicode for Unicode and Latin 1 */
-      face->root.charmaps     = &face->charmap_handle;
-      face->root.num_charmaps = 1;
-
-      face->charmap.encoding    = ft_encoding_none;
-      face->charmap.platform_id = 0;
-      face->charmap.encoding_id = 0;
-
-      if ( unicode_charmap )
-      {
-        face->charmap.encoding    = ft_encoding_unicode;
-        face->charmap.platform_id = 3;
-        face->charmap.encoding_id = 1;
-      }
-
-      face->charmap.face   = &face->root;
-      face->charmap_handle = &face->charmap;
-      face->root.charmap   = face->charmap_handle;
-
-#endif /* !FT_CONFIG_OPTION_USE_CMAPS */
-
     }
 
   Exit:
@@ -416,7 +348,7 @@ THE SOFTWARE.
   PCF_Glyph_Load( FT_GlyphSlot  slot,
                   FT_Size       size,
                   FT_UInt       glyph_index,
-                  FT_Int        load_flags )
+                  FT_Int32      load_flags )
   {
     PCF_Face    face   = (PCF_Face)FT_SIZE_FACE( size );
     FT_Stream   stream = face->root.stream;
@@ -445,7 +377,7 @@ THE SOFTWARE.
     bitmap->rows       = metric->ascent + metric->descent;
     bitmap->width      = metric->rightSideBearing - metric->leftSideBearing;
     bitmap->num_grays  = 1;
-    bitmap->pixel_mode = ft_pixel_mode_mono;
+    bitmap->pixel_mode = FT_PIXEL_MODE_MONO;
 
     FT_TRACE6(( "BIT_ORDER %d ; BYTE_ORDER %d ; GLYPH_PAD %d\n",
                   PCF_BIT_ORDER( face->bitmapsFormat ),
@@ -485,7 +417,7 @@ THE SOFTWARE.
       goto Exit;
 
     if ( PCF_BIT_ORDER( face->bitmapsFormat ) != MSBFirst )
-      BitOrderInvert( bitmap->buffer,bytes );
+      BitOrderInvert( bitmap->buffer, bytes );
 
     if ( ( PCF_BYTE_ORDER( face->bitmapsFormat ) !=
            PCF_BIT_ORDER( face->bitmapsFormat )  ) )
@@ -509,13 +441,14 @@ THE SOFTWARE.
     slot->bitmap_top  = metric->ascent;
 
     slot->metrics.horiAdvance  = metric->characterWidth << 6 ;
-    slot->metrics.horiBearingX = metric->rightSideBearing << 6 ;
+    slot->metrics.horiBearingX = metric->leftSideBearing << 6 ;
     slot->metrics.horiBearingY = metric->ascent << 6 ;
-    slot->metrics.width        = metric->characterWidth << 6 ;
+    slot->metrics.width        = ( metric->rightSideBearing -
+                                   metric->leftSideBearing ) << 6;
     slot->metrics.height       = bitmap->rows << 6;
 
     slot->linearHoriAdvance = (FT_Fixed)bitmap->width << 16;
-    slot->format            = ft_glyph_format_bitmap;
+    slot->format            = FT_GLYPH_FORMAT_BITMAP;
     slot->flags             = FT_GLYPH_OWN_BITMAP;
 
     FT_TRACE4(( " --- ok\n" ));
@@ -559,21 +492,9 @@ THE SOFTWARE.
 
     (FT_Slot_LoadFunc)        PCF_Glyph_Load,
 
-#ifndef FT_CONFIG_OPTION_USE_CMAPS
-    (FT_CharMap_CharIndexFunc)PCF_Char_Get_Index,
-#else
-    (FT_CharMap_CharIndexFunc)0,
-#endif
-
     (FT_Face_GetKerningFunc)  0,
     (FT_Face_AttachFunc)      0,
-    (FT_Face_GetAdvancesFunc) 0,
-
-#ifndef FT_CONFIG_OPTION_USE_CMAPS
-    (FT_CharMap_CharNextFunc) PCF_Char_Get_Next,
-#else
-    (FT_CharMap_CharNextFunc) 0
-#endif
+    (FT_Face_GetAdvancesFunc) 0
   };
 
 
