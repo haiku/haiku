@@ -75,13 +75,13 @@ static void scrup(void)
 	unsigned long i;
 
 	// move the screen up one
-	memcpy((void *)origin, (void *)origin+2*COLUMNS, 2*(LINES-1)*COLUMNS);
+	memcpy((void *)origin, (void *)(origin + 2 * COLUMNS), 2 * (LINES - 1) * COLUMNS);
 
 	// set the new position to the beginning of the last line
 	pos = origin + (LINES-1)*COLUMNS*2;
 
 	// clear the bottom line
-	for(i = pos; i < scr_end; i += 2) {
+	for (i = pos; i < scr_end; i += 2) {
 		*(unsigned short *)i = 0x0720;
 	}
 }
@@ -161,13 +161,6 @@ static status_t console_open(const char *name, uint32 flags, void **cookie)
 static status_t console_freecookie(void * cookie)
 {
 	return 0;
-}
-
-static status_t console_seek(void * cookie, off_t pos, int st)
-{
-//	dprintf("console_seek: entry\n");
-
-	return EPERM;
 }
 
 static status_t console_close(void * cookie)

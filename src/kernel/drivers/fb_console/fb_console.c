@@ -257,14 +257,6 @@ console_freecookie(void * cookie)
 }
 
 
-static status_t console_seek(void * cookie, off_t pos, int st)
-{
-//	dprintf("console_seek: entry\n");
-
-	return EPERM;
-}
-
-
 static status_t
 console_close(void * cookie)
 {
