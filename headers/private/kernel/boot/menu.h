@@ -37,6 +37,9 @@ class MenuItem {
 		void Select(bool selected);
 		bool IsSelected() const { return fIsSelected; }
 
+		void SetEnabled(bool enabled);
+		bool IsEnabled() const { return fIsEnabled; }
+
 		void SetType(menu_item_type type);
 		menu_item_type Type() const { return fType; }
 
@@ -59,6 +62,7 @@ class MenuItem {
 		menu_item_hook	fTarget;
 		bool			fIsMarked;
 		bool			fIsSelected;
+		bool			fIsEnabled;
 		menu_item_type	fType;
 		Menu			*fMenu, *fSubMenu;
 		void			*fData;
