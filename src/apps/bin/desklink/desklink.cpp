@@ -371,7 +371,7 @@ main(int, char **argv)
 	
 	if (!atLeastOnePath) {
 		// print a simple usage string
-		printf(	"usage: desklink { [ --list|--remove|cmd=title:action ... ] path } ...\n"
+		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] path ] } ...\n"
 			"--list: list all Deskbar addons.\n"
 			"--remove: delete all desklink addons.\n");
 		return 1;
