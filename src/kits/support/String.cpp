@@ -198,7 +198,8 @@ BString::SetTo(char c, int32 count)
 /*---- Substring copying ---------------------------------------------------*/
 BString &BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 {
-	into.SetTo(String() + fromOffset, length);
+	if (&into != this)
+		into.SetTo(String() + fromOffset, length);
 	return into;
 }
 
@@ -209,7 +210,6 @@ BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 	if (into) {
 		int32 len = min(Length() - fromOffset , length);
 		strncpy(into, _privateData + fromOffset, len);
-		into[len] = '\0'; 
 	}
 }
 
@@ -718,7 +718,9 @@ BString::IFindLast(const char *string, int32 beforeOffset) const
 BString&
 BString::ReplaceFirst(char replaceThis, char withThis)
 {
-	int32 pos = FindFirst(replaceThis, 0);
+	char tmp[2] = { replaceThis, '\0' };
+	int32 pos = _FindAfter(tmp, 0, -1);
+	
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 	return *this;
@@ -728,7 +730,9 @@ BString::ReplaceFirst(char replaceThis, char withThis)
 BString&
 BString::ReplaceLast(char replaceThis, char withThis)
 {
-	int32 pos = FindLast(replaceThis, Length());
+	char tmp[2] = { replaceThis, '\0' };
+	int32 pos = _FindBefore(tmp, Length(), -1);
+	
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 	return *this;
@@ -739,7 +743,9 @@ BString&
 BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 {
 	int32 pos = B_ERROR;
-	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0) {
+	char tmp[2] = { replaceThis, '\0' };
+	
+	while ((pos = _FindAfter(tmp, fromOffset, -1)) >= 0) {
 		_privateData[pos] = withThis;
 		fromOffset += pos;
 	}
@@ -752,8 +758,9 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 {
 	int32 pos = B_ERROR;
 	int32 replaceCount = 0;
-
-	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0) {
+	char tmp[2] = { replaceThis, '\0' };
+	
+	while ((pos = _FindAfter(tmp, fromOffset, -1)) >= 0) {
 		_privateData[pos] = withThis;
 		fromOffset += pos;
 		
@@ -770,11 +777,10 @@ BString::ReplaceFirst(const char *replaceThis, const char *withThis)
 	if (replaceThis == NULL)
 		return *this;
 	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - strlen(replaceThis);
-	
 	int32 pos = _FindAfter(replaceThis, 0, -1);
 	if (pos >= 0) {
+		int32 len = (withThis ? strlen(withThis) : 0);
+		int32 difference = len - strlen(replaceThis);
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -791,12 +797,11 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 {
 	if (replaceThis == NULL)
 		return *this;
-	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - strlen(replaceThis);
-	
+		
 	int32 pos = _FindBefore(replaceThis, Length(), -1);
 	if (pos >= 0) {
+		int32 len = (withThis ? strlen(withThis) : 0);
+		int32 difference = len - strlen(replaceThis);
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -811,7 +816,22 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 BString&
 BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos; 
+	while ((pos = _FindAfter(replaceThis, fromOffset, -1))>= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+		fromOffset += pos;
+	}
+
 	return *this;
 }
 
@@ -827,7 +847,8 @@ BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplace
 BString&
 BString::IReplaceFirst(char replaceThis, char withThis)
 {
-	int32 pos = IFindFirst(replaceThis, 0);
+	char tmp[2] = { replaceThis, '\0' };
+	int32 pos = _FindAfter(tmp, 0, -1);
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 
@@ -837,8 +858,9 @@ BString::IReplaceFirst(char replaceThis, char withThis)
 
 BString&
 BString::IReplaceLast(char replaceThis, char withThis)
-{	
-	int32 pos = IFindLast(replaceThis, 0);
+{
+	char tmp[2] = { replaceThis, '\0' };	
+	int32 pos = _IFindBefore(tmp, Length(), -1);
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 	
@@ -849,7 +871,13 @@ BString::IReplaceLast(char replaceThis, char withThis)
 BString&
 BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 {
-	//TODO: Implement
+	int32 pos = B_ERROR;
+	char tmp[2] = { replaceThis, '\0' };
+	
+	while ((pos = _IFindAfter(tmp, fromOffset, -1)) >= 0) {
+		_privateData[pos] = withThis;
+		fromOffset += pos;
+	}
 	return *this;
 }
 
@@ -909,7 +937,22 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 BString&
 BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos; 
+	while ((pos = _IFindAfter(replaceThis, fromOffset, -1))>= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+		fromOffset += pos;
+	}
+
 	return *this;
 }
 
@@ -970,7 +1013,8 @@ BString::UnlockBuffer(int32 length)
 BString&
 BString::ToLower()
 {
-	for (int32 count = 0; count < Length(); count++)
+	int32 length = Length();
+	for (int32 count = 0; count < length; count++)
 			_privateData[count] = tolower(_privateData[count]);
 	
 	return *this;
@@ -980,7 +1024,8 @@ BString::ToLower()
 BString&
 BString::ToUpper()
 {	
-	for (int32 count = 0; count < Length(); count++)
+	int32 length = Length();
+	for (int32 count = 0; count < length; count++)
 			_privateData[count] = toupper(_privateData[count]);
 	
 	return *this;
@@ -991,8 +1036,9 @@ BString&
 BString::Capitalize()
 {
 	_privateData[0] = toupper(_privateData[0]);
-	
-	for (int32 count = 0; count < Length(); count++)
+	int32 length = Length();
+		
+	for (int32 count = 1; count < length; count++)
 			_privateData[count] = tolower(_privateData[count]);
 
 	return *this;
@@ -1002,7 +1048,28 @@ BString::Capitalize()
 BString&
 BString::CapitalizeEachWord()
 {
-	//TODO: Implement
+	if (_privateData == NULL)
+		return *this;
+		
+	int32 count = 0;
+	int32 length = Length();
+		
+	do {	
+		for(; count < length; count++) {
+			if (isalpha(_privateData[count])) {
+				_privateData[count] = toupper(_privateData[count]);
+				count++;
+				break;
+			}
+		}
+		for(; count < length; count++) {
+			if (isalpha(_privateData[count]))
+				_privateData[count] = tolower(_privateData[count]);
+			else
+				break;
+		}
+	} while (count < length);
+				
 	return *this;
 }
 
@@ -1197,8 +1264,8 @@ char*
 BString::_OpenAtBy(int32 offset, int32 length)
 {
 	int32 oldLength = Length();
-	
-	_privateData -= sizeof(int32);
+	if (_privateData != NULL)
+		_privateData -= sizeof(int32);
 	_privateData = (char*)realloc(_privateData , oldLength + length + sizeof(int32) + 1);
 	_privateData += sizeof(int32);
 	memmove(_privateData + offset + length, _privateData + offset,
