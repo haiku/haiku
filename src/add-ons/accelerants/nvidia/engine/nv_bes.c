@@ -320,13 +320,6 @@ static void nv_bes_program_move_overlay(move_overlay_info moi)
 		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
 		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
 		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
-
-		/* setup buffer source pitch including slopspace (in bytes).
-		 * Note:
-		 * source pitch granularity = 16 pixels on the RIVA128 - TNT (so pre-NV10) bes */
-		/* (program both buffers to prevent sync distortions) */
-//		BESW(NV04_0SRCPTCH, (ob->width * 2));
-//		BESW(NV04_1SRCPTCH, (ob->width * 2));
 		/* setup output window position */
 		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
@@ -334,9 +327,6 @@ static void nv_bes_program_move_overlay(move_overlay_info moi)
 			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
 			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
-
-		/* enable BES (b0), enable colorkeying (b4), format yuy2 (b8: 0 = ccir) */
-//		BESW(NV04_GENCTRL, 0x00000111);
 		/* select buffer 1 as active (b16) */
 		BESW(NV04_SU_STATE, 0x00010000);
 	}
@@ -346,14 +336,6 @@ static void nv_bes_program_move_overlay(move_overlay_info moi)
 	
 		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
 		BESW(NV10_0SRCREF, ((moi.v1srcstv << 4) & 0xffff0000) | ((moi.hsrcstv >> 12) & 0x0000ffff));
-		/* setup buffersize */
-		//fixme if needed: width must be even officially...
-//		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
-		/* setup source pitch including slopspace (in bytes),
-		 * b16: select YUY2 (0 = YV12), b20: use colorkey, b24: no iturbt_709 (do iturbt_601) */
-		/* Note:
-		 * source pitch granularity = 32 pixels on GeForce cards!! */
-//		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
 		/* setup output window position */
 		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
@@ -361,10 +343,6 @@ static void nv_bes_program_move_overlay(move_overlay_info moi)
 			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
 			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
-		/* setup (unclipped!) buffer startadress in RAM */
-//		BESW(NV10_0BUFADR, a1orgv);
-		/* enable BES (b0 = 0) */
-//		BESW(NV10_GENCTRL, 0x00000000);
 		/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
 		/* This also triggers activation of programmed values (double buffered registers feature) */
 		BESW(NV10_BUFSEL, 0x00000001);
