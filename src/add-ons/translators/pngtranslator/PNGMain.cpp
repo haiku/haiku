@@ -56,7 +56,7 @@ main()
 	BApplication app("application/x-vnd.obos-png-translator");
 	status_t result;
 	result = LaunchTranslatorWindow(new PNGTranslator,
-		"PNGTranslator", BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT));
+		"PNG Settings", BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

@@ -55,7 +55,7 @@ main()
 	BApplication app("application/x-vnd.obos-tiff-translator");
 	status_t result;
 	result = LaunchTranslatorWindow(new TIFFTranslator,
-		"TIFFTranslator", BRect(0, 0, 225, 175));
+		"TIFF Settings", BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;
