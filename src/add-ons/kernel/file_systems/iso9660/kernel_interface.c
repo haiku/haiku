@@ -180,7 +180,7 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
 	// Check for a 'nojoliet' parm
 	// all we check for is the existance of 'nojoliet' in the parms.
 	if (parms != NULL) {
-		int i;
+		uint32 i;
 		char *spot;
 		char *buf;
 
