@@ -27,8 +27,6 @@ void arch_cpu_invalidate_TLB_list(addr pages[], int num_pages);
 void arch_cpu_global_TLB_invalidate(void);
 
 int arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *faultHandler);
-int arch_cpu_user_strcpy(char *to, const char *from, addr *faultHandler);
-int arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *faultHandler);
 int arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHandler);
 int arch_cpu_user_memset(void *s, char c, size_t count, addr *faultHandler);
 

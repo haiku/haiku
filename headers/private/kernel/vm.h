@@ -59,8 +59,6 @@ int vm_get_physical_page(addr paddr, addr *vaddr, int flags);
 int vm_put_physical_page(addr vaddr);
 
 int user_memcpy(void *to, const void *from, size_t size);
-int user_strcpy(char *to, const char *from);
-int user_strncpy(char *to, const char *from, size_t size);
 int user_strlcpy(char *to, const char *from, size_t size);
 int user_memset(void *s, char c, size_t count);
 
