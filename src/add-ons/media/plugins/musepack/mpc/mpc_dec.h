@@ -13,7 +13,7 @@ class StreamInfo;
 #define TO_PCM      2
 
 #ifndef MPC_DECODE
-  #define MPC_DECODE    TO_FLOAT    // decode to 32 bit floats ( -1.000...+1.000 )
+#define MPC_DECODE    TO_FLOAT    // decode to 32 bit floats ( -1.000...+1.000 )
 //#define MPC_DECODE    TO_PCM      // decode to 16 bit PCM    ( -32768...+32767 )
 #endif
 
@@ -42,17 +42,6 @@ class StreamInfo;
 #define FRAMELEN        (36 * 32)               // samples per frame
 #define SYNTH_DELAY     481
 
-
-class Reader {
-public:
-  virtual size_t read ( void *ptr, size_t size ) = 0;
-  virtual size_t write ( void *ptr, size_t size ) = 0;
-  virtual int seek ( int offset, int origin ) = 0;
-  virtual long tell () = 0;
-  virtual void seteof ( size_t ofs ) {};
-  virtual ~Reader () {}
-  virtual int canwrite () { return 0; }; // is writing supported or not
-};
 
 class MPC_decoder {
 private:
@@ -114,6 +103,7 @@ public:
   int           SectionBitrate;             // average bitrate for short section
   int           SampleRate;                 // Sample frequency
   int           NumberOfConsecutiveBrokenFrames;  // counter for consecutive broken frames
+  StreamInfo    *fInfo;
 
 private:
   unsigned int  StreamVersion;              // version of bitstream

@@ -194,6 +194,8 @@ MPC_decoder::DECODE ( MPC_SAMPLE_FORMAT *buffer )
 #endif
     Synthese_Filter_dithered ( buffer );
 
+#else
+#	error Define MPC_DECODE to either TO_FLOAT or TO_PCM
 #endif
     // (PluginSettings.DitherUsed  ?  this->Synthese_Filter_dithered  :  this->Synthese_Filter_opt) ( (short*)buffer );
 
@@ -978,8 +980,13 @@ MPC_decoder::MPC_decoder(BPositionIO *file)
   Huffman_SV7_Decoder ();
 }
 
-void MPC_decoder::SetStreamInfo ( StreamInfo *si )
+
+void
+MPC_decoder::SetStreamInfo(StreamInfo *si)
 {
+	fInfo = si;
+		// this is used in MusePackDecoder::NegotiateOutputFormat()
+
   StreamVersion      = si->simple.StreamVersion;
   MS_used            = si->simple.MS;
   Max_Band           = si->simple.MaxBand;
