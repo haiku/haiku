@@ -1,7 +1,7 @@
 /* nm Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 3/2004-5/2004.
+   Rudolf Cornelissen 3/2004-7/2004.
 */
 
 #define MODULE_BIT 0x00080000
@@ -20,6 +20,7 @@ blit
 */
 
 //fixme: acc setup for NM2070, NM2097 and NM2160 only for now...
+//fixme: seperate acc routines for different architectures for (marginal) speedup?
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
@@ -60,7 +61,11 @@ status_t nm_acc_init()
 		si->engine.depth = 2;
 		break;
 	case B_RGB24_LITTLE:
-		/* no acceleration supported on NM2070, NM2097 and NM2160 */
+		/* b8-9 determine engine colordepth */
+		si->engine.control = (3 << 8);
+		si->engine.depth = 3;
+		/* no acceleration supported on NM2070 - NM2200: let them fallthrough... */
+		if (si->ps.card_type >= NM2230) break;
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
 		return B_ERROR;
@@ -96,7 +101,7 @@ status_t nm_acc_init()
 		}
 	}
 
-	/* enable engine FIFO */
+	/* enable engine FIFO (fixme: works this way on pre NM2200 only (engine.control)) */
 	/* fixme when/if possible:
 	 * does not work on most cards.. (tried NM2070 and NM2160)
 	 * workaround: always wait until engine completely idle before programming. */
@@ -107,7 +112,7 @@ status_t nm_acc_init()
 	 * not possible on all cards or not enough specs known. (tried NM2160)
 	 * workaround: place cursor bitmap at _end_ of cardRAM instead of in _beginning_. */
 
-	/* setup clipping */
+	/* setup clipping (fixme: works this way on pre NM2200 only (engine.control)) */
 	/* note:
 	 * on NM2160 the max acc engine width of 1600 pixels can be programmed, but
 	 * the max. height is only 1023 pixels (height register holds just 10 bits)! 
@@ -122,20 +127,42 @@ status_t nm_acc_init()
 //	ACCW(CLIPLT, 0);
 //	ACCW(CLIPRB, ((si->dm.virtual_height << 16) | (si->dm.virtual_width & 0x0000ffff)));
 
-	/* init some extra registers on NM2070 (memory pitch) */
-	if(si->ps.card_type == NM2070)
+	/* init some extra registers on some cards */
+	switch(si->ps.card_type)
 	{
+	case NM2070:
 		/* make sure the previous command (if any) is completed */
 //		does not work yet:
 //		nm_acc_wait_fifo(5);
 //		so:
 		nm_acc_wait_idle();
 
+		/* setup memory pitch */
 		ACCW(2070_PLANEMASK, 0x0000ffff);
 		ACCW(2070_SRCPITCH, si->fbc.bytes_per_row);
 		ACCW(2070_SRCBITOFF, 0);
 		ACCW(2070_DSTPITCH, si->fbc.bytes_per_row);
 		ACCW(2070_DSTBITOFF, 0);
+		break;
+	case NM2200:
+	case NM2230:
+	case NM2360:
+	case NM2380:
+		/* make sure the previous command (if any) is completed */
+//		does not work yet:
+//		nm_acc_wait_fifo(2);
+//		so:
+		nm_acc_wait_idle();
+
+		/* setup engine depth and pixel pitch */
+		ACCW(STATUS, ((si->engine.control & 0x0000ffff) << 16));
+		/* setup memory pitch */
+		ACCW(2200_PITCH,
+			((si->fbc.bytes_per_row << 16) | (si->fbc.bytes_per_row & 0x0000ffff)));
+		break;
+	default:
+		/* nothing to do */
+		break;
 	}
 
 	return B_OK;
@@ -153,45 +180,67 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
     if ((yd < ys) || ((yd == ys) && (xd < xs)))
     {
 		/* start with upper left corner */
-		if (si->ps.card_type == NM2070)
+		switch (si->ps.card_type)
 		{
+		case NM2070:
 			/* use ROP GXcopy (b16-19), and use linear adressing system */
 			ACCW(CONTROL, si->engine.control | 0x000c0000);
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(2070_XYEXT, ((h << 16) | (w & 0x0000ffff)));
 			ACCW(SRCSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
 			ACCW(2070_DSTSTARTOFF, ((yd * si->fbc.bytes_per_row) + (xd * si->engine.depth)));
-		}
-		else
-		{
+			break;
+		case NM2097:
+		case NM2160:
 			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
 			ACCW(CONTROL, si->engine.control | 0x830c0000);
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 			ACCW(2090_DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
 			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+			break;
+		default: /* NM2200 and later */
+			/* use ROP GXcopy (b16-19), and use linear adressing system */
+			//fixme? it seems CONTROL nolonger needs direction, and can be pgm'd just once...
+			ACCW(CONTROL, (si->engine.control | 0x800c0000));
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(SRCSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
+			ACCW(2090_DSTSTARTOFF, ((yd * si->fbc.bytes_per_row) + (xd * si->engine.depth)));
+			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+			break;
 		}
 	}
     else
     {
 		/* start with lower right corner */
-		if (si->ps.card_type == NM2070)
+		switch (si->ps.card_type)
 		{
+		case NM2070:
 			/* use ROP GXcopy (b16-19), and use linear adressing system */
 			ACCW(CONTROL, (si->engine.control | 0x000c0013));
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(2070_XYEXT, ((h << 16) | (w & 0x0000ffff)));
 			ACCW(SRCSTARTOFF, (((ys + h) * si->fbc.bytes_per_row) + ((xs + w) * si->engine.depth)));
 			ACCW(2070_DSTSTARTOFF, (((yd + h) * si->fbc.bytes_per_row) + ((xd + w) * si->engine.depth)));
-		}
-		else
-		{
+			break;
+		case NM2097:
+		case NM2160:
 			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
 			ACCW(CONTROL, (si->engine.control | 0x830c0013));
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(SRCSTARTOFF, (((ys + h) << 16) | ((xs + w) & 0x0000ffff)));
 			ACCW(2090_DSTSTARTOFF, (((yd + h) << 16) | ((xd + w) & 0x0000ffff)));
 			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+			break;
+		default: /* NM2200 and later */
+			/* use ROP GXcopy (b16-19), and use linear adressing system */
+			//fixme? it seems CONTROL nolonger needs direction, and can be pgm'd just once...
+			ACCW(CONTROL, (si->engine.control | 0x800c0013));
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(SRCSTARTOFF, (((ys + h) * si->fbc.bytes_per_row) + ((xs + w) * si->engine.depth)));
+			ACCW(2090_DSTSTARTOFF, (((yd + h) * si->fbc.bytes_per_row) + ((xd + w) * si->engine.depth)));
+			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+			break;
 		}
 	}
 

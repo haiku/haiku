@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-6/2004
+   Rudolf Cornelissen 4/2003-7/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-final running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.07 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -490,11 +490,16 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	case NM2070:
 	case NM2097:
 	case NM2160:
-		if (target->space != B_RGB24) *acc_mode = true;
-		else *acc_mode = false;
+	case NM2200:
+		if (target->space == B_RGB24) *acc_mode = false;
+		break;
+	//fixme: no acc implemented for the cards below yet...
+	case NM2090:
+	case NM2093:
+		*acc_mode = false;
 		break;
 	default:
-		*acc_mode = false;
+		/* NM2230 and later cards support accelerated 24bit modes */
 		break;
 	}
 

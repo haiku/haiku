@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 	
 	Other authors:
-	Rudolf Cornelissen 10/2002-5/2004
+	Rudolf Cornelissen 10/2002-7/2004
 */
 
 #define MODULE_BIT 0x08000000
@@ -183,7 +183,6 @@ status_t check_overlay_capability(uint32 feature)
 
 status_t check_acc_capability(uint32 feature)
 {
-	bool fill = false;
 	char *msg = "";
 
 	/* setup logmessage text */
@@ -194,15 +193,12 @@ status_t check_acc_capability(uint32 feature)
 		break;
 	case B_FILL_RECTANGLE:
 		msg = "B_FILL_RECTANGLE";
-		fill = true;
 		break;
 	case B_INVERT_RECTANGLE:
 		msg = "B_INVERT_RECTANGLE";
-		fill = true;
 		break;
 	case B_FILL_SPAN:
 		msg = "B_FILL_SPAN";
-		fill = true;
 		break;
 	case B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT:
 		msg = "B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT";
@@ -219,6 +215,13 @@ status_t check_acc_capability(uint32 feature)
 	 * memory pitch.. */
 	if (si->acc_mode)
 	{
+		//fixme: temporary, until acc for these cards is completely setup...
+		if ((si->ps.card_type >= NM2200) && (feature != B_SCREEN_TO_SCREEN_BLIT))
+		{
+			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
+			return B_ERROR;
+		}
+
 		LOG(4, ("Acc: Exporting hook %s.\n", msg));
 		return B_OK;
 	}
