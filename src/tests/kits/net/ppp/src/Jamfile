@@ -2,6 +2,7 @@ SubDir OBOS_TOP src tests kits net ppp src ;
 
 # for cpp.cpp
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
 
 UsePrivateHeaders net ;
