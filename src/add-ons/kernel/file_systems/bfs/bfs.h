@@ -172,6 +172,7 @@ enum inode_flags
 	INODE_NO_TRANSACTION	= 0x00040000,
 	INODE_DONT_FREE_SPACE	= 0x00080000,	// only used by the "chkbfs" functionality
 	INODE_NOT_READY			= 0x00100000,	// used during construction
+	INODE_CHKBFS_RUNNING	= 0x00200000,
 };
 
 //**************************************

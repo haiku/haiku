@@ -375,13 +375,27 @@ bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = inode->InitCheck();
-	if (status == B_OK) {
-		*_node = (void *)inode;
-		return B_OK;
-	}
+	status_t status;
+	int32 tries = 0;
 
-	// ToDo: if "status" is B_BUSY, we could wait a bit and try again
+	while (true) {
+		if ((status = inode->InitCheck()) == B_OK) {
+			*_node = (void *)inode;
+			return B_OK;
+		}
+
+		// if "status" is B_BUSY, we wait a bit and try again
+
+		if (status == B_BUSY) {
+			// wait for half a second at maximum
+			if (tries++ < 100) {
+				snooze(5000);
+				continue;
+			}
+			FATAL(("inode is not becoming unbusy (id = %Ld)\n", id));
+		}
+		break;
+	}
 
 	delete inode;
 	RETURN_ERROR(status);
@@ -584,7 +598,11 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 			BlockAllocator &allocator = volume->Allocator();
 			check_control *control = (check_control *)buffer;
 
-			return allocator.StartChecking(control);
+			status_t status = allocator.StartChecking(control);
+			if (status == B_OK && inode != NULL)
+				inode->Node()->flags |= INODE_CHKBFS_RUNNING;
+
+			return status;
 		}
 		case BFS_IOCTL_STOP_CHECKING:
 		{
@@ -592,7 +610,11 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 			BlockAllocator &allocator = volume->Allocator();
 			check_control *control = (check_control *)buffer;
 
-			return allocator.StopChecking(control);
+			status_t status = allocator.StopChecking(control);
+			if (status == B_OK && inode != NULL)
+				inode->Node()->flags &= ~INODE_CHKBFS_RUNNING;
+
+			return status;
 		}
 		case BFS_IOCTL_CHECK_NEXT_NODE:
 		{
@@ -1291,6 +1313,11 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 			// We don't need to save the inode, because INODE_NO_CACHE is a
 			// non-permanent flag which will be removed when the inode is loaded
 			// into memory.
+	}
+	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
+		// "chkbfs" exited abnormally, so we have to stop it here...
+		FATAL(("check process was aborted!\n"));
+		volume->Allocator().StopChecking(NULL);
 	}
 
 	return B_OK;
