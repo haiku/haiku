@@ -495,7 +495,7 @@ create_new_vnode(void)
 }
 
 
-static int
+static status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
 	int err;
@@ -542,12 +542,11 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 }
 
 
-static int
+static void
 inc_vnode_ref_count(struct vnode *vnode)
 {
 	atomic_add(&vnode->ref_count, 1);
 	PRINT(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
-	return 0;
 }
 
 
@@ -563,7 +562,7 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
 }
 
 
-static int
+static status_t
 get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 {
 	struct vnode *vnode;
@@ -575,13 +574,13 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 	while (true) {
 		vnode = lookup_vnode(mountID, vnodeID);
-		if (vnode) {
-			if (vnode->busy) {
-				mutex_unlock(&gVnodeMutex);
-				snooze(10000); // 10 ms
-				mutex_lock(&gVnodeMutex);
-				continue;
-			}
+		if (vnode && vnode->busy) {
+			// ToDo: this is an endless loop if the vnode is not
+			//	becoming unbusy anymore (for whatever reason)
+			mutex_unlock(&gVnodeMutex);
+			snooze(10000); // 10 ms
+			mutex_lock(&gVnodeMutex);
+			continue;
 		}
 		break;
 	}
@@ -599,13 +598,13 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 		}
 		vnode->mount_id = mountID;
 		vnode->id = vnodeID;
-		
+
 		mutex_lock(&gMountMutex);	
 
 		vnode->mount = find_mount(mountID);
 		if (!vnode->mount) {
 			mutex_unlock(&gMountMutex);
-			err = ERR_INVALID_HANDLE;
+			err = B_ENTRY_NOT_FOUND;
 			goto err;
 		}
 		vnode->busy = true;
@@ -616,10 +615,10 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 		mutex_unlock(&gMountMutex);
 
 		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
-		if (err < 0 && vnode->private_node == NULL) {
+		if (err < 0 || vnode->private_node == NULL) {
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			if (vnode->private_node == NULL)
-				err = EINVAL;
+				err = B_BAD_VALUE;
 		}
 		mutex_lock(&gVnodeMutex);
 		if (err < 0)
@@ -758,10 +757,11 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 		mutex_unlock(&gVnodeMutex);
 
 		if (!nextVnode) {
-			// pretty screwed up here
+			// pretty screwed up here - the file system found the vnode, but the hash
+			// lookup failed, so our internal structures are messed up
 			panic("path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->mount_id, vnodeID);
 			put_vnode(vnode);
-			return ERR_VFS_PATH_NOT_FOUND;
+			return B_ENTRY_NOT_FOUND;
 		}
 
 		// If the new node is a symbolic link, resolve it (if we've been told to do it)
@@ -1188,7 +1188,60 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 //	Functions the VFS exports for other parts of the kernel
 
 
-int
+status_t
+vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+{
+	struct vnode *vnode;
+	status_t status = B_OK;
+
+	if (privateNode == NULL)
+		return B_BAD_VALUE;
+
+	mutex_lock(&gVnodeMutex);
+
+	// file system integrity check:
+	// test if the vnode already exists and bail out if this is the case!
+
+	// ToDo: the R5 implementation obviously checks for a different cookie
+	//	and doesn't panic if they are equal
+
+	vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode != NULL)
+		panic("vnode %ld:%Ld already exists (node = %p, vnode->node = %p)!", mountID, vnodeID, privateNode, vnode->private_node);
+
+	vnode = create_new_vnode();
+	if (!vnode) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+
+	vnode->mount_id = mountID;
+	vnode->id = vnodeID;
+	vnode->private_node = privateNode;
+
+	// add the vnode to the mount structure
+	mutex_lock(&gMountMutex);	
+	vnode->mount = find_mount(mountID);
+	if (!vnode->mount) {
+		mutex_unlock(&gMountMutex);
+		status = B_ENTRY_NOT_FOUND;
+		goto err;
+	}
+	hash_insert(gVnodeTable, vnode);
+
+	add_vnode_to_mount_list(vnode, vnode->mount);
+	mutex_unlock(&gMountMutex);
+
+	vnode->ref_count = 1;
+
+err:	
+	mutex_unlock(&gVnodeMutex);
+
+	return status;
+}
+
+
+status_t
 vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
@@ -1202,7 +1255,7 @@ vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 }
 
 
-int
+status_t
 vfs_put_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
@@ -1234,7 +1287,7 @@ vfs_vnode_release_ref(void *vnode)
 }
 
 
-int
+status_t
 vfs_remove_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
@@ -1276,7 +1329,7 @@ vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 	*vnode = get_vnode_from_fd(ioctx, fd);
 
 	if (*vnode == NULL)
-		return ERR_INVALID_HANDLE;
+		return B_FILE_ERROR;
 
 	return B_NO_ERROR;
 }
@@ -2275,7 +2328,7 @@ common_sync(int fd, bool kernel)
 
 	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
 	if (descriptor == NULL)
-		return ERR_INVALID_HANDLE;
+		return B_FILE_ERROR;
 
 	if (FS_CALL(vnode, fsync) != NULL)
 		status = FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
@@ -3109,7 +3162,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	mount->fs = get_file_system(fsName);
 	if (mount->fs == NULL) {
-		err = ERR_VFS_INVALID_FS;
+		err = ENODEV;
 		goto err2;
 	}
 
@@ -3120,13 +3173,14 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (!gRoot) {
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
-			err = ERR_VFS_GENERAL;
+			err = B_ERROR;
 			goto err3;
 		}
 
 		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
-			err = ERR_VFS_GENERAL;
+			// ToDo: why should we hide the error code from the file system here?
+			//err = ERR_VFS_GENERAL;
 			goto err3;
 		}
 
@@ -3137,7 +3191,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 			goto err2;
 
 		if (!covered_vnode) {
-			err = ERR_VFS_GENERAL;
+			err = B_ERROR;
 			goto err2;
 		}
 
@@ -3411,7 +3465,7 @@ set_cwd(int fd, char *path, bool kernel)
 
 	if (!S_ISDIR(stat.st_mode)) {
 		// nope, can't cwd to here
-		rc = ERR_VFS_WRONG_STREAM_TYPE;
+		rc = B_NOT_A_DIRECTORY;
 		goto err;
 	}
 
@@ -3838,7 +3892,7 @@ user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 	int status;
 
 	if (!CHECK_USER_ADDRESS(userName))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
 	status = user_strlcpy(name, userName, sizeof(name) - 1);
 	if (status < B_OK)
@@ -3855,7 +3909,7 @@ user_open(const char *userPath, int omode)
 	int status;
 
 	if (!CHECK_USER_ADDRESS(userPath))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
 	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
