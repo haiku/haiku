@@ -25,22 +25,22 @@ null_commit(struct vm_store *store, off_t size)
 }
 
 
-static int
+static bool
 null_has_page(struct vm_store *store, off_t offset)
 {
-	return 1; // we always have the page, man
+	return true; // we always have the page, man
 }
 
 
-static ssize_t
-null_read(struct vm_store *store, off_t offset, iovecs *vecs)
+static status_t
+null_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return -1;
 }
 
 
-static ssize_t
-null_write(struct vm_store *store, off_t offset, iovecs *vecs)
+static status_t
+null_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return -1;
 }

@@ -38,23 +38,23 @@ anonymous_commit(struct vm_store *store, off_t size)
 }
 
 
-static int
+static bool
 anonymous_has_page(struct vm_store *store, off_t offset)
 {
-	return 0;
+	return false;
 }
 
 
-static ssize_t
-anonymous_read(struct vm_store *store, off_t offset, iovecs *vecs)
+static status_t
+anonymous_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	panic("anonymous_store: read called. Invalid!\n");
 	return B_ERROR;
 }
 
 
-static ssize_t
-anonymous_write(struct vm_store *store, off_t offset, iovecs *vecs)
+static status_t
+anonymous_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return 0;

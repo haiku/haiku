@@ -35,30 +35,30 @@ store_commit(struct vm_store *_store, off_t size)
 }
 
 
-static int
+static bool
 store_has_page(struct vm_store *_store, off_t offset)
 {
 	// We always pretend to have the page - even if it's beyond the size of
 	// the file. The read function will only cut down the size of the read,
 	// it won't fail because of that.
-	return 1;
+	return true;
 }
 
 
-static ssize_t
-store_read(struct vm_store *_store, off_t offset, iovecs *vecs)
+static status_t
+store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_read_page(store->vnode, vecs, offset);
+	return vfs_read_pages(store->vnode, offset, vecs, count, _numBytes);
 		// ToDo: the file system must currently clear out the remainder of the last page...
 }
 
 
-static ssize_t
-store_write(struct vm_store *_store, off_t offset, iovecs *vecs)
+static status_t
+store_write(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_write_page(store->vnode, vecs, offset);
+	return vfs_write_pages(store->vnode, offset, vecs, count, _numBytes);
 }
 
 

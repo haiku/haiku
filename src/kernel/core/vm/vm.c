@@ -2326,21 +2326,20 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// see if the vm_store has it
 		if (cache_ref->cache->store->ops->has_page != NULL
 			&& cache_ref->cache->store->ops->has_page(cache_ref->cache->store, cache_offset)) {
-			IOVECS(vecs, 1);
+			size_t bytesRead;
+			iovec vec;
+
+			vec.iov_len = bytesRead = B_PAGE_SIZE;
 
 			TRACEPFAULT;
 
 			mutex_unlock(&cache_ref->lock);
 
-			vecs->num = 1;
-			vecs->total_len = PAGE_SIZE;
-			vecs->vec[0].iov_len = PAGE_SIZE;
-
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
-			(*aspace->translation_map.ops->get_physical_page)(page->ppn * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+			aspace->translation_map.ops->get_physical_page(page->ppn * PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
-			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cache_offset, vecs);
-			(*aspace->translation_map.ops->put_physical_page)((addr_t)vecs->vec[0].iov_base);
+			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cache_offset, &vec, 1, &bytesRead);
+			aspace->translation_map.ops->put_physical_page((addr_t)vec.iov_base);
 
 			mutex_lock(&cache_ref->lock);
 
