@@ -30,6 +30,8 @@
 
 #include <Locker.h>
 #include "RGBColor.h"
+#include <Message.h>
+#include <String.h>
 
 /*!
 	\class ColorSet ColorSet.h
@@ -43,6 +45,13 @@ public:
 	ColorSet & operator=(const ColorSet &cs);
 	void SetColors(const ColorSet &cs);
 	void PrintToStream(void) const;
+	bool ConvertToMessage(BMessage *msg) const;
+	bool ConvertFromMessage(const BMessage *msg);
+	void SetToDefaults(void);
+	RGBColor StringToColor(const char *string);
+	status_t SetColor(const char *string, rgb_color value);
+	
+	BString name;
 	
 	RGBColor panel_background,
 	panel_text,
@@ -78,9 +87,11 @@ public:
 	window_tab_text,
 	inactive_window_tab,
 	inactive_window_tab_text;
+private:
+	RGBColor *StringToMember(const char *string);
 };
 
-void SetDefaultGUIColors(ColorSet *set);
+
 bool LoadGUIColors(ColorSet *set);
 void SaveGUIColors(const ColorSet &set);
 
