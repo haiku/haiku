@@ -649,6 +649,9 @@ media_format::MetaDataSize() const
 media_format::media_format()
 {
 	memset(this, 0x00, sizeof(*this));
+	meta_data_area = B_BAD_VALUE;
+	use_area = B_BAD_VALUE;
+	team = B_BAD_VALUE;
 	//meta_data, meta_data_size, meta_data_area, use_area, 
 	//team, and thisPtr are currently only used by decoders
 	//when communicating with the file reader; they're not
@@ -674,17 +677,24 @@ media_format::~media_format()
 media_format &
 media_format::operator=(const media_format &clone)
 {
-	memset(this, 0x00, sizeof(*this));
-
-	type = clone.type;
-	user_data_type = clone.user_data_type;
-
-	memcpy(user_data, clone.user_data, sizeof(media_format::user_data));
-
-	require_flags = clone.require_flags;
-	deny_flags = clone.deny_flags;
-
-	memcpy(u._reserved_, clone.u._reserved_, sizeof(media_format::u._reserved_));
+	memcpy(this, &clone, sizeof(*this));
+	// these things only happen when a meta_data_area is defined:
+	if (meta_data_area != B_BAD_VALUE) {
+		thread_id thread = find_thread(NULL);
+		if (thread != B_NAME_NOT_FOUND) {
+			thread_info info;
+			if (get_thread_info(thread,&info) == B_OK) {
+				team = info.team;
+			}
+		}
+		thisPtr = this;
+		// TODO: start _Media_Roster_
+		// TODO: request the _Media_Roster_ to give us the
+		// use_area for this team, or to create a
+		// clone for our team if our team doesn't have one yet
+		// TODO: set meta_data to point to the clone's address
+		UNIMPLEMENTED();
+	}
 	return *this;
 }
 
