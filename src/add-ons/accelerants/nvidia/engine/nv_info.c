@@ -140,6 +140,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
 	/* confirmed by comparing cards */
 	uint16 ram_tab = init1 - 0x0010;
+	/* fixme: PPC BIOSes (might) return NULL pointers for messages here */
 	char* signon_msg   = &(rom[(rom[offset + 24] + (rom[offset + 25] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
 	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
@@ -161,6 +162,7 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
 	/* still confirm!! */
 	uint16 ram_tab = init1 - 0x0010;
+	/* fixme: PPC BIOSes (might) return NULL pointers for messages here */
 	char* signon_msg   = &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
 	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
