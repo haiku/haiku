@@ -94,6 +94,7 @@
 /* VGA standard registers: */
 #define NMSEQX_RESET		0x00
 #define NMSEQX_CLKMODE		0x01
+#define NMSEQX_MAPMASK		0x02
 #define NMSEQX_MEMMODE		0x04
 /* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
 #define NMSEQX_BESCTRL2		0x08
@@ -122,6 +123,7 @@
 #define NMATBX_COLPLANE_EN	0x12
 #define NMATBX_HORPIXPAN	0x13
 #define NMATBX_COLSEL		0x14
+#define NMATBX_0x16			0x16
 
 /* neomagic ISA GRAPHICS indexed registers */
 /* VGA standard registers: */
@@ -135,8 +137,10 @@
 #define NMGRPHX_GRPHXLOCK	0x09
 #define NMGRPHX_GENLOCK		0x0a
 #define NMGRPHX_FBSTADDE	0x0e
-#define NMGRPHX_CRTC_PITCHE	0x0f
-#define NMGRPHX_IFACECTRL	0x11
+#define NMGRPHX_CRTC_PITCHE	0x0f /* > NM2070 */
+#define NMGRPHX_IFACECTRL1	0x10
+#define NMGRPHX_IFACECTRL2	0x11
+#define NMGRPHX_0x15		0x15
 #define NMGRPHX_PANELCTRL1	0x20
 #define NMGRPHX_PANELTYPE	0x21
 #define NMGRPHX_PANELCTRL2	0x25

@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-7, Rudolf)</h1></p>
+<p><h1>head (0.06-8, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
@@ -17,6 +17,7 @@
 	<li>Updated hardware cursor to be placed elsewhere in cardRAM (acc engine requirement); distorted mousepointers could be fixed by this also on some cards outthere;
 	<li>Updated workspace virtualsize restrictions for accelerated modes. Confirmed that the MagicGraph series (pre NM2200) engines can do upto and including 1600x1024 resolution. Assuming MagicMedia series (NM2200 and later) can do upto and including 1600x2048 for now. Modes above these resolutions are unaccelerated;
 	<li>Removed register area cloning bug in accelerant that prevented it from working with NM2070, NM2090 and NM2093 cards at all!
+	<li>Added various fixes to get Dell Latitude XPi (NM2070) working on it's panel, probably fixes various faults on other cards as well.
 </ul>
 Note:<br>
 Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
