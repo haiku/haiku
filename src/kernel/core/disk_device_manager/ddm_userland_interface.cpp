@@ -72,30 +72,35 @@ get_unmovable_descendants(KPartition *partition, partition_id *&unmovable,
 // validate_move_descendants
 static
 status_t
-validate_move_descendants(KPartition *partition, off_t moveBy, bool force,
+validate_move_descendants(KPartition *partition, off_t moveBy,
 						  bool markMovable = false)
 {
 	if (!partition)
 		return B_BAD_VALUE;
 	// check partition
+	bool uninitialized = partition->IsUninitialized();
 	KDiskSystem *diskSystem = partition->DiskSystem();
-	bool movable = (diskSystem || diskSystem->SupportsMoving(partition, NULL));
+	bool movable = (uninitialized || diskSystem
+					|| diskSystem->SupportsMoving(partition, NULL));
 	if (markMovable)
 		partition->SetAlgorithmData(movable);
-	if (movable) {
-		off_t offset = partition->Offset() + moveBy;
-		off_t newOffset = offset;
-		if (!diskSystem->ValidateMove(partition, &newOffset)
-			|| newOffset != offset) {
+	// moving partition is supported in principle, now check the new offset
+	if (!uninitialized) {
+		if (movable) {
+			off_t offset = partition->Offset() + moveBy;
+			off_t newOffset = offset;
+			if (!diskSystem->ValidateMove(partition, &newOffset)
+				|| newOffset != offset) {
+				return B_ERROR;
+			}
+		} else
 			return B_ERROR;
+		// check children
+		for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
+			status_t error = validate_move_descendants(child, moveBy);
+			if (error != B_OK)
+				return error;
 		}
-	} else if (!force)
-		return B_ERROR;
-	// check children
-	for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
-		status_t error = validate_move_descendants(child, moveBy, force);
-		if (error != B_OK)
-			return error;
 	}
 	return B_OK;
 }
@@ -142,7 +147,7 @@ validate_repair_partition(KPartition *partition, int32 changeCounter,
 static
 status_t
 validate_resize_partition(KPartition *partition, int32 changeCounter,
-						  off_t *size, bool resizeContents)
+						  off_t *size)
 {
 	if (!partition || !size
 		|| !check_shadow_partition(partition, changeCounter)
@@ -159,17 +164,19 @@ validate_resize_partition(KPartition *partition, int32 changeCounter,
 		return B_ENTRY_NOT_FOUND;
 	if (!parentDiskSystem->ValidateResizeChild(partition, size))
 		return B_ERROR;
+	// if contents is uninitialized, then there's no need to check anything
+	// more
+	if (partition->IsUninitialized())
+		return B_OK;
 	// get the child disk system and let it check the value
-	if (resizeContents) {
-		KDiskSystem *childDiskSystem = partition->DiskSystem();
-		if (!childDiskSystem)
-			return B_ENTRY_NOT_FOUND;
-		off_t childSize = *size;
-		// don't worry, if the content system desires to be smaller
-		if (!childDiskSystem->ValidateResize(partition, &childSize)
-			|| childSize > *size) {
-			return B_ERROR;
-		}
+	KDiskSystem *childDiskSystem = partition->DiskSystem();
+	if (!childDiskSystem)
+		return B_ENTRY_NOT_FOUND;
+	off_t childSize = *size;
+	// don't worry, if the content system desires to be smaller
+	if (!childDiskSystem->ValidateResize(partition, &childSize)
+		|| childSize > *size) {
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -177,7 +184,7 @@ validate_resize_partition(KPartition *partition, int32 changeCounter,
 // validate_move_partition
 status_t
 validate_move_partition(KPartition *partition, int32 changeCounter,
-						off_t *newOffset, bool force, bool markMovable = false)
+						off_t *newOffset, bool markMovable = false)
 {
 	if (!partition || !newOffset
 		|| !check_shadow_partition(partition, changeCounter)
@@ -196,7 +203,7 @@ validate_move_partition(KPartition *partition, int32 changeCounter,
 		return B_ERROR;
 	// let the concerned content disk systems check the value
 	return validate_move_descendants(partition,
-		partition->Offset() - *newOffset, force, markMovable);
+		partition->Offset() - *newOffset, markMovable);
 }
 
 // move_descendants
@@ -1012,7 +1019,7 @@ _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
 // _kern_validate_resize_partition
 status_t
 _kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
-								off_t *size, bool resizeContents)
+								off_t *size)
 {
 	if (!size)
 		return B_BAD_VALUE;
@@ -1024,14 +1031,13 @@ _kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	return validate_resize_partition(partition, changeCounter, size,
-									 resizeContents);
+	return validate_resize_partition(partition, changeCounter, size);
 }
 
 // _kern_validate_move_partition
 status_t
 _kern_validate_move_partition(partition_id partitionID, int32 changeCounter,
-							  off_t *newOffset, bool force)
+							  off_t *newOffset)
 {
 	if (!newOffset)
 		return B_BAD_VALUE;
@@ -1043,8 +1049,7 @@ _kern_validate_move_partition(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	return validate_resize_partition(partition, changeCounter, newOffset,
-									 force);
+	return validate_move_partition(partition, changeCounter, newOffset);
 }
 
 // _kern_validate_set_partition_name
@@ -1329,7 +1334,7 @@ _kern_repair_partition(partition_id partitionID, int32 changeCounter,
 // _kern_resize_partition
 status_t
 _kern_resize_partition(partition_id partitionID, int32 changeCounter,
-					   off_t size, bool resizeContents)
+					   off_t size)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1344,7 +1349,7 @@ _kern_resize_partition(partition_id partitionID, int32 changeCounter,
 		return B_OK;
 	off_t proposedSize = size;
 	status_t error = validate_resize_partition(partition, changeCounter,
-											   &proposedSize, resizeContents);
+											   &proposedSize);
 	if (error != B_OK)
 		return error;
 	if (proposedSize != size)
@@ -1357,12 +1362,10 @@ _kern_resize_partition(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_RESIZE_CHILD);
 	if (error != B_OK)
 		return error;
-	if (resizeContents) {
-		// implicit content disk system changes
+	// implicit content disk system changes
+	if (partition->DiskSystem()) {
 		error = partition->DiskSystem()->ShadowPartitionChanged(
 			partition, B_PARTITION_RESIZE);
-	} else {
-		partition->UninitializeContents();
 	}
 	return error;
 }
@@ -1370,7 +1373,7 @@ _kern_resize_partition(partition_id partitionID, int32 changeCounter,
 // _kern_move_partition
 status_t
 _kern_move_partition(partition_id partitionID, int32 changeCounter,
-					 off_t newOffset, bool force)
+					 off_t newOffset)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1385,7 +1388,7 @@ _kern_move_partition(partition_id partitionID, int32 changeCounter,
 		return B_OK;
 	off_t proposedOffset = newOffset;
 	status_t error = validate_move_partition(partition, changeCounter,
-											 &proposedOffset, force, true);
+											 &proposedOffset, true);
 	if (error != B_OK)
 		return error;
 	if (proposedOffset != newOffset)

@@ -125,11 +125,9 @@ bool _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
 								  int32 changeCounter);
 
 status_t _kern_validate_resize_partition(partition_id partitionID,
-										 int32 changeCounter, off_t *size,
-										 bool resizeContents);
+										 int32 changeCounter, off_t *size);
 status_t _kern_validate_move_partition(partition_id partitionID,
-									   int32 changeCounter, off_t *newOffset,
-									   bool force);
+									   int32 changeCounter, off_t *newOffset);
 status_t _kern_validate_set_partition_name(partition_id partitionID,
 										   int32 changeCounter, char *name);
 status_t _kern_validate_set_partition_content_name(partition_id partitionID,
@@ -172,9 +170,9 @@ status_t _kern_defragment_partition(partition_id partitionID,
 status_t _kern_repair_partition(partition_id partitionID, int32 changeCounter,
 								bool checkOnly);
 status_t _kern_resize_partition(partition_id partitionID, int32 changeCounter,
-								off_t size, bool resizeContents);
+								off_t size);
 status_t _kern_move_partition(partition_id partitionID, int32 changeCounter,
-							  off_t newOffset, bool force);
+							  off_t newOffset);
 status_t _kern_set_partition_name(partition_id partitionID,
 								  int32 changeCounter, const char *name);
 status_t _kern_set_partition_content_name(partition_id partitionID,
