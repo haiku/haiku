@@ -39,23 +39,24 @@
 /*----- General Errors ----------------------------------------*/
 enum {
 	B_NO_MEMORY = B_GENERAL_ERROR_BASE,
-	B_IO_ERROR,					
-	B_PERMISSION_DENIED,		
-	B_BAD_INDEX,				
-	B_BAD_TYPE,					
-	B_BAD_VALUE,				
-	B_MISMATCHED_VALUES,		
-	B_NAME_NOT_FOUND,			
-	B_NAME_IN_USE,			
-	B_TIMED_OUT,			
-    B_INTERRUPTED,           
-	B_WOULD_BLOCK,    
-    B_CANCELED,          
-	B_NO_INIT,			
-	B_BUSY,					
-	B_NOT_ALLOWED,				
+	B_IO_ERROR,
+	B_PERMISSION_DENIED,
+	B_BAD_INDEX,
+	B_BAD_TYPE,
+	B_BAD_VALUE,
+	B_MISMATCHED_VALUES,
+	B_NAME_NOT_FOUND,
+	B_NAME_IN_USE,
+	B_TIMED_OUT,
+    B_INTERRUPTED,
+	B_WOULD_BLOCK,
+    B_CANCELED,
+	B_NO_INIT,
+	B_BUSY,
+	B_NOT_ALLOWED,
+	B_BAD_DATA,
 
-	B_ERROR = -1,				
+	B_ERROR = -1,
 	B_OK = 0,
 	B_NO_ERROR = 0
 };
@@ -63,20 +64,20 @@ enum {
 /*-------------------------------------------------------------*/
 /*----- Kernel Kit Errors -------------------------------------*/
 enum {
-	B_BAD_SEM_ID = B_OS_ERROR_BASE,	
-	B_NO_MORE_SEMS,				
+	B_BAD_SEM_ID = B_OS_ERROR_BASE,
+	B_NO_MORE_SEMS,
 
 	B_BAD_THREAD_ID = B_OS_ERROR_BASE + 0x100,
-	B_NO_MORE_THREADS,			
-	B_BAD_THREAD_STATE,			
-	B_BAD_TEAM_ID,				
-	B_NO_MORE_TEAMS,			
+	B_NO_MORE_THREADS,
+	B_BAD_THREAD_STATE,
+	B_BAD_TEAM_ID,
+	B_NO_MORE_TEAMS,
 
 	B_BAD_PORT_ID = B_OS_ERROR_BASE + 0x200,
-	B_NO_MORE_PORTS,			
+	B_NO_MORE_PORTS,
 
 	B_BAD_IMAGE_ID = B_OS_ERROR_BASE + 0x300,
-	B_BAD_ADDRESS,				
+	B_BAD_ADDRESS,
 	B_NOT_AN_EXECUTABLE,
 	B_MISSING_LIBRARY,
 	B_MISSING_SYMBOL,
@@ -90,8 +91,8 @@ enum {
 enum
 {
 	B_BAD_REPLY = B_APP_ERROR_BASE,
-	B_DUPLICATE_REPLY,			
-	B_MESSAGE_TO_SELF,			
+	B_DUPLICATE_REPLY,
+	B_MESSAGE_TO_SELF,
 	B_BAD_HANDLER,
 	B_ALREADY_RUNNING,
 	B_LAUNCH_FAILED,
@@ -111,20 +112,20 @@ enum
 /*-------------------------------------------------------------*/
 /*----- Storage Kit/File System Errors ------------------------*/
 enum {
-	B_FILE_ERROR =B_STORAGE_ERROR_BASE,
+	B_FILE_ERROR = B_STORAGE_ERROR_BASE,
 	B_FILE_NOT_FOUND,	/* discouraged; use B_ENTRY_NOT_FOUND in new code*/
-	B_FILE_EXISTS,				
-	B_ENTRY_NOT_FOUND,			
-	B_NAME_TOO_LONG,			
-	B_NOT_A_DIRECTORY,			
-	B_DIRECTORY_NOT_EMPTY,		
-	B_DEVICE_FULL,				
-	B_READ_ONLY_DEVICE,			
-	B_IS_A_DIRECTORY,			
-	B_NO_MORE_FDS,				
-	B_CROSS_DEVICE_LINK,		
-	B_LINK_LIMIT,			    
-	B_BUSTED_PIPE,				
+	B_FILE_EXISTS,
+	B_ENTRY_NOT_FOUND,
+	B_NAME_TOO_LONG,
+	B_NOT_A_DIRECTORY,
+	B_DIRECTORY_NOT_EMPTY,
+	B_DEVICE_FULL,
+	B_READ_ONLY_DEVICE,
+	B_IS_A_DIRECTORY,
+	B_NO_MORE_FDS,
+	B_CROSS_DEVICE_LINK,
+	B_LINK_LIMIT,
+	B_BUSTED_PIPE,
 	B_UNSUPPORTED,
 	B_PARTITION_TOO_SMALL
 };
