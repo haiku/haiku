@@ -891,11 +891,10 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
-			printf("get input mute control size %d\n", *ioSize);
 			if (*ioSize < sizeof(int32))
 				goto err;
 			*ioSize = sizeof(int32);
-			static_cast<int32 *>(value)[0] = 0;
+			static_cast<int32 *>(value)[0] = !input->IsEnabled();
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
@@ -936,7 +935,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			if (size < output->GetOutputChannelCount() * sizeof(float))
 				goto err;
 			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-				output->SetOutputChannelGain(chan, GAIN_TO_DB(static_cast<float *>(value)[chan]));
+				output->SetOutputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
 		}
 	} else {
 		MixerInput *input;
@@ -947,16 +946,16 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
-			printf("set input mute control size %d\n", size);
 			if (size != sizeof(int32))
 				goto err;
+			input->SetEnabled(!static_cast<const int32 *>(value)[0]);
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
 			if (size < input->GetMixerChannelCount() * sizeof(float))
 				goto err;
 			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<float *>(value)[chan]));
+				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
 		}
 	}
 	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);

@@ -43,7 +43,6 @@ class AudioMixer :
 	// AudioMixer support
 					
 		void				UpdateParameterWeb();
-		void				MakeWebForInput(char *name, media_format format);
 		
 		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
 		

@@ -32,6 +32,9 @@ public:
 	uint32 GetInputChannelType(int channel);
 	void SetInputChannelGain(int channel, float gain);
 	float GetInputChannelGain(int channel);
+	
+	void SetEnabled(bool yesno);
+	bool IsEnabled();
 
 	// only for use by MixerCore
 	bool GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
@@ -61,6 +64,8 @@ private:
 	MixerCore		*fCore;
 	media_input		fInput;
 	ByteSwap		*fInputByteSwap;
+	
+	bool			fEnabled;
 
 	input_chan_info *fInputChannelInfo; // array
 	uint32			fInputChannelCount;
@@ -89,7 +94,7 @@ MixerInput::GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, con
 {
 	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
-	if (time > fLastDataAvailableTime)
+	if (time > fLastDataAvailableTime || !fEnabled)
 		return false;
 	
 	int32 offset = framepos % fMixBufferFrameCount;

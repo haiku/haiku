@@ -14,6 +14,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
  :	fCore(core),
  	fInput(input),
 	fInputByteSwap(0),
+	fEnabled(true),
 	fInputChannelInfo(0),
 	fInputChannelCount(0),
 	fInputChannelMask(0),
@@ -435,6 +436,18 @@ MixerInput::GetMixerChannelGain(int channel)
 	if (channel < 0 || channel >= fMixerChannelCount)
 		return 1.0;
 	return fMixerChannelInfo[channel].gain;
+}
+
+void
+MixerInput::SetEnabled(bool yesno)
+{
+	fEnabled = yesno;
+}
+
+bool
+MixerInput::IsEnabled()
+{
+	return fEnabled;
 }
 
 void
