@@ -1922,7 +1922,7 @@ ShowImageView::SetSlideShowDelay(float seconds)
 			settings->SetInt32("SlideShowDelay", fSlideShowDelay);
 			settings->Unlock();
 		}
-	}	
+	}
 }
 
 void
@@ -1984,8 +1984,10 @@ void
 ShowImageView::Rotate(int degree)
 {
 	if (degree == 90) {
+		fUndo.Clear();
 		DoImageOperation(ImageProcessor::kRotateClockwise);
 	} else if (degree == 270) {
+		fUndo.Clear();
 		DoImageOperation(ImageProcessor::kRotateAntiClockwise);
 	}
 }
@@ -1993,6 +1995,7 @@ ShowImageView::Rotate(int degree)
 void
 ShowImageView::Mirror(bool vertical) 
 {
+	fUndo.Clear();
 	if (vertical) {
 		DoImageOperation(ImageProcessor::kMirrorVertical);
 	} else {
@@ -2003,9 +2006,14 @@ ShowImageView::Mirror(bool vertical)
 void
 ShowImageView::Invert()
 {
-	DoImageOperation(ImageProcessor::kInvert);
+	if (fBitmap->ColorSpace() != B_CMAP8) {
+		// Only allow an invert operation if the
+		// bitmap color space is supported by the
+		// invert algorithm
+		fUndo.Clear();
+		DoImageOperation(ImageProcessor::kInvert);
+	}
 }
-
 
 void
 ShowImageView::SetIcon(bool clear, icon_size which)
