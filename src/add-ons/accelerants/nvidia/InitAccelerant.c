@@ -291,13 +291,18 @@ error0:
 void UNINIT_ACCELERANT(void)
 {
 	if (accelerantIsClone)
+	{
 		LOG(4,("UNINIT_ACCELERANT: shutting down clone accelerant.\n"));
+	}
 	else
+	{
 		LOG(4,("UNINIT_ACCELERANT: shutting down primary accelerant.\n"));
 
-	/*delete benaphore*/
-	DELETE_BEN(si->engine.lock);
-	DELETE_BEN(si->overlay.lock);
+		/* delete benaphores ONLY if we are the primary accelerant */
+		DELETE_BEN(si->engine.lock);
+		DELETE_BEN(si->overlay.lock);
+	}
+
 	/* free our mode list area */
 	delete_area(my_mode_list_area);
 	/* paranoia */
