@@ -49,7 +49,7 @@ vorbisDecoder::Setup(media_format *inputFormat,
 {
 	if ((inputFormat->type != B_MEDIA_UNKNOWN_TYPE)
 	    && (inputFormat->type != B_MEDIA_ENCODED_AUDIO)) {
-		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis");
+		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis\n");
 		return B_ERROR;
 	}
 	if (inputFormat->MetaDataSize() == sizeof(ogg_packet)) {
@@ -58,7 +58,7 @@ vorbisDecoder::Setup(media_format *inputFormat,
 			ogg_packet * packet = (ogg_packet*)inputFormat->MetaData();
 			// parse header packet
 			if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-				TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
+				TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
 				return B_ERROR;
 			}
 			fHeaderPacketParsed = true;
@@ -84,7 +84,7 @@ vorbisDecoder::InitializeInput(media_format *ioEncodedFormat)
 		}
 		// parse header packet
 		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
+			TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
 			return B_ERROR;
 		}
 		fHeaderPacketParsed = true;
@@ -97,7 +97,7 @@ vorbisDecoder::InitializeInput(media_format *ioEncodedFormat)
 		}
 		// parse comment packet
 		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment");
+			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment\n");
 			return B_ERROR;
 		}
 		fCommentPacketParsed = true;
@@ -110,7 +110,7 @@ vorbisDecoder::InitializeInput(media_format *ioEncodedFormat)
 		}
 		// parse codebook packet
 		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook");
+			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook\n");
 			return B_ERROR;
 		}
 		// initialize decoder
