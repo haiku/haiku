@@ -60,6 +60,12 @@
 #define PSRV_SPOOL_ATTR_STATUS		"_spool/Status"
 #define PSRV_SPOOL_ATTR_ERRCODE		"_spool/_errorcode"
 
+// spool file status attribute values
+#define PSRV_JOB_STATUS_                ""
+#define PSRV_JOB_STATUS_WAITING         "Waiting"
+#define PSRV_JOB_STATUS_PROCESSING      "Processing"
+#define PSRV_JOB_STATUS_FAILED          "Failed"
+
 // printer attributes
 #define PSRV_PRINTER_ATTR_DRV_NAME			"Driver Name"
 #define PSRV_PRINTER_ATTR_PRT_NAME			"Printer Name"
