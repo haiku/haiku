@@ -13,38 +13,51 @@
 #if !defined(_AGP_H_)
 #define _AGP_H_
 
-#include <Drivers.h>
+#include <bus_manager.h>
 
-/* The API for driver access is C, not C++ */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-//driver IOCTRL argument:
-typedef struct {
+/* -----
+	agp device info
+----- */
+
+typedef struct agp_info {
+	ushort	vendor_id;				/* vendor id */
+	ushort	device_id;				/* device id */
+	uchar	bus;					/* bus number */
+	uchar	device;					/* device number on bus */
+	uchar	function;				/* function number in device */
+	uchar	class_sub;				/* specific device function */
+	uchar	class_base;				/* device type (display vs host bridge) */
 	struct
 	{
-		ushort	vendor_id,	/* host bridge vendor id */
-				device_id;	/* host bridge device id */
-	} dev;
-	struct
-	{
-		uint32	agp_cap_id,	/* AGP capability register as defined in the AGP standard */
-				agp_stat,	/* AGP STATUS register as defined in the AGP standard */
-				agp_cmd;	/* AGP COMMAND register as defined in the AGP standard */
-	}config;
-	status_t	status;		/* hostbridge usability status (B_OK if usable, B_ERROR if it
-							 * did not respond according to the AGP standard */
+		uint32	agp_cap_id;	/* AGP capability register as defined in the AGP standard */
+		uint32	agp_stat;	/* AGP STATUS register as defined in the AGP standard */
+		uint32	agp_cmd;	/* AGP COMMAND register as defined in the AGP standard */
+	} interface;
+	status_t	status;		/* B_OK if usable, B_ERROR if device did not respond
+							 * according to the AGP standard */
 } agp_info;
 
+typedef struct agp_module_info agp_module_info;
 
-//driver IOCTRL operation codes:
-enum
-{
-	GET_CONFIG = B_DEVICE_OP_CODES_END+20001, 
-    SET_CONFIG,
+struct agp_module_info {
+	bus_manager_info	binfo;
+
+	long			(*get_nth_agp_info) (
+						long		index,	/* index into agp device table */
+						agp_info 	*info	/* caller-supplied buffer for info */
+					);
+	void			(*enable_agp) (
+						uint32	*command	/* max. mode to set */
+					);
+	//fixme: GART and APERTURE stuff is lacking for now, add here...
 };
+
+#define	B_AGP_MODULE_NAME		"bus_managers/agp/v0"
 
 
 /* ---
