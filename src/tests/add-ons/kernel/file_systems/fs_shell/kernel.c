@@ -187,7 +187,7 @@ static void     dec_vnode(vnode *vn, char r);
 static int      compare_vnode(vnode *vna, vnode *vnb);
 
 static nspace * nsidtons(nspace_id nsid);
-static int      alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp);
+//static int      alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp);
 
 static int      is_root(vnode *root, vnode **mount);
 static int      is_mount_vnode(vnode *mount, vnode **root);
@@ -197,14 +197,14 @@ static ofile *      get_fd(bool kernel, int fd, int type);
 static int          put_fd(ofile *f);
 static int          new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe);
 static int          remove_fd(bool kernel, int fd, int type);
-static int          get_coe(bool kernel, int fd, int type, bool *coe);
-static int          set_coe(bool kernel, int fd, int type, bool coe);
-static int          get_omode(bool kernel, int fd, int type, int *omode);
+//static int          get_coe(bool kernel, int fd, int type, bool *coe);
+//static int          set_coe(bool kernel, int fd, int type, bool coe);
+//static int          get_omode(bool kernel, int fd, int type, int *omode);
 static int          invoke_close(ofile *f);
 static int          invoke_free(ofile *f);
 
 static fdarray *    new_fds(int num);
-static int          free_fds(fdarray *fds);
+//static int          free_fds(fdarray *fds);
 
 
 #define BITSZ(n)        (((n) + 31) & ~31)
@@ -461,7 +461,6 @@ init_vnode_layer(void)
     fsystem     *fs;
     nspace      *ns;
     void        *data;
-    size_t      sz;
     extern vnode_ops rootfs;  /* XXXdbg */
 
     /*
@@ -970,7 +969,6 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
     void            *cookie;
     ofile           *f;
     int             nfd;
-    fdarray         *fds;
     op_create       *opc;
     op_open         *opo;
     op_free_cookie  *opf;
@@ -1066,12 +1064,9 @@ sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *n
 {
     int             err;
     vnode           *vn;
-    vnode_id        vnid;
     void            *cookie;
     ofile           *f;
     int             nfd;
-    fdarray         *fds;
-    op_create       *opc;
     op_open         *opo;
     op_free_cookie  *opf;
 
@@ -1901,7 +1896,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 	int		err;
 	nspace	*ns;
 	fsystem	*fs;
-	vnode	*root, *vn, *mount;
+	vnode	*root;
 
 	printf("sys_open_query() -- start\n");
 	err = get_file_fd(TRUE, fd, path, TRUE, &root);
@@ -1931,7 +1926,7 @@ sys_close_query(bool kernel, int fd, const char *path, void *cookie)
 	int		err;
 	nspace	*ns;
 	fsystem	*fs;
-	vnode	*root, *vn, *mount;
+	vnode	*root;
 
     err = get_file_fd(TRUE, fd, path, TRUE, &root);
     if (err)
@@ -1962,7 +1957,7 @@ sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent
 	int		err;
 	nspace	*ns;
 	fsystem	*fs;
-	vnode	*root, *vn, *mount;
+	vnode	*root;
 	long	num;
 
     err = get_file_fd(TRUE, fd, path, TRUE, &root);
@@ -2122,11 +2117,8 @@ parse_path_vn(nspace_id nsid, vnode_id vnid, char **pstart, int eatsymlink,
             return err;
     }
     return parse_path(bvn, pstart, path, eatsymlink, vnp);
-
-error1:
-    dec_vnode(bvn, FALSE);
-    return err;
 }
+
 
 static int
 parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
@@ -2336,8 +2328,8 @@ restart:
 		else {
 			printf("new_vnode(): vnode already exists with the same data (vnode id = %Ld)\n", vnid);
 			vn->rcnt++;
-			return;
         	UNLOCK(vnlock);
+			return 0;
 		}
 	}
 
@@ -2446,7 +2438,7 @@ dec_vnode(vnode *vn, char r)
 
     LOCK(vnlock);
     vn->rcnt--;
-    if (vn->rcnt == 0)
+    if (vn->rcnt == 0) {
         if (vn->remove) {
             vn->busy = TRUE;
             move_vnode(vn, LOCKED_LIST);
@@ -2463,6 +2455,7 @@ dec_vnode(vnode *vn, char r)
                 move_vnode(ovn, FREE_LIST);
             }
         }
+	}
     UNLOCK(vnlock);
 
     return;
@@ -2514,12 +2507,12 @@ move_vnode(vnode *vn, int list)
     if (vn->list.prev)
         vn->list.prev->list.next = vn->list.next;
     else
-        lists[vn->inlist].head = vn->list.next;
+        lists[(int)vn->inlist].head = vn->list.next;
     if (vn->list.next)
         vn->list.next->list.prev = vn->list.prev;
     else
-        lists[vn->inlist].tail = vn->list.prev;
-    lists[vn->inlist].num--;
+        lists[(int)vn->inlist].tail = vn->list.prev;
+    lists[(int)vn->inlist].num--;
     vn->inlist = list;
     vn->list.next = NULL;
     vn->list.prev = lists[list].tail;
@@ -2579,7 +2572,7 @@ load_vnode(nspace_id nsid, vnode_id vnid, char r, vnode **vnp)
     LOCK(vnlock);
     while (TRUE) {
         vn = lookup_vnode(nsid, vnid);
-        if (vn)
+        if (vn) {
             if (vn->busy) {
                 UNLOCK(vnlock);
                 snooze(SLEEP_TIME);
@@ -2587,6 +2580,7 @@ load_vnode(nspace_id nsid, vnode_id vnid, char r, vnode **vnp)
                 continue;
             } else
                 break;
+		}
 
         vn = steal_vnode(FREE_LIST);
         if (!vn) {
@@ -2933,6 +2927,7 @@ remove_fd(bool kernel, int fd, int type)
     return err;
 }
 
+#if 0
 static int
 get_coe(bool kernel, int fd, int type, bool *coe)
 {
@@ -3004,6 +2999,7 @@ get_omode(bool kernel, int fd, int type, int *omode)
     UNLOCK(fds->lock);
     return EBADF;
 }
+#endif
 
 static int
 invoke_close(ofile *f)
@@ -3068,6 +3064,7 @@ nsidtons(nspace_id nsid)
     return ns;
 }
 
+#if 0
 static int
 alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp)
 {
@@ -3104,7 +3101,7 @@ error2:
 error1:
     return err;
 }
-
+#endif
 
 
 /*
@@ -3217,6 +3214,7 @@ new_fds(int num)
     return fds;
 }
 
+#if 0
 static int
 free_fds(fdarray *fds)
 {
@@ -3238,7 +3236,7 @@ free_fds(fdarray *fds)
     free(fds);
     return 0;
 }
-
+#endif
 
 // dummies
 

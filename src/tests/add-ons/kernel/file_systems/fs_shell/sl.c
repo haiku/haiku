@@ -282,8 +282,8 @@ void *SearchSL(SkipList l, void *key)
 
 void DoForSL(SkipList l, int (*function)(), void *arg)
 {
-  register SLNode p,q, fix;
-  register int k,m, ret;
+  register SLNode p, q, fix;
+  register int k, ret;
   SLNode save[MaxNumberOfLevels], who[MaxNumberOfLevels];
   void (*freeitem)() = l->freeitem;
   
@@ -347,7 +347,7 @@ void DoForSL(SkipList l, int (*function)(), void *arg)
 void DoForRangeSL(SkipList l, void *key, int (*compare)(), int (*func)(),
           void *arg)
 {
-  register int k,m;
+  register int k;
   SLNode update[MaxNumberOfLevels];
   register SLNode p,q;
   void (*freeitem)() = l->freeitem;

@@ -35,12 +35,12 @@ tracker_query_file(dev_t device, ino_t parent, char *name)
 	sys_close(true, fd);
 }
 
-
+#if 0
 static void
 tracker_scan_files(void)
 {
 }
-
+#endif
 
 extern "C" int32
 tracker_loop(void *data)
@@ -74,4 +74,5 @@ tracker_loop(void *data)
 	}
 
 	delete_port(gTrackerPort);
+	return B_OK;
 }

@@ -28,7 +28,6 @@ char **
 build_argv(char *str, int *argc)
 {
     int table_size = 16, _argc;
-    char *ptr=str;
     char **argv;
 
     if (argc == NULL)

@@ -93,7 +93,6 @@ device_is_removeable(int fd)
 #ifdef unix
     return 0;   /* XXXdbg should do an ioctl or something */
 #else
-    struct stat     st;
     device_geometry dg;
 
     if (ioctl(fd, B_GET_GEOMETRY, &dg) < 0) {
@@ -335,6 +334,7 @@ system_time(void)
 #endif  /* unix */
 
 #ifdef __BEOS__
+#include <KernelExport.h>
 
 void
 dprintf(const char *format, ...)

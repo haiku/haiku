@@ -651,7 +651,7 @@ rootfs_readdir(void *_ns, void *_node, void *_cookie, long *num,
     nspace              *ns;
     vnode               *node;
     dirpos              *cookie;
-    char                *e, *q;
+    char                *e;
     struct my_dirent    *p;
     long                 i;
     vnode               *vn;
@@ -699,8 +699,9 @@ rootfs_readdir(void *_ns, void *_node, void *_cookie, long *num,
     }
     if ((cookie->pos > 2) && (i > 0))
         strcpy(cookie->name, last);
+
     *num = i;
-exit:
+
     UNLOCK(cookie->lock);
     UNLOCK(ns->lock);
     return 0;
