@@ -166,12 +166,13 @@ ShowImageWindow::UpdateRecentDocumentsMenu()
 	be_roster->GetRecentDocuments(&list, 20, NULL, APP_SIG);
 	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
 		BEntry entry(&ref);
-		entry.GetName(name);
-		msg = new BMessage(B_REFS_RECEIVED);
-		msg->AddRef("refs", &ref);
-		item =  new BMenuItem(name, msg, 0, 0);
-		fpOpenMenu->AddItem(item);
-		item->SetTarget(be_app, NULL);
+		if (entry.GetName(name) == B_OK) {
+			msg = new BMessage(B_REFS_RECEIVED);
+			msg->AddRef("refs", &ref);
+			item =  new BMenuItem(name, msg, 0, 0);
+			fpOpenMenu->AddItem(item);
+			item->SetTarget(be_app, NULL);
+		}
 	}
 }
 
@@ -209,13 +210,16 @@ ShowImageWindow::BuildViewMenu(BMenu *pmenu)
 	AddItemMenu(pmenu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
 	AddItemMenu(pmenu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
+	AddItemMenu(pmenu, "Scale Bilinear", MSG_SCALE_BILINEAR, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
+	MarkMenuItem(pmenu, MSG_FULL_SCREEN, fFullScreen);
 	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
 	MarkMenuItem(pmenu, MSG_SHOW_CAPTION, fShowCaption);
 
 	if (fpImageView) {
+		MarkMenuItem(pmenu, MSG_SCALE_BILINEAR, fpImageView->GetScaleBilinear());
 		bool resize = fpImageView->GetResizeToViewBounds();
 		MarkMenuItem(pmenu, MSG_FIT_TO_WINDOW_SIZE, resize);
 		EnableMenuItem(pmenu, MSG_ORIGINAL_SIZE, !resize);
@@ -639,6 +643,9 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 		case MSG_ORIGINAL_SIZE:
 			fpImageView->SetZoom(1.0);
+			break;
+		case MSG_SCALE_BILINEAR:
+			fpImageView->SetScaleBilinear(ToggleMenuItem(pmsg->what));
 			break;
 					
 		default:

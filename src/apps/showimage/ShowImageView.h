@@ -35,6 +35,8 @@
 #include <String.h>
 #include <TranslatorRoster.h>
 
+#include "Filter.h"
+
 class ShowImageView : public BView {
 public:
 	ShowImageView(BRect rect, const char *name, uint32 resizingMode,
@@ -52,6 +54,8 @@ public:
 	void GetName(BString *name);
 	void GetPath(BString *name);
 	void FlushToLeftTop();
+	void SetScaleBilinear(bool b);
+	bool GetScaleBilinear() { return fScaleBilinear; }
 	
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
@@ -106,11 +110,12 @@ private:
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
 	void AddToRecentDocuments();
+	void DeleteBitmap();
 	int32 BytesPerPixel(color_space cs) const;
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
 	void DoImageOperation(image_operation op);
-	BRect AlignBitmap() const;
+	BRect AlignBitmap();
 	void Setup(BRect r);
 	BPoint ImageToView(BPoint p) const;
 	BPoint ViewToImage(BPoint p) const;
@@ -135,6 +140,8 @@ private:
 	void DrawBorder(BRect border);
 	void DrawCaption();
 	void DrawSelectionBox(BRect &rect);
+	Scaler* GetScaler();
+	void DrawImage(BRect rect);
 	float LimitToRange(float v, orientation o, bool absolute);
 	void ScrollRestricted(float x, float y, bool absolute);
 	void ScrollRestrictedTo(float x, float y);
@@ -147,6 +154,8 @@ private:
 	int32 fDocumentCount;
 	BBitmap *fpBitmap;
 	float fZoom;
+	bool fScaleBilinear;
+	Scaler* fScaler;
 	bool fResizeToViewBounds;
 	alignment fHAlignment;
 	vertical_alignment fVAlignment;

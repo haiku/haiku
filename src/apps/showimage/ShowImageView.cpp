@@ -167,6 +167,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShowCaption = false;
 	fZoom = 1.0;
 	fMovesImage = false;
+	fScaleBilinear = false;
+	fScaler = NULL;
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -176,8 +178,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 ShowImageView::~ShowImageView()
 {
-	delete fpBitmap;
-	fpBitmap = NULL;
+	DeleteBitmap();
 }
 
 bool
@@ -225,10 +226,20 @@ ShowImageView::AddToRecentDocuments()
 }
 
 void
-ShowImageView::SetImage(const entry_ref *pref)
+ShowImageView::DeleteBitmap()
 {
+	if (fScaler) {
+		delete fScaler; 
+		fScaler = NULL;
+	}
 	delete fpBitmap;
 	fpBitmap = NULL;
+}
+
+void
+ShowImageView::SetImage(const entry_ref *pref)
+{
+	DeleteBitmap();
 	fbHasSelection = false;
 	fMakesSelection = false;
 	
@@ -356,13 +367,21 @@ ShowImageView::FlushToLeftTop()
 }
 
 void
+ShowImageView::SetScaleBilinear(bool s)
+{
+	if (fScaleBilinear != s) {
+		fScaleBilinear = s; Invalidate();
+	}
+}
+
+void
 ShowImageView::AttachedToWindow()
 {
 	FixupScrollBars();
 }
 
 BRect
-ShowImageView::AlignBitmap() const
+ShowImageView::AlignBitmap()
 {
 	BRect rect(fpBitmap->Bounds());
 	float width, height;
@@ -374,20 +393,22 @@ ShowImageView::AlignBitmap() const
 		s = width / rect.Width();
 			
 		if (s * rect.Height() <= height) {
+			fZoom = s;
 			rect.right = width;
 			rect.bottom = s * rect.Height();
 			// center vertically
 			rect.OffsetBy(0, (height - rect.Height()) / 2);
 		} else {
-			rect.right = height / rect.Height() * rect.Width();
+			fZoom = height / rect.Height();
+			rect.right = fZoom * rect.Width();
 			rect.bottom = height;
 			// center horizontally
 			rect.OffsetBy((width - rect.Width()) / 2, 0);
 		}
 	} else {
 		// zoom image
-		rect.right = (rect.right+1)*fZoom-1; 
-		rect.bottom = (rect.bottom+1)*fZoom-1;
+		rect.right = ((int)(rect.right+1)*fZoom)-1; 
+		rect.bottom = ((int)(rect.bottom+1)*fZoom)-1;
 		// align
 		switch (fHAlignment) {
 			case B_ALIGN_CENTER:
@@ -423,11 +444,8 @@ ShowImageView::Setup(BRect rect)
 {
 	fLeft = rect.left;
 	fTop = rect.top;
-	fScaleX = rect.Width() / fpBitmap->Bounds().Width();
-	fScaleY = rect.Height() / fpBitmap->Bounds().Height();
-// XXX Is Width/Height off by one?
-//	fScaleX = (rect.Width()+1) / (fpBitmap->Bounds().Width()+1);
-//	fScaleY = (rect.Width()+1) / (fpBitmap->Bounds().Height()+1);
+	fScaleX = (rect.Width()+1.0) / (fpBitmap->Bounds().Width()+1.0);
+	fScaleY = (rect.Height()+1.0) / (fpBitmap->Bounds().Height()+1.0);
 }
 
 BPoint
@@ -511,6 +529,32 @@ ShowImageView::DrawCaption()
 	PopState();
 }
 
+Scaler*
+ShowImageView::GetScaler()
+{
+	if (fScaler == NULL || fScaler->Scale() != fZoom) {
+		delete fScaler;
+		BMessenger msgr(this, Window());
+		fScaler = new Scaler(fpBitmap, fZoom, msgr, MSG_INVALIDATE);
+		fScaler->Start();
+	}
+	return fScaler;
+}
+
+void
+ShowImageView::DrawImage(BRect rect)
+{
+	if (fScaleBilinear) {
+		Scaler* scaler = GetScaler();
+		if (scaler != NULL && scaler->GetBitmap() != NULL && !scaler->IsRunning()) {
+			BBitmap* bitmap = scaler->GetBitmap();
+			DrawBitmap(bitmap, BPoint(rect.left, rect.top));
+			return;
+		}
+	}
+	DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
+}
+
 void
 ShowImageView::Draw(BRect updateRect)
 {
@@ -527,8 +571,8 @@ ShowImageView::Draw(BRect updateRect)
 			// Draw black rectangle around image
 			StrokeRect(border);
 			
-			// Draw image	
-			DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
+			// Draw image
+			DrawImage(rect);
 						
 			if (fShowCaption && !fMovesImage) {
 				// to avoid flickering, disabled during moving with mouse
@@ -1020,6 +1064,9 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 		case B_MOUSE_WHEEL_CHANGED:
 			MouseWheelChanged(pmsg);
 			break;
+		case MSG_INVALIDATE:
+			Invalidate();
+			break;
 		default:
 			BView::MessageReceived(pmsg);
 			break;
@@ -1284,6 +1331,9 @@ ShowImageView::FirstFile()
 void
 ShowImageView::SetZoom(float zoom)
 {
+	if (fScaleBilinear && fZoom != zoom) {
+		delete fScaler; fScaler = NULL;
+	}
 	fZoom = zoom;
 	FixupScrollBars();
 	Invalidate();
@@ -1453,7 +1503,8 @@ ShowImageView::DoImageOperation(image_operation op)
 	}
 
 	// set new bitmap
-	delete fpBitmap; fpBitmap = bm; 
+	DeleteBitmap();
+	fpBitmap = bm; 
 	// remove selection
 	fbHasSelection = false;
 	Notify(NULL);	

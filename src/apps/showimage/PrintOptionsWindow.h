@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // PrintOptionsWindow
-// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
+// Written by Michael Pfeiffer
 //
 // PrintOptionsWindow.h
 //

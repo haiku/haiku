@@ -8,6 +8,8 @@ App ShowImage : ShowImageApp.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 	PrintOptionsWindow.cpp
+	Filter.cpp
+	Scale.cpp
 	;
 
 LinkSharedOSLibs ShowImage : be tracker translation ;

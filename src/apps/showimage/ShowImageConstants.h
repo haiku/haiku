@@ -67,6 +67,8 @@ const uint32 MSG_PRINT              = 'mPRT';
 const uint32 MSG_ZOOM_IN            = 'mZIN';
 const uint32 MSG_ZOOM_OUT           = 'mZOU';
 const uint32 MSG_ORIGINAL_SIZE      = 'mOSZ';
+const uint32 MSG_INVALIDATE         = 'mIVD';
+const uint32 MSG_SCALE_BILINEAR     = 'mSBL';
 
 extern const char *APP_SIG;
 
