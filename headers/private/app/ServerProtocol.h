@@ -1,6 +1,12 @@
 #ifndef _APPSERVER_PROTOCOL_
 #define _APPSERVER_PROTOCOL_
 
+// Server port names. The input port is the port which is used to receive
+// input messages from the Input Server. The other is the "main" port for
+// the server and is utilized mostly by BApplication objects.
+#define SERVER_PORT_NAME "OBappserver"
+#define SERVER_INPUT_PORT "OBinputport"
+
 #define CREATE_APP 'drca'
 #define DELETE_APP 'drda'
 #define QUIT_APP 'srqa'
@@ -13,14 +19,6 @@
 #define HIDE_WINDOW 'drhw'
 #define QUIT_WINDOW 'srqw'
 
-#define SERVER_PORT_NAME "OBappserver"
-#define SERVER_INPUT_PORT "OBinputport"
-#define SERVER_SETTINGS_DIR "/boot/home/config/settings/app_server/"
-#define COLOR_SET_DIR "/boot/home/config/settings/app_server/color_sets/"
-#define DECORATORS_DIR "/boot/home/config/add-ons/decorators/"
-#define SERVER_FONT_LIST "/boot/home/config/settings/app_server/fontlist"
-#define COLOR_SETTINGS_NAME "system_colors"
-
 // Used for quick replies from the app_server
 #define SERVER_TRUE 'svtr'
 #define SERVER_FALSE 'svfl'
@@ -32,7 +30,6 @@
 #define GET_STYLE_ID 'stid'
 #define GET_STYLE_FOR_FACE 'stff'
 
-// TODO: Eventually remove
 // This will be modified. Currently a kludge for the input server until
 // BScreens are implemented by the IK Taeam
 #define GET_SCREEN_MODE 'gsmd'
@@ -42,12 +39,17 @@
 #define SET_DECORATOR 'sdec'
 #define GET_DECORATOR 'gdec'
 
+// Cursor-related communications
+#define SET_CURSOR_DATA 'sscd'
 #define SET_CURSOR_BCURSOR 'sscb'
 #define SET_CURSOR_BBITMAP 'sscB'
 #define SHOW_CURSOR 'srsc'
 #define HIDE_CURSOR 'srhc'
 #define OBSCURE_CURSOR 'sroc'
-#define QUERY_CURSOR_HIDDEN 'qcuh'
+#define QUERY_CURSOR_HIDDEN 'sqch'
+
+#define BEGIN_RECT_TRACKING 'sbrt'
+#define END_RECT_TRACKING 'sert'
 
 #define GFX_COUNT_WORKSPACES 'gcws'
 #define GFX_SET_WORKSPACE_COUNT 'ggwc'
@@ -111,9 +113,6 @@
 #define LAYER_RESIZE 'lyre'
 #define LAYER_INVALIDATE 'lyin'
 #define LAYER_DRAW 'lydr'
-
-#define BEGIN_RECT_TRACKING 'rtbg'
-#define END_RECT_TRACKING 'rten'
 
 #define VIEW_GET_TOKEN 'vgtk'
 #define VIEW_ADD 'vadd'
