@@ -30,10 +30,10 @@ typedef status_t (*device_select_hook) (void *cookie, uint8 event, uint32 ref,
                                         selectsync *sync);
 typedef status_t (*device_deselect_hook) (void *cookie, uint8 event,
                                           selectsync *sync);
-typedef status_t (*device_readv_hook) (void *cookie, off_t position, const iovec *vec,
-					size_t count, size_t *numBytes);
-typedef status_t (*device_writev_hook) (void *cookie, off_t position, const iovec *vec,
-					size_t count, size_t *numBytes);
+typedef status_t (*device_read_pages_hook)(void *deviceCookie, off_t position, const iovec *vec,
+					size_t count, size_t *_numBytes);
+typedef status_t (*device_write_pages_hook) (void *deviceCookie, off_t position, const iovec *vec,
+					size_t count, size_t *_numBytes);
 
 #define	B_CUR_DRIVER_API_VERSION	2
 
@@ -43,16 +43,16 @@ typedef status_t (*device_writev_hook) (void *cookie, off_t position, const iove
 --- */
 
 typedef struct {
-	device_open_hook		open;		/* called to open the device */
-	device_close_hook		close;		/* called to close the device */
-	device_free_hook		free;		/* called to free the cookie */
-	device_control_hook		control;	/* called to control the device */
-	device_read_hook		read;		/* reads from the device */
-	device_write_hook		write;		/* writes to the device */
-	device_select_hook		select;		/* start select */
-	device_deselect_hook	deselect;	/* stop select */
-	device_readv_hook		readv;		/* scatter-gather read from the device */
-	device_writev_hook		writev;		/* scatter-gather write to the device */
+	device_open_hook		open;			/* called to open the device */
+	device_close_hook		close;			/* called to close the device */
+	device_free_hook		free;			/* called to free the cookie */
+	device_control_hook		control;		/* called to control the device */
+	device_read_hook		read;			/* reads from the device */
+	device_write_hook		write;			/* writes to the device */
+	device_select_hook		select;			/* start select */
+	device_deselect_hook	deselect;		/* stop select */
+	device_read_pages_hook	read_pages;		/* scatter-gather physical read from the device */
+	device_write_pages_hook	write_pages;	/* scatter-gather physical write to the device */
 } device_hooks;
 
 status_t		init_hardware(void);

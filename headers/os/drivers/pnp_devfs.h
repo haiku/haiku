@@ -40,8 +40,8 @@ typedef struct pnp_devfs_driver_info {
 	device_write_hook		write;			// writes to the device
 	device_select_hook		select;			// start select (can be NULL)
 	device_deselect_hook	deselect;		// stop select (can be NULL)
-	device_readv_hook		readv;			// scatter-gather read from the device (can be NULL)
-	device_writev_hook		writev;			// scatter-gather write to the device (can be NULL)
+	device_read_pages_hook	read_pages;		// scatter-gather read from the device (can be NULL)
+	device_write_pages_hook	write_pages;	// scatter-gather write to the device (can be NULL)
 } pnp_devfs_driver_info;
 
 
