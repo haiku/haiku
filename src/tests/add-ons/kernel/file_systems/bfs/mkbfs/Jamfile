@@ -1,0 +1,53 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems bfs mkbfs ;
+
+SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+{
+	# set CHECK_MALLOC to something when doing tests against memory corruption
+	local malloc_debug_defines ;
+	local malloc_debug_flags ;
+	if $(CHECK_MALLOC) {
+		malloc_debug_defines = _NO_INLINE_ASM ;
+		malloc_debug_flags = -fcheck-memory-usage ;
+	}
+
+	local defines = [ FDefines USER DEBUG
+		#BFS_BIG_ENDIAN_ONLY
+		$(malloc_debug_defines) ] ;
+	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
+}
+
+SimpleTest mkbfs
+	:
+	mkbfs.cpp
+
+	cache.c
+	kernel.c
+	sl.c
+	sysdep.c
+	rootfs.c
+
+	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
+	BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
+	Debug.cpp
+	:
+	;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles
+		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
+		BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
+		Debug.cpp
+	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+
+SEARCH on [ FGristFiles
+		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
+		sysdep.c hexdump.c argv.c
+	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
