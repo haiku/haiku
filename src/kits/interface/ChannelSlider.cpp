@@ -317,6 +317,7 @@ const BBitmap *
 BChannelSlider::ThumbFor(int32 channel, bool pressed)
 {
 	// TODO: Implement
+	return NULL;
 }
 
 

@@ -5,7 +5,13 @@
 
 
 #include <ChannelControl.h>
-#include <Message.h>
+#include <PropertyInfo.h>
+
+
+static property_info // TODO: Finish this
+sPropertyInfo[] = {	
+	{0}
+};
 
 
 BChannelControl::BChannelControl(BRect frame, const char *name, const char *label,
@@ -23,7 +29,7 @@ BChannelControl::BChannelControl(BRect frame, const char *name, const char *labe
 	memset(_m_channel_min, 0, sizeof(int32) * channel_count);
 	
 	_m_channel_max = new int32[channel_count];
-	memset(_m_channel_max, 64, sizeof(int32) * channel_count);
+	memset(_m_channel_max, 100, sizeof(int32) * channel_count);
 	
 	_m_channel_val = new int32[channel_count];
 	memset(_m_channel_val, 0, sizeof(int32) * channel_count);
@@ -106,7 +112,15 @@ BChannelControl::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifie
 status_t
 BChannelControl::GetSupportedSuites(BMessage *data)
 {
-	return B_ERROR;
+	if (data == NULL)
+		return B_BAD_VALUE;
+	
+	data->AddString("suites", "suite/vnd.Be-channel-control");
+
+	BPropertyInfo propertyInfo(sPropertyInfo);
+	data->AddFlat("messages", &propertyInfo);
+
+	return BControl::GetSupportedSuites(data);
 }
 
 
