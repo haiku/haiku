@@ -1130,6 +1130,14 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 					error = childEntry.GetPath(&childPath);
 					if (!error)
 						error = childPath.InitCheck();
+					// Skip symlinks until we add symlink support; this
+					// allows graceful skipping of them later on instead
+					// of stopping with a fatal error
+					struct stat childStats;
+					if (!error)
+						error = childEntry.GetStat(&childStats);
+					if (!error && S_ISLNK(childStats.st_mode))
+						continue;					
 					if (!error) {
 						_PrintUpdate(VERBOSITY_MEDIUM, "found child: `%s'", childPath.Leaf());
 						entries++;
@@ -1296,10 +1304,9 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 						} else if (S_ISLNK(childStats.st_mode)) {
 							// Symlink
 							// For now, skip it
-							_PrintError("No symlink support yet; please remove the following symlink and try again: `%s'",
+							_PrintWarning("No symlink support yet; skipping symlink: `%s'",
 							              childImagePath.c_str());
-							error = B_ERROR;
-							break;
+							continue;
 						}
 				
 						// Write iso direntry
