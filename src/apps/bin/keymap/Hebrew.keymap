@@ -1,0 +1,274 @@
+#!/bin/keymap -l
+#
+#	Raw key numbering for 101 keyboard...
+#                                                                                        [sys]       [brk]
+#                                                                                         0x7e        0x7f
+# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]
+#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S
+#
+# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]
+#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e     0x1f  0x20  0x21     0x22  0x23  0x24  0x25
+#
+# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]
+#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a
+#
+# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]                         [ 4 ] [ 5 ] [ 6 ]
+#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                             0x48  0x49  0x4a
+#
+# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]
+#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b
+#
+# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]
+#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65
+#
+#	NOTE: On a Microsoft Natural Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			menu key     = 0x68
+#	NOTE: On an Apple Extended Keyboard:
+#			left option  = 0x66
+#			right option = 0x67
+#			keypad '='   = 0x6a
+#			power key    = 0x6b
+Version = 3
+CapsLock = 0x3b
+ScrollLock = 0x0f
+NumLock = 0x22
+LShift = 0x4b
+RShift = 0x56
+LCommand = 0x5d
+RCommand = 0x60
+LControl = 0x5c
+RControl = 0x00
+LOption = 0x66
+ROption = 0x5f
+Menu = 0x68
+#
+# Lock settings
+# To set NumLock, do the following:
+#   LockSettings = NumLock
+#
+# To set everything, do the following:
+#   LockSettings = CapsLock NumLock ScrollLock
+#
+LockSettings = 
+# Legend:
+#   n = Normal
+#   s = Shift
+#   c = Control
+#   C = CapsLock
+#   o = Option
+# Key      n        s        c        o        os       C        Cs       Co       Cos     
+Key 0x00 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x01 = 0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     0x1b     
+Key 0x02 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x03 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x04 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x05 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x06 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x07 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x08 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x09 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0a = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0b = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0c = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0d = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0e = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x0f = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x10 = 0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     0x10     
+Key 0x11 = ';'      '~'      ''       ' '      ''       ';'      0xd6b0   ' '      ''       
+Key 0x12 = '1'      '!'      ''       ' '      ''       '1'      0xd6b1   ' '      ''       
+Key 0x13 = '2'      '@'      0x00     ' '      ''       '2'      0xd6b2   ' '      ''       
+Key 0x14 = '3'      '#'      ''       ' '      ''       '3'      0xd6b3   ' '      ''       
+Key 0x15 = '4'      '$'      ''       0xe282aa ''       '4'      0xd6b4   0xe282aa ''       
+Key 0x16 = '5'      '%'      ''       0xe282ac ''       '5'      0xd6b5   0xe282ac ''       
+Key 0x17 = '6'      '^'      0x1e     ' '      ''       '6'      0xd6b6   ' '      ''       
+Key 0x18 = '7'      '&'      ''       ' '      ''       '7'      0xd6b7   ' '      ''       
+Key 0x19 = '8'      '*'      ''       ' '      ''       '8'      0xd6b8   ' '      ''       
+Key 0x1a = '9'      '('      ''       ' '      ''       '9'      0xd782   ' '      ''       
+Key 0x1b = '0'      ')'      ''       ' '      ''       '0'      0xd781   ' '      ''       
+Key 0x1c = '-'      '_'      0x1f     0xd6bf   ''       '-'      0xd6b9   0xd6bf   ''       
+Key 0x1d = '='      '+'      ''       ' '      ''       '='      0xd6bc   ' '      ''       
+Key 0x1e = 0x08     0x08     0x7f     0x08     0x08     0x08     0x08     0x08     0x08     
+Key 0x1f = 0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     0x05     
+Key 0x20 = 0x01     0x01     0x01     0x01     0x01     0x01     0x01     0x01     0x01     
+Key 0x21 = 0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     0x0b     
+Key 0x22 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x23 = '/'      '/'      '/'      '/'      '/'      '/'      '/'      '/'      '/'      
+Key 0x24 = '*'      '*'      '*'      '*'      '*'      '*'      '*'      '*'      '*'      
+Key 0x25 = '-'      '-'      '-'      '-'      '-'      '-'      '-'      '-'      '-'      
+Key 0x26 = 0x09     0x09     0x09     0x09     0x09     0x09     0x09     0x09     0x09     
+Key 0x27 = '/'      'Q'      0x11     ' '      ''       'Q'      '/'      ' '      ''       
+Key 0x28 = '\''     'W'      0x17     ' '      ''       'W'      '\''     ' '      ''       
+Key 0x29 = 0xd7a7   'E'      0x05     0xe282ac ''       'E'      0xd7a7   0xe282ac ''       
+Key 0x2a = 0xd7a8   'R'      0x12     ' '      ''       'R'      0xd7a8   ' '      ''       
+Key 0x2b = 0xd790   'T'      0x14     ' '      ''       'T'      0xd790   ' '      ''       
+Key 0x2c = 0xd798   'Y'      0x19     ' '      ''       'Y'      0xd798   ' '      ''       
+Key 0x2d = 0xd795   'U'      0x15     0xd7b0   ''       'U'      0xd795   0xd7b0   ''       
+Key 0x2e = 0xd79f   'I'      0x09     ' '      ''       'I'      0xd79f   ' '      ''       
+Key 0x2f = 0xd79d   'O'      0x0f     ' '      ''       'O'      0xd79d   ' '      ''       
+Key 0x30 = 0xd7a4   'P'      0x10     ' '      ''       'P'      0xd7a4   ' '      ''       
+Key 0x31 = ']'      '}'      0x1b     ' '      ''       '['      ']'      ' '      ''       
+Key 0x32 = '['      '{'      0x1d     ' '      ''       ']'      '['      ' '      ''       
+Key 0x33 = '\\'     '|'      0x1c     ' '      ''       '\\'     0xd6bb   ' '      ''       
+Key 0x34 = 0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     
+Key 0x35 = 0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     
+Key 0x36 = 0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     
+Key 0x37 = 0x01     '7'      0x01     0x01     '7'      0x01     '7'      0x01     '7'      
+Key 0x38 = 0x1e     '8'      0x1e     0x1e     '8'      0x1e     '8'      0x1e     '8'      
+Key 0x39 = 0x0b     '9'      0x0b     0x0b     '9'      0x0b     '9'      0x0b     '9'      
+Key 0x3a = '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      
+Key 0x3b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x3c = 0xd7a9   'A'      0x01     ' '      ''       'A'      0xd7a9   ' '      ''       
+Key 0x3d = 0xd793   'S'      0x13     ' '      ''       'S'      0xd793   ' '      ''       
+Key 0x3e = 0xd792   'D'      0x04     ' '      ''       'D'      0xd792   ' '      ''       
+Key 0x3f = 0xd79b   'F'      0x06     ' '      ''       'F'      0xd79b   ' '      ''       
+Key 0x40 = 0xd7a2   'G'      0x07     ' '      ''       'G'      0xd7a2   ' '      ''       
+Key 0x41 = 0xd799   'H'      0x08     0xd7b2   ''       'H'      0xd799   0xd7b2   ''       
+Key 0x42 = 0xd797   'J'      0x0a     0xd7b1   ''       'J'      0xd797   0xd7b1   ''       
+Key 0x43 = 0xd79c   'K'      0x0b     ' '      ''       'K'      0xd79c   ' '      ''       
+Key 0x44 = 0xd79a   'L'      0x0c     ' '      ''       'L'      0xd79a   ' '      ''       
+Key 0x45 = 0xd7a3   ':'      ''       ' '      ''       ';'      0xd7a3   ' '      ''       
+Key 0x46 = ','      '"'      ''       ' '      ''       '\''     ','      ' '      ''       
+Key 0x47 = 0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     
+Key 0x48 = 0x1c     '4'      0x1c     0x1c     '4'      0x1c     '4'      0x1c     '4'      
+Key 0x49 = ''       '5'      ''       ''       '5'      ''       '5'      ''       '5'      
+Key 0x4a = 0x1d     '6'      0x1d     0x1d     '6'      0x1d     '6'      0x1d     '6'      
+Key 0x4b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x4c = 0xd796   'Z'      0x1a     ' '      ''       'Z'      0xd796   ' '      ''       
+Key 0x4d = 0xd7a1   'X'      0x18     ' '      ''       'X'      0xd7a1   ' '      ''       
+Key 0x4e = 0xd791   'C'      0x03     ' '      ''       'C'      0xd791   ' '      ''       
+Key 0x4f = 0xd794   'V'      0x16     ' '      ''       'V'      0xd794   ' '      ''       
+Key 0x50 = 0xd7a0   'B'      0x02     ' '      ''       'B'      0xd7a0   ' '      ''       
+Key 0x51 = 0xd79e   'N'      0x0e     ' '      ''       'N'      0xd79e   ' '      ''       
+Key 0x52 = 0xd7a6   'M'      0x0d     ' '      ''       'M'      0xd7a6   ' '      ''       
+Key 0x53 = 0xd7aa   '>'      ''       ' '      ''       ','      0xd7aa   ' '      ''       
+Key 0x54 = 0xd7a5   '<'      ''       ' '      ''       '.'      0xd7a5   ' '      ''       
+Key 0x55 = '.'      '?'      ''       ' '      ''       '/'      '.'      ' '      ''       
+Key 0x56 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x57 = 0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     0x1e     
+Key 0x58 = 0x04     '1'      0x04     0x04     '1'      0x04     '1'      0x04     '1'      
+Key 0x59 = 0x1f     '2'      0x1f     0x1f     '2'      0x1f     '2'      0x1f     '2'      
+Key 0x5a = 0x0c     '3'      0x0c     0x0c     '3'      0x0c     '3'      0x0c     '3'      
+Key 0x5b = 0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     0x0a     
+Key 0x5c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x5d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x5e = ' '      ' '      0x00     ' '      ' '      ' '      ' '      ' '      ' '      
+Key 0x5f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x60 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x61 = 0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     0x1c     
+Key 0x62 = 0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     0x1f     
+Key 0x63 = 0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     0x1d     
+Key 0x64 = 0x05     '0'      0x05     0x05     '0'      0x05     '0'      0x05     '0'      
+Key 0x65 = 0x7f     '.'      0x7f     0x7f     '.'      0x7f     '.'      0x7f     '.'      
+Key 0x66 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x67 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x68 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x69 = '\\'     '|'      0x1c     ' '      ''       '\\'     '|'      ' '      ''       
+Key 0x6a = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6e = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x6f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x70 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x71 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x72 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x73 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x74 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x75 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x76 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x77 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x78 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x79 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7a = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7d = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7e = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Key 0x7f = ''       ''       ''       ''       ''       ''       ''       ''       ''       
+Acute ' '       = 0xce84   
+Acute 0xce      = 0xce86   
+Acute 0xce      = 0xce88   
+Acute 0xce      = 0xce89   
+Acute 0xce      = 0xce8a   
+Acute 0xce      = 0xce8c   
+Acute 0xce      = 0xce8e   
+Acute 0xce      = 0xce8f   
+Acute 0xce      = 0xceac   
+Acute 0xce      = 0xcead   
+Acute 0xce      = 0xceae   
+Acute 0xce      = 0xceaf   
+Acute 0xce      = 0xcf8c   
+Acute 0xce      = 0xcf8d   
+Acute 0xce      = 0xcf8e   
+Acute ''        = ''       
+AcuteTab = 
+Grave ' '       = '`'      
+Grave 'A'       = 0xc380   
+Grave 'E'       = 0xc388   
+Grave 'I'       = 0xc38c   
+Grave 'O'       = 0xc392   
+Grave 'U'       = 0xc399   
+Grave 'a'       = 0xc3a0   
+Grave 'e'       = 0xc3a8   
+Grave 'i'       = 0xc3ac   
+Grave 'o'       = 0xc3b2   
+Grave 'u'       = 0xc3b9   
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+Grave ''        = ''       
+GraveTab = 
+Circumflex ' '       = '^'      
+Circumflex 'A'       = 0xc382   
+Circumflex 'E'       = 0xc38a   
+Circumflex 'I'       = 0xc38e   
+Circumflex 'O'       = 0xc394   
+Circumflex 'U'       = 0xc39b   
+Circumflex 'a'       = 0xc3a2   
+Circumflex 'e'       = 0xc3aa   
+Circumflex 'i'       = 0xc3ae   
+Circumflex 'o'       = 0xc3b4   
+Circumflex 'u'       = 0xc3bb   
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+Circumflex ''        = ''       
+CircumflexTab = 
+Diaeresis ' '       = 0xc2a8   
+Diaeresis 0xce      = 0xceaa   
+Diaeresis 0xce      = 0xceab   
+Diaeresis 0xce      = 0xcf8a   
+Diaeresis 0xce      = 0xcf8b   
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+Diaeresis ''        = ''       
+DiaeresisTab = 
+Tilde ' '       = 0xce85   
+Tilde 0xce      = 0xce90   
+Tilde 0xce      = 0xceb0   
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+Tilde ''        = ''       
+TildeTab = 
