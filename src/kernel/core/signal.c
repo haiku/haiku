@@ -1,10 +1,11 @@
 /* POSIX signals handling routines
 ** 
 ** Copyright 2002, Angelo Mottola, a.mottola@libero.it. All rights reserved.
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
+
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -109,7 +110,7 @@ handle_signals(struct thread *thread, int state)
 			if (handler->sa_flags & SA_ONESHOT)
 				handler->sa_handler = SIG_DFL;
 			if (!(handler->sa_flags & SA_NOMASK))
-				thread->sig_block_mask |= (handler->sa_mask | (1L << (sig - 1))) & BLOCKABLE_SIGS;
+				thread->sig_block_mask |= (handler->sa_mask | SIGNAL_TO_MASK(sig)) & BLOCKABLE_SIGS;
 
 			return global_resched;
 		} else
@@ -222,6 +223,37 @@ has_signals_pending(void *_thread)
 
 
 int
+sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
+{
+	struct thread *thread = thread_get_current_thread();
+	sigset_t oldMask = thread->sig_block_mask;
+
+	// ToDo: "sig_block_mask" is probably not the right thing to change?
+	//	At least it's often changed at other places...
+
+	switch (how) {
+		case SIG_BLOCK:
+			atomic_or(&thread->sig_block_mask, *set);
+			break;
+		case SIG_UNBLOCK:
+			atomic_and(&thread->sig_block_mask, ~*set);
+			break;
+		case SIG_SETMASK:
+			atomic_set(&thread->sig_block_mask, *set);
+			break;
+
+		default:
+			return B_BAD_VALUE;
+	}
+
+	if (oldSet != NULL)
+		*oldSet = oldMask;
+
+	return B_OK;
+}
+
+
+int
 sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
 {
 	struct thread *thread;
@@ -317,22 +349,45 @@ _user_send_signal(pid_t team, uint signal)
 
 
 int
+_user_sigprocmask(int how, const sigset_t *userSet, sigset_t *userOldSet)
+{
+	sigset_t set, oldSet;
+	status_t status;
+
+	if (userSet == NULL)
+		return B_BAD_VALUE;
+
+	if (user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK
+		|| (userOldSet != NULL && user_memcpy(&oldSet, userOldSet, sizeof(sigset_t)) < B_OK))
+		return B_BAD_ADDRESS;
+
+	status = sigprocmask(how, &set, userOldSet ? &oldSet : NULL);
+
+	// copy old set if asked for
+	if (status >= B_OK && userOldSet != NULL && user_memcpy(userOldSet, &oldSet, sizeof(sigset_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
+}
+
+
+int
 _user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *userOldAction)
 {
 	struct sigaction act, oact;
-	int rc;
+	status_t status;
 
 	if ((userAction != NULL && user_memcpy(&act, userAction, sizeof(struct sigaction)) < B_OK)
 		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction, sizeof(struct sigaction)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	rc = sigaction(sig, userAction ? &act : NULL, userOldAction ? &oact : NULL);
+	status = sigaction(sig, userAction ? &act : NULL, userOldAction ? &oact : NULL);
 
 	// only copy the old action if a pointer has been given
-	if (rc >= 0 && userOldAction != NULL
+	if (status >= B_OK && userOldAction != NULL
 		&& user_memcpy(userOldAction, &oact, sizeof(struct sigaction)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return rc;
+	return status;
 }
 
