@@ -15,9 +15,15 @@
 #include <dirent.h>
 
 /* use R5 undocumented syscalls to find mountpoints */
-#define USE_R5_SYSCALL_HACK
+//#define USE_R5_SYSCALL_HACK
+
 /* use pwents to find home */
 #define USE_PWENTS
+
+#ifdef COMPILE_FOR_R5
+#define USE_R5_SYSCALL_HACK
+#undef USE_PWENTS
+#endif
 
 
 #ifdef USE_R5_SYSCALL_HACK
@@ -29,7 +35,7 @@ extern status_t _kclosedir_(int dir);
 #endif
 
 /* /bin/strings rox */
-const char *beos_dirs[] = {
+static const char *beos_dirs[] = {
 "beos",
 "beos/system",
 "beos/system/add-ons",
@@ -52,7 +58,7 @@ const char *beos_dirs[] = {
 //#define HOME "$h"
 #define HOME "home"
 
-const char *common_dirs[] = {
+static const char *common_dirs[] = {
 HOME"",
 HOME"/config",
 HOME"/config/add-ons",
@@ -77,7 +83,7 @@ HOME"/config/sounds",
 #undef HOME
 #define HOME "$h"
 
-const char *user_dirs[] = {
+static const char *user_dirs[] = {
 HOME"",
 HOME"/config",
 HOME"/config/add-ons",
@@ -99,7 +105,7 @@ apps
 */
 
 /* make dir and parents if needed */
-int mkdir_p(const char *path, mode_t mode)
+static int mkdir_p(const char *path, mode_t mode)
 {
 	char buffer[B_PATH_NAME_LENGTH+1];
 	int slash = 0;
