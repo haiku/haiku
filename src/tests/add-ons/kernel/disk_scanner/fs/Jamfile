@@ -17,3 +17,11 @@ Addon <userland>bfs : userland disk_scanner fs :
 	bfs.c
 ;
 LinkSharedOSLibs <userland>bfs : <installed>DiskScannerTest ;
+
+# iso9660
+
+Addon <userland>iso9660 : userland disk_scanner fs :
+	iso9660.c
+;
+LinkSharedOSLibs <userland>iso9660 : <installed>DiskScannerTest ;
+
