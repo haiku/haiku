@@ -22,15 +22,12 @@
   The superblock class controls a number of blocks (which are
   allocatable units of memory).
   ------------------------------------------------------------------------
-  @(#) $Id$
-  ------------------------------------------------------------------------
   Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
   Department of Computer Sciences |             <http://www.cs.utexas.edu>
   University of Texas at Austin   |                <http://www.utexas.edu>
   ========================================================================
 */
 
-//#include <new.h>
 #include <string.h>
 
 #include "arch-specific.h"
@@ -88,7 +85,7 @@ superblock::superblock(int numBlocks,	// The number of blocks in the sb.
 
 
 superblock *
-superblock::makeSuperblock(int sizeclass, processHeap * pHeap)
+superblock::makeSuperblock(int sizeclass, processHeap *pHeap)
 {
 	// We need to get more memory.
 

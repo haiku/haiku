@@ -23,8 +23,6 @@
   The superblock class controls a number of blocks (which are
   allocatable units of memory).
   ------------------------------------------------------------------------
-  @(#) $Id$
-  ------------------------------------------------------------------------
   Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
   Department of Computer Sciences |             <http://www.cs.utexas.edu>
   University of Texas at Austin   |                <http://www.utexas.edu>
@@ -35,12 +33,6 @@
 #define _SUPERBLOCK_H_
 
 #include "config.h"
-
-//#include <assert.h>
-//#include <new.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-
 #include "arch-specific.h"
 #include "block.h"
 
