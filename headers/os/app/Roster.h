@@ -192,12 +192,11 @@ private:
 						 entry_ref *appRef, char *appSig, uint32 *appFlags,
 						 bool *wasDocument) const;
 	status_t translate_ref(const entry_ref *ref, BMimeType *appMeta,
-						   entry_ref *appRef, BFile *appFile, char *appSig,
+						   entry_ref *appRef, BFile *appFile,
 						   bool *wasDocument) const;
-	status_t translate_type(const char *mimeType, BMimeType *meta,
-							entry_ref *appRef, BFile *appFile,
-							char *appSig) const;
-	status_t sniff_file(const entry_ref *file, BNodeInfo *finfo,
+	status_t translate_type(const char *mimeType, BMimeType *appMeta,
+							entry_ref *appRef, BFile *appFile) const;
+	status_t sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 						char *mimeType) const;
 	bool is_wildcard(const char *sig) const;
 	status_t get_unique_supporting_app(const BMessage *apps,

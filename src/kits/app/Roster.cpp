@@ -31,10 +31,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AppFileInfo.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <fs_info.h>
 #include <List.h>
+#include <Mime.h>
+#include <Node.h>
+#include <NodeInfo.h>
 #include <OS.h>
+#include <Path.h>
+#include <Query.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
+#include <Volume.h>
 
 // debugging
 //#define DBG(x) x
@@ -47,6 +58,12 @@ enum {
 
 // helper function prototypes
 static status_t find_message_app_info(BMessage *message, app_info *info);
+static status_t query_for_app(const char *signature, entry_ref *appRef);
+static status_t can_app_be_used(const entry_ref *ref);
+static int32 compare_version_infos(const version_info &info1,
+								   const version_info &info2);
+static int32 compare_app_versions(const entry_ref *app1,
+								  const entry_ref *app2);
 
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
@@ -366,17 +383,81 @@ BRoster::GetActiveAppInfo(app_info *info) const
 }
 
 // FindApp
+/*!	\brief Finds an application associated with a MIME type.
+
+	The method gets the signature of the supplied type's preferred application
+	or, if it doesn't have a preferred application, the one of its supertype.
+	Then the MIME database is asked which executable is associated with the
+	signature. If the database doesn't have a reference to an exectuable, the
+	boot volume is queried for a file with the signature. If more than one
+	file has been found, the one with the greatest version is picked, or if
+	no file has a version info, the one with the most recent modification
+	date.
+
+	\param mimeType The MIME type for which an application shall be found.
+	\param app A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- other error codes
+*/
 status_t
 BRoster::FindApp(const char *mimeType, entry_ref *app) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (mimeType && app ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = resolve_app(mimeType, NULL, app, NULL, NULL, NULL);
+	return error;
 }
 
 // FindApp
+/*!	\brief Finds an application associated with a file.
+
+	The method first checks, if the file has a preferred application
+	associated with it (see BNodeInfo::GetPreferredApp()) and if so,
+	tries to find the executable the same way FindApp(const char*, entry_ref*)
+	does. If not, it gets the MIME type of the file and searches an
+	application for it exactly like the first FindApp() method.
+
+	The type of the file is defined in a file attribute (BNodeInfo::GetType()),
+	but if it is not set yet, the method tries to guess it via
+	BMimeType::GuessMimeType().
+
+	As a special case the file may have execute permission. Then preferred
+	application and type are ignored and an entry_ref to the file itself is
+	returned.
+
+	\param ref An entry_ref referring to the file for which an application
+		   shall be found.
+	\param app A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- other error codes
+*/
 status_t
 BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref && app ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = resolve_app(NULL, ref, app, NULL, NULL, NULL);
+	return error;
 }
 
 
@@ -862,38 +943,299 @@ BRoster::DumpRoster() const
 }
 
 // resolve_app
+/*!	\brief Finds an application associated with a MIME type or a file.
+
+	It does also supply the caller with some more information about the
+	application, like signature, app flags and whether the supplied
+	MIME type/entry_ref already identified an application.
+
+	At least one of \a inType or \a ref must not be \c NULL. If \a inType is
+	supplied, \a ref is ignored.
+
+	\see FindApp() for how the application is searched.
+
+	\a appSig is set to a string with length 0, if the found application
+	has no signature.
+
+	\param inType The MIME type for which an application shall be found.
+		   May be \c NULL.
+	\param ref The file for which an application shall be found.
+		   May be \c NULL.
+	\param appRef A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable. May be \c NULL.
+	\param appSig A pointer to a pre-allocated char buffer of at least size
+		   \c B_MIME_TYPE_LENGTH to be filled with the signature of the found
+		   application. May be \c NULL.
+	\param appFlags A pointer to a pre-allocated uint32 variable to be filled
+		   with the app flags of the found application. May be \c NULL.
+	\param wasDocument A pointer to a pre-allocated bool variable to be set to
+		   \c true, if the supplied file was not identifying an application,
+		   to \c false otherwise. Has no meaning, if a \a inType is supplied.
+		   May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a inType and \a ref.
+	- \see FindApp() for other error codes.
+*/
 status_t
 BRoster::resolve_app(const char *inType, const entry_ref *ref,
 					 entry_ref *appRef, char *appSig, uint32 *appFlags,
 					 bool *wasDocument) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (inType || ref ? B_OK : B_BAD_VALUE);
+	if (error == B_OK && inType && strlen(inType) >= B_MIME_TYPE_LENGTH)
+		error = B_BAD_VALUE;
+	// find the app
+	BMimeType appMeta;
+	BFile appFile;
+	entry_ref _appRef;
+	if (error == B_OK) {
+		if (inType)
+			error = translate_type(inType, &appMeta, &_appRef, &appFile);
+		else {
+			error = translate_ref(ref, &appMeta, &_appRef, &appFile,
+								  wasDocument);
+		}
+	}
+	// create meta mime
+	if (error == B_OK) {
+		BPath path;
+		if (path.SetTo(&_appRef) == B_OK)
+			create_app_meta_mime(path.Path(), false, true, false);
+	}
+	// set the app hint on the type -- but only if the file has the
+	// respective signature, otherwise unset the app hint
+	BAppFileInfo appFileInfo;
+	if (error == B_OK) {
+		char signature[B_MIME_TYPE_LENGTH];
+		if (appFileInfo.SetTo(&appFile) == B_OK
+			&& appFileInfo.GetSignature(signature) == B_OK
+			&& strcmp(appMeta.Type(), signature)) {
+			appMeta.SetAppHint(NULL);
+		} else
+			appMeta.SetAppHint(&_appRef);
+	}
+	// set the return values
+	if (error == B_OK) {
+		if (appRef)
+			*appRef = _appRef;
+		if (appSig) {
+			// there's no warranty, the appMeta is valid
+			if (appMeta.IsValid())
+				strcpy(appSig, appMeta.Type());
+			else
+				appSig[0] = '\0';
+		}
+		if (appFlags) {
+			// if an error occurs here, we don't care and just set a default
+			// value
+			if (appFileInfo.InitCheck() != B_OK
+				|| appFileInfo.GetAppFlags(appFlags) != B_OK) {
+				*appFlags = B_REG_DEFAULT_APP_FLAGS;
+			}
+		}
+	} else {
+		// unset the ref on error
+		if (appRef)
+			*appRef = _appRef;
+	}
+	return error;
 }
 
 // translate_ref
+/*!	\brief Finds an application associated with a file.
+
+	\a appMeta is left unmodified, if the file is executable, but has no
+	signature.
+
+	\see FindApp() for how the application is searched.
+
+	\param ref The file for which an application shall be found.
+	\param appMeta A pointer to a pre-allocated BMimeType to be set to the
+		   signature of the found application.
+	\param appRef A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\param appFile A pointer to a pre-allocated BFile to be set to the
+		   executable of the found application.
+	\param wasDocument A pointer to a pre-allocated bool variable to be set to
+		   \c true, if the supplied file was not identifying an application,
+		   to \c false otherwise. May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref, \a appMeta, \a appRef or \a appFile.
+	- \see FindApp() for other error codes.
+*/
 status_t
 BRoster::translate_ref(const entry_ref *ref, BMimeType *appMeta,
-					   entry_ref *appRef, BFile *appFile, char *appSig,
+					   entry_ref *appRef, BFile *appFile,
 					   bool *wasDocument) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref && appMeta && appRef && appFile ? B_OK
+														  : B_BAD_VALUE);
+	// init node
+	BNode node;
+	if (error == B_OK)
+		error = node.SetTo(ref);
+	// get permissions
+	mode_t permissions;
+	if (error == B_OK)
+		error = node.GetPermissions(&permissions);
+	if (error == B_OK) {
+		if ((permissions & S_IXUSR) && node.IsFile()) {
+			// node is executable and a file -- we're done
+			*appRef = *ref;
+			error = appFile->SetTo(appRef, B_READ_ONLY);
+			if (wasDocument)
+				*wasDocument = false;
+			// get the app's signature via a BAppFileInfo
+			BAppFileInfo appFileInfo;
+			if (error == B_OK)
+				error = appFileInfo.SetTo(appFile);
+			char signature[B_MIME_TYPE_LENGTH];
+			if (error == B_OK) {
+				// don't worry, if the file doesn't have a signature, just
+				// unset the supplied object
+				if (appFileInfo.GetSignature(signature) == B_OK)
+					error = appMeta->SetTo(signature);
+				else
+					appMeta->Unset();
+			}
+		} else {
+			// the node is not exectuable or not a file
+			// init a node info
+			BNodeInfo nodeInfo;
+			if (error == B_OK)
+				error = nodeInfo.SetTo(&node);
+			char preferredApp[B_MIME_TYPE_LENGTH];
+			if (error == B_OK) {
+				// if the file has a preferred app, let translate_type() find
+				// it for us
+				if (nodeInfo.GetPreferredApp(preferredApp) == B_OK) {
+					error = translate_type(preferredApp, appMeta, appRef,
+										   appFile);
+				} else {
+					// no preferred app -- we need to get the file's type
+					char fileType[B_MIME_TYPE_LENGTH];
+					// get the type from the file, or guess a type
+					if (nodeInfo.GetType(fileType) != B_OK)
+						error = sniff_file(ref, &nodeInfo, fileType);
+					// now let translate_type() do the actual work
+					if (error == B_OK) {
+						error = translate_type(fileType, appMeta, appRef,
+											   appFile);
+					}
+				}
+			}
+			if (wasDocument)
+				*wasDocument = true;
+		}
+	}
+	return error;
 }
 
 // translate_type
+/*!	\brief Finds an application associated with a MIME type.
+
+	\see FindApp() for how the application is searched.
+
+	\param mimeType The MIME type for which an application shall be found.
+	\param appMeta A pointer to a pre-allocated BMimeType to be set to the
+		   signature of the found application.
+	\param appRef A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\param appFile A pointer to a pre-allocated BFile to be set to the
+		   executable of the found application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType, \a appMeta, \a appRef or \a appFile.
+	- \see FindApp() for other error codes.
+*/
 status_t
-BRoster::translate_type(const char *mimeType, BMimeType *meta,
-						entry_ref *appRef, BFile *appFile,
-						char *appSig) const
+BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
+						entry_ref *appRef, BFile *appFile) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (mimeType && appMeta && appRef && appFile
+					  && strlen(mimeType) < B_MIME_TYPE_LENGTH ? B_OK
+															   : B_BAD_VALUE);
+	// create a BMimeType and check, if the type is installed
+	BMimeType type;
+	if (error == B_OK)
+		error = type.SetTo(mimeType);
+	// get the preferred app
+	char appSignature[B_MIME_TYPE_LENGTH];
+	if (error == B_OK)
+		if (type.IsInstalled()) {
+			BMimeType superType;
+			if (type.GetPreferredApp(appSignature) != B_OK
+				&& (type.GetSupertype(&superType) != B_OK
+					|| superType.GetPreferredApp(appSignature) != B_OK)) {
+				// The type is installed, but has no preferred app.
+				// In fact it might be an app signature and even having a
+				// valid app hint. Nevertheless we fail.
+				error = B_LAUNCH_FAILED_NO_PREFERRED_APP;
+			}
+		} else {
+			// The type is not installed. We assume it is an app signature.
+			strcpy(appSignature, mimeType);
+		}
+	if (error == B_OK)
+		error = appMeta->SetTo(appSignature);
+	// check, whether the signature is installed and has an app hint
+	bool appFound = false;
+	if (error == B_OK && appMeta->GetAppHint(appRef) == B_OK) {
+		// resolve symbolic links, if necessary
+		BEntry entry;
+		if (entry.SetTo(appRef) == B_OK && entry.IsFile()
+			&& entry.GetRef(appRef) == B_OK) {
+			appFound = true;
+		}
+	}
+	// in case there is no app hint or it is invalid, we need to query for the
+	// app
+	if (error == B_OK && !appFound)
+		error = query_for_app(appMeta->Type(), appRef);
+	if (error == B_OK)
+		error = appFile->SetTo(appRef, B_READ_ONLY);
+	// check, whether the app can be used
+	if (error == B_OK)
+		error = can_app_be_used(appRef);
+	return error;
 }
 
 // sniff_file
+/*!	\brief Sniffs the MIME type for a file.
+
+	Also updates the file's MIME info, if possible.
+
+	\param file An entry_ref referring to the file in question.
+	\param nodeInfo A BNodeInfo initialized to the file.
+	\param mimeType A pointer to a pre-allocated char buffer of at least size
+		   \c B_MIME_TYPE_LENGTH to be filled with the MIME type sniffed for
+		   the file.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a file, \a nodeInfo or \a mimeType.
+	- other errors
+*/
 status_t
-BRoster::sniff_file(const entry_ref *file, BNodeInfo *finfo,
+BRoster::sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 					char *mimeType) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (file && nodeInfo && mimeType ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// Try to update the file's MIME info and just read the updated type.
+		// If that fails, sniff manually.
+		BPath path;
+		if (path.SetTo(file) != B_OK
+			|| update_mime_info(path.Path(), false, true, false) != B_OK
+			|| nodeInfo->GetType(mimeType) != B_OK) {
+			BMimeType type;
+			error = BMimeType::GuessMimeType(file, &type);
+			if (error == B_OK && type.IsValid())
+				strcpy(mimeType, type.Type());
+		}
+	}
+	return error;
 }
 
 // is_wildcard
@@ -1093,4 +1435,181 @@ find_message_app_info(BMessage *message, app_info *info)
 	}
 	return error;
  }
+
+// query_for_app
+/*!	\brief Finds an app by signature on the boot volume.
+	\param signature The app's signature.
+	\param appRef A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a signature or \a appRef.
+	- B_LAUNCH_FAILED_APP_NOT_FOUND: An application with this signature
+	  could not be found.
+	- other error codes
+*/
+static
+status_t
+query_for_app(const char *signature, entry_ref *appRef)
+{
+	status_t error = (signature && appRef ? B_OK : B_BAD_VALUE);
+	BVolume volume;
+	BQuery query;
+	if (error == B_OK) {
+		// init the query
+		if (volume.SetTo(dev_for_path("/boot")) != B_OK
+			|| query.SetVolume(&volume) != B_OK
+			|| query.PushAttr("BEOS:APP_SIG") != B_OK
+			|| query.PushString(signature) != B_OK
+			|| query.PushOp(B_EQ) != B_OK
+			|| query.Fetch() != B_OK) {
+			error = B_LAUNCH_FAILED_APP_NOT_FOUND;
+		}
+	}
+	// walk through the query
+	bool appFound = false;
+	status_t foundAppError = B_OK;
+	if (error == B_OK) {
+		entry_ref ref;
+		while (query.GetNextRef(&ref) == B_OK) {
+			if ((!appFound || compare_app_versions(appRef, &ref) < 0)
+				&& (foundAppError = can_app_be_used(&ref)) == B_OK) {
+				*appRef = ref;
+				appFound = true;
+			}
+		}
+		if (!appFound) {
+			// If the query didn't return any hits, the error is
+			// B_LAUNCH_FAILED_APP_NOT_FOUND, otherwise we return the
+			// result of the last can_app_be_used().
+			error = (foundAppError != B_OK ? foundAppError
+										   : B_LAUNCH_FAILED_APP_NOT_FOUND);
+		}
+	}
+	return error;
+}
+
+// can_app_be_used
+/*!	\brief Checks whether or not an application can be used.
+
+	Currently it is only checked whether the application is in the trash.
+
+	\param ref An entry_ref referring to the application executable.
+	\return
+	- \c B_OK: The application can be used.
+	- \c B_ENTRY_NOT_FOUND: \a ref doesn't refer to and existing entry.
+	- \c B_IS_A_DIRECTORY: \a ref refers to a directory.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The application executable is in the
+	  trash.
+	- other error codes specifying why the application cannot be used.
+*/
+static
+status_t
+can_app_be_used(const entry_ref *ref)
+{
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	// check whether the file exists and is a file.
+	BEntry entry;
+	if (error == B_OK)
+		error = entry.SetTo(ref, true);
+	if (error == B_OK && !entry.Exists())
+		error = B_ENTRY_NOT_FOUND;
+	if (error == B_OK && !entry.IsFile())
+		error = B_IS_A_DIRECTORY;
+	// check whether the file is in trash
+	BPath trashPath;
+	BDirectory directory;
+	if (error == B_OK
+		&& find_directory(B_TRASH_DIRECTORY, &trashPath) == B_OK
+		&& directory.SetTo(trashPath.Path()) == B_OK
+		&& directory.Contains(&entry)) {
+		error = B_LAUNCH_FAILED_APP_IN_TRASH;
+	}
+	return error;
+}
+
+// compare_version_infos
+/*!	\brief Compares the supplied version infos.
+	\param info1 The first info.
+	\param info2 The second info.
+	\return \c -1, if the first info is less than the second one, \c 1, if
+			the first one is greater than the second one, and \c 0, if both
+			are equal.
+*/
+static
+int32
+compare_version_infos(const version_info &info1, const version_info &info2)
+{
+	int32 result = 0;
+	if (info1.major < info2.major)
+		result = -1;
+	else if (info1.major > info2.major)
+		result = 1;
+	else if (info1.middle < info2.middle)
+		result = -1;
+	else if (info1.middle > info2.middle)
+		result = 1;
+	else if (info1.minor < info2.minor)
+		result = -1;
+	else if (info1.minor > info2.minor)
+		result = 1;
+	else if (info1.variety < info2.variety)
+		result = -1;
+	else if (info1.variety > info2.variety)
+		result = 1;
+	else if (info1.internal < info2.internal)
+		result = -1;
+	else if (info1.internal > info2.internal)
+		result = 1;
+	return result;
+}
+
+// compare_app_versions
+/*!	\brief Compares the version of two applications.
+
+	If both files have a version info, then those are compared.
+	If one file has a version info, it is said to be greater. If both
+	files have no version info, their modification times are compared.
+
+	\param app1 An entry_ref referring to the first application.
+	\param app2 An entry_ref referring to the second application.
+	\return \c -1, if the first application version is less than the second
+			one, \c 1, if the first one is greater than the second one, and
+			\c 0, if both are equal.
+*/
+static
+int32
+compare_app_versions(const entry_ref *app1, const entry_ref *app2)
+{
+	BFile file1, file2;
+	BAppFileInfo appFileInfo1, appFileInfo2;
+	file1.SetTo(app1, B_READ_ONLY);
+	file2.SetTo(app2, B_READ_ONLY);
+	appFileInfo1.SetTo(&file1);
+	appFileInfo2.SetTo(&file2);
+	time_t modificationTime1 = 0;
+	time_t modificationTime2 = 0;
+	file1.GetModificationTime(&modificationTime1);
+	file2.GetModificationTime(&modificationTime2);
+	int32 result = 0;
+	version_info versionInfo1, versionInfo2;
+	bool hasVersionInfo1 = (appFileInfo1.GetVersionInfo(
+		&versionInfo1, B_APP_VERSION_KIND) == B_OK);
+	bool hasVersionInfo2 = (appFileInfo2.GetVersionInfo(
+		&versionInfo2, B_APP_VERSION_KIND) == B_OK);
+	if (hasVersionInfo1) {
+		if (hasVersionInfo2)
+			result = compare_version_infos(versionInfo1, versionInfo2);
+		else
+			result = 1;
+	} else {
+		if (hasVersionInfo2)
+			result = -1;
+		else if (modificationTime1 < modificationTime2)
+			result = -1;
+		else if (modificationTime1 > modificationTime2)
+			result = 1;
+	}
+	return result;	
+}
 
