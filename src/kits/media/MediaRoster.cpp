@@ -70,7 +70,6 @@ status_t SetNode(node_type type, const media_node *node, const dormant_node_info
 {
 	server_set_node_request request;
 	server_set_node_reply reply;
-	status_t rv;
 		
 	request.type = type;
 	request.use_node = node ? true : false;
@@ -293,7 +292,7 @@ BMediaRoster::Connect(const media_source & from,
 	request1.format = *io_format;
 	rv = QueryPort(from.port, PRODUCER_FORMAT_PROPOSAL, &request1, sizeof(request1), &reply1, sizeof(reply1));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::FormatProposal, status = %#x\n",rv);
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::FormatProposal, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply1.format now contains the format proposed by the producer
@@ -306,7 +305,7 @@ BMediaRoster::Connect(const media_source & from,
 	request2.format = reply1.format;
 	rv = QueryPort(to.port, CONSUMER_ACCEPT_FORMAT, &request2, sizeof(request2), &reply2, sizeof(reply2));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferConsumer::AcceptFormat, status = %#x\n",rv);
+		TRACE("BMediaRoster::Connect: aborted after BBufferConsumer::AcceptFormat, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply2.format now contains the format accepted by the consumer
@@ -321,7 +320,7 @@ BMediaRoster::Connect(const media_source & from,
 	strcpy(request3.name, "XXX some default name"); // XXX fix this
 	rv = QueryPort(from.port, PRODUCER_PREPARE_TO_CONNECT, &request3, sizeof(request3), &reply3, sizeof(reply3));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::PrepareToConnect, status = %#x\n",rv);
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::PrepareToConnect, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply3.format is still our pretty media format
@@ -338,7 +337,7 @@ BMediaRoster::Connect(const media_source & from,
 	request4.with_format = reply3.format;
 	con_status = QueryPort(to.port, CONSUMER_CONNECTED, &request4, sizeof(request4), &reply4, sizeof(reply4));
 	if (con_status != B_OK) {
-		TRACE("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#x\n",con_status);
+		TRACE("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#lx\n",con_status);
 		// we do NOT return here!
 	}
 	// con_status contains the status code to be supplied to BBufferProducer::Connect's status argument
@@ -359,7 +358,7 @@ BMediaRoster::Connect(const media_source & from,
 		return con_status;
 	}
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::Connect, status = %#x\n",rv);
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::Connect, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply5.name contains the name assigned to the connection by the producer
@@ -1047,7 +1046,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	}
 
 // XXX SOMETHING IS VERY WRONG HERE
-	printf("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", in_info.addon, in_info.flavor_id, flags);
+	printf("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", (int)in_info.addon, (int)in_info.flavor_id, flags);
 
 	return B_ERROR;
 }

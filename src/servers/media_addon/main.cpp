@@ -157,7 +157,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	ASSERT(addon);
 	ASSERT(addon->AddonID() > 0);
 	
-	printf("MediaAddonServer::ScanAddOnFlavors: id %d\n",addon->AddonID());
+	printf("MediaAddonServer::ScanAddOnFlavors: id %ld\n",addon->AddonID());
 	
 	port = find_port("media_server port");
 	if (port <= B_OK) {
@@ -176,7 +176,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	newflavorcount = addon->CountFlavors();
 	*flavorcount = newflavorcount;
 	
-	printf("%d old flavors, %d new flavors\n", oldflavorcount, newflavorcount);
+	printf("%ld old flavors, %ld new flavors\n", oldflavorcount, newflavorcount);
 
 	// during the first update (i == 0), the server removes old dormant_flavor_infos
 	for (int i = 0; i < newflavorcount; i++) {
@@ -234,8 +234,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 
 	BMediaAddOn *addon;
 	media_addon_id id;
-	status_t rv;
-	
+
 	id = _DormantNodeManager->RegisterAddon(path);
 	if (id <= 0) {
 		printf("MediaAddonServer::AddOnAdded: failed to register add-on\n");

@@ -52,7 +52,7 @@ DormantNodeManager::~DormantNodeManager()
 	// force unloading all currently loaded images
 	loaded_addon_info *info;
 	for (int32 index = 0; fAddonmap->GetPointerAt(index,&info); index++) {
-		printf("Forcing unload of add-on id %d with usecount %d\n",info->addon->AddonID(), info->usecount);
+		printf("Forcing unload of add-on id %ld with usecount %ld\n",info->addon->AddonID(), info->usecount);
 		UnloadAddon(info->addon, info->image);
 	}
 	
@@ -84,7 +84,7 @@ DormantNodeManager::GetAddon(media_addon_id id)
 {
 	BMediaAddOn *addon;
 	
-	printf("DormantNodeManager::GetAddon, id %d\n",id);
+	printf("DormantNodeManager::GetAddon, id %ld\n",id);
 	
 	// first try to use a already loaded add-on
 	addon = TryGetAddon(id);
@@ -96,7 +96,7 @@ DormantNodeManager::GetAddon(media_addon_id id)
 	// ok, it's not loaded, try to get the path
 	BPath path;
 	if (B_OK != FindAddonPath(&path, id)) {
-		printf("DormantNodeManager::GetAddon: can't find path for add-on %d\n",id);
+		printf("DormantNodeManager::GetAddon: can't find path for add-on %ld\n",id);
 		return NULL;
 	}
 	
@@ -104,7 +104,7 @@ DormantNodeManager::GetAddon(media_addon_id id)
 	BMediaAddOn *newaddon;
 	image_id image;
 	if (B_OK != LoadAddon(&newaddon, &image, path.Path(), id)) {
-		printf("DormantNodeManager::GetAddon: can't load add-on %d from path %s\n",id, path.Path());
+		printf("DormantNodeManager::GetAddon: can't load add-on %ld from path %s\n",id, path.Path());
 		return NULL;
 	}
 	
@@ -135,15 +135,15 @@ void
 DormantNodeManager::PutAddon(media_addon_id id)
 {
 	loaded_addon_info *info;
-	BMediaAddOn *addon;
-	image_id image;
+	BMediaAddOn *addon = 0; /* avoid compiler warning */
+	image_id image = 0; /* avoid compiler warning */
 	bool unload;
 
-	printf("DormantNodeManager::PutAddon, id %d\n",id);
+	printf("DormantNodeManager::PutAddon, id %ld\n",id);
 	
 	fLock->Lock();
 	if (!fAddonmap->GetPointer(id, &info)) {
-		printf("DormantNodeManager::PutAddon: failed to find add-on %d\n",id);
+		printf("DormantNodeManager::PutAddon: failed to find add-on %ld\n",id);
 		fLock->Unlock();
 		return;
 	}
@@ -152,7 +152,6 @@ DormantNodeManager::PutAddon(media_addon_id id)
 	if (unload) {
 		addon	= info->addon;
 		image	= info->image;
-		unload	= true;
 		fAddonmap->Remove(id);
 	}
 	fLock->Unlock();
@@ -192,7 +191,7 @@ DormantNodeManager::RegisterAddon(const char *path)
 	if (rv < B_OK)
 		return 0;
 
-	printf("DormantNodeManager::RegisterAddon finished with id %d\n",reply.addonid);
+	printf("DormantNodeManager::RegisterAddon finished with id %ld\n",reply.addonid);
 
 	return reply.addonid;
 }
@@ -204,7 +203,7 @@ DormantNodeManager::UnregisterAddon(media_addon_id id)
 	ASSERT(id > 0);
 	xfer_server_unregister_mediaaddon msg;
 
-	printf("DormantNodeManager::UnregisterAddon id %d\n",id);
+	printf("DormantNodeManager::UnregisterAddon id %ld\n",id);
 
 	port_id port;
 	port = find_port("media_server port");

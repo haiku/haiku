@@ -73,7 +73,6 @@ Queue::AddItem(void *item)
 void *
 Queue::RemoveItem()
 {
-	status_t rv;
 	void *item;
 
 	// if the semaphore is deleted by Terminate(),
