@@ -32,6 +32,11 @@ OutputFile::WriteAt(off_t pos, const void *buffer, size_t size)
 	return BFile::WriteAt(pos, buffer, size);
 }
 
+/*! \brief Writes \a size bytes worth of data from \a data at the current
+	position in the file, incrementing the file's position marker as it goes.
+	
+	\param bufferSize The size of the memory buffer to be used for writing.
+*/
 ssize_t
 OutputFile::Write(BDataIO &data, size_t size, size_t bufferSize)
 {
@@ -68,6 +73,11 @@ OutputFile::Write(BDataIO &data, size_t size, size_t bufferSize)
 	return error ? ssize_t(error) : ssize_t(bytes);	
 }
 
+/*! \brief Writes \a size bytes worth of data from \a data at position
+	\a pos in the file without incrementing the file's position marker.
+	
+	\param bufferSize The size of the memory buffer to be used for writing.
+*/
 ssize_t
 OutputFile::WriteAt(off_t pos, BDataIO &data, size_t size, size_t bufferSize)
 {
@@ -105,6 +115,11 @@ OutputFile::WriteAt(off_t pos, BDataIO &data, size_t size, size_t bufferSize)
 	return error ? ssize_t(error) : ssize_t(bytes);	
 }
 
+/*! \brief Writes \a size bytes worth of zeros at the current position 
+	in the file, incrementing the file's position marker as it goes.
+	
+	\param bufferSize The size of the memory buffer to be used for writing.
+*/
 ssize_t
 OutputFile::Zero(size_t size, size_t bufferSize)
 {
@@ -135,6 +150,11 @@ OutputFile::Zero(size_t size, size_t bufferSize)
 	return error ? ssize_t(error) : ssize_t(bytes);	
 }
 
+/*! \brief Writes \a size bytes worth of zeros at position \a pos
+	in the file without incrementing the file's position marker.
+	
+	\param bufferSize The size of the memory buffer to be used for writing.
+*/
 ssize_t
 OutputFile::ZeroAt(off_t pos, size_t size, size_t bufferSize)
 {
