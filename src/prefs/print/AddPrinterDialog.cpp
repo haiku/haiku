@@ -28,11 +28,13 @@
 #include <Button.h>
 #include <TextControl.h>
 #include <MenuField.h>
+#include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <StringView.h>
 #include <ListView.h>
 #include <ScrollView.h>
 #include <Application.h>
+#include <StorageKit.h>
 
 status_t AddPrinterDialog::Start() {
 	AddPrinterDialog* dialog = new AddPrinterDialog();
@@ -53,13 +55,75 @@ void AddPrinterDialog::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-		case B_OK:
-			// TODO: create the new spooler!
-			// fallback not to dialog cancelling case...
+		case B_OK: {
+				BMessage m(PSRV_MAKE_PRINTER);
+				BMessenger msgr;
+				if (GetPrinterServerMessenger(msgr) != B_OK) break;								
+				
+				BString transport, transportPath;
+				if (fPrinterText != "Preview") {
+					transport = fTransportText;
+					transportPath = fTransportPathText;
+				}
+				
+				m.AddString("driver", fPrinterText.String());			
+				m.AddString("transport", transport.String());			
+				m.AddString("transport path", transportPath.String());			
+				m.AddString("printer name", fNameText.String());
+				m.AddString("connection", "Local");
+					// request print_server to create printer
+				msgr.SendMessage(&m);
+
+				PostMessage(B_QUIT_REQUESTED);
+			} 
+			break;
 		case B_CANCEL:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-			
+		case MSG_NAME_CHANGED:
+				fNameText = fName->Text(); Update();
+			break;
+		case MSG_PRINTER_SELECTED:
+		case MSG_TRANSPORT_SELECTED:
+			{
+				BString name, path;
+				if (msg->FindString("name", &name) != B_OK) {
+					name = "";
+				}	
+				if (msg->what == MSG_PRINTER_SELECTED) {
+					fPrinterText = name;
+				} else {
+					fTransportText = name;
+					if (msg->FindString("path", &path) == B_OK) {
+							// transport path selected
+						fTransportPathText = path;
+						void* pointer;
+							// mark sub menu
+						if (msg->FindPointer("source", &pointer) == B_OK) {
+							BMenuItem* item = (BMenuItem*)pointer;
+							BMenu* menu = item->Menu();
+							int32 index = fTransport->IndexOf(menu);
+							item = fTransport->ItemAt(index);
+							if (item) item->SetMarked(true);
+						}
+					} else {
+							// transport selected
+						fTransportPathText = "";
+							// remove mark from item in sub menu of transport sub menu
+						for (int32 i = fTransport->CountItems()-1; i >= 0; i --) {
+							BMenu* menu = fTransport->SubmenuAt(i);
+							if (menu) {
+								BMenuItem* item = menu->FindMarked();
+								if (item) item->SetMarked(false);								
+							}
+						}
+					}
+				}
+				Update();
+			}
+			break;
+		
+		
 		default:
 			Inherited::MessageReceived(msg);
 	}
@@ -100,8 +164,10 @@ void AddPrinterDialog::BuildGUI(int stage)
 	// add a "printer name" input field
 	tc = new BTextControl(r, "printer_name",
 							NAME_LABEL, B_EMPTY_STRING, NULL);
+	fName = tc;
 	tc->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
 	panel->AddChild(tc);
+	tc->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
 	tc->SetFont(be_bold_font);
 	tc->GetPreferredSize(&w, &h);
 	tc->SetDivider(be_bold_font->StringWidth(NAME_LABEL "#"));
@@ -116,6 +182,7 @@ void AddPrinterDialog::BuildGUI(int stage)
 	panel->AddChild(bb);
 
 	pum = new BPopUpMenu("<pick one>");
+	fPrinter = pum;
 	mf = new BMenuField(r, "drivers_list", KIND_LABEL, pum, 
 							B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 							B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
@@ -124,6 +191,7 @@ void AddPrinterDialog::BuildGUI(int stage)
 	bb->SetLabel(mf);
 	mf->ResizeToPreferred();
 	mf->GetPreferredSize(&w, &h);
+	FillMenu(pum, "Print", MSG_PRINTER_SELECTED);
 
 	tr = bb->Bounds();
 	tr.top += h;
@@ -145,6 +213,7 @@ void AddPrinterDialog::BuildGUI(int stage)
 
 	// add a "connected to" (aka transports list) menu field
 	pum = new BPopUpMenu("<pick one>");
+	fTransport = pum;
 	mf = new BMenuField(r, "transports_list", PORT_LABEL, pum, 
 							B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 							B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
@@ -153,6 +222,7 @@ void AddPrinterDialog::BuildGUI(int stage)
 	bb->SetLabel(mf);
 	mf->ResizeToPreferred();
 	mf->GetPreferredSize(&w, &h);
+	FillMenu(pum, "Print/transport", MSG_TRANSPORT_SELECTED);
 
 	tr = bb->Bounds();
 	tr.top += h;
@@ -171,12 +241,14 @@ void AddPrinterDialog::BuildGUI(int stage)
 
 	// add a "OK" button, and make it default
 	ok 	= new BButton(r, NULL, "Add", new BMessage(B_OK), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	fOk = ok;
 	ok->MakeDefault(true);
 	ok->ResizeToPreferred();
 	ok->GetPreferredSize(&w, &h);
 	x = r.right - w;
 	ok->MoveTo(x, ok->Frame().top);	// put the ok bottom at bottom right corner
 	panel->AddChild(ok);
+	SetDefaultButton(fOk);
 
 	// add a "Cancel button	
 	cancel = new BButton(r, NULL, "Cancel", new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
@@ -188,6 +260,7 @@ void AddPrinterDialog::BuildGUI(int stage)
 	// Auto resize window
 	ResizeTo(ok->Frame().right + H_MARGIN, ok->Frame().bottom + V_MARGIN);
 	
+	Update();
 // Stage == 0
 // init_icon 64x114  Add a Local or Network Printer
 //                   ------------------------------
@@ -240,3 +313,100 @@ void AddPrinterDialog::BuildGUI(int stage)
 // ------------------------------------------------
 //                                Cancel        Add
 }
+
+static directory_which gAddonDirs[] = {
+	B_BEOS_ADDONS_DIRECTORY,
+	B_COMMON_ADDONS_DIRECTORY
+	// B_USER_ADDONS_DIRECTORY same as common directory
+};
+
+#ifdef __INTEL__
+static const char* kExecutableType = "application/x-vnd.Be-elfexecutable";
+#else
+static const char* kExecutableType = "application/x-vnd.Be-executable";
+#endif
+
+void AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what) {
+	for (int i = 0; i < sizeof(gAddonDirs) / sizeof(directory_which); i ++) {
+		BPath addonPath;
+		if (find_directory(gAddonDirs[i], &addonPath) != B_OK) continue;
+		if (addonPath.Append(path) != B_OK) continue;
+		BDirectory dir(addonPath.Path());
+		if (dir.InitCheck() != B_OK) continue;
+		BEntry entry;
+		while (dir.GetNextEntry(&entry) == B_OK) {
+			if (!entry.IsFile()) continue;
+
+			BNode node(&entry);
+			if (node.InitCheck() != B_OK) continue;
+
+			BNodeInfo info(&node);
+			if (info.InitCheck() != B_OK) continue;
+
+			char type[B_MIME_TYPE_LENGTH+1];
+			info.GetType(type);
+			if (strcmp(type, kExecutableType) != 0) continue;
+
+			BPath path;
+			if (entry.GetPath(&path) != B_OK) continue;
+
+			bool addMenuItem = true;
+				// some hard coded special cases for transport add-ons
+			if (menu == fTransport) {
+				const char* transport = path.Leaf();
+					// Network not implemented yet!
+				if (strcmp(transport, "Network") == 0) continue;
+				addMenuItem = false;
+				if (strcmp(transport, "Serial Port") == 0) {
+					AddPortSubMenu(menu, transport, "/dev/ports");					
+				} else if (strcmp(transport, "Parallel Port") == 0) {
+					AddPortSubMenu(menu, transport, "/dev/parallel");
+				} else if (strcmp(transport, "USB Port") == 0) {
+					AddPortSubMenu(menu, transport, "/dev/printer/usb");
+				} else {
+					addMenuItem = true;
+				}
+			} 
+
+			if (addMenuItem) {
+				BMessage* msg = new BMessage(what);
+				msg->AddString("name", path.Leaf());
+				menu->AddItem(new BMenuItem(path.Leaf(), msg));
+			}
+		}
+	}
+}
+
+void AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const char* port) {
+	BEntry entry(port);
+	BDirectory dir(&entry);
+	if (dir.InitCheck() != B_OK) return;
+	BMenu* subMenu = NULL;
+	
+	BPath path;
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		if (entry.GetPath(&path) != B_OK) continue;
+			// lazily create sub menu 
+		if (subMenu == NULL) {
+			subMenu = new BMenu(transport);
+			menu->AddItem(subMenu);
+			subMenu->SetRadioMode(true);
+			int32 index = menu->IndexOf(subMenu);
+			BMenuItem* item = menu->ItemAt(index);
+			if (item) item->SetMessage(new BMessage(MSG_TRANSPORT_SELECTED));
+		}
+			// setup menu item for port
+		BMessage* msg = new BMessage(MSG_TRANSPORT_SELECTED);
+		msg->AddString("name", transport);
+		msg->AddString("path", path.Leaf());
+		BMenuItem* item = new BMenuItem(path.Leaf(), msg);
+		subMenu->AddItem(item);		
+	}
+}
+
+void AddPrinterDialog::Update() {
+	fOk->SetEnabled(fNameText != "" && fPrinterText != "" && 
+		(fTransportText != "" || fPrinterText == "Preview"));
+	fTransport->SetEnabled(fPrinterText != "" &&fPrinterText != "Preview");	
+}
+

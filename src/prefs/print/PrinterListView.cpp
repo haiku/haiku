@@ -54,8 +54,9 @@ PrinterListView::PrinterListView(BRect frame)
 				reply.PrintToStream();
 				
 				BMessenger thePrinter;
-				if (reply.FindMessenger("result", &thePrinter) == B_OK)
+				if (reply.FindMessenger("result", &thePrinter) == B_OK) {
 					AddItem(new PrinterItem(thePrinter), CountItems());
+				}
 			}
 		}
 	}
@@ -68,6 +69,14 @@ void PrinterListView::AttachedToWindow()
 	SetSelectionMessage(new BMessage(MSG_PRINTER_SELECTED));
 	SetInvocationMessage(new BMessage(MSG_MKDEF_PRINTER));
 	SetTarget(Window());	
+
+		// Select active printer
+	for (int32 i = 0; i < CountItems(); i ++) {
+		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
+		if (item->IsActivePrinter()) {
+			Select(i); break;
+		}
+	}
 }
 
 BBitmap* PrinterItem::sIcon = NULL;

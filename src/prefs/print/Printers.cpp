@@ -25,10 +25,8 @@
 
 int main()
 {
-	new PrintersApp;
-		be_app->Run();
-	delete be_app;
-	
+	PrintersApp app;
+	app.Run();	
 	return 0;
 }
 
