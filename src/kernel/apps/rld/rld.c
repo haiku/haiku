@@ -3,55 +3,29 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <string.h>
 #include <syscalls.h>
 #include <user_runtime.h>
 #include "rld_priv.h"
 
 
-
-static struct rld_export_t exports=
-{
-	/*
-	 * Unix like stuff
-	 */
-	export_dl_open,
-	export_dl_close,
-	export_dl_sym,
-
-
-	/*
-	 * BeOS like stuff
-	 */
-	export_load_addon,
-	export_unload_addon,
-	export_addon_symbol
-};
-
-
 int
-rldmain(void *arg)
+rldmain(void *_args)
 {
-	int retval;
-	unsigned long entry;
-	struct uspace_prog_args_t *uspa= (struct uspace_prog_args_t *)arg;
+	struct uspace_program_args *args = (struct uspace_program_args *)_args;
+	void *entry = 0;
 
 	rldheap_init();
 
-	entry= 0;
+	rldexport_init(args);
+	rldelf_init(args);
 
-	uspa->rld_export= &exports;
+	load_program(args->program_path, &entry);
 
-	rldelf_init(uspa);
-
-	load_program(uspa->prog_path, (void**)&entry);
-
-	if(entry) {
-		retval= ((int(*)(void*))(entry))(uspa);
-	} else {
+	if (entry == NULL)
 		return -1;
-	}
 
-	return retval;
+	// call the program entry point (usually main())
+	return ((int (*)(void *))entry)(args);
 }
-
