@@ -696,7 +696,7 @@ devfs_fsync(fs_cookie _fs, fs_vnode _v)
 
 
 static ssize_t
-devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buffer, off_t pos, size_t *length)
+devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *buffer, size_t *length)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
@@ -729,8 +729,7 @@ devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buffer, off_t 
 
 
 static ssize_t
-devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, const void *buf, 
-		off_t pos, size_t *len)
+devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, const void *buf, size_t *len)
 {
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;

@@ -121,8 +121,8 @@ static int vfs_close(struct file_descriptor *, int, struct io_context *);
 static int common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
 static int common_read_stat(struct file_descriptor *, struct stat *);
 
-static ssize_t file_read(struct file_descriptor *, void *, off_t, size_t *);
-static ssize_t file_write(struct file_descriptor *, const void *, off_t, size_t *);
+static ssize_t file_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
+static ssize_t file_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static status_t dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
@@ -1771,22 +1771,22 @@ file_close(struct file_descriptor *descriptor)
 
 
 static ssize_t
-file_read(struct file_descriptor *descriptor, void *buffer, off_t pos, size_t *length)
+file_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
-	return FS_CALL(vnode,fs_read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
+	return FS_CALL(vnode,fs_read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
 }
 
 
 static ssize_t
-file_write(struct file_descriptor *descriptor, const void *buffer, off_t pos, size_t *length)
+file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
-	return FS_CALL(vnode,fs_write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
+	return FS_CALL(vnode,fs_write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -2322,7 +2322,7 @@ fs_unmount(char *path, bool kernel)
 	dec_vnode_ref_count(mount->root_vnode, false);
 	dec_vnode_ref_count(mount->root_vnode, false);
 
-	// XXX when full vnode cache in place, will need to force
+	// ToDo: when full vnode cache in place, will need to force
 	// a putvnode/removevnode here
 
 	/* remove the mount structure from the hash table */
@@ -2389,7 +2389,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	else
 		status = EOPNOTSUPP;
 
-	// fill in other info the file system doesn't know about
+	// fill in other info the file system doesn't (have to) know about
 	info->dev = mount->id;
 	info->root = mount->root_vnode->id;
 
@@ -2648,6 +2648,27 @@ sys_read_link(const char *path, char *buffer, size_t bufferSize)
 	pathCopy[SYS_MAX_PATH_LEN] = '\0';
 
 	return common_read_link(pathCopy, buffer, bufferSize, true);
+}
+
+
+int
+sys_write_link(const char *path, const char *toPath)
+{
+	char pathCopy[SYS_MAX_PATH_LEN + 1];
+	char toPathCopy[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
+	pathCopy[SYS_MAX_PATH_LEN] = '\0';
+
+	strncpy(toPathCopy, toPath, SYS_MAX_PATH_LEN);
+	toPathCopy[SYS_MAX_PATH_LEN] = '\0';
+
+	status = check_path(toPathCopy);
+	if (status < B_OK)
+		return status;
+
+	return common_write_link(pathCopy, toPathCopy, true);
 }
 
 
@@ -3011,6 +3032,35 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 		return status;
 
 	return user_strncpy(userBuffer, buffer, SYS_MAX_PATH_LEN);
+}
+
+
+int
+user_write_link(const char *userPath, const char *userToPath)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	char toPath[SYS_MAX_PATH_LEN + 1];
+	int status;
+	
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userToPath))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN] = '\0';
+
+	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	toPath[SYS_MAX_PATH_LEN] = '\0';
+
+	status = check_path(toPath);
+	if (status < B_OK)
+		return status;
+
+	return common_write_link(path, toPath, false);
 }
 
 

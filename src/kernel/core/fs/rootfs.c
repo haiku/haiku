@@ -490,14 +490,14 @@ rootfs_fsync(fs_cookie _fs, fs_vnode _v)
 
 
 static ssize_t
-rootfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buf, off_t pos, size_t *len)
+rootfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *buf, size_t *len)
 {
 	return EINVAL;
 }
 
 
 static ssize_t
-rootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_t pos, size_t *len)
+rootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void *buf, size_t *len)
 {
 	TRACE(("rootfs_write: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, *len));
 

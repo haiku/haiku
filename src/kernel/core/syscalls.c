@@ -73,10 +73,10 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_fsync((int)arg0);
 			break;
 		case SYSCALL_READ:
-			*call_ret = user_read((int)arg0, (void *)arg1, (off_t)INT32TOINT64(arg2, arg3), (ssize_t)arg4);
+			*call_ret = user_read((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (void *)arg3, (ssize_t)arg4);
 			break;
 		case SYSCALL_WRITE:
-			*call_ret = user_write((int)arg0, (const void *)arg1, (off_t)INT32TOINT64(arg2, arg3), (ssize_t)arg4);
+			*call_ret = user_write((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (const void *)arg3, (ssize_t)arg4);
 			break;
 		case SYSCALL_SEEK:
 			*call_ret = user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);

@@ -91,18 +91,18 @@ int read_file_in_buffer(const char *filename,char **buffer)
 	*buffer = NULL;
 
 	file_no = open(filename, O_RDONLY);
-	if (file_no < 0){
+	if (file_no < 0)
 		return file_no;
-	}
 
 	err = fstat(file_no,&stat);
 	if (err < 0)
 		return err;
 
 	*buffer = malloc(stat.st_size + 1);
-	if(*buffer == NULL) return ENOMEM;
+	if (*buffer == NULL)
+		return ENOMEM;
 
-	size = sys_read(file_no,*buffer,0,stat.st_size);
+	size = sys_read(file_no, 0, *buffer, stat.st_size);
 
 	sys_close(file_no);
 

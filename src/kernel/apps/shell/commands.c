@@ -118,7 +118,7 @@ int cmd_cat(int argc, char *argv[])
 	}
 
 	for(;;) {
-		rc = sys_read(fd, buf, -1, sizeof(buf) -1);
+		rc = sys_read(fd, -1, buf, sizeof(buf) -1);
 		if(rc <= 0)
 			break;
 

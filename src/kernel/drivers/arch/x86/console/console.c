@@ -177,10 +177,10 @@ static int console_close(void * cookie)
 	return 0;
 }
 
-static ssize_t console_read(void * cookie, off_t pos, void *buf, size_t *len)
+static ssize_t console_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
 	/* XXX - optimistic!! */
-	*len = sys_read(keyboard_fd, buf, 0, *len);
+	*len = sys_read(keyboard_fd, 0, buf, *len);
 	return 0;
 }
 

@@ -356,12 +356,10 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!unistd>open.o
 	<$(SOURCE_GRIST)!libc!unistd>opendir.o
 	<$(SOURCE_GRIST)!libc!unistd>link.o
-	<$(SOURCE_GRIST)!libc!unistd>pread.o
-	<$(SOURCE_GRIST)!libc!unistd>pwrite.o
 	<$(SOURCE_GRIST)!libc!unistd>read.o
+	<$(SOURCE_GRIST)!libc!unistd>write.o
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
-	<$(SOURCE_GRIST)!libc!unistd>write.o
 	;
 
 KernelLd libc.so :
@@ -473,12 +471,10 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!unistd>open.o
 	<$(SOURCE_GRIST)!libc!unistd>opendir.o
 	<$(SOURCE_GRIST)!libc!unistd>link.o
-	<$(SOURCE_GRIST)!libc!unistd>pread.o
-	<$(SOURCE_GRIST)!libc!unistd>pwrite.o
 	<$(SOURCE_GRIST)!libc!unistd>read.o
+	<$(SOURCE_GRIST)!libc!unistd>write.o
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
-	<$(SOURCE_GRIST)!libc!unistd>write.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
 	:

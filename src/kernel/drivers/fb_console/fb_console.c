@@ -267,7 +267,7 @@ static int console_close(void * cookie)
 static ssize_t console_read(void * cookie, off_t pos, void *buf, 
                             size_t *len)
 {
-	return sys_read(console.keyboard_fd, buf, 0, *len);
+	return sys_read(console.keyboard_fd, 0, buf, *len);
 }
 
 static ssize_t _console_write(const void *buf, size_t *len)

@@ -229,7 +229,7 @@ fd_dup2(int oldfd, int newfd, bool kernel)
 
 
 ssize_t
-user_read(int fd, void *buffer, off_t pos, size_t length)
+user_read(int fd, off_t pos, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
@@ -242,7 +242,7 @@ user_read(int fd, void *buffer, off_t pos, size_t length)
 		return EBADF;
 
 	if (descriptor->ops->fd_read) {
-		retval = descriptor->ops->fd_read(descriptor, buffer, pos, &length);
+		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 		if (retval >= 0)
 			retval = (ssize_t)length;
 	} else
@@ -254,7 +254,7 @@ user_read(int fd, void *buffer, off_t pos, size_t length)
 
 
 ssize_t
-user_write(int fd, const void *buffer, off_t pos, size_t length)
+user_write(int fd, off_t pos, const void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval = 0;
@@ -266,7 +266,7 @@ user_write(int fd, const void *buffer, off_t pos, size_t length)
 		return EBADF;
 
 	if (descriptor->ops->fd_write) {
-		retval = descriptor->ops->fd_write(descriptor, buffer, pos, &length);
+		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
 		if (retval >= 0)
 			retval = (ssize_t)length;
 	} else
@@ -439,7 +439,7 @@ user_dup2(int ofd, int nfd)
 
 
 ssize_t
-sys_read(int fd, void *buffer, off_t pos, size_t length)
+sys_read(int fd, off_t pos, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
@@ -449,7 +449,7 @@ sys_read(int fd, void *buffer, off_t pos, size_t length)
 		return EBADF;
 
 	if (descriptor->ops->fd_read) {
-		retval = descriptor->ops->fd_read(descriptor, buffer, pos, &length);
+		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 		if (retval >= 0)
 			retval = (ssize_t)length;
 	} else
@@ -461,7 +461,7 @@ sys_read(int fd, void *buffer, off_t pos, size_t length)
 
 
 ssize_t
-sys_write(int fd, const void *buffer, off_t pos, size_t length)
+sys_write(int fd, off_t pos, const void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
@@ -471,7 +471,7 @@ sys_write(int fd, const void *buffer, off_t pos, size_t length)
 		return EBADF;
 
 	if (descriptor->ops->fd_write) {
-		retval = descriptor->ops->fd_write(descriptor, buffer, pos, &length);
+		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
 		if (retval >= 0)
 			retval = (ssize_t)length;
 

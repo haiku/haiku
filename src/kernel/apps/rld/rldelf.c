@@ -748,41 +748,41 @@ load_container(char const *path, char const *name, bool fixed)
 
 	struct Elf32_Ehdr eheader;
 
-	found= find_image(name);
-	if(found) {
-		found->refcount+= 1;
+	found = find_image(name);
+	if (found) {
+		found->refcount += 1;
 		return found;
 	}
 
-	fd= sys_open(path, 0);
-	FATAL((fd< 0), "cannot open file %s\n", path);
+	fd = sys_open(path, 0);
+	FATAL((fd < 0), "cannot open file %s\n", path);
 
-	len= sys_read(fd, &eheader, 0, sizeof(eheader));
-	FATAL((len!= sizeof(eheader)), "troubles reading ELF header\n");
+	len = sys_read(fd, 0, &eheader, sizeof(eheader));
+	FATAL((len != sizeof(eheader)), "troubles reading ELF header\n");
 
-	ph_len= parse_eheader(&eheader);
-	FATAL((ph_len<= 0), "incorrect ELF header\n");
-	FATAL((ph_len> (int)sizeof(ph_buff)), "cannot handle Program headers bigger than %lu\n", (long unsigned)sizeof(ph_buff));
+	ph_len = parse_eheader(&eheader);
+	FATAL((ph_len <= 0), "incorrect ELF header\n");
+	FATAL((ph_len > (int)sizeof(ph_buff)), "cannot handle Program headers bigger than %lu\n", (long unsigned)sizeof(ph_buff));
 
-	len= sys_read(fd, ph_buff, eheader.e_phoff, ph_len);
-	FATAL((len!= ph_len), "troubles reading Program headers\n");
+	len = sys_read(fd, eheader.e_phoff, ph_buff, ph_len);
+	FATAL((len != ph_len), "troubles reading Program headers\n");
 
-	num_regions= count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	FATAL((num_regions<= 0), "troubles parsing Program headers, num_regions= %d\n", num_regions);
+	num_regions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
+	FATAL((num_regions <= 0), "troubles parsing Program headers, num_regions= %d\n", num_regions);
 
-	image= create_image(name, num_regions);
+	image = create_image(name, num_regions);
 	FATAL((!image), "failed to allocate image_t control block\n");
 
 	parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
 	FATAL(!assert_dynamic_loadable(image), "dynamic segment must be loadable (implementation restriction)\n");
 
-	map_success= map_image(fd, path, image, fixed);
+	map_success = map_image(fd, path, image, fixed);
 	FATAL(!map_success, "troubles reading image\n");
 
-	dynamic_success= parse_dynamic_segment(image);
+	dynamic_success = parse_dynamic_segment(image);
 	FATAL(!dynamic_success, "troubles handling dynamic section\n");
 
-	image->entry_point= eheader.e_entry + image->regions[0].delta;
+	image->entry_point = eheader.e_entry + image->regions[0].delta;
 
 	sys_close(fd);
 
@@ -804,11 +804,10 @@ load_dependencies(image_t *img)
 	char   path[256];
 
 	d = (struct Elf32_Dyn *)img->dynamic_ptr;
-	if(!d) {
+	if (!d)
 		return;
-	}
 
-	img->needed= rldalloc(img->num_needed*sizeof(image_t*));
+	img->needed = rldalloc(img->num_needed*sizeof(image_t*));
 	FATAL((!img->needed), "failed to allocate needed struct\n");
 	memset(img->needed, 0, img->num_needed*sizeof(image_t*));
 

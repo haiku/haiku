@@ -194,6 +194,7 @@ const char *const module_paths[] = {
 new_hash_table *module_files = NULL;
 new_hash_table *modules_list = NULL;
 
+
 /* load_module_file
  * Try to load the module file we've found into memory.
  * This may fail if all the symbols can't be resolved.
@@ -206,7 +207,9 @@ new_hash_table *modules_list = NULL;
  *   NULL on failure
  *   pointer to modules symbol on success
  */
-static module_info **load_module_file(const char *path) 
+
+static module_info **
+load_module_file(const char *path) 
 {
 	image_id file_image = elf_load_kspace(path, "");
 	loaded_module *lm;
@@ -246,7 +249,9 @@ static module_info **load_module_file(const char *path)
 	return lm->info;
 }
 
-static inline void unload_module_file(const char *path)
+
+static inline void
+unload_module_file(const char *path)
 {
 	loaded_module *themod; 
 dprintf("unload_mdoule_file: %s\n", path);
@@ -271,6 +276,7 @@ dprintf("unload_mdoule_file: %s\n", path);
 	kfree(themod);
 }
 
+
 /* simple_module_info()
  * Extract the information from the module_info structure pointed at
  * by mod and create the entries required for access to it's details.
@@ -279,7 +285,9 @@ dprintf("unload_mdoule_file: %s\n", path);
  *  -1 if error
  *   0 if ok
  */
-static int simple_module_info(module_info *mod, const char *file, int offset)
+
+static int
+simple_module_info(module_info *mod, const char *file, int offset)
 {
 	module *m;
 	
@@ -326,6 +334,7 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 	return 0;
 }
 
+
 /* recurse_check_file
  * Load the file filepath and check to see if we have a module within it
  * that matches module_wanted.
@@ -337,7 +346,9 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
  *   0 on no match
  *   1 on match
  */
-static int recurse_check_file(const char *filepath, const char *module_wanted)
+
+static int
+recurse_check_file(const char *filepath, const char *module_wanted)
 {
 	module_info **hdr = NULL, **chk;
 	int i = 0, match = 0;
@@ -368,6 +379,7 @@ static int recurse_check_file(const char *filepath, const char *module_wanted)
 
 	return match;
 }
+
 	
 /* recurse_directory
  * Enter the directory and try every entry, entering directories if
@@ -381,7 +393,9 @@ static int recurse_check_file(const char *filepath, const char *module_wanted)
  *   0 for no match
  *   1 for match
  */
-static int recurse_directory(const char *path, const char *match)
+
+static int
+recurse_directory(const char *path, const char *match)
 {
 	/* ToDo: should just use opendir(), readdir(), ... */
 	struct stat stat;
@@ -448,10 +462,13 @@ static int recurse_directory(const char *path, const char *match)
 	return res;
 }
 
+
 /* This is only called if we fail to find a module already in our cache...saves us
  * some extra checking here :)
  */
-static module *search_module(const char *name)
+
+static module *
+search_module(const char *name)
 {
 	int i, res = 0;
 	SHOW_FLOW(3, "search_module(%s)\n", name);
@@ -461,15 +478,15 @@ static module *search_module(const char *name)
 			break;
 	}
 
-	if (res != 1) {
+	if (res != 1)
 		return NULL;
-	}
 	
 	return (module*)hash_get(modules_list, name, strlen(name));
 }
 
 
-static inline int init_module(module *module)
+static inline int
+init_module(module *module)
 {
 	int res = 0;
 		
@@ -513,7 +530,9 @@ static inline int init_module(module *module)
 	return res;
 }
 
-static inline int uninit_module(module *module)
+
+static inline int
+uninit_module(module *module)
 {
 	switch( module->state ) {
 		case MOD_QUERIED:
@@ -556,7 +575,9 @@ static inline int uninit_module(module *module)
 	}
 }
 
-static int process_module_info(module_iterator *iter, char *buf, size_t *bufsize)
+
+static int
+process_module_info(module_iterator *iter, char *buf, size_t *bufsize)
 {
 	module *m = NULL;
 	module_info **mod;
@@ -588,31 +609,33 @@ static int process_module_info(module_iterator *iter, char *buf, size_t *bufsize
 	return res;
 }	
 
-static inline int module_create_dir_iterator( module_iterator *iter, int file, const char *name )
+
+static inline int
+module_create_dir_iterator(module_iterator *iter, int file, const char *name)
 {
 	module_dir_iterator *dir;
-	
+
 	/* if we're creating a dir_iterator, there is no way that the
 	 * cur_header value can be valid, so make sure and reset it
 	 * here.
 	 */
 	iter->cur_header = NULL;
-	
-	dir = (struct module_dir_iterator *)kmalloc( sizeof( *dir ));
+
+	dir = (struct module_dir_iterator *)kmalloc(sizeof(*dir));
 	if (dir == NULL )
 		return ENOMEM;
-		
-	dir->name = (char *)kstrdup( name );
-	if (dir->name == NULL ) {
-		kfree( dir );
+
+	dir->name = (char *)kstrdup(name);
+	if (dir->name == NULL) {
+		kfree(dir);
 		return ENOMEM;
 	}
 
 	dir->file = file;
 	dir->sub_dir = NULL;		
 	dir->parent_dir = iter->cur_dir;
-	
-	if (iter->cur_dir )
+
+	if (iter->cur_dir)
 		iter->cur_dir->sub_dir = dir;
 	else
 		iter->base_dir = dir;
@@ -623,13 +646,15 @@ static inline int module_create_dir_iterator( module_iterator *iter, int file, c
 	return B_NO_ERROR;
 }
 
-static inline int module_enter_dir(module_iterator *iter, const char *path)
+
+static inline int
+module_enter_dir(module_iterator *iter, const char *path)
 {
 	int dir;
 	int res;
 	
 	dir = sys_open_dir(path);
-	if (dir < 0 ) {
+	if (dir < 0) {
 		SHOW_FLOW(3, "couldn't open directory %s (%s)\n", path, strerror(dir));
 
 		// there are so many errors for "not found" that we don't bother
@@ -648,7 +673,8 @@ static inline int module_enter_dir(module_iterator *iter, const char *path)
 }
 
 
-static inline void destroy_dir_iterator( module_iterator *iter )
+static inline void
+destroy_dir_iterator( module_iterator *iter )
 {
 	module_dir_iterator *dir;
 	
@@ -666,7 +692,8 @@ static inline void destroy_dir_iterator( module_iterator *iter )
 }
 
 
-static inline void module_leave_dir( module_iterator *iter )
+static inline void
+module_leave_dir( module_iterator *iter )
 {
 	module_dir_iterator *parent_dir;
 	
@@ -705,6 +732,7 @@ static void compose_path( char *path, module_iterator *iter, const char *name, b
 		path );
 }
 
+
 /* module_traverse_directory
  * Logic as follows...
  * If we have a headers pointer,
@@ -713,14 +741,17 @@ static void compose_path( char *path, module_iterator *iter, const char *name, b
  *
  * This function tries to find the next module filename and then set the headers
  * pointer in the cur_dir structure.
- */ 
-static inline int module_traverse_dir(module_iterator *iter)
+ */
+
+static inline int
+module_traverse_dir(module_iterator *iter)
 {
 	int res;
 	struct stat stat;
-	char name[SYS_MAX_NAME_LEN];
+	char buffer[SYS_MAX_NAME_LEN + sizeof(struct dirent)];
+	struct dirent *dirent = (struct dirent *)buffer;
 	char path[SYS_MAX_PATH_LEN];
-	
+
 	/* If (*iter->cur_header) != NULL we have another module within
 	 * the existing file to return, so just return.
 	 * Otherwise, actually find the next file to read.
@@ -731,26 +762,21 @@ static inline int module_traverse_dir(module_iterator *iter)
 		else
 			return B_NO_ERROR;
 	}
-	
-	SHOW_FLOW( 3, "scanning %s\n", iter->cur_dir->name );
-	if ((res = sys_read(iter->cur_dir->file, name, 0, sizeof(name))) <= 0) {
+
+	SHOW_FLOW( 3, "scanning %s\n", iter->cur_dir->name);
+	if ((res = sys_read_dir(iter->cur_dir->file, dirent, sizeof(buffer), 1)) <= 0) {
 		SHOW_FLOW(3, "got error: %s\n", strerror(res));
 		module_leave_dir(iter);
 		return B_NO_ERROR;
 	}
 
-	SHOW_FLOW( 3, "got %s\n", name );
+	SHOW_FLOW(3, "got %s\n", dirent->d_name);
 
-	if (strcmp(name, ".") == 0 ||
-		strcmp(name, "..") == 0 )
+	if (strcmp(dirent->d_name, ".") == 0 ||
+		strcmp(dirent->d_name, "..") == 0 )
 		return B_NO_ERROR;
-	
-	/* currently, sys_read returns an error if buffer is too small
-	 * I don't know the official specification, so it's always safe
-	 * to add a trailing end-of-string
-	 */
-	name[sizeof(name) - 1] = 0;
-	compose_path(path, iter, name, true);
+
+	compose_path(path, iter, dirent->d_name, true);
 
 	/* As we're doing a new file, reset the pointers that might get
 	 * screwed up...
@@ -760,7 +786,7 @@ static inline int module_traverse_dir(module_iterator *iter)
 		
 	if ((res = sys_read_stat(path, true, &stat)) != B_NO_ERROR)
 		return res;
-		
+
 	if (S_ISREG(stat.st_mode)) {
 		module_info **hdrs = NULL;
 		if ((hdrs = load_module_file(path)) != NULL) {
@@ -770,19 +796,22 @@ static inline int module_traverse_dir(module_iterator *iter)
 		}
 		return EINVAL; /* not sure what we should return here */
 	}
-	
+
 	if (S_ISDIR(stat.st_mode))
 		return module_enter_dir(iter, path);
 
-	SHOW_FLOW( 3, "entry %s not a file nor a directory - ignored\n", name );
+	SHOW_FLOW(3, "entry %s not a file nor a directory - ignored\n", dirent->d_name);
 	return B_NO_ERROR;
 }
+
 
 /* module_enter_base_path
  * Basically try each of the directories we have listed as module paths,
  * trying each with the prefix we've been allocated.
  */
-static inline int module_enter_base_path(module_iterator *iter)
+
+static inline int
+module_enter_base_path(module_iterator *iter)
 {
 	char path[SYS_MAX_PATH_LEN];
 	
@@ -808,6 +837,7 @@ static inline int module_enter_base_path(module_iterator *iter)
 	return module_enter_dir(iter, path);
 }
 
+
 /* open_module_list
  * This returns a pointer to a structure that can be used to
  * iterate through a list of all modules available under
@@ -817,7 +847,9 @@ static inline int module_enter_base_path(module_iterator *iter)
  * The structure is then used by the read_next_module_name function
  * and MUST be freed or memory will be leaked.
  */
-void *open_module_list(const char *prefix)
+
+void *
+open_module_list(const char *prefix)
 {
 	module_iterator *iter;
 	
@@ -841,19 +873,22 @@ void *open_module_list(const char *prefix)
 	return (void *)iter;
 }
 
+
 /* read_next_module_name
  * Return the next module name from the available list, using
  * a structure previously created by a call to open_module_list.
  * Returns 0 if a module was available.
  */
-int read_next_module_name(void *cookie, char *buf, size_t *bufsize )
+
+int
+read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 {
 	module_iterator *iter = (module_iterator *)cookie;
 	int res;
 
 	*buf = '\0';
 		
-	if(!iter)
+	if (!iter)
 		return EINVAL;
 
 	res = iter->err;

@@ -632,7 +632,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 
 	// read and verify the ELF header
 
-	len = sys_read(fd, &eheader, 0, sizeof(eheader));
+	len = sys_read(fd, 0, &eheader, sizeof(eheader));
 	if (len < 0) {
 		err = len;
 		goto error;
@@ -657,7 +657,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 	}
 
 	dprintf("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
-	len = sys_read(fd, pheaders, eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
+	len = sys_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
 	if (len < 0) {
 		err = len;
 		dprintf("error reading in program headers\n");
@@ -815,7 +815,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		goto error;
 	}
 
-	len = sys_read(fd, eheader, 0, sizeof(*eheader));
+	len = sys_read(fd, 0, eheader, sizeof(*eheader));
 	if (len < 0) {
 		err = len;
 		goto error1;
@@ -846,7 +846,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	}
 
 	PRINT(("reading in program headers at 0x%x, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
-	len = sys_read(fd, pheaders, eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize);
+	len = sys_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
 		PRINT(("error reading in program headers\n"));
@@ -918,8 +918,9 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 		PRINT(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
 
-		len = sys_read(fd, (void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
-			pheaders[i].p_offset, pheaders[i].p_filesz);
+		len = sys_read(fd, pheaders[i].p_offset,
+			(void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
+			pheaders[i].p_filesz);
 		if (len < 0) {
 			err = len;
 			dprintf("error reading in seg %d\n", i);
