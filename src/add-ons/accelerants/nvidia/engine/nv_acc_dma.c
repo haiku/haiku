@@ -475,38 +475,43 @@ status_t nv_acc_init_dma()
 			ACCW(DEBUG3, 0xf00e0431);
 			ACCW(NV10_DEBUG4, 0x00008000);
 			ACCW(NV25_WHAT0, 0xf04b1f36);
-			ACCW(NV25_WHAT2, 0x1002d888);
-			ACCW(NV25_WHAT4, 0x62ff007f);
+			ACCW(NV20_WHAT3, 0x1002d888);
+			ACCW(NV25_WHAT2, 0x62ff007f);
 			break;
 		case NV20A:
-/*
-              pNv->PGRAPH[0x0084/4] = 0x00118700;//acc DEBUG1
-              pNv->PGRAPH[0x008C/4] = 0xF20E0431;//acc DEBUG3
-              pNv->PGRAPH[0x0090/4] = 0x00000000;//acc NV10_DEBUG4
-              pNv->PGRAPH[0x009C/4] = 0x00000040;//0x0040009c nieuw: unknown!!<<<<<<<<
+			/* init some function blocks, but most is unknown.. */
+			ACCW(DEBUG1, 0x00118700);
+			ACCW(DEBUG3, 0xf20e0431);
+			ACCW(NV10_DEBUG4, 0x00000000);
+			ACCW(NV20_WHAT1, 0x00000040);
+			if (si->ps.card_type < NV25)
+			{
+				ACCW(NV20_WHAT2, 0x00080000);
+				ACCW(NV10_DEBUG5, 0x00000005);
+				ACCW(NV20_WHAT3, 0x45caa208);
+				ACCW(NV20_WHAT4, 0x24000000);
+				ACCW(NV20_WHAT5, 0x00000040);
 
-              if((pNv->Chipset & 0x0ff0) >= 0x0250)
-              {
-                 pNv->PGRAPH[0x0890/4] = 0x00080000;//0x00400890 nieuw: unknown!!<<<<<<<<
-                 pNv->PGRAPH[0x0610/4] = 0x304B1FB6;//NVACC_NV4X_WHAT2 nw,ook op NV25 en+!<<< 
-                 pNv->PGRAPH[0x0B80/4] = 0x18B82880;//0x00400b80 nieuw: unknown!!<<<<<<< 
-                 pNv->PGRAPH[0x0B84/4] = 0x44000000;//0x00400b84 nieuw: unknown!!<<<<<<< 
-                 pNv->PGRAPH[0x0098/4] = 0x40000080;//0x00400098 nieuw: unknown!!<<<<<<< 
-                 pNv->PGRAPH[0x0B88/4] = 0x000000ff;//0x00400b88 nieuw: unknown!!<<<<<<< 
-              }
-              else
-              {
-                 pNv->PGRAPH[0x0880/4] = 0x00080000;
-                 pNv->PGRAPH[0x0094/4] = 0x00000005;
-                 pNv->PGRAPH[0x0B80/4] = 0x45CAA208; 
-                 pNv->PGRAPH[0x0B84/4] = 0x24000000;
-                 pNv->PGRAPH[0x0098/4] = 0x00000040;
-                 pNv->PGRAPH[0x0750/4] = 0x00E00038;
-                 pNv->PGRAPH[0x0754/4] = 0x00000030;
-                 pNv->PGRAPH[0x0750/4] = 0x00E10038;
-                 pNv->PGRAPH[0x0754/4] = 0x00000030;
-              }
-*/
+				/* copy some fixed RAM(?) configuration info(?) to some indexed registers: */
+				/* b16-24 is select; b2-13 is adress in 32-bit words */
+				ACCW(RDI_INDEX, 0x00e00038);
+				/* data is 32-bit */
+				ACCW(RDI_DATA, 0x00000030);
+				/* copy some fixed RAM(?) configuration info(?) to some indexed registers: */
+				/* b16-24 is select; b2-13 is adress in 32-bit words */
+				ACCW(RDI_INDEX, 0x00e10038);
+				/* data is 32-bit */
+				ACCW(RDI_DATA, 0x00000030);
+			}
+			else
+			{
+				ACCW(NV25_WHAT1, 0x00080000);
+				ACCW(NV25_WHAT0, 0x304b1fb6);
+				ACCW(NV20_WHAT3, 0x18b82880);
+				ACCW(NV20_WHAT4, 0x44000000);
+				ACCW(NV20_WHAT5, 0x40000080);
+				ACCW(NV25_WHAT2, 0x000000ff);
+			}
 			break;
 		}
 
