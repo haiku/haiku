@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-4/2004
+	Rudolf Cornelissen 10/2002-1/2005
 */
 
 #define MODULE_BIT 0x08000000
@@ -127,6 +127,7 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 }
 #undef CHKO
 #undef CHKA
+#undef CHKD
 #undef HOOK
 #undef ZERO
 #undef HRDC
@@ -204,6 +205,13 @@ status_t check_acc_capability(uint32 feature)
 	default:
 		msg = "UNKNOWN";
 		break;
+	}
+
+	//fixme:
+	if(si->ps.card_arch >= NV40A)
+	{
+		LOG(4, ("Acc: Acc not setup yet; not exporting hook %s.\n", msg));
+		return B_ERROR;
 	}
 
 	/* hardware acceleration is only supported in modes with upto a certain

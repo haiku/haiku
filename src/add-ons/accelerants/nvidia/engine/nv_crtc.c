@@ -723,6 +723,11 @@ status_t nv_crtc_cursor_show()
 	/* b0 = 1 enables cursor */
 	CRTCW(CURCTL0, (CRTCR(CURCTL0) | 0x01));
 
+	/* workaround for hardware bug confirmed existing on NV43:
+	 * Cursor visibility is not updated without a position update if its hardware
+	 * retrace sync is enabled. */
+	if (si->ps.card_arch == NV40A) DACW(CURPOS, (DACR(CURPOS)));
+
 	return B_OK;
 }
 
@@ -735,6 +740,11 @@ status_t nv_crtc_cursor_hide()
 
 	/* b0 = 0 disables cursor */
 	CRTCW(CURCTL0, (CRTCR(CURCTL0) & 0xfe));
+
+	/* workaround for hardware bug confirmed existing on NV43:
+	 * Cursor visibility is not updated without a position update if its hardware
+	 * retrace sync is enabled. */
+	if (si->ps.card_arch == NV40A) DACW(CURPOS, (DACR(CURPOS)));
 
 	return B_OK;
 }

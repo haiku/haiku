@@ -7,6 +7,13 @@
 	Rudolf Cornelissen 3/2004-12/2004
 */
 
+/*
+	note:
+	attempting DMA on NV40 and higher because without it I can't get it going ATM.
+	Later on this can become a nv.settings switch, and maybe later we can even
+	forget about non-DMA completely (depends on 3D acceleration attempts).
+*/
+
 #define MODULE_BIT 0x10000000
 
 #include "acc_std.h"
@@ -28,7 +35,8 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	if (st) SYNC_TO_TOKEN(st);
 
 	/* make sure all needed engine cmd's are mapped to the FIFO */
-	nv_acc_assert_fifo();
+	if (si->ps.card_arch < NV40A)
+		nv_acc_assert_fifo();
 
 	/* return an engine token */
 	*et = &nv_engine_token;
@@ -48,7 +56,10 @@ status_t RELEASE_ENGINE(engine_token *et, sync_token *st)
 void WAIT_ENGINE_IDLE(void)
 {
 	/*wait for the engine to be totally idle*/
-	nv_acc_wait_idle();
+	if (si->ps.card_arch < NV40A)
+		nv_acc_wait_idle();
+	else
+		nv_acc_wait_idle_dma();
 }
 
 status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st)

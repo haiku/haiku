@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-4/2004
+	Rudolf Cornelissen 11/2002-1/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -310,7 +310,14 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
-	nv_acc_init();
+	/* note:
+	 * attempting DMA on NV40 and higher because without it I can't get it going ATM.
+	 * Later on this can become a nv.settings switch, and maybe later we can even
+	 * forget about non-DMA completely (depends on 3D acceleration attempts). */
+	if (si->ps.card_arch < NV40)
+		nv_acc_init();
+	else
+		nv_acc_init_dma();
 	/* set up overlay unit for this mode */
 	nv_bes_init();
 

@@ -5,6 +5,7 @@ UsePrivateHeaders [ FDirName graphics nvidia ] ;
 
 StaticLibrary nvidia_engine :
 	nv_acc.c
+	nv_acc_dma.c
 	nv_bes.c
 	nv_brooktreetv.c
 	nv_crtc.c

@@ -352,7 +352,7 @@ status_t nv_acc_init()
 		/* disable specific functions, but enable SETUP_SPARE2 register */
 		ACCW(NV10_DEBUG4, 0x00008000);
 		/* set limit_viol_pix_adress(?): more likely something unknown.. */
-		ACCW(NV4X_WHAT2, 0x00be3c5f);
+		ACCW(NV25_WHAT0, 0x00be3c5f);
 		/* unknown.. */
 		switch (si->ps.card_type)
 		{
