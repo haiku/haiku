@@ -4,6 +4,10 @@ SubDir OBOS_TOP src kits interface ;
 
 UsePrivateHeaders interface ;
 
+if ! $(HAIKU_COMPATIBLE) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
 StaticLibrary haiku :
 	ScrollView.cpp
 	: STATIC_LIBRARY_DIR
