@@ -1,110 +1,194 @@
 /*
  * ValidRect.cpp
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
+ * Copyright 2005 Michael Pfeiffer. All Rights Reserved.
+ * - Rewrote get_valid_rect from scratch.
  */
 
 #include <Bitmap.h>
 #include "ValidRect.h"
 
-bool get_valid_line_RGB32(
-	const uchar *bits,
-	int width,
-	int *left,
-	int *right)
+#define INLINE inline
+
+class BoundsCalculator
 {
-	int i = 0;
-	rgb_color c;
-	const rgb_color *ptr = (const rgb_color *)bits;
+public:
+	bool getValidRect(BBitmap *bitmap, RECT *rect);
+	
+private:
+	const uchar *fBits;
+	int fBPR;
+	int fLeft;
+	int fRight;
+	int fTop;
+	int fBottom;
+	int fWidth;
+	
+	int fLeftBound;
+	int fRightBound;
 
-	while (i < *left) {
-		c = *ptr++;
-		if (c.red != 0xff || c.green != 0xff || c.blue != 0xff) {
-			*left = i;
-			break;
+	INLINE bool isEmpty(const rgb_color *pixel);
+
+	INLINE bool isRowEmpty(const rgb_color *row);
+
+	INLINE const uchar *getRow(int x, int y);
+
+	int getTop();
+	
+	int getBottom();
+	
+	INLINE void updateLeftBound(const rgb_color *row);
+	INLINE void updateRightBound(const rgb_color *row);
+};
+
+bool 
+BoundsCalculator::isEmpty(const rgb_color *pixel)
+{
+	return pixel->red == 0xff && pixel->green == 0xff && pixel->blue == 0xff;
+}
+
+
+bool 
+BoundsCalculator::isRowEmpty(const rgb_color *row)
+{
+	for (int x = 0; x < fWidth; x ++) {
+		if (!isEmpty(row)) {
+			return false;
 		}
-		i++;
-	}
-
-	if (i == width) {
-		return false;
-	}
-
-	i = width - 1;
-	ptr = (const rgb_color *)bits + width - 1;
-
-	while (i > *right) {
-		c = *ptr--;
-		if (c.red != 0xff || c.green != 0xff || c.blue != 0xff) {
-			*right = i;
-			break;
-		}
-		i--;
+		row ++;
 	}
 	return true;
 }
 
-typedef bool (*PFN_GET_VALID_LINE)(const uchar *, int, int *, int *);
+const uchar *
+BoundsCalculator::getRow(int x, int y)
+{
+	return fBits + x + fBPR * y;
+}
+	
+int 
+BoundsCalculator::getTop()
+{	
+	const uchar* row = getRow(fLeft, fTop);
+
+	int top;
+	for (top = fTop; top <= fBottom; top ++) {
+		if (!isRowEmpty((const rgb_color*)row)) {
+			break;
+		}
+		row += fBPR;
+	}
+	
+	return top;
+}
+
+int
+BoundsCalculator::getBottom()
+{
+	const uchar *row = getRow(fLeft, fBottom);
+
+	int bottom;
+	for (bottom = fBottom; bottom >= fTop; bottom --) {
+		if (!isRowEmpty((const rgb_color*)row)) {
+			break;
+		}
+		row -= fBPR;
+	}
+	
+	return bottom;
+}
+
+void
+BoundsCalculator::updateLeftBound(const rgb_color *row)
+{
+	for (int x = fLeft; x < fLeftBound; x ++) {
+		if (!isEmpty(row)) {
+			fLeftBound = x;
+			return;
+		}
+		row ++;
+	}
+}
+
+void
+BoundsCalculator::updateRightBound(const rgb_color *row)
+{
+	row += fWidth - 1;
+	for (int x = fRight; x > fRightBound; x --) {
+		if (!isEmpty(row)) {
+			fRightBound = x;
+			return;
+		}
+		row --;
+	}
+}
+
+// returns false if the bitmap is empty or has wrong color space.
+bool
+BoundsCalculator::getValidRect(BBitmap *bitmap, RECT *rect)
+{
+	enum {
+		kRectIsInvalid = false,
+		kRectIsEmpty = false,
+		kRectIsValid = true
+	};
+	
+	switch (bitmap->ColorSpace()) {
+		case B_RGB32:
+		case B_RGB32_BIG:
+			break;
+		default:
+			return kRectIsInvalid;
+			break;
+	};
+
+	// initialize member variables
+	fBits = (uchar*)bitmap->Bits();
+	fBPR  = bitmap->BytesPerRow();
+	
+	fLeft   = rect->left;	
+	fRight  = rect->right;
+	fTop    = rect->top;
+	fBottom = rect->bottom;
+	
+	fWidth = fRight - fLeft + 1;
+
+	// get top bound
+	fTop = getTop();
+	if (fTop > fBottom) {
+		return kRectIsEmpty;
+	}
+	
+	// get bottom bound
+	fBottom = getBottom();
+	
+	// calculate left and right bounds
+	fLeftBound = fRight + 1;
+	fRightBound = fLeft - 1;
+	
+	const uchar *row = getRow(fLeft, fTop);
+	for (int y = fTop; y <= fBottom; y ++) {
+		updateLeftBound((const rgb_color*)row);
+		updateRightBound((const rgb_color*)row);
+		if (fLeft == fLeftBound && fRight == fRightBound) {
+			break;
+		}
+		row += fBPR;
+	}
+	
+	// return bounds in rectangle
+	rect->left = fLeftBound;
+	rect->right = fRightBound; 
+	rect->top = fTop;
+	rect->bottom = fBottom;
+		
+	return kRectIsValid;
+}
 
 bool get_valid_rect(BBitmap *a_bitmap, RECT *rc)
 {
-	int width  = rc->right  - rc->left + 1;
-	int height = rc->bottom - rc->top  + 1;
-	int delta  = a_bitmap->BytesPerRow();
-
-	int left   = width;
-	int right  = 0;
-	int top    = 0;
-	int bottom = 0;
-
-	PFN_GET_VALID_LINE get_valid_line;
-
-	switch (a_bitmap->ColorSpace()) {
-	case B_RGB32:
-	case B_RGB32_BIG:
-		get_valid_line = get_valid_line_RGB32;
-		break;
-	default:
-		return false;
-		break;
-	};
-
-	int i = 0;
-	uchar *ptr = (uchar *)a_bitmap->Bits();
-
-	while (i < height) {
-		if (get_valid_line(ptr, width, &left, &right)) {
-			top = i;
-			break;
-		}
-		ptr += delta;
-		i++;
-	}
-
-	if (i == height) {
-		return false;
-	}
-
-	int j = height - 1;
-	ptr = (uchar *)a_bitmap->Bits() + (height - 1) * delta;
-	bool found_boundary = false;
-
-	while (j >= i) {
-		if (get_valid_line(ptr, width, &left, &right)) {
-			if (!found_boundary) {
-				bottom = j;
-				found_boundary = true;
-			}
-		}
-		ptr -= delta;
-		j--;
-	}
-
-	rc->left   = left;
-	rc->top    = top;
-	rc->right  = right;
-	rc->bottom = bottom;
-
-	return true;
+	BoundsCalculator calculator;
+	return calculator.getValidRect(a_bitmap, rc);
 }
 
 int color_space2pixel_depth(color_space cs)
