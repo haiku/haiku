@@ -41,7 +41,7 @@ using namespace std;
 #define std
 #endif
 
-#define	PAGESETUP_WIDTH		270
+#define	PAGESETUP_WIDTH		350
 #define PAGESETUP_HEIGHT	135
 
 #define	MENU_HEIGHT			16

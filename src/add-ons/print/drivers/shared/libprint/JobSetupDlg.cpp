@@ -105,7 +105,7 @@ using namespace std;
 	#define TO_WIDTH			59
 	#define TO_HEIGHT			FROM_HEIGHT
 
-#define	PRINT_WIDTH			355
+#define	PRINT_WIDTH			365
 #define PRINT_HEIGHT		QUALITY_HEIGHT + PAGERABGE_HEIGHT + 20 // 210
 
 #define PAPERFEED_H			QUALITY_H + QUALITY_WIDTH + 10
