@@ -14,7 +14,6 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>kernel_daemon.c 
 	<$(SOURCE_GRIST)>khash.c 
 	<$(SOURCE_GRIST)>linkhack.c 
-	<$(SOURCE_GRIST)>list.c 
 	<$(SOURCE_GRIST)>lock.c 
 	<$(SOURCE_GRIST)>main.c 
 	<$(SOURCE_GRIST)>misc.c 
