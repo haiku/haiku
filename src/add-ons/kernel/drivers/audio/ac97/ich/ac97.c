@@ -101,6 +101,19 @@ typedef struct
 
 codec_table codecs[] = 
 {
+
+	CODEC_ID_AD1819 	= 0x41445303, // ok, AD1819A, AD1819B
+	CODEC_ID_AD1881		= 0x41445340, // ok, AD1881
+	CODEC_ID_AD1881A	= 0x41445348, // ok, AD1881A
+	CODEC_ID_AD1885		= 0x41445360, // ok, AD1885
+	CODEC_ID_AD1886		= 0x41445361, // ok, AD1886
+	CODEC_ID_AD1886A 	= 0x41445363, // ok, AD1886A
+	CODEC_ID_AD1887		= 0x41445362, // ok, AD1887
+	CODEC_ID_AD1980		= 0x41445370, // ok, AD1980
+	CODEC_ID_AD1981B	= 0x41445374, // ok, AD1981B
+	CODEC_ID_AD1985		= 0x41445375, // ok, AD1985
+
+
 	{ CODEC_ID_AD1819,	0xffffffff, ad1819_init,	"Analog Devices AD1819B SoundPort"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1881,	0xffffffff, ad1881_init,	"Analog Devices AD1881 SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1881A,	0xffffffff, ad1881_init,	"Analog Devices AD1881A SoundMAX"B_UTF8_REGISTERED },
@@ -108,7 +121,9 @@ codec_table codecs[] =
 	{ CODEC_ID_AD1886,	0xffffffff, ad1886_init,	"Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1886A,	0xffffffff, ad1881_init,	"Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1887,	0xffffffff, ad1881_init,	"Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
-	{ 0x41445370,		0xffffffff, ad1980_init,	"Analog Devices 0x41445370 (???)" },
+	{ CODEC_ID_AD1980,	0xffffffff, ad1980_init,	"Analog Devices AD1980 SoundMAX"B_UTF8_REGISTERED },
+	{ CODEC_ID_AD1981B,	0xffffffff, default_init,	"Analog Devices AD1981B SoundMAX"B_UTF8_REGISTERED },
+	{ CODEC_ID_AD1985,	0xffffffff, default_init,	"Analog Devices AD1985 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445371,		0xffffffff, default_init,	"Analog Devices 0x41445371 (???)" },
 	{ 0x41445372,		0xffffffff, ad1881_init,	"Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AK4540,	0xffffffff, default_init,	"Asahi Kasei AK4540" },
@@ -216,10 +231,10 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	
 	/* set mixer defaults, enabled Line-out sources are PCM-out, CD-in, Line-in */
 	ac97_reg_update(dev, AC97_CENTER_LFE_VOLUME, 0x0000);	/* set LFE & center volume 0dB */
-	ac97_reg_update(dev, AC97_SURR_VOLUME, 0x0000);		/* set surround volume 0dB */
+	ac97_reg_update(dev, AC97_SURR_VOLUME, 0x0000);			/* set surround volume 0dB */
 	ac97_reg_update(dev, AC97_MASTER_VOLUME, 0x0000);		/* set master output 0dB */
 	ac97_reg_update(dev, AC97_AUX_OUT_VOLUME, 0x0000);		/* set aux output 0dB */
-	ac97_reg_update(dev, AC97_MONO_VOLUME, 0x0000);		/* set mono output 0dB */
+	ac97_reg_update(dev, AC97_MONO_VOLUME, 0x0000);			/* set mono output 0dB */
 	ac97_reg_update(dev, AC97_PCM_OUT_VOLUME, 0x0808);		/* enable pcm-out */
 	ac97_reg_update(dev, AC97_CD_VOLUME, 0x0808);			/* enable cd-in */
 	ac97_reg_update(dev, AC97_LINE_IN_VOLUME, 0x0808);		/* enable line-in */
