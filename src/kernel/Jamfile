@@ -216,7 +216,7 @@ KernelLd rld.so :
 	: beos/system/lib/rld.so
 	;
 
-KernelLd false :
+KernelLd kernel_false :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>false_main.o
 	libroot.so
@@ -226,7 +226,7 @@ KernelLd false :
 	: beos/bin/false
 	;
 
-KernelLd true :
+KernelLd kernel_true :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>true_main.o
 	libroot.so
@@ -266,7 +266,7 @@ KernelLd monitor_test :
 	: beos/bin/monitor_test
 	;
 
-KernelLd fortune :
+KernelLd kernel_fortune :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!fortune>main.o
 	libroot.so
@@ -374,7 +374,7 @@ KernelLd envtest :
 #		;
 #}
 
-KernelLd ps :
+KernelLd kernel_ps :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!ps>main.o
 	libroot.so
@@ -384,7 +384,7 @@ KernelLd ps :
 	: beos/bin/ps
 	; 
 
-KernelLd echo :
+KernelLd kernel_echo :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!echo>main.o
 	libroot.so
@@ -394,7 +394,7 @@ KernelLd echo :
 	: beos/bin/echo
 	; 
 
-KernelLd uname :
+KernelLd kernel_uname :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!uname>main.o
 	libroot.so
