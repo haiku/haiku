@@ -39,6 +39,14 @@ Media - MediaWindow by Sikosis
 #include "Media.h"
 #include "MediaViews.h"
 #include "MediaWindows.h"
+#include "MediaListItem.h"
+
+// Images
+#include "devices.h"
+#include "mixer.h"
+#include "tv.h"
+
+const uint32 NEW_MSG = 'nwm';
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
 static void CenterWindowOnScreen(BWindow* w)
@@ -94,24 +102,39 @@ void MediaWindow::InitWindow(void)
 	BRect TitleRect(0,0,140,16);
 	BRect AudioMixerRect(0,30,470,400);
 	BOutlineListView *outline;
-	BListItem 		 *topmenu;
-	BListItem 		 *submenu;
+	MediaListItem 		 *topmenu;
+	MediaListItem 		 *submenu;
 	BScrollView 	 *outlinesv;
 	BStringView 	 *stvAudioSettings;
 	BStringView 	 *stvAudioMixer;
 
 	outline = new BOutlineListView(outlinerect,"audio_list", B_SINGLE_SELECTION_LIST);
-	outline->AddItem(topmenu = new BStringItem("Audio Settings"));
+	/*outline->AddItem(topmenu = new BStringItem("Audio Settings"));
 	outline->AddUnder(submenu = new BStringItem("Audio Mixer"), topmenu);
 	outline->AddUnder(new BStringItem("None Out"), submenu);
 	outline->AddUnder(new BStringItem("None In"), submenu);
 	outline->AddItem(topmenu = new BStringItem("Video Settings"));
-	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);
-	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
+	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);*/
 	
-	BRect IconRect(0,0,16,16);
-	ptrIconView = new IconView(IconRect);
-	topmenu->DrawItem(ptrIconView,IconRect,false);
+	// Bitmaps
+	BRect BitmapFrame(0,0,15,15);
+  	BBitmap *DevicesIcon = new BBitmap(BitmapFrame,B_RGB32);
+	DevicesIcon->SetBits(devicesicon,768,0,B_RGB32);
+	BBitmap *MixerIcon = new BBitmap(BitmapFrame,B_RGB32);
+	MixerIcon->SetBits(mixericon,768,0,B_RGB32);
+	BBitmap *TVIcon = new BBitmap(BitmapFrame,B_RGB32);
+	TVIcon->SetBits(tvicon,768,0,B_RGB32);
+	
+	outline->AddItem(topmenu = new MediaListItem("Audio Settings", MediaListItem::AS, DevicesIcon, new BMessage(NEW_MSG)));
+	topmenu->SetHeight(30);
+	outline->AddItem(submenu = new MediaListItem("Audio Mixer", MediaListItem::AM, MixerIcon, new BMessage(NEW_MSG)));
+	outline->AddUnder(new BStringItem("None Out"), submenu);
+	outline->AddUnder(new BStringItem("None In"), submenu);
+	outline->AddItem(topmenu = new MediaListItem("Video Settings", MediaListItem::VS, DevicesIcon, new BMessage(NEW_MSG)));
+	outline->AddItem(submenu = new MediaListItem("Video Window Consumer", MediaListItem::VWC, TVIcon, new BMessage(NEW_MSG)));
+		
+	// Add ScrollView to Media Menu
+	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
 	
 	// StringViews
 	rgb_color TitleFontColor = { 0,0,0,0 };	
@@ -145,8 +168,13 @@ void MediaWindow::InitWindow(void)
 	ptrMediaView->AddChild(ptrAvailableViewArea = new AvailableViewArea(AvailableRect));
 	ptrAvailableViewArea->AddChild(ptrAudioMixerView = new AudioMixerView(AudioMixerRect));
 	
+	// Add Child(ren) - Audio Settings View
+	ptrAvailableViewArea->AddChild(stvAudioSettings);
+	stvAudioSettings->Hide();
+		
 	// Add Child(ren) - Audio Mixer View
 	ptrAvailableViewArea->AddChild(stvAudioMixer);
+	//stvAudioMixer->Hide();
 	ptrAudioMixerView->AddChild(paramView);
 }
 // ---------------------------------------------------------------------------------------------------------- //
@@ -170,17 +198,28 @@ void MediaWindow::FrameResized (float width, float height)
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+// ErrorAlert -- Displays a BAlert Box with a Custom Error or Debug Message
+void ErrorAlert(char* errorMessage) {
+	printf("%s\n", errorMessage);
+	BAlert *alert = new BAlert("BAlert", errorMessage, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+	alert->Go();
+	//exit(1);
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
 
 // MediaWindow::MessageReceived -- receives messages
 void MediaWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
-	{
+	{	
+		char* myerror;
+		sprintf(myerror,"%s",message->what);
+		ErrorAlert(myerror);
+		
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
 }
 // ---------------------------------------------------------------------------------------------------------- //
-
-

@@ -11,6 +11,7 @@ Media Windows Header by Sikosis
 
 #include "Media.h"
 #include "MediaViews.h"
+#include "MediaListItem.h"
 
 class BParameterWeb;
 class BContinuousParameter;
@@ -21,6 +22,8 @@ class IconView;
 class AvailableViewArea;
 class AudioSettingsView;
 class AudioMixerView;
+
+class MediaListItem;
 
 class MediaWindow : public BWindow
 {
