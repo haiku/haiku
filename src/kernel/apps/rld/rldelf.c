@@ -39,8 +39,6 @@
 
 // ToDo: implement better locking strategy
 // ToDo: implement unload_program()
-// ToDo: implement load_addon()/unload_addon(): at the very least, we will have to make
-//	sure that B_ADD_ON_IMAGE is set correctly
 // ToDo: implement search paths $LIBRARY_PATH, $ADDON_PATH
 // ToDo: implement lazy binding
 
@@ -54,16 +52,25 @@
 	/* keep in sync with app ldscript */
 
 enum {
-	RFLAG_RW				= 0x0001,
-	RFLAG_ANON				= 0x0002,
+	RFLAG_RW					= 0x0001,
+	RFLAG_ANON					= 0x0002,
 
-	RFLAG_SORTED			= 0x0400,
-	RFLAG_SYMBOLIC			= 0x0800,
-	RFLAG_RELOCATED			= 0x1000,
-	RFLAG_PROTECTED			= 0x2000,
-	RFLAG_INITIALIZED		= 0x4000,
-	RFLAG_REMAPPED			= 0x8000
+	RFLAG_SORTED				= 0x0400,	// also means `initialized'
+	RFLAG_SYMBOLIC				= 0x0800,
+	RFLAG_RELOCATED				= 0x1000,
+	RFLAG_PROTECTED				= 0x2000,
+	RFLAG_DEPENDENCIES_LOADED	= 0x4000,
+	RFLAG_REMAPPED				= 0x8000
 };
+
+
+#define IMAGE_TYPE_TO_MASK(type)	(1 << ((type) - 1))
+#define ALL_IMAGE_TYPES				(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
+									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE) \
+									| IMAGE_TYPE_TO_MASK(B_ADD_ON_IMAGE) \
+									| IMAGE_TYPE_TO_MASK(B_SYSTEM_IMAGE))
+#define APP_OR_LIBRARY_TYPE			(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
+									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
 
 typedef
@@ -82,6 +89,7 @@ struct elf_region_t {
 
 typedef struct image_t {
 	// image identification
+	char				path[B_OS_NAME_LENGTH];
 	char				name[B_OS_NAME_LENGTH];
 	image_id			id;
 	image_type			type;
@@ -265,21 +273,43 @@ elf_hash(const uchar *name)
 
 
 static image_t *
-find_image(char const *name)
+find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
+	uint32 typeMask)
 {
 	image_t *iter;
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		if (strncmp(iter->name, name, sizeof(iter->name)) == 0)
-			return iter;
-	}
-
-	for (iter = gLoadingImages.head; iter; iter = iter->next) {
-		if (strncmp(iter->name, name, sizeof(iter->name)) == 0)
-			return iter;
+	if (isPath) {
+		for (iter = queue->head; iter; iter = iter->next) {
+			if (strncmp(iter->path, name, sizeof(iter->path)) == 0
+				&& typeMask & IMAGE_TYPE_TO_MASK(iter->type)) {
+				return iter;
+			}
+		}
+	} else {
+		for (iter = queue->head; iter; iter = iter->next) {
+			if (strncmp(iter->name, name, sizeof(iter->path)) == 0
+				&& typeMask & IMAGE_TYPE_TO_MASK(iter->type)) {
+				return iter;
+			}
+		}
 	}
 
 	return NULL;
+}
+
+
+static image_t *
+find_image(char const *name, uint32 typeMask)
+{
+	bool isPath = (strchr(name, '/') != NULL);
+	image_t *image;
+
+	image = find_image_in_queue(&gLoadedImages, name, isPath, typeMask);
+
+	if (!image)
+		image = find_image_in_queue(&gLoadingImages, name, isPath, typeMask);
+
+	return image;
 }
 
 
@@ -376,17 +406,26 @@ count_regions(char const *buff, int phnum, int phentsize)
  */
 
 static image_t *
-create_image(char const *name, int num_regions)
+create_image(const char *name, const char *path, int num_regions)
 {
 	size_t allocSize;
 	image_t *image;
+	const char *lastSlash;
 
 	allocSize = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
 
 	image = rldalloc(allocSize);
 	memset(image, 0, allocSize);
 
-	strlcpy(image->name, name, sizeof(image->name));
+	strlcpy(image->path, path, sizeof(image->path));
+
+	// Make the last component of the supplied name the image name.
+	// If present, DT_SONAME will replace this name.
+	if ((lastSlash = strrchr(name, '/')))
+		strlcpy(image->name, lastSlash + 1, sizeof(image->name));
+	else
+		strlcpy(image->name, name, sizeof(image->name));
+
 	image->ref_count = 1;
 	image->num_regions = num_regions;
 
@@ -666,6 +705,7 @@ parse_dynamic_segment(image_t *image)
 {
 	struct Elf32_Dyn *d;
 	int i;
+	int sonameOffset = -1;
 
 	image->symhash = 0;
 	image->syms = 0;
@@ -714,6 +754,9 @@ parse_dynamic_segment(image_t *image)
 			case DT_FINI:
 				image->term_routine = (d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
+			case DT_SONAME:
+				sonameOffset = d[i].d_un.d_val;
+				break;
 			default:
 				continue;
 		}
@@ -722,6 +765,9 @@ parse_dynamic_segment(image_t *image)
 	// lets make sure we found all the required sections
 	if (!image->symhash || !image->syms || !image->strtab)
 		return false;
+
+	if (sonameOffset >= 0)
+		strlcpy(image->name, STRING(image, sonameOffset), sizeof(image->name));
 
 	return true;
 }
@@ -914,7 +960,9 @@ search_path_for_type(image_type type)
 			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
 
 		case B_ADD_ON_IMAGE:
-			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
+			return "%A/add-ons"
+				":/boot/home/config/add-ons"
+				":/boot/beos/system/add-ons";
 
 		default:
 			return NULL;
@@ -923,73 +971,132 @@ search_path_for_type(image_type type)
 
 
 static int
-open_container(char *name, image_type type)
+try_open_container(const char *dir, int dirLen, const char *name, char *path,
+	int pathLen)
 {
-	char searchPath[PATH_MAX];
+	int nameLen = strlen(name);
+
+	// construct the path
+	if (dirLen > 0) {
+		char *buffer = path;
+
+		if (dirLen >= 2 && strncmp(dir, "%A", 2) == 0) {
+			// Replace %A with current app folder path (of course,
+			// this must be the first part of the path)
+			// ToDo: Maybe using first image info is better suited than
+			// gProgamArgs->program_path here?
+			char *lastSlash = strrchr(gProgramArgs->program_path, '/');
+			int bytesCopied;
+
+			// copy what's left (when the application name is removed)
+			if (lastSlash != NULL) {
+				strlcpy(buffer, gProgramArgs->program_path,
+					min(pathLen, lastSlash + 1 - gProgramArgs->program_path));
+			} else
+				strlcpy(buffer, ".", pathLen);
+
+			bytesCopied = strlen(buffer);
+			buffer += bytesCopied;
+			pathLen -= bytesCopied;
+			dir += 2;
+			dirLen -= 2;
+		}
+
+		if (dirLen + 1 + nameLen >= pathLen)
+			return B_NAME_TOO_LONG;
+
+		memcpy(buffer, dir, dirLen);
+		buffer[dirLen] = '/';
+		strcpy(buffer + dirLen + 1, name);
+
+	} else {
+		if (nameLen >= pathLen)
+			return B_NAME_TOO_LONG;
+
+		strcpy(path + dirLen + 1, name);
+	}
+
+	TRACE(("rld.so: try_open_container(): %s\n", path));
+
+	return _kern_open(-1, path, O_RDONLY, 0);
+}
+
+
+static int
+search_container_in_path_list(const char *name, const char *pathList,
+	int pathListLen, char *pathBuffer, int pathBufferLen)
+{
+	const char *pathListEnd = pathList + pathListLen;
+
+	TRACE(("rld.so: search_container_in_path_list() %s in %.*s\n", name,
+		pathListLen, pathList));
+
+	while (pathListLen > 0) {
+		const char *pathEnd = pathList;
+		int fd;
+
+		// find the next ':' or run till the end of the string
+		while (pathEnd < pathListEnd && *pathEnd != ':')
+			pathEnd++;
+
+		fd = try_open_container(pathList, pathEnd - pathList, name, pathBuffer,
+			pathBufferLen);
+		if (fd >= 0)
+			return fd;
+
+		pathListLen = pathListEnd - pathEnd - 1;
+		pathList = pathEnd + 1;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static int
+open_container(char *name, image_type type, const char *rpath)
+{
 	const char *paths;
-	char *path;
-	char *nextPathToken = NULL;
+	char buffer[PATH_MAX];
+	int fd = -1;
 
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
 		return _kern_open(-1, name, O_RDONLY, 0);
 	}
 
+	// first try rpath (DT_RPATH)
+	if (rpath) {
+		// It consists of a colon-separated search path list. Optionally it
+		// follows a second search path list, separated from the first by a
+		// semicolon.
+		const char *semicolon = strchr(rpath, ';');
+		const char *firstList = (semicolon ? rpath : NULL);
+		const char *secondList = (semicolon ? semicolon + 1 : rpath);
+			// If there is no ';', we set only secondList to simplify things.
+		if (firstList) {
+			fd = search_container_in_path_list(name, firstList,
+				semicolon - firstList, buffer, sizeof(buffer));
+		}
+		if (fd < 0) {
+			fd = search_container_in_path_list(name, secondList,
+				strlen(secondList), buffer, sizeof(buffer));
+		}
+	}
+
 	// let's evaluate the system path variables to find the container
-
-	paths = search_path_for_type(type);
-	if (paths == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// duplicate environment variable before screw it!
-	strlcpy(searchPath, paths, PATH_MAX);
-		// ToDo: PATH_MAX is definitely too short for a list of paths.
-		// Better roll our own non-destructive strtok_r() replacement for this
-		// special case, so that the string doesn't need to be copied.
-		// Alternatively use strdup().
-
-	TRACE(("rld.so: open_container() %s in %s\n", name, searchPath));
-
-	path = strtok_r(searchPath, ":", &nextPathToken);
-	while (path != NULL) {
-		char buffer[PATH_MAX + 1];
-		int fd;
-
-		if (strncmp(path, "%A", 2) == 0) {
-			// Replace %A with current app folder path (of course,
-			// this must be the first part of the path)
-			// ToDo: Maybe using first image info is better suited than gProgamArgs->program_path here?
-			char *lastSlash = strrchr(gProgramArgs->program_path, '/');
-
-			// copy what's left (when the application name is removed)
-			if (lastSlash != NULL) {
-				strlcpy(buffer, gProgramArgs->program_path,
-					min(PATH_MAX, lastSlash + 1 - gProgramArgs->program_path));
-			} else
-				strlcpy(buffer, ".", PATH_MAX);
-
-			strlcat(buffer, path + 2, PATH_MAX);
-		} else {
-			// Take the path as-is
-			strlcpy(buffer, path, PATH_MAX);
+	if (fd < 0) {
+		paths = search_path_for_type(type);
+		if (paths) {
+			fd = search_container_in_path_list(name, paths, strlen(paths),
+				buffer, sizeof(buffer));
 		}
+	}
 
-		strlcat(buffer, "/", PATH_MAX);
-			// Several slashes in sequence will be ignored, so we're playing safe and add one more
-		strlcat(buffer, name, PATH_MAX);
-
-		TRACE(("rld.so: open_container(%s): trying %s\n", name, buffer));
-
-		fd = _kern_open(-1, buffer, O_RDONLY, 0);
-		if (fd >= B_OK) {
-			// we found it, copy path!
-			TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
-			strlcpy(name, buffer, PATH_MAX);
-			return fd;
-		}
-
-		// Try next search path
-		path = strtok_r(NULL, ":", &nextPathToken);
+	if (fd >= 0) {
+		// we found it, copy path!
+		TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
+		strlcpy(name, buffer, PATH_MAX);
+		return fd;
 	}
 
 	return B_ENTRY_NOT_FOUND;
@@ -997,7 +1104,7 @@ open_container(char *name, image_type type)
 
 
 static image_t *
-load_container(char const *containerPath, char const *name, image_type type)
+load_container(char const *name, image_type type, const char *rpath)
 {
 	int32 pheaderSize, sheaderSize;
 	char path[PATH_MAX];
@@ -1012,17 +1119,20 @@ load_container(char const *containerPath, char const *name, image_type type)
 
 	struct Elf32_Ehdr eheader;
 
-	// have we already loaded that image?
-	found = find_image(name);
-	if (found) {
-		atomic_add(&found->ref_count, 1);
-		return found;
+	// Have we already loaded that image? Don't check for add-ons -- we always
+	// reload them.
+	if (type != B_ADD_ON_IMAGE) {
+		found = find_image(name, APP_OR_LIBRARY_TYPE);
+		if (found) {
+			atomic_add(&found->ref_count, 1);
+			return found;
+		}
 	}
 
-	strlcpy(path, containerPath, sizeof(path));
+	strlcpy(path, name, sizeof(path));
 
 	// Try to load explicit image path first
-	fd = open_container(path, type);
+	fd = open_container(path, type, rpath);
 	FATAL((fd < 0), "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
@@ -1040,7 +1150,7 @@ load_container(char const *containerPath, char const *name, image_type type)
 	num_regions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
 	FATAL((num_regions <= 0), "troubles parsing Program headers, num_regions= %d\n", num_regions);
 
-	image = create_image(name, num_regions);
+	image = create_image(name, path, num_regions);
 	FATAL((!image), "failed to allocate image_t control block\n");
 
 	parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
@@ -1064,15 +1174,35 @@ load_container(char const *containerPath, char const *name, image_type type)
 }
 
 
+static const char *
+find_dt_rpath(image_t *image)
+{
+	int i;
+	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
+
+	for (i = 0; d[i].d_tag != DT_NULL; i++) {
+		if (d[i].d_tag == DT_RPATH)
+			return STRING(image, d[i].d_un.d_val);
+	}
+
+	return NULL;
+}
+
+
 static void
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	addr_t needed_offset;
+	int needed_offset;
 	uint32 i, j;
+	const char *rpath;
 
-	if (!d)
+	if (!d || (image->flags & RFLAG_DEPENDENCIES_LOADED))
 		return;
+
+	image->flags |= RFLAG_DEPENDENCIES_LOADED;
+
+	rpath = find_dt_rpath(image);
 
 	image->needed = rldalloc(image->num_needed * sizeof(image_t *));
 	FATAL((!image->needed), "failed to allocate needed struct\n");
@@ -1081,9 +1211,9 @@ load_dependencies(image_t *image)
 	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				needed_offset = d[i].d_un.d_ptr;
+				needed_offset = d[i].d_un.d_val;
 				image->needed[j] = load_container(STRING(image, needed_offset),
-										STRING(image, needed_offset), B_LIBRARY_IMAGE);
+					B_LIBRARY_IMAGE, rpath);
 				j += 1;
 				break;
 
@@ -1197,7 +1327,7 @@ load_program(char const *path, void **_entry)
 
 	TRACE(("rld: load %s\n", path));
 
-	image = load_container(path, MAGIC_APP_NAME, B_APP_IMAGE);
+	image = load_container(path, B_APP_IMAGE, NULL);
 
 	for (iter = gLoadedImages.head; iter; iter = iter->next) {
 		load_dependencies(iter);
@@ -1220,10 +1350,11 @@ load_program(char const *path, void **_entry)
 
 
 image_id
-load_library(char const *path, uint32 flags)
+load_library(char const *path, uint32 flags, bool addOn)
 {
-	image_t *image;
+	image_t *image = NULL;
 	image_t *iter;
+	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 
 	// ToDo: implement flags
 	(void)flags;
@@ -1233,15 +1364,16 @@ load_library(char const *path, uint32 flags)
 
 	// have we already loaded this library?
 	// Checking it at this stage saves loading its dependencies again
-	// ToDo: don't we have to increment the reference counter of the dependencies??
-	image = find_image(path);
-	if (image) {
-		atomic_add(&image->ref_count, 1);
-		rld_unlock();
-		return image->id;
+	if (!addOn) {
+		image = find_image(path, APP_OR_LIBRARY_TYPE);
+		if (image) {
+			atomic_add(&image->ref_count, 1);
+			rld_unlock();
+			return image->id;
+		}
 	}
 
-	image = load_container(path, path, B_LIBRARY_IMAGE);
+	image = load_container(path, type, NULL);
 
 	for (iter = gLoadedImages.head; iter; iter = iter->next) {
 		load_dependencies(iter);
@@ -1261,10 +1393,11 @@ load_library(char const *path, uint32 flags)
 
 
 status_t
-unload_library(image_id imageID)
+unload_library(image_id imageID, bool addOn)
 {
-	status_t status;
+	status_t status = B_BAD_IMAGE_ID;
 	image_t *image;
+	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 
 	rld_lock();
 		// for now, just do stupid simple global locking
@@ -1278,22 +1411,26 @@ unload_library(image_id imageID)
 			/*
 			 * do the unloading
 			 */
-			put_image(image);
+			if (type == image->type) {
+				put_image(image);
+				status = B_OK;
+			} else
+				status = B_BAD_VALUE;
 			break;
 		}
 	}
 
-	status = image ? B_OK : B_BAD_IMAGE_ID;
-
-	while ((image = gDisposableImages.head) != NULL) {
-		// call image fini here...
-		if (image->term_routine)
-			((libinit_f *)image->term_routine)(image->id, gProgramArgs);
-
-		dequeue_image(&gDisposableImages, image);
-		unmap_image(image);
-
-		delete_image(image);
+	if (status == B_OK) {
+		while ((image = gDisposableImages.head) != NULL) {
+			// call image fini here...
+			if (image->term_routine)
+				((libinit_f *)image->term_routine)(image->id, gProgramArgs);
+	
+			dequeue_image(&gDisposableImages, image);
+			unmap_image(image);
+	
+			delete_image(image);
+		}
 	}
 
 	rld_unlock();
