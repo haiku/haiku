@@ -34,12 +34,23 @@
 #include <arch/cpu.h>
 #include <arch/faults.h>
 
+
+#define TRACE_BOOT 1
+#if TRACE_BOOT
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 static kernel_args ka;
 
 static int main2(void *);
 
 int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
-int _start(kernel_args *oldka, int cpu_num)
+
+int
+_start(kernel_args *oldka, int cpu_num)
 {
 	memcpy(&ka, oldka, sizeof(kernel_args));
 
@@ -63,7 +74,7 @@ int _start(kernel_args *oldka, int cpu_num)
 		int_init(&ka);
 
 		vm_init(&ka);
-		dprintf("vm up\n");
+		TRACE(("vm up\n"));
 
 		// now we can use the heap and create areas
 		dbg_init2(&ka);
@@ -104,32 +115,37 @@ int _start(kernel_args *oldka, int cpu_num)
 	}
 	enable_interrupts();
 
-	dprintf("main: done... begin idle loop on cpu %d\n", cpu_num);
+	TRACE(("main: done... begin idle loop on cpu %d\n", cpu_num));
 	for(;;)
 		arch_cpu_idle();
 
 	return 0;
 }
 
-static int main2(void *unused)
+
+static int
+main2(void *unused)
 {
 	(void)(unused);
 
-	dprintf("start of main2: initializing devices\n");
+	TRACE(("start of main2: initializing devices\n"));
 
 	/* bootstrap all the filesystems */
-dprintf("******************** a ********************\n");
+	TRACE(("Bootstrap all filesystems\n");
 	vfs_bootstrap_all_filesystems();
-dprintf("******************** b ********************\n");
 
+	TRACE(("Init modules\n"));
 	module_init(&ka, NULL);
-dprintf("******************** c ********************\n");
+
+	TRACE(("Init busses\n"));
 	bus_init(&ka);
-dprintf("******************** d ********************\n");
+
+	TRACE(("Init devices\n"));
 	dev_init(&ka);
-dprintf("******************** e ********************\n");
+
+	TRACE(("Init console\n"));
 	con_init(&ka);
-dprintf("******************** f ********************\n");
+
 	//net_init_postdev(&ka);
 
 #if 0
@@ -156,12 +172,11 @@ dprintf("******************** f ********************\n");
 	{
 		team_id pid;
 		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
-dprintf("******************** g ********************\n");
+		
+		TRACE(("Init started\n"));
 		if (pid < 0)
 			kprintf("error starting 'init' error = %ld \n", pid);
-dprintf("******************** h ********************\n");
 	}
-dprintf("******************** i ********************\n");
 
 	return 0;
 }
