@@ -2036,7 +2036,7 @@ emuxki_setup(emuxki_dev * card)
 	card->config.type = 0;
 	if(card->info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID)
 		card->config.type |= TYPE_AUDIGY;
-	if(IS_AUDIGY(&card->config) && card->info.revision == 4)
+	if(IS_AUDIGY(&card->config) && (card->info.revision == 4 || card->info.revision == 8))
 		card->config.type |= TYPE_AUDIGY2;
 	
 	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %x\n", card->name, card->info.device_id,
@@ -2646,9 +2646,14 @@ emuxki_init(emuxki_dev * card)
 		emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCSEL);
 		emuxki_reg_write_32(&card->config, EMU_A2_DATA, 
 			EMU_A2_SRCSEL_ENABLE_SPDIF | EMU_A2_SRCSEL_ENABLE_SRCMULTI);
-		
-		emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCMULTI);
-		emuxki_reg_write_32(&card->config, EMU_A2_DATA, EMU_A2_SRCMULTI_ENABLE_INPUT);
+	
+		if (card->info.revision == 4) {
+			emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCMULTI);
+			emuxki_reg_write_32(&card->config, EMU_A2_DATA, EMU_A2_SRCMULTI_ENABLE_INPUT);
+		} else {
+			emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCMULTI2);
+			emuxki_reg_write_32(&card->config, EMU_A2_DATA, EMU_A2_SRCMULTI2_ENABLE_INPUT);
+		}
 	}
 	
 	/* Let's play with sound processor */

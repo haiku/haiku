@@ -195,7 +195,8 @@
 #define EMU_A2_SRCSEL_ENABLE_SRCMULTI	0x00000010
 #define EMU_A2_SRCMULTI	0x6e0000
 #define EMU_A2_SRCMULTI_ENABLE_INPUT	0xff00ff00
-
+#define EMU_A2_SRCMULTI2 0x7b0000
+#define EMU_A2_SRCMULTI2_ENABLE_INPUT	0xff000000
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
