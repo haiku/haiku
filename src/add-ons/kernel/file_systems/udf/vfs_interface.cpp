@@ -35,6 +35,7 @@ extern "C" {
 #	define dprintf printf
 #endif
 
+#include "Icb.h"
 #include "Volume.h"
 
 extern "C" {
@@ -238,7 +239,7 @@ udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 
 	status_t err = B_OK;
 	off_t deviceSize = 0;	// in blocks
-	UDF::Volume *volume = NULL;
+	Udf::Volume *volume = NULL;
 	device_geometry geometry;
 
 	// Open the device (read only should be fine), get its geometry,
@@ -256,7 +257,7 @@ udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 	
 	// Create and mount the volume
 	if (!err) {
-		volume = new UDF::Volume(nsid);
+		volume = new Udf::Volume(nsid);
 		err = volume ? B_OK : B_NO_MEMORY;
 	}
 	if (!err) {
@@ -265,11 +266,9 @@ udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 		
 	if (!err) {
 		if (rootID)
-			*rootID = 0;	// todo: get the real root id once it's implemented
+			*rootID = volume->RootIcb()->Id();
 		if (volumeCookie)
 			*volumeCookie = volume;
-		// todo: ditch this
-		dprintf("new_vnode(root) = %d\n", new_vnode(nsid, *rootID, (void*)23));
 	}
 
 	RETURN(err);	
@@ -280,7 +279,7 @@ int
 udf_unmount(void *ns)
 {
 	DEBUG_INIT(CF_ENTRY | CF_VOLUME_OPS, NULL);
-	return B_OK;	
+	RETURN(B_OK);	
 }
 
 
@@ -335,9 +334,11 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 int
 udf_release_vnode(void *ns, void *node, char reenter)
 {
-	DEBUG_INIT(CF_ENTRY | CF_VOLUME_OPS, NULL);
-	// FUNCTION_START(("node = %p\n",node));
-	return B_ERROR;
+	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("node = %p", node));
+	
+	Udf::Icb *icb = reinterpret_cast<Udf::Icb*>(node);
+	delete icb;
+	RETURN(B_OK);
 }
 
 
