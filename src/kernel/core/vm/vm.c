@@ -1297,11 +1297,14 @@ display_mem(int argc, char **argv)
 	int j;
 
 	if (argc < 2) {
-		dprintf("not enough arguments\n");
+		dprintf("usage: dw/ds/db <address> [num]\n"
+			"\tdw - 4 bytes\n"
+			"\tds - 2 bytes\n"
+			"\tdb - 1 byte\n");
 		return 0;
 	}
 
-	address = atoul(argv[1]);
+	address = strtoul(argv[1], NULL, 0);
 
 	if (argc >= 3) {
 		num = -1;
