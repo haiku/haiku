@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src add-ons kernel partitioning_systems ;
 
 SubInclude OBOS_TOP src add-ons kernel partitioning_systems intel ;
+SubInclude OBOS_TOP src add-ons kernel partitioning_systems amiga ;

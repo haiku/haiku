@@ -1,0 +1,202 @@
+/*
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
+#include "amiga_rdb.h"
+#include <ByteOrder.h>
+#include <ddm_modules.h>
+#include <DiskDeviceTypes.h>
+#include <KernelExport.h>
+
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <errno.h>
+
+#define TRACE_AMIGA_RDB 1
+#if TRACE_AMIGA_RDB
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
+static const char *kPartitionModuleName = "partitioning_systems/amiga/rdb/v1";
+
+#if TRACE_AMIGA_RDB
+static char *
+get_tupel(uint32 id)
+{
+	static unsigned char tupel[5];
+
+	tupel[0] = 0xff & (id >> 24);
+	tupel[1] = 0xff & (id >> 16);
+	tupel[2] = 0xff & (id >> 8);
+	tupel[3] = 0xff & (id);
+	tupel[4] = 0;
+	for (int16 i = 0;i < 4;i++) {
+		if (tupel[i] < ' ' || tupel[i] > 128)
+			tupel[i] = '.';
+	}
+
+	return (char *)tupel;
+}
+#endif
+
+
+status_t
+get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_block &partition)
+{
+	if (cookie == 0) {
+		// first entry
+		cookie = rdb.partition_list;
+	} else if (cookie == 0xffffffff) {
+		// last entry
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	ssize_t bytesRead = read_pos(fd, (off_t)cookie * rdb.block_size, (void *)&partition,
+							sizeof(partition_block));
+	if (bytesRead < (ssize_t)sizeof(partition_block))
+		return B_ERROR;
+
+	cookie = partition.next;
+	return B_OK;
+}
+
+
+bool
+search_rdb(int fd, rigid_disk_block *_rdb)
+{
+	rigid_disk_block *rdb;
+	uint8 buffer[512];
+
+	for (int32 sector = 0; sector < RDB_LOCATION_LIMIT; sector++) {
+		ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
+		if (bytesRead < (ssize_t)sizeof(buffer))
+			return false;
+
+		rdb = (rigid_disk_block *)buffer;
+		if (rdb->id == RDB_DISK_ID && rdb->summed_longs == sizeof(rigid_disk_block) / sizeof(uint32)) {
+			// check checksum
+			uint32 *longs = (uint32 *)buffer;
+			uint32 sum = 0;
+			for (uint32 i = 0; i < rdb->summed_longs; i++)
+				sum += longs[i];
+
+			if (sum != 0) {
+				TRACE(("amiga_rdb: check sum is incorrect!\n"));
+				return false;
+			}
+
+			*_rdb = *rdb;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+//	#pragma mark -
+//	AmigaRDB public module interface
+
+
+static status_t
+amiga_rdb_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		case B_MODULE_UNINIT:
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+static float
+amiga_rdb_identify_partition(int fd, partition_data *partition, void **_cookie)
+{
+	rigid_disk_block *rdb = new rigid_disk_block();
+	if (!search_rdb(fd, rdb)) {
+		delete rdb;
+		return B_ERROR;
+	}
+
+	*_cookie = (void *)rdb;
+	return 0.5f;
+}
+
+
+static status_t
+amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
+{
+	rigid_disk_block &rdb = *(rigid_disk_block *)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
+						| B_PARTITION_READ_ONLY;
+	partition->content_size = partition->size;
+
+	// scan all children
+
+	partition_block partitionBlock;
+	uint32 index = 0, cookie = 0;
+	status_t status;
+
+	while ((status = get_next_partition(fd, rdb, cookie, partitionBlock)) == B_OK) {
+		disk_environment &environment = *(disk_environment *)&partitionBlock.environment[0];
+		TRACE(("amiga_rdb: file system: %s\n", get_tupel(environment.dos_type)));
+
+		partition_data *child = create_child_partition(partition->id, index++, -1);
+		if (child == NULL) {
+			TRACE(("Creating child at index %ld failed\n", index - 1));
+			return B_ERROR;
+		}
+
+		child->offset = partition->offset + environment.Start();
+		child->size = environment.Size();
+		child->block_size = partition->block_size;
+	}
+
+	if (status == B_ENTRY_NOT_FOUND)
+		return B_OK;
+
+	return status;
+}
+
+
+static void
+amiga_rdb_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+{
+	delete (rigid_disk_block *)_cookie;
+}
+
+
+static partition_module_info amiga_rdb_partition_module = {
+	{
+		kPartitionModuleName,
+		0,
+		amiga_rdb_std_ops
+	},
+	kPartitionTypeAmiga,				// pretty_name
+	0,									// flags
+
+	// scanning
+	amiga_rdb_identify_partition,		// identify_partition
+	amiga_rdb_scan_partition,			// scan_partition
+	amiga_rdb_free_identify_partition_cookie,	// free_identify_partition_cookie
+	NULL,
+//	amiga_rdb_free_partition_cookie,			// free_partition_cookie
+//	amiga_rdb_free_partition_content_cookie,	// free_partition_content_cookie
+};
+
+partition_module_info *modules[] = {
+	&amiga_rdb_partition_module,
+	NULL
+};
+
