@@ -18,6 +18,8 @@ struct core_module_info {
 
 	int (*start)(void);
 	int (*stop)(void);
+	status_t (*control_net_module)(const char *name, uint32 op, void *data,
+		size_t length);
 	void (*add_domain)(struct domain *, int);
 	void (*remove_domain)(int);
 	void (*add_protocol)(struct protosw *, int);

@@ -21,6 +21,7 @@ struct kernel_net_module_info {
 	module_info info;
 	int (*start)(void *);
 	int (*stop)(void);
+	status_t (*control)(uint32 op, void *data, size_t length);
 };
 
 struct net_module {

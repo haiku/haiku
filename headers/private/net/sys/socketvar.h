@@ -11,10 +11,10 @@
 struct mbuf;
 
 struct  sockbuf {
-	uint32  sb_cc;			/* actual chars in buffer */
-	uint32  sb_hiwat;		/* max actual char count (high water mark) */
-	uint32  sb_mbcnt;		/* chars of mbufs used */
-	uint32  sb_mbmax;		/* max chars of mbufs to use */
+	int32  sb_cc;			/* actual chars in buffer */
+	int32  sb_hiwat;		/* max actual char count (high water mark) */
+	int32  sb_mbcnt;		/* chars of mbufs used */
+	int32  sb_mbmax;		/* max chars of mbufs to use */
 	int32   sb_lowat;		/* low water mark */
 	struct  mbuf *sb_mb;	/* the mbuf chain */
 	int16   sb_flags;		/* flags, see below */
@@ -101,8 +101,8 @@ struct socket {
 }
 
 #define sbspace(sb) \
-    ((uint32) min((int)((sb)->sb_hiwat - (sb)->sb_cc), \
-         (int)((sb)->sb_mbmax - (sb)->sb_mbcnt)))
+    (abs(min((int)((sb)->sb_hiwat - (sb)->sb_cc), \
+         (int)((sb)->sb_mbmax - (sb)->sb_mbcnt))))
 
 /* do we have to send all at once on a socket? */
 #define sosendallatonce(so) \

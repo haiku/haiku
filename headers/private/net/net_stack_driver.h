@@ -44,6 +44,8 @@ enum {
 	
 	NET_STACK_NOTIFY_SOCKET_EVENT,				// notify_socket_event_args * (userland stack only)
 	
+	NET_STACK_CONTROL_NET_MODULE,
+	
 	NET_STACK_IOCTL_MAX
 };
 
@@ -86,6 +88,13 @@ struct sysctl_args {	// used by NET_STACK_SYSCTL
 	size_t *oldlenp;
 	void *newp;
 	size_t newlen;
+};
+
+struct control_net_module_args {	// used by NET_STACK_CONTROL_NET_MODULE
+	char *name;
+	uint32 op;
+	void *data;
+	size_t length;
 };
 
 /*
