@@ -53,8 +53,14 @@ PartitionMapParser::Parse(const uint8 *block, PartitionMap *map)
 			if (error == B_OK)
 				error = _ParsePrimary(&pts);
 		}
-		if (error == B_OK && !fMap->Check(fSessionSize, fBlockSize))
+
+		// If we don't have any partitions it might also just be an
+		// empty partition map, but we still can't do much with it
+		if (error == B_OK
+			&& (fMap->CountNonEmptyPartitions() == 0
+				|| !fMap->Check(fSessionSize, fBlockSize))) {
 			error = B_BAD_DATA;
+		}
 		fMap = NULL;
 	}
 	return error;
@@ -81,7 +87,6 @@ PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 				TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
 					"ignoring\n"));
 				partition->Unset();
-				break;
 			}
 		}
 	}

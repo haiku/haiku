@@ -327,6 +327,19 @@ PartitionMap::CountPartitions() const
 	return count;
 }
 
+// CountNonEmptyPartitions
+int32 
+PartitionMap::CountNonEmptyPartitions() const
+{
+	int32 count = 0;
+	for (int32 i = CountPartitions() - 1; i >= 0; i--) {
+		if (!PartitionAt(i)->IsEmpty())
+			count++;
+	}
+
+	return count;
+}
+
 // PartitionAt
 Partition *
 PartitionMap::PartitionAt(int32 index)

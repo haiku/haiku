@@ -164,6 +164,7 @@ public:
 	const PrimaryPartition *PrimaryPartitionAt(int32 index) const;
 
 	int32 CountPartitions() const;
+	int32 CountNonEmptyPartitions() const;
 	Partition *PartitionAt(int32 index);
 	const Partition *PartitionAt(int32 index) const;
 
