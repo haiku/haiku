@@ -258,7 +258,7 @@ status_t nv_crtc2_depth(int mode)
 		break;
 	}
 	CRTC2W(PIXEL, ((CRTC2R(PIXEL) & 0xfc) | viddelay));
-//fixme: check if this works..
+//fixme: check if this works...
 	DAC2W(GENCTRL, genctrl);
 
 	return B_OK;

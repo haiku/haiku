@@ -522,7 +522,7 @@
 #define NVDAC_PLLSEL		0x0068050c
 #define NVDAC_GENCTRL		0x00680600
 /* secondary head */
-#define NVDAC2_CURPOS		0x00680b00
+#define NVDAC2_CURPOS		0x00682300//confirmed NV34: 0x00680b00 does not work here
 #define NVDAC2_PIXPLLC		0x00680d20//verify!!!
 #define NVDAC2_PLLSEL		0x00680d0c//verify!!!
 #define NVDAC2_GENCTRL		0x00680e00//verify!!!
@@ -646,20 +646,7 @@
 #define NVBES_NV10_1SRCPTCH	0x0000895c
 /* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
 #define NVBES_DEC_GENCTRL	0x00001588
-
-/* NV 2nd CRTC registers (>= G400) */
-#define NVCR2_CTL           0x3C10
-#define NVCR2_HPARAM        0x3C14
-#define NVCR2_HSYNC         0x3C18
-#define NVCR2_VPARAM        0x3C1C
-#define NVCR2_VSYNC         0x3C20
-#define NVCR2_PRELOAD       0x3C24
-#define NVCR2_STARTADD0     0x3C28
-#define NVCR2_STARTADD1     0x3C2C
-#define NVCR2_OFFSET        0x3C40
-#define NVCR2_MISC          0x3C44
-#define NVCR2_VCOUNT        0x3C48
-#define NVCR2_DATACTL       0x3C4C
+//end new.
 
 /*MAVEN registers (<= G400) */
 #define NVMAV_PGM            0x3E
