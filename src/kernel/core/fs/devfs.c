@@ -396,7 +396,7 @@ err2:
 
 
 static int
-devfs_mount(fs_cookie *_fs, fs_id id, const char *devfs, void *args, vnode_id *root_vnid)
+devfs_mount(fs_id id, const char *devfs, void *args, fs_cookie *_fs, vnode_id *root_vnid)
 {
 	struct devfs *fs;
 	struct devfs_vnode *v;
@@ -612,14 +612,14 @@ devfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
 
 
 static int
-devfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
+devfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static int
-devfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
+devfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
@@ -1043,6 +1043,8 @@ devfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 static struct fs_calls devfs_calls = {
 	&devfs_mount,
 	&devfs_unmount,
+	NULL,
+	NULL,
 	&devfs_sync,
 
 	&devfs_lookup,

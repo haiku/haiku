@@ -381,7 +381,7 @@ bootfs_create_vnode_tree(struct bootfs *fs, struct bootfs_vnode *root)
 
 
 static int
-bootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id *root_vnid)
+bootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *root_vnid)
 {
 	struct bootfs *fs;
 	struct bootfs_vnode *v;
@@ -535,12 +535,12 @@ bootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t buffe
 
 
 static int
-bootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
+bootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 	int err;
 
-	TRACE(("bootfs_getvnode: asking for vnode 0x%x 0x%x, r %d\n", id, r));
+	TRACE(("bootfs_get_vnode: asking for vnode 0x%x 0x%x, r %d\n", id, r));
 
 	if(!r)
 		mutex_lock(&fs->lock);
@@ -550,7 +550,7 @@ bootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 	if(!r)
 		mutex_unlock(&fs->lock);
 
-	TRACE(("bootfs_getnvnode: looked it up at 0x%x\n", *v));
+	TRACE(("bootfs_get_vnode: looked it up at 0x%x\n", *v));
 
 	if(*v)
 		return 0;
@@ -560,32 +560,32 @@ bootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 
 
 static int
-bootfs_putvnode(fs_cookie _fs, fs_vnode _v, bool r)
+bootfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 	struct bootfs_vnode *v = (struct bootfs_vnode *)_v;
 
-	TRACE(("bootfs_putvnode: entry on vnode 0x%x 0x%x, r %d\n", v->id, r));
+	TRACE(("bootfs_put_vnode: entry on vnode 0x%x 0x%x, r %d\n", v->id, r));
 
 	return 0; // whatever
 }
 
 
 static int
-bootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
+bootfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 	struct bootfs_vnode *v = (struct bootfs_vnode *)_v;
 	struct bootfs_vnode dummy;
 	int err;
 
-	TRACE(("bootfs_removevnode: remove 0x%x (0x%x 0x%x), r %d\n", v, v->id, r));
+	TRACE(("bootfs_remove_vnode: remove 0x%x (0x%x 0x%x), r %d\n", v, v->id, r));
 
-	if(!r)
+	if (!reenter)
 		mutex_lock(&fs->lock);
 
-	if(v->dir_next) {
+	if (v->dir_next) {
 		// can't remove node if it's linked to the dir
-		panic("bootfs_removevnode: vnode %p asked to be removed is present in dir\n", v);
+		panic("bootfs_remove_vnode: vnode %p asked to be removed is present in dir\n", v);
 	}
 
 	bootfs_delete_vnode(fs, v, false);
@@ -593,7 +593,7 @@ bootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
 	err = 0;
 
 err:
-	if (!r)
+	if (!reenter)
 		mutex_unlock(&fs->lock);
 
 	return err;
@@ -601,14 +601,14 @@ err:
 
 
 static int
-bootfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
+bootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static int
-bootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
+bootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *vnode = _v;
@@ -879,7 +879,7 @@ bootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *bu
 
 
 static int
-bootfs_canpage(fs_cookie _fs, fs_vnode _v)
+bootfs_can_page(fs_cookie _fs, fs_vnode _v)
 {
 	struct bootfs_vnode *v = _v;
 
@@ -893,7 +893,7 @@ bootfs_canpage(fs_cookie _fs, fs_vnode _v)
 
 
 static ssize_t
-bootfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_read_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -912,7 +912,7 @@ bootfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 			memcpy(vecs->vec[i].iov_base, v->stream.u.file.start + pos, copy_len);
 
-			if(copy_len < vecs->vec[i].iov_len)
+			if (copy_len < vecs->vec[i].iov_len)
 				memset((char *)vecs->vec[i].iov_base + copy_len, 0, vecs->vec[i].iov_len - copy_len);
 
 			pos += vecs->vec[i].iov_len;
@@ -924,7 +924,7 @@ bootfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 
 static ssize_t
-bootfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -1007,18 +1007,20 @@ bootfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 static struct fs_calls bootfs_calls = {
 	&bootfs_mount,
 	&bootfs_unmount,
+	NULL,
+	NULL,
 	&bootfs_sync,
 
 	&bootfs_lookup,
 	&bootfs_get_vnode_name,
 
-	&bootfs_getvnode,
-	&bootfs_putvnode,
-	&bootfs_removevnode,
+	&bootfs_get_vnode,
+	&bootfs_put_vnode,
+	&bootfs_remove_vnode,
 
-	&bootfs_canpage,
-	&bootfs_readpage,
-	&bootfs_writepage,
+	&bootfs_can_page,
+	&bootfs_read_page,
+	&bootfs_write_page,
 
 	/* common */
 	&bootfs_ioctl,

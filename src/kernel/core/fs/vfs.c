@@ -51,6 +51,11 @@
 #ifndef B_FILE_NAME_LENGTH
 #	define B_FILE_NAME_LENGTH 256
 #endif
+#include <fs_info.h>
+
+// Passed in buffers from user-space shouldn't be in the kernel
+#define CHECK_USER_ADDRESS(x) \
+	((addr)(x) < KERNEL_BASE || (addr)(x) > KERNEL_TOP)
 
 struct vnode {
 	struct vnode    *next;
@@ -673,12 +678,15 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
  *	file system doesn't support this call, it will fall back to iterating
  *	through the parent directory to get the name of the child.
  *
- *	To detect circular loops, it supports a maximum tree depth
+ *	To protect against circular loops, it supports a maximum tree depth
  *	of 256 levels.
  *
  *	Note that the path may not be correct the time this function returns!
  *	It doesn't use any locking to prevent returning the correct path, as
  *	paths aren't safe anyway: the path to a file can change at any time.
+ *
+ *	It might be a good idea, though, to check if the returned path exists
+ *	in the calling function (it's not done here because of efficiency)
  */
 
 static status_t
@@ -723,6 +731,9 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		if (status < B_OK)
 			return status;
+
+		// ToDo: add an explicit check for loops in about 10 levels to do
+		// real loop detection
 
 		// don't go deeper as 'maxLevel' to prevent circular loops
 		if (maxLevel-- < 0)
@@ -1443,7 +1454,7 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 	if (FS_CALL(directory,fs_create) == NULL)
 		return EROFS;
 
-	status = FS_CALL(directory,fs_create)(directory->mount->cookie, directory->private_node, &cookie, &newID, name, omode, perms);
+	status = FS_CALL(directory,fs_create)(directory->mount->cookie, directory->private_node, name, omode, perms, &cookie, &newID);
 	if (status < B_OK)
 		return status;
 
@@ -1479,7 +1490,7 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 	file_cookie cookie;
 	int status;
 
-	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->private_node, &cookie, omode);
+	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->private_node, omode, &cookie);
 	if (status < 0)
 		return status;
 
@@ -1666,11 +1677,34 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 
 
 static int
+dir_create_entry_ref(fs_id fsID, vnode_id parentID, const char *name, int perms, bool kernel)
+{
+	struct vnode *vnode;
+	vnode_id newID;
+	int status;
+
+	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", fdID, parentID, name, perms));
+	
+	status = get_vnode(fsID, parentID, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(vnode, fs_create_dir))
+		status = FS_CALL(vnode, fs_create_dir)(vnode->mount->cookie, vnode->private_node, name, perms, &newID);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
+	return status;
+}
+
+
+static int
 dir_create(char *path, int perms, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
 	struct vnode *vnode;
-	vnode_id vnid;
+	vnode_id newID;
 	int status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
@@ -1680,7 +1714,7 @@ dir_create(char *path, int perms, bool kernel)
 		return status;
 
 	if (FS_CALL(vnode,fs_create_dir))
-		status = FS_CALL(vnode,fs_create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &vnid);
+		status = FS_CALL(vnode,fs_create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
 	else
 		status = EROFS;
 
@@ -1961,7 +1995,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 			goto err3;
 		}
 
-		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
+		err = mount->fs->calls->fs_mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
 			err = ERR_VFS_GENERAL;
 			goto err3;
@@ -1988,7 +2022,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 		mount->covers_vnode = covered_vnode;
 
 		// mount it
-		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
+		err = mount->fs->calls->fs_mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0)
 			goto err4;
 	}
@@ -2147,6 +2181,60 @@ fs_sync(void)
 
 
 static int
+fs_read_info(dev_t device, struct fs_info *info)
+{
+	struct fs_mount *mount;
+	int status;
+
+	mutex_lock(&vfs_mount_mutex);	
+
+	mount = find_mount(device);
+	if (mount == NULL) {
+		status = EINVAL;
+		goto error;
+	}
+
+	if (mount->fs->calls->fs_read_fs_info)
+		status = mount->fs->calls->fs_read_fs_info(mount->cookie, info);
+	else
+		status = EOPNOTSUPP;
+
+	// fill in other info the file system doesn't know about
+	info->dev = mount->id;
+	info->root = mount->root_vnode->id;
+
+error:
+	mutex_unlock(&vfs_mount_mutex);
+	return status;
+}
+
+
+static int
+fs_write_info(dev_t device, struct fs_info *info, int mask)
+{
+	struct fs_mount *mount;
+	int status;
+
+	mutex_lock(&vfs_mount_mutex);	
+
+	mount = find_mount(device);
+	if (mount == NULL) {
+		status = EINVAL;
+		goto error;
+	}
+
+	if (mount->fs->calls->fs_write_fs_info)
+		status = mount->fs->calls->fs_write_fs_info(mount->cookie, info, mask);
+	else
+		status = EROFS;
+
+error:
+	mutex_unlock(&vfs_mount_mutex);
+	return status;
+}
+
+
+static int
 get_cwd(char *buffer, size_t size, bool kernel)
 {
 	// Get current working directory from io context
@@ -2250,21 +2338,52 @@ sys_sync(void)
 
 
 int
+sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
+{
+	char nameCopy[B_FILE_NAME_LENGTH];
+
+	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
+	nameCopy[sizeof(nameCopy) - 1] = '\0';
+
+	return file_open_entry_ref(device, inode, nameCopy, omode, true);
+}
+
+
+int
 sys_open(const char *path, int omode)
 {
-	char buffer[SYS_MAX_PATH_LEN+1];
+	char pathCopy[SYS_MAX_PATH_LEN + 1];
 
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
+	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
+	pathCopy[SYS_MAX_PATH_LEN] = 0;
 
-	return file_open(buffer, omode, true);
+	return file_open(pathCopy, omode, true);
+}
+
+
+int
+sys_open_dir_node_ref(dev_t device, ino_t inode)
+{
+	return dir_open_node_ref(device, inode, true);
+}
+
+
+int
+sys_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
+{
+	char nameCopy[B_FILE_NAME_LENGTH];
+
+	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
+	nameCopy[sizeof(nameCopy) - 1] = '\0';
+
+	return dir_open_entry_ref(device, inode, nameCopy, true);
 }
 
 
 int
 sys_open_dir(const char *path)
 {
-	char buffer[SYS_MAX_PATH_LEN+1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buffer, path, SYS_MAX_PATH_LEN);
 	buffer[SYS_MAX_PATH_LEN] = 0;
@@ -2281,14 +2400,39 @@ sys_fsync(int fd)
 
 
 int
+sys_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int perms)
+{
+	char nameCopy[B_FILE_NAME_LENGTH];
+	int status;
+
+	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
+	nameCopy[sizeof(nameCopy) - 1] = '\0';
+
+	return file_create_entry_ref(device, inode, nameCopy, omode, perms, true);
+}
+
+
+int
 sys_create(const char *path, int omode, int perms)
 {
 	char buffer[SYS_MAX_PATH_LEN+1];
 
 	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
+	buffer[SYS_MAX_PATH_LEN] = '\0';
 
 	return file_create(buffer, omode, perms, true);
+}
+
+
+int
+sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms)
+{
+	char nameCopy[B_FILE_NAME_LENGTH];
+
+	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
+	nameCopy[sizeof(nameCopy) - 1] = '\0';
+
+	return dir_create_entry_ref(device, inode, nameCopy, perms, true);
 }
 
 
@@ -2416,7 +2560,7 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 	int rc;
 
 	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
 	if ((addr)ufs_name >= KERNEL_BASE && (addr)ufs_name <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
@@ -2469,20 +2613,63 @@ user_sync(void)
 
 
 int
+user_open_entry_ref(dev_t device, ino_t inode, const char *uname, int omode)
+{
+	char name[B_FILE_NAME_LENGTH];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(uname))
+		return ERR_VM_BAD_USER_MEMORY;
+
+	status = user_strncpy(name, uname, sizeof(name) - 1);
+	if (status < B_OK)
+		return status;
+	name[sizeof(name) - 1] = '\0';
+
+	return file_open_entry_ref(device, inode, name, omode, false);
+}
+
+
+int
 user_open(const char *upath, int omode)
 {
 	char path[SYS_MAX_PATH_LEN];
 	int rc;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	rc = user_strncpy(path, upath, sizeof(path) - 1);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
+	path[sizeof(path) - 1] = 0;
 
 	return file_open(path, omode, false);
+}
+
+
+int
+user_open_dir_node_ref(dev_t device, ino_t inode)
+{
+	return dir_open_node_ref(device, inode, false);
+}
+
+
+int
+user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
+{
+	char name[B_FILE_NAME_LENGTH];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(uname))
+		return ERR_VM_BAD_USER_MEMORY;
+
+	status = user_strncpy(name, uname, sizeof(name) - 1);
+	if (status < B_OK)
+		return status;
+	name[sizeof(name) - 1] = '\0';
+
+	return dir_open_entry_ref(device, inode, name, false);
 }
 
 
@@ -2490,15 +2677,15 @@ int
 user_open_dir(const char *upath)
 {
 	char path[SYS_MAX_PATH_LEN];
-	int rc;
+	int status;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
+	status = user_strncpy(path, upath, sizeof(path) - 1);
+	if (status < 0)
+		return status;
+	path[sizeof(path) - 1] = 0;
 
 	return dir_open(path, false);
 }
@@ -2508,6 +2695,24 @@ int
 user_fsync(int fd)
 {
 	return common_sync(fd, false);
+}
+
+
+int
+user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms)
+{
+	char name[B_FILE_NAME_LENGTH];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(uname))
+		return ERR_VM_BAD_USER_MEMORY;
+
+	status = user_strncpy(name, uname, sizeof(name) - 1);
+	if (status < 0)
+		return status;
+	name[sizeof(name) - 1] = '\0';
+
+	return file_create_entry_ref(device, inode, name, omode, perms, false);
 }
 
 
@@ -2523,9 +2728,27 @@ user_create(const char *upath, int omode, int perms)
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = 0;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return file_create(path, omode, perms, false);
+}
+
+
+int
+user_create_dir_entry_ref(dev_t device, ino_t inode, const char *uname, int perms)
+{
+	char name[B_FILE_NAME_LENGTH];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(uname))
+		return ERR_VM_BAD_USER_MEMORY;
+
+	status = user_strncpy(name, uname, sizeof(name) - 1);
+	if (status < 0)
+		return status;
+	name[sizeof(name) - 1] = '\0';
+
+	return dir_create_entry_ref(device, inode, name, perms, false);
 }
 
 
@@ -2535,13 +2758,13 @@ user_create_dir(const char *upath, int perms)
 	char path[SYS_MAX_PATH_LEN];
 	int rc;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = 0;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return dir_create(path, perms, false);
 }

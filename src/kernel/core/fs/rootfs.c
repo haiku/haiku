@@ -212,7 +212,7 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 
 
 static int
-rootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id *root_vnid)
+rootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *root_vnid)
 {
 	struct rootfs *fs;
 	struct rootfs_vnode *v;
@@ -425,14 +425,14 @@ rootfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 
 
 static int
-rootfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
+rootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EINVAL;
 }
 
 
 static int
-rootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
+rootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 {
 	// allow to open the file, but it can't be done anything with it
 	return B_OK;
@@ -810,6 +810,8 @@ rootfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 static struct fs_calls rootfs_calls = {
 	&rootfs_mount,
 	&rootfs_unmount,
+	NULL,
+	NULL,
 	&rootfs_sync,
 
 	&rootfs_lookup,
