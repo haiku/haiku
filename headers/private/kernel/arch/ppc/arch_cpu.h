@@ -17,4 +17,15 @@
 struct iframe {
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern uint32 get_sdr1(void);
+extern uint32 set_sdr1(uint32 value);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */
