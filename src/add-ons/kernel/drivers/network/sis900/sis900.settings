@@ -1,8 +1,7 @@
 # Sample settings file for the sis900 driver
 #
-# This file should be moved to the directory
-# ~/config/settings/kernel/drivers/
-#
+# This file should be moved to the directory ~/config/settings/kernel/drivers/
+# and RENAMED into "sis900" 
 
 # Currently supported settings are:
 #
