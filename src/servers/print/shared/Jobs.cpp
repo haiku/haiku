@@ -231,8 +231,8 @@ void Folder::SetupJobList() {
 }
 
 Folder::Folder(BLocker* locker, BLooper* looper, const BDirectory& spoolDir) 
-	: fLocker(locker)
-	, FolderWatcher(looper, spoolDir, true)
+	: FolderWatcher(looper, spoolDir, true)
+	, fLocker(locker)
 	, fJobs()
 {
 	SetListener(this);
