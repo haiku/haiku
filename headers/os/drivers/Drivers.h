@@ -14,11 +14,6 @@ extern "C" {
 	these hooks are how the kernel accesses the device
 --- */
 
-// XXX hack, this is also in private/kernel/defines.h
-#ifndef SYS_MAX_PATH_LEN
- #define SYS_MAX_PATH_LEN 512
-#endif
-
 struct selectsync;
 typedef struct selectsync selectsync;
 
@@ -67,29 +62,6 @@ status_t		init_driver(void);
 void			uninit_driver(void);	
 
 extern int32	api_version;
-
-enum {
-	// called on partition device to get info
-	IOCTL_DEVFS_GET_PARTITION_INFO = 1000,
-	// called on raw device to declare one partition
-	IOCTL_DEVFS_SET_PARTITION,
-};
-
-typedef struct devfs_partition_info {
-	// offset and size relative to raw device in bytes
-	off_t offset;
-	off_t size;
-	
-	// logical block size in bytes
-	uint32 logical_block_size;
-	
-	// session/partition id
-	uint32 session;
-	uint32 partition;
-	
-	// path of raw device (GET_PARTITION_INFO only)
-	char raw_device[SYS_MAX_PATH_LEN];
-} devfs_partition_info;
 
 enum {
 	B_GET_DEVICE_SIZE = 1,			/* get # bytes */
