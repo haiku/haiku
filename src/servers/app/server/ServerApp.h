@@ -83,7 +83,6 @@ protected:
 	friend class AppServer;
 	friend class ServerWindow;
 	
-//	void DispatchMessage(int32 code, BPortLink& msg);
 	void DispatchMessage(int32 code, LinkMsgReader &link);
 	
 	port_id	fClientAppPort,

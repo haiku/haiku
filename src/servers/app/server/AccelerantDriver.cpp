@@ -214,9 +214,9 @@ void AccelerantDriver::Shutdown(void)
 	\param pensize The thickness of the lines
 	\param colors Array of colors for each respective line
 */
-void AccelerantDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors)
+void AccelerantDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d)
 {
-	if(!d)
+	if(!d || !linedata)
 		return;
 	
 	int x1, y1, x2, y2, dx, dy;
@@ -224,18 +224,22 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const
 	double xInc, yInc;
 	double x,y;
 	int i;
-
+	const LineArrayData *data;
+	
 	Lock();
 	fLineThickness = (int)d->pensize;
 	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
 	for (i=0; i<numlines; i++)
 	{
+		data=(const LineArrayData *)&(linedata[i]);
+		
 		//fDrawColor = colors[i];
-		fDrawPattern.SetColors(colors[i],colors[i]);
-		x1 = ROUND(pts[i*2].x);
-		y1 = ROUND(pts[i*2].y);
-		x2 = ROUND(pts[i*2+1].x);
-		y2 = ROUND(pts[i*2+1].y);
+		fDrawPattern.SetColors(data->color,data->color);
+		
+		x1 = ROUND(data->pt1.x);
+		y1 = ROUND(data->pt1.y);
+		x2 = ROUND(data->pt2.x);
+		y2 = ROUND(data->pt2.y);
 		dx = x2-x1;
 		dy = y2-y1;
 		x = x1;
@@ -246,7 +250,7 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const
 			steps = abs(dy);
 		xInc = dx / (double) steps;
 		yInc = dy / (double) steps;
-
+	
 		SetThickPatternPixel(ROUND(x),ROUND(y));
 		for (k=0; k<steps; k++)
 		{

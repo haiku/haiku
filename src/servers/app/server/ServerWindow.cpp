@@ -34,9 +34,12 @@
 #include <Message.h>
 #include <GraphicsDefs.h>
 #include <PortLink.h>
-#include "Desktop.h"
+#include <ViewAux.h>
 #include "AppServer.h"
+#include "BGet++.h"
+#include "Desktop.h"
 #include "Layer.h"
+#include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
 #include "ServerWindow.h"
 #include "ServerApp.h"
@@ -149,12 +152,13 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	// fMessagePort is the port to which the app sends messages for the server
 	fMessagePort = create_port(30,fTitle.String());
 
-	fSession = new BPortLink(fClientWinPort, fMessagePort);
+	fMsgSender=new LinkMsgSender(fClientWinPort);
+	fMsgReader=new LinkMsgReader(fMessagePort);
 	
 	// Send a reply to our window - it is expecting fMessagePort port.
-	fSession->StartMessage(SERVER_TRUE);
-	fSession->Attach<port_id>(fMessagePort);
-	fSession->Flush();
+	fMsgSender->StartMessage(SERVER_TRUE);
+	fMsgSender->Attach<port_id>(fMessagePort);
+	fMsgSender->Flush();
 
 	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
@@ -183,12 +187,18 @@ ServerWindow::~ServerWindow(void)
 	desktop->RemoveWinBorder(fWinBorder);
 	STRACE(("SW(%s) Successfully removed from the desktop\n", fTitle.String()));
 	
-	if(fSession)
+	if(fMsgSender)
 	{
-		delete fSession;
-		fSession = NULL;
+		delete fMsgSender;
+		fMsgSender=NULL;
 	}
-	
+		
+	if(fMsgReader)
+	{
+		delete fMsgReader;
+		fMsgReader=NULL;
+	}
+		
 	if (fWinBorder)
 	{
 		delete fWinBorder;
@@ -512,17 +522,17 @@ bool ServerWindow::IsLocked(void) const
 	\brief Sets the font state for a layer
 	\param layer The layer to set the font
 */
-void ServerWindow::SetLayerFontState(Layer *layer)
+void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 	uint16 mask;
 
-	fSession->Read<uint16>(&mask);
+	link.Read<uint16>(&mask);
 			
 	if (mask & B_FONT_FAMILY_AND_STYLE)
 	{
 		uint32		fontID;
-		fSession->Read<int32>((int32*)&fontID);
+		link.Read<int32>((int32*)&fontID);
 		
 		// TODO: Implement. ServerFont::SetFamilyAndStyle(uint32) is needed
 		//layer->fLayerData->font->
@@ -531,78 +541,78 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 	if (mask & B_FONT_SIZE)
 	{
 		float size;
-		fSession->Read<float>(&size);
+		link.Read<float>(&size);
 		layer->fLayerData->font.SetSize(size);
 	}
 	
 	if (mask & B_FONT_SHEAR)
 	{
 		float shear;
-		fSession->Read<float>(&shear);
+		link.Read<float>(&shear);
 		layer->fLayerData->font.SetShear(shear);
 	}
 
 	if (mask & B_FONT_ROTATION)
 	{
 		float rotation;
-		fSession->Read<float>(&rotation);
+		link.Read<float>(&rotation);
 		layer->fLayerData->font.SetRotation(rotation);
 	}
 
 	if (mask & B_FONT_SPACING)
 	{
 		uint8 spacing;
-		fSession->Read<uint8>(&spacing);
+		link.Read<uint8>(&spacing);
 		layer->fLayerData->font.SetSpacing(spacing);
 	}
 
 	if (mask & B_FONT_ENCODING)
 	{
 		uint8 encoding;
-		fSession->Read<uint8>((uint8*)&encoding);
+		link.Read<uint8>((uint8*)&encoding);
 		layer->fLayerData->font.SetEncoding(encoding);
 	}
 
 	if (mask & B_FONT_FACE)
 	{
 		uint16 face;
-		fSession->Read<uint16>(&face);
+		link.Read<uint16>(&face);
 		layer->fLayerData->font.SetFace(face);
 	}
 
 	if (mask & B_FONT_FLAGS)
 	{
 		uint32 flags;
-		fSession->Read<uint32>(&flags);
+		link.Read<uint32>(&flags);
 		layer->fLayerData->font.SetFlags(flags);
 	}
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",
 			fTitle.String(), layer->fName->String()));
 }
 //------------------------------------------------------------------------------
-void ServerWindow::SetLayerState(Layer *layer)
+void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 	rgb_color highColor, lowColor, viewColor;
 	pattern patt;
 	int32 clipRegRects;
 
-	fSession->Read<BPoint>(		&(layer->fLayerData->penlocation));
-	fSession->Read<float>(		&(layer->fLayerData->pensize));
-	fSession->Read(			&highColor, sizeof(rgb_color));
-	fSession->Read(			&lowColor, sizeof(rgb_color));
-	fSession->Read(			&viewColor, sizeof(rgb_color));
-	fSession->Read(			&patt, sizeof(pattern));
-	fSession->Read<int8>((int8*)	&(layer->fLayerData->draw_mode));
-	fSession->Read<BPoint>(		&(layer->fLayerData->coordOrigin));
-	fSession->Read<int8>((int8*)	&(layer->fLayerData->lineJoin));
-	fSession->Read<int8>((int8*)	&(layer->fLayerData->lineCap));
-	fSession->Read<float>(		&(layer->fLayerData->miterLimit));
-	fSession->Read<int8>((int8*)	&(layer->fLayerData->alphaSrcMode));
-	fSession->Read<int8>((int8*)	&(layer->fLayerData->alphaFncMode));
-	fSession->Read<float>(		&(layer->fLayerData->scale));
-	fSession->Read<bool>(			&(layer->fLayerData->fontAliasing));
-	fSession->Read<int32>(		&clipRegRects);
+	link.Read<BPoint>(		&(layer->fLayerData->penlocation));
+	link.Read<float>(		&(layer->fLayerData->pensize));
+	link.Read(			&highColor, sizeof(rgb_color));
+	link.Read(			&lowColor, sizeof(rgb_color));
+	link.Read(			&viewColor, sizeof(rgb_color));
+	link.Read(			&patt, sizeof(pattern));
+	link.Read<int8>((int8*)	&(layer->fLayerData->draw_mode));
+	link.Read<BPoint>(		&(layer->fLayerData->coordOrigin));
+	link.Read<int8>((int8*)	&(layer->fLayerData->lineJoin));
+	link.Read<int8>((int8*)	&(layer->fLayerData->lineCap));
+	link.Read<float>(		&(layer->fLayerData->miterLimit));
+	link.Read<int8>((int8*)	&(layer->fLayerData->alphaSrcMode));
+	link.Read<int8>((int8*)	&(layer->fLayerData->alphaFncMode));
+	link.Read<float>(		&(layer->fLayerData->scale));
+	link.Read<bool>(			&(layer->fLayerData->fontAliasing));
+	link.Read<int32>(		&clipRegRects);
 
 	layer->fLayerData->patt.Set(*((uint64*)&patt));
 	layer->fLayerData->highcolor.SetColor(highColor);
@@ -620,7 +630,7 @@ void ServerWindow::SetLayerState(Layer *layer)
 				
 		for(int32 i = 0; i < clipRegRects; i++)
 		{
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			layer->fLayerData->clipReg->Include(rect);
 		}
 	}
@@ -636,7 +646,7 @@ void ServerWindow::SetLayerState(Layer *layer)
 			 layer->fName->String()));
 }
 //------------------------------------------------------------------------------
-Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
+Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 	STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
@@ -649,13 +659,13 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	int32 childCount;
 	char *name = NULL;
 		
-	fSession->Read<int32>(&token);
-	fSession->ReadString(&name);
-	fSession->Read<BRect>(&frame);
-	fSession->Read<uint32>(&resizeMask);
-	fSession->Read<uint32>(&flags);
-	fSession->Read<bool>(&hidden);
-	fSession->Read<int32>(&childCount);
+	link.Read<int32>(&token);
+	link.ReadString(&name);
+	link.Read<BRect>(&frame);
+	link.Read<uint32>(&resizeMask);
+	link.Read<uint32>(&flags);
+	link.Read<bool>(&hidden);
+	link.Read<int32>(&childCount);
 			
 	Layer *newLayer;
 	newLayer = new Layer(frame, name, token, resizeMask, 
@@ -676,7 +686,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	return newLayer;
 }
 //------------------------------------------------------------------------------
-void ServerWindow::DispatchMessage(int32 code)
+void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 {
 	if (cl == NULL && code != AS_LAYER_CREATE_ROOT)
 	{
@@ -691,8 +701,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32		bitmapToken;
 			BPoint 		point;
 			
-			fSession->Read<int32>(&bitmapToken);
-			fSession->Read<BPoint>(&point);
+			link.Read<int32>(&bitmapToken);
+			link.Read<BPoint>(&point);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -716,8 +726,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32		bitmapToken;
 			BPoint 		point;
 			
-			fSession->Read<int32>(&bitmapToken);
-			fSession->Read<BPoint>(&point);
+			link.Read<int32>(&bitmapToken);
+			link.Read<BPoint>(&point);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -739,9 +749,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
-			fSession->Read<int32>(&bitmapToken);
-			fSession->Read<BRect>(&dstRect);
-			fSession->Read<BRect>(&srcRect);
+			link.Read<int32>(&bitmapToken);
+			link.Read<BRect>(&dstRect);
+			link.Read<BRect>(&srcRect);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -763,9 +773,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
-			fSession->Read<int32>(&bitmapToken);
-			fSession->Read<BRect>(&dstRect);
-			fSession->Read<BRect>(&srcRect);
+			link.Read<int32>(&bitmapToken);
+			link.Read<BRect>(&dstRect);
+			link.Read<BRect>(&srcRect);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -785,7 +795,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 token;
 			
-			fSession->Read<int32>(&token);
+			link.Read<int32>(&token);
 			
 			Layer *current = FindLayer(fWinBorder->fTopLayer, token);
 
@@ -803,7 +813,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			if (cl != NULL)
 				break;
 			
-			fWinBorder->fTopLayer = CreateLayerTree(NULL);
+//			fWinBorder->fTopLayer = CreateLayerTree(NULL);
+			fWinBorder->fTopLayer = CreateLayerTree(NULL, link);
 			fWinBorder->fTopLayer->SetAsTopLayer(true);
 			cl = fWinBorder->fTopLayer;
 
@@ -822,7 +833,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			if (cl == NULL)
 				break;
 
-			newLayer	= CreateLayerTree(NULL);
+//			newLayer	= CreateLayerTree(NULL);
+			newLayer	= CreateLayerTree(NULL, link);
 			cl->AddChild(newLayer, this);
 
 			if (!(newLayer->IsHidden())){
@@ -862,14 +874,16 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_SET_STATE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
-			SetLayerState(cl);
+//			SetLayerState(cl);
+			SetLayerState(cl,link);
 			cl->RebuildFullRegion();
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
-			SetLayerFontState(cl);
+//			SetLayerFontState(cl);
+			SetLayerFontState(cl,link);
 			cl->RebuildFullRegion();
 			break;
 		}
@@ -889,48 +903,51 @@ void ServerWindow::DispatchMessage(int32 code)
 			patt = ld->patt.GetInt64();
 			
 			// TODO: Implement when ServerFont::SetfamilyAndStyle(int32) exists
-			fSession->StartMessage(SERVER_TRUE);
+			fMsgSender->StartMessage(SERVER_TRUE);
 			
 			// Attach font state
-			fSession->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
-			fSession->Attach<float>(ld->font.Size());
-			fSession->Attach<float>(ld->font.Shear());
-			fSession->Attach<float>(ld->font.Rotation());
-			fSession->Attach<uint8>(ld->font.Spacing());
-			fSession->Attach<uint8>(ld->font.Encoding());
-			fSession->Attach<uint16>(ld->font.Face());
-			fSession->Attach<uint32>(ld->font.Flags());
+			
+			// TODO: need a ServerFont::GetFamAndStyle
+//			fMsgSender->Attach<uint32>(0UL uint32 ld->font.GetFamAndStyle());
+			fMsgSender->Attach<uint32>(0UL);
+			fMsgSender->Attach<float>(ld->font.Size());
+			fMsgSender->Attach<float>(ld->font.Shear());
+			fMsgSender->Attach<float>(ld->font.Rotation());
+			fMsgSender->Attach<uint8>(ld->font.Spacing());
+			fMsgSender->Attach<uint8>(ld->font.Encoding());
+			fMsgSender->Attach<uint16>(ld->font.Face());
+			fMsgSender->Attach<uint32>(ld->font.Flags());
 			
 			// Attach view state
-			fSession->Attach<BPoint>(ld->penlocation);
-			fSession->Attach<float>(ld->pensize);
-			fSession->Attach(&hc, sizeof(rgb_color));
-			fSession->Attach(&lc, sizeof(rgb_color));
-			fSession->Attach(&vc, sizeof(rgb_color));
-			fSession->Attach<uint64>(patt);
-			fSession->Attach<BPoint>(ld->coordOrigin);
-			fSession->Attach<uint8>((uint8)(ld->draw_mode));
-			fSession->Attach<uint8>((uint8)(ld->lineCap));
-			fSession->Attach<uint8>((uint8)(ld->lineJoin));
-			fSession->Attach<float>(ld->miterLimit);
-			fSession->Attach<uint8>((uint8)(ld->alphaSrcMode));
-			fSession->Attach<uint8>((uint8)(ld->alphaFncMode));
-			fSession->Attach<float>(ld->scale);
-			fSession->Attach<float>(ld->fontAliasing);
+			fMsgSender->Attach<BPoint>(ld->penlocation);
+			fMsgSender->Attach<float>(ld->pensize);
+			fMsgSender->Attach(&hc, sizeof(rgb_color));
+			fMsgSender->Attach(&lc, sizeof(rgb_color));
+			fMsgSender->Attach(&vc, sizeof(rgb_color));
+			fMsgSender->Attach<uint64>(patt);
+			fMsgSender->Attach<BPoint>(ld->coordOrigin);
+			fMsgSender->Attach<uint8>((uint8)(ld->draw_mode));
+			fMsgSender->Attach<uint8>((uint8)(ld->lineCap));
+			fMsgSender->Attach<uint8>((uint8)(ld->lineJoin));
+			fMsgSender->Attach<float>(ld->miterLimit);
+			fMsgSender->Attach<uint8>((uint8)(ld->alphaSrcMode));
+			fMsgSender->Attach<uint8>((uint8)(ld->alphaFncMode));
+			fMsgSender->Attach<float>(ld->scale);
+			fMsgSender->Attach<float>(ld->fontAliasing);
 			
 			int32 noOfRects = 0;
 			if (ld->clipReg)
 				noOfRects = ld->clipReg->CountRects();
 			
-			fSession->Attach<int32>(noOfRects);
+			fMsgSender->Attach<int32>(noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
-				fSession->Attach<BRect>(ld->clipReg->RectAt(i));
+				fMsgSender->Attach<BRect>(ld->clipReg->RectAt(i));
 			
-			fSession->Attach<float>(cl->fFrame.left);
-			fSession->Attach<float>(cl->fFrame.top);
-			fSession->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
-			fSession->Flush();
+			fMsgSender->Attach<float>(cl->fFrame.left);
+			fMsgSender->Attach<float>(cl->fFrame.top);
+			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fMsgSender->Flush();
 
 			break;
 		}
@@ -939,8 +956,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float x, y;
 			
-			fSession->Read<float>(&x);
-			fSession->Read<float>(&y);
+			link.Read<float>(&x);
+			link.Read<float>(&y);
 			
 			cl->MoveBy(x, y);
 			
@@ -951,8 +968,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float newWidth, newHeight;
 			
-			fSession->Read<float>(&newWidth);
-			fSession->Read<float>(&newHeight);
+			link.Read<float>(&newWidth);
+			link.Read<float>(&newHeight);
 			
 			// TODO: Check for minimum size allowed. Need WinBorder::GetSizeLimits
 			
@@ -963,11 +980,11 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<float>(cl->fFrame.left);
-			fSession->Attach<float>(cl->fFrame.top);
-			fSession->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<float>(cl->fFrame.left);
+			fMsgSender->Attach<float>(cl->fFrame.top);
+			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fMsgSender->Flush();
 
 			break;
 		}
@@ -976,8 +993,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float x, y;
 			
-			fSession->Read<float>(&x);
-			fSession->Read<float>(&y);
+			link.Read<float>(&x);
+			link.Read<float>(&y);
 			
 			cl->fLayerData->coordOrigin.Set(x, y);
 
@@ -986,16 +1003,16 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<BPoint>(cl->fLayerData->coordOrigin);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<BPoint>(cl->fLayerData->coordOrigin);
+			fMsgSender->Flush();
 
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->Read<uint32>(&(cl->fResizeMode));
+			link.Read<uint32>(&(cl->fResizeMode));
 			
 			break;
 		}
@@ -1004,7 +1021,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int32 token;
 
-			fSession->Read<int32>(&token);
+			link.Read<int32>(&token);
 			
 			cursormanager->SetCursor(token);
 
@@ -1012,7 +1029,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			fSession->Read<uint32>(&(cl->fFlags));
+			link.Read<uint32>(&(cl->fFlags));
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			break;
@@ -1036,9 +1053,9 @@ void ServerWindow::DispatchMessage(int32 code)
 
 			// TODO: Look into locking scheme relating to Layers and modifying redraw-related members
 
-			fSession->Read<int8>(&lineCap);
-			fSession->Read<int8>(&lineJoin);
-			fSession->Read<float>(&(cl->fLayerData->miterLimit));
+			link.Read<int8>(&lineCap);
+			link.Read<int8>(&lineJoin);
+			link.Read<float>(&(cl->fLayerData->miterLimit));
 			
 			cl->fLayerData->lineCap	= (cap_mode)lineCap;
 			cl->fLayerData->lineJoin = (join_mode)lineJoin;
@@ -1048,11 +1065,11 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_LINE_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<int8>((int8)(cl->fLayerData->lineCap));
-			fSession->Attach<int8>((int8)(cl->fLayerData->lineJoin));
-			fSession->Attach<float>(cl->fLayerData->miterLimit);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineCap));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineJoin));
+			fMsgSender->Attach<float>(cl->fLayerData->miterLimit);
+			fMsgSender->Flush();
 		
 			break;
 		}
@@ -1087,7 +1104,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_SET_SCALE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
-			fSession->Read<float>(&(cl->fLayerData->scale));
+			link.Read<float>(&(cl->fLayerData->scale));
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -1100,9 +1117,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			while((ld = ld->prevState))
 				scale		*= ld->scale;
 			
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<float>(scale);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<float>(scale);
+			fMsgSender->Flush();
 		
 			break;
 		}
@@ -1111,8 +1128,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float		x, y;
 			
-			fSession->Read<float>(&x);
-			fSession->Read<float>(&y);
+			link.Read<float>(&x);
+			link.Read<float>(&y);
 
 			cl->fLayerData->penlocation.Set(x, y);
 
@@ -1121,25 +1138,25 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_PEN_LOC:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<BPoint>(cl->fLayerData->penlocation);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<BPoint>(cl->fLayerData->penlocation);
+			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->Read<float>(&(cl->fLayerData->pensize));
+			link.Read<float>(&(cl->fLayerData->pensize));
 		
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<float>(cl->fLayerData->pensize);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<float>(cl->fLayerData->pensize);
+			fMsgSender->Flush();
 		
 			break;
 		}
@@ -1148,7 +1165,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->Read(&c, sizeof(rgb_color));
+			link.Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->viewcolor.SetColor(c);
 			
@@ -1165,11 +1182,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			lowColor = cl->fLayerData->lowcolor.GetColor32();
 			viewColor = cl->fLayerData->viewcolor.GetColor32();
 			
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach(&highColor, sizeof(rgb_color));
-			fSession->Attach(&lowColor, sizeof(rgb_color));
-			fSession->Attach(&viewColor, sizeof(rgb_color));
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach(&highColor, sizeof(rgb_color));
+			fMsgSender->Attach(&lowColor, sizeof(rgb_color));
+			fMsgSender->Attach(&viewColor, sizeof(rgb_color));
+			fMsgSender->Flush();
 
 			break;
 		}
@@ -1178,8 +1195,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 srcAlpha, alphaFunc;
 			
-			fSession->Read<int8>(&srcAlpha);
-			fSession->Read<int8>(&alphaFunc);
+			link.Read<int8>(&srcAlpha);
+			link.Read<int8>(&alphaFunc);
 			
 			cl->fLayerData->alphaSrcMode = (source_alpha)srcAlpha;
 			cl->fLayerData->alphaFncMode = (alpha_function)alphaFunc;
@@ -1189,10 +1206,10 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_BLEND_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<int8>((int8)(cl->fLayerData->alphaSrcMode));
-			fSession->Attach<int8>((int8)(cl->fLayerData->alphaFncMode));
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaSrcMode));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaFncMode));
+			fMsgSender->Flush();
 
 			break;
 		}
@@ -1201,7 +1218,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 drawingMode;
 			
-			fSession->Read<int8>(&drawingMode);
+			link.Read<int8>(&drawingMode);
 			
 			cl->fLayerData->draw_mode = (drawing_mode)drawingMode;
 			
@@ -1210,16 +1227,16 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_DRAW_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Attach<int8>((int8)(cl->fLayerData->draw_mode));
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->draw_mode));
+			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->Read<bool>(&(cl->fLayerData->fontAliasing));
+			link.Read<bool>(&(cl->fLayerData->fontAliasing));
 			
 			break;
 		}
@@ -1231,8 +1248,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 pictureToken;
 			BPoint where;
 			
-			fSession->Read<int32>(&pictureToken);
-			fSession->Read<BPoint>(&where);
+			link.Read<int32>(&pictureToken);
+			link.Read<BPoint>(&where);
 			
 			
 			BRegion reg;
@@ -1306,8 +1323,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 pictureToken;
 			BPoint where;
 			
-			fSession->Read<int32>(&pictureToken);
-			fSession->Read<BPoint>(&where);
+			link.Read<int32>(&pictureToken);
+			link.Read<BPoint>(&where);
 			
 			ServerPicture *sp = NULL;
 			int32 i = 0;
@@ -1345,9 +1362,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (cl->IsHidden())
 			{
-				fSession->StartMessage(SERVER_TRUE);
-				fSession->Attach<int32>(0L);
-				fSession->Flush();
+				fMsgSender->StartMessage(SERVER_TRUE);
+				fMsgSender->Attach<int32>(0L);
+				fMsgSender->Flush();
 			}
 			else
 			{
@@ -1369,11 +1386,11 @@ void ServerWindow::DispatchMessage(int32 code)
 				}
 			
 				noOfRects = reg.CountRects();
-				fSession->StartMessage(SERVER_TRUE);
-				fSession->Attach<int32>(noOfRects);
+				fMsgSender->StartMessage(SERVER_TRUE);
+				fMsgSender->Attach<int32>(noOfRects);
 
 				for(int i = 0; i < noOfRects; i++)
-					fSession->Attach<BRect>(reg.RectAt(i));
+					fMsgSender->Attach<BRect>(reg.RectAt(i));
 			}
 			break;
 		}
@@ -1390,11 +1407,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			else
 				cl->fLayerData->clipReg = new BRegion();
 			
-			fSession->Read<int32>(&noOfRects);
+			link.Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
 			{
-				fSession->Read<BRect>(&r);
+				link.Read<BRect>(&r);
 				cl->fLayerData->clipReg->Include(r);
 			}
 
@@ -1416,7 +1433,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: Watch out for the coordinate system in AS_LAYER_INVAL_RECT
 			BRect		invalRect;
 			
-			fSession->Read<BRect>(&invalRect);
+			link.Read<BRect>(&invalRect);
 			
 			cl->Invalidate(invalRect);
 			
@@ -1431,11 +1448,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 noOfRects;
 			BRect rect;
 			
-			fSession->Read<int32>(&noOfRects);
+			link.Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
 			{
-				fSession->Read<BRect>(&rect);
+				link.Read<BRect>(&rect);
 				invalReg.Include(rect);
 			}
 			
@@ -1515,21 +1532,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 mainToken;
 			team_id	teamID;
 			
-			fSession->Read<int32>(&mainToken);
-			fSession->Read(&teamID, sizeof(team_id));
+			link.Read<int32>(&mainToken);
+			link.Read(&teamID, sizeof(team_id));
 			
 			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
-				fSession->StartMessage(SERVER_TRUE);
-				fSession->Flush();
+				fMsgSender->StartMessage(SERVER_TRUE);
+				fMsgSender->Flush();
 				
 				fWinBorder->AddToSubsetOf(wb);
 			}
 			else
 			{
-				fSession->StartMessage(SERVER_FALSE);
-				fSession->Flush();
+				fMsgSender->StartMessage(SERVER_FALSE);
+				fMsgSender->Flush();
 			}
 			break;
 		}
@@ -1539,21 +1556,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 mainToken;
 			team_id teamID;
 			
-			fSession->Read<int32>(&mainToken);
-			fSession->Read(&teamID, sizeof(team_id));
+			link.Read<int32>(&mainToken);
+			link.Read(&teamID, sizeof(team_id));
 			
 			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
-				fSession->StartMessage(SERVER_TRUE);
-				fSession->Flush();
+				fMsgSender->StartMessage(SERVER_TRUE);
+				fMsgSender->Flush();
 				
 				fWinBorder->RemoveFromSubsetOf(wb);
 			}
 			else
 			{
-				fSession->StartMessage(SERVER_FALSE);
-				fSession->Flush();
+				fMsgSender->StartMessage(SERVER_FALSE);
+				fMsgSender->Flush();
 			}
 			break;
 		}
@@ -1604,8 +1621,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			float xResizeBy;
 			float yResizeBy;
 			
-			fSession->Read<float>(&xResizeBy);
-			fSession->Read<float>(&yResizeBy);
+			link.Read<float>(&xResizeBy);
+			link.Read<float>(&yResizeBy);
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
 			
@@ -1616,8 +1633,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			float xMoveBy;
 			float yMoveBy;
 			
-			fSession->Read<float>(&xMoveBy);
-			fSession->Read<float>(&yMoveBy);
+			link.Read<float>(&xMoveBy);
+			link.Read<float>(&yMoveBy);
 
 			fWinBorder->MoveBy(xMoveBy, yMoveBy);
 
@@ -1633,15 +1650,15 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			float wmin,wmax,hmin,hmax;
 			
-			fSession->Read<float>(&wmin);
-			fSession->Read<float>(&wmax);
-			fSession->Read<float>(&hmin);
-			fSession->Read<float>(&hmax);
+			link.Read<float>(&wmin);
+			link.Read<float>(&wmax);
+			link.Read<float>(&hmin);
+			link.Read<float>(&hmax);
 			
 			fWinBorder->SetSizeLimits(wmin,wmax,hmin,hmax);
 			
-			fSession->StartMessage(SERVER_TRUE);
-			fSession->Flush();
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Flush();
 			break;
 		}
 		case B_MINIMIZE:
@@ -1671,7 +1688,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->Read(&c, sizeof(rgb_color));
+			link.Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->highcolor.SetColor(c);
 
@@ -1682,7 +1699,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->Read(&c, sizeof(rgb_color));
+			link.Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->lowcolor.SetColor(c);
 			
@@ -1693,10 +1710,10 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: Add clipping TO AS_STROKE_LINE
 			float x1, y1, x2, y2;
 			
-			fSession->Read<float>(&x1);
-			fSession->Read<float>(&y1);
-			fSession->Read<float>(&x2);
-			fSession->Read<float>(&y2);
+			link.Read<float>(&x1);
+			link.Read<float>(&y1);
+			link.Read<float>(&x2);
+			link.Read<float>(&y2);
 			
 			if (cl && cl->fLayerData)
 			{
@@ -1711,10 +1728,10 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// TODO: Add clipping TO AS_STROKE_RECT
 			float left, top, right, bottom;
-			fSession->Read<float>(&left);
-			fSession->Read<float>(&top);
-			fSession->Read<float>(&right);
-			fSession->Read<float>(&bottom);
+			link.Read<float>(&left);
+			link.Read<float>(&top);
+			link.Read<float>(&right);
+			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 
 			if (cl && cl->fLayerData)
@@ -1724,7 +1741,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// TODO: Add clipping TO AS_STROKE_RECT
 			BRect rect;
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rect),cl->fLayerData);
 		}
@@ -1734,9 +1751,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			float angle, span;
 			BRect r;
 			
-			fSession->Read<BRect>(&r);
-			fSession->Read<float>(&angle);
-			fSession->Read<float>(&span);
+			link.Read<BRect>(&r);
+			link.Read<float>(&angle);
+			link.Read<float>(&span);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->StrokeArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
 			break;
@@ -1747,9 +1764,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			float angle, span;
 			BRect r;
 			
-			fSession->Read<BRect>(&r);
-			fSession->Read<float>(&angle);
-			fSession->Read<float>(&span);
+			link.Read<BRect>(&r);
+			link.Read<float>(&angle);
+			link.Read<float>(&span);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
 			break;
@@ -1762,7 +1779,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			pts = new BPoint[4];
 			
 			for (i=0; i<4; i++)
-				fSession->Read<BPoint>(&(pts[i]));
+				link.Read<BPoint>(&(pts[i]));
 			
 			if (cl && cl->fLayerData)
 			{
@@ -1782,7 +1799,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			pts = new BPoint[4];
 			
 			for (i=0; i<4; i++)
-				fSession->Read<BPoint>(&(pts[i]));
+				link.Read<BPoint>(&(pts[i]));
 			
 			if (cl && cl->fLayerData)
 			{
@@ -1798,7 +1815,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->StrokeEllipse(cl->ConvertToTop(rect),cl->fLayerData);
 			break;
@@ -1807,7 +1824,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillEllipse(cl->ConvertToTop(rect),cl->fLayerData);
 			break;
@@ -1817,9 +1834,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
-			fSession->Read<BRect>(&rect);
-			fSession->Read<float>(&xrad);
-			fSession->Read<float>(&yrad);
+			link.Read<BRect>(&rect);
+			link.Read<float>(&xrad);
+			link.Read<float>(&yrad);
 			
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->StrokeRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
@@ -1830,9 +1847,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
-			fSession->Read<BRect>(&rect);
-			fSession->Read<float>(&xrad);
-			fSession->Read<float>(&yrad);
+			link.Read<BRect>(&rect);
+			link.Read<float>(&xrad);
+			link.Read<float>(&yrad);
 			
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
@@ -1845,9 +1862,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			BRect rect;
 			
 			for (int i=0; i<3; i++)
-				fSession->Read<BPoint>(&(pts[i]));
+				link.Read<BPoint>(&(pts[i]));
 			
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			
 			if (cl && cl->fLayerData)
 			{
@@ -1865,9 +1882,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			BRect rect;
 			
 			for (int i=0; i<3; i++)
-				fSession->Read<BPoint>(&(pts[i]));
+				link.Read<BPoint>(&(pts[i]));
 			
-			fSession->Read<BRect>(&rect);
+			link.Read<BRect>(&rect);
 			
 			if (cl && cl->fLayerData)
 			{
@@ -1885,13 +1902,13 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 pointcount;
 			BPoint *pointlist;
 			
-			fSession->Read<BRect>(&polyframe);
-			fSession->Read<bool>(&isclosed);
-			fSession->Read<int32>(&pointcount);
+			link.Read<BRect>(&polyframe);
+			link.Read<bool>(&isclosed);
+			link.Read<int32>(&pointcount);
 			
 			pointlist=new BPoint[pointcount];
 			
-			fSession->Read(pointlist, sizeof(BPoint)*pointcount);
+			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=cl->ConvertToTop(pointlist[i]);
@@ -1909,12 +1926,12 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 pointcount;
 			BPoint *pointlist;
 			
-			fSession->Read<BRect>(&polyframe);
-			fSession->Read<int32>(&pointcount);
+			link.Read<BRect>(&polyframe);
+			link.Read<int32>(&pointcount);
 			
 			pointlist=new BPoint[pointcount];
 			
-			fSession->Read(pointlist, sizeof(BPoint)*pointcount);
+			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=cl->ConvertToTop(pointlist[i]);
@@ -1933,15 +1950,15 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 *oplist;
 			BPoint *ptlist;
 			
-			fSession->Read<BRect>(&shaperect);
-			fSession->Read<int32>(&opcount);
-			fSession->Read<int32>(&ptcount);
+			link.Read<BRect>(&shaperect);
+			link.Read<int32>(&opcount);
+			link.Read<int32>(&ptcount);
 			
 			oplist=new int32[opcount];
 			ptlist=new BPoint[ptcount];
 			
-			fSession->Read(oplist,sizeof(int32)*opcount);
-			fSession->Read(ptlist,sizeof(BPoint)*ptcount);
+			link.Read(oplist,sizeof(int32)*opcount);
+			link.Read(ptlist,sizeof(BPoint)*ptcount);
 			
 			for(int32 i=0; i<ptcount; i++)
 				ptlist[i]=cl->ConvertToTop(ptlist[i]);
@@ -1960,15 +1977,15 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 *oplist;
 			BPoint *ptlist;
 			
-			fSession->Read<BRect>(&shaperect);
-			fSession->Read<int32>(&opcount);
-			fSession->Read<int32>(&ptcount);
+			link.Read<BRect>(&shaperect);
+			link.Read<int32>(&opcount);
+			link.Read<int32>(&ptcount);
 			
 			oplist=new int32[opcount];
 			ptlist=new BPoint[ptcount];
 			
-			fSession->Read(oplist,sizeof(int32)*opcount);
-			fSession->Read(ptlist,sizeof(BPoint)*ptcount);
+			link.Read(oplist,sizeof(int32)*opcount);
+			link.Read(ptlist,sizeof(BPoint)*ptcount);
 			
 			for(int32 i=0; i<ptcount; i++)
 				ptlist[i]=cl->ConvertToTop(ptlist[i]);
@@ -1985,11 +2002,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 rectcount;
 			BRect *rectlist;
 			
-			fSession->Read<int32>(&rectcount);
+			link.Read<int32>(&rectcount);
 			
 			rectlist=new BRect[rectcount];
 			
-			fSession->Read(rectlist, sizeof(BRect)*rectcount);
+			link.Read(rectlist, sizeof(BRect)*rectcount);
 			
 			// Between the client-side conversion to BRects from clipping_rects to the overhead
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
@@ -2006,7 +2023,33 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_STROKE_LINEARRAY:
 		{
-			// TODO: Implement AS_STROKE_LINEARRAY
+			// Attached Data:
+			// 1) int32 Number of lines in the array
+			// 2) array of struct _array_data_ objects, as defined in ViewAux.h
+			
+			int32 linecount;
+			
+			link.Read<int32>(&linecount);
+			if(linecount>0)
+			{
+				LineArrayData linedata[linecount], *index;
+				
+				for(int32 i=0; i<linecount; i++)
+				{
+					index=&linedata[i];
+					
+					link.Read<float>(&(index->pt1.x));
+					link.Read<float>(&(index->pt1.y));
+					link.Read<float>(&(index->pt2.x));
+					link.Read<float>(&(index->pt2.y));
+					link.Read<rgb_color>(&(index->color));
+					
+					index->pt1=cl->ConvertToTop(index->pt1);
+					index->pt2=cl->ConvertToTop(index->pt2);
+				}
+				
+				desktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,cl->fLayerData);
+			}
 			break;
 		}
 		case AS_DRAW_STRING:
@@ -2016,9 +2059,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			BPoint location;
 			escapement_delta delta;
 			
-			fSession->Read<BPoint>(&location);
-			fSession->Read<escapement_delta>(&delta);
-			fSession->ReadString(&string);
+			link.Read<BPoint>(&location);
+			link.Read<escapement_delta>(&delta);
+			link.ReadString(&string);
 			
 			if(cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->DrawString(string,length,cl->ConvertToTop(location),
@@ -2031,8 +2074,8 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			float x,y;
 			
-			fSession->Read<float>(&x);
-			fSession->Read<float>(&y);
+			link.Read<float>(&x);
+			link.Read<float>(&y);
 			if(cl && cl->fLayerData)
 				cl->fLayerData->penlocation.Set(x,y);
 			
@@ -2042,7 +2085,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			float size;
 			
-			fSession->Read<float>(&size);
+			link.Read<float>(&size);
 			if(cl && cl->fLayerData)
 				cl->fLayerData->pensize=size;
 			
@@ -2056,6 +2099,42 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_SET_FONT_SIZE:
 		{
 			// TODO: Implement AS_SET_FONT_SIZE?
+			break;
+		}
+		case AS_AREA_MESSAGE:
+		{
+			// This occurs in only one kind of case: a message is too big to send over a port. This
+			// is really an edge case, so this shouldn't happen *too* often
+			
+			// Attached Data:
+			// 1) area_id id of an area already owned by the server containing the message
+			// 2) size_t offset of the pointer in the area
+			// 3) size_t size of the message
+			
+			area_id area;
+			size_t offset;
+			size_t msgsize;
+			area_info ai;
+			int8 *msgpointer;
+			
+			link.Read<area_id>(&area);
+			link.Read<size_t>(&offset);
+			link.Read<size_t>(&msgsize);
+			
+			// Part sanity check, part get base pointer :)
+			if(get_area_info(area,&ai)!=B_OK)
+				break;
+			
+			msgpointer=(int8*)ai.address + offset;
+			
+			RAMLinkMsgReader mlink(msgpointer);
+			DispatchMessage(mlink.Code(),mlink);
+			
+			// This is a very special case in the sense that when ServerMemIO is used for this 
+			// purpose, it will be set to NOT automatically free the memory which it had 
+			// requested. This is the server's job once the message has been dispatched.
+			fServerApp->fSharedMem->ReleaseBuffer(msgpointer);
+			
 			break;
 		}
 		default:
@@ -2076,7 +2155,8 @@ void ServerWindow::DispatchMessage(int32 code)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	BPortLink	*ses = win->fSession;
+	LinkMsgReader *ses = win->fMsgReader;
+	
 	bool			quitting = false;
 	int32			code;
 	status_t		err = B_OK;
@@ -2085,7 +2165,7 @@ int32 ServerWindow::MonitorWin(void *data)
 	{
 		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
 		code = AS_CLIENT_DEAD;
-		err = ses->GetNextReply(&code);
+		err = ses->GetNextMessage(&code);
 		if (err < B_OK)
 			return err;
 
@@ -2099,6 +2179,7 @@ int32 ServerWindow::MonitorWin(void *data)
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
 				quitting = true;
+				
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				delete win;
 				break;
@@ -2112,7 +2193,7 @@ int32 ServerWindow::MonitorWin(void *data)
 			}
 			default:
 			{
-				win->DispatchMessage(code);
+				win->DispatchMessage(code, *ses);
 				break;
 			}
 		}

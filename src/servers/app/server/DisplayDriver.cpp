@@ -3599,32 +3599,58 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawD
 
 /*!
 	\brief Draws a series of lines - optimized for speed
-	\param pts Array of BPoints pairs
 	\param numlines Number of lines to be drawn
-	\param pensize The thickness of the lines
-	\param colors Array of colors for each respective line
+	\param linedata Array of LineArrayData objects
+	\param d current DrawData settings
 */
-void DisplayDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors)
+void DisplayDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d)
 {
-	int i;
-	DrawData data;
+	if(!d || !linedata)
+		return;
+	
+	const LineArrayData *dataindex=linedata;
+	BRect r(0,0,0,0);
+	DrawData drawdata;
 
 	Lock();
 	
-	BRect invalid=CalculatePolygonBounds(pts,numlines*2);
+	fCursorHandler->DriverHide();
 	
-	if(fCursorHandler->IntersectsCursor(invalid))
-		fCursorHandler->DriverHide();
+	drawdata = *d;
 	
-	data = *d;
-	for (i=0; i<numlines; i++)
+	r.Set(linedata->pt1.x,linedata->pt1.y,linedata->pt1.x,linedata->pt1.y);
+	
+	for (int32 i=0; i<numlines; i++)
 	{
-		data.highcolor = colors[i];
-		StrokeLine(pts[i<<1],pts[i<<1+1],&data);
+		dataindex=(const LineArrayData*) &linedata[i];
+		drawdata.highcolor = dataindex->color;
+		
+		// Keep track of the invalid region
+		if (dataindex->pt1.x < r.left)
+			r.left = dataindex->pt1.x;
+		if (dataindex->pt1.y < r.top)
+			r.top = dataindex->pt1.y;
+		if (dataindex->pt1.x > r.right)
+			r.right = dataindex->pt1.x;
+		if (dataindex->pt1.y > r.bottom)
+			r.bottom = dataindex->pt1.y;
+		
+		if (dataindex->pt2.x < r.left)
+			r.left = dataindex->pt2.x;
+		if (dataindex->pt2.y < r.top)
+			r.top = dataindex->pt2.y;
+		if (dataindex->pt2.x > r.right)
+			r.right = dataindex->pt2.x;
+		if (dataindex->pt2.y > r.bottom)
+			r.bottom = dataindex->pt2.y;
+		
+		StrokeLine(dataindex->pt1,dataindex->pt2,&drawdata);
 	}
 	
+	Invalidate(r);
+	
 	fCursorHandler->DriverShow();
-
+	
 	Unlock();
 }
 

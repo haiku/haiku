@@ -79,13 +79,13 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 //	tab_highcol=_colors->window_tab;
 //	tab_lowcol=_colors->window_tab;
 
-STRACE(("DefaultDecorator:\n"));
-STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
+	STRACE(("DefaultDecorator:\n"));
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
 }
 
 DefaultDecorator::~DefaultDecorator(void)
 {
-STRACE(("DefaultDecorator: ~DefaultDecorator()\n"));
+	STRACE(("DefaultDecorator: ~DefaultDecorator()\n"));
 	delete [] framecolors;
 }
 
@@ -176,7 +176,7 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 
 void DefaultDecorator::_DoLayout(void)
 {
-STRACE(("DefaultDecorator: Do Layout\n"));
+	STRACE(("DefaultDecorator: Do Layout\n"));
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
 
@@ -302,8 +302,8 @@ void DefaultDecorator::ResizeBy(BPoint pt)
 	_frame.right	+= pt.x;
 	_frame.bottom	+= pt.y;
 
-// TODO: make bigger/smaller
-//	_tabrect.
+	// TODO: make bigger/smaller
+	//	_tabrect.
 
 	_resizerect.OffsetBy(pt);
 //	_zoomrect.OffsetBy(pt);

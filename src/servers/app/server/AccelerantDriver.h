@@ -50,7 +50,7 @@ public:
 	virtual void SetMode(const int32 &mode);
 	virtual void SetMode(const display_mode &mode);
 	virtual bool DumpToFile(const char *path);
-	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
+	virtual void StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d);
 
 /*
 	virtual status_t SetDPMSMode(const uint32 &state);

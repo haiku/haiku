@@ -235,27 +235,23 @@ void DirectDriver::InvertRect(const BRect &r)
 	Unlock();
 }
 
-void DirectDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors)
+void DirectDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata, const DrawData *d)
 {
-	if( !numlines || !pts || !colors || !d)
+	if( !numlines || !linedata || !d)
 		return;
+	
+	const LineArrayData *data;
 	
 	Lock();
 	framebuffer->Lock();
 	drawview->SetPenSize(d->pensize);
 	drawview->SetDrawingMode(d->draw_mode);
 
-	int32 ptindex=0;
-
 	drawview->BeginLineArray(numlines);
 	for(int32 i=0; i<numlines; i++)
 	{
-		BPoint pt1=pts[ptindex++];
-		BPoint pt2=pts[ptindex++];
-		rgb_color col=colors[i].GetColor32();
-		
-		drawview->AddLine(pt1,pt2,col);
-		
+		data=(const LineArrayData *)&linedata[i];
+		drawview->AddLine(data->pt1,data->pt2,data->color);
 	}
 	drawview->EndLineArray();
 	

@@ -34,6 +34,8 @@
 #include <Rect.h>
 #include <String.h>
 #include <Window.h>
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 #include "FMWList.h"
 
 class BString;
@@ -120,12 +122,12 @@ public:
 
 private:
 	// methods for retrieving and creating a tree strcture of Layers.
-	Layer *CreateLayerTree(Layer *localRoot);
-	void SetLayerState(Layer *layer);
-	void SetLayerFontState(Layer *layer);
+	Layer *CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
+	void SetLayerState(Layer *layer, LinkMsgReader &link);
+	void SetLayerFontState(Layer *layer, LinkMsgReader &link);
 
 	// message handle methods.
-	void DispatchMessage(int32 code);
+	void DispatchMessage(int32 code, LinkMsgReader &link);
 	static int32 MonitorWin(void *data);
 
 
@@ -156,7 +158,8 @@ protected:
 	uint32 fToken;
 	int32 fHandlerToken;
 	
-	BPortLink *fSession;
+	LinkMsgReader *fMsgReader;
+	LinkMsgSender *fMsgSender;
 
 	// cl is short for currentLayer. We'll use it a lot, that's why it's short :-)
 	Layer *cl;
