@@ -62,7 +62,8 @@ BString::BString(const char *str, int32 maxLength)
 	:_privateData(NULL)		
 {
 	if (str) {
-		int32 len = min(maxLength, (int32)strlen(str));
+		int32 len = (int32)strlen(str);
+		len = min(len, maxLength);
 		_Init(str, len);
 	}
 }
@@ -123,8 +124,10 @@ BString::operator=(char c)
 BString&
 BString::SetTo(const char *str, int32 length)
 {
-	if (str)
-		_DoAssign(str, min(length, (int32)strlen(str)));
+	if (str) {
+		int32 len = (int32)strlen(str);
+		_DoAssign(str, min(length, len));
+	}
 	return *this;
 }
 
@@ -233,8 +236,10 @@ BString::Append(const BString &string, int32 length)
 BString&
 BString::Append(const char *str, int32 length)
 {
-	if (str)
-		_DoAppend(str, min(length, (int32)strlen(str)));
+	if (str) {
+		int32 len = (int32)strlen(str);
+		_DoAppend(str, min(len, length));
+	}	
 	return *this;
 }
 
@@ -263,16 +268,19 @@ BString::Prepend(const char *str)
 BString&
 BString::Prepend(const BString &string)
 {
-	_DoPrepend(string.String(), string.Length());
+	if (&string != this)
+		_DoPrepend(string.String(), string.Length());
 	return *this;
 }
 
 
 BString&
-BString::Prepend(const char *str, int32 len)
+BString::Prepend(const char *str, int32 length)
 {
-	if (str)
-		_DoPrepend(str, min(len, (int32)strlen(str)));
+	if (str) {
+		int32 len = (int32)strlen(str);
+		_DoPrepend(str, min(len, length));		
+	}
 	return *this;
 }
 
@@ -280,7 +288,8 @@ BString::Prepend(const char *str, int32 len)
 BString&
 BString::Prepend(const BString &string, int32 len)
 {
-	_DoPrepend(string.String(), min(len, string.Length()));
+	if (&string != this)
+		_DoPrepend(string.String(), min(len, string.Length()));
 	return *this;
 }
 
@@ -312,7 +321,8 @@ BString&
 BString::Insert(const char *str, int32 length, int32 pos)
 {
 	if (str) {
-		int32 len = min(length, (int32)strlen(str));
+		int32 len = (int32)strlen(str);
+		len = min(len, length);
 		_privateData = _OpenAtBy(pos, len);
 		memcpy(_privateData + pos, str, len);
 	}
@@ -324,7 +334,8 @@ BString&
 BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 {
 	if (str) {
-		int32 len = min(length, (int32)strlen(str));
+		int32 len = (int32)strlen(str);
+		len = min(len, length);
 		_privateData = _OpenAtBy(pos, len);
 		memcpy(_privateData + pos, str + fromOffset, len);
 	}
@@ -378,7 +389,7 @@ BString::Truncate(int32 newLength, bool lazy = true)
 	if (newLength < Length()) {
 #if 0 
 		if (lazy)
-			; //ToDo: Fix this
+			; //ToDo: Implement
 		else
 #endif		
 			_privateData = _GrowBy(newLength - Length()); // Negative value	
@@ -395,6 +406,101 @@ BString::Remove(int32 from, int32 length)
 	return *this;
 }
 
+
+BString&
+BString::RemoveFirst(const BString &string)
+{
+	int32 pos = _FindAfter(string.String(), 0, -1);
+	
+	if (pos >= 0)
+		_privateData = _ShrinkAtBy(pos, string.Length());
+	
+	return *this;
+}
+
+
+BString&
+BString::RemoveLast(const BString &string)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::RemoveAll(const BString &string)
+{
+	int32 pos = B_ERROR;
+	while ((pos = _FindAfter(string.String(), 0, -1)) >= 0)
+		_privateData = _ShrinkAtBy(pos, string.Length());
+	return *this;
+}
+
+
+BString&
+BString::RemoveFirst(const char *str)
+{
+	if (str) {
+		int32 pos = _FindAfter(str, 0, -1);
+		int32 len = strlen(str);
+		if (pos >= 0)
+			_privateData = _ShrinkAtBy(pos, len);
+	}
+	return *this;
+}
+
+
+BString&
+BString::RemoveLast(const char *str)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::RemoveAll(const char *str)
+{
+	if (str) {
+		int32 pos = B_ERROR;
+		int32 len = strlen(str);
+		while ((pos = _FindAfter(str, 0, -1)) >= 0)
+			_privateData = _ShrinkAtBy(pos, len);
+	}
+	return *this;
+}
+
+
+BString&
+BString::RemoveSet(const char *setOfCharsToRemove)
+{
+	if (setOfCharsToRemove) {
+		int32 pos;
+		while ((pos = strcspn(String(), setOfCharsToRemove)) < Length())
+			_privateData = _ShrinkAtBy(pos, 1);
+	}		
+	return *this;
+}
+
+
+BString&
+BString::MoveInto(BString &into, int32 from, int32 length)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+void
+BString::MoveInto(char *into, int32 from, int32 length)
+{
+	//TODO: Test
+	if (into && (from + length <= Length())) {
+		memcpy(into, String() + from, length);
+		_privateData = _ShrinkAtBy(from, length);
+		into[length] = 0;
+	}		 
+}
 
 /*---- Compare functions ---------------------------------------------------*/
 // Implemented inline in the header file
@@ -709,14 +815,14 @@ void
 BString::_DoPrepend(const char *str, int32 count)
 {
 	assert(str != NULL);
-	_privateData = _GrowBy(count);
+	_privateData = _OpenAtBy(0, count);
 	strncpy(_privateData, str, count);
 }
 
 
 int32
 BString::_FindAfter(const char *str, int32 offset, int32) const
-{
+{	
 	if (offset > Length())
 		return B_ERROR;
 
