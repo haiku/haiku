@@ -33,7 +33,7 @@
 /* check if freed pointers are already freed, and fill freed memory with 0xdeadbeef */  
 #define PARANOID_KFREE 1
 /* use a back and front wall around each allocation */
-#define USE_WALL 1
+#define USE_WALL 0
 #define USE_CHECKING_WALL 0
 
 #define WALL_SIZE 8
