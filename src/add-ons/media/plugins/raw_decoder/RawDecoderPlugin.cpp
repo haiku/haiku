@@ -209,7 +209,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 				fSwapInput = 0;
 				break;
 			default:
-				debugger("RawDecoder::NegotiateAudioOutputFormat unkown input format\n");
+				debugger("RawDecoder::NegotiateAudioOutputFormat unknown input format\n");
 				break;
 		}
 	}
@@ -233,7 +233,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 				fSwapOutput = 0;
 				break;
 			default:
-				debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+				debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 				break;
 		}
 	}
@@ -258,7 +258,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &uint8_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -281,7 +281,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &int8_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -304,7 +304,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &int16_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -327,7 +327,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &int24_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -350,7 +350,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &int32_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -373,7 +373,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &float32_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
@@ -396,13 +396,13 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					fConvert = &float64_to_float32;
 					break;
 				default:
-					debugger("RawDecoder::NegotiateAudioOutputFormat unkown output format\n");
+					debugger("RawDecoder::NegotiateAudioOutputFormat unknown output format\n");
 					break;
 			}
 			break;
 
 		default:
-			debugger("RawDecoder::NegotiateAudioOutputFormat unkown input format\n");
+			debugger("RawDecoder::NegotiateAudioOutputFormat unknown input format\n");
 			break;
 	}
 	
