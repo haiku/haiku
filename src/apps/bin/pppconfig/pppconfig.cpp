@@ -142,7 +142,7 @@ create(const char *name, bool bringUp = true)
 		printf("This interface is hidden! You can delete it by typing:\n"
 			"pppconfig delete %ld\n", interface.ID());
 	
-	if(bringUp && !info.info.doesDialOnDemand) {
+	if(bringUp) {
 		interface.Up();
 		printf("Connecting in background...\n");
 	}
