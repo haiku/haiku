@@ -14,8 +14,6 @@
 #include <arch/cpu.h>
 #include <Errors.h>
 
-#include <arch/x86/keyboard.h>
-
 #define DEVICE_NAME "keyboard"
 
 #define TRACE_KEYBOARD 0
