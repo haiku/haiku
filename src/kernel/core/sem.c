@@ -34,19 +34,32 @@
 
 struct sem_entry {
 	sem_id		id;
-	int			count;
-	struct thread_queue q;
-	char		*name;
-	spinlock	lock;
-	team_id		owner;		 // if set to -1, means owned by a port
+	spinlock	lock;	// protects only the id field when unused
+	union {
+		// when slot in use
+		struct {
+			int					count;
+			struct thread_queue q;
+			char				*name;
+			team_id				owner;	// if set to -1, means owned by a port
+		} used;
+
+		// when slot unused
+		struct {
+			sem_id				next_id;
+			struct sem_entry	*next;
+		} unused;
+	} u;
 };
 
+// Todo: Compute based on the amount of available memory.
 #define MAX_SEMS 4096
 
 static struct sem_entry *gSems = NULL;
 static region_id         gSemRegion = 0;
 static bool              gSemsActive = false;
-static sem_id            gNextSemID = 0;
+static struct sem_entry	*gFreeSemsHead = NULL;
+static struct sem_entry	*gFreeSemsTail = NULL;
 
 static spinlock sem_spinlock = 0;
 #define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sem_spinlock)
@@ -70,7 +83,8 @@ dump_sem_list(int argc, char **argv)
 
 	for (i = 0; i < MAX_SEMS; i++) {
 		if (gSems[i].id >= 0)
-			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &gSems[i], gSems[i].id, gSems[i].name);
+			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &gSems[i], gSems[i].id,
+					gSems[i].u.used.name);
 	}
 	return 0;
 }
@@ -79,11 +93,18 @@ dump_sem_list(int argc, char **argv)
 static void
 dump_sem(struct sem_entry *sem)
 {
-	dprintf("SEM:   %p\n", sem);
-	dprintf("name:  '%s'\n", sem->name);
-	dprintf("owner: 0x%lx\n", sem->owner);
-	dprintf("count: 0x%x\n", sem->count);
-	dprintf("queue: head %p tail %p\n", sem->q.head, sem->q.tail);
+	dprintf("SEM:     %p\n", sem);
+	dprintf("id:      %ld\n", sem->id);
+	if (sem->id >= 0) {
+		dprintf("name:    '%s'\n", sem->u.used.name);
+		dprintf("owner:   0x%lx\n", sem->u.used.owner);
+		dprintf("count:   0x%x\n", sem->u.used.count);
+		dprintf("queue:   head %p tail %p\n", sem->u.used.q.head,
+				sem->u.used.q.tail);
+	} else {
+		dprintf("next:    %p\n", sem->u.unused.next);
+		dprintf("next_id: %ld\n", sem->u.unused.next_id);
+	}
 }
 
 
@@ -118,13 +139,41 @@ dump_sem_info(int argc, char **argv)
 
 	// walk through the sem list, trying to match name
 	for (i = 0; i < MAX_SEMS; i++) {
-		if (gSems[i].name != NULL
-			&& strcmp(argv[1], gSems[i].name) == 0) {
+		if (gSems[i].u.used.name != NULL
+			&& strcmp(argv[1], gSems[i].u.used.name) == 0) {
 			dump_sem(&gSems[i]);
 			return 0;
 		}
 	}
 	return 0;
+}
+
+/*!	\brief Appends a semaphore slot to the free list.
+
+	The semaphore list must be locked.
+	The slot's id field is not changed. It should already be set to -1.
+
+	\param slot The index of the semaphore slot.
+	\param nextID The ID the slot will get when reused. If < 0 the \a slot
+		   is used.
+*/
+static
+void
+free_sem_slot(int slot, sem_id nextID)
+{
+	struct sem_entry *sem = gSems + slot;
+	// set next_id to the next possible value; for sanity check the current ID
+	if (nextID < 0)
+		sem->u.unused.next_id = slot;
+	else
+		sem->u.unused.next_id = nextID;
+	// append the entry to the list
+	if (gFreeSemsTail)
+		gFreeSemsTail->u.unused.next = sem;
+	else
+		gFreeSemsHead = sem;
+	gFreeSemsTail = sem;
+	sem->u.unused.next = NULL;
 }
 
 
@@ -143,8 +192,10 @@ sem_init(kernel_args *ka)
 		panic("unable to allocate semaphore table!\n");
 
 	memset(gSems, 0, sizeof(struct sem_entry) * MAX_SEMS);
-	for (i = 0; i < MAX_SEMS; i++)
+	for (i = 0; i < MAX_SEMS; i++) {
 		gSems[i].id = -1;
+		free_sem_slot(i, i);
+	}
 
 	// add debugger commands
 	add_debugger_command("sems", &dump_sem_list, "Dump a list of all active semaphores");
@@ -169,7 +220,7 @@ sem_init(kernel_args *ka)
 sem_id
 create_sem_etc(int32 count, const char *name, team_id owner)
 {
-	int i;
+	struct sem_entry *sem = NULL;
 	int state;
 	sem_id retval = B_NO_MORE_SEMS;
 	char *temp_name;
@@ -191,46 +242,30 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	state = disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
 
-	// find the first empty spot
-	for (i = 0; i < MAX_SEMS; i++) {
-		if (gSems[i].id == -1) {
-			// adjust the sem ID so that: sem ID % MAX_SEMS == slot
-			if (i >= gNextSemID % MAX_SEMS)
-				gNextSemID += i - gNextSemID % MAX_SEMS;
-			else
-				gNextSemID += MAX_SEMS - (gNextSemID % MAX_SEMS - i);
-			gSems[i].id = gNextSemID;
-
-			// increment next free sem ID, check for overflow
-			if (++gNextSemID < 0)
-				gNextSemID = 0;
-
-			// Set the owner while the sem list lock is hold, or else it
-			// might get lost if we have a sem_delete_owned_sems() running
-			// (although this should be impossible (if create_sem_etc() is
-			// just properly, I just feel better with it).
-			gSems[i].owner = owner;
-
-			gSems[i].lock = 0;
-			GRAB_SEM_LOCK(gSems[i]);
-			RELEASE_SEM_LIST_LOCK();
-
-			gSems[i].q.tail = NULL;
-			gSems[i].q.head = NULL;
-			gSems[i].count = count;
-			gSems[i].name = temp_name;
-			retval = gSems[i].id;
-
-			RELEASE_SEM_LOCK(gSems[i]);
-			goto out;
-		}
+	// get the first slot from the free list
+	sem = gFreeSemsHead;
+	if (sem) {
+		// remove it from the free list
+		gFreeSemsHead = sem->u.unused.next;
+		if (!gFreeSemsHead)
+			gFreeSemsTail = NULL;
+		// init the slot
+		GRAB_SEM_LOCK(*sem);
+		sem->id = sem->u.unused.next_id;
+		sem->u.used.count = count;
+		sem->u.used.q.tail = NULL;
+		sem->u.used.q.head = NULL;
+		sem->u.used.name = temp_name;
+		sem->u.used.owner = owner;
+		RELEASE_SEM_LOCK(*sem);
+		retval = sem->id;
 	}
 
 	RELEASE_SEM_LIST_LOCK();
-	free(temp_name);
-
-out:
 	restore_interrupts(state);
+
+	if (!sem)
+		free(temp_name);
 
 	return retval;
 }
@@ -281,7 +316,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	release_queue.head = release_queue.tail = NULL;
 
 	// free any threads waiting for this semaphore
-	while ((t = thread_dequeue(&gSems[slot].q)) != NULL) {
+	while ((t = thread_dequeue(&gSems[slot].u.used.q)) != NULL) {
 		t->state = B_THREAD_READY;
 		t->sem_errcode = interrupted ? B_INTERRUPTED : B_BAD_SEM_ID;
 		t->sem_deleted_retcode = return_code;
@@ -291,10 +326,15 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	}
 
 	gSems[slot].id = -1;
-	old_name = gSems[slot].name;
-	gSems[slot].name = NULL;
+	old_name = gSems[slot].u.used.name;
+	gSems[slot].u.used.name = NULL;
 
 	RELEASE_SEM_LOCK(gSems[slot]);
+
+	// append slot to the free list
+	GRAB_SEM_LIST_LOCK();
+	free_sem_slot(slot, id + MAX_SEMS);
+	RELEASE_SEM_LIST_LOCK();
 
 	if (released_threads > 0) {
 		GRAB_THREAD_LOCK();
@@ -392,24 +432,26 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		goto err;
 	}
 
-	if (gSems[slot].count - count < 0 && (flags & B_TIMEOUT) != 0 && timeout <= 0) {
+	if (gSems[slot].u.used.count - count < 0 && (flags & B_TIMEOUT) != 0
+		&& timeout <= 0) {
 		// immediate timeout
 		status = B_WOULD_BLOCK;
 		goto err;
 	}
 
-	if ((gSems[slot].count -= count) < 0) {
+	if ((gSems[slot].u.used.count -= count) < 0) {
 		// we need to block
 		struct thread *t = thread_get_current_thread();
 		timer timeout_timer; // stick it on the stack, since we may be blocking here
 		struct sem_timeout_args args;
 
-		TRACE_BLOCK(("acquire_sem_etc(id = %ld): block name = %s, thread = %p, name = %s\n", id, gSems[slot].name, t, t->name));
+		TRACE_BLOCK(("acquire_sem_etc(id = %ld): block name = %s, thread = %p,"
+					 " name = %s\n", id, gSems[slot].u.used.name, t, t->name));
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
 		if ((flags & B_CAN_INTERRUPT) && t->sig_pending) {
-			gSems[slot].count += count;
+			gSems[slot].u.used.count += count;
 			status = B_INTERRUPTED;
 			goto err;
 		}
@@ -418,10 +460,11 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		t->sem_flags = flags;
 		t->sem_blocking = id;
 		t->sem_acquire_count = count;
-		t->sem_count = min(-gSems[slot].count, count); // store the count we need to restore upon release
+		t->sem_count = min(-gSems[slot].u.used.count, count);
+			// store the count we need to restore upon release
 		t->sem_deleted_retcode = 0;
 		t->sem_errcode = B_NO_ERROR;
-		thread_enqueue(t, &gSems[slot].q);
+		thread_enqueue(t, &gSems[slot].u.used.q);
 
 		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
 			TRACE(("sem_acquire_etc: setting timeout sem for %d %d usecs, semid %d, tid %d\n",
@@ -473,7 +516,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 		restore_interrupts(state);
 
-		TRACE_BLOCK(("acquire_sem_etc(id = %ld): exit block name = %s, thread = %p (%s)\n", id, gSems[slot].name, t, t->name));
+		TRACE_BLOCK(("acquire_sem_etc(id = %ld): exit block name = %s, "
+					 "thread = %p (%s)\n", id, gSems[slot].u.used.name, t,
+					 t->name));
 		return t->sem_errcode;
 	}
 
@@ -525,14 +570,14 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 	while (count > 0) {
 		int delta = count;
-		if (gSems[slot].count < 0) {
-			struct thread *t = thread_lookat_queue(&gSems[slot].q);
+		if (gSems[slot].u.used.count < 0) {
+			struct thread *t = thread_lookat_queue(&gSems[slot].u.used.q);
 
 			delta = min(count, t->sem_count);
 			t->sem_count -= delta;
 			if (t->sem_count <= 0) {
 				// release this thread
-				t = thread_dequeue(&gSems[slot].q);
+				t = thread_dequeue(&gSems[slot].u.used.q);
 				thread_enqueue(t, &release_queue);
 				t->state = B_THREAD_READY;
 				released_threads++;
@@ -541,7 +586,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			}
 		}
 
-		gSems[slot].count += delta;
+		gSems[slot].u.used.count += delta;
 		count -= delta;
 	}
 	RELEASE_SEM_LOCK(gSems[slot]);
@@ -599,7 +644,7 @@ get_sem_count(sem_id id, int32 *thread_count)
 		return B_BAD_SEM_ID;
 	}
 
-	*thread_count = gSems[slot].count;
+	*thread_count = gSems[slot].u.used.count;
 
 	RELEASE_SEM_LOCK(gSems[slot]);
 	restore_interrupts(state);
@@ -640,10 +685,11 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	}
 
 	info->sem			= gSems[slot].id;
-	info->team			= gSems[slot].owner;
-	strncpy(info->name, gSems[slot].name, SYS_MAX_OS_NAME_LEN-1);
-	info->count			= gSems[slot].count;
-	info->latest_holder	= gSems[slot].q.head->id; // XXX not sure if this is correct
+	info->team			= gSems[slot].u.used.owner;
+	strncpy(info->name, gSems[slot].u.used.name, SYS_MAX_OS_NAME_LEN-1);
+	info->count			= gSems[slot].u.used.count;
+	info->latest_holder	= gSems[slot].u.used.q.head->id;
+		// XXX not sure if this is correct
 
 	RELEASE_SEM_LOCK(gSems[slot]);
 	restore_interrupts(state);
@@ -688,15 +734,18 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 	GRAB_SEM_LIST_LOCK();
 
 	while (slot < MAX_SEMS) {
-		if (gSems[slot].id != -1 && gSems[slot].owner == team) {
+		if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
 			GRAB_SEM_LOCK(gSems[slot]);
-			if (gSems[slot].id != -1 && gSems[slot].owner == team) {
+			if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
 				// found one!
 				info->sem			= gSems[slot].id;
-				info->team			= gSems[slot].owner;
-				strncpy(info->name, gSems[slot].name, SYS_MAX_OS_NAME_LEN-1);
-				info->count			= gSems[slot].count;
-				info->latest_holder	= gSems[slot].q.head->id; // XXX not sure if this is the latest holder, or the next holder...
+				info->team			= gSems[slot].u.used.owner;
+				strncpy(info->name, gSems[slot].u.used.name,
+						SYS_MAX_OS_NAME_LEN-1);
+				info->count			= gSems[slot].u.used.count;
+				info->latest_holder	= gSems[slot].u.used.q.head->id;
+					// XXX not sure if this is the latest holder, or the next
+					// holder...
 
 				RELEASE_SEM_LOCK(gSems[slot]);
 				slot++;
@@ -749,7 +798,7 @@ set_sem_owner(sem_id id, team_id team)
 	// Todo: this is a small race condition: the team ID could already
 	// be invalid at this point - we would lose one semaphore slot in
 	// this case!
-	gSems[slot].owner = team;
+	gSems[slot].u.used.owner = team;
 
 	RELEASE_SEM_LOCK(gSems[slot]);
 	restore_interrupts(state);
@@ -808,25 +857,26 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 	struct thread *t1;
 
 	// remove the thread from the queue and place it in the supplied queue
-	t1 = thread_dequeue_id(&sem->q, t->id);
+	t1 = thread_dequeue_id(&sem->u.used.q, t->id);
 	if (t != t1)
 		return ERR_NOT_FOUND;
-	sem->count += t->sem_acquire_count;
+	sem->u.used.count += t->sem_acquire_count;
 	t->state = t->next_state = B_THREAD_READY;
 	t->sem_errcode = sem_errcode;
 	thread_enqueue(t, queue);
 
 	// now see if more threads need to be woken up
-	while (sem->count > 0 && (t1 = thread_lookat_queue(&sem->q))) {
-		int delta = min(t->sem_count, sem->count);
+	while (sem->u.used.count > 0
+		   && (t1 = thread_lookat_queue(&sem->u.used.q))) {
+		int delta = min(t->sem_count, sem->u.used.count);
 
 		t->sem_count -= delta;
 		if (t->sem_count <= 0) {
-			t = thread_dequeue(&sem->q);
+			t = thread_dequeue(&sem->u.used.q);
 			t->state = t->next_state = B_THREAD_READY;
 			thread_enqueue(t, queue);
 		}
-		sem->count -= delta;
+		sem->u.used.count -= delta;
 	}
 	return B_NO_ERROR;
 }
@@ -850,7 +900,7 @@ sem_delete_owned_sems(team_id owner)
 	GRAB_SEM_LIST_LOCK();
 
 	for (i = 0; i < MAX_SEMS; i++) {
-		if (gSems[i].id != -1 && gSems[i].owner == owner) {
+		if (gSems[i].id != -1 && gSems[i].u.used.owner == owner) {
 			sem_id id = gSems[i].id;
 
 			RELEASE_SEM_LIST_LOCK();
