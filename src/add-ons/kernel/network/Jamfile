@@ -3,4 +3,4 @@ SubDir OBOS_TOP src add-ons kernel network ;
 SubInclude OBOS_TOP src add-ons kernel network core ;
 SubInclude OBOS_TOP src add-ons kernel network interfaces ;
 SubInclude OBOS_TOP src add-ons kernel network protocols ;
-
+SubInclude OBOS_TOP src add-ons kernel network ppp ;

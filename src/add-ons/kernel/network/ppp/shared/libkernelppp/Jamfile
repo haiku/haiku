@@ -1,0 +1,31 @@
+SubDir OBOS_TOP src add-ons kernel network ppp shared libkernelppp ;
+
+# for cpp.cpp and BLocker
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+
+R5KernelStaticLibrary kernelppp :
+	KPPPConfigurePacket.cpp
+	KPPPDevice.cpp
+	KPPPEncapsulator.cpp
+	KPPPInterface.cpp
+	KPPPLCP.cpp
+	KPPPLCPExtension.cpp
+	KPPPOptionHandler.cpp
+	KPPPProtocol.cpp
+	KPPPReportManager.cpp
+	KPPPStateMachine.cpp
+	KPPPUtils.cpp
+	Locker.cpp
+	settings_tools.cpp
+	cpp.cpp
+	
+	# integrated modules
+	_KPPPMRUHandler.cpp
+	_KPPPAuthenticationHandler.cpp
+	_KPPPPFCHandler.cpp
+;
