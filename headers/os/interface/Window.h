@@ -414,7 +414,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		BView*		findNextView( BView *focus, uint32 flags);
 		BView*		findPrevView( BView *focus, uint32 flags);
 		BView*		findLastChild(BView *parent);
-		bool		handleKeyDown( int32 raw_char, uint32 modifiers);
+		bool		handleKeyDown( const char key, uint32 modifiers);
 		void		handleActivation( bool active );
 		void		activateView( BView *aView, bool active );
 
