@@ -508,6 +508,8 @@ tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
 	size_t length = *_length;
 	ssize_t bytesRead = 0;
 
+	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
+
 	if (length == 0)
 		return B_OK;
 
@@ -551,6 +553,9 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 		// Confusingly enough, we need to echo when the target's ECHO flag is
 		// set. That's because our target is supposed to echo back at us, not
 		// to itself.
+
+	TRACE(("tty_write_to_tty(source = %p, target = %p, length = %lu, %s%s)\n", source, target, length,
+		sourceIsMaster ? "master" : "slave", echo ? ", echo mode" : ""));
 
 	// ToDo: "buffer" is not yet copied or accessed in a safe way!
 
