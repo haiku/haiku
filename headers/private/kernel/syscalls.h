@@ -25,7 +25,7 @@ int     sys_getrlimit(int resource, struct rlimit * rlp);
 int     sys_setrlimit(int resource, const struct rlimit * rlp);
 
 bigtime_t sys_system_time();
-status_t  sys_snooze_until(bigtime_t time, int timebase);
+status_t  sys_snooze_etc(bigtime_t time, int timebase, int32 flags);
 
 /* sem functions */
 sem_id sys_create_sem(int count, const char *name);

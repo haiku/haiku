@@ -73,7 +73,7 @@ struct team {
 struct thread {
 	struct thread	*all_next;
 	struct thread	*team_next;
-	struct thread	*q_next;
+	struct thread	*queue_next;	/* i.e. run queue, release queue, etc. */
 	timer			alarm;
 	thread_id		id;
 	char			name[SYS_MAX_OS_NAME_LEN];
@@ -108,7 +108,7 @@ struct thread {
 	int32			page_faults_allowed;
 		/* this field may only stay in debug builds in the future*/
 
-	addr			entry;
+	thread_func		entry;
 	void			*args;
 	struct team		*team;
 	status_t		return_code;

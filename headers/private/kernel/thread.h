@@ -9,29 +9,26 @@
 extern "C" {
 #endif
 
+#include <OS.h>
 #include <thread_types.h>
 #include <arch/thread.h>
-#include <signal.h>
 
-void resched(void);
+
+void scheduler_reschedule(void);
 void start_scheduler(void);
-
-#define BLOCKABLE_SIGS	(~((1L << (SIGKILL - 1)) | (1L << (SIGSTOP - 1))))
-
-int handle_signals(struct thread *t, int state);
 
 void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
 struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
-void thread_enqueue_run_q(struct thread *t);
+
+void scheduler_enqueue_in_run_queue(struct thread *thread);
+void scheduler_remove_from_run_queue(struct thread *thread);
+
 void thread_atkernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);
 
-int thread_suspend_thread(thread_id id);
-int thread_resume_thread(thread_id id);
-status_t thread_set_priority(thread_id id, int32 priority);
 int thread_init(kernel_args *ka);
 int thread_init_percpu(int cpu_num);
 void thread_exit(void);
@@ -51,17 +48,13 @@ thread_get_current_thread_id(void)
 	return t ? t->id : 0;
 }
 
-int thread_wait_on_thread(thread_id id, int *retcode);
-
-thread_id thread_create_user_thread(char *name, team_id tid, addr entry, void *args);
-thread_id thread_create_kernel_thread(const char *name, int (*func)(void *args), void *args);
-thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p);
+thread_id spawn_kernel_thread_etc(thread_func, const char *name, int32 priority, void *args, team_id team);
 
 int team_init(kernel_args *ka);
 struct team *team_get_kernel_team(void);
 team_id team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 int team_kill_team(team_id);
-int team_wait_on_team(team_id id, int *retcode);
+status_t wait_for_team(team_id id, status_t *returnCode);
 void team_remove_team_from_hash(struct team *team);
 team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
@@ -71,13 +64,20 @@ struct team *team_get_team_struct(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 
 // used in syscalls.c
-int user_thread_wait_on_thread(thread_id id, int *uretcode);
+int user_thread_wait_for_thread(thread_id id, int *uretcode);
 team_id user_team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
-int user_team_wait_on_team(team_id id, int *uretcode);
+int user_team_wait_for_team(team_id id, int *uretcode);
 
-thread_id user_thread_create_user_thread(addr, team_id, const char*, 
-                                         int, void *);
+status_t user_set_thread_priority(thread_id thread, int32 newPriority);
+status_t user_suspend_thread(thread_id thread);
+status_t user_resume_thread(thread_id thread);
+thread_id user_spawn_thread(thread_func func, const char *name, int32 priority, void *arg);
+status_t user_wait_for_thread(thread_id id, status_t *returnCode);
+status_t user_wait_for_team(team_id id, status_t *returnCode);
+status_t user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags);
+void user_exit_thread(status_t return_value);
 
+bool user_has_data(thread_id thread);
 status_t user_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
 status_t user_receive_data(thread_id *sender, void *buffer, size_t buffer_size);
 
@@ -89,10 +89,9 @@ status_t user_get_next_team_info(int32 *cookie, team_info *info);
 int user_getrlimit(int resource, struct rlimit * rlp);
 int user_setrlimit(int resource, const struct rlimit * rlp);
 
+// ToDo: please move the "env" setter/getter out of the kernel!
 int user_setenv(const char *name, const char *value, int overwrite);
 int user_getenv(const char *name, char **value);
-
-int user_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 
 #if 1
 // XXX remove later
