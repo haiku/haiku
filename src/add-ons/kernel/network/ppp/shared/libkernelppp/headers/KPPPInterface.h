@@ -47,7 +47,7 @@ class KPPPInterface : public KPPPLayer {
 		friend class KPPPInterfaceAccess;
 
 	private:
-		// copies are not allowed!
+		//!	Copies are not allowed.
 		KPPPInterface(const KPPPInterface& copy);
 		KPPPInterface& operator= (const KPPPInterface& copy);
 		
@@ -62,51 +62,62 @@ class KPPPInterface : public KPPPLayer {
 		
 		virtual status_t InitCheck() const;
 		
+		//!	Returns this interface's unique identifier.
 		ppp_interface_id ID() const
 			{ return fID; }
 		
+		//!	Returns interface's settings.
 		driver_settings* Settings() const
 			{ return fSettings; }
 		
+		//!	Returns the KPPPStateMachine of this interface.
 		KPPPStateMachine& StateMachine()
 			{ return fStateMachine; }
+		//!	Returns the KPPPLCP protocol of this interface.
 		KPPPLCP& LCP()
 			{ return fLCP; }
+		//!	Returns interface's profile object.
 		KPPPProfile& Profile()
 			{ return fProfile; }
 		
+		//!	Returns the interfac's ifnet structure that is exported to the netstack.
 		struct ifnet *Ifnet() const
 			{ return fIfnet; }
 		
-		// delays
+		//!	Delay in miliseconds between a dial retry.
 		uint32 DialRetryDelay() const
 			{ return fDialRetryDelay; }
+		//!	Delay in miliseconds to wait until redialing.
 		uint32 RedialDelay() const
 			{ return fRedialDelay; }
 		
-		// idle handling
+		//!	Used for reporting that a packet was send/received (updates idle time).
 		void UpdateIdleSince()
 			{ fUpdateIdleSince = true; }
+		//!	Returns the time in seconds when the last packet was received.
 		uint32 IdleSince() const
 			{ return fIdleSince; }
+		//!	If no packets were received this number of seconds we will disconnect.
 		uint32 DisconnectAfterIdleSince() const
 			{ return fDisconnectAfterIdleSince; }
 		
 		bool SetMRU(uint32 MRU);
+		//!	This is the smallest MRU that we and the peer have.
 		uint32 MRU() const
 			{ return fMRU; }
-				// this is the smallest MRU that we and the peer have
+		//!	Sets interface's maximum transfer unit (will set ifnet value accordingly).
 		bool SetInterfaceMTU(uint32 interfaceMTU)
 			{ return SetMRU(interfaceMTU - fHeaderLength); }
+		//!	This is the MRU including protocol overhead.
 		uint32 InterfaceMTU() const
 			{ return fInterfaceMTU; }
-				// this is the MRU including protocol overhead
+		//!	Includes the length of all device and encapsulator headers.
 		uint32 PacketOverhead() const;
-			// including device and encapsulator headers
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
 		bool SetDevice(KPPPDevice *device);
+		//!	Returns interface's transport device.
 		KPPPDevice *Device() const
 			{ return fDevice; }
 		
@@ -114,6 +125,7 @@ class KPPPInterface : public KPPPLayer {
 		bool RemoveProtocol(KPPPProtocol *protocol);
 		int32 CountProtocols() const;
 		KPPPProtocol *ProtocolAt(int32 index) const;
+		//!	Returns first protocol in chain.
 		KPPPProtocol *FirstProtocol() const
 			{ return fFirstProtocol; }
 		KPPPProtocol *ProtocolFor(uint16 protocolNumber,
@@ -122,42 +134,59 @@ class KPPPInterface : public KPPPLayer {
 		// multilink methods
 		bool AddChild(KPPPInterface *child);
 		bool RemoveChild(KPPPInterface *child);
+		//!	Returns the number of child interfaces that this interface has.
 		int32 CountChildren() const
 			{ return fChildren.CountItems(); }
 		KPPPInterface *ChildAt(int32 index) const;
+		//!	Returns this interface's parent.
 		KPPPInterface *Parent() const
 			{ return fParent; }
+		//!	Returns whether we are a multilink-interface.
 		bool IsMultilink() const
 			{ return fIsMultilink; }
 		
 		void SetAutoRedial(bool autoRedial = true);
+		//!	Returns whether this interface redials automatically.
 		bool DoesAutoRedial() const
 			{ return fAutoRedial; }
 		
 		void SetDialOnDemand(bool dialOnDemand = true);
+		//!	Returns whether dial-on-demand (auto-dial) is enabled.
 		bool DoesDialOnDemand() const
 			{ return fDialOnDemand; }
 		
+		//!	Clients are in \c PPP_CLIENT_MODE and servers are in \c PPP_SERVER_MODE.
 		ppp_mode Mode() const
 			{ return fMode; }
-			// client or server mode?
+		//!	Current state of the state machine (see enum: \c ppp_state).
 		ppp_state State() const
 			{ return fStateMachine.State(); }
+		//!	Current phase of the state machine (see enum: \c ppp_phase).
 		ppp_phase Phase() const
 			{ return fStateMachine.Phase(); }
 		
 		// Protocol-Field-Compression
 		bool SetPFCOptions(uint8 pfcOptions);
+		//!	PFC option flags as defined in enum: \c ppp_pfc_options.
 		uint8 PFCOptions() const
 			{ return fPFCOptions; }
+		/*!	\brief Local PFC state
+			
+			Values defined in \c ppp_pfc_state.\n
+			The local PFC state says if we accepted a request from the peer
+			i.e.: we may use PFC in outgoing packets.
+		*/
 		ppp_pfc_state LocalPFCState() const
 			{ return fLocalPFCState; }
-				// the local PFC state says if we accepted a request from the peer
-				// i.e.: we may use PFC in outgoing packets
+		/*!	\brief Peer PFC state
+			
+			Values defined in \c ppp_pfc_state.\n
+			The peer PFC state says if the peer accepted a request us
+			i.e.: the peer might send PFC-compressed packets to us
+		*/
 		ppp_pfc_state PeerPFCState() const
 			{ return fPeerPFCState; }
-				// the peer PFC state says if the peer accepted a request us
-				// i.e.: the peer might send PFC-compressed packets to us
+		//!	Shortcut for check if local state is \c PPP_PFC_ACCEPTED.
 		bool UseLocalPFC() const
 			{ return LocalPFCState() == PPP_PFC_ACCEPTED; }
 		
@@ -166,8 +195,10 @@ class KPPPInterface : public KPPPLayer {
 		virtual bool Down();
 		bool IsUp() const;
 		
+		//!	Returns interface's report manager.
 		KPPPReportManager& ReportManager()
 			{ return fReportManager; }
+		//!	Shortcut to KPPPReportManager::Report() of this interface's report manager.
 		bool Report(ppp_report_type type, int32 code, void *data, int32 length)
 			{ return ReportManager().Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
@@ -215,6 +246,7 @@ class KPPPInterface : public KPPPLayer {
 		void Redial(uint32 delay);
 		
 		// multilink methods
+		//!	Set the parent of this interface.
 		void SetParent(KPPPInterface *parent)
 			{ fParent = parent; }
 

@@ -5,6 +5,17 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPLCP
+	\brief The LCP protocol.
+	
+	Every PPP interface \e must have an LCP protocol. It is used for establishing
+	and terminating connections.\n
+	When establishing a connecition the LCP protocol determines connection-specific
+	settings like the packet MRU. These settings are handled by the KPPPOptionHandler
+	class. Additional LCP codes like the PPP Multilink-Protocol uses them should
+	be implemented through the KPPPLCPExtension class.\n
+*/
+
 #include <KPPPInterface.h>
 #include <KPPPDevice.h>
 #include <KPPPLCPExtension.h>
@@ -17,6 +28,7 @@
 #include <sys/socket.h>
 
 
+//!	Creates a new LCP protocol for the given interface.
 KPPPLCP::KPPPLCP(KPPPInterface& interface)
 	: KPPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
 		PPP_PROTOCOL_LEVEL, AF_UNSPEC, 0, interface, NULL, PPP_ALWAYS_ALLOWED),
@@ -28,6 +40,7 @@ KPPPLCP::KPPPLCP(KPPPInterface& interface)
 }
 
 
+//!	Deletes all added option handlers and LCP extensions.
 KPPPLCP::~KPPPLCP()
 {
 	while(CountOptionHandlers())
@@ -37,6 +50,7 @@ KPPPLCP::~KPPPLCP()
 }
 
 
+//!	Adds a new option handler.
 bool
 KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 {
@@ -54,6 +68,7 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 }
 
 
+//!	Removes an option handler, but does not delete it.
 bool
 KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 {
@@ -67,6 +82,7 @@ KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 }
 
 
+//!	Returns the option handler at the given \a index.
 KPPPOptionHandler*
 KPPPLCP::OptionHandlerAt(int32 index) const
 {
@@ -79,6 +95,7 @@ KPPPLCP::OptionHandlerAt(int32 index) const
 }
 
 
+//!	Returns the option handler that can handle options of a given \a type.
 KPPPOptionHandler*
 KPPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 {
@@ -105,6 +122,7 @@ KPPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 }
 
 
+//!	Adds a new LCP extension.
 bool
 KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 {
@@ -121,6 +139,7 @@ KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 }
 
 
+//!	Removes an LCP extension, but does not delete it.
 bool
 KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 {
@@ -134,6 +153,7 @@ KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 }
 
 
+//!	Returns the LCP extension at the given \a index.
 KPPPLCPExtension*
 KPPPLCP::LCPExtensionAt(int32 index) const
 {
@@ -146,6 +166,7 @@ KPPPLCP::LCPExtensionAt(int32 index) const
 }
 
 
+//!	Returns the LCP extension that can handle LCP packets of a given \a code.
 KPPPLCPExtension*
 KPPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 {
@@ -172,6 +193,7 @@ KPPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 }
 
 
+//!	Returns the interface, target, and device overhead.
 uint32
 KPPPLCP::AdditionalOverhead() const
 {
@@ -187,6 +209,7 @@ KPPPLCP::AdditionalOverhead() const
 }
 
 
+//!	Calls \c ProfileChanged() for each option handler and LCP extension.
 void
 KPPPLCP::ProfileChanged()
 {
@@ -207,6 +230,7 @@ KPPPLCP::ProfileChanged()
 }
 
 
+//!	Always returns \c true.
 bool
 KPPPLCP::Up()
 {
@@ -214,6 +238,7 @@ KPPPLCP::Up()
 }
 
 
+//!	Always returns \c true.
 bool
 KPPPLCP::Down()
 {
@@ -221,6 +246,7 @@ KPPPLCP::Down()
 }
 
 
+//!	Sends a packet to the target (if there is one) or to the interface.
 status_t
 KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
 {
@@ -231,6 +257,7 @@ KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
 }
 
 
+//!	Decodes the LCP packet and passes it to the KPPPStateMachine or an LCP extension.
 status_t
 KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
@@ -342,6 +369,7 @@ KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 }
 
 
+//!	Calls \c Pulse() for each LCP extension.
 void
 KPPPLCP::Pulse()
 {

@@ -5,6 +5,21 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPInterface
+	\brief The kernel representation of a PPP interface.
+	
+	This class is never created by the programmer directly. Instead, the PPP manager
+	kernel module should be used.\n
+	KPPPInterface handles all interface-specific commands from userspace and it
+	passes packets to their receiver or sends them to the device. Additionally,
+	it contains the KPPPLCP object with represents the LCP protocol and the
+	KPPPStateMachine object which represents the state machine.\n
+	All PPP modules are loaded from here.\n
+	Protocols and encapsulators should be added to this class. LCP-specific extensions
+	belong to the KPPPLCP object.\n
+	Multilink support is distributed between KPPPInterface and KPPPStateMachine.
+*/
+
 // cstdio must be included before KPPPModule.h/KPPPManager.h because
 // ddprintf is defined twice with different return values, once with
 // void (KernelExport.h) and once with int (stdio.h).
@@ -57,6 +72,17 @@ status_t call_open_event_thread(void *data);
 status_t call_close_event_thread(void *data);
 
 
+/*!	\brief Creates a new interface.
+	
+	\param name Name of the PPP interface description file.
+	\param entry The PPP manager passes an internal structure to the constructor.
+	\param ID The interface's ID.
+	\param settings (Optional): If no name is given you must pass the settings here.
+	\param profile (Optional): Overriding profile for this interface.
+	\param parent (Optional): Interface's parent (only used for multilink interfaces).
+	
+	\sa KPPPProfile
+*/
 KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		ppp_interface_id ID, const driver_settings *settings,
 		const driver_settings *profile, KPPPInterface *parent = NULL)
@@ -205,6 +231,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 }
 
 
+//!	Destructor: Disconnects and marks interface for deletion.
 KPPPInterface::~KPPPInterface()
 {
 #if DEBUG
@@ -272,6 +299,7 @@ KPPPInterface::~KPPPInterface()
 }
 
 
+//!	Marks interface for deletion.
 void
 KPPPInterface::Delete()
 {
@@ -294,6 +322,7 @@ KPPPInterface::Delete()
 }
 
 
+//!	Returns if interface was initialized correctly.
 status_t
 KPPPInterface::InitCheck() const
 {
@@ -314,6 +343,7 @@ KPPPInterface::InitCheck() const
 }
 
 
+//!	Sets interface MRU.
 bool
 KPPPInterface::SetMRU(uint32 MRU)
 {
@@ -334,6 +364,7 @@ KPPPInterface::SetMRU(uint32 MRU)
 }
 
 
+//!	Returns number of bytes spent for protocol overhead. Includes device overhead.
 uint32
 KPPPInterface::PacketOverhead() const
 {
@@ -346,13 +377,28 @@ KPPPInterface::PacketOverhead() const
 }
 
 
+/*!	\brief Allows accessing additional functions.
+	
+	This is normally called by userland apps to get information about the interface.
+	
+	\param op The op value (see ppp_control_ops enum).
+	\param data (Optional): Additional data may be needed for this op.
+	\param length Length of data.
+	
+	\return
+		- \c B_OK: \c Control() was successful.
+		- \c B_ERROR: Either \a length is too small or data is NULL.
+		- \c B_BAD_INDEX: Wrong index (e.g.: when accessing interface submodules).
+		- \c B_BAD_VALUE: Unknown op.
+		- Return value of submodule (when controlling one).
+*/
 status_t
 KPPPInterface::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_INTERFACE_INFO: {
 			if(length < sizeof(ppp_interface_info_t) || !data)
-				return B_NO_MEMORY;
+				return B_ERROR;
 			
 			ppp_interface_info *info = (ppp_interface_info*) data;
 			memset(info, 0, sizeof(ppp_interface_info_t));
@@ -400,14 +446,14 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 		
 		case PPPC_SET_DIAL_ON_DEMAND:
 			if(length < sizeof(uint32) || !data)
-				return B_NO_MEMORY;
+				return B_ERROR;
 			
 			SetDialOnDemand(*((uint32*)data));
 		break;
 		
 		case PPPC_SET_AUTO_REDIAL:
 			if(length < sizeof(uint32) || !data)
-				return B_NO_MEMORY;
+				return B_ERROR;
 			
 			SetAutoRedial(*((uint32*)data));
 		break;
@@ -518,6 +564,18 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 }
 
 
+/*!	\brief Sets a new device for this interface.
+	
+	A device add-on should call this method to register itself. The best place to do
+	this is in your module's \c add_to() function.
+	
+	\param device The device object.
+	
+	\return \c true if successful or \false otherwise.
+	
+	\sa KPPPDevice
+	\sa kppp_module_info
+*/
 bool
 KPPPInterface::SetDevice(KPPPDevice *device)
 {
@@ -554,6 +612,18 @@ KPPPInterface::SetDevice(KPPPDevice *device)
 }
 
 
+/*!	\brief Adds a new protocol to this interface.
+	
+	A protocol add-on should call this method to register itself. The best place to do
+	this is in your module's \c add_to() function.
+	
+	\param protocol The protocol object.
+	
+	\return \c true if successful or \false otherwise.
+	
+	\sa KPPPProtocol
+	\sa kppp_module_info
+*/
 bool
 KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 {
@@ -615,6 +685,17 @@ KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 }
 
 
+/*!	\brief Removes a protocol from this interface.
+	
+	A protocol add-on should call this method to remove itself explicitly from the
+	interface.\n
+	Normally, this method is called in KPPPProtocol's destructor. Do not call it
+	yourself unless you know what you do!
+	
+	\param protocol The protocol object.
+	
+	\return \c true if successful or \false otherwise.
+*/
 bool
 KPPPInterface::RemoveProtocol(KPPPProtocol *protocol)
 {
@@ -660,6 +741,7 @@ KPPPInterface::RemoveProtocol(KPPPProtocol *protocol)
 }
 
 
+//!	Returns the number of protocol modules belonging to this interface.
 int32
 KPPPInterface::CountProtocols() const
 {
@@ -673,6 +755,7 @@ KPPPInterface::CountProtocols() const
 }
 
 
+//!	Returns the protocol at the given \a index or \c NULL if it could not be found.
 KPPPProtocol*
 KPPPInterface::ProtocolAt(int32 index) const
 {
@@ -686,6 +769,13 @@ KPPPInterface::ProtocolAt(int32 index) const
 }
 
 
+/*!	\brief Returns the protocol object responsible for a given protocol number.
+	
+	\param protocolNumber The protocol number that the object should handle.
+	\param start (Optional): Start with this protocol. Can be used for iteration.
+	
+	\return Either the object that was found or \c NULL.
+*/
 KPPPProtocol*
 KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start = NULL) const
 {
@@ -707,6 +797,7 @@ KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start = NULL) co
 }
 
 
+//!	Adds a new child interface (used for multilink interfaces).
 bool
 KPPPInterface::AddChild(KPPPInterface *child)
 {
@@ -729,6 +820,7 @@ KPPPInterface::AddChild(KPPPInterface *child)
 }
 
 
+//!	Removes a new child from this interface (used for multilink interfaces).
 bool
 KPPPInterface::RemoveChild(KPPPInterface *child)
 {
@@ -752,6 +844,7 @@ KPPPInterface::RemoveChild(KPPPInterface *child)
 }
 
 
+//!	Returns the child interface at the given \a index (used for multilink interfaces).
 KPPPInterface*
 KPPPInterface::ChildAt(int32 index) const
 {
@@ -768,6 +861,7 @@ KPPPInterface::ChildAt(int32 index) const
 }
 
 
+//!	Enables or disables the auto-redial feture.
 void
 KPPPInterface::SetAutoRedial(bool autoRedial = true)
 {
@@ -784,6 +878,7 @@ KPPPInterface::SetAutoRedial(bool autoRedial = true)
 }
 
 
+//!	Enables or disables the dial-on-demand feature.
 void
 KPPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 {
@@ -832,6 +927,7 @@ KPPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 }
 
 
+//!	Sets Protocol-Field-Compression options.
 bool
 KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 {
@@ -847,6 +943,13 @@ KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 }
 
 
+/*!	\brief Brings this interface up.
+	
+	\c Down() overrides all \c Up() requests.\n
+	This blocks until the connection process is finished.
+	
+	\return \c true if successful or \c false otherwise.
+*/
 bool
 KPPPInterface::Up()
 {
@@ -1038,6 +1141,13 @@ KPPPInterface::Up()
 }
 
 
+/*!	\brief Brings this interface down.
+	
+	\c Down() overrides all \c Up() requests.\n
+	This blocks until diconnecting finished.
+	
+	\return \c true if successful or \c false otherwise.
+*/
 bool
 KPPPInterface::Down()
 {
@@ -1099,6 +1209,7 @@ KPPPInterface::Down()
 }
 
 
+//!	Returns if the interface is connected.
 bool
 KPPPInterface::IsUp() const
 {
@@ -1108,6 +1219,14 @@ KPPPInterface::IsUp() const
 }
 
 
+/*!	\brief Loads modules specified in the settings structure.
+	
+	\param settings PPP interface description file format settings.
+	\param start Index of driver_parameter to start with.
+	\param count Number of driver_parameters to look at.
+	
+	\return \c true if successful or \c false otherwise.
+*/
 bool
 KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 {
@@ -1126,7 +1245,7 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 	
 	// multilink handling
 	for(int32 index = start;
-			index < settings->parameter_count && index < start + count; index++) {
+			index < settings->parameter_count && index < (start + count); index++) {
 		if(!strcasecmp(settings->parameters[index].name, PPP_MULTILINK_KEY)
 				&& settings->parameters[index].value_count > 0) {
 			if(!LoadModule(settings->parameters[index].values[0],
@@ -1171,6 +1290,14 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 }
 
 
+/*!	\brief Loads a specific module.
+	
+	\param name Name of the module.
+	\param parameter Module settings.
+	\param type Type of module.
+	
+	\return \c true if successful or \c false otherwise.
+*/
 bool
 KPPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 	ppp_module_key_type type)
@@ -1204,6 +1331,7 @@ KPPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 }
 
 
+//!	Always returns true.
 bool
 KPPPInterface::IsAllowedToSend() const
 {
@@ -1211,6 +1339,19 @@ KPPPInterface::IsAllowedToSend() const
 }
 
 
+/*!	\brief Sends a packet to the device.
+	
+	This brings the interface up if dial-on-demand is enabled and we are not
+	connected.\n
+	PFC encoding is handled here.
+	
+	\param packet The packet.
+	\param protocolNumber The packet's protocol number.
+	
+	\return
+		- \c B_OK: Sending was successful.
+		- \c B_ERROR: Some error occured.
+*/
 status_t
 KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 {
@@ -1305,6 +1446,23 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 }
 
 
+/*!	\brief Receives a packet.
+	
+	Encapsulation protocols may use this method to pass encapsulated packets to the
+	PPP interface. Packets will be handled as if they were raw packets that came
+	directly from the device via \c ReceiveFromDevice().\n
+	If no handler could be found in this interface the parent's \c Receive() method
+	is called.
+	
+	\param packet The packet.
+	\param protocolNumber The packet's protocol number.
+	
+	\return
+		- \c B_OK: Receiving was successful.
+		- \c B_ERROR: Some error occured.
+		- \c PPP_REJECTED: No protocol handler could be found for this packet.
+		- \c PPP_DISCARDED: The protocol handler(s) did not handle this packet.
+*/
 status_t
 KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
@@ -1367,6 +1525,19 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 }
 
 
+/*!	\brief Receives a base PPP packet from the device.
+	
+	KPPPDevice should call this method when it receives a packet.\n
+	PFC decoding is handled here.
+	
+	\param packet The packet.
+	
+	\return
+		- \c B_OK: Receiving was successful.
+		- \c B_ERROR: Some error occured.
+		- \c PPP_REJECTED: No protocol handler could be found for this packet.
+		- \c PPP_DISCARDED: The protocol handler(s) did not handle this packet.
+*/
 status_t
 KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 {
@@ -1395,6 +1566,7 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 }
 
 
+//!	Manages Pulse() calls for all add-ons and hanldes idle-disconnection.
 void
 KPPPInterface::Pulse()
 {
@@ -1418,6 +1590,7 @@ KPPPInterface::Pulse()
 }
 
 
+//!	Registers an ifnet structure for this interface.
 bool
 KPPPInterface::RegisterInterface()
 {
@@ -1453,6 +1626,7 @@ KPPPInterface::RegisterInterface()
 }
 
 
+//!	Unregisters this interface's ifnet structure.
 bool
 KPPPInterface::UnregisterInterface()
 {
@@ -1481,7 +1655,7 @@ KPPPInterface::UnregisterInterface()
 }
 
 
-// called when profile changes
+//!	Called when profile changes.
 void
 KPPPInterface::UpdateProfile()
 {
@@ -1491,7 +1665,7 @@ KPPPInterface::UpdateProfile()
 }
 
 
-// called by KPPPManager: manager routes stack ioctls to interface
+//!	Called by KPPPManager: manager routes stack ioctls to the corresponding interface.
 status_t
 KPPPInterface::StackControl(uint32 op, void *data)
 {
@@ -1530,11 +1704,13 @@ class CallStackControl {
 		status_t& fResult;
 };
 
-// This calls Control() with the given parameters for each handler.
-// Return values:
-//  B_OK: all handlers returned B_OK
-//  B_BAD_VALUE: no handler was found
-//  any other value: the error value that was returned by the last handler that failed
+/*!	\brief This calls Control() with the given parameters for each add-on.
+	
+	\return
+		- \c B_OK: All handlers returned B_OK.
+		- \c B_BAD_VALUE: No handler was found.
+		- Any other value: Error code which was returned by the last failing handler.
+*/
 status_t
 KPPPInterface::StackControlEachHandler(uint32 op, void *data)
 {
@@ -1562,6 +1738,7 @@ KPPPInterface::StackControlEachHandler(uint32 op, void *data)
 }
 
 
+//!	Recalculates the MTU from the MRU (includes encapsulation protocol overheads).
 void
 KPPPInterface::CalculateInterfaceMTU()
 {
@@ -1591,6 +1768,7 @@ KPPPInterface::CalculateInterfaceMTU()
 }
 
 
+//!	Recalculates the baud rate.
 void
 KPPPInterface::CalculateBaudRate()
 {
@@ -1613,6 +1791,7 @@ KPPPInterface::CalculateBaudRate()
 }
 
 
+//!	Redials. Waits a given delay (in miliseconds) before redialing.
 void
 KPPPInterface::Redial(uint32 delay)
 {

@@ -5,6 +5,16 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPLayer
+	\brief An abstract layer that can encapsulate/send and receive packets.
+	
+	All packet handlers should derive from this class. It does not define a protocol
+	number like KPPPProtocol does. It only has a header overhead and an encapsulation
+	level that is used to determine the order at which the packets get encapsulated
+	by the layers. If this layer does not encapsulate PPP packets you should use
+	PPP_PROTOCOL_LEVEL.
+*/
+
 #ifdef _KERNEL_MODE
 	#include <kernel_cpp.h>
 #endif
@@ -16,6 +26,10 @@
 #include <core_funcs.h>
 
 
+/*!	\brief Creates a new layer.
+	
+	If an error appears in the constructor you should set \c fInitStatus.
+*/
 KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),
 	fOverhead(overhead),
@@ -27,12 +41,14 @@ KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 }
 
 
+//!	Only frees the name.
 KPPPLayer::~KPPPLayer()
 {
 	free(fName);
 }
 
 
+//!	Returns \c fInitStatus. May be overridden to return status-dependend errors.
 status_t
 KPPPLayer::InitCheck() const
 {
@@ -40,6 +56,12 @@ KPPPLayer::InitCheck() const
 }
 
 
+/*!	\brief Notification hook when the interface profile changes dynamically.
+	
+	You should override this method to update your profile settings if this layer
+	has such settings at all. This is mostly used by authenticators and possibly
+	protocols.
+*/
 void
 KPPPLayer::ProfileChanged()
 {
@@ -47,6 +69,7 @@ KPPPLayer::ProfileChanged()
 }
 
 
+//!	Sends a packet to the next layer in the chain.
 status_t
 KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 {
@@ -68,6 +91,10 @@ KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 }
 
 
+/*!	\brief You may override this for periodic tasks.
+	
+	This method gets called every \c PPP_PULSE_RATE microseconds.
+*/
 void
 KPPPLayer::Pulse()
 {
@@ -75,6 +102,7 @@ KPPPLayer::Pulse()
 }
 
 
+//!	Allows changing the name of this layer.
 void
 KPPPLayer::SetName(const char *name)
 {

@@ -26,19 +26,25 @@ class KPPPLCPExtension {
 		
 		virtual status_t InitCheck() const;
 		
+		//!	Returns the name of this LCP extension.
 		const char *Name() const
 			{ return fName; }
 		
+		//!	Returns the owning interface.
 		KPPPInterface& Interface() const
 			{ return fInterface; }
+		//!	Returns the LCP extension's settings.
 		driver_parameter *Settings() const
 			{ return fSettings; }
 		
+		//!	Enables or disables this handler.
 		void SetEnabled(bool enabled = true)
 			{ fEnabled = enabled; }
+		//!	Returns if the handler is enabled.
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
+		//!	Returns the LCP packet code this extension can handle.
 		uint8 Code() const
 			{ return fCode; }
 		
@@ -48,6 +54,7 @@ class KPPPLCPExtension {
 		
 		virtual void ProfileChanged();
 		
+		//!	Must be overridden. Called when an LCP packet with your code is received.
 		virtual status_t Receive(struct mbuf *packet, uint8 code) = 0;
 		
 		virtual void Reset();

@@ -12,11 +12,14 @@
 
 struct mbuf;
 
+//!	An abstract configure item.
 typedef struct ppp_configure_item {
 	uint8 type;
+		//!< Item's type.
 	uint8 length;
+		//!< Item length (including appended data, if any).
 	uint8 data[0];
-		// the data follows this structure
+		//!< Additional data may be appended to this structure.
 } ppp_configure_item;
 
 
@@ -32,16 +35,20 @@ class KPPPConfigurePacket {
 		~KPPPConfigurePacket();
 		
 		bool SetCode(uint8 code);
+		//!	Returns this packet's code value.
 		uint8 Code() const
 			{ return fCode; }
 		
+		//!	Sets the packet's (unique) ID. Use KPPPLCP::NextID() to get a unique ID.
 		void SetID(uint8 id)
 			{ fID = id; }
+		//!	Returns this packet's ID.
 		uint8 ID() const
 			{ return fID; }
 		
 		bool AddItem(const ppp_configure_item *item, int32 index = -1);
 		bool RemoveItem(ppp_configure_item *item);
+		//!	Returns number of items in this packet.
 		int32 CountItems() const
 			{ return fItems.CountItems(); }
 		ppp_configure_item *ItemAt(int32 index) const;

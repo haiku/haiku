@@ -29,7 +29,7 @@
 #define PPP_USER_OPS_START					PPP_OPS_START + 32 * PPP_RESERVE_OPS_COUNT
 
 
-//! These values should be used for ppp_control_info::op.
+//!	These values should be used for ppp_control_info::op.
 enum ppp_control_ops {
 	// -----------------------------------------------------
 	// PPPManager (the PPP interface module)

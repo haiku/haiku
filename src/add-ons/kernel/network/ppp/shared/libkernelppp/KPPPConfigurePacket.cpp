@@ -5,12 +5,22 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPConfigurePacket
+	\brief Helper class for LCP configure packets.
+	
+	This class allows iterating over configure items and adding/removing items.
+*/
+
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
 
 #include <core_funcs.h>
 
 
+/*!	\brief Constructor.
+	
+	\param code The code value (e.g.: PPP_CONFIGURE_REQUEST) of this packet.
+*/
 KPPPConfigurePacket::KPPPConfigurePacket(uint8 code)
 	: fCode(code),
 	fID(0)
@@ -18,6 +28,7 @@ KPPPConfigurePacket::KPPPConfigurePacket(uint8 code)
 }
 
 
+//!	Decodes a packet and adds its items to this object.
 KPPPConfigurePacket::KPPPConfigurePacket(struct mbuf *packet)
 {
 	// decode packet
@@ -48,6 +59,7 @@ KPPPConfigurePacket::KPPPConfigurePacket(struct mbuf *packet)
 }
 
 
+//!	Frees all items.
 KPPPConfigurePacket::~KPPPConfigurePacket()
 {
 	for(int32 index = 0; index < CountItems(); index++)
@@ -55,6 +67,7 @@ KPPPConfigurePacket::~KPPPConfigurePacket()
 }
 
 
+//!	Sets the packet's code value (e.g.: PPP_CONFIGURE_REQUEST).
 bool
 KPPPConfigurePacket::SetCode(uint8 code)
 {
@@ -68,6 +81,18 @@ KPPPConfigurePacket::SetCode(uint8 code)
 }
 
 
+/*!	\brief Adds a new configure item to this packet.
+	
+	Make sure all values are correct because the item will be copied. If the item's
+	length field is incorrect you will get bad results.
+	
+	\param item The item.
+	\param index Item's index. Adds after the last item if not specified or negative.
+	
+	\return \c true if successful, \c false otherwise.
+	
+	\sa ppp_configure_item
+*/
 bool
 KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 {
@@ -91,6 +116,7 @@ KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 }
 
 
+//!	Removes an item. The item \e must belong to this packet.
 bool
 KPPPConfigurePacket::RemoveItem(ppp_configure_item *item)
 {
@@ -104,6 +130,7 @@ KPPPConfigurePacket::RemoveItem(ppp_configure_item *item)
 }
 
 
+//!	Returns the item at \a index or \c NULL.
 ppp_configure_item*
 KPPPConfigurePacket::ItemAt(int32 index) const
 {
@@ -116,6 +143,7 @@ KPPPConfigurePacket::ItemAt(int32 index) const
 }
 
 
+//!	Returns the item of a special \a type or \c NULL.
 ppp_configure_item*
 KPPPConfigurePacket::ItemWithType(uint8 type) const
 {
@@ -131,6 +159,15 @@ KPPPConfigurePacket::ItemWithType(uint8 type) const
 }
 
 
+/*!	\brief Converts this packet into an mbuf structure.
+	
+	ATTENTION: You are responsible for freeing this packet by calling \c m_freem()!
+	
+	\param MRU The interface's maximum receive unit (MRU).
+	\param reserve Number of bytes to reserve at the beginning of the packet.
+	
+	\return The mbuf structure or \c NULL on error (e.g.: too big for given MRU).
+*/
 struct mbuf*
 KPPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve = 0)
 {

@@ -5,6 +5,14 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPDevice
+	\brief Represents a device at the lowest level of the communcation stack.
+	
+	A device may be, for example: Modem, PPPoE, PPTP.\n
+	It encapsulates the packet and sends it over a line to the other end.
+	The device is the first layer that receives a packet.
+*/
+
 #include <KPPPDevice.h>
 
 #include <net/if.h>
@@ -13,6 +21,13 @@
 #include <PPPControl.h>
 
 
+/*!	\brief Initializes the device.
+	
+	\param name The device's type name (e.g.: PPPoE).
+	\param overhead Length of the header that is prepended to each packet.
+	\param interface Owning interface.
+	\param settings Device's settings.
+*/
 KPPPDevice::KPPPDevice(const char *name, uint32 overhead, KPPPInterface& interface,
 		driver_parameter *settings)
 	: KPPPLayer(name, PPP_DEVICE_LEVEL, overhead),
@@ -24,6 +39,7 @@ KPPPDevice::KPPPDevice(const char *name, uint32 overhead, KPPPInterface& interfa
 }
 
 
+//!	Destructor. Removes device from interface.
 KPPPDevice::~KPPPDevice()
 {
 	if(Interface().Device() == this)
@@ -31,6 +47,10 @@ KPPPDevice::~KPPPDevice()
 }
 
 
+/*!	\brief Allows private extensions.
+	
+	If you override this method you must call the parent's method for unknown ops.
+*/
 status_t
 KPPPDevice::Control(uint32 op, void *data, size_t length)
 {
@@ -58,6 +78,7 @@ KPPPDevice::Control(uint32 op, void *data, size_t length)
 }
 
 
+//!	Returns \c true (indicates to KPPPInterface we are always allowed to send).
 bool
 KPPPDevice::IsAllowedToSend() const
 {
@@ -66,6 +87,7 @@ KPPPDevice::IsAllowedToSend() const
 }
 
 
+//!	This method is never used.
 status_t
 KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
@@ -77,13 +99,15 @@ KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 }
 
 
-void
-KPPPDevice::Pulse()
-{
-	// do nothing by default
-}
-
-
+/*!	\brief Report that device is going up.
+	
+	Called by Up().\n
+	From now on, the connection attempt can may be aborted by calling Down().
+	
+	\return
+		- \c true: You are allowed to connect.
+		- \c false: You should abort immediately. Down() will \e not be called!
+*/
 bool
 KPPPDevice::UpStarted()
 {
@@ -93,6 +117,14 @@ KPPPDevice::UpStarted()
 }
 
 
+/*!	\brief Report that device is going down.
+	
+	Called by Down().
+	
+	\return
+		- \c true: You are allowed to disconnect.
+		- \c false: You must not disconnect!
+*/
 bool
 KPPPDevice::DownStarted()
 {
@@ -102,6 +134,7 @@ KPPPDevice::DownStarted()
 }
 
 
+//!	Reports that device failed going up. May only be called after Up() was called.
 void
 KPPPDevice::UpFailedEvent()
 {
@@ -111,6 +144,7 @@ KPPPDevice::UpFailedEvent()
 }
 
 
+//!	Reports that device went up. May only be called after Up() was called.
 void
 KPPPDevice::UpEvent()
 {
@@ -120,6 +154,7 @@ KPPPDevice::UpEvent()
 }
 
 
+//!	Reports that device went down. This may be called to indicate connection loss.
 void
 KPPPDevice::DownEvent()
 {

@@ -57,7 +57,7 @@ enum ppp_interface_filter {
 
 // return values for Send()/Receive() methods in addition to B_ERROR and B_OK
 // PPP_UNHANDLED is also used by KPPPOptionHandler
-enum {
+enum ppp_return_values {
 	// B_ERROR means that the packet is corrupted
 	// B_OK means the packet was handled correctly
 	
@@ -76,23 +76,26 @@ enum {
 		// could not send a packet because device is not connected
 };
 
-// PFC options
-enum {
+//!	PFC options. Should be set by KPPPDevice.
+enum ppp_pfc_options {
 	PPP_REQUEST_PFC = 0x01,
-		// try to request PFC (does not fail if not successful)
+		//!< Try requesting PFC (does not fail if not successful).
 	PPP_ALLOW_PFC = 0x02,
-		// allow PFC if other side requests it
+		//!< Allow PFC if other side requests it.
 	PPP_FORCE_PFC_REQUEST = 0x04,
-		// if PFC request fails the connection attempt will terminate
+		//!< If PFC request fails the connection attempt will terminate.
 	PPP_FREEZE_PFC_OPTIONS = 0x80
-		// the options cannot be changed if this flag is set (mainly used by KPPPDevice)
+		//!< Options cannot be changed if this flag is set (mainly used by KPPPDevice).
 };
 
+//!	PFC state constants.
 enum ppp_pfc_state {
 	PPP_PFC_DISABLED,
+		//!< PFC is disabled.
 	PPP_PFC_ACCEPTED,
+		//!< PFC was accepted by other side.
 	PPP_PFC_REJECTED
-		// not used for peer state
+		//!< PFC was rejected by other side. Not used for peer state.
 };
 
 // protocol flags

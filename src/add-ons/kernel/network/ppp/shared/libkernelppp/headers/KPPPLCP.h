@@ -26,6 +26,7 @@ class KPPPLCPExtension;
 class KPPPOptionHandler;
 
 
+//!	LCP packet header structure.
 typedef struct ppp_lcp_packet {
 	uint8 code;
 	uint8 id;
@@ -47,11 +48,13 @@ class KPPPLCP : public KPPPProtocol {
 		KPPPLCP& operator= (const KPPPLCP& copy);
 
 	public:
+		//!	Returns the KPPPStateMachine of the interface that owns this protocol.
 		KPPPStateMachine& StateMachine() const
 			{ return fStateMachine; }
 		
 		bool AddOptionHandler(KPPPOptionHandler *handler);
 		bool RemoveOptionHandler(KPPPOptionHandler *handler);
+		//!	Returns number of registered KPPPOptionHandler objects.
 		int32 CountOptionHandlers() const
 			{ return fOptionHandlers.CountItems(); }
 		KPPPOptionHandler *OptionHandlerAt(int32 index) const;
@@ -59,15 +62,22 @@ class KPPPLCP : public KPPPProtocol {
 		
 		bool AddLCPExtension(KPPPLCPExtension *extension);
 		bool RemoveLCPExtension(KPPPLCPExtension *extension);
+		//!	Returns number of registered KPPPLCPExtension objects.
 		int32 CountLCPExtensions() const
 			{ return fLCPExtensions.CountItems(); }
 		KPPPLCPExtension *LCPExtensionAt(int32 index) const;
 		KPPPLCPExtension *LCPExtensionFor(uint8 code, int32 *start = NULL) const;
 		
+		/*!	\brief Sets the target protocol handler for outgoing LCP packets.
+			
+			This may be used for filtering or routing LCP packets. Multilink
+			protocols might need this method.\n
+			If \a target != \c NULL all packets will be passed to the given protocol
+			instead of the interface/device.
+		*/
 		void SetTarget(KPPPProtocol *target)
 			{ fTarget = target; }
-			// if target != NULL all packtes will be passed to the protocol
-			// instead of the interface/device
+		//!	Returns the LCP packet handler or \c NULL.
 		KPPPProtocol *Target() const
 			{ return fTarget; }
 		

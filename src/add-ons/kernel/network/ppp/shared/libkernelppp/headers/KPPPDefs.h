@@ -18,9 +18,10 @@ extern struct core_module_info *core;
 
 // various constants
 #define PPP_PULSE_RATE						500000
+	//!< Rate at which Pulse() is called (in microseconds).
 
 
-// module key types (used when loading a module)
+//!	Module key types used when loading a module.
 enum ppp_module_key_type {
 	PPP_UNDEFINED_KEY_TYPE = -1,
 	PPP_LOAD_MODULE_KEY_TYPE = 0,
@@ -30,7 +31,7 @@ enum ppp_module_key_type {
 	PPP_MULTILINK_KEY_TYPE
 };
 
-// PPP events as defined in RFC 1661 (with one exception: PPP_UP_FAILED_EVENT)
+//!	PPP events as defined in RFC 1661 (with one exception: PPP_UP_FAILED_EVENT).
 enum ppp_event {
 	PPP_UP_FAILED_EVENT,
 	PPP_UP_EVENT,
@@ -51,8 +52,7 @@ enum ppp_event {
 	PPP_RXR_EVENT
 };
 
-// LCP protocol codes as defined in RFC 1661
-// ToDo: add LCP extensions
+//!	LCP protocol codes as defined in RFC 1661.
 enum ppp_lcp_code {
 	PPP_CONFIGURE_REQUEST = 1,
 	PPP_CONFIGURE_ACK = 2,
@@ -65,6 +65,8 @@ enum ppp_lcp_code {
 	PPP_ECHO_REQUEST = 9,
 	PPP_ECHO_REPLY = 10,
 	PPP_DISCARD_REQUEST = 11
+	
+	// ToDo: add LCP extensions
 };
 
 #define PPP_MIN_LCP_CODE PPP_CONFIGURE_REQUEST
