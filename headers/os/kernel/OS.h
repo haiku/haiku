@@ -6,12 +6,13 @@
 #ifndef _OS_H
 #define _OS_H
  
-#include <ktypes.h>
+//#include <ktypes.h>
 // ToDo: has to be included here, but does currently causes compiler errors
 // (redefinitions in ktypes.h (bigtime_t), and arch/x86/types.h (int8, ...))
-//#include <SupportDefs.h>
+#include <SupportDefs.h>
+#include <StorageDefs.h>
 // ToDo: is automatically included by SupportDefs.h, so that one can be removed later
-#include <Errors.h>
+//#include <Errors.h>
 
 
 #ifdef __cplusplus
@@ -257,6 +258,8 @@ typedef struct {
 #define B_FIRST_REAL_TIME_PRIORITY		B_REAL_TIME_DISPLAY_PRIORITY
 #define B_MIN_PRIORITY					B_IDLE_PRIORITY
 #define B_MAX_PRIORITY					B_REAL_TIME_PRIORITY
+
+#define B_SYSTEM_TIMEBASE				0
 
 typedef int32 (*thread_func) (void *);
 // the equivalent thread_entry has been removed (deprecated)

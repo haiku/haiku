@@ -27,7 +27,7 @@ class BStringItem : public BListItem
 public:
   BStringItem(const char* text, uint32 outlineLevel = 0, bool expanded = true) ;
   BStringItem(BMessage* data) ;
-virtual ~MyStringItem() ;
+virtual ~BStringItem() ;
 
 static  BArchivable	*Instantiate(BMessage* data);
 virtual status_t    Archive(BMessage* data, bool deep = true) const ;
@@ -53,3 +53,4 @@ private:
 #endif
 
 #endif /* _STRING_ITEM_H */
+	

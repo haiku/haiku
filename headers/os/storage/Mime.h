@@ -9,6 +9,10 @@
 #ifndef _MIME_H
 #define _MIME_H
 
+#ifndef _BE_BUILD_H
+#include <BeBuild.h>
+#endif
+#include <sys/types.h>
 #include <SupportDefs.h>
 #include <StorageDefs.h>
 

@@ -25,7 +25,7 @@ extern "C" {
 --- */
 
 extern _IMPEXP_KERNEL thread_id spawn_kernel_thread (
-	thread_entry	function, 
+	thread_func		function, 
 	const char 		*thread_name, 
 	long			priority,
 	void			*arg
@@ -241,6 +241,7 @@ extern _IMPEXP_KERNEL int			register_kernel_daemon(void (*func)(void *, int), vo
 extern _IMPEXP_KERNEL int			unregister_kernel_daemon(void (*func)(void *, int), void *arg);
 extern _IMPEXP_KERNEL void			call_all_cpus(void (*f)(void*, int), void* cookie);
 
+extern _IMPEXP_KERNEL int			load_driver_symbols(const char *driver_name);
 
 #ifdef __cplusplus
 }

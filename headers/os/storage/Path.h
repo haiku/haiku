@@ -11,7 +11,8 @@
 #define _PATH_H
 
 #include <Flattenable.h>
-#include <SupportDefs.h>
+#include <StorageDefs.h>
+#include <Message.h> /*  for convenience, as in R5 */
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {

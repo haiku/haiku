@@ -1,13 +1,19 @@
 #ifndef _DRIVERS_DRIVERS_H
 #define _DRIVERS_DRIVERS_H
 
+#include <BeBuild.h>
 #include <sys/types.h>
-#include <defines.h>
 #include <sys/uio.h>
+#include <SupportDefs.h>
 
 /* ---
 	these hooks are how the kernel accesses the device
 --- */
+
+// XXX hack, this is also in private/kernel/defines.h
+#ifndef SYS_MAX_PATH_LEN
+ #define SYS_MAX_PATH_LEN 512
+#endif
 
 struct selectsync;
 typedef struct selectsync selectsync;
@@ -149,5 +155,81 @@ enum {
 
 	B_DEVICE_OP_CODES_END = 9999	/* end of Be-defined contol id's */
 };
+
+/* ---
+	geometry structure for the B_GET_GEOMETRY opcode
+--- */
+
+typedef struct {
+	uint32	bytes_per_sector;		/* sector size in bytes */
+	uint32	sectors_per_track;		/* # sectors per track */
+	uint32	cylinder_count;			/* # cylinders */
+	uint32	head_count;				/* # heads */
+	uchar	device_type;			/* type */
+	bool	removable;				/* non-zero if removable */
+	bool	read_only;				/* non-zero if read only */
+	bool	write_once;				/* non-zero if write-once */
+} device_geometry;
+
+
+/* ---
+	Be-defined device types returned by B_GET_GEOMETRY.  Use these if it makes
+	sense for your device.
+--- */
+
+enum {
+	B_DISK = 0,						/* Hard disks, floppy disks, etc. */
+	B_TAPE,							/* Tape drives */
+	B_PRINTER,						/* Printers */
+	B_CPU,							/* CPU devices */
+	B_WORM,							/* Write-once, read-many devives */
+	B_CD,							/* CD ROMS */
+	B_SCANNER,						/* Scanners */
+	B_OPTICAL,						/* Optical devices */
+	B_JUKEBOX,						/* Jukeboxes */
+	B_NETWORK						/* Network devices */
+};
+
+
+/* ---
+	partition_info structure used by B_GET_PARTITION_INFO and B_SET_PARTITION
+--- */
+
+typedef struct {
+	off_t	offset;					/* offset (in bytes) */
+	off_t	size;					/* size (in bytes) */
+	int32	logical_block_size;		/* logical block size of partition */
+	int32	session;				/* id of session */
+	int32	partition;				/* id of partition */
+	char	device[256];			/* path to the physical device */
+} partition_info;
+
+/* ---
+	driver_path structure returned by the B_GET_DRIVER_FOR_DEVICE
+--- */
+
+typedef char	driver_path[256];
+
+
+/* ---
+	open_device_iterator structure used by the B_GET_NEXT_OPEN_DEVICE opcode
+--- */
+
+typedef struct {
+	uint32		cookie;			/* must be set to 0 before iterating */
+	char		device[256];	/* device path */	
+} open_device_iterator;
+
+
+/* ---
+	icon structure for the B_GET_ICON opcode
+--- */
+
+typedef struct {
+	int32	icon_size;			/* icon size requested */
+	void	*icon_data;			/* where to put 'em (usually BBitmap->Bits()) */
+} device_icon;
+
+
 
 #endif /* _DRIVERS_DRIVERS_H */
