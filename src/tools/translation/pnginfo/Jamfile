@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src tools translation pnginfo ;
+
+UseLibraryHeaders zlib ;
+UseLibraryHeaders png ;
+
+BinCommand pnginfo : pnginfo.cpp : be libpng.a libz.a ;
+
