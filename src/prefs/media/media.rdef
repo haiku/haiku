@@ -57,7 +57,7 @@ resource mini_icon
 
 resource file_types message;
 
-resource app_signature "application/x-vnd.OBOS.Media";
+resource app_signature "application/x-vnd.haiku.Media";
 
 resource app_version
 {
