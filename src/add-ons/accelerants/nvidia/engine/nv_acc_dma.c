@@ -334,23 +334,30 @@ status_t nv_acc_init_dma()
 
 	if (si->ps.card_arch == NV10A)
 	{
-/*
-           pNv->PGRAPH[0x0084/4] = 0x00118700;//acc DEBUG1
-           pNv->PGRAPH[0x0088/4] = 0x24E00810;//acc DEBUG2
-           pNv->PGRAPH[0x008C/4] = 0x55DE0030;//acc DEBUG3
+		/* init some function blocks */
+		ACCW(DEBUG1, 0x00118700);
+		ACCW(DEBUG2, 0x24e00810);
+		ACCW(DEBUG3, 0x55de0030);
 
-//tile spul NV10:
-           for(i = 0; i < 32; i++)
-             pNv->PGRAPH[(0x0B00/4) + i] = pNv->PFB[(0x0240/4) + i];//NV10_TIL0AD etc
+		/* copy tile setup stuff from 'source' to acc engine */
+		for (cnt = 0; cnt < 32; cnt++)
+		{
+			NV_REG32(NVACC_NV10_TIL0AD + (cnt << 2)) =
+				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+		}
 
-           pNv->PGRAPH[0x640/4] = 0;//OFFSET0
-           pNv->PGRAPH[0x644/4] = 0;//OFFSET1
-           pNv->PGRAPH[0x684/4] = pNv->FbMapSize - 1;//BLIMIT0
-           pNv->PGRAPH[0x688/4] = pNv->FbMapSize - 1;//BLIMIT1
+		/* setup accesible card memory range for acc engine */
+		//fixme: should these two be zero after all??!!
+		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		//end fixme.
+		ACCW(BLIMIT0, (si->ps.memory_size - 1));
+		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
-           pNv->PGRAPH[0x0810/4] = 0x00000000;//PAT_SHP
-           pNv->PGRAPH[0x0608/4] = 0xFFFFFFFF;//<<<<<<<<<<<< nvx: NV_PGRAPH_BETA_AND
-*/
+		/* pattern shape value = 8x8, 2 color */
+		ACCW(PAT_SHP, 0x00000000);
+		/* Pgraph Beta AND value (fraction) b23-30 */
+		ACCW(BETA_AND_VAL, 0xffffffff);
 	}
 
 	if (si->ps.card_arch >= NV20A)
