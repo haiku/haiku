@@ -208,10 +208,10 @@ Volume::Sync()
 status_t
 Volume::ValidateBlockRun(block_run run)
 {
-	if (run.allocation_group < 0 || run.allocation_group > AllocationGroups()
-		|| run.start > (1LL << AllocationGroupShift())
+	if (run.allocation_group < 0 || run.allocation_group > (int32)AllocationGroups()
+		|| run.start > (1UL << AllocationGroupShift())
 		|| run.length == 0
-		|| (uint32)run.length + run.start > (1LL << AllocationGroupShift())) {
+		|| uint32(run.length + run.start) > (1UL << AllocationGroupShift())) {
 		Panic();
 		FATAL(("*** invalid run(%ld,%d,%d)\n", run.allocation_group, run.start, run.length));
 		return B_BAD_DATA;
