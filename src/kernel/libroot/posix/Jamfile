@@ -24,6 +24,7 @@ SubInclude OBOS_TOP src kernel libroot posix arch ;
 SubInclude OBOS_TOP src kernel libroot posix locale ;
 SubInclude OBOS_TOP src kernel libroot posix malloc ;
 SubInclude OBOS_TOP src kernel libroot posix math ;
+SubInclude OBOS_TOP src kernel libroot posix pthread ;
 SubInclude OBOS_TOP src kernel libroot posix signal ;
 SubInclude OBOS_TOP src kernel libroot posix stdio ;
 SubInclude OBOS_TOP src kernel libroot posix stdlib ;
