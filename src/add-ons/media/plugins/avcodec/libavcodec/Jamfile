@@ -1,0 +1,78 @@
+SubDir OBOS_TOP src add-ons media plugins avcodec libavcodec ;
+
+CFLAGS += -fomit-frame-pointer -DPIC ;
+DEFINES += HAVE_AV_CONFIG_H=1 ;
+
+StaticLibrary avcodec :
+	4xm.c
+	8bps.c 
+	ac3enc.c 
+	adpcm.c 
+	adx.c 
+	allcodecs.c 
+	asv1.c 
+	avcodec.c 
+	cabac.c 
+	cinepak.c 
+	cljr.c 
+	common.c 
+	cyuv.c 
+	dpcm.c 
+	dsputil.c 
+	dv.c 
+	error_resilience.c 
+	eval.c 
+	faandct.c 
+	fdctref.c 
+	fft.c 
+	ffv1.c 
+	flicvideo.c 
+	golomb.c 
+	h263.c 
+	h263dec.c 
+	h264.c 
+	huffyuv.c 
+	idcinvideo.c 
+	imgconvert.c 
+	imgresample.c 
+	indeo3.c 
+	interplayvideo.c 
+	jfdctfst.c 
+	jfdctint.c 
+	jrevdct.c 
+	mace.c 
+	mdct.c 
+	mem.c 
+	mjpeg.c 
+	motion_est.c 
+	mpeg12.c 
+	mpegaudio.c 
+	mpegaudiodec.c 
+	mpegvideo.c 
+	msmpeg4.c 
+	msrle.c 
+	msvideo1.c 
+	opts.c 
+	parser.c 
+	pcm.c 
+	ra144.c 
+	ra288.c 
+	ratecontrol.c 
+	rational.c 
+	raw.c 
+	resample.c 
+	roqvideo.c 
+	rpza.c 
+	rv10.c 
+	simple_idct.c 
+	smc.c 
+	svq1.c 
+	truemotion1.c 
+	utils.c 
+	vcr1.c 
+	vp3.c 
+	vqavideo.c 
+	wmadec.c 
+	xan.c 
+	xvmcvideo.c 
+;

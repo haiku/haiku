@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons media plugins avcodec ;
+
+UsePrivateHeaders media ;
+
+Addon avcodec : media plugins :
+	avcodec.cpp
+	: 
+	false
+	:  
+	libavcodec.a
+;
+
+LinkSharedOSLibs avcodec : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins avcodec libavcodec ;
