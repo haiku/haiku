@@ -330,6 +330,9 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	t->state = B_THREAD_SUSPENDED;
 	t->next_state = B_THREAD_SUSPENDED;
 
+	// init debug structure
+	clear_thread_debug_info(&t->debug_info, false);
+
 	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, t->id);
 	t->kernel_stack_area = create_area(stack_name, (void **)&t->kernel_stack_base,
 		B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
@@ -761,6 +764,7 @@ thread_exit(void)
 	uint32 death_stack;
 	sem_id cachedDeathSem, parentDeadSem = -1, groupDeadSem = -1;
 	status_t status;
+	struct thread_debug_info debugInfo;
 
 	if (!are_interrupts_enabled())
 		dprintf("thread_exit() called with interrupts disabled!\n");
@@ -771,6 +775,18 @@ thread_exit(void)
 
 	// boost our priority to get this over with
 	thread->priority = B_URGENT_DISPLAY_PRIORITY;
+
+	// stop debugging for this thread
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	debugInfo = thread->debug_info;
+	clear_thread_debug_info(&thread->debug_info, true);
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	destroy_thread_debug_info(&debugInfo);
 
 	// shutdown the thread messaging
 
@@ -1003,7 +1019,7 @@ thread_atkernel_exit(void)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	if (handle_signals(t, state))
+	if (handle_signals(t, &state))
 		scheduler_reschedule();
 	// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 
