@@ -291,7 +291,8 @@ STXTTranslator::OutputFormats(int32 *out_count) const
 // Returns: B_OK, if the data appears to be in the STXT format,
 // B_NO_TRANSLATOR, if the data is not in the STXT format or
 // returns B_ERROR if errors were encountered in trying to
-// determine the format
+// determine the format, or another error code if there was an
+// error calling BPostionIO::Read()
 // ---------------------------------------------------------------
 status_t
 identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
@@ -301,7 +302,7 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 	const ssize_t ktxtsize = sizeof(TranslatorStyledTextTextHeader);
 	const ssize_t kstylsize = sizeof(TranslatorStyledTextStyleHeader);
 	
-	char buffer[max(ktxtsize, kstylsize)];
+	uint8 buffer[max(ktxtsize, kstylsize)];
 	
 	// Check the TEXT header
 	TranslatorStyledTextTextHeader txtheader;
@@ -335,6 +336,8 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 	ssize_t read = 0;
 	TranslatorStyledTextStyleHeader stylheader;
 	read = inSource->Read(buffer, kstylsize);
+	if (read < 0)
+		return read;
 	if (read != kstylsize && read != 0)
 		return B_NO_TRANSLATOR;
 	
@@ -477,6 +480,8 @@ identify_txt_header(uint8 *data, int32 nread,
 //
 // B_OK,	if this translator understand the data and there were
 //			no errors found
+//
+// Other errors if BPositionIO::Read() returned an error value
 // ---------------------------------------------------------------
 status_t
 STXTTranslator::Identify(BPositionIO *inSource,
@@ -538,7 +543,7 @@ STXTTranslator::Identify(BPositionIO *inSource,
 //
 // Postconditions:
 //
-// Returns: B_BAD_VALUE, if the options in ioExtension are bad
+// Returns: B_BAD_VALUE, if outType is invalid
 //
 // B_NO_TRANSLATOR, if this translator doesn't understand the data
 //
