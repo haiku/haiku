@@ -1,4 +1,9 @@
-#include <Be.h>
+#include <Application.h>
+#include <Window.h>
+#include <View.h>
+#include <Box.h>
+#include <Button.h>
+#include <StringView.h>
 
 class ScrollBarApp : public BApplication
 {
