@@ -300,7 +300,8 @@ PositionSlider::DrawBar()
 	frame.top++;
 	frame.left++;
 	frame.right = ThumbFrame().left + ThumbFrame().Width() / 2;
-	view->SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
+	view->SetHighColor(IsEnabled() ? ui_color(B_CONTROL_HIGHLIGHT_COLOR)
+		: tint_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR), B_DARKEN_1_TINT));
 	view->FillRect(frame);
 
 	frame.left = frame.right + 1;
@@ -311,7 +312,7 @@ PositionSlider::DrawBar()
 	rgb_color cornerColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	rgb_color darkColor = tint_color(ViewColor(), B_DARKEN_3_TINT);
 	rgb_color shineColor = ui_color(B_SHINE_COLOR);
-	rgb_color shadowColor =ui_color(B_SHADOW_COLOR);
+	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
 	if (!IsEnabled()) {
 		darkColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 		shineColor = tint_color(shineColor, B_DARKEN_2_TINT);
