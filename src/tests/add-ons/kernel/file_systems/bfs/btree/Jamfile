@@ -2,7 +2,7 @@ SubDir OBOS_TOP src tests add-ons kernel file_systems bfs btree ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 rule FPreIncludes { return -include\ $(1:D=$(SUBDIR)) ; }
 

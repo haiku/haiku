@@ -1,6 +1,0 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems befs randomread ;
-
-SimpleTest randomread
-	: randomread.cpp
-	: be ;
-

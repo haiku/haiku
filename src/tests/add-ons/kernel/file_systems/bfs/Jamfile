@@ -5,4 +5,7 @@ SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs bufferPool ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs btree ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs mkbfs ;
+SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs queries ;
+SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs randomread ;
+SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs rename ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs structureSizes ;

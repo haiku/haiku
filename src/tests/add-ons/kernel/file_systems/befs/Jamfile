@@ -1,6 +1,0 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems befs ;
-
-SubInclude OBOS_TOP src tests add-ons kernel file_systems befs array ;
-SubInclude OBOS_TOP src tests add-ons kernel file_systems befs queries ;
-SubInclude OBOS_TOP src tests add-ons kernel file_systems befs randomread ;
-SubInclude OBOS_TOP src tests add-ons kernel file_systems befs rename ;
