@@ -6,6 +6,7 @@
 #ifndef __PACKBITS_H
 #define __PACKBITS_H
 
-int	pack_bits(unsigned char *out, unsigned char *in, int bytes);
+int	pack_bits_size(const unsigned char *in, int bytes);
+int	pack_bits(unsigned char *out, const unsigned char *in, int bytes);
 
 #endif	/* __PACKBITS_H */
