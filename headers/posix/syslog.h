@@ -11,8 +11,8 @@
 #define LOG_CONS		(2 << 12)	/* log to the system console on error */
 #define LOG_ODELAY		(4 << 12)	/* delay open until syslog() is called */
 #define LOG_NDELAY		(8 << 12)	/* connect to the syslog daemon immediately */
-#define LOG_SERIAL		(16 << 12)
-#define LOG_PERROR		(32 << 12)
+#define LOG_SERIAL		(16 << 12)	/* dump to serial output as well (not implemented) */
+#define LOG_PERROR		(32 << 12)	/* dump to stderr as well */
 #define LOG_NOWAIT		(64 << 12)	/* do not wait for child processes */
 
 
