@@ -11,8 +11,11 @@
 #include <DiskDeviceRoster.h>
 #include <Locker.h>
 #include <Looper.h>
+#include <ObjectLocker.h>
 #include <Partition.h>
 #include <Session.h>
+
+using BPrivate::BObjectLocker;
 
 // constructor
 /*!	\brief Creates an empty BDiskDeviceList object.
@@ -41,7 +44,7 @@ BDiskDeviceList::~BDiskDeviceList()
 void
 BDiskDeviceList::MessageReceived(BMessage *message)
 {
-	bool locked = Lock();
+	BObjectLocker<BDiskDeviceList> _(this);
 	switch (message->what) {
 		case B_DEVICE_UPDATE:
 		{
@@ -57,20 +60,26 @@ BDiskDeviceList::MessageReceived(BMessage *message)
 					case B_DEVICE_PARTITION_UNMOUNTED:
 						_PartitionUnmounted(message);
 						break;
-					case B_DEVICE_PARTITION_CHANGED:
-						_PartitionChanged(message);
+					case B_DEVICE_PARTITION_INITIALIZED:
+						_PartitionInitialized(message);
 						break;
-					case B_DEVICE_PARTITION_ADDED:
-						_PartitionAdded(message);
+					case B_DEVICE_PARTITION_RESIZED:
+						_PartitionResized(message);
 						break;
-					case B_DEVICE_PARTITION_REMOVED:
-						_PartitionRemoved(message);
+					case B_DEVICE_PARTITION_MOVED:
+						_PartitionMoved(message);
 						break;
-					case B_DEVICE_SESSION_ADDED:
-						_SessionAdded(message);
+					case B_DEVICE_PARTITION_CREATED:
+						_PartitionCreated(message);
 						break;
-					case B_DEVICE_SESSION_REMOVED:
-						_SessionRemoved(message);
+					case B_DEVICE_PARTITION_DELETED:
+						_PartitionDeleted(message);
+						break;
+					case B_DEVICE_PARTITION_DEFRAGMENTED:
+						_PartitionDefragmented(message);
+						break;
+					case B_DEVICE_PARTITION_REPAIRED:
+						_PartitionRepaired(message);
 						break;
 					case B_DEVICE_MEDIA_CHANGED:
 						_MediaChanged(message);
@@ -87,8 +96,6 @@ BDiskDeviceList::MessageReceived(BMessage *message)
 		default:
 			BHandler::MessageReceived(message);
 	}
-	if (locked)
-		Unlock();
 }
 
 // SetNextHandler
@@ -98,13 +105,12 @@ BDiskDeviceList::MessageReceived(BMessage *message)
 void
 BDiskDeviceList::SetNextHandler(BHandler *handler)
 {
-	if (!handler && fSubscribed) {
-		bool locked = Lock();
-		BDiskDeviceRoster().StopWatching(BMessenger(this));
-		fSubscribed = false;
-		if (locked)
-			Unlock();
+	if (!handler) {
+		BObjectLocker<BDiskDeviceList> _(this);
+		if (fSubscribed) 
+			_StopWatching();
 	}
+	BHandler::SetNextHandler(handler);
 }
 
 // Fetch
@@ -126,11 +132,14 @@ status_t
 BDiskDeviceList::Fetch()
 {
 	Unset();
-	bool locked = Lock();
-	// get the devices
+	BObjectLocker<BDiskDeviceList> _(this);
+	// register for notifications
 	status_t error = B_OK;
+	if (Looper())
+		error = _StartWatching();
+	// get the devices
 	BDiskDeviceRoster roster;
-	do {
+	while (error == B_OK) {
 		if (BDiskDevice *device = new(nothrow) BDiskDevice) {
 			status_t status = roster.GetNextDevice(device);
 			if (status == B_OK)
@@ -141,17 +150,10 @@ BDiskDeviceList::Fetch()
 				error = status;
 		} else
 			error = B_NO_MEMORY;
-	} while (error == B_OK);
-	// register for notifications
-	if (error == B_OK && Looper()) {
-		error = roster.StartWatching(BMessenger(this));
-		fSubscribed = (error == B_OK);
 	}
 	// cleanup on error
 	if (error != B_OK)
 		Unset();
-	if (locked)
-		Unlock();
 	return error;
 }
 
@@ -166,16 +168,11 @@ BDiskDeviceList::Fetch()
 void
 BDiskDeviceList::Unset()
 {
-	bool locked = Lock();
+	BObjectLocker<BDiskDeviceList> _(this);
 	// unsubscribe from notification services
-	if (fSubscribed) {
-		BDiskDeviceRoster().StopWatching(BMessenger(this));
-		fSubscribed = false;
-	}
+	_StopWatching();
 	// empty the list
 	fDevices.MakeEmpty();
-	if (locked)
-		Unlock();
 }
 
 // Lock
@@ -264,31 +261,6 @@ BDiskDeviceList::VisitEachDevice(BDiskDeviceVisitor *visitor)
 	return NULL;
 }
 
-// VisitEachSession
-/*!	\brief Iterates through the all devices' sessions.
-
-	The supplied visitor's Visit(BSession*) is invoked for each session.
-	If Visit() returns \c true, the iteration is terminated and this method
-	returns the respective session.
-
-	The list must be locked.
-
-	\param visitor The visitor.
-	\return The respective session, if the iteration was terminated early,
-			\c NULL otherwise.
-*/
-BSession *
-BDiskDeviceList::VisitEachSession(BDiskDeviceVisitor *visitor)
-{
-	if (visitor) {
-		for (int32 i = 0; BDiskDevice *device = DeviceAt(i); i++) {
-			if (BSession *session = device->VisitEachSession(visitor))
-				return session;
-		}
-	}
-	return NULL;
-}
-
 // VisitEachPartition
 /*!	\brief Iterates through the all devices' partitions.
 
@@ -307,35 +279,11 @@ BDiskDeviceList::VisitEachPartition(BDiskDeviceVisitor *visitor)
 {
 	if (visitor) {
 		for (int32 i = 0; BDiskDevice *device = DeviceAt(i); i++) {
-			if (BPartition *partition = device->VisitEachPartition(visitor))
+			if (BPartition *partition = device->VisitEachDescendant(visitor))
 				return partition;
 		}
 	}
 	return NULL;
-}
-
-// Traverse
-/*!	\brief Pre-order traverses the trees of the spanned by the BDiskDevices
-		   and their subobjects.
-
-	The supplied visitor's Visit() is invoked for each device, for each
-	session and for each partition.
-	If Visit() returns \c true, the iteration is terminated and this method
-	returns \c true as well.
-
-	\param visitor The visitor.
-	\return \c true, if the iteration was terminated, \c false otherwise.
-*/
-bool
-BDiskDeviceList::Traverse(BDiskDeviceVisitor *visitor)
-{
-	if (visitor) {
-		for (int32 i = 0; BDiskDevice *device = DeviceAt(i); i++) {
-			if (device->Traverse(visitor))
-				return true;
-		}
-	}
-	return false;
 }
 
 // VisitEachMountedPartition
@@ -358,7 +306,7 @@ BDiskDeviceList::VisitEachMountedPartition(BDiskDeviceVisitor *visitor)
 	BPartition *partition = NULL;
 	if (visitor) {
 		struct MountedPartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32 level)
 				{ return partition->IsMounted(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
@@ -387,37 +335,8 @@ BDiskDeviceList::VisitEachMountablePartition(BDiskDeviceVisitor *visitor)
 	BPartition *partition = NULL;
 	if (visitor) {
 		struct MountablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
+			virtual bool Filter(BPartition *partition, int32 level)
 				{ return partition->ContainsFileSystem(); }
-		} filter;
-		PartitionFilterVisitor filterVisitor(visitor, &filter);
-		partition = VisitEachPartition(&filterVisitor);
-	}
-	return partition;
-}
-
-// VisitEachInitializablePartition
-/*!	\brief Iterates through the all devices' partitions that are initializable.
-
-	The supplied visitor's Visit(BPartition*) is invoked for each
-	initializable partition.
-	If Visit() returns \c true, the iteration is terminated and this method
-	returns the respective partition.
-
-	The list must be locked.
-
-	\param visitor The visitor.
-	\return The respective partition, if the iteration was terminated early,
-			\c NULL otherwise.
-*/
-BPartition *
-BDiskDeviceList::VisitEachInitializablePartition(BDiskDeviceVisitor *visitor)
-{
-	BPartition *partition = NULL;
-	if (visitor) {
-		struct InitializablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition)
-				{ return !partition->IsHidden(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
 		partition = VisitEachPartition(&filterVisitor);
@@ -439,22 +358,6 @@ BDiskDeviceList::DeviceWithID(int32 id) const
 {
 	IDFinderVisitor visitor(id);
 	return const_cast<BDiskDeviceList*>(this)->VisitEachDevice(&visitor);
-}
-
-// SessionWithID
-/*!	\brief Retrieves a session by ID.
-
-	The list must be locked.
-
-	\param id The ID of the session to be returned.
-	\return The session with ID \a id, or \c NULL, if the list is not
-			locked or no session with ID \a id is in the list.
-*/
-BSession *
-BDiskDeviceList::SessionWithID(int32 id) const
-{
-	IDFinderVisitor visitor(id);
-	return const_cast<BDiskDeviceList*>(this)->VisitEachSession(&visitor);
 }
 
 // PartitionWithID
@@ -483,6 +386,7 @@ BDiskDeviceList::PartitionWithID(int32 id) const
 void
 BDiskDeviceList::MountPointMoved(BPartition *partition)
 {
+	PartitionChanged(partition, B_DEVICE_MOUNT_POINT_MOVED);
 }
 
 // PartitionMounted
@@ -495,6 +399,7 @@ BDiskDeviceList::MountPointMoved(BPartition *partition)
 void
 BDiskDeviceList::PartitionMounted(BPartition *partition)
 {
+	PartitionChanged(partition, B_DEVICE_PARTITION_MOUNTED);
 }
 
 // PartitionUnmounted
@@ -507,71 +412,121 @@ BDiskDeviceList::PartitionMounted(BPartition *partition)
 void
 BDiskDeviceList::PartitionUnmounted(BPartition *partition)
 {
+	PartitionChanged(partition, B_DEVICE_PARTITION_UNMOUNTED);
+}
+
+// PartitionInitialized
+/*!	\brief Invoked, when a partition has been initialized.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionInitialized(BPartition *partition)
+{
+	PartitionChanged(partition, B_DEVICE_PARTITION_INITIALIZED);
+}
+
+// PartitionResized
+/*!	\brief Invoked, when a partition has been resized.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionResized(BPartition *partition)
+{
+	PartitionChanged(partition, B_DEVICE_PARTITION_RESIZED);
+}
+
+// PartitionMoved
+/*!	\brief Invoked, when a partition has been moved.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionMoved(BPartition *partition)
+{
+	PartitionChanged(partition, B_DEVICE_PARTITION_MOVED);
+}
+
+// PartitionCreated
+/*!	\brief Invoked, when a partition has been created.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionCreated(BPartition *partition)
+{
+}
+
+// PartitionDeleted
+/*!	\brief Invoked, when a partition has been deleted.
+
+	The method is called twice for a deleted partition. The first time
+	before the BDiskDevice the partition belongs to has been updated. The
+	\a partition parameter will point to a still valid BPartition object.
+	On the second invocation the device object will have been updated and
+	the partition object will have been deleted -- \a partition will be
+	\c NULL then.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition. Only non- \c NULL on the first
+		   invocation.
+	\param partitionID The ID of the concerned partition.
+*/
+void
+BDiskDeviceList::PartitionDeleted(BPartition *partition,
+	partition_id partitionID)
+{
+}
+
+// PartitionDefragmented
+/*!	\brief Invoked, when a partition has been defragmented.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionDefragmented(BPartition *partition)
+{
+	PartitionChanged(partition, B_DEVICE_PARTITION_DEFRAGMENTED);
+}
+
+// PartitionRepaired
+/*!	\brief Invoked, when a partition has been repaired.
+
+	The list is locked, when this method is invoked.
+
+	\param partition The concerned partition.
+*/
+void
+BDiskDeviceList::PartitionRepaired(BPartition *partition)
+{
+	PartitionChanged(partition, B_DEVICE_PARTITION_REPAIRED);
 }
 
 // PartitionChanged
-/*!	\brief Invoked, when data concerning a partition have changed.
+/*!	\brief Catch-all method invoked by the \c Partition*() hooks, save by
+		   PartitionCreated() and PartitionDeleted().
 
-	The list is locked, when this method is invoked.
-
-	\param partition The concerned partition.
-*/
-void
-BDiskDeviceList::PartitionChanged(BPartition *partition)
-{
-}
-
-// PartitionAdded
-/*!	\brief Invoked, when a partition has been added.
-
-	The list is locked, when this method is invoked.
+	If you're interested only in the fact, that something about the partition
+	changed, you can just override this hook instead of the ones telling you
+	exactly what happened.
 
 	\param partition The concerned partition.
+	\param event The event that occurred, if you are interested in it after all.
 */
 void
-BDiskDeviceList::PartitionAdded(BPartition *partition)
-{
-}
-
-// PartitionRemoved
-/*!	\brief Invoked, when a partition has been removed.
-
-	The supplied object is already removed from the list and is going to be
-	deleted after the hook returns.
-
-	The list is locked, when this method is invoked.
-
-	\param partition The concerned partition.
-*/
-void
-BDiskDeviceList::PartitionRemoved(BPartition *partition)
-{
-}
-
-// SessionAdded
-/*!	\brief Invoked, when a session has been added.
-
-	The list is locked, when this method is invoked.
-
-	\param session The concerned session.
-*/
-void
-BDiskDeviceList::SessionAdded(BSession *session)
-{
-}
-
-// SessionRemoved
-/*!	\brief Invoked, when a session has been removed.
-
-	The supplied object is already removed from the list and is going to be
-	deleted after the hook returns.
-
-	The list is locked, when this method is invoked.
-
-	\param session The concerned session.
-*/
-void
-BDiskDeviceList::SessionRemoved(BSession *session)
+BDiskDeviceList::PartitionChanged(BPartition *partition, uint32 event)
 {
 }
 
@@ -614,6 +569,40 @@ BDiskDeviceList::DeviceRemoved(BDiskDevice *device)
 {
 }
 
+// _StartWatching
+/*!	\brief Starts watching for disk device notifications.
+
+	The object must be locked (if possible at all), when this method is
+	invoked.
+
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BDiskDeviceList::_StartWatching()
+{
+	if (!Looper() || fSubscribed)
+		return B_BAD_VALUE;
+		
+	status_t error = BDiskDeviceRoster().StartWatching(BMessenger(this));
+	fSubscribed = (error == B_OK);
+	return error;
+}
+
+// _StopWatching
+/*!	\brief Stop watching for disk device notifications.
+
+	The object must be locked (if possible at all), when this method is
+	invoked.
+*/
+void
+BDiskDeviceList::_StopWatching()
+{
+	if (fSubscribed) {
+		BDiskDeviceRoster().StopWatching(BMessenger(this));
+		fSubscribed = false;
+	}
+}
+
 // _MountPointMoved
 /*!	\brief Handles a "mount point moved" message.
 	\param message The respective notification message.
@@ -653,72 +642,96 @@ BDiskDeviceList::_PartitionUnmounted(BMessage *message)
 	}
 }
 
-// _PartitionChanged
-/*!	\brief Handles a "partition changed" message.
+// _PartitionInitialized
+/*!	\brief Handles a "partition initialized" message.
 	\param message The respective notification message.
 */
 void
-BDiskDeviceList::_PartitionChanged(BMessage *message)
+BDiskDeviceList::_PartitionInitialized(BMessage *message)
 {
 	if (BDiskDevice *device = _UpdateDevice(message)) {
 		if (BPartition *partition = _FindPartition(message))
-			PartitionChanged(partition);
+			PartitionInitialized(partition);
 	}
 }
 
-// _PartitionAdded
-/*!	\brief Handles a "partition added" message.
+// _PartitionResized
+/*!	\brief Handles a "partition resized" message.
 	\param message The respective notification message.
 */
 void
-BDiskDeviceList::_PartitionAdded(BMessage *message)
+BDiskDeviceList::_PartitionResized(BMessage *message)
 {
 	if (BDiskDevice *device = _UpdateDevice(message)) {
 		if (BPartition *partition = _FindPartition(message))
-			PartitionAdded(partition);
+			PartitionResized(partition);
 	}
 }
 
-// _PartitionRemoved
-/*!	\brief Handles a "partition removed" message.
+// _PartitionMoved
+/*!	\brief Handles a "partition moved" message.
 	\param message The respective notification message.
 */
 void
-BDiskDeviceList::_PartitionRemoved(BMessage *message)
+BDiskDeviceList::_PartitionMoved(BMessage *message)
+{
+	if (BDiskDevice *device = _UpdateDevice(message)) {
+		if (BPartition *partition = _FindPartition(message))
+			PartitionMoved(partition);
+	}
+}
+
+// _PartitionCreated
+/*!	\brief Handles a "partition created" message.
+	\param message The respective notification message.
+*/
+void
+BDiskDeviceList::_PartitionCreated(BMessage *message)
+{
+	if (BDiskDevice *device = _UpdateDevice(message)) {
+		if (BPartition *partition = _FindPartition(message))
+			PartitionCreated(partition);
+	}
+}
+
+// _PartitionDeleted
+/*!	\brief Handles a "partition deleted" message.
+	\param message The respective notification message.
+*/
+void
+BDiskDeviceList::_PartitionDeleted(BMessage *message)
 {
 	if (BPartition *partition = _FindPartition(message)) {
-		partition->Session()->fPartitions.RemoveItem(partition, false);
-		if (_UpdateDevice(message) && !_FindPartition(message))
-			PartitionRemoved(partition);
-		delete partition;
+		partition_id id = partition->ID();
+		PartitionDeleted(partition, id);
+		if (_UpdateDevice(message))
+			PartitionDeleted(NULL, id);
 	}
 }
 
-// _SessionAdded
-/*!	\brief Handles a "session added" message.
+// _PartitionDefragmented
+/*!	\brief Handles a "partition defragmented" message.
 	\param message The respective notification message.
 */
 void
-BDiskDeviceList::_SessionAdded(BMessage *message)
+BDiskDeviceList::_PartitionDefragmented(BMessage *message)
 {
 	if (BDiskDevice *device = _UpdateDevice(message)) {
-		if (BSession *session = _FindSession(message))
-			SessionAdded(session);
+		if (BPartition *partition = _FindPartition(message))
+			PartitionDefragmented(partition);
 	}
 }
 
-// _SessionRemoved
-/*!	\brief Handles a "session removed" message.
+// _PartitionRepaired
+/*!	\brief Handles a "partition repaired" message.
 	\param message The respective notification message.
 */
 void
-BDiskDeviceList::_SessionRemoved(BMessage *message)
+BDiskDeviceList::_PartitionRepaired(BMessage *message)
 {
-	if (BSession *session = _FindSession(message)) {
-		session->Device()->fSessions.RemoveItem(session, false);
-		if (_UpdateDevice(message) && !_FindSession(message))
-			SessionRemoved(session);
-		delete session;
+	if (BDiskDevice *device = _UpdateDevice(message)) {
+		if (BPartition *partition = _FindPartition(message))
+			PartitionRepaired(partition);
 	}
 }
 
@@ -779,22 +792,6 @@ BDiskDeviceList::_FindDevice(BMessage *message)
 	if (message->FindInt32("device_id", &id) == B_OK)
 		device = DeviceWithID(id);
 	return device;
-}
-
-// _FindSession
-/*!	\brief Returns the session for the ID contained in a motification message.
-	\param message The notification message.
-	\return The session with the ID, or \c NULL, if the ID or the session could
-			not be found.
-*/
-BSession *
-BDiskDeviceList::_FindSession(BMessage *message)
-{
-	BSession *session = NULL;
-	int32 id;
-	if (message->FindInt32("session_id", &id) == B_OK)
-		session = SessionWithID(id);
-	return session;
 }
 
 // _FindPartition

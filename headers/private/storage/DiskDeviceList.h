@@ -11,6 +11,7 @@
 #include <ObjectList.h>
 
 class BDiskDevice;
+class BDiskDeviceRoster;
 class BPartition;
 class BSession;
 
@@ -33,11 +34,9 @@ public:
 
 	BDiskDevice *VisitEachDevice(BDiskDeviceVisitor *visitor);
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
-	bool Traverse(BDiskDeviceVisitor *visitor);
 
 	BPartition *VisitEachMountedPartition(BDiskDeviceVisitor *visitor);
 	BPartition *VisitEachMountablePartition(BDiskDeviceVisitor *visitor);
-	BPartition *VisitEachInitializablePartition(BDiskDeviceVisitor *visitor);
 
 	BDiskDevice *DeviceWithID(partition_id id) const;
 	BPartition *PartitionWithID(partition_id id) const;
@@ -45,17 +44,23 @@ public:
 	virtual void MountPointMoved(BPartition *partition);
 	virtual void PartitionMounted(BPartition *partition);
 	virtual void PartitionUnmounted(BPartition *partition);
+	virtual void PartitionInitialized(BPartition *partition);
 	virtual void PartitionResized(BPartition *partition);
 	virtual void PartitionMoved(BPartition *partition);
 	virtual void PartitionCreated(BPartition *partition);
-	virtual void PartitionDeleted(BPartition *partition);
+	virtual void PartitionDeleted(BPartition *partition,
+		partition_id partitionID);
 	virtual void PartitionDefragmented(BPartition *partition);
 	virtual void PartitionRepaired(BPartition *partition);
+	virtual void PartitionChanged(BPartition *partition, uint32 event);
 	virtual void MediaChanged(BDiskDevice *device);
 	virtual void DeviceAdded(BDiskDevice *device);
 	virtual void DeviceRemoved(BDiskDevice *device);
 
 private:
+	status_t _StartWatching();
+	void _StopWatching();
+
 	void _MountPointMoved(BMessage *message);
 	void _PartitionMounted(BMessage *message);
 	void _PartitionUnmounted(BMessage *message);
