@@ -4,6 +4,21 @@
 
 typedef struct
 {
+	uint32				regbase;
+	ich_bd *			bd[ICH_BD_COUNT];
+	void *				buffer[ICH_BD_COUNT];
+
+	area_id				bd_area;
+	area_id				buffer_area;
+
+	volatile int		lastindex;
+	volatile int64		processed_samples;
+
+} ichaudio_stream;
+
+
+typedef struct
+{
 	uint32	irq;
 	uint32	nambar;
 	uint32	nabmbar;
@@ -16,28 +31,13 @@ typedef struct
 	uint32 input_rate;
 	uint32 output_rate;
 	
-	stream_id	po_stream_id;
-	stream_id	pi_stream_id;
+	ichaudio_stream stream[2];
 
 	pci_module_info *	pci;
 	uint32				flags;
 
 } ichaudio_cookie;
 
-
-typedef struct
-{
-	uint32				regbase;
-	ich_bd *			bd[ICH_BD_COUNT];
-	void *				buffer[ICH_BD_COUNT];
-
-	area_id				bd_area;
-	area_id				buffer_area;
-
-	volatile int		lastindex;
-	volatile int64		processed_samples;
-
-} ichaudio_stream_cookie;
 
 
 #define TYPE_ICH4			0x01

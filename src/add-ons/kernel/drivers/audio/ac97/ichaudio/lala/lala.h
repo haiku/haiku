@@ -30,10 +30,9 @@ typedef struct
 	int32			subsystem_device;
 	const char *	name;
 	void *			param;
-} id_table_t;
+} pci_id_table_t;
 
 
-typedef int32 	stream_id;
 typedef int32 	control_id;
 
 
@@ -44,8 +43,8 @@ typedef status_t (*drv_detach)		(audio_drv_t *drv, void *cookie);
 
 typedef struct 
 {
-	id_table_t *	id_table;
 	const char *	basename;
+	pci_id_table_t *pci_id_table;
 
 	uint32			_reserved1[16];
 
@@ -65,12 +64,13 @@ typedef struct
 } stream_buffer_desc_t;
 
 
-typedef status_t (*stream_attach)			(audio_drv_t *drv, void **cookie, void *param);
-typedef status_t (*stream_detach)			(audio_drv_t *drv, void *cookie);
-typedef status_t (*stream_control)			(audio_drv_t *drv, void *cookie, int op);
-typedef status_t (*stream_process)			(audio_drv_t *drv, void *cookie, int buffer);
-typedef status_t (*stream_set_buffers)		(audio_drv_t *drv, void *cookie, uint32 *buffer_size, stream_buffer_desc_t *desc);
-typedef status_t (*stream_set_frame_rate)	(audio_drv_t *drv, void *cookie, uint32 *frame_rate);
+typedef status_t (*stream_attach)			(audio_drv_t *drv, void *cookie, int stream);
+typedef status_t (*stream_detach)			(audio_drv_t *drv, void *cookie, int stream);
+typedef status_t (*stream_control)			(audio_drv_t *drv, void *cookie, int stream, int op);
+typedef status_t (*stream_process)			(audio_drv_t *drv, void *cookie, int stream, int buffer);
+typedef status_t (*stream_set_buffers)		(audio_drv_t *drv, void *cookie, int stream, uint32 *buffer_size, stream_buffer_desc_t *desc);
+typedef status_t (*stream_set_frame_rate)	(audio_drv_t *drv, void *cookie, int stream, uint32 *frame_rate);
+
 
 enum {
 	B_RECORDING_STREAM			= 0x00000001,
@@ -128,10 +128,10 @@ typedef struct
 area_id		alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *name);
 area_id		map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name);
 
-stream_id	create_stream(stream_info_t *info, void *param);
-status_t	delete_stream(stream_id stream);
+status_t	create_stream(audio_drv_t *drv, int stream, stream_info_t *info);
+status_t	delete_stream(audio_drv_t *drv, int stream);
 
-void		report_stream_buffer_ready(stream_id stream, int buffer, bigtime_t end_time, int64 total_frames);
+void		report_stream_buffer_ready(audio_drv_t *drv, int stream, int buffer, bigtime_t end_time, int64 total_frames);
 
 control_id	create_control_group(control_id parent, audio_drv_t *dev);
 control_id	create_control(control_id parent, uint32 flags, void *get, void *set, const char *name);

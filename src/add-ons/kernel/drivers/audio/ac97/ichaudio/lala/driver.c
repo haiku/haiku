@@ -56,25 +56,25 @@ init_driver(void)
 //			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
 //			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base);
 			
-		for (devindex = 0; driver_info.id_table[devindex].vendor != 0; devindex++) {
-			if (driver_info.id_table[devindex].vendor != -1 && driver_info.id_table[devindex].vendor != pciinfo->vendor_id)
+		for (devindex = 0; driver_info.pci_id_table[devindex].vendor != 0; devindex++) {
+			if (driver_info.pci_id_table[devindex].vendor != -1 && driver_info.pci_id_table[devindex].vendor != pciinfo->vendor_id)
 				continue;
-			if (driver_info.id_table[devindex].device != -1 && driver_info.id_table[devindex].device != pciinfo->device_id)
+			if (driver_info.pci_id_table[devindex].device != -1 && driver_info.pci_id_table[devindex].device != pciinfo->device_id)
 				continue;
-			if (driver_info.id_table[devindex].revision != -1 && driver_info.id_table[devindex].revision != pciinfo->revision)
+			if (driver_info.pci_id_table[devindex].revision != -1 && driver_info.pci_id_table[devindex].revision != pciinfo->revision)
 				continue;
-			if (driver_info.id_table[devindex].class != -1 && driver_info.id_table[devindex].class != pciinfo->class_base)
+			if (driver_info.pci_id_table[devindex].class != -1 && driver_info.pci_id_table[devindex].class != pciinfo->class_base)
 				continue;
-			if (driver_info.id_table[devindex].subclass != -1 && driver_info.id_table[devindex].subclass != pciinfo->class_sub)
+			if (driver_info.pci_id_table[devindex].subclass != -1 && driver_info.pci_id_table[devindex].subclass != pciinfo->class_sub)
 				continue;
 			if (pciinfo->header_type == 0) {
-				if (driver_info.id_table[devindex].subsystem_vendor != -1 && driver_info.id_table[devindex].subsystem_vendor != pciinfo->u.h0.subsystem_vendor_id)
+				if (driver_info.pci_id_table[devindex].subsystem_vendor != -1 && driver_info.pci_id_table[devindex].subsystem_vendor != pciinfo->u.h0.subsystem_vendor_id)
 					continue;
-				if (driver_info.id_table[devindex].subsystem_device != -1 && driver_info.id_table[devindex].subsystem_device != pciinfo->u.h0.subsystem_id)
+				if (driver_info.pci_id_table[devindex].subsystem_device != -1 && driver_info.pci_id_table[devindex].subsystem_device != pciinfo->u.h0.subsystem_id)
 					continue;
 			}
 
-			dprintf("found device '%s'\n", driver_info.id_table[devindex].name);
+			dprintf("found device '%s'\n", driver_info.pci_id_table[devindex].name);
 			
 			drv_path[drv_count] = (char *) malloc(strlen(driver_info.basename) + 5);
 			sprintf(drv_path[drv_count], "%s/%d", driver_info.basename, drv_count + 1);
@@ -84,8 +84,8 @@ init_driver(void)
 			drv_data[drv_count]->bus		= pciinfo->bus;
 			drv_data[drv_count]->device		= pciinfo->device;
 			drv_data[drv_count]->function	= pciinfo->function;
-			drv_data[drv_count]->name		= driver_info.id_table[devindex].name;
-			drv_data[drv_count]->param		= driver_info.id_table[devindex].param;
+			drv_data[drv_count]->name		= driver_info.pci_id_table[devindex].name;
+			drv_data[drv_count]->param		= driver_info.pci_id_table[devindex].param;
 			drv_open_count[drv_count]		= 0;
 
 			drv_count++;
@@ -114,7 +114,7 @@ uninit_driver(void)
 }
 
 static status_t
-ich_open(const char *name, uint32 flags, void** cookie)
+driver_open(const char *name, uint32 flags, void** cookie)
 {
 	int index;
 	status_t res;
@@ -145,14 +145,14 @@ ich_open(const char *name, uint32 flags, void** cookie)
 }
 
 static status_t
-ich_close(void* cookie)
+driver_close(void* cookie)
 {
 	dprintf("close\n");
 	return B_OK;
 }
 
 static status_t
-ich_free(void* cookie)
+driver_free(void* cookie)
 {
 	int index;
 	status_t res;
@@ -176,32 +176,32 @@ ich_free(void* cookie)
 }
 
 static status_t
-ich_control(void* cookie, uint32 op, void* arg, size_t len)
+driver_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	return B_OK;
 }
 
 static status_t
-ich_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
+driver_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	*num_bytes = 0;
 	return B_IO_ERROR;
 }
 
 static status_t
-ich_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+driver_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	*num_bytes = 0;
 	return B_IO_ERROR;
 }
 
-device_hooks ich_hooks = {
-	ich_open,
-	ich_close,
-	ich_free,
-	ich_control,
-	ich_read,
-	ich_write
+device_hooks driver_hooks = {
+	driver_open,
+	driver_close,
+	driver_free,
+	driver_control,
+	driver_read,
+	driver_write
 };
 
 const char **
@@ -215,6 +215,6 @@ device_hooks*
 find_device(const char* name)
 {
 	dprintf("find_device\n");
-	return &ich_hooks;
+	return &driver_hooks;
 }
 
