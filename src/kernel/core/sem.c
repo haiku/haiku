@@ -55,7 +55,9 @@ struct sem_timeout_args {
 	int sem_count;
 };
 
-static int dump_sem_list(int argc, char **argv)
+
+static int
+dump_sem_list(int argc, char **argv)
 {
 	int i;
 
@@ -66,7 +68,9 @@ static int dump_sem_list(int argc, char **argv)
 	return 0;
 }
 
-static void _dump_sem_info(struct sem_entry *sem)
+
+static void
+_dump_sem_info(struct sem_entry *sem)
 {
 	dprintf("SEM:   %p\n", sem);
 	dprintf("name:  '%s'\n", sem->name);
@@ -75,7 +79,9 @@ static void _dump_sem_info(struct sem_entry *sem)
 	dprintf("queue: head %p tail %p\n", sem->q.head, sem->q.tail);
 }
 
-static int dump_sem_info(int argc, char **argv)
+
+static int
+dump_sem_info(int argc, char **argv)
 {
 	int i;
 
@@ -112,9 +118,12 @@ static int dump_sem_info(int argc, char **argv)
 				return 0;
 			}
 	}
+	return 0;
 }
 
-int sem_init(kernel_args *ka)
+
+int
+sem_init(kernel_args *ka)
 {
 	int i;
 
