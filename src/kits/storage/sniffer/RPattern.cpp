@@ -23,15 +23,12 @@ RPattern::RPattern(Range range, Pattern *pattern)
 
 status_t
 RPattern::InitCheck() const {
-	if (fRange.InitCheck() != B_OK)
-		return fRange.InitCheck();
-	else if (fPattern) {
-		if (fPattern->InitCheck() != B_OK)
-			return fPattern->InitCheck();
-		else
-			return B_OK;
-	} else
-		return B_BAD_VALUE;
+	status_t err = fRange.InitCheck();
+	if (!err)
+		err = fPattern ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = fPattern->InitCheck();
+	return err;
 }
 
 Err*
@@ -60,5 +57,18 @@ RPattern::Sniff(BPositionIO *data, bool caseInsensitive) const {
 		return fPattern->Sniff(fRange, data, caseInsensitive);
 }
 
+/*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
+	code if something goes wrong.
+*/
+ssize_t
+RPattern::BytesNeeded() const
+{
+	ssize_t result = InitCheck();
+	if (result == B_OK)
+		result = fPattern->BytesNeeded();
+	if (result >= 0)
+		result += fRange.End();
+	return result;	
+}
 
 

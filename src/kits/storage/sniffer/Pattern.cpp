@@ -94,8 +94,21 @@ Pattern::Sniff(Range range, BPositionIO *data, bool caseInsensitive) const {
 	return false;
 }
 
-// Assumes the BPositionIO object is in the correct
-// position from which to sniff
+// BytesNeeded
+/*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
+	code if something goes wrong.
+*/
+ssize_t
+Pattern::BytesNeeded() const
+{
+	ssize_t result = InitCheck();
+	if (result == B_OK)
+		result = fString.length();
+	return result;
+}
+
+//#define OPTIMIZATION_IS_FOR_CHUMPS
+#if OPTIMIZATION_IS_FOR_CHUMPS
 bool
 Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const {
 	off_t len = fString.length();
@@ -140,6 +153,52 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 	} else
 		return false;
 }
+#else
+bool
+Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const {
+	off_t len = fString.length();
+	char *buffer = new(nothrow) char[len+1];
+	if (buffer) {
+		ssize_t bytesRead = data->ReadAt(start, buffer, len);
+		// \todo If there are fewer bytes left in the data stream
+		// from the given position than the length of our data
+		// string, should we just return false (which is what we're
+		// doing now), or should we compare as many bytes as we
+		// can and return true if those match?
+		if (bytesRead < len)
+			return false;
+		else {
+			bool result = true;
+			if (caseInsensitive) {
+				for (int i = 0; i < len; i++) {
+					char secondChar;
+					if ('A' <= fString[i] && fString[i] <= 'Z')
+						secondChar = 'a' + (fString[i] - 'A');	// Also check lowercase
+					else if ('a' <= fString[i] && fString[i] <= 'z')
+						secondChar = 'A' + (fString[i] - 'a');	// Also check uppercase
+					else
+						secondChar = fString[i]; // Check the same char twice as punishment for doing a case insensitive search ;-)
+					if (((fString[i] & fMask[i]) != (buffer[i] & fMask[i]))
+					     && ((secondChar & fMask[i]) != (buffer[i] & fMask[i])))
+					{
+						result = false;
+						break;
+					}
+				}
+			} else {
+				for (int i = 0; i < len; i++) {
+					if ((fString[i] & fMask[i]) != (buffer[i] & fMask[i])) {
+						result = false;
+						break;
+					}
+				}
+			}
+			return result;
+		}	
+	} else
+		return false;
+}
+#endif
 
 void
 Pattern::SetStatus(status_t status, const char *msg) {

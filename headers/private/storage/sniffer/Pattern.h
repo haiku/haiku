@@ -33,6 +33,7 @@ public:
 	Err* GetErr() const;
 	
 	bool Sniff(Range range, BPositionIO *data, bool caseInsensitive) const;
+	ssize_t BytesNeeded() const;
 	
 	status_t SetTo(const std::string &string, const std::string &mask);
 private:

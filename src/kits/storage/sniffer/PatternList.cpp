@@ -56,6 +56,41 @@ PatternList::Sniff(BPositionIO *data) const {
 	}
 }
 	
+/*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
+	code if something goes wrong.
+*/
+ssize_t
+PatternList::BytesNeeded() const
+{
+	ssize_t result = InitCheck();
+
+	// Find the number of bytes needed to sniff any of our
+	// patterns from a single location in a data stream
+	if (result == B_OK) {
+		result = 0;	// I realize it already *is* zero if it == B_OK, but just in case that changes...	
+		std::vector<Pattern*>::const_iterator i;
+		for (i = fList.begin(); i != fList.end(); i++) {
+			if (*i) {
+				ssize_t bytes = (*i)->BytesNeeded();
+				if (bytes >= 0) {
+					if (bytes > result)
+						result = bytes;
+				} else {
+					result = bytes;
+					break;
+				}
+			}
+		}
+	}
+
+	// Now add on the number of bytes needed to get to the
+	// furthest allowed starting point
+	if (result >= 0)
+		result += fRange.End();
+
+	return result;	
+}
+
 void
 PatternList::Add(Pattern *pattern) {
 	if (pattern)

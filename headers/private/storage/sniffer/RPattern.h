@@ -30,6 +30,7 @@ public:
 	Err* GetErr() const;
 	
 	bool Sniff(BPositionIO *data, bool caseInsensitive) const;
+	ssize_t BytesNeeded() const;
 private:
 	Range fRange;
 	Pattern *fPattern;

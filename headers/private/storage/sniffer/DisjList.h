@@ -9,6 +9,8 @@
 #ifndef _SNIFFER_DISJ_LIST_H
 #define _SNIFFER_DISJ_LIST_H
 
+#include <sys/types.h>
+
 class BPositionIO;
 
 namespace BPrivate {
@@ -20,7 +22,9 @@ class DisjList {
 public:
 	DisjList();
 	virtual ~DisjList();
+
 	virtual bool Sniff(BPositionIO *data) const = 0;
+	virtual ssize_t BytesNeeded() const = 0;
 	
 	void SetCaseInsensitive(bool how);
 	bool IsCaseInsensitive();

@@ -55,6 +55,34 @@ RPatternList::Sniff(BPositionIO *data) const {
 		return result;
 	}
 }
+
+/*! \brief Returns the number of bytes needed to perform a complete sniff, or an error
+	code if something goes wrong.
+*/
+ssize_t
+RPatternList::BytesNeeded() const
+{
+	ssize_t result = InitCheck();
+	
+	// Tally up the BytesNeeded() values for all the RPatterns and return the largest.
+	if (result == B_OK) {
+		result = 0; // Just to be safe...
+		std::vector<RPattern*>::const_iterator i;
+		for (i = fList.begin(); i != fList.end(); i++) {
+			if (*i) {
+				ssize_t bytes = (*i)->BytesNeeded();
+				if (bytes >= 0) {
+					if (bytes > result)
+						result = bytes;
+				} else {
+					result = bytes;
+					break;
+				}
+			}
+		}
+	}	
+	return result;
+}
 	
 void
 RPatternList::Add(RPattern *rpattern) {

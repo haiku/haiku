@@ -31,6 +31,7 @@ public:
 	Err* GetErr() const;
 	
 	virtual bool Sniff(BPositionIO *data) const;
+	virtual ssize_t BytesNeeded() const;
 	void Add(RPattern *rpattern);
 private:
 	std::vector<RPattern*> fList;

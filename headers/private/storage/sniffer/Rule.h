@@ -10,6 +10,8 @@
 #define _SNIFFER_RULE_H
 
 #include <SupportDefs.h>
+
+#include <sys/types.h>
 #include <vector>
 
 class BPositionIO;
@@ -28,10 +30,10 @@ public:
 	Rule();
 	~Rule();
 	
-	status_t InitCheck() const;
-	
+	status_t InitCheck() const;	
 	double Priority() const;	
 	bool Sniff(BPositionIO *data) const;	
+	ssize_t BytesNeeded() const;
 private:
 	friend class Parser;
 

@@ -11,9 +11,13 @@
 #include <sniffer/DisjList.h>
 #include <sniffer/Rule.h>
 #include <DataIO.h>
+#include <stdio.h>
 
 using namespace BPrivate::Storage::Sniffer;
 
+/*! \brief Creates an unitialized Sniffer::Rule object. To initialize it, you
+	must pass a pointer to the object to Sniffer::parse().
+*/
 Rule::Rule()
 	: fPriority(0.0)
 	, fConjList(NULL)
@@ -50,6 +54,35 @@ Rule::Sniff(BPositionIO *data) const {
 		return result;
 	}
 }
+
+/*! \brief Returns the number of bytes needed for this rule to perform a complete sniff,
+	or an error code if something goes wrong.
+*/
+ssize_t
+Rule::BytesNeeded() const
+{
+	ssize_t result = InitCheck();
+	
+	// Tally up the BytesNeeded() values for all the DisjLists and return the largest.
+	if (result == B_OK) {
+		result = 0; // Just to be safe...
+		std::vector<DisjList*>::const_iterator i;
+		for (i = fConjList->begin(); i != fConjList->end(); i++) {
+			if (*i) {
+				ssize_t bytes = (*i)->BytesNeeded();
+				if (bytes >= 0) {
+					if (bytes > result)
+						result = bytes;
+				} else {
+					result = bytes;
+					break;
+				}
+			}
+		}
+	}	
+	return result;
+}
+
 
 void
 Rule::Unset() {
