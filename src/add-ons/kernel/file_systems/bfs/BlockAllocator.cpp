@@ -328,7 +328,7 @@ BlockAllocator::~BlockAllocator()
 
 
 status_t 
-BlockAllocator::Initialize()
+BlockAllocator::Initialize(bool full)
 {
 	if (fLock.InitCheck() < B_OK)
 		return B_ERROR;
@@ -339,12 +339,61 @@ BlockAllocator::Initialize()
 	if (fGroups == NULL)
 		return B_NO_MEMORY;
 
+	if (!full)
+		return B_OK;
+
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::initialize,
-		"bfs block allocator", B_LOW_PRIORITY, (void *)this);
+			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
 	if (id < B_OK)
 		return initialize(this);
 
 	return resume_thread(id);
+}
+
+
+status_t 
+BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
+{
+	status_t status = Initialize(false);
+	if (status < B_OK)
+		return status;
+
+	uint32 blocks = fBlocksPerGroup;
+	uint32 numBits = 8 * blocks * fVolume->BlockSize();
+
+	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
+	if (buffer == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	memset(buffer, 0, numBits >> 3);
+
+	off_t offset = 1;
+
+	// initialize the AllocationGroup objects and clear the on-disk bitmap
+
+	for (int32 i = 0; i < fNumGroups; i++) {
+		if (cached_write(fVolume->Device(), offset, buffer, blocks, fVolume->BlockSize()) < B_OK)
+			return B_ERROR;
+
+		// the last allocation group may contain less blocks than the others
+		fGroups[i].fNumBits = i == fNumGroups - 1 ? fVolume->NumBlocks() - i * numBits : numBits;
+		fGroups[i].fStart = offset;
+		fGroups[i].fFirstFree = fGroups[i].fLargestFirst = 0;
+		fGroups[i].fFreeBits = fGroups[i].fLargest = fGroups[i].fNumBits;
+
+		offset += blocks;
+	}
+	free(buffer);
+
+	// reserve the boot block, the log area, and the block bitmap itself
+	uint32 reservedBlocks = fVolume->Log().Start() + fVolume->Log().Length();
+
+	if (fGroups[0].Allocate(&transaction, 0, reservedBlocks) < B_OK) {
+		FATAL(("could not allocate reserved space for block bitmap/log!\n"));
+		return B_ERROR;
+	}
+
+	return B_OK;
 }
 
 
@@ -371,7 +420,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 			break;
 
 		// the last allocation group may contain less blocks than the others
-		groups[i].fNumBits = i == num - 1 ? allocator->fVolume->NumBlocks() - i * numBits : numBits;
+		groups[i].fNumBits = i == num - 1 ? volume->NumBlocks() - i * numBits : numBits;
 		groups[i].fStart = offset;
 
 		// finds all free ranges in this allocation group
@@ -534,7 +583,7 @@ BlockAllocator::AllocateForInode(Transaction *transaction, const block_run *pare
 	// apply some allocation policies here (AllocateBlocks() will break them
 	// if necessary) - we will start with those described in Dominic Giampaolo's
 	// "Practical File System Design", and see how good they work
-	
+
 	// files are going in the same allocation group as its parent, sub-directories
 	// will be inserted 8 allocation groups after the one of the parent
 	uint16 group = parent->AllocationGroup();
@@ -641,6 +690,13 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 }
 
 
+size_t 
+BlockAllocator::BitmapSize() const
+{
+	return fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+}
+
+
 //	#pragma mark -
 //	Functions to check the validity of the bitmap - they are used from
 //	the "chkbfs" command
@@ -669,7 +725,7 @@ BlockAllocator::StartChecking(check_control *control)
 	if (status < B_OK)
 		return status;
 
-	size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+	size_t size = BitmapSize();
 	fCheckBitmap = (uint32 *)malloc(size);
 	if (fCheckBitmap == NULL) {
 		fLock.Unlock();
@@ -942,7 +998,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 bool
 BlockAllocator::CheckBitmapIsUsedAt(off_t block) const
 {
-	size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+	size_t size = BitmapSize();
 	uint32 index = block / 32;	// 32bit resolution
 	if (index > size / 4)
 		return false;
@@ -954,7 +1010,7 @@ BlockAllocator::CheckBitmapIsUsedAt(off_t block) const
 void
 BlockAllocator::SetCheckBitmapAt(off_t block)
 {
-	size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+	size_t size = BitmapSize();
 	uint32 index = block / 32;	// 32bit resolution
 	if (index > size / 4)
 		return;

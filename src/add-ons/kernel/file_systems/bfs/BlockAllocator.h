@@ -25,7 +25,8 @@ class BlockAllocator {
 		BlockAllocator(Volume *volume);
 		~BlockAllocator();
 
-		status_t Initialize();
+		status_t Initialize(bool full = true);
+		status_t InitializeAndClearBitmap(Transaction &transaction);
 
 		status_t AllocateForInode(Transaction *transaction, const block_run *parent,
 					mode_t type, block_run &run);
@@ -43,6 +44,8 @@ class BlockAllocator {
 		status_t CheckBlockRun(block_run run, const char *type = NULL, check_control *control = NULL);
 		status_t CheckInode(Inode *inode, check_control *control = NULL);
 
+		size_t BitmapSize() const;
+
 	private:
 		bool IsValidCheckControl(check_control *control);
 		bool CheckBitmapIsUsedAt(off_t block) const;
@@ -55,6 +58,7 @@ class BlockAllocator {
 		AllocationGroup	*fGroups;
 		int32			fNumGroups;
 		uint32			fBlocksPerGroup;
+
 		uint32			*fCheckBitmap;
 		check_cookie	*fCheckCookie;
 };
