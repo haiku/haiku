@@ -16,6 +16,15 @@
 #include "RPartition.h"
 #include "RSession.h"
 
+// print_time
+void
+print_time(const char *format, bigtime_t &time)
+{
+	bigtime_t lastTime = time;
+	time = system_time();
+	printf("%lld: %s took: %lld us\n", time, format, time - lastTime);
+}
+
 // priorities of the different message kinds
 enum {
 	REQUEST_PRIORITY			= 0,
@@ -81,10 +90,15 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 		case B_REG_NEXT_DISK_DEVICE:
 		case B_REG_GET_DISK_DEVICE:
 		case B_REG_UPDATE_DISK_DEVICE:
+{
+bigtime_t time = system_time();
+print_time("getting message", time);
 			DetachCurrentMessage();
 			if (!_PushMessage(message, REQUEST_PRIORITY))
 				delete message;
+print_time("pushing message into priority queue", time);
 			break;
+}
 		case B_REG_DEVICE_START_WATCHING:
 		case B_REG_DEVICE_STOP_WATCHING:
 			DetachCurrentMessage();
@@ -141,8 +155,10 @@ DiskDeviceManager::_NextDiskDeviceRequest(BMessage *request)
 void
 DiskDeviceManager::_GetDiskDeviceRequest(BMessage *request)
 {
+bigtime_t time = system_time();
 	Lock();
-	status_t error = B_ENTRY_NOT_FOUND;
+print_time("locking", time);
+	status_t error = B_OK;
 	// get the device
 	RDiskDevice *device = NULL;
 	int32 id = 0;
@@ -156,6 +172,7 @@ DiskDeviceManager::_GetDiskDeviceRequest(BMessage *request)
 			device = partition->Device();
 	} else
 		error = B_BAD_VALUE;
+print_time("finding device", time);
 	// archive device and add it to the reply message
 	BMessage reply(B_REG_RESULT);
 	if (device) {
@@ -163,11 +180,15 @@ DiskDeviceManager::_GetDiskDeviceRequest(BMessage *request)
 		error = device->Archive(&deviceArchive);
 		if (error == B_OK)
 			error = reply.AddMessage("device", &deviceArchive);
-	}
+	} else	// requested object not found
+		error = B_ENTRY_NOT_FOUND;
+print_time("archiving device", time);
 	// add result and send reply
 	reply.AddInt32("result", error);
 	request->SendReply(&reply);
+print_time("sending reply", time);
 	Unlock();
+print_time("unlocking", time);
 }
 
 // _UpdateDiskDeviceRequest
@@ -175,7 +196,7 @@ void
 DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *request)
 {
 	Lock();
-	status_t error = B_ENTRY_NOT_FOUND;
+	status_t error = B_OK;
 	// get the device and check the object is up to date
 	bool upToDate = false;
 	RDiskDevice *device = NULL;
@@ -190,6 +211,8 @@ DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *request)
 		device = fDeviceList.DeviceWithID(id);
 		if (device)
 			upToDate = (device->ChangeCounter() == changeCounter);
+PRINT(("DiskDeviceManager::_UpdateDiskDeviceRequest(): device id: %ld, "
+"device: %p\n", id, device));
 	} else if (request->FindInt32("session_id", &id) == B_OK) {
 		if (RSession *session = fDeviceList.SessionWithID(id)) {
 			device = session->Device();
@@ -213,7 +236,8 @@ DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *request)
 			if (error == B_OK)
 				error = reply.AddMessage("device", &deviceArchive);
 		}
-	}
+	} else	// requested object not found
+		error = B_ENTRY_NOT_FOUND;
 	// add result and send reply
 	if (error == B_OK)
 		error = reply.AddBool("up_to_date", upToDate);

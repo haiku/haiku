@@ -18,6 +18,7 @@ class RDiskDeviceList;
 class RPartition;
 class RSession;
 
+#include "Debug.h"
 class RDiskDevice {
 public:
 	RDiskDevice();
@@ -36,7 +37,8 @@ public:
 
 	int32 ID() const { return fID; }
 	int32 ChangeCounter() const { return fChangeCounter.Count(); }
-	void Changed() { fChangeCounter.Increment(); }
+//	void Changed() { fChangeCounter.Increment(); }
+void Changed() { if (fChangeCounter.Increment()) PRINT(("RDiskDevice::Changed()\n")); }
 
 	void SetTouched(bool touched) { fTouched = touched; }
 	bool Touched() const { return fTouched; }

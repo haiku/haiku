@@ -16,7 +16,7 @@ public:
 	int32 Count() const { return fCount; }
 
 	bool Lock() { fLocked++; return true; }
-	void Unlock() { if (fLocked > 0) fLocked--; }
+	void Unlock() { if (fLocked > 0 && --fLocked == 0) fChanged = false; }
 	bool IsLocked() const { return (fLocked > 0); }
 
 	bool Increment()
