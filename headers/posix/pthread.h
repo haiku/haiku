@@ -1,8 +1,8 @@
+/* 
+** Distributed under the terms of the Haiku License.
+*/
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <time.h>
@@ -28,6 +28,10 @@ typedef struct _pthread_mutex *pthread_mutex_t;
 typedef struct _pthread_mutexattr *pthread_mutexattr_t;
 
 //extern pthread_mutexattr_t pthread_mutexattr_default;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern pthread_mutex_t _pthread_mutex_static_initializer(void);
 extern pthread_mutex_t _pthread_recursive_mutex_static_initializer(void);
@@ -58,5 +62,12 @@ extern int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *mutexAttr, int 
 extern int pthread_mutexattr_setprotocol(pthread_mutexattr_t *mutexAttr, int protocol);
 extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *mutexAttr, int processShared);
 extern int pthread_mutexattr_settype(pthread_mutexattr_t *mutexAttr, int type);
+
+/* misc. functions */
+extern int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _PTHREAD_ */
