@@ -107,6 +107,7 @@
 # include "variable.h"
 # include "compile.h"
 # include "builtins.h"
+# include "jcache.h"
 # include "rules.h"
 # include "newstr.h"
 # include "scan.h"
@@ -316,12 +317,19 @@ main( int argc, char **argv, char **arg_environ )
 	load_builtins();
 
 	/* Parse ruleset */
+#ifdef OPT_JAMFILE_CACHE_EXT
+	jcache_init();
+#endif
 
 	for( n = 0; s = getoptval( optv, 'f', n ); n++ )
 	    parse_file( s );
 
 	if( !n )
 	    parse_file( "+" );
+
+#ifdef OPT_JAMFILE_CACHE_EXT
+	jcache_done();
+#endif
 
 	status = yyanyerrors();
 

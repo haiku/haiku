@@ -8,6 +8,7 @@
 # include "lists.h"
 # include "parse.h"
 # include "scan.h"
+# include "jcache.h"
 # include "jamgram.h"
 # include "jambase.h"
 # include "newstr.h"
@@ -138,6 +139,30 @@ yyline()
 
 	/* If necessary, open the file */
 
+#ifdef OPT_JAMFILE_CACHE_EXT
+	if( !i->file )
+	{
+		if ( strcmp( i->fname, "-" ) )
+		{
+			i->strings = jcache(i->fname);
+			if (!i->strings || !*i->strings)
+				goto next;
+			i->line++;
+			i->string = *(i->strings++);
+			return *i->string++;
+		}
+		else
+		{
+			i->file = stdin;
+			if( fgets( i->buf, sizeof( i->buf ), i->file ) )
+			{
+			    i->line++;
+			    i->string = i->buf;
+			    return *i->string++;
+			}
+		}
+	}
+#else
 	if( !i->file )
 	{
 	    FILE *f = stdin;
@@ -156,6 +181,7 @@ yyline()
 	    i->string = i->buf;
 	    return *i->string++;
 	}
+#endif
 
     next:
 	/* This include is done.  */
