@@ -1,31 +1,70 @@
 /* NM registers definitions and macros for access to */
 
-//old:
 /* PCI_config_space */
-#define NMCFG_DEVID        0x00
-#define NMCFG_DEVCTRL      0x04
-#define NMCFG_CLASS        0x08
-#define NMCFG_HEADER       0x0c
-#define NMCFG_NMBASE2     0x10
-#define NMCFG_NMBASE1     0x14
-#define NMCFG_NMBASE3     0x18 // >= MYST
-#define NMCFG_SUBSYSIDR    0x2c // >= MYST
-#define NMCFG_ROMBASE      0x30
-#define NMCFG_CAP_PTR      0x34 // >= MIL2
-#define NMCFG_INTCTRL      0x3c
-#define NMCFG_OPTION       0x40
-#define NMCFG_NM_INDEX    0x44
-#define NMCFG_NM_DATA     0x48
-#define NMCFG_SUBSYSIDW    0x4c // >= MYST
-#define NMCFG_OPTION2      0x50 // >= G100
-#define NMCFG_OPTION3      0x54 // >= G400
-#define NMCFG_OPTION4      0x58 // >= G450
-#define NMCFG_PM_IDENT     0xdc // >= G100
-#define NMCFG_PM_CSR       0xe0 // >= G100
-#define NMCFG_AGP_IDENT    0xf0 // >= MIL2
-#define NMCFG_AGP_STS      0xf4 // >= MIL2
-#define NMCFG_AGP_CMD      0xf8 // >= MIL2
-//end old.
+#define NMCFG_DEVID		0x00
+#define NMCFG_DEVCTRL	0x04
+#define NMCFG_CLASS		0x08
+#define NMCFG_HEADER	0x0c
+#define NMCFG_BASE1FB	0x10
+#define NMCFG_BASE2REG1	0x14
+#define NMCFG_BASE3REG2	0x18
+#define NMCFG_BASE4		0x1c //unknown if used
+#define NMCFG_BASE5		0x20 //unknown if used
+#define NMCFG_BASE6		0x24 //unknown if used
+#define NMCFG_BASE7		0x28 //unknown if used
+#define NMCFG_SUBSYSID1	0x2c
+#define NMCFG_ROMBASE	0x30
+#define NMCFG_CAPPTR	0x34
+#define NMCFG_CFG_1		0x38 //unknown if used
+#define NMCFG_INTERRUPT	0x3c
+#define NMCFG_CFG_3		0x40 //unknown if used
+#define NMCFG_CFG_4		0x44 //unknown if used
+#define NMCFG_CFG_5		0x48 //unknown if used
+#define NMCFG_CFG_6		0x4c //unknown if used
+#define NMCFG_CFG_7		0x50 //unknown if used
+#define NMCFG_CFG_8		0x54 //unknown if used
+#define NMCFG_CFG_9		0x58 //unknown if used
+#define NMCFG_CFG_10	0x5c //unknown if used
+#define NMCFG_CFG_11	0x60 //unknown if used
+#define NMCFG_CFG_12	0x64 //unknown if used
+#define NMCFG_CFG_13	0x68 //unknown if used
+#define NMCFG_CFG_14	0x6c //unknown if used
+#define NMCFG_CFG_15	0x70 //unknown if used
+#define NMCFG_CFG_16	0x74 //unknown if used
+#define NMCFG_CFG_17	0x78 //unknown if used
+#define NMCFG_CFG_18	0x7c //unknown if used
+#define NMCFG_CFG_19	0x80 //unknown if used
+#define NMCFG_CFG_20	0x84 //unknown if used
+#define NMCFG_CFG_21	0x88 //unknown if used
+#define NMCFG_CFG_22	0x8c //unknown if used
+#define NMCFG_CFG_23	0x90 //unknown if used
+#define NMCFG_CFG_24	0x94 //unknown if used
+#define NMCFG_CFG_25	0x98 //unknown if used
+#define NMCFG_CFG_26	0x9c //unknown if used
+#define NMCFG_CFG_27	0xa0 //unknown if used
+#define NMCFG_CFG_28	0xa4 //unknown if used
+#define NMCFG_CFG_29	0xa8 //unknown if used
+#define NMCFG_CFG_30	0xac //unknown if used
+#define NMCFG_CFG_31	0xb0 //unknown if used
+#define NMCFG_CFG_32	0xb4 //unknown if used
+#define NMCFG_CFG_33	0xb8 //unknown if used
+#define NMCFG_CFG_34	0xbc //unknown if used
+#define NMCFG_CFG_35	0xc0 //unknown if used
+#define NMCFG_CFG_36	0xc4 //unknown if used
+#define NMCFG_CFG_37	0xc8 //unknown if used
+#define NMCFG_CFG_38	0xcc //unknown if used
+#define NMCFG_CFG_39	0xd0 //unknown if used
+#define NMCFG_CFG_40	0xd4 //unknown if used
+#define NMCFG_CFG_41	0xd8 //unknown if used
+#define NMCFG_CFG_42	0xdc //unknown if used
+#define NMCFG_CFG_43	0xe0 //unknown if used
+#define NMCFG_CFG_44	0xe4 //unknown if used
+#define NMCFG_CFG_45	0xe8 //unknown if used
+#define NMCFG_CFG_46	0xec //unknown if used
+#define NMCFG_CFG_47	0xf0 //unknown if used
+#define NMCFG_CFG_48	0xf4 //unknown if used
+#define NMCFG_CFG_49	0xf8 //unknown if used
+#define NMCFG_CFG_50	0xfc //unknown if used
 
 /* neomagic ISA direct registers */
 /* VGA standard registers: */
