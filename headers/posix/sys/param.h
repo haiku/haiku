@@ -1,5 +1,8 @@
 #ifndef _SYS_PARAM_H
 #define _SYS_PARAM_H
+/* 
+** Distributed under the terms of the OpenBeOS License.
+*/
 
 #include <limits.h>
 

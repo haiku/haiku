@@ -1,15 +1,10 @@
-/**
- * @file dirent.h
- * @brief File Control functions and definitions
- */
-
 #ifndef _DIRENT_H
 #define	_DIRENT_H
+/* 
+** Distributed under the terms of the OpenBeOS License.
+*/
 
-// ToDo: should really be <sys/types>
-// This file should reside in headers/posix, not here...
-// needs ino_t (int64), and dev_t (long)
-#include <ktypes.h>
+#include <sys/types.h>
 
 
 typedef struct dirent {

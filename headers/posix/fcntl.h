@@ -1,8 +1,10 @@
 #ifndef _FCNTL_H
 #define _FCNTL_H
+/* 
+** Distributed under the terms of the OpenBeOS License.
+*/
 
-//#include <sys/types.h>  /* for mode_t */
-#include <ktypes.h>	/* ToDo: remove me */
+#include <sys/types.h>
 #include <sys/stat.h>
 
 /* commands that can be passed to fcntl */
