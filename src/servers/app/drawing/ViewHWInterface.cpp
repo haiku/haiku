@@ -51,6 +51,45 @@ enum {
 	MSG_UPDATE = 'updt',
 };
 
+// string_for_color_space
+const char*
+string_for_color_space(color_space format)
+{
+	const char* name = "<unkown format>";
+	switch (format) {
+		case B_RGB32:
+			name = "B_RGB32";
+			break;
+		case B_RGBA32:
+			name = "B_RGBA32";
+			break;
+		case B_RGB32_BIG:
+			name = "B_RGB32_BIG";
+			break;
+		case B_RGBA32_BIG:
+			name = "B_RGBA32_BIG";
+			break;
+		case B_RGB24:
+			name = "B_RGB24";
+			break;
+		case B_RGB24_BIG:
+			name = "B_RGB24_BIG";
+			break;
+		case B_CMAP8:
+			name = "B_CMAP8";
+			break;
+		case B_GRAY8:
+			name = "B_GRAY8";
+			break;
+		case B_GRAY1:
+			name = "B_GRAY1";
+			break;
+		default:
+			break;
+	}
+	return name;
+}
+
 class CardView : public BView {
  public:
 								CardView(BRect bounds);
@@ -365,7 +404,8 @@ ViewHWInterface::SetMode(const display_mode &mode)
 {
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fDisplayMode.virtual_width == mode.virtual_width &&
+	if (fBackBuffer && fFrontBuffer &&
+		fDisplayMode.virtual_width == mode.virtual_width &&
 		fDisplayMode.virtual_height == mode.virtual_height &&
 		fDisplayMode.space == mode.space) {
 		return ret;
@@ -377,6 +417,8 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	fDisplayMode.virtual_width = mode.virtual_width;
 	fDisplayMode.virtual_height = mode.virtual_height;
 	fDisplayMode.space = mode.space;
+
+printf("ViewHWInterface::SetMode(%s)\n", string_for_color_space((color_space)fDisplayMode.space));
 
 // left over code
 //	hide_cursor=0;
@@ -403,7 +445,10 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		delete fBackBuffer;
 		delete fFrontBuffer;
 
-		BBitmap* backBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
+		// NOTE: backbuffer is always B_RGBA32, this simplifies the
+		// drawing backend implementation tremendously for the time
+		// being. The color space conversion is handled in CopyBackToFront()
+		BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
 		BBitmap* frontBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
 
 		fBackBuffer = new BitmapBuffer(backBitmap);
@@ -646,6 +691,148 @@ ViewHWInterface::CopyBackToFront(const BRect& frame)
 		int32 y = (int32)floorf(area.top);
 		int32 right = (int32)ceilf(area.right);
 		int32 bottom = (int32)ceilf(area.bottom);
+
+		// offset to left top pixel in source buffer (always B_RGBA32)
+		src += y * srcBPR + x * 4;
+
+		// transfer, handle colorspace conversion
+		switch (into->ColorSpace()) {
+			case B_RGB32:
+			case B_RGBA32: {
+				int32 bytes = (right - x + 1) * 4;
+		
+				if (bytes > 0) {
+					// offset to left top pixel in dest buffer
+					dst += y * dstBPR + x * 4;
+					// copy
+					for (; y <= bottom; y++) {
+						memcpy(dst, src, bytes);
+						dst += dstBPR;
+						src += srcBPR;
+					}
+				}
+				break;
+			}
+			// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
+			case B_RGB24: {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x * 3;
+				int32 left = x;
+				// copy
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint8* dstHandle = dst;
+					x = left;
+					for (; x <= right; x++) {
+						dstHandle[0] = srcHandle[0];
+						dstHandle[1] = srcHandle[1];
+						dstHandle[2] = srcHandle[2];
+						dstHandle += 3;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
+				break;
+			}
+			case B_RGB16: {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x * 2;
+				int32 left = x;
+				// copy
+				// TODO: assumes BGR order, does this work on big endian as well?
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint16* dstHandle = (uint16*)dst;
+					x = left;
+					for (; x <= right; x++) {
+						*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 8) |
+											  ((srcHandle[1] & 0xfc) << 3) |
+											  (srcHandle[0] >> 3));
+						dstHandle ++;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
+				break;
+			}
+			case B_RGB15: {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x * 2;
+				int32 left = x;
+				// copy
+				// TODO: assumes BGR order, does this work on big endian as well?
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint16* dstHandle = (uint16*)dst;
+					x = left;
+					for (; x <= right; x++) {
+						*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 7) |
+											  ((srcHandle[1] & 0xf8) << 2) |
+											  (srcHandle[0] >> 3));
+						dstHandle ++;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
+				break;
+			}
+			case B_CMAP8: {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x;
+				int32 left = x;
+				// copy
+				// TODO: using BScreen will not be an option in the
+				// final implementation, will it? The BBitmap implementation
+				// has a class that handles this, something so useful
+				// should be moved to a more public place.
+				// TODO: assumes BGR order again
+				BScreen screen;
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint8* dstHandle = dst;
+					x = left;
+					for (; x <= right; x++) {
+						*dstHandle = screen.IndexForColor(srcHandle[2],
+														  srcHandle[1],
+														  srcHandle[0]);
+						dstHandle ++;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
+				break;
+			}
+			case B_GRAY8: {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x;
+				int32 left = x;
+				// copy
+				// TODO: assumes BGR order, does this work on big endian as well?
+				for (; y <= bottom; y++) {
+					uint8* srcHandle = src;
+					uint8* dstHandle = dst;
+					x = left;
+					for (; x <= right; x++) {
+						*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
+						dstHandle ++;
+						srcHandle += 4;
+					}
+					dst += dstBPR;
+					src += srcBPR;
+				}
+				break;
+			}
+			default:
+				fprintf(stderr, "ViewHWInterface::CopyBackToFront() - unsupported front buffer format!\n");
+				break;
+		}
+
+
+
 
 		int32 pixelSize = 0;
 		color_space dstFormat = into->ColorSpace();
