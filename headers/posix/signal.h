@@ -7,33 +7,75 @@
 
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-typedef int	sig_atomic_t;
+typedef int	 sig_atomic_t;
+typedef long sigset_t;
+
 typedef void (*sig_func_t)(int);
-typedef void (*__signal_func_ptr)(int);  /* old BeOS typedef (kept for backwards compatibility) */
-
-
-sig_func_t signal(int sig, sig_func_t signal_handler);
-int        raise(int sig);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#define SIG_DFL	((sig_func_t) 0)
-#define SIG_IGN	((sig_func_t) 1)
-#define SIG_ERR	((sig_func_t)-1)
+typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with BeOS only */
 
 
 /*
- * The numbering of signals for BeOS attempts to maintain 
+ * macros defining the standard signal handling behavior
+ */
+#define SIG_DFL	((sig_func_t) 0)   /* the signal was treated in the "default" manner */
+#define SIG_IGN	((sig_func_t) 1)   /* the signal was ignored */
+#define SIG_ERR	((sig_func_t)-1)   /* an error ocurred during signal processing */
+
+
+/*
+ * structure used by sigaction()
+ *
+ * Note: the 'sa_userdata' field is a non-Posix extension.
+ * See the SPECIAL NOTES below for an explanation of this.
+ * 
+ */
+struct sigaction {
+	sig_func_t sa_handler;
+	sigset_t   sa_mask;
+	int        sa_flags;
+	void      *sa_userdata;  /* will be passed to the signal handler */
+};
+
+
+/*
+ * values for sa_flags
+ */
+#define SA_NOCLDSTOP  0x01
+#define SA_ONESHOT    0x02
+#define SA_NOMASK     0x04
+#define SA_NODEFER    SA_NOMASK
+#define SA_RESTART    0x08
+#define SA_STACK      0x10
+
+
+
+/*
+ * for signals using an alternate stack
+ */
+typedef struct stack_t {
+	void   *ss_sp;
+	size_t  ss_size;
+	int     ss_flags;
+} stack_t;
+
+
+/*
+ * for the 'how' arg of sigprocmask()
+ */
+#define SIG_BLOCK    1
+#define SIG_UNBLOCK  2
+#define SIG_SETMASK  3
+
+
+
+/*
+ * The list of all defined signals:
+ *
+ * The numbering of signals for OpenBeOS attempts to maintain 
  * some consistency with UN*X conventions so that things 
  * like "kill -9" do what you expect.
- */   
+ */
 #define	SIGHUP      1      /* hangup -- tty is gone! */
 #define SIGINT      2      /* interrupt */
 #define SIGQUIT     3      /* `quit' special character typed in tty  */
@@ -65,141 +107,141 @@ int        raise(int sig);
  * releases.  Use them at your own peril (if you do use them, at least
  * be smart and use them backwards from signal 32).
  */
-#define MAX_SIGNO 32
-
-#define __signal_max  22
-#define NSIG (__signal_max+1)
-
+#define MAX_SIGNO     32       /* the most signals that a single thread can reference */
+#define __signal_max  22       /* the largest signal number that is actually defined */
+#define NSIG (__signal_max+1)  /* the number of defined signals */
 
 
-typedef long sigset_t;
 
-/*
-   The Posix interface for signal handling functions isn't as useful
-   as it could be.  The standard indicates that only a single argument
-   (the signal number) is passed to the signal handler.  It is useful
-   to have more information and the BeOS provides two extra arguments.
-   However, to remain compatible with Posix and ANSI C, we declare the
-   sa_handler field of the sigaction struct as type 'sig_func_t'.
-   That means you'll need to cast any function you assign to the
-   sa_handler field.  NOTE: C++ member functions can not be signal
-   handlers (because they expect a "this" pointer as the first
-   argument).
-
-   The 3 arguments that the BeOS provides to signal handlers are as
-   follows:
-    - The first argument is the signal number (as an integer).
-	- The next argument is whatever value is put in the sa_userdata field
-      of the sigaction struct.
-	- The last argument is a pointer to a vregs struct (defined
-	  below).  The vregs struct contains the contents of the volatile
-	  registers at the time the signal was delivered to your thread.
-	  You can change the fields of the structure.  After your signal
-	  handler completes, the OS uses this struct to reload the
-	  registers for your thread (privileged registers are not loaded
-	  of course).  The vregs struct is of course terribly machine
-	  dependent and is guaranteed to change, potentially even between
-	  different models of the PowerPC family.  If you use it, you
-	  should expect to have to re-work your code when new processors
-	  come out.  Nonetheless the ability to change the registers does 
-	  open some interesting programming possibilities.
-*/
-struct sigaction {
-	sig_func_t sa_handler;
-	sigset_t   sa_mask;
-	int        sa_flags;
-	void      *sa_userdata;  /* will be passed to the signal handler */
-};
+/* the global table of text strings containing descriptions for each signal */
+extern const char * const sys_siglist[NSIG];
 
 
-typedef struct stack_t {
-	void   *ss_sp;
-	size_t  ss_size;
-	int     ss_flags;
-} stack_t;
-
-
-#define SA_NOCLDSTOP  0x01  /* for sa_flags */
-#define SA_ONESHOT    0x02
-#define SA_NOMASK     0x04
-#define SA_NODEFER    SA_NOMASK
-#define SA_RESTART    0x08
-#define SA_STACK      0x10
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+sig_func_t signal(int sig, sig_func_t signal_handler);
+int        raise(int sig);
+int        kill(pid_t pid, int sig);
+int        send_signal(pid_t tid, uint sig);
 
-int sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int        sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int        sigprocmask(int how, const sigset_t *set, sigset_t *oset);
+int        sigpending(sigset_t *set);
+int        sigsuspend(const sigset_t *mask);
 
-int sigemptyset(sigset_t *set);
-int sigfillset(sigset_t *set);
-int sigaddset(sigset_t *set, int signo);
-int sigdelset(sigset_t *set, int signo);
-int sigismember(const sigset_t *set, int signo);
-int sigprocmask(int how, const sigset_t *set, sigset_t *oset);
+int        sigemptyset(sigset_t *set);
+int        sigfillset(sigset_t *set);
+static int sigaddset(sigset_t *set, int signo);
+static int sigdelset(sigset_t *set, int signo);
+static int sigismember(const sigset_t *set, int signo);
 
-extern const char * const sys_siglist[NSIG];
 const char *strsignal(int sig);
 
 const void  set_signal_stack(void *ptr, size_t size);
-int sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
+int         sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
 
-
-extern inline int
-sigemptyset(sigset_t *set)	
-{
-	*set = (sigset_t) 0L;
-	return 0;
-}
-
-extern inline int
-sigfillset(sigset_t *set)
-{
-	*set = (sigset_t) ~(0UL);
-	return 0;
-}
-
-extern inline int
-sigismember(const sigset_t *set, int sig)	
+static inline int
+sigismember(const sigset_t *set, int sig)
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
 	return   (*set & mask) ? 1 : 0 ;	
 }
 
-extern inline int
+static inline int
 sigaddset(sigset_t *set, int sig)	
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
 	return   ((*set |= mask), 0) ;	
 }
 
-extern inline int
+static inline int
 sigdelset(sigset_t *set, int sig)	
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
 	return   ((*set &= ~mask), 0) ;	
-} 
-
-
-#define SIG_BLOCK    1   /* defines for the how arg of sigprocmask() */
-#define SIG_UNBLOCK  2
-#define SIG_SETMASK  3
-
-
-int sigpending(sigset_t *set);
-int sigsuspend(const sigset_t *mask);
-
-int kill(pid_t pid, int sig);
-int send_signal(pid_t tid, uint sig);
+}
 
 #ifdef __cplusplus
 }
 #endif
 
 
-/* signal handlers get this as the last argument */
+/*
+ * ==================================================
+ * !!! SPECIAL NOTES CONCERNING NON-POSIX EXTENSIONS:
+ * ==================================================
+ *
+ * The standard Posix interface for signal handlers is not as useful
+ * as it could be. The handler can define only one single argument
+ * (the signal number). For example:
+ *    void
+ *    my_signal_handler(int sig)
+ *    {
+ *    . . .
+ *    }
+ *
+ *    // install the handler
+ *    signal(SIGINT, &my_signal_handler);
+ *    
+ * The sigaction() function allows finer grained control of the signal
+ * handling. It also allows an opportunity, via the 'sigaction' struct, to
+ * enable additional data to be passed to the handler. For example:
+ *    void
+ *    my_signal_handler(int sig, char *somedata, vregs regs)
+ *    {
+ *    . . .
+ *    }
+ *
+ *    struct sigaction sa;
+ *    char data_buffer[32];
+ *
+ *    sa.sa_handler = (sig_func_t) my_signal_handler;
+ *    sigemptyset(&sa.sa_mask);
+ *    sigaddset(&sa.sa_mask, SIGINT);
+ *    sa.sa_userdata = data_buffer;
+ *
+ *    // install the handler
+ *    sigaction(SIGINT, &sa, NULL);
+ *
+ * The two additional arguments available to the signal handler are extensions
+ * to the Posix standard. This feature was introduced by the BeOS and retained
+ * by OpenBeOS. However, to remain compatible with Posix and ANSI C, the type
+ * of the sa_handler field is defined as 'sig_func_t'. This requires the handler
+ * to be cast when assigned to the sa_handler field, as in the example above.
+ *
+ * NOTE: C++ member functions can not be signal handlers!
+ * This is because they expect a "this" pointer as the first argument.
+ *
+ *
+ * The 3 arguments that OpenBeOS provides to signal handlers are as follows:
+ *
+ *  - The first argument is the (usual) signal number.
+ *
+ *  - The second argument is whatever value is put in the sa_userdata field
+ *    of the sigaction struct.
+ *
+ *  - The third argument is a pointer to a vregs struct (defined below).
+ *    The vregs struct contains the contents of the volatile registers at
+ *    the time the signal was delivered to your thread. You can change the fields
+ *    of the structure. After your signal handler completes, the OS uses this struct
+ *    to reload the registers for your thread (privileged registers are not loaded
+ *    of course). The vregs struct is of course terribly machine dependent.
+ *    If you use it, you should expect to have to re-work your code when new
+ *    processors come out. Nonetheless, the ability to change the registers does
+ *    open some interesting programming possibilities.
+ */
+
+
+
+
+/*
+ * the vregs struct:
+ *
+ * signal handlers get this as the last argument
+ */
 
 typedef struct vregs vregs;
 
