@@ -156,10 +156,11 @@ public:
 	uint32 GetBytesPerRow(void);
 	int32 GetMode(void);
 	bool IsCursorObscured(bool state);
+	
+	bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
+	void Unlock(void);
 
 protected:
-	bool _Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
-	void _Unlock(void);
 	void _SetDepth(uint8 d);
 	void _SetHeight(uint16 h);
 	void _SetWidth(uint16 w);
