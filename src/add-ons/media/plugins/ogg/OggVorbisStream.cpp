@@ -59,14 +59,20 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
 	vi->bitrate_upper = oggpack_read(opb, 32);
 	vi->bitrate_nominal = oggpack_read(opb, 32);
 	vi->bitrate_lower = oggpack_read(opb, 32);
-	oggpack_read(opb, 4); // discard blocksizes 0
-	oggpack_read(opb, 4); // discard blocksizes 1
+	long blocksizes0 = oggpack_read(opb, 4);
+	long blocksizes1 = oggpack_read(opb, 4);
 	if (vi->rate < 1) {
 		return -1;
 	}
 	if (vi->channels < 1) {
 		return -1;
 	}
+	if (blocksizes0 < 8) {
+		return -1;
+	}
+	if (blocksizes1 < blocksizes0) {
+		return -1;
+	}	
 	if (oggpack_read(opb, 1) != 1) {
 		return -1;
 	} /* EOP check */
