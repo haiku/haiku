@@ -2,3 +2,4 @@ SubDir OBOS_TOP src tests add-ons kernel file_systems ;
 
 SubInclude OBOS_TOP src tests add-ons kernel file_systems befs ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems bfs ;
+SubInclude OBOS_TOP src tests add-ons kernel file_systems iso9660 ;
