@@ -8,15 +8,33 @@
 #include "nv_std.h"
 
 static void nv_agp_list_info(agp_info ai);
-static bool has_AGP_interface(agp_info *ai_card, uint8 *adress);
 static bool zooi(void);
 
 status_t nv_agp_setup(void)
 {
 	nv_nth_agp_info nai;
 	uint8 index;
+	bool agp = false;
 
-	/* set the magic number so the driver knows we're for real */
+	/* first try to enable FW support on our card if user requested this
+	 * ('unsupported' tweak!)
+	 * This has no effect on PCI cards. */
+	if (si->settings.unhide_fw)
+	{
+		uint32 reg;
+
+		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+
+		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
+		/* 'force' FW support */
+		reg = (NV_REG32(NV32_NVSTRAPINFO2) & ~0x00000800);
+		/* enable strapinfo overwrite */
+		NV_REG32(NV32_NVSTRAPINFO2) = (reg | 0x80000000);
+
+		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+	}
+
+	/* set the magic number so the nvidia kerneldriver knows we're for real */
 	nai.magic = NV_PRIVATE_DATA_MAGIC;
 
 	/* contact driver and get a pointer to the registers and shared data */
@@ -31,69 +49,44 @@ status_t nv_agp_setup(void)
 			if (index != 0)
 				LOG(4,("AGP: end of AGP capable devices list.\n"));
 			else
-				LOG(4,("AGP: no AGP capable devices found.\n"));
+				LOG(4,("AGP: no AGP busmanager or no AGP capable devices found.\n"));
 			break;
 		}
 
 		LOG(4,("AGP: AGP capable device #%d:\n", (index + 1)));
+
+		/* see if we are this one */
+		if (((((uint32)(nai.agpi.device_id)) << 16) | nai.agpi.vendor_id) == CFGR(DEVID))
+		{
+			LOG(4,("AGP: (this is the device this accelerant controls)\n"));
+			agp = true;
+		}
+
 		/* log capabilities */
 		nv_agp_list_info(nai.agpi);
 	}
+
+	/* if our card is not an AGP type, abort here */
+	/* Note:
+	 * We have to iterate through the capability list as specified in the PCI spec
+	 * one way or the other, otherwise we cannot distinquish between nVidia PCI and
+	 * AGP type cards as nVidia PCI cards still have AGP registers that pretend to
+	 * support AGP.
+	 * We rely on the AGP busmanager to iterate trough this list for us. */
+	if (!agp)
+	{
+		LOG(4,("AGP: assuming the graphicscard this accelerant controls is PCI type.\n"));
+
+		/* make sure the card is in PCI mode if it's an AGP type after all */
+		CFGW(AGPCMD, 0x00000000);
+
+		return B_ERROR;
+	}
+
 }
 
 static bool zooi(void)
 {
-	agp_info ai_card;
-	uint8 adress;
-
-	/* check for card's AGP capabilities - see PCI specification */
-	/* Note:
-	 * We have to iterate through the capability list as specified in the PCI spec,
-	 * otherwise we cannot distinquish between nVidia PCI and AGP cards!
-	 * (PCI cards still have AGP registers that pretend to support AGP) */
-	if (!(has_AGP_interface(&ai_card, &adress)))
-	{
-		LOG(4,("AGP: graphicscard is PCI type.\n"));
-		return B_ERROR;
-	}
-
-//	LOG(4,("AGP: graphicscard is AGP type, supporting specification %d.%d;\n",
-//		((ai_card.config.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
-//		((ai_card.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
-
-	/* try to enable FW support if user requested this ('unsupported' tweak!) */
-	if (si->settings.unhide_fw)
-	{
-		uint32 reg;
-
-		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
-
-		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
-		/* 'force' FW support */
-		reg = (NV_REG32(NV32_NVSTRAPINFO2) & ~0x00000800);
-		/* enable strapinfo overwrite */
-		NV_REG32(NV32_NVSTRAPINFO2) = (reg | 0x80000000);
-		/* reread cards AGP capabilities */
-//		ai_card.config.agp_stat = PCI_CFGR(adress + 4);
-
-		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
-	}
-
-//	nv_agp_list_caps(ai_card);
-
-	/* check for motherboard AGP host bridge */
-	/* open the BeOS AGP kernel driver, the permissions aren't important */
-//	strcpy(path, "/dev/graphics/agp/1");
-//	agp_fd = open(path, B_READ_WRITE);
-//	if (agp_fd < 0)
-	{
-		LOG(4,("AGP: cannot open AGP host bridge driver, aborting!\n"));
-		/* program card for PCI access */
-//		PCI_CFGW((adress + 8), 0x00000000);
-
-		return B_ERROR;
-	}
-
 	/* get host bridge info */
 //	ioctl(agp_fd, GET_CONFIG, &ai_bridge); 
 
@@ -281,6 +274,10 @@ static void nv_agp_list_info(agp_info ai)
 	/*
 		list capabilities
 	*/
+	LOG(4,("AGP: this device supports AGP specification %d.%d;\n",
+		((ai.interface.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
+		((ai.interface.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
+
 	/* the AGP devices determine AGP speed scheme version used on power-up/reset */
 	if (!(ai.interface.agp_stat & AGP_rate_rev))
 	{
@@ -335,41 +332,4 @@ static void nv_agp_list_info(agp_info ai)
 		LOG(4,("AGP: this AGP interface is currently enabled.\n"));
 	else
 		LOG(4,("AGP: this AGP interface is currently disabled.\n"));
-}
-
-static bool has_AGP_interface(agp_info *ai_card, uint8 *adress)
-{
-	bool has_AGP = false;
-
-	/* check if device implements a list of capabilities */
-	if (CFGR(DEVCTRL) & 0x00100000)
-	{
-		uint32 item = 0;
-		uint8 item_adress;
-
-		/* get pointer to PCI capabilities list */
-		item_adress = CFGR(CFG_0) & 0x000000ff;
-		/* read first item from list */
-//		item = PCI_CFGR(item_adress);
-		while ((item & AGP_next_ptr) && ((item & AGP_id_mask) != AGP_id))
-		{
-			/* read next item from list */
-			item_adress = ((item & AGP_next_ptr) >> AGP_next_ptr_shift);
-//			item = PCI_CFGR(item_adress);
-		}
-		if ((item & AGP_id_mask) == AGP_id)
-		{
-			/* we found the AGP interface! */
-			has_AGP = true;
-
-			/* return the adress if the interface */
-			*adress = item_adress;
-
-			/* readout the AGP interface capabilities and settings */
-//			ai_card->config.agp_cap_id = PCI_CFGR(item_adress);
-//			ai_card->config.agp_stat = PCI_CFGR(item_adress + 4);
-//			ai_card->config.agp_cmd = PCI_CFGR(item_adress + 8);
-		}
-	}
-	return has_AGP;
 }
