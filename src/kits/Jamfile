@@ -1,33 +1,53 @@
 SubDir OBOS_TOP src kits ;
 
-include $(SUBDIR)/app/app.src ;
-include $(SUBDIR)/interface/interface.src ;
-include $(SUBDIR)/support/support.src ;
+# Collect libopenbeos.so sources.
+subdirs = app interface support storage ;
+for subdir in $(subdirs) {
+	local dir = [ FDirName $(SUBDIR) $(subdir) ] ;
+	local file = $(subdir:S=.src) ;
+	include $(file:D=$(dir)) ;
+	UsePrivateHeaders $(subdir) ;
+	UsePublicHeaders $(subdir) ;
+	SEARCH_SOURCE += $(dir) ;
+}
 
-UsePrivateHeaders app ;
-UsePrivateHeaders interface ;
+UsePublicHeaders [ FDirName add-ons file_system ] ;
 UsePrivateHeaders shared ;
-UsePrivateHeaders support ;
 
-UsePublicHeaders app ;
-UsePublicHeaders interface ;
-UsePublicHeaders support ;
+# Add subsubdirs to the SEARCH_SOURCE.
+SEARCH_SOURCE += [ FDirName $(SUBDIR) storage mime ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) storage sniffer ] ;
 
 SharedLibrary openbeos :
-	<$(SOURCE_GRIST)>app/$(APP_KIT_SOURCE)
-	<$(SOURCE_GRIST)>interface/$(INTERFACE_KIT_SOURCE)
-	<$(SOURCE_GRIST)>support/$(SUPPORT_KIT_SOURCE)
+	$(APP_KIT_SOURCE)
+	$(INTERFACE_KIT_SOURCE)
+	$(SUPPORT_KIT_SOURCE)
+	$(STORAGE_KIT_SOURCE)
 ;
 
 LinkSharedOSLibs libopenbeos.so :
+	libbeadapter.so
 	be
 	stdc++.r4 ;
+
+# The adapter library we need (Storage Kit).
+#
+SharedLibrary beadapter :
+	LibBeAdapter.cpp
+;
+LinkSharedOSLibs libbeadapter.so :
+	be
+;
 
 # Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
 # rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
 # libopenbeos.so.
-LOCATE on <boot!home!config!lib>libopenbeos.so = /boot/home/config/lib ;
+LOCATE on <boot!home!config!lib>libopenbeos.so
+		  <boot!home!config!lib>libbeadapter.so = /boot/home/config/lib ;
 File <boot!home!config!lib>libopenbeos.so : libopenbeos.so ;
+File <boot!home!config!lib>libbeadapter.so : libbeadapter.so ;
+Includes <boot!home!config!lib>libopenbeos.so
+	: <boot!home!config!lib>libbeadapter.so ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
