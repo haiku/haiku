@@ -23,6 +23,14 @@
 
 static bool modules_disable_user_addons = false;
 
+/** The modules referenced by this structure are built-in
+ *	modules that can't be loaded from disk.
+ */
+
+static module_info *sBuiltInModules[] = {
+	NULL
+};
+
 #define TRACE_MODULE
 #ifdef TRACE_MODULE
 #	define TRACE(x) dprintf x
@@ -71,11 +79,12 @@ typedef struct module {
 	char				*file;
 	int32				ref_count;
 	module_info			*info;		/* will only be valid if ref_count > 0 */
-	int					offset;		/* this is the offset in the headers */
+	int32				offset;		/* this is the offset in the headers */
 	module_state		state;		/* state of module */
-	bool				keep_loaded;
+	uint32				flags;
 } module;
 
+#define B_BUILT_IN_MODULE	2
 
 typedef struct module_iterator {
 	const char			**path_stack;
@@ -365,14 +374,11 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 	}
 
 	module->state = MODULE_QUERIED;
+	module->info = info;
 	module->offset = offset;
 		// record where the module_info can be found in the module_info array
 	module->ref_count = 0;
-
-	if (info->flags & B_KEEP_LOADED) {
-		TRACE(("module %s wants to be kept loaded\n", module->name));
-		module->keep_loaded = true;
-	}
+	module->flags = info->flags;
 
 	recursive_lock_lock(&gModulesLock);
 	hash_insert(gModulesHash, module);
@@ -550,11 +556,13 @@ search_module(const char *name)
 
 
 static status_t
-put_dependent_modules(module_dependency *dependencies)
+put_dependent_modules(struct module *module)
 {
+	module_dependency *dependencies;
 	int32 i = 0;
 
-	if (dependencies == NULL)
+	if (module->module_image == NULL
+		|| (dependencies = module->module_image->dependencies) == NULL)
 		return B_OK;
 
 	for (; dependencies[i].name != NULL; i++) {
@@ -568,11 +576,14 @@ put_dependent_modules(module_dependency *dependencies)
 
 
 static status_t
-get_dependent_modules(module_dependency *dependencies)
+get_dependent_modules(struct module *module)
 {
+	module_dependency *dependencies;
 	int32 i = 0;
 
-	if (dependencies == NULL)
+	// built-in modules don't have a module_image structure
+	if (module->module_image == NULL
+		|| (dependencies = module->module_image->dependencies) == NULL)
 		return B_OK;
 
 	TRACE(("resolving module dependencies...\n"));
@@ -603,7 +614,7 @@ init_module(module *module)
 
 			// resolve dependencies
 
-			status = get_dependent_modules(module->module_image->dependencies);
+			status = get_dependent_modules(module);
 			if (status < B_OK) {
 				module->state = MODULE_LOADED;
 				return status;
@@ -611,14 +622,15 @@ init_module(module *module)
 
 			// init module
 
-			TRACE(("initing module %s... \n", module->name));
+dprintf("module = %p, info = %p\n", module, module->info);
+			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
 			status = module->info->std_ops(B_MODULE_INIT);
 			TRACE(("...done (%s)\n", strerror(status)));
 
 			if (status >= B_OK)
 				module->state = MODULE_READY;
 			else {
-				put_dependent_modules(module->module_image->dependencies);
+				put_dependent_modules(module);
 				module->state = MODULE_LOADED;
 			}
 
@@ -671,21 +683,21 @@ uninit_module(module *module)
 
 			module->state = MODULE_UNINIT;
 
-			TRACE(("uniniting module %s...\n", module->name));
+			TRACE(("uninitializing module %s...\n", module->name));
 			status = module->info->std_ops(B_MODULE_UNINIT);
 			TRACE(("...done (%s)\n", strerror(status)));
 
 			if (status == B_NO_ERROR) {
 				module->state = MODULE_LOADED;
 
-				put_dependent_modules(module->module_image->dependencies);
+				put_dependent_modules(module);
 				return 0;
 			}
 
 			FATAL(("Error unloading module %s (%s)\n", module->name, strerror(status)));
 
 			module->state = MODULE_ERROR;
-			module->keep_loaded = true;
+			module->flags |= B_KEEP_LOADED;
 
 			return status;
 		}
@@ -840,6 +852,19 @@ nextModuleImage:
 }
 
 
+static void
+register_builtin_modules(struct module_info **info)
+{
+	for (; *info; info++) {
+		(*info)->flags |= B_BUILT_IN_MODULE;
+			// this is an internal flag, it doesn't have to be set by modules itself
+
+		if (create_module(*info, "", -1, NULL) != B_OK)
+			dprintf("creation of built-in module \"%s\" failed!\n", (*info)->name);
+	}
+}
+
+
 static int
 dump_modules(int argc, char **argv)
 {
@@ -851,7 +876,7 @@ dump_modules(int argc, char **argv)
 	dprintf("-- known modules:\n");
 
 	while ((module = (struct module *)hash_next(gModulesHash, &iterator)) != NULL) {
-		dprintf("%p: \"%s\", \"%s\" (%d), refcount = %ld, state = %d, mimage = %p\n",
+		dprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
 			module, module->name, module->file, module->offset, module->ref_count,
 			module->state, module->module_image);
 	}
@@ -877,7 +902,7 @@ dump_modules(int argc, char **argv)
  */
 
 status_t
-module_init(kernel_args *ka, module_info **sys_module_headers)
+module_init(kernel_args *args)
 {
 	if (recursive_lock_init(&gModulesLock, "modules rlock") < B_OK)
 		return B_ERROR;
@@ -890,12 +915,13 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 	if (gModuleImagesHash == NULL)
 		return B_NO_MEMORY;
 
-/*
-	if (sys_module_headers) { 
-		if (register_module_image("", "(built-in)", 0, sys_module_headers) == NULL)
-			return ENOMEM;
-	}
-*/
+	// register built-in modules
+
+	register_builtin_modules(sBuiltInModules);
+
+	// register preloaded images
+
+	// ToDo!
 
 	add_debugger_command("modules", &dump_modules, "list all known & loaded modules");
 
@@ -1127,23 +1153,25 @@ get_module(const char *path, module_info **_info)
 		}
 	}
 
-	/* We now need to find the module_image for the module. This should
-	 * be in memory if we have just run search_modules, but may not be
-	 * if we are using cached information.
-	 * We can't use the module->module_image pointer, because it is not
-	 * reliable at this point (it won't be set to NULL when the module_image
-	 * is unloaded).
-	 */
-	if (get_module_image(module->file, &moduleImage) < B_OK)
-		goto err;
-
-	// (re)set in-memory data for the loaded module
-	module->info = moduleImage->info[module->offset];
-	module->module_image = moduleImage;
-
-	// the module image must not be unloaded anymore
-	if (module->keep_loaded)
-		module->module_image->keep_loaded = true;
+	if ((module->flags & B_BUILT_IN_MODULE) == 0) {
+		/* We now need to find the module_image for the module. This should
+		 * be in memory if we have just run search_modules, but may not be
+		 * if we are using cached information.
+		 * We can't use the module->module_image pointer, because it is not
+		 * reliable at this point (it won't be set to NULL when the module_image
+		 * is unloaded).
+		 */
+		if (get_module_image(module->file, &moduleImage) < B_OK)
+			goto err;
+	
+		// (re)set in-memory data for the loaded module
+		module->info = moduleImage->info[module->offset];
+		module->module_image = moduleImage;
+	
+		// the module image must not be unloaded anymore
+		if (module->flags & B_KEEP_LOADED)
+			module->module_image->keep_loaded = true;
+	}
 
 	inc_module_ref_count(module);
 
@@ -1188,7 +1216,8 @@ put_module(const char *path)
 	if (module->ref_count == 0)
 		uninit_module(module);
 
-	put_module_image(module->module_image);
+	if ((module->flags & B_BUILT_IN_MODULE) == 0)
+		put_module_image(module->module_image);
 
 	recursive_lock_unlock(&gModulesLock);
 	return B_OK;
