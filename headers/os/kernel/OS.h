@@ -4,7 +4,7 @@
 */
 #ifndef _OS_H
 #define _OS_H
- 
+
 
 #include <SupportDefs.h>
 #include <StorageDefs.h>
@@ -187,7 +187,8 @@ typedef struct {
 	gid_t			gid;
 } team_info;
 
-#define	B_SYSTEM_TEAM	2
+#define B_CURRENT_TEAM	0
+#define B_SYSTEM_TEAM	2
 
 extern status_t kill_team(team_id team);
 	/* see also: send_signal() */
