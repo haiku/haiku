@@ -295,7 +295,7 @@ extern status_t		_get_next_thread_info(team_id team, int32 *cookie, thread_info 
 /* Time */
 
 extern uint32		real_time_clock(void);
-extern void			set_real_time_clock(int32 secs_since_jan1_1970);
+extern void			set_real_time_clock(uint32 secs_since_jan1_1970);
 extern bigtime_t	real_time_clock_usecs(void);
 extern status_t		set_timezone(char *timezone);
 extern bigtime_t	system_time(void);     /* time since booting in microseconds */
