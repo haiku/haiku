@@ -24,9 +24,10 @@ static const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 int usage(int ret)
 {
 	printf("\nSend files to trash, or restore them.\nUsage:\n");
-	printf("trash [--empty|--list] file ...\n");
-	printf("\t--empty\tempty the Trash\n");
-	printf("\t--list\tlist what's already in the Trash\n");
+	printf("trash [--restore|--empty|--list] file ...\n");
+	printf("\t--restore\trestore files (act as untrash)\n");
+	printf("\t--empty\t\tempty the Trash\n");
+	printf("\t--list\t\tlist what's already in the Trash\n");
 	printf("untrash [--all] [file ...]\n");
 	//printf("restore [--all] [file ...]\n");
 	return ret;
@@ -151,7 +152,7 @@ status_t foreach_in_trash(status_t (*iterator)(const char *))
 int main(int argc, char **argv)
 {
 	int dountrash = 0;
-	int i;
+	int i = 1;
 	int err = 0;
 	if (strstr(argv[0], "untrash") || strstr(argv[0], "restore"))
 		dountrash = 1;
@@ -159,6 +160,10 @@ int main(int argc, char **argv)
 		return usage(1);
 	if (!strcmp(argv[1], "--help"))
 		return usage(0);
+	if (!strcmp(argv[1], "--restore")) {
+		dountrash = 1;
+		i++;
+	}
 	if (!dountrash && !strcmp(argv[1], "--empty")) {
 		/* XXX: clean that */
 		BMessage msg(B_DELETE_PROPERTY);
@@ -171,7 +176,7 @@ int main(int argc, char **argv)
 		}
 		return 0;
 	}
-	if (dountrash && !strcmp(argv[1], "--all")) {
+	if (dountrash && !strcmp(argv[i], "--all")) {
 		/* restore all trashed files */
 		err = foreach_in_trash(untrash);
 		if (err) {
@@ -180,13 +185,13 @@ int main(int argc, char **argv)
 		}
 		return 0;
 	}
-	if (!strcmp(argv[1], "--list")) {
+	if (!strcmp(argv[i], "--list")) {
 		err = foreach_in_trash(show_trashed_file);
 		return 0;
 	}
 	/* restore files... */
 	if (dountrash) {
-		for (i = 1; i < argc; i++) {
+		for (; i < argc; i++) {
 			err = untrash(argv[i]);
 			if (err) {
 				fprintf(stderr, "%s: %s\n", argv[i], strerror(err));
