@@ -49,9 +49,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	display_mode /*bounds,*/ target;
 
 	uint8 colour_depth1 = 32;
-	status_t result;
+//	status_t result;
 	uint32 startadd,startadd_right;
-	bool display, h, v;
+//	bool display, h, v;
 //	bool crt1, crt2, cross;
 
 	/* Adjust mode to valid one and fail if invalid */
@@ -81,9 +81,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	interrupt_enable(false);
 
 	/* find current DPMS state, then turn off screen(s) */
-	head1_dpms_fetch(&display, &h, &v);
-	head1_dpms(false, false, false);
-	if (si->ps.secondary_head) head2_dpms(false, false, false);
+//	head1_dpms_fetch(&display, &h, &v);
+//	head1_dpms(false, false, false);
+//	if (si->ps.secondary_head) head2_dpms(false, false, false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
@@ -102,12 +102,12 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		LOG(1,("SETMODE: setting DUALHEAD mode\n"));
 
 		/* validate flags for secondary TVout */
-		if ((i2c_sec_tv_adapter() != B_OK) && (target2.flags & TV_BITS))
-		{
-			target.flags &= ~TV_BITS;//still needed for some routines...
-			target2.flags &= ~TV_BITS;
-			LOG(1,("SETMODE: blocking TVout: no TVout cable connected!\n"));
-		}
+//		if ((i2c_sec_tv_adapter() != B_OK) && (target2.flags & TV_BITS))
+//		{
+//			target.flags &= ~TV_BITS;//still needed for some routines...
+//			target2.flags &= ~TV_BITS;
+//			LOG(1,("SETMODE: blocking TVout: no TVout cable connected!\n"));
+//		}
 
 		/* detect which connectors have a CRT connected */
 		//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
@@ -130,47 +130,47 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //				cross = false;
 //		}
 		/* set output connectors assignment if possible */
-		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
+//		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
 			/* invert output assignment in switch mode */
-			eng_general_head_select(true);
-		else
-			eng_general_head_select(false);
+//			eng_general_head_select(true);
+//		else
+//			eng_general_head_select(false);
 
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));
-		if (head1_set_pix_pll(target) == B_ERROR)
-			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
+//		if (head1_set_pix_pll(target) == B_ERROR)
+//			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
 
 		/* we do not need to set the pixelclock here for a head that's in TVout mode */
-		if (!(target2.flags & TV_BITS))
-		{
-			LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
-			if (head2_set_pix_pll(target2) == B_ERROR)
-				LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
-		}
+//		if (!(target2.flags & TV_BITS))
+//		{
+//			LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
+//			if (head2_set_pix_pll(target2) == B_ERROR)
+//				LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
+//		}
 
 		/*set the colour depth for CRTC1 and the DAC */
 		switch(target.space)
 		{
 		case B_CMAP8:
 			colour_depth1 =  8;
-			head1_mode(BPP8, 1.0);
-			head1_depth(BPP8);
+//			head1_mode(BPP8, 1.0);
+//			head1_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth1 = 16;
-			head1_mode(BPP15, 1.0);
-			head1_depth(BPP15);
+//			head1_mode(BPP15, 1.0);
+//			head1_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth1 = 16;
-			head1_mode(BPP16, 1.0);
-			head1_depth(BPP16);
+//			head1_mode(BPP16, 1.0);
+//			head1_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth1 = 32;
-			head1_mode(BPP32, 1.0);
-			head1_depth(BPP32);
+//			head1_mode(BPP32, 1.0);
+//			head1_depth(BPP32);
 			break;
 		}
 		/*set the colour depth for CRTC2 and DAC2 */
@@ -178,23 +178,23 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case B_CMAP8:
 			colour_depth2 =  8;
-			head2_mode(BPP8, 1.0);
-			head2_depth(BPP8);
+//			head2_mode(BPP8, 1.0);
+//			head2_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth2 = 16;
-			head2_mode(BPP15, 1.0);
-			head2_depth(BPP15);
+//			head2_mode(BPP15, 1.0);
+//			head2_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth2 = 16;
-			head2_mode(BPP16, 1.0);
-			head2_depth(BPP16);
+//			head2_mode(BPP16, 1.0);
+//			head2_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth2 = 32;
-			head2_mode(BPP32, 1.0);
-			head2_depth(BPP32);
+//			head2_mode(BPP32, 1.0);
+//			head2_depth(BPP32);
 			break;
 		}
 
@@ -204,10 +204,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			si->interlaced_tv_mode = true;
 */
 		/*set the display(s) pitches*/
-		head1_set_display_pitch ();
+//		head1_set_display_pitch ();
 		//fixme: seperate for real dualhead modes:
 		//we need a secondary si->fbc!
-		head2_set_display_pitch ();
+//		head2_set_display_pitch ();
 
 		/*work out where the "right" screen starts*/
 		startadd_right = startadd + (target.timing.h_display * (colour_depth1 >> 3));
@@ -217,22 +217,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-			head1_set_display_start(startadd,colour_depth1);
-			head2_set_display_start(startadd_right,colour_depth2);
+//			head1_set_display_start(startadd,colour_depth1);
+//			head2_set_display_start(startadd_right,colour_depth2);
 			break;
 		case DUALHEAD_CLONE:
-			head1_set_display_start(startadd,colour_depth1);
-			head2_set_display_start(startadd,colour_depth2);
+//			head1_set_display_start(startadd,colour_depth1);
+//			head2_set_display_start(startadd,colour_depth2);
 			break;
 		}
 
 		/* set the timing */
-		head1_set_timing(target);
+//		head1_set_timing(target);
 		/* we do not need to setup CRTC2 here for a head that's in TVout mode */
-		if (!(target2.flags & TV_BITS))	result = head2_set_timing(target2);
+//		if (!(target2.flags & TV_BITS))	result = head2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
-		if (si->ps.tvout && (target2.flags & TV_BITS)) maventv_init(target2);
+//		if (si->ps.tvout && (target2.flags & TV_BITS)) maventv_init(target2);
 	}
 	else /* single head mode */
 	{
@@ -278,25 +278,26 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the pixel clock PLL */
-		status = head1_set_pix_pll(target);
+//		status = head1_set_pix_pll(target);
+status = B_OK;
 
 		if (status==B_ERROR)
 			LOG(8,("CRTC: error setting pixel clock (internal DAC)\n"));
 
 		/* set the colour depth for CRTC1 and the DAC */
 		/* first set the colordepth */
-		head1_depth(colour_mode);
+//		head1_depth(colour_mode);
 		/* then(!) program the PAL (<8bit colordepth does not support 8bit PAL) */
-		head1_mode(colour_mode,1.0);
+//		head1_mode(colour_mode,1.0);
 
 		/* set the display pitch */
-		head1_set_display_pitch();
+//		head1_set_display_pitch();
 
 		/* tell the card what memory to display */
-		head1_set_display_start(startadd,colour_depth1);
+//		head1_set_display_start(startadd,colour_depth1);
 
 		/* set the timing */
-		head1_set_timing(target);
+//		head1_set_timing(target);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
@@ -305,14 +306,14 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	si->dm = target;
 
 	/* turn screen one on */
-	head1_dpms(display, h, v);
+//	head1_dpms(display, h, v);
 	/* turn screen two on if a dualhead mode is active */
-	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
+//	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
-	eng_acc_init();
+//	eng_acc_init();
 	/* set up overlay unit for this mode */
-	eng_bes_init();
+//	eng_bes_init();
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
@@ -395,15 +396,15 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-			head1_set_display_start(startadd,colour_depth);
-			head2_set_display_start(startadd_right,colour_depth);
+//			head1_set_display_start(startadd,colour_depth);
+//			head2_set_display_start(startadd_right,colour_depth);
 			break;
 		case DUALHEAD_OFF:
-			head1_set_display_start(startadd,colour_depth);
+//			head1_set_display_start(startadd,colour_depth);
 			break;
 		case DUALHEAD_CLONE:
-			head1_set_display_start(startadd,colour_depth);
-			head2_set_display_start(startadd,colour_depth);
+//			head1_set_display_start(startadd,colour_depth);
+//			head2_set_display_start(startadd,colour_depth);
 			break;
 	}
 
@@ -431,7 +432,7 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		b[i]=*color_data++;
 		i++;	
 	}
-	head1_palette(r,g,b);
+//	head1_palette(r,g,b);
 	if (si->dm.flags & DUALHEAD_BITS) head2_palette(r,g,b);
 }
 
@@ -446,20 +447,20 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 		switch(dpms_flags) 
 		{
 		case B_DPMS_ON:	/* H: on, V: on, display on */
-			head1_dpms(true, true, true);
-			if (si->ps.secondary_head) head2_dpms(true, true, true);
+//			head1_dpms(true, true, true);
+//			if (si->ps.secondary_head) head2_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
-			head1_dpms(false, false, true);
-			if (si->ps.secondary_head) head2_dpms(false, false, true);
+//			head1_dpms(false, false, true);
+//			if (si->ps.secondary_head) head2_dpms(false, false, true);
 			break;
 		case B_DPMS_SUSPEND:
-			head1_dpms(false, true, false);
-			if (si->ps.secondary_head) head2_dpms(false, true, false);
+//			head1_dpms(false, true, false);
+//			if (si->ps.secondary_head) head2_dpms(false, true, false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
-			head1_dpms(false, false, false);
-			if (si->ps.secondary_head) head2_dpms(false, false, false);
+//			head1_dpms(false, false, false);
+//			if (si->ps.secondary_head) head2_dpms(false, false, false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
@@ -472,16 +473,16 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 		switch(dpms_flags) 
 		{
 		case B_DPMS_ON:	/* H: on, V: on, display on */
-			head1_dpms(true, true, true);
+//			head1_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
-			head1_dpms(false, false, true);
+//			head1_dpms(false, false, true);
 			break;
 		case B_DPMS_SUSPEND:
-			head1_dpms(false, true, false);
+//			head1_dpms(false, true, false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
-			head1_dpms(false, false, false);
+//			head1_dpms(false, false, false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
@@ -503,7 +504,9 @@ uint32 DPMS_MODE(void) {
 	bool display, h, v;
 	
 	interrupt_enable(false);
-	head1_dpms_fetch(&display, &h, &v);
+//	head1_dpms_fetch(&display, &h, &v);
+display = h = v = true;
+
 	interrupt_enable(true);
 
 	if (display && h && v)

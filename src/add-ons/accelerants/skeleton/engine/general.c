@@ -9,7 +9,7 @@
 #include "std.h"
 
 static status_t test_ram(void);
-static status_t nvxx_general_powerup (void);
+static status_t engxx_general_powerup (void);
 static status_t eng_general_bios_to_powergraphics(void);
 
 static void eng_dump_configuration_space (void)
@@ -93,7 +93,7 @@ status_t eng_general_powerup()
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
 		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
-		status = nvxx_general_powerup();
+		status = engxx_general_powerup();
 		break;
 	default:
 		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
@@ -283,9 +283,9 @@ void set_crtc_owner(bool head)
 	}
 }
 
-static status_t nvxx_general_powerup()
+static status_t engxx_general_powerup()
 {
-	LOG(4, ("INIT: NV powerup\n"));
+	LOG(4, ("INIT: card powerup\n"));
 
 	/* setup cardspecs */
 	/* note:
@@ -303,7 +303,7 @@ static status_t nvxx_general_powerup()
 		/* update the cardspecs in the shared_info PINS struct according to reported
 		 * specs as much as is possible;
 		 * this also coldstarts the card if possible (executes BIOS CMD script(s)) */
-		parse_pins();
+//		parse_pins();
 	}
 	else
 	{
@@ -311,7 +311,7 @@ static status_t nvxx_general_powerup()
 	}
 
 	/* get RAM size and fake panel startup (panel init code is still missing) */
-	fake_panel_start();
+//	fake_panel_start();
 
 	/* log the final card specifications */
 	dump_pins();
@@ -406,7 +406,7 @@ status_t eng_general_head_select(bool cross)
 static status_t eng_general_bios_to_powergraphics()
 {
 	/* let acc engine make power off/power on cycle to start 'fresh' */
-	ENG_RG32(RG32_PWRUPCTRL) = 0x13110011;
+//	ENG_RG32(RG32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
 
 	/* power-up all hardware function blocks */
@@ -419,17 +419,18 @@ static status_t eng_general_bios_to_powergraphics()
 	 * bit  8: PFIFO,
 	 * bit  4: PMEDIA,
 	 * bit  0: TVOUT. (> NV04A) */
-	ENG_RG32(RG32_PWRUPCTRL) = 0x13111111;
+//	ENG_RG32(RG32_PWRUPCTRL) = 0x13111111;
 
 	/* select colormode CRTC registers base adresses */
-	ENG_REG8(RG8_MISCW) = 0xcb;
+//	ENG_REG8(RG8_MISCW) = 0xcb;
 
 	/* enable access to primary head */
-	set_crtc_owner(0);
+//	set_crtc_owner(0);
 	/* unlock head's registers for R/W access */
-	CRTCW(LOCK, 0x57);
-	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	if (si->ps.secondary_head)
+//	CRTCW(LOCK, 0x57);
+//	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+//	if (si->ps.secondary_head)
+	if (0)
 	{
 		/* enable access to secondary head */
 		set_crtc_owner(1);
@@ -439,15 +440,17 @@ static status_t eng_general_bios_to_powergraphics()
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	head1_dpms(false, false, false);
-	head1_cursor_hide();
-	if (si->ps.secondary_head)
+//	head1_dpms(false, false, false);
+//	head1_cursor_hide();
+//	if (si->ps.secondary_head)
+	if (0)
 	{
-		head2_dpms(false, false, false);
-		head2_cursor_hide();
+//		head2_dpms(false, false, false);
+//		head2_cursor_hide();
 	}
 
-	if (si->ps.secondary_head)
+//	if (si->ps.secondary_head)
+	if (0)
 	{
 		/* switch overlay engine to CRTC1 */
 		/* bit 17: GPU FP port #1	(confirmed NV25, NV28, confirmed not on NV34),
@@ -463,7 +466,7 @@ static status_t eng_general_bios_to_powergraphics()
 
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
-	set_crtc_owner(0);
+//	set_crtc_owner(0);
 	/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
 	 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
 	 * behave normally.
@@ -471,28 +474,29 @@ static status_t eng_general_bios_to_powergraphics()
 	 *
 	 * Double-write action needed on those strange NV11 cards: */
 	/* RESET: don't doublebuffer CRTC access: set programmed values immediately... */
-	CRTCW(BUFFER, 0xff);
+//	CRTCW(BUFFER, 0xff);
 	/* ... and use fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
 	/* note: this has no effect on possible bandwidth issues. */
-	CRTCW(BUFFER, 0xfb);
+//	CRTCW(BUFFER, 0xfb);
 	/* select VGA mode (old VGA register) */
-	CRTCW(MODECTL, 0xc3);
+//	CRTCW(MODECTL, 0xc3);
 	/* select graphics mode (old VGA register) */
-	SEQW(MEMMODE, 0x0e);
+//	SEQW(MEMMODE, 0x0e);
 	/* select 8 dots character clocks (old VGA register) */
-	SEQW(CLKMODE, 0x21);
+//	SEQW(CLKMODE, 0x21);
 	/* select VGA mode (old VGA register) */
-	GRPHW(MODE, 0x00);
+//	GRPHW(MODE, 0x00);
 	/* select graphics mode (old VGA register) */
-	GRPHW(MISC, 0x01);
+//	GRPHW(MISC, 0x01);
 	/* select graphics mode (old VGA register) */
-	ATBW(MODECTL, 0x01);
+//	ATBW(MODECTL, 0x01);
 	/* enable 'enhanced mode', enable Vsync & Hsync,
 	 * set DAC palette to 8-bit width, disable large screen */
-	CRTCW(REPAINT1, 0x04);
+//	CRTCW(REPAINT1, 0x04);
 
 	/* enable 'enhanced' mode on secondary head: */
-	if (si->ps.secondary_head)
+//	if (si->ps.secondary_head)
+	if (0)
 	{
 		/* enable access to secondary head */
 		set_crtc_owner(1);
@@ -527,20 +531,20 @@ static status_t eng_general_bios_to_powergraphics()
 	}
 
 	/* enable palettes */
-	DACW(GENCTRL, 0x00100100);
-	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
+//	DACW(GENCTRL, 0x00100100);
+//	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
 
 	/* enable programmable PLLs */
-	DACW(PLLSEL, 0x10000700);
-	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
+//	DACW(PLLSEL, 0x10000700);
+//	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
 
 	/* turn on DAC and make sure detection testsignal routing is disabled
 	 * (b16 = disable DAC,
 	 *  b12 = enable testsignal output */
-	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
+//	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
 	/* turn on DAC2 if it exists
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
-	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+//	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
 
 	/* setup AGP:
 	 * Note:
@@ -549,7 +553,7 @@ static status_t eng_general_bios_to_powergraphics()
 	eng_agp_setup();
 
 	/* turn screen one on */
-	head1_dpms(true, true, true);
+//	head1_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -758,7 +762,9 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 	if (max_acc_width <= max_crtc_width)
 	{
 		/* check if we can setup this mode with acceleration */
-		*acc_mode = true;
+//		*acc_mode = true;
+//blocking acc totally:
+*acc_mode = false;
 		/* virtual_width */
 		if (target->virtual_width > max_acc_width) *acc_mode = false;
 		/* virtual_height */
