@@ -2,6 +2,7 @@ SubDir OBOS_TOP src kits storage ;
 
 UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
