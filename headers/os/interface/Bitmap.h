@@ -82,6 +82,11 @@ public:
 	void SetBits(const void *data, int32 length, int32 offset,
 				 color_space colorSpace);
 
+	// not part of the R5 API
+	status_t ImportBits(const void *data, int32 length, int32 bpr,
+						int32 offset, color_space colorSpace);
+	status_t ImportBits(const BBitmap *bitmap);
+
 	status_t GetOverlayRestrictions(overlay_restrictions *restrictions) const;
 
 	// to mimic a BWindow
@@ -112,16 +117,6 @@ private:
 	BBitmap &operator=(const BBitmap &);
 
 	char *get_shared_pointer() const;
-	void set_bits(long offset, char *data, long length);
-	void set_bits_24(long offset, char *data, long length);
-	void set_bits_24_local_gray(long offset, char *data, long length);
-	void set_bits_24_local_256(long offset, uchar *data, long length);
-	void set_bits_24_24(long offset, char *data, long length,
-						bool bigEndianDest);
-	void set_bits_8_24(long offset, char *data, long length,
-					   bool bigEndianDest);
-	void set_bits_gray_24(long offset, char *data, long length,
-						  bool bigEndianDest);
 	int32 get_server_token() const;
 	void InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					int32 bytesPerRow, screen_id screenID);
