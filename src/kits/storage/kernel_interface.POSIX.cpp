@@ -1156,6 +1156,39 @@ BPrivate::Storage::remove(const char *path)
 	return (::remove(path) == -1) ? errno : B_OK ;
 }
 
+// TODO: This is a hack! I'm not even sure, if the signature of _kwfsstat_()
+// is correct. Isn't libroot.so LGPL and doesn't that mean that the sources
+// are available?
+#define		WFSSTAT_NAME	0x0001
+extern "C" int _kwfsstat_(dev_t device, fs_info *info, long mask);
 
-
+/*!
+	\param device The device ID of the volume in question.
+	\param name The volume's new name. Must not be longer than
+		   \c B_FILE_NAME_LENGTH (including the terminating null).
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a name.
+	- \c B_NAME_TOO_LONG: \a name is longer than \c B_FILE_NAME_LENGTH.
+	- another error code
+*/
+status_t
+BPrivate::Storage::set_volume_name(dev_t device, const char *name)
+{
+	// check parameter and initialization
+	status_t error = (name ? B_OK : B_BAD_VALUE);
+	if (error == B_OK && strlen(name) >= B_FILE_NAME_LENGTH)
+		error = B_NAME_TOO_LONG;
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(device, &info) != 0)
+		error = errno;
+	// replace the name and let it be written
+	if (error == B_OK) {
+		strcpy(info.volume_name, name);
+		if (_kwfsstat_(device, &info, WFSSTAT_NAME) != 0)
+			error = errno;
+	}
+	return error;
+}
 
