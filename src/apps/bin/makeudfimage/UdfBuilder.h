@@ -71,8 +71,10 @@ private:
 	void _PrintUpdate(VerbosityLevel level, const char *formatString, ...) const;
 	
 	status_t _ProcessDirectory(BEntry &entry, const char *path, struct stat stats,
-	                           node_data &node, bool isRootDirectory = false);
-	status_t _ProcessFile(BEntry &file);
+	                           node_data &node, Udf::long_address parentIcbAddress,
+	                           bool isRootDirectory = false);
+	status_t _ProcessFile(BEntry &entry, const char *path, struct stat stats,
+	                      node_data &node);
 	status_t _ProcessSymlink(BEntry &symlink);
 	status_t _ProcessAttributes(BNode &node);
 
