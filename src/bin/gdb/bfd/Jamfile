@@ -1,0 +1,185 @@
+SubDir OBOS_TOP src bin gdb bfd ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+	# Use gawk's libintl for the time being.
+	# TODO: Put a current version of intl ot src/libs and build a static lib
+	# all interested apps can link against.
+
+SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
+
+# architecture specific sources
+local bfdArchSources ;
+if $(OBOS_ARCH) = x86 {
+	bfdArchSources =
+		cpu-i386.c
+		elf32-i386.c
+		pe-i386.c
+		pei-i386.c
+	;
+
+	ObjectCcFlags archures.c targets.c :
+		-DDEFAULT_VECTOR=bfd_elf32_i386_vec
+		-DSELECT_VECS=\"&bfd_elf32_i386_vec,&i386pe_vec,&i386pei_vec,&bfd_elf32_little_generic_vec,&bfd_elf32_big_generic_vec\"
+		-DSELECT_ARCHITECTURES=\"&bfd_i386_arch\"
+		-DHAVE_bfd_elf32_i386_vec
+		-DHAVE_i386pe_vec
+		-DHAVE_i386pei_vec
+		-DHAVE_bfd_elf32_little_generic_vec
+		-DHAVE_bfd_elf32_big_generic_vec
+	;
+} else if $(OBOS_ARCH) = ppc {
+	bfdArchSources =
+		cpu-powerpc.c
+		elf32-ppc.c
+		pe-ppc.c
+		pei-ppc.c
+	;
+		# TODO: Check, if this is correct (probably is).
+	# TODO: Add correct CcFlags foor archures.c and targets.c.
+} # else: architecture not supported by Haiku
+
+local bfdBaseSources =
+	archive.c
+	archures.c
+	bfd.c
+	bfdio.c
+	bfdwin.c
+	cache.c
+	coffgen.c
+	corefile.c
+	format.c
+	init.c
+	libbfd.c
+	opncls.c
+	reloc.c
+	section.c
+	syms.c
+	targets.c
+	hash.c
+	linker.c
+	srec.c
+	binary.c
+	tekhex.c
+	ihex.c
+	stabs.c
+	stab-syms.c
+	merge.c
+	dwarf2.c
+	simple.c
+	archive64.c
+;
+
+local bfdGenericSources = 
+	cofflink.c
+	dwarf1.c
+	elf.c
+	elf32.c
+	elf32-gen.c
+	elflink.c
+	elf-eh-frame.c
+	elf-strtab.c
+;
+
+local bfdGeneratedSources = peigen.c ;
+
+local bfdAllSources = 
+	$(bfdBaseSources)
+	$(bfdGenericSources)
+	$(bfdArchSources)
+	$(bfdGeneratedSources)
+;
+
+StaticLibrary <gdb>bfd :
+	$(bfdAllSources)
+
+	: [ FCurrentObjectsDir ]
+;
+
+
+# generate source files/headers
+
+rule BFDSimpleSed
+{
+	# BFDSimpleSed <target> : <source> : <sed expression>
+
+	local target = [ FGristFiles $(1) ] ;
+	local source = [ FGristFiles $(2) ] ;
+
+	SED_EXPRESSION on $(target) = $(3) ;
+
+	Depends $(target) : $(source) ;
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	Clean clean : $(target) ;
+
+	BFDSimpleSed1 $(target) : $(source) ;
+}
+
+actions BFDSimpleSed1
+{
+	sed -e $(SED_EXPRESSION) < $(2) > $(1)
+}
+
+rule BFDFileSed
+{
+	# BFDFileSed <target> : <source> : <sed file>
+
+	local target = [ FGristFiles $(1) ] ;
+	local source = [ FGristFiles $(2) ] ;
+	local sedFile = [ FGristFiles $(3) ] ;
+
+	SED_FILE on $(target) = $(sedFile) ;
+	SEARCH on $(sedFile) = $(SEARCH_SOURCE) ;
+	Depends $(target) : $(sedFile) ;
+
+	Depends $(target) : $(source) ;
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	Clean clean : $(target) ;
+
+	BFDFileSed1 $(target) : $(source) ;
+}
+
+actions BFDFileSed1 bind SED_FILE
+{
+	sed -f $(SED_FILE) < $(2) > $(1)
+}
+
+rule BFDCopyConfigHeaders
+{
+	# BFDCopyConfigHeaders <header names> ;
+	local sources = $(1:G=$(SOURCE_GRIST:E)!config) ;
+
+	local source ;
+	for source in $(1) {
+		local target = [ FGristFiles $(source) ] ;
+		File $(target) : $(source) ;
+		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(OBOS_ARCH) ] ;
+		MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	}
+}
+
+local bfdHeadersToCopy =
+	bfd-in3.h
+	bfd.h
+	bfdver.h	# could be generated, too, but that'd require several `sed's
+	config.h
+;
+
+BFDSimpleSed peigen.c : peXXigen.c : s/XX/pe/g ;
+BFDSimpleSed elf32-target.h : elfxx-target.h : s/NN/32/g ;
+BFDFileSed targmatch.h : config.bfd : targmatch.sed ;
+BFDCopyConfigHeaders $(bfdHeadersToCopy) ;
+
+# Make a pseudo-target for all generated headers and make all object files
+# depend on them.
+
+local bfdGeneratedHeaders
+	= [ FGristFiles $(bfdHeadersToCopy) elf32-target.h targmatch.h ] ;
+
+Depends gdb-bfd-generated-headers : $(bfdGeneratedHeaders) ;
+NotFile gdb-bfd-generated-headers ;
+
+Depends [ FGristFiles $(bfdAllSources:S=$(SUFOBJ)) ]
+	 : gdb-bfd-generated-headers ;
