@@ -101,7 +101,6 @@ struct team {
 	} dead_children;
 	struct vm_address_space *aspace;
 	struct vm_address_space *kaspace;
-	addr_t			user_env_base;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
 	struct list		image_list;
