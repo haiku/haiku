@@ -28,8 +28,14 @@
 
 #define DIRECTDRIVER 4
 
+// The Painter driver will be a complete app_server drawing backend based on
+// the Anti-Grain Geometry 2D graphics engine. The Painter class encapsulates
+// all AGG related functionality, while the DisplayDriverPainter class uses
+// a Painter object to implement all app_server required drawing functions.
+#define PAINTERDRIVER 5
+
 // Display driver to be used by the server.
-#define DISPLAYDRIVER VIEWDRIVER
+#define DISPLAYDRIVER PAINTERDRIVER
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available
