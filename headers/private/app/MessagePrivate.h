@@ -9,6 +9,7 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <MessengerPrivate.h>
+#include <TokenSpace.h>
 
 class BMessage::Private
 {
@@ -26,7 +27,8 @@ class BMessage::Private
 		{
 			BMessenger::Private mp(messenger);
 			fMessage->fReplyTo.port = mp.Port();
-			fMessage->fReplyTo.target = mp.Token();
+			fMessage->fReplyTo.target
+				= (mp.IsPreferredTarget() ? B_PREFERRED_TOKEN : mp.Token());
 			fMessage->fReplyTo.team = mp.Team();
 			fMessage->fReplyTo.preferred = mp.IsPreferredTarget();
 		}
