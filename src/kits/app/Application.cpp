@@ -30,7 +30,6 @@
 #include <new>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 // System Includes -------------------------------------------------------------
 #include <Alert.h>
@@ -38,9 +37,9 @@
 #include <Application.h>
 #include <AppMisc.h>
 #include <Cursor.h>
+#include <Debug.h>
 #include <Entry.h>
 #include <File.h>
-#include <InterfaceDefs.h>
 #include <Locker.h>
 #include <Path.h>
 #include <PropertyInfo.h>
@@ -1067,70 +1066,53 @@ uint32 BApplication::InitialWorkspace()
 	return fInitialWorkspace;
 }
 //------------------------------------------------------------------------------
-int32 BApplication::count_windows(bool incl_menus) const
+int32
+BApplication::count_windows(bool includeMenus) const
 {
-	using namespace BPrivate;
-
-	// Windows are BLoopers, so we can just check each BLooper to see if it's
-	// a BWindow (or BMenuWindow)
 	int32 count = 0;
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	if (ListLock.IsLocked())
-	{
-		BLooper* Looper = NULL;
-		for (int32 i = 0; i < gLooperList.CountLoopers(); ++i)
-		{
-			Looper = gLooperList.LooperAt(i);
-			if (dynamic_cast<BWindow*>(Looper))
-			{
-				if (incl_menus || dynamic_cast<BMenuWindow*>(Looper) == NULL)
-				{
-					++count;
-				}
-			}
-		}
-	}
-
+	BList windowList;
+	if (get_window_list(&windowList, includeMenus) == B_OK)
+		count = windowList.CountItems();
+	
 	return count;
 }
 //------------------------------------------------------------------------------
-BWindow* BApplication::window_at(uint32 index, bool incl_menus) const
+BWindow *
+BApplication::window_at(uint32 index, bool includeMenus) const
+{
+	BList windowList;
+	BWindow *window = NULL;
+	if (get_window_list(&windowList, includeMenus) == B_OK) {
+		if ((int32)index < windowList.CountItems())
+			window = static_cast<BWindow *>(windowList.ItemAt(index));
+	}
+	
+	return window;	
+}
+//------------------------------------------------------------------------------
+status_t
+BApplication::get_window_list(BList *list, bool includeMenus) const
 {
 	using namespace BPrivate;
+	
+	ASSERT(list);
 
 	// Windows are BLoopers, so we can just check each BLooper to see if it's
 	// a BWindow (or BMenuWindow)
-	uint32 count = 0;
-	BWindow* Window = NULL;
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	if (ListLock.IsLocked())
-	{
-		BLooper* Looper = NULL;
-		for (int32 i = 0; i < gLooperList.CountLoopers() && !Window; ++i)
-		{
-			Looper = gLooperList.LooperAt(i);
-			if (dynamic_cast<BWindow*>(Looper))
-			{
-				if (incl_menus || dynamic_cast<BMenuWindow*>(Looper) == NULL)
-				{
-					if (count == index)
-					{
-						Window = dynamic_cast<BWindow*>(Looper);
-					}
-					else
-					{
-						++count;
-					}
-				}
+	BObjectLocker<BLooperList> listLock(gLooperList);
+	if (listLock.IsLocked()) {
+		BLooper *looper = NULL;
+		for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
+			looper = gLooperList.LooperAt(i);
+			if (dynamic_cast<BWindow *>(looper)) {
+				if (includeMenus || dynamic_cast<BMenuWindow *>(looper) == NULL)
+					list->AddItem(looper);
 			}
 		}
+		
+		return B_OK;
 	}
-
-	return Window;
-}
-//------------------------------------------------------------------------------
-status_t BApplication::get_window_list(BList* list, bool incl_menus) const
-{
+	
 	return B_ERROR;
 }
 //------------------------------------------------------------------------------
