@@ -14,6 +14,7 @@
 
 #include <debugger.h>
 #include <image.h>
+#include <syscalls.h>
 
 #include "MemoryReader.h"
 #include "Syscall.h"
@@ -54,6 +55,8 @@ static const char *kUsage =
 "  -c             - Don't colorize output.\n"
 "  -f             - Fast mode. Syscall arguments contents aren't retrieved.\n"
 "  -h, --help     - Print this text.\n"
+"  -l             - Also trace loading the excecutable. Only considered when\n"
+"                   an executable is provided.\n"
 "  -r             - Don't print syscall return values.\n"
 "  -s             - Also trace all threads spawned by the supplied thread,\n"
 "                   respectively the loaded executable's main thread.\n"
@@ -162,7 +165,7 @@ find_program(const char *programName, string &resolvedPath)
 
 // load_program
 thread_id
-load_program(const char *const *args, int32 argCount)
+load_program(const char *const *args, int32 argCount, bool traceLoading)
 {
 	// clone the argument vector so that we can change it
 	const char **mutableArgs = new const char*[argCount];
@@ -176,8 +179,15 @@ load_program(const char *const *args, int32 argCount)
 		return error;
 	mutableArgs[0] = programPath.c_str();
 
+	// count environment variables
+	int envCount = 0;
+	while (environ[envCount] != NULL)
+		envCount++;
+
 	// load the program
-	error = load_image(argCount, mutableArgs, (const char**)environ);
+	error = _kern_load_image(argCount, mutableArgs, envCount,
+		(const char**)environ, B_NORMAL_PRIORITY,
+		(traceLoading ? 0 : B_WAIT_TILL_LOADED));
 
 	delete[] mutableArgs;
 
@@ -375,6 +385,7 @@ main(int argc, const char *const *argv)
 	bool printArguments = true;
 	bool colorize = true;
 	bool fastMode = false;
+	bool traceLoading = false;
 	bool printReturnValues = true;
 	bool traceChildThreads = false;
 	bool traceTeam = false;
@@ -391,6 +402,8 @@ main(int argc, const char *const *argv)
 				colorize = false;
 			} else if (strcmp(arg, "-f") == 0) {
 				fastMode = true;
+			} else if (strcmp(arg, "-l") == 0) {
+				traceLoading = true;
 			} else if (strcmp(arg, "-r") == 0) {
 				printReturnValues = false;
 			} else if (strcmp(arg, "-s") == 0) {
@@ -423,7 +436,12 @@ main(int argc, const char *const *argv)
 	if (programArgCount > 1
 		|| !get_id(*programArgs, (traceTeam ? team : thread))) {
 		// we've been given an executable and need to load it
-		thread = load_program(programArgs, programArgCount);
+		thread = load_program(programArgs, programArgCount, traceLoading);
+		if (thread < 0) {
+			fprintf(stderr, "Failed to start `%s': %s\n", programArgs[0],
+				strerror(thread));
+			exit(1);
+		}
 	}		
 
 	// get the team ID, if we have none yet
