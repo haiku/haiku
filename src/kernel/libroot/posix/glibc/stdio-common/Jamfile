@@ -2,8 +2,8 @@ SubDir OBOS_TOP src kernel libroot posix glibc stdio-common ;
 
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
@@ -11,7 +11,7 @@ SubDirCcFlags -imacrolibc-symbols.h ;
 
 # ToDo: for now, all wide character functions are disabled
 
-KernelMergeObject posix_gnu_stdio_common.o :
+KernelMergeObject posix_gnu_stdio.o : #_common.o :
 	<$(SOURCE_GRIST)>_itoa.c
 #	<$(SOURCE_GRIST)>_itowa.c
 	<$(SOURCE_GRIST)>asprintf.c
@@ -23,11 +23,11 @@ KernelMergeObject posix_gnu_stdio_common.o :
 	<$(SOURCE_GRIST)>itoa-digits.c
 	<$(SOURCE_GRIST)>itoa-udigits.c
 #	<$(SOURCE_GRIST)>itowa-digits.c
-#	<$(SOURCE_GRIST)>perror.c
-	<$(SOURCE_GRIST)>printf-prs.c
+	<$(SOURCE_GRIST)>perror.c
+	<$(SOURCE_GRIST)>printf-parse.c
 	<$(SOURCE_GRIST)>printf.c
-	<$(SOURCE_GRIST)>printf_fp.c
-	<$(SOURCE_GRIST)>printf_size.c
+#	<$(SOURCE_GRIST)>printf_fp.c
+#	<$(SOURCE_GRIST)>printf_size.c
 	<$(SOURCE_GRIST)>putw.c
 	<$(SOURCE_GRIST)>reg-printf.c
 	<$(SOURCE_GRIST)>scanf.c
@@ -35,9 +35,12 @@ KernelMergeObject posix_gnu_stdio_common.o :
 	<$(SOURCE_GRIST)>sprintf.c
 	<$(SOURCE_GRIST)>sscanf.c
 	<$(SOURCE_GRIST)>tempnam.c
+	<$(SOURCE_GRIST)>tempname.c
 	<$(SOURCE_GRIST)>tmpnam.c
 	<$(SOURCE_GRIST)>tmpnam_r.c
 	<$(SOURCE_GRIST)>vfprintf.c
+#	<$(SOURCE_GRIST)>vfprintf_stub.c
+#	<$(SOURCE_GRIST)>vfscanf_stub.c
 	<$(SOURCE_GRIST)>vfscanf.c
 #	<$(SOURCE_GRIST)>vfwprintf.c
 #	<$(SOURCE_GRIST)>vfwscanf.c

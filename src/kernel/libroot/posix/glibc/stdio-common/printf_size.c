@@ -19,15 +19,11 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include <stdio_private.h>
 #include <ctype.h>
 #include <ieee754.h>
 #include <math.h>
 #include <printf.h>
-#ifdef USE_IN_LIBIO
-# include <libioP.h>
-#else
-# include <stdio.h>
-#endif
 
 
 /* This defines make it possible to use the same code for GNU C library and

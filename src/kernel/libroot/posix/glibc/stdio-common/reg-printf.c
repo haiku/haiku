@@ -14,13 +14,17 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   02111-1307 USA.
+*/
 
+
+#include <stdio_private.h>
 #include <errno.h>
 #include <limits.h>
 #include <printf.h>
 #include <stddef.h>
 #include <stdlib.h>
+
 
 /* Array of functions indexed by format character.  */
 libc_freeres_ptr (printf_arginfo_function **__printf_arginfo_table)

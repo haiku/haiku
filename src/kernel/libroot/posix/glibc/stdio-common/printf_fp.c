@@ -21,11 +21,7 @@
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-#ifdef USE_IN_LIBIO
-#  include <libioP.h>
-#else
-#  include <stdio.h>
-#endif
+#include <stdio_private.h>
 #include <alloca.h>
 #include <ctype.h>
 #include <float.h>
@@ -236,9 +232,11 @@ __printf_fp (FILE *fp,
 		}
 	    }
 
-	  mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);
-	  if (_cy != 0)
-	    frac[fracsize++] = _cy;
+		{
+			mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);
+			if (_cy != 0)
+				frac[fracsize++] = _cy;
+		}
 	}
 
       return L'0' + hi;
@@ -304,7 +302,7 @@ __printf_fp (FILE *fp,
 	       multibyte representation for the thousands separator,
 	       we must ensure the wide character thousands separator
 	       is available, even if it is fake.  */
-	    thousands_sepwc = 0xfffffffe;
+	    thousands_sepwc = (wchar_t)0xfffffffe;
 	}
     }
   else

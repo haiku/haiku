@@ -20,4 +20,4 @@
 /* Upper-case digits.  */
 const char _itoa_upper_digits[36]
 	= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-INTVARDEF(_itoa_upper_digits)
+//INTVARDEF(_itoa_upper_digits)

@@ -20,4 +20,4 @@
 /* Lower-case digits.  */
 const char _itoa_lower_digits[36]
 	= "0123456789abcdefghijklmnopqrstuvwxyz";
-INTVARDEF(_itoa_lower_digits)
+//INTVARDEF(_itoa_lower_digits)
