@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <Autolock.h>
 
 #define LOGGING 0
+#define LOG_TO_STDERR 0
 
 Report* Report::fInstance = NULL;
 
@@ -71,6 +72,10 @@ void Report::Add(kind kind, int32 page, const char* fmt, ...) {
 		va_list list;
 		char *b = new char[1 << 16];
 		va_start(list, fmt);
+#if LOG_TO_STDERR
+		vfprintf(stderr, fmt, list);
+		fprintf(stderr, "\n");
+#endif
 		vsprintf(b, fmt, list);
 		AddItem(new ReportRecord(kind, page, "", b));
 		delete b;
