@@ -79,7 +79,6 @@ enum {
 	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS = 0x50,
 
 	SERVER_MESSAGE_START = 0x100,
-	SERVER_REGISTER_ADDONSERVER,
 	SERVER_REGISTER_APP,
 	SERVER_UNREGISTER_APP,
 	SERVER_GET_NODE,
@@ -601,15 +600,6 @@ struct consumer_seek_tag_requested_reply : public reply_data
 	media_seek_tag seek_tag;
 	bigtime_t tagged_time;
 	uint32 flags;
-};
-
-struct server_register_addonserver_request : public request_data
-{
-	team_id team;
-};
-
-struct server_register_addonserver_reply : public reply_data
-{
 };
 
 struct server_register_app_request : public request_data

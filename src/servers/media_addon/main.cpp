@@ -184,24 +184,12 @@ MediaAddonServer::ReadyToRun()
 	// so we can talk to the media server and also receive
 	// commands for instantiation
 
-	// register with media_server
-	server_register_addonserver_request request;
-	server_register_addonserver_reply reply;
-	status_t result;
-	request.team = BPrivate::media::team;
-	result = QueryServer(SERVER_REGISTER_ADDONSERVER, &request, sizeof(request), &reply, sizeof(reply));
-	if (result != B_OK) {
-		ERROR("Communication with server failed. Terminating.\n");
-		PostMessage(B_QUIT_REQUESTED);
-		return;
-	}
-
 	ASSERT(fStartup == true);
 	
 	// The very first thing to do is to create the system time source,
 	// register it with the server, and make it the default SYSTEM_TIME_SOURCE
 	BMediaNode *ts = new SystemTimeSource;
-	result = mediaroster->RegisterNode(ts);
+	status_t result = mediaroster->RegisterNode(ts);
 	if (result != B_OK)
 		debugger("Can't register system time source");
 	if (ts->ID() != NODE_SYSTEM_TIMESOURCE_ID)

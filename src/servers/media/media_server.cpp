@@ -31,12 +31,15 @@
 char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
 
 #include <Application.h>
-#include <stdio.h>
+#include <Roster.h>
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Autolock.h>
+#include <Alert.h>
+#include <stdio.h>
 #include <string.h>
+
 #include "MMediaFilesManager.h"
 #include "NotificationManager.h"
 #include "ServerInterface.h"
@@ -78,11 +81,13 @@ public:
 	ServerApp();
 	~ServerApp();
 
-	bool QuitRequested();
-	void HandleMessage(int32 code, void *data, size_t size);
-	void ArgvReceived(int32 argc, char **argv);
-	static int32 controlthread(void *arg);
-//	void StartSystemTimeSource();
+private:
+	bool		QuitRequested();
+	void		HandleMessage(int32 code, void *data, size_t size);
+	void		ArgvReceived(int32 argc, char **argv);
+
+	void		StartAddonServer();
+	void		TerminateAddonServer();
 
 /* functionality not yet implemented
 00014a00 T _ServerApp::_ServerApp(void)
@@ -104,6 +109,8 @@ public:
 0001a658 T _ServerApp::BroadcastCurrentStateTo(BMessenger &)
 0001adcc T _ServerApp::ReadyToRun(void)
 */
+
+	static int32 controlthread(void *arg);
 
 private:
 	port_id		control_port;
@@ -131,17 +138,18 @@ ServerApp::ServerApp()
 	control_port = create_port(64, MEDIA_SERVER_PORT_NAME);
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
 	resume_thread(control_thread);
-
-//	StartSystemTimeSource();
-	gNodeManager->LoadState();
-	gFormatManager->LoadState();
-	
-
 }
 
 void ServerApp::ReadyToRun()
 {
-	gAppManager->StartAddonServer();
+	gNodeManager->LoadState();
+	gFormatManager->LoadState();
+
+	// make sure any previous media_addon_server is gone
+	TerminateAddonServer();
+	// and start a new one
+	StartAddonServer();
+	
 	gAddOnManager->LoadState();
 }
 
@@ -160,6 +168,20 @@ ServerApp::~ServerApp()
 	status_t err;
 	wait_for_thread(control_thread,&err);
 }
+
+
+bool
+ServerApp::QuitRequested()
+{
+	TRACE("ServerApp::QuitRequested()\n");
+	gMMediaFilesManager->SaveState();
+	gNodeManager->SaveState();
+	gFormatManager->SaveState();
+	gAddOnManager->SaveState();
+	TerminateAddonServer();
+	return true;
+}
+
 
 void ServerApp::ArgvReceived(int32 argc, char **argv)
 {
@@ -183,42 +205,80 @@ void ServerApp::ArgvReceived(int32 argc, char **argv)
 	}
 }
 
-bool
-ServerApp::QuitRequested()
-{
-	TRACE("ServerApp::QuitRequested()\n");
-	gMMediaFilesManager->SaveState();
-	gNodeManager->SaveState();
-	gFormatManager->SaveState();
-	gAddOnManager->SaveState();
-	gAppManager->TerminateAddonServer();
-	return true;
-}
 
+void ServerApp::StartAddonServer()
+{
+	status_t err;
+
+	// launching media_addon_server from this application's directoy
+	// should no longer be needed, we now can launch by mime signature
 /*
-void
-ServerApp::StartSystemTimeSource()
-{
-	TRACE("StartSystemTimeSource enter\n");
-	status_t rv;
-
-	TRACE("StartSystemTimeSource creating object\n");
-
-	// register a dummy node 
-	media_node node;
-	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "System Clock", B_TIME_SOURCE, SYSTEM_TIMESOURCE_CONTROL_PORT, BPrivate::media::team);
-	ASSERT(rv == B_OK);
+	app_info info;
+	BEntry entry;
+	BDirectory dir;
+	entry_ref ref;
 	
-	ASSERT(node.node == NODE_SYSTEM_TIMESOURCE_ID);
-
-	TRACE("StartSystemTimeSource setting as default\n");
+	err = GetAppInfo(&info);
+	err |= entry.SetTo(&info.ref);
+	err |= entry.GetParent(&entry);
+	err |= dir.SetTo(&entry);
+	err |= entry.SetTo(&dir, "media_addon_server");
+	err |= entry.GetRef(&ref);
 	
-	rv = gNodeManager->SetDefaultNode(SYSTEM_TIME_SOURCE, &node, NULL, NULL);
-	ASSERT(rv == B_OK);
-	
-	TRACE("StartSystemTimeSource leave\n");
-}
+	if (err == B_OK)
+		be_roster->Launch(&ref);
+	if (err == B_OK)
+		return;
 */
+
+	err = be_roster->Launch(B_MEDIA_ADDON_SERVER_SIGNATURE);
+	if (err == B_OK)
+		return;
+	
+	(new BAlert("media_server", "Launing media_addon_server failed.\n\nmedia_server will terminate", "OK"))->Go();
+	exit(1);
+}
+
+
+void ServerApp::TerminateAddonServer()
+{
+	// nothing to do if it's already terminated
+	if (!be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
+		return;
+
+	// send a quit request to the media_addon_server
+	BMessenger msger(B_MEDIA_ADDON_SERVER_SIGNATURE);
+	if (!msger.IsValid()) {
+		ERROR("Trouble terminating media_addon_server. Messenger invalid\n");
+	} else {
+		BMessage msg(B_QUIT_REQUESTED);
+		status_t err = msger.SendMessage(&msg, (BHandler *)NULL, 2000000 /* 2 sec timeout */);
+		if (err) {
+			ERROR("Trouble terminating media_addon_server (2). Error %d (%s)\n", err, strerror(err));
+		}
+	}
+	
+	// wait 5 seconds for it to terminate
+	for (int i = 0; i < 50; i++) {
+		if (!be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
+			return;
+		snooze(100000); // 100 ms
+	}
+	
+	// try to kill it (or many of them), up to 10 seconds
+	for (int i = 0; i < 50; i++) {
+		team_id id = be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE);
+		if (id < 0)
+			break;
+		kill_team(id);
+		snooze(200000); // 200 ms
+	}
+
+	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		ERROR("Trouble terminating media_addon_server, it's still running\n");
+	}
+}
+
 
 void 
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
@@ -245,15 +305,6 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 	
-		case SERVER_REGISTER_ADDONSERVER:
-		{
-			const server_register_addonserver_request *request = reinterpret_cast<const server_register_addonserver_request *>(data);
-			server_register_addonserver_reply reply;
-			rv = gAppManager->RegisterAddonServer(request->team);
-			request->SendReply(rv, &reply, sizeof(reply));
-			break;
-		}
-		
 		case SERVER_REGISTER_APP:
 		{
 			const server_register_app_request *request = reinterpret_cast<const server_register_app_request *>(data);
@@ -753,8 +804,8 @@ ServerApp::MessageReceived(BMessage *msg)
 
 		default:
 			inherited::MessageReceived(msg);
-			//printf("\nnew media server: unknown message received\n");
-			//msg->PrintToStream();
+			printf("\nmedia_server: unknown message received:\n");
+			msg->PrintToStream();
 			break;
 	}
 	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);

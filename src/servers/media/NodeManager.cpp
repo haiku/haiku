@@ -174,7 +174,7 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 		// exception. If the node is global, and the creator team tries to release it,
 		// we will release it in the the media_addon_server.
 		team_id addon_server_team;
-		addon_server_team = gAppManager->AddonServer();
+		addon_server_team = gAppManager->AddonServerTeam();
 		if (rn->creator == team && rn->teamrefcount.Get(addon_server_team, &count)) {
 			printf("!!! NodeManager::DecrementGlobalRefCount doing global release!\n");
 			rn->creator = -1; //invalidate!

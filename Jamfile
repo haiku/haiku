@@ -31,9 +31,16 @@ NotFile MediaKit ;
 Depends MediaKit :
 	libmedia.so 
 
-	desklink
+	# Servers
 	media_addon_server 
 	media_server
+
+	# Preference
+	Sounds
+	Media
+	
+	# Deskbar replicant
+	desklink
 
 	# add-ons
 	mixer.media_addon 	

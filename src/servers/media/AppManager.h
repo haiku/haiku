@@ -2,37 +2,34 @@
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#ifndef __APP_MANAGER_H
+#define __APP_MANAGER_H
 
 #include "TMap.h"
 
 class AppManager
 {
 public:
-	AppManager();
-	~AppManager();
+				AppManager();
+				~AppManager();
 
-	status_t RegisterAddonServer(team_id);
-	status_t RegisterTeam(team_id, BMessenger);
-	status_t UnregisterTeam(team_id);
-	bool HasTeam(team_id);
-	void StartAddonServer();
-	void TerminateAddonServer();
-	team_id AddonServer();
+	status_t	RegisterTeam(team_id, BMessenger);
+	status_t	UnregisterTeam(team_id);
+	bool		HasTeam(team_id);
+
+	team_id		AddonServerTeam();
+		
+	status_t	SendMessage(team_id team, BMessage *msg);
 	
-	status_t SendMessage(team_id team, BMessage *msg);
-	
-	void Dump();	
+	void		Dump();	
 	
 private:
-	void CleanupTeam(team_id);
-	void CleanupAddonServer();
-	void TeamDied(team_id team);
-	void RestartAddonServer();
+	void		CleanupTeam(team_id);
+	void		TeamDied(team_id team);
 	static int32 bigbrother(void *self);
-	void BigBrother();
+	void		BigBrother();
 
 private:
-	team_id fAddonServer;
 	thread_id fBigBrother;
 	sem_id fQuit;
 
@@ -43,3 +40,5 @@ private:
 	Map<team_id, App> * fAppMap;
 	BLocker	*fLocker;
 };
+
+#endif // __APP_MANAGER_H
