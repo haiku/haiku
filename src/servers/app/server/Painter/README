@@ -20,7 +20,7 @@ There is some work involved when trying to make this fast. The conversion should
 
 4) Most of the BView behaviour for DrawString() is missing.
 
-There is a lot of inconsistency in the BView implementation concerning the "current pen position", but all versions of DrawString() do put the pen at the position of the virtual next character. I will see to that when I implement all this escapment_delta stuff.
+Putting the current pen at the position of the virtual next char is now handled, but I have to figure out the escapment_delta stuff.
 
 5) Font handling is somewhat weird.
 
@@ -28,6 +28,10 @@ There is a FontManager class that is supposed to be an interface between font fa
 
 6) The framework is still developing.
 
-I'm still working on many ends of Painter and I might refactor things. The basic idea will of course stay for the most part, and is of course open for discussion by the rest of the team. I felt I wanted to get some results first, then see how it can all be improved. So, keep the comments comming.
+I'm still working on many ends of Painter and I might refactor things. The basic idea will likely stay for the most part, but is of course open for discussion by the rest of the team. I felt I wanted to get some results first, then see how it can all be improved. So, keep the comments comming.
+
+7) Article
+
+I have written a Newsletter article, that explains the concepts of AGG, how Painter is therefor designed and how it can be improved with the knowledge of AGG inner workings. I don't know when this article will appear, but email me if you're interested in the current version.
 
 
