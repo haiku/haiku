@@ -225,7 +225,8 @@ enum
 
 struct addonserver_instantiate_dormant_node_request : public request_data
 {
-	dormant_node_info info;
+	media_addon_id addonid;
+	int32 flavorid;
 };
 
 struct addonserver_instantiate_dormant_node_reply : public reply_data
