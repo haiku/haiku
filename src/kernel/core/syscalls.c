@@ -73,6 +73,9 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_WRITE_FS_INFO:
 			*call_ret = _user_write_fs_info((dev_t)arg0, (struct fs_info *)arg1, (int)arg2);
 			break;
+		case SYSCALL_NEXT_DEVICE:
+			*call_ret = _user_next_device((int32 *)arg0);
+			break;
 		case SYSCALL_SYNC:
 			*call_ret = _user_sync();
 			break;
