@@ -2,6 +2,7 @@ SubDir OBOS_TOP src apps bin coreutils-5.0 src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StdBinCommands
 	basename.c
@@ -85,30 +86,30 @@ StdBinCommands
 
 
 BinCommand ls : 
-	ls.c ls-dir.c : root libfetish.a ;
+	ls.c ls-dir.c : libfetish.a ;
 
 BinCommand rm : 
-	rm.c remove.c : root libfetish.a ;
+	rm.c remove.c : libfetish.a ;
 
 BinCommand chgroup : 
-	chgrp.c chown-core.c : root libfetish.a ;
+	chgrp.c chown-core.c : libfetish.a ;
 
 BinCommand chmod : 
-	chmod.c chown-core.c : root libfetish.a ;
+	chmod.c chown-core.c : libfetish.a ;
 
 BinCommand cp : 
-	cp.c copy.c cp-hash.c : root libfetish.a ;
+	cp.c copy.c cp-hash.c : libfetish.a ;
 
 BinCommand md5sum : 
-	md5sum.c md5.c : root libfetish.a ;
+	md5sum.c md5.c : libfetish.a ;
 
 BinCommand mv : 
-	mv.c copy.c cp-hash.c remove.c : root libfetish.a ;
+	mv.c copy.c cp-hash.c remove.c : libfetish.a ;
 
 BinCommand sha1sum : 
-	md5sum.c sha1sum.c : root libfetish.a ;
+	md5sum.c sha1sum.c : libfetish.a ;
 
 BinCommand vdir : 
-	ls.c ls-vdir.c : root libfetish.a ;
+	ls.c ls-vdir.c : libfetish.a ;
 
 

@@ -1,21 +1,22 @@
 SubDir OBOS_TOP src apps bin sharutils-4.2.1 lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary sharutils : 
-alloca.c
-basename.c
-error.c
-getopt.c
-getopt1.c
-md5.c
-memset.c
-mktime.c
-stpcpy.c
-strftime.c
-whoami.c
-xgetcwd.c
-xmalloc.c
-xstrdup.c
-: STATIC_LIBRARY_DIR
+	alloca.c
+	basename.c
+	error.c
+	getopt.c
+	getopt1.c
+	md5.c
+	memset.c
+	mktime.c
+	stpcpy.c
+	strftime.c
+	whoami.c
+	xgetcwd.c
+	xmalloc.c
+	xstrdup.c
+	: STATIC_LIBRARY_DIR
 ;

@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps bin grep-2.5 lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary greputils : 
 alloca.c

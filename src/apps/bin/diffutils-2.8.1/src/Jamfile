@@ -1,13 +1,14 @@
 SubDir OBOS_TOP src apps bin diffutils-2.8.1 src ;
 
-SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' -DPR_PROGRAM=\'\"/bin/pr\"\' -DDEFAULT_DIFF_PROGRAM=\'\"diff\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand diff : 
-  	analyze.c context.c diff.c dir.c ed.c ifdef.c io.c normal.c side.c util.c version.c : root libdiffutils.a ;
+  	analyze.c context.c diff.c dir.c ed.c ifdef.c io.c normal.c side.c util.c version.c : libdiffutils.a ;
 
 BinCommand diff3 : 
-	diff3.c version.c : root libdiffutils.a ;
+	diff3.c version.c : libdiffutils.a ;
 
 BinCommand cmp : 
-	cmp.c version.c : root libdiffutils.a ;
+	cmp.c version.c : libdiffutils.a ;

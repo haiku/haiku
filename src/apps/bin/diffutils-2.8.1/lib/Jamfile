@@ -1,43 +1,44 @@
 SubDir OBOS_TOP src apps bin diffutils-2.8.1 lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary diffutils : 
-alloca.c
-basename.c
-c-stack.c
-cmpbuf.c
-error.c
-exclude.c
-exitfail.c
-fnmatch.c
-freesoft.c
-getopt.c
-getopt1.c
-hard-locale.c
-imaxtostr.c
-malloc.c
-memchr.c
-mkstemp.c
-offtostr.c
-posixver.c
-prepargs.c
-quotesys.c
-realloc.c
-regex.c
-setmode.c
-strcasecmp.c
-strftime.c
-strtoimax.c
-strtol.c
-strtoul.c
-strtoull.c
-strtoumax.c
-tempname.c
-umaxtostr.c
-waitpid.c
-xmalloc.c
-xstrtol.c
-xstrtoumax.c
-: STATIC_LIBRARY_DIR
+	alloca.c
+	basename.c
+	c-stack.c
+	cmpbuf.c
+	error.c
+	exclude.c
+	exitfail.c
+	fnmatch.c
+	freesoft.c
+	getopt.c
+	getopt1.c
+	hard-locale.c
+	imaxtostr.c
+	malloc.c
+	memchr.c
+	mkstemp.c
+	offtostr.c
+	posixver.c
+	prepargs.c
+	quotesys.c
+	realloc.c
+	regex.c
+	setmode.c
+	strcasecmp.c
+	strftime.c
+	strtoimax.c
+	strtol.c
+	strtoul.c
+	strtoull.c
+	strtoumax.c
+	tempname.c
+	umaxtostr.c
+	waitpid.c
+	xmalloc.c
+	xstrtol.c
+	xstrtoumax.c
+	: STATIC_LIBRARY_DIR
 ;

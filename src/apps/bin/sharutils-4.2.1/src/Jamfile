@@ -2,6 +2,7 @@ SubDir OBOS_TOP src apps bin sharutils-4.2.1 src ;
 
 SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand shar : 
   	shar.c encode.c : root libsharutils.a ;

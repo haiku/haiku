@@ -2,6 +2,8 @@ SubDir OBOS_TOP src apps bin coreutils-5.0 lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
 StaticLibrary fetish : 
 __fpending.c
 acl.c
