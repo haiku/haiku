@@ -23,6 +23,7 @@
 
 // Project Includes ------------------------------------------------------------
 #include <cppunit/Exception.h>
+#include <TestShell.h>
 
 // Local Includes --------------------------------------------------------------
 #include "remoteobjectdef/RemoteTestObject.h"
@@ -41,7 +42,11 @@ const char* gLocalSig			= "application/x-vnd.LocalSignature";
 const char* gRemoteClassName	= "TRemoteTestObject";
 const char* gRemoteSig			= "application/x-vnd.RemoteObjectDef";
 const char* gValidSig			= gRemoteSig;
-
+#if !TEST_R5
+const char* gRemoteLib			= "/lib/libsupporttest_RemoteTestObject.so";
+#else
+const char* gRemoteLib			= "/lib_r5/libsupporttest_RemoteTestObject_r5.so";
+#endif
 
 void FormatAndThrow(int line, const char* file, const char* msg, int err);
 
@@ -456,17 +461,13 @@ void TInstantiateObjectTester::LoadAddon()
 	if (fAddonId > 0)
 		return;
 
-	BRoster Roster;
-	entry_ref ref;
-	status_t err = Roster.FindApp(gRemoteSig, &ref);
+	// We're not testing the roster, so I'm going to just
+	// find the add-on manually.
+	std::string libPath = std::string(BTestShell::GlobalTestDir()) + gRemoteLib;
+	cout << "dir == '" << libPath << "'" << endl;
+	fAddonId = load_add_on(libPath.c_str());
 
-	if (err)
-	{
-		FORMAT_AND_THROW(" failed to find app: ", err);
-	}
-
-	BPath Path(&ref);
-	fAddonId = load_add_on(Path.Path());
+	RES(fAddonId);
 	if (fAddonId <= 0)
 	{
 		FORMAT_AND_THROW(" failed to load addon: ", fAddonId);
