@@ -24,9 +24,11 @@ public:
 	status_t	DecodeNextChunk();
 	
 private:
-	struct vorbis_dsp_state fVorbisDspState;
-	struct vorbis_info fVorbisInfo;
-	struct media_raw_video_format fOutput;
+	vorbis_info			fInfo;
+	vorbis_comment		fComment;
+	vorbis_dsp_state	fDspState;
+	vorbis_block		fBlock;
+	media_raw_video_format fOutput;
 	int32			fResidualBytes;
 	uint8 *			fResidualBuffer;
 	uint8 *			fDecodeBuffer;

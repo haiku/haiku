@@ -5,9 +5,9 @@ UsePrivateHeaders media ;
 SubDirHdrs $(SUBDIR) .. ogg libogg ;
 SubDirHdrs $(SUBDIR) libvorbis vorbis ;
 
-Addon vorbis_decoder : media plugins :
+Addon vorbis : media plugins :
 	vorbisCodecPlugin.cpp
-	: false : libvorbis.a
+	: false : libvorbis.a libogg.a
 ;
 
 LinkSharedOSLibs vorbis : be libmedia.so ;
