@@ -157,7 +157,7 @@ BArchivable *BNetEndpoint::Instantiate(BMessage *archive)
 // #pragma mark -
 
 
-status_t BNetEndpoint::InitCheck() const
+status_t BNetEndpoint::InitCheck()
 {
 	return m_init;
 }
@@ -169,13 +169,13 @@ int BNetEndpoint::Socket() const
 }
 
 
-const BNetAddress & BNetEndpoint::LocalAddr() const
+const BNetAddress & BNetEndpoint::LocalAddr()
 {
 	return m_addr;
 }
 
 
-const BNetAddress & BNetEndpoint::RemoteAddr() const
+const BNetAddress & BNetEndpoint::RemoteAddr()
 {
 	return m_peer;
 }

@@ -62,7 +62,7 @@ public:
 	/*
 	 * It is important to call InitCheck() after creating an instance of this class.
 	 */	
-	status_t InitCheck() const;
+	status_t InitCheck();
 
 
 	/*
@@ -105,8 +105,8 @@ public:
 	 * BNetEndpoint. RemoteAddr() returns a BNetAddress corresponding to the address of
 	 * the remote peer we are connected to, if using a connected stream protocol.
 	 */
-	const BNetAddress & LocalAddr() const;
-	const BNetAddress & RemoteAddr() const;
+	const BNetAddress & LocalAddr();
+	const BNetAddress & RemoteAddr();
 	
 	/*
 	 * BNetEndpoint::Socket() returns the actual socket used for data communications.
