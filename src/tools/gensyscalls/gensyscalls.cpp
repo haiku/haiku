@@ -14,15 +14,20 @@
 
 // usage
 const char *kUsage =
-"Usage: gensyscalls <header> <dispatcher template> <calls> <dispatcher>\n"
+"Usage: gensyscalls <header> <calls> <dispatcher>\n"
+"\n"
+"Given the (preprocessed) header file that defines the syscall prototypes the\n"
+"command generates a piece of assembly source file that defines the actual\n"
+"syscalls and a piece of C source (cases of a switch statement) for the \n"
+"kernel syscall dispatcher. Either file is to be included from a respective\n"
+"skeleton source file.\n"
 "\n"
 "  <header>               - Input: The preprocessed header file with the\n"
 "                           syscall prototypes.\n"
-"  <dispatcher template>  - Input: A template used to generate the syscall\n"
-"                           dispatcher source file.\n"
 "  <calls>                - Output: The assembly source file implementing the\n"
 "                           actual syscalls."
-"  <dispatcher>           - Output: The syscall dispatcher source file.\n";
+"  <dispatcher>           - Output: The C source file to be included by the\n"
+"                           syscall dispatcher source file.\n";
 
 // print_usage
 static
@@ -80,10 +85,26 @@ public:
 		return fReturnType;
 	}
 
-private:
+protected:
 	string			fName;
 	vector<Type>	fParameters;
 	Type			fReturnType;
+};
+
+// Syscall
+class Syscall : public Function {
+public:
+	string GetKernelName() const
+	{
+		int baseIndex = 0;
+		if (fName.find("_kern_") == 0)
+			baseIndex = strlen("_kern_");
+		else if (fName.find("sys_") == 0)
+			baseIndex = strlen("sys_");
+		string kernelName("_user_");
+		kernelName.append(string(fName, baseIndex));
+		return kernelName;
+	}
 };
 
 // Exception
@@ -168,7 +189,6 @@ public:
 		fHasCurrent = true;
 		if (skippedTokens)
 			skippedTokens->push(fTokens.front());
-printf("next token: `%s'\n", fTokens.front().c_str());
 		return fTokens.front();
 	}
 
@@ -290,38 +310,26 @@ public:
 			print_usage(false);
 			return 0;
 		}
-		if (argc != 5) {
+		if (argc != 4) {
 			print_usage(true);
 			return 1;
 		}
-//		fDispatcherTemplateFile = argv[2];
-//		fCallsFile = argv[3];
-//		fDispatcherFile = argv[4];
-		// open the files
-		fHeaderFile.open(argv[1], ifstream::in);
-		if (!fHeaderFile.is_open())
-			throw new IOException(string("Failed to open `") + argv[1] + "'.");
-		// parse the syscalls
-		vector<Function> syscalls;
-		_ParseSyscalls(syscalls);
-		for (int i = 0; i < (int)syscalls.size(); i++) {
-			const Function &syscall = syscalls[i];
-			printf("syscall: `%s'\n", syscall.GetName().c_str());
-			for (int k = 0; k < (int)syscall.CountParameters(); k++)
-				printf("  arg: `%s'\n", syscall.ParameterAt(k).type.c_str());
-			printf("  return type: `%s'\n",
-				syscall.GetReturnType().type.c_str());
-			
-		}
-printf("Found %lu syscalls.\n", syscalls.size());
+		_ParseSyscalls(argv[1]);
+		_WriteSyscallsFile(argv[2]);
+		_WriteDispatcherFile(argv[3]);
 		return 0;
 	}
 
 
 private:
-	void _ParseSyscalls(vector<Function> &syscalls)
+	void _ParseSyscalls(const char *filename)
 	{
-		Tokenizer tokenizer(fHeaderFile);
+		// open the input file
+		ifstream file(filename, ifstream::in);
+		if (!file.is_open())
+			throw new IOException(string("Failed to open `") + filename + "'.");
+		// parse the syscalls
+		Tokenizer tokenizer(file);
 		// find "#pragma syscalls begin"
 		while (true) {
 			while (tokenizer.GetNextToken() != "#");
@@ -335,17 +343,65 @@ private:
 		}
 		// parse the functions
 		while (!tokenizer.CheckNextToken("#")) {
-			Function syscall;
+			Syscall syscall;
 			_ParseSyscall(tokenizer, syscall);
-			syscalls.push_back(syscall);
+			fSyscalls.push_back(syscall);
 		}
 		// expect "pragma syscalls end"
 		tokenizer.ExpectNextToken("pragma");
 		tokenizer.ExpectNextToken("syscalls");
 		tokenizer.ExpectNextToken("end");
+
+//		for (int i = 0; i < (int)fSyscalls.size(); i++) {
+//			const Syscall &syscall = fSyscalls[i];
+//			printf("syscall: `%s'\n", syscall.GetName().c_str());
+//			for (int k = 0; k < (int)syscall.CountParameters(); k++)
+//				printf("  arg: `%s'\n", syscall.ParameterAt(k).type.c_str());
+//			printf("  return type: `%s'\n",
+//				syscall.GetReturnType().type.c_str());
+//		}
+//		printf("Found %lu syscalls.\n", fSyscalls.size());
 	}
 
-	void _ParseSyscall(Tokenizer &tokenizer, Function &syscall)
+	void _WriteSyscallsFile(const char *filename)
+	{
+		// open the syscalls output file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw new IOException(string("Failed to open `") + filename + "'.");
+		// output the syscalls definitions
+		for (int i = 0; i < (int)fSyscalls.size(); i++) {
+			const Syscall &syscall = fSyscalls[i];
+			file << "SYSCALL" << syscall.CountParameters() << "("
+				<< syscall.GetName() << ", " << i << ")" << endl;
+		}
+	}
+
+	void _WriteDispatcherFile(const char *filename)
+	{
+		// open the dispatcher output file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw new IOException(string("Failed to open `") + filename + "'.");
+		// output the case statements
+		for (int i = 0; i < (int)fSyscalls.size(); i++) {
+			const Syscall &syscall = fSyscalls[i];
+			file << "case " << i << ":" << endl;
+			file << "\t";
+			if (syscall.GetReturnType().type != "void")
+				file << "*call_ret = ";
+			file << syscall.GetKernelName() << "(";
+			if (syscall.CountParameters() > 0) {
+				file << "(" << syscall.ParameterAt(0).type << ")arg0";
+				for (int k = 1; k < (int)syscall.CountParameters(); k++)
+					file << ", (" << syscall.ParameterAt(k).type << ")arg" << k;
+			}
+			file << ");" << endl;
+			file << "\tbreak;" << endl;
+		}
+	}
+
+	void _ParseSyscall(Tokenizer &tokenizer, Syscall &syscall)
 	{
 		// get return type and function name
 		vector<string> returnType;
@@ -378,7 +434,7 @@ private:
 		tokenizer.ExpectNextToken(";");
 	}
 
-	void _ParseParameter(Tokenizer &tokenizer, Function &syscall)
+	void _ParseParameter(Tokenizer &tokenizer, Syscall &syscall)
 	{
 		vector<string> type;
 		while (tokenizer.GetNextToken() != ")"
@@ -410,7 +466,7 @@ private:
 		syscall.AddParameter(typeString);
 	}
 
-	void _ParseFunctionPointerParameter(Tokenizer &tokenizer, Function &syscall,
+	void _ParseFunctionPointerParameter(Tokenizer &tokenizer, Syscall &syscall,
 		vector<string> &type)
 	{
 		// When this method is entered, the return type and the opening
@@ -445,10 +501,7 @@ private:
 	}
 
 private:
-	ifstream	fHeaderFile;
-	const char	*fDispatcherTemplateFile;
-	const char	*fCallsFile;
-	const char	*fDispatcherFile;
+	vector<Syscall>	fSyscalls;
 };
 
 
