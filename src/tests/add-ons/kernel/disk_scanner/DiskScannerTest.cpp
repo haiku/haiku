@@ -83,7 +83,7 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 
 	// get the session info
 	error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
-												  &sessionInfo, NULL);
+											  &sessionInfo, NULL);
 
 	// get the partition info
 	if (error == B_OK) {
