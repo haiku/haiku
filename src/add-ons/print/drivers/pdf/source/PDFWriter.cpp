@@ -117,10 +117,12 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 	fPage = pageNumber;
 
 	if (pageNumber == 1) {
-		if (MakesPattern()) 
+		if (MakesPattern()) {
 			REPORT(kDebug, fPage, ">>>>> Collecting patterns...");
-		else if (MakesPDF())
+		} else if (MakesPDF()) {
 			REPORT(kDebug, fPage, ">>>>> Generating PDF...");
+			fImageCache.ResetID();
+		}
 	}
 	
 	paperRect = JobMsg()->FindRect("paper_rect");
@@ -229,7 +231,8 @@ PDFWriter::EndJob()
 		fprintf(fLog, ": %s\n", rr->Desc()); 
 	}
 #endif
-
+	fImageCache.Flush(fPdf);
+	
 	PDF_close(fPdf);
 	REPORT(kDebug, 0, ">>>> PDF_close");
 
@@ -262,12 +265,14 @@ PDFWriter::InitWriter()
 	fStateDepth = 0;
 
 	// pdflib scope: object
+/*
 	const char* license_key;
 	if (JobMsg()->FindString("pdflib_license_key", &license_key) == B_OK &&
 		license_key[0] != 0) {
 		REPORT(kDebug, 0, "license key found %s!", license_key);
 		PDF_set_parameter(fPdf, "license", license_key);
 	}
+*/
 
 	fPDFVersion = kPDF13;
 	const char * compatibility;
@@ -278,6 +283,7 @@ PDFWriter::InitWriter()
 		else if (strcmp(compatibility, "1.5") == 0) fPDFVersion = kPDF15;
 	}
 
+/*
 	// set user/master password
 	BString master_password, user_password;
 	if (JobMsg()->FindString("master_password", &master_password) == B_OK &&
@@ -293,6 +299,7 @@ PDFWriter::InitWriter()
 		permissions.Length() > 0) {
 		PDF_set_parameter(fPdf, "permissions", permissions.String());
 	}
+*/
 
 	REPORT(kDebug, 0, ">>>> PDF_open_mem");	
 	PDF_open_mem(fPdf, _WriteData);	// use callback to stream PDF document data to printer transport
@@ -791,14 +798,18 @@ PDFWriter::CreatePattern()
 	int pattern = PDF_begin_pattern(fPdf, 8, 8, 8, 8, 1);
 	if (pattern == -1) {
 		REPORT(kError, fPage, "CreatePattern could not create pattern");
+#if !USE_IMAGE_CACHE
 		PDF_close_image(fPdf, image);
+#endif
 		if (mask != -1) PDF_close_image(fPdf, mask);
 		return;
 	}
 	PDF_setcolor(fPdf, "both", "rgb", 0, 0, 1, 0);
 	PDF_place_image(fPdf, image, 0, 0, 1);
 	PDF_end_pattern(fPdf);
+#if !USE_IMAGE_CACHE
 	PDF_close_image(fPdf, image);
+#endif
 	if (mask != -1) PDF_close_image(fPdf, mask);
 #endif
 	
@@ -1612,8 +1623,13 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 	}
 	
 	if (mask) {
-		*maskId = PDF_open_image(fPdf, "raw", "memory", (const char *) mask, length, width, height, 1, bpc, "mask");
+//		*maskId = PDF_open_image(fPdf, "raw", "memory", (const char *) mask, length, width, height, 1, bpc, "mask");
+		BString options;
+		PDF_create_pvf(fPdf, "mask", 0, mask, length, NULL);
+		options << "width " << width << " height " << height << " components 1 bpc " << bpc;  
+		*maskId = PDF_load_image(fPdf, "raw", "mask", 0, options.String());
 		delete []mask;
+		PDF_delete_pvf(fPdf, "mask", 0);
 	}
 
 	BBitmap * bm = ConvertBitmap(src, bytesPerRow, pixelFormat, flags, data);
@@ -1623,6 +1639,10 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 		return false;
 	}
 
+#if USE_IMAGE_CACHE
+	*image = fImageCache.GetImage(fPdf, bm, *maskId);
+	delete bm;
+#else
 	char *pdfLibFormat   = "png";
 	char *bitmapFileName = "/tmp/pdfwriter.png";	
 	const uint32 beosFormat    = B_PNG_FORMAT;
@@ -1637,6 +1657,7 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 
 	*image = PDF_open_image_file(fPdf, pdfLibFormat, bitmapFileName, 
 		*maskId == -1 ? "" : "masked", *maskId == -1 ? 0 : *maskId);
+#endif
 
 	return *image >= 0;
 }
@@ -2111,7 +2132,6 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 					width, height, bytesPerRow, pixelFormat, flags, data);
 
 	SetColor();
-	if (!MakesPDF()) return;
 	
 	if (IsClipping()) {
 		REPORT(kError, fPage, "DrawPixels for clipping not implemented yet!");
@@ -2123,6 +2143,7 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 	if (!GetImages(src, width, height, bytesPerRow, pixelFormat, flags, data, &maskId, &image)) {
 		return;
 	}
+	if (!MakesPDF()) return;
 
 	const float scaleX = (dest.Width()+1) / (src.Width()+1);
 	const float scaleY = (dest.Height()+1) / (src.Height()+1);
@@ -2146,7 +2167,9 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 
 	if ( image >= 0 ) {
 		PDF_place_image(fPdf, image, x, y, scale(1.0));
+#if !USE_IMAGE_CACHE
 		PDF_close_image(fPdf, image);
+#endif
 	} else 
 		REPORT(kError, fPage, "PDF_open_image_file failed!");
 

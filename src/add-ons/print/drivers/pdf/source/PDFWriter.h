@@ -45,8 +45,11 @@ THE SOFTWARE.
 #include "SubPath.h"
 #include "Utils.h"
 #include "Link.h"
+#include "ImageCache.h"
 
 #include "pdflib.h"
+
+#define USE_IMAGE_CACHE 1
 
 #define RAD2DEGREE(r) (180.0 * r / PI)
 #define DEGREE2RAD(d) (PI * d / 180.0)
@@ -310,6 +313,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		TList<Pattern>  fPatterns;
 		TList<Transparency> fTransparencyCache;
 		TList<Transparency> fTransparencyStack;
+		ImageCache      fImageCache;
 		int64           fEmbedMaxFontSize;
 		BScreen         *fScreen;
 		Fonts           *fFonts;
