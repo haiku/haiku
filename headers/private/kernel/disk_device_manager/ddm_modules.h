@@ -35,6 +35,8 @@ typedef bool (*partition_supports_moving_partition)(partition_data *partition,
 	bool *whileMounted);
 typedef bool (*partition_supports_moving_child_partition)(
 	partition_data *partition, partition_data *child);
+typedef bool (*partition_supports_creating_child_partition)(
+	partition_data *partition);
 typedef bool (*partition_supports_parent_system)(const char *system);
 typedef bool (*partition_supports_child_system)(const char *system);
 
@@ -48,7 +50,7 @@ typedef bool (*partition_validate_move_child_partition)(
 	partition_data *partition, partition_data *child, off_t *start);
 typedef bool (*partition_validate_create_child_partition)(
 	partition_data *partition, partition_data *child, off_t *start,
-	off_t *size, const char *parameters);
+	off_t *size, const char *type, const char *parameters);
 typedef bool (*partition_validate_initialize_partition)(
 	partition_data *partition, const char *parameters);
 typedef bool (*partition_validate_set_partition_parameters)(
@@ -72,8 +74,8 @@ typedef status_t (*partition_move_partition)(int fd,
 typedef status_t (*partition_move_child_partition)(int fd,
 	partition_id partition, partition_id child, off_t offset, disk_job_id job);
 typedef status_t (*partition_create_child_partition)(int fd,
-	partition_id partition, off_t offset, off_t size, const char *parameters,
-	disk_job_id job, partition_id *childID);
+	partition_id partition, off_t offset, off_t size, const char *type,
+	const char *parameters, disk_job_id job, partition_id *childID);
 	// childID is used for the return value, but is also an optional input
 	// parameter -- -1 to be ignored
 typedef status_t (*partition_delete_child_partition)(int fd,
@@ -104,12 +106,14 @@ typedef struct partition_module_info {
 	partition_supports_moving_partition			supports_moving_partition;
 	partition_supports_moving_child_partition
 			supports_moving_child_partition;
+	partition_supports_creating_child_partition
+			supports_creating_child_partition;
 	partition_supports_parent_system			supports_parent_system;
 	partition_supports_child_system				supports_child_system;
 	partition_validate_resize_partition			validate_resize_partition;
-	partition_validate_move_partition			validate_move_partition;
 	partition_validate_resize_child_partition
 			validate_resize_child_partition;
+	partition_validate_move_partition			validate_move_partition;
 	partition_validate_move_child_partition		validate_move_child_partition;
 	partition_validate_create_child_partition
 			validate_create_child_partition;
@@ -139,14 +143,13 @@ typedef struct partition_module_info {
 
 // scanning
 // (the device is write locked)
-typedef float (*fs_identify_partition)(const char *partitionPath,
-	partition_data *partition, void **cookie);
-typedef status_t (*fs_scan_partition)(const char *partitionPath,
-	partition_data *partition, void *identifyCookie);
+typedef float (*fs_identify_partition)(int fd, partition_data *partition,
+	void **cookie);
+typedef status_t (*fs_scan_partition)(int fd, partition_data *partition,
+	void *cookie);
 typedef void (*fs_free_identify_partition_cookie)(partition_data *partition,
 	void *cookie);
-typedef void (*fs_free_partition_content_cookie)(partition_data *partition,
-	void *cookie);
+typedef void (*fs_free_partition_content_cookie)(partition_data *partition);
 
 // querying
 // (the device is read locked)
