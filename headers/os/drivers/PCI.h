@@ -239,6 +239,11 @@ struct pci_module_info {
 #define PCI_docking_station			0x0a	/* docking stations */
 #define PCI_processor				0x0b	/* processors */
 #define PCI_serial_bus				0x0c	/* serial_bus_controller */
+#define PCI_wireless				0x0d
+#define PCI_intelligent_io			0x0e
+#define PCI_satellite_communications 0x0f
+#define PCI_encryption_decryption	0x10
+#define PCI_data_acquisition		0x11
 
 #define PCI_undefined				0xFF	/* not in any defined class */
 
