@@ -105,6 +105,10 @@ create_temp_sg(scsi_ccb *ccb)
 	SHOW_FLOW(3, "ccb=%p, data=%p, data_len=%lu", ccb, ccb->data, ccb->data_len);
 
 	ccb->sg_list = temp_sg = locked_pool->alloc(temp_sg_pool);
+	if (temp_sg == NULL) {
+		SHOW_ERROR0(2, "cannot allocate memory for IO request!");
+		return false;
+	}
 
 	res = lock_memory(ccb->data, ccb->data_len, B_DMA_IO
 		| ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
@@ -127,15 +131,19 @@ err:
 }
 
 
-// cleanup temporary SG list
-void uninit_temp_sg( void )
+/** cleanup temporary SG list */
+
+void
+uninit_temp_sg(void)
 {
-	locked_pool->destroy( temp_sg_pool );
+	locked_pool->destroy(temp_sg_pool);
 }
 
 
-// destroy SG list buffer
-void cleanup_tmp_sg( scsi_ccb *ccb )
+/** destroy SG list buffer */
+
+void
+cleanup_tmp_sg(scsi_ccb *ccb)
 {
 	status_t res;
 
@@ -143,15 +151,15 @@ void cleanup_tmp_sg( scsi_ccb *ccb )
 		ccb, ccb->data, (int)ccb->data_len );
 
 	res = unlock_memory( ccb->data, ccb->data_len, B_DMA_IO | 
-		( (ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0 ));
+		((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 	if (res != B_OK) {
 		SHOW_FLOW0(3, "Cannot unlock previously locked memory!");
 		panic("Cannot unlock previously locked memory!");
 	}
-		
+
 	locked_pool->free(temp_sg_pool, (physical_entry *)ccb->sg_list);
-	
+
 	// restore previous state
 	ccb->sg_list = NULL;
 }
