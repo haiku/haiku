@@ -177,11 +177,19 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
 
+	/* unknown.. */
+	NV_REG8(NV8_VSE2) = 0x01;
+
 	/* enable access to primary head */
 	set_crtc_owner(0);
 	/* unlock head's registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	/* disable RMA as it's not used */
+	/* (RMA is the cmd register for the 32bit port in the GPU to access 32bit registers
+	 *  and framebuffer via legacy ISA I/O space.) */
+	CRTCW(RMA, 0x00);
+
 	if (si->ps.secondary_head)
 	{
 		/* enable access to secondary head */
@@ -309,6 +317,8 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			/* execute */
 			adress += 1;
 			LOG(8,("cmd 'setup RAM config'\n"));
+			//fixme: setup_ram_config is also used on NV11 (at least), which means the
+			//       routine should function differently there!
 			if (exec) setup_ram_config(rom);
 			break;
 		case 0x65:
@@ -382,6 +392,36 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			}
 
 			adress += 1;
+			break;
+		case 0x69:
+			*size -= 5;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			or_in = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'RD 8bit ISA I/O REG $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+				reg, and_out, or_in));
+			//fixme? this is for ISA I/O registers. Looks like they are in mapped range
+			//       as well (confirm or update code!)
+			if (exec)
+			{
+				byte = NV_REG8(/*0x00601000 + */reg);
+				byte &= (uint8)and_out;
+				byte |= (uint8)or_in;
+				NV_REG8(/*0x00601000 + */reg) = byte;
+			}
 			break;
 		case 0x6e:
 			*size -= 13;
@@ -479,17 +519,19 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit indexed REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD 8bit indexed ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
+			//fixme? this is for ISA I/O registers. Looks like they are in mapped range
+			//       as well (confirm or update code!)
 			if (exec)
 			{
-				safe = NV_REG8(0x00601000 + reg);
-				NV_REG8(0x00601000 + reg) = index;
-				byte = NV_REG8(0x00601000 + reg + 1);
+				safe = NV_REG8(/*0x00601000 + */reg);
+				NV_REG8(/*0x00601000 + */reg) = index;
+				byte = NV_REG8(/*0x00601000 + */reg + 1);
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				NV_REG8(0x00601000 + reg + 1) = byte;
-				NV_REG8(0x00601000 + reg) = safe;
+				NV_REG8(/*0x00601000 + */reg + 1) = byte;
+				NV_REG8(/*0x00601000 + */reg) = safe;
 			}
 			break;
 		case 0x79:
