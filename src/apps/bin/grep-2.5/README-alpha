@@ -1,0 +1,10 @@
+Newer ALPHA versions of this code are available through
+anonymous CVS:
+
+$ cvs -d :pserver:anoncvs@subversions.gnu.org:/cvs checkout grep
+
+If you are using an old version of cvs, you might have to run
+$ cvs -d :pserver:anoncvs@subversions.gnu.org:/cvs login
+first (and just press enter at the password prompt).
+
+Please send comments and problem reports to <bug-grep@gnu.org>.

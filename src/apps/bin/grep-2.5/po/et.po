@@ -1,0 +1,395 @@
+# Estonian translations for grep
+# Copyright (C) 2000 Free Software Foundation, Inc.
+# Toomas Soome <tsoome@ut.ee>, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: grep 2.5g\n"
+"POT-Creation-Date: 2002-01-22 14:39+0100\n"
+"PO-Revision-Date: 2002-03-07 13:09+0200\n"
+"Last-Translator: Toomas Soome <tsoome@ut.ee>\n"
+"Language-Team: Estonian <et@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: src/dfa.c:136 src/dfa.c:147 src/dfa.c:158 src/search.c:689
+msgid "Memory exhausted"
+msgstr "Mälu on otsas"
+
+#: src/dfa.c:489 src/dfa.c:492 src/dfa.c:510 src/dfa.c:521 src/dfa.c:545 src/dfa.c:604 src/dfa.c:609 src/dfa.c:622 src/dfa.c:623 src/dfa.c:1001 src/dfa.c:1004 src/dfa.c:1028 src/dfa.c:1032 src/dfa.c:1033 src/dfa.c:1036 src/dfa.c:1048 src/dfa.c:1049
+msgid "Unbalanced ["
+msgstr "Balanseerimata ["
+
+#: src/dfa.c:741
+msgid "Unfinished \\ escape"
+msgstr "Lõpetamata \\ paojada"
+
+#. Cases:
+#. {M} - exact count
+#. {M,} - minimum count, maximum is infinity
+#. {M,N} - M through N
+#: src/dfa.c:874 src/dfa.c:880 src/dfa.c:890 src/dfa.c:898 src/dfa.c:913
+msgid "unfinished repeat count"
+msgstr "lõpetamata korduste arv"
+
+#: src/dfa.c:887 src/dfa.c:904 src/dfa.c:912 src/dfa.c:916
+msgid "malformed repeat count"
+msgstr "vigane korduste arv"
+
+#: src/dfa.c:1253
+msgid "Unbalanced ("
+msgstr "Balanseerimata ("
+
+#: src/dfa.c:1378
+msgid "No syntax specified"
+msgstr "Süntaksit pole määratud"
+
+#: src/dfa.c:1386
+msgid "Unbalanced )"
+msgstr "Balanseerimata )"
+
+#: src/dfa.c:2956
+msgid "out of memory"
+msgstr "mälu on otsas"
+
+#: lib/obstack.c:471 src/kwset.c:171 src/kwset.c:177 src/search.c:103 src/search.c:209 src/search.c:293
+msgid "memory exhausted"
+msgstr "mälu on otsas"
+
+#: src/grep.c:205
+msgid "invalid context length argument"
+msgstr "vigane konteksti pikkuse argument"
+
+#: src/grep.c:475
+msgid "input is too large to count"
+msgstr "sisend on loendamiseks liiga suur"
+
+#: src/grep.c:597
+msgid "writing output"
+msgstr "kirjutan väljundit"
+
+#: src/grep.c:870
+#, c-format
+msgid "Binary file %s matches\n"
+msgstr "Kahendfail %s sobib\n"
+
+#: src/grep.c:884
+msgid "(standard input)"
+msgstr "(standardsisend)"
+
+#: src/grep.c:989
+#, c-format
+msgid "warning: %s: %s\n"
+msgstr "hoiatus: %s: %s\n"
+
+#: src/grep.c:990
+msgid "recursive directory loop"
+msgstr "rekursiivne kataloogipuu tsükkel"
+
+#: src/grep.c:1038
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE]...\n"
+msgstr "Kasuta: %s [VÕTI]... MUSTER [FAIL] ...\n"
+
+#: src/grep.c:1040
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Lisainfo saamiseks proovige võtit `%s --help'.\n"
+
+#: src/grep.c:1045
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE] ...\n"
+msgstr "Kasuta: %s [VÕTI]... MUSTER [FAIL] ...\n"
+
+#: src/grep.c:1046
+#, c-format
+msgid ""
+"Search for PATTERN in each FILE or standard input.\n"
+"Example: %s -i 'hello world' menu.h main.c\n"
+"\n"
+"Regexp selection and interpretation:\n"
+msgstr ""
+"Otsi MUSTRIT igast FAIList või standardsisendist.\n"
+"Näiteks: %s -i 'tere kõik' menu.h main.c\n"
+"\n"
+"Regulaaravaldise valik ja interpreteerimine:\n"
+
+#: src/grep.c:1051
+msgid ""
+"  -E, --extended-regexp     PATTERN is an extended regular expression\n"
+"  -F, --fixed-strings       PATTERN is a set of newline-separated strings\n"
+"  -G, --basic-regexp        PATTERN is a basic regular expression\n"
+"  -P, --perl-regexp         PATTERN is a Perl regular expression\n"
+msgstr ""
+"  -E, --extended-regexp     MUSTER on laiendatud regulaaravaldis\n"
+"  -F, --fixed-strings       MUSTER on hulk reavahetustega eraldatud sõnesid\n"
+"  -G, --basic-regexp        MUSTER on lihtne regulaaravaldis\n"
+"  -P, --perl-regexp         MUSTER on Perl regulaaravaldis\n"
+
+#: src/grep.c:1056
+msgid ""
+"  -e, --regexp=PATTERN      use PATTERN as a regular expression\n"
+"  -f, --file=FILE           obtain PATTERN from FILE\n"
+"  -i, --ignore-case         ignore case distinctions\n"
+"  -w, --word-regexp         force PATTERN to match only whole words\n"
+"  -x, --line-regexp         force PATTERN to match only whole lines\n"
+"  -z, --null-data           a data line ends in 0 byte, not newline\n"
+msgstr ""
+"  -e, --regexp=MUSTER       kasuta regulaaravaldisena\n"
+"  -f, --file=FAIL           loe MUSTER failist FAIL\n"
+"  -i, --ignore-case         ignoreeri suur- ja väiketähtede erinevusi\n"
+"  -w, --word-regexp         kasuta MUSTRIT sõnade leidmiseks\n"
+"  -x, --line-regexp         kasuta MUSTRIT ridade leidmiseks\n"
+"  -z, --null-data           andmerida lõppeb baidil 0, mitte reavahetusel\n"
+
+#: src/grep.c:1063
+msgid ""
+"\n"
+"Miscellaneous:\n"
+"  -s, --no-messages         suppress error messages\n"
+"  -v, --invert-match        select non-matching lines\n"
+"  -V, --version             print version information and exit\n"
+"      --help                display this help and exit\n"
+"      --mmap                use memory-mapped input if possible\n"
+msgstr ""
+"\n"
+"Muud:\n"
+"  -s, --no-messages         blokeeri veateated\n"
+"  -v, --invert-match        vali mitte-sobivad read\n"
+"  -V, --version             esita versiooniinfo ja lõpeta töö\n"
+"      --help                esita see abiinfo ja lõpeta töö\n"
+"      --mmap                kasuta kui võimalik sisendi mällu laadimist\n"
+
+#: src/grep.c:1071
+msgid ""
+"\n"
+"Output control:\n"
+"  -m, --max-count=NUM       stop after NUM matches\n"
+"  -b, --byte-offset         print the byte offset with output lines\n"
+"  -n, --line-number         print line number with output lines\n"
+"      --line-buffered       flush output on every line\n"
+"  -H, --with-filename       print the filename for each match\n"
+"  -h, --no-filename         suppress the prefixing filename on output\n"
+"      --label=LABEL         print LABEL as filename for standard input\n"
+"  -o, --only-matching       show only the part of a line matching PATTERN\n"
+"  -q, --quiet, --silent     suppress all normal output\n"
+"      --binary-files=TYPE   assume that binary files are TYPE\n"
+"                            TYPE is 'binary', 'text', or 'without-match'\n"
+"  -a, --text                equivalent to --binary-files=text\n"
+"  -I                        equivalent to --binary-files=without-match\n"
+"  -d, --directories=ACTION  how to handle directories\n"
+"                            ACTION is 'read', 'recurse', or 'skip'\n"
+"  -D, --devices=ACTION      how to handle devices, FIFOs and sockets\n"
+"                            ACTION is 'read' or 'skip'\n"
+"  -R, -r, --recursive       equivalent to --directories=recurse\n"
+"      --include=PATTERN     files that match PATTERN will be examined\n"
+"      --exclude=PATTERN     files that match PATTERN will be skipped.\n"
+"      --exclude-from=FILE   files that match PATTERN in FILE will be skipped.\n"
+"  -L, --files-without-match only print FILE names containing no match\n"
+"  -l, --files-with-matches  only print FILE names containing matches\n"
+"  -c, --count               only print a count of matching lines per FILE\n"
+"  -Z, --null                print 0 byte after FILE name\n"
+msgstr ""
+"\n"
+"Väljundi kontroll:\n"
+"  -m, --max-count=NUM       lõpeta peale NUM leidu\n"
+"  -b, --byte-offset         trüki baidi aadress väljundreale\n"
+"  -n, --line-number         trüki rea number väljundreale\n"
+"      --line-buffered       väljasta käik peale iga rida\n"
+"  -H, --with-filename       trüki iga leiu failinimi\n"
+"  -h, --no-filename         keela väljundis prefiks failinimi\n"
+"  -q, --quiet, --silent     keela kogu tavapärane väljund\n"
+"      --binary-files=TÜÜP   eeldab kahendfailide TÜÜPi\n"
+"                            TÜÜP on 'binary', 'text' või 'without-match'\n"
+"  -a, --text                sama, kui --binary-files=text\n"
+"  -I                        sama, kui --binary-files=without-match\n"
+"  -d, --directories=TEGEVUS kuidas käsitleda katalooge\n"
+"                            TEGEVUS on 'read', 'recurse' või 'skip'\n"
+"  -D, --devices=TEGEVUS     kuidas käsitleda seadmeid, FIFO ja pistik faile\n"
+"                            TEGEVUS on 'read' või 'skip'\n"
+"  -R, -r, --recursive       sama, kui --directories=recurse\n"
+"      --include=MUSTER      vaadeldakse mustrile MUSTER vastavaid faile\n"
+"      --exclude=MUSTER      mustrile MUSTER vastavad failid jäetakse vahele\n"
+"      --exclude-from=FAIL   mustrile failist FAIL vastavad failid\n"
+"                            jäetakse vahele\n"
+"  -L, --files-without-match trüki ainult failinimed, kus mustrit ei leitud\n"
+"  -l, --files-with-matches  trüki ainult failinimed, kus muster leiti\n"
+"  -c, --count               trüki ainult leitud ridade arv faili kaupa\n"
+"  -Z, --null                trüki peale filinime bait 0\n"
+
+#: src/grep.c:1099
+msgid ""
+"\n"
+"Context control:\n"
+"  -B, --before-context=NUM  print NUM lines of leading context\n"
+"  -A, --after-context=NUM   print NUM lines of trailing context\n"
+"  -C, --context=NUM         print NUM lines of output context\n"
+"  -NUM                      same as --context=NUM\n"
+"      --color[=WHEN],\n"
+"      --colour[=WHEN]       use markers to distinguish the matching string\n"
+"                            WHEN may be `always', `never' or `auto'.\n"
+"  -U, --binary              do not strip CR characters at EOL (MSDOS)\n"
+"  -u, --unix-byte-offsets   report offsets as if CRs were not there (MSDOS)\n"
+"\n"
+"`egrep' means `grep -E'.  `fgrep' means `grep -F'.\n"
+"With no FILE, or when FILE is -, read standard input.  If less than\n"
+"two FILEs given, assume -h.  Exit status is 0 if match, 1 if no match,\n"
+"and 2 if trouble.\n"
+msgstr ""
+"\n"
+"Konteksti kontroll:\n"
+"  -B, --before-context=NUM  trüki NUM rida eelnevat konteksti\n"
+"  -A, --after-context=NUM   trüki NUM rida järgnevat konteksti\n"
+"  -C, --context[=NUM]       trüki NUM rida väljund konteksti\n"
+"  -NUM                      sama, kui --context=NUM\n"
+"      --color[=MILLAL],\n"
+"      --colour[=MILLAL]     kasuta otsitava sõne eristamiseks markereid\n"
+"                            MILLAL võib olla `always', `never' või `auto'.\n"
+"  -U, --binary              ära eemalda rea lõpust CR sümboleid (MSDOS)\n"
+"  -u, --unix-byte-offsets   teata aadressid CR sümboleid arvestamata (MSDOS)\n"
+"\n"
+"`egrep' tähendab `grep -E'.  `fgrep' tähendab `grep -F'.\n"
+"Kui FAIL pole antud või kui FAIL väärtus on -, loeb standardsisendit. Kui on\n"
+"antud vähem kui kaks faili, eeldatakse võtit -h. Kui muster leitakse,\n"
+"lõpetab programm töö koodiga 0, kui ei leita, siis koodiga 1 ja\n"
+"kui oli mingi muu probleem, siis koodiga 2.\n"
+
+#: src/grep.c:1116
+msgid ""
+"\n"
+"Report bugs to <bug-gnu-utils@gnu.org>.\n"
+msgstr ""
+"\n"
+"Teatage palun vigadest aadressil <bug-gnu-utils@gnu.org>.\n"
+
+#: src/grep.c:1126
+msgid "conflicting matchers specified"
+msgstr "määrati konfliktsed otsijad"
+
+#: src/grep.c:1363
+msgid "unknown devices method"
+msgstr "tundmatu seadmete meetod"
+
+#: src/grep.c:1430
+msgid "unknown directories method"
+msgstr "tundmatu kataloogide meetod"
+
+#: src/grep.c:1497
+msgid "invalid max count"
+msgstr "vigane maksimum"
+
+#: src/grep.c:1551
+msgid "unknown binary-files type"
+msgstr "tundmatu kahendfailide tüüp"
+
+#: src/grep.c:1646
+#, c-format
+msgid "%s (GNU grep) %s\n"
+msgstr "%s (GNU grep) %s\n"
+
+#: src/grep.c:1648
+msgid "Copyright 1988, 1992-1999, 2000, 2001 Free Software Foundation, Inc.\n"
+msgstr "Autoriõigus 1988, 1992-1999, 2000, 2001 Free Software Foundation, Inc.\n"
+
+#: src/grep.c:1650
+msgid ""
+"This is free software; see the source for copying conditions. There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"See on vaba tarkvara; kopeerimistingimused leiate lähtetekstidest. Garantii\n"
+"PUUDUB; ka müügiks või mingil eesmärgil kasutamiseks, vastavalt seadustega\n"
+"lubatud piiridele.\n"
+
+#: src/search.c:606
+msgid "The -P option is not supported"
+msgstr "Võtit -P ei toetata"
+
+#: src/search.c:619
+msgid "The -P and -z options cannot be combined"
+msgstr "Võtmeid -P ja -z ei saa koos kasutada"
+
+#: lib/error.c:117
+msgid "Unknown system error"
+msgstr "Tundmatu süsteemi viga"
+
+#: lib/getopt.c:675
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: võti `%s' on segane\n"
+
+#: lib/getopt.c:700
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: võti `--%s' ei luba argumenti\n"
+
+#: lib/getopt.c:705
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: võti `%c%s' ei luba argumenti\n"
+
+#: lib/getopt.c:723 lib/getopt.c:896
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: võti `%s' nõuab argumenti\n"
+
+#. --option
+#: lib/getopt.c:752
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: tundmatu võti `--%s'\n"
+
+#. +option or -option
+#: lib/getopt.c:756
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: tundmatu võti `%c%s'\n"
+
+#. 1003.2 specifies the format of this message.
+#: lib/getopt.c:782
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: lubamatu võti -- %c\n"
+
+#: lib/getopt.c:785
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: vigane võti -- %c\n"
+
+#. 1003.2 specifies the format of this message.
+#: lib/getopt.c:815 lib/getopt.c:945
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: võti nõuab argumenti -- %c\n"
+
+#: lib/getopt.c:862
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: võti `-W %s' on segane\n"
+
+#: lib/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: võti `-W %s' ei luba argumenti\n"
+
+#. Get translations for open and closing quotation marks.
+#.
+#. The message catalog should translate "`" to a left
+#. quotation mark suitable for the locale, and similarly for
+#. "'".  If the catalog has no translation,
+#. locale_quoting_style quotes `like this', and
+#. clocale_quoting_style quotes "like this".
+#.
+#. For example, an American English Unicode locale should
+#. translate "`" to U+201C (LEFT DOUBLE QUOTATION MARK), and
+#. should translate "'" to U+201D (RIGHT DOUBLE QUOTATION
+#. MARK).  A British English Unicode locale should instead
+#. translate these to U+2018 (LEFT SINGLE QUOTATION MARK) and
+#. U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
+#: lib/quotearg.c:259
+msgid "`"
+msgstr "`"
+
+#: lib/quotearg.c:260
+msgid "'"
+msgstr "'"

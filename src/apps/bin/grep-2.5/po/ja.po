@@ -1,0 +1,387 @@
+# Japanese messages for GNU grep
+# Copyright (C) 1996, 1997, 2001 Free Software Foundation, Inc.
+# IIDA Yosiaki <iida@gnu.org>, 1999, 2000, 2001.
+# This file is distributed under the same license as the GNU grep package.
+# Contributed by
+# Yasuyuki Furukawa <yasu@on.cs.keio.ac.jp>, 1997
+# and taken over on 1999-09-24 by IIDA.
+# Special thanks to
+# Daisuke Yamashita <yamad@mb.infoweb.ne.jp>, 1999.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU grep 2.5e\n"
+"POT-Creation-Date: 2001-03-07 00:02-0500\n"
+"PO-Revision-Date: 2002-02-08 22:15+0900\n"
+"Last-Translator: IIDA Yosiaki <iida@gnu.org>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Comments: This file is part of GNU grep.\n"
+
+#: src/dfa.c:136 src/dfa.c:147 src/dfa.c:158 src/grep.c:944 src/search.c:706
+msgid "Memory exhausted"
+msgstr "メモリーが足りません"
+
+#: src/dfa.c:486 src/dfa.c:489 src/dfa.c:507 src/dfa.c:518 src/dfa.c:542
+#: src/dfa.c:601 src/dfa.c:606 src/dfa.c:619 src/dfa.c:620 src/dfa.c:998
+#: src/dfa.c:1001 src/dfa.c:1025 src/dfa.c:1029 src/dfa.c:1030 src/dfa.c:1033
+#: src/dfa.c:1045 src/dfa.c:1046
+msgid "Unbalanced ["
+msgstr "[ が釣り合いません"
+
+#: src/dfa.c:738
+msgid "Unfinished \\ escape"
+msgstr "\\ エスケープが終了していません"
+
+#. Cases:
+#. {M} - exact count
+#. {M,} - minimum count, maximum is infinity
+#. {M,N} - M through N
+#: src/dfa.c:871 src/dfa.c:877 src/dfa.c:887 src/dfa.c:895 src/dfa.c:910
+msgid "unfinished repeat count"
+msgstr "繰返しカウントが終了しません"
+
+#: src/dfa.c:884 src/dfa.c:901 src/dfa.c:909 src/dfa.c:913
+msgid "malformed repeat count"
+msgstr "繰返しカウントが異常です"
+
+#: src/dfa.c:1232
+msgid "Unbalanced ("
+msgstr "( が釣り合いません"
+
+#: src/dfa.c:1357
+msgid "No syntax specified"
+msgstr "構文が特定されていません"
+
+#: src/dfa.c:1365
+msgid "Unbalanced )"
+msgstr ") が釣り合いません"
+
+#: src/dfa.c:2933
+msgid "out of memory"
+msgstr "メモリーがなくなりました"
+
+#: lib/obstack.c:471 src/grep.c:343 src/kwset.c:171 src/kwset.c:177
+#: src/search.c:103 src/search.c:223 src/search.c:307
+msgid "memory exhausted"
+msgstr "メモリーが足りません"
+
+#: src/grep.c:191
+msgid "invalid context length argument"
+msgstr "行数の指定が間違っています"
+
+#: src/grep.c:466
+msgid "input is too large to count"
+msgstr "入力が大きすぎて数えられません"
+
+#: src/grep.c:539
+msgid "writing output"
+msgstr "出力の書込み"
+
+#: src/grep.c:812
+#, c-format
+msgid "Binary file %s matches\n"
+msgstr "バイナリー・ファイル%sは一致しました\n"
+
+#: src/grep.c:826
+msgid "(standard input)"
+msgstr "(標準入力)"
+
+#: src/grep.c:931
+#, c-format
+msgid "warning: %s: %s\n"
+msgstr "警告: %s: %s\n"
+
+#: src/grep.c:932
+msgid "recursive directory loop"
+msgstr "ディレクトリーが再帰的ループをしています"
+
+#: src/grep.c:980
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE]...\n"
+msgstr "使用法: %s [オプション]‥‥ 文字列パターン [ファイル]‥‥\n"
+
+#: src/grep.c:982
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "詳しくは`%s --help'を実行してください。\n"
+
+#: src/grep.c:987
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE] ...\n"
+msgstr "使用法: %s [オプション]‥‥ パターン [ファイル] ‥‥\n"
+
+#: src/grep.c:988
+#, c-format
+msgid ""
+"Search for PATTERN in each FILE or standard input.\n"
+"Example: %s -i 'hello world' menu.h main.c\n"
+"\n"
+"Regexp selection and interpretation:\n"
+msgstr ""
+"「ファイル」もしくは標準入力から「パターン」の検索を行なう。\n"
+"例: %s -i 'hello world' menu.h main.c\n"
+"\n"
+"正規表現の選択と解釈方法:\n"
+
+#: src/grep.c:993
+msgid ""
+"  -E, --extended-regexp     PATTERN is an extended regular expression\n"
+"  -F, --fixed-strings       PATTERN is a set of newline-separated strings\n"
+"  -G, --basic-regexp        PATTERN is a basic regular expression\n"
+"  -P, --perl-regexp         PATTERN is a Perl regular expression\n"
+msgstr ""
+"  -E, --extended-regexp     「パターン」を拡張された正規表現とする\n"
+"  -F, --fixed-strings       「パターン」を改行で区切られた固定の文字列とする\n"
+"  -G, --basic-regexp        「パターン」を基本的な正規表現とする\n"
+"  -P, --perl-regexp         「パターン」をPerlの正規表現とする\n"
+
+#: src/grep.c:998
+msgid ""
+"  -e, --regexp=PATTERN      use PATTERN as a regular expression\n"
+"  -f, --file=FILE           obtain PATTERN from FILE\n"
+"  -i, --ignore-case         ignore case distinctions\n"
+"  -w, --word-regexp         force PATTERN to match only whole words\n"
+"  -x, --line-regexp         force PATTERN to match only whole lines\n"
+"  -z, --null-data           a data line ends in 0 byte, not newline\n"
+msgstr ""
+"  -e, --regexp=パターン     正規表現に指定パターンを使う\n"
+"  -f, --file=ファイル       「パターン」を指定ファイルから読む\n"
+"  -i, --ignore-case         大文字/小文字を無視する\n"
+"  -w, --word-regexp         「パターン」一致を単語全体(単語単位)で行なう\n"
+"  -x, --line-regexp         「パターン」一致を行全体(行単位)で行なう\n"
+"  -z, --null-data           出力を改行でなく、ヌル値のバイトで区切る\n"
+
+#: src/grep.c:1005
+msgid ""
+"\n"
+"Miscellaneous:\n"
+"  -s, --no-messages         suppress error messages\n"
+"  -v, --invert-match        select non-matching lines\n"
+"  -V, --version             print version information and exit\n"
+"      --help                display this help and exit\n"
+"      --mmap                use memory-mapped input if possible\n"
+msgstr ""
+"\n"
+"その他:\n"
+"  -s, --no-messages         エラー・メッセージを抑止する\n"
+"  -v, --invert-match        一致しない行を対象にする\n"
+"  -V  --version             バージョン情報を標準出力に表示して終了する\n"
+"      --help                使い方を標準出力に表示する\n"
+"      --mmap                もし可能なら、入力をメモリー・マップする\n"
+
+#: src/grep.c:1013
+msgid ""
+"\n"
+"Output control:\n"
+"  -m, --max-count=NUM       stop after NUM matches\n"
+"  -b, --byte-offset         print the byte offset with output lines\n"
+"  -n, --line-number         print line number with output lines\n"
+"      --line-buffered       flush output on every line\n"
+"  -H, --with-filename       print the filename for each match\n"
+"  -h, --no-filename         suppress the prefixing filename on output\n"
+"  -q, --quiet, --silent     suppress all normal output\n"
+"      --binary-files=TYPE   assume that binary files are TYPE\n"
+"                            TYPE is 'binary', 'text', or 'without-match'\n"
+"  -a, --text                equivalent to --binary-files=text\n"
+"  -I                        equivalent to --binary-files=without-match\n"
+"  -d, --directories=ACTION  how to handle directories\n"
+"                            ACTION is 'read', 'recurse', or 'skip'\n"
+"  -R, -r, --recursive       equivalent to --directories=recurse\n"
+"      --include=PATTERN     files that match PATTERN will be examine\n"
+"      --exclude=PATTERN     files that match PATTERN will be skip.\n"
+"      --exclude-from=FILE   files that match PATTERN in FILE will be skip.\n"
+"  -L, --files-without-match only print FILE names containing no match\n"
+"  -l, --files-with-matches  only print FILE names containing matches\n"
+"  -c, --count               only print a count of matching lines per FILE\n"
+"  -Z, --null                print 0 byte after FILE name\n"
+msgstr ""
+"\n"
+"出力制御:\n"
+"  -m, --max-count=回数      指定した一致回数の後、終了する\n"
+"  -b, --byte-offset         各一致に対してそのバイト・オフセットも表示する\n"
+"  -n, --line-number         各一致に対してその行数も表示する\n"
+"      --line-buffered       行ごとに出力を掃き出す\n"
+"  -H, --with-filename       各一致に対してそのファイル名も表示する\n"
+"  -h, --no-filename         ファイル名を表示しない\n"
+"  -q, --quiet, --silent     通常の出力をすべて抑止する\n"
+"      --binary-files=型     バイナリー・ファイルの「型」。「binary」\n"
+"                            「text」「without-match」を指定。\n"
+"  -a, --text                --binary-files=textと同じ\n"
+"  -I                        --binary-files=without-matchと同じ\n"
+"  -d, --directories=操作    ディレクトリーへの操作。「read」(読込み)、\n"
+"                            「recurse」(再帰)、「skip」(省略)を指定\n"
+"  -R, -r, --recursive       --directories=recurseと同じ\n"
+"      --include=パターン    パターンと一致するファイルを検査する\n"
+"      --exclude=パターン    パターンと一致するファイルを省略する。\n"
+"      --exclude-from=ファイル 指定したファイル内の「パターン」と\n"
+"                            一致するファイルを省略する。\n"
+"  -L, --files-without-match 一致のなかったファイル名のみを表示する\n"
+"  -l, --files-with-matches  一致したファイル名のみを表示する\n"
+"  -c, --count               ファイルごとに一致した行数のみを表示する\n"
+"  -Z, --null                ファイル名の後に、ヌル値のバイトを表示\n"
+
+#: src/grep.c:1037
+msgid ""
+"\n"
+"Context control:\n"
+"  -B, --before-context=NUM  print NUM lines of leading context\n"
+"  -A, --after-context=NUM   print NUM lines of trailing context\n"
+"  -C, --context=NUM         print NUM lines of output context\n"
+"  -NUM                      same as --context=NUM\n"
+"      --color, --colour     use markers to distinguish the matching string\n"
+"  -U, --binary              do not strip CR characters at EOL (MSDOS)\n"
+"  -u, --unix-byte-offsets   report offsets as if CRs were not there (MSDOS)\n"
+"\n"
+"`egrep' means `grep -E'.  `fgrep' means `grep -F'.\n"
+"With no FILE, or when FILE is -, read standard input.  If less than\n"
+"two FILEs given, assume -h.  Exit status is 0 if match, 1 if no match,\n"
+"and 2 if trouble.\n"
+msgstr ""
+"\n"
+"前後関係の制御:\n"
+"  -B, --before-context=数   一致前の「数」行も出力する\n"
+"  -A, --after-context=数    一致後の「数」行も出力する\n"
+"  -C, --context=行数        一致前後の指定行数の内容も出力する\n"
+"  -行数                     --context=行数 と同じ\n"
+"      --color, --colour     use markers to distinguish the matching string\n"
+"  -U, --binary              EOLでのCR文字を取り省かない(MS-DOS)\n"
+"  -u, --unix-byte-offsets   CR文字がないものとしてオフセットを\n"
+"                            出力する(MS-DOS)\n"
+"\n"
+"「egrep」は「grep -E」のことです。「fgrep」は「grep -F」のことです。\n"
+"「ファイル」の指定がなかったり、「ファイル」に「-」を指定したりすると、\n"
+"標準入力から読み込みます。「ファイル」の個数が1以下の場合、-hと仮定します。\n"
+"もし一致があると0で、ないと1で、障害があると2で、終了します。\n"
+
+#: src/grep.c:1052
+msgid "\nReport bugs to <bug-gnu-utils@gnu.org>.\n"
+msgstr "\nバグは <bug-gnu-utils@gnu.org> へ報告してください。\n"
+
+#: src/grep.c:1062
+msgid "conflicting matchers specified"
+msgstr "指定した照合子が衝突しています"
+
+#: src/grep.c:1355
+msgid "unknown directories method"
+msgstr "未知のディレクトリー操作です"
+
+#: src/grep.c:1422
+msgid "invalid max count"
+msgstr "一致回数が間違っています"
+
+#: src/grep.c:1472
+msgid "unknown binary-files type"
+msgstr "未知のバイナリー・ファイルの型です"
+
+#: src/grep.c:1543
+#, c-format
+msgid "%s (GNU grep) %s\n"
+msgstr "%s (GNU grep) %s\n"
+
+#: src/grep.c:1545
+msgid "Copyright 1988, 1992-1999, 2000, 2001 Free Software Foundation, Inc.\n"
+msgstr "Copyright 1988, 1992-1999, 2000, 2001 Free Software Foundation, Inc.\n"
+
+#: src/grep.c:1547
+msgid ""
+"This is free software; see the source for copying conditions. There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"これはフリー・ソフトウェアです。複製に関する条件はソースをご覧ください。\n"
+"これは無保証です。営利目的やある特定の目的にむけた適正のものでもありません。\n"
+
+#: src/search.c:623
+msgid "The -P option is not supported"
+msgstr "-Pオプションはサポートしていません"
+
+#: src/search.c:636
+msgid "The -P and -z options cannot be combined"
+msgstr "-Pと-zのオプションの組合せはできません"
+
+#: lib/error.c:117
+msgid "Unknown system error"
+msgstr "未知のシステム・エラーです"
+
+#: lib/getopt.c:675
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: オプションの指定`%s'が曖昧です\n"
+
+#: lib/getopt.c:700
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: オプション`--%s'は引数をとりません\n"
+
+#: lib/getopt.c:705
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: オプション`%c%s'は引数をとりません\n"
+
+#: lib/getopt.c:723 lib/getopt.c:896
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: オプション`-%s'には引数が必要です\n"
+
+#. --option
+#: lib/getopt.c:752
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: オプション`--%s'を認識できません\n"
+
+#. +option or -option
+#: lib/getopt.c:756
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: オプション`%c%s'を認識できません\n"
+
+#. 1003.2 specifies the format of this message.
+#: lib/getopt.c:782
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: オプションが間違っています -- %c\n"
+
+#: lib/getopt.c:785
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: オプションが不正です -- %c\n"
+
+#. 1003.2 specifies the format of this message.
+#: lib/getopt.c:815 lib/getopt.c:945
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: オプション`-%c'には引数が必要です\n"
+
+#: lib/getopt.c:862
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: オプションの指定`-W %s'が曖昧です\n"
+
+#: lib/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: オプション`-W %s'は引数をとりません\n"
+
+#. Get translations for open and closing quotation marks.
+#.
+#. The message catalog should translate "`" to a left
+#. quotation mark suitable for the locale, and similarly for
+#. "'".  If the catalog has no translation,
+#. locale_quoting_style quotes `like this', and
+#. clocale_quoting_style quotes "like this".
+#.
+#. For example, an American English Unicode locale should
+#. translate "`" to U+201C (LEFT DOUBLE QUOTATION MARK), and
+#. should translate "'" to U+201D (RIGHT DOUBLE QUOTATION
+#. MARK).  A British English Unicode locale should instead
+#. translate these to U+2018 (LEFT SINGLE QUOTATION MARK) and
+#. U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
+#: lib/quotearg.c:265
+msgid "`"
+msgstr "“"
+
+#: lib/quotearg.c:266
+msgid "'"
+msgstr "”"

@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src apps bin grep-2.5 ;
+
+SubInclude OBOS_TOP src apps bin grep-2.5 lib ;
+SubInclude OBOS_TOP src apps bin grep-2.5 src ; 

@@ -1,0 +1,618 @@
+# Generated Spencer ERE Test
+failures=0
+status=`echo 'a' | { ${GREP} -E -e 'a' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#1 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'abc' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#2 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'abc|de' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#3 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a|b|c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#4 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a(b)c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#5 failed
+	failures=1
+fi
+status=`echo 'EPAREN' | { ${GREP} -E -e 'a(' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#6 failed
+	failures=1
+fi
+status=`echo 'a(' | { ${GREP} -E -e 'a\(' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#7 failed
+	failures=1
+fi
+status=`echo 'EPAREN' | { ${GREP} -E -e 'a(b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#8 failed
+	failures=1
+fi
+status=`echo 'ab' | { ${GREP} -E -e 'a()b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#9 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '^abc$' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#10 failed
+	failures=1
+fi
+status=`echo 'a^b' | { ${GREP} -E -e 'a^b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#11 failed
+	failures=1
+fi
+status=`echo 'a$b' | { ${GREP} -E -e 'a$b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#12 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '^' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#13 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '$' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#14 failed
+	failures=1
+fi
+status=`echo 'b' | { ${GREP} -E -e 'a*(^b$)c*' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#15 failed
+	failures=1
+fi
+status=`echo 'PASS' | { ${GREP} -E -e '&C' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#16 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '()' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#17 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a.c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#18 failed
+	failures=1
+fi
+status=`echo 'abd' | { ${GREP} -E -e 'a[bc]d' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#19 failed
+	failures=1
+fi
+status=`echo 'a*c' | { ${GREP} -E -e 'a\*c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#20 failed
+	failures=1
+fi
+status=`echo 'a[b' | { ${GREP} -E -e 'a\[b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#21 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#22 failed
+	failures=1
+fi
+status=`echo 'a' | { ${GREP} -E -e 'a$' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#23 failed
+	failures=1
+fi
+status=`echo 'a$' | { ${GREP} -E -e 'a$' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#24 failed
+	failures=1
+fi
+status=`echo 'a' | { ${GREP} -E -e 'a\\$' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#25 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'ab*c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#26 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'ab+c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#27 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'ab?c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#28 failed
+	failures=1
+fi
+status=`echo '{1' | { ${GREP} -E -e '{1' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#29 failed
+	failures=1
+fi
+status=`echo 'ab' | { ${GREP} -E -e 'a{1}b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#30 failed
+	failures=1
+fi
+status=`echo 'ab' | { ${GREP} -E -e 'a{1,}b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#31 failed
+	failures=1
+fi
+status=`echo 'aab' | { ${GREP} -E -e 'a{1,2}b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#32 failed
+	failures=1
+fi
+status=`echo 'a{1' | { ${GREP} -E -e 'a{1' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#33 failed
+	failures=1
+fi
+status=`echo 'aa' | { ${GREP} -E -e 'a{1a' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#34 failed
+	failures=1
+fi
+status=`echo 'a{1a}' | { ${GREP} -E -e 'a{1a}' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#35 failed
+	failures=1
+fi
+status=`echo 'a{,2}' | { ${GREP} -E -e 'a{,2}' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#36 failed
+	failures=1
+fi
+status=`echo 'a{,}' | { ${GREP} -E -e 'a{,}' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#37 failed
+	failures=1
+fi
+status=`echo 'a{1,,,}' | { ${GREP} -E -e 'a{1,*}' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#38 failed
+	failures=1
+fi
+status=`echo 'abcac' | { ${GREP} -E -e 'ab{0,0}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#39 failed
+	failures=1
+fi
+status=`echo 'abcac' | { ${GREP} -E -e 'ab{0,1}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#40 failed
+	failures=1
+fi
+status=`echo 'abbcac' | { ${GREP} -E -e 'ab{0,3}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#41 failed
+	failures=1
+fi
+status=`echo 'acabc' | { ${GREP} -E -e 'ab{1,1}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#42 failed
+	failures=1
+fi
+status=`echo 'acabc' | { ${GREP} -E -e 'ab{1,3}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#43 failed
+	failures=1
+fi
+status=`echo 'abcabbc' | { ${GREP} -E -e 'ab{2,2}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#44 failed
+	failures=1
+fi
+status=`echo 'abcabbc' | { ${GREP} -E -e 'ab{2,4}c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#45 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a[b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#46 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a[ab]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#47 failed
+	failures=1
+fi
+status=`echo 'adc' | { ${GREP} -E -e 'a[^ab]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#48 failed
+	failures=1
+fi
+status=`echo 'a]c' | { ${GREP} -E -e 'a[]b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#49 failed
+	failures=1
+fi
+status=`echo 'a[c' | { ${GREP} -E -e 'a[[b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#50 failed
+	failures=1
+fi
+status=`echo 'a-c' | { ${GREP} -E -e 'a[-b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#51 failed
+	failures=1
+fi
+status=`echo 'adc' | { ${GREP} -E -e 'a[^]b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#52 failed
+	failures=1
+fi
+status=`echo 'adc' | { ${GREP} -E -e 'a[^-b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#53 failed
+	failures=1
+fi
+status=`echo 'a-c' | { ${GREP} -E -e 'a[b-]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#54 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#55 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#56 failed
+	failures=1
+fi
+status=`echo 'a2c' | { ${GREP} -E -e 'a[1-3]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#57 failed
+	failures=1
+fi
+status=`echo 'ERANGE' | { ${GREP} -E -e 'a[1-' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#58 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[.' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#59 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[.x' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#60 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[.x.' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#61 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a[[:alpha:]]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#62 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:notdef:]]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#63 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[:' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#64 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[:alpha' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#65 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[:alpha:]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#66 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:alpha,:]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#67 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:]:]]b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#68 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:-:]]b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#69 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:alph:]]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#70 failed
+	failures=1
+fi
+status=`echo 'ECTYPE' | { ${GREP} -E -e 'a[[:alphabet:]]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#71 failed
+	failures=1
+fi
+status=`echo 'a019b' | { ${GREP} -E -e '[[:digit:]]+' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#72 failed
+	failures=1
+fi
+status=`echo 'AabC' | { ${GREP} -E -e '[[:lower:]]+' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#73 failed
+	failures=1
+fi
+status=`echo 'aBCd' | { ${GREP} -E -e '[[:upper:]]+' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#74 failed
+	failures=1
+fi
+status=`echo 'p0f3Cq' | { ${GREP} -E -e '[[:xdigit:]]+' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#75 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[=' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#76 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[=b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#77 failed
+	failures=1
+fi
+status=`echo 'EBRACK' | { ${GREP} -E -e 'a[[=b=' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 2 ; then
+	echo Spencer ere test \#78 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a(((b)))c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#79 failed
+	failures=1
+fi
+status=`echo 'abd' | { ${GREP} -E -e 'a(b|(c))d' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#80 failed
+	failures=1
+fi
+status=`echo 'abbd' | { ${GREP} -E -e 'a(b*|c)d' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#81 failed
+	failures=1
+fi
+status=`echo 'aaaaabaaaabaaaabaaaab' | { ${GREP} -E -e 'a[ab]{20}' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#82 failed
+	failures=1
+fi
+status=`echo 'aaaaabaaaabaaaabaaaab' | { ${GREP} -E -e 'a[ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#83 failed
+	failures=1
+fi
+status=`echo 'aaaaabaaaabaaaabaaaabweeknights' | { ${GREP} -E -e 'a[ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab][ab](wee|week)(knights|night)' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#84 failed
+	failures=1
+fi
+status=`echo 'a12345678901234567890123456789b' | { ${GREP} -E -e '12345678901234567890123456789' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#85 failed
+	failures=1
+fi
+status=`echo 'a123456789012345678901234567890b' | { ${GREP} -E -e '123456789012345678901234567890' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#86 failed
+	failures=1
+fi
+status=`echo 'a1234567890123456789012345678901b' | { ${GREP} -E -e '1234567890123456789012345678901' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#87 failed
+	failures=1
+fi
+status=`echo 'a12345678901234567890123456789012b' | { ${GREP} -E -e '12345678901234567890123456789012' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#88 failed
+	failures=1
+fi
+status=`echo 'a123456789012345678901234567890123b' | { ${GREP} -E -e '123456789012345678901234567890123' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#89 failed
+	failures=1
+fi
+status=`echo 'a1234567890123456789012345678901234567890123456789012345678901234567890b' | { ${GREP} -E -e '1234567890123456789012345678901234567890123456789012345678901234567890' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#90 failed
+	failures=1
+fi
+status=`echo 'xacegikmoq' | { ${GREP} -E -e '[ab][cd][ef][gh][ij][kl][mn]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#91 failed
+	failures=1
+fi
+status=`echo 'xacegikmoq' | { ${GREP} -E -e '[ab][cd][ef][gh][ij][kl][mn][op]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#92 failed
+	failures=1
+fi
+status=`echo 'xacegikmoqy' | { ${GREP} -E -e '[ab][cd][ef][gh][ij][kl][mn][op][qr]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#93 failed
+	failures=1
+fi
+status=`echo 'xacegikmoqy' | { ${GREP} -E -e '[ab][cd][ef][gh][ij][kl][mn][op][q]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#94 failed
+	failures=1
+fi
+status=`echo 'xabcy' | { ${GREP} -E -e 'abc' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#95 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e 'a[^b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 1 ; then
+	echo Spencer ere test \#96 failed
+	failures=1
+fi
+status=`echo 'adc' | { ${GREP} -E -e 'a[^b]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#97 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '[a]b[c]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#98 failed
+	failures=1
+fi
+status=`echo 'aba' | { ${GREP} -E -e '[a]b[a]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#99 failed
+	failures=1
+fi
+status=`echo 'abc' | { ${GREP} -E -e '[abc]b[abc]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#100 failed
+	failures=1
+fi
+status=`echo 'abd' | { ${GREP} -E -e '[abc]b[abd]' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#101 failed
+	failures=1
+fi
+status=`echo 'accd' | { ${GREP} -E -e 'a(b?c)+d' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#102 failed
+	failures=1
+fi
+status=`echo 'weeknights' | { ${GREP} -E -e '(wee|week)(knights|night)' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#103 failed
+	failures=1
+fi
+status=`echo 'weeknights' | { ${GREP} -E -e '(we|wee|week|frob)(knights|night|day)' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#104 failed
+	failures=1
+fi
+status=`echo 'xyzaaabcaababdacd' | { ${GREP} -E -e 'a[bc]d' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#105 failed
+	failures=1
+fi
+status=`echo 'aaabc' | { ${GREP} -E -e 'a[ab]c' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#106 failed
+	failures=1
+fi
+status=`echo 'b' | { ${GREP} -E -e 'a*' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#107 failed
+	failures=1
+fi
+status=`echo '/*x*/' | { ${GREP} -E -e '/\*.*\*/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#108 failed
+	failures=1
+fi
+status=`echo '/*x*/y/*z*/' | { ${GREP} -E -e '/\*.*\*/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#109 failed
+	failures=1
+fi
+status=`echo '/*x*/' | { ${GREP} -E -e '/\*([^*]|\*[^/])*\*/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#110 failed
+	failures=1
+fi
+status=`echo '/*x*/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*[^/])*\*/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#111 failed
+	failures=1
+fi
+status=`echo '/*x**/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*[^/])*\*/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#112 failed
+	failures=1
+fi
+status=`echo '/*x*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#113 failed
+	failures=1
+fi
+status=`echo '/*x*/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#114 failed
+	failures=1
+fi
+status=`echo '/*x**/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#115 failed
+	failures=1
+fi
+status=`echo '/*x****/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#116 failed
+	failures=1
+fi
+status=`echo '/*x**x*/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#117 failed
+	failures=1
+fi
+status=`echo '/*x***x/y/*z*/' | { ${GREP} -E -e '/\*([^*]|\*+[^*/])*\*+/' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#118 failed
+	failures=1
+fi
+status=`echo 'A1' | { ${GREP} -E -e '(A[1])|(A[2])|(A[3])|(A[4])|(A[5])|(A[6])|(A[7])|(A[8])|(A[9])|(A[A])' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#119 failed
+	failures=1
+fi
+status=`echo 'abcdefghijklmnop' | { ${GREP} -E -e 'abcdefghijklmnop' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#120 failed
+	failures=1
+fi
+status=`echo 'abcdefghijklmnopqrstuv' | { ${GREP} -E -e 'abcdefghijklmnopqrstuv' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#121 failed
+	failures=1
+fi
+status=`echo 'CC11' | { ${GREP} -E -e 'CC[13]1|a{21}[23][EO][123][Es][12]a{15}aa[34][EW]aaaaaaa[X]a' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#122 failed
+	failures=1
+fi
+status=`echo 'ab' | { ${GREP} -E -e 'a?b' > /dev/null 2>&1; echo $?;  }`
+if test $status -ne 0 ; then
+	echo Spencer ere test \#123 failed
+	failures=1
+fi
+exit $failures

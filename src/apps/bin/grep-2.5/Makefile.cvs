@@ -1,0 +1,47 @@
+VERSION = $(shell cat configure.in |grep INIT_AUTOMAKE |sed -e 's/.*,//;s/^ //;s/.$$//' )
+SRCDIR = $(shell pwd)
+
+all: autogen.sh configure.in
+	./autogen.sh
+
+grep-$(VERSION).tar:
+	[ -e configure.in ] || ( echo Must be run from grep source dir ; exit 1 )
+	rm -rf /tmp/grep-$(VERSION) && cp -aR $(SRCDIR) /tmp/grep-$(VERSION) && cd /tmp/grep-$(VERSION) && make -f Makefile.cvs cvs-clean && make -f Makefile.cvs && rm -rf autom4te.cache && (find . -type d -name CVS |xargs rm -rf) && cd .. && tar chf $(SRCDIR)/grep-$(VERSION).tar grep-$(VERSION)
+
+grep-$(VERSION).tar.bz2: grep-$(VERSION).tar
+	bzip2 -9f grep-$(VERSION).tar
+
+grep-$(VERSION).tar.gz: grep-$(VERSION).tar
+	gzip -9f grep-$(VERSION).tar
+
+rpm: grep-$(VERSION).tar.bz2
+	rpm -ts --define '_srcrpmdir $(SRCDIR)' grep-$(VERSION).tar.bz2
+
+# make cvs-clean blatantly stolen from KDE CVS ;)
+cvs-clean:
+	@if test ! -d CVS; then \
+	  echo "You don't have a toplevel CVS directory."; \
+	  echo "You most certainly didn't use cvs to get these sources."; \
+	  echo "But this function depends on cvs's information."; \
+	  exit 1 ;\
+	fi;\
+	pwd=`pwd` ;\
+	dirs=`find . -type d | grep -v CVS | sed -e "s#^./##"` ;\
+	for i in $$dirs; do \
+	  if test ! -d "$$pwd/$$i/CVS"; then \
+	    echo "D $$i" ;\
+	    rm -rf "$$pwd/$$i"; \
+	    continue; \
+	  fi ;\
+	  cd $$pwd/$$i ;\
+	  for f in * .*; do \
+	    if test ! -d "$$f"; then \
+	      if grep "^/$$f/" CVS/Entries > /dev/null; then \
+		a="b"; \
+	      else \
+	        echo "F $$i/$$f"; \
+		rm -f "$$pwd/$$i/$$f"; \
+	      fi; \
+	    fi ; \
+	  done; \
+	done

@@ -1,0 +1,32 @@
+SubDir OBOS_TOP src apps bin grep-2.5 lib ;
+
+SubDirCcFlags += -DHAVE_CONFIG_H ;
+
+StaticLibrary greputils : 
+alloca.c
+atexit.c
+closeout.c
+error.c
+exclude.c
+fnmatch.c
+getopt.c
+getopt1.c
+hard-locale.c
+isdir.c
+malloc.c
+memchr.c
+obstack.c
+quotearg.c
+realloc.c
+regex.c
+savedir.c
+stpcpy.c
+strtol.c
+strtoul.c
+strtoull.c
+strtoumax.c
+xmalloc.c
+xstrtol.c
+xstrtoumax.c
+: STATIC_LIBRARY_DIR
+;

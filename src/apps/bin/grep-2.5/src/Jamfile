@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src apps bin grep-2.5 src ;
+
+SubDirCcFlags += -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+
+BinCommand grep : dfa.c grep.c grepmat.c kwset.c search.c : root libgreputils.a ;
+

@@ -1,0 +1,351 @@
+# The Croatian translation of grep.
+# Copyright (C) 1999 Free Software Foundation, Inc.
+# Matej Vela <mvela@public.srce.hr>, 1999.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: grep 2.2f\n"
+"POT-Creation-Date: 1999-02-03 13:09-0500\n"
+"PO-Revision-Date: 1999-07-15 12:34+0200\n"
+"Last-Translator: Matej Vela <mvela@public.srce.hr>\n"
+"Language-Team: Croatian <hr-translation@bagan.srce.hr>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/dfa.c:155 src/dfa.c:167 src/dfa.c:180 src/grep.c:858
+msgid "Memory exhausted"
+msgstr "Memorija iscrpljena"
+
+#: src/dfa.c:452
+msgid "Unfinished \\ escape"
+msgstr "\\ escape nedovr¹en"
+
+#. Cases:
+#. {M} - exact count
+#. {M,} - minimum count, maximum is infinity
+#. {,M} - 0 through M
+#. {M,N} - M through N
+#: src/dfa.c:564 src/dfa.c:570 src/dfa.c:581 src/dfa.c:592
+msgid "unfinished repeat count"
+msgstr "broj ponavljanja nedovr¹en"
+
+#: src/dfa.c:577 src/dfa.c:591 src/dfa.c:595
+msgid "malformed repeat count"
+msgstr "broj ponavljanja neispravan"
+
+#: src/dfa.c:660 src/dfa.c:663 src/dfa.c:690 src/dfa.c:694 src/dfa.c:695
+#: src/dfa.c:698 src/dfa.c:711 src/dfa.c:712
+msgid "Unbalanced ["
+msgstr "[ bez para"
+
+#: src/dfa.c:849
+msgid "Unbalanced ("
+msgstr "( bez para"
+
+#: src/dfa.c:970
+msgid "No syntax specified"
+msgstr "Nije zadana sintaksa"
+
+#: src/dfa.c:978
+msgid "Unbalanced )"
+msgstr ") bez para"
+
+#: src/dfa.c:1998
+msgid "out of memory"
+msgstr "ponestalo memorije"
+
+#: src/getopt.c:628
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: opcija `%s' je dvosmislena\n"
+
+#: src/getopt.c:652
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: opcija `--%s' ne dopu¹ta argument\n"
+
+#: src/getopt.c:657
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: opcija `%c%s' ne dopu¹ta argument\n"
+
+#: src/getopt.c:674 src/getopt.c:847
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: opcija `%s' zahtijeva argument\n"
+
+#. --option
+#: src/getopt.c:703
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: opcija `--%s' neprepoznata\n"
+
+#. +option or -option
+#: src/getopt.c:707
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: opcija `%c%s' neprepoznata\n"
+
+#. 1003.2 specifies the format of this message.
+#: src/getopt.c:733
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: neispravna opcija -- %c\n"
+
+#: src/getopt.c:736
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: neispravna opcija -- %c\n"
+
+#. 1003.2 specifies the format of this message.
+#: src/getopt.c:766 src/getopt.c:896
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: opcija zahtijeva argument -- %c\n"
+
+#: src/getopt.c:813
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: opcija `-W %s' je dvosmislena\n"
+
+#: src/getopt.c:831
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: opcija `-W %s' ne dopu¹ta argument\n"
+
+#: src/getopt1.c:132
+#, c-format
+msgid "option %s"
+msgstr "opcija %s"
+
+#: src/getopt1.c:134
+#, c-format
+msgid " with arg %s"
+msgstr " s argumentom %s"
+
+#: src/getopt1.c:149
+msgid "digits occur in two different argv-elements.\n"
+msgstr "znamenke se pojavljuju u dva razlièita elementa argv\n"
+
+#: src/getopt1.c:151
+#, c-format
+msgid "option %c\n"
+msgstr "opcija %c\n"
+
+#: src/getopt1.c:155
+msgid "option a\n"
+msgstr "opcija a\n"
+
+#: src/getopt1.c:159
+msgid "option b\n"
+msgstr "opcija b\n"
+
+#: src/getopt1.c:163
+#, c-format
+msgid "option c with value `%s'\n"
+msgstr "opcija c s vrijedno¹æu `%s'\n"
+
+#: src/getopt1.c:167
+#, c-format
+msgid "option d with value `%s'\n"
+msgstr "opcija d s vrijedno¹æu `%s'\n"
+
+#: src/getopt1.c:174
+#, c-format
+msgid "?? getopt returned character code 0%o ??\n"
+msgstr "?? getopt vratio znak 0%o ??\n"
+
+#: src/getopt1.c:180
+msgid "non-option ARGV-elements: "
+msgstr "elementi ARGV-a koji nisu opcije: "
+
+#: src/grep.c:169 src/grep.c:186 src/grep.c:288 src/grep.c:344 src/kwset.c:184
+#: src/kwset.c:190
+msgid "memory exhausted"
+msgstr "memorija iscrpljena"
+
+#: src/grep.c:372 src/grep.c:843
+#, c-format
+msgid "%s: warning: %s: %s\n"
+msgstr "%s: upozorenje: %s: %s\n"
+
+#: src/grep.c:497 src/grep.c:1318
+msgid "writing output"
+msgstr "pi¹em izlaz"
+
+#: src/grep.c:726
+#, c-format
+msgid "Binary file %s matches\n"
+msgstr "Binarna datoteka %s se podudara\n"
+
+#: src/grep.c:742
+msgid "(standard input)"
+msgstr "(standardni ulaz)"
+
+#: src/grep.c:844
+msgid "recursive directory loop"
+msgstr "petlja u rekurziji direktorijima"
+
+#: src/grep.c:895
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE]...\n"
+msgstr "Kori¹tenje: %s [OPCIJA]... UZORAK [DATOTEKA]...\n"
+
+#: src/grep.c:896
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Za vi¹e informacija pokrenite `%s --help'.\n"
+
+#: src/grep.c:900
+#, c-format
+msgid "Usage: %s [OPTION]... PATTERN [FILE] ...\n"
+msgstr "Kori¹tenje: %s [OPCIJA]... UZORAK [DATOTEKA] ...\n"
+
+#: src/grep.c:901
+msgid ""
+"Search for PATTERN in each FILE or standard input.\n"
+"\n"
+"Regexp selection and interpretation:\n"
+"  -E, --extended-regexp     PATTERN is an extended regular expression\n"
+"  -F, --fixed-regexp        PATTERN is a fixed string separated by newlines\n"
+"  -G, --basic-regexp        PATTERN is a basic regular expression\n"
+"  -e, --regexp=PATTERN      use PATTERN as a regular expression\n"
+"  -f, --file=FILE           obtain PATTERN from FILE\n"
+"  -i, --ignore-case         ignore case distinctions\n"
+"  -w, --word-regexp         force PATTERN to match only whole words\n"
+"  -x, --line-regexp         force PATTERN to match only whole lines\n"
+msgstr ""
+"Tra¾i UZORAK u svakoj DATOTECI ili standardnom ulazu.\n"
+"\n"
+"Odabir i tumaèenje regularnih izraza:\n"
+"  -E, --extended-regexp     UZORAK je pro¹ireni regularni izraz\n"
+"  -F, --fixed-regexp        UZORAK je fiksni string razdvojen novim redovima\n"
+"  -G, --basic-regexp        UZORAK je jednostavni regularni izraz\n"
+"  -e, --regexp=UZORAK       koristi UZORAK kao regularni izraz\n"
+"  -f, --file=DATOTEKA       UZORAK pribavi iz DATOTEKE\n"
+"  -i, --ignore-case         zanemaruj razlike izmeðu velikih i malih slova\n"
+"  -w, --word-regexp         UZORAK mo¾e odgovarati samo potpunim rijeèima\n"
+"  -x, --line-regexp         UZORAK mo¾e odgovarati samo potpunim redovima\n"
+
+#: src/grep.c:913
+msgid ""
+"\n"
+"Miscellaneous:\n"
+"  -s, --no-messages         suppress error messages\n"
+"  -v, --revert-match        select non-matching lines\n"
+"  -V, --version             print version information and exit\n"
+"      --help                display this help and exit\n"
+msgstr ""
+"\n"
+"Sporedno:\n"
+"  -s, --no-messages         izostavi poruke o gre¹kama\n"
+"  -v, --revert-match        odabiri redove koji ne odgovaraju\n"
+"  -V, --version             ispi¹i informacije o verziji i zavr¹i\n"
+"      --help                prika¾i ovu pomoæ i zavr¹i\n"
+
+#: src/grep.c:920
+msgid ""
+"\n"
+"Output control:\n"
+"  -b, --byte-offset         print the byte offset with output lines\n"
+"  -n, --line-number         print line number with output lines\n"
+"  -H, --with-filename       print the filename for each match\n"
+"  -h, --no-filename         suppress the prefixing filename on output\n"
+"  -q, --quiet, --silent     suppress all normal output\n"
+"  -a, --text                do not suppress binary output\n"
+"  -d, --directories=ACTION  how to handle directories\n"
+"                            ACTION is 'read', 'recurse', or 'skip'.\n"
+"  -r, --recursive           equivalent to --directories=recurse.\n"
+"  -L, --files-without-match only print FILE names containing no match\n"
+"  -l, --files-with-matches  only print FILE names containing matches\n"
+"  -c, --count               only print a count of matching lines per FILE\n"
+msgstr ""
+"\n"
+"Kontrola izlaza:\n"
+"  -b, --byte-offset         uz ispisane redove ispisuj polo¾aj bajta\n"
+"  -n, --line-number         uz ispisane redove ispisuj broj reda\n"
+"  -H, --with-filename       za svako podudaranje ispi¹i ime datoteke\n"
+"  -h, --no-filename         u ispisu izostavi imena datoteka\n"
+"  -q, --quiet, --silent     izostavi sav normalni ispis\n"
+"  -a, --text                ne izostavljaj binarni ispis\n"
+"  -d, --directories=RADNJA  kako se nositi s direktorijima:\n"
+"                            RADNJA je 'read', 'recurse', or 'skip'.\n"
+"  -r, --recursive           isto ¹to i --directories=recurse.\n"
+"  -L, --files-without-match ispisuj samo imena DATOTEKA bez podudaranja\n"
+"  -l, --files-with-matches  ispisuj samo imena DATOTEKA s podudaranjima\n"
+"  -c, --count               ispisuj samo broj podudarajuæih redova po datoteci\n"
+
+#: src/grep.c:935
+msgid ""
+"\n"
+"Context control:\n"
+"  -B, --before-context=NUM  print NUM lines of leading context\n"
+"  -A, --after-context=NUM   print NUM lines of trailing context\n"
+"  -C, --context[=NUM]       print NUM (default 2) lines of output context\n"
+"                            unless overriden by -A or -B\n"
+"  -NUM                      same as --context=NUM\n"
+"  -U, --binary              do not strip CR characters at EOL (MSDOS)\n"
+"  -u, --unix-byte-offsets   report offsets as if CRs were not there (MSDOS)\n"
+"\n"
+"If no -[GEF], then `egrep' assumes -E, `fgrep' -F, else -G.\n"
+"With no FILE, or when FILE is -, read standard input. If less than\n"
+"two FILEs given, assume -h. Exit with 0 if matches, with 1 if none.\n"
+"Exit with 2 if syntax errors or system errors.\n"
+msgstr ""
+"\n"
+"Kontrola konteksta:\n"
+"  -B, --before-context=BR   ispisuj BR redova prethodeæeg konteksta\n"
+"  -A, --after-context=BR    ispisuj BR redova sljedeæeg konteksta\n"
+"  -C, --context[=BR]        ispisuj BR (podrazumijevano 2) redova konteksta\n"
+"                            osim ako je drukèije odreðeno pomoæu -A ili -B\n"
+"  -BR                       isto ¹to i --context=BR\n"
+"  -U, --binary              ne uklanjaj CR znakove na kraju reda (MSDOS)\n"
+"  -u, --unix-byte-offsets   prikazuj polo¾aje kao da CR-ova nema (MSDOS)\n"
+"\n"
+"Ako nije zadano -[GEF], onda `egrep' podrazumijeva -E, `fgrep' -F, a inaèe\n"
+"-G. Ako DATOTEKA nije zadana, ili ako je DATOTEKA -, èitaj standardni ulaz.\n"
+"Ako su zadane manje od dvije DATOTEKE, pretpostavi -h. Zavr¹i uz 0 ako ima\n"
+"podudaranja, uz 1 ako nema. Zavr¹i uz 2 ako bude gre¹aka u sintaksi ili u\n"
+"sustavu.\n"
+
+#: src/grep.c:950
+msgid "\nReport bugs to <bug-gnu-utils@gnu.org>.\n"
+msgstr "\nBugove prijavljujte na <bug-gnu-utils@gnu.org>.\n"
+
+#: src/grep.c:1093 src/grep.c:1100 src/grep.c:1109
+msgid "invalid context length argument"
+msgstr "neispravan argument duljine konteksta"
+
+#: src/grep.c:1116 src/grep.c:1121 src/grep.c:1126
+msgid "you may specify only one of -E, -F, or -G"
+msgstr "mo¾ete navesti samo jedno od -E, -F ili -G"
+
+#: src/grep.c:1145
+msgid "matcher already specified"
+msgstr "izraz veæ zadan"
+
+#: src/grep.c:1166
+msgid "unknown directories method"
+msgstr "nepoznata metoda za direktorije"
+
+#: src/grep.c:1252
+#, c-format
+msgid "grep (GNU grep) %s\n"
+msgstr "grep (GNU grep) %s\n"
+
+#: src/grep.c:1254
+msgid "Copyright (C) 1988, 1992-1997, 1998 Free Software Foundation, Inc.\n"
+msgstr "Copyright (C) 1988, 1992-1997, 1998 Free Software Foundation, Inc.\n"
+
+#: src/grep.c:1256
+msgid ""
+"This is free software; see the source for copying conditions. There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"Ovo je slobodan program; za uvjete kopiranja pogledajte izvorni kod. NEMA\n"
+"jamstva; èak ni za TRGOVINSKU PRIKLADNOST ili ODGOVARANJE ODREÐENOJ SVRSI.\n"
+
+#: src/obstack.c:467
+msgid "memory exhausted\n"
+msgstr "memorija iscrpljena\n"

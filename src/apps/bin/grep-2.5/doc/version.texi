@@ -1,0 +1,4 @@
+@set UPDATED 22 January 2002
+@set UPDATED-MONTH January 2002
+@set EDITION 2.5
+@set VERSION 2.5
