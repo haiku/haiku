@@ -53,8 +53,8 @@ static const char *textTestType = "text/x-vnd.obos-roster-launch";
 static const char *testDir		= "/tmp/testdir";
 static const char *appFile1		= "/tmp/testdir/app1";
 static const char *appFile2		= "/tmp/testdir/app2";
-//static const char *testFile1	= "/tmp/testdir/testFile1";
-//static const char *testLink1	= "/tmp/testdir/testLink1";
+static const char *testFile1	= "/tmp/testdir/testFile1";
+static const char *testLink1	= "/tmp/testdir/testLink1";
 static const char *trashAppName	= "roster-launch-app";
 
 // dump_messenger
@@ -162,7 +162,7 @@ create_app(const char *filename, const char *signature,
 }
 
 // create_file
-/*static
+static
 entry_ref
 create_file(const char *filename, const char *type,
 			const char *preferredApp = NULL, const char *appHintPath = NULL,
@@ -187,7 +187,7 @@ create_file(const char *filename, const char *type,
 		}
 	}
 	return ref_for_path(filename);
-}*/
+}
 
 // check_app_type
 static
@@ -310,9 +310,9 @@ CommonLaunchTest3(LaunchCaller &caller)
 /*
 	@case 4			installed type mimeType, preferred app, app type not
 					installed, app has signature
-	@results		Should return B_OK and set the ref to refer to the
-					application's executable. Should install the app type and
-					set the app hint on it.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
 */
 static
 void
@@ -327,19 +327,24 @@ CommonLaunchTest4(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
 	int32 cookie = 0;
-	context.CheckNextMessage(team, cookie, MSG_STARTED);
-	context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN);
-	context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED);
-	context.CheckNextMessage(team, cookie, MSG_TERMINATED);
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 5			installed type mimeType, preferred app, app type installed,
 					app has signature
-	@results		Should return B_OK and set the ref to refer to the
-					application'sexecutable. Should set the app hint on the
-					app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should set the app
+					hint on the app type.
 */
 static
 void
@@ -354,14 +359,24 @@ CommonLaunchTest5(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 6			installed type mimeType, preferred app, app type installed,
 					app has signature, app has no execute permission
-	@results		Should return B_OK and set the ref to refer to the
-					application's executable. Should set the app hint on the
-					app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should set the app
+					hint on the app type.
 */
 static
 void
@@ -376,14 +391,24 @@ CommonLaunchTest6(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 7			installed type mimeType, preferred app, app type installed,
 					two apps have the signature
-	@results		Should return B_OK and set the ref to refer to the
-					application executable with the most recent modification
-					time. Should set the app hint on the app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application executable with the most recent
+					modification time. Should set the app hint on the app type.
 */
 static
 void
@@ -400,15 +425,25 @@ CommonLaunchTest7(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile2) == ref);
 	check_app_type(appType1, appFile2);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 8			installed type mimeType, preferred app, app type installed,
 					two apps have the signature, one has a version info, the
 					other one is newer
-	@results		Should return B_OK and set the ref to refer to the
-					application executable with version info. Should set the
-					app hint on the app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application executable with version info.
+					Should set the app hint on the app type.
 */
 static
 void
@@ -426,14 +461,24 @@ CommonLaunchTest8(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 9			installed type mimeType, preferred app, app type installed,
 					two apps have the signature, both apps have a version info
-	@results		Should return B_OK and set the ref to refer to the
-					application executable with the greater version. Should
-					set the app hint on the app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application executable with the greater
+					version. Should set the app hint on the app type.
 */
 static
 void
@@ -452,16 +497,26 @@ CommonLaunchTest9(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 10		installed type mimeType, preferred app, app type installed,
 					preferred app type has an app hint that points to an app
 					with a different signature
-	@results		Should return B_OK and set the ref to refer to the
-					application's executable. Should remove the incorrect app
-					hint on the app type. (OBOS: Should set the correct app
-					hint. Don't even return the wrong app?)
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should remove the
+					incorrect app hint on the app type. (OBOS: Should set the
+					correct app hint. Don't even return the wrong app?)
 */
 static
 void
@@ -480,15 +535,25 @@ CommonLaunchTest10(LaunchCaller &caller)
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
 	CHK(BMimeType(appType2).IsInstalled() == false);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 11		installed type mimeType, preferred app, app type installed,
 					preferred app type has an app hint pointing to void,
 					a differently named app with this signature exists
-	@results		Should return B_OK and set the ref to refer to the
-					application's executable. Should update the app
-					hint on the app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should update the
+					app hint on the app type.
 */
 static
 void
@@ -504,13 +569,23 @@ CommonLaunchTest11(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 12		mimeType is app signature, not installed
-	@results		Should return B_OK and set the ref to refer to the
-					application executable. Should set the app hint on the
-					app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application executable. Should set the app
+					hint on the app type.
 */
 static
 void
@@ -524,14 +599,25 @@ CommonLaunchTest12(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
 	@case 13		mimeType is installed, but has no preferred application,
 					super type has preferred application
-	@results		Should return B_OK and set the ref to refer to the
-					application executable associated with the preferred app
-					of the supertype. Should set the app hint on the app type.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application executable associated with the
+					preferred app of the supertype. Should set the app hint
+					on the app type.
 */
 static
 void
@@ -567,11 +653,21 @@ CommonLaunchTest13(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
-	@case 14		installed type mimeType, preferred app, app type not installed,
-					app has signature, app is trash
+	@case 14		installed type mimeType, preferred app, app type not
+					installed, app has signature, app is trash
 	@results		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
 */
 static
@@ -606,8 +702,8 @@ static int32 commonTestFunctionCount
 void LaunchTester::LaunchTestA1()
 {
 	BRoster roster;
-	CHK(roster.Launch((const char*)NULL, (BMessage*)NULL, NULL)
-		== B_BAD_VALUE);
+	BMessage message;
+	CHK(roster.Launch((const char*)NULL, &message, NULL) == B_BAD_VALUE);
 }
 
 /*
@@ -619,30 +715,31 @@ void LaunchTester::LaunchTestA1()
 void LaunchTester::LaunchTestA2()
 {
 	BRoster roster;
-	entry_ref ref;
-	CHK(roster.Launch("invalid/mine/type", (BMessage*)NULL, NULL)
-		== B_BAD_VALUE);
+	BMessage message;
+	CHK(roster.Launch("invalid/mine/type", &message, NULL) == B_BAD_VALUE);
 }
 
-// LaunchTypeCaller
-class LaunchTypeCaller : public LaunchCaller {
+// LaunchTypeCaller1
+class LaunchTypeCaller1 : public LaunchCaller {
 public:
-	virtual status_t operator()(const char *type, team_id *team)
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
 	{
+		BMessage *message = (messages ? (BMessage*)messages->ItemAt(0L)
+									  : NULL);
 		BRoster roster;
-		return roster.Launch(type, (BMessage*)NULL, team);
+		return roster.Launch(type, message, team);
 	}
 };
 
 /*
 	status_t Launch(const char *mimeType, BMessage *initialMsgs,
 					team_id *appTeam) const
-	@case 3			Launch(const char*, entry_ref*) cases 3-16
-					(== common cases 1-14)
+	@case 3			common cases 1-14
 */
 void LaunchTester::LaunchTestA3()
 {
-	LaunchTypeCaller caller;
+	LaunchTypeCaller1 caller;
 	for (int32 i = 0; i < commonTestFunctionCount; i++) {
 		NextSubTest();
 		(*commonTestFunctions[i])(caller);
@@ -651,148 +748,478 @@ void LaunchTester::LaunchTestA3()
 	}
 }
 
-#if 0
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 1			ref or app are NULL
+	status_t Launch(const char *mimeType, BMessage *initialMsgs,
+					team_id *appTeam) const
+	@case 4			installed type mimeType, preferred app, app type not
+					installed, app has signature, NULL initialMsg
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestA4()
+{
+	LaunchTypeCaller1 caller;
+	LaunchContext context(caller);
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	team_id team;
+	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const char *mimeType, BList *messageList,
+					team_id *appTeam) const
+	@case 1			mimeType is NULL
 	@results		Should return B_BAD_VALUE.
 */
 void LaunchTester::LaunchTestB1()
 {
 	BRoster roster;
-	CHK(roster.Launch((entry_ref*)NULL, NULL) == B_BAD_VALUE);
-// R5: Crashes when passing a NULL (app) ref.
-#ifndef TEST_R5
-	create_app(appFile1, appType1);
-	entry_ref fileRef(create_file(testFile1, fileType1, appType1));
-	CHK(roster.Launch(&fileRef, NULL) == B_BAD_VALUE);
-#endif
-	entry_ref ref;
-	CHK(roster.Launch((entry_ref*)NULL, &ref) == B_BAD_VALUE);
+	BList list;
+	CHK(roster.Launch((const char*)NULL, &list, NULL) == B_BAD_VALUE);
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 2			ref doesn't refer to an existing entry =>
-	@results		Should return B_ENTRY_NOT_FOUND.
+	status_t Launch(const char *mimeType, BMessage *initialMsgs,
+					team_id *appTeam) const
+	@case 2			mimeType is invalid
+	@results		Should return B_BAD_VALUE.
 */
 void LaunchTester::LaunchTestB2()
 {
 	BRoster roster;
-	entry_ref fileRef(ref_for_path(testFile1));
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_ENTRY_NOT_FOUND);
+	BList list;
+	CHK(roster.Launch("invalid/mine/type", &list, NULL) == B_BAD_VALUE);
 }
 
+// LaunchTypeCaller2
+class LaunchTypeCaller2 : public LaunchCaller {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		return roster.Launch(type, messages, team);
+	}
+	virtual int32 SupportsMessages() const { return 1000; }
+};
+
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 3			ref is valid, file has type and preferred app, preferred
-					app is in trash
-	@results		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+	status_t Launch(const char *mimeType, BList *messageList,
+					team_id *appTeam) const
+	@case 3			common cases 1-14
 */
 void LaunchTester::LaunchTestB3()
 {
-	BRoster roster;
-	create_app(get_trash_app_file(), appType1);
-	entry_ref fileRef(create_file(testFile1, fileType1, appType1));
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_LAUNCH_FAILED_APP_IN_TRASH);
+	LaunchTypeCaller2 caller;
+	for (int32 i = 0; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 4			ref is valid, file has type and preferred app, app type is
-					not installed, app exists and has signature
-	@results		Should return B_OK and set the ref to refer to the file's
-					(not the file type's) preferred application's executable.
-					Should install the app type and set the app hint on it.
+	status_t Launch(const char *mimeType, BList *messageList,
+					team_id *appTeam) const
+	@case 4			installed type mimeType, preferred app, app type not
+					installed, app has signature, NULL messageList
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
 */
 void LaunchTester::LaunchTestB4()
+{
+	LaunchTypeCaller2 caller;
+	LaunchContext context(caller);
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	team_id team;
+	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const char *mimeType, BList *messageList,
+					team_id *appTeam) const
+	@case 5			installed type mimeType, preferred app, app type not
+					installed, app has signature, empty messageList
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestB5()
+{
+	LaunchTypeCaller2 caller;
+	LaunchContext context(caller);
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	team_id team;
+	BList list;
+	CHK(context(fileType1, &list, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const char *mimeType, int argc, char **args,
+					team_id *appTeam) const
+	@case 1			mimeType is NULL or argc > 0 and args is NULL
+	@results		Should return B_BAD_VALUE.
+*/
+void LaunchTester::LaunchTestC1()
+{
+	BRoster roster;
+	char *argv[] = { "Hey!" };
+	CHK(roster.Launch((const char*)NULL, 1, argv, NULL) == B_BAD_VALUE);
+	CHK(roster.Launch((const char*)NULL, 1, (char**)NULL, NULL)
+		== B_BAD_VALUE);
+}
+
+/*
+	status_t Launch(const char *mimeType, int argc, char **args,
+					team_id *appTeam) const
+	@case 2			mimeType is invalid
+	@results		Should return B_BAD_VALUE.
+*/
+void LaunchTester::LaunchTestC2()
+{
+	BRoster roster;
+	BList list;
+	char *argv[] = { "Hey!" };
+	CHK(roster.Launch("invalid/mine/type", 1, argv, NULL) == B_BAD_VALUE);
+}
+
+// LaunchTypeCaller3
+class LaunchTypeCaller3 : public LaunchCaller {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		return roster.Launch(type, argc, const_cast<char**>(argv), team);
+	}
+	virtual int32 SupportsMessages() const { return 0; }
+};
+
+/*
+	status_t Launch(const char *mimeType, int argc, char **args,
+					team_id *appTeam) const
+	@case 3			common cases 1-14
+*/
+void LaunchTester::LaunchTestC3()
+{
+	LaunchTypeCaller3 caller;
+	for (int32 i = 0; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
+}
+
+/*
+	status_t Launch(const char *mimeType, int argc, char **args,
+					team_id *appTeam) const
+	@case 4			installed type mimeType, preferred app, app type not
+					installed, app has signature, NULL args, argc is 0
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestC4()
+{
+	LaunchTypeCaller3 caller;
+	LaunchContext context(caller);
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	team_id team;
+	CHK(context(fileType1, NULL, 0, (const char**)NULL, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+// SimpleFileCaller1
+class SimpleFileCaller1 : public LaunchCaller {
+public:
+	SimpleFileCaller1() : fRef() {}
+	SimpleFileCaller1(const entry_ref &ref) : fRef(ref) {}
+	virtual ~SimpleFileCaller1() {}
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		BMessage *message = (messages ? (BMessage*)messages->ItemAt(0L)
+									  : NULL);
+		return roster.Launch(&fRef, message, team);
+	}
+	virtual bool SupportsRefs() const { return true; }
+	virtual const entry_ref *Ref() const { return &fRef; }
+
+protected:
+	entry_ref fRef;
+};
+
+// FileWithTypeCaller1
+class FileWithTypeCaller1 : public SimpleFileCaller1 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		BMessage *message = (messages ? (BMessage*)messages->ItemAt(0L)
+									  : NULL);
+		fRef = create_file(testFile1, type);
+		return roster.Launch(&fRef, message, team);
+	}
+};
+
+// SniffFileTypeCaller1
+class SniffFileTypeCaller1 : public SimpleFileCaller1 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		BMessage *message = (messages ? (BMessage*)messages->ItemAt(0L)
+									  : NULL);
+		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
+		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
+		return roster.Launch(&fRef, message, team);
+	}
+};
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 1			ref is NULL
+	@results		Should return B_BAD_VALUE.
+*/
+void LaunchTester::LaunchTestD1()
+{
+	BRoster roster;
+	BMessage message;
+	CHK(roster.Launch((const entry_ref*)NULL, &message, NULL) == B_BAD_VALUE);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 2			ref doesn't refer to an existing entry
+	@results		Should return B_ENTRY_NOT_FOUND.
+*/
+void LaunchTester::LaunchTestD2()
+{
+	BRoster roster;
+	BMessage message;
+	entry_ref fileRef(ref_for_path(testFile1));
+	CHK(roster.Launch(&fileRef, &message, NULL) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 3			ref is valid, file has type and preferred app, app type is
+					not installed, app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file's (not the file type's) preferred
+					application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestD3()
 {
 	BRoster roster;
 	create_app(appFile1, appType1);
 	create_app(appFile2, appType2);
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_OK);
+	SimpleFileCaller1 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile2) == ref);
 	check_app_type(appType2, appFile2);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 5			ref is valid, file has no type, but preferred app,
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 4			ref is valid, file has no type, but preferred app,
 					app type is not installed, app exists and has signature
-	@results		Should return B_OK and set the ref to refer to the
-					application's executable. Should install the app type and
-					set the app hint on it.
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
 */
-void LaunchTester::LaunchTestB5()
+void LaunchTester::LaunchTestD4()
 {
 	BRoster roster;
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_OK);
+	SimpleFileCaller1 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 6			ref is valid, file has type and app hint, the type's
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 5			ref is valid, file has type and app hint, the type's
 					preferred app type is not installed, app exists and has
 					signature
-	@results		Should return B_OK and set the ref to refer to the file
-					type's preferred application's executable. Should install
-					the app type and set the app hint on it.
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
 */
-void LaunchTester::LaunchTestB6()
+void LaunchTester::LaunchTestD5()
 {
 	BRoster roster;
 	create_app(appFile1, appType1);
 	create_app(appFile2, appType2);
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_OK);
+	SimpleFileCaller1 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 7			ref is valid, file has type, the type's preferred app
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 6			ref is valid, file has type, the type's preferred app
 					type is not installed, app exists and has signature,
 					file is executable
-	@results		Should return B_OK and set the ref to refer to the file.
-					Should not set the app hint on the app or file type (Why?).
+	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
+					Should not set the app hint on the app or file type.
 */
-void LaunchTester::LaunchTestB7()
+void LaunchTester::LaunchTestD6()
 {
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1));
 	system((string("chmod a+x ") + testFile1).c_str());
-	entry_ref ref;
-	CHK(roster.Launch(&fileRef, &ref) == B_OK);
-	CHK(ref_for_path(testFile1) == ref);
+	BMessage message;
+	team_id team;
+	CHK(roster.Launch(&fileRef, &message, &team)
+		== B_LAUNCH_FAILED_EXECUTABLE);
 	CHK(BMimeType(appType1).IsInstalled() == false);
-	CHK(BMimeType(fileType1).GetAppHint(&ref) == B_ENTRY_NOT_FOUND);
+	CHK(BMimeType(fileType1).GetAppHint(&fileRef) == B_ENTRY_NOT_FOUND);
 }
 
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 8			ref is valid and refers to a link to a file, file has type,
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 7			ref is valid and refers to a link to a file, file has type,
 					the type's preferred app type is not installed,
 					app exists and has signature
-	@results		Should return B_OK and set the ref to refer to the file
-					type's preferred application's executable. Should install
-					the app type and set the app hint on it.
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
 */
-void LaunchTester::LaunchTestB8()
+void LaunchTester::LaunchTestD7()
 {
 	BRoster roster;
 	create_app(appFile1, appType1);
@@ -800,33 +1227,41 @@ void LaunchTester::LaunchTestB8()
 	create_file(testFile1, fileType1);
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
 	entry_ref linkRef(ref_for_path(testLink1));
-	entry_ref ref;
-	CHK(roster.Launch(&linkRef, &ref) == B_OK);
+	SimpleFileCaller1 caller(linkRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
 }
 
-// FileWithTypeCaller
-class FileWithTypeCaller : public LaunchCaller {
-public:
-	virtual status_t operator()(const char *type, entry_ref *ref)
-	{
-		BRoster roster;
-		entry_ref fileRef(create_file(testFile1, type));
-		return roster.Launch(&fileRef, ref);
-	}
-};
-
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 9			ref is valid, file has no type, sniffing results in a type,
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 8			ref is valid, file has no type, sniffing results in a type,
 					type is set on file,
 					Launch(const char*, entry_ref*) cases 4-16
 					(== common cases 2-14)
 */
-void LaunchTester::LaunchTestB9()
+void LaunchTester::LaunchTestD8()
 {
-	FileWithTypeCaller caller;
+	FileWithTypeCaller1 caller;
 	for (int32 i = 0; i < commonTestFunctionCount; i++) {
 		NextSubTest();
 		(*commonTestFunctions[i])(caller);
@@ -835,29 +1270,17 @@ void LaunchTester::LaunchTestB9()
 	}
 }
 
-// SniffFileTypeCaller
-class SniffFileTypeCaller : public LaunchCaller {
-public:
-	virtual status_t operator()(const char *type, entry_ref *ref)
-	{
-		BRoster roster;
-		entry_ref fileRef(create_file(testFile1, type, NULL, NULL,
-						  "UnIQe pAtTeRn"));
-		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
-		return roster.Launch(&fileRef, ref);
-	}
-};
-
 /*
-	status_t Launch(entry_ref *ref, entry_ref *app) const
-	@case 10		ref is valid, file has no type, sniffing results in a type,
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 9			ref is valid, file has no type, sniffing results in a type,
 					type is set on file,
 					Launch(const char*, entry_ref*) cases 3-16
 					(== common cases 1-14)
 */
-void LaunchTester::LaunchTestB10()
+void LaunchTester::LaunchTestD9()
 {
-	SniffFileTypeCaller caller;
+	SniffFileTypeCaller1 caller;
 	for (int32 i = 1; i < commonTestFunctionCount; i++) {
 		NextSubTest();
 		(*commonTestFunctions[i])(caller);
@@ -866,7 +1289,780 @@ void LaunchTester::LaunchTestB10()
 	}
 }
 
-#endif // 0
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 10		ref is valid, file has no type, but preferred app, app
+					type is not installed, app exists and has signature,
+					NULL initialMessage
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestD10()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller1 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+// SimpleFileCaller2
+class SimpleFileCaller2 : public LaunchCaller {
+public:
+	SimpleFileCaller2() : fRef() {}
+	SimpleFileCaller2(const entry_ref &ref) : fRef(ref) {}
+	virtual ~SimpleFileCaller2() {}
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		return roster.Launch(&fRef, messages, team);
+	}
+	virtual int32 SupportsMessages() const { return 1000; }
+	virtual bool SupportsRefs() const { return true; }
+	virtual const entry_ref *Ref() const { return &fRef; }
+
+protected:
+	entry_ref fRef;
+};
+
+// FileWithTypeCaller2
+class FileWithTypeCaller2 : public SimpleFileCaller2 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		fRef = create_file(testFile1, type);
+		return roster.Launch(&fRef, messages, team);
+	}
+};
+
+// SniffFileTypeCaller2
+class SniffFileTypeCaller2 : public SimpleFileCaller2 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
+		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
+		return roster.Launch(&fRef, messages, team);
+	}
+};
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 1			ref is NULL
+	@results		Should return B_BAD_VALUE.
+*/
+void LaunchTester::LaunchTestE1()
+{
+	BRoster roster;
+	BList list;
+	CHK(roster.Launch((const entry_ref*)NULL, &list, NULL) == B_BAD_VALUE);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 2			ref doesn't refer to an existing entry
+	@results		Should return B_ENTRY_NOT_FOUND.
+*/
+void LaunchTester::LaunchTestE2()
+{
+	BRoster roster;
+	BMessage message;
+	entry_ref fileRef(ref_for_path(testFile1));
+	BList list;
+	CHK(roster.Launch(&fileRef, &list, NULL) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 3			ref is valid, file has type and preferred app, app type is
+					not installed, app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file's (not the file type's) preferred
+					application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE3()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	create_app(appFile2, appType2);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile2) == ref);
+	check_app_type(appType2, appFile2);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 4			ref is valid, file has no type, but preferred app,
+					app type is not installed, app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE4()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 5			ref is valid, file has type and app hint, the type's
+					preferred app type is not installed, app exists and has
+					signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE5()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	create_app(appFile2, appType2);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 6			ref is valid, file has type, the type's preferred app
+					type is not installed, app exists and has signature,
+					file is executable
+	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
+					Should not set the app hint on the app or file type.
+*/
+void LaunchTester::LaunchTestE6()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1));
+	system((string("chmod a+x ") + testFile1).c_str());
+	BList list;
+	team_id team;
+	CHK(roster.Launch(&fileRef, &list, &team) == B_LAUNCH_FAILED_EXECUTABLE);
+	CHK(BMimeType(appType1).IsInstalled() == false);
+	CHK(BMimeType(fileType1).GetAppHint(&fileRef) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 7			ref is valid and refers to a link to a file, file has type,
+					the type's preferred app type is not installed,
+					app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE7()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	create_file(testFile1, fileType1);
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1));
+	SimpleFileCaller2 caller(linkRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 8			ref is valid, file has no type, sniffing results in a type,
+					type is set on file,
+					Launch(const char*, entry_ref*) cases 4-16
+					(== common cases 2-14)
+*/
+void LaunchTester::LaunchTestE8()
+{
+	FileWithTypeCaller2 caller;
+	for (int32 i = 0; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 9			ref is valid, file has no type, sniffing results in a type,
+					type is set on file,
+					Launch(const char*, entry_ref*) cases 3-16
+					(== common cases 1-14)
+*/
+void LaunchTester::LaunchTestE9()
+{
+	SniffFileTypeCaller2 caller;
+	for (int32 i = 1; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 10		ref is valid, file has no type, but preferred app, app
+					type is not installed, app exists and has signature,
+					NULL messageList
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE10()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 11		ref is valid, file has no type, but preferred app, app
+					type is not installed, app exists and has signature,
+					empty messageList
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestE11()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	BList list;
+	CHK(context(fileType1, &list, LaunchContext::kStandardArgc,
+				LaunchContext::kStandardArgv, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+// SimpleFileCaller3
+class SimpleFileCaller3 : public LaunchCaller {
+public:
+	SimpleFileCaller3() : fRef() {}
+	SimpleFileCaller3(const entry_ref &ref) : fRef(ref) {}
+	virtual ~SimpleFileCaller3() {}
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		return roster.Launch(&fRef, argc, argv, team);
+	}
+	virtual int32 SupportsMessages() const { return 0; }
+	virtual bool SupportsRefs() const { return true; }
+	virtual const entry_ref *Ref() const { return &fRef; }
+
+protected:
+	entry_ref fRef;
+};
+
+// FileWithTypeCaller3
+class FileWithTypeCaller3 : public SimpleFileCaller3 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		fRef = create_file(testFile1, type);
+		return roster.Launch(&fRef, argc, argv, team);
+	}
+};
+
+// SniffFileTypeCaller3
+class SniffFileTypeCaller3 : public SimpleFileCaller3 {
+public:
+	virtual status_t operator()(const char *type, BList *messages, int32 argc,
+								const char **argv, team_id *team)
+	{
+		BRoster roster;
+		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
+		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
+		return roster.Launch(&fRef, argc, argv, team);
+	}
+};
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 1			ref is NULL
+	@results		Should return B_BAD_VALUE.
+*/
+void LaunchTester::LaunchTestF1()
+{
+	BRoster roster;
+	char *argv[] = { "Hey!" };
+	CHK(roster.Launch((const entry_ref*)NULL, 1, argv, NULL) == B_BAD_VALUE);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 2			ref doesn't refer to an existing entry
+	@results		Should return B_ENTRY_NOT_FOUND.
+*/
+void LaunchTester::LaunchTestF2()
+{
+	BRoster roster;
+	BMessage message;
+	entry_ref fileRef(ref_for_path(testFile1));
+	char *argv[] = { "Hey!" };
+	CHK(roster.Launch(&fileRef, 1, argv, NULL) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 3			ref is valid, file has type and preferred app, app type is
+					not installed, app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file's (not the file type's) preferred
+					application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestF3()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	create_app(appFile2, appType2);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile2) == ref);
+	check_app_type(appType2, appFile2);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 4			ref is valid, file has no type, but preferred app,
+					app type is not installed, app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestF4()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 5			ref is valid, file has type and app hint, the type's
+					preferred app type is not installed, app exists and has
+					signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestF5()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	create_app(appFile2, appType2);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 6			ref is valid, file has type, the type's preferred app
+					type is not installed, app exists and has signature,
+					file is executable
+	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
+					Should not set the app hint on the app or file type.
+*/
+void LaunchTester::LaunchTestF6()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	entry_ref fileRef(create_file(testFile1, fileType1));
+	system((string("chmod a+x ") + testFile1).c_str());
+	team_id team;
+	char *argv[] = { "Hey!" };
+	CHK(roster.Launch(&fileRef, 1, argv, &team) == B_LAUNCH_FAILED_EXECUTABLE);
+	CHK(BMimeType(appType1).IsInstalled() == false);
+	CHK(BMimeType(fileType1).GetAppHint(&fileRef) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 7			ref is valid and refers to a link to a file, file has type,
+					the type's preferred app type is not installed,
+					app exists and has signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the file type's preferred application's executable.
+					Should install the app type and set the app hint on it.
+*/
+void LaunchTester::LaunchTestF7()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	create_file(testFile1, fileType1);
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1));
+	SimpleFileCaller3 caller(linkRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+	CHK(context.CheckArgvMessage(team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 8			ref is valid, file has no type, sniffing results in a type,
+					type is set on file,
+					Launch(const char*, entry_ref*) cases 4-16
+					(== common cases 2-14)
+*/
+void LaunchTester::LaunchTestF8()
+{
+	FileWithTypeCaller3 caller;
+	for (int32 i = 0; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 9			ref is valid, file has no type, sniffing results in a type,
+					type is set on file,
+					Launch(const char*, entry_ref*) cases 3-16
+					(== common cases 1-14)
+*/
+void LaunchTester::LaunchTestF9()
+{
+	SniffFileTypeCaller3 caller;
+	for (int32 i = 1; i < commonTestFunctionCount; i++) {
+		NextSubTest();
+		(*commonTestFunctions[i])(caller);
+		tearDown();
+		setUp();
+	}
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 10		ref is valid, file has no type, but preferred app, app
+					type is not installed, app exists and has signature,
+					NULL args, argc is 0
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it. argv are ignored.
+*/
+void LaunchTester::LaunchTestF10()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, NULL, 0, NULL, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 11		ref is valid, file has no type, but preferred app, app
+					type is not installed, app exists and has signature,
+					NULL args, argc > 0
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it. argv are ignored.
+*/
+void LaunchTester::LaunchTestF11()
+{
+	BRoster roster;
+	create_app(appFile1, appType1);
+	entry_ref fileRef(create_file(testFile1, NULL, appType1));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context(caller);
+	team_id team;
+	BMessage message(MSG_1);
+	BList messages;
+	messages.AddItem(&message);
+	CHK(context(fileType1, NULL, 1, NULL, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(team, cookie));
+//	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckRefsMessage(team, cookie));
+	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+}
 
 
 Test* LaunchTester::Suite()
@@ -876,17 +2072,53 @@ Test* LaunchTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestA1);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestA2);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestA4);
 
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB1);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB2);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB3);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB4);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB5);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB6);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB7);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB8);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB9);
-//	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB10);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB4);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestB5);
+
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestC1);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestC2);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestC3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestC4);
+
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD1);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD2);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD4);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD5);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD6);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD7);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD8);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD9);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD10);
+
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE1);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE2);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE4);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE5);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE6);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE7);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE8);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE9);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE10);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE11);
+
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF1);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF2);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF3);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF4);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF5);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF6);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF7);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF8);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF9);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF10);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF11);
 
 	return SuiteOfTests;
 }

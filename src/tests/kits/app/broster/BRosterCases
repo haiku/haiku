@@ -89,68 +89,71 @@ case 3:	teamIDList is not NULL and not empty, signature is not NULL and
 		Should append the team IDs of all running apps with the supplied
 		signature to teamIDList.
 
-status_t FindApp(const char *mimeType, entry_ref *app) const
-case 1:	mimeType or app are NULL =>
-		Should return B_BAD_VALUE.
-case 2:	mimeType is invalid =>
-		Should return B_BAD_VALUE.
-case 3:	uninstalled type mimeType =>
+status_t FindApp() const: common cases
+case 1:	uninstalled type mimeType =>
 		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
-case 4:	installed type mimeType, no preferred app =>
+case 2:	installed type mimeType, no preferred app =>
 		Should return B_LAUNCH_FAILED_NO_PREFERRED_APP.
-case 5:	installed type mimeType, preferred app, app type not installed,
+case 3:	installed type mimeType, preferred app, app type not installed,
 		app has no signature =>
 		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
-case 6:	installed type mimeType, preferred app, app type not installed,
+case 4:	installed type mimeType, preferred app, app type not installed,
 		app has signature =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. Should install the app type and set the app hint on it.
-case 7:	installed type mimeType, preferred app, app type installed,
+case 5:	installed type mimeType, preferred app, app type installed,
 		app has signature =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. Should set the app hint on the app type.
-case 8:	installed type mimeType, preferred app, app type installed,
+case 6:	installed type mimeType, preferred app, app type installed,
 		app has signature, app has no execute permission =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. Should set the app hint on the app type.
-case 9:	installed type mimeType, preferred app, app type installed,
+case 7:	installed type mimeType, preferred app, app type installed,
 		two apps have the signature =>
 		Should return B_OK and set the ref to refer to the application
 		executable with the most recent modification time. Should set the app
 		hint on the app type.
-case 10:installed type mimeType, preferred app, app type installed,
+case 8:	installed type mimeType, preferred app, app type installed,
 		two apps have the signature, one has a version info, the other one is
 		newer =>
 		Should return B_OK and set the ref to refer to the application
 		executable with version info. Should set the app hint on the app type.
-case 11:installed type mimeType, preferred app, app type installed,
+case 9:	installed type mimeType, preferred app, app type installed,
 		two apps have the signature, both apps have a version info =>
 		Should return B_OK and set the ref to refer to the application
 		executable with the greater version. Should set the app
 		hint on the app type.
-case 12:installed type mimeType, preferred app, app type installed,
+case 10:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint that points to an app with a
 		different signature =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. Should remove the incorrect app hint on the app type.
 		(OBOS: Should set the correct app hint.
 		 Don't even return the wrong app?)
-case 13:installed type mimeType, preferred app, app type installed,
+case 11:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint pointing to void,
 		a differently named app with this signature exists =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. (not R5: Should update the app hint on the app type?)
-case 14:mimeType is app signature, not installed =>
+case 12:mimeType is app signature, not installed =>
 		Should return B_OK and set the ref to refer to the application
 		executable. Should set the app hint on the app type.
-case 15:mimeType is installed, but has no preferred application,
+case 13:mimeType is installed, but has no preferred application,
 		super type has preferred application =>
 		Should return B_OK and set the ref to refer to the application
 		executable associated with the preferred app of the supertype.
 		Should set the app hint on the app type.
-case 16:installed type mimeType, preferred app, app type not installed,
+case 14:installed type mimeType, preferred app, app type not installed,
 		app has signature, app is trash =>
 		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+
+status_t FindApp(const char *mimeType, entry_ref *app) const
+case 1:	mimeType or app are NULL =>
+		Should return B_BAD_VALUE.
+case 2:	mimeType is invalid =>
+		Should return B_BAD_VALUE.
+case 3:	common tests (all)
 
 status_t FindApp(entry_ref *ref, entry_ref *app) const
 case 1:	ref or app are NULL =>
@@ -186,88 +189,261 @@ case 8:	ref is valid and refers to a link to a file, file has type,
 		preferred application's executable. Should install the app type and
 		set the app hint on it.
 case 9:	ref is valid, file has type,
-		FindApp(const char*, entry_ref*) cases 3-16 (== common cases 1-14)
+		common cases 1-14
 case 10:ref is valid, file has no type, sniffing results in a type,
 		type is set on file,
-		FindApp(const char*, entry_ref*) cases 4-16 (== common cases 2-14)
+		common cases 2-14
 
-status_t Launch(const char *mimeType, BMessage *initialMsgs,
+status_t Launch() const: common cases
+case 1:	uninstalled type mimeType =>
+		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
+case 2:	installed type mimeType, no preferred app =>
+		Should return B_LAUNCH_FAILED_NO_PREFERRED_APP.
+case 3:	installed type mimeType, preferred app, app type not installed,
+		app has no signature =>
+		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
+case 4:	installed type mimeType, preferred app, app type not installed,
+		app has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the
+		app hint on it.
+case 5:	installed type mimeType, preferred app, app type installed,
+		app has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should set the app hint on the app type.
+case 6:	installed type mimeType, preferred app, app type installed,
+		app has signature, app has no execute permission =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should set the app hint on the app type.
+case 7:	installed type mimeType, preferred app, app type installed,
+		two apps have the signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application executable with the most recent modification time.
+		Should set the app hint on the app type.
+case 8:	installed type mimeType, preferred app, app type installed,
+		two apps have the signature, one has a version info, the other one is
+		newer =>
+		Should return B_OK and set team to the ID of the team running the
+		application executable with version info. Should set the app hint
+		on the app type.
+case 9:	installed type mimeType, preferred app, app type installed,
+		two apps have the signature, both apps have a version info =>
+		Should return B_OK and set team to the ID of the team running the
+		application executable with the greater version. Should set the app
+		hint on the app type.
+case 10:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint that points to an app with a
+		different signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should remove the incorrect app hint on
+		the app type.
+		(OBOS: Should set the correct app hint.
+		 Don't even run the wrong app?)
+case 11:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint pointing to void,
+		a differently named app with this signature exists =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable.
+		(not R5: Should update the app hint on the app type?)
+case 12:mimeType is app signature, not installed =>
+		Should return B_OK and set team to the ID of the team running the
+		application executable. Should set the app hint on the app type.
+case 13:mimeType is installed, but has no preferred application,
+		super type has preferred application =>
+		Should return B_OK and set team to the ID of the team running the
+		application executable associated with the preferred app of the
+		supertype. Should set the app hint on the app type.
+case 14:installed type mimeType, preferred app, app type not installed,
+		app has signature, app is trash =>
+		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+
+status_t Launch(const char *mimeType, BMessage *initialMsg,
 				team_id *appTeam) const
 case 1:	mimeType is NULL =>
 		Should return B_BAD_VALUE.
 case 2:	mimeType is invalid =>
 		Should return B_BAD_VALUE.
-case 3:	uninstalled type mimeType =>
-		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
-case 4:	installed type mimeType, no preferred app =>
-		Should return B_LAUNCH_FAILED_NO_PREFERRED_APP.
-case 5:	installed type mimeType, preferred app, app type not installed,
-		app has no signature =>
-		Should return B_LAUNCH_FAILED_APP_NOT_FOUND.
-case 6:	installed type mimeType, preferred app, app type not installed,
-		app has signature =>
-		Should return B_OK and set the ref to refer to the application's
-		executable. Should install the app type and set the app hint on it.
-case 7:	installed type mimeType, preferred app, app type installed,
-		app has signature =>
-		Should return B_OK and set the ref to refer to the application's
-		executable. Should set the app hint on the app type.
-case 8:	installed type mimeType, preferred app, app type installed,
-		app has signature, app has no execute permission =>
-		Should return B_OK and set the ref to refer to the application's
-		executable. Should set the app hint on the app type.
-case 9:	installed type mimeType, preferred app, app type installed,
-		two apps have the signature =>
-		Should return B_OK and set the ref to refer to the application
-		executable with the most recent modification time. Should set the app
-		hint on the app type.
-case 10:installed type mimeType, preferred app, app type installed,
-		two apps have the signature, one has a version info, the other one is
-		newer =>
-		Should return B_OK and set the ref to refer to the application
-		executable with version info. Should set the app hint on the app type.
-case 11:installed type mimeType, preferred app, app type installed,
-		two apps have the signature, both apps have a version info =>
-		Should return B_OK and set the ref to refer to the application
-		executable with the greater version. Should set the app
-		hint on the app type.
-case 12:installed type mimeType, preferred app, app type installed,
-		preferred app type has an app hint that points to an app with a
-		different signature =>
-		Should return B_OK and set the ref to refer to the application's
-		executable. Should remove the incorrect app hint on the app type.
-		(OBOS: Should set the correct app hint.
-		 Don't even return the wrong app?)
-case 13:installed type mimeType, preferred app, app type installed,
-		preferred app type has an app hint pointing to void,
-		a differently named app with this signature exists =>
-		Should return B_OK and set the ref to refer to the application's
-		executable. (not R5: Should update the app hint on the app type?)
-case 14:mimeType is app signature, not installed =>
-		Should return B_OK and set the ref to refer to the application
-		executable. Should set the app hint on the app type.
-case 15:mimeType is installed, but has no preferred application,
-		super type has preferred application =>
-		Should return B_OK and set the ref to refer to the application
-		executable associated with the preferred app of the supertype.
-		Should set the app hint on the app type.
-case 16:installed type mimeType, preferred app, app type not installed,
-		app has signature, app is trash =>
-		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+case 3:	common cases (all)
+case 4:	installed type mimeType, preferred app, app type not installed,
+		app has signature, NULL initialMsg =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the
+		app hint on it.
+
 
 status_t Launch(const char *mimeType, BList *messageList,
 				team_id *appTeam) const
+case 1:	mimeType is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	mimeType is invalid =>
+		Should return B_BAD_VALUE.
+case 3:	common cases (all)
+case 4:	installed type mimeType, preferred app, app type not installed,
+		app has signature, NULL messageList =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the
+		app hint on it.
+case 5:	installed type mimeType, preferred app, app type not installed,
+		app has signature, empty messageList =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the
+		app hint on it.
 
 status_t Launch(const char *mimeType, int argc, char **args,
 				team_id *appTeam) const
+case 1:	mimeType is NULL or argc > 0 and args is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	mimeType is invalid =>
+		Should return B_BAD_VALUE.
+case 3:	common cases (all)
+case 4:	installed type mimeType, preferred app, app type not installed,
+		app has signature, NULL args, argc is 0 =>
+		Should return B_OK and set team to the ID of the team running
+		the application's executable. Should install the app type and set the
+		app hint on it.
 
 status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
 				team_id *app_team) const
+case 1:	ref is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	ref doesn't refer to an existing entry =>
+		Should return B_ENTRY_NOT_FOUND.
+case 3:	ref is valid, file has type and preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		file's (not the file type's) preferred application's executable.
+		Should install the app type and set the app hint on it.
+case 4:	ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
+case 5:	ref is valid, file has type and app hint, the type's preferred app
+		type is not installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+case 6:	ref is valid, file has type, the type's preferred app
+		type is not installed, app exists and has signature, file is
+		executable =>
+		Should return B_LAUNCH_FAILED_EXECUTABLE.
+		Should not set the app hint on the app or file type.
+case 7:	ref is valid and refers to a link to a file, file has type,
+		the type's preferred app type is not installed,
+		app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+case 8:	ref is valid, file has type,
+		common cases 1-14
+case 9:	ref is valid, file has no type, sniffing results in a type,
+		type is set on file,
+		common cases 2-14
+case 10:ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature, NULL initialMessage =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
 
 status_t Launch(const entry_ref *ref, const BList *messageList,
 				team_id *appTeam) const
+case 1:	ref is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	ref doesn't refer to an existing entry =>
+		Should return B_ENTRY_NOT_FOUND.
+case 3:	ref is valid, file has type and preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		file's (not the file type's) preferred application's executable.
+		Should install the app type and set the app hint on it.
+case 4:	ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
+case 5:	ref is valid, file has type and app hint, the type's preferred app
+		type is not installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+case 6:	ref is valid, file has type, the type's preferred app
+		type is not installed, app exists and has signature, file is
+		executable =>
+		Should return B_LAUNCH_FAILED_EXECUTABLE.
+		Should not set the app hint on the app or file type.
+case 7:	ref is valid and refers to a link to a file, file has type,
+		the type's preferred app type is not installed,
+		app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+case 8:	ref is valid, file has type,
+		common cases 1-14
+case 9:	ref is valid, file has no type, sniffing results in a type,
+		type is set on file,
+		common cases 2-14
+case 10:ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature, NULL messageList =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
+case 11:ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature, empty messageList =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
 
 status_t Launch(const entry_ref *ref, int argc, const char * const *args,
 				team_id *appTeam) const
-
+case 1:	ref is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	ref doesn't refer to an existing entry =>
+		Should return B_ENTRY_NOT_FOUND.
+case 3:	ref is valid, file has type and preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		file's (not the file type's) preferred application's executable.
+		Should install the app type and set the app hint on it.
+		ref is converted to path and added as additional argv.
+case 4:	ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it.
+		ref is converted to path and added as additional argv.
+case 5:	ref is valid, file has type and app hint, the type's preferred app
+		type is not installed, app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+		ref is converted to path and added as additional argv.
+case 6:	ref is valid, file has type, the type's preferred app
+		type is not installed, app exists and has signature, file is
+		executable =>
+		Should return B_LAUNCH_FAILED_EXECUTABLE.
+		Should not set the app hint on the app or file type.
+case 7:	ref is valid and refers to a link to a file, file has type,
+		the type's preferred app type is not installed,
+		app exists and has signature =>
+		Should return B_OK and set team to the ID of the team running the file
+		type's preferred application's executable. Should install the app
+		type and set the app hint on it.
+		ref is converted to path and added as additional argv.
+case 8:	ref is valid, file has type,
+		common cases 1-14
+		(ref is converted to path and added as additional argv.)
+case 9:	ref is valid, file has no type, sniffing results in a type,
+		type is set on file,
+		common cases 2-14
+		(ref is converted to path and added as additional argv.)
+case 10:ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature, NULL args, argc is 0 =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it. argv are ignored.
+case 11:ref is valid, file has no type, but preferred app, app type is not
+		installed, app exists and has signature, NULL args, argc > 0 =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the app
+		hint on it. argv are ignored.
 
