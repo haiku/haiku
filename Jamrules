@@ -946,13 +946,14 @@ actions MimeSet
 
 rule assemble
 {
-	Depends $(1) : $(2) ;
-	LocalClean clean : $(1) ;
+	Depends $(<) : $(>) ;
+	ASFLAGS on $(<) += $(ASFLAGS) $(SUBDIRASFLAGS) ;
+	ASHDRS on $(<) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 }
 
 actions assemble
 {
-	$(CC) -c "$(2)" -O2 $(KERNEL_CCFLAGS) -o "$(1)" ;
+	$(CC) -c "$(2)" -O2 $(ASFLAGS) $(KERNEL_CCFLAGS) $(ASHDRS) -o "$(1)" ;
 }
 
 # Overridden to allow spaces in file names.
