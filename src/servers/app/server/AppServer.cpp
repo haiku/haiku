@@ -205,7 +205,6 @@ int32 AppServer::PollerThread(void *data)
 {
 	// This thread handles nothing but input messages for mouse and keyboard
 	AppServer *appserver=(AppServer*)data;
-	int8 *index;
 	PortQueue mousequeue(appserver->_mouseport);
 	PortMessage *msg;
 	
@@ -244,21 +243,13 @@ int32 AppServer::PollerThread(void *data)
 				// 3) float - y coordinate of mouse click
 				// 4) int32 - buttons down
 				
-				index=(int8*)msg->Buffer();
-				if(!index)
-					break;
-				
-				// Skip past the message code
-				index += sizeof(int32);
-				
-				// Time sent is not necessary for cursor processing.
-				index += sizeof(int64);
-				
+				int64 dummy;
 				float tempx=0,tempy=0;
-				tempx=*((float*)index);
-				index+=sizeof(float);
-				tempy=*((float*)index);
-				index+=sizeof(float);
+				
+				msg->Read<int64>(&dummy);
+				msg->Read<float>(&tempx);
+				msg->Read<float>(&tempy);
+				msg->Rewind();
 				
 				if(appserver->_driver)
 				{
@@ -343,12 +334,15 @@ void AppServer::MainLoop(void)
 	{
 		if(pmsg.ReadFromPort(_messageport)==B_OK)
 		{
+			if(pmsg.Protocol()==B_QUIT_REQUESTED)
+				pmsg.SetCode(B_QUIT_REQUESTED);
+			
 			switch(pmsg.Code())
 			{
+				case B_QUIT_REQUESTED:
 				case AS_CREATE_APP:
 				case AS_DELETE_APP:
 				case AS_GET_SCREEN_MODE:
-				case B_QUIT_REQUESTED:
 				case AS_UPDATED_CLIENT_FONTLIST:
 				case AS_QUERY_FONTS_CHANGED:
 				case AS_SET_UI_COLORS:
@@ -368,7 +362,7 @@ void AppServer::MainLoop(void)
 
 		}
 
-		if(pmsg.Code()==AS_DELETE_APP || (pmsg.Code()==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
+		if(pmsg.Code()==AS_DELETE_APP || (pmsg.Protocol()==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
 		{
 			if(_quitting_server==true && _applist->CountItems()==0)
 				break;

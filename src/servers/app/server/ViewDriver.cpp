@@ -497,7 +497,9 @@ bool VDWindow::QuitRequested(void)
 	port_id serverport=find_port(SERVER_PORT_NAME);
 
 	if(serverport!=B_NAME_NOT_FOUND)
+	{
 		write_port(serverport,B_QUIT_REQUESTED,NULL,0);
+	}
 
 	return true;
 }
