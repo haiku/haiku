@@ -10,7 +10,11 @@
  * for fast data retrieval by the MixerCore, which
  * will call GetOutputChannelSourceInfoAt() and
  * iterate through the first source_count array entries
- * for source_gain[] and source_type[]
+ * for source_gain[] and source_type[] arrays, they are
+ * index by 0 to GetOutputChannelSourceCount() - 1.
+ * To allow gain change for not active sources,
+ * we use the source_gain_cache[] array that is indexed
+ * by source_type.
  */
 
 class MixerOutput
@@ -30,9 +34,9 @@ public:
 	float	GetOutputChannelGain(int channel);
 	
 	// The Sources for each channel
-	void	AddOutputChannelSource(int channel, int source_type, float source_gain);
+	void	AddOutputChannelSource(int channel, int source_type);
 	void	RemoveOutputChannelSource(int channel, int source_type);
-	bool	SetOutputChannelSourceGain(int channel, int source_type, float source_gain);
+	void	SetOutputChannelSourceGain(int channel, int source_type, float source_gain);
 	float	GetOutputChannelSourceGain(int channel, int source_type);
 	bool	HasOutputChannelSource(int channel, int source_type);
 	
@@ -69,6 +73,7 @@ private:
 		int		source_count;
 		float	source_gain[MAX_SOURCE_ENTRIES];
 		int		source_type[MAX_SOURCE_ENTRIES];
+		float	source_gain_cache[MAX_CHANNEL_TYPES];
 	};	
 
 	MixerCore 			*fCore;

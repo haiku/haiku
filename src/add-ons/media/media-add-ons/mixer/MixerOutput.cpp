@@ -75,7 +75,11 @@ MixerOutput::UpdateOutputChannels()
 		fOutputChannelInfo[i].source_count = 1;
 		fOutputChannelInfo[i].source_gain[0] = 1.0;
 		fOutputChannelInfo[i].source_type[0] = fOutputChannelInfo[i].channel_type;
+		// all the cached values are 0.0 for a new channel
+		for (int j = 0; j < MAX_CHANNEL_TYPES; j++)
+			fOutputChannelInfo[i].source_gain_cache[j] = 0.0;
 	}
+
 	AssignDefaultSources();
 	
 	// apply old gains and sources, overriding the 1.0 gain defaults for the old channels
@@ -89,6 +93,9 @@ MixerOutput::UpdateOutputChannels()
 						fOutputChannelInfo[i].source_gain[k] == oldInfo[j].source_gain[k];
 						fOutputChannelInfo[i].source_type[k] == oldInfo[j].source_type[k];
 					}
+					// also copy the old gain cache
+					for (int k = 0; k < MAX_CHANNEL_TYPES; k++)
+						fOutputChannelInfo[i].source_gain_cache[k] = oldInfo[j].source_gain_cache[k];
 					break;
 				}
 			}
@@ -240,9 +247,11 @@ MixerOutput::SetOutputChannelGain(int channel, float gain)
 }
 
 void
-MixerOutput::AddOutputChannelSource(int channel, int source_type, float source_gain)
+MixerOutput::AddOutputChannelSource(int channel, int source_type)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
+		return;
+	if (source_type < 0 || source_type >= MAX_CHANNEL_TYPES)
 		return;
 	if (fOutputChannelInfo[channel].source_count == MAX_SOURCE_ENTRIES)
 		return;
@@ -250,6 +259,8 @@ MixerOutput::AddOutputChannelSource(int channel, int source_type, float source_g
 		if (fOutputChannelInfo[channel].source_type[i] == source_type)
 			return;
 	}
+	// when adding a new source, use the current gain value from cache
+	float source_gain = fOutputChannelInfo[channel].source_gain_cache[source_type];
 	fOutputChannelInfo[channel].source_type[fOutputChannelInfo[channel].source_count] = source_type;
 	fOutputChannelInfo[channel].source_gain[fOutputChannelInfo[channel].source_count] = source_gain;
 	fOutputChannelInfo[channel].source_count++;
@@ -262,6 +273,9 @@ MixerOutput::RemoveOutputChannelSource(int channel, int source_type)
 		return;
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
+			// when removing a source, save the current gain value into the cache
+			fOutputChannelInfo[channel].source_gain_cache[source_type] = fOutputChannelInfo[channel].source_gain[i];
+			// remove the entry
 			fOutputChannelInfo[channel].source_type[i] = fOutputChannelInfo[channel].source_type[fOutputChannelInfo[channel].source_count - 1];
 			fOutputChannelInfo[channel].source_gain[i] = fOutputChannelInfo[channel].source_gain[fOutputChannelInfo[channel].source_count - 1];
 			fOutputChannelInfo[channel].source_count--;
@@ -270,18 +284,22 @@ MixerOutput::RemoveOutputChannelSource(int channel, int source_type)
 	}
 }
 
-bool
+void
 MixerOutput::SetOutputChannelSourceGain(int channel, int source_type, float source_gain)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
-		return false;
+		return;
+	// set gain for active source
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
 			fOutputChannelInfo[channel].source_gain[i] = source_gain;
-			return true;
+			return;
 		}
 	}
-	return false;
+	// we don't have an active source of that type, save gain in cache
+	if (source_type < 0 || source_type >= MAX_CHANNEL_TYPES)
+		return;
+	fOutputChannelInfo[channel].source_gain_cache[source_type] = source_gain;
 }
 
 float
@@ -289,12 +307,16 @@ MixerOutput::GetOutputChannelSourceGain(int channel, int source_type)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return 0.0;
+	// get gain for active source
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
 			return fOutputChannelInfo[channel].source_gain[i];
 		}
 	}
-	return 0.0;
+	// we don't have an active source of that type, get gain from cache
+	if (source_type < 0 || source_type >= MAX_CHANNEL_TYPES)
+		return 0.0;
+	return fOutputChannelInfo[channel].source_gain_cache[source_type];
 }
 
 bool

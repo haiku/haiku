@@ -976,22 +976,15 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			if (size != sizeof(int32))
 				goto err;
 			if (static_cast<const int32 *>(value)[0]) {
-				output->AddOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id), 0.0);
+				output->AddOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id));
 			} else {
 				output->RemoveOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id));
 			}
-			// after adding/removing sources, reset gain to 0.0
-			float nullgain = 0.0;
-			BroadcastNewParameterValue(when, PARAM_SRC_GAIN(PARAM(id), PARAM_CHAN(id), PARAM_SRC(id)), &nullgain, sizeof(nullgain));
 		}
 		if (PARAM_IS_SRC_GAIN(id)) {
 			if (size != sizeof(float))
 				goto err;
-			if (!output->SetOutputChannelSourceGain(PARAM_CHAN(id), PARAM_SRC(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]))) {
-				// gain setting failed, reset to 0.0
-				float nullgain = 0.0;
-				BroadcastNewParameterValue(when, PARAM_SRC_GAIN(PARAM(id), PARAM_CHAN(id), PARAM_SRC(id)), &nullgain, sizeof(nullgain));
-			}
+			output->SetOutputChannelSourceGain(PARAM_CHAN(id), PARAM_SRC(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]));
 		}
 	} else {
 		MixerInput *input;
