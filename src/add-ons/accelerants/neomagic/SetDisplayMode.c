@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-4/2004
+	Rudolf Cornelissen 4/2003-5/2004
 */
 
 #define MODULE_BIT 0x00200000
@@ -127,7 +127,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		nm_crtc_set_timing(target, crt_only);
 
 		/* always setup centering so a KB BIOS switch to flatpanel will go OK... */
-		nm_crtc_center(target);
+		nm_crtc_center(target, crt_only);
 	}
 
 	/* update driver's mode store */

@@ -504,7 +504,7 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 }
 
 /* setup centering mode for current internal or simultaneous flatpanel mode */
-status_t nm_crtc_center(display_mode target)
+status_t nm_crtc_center(display_mode target, bool crt_only)
 {
 	/* note:
 	 * NM2070 apparantly doesn't support horizontal centering this way... */
@@ -521,56 +521,59 @@ status_t nm_crtc_center(display_mode target)
 	ctrl2 = ctrl3 = 0x00;
 
 	/* calculate offsets for centering if prudent */
-	if (target.timing.h_display < si->ps.panel_width)
+	if (!crt_only)
 	{
-		hoffset = (si->ps.panel_width - target.timing.h_display);
-		/* adjust for register contraints:
-		 * horizontal center granularity is 16 pixels */
-		hoffset = ((hoffset >> 4) - 1);
-		/* turn on horizontal centering? */
-		ctrl3 = 0x10;
-	}
-
-	if (target.timing.v_display < si->ps.panel_height)
-	{
-		voffset = (si->ps.panel_height - target.timing.v_display);
-		/* adjust for register contraints:
-		 * vertical center granularity is 2 pixels */
-		voffset = ((voffset >> 1) - 2);
-		/* turn on vertical centering? */
-		ctrl2 = 0x01;
-	}
-
-	switch(target.timing.h_display)
-	{
-	case 640:
-		hcent1 = hoffset;
-		vcent3 = voffset;
-		break;
-	case 800:
-		hcent2 = hoffset;
-		switch(target.timing.v_display)
+		if (target.timing.h_display < si->ps.panel_width)
 		{
-		case 480:
-			//Linux fixme: check this out...
+			hoffset = (si->ps.panel_width - target.timing.h_display);
+			/* adjust for register contraints:
+			 * horizontal center granularity is 16 pixels */
+			hoffset = ((hoffset >> 4) - 1);
+			/* turn on horizontal centering? */
+			ctrl3 = 0x10;
+		}
+
+		if (target.timing.v_display < si->ps.panel_height)
+		{
+			voffset = (si->ps.panel_height - target.timing.v_display);
+			/* adjust for register contraints:
+			 * vertical center granularity is 2 pixels */
+			voffset = ((voffset >> 1) - 2);
+			/* turn on vertical centering? */
+			ctrl2 = 0x01;
+		}
+
+		switch(target.timing.h_display)
+		{
+		case 640:
+			hcent1 = hoffset;
 			vcent3 = voffset;
 			break;
-		case 600:
-			vcent4 = voffset;
+		case 800:
+			hcent2 = hoffset;
+			switch(target.timing.v_display)
+			{
+			case 480:
+				//Linux fixme: check this out...
+				vcent3 = voffset;
+				break;
+			case 600:
+				vcent4 = voffset;
+				break;
+			}
+			break;
+		case 1024:
+			hcent5 = hoffset;
+			vcent5 = voffset;
+			break;
+		case 1280:
+			/* this mode equals the largest possible panel on the newest chip:
+			 * so no centering needed here. */
+			break;
+		default:
+			//fixme?: block non-standard modes? for now: not centered.
 			break;
 		}
-		break;
-	case 1024:
-		hcent5 = hoffset;
-		vcent5 = voffset;
-		break;
-	case 1280:
-		/* this mode equals the largest possible panel on the newest chip:
-		 * so no centering needed here. */
-		break;
-	default:
-		//fixme?: block non-standard modes? for now: not centered.
-		break;
 	}
 
 	/* now program the card's registers */
