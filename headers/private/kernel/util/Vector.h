@@ -88,9 +88,10 @@ public:
 	inline Value &ElementAt(int32 index);
 
 	int32 IndexOf(const Value &value, int32 start = 0) const;
-	Iterator Find(const Value &value, const Iterator &start = Begin());
-	ConstIterator Find(const Value &value,
-					   const ConstIterator &start = Begin()) const;
+	Iterator Find(const Value &value);
+	Iterator Find(const Value &value, const Iterator &start);
+	ConstIterator Find(const Value &value) const;
+	ConstIterator Find(const Value &value, const ConstIterator &start) const;
 
 	inline Value &operator[](int32 index);
 	inline const Value &operator[](int32 index) const;
@@ -431,7 +432,7 @@ _VECTOR_CLASS_NAME::IsEmpty() const
 }
 
 // MakeEmpty
-/*!	\brief Removes all elements of the vector.
+/*!	\brief Removes all elements from the vector.
 */
 _VECTOR_TEMPLATE_LIST
 void
@@ -474,38 +475,6 @@ _VECTOR_CLASS_NAME::Begin() const
 	return ConstIterator(fItems);
 }
 
-// Null
-/*!	\brief Returns an invalid iterator.
-
-	Null() is used as a return value, if something went wrong. It must
-	neither be incremented or decremented nor dereferenced!
-
-	\return An invalid iterator.
-*/
-_VECTOR_TEMPLATE_LIST
-inline
-_VECTOR_CLASS_NAME::Iterator
-_VECTOR_CLASS_NAME::Null()
-{
-	return Iterator(NULL);
-}
-
-// Null
-/*!	\brief Returns an invalid iterator.
-
-	Null() is used as a return value, if something went wrong. It must
-	neither be incremented or decremented nor dereferenced!
-
-	\return An invalid iterator.
-*/
-_VECTOR_TEMPLATE_LIST
-inline
-_VECTOR_CLASS_NAME::ConstIterator
-_VECTOR_CLASS_NAME::Null() const
-{
-	return ConstIterator(NULL);
-}
-
 // End
 /*!	\brief Returns an iterator referring to the end of the vector.
 
@@ -536,6 +505,38 @@ _VECTOR_CLASS_NAME::ConstIterator
 _VECTOR_CLASS_NAME::End() const
 {
 	return ConstIterator(fItems + fItemCount);
+}
+
+// Null
+/*!	\brief Returns an invalid iterator.
+
+	Null() is used as a return value, if something went wrong. It must
+	neither be incremented or decremented nor dereferenced!
+
+	\return An invalid iterator.
+*/
+_VECTOR_TEMPLATE_LIST
+inline
+_VECTOR_CLASS_NAME::Iterator
+_VECTOR_CLASS_NAME::Null()
+{
+	return Iterator(NULL);
+}
+
+// Null
+/*!	\brief Returns an invalid iterator.
+
+	Null() is used as a return value, if something went wrong. It must
+	neither be incremented or decremented nor dereferenced!
+
+	\return An invalid iterator.
+*/
+_VECTOR_TEMPLATE_LIST
+inline
+_VECTOR_CLASS_NAME::ConstIterator
+_VECTOR_CLASS_NAME::Null() const
+{
+	return ConstIterator(NULL);
 }
 
 // IteratorForIndex
@@ -623,7 +624,22 @@ _VECTOR_CLASS_NAME::IndexOf(const Value &value, int32 start) const
 }
 
 // Find
-/*!	\brief Returns an iterator referring to the of the next element with the
+/*!	\brief Returns an iterator referring to the next element with the
+		   specified value.
+	\param value The value of the element to be found.
+	\return An iterator referring to the found element, or End(), if no
+			further with the given value could be found.
+*/
+_VECTOR_TEMPLATE_LIST
+inline
+_VECTOR_CLASS_NAME::Iterator
+_VECTOR_CLASS_NAME::Find(const Value &value)
+{
+	return Find(value, Begin());
+}
+
+// Find
+/*!	\brief Returns an iterator referring to the next element with the
 		   specified value.
 	\param value The value of the element to be found.
 	\param start And iterator specifying where to start searching for the
@@ -640,6 +656,21 @@ _VECTOR_CLASS_NAME::Find(const Value &value, const Iterator &start)
 	if (index >= 0)
 		return Iterator(fItems + index);
 	return End();
+}
+
+// Find
+/*!	\brief Returns an iterator referring to the of the next element with the
+		   specified value.
+	\param value The value of the element to be found.
+	\return An iterator referring to the found element, or End(), if no
+			further with the given value could be found.
+*/
+_VECTOR_TEMPLATE_LIST
+inline
+_VECTOR_CLASS_NAME::ConstIterator
+_VECTOR_CLASS_NAME::Find(const Value &value) const
+{
+	return Find(value, Begin());
 }
 
 // Find
