@@ -1,6 +1,7 @@
+# Haiku main build rules
+
 # Vanilla Jam compatibility
 if ! $(INVOCATION_SUBDIR_SET) {
-
 	rule FIsPrefix
 	{
 		# FIsPrefix <a> : <b> ;
@@ -832,8 +833,8 @@ rule R5KernelAddon
 	local sources = $(3) ;
 
 	Addon $(1) : $(2) : $(3) ;
-	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -fno-pic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -fno-pic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) /boot/develop/lib/x86/_KERNEL_ ;
 }
@@ -924,8 +925,8 @@ rule R5KernelStaticLibrary
 	SetupObjectsDir ;
 	MakeLocateObjects $(sources) ;
 	Library $(lib) : $(sources) ;
-	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -fno-pic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -fno-pic -fno-exceptions ;
 }
 
 rule MergeObjectFromObjects
@@ -1858,8 +1859,8 @@ rule KernelAddon
 
 	SetupObjectsDir ;
 	Addon $(1) : $(2) : $(sources) ;
-	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -fno-pic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -fno-pic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) <nogrist>kernel.so ;
 	SetupKernel $(sources) ;
