@@ -52,7 +52,7 @@ handle_signals(struct thread *thread, int state)
 
 			if (handler->sa_handler == SIG_IGN) {
 				// signal is to be ignored
-				// XXX apply zombie cleaning on SIGCHLD
+				// ToDo: apply zombie cleaning on SIGCHLD
 				continue;
 			}
 			if (handler->sa_handler == SIG_DFL) {
@@ -85,6 +85,15 @@ handle_signals(struct thread *thread, int state)
 							thread->return_flags |= THREAD_RETURN_INTERRUPTED;
 						RELEASE_THREAD_LOCK();
 						restore_interrupts(state);
+						
+						// ToDo: when we have more than a thread per process,
+						// it can likely happen (for any thread other than the first)
+						// that here, interrupts are still disabled.
+						// Changing the above line with "enable_interrupts()" fixes
+						// the problem, though we should find its cause.
+						// We absolutely need interrupts enabled when we enter
+						// thread_exit().
+
 						thread_exit();
 				}
 			}
