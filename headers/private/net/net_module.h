@@ -30,13 +30,5 @@ struct net_module {
 	int status;
 };
 
-//XXX already in posix/sys/protosw.h
-//enum {
-//	NET_LAYER1	= 1, /* link layer */
-//	NET_LAYER2,	     /* network layer */
-//	NET_LAYER3,	     /* transport layer */
-//	NET_LAYER4	     /* socket layer */
-//};
-
 #endif /* OBOS_NET_MODULE_H */
 
