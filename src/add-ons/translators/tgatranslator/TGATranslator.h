@@ -128,6 +128,8 @@ struct TGAImageSpec {
 
 #define TGA_HEADERS_SIZE 18
 
+#define TGA_STREAM_BUFFER_SIZE 1024
+
 class TGATranslator : public BTranslator {
 public:
 	TGATranslator();
