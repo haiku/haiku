@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,12 +14,12 @@
 void initialize_before(image_id imageID, struct uspace_program_args const *args);
 
 char *__progname = NULL;
+int __libc_argc;
+char **__libc_argv;
 
 char _single_threaded = true;
 	// determines if I/O locking needed; needed for BeOS compatibility
 
-int __libc_argc;
-char **__libc_argv;
 thread_id __main_thread_id;
 char **argv_save;
 	// needed for BeOS compatibility - they are set in the startup code
@@ -36,6 +36,9 @@ initialize_before(image_id imageID, struct uspace_program_args const *args)
 		else
 			__progname++;
 	}
+
+	__libc_argc = args->argc;
+	__libc_argv = args->argv;
 
 	__init_time();
 	__init_image(args);
