@@ -1,5 +1,5 @@
 /* NeoMagic Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-06/2004 */
+/* Written by Rudolf Cornelissen 05/2002-07/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -453,6 +453,9 @@ status_t nm_configure_bes
 
 	if (si->ps.card_type >= NM2097)
 	{
+		/* helper: some cards use pixels to define buffer pitch, others use bytes */
+		uint16 buf_pitch = ob->width;
+
 		/* PCI card */
 		LOG(4,("Overlay: accelerant is programming BES\n"));
 		/* unlock card overlay sequencer registers (b5 = 1) */
@@ -485,6 +488,8 @@ status_t nm_configure_bes
 		}
 		else
 		{
+			/* NM2200 and later cards use bytes to define buffer pitch */
+			buf_pitch <<= 1;
 			/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
 			//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
 			//fixme? check if overlaybuffer width should also have granularity of 16 now!
@@ -555,10 +560,10 @@ status_t nm_configure_bes
 		/* setup brightness to be 'neutral' (two's complement number) */
 		PCIGRPHW(BRIGHTNESS, 0x00);
 
-		/* setup inputbuffer #1 pitch including slopspace (in pixels) */
+		/* setup inputbuffer #1 pitch including slopspace */
 		/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
-		PCIGRPHW(BUF1PITCHL, (ob->width & 0xff));
-		PCIGRPHW(BUF1PITCHH, ((ob->width >> 8) & 0xff));
+		PCIGRPHW(BUF1PITCHL, (buf_pitch & 0xff));
+		PCIGRPHW(BUF1PITCHH, ((buf_pitch >> 8) & 0xff));
 	}
 	else
 	{

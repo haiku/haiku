@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-6/2004.
+	Rudolf Cornelissen 5/2002-7/2004.
 */
 
 /* standard kernel driver stuff */
@@ -182,7 +182,10 @@ init_hardware(void) {
 
 	/* choke if we can't find the ISA bus */
 	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
+	{
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
+	}
 
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
@@ -257,7 +260,10 @@ init_driver(void) {
 
 	/* get a handle for the isa bus */
 	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
+	{
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
+	}
 
 	/* driver private data */
 	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
@@ -911,6 +917,9 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 {
 	uint8 temp;
 
+	/* helper: some cards use pixels to define buffer pitch, others use bytes */
+	uint16 buf_pitch = bes->ob_width;
+
 	/* ISA card */
 	/* unlock card overlay sequencer registers (b5 = 1) */
 	temp = (KISAGRPHR(GENLOCK) | 0x20);
@@ -945,6 +954,8 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	}
 	else
 	{
+		/* NM2200 and later cards use bytes to define buffer pitch */
+		buf_pitch <<= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
 		//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
 		//fixme? check if overlaybuffer width should also have granularity of 16 now!
@@ -1015,8 +1026,8 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	/* setup brightness to be 'neutral' (two's complement number) */
 	KISAGRPHW(BRIGHTNESS, 0x00);
 
-	/* setup inputbuffer #1 pitch including slopspace (in pixels) */
+	/* setup inputbuffer #1 pitch including slopspace */
 	/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
-	KISAGRPHW(BUF1PITCHL, (bes->ob_width & 0xff));
-	KISAGRPHW(BUF1PITCHH, ((bes->ob_width >> 8) & 0xff));
+	KISAGRPHW(BUF1PITCHL, (buf_pitch & 0xff));
+	KISAGRPHW(BUF1PITCHH, ((buf_pitch >> 8) & 0xff));
 }
