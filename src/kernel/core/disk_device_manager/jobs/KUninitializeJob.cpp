@@ -70,6 +70,7 @@ DBG(OUT("KUninitializeJob::Do(%ld)\n", PartitionID()));
 		SetErrorMessage("Couldn't find partition.");
 		return B_ENTRY_NOT_FOUND;
 	}
-	return B_OK;
+	// cannot come here
+	return B_ERROR;
 }
 
