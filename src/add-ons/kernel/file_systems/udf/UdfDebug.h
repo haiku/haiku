@@ -70,6 +70,7 @@ enum _DebugCategoryFlags {
 	\brief Bitmask of currently enabled debugging categories.
 */
 #define CATEGORY_FILTER	CF_ALL
+//#define CATEGORY_FILTER	~CF_DUMP
 //#define CATEGORY_FILTER	CF_ALL_STANDARD
 //#define CATEGORY_FILTER	CF_ENTRY
 //#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC)
@@ -195,6 +196,20 @@ private:
 	#define PRINT_DIVIDER()	\
 		PRINT_INDENT(); 	\
 		SIMPLE_PRINT(("------------------------------------------------------------\n"));
+		
+	#define DUMP(object)												\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debugHelper.CategoryFlags()) 				\
+		{														\
+			(object).dump();											\
+		}		
+	
+	#define PDUMP(objectPointer)								\
+		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debugHelper.CategoryFlags()) 				\
+		{														\
+			(objectPointer)->dump();								\
+		}		
 	
 	#define REPORT_ERROR(err) {											\
 		LPRINT(("returning error 0x%lx, `%s'\n", err, strerror(err)));	\
@@ -235,6 +250,8 @@ private:
 	#define SIMPLE_PRINT(x) ;
 	#define PRINT_INDENT(x) ;
 	#define PRINT_DIVIDER()	;
+	#define DUMP(object) ;
+	#define PDUMP(objectPointer) ;
 	#define REPORT_ERROR(status) ;
 	#define RETURN_ERROR(status) return status;
 	#define RETURN(status) return status;
