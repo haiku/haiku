@@ -12,6 +12,7 @@
 struct vnode_store {
 	vm_store	vm;
 	void		*vnode;
+	void		*file_cache_ref;
 };
 
 #endif	/* VNODE_STORE_H */

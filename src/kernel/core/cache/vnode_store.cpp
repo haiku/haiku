@@ -122,6 +122,7 @@ vm_create_vnode_store(void *vnode)
 	store->vm.committed_size = 0;
 
 	store->vnode = vnode;
+	store->file_cache_ref = NULL;
 
 	return &store->vm;
 }
