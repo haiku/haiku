@@ -472,7 +472,7 @@ struct media_format {	/* no more than 192 bytes */
 
 	private:
 
-	void *							meta_data;
+	const void *					meta_data;
 	int32							meta_data_size;
 	area_id							meta_data_area;
 	area_id							use_area;
