@@ -229,15 +229,15 @@ team_wait_on_team(team_id id, int *retcode)
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 	p = team_get_team_struct_locked(id);
-	if(p && p->main_thread) {
+	if (p && p->main_thread)
 		tid = p->main_thread->id;
-	} else {
+	else
 		tid = ERR_INVALID_HANDLE;
-	}
+
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	if(tid < 0)
+	if (tid < 0)
 		return tid;
 
 	return thread_wait_on_thread(tid, retcode);
@@ -333,44 +333,44 @@ team_get_current_team_id(void)
 static struct team *
 create_team_struct(const char *name, bool kernel)
 {
-	struct team *p;
+	struct team *team;
 
-	p = (struct team *)malloc(sizeof(struct team));
-	if (p == NULL)
+	team = (struct team *)malloc(sizeof(struct team));
+	if (team == NULL)
 		goto error;
 
-	p->id = atomic_add(&next_team_id, 1);
-	strncpy(&p->name[0], name, SYS_MAX_OS_NAME_LEN-1);
-	p->name[SYS_MAX_OS_NAME_LEN-1] = 0;
-	p->num_threads = 0;
-	p->io_context = NULL;
-	p->_aspace_id = -1;
-	p->aspace = NULL;
-	p->kaspace = vm_get_kernel_aspace();
-	vm_put_aspace(p->kaspace);
-	p->thread_list = NULL;
-	p->main_thread = NULL;
-	p->state = TEAM_STATE_BIRTH;
-	p->pending_signals = 0;
-	p->death_sem = -1;
-	p->user_env_base = 0;
+	team->id = atomic_add(&next_team_id, 1);
+	strncpy(&team->name[0], name, SYS_MAX_OS_NAME_LEN-1);
+	team->name[SYS_MAX_OS_NAME_LEN-1] = 0;
+	team->num_threads = 0;
+	team->io_context = NULL;
+	team->_aspace_id = -1;
+	team->aspace = NULL;
+	team->kaspace = vm_get_kernel_aspace();
+	vm_put_aspace(team->kaspace);
+	team->thread_list = NULL;
+	team->main_thread = NULL;
+	team->state = TEAM_STATE_BIRTH;
+	team->pending_signals = 0;
+	team->death_sem = -1;
+	team->user_env_base = 0;
 
-	if (arch_team_init_team_struct(p, kernel) < 0)
+	if (arch_team_init_team_struct(team, kernel) < 0)
 		goto error1;
 
-	return p;
+	return team;
 
 error1:
-	free(p);
+	free(team);
 error:
 	return NULL;
 }
 
 
 static void
-delete_team_struct(struct team *p)
+delete_team_struct(struct team *team)
 {
-	free(p);
+	free(team);
 }
 
 
@@ -413,6 +413,8 @@ team_create_team2(void *args)
 
 	// create an initial primary stack region
 
+	// ToDo: give the main thread a larger user stack (for gcc and friends, as in BeOS)
+	// ToDo: clean up the ENV_SIZE/STACK_SIZE/whatever mess (and maybe add TLS to it)
 	tot_top_size = STACK_SIZE + ENV_SIZE + PAGE_ALIGN(get_arguments_data_size(pargs->args, pargs->argc));
 	t->user_stack_base = ((USER_STACK_REGION - tot_top_size) + USER_STACK_REGION_SIZE);
 	sprintf(ustack_name, "%s_primary_stack", p->name);
@@ -428,7 +430,7 @@ team_create_team2(void *args)
 	udest = (char  *)(uargs + pargs->argc + 1);
 //	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
 
-	for(arg_cnt = 0; arg_cnt < pargs->argc; arg_cnt++) {
+	for (arg_cnt = 0; arg_cnt < pargs->argc; arg_cnt++) {
 		uargs[arg_cnt] = udest;
 		user_strcpy(udest, pargs->args[arg_cnt]);
 		udest += (strlen(pargs->args[arg_cnt]) + 1);
