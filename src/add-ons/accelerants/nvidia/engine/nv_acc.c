@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-9/2004.
+   Rudolf Cornelissen 8/2003-12/2004.
 
    This code was possible thanks to the Linux NV driver.
 */
@@ -372,15 +372,26 @@ status_t nv_acc_init()
 	}
 
 	/*** Set pixel width and format ***/
+	//fixme (3D?):
+	//the BPIXEL register holds the colorspaces for different engine 'contexts' or so.
+	//B0-3 is 'channel' 0, b4-7 is 'channel '1', etc.
+	//It looks like we are only using channel 0, so the settings for other channels
+	//shouldn't matter yet.
+	//When for instance rect_fill is going to be used on other buffers than the actual
+	//screen, it's colorspace should be corrected. When the engine is setup in 32bit
+	//desktop mode for example, the pixel's alpha channel doesn't get touched currently.
+	//choose mode $d (which is Y32) to get alpha filled too.
 	switch(si->dm.space)
 	{
 	case B_CMAP8:
 		/* acc engine */
 		ACCW(FORMATS, 0x00001010);
 		if (si->ps.card_arch < NV30A)
-			ACCW(BPIXEL, 0x00111111); /* set depth 0-5: 4 bits per color */
+			/* set depth 0-5: $1 = Y8 */
+			ACCW(BPIXEL, 0x00111111);
 		else
-			ACCW(BPIXEL, 0x00000021); /* set depth 0-1: 5 bits per color */
+			/* set depth 0-1: $1 = Y8, $2 = X1R5G5B5_Z1R5G5B5 */
+			ACCW(BPIXEL, 0x00000021);
 		ACCW(STRD_FMT, 0x03020202);
 		/* PRAMIN */
 		ACCW(PR_CTX1_0, 0x00000302); /* format is X24Y8, LSB mono */
@@ -407,9 +418,11 @@ status_t nv_acc_init()
 		/* acc engine */
 		ACCW(FORMATS, 0x00002071);
 		if (si->ps.card_arch < NV30A)
-			ACCW(BPIXEL, 0x00226222); /* set depth 0-5: 4 bits per color */
+			/* set depth 0-5: $2 = X1R5G5B5_Z1R5G5B5, $6 = Y16 */
+			ACCW(BPIXEL, 0x00226222);
 		else
-			ACCW(BPIXEL, 0x00000042); /* set depth 0-1: 5 bits per color */
+			/* set depth 0-1: $2 = X1R5G5B5_Z1R5G5B5, $4 = A1R5G5B5 */
+			ACCW(BPIXEL, 0x00000042);
 		ACCW(STRD_FMT, 0x09080808);
 		/* PRAMIN */
 		ACCW(PR_CTX1_0, 0x00000902); /* format is X17RGB15, LSB mono */
@@ -437,9 +450,11 @@ status_t nv_acc_init()
 		/* acc engine */
 		ACCW(FORMATS, 0x000050C2);
 		if (si->ps.card_arch < NV30A)
-			ACCW(BPIXEL, 0x00556555); /* set depth 0-5: 4 bits per color */
+			/* set depth 0-5: $5 = R5G6B5, $6 = Y16 */
+			ACCW(BPIXEL, 0x00556555);
 		else
-			ACCW(BPIXEL, 0x000000a5); /* set depth 0-1: 5 bits per color */
+			/* set depth 0-1: $5 = R5G6B5, $a = X1A7R8G8B8_O1A7R8G8B8 */
+			ACCW(BPIXEL, 0x000000a5);
 		if (si->ps.card_arch == NV04A)
 			ACCW(STRD_FMT, 0x0c0b0b0b);
 		else
@@ -470,9 +485,11 @@ status_t nv_acc_init()
 		/* acc engine */
 		ACCW(FORMATS, 0x000070e5);
 		if (si->ps.card_arch < NV30A)
-			ACCW(BPIXEL, 0x0077d777); /* set depth 0-5: 4 bits per color */
+			/* set depth 0-5: $7 = X8R8G8B8_Z8R8G8B8, $d = Y32 */
+			ACCW(BPIXEL, 0x0077d777);
 		else
-			ACCW(BPIXEL, 0x000000e7); /* set depth 0-1: 5 bits per color */
+			/* set depth 0-1: $7 = X8R8G8B8_Z8R8G8B8, $e = V8YB8U8YA8 */
+			ACCW(BPIXEL, 0x000000e7);
 		ACCW(STRD_FMT, 0x0e0d0d0d);
 		/* PRAMIN */
 		ACCW(PR_CTX1_0, 0x00000e02); /* format is X8RGB24, LSB mono */
@@ -675,11 +692,11 @@ status_t nv_acc_init()
 	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
 	ACCW(FIFO_00802000, 0x80000001); /* Clip */
 	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
-	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used) */
+	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used or 3D only?) */
 	ACCW(FIFO_00808000, 0x80000011); /* Blit */
 	ACCW(FIFO_0080a000, 0x80000012); /* Bitmap */
-	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used) */
-	ACCW(FIFO_0080e000, 0x80000014); /* ??? (not used) */
+	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used or 3D only?) */
+	ACCW(FIFO_0080e000, 0x80000014); /* Textured Triangle (3D only) */
 
 	/* do first actual acceleration engine command:
 	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
