@@ -211,7 +211,10 @@ TAnalogClock::Draw(BRect updaterect)
 	ASSERT(f_offscreen);
 	ASSERT(f_bitmap);
 	SetHighColor(0, 100, 10);
-	bool b = f_bitmap->Lock();
+#ifdef DEBUG
+	bool b = 
+#endif
+	         f_bitmap->Lock();
 	ASSERT(b);
 	f_offscreen->DrawX();
 	DrawBitmap(f_bitmap, f_drawpt);
