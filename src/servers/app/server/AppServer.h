@@ -14,6 +14,7 @@ class Layer;
 class BMessage;
 class ServerApp;
 class DisplayDriver;
+class BPortLink;
 class CursorManager;
 class BitmapManager;
 
