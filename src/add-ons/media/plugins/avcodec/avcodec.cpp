@@ -200,8 +200,6 @@ avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
 status_t
 avCodec::NegotiateOutputFormat(media_format *inout_format)
 {
-	enum PixelFormat ffPixelFmt;
-	
 	PRINT(("[%c] avCodec::Format()\n", isAudio?('a'):('v')));
 
 #if DEBUG
@@ -209,12 +207,6 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 	string_for_format(*inout_format, buffer, sizeof(buffer));
 	PRINT(("[%c]  in_format=%s\n", isAudio?('a'):('v'), buffer));
 #endif
-
-	// close any previous instance
-	if (fCodecInitDone) {
-		fCodecInitDone = false;
-		avcodec_close(ffc);
-	}
 
 	if (isAudio) {
 		media_multi_audio_format outputAudioFormat;
@@ -237,6 +229,13 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		printf("bit_rate %d, sample_rate %d, channels %d, block_align %d, extradata_size %d\n",
 			ffc->bit_rate, ffc->sample_rate, ffc->channels, ffc->block_align, ffc->extradata_size);
 
+		// close any previous instance
+		if (fCodecInitDone) {
+			fCodecInitDone = false;
+			avcodec_close(ffc);
+		}
+
+		// open new
 		if (avcodec_open(ffc, fCodec) >= 0)
 			fCodecInitDone = true;
 
@@ -251,14 +250,21 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		fChunkBufferSize = 0;
 		fOutputBufferOffset = 0;
 		fOutputBufferSize = 0;
+		
+		inout_format->require_flags = 0;
+		inout_format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-	} else {	// no AUDIO_CODEC
+		return fCodecInitDone ? B_OK : B_ERROR;
+
+	} else {	// VIDEO
 
 		fOutputVideoFormat = fInputFormat.u.encoded_video.output;
 
 		ffc->width = fOutputVideoFormat.display.line_width;
 		ffc->height = fOutputVideoFormat.display.line_count;
 		ffc->frame_rate = (int)(fOutputVideoFormat.field_rate * ffc->frame_rate_base);
+
+		printf("#### requested video format 0x%x\n", inout_format->u.raw_video.display.format);
 
 		// make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
 		// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the default
@@ -269,26 +275,33 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 			fOutputVideoFormat.display.format = B_RGB32;
 
 		// search for a pixel-format the codec handles
-		while (!fCodecInitDone)
-		{
-			// find the proper ff pixel format and the convertion func
-			conv_func = resolve_colorspace(fOutputVideoFormat.display.format, &ffPixelFmt);
-			PRINT(("ffc = %08lx, fCodec = %08lx, conv_func = %08lx\n", ffc, fCodec, conv_func));
-			if (!conv_func)
-				PRINT(("no conv_func (1) !\n"));
-
-			if (avcodec_open(ffc, fCodec) >= 0)
-				fCodecInitDone = true;
-			else
-				printf("avCodec: error in avcodec_open()\n");
-
-			conv_func = resolve_colorspace(fOutputVideoFormat.display.format, &ffc->pix_fmt);
-			PRINT(("ffc = %08lx, fCodec = %08lx, conv_func = %08lx, ffcolspace= %s\n", ffc, fCodec, conv_func, pixfmt_to_string(ffc->pix_fmt)));
-			if (!conv_func)	{
-				PRINT(("no conv_func (2) !\n"));
-				return B_ERROR;
+		// XXX We should try this a couple of times until it succeeds, each time
+		// XXX using another format pixel-format that is supported by the decoder.
+		// XXX But libavcodec doesn't seem to offer any way to tell the decoder
+		// XXX which format it should use.
+		conv_func = 0;
+		for (int i = 0; i < 1; i++) { // iterate over supported codec formats
+			// close any previous instance
+			if (fCodecInitDone) {
+				fCodecInitDone = false;
+				avcodec_close(ffc);
 			}
-			PRINT(("PIXFMT: %s -> %s\n", pixfmt_to_string(ffPixelFmt), pixfmt_to_string(ffc->pix_fmt)));
+			// XXX set n-th ffc->pix_fmt here
+			if (avcodec_open(ffc, fCodec) >= 0) {
+				fCodecInitDone = true;
+				conv_func = resolve_colorspace(fOutputVideoFormat.display.format, ffc->pix_fmt);
+			}
+			if (conv_func != 0)
+				break;
+		}
+
+		if (!fCodecInitDone) {
+			printf("avcodec_open() failed!\n");
+			return B_ERROR;
+		}
+		if (!conv_func) {
+			printf("no conv_func!\n");
+			return B_ERROR;
 		}
 
 		if (fOutputVideoFormat.display.format == B_YCbCr422)
@@ -298,17 +311,19 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 
 		inout_format->type = B_MEDIA_RAW_VIDEO;
 		inout_format->u.raw_video = fOutputVideoFormat;
+
+		inout_format->require_flags = 0;
+		inout_format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+
+	#if DEBUG		
+		string_for_format(*inout_format, buffer, sizeof(buffer));
+		PRINT(("[%c]  out_format=%s\n", isAudio?('a'):('v'), buffer));
+	#endif
+
+		printf("#### returned  video format 0x%x\n", inout_format->u.raw_video.display.format);
+
+		return B_OK;
 	}
-
-	inout_format->require_flags = 0;
-	inout_format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	
-#if DEBUG		
-	string_for_format(*inout_format, buffer, sizeof(buffer));
-	PRINT(("[%c]  out_format=%s\n", isAudio?('a'):('v'), buffer));
-#endif
-
-	return B_OK;
 }
 
 
