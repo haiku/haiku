@@ -44,7 +44,6 @@ struct team_arg {
 	char	**args;
 	uint32	env_count;
 	char	**env;
-	bool	owns_arrays;
 };
 
 struct fork_arg {
@@ -197,6 +196,45 @@ free_strings_array(char **strings, int32 count)
 		free(strings[i]);
 
     free(strings);
+}
+
+
+/**	Copy an array of strings in kernel space
+ *
+ *	\param strings strings array to be copied
+ *	\param count number of strings in array
+ *	\param kstrings	pointer to the kernel copy
+ *	\return \c B_OK on success, or an appropriate error code on
+ *		failure.
+ */
+
+static status_t
+copy_strings_array(const char **in, int32 count, char ***_strings)
+{
+	status_t status;
+	char **strings;
+	int32 i = 0;
+
+	strings = (char **)malloc((count + 1) * sizeof(char *));
+	if (strings == NULL)
+		return B_NO_MEMORY;
+
+	for (; i < count; i++) {
+		strings[i] = strdup(in[i]);
+		if (strings[i] == NULL) {
+			status = B_NO_MEMORY;
+			goto error;
+		}
+	}
+
+	strings[count] = NULL;
+	*_strings = strings;
+
+	return B_OK;
+
+error:
+	free_strings_array(strings, i);
+	return status;
 }
 
 
@@ -733,17 +771,15 @@ get_arguments_data_size(char **args, int32 argc)
 static void
 free_team_arg(struct team_arg *teamArg)
 {
-	if (teamArg->owns_arrays) {
-		free_strings_array(teamArg->args, teamArg->arg_count);
-		free_strings_array(teamArg->env, teamArg->env_count);
-	}
+	free_strings_array(teamArg->args, teamArg->arg_count);
+	free_strings_array(teamArg->env, teamArg->env_count);
 
 	free(teamArg);
 }
 
 
 static struct team_arg *
-create_team_arg(int32 argc, char **args, int32 envCount, char **env, bool deleteArrays)
+create_team_arg(int32 argc, char **args, int32 envCount, char **env)
 {
 	struct team_arg *teamArg = (struct team_arg *)malloc(sizeof(struct team_arg));
 	if (teamArg == NULL)
@@ -753,7 +789,6 @@ create_team_arg(int32 argc, char **args, int32 envCount, char **env, bool delete
 	teamArg->args = args;
 	teamArg->env_count = envCount;
 	teamArg->env = env;
-	teamArg->owns_arrays = deleteArrays;
 
 	return teamArg;
 }
@@ -873,8 +908,7 @@ team_create_thread_start(void *args)
  */
 
 static thread_id
-load_image_etc(int32 argCount, const char **args, int32 envCount, const char **env,
-	bool deleteStrings, int32 priority)
+load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 priority)
 {
 	struct process_group *group;
 	struct team *team, *parent;
@@ -907,7 +941,7 @@ load_image_etc(int32 argCount, const char **args, int32 envCount, const char **e
 	restore_interrupts(state);
 
 	// copy the args over
-	teamArgs = create_team_arg(argCount, (char **)args, envCount, (char **)env, deleteStrings);
+	teamArgs = create_team_arg(argCount, args, envCount, env);
 	if (teamArgs == NULL) {
 		err = B_NO_MEMORY;
 		goto err1;
@@ -994,7 +1028,7 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 
 	// ToDo: maybe we should make sure upfront that the target path is an app?
 
-	teamArgs = create_team_arg(argCount, args, envCount, env, true);
+	teamArgs = create_team_arg(argCount, args, envCount, env);
 	if (teamArgs == NULL)
 		return B_NO_MEMORY;
 
@@ -1372,12 +1406,22 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 thread_id
 load_image(int32 argCount, const char **args, const char **env)
 {
-	// count env variables
+	char **argsCopy, **envCopy;
 	int32 envCount = 0;
+
+	if (copy_strings_array(args, argCount, &argsCopy) != B_OK)
+		return B_NO_MEMORY;
+
+	// count env variables
 	while (env && env[envCount] != NULL)
 		envCount++;
 
-	return load_image_etc(argCount, args, envCount, env, false, B_NORMAL_PRIORITY);
+	if (copy_strings_array(env, envCount, &envCopy) != B_OK) {
+		free_strings_array(argsCopy, argCount);
+		return B_NO_MEMORY;
+	}
+
+	return load_image_etc(argCount, argsCopy, envCount, envCopy, B_NORMAL_PRIORITY);
 }
 
 
@@ -2014,7 +2058,7 @@ _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 		return B_BAD_ADDRESS;
 	}
 
-	return load_image_etc(argCount, (const char **)args, envCount, (const char **)env, true, priority);
+	return load_image_etc(argCount, args, envCount, env, priority);
 }
 
 
