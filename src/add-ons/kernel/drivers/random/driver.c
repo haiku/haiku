@@ -34,7 +34,7 @@
 
 #if defined (_M_IX86) || defined (__i386__) && defined (__GNUC__) 
 
-static volatile  __inline__ unsigned long long clock_counter (void) 
+static __inline__ unsigned long long clock_counter (void) 
 { 
 	return system_time(); /* eventually real_time_clock_usecs() ? */
 } 
@@ -148,7 +148,7 @@ __inline void chseed (ch_randgen *prandgen, const unsigned __int64 seed)
    speed. */ 
 /* temporary file creation is just a little extra thwart to bewilder the processor cache and pipes. */ /* if you make clock_counter return all 0's, still produces a stream indistinguishable from 
 													  random. */ 
-volatile void reseed (ch_randgen *prandgen, const unsigned int inittimes) 
+void reseed (ch_randgen *prandgen, const unsigned int inittimes) 
 { 
 	volatile unsigned int i, j; 
 	OCTET x, y; 
@@ -165,7 +165,7 @@ volatile void reseed (ch_randgen *prandgen, const unsigned int inittimes)
 	} 
 } 
 /* returns a 64 bit of Yarrow 2000 Chuma RNG random number */ 
-volatile __inline unsigned __int64 chrand (ch_randgen *prandgen) 
+__inline unsigned __int64 chrand (ch_randgen *prandgen) 
 { 
 	prandgen->rndptrX ++; 
 	prandgen->rndptrA += NA; 
@@ -185,13 +185,13 @@ volatile __inline unsigned __int64 chrand (ch_randgen *prandgen)
 	return prandgen->rndRite.Q[0] ^ prandgen->rndLeft.Q[0]; 
 } 
 /* returns a 32 bit random number */ 
-volatile __inline unsigned __int32 chrand32 (ch_randgen *prandgen) 
+__inline unsigned __int32 chrand32 (ch_randgen *prandgen) 
 { 
 	OCTET r = {{chrand (prandgen)}}; 
 	return r.D[0] ^ r.D[1]; 
 } 
 /* returns an 8 bit random number */
-volatile __inline unsigned __int8 chrand8 (ch_randgen *prandgen)
+__inline unsigned __int8 chrand8 (ch_randgen *prandgen)
 {
 	OCTET r = {{chrand(prandgen)}};
 	return r.B[0] ^ r.B[1] ^ r.B[2] ^ r.B[3] ^ r.B[4] ^ r.B[5] ^ r.B[6] ^ r.B[7] ;
