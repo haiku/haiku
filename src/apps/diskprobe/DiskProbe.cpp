@@ -121,7 +121,7 @@ Settings::Settings()
 
 		if (settings.base_type == kHexBase || settings.base_type == kDecimalBase)
 			fMessage.ReplaceInt32("base_type", B_LENDIAN_TO_HOST_INT32(settings.base_type));
-		if (settings.font_size >= 0 || settings.font_size <= 72)
+		if (settings.font_size >= 0 && settings.font_size <= 72)
 			fMessage.ReplaceFloat("font_size", float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
 	}
 }
