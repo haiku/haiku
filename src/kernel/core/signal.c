@@ -17,6 +17,8 @@
 #include <syscalls.h>
 
 
+#define SIGNAL_TO_MASK(signal) (1LL << (signal - 1))
+
 
 const char * const sigstr[NSIG] = {
 	"NONE", "HUP", "INT", "QUIT", "ILL", "CHLD", "ABRT", "PIPE",
@@ -25,96 +27,99 @@ const char * const sigstr[NSIG] = {
 };
 
 
-// Expects interrupts off and thread lock held.
+/** Expects interrupts off and thread lock held. */
+
 int
-handle_signals(struct thread *t, int state)
+handle_signals(struct thread *thread, int state)
 {
-	uint32 sig_mask = t->sig_pending & (~t->sig_block_mask);
+	uint32 signalMask = thread->sig_pending & (~thread->sig_block_mask);
 	int i, sig, global_resched = 0;
 	struct sigaction *handler;
-	
-	if (sig_mask) {
-		for (i = 0; i < NSIG; i++) {
-			if (sig_mask & 0x1) {
-				
-				sig = i + 1;
-				handler = &t->sig_action[i];
-				sig_mask >>= 1;
-				t->sig_pending &= ~(1L << i);
-				
-				dprintf("Thread 0x%lx received signal %s\n", t->id, sigstr[sig]);
-				
-				if (handler->sa_handler == SIG_IGN) {
-					// signal is to be ignored
-					// XXX apply zombie cleaning on SIGCHLD
-					continue;
+
+	if (signalMask == 0)
+		return 0;
+
+	for (i = 0; i < NSIG; i++) {
+		if (signalMask & 0x1) {
+			sig = i + 1;
+			handler = &thread->sig_action[i];
+			signalMask >>= 1;
+			thread->sig_pending &= ~(1L << i);
+
+			dprintf("Thread 0x%lx received signal %s\n", thread->id, sigstr[sig]);
+
+			if (handler->sa_handler == SIG_IGN) {
+				// signal is to be ignored
+				// XXX apply zombie cleaning on SIGCHLD
+				continue;
+			}
+			if (handler->sa_handler == SIG_DFL) {
+				// default signal behaviour
+				switch (sig) {
+					case SIGCHLD:
+					case SIGWINCH:
+					case SIGTSTP:
+					case SIGTTIN:
+					case SIGTTOU:
+					case SIGCONT:
+						continue;
+
+					case SIGSTOP:
+						thread->next_state = B_THREAD_SUSPENDED;
+						global_resched = 1;
+						continue;
+
+					case SIGQUIT:
+					case SIGILL:
+					case SIGTRAP:
+					case SIGABRT:
+					case SIGFPE:
+					case SIGSEGV:
+						dprintf("Shutting down thread 0x%lx due to signal #%d\n", thread->id, sig);
+					case SIGKILL:
+					case SIGKILLTHR:
+					default:
+						if (!(thread->return_flags & THREAD_RETURN_EXIT))
+							thread->return_flags |= THREAD_RETURN_INTERRUPTED;
+						RELEASE_THREAD_LOCK();
+						restore_interrupts(state);
+						thread_exit();
 				}
-				if (handler->sa_handler == SIG_DFL) {
-					// default signal behaviour
-					switch (sig) {
-						case SIGCHLD:
-						case SIGWINCH:
-						case SIGTSTP:
-						case SIGTTIN:
-						case SIGTTOU:
-						case SIGCONT:
-							continue;
-						
-						case SIGSTOP:
-							t->next_state = B_THREAD_SUSPENDED;
-							global_resched = 1;
-							continue;
-													
-						case SIGQUIT:
-						case SIGILL:
-						case SIGTRAP:
-						case SIGABRT:
-						case SIGFPE:
-						case SIGSEGV:
-							dprintf("Shutting down thread 0x%lx due to signal #%d\n", t->id, sig);
-						case SIGKILL:
-						case SIGKILLTHR:
-						default:
-							if (!(t->return_flags & THREAD_RETURN_EXIT))
-								t->return_flags |= THREAD_RETURN_INTERRUPTED;
-							RELEASE_THREAD_LOCK();
-							restore_interrupts(state);
-							thread_exit();
-					}
-				}
-				
-				// User defined signal handler
-				dprintf("### Setting up custom signal handler frame...\n");
-				arch_setup_signal_frame(t, handler, sig, t->sig_block_mask);
-				
-				if (handler->sa_flags & SA_ONESHOT)
-					handler->sa_handler = SIG_DFL;
-				if (!(handler->sa_flags & SA_NOMASK))
-					t->sig_block_mask |= (handler->sa_mask | (1L << sig)) & BLOCKABLE_SIGS;
-				
-				return global_resched;
-			} else
-				sig_mask >>= 1;
-		}
-		arch_check_syscall_restart(t);
+			}
+
+			// User defined signal handler
+			dprintf("### Setting up custom signal handler frame...\n");
+			arch_setup_signal_frame(thread, handler, sig, thread->sig_block_mask);
+
+			if (handler->sa_flags & SA_ONESHOT)
+				handler->sa_handler = SIG_DFL;
+			if (!(handler->sa_flags & SA_NOMASK))
+				thread->sig_block_mask |= (handler->sa_mask | (1L << sig)) & BLOCKABLE_SIGS;
+				// ToDo: is that really (1L << sig) and not (1L << (sig-1)) ???
+
+			return global_resched;
+		} else
+			signalMask >>= 1;
 	}
+	arch_check_syscall_restart(thread);
+
 	return global_resched;
 }
 
 
 int
-send_signal_etc(pid_t team, uint sig, uint32 flags)
+send_signal_etc(pid_t threadID, uint signal, uint32 flags)
 {
 	struct thread *thread;
 	cpu_status state;
 
-	if (sig < 1 || sig > MAX_SIGNO)
+	if (signal < 1 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	thread = thread_get_thread_struct_locked(team);
+	thread = thread_get_thread_struct_locked(threadID);
 	if (!thread) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
@@ -122,23 +127,22 @@ send_signal_etc(pid_t team, uint sig, uint32 flags)
 	}
 	// XXX check permission
 
-	// Signals to kernel threads will only wake them up
 	if (thread->team == team_get_kernel_team()) {
+		// Signals to kernel threads will only wake them up
 		if (thread->state == B_THREAD_SUSPENDED) {
 			thread->state = thread->next_state = B_THREAD_READY;
 			scheduler_enqueue_in_run_queue(thread);
 		}
-	}
-	else {
-		thread->sig_pending |= (1L << (sig - 1));
+	} else {
+		thread->sig_pending |= SIGNAL_TO_MASK(signal);
 
-		switch (sig) {
+		switch (signal) {
 			case SIGKILL:
 			{
 				struct thread *mainThread = thread->team->main_thread;
 				// Forward KILLTHR to the main thread of the team
 
-				mainThread->sig_pending |= (1L << (SIGKILLTHR - 1));
+				mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
 				// Wake up main thread
 				if (mainThread->state == B_THREAD_SUSPENDED) {
 					mainThread->state = mainThread->next_state = B_THREAD_READY;
@@ -164,7 +168,7 @@ send_signal_etc(pid_t team, uint sig, uint32 flags)
 				}
 				break;
 			default:
-				if (thread->sig_pending & ((~thread->sig_block_mask) | (1L << (SIGCHLD - 1)))) {
+				if (thread->sig_pending & (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
 					// Interrupt thread if it was waiting
 					if (thread->state == B_THREAD_WAITING)
 						sem_interrupt_thread(thread);
@@ -178,15 +182,15 @@ send_signal_etc(pid_t team, uint sig, uint32 flags)
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	
+
 	return B_OK;
 }
 
 
 int
-send_signal(pid_t team, uint sig)
+send_signal(pid_t threadID, uint signal)
 {
-	return send_signal_etc(team, sig, 0);
+	return send_signal_etc(threadID, signal, 0);
 }
 
 
@@ -202,30 +206,30 @@ has_signals_pending(void *_thread)
 
 
 int
-sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
+sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
 {
-	struct thread *t;
-	int state;
+	struct thread *thread;
+	cpu_status state;
 
-	if (sig < 1 || sig > MAX_SIGNO
-		|| sig == SIGKILL || sig == SIGKILLTHR || sig == SIGSTOP)
+	if (signal < 1 || signal > MAX_SIGNO
+		|| signal == SIGKILL || signal == SIGKILLTHR || signal == SIGSTOP)
 		return EINVAL;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	t = thread_get_current_thread();
+	thread = thread_get_current_thread();
 
 	if (oact)
-		memcpy(oact, &t->sig_action[sig - 1], sizeof(struct sigaction));
+		memcpy(oact, &thread->sig_action[signal - 1], sizeof(struct sigaction));
 	if (act)
-		memcpy(&t->sig_action[sig - 1], act, sizeof(struct sigaction));
+		memcpy(&thread->sig_action[signal - 1], act, sizeof(struct sigaction));
 
 	if (act && act->sa_handler == SIG_IGN)
-		t->sig_pending &= ~(1L << (sig - 1));
+		thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
 	else if (act && act->sa_handler == SIG_DFL) {
-		if ((sig == SIGCONT) || (sig == SIGCHLD) || (sig == SIGWINCH))
-			t->sig_pending &= ~(1L << (sig - 1));
+		if (signal == SIGCONT || signal == SIGCHLD || signal == SIGWINCH)
+			thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
 	} /*else
 		dprintf("### custom signal handler set\n");*/
 
@@ -250,19 +254,19 @@ alarm_event(timer *t)
 bigtime_t
 set_alarm(bigtime_t time, uint32 mode)
 {
-	struct thread *t = thread_get_current_thread();
-	int state;
+	struct thread *thread = thread_get_current_thread();
 	bigtime_t rv = 0;
 
-	state = disable_interrupts(); //XXX really here? and what about a spinlock?
+	ASSERT(B_ONE_SHOT_RELATIVE_ALARM == B_ONE_SHOT_RELATIVE_TIMER);
+		// just to be sure no one changes the headers some day
 
-	if (t->alarm.period)
-		rv = (bigtime_t)t->alarm.entry.key - system_time();
-	cancel_timer(&t->alarm);
+	if (thread->alarm.period)
+		rv = (bigtime_t)thread->alarm.entry.key - system_time();
+
+	cancel_timer(&thread->alarm);
+
 	if (time != B_INFINITE_TIMEOUT)
-		add_timer(&t->alarm, &alarm_event, time, mode);
-
-	restore_interrupts(state);
+		add_timer(&thread->alarm, &alarm_event, time, mode);
 
 	return rv;
 }
