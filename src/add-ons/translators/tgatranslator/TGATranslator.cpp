@@ -30,9 +30,9 @@
 #include <stdio.h>
 #include "TGATranslator.h"
 #include "TGAView.h"
-
-#define min(x,y) ((x < y) ? x : y)
-#define max(x,y) ((x > y) ? x : y)
+#include "StreamBuffer.h"
+#include <SupportDefs.h>
+	// for min()/max()
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -1593,13 +1593,16 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 	memset(bitsRowData, 0xff, bitsRowBytes);
 	uint8 *pbitspixel = bitsRowData;
 	uint8 packethead;
-	ssize_t rd = inSource->Read(&packethead, 1);
+	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE);
+	ssize_t rd = 0;
+	if (sbuf.InitCheck() == B_OK)
+		rd = sbuf.Read(&packethead, 1);
 	while (rd == 1) {
 		// Run Length Packet
 		if (packethead & TGA_RLE_PACKET_TYPE_BIT) {
 			uint8 tgapixel[4], rlecount;
 			rlecount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
-			rd = inSource->Read(tgapixel, tgaBytesPerPixel);
+			rd = sbuf.Read(tgapixel, tgaBytesPerPixel);
 			if (rd == tgaBytesPerPixel) {
 				pix_tganm_to_bits(pbitspixel, tgapixel,
 					rlecount, imagespec.depth, 0, nalpha);
@@ -1615,7 +1618,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 			uint16 rawbytes;
 			rawcount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
 			rawbytes = tgaBytesPerPixel * rawcount;
-			rd = inSource->Read(tgaPixelBuf, rawbytes);
+			rd = sbuf.Read(tgaPixelBuf, rawbytes);
 			if (rd == rawbytes) {
 				pix_tganm_to_bits(pbitspixel, tgaPixelBuf,
 					rawcount, imagespec.depth, tgaBytesPerPixel, nalpha);
@@ -1636,7 +1639,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 				outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
 			pbitspixel = bitsRowData;
 		}
-		rd = inSource->Read(&packethead, 1);
+		rd = sbuf.Read(&packethead, 1);
 	}
 	
 	delete[] bitsRowData;
@@ -1856,13 +1859,16 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 	memset(bitsRowData, 0xff, bitsRowBytes);
 	uint8 *pbitspixel = bitsRowData;
 	uint8 packethead;
-	ssize_t rd = inSource->Read(&packethead, 1);
+	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE);
+	ssize_t rd = 0;
+	if (sbuf.InitCheck() == B_OK)
+		rd = sbuf.Read(&packethead, 1);
 	while (rd == 1) {
 		// Run Length Packet
 		if (packethead & TGA_RLE_PACKET_TYPE_BIT) {
 			uint8 tgaindex, rlecount;
 			rlecount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
-			rd = inSource->Read(&tgaindex, 1);
+			rd = sbuf.Read(&tgaindex, 1);
 			if (rd == tgaBytesPerPixel) {
 				uint8 *ptgapixel;
 				ptgapixel = pmap + (tgaindex * tgaPalBytesPerPixel);
@@ -1879,7 +1885,7 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 		} else {
 			uint8 tgaIndexBuf[128], rawcount;
 			rawcount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
-			rd = inSource->Read(tgaIndexBuf, rawcount);
+			rd = sbuf.Read(tgaIndexBuf, rawcount);
 			if (rd == rawcount) {
 				pix_tgam_to_bits(pbitspixel, tgaIndexBuf,
 					rawcount, mapspec.entrysize, pmap);
@@ -1900,7 +1906,7 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 				outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
 			pbitspixel = bitsRowData;
 		}
-		rd = inSource->Read(&packethead, 1);
+		rd = sbuf.Read(&packethead, 1);
 	}
 	
 	delete[] bitsRowData;
