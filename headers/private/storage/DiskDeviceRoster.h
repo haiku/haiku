@@ -26,8 +26,7 @@ namespace BPrivate {
 enum {
 	B_DEVICE_REQUEST_MOUNT_POINT	= 0x01,	// mount point changes
 	B_DEVICE_REQUEST_MOUNTING		= 0x02,	// mounting/unmounting
-	B_DEVICE_REQUEST_PARTITION		= 0x04,	// partition changes (initial.)
-	B_DEVICE_REQUEST_SESSION		= 0x08,	// session changes (partitioning)
+	B_DEVICE_REQUEST_PARTITION		= 0x04,	// partition changes 
 	B_DEVICE_REQUEST_DEVICE			= 0x10,	// device changes (media changes)
 	B_DEVICE_REQUEST_DEVICE_LIST	= 0x20,	// device additions/removals
 	B_DEVICE_REQUEST_ALL			= 0xff,	// all events
@@ -45,11 +44,9 @@ enum {
 	B_DEVICE_PARTITION_MOUNTED,			// partition mounted
 	B_DEVICE_PARTITION_UNMOUNTED,		// partition unmounted
 	B_DEVICE_PARTITION_CHANGED,			// partition changed, e.g. initialized
-										// or resized
+										// or resized or moved
 	B_DEVICE_PARTITION_ADDED,			// partition added
 	B_DEVICE_PARTITION_REMOVED,			// partition removed
-	B_DEVICE_SESSION_ADDED,				// session added
-	B_DEVICE_SESSION_REMOVED,			// session removed
 	B_DEVICE_MEDIA_CHANGED,				// media changed
 	B_DEVICE_ADDED,						// device added
 	B_DEVICE_REMOVED					// device removed
@@ -78,9 +75,6 @@ public:
 
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
 						 BDiskDevice *device = NULL);
-	bool VisitEachSession(BDiskDeviceVisitor *visitor,
-						  BDiskDevice *device = NULL,
-						  BSession **session = NULL);
 	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
 							BDiskDevice *device = NULL,
 							BPartition **partition = NULL);
@@ -95,11 +89,12 @@ public:
 	bool VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
 										 BDiskDevice *device = NULL,
 										 BPartition **partition = NULL);
+	bool VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
+									 BDiskDevice *device = NULL,
+									 BPartition **partition = NULL);
 
 	
 	status_t GetDeviceWithID(int32 id, BDiskDevice *device) const;
-	status_t GetSessionWithID(int32 id, BDiskDevice *device,
-							  BSession **session) const;
 	status_t GetPartitionWithID(int32 id, BDiskDevice *device,
 								BPartition **partition) const;
 
@@ -134,8 +129,6 @@ private:
 										BDiskScannerPartitionAddOn **addOn);
 
 private:
-	friend class BSession;
-
 	BMessenger	fManager;
 	int32		fCookie;
 	BDirectory	*fPartitionAddOnDir;
