@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef _KERNEL_TIMER_H
@@ -13,13 +13,14 @@
 extern "C" {
 #endif
 
-/* kernel functions */
-int  timer_init(kernel_args *);
-int  timer_interrupt(void);
+struct kernel_args;
 
-/* these two are only to be used by the scheduler */
-int local_timer_cancel_event(timer *event);
-int _local_timer_cancel_event(int curr_cpu, timer *event);
+/* kernel functions */
+status_t timer_init(struct kernel_args *);
+int32 timer_interrupt(void);
+
+/* this one is only to be used by the scheduler */
+status_t _local_timer_cancel_event(int currentCPU, timer *event);
 
 #ifdef __cplusplus
 }
