@@ -1167,14 +1167,51 @@ status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 /* rectangle invert - i.e. text cursor and text selection */
 status_t nv_acc_setup_rect_invert_dma()
 {
-	//fixme: implement.
+	/* setup solid pattern:
+	 * wait for room in fifo for pattern cmd if needed. */
+	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
+	/* now setup pattern (writing 7 32bit words) */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 
-	return B_ERROR;
+	/* ROP registers (Raster OPeration):
+	 * wait for room in fifo for ROP cmd if needed. */
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	/* now setup ROP (writing 2 32bit words) for GXinvert */
+	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x55; /* SetRop5 */
+
+	/* reset fill color:
+	 * wait for room in fifo for bitmap cmd if needed. */
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	/* now reset color (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* Color1A */
+
+	return B_OK;
 }
 
 status_t nv_acc_rectangle_invert_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
-	//fixme: implement.
+	/* instruct engine what to fill:
+	 * wait for room in fifo for bitmap cmd if needed. */
+	if (nv_acc_fifofree_dma(3) != B_OK) return B_ERROR;
+	/* now setup fill (writing 3 32bit words) */
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		((xs << 16) | (ys & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(((xe - xs) << 16) | (yl & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
 
-	return B_ERROR;
+	/* tell the engine to fetch the commands in the DMA buffer that where not
+	 * executed before. At this time the setup done by nv_acc_setup_rectangle_dma() is
+	 * also executed on the first call of nv_acc_rectangle_dma(). */
+	nv_start_dma();
+
+	return B_OK;
 }
