@@ -10,7 +10,7 @@ namespace DiskDevice {
 
 class KUninitializeJob : public KDiskDeviceJob {
 public:
-	KUninitializeJob(partition_id partition);
+	KUninitializeJob(partition_id partitionID);
 	virtual ~KUninitializeJob();
 
 	virtual status_t Do();

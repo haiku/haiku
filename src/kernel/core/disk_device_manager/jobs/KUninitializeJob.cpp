@@ -12,8 +12,8 @@
 #define OUT printf
 
 // constructor
-KUninitializeJob::KUninitializeJob(partition_id partition)
-	: KDiskDeviceJob(B_DISK_DEVICE_JOB_UNINITIALIZE, partition)
+KUninitializeJob::KUninitializeJob(partition_id partitionID)
+	: KDiskDeviceJob(B_DISK_DEVICE_JOB_UNINITIALIZE, partitionID)
 {
 	SetDescription("uninitializing partition");
 }
