@@ -140,7 +140,9 @@ public:
 
 	const char *GetPath(void);
 	font_height GetHeight(const float &size);
-
+	
+	FT_Face GetFTFace() const { return fFTFace; }
+	
 	// TODO: Re-enable when I understand how the FT2 Cache system changed from
 	// 2.1.4 to 2.1.8
 //	int16 ConvertToUnicode(uint16 c);
@@ -154,6 +156,7 @@ protected:
 	bool is_fixedwidth, is_scalable, has_kerning, has_bitmaps;
 	int32 tunedcount;
 	CachedFace cachedface;
+	FT_Face	fFTFace;
 	uint8 format;
 	BRect fbounds;
 	uint16 fID;

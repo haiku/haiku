@@ -286,7 +286,9 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 		else
 			validcount++;
 
-		FT_Done_Face(face);
+		// FT_Face is kept open in FontStyle and will be unset in the
+		// FontStyle destructor
+		
 	}	// end for(i<refcount)
 
 	dir.Unset();

@@ -33,10 +33,11 @@ FTC_Manager ftmanager;
 /*!
 	\brief Constructor
 	\param filepath path to a font file
-	\param face FreeType handle for the font file after it is loaded - for its info only
+	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
 FontStyle::FontStyle(const char *filepath, FT_Face face)
 {
+	fFTFace = face;
 	fName=face->style_name;
 	cachedface=new CachedFaceRec;
 	cachedface->file_path=filepath;

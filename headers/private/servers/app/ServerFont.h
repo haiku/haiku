@@ -64,13 +64,15 @@ public:
 	void SetRotation(const float &value) { frotation=value; }
 	void SetFace(const uint32 &value) { fFace=value; }
 	
-	bool IsFixedWidth(void) { return fStyle->IsFixedWidth(); }
-	bool IsScalable(void) { return fStyle->IsScalable(); }
-	bool HasKerning(void) { return fStyle->HasKerning(); }
-	bool HasTuned(void) { return fStyle->HasTuned(); }
-	int32 TunedCount(void) { return fStyle->TunedCount(); }
-	uint16 GlyphCount(void) { return fStyle->GlyphCount(); }
-	uint16 CharMapCount(void) { return fStyle->CharMapCount(); }
+	bool IsFixedWidth(void) const { return fStyle->IsFixedWidth(); }
+	bool IsScalable(void) const { return fStyle->IsScalable(); }
+	bool HasKerning(void) const { return fStyle->HasKerning(); }
+	bool HasTuned(void) const { return fStyle->HasTuned(); }
+	int32 TunedCount(void) const { return fStyle->TunedCount(); }
+	uint16 GlyphCount(void) const { return fStyle->GlyphCount(); }
+	uint16 CharMapCount(void) const { return fStyle->CharMapCount(); }
+	
+	FT_Face GetFTFace() const { return fStyle->GetFTFace(); };
 	
 	const char *GetStyle(void) const;
 	const char *GetFamily(void) const;
