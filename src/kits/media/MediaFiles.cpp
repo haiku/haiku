@@ -173,6 +173,8 @@ BMediaFiles::GetRefFor(const char *type,
 	
 	rv = QueryServer(SERVER_GETREFFOR, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
+		entry_ref ref;
+		*out_ref = ref;
 		ERROR("BMediaFiles::GetRefFor: failed to getreffor (error %#lx)\n", rv);
 		return rv;
 	}

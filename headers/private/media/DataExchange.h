@@ -197,6 +197,8 @@ public:
 			directory = ref.directory;
 			if(ref.name)
 				strcpy(name, ref.name);
+			else
+				name[0] = 0;
 		}
 private:
 	dev_t	device;
