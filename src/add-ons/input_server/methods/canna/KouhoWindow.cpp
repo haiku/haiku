@@ -11,12 +11,13 @@
 #ifdef DEBUG
 #include <Debug.h>
 #endif
+#include "WindowPrivate.h"
 
 #include "KouhoWindow.h"
 
 KouhoWindow::KouhoWindow( BFont *font, BLooper *looper )
 	:BWindow(	DUMMY_RECT,
-				"kouho", (window_look) 25/*B_FLOATING_WINDOW_LOOK*/, 
+				"kouho", kLeftTitledWindowLook, 
 				B_FLOATING_ALL_WINDOW_FEEL,
 				B_NOT_RESIZABLE | B_NOT_CLOSABLE |
 				B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FOCUS |
