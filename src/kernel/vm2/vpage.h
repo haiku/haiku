@@ -41,8 +41,8 @@ class vpage : public node
 		bool contains(uint32 address) { return ((start_address<=address) && (end_address>=address)); }
 
 		// External methods for "server" type calls
-		bool fault(void *fault_address, bool writeError); // true = OK, false = panic.
-		void pager(int desperation);
+		bool fault(void *fault_address, bool writeError, int &in_count); // true = OK, false = panic.
+		bool pager(int desperation);
 		void saver(void);
 		
 		// Debugging

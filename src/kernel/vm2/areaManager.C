@@ -5,14 +5,12 @@
 #include "areaPool.h"
 extern vmHeaderBlock *vmBlock; 
 
-bool areaIsLessThan(void *a,void *b)
-{
+bool areaIsLessThan(void *a,void *b) {
 	return (((reinterpret_cast<area *>(a))->getStartAddress()) < (reinterpret_cast<area *>(b))->getStartAddress());
 }
 
 // This creates the one true lock for this area
-areaManager::areaManager(void)
-{  
+areaManager::areaManager(void) {  
 	team=0; // should be proc_get_current_proc_id()
 	myLock=0;
 	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
@@ -20,8 +18,7 @@ areaManager::areaManager(void)
 }
 
 // Loops over every area looking for someplace where we can get the space we need.
-unsigned long areaManager::getNextAddress(int pages, unsigned long start)
-{
+unsigned long areaManager::getNextAddress(int pages, unsigned long start) {
 		// This function needs to deal with the possibility that we run out of address space...
 //	areas.dump();
 	unsigned long end=start+(pages*PAGE_SIZE)-1;
@@ -42,8 +39,7 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 }
 
 // Remove the area from our list, put it on the area pool and move on
-void areaManager::freeArea(area_id areaID)
-{
+void areaManager::freeArea(area_id areaID) {
 	error ("areaManager::freeArea: begin\n");
 	lock();
 	area *oldArea=findArea(areaID);	
@@ -54,6 +50,7 @@ void areaManager::freeArea(area_id areaID)
 //		error ("areaManager::freeArea: areaManager =  %x \n",manager);
 		removeArea(oldArea);
 //		error ("areaManager::freeArea: deleting area %x \n",oldArea);
+		vmBlock->areas.remove(oldArea);
 		oldArea->freeArea();
 //		error ("areaManager::freeArea: freeArea complete \n");
 		vmBlock->areaPool->put(oldArea);
@@ -63,8 +60,7 @@ void areaManager::freeArea(area_id areaID)
 	unlock();
 }
 
-area *areaManager::findAreaLock(void *address)
-{
+area *areaManager::findAreaLock(void *address) {
 	lock();
 	area *retVal=findArea(address);
 	unlock();
@@ -72,8 +68,7 @@ area *areaManager::findAreaLock(void *address)
 }
 
 // Loops over our areas looking for this one by name
-area *areaManager::findArea(char *address)
-{
+area *areaManager::findArea(char *address) {
 	error ("Finding area by string\n");
 	area *retVal=NULL;
 	lock();
@@ -88,8 +83,7 @@ area *areaManager::findArea(char *address)
 }
 
 // Loops over our areas looking for the one whose virtual address matches the passed in address
-area *areaManager::findArea(void *address)
-{
+area *areaManager::findArea(void *address) {
 	// THIS DOES NOT HAVE LOCKING - all callers must lock.
 //	error ("Finding area by void * address\n");
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
@@ -103,8 +97,7 @@ area *areaManager::findArea(void *address)
 	return NULL;
 }
 
-area *areaManager::findAreaLock(area_id id)
-{
+area *areaManager::findAreaLock(area_id id) {
 	error ("Finding area by areaID \n");
 	lock();
 	area *retVal=findArea(id);
@@ -113,8 +106,7 @@ area *areaManager::findAreaLock(area_id id)
 }
 
 // Loops over our areas looking for the one whose ID was passed in
-area *areaManager::findArea(area_id id)
-{
+area *areaManager::findArea(area_id id) {
 	//error ("Finding area by area_id\n");
 	area *retVal=NULL;
 	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
@@ -127,8 +119,7 @@ area *areaManager::findArea(area_id id)
 }
 
 // Find the area whose address matches this page fault and dispatch the fault to it.
-bool areaManager::fault(void *fault_address, bool writeError) // true = OK, false = panic.
-{
+bool areaManager::fault(void *fault_address, bool writeError) { // true = OK, false = panic. 
 	area *myArea;
 	bool retVal;
 	error ("Faulting \n");
@@ -145,8 +136,7 @@ bool areaManager::fault(void *fault_address, bool writeError) // true = OK, fals
 long areaManager::nextAreaID=0;
 
 // Create an area; get a new structure, call setup, create the guts, set its ID, add it to our list 
-int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) 
-{
+int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) {
 	error ("areaManager::createArea - Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
@@ -167,14 +157,24 @@ int areaManager::createArea(char *AreaName,int pageCount,void **address, address
     return  retVal;
 }
 
+area *findAreaGlobal(int areaID) {
+	for (struct node *cur=vmBlock->areas.rock;cur;cur=cur->next) {
+		area *myArea=(area *)cur;
+		if (((area *)(cur))->getAreaID()==areaID)
+			return myArea;
+		}
+	return NULL;
+}
+
 // FIX: THIS IS WRONG! It will only clone areas in our areaManager.
 // Should: find the specified area, create a new area to be its clone, and set it up
-int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType,pageState state,protectType protect) 
-    {
+int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType,pageState state,protectType protect) {
 	int retVal;
 	error ("Cloning an area\n");
 	lock();
     area *oldArea=findArea(newAreaID);
+	if (!oldArea)
+		oldArea=findAreaGlobal(newAreaID);
 	if (oldArea)
 		{
     	area *newArea = new (vmBlock->areaPool->get()) area;
@@ -191,8 +191,7 @@ int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressS
 	return retVal;
     }   
 
-char areaManager::getByte(unsigned long address)
-{
+char areaManager::getByte(unsigned long address) {
 	area *myArea;
 //	error ("areaManager::getByte : starting\n");
 	int retVal;
@@ -210,8 +209,7 @@ char areaManager::getByte(unsigned long address)
 	return retVal;
 }
 
-int areaManager::getInt(unsigned long address)
-{
+int areaManager::getInt(unsigned long address) {
 	area *myArea;
 	int retVal;
 	lock();
@@ -228,8 +226,7 @@ int areaManager::getInt(unsigned long address)
 	return retVal;
 }
 
-void areaManager::setByte(unsigned long address,char value)
-{
+void areaManager::setByte(unsigned long address,char value) {
 //	error ("areaManager::setByte : starting\n");
 	area *myArea;
 	lock();
@@ -245,15 +242,13 @@ void areaManager::setByte(unsigned long address,char value)
 	unlock();
 }
 
-void areaManager::setInt(unsigned long address,int value)
-{
+void areaManager::setInt(unsigned long address,int value) {
 	area *myArea;
 	lock();
 	myArea=findArea((void *)address);
 	if (myArea)
 		myArea->setInt(address,value);	
-	else
-		{
+	else {
 		char temp[1000];
 		sprintf (temp,"Unable to find an area for address %d\n",address);
 		throw (temp);
@@ -262,11 +257,9 @@ void areaManager::setInt(unsigned long address,int value)
 }
 
 // Call pager for each of our areas
-void areaManager::pager(int desperation)
-{
+void areaManager::pager(int desperation) {
 	lock();
-	for (struct node *cur=areas.rock;cur;cur=cur->next)
-		{
+	for (struct node *cur=areas.rock;cur;cur=cur->next) {
 		area *myArea=(area *)cur;
 		//error ("areaManager::pager; area = \n");
 		//myArea->dump();
@@ -276,11 +269,9 @@ void areaManager::pager(int desperation)
 }
 
 // Call saver for each of our areas
-void areaManager::saver(void)
-{
+void areaManager::saver(void) {
 	lock();
-	for (struct node *cur=areas.rock;cur;cur=cur->next)
-		{
+	for (struct node *cur=areas.rock;cur;cur=cur->next) {
 		area *myArea=(area *)cur;
 		myArea->saver();
 		}
@@ -288,8 +279,7 @@ void areaManager::saver(void)
 }
 
 // mmap is basically map POSIX values to ours and call createAreaMappingFile...
-void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
-{
+void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset) {
 	char name[MAXPATHLEN];
 	// Get the filename from fd...
 	strcpy(	name,"mmap - need to include fileName");
@@ -299,8 +289,7 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
 	//error ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	lock();
-	if (flags & MAP_ANON) 
-		{
+	if (flags & MAP_ANON) {
 		createArea(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr, addType ,LAZY,protType);
 		return addr;
 		}
@@ -326,14 +315,12 @@ status_t areaManager::munmap(void *addr,size_t len)
 		status_t retVal=B_OK;
 		lock();
 		area *myArea=findArea(addr);
-		if (myArea)
-			{
+		if (myArea) {
 			removeArea(myArea);
 			myArea->freeArea();
 			vmBlock->areaPool->put(myArea);
 			}
-		else
-			{
+		else {
 			error ("areaManager::munmap: unable to find requested area\n");
 			retVal=B_ERROR;
 			}

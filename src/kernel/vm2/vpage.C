@@ -102,7 +102,7 @@ void vpage::setProtection(protectType prot) {
 
 // This is dispatched by the real interrupt handler, who locates us
 // true = OK, false = panic.  
-bool vpage::fault(void *fault_address, bool writeError) { 
+bool vpage::fault(void *fault_address, bool writeError, int &in_count) { 
 	error ("vpage::fault: virtual address = %lx, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError && physPage) { // If we already have a page and this is a write, it is either a copy on write or a "dirty" notice
 		dirty=true;
@@ -112,7 +112,9 @@ bool vpage::fault(void *fault_address, bool writeError) {
 			memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 			physPage=newPhysPage;
 			protection=writable;
+			vmBlock->vnodeMan->remove(*backingNode,*this);
 			backingNode=&(vmBlock->swapMan->findNode()); // Need new backing store for this node, since it was copied, the original is no good...
+			vmBlock->vnodeMan->addVnode(backingNode,*this);
 			// Update the architecture specific stuff here...
 			}
 		return true; 
@@ -128,6 +130,7 @@ bool vpage::fault(void *fault_address, bool writeError) {
 	dump();
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
 	dirty=false;
+	in_count++;
 	error ("vpage::fault: Refreshed\n");
 	dump();
 	error ("vpage::fault: exiting\n");
@@ -170,18 +173,18 @@ void  vpage::setInt(unsigned long address,int value,areaManager *manager) {
 	}
 
 // Swaps pages out where necessary.
-void vpage::pager(int desperation) {
+bool vpage::pager(int desperation) {
 	//error ("vpage::pager start desperation = %d\n",desperation);
 	if (!swappable)
-			return;
+			return false;
 	error ("vpage::pager swappable\n");
 	switch (desperation) {
-		case 1: return; break;
-		case 2: if (!physPage || protection!=readable)  return;break;
-		case 3: if (!physPage || dirty)  return;break;
-		case 4: if (!physPage)  return;break;
-		case 5: if (!physPage)  return;break;
-		default: return;break;
+		case 1: return false; break;
+		case 2: if (!physPage || protection!=readable)  return false;break;
+		case 3: if (!physPage || dirty)  return false;break;
+		case 4: if (!physPage)  return false;break;
+		case 5: if (!physPage)  return false;break;
+		default: return false;break;
 		}
 	error ("vpage::pager flushing\n");
 	flush();
@@ -189,11 +192,13 @@ void vpage::pager(int desperation) {
 	vmBlock->pageMan->freePage(physPage);
 	error ("vpage::pager going to NULL\n");
 	physPage=NULL;
+	return true;
 	}
 
 // Saves dirty pages
 void vpage::saver(void) {
-	if (dirty)
+	if (dirty) {
 		flush();
-	dirty=false;
+		dirty=false;
+		}
 	}

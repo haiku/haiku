@@ -95,6 +95,7 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 			base+=PAGE_SIZE;
 			}
 	dump();
+	vmBlock->areas.add(this);
 	return B_OK;
 }
 
@@ -152,16 +153,13 @@ status_t area::getInfo(area_info *dest) {
 	dest->protection=protection; 
 	dest->team=manager->getTeam();
 	dest->ram_size=0;
-	dest->in_count=0;
-	dest->out_count=0;
+	dest->in_count=in_count;
+	dest->out_count=out_count;
 	dest->copy_count=0;
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		if (page->isMapped())
 			dest->ram_size+=PAGE_SIZE;
-		dest->in_count+=PAGE_SIZE;
-		dest->out_count+=PAGE_SIZE;
-		dest->copy_count+=PAGE_SIZE;
 		}
 	dest->address=(void *)start_address;
 	return B_OK;
@@ -234,7 +232,7 @@ vpage *area::findVPage(unsigned long address) {
 bool area::fault(void *fault_address, bool writeError) { // true = OK, false = panic.  
 	vpage *page=findVPage((unsigned long)fault_address);
 	if (page)
-		return page->fault(fault_address,writeError);
+		return page->fault(fault_address,writeError,in_count);
 	else
 		return false;
 	}
@@ -271,7 +269,8 @@ void area::setInt(unsigned long address,int value) { // This is for testing only
 void area::pager(int desperation) {
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
-		page->pager(desperation);
+		if (page->pager(desperation))
+			out_count++;
 		}
 	}
 

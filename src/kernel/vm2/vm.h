@@ -18,7 +18,7 @@ struct vnode : public node
 	}
 };
 #define B_OS_NAME_LENGTH 32
-enum protectType {none=0,readable, writable,copyOnWrite,symCopyOnWrite};
+enum protectType {none=0,readable, writable,copyOnWrite};
 //B_EXACT_ADDRESS 		You want the value of *addr to be taken literally and strictly. 
 //						If the area can't be allocated at that location, the function fails. 
 //B_BASE_ADDRESS 		The area can start at a location equal to or greater than *addr. 
