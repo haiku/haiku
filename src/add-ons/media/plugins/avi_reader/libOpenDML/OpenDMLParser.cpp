@@ -20,6 +20,7 @@ struct movie_chunk
 OpenDMLParser::OpenDMLParser()
  :	fSource(0),
  	fSize(0),
+ 	fMovieListStart(0),
  	fStandardIndexStart(0),
  	fStandardIndexSize(0),
  	fStreamCount(0),
@@ -63,6 +64,12 @@ uint32
 OpenDMLParser::StandardIndexSize()
 {
 	return fStandardIndexSize;
+}
+
+int64
+OpenDMLParser::MovieListStart()
+{
+	return fMovieListStart;
 }
 
 const avi_main_header *
@@ -602,6 +609,9 @@ void
 OpenDMLParser::ParseList_movi(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseList_movi\n");
+
+	if (fMovieListStart == 0)
+		fMovieListStart = start;
 	
 	fMovieChunkCount++;
 	return;

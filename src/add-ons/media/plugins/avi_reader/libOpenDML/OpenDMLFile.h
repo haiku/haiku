@@ -29,9 +29,13 @@ public:
 
 private:
 	void		InitData();
-	bool		ReadIndexChunk(int stream_index);
-	bool		ReadIndexInfo(int stream_index);
-	
+
+	bool		OdmlReadIndexChunk(int stream_index);
+	bool		OdmlReadIndexInfo(int stream_index);
+	bool		OdmlGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe);
+
+	bool		AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe);
+		
 private:
 	BPositionIO *	fSource;
 	OpenDMLParser *	fParser;

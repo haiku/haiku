@@ -32,6 +32,8 @@ public:
 	
 	int64			StandardIndexStart();
 	uint32			StandardIndexSize();
+	
+	int64			MovieListStart();
 
 	const avi_main_header * AviMainHeader();
 	const odml_extended_header * OdmlExtendedHeader();
@@ -54,6 +56,8 @@ private:
 
 	BPositionIO *	fSource;
 	int64 			fSize;
+	
+	int64			fMovieListStart;
 	
 	int64			fStandardIndexStart;
 	uint32			fStandardIndexSize;

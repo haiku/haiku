@@ -31,6 +31,14 @@ struct avi_standard_index_entry
 	uint32 chunk_offset;
 	uint32 chunk_length;
 } _PACKED;
+#define AVIIF_LIST      0x00000001 
+#define AVIIF_KEYFRAME  0x00000010 
+#define AVIIF_FIRSTPART 0x00000020 
+#define AVIIF_LASTPART  0x00000040 
+#define AVIIF_MIDPART   (AVIIF_LASTPART | AVIFF_FIRSTPART) 
+#define AVIIF_NOTIME    0x00000100 
+#define AVIIF_COMPUSE   0x0fff0000 
+
 
 struct odml_extended_header
 {
