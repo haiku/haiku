@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <OS.h>
@@ -446,7 +446,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 	// pair to handle the private copies of pages as they are written to
 	if (mapping == REGION_PRIVATE_MAP) {
 		// create an anonymous store object
-		nu_store = vm_store_create_anonymous_noswap();
+		nu_store = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0, USER_STACK_GUARD_PAGES);
 		if (nu_store == NULL)
 			panic("map_backing_store: vm_create_store_anonymous_noswap returned NULL");
 		nu_cache = vm_cache_create(nu_store);
@@ -632,9 +632,15 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	vm_address_space *aspace;
 	vm_cache_ref *cache_ref;
 	vm_page *page = NULL;
+	bool isStack = (protection & B_STACK_AREA) != 0;
 	status_t err;
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
+
+#ifdef DEBUG_KERNEL_STACKS
+	if ((protection & B_KERNEL_STACK_AREA) != 0)
+		isStack = true;
+#endif
 
 	/* check parameters */
 	switch (addressSpec) {
@@ -680,7 +686,8 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	}
 
 	// create an anonymous store object
-	store = vm_store_create_anonymous_noswap();
+	store = vm_store_create_anonymous_noswap(isStack, (protection & B_USER_PROTECTION) != 0 ? 
+		USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES);
 	if (store == NULL)
 		panic("vm_create_anonymous_area: vm_create_store_anonymous_noswap returned NULL");
 	cache = vm_cache_create(store);
@@ -742,7 +749,14 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 			addr_t va;
 			// XXX remove
 			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE) {
-//				dprintf("mapping wired pages: area 0x%x, cache_ref 0x%x 0x%x\n", area, cache_ref, area->cache_ref);
+#ifdef DEBUG_KERNEL_STACKS
+#	ifdef STACK_GROWS_DOWNWARDS
+				if (isStack && va < area->base + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
+#	else
+				if (isStack && va >= area->base + area->size - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
+#	endif
+					continue;
+#endif
 				vm_soft_fault(va, false, false);
 			}
 			break;
@@ -1027,13 +1041,13 @@ _user_vm_map_file(const char *uname, void **uaddress, int addressSpec,
 	addr_t size, int protection, int mapping, const char *upath, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
+	char path[B_PATH_NAME_LENGTH];
 	void *address;
-	char path[SYS_MAX_PATH_LEN];
 	int rc;
 
 	if (!IS_USER_ADDRESS(uname) || !IS_USER_ADDRESS(uaddress) || !IS_USER_ADDRESS(upath)
 		|| user_strlcpy(name, uname, B_OS_NAME_LENGTH) < B_OK
-		|| user_strlcpy(path, upath, SYS_MAX_PATH_LEN) < B_OK
+		|| user_strlcpy(path, upath, B_PATH_NAME_LENGTH) < B_OK
 		|| user_memcpy(&address, uaddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -1220,7 +1234,7 @@ vm_copy_on_write_area(vm_area *area)
 	lowerCache = upperCacheRef->cache;
 
 	// create an anonymous store object
-	store = vm_store_create_anonymous_noswap();
+	store = vm_store_create_anonymous_noswap(false, 0);
 	if (store == NULL)
 		return B_NO_MEMORY;
 
@@ -2068,7 +2082,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		if (aspace == NULL) {
 			if (isUser == false) {
 				dprintf("vm_soft_fault: kernel thread accessing invalid user memory!\n");
-				return ERR_VM_PF_FATAL;
+				return B_BAD_ADDRESS;
 			} else {
 				// XXX weird state.
 				panic("vm_soft_fault: non kernel thread accessing user memory that doesn't exist!\n");
@@ -2077,7 +2091,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	} else {
 		// the hit was probably in the 64k DMZ between kernel and user space
 		// this keeps a user space thread from passing a buffer that crosses into kernel space
-		return ERR_VM_PF_FATAL;
+		return B_BAD_ADDRESS;
 	}
 	map = &aspace->virtual_map;
 	atomic_add(&aspace->fault_count, 1);
@@ -2090,7 +2104,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("vm_soft_fault: va 0x%lx not covered by area in address space\n", originalAddress);
-		return ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
+		return B_BAD_ADDRESS;
 	}
 
 	// check permissions
@@ -2098,13 +2112,13 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("user access on kernel area 0x%lx at %p\n", area->id, (void *)originalAddress);
-		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
+		return B_PERMISSION_DENIED;
 	}
 	if (isWrite && (area->protection & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("write access attempted on read-only area 0x%lx at %p\n", area->id, (void *)originalAddress);
-		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
+		return B_PERMISSION_DENIED;
 	}
 
 	// We have the area, it was a valid access, so let's try to resolve the page fault now.
@@ -2117,14 +2131,16 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	release_sem_etc(map->sem, READ_COUNT, 0);
 
 	// See if this cache has a fault handler - this will do all the work for us
-	if (top_cache_ref->cache->store->ops->fault) {
+	if (top_cache_ref->cache->store->ops->fault != NULL) {
 		// Note, since the page fault is resolved with interrupts enabled, the
 		// fault handler could be called more than once for the same reason -
 		// the store must take this into account
-		int err = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, aspace, cache_offset);
-		vm_cache_release_ref(top_cache_ref);
-		vm_put_aspace(aspace);
-		return err;
+		status_t status = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, aspace, cache_offset);
+		if (status != B_BAD_HANDLER) {
+			vm_cache_release_ref(top_cache_ref);
+			vm_put_aspace(aspace);
+			return status;
+		}
 	}
 
 	// The top most cache has no fault handler, so let's see if the cache or its sources
@@ -2872,8 +2888,10 @@ _user_get_next_area_info(team_id team, int32 *userCookie, area_info *userInfo)
 status_t
 _user_set_area_protection(area_id area, uint32 newProtection)
 {
-	// ToDo: implement set_area_protection()
-	return B_ERROR;
+	if ((newProtection & ~B_USER_PROTECTION) != 0)
+		return B_BAD_VALUE;
+
+	return set_area_protection(area, newProtection);
 }
 
 
@@ -2898,7 +2916,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			return B_BAD_VALUE;
 	}
-	if (protection & B_KERNEL_PROTECTION)
+	if ((protection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
@@ -2936,7 +2954,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			return B_BAD_VALUE;
 	}
-	if (protection & B_KERNEL_PROTECTION)
+	if ((protection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
@@ -2948,9 +2966,6 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	if (addressSpec == B_EXACT_ADDRESS
 		&& IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
-
-	if ((protection & B_KERNEL_PROTECTION) == 0)
-		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
 	area = vm_create_anonymous_area(vm_get_current_user_aspace_id(), (char *)name, &address, 
 				addressSpec, size, lock, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
