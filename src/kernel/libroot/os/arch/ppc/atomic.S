@@ -50,10 +50,10 @@ lost4:	lwarx	%r5, 0, %r3
 		mr		%r3, %r5
 		blr
 
-/* int test_and_set(int *value, int setTo, int testValue) 
+/* int atomic_test_and_set(int *value, int setTo, int testValue) 
  *                  r3          r4         r5
  */
-FUNCTION(test_and_set):
+FUNCTION(atomic_test_and_set):
 lost5:	lwarx	%r6, 0, %r3
 		cmpw	%r6, %r5
 		bne		out5
