@@ -13,20 +13,16 @@ SECTIONS
 	.ctors : { *(.ctors) }
 	__ctor_end = .;
 
-	.rodata : { *(.rodata) }
+	.rodata : { *(.rodata .rodata.*) }
 
 	/* writable data  */
 	. = ALIGN(0x1000);
 	__data_start = .;
-	.data : { *(.data .gnu.linkonce.d.*) }
-
-	/* unintialized data (in same segment as writable data) */
-	__bss_start = .;
-	.bss : { *(.bss) }
+	.data : { *(.data .gnu.linkonce.d.* .bss) }
 
 	. = ALIGN(0x1000);
 	_end = . ;
 
 	/* Strip unnecessary stuff */
-	/DISCARD/ : { *(.comment .note .eh_frame .dtors) }
+	/DISCARD/ : { *(.comment .note .eh_frame .dtors .stab .stabstr .debug*) }
 }
