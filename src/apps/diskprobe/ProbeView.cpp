@@ -1270,7 +1270,7 @@ ProbeView::AttachedToWindow()
 
 	BMenu *subMenu = new BMenu("Selection");
 	message = new BMessage(kMsgPositionUpdate);
-	message->AddInt64("position", 0);
+	message->AddInt64("block", 0);
 	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K', B_COMMAND_KEY));
 	fNativeMenuItem->SetTarget(fHeaderView);
 	message = new BMessage(*message);
