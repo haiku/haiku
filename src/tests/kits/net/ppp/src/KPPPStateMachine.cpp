@@ -1,6 +1,8 @@
 #include "KPPPStateMachine.h"
 
 
+#define PPP_STATE_MACHINE_TIMEOUT			3000000
+
 // TODO:
 // do not forget to reset authentication status when:
 // - connection is lost
@@ -16,7 +18,7 @@ PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	fAuthenticationName(NULL), fPeerAuthenticationName(NULL),
 	fAuthenticatorIndex(-1), fPeerAuthenticatorIndex(-1),
 	fMaxTerminate(2), fMaxConfigure(10), fMaxNak(5),
-	fRequestID(0), fTerminateID(0), fTimeout(0)
+	fRequestID(0), fTerminateID(0), fNextTimeout(0)
 {
 }
 
@@ -40,6 +42,9 @@ PPPStateMachine::NextID()
 void
 PPPStateMachine::NewState(PPP_STATE next)
 {
+	if(next < PPP_CLOSING_STATE || next == PPP_OPENED_STATE)
+		fNextTimeout = 0;
+	
 	if(State() == PPP_OPENED_STATE && next != State())
 		ResetOptionHandlers();
 	
@@ -360,6 +365,11 @@ PPPStateMachine::UpEvent()
 		return;
 			// it is not our device that went up...
 	
+	if(Interface()->Ifnet())
+		Interface()->Ifnet()->if_baudrate = max(
+			Interface()->Device()->InputTransferRate(),
+			Interface()->Device()->OutputTransferRate());
+	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			if(Mode() != PPP_SERVER_MODE
@@ -410,6 +420,15 @@ void
 PPPStateMachine::DownEvent()
 {
 	LockerHelper locker(fLock);
+	
+	if(!Interface()->Device() || Interface()->Device->IsUp())
+		return;
+			// it is not our device that went up...
+	
+	if(Interface()->Ifnet())
+		Interface()->Ifnet()->if_baudrate = max(
+			Interface()->Device()->InputTransferRate(),
+			Interface()->Device()->OutputTransferRate());
 	
 	switch(State()) {
 		case PPP_CLOSED_STATE:
@@ -1048,8 +1067,6 @@ PPPStateMachine::RXJBadEvent(mbuf *packet)
 void
 PPPStateMachine::RXREvent(mbuf *packet)
 {
-	LockerHelper locker(fLock);
-	
 	lcp_packet *echo = mtod(mbuf, lcp_packet*);
 	
 	switch(State()) {
@@ -1071,6 +1088,10 @@ void
 PPPStateMachine::TimerEvent()
 {
 	LockerHelper locker(fLock);
+	if(fNextTimeout == 0 || fNextTimeout > system_time())
+		return;
+	fNextTimeout = 0;
+	locker.UnlockNow();
 	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
@@ -1264,8 +1285,8 @@ PPPStateMachine::InitializeRestartCount()
 	fTerminateCounter = fMaxTerminate;
 	fNakCounter = fMaxNak;
 	
-	// TODO:
-	// start timer
+	LockerHelper locker(fLock);
+	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
 }
 
 
@@ -1276,8 +1297,8 @@ PPPStateMachine::ZeroRestartCount()
 	fTerminateCounter = 0;
 	fNakCounter = 0;
 	
-	// TODO:
-	// start timer
+	LockerHelper locker(fLock);
+	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
 }
 
 
@@ -1299,8 +1320,6 @@ PPPStateMachine::SendConfigureRequest()
 	}
 	
 	LCP().Send(request.ToMbuf());
-	
-	fTimeout = system_time();
 }
 
 

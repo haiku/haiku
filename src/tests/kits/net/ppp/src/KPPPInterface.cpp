@@ -32,15 +32,22 @@ typedef struct redial_info {
 
 status_t redial_func(void *data);
 
+// other functions
+status_t in_queue_thread(void *data);
 
 
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
-	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
+	fStateMachine(*this), fLCP(*this), ReportManager()(StateMachine().Locker()),
 	fIfnet(NULL), fUpThread(-1), fRedialThread(-1), fDialRetry(0),
 	fDialRetriesLimit(0), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
 	fDevice(NULL), fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
 {
+	fInQueue = start_ifq();
+	fInQueueThread = spawn_kernel_thread(in_queue_thread, "PPPInterface: Input",
+		B_NORMAL_PRIORITY, this);
+	resume_thread(fInQueueThread);
+	
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
 	
@@ -87,8 +94,15 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 
 PPPInterface::~PPPInterface()
 {
+	fLock.Lock();
+		// make sure no thread wants to call Unlock() on fLock after it is deleted
+	
 	Report(PPP_DESTRUCTION_REPORT, 0, NULL, 0);
 		// tell all listeners that we are being destroyed
+	
+	int32 tmp;
+	stop_ifq(InQueue());
+	wait_for_thread(fInQueueThread, &tmp);
 	
 	// TODO:
 	// kill (or wait for) fRedialThread
@@ -185,6 +199,9 @@ PPPInterface::SetDevice(PPPDevice *device)
 	fDevice = device;
 	
 	fLinkMTU = fDevice->MTU();
+	if(Ifnet())
+		Ifnet()->if_baudrate = max(fDevice->InputTransferRate(),
+			fDevice->OutputTransferRate());
 	
 	CalculateMRU();
 }
@@ -440,7 +457,7 @@ PPPInterface::Up()
 	if(fUpThread == -1)
 		fUpThread = me;
 	
-	fReportManager.EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
+	ReportManager().EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
 	fLock.Unlock();
 	
 	// fUpThread tells the state machine to go up
@@ -449,7 +466,7 @@ PPPInterface::Up()
 	
 	while(true) {
 		if(IsUp()) {
-			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			
 			if(me == fUpThread) {
 				fLock.Lock();
@@ -471,7 +488,7 @@ PPPInterface::Up()
 			}
 			
 			PPP_REPLY(sender, B_OK);
-			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			return true;
 		}
 		
@@ -483,7 +500,7 @@ PPPInterface::Up()
 			}
 			
 			PPP_REPLY(sender, B_OK);
-			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			return false;
 		} else if(report.type != PPP_CONNECTION_REPORT) {
 			PPP_REPLY(sender, B_OK);
@@ -500,7 +517,7 @@ PPPInterface::Up()
 			}
 			
 			PPP_REPLY(sender, B_OK);
-			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			return true;
 		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
 				|| report.code == PPP_REPORT_UP_ABORTED
@@ -514,7 +531,7 @@ PPPInterface::Up()
 			}
 			
 			PPP_REPLY(sender, B_OK);
-			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			return false;
 		}
 		
@@ -523,7 +540,7 @@ PPPInterface::Up()
 			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
 				if(fDialRetry >= fDialRetriesLimit || fUpThread == -1) {
 					PPP_REPLY(sender, B_OK);
-					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
 				} else {
 					PPP_REPLY(sender, B_OK);
@@ -535,7 +552,7 @@ PPPInterface::Up()
 					continue;
 				} else {
 					PPP_REPLY(sender, B_OK);
-					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
 				}
 			}
@@ -551,7 +568,7 @@ PPPInterface::Up()
 						fManager->delete_interface(this);
 					
 					PPP_REPLY(sender, B_OK);
-					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
 				} else {
 					++fDialRetry;
@@ -571,7 +588,7 @@ PPPInterface::Up()
 					fDialRetry = 0;
 					fUpThread = -1;
 					PPP_REPLY(sender, B_OK);
-					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					
 					if(!DoesDialOnDemand()
 							&& report.code != PPP_REPORT_DOWN_SUCCESSFUL)
@@ -590,23 +607,39 @@ PPPInterface::Up()
 bool
 PPPInterface::Down()
 {
-	// ToDo:
-	// instead of waiting for state change we should wait until
-	// all retries are done
-	
 	if(!InitCheck())
 		return false;
 	
-	// TODO:
-	// Add one-time connection report request.
+	// this locked section guarantees that there are no state changes before we
+	// enable the connection reports
+	LockerHelper locker(fLock);
+	if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
+		return true;
 	
+	ReportManager().EnableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
+	locker.UnlockNow();
 	
+	thread_id sender;
+	ppp_report_packet report;
 	
-	// All attempts to connect have failed.
+	StateMachine().CloseEvent();
+	
+	while(true) {
+		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
+			continue;
+		
+		if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
+				|| report.code == PPP_REPORT_UP_ABORTED
+				|| (State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)) {
+			ReportManager().DisableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
+			break;
+		}
+	}
+	
 	if(!DoesDialOnDemand())
 		fManager->delete_interface(this);
 	
-	return false;
+	return true;
 }
 
 
@@ -936,6 +969,16 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 }
 
 
+void
+PPPInterface::Pulse()
+{
+	// TODO:
+	// check our idle time
+	
+	StateMachine().TimerEvent();
+}
+
+
 bool
 PPPInterface::RegisterInterface()
 {
@@ -958,6 +1001,10 @@ PPPInterface::RegisterInterface()
 	
 	if(!fIfnet)
 		return false;
+	
+	if(Device())
+		fIfnet->if_baudrate = max(Device()->InputTransferRate(),
+			Device()->OutputTransferRate());
 	
 	return true;
 }
@@ -1021,8 +1068,10 @@ PPPInterface::Redial()
 	info.interface = this;
 	info.thread = &fRedialThread;
 	
-	fRedialThread = spawn_thread(redial_func, "PPPInterface: redial_thread",
+	fRedialThread = spawn_kernel_thread(redial_func, "PPPInterface: redial_thread",
 		B_NORMAL_PRIORITY, info);
+	
+	resume_thread(fRedialThread);
 }
 
 
@@ -1035,4 +1084,30 @@ redial_func(void *data)
 	*info->thread = -1;
 	
 	delete info;
+}
+
+
+status_t
+in_queue_thread(void *data)
+{
+	PPPInterface *interface = (PPPInterface*) data;
+	struct ifq *queue = interface->InQueue();
+	mbuf *packet;
+	status_t error;
+	
+	while(true) {
+		error = acquire_sem_etc(queue->pop, 1, B_CAN_INTERRUPT | B_DO_NOT_RESCHEDULE, 0);
+		
+		if(error == B_INTERRUPTED)
+			continue;
+		else if(error != B_NO_ERROR)
+			break;
+		
+		IFQ_DEQUEUE(queue, packet);
+		
+		if(packet)
+			interface->ReceiveFromDevice(packet);
+	}
+	
+	return B_ERROR;
 }

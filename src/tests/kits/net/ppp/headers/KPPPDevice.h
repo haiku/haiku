@@ -6,7 +6,8 @@
 
 class PPPDevice {
 	public:
-		PPPDevice(const char *fName, uint32 overhead, PPPInterface *interface, driver_parameter *settings);
+		PPPDevice(const char *fName, uint32 overhead, PPPInterface *interface,
+			driver_parameter *settings);
 		virtual ~PPPDevice();
 		
 		virtual status_t InitCheck() const = 0;

@@ -42,8 +42,11 @@ class PPPInterface {
 		PPPLCP& LCP() const
 			{ return fLCP; }
 		
-		ifnet *Ifnet() const
+		struct ifnet *Ifnet() const
 			{ return fIfnet; }
+		
+		struct ifq *InQueue() const
+			{ return fInQueue; }
 		
 		void SetLinkMTU(uint32 linkMTU);
 		uint32 LinkMTU() const
@@ -103,6 +106,8 @@ class PPPInterface {
 		bool Down();
 		bool IsUp() const;
 		
+		PPPReportManager& ReportManager() const
+			{ return fReportManager; }
 		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
 			{ fReportManager.Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
@@ -119,6 +124,9 @@ class PPPInterface {
 			// This is called by the receive-thread.
 			// Only call this if it does not block Send() or
 			// SendToDevice()!
+		
+		void Pulse();
+			// this manages all timeouts, etc.
 
 	private:
 		bool RegisterInterface();
@@ -139,9 +147,12 @@ class PPPInterface {
 		PPPStateMachine fStateMachine;
 		PPPLCP fLCP;
 		PPPReportManager fReportManager;
-		ifnet *fIfnet;
+		struct ifnet *fIfnet;
 		
-		thread_id fUpThread, fRedialThread;
+		thread_id fUpThread, fInQueueThread;
+		struct ifq *fInQueue;
+		
+		thread_id fRedialThread;
 		uint32 fDialRetry, fDialRetriesLimit;
 		
 		ppp_manager_info *fManager;

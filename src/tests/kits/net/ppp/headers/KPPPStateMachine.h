@@ -143,8 +143,7 @@ class PPPStateMachine {
 		int32 fRequestCounter, fTerminateCounter, fNakCounter;
 		uint8 fRequestID, fTerminateID;
 			// the ID we used for the last configure/terminate request
-		bigtime_t fTimeout;
-			// last time we sent a packet
+		bigtime_t fNextTimeout;
 };
 
 
