@@ -15,6 +15,8 @@
 #include <agg_span_image_filter_rgba32.h>
 #include <agg_span_interpolator_linear.h>
 
+#include "LayerData.h"
+
 #include "AGGTextRenderer.h"
 #include "DrawingMode.h"
 #include "DrawingModeFactory.h"
@@ -137,6 +139,26 @@ void
 Painter::DetachFromBuffer()
 {
 	_MakeEmpty();
+}
+
+// SetDrawData
+void
+Painter::SetDrawData(const DrawData* data)
+{
+	// for now...
+	SetHighColor(data->highcolor.GetColor32());
+	SetLowColor(data->lowcolor.GetColor32());
+	SetScale(data->scale);
+	SetPenSize(data->pensize);
+//	SetOrigin();
+	SetDrawingMode(data->draw_mode);
+	SetBlendingMode(data->alphaSrcMode, data->alphaFncMode);
+	SetPenLocation(data->penlocation);
+	SetFont(data->font);
+	if (data->clipReg) {
+		ConstrainClipping(*data->clipReg);
+	}
+	fPatternHandler->SetPattern(data->patt);
 }
 
 // #pragma mark -
@@ -700,6 +722,15 @@ Painter::InvertRect(const BRect& r) const
 	}
 }
 
+// BoundingBox
+BRect
+Painter::BoundingBox(const char* utf8String, uint32 length,
+					 const BPoint& baseLine) const
+{
+	Transformable transform;
+	transform.TranslateBy(baseLine);
+	return fTextRenderer->Bounds(utf8String, length, transform);
+}
 
 // #pragma mark -
 
