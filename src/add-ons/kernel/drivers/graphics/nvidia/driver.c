@@ -508,7 +508,12 @@ static status_t map_device(device_info *di)
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
 	/* disable ROM shadowing, we want the guaranteed exact contents of the chip */
-	set_pci(NVCFG_ROMSHADOW, 4, 0);
+	/* warning:
+	 * don't touch: (confirmed) NV04, NV05, NV05-M64, NV11 all shutoff otherwise.
+	 * NV18, NV28 and NV34 keep working.
+	 * confirmed NV28 and NV34 to use upper part of shadowed ROM for scratch purposes,
+	 * however the actual ROM content (so the used part) is intact (confirmed). */
+	//set_pci(NVCFG_ROMSHADOW, 4, 0);
 
 	/* enable ROM decoding - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
