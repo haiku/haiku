@@ -14,12 +14,13 @@
 #include <timer.h>
 #include <Errors.h>
 #include <stage2.h>
+#include <OS.h>
 
 #include <arch/cpu.h>
 #include <arch/timer.h>
 #include <arch/smp.h>
 
-static struct timer_event * volatile events[SMP_MAX_CPUS] = { NULL, };
+static timer * volatile events[SMP_MAX_CPUS] = { NULL, };
 static spinlock_t timer_spinlock[SMP_MAX_CPUS] = { 0, };
 
 int timer_init(kernel_args *ka)
@@ -30,31 +31,31 @@ int timer_init(kernel_args *ka)
 }
 
 // NOTE: expects interrupts to be off
-static void add_event_to_list(struct timer_event *event, struct timer_event * volatile *list)
+static void add_event_to_list(timer *event, timer * volatile *list)
 {
-	struct timer_event *next;
-	struct timer_event *last = NULL;
+	timer *next;
+	timer *last = NULL;
 
 	// stick it in the event list
-	next = *list;
-	while(next != NULL && next->sched_time < event->sched_time) {
-		last = next;
-		next = next->next;
+	for (next = *list; next; last = next, next = (timer *)next->entry.next) {
+		if ((bigtime_t)next->entry.key >= (bigtime_t)event->entry.key)
+			break;
 	}
 
-	if(last != NULL) {
-		event->next = last->next;
-		last->next = event;
-	} else {
-		event->next = next;
+	if (last != NULL) {
+		(timer *)event->entry.next = (timer *)last->entry.next;
+		(timer *)last->entry.next = event;
+	}
+	else {
+		(timer *)event->entry.next = next;
 		*list = event;
 	}
 }
 
 int timer_interrupt()
 {
-	bigtime_t curr_time = system_time();
-	struct timer_event *event;
+	bigtime_t sched_time;
+	timer *event;
 	spinlock_t *spinlock;
 	int curr_cpu = smp_get_current_cpu();
 	int rc = B_HANDLED_INTERRUPT;
@@ -67,33 +68,34 @@ int timer_interrupt()
 
 restart_scan:
 	event = events[curr_cpu];
-	if(event != NULL && event->sched_time < curr_time) {
+	if ((event) && ((bigtime_t)event->entry.key < system_time())) {
 		// this event needs to happen
-		int mode = event->mode;
+		int mode = event->flags;
 
-		events[curr_cpu] = event->next;
-		event->sched_time = 0;
+		events[curr_cpu] = (timer *)event->entry.next;
+		event->entry.key = 0;
 
 		release_spinlock(spinlock);
 
 		// call the callback
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
-		if(event->func != NULL) {
-			rc = event->func(event->data);
+		if (event->hook) {
+			rc = event->hook(event);
 //			if (event->func(event->data) == INT_RESCHEDULE)
 //				rc = INT_RESCHEDULE;
 		}
 
 		acquire_spinlock(spinlock);
 
-		if(mode == TIMER_MODE_PERIODIC) {
+		if (mode == B_PERIODIC_TIMER) {
 			// we need to adjust it and add it back to the list
-			event->sched_time = system_time() + event->periodic_time;
-			if(event->sched_time == 0)
-				event->sched_time = 1; // if we wrapped around and happen
-				                       // to hit zero, set it to one, since
-				                       // zero represents not scheduled
+			sched_time = system_time() + event->period;
+			if (sched_time == 0)
+				sched_time = 1; // if we wrapped around and happen
+				                // to hit zero, set it to one, since
+				                // zero represents not scheduled
+			event->entry.key = (int64)sched_time;
 			add_event_to_list(event, &events[curr_cpu]);
 		}
 
@@ -101,122 +103,103 @@ restart_scan:
 	}
 
 	// setup the next hardware timer
-	if(events[curr_cpu] != NULL)
-		arch_timer_set_hardware_timer(events[curr_cpu]->sched_time - system_time());
+	if (events[curr_cpu] != NULL)
+		arch_timer_set_hardware_timer((bigtime_t)events[curr_cpu]->entry.key - system_time());
 
 	release_spinlock(spinlock);
 
 	return rc;
 }
 
-void timer_setup_timer(timer_callback func, void *data, struct timer_event *event)
+status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
 {
-	event->func = func;
-	event->data = data;
-	event->sched_time = 0;
-}
-
-int timer_set_event(bigtime_t relative_time, timer_mode mode, struct timer_event *event)
-{
+	bigtime_t sched_time;
+	bigtime_t curr_time = system_time();
 	int state;
 	int curr_cpu;
-
-	if(event == NULL)
-		return EINVAL;
-
-	if(relative_time < 0)
-		relative_time = 0;
-
-	if(event->sched_time != 0)
-		panic("timer_set_event: event %p in list already!\n", event);
-
-	event->sched_time = system_time() + relative_time;
-	if(event->sched_time == 0)
-		event->sched_time = 1; // if we wrapped around and happen
-		                       // to hit zero, set it to one, since
-		                       // zero represents not scheduled
-	event->mode = mode;
-	if(event->mode == TIMER_MODE_PERIODIC)
-		event->periodic_time = relative_time;
+	
+	if ((!t) || (!hook) || (period < 0))
+		return B_BAD_VALUE;
+		
+	sched_time = period;
+	if (flags != B_ONE_SHOT_ABSOLUTE_TIMER)
+		sched_time += curr_time;
+	if (sched_time == 0)
+		sched_time = 1;
+	
+	t->entry.key = (int64)sched_time;
+	t->period = period;
+	t->hook = hook;
+	t->flags = flags;
 
 	state = int_disable_interrupts();
-
 	curr_cpu = smp_get_current_cpu();
-
 	acquire_spinlock(&timer_spinlock[curr_cpu]);
 
-	add_event_to_list(event, &events[curr_cpu]);
+	add_event_to_list(t, &events[curr_cpu]);
+	t->cpu = curr_cpu;
 
 	// if we were stuck at the head of the list, set the hardware timer
-	if(event == events[curr_cpu]) {
-		arch_timer_set_hardware_timer(relative_time);
-	}
+	if (t == events[curr_cpu])
+		arch_timer_set_hardware_timer(sched_time - curr_time);
 
 	release_spinlock(&timer_spinlock[curr_cpu]);
 	int_restore_interrupts(state);
 
-	return 0;
+	return B_OK;
 }
 
 /* this is a fast path to be called from reschedule and from timer_cancel_event */
 /* must always be invoked with interrupts disabled */
-int _local_timer_cancel_event(int curr_cpu, struct timer_event *event)
+int _local_timer_cancel_event(int curr_cpu, timer *event)
 {
-	struct timer_event *last = NULL;
-	struct timer_event *e;
-	bool foundit = false;
+	timer *last = NULL;
+	timer *e;
 
 	acquire_spinlock(&timer_spinlock[curr_cpu]);
 	e = events[curr_cpu];
-	while(e != NULL) {
-		if(e == event) {
+	while (e != NULL) {
+		if (e == event) {
 			// we found it
-			foundit = true;
-			if(e == events[curr_cpu]) {
-				events[curr_cpu] = e->next;
-			} else {
-				last->next = e->next;
-			}
-			e->next = NULL;
+			if (e == events[curr_cpu])
+				events[curr_cpu] = (timer *)e->entry.next;
+			else
+				(timer *)last->entry.next = (timer *)e->entry.next;
+			e->entry.next = NULL;
 			// break out of the whole thing
-			goto done;
+			break;
 		}
 		last = e;
-		e = e->next;
+		e = (timer *)e->entry.next;
 	}
-	release_spinlock(&timer_spinlock[curr_cpu]);
-done:
 
-	if(events[curr_cpu] == NULL) {
+	if (events[curr_cpu] == NULL)
 		arch_timer_clear_hardware_timer();
-	} else {
-		arch_timer_set_hardware_timer(events[curr_cpu]->sched_time - system_time());
-	}
+	else
+		arch_timer_set_hardware_timer((bigtime_t)events[curr_cpu]->entry.key - system_time());
+	
+	release_spinlock(&timer_spinlock[curr_cpu]);
 
-	if(foundit) {
-		release_spinlock(&timer_spinlock[curr_cpu]);
-	}
-
-	return (foundit ? 0 : B_ERROR);
+	return (e == event ? 0 : B_ERROR);
 }
 
-int local_timer_cancel_event(struct timer_event *event)
+int local_timer_cancel_event(timer *event)
 {
 	return _local_timer_cancel_event(smp_get_current_cpu(), event);
 }
 
-int timer_cancel_event(struct timer_event *event)
+bool cancel_timer(timer *event)
 {
 	int state;
-	struct timer_event *last = NULL;
-	struct timer_event *e;
+	timer *last = NULL;
+	timer *e;
 	bool foundit = false;
 	int num_cpus = smp_get_num_cpus();
 	int cpu= 0;
 	int curr_cpu;
 
-	if(event->sched_time == 0)
-		return 0; // it's not scheduled
+//	if (event->sched_time == 0)
+//		return 0; // it's not scheduled
 
 	state = int_disable_interrupts();
 	curr_cpu = smp_get_current_cpu();
@@ -227,38 +210,38 @@ int timer_cancel_event(struct timer_event *event)
 	// a cheap match. If this fails, we start harassing
 	// other cpus.
 	//
-	if(_local_timer_cancel_event(curr_cpu, event) < 0) {
-		for(cpu = 0; cpu < num_cpus; cpu++) {
-			if(cpu== curr_cpu) continue;
+	if (_local_timer_cancel_event(curr_cpu, event) < 0) {
+		for (cpu = 0; cpu < num_cpus; cpu++) {
+			if (cpu== curr_cpu) continue;
 			acquire_spinlock(&timer_spinlock[cpu]);
 			e = events[cpu];
-			while(e != NULL) {
-				if(e == event) {
+			while (e != NULL) {
+				if (e == event) {
 					// we found it
 					foundit = true;
-					if(e == events[cpu]) {
-						events[cpu] = e->next;
-					} else {
-						last->next = e->next;
-					}
-					e->next = NULL;
+					if(e == events[cpu])
+						events[cpu] = (timer *)e->entry.next;
+					else
+						(timer *)last->entry.next = (timer *)e->entry.next;
+					e->entry.next = NULL;
 					// break out of the whole thing
 					goto done;
 				}
 				last = e;
-				e = e->next;
+				e = (timer *)e->entry.next;
 			}
 			release_spinlock(&timer_spinlock[cpu]);
 		}
 	}
 done:
 
-	if(foundit) {
+	if (foundit)
 		release_spinlock(&timer_spinlock[cpu]);
-	}
 	int_restore_interrupts(state);
 
-	return (foundit ? 0 : B_ERROR);
+	if (foundit && ((bigtime_t)event->entry.key < system_time()))
+		return true;
+	return false;
 }
 
 void spin(bigtime_t microseconds)

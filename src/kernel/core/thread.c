@@ -1475,7 +1475,7 @@ static int _rand(void)
 	return((next >> 16) & 0x7FFF);
 }
 
-static int reschedule_event(void *unused)
+static int reschedule_event(timer *unused)
 {
 	// this function is called as a result of the timer event set by the scheduler
 	// returning this causes a reschedule on the timer event
@@ -1491,7 +1491,7 @@ void thread_resched(void)
 	struct thread *old_thread = thread_get_current_thread();
 	int i;
 	bigtime_t quantum;
-	struct timer_event *quantum_timer;
+	timer *quantum_timer;
 
 //	dprintf("top of thread_resched: cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread());
 
@@ -1560,9 +1560,8 @@ found_thread:
 	if(!old_thread->cpu->info.preempted) {
 		_local_timer_cancel_event(old_thread->cpu->info.cpu_num, quantum_timer);
 	}
-	old_thread->cpu->info.preempted= 0;
-	timer_setup_timer(&reschedule_event, NULL, quantum_timer);
-	timer_set_event(quantum, TIMER_MODE_ONESHOT, quantum_timer);
+	old_thread->cpu->info.preempted = 0;
+	add_timer(quantum_timer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
 
 	if(next_thread != old_thread) {
 //		dprintf("thread_resched: cpu %d switching from thread %d to %d\n",

@@ -34,16 +34,15 @@ struct sem_entry {
 #define MAX_SEMS 4096
 
 static struct sem_entry *sems = NULL;
-static region_id sem_region = 0;
-static bool sems_active = false;
-
-static sem_id next_sem = 0;
+static region_id         sem_region = 0;
+static bool              sems_active = false;
+static sem_id            next_sem = 0;
 
 static int sem_spinlock = 0;
-#define GRAB_SEM_LIST_LOCK() acquire_spinlock(&sem_spinlock)
-#define RELEASE_SEM_LIST_LOCK() release_spinlock(&sem_spinlock)
-#define GRAB_SEM_LOCK(s) acquire_spinlock(&(s).lock)
-#define RELEASE_SEM_LOCK(s) release_spinlock(&(s).lock)
+#define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sem_spinlock)
+#define RELEASE_SEM_LIST_LOCK()  release_spinlock(&sem_spinlock)
+#define GRAB_SEM_LOCK(s)         acquire_spinlock(&(s).lock)
+#define RELEASE_SEM_LOCK(s)      release_spinlock(&(s).lock)
 
 // used in functions that may put a bunch of threads in the run q at once
 #define READY_THREAD_CACHE_SIZE 16
@@ -60,10 +59,9 @@ static int dump_sem_list(int argc, char **argv)
 {
 	int i;
 
-	for(i=0; i<MAX_SEMS; i++) {
-		if(sems[i].id >= 0) {
+	for (i=0; i<MAX_SEMS; i++) {
+		if (sems[i].id >= 0)
 			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &sems[i], sems[i].id, sems[i].name);
-		}
 	}
 	return 0;
 }
@@ -81,22 +79,23 @@ static int dump_sem_info(int argc, char **argv)
 {
 	int i;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("sem: not enough arguments\n");
 		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
-	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		unsigned long num = atoul(argv[1]);
 
-		if(num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
+		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
 			_dump_sem_info((struct sem_entry *)num);
 			return 0;
-		} else {
+		}
+		else {
 			unsigned slot = num % MAX_SEMS;
-			if(sems[slot].id != (int)num) {
+			if (sems[slot].id != (int)num) {
 				dprintf("sem 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
@@ -106,9 +105,9 @@ static int dump_sem_info(int argc, char **argv)
 	}
 
 	// walk through the sem list, trying to match name
-	for(i=0; i<MAX_SEMS; i++) {
+	for (i=0; i<MAX_SEMS; i++) {
 		if (sems[i].name != NULL)
-			if(strcmp(argv[1], sems[i].name) == 0) {
+			if (strcmp(argv[1], sems[i].name) == 0) {
 				_dump_sem_info(&sems[i]);
 				return 0;
 			}
@@ -124,12 +123,12 @@ int sem_init(kernel_args *ka)
 	// create and initialize semaphore table
 	sem_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "sem_table", (void **)&sems,
 		REGION_ADDR_ANY_ADDRESS, sizeof(struct sem_entry) * MAX_SEMS, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-	if(sem_region < 0) {
+	if (sem_region < 0) {
 		panic("unable to allocate semaphore table!\n");
 	}
 
 	memset(sems, 0, sizeof(struct sem_entry) * MAX_SEMS);
-	for(i=0; i<MAX_SEMS; i++)
+	for (i=0; i<MAX_SEMS; i++)
 		sems[i].id = -1;
 
 	// add debugger commands
@@ -150,20 +149,21 @@ sem_id create_sem_etc(int count, const char *name, proc_id owner)
 	sem_id retval = B_NO_MORE_SEMS;
 	char *temp_name;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
 
-	if(name) {
+	if (name) {
 		int name_len = strlen(name);
 
 		temp_name = (char *)kmalloc(min(name_len + 1, SYS_MAX_OS_NAME_LEN));
-		if(temp_name == NULL)
+		if (temp_name == NULL)
 			return ENOMEM;
 		strncpy(temp_name, name, SYS_MAX_OS_NAME_LEN-1);
 		temp_name[SYS_MAX_OS_NAME_LEN-1] = 0;
-	} else {
+	}
+	else {
 		temp_name = (char *)kmalloc(sizeof("default_sem_name")+1);
-		if(temp_name == NULL)
+		if (temp_name == NULL)
 			return ENOMEM;
 		strcpy(temp_name, "default_sem_name");
 	}
@@ -172,14 +172,13 @@ sem_id create_sem_etc(int count, const char *name, proc_id owner)
 	GRAB_SEM_LIST_LOCK();
 
 	// find the first empty spot
-	for(i=0; i<MAX_SEMS; i++) {
-		if(sems[i].id == -1) {
+	for (i=0; i<MAX_SEMS; i++) {
+		if (sems[i].id == -1) {
 			// make the sem id be a multiple of the slot it's in
-			if(i >= next_sem % MAX_SEMS) {
+			if (i >= next_sem % MAX_SEMS)
 				next_sem += i - next_sem % MAX_SEMS;
-			} else {
+			else
 				next_sem += MAX_SEMS - (next_sem % MAX_SEMS - i);
-			}
 			sems[i].id = next_sem++;
 
 			sems[i].lock = 0;
@@ -198,7 +197,6 @@ sem_id create_sem_etc(int count, const char *name, proc_id owner)
 		}
 	}
 
-//err:
 	RELEASE_SEM_LIST_LOCK();
 	kfree(temp_name);
 
@@ -228,9 +226,9 @@ int delete_sem_etc(sem_id id, int return_code)
 	char *old_name;
 	struct thread_queue release_queue;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_SEM_ID;
 
 	slot = id % MAX_SEMS;
@@ -238,7 +236,7 @@ int delete_sem_etc(sem_id id, int return_code)
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != id) {
+	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		int_restore_interrupts(state);
 		dprintf("delete_sem: invalid sem_id %d\n", id);
@@ -249,7 +247,7 @@ int delete_sem_etc(sem_id id, int return_code)
 	release_queue.head = release_queue.tail = NULL;
 
 	// free any threads waiting for this semaphore
-	while((t = thread_dequeue(&sems[slot].q)) != NULL) {
+	while ((t = thread_dequeue(&sems[slot].q)) != NULL) {
 		t->state = THREAD_STATE_READY;
 		t->sem_errcode = B_BAD_SEM_ID;
 		t->sem_deleted_retcode = return_code;
@@ -264,9 +262,9 @@ int delete_sem_etc(sem_id id, int return_code)
 
 	RELEASE_SEM_LOCK(sems[slot]);
 
-	if(released_threads > 0) {
+	if (released_threads > 0) {
 		GRAB_THREAD_LOCK();
-		while((t = thread_dequeue(&release_queue)) != NULL) {
+		while ((t = thread_dequeue(&release_queue)) != NULL) {
 			thread_enqueue_run_q(t);
 		}
 		thread_resched();
@@ -281,16 +279,16 @@ int delete_sem_etc(sem_id id, int return_code)
 }
 
 // Called from a timer handler. Wakes up a semaphore
-static int sem_timeout(void *data)
+static int sem_timeout(timer *data)
 {
-	struct sem_timeout_args *args = (struct sem_timeout_args *)data;
+	struct sem_timeout_args *args = (struct sem_timeout_args *)data->entry.prev;
 	struct thread *t;
 	int slot;
 	int state;
 	struct thread_queue wakeup_queue;
 
 	t = thread_get_thread_struct(args->blocked_thread);
-	if(t == NULL)
+	if (t == NULL)
 		return B_HANDLED_INTERRUPT;
 	slot = args->blocked_sem_id % MAX_SEMS;
 
@@ -299,7 +297,7 @@ static int sem_timeout(void *data)
 
 //	dprintf("sem_timeout: called on 0x%x sem %d, tid %d\n", to, to->sem_id, to->thread_id);
 
-	if(sems[slot].id != args->blocked_sem_id) {
+	if (sems[slot].id != args->blocked_sem_id) {
 		// this thread was not waiting on this semaphore
 		panic("sem_timeout: thid %d was trying to wait on sem %d which doesn't exist!\n",
 			args->blocked_thread, args->blocked_sem_id);
@@ -312,7 +310,7 @@ static int sem_timeout(void *data)
 
 	GRAB_THREAD_LOCK();
 	// put the threads in the run q here to make sure we dont deadlock in sem_interrupt_thread
-	while((t = thread_dequeue(&wakeup_queue)) != NULL) {
+	while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
 		thread_enqueue_run_q(t);
 	}
 	RELEASE_THREAD_LOCK();
@@ -334,41 +332,39 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 	int state;
 	int err = 0;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-
-	if(id < 0) {
+	if (id < 0) {
 		dprintf("acquire_sem_etc: invalid sem handle %d\n", id);
 		return B_BAD_SEM_ID;
 	}
-
-	if(count <= 0)
+	if (count <= 0)
 		return EINVAL;
 
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
-
-	if(sems[slot].id != id) {
+	
+	if (sems[slot].id != id) {
 		dprintf("acquire_sem_etc: bad sem_id %d\n", id);
 		err = B_BAD_SEM_ID;
 		goto err;
 	}
 
-	if(sems[slot].count - count < 0 && (flags & B_TIMEOUT) != 0 && timeout <= 0) {
+	if (sems[slot].count - count < 0 && (flags & B_TIMEOUT) != 0 && timeout <= 0) {
 		// immediate timeout
 		err = B_TIMED_OUT;
 		goto err;
 	}
 
-	if((sems[slot].count -= count) < 0) {
+	if ((sems[slot].count -= count) < 0) {
 		// we need to block
 		struct thread *t = thread_get_current_thread();
-		struct timer_event timer; // stick it on the stack, since we may be blocking here
+		timer timeout_timer; // stick it on the stack, since we may be blocking here
 		struct sem_timeout_args args;
 
 		// do a quick check to see if the thread has any pending kill signals
 		// this should catch most of the cases where the thread had a signal
-		if((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
+		if ((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
 			sems[slot].count += count;
 			err = EINTR;
 			goto err;
@@ -383,27 +379,26 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 		t->sem_errcode = B_NO_ERROR;
 		thread_enqueue(t, &sems[slot].q);
 
-		if((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
-			int the_timeout = timeout;
+		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
 //			dprintf("sem_acquire_etc: setting timeout sem for %d %d usecs, semid %d, tid %d\n",
 //				timeout, sem_id, t->id);
 			// set up an event to go off with the thread struct as the data
-			if (flags & B_ABSOLUTE_TIMEOUT)
-				the_timeout -= system_time();
-
 			args.blocked_sem_id = id;
 			args.blocked_thread = t->id;
 			args.sem_count = count;
 			
-			timer_setup_timer(&sem_timeout, &args, &timer);
-			timer_set_event(the_timeout, TIMER_MODE_ONESHOT, &timer);
+			// another evil hack: pass the args into timer->entry.prev
+			timeout_timer.entry.prev = (qent *)&args;
+			add_timer(&timeout_timer, &sem_timeout, timeout,
+				flags & B_RELATIVE_TIMEOUT ?
+					B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER);			
 		}
 
 		RELEASE_SEM_LOCK(sems[slot]);
 		GRAB_THREAD_LOCK();
 		// check again to see if a kill signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
-		if((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
+		if ((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
 			struct thread_queue wakeup_queue;
 			// ok, so a tiny race happened where a signal was delivered to this thread while
 			// it was setting up the sem. We can only be sure a signal wasn't delivered
@@ -411,11 +406,11 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 			// instances, but there was a race, so we have to handle it. It'll be more messy...
 			wakeup_queue.head = wakeup_queue.tail = NULL;
 			GRAB_SEM_LOCK(sems[slot]);
-			if(sems[slot].id == id) {
+			if (sems[slot].id == id) {
 				remove_thread_from_sem(t, &sems[slot], &wakeup_queue, EINTR);
 			}
 			RELEASE_SEM_LOCK(sems[slot]);
-			while((t = thread_dequeue(&wakeup_queue)) != NULL) {
+			while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
 				thread_enqueue_run_q(t);
 			}
 			// fall through and reschedule since another thread with a higher priority may have been woken up
@@ -423,11 +418,11 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 		thread_resched();
 		RELEASE_THREAD_LOCK();
 
-		if((flags & B_TIMEOUT) != 0) {
-			if(t->sem_errcode != B_TIMED_OUT) {
+		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
+			if (t->sem_errcode != B_TIMED_OUT) {
 				// cancel the timer event, the sem may have been deleted or interrupted
 				// with the timer still active
-				timer_cancel_event(&timer);
+				cancel_timer(&timeout_timer);
 			}
 		}
 
@@ -457,19 +452,17 @@ int release_sem_etc(sem_id id, int count, int flags)
 	int err = 0;
 	struct thread_queue release_queue;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_SEM_ID;
-
-	if(count <= 0)
+	if (count <= 0)
 		return EINVAL;
 
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != id) {
+	if (sems[slot].id != id) {
 		dprintf("sem_release_etc: invalid sem_id %d\n", id);
 		err = B_BAD_SEM_ID;
 		goto err;
@@ -481,14 +474,14 @@ int release_sem_etc(sem_id id, int count, int flags)
 	// order in sem_interrupt_thread.
 	release_queue.head = release_queue.tail = NULL;
 
-	while(count > 0) {
+	while (count > 0) {
 		int delta = count;
-		if(sems[slot].count < 0) {
+		if (sems[slot].count < 0) {
 			struct thread *t = thread_lookat_queue(&sems[slot].q);
 
 			delta = min(count, t->sem_count);
 			t->sem_count -= delta;
-			if(t->sem_count <= 0) {
+			if (t->sem_count <= 0) {
 				// release this thread
 				t = thread_dequeue(&sems[slot].q);
 				thread_enqueue(t, &release_queue);
@@ -505,13 +498,13 @@ int release_sem_etc(sem_id id, int count, int flags)
 	RELEASE_SEM_LOCK(sems[slot]);
 
 	// pull off any items in the release queue and put them in the run queue
-	if(released_threads > 0) {
+	if (released_threads > 0) {
 		struct thread *t;
 		GRAB_THREAD_LOCK();
-		while((t = thread_dequeue(&release_queue)) != NULL) {
+		while ((t = thread_dequeue(&release_queue)) != NULL) {
 			thread_enqueue_run_q(t);
 		}
-		if((flags & B_DO_NOT_RESCHEDULE) == 0) {
+		if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
 			thread_resched();
 		}
 		RELEASE_THREAD_LOCK();
@@ -530,11 +523,10 @@ int get_sem_count(sem_id id, int32* thread_count)
 {
 	int slot;
 	int state;
-//	int count;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_SEM_ID;
 	if (thread_count == NULL)
 		return EINVAL;
@@ -544,7 +536,7 @@ int get_sem_count(sem_id id, int32* thread_count)
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != id) {
+	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		int_restore_interrupts(state);
 		dprintf("sem_get_count: invalid sem_id %d\n", id);
@@ -564,9 +556,9 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	int state;
 	int slot;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_SEM_ID;
 	if (info == NULL)
 		return EINVAL;
@@ -576,7 +568,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != id) {
+	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		int_restore_interrupts(state);
 		dprintf("get_sem_info: invalid sem_id %d\n", id);
@@ -600,9 +592,8 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	int state;
 	int slot;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-
 	if (cookie == NULL)
 		return EINVAL;
 	/* prevents sems[].owner == -1 >= means owned by a port */
@@ -612,7 +603,8 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	if (*cookie == NULL) {
 		// return first found
 		slot = 0;
-	} else {
+	}
+	else {
 		// start at index cookie, but check cookie against MAX_PORTS
 		slot = *cookie;
 		if (slot >= MAX_SEMS)
@@ -654,11 +646,11 @@ int set_sem_owner(sem_id id, proc_id proc)
 	int state;
 	int slot;
 
-	if(sems_active == false)
+	if (sems_active == false)
 		return B_NO_MORE_SEMS;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (proc < NULL)
+	if (proc < 0)
 		return EINVAL;
 
 	// XXX: todo check if proc exists
@@ -670,7 +662,7 @@ int set_sem_owner(sem_id id, proc_id proc)
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != id) {
+	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		int_restore_interrupts(state);
 		dprintf("set_sem_owner: invalid sem_id %d\n", id);
@@ -694,26 +686,26 @@ int sem_interrupt_thread(struct thread *t)
 
 //	dprintf("sem_interrupt_thread: called on thread %p (%d), blocked on sem 0x%x\n", t, t->id, t->sem_blocking);
 
-	if(t->state != THREAD_STATE_WAITING || t->sem_blocking < 0)
+	if (t->state != THREAD_STATE_WAITING || t->sem_blocking < 0)
 		return EINVAL;
-	if((t->sem_flags & B_CAN_INTERRUPT) == 0)
+	if ((t->sem_flags & B_CAN_INTERRUPT) == 0)
 		return ERR_SEM_NOT_INTERRUPTABLE;
 
 	slot = t->sem_blocking % MAX_SEMS;
 
 	GRAB_SEM_LOCK(sems[slot]);
 
-	if(sems[slot].id != t->sem_blocking) {
+	if (sems[slot].id != t->sem_blocking) {
 		panic("sem_interrupt_thread: thread 0x%x sez it's blocking on sem 0x%x, but that sem doesn't exist!\n", t->id, t->sem_blocking);
 	}
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
-	if(remove_thread_from_sem(t, &sems[slot], &wakeup_queue, EINTR) == ERR_NOT_FOUND)
+	if (remove_thread_from_sem(t, &sems[slot], &wakeup_queue, EINTR) == ERR_NOT_FOUND)
 		panic("sem_interrupt_thread: thread 0x%x not found in sem 0x%x's wait queue\n", t->id, t->sem_blocking);
 
 	RELEASE_SEM_LOCK(sems[slot]);
 
-	while((t = thread_dequeue(&wakeup_queue)) != NULL) {
+	while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
 		thread_enqueue_run_q(t);
 	}
 
@@ -737,7 +729,7 @@ static int remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struc
 	thread_enqueue(t, queue);
 
 	// now see if more threads need to be woken up
-	while(sem->count > 0 && (t1 = thread_lookat_queue(&sem->q))) {
+	while (sem->count > 0 && (t1 = thread_lookat_queue(&sem->q))) {
 		int delta = min(t->sem_count, sem->count);
 
 		t->sem_count -= delta;
@@ -765,7 +757,7 @@ int sem_delete_owned_sems(proc_id owner)
 	state = int_disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
 
-	for(i=0; i<MAX_SEMS; i++) {
+	for (i=0; i<MAX_SEMS; i++) {
 		if(sems[i].id != -1 && sems[i].owner == owner) {
 			sem_id id = sems[i].id;
 
@@ -788,20 +780,21 @@ int sem_delete_owned_sems(proc_id owner)
 
 sem_id user_create_sem(int count, const char *uname)
 {
-	if(uname != NULL) {
+	if (uname != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
 		int rc;
 
-		if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+		if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
 			return ERR_VM_BAD_USER_MEMORY;
 
 		rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-		if(rc < 0)
+		if (rc < 0)
 			return rc;
 		name[SYS_MAX_OS_NAME_LEN-1] = 0;
 
 		return create_sem_etc(count, name, proc_get_current_proc_id());
-	} else {
+	}
+	else {
 		return create_sem_etc(count, NULL, proc_get_current_proc_id());
 	}
 }
@@ -844,7 +837,7 @@ int user_get_sem_count(sem_id uid, int32* uthread_count)
 	int rc, rc2;
 	rc  = get_sem_count(uid, &thread_count);
 	rc2 = user_memcpy(uthread_count, &thread_count, sizeof(int32));
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 	return rc;
 }
@@ -854,12 +847,12 @@ int user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
 	struct sem_info info;
 	int rc, rc2;
 
-	if((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
+	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = _get_sem_info(uid, &info, sz);
 	rc2 = user_memcpy(uinfo, &info, sz);
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 	return rc;
 }
@@ -870,18 +863,18 @@ int user_get_next_sem_info(proc_id uproc, uint32 *ucookie, struct sem_info *uinf
 	uint32 cookie;
 	int rc, rc2;
 
-	if((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
+	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	rc2 = user_memcpy(&cookie, ucookie, sizeof(uint32));
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 	rc = _get_next_sem_info(uproc, &cookie, &info, sz);
 	rc2 = user_memcpy(uinfo, &info, sz);
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 	rc2 = user_memcpy(ucookie, &cookie, sizeof(uint32));
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 	return rc;
 }
