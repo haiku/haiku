@@ -2898,9 +2898,12 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	vnode_id root_id;
 	int err = 0;
 
-	FUNCTION(("vfs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
+	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
 
-	if (device[0] == '\0' || fsName[0] == '\0')
+	// The path is always safe, we just have to make sure that fsName is
+	// almost valid - we can't make any assumptions about device and args,
+	// though.
+	if (fsName == NULL || fsName[0] == '\0')
 		return B_BAD_VALUE;
 
 	mutex_lock(&gMountOpMutex);
