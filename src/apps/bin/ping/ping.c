@@ -152,7 +152,7 @@ int bufspace = DEFAULT_BUFSPACE;
 
 void fill (char *, char *);
 void catcher(), prtsig(), finish(), summary(int);
-int in_cksum (u_short *, int);
+int compute_in_cksum (u_short *, int);
 void pinger();
 char *pr_addr (in_addr_t);
 int check_icmph (struct ip *);
@@ -591,7 +591,7 @@ void pinger()
 	cc = datalen + 8;			/* skips ICMP portion */
 
 	/* compute ICMP checksum here */
-	icp->icmp_cksum = in_cksum((u_short *)icp, cc);
+	icp->icmp_cksum = compute_in_cksum((u_short *)icp, cc);
 
 	if (options & F_HDRINCL) {
 		struct ip *ip = (struct ip*)outpackhdr;
@@ -599,7 +599,7 @@ void pinger()
 		packet = (char*)ip;
 		cc += sizeof(struct ip);
 		ip->ip_len = htons(cc);
-		ip->ip_sum = in_cksum((u_short *)outpackhdr, cc);
+		ip->ip_sum = compute_in_cksum((u_short *)outpackhdr, cc);
 	}
 
 	i = sendto(s, (char *)packet, cc, 0, &whereto,
@@ -832,11 +832,11 @@ void pr_pack(char *buf, int cc, struct sockaddr_in *from)
 }
 
 /*
- * in_cksum --
+ * compute_in_cksum --
  *	Checksum routine for Internet Protocol family headers (C Version)
  */
 int
-in_cksum(addr, len)
+compute_in_cksum(addr, len)
 	u_short *addr;
 	int len;
 {
