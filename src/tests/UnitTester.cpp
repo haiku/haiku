@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 	return shell.Run(argc, argv);
 }
 
-const std::string UnitTesterShell::defaultLibDir = "./lib";
+//const std::string UnitTesterShell::defaultLibDir = "./lib";
 
 UnitTesterShell::UnitTesterShell(const std::string &description, SyncObject *syncObject)
 	: BTestShell(description, syncObject)
@@ -71,6 +71,7 @@ UnitTesterShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
 void
 UnitTesterShell::LoadDynamicSuites() {
 	// Add the appropriate test lib path 
+	string defaultLibDir = string(GlobalTestDir()) + "/lib";
 	fLibDirs.insert(defaultLibDir + (doR5Tests ? "_r5" : ""));
 
 	// Load away

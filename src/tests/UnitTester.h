@@ -8,7 +8,7 @@ class UnitTesterShell : public BTestShell {
 public:
 	UnitTesterShell(const std::string &description = "", SyncObject *syncObject = 0);
 protected:
-	static const std::string defaultLibDir;
+//	static const std::string defaultLibDir;
 	bool doR5Tests;
 	virtual void PrintDescription(int argc, char *argv[]);
 	virtual void PrintValidArguments();
