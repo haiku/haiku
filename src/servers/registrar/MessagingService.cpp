@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <map>
 #include <new>
 
 #include <string.h>
@@ -11,6 +12,9 @@
 
 #include "Debug.h"
 #include "MessagingService.h"
+
+// sService -- the singleton instance
+MessagingService *MessagingService::sService = NULL;
 
 // constructor
 MessagingArea::MessagingArea()
@@ -27,10 +31,10 @@ MessagingArea::~MessagingArea()
 // Create
 status_t
 MessagingArea::Create(area_id kernelAreaID, sem_id lockSem, sem_id counterSem,
-	MessagingArea *&area)
+	MessagingArea *&_area)
 {
 	// allocate the object on the heap
-	area = new(nothrow) MessagingArea;
+	MessagingArea *area = new(nothrow) MessagingArea;
 	if (!area)
 		return B_NO_MEMORY;
 
@@ -49,6 +53,7 @@ MessagingArea::Create(area_id kernelAreaID, sem_id lockSem, sem_id counterSem,
 	area->fCounterSem = counterSem;
 	area->fNextArea = NULL;
 
+	_area = area;
 	return B_OK;
 }
 
@@ -144,11 +149,17 @@ MessagingArea::NextArea() const
 
 // #pragma mark -
 
+// CommandHandlerMap
+struct MessagingService::CommandHandlerMap
+	: map<uint32, MessagingCommandHandler*> {
+};
+
 // constructor
 MessagingService::MessagingService()
 	: fLockSem(-1),
 	  fCounterSem(-1),
 	  fFirstArea(NULL),
+	  fCommandHandlers(NULL),
 	  fCommandProcessor(-1),
 	  fTerminating(false)
 {
@@ -169,6 +180,8 @@ MessagingService::~MessagingService()
 		wait_for_thread(fCommandProcessor, &result);
 	}
 
+	delete fCommandHandlers;
+
 	delete fFirstArea;
 }
 
@@ -184,6 +197,11 @@ MessagingService::Init()
 	fCounterSem = create_sem(0, "messaging counter");
 	if (fCounterSem < 0)
 		return fCounterSem;
+
+	// create the command handler map
+	fCommandHandlers = new(nothrow) CommandHandlerMap;
+	if (!fCommandHandlers)
+		return B_NO_MEMORY;
 
 	// spawn the command processor
 	fCommandProcessor = spawn_thread(MessagingService::_CommandProcessorEntry,
@@ -204,7 +222,73 @@ MessagingService::Init()
 		return error;
 	}
 
+	// resume the command processor
+	resume_thread(fCommandProcessor);
+
 	return B_OK;
+}
+
+// CreateDefault
+status_t
+MessagingService::CreateDefault()
+{
+	if (sService)
+		return B_OK;
+
+	// create the service
+	MessagingService *service = new(nothrow) MessagingService;
+	if (!service)
+		return B_NO_MEMORY;
+
+	// init it
+	status_t error = service->Init();
+	if (error != B_OK) {
+		delete service;
+		return error;
+	}
+
+	sService = service;
+	return B_OK;
+}
+
+// DeleteDefault
+void
+MessagingService::DeleteDefault()
+{
+	if (sService) {
+		delete sService;
+		sService = NULL;
+	}
+}
+
+// Default
+MessagingService *
+MessagingService::Default()
+{
+	return sService;
+}
+
+// SetCommandHandler
+void
+MessagingService::SetCommandHandler(uint32 command,
+	MessagingCommandHandler *handler)
+{
+	if (handler) {
+		(*fCommandHandlers)[command] = handler;
+	} else {
+		// no handler: remove and existing entry
+		CommandHandlerMap::iterator it = fCommandHandlers->find(command);
+		if (it != fCommandHandlers->end())
+			fCommandHandlers->erase(it);
+	}
+}
+
+// _GetCommandHandler
+MessagingCommandHandler *
+MessagingService::_GetCommandHandler(uint32 command) const
+{
+	CommandHandlerMap::iterator it = fCommandHandlers->find(command);
+	return (it != fCommandHandlers->end() ? it->second : NULL);
 }
 
 // _CommandProcessorEntry
@@ -218,11 +302,15 @@ MessagingService::_CommandProcessorEntry(void *data)
 int32
 MessagingService::_CommandProcessor()
 {
+	bool commandWaiting = false;
 	while (!fTerminating) {
 		// wait for the next command
-		status_t error = acquire_sem(fCounterSem);
-		if (error != B_OK)
-			continue;
+		if (!commandWaiting) {
+			status_t error = acquire_sem(fCounterSem);
+			if (error != B_OK)
+				continue;
+		} else
+			commandWaiting = false;
 
 		// get it from the first area
 		MessagingArea *area = fFirstArea;
@@ -238,7 +326,12 @@ MessagingService::_CommandProcessor()
 			}
 
 			// dispatch the command
-			// TODO: ...
+			MessagingCommandHandler *handler
+				= _GetCommandHandler(command->command);
+			if (handler) {
+				handler->HandleMessagingCommand(command->command, command->data,
+					command->size - sizeof(messaging_command));
+			}
 		}
 
 		// there is a new area we don't know yet
@@ -249,6 +342,7 @@ MessagingService::_CommandProcessor()
 				fLockSem, fCounterSem, nextArea);
 			if (error == B_OK) {
 				area->SetNextArea(nextArea);
+				commandWaiting = true;
 			} else {
 				// Bad, but what can we do?
 				ERROR(("MessagingService::_CommandProcessor(): Failed to clone "

@@ -8,6 +8,16 @@
 
 #include <MessagingServiceDefs.h>
 
+// MessagingCommandHandler
+class MessagingCommandHandler {
+public:
+	MessagingCommandHandler();
+	virtual ~MessagingCommandHandler();
+
+	virtual void HandleMessagingCommand(uint32 command, const void *data,
+		int32 dataSize) = 0;
+};
+
 // MessagingArea
 class MessagingArea {
 public:
@@ -44,21 +54,35 @@ private:
 
 // MessagingService
 class MessagingService {
-public:
+private:
 	MessagingService();
 	~MessagingService();
 
 	status_t Init();
 
+public:
+	static status_t CreateDefault();
+	static void DeleteDefault();
+	static MessagingService *Default();
+
+	void SetCommandHandler(uint32 command, MessagingCommandHandler *handler);
+
 private:
+	MessagingCommandHandler *_GetCommandHandler(uint32 command) const;
+
 	static int32 _CommandProcessorEntry(void *data);
 	int32 _CommandProcessor();
 
-	sem_id			fLockSem;
-	sem_id			fCounterSem;
-	MessagingArea	*fFirstArea;
-	thread_id		fCommandProcessor;
-	volatile bool	fTerminating;
+	struct CommandHandlerMap;
+
+	static MessagingService	*sService;
+
+	sem_id					fLockSem;
+	sem_id					fCounterSem;
+	MessagingArea			*fFirstArea;
+	CommandHandlerMap		*fCommandHandlers;
+	thread_id				fCommandProcessor;
+	volatile bool			fTerminating;
 };
 
 #endif	// MESSAGING_SERVICE_H
