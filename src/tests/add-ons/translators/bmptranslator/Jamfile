@@ -3,7 +3,7 @@ SubDir OBOS_TOP src tests add-ons translators bmptranslator ;
 CommonTestLib libtranslatorstest.so
 	: BMPTranslatorTestAddOn.cpp
 		BMPTranslatorTest.cpp
-	: translation be stdc++.r4
+	: libtranslation.so be stdc++.r4
 	: translation be stdc++.r4
 	:
 	: translation
