@@ -16,6 +16,8 @@
 #include <KernelExport.h>
 #include <TLS.h>
 
+#include <string.h>
+
 //----------------------------------------------------------------------
 // Long-winded overview of the debug output macros:
 //----------------------------------------------------------------------
