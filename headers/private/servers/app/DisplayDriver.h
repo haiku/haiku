@@ -163,6 +163,7 @@ public:
 	void CopyBits(const BRect &src, const BRect &dest);
 	void CopyRegion(BRegion *src, const BPoint &lefttop);
 	void DrawBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+	void DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 		// one more:
 	void CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg);
 
