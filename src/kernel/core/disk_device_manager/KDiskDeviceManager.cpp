@@ -12,6 +12,7 @@
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
+#include "KFileDiskDevice.h"
 #include "KFileSystem.h"
 #include "KPartition.h"
 #include "KPartitioningSystem.h"
@@ -58,6 +59,7 @@ DBG(OUT("file system: %s\n", moduleName));
 		}
 		close_module_list(list);
 	}
+DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
 }
 
@@ -174,6 +176,21 @@ KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
 	return NULL;
 }
 
+// FindFileDevice
+KFileDiskDevice *
+KDiskDeviceManager::FindFileDevice(const char *filePath, bool noShadow)
+{
+// TODO: Handle shadows correctly!
+	for (int32 i = 0; KDiskDevice *device = fDevices.ItemAt(i); i++) {
+		KFileDiskDevice *fileDevice = dynamic_cast<KFileDiskDevice*>(device);
+		if (fileDevice && fileDevice->FilePath()
+			&& !strcmp(filePath, fileDevice->FilePath())) {
+			return fileDevice;
+		}
+	}
+	return NULL;
+}
+
 // RegisterDevice
 KDiskDevice *
 KDiskDeviceManager::RegisterDevice(const char *path, bool noShadow)
@@ -246,6 +263,64 @@ KDiskDeviceManager::RegisterPartition(partition_id id, bool noShadow)
 		}
 	}
 	return NULL;
+}
+
+// RegisterFileDevice
+KFileDiskDevice *
+KDiskDeviceManager::RegisterFileDevice(const char *filePath, bool noShadow)
+{
+	if (ManagerLocker locker = this) {
+		if (KFileDiskDevice *device = FindFileDevice(filePath, noShadow)) {
+			device->Register();
+			return device;
+		}
+	}
+	return NULL;
+}
+
+// CreateFileDevice
+status_t
+KDiskDeviceManager::CreateFileDevice(const char *filePath, int32 *deviceID)
+{
+	if (!filePath)
+		return B_BAD_VALUE;
+	status_t error = B_ERROR;
+	KFileDiskDevice *device = NULL;
+	if (ManagerLocker locker = this) {
+		// check, if the device does already exist
+		if (FindFileDevice(filePath))
+			return B_FILE_EXISTS;
+		// allocate a KFileDiskDevice
+		device = new(nothrow) KFileDiskDevice;
+		if (!device)
+			return B_NO_MEMORY;
+		// initialize and add the device
+		error = device->SetTo(filePath);
+		if (error == B_OK && !fDevices.AddItem(device))
+			error = B_NO_MEMORY;
+		// set result / cleanup und failure
+		if (error != B_OK) {
+			delete device;
+			return error;
+		}
+		if (deviceID)
+			*deviceID = device->ID();
+		device->Register();
+	}
+	// scan device
+	if (error == B_OK && device) {
+		_ScanDevice(device);
+		device->Unregister();
+	}
+	return error;
+}
+
+// DeleteFileDevice
+status_t
+KDiskDeviceManager::DeleteFileDevice(const char *filePath)
+{
+	// not implemented
+	return B_ERROR;
 }
 
 // CountDevices
@@ -411,17 +486,7 @@ KDiskDeviceManager::InitialDeviceScan()
 	if (error == B_OK) {
 		int32 cookie = 0;
 		while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
-			if (device->WriteLock()) {
-				// scan the device
-				if (device->HasMedia()) {
-					error = _ScanPartition(device);
-					if (error != B_OK) {
-						// ...
-						error = B_OK;
-					}
-				}
-				device->WriteUnlock();
-			}
+			error = _ScanDevice(device);
 			device->Unregister();
 		}
 	}
@@ -444,16 +509,12 @@ KDiskDeviceManager::_AddPartitioningSystem(const char *name)
 status_t
 KDiskDeviceManager::_AddFileSystem(const char *name)
 {
-// TODO: Uncomment when KFileSystem is implemented.
-/*
 	if (!name)
 		return B_BAD_VALUE;
 	KDiskSystem *diskSystem = new(nothrow) KFileSystem(name);
 	if (!diskSystem)
 		return B_NO_MEMORY;
 	return _AddDiskSystem(diskSystem);
-*/
-return B_ERROR;
 }
 
 // _AddDiskSystem
@@ -538,6 +599,26 @@ DBG(OUT("  found device: %s\n", path));
 		if (error != B_OK)
 			delete device;
 	}
+	return error;
+}
+
+// _ScanDevice
+status_t
+KDiskDeviceManager::_ScanDevice(KDiskDevice *device)
+{
+	status_t error = B_OK;
+	if (device->WriteLock()) {
+		// scan the device
+		if (device->HasMedia()) {
+			error = _ScanPartition(device);
+			if (error != B_OK) {
+				// ...
+				error = B_OK;
+			}
+		}
+		device->WriteUnlock();
+	} else
+		error = B_ERROR;
 	return error;
 }
 

@@ -14,6 +14,7 @@ class KDiskDevice;
 class KDiskDeviceJob;
 class KDiskDeviceJobQueue;
 class KDiskSystem;
+class KFileDiskDevice;
 class KPartition;
 
 class KDiskDeviceManager {
@@ -41,12 +42,19 @@ public:
 	KDiskDevice *FindDevice(partition_id id, bool noShadow = true);
 	KPartition *FindPartition(const char *path, bool noShadow = true);
 	KPartition *FindPartition(partition_id id, bool noShadow = true);
+	KFileDiskDevice *FindFileDevice(const char *filePath,
+									bool noShadow = true);
 
 	KDiskDevice *RegisterDevice(const char *path, bool noShadow = true);
 	KDiskDevice *RegisterDevice(partition_id id, bool noShadow = true);
 	KDiskDevice *RegisterNextDevice(int32 *cookie);
 	KPartition *RegisterPartition(const char *path, bool noShadow = true);
 	KPartition *RegisterPartition(partition_id id, bool noShadow = true);
+	KFileDiskDevice *RegisterFileDevice(const char *filePath,
+										bool noShadow = true);
+
+	status_t CreateFileDevice(const char *filePath, int32 *device = 0);
+	status_t DeleteFileDevice(const char *filePath);
 
 	// manager must be locked
 	int32 CountDevices();
@@ -94,6 +102,7 @@ private:
 	bool _RemoveDevice(KDiskDevice *device);
 
 	status_t _Scan(const char *path);
+	status_t _ScanDevice(KDiskDevice *device);
 	status_t _ScanPartition(KPartition *partition);
 
 	BLocker						fLock;
