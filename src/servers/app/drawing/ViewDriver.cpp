@@ -72,7 +72,7 @@ VDWIN_SETCURSOR,
 extern RGBColor workspace_default_color;
 
 bool is_initialized = false;
-BPoint		offset(100,50);
+BPoint		offset(50,50);
 
 VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
