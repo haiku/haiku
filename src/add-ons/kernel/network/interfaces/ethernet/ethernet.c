@@ -907,7 +907,8 @@ struct kernel_net_module_info device_info = {
 	},
 
 	ether_init,
-	ether_stop
+	ether_stop,
+	NULL
 };
 
 // #pragma mark -
