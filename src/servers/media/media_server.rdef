@@ -24,7 +24,7 @@ resource app_signature "application/x-vnd.OpenBeOS-media-server";
    0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
    */
 
-resource app_flags 0x00000002;
+resource app_flags B_EXCLUSIVE_LAUNCH;
 
 resource app_version {
 
