@@ -7,9 +7,21 @@ SimpleTest RegistrarTest1
 	: <boot!home!config!lib>libopenbeos.so be
 ;
 
-SimpleTest RosterShell
-	: RosterShell.cpp
-	: <boot!home!config!lib>libopenbeos.so
-	  be stdc++.r4
-;
+# RosterShell isn't really a unit test, but using CommonUnitTest we can
+# easily build a R5 version as well, which is quite useful. We'll have to
+# change it back, when we start dealing with (OBOS) roster internals (if
+# ever).
 
+#SimpleTest RosterShell
+#	: RosterShell.cpp
+#	: <boot!home!config!lib>libopenbeos.so
+#	  be stdc++.r4
+#;
+
+CommonUnitTest RosterShell
+	: RosterShell.cpp
+	: servers registrar
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app
+;
