@@ -47,7 +47,7 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
-class PortLink;
+class BPortLink;
 
 class InputDeviceListItem
 {
@@ -174,7 +174,7 @@ private:
 	
 	// added this to communicate via portlink
 	
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	
 	//fMouseState;
 };

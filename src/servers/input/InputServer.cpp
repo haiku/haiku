@@ -34,7 +34,7 @@
 
 #include <stdio.h>
 
-#include "InputServer.h"
+#include <InputServer.h>
 #include <Path.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -1069,13 +1069,13 @@ int InputServer::DispatchEvent(BMessage *message)
     printf("[DispatchEvent] x = %lu:\n",xValue);
 	
 	port_id pid = find_port(SERVER_INPUT_PORT);
-   	PortLink *appsvrlink = new PortLink(pid);
+   	BPortLink *appsvrlink = new BPortLink(pid);
    	switch(message->what){
    		case B_MOUSE_MOVED:{
     		// get point and button from msg
     		if((message->FindInt32(X_VALUE,&xValue) == B_OK) && (message->FindInt32(Y_VALUE,&yValue) == B_OK)){
     			int64 time=(int64)real_time_clock();
-    			appsvrlink->SetOpCode(B_MOUSE_MOVED);
+    			appsvrlink->StartMessage(B_MOUSE_MOVED);
     			appsvrlink->Attach(&time,sizeof(int64));
     			appsvrlink->Attach((float)xValue);
     			appsvrlink->Attach((float)yValue);
@@ -1098,7 +1098,7 @@ int InputServer::DispatchEvent(BMessage *message)
 					message->FindInt32("clicks",&clicks)!=B_OK)
 				break;
 		
-			appsvrlink->SetOpCode(B_MOUSE_DOWN);
+			appsvrlink->StartMessage(B_MOUSE_DOWN);
 			appsvrlink->Attach(&time, sizeof(int64));
 			appsvrlink->Attach(&pt.x,sizeof(float));
 			appsvrlink->Attach(&pt.y,sizeof(float));
@@ -1117,7 +1117,7 @@ int InputServer::DispatchEvent(BMessage *message)
 					message->FindInt32("modifiers",&mod)!=B_OK)
 				break;
 			
-			appsvrlink->SetOpCode(B_MOUSE_UP);
+			appsvrlink->StartMessage(B_MOUSE_UP);
 			appsvrlink->Attach(&time, sizeof(int64));
 			appsvrlink->Attach(&pt.x,sizeof(float));
 			appsvrlink->Attach(&pt.y,sizeof(float));
@@ -1131,7 +1131,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindFloat("be:wheel_delta_y",&y);
 			int64 time=real_time_clock();
 			
-			appsvrlink->SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			appsvrlink->StartMessage(B_MOUSE_WHEEL_CHANGED);
 			appsvrlink->Attach(&time,sizeof(int64));
 			appsvrlink->Attach(x);
 			appsvrlink->Attach(y);
@@ -1156,7 +1156,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->SetOpCode(B_KEY_DOWN);
+			appsvrlink->StartMessage(B_KEY_DOWN);
 			appsvrlink->Attach(&systime,sizeof(bigtime_t));
 			appsvrlink->Attach(scancode);
 			appsvrlink->Attach(asciicode);
@@ -1186,7 +1186,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->SetOpCode(B_KEY_UP);
+			appsvrlink->StartMessage(B_KEY_UP);
 			appsvrlink->Attach(&systime,sizeof(bigtime_t));
 			appsvrlink->Attach(scancode);
 			appsvrlink->Attach(asciicode);
@@ -1208,7 +1208,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->SetOpCode(B_UNMAPPED_KEY_DOWN);
+			appsvrlink->StartMessage(B_UNMAPPED_KEY_DOWN);
 			appsvrlink->Attach(&systime,sizeof(bigtime_t));
 			appsvrlink->Attach(scancode);
 			appsvrlink->Attach(modifiers);
@@ -1226,7 +1226,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->SetOpCode(B_UNMAPPED_KEY_UP);
+			appsvrlink->StartMessage(B_UNMAPPED_KEY_UP);
 			appsvrlink->Attach(&systime,sizeof(bigtime_t));
 			appsvrlink->Attach(scancode);
 			appsvrlink->Attach(modifiers);
@@ -1245,7 +1245,7 @@ int InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("be:old_modifiers",&oldmodifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->SetOpCode(B_MODIFIERS_CHANGED);
+			appsvrlink->StartMessage(B_MODIFIERS_CHANGED);
 			appsvrlink->Attach(&systime,sizeof(bigtime_t));
 			appsvrlink->Attach(scancode);
 			appsvrlink->Attach(modifiers);

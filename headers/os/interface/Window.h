@@ -51,7 +51,7 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-class PortLink;
+class BPortLink;
 
 // Globals ---------------------------------------------------------------------
 
@@ -122,7 +122,6 @@ enum {
 
 //----------------------------------------------------------------
 
-class BSession;
 class BButton;
 class BMenuBar;
 class BMenuItem;
@@ -444,7 +443,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		BView			*top_view;					// used
 		BView			*fFocus;					// used
 		BView			*fLastMouseMovedView;		// used
-		BSession		*session;				// used
+		void			*a_session;					// unused	//changed from _BSession_
 		BMenuBar		*fKeyMenuBar;				// used
 		BButton			*fDefaultButton;			// used
 		BList			accelList;					// used
@@ -468,7 +467,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		ViewAttr		*fCurDrawViewState;
 		window_feel		fFeel;						// used
 		int32			fLastViewToken;
-		PortLink		*fServerLink;				// changed from: _CEventPort_* 	fEventPort;
+		BPortLink		*fLink;						// used		// changed from: _CEventPort_* 	fEventPort;
 		BMessageRunner	*fPulseRunner;				// used
 		BRect			fCurrentFrame;
 
