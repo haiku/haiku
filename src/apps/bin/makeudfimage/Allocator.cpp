@@ -205,8 +205,8 @@ uint32
 Allocator::BlocksFor(uint32 bytes)
 {
 	if (BlockSize() == 0) {
-//		DEBUG_INIT_ETC("Allocator", ("bytes: %ld\n", bytes));
-//		PRINT(("WARNING: Allocator::BlockSize() == 0!\n")); 
+		DEBUG_INIT_ETC("Allocator", ("bytes: %ld\n", bytes));
+		PRINT(("WARNING: Allocator::BlockSize() == 0!\n")); 
 		return 0;
 	} else {
 		uint32 blocks = bytes / BlockSize();

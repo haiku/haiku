@@ -35,6 +35,7 @@ public:
 	                         Udf::extent_address &extent);
 	                         
 	uint32 Length() const { return fLength; }
+	uint32 Tail() const { return fLength; }	//!< Returns the first unallocated block in the tail
 	uint32 BlockSize() const { return fBlockSize; }
 	uint32 BlockShift() const { return fBlockShift; }
 	
