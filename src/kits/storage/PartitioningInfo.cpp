@@ -5,7 +5,8 @@
 
 #include <new>
 
-#include <ddm_userland_interface.h>
+#include <syscalls.h>
+
 #include <PartitioningInfo.h>
 
 using namespace std;

@@ -14,13 +14,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <syscalls.h>
+
 #include <DiskDevice.h>
 #include <DiskDeviceVisitor.h>
 #include <Drivers.h>
 #include <Message.h>
 #include <Path.h>
 
-#include "ddm_userland_interface.h"
 
 /*!	\class BDiskDevice
 	\brief A BDiskDevice object represents a storage device.

@@ -3,7 +3,8 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <ddm_userland_interface.h>
+#include <syscalls.h>
+
 #include <DiskSystem.h>
 #include <Partition.h>
 

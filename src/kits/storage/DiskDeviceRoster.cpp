@@ -5,6 +5,8 @@
 
 #include <new>
 
+#include <syscalls.h>
+
 #include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDeviceJob.h>
@@ -18,7 +20,6 @@
 #include <Path.h>
 
 //#include "AddOnImage.h"
-#include "ddm_userland_interface.h"
 
 /*!	\class BDiskDeviceRoster
 	\brief An interface for iterating through the disk devices known to the
