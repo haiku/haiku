@@ -931,6 +931,10 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 }
 
 
+/**	Returns the vnode for the relative path starting at the specified \a vnode.
+ *	\a path must not be NULL.
+ */
+
 static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	int count, struct vnode **_vnode, int *_type)
@@ -940,7 +944,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 
-	if (!path)
+	if (path == NULL)
 		return B_BAD_VALUE;
 
 	while (true) {
@@ -1132,29 +1136,30 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 
 
 /**	\brief Retrieves the directory vnode and the leaf name of an entry referred
-		   to by a FD + path pair.
+ *		   to by a FD + path pair.
+ *
+ *	\a path must be given in either case. \a fd might be omitted, in which
+ *	case \a path is either an absolute path or one relative to the current
+ *	directory. If both a supplied and \a path is relative it is reckoned off
+ *	of the directory referred to by \a fd. If \a path is absolute \a fd is
+ *	ignored.
+ *
+ *	The caller has the responsibility to call put_vnode() on the returned
+ *	directory vnode.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. Must not be \c NULL. The buffer
+ *	       is modified by this function. It must have at least room for a
+ *	       string one character longer than the path it contains.
+ *	\param _vnode A pointer to a variable the directory vnode shall be written
+ *		   into.
+ *	\param filename A buffer of size B_FILE_NAME_LENGTH or larger into which
+ *		   the leaf name of the specified entry will be written.
+ *	\param kernel \c true, if invoked from inside the kernel, \c false if
+ *		   invoked from userland.
+ *	\return \c B_OK, if everything went fine, another error code otherwise.
+ */
 
-	\a path must be given in either case. \a fd might be omitted, in which
-	case \a path is either an absolute path or one relative to the current
-	directory. If both a supplied and \a path is relative it is reckoned off
-	of the directory referred to by \a fd. If \a path is absolute \a fd is
-	ignored.
-
-	The caller has the responsibility to call put_vnode() on the returned
-	directory vnode.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL. The buffer
-	       is modified by this function. It must have at least room for a
-	       string one character longer than the path it contains.
-	\param _vnode A pointer to a variable the directory vnode shall be written
-		   into.
-	\param filename A buffer of size B_FILE_NAME_LENGTH or larger into which
-		   the leaf name of the specified entry will be written.
-	\param kernel \c true, if invoked from inside the kernel, \c false if
-		   invoked from userland.
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
 static status_t
 fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
 	char *filename, bool kernel)
@@ -1466,6 +1471,13 @@ get_vnode_from_fd(int fd, bool kernel)
 }
 
 
+/**	Gets the vnode from an FD + path combination. If \a fd is lower than zero,
+ *	only the path will be considered. In this case, the \a path must not be
+ *	NULL.
+ *	If \a fd is a valid file descriptor, \a path may be NULL for directories,
+ *	and should be NULL for files.
+ */
+
 static status_t
 fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_vnode, bool kernel)
 {
@@ -1474,7 +1486,7 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_
 
 	status_t status;
 	struct vnode *vnode = NULL;
-	if (fd < 0 || path[0] == '/') {
+	if (fd < 0 || (path != NULL && path[0] == '/')) {
 		// no FD or absolute path
 		status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
 	} else {
@@ -1482,8 +1494,12 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_
 		vnode = get_vnode_from_fd(fd, kernel);
 		if (!vnode)
 			return B_FILE_ERROR;
-		status = vnode_path_to_vnode(vnode, path, traverseLeafLink, 0, &vnode,
-			NULL);
+
+		if (path != NULL) {
+			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
+				&vnode, NULL);
+		} else
+			status = B_OK;
 	}
 
 	if (status == B_OK)
@@ -3303,7 +3319,7 @@ common_path_write_stat(int fd, char *path, bool traverseLeafLink,
 }
 
 
-static status_t
+static int
 attr_dir_open(int fd, char *path, bool kernel)
 {
 	struct vnode *vnode;
@@ -3328,7 +3344,7 @@ attr_dir_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
-	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
+	FUNCTION(("attr_dir_close(descriptor = %p)\n", descriptor));
 
 	if (FS_CALL(vnode, close_attr_dir))
 		return FS_CALL(vnode, close_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
@@ -3354,6 +3370,8 @@ attr_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t 
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
+	FUNCTION(("attr_dir_read(descriptor = %p)\n", descriptor));
+
 	if (FS_CALL(vnode, read_attr_dir))
 		return FS_CALL(vnode, read_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, bufferSize, _count);
 
@@ -3365,6 +3383,8 @@ static status_t
 attr_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
+
+	FUNCTION(("attr_dir_rewind(descriptor = %p)\n", descriptor));
 
 	if (FS_CALL(vnode, rewind_attr_dir))
 		return FS_CALL(vnode, rewind_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
@@ -3434,6 +3454,7 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	if (status < B_OK)
 		goto err;
 
+	// now we only need a file descriptor for this attribute and we're done
 	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
@@ -3549,6 +3570,7 @@ attr_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("attr_read_stat: stat 0x%p\n", stat));
+
 	if (!FS_CALL(vnode, read_attr_stat))
 		return EOPNOTSUPP;
 
@@ -4919,10 +4941,10 @@ _kern_open_attr_dir(int fd, const char *path)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 
-	if (fd == -1)
+	if (path != NULL)
 		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
 
-	return attr_dir_open(fd, pathBuffer, true);
+	return attr_dir_open(fd, path ? pathBuffer : NULL, true);
 }
 
 
@@ -5747,13 +5769,13 @@ _user_open_attr_dir(int fd, const char *userPath)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 
-	if (fd == -1) {
+	if (userPath != NULL) {
 		if (!IS_USER_ADDRESS(userPath)
 			|| user_strlcpy(pathBuffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
 			return B_BAD_ADDRESS;
 	}
 
-	return attr_dir_open(fd, pathBuffer, false);
+	return attr_dir_open(fd, userPath ? pathBuffer : NULL, false);
 }
 
 
