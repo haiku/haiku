@@ -52,8 +52,14 @@
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
+
 status_t shutdown(bool reboot);
+status_t _user_shutdown(bool reboot);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_KERNEL_H */
