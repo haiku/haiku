@@ -28,13 +28,9 @@
 #	define TRACE(x)
 #endif
 
-typedef enum {
-	STREAM_TYPE_DIR = S_IFDIR,
-	STREAM_TYPE_SYMLINK = S_IFLNK,
-} stream_type;
 
 struct rootfs_stream {
-	stream_type type;
+	mode_t type;
 	struct stream_dir {
 		struct rootfs_vnode *dir_head;
 		struct rootfs_cookie *jar_head;
@@ -47,8 +43,12 @@ struct rootfs_stream {
 
 struct rootfs_vnode {
 	struct rootfs_vnode *all_next;
-	vnode_id id;
-	char *name;
+	vnode_id	id;
+	char		*name;
+	time_t		modification_time;
+	time_t		creation_time;
+	uid_t		uid;
+	gid_t		gid;
 	struct rootfs_vnode *parent;
 	struct rootfs_vnode *dir_next;
 	struct rootfs_stream stream;
@@ -109,7 +109,7 @@ rootfs_vnode_compare_func(void *_v, const void *_key)
 
 
 static struct rootfs_vnode *
-rootfs_create_vnode(struct rootfs *fs, const char *name, int type)
+rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent, const char *name, int type)
 {
 	struct rootfs_vnode *vnode;
 
@@ -127,6 +127,10 @@ rootfs_create_vnode(struct rootfs *fs, const char *name, int type)
 
 	vnode->id = fs->next_vnode_id++;
 	vnode->stream.type = type;
+	vnode->creation_time = vnode->modification_time = time(NULL);
+	vnode->uid = geteuid();
+	vnode->gid = parent ? parent->gid : getegid();
+		// inherit group from parent if possible
 
 	return vnode;
 }
@@ -215,7 +219,9 @@ rootfs_insert_in_dir(struct rootfs_vnode *dir, struct rootfs_vnode *v)
 {
 	v->dir_next = dir->stream.dir.dir_head;
 	dir->stream.dir.dir_head = v;
-	return 0;
+
+	dir->modification_time = time(NULL);
+	return B_OK;
 }
 
 
@@ -235,10 +241,12 @@ rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
 			else
 				dir->stream.dir.dir_head = v->dir_next;
 			v->dir_next = NULL;
-			return 0;
+
+			dir->modification_time = time(NULL);
+			return B_OK;
 		}
 	}
-	return -1;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -260,9 +268,9 @@ rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, boo
 	vnode = rootfs_find_in_dir(dir, name);
 	if (!vnode)
 		status = B_ENTRY_NOT_FOUND;
-	else if (isDirectory && vnode->stream.type != STREAM_TYPE_DIR)
+	else if (isDirectory && !S_ISDIR(vnode->stream.type))
 		status = B_NOT_A_DIRECTORY;
-	else if (!isDirectory && vnode->stream.type == STREAM_TYPE_DIR)
+	else if (!isDirectory && S_ISDIR(vnode->stream.type))
 		status = B_IS_A_DIRECTORY;
 	else if (isDirectory && !rootfs_is_dir_empty(vnode))
 		status = B_DIRECTORY_NOT_EMPTY;
@@ -314,7 +322,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 	}
 
 	// create the root vnode
-	vnode = rootfs_create_vnode(fs, ".", STREAM_TYPE_DIR);
+	vnode = rootfs_create_vnode(fs, NULL, ".", S_IFDIR | 0777);
 	if (vnode == NULL) {
 		err = B_NO_MEMORY;
 		goto err3;
@@ -385,7 +393,7 @@ rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 	status_t status;
 
 	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
-	if (dir->stream.type != STREAM_TYPE_DIR)
+	if (!S_ISDIR(dir->stream.type))
 		return B_NOT_A_DIRECTORY;
 
 	mutex_lock(&fs->lock);
@@ -556,7 +564,7 @@ rootfs_write(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *
 
 
 static status_t
-rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vnode_id *_newID)
+rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnode_id *_newID)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
@@ -575,7 +583,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	}
 
 	TRACE(("rootfs_create: creating new vnode\n"));
-	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_DIR);
+	vnode = rootfs_create_vnode(fs, dir, name, S_IFDIR | (mode & S_IUMSK));
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
@@ -621,7 +629,7 @@ rootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 
 	TRACE(("rootfs_open: vnode %p\n", vnode));
 
-	if (vnode->stream.type != STREAM_TYPE_DIR)
+	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
 
 	cookie = malloc(sizeof(struct rootfs_cookie));
@@ -764,7 +772,7 @@ rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 {
 	struct rootfs_vnode *link = _link;
 	
-	if (link->stream.type != STREAM_TYPE_SYMLINK)
+	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
 	if (bufferSize < link->stream.symlink.length)
@@ -794,7 +802,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	}
 
 	TRACE(("rootfs_create: creating new symlink\n"));
-	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_SYMLINK);
+	vnode = rootfs_create_vnode(fs, dir, name, S_IFLNK | (mode & S_IUMSK));
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
@@ -914,28 +922,55 @@ rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *vnode = _v;
 
-	TRACE(("rootfs_rstat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
+	TRACE(("rootfs_read_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
 
 	// stream exists, but we know to return size 0, since we can only hold directories
 	stat->st_dev = fs->id;
 	stat->st_ino = vnode->id;
 	stat->st_size = 0;
-	stat->st_mode = vnode->stream.type | DEFFILEMODE;
+	stat->st_mode = vnode->stream.type;
+
+	stat->st_nlink = 1;
+	stat->st_blksize = 65536;
+
+	stat->st_uid = vnode->uid;
+	stat->st_gid = vnode->gid;
+
+	stat->st_atime = time(NULL);
+	stat->st_mtime = stat->st_ctime = vnode->creation_time;
+	stat->st_crtime = vnode->creation_time;
 
 	return 0;
 }
 
 
 static status_t
-rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, uint32 statMask)
+rootfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32 statMask)
 {
-#ifdef TRACE_ROOTFS
-	struct rootfs_vnode *v = _v;
+	struct rootfs *fs = _fs;
+	struct rootfs_vnode *vnode = _vnode;
 
-	TRACE(("rootfs_wstat: vnode %p (0x%Lx), stat %p\n", v, v->id, stat));
-#endif
-	// cannot change anything
-	return EINVAL;
+	TRACE(("rootfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
+
+	// we cannot change the size of anything
+	if (statMask & FS_WRITE_STAT_SIZE)
+		return B_BAD_VALUE;
+
+	if (statMask & FS_WRITE_STAT_MODE)
+		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
+
+	if (statMask & FS_WRITE_STAT_UID)
+		vnode->uid = stat->st_uid;
+	if (statMask & FS_WRITE_STAT_GID)
+		vnode->gid = stat->st_gid;
+
+	if (statMask & FS_WRITE_STAT_MTIME)
+		vnode->modification_time = stat->st_mtime;
+	if (statMask & FS_WRITE_STAT_CRTIME) 
+		vnode->creation_time = stat->st_crtime;
+
+	notify_listener(B_STAT_CHANGED, fs->id, 0, 0, vnode->id, NULL);
+	return B_OK;
 }
 
 
