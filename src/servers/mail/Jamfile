@@ -4,7 +4,7 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-AddResources E-mail : <$(SOURCE_GRIST)>mail_daemon.rsrc ;
+AddResources mail_daemon : <$(SOURCE_GRIST)>mail_daemon.rsrc ;
 
 Server mail_daemon :
 	deskbarview.cpp
