@@ -55,30 +55,7 @@ TerminalWindow::~TerminalWindow()
 status_t
 TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 {
-	BFile settingsFile;
-	if (settingsRef != 0) {
-		status_t status = settingsFile.SetTo(settingsRef,B_READ_ONLY);
-		if (status != B_OK) {
-			return status;
-		}
-	} else {
-		char settingsDirectory[B_PATH_NAME_LENGTH];
-		status_t status = find_directory(B_USER_SETTINGS_DIRECTORY,0,true,
-		                                 settingsDirectory,B_PATH_NAME_LENGTH);
-		if (status != B_OK) {
-			return status;
-		}
-		BPath settingsFilePath(settingsDirectory,"Terminal");
-		status = settingsFilePath.InitCheck();
-		if (status != B_OK) {
-			return status;
-		}
-		status = settingsFile.SetTo(settingsFilePath.Path(),B_READ_ONLY);
-		if (status != B_OK) {
-			return status;
-		}
-	}
-	// TODO : actually read the settings file	
+	status_t ignore = RestoreSettings(settingsRef);
 	
 	BString unTitled;
 	unTitled.SetTo("Terminal ");
@@ -228,6 +205,37 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fLogToFilePanel = 0;
 	fWriteSelectionPanel = 0;
 	fSaveAsSettingsFilePanel = 0;
+}
+
+status_t
+TerminalWindow::RestoreSettings(entry_ref * settingsRef)
+{
+	status_t result = B_OK;
+	BFile settingsFile;
+	if (settingsRef != 0) {
+		result = settingsFile.SetTo(settingsRef,B_READ_ONLY);
+		if (result != B_OK) {
+			return result;
+		}
+	} else {
+		char settingsDirectory[B_PATH_NAME_LENGTH];
+		result = find_directory(B_USER_SETTINGS_DIRECTORY,0,true,
+		                        settingsDirectory,B_PATH_NAME_LENGTH);
+		if (result != B_OK) {
+			return result;
+		}
+		BPath settingsFilePath(settingsDirectory,"Terminal");
+		result = settingsFilePath.InitCheck();
+		if (result != B_OK) {
+			return result;
+		}
+		result = settingsFile.SetTo(settingsFilePath.Path(),B_READ_ONLY);
+		if (result != B_OK) {
+			return result;
+		}
+	}
+	// TODO : actually read the settings file	
+	return B_OK;
 }
 
 void

@@ -27,6 +27,7 @@ public:
 	
 private: 
 	status_t		InitWindow(int32 id, entry_ref * settingsRef = 0);
+	status_t		RestoreSettings(entry_ref * settingsRef = 0);
 
 	// Menu variables
 	BMenuBar		*fMenuBar;
