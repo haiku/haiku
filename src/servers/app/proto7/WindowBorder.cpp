@@ -351,10 +351,6 @@ void WindowBorder::MoveToBack(void)
 #ifdef DEBUG_WINBORDER
 printf("WindowBorder(): MoveToBack\n");
 #endif
-	Layer *temp=NULL;
-	if(uppersibling)
-		temp=uppersibling;
-
 	// Move the window to the back (the top of the tree)
 	Layer *top=GetRootLayer();
 	ASSERT(top!=NULL);
@@ -366,7 +362,7 @@ printf("WindowBorder(): MoveToBack\n");
 	decor->SetFocus(false);
 	decor->Draw();
 
-	if(temp)
+	if(uppersibling)
 		ActivateWindow(uppersibling->serverwin);
 	layerlock->Unlock();
 	parent->RebuildRegions(true);
@@ -399,7 +395,8 @@ printf("MoveToFront: \n");
 	// Tweak this layer
 	parent=top;
 	uppersibling=templayer;
-	uppersibling->lowersibling=this;
+	if(uppersibling)
+		uppersibling->lowersibling=this;
 	lowersibling=NULL;
 
 	layerlock->Unlock();
