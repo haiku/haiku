@@ -5,6 +5,9 @@
 #ifndef KQUEUE_H
 #define KQUEUE_H
 
+/* The name "que" actually means that it is a very
+ * light-weight implementation of a queue ;-))
+ */
 
 /* The object that is put into a queue must begin with these
  * fields, but it doesn't have to be this structure.
@@ -15,13 +18,24 @@ struct quehead {
 };
 
 
-/** Inserts an element (a) to the queue (b) */
+/** Initializes a queue to be used */
 
 static inline void
-insque(void *a, void *b)
+initque(void *_head)
 {
-	struct quehead *element = (struct quehead *)a,
-		 *head = (struct quehead *)b;
+	struct quehead *head = (struct quehead *)_head;
+
+	head->next = head->prev = head;
+}
+
+
+/** Inserts an element (_element) to the queue (_head) */
+
+static inline void
+insque(void *_element, void *_head)
+{
+	struct quehead *element = (struct quehead *)_element,
+		 *head = (struct quehead *)_head;
 
 	element->next = head->next;
 	element->prev = head;
@@ -33,9 +47,9 @@ insque(void *a, void *b)
 /** removes an element from the queue it's currently in */
 
 static inline void
-remque(void *a)
+remque(void *_element)
 {
-	struct quehead *element = (struct quehead *)a;
+	struct quehead *element = (struct quehead *)_element;
 
 	element->next->prev = element->prev;
 	element->prev->next = element->next;
