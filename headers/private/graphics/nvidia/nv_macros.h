@@ -572,6 +572,8 @@
 #define NVCRTCX_INTERLACE	0x39
 #define NVCRTCX_EXTRA		0x41
 #define NVCRTCX_OWNER		0x44
+#define NVCRTCX_FP_HTIMING	0x53
+#define NVCRTCX_FP_VTIMING	0x54
 
 /* Nvidia ATTRIBUTE indexed registers */
 /* VGA standard registers: */
