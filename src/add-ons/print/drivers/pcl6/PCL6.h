@@ -30,19 +30,24 @@ protected:
 
 private:
 	HP_UByte mediaSize(JobData::Paper paper);
+	HP_UByte mediaSource(JobData::PaperSource source);
 	void move(int x, int y);
 	void jobStart();
-	void startRasterGraphics(int x, int y, int width, int height);
+	void writeBitmap(const uchar* buffer, int outSize, int rowSize, int x, int y, int width, int height, int deltaRowSize);
+	void startRasterGraphics(int x, int y, int width, int height, int compressionMethod);
 	void endRasterGraphics();
 	void rasterGraphics(
-		int compression_method,
 		const uchar *buffer,
-		int size);
+		int bufferSize,
+		int dataSize,
+		int rowSize,
+		int height,
+		int compression_method);
 	void jobEnd();
 
-	HP_StreamHandleType fStream;
-	int fCompressionMethod;
-	Halftone *fHalftone;
+	HP_StreamHandleType  fStream;
+	Halftone            *fHalftone;
+	HP_UByte             fMediaSide; // side if in duplex mode
 };
 
 #endif	/* __PCL6_H */

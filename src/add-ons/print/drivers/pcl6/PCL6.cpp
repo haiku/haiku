@@ -17,12 +17,45 @@
 #include "Halftone.h"
 #include "ValidRect.h"
 #include "DbgMsg.h"
+#include "DeltaRowCompression.h"
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
 #else 
 #define std
 #endif
+
+// Compression method configuration
+// Set to 0 to disable compression and to 1 to enable compression
+// Note compression takes place only if it takes less space than uncompressed data!
+
+// Run-Length-Encoding Compression
+// DO NOT ENABLE HP_M2TIFF_Compress seems to be broken!!!
+#define ENABLE_RLE_COMPRESSION       0 
+
+// Delta Row Compression
+#define ENABLE_DELTA_ROW_COMPRESSION 1
+
+// DeltaRowStreamCompressor writes the delta row directly to the 
+// in the contructor specified stream.
+class DeltaRowStreamCompressor : public AbstractDeltaRowCompressor
+{
+public:
+	DeltaRowStreamCompressor(int rowSize, uchar initialSeed, HP_StreamHandleType stream)
+		: AbstractDeltaRowCompressor(rowSize, initialSeed)
+		, fStream(stream)
+	{
+		// nothing to do
+	}
+	
+protected:
+	void AppendByteToDeltaRow(uchar byte) {
+		HP_RawUByte(fStream, byte);
+	}
+	
+private:
+	HP_StreamHandleType fStream;	
+};
 
 PCL6Driver::PCL6Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
@@ -138,8 +171,6 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 						+ rc.top * delta
 						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
-			int compression_method;
-			int compressed_size;
 			const uchar *buffer;
 
 			uchar *out_buffer = new uchar[out_size]; 
@@ -150,13 +181,18 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 			DBGMSG(("move\n"));
 
-			move(x, y);
-			startRasterGraphics(x, y, width, height);
-
-			compression_method = 0; // uncompressed
 			buffer = out_buffer;
-			compressed_size = out_size;
 
+			int xPage = x;
+			int yPage = y;
+			
+			DeltaRowCompressor deltaRowCompressor(out_row_length, 0);
+			if (deltaRowCompressor.InitCheck() != B_OK) {
+				return false;
+			}
+			
+			int deltaRowSize = 0;
+			
 			// dither entire band into out_buffer
 			for (int i = rc.top; i <= rc.bottom; i++) {
 				uchar* out = out_ptr;
@@ -180,17 +216,17 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 					*out = 0;
 				}
 
+				{
+					int size = deltaRowCompressor.CalculateSize(out_ptr, true);
+					deltaRowSize += size + 2; // two bytes for the row byte count
+				}
+
 				ptr  += delta;
 				out_ptr += out_row_length;
 				y++;
 			}
 
-			rasterGraphics(
-				compression_method,
-				buffer,
-				compressed_size);
-
-			endRasterGraphics();
+			writeBitmap(buffer, out_size, out_row_length, xPage, yPage, width, height, deltaRowSize);
 
 		} else {
 			DBGMSG(("band bitmap is clean.\n"));
@@ -213,6 +249,50 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 	} 
 }
 
+void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x, int y, int width, int height, int deltaRowSize)
+{
+	// choose the best compression method
+	int compressionMethod = HP_eNoCompression;
+	int dataSize = outSize;
+
+#if ENABLE_DELTA_ROW_COMPRESSION
+	if (deltaRowSize < dataSize) {
+		compressionMethod = HP_eDeltaRowCompression;
+		dataSize = deltaRowSize;
+	}
+#endif
+
+#if ENABLE_RLE_COMPRESSION
+	HP_UInt32 compressedSize = 0;
+	HP_M2TIFF_CalcCompression((HP_pCharHuge)buffer, outSize, &compressedSize);
+	if (compressedSize < (uint32)dataSize) {
+		compressionMethod = HP_eRLECompression;
+		dataSize = compressedSize;
+	}
+#endif
+	
+	// write bitmap
+	move(x, y);
+	
+	startRasterGraphics(x, y, width, height, compressionMethod);
+
+	rasterGraphics(buffer, outSize, dataSize, rowSize, height, compressionMethod);
+
+	endRasterGraphics();
+	
+#if 1
+	fprintf(stderr, "Out Size       %d %2.2f\n", (int)outSize, 100.0);
+#if ENABLE_RLE_COMPRESSION
+	fprintf(stderr, "RLE Size       %d %2.2f\n", (int)compressedSize, 100.0 * compressedSize / outSize);
+#endif
+#if ENABLE_DELTA_ROW_COMPRESSION
+	fprintf(stderr, "Delta Row Size %d %2.2f\n", (int)deltaRowSize, 100.0 * deltaRowSize / outSize);
+#endif
+	fprintf(stderr, "Data Size      %d %2.2f\n", (int)dataSize, 100.0 * dataSize / outSize);
+#endif
+}
+
+
 void PCL6Driver::jobStart()
 {
 	// PJL header
@@ -225,7 +305,8 @@ void PCL6Driver::jobStart()
 	// PCL6 begin
 	fStream = HP_NewStream(16 * 1024, this);
 	HP_BeginSession_2(fStream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch, HP_eBackChAndErrPage);
-	HP_OpenDataSource_1(fStream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);	
+	HP_OpenDataSource_1(fStream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);
+	fMediaSide = HP_eFrontMediaSide;
 }
 
 bool PCL6Driver::startPage(int)
@@ -234,7 +315,22 @@ bool PCL6Driver::startPage(int)
 	if (getJobData()->getOrientation() == JobData::kLandscape) {
 		orientation = HP_eLandscapeOrientation;
 	}
-	HP_BeginPage_3(fStream, orientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
+	
+	HP_UByte mediaSize = PCL6Driver::mediaSize(getJobData()->getPaper());
+	if (getJobData()->getPrintStyle() == JobData::kSimplex) {
+		HP_BeginPage_3(fStream, orientation, mediaSize, PCL6Driver::mediaSource(getJobData()->getPaperSource()));
+	} else if (getJobData()->getPrintStyle() == JobData::kDuplex) {
+		HP_BeginPage_5(fStream, orientation, mediaSize, HP_DuplexPageMode, fMediaSide);
+
+		if (fMediaSide == HP_eFrontMediaSide) {
+			fMediaSide = HP_eBackMediaSide;
+		} else {
+			fMediaSide = HP_eFrontMediaSide;
+		}
+	} else {
+		return false;
+	}
+	
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
@@ -247,12 +343,11 @@ bool PCL6Driver::startPage(int)
 	return true;
 }
 
-void PCL6Driver::startRasterGraphics(int x, int y, int width, int height)
+void PCL6Driver::startRasterGraphics(int x, int y, int width, int height, int compressionMethod)
 {
 	bool color = getJobData()->getColor() == JobData::kColor;
-	fCompressionMethod = -1;
 	HP_BeginImage_1(fStream, HP_eDirectPixel, color ? HP_e8Bit : HP_e1Bit, width, height, width, height);
-	HP_ReadImage_1(fStream, 0, height, HP_eNoCompression);
+	HP_ReadImage_1(fStream, 0, height, compressionMethod);
 }
 
 void PCL6Driver::endRasterGraphics()
@@ -261,15 +356,46 @@ void PCL6Driver::endRasterGraphics()
 }
 
 void PCL6Driver::rasterGraphics(
-	int compression_method,
 	const uchar *buffer,
-	int size)
+	int bufferSize,
+	int dataSize,
+	int rowSize,
+	int height,
+	int compressionMethod
+)
 {
-	if (fCompressionMethod != compression_method) {
-		fCompressionMethod = compression_method;
+	// write bitmap byte size
+	HP_EmbeddedDataPrefix32(fStream, dataSize);
+	
+	// write data
+	if (compressionMethod == HP_eRLECompression) {
+		// use RLE compression
+		HP_UInt32 compressedSize = 0;
+		HP_M2TIFF_Compress(fStream, 0, (HP_pCharHuge)buffer, bufferSize, &compressedSize);
+	} else if (compressionMethod == HP_eDeltaRowCompression) {
+		// use delta row compression
+		DeltaRowStreamCompressor compressor(rowSize, 0, fStream);
+		if (compressor.InitCheck() != B_OK) {
+			return;
+		}
+		
+		const uchar* row = buffer;
+		for (int i = 0; i < height; i ++) {
+			// write row byte count
+			int size = compressor.CalculateSize(row);
+			HP_RawUInt16(fStream, size);
+			
+			if (size > 0) {
+				// write delta row
+				compressor.Compress(row);
+			}
+			
+			row += rowSize;
+		}
+	} else {
+		// write raw data
+		HP_RawUByteArray(fStream, (uchar*)buffer, bufferSize);
 	}
-	HP_EmbeddedDataPrefix32(fStream, size);
-	HP_RawUByteArray(fStream, (uchar*)buffer, size);
 }
 
 bool PCL6Driver::endPage(int)
@@ -301,12 +427,12 @@ void PCL6Driver::move(int x, int y)
 HP_UByte PCL6Driver::mediaSize(JobData::Paper paper)
 {
 	switch (paper) {
-		case JobData::kLetter: return HP_eLetterPaper;
-		case JobData::kLegal: return HP_eLegalPaper;
-		case JobData::kA4: return HP_eA4Paper;
+		case JobData::kLetter:    return HP_eLetterPaper;
+		case JobData::kLegal:     return HP_eLegalPaper;
+		case JobData::kA4:        return HP_eA4Paper;
 		case JobData::kExecutive: return HP_eExecPaper;
-		case JobData::kLedger: return HP_eLedgerPaper;
-		case JobData::kA3: return HP_eA3Paper;
+		case JobData::kLedger:    return HP_eLedgerPaper;
+		case JobData::kA3:        return HP_eA3Paper;
 /*
 		case : return HP_eCOM10Envelope;
 		case : return HP_eMonarchEnvelope;
@@ -327,6 +453,23 @@ HP_UByte PCL6Driver::mediaSize(JobData::Paper paper)
 */
 		default:
 			return HP_eLegalPaper;
+	}
+}
+
+HP_UByte PCL6Driver::mediaSource(JobData::PaperSource source)
+{
+	switch (source) {
+		case JobData::kAuto:       return HP_eAutoSelect;
+		case JobData::kCassette1:  return HP_eDefaultSource;
+		case JobData::kCassette2:  return HP_eEnvelopeTray;
+		case JobData::kLower:      return HP_eLowerCassette;
+		case JobData::kUpper:      return HP_eUpperCassette;
+		case JobData::kMiddle:     return HP_eThirdCassette;
+		case JobData::kManual:     return HP_eManualFeed;
+		case JobData::kCassette3:  return HP_eMultiPurposeTray;
+		
+		default:
+			return HP_eAutoSelect;
 	}
 }
 

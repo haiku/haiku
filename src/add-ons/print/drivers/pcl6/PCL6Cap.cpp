@@ -65,10 +65,20 @@ const PaperCap legal(
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4980.0f), TO72DPI(8280.0f)));
 
 const PaperSourceCap autobin("Auto",  true,  JobData::kAuto);
+const PaperSourceCap defaultSource("Default",  false,  JobData::kCassette1);
+const PaperSourceCap envelopeTray("Envelope Tray",  false,  JobData::kCassette2);
+const PaperSourceCap lowerCassette("Lower Cassette",  false,  JobData::kLower);
+const PaperSourceCap upperCassette("Upper Cassette",  false,  JobData::kUpper);
+const PaperSourceCap thridCassette("Thrid Cassette",  false,  JobData::kMiddle);
+const PaperSourceCap manualFeed("Manual Feed",  false,  JobData::kManual);
+const PaperSourceCap multiPurposeTray("Multi Purpose Tray",  false,  JobData::kCassette3);
 
 const ResolutionCap dpi300("300dpi",   true, 300,  300);
 const ResolutionCap dpi600("600dpi",  false, 600,  600);
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
+
+const PrintStyleCap simplex("Simplex", true, JobData::kSimplex);
+const PrintStyleCap duplex("Duplex", false, JobData::kDuplex);
 
 const PaperCap *papers[] = {
 	&a4,
@@ -82,12 +92,24 @@ const PaperCap *papers[] = {
 
 const PaperSourceCap *papersources[] = {
 	&autobin,
+	&defaultSource,
+	&envelopeTray,
+	&lowerCassette,
+	&upperCassette,
+	&thridCassette,
+	&manualFeed,
+	&multiPurposeTray
 };
 
 const ResolutionCap *resolutions[] = {
 	&dpi300,
 	&dpi600,
 	&dpi1200,
+};
+
+const PrintStyleCap *printStyles[] = {
+	&simplex,
+	&duplex
 };
 
 const ColorCap color("Color", false, JobData::kColor);
@@ -114,6 +136,8 @@ int PCL6Cap::countCap(CapID capid) const
 		return sizeof(resolutions) / sizeof(resolutions[0]);
 	case kColor:
 		return sizeof(colors) / sizeof(colors[0]);
+	case kPrintStyle:
+		return sizeof(printStyles) / sizeof(printStyles[0]);
 	default:
 		return 0;
 	}
@@ -130,6 +154,8 @@ const BaseCap **PCL6Cap::enumCap(CapID capid) const
 		return (const BaseCap **)resolutions;
 	case kColor:
 		return (const BaseCap **)colors;
+	case kPrintStyle:
+		return (const BaseCap **)printStyles;
 	default:
 		return NULL;
 	}
@@ -143,6 +169,7 @@ bool PCL6Cap::isSupport(CapID capid) const
 	case kResolution:
 	case kColor:
 	case kCopyCommand:
+	case kPrintStyle:
 		return true;
 	default:
 		return false;
