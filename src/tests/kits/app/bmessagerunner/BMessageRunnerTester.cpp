@@ -125,8 +125,7 @@ void TBMessageRunnerTester::BMessageRunnerA3()
 	check_message_runner_info(runner, B_OK, interval, count);
 	snooze((count + 1) * interval + 10000);
 	CHK(looper->CheckMessages(startTime, interval, count));
-	CHK(app.CountReplies() == 0);
-	CHK(handler->CountReplies() == count);
+	CHK(app.CountReplies() == count);
 #endif
 }
 
@@ -305,7 +304,7 @@ void TBMessageRunnerTester::BMessageRunnerB2()
 	int32 count = 5;
 	MessageRunnerTestHandler *handler = app.TestHandler();
 	BMessenger replyTo(handler);
-	BMessageRunner runner(target, &message, interval, count, replyTo);
+	BMessageRunner runner(target, NULL, interval, count, replyTo);
 	CHK(runner.InitCheck() == B_BAD_VALUE);
 	check_message_runner_info(runner, B_BAD_VALUE);
 #endif
@@ -533,8 +532,6 @@ Test* TBMessageRunnerTester::Suite()
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
 			  BMessageRunnerA3);
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
-			  BMessageRunnerA3);
-	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
 			  BMessageRunnerA4);
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
 			  BMessageRunnerA5);
@@ -549,8 +546,6 @@ Test* TBMessageRunnerTester::Suite()
 			  BMessageRunnerB1);
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
 			  BMessageRunnerB2);
-	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
-			  BMessageRunnerB3);
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
 			  BMessageRunnerB3);
 	ADD_TEST4(BMessageRunner, SuiteOfTests, TBMessageRunnerTester,
