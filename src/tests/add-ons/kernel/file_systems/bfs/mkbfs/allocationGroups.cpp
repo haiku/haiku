@@ -49,7 +49,7 @@ main(int argc, char **argv)
 	// files
 
 	while (true) {
-		num_ags = bitmapBlocks / blocks_per_ag;
+		num_ags = (bitmapBlocks + blocks_per_ag - 1) / blocks_per_ag;
 		if (num_ags > kDesiredAllocationGroups) {
 			if (ag_shift == 16)
 				break;
