@@ -7,6 +7,7 @@
 #include <TranslatorFormats.h>
 #include <TranslationDefs.h>
 #include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
 #include <DataIO.h>
 #include <ByteOrder.h>
 
