@@ -9,6 +9,7 @@
 #include "cpp.h"
 #include "Inode.h"
 #include "BPlusTree.h"
+#include "Stream.h"
 #include "Index.h"
 
 #include <string.h>
@@ -69,7 +70,8 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **i
 }
 
 
-void InodeAllocator::Keep()
+void
+InodeAllocator::Keep()
 {
 	fTransaction = NULL;
 	fInode = NULL;
@@ -850,375 +852,45 @@ Inode::IsEmpty()
  *	If successful, "offset" will then be set to the file offset
  *	of the block_run returned; so "pos - offset" is for the block_run
  *	what "pos" is for the whole stream.
+ *	The caller has to make sure that "pos" is inside the stream.
  */
 
-status_t
-Inode::FindBlockRun(off_t pos,block_run &run,off_t &offset)
+status_t 
+Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 {
-	data_stream *data = &Node()->data;
-
-	// Inode::ReadAt() does already does this
-	//if (pos > data->size)
-	//	return B_ENTRY_NOT_FOUND;
-
-	// find matching block run
-
-	if (data->max_direct_range > 0 && pos >= data->max_direct_range) {
-		if (data->max_double_indirect_range > 0 && pos >= data->max_indirect_range) {
-			// access to double indirect blocks
-
-			CachedBlock cached(fVolume);
-
-			off_t start = pos - data->max_indirect_range;
-			int32 indirectSize = (16 << fVolume->BlockShift()) * (fVolume->BlockSize() / sizeof(block_run));
-			int32 directSize = 4 << fVolume->BlockShift();
-			int32 index = start / indirectSize;
-			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
-
-			block_run *indirect = (block_run *)cached.SetTo(
-					fVolume->ToBlock(data->double_indirect) + index / runsPerBlock);
-			if (indirect == NULL)
-				RETURN_ERROR(B_ERROR);
-
-			//printf("\tstart = %Ld, indirectSize = %ld, directSize = %ld, index = %ld\n",start,indirectSize,directSize,index);
-			//printf("\tlook for indirect block at %ld,%d\n",indirect[index].allocation_group,indirect[index].start);
-
-			int32 current = (start % indirectSize) / directSize;
-
-			indirect = (block_run *)cached.SetTo(
-					fVolume->ToBlock(indirect[index % runsPerBlock]) + current / runsPerBlock);
-			if (indirect == NULL)
-				RETURN_ERROR(B_ERROR);
-
-			run = indirect[current % runsPerBlock];
-			offset = data->max_indirect_range + (index * indirectSize) + (current * directSize);
-			//printf("\tfCurrent = %ld, fRunFileOffset = %Ld, fRunBlockEnd = %Ld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
-		} else {
-			// access to indirect blocks
-
-			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
-			off_t runBlockEnd = data->max_direct_range;
-
-			CachedBlock cached(fVolume);
-			off_t block = fVolume->ToBlock(data->indirect);
-
-			for (int32 i = 0;i < data->indirect.length;i++) {
-				block_run *indirect = (block_run *)cached.SetTo(block + i);
-				if (indirect == NULL)
-					RETURN_ERROR(B_IO_ERROR);
-
-				int32 current = -1;
-				while (++current < runsPerBlock) {
-					if (indirect[current].IsZero())
-						break;
-
-					runBlockEnd += indirect[current].length << fVolume->BlockShift();
-					if (runBlockEnd > pos) {
-						run = indirect[current];
-						offset = runBlockEnd - (run.length << fVolume->BlockShift());
-						//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
-						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
-						return fVolume->IsValidBlockRun(run);
-					}
-				}
-			}
-			RETURN_ERROR(B_ERROR);
-		}
-	} else {
-		// access from direct blocks
-
-		off_t runBlockEnd = 0LL;
-		int32 current = -1;
-
-		while (++current < NUM_DIRECT_BLOCKS) {
-			if (data->direct[current].IsZero())
-				break;
-
-			runBlockEnd += data->direct[current].length << fVolume->BlockShift();
-			if (runBlockEnd > pos) {
-				run = data->direct[current];
-				offset = runBlockEnd - (run.length << fVolume->BlockShift());
-				//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
-				return fVolume->IsValidBlockRun(run);
-			}
-		}
-		//PRINT(("FindBlockRun() failed in direct range: size = %Ld, pos = %Ld\n",data->size,pos));
-		return B_ENTRY_NOT_FOUND;
-	}
-	return fVolume->IsValidBlockRun(run);
+	// The BPlusTree class will call this function, we'll provide
+	// standard cached access only from here
+	return ((Stream<Access::Cached> *)this)->FindBlockRun(pos, run, offset);
 }
 
 
 status_t
 Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 {
-	// set/check boundaries for pos/length
+	// call the right ReadAt() method, depending on the inode flags
 
-	if (pos < 0)
-		pos = 0;
-	else if (pos >= Node()->data.size) {
-		*_length = 0;
-		return B_NO_ERROR;
-	}
+	if (Flags() & INODE_NO_CACHE)
+		return ((Stream<Access::Uncached> *)this)->ReadAt(pos, buffer, _length);
 
-	size_t length = *_length;
+	if (Flags() & INODE_LOGGED)
+		return ((Stream<Access::Logged> *)this)->ReadAt(pos, buffer, _length);
 
-	if (pos + length > Node()->data.size)
-		length = Node()->data.size - pos;
-
-	block_run run;
-	off_t offset;
-	if (FindBlockRun(pos,run,offset) < B_OK) {
-		*_length = 0;
-		RETURN_ERROR(B_BAD_VALUE);
-	}
-
-	uint32 bytesRead = 0;
-	uint32 blockSize = fVolume->BlockSize();
-	uint32 blockShift = fVolume->BlockShift();
-	uint8 *block;
-
-	// the first block_run we read could not be aligned to the block_size boundary
-	// (read partial block at the beginning)
-
-	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
-	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
-
-		CachedBlock cached(fVolume,run);
-		if ((block = cached.Block()) == NULL) {
-			*_length = 0;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-
-		bytesRead = blockSize - (pos % blockSize);
-		if (length < bytesRead)
-			bytesRead = length;
-
-		memcpy(buffer,block + (pos % blockSize),bytesRead);
-		pos += bytesRead;
-
-		length -= bytesRead;
-		if (length == 0) {
-			*_length = bytesRead;
-			return B_OK;
-		}
-
-		if (FindBlockRun(pos,run,offset) < B_OK) {
-			*_length = bytesRead;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-	}
-
-	// the first block_run is already filled in at this point
-	// read the following complete blocks using cached_read(),
-	// the last partial block is read using the CachedBlock class
-
-	bool partial = false;
-
-	while (length > 0) {
-		// offset is the offset to the current pos in the block_run
-		run.start += (pos - offset) >> blockShift;
-		run.length -= (pos - offset) >> blockShift;
-
-		if ((run.length << blockShift) > length) {
-			if (length < blockSize) {
-				CachedBlock cached(fVolume,run);
-				if ((block = cached.Block()) == NULL) {
-					*_length = bytesRead;
-					RETURN_ERROR(B_BAD_VALUE);
-				}
-				memcpy(buffer + bytesRead,block,length);
-				bytesRead += length;
-				break;
-			}
-			run.length = length >> blockShift;
-			partial = true;
-		}
-
-		if (cached_read(fVolume->Device(),fVolume->ToBlock(run),buffer + bytesRead,
-						run.length,blockSize) != B_OK) {
-			*_length = bytesRead;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-
-		int32 bytes = run.length << blockShift;
-		length -= bytes;
-		bytesRead += bytes;
-		if (length == 0)
-			break;
-
-		pos += bytes;
-
-		if (partial) {
-			// if the last block was read only partially, point block_run
-			// to the remaining part
-			run.start += run.length;
-			run.length = 1;
-			offset = pos;
-		} else if (FindBlockRun(pos,run,offset) < B_OK) {
-			*_length = bytesRead;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-	}
-
-	*_length = bytesRead;
-	return B_NO_ERROR;
+	return ((Stream<Access::Cached> *)this)->ReadAt(pos, buffer, _length);
 }
 
 
 status_t 
 Inode::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_length)
 {
-	size_t length = *_length;
+	// call the right WriteAt() method, depending on the inode flags
 
-	// set/check boundaries for pos/length
-	if (pos < 0)
-		pos = 0;
-	else if (pos + length > Node()->data.size) {
-		off_t oldSize = Size();
+	if (Flags() & INODE_NO_CACHE)
+		return ((Stream<Access::Uncached> *)this)->WriteAt(transaction, pos, buffer, _length);
 
-		// the transaction doesn't have to be started already
-		if ((Flags() & INODE_NO_TRANSACTION) == 0)
-			transaction->Start(fVolume,BlockNumber());
+	if (Flags() & INODE_LOGGED)
+		return ((Stream<Access::Logged> *)this)->WriteAt(transaction, pos, buffer, _length);
 
-		// let's grow the data stream to the size needed
-		status_t status = SetFileSize(transaction,pos + length);
-		if (status < B_OK) {
-			*_length = 0;
-			RETURN_ERROR(status);
-		}
-		// If the position of the write was beyond the file size, we
-		// have to fill the gap between that position and the old file
-		// size with zeros.
-		FillGapWithZeros(oldSize,pos);
-	}
-
-	block_run run;
-	off_t offset;
-	if (FindBlockRun(pos,run,offset) < B_OK) {
-		*_length = 0;
-		RETURN_ERROR(B_BAD_VALUE);
-	}
-
-	bool logStream = (Flags() & INODE_LOGGED) == INODE_LOGGED;
-	if (logStream)
-		transaction->Start(fVolume,BlockNumber());
-
-	uint32 bytesWritten = 0;
-	uint32 blockSize = fVolume->BlockSize();
-	uint32 blockShift = fVolume->BlockShift();
-	uint8 *block;
-
-	// the first block_run we write could not be aligned to the block_size boundary
-	// (write partial block at the beginning)
-
-	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
-	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
-
-		CachedBlock cached(fVolume,run);
-		if ((block = cached.Block()) == NULL) {
-			*_length = 0;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-
-		bytesWritten = blockSize - (pos % blockSize);
-		if (length < bytesWritten)
-			bytesWritten = length;
-
-		memcpy(block + (pos % blockSize),buffer,bytesWritten);
-
-		// either log the stream or write it directly to disk
-		if (logStream)
-			cached.WriteBack(transaction);
-		else
-			fVolume->WriteBlocks(cached.BlockNumber(),block,1);
-
-		pos += bytesWritten;
-		
-		length -= bytesWritten;
-		if (length == 0) {
-			*_length = bytesWritten;
-			return B_OK;
-		}
-
-		if (FindBlockRun(pos,run,offset) < B_OK) {
-			*_length = bytesWritten;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-	}
-	
-	// the first block_run is already filled in at this point
-	// write the following complete blocks using Volume::WriteBlocks(),
-	// the last partial block is written using the CachedBlock class
-
-	bool partial = false;
-
-	while (length > 0) {
-		// offset is the offset to the current pos in the block_run
-		run.start += (pos - offset) >> blockShift;
-		run.length -= (pos - offset) >> blockShift;
-
-		if ((run.length << blockShift) > length) {
-			if (length < blockSize) {
-				CachedBlock cached(fVolume,run);
-				if ((block = cached.Block()) == NULL) {
-					*_length = bytesWritten;
-					RETURN_ERROR(B_BAD_VALUE);
-				}
-				memcpy(block,buffer + bytesWritten,length);
-
-				if (logStream)
-					cached.WriteBack(transaction);
-				else
-					fVolume->WriteBlocks(cached.BlockNumber(),block,1);
-
-				bytesWritten += length;
-				break;
-			}
-			run.length = length >> blockShift;
-			partial = true;
-		}
-
-		status_t status;
-		if (logStream) {
-			status = transaction->WriteBlocks(fVolume->ToBlock(run),
-						buffer + bytesWritten,run.length);
-		} else {
-			status = fVolume->WriteBlocks(fVolume->ToBlock(run),
-						buffer + bytesWritten,run.length);
-		}
-		if (status != B_OK) {
-			*_length = bytesWritten;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-
-		int32 bytes = run.length << blockShift;
-		length -= bytes;
-		bytesWritten += bytes;
-		if (length == 0)
-			break;
-
-		pos += bytes;
-
-		if (partial) {
-			// if the last block was written only partially, point block_run
-			// to the remaining part
-			run.start += run.length;
-			run.length = 1;
-			offset = pos;
-		} else if (FindBlockRun(pos,run,offset) < B_OK) {
-			*_length = bytesWritten;
-			RETURN_ERROR(B_BAD_VALUE);
-		}
-	}
-
-	*_length = bytesWritten;
-
-	return B_NO_ERROR;
+	return ((Stream<Access::Cached> *)this)->WriteAt(transaction, pos, buffer, _length);
 }
 
 
