@@ -84,7 +84,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 {
 	status_t status = B_OK;
 	float pix_clock_found;
-	uint8 m,n,p;
+	uint8 m,n,p, bpp;
 	status_t result;
 	uint32 max_vclk, row_bytes, pointer_reservation;
 	bool acc_mode;
@@ -302,7 +302,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	 * mode (fixed), and all modes support DPMS (fixed);
 	 * We support scrolling and panning in every mode, so we 'send a signal' to
 	 * BWindowScreen.CanControlFrameBuffer() by setting B_SCROLL.  */
-	//fixme: secondary head does not support DPMS...
+	/* BTW: B_PARALLEL_ACCESS in combination with a hardcursor enables
+	 * BDirectWindow windowed modes. */
 	target->flags |= (B_PARALLEL_ACCESS | B_8_BIT_DAC | B_DPMS | B_SCROLL);
 
 	/* determine the 'would be' max. pixelclock for the second DAC for the current videomode if dualhead were activated */
@@ -310,33 +311,64 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	{
 		case B_CMAP8:
 			max_vclk = si->ps.max_dac2_clock_8;
+			bpp = 1;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_16;
+			bpp = 2;
 			break;
 		case B_RGB24_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_24;
+			bpp = 3;
 			break;
 		case B_RGB32_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_32dh;
+			bpp = 4;
 			break;
 		default:
 			/* use fail-safe value */
 			max_vclk = si->ps.max_dac2_clock_32dh;
+			bpp = 4;
 			break;
 	}
 
 	/* set DUALHEAD_CAPABLE if suitable */
 	//fixme: update for independant secondary head use! (reserve fixed memory then)
 	if (si->ps.secondary_head &&
-		(((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
-	 		/* note: extra line for maven vblank included here! */
-			(row_bytes * (target->virtual_height + 1) * 2)) &&
 	 	((target->space == B_RGB16_LITTLE) || (target->space == B_RGB32_LITTLE)) &&
 	 	(target->timing.pixel_clock <= (max_vclk * 1000)))
 	{
-		target->flags |= DUALHEAD_CAPABLE;
+		/* extra line for G400 MAVEN vblank design fault workaround needed! */
+		uint16 vblank_fix = 0;
+		if (si->ps.card_type == G550) vblank_fix = 1;
+
+		switch (target->flags & DUALHEAD_BITS)
+		{
+		case DUALHEAD_ON:
+		case DUALHEAD_SWITCH:
+			if ((((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix))) &&
+			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		case DUALHEAD_CLONE:
+			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix)))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		case DUALHEAD_OFF:
+			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix) * 2))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		}
 	}
 
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
