@@ -24,6 +24,8 @@
 
 #include <string.h>
 
+#define DEBUG_SPINLOCKS 1
+
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
 struct smp_msg {
@@ -74,6 +76,13 @@ acquire_spinlock(spinlock *lock)
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
+	} else {
+		#if DEBUG_SPINLOCKS
+			if (are_interrupts_enabled())
+				panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
+			if (atomic_set((int32 *)lock, 1) != 0)
+				panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system\n", lock);
+		#endif
 	}
 }
 
@@ -82,12 +91,23 @@ static void
 acquire_spinlock_nocheck(spinlock *lock)
 {
 	if (smp_num_cpus > 1) {
+		#if DEBUG_SPINLOCKS
+			if (are_interrupts_enabled())
+				panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
+		#endif
 		while (1) {
 			while(*lock != 0)
 				;
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
+	} else {
+		#if DEBUG_SPINLOCKS
+			if (are_interrupts_enabled())
+				panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
+			if (atomic_set((int32 *)lock, 1) != 0)
+				panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice on non-SMP system\n", lock);
+		#endif
 	}
 }
 
@@ -95,7 +115,19 @@ acquire_spinlock_nocheck(spinlock *lock)
 void
 release_spinlock(spinlock *lock)
 {
-	*lock = 0;
+	if (smp_num_cpus > 1) {
+		if (are_interrupts_enabled())
+			panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
+		if (atomic_set((int32 *)lock, 0) != 1)
+			panic("release_spinlock: lock %p was already released\n", lock);
+	} else {
+		#if DEBUG_SPINLOCKS
+			if (are_interrupts_enabled())
+				panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
+			if (atomic_set((int32 *)lock, 0) != 1)
+				panic("release_spinlock: lock %p was already released\n", lock);
+		#endif
+	}
 }
 
 
