@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include "uhci.h"
+#include "util.h"
 #include "host_controller.h"
 
 #define UHCI_DEBUG
@@ -38,8 +39,8 @@ void silent( const char * , ... ) {}
 
 
 static status_t init_hardware(void);
-static status_t submit_packet( usb_packet_t *packet );
-static status_t rh_submit_packet( usb_packet_t *packet );
+static status_t submit_packet( usb_transfer_t *transfer );
+static status_t rh_submit_packet( usb_transfer_t *transfer );
 static void     rh_update_port_status(void);
 //static int32    uhci_interrupt( void *d );
 
@@ -172,7 +173,8 @@ init_hardware(void)
 	//Initialise the host controller
 	m_data = (uhci_properties_t *)malloc( sizeof( uhci_properties_t ) );
 	m_data->pcii = m_device;
-	m_data->reg_base = m_device->u.h0.base_registers[0];
+	m_data->reg_base = m_pcimodule->read_pci_config(m_data->pcii->bus, m_data->pcii->device, m_data->pcii->function, 0x20 , 4 ) ^ 1;
+	TRACE( "USB UHCI: iospace offset: %lx\n" , m_data->reg_base );
 	m_data->rh_address = 255; //Invalidate the RH address
 	{
 		/* enable pci address access */	
@@ -198,12 +200,22 @@ init_hardware(void)
 	       m_data->port_status[0].status , m_data->port_status[1].status );
 
 	//Set up the frame list
-	/*m_data->framearea = map_physical_memory( "uhci framelist" , m_data->framelist_phy ,
-	                                         4096 , B_ANY_KERNEL_BLOCK_ADDRESS ,
-	                                         B_WRITE_AREA , m_data->framelist );
+	m_data->framearea = alloc_mem( &(m_data->framelist[0]) , &(m_data->framelist_phy) ,
+	                                         4096 , "uhci framelist" );
+	if ( m_data->framearea < B_OK )
+	{
+		TRACE( "USB UHCI: init_hardware(): unable to create an area for the frame pointer list\n" );
+		free( item );
+		put_module( B_PCI_MODULE_NAME );
+		return ENODEV;
+	}
 	                                         
-	//!!!!!!!!!!!!!! Check the area
-	*/
+	//Make all frame list entries invalid
+	for( i = 0 ; i < 1024 ; i++ )
+		(int32)(m_data->framelist[i]) = 0x1;
+	
+	//Set base pointer
+	m_pcimodule->write_io_32( m_data->reg_base + UHCI_FRBASEADD , (int32)(m_data->framelist_phy) );	
 	
 	// Install the interrupt handler
 	//install_io_interrupt_handler( m_data->pcii->h0.interrupt_line ,
@@ -215,23 +227,24 @@ init_hardware(void)
 }
 
 /* ++++++++++
-Inserting packets in the queue
+Inserting transfers in the queue
 ++++++++++ */
-status_t submit_packet( usb_packet_t *packet )
+status_t submit_packet( usb_transfer_t *transfer )
 {
 	dprintf( "uhci submit_packet(): CALLED\n");
 	//Do the following:
 	//1. Check if the packet really belongs to this bus -- no way of doing that now
 	//2. Acquire the spinlock of the packet -- still needs to be fixed
 
-	if ( packet->address == 0 ) //First device of a bus has address 0 per definition
+	if ( transfer->pipe->deviceid == 1 ) //First device of a bus has address 1 per definition
 	{
-		rh_submit_packet( packet );
+		rh_submit_packet( transfer );
 		goto out;
 	}
 	//4. Determine the type of transfer and send it to the proper function
 	//5. Release the spinlock
 out:
+	return B_OK;
 }
 
 /* ++++++++++
@@ -300,9 +313,9 @@ usb_hub_descriptor uhci_hubd =
 };
 
 status_t 
-rh_submit_packet( usb_packet_t *packet )
+rh_submit_packet( usb_transfer_t *transfer )
 {
-	usb_request_data *request = (usb_request_data *)packet->requestdata;
+	usb_request_data *request = transfer->request;
 	status_t retval;
 	
 	uint16 port; //used in RH_CLEAR/SET_FEATURE
@@ -315,7 +328,7 @@ rh_submit_packet( usb_packet_t *packet )
 		if ( request->Index == 0 )
 		{
 			//Get the hub status -- everything as 0 means that it is all-rigth
-			memset( packet->buffer , NULL , sizeof(get_status_buffer) );
+			memset( transfer->buffer , NULL , sizeof(get_status_buffer) );
 			retval = B_OK;
 			break;
 		}
@@ -327,8 +340,8 @@ rh_submit_packet( usb_packet_t *packet )
 		}
 		//Get port status
 		rh_update_port_status();
-		memcpy( packet->buffer , (void *)&(m_data->port_status[request->Index - 1]) , packet->bufferlength );
-		*(packet->actual_length) = packet->bufferlength;
+		memcpy( transfer->buffer , (void *)&(m_data->port_status[request->Index - 1]) , transfer->bufferlength );
+		*(transfer->actual_length) = transfer->bufferlength;
 		retval = B_OK;
 		break;
 
@@ -349,28 +362,28 @@ rh_submit_packet( usb_packet_t *packet )
 			switch ( request->Value )
 			{
 			case RH_DEVICE_DESCRIPTOR:
-				memcpy( packet->buffer , (void *)&uhci_devd , packet->bufferlength );
-				*(packet->actual_length) = packet->bufferlength; 
+				memcpy( transfer->buffer , (void *)&uhci_devd , transfer->bufferlength );
+				*(transfer->actual_length) = transfer->bufferlength; 
 				retval = B_OK;
 				break;
 			case RH_CONFIG_DESCRIPTOR:
-				memcpy( packet->buffer , (void *)&uhci_confd , packet->bufferlength );
-				*(packet->actual_length) = packet->bufferlength;
+				memcpy( transfer->buffer , (void *)&uhci_confd , transfer->bufferlength );
+				*(transfer->actual_length) = transfer->bufferlength;
 				retval =  B_OK;
 				break;
 			case RH_INTERFACE_DESCRIPTOR:
-				memcpy( packet->buffer , (void *)&uhci_intd , packet->bufferlength );
-				*(packet->actual_length) = packet->bufferlength;
+				memcpy( transfer->buffer , (void *)&uhci_intd , transfer->bufferlength );
+				*(transfer->actual_length) = transfer->bufferlength;
 				retval = B_OK ;
 				break;
 			case RH_ENDPOINT_DESCRIPTOR:
-				memcpy( packet->buffer , (void *)&uhci_endd , packet->bufferlength );
-				*(packet->actual_length) = packet->bufferlength;
+				memcpy( transfer->buffer , (void *)&uhci_endd , transfer->bufferlength );
+				*(transfer->actual_length) = transfer->bufferlength;
 				retval = B_OK ;
 				break;
 			case RH_HUB_DESCRIPTOR:
-				memcpy( packet->buffer , (void *)&uhci_hubd , packet->bufferlength );
-				*(packet->actual_length) = packet->bufferlength;
+				memcpy( transfer->buffer , (void *)&uhci_hubd , transfer->bufferlength );
+				*(transfer->actual_length) = transfer->bufferlength;
 				retval = B_OK;
 				break;
 			default:
@@ -403,6 +416,11 @@ rh_submit_packet( usb_packet_t *packet )
 		TRACE("UHCI: RH_CLEAR_FEATURE called. Feature: %u!\n" , request->Value );
 		switch( request->Value )
 		{
+		case PORT_RESET:
+			port = m_pcimodule->read_io_16( m_data->reg_base + UHCI_PORTSC1 + (request->Index - 1 ) * 2 );
+			port &= ~UHCI_PORTSC_RESET;
+			TRACE( "UHCI rh: port %x Clear RESET\n" , port );
+			m_pcimodule->write_io_16( m_data->reg_base + UHCI_PORTSC1 + (request->Index - 1 ) * 2 , port );
 		case C_PORT_CONNECTION:
 			port = m_pcimodule->read_io_16( m_data->reg_base + UHCI_PORTSC1 + (request->Index - 1 ) * 2 );
 			port = port & UHCI_PORTSC_DATAMASK;
@@ -414,7 +432,7 @@ rh_submit_packet( usb_packet_t *packet )
 		default:
 			retval = EINVAL;
 			break;
-		} //switch( packet->value) 
+		} //switch( transfer->value) 
 		break;
 		
 	default: 
@@ -435,7 +453,7 @@ rh_update_port_status(void)
 		uint16 newchange = 0;
 		
 		uint16 portsc = m_pcimodule->read_io_16( m_data->reg_base + UHCI_PORTSC1 + i * 2 );
-		dprintf( "USB UHCI: port status: 0x%x\n" , portsc );
+		dprintf( "USB UHCI: port: %x status: 0x%x\n" , UHCI_PORTSC1 + i * 2 , portsc );
 		//Set all individual bits
 		if ( portsc & UHCI_PORTSC_CURSTAT )
 			newstatus |= PORT_STATUS_CONNECTION;

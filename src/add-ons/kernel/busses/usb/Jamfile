@@ -4,5 +4,6 @@ AddResources uhci : uhci.rdef ;
 
 R5KernelAddon uhci : [ FDirName kernel busses usb ] :
 	uhci.c
+	util.c
 	;
 
