@@ -26,13 +26,17 @@ using namespace BPrivate::DiskDevice;
 // ddm_strlcpy
 /*! \brief Wrapper around user_strlcpy() that returns a status_t
 	indicating appropriate success or failure.
+	
+	\param allowTruncation If \c true, does not return an error if 
+	       \a from is longer than \to. If \c false, returns \c B_NAME_TOO_LONG
+	       if \a from is longer than \to.
 */
 static
 status_t
-ddm_strlcpy(char *to, const char *from, size_t size) {
+ddm_strlcpy(char *to, const char *from, size_t size, bool allowTruncation = false) {
 	int error = user_strlcpy(to, from, size);
 	error = (0 <= error && size_t(error) < size) ? B_OK
-	        : (error < B_OK ? error : B_NAME_TOO_LONG);
+	        : (error < B_OK ? error : (allowTruncation ? B_OK : B_NAME_TOO_LONG));
 	return status_t(error);
 }
 
@@ -846,7 +850,7 @@ _kern_validate_set_partition_name(partition_id partitionID,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH, true);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -868,7 +872,7 @@ _kern_validate_set_partition_content_name(partition_id partitionID,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH, true);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -909,7 +913,8 @@ status_t
 _kern_validate_initialize_partition(partition_id partitionID,
 									int32 changeCounter,
 									const char *_diskSystemName, char *_name,
-									const char *_parameters)
+									const char *_parameters,
+									size_t parametersSize)
 {
 	if (!_diskSystemName || !_name)
 		return B_BAD_VALUE;
@@ -917,14 +922,14 @@ _kern_validate_initialize_partition(partition_id partitionID,
 	char name[B_OS_NAME_LENGTH];
 	char *parameters = NULL;
 	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH);
-	if (!error)
-		error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (!error) 
+		error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH, true);
 	if (error)
 		return error;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}
@@ -948,7 +953,8 @@ status_t
 _kern_validate_create_child_partition(partition_id partitionID,
 									  int32 changeCounter, off_t *_offset,
 									  off_t *_size, const char *_type,
-									  const char *_parameters)
+									  const char *_parameters,
+									  size_t parametersSize)
 {
 	if (!_offset || !_size || !_type)
 		return B_BAD_VALUE;
@@ -962,9 +968,9 @@ _kern_validate_create_child_partition(partition_id partitionID,
 	if (error)
 		return error;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}	
@@ -1373,15 +1379,15 @@ _kern_set_partition_type(partition_id partitionID, int32 changeCounter,
 // _kern_set_partition_parameters
 status_t
 _kern_set_partition_parameters(partition_id partitionID, int32 changeCounter,
-							   const char *_parameters)
+							   const char *_parameters, size_t parametersSize)
 {
 	if (!_parameters)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}
@@ -1415,15 +1421,16 @@ _kern_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 status_t
 _kern_set_partition_content_parameters(partition_id partitionID,
 									   int32 changeCounter,
-									   const char *_parameters)
+									   const char *_parameters,
+									   size_t parametersSize)
 {
 	if (!_parameters)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}
@@ -1457,7 +1464,7 @@ _kern_set_partition_content_parameters(partition_id partitionID,
 status_t
 _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 						   const char *_diskSystemName, const char *_name,
-						   const char *_parameters)
+						   const char *_parameters, size_t parametersSize)
 {
 	if (!_diskSystemName || !_name)
 		return B_BAD_VALUE;
@@ -1470,9 +1477,9 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	if (error)
 		return error;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}
@@ -1541,7 +1548,8 @@ _kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 status_t
 _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 							 off_t offset, off_t size, const char *_type,
-							 const char *_parameters, partition_id *_childID)
+							 const char *_parameters, size_t parametersSize,
+							 partition_id *_childID)
 {
 	if (!_type)
 		return B_BAD_VALUE;
@@ -1551,9 +1559,9 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 	if (error)
 		return error;
 	if (_parameters) {
-		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
+		parameters = static_cast<char*>(malloc(parametersSize));
 		if (parameters)
-			user_strcpy(parameters, _parameters);
+			user_memcpy(parameters, _parameters, parametersSize);
 		else
 			return B_NO_MEMORY;
 	}
