@@ -222,7 +222,7 @@ TranslationUtilsTest::GetPutStyledTextTest()
 	CPPUNIT_ASSERT(ptextview);
 	ptextview->SetStylable(false);
 	BFile stylfile(
-		"../src/tests/kits/translation/data/styled_text.stxt",
+		"../src/tests/kits/translation/data/text/sentence.stxt",
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(stylfile.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(BTranslationUtils::GetStyledText(&stylfile, ptextview) == B_OK);
