@@ -22,6 +22,7 @@
 
 class BHandler;
 class BLooper;
+class SMTester;
 
 class SendMessageTester : public BThreadedTestCase
 {
@@ -29,6 +30,9 @@ public:
 	SendMessageTester();
 	SendMessageTester(std::string name);
 	virtual ~SendMessageTester();
+
+	void TestUninitialized();
+	void TestInitialized(SMTester &tester);
 
 	void SendMessageTest1();
 

@@ -31,105 +31,18 @@
 
 // Globals ---------------------------------------------------------------------
 
-// procedure:
-// * init target (block/timeout), construct messenger
-//   (- uninitialized)
-//   - local
-//     - preferred
-//     - specific
-//   - remote
-//     - preferred
-//     - specific
-// * init parameters
-//   - reply handler
-//   - reply messenger
-// * invoke SM()
-// * compare result
-// * compare time
-// * get + compare reply
-//   - no reply
-//   - reply handler
-//   - reply per reference
-
-// SM() params:
-//
-//	status_t SendMessage(uint32 command, BHandler *replyTo = NULL) const;
-//  * command
-//  * useReplyTo
-//
-//	status_t SendMessage(BMessage *message, BHandler *replyTo = NULL,
-//						 bigtime_t timeout = B_INFINITE_TIMEOUT) const;
-//  * message (command?)
-//  * useReplyTo
-//  * timeout
-//
-//	status_t SendMessage(BMessage *message, BMessenger replyTo,
-//						 bigtime_t timeout = B_INFINITE_TIMEOUT) const;
-//  * message (command?)
-//  * useReplyTo
-//  * timeout
-//
-//	status_t SendMessage(uint32 command, BMessage *reply) const;
-//  * command
-//  * useReply
-//
-//	status_t SendMessage(BMessage *message, BMessage *reply,
-//						 bigtime_t deliveryTimeout = B_INFINITE_TIMEOUT,
-//						 bigtime_t replyTimeout = B_INFINITE_TIMEOUT) const;
-//  * message (command?)
-//  * useReply
-//  * deliveryTimeout
-//  * replyTimeout
-//
-
-// Tester params:
-//
-// target:
-// - invalid
-// - local
-//   - preferred
-//   - specific
-// - remote
-//   - preferred
-//   - specific
-//
-// target behavior:
-// - unblock after ms
-// - reply after ms
-//
-// SM() result
-//
-// delivery success
-//
-// SM() return time
-
-
+// target flavors
 enum target_kind {
 	TARGET_UNINITIALIZED,
 	TARGET_LOCAL_PREFERRED,
 	TARGET_LOCAL_SPECIFIC,
-	// ...
+	TARGET_REMOTE_PREFERRED,
+	TARGET_REMOTE_SPECIFIC,
 };
 
-
+// tester class
 class SMTester {
 public:
-// target:
-// - invalid
-// - local
-//   - preferred
-//   - specific
-// - remote
-//   - preferred
-//   - specific
-//
-// target behavior:
-// - unblock after ms
-// - reply after ms
-//
-// SM() result
-//
-// SM() return time
 	SMTester(target_kind targetKind)
 		: fTargetKind(targetKind)
 	{
@@ -143,9 +56,8 @@ public:
 			 bigtime_t targetReply, status_t result, bool deliverySuccess,
 			 bool replySuccess, bigtime_t duration)
 	{
-//		NextSubTest();
-printf("SMTester::Run(%lld, %lld, %lx, %d, %d, %lld)\n", targetUnblock,
-targetReply, result, deliverySuccess, replySuccess, duration);
+//printf("SMTester::Run(%lld, %lld, %lx, %d, %d, %lld)\n", targetUnblock,
+//targetReply, result, deliverySuccess, replySuccess, duration);
 		enum { JITTER = 10000 };
 		enum { SETUP_LATENCY = 100000 };
 		enum { DELIVERY_LATENCY = 10000 };
@@ -164,6 +76,12 @@ targetReply, result, deliverySuccess, replySuccess, duration);
 			case TARGET_LOCAL_SPECIFIC:
 				target = new LocalSMTarget(false);
 				break;
+			case TARGET_REMOTE_PREFERRED:
+				target = new RemoteSMTarget(true);
+				break;
+			case TARGET_REMOTE_SPECIFIC:
+				target = new RemoteSMTarget(false);
+				break;
 		}
 		AutoDeleter<SMTarget> deleter(target);
 		// create the reply target
@@ -178,7 +96,7 @@ targetReply, result, deliverySuccess, replySuccess, duration);
 		status_t actualResult = invoker.Invoke(targetMessenger, replyHandler,
 											   replyMessenger);
 		bigtime_t actualDuration = system_time() - startTime;
-printf("duration: %lld vs %lld\n", actualDuration, duration);
+//printf("duration: %lld vs %lld\n", actualDuration, duration);
 		// We need to wait for the reply, if reply mode is asynchronous.
 		snooze_until(startTime + targetUnblock + targetReply
 					 + 2 * DELIVERY_LATENCY, B_SYSTEM_TIMEBASE);
@@ -232,12 +150,12 @@ SendMessageTester::~SendMessageTester()
 }
 
 // TestUninitialized
-static
 void
-TestUninitialized()
+SendMessageTester::TestUninitialized()
 {
 	SMTester tester(TARGET_UNINITIALIZED);
 	// status_t SendMessage(uint32 command, BHandler *replyTo) const
+	NextSubTest();
 	{
 		SMInvoker1 invoker1(false);
 		SMInvoker1 invoker2(true);
@@ -246,6 +164,7 @@ TestUninitialized()
 	}
 	// status_t SendMessage(BMessage *message, BHandler *replyTo,
 	//						bigtime_t timeout) const
+	NextSubTest();
 	{
 		SMInvoker2 invoker1(true, false, B_INFINITE_TIMEOUT);
 		SMInvoker2 invoker2(true, true, B_INFINITE_TIMEOUT);
@@ -254,6 +173,7 @@ TestUninitialized()
 	}
 	// status_t SendMessage(BMessage *message, BMessenger replyTo,
 	//						bigtime_t timeout) const
+	NextSubTest();
 	{
 		SMInvoker3 invoker1(true, false, B_INFINITE_TIMEOUT);
 		SMInvoker3 invoker2(true, true, B_INFINITE_TIMEOUT);
@@ -261,6 +181,7 @@ TestUninitialized()
 		tester.Run(invoker2, 0, 0, B_BAD_PORT_ID, false, false, 0);
 	}
 	// status_t SendMessage(uint32 command, BMessage *reply) const
+	NextSubTest();
 	{
 		SMInvoker4 invoker1(false);
 		SMInvoker4 invoker2(true);
@@ -272,14 +193,30 @@ TestUninitialized()
 #endif
 		tester.Run(invoker2, 0, 0, B_BAD_PORT_ID, false, false, 0);
 	}
+	// status_t SendMessage(BMessage *message, BMessage *reply,
+	//						bigtime_t deliveryTimeout,
+	//						bigtime_t replyTimeout) const
+	NextSubTest();
+	{
+		SMInvoker5 invoker1(true, false, B_INFINITE_TIMEOUT,
+							B_INFINITE_TIMEOUT);
+		SMInvoker5 invoker2(true, true, B_INFINITE_TIMEOUT,
+							B_INFINITE_TIMEOUT);
+#ifdef TEST_OBOS
+		tester.Run(invoker1, 0, 0, B_BAD_VALUE, false, false, 0);
+#else
+		tester.Run(invoker1, 0, 0, B_BAD_PORT_ID, false, false, 0);
+#endif
+		tester.Run(invoker2, 0, 0, B_BAD_PORT_ID, false, false, 0);
+	}
 }
 
 // TestInitialized
-static
 void
-TestInitialized(SMTester &tester)
+SendMessageTester::TestInitialized(SMTester &tester)
 {
 	// status_t SendMessage(uint32 command, BHandler *replyTo) const
+	NextSubTest();
 	{
 		SMInvoker1 invoker1(false);
 		SMInvoker1 invoker2(true);
@@ -288,6 +225,7 @@ TestInitialized(SMTester &tester)
 	}
 	// status_t SendMessage(BMessage *message, BHandler *replyTo,
 	//						bigtime_t timeout) const
+	NextSubTest();
 	{
 // R5 crashes when passing a NULL message.
 #ifndef TEST_R5
@@ -295,12 +233,14 @@ TestInitialized(SMTester &tester)
 		tester.Run(invoker1, 0, 0, B_BAD_VALUE, false, false, 0);
 #endif
 	}
+	NextSubTest();
 	{
 		SMInvoker2 invoker1(true, false, B_INFINITE_TIMEOUT);
 		SMInvoker2 invoker2(true, true, B_INFINITE_TIMEOUT);
 		tester.Run(invoker1, 0, 0, B_OK, true, false, 0);
 		tester.Run(invoker2, 0, 0, B_OK, true, true, 0);
 	}
+	NextSubTest();
 	{
 		SMInvoker2 invoker1(true, false, 0);
 		SMInvoker2 invoker2(true, true, 0);
@@ -309,6 +249,7 @@ TestInitialized(SMTester &tester)
 		tester.Run(invoker1, 20000, 0, B_WOULD_BLOCK, false, false, 0);
 		tester.Run(invoker2, 20000, 0, B_WOULD_BLOCK, false, false, 0);
 	}
+	NextSubTest();
 	{
 		SMInvoker2 invoker1(true, false, 20000);
 		SMInvoker2 invoker2(true, true, 20000);
@@ -319,6 +260,7 @@ TestInitialized(SMTester &tester)
 	}
 	// status_t SendMessage(BMessage *message, BMessenger replyTo,
 	//						bigtime_t timeout) const
+	NextSubTest();
 	{
 // R5 crashes when passing a NULL message.
 #ifndef TEST_R5
@@ -326,12 +268,14 @@ TestInitialized(SMTester &tester)
 		tester.Run(invoker1, 0, 0, B_BAD_VALUE, false, false, 0);
 #endif
 	}
+	NextSubTest();
 	{
 		SMInvoker3 invoker1(true, false, B_INFINITE_TIMEOUT);
 		SMInvoker3 invoker2(true, true, B_INFINITE_TIMEOUT);
 		tester.Run(invoker1, 0, 0, B_OK, true, false, 0);
 		tester.Run(invoker2, 0, 0, B_OK, true, true, 0);
 	}
+	NextSubTest();
 	{
 		SMInvoker3 invoker1(true, false, 0);
 		SMInvoker3 invoker2(true, true, 0);
@@ -340,6 +284,7 @@ TestInitialized(SMTester &tester)
 		tester.Run(invoker1, 20000, 0, B_WOULD_BLOCK, false, false, 0);
 		tester.Run(invoker2, 20000, 0, B_WOULD_BLOCK, false, false, 0);
 	}
+	NextSubTest();
 	{
 		SMInvoker3 invoker1(true, false, 20000);
 		SMInvoker3 invoker2(true, true, 20000);
@@ -349,6 +294,7 @@ TestInitialized(SMTester &tester)
 		tester.Run(invoker2, 40000, 0, B_TIMED_OUT, false, false, 20000);
 	}
 	// status_t SendMessage(uint32 command, BMessage *reply) const
+	NextSubTest();
 	{
 // R5 crashes when passing a NULL reply message
 #ifndef TEST_R5
@@ -360,20 +306,88 @@ TestInitialized(SMTester &tester)
 #endif
 		tester.Run(invoker2, 20000, 20000, B_OK, true, true, 40000);
 	}
+	// status_t SendMessage(BMessage *message, BMessage *reply,
+	//						bigtime_t deliveryTimeout,
+	//						bigtime_t replyTimeout) const
+	NextSubTest();
+	{
+// R5 crashes when passing a NULL message.
+#ifndef TEST_R5
+		SMInvoker5 invoker1(false, true, B_INFINITE_TIMEOUT,
+							B_INFINITE_TIMEOUT);
+		tester.Run(invoker1, 0, 0, B_BAD_VALUE, false, false, 0);
+#endif
+	}
+	NextSubTest();
+	{
+		SMInvoker5 invoker1(true, true, B_INFINITE_TIMEOUT,
+							B_INFINITE_TIMEOUT);
+		SMInvoker5 invoker2(true, true, B_INFINITE_TIMEOUT, 0);
+		SMInvoker5 invoker3(true, true, B_INFINITE_TIMEOUT, 20000);
+		tester.Run(invoker1, 0, 0, B_OK, true, true, 0);
+		tester.Run(invoker1, 10000, 0, B_OK, true, true, 10000);
+		tester.Run(invoker1, 0, 10000, B_OK, true, true, 10000);
+		// These two are race-conditional: The sending task must be pre-empted
+		// before reading from the reply port and the target must reply before
+		// the sending task gets another time slice.
+//		tester.Run(invoker2, 0, 0, B_OK, true, true, 0);
+//		tester.Run(invoker2, 10000, 0, B_OK, true, true, 10000);
+		tester.Run(invoker2, 0, 10000, B_WOULD_BLOCK, true, false, 0);
+		tester.Run(invoker3, 0, 10000, B_OK, true, true, 10000);
+		tester.Run(invoker3, 20000, 10000, B_OK, true, true, 30000);
+		tester.Run(invoker3, 0, 30000, B_TIMED_OUT, true, false, 20000);
+	}
+	NextSubTest();
+	{
+		SMInvoker5 invoker1(true, true, 0, B_INFINITE_TIMEOUT);
+		SMInvoker5 invoker2(true, true, 0, 0);
+		SMInvoker5 invoker3(true, true, 0, 20000);
+		tester.Run(invoker1, 0, 0, B_OK, true, true, 0);
+		tester.Run(invoker1, 10000, 0, B_WOULD_BLOCK, false, false, 0);
+		tester.Run(invoker1, 0, 10000, B_OK, true, true, 10000);
+		// This one is race-conditional: The sending task must be pre-empted
+		// before reading from the reply port and the target must reply before
+		// the sending task gets another time slice.
+//		tester.Run(invoker2, 0, 0, B_OK, true, true, 0);
+		tester.Run(invoker2, 10000, 0, B_WOULD_BLOCK, false, false, 0);
+		tester.Run(invoker2, 0, 10000, B_WOULD_BLOCK, true, false, 0);
+		tester.Run(invoker3, 0, 10000, B_OK, true, true, 10000);
+		tester.Run(invoker3, 10000, 10000, B_WOULD_BLOCK, false, false, 0);
+		tester.Run(invoker3, 0, 30000, B_TIMED_OUT, true, false, 20000);
+	}
+	NextSubTest();
+	{
+		SMInvoker5 invoker1(true, true, 20000, B_INFINITE_TIMEOUT);
+		SMInvoker5 invoker2(true, true, 20000, 0);
+		SMInvoker5 invoker3(true, true, 20000, 20000);
+		tester.Run(invoker1, 0, 0, B_OK, true, true, 0);
+		tester.Run(invoker1, 10000, 0, B_OK, true, true, 10000);
+		tester.Run(invoker1, 30000, 0, B_TIMED_OUT, false, false, 20000);
+		tester.Run(invoker1, 10000, 20000, B_OK, true, true, 30000);
+		// These two are race-conditional: The sending task must be pre-empted
+		// before reading from the reply port and the target must reply before
+		// the sending task gets another time slice.
+//		tester.Run(invoker2, 0, 0, B_OK, true, true, 0);
+//		tester.Run(invoker2, 10000, 0, B_OK, true, true, 0);
+		tester.Run(invoker2, 30000, 0, B_TIMED_OUT, false, false, 20000);
+		tester.Run(invoker2, 0, 10000, B_WOULD_BLOCK, true, false, 0);
+		tester.Run(invoker3, 10000, 10000, B_OK, true, true, 20000);
+		tester.Run(invoker3, 30000, 10000, B_TIMED_OUT, false, false, 20000);
+		tester.Run(invoker3, 10000, 30000, B_TIMED_OUT, true, false, 30000);
+	}
 }
 
 /*
-	bool operator<(const BMessenger &a, const BMessenger &b)
-	@case 1			set fields of a and b manually
-	@results		should return whatever the reference implementation
-					returns.
+	The different SendMessage() flavors.
  */
 void SendMessageTester::SendMessageTest1()
 {
 	TestUninitialized();
 	target_kind targetKinds[] = {
 		TARGET_LOCAL_PREFERRED,
-		TARGET_LOCAL_SPECIFIC
+		TARGET_LOCAL_SPECIFIC,
+		TARGET_REMOTE_PREFERRED,
+		TARGET_REMOTE_SPECIFIC
 	};
 	int32 targetKindCount = sizeof(targetKinds) / sizeof(target_kind);
 	for (int32 i = 0; i < targetKindCount; i++) {
