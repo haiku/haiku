@@ -68,154 +68,156 @@ static struct console_desc {
 
 	/* state machine */
 	console_state state;
-	int32	arg_ptr;
+	int32	arg_count;
 	int32	args[MAX_ARGS];
 
 	char	module_name[B_FILE_NAME_LENGTH];
 	console_module_info *module;
-} gconsole;
+} sConsole;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 
 static inline void
-update_cursor(struct console_desc *con, int x, int y)
+update_cursor(struct console_desc *console, int x, int y)
 {
-	con->module->move_cursor(x, y);
+	console->module->move_cursor(x, y);
 }
 
 
 static void
-gotoxy(struct console_desc *con, int new_x, int new_y)
+gotoxy(struct console_desc *console, int new_x, int new_y)
 {
-	if (new_x >= con->columns)
-		new_x = con->columns - 1;
+	if (new_x >= console->columns)
+		new_x = console->columns - 1;
 	if (new_x < 0)
 		new_x = 0;
-	if (new_y >= con->lines)
-		new_y = con->lines - 1;
+	if (new_y >= console->lines)
+		new_y = console->lines - 1;
 	if (new_y < 0)
 		new_y = 0;
 
-	con->x = new_x;
-	con->y = new_y;
+	console->x = new_x;
+	console->y = new_y;
 }
 
 
 static void
-reset_console(struct console_desc *con)
+reset_console(struct console_desc *console)
 {
-	con->attr = 0x0f;
-	con->scroll_top = 0;
-	con->scroll_bottom = con->lines - 1;
-	con->bright_attr = true;
-	con->reverse_attr = false;
+	console->attr = 0x0f;
+	console->scroll_top = 0;
+	console->scroll_bottom = console->lines - 1;
+	console->bright_attr = true;
+	console->reverse_attr = false;
 }
 
 
 /** scroll from the cursor line up to the top of the scroll region up one line */
 
 static void
-scrup(struct console_desc *con)
+scrup(struct console_desc *console)
 {
 	// see if cursor is outside of scroll region
-	if (con->y < con->scroll_top || con->y > con->scroll_bottom)
+	if (console->y < console->scroll_top || console->y > console->scroll_bottom)
 		return;
 
-	if (con->y - con->scroll_top > 1) {
+	if (console->y - console->scroll_top > 1) {
 		// move the screen up one
-		con->module->blit(0, con->scroll_top + 1, con->columns,
-			con->y - con->scroll_top, 0, con->scroll_top);
+		console->module->blit(0, console->scroll_top + 1, console->columns,
+			console->y - console->scroll_top, 0, console->scroll_top);
 	}
 
 	// clear the bottom line
-	con->module->fill_glyph(0, con->y, con->columns, 1, ' ', con->attr);
+	console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
 }
 
 
 /** scroll from the cursor line down to the bottom of the scroll region down one line */
 
 static void
-scrdown(struct console_desc *con)
+scrdown(struct console_desc *console)
 {
 	// see if cursor is outside of scroll region
-	if (con->y < con->scroll_top || con->y > con->scroll_bottom)
+	if (console->y < console->scroll_top || console->y > console->scroll_bottom)
 		return;
 
-	if (con->scroll_bottom - con->y > 1) {
+	if (console->scroll_bottom - console->y > 1) {
 		// move the screen down one
-		con->module->blit(0, con->y, con->columns, con->scroll_bottom - con->y, 0, con->y + 1);
+		console->module->blit(0, console->y, console->columns,
+			console->scroll_bottom - console->y, 0, console->y + 1);
 	}
 
 	// clear the top line
-	con->module->fill_glyph(0, con->y, con->columns, 1, ' ', con->attr);
+	console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
 }
 
 
 static void
-lf(struct console_desc *con)
+lf(struct console_desc *console)
 {
-	//dprintf("lf: y %d x %d scroll_top %d scoll_bottom %d\n", con->y, con->x, con->scroll_top, con->scroll_bottom);
+	//dprintf("lf: y %d x %d scroll_top %d scoll_bottom %d\n", console->y, console->x, console->scroll_top, console->scroll_bottom);
 
-	if (con->y == con->scroll_bottom ) {
+	if (console->y == console->scroll_bottom ) {
  		// we hit the bottom of our scroll region
- 		scrup(con);
-	} else if(con->y < con->scroll_bottom) {
-		con->y++;
+ 		scrup(console);
+	} else if(console->y < console->scroll_bottom) {
+		console->y++;
 	}
 }
 
 
 static void
-rlf(struct console_desc *con)
+rlf(struct console_desc *console)
 {
-	if (con->y == con->scroll_top) {
+	if (console->y == console->scroll_top) {
  		// we hit the top of our scroll region
- 		scrdown(con);
-	} else if (con->y > con->scroll_top) {
-		con->y--;
+ 		scrdown(console);
+	} else if (console->y > console->scroll_top) {
+		console->y--;
 	}
 }
 
 
 static void
-cr(struct console_desc *con)
+cr(struct console_desc *console)
 {
-	con->x = 0;
+	console->x = 0;
 }
 
 
 static void
-del(struct console_desc *con)
+del(struct console_desc *console)
 {
-	if (con->x > 0) {
-		con->x--;
-	} else if (con->y > 0) {
-        con->y--;
-        con->x = con->columns - 1;
+	if (console->x > 0) {
+		console->x--;
+	} else if (console->y > 0) {
+        console->y--;
+        console->x = console->columns - 1;
     } else {
         //This doesn't work...
-        //scrdown(con);
-        //con->y--;
-        //con->x = con->columns - 1;
+        //scrdown(console);
+        //console->y--;
+        //console->x = console->columns - 1;
         return;
     }
-	con->module->put_glyph(con->x, con->y, ' ', con->attr);
+	console->module->put_glyph(console->x, console->y, ' ', console->attr);
 }
 
 
 static void
-erase_line(struct console_desc *con, erase_line_mode mode)
+erase_line(struct console_desc *console, erase_line_mode mode)
 {
 	switch (mode) {
 		case LINE_ERASE_WHOLE:
-			con->module->fill_glyph(0, con->y, con->columns, 1, ' ', con->attr);
+			console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
 			break;
 		case LINE_ERASE_LEFT:
-			con->module->fill_glyph(0, con->y, con->x+1, 1, ' ', con->attr);
+			console->module->fill_glyph(0, console->y, console->x+1, 1, ' ', console->attr);
 			break;
 		case LINE_ERASE_RIGHT:
-			con->module->fill_glyph(con->x, con->y, con->columns - con->x, 1, ' ', con->attr);
+			console->module->fill_glyph(console->x, console->y,
+				console->columns - console->x, 1, ' ', console->attr);
 			break;
 		default:
 			return;
@@ -224,17 +226,18 @@ erase_line(struct console_desc *con, erase_line_mode mode)
 
 
 static void
-erase_screen(struct console_desc *con, erase_screen_mode mode)
+erase_screen(struct console_desc *console, erase_screen_mode mode)
 {
 	switch (mode) {
 		case SCREEN_ERASE_WHOLE:
-			con->module->clear(con->attr);
+			console->module->clear(console->attr);
 			break;
 		case SCREEN_ERASE_UP:
-			con->module->fill_glyph(0, 0, con->columns, con->y + 1, ' ', con->attr);
+			console->module->fill_glyph(0, 0, console->columns, console->y + 1, ' ', console->attr);
 			break;
 		case SCREEN_ERASE_DOWN:
-			con->module->fill_glyph(con->y, 0, con->columns, con->lines - con->y, ' ', con->attr);
+			console->module->fill_glyph(console->y, 0,
+				console->columns, console->lines - console->y, ' ', console->attr);
 			break;
 		default:
 			return;
@@ -243,65 +246,65 @@ erase_screen(struct console_desc *con, erase_screen_mode mode)
 
 
 static void
-save_cur(struct console_desc *con, bool save_attrs)
+save_cur(struct console_desc *console, bool save_attrs)
 {
-	con->saved_x = con->x;
-	con->saved_y = con->y;
+	console->saved_x = console->x;
+	console->saved_y = console->y;
 	if (save_attrs)
-		con->saved_attr = con->attr;
+		console->saved_attr = console->attr;
 }
 
 
 static void
-restore_cur(struct console_desc *con, bool restore_attrs)
+restore_cur(struct console_desc *console, bool restore_attrs)
 {
-	con->x = con->saved_x;
-	con->y = con->saved_y;
+	console->x = console->saved_x;
+	console->y = console->saved_y;
 	if (restore_attrs)
-		con->attr = con->saved_attr;
+		console->attr = console->saved_attr;
 }
 
 
 static char
-console_putch(struct console_desc *con, const char c)
+console_putch(struct console_desc *console, const char c)
 {
-	if (++con->x >= con->columns) {
-		cr(con);
-		lf(con);
+	if (++console->x >= console->columns) {
+		cr(console);
+		lf(console);
 	}
-	con->module->put_glyph(con->x-1, con->y, c, con->attr);
+	console->module->put_glyph(console->x-1, console->y, c, console->attr);
 	return c;
 }
 
 
 static void
-tab(struct console_desc *con)
+tab(struct console_desc *console)
 {
-	con->x = (con->x + TAB_SIZE) & ~TAB_MASK;
-	if (con->x >= con->columns) {
-		con->x -= con->columns;
-		lf(con);
+	console->x = (console->x + TAB_SIZE) & ~TAB_MASK;
+	if (console->x >= console->columns) {
+		console->x -= console->columns;
+		lf(console);
 	}
 }
 
 
 static void
-set_scroll_region(struct console_desc *con, int top, int bottom)
+set_scroll_region(struct console_desc *console, int top, int bottom)
 {
 	if (top < 0)
 		top = 0;
-	if (bottom >= con->lines)
-		bottom = con->lines - 1;
+	if (bottom >= console->lines)
+		bottom = console->lines - 1;
 	if (top > bottom)
 		return;
 
-	con->scroll_top = top;
-	con->scroll_bottom = bottom;
+	console->scroll_top = top;
+	console->scroll_bottom = bottom;
 }
 
 
 static void
-set_vt100_attributes(struct console_desc *con, int32 *args, int32 argCount)
+set_vt100_attributes(struct console_desc *console, int32 *args, int32 argCount)
 {
 	if (argCount == 0) {
 		// that's the default (attributes off)
@@ -313,58 +316,58 @@ set_vt100_attributes(struct console_desc *con, int32 *args, int32 argCount)
 		//dprintf("set_vt100_attributes: %ld\n", args[i]);
 		switch (args[i]) {
 			case 0: // reset
-				con->attr = 0x0f;
-				con->bright_attr = true;
-				con->reverse_attr = false;
+				console->attr = 0x0f;
+				console->bright_attr = true;
+				console->reverse_attr = false;
 				break;
 			case 1: // bright
-				con->bright_attr = true;
-				con->attr |= 0x08; // set the bright bit
+				console->bright_attr = true;
+				console->attr |= 0x08; // set the bright bit
 				break;
 			case 2: // dim
-				con->bright_attr = false;
-				con->attr &= ~0x08; // unset the bright bit
+				console->bright_attr = false;
+				console->attr &= ~0x08; // unset the bright bit
 				break;
 			case 4: // underscore we can't do
 				break;
 			case 5: // blink
-				con->attr |= 0x80; // set the blink bit
+				console->attr |= 0x80; // set the blink bit
 				break;
 			case 7: // reverse
-				con->reverse_attr = true;
-				con->attr = ((con->attr & BMASK) >> 4) | ((con->attr & FMASK) << 4);
-				if (con->bright_attr)
-					con->attr |= 0x08;
+				console->reverse_attr = true;
+				console->attr = ((console->attr & BMASK) >> 4) | ((console->attr & FMASK) << 4);
+				if (console->bright_attr)
+					console->attr |= 0x08;
 				break;
 			case 8: // hidden?
 				break;
 
 			/* foreground colors */
-			case 30: con->attr = (con->attr & ~FMASK) | 0 | (con->bright_attr ? 0x08 : 0); break; // black
-			case 31: con->attr = (con->attr & ~FMASK) | 4 | (con->bright_attr ? 0x08 : 0); break; // red
-			case 32: con->attr = (con->attr & ~FMASK) | 2 | (con->bright_attr ? 0x08 : 0); break; // green
-			case 33: con->attr = (con->attr & ~FMASK) | 6 | (con->bright_attr ? 0x08 : 0); break; // yellow
-			case 34: con->attr = (con->attr & ~FMASK) | 1 | (con->bright_attr ? 0x08 : 0); break; // blue
-			case 35: con->attr = (con->attr & ~FMASK) | 5 | (con->bright_attr ? 0x08 : 0); break; // magenta
-			case 36: con->attr = (con->attr & ~FMASK) | 3 | (con->bright_attr ? 0x08 : 0); break; // cyan
-			case 37: con->attr = (con->attr & ~FMASK) | 7 | (con->bright_attr ? 0x08 : 0); break; // white
+			case 30: console->attr = (console->attr & ~FMASK) | 0 | (console->bright_attr ? 0x08 : 0); break; // black
+			case 31: console->attr = (console->attr & ~FMASK) | 4 | (console->bright_attr ? 0x08 : 0); break; // red
+			case 32: console->attr = (console->attr & ~FMASK) | 2 | (console->bright_attr ? 0x08 : 0); break; // green
+			case 33: console->attr = (console->attr & ~FMASK) | 6 | (console->bright_attr ? 0x08 : 0); break; // yellow
+			case 34: console->attr = (console->attr & ~FMASK) | 1 | (console->bright_attr ? 0x08 : 0); break; // blue
+			case 35: console->attr = (console->attr & ~FMASK) | 5 | (console->bright_attr ? 0x08 : 0); break; // magenta
+			case 36: console->attr = (console->attr & ~FMASK) | 3 | (console->bright_attr ? 0x08 : 0); break; // cyan
+			case 37: console->attr = (console->attr & ~FMASK) | 7 | (console->bright_attr ? 0x08 : 0); break; // white
 
 			/* background colors */
-			case 40: con->attr = (con->attr & ~BMASK) | (0 << 4); break; // black
-			case 41: con->attr = (con->attr & ~BMASK) | (4 << 4); break; // red
-			case 42: con->attr = (con->attr & ~BMASK) | (2 << 4); break; // green
-			case 43: con->attr = (con->attr & ~BMASK) | (6 << 4); break; // yellow
-			case 44: con->attr = (con->attr & ~BMASK) | (1 << 4); break; // blue
-			case 45: con->attr = (con->attr & ~BMASK) | (5 << 4); break; // magenta
-			case 46: con->attr = (con->attr & ~BMASK) | (3 << 4); break; // cyan
-			case 47: con->attr = (con->attr & ~BMASK) | (7 << 4); break; // white
+			case 40: console->attr = (console->attr & ~BMASK) | (0 << 4); break; // black
+			case 41: console->attr = (console->attr & ~BMASK) | (4 << 4); break; // red
+			case 42: console->attr = (console->attr & ~BMASK) | (2 << 4); break; // green
+			case 43: console->attr = (console->attr & ~BMASK) | (6 << 4); break; // yellow
+			case 44: console->attr = (console->attr & ~BMASK) | (1 << 4); break; // blue
+			case 45: console->attr = (console->attr & ~BMASK) | (5 << 4); break; // magenta
+			case 46: console->attr = (console->attr & ~BMASK) | (3 << 4); break; // cyan
+			case 47: console->attr = (console->attr & ~BMASK) | (7 << 4); break; // white
 		}
 	}
 }
 
 
 static bool
-process_vt100_command(struct console_desc *con, const char c,
+process_vt100_command(struct console_desc *console, const char c,
 	bool seen_bracket, int32 *args, int32 argCount)
 {
 	bool ret = true;
@@ -382,14 +385,14 @@ process_vt100_command(struct console_desc *con, const char c,
 					row--;
 				if (col > 0)
 					col--;
-				gotoxy(con, col, row);
+				gotoxy(console, col, row);
 				break;
 			}
 			case 'A': { /* move up */
 				int32 deltay = argCount > 0 ? -args[0] : -1;
 				if (deltay == 0)
 					deltay = -1;
-				gotoxy(con, con->x, con->y + deltay);
+				gotoxy(console, console->x, console->y + deltay);
 				break;
 			}
 			case 'e':
@@ -397,14 +400,14 @@ process_vt100_command(struct console_desc *con, const char c,
 				int32 deltay = argCount > 0 ? args[0] : 1;
 				if (deltay == 0)
 					deltay = 1;
-				gotoxy(con, con->x, con->y + deltay);
+				gotoxy(console, console->x, console->y + deltay);
 				break;
 			}
 			case 'D': { /* move left */
 				int32 deltax = argCount > 0 ? -args[0] : -1;
 				if (deltax == 0)
 					deltax = -1;
-				gotoxy(con, con->x + deltax, con->y);
+				gotoxy(console, console->x + deltax, console->y);
 				break;
 			}
 			case 'a':
@@ -412,7 +415,7 @@ process_vt100_command(struct console_desc *con, const char c,
 				int32 deltax = argCount > 0 ? args[0] : 1;
 				if (deltax == 0)
 					deltax = 1;
-				gotoxy(con, con->x + deltax, con->y);
+				gotoxy(console, console->x + deltax, console->y);
 				break;
 			}
 			case '`':
@@ -420,33 +423,33 @@ process_vt100_command(struct console_desc *con, const char c,
 				int32 newx = argCount > 0 ? args[0] : 1;
 				if (newx > 0)
 					newx--;
-				gotoxy(con, newx, con->y);
+				gotoxy(console, newx, console->y);
 				break;
 			}
 			case 'd': { /* set y position */
 				int32 newy = argCount > 0 ? args[0] : 1;
 				if (newy > 0)
 					newy--;
-				gotoxy(con, con->x, newy);
+				gotoxy(console, console->x, newy);
 				break;
 			}
 			case 's': /* save current cursor */
-				save_cur(con, false);
+				save_cur(console, false);
 				break;
 			case 'u': /* restore cursor */
-				restore_cur(con, false);
+				restore_cur(console, false);
 				break;
 			case 'r': { /* set scroll region */
 				int32 low = argCount > 0 ? args[0] : 1;
-				int32 high = argCount > 1 ? args[1] : con->lines;
+				int32 high = argCount > 1 ? args[1] : console->lines;
 				if (low <= high)
-					set_scroll_region(con, low - 1, high - 1);
+					set_scroll_region(console, low - 1, high - 1);
 				break;
 			}
 			case 'L': { /* scroll virtual down at cursor */
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
-					scrdown(con);
+					scrdown(console);
 					lines--;
 				}
 				break;
@@ -454,7 +457,7 @@ process_vt100_command(struct console_desc *con, const char c,
 			case 'M': { /* scroll virtual up at cursor */
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
-					scrup(con);
+					scrup(console);
 					lines--;
 				}
 				break;
@@ -462,28 +465,28 @@ process_vt100_command(struct console_desc *con, const char c,
 			case 'K':
 				if (argCount == 0 || args[0] == 0) {
 					// erase to end of line
-					erase_line(con, LINE_ERASE_RIGHT);
+					erase_line(console, LINE_ERASE_RIGHT);
 				} else if (argCount > 0) {
 					if (args[0] == 1)
-						erase_line(con, LINE_ERASE_LEFT);
+						erase_line(console, LINE_ERASE_LEFT);
 					else if (args[0] == 2)
-						erase_line(con, LINE_ERASE_WHOLE);
+						erase_line(console, LINE_ERASE_WHOLE);
 				}
 				break;
 			case 'J':
 				if (argCount == 0 || args[0] == 0) {
 					// erase to end of screen
-					erase_screen(con, SCREEN_ERASE_DOWN);
+					erase_screen(console, SCREEN_ERASE_DOWN);
 				} else {
 					if (args[0] == 1)
-						erase_screen(con, SCREEN_ERASE_UP);
+						erase_screen(console, SCREEN_ERASE_UP);
 					else if (args[0] == 2)
-						erase_screen(con, SCREEN_ERASE_WHOLE);
+						erase_screen(console, SCREEN_ERASE_WHOLE);
 				}
 				break;
 			case 'm':
 				if (argCount >= 0)
-					set_vt100_attributes(con, args, argCount);
+					set_vt100_attributes(console, args, argCount);
 				break;
 			default:
 				ret = false;
@@ -491,19 +494,19 @@ process_vt100_command(struct console_desc *con, const char c,
 	} else {
 		switch (c) {
 			case 'c':
-				reset_console(con);
+				reset_console(console);
 				break;
 			case 'D':
-				rlf(con);
+				rlf(console);
 				break;
 			case 'M':
-				lf(con);
+				lf(console);
 				break;
 			case '7':
-				save_cur(con, true);
+				save_cur(console, true);
 				break;
 			case '8':
-				restore_cur(con, true);
+				restore_cur(console, true);
 				break;
 			default:
 				ret = false;
@@ -515,7 +518,7 @@ process_vt100_command(struct console_desc *con, const char c,
 
 
 static ssize_t
-_console_write(struct console_desc *con, const void *buf, size_t len)
+_console_write(struct console_desc *console, const void *buf, size_t len)
 {
 	const char *c;
 	size_t pos = 0;
@@ -523,21 +526,21 @@ _console_write(struct console_desc *con, const void *buf, size_t len)
 	while (pos < len) {
 		c = &((const char *)buf)[pos++];
 
-		switch (con->state) {
+		switch (console->state) {
 			case CONSOLE_STATE_NORMAL:
 				// just output the stuff
 				switch (*c) {
 					case '\n':
-						lf(con);
+						lf(console);
 						break;
 					case '\r':
-						cr(con);
+						cr(console);
 						break;
 					case 0x8: // backspace
-						del(con);
+						del(console);
 						break;
 					case '\t':
-						tab(con);
+						tab(console);
 						break;
 					case '\a':
 						// beep
@@ -547,70 +550,70 @@ _console_write(struct console_desc *con, const void *buf, size_t len)
 						break;
 					case 0x1b:
 						// escape character
-						con->arg_ptr = -1;
-						con->state = CONSOLE_STATE_GOT_ESCAPE;
+						console->arg_count = -1;
+						console->state = CONSOLE_STATE_GOT_ESCAPE;
 						break;
 					default:
-						console_putch(con, *c);
+						console_putch(console, *c);
 				}
 				break;
 			case CONSOLE_STATE_GOT_ESCAPE:
 				// look for either commands with no argument, or the '[' character
 				switch (*c) {
 					case '[':
-						con->state = CONSOLE_STATE_SEEN_BRACKET;
+						console->state = CONSOLE_STATE_SEEN_BRACKET;
 						break;
 					default:
-						con->args[con->arg_ptr] = 0;
-						process_vt100_command(con, *c, false, con->args, con->arg_ptr + 1);
-						con->state = CONSOLE_STATE_NORMAL;
+						console->args[console->arg_count] = 0;
+						process_vt100_command(console, *c, false, console->args, console->arg_count + 1);
+						console->state = CONSOLE_STATE_NORMAL;
 				}
 				break;
 			case CONSOLE_STATE_SEEN_BRACKET:
 				switch (*c) {
 					case '0'...'9':
-						con->arg_ptr = 0;
-						con->args[con->arg_ptr] = *c - '0';
-						con->state = CONSOLE_STATE_PARSING_ARG;
+						console->arg_count = 0;
+						console->args[console->arg_count] = *c - '0';
+						console->state = CONSOLE_STATE_PARSING_ARG;
 						break;
 					case '?':
 						// private DEC mode parameter follows - we ignore those anyway
 						// ToDo: check if it was really used in combination with a mode command
 						break;
 					default:
-						process_vt100_command(con, *c, true, con->args, con->arg_ptr + 1);
-						con->state = CONSOLE_STATE_NORMAL;
+						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						console->state = CONSOLE_STATE_NORMAL;
 				}
 				break;
 			case CONSOLE_STATE_NEW_ARG:
 				switch (*c) {
 					case '0'...'9':
-						con->arg_ptr++;
-						if (con->arg_ptr == MAX_ARGS) {
-							con->state = CONSOLE_STATE_NORMAL;
+						console->arg_count++;
+						if (console->arg_count == MAX_ARGS) {
+							console->state = CONSOLE_STATE_NORMAL;
 							break;
 						}
-						con->args[con->arg_ptr] = *c - '0';
-						con->state = CONSOLE_STATE_PARSING_ARG;
+						console->args[console->arg_count] = *c - '0';
+						console->state = CONSOLE_STATE_PARSING_ARG;
 						break;
 					default:
-						process_vt100_command(con, *c, true, con->args, con->arg_ptr + 1);
-						con->state = CONSOLE_STATE_NORMAL;
+						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						console->state = CONSOLE_STATE_NORMAL;
 				}
 				break;
 			case CONSOLE_STATE_PARSING_ARG:
 				// parse args
 				switch (*c) {
 					case '0'...'9':
-						con->args[con->arg_ptr] *= 10;
-						con->args[con->arg_ptr] += *c - '0';
+						console->args[console->arg_count] *= 10;
+						console->args[console->arg_count] += *c - '0';
 						break;
 					case ';':
-						con->state = CONSOLE_STATE_NEW_ARG;
+						console->state = CONSOLE_STATE_NEW_ARG;
 						break;
 					default:
-						process_vt100_command(con, *c, true, con->args, con->arg_ptr + 1);
-						con->state = CONSOLE_STATE_NORMAL;
+						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						console->state = CONSOLE_STATE_NORMAL;
 				}
 			}
 	}
@@ -625,11 +628,11 @@ _console_write(struct console_desc *con, const void *buf, size_t len)
 static status_t
 console_open(const char *name, uint32 flags, void **cookie)
 {
-	*cookie = &gconsole;
+	*cookie = &sConsole;
 
-	status_t status = get_module(gconsole.module_name, (module_info **)&gconsole.module);
+	status_t status = get_module(sConsole.module_name, (module_info **)&sConsole.module);
 	if (status == B_OK)
-		gconsole.module->clear(0x0f);
+		sConsole.module->clear(0x0f);
 
 	return status;
 }
@@ -638,9 +641,9 @@ console_open(const char *name, uint32 flags, void **cookie)
 static status_t
 console_freecookie(void *cookie)
 {
-	if (gconsole.module != NULL) {
-		put_module(gconsole.module_name);
-		gconsole.module = NULL;
+	if (sConsole.module != NULL) {
+		put_module(sConsole.module_name);
+		sConsole.module = NULL;
 	}
 
 	return B_OK;
@@ -666,7 +669,7 @@ console_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 static status_t
 console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
-	struct console_desc *con = (struct console_desc *)cookie;
+	struct console_desc *console = (struct console_desc *)cookie;
 	ssize_t written;
 
 #if 0
@@ -683,13 +686,13 @@ console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 }
 #endif
 
-	mutex_lock(&con->lock);
+	mutex_lock(&console->lock);
 
-	update_cursor(con, -1, -1); // hide it
-	written = _console_write(con, buffer, *_length);
-	update_cursor(con, con->x, con->y);
+	update_cursor(console, -1, -1); // hide it
+	written = _console_write(console, buffer, *_length);
+	update_cursor(console, console->x, console->y);
 
-	mutex_unlock(&con->lock);
+	mutex_unlock(&console->lock);
 
 	if (written >= 0) {
 		*_length = written;
@@ -724,8 +727,8 @@ init_hardware(void)
 
 	while (read_next_module_name(cookie, buffer, &bufferSize) == B_OK) {
 		dprintf("con_init: trying module %s\n", buffer);
-		if (get_module(buffer, (module_info **)&gconsole.module) == B_OK) {
-			strlcpy(gconsole.module_name, buffer, sizeof(gconsole.module_name));
+		if (get_module(buffer, (module_info **)&sConsole.module) == B_OK) {
+			strlcpy(sConsole.module_name, buffer, sizeof(sConsole.module_name));
 			put_module(buffer);
 			found = true;
 			break;
@@ -736,12 +739,12 @@ init_hardware(void)
 
 	if (found) {
 		// set up the console structure
-		mutex_init(&gconsole.lock, "console lock");
-		gconsole.module->get_size(&gconsole.columns, &gconsole.lines);
+		mutex_init(&sConsole.lock, "console lock");
+		sConsole.module->get_size(&sConsole.columns, &sConsole.lines);
 
-		reset_console(&gconsole);
-		gotoxy(&gconsole, 0, 0);
-		save_cur(&gconsole, true);
+		reset_console(&sConsole);
+		gotoxy(&sConsole, 0, 0);
+		save_cur(&sConsole, true);
 	}
 
 	close_module_list(cookie);
