@@ -45,7 +45,7 @@ print_env(char *arg)
 	
 	if (arg == NULL) {
 		// print all environment 'key=value' pairs (one per line)
-	    while (*env)
+		while (*env)
 			printf("%s\n", *env++);
 		
 		return 0;
@@ -56,10 +56,10 @@ print_env(char *arg)
 		int   len   = strlen(arg);
 		bool  found = false;
 		
-	    while ((s = *env++) != NULL)
-	    	if (!strncmp(s, arg, len)) {
-	    		char *p = strchr(s, '=');
-	    		if (p) {
+		while ((s = *env++) != NULL)
+			if (!strncmp(s, arg, len)) {
+				char *p = strchr(s, '=');
+				if (p) {
 					printf("%s\n", p+1);
 					found = true;
 				}
