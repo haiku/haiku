@@ -14,6 +14,7 @@
 #include "JSDSlider.h"
 
 class BTextControl;
+class BTextView;
 class BRadioButton;
 class BCheckBox;
 class BPopUpMenu;
@@ -30,17 +31,19 @@ public:
 	virtual void MessageReceived(BMessage *msg);
 	bool UpdateJobData();
 
-public:
-	BTextControl *copies;
-	BTextControl *from_page;
-	BTextControl *to_page;
-
 private:
+	void UpdateButtonEnabledState();
+	BRadioButton* AddPageSelectionItem(BView* parent, BRect rect, const char* name, const char* label, 
+		JobData::PageSelection pageSelection);
+	void AllowOnlyDigits(BTextView* textView, int maxDigits);
 	JobData::Color getColor();
 	Halftone::DitherType getDitherType();
 	float getGamma();
 	float getInkDensity();
 
+	BTextControl     *fCopies;
+	BTextControl     *fFromPage;
+	BTextControl     *fToPage;
 	JobData          *fJobData;
 	PrinterData      *fPrinterData;
 	const PrinterCap *fPrinterCap;
@@ -56,16 +59,18 @@ private:
 	BPopUpMenu       *fPaperFeed;
 	BCheckBox        *fDuplex;
 	BPopUpMenu       *fNup;
+	BRadioButton     *fAllPages;
+	BRadioButton     *fOddNumberedPages;
+	BRadioButton     *fEvenNumberedPages;	
 };
 
 class JobSetupDlg : public DialogWindow {
 public:
 	JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
-	~JobSetupDlg();
 	virtual	void MessageReceived(BMessage *message);
 
 private:
-	BMessageFilter *fFilter;
+	JobSetupView *fJobSetup;
 };
 
 #endif	/* __JOBSETUPDLG_H */

@@ -212,6 +212,12 @@ public:
 		kPageSettings,
 		kJobSettings
 	};
+	
+	enum PageSelection {
+		kAllPages,
+		kOddNumberedPages,
+		kEvenNumberedPages
+	};
 
 private:
 	Paper       fPaper;
@@ -237,8 +243,9 @@ private:
 	PageOrder   fPageOrder;
 	Settings    fSettings;
 	BMessage    *fMsg;
-	bool        fColor;
+	Color       fColor;
 	Halftone::DitherType fDitherType;
+	PageSelection        fPageSelection;
 
 public:
 	JobData(BMessage *msg, const PrinterCap *cap, Settings settings);
@@ -316,11 +323,14 @@ public:
 	PageOrder getPageOrder() const { return fPageOrder; }
 	void setPageOrder(PageOrder page_order) { fPageOrder = page_order; }
 	
-	Color getColor() const { return fColor ? kColor : kMonochrome; }
-	void setColor(Color color) { fColor = color == kColor; }
+	Color getColor() const { return fColor; }
+	void setColor(Color color) { fColor = color; }
 	
 	Halftone::DitherType getDitherType() const { return fDitherType; }
 	void setDitherType(Halftone::DitherType dither_type) { fDitherType = dither_type; }
+	
+	PageSelection getPageSelection() const { return fPageSelection; }
+	void setPageSelection(PageSelection pageSelection) { fPageSelection = pageSelection; }
 };
 
 #endif	/* __JOBDATA_H */

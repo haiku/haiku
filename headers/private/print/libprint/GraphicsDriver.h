@@ -61,6 +61,8 @@ private:
 	void cleanupData();
 	void cleanupBitmap();
 	bool printPage(PageDataList *pages);
+	bool collectPages(SpoolData *spool_data, PageDataList *pages);
+	bool skipPages(SpoolData *spool_data);
 	bool printDocument(SpoolData *spool_data);
 	bool printJob(BFile *file);
 	static void rgb32_to_rgb24(void* src, void* dst, int width);
