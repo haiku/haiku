@@ -3,7 +3,7 @@
 */
 
 /* 
-** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -3943,7 +3943,7 @@ int
 user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	char fs_name[SYS_MAX_OS_NAME_LEN + 1];
+	char fs_name[B_OS_NAME_LENGTH + 1];
 	char device[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
@@ -3956,7 +3956,7 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 	if (rc < 0)
 		return rc;
 
-	rc = user_strlcpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN);
+	rc = user_strlcpy(fs_name, ufs_name, B_OS_NAME_LENGTH);
 	if (rc < 0)
 		return rc;
 
