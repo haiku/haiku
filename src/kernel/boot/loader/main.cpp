@@ -1,11 +1,12 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "menu.h"
 #include "loader.h"
+#include "load_driver_settings.h"
 
 #include <boot/stage2.h>
 #include <boot/vfs.h>
@@ -35,8 +36,6 @@ main(stage2_args *args)
 	TRACE(("boot(): heap initialized...\n"));
 
 	platform_init_video();
-	if ((platform_boot_options() & (BOOT_OPTION_DEBUG_OUTPUT | BOOT_OPTION_MENU)) == 0)
-		platform_switch_to_logo();
 
 	// the main platform dependent initialisation
 	// has already taken place at this point.
@@ -97,7 +96,12 @@ main(stage2_args *args)
 		// know our boot volume, too
 		if (status == B_OK) {
 			register_boot_file_system(volume);
+
+			if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
+				platform_switch_to_logo();
+
 			load_modules(args, volume);
+			load_driver_settings(args, volume);
 
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);
