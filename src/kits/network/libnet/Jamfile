@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src kits network libnet ;
 
-UsePrivateHeaders net ;
 UseHeaders [ FDirName $(SUBDIR) headers ] ;
+UsePrivateHeaders net ;
 
 {
 	# Default libs include BeOS R5 libnet.so, something we don't want here!
