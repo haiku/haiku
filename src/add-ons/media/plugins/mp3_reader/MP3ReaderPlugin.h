@@ -46,6 +46,9 @@ private:
 	int			GetInfoCbrLength(uint8 *header);
 	
 	bool		FindData();
+
+	void		ParseXingVbrHeader(int64 pos);
+	void		ParseFraunhoferVbrHeader(int64 pos);
 	
 	
 private:
@@ -54,6 +57,9 @@ private:
 	
 	int64			fDataStart;
 	int64			fDataSize;
+	
+	uint8 *			fXingVbrHeader;
+	uint8 *			fFraunhoferVbrHeader;
 };
 
 

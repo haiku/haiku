@@ -67,12 +67,17 @@ struct mp3data
 };
 
 mp3Reader::mp3Reader()
+ :	fXingVbrHeader(0),
+	fFraunhoferVbrHeader(0)
+
 {
 	TRACE("mp3Reader::mp3Reader\n");
 }
 
 mp3Reader::~mp3Reader()
 {
+	delete fXingVbrHeader;
+	delete fFraunhoferVbrHeader;
 }
       
 const char *
@@ -292,6 +297,7 @@ mp3Reader::ParseFile()
 			hdr_length = GetXingVbrLength(&buf[pos]);
 			if (hdr_length > 0) {
 				TRACE("mp3ReaderPlugin::ParseFile found a Xing VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				ParseXingVbrHeader(offset + pos);
 				goto skip_header;
 			}
 
@@ -304,6 +310,7 @@ mp3Reader::ParseFile()
 			hdr_length = GetFraunhoferVbrLength(&buf[pos]);
 			if (hdr_length > 0) {
 				TRACE("mp3ReaderPlugin::ParseFile found a Fraunhofer VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				ParseFraunhoferVbrHeader(offset + pos);
 				goto skip_header;
 			}
 			
@@ -433,6 +440,11 @@ mp3Reader::GetInfoCbrLength(uint8 *header)
 	return GetFrameLength(header);
 }
 
+void
+mp3Reader::ParseXingVbrHeader(int64 pos)
+{
+}
+
 int
 mp3Reader::GetLameVbrLength(uint8 *header)
 {
@@ -449,6 +461,11 @@ mp3Reader::GetFraunhoferVbrLength(uint8 *header)
 	if (header[39] != 'I') return -1;
 
 	return GetFrameLength(header);
+}
+
+void
+mp3Reader::ParseFraunhoferVbrHeader(int64 pos)
+{
 }
 
 int
@@ -469,6 +486,8 @@ mp3Reader::GetId3v2Length(uint8 *buffer)
 bool
 mp3Reader::IsMp3File()
 {
+	// avoid detecting mp3 in a container format like AVI or mov
+
 	// To detect an mp3 file, we seek into the middle,
 	// and search for a valid sequence of 3 frame headers.
 	// A mp3 frame has a maximum length of 2881 bytes, we
@@ -479,6 +498,37 @@ mp3Reader::IsMp3File()
 	int32	size;
 	uint8	buf[search_size];
 
+	size = 8;
+	offset = 0;
+	if (size != Source()->ReadAt(offset, buf, size)) {
+		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
+		return false;
+	}
+	
+	// avoid reading some common formats that might have an embedded mp3 stream
+	// RIFF, AVI or WAV
+	if (buf[0] == 'R' && buf[1] == 'I' && buf[2] == 'F' && buf[3] == 'F')
+		return false;
+	// Ogg Vorbis
+	if (buf[0] == 'O' && buf[1] == 'g' && buf[2] == 'g' && buf[3] == 'S')
+		return false;
+	// Real Media
+	if (buf[0] == '.' && buf[1] == 'R' && buf[2] == 'M' && buf[3] == 'F')
+		return false;
+	// Quicktime
+	if (buf[4] == 'm' && buf[5] == 'o' && buf[6] == 'o' && buf[7] == 'v')
+		return false;
+	// ASF 1 (first few bytes of GUID)
+	if (buf[0] == 0x30 && buf[1] == 0x26 && buf[2] == 0xb2 && buf[3] == 0x75
+		&& buf[4] == 0x8e && buf[5] == 0x66 && buf[6] == 0xcf && buf[7] == 0x11)
+		return false;
+	// ASF 2.0 (first few bytes of GUID)
+	if (buf[0] == 0xd1 && buf[1] == 0x29 && buf[2] == 0xe2 && buf[3] == 0xd6
+		&& buf[4] == 0xda && buf[5] == 0x35 && buf[6] == 0xd1 && buf[7] == 0x11)
+		return false;
+
+	// search for a valid mpeg audio frame header
+	// sequence in the middle of the file
 	size = search_size;
 	offset = fFileSize / 2 - search_size / 2;
 	if (size > fFileSize) {
