@@ -690,6 +690,11 @@ HeaderView::MessageReceived(BMessage *message)
 			fPosition = (fPosition / fBlockSize) * fBlockSize;
 				// round to block size
 
+			if (fPosition < 0)
+				fPosition = 0;
+			else if (fPosition > ((fFileSize - 1) / fBlockSize) * fBlockSize)
+				fPosition = ((fFileSize - 1) / fBlockSize) * fBlockSize;
+
 			// update views
 			UpdatePositionViews();
 			fPositionSlider->SetPosition(fPosition);
