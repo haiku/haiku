@@ -96,6 +96,10 @@ protected:
 	void SetPixel32(int x, int y, rgb_color col);
 	void SetPixel16(int x, int y, uint16 col);
 	void SetPixel8(int x, int y, uint8 col);
+	void SetThickPixel(int x, int y, int thick, RGBColor col);
+	void SetThickPixel32(int x, int y, int thick, rgb_color col);
+	void SetThickPixel16(int x, int y, int thick, uint16 col);
+	void SetThickPixel8(int x, int y, int thick, uint8 col);
 	FrameBuffer *fbuffer;
 	int hide_cursor;
 	ServerBitmap *cursor, *under_cursor;

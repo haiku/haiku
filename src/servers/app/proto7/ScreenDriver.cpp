@@ -601,6 +601,87 @@ r.PrintToStream();
 	Unlock();
 }
 
+void ScreenDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
+{
+	switch(fbuffer->gcinfo.bits_per_pixel)
+	{
+		case 32:
+		case 24:
+			SetThickPixel32(x,y,thick,col.GetColor32());
+			break;
+		case 16:
+		case 15:
+			SetThickPixel16(x,y,thick,col.GetColor16());
+			break;
+		case 8:
+			SetThickPixel8(x,y,thick,col.GetColor8());
+			break;
+		default:
+			printf("Unknown pixel depth %d in SetThickPixel\n",fbuffer->gcinfo.bits_per_pixel);
+			break;
+	}
+}
+
+void ScreenDriver::SetThickPixel32(int x, int y, int thick, rgb_color col)
+{
+	// Code courtesy of YNOP's SecondDriver
+	union
+	{
+		uint8 bytes[4];
+		uint32 word;
+	}c1;
+	
+	c1.bytes[0]=col.blue; 
+	c1.bytes[1]=col.green; 
+	c1.bytes[2]=col.red; 
+	c1.bytes[3]=col.alpha; 
+
+	/*
+	uint32 *bits=(uint32*)fbuffer->gcinfo.frame_buffer;
+	*(bits + x + (y*fbuffer->gcinfo.width))=c1.word;
+	*/
+	uint32 *bits=(uint32*)fbuffer->gcinfo.frame_buffer+(x-thick/2)+(y-thick/2)*fbuffer->gcinfo.width;
+	int i,j;
+	for (i=0; i<thick; i++)
+	{
+		for (j=0; j<thick; j++)
+		{
+			*(bits+j)=c1.word;
+		}
+		bits += fbuffer->gcinfo.width;
+	}
+}
+
+void ScreenDriver::SetThickPixel16(int x, int y, int thick, uint16 col)
+{
+
+#ifdef DEBUG_DRIVER
+printf("SetPixel16 unimplemented\n");
+#endif
+
+}
+
+void ScreenDriver::SetThickPixel8(int x, int y, int thick, uint8 col)
+{
+	// When the DisplayDriver API changes, we'll use the uint8 highcolor. Until then,
+	// we'll use *pattern
+  /*
+	uint8 *bits=(uint8*)fbuffer->gcinfo.frame_buffer;
+	*(bits + x + (y*fbuffer->gcinfo.bytes_per_row))=col;
+	*/
+
+	uint8 *bits=(uint8*)fbuffer->gcinfo.frame_buffer+(x-thick/2)+(y-thick/2)*fbuffer->gcinfo.bytes_per_row;
+	int i,j;
+	for (i=0; i<thick; i++)
+	{
+		for (j=0; j<thick; j++)
+		{
+			*(bits+j)=col;
+		}
+		bits += fbuffer->gcinfo.bytes_per_row;
+	}
+}
+
 void ScreenDriver::SetPixel(int x, int y, RGBColor col)
 {
 	switch(fbuffer->gcinfo.bits_per_pixel)
@@ -684,7 +765,7 @@ printf("ScreenDriver::SetScreen(%lu}\n",space);
 }
 
 
-// Currently only supports line thickness 1 and no pattern
+// Currently does not support pattern
 void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
 	float xc = (r.left+r.right)/2;
@@ -704,6 +785,7 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
+	int thick = d->pensize;
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
@@ -756,19 +838,19 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	if ( useQuad1 || 
 	     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetPixel(xc+x,yc+y,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 	if ( useQuad2 || 
 	     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
 	     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-		SetPixel(xc-x,yc+y,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 	if ( useQuad3 || 
 	     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
 	     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-		SetPixel(xc-x,yc-y,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
 	if ( useQuad4 || 
 	     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetPixel(xc+x,yc-y,d->highcolor);
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -787,19 +869,19 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		if ( useQuad1 || 
 		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetPixel(xc+x,yc+y,d->highcolor);
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 		if ( useQuad2 || 
 		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
 		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-			SetPixel(xc-x,yc+y,d->highcolor);
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 		if ( useQuad3 || 
 		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
 		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-			SetPixel(xc-x,yc-y,d->highcolor);
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
 		if ( useQuad4 || 
 		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetPixel(xc+x,yc-y,d->highcolor);
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -819,23 +901,23 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		if ( useQuad1 || 
 		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetPixel(xc+x,yc+y,d->highcolor);
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 		if ( useQuad2 || 
 		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
 		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-			SetPixel(xc-x,yc+y,d->highcolor);
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 		if ( useQuad3 || 
 		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
 		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-			SetPixel(xc-x,yc-y,d->highcolor);
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
 		if ( useQuad4 || 
 		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetPixel(xc+x,yc-y,d->highcolor);
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
 	}
 }
 
-// Currently only supports line thickness 1 and no pattern
+// Currently does not support pattern
 void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
 	double Ax, Bx, Cx, Dx;
@@ -876,7 +958,7 @@ void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 		x = ROUND(X);
 		y = ROUND(Y);
 		if ( (x!=lastx) || (y!=lasty) )
-			SetPixel(x,y,d->highcolor);
+			SetThickPixel(x,y,d->pensize,d->highcolor);
 		lastx = x;
 		lasty = y;
 
@@ -1575,9 +1657,15 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	// if we do any transformation, we do a call to FT_Set_Transform() here
 	
 	// First, rotate
+        /*
 	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
 	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
 	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
+        */
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	rmatrix.xy = (FT_Fixed)( rotation.Sine()*0x10000); 
+	rmatrix.yx = (FT_Fixed)(-rotation.Sine()*0x10000); 
 	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
 	
 	// Next, shear
@@ -1586,7 +1674,8 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	smatrix.yx = (FT_Fixed)(0); 
 	smatrix.yy = (FT_Fixed)(0x10000); 
 
-	FT_Matrix_Multiply(&rmatrix,&smatrix);
+	//FT_Matrix_Multiply(&rmatrix,&smatrix);
+	FT_Matrix_Multiply(&smatrix,&rmatrix);
 	
 	// Set up the increment value for escapement padding
 	space.x=int32(d->edelta.space * rotation.Cosine()*64);
@@ -1607,7 +1696,8 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 
 	for(i=0;i<strlength;i++)
 	{
-		FT_Set_Transform(face,&smatrix,&pen);
+		//FT_Set_Transform(face,&smatrix,&pen);
+		FT_Set_Transform(face,&rmatrix,&pen);
 
 		// Handle escapement padding option
 		if((uint8)string[i]<=0x20)
