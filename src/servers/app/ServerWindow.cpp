@@ -1409,7 +1409,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fTitle.String()));
 			fWinBorder->GetRootLayer()->Lock();
-			cl->UpdateStart();
+			fWinBorder->UpdateStart();
 			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
@@ -1417,7 +1417,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n",fTitle.String()));
 			fWinBorder->GetRootLayer()->Lock();
-			cl->UpdateEnd();
+			fWinBorder->UpdateEnd();
 			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
@@ -1651,9 +1651,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
 	BRegion		rreg(cl->fVisible);
-	rreg.Include(&fWinBorder->yUpdateReg);
+	rreg.IntersectWith(&fWinBorder->yUpdateReg);
 
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
+//	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
+//	RGBColor c(rand()%255,rand()%255,rand()%255);
+//	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
 
 	switch (code)
 	{

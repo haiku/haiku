@@ -535,42 +535,40 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	if (!startFrom)
 		redraw = true;
 
+	if (HasClient() && IsTopLayer())
+	{
+		// calculate the minimum region/rectangle to be updated with
+		// a single message to the client.
+		fUpdateReg = fFullVisible;
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE
+			&& fFrameAction	== B_LAYER_ACTION_RESIZE)
+		{
+			// do nothing
+		}
+		else
+		{
+			fUpdateReg.IntersectWith(&reg);
+		}
+		if (fUpdateReg.CountRects() > 0)
+		{
+			if (!fOwner->fInUpdate)
+			{
+				fOwner->prevInvalid = fUpdateReg;
+				SendUpdateMsg();
+			}
+			else
+			{
+				fOwner->zUpdateReg.Include(&fUpdateReg);
+			}
+		}
+	}
+
 	if (fVisible.CountRects() > 0)
 	{
 		// client side drawing. Send only one UPDATE message!
 		if (HasClient())
 		{
-			if (IsTopLayer())
-			{
-				// calculate the minimum region/rectangle to be updated with
-				// a single message to the client.
-				fUpdateReg = fFullVisible;
-				if (fFlags & B_FULL_UPDATE_ON_RESIZE
-					&& fFrameAction	== B_LAYER_ACTION_RESIZE)
-				{
-					// do nothing
-				}
-				else
-				{
-					fUpdateReg.IntersectWith(&reg);
-				}
-
-				if (fUpdateReg.CountRects() > 0)
-				{
-					if (!fOwner->fInUpdate)
-					{
-						fOwner->prevInvalid = fUpdateReg;
-						SendUpdateMsg();
-					}
-					else
-						fOwner->zUpdateReg.Include(&fUpdateReg);
-				}
-				
-				// we're not that different than other. We too have an
-				// update region to which our drawing is restrincted.
-			}
-
-			// calculate the update region, then...
+			// calculate the update region
 			fUpdateReg = fVisible;
 			if (fFlags & B_FULL_UPDATE_ON_RESIZE
 				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
@@ -586,9 +584,11 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			{
 				// clear background with viewColor.
 				fDriver->ConstrainClippingRegion(&fUpdateReg);
+//				RGBColor c(rand()%255,rand()%255,rand()%255);
+//				fDriver->FillRect(fUpdateReg.Frame(), c);
 				fDriver->FillRect(fUpdateReg.Frame(), fLayerData->viewcolor);
 				fDriver->ConstrainClippingRegion(NULL);
-				SendUpdateMsg();
+				fUpdateReg.MakeEmpty();
 			}
 		}
 		else
@@ -681,9 +681,9 @@ void Layer::UpdateEnd()
 		wb->zUpdateReg.Exclude(&wb->prevInvalid);
 		if (wb->zUpdateReg.CountRects() > 0)
 		{
-			wb->prevInvalid = wb->zUpdateReg;
-			fUpdateReg = wb->zUpdateReg;
-			SendUpdateMsg();
+			BRegion		reg(wb->zUpdateReg);
+			wb->RequestDraw(reg, NULL);
+			wb->zUpdateReg.MakeEmpty();
 		}
 		else
 			wb->prevInvalid.MakeEmpty();
@@ -1154,6 +1154,11 @@ void Layer::move_layer(float x, float y)
 
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
+	if (fClassID == AS_WINBORDER_CLASS)
+	{
+		WinBorder	*wb = (WinBorder*)this;
+		wb->prevInvalid.OffsetBy(x, y);
+	}
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
@@ -1477,16 +1482,14 @@ void Layer::SendViewMovedMsg()
 //! Sends an _UPDATE_ message to the client BWindow
 void Layer::SendUpdateMsg()
 {
-	if( fServerWin )
-	{
-		BMessage msg;
-		msg.what = _UPDATE_;
-		msg.AddRect("_rect", ConvertFromTop(fUpdateReg.Frame()) );
-		msg.AddRect("debug_rect", fUpdateReg.Frame() );
-		msg.AddInt32("_token",fViewToken);
+	BMessage msg;
+	msg.what = _UPDATE_;
+	msg.AddRect("_rect", ConvertFromTop(fUpdateReg.Frame()) );
+	msg.AddRect("debug_rect", fUpdateReg.Frame() );
+	msg.AddInt32("_token",fViewToken);
 		
-		fServerWin->SendMessageToClient( &msg );
-	}
+	fOwner->Window()->SendMessageToClient(&msg);
+	//fServerWin->SendMessageToClient( &msg );
 }
 
 Layer *Layer::VirtualTopChild() const
