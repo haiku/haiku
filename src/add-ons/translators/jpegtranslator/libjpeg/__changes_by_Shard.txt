@@ -1,0 +1,76 @@
+libjpeg release 6b of 27-Mar-1998 (http://www.ijg.org/files/) patched with "lossless" patch by Ken Murchison (http://www.oceana.com/ftp/ljpeg/) with following changes by Marcin 'Shard' Konicki.
+
+
+@jconfig.h
+
++ #define USE_BEOS_ALERT // use Alert window for error messages in BeOS
+
+
+
+@jpeglib.h
+
+  #ifndef JCONFIG_INCLUDED	/* in case jinclude.h already did */
+  #include "jconfig.h"		/* widely used configuration options */
+  #endif
+  #include "jmorecfg.h"		/* seldom changed options */
+
++ #ifdef __cplusplus
++ extern "C" {
++ #endif
+
+....
+
+  #endif /* JPEG_INTERNALS */
+  #endif /* INCOMPLETE_TYPES_BROKEN */
+
++ #ifdef __cplusplus
++ }
++ #endif
+
+
+@jerror.c
+
+   * If you define USE_WINDOWS_MESSAGEBOX in jconfig.h or in the makefile,
+   * you get a Windows-specific hack to display error messages in a dialog box.
+   * It ain't much, but it beats dropping error messages into the bit bucket,
+   * which is what happens to output to stderr under most Windows C compilers.
++  *
++  * If you define USE_BEOS_ALERT in jconfig.h or in the makefile,
++  * you get a BeOS-specific hack to display error messages in a dialog box.
++  * It ain't much, but it beats dropping error messages into the bit bucket,
++  * which is what happens to output to stderr under most Windows C compilers.
+   *
+
+....
+
+  #ifdef USE_WINDOWS_MESSAGEBOX
+  #include <windows.h>
+  #endif
+
++ #ifdef USE_BEOS_ALERT
++ #include <Alert.h>
++ #endif
+
+....
+
+METHODDEF(void)
+output_message (j_common_ptr cinfo)
+{
+  char buffer[JMSG_LENGTH_MAX];
+
+  /* Create the message */
+  (*cinfo->err->format_message) (cinfo, buffer);
+
+#ifdef USE_WINDOWS_MESSAGEBOX
+  /* Display it in a message dialog box */
+  MessageBox(GetActiveWindow(), buffer, "JPEG Library Error",
+	     MB_OK | MB_ICONERROR);
+#else 
++	#ifdef USE_BEOS_ALERT
++		(new BAlert("JPEG Library Error", buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
++	#else
+	  /* Send it to stderr, adding a newline */
+	  fprintf(stderr, "%s\n", buffer);
++	#endif
+#endif
+}
