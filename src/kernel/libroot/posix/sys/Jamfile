@@ -7,6 +7,7 @@ KernelMergeObject posix_sys.o :
  	<$(SOURCE_GRIST)>select.c
  	<$(SOURCE_GRIST)>sysctl.c
  	<$(SOURCE_GRIST)>gettimeofday.c
+ 	<$(SOURCE_GRIST)>wait.c
 	:
 	-fPIC -DPIC
 	;
