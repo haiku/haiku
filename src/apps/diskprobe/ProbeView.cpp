@@ -1156,15 +1156,26 @@ ProbeView::AttachedToWindow()
 	// Block Size
 
 	subMenu = new BMenu("BlockSize");
-	subMenu->AddItem(item = new BMenuItem("512", message = new BMessage(kMsgBlockSize)));
-	message->AddInt32("block_size", 512);
-	item->SetMarked(true);
-	subMenu->AddItem(new BMenuItem("1024", message = new BMessage(kMsgBlockSize)));
-	message->AddInt32("block_size", 1024);
-	subMenu->AddItem(new BMenuItem("2048", message = new BMessage(kMsgBlockSize)));
-	message->AddInt32("block_size", 2048);
-	subMenu->SetTargetForItems(this);
 	subMenu->SetRadioMode(true);
+	const uint32 blockSizes[] = {512, 1024, 2048};
+	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
+		char buffer[32];
+		snprintf(buffer, sizeof(buffer), "%ld%s", blockSizes[i],
+			fEditor.IsDevice() && fEditor.BlockSize() == blockSizes[i] ? " (native)" : "");
+		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgBlockSize)));
+		message->AddInt32("block_size", blockSizes[i]);
+		if (fEditor.BlockSize() == blockSizes[i])
+			item->SetMarked(true);
+	}
+	if (subMenu->FindMarked() == NULL) {
+		// if the device has some weird block size, we'll add it here, too
+		char buffer[32];
+		snprintf(buffer, sizeof(buffer), "%ld (native)", fEditor.BlockSize());
+		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgBlockSize)));
+		message->AddInt32("block_size", fEditor.BlockSize());
+		item->SetMarked(true);
+	}
+	subMenu->SetTargetForItems(this);
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
 
