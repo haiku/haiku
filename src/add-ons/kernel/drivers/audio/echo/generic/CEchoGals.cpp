@@ -412,9 +412,3 @@ char *	pStatusStrs[ECHOSTATUS_LAST] =
 
 
 // *** CEchoGals.cpp ***
-
- 
- 
- 
- 
- 
