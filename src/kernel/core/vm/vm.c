@@ -2575,11 +2575,34 @@ user_memset(void *s, char c, size_t count)
 
 
 long
-lock_memory(void *buffer, ulong numBytes, ulong flags)
+lock_memory(void *address, ulong numBytes, ulong flags)
 {
-	// The NewOS VM currently doesn't support locking - dunno if we'll
-	// ever change this, but if, we should definitely implement these
-	// functions :-)
+	addr_t base = (addr_t)address;
+	addr_t end = base + numBytes;
+	bool isUser = IS_USER_ADDRESS(address);
+
+	// ToDo: Our VM currently doesn't support locking, this function
+	//	will now at least make sure that the memory is paged in, but
+	//	that's about it.
+	//	Nevertheless, it must be implemented as soon as we're able to
+	//	swap pages out of memory.
+
+	// ToDo: this is a hack, too; the iospace area is a null region and
+	//	officially cannot be written to or read; ie. vm_soft_fault() will
+	//	fail there. Furthermore, this is x86 specific as well.
+	#define IOSPACE_SIZE (256 * 1024 * 1024)
+	if (base >= KERNEL_BASE + IOSPACE_SIZE && base + numBytes < KERNEL_BASE + 2 * IOSPACE_SIZE)
+		return B_OK;
+
+	for (; base < end; base += B_PAGE_SIZE) {
+		status_t status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
+		if (status != B_OK)	{
+			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
+				address, numBytes, flags, strerror(status));
+			return status;
+		}
+	}
+
 	return B_OK;
 }
 
