@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel libroot ;
 
+UsePrivateHeaders libroot ;
+
 KernelObjects
 	<$(SOURCE_GRIST)>libroot_init.c
 	: -fPIC -DPIC

@@ -4,12 +4,12 @@
 */
 
 
+#include <libroot_private.h>
 #include <user_runtime.h>
+#include <fork.h>
+
 #include <string.h>
 
-
-extern void __init__image(struct uspace_program_args const *args);
-extern void __init__dlfcn(struct uspace_program_args const *args);
 
 void initialize_before(image_id imageID, struct uspace_program_args const *args);
 
@@ -37,8 +37,9 @@ initialize_before(image_id imageID, struct uspace_program_args const *args)
 			__progname++;
 	}
 
-	__init__image(args);
-	__init__dlfcn(args);
+	__init_image(args);
+	__init_dlfcn(args);
+	__init_fork();
 }
 
 
