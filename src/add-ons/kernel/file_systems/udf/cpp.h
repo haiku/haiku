@@ -10,6 +10,8 @@
 #include <new>
 #include <stdlib.h>
 
+#ifdef USER
+#else
 /*!	Looking through the \c &lt;new&gt; header on my Linux distro
 	(can't seem	to find it in the R5 headers...), it looks like
 	the type of \c nothrow_t is just:
@@ -78,5 +80,6 @@ operator delete[](void *ptr)
 // we're using virtuals
 extern "C" void __pure_virtual();
 
+#endif // USER
 
 #endif	/* CPP_H */
