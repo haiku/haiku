@@ -16,7 +16,7 @@
 #include "SimulatedStream.h"
 #include "UdfStructures.h"
 
-/*! \brief AbstractExtentStream implementation that takes a list of
+/*! \brief SimulatedStream implementation that takes a list of
 	block-aligned data extents.
 */
 class ExtentStream : public SimulatedStream {

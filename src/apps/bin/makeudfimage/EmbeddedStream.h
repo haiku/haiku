@@ -13,7 +13,7 @@
 
 #include "SimulatedStream.h"
 
-/*! \brief AbstractExtentStream implementation that takes a single, 
+/*! \brief SimulatedStream implementation that takes a single, 
 	not-neccessarily-block-aligned extent.
 */
 class EmbeddedStream : public SimulatedStream {
