@@ -333,27 +333,46 @@ status_t nv_acc_init_dma()
 	if (si->ps.card_arch == NV04A)
 	{
 /*
-       if((pNv->Chipset & 0x0fff) == 0x0020)
-       {
-           pNv->PRAMIN[0x0824] |= 0x00020000;
-           pNv->PRAMIN[0x0826] += pNv->FbAddress;
-       }
-       pNv->PGRAPH[0x0080/4] = 0x000001FF;//acc DEBUG0
-       pNv->PGRAPH[0x0080/4] = 0x1230C000;
-       pNv->PGRAPH[0x0084/4] = 0x72111101;
-       pNv->PGRAPH[0x0088/4] = 0x11D5F071;
-       pNv->PGRAPH[0x008C/4] = 0x0004FF31;
-       pNv->PGRAPH[0x008C/4] = 0x4004FF31;
+if(TNT1)
+{
+//cmd buffer DMA update: look at the DMA cmd buffer on cardRAM via main mem...
+  PR_CTX0_C |= 0x00020000; //select NV_DMA_TARGET_NODE_PCI
+  PR_CTX2_C += pNv->FbAddress; //set main mem adress ptr to the buf (workaround!)
 
-       pNv->PGRAPH[0x0140/4] = 0x00000000;
-       pNv->PGRAPH[0x0100/4] = 0xFFFFFFFF;
-       pNv->PGRAPH[0x0170/4] = 0x10010100;
-       pNv->PGRAPH[0x0710/4] = 0xFFFFFFFF;
-       pNv->PGRAPH[0x0720/4] = 0x00000001;
-
-       pNv->PGRAPH[0x0810/4] = 0x00000000;
-       pNv->PGRAPH[0x0608/4] = 0xFFFFFFFF; 
+//info: pNv->FbAddress = pNv->PciInfo->memBase[1] & 0xff800000;
+//membase[1] is the virtual (high) adress where the buffer is really mapped probably..
+}
 */
+
+		/* do a explicit engine reset */
+		ACCW(DEBUG0, 0x000001ff);
+		/* init some function blocks */
+		ACCW(DEBUG0, 0x1230c000);
+		ACCW(DEBUG1, 0x72111101);
+		ACCW(DEBUG2, 0x11d5f071);
+		ACCW(DEBUG3, 0x0004ff31);
+		/* init OP methods */
+		ACCW(DEBUG3, 0x4004ff31);
+		/* disable all acceleration engine INT reguests */
+		ACCW(ACC_INTE, 0x00000000);
+		/* reset all acceration engine INT status bits */
+		ACCW(ACC_INTS, 0xffffffff);
+		/* context control enabled */
+		ACCW(NV04_CTX_CTRL, 0x10010100);
+		/* all acceleration buffers, pitches and colors are valid */
+		ACCW(NV04_ACC_STAT, 0xffffffff);
+		/* enable acceleration engine command FIFO */
+		ACCW(FIFO_EN, 0x00000001);
+
+//fixme: offset and blimit registers are lacking!
+
+		/* pattern shape value = 8x8, 2 color */
+		//fixme: setting this here means that we don't need to provide the acc
+		//commands with it. But have other architectures this pre-programmed
+		//explicitly??? I don't think so!
+		ACCW(PAT_SHP, 0x00000000);
+		/* Pgraph Beta AND value (fraction) b23-30 */
+		ACCW(BETA_AND_VAL, 0xffffffff);
 	}
 	else
 	{

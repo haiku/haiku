@@ -503,7 +503,7 @@ status_t nv_acc_init()
 	}
 	if (si->ps.card_arch >= NV20A)
 	{
-		if (si->ps.card_type > NV40)
+		if ((si->ps.card_type > NV40) && (si->ps.card_type != NV45))
 		{
 			ACCW(NV40P_BLIMIT6, (si->ps.memory_size - 1));
 			ACCW(NV40P_BLIMIT7, (si->ps.memory_size - 1));
