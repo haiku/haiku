@@ -40,6 +40,9 @@ struct file_cache_ref {
 };
 
 
+static struct cache_module_info *sCacheModule;
+
+
 static void
 add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 {
@@ -365,7 +368,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	size_t size = *_size + pageOffset;
 	offset -= pageOffset;
 
-	addr_t buffer = bufferBase;
 	if (offset + size > fileSize) {
 		// adapt size to be within the file's offsets
 		size = fileSize - offset;
@@ -373,6 +375,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	}
 
 	size_t bytesLeft = size, lastLeft = size;
+	addr_t buffer = bufferBase;
 	off_t lastOffset = offset;
 
 	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
@@ -393,12 +396,13 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
 			// it is, so let's satisfy in the first part of the request
 			if (bufferBase != buffer) {
-				size_t requestSize = buffer - (addr_t)bufferBase;
+				size_t requestSize = buffer - bufferBase;
 				if ((doWrite && write_to_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
 					|| (!doWrite && read_from_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
 					vm_put_physical_page(virtualAddress);
 					return B_IO_ERROR;
 				}
+				bufferBase += requestSize;
 			}
 
 			// and copy the contents of the page already in memory
@@ -437,6 +441,45 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 		return write_to_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
 
 	return read_from_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+}
+
+
+//	#pragma mark -
+//	kernel public API
+
+
+extern "C" void
+cache_prefetch(mount_id mountID, vnode_id vnodeID)
+{
+	// ToDo: schedule prefetch
+	// ToDo: maybe get 1) access type (random/sequential), 2) file vecs which blocks to prefetch
+	dprintf("prefetch vnode %ld:%Ld\n", mountID, vnodeID);
+}
+
+
+extern "C" void
+cache_node_opened(void *_ref, mount_id mountID, vnode_id vnodeID)
+{
+	file_cache_ref *ref = (file_cache_ref *)_ref;
+
+	if (ref != NULL && sCacheModule != NULL)
+		sCacheModule->node_opened(ref->cache->cache->virtual_size, mountID, vnodeID);
+}
+
+
+extern "C" void
+cache_node_closed(void *ref, mount_id mountID, vnode_id vnodeID)
+{
+	if (ref != NULL && sCacheModule != NULL)
+		sCacheModule->node_closed(mountID, vnodeID);
+}
+
+
+extern "C" status_t
+file_cache_init(void)
+{
+	// ToDo: get cache module
+	return B_OK;
 }
 
 
