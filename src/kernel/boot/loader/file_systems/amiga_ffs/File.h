@@ -20,6 +20,9 @@ class File : public Node {
 
 		status_t InitCheck();
 
+		virtual status_t Open(void **_cookie, int mode);
+		virtual status_t Close(void *cookie);
+
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
@@ -28,6 +31,7 @@ class File : public Node {
 		virtual off_t Size() const;
 
 	private:
+		Volume		&fVolume;
 		FileBlock	fNode;
 };
 
