@@ -506,7 +506,7 @@ MediaWindow::MessageReceived (BMessage *message)
 				if(settingsView->mRealtimeCheckBox->Value()==B_CONTROL_ON)
 					flags |= realtimeFlag;
 				else
-					flags &= !realtimeFlag;
+					flags &= ~realtimeFlag;
 				roster->SetRealtimeFlags(flags);
 			}
 			break;
