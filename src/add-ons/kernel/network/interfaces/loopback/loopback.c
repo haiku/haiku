@@ -2,8 +2,9 @@
  */
 
 #include <stdio.h>
-#include <malloc.h>
-#include <kernel/OS.h>
+#include <stdlib.h>
+#include <string.h>
+#include <OS.h>
 
 #include "sys/socket.h"
 #include "protocols.h"
