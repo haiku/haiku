@@ -1,15 +1,15 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FD_H
 #define _FD_H
 
-#include <sem.h>
-#include <lock.h>
-#include <memheap.h>
-#include <sys/stat.h>
+
 #include <team.h>
+#include <thread.h>
+
+#include <sys/stat.h>
 
 
 #ifdef __cplusplus
@@ -64,6 +64,7 @@ enum fd_types {
 /* Prototypes */
 
 extern struct file_descriptor *alloc_fd(void);
+extern int new_fd_etc(struct io_context *, struct file_descriptor *, int firstIndex);
 extern int new_fd(struct io_context *, struct file_descriptor *);
 extern struct file_descriptor *get_fd(struct io_context *, int);
 extern void put_fd(struct file_descriptor *);
