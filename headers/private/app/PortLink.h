@@ -67,6 +67,7 @@ public:
 
 	status_t Attach(const void *data, ssize_t size);
 	status_t AttachString(const char *string);
+	status_t AttachRegion(const BRegion &region);
 	template <class Type> status_t Attach(const Type& data)
 	{
 		return Attach(&data, sizeof(Type));
@@ -75,6 +76,7 @@ public:
 	status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t Read(void *data, ssize_t size);
 	status_t ReadString(char **string);
+	status_t ReadRegion(BRegion *region);
 	template <class T> status_t Read(T *data)
 	{
 		return fReader->Read(data,sizeof(T));

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <new>
+#include <Region.h>
 
 #include <ServerProtocol.h>
 #include <PortLink.h>
@@ -105,4 +106,19 @@ status_t BPortLink::ReadString(char **string)
 status_t BPortLink::AttachString(const char *string)
 {
 	return fSender->AttachString(string);
+}
+
+status_t BPortLink::ReadRegion(BRegion *region)
+{
+	fReader->Read(&region->count, sizeof(long));
+	fReader->Read(&region->bound, sizeof(clipping_rect));
+	region->set_size(region->count + 1);
+	return fReader->Read(region->data, region->count * sizeof(clipping_rect));
+}
+
+status_t BPortLink::AttachRegion(const BRegion &region)
+{
+	fSender->Attach(&region.count, sizeof(long));
+	fSender->Attach(&region.bound, sizeof(clipping_rect));
+	return fSender->Attach(region.data, region.count * sizeof(clipping_rect));
 }
