@@ -16,16 +16,12 @@
 #include <util/kernel_cpp.h>
 
 
-#define TRACE_MAIN 0
-#if TRACE_MAIN
+//#define TRACE_MAIN
+#ifdef TRACE_MAIN
 #	define TRACE(x) printf x
 #else
 #	define TRACE(x) ;
 #endif
-
-
-kernel_args gKernelArgs;
-addr_t gKernelEntry;
 
 
 extern "C" int

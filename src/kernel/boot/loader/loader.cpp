@@ -26,6 +26,8 @@
 // temp. VFS API
 extern Node *get_node_from(int fd);
 
+addr_t gKernelEntry;
+
 
 bool
 is_bootable(Directory *volume)

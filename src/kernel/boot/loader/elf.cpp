@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -15,8 +15,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define TRACE_ELF 1
-#if TRACE_ELF
+//#define TRACE_ELF
+#ifdef TRACE_ELF
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -181,7 +181,7 @@ elf_load_image(Directory *directory, const char *path)
 	if (fd < 0)
 		return fd;
 
-	image = (preloaded_image *)malloc(sizeof(preloaded_image));
+	image = (preloaded_image *)kernel_args_malloc(sizeof(preloaded_image));
 	if (image == NULL) {
 		close(fd);
 		return B_NO_MEMORY;
@@ -195,7 +195,7 @@ elf_load_image(Directory *directory, const char *path)
 		image->next = gKernelArgs.preloaded_images;
 		gKernelArgs.preloaded_images = image;
 	} else
-		free(image);
+		kernel_args_free(image);
 
 	close(fd);
 	return B_OK;
