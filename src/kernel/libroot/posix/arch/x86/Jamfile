@@ -1,8 +1,10 @@
 SubDir OBOS_TOP src kernel libroot posix arch x86 ;
 
 KernelMergeObject posix_arch_$(OBOS_ARCH).o :
-	_setjmp.S
-	setjmp.S
+	setjmp.c
+	setjmp_save_sigs.c
 	sigsetjmp.S
+	siglongjmp.S
+
 	: -fPIC -DPIC
 	;
