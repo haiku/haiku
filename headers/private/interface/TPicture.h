@@ -47,7 +47,7 @@
 class TPicture {
 public:
 					TPicture();
-					TPicture(void *data, int32 size/*, BArray<BPicture *> **/);
+					TPicture(void *data, int32 size, BList &pictures);
 virtual				~TPicture();
 
 		int16		GetOp();
@@ -109,10 +109,10 @@ virtual				~TPicture();
 private:
 		BMemoryIO	fData;
 		int32		fSize;
+		BList		&fPictures;
 };
 //------------------------------------------------------------------------------
 
 //status_t do_playback(void *, long, BArray<BPicture *> &, void **, long, void *)
 
 #endif // _TPICTURE_H
-

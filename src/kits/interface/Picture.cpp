@@ -26,6 +26,8 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <stdio.h>
+#include <malloc.h>
 
 // System Includes -------------------------------------------------------------
 #include <Picture.h>
@@ -33,7 +35,7 @@
 #include <ByteOrder.h>
 #include <TPicture.h>
 #include <Errors.h>
-#include <malloc.h>
+#include <List.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -47,8 +49,13 @@ struct _BPictureExtent_ {
 	void	*fNewData;
 	int32	fNewSize;
 	void	*fOldData;
-	int32	fOldSize;	
+	int32	fOldSize;
+	BList	fPictures;	// In R5 this is a BArray<BPicture*> which is completely
+						// inline.
 };
+
+status_t do_playback(void * data, int32 size, BList& pictures,
+	void **callBackTable, int32 tableEntries, void *user);
 
 //------------------------------------------------------------------------------
 BPicture::BPicture()
@@ -56,6 +63,11 @@ BPicture::BPicture()
 		extent(NULL),
 		usurped(NULL)
 {
+	extent = new _BPictureExtent_;
+	extent->fNewData = NULL;
+	extent->fNewSize = 0;
+	extent->fOldData = NULL;
+	extent->fOldSize = 0;
 }
 //------------------------------------------------------------------------------
 BPicture::BPicture(const BPicture &picture)
@@ -65,21 +77,37 @@ BPicture::BPicture(const BPicture &picture)
 {
 	init_data();
 
-	if (picture.extent->fNewData == NULL)
+	if (picture.token != -1)
 	{
 /*		_BAppServerLink_ link;
 		int32 err;
 
-		link.swrite_l(0xed2);
+		link.swrite_l(B_CLONE_PICTURE);
 		link.swrite_l(picture->server_token);
 		link.sync();
-		link.sread(4, &server_token);*/
+		link.sread(4, &token);*/
 	}
-	else
+	if (picture.extent->fNewData != NULL)
 	{
 		extent->fNewSize = picture.extent->fNewSize;
 		extent->fNewData = malloc(extent->fNewSize);
 		memcpy(extent->fNewData, picture.extent->fNewData, extent->fNewSize);
+
+		BPicture *pic;
+
+		for (int32 i = 0; i < picture.extent->fPictures.CountItems(); i++)
+		{
+			pic = new BPicture(*(BPicture*)picture.extent->fPictures.ItemAt(i));
+			extent->fPictures.AddItem(pic);
+		}
+	}
+	else if (picture.extent->fOldData != NULL)
+	{
+		extent->fOldSize = picture.extent->fOldSize;
+		extent->fOldData = malloc(extent->fOldSize);
+		memcpy(extent->fOldData, picture.extent->fOldData, extent->fOldSize);
+
+		// In old data the sub pictures are inside the data
 	}
 }
 //------------------------------------------------------------------------------
@@ -88,13 +116,107 @@ BPicture::BPicture(BMessage *archive)
 		extent(NULL),
 		usurped(NULL)
 {
-	// TODO:
 	init_data();
+
+	int32 version, size;
+	int8 endian;
+	const void *data;
+
+	if (archive->FindInt32("_ver", &version) != B_OK)
+		version = 0;
+
+	if (archive->FindInt8("_endian", &endian) != B_OK)
+		endian = 0;
+
+	if (archive->FindData("_data", B_RAW_TYPE, &data, (ssize_t*)&size) != B_OK)
+		return;
+	
+	// Load sub pictures
+	BMessage picMsg;
+	int32 i = 0;
+
+	while (archive->FindMessage("piclib", i++, &picMsg) == B_OK)
+	{
+		BPicture *pic = new BPicture(&picMsg);
+		extent->fPictures.AddItem(pic);
+	}
+
+	if (version == 0)
+		import_old_data(data, size);
+	else if (version == 1)
+	{
+		extent->fNewSize = size;
+		extent->fNewData = malloc(extent->fNewSize);
+		memcpy(extent->fNewData, data, extent->fNewSize);
+
+//		swap_data(extent->fNewData, extent->fNewSize);
+
+		if (extent->fNewSize != 0 && extent->fNewData != 0)
+		{
+/*			_BAppServerLink_ link;
+
+			link.swrite_l(B_CREATE_PICTURE);
+			link.swrite_l(extent->fPictures.CountItems());
+			for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+				link.swrite_l(extent->fPictures.ItemAt(i)->token);
+			link.swrite_l(extent->fNewSize);
+			link.swrite(extent->fNewSize, extent->fNewData);
+			link.sync();
+			link.sread(4, &token);*/
+		}
+	}
+
+	// Do we just free the data now?
+	if (extent->fNewData)
+	{
+		free(extent->fNewData);
+		extent->fNewData = NULL;
+		extent->fNewSize = 0;
+	}
+
+	if (extent->fOldData)
+	{
+		free(extent->fOldData);
+		extent->fOldData = NULL;
+		extent->fOldSize = 0;
+	}
+
+	// What with the sub pictures?
+	for (i = 0; i < extent->fPictures.CountItems(); i++)
+		delete extent->fPictures.ItemAt(i);
+	extent->fPictures.MakeEmpty();
 }
 //------------------------------------------------------------------------------
 BPicture::~BPicture()
 {
-	delete extent;
+	if (token != -1)
+	{
+/*		_BAppServerLink_ link;
+		int32 err;
+
+		link.swrite_l(B_DELETE_PICTURE);
+		link.swrite_l(token);*/
+	}
+
+	if (extent->fNewData != NULL)
+	{
+		free(extent->fNewData);
+		extent->fNewData = NULL;
+		extent->fNewSize = 0;
+	}
+
+	if (extent->fOldData != NULL)
+	{
+		free(extent->fOldData);
+		extent->fOldData = NULL;
+		extent->fOldSize = 0;
+	}
+
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		delete extent->fPictures.ItemAt(i);
+	extent->fPictures.MakeEmpty();
+
+	free(extent);
 }
 //------------------------------------------------------------------------------
 BArchivable *BPicture::Instantiate(BMessage *archive)
@@ -107,7 +229,7 @@ BArchivable *BPicture::Instantiate(BMessage *archive)
 //------------------------------------------------------------------------------
 status_t BPicture::Archive(BMessage *archive, bool deep) const
 {
-	if (!((BPicture*)this)->assert_local_copy())
+	if (!const_cast<BPicture*>(this)->assert_local_copy())
 		return B_ERROR;
 
 	status_t err = BArchivable::Archive(archive, deep);
@@ -128,6 +250,15 @@ status_t BPicture::Archive(BMessage *archive, bool deep) const
 	err = archive->AddData("_data", B_RAW_TYPE, extent->fNewData,
 		extent->fNewSize);
 
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+	{
+		BMessage picMsg;
+		
+		((BPicture*)extent->fPictures.ItemAt(i))->Archive(&picMsg, deep);
+		
+		archive->AddMessage("piclib", &picMsg);
+	}
+
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -141,19 +272,80 @@ status_t BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 	if (!assert_local_copy())
 		return B_ERROR;
 
-	//do_playback(extent->fData, extent->fSize, ?BArray<BPicture*>&?,
-	//	callBackTable, tableEntries, user);
-
-	return B_OK;
+	return do_playback(extent->fNewData, extent->fNewSize, extent->fPictures,
+		callBackTable, tableEntries, user);
 }
 //------------------------------------------------------------------------------
 status_t BPicture::Flatten(BDataIO *stream)
 {
+	if (!assert_local_copy())
+		return B_ERROR;
+
+	// TODO check the header
+	int32 bla1 = 2;
+	int32 bla2 = 0;
+	int32 count = 0;
+
+	stream->Write(&bla1, 4);
+	stream->Write(&bla2, 4);
+
+	count = extent->fPictures.CountItems();
+	stream->Write(&count, 4);
+
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		((BPicture*)extent->fPictures.ItemAt(i))->Flatten(stream);
+
+	stream->Write(&extent->fNewSize, 4);
+	stream->Write(extent->fNewData, extent->fNewSize);
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
 status_t BPicture::Unflatten(BDataIO *stream)
 {
+	// TODO check the header
+	int32 bla1 = 2;
+	int32 bla2 = 0;
+	int32 count = 0;
+
+	stream->Read(&bla1, 4);
+	stream->Read(&bla2, 4);
+
+	stream->Read(&count, 4);
+
+	for (int32 i = 0; i < count; i++)
+	{
+		BPicture *pic = new BPicture;
+
+		pic->Unflatten(stream);
+
+		extent->fPictures.AddItem(pic);
+	}
+
+	stream->Read(&extent->fNewSize, 4);
+	extent->fNewData = malloc(extent->fNewSize);
+	stream->Read(extent->fNewData, extent->fNewSize);
+
+//	swap_data(extent->fNewData, extent->fNewSize);
+
+/*	_BAppServerLink_ link;
+
+	link.swrite_l(B_CREATE_PICTURE);
+	link.swrite_l(extent->fPictures.CountItems());
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		link.swrite_l(extent->fPictures.ItemAt(i)->token);
+	link.swrite_l(extent->fNewSize);
+	link.swrite(extent->fNewSize, extent->fNewData);
+	link.sync();
+	link.sread(4, &token); */
+
+	if (extent->fNewData)
+	{
+		free(extent->fNewData);
+		extent->fNewData = NULL;
+		extent->fNewSize = 0;
+	}
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -181,23 +373,51 @@ void BPicture::init_data()
 void BPicture::import_data(const void *data, int32 size, BPicture **subs,
 						   int32 subCount)
 {
+	if (data == NULL || size == 0)
+		return;
 
+/*	_BAppServerLink_ link;
+
+	link.swrite_l(B_CREATE_PICTURE);
+	link.swrite_l(subCount);
+
+	for (int32 i = 0; i < subCount; i++)
+		link.swrite_l(subs[i]->token);
+
+	link.swrite_l(size);
+	link.swrite(size, data);
+	link.sync();
+	link.sread(4, &token);*/
 }
 //------------------------------------------------------------------------------
 void BPicture::import_old_data(const void *data, int32 size)
 {
 	// TODO: do we need to support old data, what is old data?
-	/*convert_old_to_new(data, size, &extent->fNewData, &extent->fNewSize);
+	/*if (data == NULL)
+		return;
+
+	if (size == 0)
+		return;
+		
+	convert_old_to_new(data, size, &extent->fNewData, &extent->fNewSize);
 
 	_BAppServerLink_ link;
 	int32 err;
 
-	link.swrite_l(0xed1);
+	link.swrite_l(B_CREATE_PICTURE);
 	link.swrite_l(0);
 	link.swrite_l(extent->fNewSize);
 	link.swrite_l(extent->fNewSize, extent->fNewData);
 	link.sync();
-	link.sread(4, &token);*/
+	link.sread(4, &token);
+	
+	// Do we free all data now?
+	free(extent->fNewData);
+	extent->fNewData = 0;
+	extent->fNewSize = 0;
+	free(extent->fOldData);
+	extent->fOldData = 0;
+	extent->fOldSize = 0;*/
 }
 //------------------------------------------------------------------------------
 void BPicture::set_token(int32 _token)
@@ -214,16 +434,21 @@ bool BPicture::assert_local_copy()
 		return false;
 
 /*	_BAppServerLink_ link;
-	int32 err;
+	int32 count;
 
-	link.swrite_l(0xed5);
-	link.swrite_l(server_token);
+	link.swrite_l(B_DOWNLOAD_PICTURE);
+	link.swrite_l(token);
 	link.sync();
-	link.sread(4, &err);
+	link.sread(4, &count);
 
-	// Read sub pictures
-	while (err > 0)
+	// Read sub picture tokens
+	for (int32 i = 0; i < count; i++)
 	{
+		BPicture *pic = new BPicture;
+
+		link.sread(4, &pic->token);
+		
+		extent->fPictures.AddItem(pic);
 	}
 
 	link.sread(4, &extent->fNewSize);
@@ -235,7 +460,15 @@ bool BPicture::assert_local_copy()
 //------------------------------------------------------------------------------
 bool BPicture::assert_old_local_copy()
 {
-	// TODO: do we need to support old copies, what are old copies?
+	if (extent->fOldData != NULL)
+		return true;
+
+	if (!assert_local_copy())
+		return false;
+
+//	convert_new_to_old(extent->fNewData, extent->fNewSize, extent->fOldData,
+//		extent->fOldSize);
+
 	return true;
 }
 //------------------------------------------------------------------------------
@@ -247,28 +480,26 @@ bool BPicture::assert_server_copy()
 	if (extent->fNewData == NULL)
 		return false;
 
-/*	BPicture *ptr = usurped;
-	for (BPicture *ptr = usurped; ptr != NULL; ptr++)
-		ptr->assert_server_copy();
+/*	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		extent->fPictures.ItemAt(i)->assert_server_copy();
 
 	_BAppServerLink_ link;
-	int32 err;
 
-	link.swrite_l(0xed1);
-	for (sub picture)
-		link.swrite_l(picture->token);
+	link.swrite_l(B_CREATE_PICTURE);
+	link.swrite_l(extent->fPictures.CountItems());
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		link.swrite_l(extent->fPictures.ItemAt(i)->token);
 	link.swrite_l(extent->fNewSize);
 	link.swrite(extent->fNewSize, extent->fNewData);
 	link.sync();
-	link.sread(4, &err);
+	link.sread(4, &token);
 
-	return err == B_OK;*/
+	return token != -1;*/
 	return true;
 }
 //------------------------------------------------------------------------------
 BPicture::BPicture(const void *data, int32 size)
 {
-	// TODO:
 	init_data();
 	import_old_data(data, size);
 }
@@ -297,25 +528,54 @@ int32 BPicture::DataSize() const
 //------------------------------------------------------------------------------
 void BPicture::usurp(BPicture *lameDuck)
 {
-/*	_BAppServerLink_ link;
-	int32 err;
+	if (token != -1)
+	{
+/*		_BAppServerLink_ link;
+		int32 err;
 
-	link.swrite_l(0xed3);
-	link.swrite_l(token);*/
+		link.swrite_l(B_DELETE_PICTURE);
+		link.swrite_l(token);*/
+	}
+
+	if (extent->fNewData != NULL)
+	{
+		free(extent->fNewData);
+		extent->fNewData = NULL;
+		extent->fNewSize = 0;
+	}
+
+	if (extent->fOldData != NULL)
+	{
+		free(extent->fOldData);
+		extent->fOldData = NULL;
+		extent->fOldSize = 0;
+	}
+
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		delete extent->fPictures.ItemAt(i);
+	extent->fPictures.MakeEmpty();
+
+	free(extent);
 
 	init_data();
+
+	// Do the usurping
+	usurped = lameDuck;
 }
 //------------------------------------------------------------------------------
 BPicture *BPicture::step_down()
 {
-	// TODO: called from EndPicture
-	return this;
+	BPicture *lameDuck = usurped;
+	
+	usurped = NULL;
+
+	return lameDuck;
 }
 //------------------------------------------------------------------------------
-status_t do_playback(void * data, int32 size, /*BArray<BPicture*>& pictures,*/
+status_t do_playback(void * data, int32 size, BList& pictures,
 	void **callBackTable, int32 tableEntries, void *user)
 {
-	TPicture pic(data, size/*, pictures*/);
+	TPicture pic(data, size, pictures);
 
 	return pic.Play(callBackTable, tableEntries, user);
 }
