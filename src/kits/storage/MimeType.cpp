@@ -617,7 +617,26 @@ BMimeType::GetLongDescription(char *description) const
 status_t
 BMimeType::GetSupportingApps(BMessage *signatures) const
 {
-	return NOT_IMPLEMENTED;
+	status_t err = signatures ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_GET_SUPPORTING_APPS);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindMessage("signatures", signatures);
+	return err;	
 }
 
 // SetIcon
@@ -1633,8 +1652,10 @@ BMimeType::GetSupportedTypes(BMessage *types)
 	return err;
 }
 
+// SetSupportedTypes
+//! For the moment, see BAppFileInfo::SetSupportedTypes()
 status_t
-BMimeType::SetSupportedTypes(const BMessage *types)
+BMimeType::SetSupportedTypes(const BMessage *types, bool fullSync)
 {
 	status_t err = InitCheck();	
 
@@ -1649,6 +1670,8 @@ BMimeType::SetSupportedTypes(const BMessage *types)
 		err = msg.AddInt32("which", B_REG_MIME_SUPPORTED_TYPES);
 	if (!err && types) 
 		err = msg.AddMessage("types", types);
+	if (!err)
+		err = msg.AddBool("full sync", fullSync);
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
