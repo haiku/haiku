@@ -158,24 +158,22 @@ int
 arch_int_init2(kernel_args *ka)
 {
 	region_id exception_region;
-	void *ex_handlers;
+	void *handlers;
 
-	// create a region to map the irq vector code into (physical addres 0x0)
-	ex_handlers = (void *)ka->arch_args.exception_handlers.start;
+	// create a region to map the irq vector code into (physical address 0x0)
+	handlers = (void *)ka->arch_args.exception_handlers.start;
 	exception_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "exception_handlers",
-		&ex_handlers, REGION_ADDR_EXACT_ADDRESS,
-		ka->arch_args.exception_handlers.size, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		&handlers, REGION_ADDR_EXACT_ADDRESS,
+		ka->arch_args.exception_handlers.size, 
+		REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 	if (exception_region < 0)
 		panic("arch_int_init2: could not create exception handler region\n");
 
-	dprintf("exception handlers at %p\n", ex_handlers);
+	dprintf("exception handlers at %p\n", handlers);
 
 	// copy the handlers into this area
-	memcpy(ex_handlers, &__irqvec_start, ka->arch_args.exception_handlers.size);
-	arch_cpu_sync_icache(0, 0x3000);
-
-	// make sure the IP bit isn't set (putting the exceptions at 0x0)
-	set_msr(get_msr() & ~MSR_IP);
+	memcpy(handlers, &__irqvec_start, ka->arch_args.exception_handlers.size);
+	arch_cpu_sync_icache(0, 0x1000);
 
 	return 0;
 }
