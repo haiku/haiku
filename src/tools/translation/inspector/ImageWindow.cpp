@@ -62,10 +62,15 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	pbar->AddItem(pmnufile);
 	
 	BMenu *pmnuwindow = new BMenu("Window");
+	BMenuItem *pitmactives = new BMenuItem("Active Translators",
+		new BMessage(M_ACTIVE_TRANSLATORS_WINDOW), 'T', 0);
+	pitmactives->SetTarget(be_app);
+	
 	BMenuItem *pitminfo = new BMenuItem("Info",
 		new BMessage(M_INFO_WINDOW), 'I', 0);
 	pitminfo->SetTarget(be_app);
 	
+	pmnuwindow->AddItem(pitmactives);
 	pmnuwindow->AddItem(pitminfo);
 	pbar->AddItem(pmnuwindow);		
 	

@@ -1,10 +1,11 @@
 /*****************************************************************************/
-// Constants
+// ActiveTranslatorsWindow
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// Constants.h
+// ActiveTranslatorsWindow.h
 //
-// Global include file containing BMessage 'what' constants and other constants
+// BWindow class for displaying information about the currently open
+// document 
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -28,23 +29,26 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef MESSAGES_H
-#define MESSAGES_H
+#ifndef ACTIVETRANSLATORSWINDOW_H
+#define ACTIVETRANSLATORSWINDOW_H
 
-// BMessage 'what' values
-#define M_OPEN_IMAGE						'opim'
-#define M_SAVE_IMAGE						'saim'
-#define M_OPEN_FILE_PANEL					'ofpl'
-#define M_ACTIVE_TRANSLATORS_WINDOW			'atrn'
-#define M_ACTIVE_TRANSLATORS_WINDOW_QUIT	'atrq'
-#define M_INFO_WINDOW						'infw'
-#define M_INFO_WINDOW_QUIT					'infq'
-#define M_INFO_WINDOW_TEXT					'inft'
+#include <Window.h>
+#include <OutlineListView.h>
 
+class ActiveTranslatorsWindow : public BWindow {
+public:
+	ActiveTranslatorsWindow(BRect rect, const char *name);
+	~ActiveTranslatorsWindow();
+	void FrameResized(float width, float height);
+	void MessageReceived(BMessage *pmsg);
+	void Quit();
+	
+private:
+	void AddTranslatorsToList(const char *path, BStringItem *pparent);
+	
+	BOutlineListView *fplist;
+	BStringItem *fpuserItem;
+	BStringItem *fpsystemItem;
+};
 
-// String constants
-#define APP_SIG				"application/x-vnd.OBOS-Inspector"
-#define IMAGEWINDOW_TITLE	"Inspector"
-
-
-#endif // #ifndef MESSAGES_H
+#endif // #ifndef ACTIVETRANSLATORSWINDOW_H

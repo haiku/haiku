@@ -33,6 +33,7 @@
 #ifndef INSPECTORAPP_H
 #define INSPECTORAPP_H
 
+#include "ActiveTranslatorsWindow.h"
 #include "InfoWindow.h"
 #include <Application.h>
 #include <String.h>
@@ -45,6 +46,7 @@ public:
 	
 private:
 	BString fbstrInfo;
+	ActiveTranslatorsWindow *fpactiveswin;
 	InfoWindow *fpinfowin;
 };
 

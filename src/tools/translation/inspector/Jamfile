@@ -4,6 +4,7 @@ AddResources Inspector : Inspector.rsrc ;
 
 App Inspector : 
 	StatusCheck.cpp
+	ActiveTranslatorsWindow.cpp
 	InfoWindow.cpp
 	ImageView.cpp
 	ImageWindow.cpp

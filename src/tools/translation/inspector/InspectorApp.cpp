@@ -40,6 +40,7 @@
 InspectorApp::InspectorApp()
 	: BApplication(APP_SIG)
 {
+	fpactiveswin = NULL;
 	fpinfowin = NULL;
 	
 	// Show application window
@@ -52,22 +53,29 @@ void
 InspectorApp::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
-		case M_INFO_WINDOW:
-			if (!fpinfowin)
-				fpinfowin = new InfoWindow(BRect(50, 50, 150, 150),
-					"Info Win", fbstrInfo.String());
+		case M_ACTIVE_TRANSLATORS_WINDOW:
+			if (!fpactiveswin)
+				fpactiveswin = new ActiveTranslatorsWindow(
+					BRect(625, 350, 800, 600), "Active Translators");
+			break;
+		case M_ACTIVE_TRANSLATORS_WINDOW_QUIT:
+			fpactiveswin = NULL;
 			break;
 			
+		case M_INFO_WINDOW:
+			if (!fpinfowin)
+				fpinfowin = new InfoWindow(BRect(625, 50, 800, 300),
+					"Info Win", fbstrInfo.String());
+			break;
+		case M_INFO_WINDOW_QUIT:
+			fpinfowin = NULL;
+			break;	
 		case M_INFO_WINDOW_TEXT:
 			// If image view is telling me to
 			// update the info window...
 			pmsg->FindString("text", &fbstrInfo);
 			if (fpinfowin)
 				fpinfowin->PostMessage(pmsg);
-			break;
-			
-		case M_INFO_WINDOW_QUIT:
-			fpinfowin = NULL;
 			break;
 			
 		default:

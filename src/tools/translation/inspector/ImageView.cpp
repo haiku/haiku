@@ -414,7 +414,7 @@ ImageView::SetImage(BMessage *pmsg)
 		
 		AdjustScrollBars();
 		
-		pwin->Zoom();
+		//pwin->Zoom();
 			// Perform all of the hard work of resizing the
 			// window while taking into account the size of
 			// the screen, the tab and borders of the window
