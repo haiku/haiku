@@ -164,6 +164,7 @@ BNetAddress& BNetAddress::operator=( const BNetAddress& refparam )
     {
         return *this;
     }
+    // TODO: what do return on clone() failure!?
 }
 
 
