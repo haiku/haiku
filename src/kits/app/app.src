@@ -9,6 +9,7 @@ APP_KIT_SOURCE =
 	LooperList.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
+	MessageRunner.cpp
 	Messenger.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
