@@ -3,6 +3,9 @@
  * settings related to the add-on, but not the server.
  *
  * $Log: SpamFilterConfig.cpp,v $
+ * Revision 1.2  2004/11/12 02:55:05  nwhitehorn
+ * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
+ *
  * Revision 1.1  2004/10/30 22:23:26  brunoga
  * AGMS Spam Filter.
  *
@@ -71,6 +74,9 @@
 #include <Roster.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <FindDirectory.h>
+#include <Entry.h>
+#include <Path.h>
 
 #include <MailAddon.h>
 #include <FileConfigView.h>
@@ -359,17 +365,30 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 
 	// Make sure the server is running.
 	if (!be_roster->IsRunning (kServerSignature)) {
-		errorCode = be_roster->Launch (kServerSignature);
-		if (errorCode != B_OK)
-			goto ErrorExit;
-	}
-
+			errorCode = be_roster->Launch (kServerSignature);
+			if (errorCode != B_OK) {
+				BPath path;
+				entry_ref ref;
+				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
+				for (int32 i = 0; i < 2; i++) {
+					find_directory(places[i],&path);
+					path.Append("spamfilter");
+					if (!BEntry(path.Path()).Exists())
+						continue;
+					get_ref_for_path(path.Path(),&ref);
+					if ((errorCode =  be_roster->Launch (&ref)) == B_OK)
+						break;
+				}
+				if (errorCode != B_OK)
+					goto ErrorExit;
+			}
+		}
+	
+	snooze (2000000);
+	
 	// Set up the messenger to the database server.
-	serverTeam = be_roster->TeamFor (kServerSignature);
-	if (serverTeam < 0)
-		goto ErrorExit;
 	messengerToServer =
-		BMessenger (kServerSignature, serverTeam, &errorCode);
+		BMessenger (kServerSignature);
 	if (!messengerToServer.IsValid ())
 		goto ErrorExit;
 

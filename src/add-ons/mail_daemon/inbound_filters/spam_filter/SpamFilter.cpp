@@ -11,6 +11,9 @@
  * Public Domain 2002, by Alexander G. M. Smith, no warranty.
  *
  * $Log: SpamFilter.cpp,v $
+ * Revision 1.2  2004/11/12 02:55:05  nwhitehorn
+ * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
+ *
  * Revision 1.1  2004/10/30 22:23:26  brunoga
  * AGMS Spam Filter.
  *
@@ -104,6 +107,8 @@
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
+#include <FindDirectory.h>
+#include <Entry.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -220,8 +225,22 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 		// Make sure the server is running.
 		if (!be_roster->IsRunning (kServerSignature)) {
 			errorCode = be_roster->Launch (kServerSignature);
-			if (errorCode != B_OK)
-				goto ErrorExit;
+			if (errorCode != B_OK) {
+				BPath path;
+				entry_ref ref;
+				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
+				for (int32 i = 0; i < 2; i++) {
+					find_directory(places[i],&path);
+					path.Append("spamfilter");
+					if (!BEntry(path.Path()).Exists())
+						continue;
+					get_ref_for_path(path.Path(),&ref);
+					if ((errorCode =  be_roster->Launch (&ref)) == B_OK)
+						break;
+				}
+				if (errorCode != B_OK)
+					goto ErrorExit;
+			}
 		}
 
 		// Set up the messenger to the database server.
