@@ -29,7 +29,7 @@ enum {
 	ETHER_SETPROMISC,						/* set promiscuous */
 	ETHER_GETFRAMESIZE,						/* get frame size */
 	ETHER_ADDTIMESTAMP,						/* (try to) add timestamps to packets (BONE ext) */
-	ETHER_HASIOVECS,						/* does the driver implement readv/writev ? (BONE ext) (bool *) */
+	ETHER_HASIOVECS,						/* does the driver implement writev ? (BONE ext) (bool *) */
 	ETHER_GETIFTYPE,						/* get the IFT_ type of the interface (int *) */
 	ETHER_GETLINKSTATE						/* get line speed, quality, duplex mode, etc. */
 };
