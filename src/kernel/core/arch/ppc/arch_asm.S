@@ -2,7 +2,10 @@
 ** Copyright 2003, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #define FUNCTION(x) .global x; .type x,@function; x
+
+#define MSR_EXCEPTIONS_ENABLED 15
 
 .text
 
@@ -15,39 +18,47 @@ FUNCTION(reboot):
 FUNCTION(arch_int_enable_interrupts):
 	mfmsr	%r3							// load msr
 
-/*
 	li		%r4, 1
-	insrwi	%r3, %r4, 1, 16				// set the EE bit
-*/
-
-	li		%r4, 0
-	ori		%r4, %r4, (1 << 15)			// create a mask for EE bit of MSR
-	or		%r3, %r3, %r4				// set the EE bit
+	insrwi  %r3, %r4, 1, 31 - MSR_EXCEPTIONS_ENABLED
+		// sets bit 15, EE
 
 	mtmsr	%r3							// put it back into the msr
 	blr
 
-/* void arch_int_disable_interrupts(void) */
+
+/* int arch_int_disable_interrupts(void) 
+ * r3
+ */
 FUNCTION(arch_int_disable_interrupts):
-	mfmsr	%r3							// load msr
+	mfmsr	%r4							// load msr
 
-/*
-	li		%r4, 0
-	rlwinm	%r3, %r4, 15, 16, 16		// mask the EE bit
-*/
+	mr		%r3, %r4					// save old state
+	rlwinm  %r4, %r4, 0, 32 - MSR_EXCEPTIONS_ENABLED, 30 - MSR_EXCEPTIONS_ENABLED
+		// clears bit 15, EE
 
-	li		%r4, 0
-	ori		%r4, %r4, (1 << 15)			// create a mask for EE bit of MSR
-	andc	%r3, %r3, %r4				// mask the EE bit
+	mtmsr	%r4							// put it back into the msr
+	blr
 
-	mtmsr	%r3							// put it back into the msr
+
+/* void arch_int_restore_interrupts(int oldState) 
+ *									r3
+ */
+FUNCTION(arch_int_restore_interrupts):
+	mfmsr	%r4
+
+	rlwimi  %r4, %r3, 0, 31 - MSR_EXCEPTIONS_ENABLED, 31 - MSR_EXCEPTIONS_ENABLED
+		// clear or set bit 15, EE to the same state as in r3, oldState
+
+	mtmsr	%r4
 	blr
 
 /* bool arch_int_are_interrupts_enabled(void) */
 FUNCTION(arch_int_are_interrupts_enabled):
 	mfmsr	%r3							// load msr
-	extrwi	%r3, %r3, 1, 16				// mask out the EE bit
+	extrwi	%r3, %r3, 1, 31 - MSR_EXCEPTIONS_ENABLED				
+		// mask out the EE bit
 	blr
+
 
 // ToDo: fixme
 FUNCTION(dbg_save_registers):
