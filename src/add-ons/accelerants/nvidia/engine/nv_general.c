@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-12/2004
+   Rudolf Cornelissen 10/2002-1/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -49,11 +49,11 @@ static void nv_dump_configuration_space (void)
 	DUMP_CFG (CFG_14,	0);
 	DUMP_CFG (CFG_15,	0);
 	DUMP_CFG (CFG_16,	0);
-	DUMP_CFG (CFG_17,	0);
-	DUMP_CFG (CFG_18,	0);
-	DUMP_CFG (CFG_19,	0);
-	DUMP_CFG (CFG_20,	0);
-	DUMP_CFG (CFG_21,	0);
+	DUMP_CFG (PCIEREF,	0);
+	DUMP_CFG (PCIEDCAP,	0);
+	DUMP_CFG (PCIEDCTST,0);
+	DUMP_CFG (PCIELCAP,	0);
+	DUMP_CFG (PCIELCTST,0);
 	DUMP_CFG (CFG_22,	0);
 	DUMP_CFG (CFG_23,	0);
 	DUMP_CFG (CFG_24,	0);
@@ -202,7 +202,7 @@ status_t nv_general_powerup()
 	case 0x00fa10de: /* Nvidia GeForce PCX 5750 PCIe */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5750 PCIe (NV36(?))\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5750 PCIe (NV36)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fb10de: /* Nvidia GeForce PCX 5900 PCIe */
