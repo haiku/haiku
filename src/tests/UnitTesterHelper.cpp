@@ -5,9 +5,9 @@
 // ##### Include headers for statically linked tests here #####
 //#include <ExampleTest.h>
 
-UnitTesterShell shell("OpenBeOS Unit Testing Framework", new SemaphoreSyncObject);
 
 int main(int argc, char *argv[]) {
+	UnitTesterShell shell("OpenBeOS Unit Testing Framework", new SemaphoreSyncObject);
 	// ##### Add test suites for statically linked tests here #####
 //	shell.AddTest( "Example", ExampleTest::Suite() );
 
@@ -15,7 +15,12 @@ int main(int argc, char *argv[]) {
 
 	// Load our dynamically linked tests
 
-	return shell.Run(argc, argv);
+	int result = shell.Run(argc, argv);
+
+	// Unset global shell, just to be sure
+	BTestShell::SetGlobalShell(NULL);
+
+	return result;
 }
 
 //const std::string UnitTesterShell::defaultLibDir = "./lib";
