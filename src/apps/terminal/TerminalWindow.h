@@ -32,6 +32,8 @@ private:
 	// message received helpers
 	void              StartNewTerminal(BMessage * message);
 	void              SwitchTerminals(BMessage * message);
+	void              EnableEditItems(BMessage * message);
+	void              DisableEditItems(BMessage * message);
 	void              EditCopy(BMessage * message);
 	void              EditPaste(BMessage * message);
 	void              EditClearAll(BMessage * message);

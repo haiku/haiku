@@ -76,16 +76,20 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	viewFrame = Bounds();
 	
 	viewFrame.top = fMenuBar->Bounds().Height()+1;
+	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
 	viewFrame.left = 0;
 	
 	textBounds = viewFrame;
 	textBounds.OffsetTo(B_ORIGIN);
 	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
 
-	fTextView = new TerminalTextView(viewFrame, textBounds, this);
+	BFont textFont(be_plain_font);
+	textFont.SetSpacing(B_FIXED_SPACING);
+	rgb_color black = {0,0,0,0};
+	fTextView = new TerminalTextView(viewFrame, textBounds, &textFont, &black, this);
 	fTextView->SetStylable(true);
 	
-	fScrollView = new BScrollView("scrollview", fTextView, 0, false, true, B_PLAIN_BORDER);
+	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, true, false, B_PLAIN_BORDER);
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);	
 
@@ -110,6 +114,7 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fCopy = new BMenuItem("Copy", new BMessage(B_COPY), 'C');
 	fEdit->AddItem(fCopy);
 	fCopy->SetTarget(fTextView);
+	fCopy->SetEnabled(false);
 	
 	fPaste = new BMenuItem("Paste", new BMessage(B_PASTE), 'V');
 	fEdit->AddItem(fPaste);
@@ -126,7 +131,6 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	
 	fClearAll = new BMenuItem("Clear All", new BMessage(EDIT_CLEAR_ALL), 'L');
 	fEdit->AddItem(fClearAll);
-	fClearAll->SetTarget(fTextView);
 
 	fEdit->AddSeparatorItem();
 	
@@ -247,7 +251,13 @@ TerminalWindow::MessageReceived(BMessage *message)
 		break;
 		case TERMINAL_SWITCH_TERMINAL:
 			SwitchTerminals(message);
-		break;	
+		break;
+		case ENABLE_ITEMS:
+			EnableEditItems(message);
+		break;
+		case DISABLE_ITEMS:
+			DisableEditItems(message);
+		break;		
 		case B_COPY:
 			EditCopy(message);
 		break;
@@ -358,6 +368,18 @@ TerminalWindow::SwitchTerminals(BMessage * message)
 }
 
 void
+TerminalWindow::EnableEditItems(BMessage * message)
+{
+	fCopy->SetEnabled(true);
+}
+
+void
+TerminalWindow::DisableEditItems(BMessage * message)
+{
+	fCopy->SetEnabled(false);
+}
+
+void
 TerminalWindow::EditCopy(BMessage * message)
 {
 	fTextView->Copy(be_clipboard);
@@ -372,5 +394,6 @@ TerminalWindow::EditPaste(BMessage * message)
 void
 TerminalWindow::EditClearAll(BMessage * message)
 {
+	fTextView->SelectAll();
 	fTextView->Clear();
 }

@@ -5,7 +5,9 @@
 
 class TerminalTextView : public BTextView {
 public:
-	TerminalTextView(BRect viewframe, BRect textframe, BHandler *handler);
+	TerminalTextView(BRect viewframe, BRect textframe,
+	                 const BFont * initialFont, const rgb_color * initialColor,
+	                 BHandler *handler);
 	~TerminalTextView();
 
 	virtual void Select(int32 start, int32 finish);
