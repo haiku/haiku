@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs screensaver ;
 
+AddResources ScreenSaver : ScreenSaver.rsrc ;
+
 local sources =
 	OBOSScreenSaverPreferences.cpp
 	ScreenSaver.cpp

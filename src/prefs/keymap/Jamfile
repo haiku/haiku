@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs keymap ;
 
-#AddResources Keymap : <$(SOURCE_GRIST)>Resource.rsrc ;
+AddResources Keymap : Keymap.rsrc ;
 
 Preference Keymap :
 	main.cpp

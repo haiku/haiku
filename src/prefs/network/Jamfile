@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src prefs network ;
+
+AddResources Network : Network.rsrc ;
+
+Preference Network : Network.cpp funcs.cpp ;
+
+LinkSharedOSLibs Appearance : be ;
