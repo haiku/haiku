@@ -9,6 +9,7 @@
 #include "DrawingModeAlphaPO.h"
 #include "DrawingModeBlend.h"
 #include "DrawingModeCopy.h"
+#include "DrawingModeCopySolid.h"
 #include "DrawingModeErase.h"
 #include "DrawingModeInvert.h"
 #include "DrawingModeMax.h"
@@ -23,7 +24,8 @@
 agg::DrawingMode*
 DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 								   source_alpha alphaSrcMode,
-								   alpha_function alphaFncMode)
+								   alpha_function alphaFncMode,
+								   bool solid)
 {
 	switch (mode) {
 		// these drawing modes discard source pixels
@@ -44,7 +46,11 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// in these drawing modes, the current high
 		// and low color are treated equally
 		case B_OP_COPY:
-			return new agg::DrawingModeBGRA32Copy();
+			if (solid) {
+printf("DrawingModeBGRA32CopySolid()\n");
+				return new agg::DrawingModeBGRA32CopySolid();
+			} else
+				return new agg::DrawingModeBGRA32Copy();
 			break;
 		case B_OP_ADD:
 			return new agg::DrawingModeBGRA32Add();

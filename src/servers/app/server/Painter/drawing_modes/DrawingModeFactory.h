@@ -14,7 +14,8 @@ class DrawingModeFactory {
 
 	static	agg::DrawingMode*		DrawingModeFor(drawing_mode mode,
 												   source_alpha alphaSrcMode,
-												   alpha_function alphaFncMode);
+												   alpha_function alphaFncMode,
+												   bool solid = false);
 };
 
 #endif // DRAWING_MODE_FACTORY_H
