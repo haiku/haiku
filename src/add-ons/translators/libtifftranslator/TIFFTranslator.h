@@ -46,7 +46,7 @@
 #define DOCUMENT_COUNT "/documentCount"
 #define DOCUMENT_INDEX "/documentIndex"
 
-#define TIFF_TRANSLATOR_VERSION 100
+#define TIFF_TRANSLATOR_VERSION 0x100
 
 #define TIFF_IN_QUALITY 0.5
 #define TIFF_IN_CAPABILITY 0.6

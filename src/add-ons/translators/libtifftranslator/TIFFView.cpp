@@ -105,8 +105,9 @@ TIFFView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		TIFF_TRANSLATOR_VERSION / 100, (TIFF_TRANSLATOR_VERSION / 10) % 10,
-		TIFF_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(TIFF_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((TIFF_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(TIFF_TRANSLATOR_VERSION & 0xf), __DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	
 	int32 lineno = 4;
