@@ -14,12 +14,12 @@
 # Cross compiling can come later
 
 if $(METROWERKS) {
-	OBOS_TARGET ?= "ppc.R5" ;
+	OBOS_TARGET ?= "ppc.R1" ;
 	OBOS_TARGET_TYPE ?= "application/x-be-executable" ;
 	OBOS_ARCH ?= "ppc" ; 
 	OBOS_TARGET_DEFINE ?= "ARCH_ppc" ;
 } else {
-	OBOS_TARGET ?= "x86.R5" ;
+	OBOS_TARGET ?= "x86.R1" ;
 	OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 	OBOS_ARCH ?= "x86" ;
 	OBOS_TARGET_DEFINE ?= "ARCH_x86" ;
@@ -356,15 +356,8 @@ rule AddResources
 {
 	# AddResources <name> : <resourcefiles> ;
 
-	local dir;
-	
-	dir = [ FDirName $(OBOS_TOP) $(SUBDIR_TOKENS) ] ;
-
-	for i in $(>)
-	{
-	    RESFILES on $(<) = [ FDirName $(dir) $(i) ] ;
-	    DEPENDS $(<) : [ FDirName $(dir) $(i) ] ;
-	}
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	RESFILES on $(1) += $(2) ;
 }
 
 rule PublicHeaders
