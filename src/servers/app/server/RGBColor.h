@@ -30,8 +30,8 @@
 #include <GraphicsDefs.h>
 
 /*!
-	\class RGBColor
-	\brief A color class to encapsulate color space ugliness
+	\class RGBColor RGBColor.h
+	\brief A color class to encapsulate color space ugliness in the app_server
 	
 	RGBColors can be used to perform tasks much more difficult using rgb_colors. This
 	class is limited to the app_server because of the access to the system palette for
@@ -59,7 +59,7 @@ public:
 	void SetColor(int r, int g, int b, int a=255);
 	void SetColor(uint16 color16);
 	void SetColor(uint8 color8);
-	void SetColor(rgb_color color);
+	void SetColor(const rgb_color &color);
 	void SetColor(const RGBColor &col);
 	
 	RGBColor MakeBlendColor(RGBColor color, float position);

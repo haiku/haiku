@@ -30,32 +30,51 @@
 
 // Local Includes --------------------------------------------------------------
 #include "RGBColor.h"
+#include "SystemPalette.h"
 
+/*!
+	\fn RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+*/
 RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 {
 	SetColor(r,g,b,a);
 }
 
+/*!
+	\fn RGBColor::RGBColor(int r, int g, int b, int a=255)
+*/
 RGBColor::RGBColor(int r, int g, int b, int a=255)
 {
 	SetColor(r,g,b,a);
 }
 
-RGBColor::RGBColor(rgb_color col)
+/*!
+	\fn RGBColor::RGBColor(const rgb_color &col)
+*/
+RGBColor::RGBColor(const rgb_color &col)
 {
 	SetColor(col);
 }
 
+/*!
+	\fn RGBColor::RGBColor(uint16 col)
+*/
 RGBColor::RGBColor(uint16 col)
 {
 	SetColor(col);
 }
 
+/*!
+	\fn RGBColor::RGBColor(uint8 col)
+*/
 RGBColor::RGBColor(uint8 col)
 {
 	SetColor(col);
 }
 
+/*!
+	\fn RGBColor::RGBColor(const RGBColor &col)
+*/
 RGBColor::RGBColor(const RGBColor &col)
 {
 	color32=col.color32;
@@ -63,26 +82,44 @@ RGBColor::RGBColor(const RGBColor &col)
 	color8=col.color8;
 }
 
+/*!
+	\fn RGBColor::RGBColor(void)
+*/
 RGBColor::RGBColor(void)
 {
 	SetColor(0,0,0,0);
 }
 
+/*!
+	\fn uint8 RGBColor::GetColor8(void)
+	\return The palette index for the current color
+*/
 uint8 RGBColor::GetColor8(void)
 {
 	return color8;
 }
 
+/*!
+	\fn uint16 RGBColor::GetColor16(void)
+	\return 16-bit value of the current color, including alpha
+*/
 uint16 RGBColor::GetColor16(void)
 {
 	return color16;
 }
 
+/*!
+	\fn rgb_color RGBColor::GetColor32(void)
+	\return current color
+*/
 rgb_color RGBColor::GetColor32(void)
 {
 	return color32;
 }
 
+/*!
+	\fn void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+*/
 void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 {
 	color32.red=r;
@@ -91,6 +128,9 @@ void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 	color32.alpha=a;
 }
 
+/*!
+	\fn void RGBColor::SetColor(int r, int g, int b, int a=255)
+*/
 void RGBColor::SetColor(int r, int g, int b, int a=255)
 {
 	color32.red=(uint8)r;
@@ -99,6 +139,9 @@ void RGBColor::SetColor(int r, int g, int b, int a=255)
 	color32.alpha=(uint8)a;
 }
 
+/*!
+	\fn void RGBColor::SetColor(uint16 col16)
+*/
 void RGBColor::SetColor(uint16 col16)
 {
 	color16=col16;
@@ -106,6 +149,9 @@ void RGBColor::SetColor(uint16 col16)
 	// TODO: convert and set the 32-bit and 8-bit values
 }
 
+/*!
+	\fn void RGBColor::SetColor(uint8 col8)
+*/
 void RGBColor::SetColor(uint8 col8)
 {
 	// Pared-down version from what is used in the app_server to
@@ -115,6 +161,9 @@ void RGBColor::SetColor(uint8 col8)
 	// TODO: convert and set the 32-bit and 16-bit values
 }
 
+/*!
+	\fn void RGBColor::SetColor(const rgb_color &color)
+*/
 void RGBColor::SetColor(const rgb_color &color)
 {
 	// Pared-down version from what is used in the app_server to
@@ -125,6 +174,9 @@ void RGBColor::SetColor(const rgb_color &color)
 	// TODO: convert and set the 16-bit and 8-bit values
 }
 
+/*!
+	\fn void RGBColor::SetColor(const RGBColor &col)
+*/
 void RGBColor::SetColor(const RGBColor &col)
 {
 	color32=col.color32;
@@ -132,7 +184,9 @@ void RGBColor::SetColor(const RGBColor &col)
 	color8=col.color8;
 }
 
-
+/*!
+	\fn RGBColor & RGBColor::operator=(const RGBColor &col)
+*/
 RGBColor & RGBColor::operator=(const RGBColor &col)
 {
 	color32=col.color32;
@@ -141,6 +195,9 @@ RGBColor & RGBColor::operator=(const RGBColor &col)
 	return *this;
 }
 
+/*!
+	\fn RGBColor & RGBColor::operator=(const rgb_color &col)
+*/
 RGBColor & RGBColor::operator=(const rgb_color &col)
 {
 	color32=col;
@@ -202,17 +259,28 @@ RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
 	return RGBColor(newcol);
 }
 
+/*!
+	\fn void RGBColor::PrintToStream(void)
+*/
 void RGBColor::PrintToStream(void)
 {
 	printf("RGBColor (%u,%u,%u,%u)\n", color32.red,color32.green,color32.blue,color32.alpha);
 }
 
+/*!
+	\fn bool RGBColor::operator==(const rgb_color &col)
+	\return true if all color elements are exactly equal
+*/
 bool RGBColor::operator==(const rgb_color &col)
 {
 	return (color32.red==col.red && color32.green==col.green
 		&& color32.blue==col.blue)?true:false;
 }
 
+/*!
+	\fn bool RGBColor::operator==(const RGBColor &col)
+	\return true if all color elements are exactly equal
+*/
 bool RGBColor::operator==(const RGBColor &col)
 {
 	return (color32.red==col.color32.red && color32.green==col.color32.green

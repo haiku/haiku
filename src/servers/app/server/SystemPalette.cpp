@@ -29,8 +29,19 @@
 // Local Includes --------------------------------------------------------------
 #include "SystemPalette.h"
 
+/*!
+	\var rgb_color system_palette[256]
+	\brief The global array of colors for the system palette.
+	
+	Whenever the system's color palette is referenced, this is the variable used.
+*/
 rgb_color system_palette[256];
 
+/*!
+	\fn void GenerateSystemPalette(rgb_color *palette)
+	\brief Takes a 256-element rgb_color array and places the BeOS System
+		palette in it.
+*/
 void GenerateSystemPalette(rgb_color *palette)
 {
 	int i,j,index=0;
