@@ -2073,9 +2073,9 @@ emuxki_setup(emuxki_dev * card)
 	ac97_init(&card->config);
 	ac97_amp_enable(&card->config, true);
 
-	PRINT(("codec vendor id      = %#08x\n",ac97_get_vendor_id()));
-	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description()));
-	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement()));
+	PRINT(("codec vendor id      = %#08x\n",ac97_get_vendor_id(&card->config)));
+	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
+	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
 	if(IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |

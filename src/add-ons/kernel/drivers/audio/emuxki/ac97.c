@@ -196,9 +196,9 @@ ac97_get_3d_stereo_enhancement(device_config *config)
 }
 
 const char *
-ac97_get_vendor_id_description()
+ac97_get_vendor_id_description(device_config *config)
 {
-	uint32 id = ac97_get_vendor_id();
+	uint32 id = ac97_get_vendor_id(config);
 	codec_table *codec = find_codec_table(id);
 	char f = (id >> 24) & 0xff;
 	char s = (id >> 16) & 0xff;

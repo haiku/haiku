@@ -514,9 +514,9 @@ auvia_setup(auvia_dev * card)
 	ac97_init(&card->config);
 	ac97_amp_enable(&card->config, true);
 
-	PRINT(("codec vendor id      = %#08x\n",ac97_get_vendor_id()));
-	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description()));
-	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement()));
+	PRINT(("codec vendor id      = %#08x\n",ac97_get_vendor_id(&card->config)));
+	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
+	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
 	PRINT(("installing interrupt : %x\n", card->config.irq));
 	install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);

@@ -68,10 +68,10 @@ enum AC97_REGISTER {
 	AC97_VENDOR_ID2			= 0x7E
 };
 
-const char *	ac97_get_3d_stereo_enhancement();
-const char *	ac97_get_vendor_id_description();
-uint32			ac97_get_vendor_id();
-void			ac97_init();
+const char *	ac97_get_3d_stereo_enhancement(device_config *config);
+const char *	ac97_get_vendor_id_description(device_config *config);
+uint32			ac97_get_vendor_id(device_config *config);
+void			ac97_init(device_config *config);
 
 void ac97_amp_enable(device_config *config, bool yesno);
 
