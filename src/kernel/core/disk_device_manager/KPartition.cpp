@@ -34,6 +34,7 @@ KPartition::KPartition(partition_id id)
 	  fDiskSystem(NULL),
 	  fChangeFlags(0),
 	  fChangeCounter(0),
+	  fAlgorithmData(0),
 	  fReferenceCount(0),
 	  fObsolete(false)
 {
@@ -422,13 +423,6 @@ KPartition::ID() const
 	return fPartitionData.id;
 }
 
-// ChangeCounter
-int32
-KPartition::ChangeCounter() const
-{
-	return fChangeCounter;
-}
-
 // GetPath
 status_t
 KPartition::GetPath(char *path) const
@@ -730,10 +724,34 @@ KPartition::ContentCookie() const
 
 // Changed
 void
-KPartition::Changed(uint32 flags)
+KPartition::Changed(uint32 flags, uint32 clearFlags)
 {
+	fChangeFlags &= ~clearFlags;
 	fChangeFlags |= flags;
 	fChangeCounter++;
+	if (Parent())
+		Parent()->Changed(B_PARTITION_CHANGED_DESCENDANTS);
+}
+
+// SetChangeFlags
+void
+KPartition::SetChangeFlags(uint32 flags)
+{
+	fChangeFlags = flags;
+}
+
+// ChangeFlags
+uint32
+KPartition::ChangeFlags() const
+{
+	return fChangeFlags;
+}
+
+// ChangeCounter
+int32
+KPartition::ChangeCounter() const
+{
+	return fChangeCounter;
 }
 
 // UninitializeContents
@@ -741,28 +759,68 @@ void
 KPartition::UninitializeContents(bool logChanges)
 {
 	if (DiskSystem()) {
-		uint32 flags = B_PARTITION_CHANGED_CONTENT_TYPE
+		uint32 flags = B_PARTITION_CHANGED_INITIALIZATION
+					   | B_PARTITION_CHANGED_CONTENT_TYPE
 					   | B_PARTITION_CHANGED_STATUS
 					   | B_PARTITION_CHANGED_FLAGS;
+		// children
+		if (CountChildren() > 0) {
+			RemoveAllChildren();
+			flags |= B_PARTITION_CHANGED_CHILDREN;
+		}
+		// volume
 		if (VolumeID() >= 0) {
 			// TODO: More? Unmounting would be a bit drastical for changes
 			// only on a shadow partition.
 			SetVolumeID(-1);
 			flags |= B_PARTITION_CHANGED_VOLUME;
 		}
+		// content name
 		if (ContentName()) {
 			SetContentName(NULL);
 			flags |= B_PARTITION_CHANGED_CONTENT_NAME;
 		}
+		// content parameters
 		if (ContentParameters()) {
 			SetContentParameters(NULL);
 			flags |= B_PARTITION_CHANGED_CONTENT_PARAMETERS;
 		}
+		// block size
+		if (Parent() && Parent()->BlockSize() != BlockSize()) {
+			SetBlockSize(Parent()->BlockSize());
+			flags |= B_PARTITION_CHANGED_BLOCK_SIZE;
+		}
+		// disk system
 		DiskSystem()->FreeContentCookie(this);
 		SetDiskSystem(NULL);
-		if (logChanges)
-			Changed(flags);
+		// status
+		SetStatus(B_PARTITION_UNINITIALIZED);
+		// flags
+		SetFlags(Flags() & ~uint32(B_PARTITION_FILE_SYSTEM
+								   | B_PARTITION_PARTITIONING_SYSTEM));
+		if (!Device()->IsReadOnlyMedia())
+			SetFlags(Flags() & ~(uint32)B_PARTITION_READ_ONLY);
+		// log changes
+		if (logChanges) {
+			Changed(flags, B_PARTITION_CHANGED_DEFRAGMENTATION
+						   | B_PARTITION_CHANGED_CHECK
+						   | B_PARTITION_CHANGED_REPAIR);
+		}
 	}
+}
+
+// SetAlgorithmData
+void
+KPartition::SetAlgorithmData(uint32 data)
+{
+	fAlgorithmData = data;
+}
+
+// AlgorithmData
+uint32
+KPartition::AlgorithmData() const
+{
+	return fAlgorithmData;
 }
 
 // WriteUserData

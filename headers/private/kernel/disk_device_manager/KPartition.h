@@ -94,8 +94,6 @@ public:
 	virtual void SetID(partition_id id);
 	partition_id ID() const;
 
-	int32 ChangeCounter() const;
-	
 	virtual status_t GetPath(char *path) const;
 		// no setter (see BDiskDevice) -- built on the fly
 
@@ -153,8 +151,17 @@ public:
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
 
-	void Changed(uint32 flags);
+	// Change Tracking
+
+	void Changed(uint32 flags, uint32 clearFlags = 0);
+	void SetChangeFlags(uint32 flags);
+	uint32 ChangeFlags() const;
+	int32 ChangeCounter() const;
 	void UninitializeContents(bool logChanges = true);
+
+	void SetAlgorithmData(uint32 data);
+	uint32 AlgorithmData() const;
+		// temporary storage freely usable by algorithms
 
 	virtual void WriteUserData(UserDataWriter &writer,
 							   user_partition_data *data);
@@ -175,6 +182,7 @@ protected:
 	KDiskSystem			*fDiskSystem;
 	uint32				fChangeFlags;
 	int32				fChangeCounter;
+	uint32				fAlgorithmData;
 	int32				fReferenceCount;
 	bool				fObsolete;
 	static int32		fNextID;
