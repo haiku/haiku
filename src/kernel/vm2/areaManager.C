@@ -249,12 +249,13 @@ void areaManager::setByte(unsigned long address,char value) {
 }
 
 void areaManager::setInt(unsigned long address,int value) {
-	error ("areaManager::setInt starting to set on address %lx, value = %d\n",address,value);
+//	error ("areaManager::setInt starting to set on address %lx, value = %d\n",address,value);
 	area *myArea;
 	lock();
-	error ("areaManager::setInt locked\n");
+//	error ("areaManager::setInt locked\n");
 	myArea=findArea((void *)address);
-	error ("areaManager::setInt area %s found\n",((myArea)?"":" not "));
+//	error ("areaManager::setInt area %s found\n",((myArea)?"":" not "));
+	try {
 	if (myArea)
 		myArea->setInt(address,value);	
 	else {
@@ -263,7 +264,10 @@ void areaManager::setInt(unsigned long address,int value) {
 		unlock();
 		throw (temp);
 		}
-	error ("areaManager::setInt unlocking\n");
+	}
+	catch (const char *t) { unlock();throw t;}
+	catch (char *t) { unlock();throw t;}
+//	error ("areaManager::setInt unlocking\n");
 	unlock();
 }
 
@@ -303,28 +307,29 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	protType=(prot&PROT_WRITE)?writable:(prot&(PROT_READ|PROT_EXEC))?readable:none;
 	//error ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	lock();
-	if (flags & MAP_ANON) {
+	if (flags & MAP_ANON) 
 		createArea(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr, addType ,LAZY,protType);
-		return addr;
+	else {
+		int shareCount=0;
+		mmapSharing share;
+		if (flags & MAP_SHARED) { share=SHARED;shareCount++;}
+		if (flags & MAP_PRIVATE) { share=PRIVATE;shareCount++;}
+		if (flags & MAP_COPY){ share=COPY;shareCount++;}
+		if (shareCount!=1) 
+			addr=NULL;	
+		else {
+			area *newArea = new (vmBlock->areaPool->get()) area;
+			newArea->setup(this);
+			//error ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
+			newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset,share);
+			atomic_add(&nextAreaID,1);
+			newArea->setAreaID(nextAreaID);
+			addArea(newArea);
+			newArea->getAreaID();
+			//pageMan.dump();
+			//newArea->dump();
 		}
-
-	int shareCount=0;
-	mmapSharing share;
-	if (flags & MAP_SHARED) { share=SHARED;shareCount++;}
-	if (flags & MAP_PRIVATE) { share=PRIVATE;shareCount++;}
-	if (flags & MAP_COPY){ share=COPY;shareCount++;}
-	if (shareCount!=1)
-		return NULL;
-	area *newArea = new (vmBlock->areaPool->get()) area;
-	newArea->setup(this);
-	//error ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
-	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset,share);
- 	atomic_add(&nextAreaID,1);
-	newArea->setAreaID(nextAreaID);
-	addArea(newArea);
-	newArea->getAreaID();
-	//pageMan.dump();
-	//newArea->dump();
+	}
 	unlock();
 	return addr;
 	}

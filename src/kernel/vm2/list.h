@@ -46,6 +46,8 @@ class list {
 						nodeCount--;
 						done=true;
 						}
+				if (!done)
+					throw ("list::remove failed to find node %x\n",toNuke);
 				}
 			//error ("list::remove ending: \n");
 			//dump();	

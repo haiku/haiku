@@ -180,7 +180,7 @@ status_t area::getInfo(area_info *dest) {
 
 bool area::contains(const void *address) {
 	unsigned long base=(unsigned long)(address); 
-	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+//	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
 	return ((start_address<=base) && (base<=end_address));
 	}
@@ -223,8 +223,10 @@ status_t area::resize(size_t newSize) {
 
 // When the protection for the area changes, the protection for every one of the pages must change
 status_t area::setProtection(protectType prot) {
+	dump();
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
+		error ("setting protection on %x\n",page);
 		page->setProtection(prot);
 		}
 	protection=prot;

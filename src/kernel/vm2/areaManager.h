@@ -53,13 +53,16 @@ class areaManager // One of these per process
 		area *findAreaLock(area_id id);
 		status_t setProtection(int areaID,protectType prot) {
 			status_t retVal;
+			error ("area::setProtection about to lock\n");
 			lock();
+			error ("area::setProtection locked\n");
 			area *myArea=findArea(areaID);
 			if (myArea)
 				retVal= myArea->setProtection(prot);
 			else
 				retVal= B_ERROR;
 			unlock();
+			error ("area::setProtection unlocked\n");
 			return retVal;
 		}
 		status_t resizeArea(int Area,size_t size) {
