@@ -183,7 +183,7 @@ void PreviewDriver::InvertRect(BRect r)
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 	BPoint points[4];
 	for(uint8 i=0;i<4;i++)
@@ -193,13 +193,13 @@ void PreviewDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeBezier(points,*((pattern *)pat));
+	drawview->StrokeBezier(points,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate();
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+void PreviewDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
 	BPoint points[4];
 	for(uint8 i=0;i<4;i++)
@@ -209,159 +209,159 @@ void PreviewDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeBezier(points,*((pattern *)pat));
+	drawview->StrokeBezier(points,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate();
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeEllipse(r,*((pattern *)pat));
+	drawview->StrokeEllipse(r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->FillEllipse(r,*((pattern *)pat));
+	drawview->FillEllipse(r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeArc(r,angle,span,*((pattern *)pat));
+	drawview->StrokeArc(r,angle,span,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+void PreviewDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->FillArc(r,angle,span,*((pattern *)pat));
+	drawview->FillArc(r,angle,span,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeLine(start,end,*((pattern *)pat));
+	drawview->StrokeLine(start,end,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate();
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void PreviewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true)
 {
 }
 
-void PreviewDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
+void PreviewDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
 }
 
-void PreviewDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeRect(r,*((pattern *)pat));
+	drawview->StrokeRect(r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillRect(BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->FillRect(r,*((pattern *)pat));
+	drawview->FillRect(r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern *)pat));
+	drawview->StrokeRoundRect(r,xrad,yrad,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
+void PreviewDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
-	drawview->FillRoundRect(r,xrad,yrad,*((pattern *)pat));
+	drawview->FillRoundRect(r,xrad,yrad,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
 /*
-void StrokeShape(SShape *sh, LayerData *d, int8 *pat)
+void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
 {
 }
 
-void FillShape(SShape *sh, LayerData *d, int8 *pat)
+void FillShape(SShape *sh, LayerData *d, const Pattern &pat)
 {
 }
 */
 
-void PreviewDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
 	drawview->StrokeTriangle(pts[0],pts[1],
-		pts[2],r,*((pattern *)pat));
+		pts[2],r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
+void PreviewDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
 	drawview->FillTriangle(pts[0],pts[1],
-		pts[2],r,*((pattern *)pat));
+		pts[2],r,*((pattern *)pat.GetInt8()));
 	drawview->Sync();
 	view->Invalidate(r);
 	view->viewbmp->Unlock();
