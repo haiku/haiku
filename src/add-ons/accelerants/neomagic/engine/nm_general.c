@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-9 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-10 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -427,6 +427,7 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 
 	switch (si->ps.card_type)
 	{
+	case NM2070:
 	case NM2097:
 	case NM2160:
 		if (target->space != B_RGB24) *acc_mode = true;

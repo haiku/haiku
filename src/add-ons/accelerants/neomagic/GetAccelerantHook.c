@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 	
 	Other authors:
-	Rudolf Cornelissen 10/2002-3/2004
+	Rudolf Cornelissen 10/2002-5/2004
 */
 
 #define MODULE_BIT 0x08000000

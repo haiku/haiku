@@ -1,7 +1,7 @@
 /* nm Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 3/2004.
+   Rudolf Cornelissen 3/2004-5/2004.
 */
 
 #define MODULE_BIT 0x00080000
@@ -19,7 +19,7 @@ invert rectangle
 blit
 */
 
-//fixme: acc setup for NM2097 and NM2160 only for now...
+//fixme: acc setup for NM2070, NM2097 and NM2160 only for now...
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
@@ -37,7 +37,7 @@ status_t nm_acc_wait_idle()
 //{
 //	while (((ACCR(STATUS) & 0x0000ff00) >> 8) < n)
 //	{
-		/* snooze a bit so I do not hammer the bus */
+//		/* snooze a bit so I do not hammer the bus */
 //		snooze (10);
 //	}
 //}
@@ -60,42 +60,45 @@ status_t nm_acc_init()
 		si->engine.depth = 2;
 		break;
 	case B_RGB24_LITTLE:
-		/* no acceleration supported on NM2097 and NM2160 */
+		/* no acceleration supported on NM2070, NM2097 and NM2160 */
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
 		return B_ERROR;
 	}
 
-	/* setup memory pitch (b10-12):
+	/* setup memory pitch (b10-12) on newer cards:
 	 * this works with a table, there are very few fixed settings.. */
-	switch(si->fbc.bytes_per_row / si->engine.depth)
+	if(si->ps.card_type > NM2070)
 	{
-	case 640:
-		si->engine.control |= (2 << 10);
-		break;
-	case 800:
-		si->engine.control |= (3 << 10);
-		break;
-	case 1024:
-		si->engine.control |= (4 << 10);
-		break;
-	case 1152:
-		si->engine.control |= (5 << 10);
-		break;
-	case 1280:
-		si->engine.control |= (6 << 10);
-		break;
-	case 1600:
-		si->engine.control |= (7 << 10);
-		break;
-	default:
-		LOG(8,("ACC: init, invalid mode width\n"));
-		return B_ERROR;
+		switch(si->fbc.bytes_per_row / si->engine.depth)
+		{
+		case 640:
+			si->engine.control |= (2 << 10);
+			break;
+		case 800:
+			si->engine.control |= (3 << 10);
+			break;
+		case 1024:
+			si->engine.control |= (4 << 10);
+			break;
+		case 1152:
+			si->engine.control |= (5 << 10);
+			break;
+		case 1280:
+			si->engine.control |= (6 << 10);
+			break;
+		case 1600:
+			si->engine.control |= (7 << 10);
+			break;
+		default:
+			LOG(8,("ACC: init, invalid mode width\n"));
+			return B_ERROR;
+		}
 	}
 
 	/* enable engine FIFO */
 	/* fixme when/if possible:
-	 * does not work on most cards.. (tried NM2160)
+	 * does not work on most cards.. (tried NM2070 and NM2160)
 	 * workaround: always wait until engine completely idle before programming. */
 //	si->engine.control |= (1 << 27);
 
@@ -119,6 +122,22 @@ status_t nm_acc_init()
 //	ACCW(CLIPLT, 0);
 //	ACCW(CLIPRB, ((si->dm.virtual_height << 16) | (si->dm.virtual_width & 0x0000ffff)));
 
+	/* init some extra registers on NM2070 (memory pitch) */
+	if(si->ps.card_type == NM2070)
+	{
+		/* make sure the previous command (if any) is completed */
+//		does not work yet:
+//		nm_acc_wait_fifo(5);
+//		so:
+		nm_acc_wait_idle();
+
+		ACCW(2070_PLANEMASK, 0x0000ffff);
+		ACCW(2070_SRCPITCH, si->fbc.bytes_per_row);
+		ACCW(2070_SRCBITOFF, 0);
+		ACCW(2070_DSTPITCH, si->fbc.bytes_per_row);
+		ACCW(2070_DSTBITOFF, 0);
+	}
+
 	return B_OK;
 }
 
@@ -134,22 +153,46 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
     if ((yd < ys) || ((yd == ys) && (xd < xs)))
     {
 		/* start with upper left corner */
-		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
-		ACCW(CONTROL, si->engine.control | 0x830c0000);
-		/* send command and exexute */
-		ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
-		ACCW(DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
-		ACCW(XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+		if (si->ps.card_type == NM2070)
+		{
+			/* use ROP GXcopy (b16-19), and use linear adressing system */
+			ACCW(CONTROL, si->engine.control | 0x000c0000);
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(2070_XYEXT, ((h << 16) | (w & 0x0000ffff)));
+			ACCW(SRCSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
+			ACCW(2070_DSTSTARTOFF, ((yd * si->fbc.bytes_per_row) + (xd * si->engine.depth)));
+		}
+		else
+		{
+			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
+			ACCW(CONTROL, si->engine.control | 0x830c0000);
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
+			ACCW(2090_DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
+			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+		}
 	}
     else
     {
 		/* start with lower right corner */
-		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
-		ACCW(CONTROL, (si->engine.control | 0x830c0013));
-		/* send command and exexute */
-		ACCW(SRCSTARTOFF, (((ys + h) << 16) | ((xs + w) & 0x0000ffff)));
-		ACCW(DSTSTARTOFF, (((yd + h) << 16) | ((xd + w) & 0x0000ffff)));
-		ACCW(XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+		if (si->ps.card_type == NM2070)
+		{
+			/* use ROP GXcopy (b16-19), and use linear adressing system */
+			ACCW(CONTROL, (si->engine.control | 0x000c0013));
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(2070_XYEXT, ((h << 16) | (w & 0x0000ffff)));
+			ACCW(SRCSTARTOFF, (((ys + h) * si->fbc.bytes_per_row) + ((xs + w) * si->engine.depth)));
+			ACCW(2070_DSTSTARTOFF, (((yd + h) * si->fbc.bytes_per_row) + ((xd + w) * si->engine.depth)));
+		}
+		else
+		{
+			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
+			ACCW(CONTROL, (si->engine.control | 0x830c0013));
+			/* send command and exexute (warning: order of programming regs is important!) */
+			ACCW(SRCSTARTOFF, (((ys + h) << 16) | ((xs + w) & 0x0000ffff)));
+			ACCW(2090_DSTSTARTOFF, (((yd + h) << 16) | ((xd + w) & 0x0000ffff)));
+			ACCW(2090_XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
+		}
 	}
 
 	return B_OK;
@@ -164,10 +207,24 @@ status_t nm_acc_setup_rectangle(uint32 color)
 //	so:
 	nm_acc_wait_idle();
 
-	/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
-	ACCW(CONTROL, (si->engine.control | 0x830c0008));
-	/* setup color */
-	ACCW(FGCOLOR, color);
+	if (si->ps.card_type == NM2070)
+	{
+		/* use ROP GXcopy (b16-19), use linear adressing system, do foreground color (b3) */
+		ACCW(CONTROL, (si->engine.control | 0x000c0008));
+		/* setup color */
+		if (si->engine.depth == 1)
+			ACCW(FGCOLOR, color);
+		else
+			/* swap colorbytes */
+			ACCW(FGCOLOR, (((color & 0xff00) >> 8) | ((color & 0x00ff) << 8)));
+	}
+	else
+	{
+		/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
+		ACCW(CONTROL, (si->engine.control | 0x830c0008));
+		/* setup color */
+		ACCW(FGCOLOR, color);
+	}
 
 	return B_OK;
 }
@@ -186,9 +243,17 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 //	so:
 	nm_acc_wait_idle();
 
-	/* send command and exexute */
-	ACCW(DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
-	ACCW(XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+	/* send command and exexute (warning: order of programming regs is important!) */
+	if (si->ps.card_type == NM2070)
+	{
+		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
+		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
+	}
+	else
+	{
+		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
+		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+	}
 
 	return B_OK;
 }
@@ -198,13 +263,25 @@ status_t nm_acc_setup_rect_invert()
 {
 	/* make sure the previous command (if any) is completed */
 //	does not work yet:
-//	nm_acc_wait_fifo(4);
+//	nm_acc_wait_fifo(2);
 //	so:
 	nm_acc_wait_idle();
 
-	/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
-	ACCW(CONTROL, (si->engine.control | 0x83050008));
-	/* reset color */
+	if (si->ps.card_type == NM2070)
+	{
+		/* use ROP GXinvert (b16-19), use linear adressing system. */
+		/* note:
+		 * although selecting foreground color (b3) should have no influence, NM2070
+		 * thinks otherwise if depth is not 8-bit. In 8-bit depth ROP takes precedence
+		 * over source-select, but in other spaces it's vice-versa (forcing GXcopy!). */
+		ACCW(CONTROL, (si->engine.control | 0x00050000));
+	}
+	else
+	{
+		/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
+		ACCW(CONTROL, (si->engine.control | 0x83050008));
+	}
+	/* reset color (just to be 'safe') */
 	ACCW(FGCOLOR, 0);
 
 	return B_OK;
@@ -218,13 +295,21 @@ status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 
 	/* make sure the previous command (if any) is completed */
 //	does not work yet:
-//	nm_acc_wait_fifo(4);
+//	nm_acc_wait_fifo(2);
 //	so:
 	nm_acc_wait_idle();
 
-	/* send command and exexute */
-	ACCW(DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
-	ACCW(XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+	/* send command and exexute (warning: order of programming regs is important!) */
+	if (si->ps.card_type == NM2070)
+	{
+		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
+		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
+	}
+	else
+	{
+		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
+		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+	}
 
 	return B_OK;
 }
