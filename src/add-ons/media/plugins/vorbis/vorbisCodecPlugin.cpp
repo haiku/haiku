@@ -185,9 +185,13 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		// reduce samples to the amount of samples we will actually consume
 		samples = min_c(samples,out_bytes_needed/fFrameSize);
 		int bytes = samples*fFrameSize;
-		memcpy(out_buffer,pcm,bytes);
-		out_buffer += bytes;
-		out_bytes_needed -= bytes;
+		for (int sample = 0; sample < samples ; sample++) {
+			for (int channel = 0; channel < fInfo.channels; channel++) {
+				memcpy(out_buffer,&pcm[channel][sample],sizeof(float));
+				out_buffer += sizeof(float);
+				out_bytes_needed -= sizeof(float);
+			}
+		}				
 		// report back how many samples we consumed
 		vorbis_synthesis_read(&fDspState,samples);
 		
