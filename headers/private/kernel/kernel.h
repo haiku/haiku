@@ -9,8 +9,11 @@
 #include <arch_kernel.h>
 
 /* Passed in buffers from user-space shouldn't point into the kernel */
-#define CHECK_USER_ADDRESS(x) \
-	((addr)(x) < KERNEL_BASE || (addr)(x) > KERNEL_TOP)
+#define IS_USER_ADDRESS(x) \
+	((addr_t)(x) < KERNEL_BASE || (addr_t)(x) > KERNEL_TOP)
+
+#define IS_KERNEL_ADDRESS(x) \
+	((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
 
 /** Size of the kernel stack */
 #define KSTACK_SIZE	(PAGE_SIZE * 2)
