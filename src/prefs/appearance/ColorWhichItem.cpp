@@ -1,4 +1,5 @@
 #include "ColorWhichItem.h"
+#include <stdio.h>
 
 ColorWhichItem::ColorWhichItem(color_which which)
  : BStringItem(NULL,0,false)
@@ -15,8 +16,13 @@ void ColorWhichItem::SetAttribute(color_which which)
 {
 	switch(which)
 	{
-#ifndef BUILD_UNDER_R5
 		// cases not existing in R5 which exist in OpenBeOS
+		case B_PANEL_BACKGROUND_COLOR:
+		{
+			attribute=which;
+			SetText("Background");
+			break;
+		}
 		case B_PANEL_TEXT_COLOR:
 		{
 			attribute=which;
@@ -59,36 +65,6 @@ void ColorWhichItem::SetAttribute(color_which which)
 			SetText("Control Highlight");
 			break;
 		}
-		case B_NAVIGATION_BASE_COLOR:
-		{
-			attribute=which;
-			SetText("Navigation Base");
-			break;
-		}
-		case B_NAVIGATION_PULSE_COLOR:
-		{
-			attribute=which;
-			SetText("Navigation Pulse");
-			break;
-		}
-		case B_SHINE_COLOR:
-		{
-			attribute=which;
-			SetText("Shine");
-			break;
-		}
-		case B_SHADOW_COLOR:
-		{
-			attribute=which;
-			SetText("Shadow");
-			break;
-		}
-		case B_MENU_SELECTED_BORDER_COLOR:
-		{
-			attribute=which;
-			SetText("Selected Menu Item Border");
-			break;
-		}
 		case B_TOOLTIP_BACKGROUND_COLOR:
 		{
 			attribute=which;
@@ -99,32 +75,6 @@ void ColorWhichItem::SetAttribute(color_which which)
 		{
 			attribute=which;
 			SetText("Tooltip Text");
-			break;
-		}
-		case B_SUCCESS_COLOR:
-		{
-			attribute=which;
-			SetText("Success");
-			break;
-		}
-		case B_FAILURE_COLOR:
-		{
-			attribute=which;
-			SetText("Failure");
-			break;
-		}
-#else
-		case B_KEYBOARD_NAVIGATION_COLOR:
-		{
-			attribute=which;
-			SetText("Keyboard Navigation");
-			break;
-		}
-#endif
-		case B_PANEL_BACKGROUND_COLOR:
-		{
-			attribute=which;
-			SetText("Background");
 			break;
 		}
 		case B_MENU_BACKGROUND_COLOR:
@@ -151,14 +101,80 @@ void ColorWhichItem::SetAttribute(color_which which)
 			SetText("Selected Menu Item Text");
 			break;
 		}
+		case B_MENU_SELECTED_BORDER_COLOR:
+		{
+			attribute=which;
+			SetText("Selected Menu Item Border");
+			break;
+		}
+		case B_NAVIGATION_BASE_COLOR:
+		{
+			attribute=which;
+			SetText("Navigation Base");
+			break;
+		}
+		case B_NAVIGATION_PULSE_COLOR:
+		{
+			attribute=which;
+			SetText("Navigation Pulse");
+			break;
+		}
+		case B_SUCCESS_COLOR:
+		{
+			attribute=which;
+			SetText("Success");
+			break;
+		}
+		case B_FAILURE_COLOR:
+		{
+			attribute=which;
+			SetText("Failure");
+			break;
+		}
+		case B_SHINE_COLOR:
+		{
+			attribute=which;
+			SetText("Shine");
+			break;
+		}
+		case B_SHADOW_COLOR:
+		{
+			attribute=which;
+			SetText("Shadow");
+			break;
+		}
 		case B_WINDOW_TAB_COLOR:
 		{
 			attribute=which;
 			SetText("Window Tab");
 			break;
 		}
-		default:
+		case B_WINDOW_TAB_TEXT_COLOR:
+		{
+			attribute=which;
+			SetText("Window Tab Text");
 			break;
+		}
+		case B_INACTIVE_WINDOW_TAB_COLOR:
+		{
+			attribute=which;
+			SetText("Inactive Window Tab");
+			break;
+		}
+		case B_INACTIVE_WINDOW_TAB_TEXT_COLOR:
+		{
+			attribute=which;
+			SetText("Inactive Window Tab Text");
+			break;
+		}
+		default:
+		{
+			printf("unknown code '%c%c%c%c'\n",(char)((which & 0xFF000000) >>  24),
+				(char)((which & 0x00FF0000) >>  16),
+				(char)((which & 0x0000FF00) >>  8),
+				(char)((which & 0x000000FF)) );
+			break;
+		}
 	}
 }
 

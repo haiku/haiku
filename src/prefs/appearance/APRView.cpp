@@ -47,9 +47,6 @@
 
 //#define DEBUG_COLORSET
 
-// uncomment this line to query the server for the current GUI settings
-#define LOAD_SETTINGS_FROM_DISK
-
 #define SAVE_COLORSET 'svcs'
 #define DELETE_COLORSET 'dlcs'
 #define LOAD_COLORSET 'ldcs'
@@ -104,35 +101,30 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	attrlist->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
 	attrlist->AddItem(new ColorWhichItem(B_PANEL_BACKGROUND_COLOR));
-#ifndef BUILD_UNDER_R5
-	attrlist->AddItem(new ColorWhichItem(B_PANEL_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_DOCUMENT_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_DOCUMENT_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_CONTROL_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_CONTROL_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_CONTROL_BORDER_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_CONTROL_HIGHLIGHT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_NAVIGATION_BASE_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_NAVIGATION_PULSE_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_SHINE_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_SHADOW_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_PANEL_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_BORDER_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_CONTROL_HIGHLIGHT_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_BASE_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_PULSE_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_SHINE_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_SHADOW_COLOR));
 	attrlist->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BACKGROUND_COLOR));
 	attrlist->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
 	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_BORDER_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_TOOLTIP_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BORDER_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_TOOLTIP_BACKGROUND_COLOR));
 	
-	attrlist->AddItem(new ColorWhichItem(B_SUCCESS_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_FAILURE_COLOR));
-#else
-	attrlist->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTION_BACKGROUND_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-	attrlist->AddItem(new ColorWhichItem(B_KEYBOARD_NAVIGATION_COLOR));
-#endif	
+	attrlist->AddItem(new ColorWhichItem((color_which)B_SUCCESS_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_FAILURE_COLOR));
 	attrlist->AddItem(new ColorWhichItem(B_WINDOW_TAB_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_WINDOW_TAB_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
+	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
 
 	picker=new BColorControl(BPoint(scrollview->Frame().right+20,scrollview->Frame().top),B_CELLS_32x8,5.0,"Picker",
 		new BMessage(UPDATE_COLOR));
@@ -602,9 +594,6 @@ void APRView::LoadSettings(void)
 	// Load the current GUI color settings from disk. This is done instead of
 	// getting them from the server at this point for testing purposes. Comment
 	// out the #define LOAD_SETTINGS_FROM_DISK line to use the server query code
-
-#ifdef LOAD_SETTINGS_FROM_DISK
-
 #ifdef DEBUG_COLORSET
 printf("Loading settings from disk\n");
 #endif
@@ -652,84 +641,6 @@ printf("Error unflattening SystemColors file %s\n",path.String());
 	// to the defaults
 	SetDefaults();
 	SaveSettings();
-#else
-	// We will query the app_server via a bunch of ui_color() calls and then
-	// add the appropriate colors to the message
-	rgb_color col;
-	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
-
-	col=ui_color(whichitem.GetAttribute());
-	settings.AddData("B_PANEL_BACKGROUND_COLOR",(type_code)'RGBC',&col,sizeof(rgb_color));
-
-#ifndef BUILD_UNDER_R5
-	whichitem.SetAttribute();
-	col=ui_color(B_PANEL_TEXT_COLOR);
-	whichitem.SetAttribute(B_PANEL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	whichitem.SetAttribute(B_DOCUMENT_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_DOCUMENT_TEXT_COLOR);
-	whichitem.SetAttribute(B_DOCUMENT_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_CONTROL_BACKGROUND_COLOR);
-	whichitem.SetAttribute(B_CONTROL_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_CONTROL_TEXT_COLOR);
-	whichitem.SetAttribute(B_CONTROL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_CONTROL_BORDER_COLOR);
-	whichitem.SetAttribute(B_CONTROL_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-	whichitem.SetAttribute(B_CONTROL_HIGHLIGHT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_NAVIGATION_BASE_COLOR);
-	whichitem.SetAttribute(B_NAVIGATION_BASE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_NAVIGATION_PULSE_COLOR);
-	whichitem.SetAttribute(B_NAVIGATION_PULSE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_SHINE_COLOR);
-	whichitem.SetAttribute(B_SHINE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_SHADOW_COLOR);
-	whichitem.SetAttribute(B_SHADOW_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_MENU_SELECTED_BORDER_COLOR);
-	whichitem.SetAttribute(B_MENU_SELECTED_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_TOOLTIP_BACKGROUND_COLOR);
-	whichitem.SetAttribute(B_TOOLTIP_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_TOOLTIP_TEXT_COLOR);
-	whichitem.SetAttribute(B_TOOLTIP_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_SUCCESS_COLOR);
-	whichitem.SetAttribute(B_SUCCESS_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_FAILURE_COLOR);
-	whichitem.SetAttribute(B_FAILURE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-#endif
-	col=ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR);
-	whichitem.SetAttribute(B_MENU_SELECTED_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_MENU_BACKGROUND_COLOR);
-	whichitem.SetAttribute(B_MENU_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_MENU_SELECTION_BACKGROUND_COLOR);
-	whichitem.SetAttribute(B_MENU_SELECTION_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_MENU_ITEM_TEXT_COLOR);
-	whichitem.SetAttribute(B_MENU_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=ui_color(B_WINDOW_TAB_COLOR);
-	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	
-#endif
 }
 
 void APRView::SetDefaults(void)
@@ -744,84 +655,73 @@ printf("Initializing color settings to defaults\n");
 	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
 	rgb_color col={216,216,216,255};
 
-#ifndef BUILD_UNDER_R5
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_PANEL_TEXT_COLOR);
+	whichitem.SetAttribute((color_which)B_PANEL_TEXT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute(B_DOCUMENT_BACKGROUND_COLOR);
+	whichitem.SetAttribute((color_which)B_DOCUMENT_BACKGROUND_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_DOCUMENT_TEXT_COLOR);
+	whichitem.SetAttribute((color_which)B_DOCUMENT_TEXT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,245,245,245);
-	whichitem.SetAttribute(B_CONTROL_BACKGROUND_COLOR);
+	whichitem.SetAttribute((color_which)B_CONTROL_BACKGROUND_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_CONTROL_TEXT_COLOR);
+	whichitem.SetAttribute((color_which)B_CONTROL_TEXT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_CONTROL_BORDER_COLOR);
+	whichitem.SetAttribute((color_which)B_CONTROL_BORDER_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,115,120,184);
-	whichitem.SetAttribute(B_CONTROL_HIGHLIGHT_COLOR);
+	whichitem.SetAttribute((color_which)B_CONTROL_HIGHLIGHT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,170,50,184);
-	whichitem.SetAttribute(B_NAVIGATION_BASE_COLOR);
+	whichitem.SetAttribute((color_which)B_NAVIGATION_BASE_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_NAVIGATION_PULSE_COLOR);
+	whichitem.SetAttribute((color_which)B_NAVIGATION_PULSE_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute(B_SHINE_COLOR);
+	whichitem.SetAttribute((color_which)B_SHINE_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_SHADOW_COLOR);
+	whichitem.SetAttribute((color_which)B_SHADOW_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_MENU_SELECTED_BORDER_COLOR);
+	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BORDER_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,255,255,0);
-	whichitem.SetAttribute(B_TOOLTIP_BACKGROUND_COLOR);
+	whichitem.SetAttribute((color_which)B_TOOLTIP_BACKGROUND_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_TOOLTIP_TEXT_COLOR);
+	whichitem.SetAttribute((color_which)B_TOOLTIP_TEXT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,255,0);
-	whichitem.SetAttribute(B_SUCCESS_COLOR);
+	whichitem.SetAttribute((color_which)B_SUCCESS_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,255,0,0);
-	whichitem.SetAttribute(B_FAILURE_COLOR);
+	whichitem.SetAttribute((color_which)B_FAILURE_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,51,102,160);
-	whichitem.SetAttribute(B_MENU_SELECTED_BACKGROUND_COLOR);
+	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BACKGROUND_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-#else
-	SetRGBColor(&col,51,102,160);
-	whichitem.SetAttribute(B_MENU_SELECTION_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,51,102,160);
-	whichitem.SetAttribute(B_KEYBOARD_NAVIGATION_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-#endif
 
 	whichitem.SetAttribute(B_PANEL_BACKGROUND_COLOR);
 	SetRGBColor(&col,216,216,216);
@@ -841,6 +741,18 @@ printf("Initializing color settings to defaults\n");
 
 	SetRGBColor(&col,255,203,0);
 	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute((color_which)B_WINDOW_TAB_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,232,232,232);
+	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,80,80,80);
+	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR);
 	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 //	BString labelstr("Color Set: ");
