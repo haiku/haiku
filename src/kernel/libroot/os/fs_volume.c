@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <fs_volume.h>
@@ -19,6 +19,6 @@ fs_mount_volume(const char *where, const char *device,
 status_t
 fs_unmount_volume(const char *path, uint32 flags)
 {
-	return _kern_unmount(path/*, flags*/);
+	return _kern_unmount(path, flags);
 }
 
