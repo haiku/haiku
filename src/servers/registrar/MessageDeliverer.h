@@ -41,6 +41,8 @@ private:
 	TargetPort *_GetTargetPort(port_id portID, bool create = false);
 	void _PutTargetPort(TargetPort *port);
 
+	status_t _SendMessage(Message *message, port_id portID, int32 token);
+
 	static int32 _DelivererThreadEntry(void *data);
 	int32 _DelivererThread();
 
