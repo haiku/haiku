@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the NewOS License.
+** Distributed under the terms of the OpenBeOS license.
 */
 #ifndef _KERNEL_ARCH_CPU_H
 #define _KERNEL_ARCH_CPU_H

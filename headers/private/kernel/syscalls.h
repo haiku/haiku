@@ -108,12 +108,19 @@ int			sys_port_set_owner(port_id port, team_id team);
 int			sys_port_write(port_id port, int32 msg_code, const void *msg_buffer, size_t buffer_size);
 int			sys_port_write_etc(port_id port, int32 msg_code, const void *msg_buffer, size_t buffer_size, uint32 flags, bigtime_t timeout);
 
-/* atomic_* ops (needed for cpus that dont support them directly) */
-int sys_atomic_add(int *val, int incr);
-int sys_atomic_and(int *val, int incr);
-int sys_atomic_or(int *val, int incr);
-int sys_atomic_set(int *val, int set_to);
-int sys_test_and_set(int *val, int set_to, int test_val);
+/* atomic_* ops (needed for CPUs that don't support them directly) */
+int32 _kern_atomic_set(vint32 *value, int32 newValue);
+int32 _kern_atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
+int32 _kern_atomic_add(vint32 *value, int32 addValue);
+int32 _kern_atomic_and(vint32 *value, int32 andValue);
+int32 _kern_atomic_or(vint32 *value, int32 orValue);	
+int32 _kern_atomic_read(vint32 *value);
+int64 _kern_atomic_set64(vint64 *value, int64 newValue);
+int64 _kern_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
+int64 _kern_atomic_add64(vint64 *value, int64 addValue);
+int64 _kern_atomic_and64(vint64 *value, int64 andValue);
+int64 _kern_atomic_or64(vint64 *value, int64 orValue);	
+int64 _kern_atomic_read64(vint64 *value);
 
 int sys_sysctl(int *, uint, void *, size_t *, void *, size_t);
 int sys_socket(int, int, int);

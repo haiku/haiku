@@ -26,10 +26,7 @@
 #include <ksignal.h>
 #include <sys/ioccom.h>
 #include <sys/socket.h>
-
-#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
-#include <arch/atomic.h>
-#endif
+#include <user_atomic.h>
 
 #define INT32TOINT64(x, y) ((int64)(x) | ((int64)(y) << 32))
 
@@ -375,24 +372,6 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_setrlimit((int)arg0, (const struct rlimit *)arg1);
 			break;
 
-#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
-		case SYSCALL_ATOMIC_ADD:
-			*call_ret = user_atomic_add((int32 *)arg0, (int32)arg1);
-			break;
-		case SYSCALL_ATOMIC_AND:
-			*call_ret = user_atomic_and((int32 *)arg0, (int32)arg1);
-			break;
-		case SYSCALL_ATOMIC_OR:
-			*call_ret = user_atomic_or((int32 *)arg0, (int32)arg1);
-			break;
-		case SYSCALL_ATOMIC_SET:
-			*call_ret = user_atomic_set((int32 *)arg0, (int32)arg1);
-			break;
-		case SYSCALL_TEST_AND_SET:
-			*call_ret = user_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
-			break;
-#endif
-
 		// image calls
 		case SYSCALL_REGISTER_IMAGE:
 			*call_ret = user_register_image((image_info *)arg0, (size_t)arg1);
@@ -458,6 +437,51 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SET_ALARM:
 			*call_ret = user_set_alarm((bigtime_t)INT32TOINT64(arg0, arg1), (uint32)arg2);
 			break;
+
+		// 32 bit atomic functions
+#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
+		case SYSCALL_ATOMIC_SET:
+			*call_ret = user_atomic_set((int32 *)arg0, (int32)arg1);
+			break;
+		case SYSCALL_ATOMIC_TEST_AND_SET:
+			*call_ret = user_atomic_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
+			break;
+		case SYSCALL_ATOMIC_ADD:
+			*call_ret = user_atomic_add((int32 *)arg0, (int32)arg1);
+			break;
+		case SYSCALL_ATOMIC_AND:
+			*call_ret = user_atomic_and((int32 *)arg0, (int32)arg1);
+			break;
+		case SYSCALL_ATOMIC_OR:
+			*call_ret = user_atomic_or((int32 *)arg0, (int32)arg1);
+			break;
+		case SYSCALL_ATOMIC_READ:
+			*call_ret = user_atomic_read((int32 *)arg0);
+			break;
+#endif
+
+		// 64 bit atomic functions
+#ifdef ATOMIC64_FUNCS_ARE_SYSCALLS
+		case SYSCALL_ATOMIC_SET64:
+			*call_ret = user_atomic_set64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			break;
+		case SYSCALL_ATOMIC_TEST_AND_SET64:
+			*call_ret = user_atomic_test_and_set64((int64 *)arg0, INT32TOINT64(arg1, arg2), INT32TOINT64(arg3, arg4));
+			break;
+		case SYSCALL_ATOMIC_ADD64:
+			*call_ret = user_atomic_add64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			break;
+		case SYSCALL_ATOMIC_AND64:
+			*call_ret = user_atomic_and64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			break;
+		case SYSCALL_ATOMIC_OR64:
+			*call_ret = user_atomic_or64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			break;
+		case SYSCALL_ATOMIC_READ64:
+			*call_ret = user_atomic_read64((int64 *)arg0);
+			break;
+#endif
+
 		default:
 			*call_ret = -1;
 	}

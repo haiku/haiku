@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kernel core arch ppc ;
 
 KernelStaticLibrary libppc :
+	<$(SOURCE_GRIST)>arch_atomic.c
 	<$(SOURCE_GRIST)>arch_cpu.c
 	<$(SOURCE_GRIST)>arch_dbg_console.c
 	<$(SOURCE_GRIST)>arch_debug.c

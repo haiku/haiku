@@ -12,6 +12,8 @@
 #define _BIG_ENDIAN 1
 #define _LITTLE_ENDIAN 0
 
+#define ATOMIC64_FUNCS_ARE_SYSCALLS 1
+
 struct iframe {
 };
 
