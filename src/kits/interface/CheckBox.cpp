@@ -23,70 +23,64 @@
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	BCheckBox displays an on/off control.
 //------------------------------------------------------------------------------
-
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <CheckBox.h>
 #include <Window.h>
-#include <Errors.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 					 BMessage *message, uint32 resizingMode, uint32 flags)
 	:	BControl(frame, name, label, message, resizingMode, flags),
 		fOutlined(false)
 {
 	// Resize to minimum height if needed
-	font_height fh;
-	GetFontHeight(&fh);
-	float minHeight = (float)ceil(6.0f + fh.ascent + fh.descent);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float minHeight = (float)ceil(6.0f + fontHeight.ascent + fontHeight.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
-//------------------------------------------------------------------------------
+
+
 BCheckBox::~BCheckBox()
 {
 
 }
-//------------------------------------------------------------------------------
+
+
 BCheckBox::BCheckBox(BMessage *archive)
 	:	BControl(archive),
 		fOutlined(false)
 {
 }
-//------------------------------------------------------------------------------
-BArchivable *BCheckBox::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BCheckBox::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BCheckBox"))
 		return new BCheckBox(archive);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BCheckBox::Archive(BMessage *archive, bool deep) const
+
+
+status_t
+BCheckBox::Archive(BMessage *archive, bool deep) const
 {
 	return BControl::Archive(archive,deep);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::Draw(BRect updateRect)
+
+
+void
+BCheckBox::Draw(BRect updateRect)
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
 	// If the focus is changing, just redraw the focus indicator
-	if (IsFocusChanging())
-	{
-		float x = (float)ceil(10.0f + fh.ascent);
-		float y = 5.0f + (float)ceil(fh.ascent);
+	if (IsFocusChanging()) {
+		float x = (float)ceil(10.0f + fontHeight.ascent);
+		float y = 5.0f + (float)ceil(fontHeight.ascent);
 
 		if (IsFocus())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
@@ -107,18 +101,16 @@ void BCheckBox::Draw(BRect updateRect)
 	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	BRect rect(1.0f, 3.0f, (float)ceil(3.0f + fh.ascent),
-		(float)ceil(5.0f + fh.ascent));
+	BRect rect(1.0f, 3.0f, (float)ceil(3.0f + fontHeight.ascent),
+		(float)ceil(5.0f + fontHeight.ascent));
 
-	if (IsEnabled())
-	{
+	if (IsEnabled()) {
 		// Filling
 		SetHighColor(lightenmax);
 		FillRect(rect);
 
 		// Box
-		if (fOutlined)
-		{
+		if (fOutlined) {
 			SetHighColor(darken3);
 			StrokeRect(rect);
 
@@ -136,9 +128,7 @@ void BCheckBox::Draw(BRect updateRect)
 					BPoint(rect.right, rect.top), darken4);
 
 			EndLineArray();
-		}
-		else
-		{
+		} else {
 			BeginLineArray(6);
 
 			AddLine(BPoint(rect.left, rect.bottom),
@@ -159,8 +149,7 @@ void BCheckBox::Draw(BRect updateRect)
 		}
 
 		// Checkmark
-		if (Value() == B_CONTROL_ON)
-		{
+		if (Value() == B_CONTROL_ON) {
 			rect.InsetBy(2,2);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
@@ -174,21 +163,18 @@ void BCheckBox::Draw(BRect updateRect)
 
 		// Label
 		SetHighColor(darkenmax);
-		DrawString(Label(), BPoint((float)ceil(10.0f + fh.ascent),
-			3.0f + (float)ceil(fh.ascent)));
+		DrawString(Label(), BPoint((float)ceil(10.0f + fontHeight.ascent),
+			3.0f + (float)ceil(fontHeight.ascent)));
 
 		// Focus
-		if (IsFocus())
-		{
-			float x = (float)ceil(10.0f + fh.ascent);
-			float y = 5.0f + (float)ceil(fh.ascent);
+		if (IsFocus()) {
+			float x = (float)ceil(10.0f + fontHeight.ascent);
+			float y = 5.0f + (float)ceil(fontHeight.ascent);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
 		}
-	}
-	else
-	{
+	} else {
 		// Filling
 		SetHighColor(lighten1);
 		FillRect(rect);
@@ -213,8 +199,7 @@ void BCheckBox::Draw(BRect updateRect)
 		EndLineArray();
 
 		// Checkmark
-		if (Value() == B_CONTROL_ON)
-		{
+		if (Value() == B_CONTROL_ON) {
 			rect.InsetBy(2, 2);
 
 			SetHighColor(tint_color(ui_color(B_KEYBOARD_NAVIGATION_COLOR),
@@ -229,17 +214,21 @@ void BCheckBox::Draw(BRect updateRect)
 
 		// Label
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint((float)ceil(10.0f + fh.ascent),
-			3.0f + (float)ceil(fh.ascent)));
+		DrawString(Label(), BPoint((float)ceil(10.0f + fontHeight.ascent),
+			3.0f + (float)ceil(fontHeight.ascent)));
 	}
 }
-//------------------------------------------------------------------------------
-void BCheckBox::AttachedToWindow()
+
+
+void
+BCheckBox::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 }
-//------------------------------------------------------------------------------
-void BCheckBox::MouseDown(BPoint point)
+
+
+void
+BCheckBox::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
 		return;
@@ -248,91 +237,89 @@ void BCheckBox::MouseDown(BPoint point)
 	Draw(Bounds());
 	Flush();
 
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
-	{
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
 
-		do
-		{
+		do {
 			snooze(40000);
 
 			GetMouse(&point, &buttons, true);
 
 			bool inside = bounds.Contains(point);
 
-			if (fOutlined != inside)
-			{
+			if (fOutlined != inside) {
 				fOutlined = inside;
 				Draw(Bounds());
 				Flush();
 			}
 		} while (buttons != 0);
 
-		if (fOutlined)
-		{
+		if (fOutlined) {
 			fOutlined = false;
 			SetValue(!Value());
 			Invoke();
-		}
-		else
-		{
+		} else {
 			Draw(Bounds());
 			Flush();
 		}
-	}
-	else
-	{
-		SetTracking(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-	}
+	}	
 }
-//------------------------------------------------------------------------------
-void BCheckBox::MessageReceived(BMessage *message)
+
+
+void
+BCheckBox::MessageReceived(BMessage *message)
 {
 	BControl::MessageReceived(message);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::WindowActivated(bool active)
+
+
+void
+BCheckBox::WindowActivated(bool active)
 {
 	BControl::WindowActivated(active);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::KeyDown(const char *bytes, int32 numBytes)
+
+
+void
+BCheckBox::KeyDown(const char *bytes, int32 numBytes)
 {
 	BControl::KeyDown(bytes, numBytes);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::MouseUp(BPoint point)
+
+
+void
+BCheckBox::MouseUp(BPoint point)
 {
 	if (!IsTracking())
 		return;
 
 	bool inside = Bounds().Contains(point);
 
-	if (fOutlined != inside)
-	{
+	if (fOutlined != inside) {
 		fOutlined = inside;
 		Draw(Bounds());
 		Flush();
 	}
 
-	if (fOutlined)
-	{
+	if (fOutlined) {
 		fOutlined = false;
 		SetValue(!Value());
 		Invoke();
-	}
-	else
-	{
+	} else {
 		Draw(Bounds());
 		Flush();
 	}
 
 	SetTracking(false);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::MouseMoved(BPoint point, uint32 transit,
+
+
+void
+BCheckBox::MouseMoved(BPoint point, uint32 transit,
 						   const BMessage *message)
 {
 	if (!IsTracking())
@@ -340,25 +327,30 @@ void BCheckBox::MouseMoved(BPoint point, uint32 transit,
 
 	bool inside = Bounds().Contains(point);
 
-	if (fOutlined != inside)
-	{
+	if (fOutlined != inside) {
 		fOutlined = inside;
 		Draw(Bounds());
 		Flush();
 	}
 }
-//------------------------------------------------------------------------------
-void BCheckBox::DetachedFromWindow()
+
+
+void
+BCheckBox::DetachedFromWindow()
 {
 	BControl::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BCheckBox::SetValue(int32 value)
+
+
+void
+BCheckBox::SetValue(int32 value)
 {
 	BControl::SetValue(value);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::GetPreferredSize(float *width, float *height)
+
+
+void
+BCheckBox::GetPreferredSize(float *width, float *height)
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -371,72 +363,87 @@ void BCheckBox::GetPreferredSize(float *width, float *height)
 
 	*width = (float)ceil(*width);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::ResizeToPreferred()
+
+
+void
+BCheckBox::ResizeToPreferred()
 {
 	BControl::ResizeToPreferred();
 }
-//------------------------------------------------------------------------------
-status_t BCheckBox::Invoke(BMessage *message)
+
+
+status_t
+BCheckBox::Invoke(BMessage *message)
 {
 	return BControl::Invoke(message);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::FrameMoved(BPoint newLocation)
+
+
+void
+BCheckBox::FrameMoved(BPoint newLocation)
 {
 	BControl::FrameMoved(newLocation);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::FrameResized(float width, float height)
+
+
+void
+BCheckBox::FrameResized(float width, float height)
 {
 	BControl::FrameResized(width, height);
 }
-//------------------------------------------------------------------------------
-BHandler *BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
+
+
+BHandler *
+BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
 									  BMessage *specifier, int32 what,
 									  const char *property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, what, property);
 }
-//------------------------------------------------------------------------------
-status_t BCheckBox::GetSupportedSuites(BMessage *message)
+
+
+status_t
+BCheckBox::GetSupportedSuites(BMessage *message)
 {
 	return BControl::GetSupportedSuites(message);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::MakeFocus(bool focused)
+
+
+void
+BCheckBox::MakeFocus(bool focused)
 {
 	BControl::MakeFocus(focused);
 }
-//------------------------------------------------------------------------------
-void BCheckBox::AllAttached()
+
+
+void
+BCheckBox::AllAttached()
 {
 	BControl::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BCheckBox::AllDetached()
+
+
+void
+BCheckBox::AllDetached()
 {
 	BControl::AllDetached();
 }
-//------------------------------------------------------------------------------
-status_t BCheckBox::Perform(perform_code d, void *arg)
+
+
+status_t
+BCheckBox::Perform(perform_code d, void *arg)
 {
 	return BControl::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
+
+
 void BCheckBox::_ReservedCheckBox1() {}
 void BCheckBox::_ReservedCheckBox2() {}
 void BCheckBox::_ReservedCheckBox3() {}
-//------------------------------------------------------------------------------
-BCheckBox &BCheckBox::operator=(const BCheckBox &)
+
+
+BCheckBox &
+BCheckBox::operator=(const BCheckBox &)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
