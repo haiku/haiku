@@ -260,15 +260,31 @@ BitmapStreamTest::ReadWriteTest()
 	NextSubTest();
 	CPPUNIT_ASSERT(stream.Size() ==
 		sizeof(TranslatorBitmap) + sheader.dataSize);
+		
+	// Test reading zero bytes
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.ReadAt(stream.Size(), &(chbuf[0]), 0) == 0);
+	CPPUNIT_ASSERT(stream.ReadAt(sheader.dataSize + 1000, &(chbuf[0]), 0) == 0);
+	CPPUNIT_ASSERT(stream.ReadAt(-1, &(chbuf[0]), 0) == 0);
 	
 	// Read bitmap data
 	NextSubTest();
-	bytesLeft = sheader.dataSize;
-	nPos = sizeof(TranslatorBitmap);
-	while (bytesLeft--) {
-		CPPUNIT_ASSERT(stream.ReadAt(nPos++, &(chbuf[0]), 1) == 1);
-		CPPUNIT_ASSERT(chbuf[0] == byt);
-	}
+	#if !TEST_R5
+		// This test fails with Be's version because of a bug.
+		// Be's BBitmapStream::ReadAt() has strange behavior in cases
+		// where the pos parameter of ReadAt() is != BBitmapStream::Position().
+		// If BBitmapStream::Read() is used instead, it calls 
+		// BBitmapStream::ReadAt() with pos = BBitmapStream::Position(),
+		// so, this issue is rarely a problem because Read() is most often used.
+		bytesLeft = sheader.dataSize;
+		nPos = sizeof(TranslatorBitmap);
+		while (bytesLeft--) {
+			chbuf[0] = 0x99;
+			ssize_t rd = stream.ReadAt(nPos++, &(chbuf[0]), 1);
+			CPPUNIT_ASSERT(rd == 1);
+			CPPUNIT_ASSERT(chbuf[0] == byt);
+		}
+	#endif
 	
 	// Send erroneous and weird data to WriteAt()
 	NextSubTest();
