@@ -188,62 +188,51 @@ void BTab::DrawLabel(BView *owner, BRect frame)
 //------------------------------------------------------------------------------
 void BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 {
-	// TODO: write a decent DrawTab method, this one is from the Be Book
-	
-	// Save the original colors
-	rgb_color hi = owner->HighColor();
-	rgb_color lo = owner->LowColor();
+	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
+		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
+		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
+		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	rgb_color kGray = ui_color(B_PANEL_BACKGROUND_COLOR),
-		kBlack = tint_color(kGray, B_DARKEN_MAX_TINT),
-		kDarkGray = tint_color(kGray, B_DARKEN_4_TINT),
-		kMedGray = tint_color(kGray, B_DARKEN_2_TINT),
-		kWhite = tint_color(kGray, B_LIGHTEN_MAX_TINT);
+	owner->SetHighColor(darkenmax);
+	owner->SetLowColor(no_tint);
+	DrawLabel(owner, frame);
 
-	// Draw the label by calling DrawLabel() 
-	owner->SetHighColor(kBlack); 
-	owner->SetLowColor(kGray); 
-	DrawLabel(owner, frame); 
+	owner->BeginLineArray(12); 
 
-	// Start a line array to draw the tab -- 
-	// this is faster than drawing the lines 
-	// one by one. 
-	owner->BeginLineArray(7); 
+	if (position != B_TAB_ANY)
+	{
+		owner->AddLine(BPoint(frame.left - 3.0f, frame.bottom),
+			BPoint(frame.left - 2.0f, frame.bottom - 1.0f), lightenmax);
+		owner->AddLine(BPoint(frame.left - 1.0f, frame.bottom - 2.0f),
+			BPoint(frame.left - 1.0f, frame.bottom - 3.0f), lightenmax);
+	}
 
-	// Do the bottom left corner, visible 
-	// only on the frontmost tab. 
-	if (position != B_TAB_ANY) { 
-		owner->AddLine(BPoint(frame.left, frame.bottom), 
-			BPoint(frame.left+3, frame.bottom-3), kWhite); 
-	} 
+	owner->AddLine(BPoint(frame.left, frame.bottom - 4.0f),
+		BPoint(frame.left, frame.top + 4.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 1.0f, frame.top + 3.0f),
+		BPoint(frame.left + 1.0f, frame.top + 2.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 2.0f, frame.top + 1.0f),
+		BPoint(frame.left + 3.0f, frame.top + 1.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 4.0f, frame.top),
+		BPoint(frame.right - 5.0f, frame.top), lightenmax);
 
-	// Left wall -- always drawn 
-	owner->AddLine(BPoint(frame.left+4, frame.bottom-4), 
-		BPoint(frame.left+4, frame.top), kWhite); 
+	owner->AddLine(BPoint(frame.right - 4.0f, frame.top + 1.0f),
+		BPoint(frame.right - 3.0f, frame.top + 1.0f), lightenmax);
 
-	// Top -- always drawn 
-	owner->AddLine(BPoint(frame.left+5, frame.top), 
-		BPoint(frame.right-5, frame.top), kWhite); 
+	owner->AddLine(BPoint(frame.right - 2.0f, frame.top + 2.0f),
+		BPoint(frame.right - 2.0f, frame.top + 3.0f), darken2);
+	owner->AddLine(BPoint(frame.right - 1.0f, frame.top + 4.0f),
+		BPoint(frame.right - 1.0f, frame.bottom - 4.0f), darken2);
 
-	// Right wall -- always drawn. Has a nice bevel. 
-		owner->AddLine(BPoint(frame.right-4, frame.top), 
-			BPoint(frame.right-4, frame.bottom-4), kDarkGray); 
-		owner->AddLine(BPoint(frame.right-5, frame.top), 
-			BPoint(frame.right-5, frame.bottom-4), kMedGray); 
+	if (full)
+	{ 
+		owner->AddLine(BPoint(frame.right, frame.bottom - 3.0f),
+			BPoint(frame.right, frame.bottom - 2.0f), darken2);
+		owner->AddLine(BPoint(frame.right + 1.0f, frame.bottom - 1.0f),
+			BPoint(frame.right + 2.0f, frame.bottom), darken2);
+	}
 
-	// Bottom-right corner, only visible if the tab 
-	// is either frontmost or the rightmost tab. 
-	if (full) { 
-		owner->AddLine(BPoint(frame.right-3, frame.bottom-3), 
-			BPoint(frame.right, frame.bottom), kDarkGray); 
-		owner->AddLine(BPoint(frame.right-4, frame.bottom-3), 
-			BPoint(frame.right-1, frame.bottom), kMedGray); 
-	} 
-
-	owner->EndLineArray(); 
-
-	owner->SetHighColor(hi); 
-	owner->SetLowColor(lo);
+	owner->EndLineArray();
 }
 //------------------------------------------------------------------------------
 void BTab::_ReservedTab1() {}
@@ -409,8 +398,9 @@ void BTabView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	// TODO: check if this color is set in the BeOS implementation
-	if (Parent())
-      SetViewColor(Parent()->ViewColor ());
+	//if (Parent())
+    //  SetViewColor(Parent()->ViewColor ());
+    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	Select(0);
 }
@@ -590,39 +580,23 @@ void BTabView::DrawBox(BRect selTabRect)
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_LIGHTEN_MAX_TINT));
 
-	StrokeLine(BPoint(0, selTabRect.bottom + 1), BPoint(0, rect.bottom));
-
-	if (selTabRect.left > 0.0f)
-		StrokeLine(BPoint ( 0, selTabRect.bottom + 1),
-			BPoint(selTabRect.left, selTabRect.bottom + 1));
-
-	if (selTabRect.right < rect.right - 2.0f)
-		StrokeLine(BPoint(selTabRect.right, selTabRect.bottom + 1),
-			BPoint(rect.right - 2, selTabRect.bottom + 1 ));
-
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-
-	StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
-		BPoint(rect.right - 1, rect.bottom - 1));
-
-	StrokeLine(BPoint(rect.right - 1, selTabRect.bottom + 1),
-		BPoint(rect.right - 1, rect.bottom - 2));
+	StrokeLine(BPoint(0.0f, rect.bottom), BPoint(0.0f, selTabRect.bottom));
+	StrokeLine(BPoint(selTabRect.left - 4.0f, selTabRect.bottom));
+	StrokeLine(BPoint(selTabRect.right + 3.0f, selTabRect.bottom),
+		BPoint(rect.right - 1.0f, selTabRect.bottom));
 
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_4_TINT));
 
-	StrokeLine(BPoint ( rect.left + 1, rect.bottom ),
-		BPoint(rect.right - 1, rect.bottom ) );
-
-	StrokeLine(BPoint(rect.right, selTabRect.bottom + 1),
+	StrokeLine(BPoint(rect.right, selTabRect.bottom + 1.0f),
 		BPoint(rect.right, rect.bottom));
+	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
 }
 //------------------------------------------------------------------------------
 BRect BTabView::TabFrame(int32 tab_index) const
 {
-	return BRect((float)(tab_index * 94), 0, (float)(tab_index * 94 + 100),
-		fTabHeight);
+	return BRect((float)(7 + tab_index * 100), 0,
+		(float)(7 + tab_index * 100 + 99), fTabHeight);
 }
 //------------------------------------------------------------------------------
 void BTabView::SetFlags(uint32 flags)
