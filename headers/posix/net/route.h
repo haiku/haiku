@@ -185,8 +185,8 @@ struct  rtstat {
                 (rt)->rt_refcnt--; \
 } while (0)
 
-struct  rtstat  rtstat;
-struct  radix_node_head *rt_tables[AF_MAX+1];
+extern struct  rtstat  rtstat;
+extern struct  radix_node_head *rt_tables[AF_MAX+1];
 
 void	route_init(void);
 
