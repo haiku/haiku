@@ -73,11 +73,11 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 		chain = settings->FindInt32("argument");
 	else
 		chain = -1;
-	printf("Chain: %d\n",chain);
+	printf("Chain: %ld\n",chain);
 	for (int32 i = 0; i < list.CountItems(); i++) {
 		BMenuItem *item = new BMenuItem(((BMailChain *)(list.ItemAt(i)))->Name(), new BMessage(((BMailChain *)(list.ItemAt(i)))->ID()));
 		outbound->AddItem(item);
-		if (((BMailChain *)(list.ItemAt(i)))->ID() == chain)
+		if (((BMailChain *)(list.ItemAt(i)))->ID() == (unsigned)chain)
 			item->SetMarked(true);
 		delete (BMailChain *)(list.ItemAt(i));
 	}

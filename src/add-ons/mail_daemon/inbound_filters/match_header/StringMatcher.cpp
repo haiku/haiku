@@ -162,7 +162,7 @@ bool MakeRegexCaseInsensitive(PortableString & str)
 {
    bool changed = false;
    PortableString ret;
-   for (uint32 i=0; i<str.Length(); i++)
+   for (uint32 i=0; i<(unsigned)str.Length(); i++)
    {
      char next = str[i];
      if ((next >= 'A')&&(next <= 'Z'))
