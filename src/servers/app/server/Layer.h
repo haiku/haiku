@@ -56,8 +56,8 @@ class ServerCursor;
 class Layer
 {
 public:
-	Layer(BRect frame, const char *name, int32 token, int32 resize, 
-			int32 flags, ServerWindow *win);
+	Layer(BRect frame, const char *name, int32 token, uint32 resize, 
+			uint32 flags, ServerWindow *win);
 	virtual ~Layer(void);
 
 	void AddChild(Layer *child, Layer *before=NULL, bool rebuild=true);
@@ -136,6 +136,7 @@ protected:
 	int32		_view_token;
 	int32		_level;
 	uint32		_flags;
+	uint32		_resize_mode;
 	bool		_hidden;
 	bool		_is_dirty;
 	bool		_is_updating;
