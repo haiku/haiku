@@ -28,17 +28,18 @@ class Partition : public Node, public partition_data {
 		status_t Mount(Directory **_fileSystem = NULL);
 		status_t Scan(bool mountFileSystems);
 
+		void SetParent(Partition *parent) { fParent = parent; }
 		Partition *Parent() const { return fParent; }
+
 		bool IsFileSystem() const { return fIsFileSystem; }
+		bool IsPartitioningSystem() const { return fIsPartitioningSystem; }
 		const char *ModuleName() const { return fModuleName; }
 
 	private:
-		void SetParent(Partition *parent) { fParent = parent; }
-
 		int			fFD;
 		NodeList	fChildren;
 		Partition	*fParent;
-		bool		fIsFileSystem;
+		bool		fIsFileSystem, fIsPartitioningSystem;
 		const char	*fModuleName;
 };
 
