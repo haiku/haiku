@@ -89,7 +89,12 @@ enum {
 #define NV10_CONTEXT_SURFACES_2D		0x00000010 /* 2D */
 #define NV1_IMAGE_FROM_CPU				0x00000010 /* 2D: unused, remove? */
 #define NV_IMAGE_BLIT					0x00000011 /* 2D */
+//fixme: lose NV3_GDI_RECTANGLE_TEXT later on? DMA does not work with it..
+//non-dma:
 #define NV3_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
+//dma:
+#define NV4_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
+//end fixme.
 #define NV_RENDER_D3D0_TRIANGLE_ZETA	0x00000013 /* unused (yet?) */
 #define NV4_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */
 #define NV10_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */

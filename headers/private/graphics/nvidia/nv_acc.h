@@ -60,6 +60,7 @@ typedef struct {
 	uint32 HeightWidth;			/* b0-15 is width, b16-31 is height */
 } cmd_nv_image_blit;
 
+//fixme: using nv4_gdi_rectangle_text for DMA acc. Differs slightly from this one!
 typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
@@ -304,9 +305,10 @@ typedef struct {
 #define NV_IMAGE_PATTERN_SETSHAPE				0x0308
 #define NV_IMAGE_PATTERN_SETCOLOR0				0x0310
 #define NV_IMAGE_BLIT_SOURCEORG					0x0300
-#define NV3_GDI_RECTANGLE_TEXT_SETCOLORFORMAT	0x0300
-#define NV3_GDI_RECTANGLE_TEXT_COLOR1A			0x03fc
-#define NV3_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP		0x0400
+//fixme note: non-DMA acc is still using NV3_GDI_RECTANGLE_TEXT...
+#define NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT	0x0300
+#define NV4_GDI_RECTANGLE_TEXT_COLOR1A			0x03fc
+#define NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP		0x0400
 #define NV4_SURFACE_FORMAT						0x0300
 
 #endif
