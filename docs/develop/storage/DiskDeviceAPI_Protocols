@@ -1,36 +1,90 @@
 Disk Device Protocols
 =====================
 
-disk device job progress update message
+disk device job scheduled message
 
-target:		Registered progress update BMessenger for the given job
-message:	B_DISK_DEVICE_JOB_UPDATE
+target:		Registered job update BMessengers
+message:	B_DISK_DEVICE_JOB_SCHEDULED
 			"job_id": B_INT32_TYPE
-			"progress": B_UINT8_TYPE
-			[ "description": B_STRING_TYPE ]
 reply:      none (asynchronous message)
 
 message fields:
 - job_id: Unique job identifier
-- progress: Percent of job completed (0 to 100)
-- description: Optional description of current action being taken, i.e.
-               "allocating inodes", "writing superblock", etc.
+
+-----------------------------------------------------------------------
+
+disk device job initiated message
+
+target:		Registered job update BMessengers
+message:	B_DISK_DEVICE_JOB_INITIATED
+			"job_id": B_INT32_TYPE
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
+
+-----------------------------------------------------------------------
+
+disk device job canceled message
+
+target:		Registered job update BMessengers
+message:	B_DISK_DEVICE_JOB_CANCELED
+			"job_id": B_INT32_TYPE
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
 
 -----------------------------------------------------------------------
 
 disk device job finished message
 
-target:		Registered progress update BMessenger for the given job
+target:		Registered job update BMessengers
 message:	B_DISK_DEVICE_JOB_FINISHED
 			"job_id": B_INT32_TYPE
+			"succeeded": B_BOOL_TYPE
+			[ "info": B_STRING_TYPE ]
 reply:      none (asynchronous message)
 
 message fields:
 - job_id: Unique job identifier
+- info: Optional description of success or failure
 
 notes:
 A separate job finished message is needed, as rounding error in
 the computation of job progress may result in multiple
 B_DISK_DEVICE_JOB_UPDATE messages with "progress" fields of 100.
+
+-----------------------------------------------------------------------
+
+disk device job simple progress update message
+
+target:		Registered job simple progress update BMessengers
+message:	B_DISK_DEVICE_JOB_SIMPLE_PROGRESS
+			"job_id": B_INT32_TYPE
+			"progress": B_UINT8_TYPE
+			"info": B_STRING_TYPE
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
+- progress: Percent of job completed (0 to 100)
+- info: Description of current action being taken, i.e.
+        "allocating inodes", "writing superblock", etc.
+
+-----------------------------------------------------------------------
+
+disk device job extra progress update message
+
+target:		Registered job extra progress update BMessengers
+message:	B_DISK_DEVICE_JOB_EXTRA_PROGRESS
+			"job_id": B_INT32_TYPE
+			"info": B_STRING_TYPE
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
+- info: Extended progress info string, i.e. "block 123: found
+        invalid inode; fixing"
 
 -----------------------------------------------------------------------
