@@ -85,8 +85,8 @@ void BCheckBox::Draw(BRect updateRect)
 	// If the focus is changing, just redraw the focus indicator
 	if (IsFocusChanging())
 	{
-		float x = ceil(10.0f + fh.ascent);
-		float y = 5.0f + ceil(fh.ascent);
+		float x = (float)ceil(10.0f + fh.ascent);
+		float y = 5.0f + (float)ceil(fh.ascent);
 
 		if (IsFocus())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
@@ -107,7 +107,8 @@ void BCheckBox::Draw(BRect updateRect)
 	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	BRect rect(1.0f, 3.0f, ceil(3.0f + fh.ascent), ceil(5.0f + fh.ascent));
+	BRect rect(1.0f, 3.0f, (float)ceil(3.0f + fh.ascent),
+		(float)ceil(5.0f + fh.ascent));
 
 	if (IsEnabled())
 	{
@@ -173,14 +174,14 @@ void BCheckBox::Draw(BRect updateRect)
 
 		// Label
 		SetHighColor(darkenmax);
-		DrawString(Label(), BPoint(ceil(10.0f + fh.ascent),
-			3.0f + ceil(fh.ascent)));
+		DrawString(Label(), BPoint((float)ceil(10.0f + fh.ascent),
+			3.0f + (float)ceil(fh.ascent)));
 
 		// Focus
 		if (IsFocus())
 		{
-			float x = ceil(10.0f + fh.ascent);
-			float y = 5.0f + ceil(fh.ascent);
+			float x = (float)ceil(10.0f + fh.ascent);
+			float y = 5.0f + (float)ceil(fh.ascent);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
@@ -228,8 +229,8 @@ void BCheckBox::Draw(BRect updateRect)
 
 		// Label
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(ceil(10.0f + fh.ascent),
-			3.0f + ceil(fh.ascent)));
+		DrawString(Label(), BPoint((float)ceil(10.0f + fh.ascent),
+			3.0f + (float)ceil(fh.ascent)));
 	}
 }
 //------------------------------------------------------------------------------
@@ -318,17 +319,14 @@ void BCheckBox::MouseUp(BPoint point)
 
 	if (fOutlined)
 	{
-		if (fOutlined)
-		{
-			fOutlined = false;
-			SetValue(!Value());
-			Invoke();
-		}
-		else
-		{
-			Draw(Bounds());
-			Flush();
-		}
+		fOutlined = false;
+		SetValue(!Value());
+		Invoke();
+	}
+	else
+	{
+		Draw(Bounds());
+		Flush();
 	}
 
 	SetTracking(false);
