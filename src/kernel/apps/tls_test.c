@@ -32,7 +32,7 @@ read_fs_register(void)
 static int32
 thread1_func(void *data)
 {
-	printf("1. stack at: %p\n", &data);
+	printf("1. stack at %p, thread id = %ld\n", &data, find_thread(NULL));
 	printf("1. TLS address = %p\n", tls_address(gSlot));
 	tls_set(gSlot, (void *)"thread 1");
 	printf("1. TLS get = \"%s\" (should be \"thread 1\")\n", (char *)tls_get(gSlot));
@@ -48,7 +48,7 @@ thread1_func(void *data)
 static int32
 thread2_func(void *data)
 {
-	printf("2. stack at: %p\n", &data);
+	printf("2. stack at %p, thread id = %ld\n", &data, find_thread(NULL));
 	printf("2. TLS address = %p\n", tls_address(gSlot));
 	printf("2. TLS get = \"%s\" (should be NULL)\n", (char *)tls_get(gSlot));
 
@@ -69,7 +69,7 @@ main(int argc, char **argv)
 	gWait = create_sem(0, "waiter");
 	gSlot = tls_allocate();
 
-	printf("got slot %ld : %p\n", gSlot, &thread1);
+	printf("got slot %ld, stack at %p, thread id = %ld\n", gSlot, &thread1, find_thread(NULL));
 
 #if __INTEL__
 	printf("FS register is %p\n", read_fs_register());
