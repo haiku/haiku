@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "RootFileSystem.h"
@@ -11,6 +11,7 @@
 #include <boot/platform.h>
 #include <boot/partitions.h>
 #include <boot/stdio.h>
+#include <boot/stage2.h>
 #include <util/kernel_cpp.h>
 
 #include <unistd.h>
@@ -295,10 +296,27 @@ vfs_init(stage2_args *args)
 }
 
 
-void
+status_t
 register_boot_file_system(Directory *volume)
 {
 	gRoot->AddLink("boot", volume);
+	
+	Partition *partition;
+	status_t status = gRoot->GetPartitionFor(volume, &partition);
+	if (status != B_OK) {
+		dprintf("register_boot_file_system(): could not locate boot volume in root!\n");
+		return status;
+	}
+
+	gKernelArgs.boot_disk.partition_offset = partition->offset;
+
+	Node *device = get_node_from(partition->FD());
+	if (device == NULL) {
+		dprintf("register_boot_file_system(): could not get boot device!\n");
+		return B_ERROR;
+	}
+
+	return platform_register_boot_device(device);
 }
 
 
