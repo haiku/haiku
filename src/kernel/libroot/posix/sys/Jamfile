@@ -11,6 +11,8 @@ KernelMergeObject posix_sys.o :
  	select.c
 	stat.c
  	sysctl.c
+ 	times.c
+ 	uio.c
  	umask.c
  	wait.c
 	: -fPIC -DPIC
