@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -311,7 +311,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 	fs->next_vnode_id = 0;
 
 	err = mutex_init(&fs->lock, "rootfs_mutex");
-	if (err < 0)
+	if (err < B_OK)
 		goto err1;
 
 	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr)&vnode->all_next - (addr)vnode,
@@ -335,7 +335,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 	*root_vnid = vnode->id;
 	*_fs = fs;
 
-	return 0;
+	return B_OK;
 
 err3:
 	hash_uninit(fs->vnode_list_hash);
@@ -371,7 +371,7 @@ rootfs_unmount(fs_volume _fs)
 	mutex_destroy(&fs->lock);
 	free(fs);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -380,7 +380,7 @@ rootfs_sync(fs_volume fs)
 {
 	TRACE(("rootfs_sync: entry\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -406,7 +406,7 @@ rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 	}
 
 	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
-	if (status < 0)
+	if (status < B_OK)
 		goto err;
 
 	*_id = vnode->id;
@@ -520,7 +520,7 @@ rootfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 	TRACE(("rootfs_close: entry vnode %p, cookie %p\n", v, cookie));
 #endif
-	return 0;
+	return B_OK;
 }
 
 
@@ -533,17 +533,16 @@ rootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 	TRACE(("rootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
 #endif
-	if (cookie)
-		free(cookie);
+	free(cookie);
 
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 rootfs_fsync(fs_volume _fs, fs_vnode _v)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -599,7 +598,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnod
 	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
 
 	mutex_unlock(&fs->lock);	
-	return 0;
+	return B_OK;
 
 err:
 	mutex_unlock(&fs->lock);
@@ -789,7 +788,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 	struct rootfs_vnode *vnode;
-	status_t status = 0;
+	status_t status = B_OK;
 
 	TRACE(("rootfs_symlink: dir %p, name = '%s', path = %s\n", dir, name, path));
 
@@ -822,7 +821,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
 
 	mutex_unlock(&fs->lock);
-	return 0;
+	return B_OK;
 
 err1:
 	rootfs_delete_vnode(fs, vnode, false);
@@ -907,7 +906,7 @@ rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 		rootfs_insert_in_dir(newdir, v1);
 	}
 
-	err = 0;
+	err = B_OK;
 
 err:
 	mutex_unlock(&fs->lock);
@@ -937,10 +936,10 @@ rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 	stat->st_gid = vnode->gid;
 
 	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = vnode->creation_time;
+	stat->st_mtime = stat->st_ctime = vnode->modification_time;
 	stat->st_crtime = vnode->creation_time;
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -956,6 +955,8 @@ rootfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint3
 	if (statMask & FS_WRITE_STAT_SIZE)
 		return B_BAD_VALUE;
 
+	mutex_lock(&fs->lock);
+
 	if (statMask & FS_WRITE_STAT_MODE)
 		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
 
@@ -968,6 +969,8 @@ rootfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint3
 		vnode->modification_time = stat->st_mtime;
 	if (statMask & FS_WRITE_STAT_CRTIME) 
 		vnode->creation_time = stat->st_crtime;
+
+	mutex_unlock(&fs->lock);
 
 	notify_listener(B_STAT_CHANGED, fs->id, 0, 0, vnode->id, NULL);
 	return B_OK;
