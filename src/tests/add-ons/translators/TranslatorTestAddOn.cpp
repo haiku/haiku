@@ -115,7 +115,8 @@ CompareTranslationFormat(const translation_format *pleft,
 void
 TestBTranslator(BTestCase *ptest, BTranslator *ptran, 
 	const translation_format *pExpectedIns, uint32 nExpectedIns,
-	const translation_format *pExpectedOuts, uint32 nExpectedOuts)
+	const translation_format *pExpectedOuts, uint32 nExpectedOuts,
+	int32 expectedVer)
 {
 	const uint32 knmatches = 50;
 	uint8 matches[knmatches];
@@ -169,8 +170,8 @@ TestBTranslator(BTestCase *ptest, BTranslator *ptran,
 	// (when ver == 100, that means that version is 1.00)
 	ptest->NextSubTest();
 	int32 ver = ptran->TranslatorVersion();
-	CPPUNIT_ASSERT((ver / 100) > 0);
-	printf(" {%d} ", (int) ver);
+	CPPUNIT_ASSERT(ver == expectedVer);
+	printf(" {0x%.8lx} ", ver);
 	
 	// Input formats?
 	ptest->NextSubTest();
@@ -236,7 +237,8 @@ TestBTranslator(BTestCase *ptest, BTranslator *ptran,
 void
 TranslatorLoadAddOnTest(const char *path, BTestCase *ptest,
 	const translation_format *pExpectedIns, uint32 nExpectedIns,
-	const translation_format *pExpectedOuts, uint32 nExpectedOuts)
+	const translation_format *pExpectedOuts, uint32 nExpectedOuts,
+	int32 expectedVer)
 {
 	// Make sure the add_on loads
 	ptest->NextSubTest();
@@ -265,7 +267,7 @@ TranslatorLoadAddOnTest(const char *path, BTestCase *ptest,
 	
 	// Run a number of tests on the BTranslator object
 	TestBTranslator(ptest, ptran, pExpectedIns, nExpectedIns,
-		pExpectedOuts, nExpectedOuts);
+		pExpectedOuts, nExpectedOuts, expectedVer);
 		// NOTE: this function Release()s ptran
 	ptran = NULL;
 	

@@ -17,6 +17,7 @@ void CheckTranslatorInfo(translator_info *pti,
 	
 void TranslatorLoadAddOnTest(const char *path, BTestCase *ptest,
 	const translation_format *pExpectedIns, uint32 nExpectedIns,
-	const translation_format *pExpectedOuts, uint32 nExpectedOuts);
+	const translation_format *pExpectedOuts, uint32 nExpectedOuts,
+	int32 expectedVer);
 
 #endif // #ifndef TRANSLATOR_TEST_ADD_ON_H
