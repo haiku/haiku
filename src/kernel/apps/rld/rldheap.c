@@ -31,17 +31,17 @@ static char      *rld_base;
 static char      *rld_base_2;
 static char      *rld_ptr;
 
+
 void
 rldheap_init(void)
 {
-	rld_region= sys_vm_create_anonymous_region(
-		(char*)names[sys_get_current_team_id()%(sizeof(names)/sizeof(names[0]))],
-		(void**)&rld_base,
+	rld_region = sys_vm_create_anonymous_region(
+		(char *)names[sys_get_current_team_id() % (sizeof(names) / sizeof(names[0]))],
+		(void **)&rld_base,
 		REGION_ADDR_ANY_ADDRESS,
 		RLD_SCRATCH_SIZE,
 		REGION_WIRING_LAZY,
-		LOCK_RW
-	);
+		LOCK_RW);
 
 	/*
 	 * Fill in the gap upto RLD_PROGRAM_BASE,
@@ -51,30 +51,31 @@ rldheap_init(void)
 	 * Not doing these leads to some funny troubles with some
 	 * libraries.
 	 */
-	rld_region_2= sys_vm_create_anonymous_region(
-		"RLD_padding",
-		(void**)&rld_base_2,
+	rld_region_2 = sys_vm_create_anonymous_region("RLD_padding",
+		(void **)&rld_base_2,
 		REGION_ADDR_ANY_ADDRESS,
-		RLD_PROGRAM_BASE - ((unsigned)(rld_base+RLD_SCRATCH_SIZE)),
+		RLD_PROGRAM_BASE - (uint32)(rld_base + RLD_SCRATCH_SIZE),
 		REGION_WIRING_LAZY,
-		LOCK_RW
-	);
+		LOCK_RW);
 
-	rld_ptr= rld_base;
+	rld_ptr = rld_base;
 }
+
 
 void *
 rldalloc(size_t s)
 {
 	void *retval;
 
-	s= (s+15)&~15;
+	s = (s + 15) & ~15;
+		// multiple of 16 bytes
 
-	retval= rld_ptr;
-	rld_ptr+= s;
+	retval = rld_ptr;
+	rld_ptr += s;
 
 	return retval;
 }
+
 
 void
 rldfree(void *p)
