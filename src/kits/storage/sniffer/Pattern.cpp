@@ -29,7 +29,7 @@ Pattern::Pattern(const std::string &string)
 	// Build a mask with all bits turned on of the
 	// appropriate length
 	std::string mask = "";
-	for (int i = 0; i < string.length(); i++)
+	for (uint i = 0; i < string.length(); i++)
 		mask += (char)0xFF;
 	SetTo(string, mask);
 }
@@ -54,7 +54,7 @@ Pattern::GetErr() const {
 void dumpStr(const std::string &string, const char *label = NULL) {
 	if (label)
 		printf("%s: ", label);
-	for (int i = 0; i < string.length(); i++)
+	for (uint i = 0; i < string.length(); i++)
 		printf("%x ", string[i]);
 	printf("\n");
 }
