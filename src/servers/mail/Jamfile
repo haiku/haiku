@@ -4,10 +4,10 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-if $(TARGET_PLATFORM) = r5 {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
-} else if $(TARGET_PLATFORM) = bone {
+if $(BONE_COMPATIBLE) {
 	SubDirC++Flags -DBONE ;
+} else {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
 }
 
 AddResources mail_daemon : mail_daemon.rdef ;
@@ -18,13 +18,13 @@ Server mail_daemon :
 	main.cpp
 ;
 
-LinkSharedOSLibs mail_daemon : 
-	be 
-	libmail.so
-	tracker
-	socket
-	stdc++.r4
-;
+LinkSharedOSLibs mail_daemon : be libmail.so tracker stdc++.r4 ;
+
+if $(BONE_COMPATIBLE) {
+	LinkSharedOSLibs mail_daemon : socket ;
+} else {
+	LinkSharedOSLibs mail_daemon : net ;
+}
 
 Package haiku-maildaemon-cvs :
 	mail_daemon : 
