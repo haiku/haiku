@@ -26,7 +26,7 @@
 //------------------------------------------------------------------------------
 
 #include <Window.h>
-
+#include <stdlib.h>
 
 #include "PrivateScreen.h"
 
