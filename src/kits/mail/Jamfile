@@ -57,6 +57,7 @@ if $(TARGET_PLATFORM) = r5 {
 		textencoding
 		tracker
 		stdc++.r4
+		net
 	;
 } else {
 	LinkSharedOSLibs libmail.so :
