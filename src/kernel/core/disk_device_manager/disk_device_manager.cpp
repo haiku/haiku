@@ -184,7 +184,7 @@ find_disk_system(const char *name)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KDiskSystem *diskSystem = manager->DiskSystemWithName(name))
+		if (KDiskSystem *diskSystem = manager->FindDiskSystem(name))
 			return diskSystem->ID();
 	}
 	return -1;

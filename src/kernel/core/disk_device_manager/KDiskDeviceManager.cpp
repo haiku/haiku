@@ -506,9 +506,9 @@ KDiskDeviceManager::JobQueueAt(int32 index)
 	return NULL;
 }
 
-// DiskSystemWithName
+// FindDiskSystem
 KDiskSystem *
-KDiskDeviceManager::DiskSystemWithName(const char *name)
+KDiskDeviceManager::FindDiskSystem(const char *name)
 {
 	for (int32 cookie = 0;
 		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
@@ -518,9 +518,9 @@ KDiskDeviceManager::DiskSystemWithName(const char *name)
 	return NULL;
 }
 
-// DiskSystemWithID
+// FindDiskSystem
 KDiskSystem *
-KDiskDeviceManager::DiskSystemWithID(disk_system_id id)
+KDiskDeviceManager::FindDiskSystem(disk_system_id id)
 {
 	DiskSystemMap::Iterator it = fDiskSystems->Find(id);
 	if (it != fDiskSystems->End())
@@ -556,7 +556,7 @@ KDiskDeviceManager::LoadDiskSystem(disk_system_id id)
 {
 	KDiskSystem *diskSystem = NULL;
 	if (ManagerLocker locker = this) {
-		diskSystem = DiskSystemWithID(id);
+		diskSystem = FindDiskSystem(id);
 		if (diskSystem && diskSystem->Load() != B_OK)
 			diskSystem = NULL;
 	}
