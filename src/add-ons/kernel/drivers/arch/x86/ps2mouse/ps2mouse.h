@@ -83,8 +83,11 @@
 #define INT_PS2_MOUSE            0x0C
 
 // other stuff
-#define PS2_PACKET_SIZE              3
 #define MOUSE_HISTORY_SIZE		 256
 
+// packet sizes
+#define PS2_PACKET_STANDARD		 3
+#define PS2_PACKET_INTELLIMOUSE	 4
+#define PS2_MAX_PACKET_SIZE		 4 // Should be equal to the biggest packet size
 
 #endif /* _KERNEL_ARCH_x86_PS2MOUSE_H */
