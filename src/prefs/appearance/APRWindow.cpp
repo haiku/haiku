@@ -43,9 +43,7 @@ void APRWindow::WorkspaceActivated(int32 wkspc, bool is_active)
 void APRWindow::MessageReceived(BMessage *msg)
 {
 	if(msg->what==SET_UI_COLORS)
-	{
 		decorators->SetColors(colors->settings);
-	}
 	else
 		BWindow::MessageReceived(msg);
 }

@@ -65,7 +65,7 @@ protected:
 	void LoadColorSet(const BString &name);
 	void SetColorSetName(const char *name);
 	BColorControl *picker;
-	BButton *apply,*revert,*defaults,*try_settings;
+	BButton *apply,*revert,*defaults;
 	BListView *attrlist;
 	color_which attribute;
 	BMessage settings;
@@ -76,6 +76,7 @@ protected:
 	BFilePanel *savepanel;
 	ColorWell *colorwell;
 	BString *colorset_name;
+	BString prev_set_name;
 };
 
 #endif

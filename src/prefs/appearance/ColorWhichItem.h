@@ -8,7 +8,7 @@
 #define B_WINDOW_TAB_TEXT_COLOR 'wttx'
 #define B_INACTIVE_WINDOW_TAB_COLOR 'iwtb'
 
-#ifdef BUILD_UNDER_R5
+//#ifdef BUILD_UNDER_R5
 	#define B_MENU_SELECTED_BACKGROUND_COLOR B_MENU_SELECTION_BACKGROUND_COLOR
 	#define B_PANEL_TEXT_COLOR 'ptxt'
 	#define B_DOCUMENT_BACKGROUND_COLOR 'dbgc'
@@ -26,7 +26,7 @@
 	#define B_TOOLTIP_TEXT_COLOR 'tttx'
 	#define B_SUCCESS_COLOR 'sucs'
 	#define B_FAILURE_COLOR 'fail'
-#endif
+//#endif
 
 class ColorWhichItem : public BStringItem
 {

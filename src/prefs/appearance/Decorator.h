@@ -95,6 +95,11 @@ public:
 	
 protected:
 	int32 _ClipTitle(float width);
+
+	/*!
+		\brief Returns the number of characters in the title
+		\return The title character count
+	*/
 	int32 _TitleWidth(void) { return (_title_string)?_title_string->CountChars():0; }
 	
 	virtual void _DrawClose(BRect r);
@@ -105,6 +110,7 @@ protected:
 	virtual void _DrawZoom(BRect r);
 	virtual void _SetFocus(void)=0;
 	virtual void _DoLayout(void)=0;
+	virtual void _SetColors(void);
 	
 	ColorSet *_colors;
 	DisplayDriver *_driver;

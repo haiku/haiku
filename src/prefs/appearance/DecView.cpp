@@ -42,7 +42,7 @@
 #include "PreviewDriver.h"
 #include "Decorator.h"
 
-#define DEBUG_DECORATOR
+//#define DEBUG_DECORATOR
 
 DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
@@ -89,6 +89,21 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	decorator_id=-1;
 	GetDecorators();	
 	LoadSettings();
+
+	BString path(ConvertIndexToPath(0L));
+	if(LoadDecorator(path.String()))
+	{
+		driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+		if(decorator)
+		{
+			BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
+			path=(item)?item->Text():path="Title";
+			decorator->SetDriver(driver);
+			decorator->SetTitle(path.String());
+			decorator->SetColors(colorset);
+			decorator->Draw();
+		}
+	}
 }
 
 DecView::~DecView(void)
@@ -138,10 +153,13 @@ printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
 				break;
 			}
 			
-//			ldata.highcolor.SetColor(colorset.desktop);
 			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
 			if(decorator)
 			{
+				BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
+				path=(item)?item->Text():path="Title";
+				decorator->SetDriver(driver);
+				decorator->SetTitle(path.String());
 				decorator->SetColors(colorset);
 				decorator->Draw();
 			}
@@ -375,7 +393,7 @@ void DecView::SetColors(const BMessage &message)
 #ifdef DEBUG_DECORATOR
 printf("DecView::SetColors\n");
 #endif
-	if(UnpackSettings(&colorset,&message))
+	if(UnpackSettings(&colorset,message))
 	{
 		if(decorator)
 		{
@@ -399,36 +417,68 @@ printf("DecView::SetColors: UnpackSetting returned false\n");
 	}
 }
 
-bool DecView::UnpackSettings(ColorSet *set, const BMessage *msg)
+bool DecView::UnpackSettings(ColorSet *set, const BMessage &msg)
 {
-	if(!set || !msg)
+	if(!set)
 	{
 #ifdef DEBUG_DECORATOR
 printf("UnpackSettings(): NULL parameter\n");
 #endif
 		return false;
 	}
-	
 	rgb_color *col;
 	ssize_t size;
 
-	// Once the OBOS app_server is in place, there will be more attributes
+	if(msg.FindData("Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->panel_background=*col;
+	if(msg.FindData("Panel Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->panel_text=*col;
+	if(msg.FindData("Document Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->document_background=*col;
+	if(msg.FindData("Document Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->document_text=*col;
+	if(msg.FindData("Control Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->control_background=*col;
+	if(msg.FindData("Control Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->control_text=*col;
+	if(msg.FindData("Control Highlight",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->control_highlight=*col;
+	if(msg.FindData("Control Border",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->control_border=*col;
+	if(msg.FindData("Tooltip Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->tooltip_background=*col;
+	if(msg.FindData("Tooltip Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->tooltip_text=*col;
+	if(msg.FindData("Menu Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_background=*col;
+	if(msg.FindData("Selected Menu Item Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_selected_background=*col;
+	if(msg.FindData("Navigation Base",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->keyboard_navigation_base=*col;
+	if(msg.FindData("Navigation Pulse",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->keyboard_navigation_pulse=*col;
+	if(msg.FindData("Menu Item Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_text=*col;
+	if(msg.FindData("Selected Menu Item Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_selected_text=*col;
+	if(msg.FindData("Selected Menu Item Border",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_selected_border=*col;
+	if(msg.FindData("Success",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->success=*col;
+	if(msg.FindData("Failure",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->failure=*col;
+	if(msg.FindData("Shine",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->shine=*col;
+	if(msg.FindData("Shadow",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->shadow=*col;
+	if(msg.FindData("Window Tab",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->window_tab=*col;
+	if(msg.FindData("Window Tab Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->window_tab_text=*col;
+	if(msg.FindData("Inactive Window Tab",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->inactive_window_tab=*col;
+	if(msg.FindData("Inactive Window Tab Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->inactive_window_tab_text=*col;
 
-	if(msg->FindData("PANEL_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->panel_background.SetColor(*col);
-	if(msg->FindData("MENU_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->menu_background.SetColor(*col);
-	if(msg->FindData("MENU_SELECTION_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->menu_selected_background.SetColor(*col);
-	if(msg->FindData("MENU_ITEM_TEXT",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->menu_text.SetColor(*col);
-	if(msg->FindData("MENU_SELECTED_ITEM_TEXT",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->menu_selected_text.SetColor(*col);
-	if(msg->FindData("WINDOW_TAB",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->window_tab.SetColor(*col);
-	if(msg->FindData("KEYBOARD_NAVIGATION_BASE",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->keyboard_navigation_base.SetColor(*col);
-	if(msg->FindData("KEYBOARD_NAVIGATION_PULSE",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->keyboard_navigation_pulse.SetColor(*col);
 	return true;
 }

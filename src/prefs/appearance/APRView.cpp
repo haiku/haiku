@@ -146,25 +146,14 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		new BMessage(REVERT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(revert);
-	// Eventually we might want to have this disabled at the start and
-	// enabled when the user makes changes and such. Then again, maybe we won't.
-//	revert->SetEnabled(false);
-	
-	cvrect.OffsetBy(70,0);
-	try_settings=new BButton(cvrect,"TryButton","Try",
-		new BMessage(TRY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(try_settings);
-	
-	// Eventually we might want to have this disabled at the start and
-	// enabled when the user makes changes and such. Then again, maybe we won't.
-//	try_settings->SetEnabled(false);
+	revert->SetEnabled(false);
 	
 	cvrect.OffsetBy(70,0);
 	apply=new BButton(cvrect,"ApplyButton","Apply",
 		new BMessage(APPLY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(apply);
+	apply->SetEnabled(false);
 
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
@@ -173,9 +162,8 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		&ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
-	attrstring="PANEL_BACKGROUND";
+	attrstring="Background";
 	LoadSettings();
-	picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
 }
 
 APRView::~APRView(void)
@@ -191,7 +179,6 @@ void APRView::AllAttached(void)
 	attrlist->SetTarget(this);
 	apply->SetTarget(this);
 	defaults->SetTarget(this);
-	try_settings->SetTarget(this);
 	revert->SetTarget(this);
 	settings_menu->SetTargetForItems(this);
 	colorset_menu->SetTargetForItems(this);
@@ -199,6 +186,7 @@ void APRView::AllAttached(void)
 
 	BMessenger msgr(this);
 	savepanel->SetTarget(msgr);
+	picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
 }
 
 void APRView::MessageReceived(BMessage *msg)
@@ -302,12 +290,15 @@ printf("MSG: Save Request - couldn't find file name\n");
 			colorwell->Invalidate();
 			
 			// Update current attribute in the settings
-			settings.ReplaceData(attrstring.String(),(type_code)'RGBC',
-			&col,sizeof(rgb_color));
-
+			settings.ReplaceData(attrstring.String(),(type_code)'RGBC',&col,sizeof(rgb_color));
+			
+			if(apply->IsEnabled()==false)
+				apply->SetEnabled(true);
+			if(revert->IsEnabled()==false)
+				revert->SetEnabled(true);
+			
 			SetColorSetName("<untitled>");
-			if(Window())
-				Window()->PostMessage(SET_UI_COLORS);
+			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case ATTRIBUTE_CHOSEN:
@@ -316,7 +307,7 @@ printf("MSG: Save Request - couldn't find file name\n");
 			ColorWhichItem *whichitem=(ColorWhichItem*)attrlist->ItemAt(attrlist->CurrentSelection());
 			if(!whichitem)
 				break;
-			
+			attrstring=whichitem->Text();
 			rgb_color col=GetColorFromMessage(&settings,whichitem->Text(),0);
 			picker->SetValue(col);
 			colorwell->SetColor(col);
@@ -343,13 +334,18 @@ printf("MSG: Save Request - couldn't find file name\n");
 		}
 		case REVERT_SETTINGS:
 		{
-			LoadSettings();
+/*			LoadSettings();
 			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
 			if(Window())
 				Window()->PostMessage(SET_UI_COLORS);
+*/
+			if(prev_set_name=="Default")
+				SetDefaults();
+			
+			LoadColorSet(prev_set_name);
 			break;
 		}
 		case DEFAULT_SETTINGS:
@@ -587,6 +583,9 @@ printf("SaveSettings: %s\n",path.String());
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
 	settings.Flatten(&file);
+	prev_set_name=*colorset_name;
+	revert->SetEnabled(false);
+	revert->SetEnabled(false);
 }
 
 void APRView::LoadSettings(void)
@@ -625,7 +624,7 @@ printf("Couldn't open file %s for read\n",path.String());
 	{
 		settings.FindString("name",colorset_name);
 		SetColorSetName(colorset_name->String());
-
+		prev_set_name=*colorset_name;
 		picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
 		colorwell->SetColor(picker->ValueAsColor());
 #ifdef DEBUG_COLORSET
@@ -805,40 +804,6 @@ printf("NotifyServer: Setting Desktop color to "); PrintRGBColor(col);
 
 	if(Window())
 		Window()->PostMessage(SET_UI_COLORS);
-	
-/*	// Name taken from ServerProtocol.h
-	port_id serverport=find_port("OBappserver");
-
-	if(serverport==B_NAME_NOT_FOUND)
-		return;
-	
-	PortLink *pl=new PortLink(serverport);
-
-	// 'suic'==SET_UI_COLORS message from ServerProtocol.h
-	pl->SetOpCode('suic');
-	
-	rgb_color col;
-	col=GetColorFromMessage(&settings,"PANEL_BACKGROUND");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"MENU_BACKGROUND");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"MENU_SELECTION_BACKGROUND");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"MENU_ITEM_TEXT");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"MENU_SELECTED_ITEM_TEXT");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"WINDOW_TAB");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"KEYBOARD_NAVIGATION");
-	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"DESKTOP");
-	pl->Attach(&col,sizeof(rgb_color));
-
-	pl->Flush();
-	delete pl;
-*/
-
 }
 
 rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 index=0)

@@ -56,7 +56,7 @@ public:
 	bool LoadDecorator(const char *path);
 	BString ConvertIndexToPath(int32 index);
 protected:
-	bool UnpackSettings(ColorSet *set, const BMessage *msg);
+	bool UnpackSettings(ColorSet *set, const BMessage &msg);
 	BButton *apply;
 	BListView *declist;
 	BMessage settings;

@@ -24,6 +24,7 @@
 #include <Region.h>
 #include <Bitmap.h>
 #include <OS.h>
+#include <Font.h>
 #include <GraphicsDefs.h>
 #include "PortLink.h"
 #include "PreviewDriver.h"
@@ -115,11 +116,36 @@ void PreviewDriver::DrawChar(char c, BPoint pt)
 void DrawPicture(SPicture *pic, BPoint pt)
 {
 }
-
-void DrawString(const char *string, int32 length, BPoint pt, escapement_delta *delta=NULL)
-{
-}
 */
+void PreviewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
+{
+	if(!d)
+		return;
+	BRect r;
+	
+	view->viewbmp->Lock();
+
+	drawview->SetHighColor(d->highcolor.GetColor32());
+	drawview->SetLowColor(d->lowcolor.GetColor32());
+	drawview->SetPenSize(d->pensize);
+	pt.y--;
+	drawview->DrawString(string,length,pt,delta);
+	drawview->Sync();
+	
+	// calculate the invalid rectangle
+	font_height fh;
+	BFont font;
+	drawview->GetFont(&font);
+	drawview->GetFontHeight(&fh);
+	r.left=pt.x;
+	r.right=pt.x+font.StringWidth(string);
+	r.top=pt.y-fh.ascent;
+	r.bottom=pt.y+fh.descent;
+	view->Invalidate(r);
+	
+	view->viewbmp->Unlock();
+}
+
 
 void PreviewDriver::InvertRect(BRect r)
 {
@@ -336,4 +362,19 @@ void PreviewDriver::SetMode(int32 mode)
 bool PreviewDriver::DumpToFile(const char *path)
 {
 	return false;
+}
+
+float PreviewDriver::StringWidth(const char *string, int32 length, LayerData *d)
+{
+	view->viewbmp->Lock();
+	float returnval=drawview->StringWidth(string,length);
+	view->viewbmp->Unlock();
+	return returnval;
+}
+
+void PreviewDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings)
+{
+	view->viewbmp->Lock();
+	be_plain_font->GetTruncatedStrings(instrings,stringcount,mode,maxwidth,outstrings);
+	view->viewbmp->Unlock();
 }
