@@ -1,9 +1,13 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 /* This file contains the kprintf stuff and console init */
 
-/* 
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -15,10 +19,18 @@
 #include <unistd.h>
 
 
-// from con.h
+// ToDo: this mechanism will be changed so that these lines can go away
+#ifdef ARCH_x86
+#	include <arch/x86/console_dev.h>
+#else
 enum {
 	CONSOLE_OP_WRITEXY = 2376
 };
+#endif
+
+
+#include <fb_console.h>
+
 
 struct console_op_xy_struct {
 	int x;
@@ -57,7 +69,7 @@ kprintf_xy(int x, int y, const char *fmt, ...)
 		va_start(args, fmt);
 		ret = vsprintf(buf.buf,fmt,args);
 		va_end(args);
-	
+
 		buf.x = x;
 		buf.y = y;
 		ioctl(console_fd, CONSOLE_OP_WRITEXY, &buf, ret + sizeof(buf.x) + sizeof(buf.y));
@@ -66,12 +78,15 @@ kprintf_xy(int x, int y, const char *fmt, ...)
 
 
 int
-con_init(kernel_args *ka)
+con_init(kernel_args *args)
 {
-	dprintf("con_init: entry\n");
+	/* now run the oddballs we have, consoles at present */
+	// ToDo: this mechanism will be changed so that these lines can go away
+#ifdef ARCH_x86
+	console_dev_init(args);
+#endif
+	fb_console_dev_init(args);
 
 	console_fd = open("/dev/console", O_RDWR);
-	dprintf("console_fd = %d\n", console_fd);
-
-	return 0;
+	return console_fd >= 0;
 }

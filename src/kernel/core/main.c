@@ -23,11 +23,9 @@
 #include <sem.h>
 #include <port.h>
 #include <vfs.h>
-#include <dev.h>
 #include <cbuf.h>
 #include <elf.h>
 #include <cpu.h>
-#include <devs.h>
 #include <bus.h>
 #include <kdriver_settings.h>
 #include <kmodule.h>
@@ -207,12 +205,6 @@ main2(void *unused)
 
 	TRACE(("Mount boot file system\n"));
 	vfs_mount_boot_file_system(&ka);
-
-	TRACE(("Init busses\n"));
-	bus_init(&ka);
-
-	TRACE(("Init devices\n"));
-	dev_init(&ka);
 
 	TRACE(("Init console\n"));
 	con_init(&ka);
