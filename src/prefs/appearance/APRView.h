@@ -37,6 +37,7 @@ public:
 protected:
 	BMenu *LoadColorSets(void);
 	void SaveColorSet(const BString &name);
+	void LoadColorSet(const BString &name);
 	void SetColorSetName(const char *name);
 	BColorControl *picker;
 	BButton *apply,*revert,*defaults,*try_settings;
