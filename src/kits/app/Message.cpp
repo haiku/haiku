@@ -576,7 +576,10 @@ status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 		err = Flatten(buffer, len);
 		if (!err)
 		{
-			*size = len;
+			// size is an optional parameter, don't crash on NULL
+			if (size != NULL) {
+				*size = len;
+			}
 			err = stream->Write(buffer, len);
 			if (err > B_OK)
 				err = B_OK;
