@@ -66,15 +66,15 @@ alloc_fd(void)
 
 
 int
-new_fd(struct io_context *ioctx, struct file_descriptor *f)
+new_fd(struct io_context *context, struct file_descriptor *descriptor)
 {
 	int fd = -1;
 	int i;
 
-	mutex_lock(&ioctx->io_mutex);
+	mutex_lock(&context->io_mutex);
 
-	for (i = 0; i < ioctx->table_size; i++) {
-		if (!ioctx->fds[i]) {
+	for (i = 0; i < context->table_size; i++) {
+		if (!context->fds[i]) {
 			fd = i;
 			break;
 		}
@@ -84,11 +84,11 @@ new_fd(struct io_context *ioctx, struct file_descriptor *f)
 		goto err;
 	}
 
-	ioctx->fds[fd] = f;
-	ioctx->num_used_fds++;
+	context->fds[fd] = descriptor;
+	context->num_used_fds++;
 
 err:
-	mutex_unlock(&ioctx->io_mutex);
+	mutex_unlock(&context->io_mutex);
 
 	return fd;
 }
@@ -112,46 +112,117 @@ put_fd(struct file_descriptor *descriptor)
 
 
 struct file_descriptor *
-get_fd(struct io_context *ioctx, int fd)
+get_fd(struct io_context *context, int fd)
 {
-	struct file_descriptor *f;
+	struct file_descriptor *descriptor = NULL;
 
-	mutex_lock(&ioctx->io_mutex);
+	if (fd < 0)
+		return NULL;
 
-	if (fd >= 0 && fd < ioctx->table_size && ioctx->fds[fd]) {
-		// valid fd
-		f = ioctx->fds[fd];
-		atomic_add(&f->ref_count, 1);
- 	} else {
-		f = NULL;
-	}
+	mutex_lock(&context->io_mutex);
 
-	mutex_unlock(&ioctx->io_mutex);
+	if (fd < context->table_size)
+		descriptor = context->fds[fd];
+	
+	if (descriptor != NULL) // fd is valid
+		atomic_add(&descriptor->ref_count, 1);
 
-	return f;
+	mutex_unlock(&context->io_mutex);
+
+	return descriptor;
 }
 
 
 void
-remove_fd(struct io_context *ioctx, int fd)
+remove_fd(struct io_context *context, int fd)
 {
-	struct file_descriptor *f;
+	struct file_descriptor *descriptor = NULL;
 
-	mutex_lock(&ioctx->io_mutex);
+	if (fd < 0)
+		return;
 
-	if (fd >= 0 && fd < ioctx->table_size && ioctx->fds[fd]) {
-		// valid fd
-		f = ioctx->fds[fd];
-		ioctx->fds[fd] = NULL;
-		ioctx->num_used_fds--;
-	} else {
-		f = NULL;
+	mutex_lock(&context->io_mutex);
+
+	if (fd < context->table_size)
+		descriptor = context->fds[fd];
+
+	if (descriptor)	{	// fd is valid
+		context->fds[fd] = NULL;
+		context->num_used_fds--;
 	}
 
-	mutex_unlock(&ioctx->io_mutex);
+	mutex_unlock(&context->io_mutex);
 
-	if (f)
-		put_fd(f);
+	if (descriptor)
+		put_fd(descriptor);
+}
+
+
+static int
+fd_dup(int fd, bool kernel)
+{
+	struct io_context *context = get_current_io_context(kernel);
+	struct file_descriptor *descriptor;
+	int status;
+
+	TRACE(("fd_dup: fd = %d\n", fd));
+
+	// Try to get the fd structure
+	descriptor = get_fd(context, fd);
+	if (descriptor == NULL)
+		return EBADF;
+
+	// now put the fd in place
+	status = new_fd(context, descriptor);
+	if (status < 0)
+		put_fd(descriptor);
+
+	return status;
+}
+
+
+static int
+fd_dup2(int oldfd, int newfd, bool kernel)
+{
+	struct file_descriptor *evicted = NULL;
+	struct io_context *context;
+
+	TRACE(("fd_dup2: ofd = %d, nfd = %d\n", oldfd, newfd));
+
+	// quick check
+	if (oldfd < 0 || newfd < 0)
+		return EBADF;
+
+	// Get current I/O context and lock it
+	context = get_current_io_context(kernel);
+	mutex_lock(&context->io_mutex);
+
+	// Check if the fds are valid (mutex must be locked because
+	// the table size could be changed)
+	if (oldfd >= context->table_size
+		|| newfd >= context->table_size
+		|| context->fds[oldfd] == NULL) {
+		mutex_unlock(&context->io_mutex);
+		return EBADF;
+	}
+
+	// Check for identity, note that it cannot be made above
+	// because we always want to return an error on invalid
+	// handles
+	if (oldfd != newfd) {
+		// Now do the work
+		evicted = context->fds[newfd];
+		context->fds[newfd] = context->fds[oldfd];
+		atomic_add(&context->fds[oldfd]->ref_count, 1);
+	}
+
+	mutex_unlock(&context->io_mutex);
+
+	// Say bye bye to the evicted fd
+	if (evicted)
+		put_fd(evicted);
+
+	return newfd;
 }
 
 
@@ -351,6 +422,20 @@ user_close(int fd)
 }
 
 
+int
+user_dup(int fd)
+{
+	return fd_dup(fd, false);
+}
+
+
+int
+user_dup2(int ofd, int nfd)
+{
+	return fd_dup2(ofd, nfd, false);
+}
+
+
 //	#pragma mark -
 /*** SYSTEM functions ***/
 
@@ -511,5 +596,19 @@ sys_close(int fd)
 
 	put_fd(descriptor);
 	return B_OK;
+}
+
+
+int
+sys_dup(int fd)
+{
+	return fd_dup(fd, true);
+}
+
+
+int
+sys_dup2(int ofd, int nfd)
+{
+	return fd_dup2(ofd, nfd, true);
 }
 

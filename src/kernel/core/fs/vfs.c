@@ -36,10 +36,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifndef MAKE_NOIZE
-#	define MAKE_NOIZE 0
+#ifndef TRACE_VFS
+#	define TRACE_VFS 0
 #endif
-#if MAKE_NOIZE
+#if TRACE_VFS
 #	define PRINT(x) dprintf x
 #	define FUNCTION(x) dprintf x
 #else
@@ -57,9 +57,9 @@ struct vnode {
 	struct vnode    *mount_prev;
 	struct vnode    *mount_next;
 	struct vm_cache *cache;
-	fs_id            fsid;
-	vnode_id         vnid;
-	fs_vnode         priv_vnode;
+	fs_id            fs_id;
+	vnode_id         id;
+	fs_vnode         private_node;
 	struct fs_mount *mount;
 	struct vnode    *covered_by;
 	int              ref_count;
@@ -68,8 +68,8 @@ struct vnode {
 };
 
 struct vnode_hash_key {
-	fs_id      fsid;
-	vnode_id   vnid;
+	fs_id      fs_id;
+	vnode_id   vnode_id;
 };
 
 struct fs_container {
@@ -194,7 +194,7 @@ mount_hash(void *_m, const void *_key, unsigned int range)
 
 
 static struct fs_mount *
-fsid_to_mount(fs_id id)
+find_mount(fs_id id)
 {
 	struct fs_mount *mount;
 
@@ -214,48 +214,28 @@ vnode_compare(void *_v, const void *_key)
 	struct vnode *v = _v;
 	const struct vnode_hash_key *key = _key;
 
-	if(v->fsid == key->fsid && v->vnid == key->vnid)
+	if (v->fs_id == key->fs_id && v->id == key->vnode_id)
 		return 0;
-	else
-		return -1;
+
+	return -1;
 }
 
 
 static unsigned int
 vnode_hash(void *_v, const void *_key, unsigned int range)
 {
-	struct vnode *v = _v;
+	struct vnode *vnode = _v;
 	const struct vnode_hash_key *key = _key;
 
 #define VHASH(fsid, vnid) (((uint32)((vnid)>>32) + (uint32)(vnid)) ^ (uint32)(fsid))
 
-	if (v != NULL)
-		return (VHASH(v->fsid, v->vnid) % range);
+	if (vnode != NULL)
+		return (VHASH(vnode->fs_id, vnode->id) % range);
 	else
-		return (VHASH(key->fsid, key->vnid) % range);
+		return (VHASH(key->fs_id, key->vnode_id) % range);
 
 #undef VHASH
 }
-
-/*
-static int init_vnode(struct vnode *v)
-{
-	v->next = NULL;
-	v->mount_prev = NULL;
-	v->mount_next = NULL;
-	v->priv_vnode = NULL;
-	v->cache = NULL;
-	v->ref_count = 0;
-	v->vnid = 0;
-	v->fsid = 0;
-	v->delete_me = false;
-	v->busy = false;
-	v->covered_by = NULL;
-	v->mount = NULL;
-
-	return 0;
-}
-*/
 
 
 static void
@@ -266,7 +246,7 @@ add_vnode_to_mount_list(struct vnode *v, struct fs_mount *mount)
 	v->mount_next = mount->vnodes_head;
 	v->mount_prev = NULL;
 	mount->vnodes_head = v;
-	if(!mount->vnodes_tail)
+	if (!mount->vnodes_tail)
 		mount->vnodes_tail = v;
 
 	recursive_lock_unlock(&mount->rlock);
@@ -278,11 +258,11 @@ remove_vnode_from_mount_list(struct vnode *v, struct fs_mount *mount)
 {
 	recursive_lock_lock(&mount->rlock);
 
-	if(v->mount_next)
+	if (v->mount_next)
 		v->mount_next->mount_prev = v->mount_prev;
 	else
 		mount->vnodes_tail = v->mount_prev;
-	if(v->mount_prev)
+	if (v->mount_prev)
 		v->mount_prev->mount_next = v->mount_next;
 	else
 		mount->vnodes_head = v->mount_next;
@@ -308,43 +288,42 @@ create_new_vnode(void)
 
 
 static int
-dec_vnode_ref_count(struct vnode *v, bool free_mem, bool r)
+dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
 	int err;
 	int old_ref;
 
 	mutex_lock(&vfs_vnode_mutex);
 
-	if (v->busy == true)
-		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", v);
+	if (vnode->busy == true)
+		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", vnode);
 
-	old_ref = atomic_add(&v->ref_count, -1);
+	old_ref = atomic_add(&vnode->ref_count, -1);
 
-	PRINT(("dec_vnode_ref_count: vnode 0x%p, ref now %d\n", v, v->ref_count));
+	PRINT(("dec_vnode_ref_count: vnode 0x%p, ref now %d\n", vnode, vnode->ref_count));
 
 	if (old_ref == 1) {
-		v->busy = true;
+		vnode->busy = true;
 
 		mutex_unlock(&vfs_vnode_mutex);
 
 		/* if we have a vm_cache attached, remove it */
-		if (v->cache)
-			vm_cache_release_ref((vm_cache_ref *)v->cache);
-		v->cache = NULL;
+		if (vnode->cache)
+			vm_cache_release_ref((vm_cache_ref *)vnode->cache);
+		vnode->cache = NULL;
 
-		if (v->delete_me)
-			FS_CALL(v,fs_remove_vnode)(v->mount->cookie, v->priv_vnode, r);
+		if (vnode->delete_me)
+			FS_CALL(vnode,fs_remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 		else
-			FS_CALL(v,fs_put_vnode)(v->mount->cookie, v->priv_vnode, r);
+			FS_CALL(vnode,fs_put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 
-		remove_vnode_from_mount_list(v, v->mount);
+		remove_vnode_from_mount_list(vnode, vnode->mount);
 
 		mutex_lock(&vfs_vnode_mutex);
-		hash_remove(vnode_table, v);
+		hash_remove(vnode_table, vnode);
 		mutex_unlock(&vfs_vnode_mutex);
 
-		if (free_mem)
-			kfree(v);
+		kfree(vnode);
 		err = 1;
 	} else {
 		mutex_unlock(&vfs_vnode_mutex);
@@ -355,188 +334,125 @@ dec_vnode_ref_count(struct vnode *v, bool free_mem, bool r)
 
 
 static int
-inc_vnode_ref_count(struct vnode *v)
+inc_vnode_ref_count(struct vnode *vnode)
 {
-	atomic_add(&v->ref_count, 1);
-	PRINT(("inc_vnode_ref_count: vnode 0x%p, ref now %d\n", v, v->ref_count));
+	atomic_add(&vnode->ref_count, 1);
+	PRINT(("inc_vnode_ref_count: vnode 0x%p, ref now %d\n", vnode, vnode->ref_count));
 	return 0;
 }
 
 
 static struct vnode *
-lookup_vnode(fs_id fsid, vnode_id vnid)
+lookup_vnode(fs_id fsID, vnode_id vnodeID)
 {
 	struct vnode_hash_key key;
 
-	key.fsid = fsid;
-	key.vnid = vnid;
+	key.fs_id = fsID;
+	key.vnode_id = vnodeID;
 
 	return hash_lookup(vnode_table, &key);
 }
 
 
 static int
-get_vnode(fs_id fsid, vnode_id vnid, struct vnode **outv, int reenter)
+get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 {
-	struct vnode *v;
+	struct vnode *vnode;
 	int err;
 
-	FUNCTION(("get_vnode: fsid %d vnid 0x%Lx 0x%p\n", fsid, vnid,outv));
+	FUNCTION(("get_vnode: fsid %d vnid 0x%Lx 0x%p\n", fsID, vnodeID,_vnode));
 
 	mutex_lock(&vfs_vnode_mutex);
 
 	do {
-		v = lookup_vnode(fsid, vnid);
-		if (v) {
-			if (v->busy) {
+		vnode = lookup_vnode(fsID, vnodeID);
+		if (vnode) {
+			if (vnode->busy) {
 				mutex_unlock(&vfs_vnode_mutex);
 				thread_snooze(10000); // 10 ms
 				mutex_lock(&vfs_vnode_mutex);
 				continue;
 			}
 		}
-	} while(0);
+	} while (0);
 
-	PRINT(("get_vnode: tried to lookup vnode, got 0x%p\n", v));
+	PRINT(("get_vnode: tried to lookup vnode, got 0x%p\n", vnode));
 
-	if (v) {
-		inc_vnode_ref_count(v);
+	if (vnode) {
+		inc_vnode_ref_count(vnode);
 	} else {
 		// we need to create a new vnode and read it in
-		v = create_new_vnode();
-		if (!v) {
+		vnode = create_new_vnode();
+		if (!vnode) {
 			err = ENOMEM;
 			goto err;
 		}
-		v->fsid = fsid;
-		v->vnid = vnid;
-		v->mount = fsid_to_mount(fsid);
-		if (!v->mount) {
+		vnode->fs_id = fsID;
+		vnode->id = vnodeID;
+		vnode->mount = find_mount(fsID);
+		if (!vnode->mount) {
 			err = ERR_INVALID_HANDLE;
 			goto err;
 		}
-		v->busy = true;
-		hash_insert(vnode_table, v);
+		vnode->busy = true;
+		hash_insert(vnode_table, vnode);
 		mutex_unlock(&vfs_vnode_mutex);
 
-		add_vnode_to_mount_list(v, v->mount);
+		add_vnode_to_mount_list(vnode, vnode->mount);
 
-		err = FS_CALL(v,fs_get_vnode)(v->mount->cookie, vnid, &v->priv_vnode, reenter);
-
-		if (err < 0)
-			remove_vnode_from_mount_list(v, v->mount);
-
+		err = FS_CALL(vnode,fs_get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
+		if (err < 0 && vnode->private_node == NULL) {
+			remove_vnode_from_mount_list(vnode, vnode->mount);
+			if (vnode->private_node == NULL)
+				err = EINVAL;
+		}
 		mutex_lock(&vfs_vnode_mutex);
 		if (err < 0)
 			goto err1;
 
-		v->busy = false;
-		v->ref_count = 1;
+		vnode->busy = false;
+		vnode->ref_count = 1;
 	}
 
 	mutex_unlock(&vfs_vnode_mutex);
 
-	PRINT(("get_vnode: returning 0x%p\n", v));
+	PRINT(("get_vnode: returning 0x%p\n", vnode));
 
-	*outv = v;
-	return B_NO_ERROR;
+	*_vnode = vnode;
+	return B_OK;
 
 err1:
-	hash_remove(vnode_table, v);
+	hash_remove(vnode_table, vnode);
 err:
 	mutex_unlock(&vfs_vnode_mutex);
-	if (v)
-		kfree(v);
+	if (vnode)
+		kfree(vnode);
 
 	return err;
 }
 
 
-static void
-put_vnode(struct vnode *v)
+static __inline void
+put_vnode(struct vnode *vnode)
 {
-	dec_vnode_ref_count(v, true, false);
+	dec_vnode_ref_count(vnode, false);
 }
 
 
-int
-vfs_get_vnode(fs_id fsid, vnode_id vnid, fs_vnode *fsv)
+static struct file_descriptor *
+get_fd_and_vnode(int fd, bool kernel, struct vnode **_vnode)
 {
-	int err;
-	struct vnode *v;
+	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return NULL;
 
-	err = get_vnode(fsid, vnid, &v, true);
-	if (err < 0)
-		return err;
+	if (descriptor->vnode == NULL) {
+		put_fd(descriptor);
+		return NULL;
+	}
 
-	*fsv = v->priv_vnode;
-	return B_NO_ERROR;
-}
-
-
-int
-vfs_put_vnode(fs_id fsid, vnode_id vnid)
-{
-	struct vnode *v;
-
-	mutex_lock(&vfs_vnode_mutex);
-
-	v = lookup_vnode(fsid, vnid);
-
-	mutex_unlock(&vfs_vnode_mutex);
-	if (v)
-		dec_vnode_ref_count(v, true, true);
-
-	return B_NO_ERROR;
-}
-
-
-void
-vfs_vnode_acquire_ref(void *v)
-{
-	FUNCTION(("vfs_vnode_acquire_ref: vnode 0x%p\n", v));
-	inc_vnode_ref_count((struct vnode *)v);
-}
-
-
-void
-vfs_vnode_release_ref(void *v)
-{
-	FUNCTION(("vfs_vnode_release_ref: vnode 0x%p\n", v));
-	dec_vnode_ref_count((struct vnode *)v, true, false);
-}
-
-
-int
-vfs_remove_vnode(fs_id fsid, vnode_id vnid)
-{
-	struct vnode *v;
-
-	mutex_lock(&vfs_vnode_mutex);
-
-	v = lookup_vnode(fsid, vnid);
-	if(v)
-		v->delete_me = true;
-
-	mutex_unlock(&vfs_vnode_mutex);
-	return 0;
-}
-
-
-void *
-vfs_get_cache_ptr(void *vnode)
-{
-	return ((struct vnode *)vnode)->cache;
-}
-
-
-int
-vfs_set_cache_ptr(void *vnode, void *cache)
-{
-	if(test_and_set((int *)&(((struct vnode *)vnode)->cache), (int)cache, 0) == 0)
-		return 0;
-	else
-		return -1;
+	*_vnode = descriptor->vnode;
+	return descriptor;
 }
 
 
@@ -546,9 +462,8 @@ file_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->vnode;
 
 	if (vnode != NULL) {
-		//FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->priv_vnode, descriptor->cookie);
-		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->priv_vnode, descriptor->cookie);
-		dec_vnode_ref_count(vnode, true, false);
+		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		dec_vnode_ref_count(vnode, false);
 	}
 }
 
@@ -559,32 +474,33 @@ dir_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->vnode;
 
 	if (vnode != NULL) {
-		//FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie, vnode->priv_vnode, descriptor->cookie);
-		FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie, vnode->priv_vnode, descriptor->cookie);
-		dec_vnode_ref_count(vnode, true, false);
+		//FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		dec_vnode_ref_count(vnode, false);
 	}
 }
 
 
 static struct vnode *
-get_vnode_from_fd(struct io_context *ioctx, int fd)
+get_vnode_from_fd(struct io_context *ioContext, int fd)
 {
-	struct file_descriptor *f;
-	struct vnode *v;
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
 
-	f = get_fd(ioctx, fd);
-	if (!f)
+	descriptor = get_fd(ioContext, fd);
+	if (descriptor == NULL)
 		return NULL;
 
-	v = f->vnode;
-	if (!v)
+	vnode = descriptor->vnode;
+	if (vnode == NULL)
 		goto out;
-	inc_vnode_ref_count(v);
+
+	inc_vnode_ref_count(vnode);
 
 out:
-	put_fd(f);
+	put_fd(descriptor);
 
-	return v;
+	return vnode;
 }
 
 
@@ -592,77 +508,99 @@ static struct fs_container *
 find_fs(const char *fs_name)
 {
 	struct fs_container *fs = fs_list;
-	while(fs != NULL) {
-		if(strcmp(fs_name, fs->name) == 0) {
+
+	while (fs != NULL) {
+		if (strcmp(fs_name, fs->name) == 0)
 			return fs;
-		}
+
 		fs = fs->next;
 	}
 	return NULL;
 }
 
 
-static int
-path_to_vnode(char *path, struct vnode **v, bool kernel)
+static status_t
+entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode **_vnode)
 {
-	char *p = path;
-	char *next_p;
-	struct vnode *curr_v;
-	struct vnode *next_v;
+	struct vnode *directory;
+	vnode_id id;
+	int status;
+
+	status = get_vnode(fsID,directoryID,&directory,false);
+	if (status < 0)
+		return status;
+
+	status = FS_CALL(directory,fs_lookup)(directory->mount->cookie,directory->private_node,name,&id);
+	dec_vnode_ref_count(directory, false);
+
+	if (status < 0)
+		return status;
+
+	return get_vnode(fsID,id,_vnode,false);
+}
+
+
+static int
+path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
+{
+	char *nextPath;
+	struct vnode *vnode;
+	struct vnode *nextVnode;
 	vnode_id vnid;
 	int err = 0;
 
-	if (!p)
+	if (!path)
 		return EINVAL;
 
 	// figure out if we need to start at root or at cwd
-	if (*p == '/') {
-		while (*++p == '/')
+	if (*path == '/') {
+		while (*++path == '/')
 			;
-		curr_v = root_vnode;
-		inc_vnode_ref_count(curr_v);
+		vnode = root_vnode;
+		inc_vnode_ref_count(vnode);
 	} else {
-		struct io_context *ioctx = get_current_io_context(kernel);
-		mutex_lock(&ioctx->io_mutex);
-		curr_v = ioctx->cwd;
-		inc_vnode_ref_count(curr_v);
-		mutex_unlock(&ioctx->io_mutex);
+		struct io_context *context = get_current_io_context(kernel);
+
+		mutex_lock(&context->io_mutex);
+		vnode = context->cwd;
+		inc_vnode_ref_count(vnode);
+		mutex_unlock(&context->io_mutex);
 	}
 
 	for (;;) {
-//		dprintf("path_to_vnode: top of loop. p 0x%x, *p = %c, p = '%s'\n", p, *p, p);
+		PRINT(("path_to_vnode: top of loop. p = %p, *p = %c, p = '%s'\n", path, *path, path));
 
 		// done?
-		if (*p == '\0') {
+		if (*path == '\0') {
 			err = 0;
 			break;
 		}
 
 		// walk to find the next component
-		for (next_p = p+1; *next_p != '\0' && *next_p != '/'; next_p++);
+		for (nextPath = path + 1;*nextPath != '\0' && *nextPath != '/';nextPath++);
 
-		if (*next_p == '/') {
-			*next_p = '\0';
+		if (*nextPath == '/') {
+			*nextPath = '\0';
 			do
-				next_p++;
-			while (*next_p == '/');
+				nextPath++;
+			while (*nextPath == '/');
 		}
 
 		// see if the .. is at the root of a mount
-		if (strcmp("..", p) == 0 && curr_v->mount->root_vnode == curr_v) {
+		if (strcmp("..", path) == 0 && vnode->mount->root_vnode == vnode) {
 			// move to the covered vnode so we pass the '..' parse to the underlying filesystem
-			if (curr_v->mount->covers_vnode) {
-				next_v = curr_v->mount->covers_vnode;
-				inc_vnode_ref_count(next_v);
-				dec_vnode_ref_count(curr_v, true, false);
-				curr_v = next_v;
+			if (vnode->mount->covers_vnode) {
+				nextVnode = vnode->mount->covers_vnode;
+				inc_vnode_ref_count(nextVnode);
+				dec_vnode_ref_count(vnode, false);
+				vnode = nextVnode;
 			}
 		}
 
 		// tell the filesystem to parse this path
-		err = curr_v->mount->fs->calls->fs_lookup(curr_v->mount->cookie, curr_v->priv_vnode, p, &vnid);
+		err = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnid);
 		if (err < 0) {
-			dec_vnode_ref_count(curr_v, true, false);
+			dec_vnode_ref_count(vnode, false);
 			goto out;
 		}
 
@@ -670,33 +608,33 @@ path_to_vnode(char *path, struct vnode **v, bool kernel)
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
 		// ref count incremented at this point
 		mutex_lock(&vfs_vnode_mutex);
-		next_v = lookup_vnode(curr_v->fsid, vnid);
+		nextVnode = lookup_vnode(vnode->fs_id, vnid);
 		mutex_unlock(&vfs_vnode_mutex);
 
-		if (!next_v) {
+		if (!nextVnode) {
 			// pretty screwed up here
-			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", curr_v->fsid, vnid);
+			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, vnid);
 			err = ERR_VFS_PATH_NOT_FOUND;
-			dec_vnode_ref_count(curr_v, true, false);
+			dec_vnode_ref_count(vnode, false);
 			goto out;
 		}
 
 		// decrease the ref count on the old dir we just looked up into
-		dec_vnode_ref_count(curr_v, true, false);
+		dec_vnode_ref_count(vnode, false);
 
-		p = next_p;
-		curr_v = next_v;
+		path = nextPath;
+		vnode = nextVnode;
 
 		// see if we hit a mount point
-		if (curr_v->covered_by) {
-			next_v = curr_v->covered_by;
-			inc_vnode_ref_count(next_v);
-			dec_vnode_ref_count(curr_v, true, false);
-			curr_v = next_v;
+		if (vnode->covered_by) {
+			nextVnode = vnode->covered_by;
+			inc_vnode_ref_count(nextVnode);
+			dec_vnode_ref_count(vnode, false);
+			vnode = nextVnode;
 		}
 	}
 
-	*v = curr_v;
+	*_vnode = vnode;
 
 out:
 	return err;
@@ -708,11 +646,10 @@ out:
  */
 
 static int
-path_to_dir_vnode(char *path, struct vnode **v, char *filename, bool kernel)
+path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel)
 {
-	char *p;
+	char *p = strrchr(path, '/');
 
-	p = strrchr(path, '/');
 	if (!p) {
 		// this path is single segment with no '/' in it
 		// ex. "foo"
@@ -727,7 +664,7 @@ path_to_dir_vnode(char *path, struct vnode **v, char *filename, bool kernel)
 			p[2] = '\0';
 		}
 	}
-	return path_to_vnode(path, v, kernel);
+	return path_to_vnode(path, _vnode, kernel);
 }
 
 
@@ -744,7 +681,7 @@ path_to_dir_vnode(char *path, struct vnode **v, char *filename, bool kernel)
  *	paths aren't safe anyway: the path to a file can change at any time.
  */
 
-status_t
+static status_t
 dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
 	/* this implementation is currently bound to SYS_MAX_PATH_LEN */
@@ -770,16 +707,16 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		vnode_id parentId, id;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->priv_vnode,"..",&parentId);
+		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentId);
 
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
 		if (status == B_OK && FS_CALL(vnode,fs_get_vnode_name))
-			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->priv_vnode,name,B_FILE_NAME_LENGTH);
+			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->private_node,name,B_FILE_NAME_LENGTH);
 
 		// ... if not, find it out later (by iterating through
 		// the parent directory, searching for the id)
-		id = vnode->vnid;
+		id = vnode->id;
 
 		// release the current vnode, we only need its parent from now on
 		put_vnode(vnode);
@@ -791,7 +728,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		if (maxLevel-- < 0)
 			return ELOOP;
 
-		if (parentId == vnode->vnid) {
+		if (parentId == vnode->id) {
 			// we have reached the root level directory of this file system
 			break;
 		}
@@ -807,12 +744,12 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			// in the parent directory now
 			file_cookie cookie;
 
-			status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie,vnode->priv_vnode,&cookie);
+			status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie,vnode->private_node,&cookie);
 			if (status >= B_OK) {
 				struct dirent *dirent = (struct dirent *)nameBuffer;
 				while (true) {
 					uint32 num = 1;
-					status = FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie,dirent,sizeof(nameBuffer),&num);
+					status = FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->private_node,cookie,dirent,sizeof(nameBuffer),&num);
 					if (status < B_OK)
 						break;
 					
@@ -820,7 +757,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 						// found correct entry!
 						break;
 				}
-				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie);
+				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->private_node,cookie);
 			}
 
 			if (status < B_OK) {
@@ -854,703 +791,87 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 }
 
 
-/** Sets up a new io_control structure, and inherits the properties
- *	of the parent io_control if it is given.
- */
+//	#pragma mark -
+//	Functions the VFS exports for other parts of the kernel
 
-void *
-vfs_new_io_context(void *_parent_ioctx)
+
+int
+vfs_get_vnode(fs_id fsID, vnode_id vnodeID, fs_vnode *_fsNode)
 {
-	size_t table_size;
-	struct io_context *ioctx;
-	struct io_context *parent_ioctx;
+	struct vnode *vnode;
+	int err;
 
-	ioctx = kmalloc(sizeof(struct io_context));
-	if (ioctx == NULL)
-		return NULL;
+	err = get_vnode(fsID, vnodeID, &vnode, true);
+	if (err < 0)
+		return err;
 
-	memset(ioctx, 0, sizeof(struct io_context));
-
-	parent_ioctx = (struct io_context *)_parent_ioctx;
-	if (parent_ioctx)
-		table_size = parent_ioctx->table_size;
-	else
-		table_size = DEFAULT_FD_TABLE_SIZE;
-
-	ioctx->fds = kmalloc(sizeof(struct file_descriptor *) * table_size);
-	if (ioctx->fds == NULL) {
-		kfree(ioctx);
-		return NULL;
-	}
-
-	memset(ioctx->fds, 0, sizeof(struct file_descriptor *) * table_size);
-
-	if (mutex_init(&ioctx->io_mutex, "ioctx_mutex") < 0) {
-		kfree(ioctx->fds);
-		kfree(ioctx);
-		return NULL;
-	}
-
-	/*
-	 * copy parent files
-	 */
-	if (parent_ioctx) {
-		size_t i;
-
-		mutex_lock(&parent_ioctx->io_mutex);
-
-		ioctx->cwd = parent_ioctx->cwd;
-		if (ioctx->cwd)
-			inc_vnode_ref_count(ioctx->cwd);
-
-		for (i = 0; i < table_size; i++) {
-			if (parent_ioctx->fds[i]) {
-				ioctx->fds[i] = parent_ioctx->fds[i];
-				atomic_add(&ioctx->fds[i]->ref_count, 1);
-			}
-		}
-
-		mutex_unlock(&parent_ioctx->io_mutex);
-	} else {
-		ioctx->cwd = root_vnode;
-
-		if (ioctx->cwd)
-			inc_vnode_ref_count(ioctx->cwd);
-	}
-
-	ioctx->table_size = table_size;
-
-	return ioctx;
+	*_fsNode = vnode->private_node;
+	return B_NO_ERROR;
 }
 
 
 int
-vfs_free_io_context(void *_ioctx)
+vfs_put_vnode(fs_id fsID, vnode_id vnodeID)
 {
-	struct io_context *ioctx = (struct io_context *)_ioctx;
-	int i;
+	struct vnode *vnode;
 
-	if (ioctx->cwd)
-		dec_vnode_ref_count(ioctx->cwd, true, false);
-
-	mutex_lock(&ioctx->io_mutex);
-
-	for (i = 0; i < ioctx->table_size; i++) {
-		if (ioctx->fds[i])
-			put_fd(ioctx->fds[i]);
-	}
-
-	mutex_unlock(&ioctx->io_mutex);
-
-	mutex_destroy(&ioctx->io_mutex);
-
-	kfree(ioctx->fds);
-	kfree(ioctx);
-	return 0;
-}
-
-
-static int
-vfs_mount(char *path, const char *device, const char *fs_name, void *args, bool kernel)
-{
-	struct fs_mount *mount;
-	int err = 0;
-	struct vnode *covered_vnode = NULL;
-	vnode_id root_id;
-
-	FUNCTION(("vfs_mount: entry. path = '%s', fs_name = '%s'\n", path, fs_name));
-
-	mutex_lock(&vfs_mount_op_mutex);
-
-	mount = (struct fs_mount *)kmalloc(sizeof(struct fs_mount));
-	if (mount == NULL)  {
-		err = ENOMEM;
-		goto err;
-	}
-
-	mount->mount_point = kstrdup(path);
-	if (mount->mount_point == NULL) {
-		err = ENOMEM;
-		goto err1;
-	}
-
-	mount->fs = find_fs(fs_name);
-	if (mount->fs == NULL) {
-		err = ERR_VFS_INVALID_FS;
-		goto err2;
-	}
-
-	recursive_lock_create(&mount->rlock);
-	mount->id = next_fsid++;
-	mount->unmounting = false;
-
-	if(!root_vnode) {
-		// we haven't mounted anything yet
-		if (strcmp(path, "/") != 0) {
-			err = ERR_VFS_GENERAL;
-			goto err3;
-		}
-
-		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
-		if (err < 0) {
-			err = ERR_VFS_GENERAL;
-			goto err3;
-		}
-
-		mount->covers_vnode = NULL; // this is the root mount
-	} else {
-		err = path_to_vnode(path,&covered_vnode,kernel);
-		if (err < 0)
-			goto err2;
-
-		if (!covered_vnode) {
-			err = ERR_VFS_GENERAL;
-			goto err2;
-		}
-
-		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
-
-		if ((covered_vnode != root_vnode) && (covered_vnode->mount->root_vnode == covered_vnode)){
-			err = ERR_VFS_ALREADY_MOUNTPOINT;
-			goto err2;
-		}
-
-		mount->covers_vnode = covered_vnode;
-
-		// mount it
-		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
-		if (err < 0)
-			goto err4;
-	}
-
-	mutex_lock(&vfs_mount_mutex);
-
-	// insert mount struct into list
-	hash_insert(mounts_table, mount);
-
-	mutex_unlock(&vfs_mount_mutex);
-
-	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
-	if (err < 0)
-		goto err5;
-
-	// XXX may be a race here
-	if (mount->covers_vnode)
-		mount->covers_vnode->covered_by = mount->root_vnode;
-
-	if (!root_vnode)
-		root_vnode = mount->root_vnode;
-
-	mutex_unlock(&vfs_mount_op_mutex);
-
-	return 0;
-
-err5:
-	mount->fs->calls->fs_unmount(mount->cookie);
-err4:
-	if (mount->covers_vnode)
-		dec_vnode_ref_count(mount->covers_vnode, true, false);
-err3:
-	recursive_lock_destroy(&mount->rlock);
-err2:
-	kfree(mount->mount_point);
-err1:
-	kfree(mount);
-err:
-	mutex_unlock(&vfs_mount_op_mutex);
-
-	return err;
-}
-
-
-static int
-vfs_unmount(char *path, bool kernel)
-{
-	struct vnode *v;
-	struct fs_mount *mount;
-	int err;
-
-	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
-
-	err = path_to_vnode(path, &v, kernel);
-	if (err < 0) {
-		err = ERR_VFS_PATH_NOT_FOUND;
-		goto err;
-	}
-
-	mutex_lock(&vfs_mount_op_mutex);
-
-	mount = fsid_to_mount(v->fsid);
-	if (!mount)
-		panic("vfs_unmount: fsid_to_mount failed on root vnode @%p of mount\n", v);
-
-	if (mount->root_vnode != v) {
-		// not mountpoint
-		dec_vnode_ref_count(v, true, false);
-		err = ERR_VFS_NOT_MOUNTPOINT;
-		goto err1;
-	}
-
-	/* grab the vnode master mutex to keep someone from creating a vnode
-	while we're figuring out if we can continue */
 	mutex_lock(&vfs_vnode_mutex);
-
-	/* simulate the root vnode having it's refcount decremented */
-	mount->root_vnode->ref_count -= 2;
-
-	/* cycle through the list of vnodes associated with this mount and
-	make sure all of them are not busy or have refs on them */
-	err = 0;
-	for(v = mount->vnodes_head; v; v = v->mount_next) {
-		if(v->busy || v->ref_count != 0) {
-			mount->root_vnode->ref_count += 2;
-			mutex_unlock(&vfs_vnode_mutex);
-			dec_vnode_ref_count(mount->root_vnode, true, false);
-			err = EBUSY;
-			goto err1;
-		}
-	}
-
-	/* we can safely continue, mark all of the vnodes busy and this mount
-	structure in unmounting state */
-	for(v = mount->vnodes_head; v; v = v->mount_next)
-		if(v != mount->root_vnode)
-			v->busy = true;
-	mount->unmounting = true;
-
+	vnode = lookup_vnode(fsID, vnodeID);
 	mutex_unlock(&vfs_vnode_mutex);
 
-	mount->covers_vnode->covered_by = NULL;
-	dec_vnode_ref_count(mount->covers_vnode, true, false);
+	if (vnode)
+		dec_vnode_ref_count(vnode, true);
 
-	/* release the ref on the root vnode twice */
-	dec_vnode_ref_count(mount->root_vnode, true, false);
-	dec_vnode_ref_count(mount->root_vnode, true, false);
-
-	// XXX when full vnode cache in place, will need to force
-	// a putvnode/removevnode here
-
-	/* remove the mount structure from the hash table */
-	mutex_lock(&vfs_mount_mutex);
-	hash_remove(mounts_table, mount);
-	mutex_unlock(&vfs_mount_mutex);
-
-	mutex_unlock(&vfs_mount_op_mutex);
-
-	mount->fs->calls->fs_unmount(mount->cookie);
-
-	kfree(mount->mount_point);
-	kfree(mount);
-
-	return 0;
-
-err1:
-	mutex_unlock(&vfs_mount_op_mutex);
-err:
-	return err;
+	return B_NO_ERROR;
 }
 
 
-static int
-vfs_sync(void)
+void
+vfs_vnode_acquire_ref(void *vnode)
 {
-	struct hash_iterator iter;
-	struct fs_mount *mount;
+	FUNCTION(("vfs_vnode_acquire_ref: vnode 0x%p\n", vnode));
+	inc_vnode_ref_count((struct vnode *)vnode);
+}
 
-	FUNCTION(("vfs_sync: entry.\n"));
 
-	/* cycle through and call sync on each mounted fs */
-	mutex_lock(&vfs_mount_op_mutex);
-	mutex_lock(&vfs_mount_mutex);
+void
+vfs_vnode_release_ref(void *vnode)
+{
+	FUNCTION(("vfs_vnode_release_ref: vnode 0x%p\n", vnode));
+	dec_vnode_ref_count((struct vnode *)vnode, false);
+}
 
-	hash_open(mounts_table, &iter);
-	while ((mount = hash_next(mounts_table, &iter))) {
-		mount->fs->calls->fs_sync(mount->cookie);
-	}
-	hash_close(mounts_table, &iter, false);
 
-	mutex_unlock(&vfs_mount_mutex);
-	mutex_unlock(&vfs_mount_op_mutex);
+int
+vfs_remove_vnode(fs_id fsid, vnode_id vnid)
+{
+	struct vnode *vnode;
 
+	mutex_lock(&vfs_vnode_mutex);
+
+	vnode = lookup_vnode(fsid, vnid);
+	if (vnode)
+		vnode->delete_me = true;
+
+	mutex_unlock(&vfs_vnode_mutex);
 	return 0;
 }
 
 
-static int
-new_file_fd(struct vnode *vnode,file_cookie cookie, bool kernel)
+void *
+vfs_get_cache_ptr(void *vnode)
 {
-	struct file_descriptor *descriptor;
-	int fd;
-
-	descriptor = alloc_fd();
-	if (!descriptor)
-		return ENOMEM;
-
-	descriptor->vnode = vnode;
-	descriptor->cookie = cookie;
-	descriptor->ops = &file_ops;
-	descriptor->type = FDTYPE_FILE;
-
-	fd = new_fd(get_current_io_context(kernel), descriptor);
-	if (fd < 0)
-		return ERR_VFS_FD_TABLE_FULL;
-
-	return fd;
+	return ((struct vnode *)vnode)->cache;
 }
 
 
-static int
-vfs_create(char *path, int omode, int perms, bool kernel)
+int
+vfs_set_cache_ptr(void *vnode, void *cache)
 {
-	char filename[SYS_MAX_NAME_LEN];
-	struct vnode *vnode, *newVnode;
-	file_cookie cookie;
-	vnode_id newID;
-	int status;
+	if (test_and_set((int *)&(((struct vnode *)vnode)->cache), (int)cache, 0) == 0)
+		return 0;
 
-	FUNCTION(("vfs_create: path '%s', omode %x, perms %d, kernel %d\n", path, omode, perms, kernel));
-
-	status = path_to_dir_vnode(path, &vnode, filename, kernel);
-	if (status < 0)
-		return status;
-
-	if (FS_CALL(vnode,fs_create) == NULL) {
-		status = EROFS;
-		goto err;
-	}
-
-	status = FS_CALL(vnode,fs_create)(vnode->mount->cookie, vnode->priv_vnode, &cookie, &newID, filename, omode, perms);
-	if (status < 0)
-		goto err;
-
-	status = get_vnode(vnode->mount->id,newID,&newVnode,false);
-	if (status < 0)
-		goto err1;
-
-	status = new_file_fd(newVnode,cookie,kernel);
-	if (status >= 0)
-		return status;
-
-err1:
-	FS_CALL(vnode,fs_close)(newVnode->mount->cookie, newVnode->priv_vnode, cookie);
-	FS_CALL(vnode,fs_free_cookie)(newVnode->mount->cookie, newVnode->priv_vnode, cookie);
-
-	FS_CALL(vnode,fs_unlink)(vnode->mount->cookie, vnode->priv_vnode, filename);
-	dec_vnode_ref_count(newVnode, true, false);
-
-err:
-	dec_vnode_ref_count(vnode, true, false);
-	return status;
-}
-
-
-static int
-vfs_open(char *path, int omode, bool kernel)
-{
-	struct file_descriptor *descriptor;
-	struct vnode *vnode = NULL;
-	file_cookie cookie;
-	int status;
-	int fd;
-
-	FUNCTION(("vfs_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
-
-	status = path_to_vnode(path, &vnode, kernel);
-	if (status < 0)
-		return status;
-
-	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->priv_vnode, &cookie, omode);
-	if (status < 0)
-		goto err;
-
-	status = new_file_fd(vnode,cookie,kernel);
-	if (status >= 0)
-		return status;
-
-err1:
-	FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->priv_vnode, cookie);
-	FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->priv_vnode, cookie);
-
-err:
-	dec_vnode_ref_count(vnode, true, false);
-	return status;
-}
-
-
-static int
-file_close(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("file_close(descriptor = %p)\n",descriptor));
-	
-	if (FS_CALL(vnode,fs_close))
-		return FS_CALL(vnode,fs_close)(vnode->mount->cookie,vnode->priv_vnode,descriptor->cookie);
-
-	return B_OK;
-}
-
-
-static int
-dir_close(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("dir_close(descriptor = %p)\n",descriptor));
-	
-	if (FS_CALL(vnode,fs_close_dir))
-		return FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->priv_vnode,descriptor->cookie);
-
-	return B_OK;
-}
-
-
-static int
-vfs_fsync(int fd, bool kernel)
-{
-	struct file_descriptor *f;
-	struct vnode *v;
-	int err;
-
-	FUNCTION(("vfs_fsync: entry. fd %d kernel %d\n", fd, kernel));
-
-	f = get_fd(get_current_io_context(kernel), fd);
-	if (!f)
-		return ERR_INVALID_HANDLE;
-
-	v = f->vnode;
-	err = v->mount->fs->calls->fs_fsync(v->mount->cookie, v->priv_vnode);
-
-	put_fd(f);
-
-	return err;
-}
-
-
-static ssize_t
-file_read(struct file_descriptor *f, void *buffer, off_t pos, size_t *length)
-{
-	struct vnode *v = f->vnode;
-
-	FUNCTION(("file_read: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
-	return v->mount->fs->calls->fs_read(v->mount->cookie, v->priv_vnode, f->cookie, buffer, pos, length);
-}
-
-
-static ssize_t
-file_write(struct file_descriptor *f, const void *buffer, off_t pos, size_t *length)
-{
-	struct vnode *v = f->vnode;
-
-	FUNCTION(("file_write: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
-	return v->mount->fs->calls->fs_write(v->mount->cookie, v->priv_vnode, f->cookie, buffer, pos, length);
-}
-
-
-static off_t
-file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("file_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
-
-	return FS_CALL(vnode,fs_seek)(vnode->mount->cookie, vnode->priv_vnode, descriptor->cookie, pos, seekType);
-}
-
-
-static int
-vfs_create_dir(char *path, int perms, bool kernel)
-{
-	char filename[SYS_MAX_NAME_LEN];
-	struct vnode *vnode;
-	vnode_id vnid;
-	int status;
-
-	FUNCTION(("vfs_create_dir: path '%s', perms %d, kernel %d\n", path, perms, kernel));
-
-	status = path_to_dir_vnode(path, &vnode, filename, kernel);
-	if (status < 0)
-		return status;
-
-	if (FS_CALL(vnode,fs_create_dir))
-		status = FS_CALL(vnode,fs_create_dir)(vnode->mount->cookie, vnode->priv_vnode, filename, perms, &vnid);
-	else
-		status = EROFS;
-
-	dec_vnode_ref_count(vnode, true, false);
-	return status;
-}
-
-
-static int
-vfs_open_dir(char *path, bool kernel)
-{
-	struct file_descriptor *descriptor;
-	struct vnode *vnode;
-	file_cookie cookie;
-	int status;
-	int fd;
-
-	FUNCTION(("vfs_open_dir: path = '%s', kernel %d\n", path, kernel));
-
-	status = path_to_vnode(path, &vnode, kernel);
-	if (status < 0)
-		return status;
-
-	status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie, vnode->priv_vnode, &cookie);
-	if (status < 0)
-		goto err;
-
-	// file is opened, create a fd
-	descriptor = alloc_fd();
-	if (!descriptor) {
-		status = ENOMEM;
-		goto err1;
-	}
-	descriptor->vnode = vnode;
-	descriptor->cookie = cookie;
-	descriptor->ops = &dir_ops;
-	descriptor->type = FDTYPE_DIR;
-
-	fd = new_fd(get_current_io_context(kernel), descriptor);
-	if (fd < 0) {
-		status = ERR_VFS_FD_TABLE_FULL;
-		goto err1;
-	}
-	return fd;
-
-err1:
-	FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie);
-	FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie,vnode->priv_vnode,cookie);
-
-err:
-	dec_vnode_ref_count(vnode, true, false);
-	return status;
-}
-
-
-static status_t 
-dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	if (FS_CALL(vnode,fs_read_dir))
-		return FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->priv_vnode,descriptor->cookie,buffer,bufferSize,_count);
-	
-	return EOPNOTSUPP;
-}
-
-
-static status_t 
-dir_rewind(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	if (FS_CALL(vnode,fs_rewind_dir))
-		return FS_CALL(vnode,fs_rewind_dir)(vnode->mount->cookie,vnode->priv_vnode,descriptor->cookie);
-
-	return EOPNOTSUPP;
-}
-
-
-static int
-common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t length)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	if (FS_CALL(vnode,fs_ioctl))
-		return FS_CALL(vnode,fs_ioctl)(vnode->mount->cookie,vnode->priv_vnode,descriptor->cookie,op,buffer,length);
-
-	return EOPNOTSUPP;
-}
-
-
-static int
-vfs_unlink(char *path, bool kernel)
-{
-	int err;
-	struct vnode *v;
-	char filename[SYS_MAX_NAME_LEN];
-
-	FUNCTION(("vfs_unlink: path '%s', kernel %d\n", path, kernel));
-
-	err = path_to_dir_vnode(path, &v, filename, kernel);
-	if (err < 0)
-		goto err;
-
-	err = v->mount->fs->calls->fs_unlink(v->mount->cookie, v->priv_vnode, filename);
-	dec_vnode_ref_count(v, true, false);
-
-err:
-	return err;
-}
-
-
-static int
-vfs_rename(char *path, char *newpath, bool kernel)
-{
-	struct vnode *v1, *v2;
-	char filename1[SYS_MAX_NAME_LEN];
-	char filename2[SYS_MAX_NAME_LEN];
-	int err;
-
-	err = path_to_dir_vnode(path, &v1, filename1, kernel);
-	if (err < 0)
-		goto err;
-
-	err = path_to_dir_vnode(newpath, &v2, filename2, kernel);
-	if (err < 0)
-		goto err1;
-
-	if (v1->fsid != v2->fsid) {
-		err = ERR_VFS_CROSS_FS_RENAME;
-		goto err2;
-	}
-
-	if (v1->mount->fs->calls->fs_rename != NULL)
-		err = v1->mount->fs->calls->fs_rename(v1->mount->cookie, v1->priv_vnode, filename1, v2->priv_vnode, filename2);
-	else
-		err = EINVAL;
-
-err2:
-	dec_vnode_ref_count(v2, true, false);
-err1:
-	dec_vnode_ref_count(v1, true, false);
-err:
-	return err;
-}
-
-
-static int
-common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
-	return FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->priv_vnode, stat);
-}
-
-
-static int
-vfs_write_stat(char *path, struct stat *stat, int stat_mask, bool kernel)
-{
-	struct vnode *vnode;
-	int status;
-
-	FUNCTION(("vfs_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, stat_mask, kernel));
-
-	status = path_to_vnode(path, &vnode, kernel);
-	if (status < 0)
-		return status;
-
-	if (FS_CALL(vnode,fs_write_stat))
-		status = FS_CALL(vnode,fs_write_stat)(vnode->mount->cookie, vnode->priv_vnode, stat, stat_mask);
-	else
-		status = EROFS;
-
-	dec_vnode_ref_count(vnode, true, false);
-
-	return status;
+	return -1;
 }
 
 
@@ -1611,7 +932,7 @@ vfs_can_page(void *_v)
 	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
 
 	if (FS_CALL(vnode,fs_can_page))
-		return FS_CALL(vnode,fs_can_page)(vnode->mount->cookie, vnode->priv_vnode);
+		return FS_CALL(vnode,fs_can_page)(vnode->mount->cookie, vnode->private_node);
 
 	return 0;
 }
@@ -1624,7 +945,7 @@ vfs_read_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_readpage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode,fs_read_page)(vnode->mount->cookie, vnode->priv_vnode, vecs, pos);
+	return FS_CALL(vnode,fs_read_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
@@ -1635,746 +956,166 @@ vfs_write_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_writepage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode,fs_write_page)(vnode->mount->cookie, vnode->priv_vnode, vecs, pos);
+	return FS_CALL(vnode,fs_write_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
-static int
-vfs_get_cwd(char *buffer, size_t size, bool kernel)
+/** Sets up a new io_control structure, and inherits the properties
+ *	of the parent io_control if it is given.
+ */
+
+void *
+vfs_new_io_context(void *_parentContext)
 {
-	// Get current working directory from io context
-	struct vnode *cwd = get_current_io_context(kernel)->cwd;
+	size_t table_size;
+	struct io_context *context;
+	struct io_context *parentContext;
 
-	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
+	context = kmalloc(sizeof(struct io_context));
+	if (context == NULL)
+		return NULL;
 
-	if (cwd)
-		return dir_vnode_to_path(cwd, buffer, size);
+	memset(context, 0, sizeof(struct io_context));
 
-	return B_ERROR; 
-}
+	parentContext = (struct io_context *)_parentContext;
+	if (parentContext)
+		table_size = parentContext->table_size;
+	else
+		table_size = DEFAULT_FD_TABLE_SIZE;
 
-
-static int
-vfs_set_cwd(char *path, bool kernel)
-{
-	struct io_context *io;
-	struct vnode *vnode = NULL;
-	struct vnode *old_cwd;
-	struct stat stat;
-	int rc;
-
-	FUNCTION(("vfs_set_cwd: path=\'%s\'\n", path));
-
-	// Get vnode for passed path, and bail if it failed
-	rc = path_to_vnode(path, &vnode, kernel);
-	if (rc < 0)
-		return rc;
-
-	rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->priv_vnode, &stat);
-	if (rc < 0)
-		goto err;
-
-	if (!S_ISDIR(stat.st_mode)) {
-		// nope, can't cwd to here
-		rc = ERR_VFS_WRONG_STREAM_TYPE;
-		goto err;
+	context->fds = kmalloc(sizeof(struct file_descriptor *) * table_size);
+	if (context->fds == NULL) {
+		kfree(context);
+		return NULL;
 	}
 
-	// Get current io context and lock
-	io = get_current_io_context(kernel);
-	mutex_lock(&io->io_mutex);
+	memset(context->fds, 0, sizeof(struct file_descriptor *) * table_size);
 
-	// save the old cwd
-	old_cwd = io->cwd;
-
-	// Set the new vnode
-	io->cwd = vnode;
-
-	// Unlock the ioctx
-	mutex_unlock(&io->io_mutex);
-
-	// Decrease ref count of previous working dir (as the ref is being replaced)
-	if (old_cwd)
-		dec_vnode_ref_count(old_cwd, true, false);
-
-	return B_NO_ERROR;
-
-err:
-	dec_vnode_ref_count(vnode, true, false);
-	return rc;
-}
-
-
-static int
-vfs_dup(int fd, bool kernel)
-{
-	struct io_context *io = get_current_io_context(kernel);
-	struct file_descriptor *f;
-	int rc;
-
-	FUNCTION(("vfs_dup: fd = %d\n", fd));
-
-	// Try to get the fd structure
-	f = get_fd(io, fd);
-	if (!f) {
-		rc = ERR_INVALID_HANDLE;
-		goto err;
+	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
+		kfree(context->fds);
+		kfree(context);
+		return NULL;
 	}
 
-	// now put the fd in place
-	rc = new_fd(io, f);
-
-	if (rc < 0)
-		put_fd(f);
-
-err:
-	return rc;
-}
-
-
-static int
-vfs_dup2(int ofd, int nfd, bool kernel)
-{
-	struct io_context *curr_ioctx;
-	struct file_descriptor *evicted;
-	int rc;
-
-	FUNCTION(("vfs_dup2: ofd = %d, nfd = %d\n", ofd, nfd));
-
-	// quick check
-	if ((ofd < 0) || (nfd < 0)) {
-		rc = ERR_INVALID_HANDLE;
-		goto err;
-	}
-
-	// Get current io context and lock
-	curr_ioctx = get_current_io_context(kernel);
-	mutex_lock(&curr_ioctx->io_mutex);
-
-	// Check for upper boundary, we do in the locked part
-	// because in the future the fd table might be resizeable
-	if ((ofd >= curr_ioctx->table_size) || !curr_ioctx->fds[ofd]) {
-		rc = ERR_INVALID_HANDLE;
-		goto err_1;
-	}
-	if ((nfd >= curr_ioctx->table_size)) {
-		rc = ERR_INVALID_HANDLE;
-		goto err_1;
-	}
-
-	// Check for identity, note that it cannot be made above
-	// because we always want to return an error on invalid
-	// handles
-	if (ofd == nfd)
-		// ToDo: this is buggy and doesn't unlock the io mutex!
-		goto success;
-
-	// Now do the work
-	evicted = curr_ioctx->fds[nfd];
-	curr_ioctx->fds[nfd] = curr_ioctx->fds[ofd];
-	atomic_add(&curr_ioctx->fds[ofd]->ref_count, 1);
-
-	// Unlock the ioctx
-	mutex_unlock(&curr_ioctx->io_mutex);
-
-	// Say bye bye to the evicted fd
-	if (evicted)
-		put_fd(evicted);
-
-success:
-	rc = nfd;
-	return nfd;
-
-err_1:
-	mutex_unlock(&curr_ioctx->io_mutex);
-err:
-	return rc;
-}
-
-
-//	#pragma mark -
-//	Calls from within the kernel
-
-
-int
-sys_mount(const char *path, const char *device, const char *fs_name, void *args)
-{
-	char buf[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_mount(buf, device, fs_name, args, true);
-}
-
-
-int
-sys_unmount(const char *path)
-{
-	char buf[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_unmount(buf, true);
-}
-
-
-int
-sys_sync(void)
-{
-	return vfs_sync();
-}
-
-
-int
-sys_open(const char *path, int omode)
-{
-	char buffer[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_open(buffer, omode, true);
-}
-
-
-int
-sys_open_dir(const char *path)
-{
-	char buffer[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_open_dir(buffer, true);
-}
-
-
-int
-sys_fsync(int fd)
-{
-	return vfs_fsync(fd, true);
-}
-
-
-int
-sys_create(const char *path, int omode, int perms)
-{
-	char buffer[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_create(buffer, omode, perms, true);
-}
-
-
-int
-sys_create_dir(const char *path, int perms)
-{
-	char buffer[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_create_dir(buffer, perms, true);
-}
-
-
-int
-sys_unlink(const char *path)
-{
-	char buf[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_unlink(buf, true);
-}
-
-
-int
-sys_rename(const char *oldpath, const char *newpath)
-{
-	char buf1[SYS_MAX_PATH_LEN+1];
-	char buf2[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buf1, oldpath, SYS_MAX_PATH_LEN);
-	buf1[SYS_MAX_PATH_LEN] = 0;
-
-	strncpy(buf2, newpath, SYS_MAX_PATH_LEN);
-	buf2[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_rename(buf1, buf2, true);
-}
-
-
-int
-sys_read_stat(const char *path, struct stat *stat)
-{
-	char buf[SYS_MAX_PATH_LEN+1];
-	struct vnode *vnode;
-	int status;
-
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	FUNCTION(("sys_read_stat: path '%s', stat %p,\n", path, stat));
-
-	status = path_to_vnode(buf, &vnode, true);
-	if (status < 0)
-		return status;
-
-	status = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->priv_vnode, stat);
-
-	dec_vnode_ref_count(vnode, true, false);
-	return status;
-}
-
-
-int
-sys_write_stat(const char *path, struct stat *stat, int stat_mask)
-{
-	char buf[SYS_MAX_PATH_LEN+1];
-
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_write_stat(buf, stat, stat_mask, true);
-}
-
-
-char *
-sys_getcwd(char *buf, size_t size)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	PRINT(("sys_getcwd: buf %p, %ld\n", buf, size));
-
-	// Call vfs to get current working directory
-	rc = vfs_get_cwd(path,SYS_MAX_PATH_LEN-1,true);
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	// Copy back the result
-	strncpy(buf,path,size);
-
-	// Return either NULL or the buffer address to indicate failure or success
-	return  (rc < 0) ? NULL : buf;
-}
-
-
-int
-sys_setcwd(const char *_path)
-{
-	char path[SYS_MAX_PATH_LEN];
-
-	PRINT(("sys_setcwd: path = %s\n", _path));
-
-	// Copy new path to kernel space
-	strncpy(path, _path, SYS_MAX_PATH_LEN-1);
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	// Call vfs to set new working directory
-	return vfs_set_cwd(path,true);
-}
-
-
-int
-sys_dup(int fd)
-{
-	return vfs_dup(fd, true);
-}
-
-
-int
-sys_dup2(int ofd, int nfd)
-{
-	return vfs_dup2(ofd, nfd, true);
-}
-
-
-//	#pragma mark -
-//	Calls from userland (with extra address checks)
-
-
-int
-user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
-{
-	char path[SYS_MAX_PATH_LEN+1];
-	char fs_name[SYS_MAX_OS_NAME_LEN+1];
-	char device[SYS_MAX_PATH_LEN+1];
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if ((addr)ufs_name >= KERNEL_BASE && (addr)ufs_name <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if (udevice != NULL && (addr)udevice >= KERNEL_BASE && (addr)udevice <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
-
-	rc = user_strncpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN);
-	if (rc < 0)
-		return rc;
-	fs_name[SYS_MAX_OS_NAME_LEN] = 0;
-
-	if (udevice) {
-		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN);
-		if (rc < 0)
-			return rc;
-		device[SYS_MAX_PATH_LEN] = 0;
-	} else
-		device[0] = 0;
-
-	return vfs_mount(path, device, fs_name, args, false);
-}
-
-
-int
-user_unmount(const char *upath)
-{
-	char path[SYS_MAX_PATH_LEN+1];
-	int rc;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_unmount(path, false);
-}
-
-
-int
-user_sync(void)
-{
-	return vfs_sync();
-}
-
-
-int
-user_open(const char *upath, int omode)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	return vfs_open(path, omode, false);
-}
-
-
-int
-user_open_dir(const char *upath)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	return vfs_open_dir(path, false);
-}
-
-
-int
-user_fsync(int fd)
-{
-	return vfs_fsync(fd, false);
-}
-
-
-int
-user_create(const char *upath, int omode, int perms)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = 0;
-
-	return vfs_create(path, omode, perms, false);
-}
-
-
-int
-user_create_dir(const char *upath, int perms)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = 0;
-
-	return vfs_create_dir(path, perms, false);
-}
-
-
-int
-user_unlink(const char *upath)
-{
-	char path[SYS_MAX_PATH_LEN+1];
-	int rc;
-
-	if((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if(rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_unlink(path, false);
-}
-
-
-int
-user_rename(const char *uoldpath, const char *unewpath)
-{
-	char oldpath[SYS_MAX_PATH_LEN+1];
-	char newpath[SYS_MAX_PATH_LEN+1];
-	int rc;
-
-	if((addr)uoldpath >= KERNEL_BASE && (addr)uoldpath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if((addr)unewpath >= KERNEL_BASE && (addr)unewpath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(oldpath, uoldpath, SYS_MAX_PATH_LEN);
-	if(rc < 0)
-		return rc;
-	oldpath[SYS_MAX_PATH_LEN] = 0;
-
-	rc = user_strncpy(newpath, unewpath, SYS_MAX_PATH_LEN);
-	if(rc < 0)
-		return rc;
-	newpath[SYS_MAX_PATH_LEN] = 0;
-
-	return vfs_rename(oldpath, newpath, false);
-}
-
-
-int
-user_read_stat(const char *upath, struct stat *ustat)
-{
-	char path[SYS_MAX_PATH_LEN];
-	struct vnode *vnode = NULL;
-	struct stat stat;
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	rc = path_to_vnode(path, &vnode, false);
-	if (rc < 0)
-		return rc;
-
-	if (FS_CALL(vnode,fs_read_stat))
-		rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->priv_vnode, &stat);
-
-	dec_vnode_ref_count(vnode, true, false);
-
-	if (rc < 0)
-		return rc;
-
-	rc = user_memcpy(ustat, &stat, sizeof(struct stat));
-
-	return rc;
-}
-
-
-int
-user_write_stat(const char *upath, struct stat *ustat, int stat_mask)
-{
-	char path[SYS_MAX_PATH_LEN+1];
-	struct stat stat;
-	int rc;
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
-
-	rc = user_memcpy(&stat, ustat, sizeof(struct stat));
-	if (rc < 0)
-		return rc;
-
-	return vfs_write_stat(path, &stat, stat_mask, false);
-}
-
-
-int
-user_getcwd(char *buffer, size_t size)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int status;
-
-	PRINT(("user_getcwd: buf %p, %ld\n", buffer, size));
-
-	// Check if userspace address is inside "shared" kernel space
-	if ((addr)buffer >= KERNEL_BASE && (addr)buffer <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	// Call vfs to get current working directory
-	status = vfs_get_cwd(path, sizeof(path), false);
-	if (status < 0)
-		return status;
-
-	// Copy back the result
-	if (user_strncpy(buffer, path, size) < 0)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	return status;
-}
-
-
-int
-user_setcwd(const char *upath)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	PRINT(("user_setcwd: path = %p\n", upath));
-
-	// Check if userspace address is inside "shared" kernel space
-	if((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	// Copy new path to kernel space
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
-
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	// Call vfs to set new working directory
-	return vfs_set_cwd(path,false);
-}
-
-
-int
-user_dup(int fd)
-{
-	return vfs_dup(fd, false);
-}
-
-
-int
-user_dup2(int ofd, int nfd)
-{
-	return vfs_dup2(ofd, nfd, false);
-}
-
-
-//	#pragma mark -
-
-
-static int
-vfs_resize_fd_table(struct io_context *ioctx, const int new_size)
-{
-	void	* new_fds;
-	int		ret;
-
-	if (new_size < 0 || new_size > MAX_FD_TABLE_SIZE)
-		return -1;
-
-	mutex_lock(&ioctx->io_mutex);
-
-	if (new_size < ioctx->table_size) {
-		int i;
-
-		/* Make sure none of the fds being dropped are in use */
-		for(i = new_size; i < ioctx->table_size; i++) {
-			if (ioctx->fds[i]) {
-				ret = -1;
-				goto error;
+	/*
+	 * copy parent files
+	 */
+	if (parentContext) {
+		size_t i;
+
+		mutex_lock(&parentContext->io_mutex);
+
+		context->cwd = parentContext->cwd;
+		if (context->cwd)
+			inc_vnode_ref_count(context->cwd);
+
+		for (i = 0; i < table_size; i++) {
+			if (parentContext->fds[i]) {
+				context->fds[i] = parentContext->fds[i];
+				atomic_add(&context->fds[i]->ref_count, 1);
 			}
 		}
 
-		new_fds = kmalloc(sizeof(struct file_descriptor *) * new_size);
-		if (!new_fds) {
-			ret = -1;
-			goto error;
-		}
-
-		memcpy(new_fds, ioctx->fds, sizeof(struct file_descriptor *) * new_size);
+		mutex_unlock(&parentContext->io_mutex);
 	} else {
-		new_fds = kmalloc(sizeof(struct file_descriptor *) * new_size);
-		if (!new_fds) {
-			ret = -1;
-			goto error;
-		}
+		context->cwd = root_vnode;
 
-		memcpy(new_fds, ioctx->fds, sizeof(struct file_descriptor *) * ioctx->table_size);
-		memset(((char *)new_fds) + (sizeof(struct file_descriptor *) * ioctx->table_size), 0,
-				(sizeof(struct file_descriptor *) * new_size) - (sizeof(struct file_descriptor *) * ioctx->table_size));
+		if (context->cwd)
+			inc_vnode_ref_count(context->cwd);
 	}
 
-	kfree(ioctx->fds);
-	ioctx->fds = new_fds;
-	ioctx->table_size = new_size;
+	context->table_size = table_size;
 
-	mutex_unlock(&ioctx->io_mutex);
+	return context;
+}
 
+
+int
+vfs_free_io_context(void *_ioContext)
+{
+	struct io_context *context = (struct io_context *)_ioContext;
+	int i;
+
+	if (context->cwd)
+		dec_vnode_ref_count(context->cwd, false);
+
+	mutex_lock(&context->io_mutex);
+
+	for (i = 0; i < context->table_size; i++) {
+		if (context->fds[i])
+			put_fd(context->fds[i]);
+	}
+
+	mutex_unlock(&context->io_mutex);
+
+	mutex_destroy(&context->io_mutex);
+
+	kfree(context->fds);
+	kfree(context);
 	return 0;
+}
 
-error:
-	mutex_unlock(&ioctx->io_mutex);
 
-	return ret;
+static int
+vfs_resize_fd_table(struct io_context *context, const int newSize)
+{
+	void *fds;
+	int	status = B_OK;
+
+	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
+		return EINVAL;
+
+	mutex_lock(&context->io_mutex);
+
+	if (newSize < context->table_size) {
+		// shrink the fd table
+		int i;
+
+		// Make sure none of the fds being dropped are in use
+		for(i = context->table_size; i-- > newSize;) {
+			if (context->fds[i]) {
+				status = EBUSY;
+				goto out;
+			}
+		}
+
+		fds = kmalloc(sizeof(struct file_descriptor *) * newSize);
+		if (fds == NULL) {
+			status = ENOMEM;
+			goto out;
+		}
+
+		memcpy(fds, context->fds, sizeof(struct file_descriptor *) * newSize);
+	} else {
+		// enlarge the fd table
+
+		fds = kmalloc(sizeof(struct file_descriptor *) * newSize);
+		if (fds == NULL) {
+			status = ENOMEM;
+			goto out;
+		}
+
+		// copy the fd array, and zero the additional slots
+		memcpy(fds, context->fds, sizeof(void *) * context->table_size);
+		memset((char *)fds + (sizeof(void *) * context->table_size), 0,
+			sizeof(void *) * (newSize - context->table_size));
+	}
+
+	kfree(context->fds);
+	context->fds = fds;
+	context->table_size = newSize;
+
+out:
+	mutex_unlock(&context->io_mutex);
+	return status;
 }
 
 
 int
 vfs_getrlimit(int resource, struct rlimit * rlp)
 {
-	if (!rlp) {
+	if (!rlp)
 		return -1;
-	}
 
 	switch (resource) {
 		case RLIMIT_NOFILE:
@@ -2658,3 +1399,1307 @@ vfs_init(kernel_args *ka)
 
 	return 0;
 }
+
+
+//	#pragma mark -
+//	The filetype-dependent implementations (fd_ops + open/create/rename/remove, ...)
+
+
+static int
+new_file_fd(struct vnode *vnode,file_cookie cookie, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	int fd;
+
+	descriptor = alloc_fd();
+	if (!descriptor)
+		return ENOMEM;
+
+	descriptor->vnode = vnode;
+	descriptor->cookie = cookie;
+	descriptor->ops = &file_ops;
+	descriptor->type = FDTYPE_FILE;
+
+	fd = new_fd(get_current_io_context(kernel), descriptor);
+	if (fd < 0)
+		return ERR_VFS_FD_TABLE_FULL;
+
+	return fd;
+}
+
+
+/** Calls fs_open() on the given vnode and returns a new
+ *	file descriptor for it
+ */
+
+static int
+create_vnode(struct vnode *directory, const char *name, int omode, int perms, bool kernel)
+{
+	struct vnode *vnode;
+	file_cookie cookie;
+	vnode_id newID;
+	int status;
+
+	if (FS_CALL(directory,fs_create) == NULL)
+		return EROFS;
+
+	status = FS_CALL(directory,fs_create)(directory->mount->cookie, directory->private_node, &cookie, &newID, name, omode, perms);
+	if (status < B_OK)
+		return status;
+
+	mutex_lock(&vfs_vnode_mutex);
+	vnode = lookup_vnode(directory->fs_id, newID);
+	mutex_unlock(&vfs_vnode_mutex);
+
+	if (vnode == NULL) {
+		dprintf("vfs: fs_create() returned success but there is no vnode!");
+		return EINVAL;
+	}
+
+	if ((status = new_file_fd(vnode,cookie,kernel)) >= 0)
+		return status;
+		
+	FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	put_vnode(vnode);
+
+	FS_CALL(directory,fs_unlink)(directory->mount->cookie, directory->private_node, name);
+	
+	return status;
+}
+
+
+/** Calls fs_open() on the given vnode and returns a new
+ *	file descriptor for it
+ */
+
+static int
+open_vnode(struct vnode *vnode, int omode, bool kernel)
+{
+	file_cookie cookie;
+	int status;
+
+	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->private_node, &cookie, omode);
+	if (status < 0)
+		return status;
+
+	status = new_file_fd(vnode,cookie,kernel);
+	if (status < 0) {
+		FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
+		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	}
+	return status;
+}
+
+
+/** Calls fs_open_dir() on the given vnode and returns a new
+ *	file descriptor for it
+ */
+
+static int
+open_dir_vnode(struct vnode *vnode, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	file_cookie cookie;
+	int status, fd;
+	
+	status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+	if (status < 0)
+		return status;
+
+	// file is opened, create a fd
+	descriptor = alloc_fd();
+	if (!descriptor) {
+		status = ENOMEM;
+		goto err;
+	}
+	descriptor->vnode = vnode;
+	descriptor->cookie = cookie;
+	descriptor->ops = &dir_ops;
+	descriptor->type = FDTYPE_DIR;
+
+	fd = new_fd(get_current_io_context(kernel), descriptor);
+	if (fd >= 0)
+		return fd;
+
+err1:
+	status = ERR_VFS_FD_TABLE_FULL;
+	kfree(descriptor);
+
+err:
+	FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+
+	return status;
+}
+
+
+static int
+file_create_entry_ref(fs_id fsID, vnode_id directoryID, const char *name, int omode, int perms, bool kernel)
+{
+	struct vnode *directory,*vnode;
+	int status;
+
+	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, kernel %d\n", name, omode, perms, kernel));
+
+	// get directory to put the new file in	
+	status = get_vnode(fsID,directoryID,&directory,false);
+	if (status < B_OK)
+		return status;
+
+	status = create_vnode(directory, name, omode, perms, kernel);
+	put_vnode(directory);
+
+	return status;
+}
+
+
+static int
+file_create(char *path, int omode, int perms, bool kernel)
+{
+	char filename[SYS_MAX_NAME_LEN];
+	struct vnode *directory,*vnode;
+	file_cookie cookie;
+	vnode_id newID;
+	int status;
+
+	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, omode, perms, kernel));
+
+	// get directory to put the new file in	
+	status = path_to_dir_vnode(path, &directory, filename, kernel);
+	if (status < 0)
+		return status;
+
+	status = create_vnode(directory,filename,omode,perms,kernel);
+	put_vnode(directory);
+
+	return status;
+}
+
+
+static int
+file_open_entry_ref(fs_id fsID, vnode_id directoryID, const char *name, int omode, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("file_open_entry_ref()\n"));
+
+	// get the vnode matching the entry_ref
+	status = entry_ref_to_vnode(fsID, directoryID, name, &vnode);
+	if (status < B_OK)
+		return status;
+
+	status = open_vnode(vnode, omode, kernel);
+	if (status < B_OK)
+		put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+file_open(char *path, int omode, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode = NULL;
+	int status;
+	int fd;
+
+	FUNCTION(("file_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
+
+	// get the vnode matching the path
+	status = path_to_vnode(path, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	status = open_vnode(vnode, omode, kernel);
+	if (status < B_OK)
+		put_vnode(vnode);
+		
+	return status;
+}
+
+
+static int
+file_close(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("file_close(descriptor = %p)\n",descriptor));
+	
+	if (FS_CALL(vnode,fs_close))
+		return FS_CALL(vnode,fs_close)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+
+	return B_OK;
+}
+
+
+static ssize_t
+file_read(struct file_descriptor *descriptor, void *buffer, off_t pos, size_t *length)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("file_read: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
+	return FS_CALL(vnode,fs_read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
+}
+
+
+static ssize_t
+file_write(struct file_descriptor *descriptor, const void *buffer, off_t pos, size_t *length)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("file_write: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
+	return FS_CALL(vnode,fs_write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
+}
+
+
+static off_t
+file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("file_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
+	return FS_CALL(vnode,fs_seek)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
+}
+
+
+static int
+dir_create(char *path, int perms, bool kernel)
+{
+	char filename[SYS_MAX_NAME_LEN];
+	struct vnode *vnode;
+	vnode_id vnid;
+	int status;
+
+	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
+
+	status = path_to_dir_vnode(path, &vnode, filename, kernel);
+	if (status < 0)
+		return status;
+
+	if (FS_CALL(vnode,fs_create_dir))
+		status = FS_CALL(vnode,fs_create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &vnid);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
+	return status;
+}
+
+
+static int
+dir_open_node_ref(fs_id fsID, vnode_id directoryID, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("dir_open_entry_ref()\n"));
+
+	// get the vnode matching the node_ref
+	status = get_vnode(fsID, directoryID, &vnode, false);
+	if (status < B_OK)
+		return status;
+
+	status = open_dir_vnode(vnode, kernel);
+	if (status < B_OK)
+		put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+dir_open_entry_ref(fs_id fsID, vnode_id parentID, const char *name, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("dir_open_entry_ref()\n"));
+
+	// get the vnode matching the entry_ref
+	status = entry_ref_to_vnode(fsID, parentID, name, &vnode);
+	if (status < B_OK)
+		return status;
+
+	status = open_dir_vnode(vnode, kernel);
+	if (status < B_OK)
+		put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+dir_open(char *path, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("dir_open: path = '%s', kernel %d\n", path, kernel));
+
+	status = path_to_vnode(path, &vnode, kernel);
+	if (status < 0)
+		return status;
+
+	status = open_dir_vnode(vnode,kernel);
+	if (status < 0)
+		put_vnode(vnode);
+
+	return status;
+}
+
+
+static status_t 
+dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (FS_CALL(vnode,fs_read_dir))
+		return FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,buffer,bufferSize,_count);
+	
+	return EOPNOTSUPP;
+}
+
+
+static status_t 
+dir_rewind(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (FS_CALL(vnode,fs_rewind_dir))
+		return FS_CALL(vnode,fs_rewind_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+
+	return EOPNOTSUPP;
+}
+
+
+static int
+dir_close(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("dir_close(descriptor = %p)\n",descriptor));
+	
+	if (FS_CALL(vnode,fs_close_dir))
+		return FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+
+	return B_OK;
+}
+
+
+static int
+common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
+	return FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+}
+
+
+static int
+common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t length)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (FS_CALL(vnode,fs_ioctl))
+		return FS_CALL(vnode,fs_ioctl)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,op,buffer,length);
+
+	return EOPNOTSUPP;
+}
+
+
+static int
+common_sync(int fd, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("vfs_fsync: entry. fd %d kernel %d\n", fd, kernel));
+
+	descriptor = get_fd_and_vnode(fd, kernel, &vnode);
+	if (descriptor == NULL)
+		return ERR_INVALID_HANDLE;
+
+	if (FS_CALL(vnode,fs_fsync) != NULL)
+		status = FS_CALL(vnode,fs_fsync)(vnode->mount->cookie, vnode->private_node);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+static int
+common_unlink(char *path, bool kernel)
+{
+	char filename[SYS_MAX_NAME_LEN];
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("vfs_unlink: path '%s', kernel %d\n", path, kernel));
+
+	status = path_to_dir_vnode(path, &vnode, filename, kernel);
+	if (status < 0)
+		return status;
+
+	if (FS_CALL(vnode,fs_unlink) != NULL)
+		status = FS_CALL(vnode,fs_unlink)(vnode->mount->cookie, vnode->private_node, filename);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+common_rename(char *path, char *newpath, bool kernel)
+{
+	struct vnode *vnode1, *vnode2;
+	char filename1[SYS_MAX_NAME_LEN];
+	char filename2[SYS_MAX_NAME_LEN];
+	int status;
+
+	status = path_to_dir_vnode(path, &vnode1, filename1, kernel);
+	if (status < 0)
+		goto err;
+
+	status = path_to_dir_vnode(newpath, &vnode2, filename2, kernel);
+	if (status < 0)
+		goto err1;
+
+	if (vnode1->fs_id != vnode2->fs_id) {
+		status = ERR_VFS_CROSS_FS_RENAME;
+		goto err2;
+	}
+
+	if (FS_CALL(vnode1,fs_rename) != NULL)
+		status = FS_CALL(vnode1,fs_rename)(vnode1->mount->cookie, vnode1->private_node, filename1, vnode2->private_node, filename2);
+	else
+		status = EROFS;
+
+err2:
+	put_vnode(vnode2);
+err1:
+	put_vnode(vnode1);
+err:
+	return status;
+}
+
+
+static int
+common_write_stat(char *path, struct stat *stat, int stat_mask, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("vfs_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, stat_mask, kernel));
+
+	status = path_to_vnode(path, &vnode, kernel);
+	if (status < 0)
+		return status;
+
+	if (FS_CALL(vnode,fs_write_stat))
+		status = FS_CALL(vnode,fs_write_stat)(vnode->mount->cookie, vnode->private_node, stat, stat_mask);
+	else
+		status = EROFS;
+
+	dec_vnode_ref_count(vnode, false);
+
+	return status;
+}
+
+
+//	#pragma mark -
+//	General File System functions
+
+
+static int
+fs_mount(char *path, const char *device, const char *fs_name, void *args, bool kernel)
+{
+	struct fs_mount *mount;
+	int err = 0;
+	struct vnode *covered_vnode = NULL;
+	vnode_id root_id;
+
+	FUNCTION(("vfs_mount: entry. path = '%s', fs_name = '%s'\n", path, fs_name));
+
+	mutex_lock(&vfs_mount_op_mutex);
+
+	mount = (struct fs_mount *)kmalloc(sizeof(struct fs_mount));
+	if (mount == NULL)  {
+		err = ENOMEM;
+		goto err;
+	}
+
+	mount->mount_point = kstrdup(path);
+	if (mount->mount_point == NULL) {
+		err = ENOMEM;
+		goto err1;
+	}
+
+	mount->fs = find_fs(fs_name);
+	if (mount->fs == NULL) {
+		err = ERR_VFS_INVALID_FS;
+		goto err2;
+	}
+
+	recursive_lock_create(&mount->rlock);
+	mount->id = next_fsid++;
+	mount->unmounting = false;
+
+	if (!root_vnode) {
+		// we haven't mounted anything yet
+		if (strcmp(path, "/") != 0) {
+			err = ERR_VFS_GENERAL;
+			goto err3;
+		}
+
+		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
+		if (err < 0) {
+			err = ERR_VFS_GENERAL;
+			goto err3;
+		}
+
+		mount->covers_vnode = NULL; // this is the root mount
+	} else {
+		err = path_to_vnode(path,&covered_vnode,kernel);
+		if (err < 0)
+			goto err2;
+
+		if (!covered_vnode) {
+			err = ERR_VFS_GENERAL;
+			goto err2;
+		}
+
+		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
+
+		if ((covered_vnode != root_vnode) && (covered_vnode->mount->root_vnode == covered_vnode)){
+			err = ERR_VFS_ALREADY_MOUNTPOINT;
+			goto err2;
+		}
+
+		mount->covers_vnode = covered_vnode;
+
+		// mount it
+		err = mount->fs->calls->fs_mount(&mount->cookie, mount->id, device, NULL, &root_id);
+		if (err < 0)
+			goto err4;
+	}
+
+	mutex_lock(&vfs_mount_mutex);
+
+	// insert mount struct into list
+	hash_insert(mounts_table, mount);
+
+	mutex_unlock(&vfs_mount_mutex);
+
+	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
+	if (err < 0)
+		goto err5;
+
+	// XXX may be a race here
+	if (mount->covers_vnode)
+		mount->covers_vnode->covered_by = mount->root_vnode;
+
+	if (!root_vnode)
+		root_vnode = mount->root_vnode;
+
+	mutex_unlock(&vfs_mount_op_mutex);
+
+	return 0;
+
+err5:
+	mount->fs->calls->fs_unmount(mount->cookie);
+err4:
+	if (mount->covers_vnode)
+		dec_vnode_ref_count(mount->covers_vnode, false);
+err3:
+	recursive_lock_destroy(&mount->rlock);
+err2:
+	kfree(mount->mount_point);
+err1:
+	kfree(mount);
+err:
+	mutex_unlock(&vfs_mount_op_mutex);
+
+	return err;
+}
+
+
+static int
+fs_unmount(char *path, bool kernel)
+{
+	struct vnode *v;
+	struct fs_mount *mount;
+	int err;
+
+	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
+
+	err = path_to_vnode(path, &v, kernel);
+	if (err < 0) {
+		err = ERR_VFS_PATH_NOT_FOUND;
+		goto err;
+	}
+
+	mutex_lock(&vfs_mount_op_mutex);
+
+	mount = find_mount(v->fs_id);
+	if (!mount)
+		panic("vfs_unmount: fsid_to_mount failed on root vnode @%p of mount\n", v);
+
+	if (mount->root_vnode != v) {
+		// not mountpoint
+		dec_vnode_ref_count(v, false);
+		err = ERR_VFS_NOT_MOUNTPOINT;
+		goto err1;
+	}
+
+	/* grab the vnode master mutex to keep someone from creating a vnode
+	while we're figuring out if we can continue */
+	mutex_lock(&vfs_vnode_mutex);
+
+	/* simulate the root vnode having it's refcount decremented */
+	mount->root_vnode->ref_count -= 2;
+
+	/* cycle through the list of vnodes associated with this mount and
+	make sure all of them are not busy or have refs on them */
+	err = 0;
+	for (v = mount->vnodes_head; v; v = v->mount_next) {
+		if (v->busy || v->ref_count != 0) {
+			mount->root_vnode->ref_count += 2;
+			mutex_unlock(&vfs_vnode_mutex);
+			dec_vnode_ref_count(mount->root_vnode, false);
+			err = EBUSY;
+			goto err1;
+		}
+	}
+
+	/* we can safely continue, mark all of the vnodes busy and this mount
+	structure in unmounting state */
+	for (v = mount->vnodes_head; v; v = v->mount_next)
+		if (v != mount->root_vnode)
+			v->busy = true;
+	mount->unmounting = true;
+
+	mutex_unlock(&vfs_vnode_mutex);
+
+	mount->covers_vnode->covered_by = NULL;
+	dec_vnode_ref_count(mount->covers_vnode, false);
+
+	/* release the ref on the root vnode twice */
+	dec_vnode_ref_count(mount->root_vnode, false);
+	dec_vnode_ref_count(mount->root_vnode, false);
+
+	// XXX when full vnode cache in place, will need to force
+	// a putvnode/removevnode here
+
+	/* remove the mount structure from the hash table */
+	mutex_lock(&vfs_mount_mutex);
+	hash_remove(mounts_table, mount);
+	mutex_unlock(&vfs_mount_mutex);
+
+	mutex_unlock(&vfs_mount_op_mutex);
+
+	mount->fs->calls->fs_unmount(mount->cookie);
+
+	kfree(mount->mount_point);
+	kfree(mount);
+
+	return 0;
+
+err1:
+	mutex_unlock(&vfs_mount_op_mutex);
+err:
+	return err;
+}
+
+
+static int
+fs_sync(void)
+{
+	struct hash_iterator iter;
+	struct fs_mount *mount;
+
+	FUNCTION(("vfs_sync: entry.\n"));
+
+	/* cycle through and call sync on each mounted fs */
+	mutex_lock(&vfs_mount_op_mutex);
+	mutex_lock(&vfs_mount_mutex);
+
+	hash_open(mounts_table, &iter);
+	while ((mount = hash_next(mounts_table, &iter))) {
+		mount->fs->calls->fs_sync(mount->cookie);
+	}
+	hash_close(mounts_table, &iter, false);
+
+	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&vfs_mount_op_mutex);
+
+	return 0;
+}
+
+
+static int
+get_cwd(char *buffer, size_t size, bool kernel)
+{
+	// Get current working directory from io context
+	struct io_context *context = get_current_io_context(kernel);
+	int status;
+
+	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
+
+	mutex_lock(&context->io_mutex);
+
+	if (context->cwd)
+		status = dir_vnode_to_path(context->cwd, buffer, size);
+	else
+		status = B_ERROR;
+
+	mutex_unlock(&context->io_mutex);
+	return status; 
+}
+
+
+static int
+set_cwd(char *path, bool kernel)
+{
+	struct io_context *context;
+	struct vnode *vnode = NULL;
+	struct vnode *oldDirectory;
+	struct stat stat;
+	int rc;
+
+	FUNCTION(("vfs_set_cwd: path=\'%s\'\n", path));
+
+	// Get vnode for passed path, and bail if it failed
+	rc = path_to_vnode(path, &vnode, kernel);
+	if (rc < 0)
+		return rc;
+
+	rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+	if (rc < 0)
+		goto err;
+
+	if (!S_ISDIR(stat.st_mode)) {
+		// nope, can't cwd to here
+		rc = ERR_VFS_WRONG_STREAM_TYPE;
+		goto err;
+	}
+
+	// Get current io context and lock
+	context = get_current_io_context(kernel);
+	mutex_lock(&context->io_mutex);
+
+	// save the old current working directory first
+	oldDirectory = context->cwd;
+	context->cwd = vnode;
+
+	mutex_unlock(&context->io_mutex);
+
+	if (oldDirectory)
+		put_vnode(oldDirectory);
+
+	return B_NO_ERROR;
+
+err:
+	put_vnode(vnode);
+	return rc;
+}
+
+
+//	#pragma mark -
+//	Calls from within the kernel
+
+
+int
+sys_mount(const char *path, const char *device, const char *fs_name, void *args)
+{
+	char buf[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buf, path, SYS_MAX_PATH_LEN);
+	buf[SYS_MAX_PATH_LEN] = 0;
+
+	return fs_mount(buf, device, fs_name, args, true);
+}
+
+
+int
+sys_unmount(const char *path)
+{
+	char buf[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buf, path, SYS_MAX_PATH_LEN);
+	buf[SYS_MAX_PATH_LEN] = 0;
+
+	return fs_unmount(buf, true);
+}
+
+
+int
+sys_sync(void)
+{
+	return fs_sync();
+}
+
+
+int
+sys_open(const char *path, int omode)
+{
+	char buffer[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
+
+	return file_open(buffer, omode, true);
+}
+
+
+int
+sys_open_dir(const char *path)
+{
+	char buffer[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
+
+	return dir_open(buffer, true);
+}
+
+
+int
+sys_fsync(int fd)
+{
+	return common_sync(fd, true);
+}
+
+
+int
+sys_create(const char *path, int omode, int perms)
+{
+	char buffer[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
+
+	return file_create(buffer, omode, perms, true);
+}
+
+
+int
+sys_create_dir(const char *path, int perms)
+{
+	char buffer[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
+
+	return dir_create(buffer, perms, true);
+}
+
+
+int
+sys_unlink(const char *path)
+{
+	char buf[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buf, path, SYS_MAX_PATH_LEN);
+	buf[SYS_MAX_PATH_LEN] = 0;
+
+	return common_unlink(buf, true);
+}
+
+
+int
+sys_rename(const char *oldpath, const char *newpath)
+{
+	char buf1[SYS_MAX_PATH_LEN+1];
+	char buf2[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buf1, oldpath, SYS_MAX_PATH_LEN);
+	buf1[SYS_MAX_PATH_LEN] = 0;
+
+	strncpy(buf2, newpath, SYS_MAX_PATH_LEN);
+	buf2[SYS_MAX_PATH_LEN] = 0;
+
+	return common_rename(buf1, buf2, true);
+}
+
+
+int
+sys_read_stat(const char *path, struct stat *stat)
+{
+	char buf[SYS_MAX_PATH_LEN+1];
+	struct vnode *vnode;
+	int status;
+
+	strncpy(buf, path, SYS_MAX_PATH_LEN);
+	buf[SYS_MAX_PATH_LEN] = 0;
+
+	FUNCTION(("sys_read_stat: path '%s', stat %p,\n", path, stat));
+
+	status = path_to_vnode(buf, &vnode, true);
+	if (status < 0)
+		return status;
+
+	status = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+
+	dec_vnode_ref_count(vnode, false);
+	return status;
+}
+
+
+int
+sys_write_stat(const char *path, struct stat *stat, int stat_mask)
+{
+	char buf[SYS_MAX_PATH_LEN+1];
+
+	strncpy(buf, path, SYS_MAX_PATH_LEN);
+	buf[SYS_MAX_PATH_LEN] = 0;
+
+	return common_write_stat(buf, stat, stat_mask, true);
+}
+
+
+char *
+sys_getcwd(char *buf, size_t size)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	PRINT(("sys_getcwd: buf %p, %ld\n", buf, size));
+
+	// Call vfs to get current working directory
+	rc = get_cwd(path,SYS_MAX_PATH_LEN-1,true);
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	// Copy back the result
+	strncpy(buf,path,size);
+
+	// Return either NULL or the buffer address to indicate failure or success
+	return (rc < 0) ? NULL : buf;
+}
+
+
+int
+sys_setcwd(const char *_path)
+{
+	char path[SYS_MAX_PATH_LEN];
+
+	PRINT(("sys_setcwd: path = %s\n", _path));
+
+	// Copy new path to kernel space
+	strncpy(path, _path, SYS_MAX_PATH_LEN-1);
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	// Call vfs to set new working directory
+	return set_cwd(path,true);
+}
+
+
+//	#pragma mark -
+//	Calls from userland (with extra address checks)
+
+
+int
+user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
+{
+	char path[SYS_MAX_PATH_LEN+1];
+	char fs_name[SYS_MAX_OS_NAME_LEN+1];
+	char device[SYS_MAX_PATH_LEN+1];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	if ((addr)ufs_name >= KERNEL_BASE && (addr)ufs_name <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	if (udevice != NULL && (addr)udevice >= KERNEL_BASE && (addr)udevice <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN] = 0;
+
+	rc = user_strncpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN);
+	if (rc < 0)
+		return rc;
+	fs_name[SYS_MAX_OS_NAME_LEN] = 0;
+
+	if (udevice) {
+		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN);
+		if (rc < 0)
+			return rc;
+		device[SYS_MAX_PATH_LEN] = 0;
+	} else
+		device[0] = 0;
+
+	return fs_mount(path, device, fs_name, args, false);
+}
+
+
+int
+user_unmount(const char *upath)
+{
+	char path[SYS_MAX_PATH_LEN+1];
+	int rc;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN] = 0;
+
+	return fs_unmount(path, false);
+}
+
+
+int
+user_sync(void)
+{
+	return fs_sync();
+}
+
+
+int
+user_open(const char *upath, int omode)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	return file_open(path, omode, false);
+}
+
+
+int
+user_open_dir(const char *upath)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	return dir_open(path, false);
+}
+
+
+int
+user_fsync(int fd)
+{
+	return common_sync(fd, false);
+}
+
+
+int
+user_create(const char *upath, int omode, int perms)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN - 1] = 0;
+
+	return file_create(path, omode, perms, false);
+}
+
+
+int
+user_create_dir(const char *upath, int perms)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN - 1] = 0;
+
+	return dir_create(path, perms, false);
+}
+
+
+int
+user_unlink(const char *upath)
+{
+	char path[SYS_MAX_PATH_LEN+1];
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN] = 0;
+
+	return common_unlink(path, false);
+}
+
+
+int
+user_rename(const char *uoldpath, const char *unewpath)
+{
+	char oldpath[SYS_MAX_PATH_LEN+1];
+	char newpath[SYS_MAX_PATH_LEN+1];
+	int rc;
+
+	if ((addr)uoldpath >= KERNEL_BASE && (addr)uoldpath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	if ((addr)unewpath >= KERNEL_BASE && (addr)unewpath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(oldpath, uoldpath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	oldpath[SYS_MAX_PATH_LEN] = 0;
+
+	rc = user_strncpy(newpath, unewpath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	newpath[SYS_MAX_PATH_LEN] = 0;
+
+	return common_rename(oldpath, newpath, false);
+}
+
+
+int
+user_read_stat(const char *upath, struct stat *ustat)
+{
+	char path[SYS_MAX_PATH_LEN];
+	struct vnode *vnode = NULL;
+	struct stat stat;
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	rc = path_to_vnode(path, &vnode, false);
+	if (rc < 0)
+		return rc;
+
+	if (FS_CALL(vnode,fs_read_stat))
+		rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+
+	put_vnode(vnode);
+
+	if (rc < 0)
+		return rc;
+
+	rc = user_memcpy(ustat, &stat, sizeof(struct stat));
+
+	return rc;
+}
+
+
+int
+user_write_stat(const char *upath, struct stat *ustat, int stat_mask)
+{
+	char path[SYS_MAX_PATH_LEN+1];
+	struct stat stat;
+	int rc;
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (rc < 0)
+		return rc;
+	path[SYS_MAX_PATH_LEN] = 0;
+
+	rc = user_memcpy(&stat, ustat, sizeof(struct stat));
+	if (rc < 0)
+		return rc;
+
+	return common_write_stat(path, &stat, stat_mask, false);
+}
+
+
+int
+user_getcwd(char *buffer, size_t size)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int status;
+
+	PRINT(("user_getcwd: buf %p, %ld\n", buffer, size));
+
+	// Check if userspace address is inside "shared" kernel space
+	if ((addr)buffer >= KERNEL_BASE && (addr)buffer <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	// Call vfs to get current working directory
+	status = get_cwd(path, sizeof(path), false);
+	if (status < 0)
+		return status;
+
+	// Copy back the result
+	if (user_strncpy(buffer, path, size) < 0)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	return status;
+}
+
+
+int
+user_setcwd(const char *upath)
+{
+	char path[SYS_MAX_PATH_LEN];
+	int rc;
+
+	PRINT(("user_setcwd: path = %p\n", upath));
+
+	// Check if userspace address is inside "shared" kernel space
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	// Copy new path to kernel space
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	if (rc < 0)
+		return rc;
+
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	// Call vfs to set new working directory
+	return set_cwd(path,false);
+}
+

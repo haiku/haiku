@@ -162,8 +162,6 @@ int sys_rename(const char *oldpath, const char *newpath);
 int sys_write_stat(const char *path, struct stat *stat, int stat_mask);
 char *sys_getcwd(char *buf, size_t size);
 int sys_setcwd(const char* path);
-int sys_dup(int fd);
-int sys_dup2(int ofd, int nfd);
 
 /* calls the syscall dispatcher should use for user file I/O */
 int user_mount(const char *path, const char *device, const char *fs_name, void *args);
@@ -181,8 +179,6 @@ int user_read_stat(const char *path, struct stat *stat);
 int user_write_stat(const char *path, struct stat *stat, int stat_mask);
 int user_getcwd(char *buf, size_t size);
 int user_setcwd(const char* path);
-int user_dup(int fd);
-int user_dup2(int ofd, int nfd);
 
 /* fd kernel prototypes (implementation located in fd.c) */
 extern ssize_t sys_read(int fd, void *buf, off_t pos, size_t len);
@@ -192,7 +188,8 @@ extern ssize_t sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, ui
 extern status_t sys_rewind_dir(int fd);
 extern int sys_read_stat(const char *path, struct stat *stat);
 extern int sys_close(int fd);
-
+extern int sys_dup(int fd);
+extern int sys_dup2(int ofd, int nfd);
 
 /* fd user prototypes (implementation located in fd.c)  */
 extern ssize_t user_read(int fd, void *buf, off_t pos, size_t len);
@@ -202,6 +199,8 @@ extern ssize_t user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, u
 extern status_t user_rewind_dir(int fd);
 extern int user_fstat(int, struct stat *);
 extern int user_close(int fd);
+extern int user_dup(int fd);
+extern int user_dup2(int ofd, int nfd);
 
 /* vfs entry points... */
 
@@ -209,5 +208,4 @@ extern int user_close(int fd);
 }
 #endif 
 
-#endif
-
+#endif	/* _KERNEL_VFS_H */
