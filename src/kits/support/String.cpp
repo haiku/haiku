@@ -42,6 +42,10 @@
 #define ENABLE_INLINES 0 // Set this to 1 to make some private methods inline
 
 
+// define proper names for case-option of _DoReplace()
+#define KEEP_CASE false
+#define IGNORE_CASE true
+
 /*!
 	\class BString
 	\brief String class supporting common string operations
@@ -771,11 +775,7 @@ BString::RemoveLast(const BString &string)
 BString&
 BString::RemoveAll(const BString &string)
 {
-	int32 pos = B_ERROR;
-	while ((pos = _ShortFindAfter(string.String(), string.Length())) >= 0)
-		_ShrinkAtBy(pos, string.Length());
-
-	return *this;
+	return _DoReplace( string.String(), "", 0x7FFFFFFF, 0, KEEP_CASE);
 }
 
 
@@ -824,14 +824,7 @@ BString::RemoveLast(const char *str)
 BString&
 BString::RemoveAll(const char *str)
 {
-	if (str != NULL) 
-	{
-		int32 pos;
-		int32 len = strlen(str);
-		while ((pos = _ShortFindAfter(str, len)) >= 0)			
-			_ShrinkAtBy(pos, len);
-	}
-	return *this;
+	return _DoReplace( str, "", 0x7FFFFFFF, 0, KEEP_CASE);
 }
 
 
@@ -843,11 +836,24 @@ BString::RemoveAll(const char *str)
 BString&
 BString::RemoveSet(const char *setOfCharsToRemove)
 {
-	if (setOfCharsToRemove != NULL) 
-	{
-		int32 pos;
-		while ((pos = strcspn(String(), setOfCharsToRemove)) < Length())
-			_privateData = _ShrinkAtBy(pos, 1);
+	char* buf;
+	if (setOfCharsToRemove && (buf=LockBuffer( Length())) != NULL) {
+		char* oldPos = buf;
+		char* newPos = buf;
+		int32 len;
+		int32 lenToGo = Length();
+		while( (len = strcspn( oldPos, setOfCharsToRemove)) < lenToGo) {
+			if (oldPos>newPos)
+				memmove( newPos, oldPos, len);
+			newPos += len++;
+			oldPos += len;
+			lenToGo -= len;
+		}
+		if (oldPos>newPos)
+			memmove( newPos, oldPos, lenToGo);
+		newPos += lenToGo;
+		*newPos = 0;
+		UnlockBuffer( newPos-buf);
 	}		
 	return *this;
 }
@@ -1336,26 +1342,7 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 BString&
 BString::ReplaceFirst(const char *replaceThis, const char *withThis)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);	
-	int32 pos = _ShortFindAfter(replaceThis, firstStringLength);
-	
-	if (pos >= 0) 
-	{
-		int32 len = (withThis ? strlen(withThis) : 0);
-		int32 difference = len - firstStringLength;
-		
-		if (difference > 0)
-			_OpenAtBy(pos, difference);
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		memcpy(_privateData + pos, withThis, len);
-	}
-		
-	return *this;
+	return _DoReplace( replaceThis, withThis, 1, 0, KEEP_CASE);
 }
 
 
@@ -1388,57 +1375,14 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 BString&
 BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - firstStringLength;
-			
-	for (int32 pos;;) 
-	{
-		pos = _FindAfter(replaceThis, fromOffset, firstStringLength);
-		if (pos < 0)
-			break;
-		
-		if (difference > 0)
-			_OpenAtBy(pos, difference);			
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		fromOffset = pos + difference;
-		memcpy(_privateData + pos, withThis, len);
-	}
-
-	return *this;
+	return _DoReplace( replaceThis, withThis, 0x7FFFFFFF, fromOffset, KEEP_CASE);
 }
 
 
 BString&
 BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - firstStringLength;
-	
-	for (int32 pos; maxReplaceCount > 0; maxReplaceCount--) 
-	{ 	
-		pos = _FindAfter(replaceThis, fromOffset, firstStringLength);
-		if (pos < 0)
-			break;
-
-		if (difference > 0)
-			_OpenAtBy(pos, difference);			
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		memcpy(_privateData + pos, withThis, len);
-		fromOffset = pos + difference;
-	}
-	return *this;
+	return _DoReplace( replaceThis, withThis, maxReplaceCount, fromOffset, KEEP_CASE);
 }
 
 
@@ -1509,26 +1453,7 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 
 BString&
 BString::IReplaceFirst(const char *replaceThis, const char *withThis)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);	
-	int32 pos = _IFindAfter(replaceThis, 0, firstStringLength);
-	
-	if (pos >= 0) 
-	{
-		int32 len = (withThis ? strlen(withThis) : 0);
-		int32 difference = len - firstStringLength;
-		
-		if (difference > 0)
-			_OpenAtBy(pos, difference);
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		memcpy(_privateData + pos, withThis, len);
-	}
-		
-	return *this;
+	return _DoReplace( replaceThis, withThis, 1, 0, IGNORE_CASE);
 }
 
 
@@ -1561,57 +1486,14 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 BString&
 BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - firstStringLength;
-	
-	for (int32 pos;;) 
-	{
-		pos = _IFindAfter(replaceThis, fromOffset, firstStringLength);
-		if (pos < 0)
-			break;
-
-		if (difference > 0)
-			_OpenAtBy(pos, difference);
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		memcpy(_privateData + pos, withThis, len);
-		fromOffset = pos + difference;
-	}
-
-	return *this;
+	return _DoReplace( replaceThis, withThis, 0x7FFFFFFF, fromOffset, IGNORE_CASE);
 }
 
 
 BString&
 BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	if (replaceThis == NULL)
-		return *this;
-	
-	int32 firstStringLength = strlen(replaceThis);	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - firstStringLength;
-	
-	for (int32 pos; maxReplaceCount > 0; maxReplaceCount--)
-	{ 	
-		pos = _IFindAfter(replaceThis, fromOffset, firstStringLength);
-		if (pos < 0)
-			break;
-
-		if (difference > 0)
-			_OpenAtBy(pos, difference);
-		else if (difference < 0)
-			_ShrinkAtBy(pos, -difference);
-		
-		memcpy(_privateData + pos, withThis, len);
-		fromOffset = pos + difference;
-	}
-	return *this;
+	return _DoReplace( replaceThis, withThis, maxReplaceCount, fromOffset, IGNORE_CASE);
 }
 
 
@@ -1708,7 +1590,7 @@ BString::UnlockBuffer(int32 length)
 	int32 len = length;
 
 	if (len < 0)
-		len = strlen(_privateData);
+		len = (_privateData == NULL) ? 0 : strlen(_privateData);
 
 	if (len != Length())
 		_GrowBy(len - Length());
@@ -2179,6 +2061,76 @@ BString::_IFindBefore(const char *str, int32 offset, int32 strlen) const
 }
 
 
+/*!
+	BStringOBuf is helper classed used by _DoReplace()
+*/
+class BStringOBuf
+{
+
+public:
+	BStringOBuf( uint32 startLen, float growFactor=1.5);
+	~BStringOBuf();
+
+	// methods to write into buffer (always append):
+	uint32 Write( const char* data, uint32 len);
+	
+	// getters:
+	BString& TheString();
+	inline bool HasData() const 			{ return mBuf!=NULL; }
+
+private:
+	bool GrowBufferToFit( uint32 len);
+
+	uint32 mBufLen;
+	float mGrowFactor;
+	char* mBuf;
+	uint32 mCurrPos;
+	BString mStr;
+
+	// Hide copy-constructor and assignment:
+	BStringOBuf( const BStringOBuf&);
+	BStringOBuf operator=( const BStringOBuf&);
+};
+
+
+BString&
+BString::_DoReplace(const char *findThis, const char *replaceWith, int32 maxReplaceCount, 
+						  int32 fromOffset,	bool ignoreCase)
+{
+	if (findThis == NULL || maxReplaceCount <= 0 || fromOffset < 0 || fromOffset >= Length())
+		return *this;
+	
+	typedef int32 (BString::*TFindMethod)(const char *, int32, int32) const;
+	TFindMethod findMethod = ignoreCase
+		? &BString::_IFindAfter
+		: &BString::_FindAfter;
+	int32 findLen = strlen( findThis);
+	int32 replaceLen = replaceWith ? strlen( replaceWith) : 0;
+	BStringOBuf tempIO( (int32)max_c( max_c( findLen, 128), Length()*1.2), 1.2);
+	int32 lastSrcPos = fromOffset;
+	int32 len;
+	for(  int32 srcPos=0; 
+			maxReplaceCount>0 && (srcPos = (this->*findMethod)( findThis, lastSrcPos, findLen))!=B_ERROR; 
+			maxReplaceCount-- ) {
+		len = srcPos-lastSrcPos;
+		if (fromOffset && !tempIO.HasData())
+			tempIO.Write( String(), fromOffset);
+		tempIO.Write( String()+lastSrcPos, len);
+		tempIO.Write( replaceWith, replaceLen);
+		lastSrcPos = srcPos+findLen;
+	}
+	if (tempIO.HasData()) {
+		// only copy remainder if we have actually changed anything
+		if ((len = Length()-lastSrcPos)!=0) {
+			if (fromOffset && !tempIO.HasData())
+				tempIO.Write( String(), fromOffset);
+			tempIO.Write( String()+lastSrcPos, len);
+		}
+		Adopt( tempIO.TheString());
+	}
+	return *this;
+}
+
 #if ENABLE_INLINES
 inline
 #endif
@@ -2234,3 +2186,61 @@ ICompare(const BString *string1, const BString *string2)
 {
 	return strcasecmp(string1->String(), string2->String());
 }
+
+
+/*----- Implementation of BStringOBuf ------------------------------*/
+BStringOBuf::BStringOBuf(uint32 startLen, float growFactor)
+	:mBufLen(startLen),
+	mGrowFactor(max_c((float)1.0, growFactor)),
+	mBuf(NULL),
+	mCurrPos(0)
+{
+}
+
+
+BStringOBuf::~BStringOBuf() 
+{
+	if (mBuf)
+		mStr.UnlockBuffer(mCurrPos);
+}
+
+
+bool
+BStringOBuf::GrowBufferToFit(uint32 len) 
+{
+	if (!mBuf || mCurrPos+len > mBufLen) {
+		if (mBuf) {
+			mStr.UnlockBuffer(mBufLen);
+			mBufLen = (uint32)max_c(mGrowFactor*mBufLen, mGrowFactor*(mCurrPos+len));
+		} else
+			mBufLen = (uint32)max_c(mBufLen, mCurrPos+len);
+		mBuf = mStr.LockBuffer(mBufLen);
+		if (!mBuf)
+			return false;
+	}
+	return true;
+}
+
+
+uint32
+BStringOBuf::Write(const char* data, uint32 len)
+{
+	if (!len || !GrowBufferToFit( len))
+		return 0;
+	memcpy( mBuf+mCurrPos, data, len);
+	mCurrPos += len;
+	return len;
+}
+
+
+BString&
+BStringOBuf::TheString()
+{
+	if (mBuf) {
+		mBuf[mCurrPos] = '\0';
+		mStr.UnlockBuffer( mCurrPos);
+		mBuf = NULL;
+	}
+	return mStr;
+}
+
