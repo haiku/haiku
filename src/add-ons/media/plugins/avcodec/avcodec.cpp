@@ -260,29 +260,16 @@ status_t avCodec::Setup(media_format *input_format, const void *in_info, int32 i
 					return B_ERROR;
 				}
 				
-//				ffc->codec_id = gCodecTable[i].id;
-
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY) {
 					const wave_format_ex *wfmt_data = (const wave_format_ex *)input_format->MetaData();
 					int wfmt_size = input_format->MetaDataSize();
 					if (wfmt_data && wfmt_size) {
 						fBlockAlign = wfmt_data->block_align;
 						fExtraDataSize = wfmt_data->extra_size;
-						printf("############# fExtraDataSize %d\n", fExtraDataSize);
-						printf("############# fBlockAlign %d\n", fBlockAlign);
-						printf("############# wfmt_size %d\n", wfmt_size);
-						printf("############# wave_format_ex %ld\n", sizeof(wave_format_ex));
 						if (fExtraDataSize) {
 							fExtraData = new char [fExtraDataSize];
 							memcpy(fExtraData, wfmt_data + 1, fExtraDataSize);
-
-							uint8 *p = (uint8 *)fExtraData;
-							printf("extra_data: %d: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-								fExtraDataSize, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
 						}
-//						static const unsigned char wma_extradata[6] = { 0x00, 0x04, 0x00, 0x00, 0x00, 0x00 };
-//						fExtraData = (void *)wma_extradata;
-//						fExtraDataSize = 6;
 					}
 				}
 
@@ -354,23 +341,15 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 		ffc->bit_rate = (int) fInputFormat.u.encoded_audio.bit_rate;
 		ffc->sample_rate = (int) fInputFormat.u.encoded_audio.output.frame_rate;
 		ffc->channels = fInputFormat.u.encoded_audio.output.channel_count;
-
 		ffc->block_align = fBlockAlign;
 		ffc->extradata = fExtraData;
 		ffc->extradata_size = fExtraDataSize;
 
+		printf("bit_rate %d, sample_rate %d, channels %d, block_align %d, extradata_size %d\n",
+			ffc->bit_rate, ffc->sample_rate, ffc->channels, ffc->block_align, ffc->extradata_size);
+
 		if (avcodec_open(ffc, fCodec) >= 0)
 			fCodecInitDone = true;
-
-		if (ffc->codec_id == CODEC_ID_WMAV1) {
-			printf("########################### WMA1\n");
-		}
-		if (ffc->codec_id == CODEC_ID_WMAV2) {
-			printf("########################### WMA2\n");
-		}
-		if (ffc->codec_id == CODEC_ID_MP2) {
-			printf("########################### MP3\n");
-		}
 
 		PRINT(("audio: bit_rate = %d, sample_rate = %d, chans = %d\n", ffc->bit_rate, ffc->sample_rate, ffc->channels));
 
@@ -525,8 +504,8 @@ status_t avCodec::Decode(void *out_buffer, int64 *out_frameCount, media_header *
 					len = 0;
 					fChunkBufferOffset = 0;
 					fChunkBufferSize = 0;
-				} else
-					printf("audio decode: len %d, out_size %d\n", len, out_size);
+				}
+//				else printf("audio decode: len %d, out_size %d\n", len, out_size);
 				fChunkBufferOffset += len;
 				fChunkBufferSize -= len;
 				fOutputBufferOffset = 0;
