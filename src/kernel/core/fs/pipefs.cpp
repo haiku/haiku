@@ -165,6 +165,15 @@ struct dir_cookie {
 	dir_cookie		*next;
 	dir_cookie		*prev;
 	Inode			*current;
+	int				state;	// iteration state
+};
+
+// directory iteration states
+enum {
+	ITERATION_STATE_DOT		= 0,
+	ITERATION_STATE_DOT_DOT	= 1,
+	ITERATION_STATE_OTHERS	= 2,
+	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
 struct file_cookie {
@@ -1100,6 +1109,7 @@ pipefs_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
 	volume->Lock();
 
 	cookie->current = volume->FirstEntry();
+	cookie->state = ITERATION_STATE_BEGIN;
 	volume->InsertCookie(cookie);
 
 	volume->Unlock();
@@ -1115,6 +1125,7 @@ pipefs_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
 	status_t status = 0;
 
 	TRACE(("pipefs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _node, _cookie, dirent, bufferSize,_num));
@@ -1125,7 +1136,34 @@ pipefs_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 	volume->Lock();
 
 	dir_cookie *cookie = (dir_cookie *)_cookie;
-	if (cookie->current == NULL) {
+	Inode *childNode = NULL;
+	const char *name = NULL;
+	Inode *nextChildNode = NULL;
+	int nextState = cookie->state;
+
+	switch (cookie->state) {
+		case ITERATION_STATE_DOT:
+			childNode = inode;
+			name = ".";
+			nextChildNode = volume->FirstEntry();
+			nextState = cookie->state + 1;
+			break;
+		case ITERATION_STATE_DOT_DOT:
+			childNode = inode; // parent of the root node is the root node
+			name = "..";
+			nextChildNode = volume->FirstEntry();
+			nextState = cookie->state + 1;
+			break;
+		default:
+			childNode = cookie->current;
+			if (childNode) {
+				name = childNode->Name();
+				nextChildNode = childNode->Next();
+			}
+			break;
+	}
+
+	if (!childNode) {
 		// we're at the end of the directory
 		*_num = 0;
 		status = B_OK;
@@ -1133,19 +1171,21 @@ pipefs_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 	}
 
 	dirent->d_dev = volume->ID();
-	dirent->d_ino = cookie->current->ID();
-	dirent->d_reclen = strlen(cookie->current->Name()) + sizeof(struct dirent);
+	dirent->d_ino = inode->ID();
+	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
 
 	if (dirent->d_reclen > bufferSize) {
 		status = ENOBUFS;
 		goto err;
 	}
 
-	status = user_strlcpy(dirent->d_name, cookie->current->Name(), bufferSize);
+	status = user_strlcpy(dirent->d_name, name, bufferSize);
 	if (status < 0)
 		goto err;
 
-	cookie->current = cookie->current->Next();
+	cookie->current = nextChildNode;
+	cookie->state = nextState;
+	status = B_OK;
 
 err:
 	volume->Unlock();
@@ -1162,6 +1202,7 @@ pipefs_rewind_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 	dir_cookie *cookie = (dir_cookie *)_cookie;
 	cookie->current = volume->FirstEntry();
+	cookie->state = ITERATION_STATE_BEGIN;
 
 	volume->Unlock();
 	return B_OK;
