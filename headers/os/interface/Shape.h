@@ -86,12 +86,6 @@ virtual	void			_ReservedShape4();
 		uint32			fBuildingOp;
 		void *			fPrivateData;
 		uint32			reserved[4];
-
-public:
-/*----- Deprecated ---------------*/
-						BShape(BShape &copyFrom);
-		BRect			Bounds();
-		status_t		AddShape(BShape *other);
 };
 
 #endif
