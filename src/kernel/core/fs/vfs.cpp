@@ -762,7 +762,6 @@ restart:
 
 		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
 		if (status < B_OK || vnode->private_node == NULL) {
-			remove_vnode_from_mount_list(vnode, vnode->mount);
 			if (status == B_NO_ERROR)
 				status = B_BAD_VALUE;
 		}
