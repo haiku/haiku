@@ -49,8 +49,8 @@ enum ICH_X_REGISTER_OFFSETS /* add base address to get the PI, PO or MC reg */
 	ICH_REG_X_BDBAR		= 0x00,
 	ICH_REG_X_CIV		= 0x04,
 	ICH_REG_X_LVI		= 0x05,
-	ICH_REG_X_SR		= 0x06,
-	ICH_REG_X_PICB		= 0x08,
+	_ICH_REG_X_SR		= 0x06, /* use GET_REG_X_SR()   macro from config.h */
+	_ICH_REG_X_PICB		= 0x08, /* use GET_REG_X_PICB() macro from config.h */
 	ICH_REG_X_PIV		= 0x0A,
 	ICH_REG_X_CR		= 0x0B
 };

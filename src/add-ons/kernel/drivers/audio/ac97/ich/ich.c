@@ -58,6 +58,7 @@ void 		chan_free_resources(void);
 status_t 	map_io_memory(void);
 status_t 	unmap_io_memory(void);
 int32 		int_thread(void *data);
+void		stop_chan(ich_chan *chan);
 
 #if DEBUG > 2
 void dump_chan(ich_chan *chan)
@@ -100,7 +101,7 @@ void init_chan(ich_chan *chan)
 		chan->buffer[i] = ((char *)chan->buffer_log_base) + (i % BUFFER_COUNT) * BUFFER_SIZE;
 		chan->bd[i] = (ich_bd *) (((char *)chan->bd_log_base) + i * sizeof(ich_bd));	
 		chan->bd[i]->buffer = ((uint32)chan->buffer_phy_base) + (i % BUFFER_COUNT) * BUFFER_SIZE;
-		chan->bd[i]->length = BUFFER_SIZE / config->sample_size;
+		chan->bd[i]->length = BUFFER_SIZE / GET_HW_SAMPLE_SIZE(config);
 		chan->bd[i]->flags = ICH_BDC_FLAG_IOC;
 	}
 	
@@ -128,7 +129,7 @@ void start_chan(ich_chan *chan)
 	chan->played_real_time = 0;
 
 	// step 1: clear status bits
-	ich_reg_write_16(chan->regbase + ICH_REG_X_SR, SR_FIFOE | SR_BCIS | SR_LVBCI); 
+	ich_reg_write_16(chan->regbase + GET_REG_X_SR(config), SR_FIFOE | SR_BCIS | SR_LVBCI); 
 	// step 2: prepare buffer transfer
 	ich_reg_write_8(chan->regbase + ICH_REG_X_LVI, (civ + 28) % ICH_BD_COUNT);
 	// step 3: enable interrupts & busmaster transfer
@@ -137,6 +138,12 @@ void start_chan(ich_chan *chan)
 	chan->running = true;
 }
 
+void stop_chan(ich_chan *chan)
+{
+	ich_reg_write_8(chan->regbase + ICH_REG_X_CR, ich_reg_read_8(chan->regbase + ICH_REG_X_CR) & ~CR_RPBM);
+	chan->running = false;
+	snooze(10000); // 10 ms
+}
 
 void reset_chan(ich_chan *chan)
 {
@@ -175,7 +182,7 @@ bool interrupt_test(void)
 	install_io_interrupt_handler(config->irq, ich_test_int, testresult, 0);
 
 	// clear status bits
-	ich_reg_write_16(chan_po->regbase + ICH_REG_X_SR, SR_FIFOE | SR_BCIS | SR_LVBCI); 
+	ich_reg_write_16(chan_po->regbase + GET_REG_X_SR(config), SR_FIFOE | SR_BCIS | SR_LVBCI); 
 	// start transfer of 1 buffer
 	ich_reg_write_8(chan_po->regbase + ICH_REG_X_LVI, (ich_reg_read_8(chan_po->regbase + ICH_REG_X_LVI) + 1) % ICH_BD_COUNT);
 	// enable interrupts & busmaster transfer
@@ -322,15 +329,15 @@ dump_hardware_regs()
 	LOG(("PI ICH_REG_X_BDBAR = %#x\n",ich_reg_read_32(ICH_REG_X_BDBAR + ICH_REG_PI_BASE)));
 	LOG(("PI ICH_REG_X_CIV = %#x\n",ich_reg_read_8(ICH_REG_X_CIV + ICH_REG_PI_BASE)));
 	LOG(("PI ICH_REG_X_LVI = %#x\n",ich_reg_read_8(ICH_REG_X_LVI + ICH_REG_PI_BASE)));
-	LOG(("PI ICH_REG_X_SR = %#x\n",ich_reg_read_16(ICH_REG_X_SR + ICH_REG_PI_BASE)));
-	LOG(("PI ICH_REG_X_PICB = %#x\n",ich_reg_read_16(ICH_REG_X_PICB + ICH_REG_PI_BASE)));
+	LOG(("PI     REG_X_SR = %#x\n",ich_reg_read_16(GET_REG_X_SR(config) + ICH_REG_PI_BASE)));
+	LOG(("PI     REG_X_PICB = %#x\n",ich_reg_read_16(GET_REG_X_PICB(config) + ICH_REG_PI_BASE)));
 	LOG(("PI ICH_REG_X_PIV = %#x\n",ich_reg_read_8(ICH_REG_X_PIV + ICH_REG_PI_BASE)));
 	LOG(("PI ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PI_BASE)));
 	LOG(("PO ICH_REG_X_BDBAR = %#x\n",ich_reg_read_32(ICH_REG_X_BDBAR + ICH_REG_PO_BASE)));
 	LOG(("PO ICH_REG_X_CIV = %#x\n",ich_reg_read_8(ICH_REG_X_CIV + ICH_REG_PO_BASE)));
 	LOG(("PO ICH_REG_X_LVI = %#x\n",ich_reg_read_8(ICH_REG_X_LVI + ICH_REG_PO_BASE)));
-	LOG(("PO ICH_REG_X_SR = %#x\n",ich_reg_read_16(ICH_REG_X_SR + ICH_REG_PO_BASE)));
-	LOG(("PO ICH_REG_X_PICB = %#x\n",ich_reg_read_16(ICH_REG_X_PICB + ICH_REG_PO_BASE)));
+	LOG(("PO     REG_X_SR = %#x\n",ich_reg_read_16(GET_REG_X_SR(config) + ICH_REG_PO_BASE)));
+	LOG(("PO     REG_X_PICB = %#x\n",ich_reg_read_16(GET_REG_X_PICB(config) + ICH_REG_PO_BASE)));
 	LOG(("PO ICH_REG_X_PIV = %#x\n",ich_reg_read_8(ICH_REG_X_PIV + ICH_REG_PO_BASE)));
 	LOG(("PO ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PO_BASE)));
 }
@@ -359,24 +366,31 @@ ich_clock_get()
 
 	do {
 		civ1 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
-		picb = ich_reg_read_16(ICH_REG_PO_BASE + (config->swap_reg ? ICH_REG_X_SR : ICH_REG_X_PICB));
+		picb = ich_reg_read_16(ICH_REG_PO_BASE + GET_REG_X_PICB(config));
 		civ2 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
 	} while (civ1 != civ2);
 	starttime = system_time();
 	startframe = (civ1 * (BUFFER_SIZE / 4));
-	if (picb < (BUFFER_SIZE / 4))
+	picb = (picb * GET_HW_SAMPLE_SIZE(config)) / 4; /* convert picb into frames */
+	if (picb <= (BUFFER_SIZE / 4))
 		startframe += (BUFFER_SIZE / 4) - picb;
+	else
+		LOG(("wrong picb = %d, max %d\n", picb, BUFFER_SIZE / 4));
 		
-	snooze(100000);
+	snooze(40000);
+	
 	do {
 		civ1 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
-		picb = ich_reg_read_16(ICH_REG_PO_BASE + (config->swap_reg ? ICH_REG_X_SR : ICH_REG_X_PICB));
+		picb = ich_reg_read_16(ICH_REG_PO_BASE + GET_REG_X_PICB(config));
 		civ2 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
 	} while (civ1 != civ2);
 	stoptime = system_time();
 	stopframe = (civ1 * (BUFFER_SIZE / 4));
-	if (picb < (BUFFER_SIZE / 4))
+	picb = (picb * GET_HW_SAMPLE_SIZE(config)) / 4; /* convert picb into frames */
+	if (picb <= (BUFFER_SIZE / 4))
 		stopframe += (BUFFER_SIZE / 4) - picb;
+	else
+		LOG(("wrong picb = %d, max %d\n", picb, BUFFER_SIZE / 4));
 
 	if (stopframe < startframe)
 		stopframe += ICH_BD_COUNT * (BUFFER_SIZE / 4);
@@ -388,9 +402,6 @@ ich_clock_get()
 void
 ich_clock_calibrate()
 {
-	int i, j;
-	#define RATES 20
-	uint32 rates[RATES];
 	uint32 rate;
 
 	if (!ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000)) {
@@ -398,35 +409,18 @@ ich_clock_calibrate()
 		return;
 	}
 
-	if (!chan_po->running)
-		start_chan(chan_po);
+	start_chan(chan_po);
 
-	for (i = 0; i < RATES; i++)
-		rates[i] = ich_clock_get();
-
-//	for (i = 0; i < RATES; i++)
-//		LOG(("ich_clock_calibrate: rate %ld\n", rates[i]));
-//	LOG(("ich_clock_calibrate: =========\n"));
-	
-	for (i = 0; i < RATES; i++) {
-		for (j = 0; j < (RATES - 1); j++) {
-			if (rates[j] > rates[j + 1]) {
-				uint32 temp = rates[j];
-				rates[j] = rates[j + 1];
-				rates[j + 1] = temp;
-			}
+	#if DEBUG > 0
+		{
+			int i;
+			for (i = 0; i < 20; i++)
+				LOG(("ich_clock_calibrate: rate %ld\n", ich_clock_get()));
 		}
-	}
+	#endif
 
-	for (i = 0; i < RATES; i++)
-		LOG(("ich_clock_calibrate: rate %ld\n", rates[i]));
-
-	rate = 0;
-	for (i = 3; i < (RATES - 3); i++)
-		rate += rates[i];
-	rate /= (RATES - 6);
-
-	LOG(("ich_clock_calibrate: finished, rate %ld\n", rate));
+	rate = ich_clock_get();
+	LOG(("ich_clock_calibrate: rate %ld\n", rate));
 
 	if (rate > (44100 - 1000) && rate < (44100 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 44100\n"));
@@ -448,6 +442,8 @@ ich_clock_calibrate()
 		ac97_set_clock(config->ac97, 48000);
 		ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000);
 	}
+
+	stop_chan(chan_po);
 }
 
 status_t
@@ -720,7 +716,7 @@ int32 ich_test_int(void *check)
 	 * pointed to by check to true.
 	 */
 	uint32 sta = ich_reg_read_32(ICH_REG_GLOB_STA);
-	uint16 sr = ich_reg_read_16(chan_po->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR));
+	uint16 sr = ich_reg_read_16(chan_po->regbase + GET_REG_X_SR(config));
 
 	if ((sta & STA_INTMASK) == 0)
 		return B_UNHANDLED_INTERRUPT;
@@ -729,7 +725,7 @@ int32 ich_test_int(void *check)
 		*(bool *)check = true; // notify
 
 	sr &= SR_FIFOE | SR_BCIS | SR_LVBCI;
-	ich_reg_write_16(chan_po->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR),sr);
+	ich_reg_write_16(chan_po->regbase + GET_REG_X_SR(config), sr);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -748,7 +744,7 @@ int32 ich_int(void *unused)
 	}
 	
 	if (sta & STA_POINT) { // pcm-out
-		uint16 sr = ich_reg_read_16(chan_po->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR));
+		uint16 sr = ich_reg_read_16(chan_po->regbase + GET_REG_X_SR(config));
 		sr &= SR_FIFOE | SR_BCIS | SR_LVBCI;
 
 		if (sr & SR_BCIS) { // a buffer completed
@@ -780,11 +776,11 @@ int32 ich_int(void *unused)
 				release_sem_etc(chan_po->buffer_ready_sem,1,B_DO_NOT_RESCHEDULE);
 		}
 
-		ich_reg_write_16(chan_po->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR),sr);
+		ich_reg_write_16(chan_po->regbase + GET_REG_X_SR(config), sr);
 	}
 
 	if (sta & STA_PIINT) { // pcm-in
-		uint16 sr = ich_reg_read_16(chan_pi->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR));
+		uint16 sr = ich_reg_read_16(chan_pi->regbase + GET_REG_X_SR(config));
 		sr &= SR_FIFOE | SR_BCIS | SR_LVBCI;
 
 		if (sr & SR_BCIS) { // a buffer completed
@@ -816,16 +812,16 @@ int32 ich_int(void *unused)
 				release_sem_etc(chan_pi->buffer_ready_sem,1,B_DO_NOT_RESCHEDULE);
 		}
 
-		ich_reg_write_16(chan_pi->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR),sr);
+		ich_reg_write_16(chan_pi->regbase + GET_REG_X_SR(config), sr);
 	}
 
 	if (sta & STA_MINT) { // mic-in
-		uint16 sr = ich_reg_read_16(chan_mc->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR));
+		uint16 sr = ich_reg_read_16(chan_mc->regbase + GET_REG_X_SR(config));
 		sr &= SR_FIFOE | SR_BCIS | SR_LVBCI;
 		if (sr & SR_BCIS) { // a buffer completed
 			release_sem_etc(chan_mc->buffer_ready_sem,1,B_DO_NOT_RESCHEDULE);
 		}
-		ich_reg_write_16(chan_mc->regbase + (config->swap_reg ? ICH_REG_X_PICB : ICH_REG_X_SR),sr);
+		ich_reg_write_16(chan_mc->regbase + GET_REG_X_SR(config), sr);
 	}
 	return B_HANDLED_INTERRUPT;
 }

@@ -241,6 +241,16 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 void
 ac97_detach(ac97_dev *dev)
 {
+	/* Mute everything */
+	ac97_reg_update_bits(dev, AC97_CENTER_LFE_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_SURR_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_MASTER_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_AUX_OUT_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_MONO_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_PCM_OUT_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_CD_VOLUME, 0x8000, 0x8000);
+	ac97_reg_update_bits(dev, AC97_LINE_IN_VOLUME, 0x8000, 0x8000);
+
 	free(dev);
 }
 

@@ -65,9 +65,7 @@ status_t probe_device(void)
 	config->mmbar = 0;
 	config->mbbar = 0;
 	config->irq = 0;
-	config->sample_size = 2;
-	config->swap_reg = false;
-	config->type = 0;
+	config->type = TYPE_DEFAULT;
 	config->log_mmbar = 0;
 	config->log_mbbar = 0;
 	config->area_mmbar = -1;
@@ -94,8 +92,7 @@ status_t probe_device(void)
 			config->type = TYPE_ICH4;
 		} else if (pciinfo->vendor_id == 0x1039 && pciinfo->device_id == 0x7012) { /* verified */
 			config->name = "SiS SI7012";
-			config->swap_reg = true;
-			config->sample_size = 1;
+			config->type = TYPE_SIS7012;
 		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x01B1) {
 			config->name = "NVIDIA nForce (MCP)";
 		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x006A) {
