@@ -50,10 +50,12 @@ class Query {
 		Query(Volume *volume, Expression *expression, uint32 flags);
 		~Query();
 
-		status_t GetNextEntry(struct dirent *,size_t size);
+		status_t Rewind();
+		status_t GetNextEntry(struct dirent *, size_t size);
 
-		void SetLiveMode(port_id port,int32 token);
-		void LiveUpdate(Inode *inode,const char *attribute,int32 type,const uint8 *oldKey,size_t oldLength,const uint8 *newKey,size_t newLength);
+		void SetLiveMode(port_id port, int32 token);
+		void LiveUpdate(Inode *inode, const char *attribute, int32 type,
+			const uint8 *oldKey, size_t oldLength, const uint8 *newKey, size_t newLength);
 
 		Expression *GetExpression() const { return fExpression; }
 

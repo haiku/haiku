@@ -1464,6 +1464,33 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 	fExpression->Root()->CalculateScore(fIndex);
 	fIndex.Unset();
 
+	Rewind();
+
+	if (fFlags & B_LIVE_QUERY)
+		volume->AddQuery(this);
+}
+
+
+Query::~Query()
+{
+	if (fFlags & B_LIVE_QUERY)
+		fVolume->RemoveQuery(this);
+}
+
+
+status_t
+Query::Rewind()
+{
+	// free previous stuff
+
+	fStack.MakeEmpty();
+
+	delete fIterator;
+	fIterator = NULL;
+	fCurrent = NULL;
+
+	// put the whole expression on the stack
+
 	Stack<Term *> stack;
 	stack.Push(fExpression->Root());
 
@@ -1486,19 +1513,11 @@ Query::Query(Volume *volume, Expression *expression, uint32 flags)
 			FATAL(("Unknown term on stack or stack error"));
 	}
 
-	if (fFlags & B_LIVE_QUERY)
-		volume->AddQuery(this);
+	return B_OK;
 }
 
 
-Query::~Query()
-{
-	if (fFlags & B_LIVE_QUERY)
-		fVolume->RemoveQuery(this);
-}
-
-
-status_t 
+status_t
 Query::GetNextEntry(struct dirent *dirent, size_t size)
 {
 	// If we don't have an equation to use yet/anymore, get a new one
