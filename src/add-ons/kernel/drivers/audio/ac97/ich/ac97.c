@@ -569,7 +569,7 @@ ac97_dump_capabilities(ac97_dev *dev)
 bool
 ac97_has_capability(ac97_dev *dev, uint64 cap)
 {
-	// return (dev->capabilities & cap); // does not work! GCC bug with 64 bit variables?
+	// return (dev->capabilities & cap); // does not work because of 64 bit to integer trucation 
 	return (dev->capabilities & cap) != 0;
 }
 
