@@ -4,8 +4,11 @@
 		of testing without requiring a second video card for SecondDriver and also
 		without the limitations (mostly speed) of ViewDriver.
 		
-		Note that unlike ViewDriver, this graphics module does NOT emulate
-		the Input Server. The Router input server filter is required for use.
+		This module also emulates the input server via the keyboard.
+		Cursor keys move the mouse and the left modifier keys Option and Ctrl, which
+		operate	the first and second mouse buttons, respectively.
+		The right window key on American keymaps doesn't map to anything, so it is
+		not used. Consequently, when a right modifier key is pressed, it works normally.
 		
 		The concept is pretty close to the retooled ViewDriver, where each module
 		call locks a couple BLockers and draws to the buffer.
@@ -91,56 +94,14 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 			msg->FindInt32("key",&key);
 			msg->FindInt32("modifiers",&modifiers);
 
+			int32 servermods=0;
+			servermods|=modifiers & B_RIGHT_COMMAND_KEY;
+			servermods|=modifiers & B_RIGHT_OPTION_KEY;
+			servermods|=modifiers & B_RIGHT_CONTROL_KEY;
+			servermods|=modifiers & B_SHIFT_KEY;
+			
 			switch(key)
 			{
-				case 0x4c:	// Z key on American QWERTY keymap
-				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
-					buttons=B_TERTIARY_MOUSE_BUTTON;
-					
-					serverlink->SetOpCode(B_MOUSE_DOWN);
-					serverlink->Attach(&time, sizeof(int64));
-					serverlink->Attach(&mousepos.x,sizeof(float));
-					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
-					serverlink->Attach(&buttons, sizeof(uint32));
-					serverlink->Attach(&clicks, sizeof(uint32));
-					serverlink->Flush();
-					break;
-				}
-				case 0x4d:	// X key on American QWERTY keymap
-				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
-					buttons=B_SECONDARY_MOUSE_BUTTON;
-					
-					serverlink->SetOpCode(B_MOUSE_DOWN);
-					serverlink->Attach(&time, sizeof(int64));
-					serverlink->Attach(&mousepos.x,sizeof(float));
-					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
-					serverlink->Attach(&buttons, sizeof(uint32));
-					serverlink->Attach(&clicks, sizeof(uint32));
-					serverlink->Flush();
-					break;
-				}
-				case 0x4e:	// C key on American QWERTY keymap
-				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
-					buttons=B_PRIMARY_MOUSE_BUTTON;
-					
-					serverlink->SetOpCode(B_MOUSE_DOWN);
-					serverlink->Attach(&time, sizeof(int64));
-					serverlink->Attach(&mousepos.x,sizeof(float));
-					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
-					serverlink->Attach(&buttons, sizeof(uint32));
-					serverlink->Attach(&clicks, sizeof(uint32));
-					serverlink->Flush();
-					break;
-				}
 				case 0x47:	// Enter key
 				{
 					port_id serverport=find_port(SERVER_PORT_NAME);
@@ -200,7 +161,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					serverlink->Attach(&time, sizeof(int64));
 					serverlink->Attach(&mousepos.x,sizeof(float));
 					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&servermods, sizeof(int32));
 					serverlink->Attach(&buttons, sizeof(uint32));
 					serverlink->Attach(&clicks, sizeof(uint32));
 					serverlink->Flush();
@@ -239,7 +200,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					serverlink->Attach(&time, sizeof(int64));
 					serverlink->Attach(&mousepos.x,sizeof(float));
 					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&servermods, sizeof(int32));
 					serverlink->Attach(&buttons, sizeof(uint32));
 					serverlink->Attach(&clicks, sizeof(uint32));
 					serverlink->Flush();
@@ -278,7 +239,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					serverlink->Attach(&time, sizeof(int64));
 					serverlink->Attach(&mousepos.x,sizeof(float));
 					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&servermods, sizeof(int32));
 					serverlink->Attach(&buttons, sizeof(uint32));
 					serverlink->Attach(&clicks, sizeof(uint32));
 					serverlink->Flush();
@@ -317,7 +278,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					serverlink->Attach(&time, sizeof(int64));
 					serverlink->Attach(&mousepos.x,sizeof(float));
 					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&servermods, sizeof(int32));
 					serverlink->Attach(&buttons, sizeof(uint32));
 					serverlink->Attach(&clicks, sizeof(uint32));
 					serverlink->Flush();
@@ -328,66 +289,69 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					break;
 			}
 		}
-		case B_KEY_UP:
+		case B_MODIFIERS_CHANGED:
 		{
-#ifndef DISABLE_SERVER_EMU
-			int32 key,modifiers;
-			msg->FindInt32("key",&key);
-			msg->FindInt32("modifiers",&modifiers);
-
-			switch(key)
+			int32 modifiers;
+			if(msg->FindInt32("modifiers",&modifiers)==B_OK)
 			{
-				case 0x4c:	// Z key on American QWERTY keymap
+#ifndef DISABLE_SERVER_EMU
+
+				uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
+				int64 time=(int64)real_time_clock();
+				
+				// we need to be able to shift click & such, so we will construct
+				// a new modifiers value which excludes our mouse click keys
+				int32 servermods=0;
+				servermods|=modifiers & B_RIGHT_COMMAND_KEY;
+				servermods|=modifiers & B_RIGHT_OPTION_KEY;
+				servermods|=modifiers & B_RIGHT_CONTROL_KEY;
+				servermods|=modifiers & B_SHIFT_KEY;
+				
+				if(modifiers & B_LEFT_OPTION_KEY)
 				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
-					buttons=B_TERTIARY_MOUSE_BUTTON;
-					
-					serverlink->SetOpCode(B_MOUSE_UP);
-					serverlink->Attach(&time, sizeof(int64));
-					serverlink->Attach(&mousepos.x,sizeof(float));
-					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
-					serverlink->Attach(&buttons, sizeof(uint32));
-					serverlink->Attach(&clicks, sizeof(uint32));
-					serverlink->Flush();
-					break;
-				}
-				case 0x4d:	// X key on American QWERTY keymap
-				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
-					buttons=B_SECONDARY_MOUSE_BUTTON;
-					
-					serverlink->SetOpCode(B_MOUSE_UP);
-					serverlink->Attach(&time, sizeof(int64));
-					serverlink->Attach(&mousepos.x,sizeof(float));
-					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
-					serverlink->Attach(&buttons, sizeof(uint32));
-					serverlink->Attach(&clicks, sizeof(uint32));
-					serverlink->Flush();
-					break;
-					break;
-				}
-				case 0x4e:	// C key on American QWERTY keymap
-				{
-					uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
-					int64 time=(int64)real_time_clock();
 					buttons=B_PRIMARY_MOUSE_BUTTON;
 					
-					serverlink->SetOpCode(B_MOUSE_UP);
+					serverlink->SetOpCode(B_MOUSE_DOWN);
 					serverlink->Attach(&time, sizeof(int64));
 					serverlink->Attach(&mousepos.x,sizeof(float));
 					serverlink->Attach(&mousepos.y,sizeof(float));
-					serverlink->Attach(&modifiers, sizeof(uint32));
+					serverlink->Attach(&servermods, sizeof(uint32));
 					serverlink->Attach(&buttons, sizeof(uint32));
 					serverlink->Attach(&clicks, sizeof(uint32));
 					serverlink->Flush();
-					break;
 				}
+				else
+					if(modifiers & B_LEFT_CONTROL_KEY)
+					{
+						buttons=B_SECONDARY_MOUSE_BUTTON;
+
+						serverlink->SetOpCode(B_MOUSE_DOWN);
+						serverlink->Attach(&time, sizeof(int64));
+						serverlink->Attach(&mousepos.x,sizeof(float));
+						serverlink->Attach(&mousepos.y,sizeof(float));
+						serverlink->Attach(&servermods, sizeof(uint32));
+						serverlink->Attach(&buttons, sizeof(uint32));
+						serverlink->Attach(&clicks, sizeof(uint32));
+						serverlink->Flush();
+					}
+					else
+					{
+						// well, we got this far so none of the buttons
+						// are down. set our mouse buttons to up and if this
+						// is a change, send a B_MOUSE_UP message
+						if(buttons>0)
+						{
+							serverlink->SetOpCode(B_MOUSE_UP);
+							serverlink->Attach(&time, sizeof(int64));
+							serverlink->Attach(&mousepos.x,sizeof(float));
+							serverlink->Attach(&mousepos.y,sizeof(float));
+							serverlink->Attach(&servermods, sizeof(uint32));
+							serverlink->Flush();
+						}
+						buttons=0;
+					}
+#endif	// end server emu code
 			}
-#endif
 			break;
 		}
 		default:
