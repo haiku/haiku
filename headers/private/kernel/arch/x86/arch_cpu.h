@@ -59,6 +59,7 @@ typedef struct pdentry {		// page directory entry
 	unsigned int addr:20;
 } pdentry;
 
+// NOTE: Keep in sync with <os/arch/x86/arch_debugger.h>!
 struct iframe {
 	unsigned int gs;
 	unsigned int fs;
