@@ -13,6 +13,10 @@ typedef struct hash_iterator {
 
 typedef struct hash_table hash_table;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct hash_table *hash_init(uint32 table_size, int next_ptr_offset,
 	int compare_func(void *element, const void *key),
 	uint32 hash_func(void *element, const void *key, uint32 range));
@@ -40,5 +44,9 @@ void hash_rewind(struct hash_table *table, struct hash_iterator *i);
  */
 
 uint32 hash_hash_string(const char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_KHASH_H */

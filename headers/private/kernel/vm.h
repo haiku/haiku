@@ -15,6 +15,10 @@
 struct kernel_args;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //void vm_dump_areas(vm_address_space *aspace);
 int vm_init(kernel_args *ka);
 int vm_init_postsem(struct kernel_args *ka);
@@ -74,5 +78,8 @@ void forbid_page_faults(void);
 // XXX remove later
 void vm_test(void);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif	/* _KERNEL_VM_H */
