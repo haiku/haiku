@@ -1573,60 +1573,72 @@ int vm_delete_aspace(aspace_id aid)
 	return B_NO_ERROR;
 }
 
-int vm_resize_region (aspace_id aid, region_id rid, size_t newSize)
+
+int
+vm_resize_region(aspace_id aid, region_id rid, size_t newSize)
 {
 	vm_cache_ref *myCacheRef;
 	vm_region *myRegion,*current;
 	size_t oldSize;
-	bool failed=false;
-// Steps:
-//1) Get the vm_cache_ref for the region 
-	myRegion=vm_get_region_by_id(rid);
+	bool failed = false;
 
+	// Steps:
+	//1) Get the vm_cache_ref for the region 
+
+	myRegion = vm_get_region_by_id(rid);
 	if (!myRegion)
 		return B_ERROR;
 
-	myCacheRef=myRegion->cache_ref;
-// 2) Resize all of the regions from the vm_cache_ref (fix them all and fail if they can't be resized)
+	myCacheRef = myRegion->cache_ref;
+
+	// 2) Resize all of the regions from the vm_cache_ref (fix them all and fail if they can't be resized)
+
 	oldSize = myRegion->size;
-	for (current=myCacheRef->region_list;current;current=current->cache_next)
-		{
-		if (current->aspace_next->base<=(current->base+newSize))
-			{
-			failed=true;
+	for (current = myCacheRef->region_list;current;current = current->cache_next) {
+		if (current->aspace_next->base <= (current->base + newSize)) {
+			failed = true;
 			break;
-			}
-		current->size=newSize;
 		}
-	if (failed) // OH NO! Go back and fix all of the broken ones...
-		{
-		for (current=myCacheRef->region_list;current;current=current->cache_next)
-			current->size=oldSize;
+		current->size = newSize;
+	}
+
+	if (failed) { // OH NO! Go back and fix all of the broken ones...
+		for (current = myCacheRef->region_list;current;current = current->cache_next)
+			current->size = oldSize;
 		return B_ERROR;
-		}
-// 3) Update the vm_cache size
-	myCacheRef->cache->virtual_size=newSize;
+	}
+
+	// 3) Update the vm_cache size
+
+	myCacheRef->cache->virtual_size = newSize;
+	return 0;
 }
 
-int vm_aspace_walk_start(struct hash_iterator *i)
+
+int
+vm_aspace_walk_start(struct hash_iterator *i)
 {
 	hash_open(aspace_table, i);
 	return 0;
 }
 
-vm_address_space *vm_aspace_walk_next(struct hash_iterator *i)
+
+vm_address_space *
+vm_aspace_walk_next(struct hash_iterator *i)
 {
 	vm_address_space *aspace;
 
 	acquire_sem_etc(aspace_hash_sem, READ_COUNT, 0, 0);
 	aspace = hash_next(aspace_table, i);
-	if(aspace)
+	if (aspace)
 		atomic_add(&aspace->ref_count, 1);
 	release_sem_etc(aspace_hash_sem, READ_COUNT, 0);
 	return aspace;
 }
 
-static int vm_thread_dump_max_commit(void *unused)
+
+static int
+vm_thread_dump_max_commit(void *unused)
 {
 	int oldmax = -1;
 
