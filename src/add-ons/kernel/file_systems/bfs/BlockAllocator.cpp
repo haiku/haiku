@@ -99,7 +99,7 @@ AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
 	// the last group may have less bits in the last block
-	if (block * fNumBits > group.fNumBits)
+	if ((block + 1) * fNumBits > group.fNumBits)
 		fNumBits = group.fNumBits % fNumBits;
 
 	return CachedBlock::SetTo(group.fStart + block) != NULL ? B_OK : B_ERROR;
