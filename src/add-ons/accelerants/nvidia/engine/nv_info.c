@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-10/2004
+   Rudolf Cornelissen 7/2003-12/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -2807,7 +2807,9 @@ static void pinsnv30_arch_fake(void)
 	{
 	case NV31:
 	case NV36:
+	/* fixme? could be all >= NV40 cards have extended PLL's... (these 2 are confirmed) */
 	case NV40:
+	case NV43:
 		/* we have a extended PLL */
 		si->ps.ext_pll = true;
 		break;

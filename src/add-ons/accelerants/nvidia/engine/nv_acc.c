@@ -26,8 +26,7 @@ blit
 	nVidia hardware info:
 	We should be able to do FIFO assignment setup changes on-the-fly now, using
 	all the engine-command-handles that are pre-defined on any FIFO channel.
-	(check channel to be emptied, then re-assign to new command, then use: etc.)
-	
+
 	Maybe we can even setup new additional handles to previously unused engine
 	commands now, and there might even be a chance DMA can be setup(?).
 */
@@ -1060,6 +1059,13 @@ static void nv_init_for_3D(void)
 	}
 }
 
+/* fixme? (check this out..)
+ * Looks like this stuff can be very much simplified and speed-up, as it seems it's not
+ * nessesary to wait for the engine to become idle before re-assigning channels.
+ * Because the cmd handles are actually programmed _inside_ the fifo channels, it might
+ * well be that the assignment is buffered along with the commands that still have to 
+ * be executed!
+ * (sounds very plausible to me :) */
 void nv_acc_assert_fifo(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
