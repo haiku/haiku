@@ -71,12 +71,12 @@ switch $(TARGET_CPU) {
 			OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 		}
 		DEFINES += __POWERPC__ ;
-		OBOS_BOOT_LIB = openfirmware ;
+		OBOS_BOOT_PLATFORM = openfirmware ;
 	}
 	case x86 :
 	{
 		# nothing special to do here...
-		OBOS_BOOT_LIB = bios_ia32 ;
+		OBOS_BOOT_PLATFORM = bios_ia32 ;
 	}
 	case * :
 		Exit "Currently unsupported build platform:" $(TARGET_CPU) ;
