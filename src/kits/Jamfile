@@ -62,7 +62,7 @@ LinkSharedOSLibs libbe.so :
 
 LinkSharedOSLibs libopenbeos.so :
 	libbeadapter.so
-	be
+	be net
 	stdc++.r4
 ;
 
