@@ -983,7 +983,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 
 			if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS)
 			{
-				fEventMaskLayer = target;
+				fEventMaskLayer = fLastMouseMoved;
 			}
 
 			// We'll need this so that GetMouse can query for which buttons
