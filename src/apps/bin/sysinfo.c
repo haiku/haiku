@@ -74,6 +74,99 @@ static void dump_cpu(system_info *info)
 		info->id[0], info->id[1]);
 
 	for (i = 0; i < info->cpu_count; i++) {
+		/* note: the R5 cpuid_info() doesn't failed when asked for a cpu > cpu_count */
+		/* indeed it should return EINVAL */
+		/* references:
+		 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
+		 */
+		cpuid_info cpuii[5];
+		cpuid_info cpuiie[5]; /* Extended CPUID */
+		int max_eax, max_eeax = 0;
+		status_t ret;
+		int j;
+
+
+		ret = get_cpuid(&cpuii[0], 0, i);
+		if (ret != B_OK) {
+			fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0, i, ret);
+			break;
+		}
+		max_eax = cpuii[0].eax_0.max_eax;
+		if (max_eax >= 500)
+			max_eax = 0; /* old Pentium sample chips has cpu signature here */
+		for (j = 1; j <= max_eax && j < 5; j++) {
+			ret = get_cpuid(&cpuii[j], j, i);
+			if (ret != B_OK) {
+				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", j, i, ret);
+				break;
+			}
+		}
+		/* Extended CPUID: add more checks */
+		if ((!strncmp(cpuii[0].eax_0.vendorid, "AuthenticAMD", 12) 
+					&& cpuii[1].eax_1.family >= 5, cpuii[1].eax_1.model >= 1)) {
+			ret = get_cpuid(&cpuiie[0], 0x80000000, i);
+			if (ret != B_OK) {
+				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0, i, ret);
+				break;
+			}
+			max_eeax = cpuiie[0].eax_0.max_eax & 0x0ff;
+		}
+		for (j = 1; j <= max_eeax && j < 5; j++) {
+			ret = get_cpuid(&cpuiie[j], 0x80000000+j, i);
+			if (ret != B_OK) {
+				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0x80000000+j, i, ret);
+				break;
+			}
+		}
+
+//printf("max_eax=%ld, max_eeax=%ld\n", max_eax, max_eeax);
+
+		printf("CPU #%d: %.12s\n", i, cpuii[0].eax_0.vendorid);
+		if (max_eax == 0)
+			break;
+		printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08x\n", 
+				cpuii[1].eax_1.type, 
+				cpuii[1].eax_1.family, 
+				cpuii[1].eax_1.model, 
+				cpuii[1].eax_1.stepping, 
+				cpuii[1].eax_1.features);
+		/* Extended CPUID */
+		if (max_eeax > 0) {
+			printf("\tExtended information:\n");
+			printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08x\n",
+				cpuiie[1].eax_1.type, 
+				cpuiie[1].eax_1.family, 
+				cpuiie[1].eax_1.model, 
+				cpuiie[1].eax_1.stepping, 
+				cpuiie[1].eax_1.features);
+		}
+		if (max_eeax > 1) {
+			char cpuname[50];
+			memset(cpuname, 0, 50);
+			memcpy(cpuname, &cpuiie[2].regs.eax, 4);
+			memcpy(cpuname+4, &cpuiie[2].regs.ebx, 4);
+			memcpy(cpuname+8, &cpuiie[2].regs.ecx, 4);
+			memcpy(cpuname+12, &cpuiie[2].regs.edx, 4);
+			memcpy(cpuname+16, &cpuiie[3].regs.eax, 4);
+			memcpy(cpuname+20, &cpuiie[3].regs.ebx, 4);
+			memcpy(cpuname+24, &cpuiie[3].regs.ecx, 4);
+			memcpy(cpuname+28, &cpuiie[3].regs.edx, 4);
+			memcpy(cpuname+32, &cpuiie[4].regs.eax, 4);
+			memcpy(cpuname+36, &cpuiie[4].regs.ebx, 4);
+			memcpy(cpuname+40, &cpuiie[4].regs.ecx, 4);
+			memcpy(cpuname+44, &cpuiie[4].regs.edx, 4);
+			
+			printf("\tName: %s\n", cpuname);
+		}
+		if (max_eax == 1)
+			break;
+		if (max_eax == 2)
+			break;
+//Serial number: %04X-%04X-%04X-%04X-%04X-%04X
+		if (max_eax == 3)
+			break;
+
+
 		/* TODO: printf("CPU #%d: %s\n", i, ); */
 	}
 	printf("\n");
