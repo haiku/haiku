@@ -6,6 +6,10 @@ SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
 		KEEP_WRONG_DIRENT_RECLEN
 		;
 
+	if $(COMPILE_FOR_R5) {
+		defines += COMPILE_FOR_R5 ;
+	}
+
 	if $(DEBUG) {
 		defines += DEBUG ;
 	} else {
