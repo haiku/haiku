@@ -2,6 +2,7 @@
  * Copyright 2003, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <Application.h>
 #include <Autolock.h>
 #include <string.h>
 #include <storage/FindDirectory.h>
@@ -12,7 +13,8 @@
 
 MMediaFilesManager::MMediaFilesManager()
 	: fLocker(new BLocker("media files manager locker")), 
-	fRegistryMap(new Map<BString, Map<BString, entry_ref> >)
+	fRegistryMap(new Map<BString, Map<BString, entry_ref> >),
+	fRunner(NULL)
 {
 	CALLED();
 	LoadState();
@@ -24,6 +26,7 @@ MMediaFilesManager::MMediaFilesManager()
 MMediaFilesManager::~MMediaFilesManager()
 {
 	CALLED();
+	delete fRunner;
 	SaveState();
 	delete fRegistryMap;
 	delete fLocker;
@@ -120,7 +123,7 @@ MMediaFilesManager::LoadState()
 	        	BEntry entry(val);
 	        	entry.GetRef(&ref);
 	        }
-	        SetRefFor(str, key, ref);
+	        SetRefFor(str, key, ref, false);
 	        
 	        free(key);
 	        free(val);
@@ -276,7 +279,7 @@ MMediaFilesManager::GetRefFor(const char *type,
 status_t
 MMediaFilesManager::SetRefFor(const char *type,
 					   const char *item,
-					   const entry_ref &ref)
+					   const entry_ref &ref, bool save)
 {
 	CALLED();
 	TRACE("MMediaFilesManager::SetRefFor %s %s\n", type, item);
@@ -294,6 +297,8 @@ MMediaFilesManager::SetRefFor(const char *type,
 	if(map->Has(itemString))
 		map->Remove(itemString);
 	map->Insert(itemString, ref);
+	if(save)
+		LaunchTimer();
 	
 	return B_OK;
 }
@@ -308,12 +313,11 @@ MMediaFilesManager::RemoveRefFor(const char *type,
 	BString itemString(item);
 	BString typeString(type);
 	Map <BString, entry_ref> *map;
-	if(!fRegistryMap->Get(typeString, &map))
-		return B_OK;
-	
-	map->Remove(itemString);
-	map->Insert(itemString, *(new entry_ref));
-	
+	if(fRegistryMap->Get(typeString, &map)) {
+		map->Remove(itemString);
+		map->Insert(itemString, *(new entry_ref));
+		LaunchTimer();
+	}
 	return B_OK;
 }
 
@@ -326,11 +330,25 @@ MMediaFilesManager::RemoveItem(const char *type,
 	BString itemString(item);
 	BString typeString(type);
 	Map <BString, entry_ref> *map;
-	if(!fRegistryMap->Get(typeString, &map))
-		return B_OK;
-	
-	map->Remove(itemString);
-	
+	if(fRegistryMap->Get(typeString, &map)) {
+		map->Remove(itemString);
+		LaunchTimer();
+	}
 	return B_OK;
 }
 
+void
+MMediaFilesManager::LaunchTimer()
+{
+	if(!fRunner)
+		fRunner = new BMessageRunner(be_app, 
+			new BMessage(MMEDIAFILESMANAGER_SAVE_TIMER), 3 * 1000000, 1);	
+}
+
+void
+MMediaFilesManager::TimerMessage()
+{
+	SaveState();
+	delete fRunner;
+	fRunner = NULL;	
+}

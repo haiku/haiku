@@ -698,6 +698,7 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
+		case MMEDIAFILESMANAGER_SAVE_TIMER:	gMMediaFilesManager->TimerMessage(); break;		
 		default:
 			printf("\nnew media server: unknown message received\n");
 			msg->PrintToStream();
