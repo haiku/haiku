@@ -134,13 +134,13 @@ public:
 
 	/* Recent document and app support */
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *ofType = NULL,
-							const char *openedByAppSig = NULL) const;
+							const char *fileType = NULL,
+							const char *appSig = NULL) const;
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *ofTypeList[], int32 ofTypeListCount,
-							const char *openedByAppSig = NULL) const;
+							const char *fileTypes[], int32 fileTypesCount,
+							const char *appSig = NULL) const;
 	void GetRecentFolders(BMessage *refList, int32 maxCount,
-						  const char *openedByAppSig = NULL) const;
+						  const char *appSig = NULL) const;
 	void GetRecentApps(BMessage *refList, int32 maxCount) const;
 
 	void AddToRecentDocuments(const entry_ref *doc,
@@ -207,6 +207,11 @@ private:
 							 const BList *messageList, const entry_ref *ref,
 							 bool readyToRun) const;
 	void InitMessengers();
+	
+	void AddToRecentApps(const char *appSig) const;
+	void ClearRecentDocuments() const;
+	void ClearRecentFolders() const;
+	void ClearRecentApps() const;
 
 	BMessenger	fMess;
 	BMessenger	fMimeMess;

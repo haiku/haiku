@@ -1040,42 +1040,224 @@ BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 // GetRecentDocuments
 void
 BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *ofType,
-							const char *openedByAppSig) const
+							const char *fileType,
+							const char *appSig) const
 {
+	if (!refList)
+		return;
+
+	status_t err = maxCount > 0 ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage &msg = *refList;
+	BMessage &reply = *refList;
+	status_t result;
+
+	// Build and send the message, read the reply
+	if (!err) {
+		msg.what = B_REG_GET_RECENT_DOCUMENTS;
+		err = msg.AddInt32("max count", maxCount);
+	}
+	if (!err && fileType)
+		err = msg.AddString("file type", fileType);
+	if (!err && appSig)
+		err = msg.AddString("app sig", appSig);
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	// Clear the result if an error occured
+	if (err && refList)
+		refList->MakeEmpty();
+	// No return value, how sad :-(
+//	return err;	
 }
 
 // GetRecentDocuments
 void
 BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *ofTypeList[], int32 ofTypeListCount,
-							const char *openedByAppSig) const
+							const char *fileTypes[], int32 fileTypesCount,
+							const char *appSig) const
 {
+	if (!refList)
+		return;
+
+	status_t err = maxCount > 0 ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage &msg = *refList;
+	BMessage &reply = *refList;
+	status_t result;
+
+	// Build and send the message, read the reply
+	if (!err) {
+		msg.what = B_REG_GET_RECENT_DOCUMENTS;
+		err = msg.AddInt32("max count", maxCount);
+	}
+	if (!err && fileTypes) {
+		for (int i = 0; i < fileTypesCount && !err; i++)
+			err = msg.AddString("file type", fileTypes[i]);
+	}
+	if (!err && appSig)
+		err = msg.AddString("app sig", appSig);
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	// Clear the result if an error occured
+	if (err && refList)
+		refList->MakeEmpty();
+	// No return value, how sad :-(
+//	return err;	
 }
 
 // GetRecentFolders
 void
 BRoster::GetRecentFolders(BMessage *refList, int32 maxCount,
-						  const char *openedByAppSig) const
+						  const char *appSig) const
 {
+	if (!refList)
+		return;
+
+	status_t err = maxCount > 0 ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage &msg = *refList;
+	BMessage &reply = *refList;
+	status_t result;
+
+	// Build and send the message, read the reply
+	if (!err) {
+		msg.what = B_REG_GET_RECENT_FOLDERS;
+		err = msg.AddInt32("max count", maxCount);
+	}
+	if (!err && appSig)
+		err = msg.AddString("app sig", appSig);
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	// Clear the result if an error occured
+	if (err && refList)
+		refList->MakeEmpty();
+	// No return value, how sad :-(
+//	return err;	
 }
 
 // GetRecentApps
 void
 BRoster::GetRecentApps(BMessage *refList, int32 maxCount) const
 {
+	if (!refList)
+		return;
+
+	status_t err = maxCount > 0 ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage &msg = *refList;
+	BMessage &reply = *refList;
+	status_t result;
+
+	// Build and send the message, read the reply
+	if (!err) {
+		msg.what = B_REG_GET_RECENT_APPS;
+		err = msg.AddInt32("max count", maxCount);
+	}
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	// Clear the result if an error occured
+	if (err && refList)
+		refList->MakeEmpty();
+	// No return value, how sad :-(
+//	return err;	
 }
 
 // AddToRecentDocuments
 void
 BRoster::AddToRecentDocuments(const entry_ref *doc, const char *appSig) const
 {
+	status_t err = doc ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage msg(B_REG_ADD_TO_RECENT_DOCUMENTS);
+	BMessage reply;
+	status_t result;
+	char *callingAppSig = NULL;
+	
+	// If no signature is supplied, look up the signature of
+	// the calling app
+	if (!err && !appSig) {
+		app_info info;
+		err = GetRunningAppInfo(be_app->Team(), &info);
+		if (!err)
+			callingAppSig = info.signature;	
+	}
+
+	// Build and send the message, read the reply
+	if (!err) 
+		err = msg.AddRef("ref", doc);
+	if (!err)
+		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (err)
+		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
 }
 
 // AddToRecentFolders
 void
 BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 {
+	status_t err = folder ? B_OK : B_BAD_VALUE;
+
+	// Use the message we've been given for both request and reply
+	BMessage msg(B_REG_ADD_TO_RECENT_FOLDERS);
+	BMessage reply;
+	status_t result;
+	char *callingAppSig = NULL;
+	
+	// If no signature is supplied, look up the signature of
+	// the calling app
+	if (!err && !appSig) {
+		app_info info;
+		err = GetRunningAppInfo(be_app->Team(), &info);
+		if (!err)
+			callingAppSig = info.signature;	
+	}
+
+	// Build and send the message, read the reply
+	if (!err) 
+		err = msg.AddRef("ref", folder);
+	if (!err)
+		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
+	fMess.SendMessage(&msg, &reply);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (err)
+		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
 }
 
 
@@ -1993,6 +2175,57 @@ strerror(error)));
 DBG(OUT("BRoster::InitMessengers() done\n"));
 }
 
+// AddToRecentApps
+/*! \brief Sends a request to the roster to add the application with the
+	given signature to the front of the recent apps list.
+*/
+void
+BRoster::AddToRecentApps(const char *appSig) const
+{
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_ADD_TO_RECENT_APPS);
+	if (error == B_OK)
+		error = request.AddString("app sig", appSig);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	status_t result;
+	if (error == B_OK)
+		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (error == B_OK)
+		error = reply.FindInt32("result", &result);
+	if (error == B_OK)
+		error = result;
+	// Nothing to return... how sad :-(
+	// return error;
+}
+
+/*! \brief Sends a request to the roster to clear the recent
+	documents list.
+*/
+void
+BRoster::ClearRecentDocuments() const
+{
+}
+
+/*! \brief Sends a request to the roster to clear the recent
+	documents list.
+*/
+void
+BRoster::ClearRecentFolders() const
+{
+}
+
+/*! \brief Sends a request to the roster to clear the recent
+	documents list.
+*/
+void
+BRoster::ClearRecentApps() const
+{
+}
 
 /*-----------------------------------------------------*/
 /*----- Global be_roster ------------------------------*/
