@@ -34,13 +34,16 @@ class DialUpView : public BView {
 		void UpdateStatus(int32 code);
 		void WatchInterface(ppp_interface_id ID);
 		
-		void LoadSettings();
+		bool LoadSettings(bool isNew);
 		void IsModified(bool& settings, bool& profile);
 		bool SaveSettings(BMessage& settings, BMessage& profile, bool saveTemporary);
 		bool SaveSettingsToFile();
 		
-		void AddInterface(const char *name);
-		void SelectInterface(int32 index);
+		void LoadInterfaces();
+		void LoadAddons();
+		
+		void AddInterface(const char *name, bool isNew = false);
+		void SelectInterface(int32 index, bool isNew = false);
 		int32 CountInterfaces() const;
 
 	private:
@@ -48,7 +51,7 @@ class DialUpView : public BView {
 		
 		thread_id fUpDownThread;
 		
-		BMessage fAddons, fSettings;
+		BMessage fAddons, fSettings, fProfile;
 		driver_settings *fDriverSettings;
 		BMenuItem *fCurrentItem;
 		ppp_interface_id fWatching;
@@ -59,6 +62,7 @@ class DialUpView : public BView {
 		BPopUpMenu *fInterfaceMenu;
 		BMenuField *fMenuField;
 		BTabView *fTabView;
+//		BStringView *fNoInterfacesStringView;
 };
 
 

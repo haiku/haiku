@@ -7,8 +7,8 @@ class BMessage;
 class BFile;
 
 
-extern BMessage *FindMessageParameter(const char *name, BMessage& message,
-	int32 *startIndex = NULL);
+extern bool FindMessageParameter(const char *name, BMessage& message,
+	BMessage& save, int32 *startIndex = NULL);
 
 extern bool ReadMessageDriverSettings(const char *name, BMessage& message);
 extern bool WriteMessageDriverSettings(BFile& file, const BMessage& message);

@@ -30,10 +30,6 @@ class DialUpAddon {
 		
 		const BMessage *Addons() const
 			{ return fAddons; }
-		bool IsValid() const
-			{ return fIsValid; }
-				// This value will be set after all add-ons are registered.
-				// Add-ons with a non-existant kernel module are invalid!
 		
 		virtual const char *FriendlyName() const
 			{ return NULL; }
@@ -49,10 +45,8 @@ class DialUpAddon {
 			{ return 0; }
 				// allows to set order in which modules are asked to add the settings
 		
-		virtual bool LoadSettings(BMessage *settings, BMessage *profile)
+		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 			{ return false; }
-				// The interface's device is saved to "device" when loading
-				// settings or when a new device is selected.
 		virtual void IsModified(bool& settings, bool& profile) const
 			{ settings = profile = false; }
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
@@ -73,7 +67,6 @@ class DialUpAddon {
 
 	private:
 		BMessage *fAddons;
-		bool fIsValid;
 		
 		char _reserved[31];
 };

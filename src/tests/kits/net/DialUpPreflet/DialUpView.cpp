@@ -35,10 +35,10 @@
 #include <cstring>
 
 
-#define MSG_CREATE_NEW			'NEWI'
-#define MSG_DELETE_CURRENT		'DELI'
-#define MSG_SELECT_INTERFACE	'SELI'
-#define MSG_CONNECT_BUTTON		'CONI'
+#define MSG_CREATE_NEW				'NEWI'
+#define MSG_DELETE_CURRENT			'DELI'
+#define MSG_SELECT_INTERFACE		'SELI'
+#define MSG_CONNECT_BUTTON			'CONI'
 
 #define LABEL_CREATE_NEW			"Create new..."
 #define LABEL_DELETE_CURRENT		"Delete current"
@@ -54,10 +54,14 @@
 #define TEXT_AUTHENTICATION_FAILED	"Authentication failed!"
 #define TEXT_CONNECTION_LOST		"Connection lost!"
 #define TEXT_CREATION_ERROR			"Error creating interface!"
+#define TEXT_NO_INTERFACE_SELECTED	"No interface selected..."
 #define TEXT_OK						"OK"
 #define ERROR_TITLE					"Error"
 #define ERROR_NO_PPP_STACK			"Error: Could not find the PPP stack!"
-#define ERROR_INTERFACE_EXISTS		"Error: An interface with this name already exists!"
+#define ERROR_INTERFACE_EXISTS		"Error: An interface with this name already " \
+										"exists!"
+#define ERROR_LOADING_FAILED		"Error: Failed loading interface! The current " \
+										"settings will be deleted."
 
 
 static
@@ -86,13 +90,6 @@ DialUpView::DialUpView(BRect frame)
 	BMessenger messenger(this);
 	fAddons.AddMessenger("Messenger", messenger);
 	
-	// load integrated add-ons
-	fAddons.AddPointer("Tab", new GeneralAddon(&fAddons));
-	
-	// TODO:
-	// load all add-ons
-	// register them and check if each one has a kernel module (set fIsValid)
-	
 	// create pop-up with all interfaces and "New..."/"Delete current" items
 	fInterfaceMenu = new BPopUpMenu(LABEL_CREATE_NEW);
 	BRect rect = bounds;
@@ -100,23 +97,6 @@ DialUpView::DialUpView(BRect frame)
 	rect.bottom = rect.top + 20;
 	fMenuField = new BMenuField(rect, "Interfaces", "Interface:", fInterfaceMenu);
 	fMenuField->SetDivider(StringWidth(fMenuField->Label()) + 10);
-	
-	fInterfaceMenu->AddSeparatorItem();
-	fInterfaceMenu->AddItem(new BMenuItem(LABEL_CREATE_NEW,
-		new BMessage(MSG_CREATE_NEW)));
-	fInterfaceMenu->AddItem(new BMenuItem(LABEL_DELETE_CURRENT,
-		new BMessage(MSG_DELETE_CURRENT)));
-	
-	BDirectory settingsDirectory;
-	BEntry entry;
-	BPath path;
-	GetPPPDirectories(&settingsDirectory, NULL);
-	while(settingsDirectory.GetNextEntry(&entry) == B_OK) {
-		if(entry.IsFile()) {
-			entry.GetPath(&path);
-			AddInterface(path.Leaf());
-		}
-	}
 	
 	rect.top = rect.bottom + 10;
 	rect.bottom = bounds.bottom
@@ -127,10 +107,16 @@ DialUpView::DialUpView(BRect frame)
 	tabViewRect.bottom -= fTabView->TabHeight();
 	fAddons.AddRect("TabViewRect", tabViewRect);
 	
+//	BRect noInterfacesRect(rect);
+//	noInterfacesRect.top = rect.top + rect.Width() / 2;
+//	noInterfacesRect.bottom = noInterfacesRect.top + 15;
+//	fNoInterfacesStringView = new BStringView(noInterfacesRect, "NoInterfacesView",
+//		TEXT_NO_INTERFACE_SELECTED);
+	
 	rect.top = rect.bottom + 15;
 	rect.bottom = rect.top + 15;
 	rect.right = rect.left + 200;
-	fStatusView = new BStringView(rect, "StringView", TEXT_NOT_CONNECTED);
+	fStatusView = new BStringView(rect, "StatusView", TEXT_NOT_CONNECTED);
 	
 	rect.InsetBy(0, -5);
 	rect.left = rect.right + 5;
@@ -143,8 +129,12 @@ DialUpView::DialUpView(BRect frame)
 	AddChild(fStatusView);
 	AddChild(fConnectButton);
 	
+	// initialize
+	LoadInterfaces();
+	LoadAddons();
 	CreateTabs();
-	
+	fCurrentItem = NULL;
+		// reset, otherwise SelectInterface will not load the settings
 	SelectInterface(0);
 }
 
@@ -159,7 +149,7 @@ DialUpView::~DialUpView()
 	// free known add-on types (these should free their known add-on types, etc.)
 	DialUpAddon *addon;
 	for(int32 index = 0;
-			fAddons.FindPointer("Tab", index,
+			fAddons.FindPointer("DeleteMe", index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++)
 		delete addon;
@@ -188,7 +178,7 @@ DialUpView::MessageReceived(BMessage *message)
 		break;
 		
 		case MSG_CREATE_NEW: {
-			AddInterface("New interface");
+			AddInterface("New interface", true);
 			if(fCurrentItem)
 				fCurrentItem->SetMarked(true);
 		} break;
@@ -225,12 +215,38 @@ DialUpView::MessageReceived(BMessage *message)
 }
 
 
-void
-DialUpView::LoadSettings()
+bool
+DialUpView::LoadSettings(bool isNew)
 {
-	BMessage settings;
+	fSettings.MakeEmpty();
+	fProfile.MakeEmpty();
+	BMessage *settingsPointer = fCurrentItem ? &fSettings : NULL,
+		*profilePointer = fCurrentItem ? &fProfile : NULL;
 	
-	// TODO: load settings
+	if(fCurrentItem && !isNew) {
+		BString name("pppidf/");
+		name << fCurrentItem->Label();
+		if(!ReadMessageDriverSettings(name.String(), fSettings))
+			return false;
+		name = "pppidf/profile/";
+		name << fCurrentItem->Label();
+		if(!ReadMessageDriverSettings(name.String(), fProfile))
+			profilePointer = settingsPointer;
+	}
+	
+	DialUpAddon *addon;
+	for(int32 index = 0; fAddons.FindPointer("Tab", index,
+			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
+		if(!addon)
+			continue;
+		
+		if(!addon->LoadSettings(settingsPointer, profilePointer, isNew))
+			return false;
+	}
+	
+	// TODO: check if settings are valid
+	
+	return true;
 }
 
 
@@ -242,11 +258,9 @@ DialUpView::IsModified(bool& settings, bool& profile)
 		// for current addon
 	
 	DialUpAddon *addon;
-	for(int32 index = 0;
-			fAddons.FindPointer("Tab", index,
-				reinterpret_cast<void**>(&addon)) == B_OK;
-			index++) {
-		if(!addon || !addon->IsValid())
+	for(int32 index = 0; fAddons.FindPointer("Tab", index,
+			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
+		if(!addon)
 			continue;
 		
 		addon->IsModified(addonSettingsChanged, addonProfileChanged);
@@ -271,7 +285,7 @@ DialUpView::SaveSettings(BMessage& settings, BMessage& profile, bool saveModifie
 			fAddons.FindPointer("Tab", index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
-		if(!addon || !addon->IsValid())
+		if(!addon)
 			continue;
 		
 		int32 insertIndex = 0;
@@ -284,7 +298,7 @@ DialUpView::SaveSettings(BMessage& settings, BMessage& profile, bool saveModifie
 	
 	settings.AddInt32("Interface", static_cast<int32>(fWatching));
 	if(fCurrentItem)
-		settings.AddString("Name", fCurrentItem->Label());
+		settings.AddString("InterfaceName", fCurrentItem->Label());
 	
 	for(int32 index = 0; index < addons.CountItems(); index++)
 		addons.ItemAt(index)->SaveSettings(&settings, &profile, saveModified);
@@ -440,7 +454,7 @@ DialUpView::CreateTabs()
 			fAddons.FindPointer("Tab", index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
-		if(!addon || !addon->IsValid() || addon->Position() < 0)
+		if(!addon || addon->Position() < 0)
 			continue;
 		
 		int32 insertIndex = 0;
@@ -522,13 +536,14 @@ DialUpView::UpdateStatus(int32 code)
 void
 DialUpView::WatchInterface(ppp_interface_id ID)
 {
-	if(fWatching == ID)
-		return;
+	// This method can be used to update the interface's connection status.
 	
-	fListener.StopWatchingInterfaces();
-	
-	if(ID == PPP_UNDEFINED_INTERFACE_ID || fListener.WatchInterface(ID))
-		fWatching = ID;
+	if(fWatching != ID) {
+		fListener.StopWatchingInterfaces();
+		
+		if(ID == PPP_UNDEFINED_INTERFACE_ID || fListener.WatchInterface(ID))
+			fWatching = ID;
+	}
 	
 	// update status
 	PPPInterface interface(fWatching);
@@ -560,7 +575,50 @@ DialUpView::WatchInterface(ppp_interface_id ID)
 
 
 void
-DialUpView::AddInterface(const char *name)
+DialUpView::LoadInterfaces()
+{
+	fInterfaceMenu->AddSeparatorItem();
+	fInterfaceMenu->AddItem(new BMenuItem(LABEL_CREATE_NEW,
+		new BMessage(MSG_CREATE_NEW)));
+	fInterfaceMenu->AddItem(new BMenuItem(LABEL_DELETE_CURRENT,
+		new BMessage(MSG_DELETE_CURRENT)));
+	
+	BDirectory settingsDirectory;
+	BEntry entry;
+	BPath path;
+	GetPPPDirectories(&settingsDirectory, NULL);
+	while(settingsDirectory.GetNextEntry(&entry) == B_OK) {
+		if(entry.IsFile()) {
+			entry.GetPath(&path);
+			AddInterface(path.Leaf(), true);
+		}
+	}
+}
+
+
+void
+DialUpView::LoadAddons()
+{
+	// Load integrated add-ons:
+	// "General" tab
+	GeneralAddon *generalAddon = new GeneralAddon(&fAddons);
+	fAddons.AddPointer("Tab", generalAddon);
+	fAddons.AddPointer("DeleteMe", generalAddon);
+	// "PAP" authenticator
+	BMessage addon;
+	addon.AddString("KernelModuleName", "pap");
+	addon.AddString("FriendlyName", "Plain-text Authentication");
+	addon.AddString("TechnicalName", "PAP");
+	fAddons.AddMessage("Authenticator", &addon);
+	// addon.MakeEmpty();
+	
+	// TODO:
+	// load all add-ons from the add-ons folder
+}
+
+
+void
+DialUpView::AddInterface(const char *name, bool isNew = false)
 {
 	if(fInterfaceMenu->FindItem(name)) {
 		(new BAlert(ERROR_TITLE, ERROR_INTERFACE_EXISTS, TEXT_OK))->Go();
@@ -572,12 +630,12 @@ DialUpView::AddInterface(const char *name)
 	fInterfaceMenu->AddItem(item, CountInterfaces());
 	if(CountInterfaces() == 1)
 		fInterfaceMenu->SetLabelFromMarked(true);
-	SelectInterface(CountInterfaces() - 1);
+	SelectInterface(CountInterfaces() - 1, isNew);
 }
 
 
 void
-DialUpView::SelectInterface(int32 index)
+DialUpView::SelectInterface(int32 index, bool isNew = false)
 {
 	BMenuItem *item = fInterfaceMenu->FindMarked();
 	if(fCurrentItem && item == fCurrentItem)
@@ -593,6 +651,13 @@ DialUpView::SelectInterface(int32 index)
 			WatchInterface(PPP_UNDEFINED_INTERFACE_ID);
 		}
 	} else {
+		if(!fCurrentItem) {
+			fTabView->Show();
+//			fTabView->MoveBy(-Bounds().Width(), 0);
+//			fNoInterfacesStringView->MoveBy(Bounds().Width(), 0);
+			fConnectButton->SetEnabled(true);
+		}
+		
 		fCurrentItem = fInterfaceMenu->ItemAt(index);
 		if(!fCurrentItem) {
 			SelectInterface(0);
@@ -603,7 +668,21 @@ DialUpView::SelectInterface(int32 index)
 		WatchInterface(fListener.Manager().InterfaceWithName(fCurrentItem->Label()));
 	}
 	
-	LoadSettings();
+	if(!fCurrentItem) {
+		LoadSettings(false);
+			// tell modules to unload all settings
+		
+		fTabView->Hide();
+//		fTabView->MoveBy(Bounds().Width(), 0);
+//		fNoInterfacesStringView->MoveBy(-Bounds().Width(), 0);
+		fConnectButton->SetEnabled(false);
+	} else if(isNew && !LoadSettings(true)) {
+		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go();
+		LoadSettings(true);
+	} else if(!LoadSettings(false)) {
+		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go();
+		LoadSettings(true);
+	}
 }
 
 

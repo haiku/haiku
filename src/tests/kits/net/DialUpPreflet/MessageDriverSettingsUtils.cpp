@@ -9,27 +9,22 @@
 #include <cstdio>
 
 
-BMessage*
-FindMessageParameter(const char *name, BMessage& message, int32 *startIndex = NULL)
+bool
+FindMessageParameter(const char *name, BMessage& message, BMessage& save,
+	int32 *startIndex = NULL)
 {
-	// XXX: this is a hack and should be removed when we can replace BMessage with
-	// something better
-	const BMessage *parameter;
+	// XXX: this should be removed when we can replace BMessage with something better
 	BString string;
-	ssize_t size;
 	int32 index = startIndex ? *startIndex : 0;
-	for(; message.FindData("parameters", B_MESSAGE_TYPE, index,
-			reinterpret_cast<const void**>(&parameter), &size) == B_OK;
-			index++) {
-		if(parameter->FindString("name", &string) == B_OK
-				&& string.ICompare(name)) {
+	for(; message.FindMessage("Parameters", index, &save) == B_OK; index++) {
+		if(save.FindString("Name", &string) == B_OK && string.ICompare(name) == 0) {
 			if(startIndex)
 				*startIndex = index;
-			return const_cast<BMessage*>(parameter);
+			return true;
 		}
 	}
 	
-	return NULL;
+	return false;
 }
 
 
@@ -41,18 +36,18 @@ AddParameter(const driver_parameter *parameter, BMessage& message)
 		return false;
 	
 	if(parameter->name)
-		message.AddString("name", parameter->name);
+		message.AddString("Name", parameter->name);
 	else
 		return false;
 	
 	for(int32 index = 0; index < parameter->value_count; index++)
 		if(parameter->values[index])
-			message.AddString("values", parameter->values[index]);
+			message.AddString("Values", parameter->values[index]);
 	
 	for(int32 index = 0; index < parameter->parameter_count; index++) {
 		BMessage parameterMessage;
 		AddParameter(&parameter->parameters[index], parameterMessage);
-		message.AddMessage("parameters", &parameterMessage);
+		message.AddMessage("Parameters", &parameterMessage);
 	}
 	
 	return true;
@@ -75,7 +70,7 @@ ReadMessageDriverSettings(const char *name, BMessage& message)
 	for(int32 index = 0; index < settings->parameter_count; index++) {
 		BMessage parameter;
 		AddParameter(&settings->parameters[index], parameter);
-		message.AddMessage("parameters", &parameter);
+		message.AddMessage("Parameters", &parameter);
 	}
 	
 	unload_driver_settings(handle);
@@ -89,20 +84,20 @@ bool
 WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 {
 	const char *name;
-	if(parameter.FindString("name", &name) != B_OK || !name)
+	if(parameter.FindString("Name", &name) != B_OK || !name)
 		return false;
 	
 	BString line;
 	line.SetTo('\t', level);
 	line << name << ' ';
 	
-	for(int32 index = 0; parameter.FindString("values", index, &name) == B_OK; index++)
+	for(int32 index = 0; parameter.FindString("Values", index, &name) == B_OK; index++)
 		if(name)
 			line << name << ' ';
 	
 	type_code type;
 	int32 parameterCount;
-	parameter.GetInfo("parameters", &type, &parameterCount);
+	parameter.GetInfo("Parameters", &type, &parameterCount);
 	
 	if(parameterCount > 0)
 		line << '{';
@@ -112,7 +107,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	
 	if(parameterCount > 0) {
 		BMessage subParameter;
-		for(int32 index = 0; parameter.FindMessage("parameters", index,
+		for(int32 index = 0; parameter.FindMessage("Parameters", index,
 				&subParameter) == B_OK; index++)
 			WriteParameter(file, subParameter, level + 1);
 		
@@ -134,7 +129,7 @@ WriteMessageDriverSettings(BFile& file, const BMessage& message)
 	file.Seek(0, SEEK_SET);
 	
 	BMessage parameter;
-	for(int32 index = 0; message.FindMessage("parameters", index, &parameter) == B_OK;
+	for(int32 index = 0; message.FindMessage("Parameters", index, &parameter) == B_OK;
 			index++)
 		WriteParameter(file, parameter, 0);
 	

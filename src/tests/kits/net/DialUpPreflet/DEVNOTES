@@ -24,6 +24,11 @@ Devices:
 Protocols:
 "Protocol" : pointer to DialUpAddon object
 
+Addons that must be deleted:
+"DeleteMe" : pointer to DialUpAddon object - this will be deleted on exit (you should register all your
+		addons here, too)
+
+
 --------------------------------------------------------------------------------------
 Additional data in the BMessage object for add-ons:
 --------------------------------------------------------------------------------------
