@@ -640,7 +640,7 @@ rule Link
 
 actions Link bind NEEDLIBS
 {
-	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(2)" $(NEEDLIBS) $(LINKLIBS) ;
+	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(2)" "$(NEEDLIBS)" $(LINKLIBS) ;
 }
 
 # BeOS specific rules
@@ -773,13 +773,13 @@ rule KernelLd
 
 	# Add libgcc.a - NB this should be detected not hard coded!
 	if ! $(5) {
-		LINKLIBS on $(1) += "-L $(GCC_PATH) -lgcc" ;
+		LINKLIBS on $(1) += -L $(GCC_PATH) -lgcc ;
 	}
 }
 
 actions KernelLd
 {
-	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(LINKLIBS)" ;
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
 }
 
 rule KernelStaticLibrary
