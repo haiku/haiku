@@ -1,8 +1,6 @@
 //
 // kb_mouse_driver.h
 //
-
-
 #ifndef _KB_MOUSE_DRIVER_H
 #define _KB_MOUSE_DRIVER_H
 
@@ -12,10 +10,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-
-// Be key numbers for various cool keys
 
 #define KEY_Scroll      0x0f
 #define KEY_Pause       0x10
@@ -42,9 +36,6 @@ extern "C" {
 
 #define KB_DEFAULT_CONTROL_ALT_DEL_TIMEOUT 4000000
 
-
-// ioctl codes
-
 enum {
 	KB_READ = B_DEVICE_OP_CODES_END,
 	KB_GET_KEYBOARD_ID,
@@ -56,7 +47,7 @@ enum {
 	KB_SET_KEY_REPEAT_DELAY,
 	KB_GET_KEY_REPEAT_DELAY,
 	KB_SET_CONTROL_ALT_DEL_TIMEOUT,
-	KB_RESERVED_1,						// was KB_ACKNOWLEDGE_CONTROL_ALT_DEL,
+	KB_RESERVED_1,
 	KB_CANCEL_CONTROL_ALT_DEL,
 	KB_DELAY_CONTROL_ALT_DEL,
 	
@@ -78,22 +69,19 @@ enum {
 };
 
 
-// structure passed to KB_READ
-
-typedef struct {                        // USB, ADB keyboards
+typedef struct {
 	bigtime_t       timestamp;
 	uint32          be_keycode;
 	bool            is_keydown;
 } raw_key_info;
 
-typedef struct {                        // AT keyboards
+
+typedef struct {
 	bigtime_t       timestamp;
-	uint8           scancode;       // high bit set for extended scancodes
+	uint8           scancode;
 	bool            is_keydown;
 } at_kbd_io;
 
-
-// structure passed to KB_SET_LEDS
 
 typedef struct {
 	bool    num_lock;
@@ -101,8 +89,6 @@ typedef struct {
 	bool    scroll_lock;
 } led_info;
 
-
-#define mouse_settings_file "Mouse_settings"
 
 typedef struct {
   int32 	cookie;
@@ -115,18 +101,6 @@ typedef struct {
   int32 	wheel_ydelta;
   int32		wheel_xdelta;
 } mouse_movement;
-
-
-// On the Mac, the I-squared C bus is controlled by the Cuda microcontroller,
-// which also runs ADB.  Since we have not yet partitioned the driver into
-// a separate Cuda driver and a kb/mouse driver, the iic is controlled with
-// control calls to the kb_mouse driver.  Yuck.
-
-typedef struct {
-	char            device;
-	char            reg;
-	char            value;
-} iic_write;
 
 #ifdef __cplusplus
 }
