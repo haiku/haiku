@@ -10,6 +10,7 @@
 #define MODULE_BIT 0x00800000
 
 #include <string.h>
+#include <unistd.h>
 #include "acc_std.h"
 
 /* defined in ProposeDisplayMode.c */
