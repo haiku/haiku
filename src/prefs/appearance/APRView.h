@@ -10,16 +10,24 @@
 #include <ScrollView.h>
 #include <ScrollBar.h>
 #include <String.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <StringView.h>
+#include <FilePanel.h>
+#include <Invoker.h>
+
+class ColorWell;
 
 class APRView : public BView
 {
 public:
-	APRView(BRect frame, const char *name, int32 resize, int32 flags);
+	APRView(const BRect &frame, const char *name, int32 resize, int32 flags);
 	~APRView(void);
 	void AttachedToWindow(void);
 	void MessageReceived(BMessage *msg);
 	color_which SelectionToAttribute(int32 index);
-	const char *AttributeToString(color_which attr);
+	const char *AttributeToString(const color_which &attr);
 	const char *SelectionToString(int32 index);
 	void SaveSettings(void);
 	void LoadSettings(void);
@@ -27,14 +35,21 @@ public:
 	void NotifyServer(void);
 	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
 protected:
+	BMenu *LoadColorSets(void);
+	void SaveColorSet(const BString &name);
+	void SetColorSetName(const char *name);
 	BColorControl *picker;
 	BButton *apply,*revert,*defaults,*try_settings;
 	BListView *attrlist;
-	BView *colorview;
 	color_which attribute;
 	BMessage settings;
 	BString attrstring;
 	BScrollView *scrollview;
+	BStringView *colorset_label;
+	BMenu *colorset_menu,*settings_menu;
+	BFilePanel *savepanel;
+	ColorWell *colorwell;
+	BString *colorset_name;
 };
 
 #endif

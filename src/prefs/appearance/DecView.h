@@ -26,7 +26,7 @@ public:
 	void NotifyServer(void);
 	void GetDecorators(void);
 	bool LoadDecorator(const char *path);
-	const char * ConvertIndexToPath(int32 index);
+	BString ConvertIndexToPath(int32 index);
 protected:
 	BButton *apply;
 	BListView *declist;

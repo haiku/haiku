@@ -20,7 +20,7 @@
 #include "PreviewDriver.h"
 #include "Decorator.h"
 
-#define DEBUG_DECORATOR
+//#define DEBUG_DECORATOR
 
 DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
@@ -101,11 +101,21 @@ void DecView::MessageReceived(BMessage *msg)
 printf("MSG: Decorator Chosen - #%ld\n",declist->CurrentSelection());
 #endif
 			bool success=false;
-			
-			success=LoadDecorator( ConvertIndexToPath( declist->CurrentSelection() ) );
+
+			BString path( ConvertIndexToPath(declist->CurrentSelection()) );
+#ifdef DEBUG_DECORATOR
+printf("MSG: Decorator path: %s\n",path.String());
+#endif
+
+			success=LoadDecorator(path.String());
 
 			if(!success)
+			{
+#ifdef DEBUG_DECORATOR
+printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
+#endif
 				break;
+			}
 			
 			LayerData ldata;
 			ldata.highcolor.SetColor(ui_color(B_DESKTOP_COLOR));
@@ -192,7 +202,7 @@ void DecView::NotifyServer(void)
 void DecView::GetDecorators(void)
 {
 #ifdef DEBUG_DECORATOR
-printf("GetDecorators\n");
+printf("DecView::GetDecorators()\n");
 #endif
 	BDirectory dir;
 	BEntry entry;
@@ -200,8 +210,52 @@ printf("GetDecorators\n");
 	BString name;
 	BStringItem *item;
 
-	if(dir.SetTo(DECORATORS_DIR)!=B_OK)
+	status_t dirstat=dir.SetTo(DECORATORS_DIR);
+	if(dirstat!=B_OK)
+		if(dirstat!=B_OK)
+	{
+		// We couldn't set the directory, so more than likely it just
+		// doesn't exist. Create it and return an empty menu.
+		switch(dirstat)
+		{
+			case B_NAME_TOO_LONG:
+			{
+				printf("DecView::GetDecorators: Couldn't open the folder for decorators - path string too long.\n");
+				break;
+			}
+			case B_ENTRY_NOT_FOUND:
+			{
+				printf("Couldn't open the folder for decorators - entry not found\n");
+				break;
+			}
+			case B_BAD_VALUE:
+			{
+				printf("DecView::GetDecorators: Couldn't open the folder for decorators - bad path\n");
+				break;
+			}
+			case B_NO_MEMORY:
+			{
+				printf("DecView::GetDecorators: No memory left. We're probably going to crash now\n");
+				break;
+			}
+			case B_BUSY:
+			{
+				printf("DecView::GetDecorators: Couldn't open the folder for decorators - node busy\n");
+				break;
+			}
+			case B_FILE_ERROR:
+			{
+				printf("DecView::GetDecorators: Couldn't open the folder for decorators - general file error\n");
+				break;
+			}
+			case B_NO_MORE_FDS:
+			{
+				printf("DecView::GetDecorators: Couldn't open the folder for decorators - no more file descriptors\n");
+				break;
+			}
+		}
 		return;
+	}
 
 	int32 count=dir.CountEntries();
 
@@ -269,12 +323,20 @@ printf("LoadDecorator(): Deleting old decorator\n");
 	return true;
 }
 
-const char * DecView::ConvertIndexToPath(int32 index)
+BString DecView::ConvertIndexToPath(int32 index)
 {
 	BStringItem *item=(BStringItem*)declist->ItemAt(index);
 	if(!item)
+	{
+#ifdef DEBUG_DECORATOR
+printf("ConvertIndexToPath(): Couldn't get item for index %ld\n",index);
+#endif
 		return NULL;
+	}
 	BString path(DECORATORS_DIR);
 	path+=item->Text();
-	return path.String();
+#ifdef DEBUG_DECORATOR
+printf("ConvertIndexToPath(): returned %s\n",path.String());
+#endif
+	return BString(path.String());
 }

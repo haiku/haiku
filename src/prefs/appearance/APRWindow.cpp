@@ -9,13 +9,13 @@ APRWindow::APRWindow(BRect frame)
 
 	BTab *tab=NULL;
 
-	DecView *dv=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(dv);
-	tabview->AddTab(dv,tab);
-
 	APRView *v=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
 	tab=new BTab(v);
 	tabview->AddTab(v,tab);
+
+	DecView *dv=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
+	tab=new BTab(dv);
+	tabview->AddTab(dv,tab);
 
 	AddChild(tabview);
 }

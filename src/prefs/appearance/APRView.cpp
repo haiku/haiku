@@ -7,23 +7,72 @@
 	strings and such, but even those should be easy to maintain.
 */
 #include <OS.h>
+#include <Directory.h>
+#include <Alert.h>
+#include <Path.h>
+#include <Entry.h>
+#include <File.h>
+#include <stdio.h>
+
 #include "APRView.h"
 #include "PortLink.h"
 #include "defs.h"
-#include <Directory.h>
-#include <File.h>
-#include <stdio.h>
+#include "ColorWell.h"
+
+#define DEBUG_COLORSET
+
+// uncomment this line to query the server for the current GUI settings
+#define LOAD_SETTINGS_FROM_DISK
+
+#define SAVE_COLORSET 'svcs'
+#define DELETE_COLORSET 'dlcs'
+#define LOAD_COLORSET 'ldcs'
+#define COLOR_DROPPED 'cldp'
 
 void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255);
 void PrintRGBColor(rgb_color col);
 
-APRView::APRView(BRect frame, const char *name, int32 resize, int32 flags)
+APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
+	BRect rect(10,60,110,160);
+
+	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
+
+	settings_menu=new BMenu("Settings");
+	settings_menu->AddItem(new BMenuItem("Save Color Set",new BMessage(SAVE_COLORSET),'S'));
+	settings_menu->AddSeparatorItem();
+	settings_menu->AddItem(new BMenuItem("Delete Color Set",new BMessage(DELETE_COLORSET)));
+	mb->AddItem(settings_menu);
+
+	colorset_menu=LoadColorSets();
+	if(colorset_menu)
+		mb->AddItem(colorset_menu);
+	else
+	{
+		// We should *never* be here, but just in case....
+		colorset_menu=new BMenu("Color Sets");
+		mb->AddItem(colorset_menu);
+	}
+	AddChild(mb);
+
+	BRect wellrect(0,0,20,20);
+	wellrect.OffsetTo(Bounds().Width()-(wellrect.Width()+10),25);
+
+	colorwell=new ColorWell(wellrect,new BMessage(COLOR_DROPPED));
+	AddChild(colorwell);
+
+	wellrect.OffsetTo(10,25);
+	wellrect.right=colorwell->Frame().left - 20;
+	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
+	AddChild(colorset_label);
+	colorset_name=new BString("<untitled>");
+
+
 	// Set up list of color attributes
-	attrlist=new BListView(BRect(10,10,110,110),"AttributeList");
+	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
 		B_FOLLOW_TOP, 0, false, true);
@@ -45,14 +94,8 @@ APRView::APRView(BRect frame, const char *name, int32 resize, int32 flags)
 		new BMessage(UPDATE_COLOR));
 	AddChild(picker);
 	
-	BRect cvrect=picker->Frame();
-	cvrect.OffsetBy(picker->Bounds().Width()+10,0);
-	cvrect.right=Bounds().right-10;
+	BRect cvrect;
 	
-	colorview=new BView(cvrect,"ColorView",B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	colorview->SetViewColor(picker->ValueAsColor());
-	AddChild(colorview);
-
 	cvrect.Set(0,0,50,25);
 	cvrect.OffsetBy(scrollview->Frame().right+20,
 		scrollview->Frame().bottom-cvrect.Height());
@@ -86,16 +129,24 @@ APRView::APRView(BRect frame, const char *name, int32 resize, int32 flags)
 		new BMessage(APPLY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(apply);
-	
+
+	BEntry entry(COLOR_SET_DIR);
+	entry_ref ref;
+	entry.GetRef(&ref);
+	savepanel=new BFilePanel(B_SAVE_PANEL, new BMessenger(this),
+		&ref, 0, false);
+
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="PANEL_BACKGROUND";
 	LoadSettings();
 	picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
-	
+
 }
 
 APRView::~APRView(void)
 {
+	delete savepanel;
+	delete colorset_name;
 }
 
 void APRView::AttachedToWindow(void)
@@ -107,33 +158,60 @@ void APRView::AttachedToWindow(void)
 	try_settings->SetTarget(this);
 	revert->SetTarget(this);
 	attrlist->Select(0);
+	settings_menu->SetTargetForItems(this);
+	colorset_menu->SetTargetForItems(this);
+	colorwell->SetTarget(this);
 }
 
 void APRView::MessageReceived(BMessage *msg)
 {
 	switch(msg->what)
 	{
+		case SAVE_COLORSET:
+		{
+			savepanel->Show();
+			break;
+		}
+		case B_SAVE_REQUESTED:
+		{
+			BString name;
+			if(msg->FindString("name",&name)!=B_OK)
+#ifdef DEBUG_COLORSET
+printf("MSG: Save Request - couldn't find file name\n");
+#endif
+				break;
+			SaveColorSet(name);
+			SetColorSetName(name.String());
+			break;
+		}
 		case UPDATE_COLOR:
 		{
+			// Received from the color picker when its color changes
+
 			rgb_color col=picker->ValueAsColor();
 
-			colorview->SetViewColor(col);
-			colorview->Invalidate();
+			colorwell->SetColor(col);
+			colorwell->Invalidate();
 			
-			// Update current attribute here
+			// Update current attribute in the settings
 			settings.ReplaceData(attrstring.String(),(type_code)'RGBC',
 			&col,sizeof(rgb_color));
+
+			SetColorSetName("<untitled>");
 			break;
 		}
 		case ATTRIBUTE_CHOSEN:
 		{
+			// Received when the user chooses a GUI attribute from the list
 			attribute=SelectionToAttribute(attrlist->CurrentSelection());
 			attrstring=SelectionToString(attrlist->CurrentSelection());
 			
 			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
 			picker->SetValue(col);
-			colorview->SetViewColor(col);
-			colorview->Invalidate();
+			colorwell->SetColor(col);
+			colorwell->Invalidate();
+
+			SetColorSetName("<untitled>");
 			break;
 		}
 		case APPLY_SETTINGS:
@@ -155,8 +233,8 @@ void APRView::MessageReceived(BMessage *msg)
 			LoadSettings();
 			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
 			picker->SetValue(col);
-			colorview->SetViewColor(col);
-			colorview->Invalidate();
+			colorwell->SetColor(col);
+			colorwell->Invalidate();
 			break;
 		}
 		case DEFAULT_SETTINGS:
@@ -164,8 +242,8 @@ void APRView::MessageReceived(BMessage *msg)
 			SetDefaults();
 			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
 			picker->SetValue(col);
-			colorview->SetViewColor(col);
-			colorview->Invalidate();
+			colorwell->SetColor(col);
+			colorwell->Invalidate();
 			break;
 		}
 		default:
@@ -174,8 +252,128 @@ void APRView::MessageReceived(BMessage *msg)
 	}
 }
 
+BMenu *APRView::LoadColorSets(void)
+{
+	// This function populates the member menu *colorset_menu with the color
+	// set files located in the color set directory. To ensure that there are
+	// no entries pointing to invalid color sets, they are validated before
+	// a menu item is added.
+	BDirectory dir;
+	BEntry entry;
+	BPath path;
+	BString name;
+
+	BMenu *menu=new BMenu("Color Sets");
+
+	status_t dirstat=dir.SetTo(COLOR_SET_DIR);
+	if(dirstat!=B_OK)
+	{
+		// We couldn't set the directory, so more than likely it just
+		// doesn't exist. Create it and return an empty menu.
+		switch(dirstat)
+		{
+			case B_NAME_TOO_LONG:
+			{
+				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets. "
+					"You will be able to change system colors, but be unable to save them to a color set. "
+					"Please contact OpenBeOS about Appearance Preferences::APRView::"
+					"LoadColorSets::B_NAME_TOO_LONG for a bugfix", "OK",
+					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->Go();
+				break;
+			}
+			case B_ENTRY_NOT_FOUND:
+			{
+				create_directory(COLOR_SET_DIR,0777);
+				break;
+			}
+			case B_BAD_VALUE:
+			{
+				printf("APRView::LoadColorSets(): Invalid colorset folder path.\n");
+				break;
+			}
+			case B_NO_MEMORY:
+			{
+				printf("APRView::LoadColorSets(): No memory left. We're probably going to crash now. \n");
+				break;
+			}
+			case B_BUSY:
+			{
+				printf("APRView::LoadColorSets(): Busy node " COLOR_SET_DIR "\n");
+				break;
+			}
+			case B_FILE_ERROR:
+			{
+				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets "
+					"because of a file error. Perhaps there is a file (instead of a folder) at " COLOR_SET_DIR
+					"? You will be able to change system colors, but be unable to save them to a color set. ",
+					"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->Go();
+				break;
+			}
+			case B_NO_MORE_FDS:
+			{
+				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets "
+					"because there are too many open files. Please close some files and restart "
+					" this application.", "OK",
+					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				a->Go();
+				if(Window())
+					Window()->PostMessage(B_QUIT_REQUESTED);
+				break;
+			}
+		}
+		
+		return menu;
+	}
+
+	int32 count=dir.CountEntries();
+
+	BMessage *msg;
+	for(int32 i=0;i<count;i++)
+	{
+		dir.GetNextEntry(&entry);
+		entry.GetPath(&path);
+		
+		// TODO:
+		// Verify entry here and add name to menu if ok
+		name=path.Path();
+		name.Remove(0,name.FindLast('/')+1);
+
+		msg=new BMessage(LOAD_COLORSET);
+		msg->AddString("path",path.Path());
+		menu->AddItem(new BMenuItem(name.String(),msg));
+	}
+	
+	return menu;
+}	
+
+void APRView::SaveColorSet(const BString &name)
+{
+	// Save the current color attributes as a flattened BMessage in the 
+	// color set folder
+	BString path(SETTINGS_DIR);
+	path+=name.String();
+
+	settings.ReplaceString("name",name.String());
+
+#ifdef DEBUG_COLORSET
+printf("SaveColorSet: %s\n",path.String());
+#endif
+
+	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
+	
+	settings.Flatten(&file);
+
+	BMessage *msg=new BMessage(LOAD_COLORSET);
+	msg->AddString("path",name.String());
+	colorset_menu->AddItem(new BMenuItem(msg));
+}
+
 color_which APRView::SelectionToAttribute(int32 index)
 {
+	// This simply converts the selected index to the appropriate color_which
+	// attribute. A bit of a hack, but it should be relarively easy to maintain
 	switch(index)
 	{	
 		case 0:
@@ -206,10 +404,23 @@ color_which APRView::SelectionToAttribute(int32 index)
 	
 }
 
+void APRView::SetColorSetName(const char *name)
+{
+	if(!name)
+		return;
+	BString namestr("Color Set: ");
+	colorset_name->SetTo(name);
+	namestr+=name;
+	colorset_label->SetText(namestr.String());
+}
+
 void APRView::SaveSettings(void)
 {
+	// Save the current GUI color settings to the GUI colors file in the 
+	// path specified in defs.h
+	
 	BString path(SETTINGS_DIR);
-	path+="SystemColors";
+	path+=COLOR_SETTINGS_NAME;
 	printf("%s\n",path.String());
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
@@ -218,34 +429,66 @@ void APRView::SaveSettings(void)
 
 void APRView::LoadSettings(void)
 {
+	// Load the current GUI color settings from disk. This is done instead of
+	// getting them from the server at this point for testing purposes. Comment
+	// out the #define LOAD_SETTINGS_FROM_DISK line to use the server query code
+
+#ifdef LOAD_SETTINGS_FROM_DISK
+
+#ifdef DEBUG_COLORSET
+printf("Loading settings from disk\n");
+#endif
 	settings.MakeEmpty();
 
 	BDirectory dir,newdir;
 	if(dir.SetTo(SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
+	{
+#ifdef DEBUG_COLORSET
+printf("Color set folder not found. Creating %s\n",SETTINGS_DIR);
+#endif
 		create_directory(SETTINGS_DIR,0777);
+	}
 
 	BString path(SETTINGS_DIR);
-	path+="SystemColors";
+	path+=COLOR_SETTINGS_NAME;
 	BFile file(path.String(),B_READ_ONLY);
 
 	if(file.InitCheck()==B_OK)
 	{
 		if(settings.Unflatten(&file)==B_OK)
 		{
-			// Get the color for the current attribute here
+			settings.FindString("name",colorset_name);
+			BString namestr("Color Set: ");
+			namestr+=colorset_name->String();
+			colorset_label->SetText(namestr.String());
+
+			// TODO:
+			// Get the colors for all attributes here
+			// Invoke a color update by getting the selection and reselecting it
 			return;
 		}
-		printf("Error unflattening settings file %s\n",path.String());
+		printf("Error unflattening SystemColors file %s\n",path.String());
 	}
 	
 	// If we get this far, we have encountered an error, so reset the settings
 	// to the defaults
 	SetDefaults();
+	SaveSettings();
+#else
+	// TODO:
+	// Write the server query code
+#endif
 }
 
 void APRView::SetDefaults(void)
 {
+#ifdef DEBUG_COLORSET
+printf("Initializing color settings to defaults\n");
+#endif
 	settings.MakeEmpty();
+	settings.AddString("name","Default");
+	colorset_name->SetTo("Default");
+	
 	rgb_color col={216,216,216,255};
 	settings.AddData("PANEL_BACKGROUND",(type_code)'RGBC',&col,sizeof(rgb_color));
 
@@ -269,6 +512,10 @@ void APRView::SetDefaults(void)
 
 	SetRGBColor(&col,51,102,160);
 	settings.AddData("DESKTOP",(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	BString labelstr("Color Set: ");
+	labelstr+=colorset_name->String();
+	colorset_label->SetText(labelstr.String());
 }
 
 void APRView::NotifyServer(void)
@@ -328,7 +575,7 @@ rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 in
 	return rcolor;
 }
 
-const char *APRView::AttributeToString(color_which attr)
+const char *APRView::AttributeToString(const color_which &attr)
 {
 	switch(attr)
 	{
