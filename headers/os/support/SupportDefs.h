@@ -133,9 +133,19 @@ extern "C" {
 #endif
 
 //----- Atomic functions; old value is returned --------------------------------
-extern _IMPEXP_ROOT int32	atomic_add(vint32 *value, int32 addvalue);
-extern _IMPEXP_ROOT int32	atomic_and(vint32 *value, int32 andvalue);
-extern _IMPEXP_ROOT int32	atomic_or(vint32 *value, int32 orvalue);	
+extern _IMPEXP_ROOT int32	atomic_set(vint32 *value, int32 newValue);
+extern _IMPEXP_ROOT int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
+extern _IMPEXP_ROOT int32	atomic_add(vint32 *value, int32 addValue);
+extern _IMPEXP_ROOT int32	atomic_and(vint32 *value, int32 andValue);
+extern _IMPEXP_ROOT int32	atomic_or(vint32 *value, int32 orValue);	
+extern _IMPEXP_ROOT int32	atomic_read(vint32 *value);
+
+extern _IMPEXP_ROOT int64	atomic_set64(vint64 *value, int64 newValue);
+extern _IMPEXP_ROOT int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
+extern _IMPEXP_ROOT int64	atomic_add64(vint64 *value, int64 addValue);
+extern _IMPEXP_ROOT int64	atomic_and64(vint64 *value, int64 andValue);
+extern _IMPEXP_ROOT int64	atomic_or64(vint64 *value, int64 orValue);	
+extern _IMPEXP_ROOT int64	atomic_read64(vint64 *value);
 
 // Other stuff -----------------------------------------------------------------
 extern _IMPEXP_ROOT void *	get_stack_frame(void);
