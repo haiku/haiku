@@ -37,7 +37,7 @@ extern struct core_module_info *core;
 
 #if DEBUG
 // defined in ModemDevice.cpp
-void dump_packet(struct mbuf *packet);
+extern void dump_packet(struct mbuf *packet);
 #endif // DEBUG
 
 

@@ -29,7 +29,7 @@ class PPPoEDevice;
 #define PPPoE_VERSION			0x1
 #define PPPoE_TYPE				0x1
 
-#define PPPoE_INTERFACE_KEY		"interface"
+#define PPPoE_INTERFACE_KEY		"Interface"
 #define PPPoE_AC_NAME_KEY		"ACName"
 #define PPPoE_SERVICE_NAME_KEY	"ServiceName"
 
@@ -62,14 +62,14 @@ typedef struct complete_pppoe_header {
 
 
 // defined in pppoe.cpp
-ifnet *FindPPPoEInterface(const char *name);
-uint32 NewHostUniq();
-void add_device(PPPoEDevice *device);
-void remove_device(PPPoEDevice *device);
+extern ifnet *FindPPPoEInterface(const char *name);
+extern uint32 NewHostUniq();
+extern void add_device(PPPoEDevice *device);
+extern void remove_device(PPPoEDevice *device);
 
 #if DEBUG
 // defined in PPPoEDevice.cpp
-void dump_packet(struct mbuf *packet);
+extern void dump_packet(struct mbuf *packet);
 #endif // DEBUG
 
 

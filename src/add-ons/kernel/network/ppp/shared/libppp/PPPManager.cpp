@@ -55,6 +55,22 @@ PPPManager::Control(uint32 op, void *data, size_t length) const
 }
 
 
+status_t
+PPPManager::ControlModule(const char *name, uint32 op, void *data,
+	size_t length) const
+{
+	if(!name)
+		return B_ERROR;
+	
+	control_net_module_args args;
+	args.name = name;
+	args.op = op;
+	args.data = data;
+	args.length = length;
+	return Control(PPPC_CONTROL_MODULE, &args, sizeof(args));
+}
+
+
 ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings,
 	const driver_settings *profile = NULL) const

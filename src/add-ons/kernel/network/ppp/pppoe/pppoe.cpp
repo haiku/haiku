@@ -243,12 +243,13 @@ control(uint32 op, void *data, size_t length)
 			
 			ifnet *current = get_interfaces();
 			for(; current; current = current->if_next) {
-				if(current->if_type == IFT_ETHER && current->name) {
-					if(position + strlen(current->name) + 1 > length)
+				if(current->if_type == IFT_ETHER && current->if_name) {
+					if(position + strlen(current->if_name) + 1 > length)
 						return B_NO_MEMORY;
 					
-					strcpy(names + position, current->name);
-					position += strlen(current->name) + 1;
+					strcpy(names + position, current->if_name);
+					position += strlen(current->if_name);
+					names[position++] = 0;
 					++count;
 				}
 			}

@@ -419,12 +419,11 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 				return B_ERROR;
 			
 			char name[B_PATH_NAME_LENGTH];
-			strcpy(name, PPP_MODULES_PATH);
-			strcat(name, args->name);
+			sprintf(name, "%s/%s", PPP_MODULES_PATH, args->name);
 			ppp_module_info *module;
 			if(get_module(name, (module_info**) &module) != B_OK
 					|| !module->control)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			
 			return module->control(args->op, args->data, args->length);
 		} break;

@@ -24,6 +24,8 @@ class PPPManager {
 		status_t InitCheck() const;
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
+		status_t ControlModule(const char *name, uint32 op, void *data,
+			size_t length) const;
 		
 		ppp_interface_id CreateInterface(const driver_settings *settings,
 			const driver_settings *profile = NULL) const;
