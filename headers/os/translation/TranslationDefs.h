@@ -76,10 +76,10 @@ struct translator_data {
 	status_t (*GetConfigMessage)(BMessage *ioExtension);
 };
 
-#define TK_MAKE_VERSION(mjr,mnr,rev) ((mjr << 8) & ((mnr << 4) & 0xf0) & (rev & 0x0f))
-#define TK_MAJOR_VERSION(v) (v >> 8)
-#define TK_MINOR_VERSION(v) ((v >> 4) & 0xf)
-#define TK_REVISION_VERSION(v) (v & 0xf)
+#define B_TRANSLATION_MAKE_VER(mjr,mnr,rev) ((mjr << 8) & ((mnr << 4) & 0xf0) & (rev & 0x0f))
+#define B_TRANSLATION_MAJOR_VER(v) (v >> 8)
+#define B_TRANSLATION_MINOR_VER(v) ((v >> 4) & 0xf)
+#define B_TRANSLATION_REVSN_VER(v) (v & 0xf)
 
 // END: Added by Michael Wilber
 
