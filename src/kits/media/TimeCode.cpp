@@ -9,27 +9,34 @@
 
 status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL)
 {
-	int fps_div;
 	int32 l_frames;
 
 	CALLED();
 	
 	if (code) {
 		// We have a valid timecode_info
-		fps_div = code->fps_div;
+		switch (code->type) {
+			case	B_TIMECODE_DEFAULT:		// NTSC
+			case	B_TIMECODE_30_DROP_2:	// NTSC
+				l_frames = int32((((micros % 1000000) * 29.97) / 1000000) + (micros / 1000000 * 29.97));
+				break;
+			case	B_TIMECODE_30_DROP_4:	// Brazil
+				l_frames = int32((((micros % 1000000) * 29.95) / 1000000) + (micros / 1000000 * 29.95));
+				break;
+			default:
+				l_frames = (((micros % 1000000) * code->fps_div) / 1000000) + (micros / 1000000 * code->fps_div);
+				break;
+		};			
 	} else {
-		fps_div = 25;		// PAL Default
+		// Convert us to frames
+		l_frames = int32((((micros % 1000000) * 29.97) / 1000000) + (micros / 1000000 * 29.97));
 	}
-
-	// Convert us to frames
-	l_frames = (((micros % 1000) * fps_div) / 1000) + (micros / 1000 * fps_div);
 
 	return frames_to_timecode(l_frames, hours, minutes, seconds, frames, code);
 }
 
 status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime_t * micros, const timecode_info * code = NULL)
 {
-	int fps_div;
 	int32 l_frames;
 	
 	CALLED();
@@ -38,12 +45,23 @@ status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime
 	
 		if (code) {
 			// We have a valid timecode_info
-			fps_div = code->fps_div;
+			switch (code->type) {
+				case	B_TIMECODE_DEFAULT:		// NTSC
+				case	B_TIMECODE_30_DROP_2:	// NTSC
+					*micros = bigtime_t(l_frames * ((1000000 / 29.97) + 0.5));
+					break;
+				case	B_TIMECODE_30_DROP_4:	// Brazil
+					*micros = bigtime_t(l_frames * ((1000000 / 29.95) + 0.5));
+					break;
+				default:
+					*micros = l_frames * 1000000 / code->fps_div;
+					break;
+			};			
+
 		} else {
-			fps_div = 25;		// PAL Default
+			*micros = bigtime_t(l_frames * ((1000000 / 29.97) + 0.5));
 		}
 
-		*micros = l_frames * 1000 / fps_div;
 		return B_OK;
 	}
 	return B_ERROR;
@@ -59,7 +77,7 @@ status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * se
 	CALLED();
 
 	if (code) {
-		// We have a valid timecode_info so get the fps_div
+		// We have a valid timecode_info so use it
 		fps_div = code->fps_div;
 
 		if (code->every_nth > 0) {
@@ -86,8 +104,25 @@ status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * se
 			// l_frames should now include all adjusted frames
 		}
 	} else {
-		// no timecode_info so set a default that doesn't use drop frames :-)
-		fps_div = 25;		// PAL Default
+		// no timecode_info so set default NTSC :-(
+		fps_div = 30;		// NTSC Default
+		total_mins = l_frames / fps_div / 60;
+
+		// "every_nth" minute we gain "drop_frames" "except_nth" minute
+		extra_frames = 2*(total_mins) - 2*(total_mins/10);
+		l_frames += extra_frames;
+
+		total_mins = l_frames / fps_div / 60;
+		extra_frames2 = 2*(total_mins) - 2*(total_mins/10);
+
+		// Gaining frames may mean that we gain more frames so we keep adjusting until no more to adjust
+		while (extra_frames != extra_frames2) {
+			l_frames += extra_frames2 - extra_frames;
+			extra_frames = extra_frames2;
+			
+			total_mins = l_frames / fps_div / 60;
+			extra_frames2 = 2*(total_mins) - 2*(total_mins/10);
+		}
 	}
 	
 	// convert frames to seconds leaving the remainder as frames
@@ -128,9 +163,14 @@ status_t timecode_to_frames(int hours, int minutes, int seconds, int frames, int
 		}
 	} else {
 
-		*l_frames = (hours * 60) + minutes;
-		*l_frames = (*l_frames * 60) + seconds;
-		*l_frames = (*l_frames * 25) + frames;
+		total_mins = (hours * 60) + minutes;
+		*l_frames = (total_mins * 60) + seconds;
+		*l_frames = (*l_frames * 30) + frames;
+
+		// Adjust "every_nth" minute we lose "drop_frames" "except_nth" minute
+		extra_frames = 2*(total_mins) - 2*(total_mins/10);
+
+		*l_frames = *l_frames - extra_frames;
 	}
 	
 	return B_OK;
@@ -141,7 +181,7 @@ status_t get_timecode_description(timecode_type type, timecode_info * out_timeco
 	CALLED();
 
 	out_timecode->type = type;
-	strncpy(out_timecode->format,"%.2i:%.2i:%.2i.%.2i",31);
+	strncpy(out_timecode->format,"%.2ih:%.2im:%.2is.%.2i",31);
 	out_timecode->every_nth = 0;
 	out_timecode->except_nth = 0;
 
@@ -185,8 +225,11 @@ status_t get_timecode_description(timecode_type type, timecode_info * out_timeco
 				out_timecode->fps_div = 18;
 				break;
 		default:
-				strncpy(out_timecode->name,"PAL",31);
-				out_timecode->fps_div = 25;
+				strncpy(out_timecode->name,"NTSC",31);
+				out_timecode->fps_div = 30;	// This is supposed to be 29.97fps but can be simulated using the drop frame format below
+				out_timecode->drop_frames = 2; // Drop 2 frames
+				out_timecode->every_nth = 1;	// every 1 minutes
+				out_timecode->except_nth = 10;	// except every 10 minutes
 				break;
 	}
 	
