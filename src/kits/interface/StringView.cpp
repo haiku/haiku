@@ -26,6 +26,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
 #include <posix/string.h>
 
 // System Includes -------------------------------------------------------------
@@ -57,13 +58,11 @@ BStringView::BStringView(BMessage* data)
 {
 	const char* text;
 
-	if (data->FindInt32("_aligne",(int32&)fAlign) != B_OK)
-	{
+	if (data->FindInt32("_aligne",(int32&)fAlign) != B_OK) {
 		fAlign = B_ALIGN_LEFT;
 	}
 
-	if (data->FindString("_text",&text) != B_OK)
-	{
+	if (data->FindString("_text",&text) != B_OK) {
 		text = NULL;
 	}
 
@@ -72,8 +71,7 @@ BStringView::BStringView(BMessage* data)
 //------------------------------------------------------------------------------
 BArchivable* BStringView::Instantiate(BMessage* data)
 {
-	if (!validate_instantiation(data,"BStringView"))
-	{
+	if (!validate_instantiation(data,"BStringView")) {
 		return NULL;
 	}
 
@@ -84,8 +82,7 @@ status_t BStringView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
 	
-	if (fText)
-	{
+	if (fText) {
 		data->AddString("_text",fText);
 	}
 
@@ -96,18 +93,12 @@ status_t BStringView::Archive(BMessage* data, bool deep) const
 //------------------------------------------------------------------------------
 BStringView::~BStringView()
 {
-	if (fText)
-	{
-		delete[] fText;
-	}
+	free(fText);
 }
 //------------------------------------------------------------------------------
 void BStringView::SetText(const char* text)
 {
-	if (fText)
-	{
-		delete[] fText;
-	}
+	free(fText);
 	fText = strdup(text);
 	Invalidate();
 }
@@ -130,8 +121,7 @@ alignment BStringView::Alignment() const
 //------------------------------------------------------------------------------
 void BStringView::AttachedToWindow()
 {
-	if (Parent())
-	{
+	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
 	}
 }
@@ -267,11 +257,4 @@ BStringView& BStringView::operator=(const BStringView&)
 	return *this;
 }
 //------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
 
