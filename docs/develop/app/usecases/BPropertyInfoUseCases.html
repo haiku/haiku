@@ -1,5 +1,5 @@
 <HTML>
-<!-- $Id: BPropertyInfoUseCases.html,v 1.4 2002/08/18 04:10:29 jrand Exp $ -->
+<!-- $Id: BPropertyInfoUseCases.html,v 1.5 2002/08/19 05:26:56 jrand Exp $ -->
 <HEAD>
 <TITLE>BPropertyInfo Use Cases and Implementation Details</TITLE>
 </HEAD>
@@ -167,9 +167,53 @@ flattened BPropertyInfo.  However, we believe the chance of this happening to be
 not worth the cost of the implementation.</LI>
 </UL>
 
+<P>The flattened format of BPropertyInfo looks like the following:</P>
+
+<TABLE BORDER=1>
+<TR><TH>Section</TH><TH>Size</TH><TH>Description</TH></TR>
+
+<TR><TD ROWSPAN=3>Header</TD><TD>1</TD><TD>Endian flag, 1 for big endian, 0 for little
+endian</TD></TR>
+<TR><TD>4</TD><TD>Number of property_info elements in the flattened data.</TD></TR>
+<TR><TD>4</TD><TD>Set to 3 if there are value_info in the flattened data, 1 otherwise</TD></TR>
+
+<TR><TD ROWSPAN=5>property_info main section, one per property_info element</TD><TD>1 to n</TD><TD>NULL terminated property_name</TD></TR>
+<TR><TD>1 to n</TD><TD>NULL terminated usage string.</TD></TR>
+<TR><TD>4</TD><TD>The extra_data value</TD></TR>
+<TR><TD>4 to 40</TD><TD>Up to 10 commands, each 4 bytes in size.  A zero command indicates the end of
+the commands.</TD></TR>
+<TR><TD>4 to 40</TD><TD>Up to 10 specifiers, each 4 bytes in size.  A zero specifier indicates the end of
+the specifiers.</TD></TR>
+
+<TR><TD ROWSPAN=2>property_info types section, one per property_info element</TD><TD>4 to 40</TD>
+<TD>Up to 10 types, each 4 bytes in size.  A zero type indicates the end of the types.</TD></TR>
+<TR><TD>4 to n</TD><TD>A series of 0 to 15 name and type pairs from the "compound types" or ctypes
+section of the property_info structure.  Each is made up of a null terminated name followed by a
+4 byte type.  There are up to 15 because there is a three element array of five name/type pairs.
+If fewer than 5 elements appear in any one set of the the three elements, four zero bytes are
+in the stream where the "name" would be.  Also, to indicate that there are fewer than three
+compound types, four zero bytes are in the stream where the first name would be.</TD></TR>
+
+<TR><TD ROWSPAN=1>value_info header, only appears if the flag in the header is set to "3"</TD>
+<TD>2</TD><TD>Number of value_info elements in the flattened data.</TD></TR>
+
+<TR><TD ROWSPAN=5>value_info section, one per value_info element</TD><TD>4</TD><TD>The "kind"
+of this value_info element.</TD></TR>
+<TR><TD>4</TD><TD>The "value" of this value_info element</TD></TR>
+<TR><TD>1 to n</TD><TD>A NULL terminated name string</TD></TR>
+<TR><TD>1 to n</TD><TD>A NULL terminated usage string</TD></TR>
+<TR><TD>4</TD><TD>The "extra_data" of this value_info element</TD></TR>
+
+</TABLE>
+
+
 <P>The following is some information from Marc Flerackers sent in a series of emails which 
 describes his investigation into how BPropertyInfo instances are flattened.  Note that the
-implementation is very much based Marc's implementation elluded to in these messages:</P>
+implementation is very much based Marc's implementation elluded to in these messages, although
+you will see some differences between the above description and Marc's messages.  The above
+table describes the actual format as it is implemented today and seems to match Be's 
+implementation.  However, Marc's investigation, implementation and emails were critical to
+getting this information and is therefore included here in this document:</P>
 
 <H3>Message 1:</H3>
 
