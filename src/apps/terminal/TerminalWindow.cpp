@@ -16,26 +16,20 @@
 #include <TextControl.h>
 #include <TranslationUtils.h>
 #include <Window.h>
-#include "Constants.h"
-#include "ToggleScrollView.h"
-#include "TerminalApp.h"
-#include "TerminalTextView.h"
-#include "TerminalWindow.h"
 
-TerminalWindow::TerminalWindow(BPoint topLeft, int32 id)
+#include <Constants.h>
+#include <TerminalApp.h>
+#include <TerminalTextView.h>
+#include <TerminalWindow.h>
+
+int id = 1;
+
+TerminalWindow::TerminalWindow(BPoint topLeft, BMessage * settings)
 	: BWindow(BRect(topLeft,topLeft+BPoint(560,390)),
 			  "terminal",B_DOCUMENT_WINDOW,0)
 {
-	status_t status = InitWindow(id);
-	// TODO: handle error status
-	Show();
-}
-
-TerminalWindow::TerminalWindow(entry_ref *ref, int32 id)
-	: BWindow(BRect(7,16,567,406),"terminal",B_DOCUMENT_WINDOW,0)
-{
-	status_t status = InitWindow(id,ref);
-	// TODO: handle error status
+	fInitStatus = B_ERROR;
+	fInitStatus = InitWindow(id++);
 	Show();
 }
 
@@ -44,13 +38,17 @@ TerminalWindow::~TerminalWindow()
 	delete fLogToFilePanel;
 	delete fWriteSelectionPanel;
 	delete fSaveAsSettingsFilePanel;
-	
 //	if (fSaveMessage)
 //		delete fSaveMessage;
 //	if (fPrintSettings)
 //		delete fPrintSettings;
 }
 
+status_t
+TerminalWindow::InitCheck(void)
+{
+	return fInitStatus;
+}
 	
 status_t
 TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
@@ -83,7 +81,7 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fTextView = new TerminalTextView(viewFrame, textBounds, this);
 	fTextView->SetStylable(true);
 	
-	fScrollView = new ToggleScrollView("scrollview", fTextView, 0, false, true, B_PLAIN_BORDER);
+	fScrollView = new BScrollView("scrollview", fTextView, 0, false, true, B_PLAIN_BORDER);
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);	
 
@@ -301,7 +299,10 @@ TerminalWindow::MenusBeginning()
 void
 TerminalWindow::Quit()
 {
-	terminal_app->CloseTerminal();
+	{
+		BAutolock lock(terminal_app);
+		terminal_app->Quit();
+	}
 	BWindow::Quit();
 }
 	

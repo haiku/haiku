@@ -2,13 +2,15 @@ SubDir OBOS_TOP src apps terminal ;
 
 AddResources Terminal :
 	Terminal.rdef
+	Terminal.icons.rdef
+	Terminal.version.rdef
 	;
 
 App Terminal :
-	ToggleScrollView.cpp
+	Terminal.cpp
 	TerminalTextView.cpp
 	TerminalWindow.cpp
 	TerminalApp.cpp
 	;
 
-LinkSharedOSLibs Terminal : be stdc++.r4 translation tracker ;
+LinkSharedOSLibs Terminal : be translation tracker ;

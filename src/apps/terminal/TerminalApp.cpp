@@ -9,17 +9,19 @@
 #include <stdio.h>
 #include <getopt.h>
 
-BPoint windowPoint(7,26);
-BPoint cascadeOffset(15,15);
-
 TerminalApp * terminal_app;
 
 TerminalApp::TerminalApp()
 	: BApplication(APP_SIGNATURE)
 {
-	fWindowCount = 0;
-	fNext_Terminal_Window = 1;
+	fWindowOpened = false;
+	fArgvOkay = true;
 	terminal_app = this;
+}
+
+TerminalApp::~TerminalApp()
+{
+	
 }
 
 void TerminalApp::DispatchMessage(BMessage *msg, BHandler *handler)
@@ -29,10 +31,15 @@ void TerminalApp::DispatchMessage(BMessage *msg, BHandler *handler)
 		if (msg->FindInt32("argc",&argc) != B_OK) {
 			argc = 0;
 		}
-		const char ** argv = new (const char*)[argc];
+		char ** argv = new (char*)[argc];
 		for (int arg = 0; (arg < argc) ; arg++) {
-			if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
+			BString string;
+			if (msg->FindString("argv",arg,&string) != B_OK) {
 				argv[arg] = "";
+			} else {
+				char * chars = new char[string.Length()];
+				strcpy(chars,string.String());
+				argv[arg] = chars;
 			}
 		}
 		const char * cwd;
@@ -45,16 +52,30 @@ void TerminalApp::DispatchMessage(BMessage *msg, BHandler *handler)
 	}
 }
 
+#include <Alert.h>
 
 void
 TerminalApp::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case TERMINAL_START_NEW_TERMINAL:
-			OpenTerminal();
+		case TERMINAL_START_NEW_TERMINAL: {
+			status_t result = be_roster->Launch(APP_SIGNATURE);
+			if (result != B_OK) {
+				// TODO: notify user
+			}
+		}
 		break;
-		case B_SILENT_RELAUNCH:
+		case B_SILENT_RELAUNCH: {
+			BAlert * go = new BAlert("SILENT","RELAUNCH","OH YEAH");
+			go->Go();
 			OpenTerminal();
+		}
+		break;
+		case B_REFS_RECEIVED: {
+			BAlert * go = new BAlert("REFS","RECEIVED","OH YEAH");
+			go->Go();
+			OpenTerminal(message);
+		}
 		break;
 		default:
 			BApplication::MessageReceived(message);
@@ -63,28 +84,10 @@ TerminalApp::MessageReceived(BMessage *message)
 }
 
 void
-TerminalApp::OpenTerminal()
+TerminalApp::OpenTerminal(BMessage * message)
 {
-	new TerminalWindow(windowPoint,fNext_Terminal_Window++);
-	windowPoint += cascadeOffset; // TODO: wrap around screen
-	fWindowCount++;
-}
-
-void
-TerminalApp::OpenTerminal(entry_ref * ref)
-{
-	new TerminalWindow(ref,fNext_Terminal_Window++);
-	fWindowCount++;
-}
-
-void
-TerminalApp::CloseTerminal()
-{
-	fWindowCount--;
-	if (fWindowCount == 0) {
-		BAutolock lock(this);
-		Quit();
-	}
+	BPoint windowPoint(7,26);
+	TerminalWindow * terminal = new TerminalWindow(windowPoint,message);
 }
 
 void
@@ -99,8 +102,11 @@ TerminalApp::RefsReceived(BMessage *message)
 		err = message->FindRef("refs", refNum, &ref);
 		if (err != B_OK)
 			return;
-		OpenTerminal(&ref);
+		BMessage single(OPEN_TERMINAL);
+		single.AddRef("refs",&ref);
+		OpenTerminal(&single);
 		refNum++;
+		printf("refNum = %ld\n",refNum);
 	} while (true);
 }
 
@@ -168,21 +174,21 @@ string2color (const char * name, rgb_color * color) {
 
 // TODO: implement the arguments for Terminal
 void
-TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
+TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 {
-	BMessage * terminal = new BMessage(OPEN_TERMINAL);
+	BMessage terminal(OPEN_TERMINAL);
+	fArgvOkay = false;
 	if (argc > 1) {
 		if (argv[1][0] == '-') {
 			const char * execname = (argc >= 1 ? argv[0] : "");
 			const char * title = 0;
 			int indexptr = 0;
 			int ch;
-			char * const * optargv = (char * const *)argv;
+			char * const * optargv = argv;
 			while ((ch = getopt_long_only(argc, optargv, "hg:mp:t:", options, &indexptr)) != -1) {
 				switch (ch) {
 				case 'h':
 					PrintUsage(execname);
-					delete terminal;
 					return;
 				break;
 				case 'g':
@@ -191,20 +197,19 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					if ((sscanf(optarg,"%ldx%ld%s",&m,&n) != 2) || (m < 0) || (n < 0)) {
 						printf("??\n");
 						printf("geometry must be of the format MxN where M and N are positive integers\n");
-						delete terminal;
 						return;
 					}
 					printf("%ld,%ld\n",m,n);
-					terminal->AddInt32("columns",m);
-					terminal->AddInt32("rows",n);					
+					terminal.AddInt32("columns",m);
+					terminal.AddInt32("rows",n);					
 				break;
 				case 'm':
 					printf("pass meta through to shell\n");
-					terminal->AddBool("meta",true);
+					terminal.AddBool("meta",true);
 				break;
 				case 't':
 					printf("title is %s\n",optarg);
-					terminal->AddString("title",optarg);
+					terminal.AddString("title",optarg);
 				break;
 				case 'p': {
 					printf("prefs file is %s\n",optarg);
@@ -220,37 +225,31 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						break;
 						case B_ENTRY_NOT_FOUND:
 							printf("could not find entry for prefs file '%s'\n",optarg);
-							delete terminal;
 							return;
 						break;
 						case B_NO_MEMORY:
 							printf("not enough memory in get_ref_for_path\n");
-							delete terminal;
 							return;
 						break;
 						default:
 							printf("unknown error in get_ref_for_path\n");
-							delete terminal;
 							return;
 					}
-					terminal->AddRef("pref",&ref);
+					terminal.AddRef("refs",&ref);
 				}
 				break;					
 				case ':':
 					switch (optopt) {
 					case 't':
 						printf("-t option must be specified with a title\n");
-						delete terminal;
 						return;
 					break;
 					default:
 						printf("-%c missing argument\n", optopt);
-						delete terminal;
 						return;
 					}
 				break;
 				case '?':
-					delete terminal;
 					return;
 				break;
 				default:
@@ -260,10 +259,9 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for curbg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("curbg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("curbg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
@@ -272,10 +270,9 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for curfg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("curfg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("curfg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
@@ -284,10 +281,9 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for bg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("bg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("bg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
@@ -296,10 +292,9 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for fg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("fg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("fg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
@@ -308,10 +303,9 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for selbg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("selbg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("selbg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
@@ -320,16 +314,14 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						rgb_color color;
 						if (string2color(optarg,&color) != B_OK) {
 							printf("invalid color specifier for selfg\n");
-							delete terminal;
 							return;
 						}
-						terminal->AddData("selfg",B_RGB_32_BIT_TYPE,
+						terminal.AddData("selfg",B_RGB_32_BIT_TYPE,
 						                  &color,sizeof(color),true,1);
 					}
 					break;
 					default:
 						printf("invalid indexptr %ld\n",indexptr);
-						delete terminal;
 						return;
 					}		
 				}
@@ -337,31 +329,22 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 		}
 		while (optind < argc) {
 			printf("adding string %s\n",argv[optind]);
-			terminal->AddString("argv",argv[optind++]);
+			terminal.AddString("argv",argv[optind++]);
 		}
 	}
-	PostMessage(terminal);
+	OpenTerminal(&terminal);
+	fArgvOkay = true;
 	return;
 }
 
 void 
 TerminalApp::ReadyToRun() 
 {
-	if (fWindowCount == 0) {
+	if (!fArgvOkay) {
 		Quit();
+		return;
+	} 
+	if (!fWindowOpened) {
+		OpenTerminal();
 	}
-}
-
-int32
-TerminalApp::NumberOfWindows()
-{
- 	return fWindowCount;
-}
-
-int
-main()
-{
-	TerminalApp	terminal;
-	terminal.Run();
-	return 0;
 }

@@ -8,26 +8,26 @@
 #include <String.h>
 #include <TextView.h>
 #include <Window.h>
+#include <Message.h>
 
-class ToggleScrollView;
 class TerminalTextView;
 
 class TerminalWindow
 	: public BWindow
 {
 public:
-					TerminalWindow(BPoint topLeft, int32 id);
-					TerminalWindow(entry_ref * ref, int32 id);
-					~TerminalWindow();
+	                  TerminalWindow(BPoint topLeft, BMessage * settings = 0);
+	virtual           ~TerminalWindow();
 	
-	virtual void	Quit();
-	virtual bool 	QuitRequested();
-	virtual void 	MessageReceived(BMessage *message);
-	virtual void	MenusBeginning();
+	virtual void      Quit(void);
+	virtual bool      QuitRequested(void);
+	virtual void      MessageReceived(BMessage *message);
+	virtual void      MenusBeginning(void);
+	virtual status_t  InitCheck(void);
 	
 private: 
-	status_t		InitWindow(int32 id, entry_ref * settingsRef = 0);
-	status_t		RestoreSettings(entry_ref * settingsRef = 0);
+	status_t          InitWindow(int32 id, entry_ref * settingsRef = 0);
+	status_t          RestoreSettings(entry_ref * settingsRef = 0);
 
 	// Menu variables
 	BMenuBar		*fMenuBar;
@@ -65,7 +65,7 @@ private:
 	
 	// Main views
 	TerminalTextView*fTextView;
-	ToggleScrollView*fScrollView;
+	BScrollView     *fScrollView;
 	
 	// File panels
 	BFilePanel		*fLogToFilePanel;
@@ -76,7 +76,8 @@ private:
 	BMenu			*fSaveAsSettingsFilePanelEncodingMenu;
 
 	BTextControl	*fSavePanelTextView;
-		
+	
+	status_t        fInitStatus;
 };
 
 #endif // TERMINAL_WINDOW_H

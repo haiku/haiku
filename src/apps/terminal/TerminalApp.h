@@ -3,6 +3,7 @@
 
 #include <Application.h>
 #include <Message.h>
+#include <Roster.h>
 
 class TerminalWindow;
 
@@ -11,23 +12,20 @@ class TerminalApp
 {
 public:
 					TerminalApp();
+	virtual         ~TerminalApp();
 	virtual void 	MessageReceived(BMessage *message);
-	virtual	void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
+	virtual	void	ArgvReceived(int32 argc, char * const argv[], const char * cwd);
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
 
 	virtual	void	DispatchMessage(BMessage *an_event, BHandler *handler);
 
-			int32	NumberOfWindows();
-			void	OpenTerminal();
-			void	OpenTerminal(entry_ref * ref);
+			void	OpenTerminal(BMessage * message = 0);
 			void	CloseTerminal();
-	
 private:
 			void	PrintUsage(const char * execname);
-	int32			fWindowCount;
-	int32			fNext_Terminal_Window;
-		
+	bool            fWindowOpened;
+	bool            fArgvOkay;
 };
 
 extern TerminalApp * terminal_app;
