@@ -182,52 +182,98 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 	
 	// iterate over the three plane buffers
 	for (int i = 0; i < fPlaneBufferSize; i ++) {
-		const uchar values[3] = { 
-			fPlaneBuffers[0][i],
-			fPlaneBuffers[1][i],
-			fPlaneBuffers[2][i]
-		};
-		
 		int pixels = 8;
 		if (remainingPixels < 8) {
 			pixels = remainingPixels;
 		}
 		remainingPixels -= pixels;
-		
-		// for each bit in the current byte of each plane	
-		uchar mask = 0x80;
-		for (; pixels > 0; pixels --) {			
-			int rgb = 0;
+
+		if (remainingPixels >= 8) {
+			register const uchar
+				red   = fPlaneBuffers[0][i],
+				green = fPlaneBuffers[1][i],
+				blue  = fPlaneBuffers[2][i];
+
+			register uchar value = 0;
+			if (red   & 0x80) value =  0x80;
+			if (red   & 0x40) value |=  0x10;
+			if (red   & 0x20) value |=  0x02;
+
+			if (green & 0x80) value |= 0x40;
+			if (green & 0x40) value |= 0x08;
+			if (green & 0x20) value |= 0x01;			
+
+			if (blue  & 0x80) value |= 0x20;
+			if (blue  & 0x40) value |= 0x04;
+
+			*out++ = value;
 			
-			if (values[0] & mask) {
-				rgb |= kRed;
-			}
-			if (values[1] & mask) {
-				rgb |= kGreen;
-			}
-			if (values[2] & mask) {
-				rgb |= kBlue;
-			}
+			value = 0;
+			if (blue  & 0x20) value =  0x80;
+			if (blue  & 0x10) value |=  0x10;
+			if (blue  & 0x08) value |=  0x02;
+
+			if (red   & 0x10) value |= 0x40;
+			if (red   & 0x08) value |= 0x08;
+			if (red   & 0x04) value |= 0x01;
+
+			if (green & 0x10) value |= 0x20;
+			if (green & 0x08) value |= 0x04;
+			*out++ = value;
 			
-			for (int plane = 0; plane < 3; plane ++) {
-				// copy pixel value to output value
-				if (rgb & (1 << plane)) {
-					value |= outMask;
+			value = 0;
+			if (green & 0x04) value =  0x80;
+			if (green & 0x02) value |=  0x10;
+			if (green & 0x01) value |=  0x02;
+
+			if (blue  & 0x04) value |= 0x40;
+			if (blue  & 0x02) value |= 0x08;
+			if (blue  & 0x01) value |= 0x01;
+
+			if (red   & 0x02) value |= 0x20;
+			if (red   & 0x01) value |= 0x04;
+			*out++ = value;
+	
+		} else {
+			register const uchar
+				red   = fPlaneBuffers[0][i],
+				green = fPlaneBuffers[1][i],
+				blue  = fPlaneBuffers[2][i];
+			// for each bit in the current byte of each plane	
+			uchar mask = 0x80;
+			for (; pixels > 0; pixels --) {			
+				int rgb = 0;
+				
+				if (red & mask) {
+					rgb |= kRed;
 				}
-			
-				// increment output mask
-				if (outMask == 0x01) {
-					outMask = 0x80;
-					// write output value to output buffer
-					*out = value;
-					out ++;
-					value = 0;
-				} else {
-					outMask >>= 1;
+				if (green & mask) {
+					rgb |= kGreen;
 				}
-			}
-			mask >>= 1;
-		}	
+				if (blue & mask) {
+					rgb |= kBlue;
+				}
+				
+				for (int plane = 0; plane < 3; plane ++) {
+					// copy pixel value to output value
+					if (rgb & (1 << plane)) {
+						value |= outMask;
+					}
+				
+					// increment output mask
+					if (outMask == 0x01) {
+						outMask = 0x80;
+						// write output value to output buffer
+						*out = value;
+						out ++;
+						value = 0;
+					} else {
+						outMask >>= 1;
+					}
+				}
+				mask >>= 1;
+			}	
+		}
 	}
 	
 	// write last output value
@@ -358,7 +404,6 @@ static void initializeBitmap(BBitmap *bitmap, int width, int height)
 	}
 }
 
-#if 1
 int main() 
 {
 	const int width = 10;
@@ -379,10 +424,8 @@ int main()
 	rasterizer.SetBitmap(0, 0, &bitmap, height);
 	rasterizer.InitializeBuffer();
 	while (rasterizer.HasNextLine()) {
-		// const uchar *rowBuffer = (uchar*) 
 		rasterizer.RasterizeNextLine();
 	}
 }
-#endif
 
 #endif
