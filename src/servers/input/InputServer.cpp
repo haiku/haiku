@@ -186,27 +186,24 @@ InputServer::LoadKeymap()
 	status_t err;
 	
 	BFile file(&ref, B_READ_ONLY);
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+	if ((err = file.InitCheck()) != B_OK)
 		return err;
-	}
 	
-	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys)) {
+	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
-	}
 	
 	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 	
-	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32))
 		return B_BAD_VALUE;
-	}
 	
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
 	if (!fChars)
 		delete[] fChars;
 	fChars = new char[fCharsSize];
-	err = file.Read(fChars, fCharsSize);
+	if (file.Read(fChars, fCharsSize) != fCharsSize)
+		return B_BAD_VALUE;
 	
 	return B_OK;
 }
@@ -222,7 +219,47 @@ InputServer::LoadSystemKeymap()
 	fChars = new char[fCharsSize];
 	memcpy(fChars, sSystemKeyChars, fCharsSize);
 	
-	// TODO : save this keymap to file
+	// we save this keymap to file
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return B_BAD_VALUE;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+	
+	status_t err;
+	
+	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+	if ((err = file.InitCheck()) != B_OK) {
+		printf("error %s\n", strerror(err));
+		return err;
+	}
+	
+	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
+		
+	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys)) {
+		return err;
+	}
+	
+	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+	
+	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+	
+	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
+		return B_BAD_VALUE;
+	}
+	
+	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
+	
+	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
+		return err;
+	
+	return B_OK;
+	
 }
 
 
