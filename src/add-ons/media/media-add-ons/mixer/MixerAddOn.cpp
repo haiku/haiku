@@ -4,9 +4,7 @@
 // Marcus Overhagen, 2003
 //
 // Allows AudioMixer to be used as an addon.
-// The add-on will request to be auto-started,
-// if this happens, it will try to connect 
-// itself to the default audio output.
+// The add-on will request to be auto-started.
 
 #include <MediaRoster.h>
 #include <MediaNode.h>
@@ -112,66 +110,6 @@ AudioMixerAddon::AutoStart(int in_index, BMediaNode ** out_node,
 		return B_ERROR;
 
 	*out_internal_id = 0;
-	*out_node = new AudioMixer(this);
-	
-	// The mixer has been created.
-	// We now try to connect it with the default audio output.
-
-	if (ConnectToOutput(*out_node) != B_OK) {
-		printf("AudioMixerAddon::AutoStart: failed to ConnectToOutput()\n");
-		// cleanup
-		// return B_ERROR;
-	}
-	
-	return B_OK;
-}
-
-status_t
-AudioMixerAddon::ConnectToOutput(BMediaNode *node)
-{
-	BMediaRoster 		*roster;
-	media_node 			mixer;
-	media_node 			soundcard;
-	media_input 		input;
-	media_output 		output;
-	int32 				count;
-	status_t 			rv;
-	
-	roster = BMediaRoster::Roster();
-	mixer = node->Node();
-	
-	// XXX this connects to *any* physical output, but not the default logical input
-
-	rv = roster->GetAudioOutput(&soundcard);
-	if (rv < B_OK) {
-		printf("AudioMixerAddon::AutoStart: failed to find soundcard (physical audio output)\n");
-		return B_ERROR;
-	}
-
-	// we now have the mixer and soundcard nodes,
-	// find a free input/output and connect them
-
-	rv = roster->GetFreeOutputsFor(mixer, &output, 1, &count, B_MEDIA_RAW_AUDIO);
-	if (rv < B_OK || count != 1) {
-		printf("AudioMixerAddon::AutoStart: can't find free mixer output\n");
-		return B_ERROR;
-	}
-
-	rv = roster->GetFreeInputsFor(soundcard, &input, 1, &count, B_MEDIA_RAW_AUDIO);
-	if (rv < B_OK || count != 1) {
-		printf("AudioMixerAddon::AutoStart: can't find free soundcard input\n");
-		return B_ERROR;
-	}
-
-	media_format format;
-	memset(&format, 0, sizeof(format));
-	format.type = B_MEDIA_RAW_AUDIO;
-
-	rv = roster->Connect(output.source, input.destination, &format, &output, &input);
-	if (rv < B_OK) {
-		printf("AudioMixerAddon::AutoStart: connect failed\n");
-		return B_ERROR;
-	}
-	
+	*out_node = new AudioMixer(this);	
 	return B_OK;
 }

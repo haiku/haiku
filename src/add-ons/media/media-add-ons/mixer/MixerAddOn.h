@@ -40,9 +40,7 @@ virtual	status_t AutoStart(
 				BMediaNode ** out_node,
 				int32 * out_internal_id,
 				bool * out_has_more);
-private:
-	status_t ConnectToOutput(BMediaNode *node);
-				
+
 private:
 	media_format 	*fFormat;
 	flavor_info		*fInfo;
