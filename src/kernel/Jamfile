@@ -129,9 +129,14 @@ KernelLd libglue.o :	# libglue.o is used for dynamic libraries
 	no_gcc
 	;
 
+UnarchiveObjects $(LIBGCC_OBJECTS) : $(LIBGCC_DIR)/libgcc.a ;
+	# we need to link against libgcc.a objects and make
+	# it available to other applications as in BeOS
+
 KernelLd libroot.so :
 	libglue.o
 
+	$(LIBGCC_OBJECTS)
 	<$(SOURCE_GRIST)!libroot>libroot_init.o
 
 	os_main.o
@@ -152,17 +157,11 @@ KernelLd libroot.so :
 	posix_termios.o
 	posix_time.o
 	posix_unistd.o
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
-	:
-	-shared -soname libroot.so -Bdynamic -export-dynamic
-	:
-	# no_gcc
-	# for now link against libgcc.a to allow more BeOS executables to be run.
-	# Needs a definitive decision - most probably we will have to link it statically
-	# against libroot.so, too, like BeOS does it
-	:
-	beos/system/lib/libroot.so
+
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
+	: -shared -soname libroot.so -Bdynamic -export-dynamic
+	: no_gcc
+	: beos/system/lib/libroot.so
 	;
 
 KernelLd libglue2.o :	# libglue2.o is used for executables
