@@ -37,8 +37,9 @@ key *gKeys;
 int32 gNum = DEFAULT_NUM_KEYS;
 int32 gType = DEFAULT_KEY_TYPE;
 int32 gTreeCount = 0;
-bool gVerbose,gExcessive;
+bool gVerbose, gExcessive;
 int32 gIterations = DEFAULT_ITERATIONS;
+int32 gHard = 1;
 Volume *gVolume;
 int32 gSeed = 42;
 
@@ -415,7 +416,7 @@ checkTree(BPlusTree *tree)
 
 
 void
-addAllKeys(Transaction *transaction,BPlusTree *tree)
+addAllKeys(Transaction *transaction, BPlusTree *tree)
 {
 	printf("*** Adding all keys to the tree...\n");
 	for (int32 i = 0;i < gNum;i++) {
@@ -432,6 +433,31 @@ addAllKeys(Transaction *transaction,BPlusTree *tree)
 		}
 	}
 	checkTree(tree);
+}
+
+
+void
+removeAllKeys(Transaction *transaction, BPlusTree *tree)
+{
+	printf("*** Removing all keys from the tree...\n");
+	for (int32 i = 0;i < gNum;i++) {
+		while (gKeys[i].in > 0) {
+			status_t status = tree->Remove(transaction, (uint8 *)gKeys[i].data,
+				gKeys[i].length, gKeys[i].value);
+			if (status < B_OK) {
+				printf("BPlusTree::Remove() returned: %s\n", strerror(status));
+				printf("key: ");
+				dumpKey(gKeys[i].data, gKeys[i].length);
+				putchar('\n');
+			}
+			else {
+				gKeys[i].in--;
+				gTreeCount--;
+			}
+		}
+	}
+	checkTree(tree);
+	
 }
 
 
@@ -575,7 +601,7 @@ usage(char *program)
 {
 	if (strrchr(program,'/'))
 		program = strrchr(program,'/') + 1;
-	fprintf(stderr,"usage: %s [-ve] [-t type] [-n keys] [-i iterations] [-r seed]\n"
+	fprintf(stderr,"usage: %s [-veh] [-t type] [-n keys] [-i iterations] [-h times] [-r seed]\n"
 		"BFS B+Tree torture test\n"
 		"\t-t\ttype is one of string, int32, uint32, int64, uint64, float,\n"
 		"\t\tor double; defaults to string.\n"
@@ -583,9 +609,10 @@ usage(char *program)
 		"\t\tminimum is 1, defaults to %ld.\n"
 		"\t-i\titerations is the number of the test cycles, defaults to %ld.\n"
 		"\t-r\tthe seed for the random function, defaults to %ld.\n"
+		"\t-h\tremoves the keys and start over again for x times.\n"
 		"\t-e\texcessive validity tests: tree contents will be tested after every operation\n"
 		"\t-v\tfor verbose output.\n",
-		program,DEFAULT_NUM_KEYS,DEFAULT_ITERATIONS,gSeed);
+		program, DEFAULT_NUM_KEYS, DEFAULT_ITERATIONS, gSeed);
 	exit(0);
 }
 
@@ -646,10 +673,18 @@ main(int argc,char **argv)
 						if (gNum < 1)
 							gNum = 1;
 						break;
+					case 'h':
+						if (*++argv == NULL || !isdigit(**argv))
+							usage(program);
+
+						gHard = atoi(*argv);
+						if (gHard < 1)
+							gHard = 1;
+						break;
 					case 'i':
 						if (*++argv == NULL || !isdigit(**argv))
 							usage(program);
-						
+
 						gIterations = atoi(*argv);
 						if (gIterations < 1)
 							gIterations = 1;
@@ -697,18 +732,22 @@ main(int argc,char **argv)
 	if (gVerbose)
 		dumpKeys();
 
-	addAllKeys(&transaction,&tree);
+	for (int32 j = 0; j < gHard; j++ ) {
+		addAllKeys(&transaction, &tree);
 
-	//
-	// Run the tests (they will exit the app, if an error occurs)
-	//
-
-	for (int32 i = 0;i < gIterations;i++) {
-		printf("---------- Test iteration %ld ---------------------------------\n",i+1);
-
-		addRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
-		removeRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
-		duplicateTest(&transaction,&tree);
+		//
+		// Run the tests (they will exit the app, if an error occurs)
+		//
+	
+		for (int32 i = 0;i < gIterations;i++) {
+			printf("---------- Test iteration %ld ---------------------------------\n",i+1);
+	
+			addRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
+			removeRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
+			duplicateTest(&transaction,&tree);
+		}
+	
+		removeAllKeys(&transaction, &tree);
 	}
 
 	// of course, we would have to free all our memory in a real application here...
