@@ -8,8 +8,9 @@
 #include "cpu.h"
 #include "mmu.h"
 #include "video.h"
+#include "keyboard.h"
 
-#include <SupportDefs.h>
+#include <KernelExport.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stage2.h>
@@ -27,6 +28,9 @@ extern uint8 _end;
 
 extern int main(stage2_args *args);
 void _start(void);
+
+
+uint32 sBootOptions;
 
 
 static void
@@ -47,10 +51,14 @@ call_ctors(void)
 }
 
 
-bool
-platform_user_menu_requested(void)
+uint32
+platform_boot_options(void)
 {
-	return false;
+#if 0
+	if (!gKernelArgs.fb.enabled)
+		sBootOptions |= check_for_boot_keys();
+#endif
+	return sBootOptions;
 }
 
 
@@ -99,6 +107,12 @@ _start(void)
 	cpu_init();
 	mmu_init();
 	video_init();
+
+	spin(50000);
+		// wait a bit to give the user the opportunity to press a key
+
+	// reading the keyboard doesn't seem to work in graphics mode (maybe a bochs problem)
+	sBootOptions = check_for_boot_keys();
 
 	main(&args);
 }
