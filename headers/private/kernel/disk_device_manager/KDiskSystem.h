@@ -12,22 +12,23 @@ class KDiskDeviceJob;
 class KPartition;
 
 class KDiskSystem {
+public:
 	KDiskSystem(const char *name);
 	virtual ~KDiskSystem();
 
 	void SetID(disk_system_id id);
 	disk_system_id ID() const;
 	const char *Name() const;
-		// We might want to introduce another name -- a more user friendly one.
-		// This one is the name of the partition module/FS add-on, e.g.
-		// "intel/extended", "bfs".
+	virtual const char *PrettyName();
+		// TODO: Add an Init(), make PrettyName() non-virtual and add a
+		// protected setter.
 
 	virtual bool IsFileSystem() const;
 	bool IsPartitioningSystem() const;
 
-	virtual status_t Load();		// load/unload -- can be nested
-	virtual status_t Unload();		//
-	virtual bool IsLoaded() const;
+	status_t Load();		// load/unload -- can be nested
+	void Unload();			//
+	bool IsLoaded() const;
 
 	// Scanning
 	// Device must be write locked.
@@ -89,7 +90,6 @@ class KDiskSystem {
 								 KDiskDeviceJob *job,
 								 KPartition **child = NULL,
 								 partition_id childID = -1);
-		// optional childID parameter or allow setting the ID later?
 	virtual status_t DeleteChild(KPartition *child, KDiskDeviceJob *job);
 	virtual status_t Initialize(KPartition *partition, const char *parameters,
 								KDiskDeviceJob *job);
@@ -103,6 +103,15 @@ class KDiskSystem {
 // since the device will not be locked, when they are called. The KPartition
 // is registered though, so that it is at least guaranteed that the object
 // won't go away.
+
+protected:
+	virtual status_t LoadModule();
+	virtual void UnloadModule();
+
+private:
+	disk_system_id	fID;
+	char			*fName;
+	int32			fLoadCounter;
 };
 
 } // namespace DiskDevice
