@@ -3,15 +3,16 @@ SubDir OBOS_TOP src kernel core fs ;
 UsePrivateHeaders storage ;
 
 KernelMergeObject kernel_fs.o : 
-	<$(SOURCE_GRIST)>bootfs.c
-	<$(SOURCE_GRIST)>devfs.cpp
-	<$(SOURCE_GRIST)>rootfs.c
-	<$(SOURCE_GRIST)>pipefs.cpp
-	<$(SOURCE_GRIST)>fd.c
-	<$(SOURCE_GRIST)>vfs.cpp
-	<$(SOURCE_GRIST)>vfs_select.c
-	<$(SOURCE_GRIST)>message.c
-	<$(SOURCE_GRIST)>node_monitor.c
-	:
-	-fno-pic -Wno-unused -D_KERNEL_MODE
+	bootfs.c
+	devfs.cpp
+	rootfs.c
+	pipefs.cpp
+	fd.c
+	vfs.cpp
+	vfs_select.c
+	message.c
+	node_monitor.c
+	IOScheduler.cpp
+
+	: -fno-pic -Wno-unused -D_KERNEL_MODE
 	;
