@@ -313,7 +313,8 @@ dump_symbols(int argc, char **argv)
 		for (i = 0; i < image->num_debug_symbols; i++) {
 			struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
-			if (symbol->st_value == 0 || symbol->st_size < 0)
+			if (symbol->st_value == 0
+				|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
 				continue;
 
 			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
@@ -328,7 +329,8 @@ dump_symbols(int argc, char **argv)
 			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
 				struct Elf32_Sym *symbol = &image->syms[j];
 
-				if (symbol->st_value == 0 || symbol->st_size < 0)
+				if (symbol->st_value == 0
+					|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
 					continue;
 
 				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
@@ -909,7 +911,8 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 			for (i = 0; i < image->num_debug_symbols; i++) {
 				struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
-				if (ELF32_ST_TYPE(symbol->st_info) != STT_FUNC)
+				if (symbol->st_value == 0
+					|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
 					continue;
 
 				symbolDelta = address - (symbol->st_value + image->regions[0].delta);
@@ -934,7 +937,8 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 				for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
 					struct Elf32_Sym *symbol = &image->syms[j];
 
-					if (ELF32_ST_TYPE(symbol->st_info) != STT_FUNC)
+					if (symbol->st_value == 0
+						|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
 						continue;
 
 					symbolDelta = address - (long)(symbol->st_value + image->regions[0].delta);
