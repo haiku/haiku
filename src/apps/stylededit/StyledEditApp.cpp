@@ -85,7 +85,4 @@ int main(){
 	StyledEdit.Run();
 	return 0;
 	}
-	
-	
-	
-	
+

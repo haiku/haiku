@@ -91,10 +91,3 @@ class StyledEditWindow: public BWindow{
 };
 #endif
 
-
-
-
-
-
-
-					 

@@ -922,31 +922,3 @@ void StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyl
 
 }/***StyledEditWindow::SetFontStyle()***/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-	
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
