@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests kits ;
 
 SubInclude OBOS_TOP src tests kits app ;
+SubInclude OBOS_TOP src tests kits game ;
 SubInclude OBOS_TOP src tests kits interface ;
 SubInclude OBOS_TOP src tests kits media ;
 SubInclude OBOS_TOP src tests kits midi ;

@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tests kits game ;
+
+SubInclude OBOS_TOP src tests kits game file_game_sound_test ;
+
