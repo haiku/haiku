@@ -76,6 +76,8 @@ enum {
 	B_REG_UNREGISTER_MESSAGE_RUNNER			= 'rgru',
 	B_REG_SET_MESSAGE_RUNNER_PARAMS			= 'rgrx',
 	B_REG_GET_MESSAGE_RUNNER_INFO			= 'rgri',
+	// internal registrar messages
+	B_REG_ROSTER_SANITY_EVENT				= 'rgir',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
