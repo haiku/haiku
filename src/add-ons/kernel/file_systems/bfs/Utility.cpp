@@ -76,8 +76,8 @@ sorted_array::Remove(off_t value)
 BlockArray::BlockArray(int32 blockSize)
 	:
 	fArray(NULL),
-	fSize(0),
-	fBlockSize(blockSize)
+	fBlockSize(blockSize),
+	fSize(0)
 {
 }
 

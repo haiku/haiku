@@ -65,7 +65,7 @@ BufferPool::RequestBuffers(uint32 blockSize)
 
 	// allocate and connect buffers
 
-	for (int32 i = 0; i < kNumBuffers; i++) {
+	for (uint32 i = 0; i < kNumBuffers; i++) {
 		buffers[i] = (void **)malloc(blockSize);
 		if (buffers[i] == NULL) {
 			// free already allocated buffers
@@ -86,7 +86,7 @@ BufferPool::RequestBuffers(uint32 blockSize)
 		release_sem(fLock);
 		release_sem_etc(fFreeBuffers, kNumBuffers, B_DO_NOT_RESCHEDULE);
 	} else {
-		for (int32 i = 0; i < kNumBuffers; i++)
+		for (uint32 i = 0; i < kNumBuffers; i++)
 			free(buffers[i]);
 	}
 
@@ -106,7 +106,7 @@ BufferPool::ReleaseBuffers()
 		return status;
 
 	void **buffer = fFirstFree;
-	for (int32 i = 0; i < kNumBuffers && buffer; i++) {
+	for (uint32 i = 0; i < kNumBuffers && buffer; i++) {
 		void **nextBuffer = (void **)*buffer;
 
 		free(buffer);
