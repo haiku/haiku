@@ -12,6 +12,8 @@ void CopySamples(float *_dst, int32 _dst_sample_offset,
 				 const float *_src, int32 _src_sample_offset,
 				 int32 _sample_count);
 
+bigtime_t buffer_duration(const media_multi_audio_format & format);
+
 int bytes_per_sample(const media_multi_audio_format & format);
 
 int bytes_per_frame(const media_multi_audio_format & format);
@@ -22,3 +24,6 @@ bigtime_t duration_for_frames(double framerate, int64 frames);
 
 int ChannelMaskToChannelType(uint32 mask);
 uint32 ChannelTypeToChannelMask(int type);
+
+double us_to_s(bigtime_t usecs);
+bigtime_t s_to_us(double secs);

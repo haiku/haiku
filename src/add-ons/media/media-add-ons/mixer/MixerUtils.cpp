@@ -194,3 +194,25 @@ frames_per_buffer(const media_multi_audio_format & format)
 	}
 	return frames;
 }
+
+bigtime_t
+buffer_duration(const media_multi_audio_format & format)
+{
+	bigtime_t duration = 0;
+	if (format.buffer_size > 0 && format.frame_rate > 0 && bytes_per_frame(format) > 0) {
+		duration = s_to_us((format.buffer_size / bytes_per_frame(format)) / format.frame_rate);
+	}
+	return duration;
+}
+
+double
+us_to_s(bigtime_t usecs)
+{
+	return (usecs / 1000000.0);
+}
+
+bigtime_t
+s_to_us(double secs)
+{
+	return (bigtime_t) (secs * 1000000.0);
+}
