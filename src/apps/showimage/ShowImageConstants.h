@@ -54,10 +54,11 @@ const uint32 MSG_ROTATE_ACLKWISE    = 'mRAC';
 const uint32 MSG_MIRROR_VERTICAL    = 'mMIV';
 const uint32 MSG_MIRROR_HORIZONTAL  = 'mMIH';
 const uint32 MSG_INVERT             = 'mINV';
-const uint32 MSG_DIA_SHOW           = 'mDIA';
-const uint32 MSG_DIA_SHOW_DELAY     = 'mDSD';
+const uint32 MSG_SLIDE_SHOW         = 'mSSW';
+const uint32 MSG_SLIDE_SHOW_DELAY   = 'mSSD';
 const uint32 MSG_FULL_SCREEN        = 'mFSC';
 const uint32 MSG_UPDATE_RECENT_DOCUMENTS = 'mURD';
+const uint32 MSG_SHOW_CAPTION       = 'mSCP';
 
 extern const char *APP_SIG;
 

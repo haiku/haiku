@@ -54,7 +54,6 @@ public:
 	status_t InitCheck();
 	ShowImageView *GetShowImageView() const { return fpImageView; }
 	
-	void SetRef(const entry_ref *pref);
 	void UpdateTitle();
 	void LoadMenus(BMenuBar *pbar);
 	void WindowRedimension(BBitmap *pbitmap);
@@ -68,6 +67,8 @@ private:
 	void UpdateRecentDocumentsMenu();
 	
 	bool ToggleMenuItem(uint32 what);
+	void EnableMenuItem(uint32 what, bool enable);
+	void MarkMenuItem(uint32 what, bool marked);
 			
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
@@ -80,12 +81,12 @@ private:
 	BFilePanel *fpSavePanel;
 	BMenuBar *fpBar;
 	BMenu *fpOpenMenu;
-	BMenu *fpPageMenu;
-	entry_ref *fpRef;
+	BMenu *fpBrowseMenu;
 	ShowImageView *fpImageView;
 	ShowImageStatusView *fpStatusView;
 	bool fFullScreen;
 	BRect fWindowFrame;
+	bool fShowCaption;
 };
 
 #endif /* _ShowImageWindow_h */

@@ -45,6 +45,7 @@
 #include <Roster.h>
 #include <NodeInfo.h>
 #include <Clipboard.h>
+#include <Path.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
@@ -132,10 +133,10 @@ ShowImageView::Pulse()
 		RotatePatterns();
 		DrawSelectionBox(fSelectionRect);
 	}
-	if (fDiaShow) {
-		fDiaShowCountDown --;
-		if (fDiaShowCountDown <= 0) {
-			fDiaShowCountDown = fDiaShowDelay;
+	if (fSlideShow) {
+		fSlideShowCountDown --;
+		if (fSlideShowCountDown <= 0) {
+			fSlideShowCountDown = fSlideShowDelay;
 			if (!NextFile()) {
 				FirstFile();
 			}
@@ -155,9 +156,10 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fAnimateSelection = true;
 	fbHasSelection = false;
 	fResizeToViewBounds = false;
-	fDiaShow = false;
-	SetDiaShowDelay(3); // 3 seconds
+	fSlideShow = false;
+	SetSlideShowDelay(3); // 3 seconds
 	fBeginDrag = false;
+	fShowCaption = false;
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -201,7 +203,6 @@ ShowImageView::Notify(const char* status)
 	if (status != NULL) {
 		msg.AddString("status", status);
 	}
-	msg.AddRef("ref", &fCurrentRef);
 	BMessenger msgr(Window());
 	msgr.SendMessage(&msg);
 
@@ -262,10 +263,25 @@ ShowImageView::SetImage(const entry_ref *pref)
 		fDocumentCount = documentCount;
 	else
 		fDocumentCount = 1;
+		
+	GetPath(&fCaption);
+	if (fDocumentCount > 1) {
+		fCaption << ", " << fDocumentIndex << "/" << fDocumentCount;
+	}
+	fCaption << ", " << info.name;
 	
 	AddToRecentDocuments();
 		
 	Notify(info.name);
+}
+
+void 
+ShowImageView::SetShowCaption(bool show)
+{
+	if (fShowCaption != show) {
+		fShowCaption = show;
+		Invalidate();
+	}
 }
 
 void
@@ -282,6 +298,20 @@ BBitmap *
 ShowImageView::GetBitmap()
 {
 	return fpBitmap;
+}
+
+void
+ShowImageView::GetPath(BString *name)
+{
+	*name = "";
+	BEntry entry(&fCurrentRef);
+	if (entry.InitCheck() == B_OK) {
+		BPath path;
+		entry.GetPath(&path);
+		if (path.InitCheck() == B_OK) {
+			name->SetTo(path.Path());
+		}
+	}		
 }
 
 void
@@ -380,6 +410,49 @@ ShowImageView::DrawBorder(BRect border)
 }
 
 void
+ShowImageView::DrawCaption()
+{
+	font_height fontHeight;
+	float width, height;
+	BRect bounds(Bounds());
+	BFont font(be_plain_font);
+	BPoint pos;
+	BRect rect;
+	width = font.StringWidth(fCaption.String())+1; // 1 for text shadow
+	font.GetHeight(&fontHeight);
+	height = fontHeight.ascent + fontHeight.descent;
+	// center text vertically
+	pos.x = (bounds.left + bounds.right - width)/2;
+	// flush bottom
+	pos.y = bounds.bottom - fontHeight.descent - 5;
+	
+	// background rectangle
+	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
+	rect.OffsetTo(pos);
+	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+		
+	PushState();
+	// draw background
+	SetDrawingMode(B_OP_ALPHA);
+	SetHighColor(0, 0, 255, 128);
+	FillRect(rect);
+	// draw text
+	SetDrawingMode(B_OP_OVER);
+	SetFont(&font);
+	SetLowColor(B_TRANSPARENT_COLOR);
+	// text shadow
+	pos += BPoint(1, 1);
+	SetHighColor(0, 0, 0);
+	SetPenSize(1);
+	DrawString(fCaption.String(), pos);
+	// text
+	pos -= BPoint(1, 1);
+	SetHighColor(255, 255, 0);
+	DrawString(fCaption.String(), pos);
+	PopState();
+}
+
+void
 ShowImageView::Draw(BRect updateRect)
 {
 	if (fpBitmap) {
@@ -397,8 +470,13 @@ ShowImageView::Draw(BRect updateRect)
 		// Draw image	
 		DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
 					
-		if (fbHasSelection)
+		if (fShowCaption) {
+			DrawCaption();
+		}
+		
+		if (fbHasSelection) {
 			DrawSelectionBox(fSelectionRect);
+		}
 	}
 }
 
@@ -780,7 +858,7 @@ ShowImageView::CopySelectionToClipboard()
 			BMessage data;
 			BBitmap* bitmap = CopySelection();
 			if (bitmap != NULL) {
-				#if 1
+				#if 0
 				// According to BeBook and Becasso, Gobe Productive do the following.
 				// Paste works in Productive, but not in Becasso and original ShowImage.
 				BMessage msg(B_OK); // Becasso uses B_TRANSLATOR_BITMAP, BeBook says its unused
@@ -932,21 +1010,21 @@ ShowImageView::FirstFile()
 }
 
 void
-ShowImageView::SetDiaShowDelay(float seconds)
+ShowImageView::SetSlideShowDelay(float seconds)
 {
-	fDiaShowDelay = (int)(seconds * 10.0);
+	fSlideShowDelay = (int)(seconds * 10.0);
 }
 
 void
-ShowImageView::StartDiaShow()
+ShowImageView::StartSlideShow()
 {
-	fDiaShow = true; fDiaShowCountDown = fDiaShowDelay;
+	fSlideShow = true; fSlideShowCountDown = fSlideShowDelay;
 }
 
 void
-ShowImageView::StopDiaShow()
+ShowImageView::StopSlideShow()
 {
-	fDiaShow = false;
+	fSlideShow = false;
 }
 
 int32 

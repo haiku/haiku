@@ -44,8 +44,10 @@ public:
 	void Pulse();
 	
 	void SetImage(const entry_ref *pref);
+	void SetShowCaption(bool show);
 	void ResizeToViewBounds(bool resize);
 	BBitmap *GetBitmap();
+	void GetPath(BString *name);
 	void FlushToLeftTop();
 	
 	virtual void AttachedToWindow();
@@ -72,9 +74,9 @@ public:
 	void PrevPage();
 	bool NextFile();
 	bool PrevFile();
-	void SetDiaShowDelay(float seconds);
-	void StartDiaShow();
-	void StopDiaShow();
+	void SetSlideShowDelay(float seconds);
+	void StartSlideShow();
+	void StopSlideShow();
 	
 	// Image manipulation
 	void Rotate(int degree); // 90 and 270 only
@@ -118,6 +120,7 @@ private:
 	void HandleDrop(BMessage* msg);
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
+	void DrawCaption();
 	void DrawSelectionBox(BRect &rect);
 	
 	entry_ref fCurrentRef;
@@ -137,9 +140,12 @@ private:
 	BRect fSelectionRect; // the selection in image space
 	pattern fPatternUp, fPatternDown, fPatternLeft, fPatternRight;
 	
-	bool fDiaShow;
-	int fDiaShowDelay;
-	int fDiaShowCountDown;
+	bool fSlideShow;
+	int fSlideShowDelay;
+	int fSlideShowCountDown;
+	
+	bool fShowCaption;
+	BString fCaption;
 };
 
 #endif /* _ShowImageView_h */

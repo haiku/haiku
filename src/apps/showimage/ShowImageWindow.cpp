@@ -54,8 +54,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
 	fpSavePanel = NULL;
-	fpRef = NULL;
 	fFullScreen = false;
+	fShowCaption = true; // XXX what is best for default?
 		
 	// create menu bar	
 	fpBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
@@ -104,7 +104,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	SetSizeLimits(250, 100000, 100, 100000);
 	
 	// finish creating window
-	SetRef(pref);
 	UpdateTitle();
 
 	fpImageView->SetImage(pref);
@@ -116,6 +115,12 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 		WindowRedimension(fpImageView->GetBitmap());
 		Show();
 	} else {
+		BAlert* alert;
+		alert = new BAlert("ShowImage", 
+			"Could not load image! Either the file or an image translator for it does not exist.", 
+			"OK", NULL, NULL, 
+			B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		alert->Go();
 		// exit if file could not be opened
 		Quit();
 	}
@@ -123,37 +128,23 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 
 ShowImageWindow::~ShowImageWindow()
 {
-	delete fpRef;
 }
 
 status_t
 ShowImageWindow::InitCheck()
 {
-	if (!fpRef || !fpImageView || fpImageView->GetBitmap() == NULL)
+	if (!fpImageView || fpImageView->GetBitmap() == NULL)
 		return B_ERROR;
 	else
 		return B_OK;
 }
 
 void
-ShowImageWindow::SetRef(const entry_ref *pref)
-{
-	if (!fpRef)
-		fpRef = new entry_ref(*pref);
-	else
-		*fpRef = *pref;
-}
-
-void
 ShowImageWindow::UpdateTitle()
 {
-	BEntry entry(fpRef);
-	if (entry.InitCheck() == B_OK) {
-		BPath path;
-		entry.GetPath(&path);
-		if (path.InitCheck() == B_OK)
-			SetTitle(path.Path());
-	}		
+	BString path;
+	fpImageView->GetPath(&path);
+	SetTitle(path.String());
 }
 
 void
@@ -191,29 +182,6 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	fpOpenMenu->Superitem()->SetTarget(be_app);
 	fpOpenMenu->Superitem()->SetShortcut('O', 0);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Dia Show", MSG_DIA_SHOW, 0, 0, 'W', true);
-	BMenu* pDelay = new BMenu("Delay");
-	pDelay->SetRadioMode(true);
-	// Note: ShowImage loades images in window thread so it becomes unresponsive if
-	// dia show delay is too short! (Especially if loading the image takes as long as
-	// or longer than the dia show delay). Should load in background thread!
-	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
-	// AddDelayItem(pDelay, "One Second", 1, false);
-	// AddDelayItem(pDelay, "Two Second", 2, false);
-	AddDelayItem(pDelay, "Three Seconds", 3, true);
-	AddDelayItem(pDelay, "Four Second", 4, false);
-	AddDelayItem(pDelay, "Five Seconds", 5, false);
-	AddDelayItem(pDelay, "Six Seconds", 6, false);
-	AddDelayItem(pDelay, "Seven Seconds", 7, false);
-	AddDelayItem(pDelay, "Eight Seconds", 8, false);
-	AddDelayItem(pDelay, "Nine Seconds", 9, false);
-	AddDelayItem(pDelay, "Ten Seconds", 10, false);
-	AddDelayItem(pDelay, "Tweenty Seconds", 20, false);
-	pmenu->AddItem(pDelay);
-	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Next", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
-	AddItemMenu(pmenu, "Previous", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);
-	pmenu->AddSeparatorItem();
 	BMenu *pmenuSaveAs = new BMenu("Save As...", B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
@@ -237,11 +205,14 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', true);
 	pbar->AddItem(pmenu);
 
-	pmenu = fpPageMenu = new BMenu("Page");
-	AddItemMenu(pmenu, "First", MSG_PAGE_FIRST, 'F', 0, 'W', true);
-	AddItemMenu(pmenu, "Last", MSG_PAGE_LAST, 'L', 0, 'W', true);
-	AddItemMenu(pmenu, "Next", MSG_PAGE_NEXT, 'N', 0, 'W', true);
-	AddItemMenu(pmenu, "Previous", MSG_PAGE_PREV, 'P', 0, 'W', true);
+	pmenu = fpBrowseMenu = new BMenu("Browse");
+	AddItemMenu(pmenu, "First Page", MSG_PAGE_FIRST, 'F', 0, 'W', true);
+	AddItemMenu(pmenu, "Last Page", MSG_PAGE_LAST, 'L', 0, 'W', true);
+	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, 'N', 0, 'W', true);
+	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, 'P', 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
+	AddItemMenu(pmenu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);	
 	pbar->AddItem(pmenu);
 
 	pmenu = new BMenu("Image");
@@ -257,9 +228,31 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pbar->AddItem(pmenu);
 
 	pmenu = new BMenu("View");
+	AddItemMenu(pmenu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, 'W', true);
+	BMenu* pDelay = new BMenu("Slide Delay");
+	pDelay->SetRadioMode(true);
+	// Note: ShowImage loades images in window thread so it becomes unresponsive if
+	// slide show delay is too short! (Especially if loading the image takes as long as
+	// or longer than the slide show delay). Should load in background thread!
+	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
+	// AddDelayItem(pDelay, "One Second", 1, false);
+	// AddDelayItem(pDelay, "Two Second", 2, false);
+	AddDelayItem(pDelay, "Three Seconds", 3, true);
+	AddDelayItem(pDelay, "Four Second", 4, false);
+	AddDelayItem(pDelay, "Five Seconds", 5, false);
+	AddDelayItem(pDelay, "Six Seconds", 6, false);
+	AddDelayItem(pDelay, "Seven Seconds", 7, false);
+	AddDelayItem(pDelay, "Eight Seconds", 8, false);
+	AddDelayItem(pDelay, "Nine Seconds", 9, false);
+	AddDelayItem(pDelay, "Ten Seconds", 10, false);
+	AddDelayItem(pDelay, "Tweenty Seconds", 20, false);
+	pmenu->AddItem(pDelay);
+	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
+	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
 	pbar->AddItem(pmenu);
+	MarkMenuItem(MSG_SHOW_CAPTION, fShowCaption);
 
 	UpdateRecentDocumentsMenu();
 }
@@ -285,7 +278,7 @@ ShowImageWindow::AddDelayItem(BMenu *pmenu, char *caption, float value, bool mar
 {
 	BMenuItem* pitem;
 	BMessage* pmsg;
-	pmsg = new BMessage(MSG_DIA_SHOW_DELAY);
+	pmsg = new BMessage(MSG_SLIDE_SHOW_DELAY);
 	pmsg->AddFloat("value", value);
 	
 	pitem = new BMenuItem(caption, pmsg, 0);
@@ -342,6 +335,30 @@ ShowImageWindow::ToggleMenuItem(uint32 what)
 }
 
 void
+ShowImageWindow::EnableMenuItem(uint32 what, bool enable)
+{
+	BMenuItem* item;
+	item = fpBar->FindItem(what);
+	if (item && item->IsEnabled() != enable) {
+		// XXX: Does this apply to menu items too?
+		// Only call this function if the state is changing
+		// to avoid flickering
+		item->SetEnabled(enable);
+	}
+}
+
+void 
+ShowImageWindow::MarkMenuItem(uint32 what, bool marked)
+{
+	BMenuItem* item;
+	item = fpBar->FindItem(what);
+	if (item && item->IsMarked() != marked) {
+		item->SetMarked(marked);
+	}
+}
+
+
+void
 ShowImageWindow::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
@@ -370,20 +387,16 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_UPDATE_STATUS:
 		{
 			bool benable = (fpImageView->PageCount() > 1) ? true : false;
-			if (fpPageMenu->IsEnabled() != benable)
-				// Only call this function if the state is changing
-				// to avoid flickering
-				fpPageMenu->SetEnabled(benable);
+			EnableMenuItem(MSG_PAGE_FIRST, benable);
+			EnableMenuItem(MSG_PAGE_LAST, benable);
+			EnableMenuItem(MSG_PAGE_NEXT, benable);
+			EnableMenuItem(MSG_PAGE_PREV, benable);
 				
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
 				fpStatusView->SetText(str);
 			
-			entry_ref ref;
-			if (pmsg->FindRef("ref", &ref) == B_OK) {
-				SetRef(&ref);
-				UpdateTitle();
-			}
+			UpdateTitle();
 			break;
 		}
 
@@ -454,23 +467,29 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_INVERT:
 			fpImageView->Invert();
 			break;
-		case MSG_DIA_SHOW:
+		case MSG_SLIDE_SHOW:
 			if (ToggleMenuItem(pmsg->what)) {
-				fpImageView->StartDiaShow();
+				fpImageView->StartSlideShow();
 			} else {
-				fpImageView->StopDiaShow();
+				fpImageView->StopSlideShow();
 			}
-		case MSG_DIA_SHOW_DELAY:
+		case MSG_SLIDE_SHOW_DELAY:
 			{
 				float value;
 				if (pmsg->FindFloat("value", &value) == B_OK) {
-					fpImageView->SetDiaShowDelay(value);
+					fpImageView->SetSlideShowDelay(value);
 				}
 			}
 			break;
 			
 		case MSG_FULL_SCREEN:
 			ToggleFullScreen();
+			break;
+		case MSG_SHOW_CAPTION:
+			fShowCaption = ToggleMenuItem(pmsg->what);
+			if (fFullScreen) {
+				fpImageView->SetShowCaption(fShowCaption);
+			}
 			break;
 		
 		case MSG_UPDATE_RECENT_DOCUMENTS:
@@ -584,6 +603,7 @@ ShowImageWindow::ToggleFullScreen()
 
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 	}
+	fpImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());
 }
