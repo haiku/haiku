@@ -50,7 +50,7 @@ BMPView::BMPView(const BRect &frame, const char *name,
 {
 	fSettings = settings;
 
-	SetViewColor(220,220,220,0);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 // ---------------------------------------------------------------

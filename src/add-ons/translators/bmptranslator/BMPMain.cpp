@@ -54,7 +54,7 @@ main()
 	BApplication app("application/x-vnd.obos-bmp-translator");
 	status_t result;
 	result = LaunchTranslatorWindow(new BMPTranslator,
-		"BMPTranslator", BRect(0, 0, 225, 175));
+		"BMP Settings", BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;
