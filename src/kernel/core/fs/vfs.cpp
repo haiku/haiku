@@ -4086,11 +4086,11 @@ err1:
 
 
 static status_t
-fs_unmount(char *path, bool kernel)
+fs_unmount(char *path, uint32 flags, bool kernel)
 {
 	struct fs_mount *mount;
 	struct vnode *vnode;
-	int err;
+	status_t err;
 
 	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
 
@@ -4132,12 +4132,13 @@ fs_unmount(char *path, bool kernel)
 		}
 	}
 
-	/* grab the vnode master mutex to keep someone from creating
-	 * a vnode while we're figuring out if we can continue
-	 */
+	// grab the vnode master mutex to keep someone from creating
+	// a vnode while we're figuring out if we can continue
 	mutex_lock(&sVnodeMutex);
 
-	/* simulate the root vnode having it's refcount decremented */
+	// simplify the loop below: we decrement the root vnode ref_count
+	// by the known number of references: one for the fs_mount, one
+	// from the path_to_vnode() call above
 	mount->root_vnode->ref_count -= 2;
 
 	// cycle through the list of vnodes associated with this mount and
@@ -4145,39 +4146,38 @@ fs_unmount(char *path, bool kernel)
 	vnode = NULL;
 	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode->busy || vnode->ref_count != 0) {
+			// there are still vnodes in use on this mount, so we cannot unmount yet
+			// ToDo: cut read/write access file descriptors, depending on the B_FORCE_UNMOUNT flag
 			mount->root_vnode->ref_count += 2;
 			mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
-			return EBUSY;
+			return B_BUSY;
 		}
 	}
 
-	/* we can safely continue, mark all of the vnodes busy and this mount
-	 * structure in unmounting state
-	 */
-	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
-		if (vnode != mount->root_vnode)
-			vnode->busy = true;
-	}
+	// we can safely continue, mark all of the vnodes busy and this mount
+	// structure in unmounting state
 	mount->unmounting = true;
 
-	/* add 2 back to the root vnode's ref */
-	mount->root_vnode->ref_count += 2;
+	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+		vnode->busy = true;
+		hash_remove(sVnodeTable, vnode);
+	}
 
 	mutex_unlock(&sVnodeMutex);
 
 	mount->covers_vnode->covered_by = NULL;
 	put_vnode(mount->covers_vnode);
 
-	/* release the ref on the root vnode twice */
-	put_vnode(mount->root_vnode);
-	put_vnode(mount->root_vnode);
+	// Free all vnodes associated with this mount.
+	// They will be removed from the mount list by free_vnode(), so
+	// we don't have to do this.
+	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, NULL)) != NULL) {
+		free_vnode(vnode, false);
+	}
 
-	// ToDo: when full vnode cache in place, will need to force
-	// a putvnode/removevnode here
-
-	/* remove the mount structure from the hash table */
+	// remove the mount structure from the hash table
 	mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
@@ -4405,12 +4405,12 @@ _kern_mount(const char *path, const char *device, const char *fs_name,
 
 
 status_t
-_kern_unmount(const char *path)
+_kern_unmount(const char *path, uint32 flags)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
 
-	return fs_unmount(pathBuffer, true);
+	return fs_unmount(pathBuffer, flags, true);
 }
 
 
@@ -5080,7 +5080,7 @@ _user_mount(const char *userPath, const char *userDevice, const char *userFileSy
 
 
 status_t
-_user_unmount(const char *userPath)
+_user_unmount(const char *userPath, uint32 flags)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	int status;
@@ -5089,7 +5089,7 @@ _user_unmount(const char *userPath)
 	if (status < 0)
 		return status;
 
-	return fs_unmount(path, false);
+	return fs_unmount(path, flags, false);
 }
 
 
