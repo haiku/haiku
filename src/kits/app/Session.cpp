@@ -1,4 +1,4 @@
-#include "Session.h"
+#include <Session.h>
 #include <malloc.h>
 #include <stdio.h>
 
@@ -10,7 +10,7 @@ BSession::BSession(port_id receivePort, port_id sendPort, bool isPortLink = fals
 	fSendPort		= sendPort;
 	fReceivePort	= receivePort;
 
-	fSendCode			= AS_SESSION_MSG;
+	fSendCode			= AS_SERVER_SESSION;
 	fSendBuffer			= NULL;
 	fSendPosition		= 4;
 
@@ -28,7 +28,7 @@ BSession::BSession( const BSession &ses){
 	fSendPort		= ses.fSendPort;
 	fReceivePort	= ses.fReceivePort;
 
-	fSendCode			= AS_SESSION_MSG;
+	fSendCode			= AS_SERVER_SESSION;
 	fSendBuffer			= NULL;
 	fSendPosition		= 4;
 
@@ -193,7 +193,7 @@ status_t BSession::ReadData( void *data, int32 size)
 			do{
 				while( (rv = read_port(fReceivePort, &fRecvCode, fReceiveBuffer, 1024)) ==
 					B_WOULD_BLOCK);
-			} while( fRecvCode != AS_SESSION_MSG && rv != B_BAD_PORT_ID );
+			} while( fRecvCode != AS_SERVER_SESSION && rv != B_BAD_PORT_ID );
 			
 			if ( rv == B_BAD_PORT_ID )
 				return B_BAD_PORT_ID;

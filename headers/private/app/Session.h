@@ -6,8 +6,7 @@
 #include <Region.h>
 #include <Rect.h>
 #include <Point.h>
-
-#define AS_SESSION_MSG		'assm'
+#include <ServerProtocol.h>
 
 class BSession {
 
