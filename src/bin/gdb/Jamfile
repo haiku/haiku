@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src bin gdb ;
 
+SubInclude OBOS_TOP src bin gdb libiberty ;
 SubInclude OBOS_TOP src bin gdb readline ;

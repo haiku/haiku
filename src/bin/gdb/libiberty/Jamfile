@@ -1,0 +1,74 @@
+SubDir OBOS_TOP src bin gdb libiberty ;
+
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wmissing-prototypes -Wsign-compare ] ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;	# for <libiberty.h>
+
+StaticLibrary <gdb>iberty :
+	# mandatory source
+	alloca.c
+	argv.c
+	choose-temp.c
+	concat.c cp-demint.c
+	cp-demangle.c
+	cplus-dem.c
+	dyn-string.c
+	fdmatch.c
+	fibheap.c
+	floatformat.c
+	fnmatch.c
+	getopt.c
+	getopt1.c
+	getpwd.c
+	getruntime.c
+	hashtab.c
+	hex.c
+	lbasename.c
+	lrealpath.c
+	make-relative-prefix.c
+	make-temp-file.c
+	md5.c
+	objalloc.c
+	obstack.c
+	partition.c
+	pex-unix.c
+	physmem.c
+	regex.c
+	safe-ctype.c
+	sort.c
+	spaces.c
+	splay-tree.c
+	strerror.c
+	strsignal.c
+	ternary.c
+	xatexit.c
+	xexit.c
+	xmalloc.c
+	xmemdup.c
+	xstrdup.c
+	xstrerror.c
+
+	# optional sources, depending on missing capabilities of the OS
+	# TODO: We should check what is really needed! This is what configure gave
+	# me, but some of those should be provided by Haiku.
+	basename.c
+	clock.c
+	getpagesize.c
+	index.c
+	insque.c
+	mempcpy.c
+	mkstemps.c
+	rindex.c
+	sigsetmask.c
+	stpncpy.c
+	strncmp.c
+	vfork.c
+	: [ FCurrentObjectsDir ]
+;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
