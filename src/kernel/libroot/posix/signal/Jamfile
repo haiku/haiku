@@ -5,6 +5,7 @@ KernelMergeObject posix_signal.o :
 	<$(SOURCE_GRIST)>send_signal.c
 	<$(SOURCE_GRIST)>sigaction.c
 	<$(SOURCE_GRIST)>signal.c
+	<$(SOURCE_GRIST)>sigprocmask.c
 	<$(SOURCE_GRIST)>sigset.c
 	<$(SOURCE_GRIST)>strsignal.c
 	:
