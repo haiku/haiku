@@ -7,12 +7,6 @@
 
 
 #include <StorageDefs.h>
-#include <Node.h>
-#include <Messenger.h>
-
-
-class BLooper;
-class BHandler;
 
 
 /* Flags for the watch_node() call.
@@ -55,6 +49,14 @@ enum {
  */
 
 #ifdef __cplusplus
+
+// these are only needed for the function exports
+#include <Node.h>
+#include <Messenger.h>
+
+class BLooper;
+class BHandler;
+
 
 extern status_t watch_node(const node_ref *node, uint32 flags, BMessenger target);
 extern status_t watch_node(const node_ref *node, uint32 flags, 
