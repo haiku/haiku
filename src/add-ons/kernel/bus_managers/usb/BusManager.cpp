@@ -176,7 +176,7 @@ status_t BusManager::Start()
 	// Start the 'explore thread'
 	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
 	                     B_LOW_PRIORITY , (void *)m_roothub );
-	resume_thread( m_explore_thread );
+	return resume_thread( m_explore_thread );
 }
 
 status_t BusManager::SubmitTransfer( Transfer &t )
