@@ -141,10 +141,14 @@ KernelLd libroot.so :
 	posix_math_arch_$(OBOS_ARCH).o
 	posix_signal.o
 	posix_stdio.o
+	posix_gnu_arch_$(OBOS_ARCH).o
+	posix_gnu_ctype.o
 	posix_gnu_ext.o
 	posix_gnu_libio.o
+	posix_gnu_locale.o
 	posix_gnu_regex.o
 	posix_gnu_stdio.o
+	posix_gnu_stdlib.o
 	posix_gnu_wcsmbs.o
 	posix_stdlib.o
 	posix_string.o
@@ -187,7 +191,9 @@ KernelStaticLibraryObjects librld.a :
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
- 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
+ 	<$(SOURCE_GRIST)!libroot!posix!glibc!ctype>ctype-info.o
+	<$(SOURCE_GRIST)!libroot!posix!glibc!locale>C-ctype.o
+	<$(SOURCE_GRIST)!libroot!posix!glibc!locale>C_name.o
   	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
   	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
 
