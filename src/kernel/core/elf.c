@@ -1,8 +1,8 @@
 /* Contains the ELF loader */
 
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -18,6 +18,7 @@
 #include <debug.h>
 #include <kimage.h>
 #include <khash.h>
+#include <syscalls.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
