@@ -1,4 +1,16 @@
 
+resource app_signature "application/x-vnd.Haiku.MediaPrefs";
+
+resource app_version
+{
+	short_info = "Media", 
+    long_info  = "Haiku Media Preferences"
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource file_types message;
+
 resource large_icon
 {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -54,15 +66,3 @@ resource mini_icon
 	$"FFFFFFFFFFFF002B2F00FF0404040F0F"
 	$"FFFFFFFFFFFFFF00000E0F0F0F0FFFFF"
 };
-
-resource file_types message;
-
-resource app_signature "application/x-vnd.haiku.Media";
-
-resource app_version
-{
-	short_info = "OBOS-Media", 
-    long_info  = "OpenBeOS version of Media"
-};
-
-resource app_flags B_SINGLE_LAUNCH;

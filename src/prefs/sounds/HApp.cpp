@@ -17,7 +17,7 @@
 #include "HApp.h"
 #include "HWindow.h"
 
-#define APP_SIG "application/x-vnd.OBOS-Sounds"
+#define APP_SIG "application/x-vnd.Haiku.SoundsPrefs"
 
 /***********************************************************
  * Constructor

@@ -18,7 +18,7 @@
 #define __MEDIA_H__
 
 // Constants ------------------------------------------------------------------------------------------------- //
-const char *APP_SIGNATURE = "application/x-vnd.haiku.Media";  // Application Signature and Title
+const char *APP_SIGNATURE = "application/x-vnd.Haiku.MediaPrefs";  // Application Signature
 
 #include <Application.h>
 #include "MediaWindow.h"
