@@ -391,16 +391,16 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 
 		// image calls
 		case SYSCALL_REGISTER_IMAGE:
-			*call_ret = user_register_image((image_info *)arg0, (size_t)arg1);
+			*call_ret = _user_register_image((image_info *)arg0, (size_t)arg1);
 			break;
 		case SYSCALL_UNREGISTER_IMAGE:
-			*call_ret = user_unregister_image((image_id)arg0);
+			*call_ret = _user_unregister_image((image_id)arg0);
 			break;
 		case SYSCALL_GET_IMAGE_INFO:
-			*call_ret = user_get_image_info((image_id)arg0, (image_info *)arg1, (size_t)arg2);
+			*call_ret = _user_get_image_info((image_id)arg0, (image_info *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_GET_NEXT_IMAGE_INFO:
-			*call_ret = user_get_next_image_info((team_id)arg0, (int32 *)arg1, (image_info *)arg2, (size_t)arg3);
+			*call_ret = _user_get_next_image_info((team_id)arg0, (int32 *)arg1, (image_info *)arg2, (size_t)arg3);
 			break;
 
 		// node monitor calls

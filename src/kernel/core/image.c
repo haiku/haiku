@@ -14,6 +14,14 @@
 #include <string.h>
 
 
+//#define TRACE_IMAGE
+#ifdef TRACE_IMAGE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 // ToDo: register kernel images as well
 
 struct image {
@@ -23,19 +31,18 @@ struct image {
 };
 
 
-static image_id gNextImageID = 1;
+static image_id sNextImageID = 1;
+static mutex sImageMutex;
 
 
 /** Registers an image with the specified team.
  */
 
 image_id
-register_image(team_id teamID, image_info *_info, size_t size)
+register_image(struct team *team, image_info *_info, size_t size)
 {
-	image_id id = atomic_add(&gNextImageID, 1);
+	image_id id = atomic_add(&sNextImageID, 1);
 	struct image *image;
-	struct team *team;
-	cpu_status state;
 
 	image = malloc(sizeof(image_info));
 	if (image == NULL)
@@ -43,19 +50,14 @@ register_image(team_id teamID, image_info *_info, size_t size)
 
 	memcpy(&image->info, _info, sizeof(image_info));
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	mutex_lock(&sImageMutex);
 
-	team = team_get_team_struct_locked(teamID);
-	if (team) {
-		image->info.id = id;
-		list_add_item(&team->image_list, image);
-	}
+	image->info.id = id;
+	list_add_item(&team->image_list, image);
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	mutex_unlock(&sImageMutex);
 
-	dprintf("register_image(team = %ld, image id = %ld, image = %p\n", teamID, id, image);
+	TRACE(("register_image(team = %p, image id = %ld, image = %p\n", team, id, image));
 	return id;
 }
 
@@ -64,31 +66,23 @@ register_image(team_id teamID, image_info *_info, size_t size)
  */
 
 status_t
-unregister_image(team_id teamID, image_id id)
+unregister_image(struct team *team, image_id id)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct team *team;
-	cpu_status state;
+	struct image *image = NULL;
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	mutex_lock(&sImageMutex);
 
-	team = team_get_team_struct_locked(teamID);
-	if (team) {
-		struct image *image = NULL;
-
-		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
-			if (image->info.id == id) {
-				list_remove_link(image);
-				free(image);
-				status = B_OK;
-				break;
-			}
+	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+		if (image->info.id == id) {
+			list_remove_link(image);
+			free(image);
+			status = B_OK;
+			break;
 		}
 	}
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	mutex_unlock(&sImageMutex);
 
 	return status;
 }
@@ -135,27 +129,20 @@ status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct team *team;
-	cpu_status state;
+	struct team *team = thread_get_current_thread()->team;
+	struct image *image = NULL;
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	mutex_lock(&sImageMutex);
 
-	team = thread_get_current_thread()->team;
-	if (team) {
-		struct image *image = NULL;
-
-		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
-			if (image->info.id == id) {
-				memcpy(info, &image->info, size);
-				status = B_OK;
-				break;
-			}
+	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+		if (image->info.id == id) {
+			memcpy(info, &image->info, size);
+			status = B_OK;
+			break;
 		}
 	}
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	mutex_unlock(&sImageMutex);
 
 	return status;
 }
@@ -167,6 +154,8 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 	status_t status = B_ENTRY_NOT_FOUND;
 	struct team *team;
 	cpu_status state;
+
+	mutex_lock(&sImageMutex);
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -191,7 +180,16 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
+	mutex_unlock(&sImageMutex);
+
 	return status;
+}
+
+
+status_t
+image_init(void)
+{
+	return mutex_init(&sImageMutex, "image");
 }
 
 
@@ -200,14 +198,14 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 
 
 status_t
-user_unregister_image(image_id id)
+_user_unregister_image(image_id id)
 {
-	return unregister_image(team_get_current_team_id(), id);
+	return unregister_image(thread_get_current_thread()->team, id);
 }
 
 
 image_id
-user_register_image(image_info *userInfo, size_t size)
+_user_register_image(image_info *userInfo, size_t size)
 {
 	image_info info;
 	
@@ -218,12 +216,12 @@ user_register_image(image_info *userInfo, size_t size)
 		|| user_memcpy(&info, userInfo, size) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return register_image(team_get_current_team_id(), &info, size);
+	return register_image(thread_get_current_thread()->team, &info, size);
 }
 
 
 status_t
-user_get_image_info(image_id id, image_info *userInfo, size_t size)
+_user_get_image_info(image_id id, image_info *userInfo, size_t size)
 {
 	image_info info;
 	status_t status;
@@ -244,7 +242,7 @@ user_get_image_info(image_id id, image_info *userInfo, size_t size)
 
 
 status_t
-user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo, size_t size)
+_user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo, size_t size)
 {
 	image_info info;
 	status_t status;

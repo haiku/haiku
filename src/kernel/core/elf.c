@@ -1,6 +1,9 @@
 /* Contains the ELF loader */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -12,6 +15,7 @@
 #include <vm.h>
 #include <thread.h>
 #include <debug.h>
+#include <kimage.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
@@ -1016,6 +1020,8 @@ elf_init(kernel_args *ka)
 {
 	area_info areaInfo;
 	struct preloaded_image *image;
+
+	image_init();
 
 	mutex_init(&image_lock, "kimages_lock");
 	mutex_init(&image_load_lock, "kimages_load_lock");
