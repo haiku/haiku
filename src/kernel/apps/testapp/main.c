@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -181,7 +182,7 @@ int main(int argc, char **argv)
 #if 0
 	{
 		for(;;)
-			sys_create_team("/boot/bin/true", "true", 32);
+			sys_create_team("/bin/true", "true", 32);
 	}
 #endif
 #if 0
@@ -191,7 +192,7 @@ int main(int argc, char **argv)
 		int rc;
 		int len = 512;
 
-		fd = sys_open("/boot/testapp", "", STREAM_TYPE_FILE);
+		fd = sys_open("/bin/testapp", "", STREAM_TYPE_FILE);
 
 		rc = sys_read(fd, buf, 0, &len);
 		printf("rc from read = 0x%x\n", rc);
@@ -281,7 +282,7 @@ int main(int argc, char **argv)
 		printf("RLIMIT_NOFILE = %lu\n", rl.rlim_cur);
 
 		for(i = 0; i < NUM_FDS; i++) {
-			fds[i] = open("/boot/bin/testapp", 0);
+			fds[i] = open("/bin/testapp", 0);
 			if (fds[i] < 0) {
 				break;
 			}
@@ -308,7 +309,7 @@ int main(int argc, char **argv)
 		printf("RLIMIT_NOFILE = %lu\n", rl.rlim_cur);
 
 		for(;i < NUM_FDS; i++) {
-			fds[i] = open("/boot/bin/testapp", 0);
+			fds[i] = open("/bin/testapp", 0);
 			if (fds[i] < 0) {
 				break;
 			}
@@ -351,7 +352,7 @@ int main(int argc, char **argv)
 
 			t = system_time();
 
-			id = _kern_create_team("/boot/bin/true", "true", NULL, 0, NULL, 0, 20);
+			id = _kern_create_team("/bin/true", "true", NULL, 0, NULL, 0, 20);
 			if(id <= 0x2) {
 				printf("new team returned 0x%lx!\n", id);
 				return -1;
