@@ -370,14 +370,10 @@ message fields:
 - "type": The mime type
 - "which": Which attribute to set. May be one of the following:
 
-    "which"                     additional message fields
-    -------------------------   ----------------------------
-# This is the format that we'll eventually use once we have
-# an OBOS::BBitmap implementation
-#	REG_MIME_ICON:				"icon archive": B_MESSAGE_TYPE,
-#								"icon size": B_INT32_TYPE
-	REG_MIME_ICON:				"icon data": B_RAW_TYPE,
-								"icon size": B_INT32_TYPE
+    "which"                     additional message fields       field comments
+    -------------------------   ----------------------------    --------------------------
+	REG_MIME_ICON:				"icon data": B_RAW_TYPE,        B_CMAP8 bitmap data only
+								"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
 	REG_MIME_PREFERRED_APP:		"signature": B_STRING_TYPE,
 								"app verb": B_INT32_TYPE
 	REG_MIME_ATTR_INFO:			"attr info": B_MESSAGE_TYPE
@@ -387,13 +383,48 @@ message fields:
 	REG_MIME_SNIFFER_RULE:		"sniffer rule": B_STRING_TYPE
 	REG_MIME_APP_HINT:			"app hint": B_REF_TYPE
 	REG_MIME_ICON_FOR_TYPE		"file type": B_STRING_TYPE,
-								"icon": B_RAW_TYPE,
-								"size": B_INT32_TYPE
+								"icon data": B_RAW_TYPE,
+								"icon size": B_INT32_TYPE
 	REG_MIME_SUPPORTED_TYPES:	"types": B_STRING_TYPE[]
 	
 reply fields:
 - "result":
   - B_OK: success
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
+delete a specific attribute of a mime type (BMimeType::Delete*()),
+
+target:		mime manager (BRoster::fMimeMess) 
+message:	B_REG_MIME_DELETE_PARAM
+			"type": B_STRING_TYPE
+			"which": B_INT32_TYPE
+			[ additional fields depending upon the "which" field (see below) ]
+			
+reply:		standard general result
+
+message fields:
+- "type": The mime type
+- "which": Which attribute to delete. May be one of the following:
+
+    "which"                     additional message fields       field comments
+    -------------------------   ----------------------------    --------------------------
+	REG_MIME_ICON:				"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
+	REG_MIME_PREFERRED_APP:		"app verb": B_INT32_TYPE
+	REG_MIME_ATTR_INFO:			
+	REG_MIME_FILE_EXTENSIONS:	
+	REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
+	REG_MIME_SNIFFER_RULE:		
+	REG_MIME_APP_HINT:			
+	REG_MIME_ICON_FOR_TYPE		"file type": B_STRING_TYPE,
+								"icon size": B_INT32_TYPE
+	REG_MIME_SUPPORTED_TYPES:	
+	
+reply fields:
+- "result":
+  - B_OK: success
+  - B_ENTRY_NOT_FOUND: no such attribute exists, or the type is not installed
   - (error code): failure			
 
 -----------------------------------------------------------------------
