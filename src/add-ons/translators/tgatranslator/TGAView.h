@@ -1,5 +1,7 @@
 /*****************************************************************************/
 // TGAView
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGAView.h
 //
 // This BView based object displays information about the TGATranslator.
@@ -53,6 +55,8 @@ private:
 	BCheckBox *fpchkRLE;
 	
 	TGATranslatorSettings *fpsettings;
+		// the actual settings for the translator,
+		// shared with the translator
 };
 
 #endif // #ifndef TGAVIEW_H

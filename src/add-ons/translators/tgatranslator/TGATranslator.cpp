@@ -1,5 +1,7 @@
 /*****************************************************************************/
 // TGATranslator
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGATranslator.cpp
 //
 // This BTranslator based object is for opening and writing TGA files.

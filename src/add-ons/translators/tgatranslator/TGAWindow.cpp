@@ -1,5 +1,7 @@
 /*****************************************************************************/
 // TGAWindow
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGAWindow.cpp
 //
 // This BWindow based object is used to hold the TGAView object when the

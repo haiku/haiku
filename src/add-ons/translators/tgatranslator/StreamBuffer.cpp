@@ -1,8 +1,12 @@
 /*****************************************************************************/
 // StreamBuffer
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // StreamBuffer.cpp
 //
-// The description goes here.
+// This class is for buffering data from a BPositionIO object in order to
+// improve performance for cases when small amounts of data are frequently
+// read from a BPositionIO object.
 //
 //
 // Copyright (c) 2002 OpenBeOS Project

@@ -1,5 +1,7 @@
 /*****************************************************************************/
 // TGAView
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGAView.cpp
 //
 // This BView based object displays information about the TGATranslator.
@@ -83,6 +85,19 @@ TGAView::~TGAView()
 	fpsettings->Release();
 }
 
+// ---------------------------------------------------------------
+// AllAttached
+//
+//
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
 void
 TGAView::AllAttached()
 {
@@ -90,6 +105,19 @@ TGAView::AllAttached()
 	fpchkRLE->SetTarget(msgr);
 }
 
+// ---------------------------------------------------------------
+// MessageReceived
+//
+// Handles state changes of the RLE setting checkbox
+//
+// Preconditions:
+//
+// Parameters: message	the actual BMessage that was received
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
 void
 TGAView::MessageReceived(BMessage *message)
 {

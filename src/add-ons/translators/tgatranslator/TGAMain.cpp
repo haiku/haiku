@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // TGATranslator
-//
+// Written by Michael Wilber, OBOS Translation Kit Team
 // Version: 1.0.0 Beta
 //
 // This translator opens and writes TGA files.
