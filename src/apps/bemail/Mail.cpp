@@ -245,7 +245,7 @@ TMailApp::AboutRequested()
 	(new BAlert("",
 		"BeMail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Mail.cpp $Revision: 1.4 $\n"
+		"Mail.cpp $Revision: 1.5 $\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
 		"Close"))->Go();
 }
@@ -3620,10 +3620,24 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 
 	if (!gMessengerToSpamServer.IsValid()) {
 		// Make sure the server is running.
-		if (!be_roster->IsRunning(kSpamServerSignature)) {
-			errorCode = be_roster->Launch(kSpamServerSignature);
-			if (errorCode != B_OK)
-				goto ErrorExit;
+		if (!be_roster->IsRunning (kSpamServerSignature)) {
+			errorCode = be_roster->Launch (kSpamServerSignature);
+			if (errorCode != B_OK) {
+				BPath path;
+				entry_ref ref;
+				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
+				for (int32 i = 0; i < 2; i++) {
+					find_directory(places[i],&path);
+					path.Append("spamfilter");
+					if (!BEntry(path.Path()).Exists())
+						continue;
+					get_ref_for_path(path.Path(),&ref);
+					if ((errorCode =  be_roster->Launch (&ref)) == B_OK)
+						break;
+				}
+				if (errorCode != B_OK)
+					goto ErrorExit;
+			}
 		}
 
 		// Set up the messenger to the database server.
