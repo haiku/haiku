@@ -1,5 +1,5 @@
 //
-//	$Id: Locker.cpp,v 1.1 2003/06/10 22:29:51 bonefish Exp $
+//	$Id: Locker.cpp,v 1.2 2003/10/25 13:24:59 wkornew Exp $
 //
 //	This file contains the OpenBeOS implementation of BLocker.
 //
@@ -8,6 +8,10 @@
 #include "Locker.h"
 #include <OS.h>
 #include <SupportDefs.h>
+
+#ifdef _KERNEL_MODE
+	#include <kernel_cpp.h>
+#endif
 
 
 #ifdef USE_OPENBEOS_NAMESPACE
@@ -208,6 +212,10 @@ BLocker::InitLocker(const char *name,
 		fBenaphoreCount = 1;
 		fSemaphoreID = create_sem(1, name);
 	}
+	
+#ifdef _KERNEL_MODE
+	set_sem_owner(fSemaphoreID, B_SYSTEM_TEAM);
+#endif
 	
 	// The lock is currently not acquired so there is no owner.
 	fLockOwner = B_ERROR;
