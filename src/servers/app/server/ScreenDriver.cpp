@@ -49,6 +49,7 @@
 #include "FontFamily.h"
 #include "LayerData.h"
 #include "PNGDump.h"
+#include "PatternHandler.h"
 
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
@@ -67,10 +68,6 @@ SDWIN_OBSCURECURSOR,
 SDWIN_MOVECURSOR,
 SDWIN_SETCURSOR,
 };
-
-//TODO: Remove the need for these
-int64 patsolidhigh64=0xFFFFFFFFLL;
-int8 *patsolidhigh=(int8*)&patsolidhigh64;
 
 extern RGBColor workspace_default_color;
 

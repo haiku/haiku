@@ -58,10 +58,6 @@
 
 extern RGBColor workspace_default_color;	// defined in AppServer.cpp
 
-//TODO: Remove the need for these
-extern int64 patsolidhigh64;
-extern int8 *patsolidhigh;
-
 void HLine_32Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, rgb_color col);
 void HLine_16Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, uint16 col);
 void HLine_16Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, uint8 col);
@@ -860,8 +856,8 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 		pstart = y - half;
 		for (pix = pstart; pix < pstart + thick; pix++)
 		{
-			Line( BPoint(cx - x, cy + pix), BPoint(cx + x, cy + pix), ldata, patsolidhigh);
-			Line( BPoint(cx - x, cy - pix), BPoint(cx + x, cy - pix), ldata, patsolidhigh);
+			Line( BPoint(cx - x, cy + pix), BPoint(cx + x, cy + pix), ldata, pat_solidhigh);
+			Line( BPoint(cx - x, cy - pix), BPoint(cx + x, cy - pix), ldata, pat_solidhigh);
 		}
 		if (d < 0)
 			d += b_sq_4 * x++ + b_sq_6;
@@ -885,8 +881,8 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 			pstart = yp - half2;
 			for (pix = pstart; pix < pstart + thick2; pix++)
 			{
-				Line( BPoint(cx - xp, cy + pix), BPoint(cx + xp, cy + pix), ldata, patsolidhigh);
-				Line( BPoint(cx - xp, cy - pix), BPoint(cx + xp, cy - pix), ldata, patsolidhigh);
+				Line( BPoint(cx - xp, cy + pix), BPoint(cx + xp, cy + pix), ldata, pat_solidhigh);
+				Line( BPoint(cx - xp, cy - pix), BPoint(cx + xp, cy - pix), ldata, pat_solidhigh);
 			}
 			if (dp < 0)
 				dp += b_sq_4 * xp++ + b_sq_6;
@@ -902,8 +898,8 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 		pstart = x - half;
 		for (pix = pstart; pix < pstart + thick; pix++)
 		{
-			Line( BPoint(cx - pix, cy + y), BPoint(cx + pix, cy + y), ldata, patsolidhigh);
-			Line( BPoint(cx - pix, cy - y), BPoint(cx + pix, cy - y), ldata, patsolidhigh);
+			Line( BPoint(cx - pix, cy + y), BPoint(cx + pix, cy + y), ldata, pat_solidhigh);
+			Line( BPoint(cx - pix, cy - y), BPoint(cx + pix, cy - y), ldata, pat_solidhigh);
 		}
 		
 		if (d < 0)
