@@ -1434,6 +1434,7 @@ pipefs_set_flags(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, int flag
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
+	TRACE(("pipefs_set_flags(vnode = %p, flags = %x)\n", _vnode, flags));
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
 	return B_OK;
 }
