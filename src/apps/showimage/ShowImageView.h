@@ -140,6 +140,7 @@ private:
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
 	void DrawCaption();
+	void EraseCaption();
 	void DrawSelectionBox(BRect &rect);
 	Scaler* GetScaler();
 	void DrawImage(BRect rect);

@@ -538,6 +538,32 @@ ShowImageView::DrawCaption()
 	PopState();
 }
 
+void
+ShowImageView::EraseCaption()
+{
+	font_height fontHeight;
+	float width, height;
+	BRect bounds(Bounds());
+	BFont font(be_plain_font);
+	BPoint pos;
+	BRect rect;
+	width = font.StringWidth(fCaption.String())+1; // 1 for text shadow
+	font.GetHeight(&fontHeight);
+	height = fontHeight.ascent + fontHeight.descent;
+	// center text horizontally
+	pos.x = (bounds.left + bounds.right - width)/2;
+	// flush bottom
+	pos.y = bounds.bottom - fontHeight.descent - 5;
+	
+	// background rectangle
+	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
+	rect.OffsetTo(pos);
+	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+	
+	// draw over portion of image where caption is located
+	Draw(rect);
+}
+
 Scaler*
 ShowImageView::GetScaler()
 {
@@ -583,8 +609,10 @@ ShowImageView::Draw(BRect updateRect)
 			// Draw image
 			DrawImage(rect);
 						
-			if (fShowCaption && !fMovesImage) {
-				// to avoid flickering, disabled during moving with mouse
+			if (fShowCaption) {
+				// fShowCaption is set to false by ScrollRestricted()
+				// to prevent the caption from dirtying up the image
+				// during scrolling.
 				DrawCaption();
 			}
 			
@@ -976,7 +1004,21 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 		y = LimitToRange(y, B_VERTICAL, absolute);
 	}
 	
+	// hide the caption when using mouse wheel
+	// in full screen mode
+	bool caption = fShowCaption;
+	if (caption) {
+		fShowCaption = false;
+		EraseCaption();
+	}
+		
 	ScrollBy(x, y);
+	
+	if (caption) {
+		// show the caption again
+		fShowCaption = true;
+		DrawCaption();
+	}
 }
 
 // XXX method is not unused
@@ -1048,6 +1090,7 @@ ShowImageView::MouseWheelChanged(BMessage *msg)
 	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK) {
 		y = dy * kscrollBy;
 	}
+		
 	ScrollRestrictedBy(x, y);
 }
 
