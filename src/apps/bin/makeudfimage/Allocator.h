@@ -30,9 +30,10 @@ public:
 	status_t GetBlock(uint32 block);
 	status_t GetExtent(Udf::extent_address extent);
 
-	status_t GetNextBlock(uint32 &block);
+	status_t GetNextBlock(uint32 &block, uint32 minimumBlock = 0);
 	status_t GetNextExtent(uint32 length, bool contiguous,
-	                         Udf::extent_address &extent);
+	                       Udf::extent_address &extent,
+	                       uint32 minimumStartingBlock = 0);
 	                         
 	uint32 Length() const { return fLength; }
 	uint32 Tail() const { return fLength; }	//!< Returns the first unallocated block in the tail

@@ -112,43 +112,49 @@ Allocator::GetExtent(Udf::extent_address extent)
 
 	\param block Output parameter into which the number of the
 	             allocated block is stored.
+	\param minimumBlock The minimum acceptable block number (used
+	                    by the physical partition allocator).              
 
 	\return
 	- B_OK: Success.
 	- error code: Failure, no blocks available.
 */
 status_t
-Allocator::GetNextBlock(uint32 &block)
+Allocator::GetNextBlock(uint32 &block, uint32 minimumBlock)
 {
 	status_t error = InitCheck();
 	if (!error) {
 		Udf::extent_address extent;
-		error = GetNextExtent(BlockSize(), true, extent);
+		error = GetNextExtent(BlockSize(), true, extent, minimumBlock);
 		if (!error)
 			block = extent.location();
 	}
 	return error;
 }
 
-/*! \brief Allocates the next available block.
+/*! \brief Allocates the next available extent of given length.
 
 	\param length The desired length (in bytes) of the extent.
 	\param contiguous If false, signals that an extent of shorter length will
 	                  be accepted. This allows for small chunks of
 	                  unallocated space to be consumed, provided a
 	                  contiguous chunk is not needed. 
-	\param block Output parameter into which the extent as allocated
-	             is stored. Note that the length field of the extent
-	             may be shorter than the length parameter passed
-	             to this function is \a contiguous is false.
-
+	\param extent Output parameter into which the extent as allocated
+	              is stored. Note that the length field of the extent
+	              may be shorter than the length parameter passed
+	              to this function is \a contiguous is false.
+	\param minimumStartingBlock The minimum acceptable starting block
+	                            for the extent (used by the physical
+	                            partition allocator).
+	                            
 	\return
 	- B_OK: Success.
 	- error code: Failure.
 */
 status_t
 Allocator::GetNextExtent(uint32 _length, bool contiguous,
-                           Udf::extent_address &extent)
+                         Udf::extent_address &extent,
+	                     uint32 minimumStartingBlock)
 {
 	uint32 length = BlocksFor(_length);
 	bool isPartial = false;
@@ -159,8 +165,34 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 		         i++)
 		{
 			uint32 chunkOffset = i->location();
-			uint32 chunkLength = BlocksFor(i->length());			
-			if (length <= chunkLength) {
+			uint32 chunkLength = BlocksFor(i->length());
+			if (chunkOffset < minimumStartingBlock)
+			{
+				if (minimumStartingBlock < chunkOffset+chunkLength) {
+					// Start of chunk is below min starting block. See if
+					// any part of the chunk would make for an acceptable
+					// allocation
+					uint32 difference = minimumStartingBlock - chunkOffset;
+					uint32 newOffset = minimumStartingBlock;
+					uint32 newLength = chunkLength-difference;
+					if (length <= newLength) {
+						// new chunk is still long enough
+						Udf::extent_address newExtent(newOffset, _length);
+						if (GetExtent(newExtent) == B_OK) {
+							extent = newExtent;
+							return B_OK;
+						}
+					} else if (!contiguous) {
+						// new chunk is too short, but we're allowed to
+						// allocate a shorter extent, so we'll do it.
+						Udf::extent_address newExtent(newOffset, newLength<<BlockShift());
+						if (GetExtent(newExtent) == B_OK) {
+							extent = newExtent;
+							return B_OK;
+						}
+					}
+				}
+			} else if (length <= chunkLength) {
 				// Chunk is larger than necessary. Allocate first
 				// length blocks, and resize the chunk appropriately.
 				extent.set_location(chunkOffset);
@@ -181,6 +213,9 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 		}
 		// No sufficient chunk found, so try to allocate from the tail
 		uint32 maxLength = LONG_MAX-Length();
+		if (minimumStartingBlock > Tail())
+			maxLength -= minimumStartingBlock - Tail();
+		uint32 tail = minimumStartingBlock > Tail() ? minimumStartingBlock : Tail();
 		if (length > maxLength) {
 			if (contiguous)
 				error = B_DEVICE_FULL;
@@ -190,10 +225,12 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 			}
 		}
 		if (!error) {
-			extent.set_location(Length());
-			extent.set_length(isPartial ? length<<BlockShift() : _length);
-			fLength += length;		
-		}		
+			Udf::extent_address newExtent(tail, isPartial ? length<<BlockShift() : _length);
+			if (GetExtent(newExtent) == B_OK) {
+				extent = newExtent;
+				return B_OK;
+			}
+		}
 	}
 	return error;
 }
