@@ -57,7 +57,7 @@ resource mini_icon array
 	$"FFFFFFFF0000000011111111FFFFFFFF"
 };
 
-resource app_signature "application/x-vnd.Haiku.PoorMan";
+resource app_signature "application/x-vnd.haiku.PoorMan";
 
 resource app_version
 {

@@ -3,7 +3,7 @@
 // ------------------------------------------------------
 // PoorMan Window
 extern const char* STR_APP_SIG
-	= "application/x-vnd.OpenBeOS-PoorMan";
+	= "application/x-vnd.haiku.PoorMan";
 			 char* STR_APP_NAME
 	= "PoorMan";
 extern const char* STR_ERR_WEB_DIR
