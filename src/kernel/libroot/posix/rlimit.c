@@ -1,4 +1,9 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2002, Jeff Hamilton. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -20,7 +25,7 @@
 int
 getrlimit(int resource, struct rlimit *rlp)
 {
-	int status = sys_getrlimit(resource, rlp);
+	int status = _kern_getrlimit(resource, rlp);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -29,7 +34,7 @@ getrlimit(int resource, struct rlimit *rlp)
 int
 setrlimit(int resource, const struct rlimit *rlp)
 {
-	int status = sys_setrlimit(resource, rlp);
+	int status = _kern_setrlimit(resource, rlp);
 
 	RETURN_AND_SET_ERRNO(status);
 }
