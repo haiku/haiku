@@ -2,7 +2,6 @@ SubDir OBOS_TOP src add-ons kernel drivers network stack ;
 
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 # a) Userland stack version:
 
