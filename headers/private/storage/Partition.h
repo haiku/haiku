@@ -36,10 +36,12 @@ public:
 	
 	const char* Name() const;
 	const char* ContentName() const;
-	const char* Type() const;   		// See DiskDeviceTypes.h
+	const char* Type() const;			// See DiskDeviceTypes.h
 	const char* ContentType() const;	// See DiskDeviceTypes.h
 	partition_id UniqueID() const;
 	uint32 Flags() const;		
+
+	status_t GetDiskSystem(BDiskSystem *diskSystem) const;
 	
 	status_t GetPath(BPath *path) const;
 	status_t GetVolume(BVolume *volume) const;
@@ -91,18 +93,17 @@ public:
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
                BDiskScannerParameterEditor **editor) const;
-	status_t Initialize(const char *diskSystem,
-	                 const char *parameters);
+	status_t Initialize(const char *diskSystem, const char *parameters);
 	
 	// Modification of child partitions
 
 	bool CanCreateChild() const;
-	status_t GetChildCreationParameterEditor(const char *system,       
+	status_t GetChildCreationParameterEditor(const char *system,
                BDiskScannerParameterEditor **editor) const;
 	status_t ValidateCreateChild(off_t *start, off_t *size,
-	           const char *parameters) const;
-	status_t CreateChild(off_t start, off_t size, const char *parameters,
-	           BPartition** child = NULL);
+				const char *type, const char *parameters) const;
+	status_t CreateChild(off_t start, off_t size, const char *type,
+				const char *parameters, BPartition** child = NULL);
 	
 	bool CanDeleteChild(int32 index) const;
 	status_t DeleteChild(int32 index);
