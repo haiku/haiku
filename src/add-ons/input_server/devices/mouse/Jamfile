@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons input_server devices mouse ;
 
+UsePrivateHeaders input ;
+
 Addon <input>mouse : input_server/devices : 
 	MouseInputDevice.cpp 
 	: false 

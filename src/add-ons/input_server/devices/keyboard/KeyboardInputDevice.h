@@ -31,7 +31,7 @@
 #include <InputServerDevice.h>
 #include <List.h>
 #include <stdio.h>
-#include "kb_mouse_driver.h"
+#include "kb_mouse_settings.h"
 
 class KeyboardInputDevice;
 

@@ -25,7 +25,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 #include "KeyboardInputDevice.h"
-
+#include "kb_mouse_driver.h"
 #include <Directory.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
