@@ -700,8 +700,12 @@ rule LinkSharedOSLibs
 		} else {
 			switch $(i:B)
 			{
+				case _APP_ : isfile = true ;
+				case _KERNEL_ : isfile = true ;
+				case *.so     : isfile = true ;
+				case *.a      : isfile = true ;
 				case lib*	: isfile = true ;
-				case *		: isfile = ;
+				case *	: isfile = ;
 			}
 		}
 		if $(isfile) {
