@@ -82,14 +82,20 @@ status_t nv_acc_init()
 	/* (setup caches) */
 	/* disable caches reassign */
 	ACCW(PF_CACHES, 0x00000000);
+	//fixme: set this up for DMA use one day..
+	/* PFIFO mode for all 32 channels is PIO (instead of DMA) */
+	ACCW(PF_MODE, 0x00000000);
 	/* cache1 push0 access disabled */
 	ACCW(PF_CACH1_PSH0, 0x00000000);
 	/* cache1 pull0 access disabled */
 	ACCW(PF_CACH1_PUL0, 0x00000000);
-
-	//fixme: set these up for DMA use one day..
+	//fixme: set this up for DMA use one day..
 	/* cache1 push1 mode = pio (disable DMA use) */
 	ACCW(PF_CACH1_PSH1, 0x00000000);
+	/* cache1 DMA Put offset = 0 (b2-28) */
+	ACCW(PF_CACH1_DMAP, 0x00000000);
+	/* cache1 DMA Get offset = 0 (b2-28) */
+	ACCW(PF_CACH1_DMAG, 0x00000000);
 	/* cache1 DMA instance adress = none (b0-15);
 	 * instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000). */
 	/* note:
@@ -97,8 +103,8 @@ status_t nv_acc_init()
 	 * This define tells the engine where the DMA cmd buffer is and what it's size is;
 	 * inside that cmd buffer you'll find the engine handles for the FIFO channels,
 	 * followed by actual issued engine commands. */
+	//fixme: set this up for DMA use one day..
 	ACCW(PF_CACH1_DMAI, 0x00000000);
-
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
@@ -130,6 +136,16 @@ status_t nv_acc_init()
 	ACCW(PF_INTSTAT, 0xffffffff);
 	/* cache0 pull0 engine = acceleration engine (graphics) */
 	ACCW(PF_CACH0_PUL1, 0x00000001);
+	/* cache1 DMA control: disable some stuff */
+	ACCW(PF_CACH1_DMAC, 0x00000000);
+	/* cache1 engine 0 upto/including 7 is software (could also be graphics or DVD) */
+	ACCW(PF_CACH1_ENG, 0x00000000);
+	/* cache1 DMA fetch: trigger at 128 bytes, size is 32 bytes, max requests is 15,
+	 * use little endian */
+	ACCW(PF_CACH1_DMAF, 0x000f0078);
+	/* cache1 DMA push: b0=0 is access disabled */
+	//fixme: set this up for DMA use one day..
+	ACCW(PF_CACH1_DMAS, 0x00000000);
 	/* cache1 push0 access enabled */
 	ACCW(PF_CACH1_PSH0, 0x00000001);
 	/* cache1 pull0 access enabled */
