@@ -447,7 +447,7 @@ static	BBlockCache	*sMsgCache;
 
 		BMessage::entry_hdr	*fEntries;
 
-		struct {
+		struct reply_to_info {
 			port_id				port;
 			int32				target;
 			team_id				team;
