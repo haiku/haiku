@@ -1,3 +1,15 @@
 SubDir OBOS_TOP src tests add-ons translators ;
 
-SubInclude OBOS_TOP src tests add-ons translators bmptranslator ;
+# Let Jam know where to find some of our source files
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmptranslator ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) stxttranslator ] ;
+
+CommonTestLib libtranslatorstest.so
+	: TranslatorTestAddOn.cpp
+		BMPTranslatorTest.cpp
+		STXTTranslatorTest.cpp
+	: libtranslation.so be stdc++.r4
+	: translation be stdc++.r4
+	:
+	: translation
+;
