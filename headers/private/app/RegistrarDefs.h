@@ -81,6 +81,13 @@ enum {
 	B_REG_GET_MESSAGE_RUNNER_INFO			= 'rgri',
 	// internal registrar messages
 	B_REG_ROSTER_SANITY_EVENT				= 'rgir',
+	// clipboard handler requests
+	B_REG_ADD_CLIPBOARD					= 'rgca',
+	B_REG_GET_CLIPBOARD_COUNT				= 'rgcc',
+	B_REG_CLIPBOARD_START_WATCHING			= 'rgcw',
+	B_REG_CLIPBOARD_STOP_WATCHING			= 'rgcx',
+	B_REG_DOWNLOAD_CLIPBOARD				= 'rgcd',
+	B_REG_UPLOAD_CLIPBOARD				= 'rgcu',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
@@ -127,3 +134,4 @@ struct flat_app_info {
 };
 
 #endif	// REGISTRAR_DEFS_H
+

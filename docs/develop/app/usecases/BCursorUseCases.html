@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>BCursor Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BCursor Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BCursor interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BCursor Interface</A></LI>
+<LI><A HREF="#usecases">BCursor Use Cases</A></LI>
+<LI><A HREF="#implement">BCursor Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BCursor Interface:</H2>
+
+<P>The BCursor class is a simple class used to represent a mouse cursor as an object instead of an array of pixel data.  The best source of information for the BCursor interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/Cursor.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BCursor Use Cases:</H2>
+
+<P>The following use cases cover the BCursor functionality:</P>
+
+<OL>
+<LI><P><B>Construction 1:</B> The first BCursor constructor requires a pointer to the pixel data.  The format for the pixel data is described
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/Cursor.html#Cursor_Data_Format">here in the Be Book</A>.
+This pixel data is used to initialize the BCursor, but BCursor does not take ownership of the data, therefore you are responsible for freeing the memory after construction.</P></LI>
+
+<LI><P><B>Construction 2:</B> The second BCursor constructor requires a BMessage as an archive, however BCursor does not currently support archiving.  Do not use this constructor.</P></LI>
+
+<LI><P><B>Destruction:</B> This releases all resources used by the BCursor.</P></LI>
+
+<LI><P><B>Instantiate:</B> This always returns NULL since it relies on the second constructor (which is not currently supported).  If it were implemented, this would return a new BArchivable consisting of a BCursor created from the archive passed in as an argument. </P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BCursor Implementation:</H2>
+
+<P>All meaningful work of the BCursor is implemented in the first constructor.  The constructor establishes a link with the app_server and sends it the pixel data.  The app_server provides the BCursor with a token which identifies the pixel data.  When BApplication::SetCursor(BCursor) is called, it must get the needed cursor data by obtaining the BCursor's token (BApplication is a friend of BCursor) and using the token to request the data from the app_server.  Note that BCursor does not internally store the pixel data.</P>
+
+</BODY>
+</HTML>
+

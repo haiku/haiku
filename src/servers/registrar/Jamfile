@@ -7,6 +7,7 @@ UsePrivateHeaders storage ;
 Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp
+	ClipboardTree.cpp
 	Event.cpp
 	EventMaskWatcher.cpp
 	EventQueue.cpp

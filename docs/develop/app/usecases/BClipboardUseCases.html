@@ -1,0 +1,153 @@
+<HTML>
+<HEAD>
+<TITLE>BClipboard Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BClipboard Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BClipboard interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BClipboard Interface</A></LI>
+<LI><A HREF="#usecases">BClipboard Use Cases</A></LI>
+<LI><A HREF="#implement">BClipboard Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BClipboard Interface:</H2>
+
+<P>The BClipboard class provides an interface to a named, system-wide, temporary storage resource.
+Access to the system clipboard is provided by the be_clipboard variable provided by a BApplication object (or by constructing a clipboard with the name "system").
+The best source of information for the BClipboard interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/Clipboard.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BClipboard Use Cases:</H2>
+
+<P>The following use cases cover the BClipboard functionality:</P>
+
+<OL>
+<LI><P><B>Construction:</B> A BClipboard will accept one or two arguments to construction.
+A name is required for identifying the clipboard.  The discard argument indicates whether the
+clipboard data should be discarded between boots.  Te discard argument defaults to false, however
+this is meaningless since functionality has not been implemented to maintain clipboard data
+between boots.
+After construction, the queue is empty.</P></LI>
+
+<LI><P><B>Destruction:</B> The destructor destroys the BClipboard object, however the system-wide clipboard itself is unaffected.</P></LI>
+
+<LI><P><B>Writing to clipboard 1:</B> 
+The normal procedure for writing data consists of the following: locking the clipboard via Lock(), clearing the
+data via Clear(), adding data to the clipboard message, committing the data via Commit(), and unlocking the
+clipboard via Unlock().
+</P></LI>
+
+<LI><P><B>Writing to clipboard 2:</B> 
+The data which is to be written is not added directly to the BClipboard object, but is added to the data
+message for the BClipboard.  The message is obtained by calling BClipboard::Data().  Data is added in fields
+of type B_MIME_TYPE.  The name of the field corresponds to the MIME type of the data.  If multiple fields are
+added, they should contain the same data, but formatted for different MIME types.
+</P></LI>
+
+<LI><P><B>Writing to clipboard 3:</B> 
+In the event that one wishes to back out of writing process before calling Commit(), Revert() must be called.
+Otherwise, the changes to the clipboard remain in the BClipboard object.
+</P></LI>
+
+<LI><P><B>Reading from clipboard 1:</B> 
+The normal procedure for reading data consists of the following: locking the clipboard via Lock(), obtaining
+the data from the clipboards data message, and unlocking the clipboard via Unlock().
+</P></LI>
+
+<LI><P><B>Reading from clipboard 2:</B> 
+The data message is obtained from a call to BClipboard::Data().  Data is obtained from the message by using
+BMessage::FindData for a specified MIME type.
+</P></LI>
+
+<LI><P><B>Reading from clipboard 3:</B> 
+The data is uploaded from the system when Lock() is called, therefore any data which is written to the clipboard
+between the calls to Lock() and Data() will not be included in the data message.
+</P></LI>
+
+<LI><P><B>Reading from clipboard 4:</B> 
+It is permissible to Unlock() the clipboard before calling FindData on the data message.
+</P></LI>
+
+<LI><P><B>Clearing:</B> 
+The Clear() function is used to remove all data from the clipboard and is used before adding new data which is
+to be written to the clipboard.  Clear() returns B_ERROR if the BClipboard is not locked, and returns B_OK if
+it is locked.
+</P></LI>
+
+<LI><P><B>Committing:</B> 
+The Commit() function is used to upload data from the BClipboard to the system.  The data is immediately
+available to other applications once Commit() has been called.  Commit() returns B_ERROR if the BClipboard
+is not locked, and returns B_OK if it is locked.
+</P></LI>
+
+<LI><P><B>Revert:</B> 
+The Revert() function is used to synchronize the data in the BClipboard to the system.  This is only needed in
+case one begins to modify the data message and wishes to back out of the changes.  Revert() returns B_ERROR if
+the BClipboard is not locked, and returns B_OK if it is locked.
+</P></LI>
+
+<LI><P><B>Accessing data:</B> 
+Data() is used to obtain a pointer to the BClipboard's data message.  One is expected to read and write data
+directly to the message, but the message must not be freed or dispatched.  Data() returns NULL if the
+BClipboard is not locked.
+</P></LI>
+
+<LI><P><B>Accessing a data source:</B> 
+DataSource() is used to obtain a BMessenger pointed at the BApplication which last committed data to the
+clipboard.  There is no requirement for the the BClipboard to be locked when calling DataSource().
+</P></LI>
+
+<LI><P><B>Obtaining a count:</B> 
+The count refers to the number of times that data has been uploaded to the clipboard.
+There are two count functions.  SystemCount() returns an up to date count which is obtained from the system.
+Count() returns a cached count.  The cached count is set to zero upon creation
+of the BClipboard, and is updated when Lock() or Commit() is called.
+</P></LI>
+
+<LI><P><B>Locking:</B>
+Lock() is used to upload data from the system into the BClipboard object and prevent other threads in the
+application from using it.  It must be called before reading or writing data to the BClipboard.  It blocks
+if the BClipboard is already locked.  The return value is true if the BClipboard is successfully locked, or
+false if the BClipboard was deleted while Lock() was blocked.
+</P></LI>
+
+<LI><P><B>Unlocking:</B>
+Unlock() is used to unlock the BClipboard and allow other threads in the application to use it.
+</P></LI>
+
+<LI><P><B>Checking lock status:</B>
+IsLocked() returns true if the BClipboard is locked, and false if it is not locked.
+</P></LI>
+
+<LI><P><B>Checking clipboard name:</B>
+Name() returns a string containing the name of the clipboard.  It is not necessary for the BClipboard to be
+locked when calling Name().
+</P></LI>
+
+<LI><P><B>Watching a clipboard:</B> 
+StartWatching and StopWatching are used to enable and disable watching of a clipboard.  When the clipboard is
+changed, a B_CLIPBOARD_CHANGED message is sent to the target specified in the call to StartWatching.
+</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BClipboard Implementation:</H2>
+
+<P>
+The BClipboard class is implemented via a message passing system between the BClipboard, the Roster, and
+the Clipboard Handler associated with the Roster.  Details of the message passing protocol are listed in the
+Roster documentation.
+</P>
+
+</BODY>
+</HTML>
+
