@@ -180,6 +180,35 @@ void PatternHandler::SetLowColor(const RGBColor& color)
 }
 
 /*!
+	\brief Set the colors for the pattern to use
+	\param high High color for the handler
+	\param low Low color for the handler
+*/
+void PatternHandler::SetColors(const rgb_color& high, const rgb_color& low)
+{
+	fHighColor = high;
+	fLowColor = low;
+}
+
+/*!
+	\brief Set the high color for the pattern to use
+	\param color High color for the handler
+*/
+void PatternHandler::SetHighColor(const rgb_color& color)
+{
+	fHighColor = color;
+}
+
+/*!
+	\brief Set the low color for the pattern to use
+	\param color Low color for the handler
+*/
+void PatternHandler::SetLowColor(const rgb_color& color)
+{
+	fLowColor = color;
+}
+
+/*!
 	\brief Obtains the color in the pattern at the specified coordinates
 	\param pt Coordinates to get the color for
 	\return Color for the coordinates

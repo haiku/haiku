@@ -96,15 +96,21 @@ class PatternHandler {
 								PatternHandler(const uint64& p);
 								PatternHandler(const Pattern& p);
 								PatternHandler(const PatternHandler& other);
-			virtual				~PatternHandler(void);
+	virtual						~PatternHandler(void);
 
 			void				SetPattern(const int8* p);
 			void				SetPattern(const uint64& p);
 			void				SetPattern(const Pattern& p);
 			void				SetPattern(const pattern& p);
+
 			void				SetColors(const RGBColor& high, const RGBColor& low);
 			void				SetHighColor(const RGBColor& color);
 			void				SetLowColor(const RGBColor& color);
+
+			void				SetColors(const rgb_color& high, const rgb_color& low);
+			void				SetHighColor(const rgb_color& color);
+			void				SetLowColor(const rgb_color& color);
+
 
 			RGBColor			HighColor() const
 									{ return fHighColor; }
@@ -114,6 +120,8 @@ class PatternHandler {
 			RGBColor			ColorAt(const BPoint& pt) const;
 			RGBColor			ColorAt(float x, float y) const;
 	inline	RGBColor			ColorAt(int x, int y) const;
+	// TODO: any ideas for a better name of the rgb_color version of this function?
+	inline	rgb_color			R5ColorAt(int x, int y) const;
 
 			bool				IsHighColor(const BPoint& pt) const;
 	inline	bool				IsHighColor(int x, int y) const;
@@ -136,6 +144,18 @@ inline	RGBColor
 PatternHandler::ColorAt(int x, int y) const
 {
 	return IsHighColor(x, y) ? fHighColor : fLowColor;
+}
+
+/*!
+	\brief Obtains the color in the pattern at the specified coordinates
+	\param x X coordinate to get the color for
+	\param y Y coordinate to get the color for
+	\return Color for the coordinates
+*/
+inline	rgb_color
+PatternHandler::R5ColorAt(int x, int y) const
+{
+	return IsHighColor(x, y) ? fHighColor.GetColor32() : fLowColor.GetColor32();
 }
 
 /*!
