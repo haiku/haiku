@@ -2,9 +2,6 @@ SubDir OBOS_TOP src apps bin make glob ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
-#SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
-#SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary glob : 
