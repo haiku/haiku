@@ -516,7 +516,8 @@ elf_parse_dynamic_section(struct elf_image_info *image)
  */
 
 status_t
-elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct elf_image_info *shared_image, const char *sym_prepend,addr *sym_addr)
+elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
+	struct elf_image_info *shared_image, const char *sym_prepend, addr_t *sym_addr)
 {
 	struct Elf32_Sym *sym2;
 	char new_symname[512];
@@ -896,7 +897,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 
 
 status_t
-elf_load_user_image(const char *path, struct team *p, int flags, addr *entry)
+elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
@@ -1313,7 +1314,7 @@ elf_init(kernel_args *ka)
 		panic("elf_init: could not look up kernel text segment region\n");
 
 	get_area_info(sKernelImage->regions[0].id, &areaInfo);
-	sKernelImage->regions[0].start = (addr)areaInfo.address;
+	sKernelImage->regions[0].start = (addr_t)areaInfo.address;
 	sKernelImage->regions[0].size = areaInfo.size;
 
 	// data segment
@@ -1322,11 +1323,11 @@ elf_init(kernel_args *ka)
 		panic("elf_init: could not look up kernel data segment region\n");
 
 	get_area_info(sKernelImage->regions[1].id, &areaInfo);
-	sKernelImage->regions[1].start = (addr)areaInfo.address;
+	sKernelImage->regions[1].start = (addr_t)areaInfo.address;
 	sKernelImage->regions[1].size = areaInfo.size;
 
 	// we know where the dynamic section is
-	sKernelImage->dynamic_ptr = (addr)ka->kernel_dynamic_section_addr.start;
+	sKernelImage->dynamic_ptr = (addr_t)ka->kernel_dynamic_section_addr.start;
 
 	// parse the dynamic section
 	if (elf_parse_dynamic_section(sKernelImage) < 0)
