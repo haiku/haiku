@@ -598,11 +598,11 @@ check_cpu(void)
 
 
 void
-sleep(uint64 time)
+spin(uint64 microseconds)
 {
 	uint64 start = system_time();
 
-	while(system_time() - start <= time)
+	while (system_time() - start <= microseconds)
 		;
 }
 

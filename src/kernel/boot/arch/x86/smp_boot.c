@@ -398,7 +398,7 @@ smp_boot_all_cpus(kernel_args *ka)
 			;
 
 		/* wait 10ms */
-		sleep(10000);
+		spin(10000);
 
 		/* is this a local apic or an 82489dx ? */
 		num_startups = (ka->arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
@@ -416,7 +416,7 @@ smp_boot_all_cpus(kernel_args *ka)
 			apic_write(APIC_ICR1, config);
 
 			/* wait */
-			sleep(200);
+			spin(200);
 
 			while ((apic_read(APIC_ICR1)& 0x00001000) == 0x00001000)
 				;

@@ -11,7 +11,7 @@
 extern void clearscreen(void);
 extern void kputs(const char *str);
 extern int dprintf(const char *fmt, ...);
-extern void sleep(uint64 time);
+extern void spin(uint64 microseconds);
 extern void execute_n_instructions(int count);
 void system_time_setup(long a);
 uint64 rdtsc();
