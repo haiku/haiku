@@ -100,32 +100,33 @@ KernelLd stage2
 
 KernelLd kernel 
 	:
-	<$(SOURCE_GRIST)!core>cbuf.o 
-	<$(SOURCE_GRIST)!core>console.o 
-	<$(SOURCE_GRIST)!core>cpu.o 
-	<$(SOURCE_GRIST)!core>debug.o 
+	<$(SOURCE_GRIST)!core>cbuf.o
+	<$(SOURCE_GRIST)!core>console.o
+	<$(SOURCE_GRIST)!core>cpu.o
+	<$(SOURCE_GRIST)!core>debug.o
+	<$(SOURCE_GRIST)!core>driver_settings.o
 	<$(SOURCE_GRIST)!core>elf.o
 	<$(SOURCE_GRIST)!core>faults.o
 	<$(SOURCE_GRIST)!core>fd.o
 	<$(SOURCE_GRIST)!core>gdb.o
 	<$(SOURCE_GRIST)!core>heap.o
 	<$(SOURCE_GRIST)!core>int.o
-	<$(SOURCE_GRIST)!core>khash.o 
-	<$(SOURCE_GRIST)!core>lock.o 
-	<$(SOURCE_GRIST)!core>main.o 
+	<$(SOURCE_GRIST)!core>khash.o
+	<$(SOURCE_GRIST)!core>lock.o
+	<$(SOURCE_GRIST)!core>main.o
 	<$(SOURCE_GRIST)!core>misc.o
 	<$(SOURCE_GRIST)!core>module.o 
-	<$(SOURCE_GRIST)!core>pools.o 
+	<$(SOURCE_GRIST)!core>pools.o
 	<$(SOURCE_GRIST)!core>port.o
-	<$(SOURCE_GRIST)!core>queue.o 
+	<$(SOURCE_GRIST)!core>queue.o
 	<$(SOURCE_GRIST)!core>scheduler.o
-	<$(SOURCE_GRIST)!core>sem.o 
-	<$(SOURCE_GRIST)!core>signal.o 
+	<$(SOURCE_GRIST)!core>sem.o
+	<$(SOURCE_GRIST)!core>signal.o
 	<$(SOURCE_GRIST)!core>smp.o
-	<$(SOURCE_GRIST)!core>syscalls.o 
+	<$(SOURCE_GRIST)!core>syscalls.o
 	<$(SOURCE_GRIST)!core>sysctl.o
-	<$(SOURCE_GRIST)!core>team.o 
-	<$(SOURCE_GRIST)!core>thread.o 
+	<$(SOURCE_GRIST)!core>team.o
+	<$(SOURCE_GRIST)!core>thread.o
 	<$(SOURCE_GRIST)!core>timer.o
 
 	linkhack.so

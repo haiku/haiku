@@ -7,7 +7,7 @@
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
@@ -137,16 +137,16 @@ devfs_create_vnode(struct devfs *fs, const char *name)
 {
 	struct devfs_vnode *v;
 
-	v = kmalloc(sizeof(struct devfs_vnode));
+	v = malloc(sizeof(struct devfs_vnode));
 	if (v == NULL)
 		return NULL;
 
 	memset(v, 0, sizeof(struct devfs_vnode));
 	v->id = fs->next_vnode_id++;
 
-	v->name = kstrdup(name);
+	v->name = strdup(name);
 	if (v->name == NULL) {
-		kfree(v);
+		free(v);
 		return NULL;
 	}
 
@@ -172,8 +172,8 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *v, bool force_delete)
 		vfs_put_vnode(fs->id, v->stream.u.dev.part_map->raw_vnode->id);
 
 	if (v->name != NULL)
-		kfree(v->name);
-	kfree(v);
+		free(v->name);
+	free(v);
 
 	return 0;
 }
@@ -336,7 +336,7 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 		return EINVAL;
 				
 	// create partition map
-	part_map = kmalloc(sizeof(*part_map));
+	part_map = malloc(sizeof(*part_map));
 	if (!part_map)
 		return ENOMEM;
 		
@@ -389,14 +389,14 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 err1:
 	mutex_unlock(&gDeviceFileSystem->lock);
 
-	kfree(part_map);
+	free(part_map);
 	return res;
 		
 err2:
 	mutex_unlock(&gDeviceFileSystem->lock);
 
 	vfs_put_vnode(fs->id, v->id);
-	kfree(part_map);
+	free(part_map);
 	return res;
 }
 
@@ -419,7 +419,7 @@ devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id
 		goto err;
 	}
 
-	fs = kmalloc(sizeof(struct devfs));
+	fs = malloc(sizeof(struct devfs));
 	if (fs == NULL) {
 		err = ENOMEM;
 		goto err;
@@ -471,7 +471,7 @@ err3:
 err2:
 	mutex_destroy(&fs->lock);
 err1:
-	kfree(fs);
+	free(fs);
 err:
 	return err;
 }
@@ -495,7 +495,7 @@ devfs_unmount(fs_volume _fs)
 
 	hash_uninit(fs->vnode_list_hash);
 	mutex_destroy(&fs->lock);
-	kfree(fs);
+	free(fs);
 
 	return 0;
 }
@@ -637,7 +637,7 @@ devfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 
 	TRACE(("devfs_open: fs_cookie %p vnode %p, oflags 0x%x, fs_cookie %p \n", fs, vnode, oflags, _cookie));
 
-	cookie = kmalloc(sizeof(struct devfs_cookie));
+	cookie = malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
 		return ENOMEM;
 
@@ -682,7 +682,7 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 	}
 
 	if (cookie)
-		kfree(cookie);
+		free(cookie);
 
 	return 0;
 }
@@ -792,7 +792,7 @@ devfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return EINVAL;
 
-	cookie = kmalloc(sizeof(struct devfs_cookie));
+	cookie = malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
 		return ENOMEM;
 

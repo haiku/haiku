@@ -6,7 +6,7 @@
 #include <kernel.h>
 #include <int.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <smp.h>
 #include <arch/int.h>
 #include <errno.h>
@@ -58,7 +58,7 @@ int_init(kernel_args *ka)
 int
 int_init2(kernel_args *ka)
 {
-	io_vectors = (struct io_vector *)kmalloc(sizeof(struct io_vector) * NUM_IO_VECTORS);
+	io_vectors = (struct io_vector *)malloc(sizeof(struct io_vector) * NUM_IO_VECTORS);
 	if (io_vectors == NULL)
 		panic("int_init2: could not create io vector table!\n");
 
@@ -88,9 +88,10 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	 * PCI drivers. Where we have multiple handlers we will call each in turn
 	 * until one returns a value other than B_UNHANDLED_INTERRUPT.
 	 */
-	io = (struct io_handler *)kmalloc(sizeof(struct io_handler));
+	io = (struct io_handler *)malloc(sizeof(struct io_handler));
 	if (io == NULL)
 		return ENOMEM;
+
 	io->func = handler;
 	io->data = data;
 
@@ -164,7 +165,7 @@ remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
 			remque(io);
-			kfree(io);
+			free(io);
 			rv = 0;
 			break;
 		}

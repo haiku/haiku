@@ -13,7 +13,7 @@
 #include <debug.h>
 #include <khash.h>
 #include <kqueue.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <elf.h>
 #include <stdio.h>
 #include <string.h>
@@ -192,20 +192,20 @@ load_module_file(const char *path)
 		return NULL;
 	}
 
-	lm = (loaded_module*)kmalloc(sizeof(loaded_module));
+	lm = (loaded_module*)malloc(sizeof(loaded_module));
 	if (!lm)
 		return NULL;
 	
 	lm->info = (module_info**) elf_lookup_symbol(file_image, "modules");
 	if (!lm->info) {
 		dprintf("Failed to load %s due to lack of 'modules' symbol\n", path);
-		kfree(lm);
+		free(lm);
 		return NULL;
 	}
 		
-	lm->path = (char*)kmalloc(strlen(path) + 1);
+	lm->path = (char*)malloc(strlen(path) + 1);
 	if (!lm->path) {
-		kfree(lm);
+		free(lm);
 		return NULL;
 	}
 	strcpy(lm->path, path);
@@ -245,7 +245,7 @@ dprintf("unload_mdoule_file: %s\n", path);
 	recursive_lock_unlock(&modules_lock);
 
 	elf_unload_kspace(themod->path);
-	kfree(themod);
+	free(themod);
 }
 
 
@@ -272,23 +272,23 @@ simple_module_info(module_info *mod, const char *file, int offset)
 		return -1;
 	}
 
-	if ((m = (module*)kmalloc(sizeof(module))) == NULL)
+	if ((m = (module*)malloc(sizeof(module))) == NULL)
 		return -1;
 	
 	SHOW_FLOW(3, "simple_module_info(%s, %s)\n", mod->name, file);
 	
 	dprintf("simple_module_info: '%s'\n", mod->name);
 	m->module = NULL; /* back pointer */
-	m->name = (char*)kmalloc(strlen(mod->name) + 1);
+	m->name = (char*)malloc(strlen(mod->name) + 1);
 	if (!m->name) {
-		kfree(m);
+		free(m);
 		return -1;
 	}
 	strcpy(m->name, mod->name);	
 	m->state = MOD_QUERIED;
 	/* Record where the module_info can be found */
 	m->offset = offset;
-	m->file = (char*)kstrdup(file);
+	m->file = strdup(file);
 	m->ref_cnt = 0;
 	/* set the keep_loaded flag */
 	if (mod->flags & B_KEEP_LOADED) {
@@ -378,7 +378,7 @@ recurse_directory(const char *path, const char *match)
 	if ((dir = sys_open_dir(path)) < 0)
 		return -1;
 
-	dirent = kmalloc(bufferSize);
+	dirent = malloc(bufferSize);
 	if (!dirent) {
 		sys_close(dir);
 		return -1;
@@ -397,13 +397,13 @@ recurse_directory(const char *path, const char *match)
 		dirent->d_name[dirent->d_reclen] = '\0';
 
 		slen = strlen(path) + strlen(dirent->d_name) + 2;	
-		newpath = (char*)kmalloc(slen);
+		newpath = (char*)malloc(slen);
 		strlcpy(newpath, path, slen);
 		strlcat(newpath, "/", slen);
 		strlcat(newpath, dirent->d_name, slen);
 
 		if ((res = stat(newpath, &st)) != B_NO_ERROR) {
-			kfree(newpath);
+			free(newpath);
 			break;
 		}
 
@@ -426,10 +426,10 @@ recurse_directory(const char *path, const char *match)
 		} else if (S_ISDIR(st.st_mode)) {
 			res = recurse_directory(newpath, match);
 		}
-		kfree(newpath);
+		free(newpath);
 	}
 
-	kfree(dirent);
+	free(dirent);
 	sys_close(dir);
 
 	return res;
@@ -594,13 +594,13 @@ module_create_dir_iterator(module_iterator *iter, int file, const char *name)
 	 */
 	iter->cur_header = NULL;
 
-	dir = (struct module_dir_iterator *)kmalloc(sizeof(*dir));
+	dir = (struct module_dir_iterator *)malloc(sizeof(*dir));
 	if (dir == NULL )
 		return ENOMEM;
 
-	dir->name = (char *)kstrdup(name);
+	dir->name = strdup(name);
 	if (dir->name == NULL) {
-		kfree(dir);
+		free(dir);
 		return ENOMEM;
 	}
 
@@ -660,8 +660,8 @@ destroy_dir_iterator( module_iterator *iter )
 		
 	iter->cur_dir = dir->parent_dir;
 
-	kfree(dir->name);
-	kfree(dir);
+	free(dir->name);
+	free(dir);
 }
 
 
@@ -764,7 +764,7 @@ module_traverse_dir(module_iterator *iter)
 		module_info **hdrs = NULL;
 		if ((hdrs = load_module_file(path)) != NULL) {
 			iter->cur_header = hdrs;
-			iter->cur_path = (char*)kstrdup(path);			
+			iter->cur_path = strdup(path);			
 			return B_NO_ERROR;
 		}
 		return EINVAL; /* not sure what we should return here */
@@ -828,13 +828,13 @@ open_module_list(const char *prefix)
 	
 	SHOW_FLOW( 3, "prefix: %s\n", prefix );
 	
-	iter = (module_iterator *)kmalloc(sizeof( module_iterator));
+	iter = (module_iterator *)malloc(sizeof( module_iterator));
 	if (!iter)
 		return NULL;
 
-	iter->prefix = (char *)kstrdup( prefix );
-	if(iter->prefix == NULL) {
-		kfree(iter);
+	iter->prefix = strdup(prefix);
+	if (iter->prefix == NULL) {
+		free(iter);
 		return NULL;
 	}
 	
@@ -906,8 +906,8 @@ close_module_list(void *cookie)
 	while(iter->cur_dir)
 		module_leave_dir(iter);
 
-	kfree(iter->prefix);
-	kfree(iter);
+	free(iter->prefix);
+	free(iter);
 
 	return 0;
 }

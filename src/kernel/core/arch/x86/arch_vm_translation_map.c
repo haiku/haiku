@@ -4,7 +4,7 @@
 */
 
 #include <kernel.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <int.h>
 #include <smp.h>
 #include <vm.h>
@@ -175,10 +175,10 @@ static void destroy_tmap(vm_translation_map *map)
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
 		}
-		kfree(map->arch_data->pgdir_virt);
+		free(map->arch_data->pgdir_virt);
 	}
 
-	kfree(map->arch_data);
+	free(map->arch_data);
 	recursive_lock_destroy(&map->lock);
 }
 
@@ -583,7 +583,7 @@ dprintf("vm_translation_map_create\n");
 	if(recursive_lock_create(&new_map->lock) < 0)
 		return ENOMEM;
 
-	new_map->arch_data = (vm_translation_map_arch_info *)kmalloc(sizeof(vm_translation_map_arch_info));
+	new_map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
 	if(new_map == NULL) {
 		recursive_lock_destroy(&new_map->lock);
 		return ENOMEM;
@@ -594,9 +594,9 @@ dprintf("vm_translation_map_create\n");
 	if(!kernel) {
 		// user
 		// allocate a pgdir
-		new_map->arch_data->pgdir_virt = kmalloc(PAGE_SIZE);
+		new_map->arch_data->pgdir_virt = malloc(PAGE_SIZE);
 		if(new_map->arch_data->pgdir_virt == NULL) {
-			kfree(new_map->arch_data);
+			free(new_map->arch_data);
 			recursive_lock_destroy(&new_map->lock);
 			return ENOMEM;
 		}

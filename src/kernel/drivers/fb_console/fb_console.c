@@ -6,7 +6,7 @@
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <int.h>
 #include <vm.h>
 #include <lock.h>
@@ -434,12 +434,12 @@ fb_console_dev_init(kernel_args *ka)
 		dprintf("console %p\n", &console);
 
 		// allocate some memory for this
-		console.render_buf = kmalloc(console.fb_x * console.fb_pixel_bytes);
+		console.render_buf = malloc(console.fb_x * console.fb_pixel_bytes);
 		memset((void *)console.render_buf, 0, console.fb_x * console.fb_pixel_bytes);
-		console.buf = kmalloc(console.rows * (console.columns+1));
+		console.buf = malloc(console.rows * (console.columns+1));
 		memset(console.buf, 0, console.rows * (console.columns+1));
-		console.lines = kmalloc(console.rows * sizeof(char *));
-		console.dirty_lines = kmalloc(console.rows);
+		console.lines = malloc(console.rows * sizeof(char *));
+		console.dirty_lines = malloc(console.rows);
 		// set up the line pointers
 		for (i = 0; i < console.rows; i++) {
 			console.lines[i] = (char *)((addr)console.buf + i*(console.columns+1));

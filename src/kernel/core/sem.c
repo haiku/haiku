@@ -4,6 +4,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <OS.h>
 #include <sem.h>
@@ -12,7 +13,7 @@
 #include <arch/int.h>
 #include <timer.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <thread.h>
 #include <Errors.h>
 #include <kerrors.h>
@@ -186,7 +187,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 
 	name_len = strlen(name) + 1;
 	name_len = min(name_len, SYS_MAX_OS_NAME_LEN);
-	temp_name = (char *)kmalloc(name_len);
+	temp_name = (char *)malloc(name_len);
 	if (temp_name == NULL)
 		return B_NO_MEMORY;
 	strlcpy(temp_name, name, name_len);
@@ -226,7 +227,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	}
 
 	RELEASE_SEM_LIST_LOCK();
-	kfree(temp_name);
+	free(temp_name);
 
 out:
 	restore_interrupts(state);
@@ -306,7 +307,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 
 	restore_interrupts(state);
 
-	kfree(old_name);
+	free(old_name);
 
 	return B_OK;
 }

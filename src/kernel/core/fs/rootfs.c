@@ -7,7 +7,7 @@
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
@@ -105,7 +105,7 @@ rootfs_create_vnode(struct rootfs *fs)
 {
 	struct rootfs_vnode *v;
 
-	v = kmalloc(sizeof(struct rootfs_vnode));
+	v = malloc(sizeof(struct rootfs_vnode));
 	if (v == NULL)
 		return NULL;
 
@@ -128,8 +128,8 @@ rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete
 	hash_remove(fs->vnode_list_hash, v);
 
 	if (v->name != NULL)
-		kfree(v->name);
-	kfree(v);
+		free(v->name);
+	free(v);
 
 	return 0;
 }
@@ -274,7 +274,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 
 	TRACE(("rootfs_mount: entry\n"));
 
-	fs = kmalloc(sizeof(struct rootfs));
+	fs = malloc(sizeof(struct rootfs));
 	if (fs == NULL)
 		return ENOMEM;
 
@@ -301,7 +301,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 
 	// set it up
 	vnode->parent = vnode;
-	vnode->name = kstrdup("");
+	vnode->name = strdup("");
 	if (vnode->name == NULL) {
 		err = ENOMEM;
 		goto err4;
@@ -324,7 +324,7 @@ err3:
 err2:
 	mutex_destroy(&fs->lock);
 err1:
-	kfree(fs);
+	free(fs);
 
 	return err;
 }
@@ -351,7 +351,7 @@ rootfs_unmount(fs_volume _fs)
 
 	hash_uninit(fs->vnode_list_hash);
 	mutex_destroy(&fs->lock);
-	kfree(fs);
+	free(fs);
 
 	return 0;
 }
@@ -517,7 +517,7 @@ rootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 	TRACE(("rootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
 #endif
 	if (cookie)
-		kfree(cookie);
+		free(cookie);
 
 	return 0;
 }
@@ -579,7 +579,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 		goto err;
 	}
 	created_vnode = true;
-	vnode->name = kstrdup(name);
+	vnode->name = strdup(name);
 	if (vnode->name == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -630,7 +630,7 @@ rootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return B_BAD_VALUE;
 
-	cookie = kmalloc(sizeof(struct rootfs_cookie));
+	cookie = malloc(sizeof(struct rootfs_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
@@ -777,7 +777,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 		goto err;
 	}
 	created_vnode = true;
-	vnode->name = kstrdup(name);
+	vnode->name = strdup(name);
 	if (vnode->name == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -788,7 +788,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 
 	hash_insert(fs->vnode_list_hash, vnode);
 
-	vnode->stream.symlink.path = kstrdup(path);
+	vnode->stream.symlink.path = strdup(path);
 	if (vnode->stream.symlink.path == NULL) {
 		status = ENOMEM;
 		goto err1;
@@ -856,14 +856,14 @@ rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 		} else {
 			char *ptr = v1->name;
 
-			v1->name = kstrdup(newname);
-			if(!v1->name) {
+			v1->name = strdup(newname);
+			if (!v1->name) {
 				// bad place to be, at least restore
 				v1->name = ptr;
 				err = ENOMEM;
 				goto err;
 			}
-			kfree(ptr);
+			free(ptr);
 		}
 
 		/* no need to remove and add it unless the dir is sorting */

@@ -2,9 +2,10 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 #include <lock.h>
 #include <vm_store_device.h>
@@ -19,7 +20,7 @@ struct device_store_data {
 static void device_destroy(struct vm_store *store)
 {
 	if(store) {
-		kfree(store);
+		free(store);
 	}
 }
 
@@ -100,7 +101,7 @@ vm_store *vm_store_create_device(addr base_addr)
 	vm_store *store;
 	struct device_store_data *d;
 
-	store = kmalloc(sizeof(vm_store) + sizeof(struct device_store_data));
+	store = malloc(sizeof(vm_store) + sizeof(struct device_store_data));
 	if(store == NULL)
 		return NULL;
 

@@ -2,12 +2,13 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <int.h>
 #include <khash.h>
 #include <lock.h>
@@ -78,7 +79,7 @@ vm_cache *vm_cache_create(vm_store *store)
 {
 	vm_cache *cache;
 
-	cache = kmalloc(sizeof(vm_cache));
+	cache = malloc(sizeof(vm_cache));
 	if(cache == NULL)
 		return NULL;
 
@@ -99,7 +100,7 @@ vm_cache_ref *vm_cache_ref_create(vm_cache *cache)
 {
 	vm_cache_ref *ref;
 
-	ref = kmalloc(sizeof(vm_cache_ref));
+	ref = malloc(sizeof(vm_cache_ref));
 	if(ref == NULL)
 		return NULL;
 
@@ -168,8 +169,8 @@ void vm_cache_release_ref(vm_cache_ref *cache_ref)
 			vm_cache_release_ref(cache_ref->cache->source->ref);
 
 		mutex_destroy(&cache_ref->lock);
-		kfree(cache_ref->cache);
-		kfree(cache_ref);
+		free(cache_ref->cache);
+		free(cache_ref);
 
 		return;
 	}

@@ -13,7 +13,7 @@
 #include <vm.h>
 #include <thread.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <atomic.h>
 #include <stdlib.h>
 
@@ -229,8 +229,8 @@ find_image_by_vnode(void *vnode)
 
 	mutex_lock(&image_lock);
 
-	for(image = kernel_images; image; image = image->next) {
-		if(image->vnode == vnode)
+	for (image = kernel_images; image; image = image->next) {
+		if (image->vnode == vnode)
 			break;
 	}
 	mutex_unlock(&image_lock);
@@ -244,7 +244,7 @@ create_image_struct()
 {
 	struct elf_image_info *image;
 
-	image = (struct elf_image_info *)kmalloc(sizeof(struct elf_image_info));
+	image = (struct elf_image_info *)malloc(sizeof(struct elf_image_info));
 	if(!image)
 		return NULL;
 	memset(image, 0, sizeof(struct elf_image_info));
@@ -655,7 +655,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 
 	// read program header
 
-	pheaders = (struct Elf32_Phdr *)kmalloc(eheader.e_phnum * eheader.e_phentsize);
+	pheaders = (struct Elf32_Phdr *)malloc(eheader.e_phnum * eheader.e_phentsize);
 	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
 		err = ENOMEM;
@@ -774,7 +774,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 
 error:
 	if (pheaders)
-		kfree(pheaders);
+		free(pheaders);
 	sys_close(fd);
 
 	return err;
@@ -815,7 +815,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		goto done;
 	}
 
-	eheader = (struct Elf32_Ehdr *)kmalloc(sizeof(*eheader));
+	eheader = (struct Elf32_Ehdr *)malloc(sizeof(*eheader));
 	if (!eheader) {
 		err = ENOMEM;
 		goto error;
@@ -842,9 +842,9 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	}
 	image->vnode = vnode;
 	image->eheader = eheader;
-	image->name = kstrdup(path);
+	image->name = strdup(path);
 
-	pheaders = (struct Elf32_Phdr *)kmalloc(eheader->e_phnum * eheader->e_phentsize);
+	pheaders = (struct Elf32_Phdr *)malloc(eheader->e_phnum * eheader->e_phentsize);
 	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
 		err = ENOMEM;
@@ -955,7 +955,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 	err = 0;
 
-	kfree(pheaders);
+	free(pheaders);
 	sys_close(fd);
 
 	insert_image_in_list(image);
@@ -971,11 +971,11 @@ error4:
 	if (image->regions[0].id >= 0)
 		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[0].id);
 error3:
-	kfree(image);
+	free(image);
 error2:
-	kfree(pheaders);
+	free(pheaders);
 error1:
-	kfree(eheader);
+	free(eheader);
 error:
 	mutex_unlock(&image_load_lock);
 error0:
@@ -995,8 +995,8 @@ elf_unlink_relocs(struct elf_image_info *image)
 	
 	for (link = image->linked_images; link; link = next_link) {
 		next_link = link->next;
-		elf_unload_image( link->image );
-		kfree( link );
+		elf_unload_image(link->image);
+		free(link);
 	}
 	
 	return B_NO_ERROR;
@@ -1016,9 +1016,9 @@ elf_unload_image_final(struct elf_image_info *image)
 		vfs_put_vnode_ptr(image->vnode);
 
 	remove_image_from_list(image);
-	kfree(image->eheader);
-	kfree(image->name);	
-	kfree(image);
+	free(image->eheader);
+	free(image->name);	
+	free(image);
 }
 
 
@@ -1084,7 +1084,7 @@ elf_init(kernel_args *ka)
 	// build a image structure for the kernel, which has already been loaded
 
 	kernel_image = create_image_struct();
-	kernel_image->name = kstrdup("kernel");
+	kernel_image->name = strdup("kernel");
 
 	// text segment
 	kernel_image->regions[0].id = vm_find_region_by_name(vm_get_kernel_aspace_id(), "kernel_ro");

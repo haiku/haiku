@@ -4,7 +4,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 #include <Errors.h>
 #include <string.h>
@@ -12,10 +12,6 @@
 
 // ToDo: this file apparently contains two different hash implementations
 //		get rid of one of them, and update the external code.
-
-// ToDo: remove these
-#define malloc kmalloc
-#define free kfree
 
 struct hash_table {
 	struct hash_elem **table;
@@ -249,14 +245,14 @@ hash_make(void)
 {
 	new_hash_table *nn;
 
-	nn = (new_hash_table *)kmalloc(sizeof(new_hash_table));
+	nn = (new_hash_table *)malloc(sizeof(new_hash_table));
 	if (!nn)
 		return NULL;
 
 	nn->count = 0;
 	nn->max = MAX_INITIAL;
 
-	nn->array = (hash_entry **)kmalloc(sizeof(hash_entry) * (nn->max + 1));
+	nn->array = (hash_entry **)malloc(sizeof(hash_entry) * (nn->max + 1));
 	memset(nn->array, 0, sizeof(hash_entry) * (nn->max +1));
 	pool_init(&nn->pool, sizeof(hash_entry));
 	if (!nn->pool)
@@ -298,14 +294,14 @@ expand_array(new_hash_table *nh)
 	int new_max = nh->max * 2 +1;
 	int i;
 
-	new_array = (hash_entry **)kmalloc(sizeof(hash_entry) * new_max);
+	new_array = (hash_entry **)malloc(sizeof(hash_entry) * new_max);
 	memset(new_array, 0, sizeof(hash_entry) * new_max);
 	for (hi = new_hash_first(nh); hi; hi = new_hash_next(hi)) {
 		i = hi->this_idx->hash & new_max;
 		hi->this_idx->next = new_array[i];
 		new_array[i] = hi->this_idx;
 	}
-	kfree(nh->array);
+	free(nh->array);
 	nh->array = new_array;
 	nh->max = new_max;
 }

@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -337,7 +338,7 @@ add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 	int flags;
 	struct debugger_command *cmd;
 
-	cmd = (struct debugger_command *)kmalloc(sizeof(struct debugger_command));
+	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
 	if (cmd == NULL)
 		return ENOMEM;
 
@@ -361,23 +362,21 @@ add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 int
 remove_debugger_command(char * name, int (*func)(int, char **))
 {
+	struct debugger_command *cmd = commands;
+	struct debugger_command *prev = NULL;
 	int flags;
-	struct debugger_command *cmd;
-	struct debugger_command *prev;
 
 	flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
-	prev = NULL;
-	cmd = commands;
 	while (cmd) {
-		if (strcmp(cmd->name, name) == 0 &&
-			cmd->func == func)
+		if (!strcmp(cmd->name, name) && cmd->func == func)
 			break;
+
 		prev = cmd;
 		cmd = cmd->next;
 	}
-	
+
 	if (cmd) {
 		if (cmd == commands)
 			commands = cmd->next;
@@ -389,10 +388,10 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 	restore_interrupts(flags);
 
 	if (cmd) {
-		kfree(cmd);
+		free(cmd);
 		return B_NO_ERROR;
 	}
-	
+
 	return B_NAME_NOT_FOUND;
 }
 

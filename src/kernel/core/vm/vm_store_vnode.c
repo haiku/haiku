@@ -5,7 +5,7 @@
 
 #include <kernel.h>
 #include <vm.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 #include <lock.h>
 #include <vm_store_vnode.h>
@@ -21,7 +21,7 @@ struct vnode_store_data {
 static void vnode_destroy(struct vm_store *store)
 {
 	if(store) {
-		kfree(store);
+		free(store);
 	}
 }
 
@@ -83,7 +83,7 @@ vm_store *vm_store_create_vnode(void *vnode)
 	vm_store *store;
 	struct vnode_store_data *d;
 
-	store = kmalloc(sizeof(vm_store) + sizeof(struct vnode_store_data));
+	store = malloc(sizeof(vm_store) + sizeof(struct vnode_store_data));
 	if(store == NULL) {
 		vfs_put_vnode_ptr(vnode);
 		return NULL;

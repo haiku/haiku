@@ -12,8 +12,8 @@
 
 #include <vfs.h>
 #include <debug.h>
-#include <memheap.h>
 
+#include <malloc.h>
 #include <string.h>
 
 #define CHECK_USER_ADDR(x) \
@@ -52,7 +52,7 @@ alloc_fd(void)
 {
 	struct file_descriptor *descriptor;
 
-	descriptor = kmalloc(sizeof(struct file_descriptor));
+	descriptor = malloc(sizeof(struct file_descriptor));
 	if (descriptor == NULL)
 		return NULL;
 
@@ -110,7 +110,7 @@ put_fd(struct file_descriptor *descriptor)
 		if (descriptor->ops->fd_free)
 			descriptor->ops->fd_free(descriptor);
 
-		kfree(descriptor);
+		free(descriptor);
 	}
 }
 

@@ -6,7 +6,7 @@
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <int.h>
 #include <lock.h>
 #include <vm.h>
@@ -903,18 +903,18 @@ pci_bridge(uint8 bus, uint8 dev, uint8 func)
 
 	write_pci_config(bus, dev, func, PCI_subordinate_bus, 1, pci_max_bus);
 
-	pcii = (pci_info*)kmalloc(sizeof(pci_info));
+	pcii = (pci_info *)malloc(sizeof(pci_info));
 	if (!pcii)
 		goto pci_bridge_skip_infolist;
-	pcid = (struct pci_device*)kmalloc(sizeof(struct pci_device));
+	pcid = (struct pci_device *)malloc(sizeof(struct pci_device));
 	if (!pcid) {
-		kfree(pcii);
+		free(pcii);
 		goto pci_bridge_skip_infolist;
 	}
-	pcib = (struct pci_bus *)kmalloc(sizeof(struct pci_bus));
+	pcib = (struct pci_bus *)malloc(sizeof(struct pci_bus));
 	if (!pcib) {
-		kfree(pcii);
-		kfree(pcid);
+		free(pcii);
+		free(pcid);
 		goto pci_bridge_skip_infolist;
 	}
 
@@ -1039,12 +1039,12 @@ pci_device_probe(uint8 bus, uint8 dev, uint8 func)
 	}
 
 	/* If we get here then it's not a bridge, so we add it... */
-	pcii = (pci_info*)kmalloc(sizeof(pci_info));
+	pcii = (pci_info *)malloc(sizeof(pci_info));
 	if (!pcii)
 		return;
-	pcid = (struct pci_device*)kmalloc(sizeof(struct pci_device));
+	pcid = (struct pci_device *)malloc(sizeof(struct pci_device));
 	if (!pcid) {
-		kfree(pcii);
+		free(pcii);
 		return;
 	}
 
@@ -1169,7 +1169,7 @@ scan_pci(void)
 				 * but we may want to review if we need to add 8 version of the
 				 * same device if only the functions differ?
 				 */
-				if ((pcii = (pci_info*)kmalloc(sizeof(pci_info))) == NULL) {
+				if ((pcii = (pci_info *)malloc(sizeof(pci_info))) == NULL) {
 					dprintf("Failed to get memory for a pic_info structure in scan_pci\n");
 					return;
 				}

@@ -2,9 +2,10 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 #include <vm_store_anonymous_noswap.h>
 #include <Errors.h>
@@ -14,7 +15,7 @@
 static void anonymous_destroy(struct vm_store *store)
 {
 	if(store) {
-		kfree(store);
+		free(store);
 	}
 }
 
@@ -70,7 +71,7 @@ vm_store *vm_store_create_anonymous_noswap()
 {
 	vm_store *store;
 	
-	store = kmalloc(sizeof(vm_store));
+	store = malloc(sizeof(vm_store));
 	if(store == NULL)
 		return NULL;
 

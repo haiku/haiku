@@ -7,7 +7,7 @@
 #include <kernel.h>
 #include <lock.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <vfs.h>
 #include <bus.h>
 #include <string.h>
@@ -61,16 +61,16 @@ bus_register_bus(const char *path)
 	mutex_lock(&bus_lock);
 
 	if (!find_bus(path)) {
-		b = (bus *)kmalloc(sizeof(bus));
+		b = (bus *)malloc(sizeof(bus));
 		if (b == NULL) {
 			err = ENOMEM;
 			goto err;
 		}
 
-		b->path = kmalloc(strlen(path)+1);
+		b->path = malloc(strlen(path)+1);
 		if (b->path == NULL) {
 			err = ENOMEM;
-			kfree(b);
+			free(b);
 			goto err;
 		}
 		strcpy((char *)b->path, path);

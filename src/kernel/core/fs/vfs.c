@@ -21,7 +21,7 @@
 #include <khash.h>
 #include <lock.h>
 #include <thread.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <arch/cpu.h>
 #include <elf.h>
 #include <Errors.h>
@@ -301,7 +301,7 @@ new_file_system(const char *name, struct fs_ops *ops)
 
 	ASSERT_LOCKED_MUTEX(&gFileSystemsMutex);
 
-	fs = (struct file_system *)kmalloc(sizeof(struct file_system));
+	fs = (struct file_system *)malloc(sizeof(struct file_system));
 	if (fs == NULL)
 		return NULL;
 
@@ -333,7 +333,7 @@ unload_file_system(file_system *fs)
 		uninit();
 
 	// ToDo: unloading is not yet supported - we need a unload image_id first...
-	kfree(fs);
+	free(fs);
 
 	return B_OK;
 }
@@ -505,7 +505,7 @@ create_new_vnode(void)
 {
 	struct vnode *vnode;
 
-	vnode = (struct vnode *)kmalloc(sizeof(struct vnode));
+	vnode = (struct vnode *)malloc(sizeof(struct vnode));
 	if (vnode == NULL)
 		return NULL;
 
@@ -550,7 +550,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 		hash_remove(gVnodeTable, vnode);
 		mutex_unlock(&gVnodeMutex);
 
-		kfree(vnode);
+		free(vnode);
 
 		err = 1;
 	} else {
@@ -660,7 +660,7 @@ err1:
 err:
 	mutex_unlock(&gVnodeMutex);
 	if (vnode)
-		kfree(vnode);
+		free(vnode);
 
 	return err;
 }
@@ -783,7 +783,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 				goto resolve_link_error;
 			}
 
-			buffer = kmalloc(SYS_MAX_PATH_LEN);
+			buffer = malloc(SYS_MAX_PATH_LEN);
 			if (buffer == NULL) {
 				status = B_NO_MEMORY;
 				goto resolve_link_error;
@@ -791,7 +791,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 
 			status = FS_CALL(nextVnode, read_link)(nextVnode->mount->cookie, nextVnode->private_node, buffer, SYS_MAX_PATH_LEN);
 			if (status < B_OK) {
-				kfree(buffer);
+				free(buffer);
 
 resolve_link_error:
 				put_vnode(vnode);
@@ -817,7 +817,7 @@ resolve_link_error:
 
 			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, &nextVnode, count + 1);
 
-			kfree(buffer);
+			free(buffer);
 
 			if (status < B_OK) {
 				put_vnode(vnode);
@@ -1185,7 +1185,7 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 
 	fd = new_fd(get_current_io_context(kernel), descriptor);
 	if (fd < 0) {
-		kfree(descriptor);
+		free(descriptor);
 		return B_NO_MORE_FDS;
 	}
 
@@ -1369,7 +1369,7 @@ vfs_new_io_context(void *_parentContext)
 	struct io_context *context;
 	struct io_context *parentContext;
 
-	context = kmalloc(sizeof(struct io_context));
+	context = malloc(sizeof(struct io_context));
 	if (context == NULL)
 		return NULL;
 
@@ -1381,17 +1381,17 @@ vfs_new_io_context(void *_parentContext)
 	else
 		table_size = DEFAULT_FD_TABLE_SIZE;
 
-	context->fds = kmalloc(sizeof(struct file_descriptor *) * table_size);
+	context->fds = malloc(sizeof(struct file_descriptor *) * table_size);
 	if (context->fds == NULL) {
-		kfree(context);
+		free(context);
 		return NULL;
 	}
 
 	memset(context->fds, 0, sizeof(struct file_descriptor *) * table_size);
 
 	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
-		kfree(context->fds);
-		kfree(context);
+		free(context->fds);
+		free(context);
 		return NULL;
 	}
 
@@ -1447,8 +1447,8 @@ vfs_free_io_context(void *_ioContext)
 
 	mutex_destroy(&context->io_mutex);
 
-	kfree(context->fds);
-	kfree(context);
+	free(context->fds);
+	free(context);
 	return 0;
 }
 
@@ -1476,7 +1476,7 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 			}
 		}
 
-		fds = kmalloc(sizeof(struct file_descriptor *) * newSize);
+		fds = malloc(sizeof(struct file_descriptor *) * newSize);
 		if (fds == NULL) {
 			status = ENOMEM;
 			goto out;
@@ -1486,7 +1486,7 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 	} else {
 		// enlarge the fd table
 
-		fds = kmalloc(sizeof(struct file_descriptor *) * newSize);
+		fds = malloc(sizeof(struct file_descriptor *) * newSize);
 		if (fds == NULL) {
 			status = ENOMEM;
 			goto out;
@@ -1498,7 +1498,7 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 			sizeof(void *) * (newSize - context->table_size));
 	}
 
-	kfree(context->fds);
+	free(context->fds);
 	context->fds = fds;
 	context->table_size = newSize;
 
@@ -1512,7 +1512,12 @@ status_t
 notify_select_event(selectsync *_sync, uint32 ref)
 {
 	select_sync *sync = (select_sync *)_sync;
-	
+
+	// ToDo: check if we have to be compatible and have to export
+	//		this function - it would be nice if we could have one
+	//		where the callee can specify which event has occured
+	//		(instead of this crypted "ref" thingie).
+
 	if (sync == NULL
 		|| sync->sem < B_OK
 		|| INDEX_FROM_REF(ref) > sync->count)
@@ -2584,7 +2589,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = kmalloc(sizeof(select_info) * numfds);
+	sync.set = malloc(sizeof(select_info) * numfds);
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
@@ -2666,7 +2671,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 err:
 	delete_sem(sync.sem);
-	kfree(sync.set);
+	free(sync.set);
 
 	return count;
 }
@@ -2690,7 +2695,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = kmalloc(sizeof(select_info) * numfds);
+	sync.set = malloc(sizeof(select_info) * numfds);
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
@@ -2795,7 +2800,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 err:
 	delete_sem(sync.sem);
-	kfree(sync.set);
+	free(sync.set);
 
 	return count;
 }
@@ -3356,7 +3361,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	mutex_lock(&gMountOpMutex);
 
-	mount = (struct fs_mount *)kmalloc(sizeof(struct fs_mount));
+	mount = (struct fs_mount *)malloc(sizeof(struct fs_mount));
 	if (mount == NULL) {
 		err = B_NO_MEMORY;
 		goto err;
@@ -3364,7 +3369,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	mount->vnodes_head = mount->vnodes_tail = NULL;
 
-	mount->mount_point = kstrdup(path);
+	mount->mount_point = strdup(path);
 	if (mount->mount_point == NULL) {
 		err = B_NO_MEMORY;
 		goto err1;
@@ -3451,9 +3456,9 @@ err3:
 	recursive_lock_destroy(&mount->rlock);
 	put_file_system(mount->fs);
 err2:
-	kfree(mount->mount_point);
+	free(mount->mount_point);
 err1:
-	kfree(mount);
+	free(mount);
 err:
 	mutex_unlock(&gMountOpMutex);
 
@@ -3539,8 +3544,8 @@ fs_unmount(char *path, bool kernel)
 	// release the file system
 	put_file_system(mount->fs);
 
-	kfree(mount->mount_point);
-	kfree(mount);
+	free(mount->mount_point);
+	free(mount);
 
 	return 0;
 
@@ -4496,7 +4501,7 @@ user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userE
 	// copy parameters
 
 	if (userReadSet != NULL) {
-		readSet = kmalloc(bytes);
+		readSet = malloc(bytes);
 		if (readSet == NULL) {
 			result = B_NO_MEMORY;
 			goto err;
@@ -4508,7 +4513,7 @@ user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userE
 	}
 
 	if (userWriteSet != NULL) {
-		writeSet = kmalloc(bytes);
+		writeSet = malloc(bytes);
 		if (writeSet == NULL) {
 			result = B_NO_MEMORY;
 			goto err;
@@ -4520,7 +4525,7 @@ user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userE
 	}
 
 	if (userErrorSet != NULL) {
-		errorSet = kmalloc(bytes);
+		errorSet = malloc(bytes);
 		if (errorSet == NULL) {
 			result = B_NO_MEMORY;
 			goto err;
@@ -4545,9 +4550,9 @@ user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userE
 		result = B_BAD_ADDRESS;
 
 err:
-	kfree(readSet);
-	kfree(writeSet);
-	kfree(errorSet);
+	free(readSet);
+	free(writeSet);
+	free(errorSet);
 
 	return result;
 }

@@ -8,6 +8,7 @@
 #include <vm.h>
 #include <lock.h>
 #include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 
 #include <arch/cpu.h>
@@ -60,6 +61,7 @@ struct heap_bin {
 	char *raw_list;
 	unsigned int raw_count;
 };
+
 static struct heap_bin bins[] = {
 	{16, PAGE_SIZE, 0, 0, 0, 0, 0},
 	{32, PAGE_SIZE, 0, 0, 0, 0, 0},
@@ -227,8 +229,11 @@ raw_alloc(unsigned int size, int bin_index)
 }
 
 
+//	#pragma mark -
+
+
 void *
-kmalloc(unsigned int size)
+malloc(size_t size)
 {
 	void *address = NULL;
 	int bin_index;
@@ -317,7 +322,7 @@ out:
 
 
 void
-kfree(void *address)
+free(void *address)
 {
 	struct heap_page *page;
 	struct heap_bin *bin;
@@ -327,7 +332,7 @@ kfree(void *address)
 		return;
 
 	if ((addr)address < heap_base || (addr)address >= (heap_base + heap_size))
-		panic("kfree: asked to free invalid address %p\n", address);
+		panic("free(): asked to free invalid address %p\n", address);
 
 #if USE_WALL
 	{
@@ -346,28 +351,28 @@ kfree(void *address)
 
 #if PARANOID_POINTER_CHECK
 	if (!ptrchecklist_remove(address))
-		panic("kfree: asked to free invalid pointer %p\n", address);
+		panic("free(): asked to free invalid pointer %p\n", address);
 #endif
 
 	mutex_lock(&heap_lock);
 
-	TRACE(("kfree: asked to free at ptr = %p\n", address));
+	TRACE(("free(): asked to free at ptr = %p\n", address));
 
 	page = &heap_alloc_table[((unsigned)address - heap_base) / PAGE_SIZE];
 
-	TRACE(("kfree: page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
+	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
 	if (page[0].bin_index >= bin_count)
-		panic("kfree: page %p: invalid bin_index %d\n", page, page->bin_index);
+		panic("free(): page %p: invalid bin_index %d\n", page, page->bin_index);
 
 	bin = &bins[page[0].bin_index];
 
 //	if((addr)address % bin->element_size != 0)
 //		panic("kfree: passed invalid pointer 0x%x! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
 
-	for(i = 0; i < bin->element_size / PAGE_SIZE; i++) {
-		if(page[i].bin_index != page[0].bin_index)
-			panic("kfree: not all pages in allocation match bin_index\n");
+	for (i = 0; i < bin->element_size / PAGE_SIZE; i++) {
+		if (page[i].bin_index != page[0].bin_index)
+			panic("free(): not all pages in allocation match bin_index\n");
 		page[i].free_count++;
 	}
 
@@ -375,10 +380,9 @@ kfree(void *address)
 	// walk the free list on this bin to make sure this address doesn't exist already
 	{
 		unsigned int *temp;
-		for(temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
-			if(temp == (unsigned int *)address) {
-				panic("kfree: address %p already exists in bin free list\n", address);
-			}
+		for (temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
+			if (temp == (unsigned int *)address)
+				panic("free(): address %p already exists in bin free list\n", address);
 		}
 	}
 #endif
@@ -388,18 +392,89 @@ kfree(void *address)
 	bin->alloc_count--;
 	bin->free_count++;
 
-//out:
 	mutex_unlock(&heap_lock);
 }
 
 
+/** Naive implementation of realloc() - it's very simple but
+ *	it's there and working.
+ *	It takes the bin of the current allocation if the new size
+ *	fits in and is larger than the size of the next smaller bin.
+ *	If not, it allocates a new chunk of memory, and copies and
+ *	frees the old buffer.
+ */
+
+void *
+realloc(void *address, size_t newSize)
+{
+	void *newAddress = NULL;
+	size_t maxSize = 0, minSize;
+
+	if (address != NULL && ((addr)address < heap_base || (addr)address >= (heap_base + heap_size)))
+		panic("realloc(): asked to realloc invalid address %p\n", address);
+
+	if (newSize == 0) {
+		free(address);
+		return NULL;
+	}
+
+	// find out the size of the old allocation first
+
+	if (address != NULL) {
+		struct heap_page *page;
+
+		mutex_lock(&heap_lock);
+		page = &heap_alloc_table[((unsigned)address - heap_base) / PAGE_SIZE];
+	
+		TRACE(("realloc(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
+	
+		if (page[0].bin_index >= bin_count)
+			panic("realloc(): page %p: invalid bin_index %d\n", page, page->bin_index);
+	
+		maxSize = bins[page[0].bin_index].element_size;
+		minSize = page[0].bin_index > 0 ? bins[page[0].bin_index - 1].element_size : 0;
+	
+		mutex_unlock(&heap_lock);
+	
+		// does the new allocation simply fit in the bin?
+		if (newSize > minSize && newSize < maxSize)
+			return address;
+	}
+
+	// if not, allocate a new chunk of memory
+	newAddress = malloc(newSize);
+	if (newAddress == NULL)
+		return NULL;
+
+	// copy the old data and free the old allocation
+	if (address) {
+		// we do have the maxSize of the bin at this point
+		memcpy(newAddress, address, min(maxSize, newSize));
+		free(address);
+	}
+
+	return newAddress;
+}
+
+
+void *
+calloc(size_t numElements, size_t size)
+{
+	void *address = malloc(numElements * size);
+	if (address != NULL)
+		memset(address, 0, numElements * size);
+
+	return address;
+}
+
+/*
 char *
 kstrdup(const char *text)
 {
 	char *buf = (char *)kmalloc(strlen(text) + 1);
 
 	if (buf != NULL)
-		strcpy(buf,text);
+		strcpy(buf, text);
 	return buf;
 }
-
+*/

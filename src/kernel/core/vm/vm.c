@@ -15,6 +15,7 @@
 #include <vm_store_null.h>
 #include <vm_store_vnode.h>
 #include <memheap.h>
+#include <malloc.h>
 #include <debug.h>
 #include <console.h>
 #include <int.h>
@@ -163,12 +164,12 @@ static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char 
 {
 	vm_region *region = NULL;
 
-	region = (vm_region *)kmalloc(sizeof(vm_region));
+	region = (vm_region *)malloc(sizeof(vm_region));
 	if(region == NULL)
 		return NULL;
-	region->name = (char *)kmalloc(strlen(name) + 1);
+	region->name = (char *)malloc(strlen(name) + 1);
 	if(region->name == NULL) {
-		kfree(region);
+		free(region);
 		return NULL;
 	}
 	strcpy(region->name, name);
@@ -448,8 +449,8 @@ err1a:
 		vm_cache_release_ref(cache_ref);
 	}
 err:
-	kfree(region->name);
-	kfree(region);
+	free(region->name);
+	free(region);
 	return err;
 }
 
@@ -992,8 +993,8 @@ static void _vm_put_region(vm_region *region, bool aspace_locked)
 	vm_put_aspace(aspace);
 
 	if(region->name)
-		kfree(region->name);
-	kfree(region);
+		free(region->name);
+	free(region);
 
 	return;
 }
@@ -1467,9 +1468,9 @@ void vm_put_aspace(vm_address_space *aspace)
 
 	(*aspace->translation_map.ops->destroy)(&aspace->translation_map);
 
-	kfree(aspace->name);
+	free(aspace->name);
 	delete_sem(aspace->virtual_map.sem);
-	kfree(aspace);
+	free(aspace);
 
 	return;
 }
@@ -1480,15 +1481,15 @@ aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
 	int err;
 
 
-	aspace = (vm_address_space *)kmalloc(sizeof(vm_address_space));
+	aspace = (vm_address_space *)malloc(sizeof(vm_address_space));
 	if(aspace == NULL)
 		return ENOMEM;
 
 	dprintf("vm_create_aspace: %s: %lx bytes starting at 0x%lx => %p\n", name, size, base, aspace);
 
-	aspace->name = (char *)kmalloc(strlen(name) + 1);
+	aspace->name = (char *)malloc(strlen(name) + 1);
 	if(aspace->name == NULL ) {
-		kfree(aspace);
+		free(aspace);
 		return ENOMEM;
 	}
 	strcpy(aspace->name, name);
@@ -1506,8 +1507,8 @@ aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
 	// initialize the corresponding translation map
 	err = vm_translation_map_create(&aspace->translation_map, kernel);
 	if(err < 0) {
-		kfree(aspace->name);
-		kfree(aspace);
+		free(aspace->name);
+		free(aspace);
 		return err;
 	}
 

@@ -7,7 +7,7 @@
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
@@ -122,16 +122,16 @@ bootfs_create_vnode(struct bootfs *fs, const char *name)
 {
 	struct bootfs_vnode *v;
 
-	v = kmalloc(sizeof(struct bootfs_vnode));
+	v = malloc(sizeof(struct bootfs_vnode));
 	if (v == NULL)
 		return NULL;
 
 	memset(v, 0, sizeof(struct bootfs_vnode));
 	v->id = atomic_add(&fs->next_vnode_id, 1);
 
-	v->name = kstrdup(name);
+	v->name = strdup(name);
 	if (v->name == NULL) {
-		kfree(v);
+		free(v);
 		return NULL;
 	}
 
@@ -144,16 +144,17 @@ bootfs_delete_vnode(struct bootfs *fs, struct bootfs_vnode *v, bool force_delete
 {
 	// cant delete it if it's in a directory or is a directory
 	// and has children
-	if(!force_delete && ((v->stream.type == STREAM_TYPE_DIR && v->stream.u.dir.dir_head != NULL) || v->dir_next != NULL)) {
+	if (!force_delete
+		&& ((v->stream.type == STREAM_TYPE_DIR && v->stream.u.dir.dir_head != NULL)
+			|| v->dir_next != NULL))
 		return EPERM;
-	}
 
 	// remove it from the global hash table
 	hash_remove(fs->vnode_list_hash, v);
 
-	if(v->name != NULL)
-		kfree(v->name);
-	kfree(v);
+	if (v->name != NULL)
+		free(v->name);
+	free(v);
 
 	return 0;
 }
@@ -397,7 +398,7 @@ bootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 
 	TRACE(("bootfs_mount: entry\n"));
 
-	fs = kmalloc(sizeof(struct bootfs));
+	fs = malloc(sizeof(struct bootfs));
 	if(fs == NULL) {
 		err = ENOMEM;
 		goto err;
@@ -452,7 +453,7 @@ err3:
 err2:
 	mutex_destroy(&fs->lock);
 err1:
-	kfree(fs);
+	free(fs);
 err:
 	return err;
 }
@@ -476,7 +477,7 @@ bootfs_unmount(fs_volume _fs)
 
 	hash_uninit(fs->vnode_list_hash);
 	mutex_destroy(&fs->lock);
-	kfree(fs);
+	free(fs);
 
 	return 0;
 }
@@ -620,7 +621,7 @@ bootfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 
 	TRACE(("bootfs_open: vnode %p, oflags 0x%x\n", vnode, oflags));
 
-	cookie = kmalloc(sizeof(struct bootfs_cookie));
+	cookie = malloc(sizeof(struct bootfs_cookie));
 	if (cookie == NULL)
 		return ENOMEM;
 
@@ -659,7 +660,7 @@ bootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 	TRACE(("bootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
 
 	if (cookie)
-		kfree(cookie);
+		free(cookie);
 
 	return 0;
 }
@@ -804,7 +805,7 @@ bootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return EINVAL;
 
-	cookie = kmalloc(sizeof(struct bootfs_cookie));
+	cookie = malloc(sizeof(struct bootfs_cookie));
 	if (cookie == NULL)
 		return ENOMEM;
 

@@ -5,7 +5,7 @@
 
 #include <kernel.h>
 #include <arch/cpu.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <vm.h>
 #include <debug.h>
 #include <smp.h>
@@ -55,13 +55,13 @@ arch_cpu_init2(kernel_args *ka)
 
 	i386_selector_init( gdt );  // pass the new gdt
 
-	tss = kmalloc(sizeof(struct tss *) * ka->num_cpus);
+	tss = malloc(sizeof(struct tss *) * ka->num_cpus);
 	if (tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss pointers\n");
 		return ENOMEM;
 	}
 
-	tss_loaded = kmalloc(sizeof(int) * ka->num_cpus);
+	tss_loaded = malloc(sizeof(int) * ka->num_cpus);
 	if (tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss booleans\n");
 		return ENOMEM;

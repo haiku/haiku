@@ -1,8 +1,4 @@
-/* team.c
- *
- * Team functions
- *
- */
+/* Team functions */
 
 /*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -15,7 +11,7 @@
 #include <thread_types.h>
 #include <int.h>
 #include <khash.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <user_runtime.h>
 #include <Errors.h>
 #include <kerrors.h>
@@ -152,11 +148,11 @@ kfree_strings_array(char **strings, int strc)
 {
 	int cnt = strc;
 
-	if(strings != NULL) {
-		for(cnt = 0; cnt < strc; cnt++){
-			kfree(strings[cnt]);
+	if (strings != NULL) {
+		for (cnt = 0; cnt < strc; cnt++){
+			free(strings[cnt]);
 		}
-	    kfree(strings);
+	    free(strings);
 	}
 }
 
@@ -183,7 +179,7 @@ user_copy_strings_array(char **strings, int strc, char ***kstrings)
 	if ((addr)strings >= KERNEL_BASE && (addr)strings <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	lstrings = (char **)kmalloc((strc + 1) * sizeof(char *));
+	lstrings = (char **)malloc((strc + 1) * sizeof(char *));
 	if (lstrings == NULL){
 		return ENOMEM;
 	}
@@ -205,7 +201,7 @@ user_copy_strings_array(char **strings, int strc, char ***kstrings)
 			goto error;
 		buf[SYS_THREAD_STRING_LENGTH_MAX - 1] = 0;
 
-		lstrings[cnt] = (char *)kstrdup(buf);
+		lstrings[cnt] = strdup(buf);
 		if (lstrings[cnt] == NULL){
 			err = ENOMEM;
 			goto error;
@@ -359,7 +355,7 @@ create_team_struct(const char *name, bool kernel)
 {
 	struct team *p;
 
-	p = (struct team *)kmalloc(sizeof(struct team));
+	p = (struct team *)malloc(sizeof(struct team));
 	if (p == NULL)
 		goto error;
 
@@ -386,7 +382,7 @@ create_team_struct(const char *name, bool kernel)
 	return p;
 
 error1:
-	kfree(p);
+	free(p);
 error:
 	return NULL;
 }
@@ -395,7 +391,7 @@ error:
 static void
 delete_team_struct(struct team *p)
 {
-	kfree(p);
+	free(p);
 }
 
 
@@ -493,8 +489,8 @@ team_create_team2(void *args)
 	}
 
 	// free the args
-	kfree(pargs->path);
-	kfree(pargs);
+	free(pargs->path);
+	free(pargs);
 
 	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
 
@@ -534,12 +530,12 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	restore_interrupts(state);
 
 	// copy the args over
-	pargs = (struct team_arg *)kmalloc(sizeof(struct team_arg));
+	pargs = (struct team_arg *)malloc(sizeof(struct team_arg));
 	if (pargs == NULL){
 		err = ENOMEM;
 		goto err1;
 	}
-	pargs->path = (char *)kstrdup(path);
+	pargs->path = strdup(path);
 	if (pargs->path == NULL){
 		err = ENOMEM;
 		goto err2;
@@ -583,9 +579,9 @@ err5:
 err4:
 	vfs_free_io_context(p->ioctx);
 err3:
-	kfree(pargs->path);
+	free(pargs->path);
 err2:
-	kfree(pargs);
+	free(pargs);
 err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();

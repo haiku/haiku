@@ -10,7 +10,7 @@
 #include <kernel.h>
 #include <arch/int.h>
 #include <debug.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <cbuf.h>
 #include <Errors.h>
 #include <int.h>
@@ -21,7 +21,7 @@
 
 struct port_msg {
 	int		msg_code;
-	cbuf*	data_cbuf;
+	cbuf	*data_cbuf;
 	size_t	data_len;
 };
 
@@ -192,15 +192,15 @@ create_port(int32 queue_length, const char *name)
 
 	name_len = strlen(name) + 1;
 	name_len = min(name_len, SYS_MAX_OS_NAME_LEN);
-	temp_name = (char *)kmalloc(name_len);
+	temp_name = (char *)malloc(name_len);
 	if (temp_name == NULL)
 		return ENOMEM;
 	strlcpy(temp_name, name, name_len);
 
 	// alloc queue
-	q = (struct port_msg *)kmalloc( queue_length * sizeof(struct port_msg) );
+	q = (struct port_msg *)malloc(queue_length * sizeof(struct port_msg));
 	if (q == NULL) {
-		kfree(temp_name); // dealloc name, too
+		free(temp_name); // dealloc name, too
 		return ENOMEM;
 	}
 
@@ -212,8 +212,8 @@ create_port(int32 queue_length, const char *name)
 	sem_r = create_sem_etc(0, temp_name, -1);
 	if (sem_r < 0) {
 		// cleanup
-		kfree(temp_name);
-		kfree(q);
+		free(temp_name);
+		free(q);
 		return sem_r;
 	}
 
@@ -222,8 +222,8 @@ create_port(int32 queue_length, const char *name)
 	if (sem_w < 0) {
 		// cleanup
 		delete_sem(sem_r);
-		kfree(temp_name);
-		kfree(q);
+		free(temp_name);
+		free(q);
 		return sem_w;
 	}
 	owner = team_get_current_team_id();
@@ -269,8 +269,8 @@ create_port(int32 queue_length, const char *name)
 	// cleanup
 	delete_sem(sem_w);
 	delete_sem(sem_r);
-	kfree(temp_name);
-	kfree(q);
+	free(temp_name);
+	free(q);
 
 out:
 	restore_interrupts(state);
@@ -334,7 +334,7 @@ delete_port(port_id id)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("delete_port: invalid port_id %ld\n", id);
@@ -354,13 +354,13 @@ delete_port(port_id id)
 	restore_interrupts(state);
 
 	// delete the cbuf's that are left in the queue (if any)
-	for (i=0; i<capacity; i++) {
+	for (i = 0; i < capacity; i++) {
 		if (q[i].data_cbuf != NULL)
 	 		cbuf_free_chain(q[i].data_cbuf);
 	}
 
-	kfree(q);
-	kfree(old_name);
+	free(q);
+	free(old_name);
 
 	// release the threads that were blocking on this port by deleting the sem
 	// read_port() will see the B_BAD_SEM_ID acq_sem() return value, and act accordingly

@@ -6,7 +6,7 @@
 #include <KernelExport.h>
 #include <pools.h>
 #include <vm.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <atomic.h>
 #include <ktypes.h>
 #include <stdio.h>
@@ -70,7 +70,7 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 {
 	struct pool_mem *block;
 
-	block = (struct pool_mem *)kmalloc(sizeof(struct pool_mem));
+	block = (struct pool_mem *)malloc(sizeof(struct pool_mem));
 	if (block == NULL)
 		return NULL;
 
@@ -83,7 +83,7 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 						REGION_WIRING_WIRED_CONTIG, 
 						LOCK_KERNEL|LOCK_RW);
 	if (block->aid < 0) {
-		kfree(block);
+		free(block);
 		return NULL;
 	}
 
@@ -119,7 +119,7 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 	UNINIT_BENAPHORE(block->lock);
 	
 	vm_delete_region(vm_get_kernel_aspace_id(), block->aid);
-	kfree(block);
+	free(block);
 
 	return NULL;
 }
@@ -138,7 +138,7 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 
 //	acquire_sem_etc(init_sem, 1, B_CAN_INTERRUPT, 0);
 	
-	pool = (struct pool_ctl*)kmalloc(sizeof(struct pool_ctl));
+	pool = (struct pool_ctl *)malloc(sizeof(struct pool_ctl));
 	if (pool == NULL)
 		return ENOMEM;
 
@@ -147,13 +147,13 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 	#if POOL_USES_BENAPHORES
 		INIT_BENAPHORE(pool->lock, "pool_lock");
 		if (CHECK_BENAPHORE(pool->lock) < 0) {
-			kfree(pool);
+			free(pool);
 			return ENOLCK;
 		}
 	#else
 		INIT_RW_LOCK(pool->lock, "pool_lock");
 		if (CHECK_RW_LOCK(pool->lock) < 0) {
-			kfree(pool);
+			free(pool);
 			return ENOLCK;
 		}
 	#endif
@@ -172,7 +172,7 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 		#else
 			UNINIT_RW_LOCK(pool->lock);
 		#endif
-		kfree(pool);
+		free(pool);
 		return ENOMEM;
 	}
 
@@ -312,7 +312,7 @@ void pool_destroy(struct pool_ctl *p)
 		temp = mp;
 		mp = mp->next;
 		UNINIT_BENAPHORE(mp->lock);
-		kfree(temp);
+		free(temp);
 	}
 
 	#if POOL_USES_BENAPHORES
@@ -320,5 +320,5 @@ void pool_destroy(struct pool_ctl *p)
 	#else
 		UNINIT_RW_LOCK(p->lock);
 	#endif
-	kfree(p);
+	free(p);
 }

@@ -23,7 +23,7 @@
 #include <port.h>
 #include <vfs.h>
 #include <elf.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <user_runtime.h>
 #include <Errors.h>
 #include <stage2.h>
@@ -242,7 +242,7 @@ create_thread_struct(const char *name)
 	restore_interrupts(state);
 
 	if (t == NULL) {
-		t = (struct thread *)kmalloc(sizeof(struct thread));
+		t = (struct thread *)malloc(sizeof(struct thread));
 		if (t == NULL)
 			goto err;
 	}
@@ -300,7 +300,7 @@ err3:
 err2:
 	delete_sem_etc(t->return_code_sem, -1, false);
 err1:
-	kfree(t);
+	free(t);
 err:
 	return NULL;
 }
@@ -315,7 +315,7 @@ delete_thread_struct(struct thread *t)
 		delete_sem_etc(t->msg.write_sem, -1, false);
 	if (t->msg.read_sem >= 0)
 		delete_sem_etc(t->msg.read_sem, -1, false);
-	kfree(t);
+	free(t);
 }
 
 
@@ -838,7 +838,7 @@ thread_init(kernel_args *ka)
 		num_death_stacks = 8*sizeof(death_stack_bitmap);
 	}
 	death_stack_bitmap = 0;
-	death_stacks = (struct death_stack *)kmalloc(num_death_stacks * sizeof(struct death_stack));
+	death_stacks = (struct death_stack *)malloc(num_death_stacks * sizeof(struct death_stack));
 	if (death_stacks == NULL) {
 		panic("error creating death stacks\n");
 		return ENOMEM;
@@ -1049,7 +1049,7 @@ thread_exit(void)
 		delete_owned_ports(p->id);
 		sem_delete_owned_sems(p->id);
 		vfs_free_io_context(p->ioctx);
-		kfree(p);
+		free(p);
 	}
 
 	// delete the sem that others will use to wait on us and get the retcode

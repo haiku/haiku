@@ -4,6 +4,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <thread.h>
 #include <console.h>
@@ -12,7 +13,7 @@
 #include <arch/int.h>
 #include <smp_priv.h>
 #include <smp.h>
-#include <memheap.h>
+#include <malloc.h>
 #include <Errors.h>
 #include <atomic.h>
 
@@ -97,10 +98,13 @@ release_spinlock(spinlock *lock)
 	*lock = 0;
 }
 
+
 // finds a free message and gets it
 // NOTE: has side effect of disabling interrupts
 // return value is interrupt state
-static int find_free_message(struct smp_msg **msg)
+
+static int
+find_free_message(struct smp_msg **msg)
 {
 	int state;
 
@@ -112,7 +116,7 @@ retry:
 	state = disable_interrupts();
 	acquire_spinlock(&free_msg_spinlock);
 
-	if(free_msg_count <= 0) {
+	if (free_msg_count <= 0) {
 		// someone grabbed one while we were getting the lock,
 		// go back to waiting for it
 		release_spinlock(&free_msg_spinlock);
@@ -131,7 +135,9 @@ retry:
 	return state;
 }
 
-static void return_free_message(struct smp_msg *msg)
+
+static void
+return_free_message(struct smp_msg *msg)
 {
 //	dprintf("return_free_message: returning msg 0x%x\n", msg);
 	acquire_spinlock_nocheck(&free_msg_spinlock);
@@ -141,13 +147,15 @@ static void return_free_message(struct smp_msg *msg)
 	release_spinlock(&free_msg_spinlock);
 }
 
-static struct smp_msg *smp_check_for_message(int curr_cpu, int *source_mailbox)
+
+static struct smp_msg *
+smp_check_for_message(int curr_cpu, int *source_mailbox)
 {
 	struct smp_msg *msg;
 
 	acquire_spinlock_nocheck(&cpu_msg_spinlock[curr_cpu]);
 	msg = smp_msgs[curr_cpu];
-	if(msg != NULL) {
+	if (msg != NULL) {
 		smp_msgs[curr_cpu] = msg->next;
 		release_spinlock(&cpu_msg_spinlock[curr_cpu]);
 //		dprintf(" found msg 0x%x in cpu mailbox\n", msg);
@@ -159,8 +167,8 @@ static struct smp_msg *smp_check_for_message(int curr_cpu, int *source_mailbox)
 		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
 
 		msg = smp_broadcast_msgs;
-		while(msg != NULL) {
-			if(CHECK_BIT(msg->proc_bitmap, curr_cpu) != 0) {
+		while (msg != NULL) {
+			if (CHECK_BIT(msg->proc_bitmap, curr_cpu) != 0) {
 				// we have handled this one already
 				msg = msg->next;
 				continue;
@@ -184,14 +192,14 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 	int old_refcount;
 
 	old_refcount = atomic_add(&msg->ref_count, -1);
-	if(old_refcount == 1) {
+	if (old_refcount == 1) {
 		// we were the last one to decrement the ref_count
 		// it's our job to remove it from the list & possibly clean it up
 		struct smp_msg **mbox = NULL;
 		spinlock *spinlock = NULL;
 
 		// clean up the message from one of the mailboxes
-		switch(source_mailbox) {
+		switch (source_mailbox) {
 			case MAILBOX_BCAST:
 				mbox = &smp_broadcast_msgs;
 				spinlock = &broadcast_msg_spinlock;
@@ -206,7 +214,7 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 
 //		dprintf("cleaning up message 0x%x\n", msg);
 
-		if(msg == *mbox) {
+		if (msg == *mbox) {
 			(*mbox) = msg->next;
 		} else {
 			// we need to walk to find the message in the list.
@@ -217,25 +225,24 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 			struct smp_msg *msg1;
 
 			msg1 = *mbox;
-			while(msg1 != NULL && msg1 != msg) {
+			while (msg1 != NULL && msg1 != msg) {
 				last = msg1;
 				msg1 = msg1->next;
 			}
 
 			// by definition, last must be something
-			if(msg1 == msg && last != NULL) {
+			if (msg1 == msg && last != NULL)
 				last->next = msg->next;
-			} else {
+			else
 				dprintf("last == NULL or msg != msg1!!!\n");
-			}
 		}
 
 		release_spinlock(spinlock);
 
-		if(msg->data_ptr != NULL)
-			kfree(msg->data_ptr);
+		if (msg->data_ptr != NULL)
+			free(msg->data_ptr);
 
-		if(msg->flags == SMP_MSG_FLAG_SYNC) {
+		if (msg->flags == SMP_MSG_FLAG_SYNC) {
 			msg->done = true;
 			// the caller cpu should now free the message
 		} else {
@@ -245,7 +252,9 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 	}
 }
 
-static int smp_process_pending_ici(int curr_cpu)
+
+static int
+smp_process_pending_ici(int curr_cpu)
 {
 	struct smp_msg *msg;
 	bool halt = false;
@@ -253,11 +262,11 @@ static int smp_process_pending_ici(int curr_cpu)
 	int retval = B_HANDLED_INTERRUPT;
 
 	msg = smp_check_for_message(curr_cpu, &source_mailbox);
-	if(msg == NULL)
+	if (msg == NULL)
 		return retval;
 
 //	dprintf("  message = %d\n", msg->message);
-	switch(msg->message) {
+	switch (msg->message) {
 		case SMP_MSG_INVL_PAGE_RANGE:
 			arch_cpu_invalidate_TLB_range((addr)msg->data, (addr)msg->data2);
 			break;
@@ -284,7 +293,7 @@ static int smp_process_pending_ici(int curr_cpu)
 
 	// special case for the halt message
 	// we otherwise wouldn't have gotten the opportunity to clean up
-	if(halt) {
+	if (halt) {
 		disable_interrupts();
 		for(;;);
 	}
@@ -292,7 +301,9 @@ static int smp_process_pending_ici(int curr_cpu)
 	return retval;
 }
 
-int smp_intercpu_int_handler(void)
+
+int
+smp_intercpu_int_handler(void)
 {
 	int retval;
 	int curr_cpu = smp_get_current_cpu();
@@ -306,14 +317,16 @@ int smp_intercpu_int_handler(void)
 	return retval;
 }
 
-void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
+
+void
+smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
 {
 	struct smp_msg *msg;
 
 //	dprintf("smp_send_ici: target 0x%x, mess 0x%x, data 0x%x, data2 0x%x, data3 0x%x, ptr 0x%x, flags 0x%x\n",
 //		target_cpu, message, data, data2, data3, data_ptr, flags);
 
-	if(ici_enabled) {
+	if (ici_enabled) {
 		int state;
 		int curr_cpu;
 
@@ -321,7 +334,7 @@ void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long
 		state = find_free_message(&msg);
 
 		curr_cpu = smp_get_current_cpu();
-		if(target_cpu == curr_cpu) {
+		if (target_cpu == curr_cpu) {
 			return_free_message(msg);
 			restore_interrupts(state);
 			return; // nope, cant do that
@@ -345,11 +358,11 @@ void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long
 
 		arch_smp_send_ici(target_cpu);
 
-		if(flags == SMP_MSG_FLAG_SYNC) {
+		if (flags == SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-			while(msg->done == false)
+			while (msg->done == false)
 				smp_process_pending_ici(curr_cpu);
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
@@ -360,14 +373,16 @@ void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long
 	}
 }
 
-void smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
+
+void
+smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
 {
 	struct smp_msg *msg;
 
 //	dprintf("smp_send_broadcast_ici: cpu %d mess 0x%x, data 0x%x, data2 0x%x, data3 0x%x, ptr 0x%x, flags 0x%x\n",
 //		smp_get_current_cpu(), message, data, data2, data3, data_ptr, flags);
 
-	if(ici_enabled) {
+	if (ici_enabled) {
 		int state;
 		int curr_cpu;
 
@@ -398,12 +413,12 @@ void smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2
 
 //		dprintf("smp_send_broadcast_ici: sent interrupt\n");
 
-		if(flags == SMP_MSG_FLAG_SYNC) {
+		if (flags == SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpus to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
 //			dprintf("smp_send_broadcast_ici: waiting for ack\n");
-			while(msg->done == false)
+			while (msg->done == false)
 				smp_process_pending_ici(curr_cpu);
 //			dprintf("smp_send_broadcast_ici: returning message to free list\n");
 			// for SYNC messages, it's our responsibility to put it
@@ -416,26 +431,31 @@ void smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2
 //	dprintf("smp_send_broadcast_ici: done\n");
 }
 
-int smp_trap_non_boot_cpus(kernel_args *ka, int cpu)
+
+int
+smp_trap_non_boot_cpus(kernel_args *ka, int cpu)
 {
-	if(cpu > 0) {
+	if (cpu > 0) {
 		boot_cpu_spin[cpu] = 1;
 		acquire_spinlock(&boot_cpu_spin[cpu]);
 		return 1;
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
-void smp_wake_up_all_non_boot_cpus()
+
+void
+smp_wake_up_all_non_boot_cpus()
 {
 	int i;
-	for(i=1; i < smp_num_cpus; i++) {
+	for (i = 1; i < smp_num_cpus; i++) {
 		release_spinlock(&boot_cpu_spin[i]);
 	}
 }
 
-void smp_wait_for_ap_cpus(kernel_args *ka)
+
+void
+smp_wait_for_ap_cpus(kernel_args *ka)
 {
 	unsigned int i;
 	int retry;
@@ -445,22 +465,24 @@ void smp_wait_for_ap_cpus(kernel_args *ka)
 			if(boot_cpu_spin[i] != 1)
 				retry = 1;
 		}
-	} while(retry == 1);
+	} while (retry == 1);
 }
 
-int smp_init(kernel_args *ka)
+
+int
+smp_init(kernel_args *ka)
 {
 	struct smp_msg *msg;
 	int i;
 
 	dprintf("smp_init: entry\n");
 
-	if(ka->num_cpus > 1) {
+	if (ka->num_cpus > 1) {
 		free_msgs = NULL;
 		free_msg_count = 0;
-		for(i=0; i<MSG_POOL_SIZE; i++) {
-			msg = (struct smp_msg *)kmalloc(sizeof(struct smp_msg));
-			if(msg == NULL) {
+		for (i = 0; i < MSG_POOL_SIZE; i++) {
+			msg = (struct smp_msg *)malloc(sizeof(struct smp_msg));
+			if (msg == NULL) {
 				panic("error creating smp mailboxes\n");
 				return B_ERROR;
 			}
@@ -475,33 +497,44 @@ int smp_init(kernel_args *ka)
 	return arch_smp_init(ka);
 }
 
-void smp_set_num_cpus(int num_cpus)
+
+void
+smp_set_num_cpus(int num_cpus)
 {
 	smp_num_cpus = num_cpus;
 }
 
-int smp_get_num_cpus()
+
+int
+smp_get_num_cpus()
 {
 	return smp_num_cpus;
 }
 
-int smp_get_current_cpu(void)
+
+int
+smp_get_current_cpu(void)
 {
 	struct thread *t = thread_get_current_thread();
-	if(t)
+	if (t)
 		return t->cpu->info.cpu_num;
-	else
-		return 0;
+
+	return 0;
 }
 
-int smp_enable_ici()
+
+int
+smp_enable_ici()
 {
-	if(smp_num_cpus > 1) // dont actually do it if we only have one cpu
+	if (smp_num_cpus > 1) // dont actually do it if we only have one cpu
 		ici_enabled = true;
+
 	return B_NO_ERROR;
 }
 
-int smp_disable_ici()
+
+int
+smp_disable_ici()
 {
 	ici_enabled = false;
 	return B_NO_ERROR;
