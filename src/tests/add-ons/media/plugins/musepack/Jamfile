@@ -1,0 +1,26 @@
+SubDir OBOS_TOP src tests add-ons media plugins musepack ;
+
+UsePrivateHeaders media ;
+
+SimpleTest mpc_reader_test :
+	main.cpp
+
+	# media kit API
+	MediaPlugin.cpp
+	ReaderPlugin.cpp
+	DecoderPlugin.cpp
+
+	# MusePack
+	MusePack.cpp
+	MusePackReader.cpp
+	MusePackDecoder.cpp
+
+	: libmusepack.a media be
+	;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles MusePack.cpp MusePackReader.cpp MusePackDecoder.cpp ]
+	= [ FDirName $(OBOS_TOP) src add-ons media plugins musepack ] ;
+
+SEARCH on [ FGristFiles MediaPlugin.cpp ReaderPlugin.cpp DecoderPlugin.cpp ]
+	= [ FDirName $(OBOS_TOP) src kits media ] ;
