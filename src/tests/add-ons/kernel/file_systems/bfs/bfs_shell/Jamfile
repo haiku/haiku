@@ -19,7 +19,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 		#BFS_BIG_ENDIAN_ONLY
 		$(malloc_debug_defines) ] ;
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
-	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) -include Debug.h ;
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) -include [ FDirName $(SUBDIR) Debug.h ] ;
 }
 
 SimpleTest bfs_shell :
