@@ -4,8 +4,10 @@ UsePrivateHeaders screensaver ;
 
 SharedLibrary screensaver :
 	ScreenSaver.cpp
+	ScreenSaverPrefs.cpp
+	ScreenSaverThread.cpp
 ;
 
 LinkSharedOSLibs libscreensaver.so :
-	be
+	be game
 ;
