@@ -36,6 +36,9 @@ static const char kMouseSettingsFile[] = "Mouse_settings";
 MouseSettings::MouseSettings()
 {
 	RetrieveSettings();
+
+	fOriginalSettings = fSettings;
+	fOriginalMode = fMode;
 }
 
 
@@ -64,8 +67,11 @@ MouseSettings::RetrieveSettings()
 
 	get_mouse_map(&fSettings.map);
 	get_click_speed(&fSettings.click_speed);
+	get_mouse_speed(&fSettings.accel.speed);
 	get_mouse_acceleration(&fSettings.accel.accel_factor);
 	get_mouse_type(&fSettings.type);
+
+	fMode = mouse_mode();
 
 	// also try to load the window position from disk
 
@@ -91,6 +97,10 @@ MouseSettings::RetrieveSettings()
 		fWindowPosition.x = -1;
 		fWindowPosition.y = -1;
 	}
+	
+#ifdef DEBUG
+	Dump();
+#endif
 }
 
 
@@ -117,6 +127,57 @@ MouseSettings::SaveSettings()
 #endif
 
 	file.Write(&fWindowPosition, sizeof(BPoint));
+
+	// who is responsible for saving the mouse mode?
+
+	return B_OK;
+}
+
+
+#ifdef DEBUG
+void
+MouseSettings::Dump()
+{
+	printf("type:\t\t%ld button mouse\n", fSettings.type);
+	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n", fSettings.map.button[0], fSettings.map.button[2], fSettings.map.button[1]);
+	printf("click speed:\t%Ld\n", fSettings.click_speed);
+	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
+	printf("accel factor:\t%ld\n", fSettings.accel.accel_factor);
+	printf("speed:\t\t%ld\n", fSettings.accel.speed);
+
+	char *mode = "unknown";
+	switch (fMode) {
+		case B_NORMAL_MOUSE:
+			mode = "normal";
+			break;
+		case B_FOCUS_FOLLOWS_MOUSE:
+			mode = "focus follows mouse";
+			break;
+		case B_WARP_MOUSE:
+			mode = "warp mouse";
+			break;
+		case B_INSTANT_WARP_MOUSE:
+			mode = "instant warp mouse";
+			break;
+	}
+	printf("mode:\t\t%s\n", mode);
+}
+#endif
+
+
+/**	Reverts to the active settings at program startup
+ */
+
+void 
+MouseSettings::Revert()
+{
+	set_mouse_type(fOriginalSettings.type);
+	set_click_speed(fOriginalSettings.click_speed);
+	set_mouse_speed(fOriginalSettings.accel.speed);
+	set_mouse_acceleration(fOriginalSettings.accel.accel_factor);
+	set_mouse_map(&fOriginalSettings.map);
+
+	set_mouse_mode(fOriginalMode);
 }
 
 
@@ -130,27 +191,72 @@ MouseSettings::SetWindowPosition(BPoint corner)
 void
 MouseSettings::SetMouseType(int32 type)
 {
-	fSettings.type = type;
+	if (set_mouse_type(type) == B_OK)
+		fSettings.type = type;
 }
 
 
 bigtime_t 
 MouseSettings::ClickSpeed() const
 {
-	return -(fSettings.click_speed - 1000000);
-		// -1000000 to correct the Sliders 0-100000 scale
+	return 1000000LL - fSettings.click_speed;
+		// to correct the Sliders 0-100000 scale
 }
 
 
 void
-MouseSettings::SetClickSpeed(bigtime_t click_speed)
+MouseSettings::SetClickSpeed(bigtime_t clickSpeed)
 {
-	fSettings.click_speed = -(click_speed-1000000);
+	clickSpeed = 1000000LL - clickSpeed;
+
+	if (set_click_speed(clickSpeed) == B_OK)
+		fSettings.click_speed = clickSpeed;
 }
 
 
 void
-MouseSettings::SetMouseSpeed(int32 accel)
+MouseSettings::SetMouseSpeed(int32 speed)
 {
-	fSettings.accel.speed = accel;
+	if (set_mouse_speed(speed) == B_OK)
+		fSettings.accel.speed = speed;
 }
+
+
+void
+MouseSettings::SetAccelerationFactor(int32 factor)
+{
+	if (set_mouse_acceleration(factor) == B_OK)
+		fSettings.accel.accel_factor = factor;
+}
+
+
+void 
+MouseSettings::Mapping(uint32 &first, uint32 &second, uint32 &third) const
+{
+	first = fSettings.map.button[0];
+	second = fSettings.map.button[1];
+	third = fSettings.map.button[2];
+}
+
+
+void
+MouseSettings::SetMapping(uint32 first, uint32 second, uint32 third)
+{
+	mouse_map map;
+	if (get_mouse_map(&map) == B_OK) {
+		map.button[0] = first;
+		map.button[1] = second;
+		map.button[2] = third;
+		if (set_mouse_map(&map) == B_OK)
+			fSettings.map = map;
+	}
+}
+
+
+void 
+MouseSettings::SetMouseMode(mode_mouse mode)
+{
+	set_mouse_mode(mode);
+	fMode = mode;
+}
+

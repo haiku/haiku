@@ -19,6 +19,10 @@
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
 
+
+// ToDo: these should be defined somewhere else; the mouse
+//		input driver or add-on must read them as well
+
 typedef struct {
         bool    enabled;        // Acceleration on / off
         int32   accel_factor;   // accel factor: 256 = step by 1, 128 = step by 1/2
@@ -38,7 +42,8 @@ class MouseSettings {
 		MouseSettings();
 		~MouseSettings();
 
-		status_t InitCheck();
+		void Revert();
+		void Dump();
 
 		BPoint WindowPosition() const { return fWindowPosition; }
 		void SetWindowPosition(BPoint corner);
@@ -52,12 +57,22 @@ class MouseSettings {
 		int32 MouseSpeed() const { return fSettings.accel.speed; }
 		void SetMouseSpeed(int32 speed);
 
+		int32 AccelerationFactor() const { return fSettings.accel.accel_factor; }
+		void SetAccelerationFactor(int32 factor);
+
+		void Mapping(uint32 &first, uint32 &second, uint32 &third) const;
+		void SetMapping(uint32 first, uint32 second, uint32 third);
+
+		mode_mouse MouseMode() const { return fMode; }
+		void SetMouseMode(mode_mouse mode);
+
 	private:
 		static status_t GetSettingsPath(BPath &path);
 		void RetrieveSettings();
 		status_t SaveSettings();
 
 		mouse_settings	fSettings, fOriginalSettings;
+		mode_mouse		fMode, fOriginalMode;
 		BPoint			fWindowPosition;
 };
 
