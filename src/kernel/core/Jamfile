@@ -17,24 +17,18 @@ if $(OS) != BEOS {
 }
 
 KernelMergeObject kernel_core.o :
-	cbuf.c
-	console.c
 	cpu.c
-	debug.c
 	elf.c
 	faults.c
-	gdb.c
 	heap.c
 	image.c
 	int.c
 	kernel_daemon.c
-	khash.c
 	linkhack.c
 	lock.c
 	main.c
 	module.c
 	port.c
-	queue.c
 	real_time_clock.c
 	scheduler.c
 	sem.c
@@ -47,7 +41,6 @@ KernelMergeObject kernel_core.o :
 	team.c
 	thread.c
 	timer.c
-	user_debugger.cpp
 
 	$(buildSources)
 	: -fno-pic

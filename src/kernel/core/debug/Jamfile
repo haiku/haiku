@@ -3,7 +3,11 @@ SubDir OBOS_TOP src kernel core debug ;
 UsePrivateHeaders [ FDirName kernel debug ] ;
 
 KernelMergeObject kernel_debug.o :
+	console.c
+	debug.c
 	frame_buffer_console.cpp
+	gdb.c
+	user_debugger.cpp
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE
+	: -fno-pic -Wno-unused
 	;

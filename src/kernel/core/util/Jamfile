@@ -3,9 +3,12 @@ SubDir OBOS_TOP src kernel core util ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_util.o :
-	list.c
+	cbuf.c
 	kernel_cpp.cpp
+	khash.c
 	KMessage.cpp
+	list.c
+	queue.c
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE -DUSING_LIBGCC
+	: -fno-pic -Wno-unused -DUSING_LIBGCC
 	;
