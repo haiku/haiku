@@ -23,8 +23,8 @@ class IAHandler : public BHandler {
 	public:
 		IAHandler(DeviceManager * manager);
 		void MessageReceived(BMessage * msg);
-		status_t AddDirectory(const node_ref * nref);
-		status_t RemoveDirectory(const node_ref * nref);
+		status_t AddDirectory(const node_ref * nref, _BDeviceAddOn_ *addon);
+		status_t RemoveDirectory(const node_ref * nref, _BDeviceAddOn_ *addon);
 	private:
 		DeviceManager * fManager;
 		
@@ -42,11 +42,11 @@ class DeviceManager {
 				const char *device);
 		status_t StopMonitoringDevice(_BDeviceAddOn_ *addon, 
 				const char *device);
-
+		_BDeviceAddOn_ *GetAddOn(int32 index) {
+			return (_BDeviceAddOn_*)fDeviceAddons.ItemAt(index);
+		}
 	private:
-		
-	private:
-		
+		BList 	fDeviceAddons;
 		BLocker fLock;
 		IAHandler	*fHandler;
 };

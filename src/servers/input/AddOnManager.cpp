@@ -185,7 +185,6 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 			if (!strcmp(pinfo->ref.name, ref.name)) {
 				InputServer::StartStopDevices(pinfo->isd, false);
 				delete pinfo->isd;
-				delete pinfo->addon;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
 				fDeviceList.RemoveCurrent();
@@ -208,7 +207,6 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 		for (fMethodList.Rewind(); fMethodList.GetNext(&pinfo);) {
 			if (!strcmp(pinfo->ref.name, ref.name)) {
 				delete pinfo->ism;
-				delete pinfo->addon;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
 				fMethodList.RemoveCurrent();
@@ -255,7 +253,7 @@ AddOnManager::RegisterAddOns()
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-//		B_BEOS_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY,
 	};
 	const char subDirectories[][24] = {
 		"input_server/devices",
@@ -278,12 +276,6 @@ AddOnManager::RegisterAddOns()
 			}
 		}
 
-	// ToDo: this is for our own convenience only, and should be removed
-	//	in the final release
-	//if ((directory.SetTo("/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons/media/plugins") == B_OK)
-	//	&& (directory.GetNodeRef(&nref) == B_OK)) {
-	//	fHandler->AddDirectory(&nref);
-	//}
 }
 
 
@@ -305,7 +297,6 @@ AddOnManager::UnregisterAddOns()
 		for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
 			InputServer::StartStopDevices(pinfo->isd, false);
 			delete pinfo->isd;
-			delete pinfo->addon;
 			if (pinfo->addon_image >= B_OK)
 				unload_add_on(pinfo->addon_image);
 			fDeviceList.RemoveCurrent();
@@ -326,7 +317,6 @@ AddOnManager::UnregisterAddOns()
 		method_info *pinfo;
 		for (fMethodList.Rewind(); fMethodList.GetNext(&pinfo);) {
 				delete pinfo->ism;
-				delete pinfo->addon;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
 				fMethodList.RemoveCurrent();
@@ -354,7 +344,6 @@ AddOnManager::RegisterDevice(BInputServerDevice *device, const entry_ref &ref, i
 	info.ref = ref;
 	info.addon_image = addon_image;
 	info.isd = device;
-	//info.addon = new _BDeviceAddOn_;
 	
 	fDeviceList.Insert(info);
 }
@@ -407,8 +396,7 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 	info.ref = ref;
 	info.addon_image = addon_image;
 	info.ism = method;
-	//info.addon = new _BMethodAddOn_;
-
+	
 	fMethodList.Insert(info);
 	
 	BAutolock lock2(InputServer::gInputMethodListLocker);

@@ -49,6 +49,8 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
+#define INPUTSERVER_SIGNATURE "application/x-vnd.OBOS-input_server"
+
 #if DEBUG>=1
 	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
 	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
@@ -77,6 +79,7 @@ class _BDeviceAddOn_
 			: fDevice(device) {};
 	
 		BInputServerDevice *fDevice;
+		BList fMonitoredRefs;
 };
 
 class _BMethodAddOn_

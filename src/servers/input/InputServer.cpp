@@ -75,11 +75,6 @@ BLocker InputServer::gInputMethodListLocker;
 
 DeviceManager InputServer::gDeviceManager;
 
-/*BList InputServer::mInputServerDeviceList;
-BList InputServer::mInputServerFilterList;
-BList InputServer::mInputServerMethodList;*/
-
-
 /*
  *
  */
@@ -97,23 +92,17 @@ int main()
  *  Method: InputServer::InputServer()
  *   Descr: 
  */
-InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_server")
+InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE)
 {
 	CALLED();
 	void *pointer=NULL;
 	
 	EventLoop(pointer);
 
-//	InitTestDevice();
-
 	gDeviceManager.LoadState();
 	
 	fAddOnManager = new AddOnManager();
 	fAddOnManager->LoadState();
-	
-//	InitDevices();
-//	InitFilters();
-//	InitMethods();
 }
 
 /*
@@ -141,7 +130,7 @@ InputServer::ArgvReceived(int32 argc, char** argv)
 			printf("InputServer::ArgvReceived - Restarting ...\n");
 			status_t   quit_status;
 			//BMessenger msgr = BMessenger("application/x-vnd.OpenBeOS-input_server", -1, &quit_status);
-			BMessenger msgr = BMessenger("application/x-vnd.OBOS-input_server", -1, &quit_status);
+			BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
 			if (B_OK == quit_status) {
 				BMessage   msg  = BMessage(B_QUIT_REQUESTED);
 				msgr.SendMessage(&msg);
@@ -487,6 +476,9 @@ bool
 InputServer::QuitRequested(void)
 {
 	CALLED();
+	if (!BApplication::QuitRequested())
+		return false;
+	
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
 	

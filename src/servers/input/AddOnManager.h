@@ -39,7 +39,6 @@ class AddOnManager {
 	private:
 		struct device_info {
 			entry_ref ref;
-			_BDeviceAddOn_* addon;
 			image_id addon_image;
 			BInputServerDevice *isd;
 		};
@@ -50,7 +49,6 @@ class AddOnManager {
 		};
 		struct method_info {
 			entry_ref ref;
-			_BMethodAddOn_* addon;
 			image_id addon_image;
 			BInputServerMethod *ism;
 		};

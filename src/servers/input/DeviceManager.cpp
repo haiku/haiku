@@ -25,6 +25,7 @@
 IAHandler::IAHandler(DeviceManager * manager) 
 	: BHandler ("DeviceManager") 
 {
+	CALLED();
 	fManager = manager;
 }
 
@@ -32,18 +33,33 @@ IAHandler::IAHandler(DeviceManager * manager)
 void
 IAHandler::MessageReceived(BMessage * msg)
 {
+	CALLED();
 	if (msg->what == B_NODE_MONITOR) {
 		int32 opcode;
 		if (msg->FindInt32("opcode", &opcode) == B_OK) {
 			switch (opcode) {
 			case B_ENTRY_CREATED:
-				
-				
-				break;
 			case B_ENTRY_REMOVED:
-				
-				break;
 			case B_ENTRY_MOVED:
+			{
+				node_ref dir_nref;
+				if ((msg->FindInt32("device", &dir_nref.device)!=B_OK)
+					|| (msg->FindInt64("directory", &dir_nref.node)!=B_OK))
+					return;
+				
+				_BDeviceAddOn_ *addon = NULL;
+				int32 i = 0;
+				while ((addon = fManager->GetAddOn(i++)) !=NULL) {
+					int32 j=0;
+					node_ref *dnref = NULL;
+					while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j++)) != NULL) {
+						if (*dnref == dir_nref) {
+							addon->fDevice->Control(NULL, NULL, msg->what, msg);
+						}
+					}					
+				}
+			}	
+				break;
 			case B_STAT_CHANGED:
 			case B_ATTR_CHANGED:
 			case B_DEVICE_MOUNTED:
@@ -58,8 +74,9 @@ IAHandler::MessageReceived(BMessage * msg)
 
 
 status_t
-IAHandler::AddDirectory(const node_ref * nref)
+IAHandler::AddDirectory(const node_ref * nref, _BDeviceAddOn_ *addon)
 {
+	CALLED();
 	BDirectory directory(nref);
 	status_t status = directory.InitCheck();
 	if (status != B_OK)
@@ -71,16 +88,14 @@ IAHandler::AddDirectory(const node_ref * nref)
 
 	BEntry entry;
 	while (directory.GetNextEntry(&entry, true) == B_OK) {
-		add_on_entry_info entry_info;
-		if (entry.GetName(entry_info.name) != B_OK) {
-			continue; // discard and proceed
-		}
-		if (entry.GetNodeRef(&entry_info.nref) != B_OK) {
-			continue; // discard and proceed
-		}
-		entry_info.dir_nref = *nref;
-		
-		// TODO : handle refs
+		entry_ref ref;
+		entry.GetRef(&ref);
+		BMessage msg(B_NODE_MONITOR);
+		msg.AddInt32("opcode", B_ENTRY_CREATED);
+		msg.AddInt32("device", nref->device);
+		msg.AddInt64("directory", nref->node);
+		msg.AddString("name", ref.name);
+		addon->fDevice->Control(NULL, NULL, msg.what, &msg);
 	}
 
 	return B_OK;
@@ -88,8 +103,9 @@ IAHandler::AddDirectory(const node_ref * nref)
 
 
 status_t
-IAHandler::RemoveDirectory(const node_ref * nref)
+IAHandler::RemoveDirectory(const node_ref * nref, _BDeviceAddOn_ *addon)
 {
+	CALLED();
 	BDirectory directory(nref);
 	status_t status = directory.InitCheck();
 	if (status != B_OK)
@@ -101,16 +117,14 @@ IAHandler::RemoveDirectory(const node_ref * nref)
 
 	BEntry entry;
 	while (directory.GetNextEntry(&entry, true) == B_OK) {
-		add_on_entry_info entry_info;
-		if (entry.GetName(entry_info.name) != B_OK) {
-			continue; // discard and proceed
-		}
-		if (entry.GetNodeRef(&entry_info.nref) != B_OK) {
-			continue; // discard and proceed
-		}
-		entry_info.dir_nref = *nref;
-		
-		// TODO : handle refs
+		entry_ref ref;
+		entry.GetRef(&ref);
+		BMessage msg(B_NODE_MONITOR);
+		msg.AddInt32("opcode", B_ENTRY_REMOVED);
+		msg.AddInt32("device", nref->device);
+		msg.AddInt64("directory", nref->node);
+		msg.AddString("name", ref.name);
+		addon->fDevice->Control(NULL, NULL, msg.what, &msg);
 	}
 
 	return B_OK;
@@ -126,6 +140,9 @@ DeviceManager::DeviceManager()
 
 DeviceManager::~DeviceManager()
 {
+	_BDeviceAddOn_ *addon = NULL;
+	while ((addon = (_BDeviceAddOn_ *)fDeviceAddons.RemoveItem((int32)0)) !=NULL)
+		delete addon;
 }
 
 
@@ -148,22 +165,59 @@ status_t
 DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon, 
 				const char *device)
 {
-	// test if already monitored
-
-	// monitor if needed
+	CALLED();
 	status_t err;
 	node_ref nref;
 	BDirectory directory;
 	BPath path("/dev");
-	if (((err = path.Append(device)) == B_OK)
-		&& ((err = directory.SetTo(path.Path())) == B_OK) 
-		&& ((err = directory.GetNodeRef(&nref)) == B_OK)
-		&& ((err = fHandler->AddDirectory(&nref)) == B_OK) ) {
-		return B_OK;
-	} else
+	if (((err = path.Append(device)) != B_OK)
+		|| ((err = directory.SetTo(path.Path())) != B_OK) 
+		|| ((err = directory.GetNodeRef(&nref)) != B_OK))
 		return err;
 		
-	// add in list
+	// test if already monitored
+	bool alreadyMonitored = false;
+	_BDeviceAddOn_ *tmpaddon = NULL;
+	int32 i = 0;
+	while ((tmpaddon = (_BDeviceAddOn_ *)fDeviceAddons.ItemAt(i++)) !=NULL) {
+		int32 j=0;
+		node_ref *dnref = NULL;
+		while ((dnref = (node_ref *)tmpaddon->fMonitoredRefs.ItemAt(j++)) != NULL) {
+			if (*dnref == nref) {
+				alreadyMonitored = true;
+				break;
+			}
+		}
+		if (alreadyMonitored)
+			break;				
+	}
+	
+	// monitor if needed
+	if (!alreadyMonitored) {
+		if ((err = fHandler->AddDirectory(&nref, addon)) != B_OK) 
+			return err;
+	}
+			
+	// add addon in list
+	if (!fDeviceAddons.HasItem(addon))
+		fDeviceAddons.AddItem(addon);
+	
+	// add dir ref in list
+	int32 j=0;
+	node_ref *dnref = NULL;
+	alreadyMonitored = false;
+	while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j++)) != NULL) {
+		if (*dnref == nref) {
+			alreadyMonitored = true;
+			break;
+		}
+	}
+	
+	if (!alreadyMonitored) {
+		addon->fMonitoredRefs.AddItem(new node_ref(nref));
+	}
+	
+	return B_OK;
 }
 
 
@@ -171,19 +225,53 @@ status_t
 DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon, 
 				const char *device)
 {
-	// test if still monitored
-	// remove from list
-	
-	// stop monitoring if needed
+	CALLED();
 	status_t err;
 	node_ref nref;
 	BDirectory directory;
 	BPath path("/dev");
-	if (((err = path.Append(device)) == B_OK)
-		&& ((err = directory.SetTo(path.Path())) == B_OK) 
-		&& ((err = directory.GetNodeRef(&nref)) == B_OK)
-		/*&& ((err = fHandler->RemoveDirectory(&nref)) ==B_OK)*/) {
-		return B_OK;
-	} else
+	if (((err = path.Append(device)) != B_OK)
+		|| ((err = directory.SetTo(path.Path())) != B_OK) 
+		|| ((err = directory.GetNodeRef(&nref)) != B_OK))
 		return err;
+		
+	// test if still monitored
+	bool stillMonitored = false;
+	_BDeviceAddOn_ *tmpaddon = NULL;
+	int32 i = 0;
+	while ((tmpaddon = (_BDeviceAddOn_ *)fDeviceAddons.ItemAt(i++)) !=NULL) {
+		if (addon == tmpaddon)
+			continue;
+			
+		int32 j=0;
+		node_ref *dnref = NULL;
+		while ((dnref = (node_ref *)tmpaddon->fMonitoredRefs.ItemAt(j++)) != NULL) {
+			if (*dnref == nref) {
+				stillMonitored = true;
+				break;
+			}
+		}
+		if (stillMonitored)
+			break;				
+	}
+	
+	// remove from list
+	node_ref *dnref = NULL;
+	int32 j=0;
+	while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j)) != NULL) {
+		if (*dnref == nref) {
+			addon->fMonitoredRefs.RemoveItem(j);
+			delete dnref;
+			break;
+		}
+		j++;
+	}
+	
+	// stop monitoring if needed
+	if (!stillMonitored) {
+		if ((err = fHandler->RemoveDirectory(&nref, addon)) != B_OK)
+			return err;
+	} 
+		
+	return B_OK;
 }
