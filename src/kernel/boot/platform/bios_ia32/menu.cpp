@@ -16,14 +16,25 @@
 
 
 // position
-static int32 kFirstLine = 8;
-static int32 kOffsetX = 10;
+static const int32 kFirstLine = 8;
+static const int32 kOffsetX = 10;
+static const int32 kHelpLines = 2;
 
 // colors
-static console_color kItemColor = SILVER;
-static console_color kSelectedItemColor = WHITE;
-static console_color kBackgroundColor = BLACK;
-static console_color kSelectedBackgroundColor = SILVER;
+static const console_color kItemColor = SILVER;
+static const console_color kSelectedItemColor = WHITE;
+static const console_color kBackgroundColor = BLACK;
+static const console_color kSelectedBackgroundColor = SILVER;
+
+
+static int32 sMenuOffset = 0;
+
+
+static int32
+menu_height()
+{
+	return console_height() - kFirstLine - kHelpLines;
+}
 
 
 static void
@@ -38,6 +49,10 @@ static void
 print_item_at(int32 line, MenuItem *item)
 {
 	bool selected = item->IsSelected();
+
+	line -= sMenuOffset;
+	if (line < 0 || line >= menu_height())
+		return;
 
 	console_color background = selected ? kSelectedBackgroundColor : kBackgroundColor;
 	console_color foreground = selected ? kSelectedItemColor : kItemColor;
@@ -131,8 +146,33 @@ draw_menu(Menu *menu)
 			continue;
 		}
 
-		print_item_at(i, item);
-		i++;
+		print_item_at(i++, item);
+	}
+
+	int32 height = menu_height();
+	if (menu->CountItems() >= height) {
+		int32 x = console_width() - kOffsetX;
+		console_set_cursor(x, kFirstLine);
+		console_set_color(YELLOW, BLACK);
+		putchar(30/*24*/);
+		height--;
+
+		int32 start = sMenuOffset * height / menu->CountItems();
+		int32 end = (sMenuOffset + height) * height / menu->CountItems();
+
+		for (i = 1; i < height; i++) {
+			console_set_cursor(x, kFirstLine + i);
+			if (i >= start && i <= end)
+				console_set_color(WHITE, YELLOW);
+			else
+				console_set_color(WHITE, GREY);
+
+			putchar(' ');
+		}
+
+		console_set_cursor(x, kFirstLine + i);
+		console_set_color(YELLOW, BLACK);
+		putchar(31/*25*/);
 	}
 }
 
@@ -140,6 +180,7 @@ draw_menu(Menu *menu)
 static void
 run_menu(Menu *menu)
 {
+	sMenuOffset = 0;
 	menu->Show();
 
 	draw_menu(menu);
@@ -179,6 +220,32 @@ run_menu(Menu *menu)
 					if (selected >= menu->CountItems())
 						selected = 0;
 					break;
+				case BIOS_KEY_PAGE_UP:
+					selected -= menu_height() - 1;
+
+					while ((item = menu->ItemAt(selected)) != NULL) {
+						if (item->Type() != MENU_ITEM_SEPARATOR)
+							break;
+
+						selected--;
+					}
+
+					if (selected < 0)
+						selected = 0;
+					break;
+				case BIOS_KEY_PAGE_DOWN:
+					selected += menu_height() - 1;
+
+					while ((item = menu->ItemAt(selected)) != NULL) {
+						if (item->Type() != MENU_ITEM_SEPARATOR)
+							break;
+
+						selected++;
+					}
+
+					if (selected >= menu->CountItems())
+						selected = menu->CountItems() - 1;
+					break;
 				case BIOS_KEY_HOME:
 					selected = 0;
 					break;
@@ -192,17 +259,30 @@ run_menu(Menu *menu)
 				MenuItem *item = menu->ItemAt(selected);
 				if (item != NULL)
 					item->Select(true);
+				
+				// make sure that the new selected entry is visible
+				if (sMenuOffset > selected
+					|| sMenuOffset + menu_height() <= selected) {
+					if (sMenuOffset > selected)
+						sMenuOffset = selected;
+					else
+						sMenuOffset = selected + 1 - menu_height();
+
+					draw_menu(menu);
+				}
 			}
 		} else if (key.code.ascii == 0xd || key.code.ascii == ' ') {
 			// leave the menu
 			if (item->Submenu() != NULL) {
+				int32 offset = sMenuOffset;
 				menu->Hide();
 
 				run_menu(item->Submenu());
 
+				// restore current menu
+				sMenuOffset = offset;
 				menu->Show();
 				draw_menu(menu);
-					// restore current menu
 			} else if (item->Type() == MENU_ITEM_MARKABLE) {
 				// toggle state
 				item->SetMarked(!item->IsMarked());
@@ -210,7 +290,9 @@ run_menu(Menu *menu)
 			} else if (key.code.ascii == 0xd) {
 				// the space key does not exit the menu
 
-				if (menu->Type() == CHOICE_MENU)
+				if (menu->Type() == CHOICE_MENU
+					&& item->Type() != MENU_ITEM_NO_CHOICE
+					&& item->Type() != MENU_ITEM_TITLE)
 					item->SetMarked(true);
 				break;
 			}
