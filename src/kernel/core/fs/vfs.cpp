@@ -934,14 +934,12 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode = nextVnode;
 
 		// see if we hit a mount point
-		mutex_lock(&sMountOpMutex);
 		if (vnode->covered_by) {
 			nextVnode = vnode->covered_by;
 			inc_vnode_ref_count(nextVnode);
 			put_vnode(vnode);
 			vnode = nextVnode;
 		}
-		mutex_unlock(&sMountOpMutex);
 	}
 
 	*_vnode = vnode;
