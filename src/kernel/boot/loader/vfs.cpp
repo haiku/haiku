@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -317,11 +317,15 @@ get_boot_file_system(stage2_args *args)
 		return NULL;
 
 	Directory *fileSystem;
-	if (partition->Mount(&fileSystem) < B_OK) {
+	status_t status = partition->Mount(&fileSystem);
+	
+	gPartitions.Remove(partition);
 		// let's remove that partition, so that it is not scanned again
 		// in mount_file_systems()
 
-		gPartitions.Remove(partition);
+	if (status < B_OK) {
+		// this partition doesn't contain any known file system; we
+		// don't need it anymore
 		delete partition;
 		return NULL;
 	}
