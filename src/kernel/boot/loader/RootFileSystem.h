@@ -19,6 +19,7 @@ class RootFileSystem : public Directory {
 
 		virtual Node *Lookup(const char *name, bool traverseLinks);
 
+		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize);
 		virtual status_t GetNextNode(void *cookie, Node **_node);
 		virtual status_t Rewind(void *cookie);
 

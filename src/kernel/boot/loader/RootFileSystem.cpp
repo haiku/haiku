@@ -63,7 +63,7 @@ RootFileSystem::Close(void *cookie)
 
 
 Node *
-RootFileSystem::Lookup(const char *name, bool traverseLinks)
+RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 {
 	file_system_entry *entry = NULL;
 
@@ -83,6 +83,20 @@ RootFileSystem::Lookup(const char *name, bool traverseLinks)
 
 
 status_t 
+RootFileSystem::GetNextEntry(void *_cookie, char *name, size_t size)
+{
+	dir_cookie *cookie = (dir_cookie *)_cookie;
+	file_system_entry *entry;
+
+	entry = cookie->current = (file_system_entry *)list_get_next_item(&fList, cookie->current);
+	if (entry != NULL)
+		return entry->root->GetName(name, size);
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t 
 RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 {
 	dir_cookie *cookie = (dir_cookie *)_cookie;
@@ -93,7 +107,6 @@ RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 		*_node = entry->root;
 		return B_OK;
 	}
-
 	return B_ENTRY_NOT_FOUND;
 }
 
