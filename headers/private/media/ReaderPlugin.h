@@ -47,7 +47,7 @@ public: // XXX for test programs only
 };
 
 
-class ReaderPlugin : public MediaPlugin
+class ReaderPlugin : public virtual MediaPlugin
 {
 public:
 	virtual Reader *NewReader() = 0;

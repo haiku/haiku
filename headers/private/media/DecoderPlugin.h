@@ -40,7 +40,7 @@ private:
 };
 
 
-class DecoderPlugin : public MediaPlugin
+class DecoderPlugin : public virtual MediaPlugin
 {
 public:
 						DecoderPlugin();
