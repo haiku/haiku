@@ -584,8 +584,10 @@ dprintf("vm_translation_map_create\n");
 		return ENOMEM;
 
 	new_map->arch_data = (vm_translation_map_arch_info *)kmalloc(sizeof(vm_translation_map_arch_info));
-	if(new_map == NULL)
+	if(new_map == NULL) {
+		recursive_lock_destroy(&new_map->lock);
 		return ENOMEM;
+	}
 
 	new_map->arch_data->num_invalidate_pages = 0;
 
@@ -595,6 +597,7 @@ dprintf("vm_translation_map_create\n");
 		new_map->arch_data->pgdir_virt = kmalloc(PAGE_SIZE);
 		if(new_map->arch_data->pgdir_virt == NULL) {
 			kfree(new_map->arch_data);
+			recursive_lock_destroy(&new_map->lock);
 			return ENOMEM;
 		}
 		if(((addr)new_map->arch_data->pgdir_virt % PAGE_SIZE) != 0)
@@ -784,7 +787,7 @@ int vm_translation_map_quick_map(kernel_args *ka, addr va, addr pa, unsigned int
 	pentry->rw = attributes & LOCK_RW;
 	pentry->present = 1;
 
-	arch_cpu_invalidate_TLB_range(va, va+1);
+	arch_cpu_invalidate_TLB_range(va, va);
 
 	return 0;
 }

@@ -123,8 +123,10 @@ i386_set_kstack(addr kstack)
 void
 arch_cpu_invalidate_TLB_range(addr start, addr end)
 {
-	for (; start < end; start += PAGE_SIZE) {
+	int num_pages = end/PAGE_SIZE - start/PAGE_SIZE;
+	while ( num_pages-- >= 0 ) {
 		invalidate_TLB(start);
+		start += PAGE_SIZE;
 	}
 }
 

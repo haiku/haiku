@@ -58,7 +58,7 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 					continue;
 				}
 
-				page = vm_lookup_page(pa);
+				page = vm_lookup_page(pa / PAGE_SIZE);
 				if(!page) {
 					aspace->translation_map.ops->unlock(&aspace->translation_map);
 					continue;

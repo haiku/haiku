@@ -86,8 +86,10 @@ sh4_invl_page(addr va)
 void
 arch_cpu_invalidate_TLB_range(addr start, addr end)
 {
-	for(; start < end; start += PAGE_SIZE) {
+	int num_pages = end/PAGE_SIZE - start/PAGE_SIZE;
+	while ( num_pages-- >= 0 ) {
 		sh4_invl_page(start);
+		start += PAGE_SIZE;
 	}
 }
 
