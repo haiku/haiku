@@ -187,6 +187,7 @@ class BMenuWindow : public BWindow
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
 static status_t check_app_signature(const char *signature);
+static void fill_argv_message(BMessage *message);
 
 //------------------------------------------------------------------------------
 BApplication::BApplication(const char* signature)
@@ -616,43 +617,13 @@ BResources* BApplication::AppResources()
 	return _app_resources;
 }
 //------------------------------------------------------------------------------
-void BApplication::DispatchMessage(BMessage* message, BHandler* handler)
+void
+BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	switch (message->what) {
 		case B_ARGV_RECEIVED:
-		{
-			// build the argv vector
-			status_t error = B_OK;
-			int32 argc;
-			char **argv = NULL;
-			if (message->FindInt32("argc", &argc) == B_OK && argc > 0) {
-				argv = new char*[argc];
-				for (int32 i = 0; error == B_OK && i < argc; i++)
-					argv[i] = NULL;
-				// copy the arguments
-				for (int32 i = 0; error == B_OK && i < argc; i++) {
-					const char *arg = NULL;
-					error = message->FindString("argv", i, &arg);
-					if (error == B_OK && arg) {
-						argv[i] = new(std::nothrow) char[strlen(arg) + 1];
-						if (argv[i])
-							strcpy(argv[i], arg);
-						else
-							error = B_NO_MEMORY;
-					}
-				}
-			}
-			// call the hook
-			if (error == B_OK)
-				ArgvReceived(argc, argv);
-			// cleanup
-			if (argv) {
-				for (int32 i = 0; i < argc; i++)
-					delete[] argv[i];
-				delete[] argv;
-			}
+			do_argv(message);
 			break;
-		}
 
 		case B_REFS_RECEIVED:
 			RefsReceived(message);
@@ -867,16 +838,19 @@ void BApplication::InitData(const char* signature, status_t* error)
 			// Do that only, if the app is NOT B_ARGV_ONLY.
 			if (otherTeam >= 0 && __libc_argc > 1) {
 				app_info otherAppInfo;
-				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo)
-					== B_OK && !(otherAppInfo.flags & B_ARGV_ONLY)) {
+				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
+					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
+					
 					// create an B_ARGV_RECEIVED message
 					BMessage argvMessage(B_ARGV_RECEIVED);
-					do_argv(&argvMessage);
+					fill_argv_message(&argvMessage);
+					
 					// replace the first argv string with the path of the
 					// other application
 					BPath path;
 					if (path.SetTo(&otherAppInfo.ref) == B_OK)
 						argvMessage.ReplaceString("argv", 0, path.Path());
+					
 					// send the message
 					BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
 				}
@@ -892,7 +866,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			
 			if (__libc_argc > 1) {
 				BMessage argvMessage(B_ARGV_RECEIVED);
-				do_argv(&argvMessage);
+				fill_argv_message(&argvMessage);
 				PostMessage(&argvMessage, this);
 			}
 			// send a B_READY_TO_RUN message as well
@@ -1070,21 +1044,48 @@ bool BApplication::window_quit_loop(bool, bool)
 	return false;
 }
 //------------------------------------------------------------------------------
-void BApplication::do_argv(BMessage* message)
+void
+BApplication::do_argv(BMessage* message)
 {
-	if (message) {
-		int32 argc = __libc_argc;
-		const char * const *argv = __libc_argv;
-		// add argc
-		message->AddInt32("argc", argc);
-		// add argv
-		for (int32 i = 0; i < argc; i++)
-			message->AddString("argv", argv[i]);
-		// add current working directory
-		char cwd[B_PATH_NAME_LENGTH + 1];
-		if (getcwd(cwd, B_PATH_NAME_LENGTH + 1))
-			message->AddString("cwd", cwd);
-	}
+	// TODO: Consider renaming this function to something 
+	// a bit more descriptive, like "handle_argv_message()", 
+	// or "HandleArgvMessage()" 
+ 
+	ASSERT(message != NULL); 
+
+	// build the argv vector 
+	status_t error = B_OK; 
+	int32 argc; 
+	char **argv = NULL; 
+	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) { 
+		argv = new char*[argc]; 
+		for (int32 i = 0; i < argc; i++) 
+			argv[i] = NULL; 
+        
+		// copy the arguments 
+		for (int32 i = 0; error == B_OK && i < argc; i++) { 
+			const char *arg = NULL; 
+			error = message->FindString("argv", i, &arg); 
+			if (error == B_OK && arg) { 
+				argv[i] = new(std::nothrow) char[strlen(arg) + 1]; 
+				if (argv[i]) 
+					strcpy(argv[i], arg); 
+				else 
+					error = B_NO_MEMORY; 
+			} 
+		} 
+	} 
+
+	// call the hook 
+	if (error == B_OK) 
+		ArgvReceived(argc, argv); 
+
+	// cleanup 
+	if (argv) { 
+		for (int32 i = 0; i < argc; i++) 
+			delete[] argv[i]; 
+		delete[] argv; 
+	} 
 }
 //------------------------------------------------------------------------------
 uint32 BApplication::InitialWorkspace()
@@ -1194,6 +1195,32 @@ looper_name_for(const char *signature)
 }
 
 
+// fill_argv_message
+/*!	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
+*/
+static void 
+fill_argv_message(BMessage *message)
+{ 
+	if (message) { 
+    	message->what = B_ARGV_RECEIVED; 
+              
+		int32 argc = __libc_argc; 
+		const char * const *argv = __libc_argv; 
+               
+		// add argc 
+		message->AddInt32("argc", argc); 
+               
+		// add argv 
+		for (int32 i = 0; i < argc; i++) 
+			message->AddString("argv", argv[i]); 
+               
+		// add current working directory        
+		char cwd[B_PATH_NAME_LENGTH]; 
+		if (getcwd(cwd, B_PATH_NAME_LENGTH)) 
+			message->AddString("cwd", cwd); 
+	} 
+} 
+ 
 /*
  * $Log $
  *
