@@ -23,14 +23,14 @@
 
 #include <stdio.h>
 
-/* TODO: move this into devfs.c, to add full dynamicly loaded device drivers support
- These are mainly here to allow testing and this needs to be revisited
-*/
+/* XXX - move this into the core
+ * These are mainly here to allow testing and this needs to be revisited
+ */
 const char *device_paths[] = {
-	"/boot/addons/drivers/dev",
-	"/boot/addons/drivers/dev/audio",	
-	"/boot/addons/drivers/dev/misc",
-	"/boot/addons/drivers/dev/net",
+	"/boot/drivers/dev",
+	"/boot/drivers/dev/audio",	
+	"/boot/drivers/dev/misc",
+	"/boot/drivers/dev/net",
 	NULL
 };
 
