@@ -22,6 +22,14 @@
 #	define TRACE(x) ;
 #endif
 
+#ifndef B_SELECT_READ
+	/* these are missing from KernelExport.h ... */
+#	define  B_SELECT_READ       1 
+#	define  B_SELECT_WRITE      2 
+#	define  B_SELECT_EXCEPTION  3 
+extern void notify_select_event(selectsync * sync, uint32 ref);
+#endif /* B_SELECT_READ */
+
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 #define	DRIVER_NAME "random"
@@ -38,6 +46,9 @@ static status_t random_write(void *cookie, off_t position, const void *buffer, s
 static status_t random_control(void *cookie, uint32 op, void *arg, size_t length);
 static status_t random_close(void *cookie);
 static status_t random_free(void *cookie);
+static status_t random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
+static status_t random_deselect(void *cookie, uint8 event, selectsync *sync);
+
 
 static device_hooks sRandomHooks = {
 	random_open,
@@ -46,8 +57,8 @@ static device_hooks sRandomHooks = {
 	random_control,
 	random_read,
 	random_write,
-	NULL,
-	NULL,
+	random_select,
+	random_deselect,
 	NULL,
 	NULL
 };
@@ -395,6 +406,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	int32 *buffer = (int32 *)_buffer;
 	uint8 *buffer8 = (uint8 *)_buffer;
 	uint32 i, j;
+	TRACE((DRIVER_NAME ": read(%Ld,, %d)\n", position, *_numBytes));
 
 	acquire_sem(sRandomSem);
 	sRandomCount += *_numBytes;
@@ -422,7 +434,9 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 static status_t 
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
-	return B_OK;
+	TRACE((DRIVER_NAME ": write(%Ld,, %d)\n", position, *_numBytes));
+	*_numBytes = 0;
+	return EINVAL;
 }
 
 
@@ -448,3 +462,23 @@ random_free(void *cookie)
 	TRACE((DRIVER_NAME ": free()\n"));
 	return B_OK;
 }
+
+static status_t
+random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
+{
+	TRACE((DRIVER_NAME ": select()\n"));
+	/* tell there is already data to read */
+	if (event == B_SELECT_READ)
+		notify_select_event(sync, ref);
+	else if (event == B_SELECT_WRITE)
+		return EINVAL; /* not writable */
+	return B_OK;
+}
+
+static status_t
+random_deselect(void *cookie, uint8 event, selectsync *sync)
+{
+	TRACE((DRIVER_NAME ": deselect()\n"));
+	return B_OK;
+}
+
