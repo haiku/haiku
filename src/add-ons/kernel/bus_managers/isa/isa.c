@@ -10,6 +10,7 @@
 */
 
 
+#include <ISA.h>
 #include <bus/ISA.h>
 #include <KernelExport.h>
 #include <device_manager.h>
@@ -90,6 +91,14 @@ ram_address(const void *physical_address_in_system_memory)
 }
 
 
+static long
+make_isa_dma_table(const void *buffer, long buffer_size, ulong num_bits,
+	isa_dma_entry *table, long num_entries)
+{
+	return ENOSYS;
+}
+
+
 static status_t
 start_isa_dma(long channel, void *buf, long transfer_count,
 	uchar mode, uchar e_mode)
@@ -99,7 +108,15 @@ start_isa_dma(long channel, void *buf, long transfer_count,
 	return B_NOT_ALLOWED;
 }
 
-#if 0
+
+static long
+start_scattered_isa_dma(long channel, const isa_dma_entry *table,
+	uchar mode, uchar emode)
+{
+	return ENOSYS;
+}
+
+
 static status_t
 lock_isa_dma_channel(long channel)
 {
@@ -116,7 +133,7 @@ unlock_isa_dma_channel(long channel)
 	// ToDo
 	return B_ERROR;
 }
-#endif
+
 
 static status_t
 isa_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
@@ -195,7 +212,30 @@ module_dependency module_dependencies[] = {
 	{}
 };
 
-isa2_module_info isa_interface = {
+static isa_module_info isa_module = {
+	{
+		{
+			B_ISA_MODULE_NAME,
+			B_KEEP_LOADED,
+			std_ops
+		},
+		NULL	// rescan
+	},
+	&isa_read_io_8, 
+	&isa_write_io_8,
+	&isa_read_io_16, 
+	&isa_write_io_16,
+	&isa_read_io_32, 
+	&isa_write_io_32,
+	&ram_address,
+	&make_isa_dma_table,
+	&start_isa_dma,
+	&start_scattered_isa_dma,
+	&lock_isa_dma_channel,
+	&unlock_isa_dma_channel
+};
+
+static isa2_module_info isa2_module = {
 	{
 		{
 			{
@@ -228,7 +268,8 @@ isa2_module_info isa_interface = {
 #if !_BUILDING_kernel && !BOOT
 _EXPORT 
 module_info *modules[] = {
-	(module_info *)&isa_interface,
+	(module_info *)&isa_module,
+	(module_info *)&isa2_module,
 	NULL
 };
 #endif
