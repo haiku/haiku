@@ -8,6 +8,7 @@
 */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <fs_attr.h> // for struct attr_info
 #include <new>
 #include <string.h>
@@ -699,10 +700,10 @@ BNode::_SetTo(int fd, const char *path, bool traverse)
 	status_t error = (fd >= 0 || path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
-		fFd = _kern_open(fd, path, O_RDWR | traverseFlag);
+		fFd = _kern_open(fd, path, O_RDWR | O_CLOEXEC | traverseFlag);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
 			// opening read-write failed, re-try read-only
-			fFd = _kern_open(fd, path, O_RDONLY | traverseFlag);
+			fFd = _kern_open(fd, path, O_RDONLY | O_CLOEXEC | traverseFlag);
 		}
 		if (fFd < 0)
 			error = fFd;
@@ -733,11 +734,11 @@ BNode::_SetTo(const entry_ref *ref, bool traverse)
 	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
-			O_RDWR | traverseFlag);
+			O_RDWR | O_CLOEXEC | traverseFlag);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
 			// opening read-write failed, re-try read-only
 			fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
-				O_RDONLY | traverseFlag);
+				O_RDONLY | O_CLOEXEC | traverseFlag);
 		}
 		if (fFd < 0)
 			error = fFd;
@@ -773,6 +774,9 @@ BNode::InitAttrDir()
 		fAttrFd = _kern_open_attr_dir(fFd, NULL);
 		if (fAttrFd < 0)
 			return fAttrFd;
+
+		// set close on exec flag
+		fcntl(fAttrFd, F_SETFD, FD_CLOEXEC);
 	}
 	return fCStatus;	
 }

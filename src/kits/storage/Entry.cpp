@@ -7,14 +7,14 @@
 	BEntry and entry_ref implementations.
 */
 
-#include <Entry.h>
-
+#include <fcntl.h>
 #include <new>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <Directory.h>
+#include <Entry.h>
 #include <Path.h>
 #include <SymLink.h>
 #include "storage_support.h"
@@ -523,15 +523,21 @@ status_t BEntry::GetParent(BEntry *entry) const
 		return B_NO_INIT;
 	if (entry == NULL)
 		return B_BAD_VALUE;
+
 	// check whether we are the root directory
 	// It is sufficient to check whether our leaf name is ".".
 	if (strcmp(fName, ".") == 0)
 		return B_ENTRY_NOT_FOUND;
+
 	// open the parent directory
 	char leafName[B_FILE_NAME_LENGTH];
 	int parentFD = _kern_open_parent_dir(fDirFd, leafName, B_FILE_NAME_LENGTH);
 	if (parentFD < 0)
 		return parentFD;
+
+	// set close on exec flag on dir FD
+	fcntl(parentFD, F_SETFD, FD_CLOEXEC);
+
 	// init the entry
 	entry->Unset();
 	entry->fDirFd = parentFD;
@@ -927,6 +933,10 @@ BEntry::set(int dirFD, const char *path, bool traverse)
 			// next round...
 		}
 	}
+
+	// set close on exec flag on dir FD
+	fcntl(dirFD, F_SETFD, FD_CLOEXEC);
+
 	// set the result
 	status_t error = set_name(leafName);
 	if (error != B_OK)

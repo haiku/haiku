@@ -7,12 +7,13 @@
 	BDirectory implementation.	
 */
 
-#include <fs_info.h>
+#include <fcntl.h>
 #include <string.h>
 
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <fs_info.h>
 #include <Path.h>
 #include <SymLink.h>
 
@@ -149,6 +150,7 @@ BDirectory::SetTo(const entry_ref *ref)
 	status_t error = _SetTo(ref, true);
 	if (error != B_OK)
 		return error;
+
 	// open dir
 	fDirFd = _kern_open_dir_entry_ref(ref->device, ref->directory, ref->name);
 	if (fDirFd < 0) {
@@ -156,6 +158,10 @@ BDirectory::SetTo(const entry_ref *ref)
 		Unset();
 		return (fCStatus = error);
 	}
+
+	// set close on exec flag on dir FD
+	fcntl(fDirFd, F_SETFD, FD_CLOEXEC);
+
 	return B_OK;
 }
 
@@ -209,10 +215,12 @@ BDirectory::SetTo(const BEntry *entry)
 		Unset();
 		return (fCStatus = B_BAD_VALUE);
 	}
+
 	// open node
 	status_t error = _SetTo(entry->fDirFd, entry->fName, true);
 	if (error != B_OK)
 		return error;
+
 	// open dir
 	fDirFd = _kern_open_dir(entry->fDirFd, entry->fName);
 	if (fDirFd < 0) {
@@ -220,6 +228,10 @@ BDirectory::SetTo(const BEntry *entry)
 		Unset();
 		return (fCStatus = error);
 	}
+
+	// set close on exec flag on dir FD
+	fcntl(fDirFd, F_SETFD, FD_CLOEXEC);
+
 	return B_OK;
 }
 
@@ -247,6 +259,7 @@ BDirectory::SetTo(const char *path)
 	status_t error = _SetTo(-1, path, true);
 	if (error != B_OK)
 		return error;
+
 	// open dir
 	fDirFd = _kern_open_dir(-1, path);
 	if (fDirFd < 0) {
@@ -254,6 +267,10 @@ BDirectory::SetTo(const char *path)
 		Unset();
 		return (fCStatus = error);
 	}
+
+	// set close on exec flag on dir FD
+	fcntl(fDirFd, F_SETFD, FD_CLOEXEC);
+
 	return B_OK;
 }
 
@@ -283,10 +300,12 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 		Unset();
 		return (fCStatus = B_BAD_VALUE);
 	}
+
 	// open node
 	status_t error = _SetTo(dir->fDirFd, path, true);
 	if (error != B_OK)
 		return error;
+
 	// open dir
 	fDirFd = _kern_open_dir(dir->fDirFd, path);
 	if (fDirFd < 0) {
@@ -294,6 +313,10 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 		Unset();
 		return (fCStatus = error);
 	}
+
+	// set close on exec flag on dir FD
+	fcntl(fDirFd, F_SETFD, FD_CLOEXEC);
+
 	return B_OK;
 }
 

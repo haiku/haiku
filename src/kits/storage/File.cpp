@@ -7,6 +7,7 @@
 	BFile implementation.
 */
 
+#include <fcntl.h>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -150,8 +151,12 @@ status_t
 BFile::SetTo(const entry_ref *ref, uint32 openMode)
 {
 	Unset();
+
 	if (!ref)
 		return (fCStatus = B_BAD_VALUE);
+
+	openMode |= O_CLOEXEC;
+
 	int fd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
 		openMode);
 	if (fd >= 0) {
@@ -160,6 +165,7 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 		fCStatus = B_OK;
 	} else
 		fCStatus = fd;
+
 	return fCStatus;
 }
 
@@ -186,17 +192,22 @@ status_t
 BFile::SetTo(const BEntry *entry, uint32 openMode)
 {
 	Unset();
+
 	if (!entry)
 		return (fCStatus = B_BAD_VALUE);
 	if (entry->InitCheck() != B_OK)
 		return (fCStatus = entry->InitCheck());
-	int fd = _kern_open(entry->fDirFd, entry->fName, openMode);
+
+	openMode |= O_CLOEXEC;
+
+	int fd = _kern_open(entry->fDirFd, entry->fName, openMode | O_CLOEXEC);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;
 		fCStatus = B_OK;
 	} else
 		fCStatus = fd;
+
 	return fCStatus;
 }
 
@@ -221,8 +232,12 @@ status_t
 BFile::SetTo(const char *path, uint32 openMode)
 {
 	Unset();
+
 	if (!path)
 		return (fCStatus = B_BAD_VALUE);
+
+	openMode |= O_CLOEXEC;
+
 	int fd = _kern_open(-1, path, openMode);
 	if (fd >= 0) {
 		set_fd(fd);
@@ -230,6 +245,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 		fCStatus = B_OK;
 	} else
 		fCStatus = fd;
+
 	return fCStatus;
 }
 
@@ -258,8 +274,12 @@ status_t
 BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 {
 	Unset();
+
 	if (!dir)
 		return (fCStatus = B_BAD_VALUE);
+
+	openMode |= O_CLOEXEC;
+
 	int fd = _kern_open(dir->fDirFd, path, openMode);
 	if (fd >= 0) {
 		set_fd(fd);
@@ -267,6 +287,7 @@ BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 		fCStatus = B_OK;
 	} else
 		fCStatus = fd;
+
 	return fCStatus;
 }
 

@@ -7,12 +7,13 @@
 	BQuery implementation.
 */
 
-#include <fs_query.h>
+#include <fcntl.h>
 #include <new>
 #include <parsedate.h>
 #include <time.h>
 
 #include <Entry.h>
+#include <fs_query.h>
 #include <Query.h>
 #include <Volume.h>
 
@@ -526,6 +527,9 @@ BQuery::Fetch()
 		fLive ? B_LIVE_QUERY : 0, fPort, fToken);
 	if (fQueryFd < 0)
 		return fQueryFd;
+
+	// set close on exec flag
+	fcntl(fQueryFd, F_SETFD, FD_CLOEXEC);
 
 	return B_OK;
 }
