@@ -47,7 +47,7 @@ BBlockCache::BBlockCache(uint32 blockCount,
 						 uint32 allocationType)
  :	fFreeList(0),
  	fBlockSize(blockSize),
- 	fFreeBlocks(blockCount),
+ 	fFreeBlocks(0),
  	fBlockCount(blockCount),
 	fLocker("some BBlockCache lock"),
 	fAlloc(0),
@@ -79,6 +79,7 @@ BBlockCache::BBlockCache(uint32 blockCount,
 		_FreeBlock *block = reinterpret_cast<_FreeBlock *>(fAlloc(blockSize));
 		if (!block)
 			break;
+		fFreeBlocks++;
 		block->next = fFreeList;
 		fFreeList = block;
 		DEBUG_ONLY(block->magic1 = MAGIC1);
