@@ -15,6 +15,18 @@
 #include <unistd.h>
 
 
+#ifdef TRACE
+#	undef TRACE
+#endif
+
+//#define TRACE_DATA_EDITOR
+#ifdef TRACE_DATA_EDITOR
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 class StateWatcher {
 	public:
 		StateWatcher(DataEditor &editor);
@@ -57,6 +69,45 @@ class ReplaceChange : public DataChange {
 
 
 //---------------------
+
+
+#ifdef TRACE_DATA_EDITOR
+
+#define DUMPED_BLOCK_SIZE 16
+
+void
+dump_block(const uint8 *buffer, int size, const char *prefix)
+{
+	for (int i = 0; i < size;) {
+		int start = i;
+
+		printf(prefix);
+		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (!(i % 4))
+				printf(" ");
+
+			if (i >= size)
+				printf("  ");
+			else
+				printf("%02x", *(unsigned char *)(buffer + i));
+		}
+		printf("  ");
+
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (i < size) {
+				char c = buffer[i];
+
+				if (c < 30)
+					printf(".");
+				else
+					printf("%c", c);
+			} else
+				break;
+		}
+		printf("\n");
+	}
+}
+#endif	// TRACE_DATA_EDITOR
 
 
 static int
@@ -166,6 +217,12 @@ ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 	if (size == 0)
 		return;
 
+#if TRACE_DATA_EDITOR
+	printf("Apply %p (buffer offset = %Ld):\n", this, bufferOffset);
+	dumpBlock(buffer + offset - bufferOffset, size, "old:");
+	dumpBlock(fNewData + dataOffset, size, "new:");
+#endif
+
 	// now we can safely exchange the buffer!
 	memcpy(fOldData + dataOffset, buffer + offset - bufferOffset, size);
 	memcpy(buffer + offset - bufferOffset, fNewData + dataOffset, size);
@@ -186,6 +243,12 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 	Normalize(bufferOffset, bufferSize, offset, dataOffset, size);
 	if (size == 0)
 		return;
+
+#ifdef TRACE_DATA_EDITOR
+	printf("Revert %p (buffer offset = %Ld):\n", this, bufferOffset);
+	dumpBlock(buffer + offset - bufferOffset, size, "old:");
+	dumpBlock(fOldData + dataOffset, size, "new:");
+#endif
 
 	// now we can safely revert the buffer!
 	memcpy(buffer + offset - bufferOffset, fOldData + dataOffset, size);
@@ -404,25 +467,25 @@ DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 void
 DataEditor::ApplyChanges()
 {
-	if (fLastChange == NULL)
+	if (fLastChange == NULL && fFirstChange == NULL)
 		return;
-
-	// ToDo: we need to support ascending *and* descending the list of changes
 
 	int32 firstIndex = fFirstChange != NULL ? fChanges.IndexOf(fFirstChange) + 1 : 0;
 	int32 lastIndex = fChanges.IndexOf(fLastChange);
 
 	if (fChangesFromSaved >= 0) {
 		// ascend changes
-		
+		TRACE(("ApplyChanges(): ascend from %ld to %ld\n", firstIndex, lastIndex));
+
 		for (int32 i = firstIndex; i <= lastIndex; i++) {
 			DataChange *change = fChanges.ItemAt(i);
 			change->Apply(fRealViewOffset, fView, fRealViewSize);
 		}
 	} else {
 		// descend changes
+		TRACE(("ApplyChanges(): descend from %ld to %ld\n", firstIndex - 1, lastIndex));
 
-		for (int32 i = firstIndex; i >= lastIndex; i--) {
+		for (int32 i = firstIndex - 1; i > lastIndex; i--) {
 			DataChange *change = fChanges.ItemAt(i);
 			change->Revert(fRealViewOffset, fView, fRealViewSize);
 		}
@@ -452,6 +515,11 @@ DataEditor::Save()
 		firstIndex = lastIndex;
 		lastIndex = temp;
 	}
+
+	if (firstIndex < 0)
+		firstIndex = 0;
+	if (lastIndex > fChanges.CountItems() - 1)
+		lastIndex = fChanges.CountItems();
 
 	// Collect ranges of data we need to write.
 
