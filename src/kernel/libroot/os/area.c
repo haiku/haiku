@@ -9,12 +9,10 @@
 
 
 area_id
-create_area(const char *name, void **start_addr, uint32 addr_spec, size_t size,
+create_area(const char *name, void **address, uint32 addressSpec, size_t size,
 	uint32 lock, uint32 protection)
 {
-	// ToDo: create_area: names don't match, but basic function does.
-	// Little work needed on addr_spec.
-	return sys_vm_create_anonymous_region(name, start_addr, addr_spec, size, lock, protection);
+	return _kern_create_area(name, address, addressSpec, size, lock, protection);
 }
 
 
@@ -45,7 +43,7 @@ area_for(void *addr)
 status_t
 delete_area(area_id id)
 {
-	return sys_vm_delete_region(id);
+	return _kern_delete_area(id);
 }
 
 

@@ -123,10 +123,10 @@ SYSCALL6(sys_stop_watching, 119)
 SYSCALL2(sys_stop_notifying, 120)
 
 /* VM calls */
-SYSCALL6(sys_vm_create_anonymous_region, 29)
+SYSCALL6(_kern_create_area, 29)
 SYSCALL6(sys_vm_clone_region, 30)
 SYSCALL9(sys_vm_map_file, 31)
-SYSCALL1(sys_vm_delete_region, 32)
+SYSCALL1(_kern_delete_area, 32)
 SYSCALL2(sys_vm_get_region_info, 33)
 SYSCALL1(sys_find_region_by_name, 34)
 SYSCALL1(sys_kill_team, 39)
