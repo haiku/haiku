@@ -1,5 +1,7 @@
 /*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -166,7 +168,7 @@ err_inv_device:
 	return;
 
 err_bus_busy:
-	SHOW_FLOW0( 3, "Bus busy" );
+	SHOW_FLOW0(3, "Bus busy");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_bus_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
@@ -175,7 +177,7 @@ err_bus_busy:
 	return;
 
 err_device_busy:
-	SHOW_FLOW0( 3, "Device busy" );
+	SHOW_FLOW0(3, "Device busy");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_device_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
@@ -184,7 +186,7 @@ err_device_busy:
 	return;
 
 err_disconnected:
-	SHOW_ERROR0( 3, "No controller anymore" );
+	SHOW_ERROR0(3, "No controller anymore");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_disconnected, (uint32)request);
 	request->subsys_status = SCSI_NO_HBA;
 	scsi->finished(request, 1);
@@ -617,12 +619,21 @@ ide_sim_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
 
 	SHOW_FLOW(2, "can_dma: %d", bus->can_DMA);
 
-	if (pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_CQ_ITEM, &bus->can_CQ, true) != B_OK)
-		// per default, command queuing is supported unless the driver
-		// reports problems (queuing should be transparent to
-		// controller, but for sure there is some buggy, over-optimizing
-		// controller out there)
-		bus->can_CQ = true;
+	if (bus->can_DMA) {
+		if (pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_CQ_ITEM, &bus->can_CQ, true) != B_OK) {
+			// per default, command queuing is supported unless the driver
+			// reports problems (queuing should be transparent to
+			// controller, but for sure there is some buggy, over-optimizing
+			// controller out there)
+			bus->can_CQ = true;
+		}
+	} else {
+		// I am not sure if it's a problem of the driver or the drive (probably the
+		// former), but we're generally disable command queueing in case of PIO
+		// transfers. Since those should be rare on a real system (as is CQ support
+		// in the drive), it's not really worth investigating, though.
+		bus->can_CQ = false;
+	}
 
 	res = pnp->load_driver(pnp->get_parent(node), bus, 
 			(pnp_driver_info **)&bus->controller, 
