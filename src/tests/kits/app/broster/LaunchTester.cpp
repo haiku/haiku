@@ -541,7 +541,12 @@ CommonLaunchTest10(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+// OBOS: We set the app hint for app type 2. There's no reason not to do it.
+#ifdef TEST_R5
 	CHK(BMimeType(appType2).IsInstalled() == false);
+#else
+	check_app_type(appType2, appFile1);
+#endif
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
@@ -1221,7 +1226,7 @@ CommonLaunchTest25(LaunchCaller &caller)
 					first: B_EXCLUSIVE_LAUNCH,
 					second: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY =>
 	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
-								{Message,Argv,Refs}Received()*, QuitRequested()
+								QuitRequested()
 					second app:	Launch() fails with B_ALREADY_RUNNING
 */
 static
