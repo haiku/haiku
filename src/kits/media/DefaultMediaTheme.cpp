@@ -532,7 +532,7 @@ ContinuousMessageFilter::ContinuousMessageFilter(BControl *control, BContinuousP
 	float value[fParameter.CountChannels()];
 	size_t size = sizeof(value);
 	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
-		ERROR("Could not get parameter value for %p\n", &parameter);
+		ERROR("ContinuousMessageFilter: Could not get value for continuous parameter %p (name '%s', node %d)\n", &parameter, parameter.Name(), parameter.Web()->Node().node);
 		return;
 	}
 
@@ -545,7 +545,7 @@ ContinuousMessageFilter::ContinuousMessageFilter(BControl *control, BContinuousP
 
 		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
 	} else
-		printf("unknown discrete parameter view\n");
+		ERROR("ContinuousMessageFilter: unknown continuous parameter view\n");
 }
 
 
@@ -575,10 +575,10 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 			value[i] = (float)(slider->ValueFor(i) / 1000.0);
 	}
 
-	printf("update view %s, %ld channels\n", control->Name(), fParameter.CountChannels());
+	TRACE("ContinuousMessageFilter::Filter: update view %s, %ld channels\n", control->Name(), fParameter.CountChannels());
 
 	if (fParameter.SetValue((void *)value, sizeof(value), system_time()) < B_OK) {
-		ERROR("Could not set parameter value for %p\n", &fParameter);
+		ERROR("ContinuousMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);
 		return B_DISPATCH_MESSAGE;
 	}
 
@@ -601,7 +601,7 @@ DiscreteMessageFilter::DiscreteMessageFilter(BControl *control, BDiscreteParamet
 	size_t size = sizeof(int32);
 	int32 value;
 	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
-		ERROR("Could not get parameter value for %p\n", &parameter);
+		ERROR("DiscreteMessageFilter: Could not get value for discrete parameter %p (name '%s', node %d)\n", &parameter, parameter.Name(), parameter.Web()->Node().node);
 		return;
 	}
 
@@ -610,7 +610,7 @@ DiscreteMessageFilter::DiscreteMessageFilter(BControl *control, BDiscreteParamet
 	} else if (BOptionPopUp *popUp = dynamic_cast<BOptionPopUp *>(control)) {
 		popUp->SelectOptionFor(value);
 	} else
-		printf("unknown discrete parameter view\n");
+		ERROR("DiscreteMessageFilter: unknown discrete parameter view\n");
 }
 
 
@@ -638,10 +638,10 @@ DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 		popUp->SelectedOption(NULL, &value);
 	}
 
-	printf("update view %s, value = %ld\n", control->Name(), value);
+	TRACE("DiscreteMessageFilter::Filter: update view %s, value = %ld\n", control->Name(), value);
 
 	if (fParameter.SetValue((void *)&value, sizeof(value), system_time()) < B_OK) {
-		ERROR("Could not set parameter value for %p\n", &fParameter);
+		ERROR("DiscreteMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);
 		return B_DISPATCH_MESSAGE;
 	}
 

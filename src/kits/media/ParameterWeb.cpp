@@ -1383,7 +1383,8 @@ BParameter::GetValue(void *buffer, size_t *_ioSize, bigtime_t *_when)
 		if (_when != NULL)
 			*_when = reply.last_change;
 	} else
-		ERROR("BParameter::GetValue querying node failed: %s\n", strerror(status));
+		ERROR("BParameter::GetValue parameter '%s' querying node %d, port %d failed: %s\n", 
+			mName, node.node, node.port, strerror(status));
 
 	if (area >= B_OK)
 		delete_area(area);
