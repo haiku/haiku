@@ -100,17 +100,15 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(newstring.String(), "") == 0);
 	delete str;
 
-	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
 #ifndef TEST_R5
+	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
 	//SetTo(char, int32) with excessive length:
 	NextSubTest();
 	str = new BString("dummy");
 	str->SetTo('C', OUT_OF_MEM_VAL);
 	CPPUNIT_ASSERT(strcmp(str->String(), "dummy") == 0);
 	delete str;
-#endif
 
-#ifndef TEST_R5
 	//SetTo(char*, int32) with excessive length:
 	NextSubTest();
 	str = new BString("dummy");

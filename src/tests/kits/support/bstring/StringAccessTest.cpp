@@ -23,12 +23,12 @@ StringAccessTest::PerformTest(void)
 	NextSubTest();
 	BString string("Something"B_UTF8_ELLIPSIS);
 	CPPUNIT_ASSERT(string.CountChars() == 10);
-	CPPUNIT_ASSERT(string.Length() == strlen(string.String()));
+	CPPUNIT_ASSERT((unsigned)string.Length() == strlen(string.String()));
 
 	NextSubTest();
 	BString string2("ABCD");
 	CPPUNIT_ASSERT(string2.CountChars() == 4);
-	CPPUNIT_ASSERT(string2.Length() == strlen(string2.String()));
+	CPPUNIT_ASSERT((unsigned)string2.Length() == strlen(string2.String()));
 
 	NextSubTest();
 	static char s[64];
@@ -36,7 +36,7 @@ StringAccessTest::PerformTest(void)
 	strcat(s, B_UTF8_SMILING_FACE);
 	BString string3(s);
 	CPPUNIT_ASSERT(string3.CountChars() == 2);	
-	CPPUNIT_ASSERT(string3.Length() == strlen(string3.String()));
+	CPPUNIT_ASSERT((unsigned)string3.Length() == strlen(string3.String()));
 	
 	//An empty string
 	NextSubTest();

@@ -23,7 +23,6 @@ MallocWriteTest::PerformTest(void)
 	
 	BMallocIO mem;	
 	ssize_t err;
-	off_t pos;
 	
 	NextSubTest();
 	err = mem.Write(writeBuf, 7);

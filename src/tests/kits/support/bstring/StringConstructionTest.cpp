@@ -32,7 +32,7 @@ StringConstructionTest::PerformTest(void)
 	NextSubTest();
 	string = new BString(str);
 	CPPUNIT_ASSERT(strcmp(string->String(), str) == 0);
-	CPPUNIT_ASSERT(string->Length() == strlen(str));
+	CPPUNIT_ASSERT((unsigned)string->Length() == strlen(str));
 	delete string;
 	
 	//BString(NULL)
@@ -61,7 +61,7 @@ StringConstructionTest::PerformTest(void)
 	NextSubTest();
 	string = new BString(str, 255);
 	CPPUNIT_ASSERT(strcmp(string->String(), str) == 0);
-	CPPUNIT_ASSERT(string->Length() == strlen(str));
+	CPPUNIT_ASSERT((unsigned)string->Length() == strlen(str));
 	delete string;	
 }
 
