@@ -53,7 +53,7 @@ status_t init_driver(void) {
    	   		
    	while (pci->get_nth_pci_info(i++,&dev_info) == 0) {
    		if (!((dev_info.class_base == PCI_network) && (dev_info.class_sub == PCI_ethernet)
-   		      && (dev_info.vendor_id == 0x14e4) && (dev_info.device_id == 0x4401)))
+   		      && (dev_info.vendor_id == 0x14e4) && ((dev_info.device_id == 0x4401) || (dev_info.device_id == 0x4402) || (dev_info.device_id == 0x170c))))
  					continue;
  	 	   		
  	 	if (cards_found >= 10)
