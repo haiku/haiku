@@ -176,9 +176,9 @@ bool ServerApp::PingTarget(void)
 	\brief Send a message to the ServerApp with no attachments
 	\param code ID code of the message to post
 */
-void ServerApp::PostMessage(int32 code)
+void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
 {
-	write_port(_receiver,code, NULL, 0);
+	write_port(_receiver,code, buffer, size);
 }
 
 /*!

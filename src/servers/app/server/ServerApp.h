@@ -67,7 +67,7 @@ public:
 	void Activate(bool value) { _isactive=value; }
 	bool PingTarget(void);
 	
-	void PostMessage(int32 code);
+	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
 protected:
 	friend AppServer;
 	void DispatchMessage(int32 code, int8 *buffer);

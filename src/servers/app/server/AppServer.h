@@ -33,7 +33,8 @@ public:
 	void DispatchMessage(int32 code, int8 *buffer);
 	void Broadcast(int32 code);
 	void HandleKeyMessage(int32 code, int8 *buffer);
-
+	ServerApp *FindApp(const char *sig);
+	
 	create_decorator *make_decorator;	// global function pointer
 private:
 	friend Decorator *instantiate_decorator(Layer *lay, const char *title, uint32 dflags, uint32 wlook);
