@@ -1,0 +1,18 @@
+SubDir  OBOS_TOP src libs zlib ;
+
+SharedLibrary z :
+	adler32.c
+	compress.c
+	crc32.c
+	deflate.c
+	gzio.c
+	infblock.c
+	infcodes.c
+	inffast.c
+	inflate.c
+	inftrees.c
+	infutil.c
+	trees.c
+	uncompr.c
+	zutil.c
+;
