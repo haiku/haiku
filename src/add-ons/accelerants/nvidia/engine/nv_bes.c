@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-7/2004 */
+/* Written by Rudolf Cornelissen 05/2002-9/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -543,7 +543,8 @@ status_t nv_configure_bes
 		}
 		break;
 	case NV30A:
-		/* GeForceFX series have a downscaling limit of 0.5 (except NV31!) */
+	case NV40A:
+		/* GeForceFX series and up have a downscaling limit of 0.5 (except NV31!) */
 		if ((hiscalv > (2 << 16)) && (si->ps.card_type != NV31))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */
@@ -634,7 +635,8 @@ status_t nv_configure_bes
 		}
 		break;
 	case NV30A:
-		/* GeForceFX series have a downscaling limit of 0.5 (except NV31!) */
+	case NV40A:
+		/* GeForceFX series and up have a downscaling limit of 0.5 (except NV31!) */
 		if ((viscalv > (2 << 16)) && (si->ps.card_type != NV31))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */

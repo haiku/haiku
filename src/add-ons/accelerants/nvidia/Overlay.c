@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-7/2004 */
+/* Written by Rudolf Cornelissen 05/2002-9/2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -449,7 +449,8 @@ status_t GET_OVERLAY_CONSTRAINTS
 			oc->v_scale.min = 1.0;
 			break;
 		case NV30A:
-			/* GeForceFX series have a new BES engine... */
+		case NV40A:
+			/* GeForceFX series and up have a new BES engine... */
 			oc->h_scale.min = 0.5;
 			oc->v_scale.min = 0.5;
 			/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!

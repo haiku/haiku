@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-7/2004.
+   Rudolf Cornelissen 8/2003-9/2004.
 
    This code was possible thanks to the Linux NV driver.
 */
@@ -492,8 +492,8 @@ status_t nv_acc_init()
 		return B_ERROR;
 	}
 
-	/* setup some extra stuff for NV30A */
-	if (si->ps.card_arch == NV30A)
+	/* setup some extra stuff for NV30A and later */
+	if (si->ps.card_arch >= NV30A)
 	{
 /*
 	fixme: Does not belong here (and not needed?)
@@ -532,6 +532,7 @@ status_t nv_acc_init()
 		break;
 	case NV20A:
 	case NV30A:
+	case NV40A:
 		/* location of active screen in framebuffer */
 		ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 		ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));

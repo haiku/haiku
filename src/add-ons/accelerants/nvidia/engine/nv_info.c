@@ -1431,6 +1431,7 @@ void fake_pins(void)
 			pinsnv20_arch_fake();
 			break;
 		case NV30A:
+		case NV40A:
 			pinsnv30_arch_fake();
 			break;
 		default:
