@@ -1143,28 +1143,6 @@ void ServerWindow::DispatchMessage(int32 code)
 		
 			break;
 		}
-		case AS_LAYER_SET_HIGH_COLOR:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			rgb_color c;
-			
-			fSession->Read(&c, sizeof(rgb_color));
-			
-			cl->fLayerData->highcolor.SetColor(c);
-
-			break;
-		}
-		case AS_LAYER_SET_LOW_COLOR:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			rgb_color c;
-			
-			fSession->Read(&c, sizeof(rgb_color));
-			
-			cl->fLayerData->lowcolor.SetColor(c);
-			
-			break;
-		}
 		case AS_LAYER_SET_VIEW_COLOR:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
@@ -1688,6 +1666,28 @@ void ServerWindow::DispatchMessage(int32 code)
 		// -------------------- Graphics messages ----------------------------------
 		
 		
+		case AS_LAYER_SET_HIGH_COLOR:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			rgb_color c;
+			
+			fSession->Read(&c, sizeof(rgb_color));
+			
+			cl->fLayerData->highcolor.SetColor(c);
+
+			break;
+		}
+		case AS_LAYER_SET_LOW_COLOR:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			rgb_color c;
+			
+			fSession->Read(&c, sizeof(rgb_color));
+			
+			cl->fLayerData->lowcolor.SetColor(c);
+			
+			break;
+		}
 		case AS_STROKE_LINE:
 		{
 			// TODO: Add clipping TO AS_STROKE_LINE
@@ -1707,7 +1707,181 @@ void ServerWindow::DispatchMessage(int32 code)
 			}
 			break;
 		}
+		case AS_STROKE_RECT:
+		{
+			// TODO: Add clipping TO AS_STROKE_RECT
+			float left, top, right, bottom;
+			fSession->Read<float>(&left);
+			fSession->Read<float>(&top);
+			fSession->Read<float>(&right);
+			fSession->Read<float>(&bottom);
+			BRect rect(left,top,right,bottom);
 
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->StrokeRect(cl->ConvertToTop(rect),cl->fLayerData);
+		}
+		case AS_FILL_RECT:
+		{
+			// TODO: Add clipping TO AS_STROKE_RECT
+			BRect rect;
+			fSession->Read<BRect>(&rect);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rect),cl->fLayerData);
+		}
+		case AS_STROKE_ARC:
+		{
+			// TODO: Add clipping to AS_STROKE_ARC
+			float angle, span;
+			BRect r;
+			
+			fSession->Read<BRect>(&r);
+			fSession->Read<float>(&angle);
+			fSession->Read<float>(&span);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->StrokeArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
+			break;
+		}
+		case AS_FILL_ARC:
+		{
+			// TODO: Add clipping to AS_STROKE_ARC
+			float angle, span;
+			BRect r;
+			
+			fSession->Read<BRect>(&r);
+			fSession->Read<float>(&angle);
+			fSession->Read<float>(&span);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->FillArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
+			break;
+		}
+		case AS_STROKE_BEZIER:
+		{
+			// TODO: Add clipping to AS_STROKE_BEZIER
+			BPoint *pts;
+			int i;
+			pts = new BPoint[4];
+			
+			for (i=0; i<4; i++)
+				fSession->Read<BPoint>(&(pts[i]));
+			
+			if (cl && cl->fLayerData)
+			{
+				for (i=0; i<4; i++)
+					pts[i]=cl->ConvertToTop(pts[i]);
+				
+				desktop->GetDisplayDriver()->StrokeBezier(pts,cl->fLayerData);
+			}
+			delete [] pts;
+			break;
+		}
+		case AS_FILL_BEZIER:
+		{
+			// TODO: Add clipping to AS_STROKE_BEZIER
+			BPoint *pts;
+			int i;
+			pts = new BPoint[4];
+			
+			for (i=0; i<4; i++)
+				fSession->Read<BPoint>(&(pts[i]));
+			
+			if (cl && cl->fLayerData)
+			{
+				for (i=0; i<4; i++)
+					pts[i]=cl->ConvertToTop(pts[i]);
+				
+				desktop->GetDisplayDriver()->FillBezier(pts,cl->fLayerData);
+			}
+			delete [] pts;
+			break;
+		}
+		case AS_STROKE_ELLIPSE:
+		{
+			// TODO: Add clipping AS_STROKE_ELLIPSE
+			BRect rect;
+			fSession->Read<BRect>(&rect);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->StrokeEllipse(cl->ConvertToTop(rect),cl->fLayerData);
+			break;
+		}
+		case AS_FILL_ELLIPSE:
+		{
+			// TODO: Add clipping AS_STROKE_ELLIPSE
+			BRect rect;
+			fSession->Read<BRect>(&rect);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->FillEllipse(cl->ConvertToTop(rect),cl->fLayerData);
+			break;
+		}
+		case AS_STROKE_ROUNDRECT:
+		{
+			// TODO: Add clipping AS_STROKE_ROUNDRECT
+			BRect rect;
+			float xrad,yrad;
+			fSession->Read<BRect>(&rect);
+			fSession->Read<float>(&xrad);
+			fSession->Read<float>(&yrad);
+			
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->StrokeRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
+			break;
+		}
+		case AS_FILL_ROUNDRECT:
+		{
+			// TODO: Add clipping AS_STROKE_ROUNDRECT
+			BRect rect;
+			float xrad,yrad;
+			fSession->Read<BRect>(&rect);
+			fSession->Read<float>(&xrad);
+			fSession->Read<float>(&yrad);
+			
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->FillRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
+			break;
+		}
+		case AS_STROKE_TRIANGLE:
+		{
+			// TODO:: Add clipping to AS_STROKE_TRIANGLE
+			BPoint pts[3];
+			BRect rect;
+			
+			for (int i=0; i<3; i++)
+				fSession->Read<BPoint>(&(pts[i]));
+			
+			fSession->Read<BRect>(&rect);
+			
+			if (cl && cl->fLayerData)
+			{
+				for(int i=0;i<3;i++)
+					pts[i]=cl->ConvertToTop(pts[i]);
+				
+				// TODO: modify DisplayDriver::StrokeTriangle to utilize a boundary BRect
+				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->fLayerData);
+//				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+			}
+			break;
+		}
+		case AS_FILL_TRIANGLE:
+		{
+			// TODO:: Add clipping to AS_FILL_TRIANGLE
+			BPoint pts[3];
+			BRect rect;
+			
+			for (int i=0; i<3; i++)
+				fSession->Read<BPoint>(&(pts[i]));
+			
+			fSession->Read<BRect>(&rect);
+			
+			if (cl && cl->fLayerData)
+			{
+				for(int i=0;i<3;i++)
+					pts[i]=cl->ConvertToTop(pts[i]);
+				
+				// TODO: modify DisplayDriver::FillTriangle to utilize a boundary BRect
+				desktop->GetDisplayDriver()->FillTriangle(pts,cl->fLayerData);
+//				desktop->GetDisplayDriver()->FillTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+			}
+			break;
+		}
 		default:
 		{
 			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), code - SERVER_TRUE);
@@ -1777,174 +1951,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		
 		switch (code)
 		{
-			case AS_SET_HIGH_COLOR:
-			{
-				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
-				{
-					uint8 r, g, b, a;
-					r = read_from_buffer<uint8>(&msgbuffer);
-					g = read_from_buffer<uint8>(&msgbuffer);
-					b = read_from_buffer<uint8>(&msgbuffer);
-					a = read_from_buffer<uint8>(&msgbuffer);
-					if (layerdata)
-						layerdata->highcolor.SetColor(r,g,b,a);
-					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_SET_LOW_COLOR:
-			{
-				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
-				{
-					uint8 r, g, b, a;
-					r = read_from_buffer<uint8>(&msgbuffer);
-					g = read_from_buffer<uint8>(&msgbuffer);
-					b = read_from_buffer<uint8>(&msgbuffer);
-					a = read_from_buffer<uint8>(&msgbuffer);
-					if (layerdata)
-						layerdata->lowcolor.SetColor(r,g,b,a);
-					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_SET_VIEW_COLOR:
-			{
-				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
-				{
-					uint8 r, g, b, a;
-					r = read_from_buffer<uint8>(&msgbuffer);
-					g = read_from_buffer<uint8>(&msgbuffer);
-					b = read_from_buffer<uint8>(&msgbuffer);
-					a = read_from_buffer<uint8>(&msgbuffer);
-					if (layerdata)
-						layerdata->viewcolor.SetColor(r,g,b,a);
-					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_STROKE_ARC:
-			{
-				// TODO: Add clipping to AS_STROKE_ARC
-				if (sizeRemaining >= AS_STROKE_ARC_MSG_SIZE)
-				{
-					float left, top, right, bottom, angle, span;
-					int8 *pattern;
-					
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					angle = read_from_buffer<float>(&msgbuffer);
-					span = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
-					sizeRemaining -= AS_STROKE_ARC_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_STROKE_BEZIER:
-			{
-				// TODO: Add clipping to AS_STROKE_BEZIER
-				if (sizeRemaining >= AS_STROKE_BEZIER_MSG_SIZE)
-				{
-					BPoint *pts;
-					int8 *pattern;
-					int i;
-					pts = new BPoint[4];
-					for (i=0; i<4; i++)
-					{
-						pts[i].x = read_from_buffer<float>(&msgbuffer);
-						pts[i].y = read_from_buffer<float>(&msgbuffer);
-					}
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeBezier(pts,layerdata,pattern);
-					delete[] pts;
-					sizeRemaining -= AS_STROKE_BEZIER_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_STROKE_ELLIPSE:
-			{
-				// TODO: Add clipping AS_STROKE_ELLIPSE
-				if (sizeRemaining >= AS_STROKE_ELLIPSE_MSG_SIZE)
-				{
-					float left, top, right, bottom;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeEllipse(rect,layerdata,pattern);
-					sizeRemaining -= AS_STROKE_ELLIPSE_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_STROKE_LINE:
-			{
-				// TODO: Add clipping TO AS_STROKE_LINE
-				if (sizeRemaining >= AS_STROKE_LINE_MSG_SIZE)
-				{
-					float x1, y1, x2, y2;
-					int8 *pattern;
-					x1 = read_from_buffer<float>(&msgbuffer);
-					y1 = read_from_buffer<float>(&msgbuffer);
-					x2 = read_from_buffer<float>(&msgbuffer);
-					y2 = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-//					BPoint p1(x1,y1);
-//					BPoint p2(x2,y2);
-					
-					// TODO: This printf should remain in place to until it actually gets printed
-					// while testing with a test app which calls StrokeLine()
-					printf("AS_STROKE_LINE\n");
-					
-//					if (cl && cl->fLayerData)
-//						desktop->GetDisplayDriver()->StrokeLine(p1,p2,cl->fLayerData);
-					sizeRemaining -= AS_STROKE_LINE_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
 			case AS_STROKE_LINEARRAY:
 			{
 				// TODO: Implement AS_STROKE_LINEARRAY
@@ -1955,169 +1961,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				// TODO: Implement AS_STROKE_POLYGON
 				break;
 			}
-			case AS_STROKE_RECT:
-			{
-				// TODO: Add clipping TO AS_STROKE_RECT
-				if (sizeRemaining >= AS_STROKE_RECT_MSG_SIZE)
-				{
-					float left, top, right, bottom;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeRect(rect,layerdata,pattern);
-					sizeRemaining -= AS_STROKE_RECT_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_STROKE_ROUNDRECT:
-			{
-				// TODO: Add clipping AS_STROKE_ROUNDRECT
-				if (sizeRemaining >= AS_STROKE_ROUNDRECT_MSG_SIZE)
-				{
-					float left, top, right, bottom, xrad, yrad;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					xrad = read_from_buffer<float>(&msgbuffer);
-					yrad = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
-					sizeRemaining -= AS_STROKE_ROUNDRECT_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
 			case AS_STROKE_SHAPE:
 			{
 				// TODO: Implement AS_STROKE_SHAPE
-				break;
-			}
-			case AS_STROKE_TRIANGLE:
-			{
-				// TODO:: Add clipping to AS_STROKE_TRIANGLE
-				if (sizeRemaining >= AS_STROKE_TRIANGLE_MSG_SIZE)
-				{
-					BPoint *pts;
-					int8 *pattern;
-					float left, top, right, bottom;
-					int i;
-					pts = new BPoint[3];
-					for (i=0; i<3; i++)
-					{
-						pts[i].x = read_from_buffer<float>(&msgbuffer);
-						pts[i].y = read_from_buffer<float>(&msgbuffer);
-					}
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
-					delete[] pts;
-					sizeRemaining -= AS_STROKE_TRIANGLE_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_FILL_ARC:
-			{
-				// TODO:: Add clipping to AS_FILL_ARC
-				if (sizeRemaining >= AS_FILL_ARC_MSG_SIZE)
-				{
-					float left, top, right, bottom, angle, span;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					angle = read_from_buffer<float>(&msgbuffer);
-					span = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->FillArc(rect,angle,span,layerdata,pattern);
-					sizeRemaining -= AS_FILL_ARC_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_FILL_BEZIER:
-			{
-				// TODO:: Add clipping to AS_FILL_BEZIER
-				if (sizeRemaining >= AS_FILL_BEZIER_MSG_SIZE)
-				{
-					BPoint *pts;
-					int8 *pattern;
-					int i;
-					pts = new BPoint[4];
-					for (i=0; i<4; i++)
-					{
-						pts[i].x = read_from_buffer<float>(&msgbuffer);
-						pts[i].y = read_from_buffer<float>(&msgbuffer);
-					}
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//if (layerdata)
-						//fServerApp->_driver->FillBezier(pts,layerdata,pattern);
-					delete[] pts;
-					sizeRemaining -= AS_FILL_BEZIER_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
-			case AS_FILL_ELLIPSE:
-			{
-				// TODO:: Add clipping to AS_FILL_ELLIPSE
-				if (sizeRemaining >= AS_FILL_ELLIPSE_MSG_SIZE)
-				{
-					float left, top, right, bottom;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->FillEllipse(rect,layerdata,pattern);
-					sizeRemaining -= AS_FILL_ELLIPSE_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
 				break;
 			}
 			case AS_FILL_POLYGON:
@@ -2125,105 +1971,14 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				// TODO: Implement AS_FILL_POLYGON
 				break;
 			}
-			case AS_FILL_RECT:
-			{
-				if (sizeRemaining >= AS_FILL_RECT_MSG_SIZE)
-				{
-					float left, top, right, bottom;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					
-//					BRect rect(left,top,right,bottom);
-//					if (layerdata && numRects)
-//						if (numRects == 1)
-//							fServerApp->_driver->FillRect(rect,layerdata,pattern);
-//						else
-//						{
-//							int i;
-//							for (i=0; i<numRects; i++)
-//								fServerApp->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
-//						}
-					
-					sizeRemaining -= AS_FILL_RECT_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
 			case AS_FILL_REGION:
 			{
 				// TODO: Implement AS_FILL_REGION
 				break;
 			}
-			case AS_FILL_ROUNDRECT:
-			{
-				// TODO: Add clipping to AS_FILL_ROUNDRECT
-				if (sizeRemaining >= AS_FILL_ROUNDRECT_MSG_SIZE)
-				{
-					float left, top, right, bottom, xrad, yrad;
-					int8 *pattern;
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					xrad = read_from_buffer<float>(&msgbuffer);
-					yrad = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
-					sizeRemaining -= AS_FILL_ROUNDRECT_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
-				break;
-			}
 			case AS_FILL_SHAPE:
 			{
 				// TODO: Implement AS_FILL_SHAPE
-				break;
-			}
-			case AS_FILL_TRIANGLE:
-			{
-				// TODO: Add clipping to AS_FILL_TRIANGLE
-				if (sizeRemaining >= AS_FILL_TRIANGLE_MSG_SIZE)
-				{
-					BPoint *pts;
-					int8 *pattern;
-					float left, top, right, bottom;
-					int i;
-					pts = new BPoint[3];
-					for (i=0; i<3; i++)
-					{
-						pts[i].x = read_from_buffer<float>(&msgbuffer);
-						pts[i].y = read_from_buffer<float>(&msgbuffer);
-					}
-					left = read_from_buffer<float>(&msgbuffer);
-					top = read_from_buffer<float>(&msgbuffer);
-					right = read_from_buffer<float>(&msgbuffer);
-					bottom = read_from_buffer<float>(&msgbuffer);
-					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BRect rect(left,top,right,bottom);
-					//if (layerdata)
-						//fServerApp->_driver->FillTriangle(pts,rect,layerdata,pattern);
-					delete[] pts;
-					sizeRemaining -= AS_FILL_TRIANGLE_MSG_SIZE;
-				}
-				else
-				{
-					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
-					sizeRemaining = 0;
-				}
 				break;
 			}
 			case AS_MOVEPENBY:
@@ -2256,10 +2011,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				// TODO: Implement AS_SET_FONT_SIZE
 				break;
 			}
-			
-			// graphics messages
-			
-			
 			default:
 			{
 				sizeRemaining -= sizeof(int32);
