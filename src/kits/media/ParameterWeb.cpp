@@ -801,47 +801,26 @@ BParameterGroup::BParameterGroup(BParameterWeb *web,
 
 BParameterGroup::~BParameterGroup()
 {
-	int i;
-
-	int NumItems;
-	void **Items;
-
-	if(mControls != NULL)
-	{
-		NumItems = mControls->CountItems();
-		Items = static_cast<void **>(mControls->Items());
-
-		for(i = 0; i < NumItems; i++)
-		{
-			if(Items[i] != NULL)
-			{
-				delete Items[i];
-				Items[i] = NULL;
-			}
-		}
-	}
-	
-	if(mGroups != NULL)
-	{
-		NumItems = mGroups->CountItems();
-		Items = static_cast<void **>(mControls->Items());
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			if(Items[i] != NULL)
-			{
-				delete Items[i];
-				Items[i] = NULL;
-			}
-		}
+	if (mControls) {
+		int count = mControls->CountItems();
+		BParameter **items = reinterpret_cast<BParameter **>(mControls->Items());
+		for (int i = 0; i < count; i++)
+			delete items[i];
+		delete mControls;
+		DEBUG_ONLY(mControls = 0);
 	}
 
-	if(mName != NULL)
-	{
-		delete[] mName;
-		mName = NULL;
+	if (mGroups) {
+		int count = mGroups->CountItems();
+		BParameterGroup **items = reinterpret_cast<BParameterGroup **>(mGroups->Items());
+		for (int i = 0; i < count; i++)
+			delete items[i];
+		delete mGroups;
+		DEBUG_ONLY(mGroups = 0);
 	}
-	
+
+	delete [] mName;
+	DEBUG_ONLY(mName = 0);
 }
 
 /*************************************************************
