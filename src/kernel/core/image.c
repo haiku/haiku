@@ -12,6 +12,7 @@
 #include <lock.h>
 #include <thread.h>
 #include <team.h>
+#include <user_debugger.h>
 
 #include <malloc.h>
 #include <string.h>
@@ -58,6 +59,13 @@ register_image(struct team *team, image_info *_info, size_t size)
 
 	mutex_unlock(&sImageMutex);
 
+	// notify the debugger
+	_info->id = id;
+	user_debug_image_created(_info);
+		// ToDo: Is this too early? Not even the loader knows about the
+		// image (ID) yet. We should probably introduce another syscall, the
+		// loader can invoke just before calling the image's init function.
+
 	TRACE(("register_image(team = %p, image id = %ld, image = %p\n", team, id, image));
 	return id;
 }
@@ -77,13 +85,19 @@ unregister_image(struct team *team, image_id id)
 	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 		if (image->info.id == id) {
 			list_remove_link(image);
-			free(image);
 			status = B_OK;
 			break;
 		}
 	}
 
 	mutex_unlock(&sImageMutex);
+
+	if (status == B_OK) {
+		// notify the debugger
+		user_debug_image_deleted(&image->info);
+
+		free(image);
+	}
 
 	return status;
 }
