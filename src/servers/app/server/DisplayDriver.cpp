@@ -609,6 +609,15 @@ uint16 DisplayDriver::GetWidth(void)
 }
 
 /*!
+	\brief Returns the number of bytes used in each row of the frame buffer
+	\return The number of bytes used in each row of the frame buffer
+*/
+uint32 DisplayDriver::GetBytesPerRow(void)
+{
+	return _bytes_per_row;
+}
+
+/*!
 	\brief Returns the screen mode constant in use by the driver
 	\return Current screen mode
 */
@@ -697,6 +706,19 @@ void DisplayDriver::_SetWidth(uint16 w)
 void DisplayDriver::_SetMode(int32 m)
 {
 	_buffer_mode=m;
+}
+
+/*!
+	\brief Internal row size-setting function
+	\param bpr Number of bytes per row in the frame buffer
+
+	_SetBytesPerRow must be called from within any implementation of SetMode. Note that this
+	does not actually change the size of the row; it just updates the state variable used
+	to talk with the outside world.
+*/
+void DisplayDriver::_SetBytesPerRow(uint32 bpr)
+{
+	_bytes_per_row=bpr;
 }
 
 /*!

@@ -27,6 +27,7 @@
 #include "DisplayDriver.h"
 #include "Desktop.h"
 #include "DesktopClasses.h"
+#include "ServerConfig.h"
 
 #include "ViewDriver.h"
 
@@ -112,7 +113,7 @@ void InitDesktop(void)
 		// TODO: figure out how to load the workspace data and do it here.
 		// For now, we'll just use 3 workspaces.
 		
-		Screen *s=new Screen(tdriver,3);
+		s=new Screen(tdriver,3);
 		desktop_private::screenlist->AddItem(s);
 	}
 	else
@@ -292,7 +293,7 @@ screen_id ActiveScreen(void)
 */
 DisplayDriver *GetGfxDriver(screen_id screen=B_MAIN_SCREEN_ID)
 {
-	return NULL;
+	return (desktop_private::activescreen)?desktop_private::activescreen->GetGfxDriver():NULL;
 }
 
 /*!

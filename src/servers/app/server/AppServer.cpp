@@ -30,13 +30,18 @@
 #include "DisplayDriver.h"
 #include "PortLink.h"
 #include "ServerApp.h"
-#include "ServerConfig.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
 #include "DefaultDecorator.h"
+#include "RGBColor.h"
 
+// Globals
+
+//! Used to access the app_server from new_decorator
 AppServer *app_server=NULL;
 
+//! Default background color for workspaces
+RGBColor workspace_default_color(51,102,160);
 /*!
 	\brief Constructor
 	
@@ -44,6 +49,9 @@ AppServer *app_server=NULL;
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
 AppServer::AppServer(void)
+#if DISPLAYDRIVER != HWDRIVER
+ : BApplication (SERVER_SIGNATURE)
+#endif
 {
 	_mouseport=create_port(100,SERVER_INPUT_PORT);
 	_messageport=create_port(100,SERVER_PORT_NAME);
@@ -196,9 +204,12 @@ int32 AppServer::PollerThread(void *data)
 					index+=sizeof(float);
 					tempy=*((float*)index);
 					index+=sizeof(float);
-
-					appserver->_driver->MoveCursorTo(tempx,tempy);
-					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					
+					if(appserver->_driver)
+					{
+						appserver->_driver->MoveCursorTo(tempx,tempy);
+						ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					}
 					break;
 				}
 				case B_KEY_DOWN:
@@ -259,10 +270,14 @@ int32 AppServer::PicassoThread(void *data)
 	return 0;
 }
 
-//! The call that starts it all...
-void AppServer::Run(void)
+/*!
+	\brief The call that starts it all...
+	\return Always 0
+*/
+thread_id AppServer::Run(void)
 {
 	MainLoop();
+	return 0;
 }
 
 

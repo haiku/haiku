@@ -21,11 +21,10 @@
 //
 //	File Name:		RootLayer.cpp
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//				DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:		Implements the RootLayer class
+//					DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	Class used for the top layer of each workspace's Layer tree
 //  
 //------------------------------------------------------------------------------
-
 #include <View.h>
 #include "RootLayer.h"
 #include "Desktop.h"
@@ -39,6 +38,8 @@ RootLayer::RootLayer(BRect rect, const char *layername)
 	: Layer(rect,layername,B_FOLLOW_NONE,0, NULL)
 {
 	_driver=GetGfxDriver();
+	_invalid=new BRegion(Bounds());
+	_is_dirty=true;
 }
 
 /*!
@@ -65,7 +66,7 @@ void RootLayer::RequestDraw(const BRect &r)
 */
 void RootLayer::RequestDraw(void)
 {
-	if(!_invalid)
+	if(!_is_dirty)
 		return;
 	
 	// Redraw the base
@@ -108,18 +109,44 @@ RGBColor RootLayer::GetColor(void) const
 	return _layerdata->lowcolor;
 }
 
-/*!
-	\brief Empty function to disable moving the RootLayer
-*/
+//! Empty function to disable moving the RootLayer
 void RootLayer::MoveBy(float x, float y)
 {
 }
 
-/*!
-	\brief Empty function to disable moving the RootLayer
-*/
+//! Empty function to disable moving the RootLayer
 void RootLayer::MoveBy(BPoint pt)
 {
+}
+
+//! Reimplemented for RootLayer special case
+void RootLayer::ResizeBy(float x, float y)
+{
+	BRect oldframe=_frame;
+	_frame.right+=x;
+	_frame.bottom+=y;
+
+	// We'll need to rebuild the regions of the child layers
+	// because resizing will affect the visible regions
+	RebuildRegions(true);
+	
+	// If we've gotten bigger, we'll need to repaint the new areas
+	if(x>0)
+	{
+		BRect dx(oldframe.right,oldframe.top, _frame.right, _frame.bottom);
+		Invalidate(dx);
+	}
+	if(y>0)
+	{
+		BRect dy(oldframe.left,oldframe.bottom, _frame.right, _frame.bottom);
+		Invalidate(dy);
+	}
+}
+
+//! Reimplemented for RootLayer special case
+void RootLayer::ResizeBy(BPoint pt)
+{
+	ResizeBy(pt.x,pt.y);
 }
 
 /*!

@@ -21,8 +21,8 @@
 //
 //	File Name:		RootLayer.h
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//				DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:		Implements the RootLayer class
+//					DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	Class used for the top layer of each workspace's Layer tree
 //  
 //------------------------------------------------------------------------------
 #ifndef _ROOTLAYER_H_
@@ -40,6 +40,8 @@ public:
 	void RequestDraw(const BRect &r);
 	void MoveBy(float x, float y);
 	void MoveBy(BPoint pt);
+	void ResizeBy(float x, float y);
+	void ResizeBy(BPoint pt);
 	void SetDriver(DisplayDriver *driver);
 	void SetColor(const RGBColor &col);
 	RGBColor GetColor(void) const;

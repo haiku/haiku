@@ -21,6 +21,7 @@
 //
 //	File Name:		ScreenDriver.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	BWindowScreen graphics module
 //  
 //------------------------------------------------------------------------------

@@ -24,6 +24,9 @@
 //	Description:	BView/BWindow combination graphics module
 //  
 //------------------------------------------------------------------------------
+
+// TODO: Update this to have GetMode, GetWidth, etc return the proper values
+
 #include <stdio.h>
 #include <iostream.h>
 #include <Message.h>
@@ -202,7 +205,7 @@ void VDView::MouseUp(BPoint pt)
 }
 
 VDWindow::VDWindow(void)
-	: BWindow(BRect(100,60,740,540),"OBOS App Server, P7",B_TITLED_WINDOW,
+	: BWindow(BRect(100,60,740,540),"OpenBeOS App Server",B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	view=new VDView(Bounds());

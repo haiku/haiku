@@ -21,15 +21,10 @@
 //
 //	File Name:		DesktopClasses.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//				Gabe Yoder <gyoder@stny.rr.com>
-//	Description:		Implements the Screen class which provides all
-//				infrastructure for handling a video card/monitor
-//				pair.
-//				Implements the Workspace class which provides all
-//				infrastructure for drawing the screen.
+//					Gabe Yoder <gyoder@stny.rr.com>
+//	Description:	Classes for managing workspaces and screens
 //  
 //------------------------------------------------------------------------------
-
 #ifndef DESKTOPCLASSES_H
 #define DESKTOPCLASSES_H
 
@@ -88,7 +83,7 @@ protected:
 	int32 _workspacecount;
 	BList *_workspacelist;
 	DisplayDriver *_driver;
-	bool _init;
+	bool _init, _active;
 	Workspace *_activeworkspace;
 	graphics_card_info _gcinfo;
 	frame_buffer_info _fbinfo;

@@ -29,6 +29,7 @@
 
 #include <OS.h>
 #include <List.h>
+#include <Locker.h>
 
 /*!
 	\class TokenHandler TokenHandler.h
@@ -46,7 +47,7 @@ public:
 	bool IsExclude(int32 value);
 private:
 	int32 _index;
-	sem_id _lock;
+	BLocker _lock;
 	BList *_excludes;
 };
 

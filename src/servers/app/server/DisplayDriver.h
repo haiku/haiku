@@ -145,6 +145,7 @@ public:
 	uint8 GetDepth(void);
 	uint16 GetHeight(void);
 	uint16 GetWidth(void);
+	uint32 GetBytesPerRow(void);
 	int32 GetMode(void);
 	bool IsCursorObscured(bool state);
 
@@ -155,6 +156,7 @@ protected:
 	void _SetHeight(uint16 h);
 	void _SetWidth(uint16 w);
 	void _SetMode(int32 m);
+	void _SetBytesPerRow(uint32 bpr);
 	ServerCursor *_GetCursor(void);
 
 private:
@@ -163,6 +165,7 @@ private:
 	uint16 _buffer_width;
 	uint16 _buffer_height;
 	int32 _buffer_mode;
+	uint32 _bytes_per_row;
 	bool _is_cursor_hidden;
 	bool _is_cursor_obscured;
 	ServerCursor *_cursor;

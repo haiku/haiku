@@ -30,8 +30,6 @@
 TokenHandler::TokenHandler(void)
 {
 	_index=-1;
-	_lock=create_sem(1,"tokenhandler_sem");
-	
 	_excludes=new BList(0);
 }
 
@@ -39,7 +37,6 @@ TokenHandler::TokenHandler(void)
 TokenHandler::~TokenHandler(void)
 {
 	ResetExcludes();
-	delete_sem(_lock);
 	delete _excludes;
 }
 
@@ -53,13 +50,13 @@ int32 TokenHandler::GetToken(void)
 {
 	int32 value;
 
-	acquire_sem(_lock);
+	_lock.Lock();
 
 	_index++;
 	while(IsExclude(_index))
 		_index++;
 	value=_index;
-	release_sem(_lock);
+	_lock.Unlock();
 	return value;
 }
 
@@ -70,25 +67,25 @@ int32 TokenHandler::GetToken(void)
 */
 void TokenHandler::ExcludeValue(int32 value)
 {
-	acquire_sem(_lock);
+	_lock.Lock();
 
 	if(!IsExclude(value))
 		_excludes->AddItem(new int32(value));
-	release_sem(_lock);
+	_lock.Unlock();
 }
 
 //! Resets the token index
 void TokenHandler::Reset(void)
 {
-	acquire_sem(_lock);
+	_lock.Lock();
 	_index=-1;
-	release_sem(_lock);
+	_lock.Unlock();
 }
 
 //! Empties object of all assigned excluded values
 void TokenHandler::ResetExcludes(void)
 {
-	acquire_sem(_lock);
+	_lock.Lock();
 	int32 *temp;
 	for(int32 i=0; i<_excludes->CountItems();i++)
 	{
@@ -97,7 +94,7 @@ void TokenHandler::ResetExcludes(void)
 			delete temp;
 	}
 	_excludes->MakeEmpty();
-	release_sem(_lock);
+	_lock.Unlock();
 }
 
 /*!
@@ -110,7 +107,7 @@ bool TokenHandler::IsExclude(int32 value)
 	bool match=false;
 	int32 *temp;
 	
-	acquire_sem(_lock);
+	_lock.Lock();
 	for(int32 i=0;i<_excludes->CountItems();i++)
 	{
 		temp=(int32*)_excludes->ItemAt(i);
@@ -120,6 +117,6 @@ bool TokenHandler::IsExclude(int32 value)
 			break;
 		}
 	}
-	delete_sem(_lock);
+	_lock.Unlock();
 	return match;
 }

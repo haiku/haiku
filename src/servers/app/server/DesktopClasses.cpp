@@ -21,16 +21,14 @@
 //
 //	File Name:		DesktopClasses.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//				Gabe Yoder <gyoder@stny.rr.com>
-//	Description:		Implements the Screen class which provides all
-//				infrastructure for handling a video card/monitor
-//				pair.
-//				Implements the Workspace class which provides all
-//				infrastructure for drawing the screen.
+//					Gabe Yoder <gyoder@stny.rr.com>
+//	Description:	Classes for managing workspaces and screens
 //  
 //------------------------------------------------------------------------------
-
 #include "DesktopClasses.h"
+
+// Defined and initialized in AppServer.cpp
+extern RGBColor workspace_default_color;
 
 /*!
 	\brief Sets up internal variables needed by the Workspace
@@ -42,14 +40,8 @@ Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &
 	_gcinfo=gcinfo;
 	_fbinfo=fbinfo;
 	
-	//TODO: create the root layer here based on gcinfo and fbinfo.
-	_rootlayer=NULL;
-
-	/* From Docs
-     1) Set background color to RGB(51,102,160)
-2) Copy frame_buffer_info and graphics_card_info structure values
-3) Create a RootLayer object using the values from the two structures
-     */
+	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1), "Workspace Root");
+	_rootlayer->SetColor(workspace_default_color);
 }
 
 /*!
@@ -99,13 +91,16 @@ RootLayer *Workspace::GetRoot(void)
 */
 void Workspace::SetData(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo)
 {
+	if(_fbinfo.display_width!=fbinfo.display_width || 
+		_fbinfo.display_height!=fbinfo.display_height)
+	{
+		// We won't need to invalidate the new regions as mentioned in the original implementation
+		// docs because RootLayer reimplements ResizeBy to handle this
+		_rootlayer->ResizeBy( (fbinfo.display_width-_fbinfo.display_width),
+			(fbinfo.display_height-_fbinfo.display_height) );
+	}
 	_gcinfo=gcinfo;
 	_fbinfo=fbinfo;
-	/* From Docs:
-     1) Copy the two structures to the internal one
-2) Resize the RootLayer
-3) If the RootLayer was resized larger, Invalidate the new areas
-*/
 }
 
 /*!
@@ -126,30 +121,43 @@ void Workspace::GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo)
 */
 Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 {
-	int i;
-
 	_workspacelist=NULL;
+	_driver=gfxmodule;
 	_resolution=0;
 	_activewin=NULL;
 	_currentworkspace=-1;
 	_activeworkspace=NULL;
 	_workspacecount=0;
 	_init=false;
-	_driver = gfxmodule;
+	_active=false;
 
-	if ( _driver && _driver->Initialize() )
+	if (_driver)
 	{
-		_init = true;
-		/* TODO: Get approriate display driver info and record it
-		   in _gcinfo and _fbinfo
-		 */
+		_init=true;
+
+		_fbinfo.bits_per_pixel=_driver->GetDepth();
+		_fbinfo.bytes_per_row=_driver->GetBytesPerRow();
+		_fbinfo.width=_driver->GetWidth();
+		_fbinfo.height=_driver->GetHeight();
+		_fbinfo.display_width=_driver->GetWidth();
+		_fbinfo.display_height=_driver->GetHeight();
+		_fbinfo.display_x=0;
+		_fbinfo.display_y=0;
+		
+		// right now, we won't do anything with the gcinfo structure. ** LAZY PROGRAMMER ALERT ** :P
 
 		_workspacelist = new BList(workspaces);
 		_workspacecount = workspaces;
-		for (i=0; i<workspaces; i++)
+		for (int i=0; i<workspaces; i++)
 		{
 			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo));
 		}
+		_resolution=_driver->GetMode();
+		_currentworkspace=0;
+		_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
+		_workspacecount=workspaces;
+		_activeworkspace->GetRoot()->Show();
+		_activeworkspace->GetRoot()->RequestDraw();
 	}
 }
 
@@ -249,11 +257,12 @@ void Screen::SetWorkspace(int32 index)
 }
 
 /*!
-	\brief Activates the Screen
-	\param active (Defaults to true)
+	\brief Changes the active status of the screen
+	\param active Flag - should the screen be active?
 */
 void Screen::Activate(bool active)
 {
+	_active=active;
 }
 
 /*!
@@ -266,11 +275,11 @@ DisplayDriver *Screen::GetGfxDriver(void)
 }
 
 /*!
-	\brief 
-	\param index
-	\param res
-	\param stick (Default is true)
-	\return 
+	\brief Changes the screen's attributes - depth, size, etc.
+	\param index Workspace to change
+	\param res Resolution constant defined in GraphicsDefs.h
+	\param stick Make the change persistent across reboots
+	\return B_OK if succcessful, B_ERROR if not
 */
 status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 {
@@ -278,25 +287,36 @@ status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 }
 
 /*!
-	\brief 
-	\param win
-	\param workspace (Default is B_CURRENT_WORKSPACE)
+	\brief Adds a Window to the desktop
+	\param win Window to add to the desktop
+	\param workspace Workspace to add the window to
+	
+	The ServerWindow's WindowBorder object is added to the RootLayer of the workspace 
+	in question. If the window has already been added to another screen, this function 
+	will remove it from its old parent and add it to the current one.
 */
 void Screen::AddWindow(ServerWindow *win, int32 workspace)
 {
+	if(!win)
+		return;
 }
 
 /*!
-	\brief 
-	\param win
+	\brief Removes a Window from the desktop
+	\param win The window to remove
+	
+	If the window does not belong to this screen or has not been added to the desktop, 
+	this function will fail.
 */
 void Screen::RemoveWindow(ServerWindow *win)
 {
+	if(!win)
+		return;
 }
 
 /*!
-	\brief 
-	\return 
+	\brief Returns the active window in the current workspace
+	\return The active window in the current workspace
 */
 ServerWindow *Screen::ActiveWindow(void)
 {
@@ -304,11 +324,16 @@ ServerWindow *Screen::ActiveWindow(void)
 }
 
 /*!
-	\brief 
-	\param win
+	\brief Activates a window on the desktop
+	\param win The window to activate
+	
+	If the given window has not been added to the desktop, it will be automatically added 
+	to the current workspace. If, for some reason, the window belongs to a workspace on 
+	another screen, this function will fail.
 */
 void Screen::SetActiveWindow(ServerWindow *win)
 {
+	
 }
 
 /*!

@@ -69,7 +69,8 @@ public:
 	void Invalidate(BRect rect);
 	void Invalidate(BRegion region);
 	void RebuildRegions(bool include_children=true);
-	void RequestDraw(const BRect &r);
+	virtual void RequestDraw(const BRect &r);
+	virtual void RequestDraw(void);
 	bool IsDirty(void) const;
 
 	void Show(void);

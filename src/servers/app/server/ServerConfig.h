@@ -27,6 +27,10 @@
 // Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
 #define ENABLE_INPUT_SERVER_EMULATION
 
+// This is the application signature of our app_server when running as a
+// regular application. When running as the app_server, this is not used.
+#define SERVER_SIGNATURE "application/x-vnd.obe-OBAppServer"
+
 // Server port names. The input port is the port which is used to receive
 // input messages from the Input Server. The other is the "main" port for
 // the server and is utilized mostly by BApplication objects.

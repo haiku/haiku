@@ -463,6 +463,11 @@ void Layer::RequestDraw(const BRect &r)
 */
 }
 
+void Layer::RequestDraw(void)
+{
+	RequestDraw(Bounds());
+}
+
 /*!
 	\brief Determines whether the layer needs to be redrawn
 	\return True if the layer needs to be redrawn, false if not

@@ -21,6 +21,7 @@
 //
 //	File Name:		ScreenDriver.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	BWindowScreen graphics module
 //  
 //------------------------------------------------------------------------------
@@ -1220,12 +1221,12 @@ void ScreenDriver::SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternin
 
 	if(fbuffer->IsConnected())
 	{
-		uint64 *p64=(uint64*)pattern;
+//		uint64 *p64=(uint64*)pattern;
 
 		// check for transparency in mask. If transparent, we can quit here
 		
-		bool transparent_bit=
-			( *p64 & ~((uint64)2 << (32-patternindex)))?true:false;
+//		bool transparent_bit=
+//			( *p64 & ~((uint64)2 << (32-patternindex)))?true:false;
 
 //		bool highcolor_bit=
 //			( *p64 & ~((uint64)2 << (64-patternindex)))?true:false;
