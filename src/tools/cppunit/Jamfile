@@ -14,7 +14,7 @@ rule CppUnitLibrary
 }
 
 CppUnitLibrary
-	SafetyLock.cpp
+	SemaphoreSyncObject.cpp
 	TestCase.cpp
 	TestListener.cpp
 	TestShell.cpp
