@@ -62,6 +62,20 @@ public:
 	////// UW_ES_IA - Three Button //////
 	
 	void twentyX_20X_20X_60X_UW_ES_IA();
+	
+	////// UW_ES_EA - One Button //////
+	
+	void OK_X_UW_ES_EA();
+	void fortyX_60X_UW_ES_EA();
+	
+	////// UW_ES_EA - Two Button //////
+	
+	void OK_Cancel_60X_UW_ES_EA();
+	void twentyX_20X_60X_UW_ES_EA();
+	
+	////// UW_ES_EA - Three Button //////
+	
+	void twentyX_20X_20X_60X_UW_ES_EA();
 };
 
 #endif	// ALERT_TEST_H
