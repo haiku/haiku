@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Mark-Jan Bastian. All rights reserved.
@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 
 //#define TRACE_PORTS
@@ -247,13 +248,13 @@ dump_port_info(int argc, char **argv)
 	int i;
 
 	if (argc < 2) {
-		dprintf("port: not enough arguments\n");
+		dprintf("usage: port [id|name|address]\n");
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = strtoul(argv[1], NULL, 16);
+	// if the argument looks like a number, treat it as such
+	if (isdigit(argv[1][0])) {
+		uint32 num = strtoul(argv[1], NULL, 0);
 
 		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
@@ -262,7 +263,7 @@ dump_port_info(int argc, char **argv)
 			return 0;
 		} else {
 			unsigned slot = num % sMaxPorts;
-			if(sPorts[slot].id != (int)num) {
+			if (sPorts[slot].id != (int)num) {
 				dprintf("port 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
@@ -778,12 +779,11 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	// block if no message, or, if B_TIMEOUT flag set, block with timeout
 
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
-
-	if (status == B_BAD_SEM_ID) {
+	if (status == B_BAD_SEM_ID || status == B_INTERRUPTED) {
 		// somebody deleted the port
 		return B_BAD_PORT_ID;
 	}
-	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
+	if (status != B_OK)
 		return status;
 
 	state = disable_interrupts();
@@ -799,7 +799,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	// determine tail & get the length of the message
 	msg = list_get_first_item(&sPorts[slot].msg_queue);
 	if (msg == NULL)
-		panic("port %ld: no messages found", sPorts[slot].id);
+		panic("port %ld: no messages found\n", sPorts[slot].id);
 
 	size = msg->size;
 
@@ -902,14 +902,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 		/* somebody deleted the port or the sem went away */
 		return B_BAD_PORT_ID;
 	}
-
-	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
+	if (status != B_OK)
 		return status;
-
-	if (status != B_NO_ERROR) {
-		dprintf("write_port_etc: unknown error %ld\n", status);
-		return status;
-	}
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -1017,17 +1011,11 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 		// get 1 entry from the queue, block if needed
 
 	if (status == B_BAD_SEM_ID || status == B_INTERRUPTED) {
-		/* somebody deleted the port or the sem while we were waiting */
+		// somebody deleted the port or the sem while we were waiting
 		return B_BAD_PORT_ID;
 	}
-
-	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
+	if (status != B_OK)
 		return status;
-
-	if (status != B_NO_ERROR) {
-		dprintf("write_port_etc: unknown error %ld\n", status);
-		return status;
-	}
 
 	msg = get_port_msg(msgCode, bufferSize);
 	if (msg == NULL)
