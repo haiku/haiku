@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel apps consoled ;
+SubDir OBOS_TOP src tests kernel consoled ;
 
 UsePrivateHeaders kernel ;
 UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
