@@ -56,6 +56,13 @@ KPPPProtocol::~KPPPProtocol()
 }
 
 
+void
+KPPPProtocol::Uninit()
+{
+	// do nothing by default
+}
+
+
 status_t
 KPPPProtocol::Control(uint32 op, void *data, size_t length)
 {

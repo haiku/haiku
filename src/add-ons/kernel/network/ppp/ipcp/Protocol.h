@@ -63,6 +63,8 @@ class IPCP : public KPPPProtocol {
 		IPCP(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~IPCP();
 		
+		virtual void Uninit();
+		
 		ppp_state State() const
 			{ return fState; }
 		

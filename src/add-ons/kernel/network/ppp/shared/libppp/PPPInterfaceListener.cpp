@@ -17,7 +17,7 @@
 static const uint32 kReportFlags = PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
 							| PPP_ALLOW_ANY_REPLY_THREAD;
 
-static const uint32 kCodeQuitReportThread = 'QUIT';
+static const int32 kCodeQuitReportThread = 'QUIT';
 
 
 class PPPInterfaceListenerThread {

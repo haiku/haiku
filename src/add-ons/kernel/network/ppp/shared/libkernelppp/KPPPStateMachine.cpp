@@ -668,9 +668,6 @@ KPPPStateMachine::DownEvent()
 	
 	DownProtocols();
 	
-	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
-	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
-	
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
 		bool needsRedial = false;
@@ -715,6 +712,9 @@ KPPPStateMachine::DownEvent()
 		if(!Interface().DoesDialOnDemand())
 			Interface().Delete();
 	}
+	
+	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 }
 
 

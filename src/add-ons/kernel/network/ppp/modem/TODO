@@ -3,3 +3,4 @@
 - add support for server mode
 - add ACCM support (including ACCM option handler and encoding)
 - add chat login authentication (like terminal login)
+- time out if the modem does not respond

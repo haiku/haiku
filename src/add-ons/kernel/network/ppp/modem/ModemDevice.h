@@ -30,8 +30,8 @@ class ModemDevice : public KPPPDevice {
 		ModemDevice(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~ModemDevice();
 		
-		const char *InterfaceName() const
-			{ return fInterfaceName; }
+		const char *PortName() const
+			{ return fPortName; }
 		int32 Handle() const
 			{ return fHandle; }
 				// returns file handle for modem driver
@@ -67,7 +67,7 @@ class ModemDevice : public KPPPDevice {
 		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber = 0);
 
 	private:
-		const char *fInterfaceName, *fInitString, *fDialString;
+		const char *fPortName, *fInitString, *fDialString;
 		int32 fHandle;
 			// file handle for modem driver
 		

@@ -44,6 +44,12 @@ IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
 
 IPCP::~IPCP()
 {
+}
+
+
+void
+IPCP::Uninit()
+{
 	RemoveRoutes();
 }
 
@@ -458,7 +464,7 @@ IPCP::RemoveRoutes()
 		
 		if(rtrequest(RTM_DELETE, (struct sockaddr*) &netmask,
 				(struct sockaddr*) &fGateway, (struct sockaddr*) &netmask,
-				RTF_GATEWAY, &fDefaultRoute) != B_OK)
+				RTF_UP | RTF_GATEWAY, &fDefaultRoute) != B_OK)
 			dprintf("IPCP: RemoveRoutes(): could not remove default/subnet route!\n");
 		
 		fDefaultRoute = NULL;

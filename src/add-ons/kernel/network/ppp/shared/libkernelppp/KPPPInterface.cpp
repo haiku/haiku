@@ -62,6 +62,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		const driver_settings *profile, KPPPInterface *parent = NULL)
 	: KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
+	fSettings(NULL),
 	fIfnet(NULL),
 	fUpThread(-1),
 	fOpenEventThread(-1),
@@ -219,6 +220,11 @@ KPPPInterface::~KPPPInterface()
 #endif
 	
 	++fDeleteCounter;
+	
+	// tell protocols to uninit (remove routes, etc.)
+	KPPPProtocol *protocol = FirstProtocol();
+	for(; protocol; protocol = protocol->NextProtocol())
+		protocol->Uninit();
 	
 	// make sure we are not accessible by any thread before we continue
 	UnregisterInterface();

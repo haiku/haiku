@@ -32,14 +32,15 @@ dup_driver_settings(const driver_settings *dup)
 	if(!dup)
 		return NULL; // we got a NULL pointer, so return nothing
 	
-	driver_settings *ret = (driver_settings*) malloc(sizeof(driver_settings));
+	driver_settings *ret = new_driver_settings();
 	
 	ret->parameter_count = dup->parameter_count;
 	
-	if(ret->parameter_count > 0)
+	if(ret->parameter_count > 0) {
 		ret->parameters = (driver_parameter*)
 			malloc(ret->parameter_count * sizeof(driver_parameter));
-	else
+		memset(ret->parameters, 0, ret->parameter_count * sizeof(driver_parameter));
+	} else
 		ret->parameters = NULL;
 	
 	for(int32 index = 0; index < ret->parameter_count; index++)
@@ -60,6 +61,14 @@ free_driver_settings(driver_settings *settings)
 	
 	free(settings->parameters);
 	free(settings);
+}
+
+
+void
+free_driver_parameter(driver_parameter *parameter)
+{
+	free_driver_parameter_fields(parameter);
+	free(parameter);
 }
 
 
@@ -126,10 +135,11 @@ copy_driver_parameter(const driver_parameter *from, driver_parameter *to)
 	
 	to->parameter_count = from->parameter_count;
 	
-	if(to->parameter_count > 0)
+	if(to->parameter_count > 0) {
 		to->parameters =
 			(driver_parameter*) malloc(to->parameter_count * sizeof(driver_parameter));
-	else
+		memset(to->parameters, 0, to->parameter_count * sizeof(driver_parameter));
+	} else
 		to->parameters = NULL;
 	
 	for(int32 index = 0; index < to->parameter_count; index++)
@@ -165,7 +175,7 @@ add_driver_parameter_value(const char *value, driver_parameter *to)
 	int32 oldCount = to->value_count;
 	char **old = to->values;
 	
-	to->values = (char**) malloc(to->value_count + 1 * sizeof(char*));
+	to->values = (char**) malloc((oldCount + 1) * sizeof(char*));
 	
 	if(!to->values) {
 		to->values = old;
@@ -190,7 +200,7 @@ add_driver_parameter(driver_parameter *add, driver_settings *to)
 	driver_parameter *old = to->parameters;
 	
 	to->parameters =
-		(driver_parameter*) malloc(to->parameter_count + 1 * sizeof(driver_parameter));
+		(driver_parameter*) malloc((oldCount + 1) * sizeof(driver_parameter));
 	
 	if(!to->parameters) {
 		to->parameters = old;

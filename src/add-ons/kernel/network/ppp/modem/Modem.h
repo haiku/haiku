@@ -28,9 +28,9 @@ class ModemDevice;
 #define PACKET_OVERHEAD			8
 #define MODEM_TIMEOUT			3000000
 	// 3 seconds
-#define MODEM_INTERFACE_KEY		"interface"
-#define MODEM_INIT_KEY			"init"
-#define MODEM_DIAL_KEY			"dial"
+#define MODEM_PORT_KEY		"Port"
+#define MODEM_INIT_KEY			"Init"
+#define MODEM_DIAL_KEY			"Dial"
 
 extern struct core_module_info *core;
 

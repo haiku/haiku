@@ -27,6 +27,8 @@ class KPPPProtocol : public KPPPLayer {
 	public:
 		virtual ~KPPPProtocol();
 		
+		virtual void Uninit();
+		
 		KPPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const

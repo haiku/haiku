@@ -13,6 +13,8 @@
 
 #include <core_funcs.h>
 #include <unistd.h>
+#include <termios.h>
+	// for port settings
 
 // from libkernelppp
 #include <settings_tools.h>
@@ -181,7 +183,7 @@ worker_thread(void *data)
 
 ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	: KPPPDevice("Modem", 0, interface, settings),
-	fInterfaceName(NULL),
+	fPortName(NULL),
 	fHandle(-1),
 	fWorkerThread(-1),
 	fOutputBytes(0),
@@ -205,7 +207,7 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	SetMTU(MODEM_MTU);
 		// MTU size does not contain PPP header
 	
-	fInterfaceName = get_parameter_value(MODEM_INTERFACE_KEY, settings);
+	fPortName = get_parameter_value(MODEM_PORT_KEY, settings);
 	fInitString = get_parameter_value(MODEM_INIT_KEY, settings);
 	fDialString = get_parameter_value(MODEM_DIAL_KEY, settings);
 	
@@ -229,7 +231,8 @@ ModemDevice::InitCheck() const
 	if(fState != INITIAL && Handle() == -1)
 		return B_ERROR;
 	
-	return InterfaceName() && KPPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
+	return PortName() && InitString() && DialString()
+		&& KPPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
 }
 
 
@@ -347,9 +350,29 @@ ModemDevice::OpenModem()
 	if(Handle() >= 0)
 		return;
 	
-	char path[B_PATH_NAME_LENGTH];
-	sprintf(path, "/dev/modem/%s", InterfaceName());
-	fHandle = open(path, O_RDWR);
+	fHandle = open(PortName(), O_RDWR);
+	
+	// init port
+	struct termios options;
+	if(ioctl(fHandle, TCGETA, &options) != B_OK) {
+		dprintf("ModemDevice: Could not retrieve port options!\n");
+		return;
+	}
+	
+	// adjust options
+	options.c_cflag &= ~CBAUD;
+	options.c_cflag |= B115200;
+	options.c_cflag |= (CLOCAL | CREAD);
+	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	options.c_oflag &= ~OPOST;
+	options.c_cc[VMIN] = 0;
+	options.c_cc[VTIME] = 10;
+	
+	// set new options
+	if(ioctl(fHandle, TCSETA, &options) != B_OK) {
+		dprintf("ModemDevice: Could not init port!\n");
+		return;
+	}
 }
 
 

@@ -14,6 +14,7 @@
 // TODO: remove this as soon as we get the extended driver_settings API
 extern driver_settings *dup_driver_settings(const driver_settings *settings);
 extern void free_driver_settings(driver_settings *settings);
+extern void free_driver_parameter(driver_parameter *parameter);
 extern void free_driver_parameter_fields(driver_parameter *parameter);
 
 extern driver_settings *new_driver_settings();
@@ -66,7 +67,7 @@ inline
 const char*
 get_parameter_value(const char *name, const driver_parameter *parameters)
 {
-	if(parameters)
+	if(!parameters)
 		return NULL;
 	
 	return get_settings_value(name, (driver_settings*) &parameters->parameter_count);
