@@ -105,7 +105,7 @@ MediaAddonServer::MediaAddonServer(const char *sig) :
 	mediaroster = BMediaRoster::Roster();
 	filemap = new Map<ino_t, media_addon_id>;
 	infomap = new Map<media_addon_id, AddOnInfo>;
-	control_port = create_port(64, "media_addon_server port");
+	control_port = create_port(64, MEDIA_ADDON_SERVER_PORT_NAME);
 	control_thread = spawn_thread(controlthread, "media_addon_server control", 12, this);
 	resume_thread(control_thread);
 }
@@ -252,7 +252,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	
 	TRACE("MediaAddonServer::ScanAddOnFlavors: id %ld\n",addon->AddonID());
 	
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK) {
 		FATAL("couldn't find media_server port\n");
 		return;

@@ -52,7 +52,7 @@ initit _initit;
 
 void find_media_server_port()
 {
-	MediaServerPort = find_port("media_server port");
+	MediaServerPort = find_port(MEDIA_SERVER_PORT_NAME);
 	if (MediaServerPort < 0) {
 		FATAL("couldn't find MediaServerPort\n");
 		MediaServerPort = BAD_MEDIA_SERVER_PORT; // make this a unique number
@@ -61,7 +61,7 @@ void find_media_server_port()
 
 void find_media_addon_server_port()
 {
-	MediaAddonServerPort = find_port("media_addon_server port");
+	MediaAddonServerPort = find_port(MEDIA_ADDON_SERVER_PORT_NAME);
 	if (MediaAddonServerPort < 0) {
 		FATAL("couldn't find MediaAddonServerPort\n");
 		MediaAddonServerPort = BAD_MEDIA_ADDON_SERVER_PORT; // make this a unique number

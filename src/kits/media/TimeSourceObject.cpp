@@ -18,7 +18,7 @@ TimeSourceObject::TimeSourceObject(const media_node &node)
  :	BMediaNode("some timesource object", node.node, node.kind),
 	BTimeSource(node.node)
 {
-	printf("TimeSourceObject::TimeSourceObject enter, id = %ld\n", node.node);
+	TRACE("TimeSourceObject::TimeSourceObject enter, id = %ld\n", node.node);
 	if (fControlPort > 0)
 		delete_port(fControlPort);
 	fControlPort = node.port;
@@ -26,22 +26,22 @@ TimeSourceObject::TimeSourceObject(const media_node &node)
 	ASSERT(fKinds == node.kind);
 
 
-if (node.node == NODE_SYSTEM_TIMESOURCE_ID) {
-	strcpy(fName, "System Clock");
-} else {
-	live_node_info lni;
-	if (B_OK == BMediaRoster::Roster()->GetLiveNodeInfo(node, &lni)) {
-		strcpy(fName, lni.name);
+	if (node.node == NODE_SYSTEM_TIMESOURCE_ID) {
+		strcpy(fName, "System Clock");
 	} else {
-		sprintf(fName, "timesource %ld", node.node);
+		live_node_info lni;
+		if (B_OK == BMediaRoster::Roster()->GetLiveNodeInfo(node, &lni)) {
+			strcpy(fName, lni.name);
+		} else {
+			sprintf(fName, "timesource %ld", node.node);
+		}
 	}
-}
 
 	AddNodeKind(NODE_KIND_SHADOW_TIMESOURCE);
 	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
 	fControlPort = SHADOW_TIMESOURCE_CONTROL_PORT; // XXX if we don't do this, we get a infinite loop somewhere. This needs to be debugged
 	
-	printf("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
+	TRACE("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
 }
 
 /* virtual */ status_t

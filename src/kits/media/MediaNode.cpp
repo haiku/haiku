@@ -209,8 +209,8 @@ BMediaNode::Node() const
 {
 	CALLED();
 	media_node temp;
-	temp.node = fNodeID;
-	temp.port = fControlPort;
+	temp.node = ID();
+	temp.port = ControlPort(); // we *must* call ControlPort(), some derived nodes use it to start the port read thread!
 	temp.kind = Kinds();
 	return temp;
 }
@@ -233,7 +233,7 @@ BMediaNode::TimeSource() const
 	if (fTimeSource != 0)
 		return fTimeSource;
 		
-	printf("BMediaNode::TimeSource node %ld enter\n", ID());
+	TRACE("BMediaNode::TimeSource node %ld enter\n", ID());
 	
 	// If the node doesn't have a time source object, we need to create one.
 	// If the node is still unregistered, we can't call MakeTimeSourceFor(),
@@ -255,7 +255,7 @@ BMediaNode::TimeSource() const
 		fTimeSource->AddMe(self);
 	}
 
-	printf("BMediaNode::TimeSource node %ld leave\n", ID());
+	TRACE("BMediaNode::TimeSource node %ld leave\n", ID());
 
 	return fTimeSource;
 }
@@ -355,16 +355,11 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	int32 message;
 	ssize_t size;
 	
-	size = read_port_etc(fControlPort, &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
+	size = read_port_etc(ControlPort(), &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size <= 0) {
 		if (size != B_TIMED_OUT)
 			FATAL("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
 		return size; // returns the error code
-	}
-
-	if (message == -1) {
-		//printf("BMediaNode::WaitForMessage dummy received\n");
-		return B_OK;
 	}
 
 	TRACE("BMediaNode::WaitForMessage %#lx, node %ld, this %p\n", message, fNodeID, this);
@@ -595,9 +590,8 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_SET_TIMESOURCE:
 		{
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
-			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld\n", fNodeID, command->timesource_id);
 
-			printf("NODE_SET_TIMESOURCE, node %ld, timesource %ld enter\n", fNodeID, command->timesource_id);
+			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld enter\n", fNodeID, command->timesource_id);
 			
 			fTimeSourceID = command->timesource_id;
 			
@@ -617,7 +611,7 @@ BMediaNode::HandleMessage(int32 message,
 			// any derived class
 			SetTimeSource(fTimeSource);
 
-			printf("NODE_SET_TIMESOURCE, node %ld, timesource %ld leave\n", fNodeID, command->timesource_id);
+			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld leave\n", fNodeID, command->timesource_id);
 
 			return B_OK;
 		}

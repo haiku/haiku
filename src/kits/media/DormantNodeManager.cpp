@@ -55,6 +55,7 @@ static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@O
 #include <MediaAddOn.h>
 #include "debug.h"
 #include "PortPool.h"
+#include "MediaMisc.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
@@ -215,7 +216,7 @@ DormantNodeManager::RegisterAddon(const char *path)
 		return 0;
 	}
 	msg.ref = tempref;
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK) {
 		FATAL("DormantNodeManager::RegisterAddon failed, couldn't find media server\n");
 		return 0;
@@ -249,7 +250,7 @@ DormantNodeManager::UnregisterAddon(media_addon_id id)
 	TRACE("DormantNodeManager::UnregisterAddon id %ld\n",id);
 
 	port_id port;
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK)
 		return;
 	msg.addonid = id;
@@ -266,7 +267,7 @@ DormantNodeManager::FindAddonPath(BPath *path, media_addon_id id)
 	entry_ref tempref;
 	status_t rv;
 	int32 code;
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK)
 		return B_ERROR;
 	msg.addonid = id;

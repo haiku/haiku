@@ -1567,6 +1567,8 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 		FATAL("BMediaRoster::RegisterNode: failed to register node %s (error %#lx)\n", node->Name(), rv);
 		return rv;
 	}
+
+	TRACE("BMediaRoster::RegisterNode: QueryServer SERVER_REGISTER_NODE finished\n");
 	
 	// we are a friend class of BMediaNode and initialize this member variable
 	node->fNodeID = reply.nodeid;
@@ -1575,6 +1577,8 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 
 	// call the callback
 	node->NodeRegistered();
+
+	TRACE("BMediaRoster::RegisterNode: NodeRegistered callback finished\n");
 	
 	// if the BMediaNode also inherits from BTimeSource, we need to call BTimeSource::FinishCreate()
 	if (node->Kinds() & B_TIME_SOURCE) {
@@ -1584,9 +1588,12 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 			ts->FinishCreate();
 	}
 
+	TRACE("BMediaRoster::RegisterNode: publishing inputs/outputs\n");
+
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
 	// with created, but unconnected nodes.
+
 	if (node->Kinds() & B_BUFFER_PRODUCER) {
 		List<media_output> list;
 		if (B_OK == GetAllOutputs(node->Node(), &list))
@@ -1598,7 +1605,12 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 			PublishInputs(node->Node(), &list);
 	}
 
+	TRACE("BMediaRoster::RegisterNode: sending NodesCreated\n");
+
 	BPrivate::media::notifications::NodesCreated(&reply.nodeid, 1);
+
+	TRACE("BMediaRoster::RegisterNode: finished\n");
+
 /*
 	TRACE("BMediaRoster::RegisterNode: registered node name '%s', id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
 	TRACE("BMediaRoster::RegisterNode: node this               %p\n", node);
@@ -1851,7 +1863,7 @@ BMediaRoster::GetDormantNodes(dormant_node_info * out_info,
 	port_id port;
 	status_t rv;
 
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK)
 		return B_ERROR;
 	
@@ -2152,7 +2164,7 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonid,
 	status_t rv;
 	int32 code;
 
-	port = find_port("media_server port");
+	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK)
 		return B_ERROR;
 

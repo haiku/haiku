@@ -53,12 +53,13 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 void
 TimeSourceObjectManager::InitSystemTimeSource()
 {
+	CALLED();
 	BAutolock lock(fLock);
 
 	if (fSystemTimeSource != 0)
 		return;
 
-	printf("TimeSourceObjectManager::InitSystemTimeSource enter\n");
+	TRACE("TimeSourceObjectManager::InitSystemTimeSource enter\n");
 	
 	media_node node;
 	node.node = NODE_SYSTEM_TIMESOURCE_ID;
@@ -67,13 +68,14 @@ TimeSourceObjectManager::InitSystemTimeSource()
 	
 	fSystemTimeSource = new SystemTimeSourceObject(node);
 
-	printf("TimeSourceObjectManager::InitSystemTimeSource leave\n");
+	TRACE("TimeSourceObjectManager::InitSystemTimeSource leave\n");
 }
 
 
 BTimeSource *
 TimeSourceObjectManager::GetSystemTimeSource()
 {
+	CALLED();
 	BAutolock lock(fLock);
 
 	if (fSystemTimeSource == 0)

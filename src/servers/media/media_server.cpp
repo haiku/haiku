@@ -119,7 +119,7 @@ ServerApp::ServerApp()
 	gAppManager = new AppManager;
 	gNodeManager = new NodeManager;
 
-	control_port = create_port(64,"media_server port");
+	control_port = create_port(64, MEDIA_SERVER_PORT_NAME);
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
 	resume_thread(control_thread);
 
@@ -174,10 +174,10 @@ ServerApp::QuitRequested()
 void
 ServerApp::StartSystemTimeSource()
 {
-	printf("StartSystemTimeSource enter\n");
+	TRACE("StartSystemTimeSource enter\n");
 	status_t rv;
 
-	printf("StartSystemTimeSource creating object\n");
+	TRACE("StartSystemTimeSource creating object\n");
 
 	// register a dummy node 
 	media_node node;
@@ -186,19 +186,19 @@ ServerApp::StartSystemTimeSource()
 	
 	ASSERT(node.node == NODE_SYSTEM_TIMESOURCE_ID);
 
-	printf("StartSystemTimeSource setting as default\n");
+	TRACE("StartSystemTimeSource setting as default\n");
 	
 	rv = gNodeManager->SetDefaultNode(SYSTEM_TIME_SOURCE, &node, NULL, NULL);
 	ASSERT(rv == B_OK);
 	
-	printf("StartSystemTimeSource leave\n");
+	TRACE("StartSystemTimeSource leave\n");
 }
 
 void 
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
 	status_t rv;
-	INFO("ServerApp::HandleMessage %#lx\n", code);
+	TRACE("ServerApp::HandleMessage %#lx enter\n", code);
 	switch (code) {
 		case SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT:
 		{
@@ -556,6 +556,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		default:
 			printf("media_server: received unknown message code %#08lx\n",code);
 	}
+	TRACE("ServerApp::HandleMessage %#lx leave\n", code);
 }
 
 int32
@@ -575,6 +576,7 @@ ServerApp::controlthread(void *arg)
 
 void ServerApp::MessageReceived(BMessage *msg)
 {
+	TRACE("ServerApp::MessageReceived %x enter\n", msg->what);
 	switch (msg->what) {
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
@@ -583,6 +585,7 @@ void ServerApp::MessageReceived(BMessage *msg)
 			printf("\nnew media server: unknown message received\n");
 			msg->PrintToStream();
 	}
+	TRACE("ServerApp::MessageReceived %x leave\n", msg->what);
 }
 
 int main()

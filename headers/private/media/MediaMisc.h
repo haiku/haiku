@@ -34,6 +34,9 @@
 
 #define ROUND_UP_TO_PAGE(size)			(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
 
+#define MEDIA_SERVER_PORT_NAME			"__media_server_port"
+#define MEDIA_ADDON_SERVER_PORT_NAME	"__media_addon_server_port"
+
 namespace BPrivate { namespace media {
 	extern team_id team;
 } } // BPrivate::media

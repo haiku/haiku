@@ -79,8 +79,7 @@ _SoundPlayNode::Format() const
 // implementation of BMediaNode
 // -------------------------------------------------------- //
 
-BMediaAddOn * _SoundPlayNode::AddOn(
-				int32 * internal_id) const
+BMediaAddOn * _SoundPlayNode::AddOn(int32 * internal_id) const
 {
 	CALLED();
 	// BeBook says this only gets called if we were in an add-on.
@@ -94,10 +93,7 @@ void _SoundPlayNode::Preroll(void)
 	BMediaNode::Preroll();
 }
 
-status_t _SoundPlayNode::HandleMessage(
-				int32 message,
-				const void * data,
-				size_t size)
+status_t _SoundPlayNode::HandleMessage(int32 message, const void * data, size_t size)
 {
 	CALLED();
 	return B_ERROR;
@@ -156,23 +152,13 @@ _SoundPlayNode::FormatSuggestionRequested(media_type type, int32 /*quality*/, me
 	// preferred data format is, given a suggestion by the caller.
 	CALLED();
 
-	if (!format)
-	{
-		fprintf(stderr, "\tERROR - NULL format pointer passed in!\n");
-		return B_BAD_VALUE;
-	}
+	// a wildcard type is okay; but we only support raw audio
+	if (type != B_MEDIA_RAW_AUDIO && type != B_MEDIA_UNKNOWN_TYPE)
+		return B_MEDIA_BAD_FORMAT;
 
 	// this is the format we'll be returning (our preferred format)
 	*format = mFormat;
 
-	// a wildcard type is okay; we can specialize it
-	if (type == B_MEDIA_UNKNOWN_TYPE)
-		type = B_MEDIA_RAW_AUDIO;
-
-	// we only support raw audio
-	if (type != B_MEDIA_RAW_AUDIO)
-		return B_MEDIA_BAD_FORMAT;
-	
 	return B_OK;
 }
 
@@ -182,9 +168,9 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 	// FormatProposal() is the first stage in the BMediaRoster::Connect() process.  We hand
 	// out a suggested format, with wildcards for any variations we support.
 	CALLED();
+
 	// is this a proposal for our one output?
-	if (output != mOutput.source)
-	{
+	if (output != mOutput.source) {
 		fprintf(stderr, "_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
@@ -193,12 +179,12 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 	// supply an error code depending on whether we found the proposal acceptable.
 	media_type requestedType = format->type;
 	*format = mFormat;
-	if ((requestedType != B_MEDIA_UNKNOWN_TYPE) && (requestedType != B_MEDIA_RAW_AUDIO))
-	{
+	if ((requestedType != B_MEDIA_UNKNOWN_TYPE) && (requestedType != B_MEDIA_RAW_AUDIO)) {
 		fprintf(stderr, "_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	else return B_OK;		// raw audio or wildcard type, either is okay by us
+	else
+		return B_OK;		// raw audio or wildcard type, either is okay by us
 }
 
 status_t 
@@ -237,8 +223,7 @@ _SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* new
 	CALLED();
 
 	// is this our output?
-	if (for_source != mOutput.source)
-	{
+	if (for_source != mOutput.source) {
 		fprintf(stderr, "_SoundPlayNode::SetBufferGroup returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
@@ -265,6 +250,8 @@ _SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* new
 		// our own buffer group to use from now on
 		size_t size = mOutput.format.u.raw_audio.buffer_size;
 		int32 count = int32(mLatency / BufferDuration() + 1 + 1);
+		if (count < 3)
+			count = 3;
 		mBufferGroup = new BBufferGroup(size, count);
 	}
 
@@ -372,7 +359,7 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	FindLatencyFor(mOutput.destination, &mLatency, &id);
 	fprintf(stderr, "\tdownstream latency = %Ld\n", mLatency);
 
-	mInternalLatency = 1000LL;
+	mInternalLatency = 10000LL;
 	fprintf(stderr, "\tbuffer-filling took %Ld usec on this machine\n", mInternalLatency);
 	SetEventLatency(mLatency + mInternalLatency);
 
@@ -433,18 +420,6 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 		return;
 	}
 
-	// If we're late, we need to catch up.  Respond in a manner appropriate to our
-	// current run mode.
-/*
-	if (RunMode() == B_RECORDING)
-	{
-		// A hardware capture node can't adjust; it simply emits buffers at
-		// appropriate points.  We (partially) simulate this by not adjusting
-		// our behavior upon receiving late notices -- after all, the hardware
-		// can't choose to capture "sooner"....
-	}
-	else if (RunMode() == B_INCREASE_LATENCY)
-*/
 	if (RunMode() != B_DROP_DATA)
 	{
 		// We're late, and our run mode dictates that we try to produce buffers
@@ -453,23 +428,25 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 		// that at the moment, so we try to start producing buffers earlier to
 		// compensate.
 		
-		
-//		mInternalLatency += how_much;
+		mInternalLatency += how_much;
 
-//		if (mInternalLatency > 50000)
-//			mInternalLatency = 50000;
+		if (mInternalLatency > 30000)	// avoid getting a too high latency
+			mInternalLatency = 30000;
 
-//		SetEventLatency(mLatency + mInternalLatency);
-
-//		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
+		SetEventLatency(mLatency + mInternalLatency);
+		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
 	}
 	else
 	{
 		// The other run modes dictate various strategies for sacrificing data quality
 		// in the interests of timely data delivery.  The way *we* do this is to skip
 		// a buffer, which catches us up in time by one buffer duration.
-		/*size_t nSamples = mOutput.format.u.raw_audio.buffer_size / sizeof(float);
-		mSamplesSent += nSamples;*/
+
+		size_t nFrames = mOutput.format.u.raw_audio.buffer_size
+			/ ((mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* mOutput.format.u.raw_audio.channel_count);
+
+		mFramesSent += nFrames;
 
 		fprintf(stderr, "\tskipping a buffer to try to catch up\n");
 	}
@@ -570,16 +547,11 @@ void _SoundPlayNode::HandleEvent(
 // how should we handle late buffers?  drop them?
 // notify the producer?
 status_t 
-_SoundPlayNode::SendNewBuffer(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent)
+_SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
 //	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
 
-//	printf("1) should arrive at %20Ld, now %20Ld\n", event->event_time, TimeSource()->Now());
-		
 	// make sure we're both started *and* connected before delivering a buffer
 	if ((RunState() != BMediaEventLooper::B_STARTED) || (mOutput.destination == media_destination::null))
 		return B_OK;
@@ -587,13 +559,10 @@ _SoundPlayNode::SendNewBuffer(
 	// The event->event_time is the time at which the buffer we are preparing here should
 	// arrive at it's destination. The MediaEventLooper should have scheduled us early enough
 	// (based on EventLatency() and the SchedulingLatency()) to make this possible.
+	// lateness is independent of EventLatency()!
 
-//	bigtime_t scheduling_latency = SchedulingLatency();
-
-	if (lateness > 5000) {
-		printf("_SoundPlayNode::SendNewBuffer, event sheduled too late, lateness is %Ld\n", lateness);
-//		mInternalLatency += 1000;
-//		SetEventLatency(mLatency + mInternalLatency);
+	if (lateness > 1000) {
+		printf("_SoundPlayNode::SendNewBuffer, event scheduled much too late, lateness is %Ld\n", lateness);
 	}
 
 	// skip buffer creation if output not enabled	
@@ -622,17 +591,12 @@ _SoundPlayNode::SendNewBuffer(
 			}
 */
 			// send the buffer downstream if and only if output is enabled
-			bigtime_t start = system_time();
-			buffer->Header()->file_pos = (off_t)start; // XXX debugging
 			if (B_OK != SendBuffer(buffer, mOutput.destination)) {
 				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
 				printf("Buffer sending failed\n");
 				buffer->Recycle();
 			}
-			bigtime_t delta = system_time() - start;
-			if (delta > 200)
-				printf("SendBuffer took %Ld usec\n", delta);
 		}
 	}
 
@@ -646,10 +610,7 @@ _SoundPlayNode::SendNewBuffer(
 	// nextEvent is the time at which the buffer should arrive at it's destination
 	bigtime_t nextEvent = TimeSource()->PerformanceTimeFor(mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate));
 	media_timed_event nextBufferEvent(nextEvent, SEND_NEW_BUFFER_EVENT);
-//	printf("0) should arrive at %20Ld, now %20Ld\n", nextEvent, TimeSource()->Now());
 	EventQueue()->AddEvent(nextBufferEvent);
-	uint32 dummy;
-	write_port(ControlPort(), -1, &dummy, sizeof(dummy));
 	
 	return B_OK;
 }
@@ -698,8 +659,6 @@ _SoundPlayNode::HandleStart(
 		//		this->HandleEvent(&firstBufferEvent, 0, false);
 		//
 		EventQueue()->AddEvent(firstBufferEvent);
-		uint32 dummy;
-		write_port(ControlPort(), -1, &dummy, sizeof(dummy));
 	}
 	return B_OK;
 }
@@ -772,16 +731,11 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	CALLED();
 
 	// get a buffer from our buffer group
-	bigtime_t start = system_time();
-	BBuffer* buf = mBufferGroup->RequestBuffer(mOutput.format.u.raw_audio.buffer_size, BufferDuration() / 4);
-	bigtime_t delta = system_time() - start;
-	if (delta > 200)
-		printf("RequestBuffer took %Ld usec\n", delta);
+	BBuffer* buf = mBufferGroup->RequestBuffer(mOutput.format.u.raw_audio.buffer_size, BufferDuration() / 2);
 
 	// if we fail to get a buffer (for example, if the request times out), we skip this
 	// buffer and go on to the next, to avoid locking up the control thread
-	if (!buf)
-	{
+	if (!buf) {
 		printf("RequestBuffer failed\n");
 		return NULL;
 	}
@@ -798,11 +752,5 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	hdr->size_used = mOutput.format.u.raw_audio.buffer_size;
 	hdr->time_source = TimeSource()->ID();
 	hdr->start_time = event_time;
-/*
-	DPRINTF("TimeSource()->Now() : %li\n", TimeSource()->Now());
-	DPRINTF("hdr->start_time : %li\n", hdr->start_time);
-	DPRINTF("mFramesSent : %li\n", mFramesSent);
-	DPRINTF("mOutput.format.u.raw_audio.frame_rate : %f\n", mOutput.format.u.raw_audio.frame_rate);
-*/	
 	return buf;
 }
