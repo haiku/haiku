@@ -139,6 +139,9 @@ public:
 	KDiskSystem *DiskSystem() const;
 	void SetParentDiskSystem(KDiskSystem *diskSystem);
 	KDiskSystem *ParentDiskSystem() const;
+		// When setting a disk system, it must already be loaded.
+		// The partition will load it too, hence it won't be unloaded before
+		// it is unset here.
 
 	void SetCookie(void *cookie);
 	void *Cookie() const;
@@ -148,6 +151,7 @@ public:
 
 private:
 	void _UpdateChildIndices(int32 index);
+	static int32 _NextID();
 
 protected:
 	partition_data		fPartitionData;
@@ -157,6 +161,7 @@ protected:
 	KDiskSystem			*fDiskSystem;
 	KDiskSystem			*fParentDiskSystem;
 	int32				fReferenceCount;
+	static int32		fNextID;
 };
 
 } // namespace DiskDevice

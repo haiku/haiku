@@ -1,8 +1,12 @@
 // KDiskDeviceManager.cpp
 
+#include <dirent.h>
+#include <errno.h>
 #include <module.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
@@ -188,6 +192,26 @@ KDiskDeviceManager::RegisterDevice(partition_id id, bool noShadow)
 	return NULL;
 }
 
+// RegisterNextDevice
+KDiskDevice *
+KDiskDeviceManager::RegisterNextDevice(int32 *cookie)
+{
+	if (!cookie)
+		return NULL;
+	if (ManagerLocker locker = this) {
+		// TODO: This loop assumes that the device list is ordered. Make sure
+		// that this is really the case.
+		for (int32 i = 0; KDiskDevice *device = fDevices.ItemAt(i); i++) {
+			if (device->ID() >= *cookie) {
+				device->Register();
+				*cookie = device->ID() + 1;
+				return device;
+			}
+		}
+	}
+	return NULL;
+}
+
 // RegisterPartition
 KPartition *
 KDiskDeviceManager::RegisterPartition(const char *path, bool noShadow)
@@ -214,18 +238,18 @@ KDiskDeviceManager::RegisterPartition(partition_id id, bool noShadow)
 	return NULL;
 }
 
-// CountDiskDevices
+// CountDevices
 int32
-KDiskDeviceManager::CountDiskDevices()
+KDiskDeviceManager::CountDevices()
 {
 	if (ManagerLocker locker = this)
 		return fDevices.CountItems();
 	return 0;
 }
 
-// DiskDeviceAt
+// DiskAt
 KDiskDevice *
-KDiskDeviceManager::DiskDeviceAt(int32 index)
+KDiskDeviceManager::DeviceAt(int32 index)
 {
 	if (ManagerLocker locker = this)
 		return fDevices.ItemAt(index);
@@ -330,6 +354,68 @@ KDiskDeviceManager::DiskSystemAt(int32 index)
 	return fDiskSystems.ItemAt(index);
 }
 
+// LoadDiskSystem
+KDiskSystem *
+KDiskDeviceManager::LoadDiskSystem(disk_system_id id)
+{
+	KDiskSystem *diskSystem = NULL;
+	if (ManagerLocker locker = this) {
+		diskSystem = DiskSystemWithID(id);
+		if (diskSystem && diskSystem->Load() != B_OK)
+			diskSystem = NULL;
+	}
+	return diskSystem;
+}
+
+// LoadNextDiskSystem
+KDiskSystem *
+KDiskDeviceManager::LoadNextDiskSystem(int32 *cookie)
+{
+	if (!cookie)
+		return NULL;
+	if (ManagerLocker locker = this) {
+		// TODO: This loop assumes that the disk system list is ordered.
+		// Make sure that this is really the case.
+		for (int32 i = 0; KDiskSystem *diskSystem = DiskSystemAt(i); i++) {
+			if (diskSystem->ID() >= *cookie) {
+				if (diskSystem->Load() == B_OK) {
+					*cookie = diskSystem->ID() + 1;
+					return diskSystem;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+// InitialDeviceScan
+status_t
+KDiskDeviceManager::InitialDeviceScan()
+{
+	status_t error = B_ERROR;
+	// scan for devices
+	if (ManagerLocker locker = this)
+		error = _Scan("/dev/disk");
+	// scan the devices for partitions
+	// TODO: This is only provisional.
+	if (error == B_OK) {
+		int32 cookie = 0;
+		while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
+			if (device->WriteLock()) {
+				// scan the device
+				error = _ScanPartition(device);
+				if (error != B_OK) {
+					// ...
+					error = B_OK;
+				}
+				device->WriteUnlock();
+			}
+			device->Unregister();
+		}
+	}
+	return error;
+}
+
 // _AddPartitioningSystem
 status_t
 KDiskDeviceManager::_AddPartitioningSystem(const char *name)
@@ -369,6 +455,107 @@ KDiskDeviceManager::_AddDiskSystem(KDiskSystem *diskSystem)
 		error = B_NO_MEMORY;
 	if (error != B_OK)
 		delete diskSystem;
+	return error;
+}
+
+// _Scan
+status_t
+KDiskDeviceManager::_Scan(const char *path)
+{
+	status_t error = B_OK;
+	struct stat st;
+	if (lstat(path, &st) < 0)
+		return errno;
+	if (S_ISDIR(st.st_mode)) {
+		// a directory: iterate through its contents
+		DIR *dir = opendir(path);
+		if (!dir)
+			return errno;
+		while (dirent *entry = readdir(dir)) {
+			// skip "." and ".."
+			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+				continue;
+			if (strlen(path) + strlen(entry->d_name) + 1 >= B_PATH_NAME_LENGTH)
+				continue;
+			char entryPath[B_PATH_NAME_LENGTH];
+			sprintf(entryPath, "%s/%s", path, entry->d_name);
+			_Scan(entryPath);
+		}
+		closedir(dir);
+	} else {
+		// not a directory
+		// check, if it is named "raw"
+		int32 len = strlen(path);
+		int32 leafLen = strlen("/raw");
+		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
+			return B_ERROR;
+		// create a KDiskDevice for it
+		KDiskDevice *device = new(nothrow) KDiskDevice;
+		if (!device)
+			return B_NO_MEMORY;
+		// init the KDiskDevice
+		status_t error = device->SetTo(path);
+		// add the device
+		if (error == B_OK && !fDevices.AddItem(device))
+			error = B_NO_MEMORY;
+		// cleanup on error
+		if (error != B_OK)
+			delete device;
+	}
+	return error;
+}
+
+// _ScanPartition
+status_t
+KDiskDeviceManager::_ScanPartition(KPartition *partition)
+{
+	// the partition's device must be write-locked
+	if (!partition)
+		return B_BAD_VALUE;
+	// find the disk system that returns the best priority for this partition
+	float bestPriority = -1;
+	KDiskSystem *bestDiskSystem = NULL;
+	void *bestCookie = NULL;
+	int32 itCookie;
+	while (KDiskSystem *diskSystem = LoadNextDiskSystem(&itCookie)) {
+		void *cookie = NULL;
+		float priority = diskSystem->Identify(partition, &cookie);
+		if (priority >= 0 && priority > bestPriority) {
+			// new best disk system
+			if (bestDiskSystem) {
+				bestDiskSystem->FreeIdentifyCookie(partition, bestCookie);
+				bestDiskSystem->Unload();
+			}
+			bestPriority = priority;
+			bestDiskSystem = diskSystem;
+			bestCookie = cookie;
+		} else {
+			// disk system doesn't identify the partition or worse than our
+			// current favorite
+			diskSystem->FreeIdentifyCookie(partition, cookie);
+			diskSystem->Unload();
+		}
+	}
+	// now, if we have found a disk system, let it scan the partition
+	status_t error = B_OK;
+	if (bestDiskSystem) {
+		error = bestDiskSystem->Scan(partition, bestCookie);
+		if (error == B_OK) {
+			partition->SetDiskSystem(bestDiskSystem);
+			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
+				child->SetParentDiskSystem(bestDiskSystem);
+				_ScanPartition(child);
+			}
+		} else {
+			// TODO: Handle the error.
+		}
+		// now we can safely unload the disk system -- it has been loaded by
+		// the partition(s) and thus will not really be unloaded
+		bestDiskSystem->Unload();
+	} else {
+		// contents not recognized
+		// nothing to be done -- partitions are created as unrecognized
+	}
 	return error;
 }
 

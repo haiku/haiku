@@ -26,6 +26,7 @@ public:
 	virtual bool IsFileSystem() const;
 	bool IsPartitioningSystem() const;
 
+	// manager will be locked
 	status_t Load();		// load/unload -- can be nested
 	void Unload();			//
 	bool IsLoaded() const;

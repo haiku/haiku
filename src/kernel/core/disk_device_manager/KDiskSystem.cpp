@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
 
@@ -75,6 +76,7 @@ KDiskSystem::IsPartitioningSystem() const
 status_t
 KDiskSystem::Load()
 {
+	ManagerLocker locker(KDiskDeviceManager::Default());
 	status_t error = B_OK;
 	if (fLoadCounter == 0)
 		error = LoadModule();
@@ -87,6 +89,7 @@ KDiskSystem::Load()
 void
 KDiskSystem::Unload()
 {
+	ManagerLocker locker(KDiskDeviceManager::Default());
 	if (fLoadCounter > 0 && --fLoadCounter == 0)
 		UnloadModule();
 }
@@ -95,6 +98,7 @@ KDiskSystem::Unload()
 bool
 KDiskSystem::IsLoaded() const
 {
+	ManagerLocker locker(KDiskDeviceManager::Default());
 	return (fLoadCounter > 0);
 }
 

@@ -23,7 +23,10 @@ public:
 	KDiskDevice(partition_id id = -1);
 	virtual ~KDiskDevice();
 
+	status_t SetTo(const char *path);
+	void Unset();
 	status_t InitCheck() const;
+		// TODO: probably superfluous
 
 	// A read lock owner can be sure that the device (incl. all of its
 	// partitions won't be changed).
@@ -64,6 +67,8 @@ public:
 	team_id ShadowOwner() const;
 
 private:
+	void _InitPartitionData();
+
 	disk_device_data	fDeviceData;
 	RWLocker			fLocker;
 	int					fFD;

@@ -14,10 +14,10 @@
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
+#include "KDiskSystem.h"
 #include "KPartition.h"
 
 using namespace std;
-using BPrivate::DiskDevice::KDiskSystem;
 
 // constructor
 KPartition::KPartition(partition_id id)
@@ -29,7 +29,7 @@ KPartition::KPartition(partition_id id)
 	  fParentDiskSystem(NULL),
 	  fReferenceCount(0)
 {
-	fPartitionData.id = id;
+	fPartitionData.id = (id >= 0 ? id : _NextID());
 	fPartitionData.offset = 0;
 	fPartitionData.size = 0;
 	fPartitionData.block_size = 0;
@@ -600,7 +600,15 @@ KPartition::IsShadowPartition() const
 void
 KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 {
+	// unload former disk system
+	if (fDiskSystem) {
+		fDiskSystem->Unload();
+		fDiskSystem = NULL;
+	}
+	// set and load new one
 	fDiskSystem = diskSystem;
+	if (fDiskSystem)
+		fDiskSystem->Load();
 }
 
 // DiskSystem
@@ -614,7 +622,15 @@ KPartition::DiskSystem() const
 void
 KPartition::SetParentDiskSystem(KDiskSystem *diskSystem)
 {
+	// unload former disk system
+	if (fParentDiskSystem) {
+		fParentDiskSystem->Unload();
+		fParentDiskSystem = NULL;
+	}
+	// set and load new one
 	fParentDiskSystem = diskSystem;
+	if (fParentDiskSystem)
+		fParentDiskSystem->Load();
 }
 
 // ParentDiskSystem
@@ -659,4 +675,15 @@ KPartition::_UpdateChildIndices(int32 index)
 	for (int32 i = index; KPartition *child = fChildren.ItemAt(i); i++)
 		child->SetIndex(index);
 }
+
+// _NextID
+int32
+KPartition::_NextID()
+{
+	return atomic_add(&fNextID, 1);
+}
+
+
+// fNextID
+int32 KPartition::fNextID = 0;
 
