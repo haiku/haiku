@@ -28,4 +28,11 @@ SharedLibrary disk_device_manager :
 	KResizeJob.cpp
 	KScanPartitionJob.cpp
 	KSetParametersJob.cpp
+
+	# utilities
+	Locker.cpp
+	RWLocker.cpp
 ;
+
+LinkSharedOSLibs libdisk_device_manager.so
+	: <boot!home!config!lib>libkernelland_emu.so ;
