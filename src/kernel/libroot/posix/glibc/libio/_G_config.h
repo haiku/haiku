@@ -26,7 +26,7 @@
 #	include <stddef.h>
 #endif
 
-#include <wchar.h>
+//#include <wchar.h>
 
 #ifndef _WINT_T
 /* Integral type unchanged by default argument promotions that can
@@ -127,11 +127,12 @@ typedef unsigned int _G_uint32_t __attribute__ ((__mode__ (__SI__)));
 /* These are the vtbl details for ELF.  */
 #define _G_NAMES_HAVE_UNDERSCORE 0
 #define _G_VTABLE_LABEL_HAS_LENGTH 1
-#ifndef _G_USING_THUNKS
-# define _G_USING_THUNKS	1
+// avoid vtable-thunks, as BeOS never used those:
+#ifdef _G_USING_THUNKS
+#undef _G_USING_THUNKS
 #endif /* _G_USING_THUNKS */
-#define _G_VTABLE_LABEL_PREFIX "__vt_"
-#define _G_VTABLE_LABEL_PREFIX_ID __vt_
+#define _G_VTABLE_LABEL_PREFIX "_vt."
+#define _G_VTABLE_LABEL_PREFIX_ID _vt.
 
 #define _G_INTERNAL_CCS	"UCS4"
 #define _G_HAVE_WEAK_SYMBOL 1
