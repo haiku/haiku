@@ -64,7 +64,7 @@
 
 // Local Defines ---------------------------------------------------------------
 
-#define DEBUG_BVIEW
+//#define DEBUG_BVIEW
 #ifdef DEBUG_BVIEW
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -407,6 +407,9 @@ BRect BView::Bounds() const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertToParent(BPoint* pt) const{
+	if (!parent && !top_level_view)
+		return;
+
 	check_lock_no_pick();
 
 	pt->x			+= originX;
@@ -416,6 +419,9 @@ void BView::ConvertToParent(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertToParent(BPoint pt) const{
+	if (!parent && !top_level_view)
+		return pt;
+
 	check_lock_no_pick();
 	
 	BPoint			p;
@@ -428,6 +434,9 @@ BPoint BView::ConvertToParent(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromParent(BPoint* pt) const{
+	if (!parent && !top_level_view)
+		return;
+
 	check_lock_no_pick();
 	
 	pt->x			-= originX;
@@ -437,6 +446,9 @@ void BView::ConvertFromParent(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertFromParent(BPoint pt) const{
+	if (!parent && !top_level_view)
+		return pt;
+
 	check_lock_no_pick();
 	
 	BPoint			p;
@@ -449,6 +461,9 @@ BPoint BView::ConvertFromParent(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertToParent(BRect* r) const{
+	if (!parent && !top_level_view)
+		return;
+
 	check_lock_no_pick();
 	
 	r->OffsetBy(originX, originY);
@@ -457,6 +472,9 @@ void BView::ConvertToParent(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertToParent(BRect r) const{
+	if (!parent && !top_level_view)
+		return r;
+
 	check_lock_no_pick();
 	
 	return r.OffsetByCopy(originX, originY);
@@ -465,6 +483,9 @@ BRect BView::ConvertToParent(BRect r) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromParent(BRect* r) const{
+	if (!parent && !top_level_view)
+		return;
+
 	check_lock_no_pick();
 	
 	r->OffsetBy(-originX, -originY);
@@ -473,6 +494,9 @@ void BView::ConvertFromParent(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertFromParent(BRect r) const{
+	if (!parent && !top_level_view)
+		return r;
+
 	check_lock_no_pick();
 
 	return r.OffsetByCopy(-originX, -originY);
@@ -483,6 +507,9 @@ BRect BView::ConvertFromParent(BRect r) const{
 
 
 void BView::ConvertToScreen(BPoint* pt) const{
+	if (!parent && !top_level_view)
+		return;
+
 	do_owner_check_no_pick();
 
 	if (top_level_view)
@@ -496,6 +523,9 @@ void BView::ConvertToScreen(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertToScreen(BPoint pt) const{
+	if (!parent && !top_level_view)
+		return pt;
+
 	do_owner_check_no_pick();
 
 	BPoint			p;
@@ -513,6 +543,9 @@ BPoint BView::ConvertToScreen(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromScreen(BPoint* pt) const{
+	if (!parent && !top_level_view)
+		return;
+
 	do_owner_check_no_pick();
 
 	if (top_level_view)
@@ -526,6 +559,9 @@ void BView::ConvertFromScreen(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertFromScreen(BPoint pt) const{
+	if (!parent && !top_level_view)
+		return pt;
+
 	do_owner_check_no_pick();
 
 	BPoint			p;
@@ -544,6 +580,9 @@ BPoint BView::ConvertFromScreen(BPoint pt) const{
 
 
 void BView::ConvertToScreen(BRect* r) const{
+	if (!parent && !top_level_view)
+		return;
+
 	do_owner_check_no_pick();
 
 	if (top_level_view)
@@ -557,6 +596,9 @@ void BView::ConvertToScreen(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertToScreen(BRect r) const{
+	if (!parent && !top_level_view)
+		return r;
+
 	do_owner_check_no_pick();
 
 	BRect			rect;
@@ -574,6 +616,9 @@ BRect BView::ConvertToScreen(BRect r) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromScreen(BRect* r) const{
+	if (!parent && !top_level_view)
+		return;
+
 	do_owner_check_no_pick();
 
 	if (top_level_view)
@@ -587,6 +632,9 @@ void BView::ConvertFromScreen(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertFromScreen(BRect r) const{
+	if (!parent && !top_level_view)
+		return r;
+
 	do_owner_check_no_pick();
 
 	BRect			rect;
@@ -627,7 +675,7 @@ void BView::SetFlags( uint32 flags ){
 			check_lock();
 			
 			owner->session->WriteInt32( AS_LAYER_SET_FLAGS );
-			owner->session->WriteInt32( flags );
+			owner->session->WriteUInt32( flags );
 		}
 	}
 			
@@ -838,85 +886,104 @@ BWindow* BView::Window() const {
 
 void BView::AttachedToWindow(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::AttachedToWindow()\n", Name()));
 }
 
 //---------------------------------------------------------------------------
 
 void BView::AllAttached(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::AllAttached()\n", Name()));
 }
 
 //---------------------------------------------------------------------------
 
 void BView::DetachedFromWindow(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::DetachedFromWindow()\n", Name()));
 }
 
 //---------------------------------------------------------------------------
 
 void BView::AllDetached(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::AllDetached()\n", Name()));
 }
 
 //---------------------------------------------------------------------------
 
 void BView::Draw(BRect updateRect){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::Draw()\n", Name()));
 }
 
 void BView::DrawAfterChildren(BRect r){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::DrawAfterChildren()\n", Name()));
 }
 
 void BView::FrameMoved(BPoint new_position){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::FrameMoved()\n", Name()));
 }
 
 void BView::FrameResized(float new_width, float new_height){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::FrameResized()\n", Name()));
 }
 
 void BView::GetPreferredSize(float* width, float* height){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::GetPreferredSize()\n", Name()));
 	*width				= fBounds.Width();
 	*height				= fBounds.Height();
 }
 
 void BView::ResizeToPreferred(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::ResizeToPreferred()\n", Name()));
+
 	ResizeTo(fBounds.Width(), fBounds.Height()); 
 }
 
 void BView::KeyDown(const char* bytes, int32 numBytes){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::KeyDown()\n", Name()));
 }
 
 void BView::KeyUp(const char* bytes, int32 numBytes){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::KeyUp()\n", Name()));
 }
 
 void BView::MouseDown(BPoint where){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::MouseDown()\n", Name()));
 }
 
 void BView::MouseUp(BPoint where){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::MouseUp()\n", Name()));
 }
 
 void BView::MouseMoved(BPoint where, uint32 code, const BMessage* a_message){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::MouseMoved()\n", Name()));
 }
 
 void BView::Pulse(){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::Pulse()\n", Name()));
 }
 
 void BView::TargetedByScrollView(BScrollView* scroll_view){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::TargetedByScrollView()\n", Name()));
 }
 
 void BView::WindowActivated(bool state){
 	// HOOK function
+	STRACE(("\tHOOK: BView(%s)::WindowActivated()\n", Name()));
 }
 
 // Input Functions
@@ -1386,11 +1453,14 @@ drawing_mode BView::DrawingMode() const{
 	if (owner)
 	{
 		check_lock();
+		int8		drawingMode;
 
 		owner->session->WriteInt32( AS_LAYER_GET_DRAW_MODE );
 		owner->session->Sync();
 		
-		owner->session->ReadInt8( (int8*)&(fState->drawingMode) );
+		owner->session->ReadInt8( &drawingMode );
+		
+		fState->drawingMode		= (drawing_mode)drawingMode;
 		
 		fState->flags			&= ~B_VIEW_DRAW_MODE_BIT;
 	}
@@ -1428,12 +1498,16 @@ void BView::GetBlendingMode(source_alpha* srcAlpha,	alpha_function* alphaFunc) c
 	if (owner)
 	{
 		check_lock();
+		int8		alphaSrcMode, alphaFncMode;
 		
 		owner->session->WriteInt32( AS_LAYER_GET_BLEND_MODE );
 		owner->session->Sync();
 		
-		owner->session->ReadInt8( (int8*)&(fState->alphaSrcMode) );
-		owner->session->ReadInt8( (int8*)&(fState->alphaFncMode) );
+		owner->session->ReadInt8( &alphaSrcMode );
+		owner->session->ReadInt8( &alphaFncMode );
+		
+		fState->alphaSrcMode	= (source_alpha)alphaSrcMode;
+		fState->alphaFncMode	= (alpha_function)alphaFncMode;
 		
 		fState->flags			&= ~B_VIEW_BLENDING_BIT;
 	}
@@ -1779,7 +1853,7 @@ void BView::ClipToPicture(BPicture* picture,
 		
 	if (do_owner_check()){
 		
-		owner->session->WriteInt32( AS_LAYER_CLIP_PICTURE );
+		owner->session->WriteInt32( AS_LAYER_CLIP_TO_PICTURE );
 		owner->session->WriteInt32( picture->token );
 		owner->session->WritePoint( where );
 		
@@ -1804,7 +1878,7 @@ void BView::ClipToInversePicture(BPicture* picture,
 		
 	if (do_owner_check()){
 		
-		owner->session->WriteInt32( AS_LAYER_CLIP_INVERSE_PICTURE );
+		owner->session->WriteInt32( AS_LAYER_CLIP_TO_INVERSE_PICTURE );
 		owner->session->WriteInt32( picture->token );
 		owner->session->WritePoint( where );
 		
@@ -2934,13 +3008,16 @@ STRACE(("BView(%s)::AddChild(child='%s' before='%s')\n", this->Name(),
 	if (child->parent != NULL)
 		debugger("AddChild failed - the view already belongs to someone else.");
 	
-	if (owner)
+	bool	lockedByAddChild = false;
+	if ( owner && !(owner->IsLocked()) ){
 		owner->Lock();
+		lockedByAddChild	= true;		
+	}
 		
 	if ( !addToList( child, before ) )
 		debugger("AddChild failed - cannot find 'before' view.");	
 
-	if (owner){
+	if ( owner ){
 		check_lock();
 
 		STRACE(("BView(%s)::AddChild(child='%s' before='%s')... contacting app_server\n", this->Name(),
@@ -2949,8 +3026,9 @@ STRACE(("BView(%s)::AddChild(child='%s' before='%s')\n", this->Name(),
 	
 		child->setOwner( this->owner);
 		attachView( child );
-		
-		owner->Unlock();
+
+		if ( lockedByAddChild )		
+			owner->Unlock();
 	}
 //	BVTRACE;
 	PrintTree();
@@ -3044,8 +3122,12 @@ void BView::MoveTo(BPoint where){
 
 void BView::MoveTo(float x, float y){
 
-	if ( x==0.0 && y==0.0 )	
+	if ( x == originX && y == originY )	
 		return;
+
+		// BeBook sez we should do this. We'll do it without. So...
+	/*x		= roundf( x );
+	y		= roundf( y );*/
 	
 	check_lock();
 	
@@ -3059,6 +3141,37 @@ void BView::MoveTo(float x, float y){
 	
 	originX		= x;
 	originY		= y;
+}
+
+//---------------------------------------------------------------------------
+
+void BView::ResizeBy(float dh, float dv){
+	ResizeTo( fBounds.right + dh, fBounds.bottom + dv );
+}
+
+//---------------------------------------------------------------------------
+
+void BView::ResizeTo(float width, float height){
+	if ( width == fBounds.Width() &&
+			height == fBounds.Height() )
+		return;
+
+		// BeBook sez we should do this. We'll do it without. So...
+	/*width		= roundf( width );
+	height		= roundf( height );*/
+	
+	check_lock();
+	
+	if (owner){
+		owner->session->WriteInt32( AS_LAYER_RESIZETO );
+		owner->session->WriteFloat( width );
+		owner->session->WriteFloat( height );
+		
+		fState->flags		|= B_VIEW_COORD_BIT;
+	}
+	
+	fBounds.right	= fBounds.left + width;
+	fBounds.bottom	= fBounds.top + height;
 }
 
 //---------------------------------------------------------------------------
@@ -4157,14 +4270,5 @@ void BView::PrintTree(){
 /*
  @log:
 	
-	* Modified a few lines from BSession::WriteInt32( uint32 ) into WriteUInt32( uint32 )
-	* in updateCachedState(), now all font attributes are received at once; I realized app_server doesn't need the flag based system. :-)
-	* added a new method: PrintToStream() - used for debugging.
-	* now the view state is allocated and initialized in BView::InitData(...)
-	* modified a few things in addToList(...) 'cause I don't know what was in my head when I wrote it?!
-	* added _ReservedView2-18() methods because of linker errors.
-	* a new method used for debugging: PrintTree()
-	* added debugging messages for a few methods
-	* TESTED view hierarchy methods like AddChild() and RemoveChild() RemoveSelf() - They WORK! :-)))
-	* minor but significant :-) ( = instead of == ) change in findView(...)
+	* some changes in ConvertXXXYYYY(...) methods.
 */
