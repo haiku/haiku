@@ -17,9 +17,8 @@
 #include <signal.h>
 #include <limits.h>
 
-#include "../stdio/local.h"
-//#include "stdio_private.h"
 
+extern void (*_IO_cleanup)(void);
 extern void _thread_do_exit_notification(void);
 
 static void (*_gExitStack[ATEXIT_MAX])(void) = {0};
