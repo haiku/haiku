@@ -27,5 +27,7 @@ Depends userland_disk_system_modules :
 	<boot!home!config!lib>libkernelland_emu.so
 	<file_system>bfs
 	<partitioning_system>intel
+	<partitioning_system>amiga_rdb
+	<partitioning_system>apple
 ;
 
