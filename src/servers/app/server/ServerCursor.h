@@ -54,8 +54,10 @@ public:
 	BPoint GetHotSpot(void);
 	void SetHotSpot(BPoint pt);
 	const char *GetAppSignature(void) { return _app_signature; }
+
+	//! Returns the cursor's ID
+	int32 ID(void) { return _token; }
 private:
-	friend ServerApp;
 	friend CursorManager;
 	
 	BPoint _hotspot;

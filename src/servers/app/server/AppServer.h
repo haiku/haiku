@@ -13,6 +13,8 @@ class Layer;
 class BMessage;
 class ServerApp;
 class DisplayDriver;
+class CursorManager;
+class BitmapManager;
 
 /*!
 	\class AppServer AppServer.h
@@ -61,4 +63,8 @@ private:
 
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver);
+
+extern CursorManager *cursormanager;
+extern BitmapManager *bitmapmanager;
+
 #endif

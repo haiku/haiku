@@ -30,10 +30,13 @@
 #include "DisplayDriver.h"
 #include "PortLink.h"
 #include "ServerApp.h"
+#include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
 #include "DefaultDecorator.h"
 #include "RGBColor.h"
+#include "BitmapManager.h"
+#include "CursorManager.h"
 
 // Globals
 
@@ -85,6 +88,23 @@ AppServer::AppServer(void)
 	// Set up the Desktop
 	InitDesktop();
 
+	// Create the cursor manager. Object declared in CursorManager.cpp
+	cursormanager=new CursorManager();
+
+	// Default cursor data stored in CursorData.cpp
+	
+	// TODO: fix the cursor display
+//	extern int8 default_cursor_data[];
+//	ServerCursor *sc=new ServerCursor(default_cursor_data);
+	extern int8 cross_cursor[];
+	ServerCursor *sc=new ServerCursor(cross_cursor);
+	cursormanager->AddCursor(sc);
+	cursormanager->ChangeCursor(B_CURSOR_DEFAULT, sc->ID());
+	cursormanager->SetCursor(B_CURSOR_DEFAULT);
+
+	// Create the bitmap allocator. Object declared in BitmapManager.cpp
+	bitmapmanager=new BitmapManager();
+
 	// This is necessary to mediate access between the Poller and app_server threads
 	_active_lock=create_sem(1,"app_server_active_sem");
 
@@ -133,6 +153,9 @@ AppServer::~AppServer(void)
 	}
 	delete _applist;
 	release_sem(_applist_lock);
+
+	delete bitmapmanager;
+	delete cursormanager;
 
 	ShutdownDesktop();
 

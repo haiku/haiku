@@ -28,6 +28,9 @@
 #include "ServerBitmap.h"
 #include <stdio.h>
 
+//! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
+BitmapManager *bitmapmanager=NULL;
+
 //! BGET function calls - defined here because of C++ name mangling causing link problems
 typedef long bufsize;
 extern "C" void	bpool(void *buffer, bufsize len);

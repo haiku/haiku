@@ -59,4 +59,6 @@ protected:
 	sem_id lock;
 };
 
+extern BitmapManager *bitmapmanager;
+
 #endif

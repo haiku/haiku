@@ -10,6 +10,7 @@ Server app_server :
 	areafunc.c
 	Angle.cpp
 	bget.c
+	CursorData.cpp
 	TokenHandler.cpp
 	PatternHandler.cpp
 

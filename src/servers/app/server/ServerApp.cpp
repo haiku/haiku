@@ -413,11 +413,11 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
 			if(_appcursor)
-				cursormanager->DeleteCursor(_appcursor->_token);
+				cursormanager->DeleteCursor(_appcursor->ID());
 
 			_appcursor=new ServerCursor(cdata);
 			cursormanager->AddCursor(_appcursor);
-			cursormanager->SetCursor(_appcursor->_token);
+			cursormanager->SetCursor(_appcursor->ID());
 			break;
 		}
 		case SET_CURSOR_BCURSOR:
