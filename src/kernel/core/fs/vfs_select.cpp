@@ -7,12 +7,22 @@
 #include <vfs.h>
 #include <fd.h>
 #include <syscalls.h>
+#include <fs/select_sync_pool.h>
 #include "vfs_select.h"
 
 #include <sys/select.h>
 #include <poll.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
+
+//#define TRACE_VFS_SELECT
+#ifdef TRACE_VFS_SELECT
+#	define PRINT(x) dprintf x
+#	define FUNCTION(x) dprintf x
+#else
+#	define PRINT(x) ;
+#	define FUNCTION(x) ;
+#endif
 
 
 /** Selects all events in the mask on the specified file descriptor */
@@ -71,6 +81,9 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	int count = 0;
 	int fd;
 
+	FUNCTION(("common_select(%d, %p, %p, %p, %lld, %p, %d)\n", numfds, readSet,
+		writeSet, errorSet, timeout, sigMask, kernel));
+
 	// ToDo: set sigMask to make pselect() functional different from select()
 
 	// check if fds are valid before doing anything
@@ -93,7 +106,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = malloc(sizeof(select_info) * numfds);
+	sync.set = (select_info*)malloc(sizeof(select_info) * numfds);
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
@@ -190,7 +203,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
 
-	sync.set = malloc(numfds * sizeof(select_info));
+	sync.set = (select_info*)malloc(numfds * sizeof(select_info));
 	if (sync.set == NULL) {
 		delete_sem(sync.sem);
 		return B_NO_MEMORY;
@@ -269,6 +282,8 @@ notify_select_event(struct selectsync *_sync, uint32 ref, uint8 event)
 {
 	select_sync *sync = (select_sync *)_sync;
 
+	FUNCTION(("notify_select_event(%p, %lu, %u)\n", _sync, ref, event));
+
 	if (sync == NULL
 		|| sync->sem < B_OK
 		|| ref > sync->count)
@@ -282,6 +297,128 @@ notify_select_event(struct selectsync *_sync, uint32 ref, uint8 event)
 		return release_sem(sync->sem);
 
 	return B_OK;
+}
+
+
+//	#pragma mark -
+//	currently private select sync pool functions exported to the kernel
+
+
+static select_sync_pool_entry *
+find_select_sync_pool_entry(select_sync_pool *pool, selectsync *sync,
+	uint32 ref)
+{
+	for (SelectSyncPoolEntryList::Iterator it = pool->entries.GetIterator();
+		 it.HasNext();) {
+		select_sync_pool_entry *entry = it.Next();
+		if (entry->sync == sync && entry->ref == ref)
+			return entry;
+	}
+
+	return NULL;
+}
+
+
+static status_t
+add_select_sync_pool_entry(select_sync_pool *pool, selectsync *sync,
+	uint32 ref, uint8 event)
+{
+	// check, whether the entry does already exist
+	select_sync_pool_entry *entry = find_select_sync_pool_entry(pool, sync,
+		ref);
+	if (!entry) {
+		entry = new(nothrow) select_sync_pool_entry;
+		if (!entry)
+			return B_NO_MEMORY;
+
+		entry->sync = sync;
+		entry->ref = ref;
+		entry->events = 0;
+	}
+
+	entry->events |= SELECT_FLAG(event);
+
+	return B_OK;
+}
+
+
+status_t
+add_select_sync_pool_entry(select_sync_pool **_pool, selectsync *sync,
+	uint32 ref, uint8 event)
+{
+	// create the pool, if necessary
+	select_sync_pool *pool = *_pool;
+	if (!pool) {
+		pool = new(nothrow) select_sync_pool;
+		if (!pool)
+			return B_NO_MEMORY;
+
+		*_pool = pool;
+	}
+
+	// add the entry
+	status_t error = add_select_sync_pool_entry(pool, sync, ref, event);
+
+	// cleanup
+	if (pool->entries.IsEmpty()) {
+		delete pool;
+		*_pool = NULL;
+	}
+
+	return error;
+}
+
+
+status_t
+remove_select_sync_pool_entry(select_sync_pool **_pool, selectsync *sync,
+	uint8 event)
+{
+	select_sync_pool *pool = *_pool;
+	if (!pool)
+		return B_ENTRY_NOT_FOUND;
+
+	// clear the event flag of the concerned entries
+	bool found = false;
+	for (SelectSyncPoolEntryList::Iterator it = pool->entries.GetIterator();
+		 it.HasNext();) {
+		select_sync_pool_entry *entry = it.Next();
+		if (entry->sync == sync) {
+			found = true;
+			entry->events &= ~SELECT_FLAG(event);
+
+			// remove the entry, if no longer needed
+			if (entry->events == 0) {
+				it.Remove();
+				delete entry;
+			}
+		}
+	}
+
+	if (!found)
+		return B_ENTRY_NOT_FOUND;
+
+	// delete the pool, if no longer needed
+	if (pool->entries.IsEmpty()) {
+		delete pool;
+		*_pool = NULL;
+	}
+
+	return B_OK;
+}
+
+
+void
+notify_select_event_pool(select_sync_pool *pool, uint8 event)
+{
+	if (!pool)
+		return;
+
+	for (SelectSyncPoolEntryList::Iterator it = pool->entries.GetIterator();
+		 it.HasNext();) {
+		select_sync_pool_entry *entry = it.Next();
+		if (entry->events & SELECT_FLAG(event))
+			notify_select_event(entry->sync, entry->ref, event);
+	}
 }
 
 
@@ -325,7 +462,7 @@ _user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *user
 	// copy parameters
 
 	if (userReadSet != NULL) {
-		readSet = malloc(bytes);
+		readSet = (fd_set *)malloc(bytes);
 		if (readSet == NULL)
 			return B_NO_MEMORY;
 
@@ -336,7 +473,7 @@ _user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *user
 	}
 
 	if (userWriteSet != NULL) {
-		writeSet = malloc(bytes);
+		writeSet = (fd_set *)malloc(bytes);
 		if (writeSet == NULL) {
 			result = B_NO_MEMORY;
 			goto err;
@@ -348,7 +485,7 @@ _user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *user
 	}
 
 	if (userErrorSet != NULL) {
-		errorSet = malloc(bytes);
+		errorSet = (fd_set *)malloc(bytes);
 		if (errorSet == NULL) {
 			result = B_NO_MEMORY;
 			goto err;
@@ -396,7 +533,7 @@ _user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
 
 	// copy parameters
 
-	fds = malloc(bytes = numfds * sizeof(struct pollfd));
+	fds = (struct pollfd *)malloc(bytes = numfds * sizeof(struct pollfd));
 	if (fds == NULL)
 		return B_NO_MEMORY;
 

@@ -12,7 +12,7 @@ KernelMergeObject kernel_fs.o :
 	pipefs.cpp
 	fd.c
 	vfs.cpp
-	vfs_select.c
+	vfs_select.cpp
 	message.c
 	node_monitor.cpp
 	IOScheduler.cpp
