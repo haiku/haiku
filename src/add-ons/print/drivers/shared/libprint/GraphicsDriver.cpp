@@ -420,19 +420,39 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 #endif	// USE_PREVIEW_FOR_DEBUG
 }
 
+bool GraphicsDriver::collectPages(SpoolData *spool_data, PageDataList *pages)
+{
+	// collect the pages to be printed on the physical page
+	PageData *page_data;
+	int nup = fOrgJobData->getNup();
+	bool more;
+	do {
+		more = spool_data->enumObject(&page_data);
+		if (pages != NULL) {
+			pages->push_back(page_data);
+		}
+	} while (more && --nup);
+	
+	return more;
+}
+
+bool GraphicsDriver::skipPages(SpoolData *spool_data)
+{
+	return collectPages(spool_data, NULL);
+}
+
 bool GraphicsDriver::printDocument(SpoolData *spool_data)
 {
 	bool more;
 	bool success;
-	PageData *page_data;
 	int page_index;
-	int nup;
 	int copy;
 	int copies;
 
 	more = true;
 	success = true;
 	page_index = 0;
+	
 	if (fPrinterCap->isSupport(PrinterCap::kCopyCommand)) {
 		// let the printer perform the copy operation
 		copies = 1;
@@ -440,17 +460,28 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 		// send the page multiple times to the printer
 		copies = fRealJobData->getCopies();
 	}
+	
 	if (spool_data->startEnum()) {
 		do {
 			DBGMSG(("page index = %d\n", page_index));
 
-			// collect the pages to be printed on the physical page
-			nup = fOrgJobData->getNup();
+			if (fRealJobData->getPageSelection() == JobData::kEvenNumberedPages) {
+				// skip odd numbered page
+				more = skipPages(spool_data);
+			}
+
+			if (!more) {
+				// end reached
+				break;
+			}
+			
 			PageDataList pages;
-			do {
-				more = spool_data->enumObject(&page_data);
-				pages.push_back(page_data);
-			} while (more && --nup);
+			more = collectPages(spool_data, &pages);
+			
+			if (more && fRealJobData->getPageSelection() == JobData::kOddNumberedPages) {
+				// skip even numbered page
+				more = skipPages(spool_data);
+			}
 
 			// print each physical page "copies" of times
 			for (copy = 0; success && copy < copies; copy ++) {
@@ -478,13 +509,11 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 		&& (fOrgJobData->getPrintStyle() != JobData::kSimplex)
 		&& (((page_index + fOrgJobData->getNup() - 1) / fOrgJobData->getNup()) % 2))
 	{
-		// print each physical page "copies" of times
-		for (copy = 0; success && copy < copies; copy ++) {
-			success = 
-				startPage(page_index) &&
-				printPage(NULL) &&
-				endPage(page_index);
-		}
+		// append an empty page on the back side of the page in duplex or booklet mode
+		success = 
+			startPage(page_index) &&
+			printPage(NULL) &&
+			endPage(page_index);
 	}
 #endif
 

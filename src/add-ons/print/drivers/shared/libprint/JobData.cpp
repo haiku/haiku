@@ -33,6 +33,7 @@ static const char *kJDColor                 = "JJJJ_color";
 static const char *kJDDitherType            = "JJJJ_dither_type";
 static const char *kJDPaperRect             = "JJJJ_paper_rect";
 static const char* kJDPrintableRect         = "JJJJ_printable_rect";
+static const char* kJDPageSelection         = "JJJJ_page_selection";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
@@ -70,6 +71,7 @@ JobData::JobData(const JobData &job_data)
 	fMsg                   = job_data.fMsg;
 	fColor                 = job_data.fColor;
 	fDitherType            = job_data.fDitherType;
+	fPageSelection         = job_data.fPageSelection;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
@@ -99,6 +101,7 @@ JobData &JobData::operator = (const JobData &job_data)
 	fMsg                   = job_data.fMsg;
 	fColor                 = job_data.fColor;
 	fDitherType            = job_data.fDitherType;
+	fPageSelection         = job_data.fPageSelection;
 	return *this;
 }
 
@@ -229,14 +232,19 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPageOrder = kAcrossFromLeft;
 
 	if (msg->HasBool(kJDColor))
-		fColor = msg->FindBool(kJDColor);
+		fColor = msg->FindBool(kJDColor) ? kColor : kMonochrome;
 	else
-		fColor = false;
+		fColor = kMonochrome;
 	
 	if (msg->HasInt32(kJDDitherType))
 		fDitherType = (Halftone::DitherType)msg->FindInt32(kJDDitherType);
 	else
 		fDitherType = Halftone::kTypeFloydSteinberg;
+	
+	if (msg->HasInt32(kJDPageSelection))
+		fPageSelection = (PageSelection)msg->FindInt32(kJDPageSelection);
+	else
+		fPageSelection = kAllPages;
 }
 
 void JobData::save(BMessage *msg)
@@ -364,4 +372,9 @@ void JobData::save(BMessage *msg)
 		msg->ReplaceInt32(kJDDitherType, fDitherType);
 	else
 		msg->AddInt32(kJDDitherType, fDitherType);
+	
+	if (msg->HasInt32(kJDPageSelection))
+		msg->ReplaceInt32(kJDPageSelection, fPageSelection);
+	else
+		msg->AddInt32(kJDPageSelection, fPageSelection);
 }

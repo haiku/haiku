@@ -30,6 +30,7 @@
 #include <Rect.h>
 #include <Slider.h>
 #include <TextControl.h>
+#include <TextView.h>
 #include <View.h>
 
 #include "HalftoneView.h"
@@ -140,9 +141,29 @@ using namespace std;
 #define REVERSE_HEIGHT		16
 
 #define PAGES_H				PAPERFEED_H
-#define PAGES_V				REVERSE_V + COLLATE_HEIGHT + 5
+#define PAGES_V				REVERSE_V + REVERSE_HEIGHT + 5
 #define PAGES_WIDTH			PAPERFEED_WIDTH
 #define PAGES_HEIGHT		40
+
+#define PAGE_SELECTION_H      PAPERFEED_H
+#define PAGE_SELECTION_V      PAGES_V + PAGES_HEIGHT + 5
+#define PAGE_SELECTION_WIDTH  PAPERFEED_WIDTH
+#define PAGE_SELECTION_HEIGHT 3 * 16 + 30
+
+	#define PS_ALL_PAGES_H       10
+	#define PS_ALL_PAGES_V       20
+	#define PS_ALL_PAGES_WIDTH   PAGE_SELECTION_WIDTH - 20
+	#define PS_ALL_PAGES_HEIGHT  16
+
+	#define PS_ODD_PAGES_H       PS_ALL_PAGES_H
+	#define PS_ODD_PAGES_V       PS_ALL_PAGES_V + PS_ALL_PAGES_HEIGHT
+	#define PS_ODD_PAGES_WIDTH   PS_ALL_PAGES_WIDTH
+	#define PS_ODD_PAGES_HEIGHT  PS_ALL_PAGES_HEIGHT
+
+	#define PS_EVEN_PAGES_H       PS_ALL_PAGES_H
+	#define PS_EVEN_PAGES_V       PS_ODD_PAGES_V + PS_ODD_PAGES_HEIGHT
+	#define PS_EVEN_PAGES_WIDTH   PS_ALL_PAGES_WIDTH
+	#define PS_EVEN_PAGES_HEIGHT  PS_ALL_PAGES_HEIGHT
 
 #define PRINT_BUTTON_WIDTH	70
 #define PRINT_BUTTON_HEIGHT	20
@@ -263,6 +284,30 @@ const BRect pages_rect(
 	PAGES_H + PAGES_WIDTH,
 	PAGES_V + PAGES_HEIGHT);
 
+const BRect page_selection_rect(
+	PAGE_SELECTION_H,
+	PAGE_SELECTION_V,
+	PAGE_SELECTION_H + PAGE_SELECTION_WIDTH,
+	PAGE_SELECTION_V + PAGE_SELECTION_HEIGHT);
+
+const BRect page_selection_all_pages_rect(
+	PS_ALL_PAGES_H,
+	PS_ALL_PAGES_V,
+	PS_ALL_PAGES_H + PS_ALL_PAGES_WIDTH,
+	PS_ALL_PAGES_V + PS_ALL_PAGES_HEIGHT);
+
+const BRect page_selection_odd_pages_rect(
+	PS_ODD_PAGES_H,
+	PS_ODD_PAGES_V,
+	PS_ODD_PAGES_H + PS_ODD_PAGES_WIDTH,
+	PS_ODD_PAGES_V + PS_ODD_PAGES_HEIGHT);
+
+const BRect page_selection_even_pages_rect(
+	PS_EVEN_PAGES_H,
+	PS_EVEN_PAGES_V,
+	PS_EVEN_PAGES_H + PS_EVEN_PAGES_WIDTH,
+	PS_EVEN_PAGES_V + PS_EVEN_PAGES_HEIGHT);
+
 const BRect ok_rect(
 	PRINT_OK_BUTTON_H,
 	PRINT_OK_BUTTON_V,
@@ -342,8 +387,9 @@ enum {
 	kMsgCancel,
 	kMsgOK,
 	kMsgQuality,
-	kCollateChanged,
-	kReverseChanged,
+	kMsgCollateChanged,
+	kMsgReverseChanged,
+	kMsgDuplexChanged,
 };
 
 JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
@@ -352,7 +398,33 @@ JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-void JobSetupView::AttachedToWindow()
+BRadioButton* 
+JobSetupView::AddPageSelectionItem(BView* parent, BRect rect, const char* name, const char* label, 
+	JobData::PageSelection pageSelection)
+{
+	BRadioButton* button = new BRadioButton(rect, name, label, NULL);
+	if (fJobData->getPageSelection() == pageSelection) {
+		button->SetValue(B_CONTROL_ON);
+	}
+	parent->AddChild(button);
+	return button;
+}
+
+void
+JobSetupView::AllowOnlyDigits(BTextView* textView, int maxDigits)
+{
+	int num;
+	for (num = 0; num <= 255; num++) {
+		textView->DisallowChar(num);
+	}
+	for (num = 0; num <= 9; num++) {
+		textView->AllowChar('0' + num);
+	}
+	textView->SetMaxBytes(maxDigits);
+}
+
+void 
+JobSetupView::AttachedToWindow()
 {
 	BBox *box;
 	BMenuItem  *item = NULL;
@@ -411,7 +483,7 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(bpp_rect, "", "Color:", fColorType);
+	menufield = new BMenuField(bpp_rect, "color", "Color:", fColorType);
 
 	box->AddChild(menufield);
 	width = StringWidth("Color:") + 10;
@@ -436,7 +508,7 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(dither_rect, "", "Dithering:", fDitherType);
+	menufield = new BMenuField(dither_rect, "dithering", "Dithering:", fDitherType);
 
 	box->AddChild(menufield);
 	width = StringWidth("Dithering:") + 10;
@@ -481,29 +553,29 @@ void JobSetupView::AttachedToWindow()
 	AddChild(box);
 	box->SetLabel("Page Range");
 
-	fAll = new BRadioButton(all_button_rect, "", "All", new BMessage(kMsgRangeAll));
+	fAll = new BRadioButton(all_button_rect, "all", "All", new BMessage(kMsgRangeAll));
 	box->AddChild(fAll);
 
-	BRadioButton *from = new BRadioButton(selection_rect, "", "", new BMessage(kMsgRangeSelection));
+	BRadioButton *from = new BRadioButton(selection_rect, "selection", "", new BMessage(kMsgRangeSelection));
 	box->AddChild(from);
 
-	from_page = new BTextControl(from_rect, "", "From", "", NULL);
-	box->AddChild(from_page);
-	from_page->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	from_page->SetDivider(StringWidth("From") + 7);
+	fFromPage = new BTextControl(from_rect, "from", "From", "", NULL);
+	box->AddChild(fFromPage);
+	fFromPage->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fFromPage->SetDivider(StringWidth("From") + 7);
+	AllowOnlyDigits(fFromPage->TextView(), 6);
 
-	to_page = new BTextControl(to_rect, "", "To", "", NULL);
-	box->AddChild(to_page);
-	to_page->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	to_page->SetDivider(StringWidth("To") + 7);
+	fToPage = new BTextControl(to_rect, "to", "To", "", NULL);
+	box->AddChild(fToPage);
+	fToPage->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fToPage->SetDivider(StringWidth("To") + 7);
+	AllowOnlyDigits(fToPage->TextView(), 6);
 
 	int first_page = fJobData->getFirstPage();
 	int last_page  = fJobData->getLastPage();
 
 	if (first_page <= 1 && last_page <= 0) {
 		fAll->SetValue(B_CONTROL_ON);
-		from_page->SetEnabled(false);
-		to_page->SetEnabled(false);
 	} else {
 		from->SetValue(B_CONTROL_ON);
 		if (first_page < 1)
@@ -513,11 +585,11 @@ void JobSetupView::AttachedToWindow()
 
 		ostringstream oss1;
 		oss1 << first_page;
-		from_page->SetText(oss1.str().c_str());
+		fFromPage->SetText(oss1.str().c_str());
 
 		ostringstream oss2;
 		oss2 << last_page;
-		to_page->SetText(oss2.str().c_str());
+		fToPage->SetText(oss2.str().c_str());
 	}
 
 	fAll->SetTarget(this);
@@ -541,7 +613,7 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(paperfeed_rect, "", "Paper Source:", fPaperFeed);
+	menufield = new BMenuField(paperfeed_rect, "paperSource", "Paper Source:", fPaperFeed);
 	AddChild(menufield);
 	width = StringWidth("Number of Copies:") + 7;
 	menufield->SetDivider(width);
@@ -564,33 +636,35 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(nup_rect, "", "Page Per Sheet:", fNup);
+	menufield = new BMenuField(nup_rect, "pagePerSheet", "Page Per Sheet:", fNup);
 	menufield->SetDivider(width);
 	AddChild(menufield);
 
 	/* duplex */
 
 	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
-		fDuplex = new BCheckBox(duplex_rect, "Duplex", "Duplex", NULL);
+		fDuplex = new BCheckBox(duplex_rect, "duplex", "Duplex", new BMessage(kMsgDuplexChanged));
 		AddChild(fDuplex);
 		if (fJobData->getPrintStyle() != JobData::kSimplex) {
 			fDuplex->SetValue(B_CONTROL_ON);
 		}
+		fDuplex->SetTarget(this);
 	}
 
 	/* copies */
 
-	copies = new BTextControl(copies_rect, "", "Number of Copies:", "", NULL);
-	AddChild(copies);
-	copies->SetDivider(width);
+	fCopies = new BTextControl(copies_rect, "copies", "Number of Copies:", "", NULL);
+	AddChild(fCopies);
+	fCopies->SetDivider(width);
+	AllowOnlyDigits(fCopies->TextView(), 3);
 
 	ostringstream oss4;
 	oss4 << fJobData->getCopies();
-	copies->SetText(oss4.str().c_str());
+	fCopies->SetText(oss4.str().c_str());
 
 	/* collate */
 
-	fCollate = new BCheckBox(collate_rect, "Collate", "Collate", new BMessage(kCollateChanged));
+	fCollate = new BCheckBox(collate_rect, "collate", "Collate", new BMessage(kMsgCollateChanged));
 	AddChild(fCollate);
 	if (fJobData->getCollate()) {
 		fCollate->SetValue(B_CONTROL_ON);
@@ -599,7 +673,7 @@ void JobSetupView::AttachedToWindow()
 
 	/* reverse */
 
-	fReverse = new BCheckBox(reverse_rect, "Reverse", "Reverse", new BMessage(kReverseChanged));
+	fReverse = new BCheckBox(reverse_rect, "reverse", "Reverse", new BMessage(kMsgReverseChanged));
 	AddChild(fReverse);
 	if (fJobData->getReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
@@ -608,56 +682,73 @@ void JobSetupView::AttachedToWindow()
 
 	/* pages view */
 
-	fPages = new PagesView(pages_rect, "Pages", B_FOLLOW_ALL, B_WILL_DRAW);
+	fPages = new PagesView(pages_rect, "pages", B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(fPages);
 	fPages->setCollate(fJobData->getCollate());
 	fPages->setReverse(fJobData->getReverse());
+	
+	/* page selection */
+	BBox* pageSelectionBox = new BBox(page_selection_rect);
+	AddChild(pageSelectionBox);
+	pageSelectionBox->SetLabel("Page Selection");
+	
+	fAllPages = AddPageSelectionItem(pageSelectionBox, page_selection_all_pages_rect, "allPages", "All Pages", JobData::kAllPages);
+	fOddNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_odd_pages_rect, "oddPages", "Odd Numbered Pages", JobData::kOddNumberedPages);
+	fEvenNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_even_pages_rect, "evenPages", "Even Numbered Pages", JobData::kEvenNumberedPages);
 
 	/* cancel */
 
-	button = new BButton(cancel_rect, "", "Cancel", new BMessage(kMsgCancel));
+	button = new BButton(cancel_rect, "cancel", "Cancel", new BMessage(kMsgCancel));
 	AddChild(button);
 
 	/* ok */
 
-	button = new BButton(ok_rect, "", "OK", new BMessage(kMsgOK));
+	button = new BButton(ok_rect, "ok", "OK", new BMessage(kMsgOK));
 	AddChild(button);
 	button->MakeDefault(true);
+	
+	UpdateButtonEnabledState();
 }
 
-void JobSetupView::MessageReceived(BMessage *msg)
+void
+JobSetupView::UpdateButtonEnabledState()
+{
+	bool pageRangeEnabled = fAll->Value() != B_CONTROL_ON;
+	fFromPage->SetEnabled(pageRangeEnabled);
+	fToPage->SetEnabled(pageRangeEnabled);
+	
+	bool pageSelectionEnabled = fDuplex->Value() != B_CONTROL_ON;
+	fAllPages->SetEnabled(pageSelectionEnabled);
+	fOddNumberedPages->SetEnabled(pageSelectionEnabled);
+	fEvenNumberedPages->SetEnabled(pageSelectionEnabled);
+}
+
+void 
+JobSetupView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 	case kMsgRangeAll:
-		Window()->Lock();
-		from_page->SetEnabled(false);
-		to_page->SetEnabled(false);
-		Window()->Unlock();
-		break;
-
 	case kMsgRangeSelection:
-		Window()->Lock();
-		from_page->SetEnabled(true);
-		to_page->SetEnabled(true);
-		Window()->Unlock();
+	case kMsgDuplexChanged:
+		UpdateButtonEnabledState();
 		break;
 
 	case kMsgQuality:
 		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() == JobData::kColor); 
 		break;
 
-	case kCollateChanged:
+	case kMsgCollateChanged:
 		fPages->setCollate(fCollate->Value() == B_CONTROL_ON);
 		break;
 	
-	case kReverseChanged:
+	case kMsgReverseChanged:
 		fPages->setReverse(fReverse->Value() == B_CONTROL_ON);
-		break;
-	
+		break;	
 	}
 }
 
-JobData::Color JobSetupView::getColor()
+JobData::Color 
+JobSetupView::getColor()
 {
 	int count = fPrinterCap->countCap(PrinterCap::kColor);
 	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
@@ -671,7 +762,8 @@ JobData::Color JobSetupView::getColor()
 	return JobData::kMonochrome;
 }
 
-Halftone::DitherType JobSetupView::getDitherType()
+Halftone::DitherType 
+JobSetupView::getDitherType()
 {
 	int count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
 	const DitherCap **dither_cap = gDitherTypes;
@@ -685,19 +777,22 @@ Halftone::DitherType JobSetupView::getDitherType()
 	return Halftone::kTypeFloydSteinberg;
 }
 
-float JobSetupView::getGamma()
+float 
+JobSetupView::getGamma()
 {
 	const float value = (float)fGamma->Value();
 	return pow(2.0, value / 100.0);
 }
 
-float JobSetupView::getInkDensity()
+float 
+JobSetupView::getInkDensity()
 {
 	const float value = (float)fInkDensity->Value();
 	return value;
 }
 
-bool JobSetupView::UpdateJobData()
+bool 
+JobSetupView::UpdateJobData()
 {
 	int count;
 
@@ -725,8 +820,8 @@ bool JobSetupView::UpdateJobData()
 		first_page = 1;
 		last_page  = -1;
 	} else {
-		first_page = atoi(from_page->Text());
-		last_page  = atoi(to_page->Text());
+		first_page = atoi(fFromPage->Text());
+		last_page  = atoi(fToPage->Text());
 	}
 
 	fJobData->setFirstPage(first_page);
@@ -758,48 +853,20 @@ bool JobSetupView::UpdateJobData()
 		fJobData->setPrintStyle((B_CONTROL_ON == fDuplex->Value()) ? JobData::kDuplex : JobData::kSimplex);
 	}
 
-	fJobData->setCopies(atoi(copies->Text()));
+	fJobData->setCopies(atoi(fCopies->Text()));
 
 	fJobData->setCollate((B_CONTROL_ON == fCollate->Value()) ? true : false);
 	fJobData->setReverse((B_CONTROL_ON == fReverse->Value()) ? true : false);
 
+	JobData::PageSelection pageSelection = JobData::kAllPages;
+	if (fOddNumberedPages->Value() == B_CONTROL_ON)
+		pageSelection = JobData::kOddNumberedPages;
+	if (fEvenNumberedPages->Value() == B_CONTROL_ON)
+		pageSelection = JobData::kEvenNumberedPages;
+	fJobData->setPageSelection(pageSelection);
+	
 	fJobData->save();
 	return true;
-}
-
-//====================================================================
-
-static filter_result PrintKeyFilter(BMessage *msg, BHandler **target, BMessageFilter *filter)
-{
-
-	BWindow *window = (BWindow *)filter->Looper();
-	JobSetupView *view = (JobSetupView *)window->ChildAt(0);
-
-	if ((*target != view->copies->ChildAt(0))    &&
-		(*target != view->from_page->ChildAt(0)) &&
-		(*target != view->to_page->ChildAt(0)))
-	{
-		return B_DISPATCH_MESSAGE;
-	}
-
-	ulong mods = msg->FindInt32("modifiers");
-	if (mods & B_COMMAND_KEY)
-		return B_DISPATCH_MESSAGE;
-
-	const uchar *bytes = NULL;
-	if (msg->FindString("bytes", (const char **)&bytes) != B_NO_ERROR)
-		return B_DISPATCH_MESSAGE;
-
-	long key =  bytes[0];
-	if (key < '0') {
-		if ((key != B_TAB) && (key != B_BACKSPACE) && (key != B_ENTER) &&
-			(key != B_LEFT_ARROW) && (key != B_RIGHT_ARROW) &&
-			(key != B_UP_ARROW) && (key != B_DOWN_ARROW))
-			return B_SKIP_MESSAGE;
-	}
-	if (key > '9')
-		return B_SKIP_MESSAGE;
-	return B_DISPATCH_MESSAGE;
 }
 
 //====================================================================
@@ -809,30 +876,18 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const Pri
 		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-/*
-	ostringstream oss;
-	oss << printer_data->get_printer_name() << " Print";
-	SetTitle(oss.str().c_str());
-*/
 	SetResult(B_ERROR);
 	
-	JobSetupView *view = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
-	AddChild(view);
-	fFilter = new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, &PrintKeyFilter);
-	AddCommonFilter(fFilter);
+	fJobSetup = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
+	AddChild(fJobSetup);
 }
 
-JobSetupDlg::~JobSetupDlg()
-{
-	RemoveCommonFilter(fFilter);
-	delete fFilter;
-}
-
-void JobSetupDlg::MessageReceived(BMessage *msg)
+void 
+JobSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 	case kMsgOK:
-		((JobSetupView *)ChildAt(0))->UpdateJobData();
+		fJobSetup->UpdateJobData();
 		SetResult(B_NO_ERROR);
 		PostMessage(B_QUIT_REQUESTED);
 		break;
