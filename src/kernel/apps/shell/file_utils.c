@@ -100,7 +100,7 @@ int read_file_in_buffer(const char *filename,char **buffer)
 		return err;
 
 	*buffer = malloc(stat.st_size + 1);
-	if(*buffer == NULL) return ERR_NO_MEMORY;
+	if(*buffer == NULL) return ENOMEM;
 
 	size = sys_read(file_no,*buffer,0,stat.st_size);
 
