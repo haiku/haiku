@@ -13,7 +13,6 @@ SubDir OBOS_TOP src tests kits net ;
 
 # SimpleTest at_client : at_client.c : ;
 
-#SubInclude OBOS_TOP src tests kits net netperf ;
-#SubInclude OBOS_TOP src tests kits net new_stack ;
-#SubInclude OBOS_TOP src tests kits net ppp ;
+SubInclude OBOS_TOP src tests kits net netperf ;
+# SubInclude OBOS_TOP src tests kits net new_stack ;
 SubInclude OBOS_TOP src tests kits net preflet ;

@@ -2,8 +2,6 @@ SubDir OBOS_TOP src tests kits net new_stack ;
 
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
 
-Depends new_stack_tester : userland_network_v2_modules ;
-
 SimpleTest new_stack_tester :
 	net_stack_server.cpp
 	userland_modules.cpp
