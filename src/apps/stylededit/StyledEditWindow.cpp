@@ -664,11 +664,14 @@ StyledEditWindow::MenusBeginning()
 	int count = 0;
 	entry_ref ref;
 	while (documents.FindRef("refs",count++,&ref) == B_OK) {
-		BMessage * openRecent = new BMessage(B_REFS_RECEIVED);
-		openRecent->AddRef("refs",&ref);
-		BMenuItem * item = new BMenuItem(ref.name,openRecent);
-		item->SetTarget(be_app);
-		fRecentMenu->AddItem(item);
+		if ((ref.device != -1) && (ref.directory != -1)) {
+			// sanity check passed
+			BMessage * openRecent = new BMessage(B_REFS_RECEIVED);
+			openRecent->AddRef("refs",&ref);
+			BMenuItem * item = new BMenuItem(ref.name,openRecent);
+			item->SetTarget(be_app);
+			fRecentMenu->AddItem(item);
+		}
 	}
 	
 	// update the font menu be/interface/GraphicsDefs.h
