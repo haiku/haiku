@@ -307,6 +307,8 @@ private:
 	int32 			_ShortFindAfter(const char *, int32) const;
 	int32 			_FindBefore(const char *, int32, int32) const;
 	int32 			_IFindBefore(const char *, int32, int32) const;
+	BString			&_DoReplace(const char *, const char *, int32, int32,
+								bool);
 	void 			_SetLength(int32);
 
 #if DEBUG
