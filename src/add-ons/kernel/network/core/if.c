@@ -62,9 +62,13 @@ ifioctl(struct socket *so, ulong cmd, caddr_t data)
 	struct ifnet *ifp;
 	struct ifreq *ifr;
 	
+#if DEBUG
+	printf("ifioctl(0x%lX)\n", cmd);
+#endif
+	
 	if (cmd == SIOCGIFCONF)
 		return (ifconf(cmd, data));
-
+	
 	ifr = (struct ifreq*) data;
 	ifp = ifunit(ifr->ifr_name);
 	if (ifp == NULL)
@@ -92,6 +96,9 @@ ifioctl(struct socket *so, ulong cmd, caddr_t data)
 			ifp->if_metric = ifr->ifr_metric;
 			break;
 		default:
+#if DEBUG
+			printf("ifioctl: Unknown cmd!\n");
+#endif
 			if (so->so_proto == NULL)
 				return EOPNOTSUPP;
 			return (*so->so_proto->pr_userreq)(so, PRU_CONTROL,
@@ -99,16 +106,19 @@ ifioctl(struct socket *so, ulong cmd, caddr_t data)
 				
 	}
 	
+#if DEBUG
+	printf("ifioctl: done\n");
+#endif
 	
 	return 0;
 }
 
-	
+
 struct ifnet *
 ifunit(char *name)
 {
 	struct ifnet *d = devices;
-
+	
 	for (d=devices;d;d = d->if_next)
 		if (strcmp(d->if_name, name) == 0)
 			return d;

@@ -60,9 +60,8 @@ status_t std_ops(int32 op, ...);
 static int start_stack(void);
 static int stop_stack(void);
 
-static int32 count_net_modules(void);
-static const char *get_net_module_name(int32 index);
-static status_t control_net_module(int32 index, uint32 op, void *data, size_t length);
+static status_t control_net_module(const char *name, uint32 op, void *data,
+	size_t length);
 
 static void add_protosw(struct protosw *[], int layer);
 static struct net_module *module_list = NULL;
@@ -93,11 +92,7 @@ struct core_module_info core_info = {
 
 	start_stack,
 	stop_stack,
-	
-	count_net_modules,
-	get_net_module_name,
 	control_net_module,
-	
 	add_domain,
 	remove_domain,
 	add_protocol,
@@ -218,56 +213,19 @@ struct core_module_info core_info = {
 
 
 static
-struct net_module*
-net_module_at(int32 index)
-{
-	int32 currentIndex;
-	struct net_module *current = module_list;
-	
-	currentIndex = 0;
-	for(; current && currentIndex != index; current = current->next)
-		++currentIndex;
-	
-	return current;
-}
-
-
-static
-int32
-count_net_modules(void)
-{
-	int32 count;
-	struct net_module *current = module_list;
-	
-	count = 0;
-	for(; current; current = current->next)
-		++count;
-	
-	return count;
-}
-
-
-static
-const char*
-get_net_module_name(int32 index)
-{
-	struct net_module *module = net_module_at(index);
-	
-	if(!module)
-		return NULL;
-	
-	return module->name;
-}
-
-
-static
 status_t
-control_net_module(int32 index, uint32 op, void *data, size_t length)
+control_net_module(const char *name, uint32 op, void *data, size_t length)
 {
-	struct net_module *module = net_module_at(index);
+	struct net_module *module = module_list;
+	
+	for(; module; module = module->next) {
+		if(module->name && !strcmp(module->name, name))
+			break;
+	}
 	
 	if(!module || !module->ptr->control)
 		return B_ERROR;
+			// no module found
 	
 	return module->ptr->control(op, data, length);
 }

@@ -410,8 +410,7 @@ on1:
 			x = x->rn_right;
 		else
 			x = x->rn_left;
-	} while (b > abs(x->rn_bit));
-				/* x->rn_bit < b && x->rn_bit >= 0 */
+	} while (b > x->rn_bit && x->rn_bit >= 0);
 #ifdef RN_DEBUG
 	if (rn_debug)
 		log(LOG_DEBUG, "rn_insert: Going In:\n"), traverse(p);
