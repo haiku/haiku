@@ -732,6 +732,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 	port = _PortPool->GetPort();
 	*out_total_count = 0;
 	cookie = 0;
+	rv = B_OK;
 	for (int32 i = 0; i < buf_num_inputs; i++) {
 		xfer_consumer_get_next_input msg;		
 		xfer_consumer_get_next_input_reply reply;
@@ -801,6 +802,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 	port = _PortPool->GetPort();
 	*out_total_count = 0;
 	cookie = 0;
+	rv = B_OK;
 	for (int32 i = 0; i < buf_num_outputs; i++) {
 		xfer_producer_get_next_output msg;		
 		xfer_producer_get_next_output_reply reply;

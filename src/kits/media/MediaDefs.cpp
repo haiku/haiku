@@ -177,13 +177,13 @@ media_multi_audio_format media_raw_audio_format::wildcard;
 
 media_multi_audio_format media_multi_audio_format::wildcard;
 
-media_encoded_audio_format media_encoded_audio_format::wildcard = {0};
+media_encoded_audio_format media_encoded_audio_format::wildcard = {{0}};
 
 media_video_display_info media_video_display_info::wildcard = {(color_space)0};
 
 media_raw_video_format media_raw_video_format::wildcard = {0};
 
-media_encoded_video_format media_encoded_video_format::wildcard = {0};
+media_encoded_video_format media_encoded_video_format::wildcard = {{0}};
 
 media_multistream_format media_multistream_format::wildcard = {0};
 

@@ -175,7 +175,7 @@ BMediaEventLooper::ControlLoop()
 {
 	CALLED();
 
-	bool is_realtime;
+	bool is_realtime = false;
 	status_t err;
 	bigtime_t latency;
 	bigtime_t waituntil;
