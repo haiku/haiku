@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons print transports lpr ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-Addon lpr
+Addon LPR
 	: print transport
 	: Lpr.cpp
 	  LprSetupDlg.cpp
@@ -19,5 +19,5 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs lpr : be stdc++.r4 ;
+LinkSharedOSLibs LPR : be stdc++.r4 ;
 

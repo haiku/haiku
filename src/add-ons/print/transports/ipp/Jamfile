@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons print transports ipp ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-Addon ipp
+Addon IPP
 	: print transport
 	: Ipp.cpp
 	  IppSetupDlg.cpp
@@ -22,5 +22,5 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs ipp : be stdc++.r4 ;
+LinkSharedOSLibs IPP : be stdc++.r4  ;
 
