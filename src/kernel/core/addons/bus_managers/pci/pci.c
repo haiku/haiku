@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <PCI.h>
 #include <bus.h>
 #include <pci_bus.h>
 
@@ -53,13 +54,6 @@ static int pci_freecookie(void * cookie)
 	kfree(cookie);
 	return 0;
 }
-
-/*
-static int pci_seek(void * cookie, off_t pos, seek_type st)
-{
-	return EPERM;
-}
-*/
 
 static int pci_close(void * cookie)
 {
@@ -112,8 +106,8 @@ device_hooks pci_hooks = {
 	&pci_write,
 	NULL, /* select */
 	NULL, /* deselect */
-//	NULL, /* readv */
-//	NULL  /* writev */
+	NULL, /* readv */
+	NULL  /* writev */
 };
 
 static int pci_create_config_structs()
@@ -191,3 +185,39 @@ int pci_bus_init(kernel_args *ka)
 	return 0;
 }
 
+static int std_ops(int32 op, ...)
+{
+	switch(op) {
+		case B_MODULE_INIT:
+			dprintf( "PCI: init\n" );
+			break;
+		case B_MODULE_UNINIT:
+			dprintf( "PCI: uninit\n" );
+			break;
+		default:
+			return EINVAL;
+	}
+	return B_OK;
+}
+
+struct pci_module_info pci_module = {
+	{
+		{
+			B_PCI_MODULE_NAME,
+			B_KEEP_LOADED,
+			std_ops
+		},
+NULL//		&pci_rescan
+	},
+	
+NULL,//	&read_io_8,
+NULL,//	&write_io_8,
+NULL,//	&read_io_16,
+NULL,//	&write_io_16,
+NULL,//	&read_io_32,
+NULL,//	&write_io_32,
+NULL,//	&get_nth_pci_info,
+NULL,//	&read_pci_config,
+NULL,//	&write_pci_config,
+NULL,//	&ram_address
+};

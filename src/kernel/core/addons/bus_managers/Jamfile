@@ -1,5 +1,21 @@
 SubDir OBOS_TOP src kernel core addons bus_managers ;
 
+KernelObjects config_manager.c : -fno-pic -D_KERNEL_MODE ;
+
+KernelLd
+	config_manager
+	:
+	<$(SOURCE_GRIST)>config_manager.o
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	addons/kernel/bus_managers/config_manager
+	;
+
 KernelStaticLibrary libbus : 
 	<$(SOURCE_GRIST)>bus_init.c 
 	<$(SOURCE_GRIST)>bus_man.c 

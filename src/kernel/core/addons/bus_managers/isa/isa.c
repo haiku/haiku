@@ -5,26 +5,14 @@
 
 #include <module.h>
 #include <Errors.h>
-#include <isa.h>
+#include <ISA.h>
 #include <arch/cpu.h>
 #include <debug.h>
-
-static int isa_init( void )
-{
-	dprintf( "ISA: init\n" );
-	return B_NO_ERROR;
-}
 
 static status_t isa_rescan(void)
 {
 	dprintf("isa_rescan()\n");
 	return 0;
-}
-
-static int isa_uninit( void )
-{
-	dprintf( "ISA: uninit\n" );
-	return B_NO_ERROR;
 }
 
 static uint8 isa_read_io_8(int mapped_io_addr)
@@ -96,21 +84,21 @@ static int std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			isa_init();
+			dprintf( "ISA: init\n" );
 			break;
 		case B_MODULE_UNINIT:
-			isa_uninit();
+			dprintf( "ISA: uninit\n" );
 			break;
 		default:
 			return EINVAL;
 	}
-	return 0;
+	return B_OK;
 }
 
-static isa_bus_manager isa_module = {
+static isa_module_info isa_module = {
 	{
 		{
-			ISA_MODULE_NAME,
+			B_ISA_MODULE_NAME,
 			B_KEEP_LOADED,
 			std_ops
 		},
