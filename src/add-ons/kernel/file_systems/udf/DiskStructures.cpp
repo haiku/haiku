@@ -37,6 +37,11 @@ const char* Udf::kVSDID_ECMA167_2 	= "NSR02";
 const char* Udf::kVSDID_ECMA167_3 	= "NSR03";
 const char* Udf::kVSDID_ECMA168		= "CDW02";
 
+// udf_entity_ids
+const udf_entity_id Udf::kMetadataPartitionMapId(0, "*UDF Metadata Partition");
+const udf_entity_id Udf::kSparablePartitionMapId(0, "*UDF Sparable Partition");
+const udf_entity_id Udf::kVirtualPartitionMapId(0, "*UDF Virtual Partition");
+
 //----------------------------------------------------------------------
 // Helper functions
 //----------------------------------------------------------------------
@@ -148,15 +153,40 @@ udf_timestamp::dump() const
 // udf_entity_id
 //----------------------------------------------------------------------
 
+udf_entity_id::udf_entity_id(uint8 flags, char *identifier, char *identifier_suffix)
+	: _flags(flags)
+{
+	if (identifier)
+		strncpy(_identifier, identifier, kIdentifierLength);
+	else
+		memset(_identifier, 0, kIdentifierLength);
+	if (identifier_suffix)
+		strncpy(_identifier_suffix, identifier_suffix, kIdentifierSuffixLength);
+	else
+		memset(_identifier_suffix, 0, kIdentifierSuffixLength);
+}
+
 void
 udf_entity_id::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_entity_id");
 	PRINT(("flags:             %d\n", flags()));
-	PRINT(("identifier:        `%s'\n", identifier()));
+	PRINT(("identifier:        `%.23s'\n", identifier()));
 	PRINT(("identifier_suffix: `%s'\n", identifier_suffix()));
 }
 
+bool
+udf_entity_id::matches(const udf_entity_id &id) const
+{
+	bool result = true;
+	for (int i = 0; i < udf_entity_id::kIdentifierLength; i++) {
+		if (identifier()[i] != id.identifier()[i]) {
+			result = false;
+			break;
+		}
+	}
+	return result;
+}
 
 //----------------------------------------------------------------------
 // udf_extent_address

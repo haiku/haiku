@@ -157,7 +157,11 @@ private:
 */
 struct udf_entity_id {
 public:
+	udf_entity_id(uint8 flags = 0, char *identifier = NULL,
+	              char *identifier_suffix = NULL);
+	
 	void dump() const;
+	bool matches(const udf_entity_id &id) const;
 
 	// Get functions
 	uint8 flags() const { return _flags; }
@@ -167,13 +171,19 @@ public:
 	char* identifier_suffix() { return _identifier_suffix; }
 
 	// Set functions
-	void set_flags(uint8 flags) { _flags = flags; }	
+	void set_flags(uint8 flags) { _flags = flags; }
+	
+	static const int kIdentifierLength = 23;
+	static const int kIdentifierSuffixLength = 8;
 private:
 	uint8 _flags;
-	char _identifier[23];
-	char _identifier_suffix[8];
+	char _identifier[kIdentifierLength];
+	char _identifier_suffix[kIdentifierSuffixLength];
 } __attribute__((packed));
 
+extern const udf_entity_id kMetadataPartitionMapId;
+extern const udf_entity_id kSparablePartitionMapId;
+extern const udf_entity_id kVirtualPartitionMapId;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -213,7 +223,6 @@ struct udf_volume_structure_descriptor_header {
 	bool id_matches(const char *id);
 } __attribute__((packed));
 
-
 // Volume structure descriptor ids 
 extern const char* kVSDID_BEA;
 extern const char* kVSDID_TEA;
@@ -222,7 +231,6 @@ extern const char* kVSDID_ISO;
 extern const char* kVSDID_ECMA167_2;
 extern const char* kVSDID_ECMA167_3;
 extern const char* kVSDID_ECMA168;
-
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 3
@@ -693,6 +701,7 @@ private:
 */
 extern const uint8 kMaxPartitionDescriptors;
 #define UDF_MAX_PARTITION_MAPS 2
+#define UDF_MAX_PARTITION_MAP_SIZE 64
 
 /*! \brief Partition Descriptor
 
@@ -889,22 +898,31 @@ private:
 		UDF type 2 for virtual maps or maps on systems not supporting
 		defect management.
 		
+		Note that we actually allocate memory for the partition maps
+		here due to the fact that we allocate udf_logical_descriptor
+		objects on the stack sometimes.
+		
 		See UDF-2.01 2.2.8, 2.2.9
 	*/
-	uint8 _partition_maps[0];
+	uint8 _partition_maps[UDF_MAX_PARTITION_MAPS * UDF_MAX_PARTITION_MAP_SIZE];
 } __attribute__((packed));
 
 
-/*! \brief Generic partition map
+/*! \brief (Mostly) common portion of various partition maps
 
 	See also: ECMA-167 3/10.7.1
 */
-struct udf_generic_partition_map {
+struct udf_partition_map_header {
 public:
 	uint8 type() const { return _type; }
 	uint8 length() const { return _length; }
 	uint8 *map_data() { return _map_data; }
 	const uint8 *map_data() const { return _map_data; }
+	
+	udf_entity_id& partition_type_id()
+		{ return *reinterpret_cast<udf_entity_id*>(&_map_data[2]); }
+	const udf_entity_id& partition_type_id() const
+		{ return *reinterpret_cast<const udf_entity_id*>(&_map_data[2]); }
 
 	void set_type(uint8 type) { _type = type; }
 	void set_length(uint8 length) { _length = length; }
@@ -1041,6 +1059,34 @@ private:
 	uint8 _reserved2;
 	uint32 _sparing_table_size;
 	uint32 _sparing_table_locations[UDF_MAX_SPARING_TABLE_COUNT];
+} __attribute__((packed));
+
+
+/* ----UDF Specific---- */
+/*! \brief Metadata partition map 
+
+	Note that this map is a customization of the ECMA-167
+	type 2 partition map.
+	
+	See also: UDF-2.50 2.2.10
+*/
+struct udf_metadata_partition_map {
+	uint8 type;
+	uint8 length;
+	uint8 reserved1[2];
+	
+	/*! - flags: 0
+	    - identifier: "*UDF Metadata Partition"
+	    - identifier_suffix: per UDF-2.50 2.1.5
+	*/
+	udf_entity_id partition_type_id;
+	uint16 volume_sequence_number;
+	
+	/*! corresponding type 1 or type 2 sparable partition
+	    map in same logical volume
+	*/
+	uint16 partition_number;	
+	uint8 reserved2[24];
 } __attribute__((packed));
 
 
