@@ -38,6 +38,7 @@ Addon i-udf-ds : [ FDirName drive_setup fs ] :
 	CS0String.cpp
 	DiskStructures.cpp
 	PartitionMap.cpp
+	Recognition.cpp
 	UdfDebug.cpp
 	Utils.cpp
 	Volume.cpp
@@ -49,7 +50,7 @@ Addon i-udf-ds : [ FDirName drive_setup fs ] :
 SEARCH on [ FGristFiles
 		vfs_interface.cpp 
 		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
-		PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
+		PartitionMap.cpp Recognition.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 rule InstallUDFDS

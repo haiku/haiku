@@ -18,8 +18,8 @@ SimpleTest udf_shell
 
 	udf.cpp
 	CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
-	MetadataPartition.cpp PartitionMap.cpp PhysicalPartition.cpp UdfDebug.cpp
-	Utils.cpp SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
+	MetadataPartition.cpp PartitionMap.cpp PhysicalPartition.cpp Recognition.cpp
+	UdfDebug.cpp Utils.cpp SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
 	:
 	;
 
@@ -27,8 +27,8 @@ SimpleTest udf_shell
 SEARCH on [ FGristFiles
 		udf.cpp 
 		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
-		MetadataPartition.cpp PartitionMap.cpp PhysicalPartition.cpp UdfDebug.cpp
-		Utils.cpp SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
+		MetadataPartition.cpp PartitionMap.cpp PhysicalPartition.cpp Recognition.cpp
+		UdfDebug.cpp Utils.cpp SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 SEARCH on [ FGristFiles
