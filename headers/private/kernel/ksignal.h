@@ -6,12 +6,13 @@
 #define _KERNEL_SIGNAL_H
 
 
+#include <KernelExport.h>
 #include <signal.h>
 
 #define BLOCKABLE_SIGS	(~((1L << (SIGKILL - 1)) | (1L << (SIGSTOP - 1))))
 
 
-extern int handle_signals(struct thread *t, int state);
+extern int handle_signals(struct thread *t, cpu_status *state);
 
 extern int _user_send_signal(pid_t tid, uint sig);
 extern int _user_sigprocmask(int how, const sigset_t *set, sigset_t *oldSet);
