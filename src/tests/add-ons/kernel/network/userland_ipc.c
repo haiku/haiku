@@ -18,9 +18,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Drivers.h>
+	// for B_SET_(NON)BLOCKING_IO
+
+
 typedef struct commands_info {
 	int op;
-	const char *name
+	const char *name;
 } commands_info;
 
 #define C2N(op) { op, #op }
