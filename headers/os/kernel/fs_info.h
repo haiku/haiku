@@ -20,6 +20,10 @@ extern "C" {
 #define	B_FS_HAS_MIME			0x00010000
 #define	B_FS_HAS_ATTR			0x00020000
 #define	B_FS_HAS_QUERY			0x00040000
+// those additions are preliminary and may be removed
+#define B_FS_HAS_SELF_HEALING_LINKS		0x00080000
+#define B_FS_HAS_ALIASES				0x00100000
+#define B_FS_SUPPORTS_NODE_MONITORING	0x00200000
 
 struct fs_info {
 	dev_t	dev;								/* fs dev_t */
