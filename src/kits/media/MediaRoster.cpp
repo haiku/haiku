@@ -84,10 +84,7 @@ BMediaRosterEx::BMediaRosterEx(status_t * out_error)
 	request.team = team;
 	request.messenger = BMessenger(NULL, this);
 	rv = QueryServer(SERVER_REGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
-	if (rv != B_OK) {
-		if (out_error)
-			*out_error = B_MEDIA_SYSTEM_FAILURE;
-	}
+	*out_error = (rv != B_OK) ? B_MEDIA_SYSTEM_FAILURE : B_OK;
 }
 
 status_t
@@ -1857,21 +1854,23 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 
 //	thread safe for multiple calls to Roster()
 /* static */ BMediaRoster * 
-BMediaRoster::Roster(status_t* out_error)
+BMediaRoster::Roster(status_t *out_error)
 {
 	static BLocker locker("BMediaRoster::Roster locker");
 	locker.Lock();
+	if (out_error)
+		*out_error = B_OK;
 	if (_sDefault == NULL) {
-		status_t err = B_OK;
+		status_t err;
 		_sDefault = new BMediaRosterEx(&err);
 		if (err != B_OK) {
-			if(out_error)
-				*out_error = err;
 			if (_sDefault) {
 				_sDefault->Lock();
 				_sDefault->Quit();
+				_sDefault = NULL;
 			}
-			_sDefault = NULL;
+			if (out_error)
+				*out_error = err;
 		}
 	}
 	locker.Unlock();
