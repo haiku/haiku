@@ -7,5 +7,5 @@ CommonUnitTest BMessengerTester
 	: kits app
 	: libopenbeos.so be stdc++.r4
 	: be stdc++.r4
-	: [ FDirName os app ] [ FDirName os support ]
+	: app support
 ;

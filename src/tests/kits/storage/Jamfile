@@ -20,7 +20,7 @@ CommonUnitTest StorageKitTester
 	: kits storage
 	: libstorage.so be stdc++.r4
 	: be stdc++.r4
-	: [ FDirName os storage ]
+	: storage
 ;
 
 # To run the tests the libraries must be around.

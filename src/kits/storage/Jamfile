@@ -14,8 +14,8 @@ LinkSharedOSLibs libbeadapter.so :
 
 UsePrivateHeaders storage ;
 
-UsePublicHeaders [ FDirName os storage ] ;
-UsePublicHeaders [ FDirName os add-ons file_system ] ;
+UsePublicHeaders storage ;
+UsePublicHeaders [ FDirName add-ons file_system ] ;
 
 SharedLibrary storage :
 	Directory.cpp
