@@ -18,23 +18,6 @@ else
 	exit -1
 fi
 
-#Sometimes the OpenSSL installer is dumb and doesn't create the requisite symlinks
-if test ! -e ~/config/lib/libssl.so && test -e ~/config/lib/libssl.so.0.9.7; then
-	ln -s ~/config/lib/libssl.so.0.9.7 ~/config/lib/libssl.so
-	ln -s ~/config/lib/libcrypto.so.0.9.7 ~/config/lib/libcrypto.so
-fi
-
-if [[ `uname -m` == BePC ]] && test ! -e ~/config/lib/libssl.so; then
-
-RETURN=`alert "You don't seem to have OpenSSL installed, which the mail daemon requires." "Get OpenSSL" "I Don't Care"`
-
-if [[ $RETURN = "Get OpenSSL" ]]
-then
-	NetPositive http://www.bebits.com/app/1020 &
-fi
-
-fi
-
 if [ -n "$TTY" ]
 then
     quit "application/x-vnd.Be-POST"
@@ -47,6 +30,9 @@ else
     then
         quit "application/x-vnd.Be-POST"
         quit "application/x-vnd.Be-TSKB"
+
+        rm /boot/home/config/add-ons/mail_daemon/inbound_filters/AGMSBayesianSpamFilter
+
         unzip -od / install.zip
 
 # Reset the relevant parts of the MIME database
