@@ -1230,13 +1230,18 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	// If B_MOUSE_UP or B_MOUSE_MOVED has not been found in the message queue,
 	// tell app_server to send us the current mouse coords and buttons.
 	owner->fLink->StartMessage(AS_LAYER_GET_MOUSE_COORDS);
+	
+	// This is because BPortLink doesn't automatically attach the reply
+	// port to a synchronous message. Bummer.
+	// TODO: Fix BPortLink synchronous reply code
+	owner->fLink->Attach<port_id>(owner->fLink->GetReplyPort());
 	owner->fLink->Flush();
-
+	
 	int32 rCode = SERVER_FALSE;
 	owner->fLink->GetNextReply(&rCode);
 	if (rCode == SERVER_TRUE) {
 		owner->fLink->Read<BPoint>(location);
-		owner->fLink->Read<int32>((int32 *)buttons);
+		owner->fLink->Read((int32 *)buttons,sizeof(int32));
 	}
 }
 
