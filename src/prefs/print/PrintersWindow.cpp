@@ -58,7 +58,7 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 	{
 		case MSG_PRINTER_SELECTED:
 			{
-				PrinterItem* fSelectedPrinter = fPrinterListView->SelectedItem();
+				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter)
 				{
 					fJobsBox->SetLabel((BString("Print Jobs for ") << fSelectedPrinter->Name()).String());
