@@ -206,9 +206,12 @@ BPlusTree::TypeCodeToKeyType(type_code code)
 		case B_STRING_TYPE:
 			return BPLUSTREE_STRING_TYPE;
 		case B_INT32_TYPE:
+		case B_SSIZE_T_TYPE:
 			return BPLUSTREE_INT32_TYPE;
 		case B_UINT32_TYPE:
+		case B_SIZE_T_TYPE:
 			return BPLUSTREE_UINT32_TYPE;
+		case B_OFF_T_TYPE:
 		case B_INT64_TYPE:
 			return BPLUSTREE_INT64_TYPE;
 		case B_UINT64_TYPE:
@@ -316,7 +319,7 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 			if (index)
 				*index = i;
 			if (next)
-				*next = values[i];
+				*next = BFS_ENDIAN_TO_HOST_INT64(values[i]);
 			return B_OK;
 		}
 	}
@@ -327,7 +330,7 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 		if (saveIndex == node->NumKeys())
 			*next = node->OverflowLink();
 		else
-			*next = values[saveIndex];
+			*next = BFS_ENDIAN_TO_HOST_INT64(values[saveIndex]);
 	}
 	return B_ENTRY_NOT_FOUND;
 }
@@ -727,7 +730,7 @@ TreeIterator::SkipDuplicates()
 void 
 bplustree_node::Initialize()
 {
-	left_link = right_link = overflow_link = BPLUSTREE_NULL;
+	left_link = right_link = overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 	all_key_count = 0;
 	all_key_length = 0;
 }
@@ -736,15 +739,16 @@ bplustree_node::Initialize()
 uint8 *
 bplustree_node::KeyAt(int32 index, uint16 *keyLength) const
 {
-	if (index < 0 || index > all_key_count)
+	if (index < 0 || index > NumKeys())
 		return NULL;
 
 	uint8 *keyStart = Keys();
 	uint16 *keyLengths = KeyLengths();
 
-	*keyLength = keyLengths[index] - (index != 0 ? keyLengths[index - 1] : 0);
+	*keyLength = BFS_ENDIAN_TO_HOST_INT16(keyLengths[index])
+		- (index != 0 ? BFS_ENDIAN_TO_HOST_INT16(keyLengths[index - 1]) : 0);
 	if (index > 0)
-		keyStart += keyLengths[index - 1];
+		keyStart += BFS_ENDIAN_TO_HOST_INT16(keyLengths[index - 1]);
 
 	return keyStart;
 }
@@ -762,7 +766,7 @@ bplustree_node::CountDuplicates(off_t offset, bool isFragment) const
 
 		return ((off_t *)this)[fragment];
 	}
-	return overflow_link;
+	return OverflowLink();
 }
 
 

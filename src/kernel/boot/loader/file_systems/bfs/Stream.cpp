@@ -294,8 +294,8 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
 	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
+		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
+		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
 
 		CachedBlock cached(fVolume, run);
 		if ((block = cached.Block()) == NULL) {

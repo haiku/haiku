@@ -45,8 +45,8 @@ class Volume {
 		uint32				AllocationGroupShift() const { return fSuperBlock.AllocationGroupShift(); }
 		disk_super_block	&SuperBlock() { return fSuperBlock; }
 
-		off_t				ToOffset(block_run run) const { return ToBlock(run) << fSuperBlock.block_shift; }
-		off_t				ToOffset(off_t block) const { return block << fSuperBlock.block_shift; }
+		off_t				ToOffset(block_run run) const { return ToBlock(run) << BlockShift(); }
+		off_t				ToOffset(off_t block) const { return block << BlockShift(); }
 		off_t				ToBlock(block_run run) const { return ((((off_t)run.AllocationGroup()) << AllocationGroupShift()) | (off_t)run.Start()); }
 		block_run			ToBlockRun(off_t block) const;
 		status_t			ValidateBlockRun(block_run run);
