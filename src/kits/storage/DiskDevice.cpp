@@ -6,6 +6,7 @@
 #include <new.h>
 
 #include <DiskDevice.h>
+#include <DiskDevicePrivate.h>
 #include <Message.h>
 #include <Partition.h>
 #include <Session.h>
@@ -295,7 +296,13 @@ BDiskDevice::Update()
 BSession *
 BDiskDevice::VisitEachSession(BDiskDeviceVisitor *visitor)
 {
-	return NULL;	// not implemented
+	if (visitor) {
+		for (int32 i = 0; BSession *session = SessionAt(i); i++) {
+			if (visitor->Visit(session))
+				return session;
+		}
+	}
+	return NULL;
 }
 
 // VisitEachPartition
@@ -312,7 +319,13 @@ BDiskDevice::VisitEachSession(BDiskDeviceVisitor *visitor)
 BPartition *
 BDiskDevice::VisitEachPartition(BDiskDeviceVisitor *visitor)
 {
-	return NULL;	// not implemented
+	if (visitor) {
+		for (int32 i = 0; BSession *session = SessionAt(i); i++) {
+			if (BPartition *partition = session->VisitEachPartition(visitor))
+				return partition;
+		}
+	}
+	return NULL;
 }
 
 // Traverse
@@ -330,7 +343,46 @@ BDiskDevice::VisitEachPartition(BDiskDeviceVisitor *visitor)
 bool
 BDiskDevice::Traverse(BDiskDeviceVisitor *visitor)
 {
-	return false;	// not implemented
+	if (visitor) {
+		// visit the device itself
+		if (visitor->Visit(this))
+			return true;
+		for (int32 i = 0; BSession *session = SessionAt(i); i++) {
+			// visit the session
+			if (visitor->Visit(session))
+				return true;
+			// visit all partitions on the session
+			if (session->VisitEachPartition(visitor))
+				return true;
+		}
+	}
+	return false;
+}
+
+// SessionWithID
+/*!	\brief Returns the session on the device, that has a certain ID.
+	\param id The ID of the session to be returned.
+	\return The session with ID \a id, or \c NULL, if a session with that
+			ID does not exist on this device.
+*/
+BSession *
+BDiskDevice::SessionWithID(int32 id)
+{
+	IDFinderVisitor visitor(id);
+	return VisitEachSession(&visitor);
+}
+
+// PartitionWithID
+/*!	\brief Returns the partition on the device, that has a certain ID.
+	\param id The ID of the partition to be returned.
+	\return The partition with ID \a id, or \c NULL, if a partition with that
+			ID does not exist on this device.
+*/
+BPartition *
+BDiskDevice::PartitionWithID(int32 id)
+{
+	IDFinderVisitor visitor(id);
+	return VisitEachPartition(&visitor);
 }
 
 // copy constructor
@@ -356,7 +408,7 @@ find_string(BMessage *message, const char *name, char *buffer)
 {
 	const char *str;
 	status_t error = message->FindString(name, &str);
-	if (error != B_OK)
+	if (error == B_OK)
 		strcpy(buffer, str);
 	return error;
 }
@@ -365,6 +417,8 @@ find_string(BMessage *message, const char *name, char *buffer)
 status_t
 BDiskDevice::_Unarchive(BMessage *archive)
 {
+//printf("BDiskDevice::_Unarchive()\n");
+//archive->PrintToStream();
 	Unset();
 	status_t error = (archive ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -373,33 +427,46 @@ BDiskDevice::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("id", &fUniqueID);
 		if (error == B_OK)
 			error = archive->FindInt32("change_counter", &fChangeCounter);
+//printf("  check: %s\n", strerror(error));
 		// geometry
 		if (error == B_OK)
 			error = archive->FindInt64("size", &fSize);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt32("block_size", &fBlockSize);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt8("type", (int8*)&fType);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindBool("removable", &fRemovable);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
-			error = archive->FindBool("read_only", fReadOnly);
+			error = archive->FindBool("read_only", &fReadOnly);
 //		if (error == B_OK)
 //			error = archive->FindBool("write_once", fGeometry.write_once);
 		// other data
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = find_string(archive, "path", fPath);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt32("media_status", &fMediaStatus);
+//printf("  check: %s\n", strerror(error));
 		// sessions
 		type_code fieldType;
 		int32 count = 0;
-		if (error == B_OK)
-			error = archive->GetInfo("sessions", &fieldType, &count);
+		if (error == B_OK) {
+			if (archive->GetInfo("sessions", &fieldType, &count) != B_OK)
+				count = 0;
+		}
+//printf("  check: %s\n", strerror(error));
 		for (int32 i = 0; error == B_OK && i < count; i++) {
+//printf("  check1: %s\n", strerror(error));
 			// get the archived session
 			BMessage sessionArchive;
 			error = archive->FindMessage("sessions", i, &sessionArchive);
+//printf("  check1.1: %s\n", strerror(error));
 			// allocate a session object
 			BSession *session = NULL;
 			if (error == B_OK) {
@@ -407,12 +474,15 @@ BDiskDevice::_Unarchive(BMessage *archive)
 				if (!session)
 					error = B_NO_MEMORY;
 			}
+//printf("  check1.1: %s\n", strerror(error));
 			// unarchive the session
 			if (error == B_OK)
 				error = session->_Unarchive(&sessionArchive);
+//printf("  check1.1: %s\n", strerror(error));
 			// add the session
 			if (error == B_OK && !_AddSession(session))
 				error = B_NO_MEMORY;
+//printf("  check1.1: %s\n", strerror(error));
 			// cleanup on error
 			if (error != B_OK && session)
 				delete session;
@@ -421,6 +491,7 @@ BDiskDevice::_Unarchive(BMessage *archive)
 	// cleanup on error
 	if (error != B_OK)
 		Unset();
+//printf("BDiskDevice::_Unarchive() done: %s\n", strerror(error));
 	return error;
 }
 

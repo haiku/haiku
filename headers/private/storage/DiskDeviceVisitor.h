@@ -12,6 +12,7 @@ class BSession;
 
 // BDiskDeviceVisitor
 class BDiskDeviceVisitor {
+public:
 	BDiskDeviceVisitor();
 	virtual ~BDiskDeviceVisitor();
 

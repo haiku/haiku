@@ -531,7 +531,7 @@ find_string(BMessage *message, const char *name, char *buffer)
 {
 	const char *str;
 	status_t error = message->FindString(name, &str);
-	if (error != B_OK)
+	if (error == B_OK)
 		strcpy(buffer, str);
 	return error;
 }
@@ -540,6 +540,7 @@ find_string(BMessage *message, const char *name, char *buffer)
 status_t
 BPartition::_Unarchive(BMessage *archive)
 {
+//printf("BPartition::_Unarchive()\n");
 	_Unset();
 	status_t error = (archive ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -550,11 +551,13 @@ BPartition::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("change_counter", &fChangeCounter);
 		if (error == B_OK)
 			error = archive->FindInt32("index", &fIndex);
+//printf("  check: %s\n", strerror(error));
 		// fInfo.info.*
 		if (error == B_OK)
 			error = archive->FindInt64("offset", &fInfo.info.offset);
 		if (error == B_OK)
 			error = archive->FindInt64("size", &fInfo.info.size);
+//printf("  check: %s\n", strerror(error));
 		// fInfo.*
 		if (error == B_OK)
 			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
@@ -576,6 +579,7 @@ BPartition::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("fs_flags",
 									   (int32*)&fInfo.file_system_flags);
 		}
+//printf("  check: %s\n", strerror(error));
 		// dev_t, if mounted
 		if (error == B_OK) {
 			if (archive->FindInt32("volume_id", &fVolumeID) != B_OK)
@@ -585,6 +589,7 @@ BPartition::_Unarchive(BMessage *archive)
 	// cleanup on error
 	if (error != B_OK)
 		_Unset();
+//printf("BPartition::_Unarchive() done: %s\n", strerror(error));
 	return error;
 }
 

@@ -43,6 +43,8 @@ public:
 
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
 
+	BPartition *PartitionWithID(int32 id);
+
 	status_t GetPartitioningParameters(const char *partitioningSystem,
 									   BString *parameters,
 									   BPoint dialogCenter = BPoint(-1, -1),

@@ -50,6 +50,9 @@ public:
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
 	bool Traverse(BDiskDeviceVisitor *visitor);
 
+	BSession *SessionWithID(int32 id);
+	BPartition *PartitionWithID(int32 id);
+
 private:
 	BDiskDevice(const BDiskDevice &);
 	BDiskDevice &operator=(const BDiskDevice &);

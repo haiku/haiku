@@ -7,6 +7,7 @@
 
 #include <Session.h>
 #include <DiskDevice.h>
+#include <DiskDevicePrivate.h>
 #include <Message.h>
 #include <Partition.h>
 
@@ -60,7 +61,7 @@ BSession::Offset() const
 off_t
 BSession::Size() const
 {
-	return fInfo.offset;
+	return fInfo.size;
 }
 
 // BlockSize
@@ -200,7 +201,26 @@ BSession::UniqueID() const
 BPartition *
 BSession::VisitEachPartition(BDiskDeviceVisitor *visitor)
 {
-	return NULL;	// not implemented
+	if (visitor) {
+		for (int32 i = 0; BPartition *partition = PartitionAt(i); i++) {
+			if (visitor->Visit(partition))
+				return partition;
+		}
+	}
+	return NULL;
+}
+
+// PartitionWithID
+/*!	\brief Returns the partition on the session, that has a certain ID.
+	\param id The ID of the partition to be returned.
+	\return The partition with ID \a id, or \c NULL, if a partition with that
+			ID does not exist on this session.
+*/
+BPartition *
+BSession::PartitionWithID(int32 id)
+{
+	IDFinderVisitor visitor(id);
+	return VisitEachPartition(&visitor);
 }
 
 // GetPartitioningParameters
@@ -356,6 +376,7 @@ BSession::_Unset()
 status_t
 BSession::_Unarchive(BMessage *archive)
 {
+//printf("BSession::_Unarchive()\n");
 	_Unset();
 	status_t error = (archive ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -366,6 +387,7 @@ BSession::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("change_counter", &fChangeCounter);
 		if (error == B_OK)
 			error = archive->FindInt32("index", &fIndex);
+//printf("  check: %s\n", strerror(error));
 		// fInfo.*
 		if (error == B_OK)
 			error = archive->FindInt64("offset", &fInfo.offset);
@@ -373,14 +395,18 @@ BSession::_Unarchive(BMessage *archive)
 			error = archive->FindInt64("size", &fInfo.size);
 		if (error == B_OK)
 			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
+//printf("  check: %s\n", strerror(error));
 		// other data
 		if (error == B_OK)
 			error = archive->FindString("partitioning", &fPartitioningSystem);
+//printf("  check: %s\n", strerror(error));
 		// partitions
 		type_code fieldType;
 		int32 count = 0;
-		if (error == B_OK)
-			error = archive->GetInfo("partitions", &fieldType, &count);
+		if (error == B_OK) {
+			if (archive->GetInfo("partitions", &fieldType, &count) != B_OK)
+				count = 0;
+		}
 		for (int32 i = 0; error == B_OK && i < count; i++) {
 			// get the archived partitions
 			BMessage partitionArchive;
@@ -406,6 +432,7 @@ BSession::_Unarchive(BMessage *archive)
 	// cleanup on error
 	if (error != B_OK)
 		_Unset();
+//printf("BSession::_Unarchive() done: %s\n", strerror(error));
 	return error;
 }
 

@@ -55,6 +55,9 @@ public:
 
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
 						 BDiskDevice *device = NULL);
+	bool VisitEachSession(BDiskDeviceVisitor *visitor,
+						  BDiskDevice *device = NULL,
+						  BSession **session = NULL);
 	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
 							BDiskDevice *device = NULL,
 							BPartition **partition = NULL);
@@ -80,6 +83,10 @@ public:
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
 	status_t StopWatching(BMessenger target);
+
+private:
+	status_t _GetObjectWithID(const char *fieldName, int32 id,
+							  BDiskDevice *device) const;
 
 private:
 	BMessenger	fManager;

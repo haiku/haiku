@@ -7,9 +7,11 @@
 
 #include <DiskDeviceRoster.h>
 #include <DiskDevice.h>
+#include <DiskDevicePrivate.h>
 #include <Message.h>
 #include <Partition.h>
 #include <RegistrarDefs.h>
+#include <RosterPrivate.h>
 #include <Session.h>
 
 /*!	\class BDiskDeviceRoster
@@ -29,7 +31,7 @@ BDiskDeviceRoster::BDiskDeviceRoster()
 {
 	BMessage request(B_REG_GET_DISK_DEVICE_MESSENGER);
 	BMessage reply;
-	if (_send_to_roster_(&request, &reply, false) == B_OK
+	if (BRoster::Private().SendTo(&request, &reply, false) == B_OK
 		&& reply.what == B_REG_SUCCESS) {
 		reply.FindMessenger("messenger", &fManager);
 	}
@@ -55,6 +57,7 @@ BDiskDeviceRoster::~BDiskDeviceRoster()
 status_t
 BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 {
+//printf("BDiskDeviceRoster::GetNextDevice()\n");
 	status_t error = (device ? B_OK : B_BAD_VALUE);
 	// compose request message
 	BMessage request(B_REG_NEXT_DISK_DEVICE);
@@ -66,21 +69,28 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 		error = fManager.SendMessage(&request, &reply);
 	// analyze reply
 	if (error == B_OK) {
+//reply.PrintToStream();
 		// result
 		status_t result = B_OK;
 		error = reply.FindInt32("result", &result);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = result;
+//printf("  check: %s\n", strerror(error));
 		// cookie
 		if (error == B_OK)
 			error = reply.FindInt32("cookie", &fCookie);
+//printf("  check: %s\n", strerror(error));
 		// device
 		BMessage archive;
 		if (error == B_OK)
 			error = reply.FindMessage("device", &archive);
+//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = device->_Unarchive(&archive);
+//printf("  check: %s\n", strerror(error));
 	}
+//printf("BDiskDeviceRoster::GetNextDevice() done: %s\n", strerror(error));
 	return error;
 }
 
@@ -112,7 +122,58 @@ bool
 BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 								   BDiskDevice *device)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		int32 oldCookie = fCookie;
+		fCookie = 0;
+		BDiskDevice deviceOnStack;
+		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
+		while (!terminatedEarly && GetNextDevice(useDevice) == B_OK)
+			terminatedEarly = visitor->Visit(useDevice);
+		fCookie = oldCookie;
+		if (!terminatedEarly)
+			useDevice->Unset();
+	}
+	return terminatedEarly;
+}
+
+// VisitEachSession
+/*!	\brief Iterates through the all devices' sessions.
+
+	The supplied visitor's Visit(BSession*) is invoked for each session.
+	If Visit() returns \c true, the iteration is terminated and this method
+	returns \c true. If supplied, \a device is set to the concerned device
+	and in \a session the pointer to the session object is returned.
+
+	\param visitor The visitor.
+	\param device Pointer to a pre-allocated BDiskDevice to be initialized
+		   to the device at which the iteration was terminated.
+		   May be \c NULL.
+	\param session Pointer to a pre-allocated BSession pointer to be set
+		   to the session at which the iteration was terminated.
+		   May be \c NULL.
+	\return \c true, if the iteration was terminated, \c false otherwise.
+*/
+bool
+BDiskDeviceRoster::VisitEachSession(BDiskDeviceVisitor *visitor,
+									BDiskDevice *device, BSession **session)
+{
+	bool terminatedEarly = false;
+	if (visitor) {
+		int32 oldCookie = fCookie;
+		fCookie = 0;
+		BDiskDevice deviceOnStack;
+		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
+		BSession *foundSession = NULL;
+		while (!foundSession && GetNextDevice(useDevice) == B_OK)
+			foundSession = useDevice->VisitEachSession(visitor);
+		fCookie = oldCookie;
+		if (!terminatedEarly)
+			useDevice->Unset();
+		else if (device && session)
+			*session = foundSession;
+	}
+	return terminatedEarly;
 }
 
 // VisitEachPartition
@@ -137,7 +198,22 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 									  BDiskDevice *device,
 									  BPartition **partition)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		int32 oldCookie = fCookie;
+		fCookie = 0;
+		BDiskDevice deviceOnStack;
+		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
+		BPartition *foundPartition = NULL;
+		while (!foundPartition && GetNextDevice(useDevice) == B_OK)
+			foundPartition = useDevice->VisitEachPartition(visitor);
+		fCookie = oldCookie;
+		if (!terminatedEarly)
+			useDevice->Unset();
+		else if (device && partition)
+			*partition = foundPartition;
+	}
+	return terminatedEarly;
 }
 
 // Traverse
@@ -155,7 +231,16 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 bool
 BDiskDeviceRoster::Traverse(BDiskDeviceVisitor *visitor)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		int32 oldCookie = fCookie;
+		fCookie = 0;
+		BDiskDevice device;
+		while (!terminatedEarly && GetNextDevice(&device) == B_OK)
+			terminatedEarly = device.Traverse(visitor);
+		fCookie = oldCookie;
+	}
+	return terminatedEarly;
 }
 
 // VisitEachMountedPartition
@@ -181,7 +266,17 @@ BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 											 BDiskDevice *device,
 											 BPartition **partition)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		struct MountedPartitionFilter : public PartitionFilter {
+			virtual bool Filter(BPartition *partition)
+				{ return partition->IsMounted(); }
+		} filter;
+		PartitionFilterVisitor filterVisitor(visitor, &filter);
+		terminatedEarly
+			= VisitEachPartition(&filterVisitor, device, partition);
+	}
+	return terminatedEarly;
 }
 
 // VisitEachMountablePartition
@@ -207,7 +302,17 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 											   BDiskDevice *device,
 											   BPartition **partition)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		struct MountablePartitionFilter : public PartitionFilter {
+			virtual bool Filter(BPartition *partition)
+				{ return partition->ContainsFileSystem(); }
+		} filter;
+		PartitionFilterVisitor filterVisitor(visitor, &filter);
+		terminatedEarly
+			= VisitEachPartition(&filterVisitor, device, partition);
+	}
+	return terminatedEarly;
 }
 
 // VisitEachInitializablePartition
@@ -233,7 +338,17 @@ BDiskDeviceRoster::VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
 												   BDiskDevice *device,
 												   BPartition **partition)
 {
-	return false;	// not implemented
+	bool terminatedEarly = false;
+	if (visitor) {
+		struct InitializablePartitionFilter : public PartitionFilter {
+			virtual bool Filter(BPartition *partition)
+				{ return !partition->IsHidden(); }
+		} filter;
+		PartitionFilterVisitor filterVisitor(visitor, &filter);
+		terminatedEarly
+			= VisitEachPartition(&filterVisitor, device, partition);
+	}
+	return terminatedEarly;
 }
 
 // GetDeviceWithID
@@ -252,7 +367,7 @@ BDiskDeviceRoster::VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
 status_t
 BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice *device) const
 {
-	return B_ERROR;	// not implemented
+	return _GetObjectWithID("device_id", id, device);
 }
 
 // GetSessionWithID
@@ -276,7 +391,12 @@ status_t
 BDiskDeviceRoster::GetSessionWithID(int32 id, BDiskDevice *device,
 									BSession **session) const
 {
-	return B_ERROR;	// not implemented
+	status_t error = (device && session ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = _GetObjectWithID("session_id", id, device);
+	if (error == B_OK)
+		*session = device->SessionWithID(id);
+	return error;
 }
 
 // GetPartitionWithID
@@ -300,6 +420,12 @@ status_t
 BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
 									  BPartition **partition) const
 {
+	status_t error = (device && partition ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = _GetObjectWithID("partition_id", id, device);
+	if (error == B_OK)
+		*partition = device->PartitionWithID(id);
+	return error;
 }
 
 // StartWatching
@@ -335,5 +461,52 @@ status_t
 BDiskDeviceRoster::StopWatching(BMessenger target)
 {
 	return B_ERROR;	// not implemented
+}
+
+// _GetObjectWithID
+/*!	\brief Returns a BDiskDevice for a given device, session or partition ID.
+
+	The supplied \a device is initialized to the device the object identified
+	by \a id belongs to.
+
+	\param fieldName "device_id", "sesison_id" or "partition_id" according to
+		   the type of object the device shall be retrieved for.
+	\param id The ID of the device, session or partition to be retrieved.
+	\param device Pointer to a pre-allocated BDiskDevice to be initialized
+		   to the device to be retrieved.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: A device, session or partition respectively with
+		 ID \a id could not be found.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
+									BDiskDevice *device) const
+{
+	status_t error = (device ? B_OK : B_BAD_VALUE);
+	// compose request message
+	BMessage request(B_REG_GET_DISK_DEVICE);
+	if (error == B_OK)
+		error = request.AddInt32(fieldName, id);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = fManager.SendMessage(&request, &reply);
+	// analyze reply
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+		// device
+		BMessage archive;
+		if (error == B_OK)
+			error = reply.FindMessage("device", &archive);
+		if (error == B_OK)
+			error = device->_Unarchive(&archive);
+	}
+	return error;
 }
 
