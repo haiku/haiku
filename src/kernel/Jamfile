@@ -465,8 +465,8 @@ BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
 KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
 
-Depends floppy : $(OBOS_FLOPPY) ;
-NotFile floppy ;
+Depends boot_floppy : $(OBOS_FLOPPY) ;
+NotFile boot_floppy ;
 
 SubInclude OBOS_TOP src kernel apps ;
 SubInclude OBOS_TOP src kernel boot ;
