@@ -10,7 +10,8 @@
 
 // forward declarations
 
-class mixer_input;
+class MixerCore;
+
 
 // includes
 
@@ -41,9 +42,6 @@ class AudioMixer :
 		
 	// AudioMixer support
 					
-		bool				IsValidDest( media_destination dest);
-		bool				IsValidSource( media_source source);
-	
 		
 		BParameterWeb	*	BuildParameterWeb(); // used to create the initial 'master' web
 		void				MakeWebForInput(char *name, media_format format);
@@ -195,16 +193,7 @@ class AudioMixer :
 															
 	private:
 	
-		thread_id			fThread; // for launching mixthread
 
-		media_output 		fOutput; // single output (temp)
-		float			*	fMasterGainScale; // array used for scaling output - _not_ for display!
-		float			*	fMasterGainDisplay; // array of volume values for display purposes
-		bigtime_t			fMasterGainDisplayLastChange;
-		
-		int					fMasterMuteValue;
-		bigtime_t			fMasterMuteValueLastChange;
-		
 
 		BMediaAddOn		*	fAddOn;
 		BParameterWeb	*	fWeb; // local pointer to parameterweb
@@ -214,14 +203,15 @@ class AudioMixer :
 		uint64 				fFramesSent; // audio frames sent
 		bool				fOutputEnabled;
 		
-		media_format 		fPrefInputFormat, fPrefOutputFormat;
 		BBufferGroup	*	fBufferGroup;
 		
 		BList				fMixerInputs;
 		
-		int					fNextFreeID;
-		
+	
 		bool				fDisableStop;
+		
+		MixerCore			*fCore;
+		media_format		fDefaultFormat;
 		
 };		
 			

@@ -15,14 +15,35 @@ public:
 	
 	bool AddInput(const media_input &input);
 	bool AddOutput(const media_output &output);
-	bool RemoveInput(const media_input &input);
-	bool RemoveOutput(const media_output &output);
+
+	bool RemoveInput(int32 inputID);
+	bool RemoveOutput();
 	
+	int32 CreateInputID();
+	
+	MixerInput *Input(int index); // index = 0 to count-1, NOT inputID
+	MixerOutput *Output();
+
 	void Lock();
 	void Unlock();
 	
+	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
+	
+	void InputFormatChanged(int32 inputID, const media_format *format);
+	void OutputFormatChanged(const media_format *format);
+
+private:
+	void OutputBufferLengthChanged(bigtime_t length);
+	
+	
 private:
 	BLocker *fLocker;
+	
+	bigtime_t	fOutputBufferLength;
+	bigtime_t	fInputBufferLength;
+	
+	BList		*fInputs;
+	MixerOutput	*fOutput;
 };
 
 

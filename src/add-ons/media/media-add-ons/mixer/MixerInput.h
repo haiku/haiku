@@ -11,6 +11,8 @@ public:
 	
 	void BufferReceived(BBuffer *buffer);
 	
+	media_input & MediaInput();
+	
 private:
 	MixerCore *fCore;
 };

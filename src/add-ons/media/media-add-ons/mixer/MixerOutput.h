@@ -9,6 +9,8 @@ public:
 	MixerOutput(MixerCore *core);
 	~MixerOutput();
 	
+	media_output MediaOutput();
+	
 private:
 	MixerCore *fCore;
 };
