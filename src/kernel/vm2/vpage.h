@@ -51,7 +51,9 @@ class vpage : public node
 		
 		// Debugging
 		void dump(void) {
-			error ("Dumping vpage %p, address = %lx, physPage: \n",this,start_address);
+			error ("Dumping vpage %p, address = %lx, vnode-fd=%d, vnode-offset = %d, dirty = %d, swappable = %d, locked = %d\n",
+							this,start_address, ((backingNode)?(backingNode->fd):99999), ((backingNode)?(backingNode->offset):999999999),
+							dirty,swappable,locked);
 			if (physPage)
 				physPage->dump();
 			else

@@ -23,7 +23,7 @@ vpage *poolvpage::get(void)
 	else
 		{
 		page *newPage=vmBlock->pageMan->getPage();
-		error ("poolvpage::get: Getting new page %lx!\n",newPage->getAddress());
+		//error ("poolvpage::get: Getting new page %lx!\n",newPage->getAddress());
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
 		int newCount=PAGE_SIZE/sizeof(vpage);

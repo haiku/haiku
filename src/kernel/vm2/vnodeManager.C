@@ -27,7 +27,7 @@ vpage *vnodeManager::findVnode(vnode &target) {
 
 // If this vnode is already in use, add this vpage to it and return one to clone. If not, add this vnode, with this vpage, and return null
 // This method will make a new vnode object
-vpage *vnodeManager::addVnode(vnode &target,vpage &vp) {
+vpage *vnodeManager::addVnode(vnode &target,vpage &vp, vnode **newOne) {
 	vpage *retVal;
 	error ("vnodeManager::addVnode : Adding by reference node %x, fd = %d, offset = %d\n",&target,target.fd,target.offset);
 	vnode *found=reinterpret_cast<vnode *>(vnodes.find(&target));
@@ -35,12 +35,18 @@ vpage *vnodeManager::addVnode(vnode &target,vpage &vp) {
 		found=new (vmBlock->vnodePool->get()) vnode;  
 		found->fd=target.fd;
 		found->offset=target.offset;
+		found->valid=target.valid;
 		vnodes.add(found);
+		*newOne=found;
 		retVal=NULL;
 		}
-	else
+	else {
 		retVal=reinterpret_cast<vpage *>(found->vpages.top());
+		*newOne=retVal->getBacking();
+		}
 	found->vpages.add(&vp);
+	error ("vnodeManager::addVnode returning %x, newOne = %x \n");
+
 	return retVal;
 }
 
@@ -71,5 +77,18 @@ bool vnodeManager::remove(vnode &target,vpage &vp) {
 		throw ("An attempt to remove from an unknown vnode occured!\n");
 	}
 	found->vpages.remove(&vp);
-	return (found->vpages.count()==0);
+	if (found->vpages.count()==0) {
+		vnodes.remove(found);
+		return true;
+	}
+	else
+		return false;
+}
+
+void vnodeManager::dump(void) {
+	for (hashIterate hi(vnodes);node *cur=hi.get();) {
+		vnode *found=reinterpret_cast<vnode *>(cur);
+		error ("vnodeManager::dump found vnode:");
+		found->dump();
+	}
 }

@@ -40,7 +40,7 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start) {
 
 // Remove the area from our list, put it on the area pool and move on
 void areaManager::freeArea(area_id areaID) {
-	error ("areaManager::freeArea: begin\n");
+	//error ("areaManager::freeArea: begin\n");
 	lock();
 	area *oldArea=findArea(areaID);	
 	//error ("areaManager::freeArea: found area %x\n",oldArea);
@@ -69,7 +69,7 @@ area *areaManager::findAreaLock(void *address) {
 
 // Loops over our areas looking for this one by name
 area *areaManager::findArea(char *address) {
-	error ("Finding area by string\n");
+	//error ("Finding area by string\n");
 	area *retVal=NULL;
 	lock();
 	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
@@ -98,7 +98,7 @@ area *areaManager::findArea(const void *address) {
 }
 
 area *areaManager::findAreaLock(area_id id) {
-	error ("Finding area by areaID \n");
+	//error ("Finding area by areaID \n");
 	lock();
 	area *retVal=findArea(id);
 	unlock();
@@ -122,7 +122,7 @@ area *areaManager::findArea(area_id id) {
 bool areaManager::fault(void *fault_address, bool writeError) { // true = OK, false = panic. 
 	area *myArea;
 	bool retVal;
-	error ("Faulting \n");
+	//error ("Faulting \n");
 // 	lock(); // Normally this should occur, but since we will be locked when we read/write anyway...
 	myArea=findArea(fault_address);
 	if (myArea)
@@ -137,23 +137,23 @@ long areaManager::nextAreaID=0;
 
 // Create an area; get a new structure, call setup, create the guts, set its ID, add it to our list 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) {
-	error ("areaManager::createArea - Creating an area\n");
+	//error ("areaManager::createArea - Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
-    error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
+    //error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
     newArea->setup(this);
-    error ("areaManager::createArea - setup complete\n");
+    //error ("areaManager::createArea - setup complete\n");
     newArea->createArea(AreaName,pageCount,address,addType,state,protect);
-    error ("areaManager::createArea - new area's createArea called\n");
+    //error ("areaManager::createArea - new area's createArea called\n");
  	atomic_add(&nextAreaID,1);
     newArea->setAreaID(nextAreaID);
-    error ("areaManager::createArea - new area's setAreaID called\n");
+    //error ("areaManager::createArea - new area's setAreaID called\n");
     addArea(newArea);
-    error ("areaManager::createArea - new area added to list\n");
+    //error ("areaManager::createArea - new area added to list\n");
 	int retVal=newArea->getAreaID();  
-    error ("areaManager::createArea - new area id found\n");
+    //error ("areaManager::createArea - new area id found\n");
 	unlock();
-	error ("areaManager::createArea - Done Creating an area\n");
+	//error ("areaManager::createArea - Done Creating an area\n");
     return  retVal;
 }
 
@@ -166,11 +166,9 @@ area *findAreaGlobal(int areaID) {
 	return NULL;
 }
 
-// FIX: THIS IS WRONG! It will only clone areas in our areaManager.
-// Should: find the specified area, create a new area to be its clone, and set it up
 int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType,pageState state,protectType protect) {
 	int retVal;
-	error ("Cloning an area\n");
+	//error ("Cloning an area\n");
 	lock();
     area *oldArea=findArea(newAreaID);
 	if (!oldArea)
@@ -281,13 +279,15 @@ void areaManager::saver(void) {
 // mmap is basically map POSIX values to ours and call createAreaMappingFile...
 void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset) {
 	char name[MAXPATHLEN];
+	if (fd<0)
+		return NULL;
 	// Get the filename from fd...
 	strcpy(	name,"mmap - need to include fileName");
 		
 	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
 
 	protectType protType;
-	protType=(flags&PROT_WRITE)?writable:(flags&(PROT_READ|PROT_EXEC))?readable:none;
+	protType=(prot&PROT_WRITE)?writable:(prot&(PROT_READ|PROT_EXEC))?readable:none;
 	//error ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	lock();
 	if (flags & MAP_ANON) {

@@ -3,6 +3,7 @@
 #include "areaManager.h"
 #include "vpage.h"
 #include "vnodePool.h"
+#include "vnodeManager.h"
 #include "vpagePool.h"
 
 #include "vmHeaderBlock.h"
@@ -76,7 +77,8 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 			if (fd) {
 				vnode newVnode;
 				newVnode.fd=fd;
-				newVnode.offset=offset;
+				newVnode.offset=offset+i*PAGE_SIZE;
+				newVnode.valid=true;
 //				vmBlock->vnodeManager->addVNode(newVnode,newPage);
 				newPage->setup(base+PAGE_SIZE*i,&newVnode,NULL,protect,inState,share);
 				}
@@ -94,6 +96,7 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 			vpages.add(newPage);
 			base+=PAGE_SIZE;
 			}
+	error ("Dumping the area's hashtable");
 	dump();
 	vmBlock->areas.add(this);
 	return B_OK;
@@ -132,14 +135,17 @@ void area::freeArea(void) {
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 //error ("area::freeArea: wasting a page: %x\n",cur);
 		vpage *page=reinterpret_cast<vpage *>(cur);
-		if (finalWrite) 
+		if (finalWrite)  {
 			page->flush(); 
-//error ("area::freeArea: flushed a page \n");
+			error ("area::freeArea: flushed page %x\n",page);
+		}
 		page->cleanup();
 		//page->next=NULL;
 		vmBlock->vpagePool->put(page);
 		}
 	vpages.~hashTable();
+	error ("area::freeArea ----------------------------------------------------------------\n");
+	vmBlock->vnodeMan->dump();
 //error ("area::freeArea: unlocking \n");
 //error ("area::freeArea: ending \n");
 	}

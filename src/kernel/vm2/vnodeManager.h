@@ -11,10 +11,10 @@ class vnodeManager
 	public:
 		vnodeManager(void);
 		vpage *findVnode(vnode &target); // pass in a vnode, get back the "master" vpage
-		vpage *addVnode (vnode &target, vpage &vp);
+		vpage *addVnode (vnode &target, vpage &vp,vnode **retOne);
 		vpage *addVnode(vnode *target,vpage &vp);
 		bool remove(vnode &target,vpage &vp);
-
+		void dump(void);
 	private:
 		hashTable vnodes;
 };

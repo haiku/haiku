@@ -62,12 +62,12 @@ void pageManager::freePage(page *toFree) {
 	if (atomic_add(&(toFree->count),-1)==1) { // atomic_add returns the *PREVIOUS* value. So we need to check to see if the one we are wasting was the last one.
 		acquire_sem(inUseLock);
 		inUse.remove(toFree);
-		inUse.dump();
+//		inUse.dump();
 		release_sem(inUseLock);
 
 		acquire_sem(unusedLock);
 		unused.add(toFree);
-		unused.dump();
+//		unused.dump();
 		release_sem(unusedLock);
 		}
 	}

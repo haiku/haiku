@@ -16,6 +16,9 @@ struct vnode : public node
 	{
 	valid=false;
 	}
+
+	void dump(void) { error ("vnode::dump - fd = %d, offset = %ld, valid = %d\n",fd,offset,valid);
+	}
 };
 #define B_OS_NAME_LENGTH 32
 enum protectType {none=0,readable, writable,copyOnWrite};
