@@ -773,17 +773,15 @@ StyledEditWindow::QuitRequested()
 	saveAlert->SetShortcut(1,'d');
 	saveAlert->SetShortcut(2,'s');
 	buttonIndex= saveAlert->Go();
-	
+
 	if (buttonIndex==0) { 		//"cancel": dont save, dont close the window
 		return false;
 	} else if(buttonIndex==1) { // "don't save": just close the window
 		return true;
-	} else if(!fSaveMessage) { //save as	
-		DispatchMessage(new BMessage(MENU_SAVEAS), this);
-		return false;
-	} else {	
-		DispatchMessage(new BMessage(B_SAVE_REQUESTED), this);
-		return true;
+	} else if(!fSaveMessage) { //save as
+		return SaveAs();
+	} else {
+		return (Save(fSaveMessage) == B_OK);
 	}
 			
 }/***QuitRequested()***/
@@ -791,7 +789,7 @@ StyledEditWindow::QuitRequested()
 status_t
 StyledEditWindow::Save(BMessage *message)
 {
-	status_t err;
+	status_t err = B_OK;
 	
 	if(!message){
 		message=fSaveMessage;
@@ -855,12 +853,12 @@ StyledEditWindow::Save(BMessage *message)
 	}	
 	
 	// clear clean modes
-	fSaveItem->SetEnabled(false); 
+	fSaveItem->SetEnabled(false);
 	fRevertItem->SetEnabled(false);
 	fUndoCleans = false;
 	fRedoCleans = false;
 	fClean = true;
-	return err;						
+	return err;
 } /***Save()***/
 
 status_t
@@ -914,6 +912,7 @@ StyledEditWindow::SaveAs()
 		}
 	}
 	fSavePanel->Show();
+	return B_OK;
 }
 
 void
