@@ -707,9 +707,6 @@ void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 	fColumns = columns;
 	fScreenXResolution = (int32)(screen[0]->Resolution().x);
 	fScreenYResolution = (int32)(screen[0]->Resolution().y);
-
-	// NOTE: a RebuildFullRegion() followed by FullInvalidate() are required after calling 
-	// this method!
 }
 
 Screen **RootLayer::Screens()
@@ -948,13 +945,6 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				// helps the window determine the target view. Testing so far has revealed
 				// that it has the same value as the "where" field
 				
-				BMessage downmsg(B_MOUSE_DOWN);
-				downmsg.AddInt64("when",evt.when);
-				downmsg.AddPoint("where",evt.where);
-				downmsg.AddInt32("modifiers",evt.modifiers);
-				downmsg.AddInt32("buttons",evt.buttons);
-				downmsg.AddInt32("clicks",evt.clicks);
-				
 				if (target!=ws->FrontLayer())
 				{
 					ws->BringToFrontANormalWindow(target);
@@ -964,6 +954,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					activeFocus		= ws->FocusLayer();
 
 					activeFocus->Window()->Lock();
+					previousFocus->Window()->Lock();
 
 					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
 						target->MouseDown(evt, true);
@@ -975,17 +966,12 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
 					invalidRegion.Include(&(activeFocus->fFull));
 					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
-					activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
-
-					if (previousFocus != activeFocus && previousFocus)
-					{
-						if (previousFocus->fVisible.CountRects() > 0)
-						{
-							invalidRegion.MakeEmpty();
-							invalidRegion.Include(&(previousFocus->fVisible));
-							activeFocus->fParent->Invalidate(invalidRegion);
-						}
-					}
+					// allow previous window's decorator to lowlight
+					redraw_layer(previousFocus, previousFocus->fVisible);
+					// highlight the visible part of the new focus window
+					redraw_layer(activeFocus, activeFocus->fVisible);
+					// rebuild regions and redraw the hidden parts of activeFocus
+					invalidate_layer(activeFocus, invalidRegion);
 
 					fMouseTarget = target;
 					
@@ -993,52 +979,14 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					STRACE(("2Front: %s\n", ws->FrontLayer()->GetName()));
 					STRACE(("2Focus: %s\n", ws->FocusLayer()->GetName()));
 
-					fMouseTarget->Window()->SendMessageToClient(&downmsg);
+					previousFocus->Window()->Unlock();
 					activeFocus->Window()->Unlock();
 				}
 				else // target == ws->FrontLayer()
 				{
-					// only if target has the focus!
-					if (target == ws->FocusLayer())
-					{
-						target->Window()->Lock();
-						target->MouseDown(evt, true);
-						target->Window()->Unlock();
-					}
-					else
-					{
-						previousFocus	= ws->FocusLayer();
-						ws->SearchAndSetNewFocus(target);
-						activeFocus		= ws->FocusLayer();
-					
-						activeFocus->Window()->Lock();
-	
-						if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
-							target->MouseDown(evt, true);
-						else
-							target->MouseDown(evt, false);
-	
-						// may or may not be empty.
-						
-						// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
-						invalidRegion.Include(&(activeFocus->fFull));
-						invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
-						activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
-	
-						if (previousFocus != activeFocus && previousFocus)
-						{
-							if (previousFocus->fVisible.CountRects() > 0)
-							{
-								invalidRegion.MakeEmpty();
-								invalidRegion.Include(&(previousFocus->fVisible));
-								activeFocus->fParent->Invalidate(invalidRegion);
-							}
-						}
-						fMouseTarget = target;
-						fMouseTarget->Window()->SendMessageToClient(&downmsg);
-						
-						activeFocus->Window()->Unlock();
-					}
+					target->Window()->Lock();
+					target->MouseDown(evt, true);
+					target->Window()->Unlock();
 				}
 
 				fMainLock.Unlock();
@@ -1662,8 +1610,7 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 					
 				// first redraw previous window's decorator. It has lost focus state.
 				if (previousFocus)
-					if (previousFocus->fDecorator)
-						winBorder->fParent->Invalidate(previousFocus->fVisible);
+					redraw_layer(winBorder, previousFocus->fVisible);
 
 				// we must build the rebuild region. we have nowhere to take it from.
 				// include decorator's(if any) and fTopLayer's full regions.
@@ -1673,7 +1620,7 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 				if (winBorder->fDecorator)
 					invalidRegion.Include(&(winBorder->fFull));
 
-				winBorder->fParent->FullInvalidate(invalidRegion);
+				invalidate_layer(winBorder, invalidRegion);
 			}
 		}
 	}
