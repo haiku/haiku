@@ -106,10 +106,10 @@ static void
 fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uint8 attr)
 {
 	uint16 pair = ((uint16)attr << 8) | (uint16)glyph;
-	int y_limit = y + height;
+	int32 y_limit = y + height;
 
 	while (y < y_limit) {
-		uint16 *p = gOrigin+(y*COLUMNS)+x;
+		uint16 *p = gOrigin + (y * COLUMNS) + x;
 		uint16 *p_limit = p + width;
 		while (p < p_limit) *p++ = pair;
 		y++;
@@ -136,7 +136,7 @@ clear(uint8 attr)
 	uint32 i;
 
 	for (i = 0; i < COLUMNS * LINES; i++)
-		base[i] = 0xf20;
+		base[i] = (attr << 8) | 0x20;
 }
 
 
