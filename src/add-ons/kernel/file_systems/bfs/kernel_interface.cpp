@@ -12,6 +12,7 @@
 #include "Index.h"
 #include "BPlusTree.h"
 #include "Query.h"
+#include "bfs_control.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -359,22 +360,22 @@ bfs_sync(void *_ns)
  */
 
 static int
-bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **node)
+bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 {
-	FUNCTION_START(("vnode_id = %Ld\n",id));
+	FUNCTION_START(("vnode_id = %Ld\n", id));
 	Volume *volume = (Volume *)_ns;
 
 	if (id < 0 || id > volume->NumBlocks()) {
-		FATAL(("inode at %Ld requested!\n",id));
+		FATAL(("inode at %Ld requested!\n", id));
 		return B_ERROR;
 	}
 
-	Inode *inode = new Inode(volume,id,false,reenter);
+	Inode *inode = new Inode(volume, id, false, reenter);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
 	if (inode->InitCheck() == B_OK) {
-		*node = (void *)inode;
+		*_node = (void *)inode;
 		return B_OK;
 	}
 
@@ -406,6 +407,13 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
+	// The "chkbfs" functionality uses this flag to prevent the space used
+	// up by the inode from being freed - this flag is set only in situations
+	// where this is a good idea... (the block bitmap will get fixed anyway
+	// in this case).
+	if (inode->Flags() & INODE_DONT_FREE_SPACE)
+		return B_OK;
+
 	// If the inode isn't in use anymore, we were called before
 	// bfs_unlink() returns - in this case, we can just use the
 	// transaction which has already deleted the inode.
@@ -415,7 +423,7 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 	if (journal != NULL && journal->CurrentThread() == find_thread(NULL))
 		transaction = journal->CurrentTransaction();
 	else
-		localTransaction.Start(volume,inode->BlockNumber());
+		localTransaction.Start(volume, inode->BlockNumber());
 
 	// Perhaps there should be an implementation of Inode::ShrinkStream() that
 	// just frees the data_stream, but doesn't change the inode (since it is
@@ -562,7 +570,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 				FATAL(("File %Ld is already uncached\n", inode->ID()));
 				return B_ERROR;
 			}
-			
+
 			PRINT(("uncached access to inode %Ld\n", inode->ID()));
 
 			// ToDo: sync the cache for this file!
@@ -577,15 +585,46 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 				inode->Node()->flags |= INODE_NO_CACHE;
 			return status;
 		}
+		case BFS_IOCTL_VERSION:
+		{
+			uint32 *version = (uint32 *)buffer;
+
+			*version = 0x10000;
+			return B_OK;
+		}
+		case BFS_IOCTL_START_CHECKING:
+		{
+			// start checking
+			BlockAllocator &allocator = volume->Allocator();
+			check_control *control = (check_control *)buffer;
+
+			return allocator.StartChecking(control);
+		}
+		case BFS_IOCTL_STOP_CHECKING:
+		{
+			// stop checking
+			BlockAllocator &allocator = volume->Allocator();
+			check_control *control = (check_control *)buffer;
+
+			return allocator.StopChecking(control);
+		}
+		case BFS_IOCTL_CHECK_NEXT_NODE:
+		{
+			// check next
+			BlockAllocator &allocator = volume->Allocator();
+			check_control *control = (check_control *)buffer;
+
+			return allocator.CheckNextNode(control);
+		}
 #ifdef DEBUG
 		case 56742:
 		{
 			// allocate all free blocks and zero them out (a test for the BlockAllocator)!
 			BlockAllocator &allocator = volume->Allocator();
-			Transaction transaction(volume,0);
+			Transaction transaction(volume, 0);
 			CachedBlock cached(volume);
 			block_run run;
-			while (allocator.AllocateBlocks(&transaction,8,0,64,1,run) == B_OK) {
+			while (allocator.AllocateBlocks(&transaction, 8, 0, 64, 1, run) == B_OK) {
 				PRINT(("write block_run(%ld, %d, %d)\n",run.allocation_group,run.start,run.length));
 				for (int32 i = 0;i < run.length;i++) {
 					uint8 *block = cached.SetTo(run);
@@ -883,7 +922,7 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 
 	if (_ns == NULL || _directory == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
-	if (!strcmp(name,"..") || !strcmp(name,"."))
+	if (!strcmp(name, "..") || !strcmp(name, "."))
 		return B_NOT_ALLOWED;
 
 	Volume *volume = (Volume *)_ns;
@@ -893,13 +932,13 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 	if (status < B_OK)
 		return status;
 
-	Transaction transaction(volume,directory->BlockNumber());
+	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
-	if ((status = directory->Remove(&transaction,name,&id)) == B_OK) {
+	if ((status = directory->Remove(&transaction, name, &id)) == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ENTRY_REMOVED,volume->ID(),directory->ID(),0,id,NULL);
+		notify_listener(B_ENTRY_REMOVED, volume->ID(), directory->ID(), 0, id, NULL);
 	}
 	return status;
 }
