@@ -9,6 +9,7 @@ struct entry_ref;
 
 class BMidiEvent;
 class BList;
+class BFile;
 
 class BMidiStore : public BMidi 
 {
@@ -78,13 +79,26 @@ private:
 
 	static int CompareEvents(const void* event1, const void* event2);
 
+	void ReadFileHeader();
+	void ReadTrackHeader();
+	void ReadTrack();
+	int32 Read32Bit();
+	int16 Read16Bit();
+	void ReadData(uint8* data, size_t size);
+
 	BList* events;
 	uint32 tempo;
 	uint32 curEvent;
 	uint32 startTime;
 	uint32 ticksPerBeat;
 
-	uint32 _reserved[21];
+	BFile* file;
+	int32 numTracks;
+	int32 trackSize;
+	int16 division;
+
+	uint16 _reserved1;
+	uint32 _reserved2[17];
 };
 
 #endif // _MIDI_STORE_H

@@ -11,8 +11,9 @@
 #include <string.h>
 
 #include <Entry.h>
-#include <Path.h>
+#include <File.h>
 #include <List.h>
+#include <Path.h>
 
 #include "debug.h"
 #include "MidiEvent.h"
@@ -198,8 +199,36 @@ void BMidiStore::AllNotesOff(bool justChannel, uint32 time)
 
 status_t BMidiStore::Import(const entry_ref* ref)
 {
-	return B_OK;
+	status_t status = B_OK;
+
+	try
+	{
+		file = new BFile(ref, B_READ_ONLY);
+
+		status = file->InitCheck();
+		if (status != B_OK) { throw status; }
+
+		ReadFileHeader();
+
+		for (int32 t = 0; t < numTracks; ++t)
+		{
+			TRACE(("[midi] Reading track %d\n", t))
+
+			ReadTrackHeader();
+			ReadTrack();
+		} 
+
+		SortEvents(true);
+	}
+	catch (status_t err)
+	{
+		status = err;
+	}
+
+	delete file;
+	return status;
 }
+
 
 //------------------------------------------------------------------------------
 
@@ -332,6 +361,87 @@ BMidiEvent* BMidiStore::EventAt(uint32 index) const
 int BMidiStore::CompareEvents(const void* event1, const void* event2) 
 {
 	return ((BMidiEvent*) event1)->time - ((BMidiEvent*) event2)->time;
+}
+
+//------------------------------------------------------------------------------
+
+void BMidiStore::ReadFileHeader()
+{
+	uint8 header[4];
+	ReadData(header, 4);
+
+	if (strncmp((char*) header, "MThd", 4) != 0)
+	{
+		throw B_BAD_MIDI_DATA;
+	}
+	
+	int32 length = Read32Bit();
+
+	if (length != 6) { throw B_BAD_MIDI_DATA; }
+
+	Read16Bit();  // skip format
+
+	numTracks = Read16Bit();
+	division  = Read16Bit();
+
+	if (numTracks == 0) { throw B_BAD_MIDI_DATA; }
+	if (division  == 0) { throw B_BAD_MIDI_DATA; }
+
+	TRACE(("[midi] numTracks = %d, division = %d\n", numTracks, division))
+}
+
+//------------------------------------------------------------------------------
+
+void BMidiStore::ReadTrackHeader()
+{
+	uint8 header[4];
+	ReadData(header, 4);
+
+	if (strncmp((char*) header, "MTrk", 4) != 0)
+	{
+		throw B_BAD_MIDI_DATA;
+	}
+
+	trackSize = Read32Bit();
+
+	TRACE(("[midi] trackSize = %d\n", trackSize))
+}	
+
+//------------------------------------------------------------------------------
+
+void BMidiStore::ReadTrack()
+{
+	/* See <http://home.concepts.nl/~hollies/midi/midi1todo.html> */
+}
+
+//------------------------------------------------------------------------------
+
+int32 BMidiStore::Read32Bit()
+{
+	uint8 buf[4];
+	ReadData(buf, 4);
+	return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+}
+
+//------------------------------------------------------------------------------
+
+int16 BMidiStore::Read16Bit()
+{
+	uint8 buf[2];
+	ReadData(buf, 2);
+	return (buf[0] << 8) | buf[1];
+}
+
+//------------------------------------------------------------------------------
+
+void BMidiStore::ReadData(uint8* data, size_t size)
+{
+	ssize_t res = file->Read(data, size);
+
+	if (res != size)
+	{
+		throw (status_t) res;
+	}
 }
 
 //------------------------------------------------------------------------------
