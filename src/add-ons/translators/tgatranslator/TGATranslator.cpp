@@ -34,7 +34,6 @@
 #include "TGAView.h"
 #include "StreamBuffer.h"
 #include <SupportDefs.h>
-#include <OS.h>
 	// for min()/max()
 
 // The input formats that this translator supports.
@@ -1100,6 +1099,7 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 	uint8 *bitsRowData = new uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
+		tgaRowData = NULL;
 		return B_ERROR;
 	}
 	
@@ -1115,7 +1115,12 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 		convert_to_tga = pix_bits_to_tga;
 	
 	ssize_t rd = inSource->Read(bitsRowData, bitsRowBytes);
-	const color_map *pmap = system_colors();
+	const color_map *pmap = NULL;
+	if (fromspace == B_CMAP8) {
+		pmap = system_colors();
+		if (!pmap)
+			return B_ERROR;
+	}
 	while (rd == bitsRowBytes) {
 		status_t bytescopied;
 		bytescopied = convert_to_tga(bitsRowData, tgaRowData, fromspace,
@@ -1133,7 +1138,9 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 	} // while (rd == bitsRowBytes)
 	
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 	delete[] tgaRowData;
+	tgaRowData = NULL;
 
 	return B_OK;
 }
@@ -1183,12 +1190,15 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 	uint8 *medRowData = new uint8[imagespec.width];
 	if (!medRowData) {
 		delete[] tgaRowData;
+		tgaRowData = NULL;
 		return B_ERROR;
 	}
 	uint8 *bitsRowData = new uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] medRowData;
+		medRowData = NULL;
 		delete[] tgaRowData;
+		tgaRowData = NULL;
 		return B_ERROR;
 	}
 	
@@ -1240,8 +1250,11 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 	} // while (rd == bitsRowBytes)
 	
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 	delete[] medRowData;
+	medRowData = NULL;
 	delete[] tgaRowData;
+	tgaRowData = NULL;
 
 	return B_OK;
 }
@@ -1592,6 +1605,8 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 				// write Be's system palette to the TGA file
 				uint8 pal[1024];
 				const color_map *pmap = system_colors();
+				if (!pmap)
+					return B_ERROR;
 				for (int32 i = 0; i < 256; i++) {
 					uint8 *palent = pal + (i * 4);
 					rgb_color c = pmap->color_list[i];
@@ -1797,6 +1812,7 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 	uint8 *bitsRowData = new uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
+		tgaRowData = NULL;
 		return B_ERROR;
 	}
 
@@ -1822,7 +1838,9 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 	}
 	
 	delete[] tgaRowData;
+	tgaRowData = NULL;
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 
 	return B_OK;
 }
@@ -1950,6 +1968,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 	}
 	
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 
 	return result;
 }
@@ -2091,6 +2110,7 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 	uint8 *bitsRowData = new uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
+		tgaRowData = NULL;
 		return B_ERROR;
 	}
 
@@ -2115,7 +2135,9 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 	}
 	
 	delete[] tgaRowData;
+	tgaRowData = NULL;
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 
 	return B_OK;
 }
@@ -2262,6 +2284,7 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 	}
 	
 	delete[] bitsRowData;
+	bitsRowData = NULL;
 
 	return result;
 }
