@@ -297,7 +297,7 @@ find_thread(const char *name) {
 		return thread;
 	}
 	return _kern_find_thread(name);
-#	ifndef __HAIKU
+#	ifndef __HAIKU__
 #		undef _kern_find_thread
 #	endif
 }
