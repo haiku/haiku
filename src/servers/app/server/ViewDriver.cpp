@@ -79,7 +79,7 @@ VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
-	viewbmp=new BBitmap(bounds,B_CMAP8,true);
+	viewbmp=new BBitmap(bounds,B_RGBA32,true);
 
 	// This link for sending mouse messages to the OBAppServer.
 	// This is only to take the place of the Input Server. 
@@ -416,7 +416,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			view->serverlink->Flush();
 			break;
 		}
-		case VDWIN_SHOWCURSOR:
+/*		case VDWIN_SHOWCURSOR:
 		{
 			if(view->hide_cursor>0)
 				view->hide_cursor--;
@@ -487,7 +487,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		default:
+*/		default:
 			BWindow::MessageReceived(msg);
 			break;
 	}
@@ -537,12 +537,10 @@ ViewDriver::ViewDriver(void)
 	framebuffer=screenwin->view->viewbmp;
 	serverlink=screenwin->view->serverlink;
 	hide_cursor=0;
-
-	_buffer_width=640;
-	_buffer_height=480;
-	_buffer_depth=8;
-	_buffer_mode=B_8_BIT_640x480;
-	_bytes_per_row=framebuffer->BytesPerRow();
+	
+	_displaymode.virtual_width=640;
+	_displaymode.virtual_height=480;
+	_displaymode.space=B_RGBA32;
 	
 	// We add this because if we see the default workspace color, then we have at least
 	// a reasonable idea that everything is kosher.
@@ -611,12 +609,7 @@ void ViewDriver::SetMode(const display_mode &mode)
 	}
 	
 	delete framebuffer;
-
-	// don't forget to update the internal vars!
-	_buffer_width=mode.virtual_width;
-	_buffer_height=mode.virtual_height;
-	_buffer_mode=mode.space;
-
+	
 	screenwin->view->viewbmp=tempbmp;
 	framebuffer=screenwin->view->viewbmp;
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
@@ -628,86 +621,6 @@ void ViewDriver::SetMode(const display_mode &mode)
 	drawview->Sync();
 	framebuffer->Unlock();
 
-	_bytes_per_row=framebuffer->BytesPerRow();
-	screenwin->view->Invalidate();
-	screenwin->Unlock();
-}
-
-void ViewDriver::SetMode(const int32 &space)
-{
-	if(!is_initialized)
-		return;
-		
-	screenwin->Lock();
-	int16 w=640,h=480;
-	color_space s=B_CMAP8;
-
-	switch(space)
-	{
-		case B_32_BIT_800x600:
-		case B_16_BIT_800x600:
-		case B_8_BIT_800x600:
-		{
-			w=800; h=600;
-			break;
-		}
-		case B_32_BIT_1024x768:
-		case B_16_BIT_1024x768:
-		case B_8_BIT_1024x768:
-		{
-			w=1024; h=768;
-			break;
-		}
-		default:
-			break;
-	}
-	screenwin->ResizeTo(w-1,h-1);
-
-	switch(space)
-	{
-		case B_32_BIT_640x480:
-		case B_32_BIT_800x600:
-		case B_32_BIT_1024x768:
-			s=B_RGBA32;
-			_buffer_depth=32;
-			break;
-		case B_16_BIT_640x480:
-		case B_16_BIT_800x600:
-		case B_16_BIT_1024x768:
-			s=B_RGBA15;
-			_buffer_depth=15;
-			break;
-		case B_8_BIT_640x480:
-		case B_8_BIT_800x600:
-		case B_8_BIT_1024x768:
-			s=B_CMAP8;
-			_buffer_depth=8;
-			break;
-		default:
-			_buffer_depth=8;
-			break;
-	}
-	
-	
-	delete framebuffer;
-
-	// don't forget to update the internal vars!
-	_buffer_width=w;
-	_buffer_height=h;
-	_buffer_mode=space;
-
-	screenwin->view->viewbmp=new BBitmap(BRect(0,0,w-1,h-1),s,true);
-	framebuffer=screenwin->view->viewbmp;
-	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
-	framebuffer->AddChild(drawview);
-
-	framebuffer->Lock();
-	drawview->SetHighColor(workspace_default_color.GetColor32());
-	drawview->FillRect(drawview->Bounds());
-	drawview->Sync();
-	framebuffer->Unlock();
-
-	_bytes_per_row=framebuffer->BytesPerRow();
 	screenwin->view->Invalidate();
 	screenwin->Unlock();
 }
@@ -1759,7 +1672,10 @@ status_t ViewDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
 void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
 {
 	if(!is_initialized || !bitmap || !d)
+	{
+		printf("CopyBitmap returned - not init or NULL bitmap\n");
 		return;
+	}
 	
 	SetDrawData(d);
 	
@@ -1775,6 +1691,8 @@ void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRe
 	framebuffer->Lock();
 
 	drawview->DrawBitmap(mediator,source,dest);
+	drawview->Sync();
+	screenwin->view->Invalidate(dest);
 	
 	framebuffer->Unlock();
 	screenwin->Unlock();
@@ -1783,11 +1701,20 @@ void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRe
 
 void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 {
-	if(!is_initialized || !destbmp)
-		return;
+	// TODO: BUG: CRASH: There is a crash on memcpy whenever the cursor is saved and it
+	// is clipped to the bottom edge of the screen.
 	
-	if(destbmp->BitsPerPixel() != _buffer_depth)
+	if(!is_initialized || !destbmp)
+	{
+		printf("CopyToBitmap returned - not init or NULL bitmap\n");
 		return;
+	}
+	
+	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	{
+		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
+		return;
+	}
 	
 	BRect destrect(destbmp->Bounds()), source(sourcerect);
 	
@@ -1797,7 +1724,6 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 	if(source.Width() > destrect.Width())
 		source.right=source.left+destrect.Width();
 	
-
 	if(source.Height() > destrect.Height())
 		source.bottom=source.top+destrect.Height();
 	
@@ -1849,14 +1775,14 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
 	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
-
-	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
-	{ 
+	
+	for (uint32 pos_y=0; pos_y<lines; pos_y++)
+	{
 		memcpy(dest_bits,src_bits,line_length);
 
 		// Increment offsets
-   		src_bits += src_width;
-   		dest_bits += dest_width;
+ 		src_bits += src_width;
+ 		dest_bits += dest_width;
 	}
 
 }

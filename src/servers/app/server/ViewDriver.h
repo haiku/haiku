@@ -112,7 +112,6 @@ public:
 
 	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
 
-	void SetMode(const int32 &mode);
 	void SetMode(const display_mode &mode);
 	
 	bool DumpToFile(const char *path);

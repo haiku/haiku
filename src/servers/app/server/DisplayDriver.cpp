@@ -242,14 +242,10 @@ DisplayDriver::DisplayDriver(void)
 {
 	_locker=new BLocker();
 
-	_buffer_depth=0;
-	_buffer_width=0;
-	_buffer_height=0;
-	_buffer_mode=-1;
-	
 	_is_cursor_hidden=false;
 	_is_cursor_obscured=false;
 	_cursor=NULL;
+	_cursorsave=NULL;
 	_dpms_caps=B_DPMS_ON;
 	_dpms_state=B_DPMS_ON;
 }
@@ -1354,7 +1350,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* dri
 			}
 			if (segmentArray[i].MinY() == segmentArray[i].MaxY())
 			{
-				if ( (segmentArray[i].MinX() < _buffer_width) &&
+				if ( (segmentArray[i].MinX() < _displaymode.virtual_width) &&
 					(segmentArray[i].MaxX() >= 0) )
 					(driver->*setLine)(ROUND(segmentArray[i].MinX()),
 					      ROUND(segmentArray[i].MaxX()), y);
@@ -1362,7 +1358,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* dri
 			}
 			else
 			{
-				if ( (segmentArray[i].GetX(y) < _buffer_width) &&
+				if ( (segmentArray[i].GetX(y) < _displaymode.virtual_width) &&
 					(segmentArray[i+1].GetX(y) >= 0) )
 					(driver->*setLine)(ROUND(segmentArray[i].GetX(y)),
 					      ROUND(segmentArray[i+1].GetX(y)), y);
@@ -1598,12 +1594,7 @@ void DisplayDriver::HideCursor(void)
 	_is_cursor_hidden=true;
 	
 	if(_cursorsave)
-	{
 		CopyBitmap(_cursorsave,_cursorsave->Bounds(),cursorframe, &_drawdata);
-		
-		delete _cursorsave;
-		_cursorsave=NULL;
-	}
 	
 	Unlock();
 }
@@ -1654,15 +1645,18 @@ void DisplayDriver::MoveCursorTo(const float &x, const float &y)
 		return;
 	}	
 	
-//	if(!_cursorsave)
-//		_cursorsave=new ServerBitmap(_cursor);
-
+	if(!_cursorsave)
+		_cursorsave=new UtilityBitmap(_cursor->Bounds(),(color_space)_displaymode.space,0);
+	
+	_drawdata.draw_mode=B_OP_COPY;
 	CopyBitmap(_cursorsave,_cursor->Bounds(),saveframe,&_drawdata);
 	
 	CopyToBitmap(_cursorsave,cursorframe);
 	saveframe=cursorframe;
 	
+	_drawdata.draw_mode=B_OP_ALPHA;
 	CopyBitmap(_cursor,_cursor->Bounds(),cursorframe,&_drawdata);
+	_drawdata.draw_mode=B_OP_COPY;
 
 	Unlock();
 }
@@ -1719,12 +1713,7 @@ void DisplayDriver::ObscureCursor(void)
 	_is_cursor_obscured=true;
 	
 	if(_cursorsave)
-	{
 		CopyBitmap(_cursorsave,_cursorsave->Bounds(),cursorframe, &_drawdata);
-		
-		delete _cursorsave;
-		_cursorsave=NULL;
-	}
 	
 	Unlock();
 
@@ -1753,8 +1742,6 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 		if(visible)
 			CopyBitmap(_cursorsave,_cursorsave->Bounds(),cursorframe, &_drawdata);
 		delete _cursor;
-		delete _cursorsave;
-		_cursorsave=NULL;
 	}
 	_cursor=new ServerCursor(cursor);
 	
@@ -1768,7 +1755,9 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	if(visible)
 	{
 		CopyToBitmap(_cursorsave, cursorframe);
+		_drawdata.draw_mode=B_OP_ALPHA;
 		CopyBitmap(_cursor, _cursor->Bounds(), cursorframe, &_drawdata);
+		_drawdata.draw_mode=B_OP_COPY;
 	}
 
 	Unlock();
@@ -2313,17 +2302,6 @@ void DisplayDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const Dr
 {
 }
 
-/*!
-	\brief Sets the screen mode to specified resolution and color depth.
-	\param mode constant as defined in GraphicsDefs.h
-	
-	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
-	to update the state variables kept internally by the DisplayDriver class.
-*/
-void DisplayDriver::SetMode(const int32 &mode)
-{
-}
-
 /*
 	\brief Sets the screen mode to specified resolution and color depth.
 	\param mode Data structure as defined in Screen.h
@@ -2474,33 +2452,6 @@ void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasa
 void DisplayDriver::GetTruncatedStrings(const char **instrings,const int32 &stringcount, 
 	const uint32 &mode, const float &maxwidth, char **outstrings)
 {
-}
-
-/*!
-	\brief Returns the bit depth for the current screen mode
-	\return Current number of bits per pixel
-*/
-uint8 DisplayDriver::GetDepth(void)
-{
-	return _buffer_depth;
-}
-
-/*!
-	\brief Returns the number of bytes used in each row of the frame buffer
-	\return The number of bytes used in each row of the frame buffer
-*/
-uint32 DisplayDriver::GetBytesPerRow(void)
-{
-	return _bytes_per_row;
-}
-
-/*!
-	\brief Returns the screen mode constant in use by the driver
-	\return Current screen mode
-*/
-int32 DisplayDriver::GetMode(void)
-{
-	return _buffer_mode;
 }
 
 /*!

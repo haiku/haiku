@@ -32,27 +32,20 @@
 #include "ServerScreen.h"
 #include "DisplayDriver.h"
 
-Screen::Screen(DisplayDriver *dDriver, BPoint res, uint32 colorspace,
-				const int32 &ID)
+Screen::Screen(DisplayDriver *dDriver, BPoint res, uint32 colorspace, const int32 &ID)
 {
 	fID			= ID;
 	fDDriver	= dDriver;
 	SetResolution(res, colorspace);
 }
 
-Screen::~Screen(void){
+Screen::~Screen(void)
+{
 //printf("~Screen( %ld )\n", fID);
 }
 
-void Screen::SetColorSpace(const uint32 &colorspace){
-//	fDDriver->SetColorSpace(colorspace);
-}
-
-uint32 Screen::ColorSpace(void) const{
-//	return fDDriver->ColorSpace();
-}
-
-bool Screen::SupportsResolution(BPoint res, uint32 colorspace){
+bool Screen::SupportsResolution(BPoint res, uint32 colorspace)
+{
 // TODO: remove/improve
 	return true;
 	display_mode	*dm = NULL;
@@ -60,7 +53,8 @@ bool Screen::SupportsResolution(BPoint res, uint32 colorspace){
 
 	fDDriver->GetModeList(&dm, &count);
 
-	for (uint32 i=0; i < count; i++){
+	for (uint32 i=0; i < count; i++)
+	{
 		if (dm[i].virtual_width == (uint16)res.x &&
 			dm[i].virtual_height == (uint16)res.y &&
 			dm[i].space == colorspace)
@@ -71,7 +65,8 @@ bool Screen::SupportsResolution(BPoint res, uint32 colorspace){
 	return false;
 }
 
-bool Screen::SetResolution(BPoint res, uint32 colorspace){
+bool Screen::SetResolution(BPoint res, uint32 colorspace)
+{
 	if (!SupportsResolution(res, colorspace))
 		return false;
 
@@ -81,12 +76,13 @@ bool Screen::SetResolution(BPoint res, uint32 colorspace){
 	mode.virtual_height	= (uint16)res.y;
 	mode.space			= colorspace;
 
-//	fDDriver->SetMode(&mode);
+	fDDriver->SetMode(mode);
 
 	return true;
 }
 
-BPoint Screen::Resolution() const{
+BPoint Screen::Resolution() const
+{
 	display_mode		mode;
 
 	fDDriver->GetMode(&mode);
@@ -94,7 +90,8 @@ BPoint Screen::Resolution() const{
 	return BPoint(mode.virtual_width, mode.virtual_height);
 }
 
-int32 Screen::ScreenNumber(void) const{
+int32 Screen::ScreenNumber(void) const
+{
 	return fID;
 }
 

@@ -97,10 +97,9 @@ void BitmapDriver::SetTarget(ServerBitmap *target)
 	
 	if(target)
 	{
-		_buffer_depth=target->Width();
-		_buffer_height=target->Height();
-		_buffer_depth=target->BitsPerPixel();
-		_bytes_per_row=target->BytesPerRow();
+		_displaymode.virtual_width=target->Width();
+		_displaymode.virtual_height=target->Height();
+		_displaymode.space=target->ColorSpace();
 		// Setting mode not necessary. Can get color space stuff via ServerBitmap->ColorSpace
 	}
 	

@@ -673,11 +673,7 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			
 			PortLink replylink(replyport);
 			replylink.SetOpCode(AS_GET_SCREEN_MODE);
-			replylink.Attach<int16>(dmode.virtual_width);
-			replylink.Attach<int16>(dmode.virtual_height);
-			
-			// Eventually, GetDepth() will get replaced
-			replylink.Attach<int16>(fDriver->GetDepth());
+			replylink.Attach<display_mode>(dmode);
 			replylink.Flush();
 			break;
 		}
