@@ -54,6 +54,25 @@ enum {
 	B_REG_GET_APP_INFO				= 'rgai',
 	B_REG_GET_APP_LIST				= 'rgal',
 	B_REG_ACTIVATE_APP				= 'rgac',
+	// MIME requests
+	B_REG_MIME_SET_PARAM			= 'rgsp',
+	B_REG_MIME_START_WATCHING		= 'rgwb',
+	B_REG_MIME_STOP_WATCHING		= 'rgwe',
+	B_REG_MIME_INSTALL				= 'rgin',
+	B_REG_MIME_DELETE				= 'rgdl',
+};
+
+// B_REG_MIME_SET_PARAM "which" constants 
+enum {
+	B_REG_MIME_APP_HINT				= 'rgmh',
+	B_REG_MIME_ATTR_INFO			= 'rgma',
+	B_REG_MIME_DESCRIPTION			= 'rgmd',
+	B_REG_MIME_FILE_EXTENSIONS		= 'rgmf',
+	B_REG_MIME_ICON					= 'rgmi',
+	B_REG_MIME_ICON_FOR_TYPE		= 'rgm4',
+	B_REG_MIME_PREFERRED_APP		= 'rgmp',
+	B_REG_MIME_SNIFFER_RULE			= 'rgmr',
+	B_REG_MIME_SUPPORTED_TYPES		= 'rgms',
 };
 
 // type constants
