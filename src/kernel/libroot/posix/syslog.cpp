@@ -96,23 +96,28 @@ get_context()
  */
 
 static void
-send_syslog_message(syslog_context *context, int priority, const char *text, va_list args)
+send_syslog_message(syslog_context *context, int options, const char *text, va_list args)
 {
 	// do we have to do anything?
-	if ((context->mask & LOG_MASK(priority)) == 0)
+	if ((context->mask & LOG_MASK(SYSLOG_PRIORITY(options))) == 0)
 		return;
 
+	options |= context->options;
 	port_id port = find_port(SYSLOG_PORT_NAME);
+
+	if ((options & LOG_PERROR) != 0
+		|| ((options & LOG_CONS) != 0 && port < B_OK)) {
+		// if asked for, print out the (simplified) message on stderr
+		if (context->ident[0])
+			fprintf(stderr, "'%s' ", context->ident);
+		if (context->options & LOG_PID)
+			fprintf(stderr, "[%ld] ", find_thread(NULL));
+
+		vfprintf(stderr, text, args);
+		fputc('\n', stderr);
+	}
 	if (port < B_OK) {
-		// apparently, there is no syslog daemon running; if asked
-		// for, print out the (simplified) message on stderr
-		if (context->options & LOG_CONS) {
-			if (context->ident[0])
-				fprintf(stderr, "'%s' ", context->ident);
-			if (context->options & LOG_PID)
-				fprintf(stderr, "[%ld] ", find_thread(NULL));
-			vfprintf(stderr, text, args);
-		}
+		// apparently, there is no syslog daemon running;
 		return;
 	}
 
@@ -121,7 +126,7 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 
 	message.from = find_thread(NULL);
 	message.when = real_time_clock();
-	message.options = context->options | priority;
+	message.options = options;
 	strcpy(message.ident, context->ident);
 
 	int length = vsnprintf(message.message, sizeof(buffer) - sizeof(syslog_message), text, args);
