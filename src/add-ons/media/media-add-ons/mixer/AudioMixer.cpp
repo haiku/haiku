@@ -1683,7 +1683,7 @@ AudioMixer::UpdateParameterWeb()
 
 	group = top->MakeGroup("");
 	group->MakeNullParameter(PARAM_ETC(1001), B_MEDIA_RAW_AUDIO, "Info:", B_GENERIC);
-	group->MakeNullParameter(PARAM_ETC(1002), B_MEDIA_RAW_AUDIO, "OpenBeOS audio mixer", B_GENERIC);
+	group->MakeNullParameter(PARAM_ETC(1002), B_MEDIA_RAW_AUDIO, "Haiku audio mixer", B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1003), B_MEDIA_RAW_AUDIO, "Version: " VERSION_STRING , B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1004), B_MEDIA_RAW_AUDIO, "Build: " BUILD_STRING
 		#if DEBUG == 0

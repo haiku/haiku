@@ -35,8 +35,8 @@ AudioMixerAddon::AudioMixerAddon(image_id image)
 
 	// Init flavor_info
 	fInfo->internal_id = 0;
-	fInfo->name = "Audio Mixer (OpenBeOS)";
-	fInfo->info = "OpenBeOS Audio Mixer media addon";
+	fInfo->name = "Audio Mixer (Haiku)";
+	fInfo->info = "Haiku Audio Mixer media addon";
 	fInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
 	fInfo->flavor_flags = 0;	// 0 = global or local instantiation allowed, no restrictions
 	fInfo->possible_count = 0;	// 0 = infinite
