@@ -635,7 +635,7 @@ parse_driver_settings_string(const char *settingsString)
  *	readable string.
  *	It's either in standard style or the single line style speficied
  *	by the "flat" parameter.
- *	If the buffer is too small to hold the string, B_DEVICE_FULL (for now)
+ *	If the buffer is too small to hold the string, B_BUFFER_OVERFLOW
  *	is returned, and the needed amount of bytes if placed in the
  *	"_bufferSize" parameter.
  *	If the "handle" parameter is not a valid driver settings handle, or
