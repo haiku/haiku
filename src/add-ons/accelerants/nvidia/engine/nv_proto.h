@@ -102,6 +102,7 @@ status_t nv_crtc2_cursor_hide(void);
 /* acceleration functions */
 status_t check_acc_capability(uint32 feature);
 status_t nv_acc_init(void);
+void nv_acc_assert_fifo(void);
 status_t nv_acc_setup_blit(void);
 status_t nv_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
 status_t nv_acc_setup_rectangle(uint32 color);

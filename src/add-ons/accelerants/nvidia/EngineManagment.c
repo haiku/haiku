@@ -4,7 +4,7 @@
 
 	other authors:
 	Mark Watson
-	Rudolf Cornelissen 3/2004
+	Rudolf Cornelissen 3/2004-12/2004
 */
 
 #define MODULE_BIT 0x10000000
@@ -26,6 +26,9 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	AQUIRE_BEN(si->engine.lock)
 	/* sync if required */
 	if (st) SYNC_TO_TOKEN(st);
+
+	/* make sure all needed engine cmd's are mapped to the FIFO */
+	nv_acc_assert_fifo();
 
 	/* return an engine token */
 	*et = &nv_engine_token;
