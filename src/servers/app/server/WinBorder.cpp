@@ -92,6 +92,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
+	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
 	fIsMoving		= false;
 	fIsResizing		= false;
@@ -341,6 +342,7 @@ void WinBorder::HighlightDecorator(const bool &active)
 void WinBorder::Draw(const BRect &r)
 {
 	STRACE(("WinBorder(%s)::Draw()\n", GetName()));
+
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
 	{

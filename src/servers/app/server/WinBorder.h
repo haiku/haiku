@@ -81,7 +81,6 @@ protected:
 	friend class ServerWindow;
 
 	Decorator *fDecorator;
-	int32 fFlags;
 	int32 fMouseButtons;
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;

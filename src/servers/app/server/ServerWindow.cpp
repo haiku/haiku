@@ -182,7 +182,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 
 void ServerWindow::Init(void)
 {
-	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, fFlags,
+	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, 0UL,
 			this, desktop->GetDisplayDriver());
 	fWinBorder->RebuildFullRegion();
 

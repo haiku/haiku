@@ -432,7 +432,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	if (fVisible.CountRects() > 0)
 	{
 		fUpdateReg = fVisible;
-		fUpdateReg.IntersectWith(&reg);
+		if (!(fFlags & B_FULL_UPDATE_ON_RESIZE))
+			fUpdateReg.IntersectWith(&reg);
 		
 		if (fUpdateReg.CountRects() > 0){
 			fDriver->ConstrainClippingRegion(&fUpdateReg);
