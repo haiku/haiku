@@ -1,0 +1,193 @@
+/*
+ * Auvia BeOS Driver for Via VT82xx Southbridge audio
+ *
+ * Copyright (c) 2003, Jerome Duval (jerome.duval@free.fr)
+ *
+ * Original code : BeOS Driver for Intel ICH AC'97 Link interface
+ * Copyright (c) 2002, Marcus Overhagen <marcus@overhagen.de>
+ *
+ * All rights reserved.
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice, 
+ *   this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation 
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+#include <KernelExport.h>
+#include <OS.h>
+#include "io.h"
+#include "auviareg.h"
+#include "debug.h"
+
+/* 
+ * from BeOS R3 KernelExport.h 
+ * should be replaced by PCI bus manager functions
+ */
+uint8         read_io_8(int mapped_io_addr); 
+void          write_io_8(int mapped_io_addr, uint8 value); 
+uint16        read_io_16(int mapped_io_addr); 
+void          write_io_16(int mapped_io_addr, uint16 value); 
+uint32        read_io_32(int mapped_io_addr); 
+void          write_io_32(int mapped_io_addr, uint32 value);
+
+uint8
+auvia_reg_read_8(device_config *config, int regno)
+{
+	return read_io_8(config->nabmbar + regno);
+}
+
+uint16
+auvia_reg_read_16(device_config *config, int regno)
+{
+	return read_io_16(config->nabmbar + regno);
+}
+
+uint32
+auvia_reg_read_32(device_config *config, int regno)
+{
+	return read_io_32(config->nabmbar + regno);
+}
+
+void
+auvia_reg_write_8(device_config *config, int regno, uint8 value)
+{
+	write_io_8(config->nabmbar + regno, value);
+}
+
+void
+auvia_reg_write_16(device_config *config, int regno, uint16 value)
+{
+	write_io_16(config->nabmbar + regno, value);
+}
+
+void
+auvia_reg_write_32(device_config *config, int regno, uint32 value)
+{
+	write_io_32(config->nabmbar + regno, value);
+}
+
+/* Emu10k1 Low level */
+
+/*uint32
+auvia_chan_read(device_config *config, uint16 chano, uint32 reg)
+{
+	uint32       ptr, mask = 0xFFFFFFFF;
+	uint8        size, offset = 0;
+	
+	ptr = ((((uint32) reg) << 16) & 
+		(IS_AUDIGY(config) ? EMU_A_PTR_ADDR_MASK : EMU_PTR_ADDR_MASK)) |
+		(chano & EMU_PTR_CHNO_MASK);
+	if (reg & 0xff000000) {
+		size = (reg >> 24) & 0x3f;
+		offset = (reg >> 16) & 0x1f;
+		mask = ((1 << size) - 1) << offset;
+	}
+	write_io_32(config->nabmbar + EMU_PTR, ptr);
+	ptr = (read_io_32(config->nabmbar + EMU_DATA) & mask) >> offset;
+	return ptr;
+}
+
+void
+auvia_chan_write(device_config *config, uint16 chano,
+	      uint32 reg, uint32 data)
+{
+	uint32       ptr, mask;
+	uint8        size, offset;
+	
+	ptr = ((((uint32) reg) << 16) & 
+		(IS_AUDIGY(config) ? EMU_A_PTR_ADDR_MASK : EMU_PTR_ADDR_MASK)) |
+		(chano & EMU_PTR_CHNO_MASK);
+	if (reg & 0xff000000) {
+		size = (reg >> 24) & 0x3f;
+		offset = (reg >> 16) & 0x1f;
+		mask = ((1 << size) - 1) << offset;
+		data = ((data << offset) & mask) |
+			(auvia_chan_read(config, chano, reg & 0xFFFF) & ~mask);
+	}
+	write_io_32(config->nabmbar + EMU_PTR, ptr);
+	write_io_32(config->nabmbar + EMU_DATA, data);
+}*/
+
+/* codec */
+
+#define AUVIA_TIMEOUT 	200
+
+int
+auvia_codec_waitready(device_config *config)
+{
+	int i;
+	
+	/* poll until codec not busy */
+	for(i=0; (i<AUVIA_TIMEOUT) && (read_io_32(config->nabmbar 
+		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_BUSY) ; i++)
+		snooze(1);
+	if(i>=AUVIA_TIMEOUT) {
+		//PRINT(("codec busy\n"));
+		return B_ERROR;
+	}
+	return B_OK;	
+}
+
+int
+auvia_codec_waitvalid(device_config *config)
+{
+	int i;
+	
+	/* poll until codec valid */
+	for(i=0; (i<AUVIA_TIMEOUT) && !(read_io_32(config->nabmbar 
+		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_PRIVALID) ; i++)
+		snooze(1);
+	if(i>=AUVIA_TIMEOUT) {
+		//PRINT(("codec invalid\n"));
+		return B_ERROR;
+	}
+	return B_OK;	
+}
+
+uint16
+auvia_codec_read(device_config *config, int regno)
+{
+	if(auvia_codec_waitready(config)!=B_OK) {
+		PRINT(("codec busy (1)\n"));
+		return -1;
+	}
+	write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
+		AUVIA_CODEC_PRIVALID | AUVIA_CODEC_READ | AUVIA_CODEC_INDEX(regno));
+	
+	if(auvia_codec_waitready(config)!=B_OK) {
+		PRINT(("codec busy (2)\n"));
+		return -1;
+	}
+	if(auvia_codec_waitvalid(config)!=B_OK) {
+		PRINT(("codec invalid (3)\n"));
+		return -1;
+	}
+	
+	return read_io_16(config->nabmbar + AUVIA_CODEC_CTL);
+}
+
+void
+auvia_codec_write(device_config *config, int regno, uint16 value)
+{
+	if(auvia_codec_waitready(config)!=B_OK) {
+		PRINT(("codec busy (4)\n"));
+		return;
+	}
+	write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
+		AUVIA_CODEC_PRIVALID | AUVIA_CODEC_INDEX(regno) | value);
+}

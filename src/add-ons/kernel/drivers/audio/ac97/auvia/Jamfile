@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio ac97 auvia ;
+
+R5KernelAddon auvia : kernel drivers bin :
+	ac97.c
+	debug.c
+	auvia.c
+	io.c
+	multi.c
+	util.c
+;
+
+# Link to kernel/drivers/dev/audio/multi
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
+	local instDriver = <kernel!drivers!dev!audio!multi>auvia ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : auvia ;
+}
