@@ -239,7 +239,7 @@ printf("ClientFontList::CountFamilies\n");
 	return count;
 }
 
-status_t ClientFontList::GetFamily(int32 index, font_family *name, uint32 *flags=NULL)
+status_t ClientFontList::GetFamily(int32 index, font_family *name, uint32 *flags)
 {
 #ifdef DEBUG_CLIENT_FONT_LIST
 printf("ClientFontList::GetFamily(%ld)\n",index);
@@ -295,7 +295,7 @@ int32 ClientFontList::CountStyles(font_family f)
 	return count;
 }
 
-status_t ClientFontList::GetStyle(font_family family, int32 index, font_style *name,uint32 *flags=NULL, uint16 *face=NULL)
+status_t ClientFontList::GetStyle(font_family family, int32 index, font_style *name,uint32 *flags, uint16 *face)
 {
 	if(!name || !(*name) || !family)
 		return B_ERROR;
