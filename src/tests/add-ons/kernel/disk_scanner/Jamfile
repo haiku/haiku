@@ -1,0 +1,30 @@
+SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
+
+UsePrivateHeaders $(DOT) ;
+
+# the test app
+
+SimpleTest DiskScannerTest : DiskScannerTest.cpp
+	: libkernelland_emu.a be stdc++.r4 ;
+LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;
+Depends <installed>DiskScannerTest : DiskScannerTest ;
+
+# the add-on
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner ] ;
+
+{
+	local defines = [ FDefines USERLAND ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+Addon <userland>disk_scanner : userland disk_scanner :
+	disk_scanner.c
+;
+#LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
+LinkSharedOSLibs <userland>disk_scanner : <installed>DiskScannerTest ;
+
+#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
+SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
+#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
