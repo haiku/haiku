@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <stage2.h>
 #include <kernel.h>
 #include <console.h>
@@ -30,14 +31,18 @@ static unsigned int cpu_apic_version[SMP_MAX_CPUS] = { 0, 0};
 static unsigned int *ioapic = NULL;
 static unsigned int apic_timer_tics_per_sec = 0;
 
-static int i386_timer_interrupt(void* data)
+
+static int32
+i386_timer_interrupt(void *data)
 {
 	arch_smp_ack_interrupt();
 
 	return apic_timer_interrupt();
 }
 
-static int i386_ici_interrupt(void* data)
+
+static int32
+i386_ici_interrupt(void *data)
 {
 	// gin-u-wine inter-cpu interrupt
 //	dprintf("inter-cpu interrupt on cpu %d\n", arch_smp_get_current_cpu());
@@ -46,7 +51,9 @@ static int i386_ici_interrupt(void* data)
 	return smp_intercpu_int_handler();
 }
 
-static int i386_spurious_interrupt(void* data)
+
+static int32
+i386_spurious_interrupt(void *data)
 {
 	// spurious interrupt
 //	dprintf("spurious interrupt on cpu %d\n", arch_smp_get_current_cpu());
@@ -54,7 +61,9 @@ static int i386_spurious_interrupt(void* data)
 	return B_HANDLED_INTERRUPT;
 }
 
-static int i386_smp_error_interrupt(void* data)
+
+static int32
+i386_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
 //	dprintf("smp error interrupt on cpu %d\n", arch_smp_get_current_cpu());
@@ -62,17 +71,23 @@ static int i386_smp_error_interrupt(void* data)
 	return B_HANDLED_INTERRUPT;
 }
 
-static unsigned int apic_read(unsigned int *addr)
+
+static unsigned int
+apic_read(unsigned int *addr)
 {
 	return *addr;
 }
 
-static void apic_write(unsigned int *addr, unsigned int data)
+
+static void
+apic_write(unsigned int *addr, unsigned int data)
 {
 	*addr = data;
 }
 
-int arch_smp_init(kernel_args *ka)
+
+int
+arch_smp_init(kernel_args *ka)
 {
 	dprintf("arch_smp_init: entry\n");
 
@@ -102,7 +117,9 @@ int arch_smp_init(kernel_args *ka)
 	return 0;
 }
 
-void arch_smp_send_broadcast_ici(void)
+
+void
+arch_smp_send_broadcast_ici(void)
 {
 	int config;
 	int state = disable_interrupts();
@@ -113,7 +130,9 @@ void arch_smp_send_broadcast_ici(void)
 	restore_interrupts(state);
 }
 
-void arch_smp_send_ici(int target_cpu)
+
+void
+arch_smp_send_ici(int target_cpu)
 {
 	int config;
 	int state = disable_interrupts();
@@ -127,23 +146,26 @@ void arch_smp_send_ici(int target_cpu)
 	restore_interrupts(state);
 }
 
-void arch_smp_ack_interrupt(void)
+
+void
+arch_smp_ack_interrupt(void)
 {
 	apic_write(APIC_EOI, 0);
 }
 
 #define MIN_TIMEOUT 1000
 
-int arch_smp_set_apic_timer(bigtime_t relative_timeout)
+int
+arch_smp_set_apic_timer(bigtime_t relative_timeout)
 {
 	unsigned int config;
 	int state;
 	unsigned int ticks;
 
-	if(apic == NULL)
+	if (apic == NULL)
 		return -1;
 
-	if(relative_timeout < MIN_TIMEOUT)
+	if (relative_timeout < MIN_TIMEOUT)
 		relative_timeout = MIN_TIMEOUT;
 
 	// calculation should be ok, since it's going to be 64-bit
@@ -166,12 +188,14 @@ int arch_smp_set_apic_timer(bigtime_t relative_timeout)
 	return 0;
 }
 
-int arch_smp_clear_apic_timer(void)
+
+int
+arch_smp_clear_apic_timer(void)
 {
 	unsigned int config;
 	int state;
 
-	if(apic == NULL)
+	if (apic == NULL)
 		return -1;
 
 	state = disable_interrupts();

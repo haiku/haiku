@@ -314,7 +314,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 	old_ref = atomic_add(&vnode->ref_count, -1);
 
-	PRINT(("dec_vnode_ref_count: vnode 0x%p, ref now %d\n", vnode, vnode->ref_count));
+	PRINT(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 
 	if (old_ref == 1) {
 		vnode->busy = true;
@@ -351,7 +351,7 @@ static int
 inc_vnode_ref_count(struct vnode *vnode)
 {
 	atomic_add(&vnode->ref_count, 1);
-	PRINT(("inc_vnode_ref_count: vnode 0x%p, ref now %d\n", vnode, vnode->ref_count));
+	PRINT(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 	return 0;
 }
 
@@ -374,7 +374,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 	struct vnode *vnode;
 	int err;
 
-	FUNCTION(("get_vnode: fsid %d vnid 0x%Lx 0x%p\n", fsID, vnodeID,_vnode));
+	FUNCTION(("get_vnode: fsid %ld vnid 0x%Lx %p\n", fsID, vnodeID, _vnode));
 
 	mutex_lock(&gVnodeMutex);
 
@@ -555,7 +555,7 @@ entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode
 	if (vnode == NULL) {
 		// fs_lookup() should have left the vnode referenced, so chances
 		// are good that this will never happen
-		panic("entry_ref_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", fsID, id);
+		panic("entry_ref_to_vnode: could not lookup vnode (fsid 0x%lx vnid 0x%Lx)\n", fsID, id);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -622,7 +622,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 
 		if (!nextVnode) {
 			// pretty screwed up here
-			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, vnodeID);
+			panic("path_to_vnode: could not lookup vnode (fsid 0x%lx vnid 0x%Lx)\n", vnode->fs_id, vnodeID);
 			put_vnode(vnode);
 			return ERR_VFS_PATH_NOT_FOUND;
 		}
@@ -809,7 +809,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		mutex_unlock(&gVnodeMutex);
 		
 		if (parentVnode == NULL) {
-			panic("dir_vnode_to_path: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, parentID);
+			panic("dir_vnode_to_path: could not lookup vnode (fsid 0x%lx vnid 0x%Lx)\n", vnode->fs_id, parentID);
 			status = B_ENTRY_NOT_FOUND;
 			goto out;
 		}
@@ -845,12 +845,12 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			break;
 		}
 
-		if (!FS_CALL(vnode,fs_get_vnode_name)) {
+		if (!FS_CALL(vnode, fs_get_vnode_name)) {
 			// If we don't got the vnode's name yet, we have to search for it
 			// in the parent directory now
-			file_cookie cookie;
+			fs_cookie cookie;
 
-			status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie,vnode->private_node,&cookie);
+			status = FS_CALL(vnode, fs_open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
 			if (status >= B_OK) {
 				struct dirent *dirent = (struct dirent *)nameBuffer;
 				while (true) {
@@ -1574,7 +1574,7 @@ vfs_init(kernel_args *ka)
 
 
 static int
-new_file_fd(struct vnode *vnode, file_cookie cookie, int openMode, bool kernel)
+new_file_fd(struct vnode *vnode, fs_cookie cookie, int openMode, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	int fd;
@@ -1605,7 +1605,7 @@ static int
 create_vnode(struct vnode *directory, const char *name, int omode, int perms, bool kernel)
 {
 	struct vnode *vnode;
-	file_cookie cookie;
+	fs_cookie cookie;
 	vnode_id newID;
 	int status;
 
@@ -1645,7 +1645,7 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 static int
 open_vnode(struct vnode *vnode, int omode, bool kernel)
 {
-	file_cookie cookie;
+	fs_cookie cookie;
 	int status;
 
 	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->private_node, omode, &cookie);
@@ -1669,7 +1669,7 @@ static int
 open_dir_vnode(struct vnode *vnode, bool kernel)
 {
 	struct file_descriptor *descriptor;
-	file_cookie cookie;
+	fs_cookie cookie;
 	int status, fd;
 	
 	status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
@@ -1728,7 +1728,7 @@ file_create(char *path, int omode, int perms, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
 	struct vnode *directory,*vnode;
-	file_cookie cookie;
+	fs_cookie cookie;
 	vnode_id newID;
 	int status;
 
@@ -1841,7 +1841,7 @@ dir_create_entry_ref(fs_id fsID, vnode_id parentID, const char *name, int perms,
 	vnode_id newID;
 	int status;
 
-	FUNCTION(("dir_create_entry_ref(dev = %d, ino = %Ld, name = '%s', perms = %d)\n", fsID, parentID, name, perms));
+	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", fsID, parentID, name, perms));
 	
 	status = get_vnode(fsID, parentID, &vnode, kernel);
 	if (status < B_OK)

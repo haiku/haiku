@@ -56,10 +56,11 @@ static void _dump_team_info(struct team *p);
 static int dump_team_info(int argc, char **argv);
 
 
-static void _dump_team_info(struct team *p)
+static void
+_dump_team_info(struct team *p)
 {
 	dprintf("TEAM: %p\n", p);
-	dprintf("id:          0x%x\n", p->id);
+	dprintf("id:          0x%lx\n", p->id);
 	dprintf("name:        '%s'\n", p->name);
 	dprintf("next:        %p\n", p->next);
 	dprintf("num_threads: %d\n", p->num_threads);
@@ -67,29 +68,31 @@ static void _dump_team_info(struct team *p)
 	dprintf("pending_signals: 0x%x\n", p->pending_signals);
 	dprintf("ioctx:       %p\n", p->ioctx);
 	dprintf("path:        '%s'\n", p->path);
-	dprintf("aspace_id:   0x%x\n", p->_aspace_id);
+	dprintf("aspace_id:   0x%lx\n", p->_aspace_id);
 	dprintf("aspace:      %p\n", p->aspace);
 	dprintf("kaspace:     %p\n", p->kaspace);
 	dprintf("main_thread: %p\n", p->main_thread);
 	dprintf("thread_list: %p\n", p->thread_list);
 }
 
-static int dump_team_info(int argc, char **argv)
+
+static int
+dump_team_info(int argc, char **argv)
 {
 	struct team *p;
 	int id = -1;
 	unsigned long num;
 	struct hash_iterator i;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("team: not enough arguments\n");
 		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
-	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		num = atoul(argv[1]);
-		if(num > vm_get_kernel_aspace()->virtual_map.base) {
+		if (num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
 			_dump_team_info((struct team*)num);
 			return 0;
@@ -100,8 +103,8 @@ static int dump_team_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(team_hash, &i);
-	while((p = hash_next(team_hash, &i)) != NULL) {
-		if((p->name && strcmp(argv[1], p->name) == 0) || p->id == id) {
+	while ((p = hash_next(team_hash, &i)) != NULL) {
+		if ((p->name && strcmp(argv[1], p->name) == 0) || p->id == id) {
 			_dump_team_info(p);
 			break;
 		}
@@ -431,7 +434,7 @@ team_create_team2(void *args)
 	t = thread_get_current_thread();
 	p = t->team;
 
-	dprintf("team_create_team2: entry thread %d\n", t->id);
+	dprintf("team_create_team2: entry thread %ld\n", t->id);
 
 	// create an initial primary stack region
 
@@ -440,7 +443,7 @@ team_create_team2(void *args)
 	sprintf(ustack_name, "%s_primary_stack", p->name);
 	t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, ustack_name, (void **)&t->user_stack_base,
 		REGION_ADDR_EXACT_ADDRESS, tot_top_size, REGION_WIRING_LAZY, LOCK_RW);
-	if(t->user_stack_region_id < 0) {
+	if (t->user_stack_region_id < 0) {
 		panic("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;
 	}

@@ -387,7 +387,7 @@ bootfs_create_vnode_tree(struct bootfs *fs, struct bootfs_vnode *root)
 
 
 static status_t
-bootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *root_vnid)
+bootfs_mount(fs_id id, const char *device, void *args, fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct bootfs *fs;
 	struct bootfs_vnode *v;
@@ -457,7 +457,7 @@ err:
 
 
 static status_t
-bootfs_unmount(fs_cookie _fs)
+bootfs_unmount(fs_volume _fs)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v;
@@ -481,7 +481,7 @@ bootfs_unmount(fs_cookie _fs)
 
 
 static status_t
-bootfs_sync(fs_cookie fs)
+bootfs_sync(fs_volume fs)
 {
 	TRACE(("bootfs_sync: entry\n"));
 
@@ -490,7 +490,7 @@ bootfs_sync(fs_cookie fs)
 
 
 static status_t
-bootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
+bootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 	struct bootfs_vnode *dir = (struct bootfs_vnode *)_dir;
@@ -526,7 +526,7 @@ err:
 
 
 static status_t
-bootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
+bootfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
 {
 	struct bootfs_vnode *vnode = (struct bootfs_vnode *)_vnode;
 
@@ -538,7 +538,7 @@ bootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t buffe
 
 
 static status_t
-bootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
+bootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 
@@ -562,7 +562,7 @@ bootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 
 
 static status_t
-bootfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
+bootfs_put_vnode(fs_volume _fs, fs_vnode _v, bool r)
 {
 	struct bootfs_vnode *v = (struct bootfs_vnode *)_v;
 
@@ -573,7 +573,7 @@ bootfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 
 
 static status_t
-bootfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
+bootfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 	struct bootfs_vnode *v = (struct bootfs_vnode *)_v;
@@ -603,14 +603,14 @@ err:
 
 
 static status_t
-bootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
+bootfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static status_t
-bootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
+bootfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *vnode = _v;
@@ -635,7 +635,7 @@ bootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 
 
 static status_t
-bootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+bootfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -648,7 +648,7 @@ bootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static status_t
-bootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+bootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -664,14 +664,14 @@ bootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static status_t
-bootfs_fsync(fs_cookie _fs, fs_vnode _v)
+bootfs_fsync(fs_volume _fs, fs_vnode _v)
 {
 	return 0;
 }
 
 
 static ssize_t
-bootfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *buf, size_t *len)
+bootfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buf, size_t *len)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -720,7 +720,7 @@ err:
 
 
 static ssize_t
-bootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void *buf, size_t *len)
+bootfs_write(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buf, size_t *len)
 {
 	TRACE(("bootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));
 
@@ -729,7 +729,7 @@ bootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void
 
 
 static off_t
-bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seekType)
+bootfs_seek(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, int seekType)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -783,14 +783,14 @@ bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seek
 
 
 static status_t
-bootfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+bootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static status_t
-bootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
+bootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *vnode = _v;
@@ -819,13 +819,13 @@ bootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 
 
 static status_t
-bootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
+bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	struct bootfs_cookie *cookie = _cookie;
 	struct bootfs *fs = _fs;
 	status_t status;
 
-	TRACE(("bootfs_read_dir(fs_cookie = %p vnode = %p, file_cookie = %p, buffer = %p, bufferSize = %ld, num = %d)\n",_fs, _vnode, cookie, dirent, bufferSize, *_num));
+	TRACE(("bootfs_read_dir(fs_volume = %p vnode = %p, fs_cookie = %p, buffer = %p, bufferSize = %ld, num = %ld)\n",_fs, _vnode, cookie, dirent, bufferSize, *_num));
 
 	mutex_lock(&fs->lock);
 
@@ -857,7 +857,7 @@ err:
 
 
 static status_t
-bootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
+bootfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *vnode = _vnode;
@@ -873,15 +873,15 @@ bootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 
 
 static status_t
-bootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf, size_t len)
+bootfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf, size_t len)
 {
-	TRACE(("bootfs_ioctl: fs_cookie %p vnode %p, file_cookie %p, op %lu, buf %p, len %ld\n", _fs, _v, _cookie, op, buf, len));
+	TRACE(("bootfs_ioctl: fs_volume %p vnode %p, fs_cookie %p, op %lu, buf %p, len %ld\n", _fs, _v, _cookie, op, buf, len));
 	return EINVAL;
 }
 
 
 static status_t
-bootfs_can_page(fs_cookie _fs, fs_vnode _v)
+bootfs_can_page(fs_volume _fs, fs_vnode _v)
 {
 	struct bootfs_vnode *v = _v;
 
@@ -895,7 +895,7 @@ bootfs_can_page(fs_cookie _fs, fs_vnode _v)
 
 
 static ssize_t
-bootfs_read_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_read_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -926,7 +926,7 @@ bootfs_read_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 
 static ssize_t
-bootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_write_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -938,21 +938,21 @@ bootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 
 static status_t
-bootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
+bootfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
 {
 	return EROFS;
 }
 
 
 static status_t
-bootfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
+bootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
 {
 	return EROFS;
 }
 
 
 static status_t
-bootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
+bootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -991,7 +991,7 @@ err:
 
 
 static status_t
-bootfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
+bootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -1056,6 +1056,9 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_free_cookie,	// and files here - that's intended, not by accident
 	&bootfs_read_dir,
 	&bootfs_rewind_dir,
+
+	// the other operations are not supported (attributes, indices, queries)
+	NULL,
 };
 
 

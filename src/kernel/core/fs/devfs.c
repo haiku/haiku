@@ -347,7 +347,7 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	part_map->session = info.session;
 	part_map->partition = info.partition;
 		
-	sprintf(part_name, "%i_%i", info.session, info.partition);
+	sprintf(part_name, "%li_%li", info.session, info.partition);
 
 	mutex_lock(&gDeviceFileSystem->lock);
 	
@@ -406,7 +406,7 @@ err2:
 
 
 static status_t
-devfs_mount(fs_id id, const char *devfs, void *args, fs_cookie *_fs, vnode_id *root_vnid)
+devfs_mount(fs_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct devfs *fs;
 	struct devfs_vnode *v;
@@ -479,7 +479,7 @@ err:
 
 
 static status_t
-devfs_unmount(fs_cookie _fs)
+devfs_unmount(fs_volume _fs)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *v;
@@ -503,7 +503,7 @@ devfs_unmount(fs_cookie _fs)
 
 
 static status_t
-devfs_sync(fs_cookie fs)
+devfs_sync(fs_volume fs)
 {
 	TRACE(("devfs_sync: entry\n"));
 
@@ -512,7 +512,7 @@ devfs_sync(fs_cookie fs)
 
 
 static status_t
-devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
+devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
@@ -548,7 +548,7 @@ err:
 
 
 static status_t
-devfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
+devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 
@@ -560,7 +560,7 @@ devfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t buffer
 
 
 static status_t
-devfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
+devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 
@@ -584,7 +584,7 @@ devfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 
 
 static status_t
-devfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
+devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
 #if DEVFS_TRACE
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
@@ -597,7 +597,7 @@ devfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
 
 
 static status_t
-devfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
+devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
@@ -622,21 +622,21 @@ devfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
 
 
 static status_t
-devfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
+devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static status_t
-devfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
+devfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie;
 	status_t status = 0;
 
-	TRACE(("devfs_open: fs_cookie %p vnode %p, oflags 0x%x, file_cookie %p \n", fs, vnode, oflags, _cookie));
+	TRACE(("devfs_open: fs_cookie %p vnode %p, oflags 0x%x, fs_cookie %p \n", fs, vnode, oflags, _cookie));
 
 	cookie = kmalloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
@@ -653,7 +653,7 @@ devfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 
 
 static status_t
-devfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+devfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
@@ -670,7 +670,7 @@ devfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static status_t
-devfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+devfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
@@ -690,14 +690,14 @@ devfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static status_t
-devfs_fsync(fs_cookie _fs, fs_vnode _v)
+devfs_fsync(fs_volume _fs, fs_vnode _v)
 {
 	return 0;
 }
 
 
 static ssize_t
-devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *buffer, size_t *length)
+devfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buffer, size_t *length)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
@@ -730,7 +730,7 @@ devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *buf
 
 
 static ssize_t
-devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, const void *buf, size_t *len)
+devfs_write(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, const void *buf, size_t *len)
 {
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
@@ -760,7 +760,7 @@ devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, const vo
 
 
 static off_t
-devfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seekType)
+devfs_seek(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, int seekType)
 {
 #ifdef DEBUG
 	struct devfs *fs = _fs;
@@ -775,14 +775,14 @@ devfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seekT
 
 
 static status_t
-devfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
 {
 	return EROFS;
 }
 
 
 static status_t
-devfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
+devfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
@@ -809,7 +809,7 @@ devfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 
 
 static status_t
-devfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
+devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	struct devfs_cookie *cookie = _cookie;
 	struct devfs *fs = _fs;
@@ -851,7 +851,7 @@ err:
 
 
 static status_t
-devfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
+devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
 	struct devfs *fs = _fs;
 	struct devfs_cookie *cookie = _cookie;
@@ -871,7 +871,7 @@ devfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 
 
 static status_t
-devfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf, size_t len)
+devfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf, size_t len)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *v = _v;
@@ -895,7 +895,7 @@ devfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf
 
 
 /*
-static int devfs_canpage(fs_cookie _fs, fs_vnode _v)
+static int devfs_canpage(fs_volume _fs, fs_vnode _v)
 {
 	struct devfs_vnode *v = _v;
 
@@ -910,7 +910,7 @@ static int devfs_canpage(fs_cookie _fs, fs_vnode _v)
 	}
 }
 
-static ssize_t devfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static ssize_t devfs_readpage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct devfs_vnode *v = _v;
 
@@ -940,7 +940,7 @@ static ssize_t devfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t po
 	}
 }
 
-static ssize_t devfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static ssize_t devfs_writepage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct devfs_vnode *v = _v;
 
@@ -972,7 +972,7 @@ static ssize_t devfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t p
 */
 
 static status_t
-devfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
+devfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *dir = _dir;
@@ -1007,14 +1007,14 @@ err:
 
 
 static status_t
-devfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
+devfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
 {
 	return EROFS;
 }
 
 
 static status_t
-devfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
+devfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 {
 	struct devfs_vnode *vnode = _v;
 
@@ -1030,7 +1030,7 @@ devfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 
 
 static status_t
-devfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
+devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
 #if DEVFS_TRACE
 	struct devfs_vnode *v = _v;
@@ -1095,6 +1095,9 @@ static struct fs_calls devfs_calls = {
 	&devfs_free_cookie,		// and files here - that's intended, not by accident
 	&devfs_read_dir,
 	&devfs_rewind_dir,
+
+	// the other operations are not supported (attributes, indices, queries)
+	NULL,
 };
 
 
