@@ -1,39 +1,47 @@
 /* Policy info for timers */
+
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <OS.h>
 
-#include <kernel.h>
-#include <console.h>
-#include <debug.h>
-#include <thread.h>
-#include <arch/int.h>
-#include <smp.h>
-#include <vm.h>
-#include <int.h>
 #include <timer.h>
+#include <arch/timer.h>
+#include <smp.h>
 #include <boot/kernel_args.h>
 
-#include <arch/cpu.h>
-#include <arch/timer.h>
-#include <arch/smp.h>
 
-static timer * volatile events[SMP_MAX_CPUS] = { NULL, };
-static spinlock timer_spinlock[SMP_MAX_CPUS] = { 0, };
+static timer * volatile sEvents[B_MAX_CPU_COUNT] = { NULL, };
+static spinlock sTimerSpinlock[B_MAX_CPU_COUNT] = { 0, };
 
 
-int timer_init(kernel_args *ka)
+//#define TRACE_TIMER
+#ifdef TRACE_TIMER
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
+status_t
+timer_init(kernel_args *args)
 {
-	dprintf("init_timer: entry\n");
+	TRACE(("timer_init: entry\n"));
 
-	return arch_init_timer(ka);
+	return arch_init_timer(args);
 }
 
-// NOTE: expects interrupts to be off
-static void add_event_to_list(timer *event, timer * volatile *list)
+
+/** NOTE: expects interrupts to be off */
+
+static void
+add_event_to_list(timer *event, timer * volatile *list)
 {
 	timer *next;
 	timer *last = NULL;
@@ -47,34 +55,34 @@ static void add_event_to_list(timer *event, timer * volatile *list)
 	if (last != NULL) {
 		(timer *)event->entry.next = (timer *)last->entry.next;
 		(timer *)last->entry.next = event;
-	}
-	else {
+	} else {
 		(timer *)event->entry.next = next;
 		*list = event;
 	}
 }
 
-int timer_interrupt()
+
+int32
+timer_interrupt()
 {
-	bigtime_t sched_time;
 	timer *event;
 	spinlock *spinlock;
-	int curr_cpu = smp_get_current_cpu();
-	int rc = B_HANDLED_INTERRUPT;
+	int currentCPU = smp_get_current_cpu();
+	int32 rc = B_HANDLED_INTERRUPT;
 
-//	dprintf("timer_interrupt: time 0x%x 0x%x, cpu %d\n", system_time(), smp_get_current_cpu());
+	TRACE(("timer_interrupt: time 0x%x 0x%x, cpu %d\n", system_time(), smp_get_current_cpu()));
 
-	spinlock = &timer_spinlock[curr_cpu];
+	spinlock = &sTimerSpinlock[currentCPU];
 
 	acquire_spinlock(spinlock);
 
 restart_scan:
-	event = events[curr_cpu];
-	if ((event) && ((bigtime_t)event->entry.key < system_time())) {
+	event = sEvents[currentCPU];
+	if (event != NULL && ((bigtime_t)event->entry.key < system_time())) {
 		// this event needs to happen
 		int mode = event->flags;
 
-		events[curr_cpu] = (timer *)event->entry.next;
+		sEvents[currentCPU] = (timer *)event->entry.next;
 		event->entry.key = 0;
 
 		release_spinlock(spinlock);
@@ -92,161 +100,163 @@ restart_scan:
 
 		if (mode == B_PERIODIC_TIMER) {
 			// we need to adjust it and add it back to the list
-			sched_time = system_time() + event->period;
-			if (sched_time == 0)
-				sched_time = 1; // if we wrapped around and happen
-				                // to hit zero, set it to one, since
-				                // zero represents not scheduled
-			event->entry.key = (int64)sched_time;
-			add_event_to_list(event, &events[curr_cpu]);
+			bigtime_t scheduleTime = system_time() + event->period;
+			if (scheduleTime == 0) {
+				// if we wrapped around and happen to hit zero, set
+				// it to one, since zero represents not scheduled
+				scheduleTime = 1;
+			}
+			event->entry.key = (int64)scheduleTime;
+			add_event_to_list(event, &sEvents[currentCPU]);
 		}
 
 		goto restart_scan; // the list may have changed
 	}
 
 	// setup the next hardware timer
-	if (events[curr_cpu] != NULL)
-		arch_timer_set_hardware_timer((bigtime_t)events[curr_cpu]->entry.key - system_time());
+	if (sEvents[currentCPU] != NULL)
+		arch_timer_set_hardware_timer((bigtime_t)sEvents[currentCPU]->entry.key - system_time());
 
 	release_spinlock(spinlock);
 
 	return rc;
 }
 
-status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
+
+status_t
+add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 {
-	bigtime_t sched_time;
-	bigtime_t curr_time = system_time();
-	int state;
-	int curr_cpu;
+	bigtime_t scheduleTime;
+	bigtime_t currentTime = system_time();
+	cpu_status state;
+	int currentCPU;
 	
-	if ((!t) || (!hook) || (period < 0))
+	if (event == NULL || hook == NULL || period < 0)
 		return B_BAD_VALUE;
-		
-	sched_time = period;
+
+	scheduleTime = period;
 	if (flags != B_ONE_SHOT_ABSOLUTE_TIMER)
-		sched_time += curr_time;
-	if (sched_time == 0)
-		sched_time = 1;
-	
-	t->entry.key = (int64)sched_time;
-	t->period = period;
-	t->hook = hook;
-	t->flags = flags;
+		scheduleTime += currentTime;
+	if (scheduleTime == 0)
+		scheduleTime = 1;
+
+	event->entry.key = (int64)scheduleTime;
+	event->period = period;
+	event->hook = hook;
+	event->flags = flags;
 
 	state = disable_interrupts();
-	curr_cpu = smp_get_current_cpu();
-	acquire_spinlock(&timer_spinlock[curr_cpu]);
+	currentCPU = smp_get_current_cpu();
+	acquire_spinlock(&sTimerSpinlock[currentCPU]);
 
-	add_event_to_list(t, &events[curr_cpu]);
-	t->cpu = curr_cpu;
+	add_event_to_list(event, &sEvents[currentCPU]);
+	event->cpu = currentCPU;
 
 	// if we were stuck at the head of the list, set the hardware timer
-	if (t == events[curr_cpu])
-		arch_timer_set_hardware_timer(sched_time - curr_time);
+	if (event == sEvents[currentCPU])
+		arch_timer_set_hardware_timer(scheduleTime - currentTime);
 
-	release_spinlock(&timer_spinlock[curr_cpu]);
+	release_spinlock(&sTimerSpinlock[currentCPU]);
 	restore_interrupts(state);
 
 	return B_OK;
 }
 
-/* this is a fast path to be called from reschedule and from timer_cancel_event */
-/* must always be invoked with interrupts disabled */
-int _local_timer_cancel_event(int curr_cpu, timer *event)
+
+/** This is a fast path to be called from reschedule() and from
+ *	cancel_timer().
+ *	Must always be invoked with interrupts disabled.
+ */
+
+status_t
+_local_timer_cancel_event(int cpu, timer *event)
 {
 	timer *last = NULL;
-	timer *e;
+	timer *current;
 
-	acquire_spinlock(&timer_spinlock[curr_cpu]);
-	e = events[curr_cpu];
-	while (e != NULL) {
-		if (e == event) {
+	acquire_spinlock(&sTimerSpinlock[cpu]);
+	current = sEvents[cpu];
+	while (current != NULL) {
+		if (current == event) {
 			// we found it
-			if (e == events[curr_cpu])
-				events[curr_cpu] = (timer *)e->entry.next;
+			if (current == sEvents[cpu])
+				sEvents[cpu] = (timer *)current->entry.next;
 			else
-				(timer *)last->entry.next = (timer *)e->entry.next;
-			e->entry.next = NULL;
+				(timer *)last->entry.next = (timer *)current->entry.next;
+			current->entry.next = NULL;
 			// break out of the whole thing
 			break;
 		}
-		last = e;
-		e = (timer *)e->entry.next;
+		last = current;
+		current = (timer *)current->entry.next;
 	}
 
-	if (events[curr_cpu] == NULL)
+	if (sEvents[cpu] == NULL)
 		arch_timer_clear_hardware_timer();
 	else
-		arch_timer_set_hardware_timer((bigtime_t)events[curr_cpu]->entry.key - system_time());
-	
-	release_spinlock(&timer_spinlock[curr_cpu]);
+		arch_timer_set_hardware_timer((bigtime_t)sEvents[cpu]->entry.key - system_time());
 
-	return (e == event ? 0 : B_ERROR);
+	release_spinlock(&sTimerSpinlock[cpu]);
+
+	return current == event ? B_OK : B_ERROR;
 }
 
-int local_timer_cancel_event(timer *event)
-{
-	return _local_timer_cancel_event(smp_get_current_cpu(), event);
-}
 
-bool cancel_timer(timer *event)
+bool
+cancel_timer(timer *event)
 {
-	int state;
-	timer *last = NULL;
-	timer *e;
-	bool foundit = false;
-	int num_cpus = smp_get_num_cpus();
-	int cpu= 0;
-	int curr_cpu;
-
-//	if (event->sched_time == 0)
-//		return 0; // it's not scheduled
+	int currentCPU = smp_get_current_cpu();
+	cpu_status state;
 
 	state = disable_interrupts();
-	curr_cpu = smp_get_current_cpu();
 
 	// walk through all of the cpu's timer queues
 	//
 	// We start by peeking our own queue, aiming for
 	// a cheap match. If this fails, we start harassing
 	// other cpus.
-	//
-	if (_local_timer_cancel_event(curr_cpu, event) < 0) {
-		for (cpu = 0; cpu < num_cpus; cpu++) {
-			if (cpu== curr_cpu) continue;
-			acquire_spinlock(&timer_spinlock[cpu]);
-			e = events[cpu];
-			while (e != NULL) {
-				if (e == event) {
+
+	if (_local_timer_cancel_event(currentCPU, event) < 0) {
+		int numCPUs = smp_get_num_cpus();
+		int cpu = 0;
+		timer *last = NULL;
+		timer *current;
+
+		for (cpu = 0; cpu < numCPUs; cpu++) {
+			if (cpu == currentCPU)
+				continue;
+
+			acquire_spinlock(&sTimerSpinlock[cpu]);
+			current = sEvents[cpu];
+			while (current != NULL) {
+				if (current == event) {
 					// we found it
-					foundit = true;
-					if(e == events[cpu])
-						events[cpu] = (timer *)e->entry.next;
+					if (current == sEvents[cpu])
+						sEvents[cpu] = (timer *)current->entry.next;
 					else
-						(timer *)last->entry.next = (timer *)e->entry.next;
-					e->entry.next = NULL;
+						(timer *)last->entry.next = (timer *)current->entry.next;
+					current->entry.next = NULL;
+
 					// break out of the whole thing
-					goto done;
+
+					release_spinlock(&sTimerSpinlock[cpu]);
+					restore_interrupts(state);
+					return (bigtime_t)event->entry.key < system_time();
 				}
-				last = e;
-				e = (timer *)e->entry.next;
+				last = current;
+				current = (timer *)current->entry.next;
 			}
-			release_spinlock(&timer_spinlock[cpu]);
+			release_spinlock(&sTimerSpinlock[cpu]);
 		}
 	}
-done:
 
-	if (foundit)
-		release_spinlock(&timer_spinlock[cpu]);
 	restore_interrupts(state);
-
-	if (foundit && ((bigtime_t)event->entry.key < system_time()))
-		return true;
 	return false;
 }
 
-void spin(bigtime_t microseconds)
+
+void
+spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
 
