@@ -1081,7 +1081,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			memUpperBound = ROUNDUP(memUpperBound, PAGE_SIZE);
 			fileUpperBound = ROUNDUP(fileUpperBound, PAGE_SIZE);
 
-			sprintf(regionName, "%s_seg%ldrw", baseName, i);
+			sprintf(regionName, "%s_seg%drw", baseName, i);
 
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
@@ -1128,7 +1128,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			/*
 			 * assume ro/text segment
 			 */
-			sprintf(regionName, "%s_seg%ldro", baseName, i);
+			sprintf(regionName, "%s_seg%dro", baseName, i);
 
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
