@@ -770,6 +770,8 @@ MapView::Draw(BRect rect)
 
 	DrawBorder(BRect(368, 49, 442, 69));
 	
+	escapement_delta delta;
+	delta.nonspace = 0.0;
 	BFont font(be_plain_font);
 	font.SetSize(9.0);
 	font.SetFlags(B_DISABLE_ANTIALIASING);
@@ -788,7 +790,7 @@ MapView::Draw(BRect rect)
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
-	DrawString("num", BPoint(lightRect.left, 65));
+	DrawString("num", BPoint(lightRect.left-2, 65), &delta);
 		
 	lightRect.OffsetBy(26,0);
 	SetHighColor(80,80,80);
@@ -802,7 +804,7 @@ MapView::Draw(BRect rect)
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
-	DrawString("caps", BPoint(lightRect.left-1, 65));
+	DrawString("caps", BPoint(lightRect.left-3, 65), &delta);
 	
 	lightRect.OffsetBy(26,0);
 	SetHighColor(80,80,80);
@@ -816,7 +818,7 @@ MapView::Draw(BRect rect)
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
-	DrawString("scroll", BPoint(lightRect.left-2, 65));
+	DrawString("scroll", BPoint(lightRect.left-4, 65), &delta);
 	
 	// the line separator
 	r = BRect(11, 40, 353, 43);
