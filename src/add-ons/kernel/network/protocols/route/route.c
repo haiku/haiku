@@ -49,7 +49,7 @@ static struct sockproto route_proto = { PF_ROUTE, };
 
 /* Routing socket support */
 
-void rt_setmetrics(uint32 which, struct rt_metrics *in, 
+static void rt_setmetrics(uint32 which, struct rt_metrics *in, 
                    struct rt_metrics *out)
 {
 #define metric(f, e) if (which & f) out->e = in->e;
@@ -138,7 +138,7 @@ again:
 	return len;
 }
 
-void raw_init(void)
+static void raw_init(void)
 {
 	rawcb.rcb_next = rawcb.rcb_prev = &rawcb;
 	memset(&route_cb, 0, sizeof(struct route_cb));
@@ -146,7 +146,7 @@ void raw_init(void)
 		pool_init(&rawcbpool, sizeof(struct rawcb));
 }
 
-int raw_attach(struct socket *so, int proto)
+static int raw_attach(struct socket *so, int proto)
 {
 	struct rawcb *rp = sotorawcb(so);
 	int error;
@@ -167,7 +167,7 @@ int raw_attach(struct socket *so, int proto)
 	return 0;
 }
 
-int raw_detach(struct rawcb *rp)
+static int raw_detach(struct rawcb *rp)
 {
 	struct socket *so = rp->rcb_socket;
 	
@@ -179,7 +179,7 @@ int raw_detach(struct rawcb *rp)
 	return 0;
 }
 
-int raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
+static int raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
               struct sockaddr *dst)
 {
 	struct rawcb *rp;
@@ -224,7 +224,7 @@ int raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
 	return 0;
 }
 
-int route_output(struct mbuf *m, struct socket *so)
+static int route_output(struct mbuf *m, struct socket *so)
 {
 	struct rt_msghdr *rtm = NULL;
 	struct rtentry *rt = NULL;
@@ -249,7 +249,7 @@ int route_output(struct mbuf *m, struct socket *so)
 		return -1;
 	}
 	len = m->m_pkthdr.len;
-	if (len < sizeof(*rtm) || len != (mtod(m, struct rt_msghdr*))->rtm_msglen) {
+	if (len < (int) sizeof(*rtm) || len != (mtod(m, struct rt_msghdr*))->rtm_msglen) {
 		info.rti_info[RTAX_DST] = NULL;
 		printf("route_output: EINVAL\n");
 		snderr(EINVAL);
@@ -439,7 +439,7 @@ flush:
 	return error;
 }
 
-int sysctl_dumpentry(struct radix_node *rn, void *data)
+static int sysctl_dumpentry(struct radix_node *rn, void *data)
 {
 	struct rtentry *rt = (struct rtentry *)rn;
 	int error = 0, size;
@@ -472,7 +472,7 @@ int sysctl_dumpentry(struct radix_node *rn, void *data)
 	return error;
 }
 
-int sysctl_iflist(int af, struct walkarg *w)
+static int sysctl_iflist(int af, struct walkarg *w)
 {
 	struct ifnet *ifp;
 	struct ifaddr *ifa;
@@ -525,7 +525,7 @@ int sysctl_iflist(int af, struct walkarg *w)
 	return 0;
 }
 
-int sysctl_rtable(int *name, uint namelen, void *where, size_t *given, void *newp, 
+static int sysctl_rtable(int *name, uint namelen, void *where, size_t *given, void *newp, 
                   size_t newlen) 
 {
 	int i, error = EINVAL;
@@ -571,7 +571,7 @@ int sysctl_rtable(int *name, uint namelen, void *where, size_t *given, void *new
 	w.w_needed += w.w_given;
 	if (where) {
 		*given = (caddr_t)w.w_where - (caddr_t)where;
-		if (*given < w.w_needed) {
+		if (*given < (size_t) w.w_needed) {
 			printf("sysctl_rtable: ENOMEM\n");
 			return ENOMEM;
 		}
@@ -581,7 +581,7 @@ int sysctl_rtable(int *name, uint namelen, void *where, size_t *given, void *new
 	return error;
 }
  
-int raw_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
+static int raw_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
                 struct mbuf *control)
 {
 	struct rawcb *rp = sotorawcb(so);
@@ -660,7 +660,7 @@ release:
 	return error;
 }
 
-int route_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
+static int route_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
                   struct mbuf *control)
 {
 	int error = 0;
