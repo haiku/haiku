@@ -2278,6 +2278,8 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 		goto err;
 	}
 
+	mount->vnodes_head = mount->vnodes_tail = NULL;
+
 	mount->mount_point = kstrdup(path);
 	if (mount->mount_point == NULL) {
 		err = ENOMEM;
