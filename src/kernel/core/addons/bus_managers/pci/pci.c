@@ -317,10 +317,20 @@ static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg
 				val = in8 (CONFIG_DATA_PORT + (reg & 3));
 				break;
 			case 2:
-				val = in16(CONFIG_DATA_PORT + (reg & 2));
+				if ((reg & 3) != 3)
+					val = in16(CONFIG_DATA_PORT + (reg & 3));
+				else {
+					val = EINVAL;
+					dprintf("ERROR: read_pci_config: can't read 2 bytes at reg %d (offset 3)!\n",reg);
+				}
 				break;
 			case 4:
-				val = in32(CONFIG_DATA_PORT + reg);
+				if ((reg & 3) == 0)
+					val = in32(CONFIG_DATA_PORT);
+				else {
+					val = EINVAL;
+					dprintf("ERROR: read_pci_config: can't read 4 bytes at reg %d (offset != 0)!\n",reg);
+				}
 				break;
 			default:
 				dprintf("ERROR: mech #1: read_pci_config: called for %d bytes!!\n", size);
@@ -372,10 +382,16 @@ static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg,
 				out8 (value, CONFIG_DATA_PORT + (reg & 3));
 				break;
 			case 2:
-				out16(value, CONFIG_DATA_PORT + (reg & 2));
+				if ((reg & 3) != 3)	
+					out16(value, CONFIG_DATA_PORT + (reg & 3));
+				else
+					dprintf("ERROR: write_pci_config: can't write 2 bytes at reg %d (offset 3)!\n",reg);
 				break;
 			case 4:
-				out32(value, CONFIG_DATA_PORT + reg);
+				if ((reg & 3) == 0)
+					out32(value, CONFIG_DATA_PORT);
+				else
+					dprintf("ERROR: write_pci_config: can't write 4 bytes at reg %d (offset != 0)!\n",reg);
 				break;
 			default:
 				dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
@@ -416,33 +432,52 @@ static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg,
 static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap, 
                               uint8 *offs)
 {
-	uint16 status = read_pci_config(bus, dev, func, PCI_status, 2);
-	uint8 hdr_type, reg_data;
+	uint16 status;
+	uint32 reg_data;
+	uint8 hdr_type;
 	uint8 ofs;
+	int maxcount;
 	
+	status = read_pci_config(bus, dev, func, PCI_status, 2);
 	if (!(status & PCI_status_capabilities))
 		return 0;
 		
 	hdr_type = read_pci_config(bus, dev, func, PCI_header_type, 1);
-	switch(hdr_type) {
+	switch (hdr_type & 0x7f) { /* mask off multi function device indicator bit */
 		case PCI_header_type_generic:
 			ofs = PCI_capabilities_ptr;
 			break;
+		case PCI_header_type_PCI_to_PCI_bridge:
+			dprintf("ERROR: pci_get_capability: PCItoPCI bridge header type has no capabilities pointer???\n");
+			return 0;
 		case PCI_header_type_cardbus:
 			ofs = PCI_capabilities_ptr_2;
 			break;
 		default:
+			dprintf("ERROR: pci_get_capability: unknown PCI header type\n");
 			return 0;
 	}
-	
+
+	/* the 192 bytes vendor defined configuration space
+	 * can hold as maximum 48 times a 32 bit capability
+	 */
+	maxcount = 48; 
 	ofs = read_pci_config(bus, dev, func, ofs, 1);
-	while (ofs != 0) {
-		reg_data = read_pci_config(bus, dev, func, ofs, 2);
+	while (maxcount-- != 0 && ofs != 0) {
+
+		/* mask off potentially wrong bits */
+		ofs &= ~3; 
+
+		/* capabilities must be read as 32bit access */
+		reg_data = read_pci_config(bus, dev, func, ofs, 4);
+
+		/* lower 8 bit (0 to 7) contain the capability */
 		if ((reg_data & 0xff) == cap) {
 			if (offs)
 				*offs = ofs;
 			return 1;
 		}
+		/* bit 8 to 15 contain next capability position */
 		ofs = (reg_data >> 8) & 0xff;
 	}
 	return 0;
