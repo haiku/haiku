@@ -32,7 +32,7 @@ int main(int argc,char **argv)
 	catch (const char *badness)
 		{
 		if (strcmp(badness,"Attempting to use an ordered list without setting up a 'toLessThan' function"))
-			printf ("Failure on adding with no isLessThan, error = %s\n", badness);
+			printf ("Failure on adding with no isLessThan, printf = %s\n", badness);
 		printf ("Success on adding with no isLessThan, \n" );
 		}
 	catch(...)

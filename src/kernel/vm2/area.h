@@ -3,6 +3,7 @@
 #include "OS.h"
 #include "vm.h"
 #include "list.h"
+#include "olist.h"
 
 class areaManager;
 class vpage;
@@ -10,12 +11,12 @@ class vpage;
 class area : public node
 {
 	protected:
-		list vpages;
+		orderedList vpages;
 		char name[B_OS_NAME_LENGTH];
 		pageState state;
 		protectType protection;
 		bool finalWrite;
-		int areaID;
+		area_id areaID;
 		int in_count;
 		int out_count;
 		int copy_count;

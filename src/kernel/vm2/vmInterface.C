@@ -70,18 +70,18 @@ vmInterface::vmInterface(int pages)
 		// This is compatability for in BeOS usage only...
 		if (0>=create_area("vm_test",(void **)(&vmBlock),B_ANY_ADDRESS,B_PAGE_SIZE*pages,B_NO_LOCK,B_READ_AREA|B_WRITE_AREA))
 			{
-			printf ("pageManager::pageManager: No memory!\n");
+			error ("pageManager::pageManager: No memory!\n");
 			exit(1);
 			}
-		//printf ("Allocated an area. Address = %x\n",vmBlock);
+		//error ("Allocated an area. Address = %x\n",vmBlock);
 		// Figure out how many pages we need
 		int pageCount = (sizeof(poolarea)+sizeof(poolvpage)+sizeof(poolvnode)+sizeof(pageManager)+sizeof(swapFileManager)+sizeof(cacheManager)+sizeof(vmHeaderBlock)+PAGE_SIZE-1)/PAGE_SIZE;
 		if (pageCount >=pages)
 			{
-			printf ("Hey! Go buy some ram! Trying to create a VM with fewer pages than the setup will take!\n");
+			error ("Hey! Go buy some ram! Trying to create a VM with fewer pages than the setup will take!\n");
 			exit(1);
 			}
-		//printf ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		//error ("Need %d pages, creation calls for %d\n",pageCount,pages);
 		void *currentAddress = addToPointer(vmBlock,sizeof(struct vmHeaderBlock));
 		vmBlock->areaPool = new (currentAddress) poolarea;
 		currentAddress=addToPointer(currentAddress,sizeof(poolarea));
@@ -95,14 +95,14 @@ vmInterface::vmInterface(int pages)
 		currentAddress=addToPointer(currentAddress,sizeof(swapFileManager));
 		vmBlock->cacheMan = new (currentAddress) cacheManager;
 		currentAddress=addToPointer(currentAddress,sizeof(cacheManager));
-		//printf ("Need %d pages, creation calls for %d\n",pageCount,pages);
-		//printf ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
+		//error ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		//error ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 		vmBlock->pageMan->setup(addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 	    }
 
-	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
-	resume_thread(spawn_thread(saverThread,"saverThread",0,getAM()));
-	resume_thread(spawn_thread(pagerThread,"pagerThread",0,getAM()));
+	resume_thread(tid_cleaner=spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
+	resume_thread(tid_saver=spawn_thread(saverThread,"saverThread",0,getAM()));
+	resume_thread(tid_pager=spawn_thread(pagerThread,"pagerThread",0,getAM()));
 	}
 
 int vmInterface::getAreaByAddress(void *address)
@@ -209,4 +209,11 @@ status_t vmInterface::munmap(void *addr, size_t len)
 	int retVal;
 	retVal = getAM()->munmap(addr,len);
 	return retVal;
+}
+
+void vmInterface::suspendAll(void)
+{
+	suspend_thread(tid_cleaner);
+	suspend_thread(tid_saver);
+	suspend_thread(tid_pager);
 }

@@ -17,27 +17,27 @@ class orderedList : public list
 	void add(node *in)
 		{
 		nodeCount++;
-		//printf ("orderedList::add starting\n");
+		//error ("orderedList::add starting\n");
 		if (!rock || isLessThan(in,rock))
 			{ // special case - this will be the first one
-			//printf ("orderedList::specialCase starting\n");
+			//error ("orderedList::specialCase starting\n");
 			in->next=rock;
 			rock=in;
 			}
 		else
 			{
-			//printf ("orderedList::Normal Case starting\n");
+			//error ("orderedList::Normal Case starting\n");
 			bool done=false;
 			for (struct node *cur=rock;cur && !done;cur=cur->next)
 				if (!(cur->next) || isLessThan(in,cur->next))
 					{ // If we have found our niche, *OR* this is the last element, insert here. 
-					//printf ("orderedList::Normal Case Adding Start\n");
+					//error ("orderedList::Normal Case Adding Start\n");
 					in->next=cur->next;
 					cur->next=in;
 					done=true;
-					//printf ("orderedList::Normal Case Adding END\n");
+					//error ("orderedList::Normal Case Adding END\n");
 					}
-			//printf ("orderedList::Normal Case ending\n");
+			//error ("orderedList::Normal Case ending\n");
 			}
 		}
 

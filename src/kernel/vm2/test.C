@@ -6,6 +6,7 @@
 #include <string.h>
 
 vmInterface vm(30);
+thread_id loop1,loop2,loop3,info1,mmap1,clone1;
 
 void writeByte(unsigned long addr,unsigned int offset, char value) { vm.setByte(addr+offset,value); }
 
@@ -16,29 +17,45 @@ int createFillAndTest(int pages,char *name)
 	try{
 	unsigned long addr;
 	int area1;
-	printf ("%s: createFillAndTest: about to create \n",name);
+	error ("%s: createFillAndTest: about to create \n",name);
 	area1=vm.createArea("Mine",pages,(void **)(&addr));
-	printf ("%s: createFillAndTest: create done\n",name);
+	error ("%s: createFillAndTest: create done\n",name);
 	for (int i=0;i<pages*PAGE_SIZE;i++)
 		{				
-		if (!(i%100) )
-			printf ("Writing to byte %d of area %s\n",i,name);
+		if (!(i%9024) )
+			error ("Writing to byte %d of area %s\n",i,name);
 		writeByte(addr,i,i%256);
 		}
-	printf ("%s: createFillAndTest: writing done\n",name);
+	error ("%s: createFillAndTest: writing done\n",name);
 	for (int i=0;i<pages*PAGE_SIZE;i++)
 		{
-		if (!(i%100) )
-			printf ("Reading from byte %d of area %s\n",i,name);
+		if (!(i%9024) )
+			error ("Reading from byte %d of area %s\n",i,name);
 		if (i%256!=readByte(addr,i))
-				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(addr,i));
+				error ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(addr,i));
 		}
-	printf ("%s: createFillAndTest: reading done\n",name);
+	error ("%s: createFillAndTest: reading done\n",name);
 	return area1;
+	}
+	catch (const char *t)
+	{
+		vm.suspendAll();
+		thread_id me=find_thread(NULL);
+		suspend_thread(clone1);
+		suspend_thread(mmap1);
+		suspend_thread(info1);
+		if (loop1!=me)
+			suspend_thread(loop1);
+		if (loop2!=me)
+			suspend_thread(loop2);
+		if (loop3!=me)
+			suspend_thread(loop3);
+		debugger(t);
 	}
 	catch (...)
 	{
-		printf ("Exception thrown!\n");
+		error ("Exception thrown!\n");
+		exit(1);
 	}
 	return 0;
 }
@@ -54,17 +71,17 @@ struct loopTestParameters
 
 int32 loopTest(void *parameters)
 	{
-	printf ("Starting Loop Test!\n");
+	error ("Starting Loop Test!\n");
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int area1;
 
 	while (1)
 		{
 		snooze(params->initialSnooze);
-		printf ("Creating %s area\n",params->name);
+		error ("Creating %s area\n",params->name);
 		area1=createFillAndTest(params->areaSize,params->name);
 		snooze(params->holdSnooze);
-		printf ("Freeing %s area\n",params->name);
+		error ("Freeing %s area\n",params->name);
 		vm.freeArea(area1);
 		snooze(params->loopSnooze);
 		}
@@ -79,23 +96,23 @@ int32 getInfoTest(void *parameters)
 	while (1)
 		{
 		snooze(params->initialSnooze);
-		//printf ("Creating %s area\n",params->name);
+		//error ("Creating %s area\n",params->name);
 		area1=createFillAndTest(params->areaSize,params->name);
 		snooze(params->holdSnooze);
 		
 		vm.getAreaInfo(area1,&ai);
-		printf ("Area info : \n");
-		printf ("name : %s\n",ai.name);
-		printf ("size : %ld\n",ai.size);
-		printf ("lock : %ld\n",ai.lock);
-		printf ("team : %ld\n",ai.team);
-		printf ("ram_size : %ld\n",ai.ram_size);
-		printf ("in_count : %ld\n",ai.in_count);
-		printf ("out_count : %ld\n",ai.out_count);
-		printf ("copy_count : %ld\n",ai.copy_count);
-		printf ("address : %p\n",ai.address);
+		error ("Area info : \n");
+		error ("name : %s\n",ai.name);
+		error ("size : %ld\n",ai.size);
+		error ("lock : %ld\n",ai.lock);
+		error ("team : %ld\n",ai.team);
+		error ("ram_size : %ld\n",ai.ram_size);
+		error ("in_count : %ld\n",ai.in_count);
+		error ("out_count : %ld\n",ai.out_count);
+		error ("copy_count : %ld\n",ai.copy_count);
+		error ("address : %p\n",ai.address);
 
-		printf ("Freeing %s area\n",params->name);
+		error ("Freeing %s area\n",params->name);
 		vm.freeArea(area1);
 		snooze(params->loopSnooze);
 		}
@@ -109,23 +126,23 @@ int32 mmapTest (void *parameters)
 	while (1)
 		{
 		int fd = open ("OBOS_mmap",O_RDWR|O_CREAT,0x777);
-		printf ("Opened file, fd = %d\n",fd);
+		error ("Opened file, fd = %d\n",fd);
 		snooze(params->initialSnooze);
-		printf ("Creating %s mmap\n",params->name);
+		error ("Creating %s mmap\n",params->name);
 		snooze(params->holdSnooze);
 		map=vm.mmap(NULL,size,PROT_WRITE|PROT_READ,MAP_SHARED,fd,0);
-		printf ("mmap address = %p\n",map);
+		error ("mmap address = %p\n",map);
 		for (int i=0;i<size;i++)
 			writeByte((int32)map,i,i%256);
-		printf ("mmapTest: writing done\n");
+		error ("mmapTest: writing done\n");
 		for (int i=0;i<size;i++)
 			if (i%256!=readByte((int32)map,i))
-				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte((int32)map,i));
-		printf ("mmapTest: reading done\n");
+				error ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte((int32)map,i));
+		error ("mmapTest: reading done\n");
 		snooze(params->loopSnooze); 
 		vm.munmap(map,size);
 		close(fd);
-		printf ("Closed file, fd = %d\n",fd);
+		error ("Closed file, fd = %d\n",fd);
 		}
 	}
 
@@ -138,16 +155,16 @@ int32 cloneTest (void *parameters)
 	while (1)
 		{
 		snooze(params->initialSnooze);
-	//	printf ("Creating %s area, size = %d\n",params->name,params->areaSize);
+	//	error ("Creating %s area, size = %d\n",params->name,params->areaSize);
 		area1=createFillAndTest(params->areaSize,params->name);
-	//	printf ("cloning, create done \n");
+	//	error ("cloning, create done \n");
 		area2=vm.cloneArea(area1,"Clone1",&cloneAddr);
 		for (int i=0;i<params->areaSize*PAGE_SIZE;i++)
 			if (i%256!=readByte((int32)cloneAddr,i))
-				printf ("ERROR! Clone Byte at offset %d of %p does not match: expected: %d, found: %d\n",i,cloneAddr,i%256,readByte((int32)cloneAddr,i));
-	//	printf ("Snoozing, compare done \n");
+				error ("ERROR! Clone Byte at offset %d of %p does not match: expected: %d, found: %d\n",i,cloneAddr,i%256,readByte((int32)cloneAddr,i));
+	//	error ("Snoozing, compare done \n");
 		snooze(params->holdSnooze);
-	//	printf ("Freeing %s area\n",params->name);
+	//	error ("Freeing %s area\n",params->name);
 		vm.freeArea(area2);
 		vm.freeArea(area1);
 		snooze(params->loopSnooze);
@@ -163,12 +180,12 @@ int main(int argc,char **argv)
 	loopTestParameters mmap1Params={"mmap",500000,8192,400000,1000000};
 	loopTestParameters clone1Params={"clone1",200000,2,300000,400000};
 
-	resume_thread(spawn_thread(loopTest,"area test 1",0,&area1Params));
-	resume_thread(spawn_thread(loopTest,"area test 2",0,&area2Params));
-	resume_thread(spawn_thread(loopTest,"area test 3",0,&area3Params));
-	//resume_thread(spawn_thread(getInfoTest,"info test 1",0,&info1Params));
-	//resume_thread(spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
-	//resume_thread(spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
+	resume_thread(loop1=spawn_thread(loopTest,"area test 1",0,&area1Params));
+	resume_thread(loop2=spawn_thread(loopTest,"area test 2",0,&area2Params));
+	resume_thread(loop3=spawn_thread(loopTest,"area test 3",0,&area3Params));
+	resume_thread(info1=spawn_thread(getInfoTest,"info test 1",0,&info1Params));
+	resume_thread(mmap1=spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
+	resume_thread(clone1=spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
 
 	snooze(1000000000);
 

@@ -3,6 +3,7 @@
 // Simple linked list
 #include <stdlib.h>
 #include <stdio.h>
+#include "error.h"
 
 struct node 
 {
@@ -18,7 +19,7 @@ class list {
 			rock=newNode;
 			nodeCount++;
 			}
-		//int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
+		//int count(void) {error ("list::count: About to return %d\n",nodeCount);return nodeCount;}
 		int count(void) {return nodeCount;}
 		node *next(void) 
 			{
@@ -34,7 +35,7 @@ class list {
 			} 
 		void remove(node *toNuke)
 			{
-			//printf ("list::remove starting: nuking %x \n",toNuke);
+			//error ("list::remove starting: nuking %x \n",toNuke);
 			//dump();	
 			if (rock==toNuke)
 				{
@@ -52,14 +53,14 @@ class list {
 						done=true;
 						}
 				}
-			//printf ("list::remove ending: \n");
+			//error ("list::remove ending: \n");
 			//dump();	
 			}
 		void dump(void)
 			{
 			for (struct node *cur=rock;cur;cur=cur->next)
 				{
-				printf ("list::dump: At %p, next = %p\n",cur,cur->next);
+				error ("list::dump: At %p, next = %p\n",cur,cur->next);
 				}
 			}
 		struct node *rock;

@@ -10,25 +10,25 @@ vpage *poolvpage::get(void)
 	vpage *ret=NULL;
 	if (unused.count())
 		{
-		//printf ("poolvpage::get: Getting an unused one!\n");
+		//error ("poolvpage::get: Getting an unused one!\n");
 		acquire_sem(inUse);
 		ret=(vpage *)unused.next();
 		release_sem(inUse);
 		}
 	if (ret)
 		{
-		//printf ("poolvpage::get: Returning address:%x \n",ret);
+		//error ("poolvpage::get: Returning address:%x \n",ret);
 		return ret;
 		}
 	else
 		{
-		//printf ("poolvpage::get: Getting a new page!\n");
+		//error ("poolvpage::get: Getting a new page!\n");
 		page *newPage=vmBlock->pageMan->getPage();
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
 		int newCount=PAGE_SIZE/sizeof(vpage);
 		acquire_sem(inUse);
-		//printf ("poolvpage::get: Adding %d new elements to the pool!\n",newCount);
+		//error ("poolvpage::get: Adding %d new elements to the pool!\n",newCount);
 		for (int i=0;i<newCount;i++)
 			unused.add(((node *)(newPage->getAddress()+(i*sizeof(vpage)))));	
 		release_sem(inUse);

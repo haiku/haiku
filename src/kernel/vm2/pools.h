@@ -21,25 +21,25 @@ class poolTYPE
 			TYPE *ret=NULL;
 			if (unused.count())
 				{
-				printf ("poolTYPE::get: Getting an unused one!\n");
+				error ("poolTYPE::get: Getting an unused one!\n");
 				acquire_sem(inUse);
 				ret=(TYPE *)unused.next();
 				release_sem(inUse);
 				}
 			if (ret)
 				{
-				printf ("poolTYPE::get: Returning address:%x \n",ret);
+				error ("poolTYPE::get: Returning address:%x \n",ret);
 				return ret;
 				}
 			else
 				{
-				printf ("poolTYPE::get: Getting a new page!\n");
+				error ("poolTYPE::get: Getting a new page!\n");
 				page *newPage=vmBlock->pageMan->getPage();
 				if (!newPage)
 					throw ("Out of pages to allocate a pool!");
 				int newCount=PAGE_SIZE/sizeof(TYPE);
 				acquire_sem(inUse);
-				printf ("poolTYPE::get: Adding %d new elements to the pool!\n",newCount);
+				error ("poolTYPE::get: Adding %d new elements to the pool!\n",newCount);
 				for (int i=0;i<newCount;i++)
 					unused.add(((void *)(newPage->getAddress()+(i*sizeof(TYPE)))));	
 				release_sem(inUse);

@@ -7,12 +7,12 @@ class areaManager // One of these per process
 		orderedList areas;
 		team_id team;
 		sem_id myLock;
-		static int nextAreaID;
+		static long nextAreaID;
 	public:
 		areaManager ();
 		void addArea(area *newArea) {areas.add(newArea);}
 		void removeArea(area *oldArea) {areas.remove(oldArea); }
-		void freeArea(int area);
+		void freeArea(area_id area);
 		team_id getTeam(void) {return team;}
 		unsigned long getNextAddress(int pages,unsigned long minimum=USER_BASE);
 		area *findArea(void *address);
@@ -91,10 +91,10 @@ class areaManager // One of these per process
 			{
 			static long lockCount=0;
 			if (!((lockCount++)%200)) 	
-				printf ("locking\n"); 
+				error ("locking\n"); 
 			acquire_sem(myLock);
 			}
-		void unlock() {/*printf ("unlocking\n");*/release_sem(myLock);}
+		void unlock() {/*error ("unlocking\n");*/release_sem(myLock);}
 		void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
 		status_t munmap(void *addr,size_t len)
 		{

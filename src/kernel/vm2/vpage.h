@@ -36,11 +36,11 @@ class vpage : public node
 		
 		void dump(void)
 		{
-			printf ("Dumping vpage %p, address = %lx, \n\t physPage: ",this,start_address);
+			error ("Dumping vpage %p, address = %lx, physPage: \n",this,start_address);
 			if (physPage)
 				physPage->dump();
 			else
-				printf ("NULL\n");
+				error ("NULL\n");
 		}
 		char getByte(unsigned long offset,areaManager *manager); // This is for testing only
 		void setByte(unsigned long offset,char value,areaManager *manager); // This is for testing only

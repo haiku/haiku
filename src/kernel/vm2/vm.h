@@ -8,7 +8,7 @@ struct vnode : public node
 	int fd;
 	unsigned long offset;
 	bool valid;
-	int count;
+	long  count;
 
 	vnode (void)
 	{

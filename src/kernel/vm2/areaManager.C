@@ -28,7 +28,7 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 		if (cur)
 			{
 			area *myArea=(area *)cur;
-//			printf ("Looking for %x, %d pages; current = %x\n",start,pages,myArea->getEndAddress());
+//			error ("Looking for %x, %d pages; current = %x\n",start,pages,myArea->getEndAddress());
 			if (!myArea->couldAdd(start,end))
 				{ // if we don't work, there must be an overlap, so go to the end of this area.
 				start=myArea->getEndAddress();
@@ -39,24 +39,24 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 	return start;
 }
 
-void areaManager::freeArea(int areaID)
+void areaManager::freeArea(area_id areaID)
 {
-	printf ("areaManager::freeArea: begin\n");
+	error ("areaManager::freeArea: begin\n");
 	lock();
 	area *oldArea=findArea(areaID);	
-	//printf ("areaManager::freeArea: found area %x\n",oldArea);
+	//error ("areaManager::freeArea: found area %x\n",oldArea);
 	if (oldArea)
 		{
-//		printf ("areaManager::freeArea: removing area %x from linked list\n",oldArea);
-//		printf ("areaManager::freeArea: areaManager =  %x \n",manager);
+//		error ("areaManager::freeArea: removing area %x from linked list\n",oldArea);
+//		error ("areaManager::freeArea: areaManager =  %x \n",manager);
 		removeArea(oldArea);
-//		printf ("areaManager::freeArea: deleting area %x \n",oldArea);
+//		error ("areaManager::freeArea: deleting area %x \n",oldArea);
 		oldArea->freeArea();
-//		printf ("areaManager::freeArea: freeArea complete \n");
+//		error ("areaManager::freeArea: freeArea complete \n");
 		vmBlock->areaPool->put(oldArea);
 		}
 	else
-		printf ("areaManager::freeArea: unable to find requested area\n");
+		error ("areaManager::freeArea: unable to find requested area\n");
 	unlock();
 }
 
@@ -70,7 +70,7 @@ area *areaManager::findAreaLock(void *address)
 
 area *areaManager::findArea(char *address)
 {
-	printf ("Finding area by string\n");
+	error ("Finding area by string\n");
 	lock();
 	area *retVal=NULL;
 	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
@@ -86,22 +86,21 @@ area *areaManager::findArea(char *address)
 area *areaManager::findArea(void *address)
 {
 	// THIS DOES NOT HAVE LOCKING - all callers must lock.
-	//printf ("Finding area by void * address\n");
+	//error ("Finding area by void * address\n");
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
-//		printf ("areaManager::findArea: Looking for %x between %x and %x\n",address,myArea->getStartAddress(),myArea->getEndAddress());
-		fflush(NULL);
+//		error ("areaManager::findArea: Looking for %x between %x and %x\n",address,myArea->getStartAddress(),myArea->getEndAddress());
 		if (myArea->contains(address))
 				return myArea;
 		}
-	printf ("areaManager::findArea is giving up\n");
+	error ("areaManager::findArea is giving up\n");
 	return NULL;
 }
 
 area *areaManager::findAreaLock(area_id id)
 {
-	printf ("Finding area by areaID \n");
+	error ("Finding area by areaID \n");
 	lock();
 	area *retVal=findArea(id);
 	unlock();
@@ -110,7 +109,7 @@ area *areaManager::findAreaLock(area_id id)
 
 area *areaManager::findArea(area_id id)
 {
-	//printf ("Finding area by area_id\n");
+	//error ("Finding area by area_id\n");
 	area *retVal=NULL;
 	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
 		{
@@ -125,7 +124,7 @@ bool areaManager::fault(void *fault_address, bool writeError) // true = OK, fals
 {
 	area *myArea;
 	bool retVal;
-	printf ("Faulting \n");
+	error ("Faulting \n");
 	lock();
 	myArea=findArea(fault_address);
 	if (myArea)
@@ -136,40 +135,48 @@ bool areaManager::fault(void *fault_address, bool writeError) // true = OK, fals
 	return retVal;
 }
 
-int areaManager::nextAreaID=0;
+long areaManager::nextAreaID=0;
 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) 
 {
-	printf ("Creating an area\n");
+	error ("Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
- //   printf ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
+ //   error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
     newArea->setup(this);
- //   printf ("areaManager::createArea - setup complete\n");
+ //   error ("areaManager::createArea - setup complete\n");
     newArea->createArea(AreaName,pageCount,address,addType,state,protect);
- //   printf ("areaManager::createArea - new area's createArea called\n");
-    newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
- //   printf ("areaManager::createArea - new area's setAreaID called\n");
+ //   error ("areaManager::createArea - new area's createArea called\n");
+ 	atomic_add(&nextAreaID,1);
+    newArea->setAreaID(nextAreaID);
+ //   error ("areaManager::createArea - new area's setAreaID called\n");
     addArea(newArea);
- //   printf ("areaManager::createArea - new area added to list\n");
+ //   error ("areaManager::createArea - new area added to list\n");
 	int retVal=newArea->getAreaID();  
- //   printf ("areaManager::createArea - new area id found\n");
+ //   error ("areaManager::createArea - new area id found\n");
 	unlock();
-	//printf ("Done Creating an area\n");
+	//error ("Done Creating an area\n");
     return  retVal;
 }
 
 int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType,pageState state,protectType protect) 
     {
-	printf ("Cloning an area\n");
+	int retVal;
+	error ("Cloning an area\n");
 	lock();
-    area *newArea = new (vmBlock->areaPool->get()) area;
-    newArea->setup(this);
     area *oldArea=findArea(newAreaID);
-    newArea->cloneArea(oldArea,AreaName,address,addType,state,protect);
-    newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
-    addArea(newArea);
-    int retVal=newArea->getAreaID();
+	if (oldArea)
+		{
+    	area *newArea = new (vmBlock->areaPool->get()) area;
+    	newArea->setup(this);
+    	newArea->cloneArea(oldArea,AreaName,address,addType,state,protect);
+		atomic_add(&nextAreaID,1);
+    	newArea->setAreaID(nextAreaID); 
+    	addArea(newArea);
+    	retVal=newArea->getAreaID();
+		}
+	else
+		retVal=B_ERROR;
 	unlock();
 	return retVal;
     }   
@@ -220,7 +227,7 @@ void areaManager::pager(int desperation)
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
-		//printf ("areaManager::pager; area = \n");
+		//error ("areaManager::pager; area = \n");
 		//myArea->dump();
 		myArea->pager(desperation);
 		}
@@ -247,7 +254,7 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
 	protectType protType=(prot&PROT_WRITE)?writable:(prot&PROT_READ)?readable:none;
 	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
-	//printf ("flags = %x, anon = %x\n",flags,MAP_ANON);
+	//error ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	lock();
 	if (flags & MAP_ANON) 
 		{
@@ -257,9 +264,10 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 
 	area *newArea = new (vmBlock->areaPool->get()) area;
 	newArea->setup(this);
-	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
+	//error ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
-	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
+ 	atomic_add(&nextAreaID,1);
+	newArea->setAreaID(nextAreaID);
 	addArea(newArea);
 	newArea->getAreaID();
 	//pageMan.dump();

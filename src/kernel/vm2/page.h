@@ -12,6 +12,6 @@ class page : public node {
 		void setup (void *address) {count=0;physicalAddress=address;};
 		void zero(void);
 		unsigned long getAddress(void) {return (unsigned long)physicalAddress;}
-		void dump(void) { printf ("Page %p, physicalAddress = %lx\n",this,getAddress()); }
+		void dump(void) { error ("page::dump: Page %p, physicalAddress = %lx\n",this,getAddress()); }
 };
 #endif

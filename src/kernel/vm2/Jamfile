@@ -1,4 +1,6 @@
 SubDir OBOS_TOP src kernel vm2 ;
 
-BinCommand vmTest  : area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C test.C vmInterface.C vpage.C : root be ; 
+BinCommand vmTest  : error.C area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C test.C vmInterface.C vpage.C areaPool.C vnodePool.C vpagePool.C : root be ; 
+BinCommand olTest  : error.C olTest.C : root be ; 
+
 
