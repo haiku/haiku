@@ -26,6 +26,6 @@ rldmain(void *_args)
 	if (entry == NULL)
 		return -1;
 
-	// call the program entry point (usually main())
+	// call the program entry point (usually _start())
 	return ((int (*)(void *))entry)(args);
 }
