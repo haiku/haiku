@@ -38,6 +38,26 @@ If your CPU supports MTRR, the kerneldriver will have activated that, and if you
 <br>
 OK, your first task is get to the point I am describing above. Once you have that going, it's time to really start development. Personally, I have a certain list I always run-down. My advice would be to follow it, as the order of doing things has a certain logic to it, making all steps as testable as can be using this development method.<br>
 <br>
-Todo: add list..<br>
+<ul>
+<li><strong>step 1. Setup VESA mode.</strong><br>
+<li><strong>step 2. Setup new driver with VESA running underneath, as described above.</strong><br>
+This is possible because the VESA mode is set somewhere during the bootprocess (around icon 2 or 3 in the splashscreen), while the real (new) driver is loaded when the splashscreen disappears. The real driver doesn't actually have to do anything, as the system is already capable of running in the VESA mode set before. The one thing we actually do, is map the framebuffer ourself instead of relying on the access via VESA/legacy space; and point the app_server at it so it uses the newly mapped buffer to write to the screen. All other functions are simply shut-off, as far as they are card-type specific. Developing the driver means we have to fill in the gaps one by one, testing the new functions as we go.<br>
+<br>
+Note: the card has to support VESA2 somehow or this development method won't work...
+<li><strong>step 3. Setup hardware cursor.</strong><br>
+<li><strong>step 4. Setup framebuffer startadress.</strong><br>
+<li><strong>step 5. Setup framebuffer pitch.</strong><br>
+<li><strong>step 6. Setup colordepth.</strong><br>
+<li><strong>step 7. Setup colorpalette.</strong><br>
+<li><strong>step 8. Setup DPMS.</strong><br>
+<li><strong>step 9. Setup refreshrate (pixelPLL).</strong><br>
+<li><strong>step 10. Setup screentiming (CRTC, modeline).</strong><br>
+<li><strong>step 11. Setup 'enhanced mode'.</strong><br>
+<li><strong>step 12. Setup 2D acceleration.</strong><br>
+<li><strong>step 13. Setup video overlay.</strong><br>
+<li><strong>step 14. Setup card coldstart.</strong><br>
+</ul>
+<br>
+Todo: complete list..<br>
 </body>
 </html>
