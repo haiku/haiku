@@ -79,6 +79,7 @@ struct page_table_entry {
 
 	static uint32 PrimaryHash(uint32 virtualSegmentID, uint32 virtualAddress);
 	static uint32 SecondaryHash(uint32 virtualSegmentID, uint32 virtualAddress);
+	static uint32 SecondaryHash(uint32 primaryHash);
 };
 
 struct page_table_entry_group {

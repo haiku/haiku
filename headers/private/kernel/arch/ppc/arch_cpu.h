@@ -22,10 +22,16 @@ extern "C" {
 #endif
 
 extern uint32 get_sdr1(void);
-extern uint32 set_sdr1(uint32 value);
+extern void set_sdr1(uint32 value);
+extern uint32 get_sr(void *virtualAddress);
+extern void set_sr(void *virtualAddress, uint32 value);
+extern uint32 get_msr(void);
+extern uint32 set_msr(uint32 value);
 
 #ifdef __cplusplus
 }
 #endif
+
+#define eieio()	asm volatile("eieio")
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */
