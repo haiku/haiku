@@ -323,14 +323,12 @@ ps2_packet_to_movement(uint8 packet[], mouse_movement *pos)
   	sButtonsState = buttons;
   	
   	if (sPacketSize == PS2_PACKET_INTELLIMOUSE) { 
-  		wheel_ydelta = ((packet[3] & 0x8) ? 0xFF : 0) | (packet[3] & 0x7);
-  		
-  		// Two wheeled mice use this nice trick:
-  		// they report -2 or +2 when the second wheel moved
-  		if (wheel_ydelta == -2 || wheel_ydelta == 2) {
-  			wheel_xdelta = wheel_ydelta;
-  			wheel_ydelta = 0;
-  		}
+		 switch (packet[3] & 0x0F) {
+			case 0x01: wheel_ydelta = +1; break; // wheel 1 down
+			case 0x0F: wheel_ydelta = -1; break; // wheel 1 up
+			case 0x02: wheel_xdelta = +1; break; // wheel 2 down
+			case 0x0E: wheel_xdelta = -1; break; // wheel 2 up
+		}
   	}
   	
   	if (pos) {
