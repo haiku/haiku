@@ -140,3 +140,13 @@ case 7:	object is properly initialized and has still some messages to deliver,
 		InitCheck() should return B_OK.
 		GetInfo() should return B_OK and the new count.
 		The timer is NOT reset. Unlimited number of messages.
+
+status_t GetInfo(bigtime_t *interval, int32 *count) const
+case 1:	object is properly initialized, interval or count are NULL =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+case 2:	object is not properly initialized, interval or count are NULL =>
+		Should return B_BAD_VALUE.
+		InitCheck() should return B_ERROR.
+Other cases are side effects of other methods' tests.
+
