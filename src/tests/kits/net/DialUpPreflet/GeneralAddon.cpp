@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -414,12 +414,7 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	fAuthenticationBox->SetLabel(fAuthenticatorField);
 	
 	rect = fAuthenticationBox->Bounds();
-	rect.InsetBy(10, 5);
-	rect.top = 25;
-	BView *authenticationView = new BView(rect, "authenticationView",
-		B_FOLLOW_NONE, 0);
-	authenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	rect = authenticationView->Bounds();
+	rect.InsetBy(10, 25);
 	rect.bottom = rect.top + 20;
 	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);
 	rect.top = rect.bottom + 5;
@@ -437,10 +432,9 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	rect.bottom = rect.top + 20;
 	fSavePassword = new BCheckBox(rect, "SavePassword", kLabelSavePassword, NULL);
 	
-	authenticationView->AddChild(fUsername);
-	authenticationView->AddChild(fPassword);
-	authenticationView->AddChild(fSavePassword);
-	fAuthenticationBox->AddChild(authenticationView);
+	fAuthenticationBox->AddChild(fUsername);
+	fAuthenticationBox->AddChild(fPassword);
+	fAuthenticationBox->AddChild(fSavePassword);
 	
 	AddChild(fDeviceBox);
 	AddChild(fAuthenticationBox);

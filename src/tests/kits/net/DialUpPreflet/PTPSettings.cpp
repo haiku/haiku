@@ -49,7 +49,7 @@ PTPSettings::SetDefaultInterface(const char *name)
 	// load current settings and replace value of "default" with <name>
 	BMessage settings;
 	if(!ReadMessageDriverSettings("ptpnet.settings", &settings))
-		return false;
+		settings.MakeEmpty();
 	
 	BMessage parameter;
 	int32 index = 0;
@@ -58,6 +58,7 @@ PTPSettings::SetDefaultInterface(const char *name)
 	
 	parameter.MakeEmpty();
 	if(name) {
+		parameter.AddString(MDSU_NAME, "default");
 		parameter.AddString(MDSU_VALUES, name);
 		settings.AddMessage(MDSU_PARAMETERS, &parameter);
 	}
@@ -273,6 +274,5 @@ PTPSettings::LoadAddons(bool loadGeneralAddon = true)
 	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);
 	// addon.MakeEmpty(); // for next authenticator
 	
-	// TODO:
-	// load all add-ons from the add-ons folder
+	// TODO: load all add-ons from the add-ons folder
 }

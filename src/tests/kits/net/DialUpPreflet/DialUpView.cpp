@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -226,6 +226,9 @@ DialUpView::AttachedToWindow()
 	fInterfaceMenu->SetTargetForItems(this);
 	fCreateNewButton->SetTarget(this);
 	fConnectButton->SetTarget(this);
+	fDefaultInterface->SetTarget(this);
+	fDefaultInterface->Hide();
+		// TODO: remove this when we have full COD support
 	
 	if(fListener.InitCheck() != B_OK) {
 		(new BAlert(kErrorTitle, kErrorNoPPPStack, kLabelOK,
@@ -675,9 +678,10 @@ DialUpView::FindInterface(const char *name)
 		return NULL;
 	
 	BMenuItem *item;
-	for(int32 index = 0; index < fInterfaceMenu->CountItems(); index++) {
+	for(int32 index = 0; index < CountInterfaces(); index++) {
 		item = fInterfaceMenu->ItemAt(index);
-		if(item && !strcmp(item->Message()->FindString("name"), name))
+		if(item && item->Message() && item->Message()->HasString("name")
+				&& !strcmp(item->Message()->FindString("name"), name))
 			return item;
 	}
 	
