@@ -124,7 +124,10 @@ DataTranslationsWindow::ShowConfigView(int32 id)
 	if (id >= num_translators)
 		return B_BAD_VALUE;
 	
-	fRightBox->RemoveChild(fConfigView);
+	// fConfigView is NULL the first time this function
+	// is called, prevent a segment fault
+	if (fConfigView)
+		fRightBox->RemoveChild(fConfigView);
 	BMessage emptyMsg;
 	BRect rect(0, 0, 200, 233);
 	status_t ret = roster->MakeConfigurationView(tid, &emptyMsg, &fConfigView, &rect);
@@ -159,6 +162,10 @@ DataTranslationsWindow::ShowConfigView(int32 id)
 void
 DataTranslationsWindow::SetupViews()
 {
+	fConfigView = NULL;
+		// This is NULL until a translator is
+		// selected from the listview
+
 	// Window box
 	BBox *mainBox = new BBox(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
 		"All_Window", B_FOLLOW_ALL_SIDES,
@@ -194,13 +201,6 @@ DataTranslationsWindow::SetupViews()
     	B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fRightBox->AddChild(fTranNameView);
     
-    // Add the translator config panel
-	BRect configRect(rightRect);
-    configRect.bottom = iconRect.top;
-	fConfigView = new BView(configRect, "ConfigPanel", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FRAME_EVENTS);
-	fRightBox->AddChild(fConfigView);
-
 	// Add the translators list view
 	fTranListView = new DataTranslationsView(BRect(10, 10, 120, 288),
 		"TransList", B_SINGLE_SELECTION_LIST); 
