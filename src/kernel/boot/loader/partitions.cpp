@@ -4,6 +4,8 @@
 */
 
 
+#include "Partition.h"
+
 #include <boot/partitions.h>
 #include <boot/vfs.h>
 #include <boot/stdio.h>
@@ -13,6 +15,8 @@
 #include <unistd.h>
 #include <string.h>
 
+
+/* supported partition modules */
 
 static partition_module_info *sPartitionModules[] = {
 #ifdef BOOT_SUPPORT_PARTITION_AMIGA
@@ -28,39 +32,35 @@ static partition_module_info *sPartitionModules[] = {
 };
 static const int32 sNumPartitionModules = sizeof(sPartitionModules) / sizeof(partition_module_info *);
 
-extern list gPartitions;
+/* supported file system modules */
 
-
-class Partition : public partition_data, Node {
-	public:
-		Partition(int deviceFD);
-		virtual ~Partition();
-
-		virtual ssize_t ReadAt(void *cookie, off_t offset, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t offset, const void *buffer, size_t bufferSize);
-
-		Partition *AddChild();
-		status_t Scan();
-
-		Partition *Parent() { return fParent; }
-
-	private:
-		void SetParent(Partition *parent) { fParent = parent; }
-
-		int			fFD;
-		Partition	*fParent;
+static file_system_module_info *sFileSystemModules[] = {
+#ifdef BOOT_SUPPORT_FILE_SYSTEM_BFS
+	&gBFSFileSystemModule,
+#endif
+#ifdef BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+	&gAmigaFFSFileSystemModule,
+#endif
+#ifdef BOOT_SUPPORT_FILE_SYSTEM_FAT
+	&gFATFileSystemModule,
+#endif
 };
+static const int32 sNumFileSystemModules = sizeof(sFileSystemModules) / sizeof(file_system_module_info *);
+
+extern list gPartitions;
 
 
 Partition::Partition(int fd)
 	:
-	fParent(NULL)
+	fParent(NULL),
+	fIsFileSystem(false)
 {
 	memset(this, 0, sizeof(partition_data));
 	id = (partition_id)this;
 
 	// it's safe to close the file
 	fFD = dup(fd);
+	list_init_etc(&fChildren, Partition::NextOffset());
 }
 
 
@@ -109,6 +109,7 @@ Partition::AddChild()
 
 	child->SetParent(this);
 	child_count++;
+	list_add_item(&fChildren, (void *)child);
 
 	return child;
 }
@@ -117,7 +118,7 @@ Partition::AddChild()
 status_t 
 Partition::Scan()
 {
-	// ToDo: the scan algorithm should be recursive
+	// scan for partitions first (recursively all eventual children as well)
 
 	for (int32 i = 0; i < sNumPartitionModules; i++) {
 		partition_module_info *module = sPartitionModules[i];
@@ -130,8 +131,50 @@ Partition::Scan()
 		status_t status = module->scan_partition(fFD, this, cookie);
 		module->free_identify_partition_cookie(this, cookie);
 
-		if (status == B_OK)
+		if (status == B_OK) {
+			// now that we've found something, check our children
+			// out as well!
+
+			Partition *child = NULL, *last = NULL;
+
+			while ((child = (Partition *)list_get_next_item(&fChildren, child)) != NULL) {
+				child->Scan();
+
+				if (child->IsFileSystem()) {
+					// move the file systems to the partition list
+					list_remove_item(&fChildren, child);
+					list_add_item(&gPartitions, child);
+
+					child = last;
+						// skip this item
+				}
+
+				last = child;
+			}
+
+			// remove all unused children (we keep only file systems)
+
+			while ((child = (Partition *)list_remove_head_item(&fChildren)) != NULL)
+				delete child;
+
 			return B_OK;
+		}
+	}
+
+	// scan for file systems
+
+	for (int32 i = 0; i < sNumFileSystemModules; i++) {
+		file_system_module_info *module = sFileSystemModules[i];
+
+		puts(module->pretty_name);
+
+		Directory *fileSystem;
+		if (module->get_file_system(this, &fileSystem) == B_OK) {
+			gRoot->AddNode(fileSystem);
+
+			fIsFileSystem = true;
+			return B_OK;
+		}
 	}
 
 	return B_ENTRY_NOT_FOUND; 
@@ -148,7 +191,7 @@ add_partitions_for(int fd)
 
 	// set some magic/default values
 	partition.block_size = 512;
-	partition.size = 1024*1024*1024; // ToDo: fix this!
+	partition.size = partition.Size();
 
 	return partition.Scan();
 }
@@ -164,8 +207,8 @@ create_child_partition(partition_id id, int32 index, partition_id childID)
 		return NULL;
 	}
 
-	// ToDo: only add file systems
-	list_add_item(&gPartitions, (void *)child);
+	// we cannot do anything with the child here, because it was not
+	// yet initialized by the partition module.
 
 	return child;
 }
