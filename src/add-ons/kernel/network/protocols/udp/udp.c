@@ -389,7 +389,7 @@ static int udp_module_stop(void)
 struct kernel_net_module_info protocol_info = {
 	{
 		NET_UDP_MODULE_NAME,
-		B_KEEP_LOADED,
+		0, // B_KEEP_LOADED, // phoudoin: Why???
 		std_ops
 	},
 	udp_module_init,
