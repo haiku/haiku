@@ -46,14 +46,29 @@ Index::Unset()
 
 	put_vnode(fVolume->ID(), fNode->ID());
 	fNode = NULL;
+	fName = NULL;
 }
 
+
+/** Sets the index to specified one. Returns an error if the index could
+ *	not be found or initialized.
+ *	Note, Index::Update() may be called on the object even if this method
+ *	failed previously. In this case, it will only update live queries for
+ *	the updated attribute.
+ */
 
 status_t 
 Index::SetTo(const char *name)
 {
 	// remove the old node, if the index is set for the second time
 	Unset();
+	
+	fName = name;
+		// only stores the pointer, so it assumes that it will stay constant
+		// in further comparisons (currently only used in Index::Update())
+
+	// Note, the name is saved even if the index couldn't be initialized!
+	// This is used to optimize Index::Update() in case there is no index
 
 	Inode *indices = fVolume->IndicesNode();
 	if (indices == NULL)
@@ -76,13 +91,15 @@ Index::SetTo(const char *name)
 		put_vnode(fVolume->ID(), id);
 		return B_ERROR;
 	}
-	fName = name;
-		// only stores the pointer, so it assumes that it will stay constant
-		// in further comparisons (currently only used in Index::Update())
 
 	return B_OK;
 }
 
+
+/** Returns a standard type code for the stat() index type codes. Returns
+ *	zero if the type is not known (can only happen if the mode field is
+ *	corrupted somehow or not that of an index).
+ */
 
 uint32 
 Index::Type()
@@ -217,7 +234,8 @@ Index::Update(Transaction *transaction, const char *name, int32 type, const uint
 	fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength, newKey, newLength);
 
 	status_t status;
-	if (name != fName && (status = SetTo(name)) < B_OK)
+	if (((name != fName || strcmp(name, fName)) && (status = SetTo(name)) < B_OK)
+		|| fNode == NULL)
 		return B_BAD_INDEX;
 
 	// now that we have the type, check again for equality
