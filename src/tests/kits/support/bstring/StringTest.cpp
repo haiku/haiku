@@ -14,6 +14,7 @@
 #include "StringCompareTest.h"
 #include "StringFormatAppendTest.h"
 #include "StringCharAccessTest.h"
+#include "StringSearchTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -32,6 +33,7 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringCompareTest::suite());
 	testSuite->addTest(StringFormatAppendTest::suite());
 	testSuite->addTest(StringCharAccessTest::suite());
+	testSuite->addTest(StringSearchTest::suite());
 	
 	return(testSuite);
 }

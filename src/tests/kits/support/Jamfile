@@ -46,7 +46,6 @@ CommonTestLib libsupporttest.so
 		MallocIOTest.cpp
 		MallocSeekTest.cpp
 		MallocWriteTest.cpp
-		#MallocReadTest.cpp
 		MallocBufferLengthTest.cpp
 		
 		#BString
@@ -64,6 +63,7 @@ CommonTestLib libsupporttest.so
 		StringCompareTest.cpp
 		StringFormatAppendTest.cpp
 		StringCharAccessTest.cpp
+		StringSearchTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
