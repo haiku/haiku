@@ -392,6 +392,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 		FATAL(("could not allocate reserved space for block bitmap/log!\n"));
 		return B_ERROR;
 	}
+	fVolume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(reservedBlocks);
 
 	return B_OK;
 }
