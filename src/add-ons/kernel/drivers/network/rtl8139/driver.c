@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003, Niels Sascha Reedijk
+//	Copyright (c) 2003-2004, Niels Sascha Reedijk
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
