@@ -2307,7 +2307,7 @@ put_vnode(nspace_id nsid, vnode_id vnid)
 int
 new_vnode(nspace_id nsid, vnode_id vnid, void *data)
 {
-    int retries = 20;
+//    int retries = 20;
     vnode *vn;
     int err;
 
@@ -2321,11 +2321,14 @@ restart:
 
 		if (vn->busy) {
 			printf("new_vnode(): vnode exists and is busy!\n");
-			snooze(500);
-			if (retries-- >= 0)
+			UNLOCK(vnlock);
+			snooze(5000);
+			LOCK(vnlock);
+
+//			if (retries-- >= 0)
 				goto restart;
 
-			printf("new_vnode(): still busy, but continue to our doom!\n");
+//			printf("new_vnode(): still busy, but continue to our doom!\n");
 		}
 
 		if (vn->data != data)
@@ -3244,6 +3247,21 @@ int
 notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
 #ifdef DEBUG
+	printf("notify_listener: op = %ld\n", op);
+#endif
+
+	return send_notification(0, 0, FSH_NOTIFY_LISTENER, op, nsid, -1, vnida, vnidb, vnidc, name);
+}
+
+
+int
+send_notification(port_id port, long token, ulong what, long op, nspace_id nsida,
+		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
+		const char *name)
+{
+	update_message message;
+
+#ifdef DEBUG
 	char *text;
 
 	switch (op) {
@@ -3272,23 +3290,8 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 			text = "unknown operation...";
 			break;
 	}
-	printf("notify_listener: %s\n", text);
-#endif
-
-	return send_notification(0, 0, FSH_NOTIFY_LISTENER, op, nsid, -1, vnida, vnidb, vnidc, name);
-}
-
-
-int
-send_notification(port_id port, long token, ulong what, long op, nspace_id nsida,
-		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
-		const char *name)
-{
-	update_message message;
-
-#ifdef DEBUG
 	printf("send_notification... op = %s, name = %s, port = %ld, token = %ld\n",
-		op == B_ENTRY_CREATED ? "B_ENTRY_CREATED" : "B_ENTRY_REMOVED", name, port, token);
+		text, name, port, token);
 #endif
 
 	message.op = op;

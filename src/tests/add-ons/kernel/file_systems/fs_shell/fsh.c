@@ -988,9 +988,12 @@ static void
 tracker_query_file(dev_t device, ino_t parent, char *name)
 {
 	struct stat stat;
-	int status;
+	int status, fd;
 
-	int fd = sys_open_entry_ref(1, device, parent, name, O_RDONLY, 0);
+	if (name == NULL || parent == 0)
+		return;
+
+	fd = sys_open_entry_ref(1, device, parent, name, O_RDONLY, 0);
 	if (fd < 0)	{
 		printf("tracker: could not open file: %s\n", name);
 		return;
@@ -1026,7 +1029,8 @@ tracker_loop(void *data)
 
 		if (code == FSH_NOTIFY_LISTENER) {
 			printf("tracker: notify listener received\n");
-			tracker_query_file(message.device, message.parentNode, message.name);
+			if (message.op != B_ATTR_CHANGED && message.op != B_DEVICE_UNMOUNTED)
+				tracker_query_file(message.device, message.parentNode, message.name);
 		} else if (code == B_QUERY_UPDATE) {
 			printf("tracker: query update received\n");
 			tracker_query_file(message.device, message.parentNode, message.name);
