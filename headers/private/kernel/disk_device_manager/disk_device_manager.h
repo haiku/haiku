@@ -21,6 +21,7 @@ typedef struct partition_data {
 	partition_id	id;				// [sys]
 	off_t			offset;
 	off_t			size;
+	off_t			content_size;
 	uint32			block_size;
 	int32			child_count;
 	int32			index;			// [sys]
@@ -69,6 +70,13 @@ enum {
 	B_PARTITION_DELETE_CHILD,
 };
 
+// disk device job cancel status
+enum {
+	B_DISK_DEVICE_JOB_CONTINUE,
+	B_DISK_DEVICE_JOB_CANCEL,
+	B_DISK_DEVICE_JOB_REVERSE,
+};
+
 // disk device locking
 disk_device_data *write_lock_disk_device(partition_id partitionID);
 void write_unlock_disk_device(partition_id partitionID);
@@ -106,6 +114,10 @@ bool set_disk_device_job_status(disk_job_id job, uint32 status);
 uint32 get_disk_device_job_status(disk_job_id job);
 bool update_disk_device_job_progress(disk_job_id job, float progress);
 bool update_disk_device_job_extra_progress(disk_job_id job, const char *info);
+uint32 update_disk_device_job_interrupt_properties(disk_job_id job,
+												   uint32 interruptProperties);
+	// returns one of B_DISK_DEVICE_JOB_{CONTINUE,CANCEL,REVERSE}
+
 
 #ifdef __cplusplus
 }
