@@ -10,6 +10,8 @@
 #define COLOR_SETTINGS_NAME "system_colors"
 */
 
+#define APPEARANCE_APP_SIGNATURE "application/x-vnd.obos-Appearance"
+
 #define APPLY_SETTINGS 'aply'
 #define REVERT_SETTINGS 'rvrt'
 #define DEFAULT_SETTINGS 'dflt'

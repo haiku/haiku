@@ -51,7 +51,7 @@ public:
 	void LoadSettings(void);
 	void NotifyServer(void);
 	void GetDecorators(void);
-	void SetColors(const BMessage &message);
+	void SetColors(const ColorSet &set);
 	bool LoadDecorator(const char *path);
 	BString ConvertIndexToPath(int32 index);
 protected:

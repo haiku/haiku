@@ -27,9 +27,10 @@
 //------------------------------------------------------------------------------
 #include "APRMain.h"
 #include <stdio.h>
+#include "defs.h"
 
 APRApplication::APRApplication()
-  :BApplication("application/x-vnd.obos-Appearance")
+  :BApplication(APPEARANCE_APP_SIGNATURE)
 {
 	BRect rect;
 

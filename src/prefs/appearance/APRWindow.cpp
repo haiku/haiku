@@ -41,21 +41,21 @@ APRWindow::APRWindow(BRect frame)
 	BTab *tab=NULL;
 	
 	
-	// TODO: Swap Cursors and Colors tabs when we're done developing it
-	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(cursors);
-	tabview->AddTab(cursors,tab);
+	colors=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
+	tab=new BTab(colors);
+	tabview->AddTab(colors,tab);
 
 	decorators=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
 	tab=new BTab(decorators);
 	tabview->AddTab(decorators,tab);
 
-	colors=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(colors);
-	tabview->AddTab(colors,tab);
+	// TODO: Finish CurView
+	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
+	tab=new BTab(cursors);
+	tabview->AddTab(cursors,tab);
 
 	AddChild(tabview);
-	decorators->SetColors(colors->settings);
+	decorators->SetColors(*colors->currentset);
 }
 
 bool APRWindow::QuitRequested()
@@ -77,7 +77,7 @@ void APRWindow::WorkspaceActivated(int32 wkspc, bool is_active)
 void APRWindow::MessageReceived(BMessage *msg)
 {
 	if(msg->what==SET_UI_COLORS)
-		decorators->SetColors(colors->settings);
+		decorators->SetColors(*colors->currentset);
 	else
 		BWindow::MessageReceived(msg);
 }

@@ -46,6 +46,13 @@
 
 //#define DEBUG_DECORATOR
 
+#ifdef DEBUG_DECORATOR
+#define STRACE(a) printf a
+#else
+#define STRACE(a) /* nothing */
+#endif
+
+
 DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
 {
@@ -63,7 +70,9 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	// set up app_server emulation
 	driver=new PreviewDriver();
 	if(!driver->Initialize())
-		printf("Uh-oh... Couldn't initialize graphics module for server emu!\n");
+	{
+		STRACE(("Uh-oh... Couldn't initialize graphics module for server emu!\n"));
+	}
 	else
 	{
 		preview=driver->View();
@@ -139,23 +148,19 @@ void DecView::MessageReceived(BMessage *msg)
 		}
 		case DECORATOR_CHOSEN:
 		{
-#ifdef DEBUG_DECORATOR
-printf("MSG: Decorator Chosen - #%ld\n",declist->CurrentSelection());
-#endif
+
+			STRACE(("MSG: Decorator Chosen - #%ld\n",declist->CurrentSelection()));
 			bool success=false;
 
 			BString path( ConvertIndexToPath(declist->CurrentSelection()) );
-#ifdef DEBUG_DECORATOR
-printf("MSG: Decorator path: %s\n",path.String());
-#endif
+
+			STRACE(("MSG: Decorator path: %s\n",path.String()));
 
 			success=LoadDecorator(path.String());
 
 			if(!success)
 			{
-#ifdef DEBUG_DECORATOR
-printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
-#endif
+				STRACE(("MSG: Decorator NOT Chosen - couldn't load decorator\n"));
 				break;
 			}
 			
@@ -165,6 +170,7 @@ printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
 				BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
 				path=(item)?item->Text():path="Title";
 				decorator->SetDriver(driver);
+				decorator->SetFocus(true);
 				decorator->SetTitle(path.String());
 				decorator->SetColors(colorset);
 				decorator->Draw();
@@ -185,7 +191,7 @@ void DecView::SaveSettings(void)
 	
 	BString path(SERVER_SETTINGS_DIR);
 	path+="DecoratorSettings";
-	printf("%s\n",path.String());
+	STRACE(("%s\n",path.String()));
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
 	settings.MakeEmpty();
@@ -228,35 +234,33 @@ void DecView::LoadSettings(void)
 			
 			return;
 		}
-		printf("Error unflattening settings file %s\n",path.String());
+		STRACE(("Error unflattening settings file %s\n",path.String()));
 	}
 }
 
 void DecView::NotifyServer(void)
 {
 	// Send a message to the app_server to tell it which decorator we have selected.
-	
-	port_id serverport=find_port(SERVER_PORT_NAME);
-
-	if(serverport==B_NAME_NOT_FOUND)
-		return;
-	
 	BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
 	if(!item)
 		return;
+
+	port_id serverport=find_port(SERVER_PORT_NAME);
+	if(serverport==B_NAME_NOT_FOUND)
+		return;
 	
-	PortLink *pl=new PortLink(serverport);
-	pl->SetOpCode(SET_DECORATOR);
-	pl->Attach(item->Text(),strlen(item->Text())+1);
-	pl->Flush();
-	delete pl;
+	
+	PortLink pl(serverport);
+	pl.SetOpCode(AS_SET_DECORATOR);
+	pl.Attach(item->Text(),strlen(item->Text())+1);
+	pl.Flush();
 }
 
 void DecView::GetDecorators(void)
 {
-#ifdef DEBUG_DECORATOR
-printf("DecView::GetDecorators()\n");
-#endif
+
+	STRACE(("DecView::GetDecorators()\n"));
+
 	BDirectory dir;
 	BEntry entry;
 	BPath path;
@@ -273,37 +277,37 @@ printf("DecView::GetDecorators()\n");
 		{
 			case B_NAME_TOO_LONG:
 			{
-				printf("DecView::GetDecorators: Couldn't open the folder for decorators - path string too long.\n");
+				STRACE(("DecView::GetDecorators: Couldn't open the folder for decorators - path string too long.\n"));
 				break;
 			}
 			case B_ENTRY_NOT_FOUND:
 			{
-				printf("Couldn't open the folder for decorators - entry not found\n");
+				STRACE(("Couldn't open the folder for decorators - entry not found\n"));
 				break;
 			}
 			case B_BAD_VALUE:
 			{
-				printf("DecView::GetDecorators: Couldn't open the folder for decorators - bad path\n");
+				STRACE(("DecView::GetDecorators: Couldn't open the folder for decorators - bad path\n"));
 				break;
 			}
 			case B_NO_MEMORY:
 			{
-				printf("DecView::GetDecorators: No memory left. We're probably going to crash now\n");
+				STRACE(("DecView::GetDecorators: No memory left. We're probably going to crash now\n"));
 				break;
 			}
 			case B_BUSY:
 			{
-				printf("DecView::GetDecorators: Couldn't open the folder for decorators - node busy\n");
+				STRACE(("DecView::GetDecorators: Couldn't open the folder for decorators - node busy\n"));
 				break;
 			}
 			case B_FILE_ERROR:
 			{
-				printf("DecView::GetDecorators: Couldn't open the folder for decorators - general file error\n");
+				STRACE(("DecView::GetDecorators: Couldn't open the folder for decorators - general file error\n"));
 				break;
 			}
 			case B_NO_MORE_FDS:
 			{
-				printf("DecView::GetDecorators: Couldn't open the folder for decorators - no more file descriptors\n");
+				STRACE(("DecView::GetDecorators: Couldn't open the folder for decorators - no more file descriptors\n"));
 				break;
 			}
 		}
@@ -340,9 +344,9 @@ bool DecView::LoadDecorator(const char *path)
 	if(stat!=B_OK)
 	{
 		unload_add_on(addon);
-#ifdef DEBUG_DECORATOR
-printf("LoadDecorator(%s): Couldn't get version symbol\n",path);
-#endif
+
+STRACE(("LoadDecorator(%s): Couldn't get version symbol\n",path));
+
 		return false;
 	}
 */
@@ -355,16 +359,16 @@ printf("LoadDecorator(%s): Couldn't get version symbol\n",path);
 	if(stat!=B_OK)
 	{
 		unload_add_on(addon);
-#ifdef DEBUG_DECORATOR
-printf("LoadDecorator(%s): Couldn't get allocation symbol\n",path);
-#endif
+
+		STRACE(("LoadDecorator(%s): Couldn't get allocation symbol\n",path));
+
 		return false;
 	}
 	if(decorator!=NULL)
 	{
-#ifdef DEBUG_DECORATOR
-printf("LoadDecorator(): Deleting old decorator\n");
-#endif
+
+		STRACE(("LoadDecorator(): Deleting old decorator\n"));
+
 		delete decorator;
 		decorator=NULL;
 
@@ -388,45 +392,34 @@ BString DecView::ConvertIndexToPath(int32 index)
 	BStringItem *item=(BStringItem*)declist->ItemAt(index);
 	if(!item)
 	{
-#ifdef DEBUG_DECORATOR
-printf("ConvertIndexToPath(): Couldn't get item for index %ld\n",index);
-#endif
+
+		STRACE(("ConvertIndexToPath(): Couldn't get item for index %ld\n",index));
+
 		return NULL;
 	}
 	BString path(DECORATORS_DIR);
 	path+=item->Text();
-#ifdef DEBUG_DECORATOR
-printf("ConvertIndexToPath(): returned %s\n",path.String());
-#endif
+
+	STRACE(("ConvertIndexToPath(): returned %s\n",path.String()));
+
 	return BString(path.String());
 }
 
-void DecView::SetColors(const BMessage &message)
+void DecView::SetColors(const ColorSet &set)
 {
-#ifdef DEBUG_DECORATOR
-printf("DecView::SetColors\n");
-#endif
-	if(UnpackSettings(&colorset,message))
+
+	STRACE(("DecView::SetColors\n"));
+	
+	colorset=set;
+	if(decorator)
 	{
-		if(decorator)
-		{
-//			ldata.highcolor.SetColor(colorset.desktop);
-			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
-			decorator->SetColors(colorset);
-			decorator->Draw();
-		}
-		else
-		{
-#ifdef DEBUG_DECORATOR
-printf("DecView::SetColors: NULL decorator\n");
-#endif
-		}
+		driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+		decorator->SetColors(colorset);
+		decorator->Draw();
 	}
 	else
 	{
-#ifdef DEBUG_DECORATOR
-printf("DecView::SetColors: UnpackSetting returned false\n");
-#endif
+		STRACE(("DecView::SetColors: NULL decorator\n"));
 	}
 }
 
@@ -434,9 +427,7 @@ bool DecView::UnpackSettings(ColorSet *set, const BMessage &msg)
 {
 	if(!set)
 	{
-#ifdef DEBUG_DECORATOR
-printf("UnpackSettings(): NULL parameter\n");
-#endif
+		STRACE(("UnpackSettings(): NULL parameter\n"));
 		return false;
 	}
 	rgb_color *col;
@@ -492,6 +483,5 @@ printf("UnpackSettings(): NULL parameter\n");
 		set->inactive_window_tab=*col;
 	if(msg.FindData("Inactive Window Tab Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->inactive_window_tab_text=*col;
-
 	return true;
 }

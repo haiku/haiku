@@ -46,7 +46,13 @@
 #include "ColorWhichItem.h"
 #include "ServerConfig.h"
 
-//#define DEBUG_COLORSET
+#define DEBUG_COLORSET
+
+#ifdef DEBUG_COLORSET
+#define STRACE(a) printf a
+#else
+#define STRACE(A) /* nothing */
+#endif
 
 #define SAVE_COLORSET 'svcs'
 #define DELETE_COLORSET 'dlcs'
@@ -54,10 +60,13 @@
 #define COLOR_DROPPED 'cldp'
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
-	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
+	:BView(frame,name,resize,flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
+	currentset=new ColorSet;
+	prevset=NULL;
+	
 	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
@@ -88,8 +97,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
 	AddChild(colorset_label);
 	colorset_label->ResizeToPreferred();
-	colorset_name=new BString("<untitled>");
-
 
 	// Set up list of color attributes
 	BRect rect(10,60,200,160);
@@ -142,6 +149,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		new BMessage(DEFAULT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(defaults);
+	defaults->SetEnabled(false);
 
 	cvrect.OffsetBy(70,0);
 	revert=new BButton(cvrect,"RevertButton","Revert",
@@ -160,8 +168,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
-	savepanel=new BFilePanel(B_SAVE_PANEL, NULL,
-		&ref, 0, false);
+	savepanel=new BFilePanel(B_SAVE_PANEL, NULL, &ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Background";
@@ -171,7 +178,10 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 APRView::~APRView(void)
 {
 	delete savepanel;
-	delete colorset_name;
+	if(currentset)
+		delete currentset;
+	if(prevset)
+		delete prevset;
 }
 
 void APRView::AllAttached(void)
@@ -188,7 +198,7 @@ void APRView::AllAttached(void)
 
 	BMessenger msgr(this);
 	savepanel->SetTarget(msgr);
-	picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
+	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
 }
 
 void APRView::MessageReceived(BMessage *msg)
@@ -206,28 +216,14 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
-		case B_WORKSPACE_ACTIVATED:
-		{
-			BScreen screen;
-			rgb_color col=screen.DesktopColor();
-			settings.ReplaceData("DESKTOP",(type_code)'RGBC',
-					&col,sizeof(rgb_color));
-			
-			if(attrstring=="DESKTOP")
-			{
-				picker->SetValue(col);
-				colorwell->SetColor(col);
-			}
-			break;
-		}
 		case DELETE_COLORSET:
 		{
 			// Construct the path and delete
 			BString path(COLOR_SET_DIR);
-			path+=*colorset_name;
+			path+=currentset->name;
 			
 			BString printstring("Remove ");
-			printstring+=*colorset_name;
+			printstring+=currentset->name;
 			printstring+=" from disk permenantly?";
 			BAlert *a=new BAlert("OpenBeOS",printstring.String(),"Yes", "No");
 			if(a->Go()==0)
@@ -235,13 +231,11 @@ void APRView::MessageReceived(BMessage *msg)
 				int stat=remove(path.String());
 				if(stat!=0)
 				{
-#ifdef DEBUG_COLORSET
-printf("MSG: Delete Request - couldn't delete file %s\n",path.String());
-#endif
+					STRACE(("MSG: Delete Request - couldn't delete file %s\n",path.String()));
 				}
 				else
 				{
-					BMenuItem *item=colorset_menu->FindItem(colorset_name->String());
+					BMenuItem *item=colorset_menu->FindItem(currentset->name.String());
 					if(item!=NULL)
 					{
 						if(colorset_menu->RemoveItem(item))
@@ -256,9 +250,7 @@ printf("MSG: Delete Request - couldn't delete file %s\n",path.String());
 			BString name;
 			if(msg->FindString("name",&name)!=B_OK)
 			{
-#ifdef DEBUG_COLORSET
-printf("MSG: Load Request - couldn't find file name\n");
-#endif
+				STRACE(("MSG: Load Request - couldn't find file name\n"));
 				break;
 			}
 			LoadColorSet(name);
@@ -274,9 +266,7 @@ printf("MSG: Load Request - couldn't find file name\n");
 			BString name;
 			if(msg->FindString("name",&name)!=B_OK)
 			{
-#ifdef DEBUG_COLORSET
-printf("MSG: Save Request - couldn't find file name\n");
-#endif
+				STRACE(("MSG: Save Request - couldn't find file name\n"));
 				break;
 			}
 			SaveColorSet(name);
@@ -285,18 +275,28 @@ printf("MSG: Save Request - couldn't find file name\n");
 		case UPDATE_COLOR:
 		{
 			// Received from the color picker when its color changes
-
+			if(!prevset)
+			{
+				prevset=new ColorSet;
+				*prevset=*currentset;
+			}
+			
 			rgb_color col=picker->ValueAsColor();
 
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
 			
 			// Update current attribute in the settings
-			settings.ReplaceData(attrstring.String(),(type_code)'RGBC',&col,sizeof(rgb_color));
+			if(currentset->SetColor(attrstring.String(),col)!=B_OK)
+			{
+				STRACE(("Couldn't set color for attribute %s\n",attrstring.String()));
+			}
 			
-			if(apply->IsEnabled()==false)
+			if(!apply->IsEnabled())
 				apply->SetEnabled(true);
-			if(revert->IsEnabled()==false)
+			if(!defaults->IsEnabled())
+				defaults->SetEnabled(true);
+			if(!revert->IsEnabled())
 				revert->SetEnabled(true);
 			
 			SetColorSetName("<untitled>");
@@ -310,23 +310,28 @@ printf("MSG: Save Request - couldn't find file name\n");
 			if(!whichitem)
 				break;
 			attrstring=whichitem->Text();
-			rgb_color col=GetColorFromMessage(&settings,whichitem->Text(),0);
+			rgb_color col=currentset->StringToColor(whichitem->Text()).GetColor32();
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
-
-//			SetColorSetName("<untitled>");
-//			if(Window())
-//				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case APPLY_SETTINGS:
 		{
+			if(prevset)
+			{
+				delete prevset;
+				prevset=NULL;
+				revert->SetEnabled(false);
+			}
+			if(currentset->name=="Default")
+				defaults->SetEnabled(false);
+			apply->SetEnabled(false);
 			SaveSettings();
 			NotifyServer();
 			break;
 		}
-		case TRY_SETTINGS:
+/*		case TRY_SETTINGS:
 		{
 			// Tell server to apply settings here without saving them.
 			// Theoretically, the user can set this temporarily and keep it
@@ -334,26 +339,43 @@ printf("MSG: Save Request - couldn't find file name\n");
 			NotifyServer();
 			break;
 		}
-		case REVERT_SETTINGS:
+*/		case REVERT_SETTINGS:
 		{
-/*			LoadSettings();
-			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
-			picker->SetValue(col);
+			delete currentset;
+			currentset=prevset;
+			prevset=NULL;
+			
+			rgb_color col=picker->ValueAsColor();
+
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
-			if(Window())
-				Window()->PostMessage(SET_UI_COLORS);
-*/
-			if(prev_set_name=="Default")
-				SetDefaults();
 			
-			LoadColorSet(prev_set_name);
+			// Update current attribute in the settings
+			currentset->SetColor(attrstring.String(),col);
+			
+			if(!apply->IsEnabled())
+				apply->SetEnabled(false);
+			if((currentset->name!="Default"))
+				defaults->SetEnabled(true);
+			else
+				defaults->SetEnabled(false);
+			revert->SetEnabled(false);
+			
+			SetColorSetName(currentset->name.String());
+			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case DEFAULT_SETTINGS:
 		{
+			if(!prevset)
+			{
+				prevset=new ColorSet;
+				*prevset=*currentset;
+				revert->SetEnabled(true);
+				apply->SetEnabled(true);
+			}
 			SetDefaults();
-			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
+			rgb_color col=currentset->StringToColor(attrstring.String()).GetColor32();
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
@@ -369,9 +391,9 @@ printf("MSG: Save Request - couldn't find file name\n");
 
 BMenu *APRView::LoadColorSets(void)
 {
-#ifdef DEBUG_COLORSET
-printf("Loading color sets from disk\n");
-#endif
+
+	STRACE(("Loading color sets from disk\n"));
+
 	// This function populates the member menu *colorset_menu with the color
 	// set files located in the color set directory. To ensure that there are
 	// no entries pointing to invalid color sets, they are validated before
@@ -407,17 +429,17 @@ printf("Loading color sets from disk\n");
 			}
 			case B_BAD_VALUE:
 			{
-				printf("APRView::LoadColorSets(): Invalid colorset folder path.\n");
+				STRACE(("APRView::LoadColorSets(): Invalid colorset folder path.\n"));
 				break;
 			}
 			case B_NO_MEMORY:
 			{
-				printf("APRView::LoadColorSets(): No memory left. We're probably going to crash now. \n");
+				STRACE(("APRView::LoadColorSets(): No memory left. We're probably going to crash now. \n"));
 				break;
 			}
 			case B_BUSY:
 			{
-				printf("APRView::LoadColorSets(): Busy node " COLOR_SET_DIR "\n");
+				STRACE(("APRView::LoadColorSets(): Busy node " COLOR_SET_DIR "\n"));
 				break;
 			}
 			case B_FILE_ERROR:
@@ -467,50 +489,37 @@ printf("Loading color sets from disk\n");
 void APRView::LoadColorSet(const BString &name)
 {
 	// Load the current GUI color settings from a color set file.
-
-#ifdef DEBUG_COLORSET
-printf("LoadColorSet: %s\n",name.String());
-#endif
-
+	
+	STRACE(("LoadColorSet: %s\n",name.String()));
+	
 	BDirectory dir,newdir;
 	if(dir.SetTo(COLOR_SET_DIR)==B_ENTRY_NOT_FOUND)
 	{
-#ifdef DEBUG_COLORSET
-printf("Color set folder not found. Creating %s\n",COLOR_SET_DIR);
-#endif
+		STRACE(("Color set folder not found. Creating %s\n",COLOR_SET_DIR));
 		create_directory(COLOR_SET_DIR,0777);
 	}
-
+	
 	BString path(COLOR_SET_DIR);
 	path+=name.String();
 	BFile file(path.String(),B_READ_ONLY);
-
+	
 	if(file.InitCheck()!=B_OK)
 	{
-#ifdef DEBUG_COLORSET
-printf("Couldn't open file %s for read\n",path.String());
-#endif
+		STRACE(("Couldn't open file %s for read\n",path.String()));
 		return;
 	}
-	if(settings.Unflatten(&file)==B_OK)
+	BMessage settings;
+	
+	if(settings.Unflatten(&file)!=B_OK)
 	{
-#ifdef DEBUG_COLORSET
-settings.PrintToStream();
-#endif
-		BString internal_name;
-		settings.FindString("name",&internal_name);
-//		BString namestr("Color Set: ");
-//		namestr+=internal_name.String();
-//		colorset_label->SetText(namestr.String());
-		SetColorSetName(internal_name.String());
-
-		picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
-		colorwell->SetColor(picker->ValueAsColor());
+		STRACE(("Error unflattening file %s\n",name.String()));
 		return;
 	}
-#ifdef DEBUG_COLORSET
-printf("Error unflattening file %s\n",name.String());
-#endif
+	currentset->ConvertFromMessage(&settings);
+	SetColorSetName(currentset->name.String());
+	
+	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
+	colorwell->SetColor(picker->ValueAsColor());
 }
 
 void APRView::SaveColorSet(const BString &name)
@@ -521,31 +530,23 @@ void APRView::SaveColorSet(const BString &name)
 	BString path(COLOR_SET_DIR);
 	path+=name.String();
 
-#ifdef DEBUG_COLORSET
-printf("SaveColorSet: %s\n",path.String());
-#endif
 
-	if(settings.ReplaceString("name",name.String())!=B_OK)
-	{
-#ifdef DEBUG_COLORSET
-printf("SaveColorSet: Couldn't replace set name in settings\n");
-#endif
-	}
+	STRACE(("SaveColorSet: %s\n",path.String()));
+
 
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 
 	if(file.InitCheck()!=B_OK)
 	{
-#ifdef DEBUG_COLORSET
-printf("SaveColorSet: Couldn't open settings file for write\n");
-#endif
+		STRACE(("SaveColorSet: Couldn't open settings file for write\n"));
+		return;
 	}
 	
+	BMessage settings;
+	currentset->ConvertToMessage(&settings);
 	if(settings.Flatten(&file)!=B_OK)
 	{
-#ifdef DEBUG_COLORSET
-printf("SaveColorSet: Couldn't flatten settings to file\n");
-#endif
+		STRACE(("SaveColorSet: Couldn't flatten settings to file\n"));
 		return;
 	}
 
@@ -554,9 +555,7 @@ printf("SaveColorSet: Couldn't flatten settings to file\n");
 
 	if(colorset_menu->AddItem(new BMenuItem(name.String(),msg))==false)
 	{
-#ifdef DEBUG_COLORSET
-printf("SaveColorSet: Error in adding item to menu\n");
-#endif
+		STRACE(("SaveColorSet: Error in adding item to menu\n"));
 	}
 	SetColorSetName(name.String());
 }
@@ -566,7 +565,7 @@ void APRView::SetColorSetName(const char *name)
 	if(!name)
 		return;
 	BString namestr("Color Set: ");
-	colorset_name->SetTo(name);
+	currentset->name.SetTo(name);
 	namestr+=name;
 	colorset_label->SetText(namestr.String());
 	colorset_label->ResizeToPreferred();
@@ -580,33 +579,29 @@ void APRView::SaveSettings(void)
 	
 	BString path(SERVER_SETTINGS_DIR);
 	path+=COLOR_SETTINGS_NAME;
-#ifdef DEBUG_COLORSET
-printf("SaveSettings: %s\n",path.String());
-#endif
+
+	STRACE(("SaveSettings: %s\n",path.String()));
+
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
+	BMessage settings;
+
+	currentset->ConvertToMessage(&settings);
 	settings.Flatten(&file);
-	prev_set_name=*colorset_name;
-	revert->SetEnabled(false);
-	revert->SetEnabled(false);
 }
 
 void APRView::LoadSettings(void)
 {
 	// Load the current GUI color settings from disk. This is done instead of
-	// getting them from the server at this point for testing purposes. Comment
-	// out the #define LOAD_SETTINGS_FROM_DISK line to use the server query code
-#ifdef DEBUG_COLORSET
-printf("Loading settings from disk\n");
-#endif
-	settings.MakeEmpty();
+	// getting them from the server at this point for testing purposes.
+
+	// TODO: Add app_server UI color query code
+	STRACE(("Loading settings from disk\n"));
 
 	BDirectory dir,newdir;
 	if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
 	{
-#ifdef DEBUG_COLORSET
-printf("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR);
-#endif
+		STRACE(("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR));
 		create_directory(SERVER_SETTINGS_DIR,0777);
 	}
 
@@ -616,151 +611,39 @@ printf("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR);
 
 	if(file.InitCheck()!=B_OK)
 	{
-#ifdef DEBUG_COLORSET
-printf("Couldn't open file %s for read\n",path.String());
-#endif
+		STRACE(("Couldn't open file %s for read\n",path.String()));
 		SetDefaults();
 		SaveSettings();
 		return;
 	}
-	if(settings.Unflatten(&file)==B_OK)
+
+	BMessage settings;
+	if(settings.Unflatten(&file)!=B_OK)
 	{
-		settings.FindString("name",colorset_name);
-		SetColorSetName(colorset_name->String());
-		prev_set_name=*colorset_name;
-		picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
-		colorwell->SetColor(picker->ValueAsColor());
-#ifdef DEBUG_COLORSET
-settings.PrintToStream();
-#endif
-		return;
+		STRACE(("Error unflattening SystemColors file %s\n",path.String()));
+		
+		SetDefaults();
+		SaveSettings();
 	}
-#ifdef DEBUG_COLORSET
-printf("Error unflattening SystemColors file %s\n",path.String());
-#endif
+
+	currentset->ConvertFromMessage(&settings);
+	SetColorSetName(currentset->name.String());
 	
-	// If we get this far, we have encountered an error, so reset the settings
-	// to the defaults
-	SetDefaults();
-	SaveSettings();
+	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
+	colorwell->SetColor(picker->ValueAsColor());
+	
+	if(currentset->name.String()!="Default")
+		defaults->SetEnabled(true);
+
 }
 
 void APRView::SetDefaults(void)
 {
-#ifdef DEBUG_COLORSET
-printf("Initializing color settings to defaults\n");
-#endif
-	settings.MakeEmpty();
-	settings.AddString("name","Default");
-	colorset_name->SetTo("Default");
+	STRACE(("Initializing color settings to defaults\n"));
+	defaults->SetEnabled(false);
+	currentset->name.SetTo("Default");
 
-	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
-	rgb_color col={216,216,216,255};
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_PANEL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute((color_which)B_DOCUMENT_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_DOCUMENT_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,245,245,245);
-	whichitem.SetAttribute((color_which)B_CONTROL_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_CONTROL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_CONTROL_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,115,120,184);
-	whichitem.SetAttribute((color_which)B_CONTROL_HIGHLIGHT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,170,50,184);
-	whichitem.SetAttribute((color_which)B_NAVIGATION_BASE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_NAVIGATION_PULSE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute((color_which)B_SHINE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_SHADOW_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,0);
-	whichitem.SetAttribute((color_which)B_TOOLTIP_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_TOOLTIP_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,255,0);
-	whichitem.SetAttribute((color_which)B_SUCCESS_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,0,0);
-	whichitem.SetAttribute((color_which)B_FAILURE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,51,102,160);
-	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	whichitem.SetAttribute(B_PANEL_BACKGROUND_COLOR);
-	SetRGBColor(&col,216,216,216);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,216,216,216,0);
-	whichitem.SetAttribute(B_MENU_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_MENU_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute(B_MENU_SELECTED_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,203,0);
-	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_WINDOW_TAB_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,232,232,232);
-	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,80,80,80);
-	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-//	BString labelstr("Color Set: ");
-//	labelstr+=colorset_name->String();
-//	colorset_label->SetText(labelstr.String());
+	currentset->SetToDefaults();
 	SetColorSetName("Default");
 }
 
@@ -780,7 +663,7 @@ void APRView::NotifyServer(void)
 	// Set menu color
 	menu_info minfo;
 	get_menu_info(&minfo);
-	col=GetColorFromMessage(&settings,"MENU_BACKGROUND");
+	col=currentset->StringToColor("Menu Background").GetColor32();
 	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
 	{
 		// do nothing
@@ -791,36 +674,6 @@ void APRView::NotifyServer(void)
 		set_menu_info(&minfo);
 	}
 	
-	// Set desktop color
-	BScreen screen;
-	col=GetColorFromMessage(&settings,"DESKTOP");
-
-#ifdef DEBUG_COLORSET
-printf("NotifyServer: Setting Desktop color to "); PrintRGBColor(col);
-#endif
-	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
-	{
-		// do nothing
-	}
-	else
-		screen.SetDesktopColor(col);
-
 	if(Window())
 		Window()->PostMessage(SET_UI_COLORS);
-}
-
-rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 index=0)
-{
-	
-	// Simple function to do the dirty work of getting an rgb_color from
-	// a message
-	rgb_color *col,rcolor={0,0,0,0};
-	ssize_t size;
-
-	if(!msg || !name)
-		return rcolor;
-
-	if(msg->FindData(name,(type_code)'RGBC',index,(const void**)&col,&size)==B_OK)
-		rcolor=*col;
-	return rcolor;
 }

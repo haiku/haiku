@@ -42,7 +42,7 @@
 #include <StringView.h>
 #include <FilePanel.h>
 #include <Invoker.h>
-
+#include <ColorSet.h>
 class ColorWell;
 class APRWindow;
 
@@ -57,7 +57,7 @@ public:
 	void LoadSettings(void);
 	void SetDefaults(void);
 	void NotifyServer(void);
-	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
+//	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
 protected:
 	friend APRWindow;
 	BMenu *LoadColorSets(void);
@@ -68,15 +68,14 @@ protected:
 	BButton *apply,*revert,*defaults;
 	BListView *attrlist;
 	color_which attribute;
-	BMessage settings;
 	BString attrstring;
 	BScrollView *scrollview;
 	BStringView *colorset_label;
 	BMenu *colorset_menu,*settings_menu;
 	BFilePanel *savepanel;
 	ColorWell *colorwell;
-	BString *colorset_name;
-	BString prev_set_name;
+	
+	ColorSet *currentset,*prevset;
 };
 
 #endif
