@@ -8,6 +8,9 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 	SubDirCcFlags -DHAVE_CONFIG_H ;
 }
 
+local tar_rsrc = [ FGristFiles tar.rsrc ] ;
+ResComp $(tar_rsrc) : [ FGristFiles tar.rdef ] ;
+
 BinCommand tar :
 	buffer.c
 	compare.c
@@ -26,9 +29,9 @@ BinCommand tar :
 	tar.c
 	update.c
 	utf8.c
-	: libtar.a : tar.rdef ;
+	: libtar.a : tar.rsrc ;
 
 BinCommand rmt :
 	rmt.c
-	: libtar.a $(NETWORK_LIBS) : tar.rdef
+	: libtar.a $(NETWORK_LIBS) : tar.rsrc
 ;
