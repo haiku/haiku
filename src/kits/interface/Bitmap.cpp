@@ -828,8 +828,9 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 */
 BBitmap::~BBitmap()
 {
-//	if (fBasePtr)
-//		free(fBasePtr);
+	// TODO: don't free fBasePtr, as it's owned by the app_server
+	// should probably decrement an associated reference count, though,
+	// so the app_server knows this bitmap isn't used anymore
 }
 
 // unarchiving constructor
@@ -919,7 +920,7 @@ BBitmap::UnlockBits()
 area_id
 BBitmap::Area() const
 {
-	return NOT_IMPLEMENTED;
+	return fArea;
 }
 
 // Bits
