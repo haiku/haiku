@@ -149,10 +149,12 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 }
 
 
-/**
+/**	Allocates a thread structure (or reuses one from the dead queue).
+ *
  * \param threadID The ID to be assigned to the new thread. If
  *		  \code < 0 \endcode a fresh one is allocated.
  */
+
 static struct thread *
 create_thread_struct(const char *name, thread_id threadID)
 {
@@ -174,7 +176,7 @@ create_thread_struct(const char *name, thread_id threadID)
 
 	strlcpy(t->name, name, B_OS_NAME_LENGTH);
 
-	t->id = (threadID >= 0 ? threadID : allocate_thread_id());
+	t->id = threadID >= 0 ? threadID : allocate_thread_id();
 	t->team = NULL;
 	t->cpu = NULL;
 	t->sem.blocking = -1;
@@ -309,10 +311,12 @@ _create_kernel_thread_kentry(void)
 }
 
 
-/**
+/** Creates a new thread in the team with the specified team ID.
+ *
  * \param threadID The ID to be assigned to the new thread. If
  *		  \code < 0 \endcode a fresh one is allocated.
  */
+
 static thread_id
 create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	void *args1, void *args2, int32 priority, bool kernel, thread_id threadID)
@@ -1159,10 +1163,12 @@ peek_next_thread_id()
 }
 
 
-/**
+/** Kernel private thread creation function.
+ *
  * \param threadID The ID to be assigned to the new thread. If
  *		  \code < 0 \endcode a fresh one is allocated.
  */
+
 thread_id
 spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 	void *arg, team_id team, thread_id threadID)
@@ -1195,7 +1201,7 @@ thread_init(kernel_args *args)
 	TRACE(("thread_init: entry\n"));
 
 	// create the thread hash table
-	sThreadHash = hash_init(15, (addr_t)&t->all_next - (addr_t)t,
+	sThreadHash = hash_init(15, offsetof(struct thread, all_next),
 		&thread_struct_compare, &thread_struct_hash);
 
 	// zero out the dead thread structure q
@@ -1212,7 +1218,7 @@ thread_init(kernel_args *args)
 		panic("arch_thread_init() failed!\n");
 
 	// skip all thread IDs including B_SYSTEM_TEAM, which is reserved
-	while (allocate_thread_id() < B_SYSTEM_TEAM);
+	sNextThreadID = B_SYSTEM_TEAM + 1;
 
 	// create an idle thread for each cpu
 
@@ -1222,7 +1228,7 @@ thread_init(kernel_args *args)
 
 		sprintf(temp, "idle thread %d", i);
 		t = create_thread_struct(temp,
-			(i == 0 ? team_get_kernel_team_id() : -1));
+			i == 0 ? team_get_kernel_team_id() : -1);
 		if (t == NULL) {
 			panic("error creating idle thread struct\n");
 			return ENOMEM;
@@ -1276,7 +1282,7 @@ thread_init(kernel_args *args)
 			sDeathStacks[i].in_use = false;
 		}
 	}
-	sDeathStackSem = create_sem(sNumDeathStacks, "death_stack_noavail_sem");
+	sDeathStackSem = create_sem(sNumDeathStacks, "death stack availability");
 
 	// set up some debugger commands
 	add_debugger_command("threads", &dump_thread_list, "list all threads");
