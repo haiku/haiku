@@ -48,7 +48,7 @@ shutdown_cache(BFile *file,int32 blockSize)
 static status_t
 readBlocks(BFile *file,uint32 num,uint32 size)
 {
-	for (int32 i = gBlocks.CountItems();i <= num;i++) {
+	for (uint32 i = gBlocks.CountItems(); i <= num; i++) {
 		void *buffer = malloc(size);
 		if (buffer == NULL)
 			return B_NO_MEMORY;

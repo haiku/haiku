@@ -88,38 +88,38 @@ bailOut()
 
 
 void
-bailOutWithKey(void *key,uint16 length)
+bailOutWithKey(void *key, uint16 length)
 {
-	dumpKey(key,length);
+	dumpKey(key, length);
 	putchar('\n');
 	bailOut();
 }
 
 
 void
-dumpKey(void *key,int32 length)
+dumpKey(void *key, int32 length)
 {
 	switch (gType) {
 		case S_STR_INDEX:
-			printf("\"%s\" (%ld bytes)",key,length);
+			printf("\"%s\" (%ld bytes)", (char *)key, length);
 			break;
 		case S_INT_INDEX:
-			printf("%ld",*(int32 *)key);
+			printf("%ld", *(int32 *)key);
 			break;
 		case S_UINT_INDEX:
-			printf("%lu",*(uint32 *)key);
+			printf("%lu", *(uint32 *)key);
 			break;
 		case S_LONG_LONG_INDEX:
-			printf("%Ld",*(int64 *)key);
+			printf("%Ld", *(int64 *)key);
 			break;
 		case S_ULONG_LONG_INDEX:
-			printf("%Lu",*(uint64 *)key);
+			printf("%Lu", *(uint64 *)key);
 			break;
 		case S_FLOAT_INDEX:
-			printf("%g",*(float *)key);
+			printf("%g", *(float *)key);
 			break;
 		case S_DOUBLE_INDEX:
-			printf("%g",*(double *)key);
+			printf("%g", *(double *)key);
 			break;
 	}
 	if ((gType == S_INT_INDEX || gType == S_UINT_INDEX || gType == S_FLOAT_INDEX)
@@ -243,11 +243,11 @@ fillBuffer(void *buffer,int32 start)
 
 
 bool
-findKey(void *key,int32 length,int32 maxIndex)
+findKey(void *key, int32 length, int32 maxIndex)
 {
 	for (int32 i = length;i < maxIndex;i += MAX_STRING - MIN_STRING) {
-		if (length == gKeys[i].length
-			&& !memcpy(key,gKeys[i].data,length))
+		if (length == (int32)gKeys[i].length
+			&& !memcpy(key, gKeys[i].data, length))
 			return true;
 	}
 	return false;
@@ -606,8 +606,8 @@ usage(char *program)
 		"\t-t\ttype is one of string, int32, uint32, int64, uint64, float,\n"
 		"\t\tor double; defaults to string.\n"
 		"\t-n\tkeys is the number of keys to be used,\n"
-		"\t\tminimum is 1, defaults to %ld.\n"
-		"\t-i\titerations is the number of the test cycles, defaults to %ld.\n"
+		"\t\tminimum is 1, defaults to %d.\n"
+		"\t-i\titerations is the number of the test cycles, defaults to %d.\n"
 		"\t-r\tthe seed for the random function, defaults to %ld.\n"
 		"\t-h\tremoves the keys and start over again for x times.\n"
 		"\t-e\texcessive validity tests: tree contents will be tested after every operation\n"
