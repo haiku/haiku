@@ -18,15 +18,6 @@
 #endif
 
 
-#define HEAP_SIZE 32768
-
-
-struct of_address {
-	void	*base;
-	int		size;
-};
-
-
 status_t
 platform_init_heap(stage2_args *args, void **_base, void **_top)
 {
@@ -37,15 +28,15 @@ platform_init_heap(stage2_args *args, void **_base, void **_top)
 		return B_ERROR;
 
 	printf("memory = %d\n", memory);
-	struct of_address available;
+	struct of_region available;
 	int memPackage = of_instance_to_package(memory);
 	printf("memPackage = %d\n", memPackage);
-	of_getprop(memPackage, "available", &available, sizeof(struct of_address));
-	printf("available: base = %p, size = %d\n", available.base, available.size);
+	of_getprop(memPackage, "available", &available, sizeof(struct of_region));
+	printf("available: base = %p, size = %ld\n", available.base, available.size);
 
-	*_base = of_claim(available.base, HEAP_SIZE);
+	*_base = of_claim(available.base, args->heap_size, 64);
 	printf("heap base = %p\n", *_base);
-	*_top = (void *)((int8 *)*_base + HEAP_SIZE);
+	*_top = (void *)((int8 *)*_base + args->heap_size);
 	printf("heap top = %p\n", *_top);
 
 	return B_OK;
@@ -53,9 +44,9 @@ platform_init_heap(stage2_args *args, void **_base, void **_top)
 
 
 void
-platform_release_heap(void *base)
+platform_release_heap(stage2_args *args, void *base)
 {
 	if (base != NULL)
-		of_release(base, HEAP_SIZE);
+		of_release(base, args->heap_size);
 }
 
