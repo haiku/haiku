@@ -29,6 +29,7 @@ class MenuItem {
 		~MenuItem();
 
 		void SetTarget(menu_item_hook target);
+		menu_item_hook Target() const { return fTarget; }
 
 		void SetMarked(bool marked);
 		bool IsMarked() const { return fIsMarked; }
