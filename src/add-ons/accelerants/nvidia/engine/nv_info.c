@@ -8,6 +8,13 @@
 
 #include "nv_std.h"
 
+/* pins V5.16 and up ROM infoblock stuff */
+typedef struct {
+	uint16	InitScriptTablePtr;	/* ptr to list of ptrs to scripts to exec */
+	uint16	ConditionTablePtr;	/* ptr to list of PCI regs and bits to tst for exec mode */
+	uint16	IOConditionTablePtr;/* ptr to list of ISA regs and bits to tst for exec mode */
+} PinsTables;
+
 static void detect_panels(void);
 static void setup_output_matrix(void);
 static void pinsnv4_fake(void);
@@ -21,9 +28,9 @@ static void getstrap_arch_nv10_20_30(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
 static status_t pins3_6_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
-static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab);
+static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
-static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
+static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
@@ -163,14 +170,26 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 	/* pins 5.16 and higher is more extensive, and works differently from before */
 	if (((rom[offset + 5]) >= 5) && ((rom[offset + 6]) >= 0x10))
 	{
+		uint32 fvco_min, fvco_max;
+
+		/* pins 5.16 and up have a more extensive command list table, and have more
+		 * commands to choose from as well. */
+		//fixme: how about pins 6???
+		PinsTables tabs;
+		tabs.InitScriptTablePtr = rom[offset + 75] + (rom[offset + 76] * 256);
+		tabs.ConditionTablePtr = rom[offset + 81] + (rom[offset + 82] * 256);
+		tabs.IOConditionTablePtr = rom[offset + 83] + (rom[offset + 84] * 256);
+
+		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
+
 		/* get PLL VCO range info */
-		uint32 fvco_max = *((uint32*)(&(rom[offset + 67])));
-		uint32 fvco_min = *((uint32*)(&(rom[offset + 71])));
+		fvco_max = *((uint32*)(&(rom[offset + 67])));
+		fvco_min = *((uint32*)(&(rom[offset + 71])));
 
 		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
 
 		/* modify presets to reflect card capability */
-		//fixme: setup and modify PLL code...
+		//fixme: enable and modify PLL code...
 		//si->ps.min_system_vco = fvco_min / 1000;
 		//si->ps.max_system_vco = fvco_max / 1000;
 		//si->ps.min_pixel_vco = fvco_min / 1000;
@@ -178,12 +197,7 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		//si->ps.min_video_vco = fvco_min / 1000;
 		//si->ps.max_video_vco = fvco_max / 1000;
 
-		/* pins 5.16 and up have a more extensive command list table, and have more
-		 * commands to choose from as well. */
-		//fixme: how about pins 6???
-		init1 = rom[offset + 75] + (rom[offset + 76] * 256);
-		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", init1));
-		return coldstart_card_516_up(rom, init1, ram_tab);
+		return coldstart_card_516_up(rom, tabs, ram_tab);
 	}
 	else
 	{
@@ -261,7 +275,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	return result;
 }
 
-static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
+static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab)
 {
 	status_t result = B_OK;
 	uint16 adress;
@@ -303,12 +317,13 @@ static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
 	}
 
 	/* execute all BIOS coldstart script(s) */
-	if (init)
+	if (tabs.InitScriptTablePtr)
 	{
-		//fixme: setup new parser instead of misusing the old one...
+		//fixme: size still needed?
 		int16 size = 32767;
-		
-		adress = *((uint16*)(&(rom[init])));
+		uint16 index = tabs.InitScriptTablePtr;
+	
+		adress = *((uint16*)(&(rom[index])));
 		if (!adress)
 		{
 			LOG(8,("INFO: no cmdlist found!\n"));
@@ -317,10 +332,10 @@ static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
 
 		while (adress && (result == B_OK))
 		{
-			result = exec_type2_script(rom, adress, &size, ram_tab);
+			result = exec_type2_script(rom, adress, &size, tabs, ram_tab);
 			/* next command script, please */
-			init += 2;
-			adress = *((uint16*)(&(rom[init])));
+			index += 2;
+			adress = *((uint16*)(&(rom[index])));
 		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
@@ -378,7 +393,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
 			data2 = *((uint16*)(&(rom[data])));
-			LOG(8,("cmd 'calculate indirect and set PLL 32bit REG $%08x for %.3fMHz'\n",
+			LOG(8,("cmd 'calculate indirect and set PLL 32bit reg $%08x for %.3fMHz'\n",
 				reg, ((float)data2)));
 			if (exec)
 			{
@@ -409,7 +424,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
 			data2 = *((uint32*)(&(rom[data])));
-			LOG(8,("cmd 'WR indirect 32bit REG' $%08x = $%08x\n", reg, data2));
+			LOG(8,("cmd 'WR indirect 32bit reg' $%08x = $%08x\n", reg, data2));
 			if (exec) NV_REG32(reg) = data2;
 			break;
 		case 0x63:
@@ -446,7 +461,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data2 = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG $%08x = $%08x, then = $%08x' (always done)\n",
+			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
 			/* (alternate NV-specific access to PCI config space registers:) */
@@ -475,7 +490,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit ISA I/O REG $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD 8bit ISA reg $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (exec)
 			{
@@ -503,7 +518,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			byte = *((uint8*)(&(rom[adress])));
 			adress += 1;
 			data &= (uint32)and_out;
-			LOG(8,("cmd 'CHK bits AND-out $%02x RAMCFG for $%02x, stop PGM on no match'\n",
+			LOG(8,("cmd 'CHK bits AND-out $%02x RAMCFG for $%02x'\n",
 				and_out, byte));
 			if (((uint8)data) != byte)
 			{
@@ -533,7 +548,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			or_in = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'RD 32bit REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
+			LOG(8,("cmd 'RD 32bit reg $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (exec)
 			{
@@ -586,7 +601,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			data2 = *((uint32*)(&(rom[adress])));
 			adress += 4;
 			data &= and_out;
-			LOG(8,("cmd 'CHK bits AND-out $%08x STRAPCFG2 for $%08x, stop PGM on no match'\n",
+			LOG(8,("cmd 'CHK bits AND-out $%08x STRAPCFG2 for $%08x'\n",
 				and_out, data2));
 			if (data != data2)
 			{
@@ -632,7 +647,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
-			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x (b31-16 = '0', b15-0 = data)\n",
+			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x (b31-16 = '0', b15-0 = data)\n",
 				reg, data));
 			if (exec) NV_REG32(reg) = data;
 			break;
@@ -656,7 +671,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit idx ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
 			if (exec)
 			{
@@ -685,7 +700,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
-			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %.3fMHz'\n", reg, (data / 100.0)));
+			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (exec)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
@@ -714,7 +729,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x\n", reg, data));
+			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
 			if (exec) NV_REG32(reg) = data;
 			break;
 		default:
@@ -850,12 +865,12 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 }
 
 /* this routine is used for NV10 and later */
-static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
+static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab)
 {
 	status_t result = B_OK;
 	bool end = false;
 	bool exec = true;
-	uint8 index, byte, safe;
+	uint8 index, byte, byte2, safe;
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
@@ -902,7 +917,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data2 = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG $%08x = $%08x, then = $%08x' (always done)\n",
+			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
 			/* (alternate NV-specific access to PCI config space registers:) */
@@ -931,7 +946,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit ISA I/O REG $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD 8bit ISA reg $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (exec)
 			{
@@ -959,7 +974,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			or_in = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'RD 32bit REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
+			LOG(8,("cmd 'RD 32bit reg $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (exec)
 			{
@@ -1018,6 +1033,72 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			/* always done */
 			snooze(data);
 			break;
+		case 0x75: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			data *= 12;
+			data += tabs.ConditionTablePtr;
+			reg = *((uint32*)(&(rom[data])));
+			and_out = *((uint32*)(&(rom[(data + 4)])));
+			data2 = *((uint32*)(&(rom[(data + 8)])));
+			data = NV_REG32(reg);
+			data &= and_out;
+			LOG(8,("cmd 'CHK bits AND-out $%08x reg %$08x for $%08x'\n",
+				and_out, reg, data2));
+			if (data != data2)
+			{
+				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
+				exec = false;
+			}
+			else
+			{
+				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
+			}
+			break;
+		case 0x76: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			data *= 5;
+			data += tabs.IOConditionTablePtr;
+			reg = *((uint16*)(&(rom[data])));
+			index = *((uint8*)(&(rom[(data + 2)])));
+			and_out = *((uint8*)(&(rom[(data + 3)])));
+			byte2 = *((uint8*)(&(rom[(data + 4)])));
+			safe = ISARB(reg);
+			ISAWB(reg, index);
+			byte = ISARB(reg + 1);
+			ISAWB(reg, safe);
+			byte &= (uint8)and_out;
+			LOG(8,("cmd 'CHK bits AND-out $%02x idx ISA reg $%02x via $%04x for $%02x'\n",
+				and_out, index, reg, byte2));
+			if (byte != byte2)
+			{
+				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
+				exec = false;
+			}
+			else
+			{
+				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
+			}
+			break;
 		case 0x78: /* identical to type1 */
 			*size -= 6;
 			if (*size < 0)
@@ -1038,7 +1119,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 1;
 			or_in = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 8bit idx ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
 			if (exec)
 			{
@@ -1068,7 +1149,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
-			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %.3fMHz'\n", reg, (data / 100.0)));
+			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (exec)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
@@ -1101,7 +1182,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 4;
 			data = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x\n", reg, data));
+			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
 			if (exec) NV_REG32(reg) = data;
 			break;
 		default:
