@@ -13,6 +13,12 @@
 #include "SoundPlayNode.h"
 #include "SoundPlayer.h"
 
+// Flags used internally in BSoundPlayer
+enum {
+	F_HAS_DATA			(1 << 0),
+	F_NODES_CONNECTED	(1 << 1),
+};
+
 /*************************************************************
  * public sound_error
  *************************************************************/
@@ -42,8 +48,13 @@ BSoundPlayer::BSoundPlayer(const char * name,
 						   void * cookie)
 {
 	CALLED();
-
-	Init(NULL,&media_multi_audio_format::wildcard,name,NULL,PlayBuffer,Notifier,cookie);
+	media_multi_audio_format fmt = media_multi_audio_format::wildcard;
+	fmt.frame_rate = 44100.0f;
+//	fmt.channel_count = 2;
+	fmt.format = media_raw_audio_format::B_AUDIO_FLOAT;
+	fmt.byte_order = B_MEDIA_HOST_ENDIAN;
+	//fmt.buffer_size = 4096;
+	Init(NULL, &fmt, name, NULL, PlayBuffer, Notifier, cookie);
 }
 
 BSoundPlayer::BSoundPlayer(const media_raw_audio_format * format, 
@@ -54,8 +65,8 @@ BSoundPlayer::BSoundPlayer(const media_raw_audio_format * format,
 {
 	CALLED();
 	media_multi_audio_format fmt = media_multi_audio_format::wildcard;
-	memcpy(&fmt,format,sizeof(*format));
-	Init(NULL,&fmt,name,NULL,PlayBuffer,Notifier,cookie);
+	fmt = *format;
+	Init(NULL, &fmt, name, NULL, PlayBuffer, Notifier, cookie);
 }
 
 BSoundPlayer::BSoundPlayer(const media_node & toNode,
@@ -69,14 +80,19 @@ BSoundPlayer::BSoundPlayer(const media_node & toNode,
 	CALLED();
 	if (toNode.kind & B_BUFFER_CONSUMER == 0)
 		debugger("BSoundPlayer: toNode must have B_BUFFER_CONSUMER kind!\n");
-	Init(&toNode,format,name,input,PlayBuffer,Notifier,cookie);
+	Init(&toNode, format, name, input, PlayBuffer, Notifier, cookie);
 }
 
 /* virtual */
 BSoundPlayer::~BSoundPlayer()
 {
 	CALLED();
-	if (_m_node) {
+	
+	F_NODES_CONNECTED
+	
+	
+	
+	if (fPlayerNode) {
 		BMediaRoster *roster = BMediaRoster::Roster();
 		if (!roster) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Couldn't get BMediaRoster\n");
@@ -89,25 +105,28 @@ BSoundPlayer::~BSoundPlayer()
 			// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
 			Stop(true, false);
 			
-			err = roster->Disconnect(m_input.node.node, m_input.source, 
-				m_output.node.node, m_output.destination);
+			err = roster->Disconnect(fMediaInput.node.node, fMediaInput.source, 
+				fMediaOutput.node.node, fMediaOutput.destination);
 			if (err) {
 				fprintf(stderr, "* Error disconnecting nodes:  %ld (%s)\n", err, strerror(err));
 			}
+			fVolumeSlider = NULL;
 			
-			err = roster->ReleaseNode(m_input.node);
+			err = roster->ReleaseNode(fMediaInput.node);
 			if (err) {
 				fprintf(stderr, "* Error releasing input node:  %ld (%s)\n", err, strerror(err));
 			}
 			
-			err = roster->ReleaseNode(m_output.node);
+			err = roster->ReleaseNode(fMediaOutput.node);
 			if (err) {
 				fprintf(stderr, "* Error releasing output node:  %ld (%s)\n", err, strerror(err));
 			}
-			_m_node = NULL;
+			fPlayerNode = NULL;
 		}
 	}
 	delete [] _m_buf;
+	
+	delete fParameterWeb;
 }
 
 
@@ -115,7 +134,7 @@ status_t
 BSoundPlayer::InitCheck()
 {
 	CALLED();
-	return _m_init_err;
+	return fInitStatus;
 }
 
 
@@ -126,9 +145,9 @@ BSoundPlayer::Format() const
 
 	media_raw_audio_format temp = media_raw_audio_format::wildcard;
 	
-	if (_m_node) {
+	if (fPlayerNode) {
 		media_multi_audio_format fmt;
-		fmt = _m_node->Format();
+		fmt = fPlayerNode->Format();
 		memcpy(&temp,&fmt,sizeof(temp));
 	}
 
@@ -141,7 +160,7 @@ BSoundPlayer::Start()
 {
 	CALLED();
 	
-	if (!_m_node)
+	if (!fPlayerNode)
 		return B_ERROR;
 
 	BMediaRoster *roster = BMediaRoster::Roster();
@@ -153,9 +172,9 @@ BSoundPlayer::Start()
 	// make sure we give the producer enough time to run buffers through
 	// the node chain, otherwise it'll start up already late
 	bigtime_t latency = 0;
-	status_t err = roster->GetLatencyFor(_m_node->Node(), &latency);
+	status_t err = roster->GetLatencyFor(fPlayerNode->Node(), &latency);
 
-	err = roster->StartNode(_m_node->Node(), _m_node->TimeSource()->Now() + latency + 5000);
+	err = roster->StartNode(fPlayerNode->Node(), fPlayerNode->TimeSource()->Now() + latency + 5000);
 	
 	return err;
 }
@@ -167,7 +186,7 @@ BSoundPlayer::Stop(bool block,
 {
 	CALLED();
 
-	if (!_m_node)
+	if (!fPlayerNode)
 		return;
 	
 	// XXX flush is ignored
@@ -180,18 +199,18 @@ BSoundPlayer::Stop(bool block,
 		return;
 	}
 	
-	roster->StopNode(_m_node->Node(), 0, true);
+	roster->StopNode(fPlayerNode->Node(), 0, true);
 	
 	if (block) {
 		// wait until the node is stopped
 		int maxtrys;
-		for (maxtrys = 250; _m_node->IsPlaying() && maxtrys != 0; maxtrys--)
+		for (maxtrys = 250; fPlayerNode->IsPlaying() && maxtrys != 0; maxtrys--)
 			snooze(2000);
 		
 		DEBUG_ONLY(if (maxtrys == 0) printf("BSoundPlayer::Stop: waiting for node stop failed\n"));
 		
 		// wait until all buffers on the way to the physical output have been played		
-		snooze(_m_node->Latency() + 2000);
+		snooze(fPlayerNode->Latency() + 2000);
 	}
 }
 
@@ -199,46 +218,46 @@ BSoundPlayer::BufferPlayerFunc
 BSoundPlayer::BufferPlayer() const
 {
 	CALLED();
-	return _PlayBuffer;
+	return fPlayBufferFunc;
 }
 
 void BSoundPlayer::SetBufferPlayer(void (*PlayBuffer)(void *, void * buffer, size_t size, const media_raw_audio_format & format))
 {
 	CALLED();
-	_m_lock.Lock();
-	_PlayBuffer = PlayBuffer;
-	_m_lock.Unlock();
+	fLocker.Lock();
+	fPlayBufferFunc = PlayBuffer;
+	fLocker.Unlock();
 }
 
 BSoundPlayer::EventNotifierFunc
 BSoundPlayer::EventNotifier() const
 {
 	CALLED();
-	return _Notifier;
+	return fNotifierFunc;
 }
 
 void BSoundPlayer::SetNotifier(void (*Notifier)(void *, sound_player_notification what, ...))
 {
 	CALLED();
-	_m_lock.Lock();
-	_Notifier = Notifier;
-	_m_lock.Unlock();
+	fLocker.Lock();
+	fNotifierFunc = Notifier;
+	fLocker.Unlock();
 }
 
 void *
 BSoundPlayer::Cookie() const
 {
 	CALLED();
-	return _m_cookie;
+	return fCookie;
 }
 
 void
 BSoundPlayer::SetCookie(void *cookie)
 {
 	CALLED();
-	_m_lock.Lock();
-	_m_cookie = cookie;
-	_m_lock.Unlock();
+	fLocker.Lock();
+	fCookie = cookie;
+	fLocker.Unlock();
 }
 
 void BSoundPlayer::SetCallbacks(void (*PlayBuffer)(void *, void * buffer, size_t size, const media_raw_audio_format & format),
@@ -246,11 +265,11 @@ void BSoundPlayer::SetCallbacks(void (*PlayBuffer)(void *, void * buffer, size_t
 								void * cookie)
 {
 	CALLED();
-	_m_lock.Lock();
+	fLocker.Lock();
 	SetBufferPlayer(PlayBuffer);
 	SetNotifier(Notifier);
 	SetCookie(cookie);
-	_m_lock.Unlock();
+	fLocker.Unlock();
 }
 
 
@@ -258,10 +277,10 @@ bigtime_t
 BSoundPlayer::CurrentTime()
 {
 	CALLED();
-	if (!_m_node)
-		return system_time();
+	if (!fPlayerNode)
+		return system_time();  // XXX wrong
 
-	return _m_node->TimeSource()->Now();
+	return fPlayerNode->TimeSource()->Now(); // XXX wrong
 }
 
 
@@ -269,10 +288,10 @@ bigtime_t
 BSoundPlayer::PerformanceTime()
 {
 	CALLED();
-	if (!_m_node)
+	if (!fPlayerNode)
 		return (bigtime_t) B_ERROR;
 
-	return _m_node->TimeSource()->Now();
+	return fPlayerNode->TimeSource()->Now();
 }
 
 
@@ -287,9 +306,9 @@ BSoundPlayer::Preroll()
 		return B_ERROR;
 	}
 	
-	status_t err = roster->PrerollNode(m_output.node);
+	status_t err = roster->PrerollNode(fMediaOutput.node);
 	
-	if(err != B_OK) {
+	if (err != B_OK) {
 		fprintf(stderr, "Error while PrerollNode:  %ld (%s)\n", err, strerror(err));
 	}
 	
@@ -358,7 +377,7 @@ BSoundPlayer::Volume()
 {
 	CALLED();
 	
-	return pow(10.0, VolumeDB(true)/20.0);
+	return pow(10.0, VolumeDB(true) / 20.0);
 }
 
 
@@ -374,21 +393,18 @@ float
 BSoundPlayer::VolumeDB(bool forcePoll)
 {
 	CALLED();
-	if(_m_volumeSlider==NULL)
-		get_volume_slider();
-	if(_m_volumeSlider==NULL)
-		return 0.0;
+	if (!fVolumeSlider)
+		return 0.0f;
 		
-	if(!forcePoll && (system_time() - _m_gotVolume < 500000))
-		return _m_volume;
+	if (!forcePoll && (system_time() - fLastVolumeUpdate < 500000))
+		return fVolume;
 	
-	bigtime_t lastChange;
-	int32 count = _m_volumeSlider->CountChannels(); 
+	int32 count = fVolumeSlider->CountChannels(); 
 	float values[count];
 	size_t size = count * sizeof(float);
-	_m_volumeSlider->GetValue(&values, &size, &lastChange);
-	_m_gotVolume = system_time();
-	_m_volume = values[0];
+	fVolumeSlider->GetValue(&values, &size, NULL);
+	fLastVolumeUpdate = system_time();
+	fVolume = values[0];
 		
 	return values[0];
 }
@@ -398,47 +414,45 @@ void
 BSoundPlayer::SetVolumeDB(float volume_dB)
 {
 	CALLED();
-	if(_m_volumeSlider==NULL)
-		get_volume_slider();
-	if(_m_volumeSlider==NULL)
+	if (!fVolumeSlider)
 		return;
+	
+	float min_dB = fVolumeSlider->MinValue();
+	float max_dB = fVolumeSlider->MinValue();
+	if (volume_dB < min_dB)
+		volume_dB = min_dB;
+	if (volume_dB > max_dB)
+		volume_dB = max_dB;
 		
-	if(volume_dB < _m_volumeSlider->MinValue())
-		volume_dB = _m_volumeSlider->MinValue();
-	if(volume_dB > _m_volumeSlider->MaxValue())
-		volume_dB = _m_volumeSlider->MaxValue();
-		
-	int32 count = _m_volumeSlider->CountChannels(); 
+	int count = fVolumeSlider->CountChannels(); 
 	float values[count];
-	for(int32 i=0; i<count; i++)
+	for (int i = 0; i < count; i++)
 		values[i] = volume_dB;
-	_m_volumeSlider->SetValue(values, sizeof(float) * count, 0);
-	_m_volume = volume_dB;
-	_m_gotVolume = system_time();
+	fVolumeSlider->SetValue(values, sizeof(float) * count, 0);
+
+	fVolume = volume_dB;
+	fLastVolumeUpdate = system_time();
 }
 
 
 status_t
 BSoundPlayer::GetVolumeInfo(media_node *out_node,
-							int32 *out_parameter,
+							int32 *out_parameter_id,
 							float *out_min_dB,
 							float *out_max_dB)
 {
 	CALLED();
-	if(_m_volumeSlider==NULL)
-		get_volume_slider();
-	if(_m_volumeSlider==NULL
-		|| out_node == NULL
-		|| out_parameter == NULL
-		|| out_min_dB == NULL
-		|| out_max_dB == NULL)
-		return B_ERROR;
-	
-	*out_node = m_input.node;
-	*out_parameter = _m_volumeSlider->ID(); /* is the parameter ID for the volume control */
-	*out_min_dB = _m_volumeSlider->MinValue();
-	*out_max_dB = _m_volumeSlider->MaxValue();
-
+	if (!fVolumeSlider)
+		return B_NO_INIT;
+		
+	if (out_node)
+		*out_node = fMediaInput.node;
+	if (out_parameter_id)
+		*out_parameter_id = fVolumeSlider->ID();
+	if (out_min_dB)
+		*out_min_dB = fVolumeSlider->MinValue();
+	if (out_max_dB)
+		*out_max_dB = fVolumeSlider->MaxValue();
 	return B_OK;
 }
 
@@ -447,20 +461,22 @@ bigtime_t
 BSoundPlayer::Latency()
 {
 	CALLED();
-		
+	if (fInitStatus != B_OK)
+		return B_NO_INIT; 
+
 	BMediaRoster *roster = BMediaRoster::Roster();
 	if (!roster) {
 		TRACE("BSoundPlayer::Latency: Couldn't get BMediaRoster\n");
 		return 0;
 	}
 	
-	bigtime_t latency = 0;
-	status_t err = roster->GetLatencyFor(m_output.node, &latency);
-	
-	if(err != B_OK) {
-		fprintf(stderr, "Error while GetLatencyFor:  %ld (%s)\n", err, strerror(err));
+	bigtime_t latency;
+	status_t err = roster->GetLatencyFor(fMediaOutput.node, &latency);
+	if (err != B_OK) {
+		TRACE("BSoundPlayer::Latency: GetLatencyFor failed %ld (%s)\n", err, strerror(err));
+		return 0;
 	}
-	
+
 	return latency;
 }
 
@@ -469,8 +485,7 @@ BSoundPlayer::Latency()
 BSoundPlayer::HasData()
 {
 	CALLED();
-
-	return _m_has_data != 0;
+	return (atomic_read(&fFlags) & F_HAS_DATA) != 0;
 }
 
 
@@ -478,9 +493,10 @@ void
 BSoundPlayer::SetHasData(bool has_data)
 {
 	CALLED();
-	_m_lock.Lock();
-	_m_has_data = has_data ? 1 : 0;
-	_m_lock.Unlock();
+	if (has_data)
+		atomic_or(&fFlags, F_HAS_DATA);
+	else
+		atomic_and(&fFlags, ~F_HAS_DATA);
 }
 
 
@@ -493,7 +509,7 @@ void
 BSoundPlayer::SetInitError(status_t in_error)
 {
 	CALLED();
-	_m_init_err = in_error;
+	fInitStatus = in_error;
 }
 
 
@@ -523,20 +539,26 @@ void
 BSoundPlayer::get_volume_slider()
 {
 	CALLED();
+
+	ASSERT(fVolumeSlider == NULL);
 	
 	BMediaRoster *roster = BMediaRoster::CurrentRoster();
-	if(roster==NULL)
+	if (!roster)
 		return;
-	BParameterWeb *web = NULL;
-	if(roster->GetParameterWebFor(m_input.node, &web) < B_OK)
+		
+	if (!fParameterWeb && roster->GetParameterWebFor(fMediaInput.node, &fParameterWeb) < B_OK)
 		return;
-	for(int32 i=0; i<web->CountParameters(); i++) {
+
+	int count = fParameterWeb->CountParameters();
+	for (int i = 0; i < count; i++) {
 		BParameter *parameter = web->ParameterAt(i);
-		if(parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER
-			|| strcmp(parameter->Kind(), B_GAIN) != 0
-			|| (parameter->ID() >> 16) != m_input.destination.id)
+		if (parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER)
 			continue;
-		_m_volumeSlider = (BContinuousParameter*)parameter;
+		if (parameter->ID() >> 16) != fMediaInput.destination.id)
+			continue;
+		if  (strcmp(parameter->Kind(), B_GAIN) != 0)
+			continue;
+		fVolumeSlider = (BContinuousParameter *)parameter;
 		break;	
 	}
 }
@@ -552,27 +574,28 @@ BSoundPlayer::Init(
 					void * cookie)
 {
 	CALLED();
-	_m_node = NULL;
+	fPlayerNode = NULL;
 	_m_sounds = NULL;
 	_m_waiting = NULL;
-	_PlayBuffer = PlayBuffer;
-	_Notifier = Notifier;
-	_m_volume = 0.0f;
+	fPlayBufferFunc = PlayBuffer;
+	fNotifierFunc = Notifier;
+	fVolume = 0.0f;
 	_m_mix_buffer = 0;
 	_m_mix_buffer_size = 0;
-	_m_cookie = cookie;
+	fCookie = cookie;
 	_m_buf = NULL;
 	_m_bufsize = 0;
-	_m_has_data = 0;
-	_m_init_err = B_ERROR;
+	fFlags = 0;
+	fInitStatus = B_ERROR;
 	_m_perfTime = 0;
-	_m_volumeSlider = NULL;
-	_m_gotVolume = 0;
+	fVolumeSlider = NULL;
+	fParameterWeb = NULL;
+	fLastVolumeUpdate = 0;
 
-	_m_node = 0;
+	fPlayerNode = 0;
 
 	status_t err; 
-	media_node outputNode;
+	media_node mixerNode;
 	media_output _output;
 	media_input _input;
 	int32 inputCount, outputCount;
@@ -585,16 +608,16 @@ BSoundPlayer::Init(
 		TRACE("BSoundPlayer::Init: Couldn't get BMediaRoster\n");
 		return;
 	}
-	
+
 	//connect our producer node either to the 
 	//system mixer or to the supplied out node
 	if (!node) {
-		err = roster->GetAudioMixer(&outputNode);
+		err = roster->GetAudioMixer(&mixerNode);
 		if (err != B_OK) {
 			TRACE("BSoundPlayer::Init: Couldn't GetAudioMixer\n");
 			goto the_end;
 		}
-		node = &outputNode;
+		node = &mixerNode;
 	}
 	
 	memcpy(&fmt,format,sizeof(fmt));
@@ -617,10 +640,10 @@ BSoundPlayer::Init(
 
 	_m_bufsize = fmt.buffer_size;
 	_m_buf = new char[_m_bufsize];
-	_m_node = new _SoundPlayNode(name,&fmt,this);
+	fPlayerNode = new _SoundPlayNode(name,&fmt,this);
 	
-	err = roster->RegisterNode(_m_node);
-	if(err != B_OK) {
+	err = roster->RegisterNode(fPlayerNode);
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't RegisterNode\n");
 		goto the_end;
 	}
@@ -629,35 +652,35 @@ BSoundPlayer::Init(
 	// the Mixer uses too.
 	
 	err = roster->GetTimeSource(&timeSource);
-	if(err != B_OK) {
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't GetTimeSource\n");
 		goto the_end;
 	}
-	err = roster->SetTimeSourceFor(_m_node->Node().node, timeSource.node);
-	if(err != B_OK) {
+	err = roster->SetTimeSourceFor(fPlayerNode->Node().node, timeSource.node);
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't SetTimeSourceFor\n");
 		goto the_end;
 	}
 	
-	if(!input) {
+	if (!input) {
 		err = roster->GetFreeInputsFor(*node, &_input, 1, 
 			&inputCount, B_MEDIA_RAW_AUDIO);
-		if(err != B_OK) {
+		if (err != B_OK) {
 			TRACE("BSoundPlayer::Init: Couldn't GetFreeInputsFor\n");
 			goto the_end;
 		}
 	} else {
 		_input = *input;
 	}
-	err = roster->GetFreeOutputsFor(_m_node->Node(), &_output, 1, &outputCount, B_MEDIA_RAW_AUDIO);
-	if(err != B_OK) {
+	err = roster->GetFreeOutputsFor(fPlayerNode->Node(), &_output, 1, &outputCount, B_MEDIA_RAW_AUDIO);
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't GetFreeOutputsFor\n");
 		goto the_end;
 	}
 
 	// Set an appropriate run mode for the producer
-	err = roster->SetRunModeNode(_m_node->Node(), BMediaNode::B_INCREASE_LATENCY);
-	if(err != B_OK) {
+	err = roster->SetRunModeNode(fPlayerNode->Node(), BMediaNode::B_INCREASE_LATENCY);
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't SetRunModeNode\n");
 		goto the_end;
 	}
@@ -665,31 +688,33 @@ BSoundPlayer::Init(
 	//tryFormat.type = B_MEDIA_RAW_AUDIO;
 	//tryformat.fileAudioOutput.format;
 	tryFormat = _output.format;
-	err = roster->Connect(_output.source, _input.destination, &tryFormat, &m_output, &m_input);
-	if(err != B_OK) {
+	err = roster->Connect(_output.source, _input.destination, &tryFormat, &fMediaOutput, &fMediaInput);
+	if (err != B_OK) {
 		TRACE("BSoundPlayer::Init: Couldn't Connect\n");
 		goto the_end;
 	}
 	
+	get_volume_slider();
 	
-	printf("BSoundPlayer node %ld has timesource %ld\n", _m_node->Node().node, _m_node->TimeSource()->Node().node);
+	
+	printf("BSoundPlayer node %ld has timesource %ld\n", fPlayerNode->Node().node, fPlayerNode->TimeSource()->Node().node);
 	
 the_end:
 	TRACE("BSoundPlayer::Init: %s\n", strerror(err));
 	SetInitError(err);
 }
 
+
 /* virtual */ void
 BSoundPlayer::Notify(sound_player_notification what,
 					 ...)
 {
 	CALLED();
-	_m_lock.Lock();
-	if (_Notifier)
-		(*_Notifier)(_m_cookie,what);
-	else {
+	if (fLocker.Lock()) {
+		if (fNotifierFunc)
+			(*fNotifierFunc)(fCookie, what);
+		fLocker.Unlock();
 	}
-	_m_lock.Unlock();
 }
 
 
@@ -698,14 +723,9 @@ BSoundPlayer::PlayBuffer(void *buffer,
 						 size_t size,
 						 const media_raw_audio_format &format)
 {
-//	CALLED();
-
-	_m_lock.Lock();
-	if (_PlayBuffer)
-		(*_PlayBuffer)(_m_cookie,buffer,size,format);
-	else {
+	if (fLocker.Lock()) {
+		if (fPlayBufferFunc)
+			(*fPlayBufferFunc)(fCookie, buffer, size, format);
+		fLocker.Unlock();
 	}
-	_m_lock.Unlock();
 }
-
-

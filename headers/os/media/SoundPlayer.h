@@ -104,7 +104,7 @@ virtual	~BSoundPlayer();
 						float volume_dB);
 		status_t	GetVolumeInfo(
 						media_node * out_node,
-						int32 * out_parameter,
+						int32 * out_parameter_id,
 						float * out_min_dB,
 						float * out_max_dB);
 		bigtime_t	Latency();
@@ -129,7 +129,7 @@ virtual	status_t _Reserved_SoundPlayer_5(void *, ...);
 virtual	status_t _Reserved_SoundPlayer_6(void *, ...);
 virtual	status_t _Reserved_SoundPlayer_7(void *, ...);
  
-		_SoundPlayNode * _m_node;
+		_SoundPlayNode * fPlayerNode;
 		struct _playing_sound {
 			_playing_sound * next;
 			off_t cur_offset;
@@ -149,24 +149,25 @@ virtual	status_t _Reserved_SoundPlayer_7(void *, ...);
 			float volume;
 		};
 		_waiting_sound * _m_waiting;
-		void (*_PlayBuffer)(void * cookie, void * buffer, size_t size, const media_raw_audio_format & format);
-		void (*_Notifier)(void * cookie, sound_player_notification what, ...);
-		BLocker _m_lock;
-		float _m_volume;
-		media_input m_input;
-		media_output m_output;
+		void (*fPlayBufferFunc)(void * cookie, void * buffer, size_t size, const media_raw_audio_format & format);
+		void (*fNotifierFunc)(void * cookie, sound_player_notification what, ...);
+		BLocker fLocker;
+		float fVolume;
+		media_input fMediaInput;
+		media_output fMediaOutput;
 		float * _m_mix_buffer;
 		size_t _m_mix_buffer_size;
-		void * _m_cookie;
+		void * fCookie;
 		void * _m_buf;
 		size_t _m_bufsize;
-		int32 _m_has_data;
+		int32 fFlags;
 
-		status_t _m_init_err;		//	new in R4.1
+		status_t fInitStatus;		//	new in R4.1
 		bigtime_t _m_perfTime;
-		BContinuousParameter * _m_volumeSlider;
-		bigtime_t _m_gotVolume;
-		uint32 _m_reserved[10];
+		BContinuousParameter * fVolumeSlider;
+		bigtime_t fLastVolumeUpdate;
+		BParameterWeb *fParameterWeb;
+		uint32 _m_reserved[9];
 
 		void NotifySoundDone(
 				play_id sound,

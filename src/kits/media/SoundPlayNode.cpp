@@ -744,10 +744,11 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 		return NULL;
 	}
 	
-	memset(buf->Data(), 0, mOutput.format.u.raw_audio.buffer_size);
 	if (mPlayer->HasData()) {
 		mPlayer->PlayBuffer(buf->Data(), 
 			mOutput.format.u.raw_audio.buffer_size, mOutput.format.u.raw_audio);
+	} else {
+		memset(buf->Data(), 0, mOutput.format.u.raw_audio.buffer_size);
 	}
 	
 	// fill in the buffer header
