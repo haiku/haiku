@@ -222,7 +222,7 @@ status_t create_link(const char *path, const char *linkToPath,
 /*! If path refers to a symlink, the pathname of the target to which path
 	is linked is copied into result and NULL terminated, if the buffer is
 	long enough, the path is being truncated at size chars if necessary
-	(a buffer of size B_PATH_NAME_LENGTH+1 is a good idea), and the number of
+	(a buffer of size B_PATH_NAME_LENGTH is a good idea), and the number of
 	chars in the target pathname is returned. If size is less than 1 or result
 	is NULL, B_BAD_VALUE will be returned and result will remain unmodified.
 	For any other error, result is set to an empty string and an error code
@@ -261,7 +261,7 @@ status_t close_query(FileDescriptor dir);
 //------------------------------------------------------------------------------
 /*! Converts the given entry_ref into an absolute pathname, returning
 	the result in the string of length size pointed to by result (a size
-	of B_PATH_NAME_LENGTH+1 is a good idea).
+	of B_PATH_NAME_LENGTH is a good idea).
 	
 	Returns B_OK if successful.
 	
@@ -288,7 +288,7 @@ status_t dir_to_self_entry_ref(FileDescriptor dir, entry_ref *result);
 
 /*! Converts the given directory into an absolute pathname, returning the
 	result in the string of length size pointed to by result (a size of
-	B_PATH_NAME_LENGTH+1 is a good idea).
+	B_PATH_NAME_LENGTH is a good idea).
 	
 	Returns B_OK if successful.
 	
