@@ -2,6 +2,8 @@ SubDir OBOS_TOP src add-ons print drivers pdf source ;
 
 UsePrivateHeaders interface print ;
 
+SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdflib ] ;
+
 AddResources PDF\ Writer : 
 	PDFWriter.rdef
 ;
@@ -46,7 +48,7 @@ LinkSharedOSLibs PDF\ Writer :
 	be 
 	textencoding 
 	translation
-	/boot/develop/lib/x86/libpdf.a 
+	libpdf.a 
 	libprint.a 
 ;
 
