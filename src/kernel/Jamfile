@@ -183,7 +183,6 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcasecmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcasestr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
@@ -194,10 +193,7 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcat.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strncat.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strncpy.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strnicmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strpbrk.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
