@@ -87,7 +87,7 @@ CacheItem* Cache::Find(CIDescription* desc) {
 	// item not in cache, create one
 	item = desc->NewItem(id);
 	if (item != NULL) {
-		ASSERT(dynamic_cast<CacheItemReference*>(item) == NULL);
+		ASSERT(dynamic_cast<CIReference*>(item) == NULL);
 		fCache.AddItem(item);
 	}
 	return item;
