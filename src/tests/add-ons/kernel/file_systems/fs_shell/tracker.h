@@ -1,0 +1,25 @@
+#ifndef TRACKER_H
+#define TRACKER_H
+
+#include <SupportDefs.h>
+#include <AppDefs.h>
+#include <sys/types.h>
+
+
+#define FSH_KILL_TRACKER	'kill'
+#define FSH_NOTIFY_LISTENER	'notl'
+
+typedef struct update_message {
+	int32	op;
+	dev_t	device;
+	dev_t	toDevice;
+	ino_t	parentNode;
+	ino_t	targetNode;
+	ino_t	node;
+	char	name[B_FILE_NAME_LENGTH];
+} update_message;
+
+
+extern port_id gTrackerPort;
+
+#endif	/* TRACKER_H */

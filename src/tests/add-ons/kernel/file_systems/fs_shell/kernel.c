@@ -20,6 +20,7 @@
 #include "lock.h"
 #include "fsproto.h"
 #include "kprotos.h"
+#include "tracker.h"
 
 #include <sys/stat.h>
 
@@ -1055,6 +1056,74 @@ errorA:
     if (err > 0)        /* XXXdbg -- a hack for linux */
         err = -err;
 
+    return err;
+}
+
+
+int
+sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *name,
+	int openMode, bool coe)
+{
+    int             err;
+    vnode           *vn;
+    vnode_id        vnid;
+    void            *cookie;
+    ofile           *f;
+    int             nfd;
+    fdarray         *fds;
+    op_create       *opc;
+    op_open         *opo;
+    op_free_cookie  *opf;
+
+	err = get_file_vn(device, parent, name, TRUE, &vn);
+	if (err)
+		return err;
+
+	opo = vn->ns->fs->ops.open;
+	if (!opo) {
+		err = EINVAL;
+		goto error1;
+	}
+	err = (*opo)(vn->ns->data, vn->data, openMode, &cookie);
+	if (err)
+		goto error1;
+
+	/*
+	 *	find a file descriptor
+	 */
+
+	f = (ofile *)calloc(sizeof(ofile), 1);
+    if (!f) {
+		err = ENOMEM;
+		goto error2;
+	}
+
+	f->type = FD_FILE;
+	f->vn = vn;
+	f->cookie = cookie;
+	f->ocnt = 0;
+	f->rcnt = 0;
+	f->pos = 0;
+	f->omode = openMode;
+
+	nfd = new_fd(kernel, -1, f, -1, coe);
+	if (nfd < 0) {
+		err = EMFILE;
+		goto error3;
+	}
+
+	return nfd;
+
+error3:
+    free(f);
+error2:
+    (*vn->ns->fs->ops.close)(vn->ns->data, vn->data, cookie);
+    opf = vn->ns->fs->ops.free_cookie;
+    if (opf)
+        (*opf)(vn->ns->data, vn->data, cookie);
+
+error1:
+    dec_vnode(vn, FALSE);
     return err;
 }
 
@@ -3205,7 +3274,8 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 	}
 	printf("notify_listener: %s\n", text);
 #endif
-	return 0;
+
+	return send_notification(0, 0, FSH_NOTIFY_LISTENER, op, nsid, -1, vnida, vnidb, vnidc, name);
 }
 
 
@@ -3214,11 +3284,27 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
 		const char *name)
 {
+	update_message message;
+
 #ifdef DEBUG
 	printf("send_notification... op = %s, name = %s, port = %ld, token = %ld\n",
 		op == B_ENTRY_CREATED ? "B_ENTRY_CREATED" : "B_ENTRY_REMOVED", name, port, token);
 #endif
-	return 0;
+
+	message.op = op;
+	message.device = nsida;
+	message.toDevice = nsidb;
+	message.parentNode = vnida;
+	message.targetNode = vnidb;
+	message.node = vnidc;
+	
+	if (name != NULL) {
+		strcpy(message.name, name);
+			// name is 256 character at maximum
+	} else
+		message.name[0] = '\0';
+
+	return write_port(gTrackerPort, what, &message, sizeof(message));
 }
 
 

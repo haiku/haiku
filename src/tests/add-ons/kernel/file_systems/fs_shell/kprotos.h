@@ -2,17 +2,18 @@
 #define my_dirent dirent
 
 int sys_symlink(bool kernel, const char *oldpath, int nfd,
-                const char *newpath);
+			const char *newpath);
 ssize_t sys_readlink(bool kernel, int fd, const char *path, char *buf,
-                     size_t bufsize);
+			size_t bufsize);
 int sys_mkdir(bool kernel, int fd, const char *path, int perms);
 int sys_open(bool kernel, int fd, const char *path, int omode,
-                int perms, bool coe);
+			int perms, bool coe);
+int sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent,
+			const char *name, int openMode, bool coe);
 int sys_close(bool kernel, int fd);
 fs_off_t sys_lseek(bool kernel, int fd, fs_off_t pos, int whence);
 ssize_t sys_read(bool kernel, int fd, void *buf, size_t len);
 ssize_t sys_write(bool kernel, int fd, void *buf, size_t len);
-int sys_ioctl(bool kernel, int fd, int cmd, void *arg, size_t sz);
 int sys_unlink(bool kernel, int fd, const char *path);
 int sys_link(bool kernel, int ofd, const char *oldpath, int nfd,
              const char *newpath);

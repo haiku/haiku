@@ -13,6 +13,7 @@
   Dominic Giampaolo
   dbg@be.com
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -22,6 +23,7 @@
 #include "myfs.h"
 #include "kprotos.h"
 #include "argv.h"
+#include "tracker.h"
 
 #include <fs_attr.h>
 #include <fs_query.h>
@@ -798,7 +800,7 @@ copydir(char *fromPath,char *toPath)
 
 	from = opendir(fromPath);
 	if (from == NULL) {
-		printf("could not open %s\n",fromPath);
+		printf("could not open %s\n", fromPath);
 		return;
 	}
 
@@ -813,27 +815,27 @@ copydir(char *fromPath,char *toPath)
 		dirent_t *attr;
 		struct stat st;
 
-		if (!strcmp(dirent->d_name,".") || !strcmp(dirent->d_name,".."))
+		if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, ".."))
 			continue;
 
 		strcpy(from_name, fromPath);
 		if (from_name[strlen(from_name) - 1] != '/')
-			strcat(from_name,"/");
+			strcat(from_name, "/");
 		strcat(from_name, dirent->d_name);
 
-		if (stat(from_name,&st) != 0)
+		if (stat(from_name, &st) != 0)
 			continue;
 		
 		if (st.st_mode & S_IFDIR) {
 			char path[1024];
-			strcpy(path,toPath);
-			strcat(path,"/");
-			strcat(path,dirent->d_name);
+			strcpy(path, toPath);
+			strcat(path, "/");
+			strcat(path, dirent->d_name);
 
 			if ((err = sys_mkdir(1, -1, path, MY_S_IRWXU)) == B_OK)
-				copydir(from_name,path);
+				copydir(from_name, path);
 			else
-				printf("Could not create directory %s: (%s)\n",path,strerror(err));
+				printf("Could not create directory %s: (%s)\n", path, strerror(err));
 		} else {
 			fd = open(from_name, O_RDONLY);
 			if (fd < 0) {
@@ -841,7 +843,7 @@ copydir(char *fromPath,char *toPath)
 				return;
 			}
 
-			sprintf(myfs_name, "%s/%s", toPath,dirent->d_name);
+			sprintf(myfs_name, "%s/%s", toPath, dirent->d_name);
 			if ((bfd = sys_open(1, -1, myfs_name, O_RDWR|O_CREAT,
 								MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
 		        close(fd);
@@ -855,7 +857,7 @@ copydir(char *fromPath,char *toPath)
 					struct attr_info attrInfo;
 					int32 size = bufferSize, bytesRead;
 
-					if (fs_stat_attr(fd,attr->d_name,&attrInfo) != 0)
+					if (fs_stat_attr(fd, attr->d_name, &attrInfo) != 0)
 						continue;
 
 					if (attrInfo.size <= size)
@@ -872,7 +874,8 @@ copydir(char *fromPath,char *toPath)
 
 				    err = sys_write_attr(1, bfd, attr->d_name, attrInfo.type, buff, size, 0);
 					if (err < B_OK) {
-						printf("write attr failed: %s\n",strerror(err));
+						printf("write attr (\"%s\", type = %p, %p, %ld bytes) failed: %s\n",
+							attr->d_name, (void *)attrInfo.type, buff, size, strerror(err));
 						continue;
 					}
 				}
@@ -975,6 +978,86 @@ do_threadfiletest(int argc, char **argv)
 	}
 
 	do_lat_fs(0,NULL);
+}
+
+
+port_id gTrackerPort;
+
+
+static void
+tracker_query_file(dev_t device, ino_t parent, char *name)
+{
+	struct stat stat;
+	int status;
+
+	int fd = sys_open_entry_ref(1, device, parent, name, O_RDONLY, 0);
+	if (fd < 0)	{
+		printf("tracker: could not open file: %s\n", name);
+		return;
+	}
+
+	status = sys_rstat(true, fd, NULL, &stat, 1);
+	if (status < 0) {
+		printf("tracker: could not stat file: %s\n", name);
+	}
+
+	sys_close(true, fd);
+}
+
+
+static int32
+tracker_loop(void *data)
+{
+	// create global messaging port
+	
+	gTrackerPort = create_port(128, "fsh tracker port");
+	if (gTrackerPort < B_OK)
+		return gTrackerPort;
+
+	while (true) {
+		update_message message;
+		uint32 code;
+		status_t status = read_port(gTrackerPort, &code, &message, sizeof(message));
+		if (status < B_OK)
+			continue;
+
+		if (code == FSH_KILL_TRACKER)
+			break;
+
+		if (code == FSH_NOTIFY_LISTENER) {
+			printf("tracker: notify listener received\n");
+			tracker_query_file(message.device, message.parentNode, message.name);
+		} else if (code == B_QUERY_UPDATE) {
+			printf("tracker: query update received\n");
+			tracker_query_file(message.device, message.parentNode, message.name);
+		} else {
+			printf("tracker: unknown code received: 0x%lx\n", code);
+		}
+	}
+
+	delete_port(gTrackerPort);
+}
+
+
+static void
+do_tracker(int argc, char **argv)
+{
+	static thread_id thread = -1;
+
+	if (thread < B_OK) {
+		puts("starting tracker...");
+
+		thread = spawn_thread(tracker_loop, "tracker", B_NORMAL_PRIORITY, NULL);
+		resume_thread(thread);
+	} else {
+		status_t status;
+		puts("stopping tracker.");
+
+		write_port(gTrackerPort, FSH_KILL_TRACKER, NULL, 0);
+		wait_for_thread(thread, &status);
+
+		thread = -1;
+	}
 }
 
 
@@ -1412,6 +1495,7 @@ cmd_entry fsh_cmds[] =
     { "cptest",  do_copytest, "copies all files from the given path" },
     { "threads", do_threadtest, "copies several files, and does a lat_fs simulaneously" },
     { "mfile",	 do_threadfiletest, "copies several big files simulaneously" },
+    { "tracker", do_tracker, "starts a Tracker like background thread that will listen to fs updates" },
     { "cio",	 do_cio, "does a I/O speed test" },
 
 // additional commands from the file system will be included here
