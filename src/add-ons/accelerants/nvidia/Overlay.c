@@ -429,9 +429,19 @@ status_t GET_OVERLAY_CONSTRAINTS
 		}
 
 		/* GeForce scaling restrictions */
-		oc->h_scale.min = 0.125;
+		switch (si->ps.card_arch)
+		{
+		case NV30A:
+			/* GeForceFX series have a new BES engine... */
+			oc->h_scale.min = 0.5;
+			oc->v_scale.min = 0.5;
+			break;
+		default:
+			oc->h_scale.min = 0.125;
+			oc->v_scale.min = 0.125;
+			break;
+		}
 		oc->h_scale.max = 16384/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
-		oc->v_scale.min =  0.125;
 		oc->v_scale.max = 16384/(float)ob->height;
 
 		return B_OK;

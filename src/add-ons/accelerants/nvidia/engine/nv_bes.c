@@ -238,11 +238,25 @@ status_t nv_configure_bes
 		hiscalv = ((((uint32)my_ov.width) << 16) / 16384);
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
 	}
-	if (hiscalv > (8 << 16))
+	switch (si->ps.card_arch)
 	{
-		/* (non-inverse) factor too small, set factor to min. valid value */
-		hiscalv = (8 << 16);
-		LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
+	case NV30A:
+		/* GeForceFX series have a downscaling limit of 0.5 */
+		if (hiscalv > (2 << 16))
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			hiscalv = (2 << 16);
+			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
+		}
+		break;
+	default:
+		if (hiscalv > (8 << 16))
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			hiscalv = (8 << 16);
+			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
+		}
+		break;
 	}
 	/* AND below is required by hardware */
 	hiscalv &= 0x001ffffc;
@@ -338,11 +352,25 @@ status_t nv_configure_bes
 		viscalv = ((((uint32)my_ov.height) << 16) / 16384);
 		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)65536 / viscalv));
 	}
-	if (viscalv > (8 << 16))
+	switch (si->ps.card_arch)
 	{
-		/* (non-inverse) factor too small, set factor to min. valid value */
-		viscalv = (8 << 16);
-		LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
+	case NV30A:
+		/* GeForceFX series have a downscaling limit of 0.5 */
+		if (viscalv > (2 << 16))
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			viscalv = (2 << 16);
+			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
+		}
+		break;
+	default:
+		if (viscalv > (8 << 16))
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			viscalv = (8 << 16);
+			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
+		}
+		break;
 	}
 	/* AND below is required by hardware */
 	viscalv &= 0x001ffffc;
@@ -430,6 +458,8 @@ status_t nv_configure_bes
 	 *** actually program the registers ***
 	 **************************************/
 
+	/* shut off GeForce4MX MPEG2 decoder */
+	BESW(DEC_GENCTRL, 0x00000000);
 	/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
 	BESW(NV10_BUFSEL, 0x00000001);  
 	/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */

@@ -130,6 +130,7 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NV32_RASTER			0x00600808
 #define NV32_NV10CURADD32	0x0060080c
 #define NV32_CURCONF		0x00600810
+#define NV32_FUNCSEL		0x00600860
 
 /* secondary head */
 #define NV8_ATTR2INDW		0x006033c0
@@ -143,6 +144,7 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NV32_RASTER2		0x00602808//verify!!!
 #define NV32_NV10CUR2ADD32	0x0060280c//verify!!!
 #define NV32_2CURCONF		0x00602810//verify!!!
+#define NV32_2FUNCSEL		0x00602860
 
 /* Nvidia DAC direct registers (standard VGA palette RAM registers) */
 /* primary head */
@@ -255,9 +257,11 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NVBES_NV10_1DSTREF	0x0000894c
 #define NVBES_NV10_1DSTSIZE	0x00008954
 #define NVBES_NV10_1SRCPTCH	0x0000895c
+/* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
+#define NVBES_DEC_GENCTRL	0x00001588
+
 /*
 	    chip->PMC[0x00008140/4] = 0;
-        chip->PMC[0x00001588/4] = 0;
 */
 //end new.
 

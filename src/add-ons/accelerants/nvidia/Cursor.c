@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003
+	Rudolf Cornelissen 4/2003-8/2003
 */
 
 #define MODULE_BIT 0x20000000
@@ -24,7 +24,9 @@
 
 status_t SET_CURSOR_SHAPE(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y, uint8 *andMask, uint8 *xorMask) 
 {
-	LOG(4,("SET_CURSOR_SHAPE: width %d, height %d\n", width, height));
+	LOG(4,("SET_CURSOR_SHAPE: width %d, height %d, hot_x %d, hot_y %d\n",
+		width, height, hot_x, hot_y));
+
 	if ((width != 16) || (height != 16))
 	{
 		return B_ERROR;
@@ -142,9 +144,11 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 		//move_overlay(hds,vds);
 	}
 
-	/* put cursor in correct physical position */
-	x -= hds + si->cursor.hot_x;
-	y -= vds + si->cursor.hot_y;
+	/* put cursor in correct physical position, so stay onscreen (rel. to CRTC) */
+	if (x > (hds + si->cursor.hot_x)) x -= (hds + si->cursor.hot_x);
+	else x = 0;
+	if (y > (vds + si->cursor.hot_y)) y -= (vds + si->cursor.hot_y);
+	else y = 0;
 
 	/* account for switched CRTC's */
 	if (si->switched_crtcs)	x -= si->dm.timing.h_display;

@@ -81,7 +81,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.04 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.05 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -739,7 +739,7 @@ status_t nv_general_bios_to_powergraphics()
 	nv_crtc_cursor_hide();
 
 	/* power-up all nvidia hardware function blocks */
-	/* bit 28: PVIDEO,
+	/* bit 28: OVERLAY ENGINE (BES),
 	 * bit 25: CRTC2, (> NV04A)
 	 * bit 24: CRTC1,
 	 * bit 20: framebuffer,
@@ -749,6 +749,11 @@ status_t nv_general_bios_to_powergraphics()
 	 * bit  4: PMEDIA,
 	 * bit  0: TVOUT. (> NV04A) */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+
+	/* switch overlay engine to head 1 */
+	//fixme: add other function blocks...
+	NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+	NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 
 	/* set card to 'enhanced' mode: (only VGA standard registers used for NeoMagic cards) */
 	/* (keep) card enabled, set plain normal memory usage, no old VGA 'tricks' ... */
