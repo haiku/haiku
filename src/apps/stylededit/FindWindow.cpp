@@ -1,38 +1,17 @@
-#ifndef _BUTTON_H
 #include <Button.h>
-#endif
-
-#ifndef _CHECK_BOX_H
 #include <CheckBox.h>
-#endif
-
-#ifndef _STRING_H
 #include <String.h>
-#endif
-
-#ifndef _TEXT_CONTROL_H
 #include <TextControl.h>
-#endif
-
-#ifndef _WINDOW_H
 #include <Window.h>
-#endif
-
-#ifndef CONSTANTS_H
+#include <Box.h>
 #include "Constants.h"
-#endif
-
-#ifndef FIND_WINDOW_H
 #include "FindWindow.h"
-#endif
-
-
 
 // FindWindow::FindWindow()
 FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, bool *caseState, bool *wrapState, bool *backState)
 			: BWindow(frame," ", B_MODAL_WINDOW, B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE) {
-	AddChild(fFindView=new BView(BRect(1.0,1.0,Bounds().Width(),Bounds().Height()),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW));
-	fFindView->SetViewColor(216,216,216);
+	AddChild(fFindView=new BBox(BRect(-1,-1,Bounds().Width()+1.5,Bounds().Height()+1.5),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW));
+	fFindView->SetViewColor(221,222,221);
 	
 	font_height height;
 	fFindView->GetFontHeight(&height);
@@ -40,10 +19,8 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, b
 	
 	float findWidth = fFindView->StringWidth("Find:")+6;
 															
-	float searchBottom = 10 + 2 + lineHeight + 2 + 1;
-	fFindView->AddChild(fSearchString= new BTextControl(BRect(14,10,frame.Width()-12,searchBottom), "", "Find:", NULL, NULL));
-		fSearchString->SetDivider(findWidth);
-	float buttonTop = frame.Height()-21-lineHeight;
+	float searchBottom = 12 + 2 + lineHeight + 2 + 1;
+	float buttonTop = frame.Height()-19-lineHeight;
 	float wrapBoxTop = (buttonTop+searchBottom-lineHeight)/2;
 	float wrapBoxBottom = (buttonTop+searchBottom+lineHeight)/2;
 	float caseBoxTop = (searchBottom+wrapBoxTop-lineHeight)/2;
@@ -51,12 +28,15 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, b
 	float backBoxTop = (buttonTop+wrapBoxBottom-lineHeight)/2;
 	float backBoxBottom = (buttonTop+wrapBoxBottom+lineHeight)/2;
 	
-	fFindView->AddChild(fCaseSensBox= new BCheckBox(BRect(16+findWidth,caseBoxTop,frame.Width()-14,caseBoxBottom),"","Case-sensitive", NULL));
-	fFindView->AddChild(fWrapBox= new BCheckBox(BRect(16+findWidth,wrapBoxTop,frame.Width()-14,wrapBoxBottom),"","Wrap-around search", NULL));
-	fFindView->AddChild(fBackSearchBox= new BCheckBox(BRect(16+findWidth,backBoxTop,frame.Width()-14,backBoxBottom),"","Search backwards", NULL));
+	fFindView->AddChild(fSearchString= new BTextControl(BRect(14,12,frame.Width()-10,searchBottom), "", "Find:", NULL, NULL));
+		fSearchString->SetDivider(findWidth);
+
+	fFindView->AddChild(fCaseSensBox= new BCheckBox(BRect(16+findWidth,caseBoxTop,frame.Width()-12,caseBoxBottom),"","Case-sensitive", NULL));
+	fFindView->AddChild(fWrapBox= new BCheckBox(BRect(16+findWidth,wrapBoxTop,frame.Width()-12,wrapBoxBottom),"","Wrap-around search", NULL));
+	fFindView->AddChild(fBackSearchBox= new BCheckBox(BRect(16+findWidth,backBoxTop,frame.Width()-12,backBoxBottom),"","Search backwards", NULL));
 	
-	fFindView->AddChild(fCancelButton= new BButton(BRect(140,buttonTop,210,frame.Height()-9),"","Cancel",new BMessage(B_QUIT_REQUESTED)));
-	fFindView->AddChild(fSearchButton= new BButton(BRect(289-70,buttonTop,289,frame.Height()-9),"","Find",new BMessage(MSG_SEARCH)));
+	fFindView->AddChild(fCancelButton= new BButton(BRect(142,buttonTop,212,frame.Height()-7),"","Cancel",new BMessage(B_QUIT_REQUESTED)));
+	fFindView->AddChild(fSearchButton= new BButton(BRect(221,buttonTop,291,frame.Height()-7),"","Find",new BMessage(MSG_SEARCH)));
 	
 	fSearchButton->MakeDefault(true);
 	fHandler=_handler;
