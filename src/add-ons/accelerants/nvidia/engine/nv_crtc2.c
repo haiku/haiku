@@ -382,7 +382,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 				DAC2W(FP_DEBUG1, (((iscale_x >> 1) & 0x00000fff) | (1 << 12)));
 				/* center/cut-off left and right side of screen */
 				diff = ((si->ps.p2_timing.h_display -
-						(target.timing.h_display * ((1 << 12) / ((float)iscale_x))))
+						((target.timing.h_display * (1 << 12)) / iscale_x))
 						/ 2);
 				DAC2W(FP_HVALID_S, diff);
 				DAC2W(FP_HVALID_E, ((si->ps.p2_timing.h_display - diff) - 1));
