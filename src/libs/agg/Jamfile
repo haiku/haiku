@@ -3,6 +3,9 @@ SubDir OBOS_TOP src libs agg ;
 UseFreeTypeHeaders ;
 UseLibraryHeaders agg ;
 
+SubDirCcFlags -w ;
+SubDirC++Flags -w ;
+
 SharedLibrary agg : 
 	font_freetype/agg_font_freetype.cpp
 	src/agg_arc.cpp
