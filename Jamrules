@@ -591,7 +591,7 @@ rule Translator
 	MakeLocate $(1) : $(targetdir) ;
 }
 
- rule MakeLocateObjects
+rule MakeLocateObjects
 {
 	# MakeLocateObjects <sources_or_objects> ;
 	
@@ -617,6 +617,30 @@ rule StaticLibrary
 	MakeLocateObjects $(2) ;
 	Library lib$(<).a : $(>) ;
 	MakeLocate lib$(<).a : $(OBOS_STLIB_DIR) ;
+}
+
+rule MergeObjectFromObjects
+{
+	# MergeObjectFromObjects <name> : <objects> ;
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	MakeLocateObjects $(2) ;
+	Depends $(<) : $(>) ;
+	LINK on $(1) = ld ;
+}
+
+actions MergeObjectFromObjects
+{
+	$(LINK) -r $(2) -o $(1) ;
+}
+
+rule MergeObject
+{
+	# MergeObject <name> : <sources> ;
+	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(2) ;
+	Objects $(2) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
 }
 
 rule SharedLibraryFromObjects
@@ -1115,7 +1139,7 @@ rule KernelObjects
 
 rule KernelLd
 {
-	# KernelLd <name> : <objs> : <linkerscript> : <args> : <gcc_off> ;
+	# KernelLd <name> : <objs> : <linkerscript> : <args> : <gcc_off> : <config_section> ;
 
 	SetupKernel $(2) ;
 	LINK on $(1) = ld ;
@@ -1148,6 +1172,17 @@ rule KernelLd
 actions KernelLd
 {
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
+}
+
+rule KernelMergeObject
+{
+	# KernelMergeObject <name> : <sources> : <extra CFLAGS> ;
+
+	SetupKernel $(2) : $(3) ;
+
+	MakeLocateObjects $(2) ;
+	Objects $(2) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
 }
 
 rule KernelStaticLibrary
