@@ -621,9 +621,15 @@ get_cur_ioctx(void)
     static ioctx io;
 
     if (init == 0) {
-        init = 1;
+		int error;
         memset(&io, 0, sizeof(io));
-    }
+		
+		error = new_lock(&io.lock, "IO context");
+		if (error < 0)
+			PANIC("Failed to init IO context lock: %s\n", fs_strerror(error));
+    
+		init = 1;
+	}
 
     return &io;
 }
