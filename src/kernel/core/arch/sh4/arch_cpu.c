@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel/arch/cpu.h>
 #include <kernel/debug.h>
 #include <kernel/int.h>
@@ -9,12 +10,16 @@
 
 static vcpu_struct *vcpu;
 
-int arch_cpu_preboot_init(kernel_args *ka)
+
+int
+arch_cpu_preboot_init(kernel_args *ka)
 {
 	return 0;
 }
 
-int arch_cpu_init(kernel_args *ka)
+
+int
+arch_cpu_init(kernel_args *ka)
 {
 	vcpu = ka->arch_args.vcpu;
 
@@ -24,18 +29,24 @@ int arch_cpu_init(kernel_args *ka)
 	return 0;
 }
 
-int arch_cpu_init2(kernel_args *ka)
+
+int
+arch_cpu_init2(kernel_args *ka)
 {
 	return 0;
 }
 
-void sh4_set_kstack(addr kstack)
+
+void
+sh4_set_kstack(addr kstack)
 {
 //	dprintf("sh4_set_kstack: setting kstack to 0x%x\n", kstack);
 	vcpu->kstack = (unsigned int *)kstack;
 }
 
-void sh4_set_user_pgdir(addr pgdir)
+
+void
+sh4_set_user_pgdir(addr pgdir)
 {
 //	dprintf("sh4_set_user_pgdir: setting pgdir to 0x%x\n", pgdir);
 	if((addr)vcpu->user_pgdir != pgdir)
@@ -43,7 +54,9 @@ void sh4_set_user_pgdir(addr pgdir)
 	vcpu->user_pgdir = (unsigned int *)pgdir;
 }
 
-void sh4_invl_page(addr va)
+
+void
+sh4_invl_page(addr va)
 {
 	int state;
 	int i;
@@ -69,14 +82,18 @@ void sh4_invl_page(addr va)
 	int_restore_interrupts(state);
 }
 
-void arch_cpu_invalidate_TLB_range(addr start, addr end)
+
+void
+arch_cpu_invalidate_TLB_range(addr start, addr end)
 {
 	for(; start < end; start += PAGE_SIZE) {
 		sh4_invl_page(start);
 	}
 }
 
-void arch_cpu_invalidate_TLB_list(addr pages[], int num_pages)
+
+void
+arch_cpu_invalidate_TLB_list(addr pages[], int num_pages)
 {
 	int i;
 	for(i=0; i<num_pages; i++) {
@@ -84,7 +101,9 @@ void arch_cpu_invalidate_TLB_list(addr pages[], int num_pages)
 	}
 }
 
-void arch_cpu_global_TLB_invalidate()
+
+void
+arch_cpu_global_TLB_invalidate()
 {
 	int state;
 	int i;
@@ -106,7 +125,9 @@ void arch_cpu_global_TLB_invalidate()
 	int_restore_interrupts(state);
 }
 
-int arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *fault_handler)
+
+int
+arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *fault_handler)
 {
 	char *tmp = (char *)to;
 	char *s = (char *)from;
@@ -124,7 +145,9 @@ error:
 	return ERR_VM_BAD_USER_MEMORY;
 }
 
-int arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
+
+int
+arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
 {
 	*fault_handler = (addr)&&error;
 
@@ -139,7 +162,9 @@ error:
 	return ERR_VM_BAD_USER_MEMORY;
 }
 
-int arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handler)
+
+int
+arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handler)
 {
 	*fault_handler = (addr)&&error;
 
@@ -154,7 +179,9 @@ error:
 	return ERR_VM_BAD_USER_MEMORY;
 }
 
-int arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
+
+int
+arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 {
 	char *xs = (char *) s;
 
@@ -171,3 +198,8 @@ error:
 	return ERR_VM_BAD_USER_MEMORY;
 }
 
+
+void
+arch_cpu_idle(void)
+{
+}
