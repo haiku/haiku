@@ -2953,11 +2953,11 @@ void BView::EndLineArray()
 			debugger("Can't call EndLineArray before BeginLineArray");
 
 		check_lock();
-
-		owner->fLink->StartMessage( AS_LAYER_LINE_ARRAY );
+		
+		owner->fLink->StartMessage( AS_STROKE_LINEARRAY );
 		owner->fLink->Attach<int32>( comm->count );
 		owner->fLink->Attach(comm->array,comm->count * sizeof(_array_hdr_) );
-
+		
 		delete [] comm->array;
 		delete comm;
 		comm = NULL;
