@@ -30,6 +30,7 @@
 #include "APRView.h"
 #include "DecView.h"
 #include "CurView.h"
+#include "MenuView.h"
 #include "defs.h"
 #include <ScrollView.h>
 #include <ListItem.h>
@@ -48,33 +49,48 @@ APRWindow::APRWindow(BRect frame)
 	topview->AddChild(listview);
 	listview->SetSelectionMessage(new BMessage(PREFS_CHOSEN));
 	
-	listview->AddItem(new BStringItem("Colors"));
-	listview->AddItem(new BStringItem("Cursors"));
-	listview->AddItem(new BStringItem("Decorators"));
-	
 	
 	r.Set(100,100,385,445);
 	r.OffsetTo(listview->Bounds().Width()+20,0);
 	r.right=Bounds().right;
 
+	listview->AddItem(new BStringItem("Colors"));
 	colors=new APRView(r,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
 	topview->AddChild(colors);
+	viewlist.AddItem(colors);
 	colors->Hide();
 
 	// TODO: Finish CurView
+	listview->AddItem(new BStringItem("Cursors"));
 	cursors=new CurView(r,"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
 	topview->AddChild(cursors);
+	viewlist.AddItem(cursors);
 	cursors->Hide();
 
+	listview->AddItem(new BStringItem("Decorators"));
 	decorators=new DecView(r,"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
 	topview->AddChild(decorators);
 	decorators->Hide();
+	viewlist.AddItem(decorators);
 	decorators->SetColors(*colors->currentset);
+
+	// This code works properly IIRC, but will remain disabled for now.
 	
-	prefsviews[0]=colors;
-	prefsviews[1]=cursors;
-	prefsviews[2]=decorators;
+	// One of the cool things about Appearance is that eventually we will probably 
+	// integrate all appearance-related preference panels into this to reduce the number
+	// of preference applications and to make the entire preferences area more organized.
+	// This is the route that Zeta took with theirs, but ours will not be a hack -- it will
+	// be done right. B^>
 	
+	// This won't amount to much -- we won't bother with the scrollbar prefs app and just
+	// set sensible defaults. It should just be menu and fonts, so not much work, either.
+	
+//	listview->AddItem(new BStringItem("Menu"));
+//	MenuView *menuview=new MenuView(r,"Menu",B_FOLLOW_ALL, B_WILL_DRAW);
+//	topview->AddChild(menuview);
+//	viewlist.AddItem(menuview);
+//	menuview->Hide();
+
 	listview->Select(0);
 }
 
@@ -95,19 +111,23 @@ void APRWindow::MessageReceived(BMessage *msg)
 		}
 		case PREFS_CHOSEN:
 		{
-
 			int32 selectionindex=listview->CurrentSelection();
 			if(selectionindex==-1)
 				break;
 			
-			for(int32 i=0; i<3; i++)
+			// Hide any visible preference views
+			for(int32 i=0; i<listview->CountItems(); i++)
 			{
-				BView *v=prefsviews[i];
-
-				if(i!=selectionindex && !v->IsHidden())
+				BView *v=(BView*)viewlist.ItemAt(i);
+				
+				if(!v)
+					continue;
+				
+				if(!v->IsHidden())
 					v->Hide();
 			}
-			prefsviews[selectionindex]->Show();
+			BView *visible=(BView*)viewlist.ItemAt(selectionindex);
+			visible->Show();
 			break;
 		}
 		default:

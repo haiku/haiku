@@ -47,7 +47,7 @@ public:
 	APRView *colors;
 	DecView *decorators;
 	CurView *cursors;
-	BView *prefsviews[3];
+	BList viewlist;
 };
 
 #endif
