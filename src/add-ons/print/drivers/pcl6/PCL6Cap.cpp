@@ -142,6 +142,7 @@ bool PCL6Cap::isSupport(CapID capid) const
 	case kPaperSource:
 	case kResolution:
 	case kColor:
+	case kCopyCommand:
 		return true;
 	default:
 		return false;
