@@ -16,4 +16,4 @@ Server media_server :
 	NotificationManager.cpp
 	Queue.cpp
 ;
-LinkSharedOSLibs media_server : be libmedia.so root ;
+LinkSharedOSLibs media_server : be libmedia.so ;

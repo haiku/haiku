@@ -341,6 +341,7 @@ MMediaFilesManager::RemoveItem(const char *type,
 	return B_OK;
 }
 
+
 void
 MMediaFilesManager::LaunchTimer()
 {
@@ -349,6 +350,7 @@ MMediaFilesManager::LaunchTimer()
 			new BMessage(MMEDIAFILESMANAGER_SAVE_TIMER), 3 * 1000000, 1);	
 }
 
+
 void
 MMediaFilesManager::TimerMessage()
 {
@@ -356,3 +358,4 @@ MMediaFilesManager::TimerMessage()
 	delete fRunner;
 	fRunner = NULL;	
 }
+
