@@ -58,6 +58,8 @@ VorbisDecoder::VorbisDecoder()
 VorbisDecoder::~VorbisDecoder()
 {
 	TRACE("VorbisDecoder::~VorbisDecoder\n");
+	vorbis_info_clear(&fInfo);
+	vorbis_comment_clear(&fComment);
 }
 
 
