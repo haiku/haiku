@@ -13,7 +13,7 @@
 #include <smp.h>
 #include <signal.h>
 #include <timer.h>
-#include <kqueue.h>
+#include <list.h>
 #include <arch/thread_struct.h>
 
 
@@ -66,7 +66,7 @@ struct team {
 	addr			user_env_base;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
-	struct quehead	image_queue;
+	struct list		image_list;
 	struct arch_team arch_info;
 };
 
