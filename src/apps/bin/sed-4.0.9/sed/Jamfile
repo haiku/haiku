@@ -4,4 +4,11 @@ SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-BinCommand sed : compile.c execute.c fmt.c regexp.c sed.c : libsedutils.a ; 
+BinCommand sed : 
+	compile.c 
+	execute.c 
+	fmt.c 
+	regexp.c 
+	sed.c 
+	: libsed.a 
+	: sed.rdef ; 
