@@ -884,12 +884,13 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	return exec_type2_script_mode(rom, &adress, size, tabs, ram_tab, &exec);
 }
 
-/* this routine is used for NV10 and later */
+/* this routine is used for NV10 and later. It's tested on a GeForce2 MX400 (NV11) and
+ * a GeForceFX 5200 (NV34). Both cards coldstart perfectly. */
 static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
 {
 	status_t result = B_OK;
 	bool end = false;
-	uint8 index, byte, byte2, safe, shift;
+	uint8 index, byte, byte2, shift;//, safe;
 	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, or_in2, safe32, offset32, size32;
 
 	while (!end)
@@ -1002,10 +1003,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			reg2 = *((uint32*)(&(rom[*adress])));
 			*adress += 4;
-			safe = ISARB(reg);
-			ISAWB(reg, index);
-			byte = ISARB(reg + 1);
-			ISAWB(reg, safe);
+//			safe = ISARB(reg);
+//			ISAWB(reg, index);
+//			byte = ISARB(reg + 1);
+//			ISAWB(reg, safe);
+//test:
+			translate_ISA_PCI(&reg);
+			NV_REG8(reg) = index;
+			byte = NV_REG8(reg + 1);
+//end test
 			byte &= (uint8)and_out;
 			data = (byte >> shift);
 			data <<= 1;
