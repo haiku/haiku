@@ -20,7 +20,8 @@ status_t elf_load_user_image(const char *path, struct team *team, int flags, add
 image_id load_kernel_add_on(const char *path);
 status_t unload_kernel_add_on(image_id id);
 
-status_t elf_lookup_symbol_address(addr_t address, addr_t *baseAddress, char *text, size_t length);
+status_t elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
+				const char **_symbolName, const char **_imageName, bool *_exactMatch);
 status_t elf_init(kernel_args *args);
 
 #ifdef __cplusplus
