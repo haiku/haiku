@@ -28,7 +28,7 @@ local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
 
 # generate the binary file for the keymap files
 local keymapFile ;
-for keymapFile in [ FGristFiles $(keymapFiles) ] {
-	local binary = $(keymapFile:B) ;
+for keymapFile in [ FGristFiles $(keymapFiles:D=) ] {
+	local binary = <keymap>$(keymapFile:B) ;
 	MkKeymapComp $(binary) : $(keymapFile) ;
 }
