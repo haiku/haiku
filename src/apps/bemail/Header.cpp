@@ -175,7 +175,7 @@ THeaderView::THeaderView (
 			name << " (" << mime << ")";
 		}
 		msg = new BMessage(kMsgEncoding);
-		int32 convert_id;
+		uint32 convert_id;
 		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0)) {
 			convert_id = charset.GetConversionID();
 		} else {
