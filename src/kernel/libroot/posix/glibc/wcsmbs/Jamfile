@@ -1,11 +1,11 @@
 SubDir OBOS_TOP src kernel libroot posix glibc wcsmbs ;
 
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc wcsmbs ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc wcsmbs ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc iconv ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
 # ToDo: for now, all wide character functions are disabled
@@ -14,5 +14,14 @@ KernelMergeObject posix_gnu_wcsmbs.o :
 	mbrlen.c
 	mbrtowc.c
 	mbsinit.c
+	mbsnrtowcs.c
+	wcrtomb.c
+	wcslen.c
+	wcsmbsload.c
+	wcsnlen.c
+	wcsrtombs.c
+	wmemcpy.c
+	wmempcpy.c
+	wmemmove.c
 	: -fPIC -DPIC
 	;

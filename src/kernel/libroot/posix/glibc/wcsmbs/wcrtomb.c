@@ -1,4 +1,4 @@
-/* Copyright (C) 1996,1997,1998,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 1997, 1998, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -42,7 +42,6 @@ __wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
   int status;
   size_t result;
   size_t dummy;
-  const struct gconv_fcts *fcts;
 
   /* Set information for this step.  */
   data.__invocation_counter = 0;
@@ -63,16 +62,16 @@ __wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
   data.__outbuf = s;
   data.__outbufend = s + MB_CUR_MAX;
 
-  /* Get the conversion functions.  */
-  fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+  /* Make sure we use the correct function.  */
+  update_conversion_ptrs ();
 
   /* If WC is the NUL character we write into the output buffer the byte
      sequence necessary for PS to get into the initial state, followed
      by a NUL byte.  */
   if (wc == L'\0')
     {
-      status = DL_CALL_FCT (fcts->tomb->__fct,
-			    (fcts->tomb, &data, NULL, NULL,
+      status = DL_CALL_FCT (__wcsmbs_gconv_fcts.tomb->__fct,
+			    (__wcsmbs_gconv_fcts.tomb, &data, NULL, NULL,
 			     NULL, &dummy, 1, 1));
 
       if (status == __GCONV_OK || status == __GCONV_EMPTY_INPUT)
@@ -83,8 +82,8 @@ __wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
       /* Do a normal conversion.  */
       const unsigned char *inbuf = (const unsigned char *) &wc;
 
-      status = DL_CALL_FCT (fcts->tomb->__fct,
-			    (fcts->tomb, &data, &inbuf,
+      status = DL_CALL_FCT (__wcsmbs_gconv_fcts.tomb->__fct,
+			    (__wcsmbs_gconv_fcts.tomb, &data, &inbuf,
 			     inbuf + sizeof (wchar_t), NULL, &dummy, 0, 1));
     }
 
@@ -109,4 +108,3 @@ __wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
   return result;
 }
 weak_alias (__wcrtomb, wcrtomb)
-libc_hidden_weak (wcrtomb)

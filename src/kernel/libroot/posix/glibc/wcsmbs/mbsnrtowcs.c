@@ -1,4 +1,4 @@
-/* Copyright (C) 1996,1997,1998,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1996.
 
@@ -51,7 +51,6 @@ __mbsnrtowcs (dst, src, nmc, len, ps)
   int status;
   struct __gconv_step *towc;
   size_t dummy;
-  const struct gconv_fcts *fcts;
 
   /* Tell where we want the result.  */
   data.__invocation_counter = 0;
@@ -64,11 +63,11 @@ __mbsnrtowcs (dst, src, nmc, len, ps)
     return 0;
   srcend = *src + __strnlen (*src, nmc - 1) + 1;
 
-  /* Get the conversion functions.  */
-  fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+  /* Make sure we use the correct function.  */
+  update_conversion_ptrs ();
 
   /* Get the structure with the function pointers.  */
-  towc = fcts->towc;
+  towc = __wcsmbs_gconv_fcts.towc;
 
   /* We have to handle DST == NULL special.  */
   if (dst == NULL)
