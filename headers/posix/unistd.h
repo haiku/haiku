@@ -1,7 +1,7 @@
 #ifndef _UNISTD_H_
 #define _UNISTD_H_
 /* 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 #include <null.h>
@@ -133,7 +133,7 @@ extern int		tcsetpgrp(int fd, pid_t pgrpid);
 extern void		*sbrk(long incr);
 
 extern uint		alarm(unsigned int seconds);
-extern uint		ualarm(unsigned int microSeconds);
+extern uint		ualarm(unsigned int microSeconds, unsigned int interval);
 extern uint 	sleep(unsigned int seconds);
 extern int		usleep(unsigned int microSeconds);
 extern clock_t	clock(void);
