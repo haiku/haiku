@@ -647,6 +647,215 @@ TGATranslator::Identify(BPositionIO *inSource,
 		return identify_tga_header(inSource, outInfo, 4, ch);
 }
 
+status_t
+pix_bits_to_tga(uint8 *pbits, uint8 *ptga, color_space fromspace,
+	uint16 width, const color_map *pmap)
+{
+	status_t result = B_OK;
+	
+	switch (fromspace) {
+		case B_RGBA32:
+			memcpy(ptga, pbits, width * 4);
+			break;
+					
+		case B_RGBA32_BIG:
+			while (width--) {
+				ptga[0] = pbits[3];
+				ptga[1] = pbits[2];
+				ptga[2] = pbits[1];
+				ptga[3] = pbits[0];
+				
+				ptga += 4;
+				pbits += 4;
+			}
+			break;
+				
+		case B_CMYA32:
+			while (width--) {
+				ptga[0] = 255 - pbits[2];
+				ptga[1] = 255 - pbits[1];
+				ptga[2] = 255 - pbits[0];
+				ptga[3] = pbits[3];
+				
+				ptga += 4;
+				pbits += 4;
+			}
+			break;
+					
+		case B_RGB32:
+		case B_RGB24:
+		{
+			int32 bytes;
+			if (fromspace == B_RGB32)
+				bytes = 4;
+			else
+				bytes = 3;
+				
+			while (width--) {
+				memcpy(ptga, pbits, 3);
+				
+				ptga += 3;
+				pbits += bytes;
+			}
+			break;
+		}
+					
+		case B_CMYK32:
+		{
+			int32 comp;
+			while (width--) {			
+				comp = 255 - pbits[2] - pbits[3];
+				ptga[0] = (comp < 0) ? 0 : comp;
+					
+				comp = 255 - pbits[1] - pbits[3];
+				ptga[1] = (comp < 0) ? 0 : comp;
+					
+				comp = 255 - pbits[0] - pbits[3];
+				ptga[2] = (comp < 0) ? 0 : comp;
+				
+				ptga += 3;
+				pbits += 4;
+			}
+			break;
+		}
+				
+		case B_CMY32:
+		case B_CMY24:
+		{
+			int32 bytes;
+			if (fromspace == B_CMY32)
+				bytes = 4;
+			else
+				bytes = 3;
+				
+			while (width--) {
+				ptga[0] = 255 - pbits[2];
+				ptga[1] = 255 - pbits[1];
+				ptga[2] = 255 - pbits[0];
+				
+				ptga += 3;
+				pbits += bytes;
+			}
+			break;
+		}
+					
+		case B_RGB16:
+		case B_RGB16_BIG:
+		{
+			// Expand to 24 bit because the TGA format handles
+			// 16 bit images differently than the Be Image Format
+			// which would cause a loss in quality
+			uint16 val;
+			while (width--) {
+				if (fromspace == B_RGB16)
+					val = pbits[0] + (pbits[1] << 8);
+				else
+					val = pbits[1] + (pbits[0] << 8);
+
+				ptga[0] =
+					((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+				ptga[1] =
+					((val & 0x7e0) >> 3) | ((val & 0x7e0) >> 9);
+				ptga[2] =
+					((val & 0xf800) >> 8) | ((val & 0xf800) >> 13);
+					
+				ptga += 3;
+				pbits += 2;
+			}
+			break;
+		}
+				
+		case B_RGBA15:
+			memcpy(ptga, pbits, 2 * width);
+			break;
+				
+		case B_RGBA15_BIG:
+			while (width--) {
+				ptga[0] = pbits[1];
+				ptga[1] = pbits[0];
+				
+				ptga += 2;
+				pbits += 2;
+			}
+			break;
+
+		case B_RGB15:
+			while (width--) {
+				ptga[0] = pbits[0];
+				ptga[1] = pbits[1] | 0x80;
+					// alpha bit is always 1
+				
+				ptga += 2;
+				pbits += 2;
+			}
+			break;
+					
+		case B_RGB15_BIG:
+			while (width--) {
+				ptga[0] = pbits[1];
+				ptga[1] = pbits[0] | 0x80;
+					// alpha bit is always 1
+				
+				ptga += 2;
+				pbits += 2;
+			}
+			break;
+						
+		case B_RGB32_BIG:
+			while (width--) {
+				ptga[0] = pbits[3];
+				ptga[1] = pbits[2];
+				ptga[2] = pbits[1];
+				
+				ptga += 3;
+				pbits += 4;
+			}
+			break;
+						
+		case B_RGB24_BIG:
+			while (width--) {
+				ptga[0] = pbits[2];
+				ptga[1] = pbits[1];
+				ptga[2] = pbits[0];
+				
+				ptga += 3;
+				pbits += 3;
+			}
+			break;
+				
+		case B_CMAP8:
+		{
+			rgb_color c;
+			while (width--) {
+				c = pmap->color_list[pbits[0]];
+				ptga[0] = c.blue;
+				ptga[1] = c.green;
+				ptga[2] = c.red;
+				
+				ptga += 3;
+				pbits++;
+			}
+			break;
+		}
+					
+		case B_GRAY8:
+			while (width--) {
+				ptga[0] = pbits[0];
+				ptga[1] = pbits[0];
+				ptga[2] = pbits[0];
+				
+				ptga += 3;
+				pbits++;
+			}
+			break;
+						
+		default:
+			result = B_ERROR;
+			break;
+	} // switch (fromspace)
+	
+	return result;
+}
 // ---------------------------------------------------------------
 // translate_from_bits_to_tgatc
 //
@@ -725,146 +934,9 @@ BPositionIO *outDestination, color_space fromspace, TGAImageSpec &imagespec)
 	const color_map *pmap = system_colors();
 	while (rd == bitsRowBytes) {
 	
-		for (uint32 i = 0; i < imagespec.width; i++) {
-			uint8 *bitspixel, *tgapixel;
-			uint16 val;
-			int32 comp;
-			switch (fromspace) {
-				case B_RGBA32:
-					memcpy(tgaRowData + (i * 4),
-						bitsRowData + (i * bitsBytesPerPixel), 4);
-					break;
-					
-				case B_RGBA32_BIG:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 4);
-					tgapixel[0] = bitspixel[3];
-					tgapixel[1] = bitspixel[2];
-					tgapixel[2] = bitspixel[1];
-					tgapixel[3] = bitspixel[0];
-					break;
-				
-				case B_CMYA32:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 4);
-					tgapixel[0] = 255 - bitspixel[2];
-					tgapixel[1] = 255 - bitspixel[1];
-					tgapixel[2] = 255 - bitspixel[0];
-					tgapixel[3] = bitspixel[3];
-					break;
-					
-				case B_RGB32:
-				case B_RGB24:
-					memcpy(tgaRowData + (i * 3),
-						bitsRowData + (i * bitsBytesPerPixel), 3);
-					break;
-					
-				case B_CMYK32:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					
-					comp = 255 - bitspixel[2] - bitspixel[3];
-					tgapixel[0] = (comp < 0) ? 0 : comp;
-					
-					comp = 255 - bitspixel[1] - bitspixel[3];
-					tgapixel[1] = (comp < 0) ? 0 : comp;
-					
-					comp = 255 - bitspixel[0] - bitspixel[3];
-					tgapixel[2] = (comp < 0) ? 0 : comp;
-					break;
-				
-				case B_CMY32:
-				case B_CMY24:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					tgapixel[0] = 255 - bitspixel[2];
-					tgapixel[1] = 255 - bitspixel[1];
-					tgapixel[2] = 255 - bitspixel[0];
-					break;
-					
-				case B_RGB16:
-				case B_RGB16_BIG:
-					// Expand to 24 bit because the TGA format handles
-					// 16 bit images differently than the Be Image Format
-					// which would cause a loss in quality
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					if (fromspace == B_RGB16)
-						val = bitspixel[0] + (bitspixel[1] << 8);
-					else
-						val = bitspixel[1] + (bitspixel[0] << 8);
-
-					tgapixel[0] =
-						((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
-					tgapixel[1] =
-						((val & 0x7e0) >> 3) | ((val & 0x7e0) >> 9);
-					tgapixel[2] =
-						((val & 0xf800) >> 8) | ((val & 0xf800) >> 13);
-					break;
-				
-				case B_RGBA15:
-					memcpy(tgaRowData + (i * 2),
-						bitsRowData + (i * bitsBytesPerPixel), 2);
-					break;
-				
-				case B_RGBA15_BIG:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 2);
-					tgapixel[0] = bitspixel[1];
-					tgapixel[1] = bitspixel[0];
-					break;
-
-				case B_RGB15:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 2);
-					tgapixel[0] = bitspixel[0];
-					tgapixel[1] = bitspixel[1] | 0x80;
-					break;
-					
-				case B_RGB15_BIG:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 2);
-					tgapixel[0] = bitspixel[1];
-					tgapixel[1] = bitspixel[0] | 0x80;
-					break;
-						
-				case B_RGB32_BIG:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					tgapixel[0] = bitspixel[3];
-					tgapixel[1] = bitspixel[2];
-					tgapixel[2] = bitspixel[1];
-					break;
-						
-				case B_RGB24_BIG:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					tgapixel[0] = bitspixel[2];
-					tgapixel[1] = bitspixel[1];
-					tgapixel[2] = bitspixel[0];
-					break;
-				
-				case B_CMAP8:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					rgb_color c = pmap->color_list[bitspixel[0]];
-					tgapixel[0] = c.blue;
-					tgapixel[1] = c.green;
-					tgapixel[2] = c.red;
-					break;
-					
-				case B_GRAY8:
-					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
-					tgapixel = tgaRowData + (i * 3);
-					tgapixel[0] = bitspixel[0];
-					tgapixel[1] = bitspixel[0];
-					tgapixel[2] = bitspixel[0];
-					break;
-						
-				default:
-					break;
-			} // switch (fromspace)
-		} // for for (uint32 i = 0; i < imagespec.width; i++)
+		pix_bits_to_tga(bitsRowData, tgaRowData, fromspace,
+			imagespec.width, pmap);
+			// convert bits row to tga row
 				
 		outDestination->Write(tgaRowData, tgaRowBytes);
 		tgapixrow++;
