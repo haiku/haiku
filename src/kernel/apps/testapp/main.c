@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 		thread_id id;
 		static double f[5] = { 2.43, 5.23, 342.34, 234123.2, 1.4 };
 
-		printf("spawning a few floating point crunchers\n");
+		printf("spawning a few floating point crunchers (press key to continue)\n");
 
 		id = spawn_thread(&fpu_cruncher_thread, "fpu thread0", B_NORMAL_PRIORITY, &f[0]);
 		resume_thread(id);
