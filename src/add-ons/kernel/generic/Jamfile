@@ -2,3 +2,4 @@ SubDir OBOS_TOP src add-ons kernel generic ;
 
 SubInclude OBOS_TOP src add-ons kernel generic atomizer ;
 # SubInclude OBOS_TOP src add-ons kernel generic memory_pool ;
+# SubInclude OBOS_TOP src add-ons kernel generic mpu401 ;
