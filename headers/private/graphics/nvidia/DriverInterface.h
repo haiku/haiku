@@ -194,14 +194,18 @@ typedef struct {
 		NV34,
 		NV35,
 		NV36,
-		NV38
+		NV38,
+		NV40,
+		NV41,
+		NV43
 	};
 	enum
 	{	// card_arch in order of date of NV chip design
 		NV04A = 0,
 		NV10A,
 		NV20A,
-		NV30A
+		NV30A,
+		NV40A
 	};
 	enum
 	{	// tvout_chip_type in order of capability (more or less)
