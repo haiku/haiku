@@ -146,6 +146,26 @@ struct option options[] =
    selbg_opt, selfg_opt, title_opt, 0
  };
 
+status_t
+string2color (const char * name, rgb_color * color) {
+	if (!name || !color) {
+		return B_BAD_VALUE;
+	}
+	if (strcmp("black",name) == 0) {
+		color->red = 0;
+		color->green = 0;
+		color->blue = 0;
+		return B_OK;
+	}
+	if (strcmp("red",name) == 0) {
+		color->red = 128;
+		color->green = 0;
+		color->blue = 0;
+		return B_OK;
+	}
+	return B_ERROR;
+}
+
 // TODO: implement the arguments for Terminal
 void
 TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
@@ -235,23 +255,77 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 				break;
 				default:
 					switch (options[indexptr].val) {
-					case 1: // curbg
+					case 1: { // curbg
 						printf("curbg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for curbg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("curbg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
-					case 2: // curfg
+					case 2: { // curfg
 						printf("curfg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for curfg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("curfg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
-					case 3: // bg
+					case 3: { // bg
 						printf("bg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for bg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("bg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
-					case 4: // fg
+					case 4: { // fg
 						printf("fg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for fg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("fg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
-					case 5: // selbg
+					case 5: { // selbg
 						printf("selbg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for selbg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("selbg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
-					case 6: // selfg
+					case 6: { // selfg
 						printf("selfg = %s\n",optarg);
+						rgb_color color;
+						if (string2color(optarg,&color) != B_OK) {
+							printf("invalid color specifier for selfg\n");
+							delete terminal;
+							return;
+						}
+						terminal->AddData("selfg",B_RGB_32_BIT_TYPE,
+						                  &color,sizeof(color),true,1);
+					}
 					break;
 					default:
 						printf("invalid indexptr %ld\n",indexptr);
@@ -261,7 +335,10 @@ TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 				}
 			}
 		}
-		printf("execvp(%ld,%s ...)\n",argc-optind,argv[optind]);
+		while (optind < argc) {
+			printf("adding string %s\n",argv[optind]);
+			terminal->AddString("argv",argv[optind++]);
+		}
 	}
 	PostMessage(terminal);
 	return;
