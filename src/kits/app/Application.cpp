@@ -550,6 +550,9 @@ void BApplication::InitData(const char* signature, status_t* error)
 		} else
 			fInitError = regError;
 	}
+	// init be_app_messenger
+	if (fInitError == B_OK)
+		be_app_messenger = BMessenger(NULL, this);
 	// TODO: SetName()
 	// TODO: create_app_meta_mime()
 	// return the error
