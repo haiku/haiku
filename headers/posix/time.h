@@ -1,8 +1,9 @@
+/*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+*/
 #ifndef _TIME_H_
 #define _TIME_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <sys/types.h>
@@ -68,6 +69,7 @@ extern struct tm	*localtime(const time_t *timer);
 extern struct tm	*localtime_r(const time_t *timer, struct tm *tm);
 extern size_t		strftime(char *buffer, size_t maxSize, const char *format,
 						const struct tm *tm);
+extern char 		*strptime(const char *buf, const char *format, struct tm *tm);
 
 /* special timezone support */
 extern void tzset(void);
