@@ -42,6 +42,7 @@ public:
 	void Draw(void);
 	void GetFootprint(BRegion *region);
 	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
+	BRect SlideTab(float dx, float dy=0);
 protected:
 	void _DrawClose(BRect r);
 	void _DrawFrame(BRect r);

@@ -37,8 +37,12 @@
 
 #define USE_VIEW_FILL_HACK
 
+#//#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
 #endif
 
 BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
@@ -55,8 +59,11 @@ BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	framecolors[3].SetColor(136,136,136);
 	framecolors[4].SetColor(96,96,96);
 
+	// Set appropriate colors based on the current focus value. In this case, each decorator
+	// defaults to not having the focus.
 	_SetFocus();
-
+	
+	// Do initial decorator setup
 	_DoLayout();
 	
 	// This flag is used to determine whether or not we're moving the tab
@@ -65,68 +72,67 @@ BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 //	tab_highcol=_colors->window_tab;
 //	tab_lowcol=_colors->window_tab;
 
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator:\n");
-printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
-#endif
+STRACE(("BeDecorator:\n"));
+STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
 }
 
 BeDecorator::~BeDecorator(void)
 {
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: ~BeDecorator()\n");
-#endif
+STRACE(("BeDecorator: ~BeDecorator()\n"));
 	delete [] framecolors;
 }
 
 click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: Clicked\n");
-printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
-printf("\tButtons:\n");
-if(buttons==0)
-	printf("\t\tNone\n");
-else
-{
-	if(buttons & B_PRIMARY_MOUSE_BUTTON)
-		printf("\t\tPrimary\n");
-	if(buttons & B_SECONDARY_MOUSE_BUTTON)
-		printf("\t\tSecondary\n");
-	if(buttons & B_TERTIARY_MOUSE_BUTTON)
-		printf("\t\tTertiary\n");
-}
-printf("\tModifiers:\n");
-if(modifiers==0)
-	printf("\t\tNone\n");
-else
-{
-	if(modifiers & B_CAPS_LOCK)
-		printf("\t\tCaps Lock\n");
-	if(modifiers & B_NUM_LOCK)
-		printf("\t\tNum Lock\n");
-	if(modifiers & B_SCROLL_LOCK)
-		printf("\t\tScroll Lock\n");
-	if(modifiers & B_LEFT_COMMAND_KEY)
-		printf("\t\t Left Command\n");
-	if(modifiers & B_RIGHT_COMMAND_KEY)
-		printf("\t\t Right Command\n");
-	if(modifiers & B_LEFT_CONTROL_KEY)
-		printf("\t\tLeft Control\n");
-	if(modifiers & B_RIGHT_CONTROL_KEY)
-		printf("\t\tRight Control\n");
-	if(modifiers & B_LEFT_OPTION_KEY)
-		printf("\t\tLeft Option\n");
-	if(modifiers & B_RIGHT_OPTION_KEY)
-		printf("\t\tRight Option\n");
-	if(modifiers & B_LEFT_SHIFT_KEY)
-		printf("\t\tLeft Shift\n");
-	if(modifiers & B_RIGHT_SHIFT_KEY)
-		printf("\t\tRight Shift\n");
-	if(modifiers & B_MENU_KEY)
-		printf("\t\tMenu\n");
-}
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("BeDecorator: Clicked\n");
+	printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
+	printf("\tButtons:\n");
+	if(buttons==0)
+		printf("\t\tNone\n");
+	else
+	{
+		if(buttons & B_PRIMARY_MOUSE_BUTTON)
+			printf("\t\tPrimary\n");
+		if(buttons & B_SECONDARY_MOUSE_BUTTON)
+			printf("\t\tSecondary\n");
+		if(buttons & B_TERTIARY_MOUSE_BUTTON)
+			printf("\t\tTertiary\n");
+	}
+	printf("\tModifiers:\n");
+	if(modifiers==0)
+		printf("\t\tNone\n");
+	else
+	{
+		if(modifiers & B_CAPS_LOCK)
+			printf("\t\tCaps Lock\n");
+		if(modifiers & B_NUM_LOCK)
+			printf("\t\tNum Lock\n");
+		if(modifiers & B_SCROLL_LOCK)
+			printf("\t\tScroll Lock\n");
+		if(modifiers & B_LEFT_COMMAND_KEY)
+			printf("\t\t Left Command\n");
+		if(modifiers & B_RIGHT_COMMAND_KEY)
+			printf("\t\t Right Command\n");
+		if(modifiers & B_LEFT_CONTROL_KEY)
+			printf("\t\tLeft Control\n");
+		if(modifiers & B_RIGHT_CONTROL_KEY)
+			printf("\t\tRight Control\n");
+		if(modifiers & B_LEFT_OPTION_KEY)
+			printf("\t\tLeft Option\n");
+		if(modifiers & B_RIGHT_OPTION_KEY)
+			printf("\t\tRight Option\n");
+		if(modifiers & B_LEFT_SHIFT_KEY)
+			printf("\t\tLeft Shift\n");
+		if(modifiers & B_RIGHT_SHIFT_KEY)
+			printf("\t\tRight Shift\n");
+		if(modifiers & B_MENU_KEY)
+			printf("\t\tMenu\n");
+	}
+	#endif
+	
+	// In checking for hit test stuff, we start with the smallest rectangles the user might
+	// be clicking on and gradually work our way out into larger rectangles.
 	if(_closerect.Contains(pt))
 		return DEC_CLOSE;
 
@@ -140,8 +146,6 @@ else
 	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
-//		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-//			return DEC_MOVETOFRONT;
 		if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			return DEC_MOVETOBACK;
 		return DEC_DRAG;
@@ -165,22 +169,10 @@ else
 
 void BeDecorator::_DoLayout(void)
 {
-//debugger("");
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: Do Layout\n");
-#endif
+	STRACE(("BeDecorator: Do Layout\n"));
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
-	
-	// Current version simply makes everything fit inside the rect
-	// instead of building around it. This will change.
-	
-	_tabrect=_frame;
-	_resizerect=_frame;
-	_borderrect=_frame;
-	_closerect=_frame;
 
-	
 	switch(GetLook())
 	{
 		case B_FLOATING_WINDOW_LOOK:
@@ -191,42 +183,27 @@ printf("BeDecorator: Do Layout\n");
 		// and there *are* apps which do this
 //			borderwidth=3;
 //			break;
+
 		case B_BORDERED_WINDOW_LOOK:
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
-			borderwidth=5;
+			borderwidth = 5;
 			break;
 		default:
-			borderwidth=0;
-	}
-
-	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
-
-	_closerect.left+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
-	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
-	_closerect.right=_closerect.left+10;
-	_closerect.bottom=_closerect.top+10;
-	
-	
-	_borderrect.top+=19;
-
-	if(borderwidth)
-	{
-		// Set up the border rectangles to handle the window's frame
-		rightborder=leftborder=topborder=bottomborder=_borderrect;
-		
-		// We want the rectangles to intersect because of the beveled intersections, so all
-		// that is necessary is to set the short dimension of each side
-		leftborder.right=leftborder.left+borderwidth;
-		rightborder.left=rightborder.right-borderwidth;
-		topborder.bottom=topborder.top+borderwidth;
-		bottomborder.top=bottomborder.bottom-borderwidth;
+			borderwidth = 0;
 	}
 	
-	_resizerect.top=_resizerect.bottom-18;
-	_resizerect.left=_resizerect.right-18;
+	// distance from one item of the tab bar to another. In this case the text and close/zoom rects
+	textoffset = (_look==B_FLOATING_WINDOW_LOOK) ? 7 : 10;
 	
-	_tabrect.bottom=_tabrect.top+18;
+	// calculate our tab rect
+	_tabrect.Set( 	_frame.left - borderwidth,
+					_frame.top - borderwidth - 19.0,
+					((_frame.right - _frame.left) < 35.0 ?
+							_frame.left + 35.0 : _frame.right) + borderwidth,
+					_frame.top - (borderwidth-1) );
+
+	// make it text width sensitive
 	if(strlen(GetTitle())>1)
 	{
 		if(_driver)
@@ -234,22 +211,63 @@ printf("BeDecorator: Do Layout\n");
 		else
 			titlepixelwidth=10;
 		
-		if(_closerect.right+textoffset+titlepixelwidth+35< _frame.Width()-1)
-			_tabrect.right=_tabrect.left+titlepixelwidth;
+		int32	tabLength	= 	int32(14 + // _closerect width
+								textoffset + titlepixelwidth + textoffset +
+								14 + // _zoomrect width
+								8); // margins
+		int32	tabWidth	= (int32)_tabrect.Width();
+		if ( tabLength < tabWidth )
+			_tabrect.right	= _tabrect.left + tabLength;
 	}
 	else
-		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
+		_tabrect.right		= _tabrect.left + _tabrect.Width()/2;
 
-	if(_look==B_FLOATING_WINDOW_LOOK)
-		_tabrect.top+=4;
+	// calculate left/top/right/bottom borders
+	if ( borderwidth != 0 ){
+		_borderrect		= _frame.InsetByCopy( -borderwidth, -borderwidth );
+		leftborder.Set( _borderrect.left, _frame.top - borderwidth,
+						_frame.left, _frame.bottom + borderwidth );
+		rightborder.Set( _frame.right, _frame.top - borderwidth,
+						 _borderrect.right, _frame.bottom + borderwidth );
+		topborder.Set( 	_borderrect.left, _borderrect.top,
+						_borderrect.right, _frame.top );
+		bottomborder.Set( _borderrect.left, _frame.bottom,
+						  _borderrect.right, _borderrect.bottom );
+	}
+	else{
+		// no border ... (?) useful when displaying windows that are just images
+		_borderrect	= _frame;
+		leftborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		rightborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		topborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		bottomborder.Set( 0.0, 0.0, -1.0, -1.0 );						
+	}
 
-	_zoomrect=_tabrect;
-	_zoomrect.top+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
-	_zoomrect.right-=4;
-	_zoomrect.bottom-=4;
-	_zoomrect.left=_zoomrect.right-10;
-	_zoomrect.bottom=_zoomrect.top+10;
-	
+	// calculate resize rect
+	_resizerect.Set(	_borderrect.right - 19.0, _borderrect.bottom - 19.0,
+						_borderrect.right, _borderrect.bottom);
+
+	// format tab rect for a floating window - make the rect smaller
+	if ( _look == B_FLOATING_WINDOW_LOOK ){
+		_tabrect.InsetBy( 0, 2 );
+		_tabrect.OffsetBy( 0, 2 );
+	}	
+
+	// calulate close rect based on the tab rectangle
+	_closerect.Set(	_tabrect.left + 4.0, _tabrect.top + 4.0,
+					_tabrect.left + 4.0 + 13.0, _tabrect.top + 4.0 + 13.0 );
+					
+	// calulate zoom rect based on the tab rectangle
+	_zoomrect.Set(  _tabrect.right - 4.0 - 13.0, _tabrect.top + 4.0,
+					_tabrect.right - 4.0, _tabrect.top + 4.0 + 13.0 );
+
+	// format close and zoom rects for a floating window - make rectangles smaller
+	if ( _look == B_FLOATING_WINDOW_LOOK ){
+		_closerect.InsetBy( 1, 1 );
+		_zoomrect.InsetBy( 1, 1 );
+		_closerect.OffsetBy( 0, -2 );
+		_zoomrect.OffsetBy( 0, -2 );
+	}
 }
 
 void BeDecorator::MoveBy(float x, float y)
@@ -259,9 +277,7 @@ void BeDecorator::MoveBy(float x, float y)
 
 void BeDecorator::MoveBy(BPoint pt)
 {
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
-#endif
+	STRACE(("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -269,40 +285,72 @@ printf("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
 	_resizerect.OffsetBy(pt);
 	_borderrect.OffsetBy(pt);
 	_zoomrect.OffsetBy(pt);
+	
+	leftborder.OffsetBy(pt);
+	rightborder.OffsetBy(pt);
+	topborder.OffsetBy(pt);
+	bottomborder.OffsetBy(pt);
 }
 
 void BeDecorator::GetFootprint(BRegion *region)
 {
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: Get Footprint\n");
-#endif
+	STRACE(("BeDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
 	if(!region)
 		return;
+
+	if(_look == B_NO_BORDER_WINDOW_LOOK)
+	{
+		region->Set(_frame);
+		return;
+	}
 	
+	if(_look == B_BORDERED_WINDOW_LOOK)
+	{
+		region->Set(_borderrect);
+		return;
+	}
+
 	region->Set(_borderrect);
 	region->Include(_tabrect);
+
+}
+
+
+BRect BeDecorator::SlideTab(float dx, float dy)
+{
+	//return Decorator::SlideTab(dx,dy);
+	return _tabrect;
 }
 
 void BeDecorator::_DrawTitle(BRect r)
 {
+	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
 	_layerdata.highcolor=_colors->window_tab_text;
 	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 
-	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset));
-	BString titlestr=GetTitle();
+	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
+	BString titlestr( GetTitle() );
+	
 	if(titlecount<titlestr.CountChars())
 	{
 		titlestr.Truncate(titlecount-1);
 		titlestr+="...";
 		titlecount+=2;
 	}
+	
+	// The text position needs tweaked when working as a floating window because the closerect placement
+	// is a little different. If it isn't moved, title placement looks really funky
+	if(_look==B_FLOATING_WINDOW_LOOK)
 	_driver->DrawString(titlestr.String(),titlecount,
 		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+	else	
+	_driver->DrawString(titlestr.String(),titlecount,
+		BPoint(_closerect.right+textoffset,_closerect.bottom),&_layerdata);
 }
 
 void BeDecorator::_SetFocus(void)
@@ -313,84 +361,88 @@ void BeDecorator::_SetFocus(void)
 	if(GetFocus())
 	{
 		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_1_TINT));
 		textcol=_colors->window_tab_text;
 	}
 	else
 	{
 		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_1_TINT));
 		textcol=_colors->inactive_window_tab_text;
 	}
 }
 
 void BeDecorator::Draw(BRect update)
 {
-#ifdef DEBUG_DECORATOR
-printf("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
-#endif
+	STRACE(("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
+
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
-	_DrawTab(update);
-
-	// Draw the top view's client area - just a hack :)
-	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect & update,_colors->document_background);
-	
 	_DrawFrame(update);
-
+	_DrawTab(update);
 }
 
 void BeDecorator::Draw(void)
 {
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
+	_DrawFrame(_borderrect);
+	_DrawTab(_tabrect);
 
-	// Draw the top view's client area - just a hack :)
-//	_layerdata.highcolor=_colors->document_background;
-
-//	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
-
-	DrawFrame();
-
-	DrawTab();
 }
 
 void BeDecorator::_DrawZoom(BRect r)
 {
+	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
-	BRect zr=r;
-	zr.left+=zr.Width()/3;
-	zr.top+=zr.Height()/3;
-
-	DrawBlendedRect(zr,GetZoom());
-	DrawBlendedRect(zr.OffsetToCopy(r.LeftTop()),GetZoom());
+	BRect zr( r );
+	
+	zr.left		+= 3.0;
+	zr.top		+= 3.0;
+	DrawBlendedRect( zr, GetZoom() );
+	
+	zr			= r;
+	zr.right	-= 5.0;
+	zr.bottom	-= 5.0;
+	DrawBlendedRect( zr, GetZoom() );
 }
 
 void BeDecorator::_DrawClose(BRect r)
 {
+	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Just like DrawZoom, but for a close button
-	DrawBlendedRect(r,GetClose());
+	DrawBlendedRect( r, GetClose());
 }
 
 void BeDecorator::_DrawTab(BRect r)
 {
+	STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
 		return;
 	
-	_driver->FillRect(_tabrect, ((GetFocus())?_colors->window_tab:_colors->inactive_window_tab) );
-	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),1.0,framecolors[3]);
-
+	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_driver->FillRect(_tabrect,_layerdata.highcolor);
+	
+	_layerdata.highcolor=framecolors[2];
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),_layerdata.pensize,_layerdata.highcolor);
+	_layerdata.highcolor=framecolors[4];
+	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),_layerdata.pensize,_layerdata.highcolor);
+	_layerdata.highcolor=framecolors[1];	
+	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom ),
+						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
+						 _layerdata.pensize,_layerdata.highcolor);
+	
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
 	if(!(_flags & B_NOT_CLOSABLE))
 		_DrawClose(_closerect);
-	if(!(_flags & B_NOT_ZOOMABLE))
+	if(!(_flags & B_NOT_ZOOMABLE) && _look != B_MODAL_WINDOW_LOOK)
 		_DrawZoom(_zoomrect);
 }
 
@@ -435,16 +487,18 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
+		_layerdata.highcolor=tmpcol;
 
 		_driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),1.0,tmpcol);
+			BPoint(r.left+i,r.top),1.0,_layerdata.highcolor);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)));
+		_layerdata.highcolor=tmpcol;
 
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),1.0,tmpcol);
+			BPoint(r.left+i,r.top+steps),1.0,_layerdata.highcolor);
 
 	}
 
@@ -460,7 +514,8 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_driver->FillRect(_borderrect,_layerdata.highcolor);
+	_layerdata.highcolor = RGBColor(192,192,192 );	
+	_driver->FillRect(_frame,_layerdata.highcolor);
 	#endif
 
 	if(!borderwidth)
