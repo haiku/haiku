@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -18,9 +18,9 @@
 
 using namespace boot;
 
-#define TRACE_PARTITIONS
+//#define TRACE_PARTITIONS
 #ifdef TRACE_PARTITIONS
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -91,7 +91,8 @@ class NodeOpener {
 Partition::Partition(int fd)
 	:
 	fParent(NULL),
-	fIsFileSystem(false)
+	fIsFileSystem(false),
+	fIsPartitioningSystem(false)
 {
 	memset((partition_data *)this, 0, sizeof(partition_data));
 	id = (partition_id)this;
@@ -221,6 +222,8 @@ Partition::Scan(bool mountFileSystems)
 		module->free_identify_partition_cookie(this, cookie);
 
 		if (status == B_OK) {
+			fIsPartitioningSystem = true;
+
 			// now that we've found something, check our children
 			// out as well!
 
@@ -280,9 +283,19 @@ add_partitions_for(int fd, bool mountFileSystems)
 	// add this partition to the list of partitions, if it contains
 	// or might contain a file system
 	if ((partition->Scan(mountFileSystems) == B_OK && partition->IsFileSystem())
-		|| (!partition->IsFileSystem() && !mountFileSystems)) {
+		|| (!partition->IsPartitioningSystem() && !mountFileSystems)) {
 		gPartitions.Add(partition);
 		return B_OK;
+	}
+
+	// if not, we'll need to tell the children that their parent is gone
+
+	NodeIterator iterator = gPartitions.Iterator();
+	Partition *child = NULL;
+
+	while ((child = (Partition *)iterator.Next()) != NULL) {
+		if (child->Parent() == partition)
+			child->SetParent(NULL);
 	}
 
 	delete partition;
@@ -301,7 +314,7 @@ add_partitions_for(Node *device, bool mountFileSystems)
 
 	status_t status = add_partitions_for(fd, mountFileSystems);
 	if (status < B_OK)
-		printf("add_partitions_for(%d) failed: %ld\n", fd, status);
+		dprintf("add_partitions_for(%d) failed: %ld\n", fd, status);
 
 	close(fd);
 	return B_OK;
@@ -314,7 +327,7 @@ create_child_partition(partition_id id, int32 index, partition_id childID)
 	Partition &partition = *(Partition *)id;
 	Partition *child = partition.AddChild();
 	if (child == NULL) {
-		printf("creating partition failed: no memory\n");
+		dprintf("creating partition failed: no memory\n");
 		return NULL;
 	}
 
