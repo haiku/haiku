@@ -25,20 +25,12 @@
 //	Description:	A buffered adapter for BPositionIO objects.  
 //------------------------------------------------------------------------------
 
-
-/*	XXX: Currently, this class implement buffered reading, 
-	but not (yet) buffered writing.
-	I'm doing tests to ensure that the implementation of the buffered
-	writing will be correct.
-*/
-
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
 #include <BufferIO.h>
-
 
 /*! \class BBufferIO
 	\brief A buffered adapter for BPositionIO objects.
@@ -68,7 +60,11 @@ BBufferIO::BBufferIO(BPositionIO *stream, size_t buf_size, bool owns_stream)
 		buf_size = 512;
 	
 	m_buffer_phys = buf_size;
-	  
+	 
+	// What can we do if this malloc fails ?
+	// I think R5 uses new, but doesn't catch the thrown exception
+	// (if you specify a very big buffer, the application just
+	// terminates with abort).  
 	m_buffer = (char*)malloc(m_buffer_phys * sizeof(char));
 }
 
@@ -93,7 +89,7 @@ BBufferIO::~BBufferIO()
 
 /*! \brief Reads the specified amount of bytes at the given position.
 	\param pos The offset into the stream where to read.
-	\param buffer A pointer to a buffer where to put the read data.
+	\param buffer A pointer to a buffer where to copy the read data.
 	\param size The amount of bytes to read.
 	\return The amount of bytes actually read, or an error code.
 */
@@ -108,20 +104,25 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 	
 	if (buffer == NULL)
 		return B_BAD_VALUE;
-	
-	if (m_buffer_dirty)
-		Flush(); // If there are pending writes, do them.
-				
+						
 	// If the amount of data we want doesn't fit in the buffer, just
-	// read it directly from the disk.
+	// read it directly from the disk (and don't touch the buffer).
 	if (size > m_buffer_phys)
-		return ReadAt(pos, buffer, size);
-		
+	{
+		if (m_buffer_dirty)
+			Flush();
+		return m_stream->ReadAt(pos, buffer, size);
+	}
+				
 	// If the data we are looking for is not in the buffer... 
 	if (size > m_buffer_used 
 		|| pos < m_buffer_start
-		|| pos > m_buffer_start + m_buffer_used)
+		|| pos > m_buffer_start + m_buffer_used
+		|| pos + size > m_buffer_start + m_buffer_used)
 	{
+		if (m_buffer_dirty)
+			Flush(); // If there are pending writes, do them.
+	
 		// ...cache as much as we can from the stream
 		m_buffer_used = m_stream->ReadAt(pos, m_buffer, m_buffer_phys);
 					
@@ -150,9 +151,45 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (m_stream == NULL)
 		return B_NO_INIT;
 	
-	// XXX: Implement buffered write
+	if (buffer == NULL)
+		return B_BAD_VALUE;
 	
-	return m_stream->WriteAt(pos, buffer, size);
+	// If data doesn't fit into the buffer, write it directly to the stream	
+	if (size > m_buffer_phys)
+		return m_stream->WriteAt(pos, buffer, size);
+	
+	// If we have cached data in the buffer, whose offset into the stream
+	// is > 0, and the buffer isn't dirty, drop the data.
+	if (!m_buffer_dirty && m_buffer_start > pos)
+	{
+		m_buffer_start = 0;
+		m_buffer_used = 0;
+	}	
+	
+	// If we want to write beyond the cached data...
+	if (pos > m_buffer_start + m_buffer_used
+		|| pos < m_buffer_start)
+	{
+		ssize_t read;
+		off_t where = pos;
+		
+		if (pos + size <= m_buffer_phys) // Can we just cache from the beginning ?
+			where = 0;
+		
+		// ...cache more.
+		read = m_stream->ReadAt(where, m_buffer, m_buffer_phys);
+		if (read > 0)
+		{
+			m_buffer_used = read;
+			m_buffer_start = where;
+		}
+	}
+	memcpy(m_buffer + pos - m_buffer_start, buffer, size); 	
+	m_buffer_dirty = true;
+	
+	m_buffer_used = max_c((size + pos), m_buffer_used);
+	
+	return size;
 }
 
 
@@ -165,14 +202,14 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	 \param position The position where you want to seek.
 	 \param seek_mode Can have three values:
 
-	 - \oSEEK_SET. The position passed is an offset from the beginning of the stream;
+	 - \c SEEK_SET. The position passed is an offset from the beginning of the stream;
 		in other words, the current position is set to position.
 		For this mode, position should be a positive value. 
 	 
-	 - \oSEEK_CUR. The position argument is an offset from the current position;
+	 - \c SEEK_CUR. The position argument is an offset from the current position;
 		the value of the argument is added to the current position.
 		
-	 - \oSEEK_END. The position argument is an offset from the end of the stream.
+	 - \c SEEK_END. The position argument is an offset from the end of the stream.
 		In this mode the position argument should be negative (or zero).
 	
 	 \return The current position as an offset in bytes
@@ -222,10 +259,16 @@ BBufferIO::SetSize(off_t size)
 status_t
 BBufferIO::Flush()
 {
-	m_buffer_dirty = false;
+	if (!m_buffer_dirty)
+		return B_OK;
+		
+	// Write the cached data to the stream
+	status_t err = m_stream->WriteAt(m_buffer_start, m_buffer, m_buffer_used);
 	
-	// XXX: Not implemented... yet
-	return B_ERROR;
+	if (err > 0)
+		m_buffer_dirty = false;
+	
+	return (err < 0) ? err : B_OK;
 }
 
 
