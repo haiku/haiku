@@ -359,8 +359,10 @@ void BApplication::Quit()
 bool BApplication::QuitRequested()
 {
 	// No windows -- nothing to do.
+	// TODO: Au contraire, we can have opened windows, and we have
+	// to quit them.
+	
 	return BLooper::QuitRequested();
-}
 //------------------------------------------------------------------------------
 void BApplication::Pulse()
 {
@@ -905,7 +907,8 @@ bool BApplication::quit_all_windows(bool force)
 //------------------------------------------------------------------------------
 bool BApplication::window_quit_loop(bool, bool)
 {
-	return false;	// not implemented
+	// TODO: Implement and use in BApplication::QuitRequested()
+	return false;
 }
 //------------------------------------------------------------------------------
 void BApplication::do_argv(BMessage* message)
