@@ -35,6 +35,7 @@
 #include <atomic.h>
 #include <kerrors.h>
 #include <syscalls.h>
+#include <ksignal.h>
 #include <tls.h>
 
 #define TRACE_THREAD 0
@@ -59,7 +60,7 @@ static struct thread *idle_threads[MAX_BOOT_CPUS];
 static void *thread_hash = NULL;
 static thread_id next_thread_id = 1;
 
-static sem_id snooze_sem = -1;
+static sem_id gSnoozeSem = -1;
 
 // death stacks - used temporarily as a thread cleans itself up
 struct death_stack {
@@ -79,68 +80,6 @@ struct thread_queue dead_q;
 
 static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
-
-
-// insert a thread onto the tail of a queue
-void
-thread_enqueue(struct thread *t, struct thread_queue *q)
-{
-	t->q_next = NULL;
-	if(q->head == NULL) {
-		q->head = t;
-		q->tail = t;
-	} else {
-		q->tail->q_next = t;
-		q->tail = t;
-	}
-}
-
-
-struct thread *
-thread_lookat_queue(struct thread_queue *q)
-{
-	return q->head;
-}
-
-
-struct thread *
-thread_dequeue(struct thread_queue *q)
-{
-	struct thread *t;
-
-	t = q->head;
-	if (t != NULL) {
-		q->head = t->q_next;
-		if(q->tail == t)
-			q->tail = NULL;
-	}
-	return t;
-}
-
-
-struct thread *
-thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
-{
-	struct thread *t;
-	struct thread *last = NULL;
-
-	t = q->head;
-	while (t != NULL) {
-		if (t->id == thr_id) {
-			if (last == NULL)
-				q->head = t->q_next;
-			else
-				last->q_next = t->q_next;
-
-			if (q->tail == t)
-				q->tail = last;
-			break;
-		}
-		last = t;
-		t = t->q_next;
-	}
-	return t;
-}
 
 
 static void
@@ -238,7 +177,7 @@ create_thread_struct(const char *name)
 	t->user_local_storage = 0;
 	t->kernel_errno = 0;
 	t->team_next = NULL;
-	t->q_next = NULL;
+	t->queue_next = NULL;
 	t->priority = -1;
 	t->args = NULL;
 	t->sig_pending = 0;
@@ -339,7 +278,7 @@ _create_kernel_thread_kentry(void)
 
 
 static thread_id
-_create_thread(const char *name, team_id teamID, addr entry, void *args, int priority, bool kernel)
+create_thread(const char *name, team_id teamID, thread_func entry, void *args, int32 priority, bool kernel)
 {
 	struct thread *t;
 	struct team *team;
@@ -446,41 +385,6 @@ _create_thread(const char *name, team_id teamID, addr entry, void *args, int pri
 }
 
 
-thread_id
-thread_create_user_thread(char *name, team_id teamID, addr entry, void *args)
-{
-	return _create_thread(name, teamID, entry, args, -1, false);
-}
-
-
-thread_id
-thread_create_kernel_thread(const char *name, int (*func)(void *), void *args)
-{
-	return _create_thread(name, team_get_kernel_team()->id, (addr)func, args, -1, true);
-}
-
-
-thread_id
-thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *team)
-{
-	return _create_thread(name, team->id, (addr)func, args, -1, true);
-}
-
-
-int
-thread_suspend_thread(thread_id id)
-{
-	return send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
-}
-
-
-int
-thread_resume_thread(thread_id id)
-{
-	return send_signal_etc(id, SIGCONT, B_DO_NOT_RESCHEDULE);
-}
-
-
 static const char *
 state_to_text(int state)
 {
@@ -510,7 +414,7 @@ _dump_thread_info(struct thread *t)
 	dprintf("id:          0x%lx\n", t->id);
 	dprintf("name:        '%s'\n", t->name);
 	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
-		t->all_next, t->team_next, t->q_next);
+		t->all_next, t->team_next, t->queue_next);
 	dprintf("priority:    0x%x\n", t->priority);
 	dprintf("state:       %s\n", state_to_text(t->state));
 	dprintf("next_state:  %s\n", state_to_text(t->next_state));
@@ -614,8 +518,8 @@ dump_next_thread_in_q(int argc, char **argv)
 	}
 
 	dprintf("next thread in queue after thread @ %p\n", t);
-	if (t->q_next != NULL)
-		_dump_thread_info(t->q_next);
+	if (t->queue_next != NULL)
+		_dump_thread_info(t->queue_next);
 	else
 		dprintf("NULL\n");
 
@@ -716,127 +620,7 @@ put_death_stack_and_reschedule(unsigned int index)
 
 	release_sem_etc(death_stack_sem, 1, B_DO_NOT_RESCHEDULE);
 
-	resched();
-}
-
-
-int
-thread_init(kernel_args *ka)
-{
-	struct thread *t;
-	unsigned int i;
-
-//	dprintf("thread_init: entry\n");
-
-	// create the thread hash table
-	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
-		&thread_struct_compare, &thread_struct_hash);
-
-	// zero out the dead thread structure q
-	memset(&dead_q, 0, sizeof(dead_q));
-
-	// allocate a snooze sem
-	snooze_sem = create_sem(0, "snooze sem");
-	if (snooze_sem < 0) {
-		panic("error creating snooze sem\n");
-		return snooze_sem;
-	}
-
-	// create an idle thread for each cpu
-	for (i = 0; i < ka->num_cpus; i++) {
-		char temp[64];
-		vm_region *region;
-
-		sprintf(temp, "idle_thread%d", i);
-		t = create_thread_struct(temp);
-		if (t == NULL) {
-			panic("error creating idle thread struct\n");
-			return ENOMEM;
-		}
-		t->team = team_get_kernel_team();
-		t->priority = B_IDLE_PRIORITY;
-		t->state = B_THREAD_RUNNING;
-		t->next_state = B_THREAD_READY;
-		sprintf(temp, "idle_thread%d_kstack", i);
-		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
-		region = vm_get_region_by_id(t->kernel_stack_region_id);
-		if (!region)
-			panic("error finding idle kstack region\n");
-
-		t->kernel_stack_base = region->base;
-		vm_put_region(region);
-		hash_insert(thread_hash, t);
-		insert_thread_into_team(t->team, t);
-		idle_threads[i] = t;
-		if (i == 0)
-			arch_thread_set_current_thread(t);
-		t->cpu = &cpu[i];
-	}
-
-	// create a set of death stacks
-	num_death_stacks = smp_get_num_cpus();
-	if (num_death_stacks > 8*sizeof(death_stack_bitmap)) {
-		/*
-		 * clamp values for really beefy machines
-		 */
-		num_death_stacks = 8*sizeof(death_stack_bitmap);
-	}
-	death_stack_bitmap = 0;
-	death_stacks = (struct death_stack *)malloc(num_death_stacks * sizeof(struct death_stack));
-	if (death_stacks == NULL) {
-		panic("error creating death stacks\n");
-		return ENOMEM;
-	}
-	{
-		char temp[64];
-
-		for (i = 0; i < num_death_stacks; i++) {
-			sprintf(temp, "death_stack%d", i);
-			death_stacks[i].rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp,
-				(void **)&death_stacks[i].address,
-				REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-			if (death_stacks[i].rid < 0) {
-				panic("error creating death stacks\n");
-				return death_stacks[i].rid;
-			}
-			death_stacks[i].in_use = false;
-		}
-	}
-	death_stack_sem = create_sem(num_death_stacks, "death_stack_noavail_sem");
-
-	// set up some debugger commands
-	add_debugger_command("threads", &dump_thread_list, "list all threads");
-	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
-	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
-	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
-	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
-
-	return 0;
-}
-
-
-int
-thread_init_percpu(int cpu_num)
-{
-	arch_thread_set_current_thread(idle_threads[cpu_num]);
-	return 0;
-}
-
-
-// This snooze is for internal kernel use only; doesn't interrupt on signals.
-status_t
-snooze(bigtime_t timeout)
-{
-	return acquire_sem_etc(snooze_sem, 1, B_RELATIVE_TIMEOUT, timeout);
-}
-
-
-status_t
-snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
-{
-	if (timebase != B_SYSTEM_TIMEBASE)
-		return B_BAD_VALUE;
-	return acquire_sem_etc(snooze_sem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
+	scheduler_reschedule();
 }
 
 
@@ -1045,15 +829,14 @@ thread_exit(void)
 int
 thread_kill_thread(thread_id id)
 {
-	int rv;
-	
-	rv = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-	if (rv < 0)
-		return rv;
+	status_t status = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	if (status < 0)
+		return status;
+
 	if (id != thread_get_current_thread()->id)
-		thread_wait_on_thread(id, NULL);
-	
-	return rv;
+		wait_for_thread(id, NULL);
+
+	return status;
 }
 
 
@@ -1071,49 +854,6 @@ thread_kthread_exit(void)
 	
 	t->return_flags = THREAD_RETURN_EXIT;
 	thread_exit();
-}
-
-
-int
-thread_wait_on_thread(thread_id id, int *retcode)
-{
-	sem_id sem;
-	cpu_status state;
-	struct thread *t;
-	int rc;
-
-	rc = send_signal_etc(id, SIGCONT, 0);
-	if (rc != B_OK)
-		return rc;
-	
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	t = thread_get_thread_struct_locked(id);
-	if (t != NULL) {
-		sem = t->return_code_sem;
-	} else {
-		sem = B_BAD_THREAD_ID;
-	}
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	rc = acquire_sem(sem);
-
-	/* This thread died the way it should, dont ripple a non-error up */
-	if (rc == B_BAD_SEM_ID) {
-		rc = B_NO_ERROR;
-		
-		if (retcode) {
-			t = thread_get_current_thread();
-			dprintf("thread_wait_on_thread: thread %ld got return code 0x%x\n",
-				t->id, t->sem_deleted_retcode);
-			*retcode = t->sem_deleted_retcode;
-		}
-	}
-
-	return rc;
 }
 
 
@@ -1200,10 +940,191 @@ thread_atkernel_exit(void)
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	
+
 	if (global_resched)
 		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 }
+
+
+//	#pragma mark -
+//	private kernel exported functions
+
+
+/** insert a thread onto the tail of a queue
+ */
+
+void
+thread_enqueue(struct thread *thread, struct thread_queue *queue)
+{
+	thread->queue_next = NULL;
+	if (queue->head == NULL) {
+		queue->head = thread;
+		queue->tail = thread;
+	} else {
+		queue->tail->queue_next = thread;
+		queue->tail = thread;
+	}
+}
+
+
+struct thread *
+thread_lookat_queue(struct thread_queue *queue)
+{
+	return queue->head;
+}
+
+
+struct thread *
+thread_dequeue(struct thread_queue *queue)
+{
+	struct thread *thread = queue->head;
+
+	if (thread != NULL) {
+		queue->head = thread->queue_next;
+		if (queue->tail == thread)
+			queue->tail = NULL;
+	}
+	return thread;
+}
+
+
+struct thread *
+thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
+{
+	struct thread *t;
+	struct thread *last = NULL;
+
+	t = q->head;
+	while (t != NULL) {
+		if (t->id == thr_id) {
+			if (last == NULL)
+				q->head = t->queue_next;
+			else
+				last->queue_next = t->queue_next;
+
+			if (q->tail == t)
+				q->tail = last;
+			break;
+		}
+		last = t;
+		t = t->queue_next;
+	}
+	return t;
+}
+
+
+int
+thread_init(kernel_args *ka)
+{
+	struct thread *t;
+	unsigned int i;
+
+//	dprintf("thread_init: entry\n");
+
+	// create the thread hash table
+	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
+		&thread_struct_compare, &thread_struct_hash);
+
+	// zero out the dead thread structure q
+	memset(&dead_q, 0, sizeof(dead_q));
+
+	// allocate snooze sem
+	gSnoozeSem = create_sem(0, "snooze sem");
+	if (gSnoozeSem < 0) {
+		panic("error creating snooze sem\n");
+		return gSnoozeSem;
+	}
+
+	// create an idle thread for each cpu
+	for (i = 0; i < ka->num_cpus; i++) {
+		char temp[64];
+		vm_region *region;
+
+		sprintf(temp, "idle_thread%d", i);
+		t = create_thread_struct(temp);
+		if (t == NULL) {
+			panic("error creating idle thread struct\n");
+			return ENOMEM;
+		}
+		t->team = team_get_kernel_team();
+		t->priority = B_IDLE_PRIORITY;
+		t->state = B_THREAD_RUNNING;
+		t->next_state = B_THREAD_READY;
+		sprintf(temp, "idle_thread%d_kstack", i);
+		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
+		region = vm_get_region_by_id(t->kernel_stack_region_id);
+		if (!region)
+			panic("error finding idle kstack region\n");
+
+		t->kernel_stack_base = region->base;
+		vm_put_region(region);
+		hash_insert(thread_hash, t);
+		insert_thread_into_team(t->team, t);
+		idle_threads[i] = t;
+		if (i == 0)
+			arch_thread_set_current_thread(t);
+		t->cpu = &cpu[i];
+	}
+
+	// create a set of death stacks
+	num_death_stacks = smp_get_num_cpus();
+	if (num_death_stacks > 8*sizeof(death_stack_bitmap)) {
+		/*
+		 * clamp values for really beefy machines
+		 */
+		num_death_stacks = 8*sizeof(death_stack_bitmap);
+	}
+	death_stack_bitmap = 0;
+	death_stacks = (struct death_stack *)malloc(num_death_stacks * sizeof(struct death_stack));
+	if (death_stacks == NULL) {
+		panic("error creating death stacks\n");
+		return ENOMEM;
+	}
+	{
+		char temp[64];
+
+		for (i = 0; i < num_death_stacks; i++) {
+			sprintf(temp, "death_stack%d", i);
+			death_stacks[i].rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp,
+				(void **)&death_stacks[i].address,
+				REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
+			if (death_stacks[i].rid < 0) {
+				panic("error creating death stacks\n");
+				return death_stacks[i].rid;
+			}
+			death_stacks[i].in_use = false;
+		}
+	}
+	death_stack_sem = create_sem(num_death_stacks, "death_stack_noavail_sem");
+
+	// set up some debugger commands
+	add_debugger_command("threads", &dump_thread_list, "list all threads");
+	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
+	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
+	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
+	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
+
+	return 0;
+}
+
+
+int
+thread_init_percpu(int cpu_num)
+{
+	arch_thread_set_current_thread(idle_threads[cpu_num]);
+	return 0;
+}
+
+
+thread_id
+spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
+{
+	return create_thread(name, team, function, arg, priority, true);
+}
+
+
+//	#pragma mark -
+//	public kernel exported functions
 
 
 status_t
@@ -1313,6 +1234,7 @@ has_data(thread_id thread)
 
 	if (get_sem_count(thread_get_current_thread()->msg.read_sem, &count) != B_OK)
 		return false;
+
 	return count == 0 ? false : true;
 }
 
@@ -1337,7 +1259,7 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	strncpy(info->name, t->name, B_OS_NAME_LENGTH);
 	info->name[B_OS_NAME_LENGTH - 1] = '\0';
 	if (t->state == B_THREAD_WAITING) {
-		if (t->sem_blocking == snooze_sem)
+		if (t->sem_blocking == gSnoozeSem)
 			info->state = B_THREAD_ASLEEP;
 		else if (t->sem_blocking == t->msg.read_sem)
 			info->state = B_THREAD_RECEIVING;
@@ -1395,7 +1317,7 @@ _get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size
 		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
 		info->name[B_OS_NAME_LENGTH - 1] = '\0';
 		if (t->state == B_THREAD_WAITING) {
-			if (t->sem_blocking == snooze_sem)
+			if (t->sem_blocking == gSnoozeSem)
 				info->state = B_THREAD_ASLEEP;
 			else if (t->sem_blocking == t->msg.read_sem)
 				info->state = B_THREAD_RECEIVING;
@@ -1418,6 +1340,152 @@ err:
 	restore_interrupts(state);
 
 	return rc;
+}
+
+
+status_t
+set_thread_priority(thread_id id, int32 priority)
+{
+	struct thread *thread;
+	int32 oldPriority;
+
+	// make sure the passed in priority is within bounds
+	if (priority > B_MAX_PRIORITY)
+		priority = B_MAX_PRIORITY;
+	if (priority < B_MIN_PRIORITY)
+		priority = B_MIN_PRIORITY;
+
+	thread = thread_get_current_thread();
+	if (thread->id == id) {
+		// it's ourself, so we know we aren't in the run queue, and we can manipulate
+		// our structure directly
+		oldPriority = thread->priority;
+			// note that this might not return the correct value if we are preempted
+			// here, and another thread changes our priority before the next line is
+			// executed
+		thread->priority = priority;
+	} else {
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread) {
+			oldPriority = thread->priority;
+			if (thread->state == B_THREAD_READY && thread->priority != priority) {
+				// if the thread is in the run queue, we reinsert it at a new position
+				// ToDo: this doesn't seem to be necessary: if a thread is already in
+				//	the run queue, running it once doesn't hurt, and if the priority
+				//	is now very low, it probably wouldn't have been selected to be in
+				//	the run queue at all right now, anyway.
+				scheduler_remove_from_run_queue(thread);
+				thread->priority = priority;
+				scheduler_enqueue_in_run_queue(thread);
+			} else
+				thread->priority = priority;
+		} else
+			oldPriority = B_BAD_THREAD_ID;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+
+	return oldPriority;
+}
+
+
+status_t
+snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
+{
+	status_t status;
+
+	if (timebase != B_SYSTEM_TIMEBASE)
+		return B_BAD_VALUE;
+
+	status = acquire_sem_etc(gSnoozeSem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
+	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
+		return B_OK;
+
+	return status;
+}
+
+
+/** snooze() for internal kernel use only; doesn't interrupt on signals.
+ */
+
+status_t
+snooze(bigtime_t timeout)
+{
+	return snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+}
+
+
+/** snooze_until() for internal kernel use only; doesn't interrupt on signals.
+ */
+
+status_t
+snooze_until(bigtime_t timeout, int timebase)
+{
+	return snooze_etc(timeout, timebase, B_ABSOLUTE_TIMEOUT);
+}
+
+
+status_t
+wait_for_thread(thread_id id, status_t *_returnCode)
+{
+	sem_id sem;
+	cpu_status state;
+	struct thread *t;
+	int rc;
+
+	rc = send_signal_etc(id, SIGCONT, 0);
+	if (rc != B_OK)
+		return rc;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	t = thread_get_thread_struct_locked(id);
+	sem = t != NULL ? t->return_code_sem : B_BAD_THREAD_ID;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	rc = acquire_sem(sem);
+
+	/* This thread died the way it should, dont ripple a non-error up */
+	if (rc == B_BAD_SEM_ID) {
+		rc = B_NO_ERROR;
+
+		if (_returnCode) {
+			t = thread_get_current_thread();
+			dprintf("thread_wait_on_thread: thread %ld got return code 0x%x\n",
+				t->id, t->sem_deleted_retcode);
+			*_returnCode = t->sem_deleted_retcode;
+		}
+	}
+
+	return rc;
+}
+
+
+status_t
+suspend_thread(thread_id id)
+{
+	return send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
+}
+
+
+status_t
+resume_thread(thread_id id)
+{
+	return send_signal_etc(id, SIGCONT, B_DO_NOT_RESCHEDULE);
+}
+
+
+thread_id
+spawn_kernel_thread(thread_func function, const char *name, int32 priority, void *arg)
+{
+	return create_thread(name, team_get_kernel_team()->id, function, arg, priority, true);
 }
 
 
@@ -1457,174 +1525,163 @@ setrlimit(int resource, const struct rlimit * rlp)
 }
 
 
-
-thread_id
-spawn_kernel_thread (thread_func function, const char *thread_name, long priority, void	*arg)
-{
-	return _create_thread(thread_name, team_get_kernel_team()->id, (addr) function, arg, (int) priority, true);
-
-}
-
-
-
-
-//	#pragma mark -
-//	Calls from within the kernel
-
-void
-sys_exit_thread(status_t return_value)
-{
-	struct thread *t = thread_get_current_thread();
-	
-	t->return_code = return_value;
-	t->return_flags = THREAD_RETURN_EXIT;
-	send_signal_etc(t->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-}
-
-
-thread_id
-sys_get_current_thread_id()
-{
-	return thread_get_current_thread_id();
-}
-
-
-
-
 //	#pragma mark -
 //	Calls from userland (with extra address checks)
 
 
+void
+user_exit_thread(status_t return_value)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	thread->return_code = return_value;
+	thread->return_flags = THREAD_RETURN_EXIT;
+
+	send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+}
+
+
+status_t
+user_resume_thread(thread_id thread)
+{
+	return resume_thread(thread);
+}
+
+
+status_t
+user_suspend_thread(thread_id thread)
+{
+	return suspend_thread(thread);
+}
+
+
+int32
+user_set_thread_priority(thread_id thread, int32 newPriority)
+{
+	return set_thread_priority(thread, newPriority);
+}
+
+
 thread_id
-user_thread_create_user_thread(addr entry, team_id pid, const char *uname, int priority,
-	void *args)
+user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *args)
 {
 	char name[SYS_MAX_OS_NAME_LEN];
-	int rc;
 
-	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if (entry >= KERNEL_BASE && entry <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if (rc < 0)
-		return rc;
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	return _create_thread(name, pid, entry, args, priority, false);
-}
-
-
-status_t
-user_get_thread_info(thread_id id, thread_info *info)
-{
-	thread_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-		
-	rc = _get_thread_info(id, &kinfo, sizeof(thread_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
-}
-
-
-status_t
-user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info)
-{
-	int32 kcookie;
-	thread_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)cookie >= KERNEL_BASE && (addr)cookie <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	
-	rc2 = user_memcpy(&kcookie, cookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc = _get_next_thread_info(team, &kcookie, &kinfo, sizeof(thread_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(cookie, &kcookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
-}
-
-
-int
-user_thread_wait_on_thread(thread_id id, int *uretcode)
-{
-	int retcode;
-	int rc, rc2;
-
-	if ((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = thread_wait_on_thread(id, &retcode);
-
-	if (uretcode) {
-		rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-		if (rc2 < 0)
-			return rc2;
-	}
-	
-	return rc;
-}
-
-
-status_t
-user_send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
-{
-	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+	if (!CHECK_USER_ADDRESS(entry) || entry == NULL
+		|| !CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK)
 		return B_BAD_ADDRESS;
-	return send_data(tid, code, buffer, buffer_size);
+
+	return create_thread(name, thread_get_current_thread()->team->id, entry, args, priority, false);
 }
 
 
 status_t
-user_receive_data(thread_id *sender, void *buffer, size_t buffer_size)
+user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 {
-	thread_id ksender;
+	return snooze_etc(timeout, timebase, flags | B_CAN_INTERRUPT);
+}
+
+
+status_t
+user_get_thread_info(thread_id id, thread_info *userInfo)
+{
+	thread_info info;
+	status_t status;
+
+	if (!CHECK_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+
+	status = _get_thread_info(id, &info, sizeof(thread_info));
+
+	if (status >= B_OK && user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
+}
+
+
+status_t
+user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo)
+{
+	status_t status;
+	thread_info info;
+	int32 cookie;
+
+	if (!CHECK_USER_ADDRESS(userCookie) || !CHECK_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status = _get_next_thread_info(team, &cookie, &info, sizeof(thread_info));
+	if (status < B_OK)
+		return status;
+
+	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+		|| user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
+}
+
+
+status_t
+user_wait_for_thread(thread_id id, status_t *userReturnCode)
+{
+	status_t returnCode;
+	status_t status;
+
+	if (!CHECK_USER_ADDRESS(userReturnCode))
+		return B_BAD_ADDRESS;
+
+	status = wait_for_thread(id, &returnCode);
+
+	if (userReturnCode && user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
+}
+
+
+bool
+user_has_data(thread_id thread)
+{
+	return has_data(thread);
+}
+
+
+status_t
+user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
+{
+	if (!CHECK_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
+
+	return send_data(thread, code, buffer, bufferSize);
+		// supports userland buffers
+}
+
+
+status_t
+user_receive_data(thread_id *userSender, void *buffer, size_t bufferSize)
+{
+	thread_id sender;
 	status_t code;
-	status_t rv;
 
-	if (((addr)sender >= KERNEL_BASE) && ((addr)sender <= KERNEL_TOP))
+	if (!CHECK_USER_ADDRESS(userSender)
+		|| !CHECK_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
-	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+
+	code = receive_data(&sender, buffer, bufferSize);
+		// supports userland buffers
+
+	if (user_memcpy(userSender, &sender, sizeof(thread_id)) < B_OK)
 		return B_BAD_ADDRESS;
-	
-	code = receive_data(&ksender, buffer, buffer_size);
-	
-	rv = user_memcpy(sender, &ksender, sizeof(thread_id));
-	if (rv < 0)
-		return rv;
-	
+
 	return code;
 }
 
 
 int
-user_getrlimit(int resource, struct rlimit * urlp)
+user_getrlimit(int resource, struct rlimit *urlp)
 {
 	struct rlimit rl;
 	int ret;
@@ -1632,8 +1689,8 @@ user_getrlimit(int resource, struct rlimit * urlp)
 	if (urlp == NULL)
 		return EINVAL;
 
-	if ((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(urlp))
+		return B_BAD_ADDRESS;
 
 	ret = getrlimit(resource, &rl);
 
@@ -1650,7 +1707,7 @@ user_getrlimit(int resource, struct rlimit * urlp)
 
 
 int
-user_setrlimit(int resource, const struct rlimit * urlp)
+user_setrlimit(int resource, const struct rlimit *urlp)
 {
 	struct rlimit rl;
 	int err;
@@ -1658,8 +1715,8 @@ user_setrlimit(int resource, const struct rlimit * urlp)
 	if (urlp == NULL)
 		return EINVAL;
 
-	if ((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(urlp))
+		return B_BAD_ADDRESS;
 
 	err = user_memcpy(&rl, urlp, sizeof(struct rlimit));
 	if (err < 0)
@@ -1667,5 +1724,4 @@ user_setrlimit(int resource, const struct rlimit * urlp)
 
 	return setrlimit(resource, &rl);
 }
-
 
