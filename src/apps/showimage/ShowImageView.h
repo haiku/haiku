@@ -37,6 +37,7 @@
 #include <TranslatorRoster.h>
 
 #include "Filter.h"
+#include "ShowImageUndo.h"
 
 #define DELAYED_SCALING 1
 
@@ -82,6 +83,7 @@ public:
 	int32 CurrentPage();
 	int32 PageCount();
 	
+	void Undo();
 	void Cut();
 	void Paste();
 	void SelectAll();
@@ -113,6 +115,7 @@ public:
 	void SetIcon(bool clear);
 	
 private:
+	ShowImageUndo fUndo;
 	enum image_orientation {
 		k0,    // 0
 		k90,   // 1
@@ -132,8 +135,10 @@ private:
 	void Notify(const char* status);
 	void AddToRecentDocuments();
 	void AddWhiteRect(BRect &rect);
+	void GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
 	void GetSelMergeRects(BRect &srcBits, BRect &destRect);
 	void PasteBitmap(BBitmap *bitmap, BPoint point);
+	void MergeWithBitmap(BBitmap *merge, BRect selection);
 	void MergeSelection();
 	void DeleteScaler();
 	void DeleteBitmap();
@@ -155,6 +160,7 @@ private:
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
 	void ConstrainToImage(BRect &rect);
+	BBitmap* CopyFromRect(BRect srcRect);
 	BBitmap* CopySelection(uchar alpha = 255, bool imageSize = true);
 	bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
 	void BeginDrag(BPoint sourcePoint);

@@ -568,6 +568,14 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 		}
 		
+		case MSG_UNDO_STATE:
+		{
+			bool benable;
+			if (pmsg->FindBool("can_undo", &benable) == B_OK)
+				EnableMenuItem(fBar, B_UNDO, benable);
+			break;
+		}
+		
 		case MSG_CLIPBOARD_CHANGED:
 		{
 			// The app sends this message after it examines
@@ -580,6 +588,7 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		}
 
 		case B_UNDO:
+			fImageView->Undo();
 			break;
 		case B_CUT:
 			fImageView->Cut();

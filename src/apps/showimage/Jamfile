@@ -6,6 +6,7 @@ App ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp
+	ShowImageUndo.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 	PrintOptionsWindow.cpp

@@ -299,6 +299,7 @@ void ShowImageView::DeleteSelBitmap()
 void
 ShowImageView::SetImage(const entry_ref *pref)
 {
+	fUndo.Clear();
 	DeleteBitmap();
 	SetHasSelection(false);
 	fMakesSelection = false;
@@ -509,6 +510,7 @@ ShowImageView::SetScaleBilinear(bool s)
 void
 ShowImageView::AttachedToWindow()
 {
+	fUndo.SetWindow(Window());
 	FixupScrollBars();
 }
 
@@ -815,6 +817,25 @@ ShowImageView::ConstrainToImage(BRect &rect)
 }
 
 BBitmap*
+ShowImageView::CopyFromRect(BRect srcRect)
+{	
+	BRect rect(0, 0, srcRect.Width(), srcRect.Height());
+	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
+	BBitmap *bitmap = new BBitmap(rect, fBitmap->ColorSpace(), true);
+	if (bitmap == NULL) return NULL;
+	
+	if (bitmap->Lock()) {
+		bitmap->AddChild(&view);
+		view.DrawBitmap(fBitmap, srcRect, rect);
+		view.Sync();
+		bitmap->RemoveChild(&view);
+		bitmap->Unlock();
+	}
+	
+	return bitmap;
+}
+
+BBitmap*
 ShowImageView::CopySelection(uchar alpha, bool imageSize)
 {
 	bool hasAlpha = alpha != 255;
@@ -1038,12 +1059,12 @@ ShowImageView::GetMouseButtons()
 }
 
 void
-ShowImageView::GetSelMergeRects(BRect &srcBits, BRect &destRect)
+ShowImageView::GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect)
 {
-	destRect = fSelectionRect;
+	destRect = selection;
 	ConstrainToImage(destRect);
 	
-	srcBits = fSelectionRect;
+	srcBits = selection;
 	if (srcBits.left < 0)
 		srcBits.left = -(srcBits.left);
 	else
@@ -1055,20 +1076,22 @@ ShowImageView::GetSelMergeRects(BRect &srcBits, BRect &destRect)
 	if (srcBits.right > fBitmap->Bounds().right)
 		srcBits.right = srcBits.left + destRect.Width();
 	else
-		srcBits.right = fSelBitmap->Bounds().right;
+		srcBits.right = merge->Bounds().right;
 	if (srcBits.bottom > fBitmap->Bounds().bottom)
 		srcBits.bottom = srcBits.top + destRect.Height();
 	else
-		srcBits.bottom = fSelBitmap->Bounds().bottom;
+		srcBits.bottom = merge->Bounds().bottom;	
 }
 
 void
-ShowImageView::MergeSelection()
+ShowImageView::GetSelMergeRects(BRect &srcBits, BRect &destRect)
 {
-	if (!HasSelection() || !fSelBitmap)
-		return;
+	GetMergeRects(fSelBitmap, fSelectionRect, srcBits, destRect);
+}
 
-	// Merge selection with background
+void
+ShowImageView::MergeWithBitmap(BBitmap *merge, BRect selection)
+{
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
 	BBitmap *bitmap = new BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
 	if (bitmap == NULL)
@@ -1077,10 +1100,9 @@ ShowImageView::MergeSelection()
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
 		view.DrawBitmap(fBitmap, fBitmap->Bounds());
-		
 		BRect srcBits, destRect;
-		GetSelMergeRects(srcBits, destRect);
-		view.DrawBitmap(fSelBitmap, srcBits, destRect);
+		GetMergeRects(merge, selection, srcBits, destRect);
+		view.DrawBitmap(merge, srcBits, destRect);
 		
 		view.Sync();
 		bitmap->RemoveChild(&view);
@@ -1093,6 +1115,25 @@ ShowImageView::MergeSelection()
 		msgr.SendMessage(MSG_MODIFIED);
 	} else
 		delete bitmap;
+}
+
+void
+ShowImageView::MergeSelection()
+{
+	if (!HasSelection())
+		return;
+		
+	if (!fSelBitmap) {
+		// Even though the merge will not change
+		// the background image, I still need to save
+		// some undo information here
+		fUndo.SetTo(fSelectionRect, NULL, CopySelection());
+		return;
+	}
+
+	// Merge selection with background
+	fUndo.SetTo(fSelectionRect, CopyFromRect(fSelectionRect), CopySelection());
+	MergeWithBitmap(fSelBitmap, fSelectionRect);
 }
 
 void
@@ -1483,6 +1524,45 @@ int32
 ShowImageView::PageCount()
 {
 	return fDocumentCount;
+}
+
+void
+ShowImageView::Undo()
+{
+	int32 undoType = fUndo.GetType();
+	if (undoType != UNDO_UNDO && undoType != UNDO_REDO)
+		return;
+		
+	// backup current selection
+	BRect undoneSelRect;
+	BBitmap *undoneSelection;
+	undoneSelRect = fSelectionRect;
+	undoneSelection = CopySelection();
+	
+	if (undoType == UNDO_UNDO) {
+		BBitmap *undoRestore;
+		undoRestore = fUndo.GetRestoreBitmap();
+		if (undoRestore)
+			MergeWithBitmap(undoRestore, fUndo.GetRect());
+	}
+		
+	// restore previous image/selection
+	BBitmap *undoSelection;
+	undoSelection = fUndo.GetSelectionBitmap();
+		// NOTE: ShowImageView is responsible for deleting this bitmap
+		// (Which it will, as it would with a fSelBitmap that it allocated itself)
+	if (!undoSelection)
+		SetHasSelection(false);
+	else {
+		SetHasSelection(true);
+		fCopyFromRect = BRect();
+		fSelectionRect = fUndo.GetRect();
+		fSelBitmap = undoSelection;
+	}
+	
+	fUndo.Undo(undoneSelRect, NULL, undoneSelection);
+	
+	Invalidate();
 }
 
 void
