@@ -21,9 +21,10 @@ static const char *sProgramName = __progname;
 static void
 usage(void)
 {
-	printf("usage: %s {-o output_file} -[d|l|r|c]\n"
+	printf("usage: %s {-o output_file} -[d|l|r|c|b input_file]\n"
 		"  -d  dump key map to standard output\n"
 		"  -l  load key map from standard input\n"
+		"  -b  load binary key map from file\n"
 		"  -r  restore system default key map\n"
 		"  -c  compile source keymap to binary\n"
 		"  -h  compile source keymap to header\n"
@@ -66,7 +67,7 @@ main(int argc, char **argv)
 				keymap.SaveAsCurrent();
 				printf("Key map loaded.\n");
 				return 0;
-			}
+			} 
 		} else {
 			if (operation == 'o') {
 				get_ref_for_path(argv[i], &outputRef);
@@ -91,6 +92,17 @@ main(int argc, char **argv)
 				keymap.Dump();
 		       	 	keymap.SaveAsHeader(outputRef);
 		        	return 0;
+			} else if (operation == 'b') {
+				entry_ref ref;
+				get_ref_for_path(argv[i], &ref);
+				Keymap keymap;
+				if (keymap.Load(ref)!=B_OK) {
+					printf("error when loading the keymap\n");
+					return 1;
+				}
+				keymap.SaveAsCurrent();
+				printf("Key map loaded.\n");
+				return 0;
             		} else 
 				break;
 		}

@@ -265,6 +265,9 @@ Keymap::Load(entry_ref &ref)
 	
 	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+
+	if (fKeys.version != 3)
+		return B_ERROR;
 	
 	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
 		return B_BAD_VALUE;
@@ -276,7 +279,7 @@ Keymap::Load(entry_ref &ref)
 	fChars = new char[fCharsSize];
 	if ((unsigned)file.Read(fChars, fCharsSize) != fCharsSize)
 		return B_BAD_VALUE;
-	
+
 	return B_OK;
 }
 
