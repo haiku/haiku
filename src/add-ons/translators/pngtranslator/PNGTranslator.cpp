@@ -538,9 +538,7 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 		// to a different value, the above is what
 		// will be returned from this function
 	
-	bool bheaderonly, bdataonly;
-	bheaderonly = settings.SetGetHeaderOnly();
-	bdataonly = settings.SetGetDataOnly();
+	bool bheaderonly = false, bdataonly = false;
 	
 	// for storing decoded PNG row data
 	uint8 **prows = NULL, *prow = NULL;
