@@ -5,6 +5,7 @@ KernelObjects
  	<$(SOURCE_GRIST)>errno.c
  	<$(SOURCE_GRIST)>fnmatch.c
  	<$(SOURCE_GRIST)>glob.c
+ 	<$(SOURCE_GRIST)>poll.c
  	<$(SOURCE_GRIST)>pwd.c
  	<$(SOURCE_GRIST)>rlimit.c
  	:
