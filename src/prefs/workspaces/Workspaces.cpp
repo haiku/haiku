@@ -1,10 +1,10 @@
 /*
  * Workspaces.cpp
- * Open BeOS version alpha 1 by François Revol revol@free.fr
+ * Open BeOS version alpha 1 by Francois Revol revol@free.fr
  *
- * Workspaces window trick found by Minox on BeShare
+ * Workspaces window trick found by Michael "Minox" Paine.
  * (using B_ALL_WORKSPACES as flags in BWindow)
- * Found out that using 0xffffffff as Flags was causing the windo not to close on Alt-W
+ * Found out that using 0xffffffff as Flags was causing the window not to close on Alt-W
  * hey Workspaces get Flags of Window 0
  * gives 0x00008080 which makes it.
  */
