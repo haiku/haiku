@@ -1251,6 +1251,10 @@ static status_t nv_general_bios_to_powergraphics()
 	/* turn on DAC and make sure detection testsignal routing is disabled
 	 * (b16 = disable DAC,
 	 *  b12 = enable testsignal output */
+	//fixme note: b20 ('DACTM_TEST') when set apparantly blocks a DAC's video output
+	//(confirmed NV43), while it's timing remains operational (black screen).
+	//It feels like in some screen configurations it can move the output to the other
+	//output connector as well...
 	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
 	/* turn on DAC2 if it exists
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */

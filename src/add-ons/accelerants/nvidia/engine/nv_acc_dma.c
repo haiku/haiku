@@ -468,10 +468,6 @@ status_t nv_acc_init_dma()
 
 				ACCW(NV44_WHAT2, 0x00000000);
 				ACCW(NV44_WHAT3, 0x00000000);
-//schakelt screrm signaal uit op NV43, maar timing blijft werken<<<<<<<<
-//      	    pNv->PRAMDAC[0x0608/4] |= 0x00100000;//0x00680608==NVDAC_TSTCTRL haiku
-              									//b20=1=DACTM_TEST ON (termination?)
-              									//how about: NVDAC2_TSTCTRL????
 				break;
 			default:
 				ACCW(NV40P_WHAT0, 0x83280eff);

@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-1/2005
+   Rudolf Cornelissen 7/2003-2/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -2493,6 +2493,24 @@ static void setup_output_matrix()
 				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
 				break;
+			case 0x32: /* more than two monitors connected to just two outputs: illegal! */
+				//general fixme:
+				//NV40 architecture contains (an) additional switch(es) to
+				//connect a CRTC/DAC combination to a connector. We can't work as
+				//usual (yet) because this interferes via BIOS card pre-programming.
+				//
+				//Also: it looks as if each pixelclock PLL can select different CRTC's
+				//as well now via a new register: one PLL can be driving both CRTC's
+				//and there's nothing we can do about that (yet). (DVI/dualhead trouble)
+				if (si->ps.card_arch < NV40A)
+				{
+					LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
+					/* head 2 takes precedence because it has a digital panel while
+					 * head 1 has not. */
+					LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+					si->ps.crtc2_prim = true;
+					break;
+				}
 			default: /* more than two monitors connected to just two outputs: illegal! */
 				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
