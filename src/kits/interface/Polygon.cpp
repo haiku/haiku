@@ -38,13 +38,30 @@
 // Globals ---------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-BPolygon::BPolygon(const BPoint *ptArray, int32 numPoints)
+BPolygon::BPolygon(const BPoint *ptArray, int32 numPoints) :
+	fBounds(0.0, 0.0, 0.0, 0.0), fCount(numPoints), fPts(NULL)
 {
-	fCount = numPoints;
-	fPts = new BPoint[numPoints];
-	memcpy(fPts, ptArray, numPoints * sizeof(BPoint));
-
-	compute_bounds();
+	if (fCount > 0) {
+		fPts = new BPoint[numPoints];
+		
+		// Note the use of memcpy here.  The assumption is that an array of BPoints can
+		// be copied bit by bit and not use a copy constructor or an assignment
+		// operator.  This breaks the containment of BPoint but will result in better
+		// performance.  An example where the memcpy will fail would be if BPoint begins
+		// to do lazy copying through reference counting.  By copying the bits, we will
+		// copy reference counting state which will not be relevant at the destination.
+		// Luckily, BPoint is a very simple class which isn't likely to change much.
+		// However, it is a risk of this implementation.
+		//
+		// If necessary, this code can be changed to iterate over the input array of
+		// BPoints and use the assignment operator to copy from the source to the
+		// destination array, one element at a time.
+		//
+		// Similar use of memcpy appears later in this implementation also.
+		//
+		memcpy(fPts, ptArray, numPoints * sizeof(BPoint));
+		compute_bounds();
+	}
 }
 //------------------------------------------------------------------------------
 BPolygon::BPolygon(const BPolygon *poly)
@@ -53,7 +70,8 @@ BPolygon::BPolygon(const BPolygon *poly)
 }
 //------------------------------------------------------------------------------
 BPolygon::BPolygon ()
-	:	fCount(0),
+	:	fBounds(0.0, 0.0, 0.0, 0.0),
+	    fCount(0),
 		fPts(NULL)
 {
 }
@@ -66,11 +84,15 @@ BPolygon::~BPolygon ()
 //------------------------------------------------------------------------------
 BPolygon &BPolygon::operator=(const BPolygon &from)
 {
-	fBounds = from.fBounds;
-	fCount = from.fCount;
-	fPts = new BPoint[fCount];
-	memcpy(fPts, from.fPts, fCount * sizeof(BPoint));
-
+	// Make sure we aren't trying to perform a "self assignment".
+	if (this != &from) {
+		fBounds = from.fBounds;
+		fCount = from.fCount;
+		if (fCount > 0) {
+			fPts = new BPoint[fCount];
+			memcpy(fPts, from.fPts, fCount * sizeof(BPoint));
+		}
+	}
 	return *this;
 }
 //------------------------------------------------------------------------------
@@ -81,20 +103,17 @@ BRect BPolygon::Frame() const
 //------------------------------------------------------------------------------
 void BPolygon::AddPoints(const BPoint *ptArray, int32 numPoints)
 {
-	BPoint *newPts = new BPoint[fCount + numPoints];
-
-	if (fPts)
-	{
-		memcpy(newPts, fPts, fCount);
-		delete fPts;
+	if (numPoints > 0) {
+		BPoint *newPts = new BPoint[fCount + numPoints];
+		if (fPts) {
+			memcpy(newPts, fPts, fCount * sizeof(BPoint));
+			delete fPts;
+		}
+		memcpy(newPts + fCount, ptArray, numPoints * sizeof(BPoint));
+		fPts = newPts;
+		fCount += numPoints;
+		compute_bounds();
 	}
-
-	memcpy(newPts + fCount, ptArray, numPoints);
-
-	fPts = newPts;
-	fCount += numPoints;
-
-	compute_bounds();
 }
 //------------------------------------------------------------------------------
 int32 BPolygon::CountPoints() const
@@ -117,8 +136,10 @@ void BPolygon::PrintToStream () const
 //------------------------------------------------------------------------------
 void BPolygon::compute_bounds()
 {
-	if (fCount == 0)
+	if (fCount == 0) {
+		fBounds = BRect(0.0, 0.0, 0.0, 0.0);
 		return;
+	}
 
 	fBounds = BRect(fPts[0], fPts[0]);
 

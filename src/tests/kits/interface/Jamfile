@@ -27,6 +27,7 @@ CommonTestLib libinterfacetest.so
 		PolygonTest.cpp
 		DummyPolygon.cpp
 		CreatePolygonTest.cpp
+		MapPolygonTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4

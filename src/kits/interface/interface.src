@@ -9,6 +9,7 @@ INTERFACE_KIT_SOURCE =
 	Font.cpp
 	PictureButton.cpp
 	Point.cpp
+	Polygon.cpp
 	RadioButton.cpp
 	Rect.cpp
 	StatusBar.cpp
