@@ -8,6 +8,7 @@
 
 #include <boot/partitions.h>
 #include <boot/vfs.h>
+#include <boot/platform.h>
 #include <boot/stdio.h>
 #include <ddm_modules.h>
 #include <util/kernel_cpp.h>
@@ -17,8 +18,8 @@
 
 using namespace boot;
 
-#define TRACE_PARTITIONS 0
-#if TRACE_PARTITIONS
+#define TRACE_PARTITIONS
+#ifdef TRACE_PARTITIONS
 #	define TRACE(x) printf x
 #else
 #	define TRACE(x) ;
@@ -27,7 +28,7 @@ using namespace boot;
 
 /* supported partition modules */
 
-static partition_module_info *sPartitionModules[] = {
+static const partition_module_info *sPartitionModules[] = {
 #ifdef BOOT_SUPPORT_PARTITION_AMIGA
 	&gAmigaPartitionModule,
 #endif
@@ -183,9 +184,12 @@ Partition::Mount(Directory **_fileSystem)
 
 		Directory *fileSystem;
 		if (module->get_file_system(this, &fileSystem) == B_OK) {
-			gRoot->AddVolume(fileSystem);
+			gRoot->AddVolume(fileSystem, this);
 			if (_fileSystem)
 				*_fileSystem = fileSystem;
+
+			// remember the module name that mounted us
+			fModuleName = module->module_name;
 
 			fIsFileSystem = true;
 			return B_OK;
@@ -204,7 +208,7 @@ Partition::Scan(bool mountFileSystems)
 	TRACE(("Partition::Scan()\n"));
 
 	for (int32 i = 0; i < sNumPartitionModules; i++) {
-		partition_module_info *module = sPartitionModules[i];
+		const partition_module_info *module = sPartitionModules[i];
 		void *cookie;
 		NodeOpener opener(this, O_RDONLY);
 
@@ -240,6 +244,9 @@ Partition::Scan(bool mountFileSystems)
 
 			while ((child = (Partition *)fChildren.RemoveHead()) != NULL)
 				delete child;
+
+			// remember the module name that identified us
+			fModuleName = module->module.name;
 
 			return B_OK;
 		}
