@@ -40,11 +40,11 @@ area *areaManager::findArea(void *address)
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
-		printf ("Looking for %d\n",address);
+		printf ("areaManager::findArea: Looking for %d\n",address);
 		if (myArea->contains(address))
 				return myArea;
 		}
-	printf ("findArea is giving up\n");
+	printf ("areaManager::findArea is giving up\n");
 	return NULL;
 }
 

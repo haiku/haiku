@@ -12,7 +12,7 @@ pageManager::pageManager(int pages)
 	void *area;
 	if (0>=create_area("vm_test",&area,B_ANY_ADDRESS,B_PAGE_SIZE*pages,B_NO_LOCK,B_READ_AREA|B_WRITE_AREA))
 		{
-		printf ("No memory!\n");
+		printf ("pageManager::pageManager: No memory!\n");
 		exit(1);
 		}
 	for (int i=0;i<pages;i++)
@@ -22,31 +22,35 @@ pageManager::pageManager(int pages)
 	unusedLock=create_sem (1,"unused_lock");
 	inUseLock=create_sem (1,"inuse_lock");
 	totalPages=pages;
+	printf ("pageManager::pageManager: About to dump the clean pages (should be 0):\n\n");
+	clean.dump();
+	printf ("pageManager::pageManager: About to dump the unused pages (should not be 0):\n\n");
+	unused.dump();
 	}
 	
 page *pageManager::getPage(void)
 	{
 	page *ret=NULL;
-	printf ("Checking clean\n");
-	printf ("clean = %d\n", &clean);
-	printf ("cleanCount = %d\n", clean.nodeCount);
+	printf ("pageManager::getPage: Checking clean\n");
+	printf ("pageManager::getPage:cleanCount = %d\n", clean.nodeCount);
 	if (clean.count())
 		{
-		printf ("locking clean\n");
+		printf ("pageManager::getPage:locking clean\n");
 		acquire_sem(cleanLock);
-		printf ("locked clean\n");
+		printf ("pageManager::getPage:locked clean\n");
 		ret=(page *)clean.next();
-		printf ("got next clean\n");
+		printf ("pageManager::getPage:got next clean\n");
 		release_sem(cleanLock);
-		printf ("unlocked clean\n");
+		printf ("pageManager::getPage:unlocked clean\n");
 		} // This could fail if someone swoops in and steal our page.
 	if (!ret && unused.count())
 		{
-		printf ("Checking unused\n");
+		printf ("pageManager::getPage:Checking unused\n");
 		acquire_sem(unusedLock);
 		ret=(page *)unused.next();
+		printf ("pageManager::getPage:got next unused\n");
 		release_sem(unusedLock);
-		printf ("ret = %x\n",ret);
+		printf ("pageManager::getPage:next unused = %x\n",ret);
 		if (ret)
 			ret->zero();
 		} // This could fail if someone swoops in and steal our page.

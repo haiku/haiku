@@ -47,7 +47,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
-	printf ("Inside fault; address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
+	printf ("vpage::fault: address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -66,30 +66,30 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			}
 		}
 	physPage=pageMan.getPage();
-	printf ("New page allocated! address = %s\n",physPage->getAddress());
+	printf ("vpage::fault: New page allocated! address = %x\n",physPage->getAddress());
 	// Update the architecture specific stuff here...
-	// This refresh is unneeded if the code was never written out...
+	// This refresh is unneeded if the data was never written out... 
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	printf ("Refreshed\n");
+	printf ("vpage::fault: Refreshed\n");
 
 	}
 
 char vpage::getByte(unsigned long address)
 	{
-	printf ("inside vpage::getByte; address = %d\n",address );
+	printf ("vpage::getByte: address = %d\n",address );
 	if (!physPage)
 		fault((void *)(address),false);
-	printf ("About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
+	printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
 void vpage::setByte(unsigned long address,char value)
 	{
-	printf ("inside vpage::setByte; address = %d, value = %d\n",address, value);
+	printf ("vpage::setByte: address = %d, value = %d\n",address, value);
 	if (!physPage)
 		fault((void *)(address),true);
 	*((char *)(address-start_address+physPage->getAddress()))=value;
-	printf ("inside vpage::setByte; physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
+	printf ("vpage::setByte: physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
 	}
 
 int  vpage::getInt(unsigned long address)

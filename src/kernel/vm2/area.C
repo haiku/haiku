@@ -55,17 +55,17 @@ status_t area::createAreaMappingFile(char *name, int pageCount,void **address, a
 status_t area::createArea(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
 	{
 	manager->lock();
-	printf ("Locked in createArea\n");
+	printf ("area::createArea: Locked in createArea\n");
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
-	printf ("in area::createArea, base address = %d\n",base);
+	printf ("area::createArea: base address = %d\n",base);
 	vpage *newPage;
 	vnode newVnode;
 	newVnode.fd=0;
 	newVnode.offset=0;
 	for (int i=0;i<pageCount;i++)
 		{
-		printf ("in area::createArea, creating page = %d\n",i);
+		printf ("in area::createArea: creating page = %d\n",i);
 		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
 		}
@@ -74,7 +74,7 @@ status_t area::createArea(char *name, int pageCount,void **address, addressSpec 
 	end_address=base+pageCount*PAGE_SIZE;
 	manager->unlock();
 	*address=(void *)base;
-	printf ("unlocked in createArea\n");
+	printf ("area::createArea: unlocked in createArea\n");
 	}
 
 void area::freeArea(void)
@@ -117,7 +117,7 @@ bool area::contains(void *address)
 	{
 	// no need to lock here...
 	unsigned long base=(unsigned long)(address); 
-	printf ("Inside contains; looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+	printf ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
 	return ((start_address<=base) && (end_address>=base));
 	}

@@ -6,6 +6,7 @@ struct vnode
 {
 	int fd;
 	unsigned long offset;
+	bool valid;
 };
 typedef unsigned long owningProcess;
 #define B_OS_NAME_LENGTH 32

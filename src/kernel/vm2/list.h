@@ -19,8 +19,8 @@ class list {
 			rock=newNode;
 			nodeCount++;
 			}
-		int count(void) {printf ("About to return %d\n",nodeCount);return nodeCount;}
-		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return rock;} 
+		int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
+		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return n;} 
 		void remove(void *in)
 			{
 			struct node *toNuke=(node *)in;
@@ -35,7 +35,7 @@ class list {
 			{
 			for (struct node *cur=rock;cur;cur=cur->next)
 				{
-				printf ("At %x, next = %x\n",cur,cur->next);
+				printf ("list::dump: At %x, next = %x\n",cur,cur->next);
 				}
 			}
 		struct node *rock;
