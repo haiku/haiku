@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+// String tokens use here and there by stack components
+typedef const void *string_token;
+
 // Networking buffer(s) definition
 typedef struct net_buffer net_buffer;
 typedef struct net_buffer_queue net_buffer_queue;
@@ -32,10 +35,14 @@ typedef int benaphore;
 // Networking layer(s) definitions
 typedef struct net_layer net_layer;
 typedef struct net_layer_module_info net_layer_module_info;
-#define NET_LAYER_MODULES_ROOT	"network/layers/"
+
+#define NET_MODULES_ROOT	"network_v2/"
 
 struct net_layer_module_info {
 	module_info	info;
+	
+	uint32	api_version;
+	#define NET_LAYER_API_VERSION	(0x1)
 	
 	status_t (*init)(net_layer *me);
 	status_t (*uninit)(net_layer *me);
@@ -48,8 +55,8 @@ struct net_layer_module_info {
 struct net_layer {
 	struct net_layer 		*next;
 	char 					*name;
-	char 					*type;		// "frame", "ethernet" "ipv4", "ppp", etc. Joker (*) allowed
-	char					*sub_type;	// joker (*) allowed here too.
+	string_token			type;		// "frame", "ethernet" "ipv4", "ppp", etc. Joker (*) allowed
+	string_token			sub_type;	// joker (*) allowed here too.
 	int						priority;	// negative values reserved for packet sniffing, high value = lesser priority
 	net_layer_module_info 	*module;
 	void 					*cookie;
@@ -58,9 +65,7 @@ struct net_layer {
 	struct net_layer		**layers_below;
 };
 
-
-// Networking attributes
-typedef const void *net_attribute_id;
+typedef string_token net_attribute_id;
 
 #define NET_ATTRIBUTE_TYPE_MASK 	0xFF		// Up to 256 basic types
 #define NET_ATTRIBUTE_FLAGS_MASK	0xFFFFFF00
@@ -86,9 +91,9 @@ struct net_stack_module_info {
 	status_t (*start)(void);
 	status_t (*stop)(void);
 
-	// Attributes IDs atomizer
-	net_attribute_id (*register_attribute_id)(const char *name);
-	
+	// String IDs atomizer
+	string_token 	(*string_to_token)(const char *name);
+	const char * 	(*string_for_token)(string_token token);
 	
 	/*
 	 * Socket layer
@@ -98,7 +103,7 @@ struct net_stack_module_info {
 	 * Net layers handling
 	 */
 	
-	status_t 	(*register_layer)(const char *name, const char *type, int priority,
+	status_t 	(*register_layer)(const char *name, const char *packets_type, int priority,
 					net_layer_module_info *module, void *cookie, net_layer **layer);
 	status_t 	(*unregister_layer)(net_layer *layer);
 	net_layer *	(*find_layer)(const char *name);
@@ -175,7 +180,7 @@ struct net_stack_module_info {
 
 };
 
-#define NET_STACK_MODULE_NAME	"network/stack/v1"
+#define NET_STACK_MODULE_NAME	NET_MODULES_ROOT "stack/v1"
 
 #ifdef __cplusplus
 }

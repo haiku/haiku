@@ -394,7 +394,7 @@ _EXPORT void kprintf(const char *fmt, ...)
 }
 
 
-_EXPORT status_t load_driver_symbols(char *driver_name)
+_EXPORT status_t load_driver_symbols(const char *driver_name)
 {
 	// Userland debugger will extract symbols itself...
 	return B_OK;
