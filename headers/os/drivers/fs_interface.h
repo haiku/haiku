@@ -68,12 +68,12 @@ typedef struct file_system_info {
 	status_t (*remove_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
 
 	/* VM file access */
-	bool (*can_page)(fs_volume fs, fs_vnode vnode);
-	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
-	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+	bool (*can_page)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
+	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 
 	/* cache file access */
-	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, struct file_io_vec *vecs, size_t *_count);
+	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
 
 	/* common operations */
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
