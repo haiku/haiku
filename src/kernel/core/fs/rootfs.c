@@ -699,7 +699,7 @@ rootfs_read_link(fs_cookie _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 
 
 static int
-rootfs_symlink(fs_cookie _fs, fs_vnode _dir, const char *name, const char *path)
+rootfs_symlink(fs_cookie _fs, fs_vnode _dir, const char *name, const char *path, int mode)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
@@ -920,6 +920,7 @@ static struct fs_calls rootfs_calls = {
 	&rootfs_fsync,
 
 	&rootfs_read_link,
+	NULL,	// fs_write_link()
 	&rootfs_symlink,
 	&rootfs_unlink,
 	&rootfs_rename,

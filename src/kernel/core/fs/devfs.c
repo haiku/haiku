@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 
-#define DEVFS_TRACE 0
+#define DEVFS_TRACE 1
 
 #if DEVFS_TRACE
 #	define TRACE(x) dprintf x
@@ -1068,6 +1068,7 @@ static struct fs_calls devfs_calls = {
 	&devfs_fsync,
 
 	NULL,	// read_link
+	NULL,	// write_link
 	NULL,	// symlink
 	&devfs_unlink,
 	&devfs_rename,

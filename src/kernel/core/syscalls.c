@@ -112,7 +112,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_create_dir((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_CREATE_SYMLINK:
-			*call_ret = user_create_symlink((const char *)arg0, (const char *)arg1);
+			*call_ret = user_create_symlink((const char *)arg0, (const char *)arg1, (int)arg2);
 			break;
 		case SYSCALL_READ_LINK:
 			*call_ret = user_read_link((const char *)arg0, (char *)arg1, (size_t)arg2);

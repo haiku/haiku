@@ -37,7 +37,7 @@
 #include <fcntl.h>
 
 #ifndef TRACE_VFS
-#	define TRACE_VFS 0
+#	define TRACE_VFS 1
 #endif
 #if TRACE_VFS
 #	define PRINT(x) dprintf x
@@ -101,10 +101,10 @@ struct fs_mount {
 	bool                 unmounting;
 };
 
-static mutex vfs_mutex;
-static mutex vfs_mount_mutex;
-static mutex vfs_mount_op_mutex;
-static mutex vfs_vnode_mutex;
+static mutex gRegisterMutex;
+static mutex gMountMutex;
+static mutex gMountOpMutex;
+static mutex gVnodeMutex;
 
 /* function declarations */
 static int vfs_mount(char *path, const char *device, const char *fs_name, void *args, bool kernel);
@@ -205,11 +205,11 @@ find_mount(fs_id id)
 {
 	struct fs_mount *mount;
 
-	mutex_lock(&vfs_mount_mutex);
+	mutex_lock(&gMountMutex);
 
 	mount = hash_lookup(mounts_table, &id);
 
-	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&gMountMutex);
 
 	return mount;
 }
@@ -300,7 +300,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	int err;
 	int old_ref;
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 
 	if (vnode->busy == true)
 		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", vnode);
@@ -312,7 +312,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	if (old_ref == 1) {
 		vnode->busy = true;
 
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 
 		/* if we have a vm_cache attached, remove it */
 		if (vnode->cache)
@@ -326,14 +326,14 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 		remove_vnode_from_mount_list(vnode, vnode->mount);
 
-		mutex_lock(&vfs_vnode_mutex);
+		mutex_lock(&gVnodeMutex);
 		hash_remove(vnode_table, vnode);
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 
 		kfree(vnode);
 		err = 1;
 	} else {
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 		err = 0;
 	}
 	return err;
@@ -369,15 +369,15 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 
 	FUNCTION(("get_vnode: fsid %d vnid 0x%Lx 0x%p\n", fsID, vnodeID,_vnode));
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 
 	do {
 		vnode = lookup_vnode(fsID, vnodeID);
 		if (vnode) {
 			if (vnode->busy) {
-				mutex_unlock(&vfs_vnode_mutex);
+				mutex_unlock(&gVnodeMutex);
 				snooze(10000); // 10 ms
-				mutex_lock(&vfs_vnode_mutex);
+				mutex_lock(&gVnodeMutex);
 				continue;
 			}
 		}
@@ -403,7 +403,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 		}
 		vnode->busy = true;
 		hash_insert(vnode_table, vnode);
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 
 		add_vnode_to_mount_list(vnode, vnode->mount);
 
@@ -413,7 +413,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 			if (vnode->private_node == NULL)
 				err = EINVAL;
 		}
-		mutex_lock(&vfs_vnode_mutex);
+		mutex_lock(&gVnodeMutex);
 		if (err < 0)
 			goto err1;
 
@@ -421,7 +421,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 		vnode->ref_count = 1;
 	}
 
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 
 	PRINT(("get_vnode: returning 0x%p\n", vnode));
 
@@ -431,7 +431,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 err1:
 	hash_remove(vnode_table, vnode);
 err:
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 	if (vnode)
 		kfree(vnode);
 
@@ -541,9 +541,9 @@ entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode
 	if (status < 0)
 		return status;
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 	vnode = lookup_vnode(fsID, id);
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 
 	if (vnode == NULL) {
 		// fs_lookup() should have left the vnode referenced, so chances
@@ -609,9 +609,9 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
 		// ref count incremented at this point
-		mutex_lock(&vfs_vnode_mutex);
+		mutex_lock(&gVnodeMutex);
 		nextVnode = lookup_vnode(vnode->fs_id, vnodeID);
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 
 		if (!nextVnode) {
 			// pretty screwed up here
@@ -797,9 +797,9 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		if (status < B_OK)
 			goto out;
 
-		mutex_lock(&vfs_vnode_mutex);
+		mutex_lock(&gVnodeMutex);
 		parentVnode = lookup_vnode(vnode->fs_id, parentID);
-		mutex_unlock(&vfs_vnode_mutex);
+		mutex_unlock(&gVnodeMutex);
 		
 		if (parentVnode == NULL) {
 			panic("dir_vnode_to_path: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, parentID);
@@ -903,7 +903,7 @@ check_path(char *to)
 		char *begin;
 		if (*to == '/')
 			to++, length++;
-		
+
 		begin = to;
 		while (*to != '/' && *to)
 			to++, length++;
@@ -911,7 +911,7 @@ check_path(char *to)
 		if (to - begin > B_FILE_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
 	}
-	
+
 	if (length == 0)
 		return B_ENTRY_NOT_FOUND;
 
@@ -924,7 +924,7 @@ check_path(char *to)
 		to[0] = '.';
 		to[1] = '\0';
 	}
-	
+
 	return B_OK;
 }
 
@@ -952,9 +952,9 @@ vfs_put_vnode(fs_id fsID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 	vnode = lookup_vnode(fsID, vnodeID);
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 
 	if (vnode)
 		dec_vnode_ref_count(vnode, true);
@@ -984,13 +984,13 @@ vfs_remove_vnode(fs_id fsid, vnode_id vnid)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 
 	vnode = lookup_vnode(fsid, vnid);
 	if (vnode)
 		vnode->delete_me = true;
 
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 	return 0;
 }
 
@@ -1489,12 +1489,12 @@ vfs_register_filesystem(const char *name, struct fs_calls *calls)
 	container->name = name;
 	container->calls = calls;
 
-	mutex_lock(&vfs_mutex);
+	mutex_lock(&gRegisterMutex);
 
 	container->next = fs_list;
 	fs_list = container;
 
-	mutex_unlock(&vfs_mutex);
+	mutex_unlock(&gRegisterMutex);
 	return 0;
 }
 
@@ -1519,16 +1519,16 @@ vfs_init(kernel_args *ka)
 	fs_list = NULL;
 	root_vnode = NULL;
 
-	if (mutex_init(&vfs_mutex, "vfs_lock") < 0)
+	if (mutex_init(&gRegisterMutex, "vfs_lock") < 0)
 		panic("vfs_init: error allocating vfs lock\n");
 
-	if (mutex_init(&vfs_mount_op_mutex, "vfs_mount_op_lock") < 0)
+	if (mutex_init(&gMountOpMutex, "vfs_mount_op_lock") < 0)
 		panic("vfs_init: error allocating vfs_mount_op lock\n");
 
-	if (mutex_init(&vfs_mount_mutex, "vfs_mount_lock") < 0)
+	if (mutex_init(&gMountMutex, "vfs_mount_lock") < 0)
 		panic("vfs_init: error allocating vfs_mount lock\n");
 
-	if (mutex_init(&vfs_vnode_mutex, "vfs_vnode_lock") < 0)
+	if (mutex_init(&gVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vfs_vnode lock\n");
 
 	return 0;
@@ -1540,7 +1540,7 @@ vfs_init(kernel_args *ka)
 
 
 static int
-new_file_fd(struct vnode *vnode,file_cookie cookie, bool kernel)
+new_file_fd(struct vnode *vnode, file_cookie cookie, int openMode, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	int fd;
@@ -1553,6 +1553,7 @@ new_file_fd(struct vnode *vnode,file_cookie cookie, bool kernel)
 	descriptor->cookie = cookie;
 	descriptor->ops = &file_ops;
 	descriptor->type = FDTYPE_FILE;
+	descriptor->open_mode = openMode;
 
 	fd = new_fd(get_current_io_context(kernel), descriptor);
 	if (fd < 0)
@@ -1581,16 +1582,16 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 	if (status < B_OK)
 		return status;
 
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 	vnode = lookup_vnode(directory->fs_id, newID);
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 
 	if (vnode == NULL) {
 		dprintf("vfs: fs_create() returned success but there is no vnode!");
 		return EINVAL;
 	}
 
-	if ((status = new_file_fd(vnode,cookie,kernel)) >= 0)
+	if ((status = new_file_fd(vnode,cookie,omode,kernel)) >= 0)
 		return status;
 		
 	FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -1617,7 +1618,7 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 	if (status < 0)
 		return status;
 
-	status = new_file_fd(vnode,cookie,kernel);
+	status = new_file_fd(vnode, cookie, omode, kernel);
 	if (status < 0) {
 		FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
 		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -1657,7 +1658,7 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 		return fd;
 
 err1:
-	status = ERR_VFS_FD_TABLE_FULL;
+	status = B_NO_MORE_FDS;
 	kfree(descriptor);
 
 err:
@@ -1743,7 +1744,7 @@ file_open(char *path, int omode, bool kernel)
 	FUNCTION(("file_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
 
 	// get the vnode matching the path
-	status = path_to_vnode(path, true, &vnode, kernel);
+	status = path_to_vnode(path, (omode & O_NOTRAVERSE) == 0, &vnode, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -1774,7 +1775,7 @@ file_read(struct file_descriptor *descriptor, void *buffer, off_t pos, size_t *l
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	FUNCTION(("file_read: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
+	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
 	return FS_CALL(vnode,fs_read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
 }
 
@@ -1784,7 +1785,7 @@ file_write(struct file_descriptor *descriptor, const void *buffer, off_t pos, si
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	FUNCTION(("file_write: buf %p, pos %Ld, len 0x%p\n", buffer, pos, length));
+	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
 	return FS_CALL(vnode,fs_write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, pos, length);
 }
 
@@ -2013,21 +2014,42 @@ common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
 
 
 static int
-common_symlink(char *path, const char *toPath, bool kernel)
+common_write_link(char *path, char *toPath, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	status = path_to_vnode(path, false, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(vnode,fs_write_link) != NULL)
+		status = FS_CALL(vnode,fs_write_link)(vnode->mount->cookie, vnode->private_node, toPath);
+	else
+		status = EOPNOTSUPP;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
 {
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_symlink(path = %s, toPath = %s, kernel = %d)\n", path, toPath, kernel));
+	FUNCTION(("common_create_alias(path = %s, toPath = %s, mode = %d, kernel = %d)\n", path, toPath, mode, kernel));
 
 	status = path_to_dir_vnode(path, &vnode, name, kernel);
 	if (status < B_OK)
 		return status;
 
 	if (FS_CALL(vnode,fs_symlink) != NULL)
-		status = FS_CALL(vnode,fs_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath);
+		status = FS_CALL(vnode,fs_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
 	else
 		status = EROFS;
 
@@ -2135,7 +2157,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 
 	FUNCTION(("vfs_mount: entry. path = '%s', fs_name = '%s'\n", path, fs_name));
 
-	mutex_lock(&vfs_mount_op_mutex);
+	mutex_lock(&gMountOpMutex);
 
 	mount = (struct fs_mount *)kmalloc(sizeof(struct fs_mount));
 	if (mount == NULL)  {
@@ -2198,12 +2220,12 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 			goto err4;
 	}
 
-	mutex_lock(&vfs_mount_mutex);
+	mutex_lock(&gMountMutex);
 
 	// insert mount struct into list
 	hash_insert(mounts_table, mount);
 
-	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&gMountMutex);
 
 	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
 	if (err < 0)
@@ -2216,7 +2238,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 	if (!root_vnode)
 		root_vnode = mount->root_vnode;
 
-	mutex_unlock(&vfs_mount_op_mutex);
+	mutex_unlock(&gMountOpMutex);
 
 	return 0;
 
@@ -2232,7 +2254,7 @@ err2:
 err1:
 	kfree(mount);
 err:
-	mutex_unlock(&vfs_mount_op_mutex);
+	mutex_unlock(&gMountOpMutex);
 
 	return err;
 }
@@ -2251,7 +2273,7 @@ fs_unmount(char *path, bool kernel)
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
-	mutex_lock(&vfs_mount_op_mutex);
+	mutex_lock(&gMountOpMutex);
 
 	mount = find_mount(vnode->fs_id);
 	if (!mount)
@@ -2266,7 +2288,7 @@ fs_unmount(char *path, bool kernel)
 
 	/* grab the vnode master mutex to keep someone from creating a vnode
 	while we're figuring out if we can continue */
-	mutex_lock(&vfs_vnode_mutex);
+	mutex_lock(&gVnodeMutex);
 
 	/* simulate the root vnode having it's refcount decremented */
 	mount->root_vnode->ref_count -= 2;
@@ -2276,7 +2298,7 @@ fs_unmount(char *path, bool kernel)
 	for (vnode = mount->vnodes_head; vnode != NULL; vnode = vnode->mount_next) {
 		if (vnode->busy || vnode->ref_count != 0) {
 			mount->root_vnode->ref_count += 2;
-			mutex_unlock(&vfs_vnode_mutex);
+			mutex_unlock(&gVnodeMutex);
 			dec_vnode_ref_count(mount->root_vnode, false);
 
 			err = EBUSY;
@@ -2291,7 +2313,7 @@ fs_unmount(char *path, bool kernel)
 			vnode->busy = true;
 	mount->unmounting = true;
 
-	mutex_unlock(&vfs_vnode_mutex);
+	mutex_unlock(&gVnodeMutex);
 
 	mount->covers_vnode->covered_by = NULL;
 	dec_vnode_ref_count(mount->covers_vnode, false);
@@ -2304,11 +2326,11 @@ fs_unmount(char *path, bool kernel)
 	// a putvnode/removevnode here
 
 	/* remove the mount structure from the hash table */
-	mutex_lock(&vfs_mount_mutex);
+	mutex_lock(&gMountMutex);
 	hash_remove(mounts_table, mount);
-	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&gMountMutex);
 
-	mutex_unlock(&vfs_mount_op_mutex);
+	mutex_unlock(&gMountOpMutex);
 
 	mount->fs->calls->fs_unmount(mount->cookie);
 
@@ -2318,7 +2340,7 @@ fs_unmount(char *path, bool kernel)
 	return 0;
 
 err:
-	mutex_unlock(&vfs_mount_op_mutex);
+	mutex_unlock(&gMountOpMutex);
 	return err;
 }
 
@@ -2332,8 +2354,8 @@ fs_sync(void)
 	FUNCTION(("vfs_sync: entry.\n"));
 
 	/* cycle through and call sync on each mounted fs */
-	mutex_lock(&vfs_mount_op_mutex);
-	mutex_lock(&vfs_mount_mutex);
+	mutex_lock(&gMountOpMutex);
+	mutex_lock(&gMountMutex);
 
 	hash_open(mounts_table, &iter);
 	while ((mount = hash_next(mounts_table, &iter))) {
@@ -2341,8 +2363,8 @@ fs_sync(void)
 	}
 	hash_close(mounts_table, &iter, false);
 
-	mutex_unlock(&vfs_mount_mutex);
-	mutex_unlock(&vfs_mount_op_mutex);
+	mutex_unlock(&gMountMutex);
+	mutex_unlock(&gMountOpMutex);
 
 	return 0;
 }
@@ -2354,7 +2376,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	struct fs_mount *mount;
 	int status;
 
-	mutex_lock(&vfs_mount_mutex);	
+	mutex_lock(&gMountMutex);	
 
 	mount = find_mount(device);
 	if (mount == NULL) {
@@ -2372,7 +2394,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	info->root = mount->root_vnode->id;
 
 error:
-	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&gMountMutex);
 	return status;
 }
 
@@ -2383,7 +2405,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 	struct fs_mount *mount;
 	int status;
 
-	mutex_lock(&vfs_mount_mutex);	
+	mutex_lock(&gMountMutex);	
 
 	mount = find_mount(device);
 	if (mount == NULL) {
@@ -2397,7 +2419,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 		status = EROFS;
 
 error:
-	mutex_unlock(&vfs_mount_mutex);
+	mutex_unlock(&gMountMutex);
 	return status;
 }
 
@@ -2630,7 +2652,7 @@ sys_read_link(const char *path, char *buffer, size_t bufferSize)
 
 
 int
-sys_create_symlink(const char *userPath, const char *userToPath)
+sys_create_symlink(const char *userPath, const char *userToPath, int mode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -2646,7 +2668,7 @@ sys_create_symlink(const char *userPath, const char *userToPath)
 	if (status < B_OK)
 		return status;
 
-	return common_symlink(path, toPath, true);
+	return common_create_symlink(path, toPath, mode, true);
 }
 
 
@@ -2993,7 +3015,7 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 
 
 int
-user_create_symlink(const char *userPath, const char *userToPath)
+user_create_symlink(const char *userPath, const char *userToPath, int mode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -3017,7 +3039,7 @@ user_create_symlink(const char *userPath, const char *userToPath)
 	if (status < B_OK)
 		return status;
 
-	return common_symlink(path, toPath, false);
+	return common_create_symlink(path, toPath, mode, false);
 }
 
 

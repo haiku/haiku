@@ -1029,6 +1029,7 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_fsync,
 
 	NULL,	// read_link
+	NULL,	// write_link
 	NULL,	// symlink
 	&bootfs_unlink,
 	&bootfs_rename,

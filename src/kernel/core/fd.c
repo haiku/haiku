@@ -16,12 +16,7 @@
 
 #define CHECK_USER_ADDR(x) \
 	if ((addr)(x) >= KERNEL_BASE && (addr)(x) <= KERNEL_TOP) \
-		return EINVAL; 
-
-#define CHECK_SYS_ADDR(x) \
-	if ((addr)(x) < KERNEL_BASE && (addr)(x) >= KERNEL_TOP) \
-		return EINVAL; 
-
+		return B_BAD_ADDRESS;
 
 #define TRACE_FD 0
 #if TRACE_FD
@@ -53,15 +48,18 @@ dump_fd(int fd,struct file_descriptor *descriptor)
 struct file_descriptor *
 alloc_fd(void)
 {
-	struct file_descriptor *f;
+	struct file_descriptor *descriptor;
 
-	f = kmalloc(sizeof(struct file_descriptor));
-	if (f) {
-		f->vnode = NULL;
-		f->cookie = NULL;
-		f->ref_count = 1;
-	}
-	return f;
+	descriptor = kmalloc(sizeof(struct file_descriptor));
+	if (descriptor == NULL)
+		return NULL;
+
+	descriptor->vnode = NULL;
+	descriptor->cookie = NULL;
+	descriptor->ref_count = 1;
+	descriptor->open_mode = 0;
+
+	return descriptor;
 }
 
 
@@ -446,11 +444,6 @@ sys_read(int fd, void *buffer, off_t pos, size_t length)
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	/* This is a sys_function, so abort if we have a kernel address */
-	// I've removed those checks because we have to be able to load things
-	// into user memory as well -- axeld.
-	//CHECK_SYS_ADDR(buffer)
-
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return EBADF;
@@ -473,8 +466,6 @@ sys_write(int fd, const void *buffer, off_t pos, size_t length)
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-//	CHECK_SYS_ADDR(buffer)
-	
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return EBADF;
@@ -519,8 +510,6 @@ sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 	int status;
 
 	PRINT(("sys_ioctl: fd %d\n", fd));
-
-	CHECK_SYS_ADDR(buffer)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)

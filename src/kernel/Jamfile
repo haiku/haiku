@@ -490,7 +490,6 @@ KernelLd libc.so :
 	;
 
 KernelLd libroot.so :
-#	libglue2.o
 	libglue.o
 	<$(SOURCE_GRIST)!libroot>libroot.o
 	:
