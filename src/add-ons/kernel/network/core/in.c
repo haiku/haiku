@@ -9,6 +9,8 @@
 #include <sys/sockio.h>
 #include <net/route.h>
 
+#include "core_private.h"
+
 #ifdef _KERNEL_MODE
   #include <KernelExport.h>
   #define printf dprintf
@@ -22,6 +24,7 @@ struct in_ifaddr *get_primary_addr(void)
 {
 	return in_ifaddr;
 }
+
 
 /*
  * Trim a mask in a sockaddr
@@ -39,9 +42,60 @@ void in_socktrim(struct sockaddr_in *ap)
 		}
 }
 
+
 #define rtinitflags(x) \
         ((((x)->ia_ifp->if_flags & (IFF_LOOPBACK | IFF_POINTOPOINT)) != 0) \
             ? RTF_HOST : 0)
+
+void
+in_if_detach(struct ifnet *ifp)
+{
+	// remove all references to this ifnet
+	struct in_ifaddr *ia = NULL, *previous = NULL;
+	struct ifaddr *ifa;
+	
+	if(!ifp || !in_ifaddr)
+		return;
+	
+	if(in_ifaddr->ia_ifp == ifp)
+		ia = in_ifaddr;
+	else {
+		for(previous = in_ifaddr; previous && previous->ia_next;
+				previous = previous->ia_next)
+			if(previous->ia_next->ia_ifp == ifp) {
+				ia = previous->ia_next;
+				break;
+			}
+	}
+	
+	if(!ia)
+		return;
+	
+	if(rtinit(&(ia->ia_ifa), RTM_DELETE, rtinitflags(ia)))
+		printf("core.c.: in_if_detach(): Could not delete route!\n");
+	
+	if(ifp->if_addrlist) {
+		ifa = ifp->if_addrlist;
+		if(ifa->ifa_addr->sa_family == AF_INET)
+			ifp->if_addrlist = ifa->ifa_next;
+		else
+			for(; ifa; ifa = ifa->ifa_next)
+				if(ifa->ifa_next && ifa->ifa_next->ifa_addr->sa_family == AF_INET) {
+					struct ifaddr *tmp = ifa;
+					ifa = ifa->ifa_next;
+					tmp->ifa_next = ifa->ifa_next;
+				}
+		
+		if(ifa)
+			free(ifa);
+	}
+	
+	if(previous)
+		previous->ia_next = ia->ia_next;
+	else
+		in_ifaddr = ia->ia_next;
+}
+
 /*
  * remove a route to prefix ("connected route" in cisco terminology).
  * re-installs the route by using another interface address, if there's one
@@ -193,12 +247,12 @@ int in_control(struct socket *so, int cmd, caddr_t data, struct ifnet *ifp)
 	struct sockaddr_in oldaddr;
 	int error = 0, hostIsNew, maskIsNew;
 	long i;
-
+	
 	if (ifp) /* we need to find the in_ifaddr */
-		for (ia = in_ifaddr;ia; ia = ia->ia_next)
+		for (ia = in_ifaddr; ia; ia = ia->ia_next)
 			if (ia->ia_ifp == ifp)
 				break;
-		
+	
 	switch (cmd) {
 		case SIOCAIFADDR:
 			printf("SIOCAIFADDR\n");

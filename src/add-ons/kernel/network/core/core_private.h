@@ -2,6 +2,11 @@
 #define _CORE_PRIVATE__H
 
 
+struct ifnet;
+
+void in_if_detach(struct ifnet *ifp);
+	// this removes all IP related references for this interface (route, address)
+
 extern struct pool_ctl *mbpool;
 extern struct pool_ctl *clpool;
 

@@ -10,6 +10,7 @@
   #define printf dprintf
 #endif
 
+#include "core_private.h"
 #include "netinet/in.h"
 #include "sys/socketvar.h"
 #include "net/if.h"
@@ -399,12 +400,34 @@ void if_attach(struct ifnet *ifp)
 void if_detach(struct ifnet *ifp)
 {
 	struct ifnet *p = devices, *q = NULL;
+	int32 index;
+	bool found = false;
 	
 	for(; p && p != ifp; p = p->if_next)
 		q = p;
 	
 	if(!p)
 		return;
+	
+	// XXX: this is a hack, but we don't want to invest too much work into this stack
+	in_if_detach(ifp);
+		// this should also remove all remaining routes
+	
+	// remove the ifa entry from ifnet_addrs and reduce all following ifnet indices
+	for(index = 0; index < if_index; index++) {
+		if(found) {
+			--ifnet_addrs[index]->ifa_ifp->if_index;
+			ifnet_addrs[index - 1] = ifnet_addrs[index];
+		}
+		
+		if(ifnet_addrs[index]->ifa_ifp == ifp) {
+			found = true;
+			free(ifnet_addrs[index]);
+		}
+	}
+	
+	if(found)
+		--if_index;
 	
 	if(q)
 		q->if_next = p->if_next;
