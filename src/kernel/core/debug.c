@@ -368,6 +368,7 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("exit", &cmd_continue, NULL);
 	add_debugger_command("es", &cmd_continue, NULL);
 
+	arch_dbg_con_init_settings(args);
 	return arch_dbg_init(args);
 }
 
