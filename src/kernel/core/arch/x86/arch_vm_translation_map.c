@@ -1,24 +1,25 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <smp.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
+#include <smp.h>
 #include <queue.h>
-#include <string.h>
 #include <kerrors.h>
+#include <memheap.h>
 #include <arch/vm_translation_map.h>
 
+#include <string.h>
 #include <stdlib.h>
 
-#define TRACE_VM_TMAP 0
-#if TRACE_VM_TMAP
+//#define TRACE_VM_TMAP
+#ifdef TRACE_VM_TMAP
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -651,7 +652,7 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 	new_map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
 	if (new_map == NULL) {
 		recursive_lock_destroy(&new_map->lock);
-		return ENOMEM;
+		return B_NO_MEMORY;
 	}
 
 	new_map->arch_data->num_invalidate_pages = 0;
@@ -659,14 +660,12 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 	if (!kernel) {
 		// user
 		// allocate a pgdir
-		new_map->arch_data->pgdir_virt = malloc(PAGE_SIZE);
+		new_map->arch_data->pgdir_virt = memalign(B_PAGE_SIZE, B_PAGE_SIZE);
 		if (new_map->arch_data->pgdir_virt == NULL) {
 			free(new_map->arch_data);
 			recursive_lock_destroy(&new_map->lock);
-			return ENOMEM;
+			return B_NO_MEMORY;
 		}
-		if (((addr_t)new_map->arch_data->pgdir_virt % PAGE_SIZE) != 0)
-			panic("vm_translation_map_create: malloced pgdir and found it wasn't aligned!\n");
 		vm_get_page_mapping(vm_get_kernel_aspace_id(), (addr_t)new_map->arch_data->pgdir_virt, (addr_t *)&new_map->arch_data->pgdir_phys);
 	} else {
 		// kernel
