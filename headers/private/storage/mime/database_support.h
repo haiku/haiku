@@ -23,6 +23,7 @@ namespace Mime {
 
 // Database directory
 extern const std::string kDatabaseDir;
+extern const std::string kApplicationDatabaseDir;
 	
 // Attribute Prefixes
 extern const char *kMiniIconAttrPrefix;
@@ -57,8 +58,11 @@ extern const int32 kSnifferRuleType;
 extern const int32 kSupportedTypesType;
 
 // Message fields
-extern const char *kTypesField;
+extern const char *kApplicationsField;
 extern const char *kSupertypesField;
+extern const char *kSupportingAppsSubCountField;
+extern const char *kSupportingAppsSuperCountField;
+extern const char *kTypesField;
 
 std::string type_to_filename(const char *type);
 

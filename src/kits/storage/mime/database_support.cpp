@@ -37,14 +37,15 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-//const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/beos_mime";
-const std::string kDatabaseDir = "/boot/home/config/settings/obos_mime";
+//const std::string kDatabaseDir					= "/boot/home/config/settings/beos_mime";
+const std::string kDatabaseDir 					= "/boot/home/config/settings/obos_mime";
+const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
 
 #define ATTR_PREFIX "META:"
 #define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
 #define LARGE_ICON_ATTR_PREFIX ATTR_PREFIX "L:"
 
-const char *kMiniIconAttrPrefix	= MINI_ICON_ATTR_PREFIX;
+const char *kMiniIconAttrPrefix		= MINI_ICON_ATTR_PREFIX;
 const char *kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX; 
 
 // attribute names
@@ -54,12 +55,12 @@ const char *kAppHintAttr			= ATTR_PREFIX "PPATH";
 const char *kAttrInfoAttr			= ATTR_PREFIX "ATTR_INFO";
 const char *kShortDescriptionAttr	= ATTR_PREFIX "S:DESC";
 const char *kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
-const char *kFileExtensionsAttr	= ATTR_PREFIX "EXTENS";
+const char *kFileExtensionsAttr		= ATTR_PREFIX "EXTENS";
 const char *kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
-const char *kLargeIconAttr		= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *kLargeIconAttr			= LARGE_ICON_ATTR_PREFIX "STD_ICON";
 const char *kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
 const char *kSnifferRuleAttr		= ATTR_PREFIX "SNIFF_RULE";
-const char *kSupportedTypesAttr	= ATTR_PREFIX "FILE_TYPES";
+const char *kSupportedTypesAttr		= ATTR_PREFIX "FILE_TYPES";
 
 // attribute data types (as used in the R5 database)
 const int32 kFileTypeType			= 'MIMS';	// B_MIME_STRING_TYPE
@@ -68,17 +69,19 @@ const int32 kAppHintType			= 'MPTH';
 const int32 kAttrInfoType			= B_MESSAGE_TYPE;
 const int32 kShortDescriptionType	= 'MSDC';
 const int32 kLongDescriptionType	= 'MLDC';
-const int32 kFileExtensionsType	= B_MESSAGE_TYPE;
+const int32 kFileExtensionsType		= B_MESSAGE_TYPE;
 const int32 kMiniIconType			= B_MINI_ICON_TYPE;
-const int32 kLargeIconType		= B_LARGE_ICON_TYPE;
+const int32 kLargeIconType			= B_LARGE_ICON_TYPE;
 const int32 kPreferredAppType		= 'MSIG';
 const int32 kSnifferRuleType		= B_STRING_TYPE;
-const int32 kSupportedTypesType	= B_MESSAGE_TYPE;
+const int32 kSupportedTypesType		= B_MESSAGE_TYPE;
 
 // Message fields
-const char *kTypesField			= "types";
-const char *kSupertypesField	= "super_types";
-
+const char *kApplicationsField				= "applications";
+const char *kSupertypesField				= "super_types";
+const char *kSupportingAppsSubCountField	= "be:sub";
+const char *kSupportingAppsSuperCountField	= "be:super";
+const char *kTypesField						= "types";
 
 // type_to_filename
 //! Converts the given MIME type to an absolute path in the MIME database.
