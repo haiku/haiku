@@ -66,8 +66,8 @@ static mutex gMonitorMutex;
 static int
 monitor_compare(void *_monitor, const void *_key)
 {
-	node_monitor *monitor = _monitor;
-	const struct monitor_hash_key *key = _key;
+	node_monitor *monitor = (node_monitor*)_monitor;
+	const struct monitor_hash_key *key = (const struct monitor_hash_key*)_key;
 
 	if (monitor->device == key->device && monitor->node == key->node)
 		return 0;
@@ -79,8 +79,8 @@ monitor_compare(void *_monitor, const void *_key)
 static uint32
 monitor_hash(void *_monitor, const void *_key, uint32 range)
 {
-	node_monitor *monitor = _monitor;
-	const struct monitor_hash_key *key = _key;
+	node_monitor *monitor = (node_monitor*)_monitor;
+	const struct monitor_hash_key *key = (const struct monitor_hash_key*)_key;
 
 #define MHASH(device, node) (((uint32)((node) >> 32) + (uint32)(node)) ^ (uint32)(device))
 
@@ -116,7 +116,8 @@ get_listener_for(node_monitor *monitor, port_id port, uint32 token)
 {
 	monitor_listener *listener = NULL;
 	
-	while ((listener = list_get_next_item(&monitor->listeners, listener)) != NULL) {
+	while ((listener = (monitor_listener*)list_get_next_item(
+			&monitor->listeners, listener)) != NULL) {
 		// does this listener match?
 		if (listener->port == port && listener->token == token)
 			return listener;
@@ -295,13 +296,15 @@ remove_node_monitors_by_target(struct io_context *context, port_id port, uint32 
 	monitor_listener *listener = NULL;
 	int32 count = 0;
 
-	while ((listener = list_get_next_item(&context->node_monitors, listener)) != NULL) {
+	while ((listener = (monitor_listener*)list_get_next_item(
+			&context->node_monitors, listener)) != NULL) {
 		monitor_listener *removeListener;
 
 		if (listener->port != port || listener->token != token)
 			continue;
 
-		listener = list_get_prev_item(&context->node_monitors, removeListener = listener);
+		listener = (monitor_listener*)list_get_prev_item(
+			&context->node_monitors, removeListener = listener);
 			// this line sets the listener one item back, allowing us
 			// to remove its successor (which is saved in "removeListener")
 
@@ -325,7 +328,8 @@ remove_node_monitors(struct io_context *context)
 	while (!list_is_empty(&context->node_monitors)) {
 		// the remove_listener() function will also free the node_monitor
 		// if it doesn't have any listeners attached anymore
-		remove_listener(list_get_first_item(&context->node_monitors));
+		remove_listener(
+			(monitor_listener*)list_get_first_item(&context->node_monitors));
 	}
 
 	mutex_unlock(&gMonitorMutex);
@@ -435,7 +439,8 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 		// iterate over all listeners for this monitor, and see
 		// if we have to send anything
 		listener = NULL;
-		while ((listener = list_get_next_item(&monitor->listeners, listener)) != NULL) {
+		while ((listener = (monitor_listener*)list_get_next_item(
+				&monitor->listeners, listener)) != NULL) {
 			// do we have a reason to notify this listener?
 			if (((listener->flags & B_WATCH_NAME) != 0
 				&& (op == B_ENTRY_MOVED || op == B_ENTRY_REMOVED))
@@ -459,7 +464,8 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 		// iterate over all listeners for this monitor, and see
 		// if we have to send anything
 		listener = NULL;
-		while ((listener = list_get_next_item(&monitor->listeners, listener)) != NULL) {
+		while ((listener = (monitor_listener*)list_get_next_item(
+				&monitor->listeners, listener)) != NULL) {
 			// do we have a reason to notify this listener?
 			if ((listener->flags & B_WATCH_DIRECTORY) != 0) {
 				send_notification(listener->port, listener->token, B_NODE_MONITOR,
@@ -475,7 +481,8 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 		// iterate over all listeners for this monitor, and see
 		// if we have to send anything
 		listener = NULL;
-		while ((listener = list_get_next_item(&monitor->listeners, listener)) != NULL) {
+		while ((listener = (monitor_listener*)list_get_next_item(
+				&monitor->listeners, listener)) != NULL) {
 			// do we have a reason to notify this listener?
 			if ((listener->flags & B_WATCH_DIRECTORY) != 0) {
 				send_notification(listener->port, listener->token, B_NODE_MONITOR,
