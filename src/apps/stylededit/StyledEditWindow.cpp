@@ -1058,50 +1058,84 @@ StyledEditWindow::PageSetup(const char *documentname)
 void
 StyledEditWindow::Print(const char *documentname)
 {
+	status_t result = B_OK;
 	BPrintJob printJob(documentname);
 														
-	if (fPrintSettings== NULL){
-		status_t pageSetup;
-		pageSetup= PageSetup(fTextView->Window()->Title());
-		
-		if (pageSetup!= B_NO_ERROR)
+	if (fPrintSettings == NULL) {
+		result = PageSetup(fTextView->Window()->Title());
+		if (result != B_NO_ERROR) {
 			return;
 		}
-	else
+	} else {
 		printJob.SetSettings(fPrintSettings);
+	}
 	
-	status_t configCheck;
-	configCheck= printJob.ConfigJob();	
-	if (configCheck== B_NO_ERROR){
-		int32 currentPage= 1;
-		int32 firstPage;
-		int32 lastPage;
-		int32 pagesInDocument;
-		BRect pageRect;
-		BRect currentPageRect;
-		
-		pageRect= printJob.PrintableRect();
-		currentPageRect= pageRect;
-		//not sure about this....
-		BRect docRect;
-		docRect= fTextView->TextRect();
-		pagesInDocument= (int32)(docRect.Height()+ (pageRect.Height()-1) / pageRect.Height());
-		
-		firstPage= printJob.FirstPage();
-		lastPage=  printJob.LastPage();
-		
-		if(lastPage> pagesInDocument)
-			lastPage= pagesInDocument;
-			
-		printJob.BeginJob();
-		
-		for(currentPage= firstPage;currentPage<= lastPage;currentPage++){
-			currentPageRect.OffsetTo(0, currentPage* pageRect.Height());
-			printJob.DrawView(fTextView, currentPageRect, BPoint(0.0, 0.0));
-			printJob.SpoolPage();
+	result = printJob.ConfigJob();
+	if (result != B_OK) {
+		return;
+	}
+	// information from printJob
+	fPrintSettings = printJob.Settings();
+	BRect paper_rect = printJob.PaperRect();
+	BRect printable_rect = printJob.PrintableRect();	
+	int32 firstPage = printJob.FirstPage();
+	int32 lastPage = printJob.LastPage();
+    
+	// lines eventually to be used to compute pages to print
+	int32 firstLine = 0;
+	int32 lastLine = fTextView->CountLines();
+	
+	// values to be computed
+	int32 pagesInDocument = 1;
+	int32 linesInDocument = fTextView->CountLines();
+	
+	int32 currentLine = 0;
+	while (currentLine < linesInDocument) {
+		float currentHeight = 0;
+		while ((currentHeight < printable_rect.Height()) && (currentLine < linesInDocument)) {
+			currentHeight += fTextView->LineHeight(currentLine);
+			if (currentHeight < printable_rect.Height()) {
+				currentLine++;
+			}
 		}
-		printJob.CommitJob();
-	}		
+		if (currentHeight >= printable_rect.Height()) {
+			pagesInDocument++;
+		}
+		if (pagesInDocument - 1 == lastPage) {
+			lastLine = currentLine;
+		}
+		currentLine++;
+		if (pagesInDocument == firstPage) {
+			firstLine = currentLine;
+		}
+	}
+	
+	if (lastPage > pagesInDocument - 1) {
+		lastPage = pagesInDocument - 1;
+		lastLine = currentLine - 1;
+	}
+		
+	printJob.BeginJob();
+	int32 printLine = firstLine;
+	while (printLine < lastLine) {
+		float currentHeight = 0;
+		int32 firstLineOnPage = printLine;
+		while ((currentHeight < printable_rect.Height()) && (printLine < lastLine)) {
+			currentHeight += fTextView->LineHeight(printLine);
+			if (currentHeight < printable_rect.Height()) {
+				printLine++;
+			}
+		}
+		float top = 0;
+		if (firstLineOnPage != 0) {
+			top = fTextView->TextHeight(0,firstLineOnPage-1);
+		}
+		float bottom = fTextView->TextHeight(0,printLine);
+		BRect textRect(0.0,top,printable_rect.Width(),bottom);
+		printJob.DrawView(fTextView,textRect,BPoint(0.0,0.0));
+		printJob.SpoolPage();
+	}
+	printJob.CommitJob();
 }/***StyledEditWindow::Print()***/
 
 bool
