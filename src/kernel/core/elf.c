@@ -347,7 +347,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 				needed_offset = d[i].d_un.d_ptr + image->regions[0].delta;
 				break;
 			case DT_HASH:
-				image->symhash = (unsigned int *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_STRTAB:
 				image->strtab = (char *)(d[i].d_un.d_ptr + image->regions[0].delta);
