@@ -11,5 +11,5 @@ KernelMergeObject os_arch_$(OBOS_ARCH).o :
 
 MergeObjectFromObjects kernel_os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.o
-	<$(SOURCE_GRIST)>system_time.S
+	<$(SOURCE_GRIST)>system_time.o
 	;
