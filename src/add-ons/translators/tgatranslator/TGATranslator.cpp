@@ -132,8 +132,9 @@ TGATranslator::TGATranslator()
 
 	strcpy(fName, "TGA Images");
 	sprintf(fInfo, "TGA image translator v%d.%d.%d %s",
-		TGA_TRANSLATOR_VERSION / 100, (TGA_TRANSLATOR_VERSION / 10) % 10,
-		TGA_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(TGA_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((TGA_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(TGA_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------

@@ -130,8 +130,9 @@ STXTTranslator::STXTTranslator()
 {
 	strcpy(fName, "StyledEdit Files");
 	sprintf(fInfo, "StyledEdit file translator v%d.%d.%d %s",
-		STXT_TRANSLATOR_VERSION / 100, (STXT_TRANSLATOR_VERSION / 10) % 10,
-		STXT_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(STXT_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((STXT_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(STXT_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------

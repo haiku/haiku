@@ -42,7 +42,7 @@
 #include <ByteOrder.h>
 #include <fs_attr.h>
 
-#define STXT_TRANSLATOR_VERSION 100
+#define STXT_TRANSLATOR_VERSION 0x100
 #define STXT_IN_QUALITY 0.5
 	// high in quality becuase this code supports all STXT features
 #define STXT_IN_CAPABILITY 0.5

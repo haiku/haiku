@@ -40,7 +40,7 @@
 #include <ByteOrder.h>
 #include "TGATranslatorSettings.h"
 
-#define TGA_TRANSLATOR_VERSION 100
+#define TGA_TRANSLATOR_VERSION 0x100
 #define TGA_IN_QUALITY 1.0
 	// high in quality becuase this code supports all TGA features
 #define TGA_IN_CAPABILITY 0.6
