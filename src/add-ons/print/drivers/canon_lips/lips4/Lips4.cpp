@@ -43,7 +43,7 @@ bool LIPS4Driver::startDoc()
 		setNumberOfCopies();
 		sidePrintingControl();
 		setBindingMargin();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma(), getJobData()->getInkDensity(), getJobData()->getDitherType());
 		return true;
 	}
 	catch (TransportException &err) {

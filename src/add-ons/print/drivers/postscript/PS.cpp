@@ -36,7 +36,7 @@ bool PSDriver::startDoc()
 {
 	try {
 		jobStart();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma(), getJobData()->getInkDensity(), getJobData()->getDitherType());
 		return true;
 	}
 	catch (TransportException &err) {
