@@ -858,7 +858,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16
 	uint8 index, byte, safe;
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
-	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
+	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
 
 	while (!end)
 	{
