@@ -262,7 +262,7 @@ typedef struct {
 #define B_SYSTEM_TIMEBASE				0
 
 typedef int32 (*thread_func) (void *);
-// the equivalent thread_entry has been removed (deprecated)
+#define thread_entry thread_func /* thread_entry is for backward compatibility only! Use thread_func */
 
 extern thread_id	spawn_thread(thread_func, const char *name, int32 priority, void *data);
 extern status_t		kill_thread(thread_id thread);
