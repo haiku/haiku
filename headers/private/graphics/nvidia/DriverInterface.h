@@ -235,6 +235,7 @@ typedef struct {
 		float panel2_aspect;		/* panel's aspect ratio */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */
+		uint8 monitors;				/* output devices connection matrix */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 
 		/* PINS */
