@@ -1,8 +1,8 @@
 /* tests node monitor functionality (very basic test!) */
 
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -26,7 +26,7 @@ main(int argc, char **argv)
 
 	printf("watch file: device = %ld, node = %Ld\n", st.st_dev, st.st_ino);
 
-	if (sys_start_watching(st.st_dev, st.st_ino, B_WATCH_DIRECTORY, 1, 2) < B_OK) {
+	if (_kern_start_watching(st.st_dev, st.st_ino, B_WATCH_DIRECTORY, 1, 2) < B_OK) {
 		fprintf(stderr, "Could not start watching!\n");
 		return -1;
 	}
@@ -34,7 +34,7 @@ main(int argc, char **argv)
 	mkdir("/temp_test", 0755);
 	rmdir("/temp_test");
 
-	if (sys_stop_watching(st.st_dev, st.st_ino, 0, 1, 2) < B_OK) {
+	if (_kern_stop_watching(st.st_dev, st.st_ino, 0, 1, 2) < B_OK) {
 		fprintf(stderr, "Could not stop watching!\n");
 		return -1;
 	}
