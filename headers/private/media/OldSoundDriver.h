@@ -2,33 +2,37 @@
 #define _OLD_SOUND_DRIVER_H_
  
 /*
- * The BeOS R3 style legacy sound card driver interface
+ * The updated BeOS R3 style legacy sound card driver interface
  * Assembled from the Be Newsletter, Volume II, Issue 22; June 3, 1998
+ * and Be Newsletter, Volume III, Issue 12, March 24, 1999
  */
  
 enum { 
-	SOUND_GET_PARAMS = B_DEVICE_OP_CODES_END, 
-	SOUND_SET_PARAMS, 
-	SOUND_SET_PLAYBACK_COMPLETION_SEM, 
-	SOUND_SET_CAPTURE_COMPLETION_SEM, 
-	SOUND_RESERVED_1,	/* unused */ 
-	SOUND_RESERVED_2,	/* unused */ 
-	SOUND_DEBUG_ON,		/* unused */ 
-	SOUND_DEBUG_OFF,	/* unused */ 
-	SOUND_WRITE_BUFFER,
-	SOUND_READ_BUFFER,
-	SOUND_LOCK_FOR_DMA
+  SOUND_GET_PARAMS = B_DEVICE_OP_CODES_END, 
+  SOUND_SET_PARAMS, 
+  SOUND_SET_PLAYBACK_COMPLETION_SEM, 
+  SOUND_SET_CAPTURE_COMPLETION_SEM, 
+  SOUND_RESERVED_1,   /* unused */ 
+  SOUND_RESERVED_2,   /* unused */ 
+  SOUND_DEBUG_ON,     /* unused */ 
+  SOUND_DEBUG_OFF,    /* unused */ 
+  SOUND_WRITE_BUFFER, 
+  SOUND_READ_BUFFER, 
+  SOUND_LOCK_FOR_DMA, 
+  SOUND_SET_CAPTURE_PREFERRED_BUF_SIZE, 
+  SOUND_SET_PLAYBACK_PREFERRED_BUF_SIZE, 
+  SOUND_GET_CAPTURE_PREFERRED_BUF_SIZE, 
+  SOUND_GET_PLAYBACK_PREFERRED_BUF_SIZE 
 };
 
 typedef struct audio_buffer_header { 
-	int32 buffer_number; 
-	int32 subscriber_count; 
-	bigtime_t time; 
-	int32 reserved_1; 
-	int32 reserved_2; 
-	int32 reserved_3; 
-	int32 reserved_4; 
-} audio_buffer_header;
+  int32 buffer_number; 
+  int32 subscriber_count; 
+  bigtime_t time; 
+  int32 reserved_1 
+  int32 reserved_2; 
+  bigtime_t sample_clock; 
+} audio_buffer_header
 
 enum adc_source { 
   line = 0, cd, mic, loopback 
