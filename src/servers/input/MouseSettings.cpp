@@ -120,7 +120,7 @@ MouseSettings::SaveSettings()
 	file.Write(&fSettings.accel, sizeof(fSettings.accel));
 	file.Write(&fSettings.click_speed, sizeof(fSettings.click_speed));
 #else
-	file.Write(fSettings, sizeof(fSettings));
+	file.Write(&fSettings, sizeof(fSettings));
 #endif
 
 	// who is responsible for saving the mouse mode?

@@ -1,5 +1,30 @@
 SubDir OBOS_TOP src servers input ;
 
+rule MkKeymapHeader
+{
+	local binary = $(1) ;
+	local source = $(2) ;
+
+	SetupObjectsDir ;
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	MakeLocate $(binary) : $(LOCATE_TARGET) ;
+
+	Depends $(binary) : $(source) keymap ;
+	MkKeymapHeader1 $(binary) : keymap $(source) ;
+	LocalClean clean : $(binary) ;
+}
+
+actions MkKeymapHeader1
+{
+	$(2[1]) -o "$(1)" -h "$(2[2-])" ;
+}
+
+MkKeymapHeader [ FGristFiles SystemKeymap.cpp ] : US-International.keymap ;
+
+SEARCH on US-International.keymap
+	  += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) apps bin keymap ] ;
+
 if $(COMPILE_FOR_R5) {
 	SubDirC++Flags -DCOMPILE_FOR_R5 ;
 }
@@ -21,6 +46,8 @@ Server input_server :
 
 	MouseSettings.cpp
 	KeyboardSettings.cpp
+
+	SystemKeymap.cpp
 
 	# storage
 	AddOnMonitor.cpp
