@@ -360,6 +360,11 @@ class SimpleLock {
 				atomic_set(&fHolder, -1);
 		}
 
+		bool IsLocked() const
+		{
+			return fHolder == find_thread(NULL);
+		}
+
 	private:
 		vint32	fHolder;
 		vint32	fCount;
