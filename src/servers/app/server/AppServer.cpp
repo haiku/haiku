@@ -215,7 +215,7 @@ int32 AppServer::PicassoThread(void *data)
 		}
 		release_sem(appserver->fAppListLock);		
 		// we do this every other second so as not to suck *too* many CPU cycles
-		snooze(2000000);
+		snooze(1000000);
 	}
 	return 0;
 }
@@ -270,12 +270,6 @@ void AppServer::MainLoop(void)
 						code,code-SERVER_TRUE));
 				break;
 			}
-		}
-
-		if(code==AS_DELETE_APP || (code==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
-		{
-			if(fQuittingServer== true && fAppList->CountItems()== 0)
-				break;
 		}
 	}
 }
@@ -653,7 +647,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 					
 					for(int32 j=0; j<5; j++)
 					{
-						snooze(1000);	// wait half a second for it to quit
+						snooze(500000);	// wait half a second for it to quit
 						if(get_thread_info(app->fMonitorThreadID, &tinfo)!=B_OK)
 						{
 							killteam=false;
@@ -668,10 +662,15 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 					}
 				}
 			}
+
+			kill_thread(fPicassoThreadID);
+
 			release_sem(fAppListLock);
 
+			delete desktop;
+
 			// When we delete the last ServerApp, we can exit the server
-			fQuittingServer=true;
+			exit_thread(0);
 
 			// we are now clear to exit
 			break;

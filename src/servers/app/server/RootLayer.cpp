@@ -1482,7 +1482,7 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 	bool	invalidate = false;
 	bool	invalid;
 
-	winBorder->Show(false);
+	winBorder->Hide(false);
 
 	for (int32 i = 0; i < fWsCount; i++)
 	{

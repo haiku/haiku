@@ -292,10 +292,7 @@ void ServerWindow::Hide(void)
 */
 bool ServerWindow::IsHidden(void) const
 {
-	if(fWinBorder)
 		return fWinBorder->IsHidden();
-	
-	return true;
 }
 //------------------------------------------------------------------------------
 void ServerWindow::Minimize(bool status)
@@ -2221,24 +2218,26 @@ int32 ServerWindow::MonitorWin(void *data)
 			{
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
-				RootLayer		*myRootLayer = win->fWinBorder->GetRootLayer();
+//				RootLayer		*myRootLayer = win->fWinBorder->GetRootLayer();
 
-				quitting = true;
+//				quitting = true;
 
 				// we are preparing to delete a ServerWindow, RootLayer should be aware
 				// of that and stop for a moment.
 				// also we must wait a bit for the associated WinBorder to become hidden
-				while(1)
-				{
-					myRootLayer->Lock();
-					if (win->IsHidden())
-						break;
-					else
-						myRootLayer->Unlock();
-				}
+//				while(1)
+//				{
+//					myRootLayer->Lock();
+//					if (win->IsHidden())
+//						break;
+//					else
+//						myRootLayer->Unlock();
+//				}
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
+				if (!win->IsHidden())
+					debugger("ServerWindow: a window must be hidden before it's deleted\n");
 				delete win;
-				myRootLayer->Unlock();
+//				myRootLayer->Unlock();
 
 				exit_thread(0);
 				break;
