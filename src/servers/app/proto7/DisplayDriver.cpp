@@ -103,9 +103,12 @@ BPoint DisplayDriver::GetHotSpot(void)
 //					Private Methods
 //---------------------------------------------------------
 
-void DisplayDriver::Lock(void)
+bool DisplayDriver::Lock(bigtime_t timeout)		// defaults to B_INIFINITE_TIMEOUT
 {
-	acquire_sem(lock_sem);
+//	acquire_sem(lock_sem);
+	if(acquire_sem_etc(lock_sem,1,B_RELATIVE_TIMEOUT,timeout)!=B_NO_ERROR)
+		return false;
+	return true;
 }
 
 void DisplayDriver::Unlock(void)

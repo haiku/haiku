@@ -110,7 +110,7 @@ public:
 	BPoint GetHotSpot(void);
 
 protected:
-	void Lock(void);
+	bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
 	void Unlock(void);
 	void SetDepthInternal(uint8 d);
 	void SetHeightInternal(uint16 h);
