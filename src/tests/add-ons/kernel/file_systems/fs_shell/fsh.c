@@ -62,7 +62,6 @@ main(int argc, char **argv)
 
     do_fsh();
 
-
     if (sys_unmount(1, -1, "/myfs") != 0) {
         printf("could not un-mount /myfs\n");
         return 5;
@@ -1136,6 +1135,29 @@ do_rename(int argc, char **argv)
 
 
 static void
+do_symlink(int argc, char **argv)
+{
+	char target[B_PATH_NAME_LENGTH];
+	char *source;
+	status_t status;
+
+	if (argc < 3) {
+		printf("usage: symlink <source> <target>\n");
+		return;
+	}
+
+	source = argv[1];
+
+	strcpy(target, "/myfs/");
+	strcpy(target + 6, argv[2]);
+
+	status = sys_symlink(1, source, -1, target);
+	if (status != B_OK)
+		printf("symlink failed with error: %s\n", strerror(status));
+}
+
+
+static void
 do_sync(int argc, char **argv)
 {
     int err;
@@ -1501,6 +1523,7 @@ cmd_entry fsh_cmds[] =
     { "tracker", do_tracker, "starts a Tracker like background thread that will listen to fs updates" },
     { "cio",	 do_cio, "does a I/O speed test" },
     { "stattest", do_stattest, "does an \"early\"/\"late\" stat test for files that are created or deleted" },
+    { "symlink", do_symlink, "creates the specified symlink on the device" },
 
 // additional commands from the file system will be included here
 #	include "additional_commands.h"
