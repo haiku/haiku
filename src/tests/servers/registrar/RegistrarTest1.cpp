@@ -21,7 +21,7 @@ int
 main()
 {
 	TestApp *app = new TestApp("application/x-vnd.OBOS-TestApp1");
-	app->Run();
+//	app->Run();
 	delete app;
 	return 0;
 }
