@@ -4,6 +4,7 @@
 #include <Locker.h>
 #include <MediaFormats.h>
 #include <MediaRoster.h>
+#include <vector>
 #include "vorbisCodecPlugin.h"
 
 #define TRACE_THIS 1
@@ -27,10 +28,6 @@ vorbisDecoder::vorbisDecoder()
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
 
-	fHeaderPacketParsed = false;
-	fCommentPacketParsed = false;
-	fCodebookPacketParsed = false;
-
 	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
@@ -47,79 +44,43 @@ status_t
 vorbisDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	if ((inputFormat->type != B_MEDIA_UNKNOWN_TYPE)
-	    && (inputFormat->type != B_MEDIA_ENCODED_AUDIO)) {
-		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis\n");
+	if (inputFormat->type != B_MEDIA_ENCODED_AUDIO) {
+		TRACE("vorbisDecoder::Setup not called with audio stream: not vorbis\n");
 		return B_ERROR;
 	}
-	if (inputFormat->MetaDataSize() == sizeof(ogg_packet)) {
-	 	if (!fHeaderPacketParsed) {
-			// header packet passed in meta data
-			ogg_packet * packet = (ogg_packet*)inputFormat->MetaData();
-			// parse header packet
-			if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-				TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
-				return B_ERROR;
-			}
-			fHeaderPacketParsed = true;
-		}
- 	} else if (inputFormat->MetaDataSize() != 0) {
-		// unexpected meta data
+	if (inputFormat->u.encoded_audio.encoding != 'vorb') {
+		TRACE("vorbisDecoder::Setup not called with 'vorb' stream: not vorbis\n");
 		return B_ERROR;
- 	}
-	return InitializeInput(inputFormat);
-}
-
-status_t
-vorbisDecoder::InitializeInput(media_format *ioEncodedFormat)
-{
-	ogg_packet * packet;
-	int32 size;
-	media_header mh;
- 	if (!fHeaderPacketParsed) {
-		// get header packet
-		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
-			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get comment\n");
-			return B_ERROR;
-		}
-		// parse header packet
-		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
-			return B_ERROR;
-		}
-		fHeaderPacketParsed = true;
 	}
-	if (!fCommentPacketParsed) {
-		// get comment packet
-		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
-			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get comment\n");
-			return B_ERROR;
-		}
-		// parse comment packet
-		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment\n");
-			return B_ERROR;
-		}
-		fCommentPacketParsed = true;
+	if (inputFormat->MetaDataSize() != sizeof(std::vector<ogg_packet> *)) {
+		TRACE("vorbisDecoder::Setup not called with ogg_packet<vector> meta data: not vorbis\n");
+		return B_ERROR;
 	}
-	if (!fCodebookPacketParsed) {
-		// get codebook packet
-		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
-			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get codebook\n");
-			return B_ERROR;
-		}
-		// parse codebook packet
-		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook\n");
-			return B_ERROR;
-		}
-		// initialize decoder
-		vorbis_synthesis_init(&fDspState,&fInfo);
-		vorbis_block_init(&fDspState,&fBlock);
+	std::vector<ogg_packet> * packets = (std::vector<ogg_packet> *)inputFormat->MetaData();
+	if (packets->size() != 3) {
+		TRACE("vorbisDecoder::Setup not called with three ogg_packets: not vorbis\n");
+		return B_ERROR;
 	}
+	// parse header packet
+	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[0]) != 0) {
+		TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
+		return B_ERROR;
+	}
+	// parse comment packet
+	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[1]) != 0) {
+		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment\n");
+		return B_ERROR;
+	}
+	// parse codebook packet
+	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[2]) != 0) {
+		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook\n");
+		return B_ERROR;
+	}
+	// initialize decoder
+	vorbis_synthesis_init(&fDspState,&fInfo);
+	vorbis_block_init(&fDspState,&fBlock);
 	// fill out the encoding format
-	CopyInfoToEncodedFormat(ioEncodedFormat);
-
+	CopyInfoToEncodedFormat(inputFormat);
 	return B_OK;
 }
 
@@ -263,7 +224,6 @@ vorbisDecoderPlugin::NewDecoder()
 status_t
 vorbisDecoderPlugin::RegisterPlugin()
 {
-	PublishDecoder("unknown", "vorbis", "vorbis decoder, based on libvorbis");
 	PublishDecoder("audiocodec/vorbis", "vorbis", "vorbis decoder, based on libvorbis");
 	return B_OK;
 }

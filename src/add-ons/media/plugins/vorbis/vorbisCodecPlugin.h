@@ -11,8 +11,6 @@ public:
 	status_t	Setup(media_format *inputFormat,
 					  const void *infoBuffer, int32 infoSize);
 
-	status_t	InitializeInput(media_format * ioEncodedFormat);
-
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 
 	status_t	Seek(uint32 seekTo,
@@ -27,9 +25,6 @@ private:
 	void		CopyInfoToEncodedFormat(media_format * format);
 	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);
 
-	bool			fHeaderPacketParsed;
-	bool			fCommentPacketParsed;
-	bool			fCodebookPacketParsed;
 	vorbis_info			fInfo;
 	vorbis_comment		fComment;
 	vorbis_dsp_state	fDspState;

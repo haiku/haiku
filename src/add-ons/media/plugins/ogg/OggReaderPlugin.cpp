@@ -15,6 +15,24 @@
   #define TRACE(a...) ((void)0)
 #endif
 
+// codec identification 
+static bool isVorbisPacket(ogg_packet * packet) {
+	static const char * vorbis = "vorbis";
+	if ((unsigned)packet->bytes < (sizeof(vorbis)+1)) {
+		return false;
+	}
+	return !memcmp(&packet->packet[1], vorbis, sizeof(vorbis));
+}
+
+// codec-dependent packet gobbling for extra header packets
+static int getPacketsLeft(ogg_packet * packet) {
+	if (isVorbisPacket(packet)) {
+		return 2;
+	}
+	return 0;
+}
+
+
 oggReader::oggReader()
 {
 	TRACE("oggReader::oggReader\n");
@@ -164,13 +182,37 @@ oggReader::Sniff(int32 *streamCount)
 			return B_ERROR;
 #endif STRICT_OGG
 		}
+		// save a copy of the packet information
 		unsigned char * buffer = new unsigned char[packet.bytes];
-		fInitialHeaderPackets[serialno] = packet;
-		memcpy(buffer,packet.packet,packet.bytes);
-		fInitialHeaderPackets[serialno].packet = buffer;
-		if (GetPage(&page,4096,short_page) != B_OK) {
+		memcpy(buffer, packet.packet, packet.bytes);
+		packet.packet = buffer;
+		fHeaderPackets[serialno].push_back(packet);
+		fHeaderPacketsLeft[serialno] = getPacketsLeft(&packet);
+		if (GetPage(&page) != B_OK) {
 			return B_ERROR;
 		}
+	}
+	packet_count_map::iterator iter = fHeaderPacketsLeft.begin();
+	while (iter != fHeaderPacketsLeft.end()) {
+		int current_serial = iter->first;
+		while (fHeaderPacketsLeft[current_serial] > 0) {
+			int serialno = ogg_page_serialno(&page);
+			if (fHeaderPacketsLeft[serialno] > 0) {
+				ogg_stream_state * stream = fStreams[serialno];
+				ogg_packet packet;
+				ogg_stream_packetout(stream,&packet);
+				// save a copy of the packet information
+				unsigned char * buffer = new unsigned char[packet.bytes];
+				memcpy(buffer, packet.packet, packet.bytes);
+				packet.packet = buffer;
+				fHeaderPackets[serialno].push_back(packet);
+				fHeaderPacketsLeft[serialno]--;
+			}
+			if (GetPage(&page) != B_OK) {
+				return B_ERROR;
+			}
+		}
+		iter++;
 	}
 	*streamCount = fStreams.size();
 	if (fSeekable) {
@@ -257,7 +299,7 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 		off_t input_length;
 		{
 			off_t current_position = fSeekable->Seek(0,SEEK_CUR);
-			input_length = fSeekable->Seek(0,SEEK_END);
+			input_length = fSeekable->Seek(0,SEEK_END)-fPostSniffPosition;
 			fSeekable->Seek(current_position,SEEK_SET);
 		}
 		*frameCount = filePositionToFrame(input_length);
@@ -268,8 +310,13 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 		*frameCount = INT64_MAX;
 		*duration = INT64_MAX;
 	}
-	ogg_packet * packet = &fInitialHeaderPackets[stream->serialno];
-	format->SetMetaData((void*)packet,sizeof(ogg_packet));
+	std::vector<ogg_packet> * ogg_packets = &fHeaderPackets[stream->serialno];
+	format->SetMetaData((void*)ogg_packets,sizeof(ogg_packets));
+	if (isVorbisPacket(&(*ogg_packets)[0])) {
+		format->type = B_MEDIA_ENCODED_AUDIO;
+		format->u.encoded_audio.encoding
+         = (media_encoded_audio_format::audio_encoding)'vorb';
+	}
 	*infoBuffer = 0;
 	*infoSize = 0;
 	return B_OK;
@@ -289,9 +336,9 @@ oggReader::Seek(void *cookie,
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	int position;
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		position = frameToFilePosition(*frame);
+		position = fPostSniffPosition+frameToFilePosition(*frame);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		position = timeToFilePosition(*time);
+		position = fPostSniffPosition+timeToFilePosition(*time);
 	} else {
 		return B_ERROR;
 	}

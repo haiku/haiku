@@ -4,11 +4,14 @@
 #include "ReaderPlugin.h"
 #include "ogg/ogg.h"
 #include <map>
+#include <vector>
 
 namespace BPrivate { namespace media {
 
 typedef std::map<int,ogg_stream_state*> ogg_stream_map;
 typedef std::map<int,ogg_packet> ogg_packet_map;
+typedef std::map<int,std::vector<ogg_packet> > ogg_packets_map;
+typedef std::map<int,int> packet_count_map;
 
 class oggReader : public Reader
 {
@@ -44,7 +47,8 @@ private:
 	off_t			fPostSniffPosition;
 	
 	ogg_sync_state	fSync;
-	ogg_packet_map	fInitialHeaderPackets;
+	ogg_packets_map fHeaderPackets;
+	packet_count_map fHeaderPacketsLeft;
 	ogg_stream_map	fStreams;
 	ogg_packet_map	fPackets;
 };
