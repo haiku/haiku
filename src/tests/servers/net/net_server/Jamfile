@@ -9,4 +9,4 @@ SimpleTest net_server :
 	: be
 ;
 
-SubInclude OBOS_TOP src tests servers net net_server add-ons ;
+# SubInclude OBOS_TOP src tests servers net net_server add-ons ;
