@@ -1,3 +1,5 @@
+#ifndef VPAGE_H
+#define VPAGE_H
 #include <vm.h>
 #include <pageManager.h>
 #include <swapFileManager.h>
@@ -17,8 +19,9 @@ class vpage : public node
 		bool contains(uint32 address) { return ((start_address<=address) && (end_address>=address)); }
 		void flush(void); // write page to vnode, if necessary
 		void refresh(void); // Read page back in from vnode
-		vpage(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
-		~vpage(void);
+		vpage(void);
+		void setup(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
+		void cleanup(void);
 		void setProtection(protectType prot);
 		protectType getProtection(void) {return protection;}
 		void *getStartAddress(void) {return (void *)start_address;}
@@ -43,3 +46,4 @@ class vpage : public node
 		int getInt(unsigned long offset); // This is for testing only
 		void setInt(unsigned long offset,int value); // This is for testing only
 };
+#endif

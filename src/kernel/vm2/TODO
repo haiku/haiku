@@ -1,16 +1,16 @@
 1) Need to make the paging daemon load the pages in, using semaphores.
 2) See how unresolvable page faults and permissions errors are handled - need to properly handle
-3) Implment cloneArea
-4) Tests are not done. 
+3) Tests are not done. 
 	Test:
-		getAreaInfo
 		getNextAreaInfo
 		cloneArea
 		resizeArea
 		setAreaProtection
-		mmap
+		mmap / munmap
 		paging
+		disk caching
 
-5) Improve locking (remains to be seen - works ok so far)
-6) I use new and delete. I know that doesn't work in kernel land. Not too tough to change, though.  
-7) There is no arch-level integration. This is to be tested (to death) in user land first.  * == can not be done in user land.
+4) Improve locking (remains to be seen - works ok so far)
+5) I use new and delete. I know that doesn't work in kernel land. Not too tough to change, though.  
+	- Pooling is now used for everything but pages
+6) There is no arch-level integration. This is to be tested (to death) in user land first.  * == can not be done in user land.

@@ -1,9 +1,4 @@
 SubDir OBOS_TOP src kernel vm2 ;
 
-C++FLAGS += -g ;
-CCFLAGS += -g ;
-
-Server vmTest : area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C test.C vmInterface.C vpage.C ;
-
-LinkSharedOSLibs vmTest : root be ;  
+BinCommand vmTest  : area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C test.C vmInterface.C vpage.C : root be ; 
 

@@ -24,7 +24,8 @@ class area : public node
 		unsigned long end_address;
 		vpage *findVPage(unsigned long);
 	public:
-		area(areaManager *myManager);
+		area(void);
+		void setup(areaManager *myManager);
 		bool nameMatch(char *matchName) {return (strcmp(matchName,name)==0);}
 		unsigned long mapAddressSpecToAddress(addressSpec type,unsigned long requested,int pageCount);
 		status_t createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect,int fd,size_t offset);

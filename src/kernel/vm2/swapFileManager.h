@@ -1,3 +1,5 @@
+#ifndef _SWAPFILE_MANAGER
+#define _SWAPFILE_MANAGER
 #include <unistd.h>
 #include <fcntl.h>
 #include "vm.h"
@@ -19,3 +21,4 @@ class swapFileManager {
 	void Lock() {acquire_sem(lockFreeList);}
 	void Unlock() {release_sem(lockFreeList);}
 };
+#endif

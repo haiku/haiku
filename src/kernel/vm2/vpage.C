@@ -1,7 +1,9 @@
 #include "vpage.h"
+#include "vnodePool.h"
 
 	extern swapFileManager  swapMan;
 	extern pageManager pageMan;  
+	extern poolvnode vnodePool;
 
 void vpage::flush(void)
 	{
@@ -14,8 +16,12 @@ void vpage::refresh(void)
 		swapMan.read_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
 	}
 
+vpage::vpage(void)
+{
+}
+
 // backing and/or physMem can be NULL/0.
-vpage::vpage(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state) 
+void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state) 
 	{ 
 	//printf ("vpage::vpage: start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	start_address=start;
@@ -42,12 +48,16 @@ vpage::vpage(unsigned long start,vnode *backing, page *physMem,protectType prot,
 	//printf ("vpage::vpage: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 
-vpage::~vpage(void)
+void vpage::cleanup(void)
 	{
 	if (physPage) //  Note that free means release one reference
 		pageMan.freePage(physPage);
-	if (backingNode->fd)
-		swapMan.freeVNode(*backingNode);
+	if (backingNode)
+		{
+		if (backingNode->fd)
+			swapMan.freeVNode(*backingNode);
+		vnodePool.put(backingNode);
+		}
 	}
 
 void vpage::setProtection(protectType prot)
@@ -130,7 +140,7 @@ void  vpage::setInt(unsigned long address,int value)
 
 void vpage::pager(int desperation)
 	{
-	printf ("vpage::pager start desperation = %d\n",desperation);
+	//printf ("vpage::pager start desperation = %d\n",desperation);
 	if (!swappable)
 			return;
 	printf ("vpage::pager swappable\n");

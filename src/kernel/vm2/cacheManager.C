@@ -1,6 +1,9 @@
 #include <cacheManager.h>
+#include <vpagePool.h>
 
-cacheManager::cacheManager(void) : area (NULL)
+extern poolvpage vpagePool;
+
+cacheManager::cacheManager(void) : area ()
 {
 	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
 }
@@ -33,7 +36,8 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 				}
 	lock();
 	// Create a vnode here
-	vpage *newPage = new vpage(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
+	vpage *newPage = vpagePool.get();
+	newPage->setup(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
 	vpages.add(newPage); 
 	cacheMembers.add(newPage);
 	unlock();

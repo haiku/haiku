@@ -2,10 +2,16 @@
 //#include "areaManager.h"
 #include "mman.h"
 #include "area.h"
+#include "areaPool.h"
+#include "vpagePool.h"
+#include "vnodePool.h"
 		
 areaManager am;
 swapFileManager swapMan;
-pageManager pageMan(10); // Obviously this hard coded number is a hack...
+poolarea areaPool;
+poolvpage vpagePool;
+poolvnode vnodePool;
+pageManager pageMan(30); // Obviously this hard coded number is a hack...
 	
 areaManager *vmInterface::getAM(void)
 	{
@@ -79,7 +85,8 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
-	area *newArea = new area(getAM());
+	area *newArea = areaPool.get();
+	newArea->setup(getAM());
 	newArea->createArea(AreaName,pageCount,address,addType,state,protect);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
 	getAM()->addArea(newArea);
@@ -93,14 +100,14 @@ void vmInterface::freeArea(int Area)
 	//printf ("vmInterface::freeArea: found area %x\n",oldArea);
 	if (oldArea)
 		{
-		//printf ("vmInterface::freeArea: removing area %x from linked list\n",oldArea);
-		areaManager *foo=getAM();
-		//printf ("vmInterface::freeArea: areaManager =  %x \n",foo);
-		foo->removeArea(oldArea);
-		//printf ("vmInterface::freeArea: deleting area %x \n",oldArea);
+//		printf ("vmInterface::freeArea: removing area %x from linked list\n",oldArea);
+		areaManager *manager=getAM();
+//		printf ("vmInterface::freeArea: areaManager =  %x \n",manager);
+		manager->removeArea(oldArea);
+//		printf ("vmInterface::freeArea: deleting area %x \n",oldArea);
 		oldArea->freeArea();
-		//printf ("vmInterface::freeArea: freeArea complete \n");
-		delete oldArea;
+//		printf ("vmInterface::freeArea: freeArea complete \n");
+		areaPool.put(oldArea);
 		}
 	else
 		printf ("vmInterface::freeArea: unable to find requested area\n");
@@ -132,8 +139,9 @@ int vmInterface::getAreaByName(char *name)
 
 int vmInterface::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
 	{
-	area *newArea = new area(getAM());
-	area *oldArea=getAM()->findArea(newAreaID);	
+	area *newArea = areaPool.get();
+	newArea->setup(getAM());
+	area *oldArea=getAM()->findArea(newAreaID);
 	newArea->cloneArea(oldArea,AreaName,address,addType,state,prot);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
 	getAM()->addArea(newArea);
@@ -182,7 +190,8 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 		return addr;
 		}
 
-	area *newArea = new area(getAM());
+	area *newArea = areaPool.get();
+	newArea->setup(getAM());
 	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE

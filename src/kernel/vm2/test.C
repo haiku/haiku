@@ -94,8 +94,6 @@ int32 getInfoTest(void *parameters)
 int32 mmapTest (void *parameters)
 	{
 	void *map;
-
-
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int size=params->areaSize; // Note that this is in bytes, not in pages
 	while (1)
@@ -109,9 +107,11 @@ int32 mmapTest (void *parameters)
 		printf ("mmap address = %x\n",map);
 		for (int i=0;i<size;i++)
 			writeByte((int32)map,i,i%256);
+		printf ("mmapTest: writing done\n");
 		for (int i=0;i<size;i++)
 			if (i%256!=readByte((int32)map,i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte((int32)map,i));
+		printf ("mmapTest: reading done\n");
 		snooze(params->loopSnooze); 
 		vm.munmap(map,size);
 		close(fd);
