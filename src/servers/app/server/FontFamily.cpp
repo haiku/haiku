@@ -128,7 +128,7 @@ int32 FontStyle::GetFlags(void) const
 int16 FontStyle::ConvertToUnicode(uint16 c)
 {
 	FT_Face f;
-	if(FTC_Manager_Lookup_Face(ftmanager,cachedface,&f)!=0)
+	if(FTC_Manager_LookupFace(ftmanager,(FTC_FaceID)cachedface,&f)!=0)
 		return 0;
 	
 	return FT_Get_Char_Index(f,c);
