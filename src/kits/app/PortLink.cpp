@@ -82,7 +82,7 @@ port_id PortLink::GetPort()
 	return fSendPort;
 }
 
-status_t PortLink::Flush(bigtime_t timeout=B_INFINITE_TIMEOUT)
+status_t PortLink::Flush(bigtime_t timeout)
 {
 	status_t	write_stat;
 	
@@ -101,7 +101,7 @@ status_t PortLink::Flush(bigtime_t timeout=B_INFINITE_TIMEOUT)
 	return write_stat;
 }
 
-status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT )
+status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout )
 {
 	if(!port_ok || !msg)
 		return B_BAD_VALUE;

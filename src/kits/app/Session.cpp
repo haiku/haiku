@@ -5,7 +5,7 @@
 //extern BSession *main_session = NULL;
 
 //------------------------------------------------------------------------------
-BSession::BSession(port_id receivePort, port_id sendPort, bool isPortLink = false)
+BSession::BSession(port_id receivePort, port_id sendPort, bool isPortLink)
 {
 	fSendPort		= sendPort;
 	fReceivePort	= receivePort;
