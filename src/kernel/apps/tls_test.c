@@ -35,11 +35,11 @@ thread1_func(void *data)
 	printf("1. stack at: %p\n", &data);
 	printf("1. TLS address = %p\n", tls_address(gSlot));
 	tls_set(gSlot, (void *)"thread 1");
-	printf("1. TLS get = %s (should be \"thread 1\")\n", (char *)tls_get(gSlot));
+	printf("1. TLS get = \"%s\" (should be \"thread 1\")\n", (char *)tls_get(gSlot));
 
 	acquire_sem(gWait);
 
-	printf("1. TLS get = %s (should be \"thread 1\")\n", (char *)tls_get(gSlot));
+	printf("1. TLS get = \"%s\" (should be \"thread 1\")\n", (char *)tls_get(gSlot));
 
 	return 0;
 }
@@ -50,11 +50,11 @@ thread2_func(void *data)
 {
 	printf("2. stack at: %p\n", &data);
 	printf("2. TLS address = %p\n", tls_address(gSlot));
-	printf("2. TLS get = %s (should be NULL)\n", (char *)tls_get(gSlot));
+	printf("2. TLS get = \"%s\" (should be NULL)\n", (char *)tls_get(gSlot));
 
 	acquire_sem(gWait);
 
-	printf("2. TLS get = %s (should be NULL)\n", (char *)tls_get(gSlot));
+	printf("2. TLS get = \"%s\" (should be NULL)\n", (char *)tls_get(gSlot));
 
 	return 0;
 }
@@ -64,6 +64,7 @@ int
 main(int argc, char **argv)
 {
 	thread_id thread1, thread2;
+	status_t returnCode;
 
 	gWait = create_sem(0, "waiter");
 	gSlot = tls_allocate();
@@ -82,11 +83,14 @@ main(int argc, char **argv)
 	thread2 = spawn_thread(thread2_func, "Thread 2" , B_NORMAL_PRIORITY, NULL);
 	resume_thread(thread2);
 
-	printf("TLS in main = %s (should be \"main thread\")\n", (char *)tls_get(gSlot));
+	printf("TLS in main = \"%s\" (should be \"main thread\")\n", (char *)tls_get(gSlot));
 
 	// shut down
 	snooze(100000);
 	delete_sem(gWait);
+
+	wait_for_thread(thread1, &returnCode);
+	wait_for_thread(thread2, &returnCode);
 
 	return 0;
 }
