@@ -211,7 +211,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 			join_mode 		joinMode;
 			float 			miterLimit;
 			float           penSize;
-			pattern         pattern;
+			pattern         pattern0;
 			int32           fontSpacing;
 			
 			// initialize with defalt values
@@ -233,7 +233,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 				joinMode         = B_MITER_JOIN; 
 				miterLimit       = B_DEFAULT_MITER_LIMIT; 
 				penSize          = 1; 
-				pattern          = B_SOLID_HIGH; 
+				pattern0         = B_SOLID_HIGH; 
 				fontSpacing      = B_STRING_SPACING; 
 			}
 

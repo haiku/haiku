@@ -564,7 +564,7 @@ PDFWriter::FindPattern()
 	const int n = fPatterns.CountItems();
 	for (int i = 0; i < n; i ++) {
 		Pattern* p = fPatterns.ItemAt(i);
-		if (p->Matches(fState->pattern, fState->backgroundColor, fState->foregroundColor)) return p->patternId;
+		if (p->Matches(fState->pattern0, fState->backgroundColor, fState->foregroundColor)) return p->patternId;
 	}
 	return -1;
 }
@@ -577,7 +577,7 @@ PDFWriter::CreatePattern()
 	REPORT(kDebug, fPage, "CreatePattern");
 	BBitmap bm(BRect(0, 0, 7, 7), B_RGBA32);
 	
-	uint8* data = (uint8*)fState->pattern.data;
+	uint8* data = (uint8*)fState->pattern0.data;
 	rgb_color h = fState->foregroundColor;
 	rgb_color l = fState->backgroundColor;
 	if (h.alpha < 128) {
@@ -625,7 +625,7 @@ PDFWriter::CreatePattern()
 	PDF_close_image(fPdf, image);
 	if (mask != -1) PDF_close_image(fPdf, mask);
 	
-	Pattern* p = new Pattern(fState->pattern, fState->backgroundColor, fState->foregroundColor, pattern);
+	Pattern* p = new Pattern(fState->pattern0, fState->backgroundColor, fState->foregroundColor, pattern);
 	fPatterns.AddItem(p);
 }
 
@@ -649,7 +649,7 @@ PDFWriter::SetPattern()
 	}
 #else
 	REPORT(kDebug, fPage, "SetPattern (color version)");
-	if (IsSame(fState->pattern, B_MIXED_COLORS)) {
+	if (IsSame(fState->pattern0, B_MIXED_COLORS)) {
 		rgb_color mixed;  // approximate mixed colors
 		mixed.red    = (fState->foregroundColor.red + fState->backgroundColor.red) / 2;
 		mixed.green  = (fState->foregroundColor.green + fState->backgroundColor.green) / 2;
@@ -724,9 +724,9 @@ PDFWriter::IsSame(const rgb_color &c1, const rgb_color &c2)
 void 
 PDFWriter::SetColor() 
 {
-	if (IsSame(fState->pattern, B_SOLID_HIGH)) {
+	if (IsSame(fState->pattern0, B_SOLID_HIGH)) {
 		SetColor(fState->foregroundColor);
-	} else if (IsSame(fState->pattern, B_SOLID_LOW)) {
+	} else if (IsSame(fState->pattern0, B_SOLID_LOW)) {
 		SetColor(fState->backgroundColor);
 	} else {
 		SetPattern();
@@ -2062,7 +2062,7 @@ void
 PDFWriter::SetStipplePattern(pattern pat)
 {
 	REPORT(kDebug, fPage, "SetStipplePattern");
-	fState->pattern = pat;
+	fState->pattern0 = pat;
 }
 
 
