@@ -391,8 +391,10 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 		arch_thread_initialize_kthread_stack(t, &_create_kernel_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	} else {
 		// create user stack
-		// XXX make this better. For now just keep trying to create a stack
-		// until we find a spot.
+
+		// ToDo: make this better. For now just keep trying to create a stack
+		//		until we find a spot.
+
 		t->user_stack_base = (USER_STACK_REGION - STACK_SIZE - ENV_SIZE) + USER_STACK_REGION_SIZE;
 		while (t->user_stack_base > USER_STACK_REGION) {
 			sprintf(stack_name, "%s_stack%ld", p->name, t->id);
