@@ -5,7 +5,9 @@
 #include <algobase.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <BitmapStream.h>
 #include <Entry.h>
+#include <File.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -26,18 +28,12 @@ BList ShowImageWindow::s_winList;
 
 status_t ShowImageWindow::NewWindow(const entry_ref* ref)
 {
-	BEntry entry(ref);
-	if (entry.InitCheck() == B_OK) {
-		BPath path;
-		entry.GetPath(&path);
-		if (path.InitCheck() == B_OK) {
-			BBitmap* pBitmap = BTranslationUtils::GetBitmap(path.Path());
-			if (pBitmap) {
-				ShowImageWindow* pWin = new ShowImageWindow(ref, pBitmap);
-				return pWin->InitCheck();			
-			}
-		}
+	BBitmap* pBitmap = BTranslationUtils::GetBitmap(ref);
+	if (pBitmap) {
+		ShowImageWindow* pWin = new ShowImageWindow(ref, pBitmap);
+		return pWin->InitCheck();			
 	}
+
 	return B_ERROR;		
 }
 
@@ -55,6 +51,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0),
 	m_pReferences(0)
 {
+	fpsavePanel = NULL;
+	
 	SetPulseRate( 200000.0 );
 	
 	// create menu bar	
@@ -187,34 +185,11 @@ void ShowImageWindow::LoadMenus(BMenuBar* pBar)
 	AddItemMenu( pMenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true );
 	pMenu->AddSeparatorItem();
 	
-//	BMenuItem * pMenuSaveAs = AddItemMenu( pMenu, "Save As...", MSG_FILE_SAVE, 'S', 0, 'W', true);
-	
 	BMenu* pMenuSaveAs = new BMenu( "Save As...", B_ITEMS_IN_COLUMN );
-	
+	BTranslationUtils::AddTranslationItems(pMenuSaveAs, B_TRANSLATOR_BITMAP);
+		// Fill Save As submenu with all types that can be converted
+		// to from the Be bitmap image format
 	pMenu->AddItem( pMenuSaveAs );
-	
-
-	BTranslatorRoster *roster = BTranslatorRoster::Default(); 
-	
-	int32 num_translators, i; 
-	translator_id *translators; 
-	const char *translator_name, *translator_info; 
-	int32 translator_version; 
-
-	roster->GetAllTranslators(&translators, &num_translators); 
-	
-	for (i=0;i<num_translators;i++) { 
-	
-		roster->GetTranslatorInfo(translators[i], &translator_name, 
-			&translator_info, &translator_version); 
-	
-		BMenuItem * pSubMenu = new BMenuItem( translator_name , NULL );
-		
-		pMenuSaveAs->AddItem( pSubMenu );
-		//printf("%s: %s (%.2f)n", translator_name, translator_info, translator_version/100.); 
-	}
-
-	delete [] translators; // clean up our droppings
 	
 	AddItemMenu( pMenu, "Close", MSG_QUIT, 'W', 0, 'A', true);
 	pMenu->AddSeparatorItem();
@@ -298,11 +273,16 @@ void ShowImageWindow::MessageReceived(BMessage* message)
 	BAlert* pAlert;
 	
 	switch (message->what) {
-	case MSG_FILE_SAVE :
-	     pAlert = new BAlert( "File/Save", 
-				  			  "File/Save not implemented yet", "OK");
-  		 pAlert->Go();
-		 break;
+		case MSG_OUTPUT_TYPE:
+			// User clicked Save As then choose an output format
+			SaveAs(message);			
+			break;
+			
+		case MSG_SAVE_PANEL:
+			// User specified where to save the output image
+			SaveToFile(message);
+			break;
+
 	case B_UNDO :
 	     pAlert = new BAlert( "Edit/Undo", 
 				  			  "Edit/Undo not implemented yet", "OK");
@@ -345,4 +325,65 @@ void ShowImageWindow::MessageReceived(BMessage* message)
 		break;
 	}
 }
+
+void
+ShowImageWindow::SaveAs(BMessage *pmsg)
+{
+	// Handle SaveAs menu choice by setting the
+	// translator and desired output format
+	// and giving the user a save panel
+
+	if (pmsg->FindInt32("be:translator",
+		reinterpret_cast<int32 *>(&foutTranslator)) != B_OK)
+		return;	
+	if (pmsg->FindInt32("be:type",
+		reinterpret_cast<int32 *>(&foutType)) != B_OK)
+		return;
+
+	if (!fpsavePanel) {
+		fpsavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
+			false, new BMessage(MSG_SAVE_PANEL));
+		if (!fpsavePanel)
+			return;
+	}
+	
+	fpsavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
+	fpsavePanel->Show();
+}
+
+void
+ShowImageWindow::SaveToFile(BMessage *pmsg)
+{
+	// After the user has chosen which format
+	// to output to and where to save the file,
+	// this function is called to save the currently
+	// open image to a file in the desired format.
+	
+	entry_ref dirref;
+	if (pmsg->FindRef("directory", &dirref) != B_OK)
+		return;
+	const char *filename;
+	if (pmsg->FindString("name", &filename) != B_OK)
+		return;
+		
+	BDirectory dir(&dirref);
+	BFile file(&dir, filename, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (file.InitCheck() != B_OK)
+		return;
+	
+	BBitmapStream stream(m_PrivateView->GetBitmap());	
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	if (proster->Translate(foutTranslator, &stream, NULL,
+		&file, foutType) != B_OK) {
+		BAlert *palert = new BAlert(NULL, "Error writing image file.", "Ok");
+		palert->Go();
+	}
+	
+	BBitmap *pout = NULL;
+	stream.DetachBitmap(&pout);
+		// bitmap used by stream still belongs to the view,
+		// detach so it doesn't get deleted
+}
+
+
 // 		BMenu* pMenuDither = ;

@@ -16,6 +16,7 @@ public:
 	~ShowImageView();
 	
 	void SetBitmap(BBitmap* pBitmap);
+	BBitmap *GetBitmap();
 	
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);

@@ -6,6 +6,9 @@
 #define _ShowImageWindow_h
 
 #include <Window.h>
+#include <FilePanel.h>
+#include <TranslationDefs.h>
+
 class ShowImageView;
 
 class ShowImageWindow : public BWindow
@@ -33,6 +36,15 @@ public:
 private:
 	BMenuItem * AddItemMenu( BMenu *pMenu, char *Caption, long unsigned int msg, 
 			char shortcut, uint32 modifier, char target, bool enabled );
+			
+	void SaveAs(BMessage *pmsg);
+		// Handle Save As submenu choice
+	void SaveToFile(BMessage *pmsg);
+		// Handle save file panel message
+
+	BFilePanel *fpsavePanel;
+	translator_id foutTranslator;
+	uint32 foutType;
 			
 	entry_ref* m_pReferences;
 	ShowImageView* m_PrivateView;

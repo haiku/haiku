@@ -34,6 +34,12 @@ void ShowImageView::SetBitmap(BBitmap* pBitmap)
 	m_pBitmap = pBitmap;
 }
 
+BBitmap *
+ShowImageView::GetBitmap()
+{
+	return m_pBitmap;
+}
+
 void ShowImageView::AttachedToWindow()
 {
 	FixupScrollBars();
