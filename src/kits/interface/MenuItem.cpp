@@ -446,7 +446,7 @@ BArchivable *BSeparatorItem::Instantiate(BMessage *data)
 //------------------------------------------------------------------------------
 void BSeparatorItem::SetEnabled(bool state)
 {
-	BSeparatorItem::SetEnabled(state);
+	BMenuItem::SetEnabled(state);
 }
 //------------------------------------------------------------------------------
 void BSeparatorItem::GetContentSize(float *width, float *height)
