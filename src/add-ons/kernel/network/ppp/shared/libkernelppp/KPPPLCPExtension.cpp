@@ -10,7 +10,7 @@
 #include <PPPControl.h>
 
 
-PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& interface,
+KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code, KPPPInterface& interface,
 		driver_parameter *settings)
 	: fInterface(interface),
 	fSettings(settings),
@@ -24,7 +24,7 @@ PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& int
 }
 
 
-PPPLCPExtension::~PPPLCPExtension()
+KPPPLCPExtension::~KPPPLCPExtension()
 {
 	free(fName);
 	
@@ -33,14 +33,14 @@ PPPLCPExtension::~PPPLCPExtension()
 
 
 status_t
-PPPLCPExtension::InitCheck() const
+KPPPLCPExtension::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 status_t
-PPPLCPExtension::Control(uint32 op, void *data, size_t length)
+KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_SIMPLE_HANDLER_INFO: {
@@ -50,7 +50,6 @@ PPPLCPExtension::Control(uint32 op, void *data, size_t length)
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
 			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			info->settings = Settings();
 			info->isEnabled = IsEnabled();
 		} break;
 		
@@ -70,7 +69,7 @@ PPPLCPExtension::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPLCPExtension::StackControl(uint32 op, void *data)
+KPPPLCPExtension::StackControl(uint32 op, void *data)
 {
 	switch(op) {
 		default:
@@ -82,14 +81,14 @@ PPPLCPExtension::StackControl(uint32 op, void *data)
 
 
 void
-PPPLCPExtension::Reset()
+KPPPLCPExtension::Reset()
 {
 	// do nothing by default
 }
 
 
 void
-PPPLCPExtension::Pulse()
+KPPPLCPExtension::Pulse()
 {
 	// do nothing by default
 }

@@ -15,21 +15,21 @@
 #endif
 
 
-class PPPLCPExtension {
+class KPPPLCPExtension {
 	protected:
-		// PPPLCPExtension must be subclassed
-		PPPLCPExtension(const char *name, uint8 code, PPPInterface& interface,
+		// KPPPLCPExtension must be subclassed
+		KPPPLCPExtension(const char *name, uint8 code, KPPPInterface& interface,
 			driver_parameter *settings);
 
 	public:
-		virtual ~PPPLCPExtension();
+		virtual ~KPPPLCPExtension();
 		
 		virtual status_t InitCheck() const;
 		
 		const char *Name() const
 			{ return fName; }
 		
-		PPPInterface& Interface() const
+		KPPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -44,7 +44,7 @@ class PPPLCPExtension {
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		virtual status_t StackControl(uint32 op, void *data);
-			// called by netstack (forwarded by PPPInterface)
+			// called by netstack (forwarded by KPPPInterface)
 		
 		virtual status_t Receive(struct mbuf *packet, uint8 code) = 0;
 		
@@ -56,7 +56,7 @@ class PPPLCPExtension {
 
 	private:
 		char *fName;
-		PPPInterface& fInterface;
+		KPPPInterface& fInterface;
 		driver_parameter *fSettings;
 		uint8 fCode;
 		

@@ -19,20 +19,30 @@
 	// create_interface() returns this value on failure
 
 
-class PPPInterface;
+class KPPPInterface;
 typedef struct ppp_interface_entry {
-	PPPInterface *interface;
+	KPPPInterface *interface;
 	vint32 accessing;
 	bool deleting;
 } ppp_interface_entry;
 
 
+/*!	\brief Exported by the PPP interface manager kernel module.
+	
+	You should always create interfaces using either of the CreateInterface()
+	functions. The manager keeps track of all running connections and automatically
+	deletes them when they are not needed anymore.
+*/
 typedef struct ppp_interface_module_info {
 	kernel_net_module_info knminfo;
+		//!< Exports needed network module functions.
 	
 	ppp_interface_id (*CreateInterface)(const driver_settings *settings,
+		const driver_settings *profile = NULL,
 		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
-			// you should always create interfaces using this function
+	ppp_interface_id (*CreateInterfaceWithName)(const char *name,
+		const driver_settings *profile = NULL,
+		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 	bool (*DeleteInterface)(ppp_interface_id ID);
 		// this marks the interface for deletion
 	bool (*RemoveInterface)(ppp_interface_id ID);

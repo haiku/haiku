@@ -14,6 +14,17 @@
 #include <malloc.h>
 
 
+static char *sSkipInterfaceParameters[] = {
+	PPP_DIALING_NOTIFICATION_KEY,
+	PPP_DISONNECT_AFTER_IDLE_SINCE_KEY,
+	PPP_DIAL_RETRIES_LIMIT_KEY,
+	PPP_DIAL_RETRY_DELAY_KEY,
+	PPP_DIAL_ON_DEMAND_KEY,
+	PPP_AUTO_REDIAL_KEY,
+	PPP_REDIAL_DELAY_KEY,
+	NULL
+};
+
 static void copy_parameter(const driver_parameter *from, driver_parameter *to);
 static void free_driver_parameter(driver_parameter *parameter);
 
@@ -153,6 +164,53 @@ equal_driver_parameters(const driver_parameter *lhs, const driver_parameter *rhs
 }
 
 
+bool
+skip_interface_parameter(const driver_parameter *parameter)
+{
+	if(!parameter || !parameter->name)
+		return false;
+	
+	for(int32 index = 0; sSkipInterfaceParameters[index]; index++)
+		if(!strcasecmp(parameter->name, sSkipInterfaceParameters[index]))
+			return true;
+	
+	return false;
+}
+
+
+bool
+equal_interface_settings(const driver_settings *lhs, const driver_settings *rhs)
+{
+	if(!lhs && !rhs)
+		return true;
+	else if(!lhs || !rhs)
+		return false;
+	
+	int32 lhsIndex = 0, rhsIndex = 0;
+	for(; lhsIndex < lhs->parameter_count; lhsIndex++) {
+		if(skip_interface_parameter(&lhs->parameters[lhsIndex]))
+			continue;
+		
+		for(; rhsIndex < rhs->parameter_count; rhsIndex++)
+			if(!skip_interface_parameter(&rhs->parameters[rhsIndex]))
+				break;
+		
+		if(rhsIndex >= rhs->parameter_count)
+			return false;
+		
+		if(!equal_driver_parameters(&lhs->parameters[lhsIndex],
+				&rhs->parameters[rhsIndex]))
+			return false;
+	}
+	
+	for(; rhsIndex < rhs->parameter_count; rhsIndex++)
+		if(!skip_interface_parameter(&rhs->parameters[rhsIndex]))
+			return false;
+	
+	return true;
+}
+
+
 ppp_side
 get_side_string_value(const char *sideString, ppp_side unknownValue)
 {
@@ -201,17 +259,27 @@ get_boolean_value(const char *string, bool unknownValue)
 }
 
 
-const char*
-get_settings_value(const char *name, const driver_settings *settings)
+const driver_parameter*
+get_parameter_with_name(const char *name, const driver_settings *settings)
 {
 	if(!name || !settings)
 		return NULL;
 	
 	for(int32 index = 0; index < settings->parameter_count; index++)
-		if(!strcasecmp(settings->parameters[index].name, name)
-				&& settings->parameters[index].value_count > 0
-				&& settings->parameters[index].values)
-			return settings->parameters[index].values[0];
+		if(!strcasecmp(settings->parameters[index].name, name))
+			return &settings->parameters[index];
+	
+	return NULL;
+}
+
+
+const char*
+get_settings_value(const char *name, const driver_settings *settings)
+{
+	const driver_parameter *parameter = get_parameter_with_name(name, settings);
+	
+	if(parameter && parameter->value_count > 0 && parameter->values)
+		return parameter->values[0];
 	
 	return NULL;
 }

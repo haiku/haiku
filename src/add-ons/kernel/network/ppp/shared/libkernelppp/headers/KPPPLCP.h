@@ -22,8 +22,8 @@
 #include <KPPPStateMachine.h>
 #endif
 
-class PPPLCPExtension;
-class PPPOptionHandler;
+class KPPPLCPExtension;
+class KPPPOptionHandler;
 
 
 typedef struct ppp_lcp_packet {
@@ -34,41 +34,41 @@ typedef struct ppp_lcp_packet {
 } ppp_lcp_packet;
 
 
-class PPPLCP : public PPPProtocol {
-		friend class PPPInterface;
+class KPPPLCP : public KPPPProtocol {
+		friend class KPPPInterface;
 
 	private:
-		// may only be constructed/destructed by PPPInterface
-		PPPLCP(PPPInterface& interface);
-		virtual ~PPPLCP();
+		// may only be constructed/destructed by KPPPInterface
+		KPPPLCP(KPPPInterface& interface);
+		virtual ~KPPPLCP();
 		
 		// copies are not allowed!
-		PPPLCP(const PPPLCP& copy);
-		PPPLCP& operator= (const PPPLCP& copy);
+		KPPPLCP(const KPPPLCP& copy);
+		KPPPLCP& operator= (const KPPPLCP& copy);
 
 	public:
-		PPPStateMachine& StateMachine() const
+		KPPPStateMachine& StateMachine() const
 			{ return fStateMachine; }
 		
-		bool AddOptionHandler(PPPOptionHandler *handler);
-		bool RemoveOptionHandler(PPPOptionHandler *handler);
+		bool AddOptionHandler(KPPPOptionHandler *handler);
+		bool RemoveOptionHandler(KPPPOptionHandler *handler);
 		int32 CountOptionHandlers() const
 			{ return fOptionHandlers.CountItems(); }
-		PPPOptionHandler *OptionHandlerAt(int32 index) const;
-		PPPOptionHandler *OptionHandlerFor(uint8 type, int32 *start = NULL) const;
+		KPPPOptionHandler *OptionHandlerAt(int32 index) const;
+		KPPPOptionHandler *OptionHandlerFor(uint8 type, int32 *start = NULL) const;
 		
-		bool AddLCPExtension(PPPLCPExtension *extension);
-		bool RemoveLCPExtension(PPPLCPExtension *extension);
+		bool AddLCPExtension(KPPPLCPExtension *extension);
+		bool RemoveLCPExtension(KPPPLCPExtension *extension);
 		int32 CountLCPExtensions() const
 			{ return fLCPExtensions.CountItems(); }
-		PPPLCPExtension *LCPExtensionAt(int32 index) const;
-		PPPLCPExtension *LCPExtensionFor(uint8 code, int32 *start = NULL) const;
+		KPPPLCPExtension *LCPExtensionAt(int32 index) const;
+		KPPPLCPExtension *LCPExtensionFor(uint8 code, int32 *start = NULL) const;
 		
-		void SetTarget(PPPProtocol *target)
+		void SetTarget(KPPPProtocol *target)
 			{ fTarget = target; }
 			// if target != NULL all packtes will be passed to the protocol
 			// instead of the interface/device
-		PPPProtocol *Target() const
+		KPPPProtocol *Target() const
 			{ return fTarget; }
 		
 		uint32 AdditionalOverhead() const;
@@ -84,12 +84,12 @@ class PPPLCP : public PPPProtocol {
 		virtual void Pulse();
 
 	private:
-		PPPStateMachine& fStateMachine;
+		KPPPStateMachine& fStateMachine;
 		
-		TemplateList<PPPOptionHandler*> fOptionHandlers;
-		TemplateList<PPPLCPExtension*> fLCPExtensions;
+		TemplateList<KPPPOptionHandler*> fOptionHandlers;
+		TemplateList<KPPPLCPExtension*> fLCPExtensions;
 		
-		PPPProtocol *fTarget;
+		KPPPProtocol *fTarget;
 };
 
 

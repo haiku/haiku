@@ -11,25 +11,26 @@
 #include <KPPPOptionHandler.h>
 
 
-class _PPPAuthenticationHandler : public PPPOptionHandler {
+class _KPPPAuthenticationHandler : public KPPPOptionHandler {
 	public:
-		_PPPAuthenticationHandler(PPPInterface& interface);
+		_KPPPAuthenticationHandler(KPPPInterface& interface);
 		
-		PPPProtocol *NextAuthenticator(const PPPProtocol *start, ppp_side side) const;
+		KPPPProtocol *NextAuthenticator(const KPPPProtocol *start,
+			ppp_side side) const;
 		
-		virtual status_t AddToRequest(PPPConfigurePacket& request);
-		virtual status_t ParseNak(const PPPConfigurePacket& nak);
-		virtual status_t ParseReject(const PPPConfigurePacket& reject);
-		virtual status_t ParseAck(const PPPConfigurePacket& ack);
+		virtual status_t AddToRequest(KPPPConfigurePacket& request);
+		virtual status_t ParseNak(const KPPPConfigurePacket& nak);
+		virtual status_t ParseReject(const KPPPConfigurePacket& reject);
+		virtual status_t ParseAck(const KPPPConfigurePacket& ack);
 		
-		virtual status_t ParseRequest(const PPPConfigurePacket& request,
-			int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject);
-		virtual status_t SendingAck(const PPPConfigurePacket& ack);
+		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
+			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
+		virtual status_t SendingAck(const KPPPConfigurePacket& ack);
 		
 		virtual void Reset();
 
 	private:
-		PPPProtocol *fLocalAuthenticator, *fPeerAuthenticator,
+		KPPPProtocol *fLocalAuthenticator, *fPeerAuthenticator,
 			*fSuggestedLocalAuthenticator, *fSuggestedPeerAuthenticator;
 		bool fPeerAuthenticatorRejected;
 };

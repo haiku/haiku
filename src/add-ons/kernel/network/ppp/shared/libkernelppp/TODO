@@ -1,2 +1,3 @@
-- finish support for server mode
+- add missing settings support (DialRetryDelay, etc.)
+- finish support for server mode (profiles, etc.)
 - add callback support

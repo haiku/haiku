@@ -11,13 +11,13 @@
 #include <KPPPDefs.h>
 
 
-class PPPLayer {
+class KPPPLayer {
 	protected:
-		// PPPLayer must be subclassed
-		PPPLayer(const char *name, ppp_level level, uint32 overhead);
+		// KPPPLayer must be subclassed
+		KPPPLayer(const char *name, ppp_level level, uint32 overhead);
 
 	public:
-		virtual ~PPPLayer();
+		virtual ~KPPPLayer();
 		
 		virtual status_t InitCheck() const;
 		
@@ -29,9 +29,9 @@ class PPPLayer {
 		uint32 Overhead() const
 			{ return fOverhead; }
 		
-		void SetNext(PPPLayer *next)
+		void SetNext(KPPPLayer *next)
 			{ fNext = next; }
-		PPPLayer *Next() const
+		KPPPLayer *Next() const
 			{ return fNext; }
 		
 		virtual bool Up() = 0;
@@ -48,6 +48,8 @@ class PPPLayer {
 		virtual void Pulse();
 
 	protected:
+		void SetName(const char *name);
+		
 		status_t fInitStatus;
 		uint32 fOverhead;
 
@@ -55,7 +57,7 @@ class PPPLayer {
 		char *fName;
 		ppp_level fLevel;
 		
-		PPPLayer *fNext;
+		KPPPLayer *fNext;
 };
 
 

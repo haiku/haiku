@@ -13,9 +13,9 @@
 #define PFC_TYPE				0x7
 
 
-_PPPPFCHandler::_PPPPFCHandler(ppp_pfc_state& localPFCState,
-		ppp_pfc_state& peerPFCState, PPPInterface& interface)
-	: PPPOptionHandler("PFC Handler", PFC_TYPE, interface, NULL),
+_KPPPPFCHandler::_KPPPPFCHandler(ppp_pfc_state& localPFCState,
+		ppp_pfc_state& peerPFCState, KPPPInterface& interface)
+	: KPPPOptionHandler("PFC Handler", PFC_TYPE, interface, NULL),
 	fLocalPFCState(localPFCState),
 	fPeerPFCState(peerPFCState)
 {
@@ -23,7 +23,7 @@ _PPPPFCHandler::_PPPPFCHandler(ppp_pfc_state& localPFCState,
 
 
 status_t
-_PPPPFCHandler::AddToRequest(PPPConfigurePacket& request)
+_KPPPPFCHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	// is PFC not requested or was it rejected?
 	if(fLocalPFCState == PPP_PFC_REJECTED
@@ -39,7 +39,7 @@ _PPPPFCHandler::AddToRequest(PPPConfigurePacket& request)
 
 
 status_t
-_PPPPFCHandler::ParseNak(const PPPConfigurePacket& nak)
+_KPPPPFCHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	// naks do not contain PFC items
 	if(nak.ItemWithType(PFC_TYPE))
@@ -50,7 +50,7 @@ _PPPPFCHandler::ParseNak(const PPPConfigurePacket& nak)
 
 
 status_t
-_PPPPFCHandler::ParseReject(const PPPConfigurePacket& reject)
+_KPPPPFCHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	if(reject.ItemWithType(PFC_TYPE)) {
 		fLocalPFCState = PPP_PFC_REJECTED;
@@ -64,7 +64,7 @@ _PPPPFCHandler::ParseReject(const PPPConfigurePacket& reject)
 
 
 status_t
-_PPPPFCHandler::ParseAck(const PPPConfigurePacket& ack)
+_KPPPPFCHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	if(ack.ItemWithType(PFC_TYPE))
 		fLocalPFCState = PPP_PFC_ACCEPTED;
@@ -80,8 +80,8 @@ _PPPPFCHandler::ParseAck(const PPPConfigurePacket& ack)
 
 
 status_t
-_PPPPFCHandler::ParseRequest(const PPPConfigurePacket& request,
-	int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject)
+_KPPPPFCHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
 	if(!request.ItemWithType(PFC_TYPE))
 		return B_OK;
@@ -98,7 +98,7 @@ _PPPPFCHandler::ParseRequest(const PPPConfigurePacket& request,
 
 
 status_t
-_PPPPFCHandler::SendingAck(const PPPConfigurePacket& ack)
+_KPPPPFCHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	ppp_configure_item *item = ack.ItemWithType(PFC_TYPE);
 	
@@ -115,7 +115,7 @@ _PPPPFCHandler::SendingAck(const PPPConfigurePacket& ack)
 
 
 void
-_PPPPFCHandler::Reset()
+_KPPPPFCHandler::Reset()
 {
 	fLocalPFCState = fPeerPFCState = PPP_PFC_DISABLED;
 }

@@ -21,18 +21,18 @@ typedef struct mru_item {
 	uint16 MRU _PACKED;
 } mru_item;
 
-status_t ParseRequestedItem(mru_item *item, PPPInterface& interface);
+status_t ParseRequestedItem(mru_item *item, KPPPInterface& interface);
 
 
-_PPPMRUHandler::_PPPMRUHandler(PPPInterface& interface)
-	: PPPOptionHandler("MRU Handler", MRU_TYPE, interface, NULL)
+_KPPPMRUHandler::_KPPPMRUHandler(KPPPInterface& interface)
+	: KPPPOptionHandler("MRU Handler", MRU_TYPE, interface, NULL)
 {
 	Reset();
 }
 
 
 status_t
-_PPPMRUHandler::AddToRequest(PPPConfigurePacket& request)
+_KPPPMRUHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	if(!Interface().Device() || Interface().MRU() == 1500)
 		return B_OK;
@@ -47,7 +47,7 @@ _PPPMRUHandler::AddToRequest(PPPConfigurePacket& request)
 
 
 status_t
-_PPPMRUHandler::ParseNak(const PPPConfigurePacket& nak)
+_KPPPMRUHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	mru_item *item = (mru_item*) nak.ItemWithType(MRU_TYPE);
 	if(!item || item->length != 4)
@@ -62,7 +62,7 @@ _PPPMRUHandler::ParseNak(const PPPConfigurePacket& nak)
 
 
 status_t
-_PPPMRUHandler::ParseReject(const PPPConfigurePacket& reject)
+_KPPPMRUHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	if(reject.ItemWithType(MRU_TYPE))
 		return B_ERROR;
@@ -72,7 +72,7 @@ _PPPMRUHandler::ParseReject(const PPPConfigurePacket& reject)
 
 
 status_t
-_PPPMRUHandler::ParseAck(const PPPConfigurePacket& ack)
+_KPPPMRUHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	uint16 MRU = 1500;
 	mru_item *item = (mru_item*) ack.ItemWithType(MRU_TYPE);
@@ -88,8 +88,8 @@ _PPPMRUHandler::ParseAck(const PPPConfigurePacket& ack)
 
 
 status_t
-_PPPMRUHandler::ParseRequest(const PPPConfigurePacket& request,
-	int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject)
+_KPPPMRUHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
 	if(index == reject.CountItems())
 		return B_OK;
@@ -101,7 +101,7 @@ _PPPMRUHandler::ParseRequest(const PPPConfigurePacket& request,
 
 
 status_t
-_PPPMRUHandler::SendingAck(const PPPConfigurePacket& ack)
+_KPPPMRUHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	return ParseRequestedItem((mru_item*) ack.ItemWithType(MRU_TYPE), Interface());
 }
@@ -109,7 +109,7 @@ _PPPMRUHandler::SendingAck(const PPPConfigurePacket& ack)
 
 // this function contains code shared by ParseRequest and SendingAck
 status_t
-ParseRequestedItem(mru_item *item, PPPInterface& interface)
+ParseRequestedItem(mru_item *item, KPPPInterface& interface)
 {
 	uint16 MRU = 1500;
 	
@@ -129,7 +129,7 @@ ParseRequestedItem(mru_item *item, PPPInterface& interface)
 
 
 void
-_PPPMRUHandler::Reset()
+_KPPPMRUHandler::Reset()
 {
 	if(Interface().Device()) {
 		fLocalMRU = Interface().Device()->MTU() - 2;

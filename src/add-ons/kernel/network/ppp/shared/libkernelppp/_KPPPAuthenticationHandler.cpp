@@ -23,8 +23,8 @@ typedef struct authentication_item {
 } authentication_item;
 
 
-_PPPAuthenticationHandler::_PPPAuthenticationHandler(PPPInterface& interface)
-	: PPPOptionHandler("Authentication Handler", AUTHENTICATION_TYPE, interface, NULL),
+_KPPPAuthenticationHandler::_KPPPAuthenticationHandler(KPPPInterface& interface)
+	: KPPPOptionHandler("Authentication Handler", AUTHENTICATION_TYPE, interface, NULL),
 	fLocalAuthenticator(NULL),
 	fPeerAuthenticator(NULL),
 	fSuggestedLocalAuthenticator(NULL),
@@ -34,12 +34,12 @@ _PPPAuthenticationHandler::_PPPAuthenticationHandler(PPPInterface& interface)
 }
 
 
-PPPProtocol*
-_PPPAuthenticationHandler::NextAuthenticator(const PPPProtocol *start,
+KPPPProtocol*
+_KPPPAuthenticationHandler::NextAuthenticator(const KPPPProtocol *start,
 	ppp_side side) const
 {
 	// find the next authenticator for side, beginning at start
-	PPPProtocol *current = start ? start->NextProtocol() : Interface().FirstProtocol();
+	KPPPProtocol *current = start ? start->NextProtocol() : Interface().FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
 		if(!strcasecmp(current->Type(), AUTHENTICATOR_TYPE_STRING)
@@ -52,7 +52,7 @@ _PPPAuthenticationHandler::NextAuthenticator(const PPPProtocol *start,
 
 
 status_t
-_PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
+_KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	// AddToRequest(): Check if peer must authenticate itself and
 	// add an authentication request if needed. This request is added
@@ -63,7 +63,7 @@ _PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
 	if(fSuggestedPeerAuthenticator)
 		fSuggestedPeerAuthenticator->SetEnabled(false);
 	
-	PPPProtocol *authenticator;
+	KPPPProtocol *authenticator;
 	if(fPeerAuthenticatorRejected) {
 		if(!fSuggestedPeerAuthenticator) {
 			// This happens when the protocol is rejected, but no alternative
@@ -100,7 +100,7 @@ _PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
 		// no problem because the suggested authenticator will be accepted (hopefully)
 	
 #if DEBUG
-	dprintf("PPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
+	dprintf("KPPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
 #endif
 	
 	authenticator->SetEnabled(true);
@@ -110,7 +110,7 @@ _PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
 
 
 status_t
-_PPPAuthenticationHandler::ParseNak(const PPPConfigurePacket& nak)
+_KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	// The authenticator's OptionHandler is not notified.
 	
@@ -135,7 +135,7 @@ _PPPAuthenticationHandler::ParseNak(const PPPConfigurePacket& nak)
 	}
 	
 	fPeerAuthenticatorRejected = true;
-	PPPProtocol *authenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
+	KPPPProtocol *authenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
 	if(authenticator
 			&& !strcasecmp(authenticator->Type(), AUTHENTICATOR_TYPE_STRING)
 			&& authenticator->OptionHandler())
@@ -148,7 +148,7 @@ _PPPAuthenticationHandler::ParseNak(const PPPConfigurePacket& nak)
 
 
 status_t
-_PPPAuthenticationHandler::ParseReject(const PPPConfigurePacket& reject)
+_KPPPAuthenticationHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	// an authentication request must not be rejected!
 	if(reject.ItemWithType(AUTHENTICATION_TYPE))
@@ -159,7 +159,7 @@ _PPPAuthenticationHandler::ParseReject(const PPPConfigurePacket& reject)
 
 
 status_t
-_PPPAuthenticationHandler::ParseAck(const PPPConfigurePacket& ack)
+_KPPPAuthenticationHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	authentication_item *item =
 		(authentication_item*) ack.ItemWithType(AUTHENTICATION_TYPE);
@@ -182,8 +182,8 @@ _PPPAuthenticationHandler::ParseAck(const PPPConfigurePacket& ack)
 
 
 status_t
-_PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
-	int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject)
+_KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
 	if(fLocalAuthenticator)
 		fLocalAuthenticator->SetEnabled(false);
@@ -194,7 +194,7 @@ _PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
 			// no authentication requested by peer (index > request.CountItems())
 	
 #if DEBUG
-	dprintf("PPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
+	dprintf("KPPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
 #endif
 	
 	// try to find the requested protocol
@@ -206,7 +206,7 @@ _PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
 			nak, reject);
 	
 	// suggest another authentication protocol
-	PPPProtocol *nextAuthenticator =
+	KPPPProtocol *nextAuthenticator =
 		NextAuthenticator(fSuggestedLocalAuthenticator, PPP_LOCAL_SIDE);
 	
 	if(!nextAuthenticator) {
@@ -233,7 +233,7 @@ _PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
 
 
 status_t
-_PPPAuthenticationHandler::SendingAck(const PPPConfigurePacket& ack)
+_KPPPAuthenticationHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	// do not insist on authenticating our side of the link ;)
 	
@@ -260,7 +260,7 @@ _PPPAuthenticationHandler::SendingAck(const PPPConfigurePacket& ack)
 
 
 void
-_PPPAuthenticationHandler::Reset()
+_KPPPAuthenticationHandler::Reset()
 {
 	if(fLocalAuthenticator) {
 		fLocalAuthenticator->SetEnabled(false);

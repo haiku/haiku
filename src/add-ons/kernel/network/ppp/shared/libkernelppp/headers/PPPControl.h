@@ -29,24 +29,28 @@
 #define PPP_USER_OPS_START					PPP_OPS_START + 32 * PPP_RESERVE_OPS_COUNT
 
 
+//! These values should be used for ppp_control_info::op.
 enum ppp_control_ops {
 	// -----------------------------------------------------
-	// PPPManager
+	// PPPManager (the PPP interface module)
 	PPPC_CREATE_INTERFACE = PPP_OPS_START,
+	PPPC_CREATE_INTERFACE_WITH_NAME,
 	PPPC_DELETE_INTERFACE,
 	PPPC_BRING_INTERFACE_UP,
 	PPPC_BRING_INTERFACE_DOWN,
 	PPPC_CONTROL_INTERFACE,
 	PPPC_GET_INTERFACES,
 	PPPC_COUNT_INTERFACES,
+	PPPC_FIND_INTERFACE_WITH_SETTINGS,
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
-	// PPPInterface
+	// KPPPInterface
 	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
 	PPPC_SET_MRU,
 	PPPC_SET_DIAL_ON_DEMAND,
 	PPPC_SET_AUTO_REDIAL,
+	PPPC_HAS_INTERFACE_SETTINGS,
 	
 	// handler access
 	PPPC_CONTROL_DEVICE,
@@ -57,12 +61,12 @@ enum ppp_control_ops {
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
-	// PPPDevice
+	// KPPPDevice
 	PPPC_GET_DEVICE_INFO = PPP_DEVICE_OPS_START,
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
-	// PPPProtocol
+	// KPPPProtocol
 	PPPC_GET_PROTOCOL_INFO = PPP_PROTOCOL_OPS_START,
 	// -----------------------------------------------------
 	
@@ -70,7 +74,7 @@ enum ppp_control_ops {
 	// Common/mixed ops
 	PPPC_ENABLE,
 	PPPC_GET_SIMPLE_HANDLER_INFO,
-		// PPPOptionHandler and PPPLCPExtension
+		// KPPPOptionHandler and KPPPLCPExtension
 	
 	// these two control ops use the ppp_report_request structure
 	PPPC_ENABLE_REPORTS,
@@ -82,29 +86,45 @@ enum ppp_control_ops {
 };
 
 
-typedef struct ppp_interface_settings_info {
-	const driver_settings *settings;
+//!	Basic structure used for creating and searching PPP interfaces.
+typedef struct ppp_interface_description_info {
+	union {
+		const driver_settings *settings;
+			//!< Interface settings.
+		const char *name;
+			//!< Name of interface description file.
+	} u;
+		//!< Different values for describing an interface.
+	const driver_settings *profile;
+		//!< 
 	ppp_interface_id interface;
-		// only when creating: this is the id of the created interface
-} ppp_interface_settings_info;
+		//!< the found/created interface
+} ppp_interface_description_info;
 
 
+//! Used to get all interface ids from the PPP interface manager.
 typedef struct ppp_get_interfaces_info {
 	ppp_interface_id *interfaces;
+		//!< The interface ids will be written to this pointer's target.
 	int32 count;
+		//!< \a Interface has \a count entries.
 	ppp_interface_filter filter;
+		//!< Only interfaces that match this filter will be returned
 	int32 resultCount;
+		//!< The number of saved interfaces.
 } ppp_get_interfaces_info;
 
 
+//! With this structure you can refer to some handler/interface.
 typedef struct ppp_control_info {
 	uint32 index;
-		// index/id of interface/protocol/etc.
+		//!< Index/id of interface/protocol/etc.
 	uint32 op;
-		// the Control()/ioctl() opcode
+		//!< The Control()/ioctl() opcode. This can be any value from ppp_control_ops.
 	void *data;
+		//!< Additional data may be specified.
 	size_t length;
-		// should always be set
+		//!< The length should always be set.
 } ppp_control_info;
 
 
@@ -116,8 +136,7 @@ typedef struct ppp_control_info {
 #define _PPP_INFO_T_SIZE_								256
 
 typedef struct ppp_interface_info {
-	const driver_settings *settings;
-	
+	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	int32 if_unit;
 		// negative if not registered
 	
@@ -147,7 +166,6 @@ typedef struct ppp_interface_info_t {
 typedef struct ppp_device_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
-	const driver_parameter *settings;
 	uint32 MTU;
 	uint32 inputTransferRate, outputTransferRate, outputBytesCount;
 	bool isUp;
@@ -162,7 +180,6 @@ typedef struct ppp_protocol_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	char type[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
-	const driver_parameter *settings;
 	ppp_phase activationPhase;
 	int32 addressFamily, flags;
 	ppp_side side;
@@ -189,11 +206,10 @@ typedef struct ppp_protocol_info_t {
 typedef struct ppp_simple_handler_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
-	const driver_parameter *settings;
 	bool isEnabled;
 	
 	uint8 code;
-		// only PPPLCPExtension
+		// only KPPPLCPExtension
 } ppp_simple_handler_info;
 typedef struct ppp_simple_handler_info_t {
 	ppp_simple_handler_info info;

@@ -12,16 +12,28 @@
 
 
 // TODO: remove this as soon as we get the extended driver_settings API
-
 driver_settings *dup_driver_settings(const driver_settings *settings);
 void free_driver_settings(driver_settings *settings);
 
 bool equal_driver_settings(const driver_settings *lhs, const driver_settings *rhs);
 bool equal_driver_parameters(const driver_parameter *lhs, const driver_parameter *rhs);
+bool equal_interface_settings(const driver_settings *lhs, const driver_settings *rhs);
+	// this compares only the relevant parts of the interface settings
 
 ppp_side get_side_string_value(const char *sideString, ppp_side unknownValue);
 bool get_boolean_value(const char *string, bool unknownValue);
+const driver_parameter *get_parameter_with_name(const char *name,
+	const driver_settings *settings);
 const char *get_settings_value(const char *name, const driver_settings *settings);
+
+
+inline
+const driver_parameter*
+get_parameter_with_name(const char *name, const driver_parameter *parameters)
+{
+	return get_parameter_with_name(name,
+		parameters ? (driver_settings*) &parameters->parameter_count : NULL);
+}
 
 
 inline

@@ -12,7 +12,6 @@
 
 struct mbuf;
 
-
 typedef struct ppp_configure_item {
 	uint8 type;
 	uint8 length;
@@ -21,16 +20,16 @@ typedef struct ppp_configure_item {
 } ppp_configure_item;
 
 
-class PPPConfigurePacket {
+class KPPPConfigurePacket {
 	private:
 		// copies are not allowed!
-		PPPConfigurePacket(const PPPConfigurePacket& copy);
-		PPPConfigurePacket& operator= (const PPPConfigurePacket& copy);
+		KPPPConfigurePacket(const KPPPConfigurePacket& copy);
+		KPPPConfigurePacket& operator= (const KPPPConfigurePacket& copy);
 
 	public:
-		PPPConfigurePacket(uint8 code);
-		PPPConfigurePacket(struct mbuf *packet);
-		~PPPConfigurePacket();
+		KPPPConfigurePacket(uint8 code);
+		KPPPConfigurePacket(struct mbuf *packet);
+		~KPPPConfigurePacket();
 		
 		bool SetCode(uint8 code);
 		uint8 Code() const

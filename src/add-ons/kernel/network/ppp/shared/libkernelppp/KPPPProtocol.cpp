@@ -13,12 +13,12 @@
 #include <cstring>
 
 
-PPPProtocol::PPPProtocol(const char *name, ppp_phase activationPhase,
+KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 		uint16 protocolNumber, ppp_level level, int32 addressFamily,
-		uint32 overhead, PPPInterface& interface,
+		uint32 overhead, KPPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
-		const char *type = NULL, PPPOptionHandler *optionHandler = NULL)
-	: PPPLayer(name, level, overhead),
+		const char *type = NULL, KPPPOptionHandler *optionHandler = NULL)
+	: KPPPLayer(name, level, overhead),
 	fActivationPhase(activationPhase),
 	fProtocolNumber(protocolNumber),
 	fAddressFamily(addressFamily),
@@ -48,7 +48,7 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase activationPhase,
 }
 
 
-PPPProtocol::~PPPProtocol()
+KPPPProtocol::~KPPPProtocol()
 {
 	Interface().RemoveProtocol(this);
 	
@@ -57,7 +57,7 @@ PPPProtocol::~PPPProtocol()
 
 
 status_t
-PPPProtocol::Control(uint32 op, void *data, size_t length)
+KPPPProtocol::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_PROTOCOL_INFO: {
@@ -68,7 +68,6 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 			memset(info, 0, sizeof(ppp_protocol_info_t));
 			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			info->settings = Settings();
 			info->activationPhase = ActivationPhase();
 			info->addressFamily = AddressFamily();
 			info->flags = Flags();
@@ -97,7 +96,7 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPProtocol::StackControl(uint32 op, void *data)
+KPPPProtocol::StackControl(uint32 op, void *data)
 {
 	switch(op) {
 		default:
@@ -109,7 +108,7 @@ PPPProtocol::StackControl(uint32 op, void *data)
 
 
 void
-PPPProtocol::SetEnabled(bool enabled = true)
+KPPPProtocol::SetEnabled(bool enabled = true)
 {
 	fEnabled = enabled;
 	
@@ -122,28 +121,28 @@ PPPProtocol::SetEnabled(bool enabled = true)
 
 
 bool
-PPPProtocol::IsAllowedToSend() const
+KPPPProtocol::IsAllowedToSend() const
 {
 	return IsEnabled() && IsUp() && IsProtocolAllowed(*this);
 }
 
 
 void
-PPPProtocol::UpStarted()
+KPPPProtocol::UpStarted()
 {
 	fConnectionPhase = PPP_ESTABLISHMENT_PHASE;
 }
 
 
 void
-PPPProtocol::DownStarted()
+KPPPProtocol::DownStarted()
 {
 	fConnectionPhase = PPP_TERMINATION_PHASE;
 }
 
 
 void
-PPPProtocol::UpFailedEvent()
+KPPPProtocol::UpFailedEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
 	
@@ -152,7 +151,7 @@ PPPProtocol::UpFailedEvent()
 
 
 void
-PPPProtocol::UpEvent()
+KPPPProtocol::UpEvent()
 {
 	fConnectionPhase = PPP_ESTABLISHED_PHASE;
 	
@@ -161,7 +160,7 @@ PPPProtocol::UpEvent()
 
 
 void
-PPPProtocol::DownEvent()
+KPPPProtocol::DownEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
 	

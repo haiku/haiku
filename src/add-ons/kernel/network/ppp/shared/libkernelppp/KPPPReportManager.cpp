@@ -11,13 +11,13 @@
 #include <KPPPUtils.h>
 
 
-PPPReportManager::PPPReportManager(BLocker& lock)
+KPPPReportManager::KPPPReportManager(BLocker& lock)
 	: fLock(lock)
 {
 }
 
 
-PPPReportManager::~PPPReportManager()
+KPPPReportManager::~KPPPReportManager()
 {
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++)
 		delete fReportRequests.ItemAt(index);
@@ -25,7 +25,7 @@ PPPReportManager::~PPPReportManager()
 
 
 void
-PPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
+KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 	int32 flags = PPP_NO_FLAGS)
 {
 	LockerHelper locker(fLock);
@@ -40,7 +40,7 @@ PPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 
 
 void
-PPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
+KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
@@ -59,7 +59,7 @@ PPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 
 
 bool
-PPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
+KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
@@ -77,10 +77,10 @@ PPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 
 
 bool
-PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
+KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
 #if DEBUG
-	dprintf("PPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
+	dprintf("KPPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
 		type, code, length, fReportRequests.CountItems());
 #endif
 	
@@ -119,7 +119,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 		
 #if DEBUG
 	if(result == B_TIMED_OUT)
-		dprintf("PPPReportManager::Report(): timed out sending\n");
+		dprintf("KPPPReportManager::Report(): timed out sending\n");
 #endif
 		
 		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
@@ -159,7 +159,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 					acceptable = false;
 #if DEBUG
 				if(result == B_TIMED_OUT)
-					dprintf("PPPReportManager::Report(): reply timed out\n");
+					dprintf("KPPPReportManager::Report(): reply timed out\n");
 #endif
 			}
 		}
@@ -171,7 +171,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 	}
 	
 #if DEBUG
-	dprintf("PPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
+	dprintf("KPPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
 #endif
 	
 	return acceptable;

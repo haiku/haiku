@@ -11,14 +11,14 @@
 #include <core_funcs.h>
 
 
-PPPConfigurePacket::PPPConfigurePacket(uint8 code)
+KPPPConfigurePacket::KPPPConfigurePacket(uint8 code)
 	: fCode(code),
 	fID(0)
 {
 }
 
 
-PPPConfigurePacket::PPPConfigurePacket(struct mbuf *packet)
+KPPPConfigurePacket::KPPPConfigurePacket(struct mbuf *packet)
 {
 	// decode packet
 	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
@@ -48,7 +48,7 @@ PPPConfigurePacket::PPPConfigurePacket(struct mbuf *packet)
 }
 
 
-PPPConfigurePacket::~PPPConfigurePacket()
+KPPPConfigurePacket::~KPPPConfigurePacket()
 {
 	for(int32 index = 0; index < CountItems(); index++)
 		free(ItemAt(index));
@@ -56,7 +56,7 @@ PPPConfigurePacket::~PPPConfigurePacket()
 
 
 bool
-PPPConfigurePacket::SetCode(uint8 code)
+KPPPConfigurePacket::SetCode(uint8 code)
 {
 	// only configure codes are allowed!
 	if(code < PPP_CONFIGURE_REQUEST || code > PPP_CONFIGURE_REJECT)
@@ -69,7 +69,7 @@ PPPConfigurePacket::SetCode(uint8 code)
 
 
 bool
-PPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
+KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 {
 	if(!item || item->length < 2)
 		return false;
@@ -92,7 +92,7 @@ PPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 
 
 bool
-PPPConfigurePacket::RemoveItem(ppp_configure_item *item)
+KPPPConfigurePacket::RemoveItem(ppp_configure_item *item)
 {
 	if(!fItems.HasItem(item))
 		return false;
@@ -105,7 +105,7 @@ PPPConfigurePacket::RemoveItem(ppp_configure_item *item)
 
 
 ppp_configure_item*
-PPPConfigurePacket::ItemAt(int32 index) const
+KPPPConfigurePacket::ItemAt(int32 index) const
 {
 	ppp_configure_item *item = fItems.ItemAt(index);
 	
@@ -117,7 +117,7 @@ PPPConfigurePacket::ItemAt(int32 index) const
 
 
 ppp_configure_item*
-PPPConfigurePacket::ItemWithType(uint8 type) const
+KPPPConfigurePacket::ItemWithType(uint8 type) const
 {
 	ppp_configure_item *item;
 	
@@ -132,7 +132,7 @@ PPPConfigurePacket::ItemWithType(uint8 type) const
 
 
 struct mbuf*
-PPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve = 0)
+KPPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve = 0)
 {
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;

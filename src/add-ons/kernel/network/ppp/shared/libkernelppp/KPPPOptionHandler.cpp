@@ -10,8 +10,8 @@
 #include <PPPControl.h>
 
 
-PPPOptionHandler::PPPOptionHandler(const char *name, uint8 type,
-		PPPInterface& interface, driver_parameter *settings)
+KPPPOptionHandler::KPPPOptionHandler(const char *name, uint8 type,
+		KPPPInterface& interface, driver_parameter *settings)
 	: fInitStatus(B_OK),
 	fType(type),
 	fInterface(interface),
@@ -25,7 +25,7 @@ PPPOptionHandler::PPPOptionHandler(const char *name, uint8 type,
 }
 
 
-PPPOptionHandler::~PPPOptionHandler()
+KPPPOptionHandler::~KPPPOptionHandler()
 {
 	free(fName);
 	
@@ -34,14 +34,14 @@ PPPOptionHandler::~PPPOptionHandler()
 
 
 status_t
-PPPOptionHandler::InitCheck() const
+KPPPOptionHandler::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 status_t
-PPPOptionHandler::Control(uint32 op, void *data, size_t length)
+KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_SIMPLE_HANDLER_INFO: {
@@ -51,7 +51,6 @@ PPPOptionHandler::Control(uint32 op, void *data, size_t length)
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
 			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			info->settings = Settings();
 			info->isEnabled = IsEnabled();
 		} break;
 		
@@ -71,7 +70,7 @@ PPPOptionHandler::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPOptionHandler::StackControl(uint32 op, void *data)
+KPPPOptionHandler::StackControl(uint32 op, void *data)
 {
 	switch(op) {
 		default:

@@ -13,9 +13,9 @@
 #include <PPPControl.h>
 
 
-PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface& interface,
+KPPPDevice::KPPPDevice(const char *name, uint32 overhead, KPPPInterface& interface,
 		driver_parameter *settings)
-	: PPPLayer(name, PPP_DEVICE_LEVEL, overhead),
+	: KPPPLayer(name, PPP_DEVICE_LEVEL, overhead),
 	fMTU(1500),
 	fInterface(interface),
 	fSettings(settings),
@@ -24,7 +24,7 @@ PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface& interface,
 }
 
 
-PPPDevice::~PPPDevice()
+KPPPDevice::~KPPPDevice()
 {
 	if(Interface().Device() == this)
 		Interface().SetDevice(NULL);
@@ -32,7 +32,7 @@ PPPDevice::~PPPDevice()
 
 
 status_t
-PPPDevice::Control(uint32 op, void *data, size_t length)
+KPPPDevice::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_DEVICE_INFO: {
@@ -42,7 +42,6 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 			ppp_device_info *info = (ppp_device_info*) data;
 			memset(info, 0, sizeof(ppp_device_info_t));
 			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			info->settings = Settings();
 			info->MTU = MTU();
 			info->inputTransferRate = InputTransferRate();
 			info->outputTransferRate = OutputTransferRate();
@@ -59,7 +58,7 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 
 
 bool
-PPPDevice::IsAllowedToSend() const
+KPPPDevice::IsAllowedToSend() const
 {
 	return true;
 		// our connection status will be reported in Send()
@@ -67,7 +66,7 @@ PPPDevice::IsAllowedToSend() const
 
 
 status_t
-PPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
+KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	// let the interface handle the packet
 	if(protocolNumber == 0)
@@ -78,14 +77,14 @@ PPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 
 
 void
-PPPDevice::Pulse()
+KPPPDevice::Pulse()
 {
 	// do nothing by default
 }
 
 
 bool
-PPPDevice::UpStarted()
+KPPPDevice::UpStarted()
 {
 	fConnectionPhase = PPP_ESTABLISHMENT_PHASE;
 	
@@ -94,7 +93,7 @@ PPPDevice::UpStarted()
 
 
 bool
-PPPDevice::DownStarted()
+KPPPDevice::DownStarted()
 {
 	fConnectionPhase = PPP_TERMINATION_PHASE;
 	
@@ -103,7 +102,7 @@ PPPDevice::DownStarted()
 
 
 void
-PPPDevice::UpFailedEvent()
+KPPPDevice::UpFailedEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
 	
@@ -112,7 +111,7 @@ PPPDevice::UpFailedEvent()
 
 
 void
-PPPDevice::UpEvent()
+KPPPDevice::UpEvent()
 {
 	fConnectionPhase = PPP_ESTABLISHED_PHASE;
 	
@@ -121,7 +120,7 @@ PPPDevice::UpEvent()
 
 
 void
-PPPDevice::DownEvent()
+KPPPDevice::DownEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
 	

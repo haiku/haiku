@@ -12,7 +12,7 @@
 
 
 bool
-IsProtocolAllowed(const PPPProtocol& protocol)
+IsProtocolAllowed(const KPPPProtocol& protocol)
 {
 	if(protocol.ProtocolNumber() == PPP_LCP_PROTOCOL)
 		return true;

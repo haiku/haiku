@@ -17,8 +17,8 @@
 #include <sys/socket.h>
 
 
-PPPLCP::PPPLCP(PPPInterface& interface)
-	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
+KPPPLCP::KPPPLCP(KPPPInterface& interface)
+	: KPPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
 		AF_UNSPEC, 0, interface, NULL, PPP_ALWAYS_ALLOWED),
 	fStateMachine(interface.StateMachine()),
 	fTarget(NULL)
@@ -28,7 +28,7 @@ PPPLCP::PPPLCP(PPPInterface& interface)
 }
 
 
-PPPLCP::~PPPLCP()
+KPPPLCP::~KPPPLCP()
 {
 	while(CountOptionHandlers())
 		delete OptionHandlerAt(0);
@@ -38,7 +38,7 @@ PPPLCP::~PPPLCP()
 
 
 bool
-PPPLCP::AddOptionHandler(PPPOptionHandler *optionHandler)
+KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 {
 	if(!optionHandler || &optionHandler->Interface() != &Interface())
 		return false;
@@ -55,7 +55,7 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *optionHandler)
 
 
 bool
-PPPLCP::RemoveOptionHandler(PPPOptionHandler *optionHandler)
+KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 {
 	LockerHelper locker(StateMachine().fLock);
 	
@@ -67,10 +67,10 @@ PPPLCP::RemoveOptionHandler(PPPOptionHandler *optionHandler)
 }
 
 
-PPPOptionHandler*
-PPPLCP::OptionHandlerAt(int32 index) const
+KPPPOptionHandler*
+KPPPLCP::OptionHandlerAt(int32 index) const
 {
-	PPPOptionHandler *optionHandler = fOptionHandlers.ItemAt(index);
+	KPPPOptionHandler *optionHandler = fOptionHandlers.ItemAt(index);
 	
 	if(optionHandler == fOptionHandlers.GetDefaultItem())
 		return NULL;
@@ -79,8 +79,8 @@ PPPLCP::OptionHandlerAt(int32 index) const
 }
 
 
-PPPOptionHandler*
-PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
+KPPPOptionHandler*
+KPPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 {
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
@@ -91,7 +91,7 @@ PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 	if(index < 0)
 		return NULL;
 	
-	PPPOptionHandler *current = OptionHandlerAt(index);
+	KPPPOptionHandler *current = OptionHandlerAt(index);
 	
 	for(; current; current = OptionHandlerAt(++index)) {
 		if(current->Type() == type) {
@@ -106,7 +106,7 @@ PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 
 
 bool
-PPPLCP::AddLCPExtension(PPPLCPExtension *lcpExtension)
+KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 {
 	if(!lcpExtension || &lcpExtension->Interface() != &Interface())
 		return false;
@@ -122,7 +122,7 @@ PPPLCP::AddLCPExtension(PPPLCPExtension *lcpExtension)
 
 
 bool
-PPPLCP::RemoveLCPExtension(PPPLCPExtension *lcpExtension)
+KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 {
 	LockerHelper locker(StateMachine().fLock);
 	
@@ -134,10 +134,10 @@ PPPLCP::RemoveLCPExtension(PPPLCPExtension *lcpExtension)
 }
 
 
-PPPLCPExtension*
-PPPLCP::LCPExtensionAt(int32 index) const
+KPPPLCPExtension*
+KPPPLCP::LCPExtensionAt(int32 index) const
 {
-	PPPLCPExtension *lcpExtension = fLCPExtensions.ItemAt(index);
+	KPPPLCPExtension *lcpExtension = fLCPExtensions.ItemAt(index);
 	
 	if(lcpExtension == fLCPExtensions.GetDefaultItem())
 		return NULL;
@@ -146,8 +146,8 @@ PPPLCP::LCPExtensionAt(int32 index) const
 }
 
 
-PPPLCPExtension*
-PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
+KPPPLCPExtension*
+KPPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 {
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
@@ -158,7 +158,7 @@ PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 	if(index < 0)
 		return NULL;
 	
-	PPPLCPExtension *current = LCPExtensionAt(index);
+	KPPPLCPExtension *current = LCPExtensionAt(index);
 	
 	for(; current; current = LCPExtensionAt(++index)) {
 		if(current->Code() == code) {
@@ -173,7 +173,7 @@ PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 
 
 uint32
-PPPLCP::AdditionalOverhead() const
+KPPPLCP::AdditionalOverhead() const
 {
 	uint32 overhead = Interface().Overhead();
 	
@@ -188,21 +188,21 @@ PPPLCP::AdditionalOverhead() const
 
 
 bool
-PPPLCP::Up()
+KPPPLCP::Up()
 {
 	return true;
 }
 
 
 bool
-PPPLCP::Down()
+KPPPLCP::Down()
 {
 	return true;
 }
 
 
 status_t
-PPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
+KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
 {
 	if(Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);
@@ -212,13 +212,13 @@ PPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
 
 
 status_t
-PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
+KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(!packet)
 		return B_ERROR;
 	
 	if(protocolNumber != PPP_LCP_PROTOCOL) {
-		dprintf("PPPLCP::Receive(): wrong protocol number!\n");
+		dprintf("KPPPLCP::Receive(): wrong protocol number!\n");
 		return PPP_UNHANDLED;
 	}
 	
@@ -295,7 +295,7 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 	// Try to find LCP extensions that can handle this code.
 	// We must duplicate the packet in order to ask all handlers.
 	int32 index = 0;
-	PPPLCPExtension *lcpExtension = LCPExtensionFor(data->code, &index);
+	KPPPLCPExtension *lcpExtension = LCPExtensionFor(data->code, &index);
 	for(; lcpExtension; lcpExtension = LCPExtensionFor(data->code, &(++index))) {
 		if(!lcpExtension->IsEnabled())
 			continue;
@@ -323,7 +323,7 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 
 
 void
-PPPLCP::Pulse()
+KPPPLCP::Pulse()
 {
 	StateMachine().TimerEvent();
 	

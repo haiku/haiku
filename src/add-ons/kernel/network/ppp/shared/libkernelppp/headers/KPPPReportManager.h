@@ -16,12 +16,13 @@
 #include <TemplateList.h>
 
 
-#define PPP_REPLY(sender, value) send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
+#define PPP_REPLY(sender, value) \
+	send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
 
-class PPPReportManager {
+class KPPPReportManager {
 	public:
-		PPPReportManager(BLocker& lock);
-		~PPPReportManager();
+		KPPPReportManager(BLocker& lock);
+		~KPPPReportManager();
 		
 		void EnableReports(ppp_report_type type, thread_id thread,
 				int32 flags = PPP_NO_FLAGS);

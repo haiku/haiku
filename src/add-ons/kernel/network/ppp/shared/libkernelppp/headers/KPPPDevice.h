@@ -16,18 +16,18 @@
 #endif
 
 
-class PPPDevice : public PPPLayer {
-		friend class PPPStateMachine;
+class KPPPDevice : public KPPPLayer {
+		friend class KPPPStateMachine;
 
 	protected:
-		// PPPDevice must be subclassed
-		PPPDevice(const char *name, uint32 overhead, PPPInterface& interface,
+		// KPPPDevice must be subclassed
+		KPPPDevice(const char *name, uint32 overhead, KPPPInterface& interface,
 			driver_parameter *settings);
 
 	public:
-		virtual ~PPPDevice();
+		virtual ~KPPPDevice();
 		
-		PPPInterface& Interface() const
+		KPPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -90,7 +90,7 @@ class PPPDevice : public PPPLayer {
 
 	private:
 		char *fName;
-		PPPInterface& fInterface;
+		KPPPInterface& fInterface;
 		driver_parameter *fSettings;
 		
 		ppp_phase fConnectionPhase;

@@ -11,23 +11,23 @@
 #include <KPPPDefs.h>
 #include <KPPPLayer.h>
 
-class PPPInterface;
-class PPPOptionHandler;
+class KPPPInterface;
+class KPPPOptionHandler;
 
 
-class PPPProtocol : public PPPLayer {
+class KPPPProtocol : public KPPPLayer {
 	protected:
-		// PPPProtocol must be subclassed
-		PPPProtocol(const char *name, ppp_phase activationPhase,
+		// KPPPProtocol must be subclassed
+		KPPPProtocol(const char *name, ppp_phase activationPhase,
 			uint16 protocolNumber, ppp_level level, int32 addressFamily,
-			uint32 overhead, PPPInterface& interface,
+			uint32 overhead, KPPPInterface& interface,
 			driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
-			const char *type = NULL, PPPOptionHandler *optionHandler = NULL);
+			const char *type = NULL, KPPPOptionHandler *optionHandler = NULL);
 
 	public:
-		virtual ~PPPProtocol();
+		virtual ~KPPPProtocol();
 		
-		PPPInterface& Interface() const
+		KPPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -48,12 +48,12 @@ class PPPProtocol : public PPPLayer {
 		
 		const char *Type() const
 			{ return fType; }
-		PPPOptionHandler *OptionHandler() const
+		KPPPOptionHandler *OptionHandler() const
 			{ return fOptionHandler; }
 		
-		void SetNextProtocol(PPPProtocol *protocol)
+		void SetNextProtocol(KPPPProtocol *protocol)
 			{ fNextProtocol = protocol; SetNext(protocol); }
-		PPPProtocol *NextProtocol() const
+		KPPPProtocol *NextProtocol() const
 			{ return fNextProtocol; }
 		
 		void SetEnabled(bool enabled = true);
@@ -65,7 +65,7 @@ class PPPProtocol : public PPPLayer {
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		virtual status_t StackControl(uint32 op, void *data);
-			// called by netstack (forwarded by PPPInterface)
+			// called by netstack (forwarded by KPPPInterface)
 		
 		virtual bool Up() = 0;
 		virtual bool Down() = 0;
@@ -105,13 +105,13 @@ class PPPProtocol : public PPPLayer {
 		ppp_phase fActivationPhase;
 		uint16 fProtocolNumber;
 		int32 fAddressFamily;
-		PPPInterface& fInterface;
+		KPPPInterface& fInterface;
 		driver_parameter *fSettings;
 		int32 fFlags;
 		char *fType;
-		PPPOptionHandler *fOptionHandler;
+		KPPPOptionHandler *fOptionHandler;
 		
-		PPPProtocol *fNextProtocol;
+		KPPPProtocol *fNextProtocol;
 		bool fEnabled;
 		bool fUpRequested;
 		ppp_phase fConnectionPhase;

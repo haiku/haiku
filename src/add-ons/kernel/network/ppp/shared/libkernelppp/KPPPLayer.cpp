@@ -16,34 +16,31 @@
 #include <core_funcs.h>
 
 
-PPPLayer::PPPLayer(const char *name, ppp_level level, uint32 overhead)
+KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),
 	fOverhead(overhead),
 	fLevel(level),
 	fNext(NULL)
 {
-	if(name)
-		fName = strdup(name);
-	else
-		fName = strdup("Unknown");
+	SetName(name);
 }
 
 
-PPPLayer::~PPPLayer()
+KPPPLayer::~KPPPLayer()
 {
 	free(fName);
 }
 
 
 status_t
-PPPLayer::InitCheck() const
+KPPPLayer::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 status_t
-PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
+KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 {
 	if(!packet)
 		return B_ERROR;
@@ -56,7 +53,7 @@ PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 		else
 			return Next()->SendToNext(packet, protocolNumber);
 	} else {
-		dprintf("PPPLayer: SendToNext() failed because there is no next handler!\n");
+		dprintf("KPPPLayer: SendToNext() failed because there is no next handler!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -64,7 +61,19 @@ PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 
 
 void
-PPPLayer::Pulse()
+KPPPLayer::Pulse()
 {
 	// do nothing by default
+}
+
+
+void
+KPPPLayer::SetName(const char *name)
+{
+	free(fName);
+	
+	if(name)
+		fName = strdup(name);
+	else
+		fName = strdup("Unknown");
 }

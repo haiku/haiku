@@ -12,11 +12,12 @@
 #include <PPPDefs.h>
 
 
+extern struct core_module_info *core;
+	// needed by core quick-access function defines
+
+
 // various constants
 #define PPP_PULSE_RATE						500000
-
-
-extern struct core_module_info *core;
 
 
 // module key types (used when loading a module)
@@ -68,5 +69,6 @@ enum ppp_lcp_code {
 
 #define PPP_MIN_LCP_CODE PPP_CONFIGURE_REQUEST
 #define PPP_MAX_LCP_CODE PPP_DISCARD_REQUEST
+
 
 #endif

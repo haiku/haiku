@@ -17,10 +17,15 @@ typedef uint32 ppp_interface_id;
 
 
 // settings keys
+#define PPP_DIALING_NOTIFICATION_KEY		"DialingNotification"
+	// userland ppp_server handles this key
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
+#define PPP_DIAL_RETRIES_LIMIT_KEY			"DialRetriesLimit"
+#define PPP_DIAL_RETRY_DELAY_KEY			"DialRetryDelay"
 #define PPP_DIAL_ON_DEMAND_KEY				"DialOnDemand"
 #define PPP_AUTO_REDIAL_KEY					"AutoRedial"
+#define PPP_REDIAL_DELAY_KEY				"RedialDelay"
 #define PPP_LOAD_MODULE_KEY					"LoadModule"
 #define PPP_PROTOCOL_KEY					"Protocol"
 #define PPP_DEVICE_KEY						"Device"
@@ -33,6 +38,8 @@ typedef uint32 ppp_interface_id;
 
 // path defines
 #define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
+#define PPP_INTERFACE_SETTINGS_PATH	"/boot/home/config/settings/kernel/drivers/pppidf"
+	// should be: /etc/ppp
 
 // built-in protocols
 #define PPP_LCP_PROTOCOL					0xC021
@@ -49,17 +56,17 @@ enum ppp_interface_filter {
 };
 
 // return values for Send()/Receive() methods in addition to B_ERROR and B_OK
-// PPP_UNHANDLED is also used by PPPOptionHandler
+// PPP_UNHANDLED is also used by KPPPOptionHandler
 enum {
 	// B_ERROR means that the packet is corrupted
 	// B_OK means the packet was handled correctly
 	
-	// return values for PPPProtocol
+	// return values for KPPPProtocol
 	PPP_UNHANDLED = PPP_ERROR_BASE,
 		// The packet does not belong to this protocol.
 		// Do not delete the packet when you return this!
 	
-	// return values of PPPInterface::Receive()
+	// return values of KPPPInterface::Receive()
 	PPP_DISCARDED,
 		// packet was silently discarded
 	PPP_REJECTED,
@@ -78,7 +85,7 @@ enum {
 	PPP_FORCE_PFC_REQUEST = 0x04,
 		// if PFC request fails the connection attempt will terminate
 	PPP_FREEZE_PFC_OPTIONS = 0x80
-		// the options cannot be changed if this flag is set (mainly used by PPPDevice)
+		// the options cannot be changed if this flag is set (mainly used by KPPPDevice)
 };
 
 enum ppp_pfc_state {
@@ -124,7 +131,7 @@ enum ppp_phase {
 enum ppp_level {
 	PPP_DEVICE_LEVEL = 0,
 	PPP_INTERFACE_LEVEL = 1,
-		// only used by PPPInterface
+		// only used by KPPPInterface
 	PPP_MULTILINK_LEVEL = 2,
 	PPP_ENCRYPTION_LEVEL = 5,
 	PPP_COMPRESSION_LEVEL = 10,

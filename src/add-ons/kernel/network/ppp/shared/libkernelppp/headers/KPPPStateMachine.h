@@ -10,7 +10,7 @@
 
 #include <KPPPDefs.h>
 
-class PPPProtocol;
+class KPPPProtocol;
 
 #ifndef _K_PPP_INTERFACE__H
 #include <KPPPInterface.h>
@@ -19,24 +19,24 @@ class PPPProtocol;
 #include <Locker.h>
 
 
-class PPPStateMachine {
-		friend class PPPInterface;
-		friend class PPPLCP;
+class KPPPStateMachine {
 		friend class PPPManager;
+		friend class KPPPInterface;
+		friend class KPPPLCP;
 
 	private:
-		// may only be constructed/destructed by PPPInterface
-		PPPStateMachine(PPPInterface& interface);
-		~PPPStateMachine();
+		// may only be constructed/destructed by KPPPInterface
+		KPPPStateMachine(KPPPInterface& interface);
+		~KPPPStateMachine();
 		
 		// copies are not allowed!
-		PPPStateMachine(const PPPStateMachine& copy);
-		PPPStateMachine& operator= (const PPPStateMachine& copy);
+		KPPPStateMachine(const KPPPStateMachine& copy);
+		KPPPStateMachine& operator= (const KPPPStateMachine& copy);
 
 	public:
-		PPPInterface& Interface() const
+		KPPPInterface& Interface() const
 			{ return fInterface; }
-		PPPLCP& LCP() const
+		KPPPLCP& LCP() const
 			{ return fLCP; }
 		
 		ppp_state State() const
@@ -78,14 +78,14 @@ class PPPStateMachine {
 			{ return fPeerAuthenticationStatus; }
 		
 		// sub-interface events
-		void UpFailedEvent(PPPInterface& interface);
-		void UpEvent(PPPInterface& interface);
-		void DownEvent(PPPInterface& interface);
+		void UpFailedEvent(KPPPInterface& interface);
+		void UpEvent(KPPPInterface& interface);
+		void DownEvent(KPPPInterface& interface);
 		
 		// protocol events
-		void UpFailedEvent(PPPProtocol *protocol);
-		void UpEvent(PPPProtocol *protocol);
-		void DownEvent(PPPProtocol *protocol);
+		void UpFailedEvent(KPPPProtocol *protocol);
+		void UpEvent(KPPPProtocol *protocol);
+		void DownEvent(KPPPProtocol *protocol);
 		
 		// device events
 		bool TLSNotify();
@@ -144,8 +144,8 @@ class PPPStateMachine {
 		void ResetLCPHandlers();
 
 	private:
-		PPPInterface& fInterface;
-		PPPLCP& fLCP;
+		KPPPInterface& fInterface;
+		KPPPLCP& fLCP;
 		
 		ppp_state fState;
 		ppp_phase fPhase;

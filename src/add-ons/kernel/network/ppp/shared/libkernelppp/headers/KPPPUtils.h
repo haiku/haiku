@@ -14,11 +14,11 @@
 
 #include <OS.h>
 
-class PPPProtocol;
+class KPPPProtocol;
 
 
 // helper functions
-bool IsProtocolAllowed(const PPPProtocol& protocol);
+bool IsProtocolAllowed(const KPPPProtocol& protocol);
 
 // the list template does not support iterating over each item :(
 // this template iterates over each item in an indexed list
