@@ -17,41 +17,16 @@
 //extern FILE *stdin;
 
 
-// ToDo: does it make sense to have the extra "\r\n" handling in here?
-// 		or should this be done by the platform dependent part?
-
-
 int
 vfprintf(FILE *file, const char *format, va_list list)
 {
 	ConsoleNode *node = (ConsoleNode *)file;
-	char buffer[1024];
+	char buffer[512];
 		// the buffer handling could (or should) be done better...
-		// we should have a vsprintf() version that accepts a
-		// maximum buffer size (for the kernel as well!)
 
-	int length = vsprintf(buffer, format, list);
-	if (length > 0) {
-		int pos = 0;
-		char *c;
-
-		// be nice to our audience and replace single "\n" with "\r\n"
-
-		for (c = buffer; c[0] && (size_t)length < sizeof(buffer) - 1; c++, pos++) {
-			if (c[0] == '\r' && c[1] == '\n') {
-				c++;
-				pos++;
-				continue;
-			}
-			if (c[0] == '\n') {
-				// insert a '\r' here
-				memmove(c + 1, c, length - pos);
-				c[0] = '\r';
-				length++;
-			}
-		}
+	int length = vsnprintf(buffer, sizeof(buffer), format, list);
+	if (length > 0)
 		node->Write(buffer, length);
-	}
 
 	return length;
 }
@@ -99,10 +74,7 @@ fputc(int character, FILE *file)
     status_t status;
 
 	// we only support direct console output right now...	
-	if (character == '\n')
-		status = ((ConsoleNode *)file)->Write("\r\n", 2);
-	else
-		status = ((ConsoleNode *)file)->Write(&character, 1);
+	status = ((ConsoleNode *)file)->Write(&character, 1);
 
 	if (status > 0)
 		return character;
@@ -116,8 +88,6 @@ fputs(const char *string, FILE *file)
 {
 	if (file == NULL)
 		return B_FILE_ERROR;
-
-	// ToDo: for consistency, we should replace "\n" with "\r\n" here, too.
 
 	status_t status = ((ConsoleNode *)file)->Write(string, strlen(string));
 	fputc('\n', file);
@@ -145,5 +115,4 @@ puts(const char *string)
 {
 	return fputs(string, stdout);
 }
-
 
