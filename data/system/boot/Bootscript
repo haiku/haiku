@@ -62,6 +62,13 @@ runprog beos/bin/clockconfig
 # Launch consoled
 launch beos/bin/consoled
 
+# Launch servers
+SERVERS=beos/system/servers
+
+#launch $SERVERS/app_server picasso			# launch app_server
+launch $SERVERS/registrar _roster_thread_	# launch registrar
+
+
 # Check for daily saving time
 # TODO to be launched when tracker and deskbar are launched
 #launch beos/bin/dstcheck
