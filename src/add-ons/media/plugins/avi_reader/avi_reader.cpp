@@ -202,9 +202,14 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 		}
 		
 		*frameCount = fFile->FrameCount();
+		*duration = fFile->Duration();
 
 		cookie->audio = false;
 		cookie->frame_pos = 0;
+
+		description.family = B_AVI_FORMAT_FAMILY;
+		description.u.avi.codec = 0;
+		formats.GetFormatFor(description, format);
 
 		return B_OK;
 	}
