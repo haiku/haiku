@@ -77,6 +77,8 @@ extern const char	*strsignal(int signal);
 #define bcopy(source, dest, length) memcpy((dest), (source), (length))
 #define bzero(buffer, length) memset((buffer), 0, (length))
 
+extern int ffs(int i);
+
 #ifdef __cplusplus
 }
 #endif
