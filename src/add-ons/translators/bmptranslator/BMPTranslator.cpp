@@ -296,7 +296,8 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 		// copy portion of header already read in
 	// read in the rest of the header
 	ssize_t size = sizeof(TranslatorBitmap) - amtread;
-	if (inSource->Read(((uint8 *) &header) + amtread, size) != size)
+	if (inSource->Read((reinterpret_cast<uint8 *> (&header)) +
+		amtread, size) != size)
 		return B_NO_TRANSLATOR;
 		
 	// convert to host byte order
@@ -418,7 +419,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 	if (swap_data(B_UINT16_TYPE, &fileHeader.magic, sizeof(uint16),
 		B_SWAP_LENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
-	if (swap_data(B_UINT32_TYPE, ((uint8 *) &fileHeader) + 2, 12,
+	if (swap_data(B_UINT32_TYPE,
+		(reinterpret_cast<uint8 *> (&fileHeader)) + 2, 12,
 		B_SWAP_LENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
 		
@@ -433,11 +435,13 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		// MS format
 		MSInfoHeader msheader;
 		msheader.size = headersize;
-		if (inSource->Read((uint8 *) (&msheader) + 4, 36) != 36)
+		if (inSource->Read(
+			reinterpret_cast<uint8 *> (&msheader) + 4, 36) != 36)
 			return B_NO_TRANSLATOR;
 	
 		// convert msheader to host byte order
-		if (swap_data(B_UINT32_TYPE, (uint8 *) (&msheader) + 4, 36,
+		if (swap_data(B_UINT32_TYPE,
+			reinterpret_cast<uint8 *> (&msheader) + 4, 36,
 			B_SWAP_LENDIAN_TO_HOST) != B_OK)
 			return B_ERROR;
 	
@@ -508,11 +512,13 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		// OS/2 format
 		OS2InfoHeader os2header;
 		os2header.size = headersize;
-		if (inSource->Read((uint8 *) (&os2header) + 4, 8) != 8)
+		if (inSource->Read(
+			reinterpret_cast<uint8 *> (&os2header) + 4, 8) != 8)
 			return B_NO_TRANSLATOR;
 	
 		// convert msheader to host byte order
-		if (swap_data(B_UINT32_TYPE, (uint8 *) (&os2header) + 4, 8,
+		if (swap_data(B_UINT32_TYPE,
+			reinterpret_cast<uint8 *> (&os2header) + 4, 8,
 			B_SWAP_LENDIAN_TO_HOST) != B_OK)
 			return B_ERROR;
 	
@@ -584,7 +590,7 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 					pmsheader->colorsused = ncolors;
 					pmsheader->colorsimportant = ncolors;
 					if (pos2skip && fileHeader.dataOffset >
-						(uint32) 26 + (ncolors * 3))
+						static_cast<uint32> (26 + (ncolors * 3)))
 							(*pos2skip) = fileHeader.dataOffset -
 								(26 + (ncolors * 3));
 
@@ -1223,8 +1229,10 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		
 		MSInfoHeader msheader;
 		msheader.size = 40;
-		msheader.width = (uint32) bitsHeader.bounds.Width() + 1;
-		msheader.height = (uint32) bitsHeader.bounds.Height() + 1;
+		msheader.width = 
+			static_cast<uint32> (bitsHeader.bounds.Width() + 1);
+		msheader.height = 
+			static_cast<uint32> (bitsHeader.bounds.Height() + 1);
 		msheader.planes = 1;
 		msheader.xpixperm = 2835; // 72 dpi horizontal
 		msheader.ypixperm = 2835; // 72 dpi vertical
