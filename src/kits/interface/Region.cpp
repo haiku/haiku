@@ -40,6 +40,8 @@ clear_region(BRegion *region)
 void
 cleanup_region_1(BRegion *region)
 {
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+
 	clipping_rect testRect =
 		{
 			1, 1,
@@ -134,6 +136,8 @@ sort_trans(long *lptr1, long *lptr2, long count)
 void
 cleanup_region_horizontal(BRegion *region)
 {
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+
 	clipping_rect testRect =
 		{
 			1, 1,
@@ -238,6 +242,7 @@ and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 }
 
 
+
 void
 and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 {
@@ -267,6 +272,14 @@ and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 }
 
 
+/*!	\brief Modify the destination region to be the intersection of the two given regions.
+	\param first The first region to be intersected.
+	\param second The second region to be intersected.
+	\param dest The destination region.
+	
+	This function is a sort of method selector. It checks for some special
+	cases, then it calls the appropriate specialized function.
+*/
 void
 and_region(BRegion *first, BRegion *second, BRegion *dest)
 {
@@ -311,6 +324,7 @@ append_region(BRegion *first, BRegion *second, BRegion *dest)
 		dest->_AddRect(second->data[c]);	
 }
 
+
 /*
 void
 r_or(long, long, BRegion *first, BRegion *second, BRegion *dest, long *L1, long *L2)
@@ -318,12 +332,51 @@ r_or(long, long, BRegion *first, BRegion *second, BRegion *dest, long *L1, long 
 }
 */
 
-/*
+/*! \brief Divides the plane into horizontal bands, then passes those bands to r_or
+	which does the real work.
+	\param first The first region to be or-ed.
+	\param second The second region to be or-ed.
+	\param dest The destination region.
+*/
 void
 or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+	long a = 0, b = 0;
+	
+	int32 top;
+	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
+	do {
+		top = bottom + 1;
+		bottom = 0x10000000;
+		
+		for (int x = a; x < first->count; x++) {
+			int32 n = first->data[x].top - 1;
+			if (n >= top && n < bottom)
+				bottom = n;
+			if (first->data[x].bottom >= top && first->data[x].bottom < bottom)
+				bottom = first->data[x].bottom;
+		}	
+		
+		for (int x = b; x < second->count; x++) {
+			int32 n = second->data[x].top;
+			if (n >= top && n < bottom)
+				bottom = n;
+			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
+				bottom = second->data[x].bottom;
+		}
+		
+		// We can stand a region which extends to 0x10000000, not more
+		if (bottom >= 0x10000000)
+			break;
+			
+		r_or(top, bottom, first, second, dest, &a, &b);
+		
+	} while (true);
+	
+	cleanup_region(dest);
 }
-*/
+
 
 void
 or_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
@@ -390,6 +443,14 @@ or_region_no_x(BRegion *first, BRegion *second, BRegion *dest)
 }
 
 
+/*!	\brief Modify the destination region to be the union of the two given regions.
+	\param first The first region to be merged.
+	\param second The second region to be merged.
+	\param dest The destination region.
+	
+	This function is a sort of method selector. It checks for some special
+	cases, then it calls the appropriate specialized function.
+*/
 void
 or_region(BRegion *first, BRegion *second, BRegion *dest)
 {
@@ -435,13 +496,60 @@ or_region(BRegion *first, BRegion *second, BRegion *dest)
 	}
 }
 
-/*
+
+/*! \brief Divides the plane into horizontal bands, then passes those bands to r_sub
+	which does the real work.
+	\param first The subtraend region.
+	\param second The minuend region.
+	\param dest The destination region.
+*/
 void
 sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+	long a = 0, b = 0;
+	
+	int32 top;
+	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
+	do {
+		top = bottom + 1;
+		bottom = 0x10000000;
+		
+		for (int x = a; x < first->count; x++) {
+			int32 n = first->data[x].top - 1;
+			if (n >= top && n < bottom)
+				bottom = n;
+			if (first->data[x].bottom >= top && first->data[x].bottom < bottom)
+				bottom = first->data[x].bottom;
+		}	
+		
+		for (int x = b; x < second->count; x++) {
+			int32 n = second->data[x].top;
+			if (n >= top && n < bottom)
+				bottom = n;
+			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
+				bottom = second->data[x].bottom;
+		}
+		
+		if (bottom >= 0x10000000)
+			break;
+			
+		r_sub(top, bottom, first, second, dest, &a, &b);
+		
+	} while (true);
+	
+	cleanup_region(dest);
 }
-*/
 
+
+/*!	\brief Modify the destination region to be the difference of the two given regions.
+	\param first The subtraend region.
+	\param second The minuend region.
+	\param dest The destination region.
+	
+	This function is a sort of method selector. It checks for some special
+	cases, then it calls the appropriate specialized function.
+*/
 void
 sub_region(BRegion *first, BRegion *second, BRegion *dest)
 {
