@@ -131,6 +131,12 @@ BLooper::~BLooper()
 	}
 
 	Lock();
+
+// TODO: delete fLastMessage;
+// In case the looper thread calls Quit() fLast message is not deleted.
+
+// TODO: Close the message port and read and reply to the remaining messages.
+
 // bonefish: Killing the looper thread doesn't work very well with
 // BApplication. In fact here it doesn't work too well either. When the
 // looper thread encounters a _QUIT_ message it deletes the BLooper object
