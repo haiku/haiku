@@ -2,13 +2,14 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-
 #ifndef _KERNEL_ARCH_CPU_H
 #define _KERNEL_ARCH_CPU_H
 
+
 #include <kernel.h>
 #include <ktypes.h>
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
+
 
 #define PAGE_ALIGN(x) (((x) + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1))
 
