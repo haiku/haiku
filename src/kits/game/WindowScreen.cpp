@@ -1,6 +1,7 @@
 /* 
- * Copyright 2003-2004,
- * Stefano Ceccherini (burton666@libero.it).
+ * Copyright 2002-2004,
+ * Marcus Overhagen, 
+ * Stefano Ceccherini (burton666@libero.it),
  * Carwyn Jones (turok2@currantbun.com)
  * All rights reserved.
  * Distributed under the terms of the MIT License.
