@@ -41,6 +41,7 @@
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>
+#include "PNGTranslatorSettings.h"
 
 // IO Extension Names:
 
@@ -93,10 +94,16 @@ public:
 		// it translates the data in inSource to outDestination
 		// using the format outType
 		
+	virtual status_t GetConfigurationMessage(BMessage *ioExtension);
+		// write the current state of the translator into
+		// the supplied BMessage object
+		
 	virtual status_t MakeConfigurationView(BMessage *ioExtension,
 		BView **outView, BRect *outExtent);
 		// creates and returns the view for displaying information
 		// about this translator
+		
+	PNGTranslatorSettings *AcquireSettings();
 
 protected:
 	virtual ~PNGTranslator();
@@ -104,7 +111,9 @@ protected:
 		// Release() function instead of being deleted directly by
 		// the user
 		
-private:	
+private:
+	PNGTranslatorSettings *fpsettings;
+	
 	char fName[30];
 	char fInfo[100];
 };

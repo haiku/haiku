@@ -58,7 +58,7 @@ main()
 	BApplication app("application/x-vnd.obos-tiff-translator");
 	PNGTranslator *ptranslator = new PNGTranslator;
 	BView *view = NULL;
-	BRect rect(0, 0, 225, 175);
+	BRect rect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT);
 	if (ptranslator->MakeConfigurationView(NULL, &view, &rect)) {
 		BAlert *err = new BAlert("Error",
 			"Unable to create the PNGTranslator view.", "OK");

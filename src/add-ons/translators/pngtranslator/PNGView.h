@@ -34,18 +34,37 @@
 #include <View.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
+#include "PNGTranslatorSettings.h"
+
+#define PNG_VIEW_WIDTH 300
+#define PNG_VIEW_HEIGHT 250
+
+// Config panel messages
+#define M_PNG_SET_INTERLACE			'pnsi'
+
 
 class PNGView : public BView {
 public:
 	PNGView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags);
+		uint32 flags, PNGTranslatorSettings *psettings);
 		// sets up the view
 		
 	~PNGView();
-		// does nothing
+		// releases the PNGTranslator settings
 
+	virtual void AllAttached();
 	virtual	void Draw(BRect area);
 		// draws information about the PNGTranslator
+	virtual void MessageReceived(BMessage *pmsg);
+		
+private:
+	BPopUpMenu *fpmnuInterlace;
+	BMenuField *fpfldInterlace;
+	
+	PNGTranslatorSettings *fpsettings;
+		// the actual settings for the translator,
+		// shared with the translator
 };
 
 #endif // #ifndef PNGVIEW_H

@@ -4,6 +4,7 @@ Translator PNGTranslator :
 	PNGMain.cpp
 	PNGTranslator.cpp
 	PNGView.cpp
-	PNGWindow.cpp ;
+	PNGWindow.cpp
+	PNGTranslatorSettings.cpp ;
 
 LinkSharedOSLibs PNGTranslator : be translation png ;

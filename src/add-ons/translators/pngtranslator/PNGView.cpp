@@ -30,8 +30,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <png.h>
+#include <Alert.h>
 #include "PNGView.h"
 #include "PNGTranslator.h"
+
+BMessage *
+interlace_msg(int option)
+{
+	BMessage *pmsg = new BMessage(M_PNG_SET_INTERLACE);
+	pmsg->AddInt32(PNG_SETTING_INTERLACE, option);
+	return pmsg;
+}
 
 // ---------------------------------------------------------------
 // Constructor
@@ -47,16 +57,37 @@
 // Returns:
 // ---------------------------------------------------------------
 PNGView::PNGView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
+	uint32 resize, uint32 flags, PNGTranslatorSettings *psettings)
 	:	BView(frame, name, resize, flags)
 {
+	fpsettings = psettings;
+	
 	SetViewColor(220,220,220,0);
+	
+	// setup PNG interlace options menu
+	fpmnuInterlace = new BPopUpMenu("Interlace Option");
+	BMenuItem *pitmNone, *pitmAdam7;
+	pitmNone = new BMenuItem("None", interlace_msg(PNG_INTERLACE_NONE));
+	pitmAdam7 = new BMenuItem("Adam7", interlace_msg(PNG_INTERLACE_ADAM7));
+	fpmnuInterlace->AddItem(pitmNone);
+	fpmnuInterlace->AddItem(pitmAdam7);
+	
+	fpfldInterlace = new BMenuField(BRect(20, 50, 200, 70), "PNG Interlace Menu",
+		"Interlacing Type", fpmnuInterlace);
+	fpfldInterlace->SetViewColor(ViewColor());
+	AddChild(fpfldInterlace);
+	
+	// set Interlace option to show the current configuration
+	if (fpsettings->SetGetInterlace() == PNG_INTERLACE_NONE)
+		pitmNone->SetMarked(true);
+	else
+		pitmAdam7->SetMarked(true);
 }
 
 // ---------------------------------------------------------------
 // Destructor
 //
-// Does nothing
+// Releases the PNGTranslator settings
 //
 // Preconditions:
 //
@@ -68,6 +99,23 @@ PNGView::PNGView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 PNGView::~PNGView()
 {
+	fpsettings->Release();
+}
+
+void
+PNGView::AllAttached()
+{
+	// Tell all controls that this view is the target for 
+	// messages from controls on this view
+	BView::AllAttached();
+	BMessenger msgr(this);
+	
+	// set target for interlace options menu items
+	for (int32 i = 0; i < fpmnuInterlace->CountItems(); i++) {
+		BMenuItem *pitm = fpmnuInterlace->ItemAt(i);
+		if (pitm)
+			pitm->SetTarget(msgr);
+	}
 }
 
 // ---------------------------------------------------------------
@@ -108,15 +156,32 @@ PNGView::Draw(BRect area)
 		PNG_TRANSLATOR_VERSION % 10, __DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	
-	int32 lineno = 4;
+	int32 lineno = 6;
 	DrawString("PNG Library:", BPoint(xbold, yplain * lineno + ybold));
-	lineno += 2;
+	lineno += 1;
 	
-	char libtiff[] = "BEER!";
-	char *tok = strtok(libtiff, "\n");
+	const int32 kinfolen = 512;
+	char libinfo[kinfolen] = { 0 };
+	strncpy(libinfo, png_get_copyright(NULL), kinfolen - 1);
+	char *tok = strtok(libinfo, "\n");
 	while (tok) {
 		DrawString(tok, BPoint(xbold, yplain * lineno + ybold));
 		lineno++;
 		tok = strtok(NULL, "\n");
 	}
 }
+
+void
+PNGView::MessageReceived(BMessage *pmsg)
+{
+	if (pmsg->what == M_PNG_SET_INTERLACE) {
+		// change setting for interlace option
+		int32 option;
+		if (pmsg->FindInt32(PNG_SETTING_INTERLACE, &option) == B_OK) {
+			fpsettings->SetGetInterlace(&option);
+			fpsettings->SaveSettings();
+		}
+	} else
+		BView::MessageReceived(pmsg);
+}
+
