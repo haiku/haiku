@@ -667,7 +667,7 @@ unload_elf_image(struct elf_image_info *image)
 
 
 static status_t
-insert_preloaded_image(struct preloaded_image *preloadedImage)
+insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 {
 	struct Elf32_Ehdr *elfHeader;
 	struct elf_image_info *image;
@@ -700,9 +700,12 @@ insert_preloaded_image(struct preloaded_image *preloadedImage)
 	if (status < B_OK)
 		goto error2;
 
-	status = elf_relocate(image, "");
-	if (status < B_OK)
-		goto error2;
+	if (!kernel) {
+		status = elf_relocate(image, "");
+		if (status < B_OK)
+			goto error2;
+	} else
+		sKernelImage = image;
 
 	image->debug_symbols = preloadedImage->debug_symbols;
 	image->num_debug_symbols = preloadedImage->num_debug_symbols;
@@ -1290,7 +1293,6 @@ unload_kernel_add_on(image_id id)
 status_t
 elf_init(kernel_args *ka)
 {
-	area_info areaInfo;
 	struct preloaded_image *image;
 
 	image_init();
@@ -1303,43 +1305,13 @@ elf_init(kernel_args *ka)
 		return B_NO_MEMORY;
 
 	// Build a image structure for the kernel, which has already been loaded.
-	// The VM has created areas for it under a known name already
-
-	sKernelImage = create_image_struct();
-	sKernelImage->name = strdup("kernel");
-
-	// text segment
-	sKernelImage->regions[0].id = find_area("kernel_ro");
-	if (sKernelImage->regions[0].id < 0)
-		panic("elf_init: could not look up kernel text segment region\n");
-
-	get_area_info(sKernelImage->regions[0].id, &areaInfo);
-	sKernelImage->regions[0].start = (addr_t)areaInfo.address;
-	sKernelImage->regions[0].size = areaInfo.size;
-
-	// data segment
-	sKernelImage->regions[1].id = find_area("kernel_rw");
-	if (sKernelImage->regions[1].id < 0)
-		panic("elf_init: could not look up kernel data segment region\n");
-
-	get_area_info(sKernelImage->regions[1].id, &areaInfo);
-	sKernelImage->regions[1].start = (addr_t)areaInfo.address;
-	sKernelImage->regions[1].size = areaInfo.size;
-
-	// we know where the dynamic section is
-	sKernelImage->dynamic_ptr = (addr_t)ka->kernel_dynamic_section_addr.start;
-
-	// parse the dynamic section
-	if (elf_parse_dynamic_section(sKernelImage) < 0)
-		dprintf("elf_init: WARNING elf_parse_dynamic_section couldn't find dynamic section.\n");
-
-	// insert it first in the list of kernel images loaded
-	register_elf_image(sKernelImage);
+	// The preloaded_images were already prepared by the VM.
+	if (insert_preloaded_image(&ka->kernel_image, true) < B_OK)
+		panic("could not create kernel image.\n");
 
 	// Build image structures for all preloaded images.
-	// Again, the VM has already created areas for them.
 	for (image = ka->preloaded_images; image != NULL; image = image->next) {
-		insert_preloaded_image(image);
+		insert_preloaded_image(image, false);
 	}
 
 	add_debugger_command("ls", &dump_address_info, "lookup symbol for a particular address");

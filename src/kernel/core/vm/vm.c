@@ -1706,15 +1706,9 @@ vm_init(kernel_args *ka)
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, REGION_ADDR_EXACT_ADDRESS,
 		HEAP_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	address = (void *)ROUNDOWN(ka->kernel_seg0_addr.start, PAGE_SIZE);
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_ro", &address, REGION_ADDR_EXACT_ADDRESS,
-		PAGE_ALIGN(ka->kernel_seg0_addr.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
-
-	if (ka->kernel_seg1_addr.size > 0) {
-		address = (void *)ROUNDOWN(ka->kernel_seg1_addr.start, PAGE_SIZE);
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_rw", &address, REGION_ADDR_EXACT_ADDRESS,
-			PAGE_ALIGN(ka->kernel_seg1_addr.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
-	}
+	ka->kernel_image.name = "kernel";
+		// the lazy boot loader currently doesn't set the kernel's name...
+	create_preloaded_image_areas(&ka->kernel_image);
 
 	// allocate areas for preloaded images
 	for (image = ka->preloaded_images; image != NULL; image = image->next) {
