@@ -71,7 +71,8 @@ public:
 protected:
 	friend AppServer;
 	friend ServerWindow;
-	void DispatchMessage(int32 code, int8 *buffer);
+	void _DispatchMessage(int32 code, int8 *buffer);
+	ServerBitmap *_FindBitmap(int32 token);
 
 	port_id _sender,_receiver;
 	BString _signature;

@@ -129,6 +129,13 @@ ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int3
 	}
 	bmp->_area=area_for(bmpbuffer);
 	bmp->_buffer=bmpbuffer;
+	bmp->_token=tokenizer.GetToken();
+	
+	// calculate area offset
+	area_info ai;
+	get_area_info(bmp->_area,&ai);
+	bmp->_offset=bmpbuffer-(uint8*)ai.address;
+	
 	bmplist->AddItem(bmp);
 	release_sem(lock);
 	return bmp;

@@ -57,6 +57,9 @@ public:
 	*/
 	area_id Area(void) { return _area; }
 	
+	// Returns the offset of the bitmap in its area
+	int32 AreaOffset(void) { return _offset; }
+	
 	//! Returns the bitmap's buffer
 	uint8 *Bits(void) { return _buffer; }
 	uint32 BitsLength(void);
@@ -82,6 +85,9 @@ public:
 	//! Returns whether the bitmap is valid
 	bool InitCheck(void) { return _initialized; }
 
+	//! Returns the identifier token for the bitmap
+	int32 Token(void) { return _token; }
+	
 protected:
 	friend BitmapManager;
 	
@@ -104,6 +110,8 @@ protected:
 	color_space _space;
 	int32 _flags;
 	int _bpp;
+	int32 _token;
+	int32 _offset;
 };
 
 #endif

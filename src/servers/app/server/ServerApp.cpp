@@ -30,7 +30,9 @@
 #include <PortLink.h>
 #include <stdio.h>
 #include <string.h>
+#include <ServerProtocol.h>
 
+#include "BitmapManager.h"
 #include "CursorManager.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
@@ -39,7 +41,6 @@
 #include "ServerWindow.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
-#include "ServerProtocol.h"
 #include "ServerConfig.h"
 #include "LayerData.h"
 
@@ -248,7 +249,7 @@ int32 ServerApp::MonitorApp(void *data)
 				}
 				default:
 				{
-					app->DispatchMessage(msgcode, msgbuffer);
+					app->_DispatchMessage(msgcode, msgbuffer);
 					break;
 				}
 			}
@@ -275,7 +276,7 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::DispatchMessage(int32 code, int8 *buffer)
+void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 {
 	int8 *index=buffer;
 	LayerData ld;
@@ -348,6 +349,78 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 					break;
 				}
 			}
+			break;
+		}
+		case AS_CREATE_BITMAP:
+		{
+			// Allocate a bitmap for an application
+			
+			// Attached Data: 
+			// 1) port_id reply port
+			// 2) BRect bounds
+			// 3) color_space space
+			// 4) int32 bitmap_flags
+			// 5) int32 bytes_per_row
+			// 6) int32 screen_id::id
+			
+			// Reply Code: SERVER_TRUE
+			// Reply Data:
+			//	1) int32 server token
+			//	2) area_id id of the area in which the bitmap data resides
+			//	3) int32 area pointer offset used to calculate fBasePtr
+			
+			// First, let's attempt to allocate the bitmap
+			port_id replyport=*((port_id*)index); index+=sizeof(port_id);
+			BRect r=*((BRect*)index); index+=sizeof(BRect);
+			color_space cs=*((color_space*)index); index+=sizeof(color_space);
+			int32 f=*((int32*)index); index+=sizeof(int32);
+			int32 bpr=*((int32*)index); index+=sizeof(int32);
+
+			screen_id s;
+			s.id=*((int32*)index);
+			
+			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
+			if(sbmp)
+			{
+				// list for doing faster lookups for a bitmap than what the BitmapManager
+				// can do.
+				_bmplist->AddItem(sbmp);
+				_applink->SetOpCode(SERVER_TRUE);
+				_applink->Attach(sbmp->Token());
+				_applink->Attach(sbmp->Area());
+				_applink->Attach(sbmp->AreaOffset());
+				_applink->Flush();
+			}
+			else
+			{
+				// alternatively, if something went wrong, we reply with SERVER_FALSE
+				write_port(replyport,SERVER_FALSE,NULL,0);
+			}
+			
+			break;
+		}
+		case AS_DELETE_BITMAP:
+		{
+			// Delete a bitmap's allocated memory
+
+			// Attached Data:
+			// 1) int32 reply port
+			// 2) int32 token
+		
+			// Reply Code: SERVER_TRUE if successful, 
+			//				SERVER_FALSE if the buffer was already deleted or was not found
+			port_id replyport=*((port_id*)index); index+=sizeof(port_id);
+			
+			ServerBitmap *sbmp=_FindBitmap(*((int32*)index));
+			if(sbmp)
+			{
+				_bmplist->RemoveItem(sbmp);
+				bitmapmanager->DeleteBitmap(sbmp);
+				write_port(replyport,SERVER_TRUE,NULL,0);
+			}
+			else
+				write_port(replyport,SERVER_FALSE,NULL,0);
+			
 			break;
 		}
 		case AS_SET_SCREEN_MODE:
@@ -450,4 +523,21 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			break;
 		}
 	}
+}
+
+/*!
+	\brief Looks up a ServerApp's ServerBitmap in its list
+	\param token ID token of the bitmap to find
+	\return The bitmap having that ID or NULL if not found
+*/
+ServerBitmap *ServerApp::_FindBitmap(int32 token)
+{
+	ServerBitmap *temp;
+	for(int32 i=0; i<_bmplist->CountItems();i++)
+	{
+		temp=(ServerBitmap*)_bmplist->ItemAt(i);
+		if(temp && temp->Token()==token)
+			return temp;
+	}
+	return NULL;
 }
