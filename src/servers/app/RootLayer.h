@@ -132,7 +132,7 @@ friend class Desktop;
 			void			show_winBorder(WinBorder* winBorder);
 			void			hide_winBorder(WinBorder* winBorder);
 
-			void			get_workspace_windows();
+			bool			get_workspace_windows();
 			void 			draw_window_tab(WinBorder *exFocus, WinBorder *focus);
 			void			empty_visible_regions(Layer *layer);
 
