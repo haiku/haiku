@@ -877,11 +877,9 @@ get next disk device
 target:		disk device manager
 message:	B_REG_NEXT_DISK_DEVICE
 			"cookie":				B_INT32_TYPE
-reply:		standard success
+reply:		standard general result
 			"device":				B_MESSAGE_TYPE
 			"cookie":				B_INT32_TYPE
-on error:	- B_NO_REPLY (fatal)
-			- standard error
 
 message fields:
 - "cookie": An iteration cookie. Initially 0.
@@ -889,9 +887,7 @@ message fields:
 reply fields:
 - "device": Archived BDiskDevice info.
 - "cookie": Next value for the iteration cookie.
-
-error reply fields:
-- "error":
+- "result":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
   - B_ENTRY_NOT_FOUND: Iteration finished.
@@ -906,10 +902,8 @@ message:	B_REG_GET_DISK_DEVICE
 			"device_id":			B_INT32_TYPE
 			| "session_id":			B_INT32_TYPE
 			| "partition_id":		B_INT32_TYPE
-reply:		standard success
+reply:		standard general result
 			"device":				B_MESSAGE_TYPE
-on error:	- B_NO_REPLY (fatal)
-			- standard error
 
 message fields:
 - "device_id": ID of the device to be retrieved.
@@ -918,9 +912,7 @@ message fields:
 
 reply fields:
 - "device": Archived BDiskDevice info.
-
-error reply fields:
-- "error":
+- "result":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
   - B_ENTRY_NOT_FOUND: A device/session/partition with that ID could not
@@ -938,17 +930,17 @@ message:	B_REG_UPDATE_DISK_DEVICE
 			| "partition_id":		B_INT32_TYPE
 			"change_counter":		B_INT32_TYPE
 			"update_policy":		B_INT32_TYPE
-reply:		standard success
+reply:		standard general result
 			"up_to_date":			B_BOOLEAN_TYPE
 			[ "device":				B_MESSAGE_TYPE ]
-on error:	- B_NO_REPLY (fatal)
-			- standard error
 
 message fields:
 - "device_id": ID of the device to be retrieved.
 - "session_id": ID of session whose device shall be retrieved.
 - "partition_id": ID of partition whose device shall be retrieved.
-- "change_counter": Change counter of the object in question.
+- "change_counter": Change counter of the object (or device in case of
+					B_REG_DEVICE_UPDATE_DEVICE_CHANGED update policy) in
+					question.
 - "update_policy": (uint32)
   B_REG_DEVICE_UPDATE_CHECK: Check only, if the object is up to date.
   B_REG_DEVICE_UPDATE_CHANGED: Update only, if the object has changed.
@@ -961,9 +953,7 @@ reply fields:
   B_REG_DEVICE_UPDATE_DEVICE_CHANGED also the device) is already up to date,
   false otherwise.
 - "device": Archived BDiskDevice info.
-
-error reply fields:
-- "error":
+- "result":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
   - B_ENTRY_NOT_FOUND: A device/session/partition with that ID could not
@@ -978,16 +968,14 @@ target:		disk device manager
 message:	B_REG_DEVICE_START_WATCHING
 			"target":	B_MESSENGER_TYPE
 			"events":	B_INT32_TYPE
-reply:		standard success
+reply:		standard general result
 on error:	- B_NO_REPLY (fatal)
 			- standard error
 
 message fields:
 - "target": The target the event messages shall be sent to.
 - "events": Specifies the events the caller is interested in (uint32).
-
-error reply fields:
-- "error":
+- "result":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
   - ...
@@ -999,15 +987,13 @@ stop disk device watching
 target:		disk device manager
 message:	B_REG_DEVICE_STOP_WATCHING
 			"target":	B_MESSENGER_TYPE
-reply:		standard success
+reply:		standard general result
 on error:	- B_NO_REPLY (fatal)
 			- standard error
 
 message fields:
 - "target": The target that shall not longer receive any event messages.
-
-error reply fields:
-- "error":
+- "result":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
   - ...
