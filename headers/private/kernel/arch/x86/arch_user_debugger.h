@@ -61,8 +61,20 @@ enum {
 
 // the EFLAGS flags we need
 enum {
+	X86_EFLAGS_CF	= 0,		// carry flag
+	X86_EFLAGS_PF	= 2,		// parity flag
+	X86_EFLAGS_AF	= 4,		// auxiliary carry flag (adjust flag)
+	X86_EFLAGS_ZF	= 6,		// zero flag
+	X86_EFLAGS_SF	= 7,		// sign flag
 	X86_EFLAGS_TF	= 8,		// trap flag (single stepping)
+	X86_EFLAGS_DF	= 10,		// direction flag
+	X86_EFLAGS_OF	= 11,		// overflow flag
 	X86_EFLAGS_RF	= 16,		// resume flag (skips instruction breakpoint)
+
+	X86_EFLAGS_USER_SETTABLE_FLAGS
+		= (1 << X86_EFLAGS_CF) | (1 << X86_EFLAGS_PF) | (1 << X86_EFLAGS_AF)
+			| (1 << X86_EFLAGS_ZF) | (1 << X86_EFLAGS_SF) | (1 << X86_EFLAGS_DF)
+			| (1 << X86_EFLAGS_OF),
 };
 
 // x86 breakpoint types
