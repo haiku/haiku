@@ -82,4 +82,3 @@ void TreeView::SetTreeViewStatus(bool condition)
 {
 	status = condition;
 }	
-		

@@ -24,4 +24,4 @@ private:
 	BBitmap				*fCheckBmp;
 };
 
-#endif // _MBitmapMenuItem_h 
+#endif // _MBitmapMenuItem_h

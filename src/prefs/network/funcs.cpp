@@ -297,4 +297,4 @@ empty things before setting the new values*/
 //And save some of them
 		fusername = GLOBAL[2];
 	}	
-} 
+}
