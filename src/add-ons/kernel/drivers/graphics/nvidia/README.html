@@ -44,7 +44,9 @@ You use this software at your own risk! Although I don't expect it to damage you
 <ul>
 	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
-	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support.
+	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
+	<li><strong>NV40 architecture cards:</strong> (GeForce 6200 and 6600 at least)<br>
+ 	Secondary analog monitor detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
 </ul>
 <br>
 <hr>
@@ -186,6 +188,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on February 13, 2005)</p>
+<p>(Page last updated on February 17, 2005)</p>
 </body>
 </html>

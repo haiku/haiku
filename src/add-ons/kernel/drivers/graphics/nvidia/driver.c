@@ -606,6 +606,10 @@ static status_t map_device(device_info *di)
 
 	/* get ROM memory mapped base adress - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
+	//fixme?: if (!tmpUlong) try to map the ROM ourselves. Confirmed a PCIe system not
+	//having the ROM mapped on PCI and PCIe cards. Falling back to fetching from ISA
+	//legacy space will get us into trouble if we aren't the primary graphics card!!
+	//(as legacy space always has the primary card's ROM 'mapped'!)
 	if (tmpUlong)
 	{
 		/* ROM was assigned an adress, so enable ROM decoding - see PCI standard */
