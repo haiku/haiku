@@ -2,13 +2,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#ifndef _GRAPHICS_DEFS_H
 #include <GraphicsDefs.h>
-#endif
-
-#ifndef _SUPPORT_DEFS_H
 #include <SupportDefs.h>
-#endif
 
 //See if this takes care of some problems with closing the application
 //by clicking the windowtab
@@ -17,7 +12,6 @@
 //seems to work, 021021
 #define APP_SIGNATURE  "application/x-vnd.obos.styled-edit"
 
-const float MENU_BAR_HEIGHT= 19.0;
 const float TEXT_INSET= 3.0;
 
 /*Messages for window registry with application*/
@@ -73,8 +67,4 @@ const uint32 DISABLE_ITEMS				='DIit';
 const uint32 CHANGE_WINDOW				='CHwi'; 
 const uint32 TEXT_CHANGED				='TEch';
 
-
-#endif
-
-
-
+#endif // CONSTANTS_H

@@ -2,31 +2,33 @@
 #ifndef STYLED_EDIT_APP
 #define STYLED_EDIT_APP
 
-#ifndef _APPLICATION_H
 #include <Application.h>
-#endif
+#include <Message.h>
+#include <FilePanel.h>
 
-#ifndef STYLED_EDIT_WINDOW_H
-#include "StyledEditWindow.h"
-#endif
+class StyledEditWindow;
 
-class StyledEditApp: public BApplication{
-	public:
-						StyledEditApp();
-		virtual void 	MessageReceived(BMessage *message);
-		virtual void	RefsReceived(BMessage *message);
-				int32	NumberOfWindows();
-						  
-		
-	private:
-		BFilePanel			*fOpenPanel;
-		int32				fWindowCount;
-		int32				fNext_Untitled_Window;
+class StyledEditApp
+	: public BApplication
+{
+public:
+					StyledEditApp();
+	virtual void 	MessageReceived(BMessage *message);
+	virtual void	RefsReceived(BMessage *message);
+	virtual void	ReadyToRun();
+
+			int32	NumberOfWindows();
+			void	OpenDocument();
+			void	OpenDocument(entry_ref * ref);
+			void	CloseDocument();
+	
+private:
+	BFilePanel		*fOpenPanel;
+	int32			fWindowCount;
+	int32			fNext_Untitled_Window;
 		
 };
-#endif
 
+extern StyledEditApp * styled_edit_app;
 
-
-
-
+#endif // STYLED_EDIT_APP
