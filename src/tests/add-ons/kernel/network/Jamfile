@@ -48,6 +48,7 @@ Depends userland_network_modules :
 
 	# protocols modules
 	<userland>raw
+	<userland>route
 	<userland>ipv4
 	<userland>icmp
 	<userland>udp
