@@ -16,11 +16,9 @@
 #endif
 #include <util/kernel_cpp.h>
 
-#include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <string.h>
-#include <errno.h>
+
 
 #define TRACE_AMIGA_RDB 0
 #if TRACE_AMIGA_RDB
