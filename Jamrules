@@ -1712,8 +1712,13 @@ rule Filter
 rule SetupKernel
 {
 	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags>;
+	#
+	# <sources_or_objects> - Ideally sources, otherwise HDRSEARCH can not be
+	#                        set for the sources and the sources some header
+	#                        dependencies might be missing.
 
-	local _objs = [ FGristFiles $(1:S=$(SUFOBJ)) ] ;
+	local sources = [ FGristFiles $(1) ] ;
+	local _objs = $(sources:S=$(SUFOBJ)) ;
 
 	#Setup Kernel header directories
 	local public_kernel_includes = add-ons/file_system add-ons/graphics app device drivers kernel storage support ;
@@ -1727,8 +1732,8 @@ rule SetupKernel
 	# The platform dependent headers.
 	headers += $(PLATFORM_HEADERS) ;
 
-	SourceHdrs $(_objs) : $(headers) ;
-	UseArchObjectHeaders $(_objs) : $(OBOS_ARCH) ;
+	SourceHdrs $(sources) : $(headers) ;
+	UseArchObjectHeaders $(sources) : $(OBOS_ARCH) ;
 
 	local object ;
 	for object in $(_objs) {
@@ -1792,13 +1797,13 @@ rule KernelAddon
 	local sources = $(3) ;
 
 	SetupObjectsDir ;
-	Addon $(1) : $(2) : $(3) ;
+	Addon $(1) : $(2) : $(sources) ;
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
 		# ToDo this has to be changed!
-	SetupKernel $(3) ;
+	SetupKernel $(sources) ;
 }
 
 rule KernelMergeObject
