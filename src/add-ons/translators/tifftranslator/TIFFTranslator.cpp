@@ -379,8 +379,11 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 // return B_NO_TRANSLATOR, otherwise, 
 // return B_OK
 status_t
-check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
+check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 {
+	if (!pdetails)
+		return B_BAD_VALUE;
+		
 	try {
 		// Extra Samples are not yet supported
 		if (ifd.HasField(TAG_EXTRA_SAMPLES))
@@ -532,16 +535,16 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			width, height, compression, interpretation, bitsPerPixel);
 		
 		// return read in details if output pointer is supplied
-		if (pdetails) {
-			pdetails->width				= width;
-			pdetails->height			= height;
-			pdetails->compression		= compression;
-			pdetails->rowsPerStrip		= rowsPerStrip;
-			pdetails->stripsPerImage	= stripsPerImage;
-			pdetails->interpretation	= interpretation;
-			pdetails->bitsPerPixel		= bitsPerPixel;
-			pdetails->imageType			= imageType;
+		pdetails->width				= width;
+		pdetails->height			= height;
+		pdetails->compression		= compression;
+		pdetails->rowsPerStrip		= rowsPerStrip;
+		pdetails->stripsPerImage	= stripsPerImage;
+		pdetails->interpretation	= interpretation;
+		pdetails->bitsPerPixel		= bitsPerPixel;
+		pdetails->imageType			= imageType;
 			
+		if (bAllocArrays) {
 			ifd.GetUint32Array(TAG_STRIP_OFFSETS,
 				&pdetails->pstripOffsets);
 			ifd.GetUint32Array(TAG_STRIP_BYTE_COUNTS,
@@ -559,6 +562,74 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 	}
 		
 	return B_OK;
+}
+
+// copy descriptive information about the TIFF image
+// into strname
+void
+copy_tiff_name(char *strname, TiffDetails *pdetails, swap_action swp)
+{
+	if (!strname || !pdetails)
+		return;
+		
+	strcpy(strname, "TIFF Image (");
+	
+	// byte order
+	if (swp == B_SWAP_BENDIAN_TO_HOST)
+		strcat(strname, "Big, ");
+	else
+		strcat(strname, "Little, ");
+		
+	// image type
+	const char *strtype = NULL;
+	switch (pdetails->imageType) {
+		case TIFF_BILEVEL:
+			if (pdetails->bitsPerPixel == 1)
+				strtype = "Mono, ";
+			else
+				strtype = "Gray, ";
+			break;
+		case TIFF_PALETTE:
+			strtype = "Palette, ";
+			break;
+		case TIFF_RGB:
+			strtype = "RGB, ";
+			break;
+		case TIFF_CMYK:
+			strtype = "CMYK, ";
+			break;
+		default:
+			strtype = "??, ";
+			break;
+	}
+	strcat(strname, strtype);
+	
+	// compression
+	const char *strcomp = NULL;
+	switch (pdetails->compression) {
+		case COMPRESSION_NONE:
+			strcomp = "None)";
+			break;
+		case COMPRESSION_HUFFMAN:
+			strcomp = "Huffman)";
+			break;
+		case COMPRESSION_T4:
+			strcomp = "Group 3)";
+			break;
+		case COMPRESSION_T6:
+			strcomp = "Group 4)";
+			break;
+		case COMPRESSION_LZW:
+			strcomp = "LZW)";
+			break;
+		case COMPRESSION_PACKBITS:
+			strcomp = "PackBits)";
+			break;	
+		default:
+			strcomp = "??)";
+			break;
+	}
+	strcat(strname, strcomp);
 }
 
 status_t
@@ -593,16 +664,27 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 	
 	// Check the required fields
 	if (initcheck == B_OK) {
-		if (outInfo) {
+			
+		bool bAllocArrays = true;
+		TiffDetails localdetails;
+		if (!pdetails) {
+			bAllocArrays = false;
+			pdetails = &localdetails;
+		}
+		status_t result;
+		result = check_tiff_fields(ifd, pdetails, bAllocArrays);
+		
+		if (result == B_OK && outInfo) {
 			outInfo->type = B_TIFF_FORMAT;
 			outInfo->group = B_TRANSLATOR_BITMAP;
 			outInfo->quality = TIFF_IN_QUALITY;
 			outInfo->capability = TIFF_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/tiff");
-			strcpy(outInfo->name, "TIFF Image");
+			
+			copy_tiff_name(outInfo->name, pdetails, swp);
 		}
 		
-		return check_tiff_fields(ifd, pdetails);
+		return result;
 	}
 		
 	if (initcheck != B_ERROR && initcheck != B_NO_MEMORY)
