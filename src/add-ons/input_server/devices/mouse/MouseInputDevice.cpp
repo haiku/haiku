@@ -30,6 +30,11 @@
 #include <unistd.h>
 
 const static uint32 kGetMouseMovements = 10099;
+const static uint32 kGetMouseAccel = 10101;
+const static uint32 kSetMouseAccel = 10102;
+const static uint32 kSetMouseType = 10104;
+const static uint32 kSetMouseMap = 10106;
+const static uint32 kSetClickSpeed = 10108;
 
 struct mouse_movement {
   int32 ser_fd_index;
@@ -51,14 +56,15 @@ instantiate_input_device()
 
 
 MouseInputDevice::MouseInputDevice()
+	: 	fThread(-1),
+		fQuit(false)
 {
-	fQuit = false;
 	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
 	if (fFd >= 0)
 		fThread = spawn_thread(DeviceWatcher, "mouse watcher thread",
 			B_NORMAL_PRIORITY, this);
 	
-	fLogFile = fopen("/boot/home/device_log.log", "w");	
+	fLogFile = fopen("/boot/home/device_log.log", "w");
 }
 
 
@@ -77,8 +83,48 @@ MouseInputDevice::~MouseInputDevice()
 
 
 status_t
+MouseInputDevice::InitFromSettings(uint32 opcode)
+{
+	// retrieve current values
+
+	if (get_mouse_map(&fSettings.map)!=B_OK)
+		fprintf(stderr, "error when get_mouse_map\n");
+	else
+		ioctl(fFd, kSetMouseMap, &fSettings.map);
+		
+	if (get_click_speed(&fSettings.click_speed)!=B_OK)
+		fprintf(stderr, "error when get_click_speed\n");
+	else
+		ioctl(fFd, kSetClickSpeed, &fSettings.click_speed);
+		
+	if (get_mouse_speed(&fSettings.accel.speed)!=B_OK)
+		fprintf(stderr, "error when get_mouse_speed\n");
+	else {
+		if (get_mouse_acceleration(&fSettings.accel.accel_factor)!=B_OK)
+			fprintf(stderr, "error when get_mouse_acceleration\n");
+		else {
+			mouse_accel accel;
+			ioctl(fFd, kGetMouseAccel, &accel);
+			accel.speed = fSettings.accel.speed;
+			accel.accel_factor = fSettings.accel.accel_factor;
+			ioctl(fFd, kSetMouseAccel, &fSettings.accel);
+		}
+	}
+	
+	if (get_mouse_type(&fSettings.type)!=B_OK)
+		fprintf(stderr, "error when get_mouse_type\n");
+	else
+		ioctl(fFd, kSetMouseType, &fSettings.type);
+
+	return B_OK;
+}
+
+
+status_t
 MouseInputDevice::InitCheck()
 {
+	InitFromSettings();
+	
 	input_device_ref mouse1 = { "Mouse 1", B_POINTING_DEVICE, (void *)this };
 		
 	input_device_ref *devices[2] = { &mouse1, NULL };
@@ -119,6 +165,20 @@ MouseInputDevice::Control(const char *name, void *cookie,
 						  uint32 command, BMessage *message)
 {
 	fputs("Control()\n", fLogFile);
+
+	if (command == B_NODE_MONITOR)
+		HandleMonitor(message);
+	else if (command >= B_MOUSE_TYPE_CHANGED 
+		&& command <= B_MOUSE_ACCELERATION_CHANGED) {
+		InitFromSettings(command);
+	}
+	return B_OK;
+}
+
+
+status_t 
+MouseInputDevice::HandleMonitor(BMessage *message)
+{
 	return B_OK;
 }
 
