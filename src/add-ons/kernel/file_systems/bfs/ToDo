@@ -1,4 +1,4 @@
-BFS - ToDo, December 6th, 2002
+BFS - ToDo, March 13th, 2003
 -----
 
 BlockAllocator
@@ -13,6 +13,7 @@ DataStream
 
  - only files are trimmed back (in bfs_close()), but every inode has a preallocated stream...
  - Inode::GrowStream(): merging of block_runs doesn't work between range/block boundaries
+ - check the array block size in BFS for different block sizes
 
 
 Queries
