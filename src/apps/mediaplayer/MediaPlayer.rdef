@@ -31,14 +31,16 @@ resource app_flags B_SINGLE_LAUNCH;
    "types" = ....   
    */
 
+// all these are official: 
+// http://www.iana.org/assignments/media-types/
+
 resource file_types message {
 	"types" = "application/ogg",
 	"types" = "audio",
-	"types" = "audio/aiff",
-	"types" = "audio/riff",
-	"types" = "audio/wav",
+	"types" = "audio/32kadpcm",
+	"types" = "audio/basic",
+	"types" = "audio/mpeg",
 	"types" = "audio/x-aiff",
-	"types" = "audio/x-mpeg",
 	"types" = "audio/x-riff",
 	"types" = "audio/x-wav",
 	"types" = "video",
