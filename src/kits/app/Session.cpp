@@ -2,35 +2,38 @@
 #include <malloc.h>
 #include <stdio.h>
 
-//extern BSession *main_session = NULL;
+#ifdef DEBUG_BSESSION
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 
 //------------------------------------------------------------------------------
-BSession::BSession(port_id receivePort, port_id sendPort, bool isPortLink)
+BSession::BSession(port_id receivePort, port_id sendPort)
 {
 	fSendPort		= sendPort;
 	fReceivePort	= receivePort;
 
-	fSendCode			= 0;
+	fSendCode			= AS_SERVER_SESSION;
 	fSendBuffer			= NULL;
-	fSendPosition		= 4;
+	fSendPosition		= 0;
 
 	fReceiveBuffer		= NULL;
 	fReceiveSize		= 1024;
 	fReceivePosition	= 1024;
 
-	if ( !isPortLink ){
-		fSendBuffer			= (char*)malloc(1024);
-		fReceiveBuffer		= (char*)malloc(1024);
-	}
+	fSendBuffer			= (char*)malloc(1024);
+	fReceiveBuffer		= (char*)malloc(1024);
 }
 //------------------------------------------------------------------------------
 BSession::BSession( const BSession &ses){
 	fSendPort		= ses.fSendPort;
 	fReceivePort	= ses.fReceivePort;
 
-	fSendCode			= 0;
+	fSendCode			= AS_SERVER_SESSION;
 	fSendBuffer			= NULL;
-	fSendPosition		= 4;
+	fSendPosition		= 0;
 
 	fReceiveBuffer		= NULL;
 	fReceiveSize		= 1024;
@@ -52,157 +55,150 @@ void BSession::SetSendPort( port_id port ){
 void BSession::SetRecvPort( port_id port ){
 	fReceivePort	= port;
 }
-//------------------------------------------------------------------------------
-bool BSession::DropInputBuffer(void){
-	// doesn't matter their value, they just need to be equal.
-	fReceiveSize		= 1024;
-	fReceivePosition	= 1024;
-	return true;
-}
-//------------------------------------------------------------------------------
+//------------DO NOT USE!-------------------------------------------------------
 void BSession::SetMsgCode(int32 code){
 	fSendCode=code;
 }
 //------------------------------------------------------------------------------
-char *BSession::ReadString(){
+char* BSession::ReadString(){
 	int16		len = 0;
 	char		*str = NULL;
 
-	if ( ReadData( &len, sizeof(int16)) != B_OK )
-		return NULL;
+	ReadData( &len, sizeof(int16));
 
-	if (len){
+	if (len > 0){
 		str = (char*)malloc(len);
-		if ( ReadData(str, len) != B_OK ){
-			delete str;
-			str		= NULL;
-		}
+		ReadData(str, len);
 	}
-
 	return str;
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadBool( bool* b ){
-	return ReadData( b, sizeof(bool) );
+void BSession::ReadBool( bool* b ){
+	ReadData( b, sizeof(bool) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadInt8( int8* i ){
-	return ReadData( i, sizeof(int8) );
+void BSession::ReadInt8( int8* i ){
+	ReadData( i, sizeof(int8) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadUInt8( uint8* i ){
-	return ReadData( i, sizeof(uint8) );
+void BSession::ReadUInt8( uint8* i ){
+	ReadData( i, sizeof(uint8) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadInt16( int16* i ){
-	return ReadData( i, sizeof(int16) );
+void BSession::ReadInt16( int16* i ){
+	ReadData( i, sizeof(int16) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadUInt16( uint16* i ){
-	return ReadData( i, sizeof(uint16) );
+void BSession::ReadUInt16( uint16* i ){
+	ReadData( i, sizeof(uint16) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadInt32( int32* i ){
-	return ReadData( i, sizeof(int32) );
+void BSession::ReadInt32( int32* i ){
+	ReadData( i, sizeof(int32) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadUInt32( uint32* i ){
-	return ReadData( i, sizeof(uint32) );
+void BSession::ReadUInt32( uint32* i ){
+	ReadData( i, sizeof(uint32) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadInt64( int64* i ){
-	return ReadData( i, sizeof(int64) );
+void BSession::ReadInt64( int64* i ){
+	ReadData( i, sizeof(int64) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadUInt64( uint64* i ){
-	return ReadData( i, sizeof(uint64) );
+void BSession::ReadUInt64( uint64* i ){
+	ReadData( i, sizeof(uint64) );
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadFloat(float *f)
+void BSession::ReadFloat(float *f)
 {
-	return ReadData(f, sizeof(float));
+	ReadData(f, sizeof(float));
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadFloatFromInt(float *f)
+void BSession::ReadFloatFromInt32(float *f)
 {
 	int32 i;
-	status_t rv;
-	rv = ReadData( &i, sizeof(int32));
+	ReadData( &i, sizeof(int32));
 	*f = (float)i;
-	return rv;
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadDouble(double *d)
+void BSession::ReadDouble(double *d)
 {
-	return ReadData(d, sizeof(double));
+	ReadData(d, sizeof(double));
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadDoubleFromInt(double *d)
+void BSession::ReadDoubleFromInt64(double *d)
 {
 	int64 i;
-	status_t rv;
-	rv = ReadData( &i, sizeof(int64));
+	ReadData( &i, sizeof(int64));
 	*d = (double)i;
-	return rv;
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadPoint(BPoint *point)
+void BSession::ReadPoint(BPoint *point)
 {
-	return ReadData( point, sizeof(BPoint));
+	ReadData( point, sizeof(BPoint));
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadPointFromInts(BPoint *point)
+void BSession::ReadPointFromInts(BPoint *point)
 {
 	int32 ipoint[2];
-	status_t rv;
-	rv = ReadData( &ipoint, 2 * sizeof(int32));
+	ReadData( &ipoint, 2 * sizeof(int32));
 	point->x = (float)ipoint[0];
 	point->y = (float)ipoint[1];
-	return rv;
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadRectCR(clipping_rect *rect)
+void BSession::ReadRectCR(clipping_rect *rect)
 {
-	return ReadData( rect, sizeof(clipping_rect));
+	ReadData( rect, sizeof(clipping_rect));
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadRect(BRect *rect)
+void BSession::ReadRect(BRect *rect)
 {
-	return ReadData( rect, sizeof(BRect));
+	ReadData( rect, sizeof(BRect));
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadRectFromInts(BRect *rect)
+void BSession::ReadRectFromInts(BRect *rect)
 {
 	int32 irect[4];
-	status_t rv;
-	rv = ReadData( irect, 4 * sizeof(int32));
+	ReadData( irect, 4 * sizeof(int32));
 	rect->left = (float)irect[0];
 	rect->top = (float)irect[1];
 	rect->right = (float)irect[2];
 	rect->bottom = (float)irect[3];
-	return rv;
 }
 //------------------------------------------------------------------------------
-status_t BSession::ReadData( void *data, int32 size)
+void BSession::ReadData( void *data, int32 size)
 {
+		// 0 = no receive port - Don't try to receive any data
 	if ( fReceivePort == 0 )
-		return B_BAD_VALUE;
+		return;
 
 	while (size > 0)
 	{
 		while (fReceiveSize == fReceivePosition)
 		{
-			int32 		fRecvCode;
-			status_t	rv;
-			while( (rv = port_buffer_size(fReceivePort) ) == B_WOULD_BLOCK);
+			ssize_t			portSize;
+			portSize		= port_buffer_size(fReceivePort);
+			if (portSize == B_BAD_PORT_ID)
+				return;
+			else
+				fReceiveSize= portSize > 1024? 1024: portSize;
+
+			ssize_t			rv;
+			do{
+				rv = read_port(fReceivePort, &fRecvCode, fReceiveBuffer, 1024);
+#ifdef DEBUG_BSESSION
+				if (fRecvCode != AS_SERVER_SESSION){
+					printf("BSession received a code DIFFERENT from AS_SERVER_SESSION. ");
+					printf("offset: %ld", fRecvCode - SERVER_TRUE);
+				}
+				printf("did read something...\n");
+#endif
+			}while( fRecvCode != AS_SERVER_SESSION );
 					
-			rv=read_port(fReceivePort, &fRecvCode, fReceiveBuffer, 1024);
-			
-			if ( rv == B_BAD_PORT_ID )
-				return B_BAD_PORT_ID;
-			
 			fReceivePosition = 0;
-			fReceiveSize = rv;
+
+			if ( rv == B_BAD_PORT_ID )
+				return;
 		}
 
 		int32 copySize = fReceiveSize - fReceivePosition;
@@ -220,138 +216,137 @@ status_t BSession::ReadData( void *data, int32 size)
 		size -= copySize;
 		fReceivePosition += copySize;
 	}
-	return B_OK;
 }
 
 //------------------------------------------------------------------------------
-status_t BSession::WriteString(const char *string)
+void BSession::WriteString(const char *string)
 {
 	int16 len = (int16)strlen(string);
 	len++;
 
 	WriteData(&len, sizeof(int16));
-	return WriteData(string, len);
+	WriteData(string, len);
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteBool(const bool& b)
+void BSession::WriteBool(const bool& b)
 {
-	return WriteData(&b, sizeof(bool));
+	WriteData(&b, sizeof(bool));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteInt8(const int8& i)
+void BSession::WriteInt8(const int8& i)
 {
-	return WriteData(&i, sizeof(int8));
+	WriteData(&i, sizeof(int8));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteUInt8(const uint8& i)
+void BSession::WriteUInt8(const uint8& i)
 {
-	return WriteData(&i, sizeof(uint8));
+	WriteData(&i, sizeof(uint8));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteInt16(const int16& i)
+void BSession::WriteInt16(const int16& i)
 {
-	return WriteData(&i, sizeof(int16));
+	WriteData(&i, sizeof(int16));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteUInt16(const uint16& i)
+void BSession::WriteUInt16(const uint16& i)
 {
-	return WriteData(&i, sizeof(uint16));
+	WriteData(&i, sizeof(uint16));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteInt32(const int32& i)
+void BSession::WriteInt32(const int32& i)
 {
-	return WriteData(&i, sizeof(int32));
+	WriteData(&i, sizeof(int32));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteUInt32(const uint32& i)
+void BSession::WriteUInt32(const uint32& i)
 {
-	return WriteData(&i, sizeof(uint32));
+	WriteData(&i, sizeof(uint32));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteInt64(const int64& i)
+void BSession::WriteInt64(const int64& i)
 {
-	return WriteData(&i, sizeof(int64));
+	WriteData(&i, sizeof(int64));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteUInt64(const uint64& i)
+void BSession::WriteUInt64(const uint64& i)
 {
-	return WriteData(&i, sizeof(uint64));
+	WriteData(&i, sizeof(uint64));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteFloat(const float& f)
+void BSession::WriteFloat(const float& f)
 {
-	return WriteData(&f, sizeof(float));
+	WriteData(&f, sizeof(float));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteFloatAsInt(const float& f)
+void BSession::WriteFloatAsInt32(const float& f)
 {
 	int32 i;
 	i = (int32)f;
-	return WriteData(&i, sizeof(int32));
+	WriteData(&i, sizeof(int32));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteDouble(const double& d)
+void BSession::WriteDouble(const double& d)
 {
-	return WriteData(&d, sizeof(double));
+	WriteData(&d, sizeof(double));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteDoubleAsInt(const double& d)
+void BSession::WriteDoubleAsInt64(const double& d)
 {
 	int64 i;
 	i = (int64)d;
-	return WriteData(&i, sizeof(int64));
+	WriteData(&i, sizeof(int64));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WritePoint(const BPoint& point)
+void BSession::WritePoint(const BPoint& point)
 {
-	return WriteData(&point, sizeof(BPoint));
+	WriteData(&point, sizeof(BPoint));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WritePointAsInt(const BPoint& point)
+void BSession::WritePointAsInt32s(const BPoint& point)
 {
 	int32 ipoint[2];
 	ipoint[0] = (int32)point.x;
 	ipoint[1] = (int32)point.y;
-	return WriteData(ipoint, 2 * sizeof(int32));
+	WriteData(ipoint, 2 * sizeof(int32));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteRect(const clipping_rect& rect)
+void BSession::WriteRect(const clipping_rect& rect)
 {
-	return WriteData(&rect, sizeof(clipping_rect));
+	WriteData(&rect, sizeof(clipping_rect));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteRectAsInt(const BRect& rect)
+void BSession::WriteRectAsInt32s(const BRect& rect)
 {
 	int32 irect[4];
 	irect[0] = (int32)floor(rect.left);
 	irect[1] = (int32)floor(rect.top);
 	irect[2] = (int32)floor(rect.right);
 	irect[3] = (int32)floor(rect.bottom);
-	return WriteData(&irect, 4 * sizeof(int32));
+	WriteData(&irect, 4 * sizeof(int32));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteRect(const BRect& rect)
+void BSession::WriteRect(const BRect& rect)
 {
-	return WriteData(&rect, sizeof(BRect));
+	WriteData(&rect, sizeof(BRect));
 }
 //------------------------------------------------------------------------------
-status_t BSession::WriteData(const void *data, int32 size)
+void BSession::WriteData(const void *data, int32 size)
 {
+		// 0 = no send port - Don't send any data
 	if ( fSendPort == 0 )
-		return B_BAD_VALUE;
+		return;
 
 	if (size <= 0)
-		return B_BAD_VALUE;
+		return;
   
 	if (1024 - fSendPosition > size)
 	{
 		memcpy(fSendBuffer + fSendPosition, data, size);
 		fSendPosition += size;
-		return B_OK;
+		return;
 	}
 
-	status_t	rv = B_OK;
-	status_t	temp_rv;
+	status_t	rv;
 	do
 	{
 		int32 copySize = 1024 - fSendPosition;
@@ -370,35 +365,27 @@ status_t BSession::WriteData(const void *data, int32 size)
 		fSendPosition += copySize;
 
 		if (fSendPosition != 1024)
-			return B_OK;
+			return;
 
-		*((int32*)fSendBuffer) = fSendPosition;
-		while( (temp_rv = write_port(fSendPort, fSendCode, fSendBuffer,
-			fSendPosition)) == B_WOULD_BLOCK);
-			
-		if (temp_rv != B_OK)
-			rv	= temp_rv;
+		rv = write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
+		
+		fSendPosition = 0;
 
-		fSendPosition = 4;
+		if (rv == B_BAD_PORT_ID)
+			return;
+
 	} while (size > 0);
-
-	return rv;
 }
 //------------------------------------------------------------------------------
-status_t BSession::Sync()
+void BSession::Sync()
 {
-	if (fSendPosition <= 4)
-		return B_OK;
+	if (fSendPosition <= 0)
+		return;
 	
 	status_t	rv;
-
-	*(int32*)fSendBuffer = fSendCode;
-	while( (rv = write_port(fSendPort, fSendCode, fSendBuffer,
-		fSendPosition)) == B_WOULD_BLOCK);
-	
-	fSendPosition = 4;
-	
-	return rv;
+	rv = write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
+		
+	fSendPosition = 0;
 }
 //------------------------------------------------------------------------------
 void BSession::Close()
@@ -406,4 +393,23 @@ void BSession::Close()
 	Sync();
 	delete this;	
 }
-//------------------------------------------------------------------------------
+//------------------if possible - no dot use!-----------------------------------
+void BSession::CopyToSendBuffer(void* buffer, int32 count){
+// Note: 'count' is there because of future modifications to PortLink class
+	int32		code;
+	int32		size;
+
+	// be compatible with ANSI C++ standard... ufff
+	uint8		*buf;
+	buf			= (uint8*)buffer;
+	
+	code		= *((int32*)buf);
+	size		= *((int32*)(buf+sizeof(int32)));
+	//size		= count;
+
+	*((int32*)fSendBuffer)	= code;
+	fSendPosition			= sizeof(int32); // = 4
+
+	memcpy(fSendBuffer + sizeof(int32), buf + 2*sizeof(int32), size > 1020? 1020 : size);
+	fSendPosition			+= size > 1020? 1020 : size;
+}
