@@ -66,9 +66,9 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 
 	// Add the "Mouse Type" pop up menu
 	fTypeMenu = new BPopUpMenu("unknown");
-	fTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(POPUP_MOUSE_TYPE)));
-	fTypeMenu->AddItem(new BMenuItem("2-Button", new BMessage(POPUP_MOUSE_TYPE)));
-	fTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(POPUP_MOUSE_TYPE)));
+	fTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(kMsgMouseType)));
+	fTypeMenu->AddItem(new BMenuItem("2-Button", new BMessage(kMsgMouseType)));
+	fTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(kMsgMouseType)));
 
 	BMenuField *field = new BMenuField(BRect(7, 8, 155, 190), "mouse_type", "Mouse type:", fTypeMenu);
 	field->ResizeToPreferred();
@@ -89,7 +89,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 		B_WARP_MOUSE, B_INSTANT_WARP_MOUSE};
 
 	for (int i = 0; i < 4; i++) {
-		BMessage *message = new BMessage(POPUP_MOUSE_FOCUS);
+		BMessage *message = new BMessage(kMsgMouseFocusMode);
 		message->AddInt32("mode", focusModes[i]);
 
 		fFocusMenu->AddItem(new BMenuItem(focusLabels[i], message));
@@ -104,7 +104,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	// Create the "Double-click speed slider...
 	frame.Set(166, 11, 328, 50);
 	fClickSpeedSlider = new BSlider(frame, "double_click_speed", "Double-click speed", 
-		new BMessage(SLIDER_DOUBLE_CLICK_SPEED), 0, 1000);
+		new BMessage(kMsgDoubleClickSpeed), 0, 1000);
 	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fClickSpeedSlider->SetHashMarkCount(5);
 	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
@@ -113,7 +113,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	// Create the "Mouse Speed" slider...
 	frame.Set(166,76,328,125);
 	fMouseSpeedSlider = new BSlider(frame, "mouse_speed", "Mouse Speed", 
-		new BMessage(SLIDER_MOUSE_SPEED), 0, 1000);
+		new BMessage(kMsgMouseSpeed), 0, 1000);
 	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMouseSpeedSlider->SetHashMarkCount(7);
 	fMouseSpeedSlider->SetLimitLabels("Slow", "Fast");
@@ -122,7 +122,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	// Create the "Mouse Acceleration" slider...
 	frame.Set(166, 141, 328, 190);
 	fAccelerationSlider = new BSlider(frame, "mouse_acceleration", "Mouse Acceleration", 
-		new BMessage(SLIDER_MOUSE_ACC), 0, 1000);
+		new BMessage(kMsgAccelerationFactor), 0, 1000);
 	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAccelerationSlider->SetHashMarkCount(5);
 	fAccelerationSlider->SetLimitLabels("Slow", "Fast");

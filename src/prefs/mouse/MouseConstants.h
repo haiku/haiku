@@ -19,20 +19,16 @@
 #define MOUSE_CONSTANTS_H
 
 // interface messages
-const uint32 BUTTON_DEFAULTS			= 'BTde';
-const uint32 BUTTON_REVERT				= 'BTre';
+const uint32 kMsgDefaults			= 'BTde';
+const uint32 kMsgRevert				= 'BTre';
 
-const uint32 POPUP_MOUSE_TYPE			= 'PUmt';
-const uint32 POPUP_MOUSE_FOCUS			= 'PUmf';
-const uint32 POPUP_MOUSE_MAP			= 'PUmm';
+const uint32 kMsgMouseType			= 'PUmt';
+const uint32 kMsgMouseFocusMode		= 'PUmf';
+const uint32 kMsgMouseMap			= 'PUmm';
 
-const uint32 DOUBLE_CLICK_TEST_AREA		= 'TCte';
-
-const uint32 SLIDER_DOUBLE_CLICK_SPEED	= 'SLdc';
-const uint32 SLIDER_MOUSE_SPEED			= 'SLms';
-const uint32 SLIDER_MOUSE_ACC			= 'SLma';
-
-const uint32 ERROR_DETECTED				= 'ERor';
+const uint32 kMsgDoubleClickSpeed	= 'SLdc';
+const uint32 kMsgMouseSpeed			= 'SLms';
+const uint32 kMsgAccelerationFactor	= 'SLma';
 
 // user interface
 const uint32 kBorderSpace = 10;

@@ -126,7 +126,7 @@ MouseView::MouseDown(BPoint where)
 	button = ConvertFromVisualOrder(button);
 
 	BPopUpMenu menu("Mouse Map Menu");
-	BMessage message(POPUP_MOUSE_MAP);
+	BMessage message(kMsgMouseMap);
 	message.AddInt32("button", button);
 
 	menu.AddItem(new BMenuItem("1", new BMessage(message)));

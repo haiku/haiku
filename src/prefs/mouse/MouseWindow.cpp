@@ -48,13 +48,13 @@ MouseWindow::MouseWindow(BRect rect)
 	// Add the "Default" button
 	BRect rect(kBorderSpace, fSettingsView->Frame().bottom + kItemSpace + 2,
 		kBorderSpace + 75, fSettingsView->Frame().bottom + 20);
-	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(BUTTON_DEFAULTS));
+	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
 	button->ResizeToPreferred();
 	view->AddChild(button);
 
 	// Add the "Revert" button
 	rect.OffsetBy(button->Bounds().Width() + kItemSpace, 0);
-	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(BUTTON_REVERT));
+	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 	view->AddChild(fRevertButton);
 
@@ -81,7 +81,7 @@ void
 MouseWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case BUTTON_DEFAULTS: {
+		case kMsgDefaults: {
 			// reverts to default settings
 			fSettings.Defaults();
 			fSettingsView->UpdateFromSettings();
@@ -90,7 +90,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case BUTTON_REVERT: {
+		case kMsgRevert: {
 			// revert to last settings
 			fSettings.Revert();
 			fSettingsView->UpdateFromSettings();
@@ -99,7 +99,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case POPUP_MOUSE_TYPE:
+		case kMsgMouseType:
 		{
 			int32 type;
 			if (message->FindInt32("index", &type) == B_OK) {
@@ -110,7 +110,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case POPUP_MOUSE_FOCUS:
+		case kMsgMouseFocusMode:
 		{
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
@@ -120,7 +120,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case SLIDER_DOUBLE_CLICK_SPEED:
+		case kMsgDoubleClickSpeed:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
@@ -131,7 +131,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case SLIDER_MOUSE_SPEED:
+		case kMsgMouseSpeed:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
@@ -142,7 +142,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case SLIDER_MOUSE_ACC:
+		case kMsgAccelerationFactor:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
@@ -153,7 +153,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case POPUP_MOUSE_MAP:
+		case kMsgMouseMap:
 		{
 			int32 index;
 			int32 button;
@@ -172,13 +172,6 @@ MouseWindow::MessageReceived(BMessage *message)
 				fSettings.SetMapping(button, mapping);
 				SetRevertable(true);
 			}
-			break;
-		}
-
-		case ERROR_DETECTED: {
-			(new BAlert("Error", "Something has gone wrong!", "OK", NULL, NULL,
-				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT))->Go();
-			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
 
