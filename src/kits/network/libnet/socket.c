@@ -77,7 +77,7 @@ _EXPORT int socket(int family, int type, int protocol)
 		/* also convert AF_INET */
 		if (family == 1)
 			family = AF_INET;
-	};
+	}
 
 	args.u.socket.family = family;
 	args.u.socket.type = type;
@@ -126,12 +126,21 @@ _EXPORT int connect(int sock, const struct sockaddr *addr, int addrlen)
 	struct sockaddr temp;
 	struct stack_driver_args args;
 	
-	if (g_beos_r5_compatibility) {
+	// XXX: HACK! FIXME!
+	// Our DNS resolver uses the new stack codes, but old apps set R5 compatibility.
+	// So, resolving an address AFTER the app opens a socket fails because
+	// connect() thinks we are in compatibility mode and thus translates the
+	// new style address family into the old style (and sockaddr format).
+	// So, we check if the address family is our AF_INET (might indicate that we
+	// are using the new stack mixed with the old one.
+	// We can to solve this problem by making R5 compatibility socket-specific.
+	// This would need a new ioctl() for retrieving the socket mode.
+	if (g_beos_r5_compatibility && addr->sa_family != AF_INET) {
 		convert_from_beos_r5_sockaddr(&temp, addr);
 		addr = &temp;
 		addrlen = sizeof(struct sockaddr_in);
 	}
-
+	
 	args.u.sockaddr.addr = (struct sockaddr *) addr;
 	args.u.sockaddr.addrlen = addrlen;
        	
@@ -160,7 +169,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	new_sock = open(get_stack_driver_path(), O_RDWR);
 	if (new_sock < 0)
 		return new_sock;
-
+	
 	// The network stack driver will need to know to which net_stack_cookie to 
 	// *bind* with the new accepted socket. He can't know himself find out 
 	// the net_stack_cookie of our new_sock file descriptor, the just open() one... 
@@ -170,12 +179,12 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 		close(new_sock); 
 		return rv; 
 	}; 
-
+	
 	args.u.accept.cookie     = cookie; // this way driver can use the right fd/cookie for the new_sock! 		
-		
+	
 	args.u.accept.addr		= g_beos_r5_compatibility ? &temp : addr;
 	args.u.accept.addrlen	= g_beos_r5_compatibility ? sizeof(temp) : *addrlen;
-       	
+	
 	rv = ioctl(sock, NET_STACK_ACCEPT, &args, sizeof(args));
 	if (rv < 0) { 
 		close(new_sock); 
@@ -187,7 +196,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 		*addrlen = sizeof(struct beosr5_sockaddr_in);
 	} else
 		*addrlen = args.u.accept.addrlen;
-
+	
 	return new_sock;
 }
 
@@ -199,9 +208,9 @@ _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
 	struct msghdr mh;
 	struct iovec iov;
 	int rv;
-
+	
 	/* XXX - would this be better done as scatter gather? */	
-	mh.msg_name = g_beos_r5_compatibility ?  (caddr_t)&temp : (caddr_t)addr;
+	mh.msg_name = g_beos_r5_compatibility ? (caddr_t)&temp : (caddr_t)addr;
 	mh.msg_namelen = g_beos_r5_compatibility ? sizeof(temp) : addrlen ? *addrlen : 0;
 	mh.msg_flags = flags;
 	mh.msg_control = NULL;
@@ -210,11 +219,11 @@ _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
 	iov.iov_len = buflen;
 	mh.msg_iov = &iov;
 	mh.msg_iovlen = 1;
-
+	
 	rv = ioctl(sock, NET_STACK_RECVFROM, &mh, sizeof(mh));
 	if (rv < 0)
 		return rv;
-		
+	
 	if (g_beos_r5_compatibility && addr)
 		convert_to_beos_r5_sockaddr(addr, &temp);
 	
@@ -224,7 +233,7 @@ _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
 		else
 			*addrlen = mh.msg_namelen;
 	}
-		
+	
 	return rv;
 }
 
@@ -234,13 +243,14 @@ _EXPORT ssize_t sendto(int sock, const void *buffer, size_t buflen, int flags,
 	struct sockaddr temp;
 	struct msghdr mh;
 	struct iovec iov;
-
-	if (g_beos_r5_compatibility) {
+	
+	// XXX: DNS HACK!
+	if (g_beos_r5_compatibility && addr->sa_family != AF_INET) {
 		convert_from_beos_r5_sockaddr(&temp, addr);
 		addr = &temp;
 		addrlen = sizeof(struct sockaddr_in);
 	}
-
+	
 	/* XXX - would this be better done as scatter gather? */	
 	mh.msg_name = (caddr_t)addr;
 	mh.msg_namelen = addrlen;
@@ -251,7 +261,7 @@ _EXPORT ssize_t sendto(int sock, const void *buffer, size_t buflen, int flags,
 	iov.iov_len = buflen;
 	mh.msg_iov = &iov;
 	mh.msg_iovlen = 1;
-
+	
 	return ioctl(sock, NET_STACK_SENDTO, &mh, sizeof(mh));
 }
 
@@ -389,7 +399,7 @@ _EXPORT int getsockname(int sock, struct sockaddr *addr, int *addrlen)
 		*addrlen = sizeof(struct beosr5_sockaddr_in);
 	} else
 		*addrlen = args.u.sockaddr.addrlen;
-
+	
 	return rv;
 }
 
