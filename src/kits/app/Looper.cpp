@@ -773,7 +773,8 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 //------------------------------------------------------------------------------
 status_t BLooper::GetSupportedSuites(BMessage* data)
 {
-	status_t err;
+	status_t err = B_OK;
+	
 	if (!data)
 	{
 		err = B_BAD_VALUE;
