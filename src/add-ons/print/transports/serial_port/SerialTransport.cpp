@@ -1,5 +1,5 @@
 /*****************************************************************************/
-// Parallel port transport add-on.
+// Serial port transport add-on.
 //
 // Author
 //   Michael Pfeiffer
@@ -8,7 +8,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001,2002 OpenBeOS Project
+// Copyright (c) 2001-2003 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -37,32 +37,33 @@
 
 #include "PrintTransportAddOn.h"
 
-class ParallelPort : public BDataIO {
-	int fFile;
-	
+class SerialTransport : public BDataIO {
 public:
-	ParallelPort(BDirectory* printer, BMessage* msg);
-	~ParallelPort();
+	SerialTransport(BDirectory* printer, BMessage* msg);
+	~SerialTransport();
 
 	status_t InitCheck() { return fFile > -1 ? B_OK : B_ERROR; }
 
 	ssize_t Read(void* buffer, size_t size);
 	ssize_t Write(const void* buffer, size_t size);
+
+private:
+	int fFile;
 };
 
-// Impelmentation of ParallelPort
-ParallelPort::ParallelPort(BDirectory* printer, BMessage* msg) 
+// Impelmentation of SerialTransport
+SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg) 
 	: fFile(-1)
 {
 	char address[80];
 	char device[B_PATH_NAME_LENGTH];
 	bool bidirectional = true;
-	
+
 	unsigned int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
 	if (size <= 0 || size >= sizeof(address)) return;
 	address[size] = 0; // make sure string is 0-terminated
 		
-	strcat(strcpy(device, "/dev/parallel/"), address);
+	strcat(strcpy(device, "/dev/ports/"), address);
 	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
 	if (fFile < 0) {
 		// Try unidirectional access mode
@@ -76,33 +77,35 @@ ParallelPort::ParallelPort(BDirectory* printer, BMessage* msg)
 	if (! msg)
 		// Caller don't care about transport init message output content...
 		return;
-	
+
+	msg->what = 'okok';
 	msg->AddBool("bidirectional", bidirectional);
-	msg->AddString("_parallel/DeviceName", device);
+	msg->AddString("_serial/DeviceName", device);
+
 }
 
-ParallelPort::~ParallelPort() {
-	if (InitCheck() == B_OK) {
+SerialTransport::~SerialTransport()
+{
+	if (InitCheck() == B_OK)
 		close(fFile);
-		fFile = -1;
-	}
 }
 
-ssize_t ParallelPort::Read(void* buffer, size_t size) {
+ssize_t SerialTransport::Read(void* buffer, size_t size)
+{
 	return read(fFile, buffer, size);
 }
 
-ssize_t ParallelPort::Write(const void* buffer, size_t size) {
+ssize_t SerialTransport::Write(const void* buffer, size_t size)
+{
 	return write(fFile, buffer, size);
 }
 
-BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
-	ParallelPort* transport = new ParallelPort(printer, msg);
-	if (transport->InitCheck() == B_OK) {
-		if (msg)
-			msg->what = 'okok';
+BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg)
+{
+	SerialTransport* transport = new SerialTransport(printer, msg);
+	if (transport->InitCheck() == B_OK)
 		return transport;
-	} else {
-		delete transport; return NULL;
-	}
+
+	delete transport;
+	return NULL;
 }

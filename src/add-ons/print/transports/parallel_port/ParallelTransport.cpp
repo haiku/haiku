@@ -1,18 +1,14 @@
 /*****************************************************************************/
-// Usb port transport add-on,
-// changes by Andreas Benzler, Philippe Houdoin
-//
-// Original from Parallel 
-// port transport add-on.
+// Parallel port transport add-on.
 //
 // Author
 //   Michael Pfeiffer
-// 
+//
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001-2004 OpenBeOS Project
+// Copyright (c) 2001,2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -33,122 +29,82 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-
-#include <stdio.h>
 #include <unistd.h>
-#include <string.h>
+#include <stdio.h>
 
 #include <StorageKit.h>
 #include <SupportKit.h>
 
-#include <USB_printer.h>
-
 #include "PrintTransportAddOn.h"
 
-class UsbPort : public BDataIO 
-{	
+class ParallelTransport : public BDataIO {
 public:
-	UsbPort(BDirectory *printer, BMessage *msg);
-	~UsbPort();
+	ParallelTransport(BDirectory* printer, BMessage* msg);
+	~ParallelTransport();
 
-	status_t InitCheck() { return fFile > -1 ? B_OK : B_ERROR; };
+	status_t InitCheck() { return fFile > -1 ? B_OK : B_ERROR; }
 
-	ssize_t Read(void *buffer, size_t size);
-	ssize_t Write(const void *buffer, size_t size);
+	ssize_t Read(void* buffer, size_t size);
+	ssize_t Write(const void* buffer, size_t size);
 
 private:
 	int fFile;
 };
 
-
-// Implementation of transport add-on interface
-
-BDataIO * 
-instanciate_transport(BDirectory *printer, BMessage *msg) 
-{
-	UsbPort * transport = new UsbPort(printer, msg);
-	if (transport->InitCheck() == B_OK)
-		return transport;
-	
-	delete transport; 
-	return NULL;
-}
-
-
-// Implementation of UsbPort
-
-UsbPort::UsbPort(BDirectory *printer, BMessage *msg) 
+// Implementation of ParallelTransport
+ParallelTransport::ParallelTransport(BDirectory* printer, BMessage* msg) 
 	: fFile(-1)
 {
-	char device_id[USB_PRINTER_DEVICE_ID_LENGTH + 1];
-	char name[USB_PRINTER_DEVICE_ID_LENGTH + 1];
-	char *desc;
-	char *value;
-	int ret;
+	char address[80];
+	char device[B_PATH_NAME_LENGTH];
 	bool bidirectional = true;
-	char *next_token;
 	
-	// We support only one USB printer, so does BeOS R5.
-	fFile = open("/dev/printer/usb/0", O_RDWR | O_EXCL | O_BINARY, 0);
+	unsigned int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
+	if (size <= 0 || size >= sizeof(address)) return;
+	address[size] = 0; // make sure string is 0-terminated
+		
+	strcat(strcpy(device, "/dev/parallel/"), address);
+	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
 	if (fFile < 0) {
 		// Try unidirectional access mode
 		bidirectional = false;
-		fFile = open("/dev/printer/usb/0", O_WRONLY | O_EXCL | O_BINARY, 0);
+		fFile = open(device, O_WRONLY | O_EXCL | O_BINARY, 0);
 	}
-	
+
 	if (fFile < 0)
 		return;
-	
-	// Get printer's DEVICE ID string
-	ret = ioctl(fFile, USB_PRINTER_GET_DEVICE_ID, device_id, sizeof(device_id));
-	if (ret < 0) {
-		close(fFile);
-		fFile = -1;
-		return;
-	}
-	
+
 	if (! msg)
 		// Caller don't care about transport init message output content...
 		return;
 	
-	// Fill up the message
 	msg->what = 'okok';
-	
 	msg->AddBool("bidirectional", bidirectional);
-	msg->AddString("device_id", device_id);
-
-	// parse and split the device_id string into separate parameters
-	desc = strtok_r(device_id, ":", &next_token);	
-	while (desc) {
-		snprintf(name, sizeof(name), "DEVID:%s", desc);
-		value = strtok_r(NULL, ";", &next_token);
-		if (!value)
-			break;
-		msg->AddString(name, value);
-		
-		// next device descriptor
-		desc = strtok_r(NULL, ":", &next_token);	
-	}
+	msg->AddString("_parallel/DeviceName", device);
 }
 
-
-UsbPort::~UsbPort()
+ParallelTransport::~ParallelTransport()
 {
-	if (fFile > -1)
+	if (InitCheck() == B_OK)
 		close(fFile);
 }
 
-
-ssize_t
-UsbPort::Read(void *buffer, size_t size)
+ssize_t ParallelTransport::Read(void* buffer, size_t size)
 {
 	return read(fFile, buffer, size);
 }
 
-
-ssize_t
-UsbPort::Write(const void *buffer, size_t size)
+ssize_t ParallelTransport::Write(const void* buffer, size_t size)
 {
 	return write(fFile, buffer, size);
 }
 
+BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg)
+{
+	ParallelTransport* transport = new ParallelTransport(printer, msg);
+	if (transport->InitCheck() == B_OK)
+		return transport;
+
+	delete transport;
+	return NULL;
+}
