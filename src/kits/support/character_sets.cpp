@@ -66,11 +66,9 @@ const BCharacterSet packedJapanese(13,18,"EUC Packed Format Japanese",
                                    "Extended_UNIX_Code_Packed_Format_for_Japanese","EUC-JP",
                                    EUCPackedJapaneseAliases);
 
-const char * EUCFixedJapaneseAliases[] =
- { "csEUCFixWidJapanese",NULL };
-const BCharacterSet fixedJapanese(14,19,"EUC Fixed Width Japanese",
-                                  "Extended_UNIX_Code_Fixed_Width_for_Japanese",NULL,
-                                  EUCFixedJapaneseAliases);
+const char * JIS0208aliases[] =
+ { "iso-ir-87","x0208","JIS_X0208-1983","csISO87JISX0208",NULL };
+const BCharacterSet JIS0208(14,63,"JIS 0208","JIS_C6226-1983",NULL,JIS0208aliases);
 
 const BCharacterSet windows1252(15,2252,"MS-Windows Codepage 1252","windows-1252",NULL,NULL);
 
@@ -120,7 +118,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	&isoLatin6,	&isoLatin7, &isoLatin8, &isoLatin9, &isoLatin10,
 	&macintosh,
 	// R5 BFont encodings end here
-	&shiftJIS, &packedJapanese, &fixedJapanese,
+	&shiftJIS, &packedJapanese, &JIS0208,
 	&windows1252, &unicode2, &KOI8R, &windows1251,
 	&IBM866, &IBM437, &eucKR, &iso13, &iso14, &iso15,
 	// R5 convert_to/from_utf8 encodings end here
