@@ -2584,7 +2584,7 @@ vm_increase_max_commit(addr_t delta)
 //	#pragma mark -
 
 
-int
+status_t
 user_memcpy(void *to, const void *from, size_t size)
 {
 	return arch_cpu_user_memcpy(to, from, size, &thread_get_current_thread()->fault_handler);
@@ -2601,14 +2601,14 @@ user_memcpy(void *to, const void *from, size_t size)
  *	\return strlen(\a from).
  */
 
-int
+ssize_t
 user_strlcpy(char *to, const char *from, size_t size)
 {
 	return arch_cpu_user_strlcpy(to, from, size, &thread_get_current_thread()->fault_handler);
 }
 
 
-int
+status_t
 user_memset(void *s, char c, size_t count)
 {
 	return arch_cpu_user_memset(s, c, count, &thread_get_current_thread()->fault_handler);
