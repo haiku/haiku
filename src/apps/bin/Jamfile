@@ -10,6 +10,7 @@ StdBinCommands
 	isvolume.cpp
 	listattr.cpp
 	lsindex.cpp
+	modifiers.cpp
 	quit.cpp
 	setversion.cpp
 	shutdown.cpp
