@@ -961,7 +961,14 @@ rule ArchHeaders
 
 rule UsePublicHeaders
 {
-	# XXX changed to do nothing
+	# UsePublicHeaders <group list> ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the
+	# objects.
+
+	UseHeaders [ PublicHeaders $(1) ] ;
 }
 
 rule UsePublicObjectHeaders
