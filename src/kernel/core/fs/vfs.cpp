@@ -3510,29 +3510,29 @@ static status_t
 fs_read_info(dev_t device, struct fs_info *info)
 {
 	struct fs_mount *mount;
-	int status;
+	status_t status = B_OK;
 
 	mutex_lock(&sMountMutex);	
 
 	mount = find_mount(device);
 	if (mount == NULL) {
-		status = EINVAL;
+		status = B_BAD_VALUE;
 		goto out;
 	}
 
 	// fill in info the file system doesn't (have to) know about
+	memset(info, 0, sizeof(struct fs_info));
 	info->dev = mount->id;
 	info->root = mount->root_vnode->id;
 	strlcpy(info->fsh_name, mount->fs_name, sizeof(info->fsh_name));
 	if (mount->device_name != NULL)
 		strlcpy(info->device_name, mount->device_name, sizeof(info->device_name));
-	else
-		info->device_name[0] = '\0';
 
 	if (FS_MOUNT_CALL(mount, read_fs_info))
 		status = FS_MOUNT_CALL(mount, read_fs_info)(mount->cookie, info);
-	else
-		status = EOPNOTSUPP;
+
+	// if the call is not supported by the file system, there are still
+	// the parts that we filled out ourselves
 
 out:
 	mutex_unlock(&sMountMutex);
