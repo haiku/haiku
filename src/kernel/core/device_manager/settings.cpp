@@ -41,7 +41,7 @@ _user_get_safemode_option(const char *userParameter, char *userBuffer, size_t *_
 {
 	char parameter[B_FILE_NAME_LENGTH];
 	char buffer[B_PATH_NAME_LENGTH];
-	size_t bufferSize;
+	size_t bufferSize, originalBufferSize;
 
 	if (!IS_USER_ADDRESS(userParameter) || !IS_USER_ADDRESS(userBuffer)
 		|| !IS_USER_ADDRESS(_userBufferSize)
@@ -52,9 +52,10 @@ _user_get_safemode_option(const char *userParameter, char *userBuffer, size_t *_
 	if (bufferSize > B_PATH_NAME_LENGTH)
 		bufferSize = B_PATH_NAME_LENGTH;
 
+	originalBufferSize = bufferSize;
 	status_t status = get_safemode_option(parameter, buffer, &bufferSize);
 
-	if (user_strlcpy(userBuffer, buffer, bufferSize) < B_OK
+	if (user_strlcpy(userBuffer, buffer, originalBufferSize) < B_OK
 		|| user_memcpy(_userBufferSize, &bufferSize, sizeof(size_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
