@@ -281,8 +281,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Rotate Clockwise", MSG_ROTATE_CLOCKWISE, ']', 0, 'W', true);	
-	AddItemMenu(pmenu, "Rotate Anticlockwise", MSG_ROTATE_ACLKWISE, '[', 0, 'W', true);
+	AddItemMenu(pmenu, "Rotate +90", MSG_ROTATE_90, ']', 0, 'W', true);	
+	AddItemMenu(pmenu, "Rotate -90", MSG_ROTATE_270, '[', 0, 'W', true);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
@@ -579,10 +579,10 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			fpImageView->NextFile();
 			break;
 		
-		case MSG_ROTATE_CLOCKWISE:
+		case MSG_ROTATE_90:
 			fpImageView->Rotate(90);
 			break;
-		case MSG_ROTATE_ACLKWISE:
+		case MSG_ROTATE_270:
 			fpImageView->Rotate(270);
 			break;
 		case MSG_MIRROR_VERTICAL:
