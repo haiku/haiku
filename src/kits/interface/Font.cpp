@@ -37,26 +37,21 @@ BFontPrivate & BFontPrivate::operator=(const BFontPrivate &fontdata)
 }
 
 
-// I think these guys are initialized by the BApplication constructor
-BFont *obe_plain_font=NULL;
-BFont *obe_bold_font=NULL;
-BFont *obe_fixed_font=NULL;
-
 BFont::BFont(void)
 {
 	private_data=new BFontPrivate();
 	if(be_plain_font)
 	{
-		fFamilyID=obe_plain_font->fFamilyID;
-		fStyleID=obe_plain_font->fStyleID;
-		fSize=obe_plain_font->fSize;
-		fShear=obe_plain_font->fShear;
-		fRotation=obe_plain_font->fRotation;
-		fSpacing=obe_plain_font->fSpacing;
-		fEncoding=obe_plain_font->fEncoding;
-		fFace=obe_plain_font->fFace;
-		fHeight=obe_plain_font->fHeight;
-		private_data->fPrivateFlags=obe_plain_font->private_data->fPrivateFlags;
+		fFamilyID=be_plain_font->fFamilyID;
+		fStyleID=be_plain_font->fStyleID;
+		fSize=be_plain_font->fSize;
+		fShear=be_plain_font->fShear;
+		fRotation=be_plain_font->fRotation;
+		fSpacing=be_plain_font->fSpacing;
+		fEncoding=be_plain_font->fEncoding;
+		fFace=be_plain_font->fFace;
+		fHeight=be_plain_font->fHeight;
+		private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
 	}
 	else
 	{
@@ -108,18 +103,18 @@ BFont::BFont(const BFont *font)
 	}
 	else
 	{
-		if(obe_plain_font)
+		if(be_plain_font)
 		{
-			fFamilyID=obe_plain_font->fFamilyID;
-			fStyleID=obe_plain_font->fStyleID;
-			fSize=obe_plain_font->fSize;
-			fShear=obe_plain_font->fShear;
-			fRotation=obe_plain_font->fRotation;
-			fSpacing=obe_plain_font->fSpacing;
-			fEncoding=obe_plain_font->fEncoding;
-			fFace=obe_plain_font->fFace;
-			fHeight=obe_plain_font->fHeight;
-			private_data->fPrivateFlags=obe_plain_font->private_data->fPrivateFlags;
+			fFamilyID=be_plain_font->fFamilyID;
+			fStyleID=be_plain_font->fStyleID;
+			fSize=be_plain_font->fSize;
+			fShear=be_plain_font->fShear;
+			fRotation=be_plain_font->fRotation;
+			fSpacing=be_plain_font->fSpacing;
+			fEncoding=be_plain_font->fEncoding;
+			fFace=be_plain_font->fFace;
+			fHeight=be_plain_font->fHeight;
+			private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
 		}
 		else
 		{
