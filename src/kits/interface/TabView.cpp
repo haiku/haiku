@@ -398,8 +398,9 @@ void BTabView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	// TODO: check if this color is set in the BeOS implementation
-	if (Parent())
-      SetViewColor(Parent()->ViewColor ());
+	//if (Parent())
+    // SetViewColor(Parent()->ViewColor ());
+    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	Select(0);
 }
@@ -521,7 +522,7 @@ void BTabView::MakeFocus(bool focused)
 {
 	BView::MakeFocus(focused);
 
-	SetFocusTab(Selection(), true);
+	SetFocusTab(Selection(), focused);
 }
 //------------------------------------------------------------------------------
 void BTabView::SetFocusTab(int32 tab, bool focused)
@@ -612,7 +613,6 @@ BRect BTabView::TabFrame(int32 tab_index) const
 		}
 		case B_WIDTH_FROM_WIDEST:
 		{
-			float x = 6.0f;
 			float width = 0.0f;
 
 			for (int32 i = 0; i < CountTabs(); i++)
