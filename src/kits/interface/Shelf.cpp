@@ -42,6 +42,7 @@
 
 #include <ZombieReplicantView.h>
 
+#include <stdio.h>
 
 class _rep_data_ {
 		_rep_data_(BMessage *message, BView *view, BDragger *dragger,
@@ -75,7 +76,7 @@ static	_rep_data_	*find(BList const *list, BMessage const *msg)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fMessage == msg)
 					return item;
 			}
@@ -87,7 +88,7 @@ static	_rep_data_	*find(BList const *list, BView const *view, bool aBool)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fView == view)
 					return item;
 
@@ -102,7 +103,7 @@ static	_rep_data_	*find(BList const *list, unsigned long id)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fId == id)
 					return item;
 			}
@@ -114,7 +115,7 @@ static	int32		index_of(BList const *list, BMessage const *msg)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fMessage == msg)
 					return i;
 			}
@@ -126,7 +127,7 @@ static	int32		index_of(BList const *list, BView const *view, bool aBool)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fView == view)
 					return i;
 
@@ -141,7 +142,7 @@ static	int32		index_of(BList const *list, unsigned long id)
 		{
 			int32 i = 0;
 			_rep_data_ *item;
-			while (item = (_rep_data_*)list->ItemAt(i++)) {
+			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
 				if (item->fId == id)
 					return i;
 			}
@@ -807,7 +808,7 @@ BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 	image_id image = B_ERROR;
 	image_id image2 = B_ERROR;
 	_BZombieReplicantView_ *zombie = NULL;
-	bool wasDropped = data->WasDropped();
+	//bool wasDropped = data->WasDropped();
 	const char *shelf_type = NULL;
 
 	data->FindString("shelf_type", &shelf_type);
@@ -841,12 +842,12 @@ BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 
 		if (data->FindString("class", &_class)) {
 			if (data->FindString("add_on", &add_on)) {
-				int32 i;
+				int32 i = 0;
 				_rep_data_ *item;
 				const char *rep_class = NULL;
 				const char *rep_add_on = NULL;
 
-				while (item = (_rep_data_*)fReplicants.ItemAt(i++)) {
+				while ((item = (_rep_data_*)fReplicants.ItemAt(i++)) !=NULL) {
 					item->fMessage->FindString("class", &rep_class);
 					item->fMessage->FindString("add_on", &rep_add_on);
 
@@ -879,14 +880,14 @@ BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 			replicant = view;
 
 			if (archivable2) {
-				if (dragger = dynamic_cast<BDragger*>(archivable2)) {
+				if ((dragger = dynamic_cast<BDragger*>(archivable2)) != NULL) {
 					// Replicant is either a sibling or unknown
 					dragger->SetViewToDrag(replicant);
 				}
 			}
 		} else {
 			// Replicant is child of the dragger
-			if (dragger = dynamic_cast<BDragger*>(view))
+			if ((dragger = dynamic_cast<BDragger*>(view)) != NULL)
 				dragger->SetViewToDrag(replicant = dragger->ChildAt(0));
 			else {
 				// Replicant is parent of the dragger

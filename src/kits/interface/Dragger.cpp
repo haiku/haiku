@@ -24,9 +24,6 @@
 //	Description:	BDragger represents a replicant "handle".
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
@@ -37,11 +34,8 @@
 #include <Shelf.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
 
 // Globals ---------------------------------------------------------------------
 bool BDragger::sVisible;
@@ -247,11 +241,11 @@ BDragger::MouseDown(BPoint where)
 
 			archive.AddInt32("be:actions", B_TRASH_TARGET);
 
-			BBitmap *bitmap;
+			
 			BPoint offset;
-			drawing_mode mode;
-
-			if (bitmap = DragBitmap(&offset, &mode))
+			drawing_mode mode;		
+			BBitmap *bitmap = DragBitmap(&offset, &mode);
+			if (bitmap)
 				DragMessage(&archive, bitmap, mode, offset, this);
 			else
 				DragMessage(&archive,
@@ -281,8 +275,8 @@ void
 BDragger::MessageReceived(BMessage *msg)
 {
 	if (msg->what == B_TRASH_TARGET) {
-		if(fShelf)
-			Window()->PostMessage(&BMessage('JAHA'), fTarget, NULL);
+		if (fShelf)
+			Window()->PostMessage('JAHA', fTarget, NULL);
 		else
 			(new BAlert("??",
 				"Can't delete this replicant from its original application. Life goes on.",

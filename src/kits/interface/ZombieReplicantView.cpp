@@ -30,7 +30,9 @@
 
 #include <ZombieReplicantView.h>
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 const static rgb_color kZombieColor = {220, 220, 220, 255};
 
