@@ -556,6 +556,8 @@ udf_read_stat(void *ns, void *node, struct stat *st)
 	st->st_atime = icb->AccessTime();
 	st->st_mtime = st->st_ctime = st->st_crtime = icb->ModificationTime();
 
+	PRINT(("stat->st_ino: %Ld\n", st->st_ino));
+
 	RETURN(B_OK);
 }
 
