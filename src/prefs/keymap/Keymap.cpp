@@ -18,6 +18,7 @@
 #include <string.h>
 #include <ByteOrder.h>
 #include <File.h>
+#include "input_globals.h"
 
 static void 
 print_key( char *chars, int32 offset ) 
@@ -385,8 +386,6 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 	(*chars)[*numBytes] = 0; 	
 	
 }
-
-status_t _restore_key_map_();
 
 
 // we make our input server use the map in /boot/home/config/settings/Keymap

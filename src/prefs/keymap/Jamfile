@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs keymap ;
 
+UsePrivateHeaders interface ;
+
 AddResources Keymap : Keymap.rdef ;
 
 Preference Keymap :
