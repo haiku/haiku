@@ -60,6 +60,8 @@ struct team {
 	struct team		*parent;
 	struct team		*children;
 	team_id			id;
+	team_id			group_id;
+	team_id			session_id;
 	char			name[B_OS_NAME_LENGTH];
 	int				num_threads;	/* number of threads in this team */
 	int				state;			/* current team state, see above */
