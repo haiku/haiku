@@ -25,6 +25,8 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
+UsePrivateHeaders [ FDirName kernel util ] ;
+
 R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	cpp.cpp
 	vfs_interface.cpp
