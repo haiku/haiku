@@ -15,7 +15,7 @@
 namespace BPrivate {
 
 // MessagingArea
-class MessagingArea : public messaging_area_header {
+class MessagingArea {
 public:
 	~MessagingArea();
 
