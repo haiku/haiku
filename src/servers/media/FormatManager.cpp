@@ -85,7 +85,6 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 		}
 		break;
 	case B_MEDIA_UNKNOWN_TYPE:
-		debugger("FormatManager::GetDescriptionForFormat");
 		strcpy(out_description->u.meta.description, "unknown");
 		break;
 	default:
