@@ -10,16 +10,20 @@ Data field:
 Data		Bytes	Meaning
 			1		flags
 			4		type
+	// Mini data (all data less than 256 bytes total)
 			1		item count (*if* there is more than one)
 			1		data length
+	// Maxi data (all data more than 255 bytes total)
+			4		item count (*if* there is more than one)
+			4		data length
 			1		name length
 			X		name
 	// Single item
 			4		item size (*if* this is a variable sized item)
-			Y		data
+			Y		item data - NULL padded to 8-byte boundary
 	// Multiple items
-			4		item size (for variable sized items)
-			Y		item data - padded to 8-byte boundary
+			4		item size (*if* this is a variable sized item)
+			Y		item data - NULL padded to 8-byte boundary
 
 //------------------------------------------------------------------------------
 // An example
