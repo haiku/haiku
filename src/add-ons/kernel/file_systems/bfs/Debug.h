@@ -8,6 +8,11 @@
 
 
 #include <KernelExport.h>
+
+#ifdef DEBUG
+#	include <string.h>
+#endif
+
 #ifdef USER
 #	include <stdio.h>
 #	define __out printf
