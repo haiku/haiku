@@ -422,7 +422,6 @@ compile_on(
 
 	    pushsettings( t->settings );
 	    result = (*parse->right->func)( parse->right, args );
-	    t->boundname = search( t->name, &t->time );
 	    popsettings( t->settings );
 
 	}
