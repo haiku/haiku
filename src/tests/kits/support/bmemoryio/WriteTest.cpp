@@ -22,12 +22,12 @@ WriteTest::PerformTest(void)
 	char buf[10];
 	const char *writeBuf = "ABCDEFG";	
 	
-	BMemoryIO mem(buf, 10);
-	
-	size_t err;
+	BMemoryIO mem(buf, 10);	
+	ssize_t err;
 	off_t pos;
 	
 	NextSubTest();
+	memset(buf, 0, 10);
 	pos = mem.Position();
 	err = mem.Write(writeBuf, 7);
 	CPPUNIT_ASSERT(err == 7); // Check how much data we wrote
@@ -35,6 +35,7 @@ WriteTest::PerformTest(void)
 	CPPUNIT_ASSERT(mem.Position() == pos + err); // Check if Position changed
 	
 	NextSubTest();
+	memset(buf, 0, 10);
 	pos = mem.Position();
 	err = mem.WriteAt(3, writeBuf, 2);
 	CPPUNIT_ASSERT(err == 2);
@@ -42,12 +43,18 @@ WriteTest::PerformTest(void)
 	CPPUNIT_ASSERT(mem.Position() == pos);
 	
 	NextSubTest();
+	memset(buf, 0, 10);
 	pos = mem.Position();
 	err = mem.WriteAt(9, writeBuf, 5);
 	CPPUNIT_ASSERT(err == 1);
 	CPPUNIT_ASSERT(strncmp(buf + 9, writeBuf, 1) == 0);
 	CPPUNIT_ASSERT(mem.Position() == pos);
 
+	NextSubTest();
+	memset(buf, 0, 10);
+	pos = mem.Position();
+	err = mem.WriteAt(-10, writeBuf, 5);
+	CPPUNIT_ASSERT(err == 5);
 }
 
 
