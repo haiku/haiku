@@ -32,10 +32,12 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 		#ScreenDriver.cpp
 		# Painter based DisplayDriver Classes
 		BitmapBuffer.cpp
+		AccelerantBuffer.cpp
 		DisplayDriverPainter.cpp
 		HWInterface.cpp
 		UpdateQueue.cpp
 		ViewHWInterface.cpp
+		AccelerantHWInterface.cpp
 		;
 }
 

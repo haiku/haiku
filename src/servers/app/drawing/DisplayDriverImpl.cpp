@@ -2766,7 +2766,7 @@ DisplayDriverImpl::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawDa
 	int32 destinc = framebuffer.BytesPerRow();
 	int32 srcwidth = src->width;
 	int32 srcheight = src->rows;
-	int32 incval=0;
+	int32 incval = 0;
 	
 	// pointers to the top left corner of the area to be copied in each bitmap
 	uint8 *srcbuffer = (uint8 *)src->buffer;
