@@ -61,7 +61,7 @@ SerialPort::SerialPort(BDirectory* printer, BMessage* msg)
 	if (size <= 0 || size >= sizeof(address)) return;
 	address[size] = 0; // make sure string is 0-terminated
 		
-	strcat(strcpy(device, "/dev/port/"), address);
+	strcat(strcpy(device, "/dev/ports/"), address);
 	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
 }
 
