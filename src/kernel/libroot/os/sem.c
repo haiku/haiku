@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,6 +33,23 @@ status_t
 acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
 	return _kern_acquire_sem_etc(id, count, flags, timeout);
+}
+
+
+// ToDo: the next two calls (switch_sem()) are not yet public API; no decision
+//	has been made yet, so they may get changed or removed until R1
+
+status_t
+switch_sem(sem_id releaseSem, sem_id id)
+{
+	return _kern_switch_sem(releaseSem, id);
+}
+
+
+status_t
+switch_sem_etc(sem_id releaseSem, sem_id id, int32 count, uint32 flags, bigtime_t timeout)
+{
+	return _kern_switch_sem_etc(releaseSem, id, count, flags, timeout);
 }
 
 

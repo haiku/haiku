@@ -407,12 +407,29 @@ sem_timeout(timer *data)
 status_t
 acquire_sem(sem_id id)
 {
-	return acquire_sem_etc(id, 1, 0, 0);
+	return switch_sem_etc(-1, id, 1, 0, 0);
 }
+
 
 status_t
 acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
+	return switch_sem_etc(-1, id, count, flags, timeout);
+}
+
+
+status_t
+switch_sem(sem_id toBeReleased, sem_id toBeAcquired)
+{
+	return switch_sem_etc(toBeReleased, toBeAcquired, 1, 0, 0);
+}
+
+
+status_t
+switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
+	uint32 flags, bigtime_t timeout)
+{
+	// ToDo: add support for B_CHECK_PERMISSION
 	int slot = id % sMaxSems;
 	int state;
 	status_t status = B_OK;
@@ -494,6 +511,10 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		}
 
 		RELEASE_SEM_LOCK(sSems[slot]);
+
+		if (semToBeReleased >= B_OK)
+			release_sem_etc(semToBeReleased, 1, B_DO_NOT_RESCHEDULE);
+
 		GRAB_THREAD_LOCK();
 		// check again to see if a signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
@@ -553,6 +574,7 @@ release_sem(sem_id id)
 status_t
 release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
+	// ToDo: add support for B_CHECK_PERMISSION
 	struct thread_queue releaseQueue;
 	int32 slot = id % sMaxSems;
 	cpu_status state;
@@ -998,28 +1020,42 @@ _user_delete_sem(sem_id id)
 status_t
 _user_acquire_sem(sem_id id)
 {
-	return _user_acquire_sem_etc(id, 1, 0, 0);
+	return switch_sem_etc(-1, id, 1, B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
 }
 
 
 status_t
 _user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
-	return acquire_sem_etc(id, count, flags | B_CAN_INTERRUPT, timeout);
+	return switch_sem_etc(-1, id, count, flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
+}
+
+
+status_t
+_user_switch_sem(sem_id releaseSem, sem_id id)
+{
+	return switch_sem_etc(releaseSem, id, 1, B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
+}
+
+
+status_t
+_user_switch_sem_etc(sem_id releaseSem, sem_id id, int32 count, uint32 flags, bigtime_t timeout)
+{
+	return switch_sem_etc(releaseSem, id, count, flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
 }
 
 
 status_t
 _user_release_sem(sem_id id)
 {
-	return release_sem_etc(id, 1, 0);
+	return release_sem_etc(id, 1, B_CHECK_PERMISSION);
 }
 
 
 status_t
 _user_release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
-	return release_sem_etc(id, count, flags);
+	return release_sem_etc(id, count, flags | B_CHECK_PERMISSION);
 }
 
 

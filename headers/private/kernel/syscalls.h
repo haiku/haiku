@@ -46,6 +46,9 @@ extern status_t		_kern_get_safemode_option(const char *parameter, char *buffer, 
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
 extern status_t		_kern_delete_sem(sem_id id);
+extern status_t		_kern_switch_sem(sem_id releaseSem, sem_id id);
+extern status_t		_kern_switch_sem_etc(sem_id releaseSem, sem_id id, uint32 count,
+						uint32 flags, bigtime_t timeout);
 extern status_t		_kern_acquire_sem(sem_id id);
 extern status_t		_kern_acquire_sem_etc(sem_id id, uint32 count, uint32 flags, bigtime_t timeout);
 extern status_t		_kern_release_sem(sem_id id);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -11,7 +11,6 @@
 
 #include <OS.h>
 #include <thread.h>
-
 
 struct kernel_args;
 
@@ -33,6 +32,8 @@ sem_id _user_create_sem(int32 count, const char *name);
 status_t _user_delete_sem(sem_id id);
 status_t _user_acquire_sem(sem_id id);
 status_t _user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
+status_t _user_switch_sem(sem_id releaseSem, sem_id id);
+status_t _user_switch_sem_etc(sem_id releaseSem, sem_id id, int32 count, uint32 flags, bigtime_t timeout);
 status_t _user_release_sem(sem_id id);
 status_t _user_release_sem_etc(sem_id id, int32 count, uint32 flags);
 status_t _user_get_sem_count(sem_id id, int32* thread_count);

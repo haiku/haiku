@@ -170,6 +170,11 @@ extern status_t	acquire_sem(sem_id id);
 extern status_t	acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
 extern status_t	release_sem(sem_id id);
 extern status_t	release_sem_etc(sem_id id, int32 count, uint32 flags);
+// ToDo: the following two calls are not part of the BeOS API, and might be
+//	changed or even removed for the final release of Haiku R1
+extern status_t	switch_sem(sem_id semToBeReleased, sem_id id);
+extern status_t	switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
+					uint32 flags, bigtime_t timeout);
 extern status_t	get_sem_count(sem_id id, int32 *threadCount);
 extern status_t	set_sem_owner(sem_id id, team_id team);
 
