@@ -1,0 +1,84 @@
+PCL5 Protocol
+
+Esc 27 decimal, 1b hexadecimal, 33 octal 
+
+Soft Reset
+	EscE
+
+Page Size Command
+	Esc&l<size>A
+	size ... 1 Executive, 2 Letter, 3 Legal, 4 Ledge, 26 A4, 27 A3, etc ...
+
+Logical Page Size Command
+	Esc&l<size>O
+	size ... 0 portrait, 1, landscape, 2 reverse portrait, 3 reverse landscape
+
+Clear Horizontal Margins Command
+	Esc9 resets margins to that of logical page
+
+Top Margin Command
+	Esc&l<lines>E
+	lines ... number of lines
+
+Unit of Measure
+	Esc&u<units>D
+
+Horizontal Cursor Positioning (PCL Units) Command
+	Esc*p<x>X (default 1/300 inch)
+
+Vertical Cursor Positioning (PCL Units) Command
+	Esc*p<x>Y (default 1/300 inch)
+
+Perforation Skip Command
+	Esc&l<skip>L
+	skip ... 0 disable, 1 enable
+
+Number of copies
+	Esc&l<copies>X
+
+Print Direction Command
+	ESC&a<degree>P degree ... 0, 90, 180, 270
+
+Job Separation Command
+	Esc&l1T (before reset at end of job)
+
+Image Transfer
+
+Raster Presentation
+	Esc*r<mode>F
+	mode ... 0 in orientation of logical page
+	         3 raster image prints along the width 
+	           of the physical page
+Raster Resolution 
+	Esc*t<dpi>R
+	dpi ... 75, 100, 150, 200, 300, 600
+Raster Height
+	Esc*r<height>T
+	height ... 0 to logical page length - current Y position
+Raster Width
+	Esc*r<width>S
+	width ... in pixels of the specified resolution
+Start Raster Graphics
+	Esc*r0A start at default left graphics margin (X position 0)
+	Esc*r1A start at current X position
+{
+	Y Offset
+		Esc*b<lines>Y
+		lines ... number of raster lines of vertical movement
+	Raster Compression
+		Esc*b<mode>M
+		mode ... 0 unencoded
+		     ... 1 run length encoding
+		     ... 2 tagged image file format (TIFF) rev. 4.0
+		     ... 3 delta row compression
+		     ... 4 reserved
+		     ... 5 adaptie compression
+	{Transfer Raster Data
+		Esc*b<length>W<data>
+		length ... 0 to 32767
+	}
+}
+End Raster Graphics
+	Esc*rC
+	Esc*rB (old)
+
