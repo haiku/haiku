@@ -6,7 +6,7 @@
 
 #include "nm_std.h"
 
-status_t test_ram();
+static status_t test_ram(void);
 static status_t nm_general_powerup (void);
 static status_t mn_general_bios_to_powergraphics(void);
 
@@ -103,7 +103,7 @@ status_t mn_general_powerup()
 	return status;
 }
 
-status_t test_ram()
+static status_t test_ram(void)
 {
 	uint32 value, offset;
 	status_t result = B_OK;
