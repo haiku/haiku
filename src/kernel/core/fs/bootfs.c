@@ -834,7 +834,7 @@ bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 
 	if (cookie->u.dir.ptr == NULL) {
 		*_num = 0;
-		status = ENOENT;
+		status = B_OK;
 		goto err;
 	}
 
