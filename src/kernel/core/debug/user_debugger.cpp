@@ -1071,10 +1071,7 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 		bool protectionChanged = false;
 		if (!(areaInfo.protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA))) {
 			error = set_area_protection(area,
-//				areaInfo.protection | B_KERNEL_WRITE_AREA);
-(areaInfo.protection & ~B_EXECUTE_AREA) | B_KERNEL_WRITE_AREA);
-// TODO: Not being writable when being executable is currently a requirement
-// of vm_set_area_protection().
+				areaInfo.protection | B_WRITE_AREA);
 			if (error != B_OK) {
 				TRACE(("write_user_memory(): failed to set new protection for "
 					"area %ld: %lx\n", area, error));
