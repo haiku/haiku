@@ -477,16 +477,18 @@ void MacDecorator::DrawBlendedRect(BRect r, bool down)
 		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
+		_layerdata.highcolor=tmpcol;
 
 		_driver->StrokeLine(BPoint(rect.left,rect.top+i),
-			BPoint(rect.left+i,rect.top),1.0,tmpcol);
+			BPoint(rect.left+i,rect.top),1.0,_layerdata.highcolor);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)) );
+		_layerdata.highcolor=tmpcol;
 
 		_driver->StrokeLine(BPoint(rect.left+steps,rect.top+i),
-			BPoint(rect.left+i,rect.top+steps),1.0,tmpcol);
+			BPoint(rect.left+i,rect.top+steps),1.0,_layerdata.highcolor);
 
 	}
 }
