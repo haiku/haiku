@@ -77,7 +77,8 @@ struct console_desc {
 
 static struct console_desc console;
 
-static void render_line16(char *line, int line_num)
+static void
+render_line16(char *line, int line_num)
 {
 	int x;
 	int y;
@@ -106,7 +107,9 @@ static void render_line16(char *line, int line_num)
 	}
 }
 
-static void render_line32(char *line, int line_num)
+
+static void
+render_line32(char *line, int line_num)
 {
 	int x;
 	int y;
@@ -136,8 +139,10 @@ static void render_line32(char *line, int line_num)
 	}
 }
 
+
 // scans through the lines, seeing if any needs to be repainted
-static void repaint()
+static void
+repaint()
 {
 	int i;
 	int line_num;
@@ -154,7 +159,9 @@ static void repaint()
 	}
 }
 
-static void scrup(void)
+
+static void
+scrup(void)
 {
 	int i;
 	int line_num;
@@ -176,7 +183,9 @@ static void scrup(void)
 	console.lines[last_line][0] = 0;
 }
 
-static void lf(void)
+
+static void
+lf(void)
 {
 	if(console.y + 1 < console.rows) {
 		console.y++;
@@ -185,12 +194,16 @@ static void lf(void)
 	scrup();
 }
 
-static void cr(void)
+
+static void
+cr(void)
 {
 	console.x = 0;
 }
 
-static void del(void)
+
+static void
+del(void)
 {
 	int target_line = WRAP(console.first_line + console.y, console.num_lines);
 
@@ -201,19 +214,25 @@ static void del(void)
 	}
 }
 
-static void save_cur(void)
+
+static void
+save_cur(void)
 {
 	console.saved_x = console.x;
 	console.saved_y = console.y;
 }
 
-static void restore_cur(void)
+
+static void
+restore_cur(void)
 {
 	console.x = console.saved_x;
 	console.y = console.saved_y;
 }
 
-static char console_putch(const char c)
+
+static char
+console_putch(const char c)
 {
 	int target_line;
 
@@ -266,14 +285,20 @@ console_close(void * cookie)
 }
 
 
-static
-ssize_t console_read(void * cookie, off_t pos, void *buffer, size_t *len)
+static status_t
+console_read(void * cookie, off_t pos, void *buffer, size_t *_length)
 {
-	return sys_read(console.keyboard_fd, 0, buffer, *len);
+	ssize_t bytesRead = sys_read(console.keyboard_fd, 0, buffer, *_length);
+	if (bytesRead >= 0) {
+		*_length = bytesRead;
+		return B_OK;
+	}
+
+	return bytesRead;
 }
 
 
-static ssize_t
+static status_t
 _console_write(const void *buf, size_t *len)
 {
 	size_t i;
@@ -301,14 +326,14 @@ _console_write(const void *buf, size_t *len)
 				console_putch(*c);
 		}
 	}
-	return 0;
+	return B_OK;
 }
 
 
-static ssize_t
+static status_t
 console_write(void * cookie, off_t pos, const void *buffer, size_t *len)
 {
-	ssize_t err;
+	status_t err;
 
 //	dprintf("console_write: entry, len = %d\n", len);
 

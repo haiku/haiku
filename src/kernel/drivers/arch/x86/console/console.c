@@ -51,7 +51,8 @@ static unsigned char attr=0x07;
 static mutex console_lock;
 static int keyboard_fd = -1;
 
-static void update_cursor(unsigned int x, unsigned int y)
+static void
+update_cursor(unsigned int x, unsigned int y)
 {
 	short int pos = y*columns + x;
 
@@ -61,7 +62,9 @@ static void update_cursor(unsigned int x, unsigned int y)
 	out8((char)(pos >> 8), TEXT_DATA);
 }
 
-static void gotoxy(unsigned int new_x,unsigned int new_y)
+
+static void
+gotoxy(unsigned int new_x,unsigned int new_y)
 {
 	if (new_x>=columns || new_y>=lines)
 		return;
@@ -70,7 +73,9 @@ static void gotoxy(unsigned int new_x,unsigned int new_y)
 	pos = origin+((y*columns+x)<<1);
 }
 
-static void scrup(void)
+
+static void
+scrup(void)
 {
 	unsigned long i;
 
@@ -86,7 +91,9 @@ static void scrup(void)
 	}
 }
 
-static void lf(void)
+
+static void
+lf(void)
 {
 	if (y+1<bottom) {
 		y++;
@@ -96,13 +103,16 @@ static void lf(void)
 	scrup();
 }
 
-static void cr(void)
+static void
+cr(void)
 {
 	pos -= x<<1;
 	x=0;
 }
 
-static void del(void)
+
+static void
+del(void)
 {
 	if (x > 0) {
 		pos -= 2;
@@ -111,23 +121,30 @@ static void del(void)
 	}
 }
 
-static int saved_x=0;
-static int saved_y=0;
 
-static void save_cur(void)
+static int saved_x = 0;
+static int saved_y = 0;
+
+
+static void
+save_cur(void)
 {
 	saved_x=x;
 	saved_y=y;
 }
 
-static void restore_cur(void)
+
+static void
+restore_cur(void)
 {
 	x=saved_x;
 	y=saved_y;
 	pos=origin+((y*columns+x)<<1);
 }
 
-static char console_putch(const char c)
+
+static char
+console_putch(const char c)
 {
 	if(++x>=COLUMNS) {
 		cr();
@@ -142,7 +159,9 @@ static char console_putch(const char c)
 	return c;
 }
 
-static void tab(void)
+
+static void
+tab(void)
 {
 	x = (x + TAB_SIZE) & ~TAB_MASK;
 	if (x >= COLUMNS) {
@@ -152,39 +171,49 @@ static void tab(void)
 	pos = origin + ((y * columns + x) << 1);
 }
 
-static status_t console_open(const char *name, uint32 flags, void **cookie)
+
+static status_t
+console_open(const char *name, uint32 flags, void **cookie)
 {
 //	dprintf("console_open\n");
-	return 0;
+	return B_OK;
 }
 
-static status_t console_freecookie(void * cookie)
+
+static status_t
+console_freecookie(void * cookie)
 {
-	return 0;
+	return B_OK;
 }
 
-static status_t console_close(void * cookie)
+
+static status_t
+console_close(void * cookie)
 {
 //	dprintf("console_close: entry\n");
 
-	return 0;
+	return B_OK;
 }
 
-static ssize_t console_read(void *cookie, off_t pos, void *buf, size_t *len)
+
+static status_t
+console_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
 	/* XXX - optimistic!! */
 	*len = sys_read(keyboard_fd, 0, buf, *len);
-	return 0;
+	return B_OK;
 }
 
-static ssize_t _console_write(const void *buf, size_t len)
+
+static ssize_t
+_console_write(const void *buf, size_t len)
 {
 	size_t i;
 	const char *c;
 
-	for(i=0; i<len; i++) {
+	for (i = 0; i < len; i++) {
 		c = &((const char *)buf)[i];
-		switch(*c) {
+		switch (*c) {
 			case '\n':
 				cr();
 				lf();
@@ -204,37 +233,42 @@ static ssize_t _console_write(const void *buf, size_t len)
 				console_putch(*c);
 		}
 	}
+
 	return len;
 }
 
-static ssize_t console_write(void * cookie, off_t pos, const void *buf, size_t *len)
+
+static status_t
+console_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
-	ssize_t err;
+	status_t status;
 
 	mutex_lock(&console_lock);
 
-	err = _console_write(buf, *len);
-	if (err < 0)
+	status = _console_write(buf, *len);
+	if (status < 0)
 		*len = 0;
 	else {
-		*len = err;
-		err = 0;
+		*len = status;
+		status = B_OK;
 	}
 	 
 	update_cursor(x, y);
 
 	mutex_unlock(&console_lock);
 
-	return err;
+	return status;
 }
 
-static status_t console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+
+static status_t
+console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
-	int err;
+	status_t err;
 
 	switch(op) {
 		case CONSOLE_OP_WRITEXY: {
-			int x,y;
+			int x, y;
 			mutex_lock(&console_lock);
 
 			x = ((int *)buf)[0];
@@ -242,7 +276,7 @@ static status_t console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 
 			save_cur();
 			gotoxy(x, y);
-			if(_console_write(((char *)buf) + 2*sizeof(int), len - 2*sizeof(int)) > 0)
+			if(_console_write(((char *)buf) + 2 * sizeof(int), len - 2 * sizeof(int)) > 0)
 				err = 0; // we're okay
 			else
 				err = EIO;
@@ -257,6 +291,7 @@ static status_t console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 	return err;
 }
 
+
 device_hooks console_hooks = {
 	&console_open,
 	&console_close,
@@ -270,7 +305,9 @@ device_hooks console_hooks = {
 	NULL
 };
 
-int console_dev_init(kernel_args *ka)
+
+int
+console_dev_init(kernel_args *ka)
 {
 	if (!ka->fb.enabled) {
 		dprintf("con_init: mapping vid mem\n");
