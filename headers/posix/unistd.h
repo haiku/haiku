@@ -69,9 +69,9 @@ extern "C" {
 /* file functions */
 //extern int		access(const char *path, int amode);
 
-//extern int		chdir(const char *path);
-//extern int		fchdir(int fd);
-//extern char		*getcwd(char *buffer, size_t size);
+extern int		chdir(const char *path);
+extern int		fchdir(int fd);
+extern char		*getcwd(char *buffer, size_t size);
 
 //extern int		pipe(int fildes[2]);
 extern int		dup(int fd);

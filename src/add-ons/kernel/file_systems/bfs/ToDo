@@ -1,4 +1,4 @@
-BFS - ToDo, June 5th, 2002
+BFS - ToDo, June 23th, 2002
 -----
 
 BlockAllocator
@@ -21,6 +21,7 @@ Queries
  - There shouldn't be any cases where you can speed up a query with reordering the query expression - test it
  - Check permissions of the parent directories
  - Add protection against crashing applications which had a query open - at least the original BeOS kernel does not free the cookie (which throws some memory away *and* prevents unmounting the disk)
+ - the query set for "!=" and last_modified/size is not the same as for "="; last_modified/size don't contain directories
 
 
 Journal

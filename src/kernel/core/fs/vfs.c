@@ -1,4 +1,11 @@
-/* Virtual File System */
+/* Virtual File System and
+** File System Interface Layer
+*/
+
+/* 
+** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
 
 /*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -439,7 +446,7 @@ err:
 }
 
 
-static __inline void
+static inline void
 put_vnode(struct vnode *vnode)
 {
 	dec_vnode_ref_count(vnode, false);
@@ -447,7 +454,7 @@ put_vnode(struct vnode *vnode)
 
 
 static struct file_descriptor *
-get_fd_and_vnode(int fd, bool kernel, struct vnode **_vnode)
+get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 {
 	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
@@ -926,6 +933,27 @@ check_path(char *to)
 	}
 
 	return B_OK;
+}
+
+
+static status_t
+fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_vnode, bool kernel)
+{
+	struct vnode *vnode;
+
+	if (fd != -1) {
+		struct file_descriptor *descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+		if (descriptor == NULL)
+			return EBADF;
+
+		inc_vnode_ref_count(vnode);
+		put_fd(descriptor);
+		
+		*_vnode = vnode;
+		return B_OK;
+	}
+
+	return path_to_vnode(path, traverseLeafLink, _vnode, kernel);
 }
 
 
@@ -1443,7 +1471,7 @@ vfs_bootstrap_all_filesystems(void)
 	if (err < 0)
 		panic("error mounting rootfs!\n");
 
-	sys_setcwd("/");
+	sys_setcwd(-1, "/");
 
 	// bootstrap the bootfs
 	bootstrap_bootfs();
@@ -1978,7 +2006,7 @@ common_sync(int fd, bool kernel)
 
 	FUNCTION(("vfs_fsync: entry. fd %d kernel %d\n", fd, kernel));
 
-	descriptor = get_fd_and_vnode(fd, kernel, &vnode);
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
 	if (descriptor == NULL)
 		return ERR_INVALID_HANDLE;
 
@@ -2121,14 +2149,14 @@ err:
 
 
 static int
-common_write_stat(char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
+common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
 	FUNCTION(("common_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
 
-	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -2446,7 +2474,7 @@ get_cwd(char *buffer, size_t size, bool kernel)
 
 
 static int
-set_cwd(char *path, bool kernel)
+set_cwd(int fd, char *path, bool kernel)
 {
 	struct io_context *context;
 	struct vnode *vnode = NULL;
@@ -2457,7 +2485,7 @@ set_cwd(char *path, bool kernel)
 	FUNCTION(("set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
-	rc = path_to_vnode(path, true, &vnode, kernel);
+	rc = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
 	if (rc < 0)
 		return rc;
 
@@ -2745,50 +2773,55 @@ sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 
 
 int
-sys_write_stat(const char *path, bool traverseLeafLink, struct stat *stat, int statMask)
+sys_write_stat(int fd, const char *_path, bool traverseLeafLink, struct stat *stat, int statMask)
 {
-	char buffer[SYS_MAX_PATH_LEN + 1];
+	char path[SYS_MAX_PATH_LEN + 1];
 
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
+	if (fd == -1) {
+		strncpy(path, _path, SYS_MAX_PATH_LEN - 1);
+		path[SYS_MAX_PATH_LEN - 1] = '\0';
+	}
 
-	return common_write_stat(buffer, traverseLeafLink, stat, statMask, true);
-}
-
-
-char *
-sys_getcwd(char *buf, size_t size)
-{
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
-
-	PRINT(("sys_getcwd: buf %p, %ld\n", buf, size));
-
-	// Call vfs to get current working directory
-	rc = get_cwd(path,SYS_MAX_PATH_LEN-1,true);
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	// Copy back the result
-	strncpy(buf,path,size);
-
-	// Return either NULL or the buffer address to indicate failure or success
-	return (rc < 0) ? NULL : buf;
+	return common_write_stat(fd, path, traverseLeafLink, stat, statMask, true);
 }
 
 
 int
-sys_setcwd(const char *_path)
+sys_getcwd(char *buffer, size_t size)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	PRINT(("sys_getcwd: buf %p, %ld\n", buffer, size));
+
+	// Call vfs to get current working directory
+	status = get_cwd(path, SYS_MAX_PATH_LEN - 1,true);
+	if (status < 0)
+		return status;
+
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
+	strlcpy(buffer, path, size);
+
+	return status;
+}
+
+
+int
+sys_setcwd(int fd, const char *_path)
 {
 	char path[SYS_MAX_PATH_LEN];
 
 	PRINT(("sys_setcwd: path = %s\n", _path));
 
-	// Copy new path to kernel space
-	strncpy(path, _path, SYS_MAX_PATH_LEN-1);
-	path[SYS_MAX_PATH_LEN-1] = 0;
+	if (_path != NULL) {
+		// Copy new path to kernel space
+		strncpy(path, _path, SYS_MAX_PATH_LEN - 1);
+		path[SYS_MAX_PATH_LEN - 1] = '\0';
+	} else
+		path[0] = '\0';
 
 	// Call vfs to set new working directory
-	return set_cwd(path,true);
+	return set_cwd(fd, path, true);
 }
 
 
@@ -3174,26 +3207,28 @@ user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 
 
 int
-user_write_stat(const char *userPath, bool traverseLeafLink, struct stat *userStat, int statMask)
+user_write_stat(int fd, const char *userPath, bool traverseLeafLink, struct stat *userStat, int statMask)
 {
-	char path[SYS_MAX_PATH_LEN+1];
+	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
 	int rc;
 
-	if (!CHECK_USER_ADDRESS(userPath)
+	if ((fd == -1 && !CHECK_USER_ADDRESS(userPath))
 		|| !CHECK_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
+	if (fd == -1) {
+		rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+		if (rc < 0)
+			return rc;
+		path[SYS_MAX_PATH_LEN - 1] = '\0';
+	}
 
 	rc = user_memcpy(&stat, userStat, sizeof(struct stat));
 	if (rc < 0)
 		return rc;
 
-	return common_write_stat(path, traverseLeafLink, &stat, statMask, false);
+	return common_write_stat(fd, path, traverseLeafLink, &stat, statMask, false);
 }
 
 
@@ -3223,25 +3258,27 @@ user_getcwd(char *buffer, size_t size)
 
 
 int
-user_setcwd(const char *upath)
+user_setcwd(int fd, const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN];
 	int rc;
 
-	PRINT(("user_setcwd: path = %p\n", upath));
+	PRINT(("user_setcwd: path = %p\n", userPath));
 
-	// Check if userspace address is inside "shared" kernel space
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userPath != NULL) {
+		if (!CHECK_USER_ADDRESS(userPath))
+			return B_BAD_ADDRESS;
 
-	// Copy new path to kernel space
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		return rc;
+		// Copy new path to kernel space
+		rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+		if (rc < 0)
+			return rc;
 
-	path[SYS_MAX_PATH_LEN-1] = 0;
+		path[SYS_MAX_PATH_LEN - 1] = '\0';
+	} else
+		path[0] = '\0';
 
 	// Call vfs to set new working directory
-	return set_cwd(path,false);
+	return set_cwd(fd, path, false);
 }
 

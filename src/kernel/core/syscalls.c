@@ -130,7 +130,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_fstat((int)arg0, (struct stat*)arg1);
 			break;
 		case SYSCALL_WRITE_STAT:
-			*call_ret = user_write_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2, (int)arg3);
+			*call_ret = user_write_stat((int)arg0, (const char *)arg1, (bool)arg2, (struct stat *)arg3, (int)arg4);
 			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
@@ -220,7 +220,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_getcwd((char*)arg0, (size_t)arg1);
 			break;
 		case SYSCALL_SETCWD:
-			*call_ret = user_setcwd((const char*)arg0);
+			*call_ret = user_setcwd((int)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_PORT_CREATE:
 			*call_ret = user_create_port((int32)arg0, (const char *)arg1);

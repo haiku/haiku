@@ -375,7 +375,7 @@ int
 user_fstat(int fd, struct stat *stat)
 {
 	struct file_descriptor *descriptor;
-	ssize_t retval;
+	status_t status;
 
 	/* This is a user_function, so abort if we have a kernel address */
 	CHECK_USER_ADDR(stat)
@@ -391,14 +391,14 @@ user_fstat(int fd, struct stat *stat)
 		// lock the given stat buffer in memory
 		struct stat kstat;
 
-		retval = descriptor->ops->fd_stat(descriptor, &kstat);
-		if (retval >= 0)
-			retval = user_memcpy(stat, &kstat, sizeof(*stat));
+		status = descriptor->ops->fd_stat(descriptor, &kstat);
+		if (status >= 0)
+			status = user_memcpy(stat, &kstat, sizeof(*stat));
 	} else
-		retval = EOPNOTSUPP;
+		status = EOPNOTSUPP;
 
 	put_fd(descriptor);
-	return retval;
+	return status;
 }
 
 
@@ -564,6 +564,28 @@ sys_rewind_dir(int fd)
 
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+int
+sys_fstat(int fd, struct stat *stat)
+{
+	struct file_descriptor *descriptor;
+	status_t status;
+
+	descriptor = get_fd(get_current_io_context(true), fd);
+	if (descriptor == NULL)
+		return EBADF;
+
+	TRACE(("sys_fstat(descriptor = %p)\n",descriptor));
+
+	if (descriptor->ops->fd_stat)
+		status = descriptor->ops->fd_stat(descriptor, stat);
 	else
 		status = EOPNOTSUPP;
 

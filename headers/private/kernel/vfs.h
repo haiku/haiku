@@ -166,9 +166,9 @@ int sys_create_symlink(const char *path, const char *toPath, int mode);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
 int sys_read_stat(const char *path, bool traverseLink, struct stat *stat);
-int sys_write_stat(const char *path, bool traverseLink, struct stat *stat, int statMask);
-char *sys_getcwd(char *buf, size_t size);
-int sys_setcwd(const char* path);
+int sys_write_stat(int fd, const char *path, bool traverseLink, struct stat *stat, int statMask);
+int sys_getcwd(char *buffer, size_t size);
+int sys_setcwd(int fd, const char *path);
 
 /* calls the syscall dispatcher should use for user file I/O */
 int user_mount(const char *path, const char *device, const char *fs_name, void *args);
@@ -191,9 +191,9 @@ int user_create_symlink(const char *path, const char *toPath, int mode);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
 int user_read_stat(const char *path, bool traverseLink, struct stat *stat);
-int user_write_stat(const char *path, bool traverseLink, struct stat *stat, int statMask);
-int user_getcwd(char *buf, size_t size);
-int user_setcwd(const char* path);
+int user_write_stat(int fd, const char *path, bool traverseLink, struct stat *stat, int statMask);
+int user_getcwd(char *buffer, size_t size);
+int user_setcwd(int fd, const char *path);
 
 /* fd kernel prototypes (implementation located in fd.c) */
 extern ssize_t sys_read(int fd, off_t pos, void *buffer, size_t bufferSize);
@@ -201,6 +201,7 @@ extern ssize_t sys_write(int fd, off_t pos, const void *buffer, size_t bufferSiz
 extern int sys_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t sys_rewind_dir(int fd);
+extern int sys_fstat(int fd, struct stat *);
 extern int sys_close(int fd);
 extern int sys_dup(int fd);
 extern int sys_dup2(int ofd, int nfd);
@@ -211,7 +212,7 @@ extern ssize_t user_write(int fd, off_t pos, const void *buffer, size_t bufferSi
 extern int user_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t user_rewind_dir(int fd);
-extern int user_fstat(int, struct stat *);
+extern int user_fstat(int fd, struct stat *);
 extern int user_close(int fd);
 extern int user_dup(int fd);
 extern int user_dup2(int ofd, int nfd);

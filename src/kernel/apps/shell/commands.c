@@ -4,9 +4,11 @@
 */
 
 #include <syscalls.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include "commands.h"
 #include "file_utils.h"
@@ -135,31 +137,28 @@ int cmd_cd(int argc, char *argv[])
 {
 	int rc;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		printf("not enough arguments to cd\n");
 		return 0;
 	}
 
-	rc = sys_setcwd(argv[1]);
-	if (rc < 0) {
-		printf("cd: sys_setcwd() returned error: %s!\n", strerror(rc));
-	}
+	rc = chdir(argv[1]);
+	if (rc < 0)
+		printf("cd: sys_setcwd() returned error: %s!\n", strerror(errno));
 
 	return 0;
 }
 
 int cmd_pwd(int argc, char *argv[])
 {
-	char buf[257];
-	char *rc;
+	char buffer[SYS_MAX_PATH_LEN];
 
-	rc = sys_getcwd(buf,256);
-	if (rc != NULL) {
-		printf("cd: sys_getcwd() returned error!\n");
+	if (getcwd(buffer, sizeof(buffer)) == NULL) {
+		printf("cd: sys_getcwd() returned error: %s!\n", strerror(errno));
+		return 0;
 	}
-	buf[256] = 0;
 
-	printf("%s\n", buf);
+	printf("%s\n", buffer);
 
 	return 0;
 }

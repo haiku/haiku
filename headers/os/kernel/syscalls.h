@@ -23,23 +23,6 @@ extern "C" {
 
 int     sys_null();
 
-/* fs api */
-int     sys_mount(const char *path, const char *device, const char *fs_name, void *args);
-int     sys_unmount(const char *path);
-int     sys_sync();
-int     sys_fsync(int fd);
-int     sys_create(const char *path, int omode, int perms);
-int     sys_open(const char *path, int omode);
-int     sys_close(int fd);
-off_t   sys_seek(int fd, off_t pos, int seek_type);
-int     sys_ioctl(int fd, ulong op, void *buf, size_t length);
-int     sys_unlink(const char *path);
-int     sys_rename(const char *oldpath, const char *newpath);
-int     sys_fstat(int, struct stat *);
-char   *sys_getcwd(char* buf, size_t size);
-int     sys_setcwd(const char* path);
-int     sys_dup(int fd);
-int     sys_dup2(int ofd, int nfd);
 int     sys_getrlimit(int resource, struct rlimit * rlp);
 int     sys_setrlimit(int resource, const struct rlimit * rlp);
 
