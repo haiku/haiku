@@ -887,10 +887,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 	if (Lock()) {
 		fPainter->SetDrawData(d);
 
-		BRect boundingBox = fPainter->BoundingBox(string, length, pt);
-
-		fPainter->DrawString(string, length, pt);
-
+		BRect boundingBox = fPainter->DrawString(string, length, pt);
 		fGraphicsCard->Invalidate(boundingBox);
 
 		Unlock();
@@ -1232,8 +1229,19 @@ void DisplayDriverPainter::Invalidate(const BRect &r)
 // ConstrainClippingRegion
 void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 {
-	if (region && Lock()) {
-		fPainter->ConstrainClipping(*region);
+	if (Lock()) {
+		if (!region || !region->Frame().IsValid()) {
+//			BRegion empty;
+//			fPainter->ConstrainClipping(empty);
+			if (RenderingBuffer* buffer = fGraphicsCard->BackBuffer()) {
+				BRegion all;
+				all.Include(BRect(0, 0, buffer->Width() - 1,
+					buffer->Height() - 1));
+				fPainter->ConstrainClipping(all);
+			}
+		} else {
+			fPainter->ConstrainClipping(*region);
+		}
 		Unlock();
 	}
 }

@@ -58,10 +58,10 @@ class TextRenderer : public BArchivable {
 /*	virtual	void				RenderString(const char* utf8String,
 											 BBitmap* bitmap,
 											 BRect constrainRect,
-											 const Transformable& transform) = 0;*/
+											 const Transformable& transform) = 0;
 
 	virtual	BRect				Bounds(const char* utf8String, uint32 length,
-									   const Transformable& transform) = 0;
+									   const Transformable& transform) = 0;*/
 
 	virtual	void				Update() {};
 

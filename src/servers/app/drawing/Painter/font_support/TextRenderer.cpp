@@ -15,7 +15,7 @@
 // constructor
 TextRenderer::TextRenderer()
 	: fPtSize(12.0),
-	  fHinted(true),
+	  fHinted(false),
 	  fAntialias(true),
 	  fKerning(true),
 	  fOpacity(255),

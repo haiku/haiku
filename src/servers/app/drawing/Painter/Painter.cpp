@@ -729,38 +729,39 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 // #pragma mark -
 
 // DrawChar
-void
+BRect
 Painter::DrawChar(char aChar)
 {
 	// TODO: to be moved elsewhere
-	DrawChar(aChar, fPenLocation);
+	return DrawChar(aChar, fPenLocation);
 }
 
 // DrawChar
-void
+BRect
 Painter::DrawChar(char aChar, BPoint baseLine)
 {
 	// TODO: to be moved elsewhere
 	char wrapper[2];
 	wrapper[0] = aChar;
 	wrapper[1] = 0;
-	DrawString(wrapper, 1, baseLine);
+	return DrawString(wrapper, 1, baseLine);
 }
 
 // DrawString
-void
+BRect
 Painter::DrawString(const char* utf8String, uint32 length,
 					const escapement_delta* delta)
 {
 	// TODO: to be moved elsewhere
-	DrawString(utf8String, length, fPenLocation, delta);
+	return DrawString(utf8String, length, fPenLocation, delta);
 }
 
 // DrawString
-void
+BRect
 Painter::DrawString(const char* utf8String, uint32 length,
 					BPoint baseLine, const escapement_delta* delta)
 {
+	BRect bounds(0.0, 0.0, -1.0, -1.0);
 	fPatternHandler->SetPattern(B_SOLID_HIGH);
 
 	if (fBuffer) {
@@ -773,12 +774,12 @@ Painter::DrawString(const char* utf8String, uint32 length,
 		transform.ScaleBy(B_ORIGIN, fScale, fScale);
 		transform.TranslateBy(fOrigin);
 	
-		fTextRenderer->RenderString(utf8String,
-									length,
-									fFontRendererSolid,
-									fFontRendererBin,
-									transform,
-									&fPenLocation);
+		bounds = fTextRenderer->RenderString(utf8String,
+											 length,
+											 fFontRendererSolid,
+											 fFontRendererBin,
+											 transform, false,
+											 &fPenLocation);
 		// pen location is not transformed in quite the same way,
 		// or transformations would add up
 		transform.Reset();
@@ -786,23 +787,24 @@ Painter::DrawString(const char* utf8String, uint32 length,
 		transform.TranslateBy(baseLine);
 		transform.Transform(&fPenLocation);
 	}
+	return bounds;
 }
 
 // DrawString
-void
+BRect
 Painter::DrawString(const char* utf8String, const escapement_delta* delta)
 {
 	// TODO: to be moved elsewhere
-	DrawString(utf8String, strlen(utf8String), fPenLocation, delta);
+	return DrawString(utf8String, strlen(utf8String), fPenLocation, delta);
 }
 
 // DrawString
-void
+BRect
 Painter::DrawString(const char* utf8String, BPoint baseLine,
 					const escapement_delta* delta)
 {
 	// TODO: to be moved elsewhere
-	DrawString(utf8String, strlen(utf8String), baseLine, delta);
+	return DrawString(utf8String, strlen(utf8String), baseLine, delta);
 }
 
 // #pragma mark -
@@ -883,7 +885,12 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 {
 	Transformable transform;
 	transform.TranslateBy(baseLine);
-	return fTextRenderer->Bounds(utf8String, length, transform);
+
+	return fTextRenderer->RenderString(utf8String,
+									length,
+									fFontRendererSolid,
+									fFontRendererBin,
+									transform, true);
 }
 
 // #pragma mark -
