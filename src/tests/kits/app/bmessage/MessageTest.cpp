@@ -17,6 +17,7 @@
 #include "MessageRefItemTest.h"
 #include "MessageBStringItemTest.h"
 #include "MessageCStringItemTest.h"
+#include "MessageMessengerItemTest.h"
 
 Test* MessageTestSuite()
 {
@@ -38,6 +39,7 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageRefItemTest::Suite());
 	tests->addTest(TMessageBStringItemTest::Suite());
 	tests->addTest(TMessageCStringItemTest::Suite());
+	tests->addTest(TMessageMessengerItemTest::Suite());
 
 	return tests;
 }
