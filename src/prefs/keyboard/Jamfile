@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src prefs time ;
+SubDir OBOS_TOP src prefs keyboard ;
 
-AddResources Time : Time.rsrc ;
+AddResources Keyboard : Keyboard.rsrc ;
 
-Preference Time : Time.cpp TimeSettings.cpp TimeView.cpp TimeWindow.cpp ;
+Preference Keyboard : Keyboard.cpp KeyboardSettings.cpp KeyboardView.cpp KeyboardWindow.cpp ;
 
-LinkSharedOSLibs Time : translation be root ;
+LinkSharedOSLibs Keyboard : translation be root ;
