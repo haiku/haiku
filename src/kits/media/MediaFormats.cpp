@@ -261,7 +261,8 @@ meta_format::Compare(const meta_format *a, const meta_format *b)
 static status_t
 update_media_formats()
 {
-	ASSERT(sLock.IsLocked());
+	if (!sLock.IsLocked())
+		return B_NOT_ALLOWED;
 
 	BMessage request(MEDIA_SERVER_GET_FORMATS);
 	request.AddInt64("last_timestamp", sLastFormatsUpdate);
@@ -337,7 +338,7 @@ BMediaFormats::~BMediaFormats()
 status_t 
 BMediaFormats::InitCheck()
 {
-	return B_OK;
+	return sLock.Sem() >= B_OK ? B_OK : sLock.Sem();
 }
 
 
