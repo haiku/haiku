@@ -152,25 +152,25 @@ static void tab(void)
 	pos = origin + ((y * columns + x) << 1);
 }
 
-static int console_open(const char *name, uint32 flags, void **cookie)
+static status_t console_open(const char *name, uint32 flags, void **cookie)
 {
 //	dprintf("console_open\n");
 	return 0;
 }
 
-static int console_freecookie(void * cookie)
+static status_t console_freecookie(void * cookie)
 {
 	return 0;
 }
 
-static int console_seek(void * cookie, off_t pos, int st)
+static status_t console_seek(void * cookie, off_t pos, int st)
 {
 //	dprintf("console_seek: entry\n");
 
 	return EPERM;
 }
 
-static int console_close(void * cookie)
+static status_t console_close(void * cookie)
 {
 //	dprintf("console_close: entry\n");
 
@@ -235,7 +235,7 @@ static ssize_t console_write(void * cookie, off_t pos, const void *buf, size_t *
 	return err;
 }
 
-static int console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+static status_t console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	int err;
 

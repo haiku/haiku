@@ -38,9 +38,6 @@
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
-
 static vm_address_space *kernel_aspace;
 
 #define REGION_HASH_TABLE_SIZE 1024
@@ -116,7 +113,7 @@ vm_address_space *vm_get_aspace_by_id(aspace_id aid)
 
 	acquire_sem_etc(aspace_hash_sem, READ_COUNT, 0, 0);
 	aspace = hash_lookup(aspace_table, &aid);
-	if(aspace)
+	if (aspace)
 		atomic_add(&aspace->ref_count, 1);
 	release_sem_etc(aspace_hash_sem, READ_COUNT, 0);
 
@@ -914,7 +911,7 @@ static int _vm_delete_region(vm_address_space *aspace, region_id rid)
 //	vm_region *temp, *last = NULL;
 	vm_region *region;
 
-	dprintf("vm_delete_region: aspace id 0x%x, region id 0x%x\n", aspace->id, rid);
+	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid);
 
 	region = vm_get_region_by_id(rid);
 	if(region == NULL)
@@ -1131,7 +1128,7 @@ static int display_mem(int argc, char **argv)
 				dprintf(" 0x%04x", *((uint16 *)address + i));
 				break;
 			case 4:
-				dprintf(" 0x%08x", *((uint32 *)address + i));
+				dprintf(" 0x%08lx", *((uint32 *)address + i));
 				break;
 			default:
 				dprintf("huh?\n");
@@ -1161,17 +1158,17 @@ static int dump_cache_ref(int argc, char **argv)
 
 	dprintf("cache_ref at %p:\n", cache_ref);
 	dprintf("cache: %p\n", cache_ref->cache);
-	dprintf("lock.holder: %d\n", cache_ref->lock.holder);
-	dprintf("lock.sem: 0x%x\n", cache_ref->lock.sem);
+	dprintf("lock.holder: %ld\n", cache_ref->lock.holder);
+	dprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
 	dprintf("region_list:\n");
 	for(region = cache_ref->region_list; region != NULL; region = region->cache_next) {
-		dprintf(" region 0x%x: ", region->id);
+		dprintf(" region 0x%lx: ", region->id);
 		dprintf("base_addr = 0x%lx ", region->base);
 		dprintf("size = 0x%lx ", region->size);
 		dprintf("name = '%s' ", region->name);
 		dprintf("lock = 0x%x\n", region->lock);
 	}
-	dprintf("ref_count: %d\n", cache_ref->ref_count);
+	dprintf("ref_count: %ld\n", cache_ref->ref_count);
 	return 0;
 }
 
@@ -1229,7 +1226,7 @@ static int dump_cache(int argc, char **argv)
 	for(page = cache->page_list; page != NULL; page = page->cache_next) {
 		// XXX offset is 64-bit
 		if(page->type == PAGE_TYPE_PHYSICAL)
-			dprintf(" %p ppn 0x%lx offset 0x%Lx type %d state %d (%s) ref_count %d\n",
+			dprintf(" %p ppn 0x%lx offset 0x%Lx type %d state %d (%s) ref_count %ld\n",
 				page, page->ppn, page->offset, page->type, page->state, page_state_to_text(page->state), page->ref_count);
 		else if(page->type == PAGE_TYPE_DUMMY)
 			dprintf(" %p DUMMY PAGE state %d (%s)\n", page, page->state, page_state_to_text(page->state));
@@ -1243,12 +1240,12 @@ static void _dump_region(vm_region *region)
 {
 	dprintf("dump of region at %p:\n", region);
 	dprintf("name: '%s'\n", region->name);
-	dprintf("id: 0x%x\n", region->id);
+	dprintf("id: 0x%lx\n", region->id);
 	dprintf("base: 0x%lx\n", region->base);
 	dprintf("size: 0x%lx\n", region->size);
 	dprintf("lock: 0x%x\n", region->lock);
 	dprintf("wiring: 0x%x\n", region->wiring);
-	dprintf("ref_count: %d\n", region->ref_count);
+	dprintf("ref_count: %ld\n", region->ref_count);
 	dprintf("cache_ref: %p\n", region->cache_ref);
 	// XXX 64-bit
 	dprintf("cache_offset: 0x%Lx\n", region->cache_offset);
@@ -1331,7 +1328,7 @@ static int dump_region_list(int argc, char **argv)
 
 	hash_open(region_table, &iter);
 	while((region = hash_next(region_table, &iter)) != NULL) {
-		dprintf("%p\t0x%x\t%32s\t0x%lx\t\t0x%lx\t%d\t%d\n",
+		dprintf("%p\t0x%lx\t%32s\t0x%lx\t\t0x%lx\t%d\t%d\n",
 			region, region->id, region->name, region->base, region->size, region->lock, region->wiring);
 	}
 	hash_close(region_table, &iter, false);
@@ -1344,19 +1341,19 @@ static void _dump_aspace(vm_address_space *aspace)
 
 	dprintf("dump of address space at %p:\n", aspace);
 	dprintf("name: '%s'\n", aspace->name);
-	dprintf("id: 0x%x\n", aspace->id);
-	dprintf("ref_count: %d\n", aspace->ref_count);
-	dprintf("fault_count: %d\n", aspace->fault_count);
+	dprintf("id: 0x%lx\n", aspace->id);
+	dprintf("ref_count: %ld\n", aspace->ref_count);
+	dprintf("fault_count: %ld\n", aspace->fault_count);
 	dprintf("working_set_size: 0x%lx\n", aspace->working_set_size);
 	dprintf("translation_map: %p\n", &aspace->translation_map);
 	dprintf("virtual_map.base: 0x%lx\n", aspace->virtual_map.base);
 	dprintf("virtual_map.size: 0x%lx\n", aspace->virtual_map.size);
 	dprintf("virtual_map.change_count: 0x%x\n", aspace->virtual_map.change_count);
-	dprintf("virtual_map.sem: 0x%x\n", aspace->virtual_map.sem);
+	dprintf("virtual_map.sem: 0x%lx\n", aspace->virtual_map.sem);
 	dprintf("virtual_map.region_hint: %p\n", aspace->virtual_map.region_hint);
 	dprintf("virtual_map.region_list:\n");
 	for(region = aspace->virtual_map.region_list; region != NULL; region = region->aspace_next) {
-		dprintf(" region 0x%x: ", region->id);
+		dprintf(" region 0x%lx: ", region->id);
 		dprintf("base_addr = 0x%lx ", region->base);
 		dprintf("size = 0x%lx ", region->size);
 		dprintf("name = '%s' ", region->name);
@@ -1409,7 +1406,7 @@ static int dump_aspace_list(int argc, char **argv)
 
 	hash_open(aspace_table, &iter);
 	while((as = hash_next(aspace_table, &iter)) != NULL) {
-		dprintf("%p\t0x%x\t%32s\t0x%lx\t\t0x%lx\n",
+		dprintf("%p\t0x%lx\t%32s\t0x%lx\t\t0x%lx\n",
 			as, as->id, as->name, as->virtual_map.base, as->virtual_map.size);
 	}
 	hash_close(aspace_table, &iter, false);
@@ -1541,7 +1538,7 @@ int vm_delete_aspace(aspace_id aid)
 	if(aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	dprintf("vm_delete_aspace: called on aspace 0x%x\n", aid);
+	dprintf("vm_delete_aspace: called on aspace 0x%lx\n", aid);
 
 	// put this aspace in the deletion state
 	// this guarantees that no one else will add regions to the list
@@ -1810,7 +1807,7 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 
 	err = vm_soft_fault(address, is_write, is_user);
 	if(err < 0) {
-		dprintf("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%x\n",
+		dprintf("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
 			err, address, fault_address, is_write, is_user, thread_get_current_thread_id());
 		if(!is_user) {
 			struct thread *t = thread_get_current_thread();
@@ -1825,7 +1822,7 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 					address, fault_address);
 			}
 		} else {
-			dprintf("vm_page_fault: killing team 0x%x\n", thread_get_current_thread()->team->id);
+			dprintf("vm_page_fault: killing team 0x%lx\n", thread_get_current_thread()->team->id);
 			team_kill_team(thread_get_current_thread()->team->id);
 		}
 	}

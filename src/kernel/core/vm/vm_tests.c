@@ -28,7 +28,7 @@ void vm_test()
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, LOCK_RW|LOCK_KERNEL);
 		if(region < 0)
 			panic("vm_test 1: failed to create test region\n");
-		dprintf("region = 0x%x, addr = 0x%lx\n", region, region_addr);
+		dprintf("region = 0x%lx, addr = 0x%lx\n", region, region_addr);
 
 		memset((void *)region_addr, 0, PAGE_SIZE * 16);
 
@@ -52,7 +52,7 @@ void vm_test()
 			panic("vm_test 2: failed to create test region\n");
 
 		vm_get_region_info(region, &info);
-		dprintf("region = 0x%x, addr = %p, region->base = 0x%lx\n", region, ptr, info.base);
+		dprintf("region = 0x%lx, addr = %p, region->base = 0x%lx\n", region, ptr, info.base);
 		if((addr)ptr != info.base)
 			panic("vm_test 2: info returned about region does not match pointer returned\n");
 
@@ -102,13 +102,13 @@ void vm_test()
 		region = vm_find_region_by_name(vm_get_kernel_aspace_id(), "vid_mem");
 		if(region < 0)
 			panic("vm_test 4: error finding region 'vid_mem'\n");
-		dprintf("vid_mem region = 0x%x\n", region);
+		dprintf("vid_mem region = 0x%lx\n", region);
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem2",
 			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, LOCK_RW|LOCK_KERNEL);
 		if(region2 < 0)
 			panic("vm_test 4: error cloning region 'vid_mem'\n");
-		dprintf("region2 = 0x%x, ptr = %p\n", region2, ptr);
+		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		vm_get_region_info(region, &info);
 		rc = memcmp(ptr, (void *)info.base, info.size);
@@ -131,13 +131,13 @@ void vm_test()
 		region = vm_find_region_by_name(vm_get_kernel_aspace_id(), "vid_mem");
 		if(region < 0)
 			panic("vm_test 5: error finding region 'vid_mem'\n");
-		dprintf("vid_mem region = 0x%x\n", region);
+		dprintf("vid_mem region = 0x%lx\n", region);
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem3",
 			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, LOCK_RO|LOCK_KERNEL);
 		if(region2 < 0)
 			panic("vm_test 5: error cloning region 'vid_mem'\n");
-		dprintf("region2 = 0x%x, ptr = %p\n", region2, ptr);
+		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		vm_get_region_info(region, &info);
 		rc = memcmp(ptr, (void *)info.base, info.size);
@@ -162,7 +162,7 @@ void vm_test()
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, LOCK_RW|LOCK_KERNEL);
 		if(region < 0)
 			panic("vm_test 6: error creating test region\n");
-		dprintf("region = 0x%x, addr = %p\n", region, region_addr);
+		dprintf("region = 0x%lx, addr = %p\n", region, region_addr);
 
 		memset(region_addr, 99, PAGE_SIZE * 16);
 
@@ -172,7 +172,7 @@ void vm_test()
 			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, LOCK_RW|LOCK_KERNEL);
 		if(region2 < 0)
 			panic("vm_test 6: error cloning test region\n");
-		dprintf("region2 = 0x%x, ptr = %p\n", region2, ptr);
+		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		rc = memcmp(region_addr, ptr, PAGE_SIZE * 16);
 		if(rc != 0)
@@ -231,7 +231,7 @@ void vm_test()
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, LOCK_RW|LOCK_KERNEL);
 		if(region < 0)
 			panic("vm_test 8: error creating test region\n");
-		dprintf("region = 0x%x, addr = %p\n", region, region_addr);
+		dprintf("region = 0x%lx, addr = %p\n", region, region_addr);
 
 		dprintf("vm_test 8: memsetting the first 2 pages\n");
 
@@ -243,7 +243,7 @@ void vm_test()
 			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_PRIVATE_MAP, LOCK_RW|LOCK_KERNEL);
 		if(region2 < 0)
 			panic("vm_test 8: error cloning test region\n");
-		dprintf("region2 = 0x%x, ptr = %p\n", region2, ptr);
+		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		dprintf("vm_test 8: comparing first 2 pages, shoudld be identical\n");
 

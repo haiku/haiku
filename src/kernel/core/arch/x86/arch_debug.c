@@ -35,7 +35,7 @@ dbg_stack_trace(int argc, char **argv)
 		dprintf("iframe %p %p %p\n", temp, temp + sizeof(struct iframe), temp + sizeof(struct iframe) - 8);
 	}
 
-	dprintf("stack trace for thread 0x%x '%s'\n", t->id, t->name);
+	dprintf("stack trace for thread 0x%lx '%s'\n", t->id, t->name);
 	dprintf("frame     \tcaller:<base function+offset>\n");
 	dprintf("-------------------------------\n");
 

@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <stage2.h>
 #include <kernel.h>
 
@@ -43,7 +44,7 @@ static void clear_isa_hardware_timer()
 	// XXX do something here
 }
 
-static int isa_timer_interrupt(void* data)
+static int32 isa_timer_interrupt(void* data)
 {
 	return timer_interrupt();
 }

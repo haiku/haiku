@@ -251,7 +251,7 @@ static struct thread *create_thread_struct(const char *name)
 	t->kernel_time = 0;
 	t->last_time = 0;		
 
-	sprintf(temp, "thread_0x%x_retcode_sem", t->id);
+	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
 	t->return_code_sem = create_sem(0, temp);
 	if(t->return_code_sem < 0)
 		goto err1;
@@ -323,8 +323,9 @@ static int _create_kernel_thread_kentry(void)
 	return func(t->args);
 }
 
-static thread_id _create_thread(const char *name, team_id pid, addr entry, void *args, 
-                                int priority, bool kernel)
+
+static thread_id
+_create_thread(const char *name, team_id pid, addr entry, void *args, int priority, bool kernel)
 {
 	struct thread *t;
 	struct team *p;
@@ -333,7 +334,7 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 	bool abort = false;
 
 	t = create_thread_struct(name);
-	if(t == NULL)
+	if (t == NULL)
 		return ENOMEM;
 
 	t->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
@@ -351,19 +352,19 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
 	p = team_get_team_struct_locked(pid);
-	if(p != NULL && p->state != TEAM_STATE_DEATH) {
+	if (p != NULL && p->state != TEAM_STATE_DEATH) {
 		insert_thread_into_team(p, t);
 	} else {
 		abort = true;
 	}
 	RELEASE_TEAM_LOCK();
-	if(abort) {
+	if (abort) {
 		GRAB_THREAD_LOCK();
 		hash_remove(thread_hash, t);
 		RELEASE_THREAD_LOCK();
 	}
 	restore_interrupts(state);
-	if(abort) {
+	if (abort) {
 		delete_thread_struct(t);
 		return ERR_TASK_PROC_DELETED;
 	}
@@ -372,13 +373,13 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 	t->kernel_stack_region_id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), stack_name,
 		(void **)&t->kernel_stack_base, REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE,
 		REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-	if(t->kernel_stack_region_id < 0)
+	if (t->kernel_stack_region_id < 0)
 		panic("_create_thread: error creating kernel stack!\n");
 
 	t->args = args;
 	t->entry = entry;
 
-	if(kernel) {
+	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
 		arch_thread_initialize_kthread_stack(t, &_create_kernel_thread_kentry, &thread_entry, &thread_kthread_exit);
 	} else {
@@ -386,19 +387,19 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 		// XXX make this better. For now just keep trying to create a stack
 		// until we find a spot.
 		t->user_stack_base = (USER_STACK_REGION - STACK_SIZE - ENV_SIZE) + USER_STACK_REGION_SIZE;
-		while(t->user_stack_base > USER_STACK_REGION) {
-			sprintf(stack_name, "%s_stack%d", p->name, t->id);
+		while (t->user_stack_base > USER_STACK_REGION) {
+			sprintf(stack_name, "%s_stack%ld", p->name, t->id);
 			t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, stack_name,
 				(void **)&t->user_stack_base,
 				REGION_ADDR_ANY_ADDRESS, STACK_SIZE, REGION_WIRING_LAZY, LOCK_RW);
-			if(t->user_stack_region_id < 0) {
+			if (t->user_stack_region_id < 0) {
 				t->user_stack_base -= STACK_SIZE;
 			} else {
 				// we created a region
 				break;
 			}
 		}
-		if(t->user_stack_region_id < 0)
+		if (t->user_stack_region_id < 0)
 			panic("_create_thread: unable to create user stack!\n");
 
 		// copy the user entry over to the args field in the thread struct
@@ -558,9 +559,11 @@ int thread_set_priority(thread_id id, int priority)
 }
 #endif /* not NEW_SCHEDULER */
 
-static const char *state_to_text(int state)
+
+static const char *
+state_to_text(int state)
 {
-	switch(state) {
+	switch (state) {
 		case B_THREAD_READY:
 			return "READY";
 		case B_THREAD_RUNNING:
@@ -576,12 +579,14 @@ static const char *state_to_text(int state)
 	}
 }
 
+
 static struct thread *last_thread_dumped = NULL;
 
-static void _dump_thread_info(struct thread *t)
+static void
+_dump_thread_info(struct thread *t)
 {
 	dprintf("THREAD: %p\n", t);
-	dprintf("id:          0x%x\n", t->id);
+	dprintf("id:          0x%lx\n", t->id);
 	dprintf("name:        '%s'\n", t->name);
 	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
 		t->all_next, t->team_next, t->q_next);
@@ -589,13 +594,13 @@ static void _dump_thread_info(struct thread *t)
 	dprintf("state:       %s\n", state_to_text(t->state));
 	dprintf("next_state:  %s\n", state_to_text(t->next_state));
 	dprintf("cpu:         %p ", t->cpu);
-	if(t->cpu)
+	if (t->cpu)
 		dprintf("(%d)\n", t->cpu->info.cpu_num);
 	else
 		dprintf("\n");
 	dprintf("pending_signals:  0x%x\n", t->pending_signals);
 	dprintf("in_kernel:   %d\n", t->in_kernel);
-	dprintf("sem_blocking:0x%x\n", t->sem_blocking);
+	dprintf("sem_blocking:0x%lx\n", t->sem_blocking);
 	dprintf("sem_count:   0x%x\n", t->sem_count);
 	dprintf("sem_deleted_retcode: 0x%x\n", t->sem_deleted_retcode);
 	dprintf("sem_errcode: 0x%x\n", t->sem_errcode);
@@ -604,10 +609,10 @@ static void _dump_thread_info(struct thread *t)
 	dprintf("args:        %p\n", t->args);
 	dprintf("entry:       0x%lx\n", t->entry);
 	dprintf("team:        %p\n", t->team);
-	dprintf("return_code_sem: 0x%x\n", t->return_code_sem);
-	dprintf("kernel_stack_region_id: 0x%x\n", t->kernel_stack_region_id);
+	dprintf("return_code_sem: 0x%lx\n", t->return_code_sem);
+	dprintf("kernel_stack_region_id: 0x%lx\n", t->kernel_stack_region_id);
 	dprintf("kernel_stack_base: 0x%lx\n", t->kernel_stack_base);
-	dprintf("user_stack_region_id:   0x%x\n", t->user_stack_region_id);
+	dprintf("user_stack_region_id:   0x%lx\n", t->user_stack_region_id);
 	dprintf("user_stack_base:   0x%lx\n", t->user_stack_base);
 	dprintf("kernel_time:       %Ld\n", t->kernel_time);
 	dprintf("user_time:         %Ld\n", t->user_time);
@@ -617,20 +622,22 @@ static void _dump_thread_info(struct thread *t)
 	last_thread_dumped = t;
 }
 
-static int dump_thread_info(int argc, char **argv)
+
+static int
+dump_thread_info(int argc, char **argv)
 {
 	struct thread *t;
 	int id = -1;
 	unsigned long num;
 	struct hash_iterator i;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("thread: not enough arguments\n");
 		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
-	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		num = atoul(argv[1]);
 		if(num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
@@ -643,8 +650,8 @@ static int dump_thread_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(thread_hash, &i);
-	while((t = hash_next(thread_hash, &i)) != NULL) {
-		if((t->name && strcmp(argv[1], t->name) == 0) || t->id == id) {
+	while ((t = hash_next(thread_hash, &i)) != NULL) {
+		if ((t->name && strcmp(argv[1], t->name) == 0) || t->id == id) {
 			_dump_thread_info(t);
 			break;
 		}
@@ -653,21 +660,23 @@ static int dump_thread_info(int argc, char **argv)
 	return 0;
 }
 
-static int dump_thread_list(int argc, char **argv)
+
+static int
+dump_thread_list(int argc, char **argv)
 {
 	struct thread *t;
 	struct hash_iterator i;
 
 	hash_open(thread_hash, &i);
-	while((t = hash_next(thread_hash, &i)) != NULL) {
+	while ((t = hash_next(thread_hash, &i)) != NULL) {
 		dprintf("%p", t);
-		if(t->name != NULL)
+		if (t->name != NULL)
 			dprintf("\t%32s", t->name);
 		else
 			dprintf("\t%32s", "<NULL>");
-		dprintf("\t0x%x", t->id);
+		dprintf("\t0x%lx", t->id);
 		dprintf("\t%16s", state_to_text(t->state));
-		if(t->cpu)
+		if (t->cpu)
 			dprintf("\t%d", t->cpu->info.cpu_num);
 		else
 			dprintf("\tNOCPU");
@@ -677,17 +686,19 @@ static int dump_thread_list(int argc, char **argv)
 	return 0;
 }
 
-static int dump_next_thread_in_q(int argc, char **argv)
+
+static int
+dump_next_thread_in_q(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
-	if(t == NULL) {
+	if (t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
 	dprintf("next thread in queue after thread @ %p\n", t);
-	if(t->q_next != NULL) {
+	if (t->q_next != NULL) {
 		_dump_thread_info(t->q_next);
 	} else {
 		dprintf("NULL\n");
@@ -695,17 +706,19 @@ static int dump_next_thread_in_q(int argc, char **argv)
 	return 0;
 }
 
-static int dump_next_thread_in_all_list(int argc, char **argv)
+
+static int
+dump_next_thread_in_all_list(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
-	if(t == NULL) {
+	if (t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
 	dprintf("next thread in global list after thread @ %p\n", t);
-	if(t->all_next != NULL) {
+	if (t->all_next != NULL) {
 		_dump_thread_info(t->all_next);
 	} else {
 		dprintf("NULL\n");
@@ -713,17 +726,19 @@ static int dump_next_thread_in_all_list(int argc, char **argv)
 	return 0;
 }
 
-static int dump_next_thread_in_team(int argc, char **argv)
+
+static int
+dump_next_thread_in_team(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
-	if(t == NULL) {
+	if (t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
 	dprintf("next thread in team after thread @ %p\n", t);
-	if(t->team_next != NULL) {
+	if (t->team_next != NULL) {
 		_dump_thread_info(t->team_next);
 	} else {
 		dprintf("NULL\n");
@@ -731,7 +746,9 @@ static int dump_next_thread_in_team(int argc, char **argv)
 	return 0;
 }
 
-static int get_death_stack(void)
+
+static int
+get_death_stack(void)
 {
 	int i;
 	unsigned int bit;
@@ -747,21 +764,16 @@ static int get_death_stack(void)
 	death_stack_bitmap |= bit;
 	RELEASE_THREAD_LOCK();
 
-
 	// sanity checks
-	if( !bit ) {
+	if (!bit)
 		panic("get_death_stack: couldn't find free stack!\n");
-	}
-	if( bit & (bit-1)) {
-		panic("get_death_stack: impossible bitmap result!\n");
-	}
 
+	if (bit & (bit - 1))
+		panic("get_death_stack: impossible bitmap result!\n");
 
 	// bit to number
-	i= -1;
-	while(bit) {
+	for (i = -1; bit; i++) {
 		bit >>= 1;
-		i += 1;
 	}
 
 //	dprintf("get_death_stack: returning 0x%lx\n", death_stacks[i].address);
@@ -769,14 +781,16 @@ static int get_death_stack(void)
 	return i;
 }
 
-static void put_death_stack_and_reschedule(unsigned int index)
+
+static void
+put_death_stack_and_reschedule(unsigned int index)
 {
 //	dprintf("put_death_stack...: passed %d\n", index);
 
-	if(index >= num_death_stacks)
+	if (index >= num_death_stacks)
 		panic("put_death_stack: passed invalid stack index %d\n", index);
 
-	if(!(death_stack_bitmap & (1 << index)))
+	if (!(death_stack_bitmap & (1 << index)))
 		panic("put_death_stack: passed invalid stack index %d\n", index);
 
 	disable_interrupts();
@@ -789,7 +803,9 @@ static void put_death_stack_and_reschedule(unsigned int index)
 	resched();
 }
 
-int thread_init(kernel_args *ka)
+
+int
+thread_init(kernel_args *ka)
 {
 	struct thread *t;
 	unsigned int i;
@@ -810,19 +826,19 @@ int thread_init(kernel_args *ka)
 
 	// allocate a snooze sem
 	snooze_sem = create_sem(0, "snooze sem");
-	if(snooze_sem < 0) {
+	if (snooze_sem < 0) {
 		panic("error creating snooze sem\n");
 		return snooze_sem;
 	}
 
 	// create an idle thread for each cpu
-	for(i=0; i<ka->num_cpus; i++) {
+	for (i = 0; i < ka->num_cpus; i++) {
 		char temp[64];
 		vm_region *region;
 
 		sprintf(temp, "idle_thread%d", i);
 		t = create_thread_struct(temp);
-		if(t == NULL) {
+		if (t == NULL) {
 			panic("error creating idle thread struct\n");
 			return ENOMEM;
 		}
@@ -833,7 +849,7 @@ int thread_init(kernel_args *ka)
 		sprintf(temp, "idle_thread%d_kstack", i);
 		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
 		region = vm_get_region_by_id(t->kernel_stack_region_id);
-		if(!region) {
+		if (!region) {
 			panic("error finding idle kstack region\n");
 		}
 		t->kernel_stack_base = region->base;
@@ -848,7 +864,7 @@ int thread_init(kernel_args *ka)
 
 	// create a set of death stacks
 	num_death_stacks = smp_get_num_cpus();
-	if(num_death_stacks > 8*sizeof(death_stack_bitmap)) {
+	if (num_death_stacks > 8*sizeof(death_stack_bitmap)) {
 		/*
 		 * clamp values for really beefy machines
 		 */
@@ -856,19 +872,19 @@ int thread_init(kernel_args *ka)
 	}
 	death_stack_bitmap = 0;
 	death_stacks = (struct death_stack *)kmalloc(num_death_stacks * sizeof(struct death_stack));
-	if(death_stacks == NULL) {
+	if (death_stacks == NULL) {
 		panic("error creating death stacks\n");
 		return ENOMEM;
 	}
 	{
 		char temp[64];
 
-		for(i=0; i<num_death_stacks; i++) {
+		for(i = 0; i < num_death_stacks; i++) {
 			sprintf(temp, "death_stack%d", i);
 			death_stacks[i].rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp,
 				(void **)&death_stacks[i].address,
 				REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-			if(death_stacks[i].rid < 0) {
+			if (death_stacks[i].rid < 0) {
 				panic("error creating death stacks\n");
 				return death_stacks[i].rid;
 			}
@@ -887,20 +903,26 @@ int thread_init(kernel_args *ka)
 	return 0;
 }
 
-int thread_init_percpu(int cpu_num)
+
+int
+thread_init_percpu(int cpu_num)
 {
 	arch_thread_set_current_thread(idle_threads[cpu_num]);
 	return 0;
 }
 
-status_t snooze(bigtime_t timeout)
+
+status_t
+snooze(bigtime_t timeout)
 {
-	return acquire_sem_etc(snooze_sem, 1, B_TIMEOUT | B_CAN_INTERRUPT, 
-	                       timeout);
+	return acquire_sem_etc(snooze_sem, 1, B_TIMEOUT | B_CAN_INTERRUPT, timeout);
 }
 
+
 // this function gets run by a new thread before anything else
-static void thread_entry(void)
+
+static void
+thread_entry(void)
 {
 	// simulates the thread spinlock release that would occur if the thread had been
 	// rescheded from. The resched didn't happen because the thread is new.
@@ -908,7 +930,9 @@ static void thread_entry(void)
 	enable_interrupts(); // this essentially simulates a return-from-interrupt
 }
 
+
 // used to pass messages between thread_exit and thread_exit2
+
 struct thread_exit_args {
 	struct thread *t;
 	region_id old_kernel_stack;
@@ -917,7 +941,9 @@ struct thread_exit_args {
 	sem_id death_sem;
 };
 
-static void thread_exit2(void *_args)
+
+static void
+thread_exit2(void *_args)
 {
 	struct thread_exit_args args;
 //	char *temp;
@@ -959,7 +985,9 @@ static void thread_exit2(void *_args)
 	panic("thread_exit2: made it where it shouldn't have!\n");
 }
 
-void thread_exit(int retcode)
+
+void
+thread_exit(int retcode)
 {
 	int state;
 	struct thread *t = thread_get_current_thread();
@@ -968,19 +996,19 @@ void thread_exit(int retcode)
 	unsigned int death_stack;
 	sem_id cached_death_sem;
 
-	dprintf("thread 0x%x exiting w/return code 0x%x\n", t->id, retcode);
+	dprintf("thread 0x%lx exiting w/return code 0x%x\n", t->id, retcode);
 
 	// boost our priority to get this over with
 	thread_set_priority(t->id, B_FIRST_REAL_TIME_PRIORITY);
 
 	// delete the user stack region first
-	if(p->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
+	if (p->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
 		t->user_stack_region_id = -1;
 		vm_delete_region(p->_aspace_id, rid);
 	}
 
-	if(p != team_get_kernel_team()) {
+	if (p != team_get_kernel_team()) {
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
@@ -1004,18 +1032,18 @@ void thread_exit(int retcode)
 	cached_death_sem = p->death_sem;
 
 	// delete the team
-	if(delete_team) {
-		if(p->num_threads > 0) {
+	if (delete_team) {
+		if (p->num_threads > 0) {
 			// there are other threads still in this team,
 			// cycle through and signal kill on each of the threads
 			// XXX this can be optimized. There's got to be a better solution.
 			struct thread *temp_thread;
 			char death_sem_name[SYS_MAX_OS_NAME_LEN];
 
-			sprintf(death_sem_name, "team %d death sem", p->id);
+			sprintf(death_sem_name, "team %ld death sem", p->id);
 			p->death_sem = create_sem(0, death_sem_name);
 			if (p->death_sem < 0)
-				panic("thread_exit: cannot init death sem for team %d\n", p->id);
+				panic("thread_exit: cannot init death sem for team %ld\n", p->id);
 			
 			state = disable_interrupts();
 			GRAB_TEAM_LOCK();
@@ -1081,7 +1109,9 @@ void thread_exit(int retcode)
 	panic("never can get here\n");
 }
 
-static int _thread_kill_thread(thread_id id, bool wait_on)
+
+static int
+_thread_kill_thread(thread_id id, bool wait_on)
 {
 	int state;
 	struct thread *t;
@@ -1093,14 +1123,14 @@ static int _thread_kill_thread(thread_id id, bool wait_on)
 	GRAB_THREAD_LOCK();
 
 	t = thread_get_thread_struct_locked(id);
-	if(t != NULL) {
-		if(t->team == team_get_kernel_team()) {
+	if (t != NULL) {
+		if (t->team == team_get_kernel_team()) {
 			// can't touch this
 			rc = EPERM;
 		} else {
 			deliver_signal(t, SIG_KILL);
 			rc = B_NO_ERROR;
-			if(t->id == thread_get_current_thread()->id)
+			if (t->id == thread_get_current_thread()->id)
 				wait_on = false; // can't wait on ourself
 		}
 	} else {
@@ -1109,48 +1139,58 @@ static int _thread_kill_thread(thread_id id, bool wait_on)
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 
-	if(wait_on)
+	if (wait_on)
 		thread_wait_on_thread(id, NULL);
 
 	return rc;
 }
 
-int thread_kill_thread(thread_id id)
+
+int
+thread_kill_thread(thread_id id)
 {
 	return _thread_kill_thread(id, true);
 }
 
-int thread_kill_thread_nowait(thread_id id)
+
+int
+thread_kill_thread_nowait(thread_id id)
 {
 	return _thread_kill_thread(id, false);
 }
 
-static void thread_kthread_exit(void)
+
+static void
+thread_kthread_exit(void)
 {
 	thread_exit(0);
 }
 
-int user_thread_wait_on_thread(thread_id id, int *uretcode)
+
+int
+user_thread_wait_on_thread(thread_id id, int *uretcode)
 {
 	int retcode;
 	int rc, rc2;
 
-	if((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
+	if ((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = thread_wait_on_thread(id, &retcode);
 
 	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-	if(rc2 < 0)
+	if (rc2 < 0)
 		return rc2;
 
 	return rc;
 }
 
-int thread_wait_on_thread(thread_id id, int *retcode)
+
+int
+thread_wait_on_thread(thread_id id, int *retcode)
 {
 	sem_id sem;
 	int state;
@@ -1161,7 +1201,7 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	GRAB_THREAD_LOCK();
 
 	t = thread_get_thread_struct_locked(id);
-	if(t != NULL) {
+	if (t != NULL) {
 		sem = t->return_code_sem;
 	} else {
 		sem = ERR_INVALID_HANDLE;
@@ -1180,7 +1220,7 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 			state = disable_interrupts();
 			GRAB_THREAD_LOCK();
 			t = thread_get_current_thread();
-			dprintf("thread_wait_on_thread: thread %d got return code 0x%x\n",
+			dprintf("thread_wait_on_thread: thread %ld got return code 0x%x\n",
 				t->id, t->sem_deleted_retcode);
 			*retcode = t->sem_deleted_retcode;
 			RELEASE_THREAD_LOCK();
@@ -1191,7 +1231,9 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	return rc;
 }
 
-struct thread *thread_get_thread_struct(thread_id id)
+
+struct thread *
+thread_get_thread_struct(thread_id id)
 {
 	struct thread *t;
 	int state;
@@ -1220,15 +1262,18 @@ struct thread *thread_get_thread_struct_locked(thread_id id)
 	return hash_lookup(thread_hash, &key);
 }
 
+
 // sets the pending signal flag on a thread and possibly does some work to wake it up, etc.
 // expects the thread lock to be held
-static void deliver_signal(struct thread *t, int signal)
+
+static void
+deliver_signal(struct thread *t, int signal)
 {
 //	dprintf("deliver_signal: thread %p (%d), signal %d\n", t, t->id, signal);
-	switch(signal) {
+	switch (signal) {
 		case SIG_KILL:
 			t->pending_signals |= SIG_KILL;
-			switch(t->state) {
+			switch (t->state) {
 				case B_THREAD_SUSPENDED:
 					t->state = B_THREAD_READY;
 					t->next_state = B_THREAD_READY;
@@ -1247,13 +1292,16 @@ static void deliver_signal(struct thread *t, int signal)
 	}
 }
 
+
 // expects the thread lock to be held
-static void _check_for_thread_sigs(struct thread *t, int state)
+
+static void
+_check_for_thread_sigs(struct thread *t, int state)
 {
-	if(t->pending_signals == SIG_NONE)
+	if (t->pending_signals == SIG_NONE)
 		return;
 
-	if(t->pending_signals & SIG_KILL) {
+	if (t->pending_signals & SIG_KILL) {
 		t->pending_signals &= ~SIG_KILL;
 
 		RELEASE_THREAD_LOCK();
@@ -1261,7 +1309,7 @@ static void _check_for_thread_sigs(struct thread *t, int state)
 		thread_exit(0);
 		// never gets to here
 	}
-	if(t->pending_signals & SIG_SUSPEND) {
+	if (t->pending_signals & SIG_SUSPEND) {
 		t->pending_signals &= ~SIG_SUSPEND;
 		t->next_state = B_THREAD_SUSPENDED;
 		// XXX will probably want to delay this
@@ -1269,8 +1317,11 @@ static void _check_for_thread_sigs(struct thread *t, int state)
 	}
 }
 
+
 // called in the int handler code when a thread enters the kernel for any reason
-void thread_atkernel_entry(void)
+
+void
+thread_atkernel_entry(void)
 {
 	int state;
 	struct thread *t;
@@ -1297,8 +1348,11 @@ void thread_atkernel_entry(void)
 	restore_interrupts(state);
 }
 
+
 // called when a thread exits kernel space to user space
-void thread_atkernel_exit(void)
+
+void
+thread_atkernel_exit(void)
 {
 	int state;
 	struct thread *t;
@@ -1464,7 +1518,7 @@ has_data(thread_id thread)
 	
 	if (get_sem_count(thread_get_current_thread()->msg.read_sem, &count) != B_OK)
 		return false;
-	return (count == 0 ? false : true);
+	return count == 0 ? false : true;
 }
 
 
