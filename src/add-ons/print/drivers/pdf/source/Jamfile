@@ -15,6 +15,7 @@ Addon
 	Driver.cpp
 	Fonts.cpp
 	FontsWindow.cpp
+	InterfaceUtils.cpp
 	JobSetupWindow.cpp
 	LinePathBuilder.cpp
 	Link.cpp
@@ -42,7 +43,8 @@ LinkSharedOSLibs
 	: 
 	be 
 	textencoding 
-	translation 
-	/boot/home/config/lib/libpdf.so  
+	translation
+	/boot/develop/lib/x86/libpdf.a 
 	;
 
+# 	/boot/home/config/lib/libpdf.so  
