@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src apps bin rcs ;
 
-local rcs_rsrc = [ FGristFiles rcs.rsrc ] ;
+SubDirCcFlags -w ;
 
+local rcs_rsrc = [ FGristFiles rcs.rsrc ] ;
 ResComp $(rcs_rsrc) : [ FGristFiles rcs.rdef ] ;
 
 StaticLibrary rcs : 

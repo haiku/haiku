@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin patch ;
 
-SubDirCcFlags -DHAVE_CONFIG_H -Ded_PROGRAM='\"ed\"' ;
+SubDirCcFlags -DHAVE_CONFIG_H -Ded_PROGRAM='\"ed\"' -w ;
 
 BinCommand patch :
 	addext.c
