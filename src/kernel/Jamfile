@@ -169,8 +169,6 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>thread.o
-		# currently only necessary for x86
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
