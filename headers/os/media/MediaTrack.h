@@ -81,7 +81,7 @@ public:
 	// The data returned through ReadFrames() will be in the format that's
  	// returned by this function.
 
-	status_t		DecodedFormat(media_format *inout_format, int32 flags = 0);
+	status_t		DecodedFormat(media_format *inout_format, uint32 flags = 0);
 
 	// CountFrames and Duration return the total number of frame and the
 	// total duration (expressed in microseconds) of a track.
@@ -177,7 +177,8 @@ public:
 	status_t		Flush();
 
 	// These are for controlling the underlying encoder and track parameters
-	BParameterWeb	*Web();
+	// returns a copy of the parameter web
+	status_t		GetParameterWeb(BParameterWeb** outWeb);
 	status_t 		GetParameterValue(int32 id, void *valu, size_t *size);
 	status_t		SetParameterValue(int32 id, const void *valu, size_t size);
 	BView			*GetParameterView();
@@ -196,6 +197,12 @@ virtual	status_t Perform(int32 selector, void * data);
 private:
 	friend class BMediaFile;
 	
+	// deprecated, but for BeOS R5 compatibility
+	BParameterWeb	*Web();
+
+	// Does nothing, returns B_ERROR, for Zeta compatiblity only	
+	status_t		ControlCodec(int32 selector, void *io_data, size_t size);
+
 					// for read-only access to a track
 					BMediaTrack(BPrivate::media::MediaExtractor *extractor, int32 stream);
 
@@ -205,10 +212,6 @@ private:
 								media_format *in_format,
 								BPrivate::media::Encoder *encoder,
 								media_codec_info *mci);
-
-#ifdef __BUILDING_MEDIA_TRACK_CPP
-	status_t		DecodedFormat(media_format *inout_format);
-#endif
 
 	void			SetupWorkaround();
 	bool			SetupFormatTranslation(const media_format &from, media_format *to);

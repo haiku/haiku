@@ -55,14 +55,19 @@ public:
 					BMediaFile(	BDataIO * source,
 								int32 flags);     // BFile is a BDataIO
 
-					//	these two constructors are for read-write access
+					//	these three constructors are for read-write access
 					BMediaFile(const entry_ref *ref,   // these two are write-only
 							   const media_file_format * mfi,
 							   int32 flags=0);
 					BMediaFile(BDataIO	*destination,  // BFile is a BDataIO
 							   const media_file_format * mfi,
 							   int32 flags=0);
-		   
+					BMediaFile(const media_file_format * mfi, // set file later using SetTo()
+							   int32 flags=0);
+
+					status_t SetTo(const entry_ref *ref);
+					status_t SetTo(BDataIO	*destination);  // BFile is a BDataIO
+							   
 	virtual			~BMediaFile();
 
 	status_t		InitCheck() const;
@@ -92,9 +97,9 @@ public:
 
 
 	// Create and add a track to the media file
-	BMediaTrack 	*CreateTrack(media_format *mf, const media_codec_info *mci);
+	BMediaTrack 	*CreateTrack(media_format *mf, const media_codec_info *mci, uint32 flags=0);
 	// Create and add a raw track to the media file (it has no encoder)
-	BMediaTrack 	*CreateTrack(media_format *mf);
+	BMediaTrack 	*CreateTrack(media_format *mf, uint32 flags=0);
 
 	// Lets you set the copyright info for the entire file
 	status_t		AddCopyright(const char *data);
@@ -109,16 +114,23 @@ public:
 	status_t        CloseFile(void);
 
 	// This is for controlling file format parameters
-	BParameterWeb	*Web();
+
+	// returns a copy of the parameter web
+	status_t		GetParameterWeb(BParameterWeb** outWeb);
 	status_t 		GetParameterValue(int32 id,	void *valu, size_t *size);
 	status_t		SetParameterValue(int32 id,	const void *valu, size_t size);
 	BView			*GetParameterView();
-
 
 	// For the future...
 	virtual	status_t Perform(int32 selector, void * data);
 
 private:
+	// deprecated, but for R5 compatibility
+	BParameterWeb	*Web();
+
+	// Does nothing, returns B_ERROR, for Zeta compatiblity only	
+	status_t		ControlFile(int32 selector, void * io_data, size_t size);
+
 	BPrivate::media::MediaExtractor *fExtractor;
 	int32					_reserved_BMediaFile_was_fExtractorID;
 	int32					fTrackNum;
