@@ -1647,6 +1647,8 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 		checksum_helper.Cache(fReplyTo.target);
 		checksum_helper.Cache(fReplyTo.team);
 
+		fWasDelivered = true;
+
 		// Get the "big flags"
 		uint8 bigFlags;
 		// Get the preferred flag
