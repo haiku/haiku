@@ -29,14 +29,7 @@
 
 #include <SupportDefs.h>
 
-/*#ifdef __cplusplus
-extern "C" {
-#endif*/
-
 status_t _restore_key_map_();
 
-/*#ifdef __cplusplus
-}
-#endif*/
-
 #endif // __INPUT_GLOBALS_H
+
