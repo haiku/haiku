@@ -715,6 +715,8 @@ status_t BMessage::Unflatten(BDataIO* stream)
 						}
 						else
 						{
+// ToDo: gcc is right, itemSize is used uninitialized here!!
+//		Since I don't know how to fix it properly, I leave this warning in
 							// Have to account for 8-byte boundary padding
 							dataPtr += itemSize + (8 - (itemSize % 8));
 						}
@@ -1821,26 +1823,22 @@ status_t BMessage::send_message(port_id port, team_id port_owner, int32 token,
 		assert(cached_reply_port < sNumReplyPorts);
 		reply_port = sReplyPorts[cached_reply_port];
 	}
-	team_id team;
-	if (be_app)
-	{
+
+	team_id team = B_BAD_TEAM_ID;
+	if (be_app != NULL)
 		team = be_app->Team();
-	}
-	else
-	{
+	else {
 		port_info pi;
 		err = get_port_info(reply_port, &pi);
 		if (err)
-		{
 			goto error;
-		}
+
 		team = pi.team;
 	}
+
 	err = set_port_owner(reply_port, port_owner);
 	if (err)
-	{
 		goto error;
-	}
 
 	{
 		BMessenger messenger(team, reply_port, B_PREFERRED_TOKEN, false);
