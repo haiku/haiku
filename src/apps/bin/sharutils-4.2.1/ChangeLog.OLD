@@ -1,0 +1,228 @@
+Makefile
+========
+
+#  makefile for shar
+#
+# $Header: /tmp/bonefish/open-beos/current/src/apps/bin/sharutils-4.2.1/ChangeLog.OLD,v 1.1 2004/03/02 02:51:51 michaelphipps Exp $
+#
+#+:EDITS:
+#:09-17-1990-12:25-rhg@cps.com-added -DMAXNAMLEN=MAX_NAME to CFLAGS for RT AIX
+#:09-17-1990-11:28-rhg@cps.com-replaced NO_DIRENT with USE_DIR and USE_NDIR
+#:09-12-1990-21:58-rhg@cps.com-moved strip from before to after cp to ${BINDIR}
+#:09-09-1990-20:12-rhg@cps.com-added CLOSEDIR_VOID
+#:09-09-1990-11:31-bill@netagw.com-add SHELL variable/-ldir for XENIX/UNIX 386
+#:08-07-1990-21:25-rhg@cps.com-compress man pages if MANEXT ends with .Z
+#:08-05-1990-23:50-rhg@cps.com-add post and compressed.
+#:08-05-1990-12:19-rhg@cps.com-add LIBS and -ldirent
+#:08-04-1990-18:51-rhg@cps.com-add CC, LD; move strip; reorder chgrp/chown.
+#:05-14-1990-17:33-wht@n4hgf-add -F 5000 for XENIX 286
+#:05-14-1990-17:32-bill@netagw.com-expanded Makefile
+#:03-28-1990-14:54-wht@n4hgf-for 3.10, add who@where.c
+
+shar.c
+======
+
+char RCS_ID[] = "$Header: /tmp/bonefish/open-beos/current/src/apps/bin/sharutils-4.2.1/ChangeLog.OLD,v 1.1 2004/03/02 02:51:51 michaelphipps Exp $";
+
+/*+:EDITS: */
+/*:09-27-1990-23:40-rhg@cps.com-added check for '.' to the OptPREFIX check */
+/*:09-27-1990-17:10-rhg@cps.com-added USE_GETCWD and getcwd */
+/*:09-27-1990-17:10-rhg@cps.com-added Delim_len to fix PREFIX (yes, again) */
+/*:09-17-1990-11:28-rhg@cps.com-replaced NO_DIRENT with USE_DIR and USE_NDIR */
+/*:09-12-1990-21:55-rhg@cps.com-added check for isgraph undefined (old BSD) */
+/*:09-12-1990-14:24-rhg@cps.com-added missing return(0) to walkdown */
+/*:09-12-1990-14:13-rhg@cps.com-deleted some redundant, unused, code */
+/*:09-12-1990-00:28-rhg@cps.com-added more directions to the shar header */
+/*:09-09-1990-20:12-rhg@cps.com-added CLOSEDIR_VOID */
+/*:09-09-1990-18:42-rhg@cps.com-added check for "From" under OptPREFIX */
+/*:09-09-1990-11:55-rhg@cps.com-modified code under NOT STR(N)CMP_IS_FAST */
+/*:09-08-1990-21:20-rhg@cps.com-added NO_DIRENT for SunOS 3 sys/dir.h */
+/*:09-08-1990-21:04-rhg@cps.com-fixed bug in PREFIX check: strcmp(line,Delim) */
+/*:08-06-1990-00:40-rhg@cps.com-revised Cut message to be more explanatory */
+/*:08-05-1990-14:04-rhg@cps.com-merged Rname into walktree */
+/*:08-05-1990-12:11-rhg@cps.com-added walktree & support for sharing dirs */
+/*:08-05-1990-09:05-rhg@cps.com-change -Bn, -t, and -b to -bn, -T, and -B */
+/*:08-04-1990-15:31-rhg@cps.com-added -Bn to set compress -bn (default 12) */
+/*:08-04-1990-15:31-rhg@cps.com-changed shar3_???_.tmp to _shar_???_.tmp */
+/*:08-04-1990-15:22-rhg@cps.com-added check for "exit 0" under OptPREFIX */
+/*:08-04-1990-14:32-rhg@cps.com-added -m to generate TOUCH (default off) */
+/*:08-04-1990-14:18-rhg@cps.com-reversed the meaning of -x and deleted -O */
+/*:06-14-1990-14:48-rhg@cps.com-made Split and eXists compatible.
+/*:06-14-1990-14:18-rhg@cps.com-made -x the default and added -O
+/*:06-14-1990-12:44-rhg@cps.com-always terminate the && and report failures
+/*:06-14-1990-12:28-rhg@cps.com-clear mkdir_already between -l files
+/*:06-14-1990-12:14-rhg@cps.com-change PREFIX from a #define to an int variable.
+/*:04-19-1990-22:49-rhg@cps.com-get rid of "set" so "sh sharfil -c" will work */
+/*:04-19-1990-21:52-rhg@cps.com-add -F to clear OptPREFIX */
+/*:04-18-1990-08:49-rhg@cps.com-add OptPREFIX (for now, always on) */
+/*:07-09-1990-19:24-wht@n4hgf-back to fgrep amc -- fits more -m touches */
+/*:07-01-1990-18:37-wht@n4hgf-wait() needed after fork() */
+/*:05-19-1990-02:47-wht@n4hgf-change fgrep amc to mmdd */
+/*:05-16-1990-01:53-wht@n4hgf-Archive-name had extra period sometimes */
+/*:05-10-1990-20:39-wht@n4hgf-altos does not not like at-sign in filenames */
+/*:05-10-1990-13:38-wht@n4hgf-add -V Vanilla mode */
+/*:05-07-1990-00:06-wht@n4hgf-test all mallocs for Purity Of Essence */
+/*:05-07-1990-00:06-wht@n4hgf-add -S switch */
+/*:05-05-1990-01:37-relay.EU.net!rivm!a3-dont assume vax is running BSD */
+/*:04-18-1990-02:01-wht@n4hgf-3.20 rhg@cps.com did all the NICE work */
+/*:04-17-1990-14:30-rhg@cps.com-pretty up if-then-else-fi in shar file */
+/*:04-17-1990-12:13-rhg@cps.com-add Split and renamed old -l to -L */
+/*:04-17-1990-12:13-rhg@cps.com-add -c option to shar file execution */
+/*:04-17-1990-11:20-rhg@cps.com-simplify TOUCH logic in shar file */
+/*:04-17-1990-10:27-rhg@cps.com-create setTOUCH to avoid duplicate code */
+/*:04-17-1990-04:43-rhg@cps.com-add missing && to commands in shar file(s) */
+/*:04-17-1990-02:03-rhg@cps.com-add Compress */
+/*:04-16-1990-17:08-rhg@cps.com-add AvoidPipes as well as code to use pipes */
+/*:04-03-1990-20:09-wht@n4hgf-3.11 */
+/*:04-01-1990-13:20-pat@rwing-correct case on M option in getopt() call */
+/*:04-01-1990-13:50-pat@rwing-change defaults on -v, -w to be on */
+/*:03-29-1990-18:23-wht@n4hgf-add automatic sequent support */
+/*:03-28-1990-15:56-wht@n4hgf-add mode and length net.bandwidth chrome */
+/*:03-28-1990-14:23-wht@n4hgf-correct some runtime diagnostics */
+/*:11-14-1989-02:21-wht-SHAR_EOF was botched if last file char not newline */
+/*:11-02-1989-14:11-wht-add touch -am */
+
+/*
+   Shar puts readable text files together in a package
+   from which they are easy to extract.
+   earlier attribution wht@n4hgf has:   decvax!microsof!uw-beave!jim
+   (James Gosling at CMU)
+ */
+/*
+ *    I have made several mods to this program:
+ *
+ *      1) the -----Cut Here-----... now preceds the script.
+ *      2) the cat has been changed to a sed which removes a prefix
+ *      character from the beginning of each line of the extracted
+ *      file, this prefix character is added to each line of the archived
+ *      files and is not the same as the first character of the
+ *      file delimeter.
+ *      3) added several options:
+ *              -c      - add the -----Cut Here-----... line.
+ *              -d'del' - change the file delimeter to del.
+ *              -s      - cause the resulting script to print the wc of
+ *                        the orignal file and the wc of the extracted
+ *                        file.
+ *
+ *                              Michael A. Thompson
+ *                              Dalhousie University
+ *                              Halifax, N.S., Canada.
+ */
+
+/*
+ *    I, too, have been hacking this code. This is the version on sixhub
+ *              bill davidsen (davidsen@sixhub.uucp)
+ *
+ *      - added support for binary files
+ *      - automatic creation of limited size multiple file archives,
+ *        each of which may be unpacked separately, and with sequence
+ *        checking.
+ *      - support for mixed text and binary files
+ *      - preserve file permissions
+ *      - restore to filename rather than pathname
+ *
+ */
+/*
+ *  One good hack deserves another ... this version generates shell
+ *  code which attempts to create missing directories
+ *  handle deviants sun, vax, pyr (pyramid), SCO XENIX/UNIX automatically
+ *  for sequent, add -DBSD42
+ *  force Verbose on
+ *  if unsharing system's touch Sys V compatible (allows touch -m),
+ *  restore file dates
+ *  -n switch puts an alpha "name" in header
+ *  -a (if also -n) puts "Submitted-by:" & "Archive-name: <name>/part##
+ *  use getopt
+ *  as well as some other chrome-plated junque
+ *  ...!gatech!emory!tridom!wht (wht%n4hgf@gatech.edu) Warren Tucker
+ *
+ *  3.11 - Fri Apr  6 14:21:51 EDT 1990
+ *  With due deference to davidsen@sixhub, more changes..... copies
+ *  of this, like 3.10,  were mailed to him:
+ *  From wht  Fri Apr  6 15:14:30 1990 remote from n4hgf
+ *  Received: by n4hgf.UUCP (smail2.5-UNIX/386 5.3.2)
+ *      id AA01781; 6 Apr 90 15:14:30 EDT (Fri)
+ *  Date: Fri, 6 Apr 90 15:14:30 EDT
+ *  X-Mailer: Mail User's Shell (6.5 4/17/89)
+ *  From: wht@n4hgf (Warren Tucker)
+ *  To: davidsen@sixhub
+ *  Subject: shar 3.11
+ *  X-Bang-Reply-to: gatech!n4hgf!wht -or- emory!tridom!n4hgf!wht
+ *  Reply-to: wht%n4hgf@gatech.edu
+ *  Message-Id: <9004061514.AA01781@n4hgf.UUCP>
+ *
+ *  1. changes suggested by pat@rwing (Pat Myrto) and silvert@cs.dal.ca
+ *  (Bill Silvert)
+ *  2. fixes to who_am_i code in who@where.c
+ *
+ *  3.20 - Wed Apr 18 01:58:32 EDT 1990
+ *  changes were made per edit notes by
+ From: gatech!mailrus!uunet!cpsolv.CPS.COM!rhg (Richard H. Gumpertz)
+ *  ...!gatech!n4hgf!wht (wht%n4hgf@gatech.edu) Warren Tucker
+ *
+ */
+
+unshar.c
+========
+
+char RCS_ID[] = "$Header: /tmp/bonefish/open-beos/current/src/apps/bin/sharutils-4.2.1/ChangeLog.OLD,v 1.1 2004/03/02 02:51:51 michaelphipps Exp $";
+
+/* HISTORY
+ * 27-Sep-90  Richard H. Gumpertz (rhg@cps.com)
+ *		add check for EXTERNAL_GETOPT to suppress the built-in getopt.  (The
+ *		builtin getopt is nice because it makes unshar more easily portable.)
+ * 12-Sep-90  Richard H. Gumpertz (rhg@cps.com)
+ *		use fprintf instead of printf when printing error return from getwd.
+ *		deleted unused initialization of more_to_read in process.
+ *		changed ch from char to int in process so the EOF check would work.
+ *  4-Aug-90  Richard H. Gumpertz (rhg@cps.com)
+ *		renamed -c and -C to -e and -E and added -c flag (passed through to sh)
+ * 24-Apr-90  Richard H. Gumpertz (rhg@cps.com)
+ *              rewrote ENC() to use a more efficient formula
+ * 19-Apr-90  Colas Nahaboo (colas@mirsa.inria.fr)
+ *		added -c and -C flags to read from concatenated archives
+ *  1-Feb-85  Guido van Rossum (guido@mcvax) at CWI, Amsterdam
+ *		Added missing 'quit' routine;
+ *		added -d flag to change to directory first;
+ *		added filter mode (read stdin when no arguments);
+ *		added 'getopt' to get flags (makes it self-contained).
+ * 29-Jan-85  Michael Mauldin (mlm) at Carnegie-Mellon University
+ *		Created.
+ ****************************************************************/
+/*+:EDITS: */
+/*:08-04-1990-15:54-rhg@cps.com-changes listed above (-c/-C => -e/-E, new -c) */
+/*:05-05-1990-01:37-relay.EU.net!rivm!a3-dont assume vax is running BSD */
+/*:04-19-1990-15:20-wht@n4hgf-fix so -d doesnt make argv files unreachable */
+/*:04-19-1990-15:06-wht@n4hgf-colas@mirsa patches had expanded tabs */
+/*:04-10-1990-22:02-wht@n4hgf-stdin failed sometimes-can not seek on pipe */
+
+And for stlmatch:
+
+ * HISTORY
+ * 18-May-82 Michael Mauldin (mlm) at Carnegie-Mellon University
+ *      Ripped out of CMU lib for Rog-O-Matic portability
+ * 20-Nov-79  Steven Shafer (sas) at Carnegie-Mellon University
+ *	Rewritten for VAX from Ken Greer's routine.
+ *
+ *  Originally from klg (Ken Greer) on IUS/SUS UNIX
+
+uushar.c
+========
+
+/* $Header: /tmp/bonefish/open-beos/current/src/apps/bin/sharutils-4.2.1/ChangeLog.OLD,v 1.1 2004/03/02 02:51:51 michaelphipps Exp $ */
+
+who@where.c
+===========
+
+/* $Header: /tmp/bonefish/open-beos/current/src/apps/bin/sharutils-4.2.1/ChangeLog.OLD,v 1.1 2004/03/02 02:51:51 michaelphipps Exp $ */
+
+   ...!gatech!kd4nc!n4hgf!wht (wht%n4hgf@gatech.edu)
+
+/*+:EDITS: */
+/*:09-12-1990-01:04-rhg@cps.com-added declarations of strcpy and strcat */
+/*:09-09-1990-19:49-rhg@cps.com-added explicit return statement to who_where */
+/*:04-03-1990-19:55-wht@n4hgf-get rid of complicated who_am_i */
+/*:04-01-1990-13:30-pat@rwing-use utsname.nodename instead of sysname */
+/*:04-02-1990-12:12-wht@n4hgf-sigh... some pwd.h dont declare functions */
+/*:03-29-1990-18:23-wht@n4hgf-add automatic sequent support */
+/*:03-28-1990-15:24-wht@n4hgf-creation */

@@ -1,0 +1,45 @@
+Here are versions of uuencode and uudecode that will work on an IBM
+PC.  There is a version for Turbo Pascal and one for Microsoft C.
+Porting them into other machines, languages or dialects should not
+pose a large problem.
+
+Sorry about the lack of documentation, but the programs are easy to
+use, so you should not have a problem.  I don't know why a UNIX
+site would not have these in the first place, but at least your
+manual should tell you how to use them.  If you are not using UNIX
+at all, you have my sympathy.
+
+The Pascal programs' author is unknown.  The C programs were
+provided by Don Kneller.
+
+Tom Reingold
+Rockefeller University
+New York City
+UUCP:    {seismo | harvard | ihnp4}!cmcl2!rna!rocky2!reintom
+BITNET:  REINTOM@ROCKVAX
+ARPANET: reintom@rockefeller.arpa
+
+======================================================================
+
+Relay-Version: version B 2.10.3 4.3bsd-beta 6/6/85; site hoptoad.uucp
+From: darmon@polaris.UUCP (Pierre Darmon)
+Newsgroups: net.sources
+Subject: Modified Turbo Pascal uudecode/encode. More user-friendly.
+Date: 30 Oct 86 01:12:40 GMT
+Date-Received: 
+Reply-To: darmon@polaris.UUCP (Pierre Darmon)
+Organization: IBM Research, Yorktown Heights, N.Y.
+
+The following are the Turbo Pascal source files for uudecode and uuencode,
+modified from the net posting to display the remaining bytes to be processed,
+instead of filling up the screen with periods. It also displays the percentage
+left. See my previous posting to net.micro,net.micro.pc and net.sources for
+details.
+
+Enjoy!
+
+-- 
+
+Pierre Darmon, IBM Thomas J. Watson Research Center.                        
+.....seismo!philabs!polaris!darmon.
+darmon.yktvmz.ibm@csnet-relay  

@@ -1,0 +1,25 @@
+From: rmarks@KSP.Unisys.COM (Richard Marks)
+Newsgroups: comp.binaries.ibm.pc.archives
+Subject: UUENCODE/DECODE 4.20
+Date: 14 Aug 91 14:26:44 GMT
+
+I have just send in my latest UUENCODE/DECODE package to c.b.i.p
+for posting.  This is level 4.20.
+
+This package has been out for four years.  It is fast and it automatically
+handles multi-section decoding - with automatic CRC testing.  Just
+save submissions as foo1.uue, foo2.uue, etc.;  download to the PC; and
+enter UUDECODE FOO.
+
+Also this package handles lots of variations in checksums and character
+permutations.  This includes XXencode/decode.
+
+The 4.20 version replaces the 4.13 version.  It is a minor update with
+some improved error messages, beeping to alert for errors, and detection
+of some additional character permutations.  Also the prior default for the
+encode was to put a checksum on each line; now with the use of full file
+CRC's, the default has been changed to turn this off.
+
+Regards,
+Richard Marks
+rmarks@MDC.unisys.COM

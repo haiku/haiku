@@ -1,0 +1,48 @@
+This is the set of GNU shar utilities.
+
+`shar' makes so-called shell archives out of many files, preparing
+them for transmission by electronic mail services.  `unshar' helps
+unpacking shell archives after reception.  The core of both programs
+is initially derived from public domain.  Some modules and other
+code sections are freely borrowed from other GNU distributions,
+bringing `shar' under the terms of the GNU General Public License.
+
+`uuencode' prepares a file for transmission over an electronic channel
+which ignores or otherwise mangles the eight bit (high order bit) of
+bytes.  `uudecode' does the converse transformation.  They are derived
+from the BSD NET/2 distribution, but enchanced with the features
+described in recent POSIX standards.  If you have more powerful
+`uuencode' and `uudecode' already available, you may want to use
+`./configure --disable-uucode' to prevent their installation.
+
+`remsync' allows for remote synchronization of directory trees,
+using electronic mail.  This part of sharutils is still alpha.
+You should have already installed Perl, gzip, GNU diff, GNU tar
+and GNU shar prior to installing remsync package.  Only Perl is
+really mandatory, write to me if you feel like helping to remove
+the other dependencies.
+
+Beside the Perl script `remsync' and its shell scripts the whole
+package now is internationalized.  This includes the generated shell
+scripts.  As described in the `ABOUT-NLS' file you have various
+options for handling this internationalization but this package is
+special in one point: it always needs the GNU message catalog files to
+be installed.  Therefore it might be a good idea to always use the GNU
+gettext functions and not the functions provided by your system.  This
+is of course not needed if your system uses GNU gettext in its system
+library.
+
+See file `ABOUT-NLS' for how to customize this program to your language.
+See file `BACKLOG' for a summary of pending mail and articles.
+See file `COPYING' for copying conditions.
+See file `INSTALL' for compilation and installation instructions.
+See file `NEWS' for a list of major changes in the current release.
+See file `THANKS' for a list of contributors.
+
+Jan Djarv takes care of the man pages, otherwise unsupported, and
+their installation is kept separate from `make install'.  You use
+`make install-man' for them.  Better think GNU and switch to Info.
+
+Your feedback will help us to make a better and more portable
+product.  Mail suggestions and bug reports (including documentation
+errors) for this program to `bug-gnu-utils@prep.ai.mit.edu'.

@@ -1,0 +1,19 @@
+Sun Nov  5 13:33:52 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Suppress error message when ln failed.
+
+Tue Aug 15 18:16:22 1995  Ulrich Drepper  <drepper@myware>
+
+	* testdata:
+	Correct data for NUL padded output format.  Previous algorithm did not
+	care for the content of the last bytes which are not filled be the
+	input data but are necessary for the last 3-byte group.
+
+Tue Aug 15 16:49:42 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Remove `copying instead' message.
+
+Thu Aug  3 00:16:48 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in: Initial revision.
+

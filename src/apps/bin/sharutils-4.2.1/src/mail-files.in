@@ -1,0 +1,88 @@
+#! @SH@
+# Mail a list of files, as they are.
+# Copyright (C) 1990, 1995 Free Software Foundation, Inc.
+# François Pinard <pinard@iro.umontreal.ca>, 1991.
+
+package="@PACKAGE@"
+version="@VERSION@"
+
+progname=`echo $0 | sed -e 's,.*/,,'`
+
+usage="\
+Usage: $progname [OPTION] DESTIN TYPE SUBJECT FILE ...
+
+with OPTION in:
+      --help      display this help and exit
+      --version   output version information and exit
+
+  -x              trace script"
+
+trytext="Try \`$progname --help' for more information."
+
+SLEEP=2
+
+### Decode the options.
+
+while test $# -gt 0; do
+  case $1 in
+    -x) trace=-x; set -x; shift ;;
+    --v* ) echo "$progname - $package $version"; exit 0 ;;
+    --h* ) echo "$usage"; exit 0 ;;
+    -) break ;;
+    -*) echo "$trytext"; exit 1 ;;
+    *) break
+  esac
+done
+
+if [ $# -lt 4 ]; then
+  echo "Too few arguments."
+  echo $trytext
+  exit 1
+fi
+
+destin="$1"; shift
+type="$1"; shift
+subject="$1"; shift
+
+maxcount=$#
+files="$*"
+
+### Mail all files, making a proper subject for each message.
+
+( if [ -f $destin ]; then
+    cat $destin
+  else
+     echo $destin
+  fi
+) |
+( total=0
+  while read destin; do
+    count=0
+    for file in $files; do
+      if [ ! -f $file ]; then
+	echo "$file not found"
+	continue
+      fi
+      count=`expr $count + 1`
+      if [ $maxcount = 1 ]; then
+	string="$type"
+      else
+	string="$type ($count/$maxcount)"
+      fi
+      echo "Mailing $string to $destin"
+      [ $total -ne 0 ] && sleep $SLEEP
+      @MAILER@ -s "$string: $subject" $destin < $file
+      total=`expr $total + 1`
+      [ $count -lt $maxcount ] && sleep $SLEEP
+    done
+  done
+  if [ $total -eq 0 ]; then
+    echo 'No message queued'
+  elif [ $total -eq 1 ]; then
+    echo 'Message queued'
+  else
+    echo "$count messages queued"
+  fi
+)
+
+exit 0

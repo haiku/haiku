@@ -1,0 +1,61 @@
+Mon Dec  4 16:55:15 1995  Ulrich Drepper  <drepper@myware>
+
+	* sv.po: Update for 4.2 by Jan Djarv.
+
+	* fr.po: Small change.
+
+Sun Dec  3 01:24:49 1995  Ulrich Drepper  <drepper@myware>
+
+	* fr.po: Version for 4.2 by Franc,ois Pinard.
+
+Mon Nov 27 02:47:52 1995  Sakai Kiyotaka  <ksakai@netwk.ntt-at.co.jp>
+
+	* ja_JP.EUC.po: Update for sharutils-4.1.12a.
+
+Sun Nov 26 02:23:53 1995  Ulrich Drepper  <drepper@myware>
+
+	* de.po: Removed double words in two line message.
+
+Fri Nov 24 19:57:59 1995  Ulrich Drepper  <drepper@myware>
+
+	* de.po: Last changes after using new xgettext program.
+
+Tue Nov 14 10:55:59 1995  Sakai Kiyotaka  <ksakai@netwk.ntt-at.co.jp>
+
+	* ja_JP.EUC.po: Initial revision.
+
+Tue Oct 31 21:26:30 1995  Franc,ois Pinard  <pinard@iro.umontreal.ca>
+
+	* fr.po: Update for version for 4.1.9.
+
+Sat Oct 28 01:43:12 1995  Ulrich Drepper  <drepper@myware>
+
+	* fr.po, nl.po, pt.po, sv.po, de.po:
+	 Removed message about fixed limit.
+
+Fri Oct 27 22:36:53 1995  Ulrich Drepper  <drepper@myware>
+
+	* de.po: Translation for 4.1.9.
+
+Fri Oct  6 02:22:27 1995  Jan Djarv  <Jan.Djarv@sa.erisoft.se>
+
+	* sv.po: Update of messages for sharutils-4.1.8.
+
+Sat Sep 23 15:35:23 1995  Ulrich Drepper  <drepper@myware>
+
+	* de.po: Last minute changes for 4.1.7.
+
+Tue Aug 15 06:49:56 1995  Ulrich Drepper  <drepper@myware>
+
+	* POTFILES.in:
+	New format of entries according to gettext-0.9.2.  Now relative to
+	top level directory of project.
+
+Sun Aug 13 23:30:54 1995  Ulrich Drepper  <drepper@myware>
+
+	* sharutils.pot: Version knowing about lock directory.
+
+Thu Aug  3 00:30:27 1995  Ulrich Drepper  <drepper@myware>
+
+	* sharutils.pot, POTFILES.in, Makefile.in.in: Initial revision.
+

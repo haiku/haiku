@@ -1,0 +1,248 @@
+Sun Dec  3 01:21:14 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (shar): Be consistent in use of || at end of beginning of
+	line.
+
+Thu Nov 30 03:04:03 1995  Ulrich Drepper  <drepper@myware>
+
+	* uudecode.c (read_base64) [b64_tab]: Initialize with \177 instead
+	of 177.  Reported by Nelson Beebe.
+
+Mon Nov 27 19:01:03 1995  Jim Meyering  <meyering@comco.com>
+
+	* uudecode.c:
+	Remove unused variable and correctly use `unsigned char'.
+
+Sun Nov 26 11:45:53 1995  Bill Aten  <bill@netagw.com>
+
+	* shar.c (shar): Add missing line continuation.
+
+Sun Nov 26 00:16:08 1995  Ulrich Drepper  <drepper@myware>
+
+	* remsync.in: Correctly implement --help and --version.
+
+	* mail-files.in: Implement --help and --version.
+	Prevent mail from handling non-existing files.
+
+Sat Nov 25 23:43:11 1995  Ulrich Drepper  <drepper@myware>
+
+	* mailshar.in: Remove temp files even when mail-files fails.
+
+	* mailshar.in: Introduce prefix variable.
+
+	* mailshar.in: Only try to remove intermediate files when previous
+	command succeeded.  Correctly exit with status 1 if error occured.
+
+	* mailshar.in (bindir, transform): Quote arguments.
+
+	* Makefile.in (all): Add SCRIPTS.
+	(mailshar, mail-files, remsync): Add rules for rebuilding if source
+	or ../config.status changed.
+
+	* mailshar.in:
+	We know where shar and mail-files are found.  Call using $bindir.
+
+	* mailshar.in: Only run mail-files if shar successfully ended.
+
+	* mailshar.in:
+	Implement --help and --version option.  Reported by Tom Tromey.
+
+	* Makefile.in (install-exec): Remove trailing ;.
+
+	* Makefile.in (clean):
+	Don't remove mailshar, mail-files, adn remsync.  Do it in
+	distclean instead.
+
+Tue Nov 21 16:28:02 1995  Ulrich Drepper  <drepper@myware>
+
+	* encode.c, uudecode.c, uuencode.c, unshar.c, shar.c:
+	DeANSIfy function definitions.
+
+Sat Nov 18 16:55:14 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (walkdown): Don't use malloc.  Alloc is better here.
+
+Thu Nov 16 21:14:12 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (shar):
+	Make produced shar catch faulty md5sum program in textutils-1.12.
+
+Tue Nov  7 13:51:28 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (mostlyclean):
+	Don't try to remove ansi2knr generated files anymore.
+	We have none.
+
+	* Makefile.in (clean): Remove remsync, mailshar, and mail-files.
+
+Sun Nov  5 23:59:58 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (INSTALL_PROGRAM): Do not specify mode.
+
+Sun Nov  5 20:24:52 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c: Rename _N to N_.
+
+	* Makefile.in:
+	(INSTALL_SCRIPT) New variable.  Names command used to install scripts.
+
+Sun Nov  5 13:40:32 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Suppress error message when ln failed.
+
+	* shar.c: Use _N instead of _C due to last change in GNU gettext.
+
+Fri Nov  3 00:39:23 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c: Replace __GTM by _C according to change in gettext-0.9.7.
+
+Tue Oct 31 01:19:18 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in:
+	Remove ansi2knr stuff.  The source now compile without this.
+
+	* shar.c (shar):
+	While detecting md5sum do not use -h option.  md5sum in
+	textutils-1.13 does not have this option anymore.  Use --help instead.
+	Though this option is not present in the Plumb/Lankester version this
+	program still gives you the complate usage message and so it still
+	works.
+
+Sun Oct 29 12:05:22 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (SCRIPTS):
+	New variable containing of scripts to be installed.
+	(install-exec): Also install scripts.
+
+Sat Oct 28 01:36:45 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (shar): Correct output for MD5 if/then/else.
+	(main): Call get_submitter with NULL argument.
+	Remove fixed limit for number of file names read from stdin.
+
+Fri Oct 27 02:19:27 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (shar): Better redirection code in shar file.  Patch by
+	Christian von Roques.
+
+	* unshar.c: Make -f/--force synonym for -c option.  This is more
+	intuitive and more conformant to the GNU coding standard.
+	Suggested by Karl Berry.
+
+	* shar.c: Make -c option to shar script really force creation of
+	file.  Reported by Karl Berry.
+
+Tue Sep 26 00:29:26 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (LIBS):
+	Undid last change.  On some systems libintl.a is not
+	completely self-contained.  alloca() is missing e.g. on HP-UX.
+
+Mon Sep 25 21:27:30 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (main):
+	When not using GNU gettext don't provide --print-text-dom-dir option.
+
+Sun Sep 24 00:08:14 1995  Ulrich Drepper  <drepper@myware>
+
+	* unshar.c (unarchive_shar_file):
+	Replace byte processing loop by fread/fwrite loop.
+
+Sat Sep 23 20:53:25 1995  Ulrich Drepper  <drepper@myware>
+
+	* unshar.c (starting_with): Oops.  Fatal bug :-).  Forgot the == 0.
+
+Sat Sep 23 14:08:14 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c:
+	Implement MD5 check.  If the md5sum program is available at *unpack*
+ 	time this now provides a much better security.
+
+	* Makefile.in (LIBS):
+	After change to latest libintl.a we don't need to link with libshar.a
+	twice.
+
+Fri Sep 22 23:06:24 1995  Ulrich Drepper  <drepper@myware>
+
+	* unshar.c: Fix typo in comment.
+
+	* unshar.c (starting_with):
+	Remove function definition.  A simple call to memcmp is
+	necessary.
+
+	* unshar.c (main): Make version string more regular.
+
+	* unshar.c (main): Replace strcat cascades with stpcpy.
+
+	* uudecode.c:
+	Implement base64 decoding and `-o' option from POSIX.2b/Draft 11.
+
+	* uuencode.c (main): Program version output written in canonical form.
+
+Thu Sep 21 22:07:13 1995  Ulrich Drepper  <drepper@myware>
+
+	* uuencode.c: Implement base64 encoding.
+
+	* shar.c (main):
+	When NLS is disabled --print-text-dom-dir option must not refernce
+	_NL_DEFAULT_DIRNAME variable from dcgettext.c.
+	Reported by Gordon Joly <gordo@tecc.ac.uk>.
+
+	* shar.c (CHARACTER_COUNT_COMMAND): Internationalized wc commands
+ 	might count multi-byte characters when a appropriate locale is
+ 	set.  Reset all locales explicitly.  Report by Kaz Sasayama
+ 	<kaz@lilia.iijnet.or.jp>.
+
+Wed Sep 20 23:54:02 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (generate_full_header):
+	Mention mkdir program as always necessary.
+	(main): If vanilla shar is selected don't use internationalization.
+	Reported by Jan Djarv.
+
+Fri Aug 18 12:06:16 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c (generate_configure):
+	Use -s unstead of --shell-script as argument to
+	gettext.
+
+	* shar.c (usage): Fix typo: internationlaized -> internationalized.
+	Reported by Franc,ois Pinard.
+
+Thu Aug 17 23:54:36 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c:
+	Don't use `getpid' all the time.  This leads to problems with fork'ed
+	processes.  Instead determine the number once at the beginning.
+	(sharpid): New variable.
+
+	* shar.c (shar):
+	Add a ! character after $shar_count string in error message because
+	this string may be empty if some error occured.
+
+Tue Aug 15 16:49:05 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Remove `copying instead' message.
+
+Sun Aug 13 23:29:27 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c: Change shar script to use lock directory.
+
+	* shar.c: Now produces internationalized shar archives.
+
+Wed Aug  9 21:54:56 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (ID, TAGS): Don't use $^.
+
+	* shar.c: Add --no-i18n option.
+
+Tue Aug  8 01:44:11 1995  Ulrich Drepper  <drepper@myware>
+
+	* shar.c:
+	Implement --print-text-domain-dir option.  This is required by the
+	internationalized shell scripts.
+
+Thu Aug  3 00:13:10 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in: Initial revision.
+

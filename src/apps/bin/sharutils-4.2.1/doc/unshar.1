@@ -1,0 +1,56 @@
+.TH UNSHAR 1 "September 10, 1995"
+.SH NAME
+unshar \- unpack a shar file
+.SH SYNOPSIS
+unshar [ options ] [ file ... ]
+.SH DESCRIPTION
+.PP
+Unshar scans mail messages looking for the start of a shell archive.  It
+then passes the archive through a copy of the shell to unpack it.  It
+will accept multiple files.  If no files are given, standard input is used.
+.SH OPTIONS
+.PP
+Options have a one letter version starting with \- or a long version starting
+with \-\-.  The exception is \f2\-\-help\f1 and \f2\-\-version\f1,
+which does not have a short version.
+.IP "\f2\-\-version\f1"
+Print the version number of the program on standard output,
+then immediately exits.
+.IP "\f2\-\-help\f1"
+Print a help summary on standard output, then immediately exits.
+.IP "\f2\-d\f1 DIRECTORY  \f2\-\-directory=\f1DIRECTORY"
+Change directory to DIRECTORY before unpacking any files.
+.IP "\f2\-c\f1  \f2\-\-overwrite\f1"
+Passed as an option to the shar file.  Many shell archive scripts
+(including those produced by `shar' 3.40 and newer) accepts a \f2\-c\f1
+argument to indicate that existing files should be overwritten.
+.IP "\f2\-e\f1  \f2\-\-exit-0\f1"
+This option exists mainly for people who collect many shell
+archives into a single mail folder.  With this option, `unshar'
+isolates each different shell archive from the others which have
+been put in the same file, unpacking each in turn, from the
+beginning of the file towards its end.  Its proper operation
+relies on the fact that many shar files are terminated by a
+`exit 0' at the beginning of a line.
+
+Option \f2\-e\f1 is internally equivalent to \f2\-E\f1 "exit 0".
+.IP "\f2\-E\f1 STRING  \f2\-\-split-at=\f1STRING"
+This option works like \f2\-e\f1, but it allows you to specify the
+string that separates archives if `exit 0' isn't appropriate.
+
+For example, noticing that most `.signatures' have a `\-\-' on a
+line right before them, one can sometimes use `\f2\-\-split-at\f1=\-\-' for
+splitting shell archives which lack the `exit 0' line at end.  The
+signature will then be skipped altogether with the headers of the
+following message.
+.IP "\f2\-f\f1  \f2\-\-force\f1"
+The same as \f2\-c\f1.
+.SH SEE ALSO
+shar(1)
+.SH DIAGNOSTICS
+Any message from the shell may be displayed.
+.SH AUTHORS
+The shar and unshar programs is the collective work of many authors.
+Many people contributed by reporting problems, suggesting
+various improvements or submitting actual code.  A list of
+these people is in the THANKS file in the sharutils distribution.

@@ -1,0 +1,13 @@
+# List of files which containing translatable strings.
+# Copyright (C) 1995 Free Software Foundation, Inc.
+
+# Files from the compatibility library
+lib/error.c
+lib/getopt.c
+lib/xmalloc.c
+
+# Package source files
+src/shar.c
+src/unshar.c
+src/uudecode.c
+src/uuencode.c

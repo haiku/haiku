@@ -1,0 +1,16 @@
+Authors of GNU shar utilities.
+
+The following contributions warranted legal paper exchanges with the
+Free Software Foundation.  Also see files ChangeLog and THANKS.
+
+UUDECODE, UUENCODE, XXDECODE, XXENCODE  David J. Camp
+Disclaims programs.
+
+UUDECODE, UUENCODE, XXDECODE, XXENCODE  Washington University
+Disclaims programs by David J. Camp.
+
+SHARUTILS	Ulrich Drepper	Germany 1968	8/3/95
+Assigns past and future changes to Sharutils.
+
+SHARUTILS       Jan Djarv       Swedish 1963    9/8/95
+Assigns the manual "Shar man pages"

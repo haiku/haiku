@@ -1,0 +1,65 @@
+Mon Dec  4 16:51:38 1995  Ulrich Drepper  <drepper@myware>
+
+	* unshar.1, shar.1: Update for 4.2 by Jan Djarv.
+
+Thu Nov 30 23:16:17 1995  Ulrich Drepper  <drepper@myware>
+
+	* remsync.texi: According to D.E.Knuth and Karl Berry `nonzero' is
+	preferable to `non-zero'.
+
+Sat Nov 25 02:45:11 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (version.texi): Also depend on ../configure.in.
+
+	* unshar.1, sharutils.texi:
+	Correct double `in`.  Reported by Nelson Beebe.
+
+	* remsync.texi: Correct double `the`.  Reported by Nelson Beebe.
+
+Sun Nov  5 13:33:39 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Suppress error message when ln failed.
+
+Sat Oct 28 01:50:37 1995  Ulrich Drepper  <drepper@myware>
+
+	* sharutils.texi: Document -f option of unshar.
+
+Tue Sep 26 14:25:20 1995  Ulrich Drepper  <drepper@myware>
+
+	* uuencode.1: Typo.
+
+	* uuencode.1: Document P1003.2b/D11 changes.
+
+Sun Sep 24 16:28:34 1995  Ulrich Drepper  <drepper@myware>
+
+	* sharutils.texi: Add some comments about transmission checks.
+
+Wed Sep 20 23:51:03 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (transform):
+	New variable.  Gets its value from configure.
+	(man1dir, man1ext, man5dir, man5ext): New variables for man page
+ 	installation.
+	(install-man): Correct some bugs.
+
+	* Makefile.in (MAN1PAGES, MAN5PAGES): Let configure set the values.
+	(install-man, uninstall-man): The for $(MAN5PAGES) to be empty; some
+	shells don't like empty for argument lists.
+
+	* unshar.1, shar.1: Changes for 4.1.6 by Jan Djarv.
+
+Tue Aug 15 16:58:58 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Remove `copying instead' message.
+
+Thu Aug 10 22:34:12 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (DISTFILES):
+	Was two times sharutils.info and remsync.info.  Change one of
+	them to sharutils.texi and remsync.texi.
+	Reported by Franc,ois Pinard.
+
+Thu Aug  3 00:27:20 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in: Initial revision.
+

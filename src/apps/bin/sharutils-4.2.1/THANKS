@@ -1,0 +1,72 @@
+The shar and unshar programs is the collective work of many authors.
+Many people contributed to shar by reporting problems, suggesting
+various improvements or submitting actual code.  Here is a list of
+these people.  Help me keeping it complete and exempt of errors.
+
+Andrew B. Smith		abs@maunsell.co.uk
+Andrew Walduck		amewaldu@undergrad.math.uwaterloo.ca
+Andrey A. Chernov	ache@astral.msk.su
+Andries E. Brouwer	aeb@win.tue.nl
+Andy Seaborne		afs@hplb.hpl.hp.com
+Antonio Esteves		esteves@di.uminho.pt
+Bernd Nordhausen	bernd@passage.com
+Bill Aten		bill@netagw.com
+Bill Campbell		bill@celestial.com
+Bill Silvert		silvert@cs.dal.ca
+Bruno Haible		haible@ma2s2.mathematik.uni-karlsruhe.de
+Christian von Roques	roques@pond.sub.org
+Christopher Sawtell	chris@gerty.equinox.gen.nz
+Colas Nahaboo		colas@mirsa.inria.fr
+David J. MacKenzie	djm@uunet.uu.net
+Dennis Boylan		nanovx!dennis
+Donald Page		donaldp@sco.com
+Elliott Pacetti		epacet@unf6.cis.unf.edu
+Elvia Lopez Hurtado	elvial@ctsmex.attmail.com
+Eric Backus		ericb@lsid.hp.com
+François Pinard		pinard@iro.umontreal.ca
+Gordon Joly		G.Joly@cs.ucl.ac.uk
+Gordon Moffet		netcom!gam
+Greg McGary		gkm@magilla.cichlid.com
+Gregory Neil Shapiro	gshapiro@wpi.edu
+Harlan Stenn		harlan@mumps.pfcs.com
+Horst von Brand		vonbrand@inf.utfsm.cl
+Ian Jackson		iwj@cam-orl.co.uk
+Jan Djarv		Jan.Djarv@sa.erisoft.se
+James Gosling		James.Gosling@eng.sun.com
+Jim Meyering		meyering@acm.org
+Joseph E. Sacco		jsacco@ssl.com
+Joshua R. Poulson	jrp@plaza.ds.adp.com
+Karl Berry		kb@cs.umb.edu
+Karl Vogel		vogelke@c-17igp.wpafb.af.mil
+Kaveh R. Ghazi		ghazi@noc.rutgers.edu
+Ken Olstad		olstad@msc.edu
+Laurent Bourbeau	bpi!bourbeau
+Meade Roberts		meade@plaza.ds.adp.com
+Michael A. Thompson	mike@iotek.ns.ca
+Michael Mauldin		mlm@cs.cmu.edu
+Michael Rendell		michael@cs.mun.ca
+Nelson H. F. Beebe	beebe@math.utah.edu
+Noah Friedman		friedman@gnu.ai.mit.edu
+Pat Myrto		rwing!pat
+Paul A. Vixie		paul@vix.com
+Paul Eggert		eggert@twinsun.com
+Richard H. Gumpertz	rhg@cps.com
+Richard Segal		segal@cs.washington.edu
+Richard Stallman	rms@prep.ai.mit.edu
+Robert J.C. Kyanko	rob@rjck.oau.org
+Roderick Schertler	roderick@gate.net
+Thomas E. Dickey	dickey@clark.net
+Ulrich Drepper		drepper@gnu.ai.mit.edu
+Warren Tucker		wht@n4hgf.atl.ga.us
+William Davidsen	davidsen@tmr.com
+
+
+Thanks to all members of the translation teams for the different
+languages.  Mentioned here are the persons who sent the catalogs:
+
+Dutch:		Andries E. Brouwer	aeb@win.tue.nl
+French:         François Pinard         pinard@iro.umontreal.ca
+German:		Ulrich Drepper		drepper@gnu.ai.mit.edu
+Japanese:	Sakai Kiyotaka		ksakai@netwk.ntt-at.co.jp
+Portugese:	Antonio Esteves		esteves@di.uminho.pt
+Svedish:        Jan Djarv               Jan.Djarv@sa.erisoft.se

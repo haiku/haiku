@@ -1,0 +1,129 @@
+'.\" Copyright (c) 1980, 1990 The Regents of the University of California.
+'.\" All rights reserved.
+'.\"
+'.\" Redistribution and use in source and binary forms, with or without
+'.\" modification, are permitted provided that the following conditions
+'.\" are met:
+'.\" 1. Redistributions of source code must retain the above copyright
+'.\"    notice, this list of conditions and the following disclaimer.
+'.\" 2. Redistributions in binary form must reproduce the above copyright
+'.\"    notice, this list of conditions and the following disclaimer in the
+'.\"    documentation and/or other materials provided with the distribution.
+'.\" 3. All advertising materials mentioning features or use of this software
+'.\"    must display the following acknowledgement:
+'.\"	This product includes software developed by the University of
+'.\"	California, Berkeley and its contributors.
+'.\" 4. Neither the name of the University nor the names of its contributors
+'.\"    may be used to endorse or promote products derived from this software
+'.\"    without specific prior written permission.
+'.\"
+'.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+'.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+'.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+'.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+'.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+'.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+'.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+'.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+'.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+'.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+'.\" SUCH DAMAGE.
+'.\"
+'.\" Modified from
+'.\"     @(#)uuencode.1	6.9 (Berkeley) 4/23/91
+'.\"
+.TH uuencode 1
+.SH NAME
+uuencode \- encode a binary file
+.PP
+uudecode \- decode a file created by uuencode
+.SH SYNOPSIS
+.B uuencode
+[\-m] [ file ] name
+.PP
+.B uudecode
+[-o outfile] [ file ]...
+.SH DESCRIPTION
+.I Uuencode
+and
+.I uudecode
+are used to transmit binary files over transmission mediums
+that do not support other than simple
+ASCII
+data.
+.PP
+.I Uuencode
+reads
+.I file
+(or by default the standard input) and writes an encoded version
+to the standard output.
+The encoding uses only printing
+ASCII
+characters and includes the
+mode of the file and the operand
+.I name
+for use by
+.I uudecode.
+If
+.I name
+is
+.I /dev/stdout
+the result will be written to standard output.  By default the standard
+UU encoding format will be used.  If the option
+.I \-m
+is given on the command line
+.B base64
+encoding is used instead.
+.PP
+.I Uudecode
+transforms
+uuencoded
+.I files
+(or by default, the standard input) into the original form.
+The resulting file is named
+.I name
+(or
+.I outfile
+if the \-o option is given)
+and will have the mode of the original file except that setuid
+and execute bits are not retained.  If
+.I outfile
+or
+.I name
+is /dev/stdout the result will be written to standard output.
+.I Uudecode
+ignores any leading and trailing lines.  The program can automatically decide
+which of the both supported encoding schemes are used.
+.SH EXAMPLES
+The following example packages up a source tree, compresses it,
+uuencodes it and mails it to a user on another system.
+When
+.I uudecode
+is run on the target system, the file ``src_tree.tar.Z'' will be
+created which may then be uncompressed and extracted into the original
+tree.
+.PP
+.IP
+.NF
+tar cf \- src_tree \&| compress \&|
+uuencode src_tree.tar.Z \&| mail sys1!sys2!user
+.FI
+.LP
+.SH SEE ALSO
+compress(1), mail(1), uucp(1), uuencode(5)
+.SH STANDARDS
+This implementation is compliant with P1003.2b/D11.
+.SH BUGS
+If more than one file is given to
+.I uudecode
+and the \-o option is given or more than one
+.I name
+in the encoded files are the same the result is probably not what is expected.
+.PP
+The encoded form of the file is expanded by 37% for UU encoding and by 35%
+for base64 encoding (3 bytes become 4 plus control information).
+.SH HISTORY
+The
+.I uuencode
+command appeared in
+BSD 4.0.

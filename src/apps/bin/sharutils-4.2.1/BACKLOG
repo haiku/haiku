@@ -1,0 +1,290 @@
+# Summary of pending email for GNU sharutils 4.1.4.
+# Last updated: Friday, February 24, 1995.
+#
+# You may use this BACKLOG file for checking if I still have an
+# unprocessed report of yours, or just to have a feeling of how
+# this package is evolving (or not :-).  Please be kind enough to
+# check here before reporting again a problem that is not solved
+# in this release.
+# 
+# When I will process a report from you, you may reasonably count
+# on the fact that I will give you some feedback at that time.
+# By merely re-sending a report I already have, you are just putting
+# more burden on my shoulders, and surely not making things go
+# any faster.
+# 
+# I could of course withhold a release until all reported problems
+# are solved.  This would not always be practical, nor fair for
+# the community, when some of all reported bugs are solved indeed.
+# So I have to cut the pear in halves, draw a line somewhere, and
+# still make releases once in a while.
+#
+# About the principle of the BACKLOG file itself, my opinion is that
+# users deserve to know where maintenance stands for what they use.
+# Ignorance is sometimes more comfortable, but does not change facts.
+# If commercial companies were indeed publishing their own internal
+# bug lists, I think you would feel more secure with GNU software!
+
+
+rmail/announce
+ 1. 31 Aug 93 <ian@cygnus.com> uuencode/uudecode
+ 2. 07 Jun 94 <pinard> shar/unshar
+ 3. 08 Jul 94 <pinard> GNU shar?
+ 4. 02 Sep 94 <pinard@IRO.UMontreal.CA> Release: GNU shar 4.0
+ 5. 30 Oct 94 <pinard@IRO.UMontreal.CA> Prerelease: GNU sharutils 4.0.1
+ 6. 06 Nov 94 <pinard@iro.umontreal.ca> Release: GNU sharutils 4.1
+ 7. 29 Nov 94 <pinard@IRO.UMontreal.CA> Prerelease: GNU sharutils 4.1.1
+ 8. 30 Nov 94 <pinard> Disappearance of uuencode 1.0
+ 9. 01 Dec 94 <pinard@IRO.UMontreal.CA> Prerelease: GNU sharutils 4.1.3
+10. 24 Feb 95 <pinard> Prerelease: GNU sharutils 4.1.4
+
+rmail/brik
+ 1. 07 Nov 94 <meyering@comco.com> Re: is this tar file ok?
+ 2. 07 Nov 94 <pinard> GNUicizing brik?
+ 3. 09 Nov 94 <dhesi@rahul.net> Re: GNUicizing brik? 
+ 4. 10 Nov 94 <pinard> 1) GNU tar, 2) GNU brik? :-)
+ 5. 10 Nov 94 <dhesi@rahul.net> Re: 1) GNU tar, 2) GNU brik? :-) 
+ 6. 12 Nov 94 <rms@gnu.ai.mit.edu> brik
+ 7. 12 Nov 94 <pinard> brik in GNU shar utilities
+ 8. 12 Nov 94 <meyering@comco.com> Re: brik in GNU shar utilities
+ 9. 12 Nov 94 <meyering@comco.com> Re: brik in GNU shar utilities
+10. 13 Nov 94 <rms@gnu.ai.mit.edu> brik
+11. 14 Nov 94 <dhesi@rahul.net> Re: brik 
+12. 29 Nov 94 <pinard> Re: brik
+13. 29 Nov 94 <pinard> Re: brik
+14. 30 Nov 94 <dhesi@rahul.net> Re: brik 
+15. 04 Dec 94 <rms@csrl.aoyama.ac.jp> Re: brik
+16. 04 Dec 94 <dhesi@rahul.net> Re: brik 
+17. 04 Dec 94 <rms@csrl.aoyama.ac.jp> Re: brik
+18. 05 Jan 95 <pinard> Re: brik
+19. 05 Jan 95 <rms@gnu.ai.mit.edu> Re: brik
+20. 05 Jan 95 <dhesi@rahul.net> Re: brik 
+21. 06 Jan 95 <pinard> Re: brik
+22. 27 Jan 95 <pinard> Legaleese for brik?
+23. 27 Jan 95 <dhesi@rahul.net> Re: Legaleese for brik? 
+24. 12 Feb 95 <pinard> brik, and uucode
+
+rmail/documentation
+ 1. 11 Nov 94 <maechler@stat.math.ethz.ch> Release: GNU sharutils 4.1
+ 2. 11 Nov 94 <pinard@IRO.UMontreal.CA> Re: Release: GNU sharutils 4.1
+ 3. 11 Nov 94 <maechler@stat.math.ethz.ch> Re: Release: GNU sharutils 4.1
+ 4. 11 Nov 94 <maechler@stat.math.ethz.ch> Release: GNU sharutils 4.1
+ 5. 11 Nov 94 <pinard@IRO.UMontreal.CA> Re: Release: GNU sharutils 4.1
+ 6. 11 Nov 94 <maechler@stat.math.ethz.ch> Re: Release: GNU sharutils 4.1
+ 7. 16 Nov 94 <pinard> Re: sharutils
+ 8. 30 Nov 94 <pinard> Re: Suggestion for Sharutils (feature)
+ 9. 30 Nov 94 <drepper@ipd.info.uni-karlsruhe.de> Re: Prerelease: GNU sharutils
+10. 30 Nov 94 <pinard@IRO.UMontreal.CA> Re: Suggestion for Sharutils (feature)
+11. 11 Feb 95 <pinard> sh, shar, unshar - explications
+
+rmail/remote-cvs
+ 1. 13 Feb 95 <paquette@atomas.crim.ca> [jimb@totoro.bio.indiana.edu: remote CV
+ 2. 13 Feb 95 <paquette@atomas.crim.ca> [zoo@armadillo.com: Re: remote CVS?]
+ 3. 13 Feb 95 <paquette@atomas.crim.ca> [kingdon@cygnus.com: Re: remote CVS?]
+ 4. 13 Feb 95 <paquette@atomas.crim.ca> [zoo@armadillo.com: Re: remote CVS?]
+ 5. 13 Feb 95 <paquette@atomas.crim.ca> [kingdon@cygnus.com: Re: remote CVS?]
+ 6. 13 Feb 95 <paquette@atomas.crim.ca> [stig@inse.com: Re: remote CVS?]
+ 7. 13 Feb 95 <paquette@atomas.crim.ca> [karl@owl.hq.ileaf.com: even more remot
+ 8. 13 Feb 95 <paquette@atomas.crim.ca> [Ollivier.Robert@hsc.fr.net: Re: even m
+ 9. 13 Feb 95 <paquette@atomas.crim.ca> [jc@irbs.com: Re: even more remote CVS?
+
+rmail/remsync
+ 1. 18 Oct 94 <pinard@gnu.ai.mit.edu> (none)
+ 2. 18 Oct 94 <pinard@gnu.ai.mit.edu> remsync chez gnu.ai
+ 3. 18 Oct 94 <pinard> remsync
+ 4. 19 Oct 94 <pinard@gnu.ai.mit.edu> remsync pour wdiff recu sur gnux
+ 5. 23 Oct 94 <pinard> Ignores ignored?
+ 6. 28 Oct 94 <pinard@gnu.ai.mit.edu> (none)
+ 7. 28 Oct 94 <pinard@gnu.ai.mit.edu> (none)
+ 8. 28 Oct 94 <pinard> (none)
+ 9. 02 Nov 94 <pinard@kicah.uucp> (none)
+10. 03 Nov 94 <latendre@IRO.UMontreal.CA> remsync
+11. 03 Nov 94 <pinard@IRO.UMontreal.CA> Full path would be better
+12. 24 Oct 94 <pinard@IRO.UMontreal.CA> remsync - modifier...
+13. 25 Oct 94 <parallel@IRO.UMontreal.CA> Hebdomadaire...
+14. 26 Oct 94 <pinard@IRO.UMontreal.CA> (none)
+15. 26 Oct 94 <latendre@IRO.UMontreal.CA> shar: .remsync.tar.gz
+16. 26 Oct 94 <pinard@IRO.UMontreal.CA> shar: .remsync.tar.gz
+17. 26 Oct 94 <latendre@IRO.UMontreal.CA> shar: .remsync.tar.gz
+18. 26 Oct 94 <latendre@IRO.UMontreal.CA> (none)
+19. 26 Oct 94 <pinard@IRO.UMontreal.CA> remsync: 1) Prudence 2) Mario
+20. 26 Oct 94 <pinard@IRO.UMontreal.CA> (none)
+21. 27 Oct 94 <pinard@IRO.UMontreal.CA> shar: remsync.in
+22. 27 Oct 94 <pinard@IRO.UMontreal.CA> shar: .remsync.tar.gz
+23. 03 Nov 94 <gerinlaj@IRO.UMontreal.CA> presentation a RISQ 95
+24. 04 Nov 94 <pinard@IRO.UMontreal.CA> Re: presentation a RISQ 95
+25. 08 Nov 94 <pinard> remsync - idées
+26. 13 Oct 94 <pinard> (none)
+27. 18 Oct 94 <pinard> Bug Perl
+28. 22 Oct 94 <Mailer-Daemon> Returned mail: User unknown
+29. 04 Nov 94 <pinard@IRO.UMontreal.CA> Re: presentation a RISQ 95
+30. 03 Nov 94 <gerinlaj> presentation a RISQ 95
+31. 03 Nov 94 <pinard@IRO.UMontreal.CA> Full path would be better
+32. 21 Nov 94 <fournier@crim.ca> RISQ95: programme preliminaire et pre-inscript
+33. 21 Nov 94 <yves@cc.mcgill.ca> RISQ95: programme preliminaire et pre-inscrip
+34. 07 Dec 94 <Diane.Fournier@CRIM.CA> RISQ95 - Vos coordonnees
+35. 07 Dec 94 <Diane.Fournier@crim.ca> RISQ95: Conferenciers - Speakers
+36. 07 Dec 94 <Diane.Fournier@crim.ca> RISQ95: Conferenciers - Speakers
+37. 09 Dec 94 <pinard@IRO.UMontreal.CA> Re: RISQ95 - Vos coordonnees
+38. 09 Dec 94 <pinard@IRO.UMontreal.CA> Re: RISQ95: Conferenciers - Speakers
+39. 09 Dec 94 <pinard@IRO.UMontreal.CA> Re: RISQ95: Conferenciers - Speakers
+40. 12 Dec 94 <Diane.Fournier@crim.ca> RAPPEL: Conferenciers - Speakers RISQ95
+41. 12 Dec 94 <Diane.Fournier@crim.ca> RAPPEL: Conferenciers - Speakers RISQ95
+42. 13 Dec 94 <efortin@clouso.crim.ca> (none)
+43. 13 Dec 94 <mkeenan@actbanksys.ie> RCVS Duplicate copies ?
+44. 13 Dec 94 <mike@fionn.lbl.gov> Re: RCVS Duplicate copies ?
+45. 20 Dec 94 <pinard@gnu.ai.mit.edu> (none)
+46. 22 Dec 94 <taarna!pinard@IRO.UMontreal.CA> (none)
+47. 23 Dec 94 <taarna!pinard@IRO.UMontreal.CA> remsync - Diagnose locally missi
+48. 31 Dec 94 <pinard> Bug remsync
+49. 31 Dec 94 <stig@inse.com> Will CVS 1.4 learn to track moving files?
+50. 12 Jan 95 <Diane.Fournier@crim.ca> RISQ95: programme final
+51. 12 Jan 95 <Diane.Fournier@crim.ca> RISQ95: programme final
+52. 24 Jan 95 <pinard@IRO.UMontreal.CA> remsync !?
+53. 24 Jan 95 <pinard> remsync vs PAGER
+54. 26 Jan 95 <pinard@IRO.UMontreal.CA> (none)
+55. 27 Jan 95 <pinard@gnu.ai.mit.edu> (none)
+56. 29 Jan 95 <claude@unimtl.uniforum.qc.ca> (none)
+57. 29 Jan 95 <pinard> Récent envoi àUniforum
+58. 29 Jan 95 <pinard> Envoi Uniforum (bis)
+59. 29 Jan 95 <pinard> Message Uniforum (ter)
+60. 06 Feb 95 <fmayhar@locus.com> Remsync.
+61. 06 Feb 95 <pinard> Re: Remsync.
+62. 06 Feb 95 <pinard> remsync to be included in GNU shar utilities
+63. 06 Feb 95 <pinard> remsync to be included in GNU shar utilities
+
+rmail/shar-archive-headers
+ 1. 15 Oct 94 <dickey@clark.net> shar 4.0 vs cshar
+ 2. 15 Oct 94 <pinard> Re: shar 4.0 vs cshar
+ 3. 19 Oct 94 <Joerg.Heitkoetter@Germany.EU.net> GNU Shar 4.1 extensions?
+ 4. 19 Oct 94 <pinard> Re: GNU Shar 4.1 extensions?
+ 5. 23 Oct 94 <Joerg.Heitkoetter@Germany.EU.net> Re: GNU Shar 4.1 extensions? 
+ 6. 23 Oct 94 <Joerg.Heitkoetter@Germany.EU.net> shar-4.0-4.1.patch
+ 7. 07 Nov 94 <pinard> Re: small enhancement to sharutils-4.1
+ 8. 16 Jan 95 <leisner@sdsp.mc.xerox.com> saving the headers in unshar
+ 9. 26 Jan 95 <leisner@sdsp.mc.xerox.com> Re: saving the headers in unshar 
+
+rmail/shar-backups
+ 1. 26 Jan 95 <leisner@sdsp.mc.xerox.com> Re: saving the headers in unshar 
+ 2. 27 Jan 95 <pinard> backups [was: Re: saving the headers in unshar]
+
+rmail/shar-documentation
+ 1. Tue Sep  6 <lvirden@cas.org> Re: Solution for [Re: shar 4.0 make shar.dvi p
+ 2. Tue Sep  6 <lvirden@cas.org> Re: Solution for [Re: shar 4.0 make shar.dvi p
+ 3. 09 Sep 94 <gaumondp@ere.umontreal.ca> Comments about shar-4.0
+ 4. 11 Sep 94 <davidsen@tmr.com> Re: shar 4.0 [was: Re: disk buffering in Linux
+ 5. 12 Sep 94 <pinard> Say a word about GNU touch
+ 6. 16 Sep 94 <djm@va.pubnix.com> comments on shar 4.0 doc
+ 7. 10 Sep 94 <Mailer-Daemon@ileaf.com> Returned mail: Host unknown
+ 8. 03 Sep 94 <pinard> GNU shar 4.0
+
+rmail/shar-old-bug
+ 1. 27 Sep 90 <pinard> shar 3.49 details
+ 2. 27 Sep 90 <pinard> Other problems requiring -F with shar [was: macros.ed]
+
+rmail/shar-touch
+ 1. 17 Nov 94 <wbe@psr.com> Suggested change to shar
+ 2. 17 Nov 94 <pinard@IRO.UMontreal.CA> Re: Suggested change to shar
+
+rmail/shar-user-id
+ 1. 23 Dec 94 <taarna!pinard@IRO.UMontreal.CA> shar: RMAIL0
+
+rmail/shar-walkdown-bug
+ 1. 12 Sep 94 <schwab@issan.informatik.uni-dortmund.de> Shar 4.0: bug in walkdo
+ 2. 13 Sep 94 <interran@uluru.stanford.edu> Re: Shar 4.0: bug in walkdown
+ 3. 12 Feb 95 <luik@pharao.stgt.sub.org> sharutils-4.1: problem sharing `.'
+
+rmail/shar-without-fork
+ 1. 07 Sep 94 <schwab@issan.informatik.uni-dortmund.de> Shar 4.0: avoid fork() 
+
+rmail/unshar-new-o-option
+ 1. 09 Sep 94 <gaumondp@ere.umontreal.ca> Suggestion for unshar 4.0
+
+rmail/unshar-slowness
+ 1. 31 Oct 94 <pinard> Re: sharutils-4.0.1
+ 2. 10 Nov 94 <pinard> Optimizing unshar
+ 3. 11 Nov 94 <djm@va.pubnix.com> Re: Optimizing unshar
+ 4. 11 Nov 94 <pinard@IRO.UMontreal.CA> Re: Optimizing unshar
+ 5. 11 Nov 94 <djm@va.pubnix.com> Re: Optimizing unshar
+ 6. 11 Nov 94 <djm@va.pubnix.com> Re: Optimizing unshar
+ 7. 11 Nov 94 <pinard@IRO.UMontreal.CA> Re: Optimizing unshar
+ 8. 11 Nov 94 <djm@va.pubnix.com> Re: Optimizing unshar
+
+rmail/unshar-standalone
+ 1. 03 Sep 94 <agulbra@nvg.unit.no> shar/unshar
+ 2. 06 Sep 94 <agulbra@pvv.unit.no> Re: shar/unshar
+
+rmail/uu-bigger-specs
+ 1. 05 Sep 93 <mathew@mantis.co.UK> Re: uuencode/uudecode
+ 2. 07 Sep 93 <mathew@mantis.co.uk> Re: GNU uudecode: why no GNU btoa?
+ 3. 03 Mar 94 <iwj@cam-orl.co.UK> uuencode 1.0: Ultrix, use of spaces, no table
+ 4. 02 Jul 94 <bcochavy@ilux39.iil.intel.com> Some slight patchs for uuencode-1
+ 5. 16 Nov 94 <rommel@ars.muc.de> sharutils
+ 6. 17 Nov 94 <rommel@ars.muc.de> Re: sharutils
+ 7. 30 Nov 94 <drepper@ipd.info.uni-karlsruhe.de> Re: Prerelease: GNU sharutils
+ 8. 21 Nov 94 <dik@cd.dsto.gov.au> uudecode enhancement
+ 9. 11 Feb 95 <pinard> uucode pas requis pour Gilles
+10. 03 Oct 94 <iwj@cam-orl.co.uk> Re: uuencode 1.0: Ultrix, use of spaces, no t
+11. 03 Oct 94 <pinard> Re: uuencode 1.0: Ultrix, use of spaces, no table, not r
+12. 02 Sep 93 <david@twg.com> Re: uuencode/uudecode
+13. 16 Feb 95 <joey@finlandia.Infodrom.North.DE> Hint: uudecode/uuencode
+
+rmail/uu-documentation
+ 1. 02 Sep 93 <ian@cygnus.com> DOS uuencode and uudecode
+ 2. 13 Oct 93 <unknown> Re: uuencode
+ 3. 17 Jul 89 <peter%essex.ac.uk%NSFNET-RELAY.AC.UK@IRO.UMontreal.CA> uudecode 
+ 4. 02 Dec 90 <jik@athena.mit.edu> Re: uudecode alias security hole?
+ 5. 17 Jun 91 <jik@cats.ucsc.edu> Re: is uudecode dangerous?
+ 6. 19 Jun 91 <wcs@cbnewsh.att.com> Re: is uudecode dangerous? ; chown?
+ 7. 01 Mar 90 <root@cca.ucsf.edu> Re: which archiver/compresser/encoder/decoder
+ 8. 03 Nov 94 <pinard@IRO.UMontreal.CA> Re: Documentation diffs, & a comment.
+
+rmail/uu-new-w-option
+ 1. 29 Oct 94 <tembel!shields> New `uudecode -w' option for easy multipart deco
+ 2. 29 Oct 94 <pinard> Re: New `uudecode -w' option for easy multipart decoding
+ 3. 29 Oct 94 <tembel!shields> Re: New `uudecode -w' option for easy multipart 
+ 4. 29 Oct 94 <tembel!shields@uunet.uu.net> New `uudecode -w' option for easy m
+
+admin/abe/RMAIL
+ 1. 17 Jan 91 <pinard> abe and directories; dabe and Turbo-C
+ 2. 27 Jan 91 <mcgill-vision!looking.on.ca!brad> Re: abe part numbering
+ 3. 11 Feb 91 <pinard> Possible bug with b= option
+ 4. 11 Feb 91 <mcgill-vision!looking.on.ca!brad> Re: Possible bug with b= optio
+ 5. 15 Jul 92 <pinard> Minor problem in dabe.c
+ 6. 23 Sep 94 <pinard> Re: Possible bug with b= option
+ 7. 24 Sep 94 <brad@alto.clarinet.com> Re: Possible bug with b= option
+ 8. 24 Sep 94 <brad@alto.clarinet.com> Re: Possible bug with b= option
+ 9. 24 Sep 94 <brad@alto.clarinet.com> Re: Possible bug with b= option
+10. 24 Sep 94 <pinard> Re: Possible bug with b= option
+11. 24 Sep 94 <pinard> Re: Possible bug with b= option
+12. 26 Sep 94 <brad@alto.clarinet.com> Re: Possible bug with b= option
+
+admin/apple/RMAIL
+ 1. 30 Jun 87 <kevin@kosman.UUCP> Comb
+
+admin/btoa/RMAIL
+ 1. 20 Sep 94 <kb@cs.umb.edu> shar, uuencode, atob
+ 2. 20 Sep 94 <pinard> Re: shar, uuencode, atob
+ 3. 29 Jul 94 <ericb@lsid.hp.com> Re: GNU shar, -M and you
+ 4. 28 Jul 94 <pinard> Re: GNU shar, -M and you
+ 5. 09 Oct 92 <jef@netcom.com> version of atob with factor of 2 speedup
+ 6. 26 Sep 93 <pinard> GNU encode 1.0 - still
+ 7. 30 Dec 89 <d84sp@efd.lth.se> Re: BTOA 5.2
+ 8. 30 Dec 89 <pinard> BTOA 5.2
+ 9. 31 Dec 89 <pinard> diffs for btoa 5.2 under MSDOS
+10. 18 Jul 90 <pinard> shar blues
+11. 20 Sep 94 <pinard@iro.umontreal.ca> Re: shar, uuencode, atob
+12. 24 Sep 94 <kb@cs.umb.edu> Re: shar, uuencode, atob
+
+admin/mailbin/RMAIL
+ 1. 05 Dec 94 <pinard> Re: mailbin.200 - part 1 of 6
+ 2. 05 Dec 94 <david@wubios.wustl.edu> mailbin.200 - part 1 of 6
+
+admin/uu-c/RMAIL
+ 1. 26 Oct 91 <w8sdz@rigel.acs.oakland.edu> UUDOALL.ZIP - More flexible uudecod
+
+admin/xx-c/RMAIL
+ 1. 21 Feb 90 <frisk@rhi.hi.is> XXENCODE/XXDECODE
+ 2. 06 Nov 90 <readdm@CCWF.CC.UTEXAS.EDU> UUXFER20.ZIP - Comprehensive UU/XX en
+ 3. 29 Nov 94 <pinard> {uu,xx}{en,de}code
+ 4. 29 Nov 94 <MAILER-DAEMON@IRO.UMontreal.CA> Returned mail: Service unavailab

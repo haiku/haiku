@@ -1,0 +1,273 @@
+This file last revised Sat Aug 4 17:15:01 CDT 1990
+
+Here is shar 3.52, an updated version of shar 3.49, derived from 'shar2'.
+This offering is the work of many people.  Thanks to wht@n4hgf.Mt-Park.GA.US
+(Warren Tucker), rhg@CPS.COM (Richard H. Gumpertz), colas@avahi.inria.fr
+(Colas Nahaboo), bill@netagw.com (Bill Aten), marks@rex.cs.tulane.edu, and
+maaaany others.
+
+This version's shar:
+1) generates shell code which attempts to create missing directories
+2) generates shell code which will force overwriting of files when passed
+   the '-c' option.
+3) allows entire directories to be archived
+4) handle deviants sun, vax, pyramid, sequent, and SCO XENIX/UNIX
+   automatically; for system V systems I did not catch, add -DSYS5
+   to CFLAGS; for other BSD-like systems, add -DBSD42
+5) if unsharing system's touch is Sys V compatible (allows touch -m),
+   the unshar process restores file dates (-m switch)
+6) An archive name may be specified for inclusion in the header
+   of the shar files (-n switch)
+7) allows automatic generation of "Submitted-by: who@where" &
+   "Archive-name: <name>/part##" headers
+8) uses getopt; no good system library should be without a copy
+   but it is readily available (like look in unshar.c)
+9) includes other chrome-plated bells, whistles, and junque
+
+This version's unshar:
+1) can change directory before unsharing
+2) can unshar from standard in, from a COLLECTION of shars,
+   from a file containing multiple concatenated shars,
+   or a mixture of shar files and concatenated-shar files.
+3) can pass the '-c' option on to the script being extracted.
+4) does not have a Social Security number.
+
+------------------------ shar  usage -----------------------------------
+shar 3.52
+usage: shar [ options ] file ...
+       shar -S [ options ]
+-V  produce "vanilla" shars demanding little of the unshar environment
+-v  verbose messages OFF while executing
+-m  restore file modification dates & times with "touch" commands
+-w  don't check with 'wc -c' after unpack
+-a  generate Submitted-by: & Archive-name: headers
+-nXXX   use XXX as the name of the archive (documentation)
+-s  override automatically determined submitter name
+-x  overwrite existing files without checking if they already exist
+-X  interactively overwrite existing files (NOT FOR NET SHARS)
+-B  treat all files as binary, use uuencode
+-T  treat all files as text (default)
+-C  compress and uuencode all files
+-bXX    pass -bXX (default 12) to compress when compressing (implies -C)
+-p  allow positional parameter options. The options "-B" and "-B"
+    and "-C" may be embedded, and files to the right of the
+    option will be processed in the specified mode
+-M  mixed mode. Determine if the files are text or
+    binary and archive correctly.
+-P  use temp files instead of pipes in the shar file
+-F  force the prefix character on every line (even if not required)
+-c  start the shar with a cut line
+-f  restore by filename only, rather than path
+-dXXX   use XXX to delimit the files in the shar
+-oXXX   (or -o XXX) output to file XXX.01 thru XXX.nn
+-lXX    limit output file size to XXk bytes (but don't split files)
+-LXX    limit output file size to XXk bytes (may split files)
+-S      read files to wrap from stdin, ignoring argument line
+
+The -S option reads filenames one per line from stdin; input
+format must be similar to 'find' output, except that if -p
+is specified, -B, -T or -C may be used (on lines by themselves)
+e.g., find . -type f -print | sort | shar -C -l50 -o /tmp/big
+
+The 'o' option is required if the 'l' or 'L' option is used
+The 'n' option is required if the 'a' option is used
+
+-a generates sharname/part## headers. If the -a argument contains
+a '/', then /part is not appended
+The automatic submitter name is trivial: essentially `whoami`@`uname`
+
+------------------------ unshar usage -----------------------------------
+Unshar has no usage built in.  It has default actions when invoked
+with no arguments (read from stdin).
+
+Usage:     unshar [ -d directory ] [ -c ] [ -e | -E exit_line ] [ files ... ]
+
+      The -c flag is passed through to the shell as a parameter to the script
+      It can unshar shar files concatenated in one file, with the
+      the "-e" command, which separates files by recognizing the
+      "exit 0" string at the beginning of a line
+
+      (The -E string option allows you to specify this string, thus
+      -e is equivalent to -E "exit 0")
+
+      The -d flag tells unshar to change directory before unsharing
+
+--------------------- history -----------------------------------------
+Changes since 3.11: kudos to rhg@CPS.COM (Richard H. Gumpertz)
+
+1.  The -l switch still specifies a maximum size for the generated
+    shar files, but now it prevents files from spanning shar parts.
+    Shars generated using this method may be unpacked in any order.
+
+2.  The old -l switch functionality is precisely emulated by using the
+    the -L switch.  That is, archived files may be split across parts.
+    Shars generated using this method must still be unpacked in order.
+
+3.  The -C switch causes files to be compressed, then uuencoded.
+    Unpacking reverses the process.
+
+4.  The -P causes the shar to use temp files instead of pipes in
+    the unshar process.
+
+5.  The -f causes files to be resotred by name only (i.e., strip
+    directory portion of input filenames before placing the name
+    into the shar.
+
+
+Changes since 3.20: kudos to colas@avahi.inria.fr (Colas Nahaboo)
+
+1.  The Archived-name: header no longer uses "/part" if there is
+    a "/" in the -n name.  Thus
+        -n xyzzy                     procduces:
+                                     xyzzy/part01
+                                     xyzzy/part02
+
+        -n xyzzy/patch               procduces:
+                                     xyzzy/patch01
+                                     xyzzy/patch02
+
+        -n xyzzy/patch01.            procduces:
+                                     xyzzy/patch01.01
+                                     xyzzy/patch01.02
+2.  The Archive-name part number other than part01 had no leading zero
+    in the number.
+
+3.  The "Submitted-by:" header was missing the hyphen (minus for olde
+    UNIX hackres).
+
+4.  The unshar program may now unshar a whole mailbox or concatenation
+    of shar files.
+
+    -C "string" looks for "string" at the beginning of the line to
+       break the file into individual shar files
+    -c is equivalent to -C "exit 0"
+
+    This of course will only work if there is something in the shar
+    file recognizable to terminate the shar.  Some shars dont have
+    "exit 0" at the end.  However, a clue: most/many .signatures have
+    "--" on a line right before them.
+
+5.  Unshar -d (change directory) no longer makes argv files unreachable.
+    I had never used the feature until the other day.  I guess the
+    author has used in only for unsharing from stdin.
+
+Changes since 3.21: thanks to Adri Verhoef, <a3@rivm.UUCP>
+
+1.  Some vaxen do not run BSD.  I guess I knew this, but -er-
+    here is Adri's note:
+> Hi Warren,
+> 
+>   I encountered a problem trying to get 'shar3.21' to compile on System V
+> on a vax.  Yes, can you believe it?  We run System V Release 3.0 on VAXen!
+> The shar3.21 code assumes that you are BSD if you're on a vax.  This is not
+> always true!  What I did to get the code compiled on System V, was:
+> (+) edit the Makefile and add -DSYS5 to CFLAGS.
+> (+) edit all the C-source files to circumcise compiler warnings
+>     ("SYS5 redefined").
+> 
+
+He made a suggestion about having a localize.sh edit a distribution
+Makefile, but for now, I'll just suggest you add -DSYS5 to CFLAGS 
+manually.
+
+2.  jhd@irfu.se (Jan Dj{rv, sorry about the screwed up character
+    translation, Jan) wrote man pages.  Thanks!
+
+Changes since 3.22: thanks to Dennis Boylan <dennis@nanovx>
+
+1.  The new -S option allows the list of files to be packed
+    to be read from the standard input rather than from the
+    command line.
+
+2.  A few purist checks were made to ensure fork() or malloc()
+    doesn't fail and excite the "if 20 hours of your time is
+    free then why isn't 200?" crowd (who probably will never see
+    this revision anyway :-))
+
+Changes since 3.23:
+
+1.  The -V mode was added.
+
+2.  Altos doesn't like the '@' in filenames.  The filename format
+    was changed.  Thanks to rhg@cps.com.
+
+Changes since 3.24:
+
+1.  Man pages were revised by gam@netcom (Gordon Moffet). Thanks.
+
+2.  When -L was specified, the "Starting ..." message was not
+produced on standard error (with or without -v).
+
+3.  When using -X, the 'not for net' warning was printed on standard
+output rather thsn standard error.
+
+4.  marks@rex.cs.tulane.edu reccommends adding -F 5000 to the load
+    line of unshar when using on XENIX 286 to avoid stack overflow
+    core dumps.  I added this information to an excellkent remake
+    of the Makefile by bill@netagw.com.
+
+Changes since 3.25:
+
+1.  Fixed one minor bug with -a/-n.  The period supplied when a
+    slash appears in the -n name was omitted.  This is a hatefully
+    small bug to fix and reissue a whole release, but
+    a) several new names are on the sharlist now and they have
+       only 3.24 to work with,
+    b) this will surely sync us all up, and
+    c) I think it will put shar to bed for a while ("no known bugs
+       at this ti ... bus error core dumped").
+
+Changes since 3.27:
+
+1.  The unshar-time test for a touch -m facility now greps for
+    'mmdd', not '[-amc]', making it more universally successful.
+
+2.  NOTE:  there is still a problem with -n arguments using
+    a 'x/y' construct, but I don't know how to properly generalize
+    it so you'll have to edit shars made with some uses of -a
+    with -n x/y.
+
+3.  This is surely my last work on this.  It does everything
+    I needed and more.  Thanks for all the help and suggestions.
+    It seems as though we didn't precipitate 'death of the shar'
+    after all :-) :-) :-).
+
+Changes since 3.32:
+
+1.  Several bug fixes.
+
+2.  Inverted the meaning of '-x'; the new default is to NOT overwrite.
+
+3.  Added '-c' checking when unpacking so the recipient can force overwrites.
+
+4.  Made '-L' work even with files not being overwritten.
+
+5.  Added '-m' and changed the default behavior to not generate TOUCH commands.
+
+6.  Added '-F'; the default is to suppress the extra 'X' at the beginning of
+    each line unless it is needed (i.e., the first character of the line is
+    already 'X' or is a non-graphic).
+
+7.  Renamed '-b' and '-t' to '-B' and '-T', respectively.
+
+8.  Added '-bn' for use with compression (calls compress with -bn).
+
+9.  Renamed the temporary files used in unpacking from shar3_???_.tmp to
+    _shar_???_.tmp.
+
+10. Directories may now be passed to shar; a recursive directory walk is
+    performed.  This feature may be disabled by compiling with -DNO_WALKTREE.
+
+Changes since 3.43:
+
+1.  Several more minor bug fixes.
+
+2.  Added support for BSD-style <sys/dir.h> and -ldir.
+
+3.  Added more usage directions to the shar header.
+
+Changes since 3.49:
+
+1.  Added more support for Unix variations.
+
+2.  A few more very minor bug fixes.

@@ -1,0 +1,82 @@
+* TODO file for GNU sharutils
+
+Tell <drepper@gnu.ai.mit.edu> if you feel like volunteering for any
+of these ideas, listed more or less in decreasing order of priority.
+Some TODO items are implicit from received email.  See file BACKLOG.
+
+(One more word.  This list already existed when I took over the task
+of maintaining sharutils.  I have not investigated the list enough
+to say this will also be correct for me.  But Franc,ois and I often
+agree so it is likely.)
+
+
+.# Next release
+The next release will have these changes:
+. + better integrate uucode with the others, code-wise
+
+
+.@ ChangeLog
+
+.* Short term
+. + Utiliser guillemets français dans fr.tt
+. + convert uucode documentation into sharutils.texi
+. + remove many fixed limits, everywhere
+. + delete useless code, among which some matching features
+. + simplify further `:' vs `true' usage, the latter might be avoided
+. + remsync matters
+.  - documentation
+The documentation is still rudimentary, but might help you to
+understand what is going on.  Many examples in some quick start
+node might help.  In any case, criticize it at will, and let me
+use your comments as an incentive for further improvement.  Any help
+from native English speakers is appreciated.
+
+Carefully ensure that you have a backup of your synchronized trees
+before your tries of remsync.  It does work for me, but who knows if
+it will not be dangerous in your particular setup.
+
+White lines, and lines beginning with \`#\', are comments.  Command
+keywords may be abbreviated to their first letter.  Space between
+successive keywords may be omitted.  Variable arguments may often be
+replaced by numeric index from lists.  SITE may also be local or 0.
+SITE_SET is a list of SITE, default is all.  A ! prefix complements it.
+The following commands are meant for automatic internal use:
+.  - handle receving files over symbolic links or directories
+.  - maintain a project title
+.  - no remote could also be local
+.  - diagnose /net/mnt_tmp/... directories
+.  - if deleting a scan, already registered files declared unexisting
+.  - have a paranoid option, in which diffs are always done
+.  - study if and how the symbolic links might be transported
+
+.* Medium term
+. + integrate remsync script and documentation
+. + have -C as synonymous for -d in shar
+	1994-08-22, Karl Berry <kb@cs.umb.edu>
+. + speedup unshar, far too slow while matching sed input
+. + construct some `make check' for shar/unshar
+. + do something sensible with file permissions
+. + study if the symbolic links might be transported
+. + when local/remote directories are relative, this should be to ~user
+. + do not send absolute files
+. + add some `-h UNSHAR.HDR' option
+	1994-08-19, Marty Leisner <leisner@sdsp.mc.xerox.com>
+. + decode options from a SHAR environment variable
+	1994-08-30, Ulrich Drepper <drepper@ira.uka.de>
+. + remsync matters
+.  - have a command to rename a remote while keeping all its values
+.  - do something sensible with file permissions
+.  - qualify each scan with destination sites
+.  - emacslisp/menage.el to omit, have it reconstructed automatically instead
+.  - have an equivalence system for email addresses
+.  - avoid computing checksums for ignored files
+.  - have a master directory for .remsync's, have them located elsewhere
+.  - have a recursive mode finding all .remsync's in tree
+.  - provide encryption hooks, so people can use e.g. PGP or rot13 :-)
+
+.* Long term
+. + automatically retrieve in correct sequence from a bunched file
+	1994-08-24, Karl Berry <kb@cs.umb.edu>
+. + when -T, just reject binary files
+	1994-08-29, Andrew A. Chernov <ache@astral.msk.su>
+	1994-09-11, Eric Backus <ericb@lsid.hp.com> -- disagrees

@@ -1,0 +1,25 @@
+Relay-Version: version B 2.10.3 4.3bsd-beta 6/6/85; site hoptoad.uucp
+From: rde@ukc.ac.uk (R.D.Eager)
+Newsgroups: net.sources
+Subject: Revised UUDECODE in MS-BASIC
+Date: 14 Mar 86 11:53:53 GMT
+Date-Received: 15 Mar 86 13:45:45 GMT
+Reply-To: rde@ukc.ac.uk (R.D.Eager)
+
+A while ago I posted a UUDECODE program, written in Microsoft Basic,
+to net.sources.  Judging from the number of replies I had, people
+are finding this useful if they don't have access to the public
+domain UUDECODE, or to a C compiler.
+
+I found one or two problems recently; the main one was that it would
+not create an output file of more than 64K due to an undocumented
+feature of MS-BASIC.  Here is a corrected version; as always, I
+suggest you compile it if you want the run time to be finite.
+
+           Bob Eager
+
+           rde@ukc.UUCP
+           rde@ukc
+           ...!mcvax!ukc!rde
+
+           Phone: +44 227 66822 ext 7589

@@ -1,0 +1,76 @@
+GNU sharutils NEWS - User visible changes.
+Copyright (C) 1994, 1995 Free Software Foundation, Inc.
+
+Version 4.2 - November 1995, by François Pinard & Ulrich Drepper
+
+* New `mailshar' is a wrapper around `shar' and electronic mail.
+
+* New `remsync' is a Perl script which uses `mailshar' to help
+synchronizing remote directories, for sites connected only by email.
+
+* Programs (but not scripts) may now speak Dutch, French, German
+and Swedish.
+
+* Option -o offers better control over where to insert the part numbering
+in the file name.
+
+* There are the beginnings of a contrib directory.
+
+* Produced shell archive are now internationalized, too
+
+* uuencode/uudecode are now compliant to the latest POSIX.2d draft
+  (more options, new encoding).
+
+* Updated man pages for shar/unshar by Jan Djarv
+
+* Speed up unshar a little bit.
+
+* Protect against transmission error by using MD5 sum.  The old wc sum
+  is more or less useless, but still the fallback solution.
+
+Version 4.1 - November 1994, by François Pinard
+
+* GNU shar 4.0 and GNU uuencode 1.0 distributions have been merged
+into this GNU sharutils package, which replaces both.  So this release
+introduces `uuencode' and `uudecode', over `shar' and `unshar'.
+
+* Option --no-verbose (-v) is being replaced by two different options:
+first is --quiet or --silent (-q), second is --quiet-unshar (-Q).
+
+Version 4.0 - September 1994, by François Pinard
+
+* The distribution includes a Texinfo manual and Info documentation.
+Jan Djarv updated the man pages.
+
+* Mixed mode (-M) mode works reliably and is the default, intermixing
+types within file lists (-p) allows `-M'.
+
+* When piping is forbidden (-P), the shar scripts are usable by
+uudecode's requiring an argument as well as by those unable to
+process one.
+
+* Interactive scripts (-X) better protect themselves against
+`unshar' programs and procedures.  The query format is nicer.
+
+Version 3.52.3 - July 1994, by François Pinard
+
+* --gzip (-z) replaces --gzipped-files (-G).  --compress (-Z)
+replaces --compressed-files (-C).  -C is kept for a while, but
+gives a warning about being deprecated.
+
+Version 3.52.2 - July 1994, by François Pinard
+
+* Long options, among which --help and --version.
+
+* Tildas are protected at the beginning of a line.
+
+* Setting timestamps is attempted by default, using an improved
+check of the local `touch' program at unshar time.
+
+* Generated shar scripts are cleaner on various details.
+
+Version 3.52.1 - June 1994, by François Pinard
+
+* New options -G and -g<N> to use gzip while making shar files.
+
+See file `ChangeLog.OLD' for prior history about shar and unshar.

@@ -1,0 +1,54 @@
+Tue Nov 21 16:28:58 1995  Ulrich Drepper  <drepper@myware>
+
+	* system.h: Add prototype for stpcpy.
+
+Thu Nov 16 20:52:11 1995  Ulrich Drepper  <drepper@myware>
+
+	* whoami.c (get_hostname): Prefer HAVE_UNAME before
+	HAVE_ETC_SYSTEMID.  Seems not to work on DGUX systems.  Hope this
+	does not break anything else.  Reported by Roderick Schertler.
+
+Sun Nov  5 20:24:38 1995  Ulrich Drepper  <drepper@myware>
+
+	* system.h: Rename _N to N_.
+
+Sun Nov  5 13:33:16 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Suppress error message when ln failed.
+
+	* system.h:
+	Rename macro _C to _N and use gettext_noop instead of gettext_const.
+
+Fri Nov  3 00:41:01 1995  Ulrich Drepper  <drepper@myware>
+
+	* system.h (_GTM): Remove macro.
+	(_C): Define according to gettext-0.9.7.  Use gettext_const.
+
+Tue Oct 31 01:25:13 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (LINK, LDFLAGS, ANSI2KNR): Remove unused variables.
+	(ALLOCA, ALLOCA_SRC): Define variables and use in SOURCES and OBJECTS.
+
+Sat Sep 23 13:10:39 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (HEADERS): Add md5.h.
+	(SOURCES): Add md5.c.
+	(OBJECTS): Add md5.o.
+
+Tue Aug 15 16:48:38 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Remove `copying instead' message.
+
+Thu Aug 10 22:40:31 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (SOURCES): Add stpcpy.c.
+  	Reported by Franc,ois Pinard.
+
+	* system.h (_GTM): Add definition.
+
+Tue Aug  1 18:33:24 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in: New file.
+
+	* Sharutils is now not any more a flat directory structure.
+

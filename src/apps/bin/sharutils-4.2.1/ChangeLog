@@ -1,0 +1,970 @@
+Mon Dec  4 00:44:40 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in (VERSION): Bump to 4.2.
+
+Sat Dec  2 03:17:01 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in: Add handling of README-alpha file.  If current
+	version is a test release we ship this file.  Inspired by Jim
+	Meyering's configure.in.
+
+	* Makefile.in (DISTFILES): Add @DIST_ALPHA@.
+
+Sun Nov 26 00:39:10 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in: Fix fatal bug: have to add AC_C_BIGENDIAN test.
+	Else the MD5 sum on big endian machines is wrong!
+
+	* configure.in: We don't need to test for shar.  We are installing it.
+
+Sat Nov 25 16:16:22 1995  Ulrich Drepper  <drepper@myware>
+
+	* README: Some corrections around ABOUT-NLS by Franc,ois Pinard.
+
+Fri Nov 24 19:59:53 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (DISTFILES): Change README.NLS to ABOUT-NLS.
+
+Tue Nov 21 16:30:51 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4 (ud_GNU_GETTEXT): Always create intl/.
+
+	* Makefile.in:
+	Make recursion loop aware of Make's -k option.  Kudos to Jim Meyering.
+
+	* Makefile.in: Make default goal `all' and depend on `all-recursice'.
+
+Tue Nov 14 12:55:50 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in (VERSION): Bump to 4.1.12.
+	(ALL_LINGUAS): Add ja_JP.EUC.
+
+Tue Nov  7 13:46:39 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4 (ud_WITH_NLS):
+	Set LIBS to correct value and filter out -intl if necessary.
+
+Mon Nov  6 16:47:58 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4 (ud_PATH_LISP):
+	Remove macro.  We don't need it in sharutils.
+
+Sun Nov  5 21:45:55 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4:
+	Franc,ois reported that po2tbl.sed is not always generated.
+
+Sun Nov  5 18:20:33 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in (VERSION): Bump to 4.1.11.
+
+	* Makefile.in (DISTFILES): Don't distributs NLS, but README.NLS.
+
+Sun Nov  5 13:33:00 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Suppress error message when ln failed.
+
+	* configure.in (VERSION): Bump to 4.1.10.
+
+Sat Nov  4 23:37:53 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4:
+	Fix typo: "Do not you" -> "Do not use".  Reported by Tom Tromey.
+
+Sun Oct 29 12:02:42 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in: Replace AC_INSTALL_PROG with fp_INSTALL_PROG.
+
+	* aclocal.m4 (fp_PROG_INSTALL): New macro by Franc,ois Pinard.
+
+Sat Oct 28 23:32:04 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4:
+	Test for dcgettext function when gettext is found in C library.  This
+	works around the missing function in Solaris 2.3.
+
+Fri Oct 27 02:29:59 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4:
+	Use single quotes where possible.  Reported by Christian von Roques.
+
+Tue Sep 26 00:52:59 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4 (md_PATH_PROG): Quote argument to echo.
+
+Mon Sep 25 22:15:36 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4 (md_PATH_PROG):
+	Use this new macro instead of AC_PATH_PROG for msgfmt and
+	xgettext program.  This warns about uses of OpenWin versions (Wrgg).
+
+Sun Sep 24 10:49:40 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4: Protect second use of ac_cv_func_stpcpy, too.
+
+	* aclocal.m4:
+	Move definition of INTLSUB to right place.  We don't need to compile
+	this directory for systems which have the gettext functions.
+
+	* configure.in (AC_REPLACE_FUNCS):
+	Add stpcpy.  Reported by Nelson Beebe and Jim Meyering.
+
+Sat Sep 23 22:49:35 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in (VERSION): Bump to 4.1.9.
+
+	* aclocal.m4 (stpcpy):
+	Fix bug where test gets empty argument when stpcpy is not available.
+	Reported by Nelson Beebe.
+
+	* configure.in (VERSION): Bump to 4.1.8.
+
+Fri Sep 22 23:47:00 1995  Ulrich Drepper  <drepper@myware>
+
+	* acconfig.h (HAVE_STPCPY): Add symbol for work around.
+
+	* configure.in (AC_C_INLINE): Add this test.
+
+Thu Sep 21 19:12:32 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4: Add aclocal.m4 from gettext-0.9.4.
+
+	* configure.in (AC_OUTPUT): Add po/po2tbl.sed.
+
+Wed Sep 20 23:51:55 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in (uucode):
+	In case of cached value set MAN1PAGES and MAN5PAGES.  Was only
+	done for uncached case before.
+
+	* Makefile.in (install-man): New rule for install man pages.
+
+	* configure.in (VERSION): Bump to 4.1.7.
+
+Thu Sep  7 00:19:52 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist):
+	Use o option for tar to generated more general tar files.
+
+	* Makefile.in (dist): Don't use long --gzip option for tar.
+
+Sat Aug 19 23:36:03 1995  Ulrich Drepper  <drepper@myware>
+
+	* aclocal.m4: Update to aclocal.m4 from gettext-0.9.3 from 950818.
+
+Tue Aug 15 16:47:46 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (dist): Remove `copying instead' message.
+
+Tue Aug 15 12:23:16 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in:
+	Make sure that .gmo catalogs are always installed if NLS is selected.
+
+	* aclocal.m4: Update NLS macros from gettext-0.9.2.
+
+Thu Aug 10 22:36:39 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in (SUBDIRS): Add contrib.
+
+Thu Aug  3 00:03:01 1995  Ulrich Drepper  <drepper@myware>
+
+	* configure.in, aclocal.m4, acconfig.h: Complete rewrite after
+ 	changing to non-flat directory structure and usage of GNU gettext.
+
+Wed Aug  2 23:59:57 1995  Ulrich Drepper  <drepper@myware>
+
+	* Makefile.in: Complete rewrite for non-flat directory structure
+ 	and usage of GNU gettext.
+
+Tue Jun 13 08:23:35 1995  =?ISO-8859-1?Q?Fran=E7ois_Pinard?=  (pinard@icule)
+
+	* shar.c: Replace all references to _sharEXT.tmp by _sh$$.EXT, so
+	many unshar may execute in parallel in the same directory.
+	Reported by Jim Meyering.
+
+Wed May 17 14:07:08 1995  =?ISO-8859-1?Q?Fran=E7ois_Pinard?=  (pinard@icule)
+
+	* pt.po: New file, for Portuguese.
+	* configure.in (LINGUAS): Adjusted.
+	Reported by Antonio Esteves.
+
+Wed May  3 20:49:53 1995  =?ISO-8859-1?Q?Fran=E7ois_Pinard?=  (pinard@icule)
+
+	* mailshar.in: Add `-s SIZE' option.  Use test instead of [.
+
+Tue May  2 23:15:01 1995  =?ISO-8859-1?Q?Fran=E7ois_Pinard?=  (pinard@icule)
+
+	* uuencode.c (encode): Use comma operator when assignment in test.
+	* uudecode.c (DEC), uuencode.c (ENC): Capitalize macro arguments.
+	* system.h (memcpy), shar.c (ISASCII): Avoid superfluous
+	parentheses in macro definitions.
+
+Tue Apr 25 18:55:26 1995  François Pinard  (pinard@icule)
+
+	* shar.c (shar): Capitalize SKIPPING messages.  These are nearly
+	errors, and so, they should call for the eye of the user.
+
+Sun Mar 26 08:48:27 1995  François Pinard  (pinard@icule)
+
+	* remsync.in: Use Emacs file variables to announce Perl mode
+	instead of using the first line.  This confuses some shells.
+	Reported by Andrey A. Chernov.
+
+	* configure.in: Define and substitute MAN1PAGES and MAN5PAGES,
+	according to --disable-uucode.
+	* Makefile.in: Adjusted accordingly.
+	Reported by Andrey A. Chernov.
+
+	* configure.in: Define SCRIPTS separately from PROGRAMS.  Use
+	fp_PROG_INSTALL instead of AC_PROG_INSTALL.
+	* Makefile.in: Adjusted accordingly.
+	Reported by Andrey A. Chernov.
+
+Fri Mar 24 07:57:57 1995  François Pinard  (pinard@icule)
+
+	* shar.c (shar): Silence the `Saving...' messages under --quiet.
+	Reported by Karl Berry.
+
+Sun Mar 19 10:32:45 1995  François Pinard  (pinard@icule)
+
+	* configure.in: Remove GLOCALE, add LINGUAS, use fp_WITH_CATALOGS.
+	* Makefile.in: Modify accordingly.
+	* acconfig.h: Add description for WITH_CATALOGS.
+	* system.h: Use WITH_CATALOGS to define _() differently.
+
+Fri Feb 24 20:09:20 1995  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (clean): Remove mail-files, mailshar and remsync.
+	Reported by Eric Backus.
+
+	* contrib/Makefile.in: Replace /doc par /contrib everywhere.  The
+	technique used for making this file shows!
+	Reported by Eric Backus, Joshua R. Poulson and Kaveh R. Ghazi.
+
+	* configure.in: Put gdiff test in parentheses, because Bourne
+	shell otherwise complains about an inexisting program.
+	Reported by Kaveh R. Ghazi.
+
+Tue Feb 21 23:57:25 1995  Francois Pinard  (pinard@icule)
+
+	* Prerelease 4.1.4.
+
+	* configure.in, Makefile.in: Replace `date' by `echo timestamp'.
+	Reported by Greg McGary and Jim Meyering.
+
+Sun Feb 19 12:06:20 1995  Francois Pinard  (pinard@icule)
+
+	* Makefile.in: Support an ID file.  Do not distribute TAGS.
+	Reported by Greg McGary.
+
+Sun Feb 12 07:21:05 1995  Francois Pinard  (pinard@icule)
+
+	Start distributing contrib:
+	* contrib/*: New files, not detailed nor maintained here.
+	* configure.in: Set make.  Output contrib/Makefile.
+	* Makefile.in (distclean, dist, dist-shar): Execute in contrib/.
+
+	Start distributing remsync:
+	* configure.in: Merge remsync's configure.in.
+	* Makefile.in: Merge remsync's Makefile.in
+	* mail-files.in, mailshar.in, remsync.in, remsync.texi: New files.
+
+Sun Feb  5 07:37:19 1995  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (maintainer-clean): New name for realclean.
+
+Sat Dec 17 14:57:41 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Check for isascii.
+	* shar.c: Properly define ISASCII after including <ctype.h>.
+	(shar): Use ISASCII before checks if not mandatory prefix mode.
+	Reported by Bruno Haible and Jim Meyering.
+
+Tue Dec 13 10:17:57 1994  Francois Pinard  (pinard@icule)
+
+	* system.h: Remove STDC_HEADERS test before including <string.h>,
+	as HAVE_STRING_H should be able to decide this alone.
+
+Sat Dec  3 20:04:39 1994  Francois Pinard  (pinard@icule)
+
+	* libintl.c: Unprotoize it once and for all.
+	* Makefile.in: Do not unprotoize libintl.c.  With old compilers,
+	the special rule ensuring LOCALEDIR is defined was bypassed.
+	Reported by Kaveh R. Ghazi.
+
+	* Makefile.in (realclean): Delete stamp-cod.
+	Reported by Eric Backus.
+
+Thu Dec  1 13:36:57 1994  Francois Pinard  (pinard@icule)
+
+	* nl.tt: New file, for Dutch.
+	Reported by Andries E. Brouwer.
+
+Wed Nov 30 11:01:29 1994  Francois Pinard  (pinard@icule)
+
+	* Prerelease 4.1.3.
+
+	* Makefile.in: Install catalog files as `.msg', not `.cat'.
+
+	* configure.in, Makefile.in, acconfig.h, shar.c, unshar.c,
+	uudecode.c, uuencode.c: Rename PRODUCT to PACKAGE.
+	Reported by Noah Friedman.
+
+	* configure.in, Makefile.in: Rename GNULOCALE to GLOCALE.
+	Reported by Richard Stallman.
+
+	* configure.in: Use AC_CHECK_PROG to check for extract-msgs.
+	Reported by Kaveh R. Ghazi.
+
+	* Makefile.in: Replace libintl.o by libintl$O.
+	Reported by Kaveh R. Ghazi.
+
+	* system.h: Define setlocale(,) to empty if not HAVE_LOCALE_H.
+	* shar.c, unshar.c, uudecode.c, uuencode.c: Avoid HAVE_LOCALE_H.
+	Reported by Jim Meyering and Paul Eggert.
+
+	* shar.c (main): Give "+..." to getopt for repairing the -p option.
+	`-p -B sv.tt -T shar.c' was turned into `-p -B -T sv.tt shar.c' by
+	getopt_long, which makes both files be treated as text.
+	Reported by Jan Djarv.
+
+	* sv.tt: New file, for Swedish.
+	Reported by Jan Djarv.
+
+	* de.tt: New file, for German.
+	Reported by Ulrich Drepper.
+
+Tue Nov 29 19:13:44 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c: Change archive_type_position from long to off_t.
+	* unshar.c (find_archive):  Idem for start argument, and position.
+	* (unarchive_shar_file): Idem for current_position.
+	Reported by David J. MacKenzie.
+
+	* Makefile.in (locale.c): Add a missing semicolon.
+	Reported by Bill Aten, Eric Backus and Jan Djarv.
+
+Mon Nov 28 19:04:56 1994  Francois Pinard  (pinard@icule)
+
+	* Prerelease 4.1.1.
+
+	* configure.in: Check if GNU locale available, then substitute
+	GNULOCALE by yes or no, accordingly.
+	* Makefile.in: Merely touch locale.c, fr.cat or $(PRODUCT).cod, when
+	GNU locale is not available.
+
+	* shar.c (shar): Double file_type by file_type_remote, localizing
+	only the first, and use appropriately.
+
+Sun Nov 27 14:36:57 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in: Implement CATALOGS and locale.c.
+	* libintl.h: New.
+	* libintl.c: New, inspired by GNU locale gettext.c.
+	* fr.tt: New translation file for French.
+
+	* Makefile.in: Normalize using temporaries for redirected-to files.
+
+Sat Nov 26 20:41:23 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Check for <locale.h>.
+	* system.h, shar.c, uudecode.c, uuencode.c: Rename _ to __P.
+	* system.h: Include <locale.h> if we have it.  Always include
+	<libintl.h>, then declare _ as gettext.
+	* shar.c, unshar.c, uudecode.c, uuencode.c: Call setlocale if we
+	have <locale.h>.  Use _ macro over all localizable strings.
+
+Tue Nov 15 23:13:18 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c: Do not include <sys/stat.h>, since it is already
+	included indirectly via "system.h".
+	Reported by Harlan Stenn and Kaveh R. Ghazi.
+
+Thu Nov 10 02:05:43 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Use putc instead of fputc.
+	* unshar.c (unarchive_shar_file): Use getc and putc, instead of
+	fgetc and fputc.
+
+Wed Nov  9 12:50:00 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (install-man): Do not transform the source name of
+	uuencode.5 while installing, only the destination name.
+	Reported by David MacKenzie.
+
+Tue Nov  8 11:44:00 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (main): Output the `Created N files' in quiet mode only.
+	When not quiet, we already get one message per archive generated.
+
+Mon Nov  7 15:09:11 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (stamp-vti): Use new -r option to date.
+
+	* shar.c: Allow more flexibility in -o by allowing a sprintf
+	format.  When no `%' characters in format, do as before.
+	(open_output, close_output): New routines.  Also check result
+	returned by fopen and fclose.
+	Reported by Paul A. Vixie.
+
+Sat Nov  5 15:57:17 1994  Francois Pinard  (pinard@icule)
+
+	* Version 4.1.
+
+	* Makefile.in (realclean): Also remove stamp-vti.
+	Reported by Eric Backus.
+
+	* uudecode.c: Declare getpwnam.
+	Reported by Christopher Sawtell.
+
+	* configure.in: Check is stat macros are dependable.
+	* system.h: Include <sys/stat.h> and define permission bits.
+	Conditionnaly define S_ISDIR and S_ISREG.
+	* shar.c: Use S_ISDIR and S_ISREG.
+	* uudecode.c, uuencode.c: Delete code now in "system.h".
+	Reported by Andy Seaborne.
+
+Wed Nov  2 00:24:41 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c: Delete verbose_mode and -v, which was a poor choice for
+	meaning *no*-verbose.  Instead, introduce quiet_mode and
+	quiet_unshar_mode, driven by new options -q and -Q.
+	Reported by Christopher Sawtell.
+
+	* uuencode.c: Normalize usage (), use EXIT_* symbols and error ().
+	* uudecode.c: Idem.  Also rename rval to exit_status.
+
+	Some systems (DEC Alpha OSF 2.0) declares basename with a
+	non-const argument in <string.h>, so conflicting with "system.h".
+	* configure.in: Check for basename, replace it when not found.
+
+	* configure.in: Check for const only after having found possible
+	ANSIfying compiler flags, this is of no use to check it before.
+
+	* Makefile.in: Adjusted.
+	* system.h: Use a degenerated prototype when basename found.
+	Reported by Kaveh R. Ghazi and Nelson Beebe.
+
+Tue Nov  1 23:11:26 1994  Francois Pinard  (pinard@icule)
+
+	* uudecode.c, uuencode.c: Remove inclusion of <stdio.h> and
+	<sys/types.h>, already included from "system.h".
+	Reported by Christopher Sawtell.
+
+	* configure.in: Check if closedir return void.  CLOSEDIR_VOID was
+	already tested in shar.c, but the symbol not configured.
+	Reported by Karl Vogel, Kaveh Ghazi and Michael Rendell.
+
+Mon Oct 31 20:59:16 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (BACKLOG): Goal deleted.  It was depending on files
+	which are not part of the distribution.
+
+	* uudecode.c, uuencode.c: Declare program_name const char *, not
+	static char *.
+	Reported by Andy Seaborne, Eric Backus, Joseph E. Sacco, Karl
+	Vogel and Kaveh R. Ghazi.
+
+Sun Oct 30 08:30:35 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Check for fchmod.
+	* uudecode.c: Use chmod if fchmod does not exist.
+	Reported by Andrew Walduck, Andrew B. Smith, Bill Campbell,
+	Christopher Sawtell, Donald Page, Elliott Pacetti and Robert J.C.
+	Kyanko.
+
+	* configure.in: Check for memcpy and strchr.
+	* system.h: Rearrange how mem* and str* are used.
+	Reported by Kaveh R. Ghazi.
+
+	* configure.in: When cross-compiling, do not check if characters
+	are unsigned, and let __CHAR_UNSIGNED__ undefined.  This is safe.
+	Reported by David MacKenzie.
+
+	* system.h: Use #if rather than #ifdef to check __STDC__.
+
+	* Makefile.in: Clean up, following the one in GNU m4.  I will not
+	detail all the changes here.
+	* configure.in: Likewise.  Also added --disable-uucode.
+
+	* acconfig.h: Document PRODUCT and VERSION.
+	* version.c: Deleted.
+	* shar.h: Delete previous VERSION definition.
+	* shar.c, unshar.c, uudecode.c, uuencode.c: Use PRODUCT and VERSION.
+	* Makefile.in: Adjusted.
+
+	* system.h: Renamed from shar.h.  All includers adjusted.
+	* alloca.c: New, from elsewhere.
+	* configure.in: Configure alloca.
+	* Makefile.in: Adjusted.
+
+	* Makefile.in (BACKLOG): New.  Distribute file BACKLOG.
+
+	* Makefile.in (TAGS): Distribute it.  Clean it in realclean.
+	Reported by Karl Berry.
+
+Sat Oct 15 21:57:42 1994  Francois Pinard  (pinard@icule)
+
+	* remsync/configure.in: Find Perl path and substitute in remsync.
+	* remsync/remsync.in: New name for remsync.pl.  Use @PERL@ in it.
+	* remsync/Makefile.in: Adjusted.
+	Reported by Jim Meyering.
+
+Sun Oct  9 08:43:28 1994  Francois Pinard  (pinard@icule)
+
+	* shar.h: Get rid of CONFIG_BROKETS.
+
+Wed Oct  5 01:52:22 1994  Francois Pinard  (pinard@icule)
+
+	* Corrected various bugs and improve a few functionnalities in
+	remsync/.  No need for a detailed ChangeLog here, before the
+	package is released for true.  I will only reported other's
+	changes for now.
+
+Sat Sep 24 09:49:22 1994  Francois Pinard  (pinard@icule)
+
+	* encode.c: New name for uushar.c.
+	* Makefile.in: Adjusted.
+
+Fri Sep 23 08:20:10 1994  Francois Pinard  (pinard@icule)
+
+	* uudecode.c: Include <sys/types.h> before <sys/stat.h>.
+	Reported by Andrew Walduck, Christopher Sawtell, Gregory Neil
+	Shapiro, Horst von Brand, Ian Jackson, Karl Berry, Kaveh R. Ghazi,
+	Ken Olstad, Meade Roberts, Nelson H. F. Beebe and Richard Segal.
+
+	* Makefile.in: Handle uudecode and uuencode installation.
+	(man1dir, man1ext): Renamed from mandir and manext.
+	(libshutl.a): Renamed from libshar.a.
+	(check): New, from GNU uuencode-1.0's Makefile.in.
+	* testdata, uudecode.c, uudecode.1, uuencode.c, uuencode.1,
+	uuencode.5, version.c : New, from GNU uuencode-1.0.
+
+	Rename the package from shar to sharutils:
+	* shar.h (VERSION): Define to "GNU sharutils M.N", instead of only
+	numbers, to account for the change in the name of the package.
+	* shar.c (generate_full_header, main): Adapt.
+	* unshar.c (main): Adapt.
+	* sharutils.texi: Renamed from shar.texinfo.
+	* Makefile.in: Adjust file names for documents.
+
+	* shar.c (main): Initialize program_name from argv[0] without
+	basename'ing it.
+	* unshar.c (main): Idem.
+	Reported by Karl Berry.
+
+Tue Sep 13 12:52:40 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (generate_configure): Echo a message suggesting the
+	installation of GNU touch when no valid touch is found.
+
+Thu Sep  8 21:33:43 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Use AC_FUNC_STRFTIME.
+
+Tue Sep  6 12:08:49 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (TAGS): Remove -t from etags call.
+
+Fri Sep  2 14:19:09 1994  Francois Pinard  (pinard@icule)
+
+	* whoami.c: Include <limits.h> prior to <sys/utsname.c>.
+	* configure.in: Check for <limits.h>.
+	Reported by Michael Rendell.
+
+Thu Sep  1 19:28:36 1994  Francois Pinard  (pinard@icule)
+
+	* Version 4.0.
+
+	* shar.c: Replace optional_prefix_mode with mandatory_prefix_mode,
+	with inverted meaning.
+	(main): Delay setting the mode to after parameter decoding.
+	Initialize to -T instead of -M in vanilla mode, if not otherwise
+	set.  Diagnose any override.
+	Reported by Eric Backus.
+
+	* Makefile.in (LIBOBJS): Cut the line differently, so \ will be
+	followed by something even if @LIBOBJS@ sustitutes to nothing.
+	Reported by Andy Seaborne and Dave Anglin.
+
+Wed Aug 31 12:14:04 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (distclean): Delete config.log.
+
+Sun Aug 28 14:38:07 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (main): Cast byte_is_binary to (char *) for memset's.
+	Reported by Joseph E. Sacco.
+
+Fri Aug 26 16:23:58 1994  Francois Pinard  (pinard@icule)
+
+	* unshar.c (matched_by): Initialize pattern_cursor and
+	result_cursor to NULL, for fails to be properly handled.
+	Reported by Joseph E. Sacco.
+
+	* shar.c (shar): Give some value to input and remaining_size.
+	Reported by Joseph E. Sacco.
+
+Thu Aug 25 14:52:28 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (main): In vanilla mode (-V), defaults to text mode (-T)
+	instead of mixed mode (-M).
+	Reported by Eric Backus.
+
+	* shar.c (generate_configure): New name for generate_touch_test.
+	When -X, configure a way for doing echo without newline, copying
+	the trick from Autoconf 2.0's AC_PROG_ECHO_N.  Do something simple
+	when in vanilla mode.
+	(shar): Do not use newlines with questions.  Rename shar_reply to
+	shar_skip, with meaning reversed, other little cleanups.
+
+	* shar.c (generate_configure): Configure if /dev/tty exists,
+	copying the trick from older GNU tar configure.in.  Do not use
+	/dev/tty when in vanilla mode.
+	(shar):  Possibly use /dev/tty to read the user reply.  This
+	should help using unshar to read shars generated with -X.
+	Reported by Eric Backus.
+
+	* configure.in: Replace mktime if missing.
+	* mktime.c: New, from elsewhere.
+	* Makefile.in: Distribute it.
+	Reported by Karl Vogel and Kaveh R. Ghazi.
+
+Wed Aug 24 08:54:03 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Implement --with-dmalloc.
+	* acconfig.h: Document WITH_DMALLOC.
+	* shar.h: Add code for when WITH_DMALLOC.
+
+	* shar.c (walktree): To know how to initialize restore_name, check
+	local_name_copy, not restore_name!
+	Reported by Andy Seaborne.
+
+Tue Aug 23 20:13:38 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (mode_string): Declare argument unsigned, instead of
+	unsigned short.  This eliminates warnings on some systems.
+	(shar): Cast masked st_mode to unsigned int, for matching format.
+	* unshar.c (main): Cast getpid to int, for matching format.
+
+	* configure.in: Use `-g -O' instead of `-g' as CFLAGS default
+	value, when GNU C is being used.  Delay testing for presets.
+
+	* Makefile.in (dist, shar): Correct for when a different build
+	directory.
+
+	* configure.in: Replace strftime if missing, and study struct tm.
+	* strftime.c: New, from elsewhere.
+	* Makefile.in: Distribute it.
+	* shar.c (generate_full_header): Use it, instead of printing UTC.
+	Reported by Ulrich Drepper.
+
+	* shar.c (walktree): Merge both versions, using NO_WALKTREE to
+	choose which heart to execute.  Remove length limitation on names.
+	Copy the received name, remove trailing slashes from the copy
+	before further processing, free the copy at end.  Trailing
+	backslashes were showing duplicated in the generated shar. Use
+	basename instead of explicit code.
+	(walkdown): Revised.  Remove length parameter on call.  Remove
+	length limitations on names.  Do not restore the string terminator
+	for error messages, since the original string is not altered anymore.
+	* xstrdup.c: New, from elsewhere.
+	* Makefile.in: Compile it, distribute it.
+	* shar.h: Declare xstrdup.  Also declare xrealloc.
+
+	* shar.c, unshar.c: Remove register specifiers.
+
+	* shar.c: Refresh for Autoconf 2.0 renamings about dirent.
+	Reported by Karl Vogel and Kaveh R. Ghazi.
+
+Mon Aug 15 12:46:19 1994  Francois Pinard  (pinard@icule)
+
+	Get rid of warnings in unshar.c about undeclared system functions.
+	* shar.h: Include <unistd.h> if we have it.
+	* shar.c: Don't.
+	Reported by Joseph E. Sacco.
+
+	* shar.c (shar): Define file_type earlier, for error messages.
+	Reported by Andy Seaborne and Joseph E. Sacco.
+
+Sat Aug 13 09:19:01 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Check for <sys/wait.h>.
+	* shar.h: Include <sys/wait.h> if we have it.
+
+	* shar.c (mode_string): Renamed from mode_map.  Remove unused
+	code, `t' editing, and second argument.
+	(generate_one_header_line): Do not pass a second NULL argument to
+	mode_string.  Do not mask out bits which are untested anyway.
+
+Fri Aug 12 09:57:07 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Use `uudecode FILE < FILE' instead of just
+	`uudecode < FILE', for those uudecode unwilling to merely read
+	their standard input.  This will work only when -P is used.
+	Reported by Laurent Bourbeau.
+
+Thu Aug 11 01:16:36 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Add newlines to incomplete lines inside the
+	reading loop, instead of after it; because fgets should not alter
+	the buffer when it returns NULL.  Also remove useless similar
+	lines in code for switching files.
+	Reported by Eric Backus.
+
+Wed Aug 10 14:12:42 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Completely avoid sed, compress, gzip and uuencode
+	for empty files.  Just touch or empty files instead, while ensuring
+	restoration of access modes and time stamps, as usual.
+	Reported by Eric Backus.
+
+	* shar.c (usage): Say that -M, not -T, is the default.
+	Reported by Eric Backus.
+
+	* Makefile.in (prefix, exec_prefix): Get value from configure.
+	Reported by Eric Backus and Gordon Joly.
+
+	* configure.in: Use a memset replacement as required.
+	* memset.c: New, from elsewhere.
+	* Makefile.in: Use it, distribute it.
+	Reported by Karl Vogel and Kaveh R. Ghazi.
+
+Tue Aug  9 13:44:28 1994  Francois Pinard  (pinard@icule)
+
+	* configure.in: Updated for Autoconf 2.0.
+	* Makefile.in (distclean): Remove config.cache.
+
+Sat Jul 30 11:52:43 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (generate_full_header): Use time_t instead of long.
+	Reported by David J. MacKenzie and Michael Rendell.
+
+Fri Jul 29 08:53:32 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (usage): Improve the wording, here and there.
+	Reported by Karl Berry.
+
+Thu Jul 28 17:26:00 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Capitalize `Saving...' messages, also use lower
+	case for file types.
+
+	* unshar.c (unarchive_shar_file): Use `sh -s - -c' if pass_c_flag.
+	Bash as sh diagnosed a missing argument to -c with `sh -s -c'.
+
+	* shar.c (shar): For mixed mode determination, look for special
+	characters in the input file, instead of calling `file' on the
+	input file and studying its output.
+	(main): Initialize the byte_is_binary table.
+	* configure.in: Find out if characters are signed or not.
+	Reported by Andrey A. Chernov and Jan Djarv.
+
+	* shar.c (shar): Do not try completing an incomplete line with a
+	newline, if that incomplete line contains no character.  This case
+	occurs for an empty file, in particular.
+	Reported by Eric Backus and Jan Djarv.
+
+	* shar.c (set_file_mode): New routine.  Use it at places where the
+	various file_mode variables were set.
+	(main): Allow for intermixing -M when -p.  Make -M the default.
+	Reported by Eric Backus and Karl Berry.
+
+Thu Jul 21 21:04:12 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in (realclean): Do not remove stamp-h.in.
+	Reported by Karl Berry.
+
+Tue Jul 19 09:58:03 1994  Francois Pinard  (pinard@icule)
+
+	* Avoid declaring getpwuid with POSIX, as per GNU find 3.8.
+	Reported by Kaveh R. Ghazi.
+
+Mon Jul 18 21:06:41 1994  Francois Pinard  (pinard@icule)
+
+	* Makefile.in: Use $(binprefix).
+	Reported by Gordon Joly.
+
+Sat Jul 16 09:28:47 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c: Change `shar' by `GNU shar' wherever the program
+	identifies itself.
+	* unshar.c: Change `unshar' by `GNU unshar' wherever the program
+	identifies itself.
+
+	* shar.texinfo: New documentation.
+	* Makefile.in: Prepare and install GNU documentation.  This solves
+	a problem about exit status for an if with no else in install.
+	(install): Do not install man pages anymore, they are obsolete.
+	(install-man): New goal, for those who do want obsolete things.
+	Reported by Karl Berry.
+
+Fri Jul 15 11:19:10 1994  Francois Pinard  (pinard@icule)
+
+	* Version 3.52.3.
+
+	* shar.c: Add -z and -Z options, change --compressed-files to
+	--compress and --gzipped-files to --gzip, also --uuencoded-files
+	to --uuencode for uniformity.  Have -C tell it will be deprecated.
+	Reported by Noah Friedman.
+
+	* shar.c: Rename --normal-files to --text-files, --maybe-uuencoded
+	to --mixed-uuencode.
+
+	* shar.c (main): Dynamically initialize output to stdout, instead
+	of statically.  GNU libc does not allow stdout as a constant.
+	Reported by Joseph E. Sacco.
+
+	* shar.c (shar): Protect lines already starting with the sed
+	prefix, so `X' will be preserved at beginning of lines.
+	Reported by Eric Backus.
+
+Thu Jul 14 10:14:44 1994  Francois Pinard  (pinard@icule)
+
+	* Version 3.52.2.
+
+	* shar.c, unshar.c: Install long options, --help and --version.
+
+	* shar.c (walktree, walkdown): Use walker_t instead of explicit
+	functionnal argument, for easing ansi2knr's life.
+	Reported by Andy Seaborne, Karl Vogel and Thomas E. Dickey.
+
+Wed Jul 13 15:23:55 1994  Francois Pinard  (pinard@icule)
+
+	* basename.c: New, from elsewhere.
+	* shar.h: Declare basename.  Remove strrchr definition.
+	* Makefile.in: Adjusted.
+	* shar.c: Use basename instead of strrchr.
+
+	* shar.c (shar): Correct a few things in the generated scripts...
+	Indent them the way configure scripts are.  Protect restored file
+	name with quotes when used with chown.  Limit shar work file names
+	to 12 characters beginning with `_shar' and ending with `.tmp'.
+	Have work shell variables begin with `shar_'.  For reading the
+	part number, use cat inside backticks instead of a parenthesized
+	subshell.  Avoid using the `true' program or script, use the `:'
+	shell construct instead.  Avoid using `test X -a Y', use `test X
+	&& test Y' instead.
+
+Tue Jul 12 00:07:14 1994  Francois Pinard  (pinard@icule)
+
+	The following starts a general cleanup, which will slowly continue
+	as things evolve, without further entries in this ChangeLog.
+	* all: Make better use of const, static.  Remove unused variables,
+	rename all others.  Uniformize exit codes, error messages, etc.
+	* shar.h: Renamed from system.h.  Move in some common declarations
+	from other modules, add missing declarations.
+	* Makefile.in: Adjusted.
+
+	* Makefile.in (dist-shar): New goal.  Since shar parts have to be
+	unshared in sequence, we can rely on the order in which files are
+	shar'ed to induce a good topological order in the timestamps at
+	the receiving site.  DISTFILES ordering is important from now on.
+	Reported by Thomas E. Dickey.
+
+	* shar.c (setTOUCH): Ensure that touch does use the date, the
+	previous test was grepping standard error, it was doomed to fail.
+	Reported by Bill Aten and Thomas E. Dickey.
+
+	* shar.c: Use the touch feature by default in generated shars, the
+	timestamps should be transmitted as far as possible.  Warn at
+	unshar time if a shar file needs touch, and if touch is found to
+	be unusable.  Try to avoid clashes when there are many unshar's
+	running in parallel.  This code is not completely solid, yet the
+	probability of a clash is far weaker than before.
+
+	* Makefile.in (distclean): Remove stamp-h.
+	(realclean): Remove stamp-h.in.
+	Reported by Thomas E. Dickey.
+
+Mon Jul 11 22:34:53 1994  Francois Pinard  (pinard@icule)
+
+	* shar.c (shar): Consider a tilde at the beginning of a line as
+	special.  This avoids trouble when using an old version of mail to
+	send a shar file.
+	Reported by Karl Vogel.
+
+	* system.h: Remove declaration of malloc and realloc, they are
+	unused.
+	Declare voidstar depending on __STDC__.
+	Check PROTOTYPES instead of __STDC__ for defining _().
+
+	* shar.c: Declare xmalloc.  Use it instead of malloc.
+	Remove some useless code to report memory allocation errors.
+
+	* Makefile.in (clean): Remove ansi2knr executable.
+	Reported by Karl Vogel.
+
+	* Makefile.in (install): Do not try installing shar.info, it does
+	not exist yet.
+	Reported by Bill Aten, Karl Vogel and Thomas E. Dickey.
+
+	* configure.in: Have CFLAGS and LDFLAGS substituted from the
+	environment.
+	Reported by Karl Vogel.
+
+	* configure.in: Use special defines fo AIX and Minix.
+
+Fri Jul  8 00:17:45 1994  Francois Pinard  (pinard@icule)
+
+	* ansi2knr.1: New file, from elsewhere.
+	* Makefile.in (DISTFILES): Distribute it.
+
+	* shar.c, unshar.c, uushar.c, who@where.c: Merge in successive
+	diffs from 3.49 towards 3.52, privately sent around 1990-10.
+	Reported by Richard H. Gumpertz.
+
+	* remsync/mail-files: Wait only 4 seconds between mailings,
+	instead of 8.
+
+Tue Jun  7 00:05:11 1994  Francois Pinard  (pinard@icule)
+
+	* remsync/find-mailer: Use -f instead of -x.  Not only -x is not
+	portable enough, but if a ~/Mail directory exists, it is wrongly
+	selected.
+	Reported by Bernd Nordhausen.
+
+Sun Jun  5 16:02:15 1994  Francois Pinard  (pinard@icule)
+
+	* Version 3.52.1.
+
+	* shar.c, unshar.c, uushar.c, who@where.c: From shar 3.49
+	distribution.  Remove various logs and group them into file
+	ChangeLog.shar.  Indent sources to GNU standards.  Modify as
+	needed for auto-configuration.  Replace perror() by error().
+	Replace both getwd() and getcwd() by xgetcwd().
+
+	* unshar.c: Remove getopt functions, for GNU getopt is used
+	instead.
+
+	* shar.c: Add -G and -gN for gzip compression.
+
+	* Initial packaging for remsync, but not distributed yet.
+	mailshar now uses gzip instead of compress, by default.
+
+This branch pops out of shar, version 3.49, as published on alt.sources
+on 1990-09-24.  For previous history, see ChangeLog.OLD.
+
+Mon Aug 23 15:32:00 1993  Ian Lance Taylor  (ian@airs.com)
+
+	* Version 1.0 (for uuencode/uudecode).
+
+Previous history for remsync.
+
+	* May 1994: Single Perl script, named remsync, replacing the
+	previous corresponding shell scripts mailsync and resync.  A clean
+	rewrap was needed because, after adding many added features, the
+	scripts became intricate and hard to maintain.  I also added other
+	functionalities, among which the possibility of interactive use.
+
+	* 1992: Shell scripts for synchronization of directory trees:
+	mailsync, resync.  They were depending on many GNU tools.
+
+	* 1992: Shell scripts for automatic selection of a mailer, later
+	condensed into find-mailer.
+
+	* 1991: Shell scripts for file mailing: mail-file, mailshar, and
+	many others too specialized for being included here.
+
+

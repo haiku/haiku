@@ -1,0 +1,657 @@
+\input texinfo
+@c %**start of header
+@setfilename sharutils.info
+@settitle GNU @code{shar} utilities
+@finalout
+@c %**end of header
+
+@include version.texi
+
+@ifinfo
+@set Francois Franc,ois
+@end ifinfo
+@tex
+@set Francois Fran\noexpand\ptexc cois
+@end tex
+
+@ifinfo
+@format
+START-INFO-DIR-ENTRY
+* Shar utilities: (sharutils).          GNU shar utilities.
+* mail-files: (sharutils)mail-files invocation. Send files to remote site.
+* mailshar: (sharutils)mailshar invocation.     Make and send a shell archive.
+* remsync: (sharutils)remsync invocation.       Synchronize remote files.
+* shar: (sharutils)shar invocation.             Make a shell archive.
+* unshar: (sharutils)unshar invocation.         Explode a shell archive.
+* uudecode: (sharutils)uudecode invocation.     Restore file from 7-bits.
+* uuencode: (sharutils)uuencode invocation.     Force binary file to 7-bits.
+END-INFO-DIR-ENTRY
+@end format
+@end ifinfo
+
+@ifinfo
+This file documents the GNU set of shar utilities.
+
+Copyright (C) 1994 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end ifinfo
+
+@titlepage
+@title GNU sharutils, version @value{VERSION}
+@subtitle A set of shell archiver utilities
+@subtitle Edition @value{EDITION}, @value{UPDATED}
+@author Jan Dj@"arv
+@author @value{Francois} Pinard
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1994 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end titlepage
+
+@ifinfo
+@node Top, Introduction, (dir), (dir)
+@top GNU @code{shar} utilities
+
+@c @item @b{@code{sharutils}} @value{hfillkludge} (UtilD, SrcCD (??))
+@c
+GNU @code{shar} makes so-called shell archives out of many files,
+preparing them for transmission by electronic mail services.
+GNU @code{unshar} helps unpacking shell archives after reception.
+This is release @value{VERSION}.
+
+@menu
+* Introduction::                Introduction to both programs
+* shar invocation::             Invoking the @code{shar} program
+* unshar invocation::           Invoking the @code{unshar} program
+* Miscellaneous::               Miscellaneous considerations
+
+ --- The Detailed Node Listing ---
+
+Creating shell archives
+
+* Selecting::                   Selecting files
+* Splitting::                   Splitting output
+* Headers::                     Controlling the shar headers
+* Stocking::                    Selecting how files are stocked
+* Transmission::                Protecting against transmission
+* Kinds::                       Producing different kinds of shar
+@end menu
+
+@end ifinfo
+
+@node Introduction, shar invocation, Top, Top
+@chapter Introduction to both programs
+
+GNU @code{shar} makes so-called shell archives out of many files,
+preparing them for transmission by electronic mail services.
+A @dfn{shell archive} is a collection of files that can be unpacked by
+@code{/bin/sh}.  A wide range of features provide extensive flexibility
+in manufacturing shars and in specifying shar @emph{smartness}.  For
+example, @code{shar} may compress files, uuencode binary files, split
+long files and construct multi-part mailings, ensure correct unsharing
+order, and provide simplistic checksums.  @xref{shar invocation}.
+
+GNU @code{unshar} scans a set of mail messages looking for the start
+of shell archives.  It will automatically strip off the mail headers
+and other introductory text.  The archive bodies are then unpacked by
+a copy of the shell.  @code{unshar} may also process files containing
+concatenated shell archives.  @xref{unshar invocation}.
+
+GNU @code{shar} has a long history.  All along this long road, numerous
+users contributed various improvements.  The file @file{THANKS}, from
+the GNU @code{shar} distribution, contain all names still having
+valid email addresses, as far as we know.
+
+Please help me getting the history straight, for the following
+information is approximative.  James Gosling wrote the public domain
+@code{shar 1.x}.  William Davidsen rewrote it as @code{shar 2.x}.
+Warren Tucker brought modifications and called it @code{shar 3.x}.
+Richard Gumpertz maintained it until 1990.  @value{Francois} Pinard,
+from the public domain @code{shar 3.49}, made @code{GNU shar 4.x},
+in 1994.  Some modules and other code sections were freely borrowed
+from other GNU distributions, bringing this @code{shar} under the
+terms of the GNU General Public License.
+
+Your feedback helps us to make a better and more portable product.
+Mail suggestions and bug reports (including documentation errors)
+for these programs to @file{bug-gnu-utils@@prep.ai.mit.edu}.
+
+@node shar invocation, unshar invocation, Introduction, Top
+@chapter Invoking the @code{shar} program
+@pindex shar
+
+The format of the @code{shar} command is one of:
+
+@example
+shar [ @var{option} ] @dots{} @var{file} @dots{}
+shar -S [ @var{option} ] @dots{}
+@end example
+
+In the first form, the file list is given as command arguments.  In the
+second form, the file list is read from standard input.  The resulting
+archive is sent to standard output unless the @code{-o} option is given.
+
+Options can be given in any order.  Some options depend on each other:
+the @code{-o} option is required if the @code{-l} or @code{-L} option
+is used.  The @code{-n} option is required if the @code{-a} option
+is used.  Also see @code{-V} below.
+
+Some options are special purpose:
+
+@table @code
+
+@item --help
+Print a help summary on standard output, then immediately exits.
+
+@item --version
+Print the version number of the program on standard output, then
+immediately exits.
+
+@item -q
+@itemx --quiet
+Verbose @emph{off} at @code{shar} time.  Messages are usually issued
+on standard error to let the user follow the progress, while making
+the archives.  This option inhibits these messages.
+
+@end table
+
+@menu
+* Selecting::                   Selecting files
+* Splitting::                   Splitting output
+* Headers::                     Controlling the shar headers
+* Stocking::                    Selecting how files are stocked
+* Transmission::                Protecting against transmission
+* Kinds::                       Producing different kinds of shar
+@end menu
+
+@node Selecting, Splitting, shar invocation, shar invocation
+@section Selecting files
+
+@table @code
+
+@item -p
+@itemx --intermix-type
+Allow positional parameter options.  The options @code{-M}, @code{-B},
+@code{-T}, @code{-z} and @code{-Z} may be embedded, and files to
+the right of the option will be processed in the specified mode.
+Without the @code{-p} option, embedded options would be interpreted
+as file names.  @xref{Stocking} for more information on these options.
+
+@item -S
+@itemx --stdin-file-list
+Read list of files to be packed from the standard input rather
+than from the command line.  Input must be one file name per line.
+This switch is especially useful when the command line will not hold
+the list of files to be packed.  For example:
+
+@example
+find . -type f -print | shar -S -o /tmp/big.shar
+@end example
+
+If @code{-p} is specified on the command line, then the options
+@code{-M}, @code{-B}, @code{-T}, @code{-z} and @code{-Z} may be
+included in the standard input (on a line separate from file names).
+The maximum number of lines of standard input, file names and options,
+may not exceed 1024.
+
+@end table
+
+@node Splitting, Headers, Selecting, shar invocation
+@section Splitting output
+
+@table @code
+
+@item -o @var{@var{prefix}}
+@itemx --output-prefix=@var{prefix}
+Save the archive to files @file{@var{prefix}.01} through
+@file{@var{prefix}.@var{nnn}} instead of standard output.  This option
+@emph{must} be used when the @code{-l} or the @code{-L} switches
+are used.
+
+When @var{prefix} contains any @samp{%} character, @var{prefix} is then
+interpreted as a @code{sprintf} format, which should be able to display
+a single decimal number.  When @var{prefix} does not contain such a
+@samp{%} character, the string @samp{.%02d} is internally appended.
+
+@item -l @var{size}
+@itemx --whole-size-limit=@var{size}
+Limit the output file size to @var{size} times 1024 bytes but don't
+split input files.  This allows the recipient of the shell archives
+to unpack them in any order.
+
+@item -L @var{size}
+@itemx --split-size-limit=@var{size}
+Limit output file size to @var{size} times 1024 bytes and split files
+if necessary.  The archives created with this option must be unpacked
+in the correct order.  If the recipient of the shell archives wants to
+put all of them in a single folder, she shall save them in the correct
+order for @code{unshar}, used with option @code{-e}, to unpack them
+all at once.  @xref{unshar invocation}.
+
+For people used to saving all the shell archives into a single mail
+folder, care must be taken to save them in the appropriate order.
+For those having the appropriate tools (like Masanobu Umeda's
+@code{rmailsort} package for GNU Emacs), shell archives can be saved
+in any order, then sorted by increasing date (or send time) before
+massive unpacking.
+
+@end table
+
+@node Headers, Stocking, Splitting, shar invocation
+@section Controlling the shar headers
+
+@table @code
+
+@item -n @var{name}
+@itemx --archive-name=@var{name}
+Name of archive to be included in the header of the shar files.
+Also see the @code{-a} switch further down.
+
+@item -s @var{address}
+@itemx --submitter=@var{address}
+The @code{-s} option allows for overriding the email address for the
+submitter, for when the default is not appropriate.  The automatically
+determined address looks like @file{@var{username}@@@var{hostname}}.
+
+@item -a
+@itemx --net-headers
+Allows automatic generation of headers:
+
+@example
+Submitted-by: @var{address}
+Archive-name: @var{name}/part@var{nn}
+@end example
+
+The @var{name} must be given with the @code{-n} switch.  If name
+includes a @samp{/}, then @samp{/part} isn't used. Thus
+@samp{-n xyzzy} produces:
+@example
+xyzzy/part01
+xyzzy/part02
+@end example
+
+@noindent
+while @samp{-n xyzzy/patch} produces:
+@example
+xyzzy/patch01
+xyzzy/patch02
+@end example
+
+@noindent
+and @samp{-n xyzzy/patch01.} produces:
+@example
+xyzzy/patch01.01
+xyzzy/patch01.02
+@end example
+
+@item -c
+@itemx --cut-mark
+Start the shar with a cut line.  A line saying @samp{Cut here} is
+placed at the start of each output file.
+
+@end table
+
+@node Stocking, Transmission, Headers, shar invocation
+@section Selecting how files are stocked
+
+@table @code
+
+@item -T
+@itemx --text-files
+Treat all files as text, regardless of their contents.
+
+@item -B
+@itemx --uuencode
+Treat all files as binary, use @code{uuencode} prior to packing. This
+increases the size of the archive. The recipient must have
+@code{uudecode} in order to unpack.
+
+@display
+Use of @code{uuencode} is not appreciated by many on the net, because
+people like to readily see, by mere inspection of a shell archive,
+what it is about.
+@end display
+
+@item -M
+@itemx --mixed-uuencode
+Mixed mode.  Automatically determine if the files are text or binary
+and archive correctly.  Files found to be binary are uuencoded prior
+to packing.  This option is selected by default.
+
+For a file is considered to be a text file, instead of a binary file,
+all the following should be true simultaneously:
+@enumerate
+@item
+The file does not contain any ASCII control character besides @key{BS}
+(backspace), @key{HT} (horizontal tab), @key{LF} (new line) or @key{FF}
+(form feed).
+@item
+The file does not contains a @key{DEL} (delete).
+@item
+The file contains no character with its eighth-bit set.
+@item
+The file, unless totally empty, terminates with a @key{LF} (newline).
+@item
+No line in the file contains more than 200 characters.  For counting
+purpose, lines are separated by a @key{LF} (newline).
+@end enumerate
+
+@item -z
+@itemx --gzip
+Use @code{gzip} and @code{uuencode} on all files prior to packing.
+The recipient must have @code{uudecode} and @code{gzip} (used with
+@code{-d}) in order to unpack.
+
+Usage of @code{-z} in net shars will cause you to be flamed off
+the earth.
+
+@item -g @var{level}
+@itemx --level-for-gzip=@var{level}
+When doing compression, use @code{-@var{level}} as a parameter to
+@code{gzip}.  The @code{-g} option turns on the @code{-z} option
+by default.  The default value is 9, that is, maximum compression.
+
+@item -Z
+@itemx --compress
+Use @code{compress} and @code{uuencode} on all files prior to packing.
+The recipient must have @code{uudecode} and @code{compress} (used
+with @code{-d}) in order to unpack.  Option @code{-C} is a synonymous
+for @code{-Z}, but is deprecated.
+
+Usage of @code{-Z} in net shars will cause you to be flamed off
+the earth.
+
+@item -b @var{bits}
+@itemx --bits-per-code=@var{bits}
+When doing compression, use @code{-b@var{x}} as a parameter to
+@code{compress}.  The @code{-B} option turns on the @code{-Z}
+option by default.  The default value is 12, foreseeing the memory
+limitations of some @code{compress} programs on smallish systems, at
+@code{unshar} time.
+
+@end table
+
+@node Transmission, Kinds, Stocking, shar invocation
+@section Protecting against transmission errors
+
+Transmission of shell archives is not always free of errors.  So one
+should make consistency checks on the receiving site.  A very simple
+(and unreliable) method is running the UNIX @code{wc} tool on the output
+file.  This can report the number of characters in the file.
+
+As one can guess this does not catch all errors.  Especially changing of
+a character value does not change the computed check sum.  To achieve
+this goal better method were invented and standardized.  One very strong
+is MD5 (MD = message digests).  This is standardized in RFC 1321.  The
+produced shell scripts do not force the @code{md5sum} program to be
+installed on the system.  This is necessary because it is not yet part
+of every UNIX.  The program is however not necessary for producing the
+shell archive.
+
+@table @code
+
+@item -w
+@itemx --no-character-count
+Do @emph{not} check with @samp{wc -c} after unpack.  The default is
+to check.
+
+@item -D
+@itemx --no-md5-digest
+Do @emph{not} check with @samp{md5sum} after unpack.  The default is
+to check.
+
+@item -F
+@itemx --force-prefix
+Prepend the prefix character to every line even if not required.
+This option may slightly increase the size of the archive, especially
+if @code{-B} or @code{-Z} is used.  Normally, the prefix character
+is @samp{X}.  If the parameter to the @code{-d} option starts with
+@samp{X}, then the prefix character becomes @samp{Y}.
+
+@item -d @var{string}
+@itemx --here-delimiter=@var{string}
+Use @var{string} to delimit the files in the shar instead of
+@samp{SHAR_EOF}.  This is for those who want to personalize their
+shar files.
+
+@end table
+
+@node Kinds,  , Transmission, shar invocation
+@section Producing different kinds of shars
+
+@table @code
+
+@item -V
+@itemx --vanilla-operation
+This option produces @dfn{vanilla} shars which rely only upon the
+existence of @code{echo}, @code{test} and @code{sed} in the unpacking
+environment.
+
+The @code{-V} disables options offensive to the @dfn{network cop}
+(or @dfn{brown shirt}).  It also changes the default from mixed mode
+@code{-M} to text mode @code{-T}.  Warnings are produced if option
+@code{-B}, @code{-z}, @code{-Z}, @code{-p} or @code{-M} is specified
+(any of which does or might require @code{uudecode}, @code{gzip} or
+@code{compress} in the unpacking environment).
+
+@item -P
+@itemx --no-piping
+In the shar file, use a temporary file to hold the file to
+@code{uudecode}, instead of using pipes.  This option is mandatory
+when you know the unpacking @code{uudecode} is unwilling to merely
+read its standard input.  Richard Marks wrote what is certainly the
+most (in)famous of these, for MSDOS :-).
+
+(Here is a side note from the maintainer.  Why isnt't this option
+the default?  In the past history of @code{shar}, it was decided
+that piping was better, surely because it is less demanding on disk
+space, and people seem to be happy with this.  Besides, I think
+that the @code{uudecode} from Richard Marks, on MSDOS, is wrong in
+refusing to handle @code{stdin}.  So far that I remember, he has
+the strong opinion that a program without any parameters should
+give its @code{--help} output.  Besides that, should I say, his
+@code{uuencode} and @code{uudecode} programs are full-featured, one
+of the most complete set I ever saw.  But Richard will not release
+his sources, he wants to stay in control.)
+
+@item -x
+@itemx --no-check-existing
+Overwrite existing files without checking.  If neither @code{-x} nor
+@code{-X} is specified, when unpacking itself, the shell archive will
+check for and not overwrite existing files (unless @code{-c} is passed
+as a parameter to the script when unpacking).
+
+@item -X
+@itemx --query-user
+Interactively overwrite existing files.
+
+Use of @code{-X} produces shars which @emph{will} cause problems
+with some @code{unshar}-style procedures, particularily when used
+together with vanilla mode (@code{-V}).  Use this feature mainly for
+archives to be passed among agreeable parties.  Certainly, @code{-X}
+is @emph{not} for shell archives which are to be submitted to Usenet
+or other public networks.
+
+The problem is that @code{unshar} programs or procedures often feed
+@file{/bin/sh} from its standard input, thus putting @file{/bin/sh}
+and the shell archive script in competition for input lines.  As an
+attempt to alleviate this problem, @code{shar} will try to detect if
+@file{/dev/tty} exists at the receiving site and will use it to read
+user replies.  But this does not work in all cases, it may happen that
+the receiving user will have to avoid using @code{unshar} programs
+or procedures, and call @code{/bin/sh} directly.  In vanilla mode,
+using @file{/dev/tty} is not even attempted.
+
+@item -m
+@itemx --no-timestamp
+Avoid generating @code{touch} commands to restore the file modification
+dates when unpacking files from the archive.
+
+When the timestamp relationship is not preserved, some files like
+@file{configure} or @file{*.info} may be uselessly remade after
+unpacking.  This is why, when this option is not used, a special
+effort is made to restore timestamps,
+
+@item -Q
+@itemx --quiet-unshar
+Verbose @emph{off} at @code{unshar} time.  Disables the inclusion of
+comments to be output when the archive is unpacked.
+
+@item -f
+@itemx --basename
+Use only the last file name component of each input file name, ignoring
+any prefix directories.  This is sometimes useful when building a shar
+from several directories, or another directory.  If a directory name
+is passed to @code{shar}, the substructure of that directory will be
+restored whether @code{-f} is specified or not.
+
+@end table
+
+@node unshar invocation, Miscellaneous, shar invocation, Top
+@chapter Invoking the @code{unshar} program
+@pindex unshar
+
+The format of the @code{unshar} command is:
+
+@example
+unshar [ @var{option} ] @dots{} [ @var{file} @dots{} ]
+@end example
+
+Each @var{file} is processed in turn, as a shell archive or a
+collection of shell archives.  If no files are given, then standard
+input is processed instead.
+
+Options:
+
+@table @code
+
+@item --version
+Print the version number of the program on standard output, then
+immediately exits.
+
+@item --help
+Print an help summary on standard output, then immediately exits.
+
+@item -d @var{directory}
+@itemx --directory=@var{directory}
+Change directory to @var{directory} before unpacking any files.
+
+@item -c
+@itemx --overwrite
+@item -f
+@itemx --force
+Passed as an option to the shar file.  Many shell archive scripts
+(including those produced by @code{shar} 3.40 and newer) accepts
+a @code{-c} argument to indicate that existing files should be
+overwritten.
+
+The option @code{-f} is provided for a more unique interface.  Many
+programs (such as @code{cp} and @code{mv}) use this option to trigger
+the very same action.
+
+@item -e
+@itemx --exit-0
+This option exists mainly for people who collect many shell archives
+into a single mail folder.  With this option, @code{unshar} isolates
+each different shell archive from the others which have been put in the
+same file, unpacking each in turn, from the beginning of the file
+towards its end.  Its proper operation relies on the fact that many shar
+files are terminated by a @w{@samp{exit 0}} at the beginning of a line.
+
+Option @code{-e} is internally equivalent to @w{@code{-E "exit 0"}}.
+
+@item -E @var{string}
+@itemx --split-at=@var{string}
+This option works like @code{-e}, but it allows you to specify the
+string that separates archives if @samp{exit 0} isn't appropriate.
+
+For example, noticing that most @file{.signatures} have a @samp{--} on
+a line right before them, one can sometimes use @samp{--split-at=--}
+for splitting shell archives which lack the @samp{exit 0} line at end.
+The signature will then be skipped altogether with the headers of
+the following message.
+
+@end table
+
+@node Miscellaneous,  , unshar invocation, Top
+@chapter Miscellaneous considerations
+
+Here is a place-holder for many considerations which do not fit
+elsewhere, while not worth a section for themselves.
+
+Be careful that the output file(s) are not included in the inputs
+or @code{shar} may loop until the disk fills up.  Be particularly
+careful when a directory is passed to @code{shar} that the output
+files are not in that directory (or a subdirectory of that directory).
+
+When a directory is passed to @code{shar}, it may be scanned more
+than once, to conserve memory.  Therefore, one should be careful to
+not change the directory contents while @code{shar} is running.
+
+No attempt is made to restore the protection and modification dates
+for directories, even if this is done by default for files.  Thus, if
+a directory is given to @code{shar}, the protection and modification
+dates of corresponding unpacked directory may not match those of
+the original.
+
+Use of the @code{-M} or @code{-B} options will slow down the archive
+process.  Use of the @code{-z} or @code{-Z} options may slow the
+archive process considerably.
+
+Let us conclude by a showing a few examples of @code{shar} usage:
+
+@example
+shar *.c > cprog.shar
+shar -Q *.[ch] > cprog.shar
+shar -B -l28 -oarc.sh. *.arc
+shar -f /lcl/src/u*.c > u.sh
+@end example
+
+@noindent
+The first shows how to make a shell archive out of all C program
+sources.  The second produces a shell archive with all @file{.c}
+and @file{.h} files, which unpacks silently.  The third gives a shell
+archive of all uuencoded @file{.arc} files, into files @file{arc.sh.01}
+through to @file{arc.sh.@var{nnn}}.  The last example gives a shell
+archive which will use only the file names at unpack time.
+
+@contents
+@bye
+
+@c Local variables:
+@c texinfo-column-for-description: 32
+@c End:
