@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2004-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,7 @@
 typedef unsigned long			ulong;
 typedef unsigned int			uint;
 typedef unsigned short			ushort;
-#endif  // _SYS_TYPES_H / _SYS_TYPES_H_
+#endif
 
 
 // Standard Includes -----------------------------------------------------------
@@ -40,16 +40,7 @@ typedef unsigned short			ushort;
 // System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <sys/types.h>
-#include <stdbool.h>
 #include <Errors.h>
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 // Shorthand type formats ------------------------------------------------------
 
@@ -106,26 +97,22 @@ extern _IMPEXP_BE const char *B_EMPTY_STRING;
 #define max_c(a,b) ((a)>(b)?(a):(b))
 
 #ifndef __cplusplus
-#ifndef min
-#define min(a,b) ((a)>(b)?(b):(a))
-#endif
-#ifndef max
-#define max(a,b) ((a)>(b)?(a):(b))
-#endif
+#	ifndef min
+#		define min(a,b) ((a)>(b)?(b):(a))
+#	endif
+#	ifndef max
+#		define max(a,b) ((a)>(b)?(a):(b))
+#	endif
 #endif 
 
 
 // Grandfathering --------------------------------------------------------------
-
-//#ifndef __cplusplus
-//typedef enum { false = 0, true = 1 } _Bool;
-//#define	bool	_Bool
-//#define false	0
-//#define true	1
-//#endif 
+#ifndef __cplusplus
+#	include <stdbool.h>
+#endif 
 
 #ifndef NULL
-#define NULL 	(0)
+#	define NULL (0)
 #endif
 
 
@@ -160,21 +147,10 @@ extern _IMPEXP_ROOT void *	get_stack_frame(void);
 
 // use 'true' and 'false'
 #ifndef FALSE
-#define FALSE		0
+#	define FALSE	0
 #endif
 #ifndef TRUE
-#define TRUE		1
+#	define TRUE		1
 #endif
 
-
-//------------------------------------------------------------------------------
-
 #endif	// _SUPPORT_DEFS_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-

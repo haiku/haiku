@@ -131,7 +131,7 @@ rule Preprocess
 
 actions Preprocess 
 {
-	$(CC) -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
 Preprocess $(syscallsHeaderPP) : $(syscallsHeader) ;
