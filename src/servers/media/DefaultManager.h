@@ -23,13 +23,26 @@ public:
 	void Dump();
 
 	void CleanupTeam(team_id team);
-	
+
+private:
 	static int32 rescan_thread(void *arg);
 	void RescanThread();
+
+	void FindPhysicalVideoOut();
+	void FindPhysicalVideoIn();
+	void FindPhysicalAudioOut();
+	void FindPhysicalAudioIn();
+	void FindAudioMixer();
+	void FindTimeSource();
 	
 private:
+	media_node_id fPhysicalVideoOut;
+	media_node_id fPhysicalVideoIn;
+	media_node_id fPhysicalAudioOut;
+	media_node_id fPhysicalAudioIn;
 	media_node_id fSystemTimeSource;
-	media_node_id fDefaultVideoOut;
-	media_node_id fDefaultVideoIn;
-	
+	media_node_id fTimeSource;
+	media_node_id fAudioMixer;
+	int32 fPhysicalAudioOutInputID;
+	char fPhysicalAudioOutInputName[B_MEDIA_NAME_LENGTH];
 };
