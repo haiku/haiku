@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src add-ons translators tifftranslator ;
 
 # Include StreamBuffer code from TGATranslator directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators tgatranslator ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
 
 Translator TIFFTranslator : 
 	StreamBuffer.cpp
