@@ -249,7 +249,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
-	if (buffer == NULL || bufferSize == 0)
+	if (bufferSize == 0)
 		return 0;
 
 	bytesLeft = ((int32)bufferSize - 1) & 0x7fffffff;
