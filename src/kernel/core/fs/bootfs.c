@@ -742,7 +742,7 @@ bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 {
 	struct bootfs_cookie *cookie = _cookie;
 	struct bootfs *fs = _fs;
-	status_t status;
+	status_t status = B_OK;
 
 	TRACE(("bootfs_read_dir(fs_volume = %p vnode = %p, fs_cookie = %p, buffer = %p, bufferSize = %ld, num = %ld)\n",_fs, _vnode, cookie, dirent, bufferSize, *_num));
 
@@ -750,7 +750,6 @@ bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 
 	if (cookie->u.dir.ptr == NULL) {
 		*_num = 0;
-		status = B_OK;
 		goto err;
 	}
 
@@ -763,11 +762,12 @@ bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 		goto err;
 	}
 
-	status = user_strcpy(dirent->d_name, cookie->u.dir.ptr->name);
+	status = user_strlcpy(dirent->d_name, cookie->u.dir.ptr->name, bufferSize - sizeof(struct dirent));
 	if (status < B_OK)
 		goto err;
 
 	cookie->u.dir.ptr = cookie->u.dir.ptr->dir_next;
+	status = B_OK;
 
 err:
 	mutex_unlock(&fs->lock);

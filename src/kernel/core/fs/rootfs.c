@@ -637,7 +637,7 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 {
 	struct rootfs_cookie *cookie = _cookie;
 	struct rootfs *fs = _fs;
-	status_t status = 0;
+	status_t status = B_OK;
 
 	TRACE(("rootfs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _vnode, cookie, dirent, bufferSize,_num));
 
@@ -646,7 +646,6 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 	if (cookie->ptr == NULL) {
 		// we're at the end of the directory
 		*_num = 0;
-		status = B_OK;
 		goto err;
 	}
 
@@ -659,11 +658,12 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 		goto err;
 	}
 
-	status = user_strcpy(dirent->d_name, cookie->ptr->name);
-	if (status < 0)
+	status = user_strlcpy(dirent->d_name, cookie->ptr->name, bufferSize - sizeof(struct dirent));
+	if (status < B_OK)
 		goto err;
 
 	cookie->ptr = cookie->ptr->dir_next;
+	status = B_OK;
 
 err:
 	mutex_unlock(&fs->lock);

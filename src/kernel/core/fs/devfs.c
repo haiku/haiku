@@ -797,7 +797,7 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent 
 {
 	struct devfs_cookie *cookie = _cookie;
 	struct devfs *fs = _fs;
-	status_t status = 0;
+	status_t status = B_OK;
 
 	TRACE(("devfs_read_dir: vnode %p, cookie %p, buffer %p, size %ld\n", _vnode, cookie, dirent, bufferSize));
 
@@ -808,7 +808,6 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent 
 
 	if (cookie->u.dir.ptr == NULL) {
 		*_num = 0;
-		status = B_OK;
 		goto err;
 	}
 
@@ -821,11 +820,12 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent 
 		goto err;
 	}
 
-	status = user_strcpy(dirent->d_name, cookie->u.dir.ptr->name);
-	if (status < 0)
+	status = user_strlcpy(dirent->d_name, cookie->u.dir.ptr->name, bufferSize - sizeof(struct dirent));
+	if (status < B_OK)
 		goto err;
 
 	cookie->u.dir.ptr = cookie->u.dir.ptr->dir_next;
+	status = B_OK;
 
 err:
 	mutex_unlock(&fs->lock);
