@@ -42,7 +42,7 @@ class RuleFilterConfig : public BView {
 
 #include <stdio.h>
 
-RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85),"rulefilter_config", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0) {
+RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85),"rulefilter_config", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0), menu(NULL) {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	attr = new BTextControl(BRect(5,5,100,20),"attr",MDR_DIALECT_CHOICE ("If","条件:"),MDR_DIALECT_CHOICE ("header (e.g. Subject)","ヘッダ(例えばSubject)"),NULL);
 	attr->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE ("If ","条件: "))+ 4);
@@ -86,6 +86,9 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 	
 
 void RuleFilterConfig::AttachedToWindow() {
+	if (menu != NULL)
+		return; // We switched back from another tab
+	
 	menu = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose Action>","<動作を選択>"));
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Move To","移動する"), new BMessage(kMsgActionMoveTo)));
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set Flags To","フラグを指定する"), new BMessage(kMsgActionSetTo)));
