@@ -60,7 +60,6 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-#define RUN_WITHOUT_REGISTRAR
 
 // Globals ---------------------------------------------------------------------
 BApplication*	be_app = NULL;
@@ -773,21 +772,27 @@ void BApplication::InitData(const char* signature, status_t* error)
 	}
 #endif	// ifdef RUN_WITHOUT_REGISTRAR
 
-	// TODO: Not sure about the order
+	// TODO: Not completely sure about the order, but this should be close.
+
+	// An app_server connection is necessary for a lot of stuff, so get that first.
 	if (fInitError == B_OK)
 		connect_to_app_server();
 	if (fInitError == B_OK)
 		setup_server_heaps();
 	if (fInitError == B_OK)
 		get_scs();
-	if (fInitError == B_OK)
-		fInitError = _init_interface_kit_();
-		
+
+	
 	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
 		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
 	}
+	
+	// Initialize the IK after we have set be_app because of a construction of a
+	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	if (fInitError == B_OK)
+		fInitError = _init_interface_kit_();
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
