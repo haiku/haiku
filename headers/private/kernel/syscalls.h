@@ -134,6 +134,8 @@ int sys_getenv(const char *, char **);
 /* region prototypes */
 area_id sys_find_region_by_name(const char *);
 
+void _kern_debug_output(const char *message);
+
 /* This is a real BSD'ism :) Basically it returns the size of the
  * descriptor table for the current process as an integer.
  */

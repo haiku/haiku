@@ -164,6 +164,7 @@ SYSCALL6(sys_sysctl, 71)
 //SYSCALL3(sys_socket, 72)
 SYSCALL3(sys_setenv, 79)
 SYSCALL2(sys_getenv, 80)
+SYSCALL1(_kern_debug_output, 139)
 
 /* atomic calls */
 SYSCALL2(_kern_atomic_set, 126)
