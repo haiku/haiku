@@ -3,6 +3,7 @@
 #ifndef _GEN_SYSCALLS_COMMON_H
 #define _GEN_SYSCALLS_COMMON_H
 
+#include <exception>
 #include <string>
 
 using namespace std;
