@@ -48,7 +48,7 @@
 #include "FontServer.h"
 #include "Desktop.h"
 #include "RootLayer.h"
-
+#include <StopWatch.h>
 //#define DEBUG_KEYHANDLING
 //#define DEBUG_SERVER
 
@@ -164,7 +164,8 @@ AppServer::AppServer(void)
 */
 AppServer::~AppServer(void)
 {
-
+	debugger("We shouldn't be here! MainLoop()::B_QUIT_REQUESTED should see if we can exit the server.\n");
+/*
 	ServerApp *tempapp;
 	int32 i;
 	acquire_sem(fAppListLock);
@@ -189,6 +190,7 @@ AppServer::~AppServer(void)
 	delete fontserver;
 	
 	make_decorator=NULL;
+*/
 }
 
 /*!
@@ -623,14 +625,13 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// is compiled as a regular Be application.
 			if(DISPLAYDRIVER== HWDRIVER)
 				break;
-			
+
 			Broadcast(AS_QUIT_APP);
 
 			// we have to wait until *all* threads have finished!
 			ServerApp	*app= NULL;
 			acquire_sem(fAppListLock);
 			thread_info tinfo;
-			
 			for(int32 i= 0; i < fAppList->CountItems(); i++)
 			{
 				app=(ServerApp*)fAppList->ItemAt(i);
@@ -668,8 +669,11 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			release_sem(fAppListLock);
 
 			delete desktop;
+			delete fAppList;
+			delete bitmapmanager;
+			delete fontserver;
+			make_decorator=NULL;	
 
-			// When we delete the last ServerApp, we can exit the server
 			exit_thread(0);
 
 			// we are now clear to exit
