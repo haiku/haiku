@@ -69,6 +69,8 @@ public:
 		ServerApp *winapp,  port_id winport, port_id looperPort, port_id replyport, 
 		uint32 index, int32 handlerID);
 	~ServerWindow(void);
+
+	void Init();
 	
 	void ReplaceDecorator(void);
 	void Quit(void);
@@ -109,6 +111,10 @@ public:
 	
 	//! Returns the window's title
 	const char *Title(void) { return fTitle.String(); }
+
+	void CreateLayerTree(Layer *localRoot);
+	void SetLayerState(Layer *layer);
+	void SetLayerFontState(Layer *layer);
 	
 	Layer* FindLayer(const Layer* start, int32 token) const;
 	void SendMessageToClient( const BMessage* msg ) const;
