@@ -1052,6 +1052,8 @@ enum gdb_osabi
 
   GDB_OSABI_CYGWIN,
 
+  GDB_OSABI_HAIKU,
+
   GDB_OSABI_INVALID		/* keep this last */
 };
 
