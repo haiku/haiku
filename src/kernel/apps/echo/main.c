@@ -32,11 +32,10 @@
  */
 
 
-#include <cdefs.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 int
 main(int argc , char *argv[])
@@ -47,8 +46,7 @@ main(int argc , char *argv[])
 	if (*++argv && !strcmp(*argv, "-n")) {
 		++argv;
 		nflag = 1;
-	}
-	else
+	} else
 		nflag = 0;
 
 	while (argv[0] != NULL) {

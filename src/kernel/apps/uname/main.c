@@ -1,5 +1,4 @@
-/*-
- * Copyright (c) 1993
+/* Copyright (c) 1993
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +30,7 @@
  * SUCH DAMAGE.
  */
 
-#include <ktypes.h>
-
-#include <cdefs.h>
+#include <sys/types.h>
 
 //#include <sys/param.h>
 #include <sysctl.h>
@@ -47,9 +44,7 @@
 void usage(void);
 
 int
-main(argc, argv)
-	int argc;
-	char *argv[];
+main(int argc, char **argv)
 {
 
 #define	MFLAG	0x01
