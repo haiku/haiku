@@ -15,6 +15,33 @@
 #include <ctype.h>
 
 
+// Note: these structures have been stolen from fs_shell/kernel.c.
+//		They shouldn't be used anywhere else
+
+extern vnode_ops fs_entry;
+struct vnode;
+
+struct vnlist {
+	vnode           *head;
+	vnode           *tail;
+	int             num;
+};
+
+struct nspace {
+	nspace_id           nsid;
+	my_dev_t            dev;
+	my_ino_t            ino;
+	fsystem             *fs;
+	vnlist              vnodes;
+	void                *data;
+	vnode *             root;
+	vnode *             mount;
+	nspace *            prev;
+	nspace *            next;
+	char                shutdown;
+};
+
+
 void
 usage(char *programName)
 {
@@ -95,15 +122,37 @@ main(int argc, char **argv)
     init_block_cache(4096, 0);
     init_vnode_layer();
 
-	Volume volume(1);
+    if (install_file_system(&fs_entry, "bfs", 1, -1) == NULL) {
+        printf("can't install my file system\n");
+        exit(0);
+    }
+
+	struct nspace *mount = (nspace *)malloc(sizeof(nspace));
+	if (add_nspace(mount, NULL, "bfs", -1, -1) < B_OK) {
+		fprintf(stderr, "%s: add mount structure failed\n", programName);
+		return -1;
+	}
+
+	Volume volume(mount->nsid);
 	status_t status = volume.Initialize(deviceName, volumeName, blockSize, flags);
 	if (status < B_OK) {
 		fprintf(stderr, "%s: Initializing volume failed: %s\n", programName, strerror(status));
 		return -1;
 	}
 
+	remove_nspace(mount);
+
 	if (verbose) {
-		// ToDo: dump disk info
+		disk_super_block super = volume.SuperBlock();
+
+		printf("%s: Disk was initialized successfully.\n", programName);
+		printf("\tname: \"%s\"\n", super.name);
+		printf("\tnum blocks: %Ld\n", super.NumBlocks());
+		printf("\tused blocks: %Ld\n", super.UsedBlocks());
+		printf("\tblock size: %lu bytes\n", super.BlockSize());
+		printf("\tnum allocation groups: %ld\n", super.AllocationGroups());
+		printf("\tallocation group size: %ld blocks\n", 1L << super.AllocationGroupShift());
+		printf("\tlog size: %u blocks\n", super.log_blocks.Length());
 	}
 
 	shutdown_block_cache();
