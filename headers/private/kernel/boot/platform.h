@@ -29,6 +29,8 @@ extern status_t platform_allocate_region(void **_virtualAddress, size_t size, ui
 extern status_t platform_free_region(void *address, size_t size);
 
 /* misc functions */
+extern void platform_switch_to_logo(void);
+extern void platform_switch_to_text_mode(void);
 extern bool platform_user_menu_requested(void);
 extern void platform_start_kernel(void);
 
