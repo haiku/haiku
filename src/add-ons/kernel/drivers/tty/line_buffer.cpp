@@ -82,8 +82,10 @@ line_buffer_user_read(struct line_buffer &buffer, char *data, size_t length)
 			bytesRead = B_BAD_ADDRESS;
 	}
 
-	if (bytesRead > 0)
+	if (bytesRead > 0) {
 		buffer.first = (buffer.first + bytesRead) % buffer.size;
+		buffer.in -= bytesRead;
+	}
 
 	return bytesRead;
 }
