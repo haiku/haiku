@@ -18,9 +18,9 @@
 #include <device_manager.h>
 #include <fast_log.h>
 
-#define debug_level_error 4
-#define debug_level_info 4
-#define debug_level_flow 4
+#define debug_level_error 2
+#define debug_level_info 1
+#define debug_level_flow 0
 
 #define DEBUG_MSG_PREFIX "IDE -- "
 
