@@ -159,8 +159,7 @@ write_unicode_char(conversion_context &context, uint32 c,
 		length = 4;
 	}
 
-	write_text(context, bytes, length, target);
-	return length;
+	return write_text(context, bytes, length, target);
 }
 
 
@@ -260,7 +259,7 @@ text_runs_are_equal(text_run *a, text_run *b)
 		return false;
 
 	return a->offset == b->offset
-		&& !memcmp(&a->color, &b->color, sizeof(rgb_color))
+		&& a->color == b->color
 		&& a->font == b->font;
 }
 
