@@ -164,18 +164,20 @@ private:
 							uint32 event_mask) const;
 	status_t _StopWatching(mtarget target, BMessenger *rosterMess, uint32 what,
 						   BMessenger notify) const;
-	uint32 AddApplication(const char *mimeSig, entry_ref *ref, uint32 flags,
-						  team_id team, thread_id thread, port_id port,
-						  bool fullReg) const;
+	status_t AddApplication(const char *mimeSig, const entry_ref *ref,
+							uint32 flags, team_id team, thread_id thread,
+							port_id port, bool fullReg, uint32 *token,
+							team_id *otherTeam) const;
 	void SetSignature(team_id team, const char *mimeSig) const;
 	void SetThread(team_id team, thread_id thread) const;
-	void SetThreadAndTeam(uint32 entry_token, thread_id thread,
-						  team_id team) const;
-	void CompleteRegistration(team_id team, thread_id, port_id port) const;
-	bool IsAppPreRegistered(entry_ref *ref, team_id team,
+	status_t SetThreadAndTeam(uint32 entryToken, thread_id thread,
+							  team_id team) const;
+	status_t CompleteRegistration(team_id team, thread_id thread,
+								  port_id port) const;
+	bool IsAppPreRegistered(const entry_ref *ref, team_id team,
 							app_info *info) const;
-	void RemovePreRegApp(uint32 entryToken) const;
-	void RemoveApp(team_id team) const;
+	status_t RemovePreRegApp(uint32 entryToken) const;
+	status_t RemoveApp(team_id team) const;
 
 	status_t xLaunchAppPrivate(const char *mimeSig, const entry_ref *ref,
 							   BList* msgList, int cargs, char **args,

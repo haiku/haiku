@@ -60,6 +60,28 @@ _delete_roster_()
 	return 0;
 }
 
+// find_message_app_info
+static
+status_t
+find_message_app_info(BMessage *message, app_info *info)
+{
+	status_t error = B_OK;
+	const flat_app_info *flatInfo = NULL;
+	ssize_t size = 0;
+	error = message->FindData("app_info", B_REG_APP_INFO_TYPE,
+							  (const void**)&flatInfo, &size);
+	if (error == B_OK) {
+		if (size == sizeof(flat_app_info)) {
+			memcpy(info, &flatInfo->info, sizeof(app_info));
+			info->ref.name = NULL;
+			if (strlen(flatInfo->ref_name) > 0)
+				info->ref.set_name(flatInfo->ref_name);
+		} else
+			error = B_ERROR;
+	}
+	return error;
+ }
+
 
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
@@ -69,7 +91,7 @@ app_info::app_info()
 		: thread(-1),
 		  team(-1),
 		  port(-1),
-		  flags(B_MULTIPLE_LAUNCH | B_ARGV_ONLY | _B_APP_INFO_RESERVED1_),
+		  flags(B_REG_DEFAULT_APP_FLAGS),
 		  ref()
 {
 	signature[0] = '\0';
@@ -158,14 +180,44 @@ BRoster::GetAppInfo(entry_ref *ref, app_info *info) const
 status_t
 BRoster::GetRunningAppInfo(team_id team, app_info *info) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (team >= 0 && info ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_RUNNING_APP_INFO);
+	if (error == B_OK)
+		error = request.AddInt32("team", team);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS)
+			error = find_message_app_info(&reply, info);
+		else
+			reply.FindInt32("error", &error);
+	}
+	return error;
 }
 
 // GetActiveAppInfo
 status_t
 BRoster::GetActiveAppInfo(app_info *info) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (info ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_RUNNING_APP_INFO);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS)
+			error = find_message_app_info(&reply, info);
+		else
+			reply.FindInt32("error", &error);
+	}
+	return error;
 }
 
 // FindApp
@@ -331,12 +383,50 @@ BRoster::_StopWatching(mtarget target, BMessenger *rosterMess, uint32 what,
 }
 
 // AddApplication
-uint32
-BRoster::AddApplication(const char *mimeSig, entry_ref *ref, uint32 flags,
-						team_id team, thread_id thread, port_id port,
-						bool fullReg) const
+status_t
+BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
+						uint32 flags, team_id team, thread_id thread,
+						port_id port, bool fullReg, uint32 *_token,
+						team_id *otherTeam) const
 {
-	return 0; // not implemented
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_ADD_APP);
+	if (error == B_OK && mimeSig)
+		error = request.AddString("signature", mimeSig);
+	if (error == B_OK && ref)
+		error = request.AddRef("ref", ref);
+	if (error == B_OK)
+		error = request.AddInt32("flags", (int32)flags);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	if (error == B_OK && thread >= 0)
+		error = request.AddInt32("thread", thread);
+	if (error == B_OK && port >= 0)
+		error = request.AddInt32("port", port);
+	if (error == B_OK)
+		error = request.AddBool("full_registration", fullReg);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS) {
+			if (!fullReg && team < 0) {
+				uint32 token;
+				if (request.FindInt32("token", (int32)&token) == B_OK)
+					*_token = token;
+				else
+					error = B_ERROR;
+			}
+		} else {
+			reply.FindInt32("error", &error);
+			if (otherTeam)
+				reply.FindInt32("other_team", otherTeam);
+		}
+	}
+	return error;
 }
 
 // SetSignature
@@ -352,35 +442,119 @@ BRoster::SetThread(team_id team, thread_id thread) const
 }
 
 // SetThreadAndTeam
-void
-BRoster::SetThreadAndTeam(uint32 entry_token, thread_id thread,
+status_t
+BRoster::SetThreadAndTeam(uint32 entryToken, thread_id thread,
 						  team_id team) const
 {
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_SET_THREAD_AND_TEAM);
+	if (error == B_OK)
+		error = request.AddInt32("token", (int32)entryToken);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	if (error == B_OK && thread >= 0)
+		error = request.AddInt32("thread", thread);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // CompleteRegistration
-void
-BRoster::CompleteRegistration(team_id team, thread_id, port_id port) const
+status_t
+BRoster::CompleteRegistration(team_id team, thread_id thread,
+							  port_id port) const
 {
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_COMPLETE_REGISTRATION);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	if (error == B_OK && thread >= 0)
+		error = request.AddInt32("thread", thread);
+	if (error == B_OK && port >= 0)
+		error = request.AddInt32("port", port);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // IsAppPreRegistered
 bool
-BRoster::IsAppPreRegistered(entry_ref *ref, team_id team, app_info *info) const
+BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
+							app_info *info) const
 {
-	return false; // not implemented
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_IS_PRE_REGISTERED);
+	if (error == B_OK && ref)
+		error = request.AddRef("ref", ref);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	bool isPreRegistered = false;
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS) {
+			if (request.FindBool("pre-registered", isPreRegistered) != B_OK)
+				error = B_ERROR;
+			if (error == B_OK && isPreRegistered && info)
+				error = find_message_app_info(&reply, info);
+		} else
+			reply.FindInt32("error", &error);
+	}
+	return (error == B_OK && isPreRegistered);
 }
 
 // RemovePreRegApp
-void
+status_t
 BRoster::RemovePreRegApp(uint32 entryToken) const
 {
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_REMOVE_PRE_REGISTERED_APP);
+	if (error == B_OK)
+		error = request.AddInt32("token", (int32)entryToken);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // RemoveApp
-void
+status_t
 BRoster::RemoveApp(team_id team) const
 {
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_REMOVE_APP);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // xLaunchAppPrivate
