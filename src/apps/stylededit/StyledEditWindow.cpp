@@ -942,24 +942,16 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 		
 	fTextView->Select(textStart,textFinish);
 	fTextView->ScrollToSelection();
-/*	// we search backwards because we are disturbing everything after the point we insert
-	start = viewText.Length();
-	while (start > 0) {
-		oldstart = start;
-		if (caseSens)
-			start = viewText.FindLast(findIt.String(),start);
-		else
-			start = viewText.IFindLast(findIt.String(),start);
-		if (start == B_ERROR) 
-			break; // done
-		if (oldstart != start) {
-			fTextView->Delete(start, start + findIt.Length());
-			fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
-		} else {
-			start--; // we prefer not to get stuck
-		}
-	} */
 	
+	fClean = false;
+	fUndoCleans = false;
+	fRedoCleans = false;	
+	fRevertItem->SetEnabled(fSaveMessage != NULL);
+	fSaveItem->SetEnabled(true);
+	fUndoItem->SetLabel("Can't Undo");	
+	fUndoItem->SetEnabled(false);
+	fCanUndo = false;
+	fCanRedo = false;
 }/***StyledEditWindow::ReplaceAll()***/
 
 void
@@ -1001,6 +993,10 @@ StyledEditWindow::SetFontSize(float fontSize)
 	fRedoCleans = false;	
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
+	fUndoItem->SetLabel("Can't Undo");	
+	fUndoItem->SetEnabled(false);
+	fCanUndo = false;
+	fCanRedo = false;
 }/***StyledEditWindow::SetFontSize()***/
 
 void
@@ -1016,6 +1012,10 @@ StyledEditWindow::SetFontColor(rgb_color *color)
 	fRedoCleans = false;	
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
+	fUndoItem->SetLabel("Can't Undo");	
+	fUndoItem->SetEnabled(false);
+	fCanUndo = false;
+	fCanRedo = false;
 }/***StyledEditWindow::SetFontColor()***/
 
 void
@@ -1036,4 +1036,8 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	fRedoCleans = false;	
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
+	fUndoItem->SetLabel("Can't Undo");	
+	fUndoItem->SetEnabled(false);
+	fCanUndo = false;
+	fCanRedo = false;
 }/***StyledEditWindow::SetFontStyle()***/
