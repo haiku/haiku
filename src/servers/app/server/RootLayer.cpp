@@ -881,11 +881,7 @@ void RootLayer::SetBGColor(const RGBColor &col)
 
 int32 RootLayer::Buttons(void)
 {
-	Lock();
-	int32 value=fButtons;
-	Unlock();
-	
-	return value;
+	return fButtons;
 }
 
 RGBColor RootLayer::BGColor(void) const

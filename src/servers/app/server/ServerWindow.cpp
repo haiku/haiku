@@ -53,7 +53,7 @@
 #include "Workspace.h"
 #include "MessagePrivate.h"
 
-//#define DEBUG_SERVERWINDOW
+#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 #define DEBUG_SERVERWINDOW_GRAPHICS
@@ -396,7 +396,7 @@ void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace
 */
 status_t ServerWindow::Lock(void)
 {
-	STRACE(("ServerWindow %s: Lock\n",fTitle.String()));
+	STRACE(("\nServerWindow %s: Lock\n",fTitle.String()));
 	
 	return (fLocker.Lock())?B_OK:B_ERROR;
 }
@@ -404,7 +404,7 @@ status_t ServerWindow::Lock(void)
 //! Unlocks the window
 void ServerWindow::Unlock(void)
 {
-	STRACE(("ServerWindow %s: Unlock\n",fTitle.String()));
+	STRACE(("ServerWindow %s: Unlock\n\n",fTitle.String()));
 	
 	fLocker.Unlock();
 }
@@ -424,6 +424,8 @@ bool ServerWindow::IsLocked(void) const
 */
 void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 {
+	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
+			fTitle.String(), layer->fName->String()));
 	// NOTE: no need to check for a lock. This is a private method.
 	uint16 mask;
 
@@ -484,12 +486,12 @@ void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 		link.Read<uint32>(&flags);
 		layer->fLayerData->font.SetFlags(flags);
 	}
-	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",
-			fTitle.String(), layer->fName->String()));
 }
 //------------------------------------------------------------------------------
 void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 {
+	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fTitle.String(),
+			 layer->fName->String()));
 	// NOTE: no need to check for a lock. This is a private method.
 	rgb_color highColor, lowColor, viewColor;
 	pattern patt;
@@ -540,14 +542,11 @@ void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 			layer->fLayerData->clipReg = NULL;
 		}
 	}
-	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(),
-			 layer->fName->String()));
 }
 //------------------------------------------------------------------------------
 Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
-	STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
 
 	int32 token;
 	BRect frame;
@@ -565,6 +564,8 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	link.Read<bool>(&hidden);
 	link.Read<int32>(&childCount);
 			
+	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fTitle.String(),name,token));
+	
 	Layer *newLayer;
 	newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, desktop->GetDisplayDriver());
@@ -577,9 +578,6 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	// add the new Layer to the tree structure.
 	if(localRoot)
 		localRoot->AddChild(newLayer, NULL);
-
-	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_CREATE: Parent: %s, Child: %s\n", fTitle.String(), 
-			localRoot? localRoot->fName->String(): "NULL", newLayer->fName->String()));
 
 	return newLayer;
 }
@@ -702,6 +700,14 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int32>(&token);
 			
 			Layer *current = FindLayer(fWinBorder->fTopLayer, token);
+			if(current)
+			{
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle.String(), current->fName->String(), token));
+			}
+			else
+			{
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle.String(), token));
+			}
 
 			if (current)
 				cl=current;

@@ -1169,7 +1169,12 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// Returns:
 			// 1) font_direction direction of font
-/*			int32 famid, styid;
+			
+			// NOTE: While this may be unimplemented, we can safely return
+			// SERVER_FALSE. This will force the BFont code to default to
+			// B_LEFT_TO_RIGHT, which is what the vast majority of fonts will be.
+			// This will be fixed later.
+			int32 famid, styid;
 			port_id replyport;
 			
 			msg.Read<int32>(&famid);
@@ -1178,7 +1183,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			replylink.SetSendPort(replyport);
 			
-			fontserver->Lock();
+/*			fontserver->Lock();
 			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
 			if(fstyle)
 			{
@@ -1190,12 +1195,11 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			}
 			else
 			{
-				replylink.StartMessage(SERVER_FALSE);
+*/				replylink.StartMessage(SERVER_FALSE);
 				replylink.Flush();
-			}
+//			}
 			
-			fontserver->Unlock();
-*/			
+//			fontserver->Unlock();
 			break;
 		}
 		case AS_GET_STRING_WIDTH:
@@ -1267,7 +1271,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_TUNED_COUNT:
 		{
-			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT unimplmemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1275,6 +1279,30 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// Returns:
 			// 1) int32 - number of font strikes available
+			int32 famid, styid;
+			port_id replyport;
+			
+			msg.Read<int32>(&famid);
+			msg.Read<int32>(&styid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+			if(fstyle)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<int32>(fstyle->TunedCount());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
 			break;
 		}
 		case AS_GET_TUNED_INFO:
@@ -1300,6 +1328,30 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// Returns:
 			// 1) bool - font is/is not fixed
+			int32 famid, styid;
+			port_id replyport;
+			
+			msg.Read<int32>(&famid);
+			msg.Read<int32>(&styid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+			if(fstyle)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<bool>(fstyle->IsFixedWidth());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_NAME:
