@@ -869,7 +869,8 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 float
 BFont::StringWidth(const char *string) const
 {
- 	return StringWidth(string, strlen(string));
+	int32 length=strlen(string);
+ 	return StringWidth(string, length);
 }
 
 
@@ -885,6 +886,10 @@ BFont::StringWidth(const char *string, int32 length) const
 	link.StartMessage(AS_GET_STRING_WIDTH);
 	link.AttachString(string);
 	link.Attach<int32>(length);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<uint8>(fSpacing);
 	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
