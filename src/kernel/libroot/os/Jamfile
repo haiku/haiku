@@ -10,7 +10,7 @@ KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>image.c
 	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>sem.c
-	<$(SOURCE_GRIST)>systeminfo.c
+	<$(SOURCE_GRIST)>system_info.c
 	<$(SOURCE_GRIST)>team.c
 	<$(SOURCE_GRIST)>thread.c
 	<$(SOURCE_GRIST)>time.c
