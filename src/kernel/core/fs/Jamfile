@@ -4,7 +4,7 @@ UsePrivateHeaders storage ;
 
 KernelMergeObject kernel_fs.o : 
 	<$(SOURCE_GRIST)>bootfs.c
-	<$(SOURCE_GRIST)>devfs.c
+	<$(SOURCE_GRIST)>devfs.cpp
 	<$(SOURCE_GRIST)>rootfs.c
 	<$(SOURCE_GRIST)>pipefs.cpp
 	<$(SOURCE_GRIST)>fd.c
