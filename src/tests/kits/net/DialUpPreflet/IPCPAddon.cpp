@@ -75,8 +75,7 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fSettings = settings;
 	fProfile = profile;
 	if(!settings || !profile || isNew) {
-		if(fIPCPWindow)
-			fIPCPWindow->Reload();
+		fIPCPWindow->Reload();
 		return true;
 	}
 	
@@ -147,6 +146,8 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	protocol.ReplaceMessage(MDSU_PARAMETERS, localSideIndex, &local);
 	protocol.AddBool(MDSU_VALID, true);
 	fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
+	
+	fIPCPWindow->Reload();
 	
 	return true;
 }

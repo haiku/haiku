@@ -182,9 +182,14 @@ DialUpView::MessageReceived(BMessage *message)
 		} break;
 		
 		case MSG_DELETE_CURRENT: {
-			// TODO: remove file from disk
-			
 			fInterfaceMenu->RemoveItem(fCurrentItem);
+			BDirectory settings, profile;
+			GetPPPDirectories(&settings, &profile);
+			BEntry entry;
+			settings.FindEntry(fCurrentItem->Label(), &entry);
+			entry.Remove();
+			profile.FindEntry(fCurrentItem->Label(), &entry);
+			entry.Remove();
 			delete fCurrentItem;
 			fCurrentItem = NULL;
 			

@@ -295,9 +295,10 @@ ProtocolsView::Reload()
 	DialUpAddon *protocol;
 	for(int32 index = 0; Addon()->Settings()->FindPointer(PROTOCOLS_TAB_PROTOCOLS,
 			index, reinterpret_cast<void**>(&protocol)) == B_OK; index++)
-		RegisterProtocol(protocol);
+		RegisterProtocol(protocol, false);
 	
 	fListView->Select(0);
+		// XXX: unfortunately, this does not work when the BListView is detached
 	
 	UpdateButtons();
 }
@@ -311,6 +312,21 @@ ProtocolsView::AttachedToWindow()
 	fAddButton->SetTarget(this);
 	fRemoveButton->SetTarget(this);
 	fPreferencesButton->SetTarget(this);
+	
+	// XXX: a workaround for the bug in BListView that causes Select() only to work
+	// when it is attached to a window
+	if(fListView->CurrentSelection() < 0)
+		fListView->Select(0);
+}
+
+
+void
+ProtocolsView::DetachedFromWindow()
+{
+	// XXX: Is this a bug in BeOS? While BListView is detached the index for the
+	// currently selected item does not get updated when it is removed.
+	// Workaround: call DeselectAll() before it gets detached
+	fListView->DeselectAll();
 }
 
 
@@ -383,7 +399,7 @@ ProtocolsView::HasProtocol(const BString& moduleName) const
 
 
 int32
-ProtocolsView::RegisterProtocol(const DialUpAddon *protocol)
+ProtocolsView::RegisterProtocol(const DialUpAddon *protocol, bool reload = true)
 {
 	if(!protocol)
 		return -1;
@@ -394,7 +410,7 @@ ProtocolsView::RegisterProtocol(const DialUpAddon *protocol)
 		item = fProtocolsMenu->ItemAt(index);
 		if(item && item->Message()->FindPointer("Addon",
 				reinterpret_cast<void**>(&addon)) == B_OK && addon == protocol)
-			return RegisterProtocol(index);
+			return RegisterProtocol(index, reload);
 	}
 	
 	return -1;
@@ -402,7 +418,7 @@ ProtocolsView::RegisterProtocol(const DialUpAddon *protocol)
 
 
 int32
-ProtocolsView::RegisterProtocol(int32 index)
+ProtocolsView::RegisterProtocol(int32 index, bool reload = true)
 {
 	DialUpAddon *addon;
 	BMenuItem *remove = fProtocolsMenu->ItemAt(index);
@@ -418,7 +434,8 @@ ProtocolsView::RegisterProtocol(int32 index)
 	fProtocolsMenu->RemoveItem(remove);
 	delete remove;
 	
-	addon->LoadSettings(Addon()->Settings(), Addon()->Profile(), true);
+	addon->LoadSettings(Addon()->Settings(), Addon()->Profile(), reload);
+	
 	return index;
 }
 

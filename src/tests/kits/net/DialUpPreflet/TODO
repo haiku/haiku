@@ -3,11 +3,11 @@ Short-term TODOs:
 - add "Extras" tab for changing dial-behaviour (auto-redial, dial-on-demand, etc.)
 - add "Revert Changes" button
 - load add-ons
-- write IP (IPCP) protocol add-on
 - move DEVNOTES into a doxygen file and document the rest of the API
 - use dynamic window positioning based on screen size instead of static coordinates
 - really delete interface description files when removing an interface
 - open dialog asking for interface name when creating a new interface
+- IPCP: check for incorrect settings (only IP addresses should be entered)
 
 Long-term TODOs:
 - (maybe) allow selecting multiple authenticators (in expert-mode)
