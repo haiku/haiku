@@ -51,31 +51,46 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 
 	if (in_family != B_META_FORMAT_FAMILY)
 		return B_ERROR;
-		
-	if (in_format.type == B_MEDIA_RAW_AUDIO) {
-		out_description->family = B_META_FORMAT_FAMILY;
-		strcpy(out_description->u.meta.description, "audiocodec/raw");
-		goto finished;
-	}
-	if (in_format.type == B_MEDIA_RAW_VIDEO) {
-		out_description->family = B_META_FORMAT_FAMILY;
-		strcpy(out_description->u.meta.description, "videocodec/raw");
-		goto finished;
-	}
 
 	out_description->family = B_META_FORMAT_FAMILY;
-	switch (in_format.u.encoded_audio.encoding) {
-			
-		case B_WAV_FORMAT_FAMILY:
-		case B_MPEG_FORMAT_FAMILY:
-			strcpy(out_description->u.meta.description, "audiocodec/mpeg1layer3");
-			break;
 
-		default:
-			return B_ERROR;
+	switch (in_format.type) {
+	case B_MEDIA_RAW_AUDIO:
+		strcpy(out_description->u.meta.description, "audiocodec/raw");
+		break;
+	case B_MEDIA_RAW_VIDEO:
+		strcpy(out_description->u.meta.description, "videocodec/raw");
+		break;
+	case B_MEDIA_ENCODED_AUDIO:
+		switch (in_format.u.encoded_audio.encoding) {
+				
+			case B_WAV_FORMAT_FAMILY:
+			case B_MPEG_FORMAT_FAMILY:
+				strcpy(out_description->u.meta.description, "audiocodec/mpeg1layer3");
+				break;
+	
+			default:
+				return B_ERROR;
+		}
+		break;
+	case B_MEDIA_ENCODED_VIDEO:
+		switch (in_format.u.encoded_video.encoding) {
+				
+			case B_MPEG_FORMAT_FAMILY:
+				strcpy(out_description->u.meta.description, "videocodec/mpeg");
+				break;
+	
+			default:
+				return B_ERROR;
+		}
+		break;
+	case B_MEDIA_UNKNOWN_TYPE:
+		debugger("FormatManager::GetDescriptionForFormat");
+		strcpy(out_description->u.meta.description, "unknown");
+		break;
+	default:
+		debugger("FormatManager::GetDescriptionForFormat");
 	}
-
-finished:
 	printf("                         description: %s\n",
 		string_for_description(*out_description, s, sizeof(s)));
 	return B_OK;
