@@ -31,9 +31,8 @@ bool
 BControllable::LockParameterWeb()
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 /*************************************************************
@@ -60,9 +59,8 @@ status_t
 BControllable::SetParameterWeb(BParameterWeb *web)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -72,9 +70,8 @@ BControllable::HandleMessage(int32 message,
 							 size_t size)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -82,9 +79,8 @@ status_t
 BControllable::BroadcastChangedParameter(int32 id)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -95,9 +91,8 @@ BControllable::BroadcastNewParameterValue(bigtime_t when,
 										  size_t valueSize)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -105,9 +100,8 @@ status_t
 BControllable::StartControlPanel(BMessenger *out_messenger)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -116,9 +110,8 @@ BControllable::ApplyParameterData(const void *value,
 								  size_t size)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -129,9 +122,8 @@ BControllable::MakeParameterData(const int32 *controls,
 								 size_t *ioSize)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************

@@ -28,9 +28,8 @@ mk_time
 BAudioEvent::Start()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -45,9 +44,8 @@ mk_time
 BAudioEvent::Duration()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -55,9 +53,8 @@ int32
 BAudioEvent::Frames()
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -73,9 +70,8 @@ int32
 BAudioEvent::ChannelCount()
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -83,9 +79,8 @@ float
 BAudioEvent::Gain()
 {
 	UNIMPLEMENTED();
-	float dummy;
 
-	return dummy;
+	return 0.0f;
 }
 
 
@@ -100,9 +95,8 @@ int32
 BAudioEvent::Destination()
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -119,9 +113,8 @@ BAudioEvent::MixIn(float *dst,
 				   mk_time time)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -137,9 +130,8 @@ bigtime_t
 BAudioEvent::CaptureTime()
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -170,9 +162,8 @@ mk_rate
 BDACRenderer::Units()
 {
 	UNIMPLEMENTED();
-	mk_rate dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -180,9 +171,8 @@ mk_time
 BDACRenderer::Latency()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -190,9 +180,8 @@ mk_time
 BDACRenderer::Start()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -200,9 +189,8 @@ mk_time
 BDACRenderer::Duration()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -270,9 +258,8 @@ BDACRenderer::_WriteDAC(void *arg,
 						void *header)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -282,9 +269,8 @@ BDACRenderer::WriteDAC(short *buf,
 					   audio_buffer_header *header)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -292,9 +278,8 @@ bool
 BDACRenderer::MixActiveSegments(mk_time start)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -345,9 +330,8 @@ BAudioFileStream::SeekToTime(BMediaChannel *channel,
 							 mk_time time)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -362,9 +346,8 @@ bigtime_t
 BAudioFileStream::CaptureTime()
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -414,9 +397,8 @@ BADCSource::SeekToTime(BMediaChannel *channel,
 					   mk_time time)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -445,9 +427,8 @@ BADCSource::_ReadADC(void *arg,
 					 void *header)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 

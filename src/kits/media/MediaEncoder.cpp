@@ -187,9 +187,8 @@ BMediaBufferEncoder::EncodeToBuffer(void *output_buffer,
 									media_encode_info *info)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -203,9 +202,8 @@ BMediaBufferEncoder::WriteChunk(const void *chunk_data,
 								media_encode_info *info)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

@@ -48,9 +48,8 @@ BSoundFile::SetTo(const entry_ref *ref,
 				  uint32 open_mode)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -58,9 +57,8 @@ int32
 BSoundFile::FileFormat() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -68,9 +66,8 @@ int32
 BSoundFile::SamplingRate() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -78,9 +75,8 @@ int32
 BSoundFile::CountChannels() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -88,9 +84,8 @@ int32
 BSoundFile::SampleSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -98,9 +93,8 @@ int32
 BSoundFile::ByteOrder() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -108,9 +102,8 @@ int32
 BSoundFile::SampleFormat() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -118,9 +111,8 @@ int32
 BSoundFile::FrameSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -138,9 +130,8 @@ bool
 BSoundFile::IsCompressed() const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -148,9 +139,8 @@ int32
 BSoundFile::CompressionType() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -166,9 +156,8 @@ int32
 BSoundFile::SetFileFormat(int32 format)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -176,9 +165,8 @@ int32
 BSoundFile::SetSamplingRate(int32 fps)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -186,9 +174,8 @@ int32
 BSoundFile::SetChannelCount(int32 spf)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -196,9 +183,8 @@ int32
 BSoundFile::SetSampleSize(int32 bps)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -206,9 +192,8 @@ int32
 BSoundFile::SetByteOrder(int32 bord)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -216,9 +201,8 @@ int32
 BSoundFile::SetSampleFormat(int32 fmt)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -226,9 +210,8 @@ int32
 BSoundFile::SetCompressionType(int32 type)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -244,9 +227,8 @@ bool
 BSoundFile::SetIsCompressed(bool tf)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -358,9 +340,8 @@ status_t
 BSoundFile::_ref_to_file(const entry_ref *ref)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

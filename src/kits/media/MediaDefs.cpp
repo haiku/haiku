@@ -195,9 +195,8 @@ bool
 media_format::Matches(const media_format *otherFormat) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -213,9 +212,8 @@ media_format::SetMetaData(const void *data,
 						  size_t size)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -231,9 +229,8 @@ int32
 media_format::MetaDataSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 // final

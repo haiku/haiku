@@ -14,9 +14,8 @@ mk_time
 BMediaEvent::Duration()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -24,9 +23,8 @@ bigtime_t
 BMediaEvent::CaptureTime()
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************
@@ -49,9 +47,8 @@ mk_time
 BEventStream::Start()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -66,9 +63,8 @@ mk_time
 BEventStream::Duration()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -84,9 +80,8 @@ BEventStream::SeekToTime(BMediaChannel *channel,
 						 mk_time time)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -119,9 +114,8 @@ mk_time
 BMediaRenderer::Latency()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -144,9 +138,8 @@ mk_time
 BMediaRenderer::Start()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -154,9 +147,8 @@ mk_time
 BMediaRenderer::Duration()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -250,9 +242,8 @@ int32
 BMediaRenderer::_LoopThread(void *arg)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -313,9 +304,8 @@ bool
 BTransport::RemoveRenderer(BMediaRenderer *)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -323,9 +313,8 @@ transport_status
 BTransport::Status()
 {
 	UNIMPLEMENTED();
-	transport_status dummy;
 
-	return dummy;
+	return B_TRANSPORT_STOPPED;
 }
 
 
@@ -340,9 +329,8 @@ mk_time
 BTransport::PerformanceTime()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -350,9 +338,8 @@ mk_rate
 BTransport::PerformanceRate()
 {
 	UNIMPLEMENTED();
-	mk_rate dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -360,9 +347,8 @@ mk_time
 BTransport::TimeOffset()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -377,9 +363,8 @@ mk_time
 BTransport::MaximumLatency()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -387,9 +372,8 @@ mk_time
 BTransport::PerformanceStart()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -397,9 +381,8 @@ mk_time
 BTransport::PerformanceEnd()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -489,9 +472,8 @@ bool
 BTimeBase::RemoveTransport(BTransport *)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -508,9 +490,8 @@ BTimeBase::CallAt(mk_time time,
 				  void *arg)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -518,9 +499,8 @@ mk_time
 BTimeBase::Time()
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -528,9 +508,8 @@ mk_rate
 BTimeBase::Rate()
 {
 	UNIMPLEMENTED();
-	mk_rate dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -538,9 +517,8 @@ mk_time
 BTimeBase::TimeAt(bigtime_t system_time)
 {
 	UNIMPLEMENTED();
-	mk_time dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -548,9 +526,8 @@ bigtime_t
 BTimeBase::SystemTimeAt(mk_time time)
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -566,9 +543,8 @@ bool
 BTimeBase::IsAbsolute()
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 /*************************************************************
@@ -579,9 +555,8 @@ int32
 BTimeBase::_SnoozeThread(void *arg)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -643,9 +618,8 @@ mk_rate
 BMediaChannel::Rate()
 {
 	UNIMPLEMENTED();
-	mk_rate dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -660,9 +634,8 @@ bool
 BMediaChannel::LockChannel()
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -670,9 +643,8 @@ status_t
 BMediaChannel::LockWithTimeout(bigtime_t)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

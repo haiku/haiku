@@ -42,9 +42,8 @@ int32
 BBufferStreamManager::BufferCount() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -59,9 +58,8 @@ int32
 BBufferStreamManager::BufferSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -76,9 +74,8 @@ bigtime_t
 BBufferStreamManager::BufferDelay() const
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -93,9 +90,8 @@ bigtime_t
 BBufferStreamManager::Timeout() const
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -110,9 +106,8 @@ stream_state
 BBufferStreamManager::Start()
 {
 	UNIMPLEMENTED();
-	stream_state dummy;
 
-	return dummy;
+	return B_IDLE;
 }
 
 
@@ -120,9 +115,8 @@ stream_state
 BBufferStreamManager::Stop()
 {
 	UNIMPLEMENTED();
-	stream_state dummy;
 
-	return dummy;
+	return B_IDLE;
 }
 
 
@@ -130,9 +124,8 @@ stream_state
 BBufferStreamManager::Abort()
 {
 	UNIMPLEMENTED();
-	stream_state dummy;
 
-	return dummy;
+	return B_IDLE;
 }
 
 
@@ -140,9 +133,8 @@ stream_state
 BBufferStreamManager::State() const
 {
 	UNIMPLEMENTED();
-	stream_state dummy;
 
-	return dummy;
+	return B_IDLE;
 }
 
 
@@ -150,9 +142,8 @@ port_id
 BBufferStreamManager::NotificationPort() const
 {
 	UNIMPLEMENTED();
-	port_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -167,9 +158,8 @@ bool
 BBufferStreamManager::Lock()
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -184,9 +174,8 @@ status_t
 BBufferStreamManager::Subscribe(BBufferStream *stream)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -194,9 +183,8 @@ status_t
 BBufferStreamManager::Unsubscribe()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -204,9 +192,8 @@ subscriber_id
 BBufferStreamManager::ID() const
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************
@@ -231,9 +218,8 @@ status_t
 BBufferStreamManager::_ProcessingThread(void *arg)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -255,9 +241,8 @@ bigtime_t
 BBufferStreamManager::SnoozeUntil(bigtime_t sys_time)
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************

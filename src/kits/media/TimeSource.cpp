@@ -208,9 +208,8 @@ status_t
 BTimeSource::RemoveMe(BMediaNode *node)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -218,9 +217,8 @@ status_t
 BTimeSource::AddMe(BMediaNode *node)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

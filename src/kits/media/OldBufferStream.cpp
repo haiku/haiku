@@ -17,9 +17,8 @@ BAbstractBufferStream::GetStreamParameters(size_t *bufferSize,
 										   int32 *subscriberCount) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -28,9 +27,8 @@ BAbstractBufferStream::SetStreamBuffers(size_t bufferSize,
 										int32 bufferCount)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 		
 
@@ -38,9 +36,8 @@ status_t
 BAbstractBufferStream::StartStreaming()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -48,9 +45,8 @@ status_t
 BAbstractBufferStream::StopStreaming()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -89,9 +85,8 @@ stream_id
 BAbstractBufferStream::StreamID() const
 {
 	UNIMPLEMENTED();
-	stream_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -101,9 +96,8 @@ BAbstractBufferStream::Subscribe(char *name,
 								 sem_id semID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -111,9 +105,8 @@ status_t
 BAbstractBufferStream::Unsubscribe(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -123,9 +116,8 @@ BAbstractBufferStream::EnterStream(subscriber_id subID,
 								   bool before)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -133,9 +125,8 @@ status_t
 BAbstractBufferStream::ExitStream(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -152,9 +143,8 @@ BAbstractBufferStream::SendRPC(BMessage *msg,
 							   BMessage *reply) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -196,9 +186,8 @@ size_t
 BBufferStream::HeaderSize() const
 {
 	UNIMPLEMENTED();
-	size_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -209,9 +198,8 @@ BBufferStream::GetStreamParameters(size_t *bufferSize,
 								   int32 *subscriberCount) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -220,9 +208,8 @@ BBufferStream::SetStreamBuffers(size_t bufferSize,
 								int32 bufferCount)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -230,9 +217,8 @@ status_t
 BBufferStream::StartStreaming()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -240,9 +226,8 @@ status_t
 BBufferStream::StopStreaming()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -258,9 +243,8 @@ int32
 BBufferStream::CountBuffers() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -270,9 +254,8 @@ BBufferStream::Subscribe(char *name,
 						 sem_id semID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -280,9 +263,8 @@ status_t
 BBufferStream::Unsubscribe(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -292,9 +274,8 @@ BBufferStream::EnterStream(subscriber_id subID,
 						   bool before)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -302,9 +283,8 @@ status_t
 BBufferStream::ExitStream(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -312,9 +292,8 @@ bool
 BBufferStream::IsSubscribed(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -322,9 +301,8 @@ bool
 BBufferStream::IsEntered(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -335,9 +313,8 @@ BBufferStream::SubscriberInfo(subscriber_id subID,
 							  int32 *position)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -345,9 +322,8 @@ status_t
 BBufferStream::UnblockSubscriber(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -357,9 +333,8 @@ BBufferStream::AcquireBuffer(subscriber_id subID,
 							 bigtime_t timeout)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -367,9 +342,8 @@ status_t
 BBufferStream::ReleaseBuffer(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -377,9 +351,8 @@ size_t
 BBufferStream::BufferSize(buffer_id bufID) const
 {
 	UNIMPLEMENTED();
-	size_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -395,9 +368,8 @@ bool
 BBufferStream::IsFinalBuffer(buffer_id bufID) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -405,9 +377,8 @@ int32
 BBufferStream::CountBuffersHeld(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -415,9 +386,8 @@ int32
 BBufferStream::CountSubscribers() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -425,9 +395,8 @@ int32
 BBufferStream::CountEnteredSubscribers() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -435,9 +404,8 @@ subscriber_id
 BBufferStream::FirstSubscriber() const
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -445,9 +413,8 @@ subscriber_id
 BBufferStream::LastSubscriber() const
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -455,9 +422,8 @@ subscriber_id
 BBufferStream::NextSubscriber(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -465,9 +431,8 @@ subscriber_id
 BBufferStream::PrevSubscriber(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -496,9 +461,8 @@ bool
 BBufferStream::Lock()
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -513,9 +477,8 @@ status_t
 BBufferStream::AddBuffer(buffer_id bufID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -523,9 +486,8 @@ buffer_id
 BBufferStream::RemoveBuffer(bool force)
 {
 	UNIMPLEMENTED();
-	buffer_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -534,9 +496,8 @@ BBufferStream::CreateBuffer(size_t size,
 							bool isFinal)
 {
 	UNIMPLEMENTED();
-	buffer_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -596,9 +557,8 @@ bool
 BBufferStream::IsSubscribedSafe(subscriber_id subID) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -606,9 +566,8 @@ bool
 BBufferStream::IsEnteredSafe(subscriber_id subID) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -623,9 +582,8 @@ status_t
 BBufferStream::WakeSubscriber(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -647,9 +605,8 @@ status_t
 BBufferStream::ReleaseBufferSafe(subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -658,9 +615,8 @@ BBufferStream::ReleaseBufferTo(buffer_id bufID,
 							   subscriber_id subID)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

@@ -36,9 +36,8 @@ int32
 BMediaTheme::ID()
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -46,9 +45,8 @@ bool
 BMediaTheme::GetRef(entry_ref *out_ref)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -66,9 +64,8 @@ status_t
 BMediaTheme::SetPreferredTheme(BMediaTheme *default_theme)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -92,7 +89,7 @@ rgb_color
 BMediaTheme::BackgroundColorFor(bg_kind bg)
 {
 	UNIMPLEMENTED();
-	rgb_color dummy;
+	rgb_color dummy = {0,0,0};
 
 	return dummy;
 }
@@ -102,7 +99,7 @@ rgb_color
 BMediaTheme::ForegroundColorFor(fg_kind fg)
 {
 	UNIMPLEMENTED();
-	rgb_color dummy;
+	rgb_color dummy = {255,255,255};
 
 	return dummy;
 }

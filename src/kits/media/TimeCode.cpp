@@ -96,9 +96,8 @@ status_t
 BTimeCode::SetType(timecode_type type)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -128,9 +127,8 @@ bool
 BTimeCode::operator==(const BTimeCode &other) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -138,9 +136,8 @@ bool
 BTimeCode::operator<(const BTimeCode &other) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -184,9 +181,8 @@ int
 BTimeCode::Hours() const
 {
 	UNIMPLEMENTED();
-	int dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -194,9 +190,8 @@ int
 BTimeCode::Minutes() const
 {
 	UNIMPLEMENTED();
-	int dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -204,9 +199,8 @@ int
 BTimeCode::Seconds() const
 {
 	UNIMPLEMENTED();
-	int dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -214,9 +208,8 @@ int
 BTimeCode::Frames() const
 {
 	UNIMPLEMENTED();
-	int dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -224,9 +217,8 @@ timecode_type
 BTimeCode::Type() const
 {
 	UNIMPLEMENTED();
-	timecode_type dummy;
 
-	return dummy;
+	return B_TIMECODE_DEFAULT;
 }
 
 
@@ -245,9 +237,8 @@ bigtime_t
 BTimeCode::Microseconds() const
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -255,9 +246,8 @@ int32
 BTimeCode::LinearFrames() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 

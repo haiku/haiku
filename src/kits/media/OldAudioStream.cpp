@@ -26,9 +26,8 @@ status_t
 BADCStream::SetADCInput(int32 device)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -36,9 +35,8 @@ status_t
 BADCStream::ADCInput(int32 *device) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -46,9 +44,8 @@ status_t
 BADCStream::SetSamplingRate(float sRate)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -56,9 +53,8 @@ status_t
 BADCStream::SamplingRate(float *sRate) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -66,9 +62,8 @@ status_t
 BADCStream::BoostMic(bool boost)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -76,9 +71,8 @@ bool
 BADCStream::IsMicBoosted() const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -87,9 +81,8 @@ BADCStream::SetStreamBuffers(size_t bufferSize,
 							 int32 bufferCount)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -109,9 +102,8 @@ stream_id
 BADCStream::StreamID() const
 {
 	UNIMPLEMENTED();
-	stream_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************
@@ -159,9 +151,8 @@ status_t
 BDACStream::SetSamplingRate(float sRate)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -169,9 +160,8 @@ status_t
 BDACStream::SamplingRate(float *sRate) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -181,9 +171,8 @@ BDACStream::SetVolume(int32 device,
 					  float r_volume)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -194,9 +183,8 @@ BDACStream::GetVolume(int32 device,
 					  bool *enabled) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -205,9 +193,8 @@ BDACStream::EnableDevice(int32 device,
 						 bool enable)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -215,9 +202,8 @@ bool
 BDACStream::IsDeviceEnabled(int32 device) const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -226,9 +212,8 @@ BDACStream::SetStreamBuffers(size_t bufferSize,
 							 int32 bufferCount)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -247,9 +232,8 @@ stream_id
 BDACStream::StreamID() const
 {
 	UNIMPLEMENTED();
-	stream_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************

@@ -26,9 +26,8 @@ status_t
 BSubscriber::Subscribe(BAbstractBufferStream *stream)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -36,9 +35,8 @@ status_t
 BSubscriber::Unsubscribe()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -46,9 +44,8 @@ subscriber_id
 BSubscriber::ID() const
 {
 	UNIMPLEMENTED();
-	subscriber_id dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -71,9 +68,8 @@ bigtime_t
 BSubscriber::Timeout() const
 {
 	UNIMPLEMENTED();
-	bigtime_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -86,9 +82,8 @@ BSubscriber::EnterStream(subscriber_id neighbor,
 						 bool background)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -96,9 +91,8 @@ status_t
 BSubscriber::ExitStream(bool synch)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -106,9 +100,8 @@ bool
 BSubscriber::IsInStream() const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 /*************************************************************
@@ -119,9 +112,8 @@ status_t
 BSubscriber::_ProcessLoop(void *arg)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -129,9 +121,8 @@ status_t
 BSubscriber::ProcessLoop()
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 

@@ -264,9 +264,8 @@ BMediaTrack::GetParameterValue(int32 id,
 							   size_t *size)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -276,9 +275,8 @@ BMediaTrack::SetParameterValue(int32 id,
 							   size_t size)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -294,9 +292,8 @@ status_t
 BMediaTrack::GetQuality(float *quality)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -304,9 +301,8 @@ status_t
 BMediaTrack::SetQuality(float quality)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -314,9 +310,8 @@ status_t
 BMediaTrack::GetEncodeParameters(encode_parameters *parameters) const
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -324,9 +319,8 @@ status_t
 BMediaTrack::SetEncodeParameters(encode_parameters *parameters)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -335,9 +329,8 @@ BMediaTrack::Perform(int32 selector,
 					 void *data)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -367,9 +360,8 @@ BMediaTrack::TrackInfo(media_format *out_format,
 					   int32 *out_infoSize)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 /*

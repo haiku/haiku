@@ -33,8 +33,8 @@ PortPool::~PortPool()
 port_id 
 PortPool::GetPort()
 {
+	port_id port = -1;
 	Lock();
-	port_id port;
 	if (count == maxcount) {
 		maxcount += 3;
 		pool = (PortInfo *)realloc(pool,sizeof(PortInfo) * maxcount);
@@ -53,6 +53,8 @@ PortPool::GetPort()
 			break;
 		}
 	Unlock();
+	if (port < 0)
+		debugger("wrong port int PortPool::GetPort()\n");
 	return port;
 }
 

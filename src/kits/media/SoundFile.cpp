@@ -43,9 +43,8 @@ BSoundFile::SetTo(const entry_ref *ref,
 				  uint32 open_mode)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
@@ -53,9 +52,8 @@ int32
 BSoundFile::FileFormat() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -63,9 +61,8 @@ int32
 BSoundFile::SamplingRate() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -73,9 +70,8 @@ int32
 BSoundFile::CountChannels() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -83,9 +79,8 @@ int32
 BSoundFile::SampleSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -93,9 +88,8 @@ int32
 BSoundFile::ByteOrder() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -103,9 +97,8 @@ int32
 BSoundFile::SampleFormat() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -113,9 +106,8 @@ int32
 BSoundFile::FrameSize() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -123,9 +115,8 @@ off_t
 BSoundFile::CountFrames() const
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -133,9 +124,8 @@ bool
 BSoundFile::IsCompressed() const
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -143,9 +133,8 @@ int32
 BSoundFile::CompressionType() const
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -161,9 +150,8 @@ BSoundFile::CompressionName() const
 BSoundFile::SetFileFormat(int32 format)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -171,9 +159,8 @@ BSoundFile::SetFileFormat(int32 format)
 BSoundFile::SetSamplingRate(int32 fps)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -181,9 +168,8 @@ BSoundFile::SetSamplingRate(int32 fps)
 BSoundFile::SetChannelCount(int32 spf)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -191,9 +177,8 @@ BSoundFile::SetChannelCount(int32 spf)
 BSoundFile::SetSampleSize(int32 bps)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -201,9 +186,8 @@ BSoundFile::SetSampleSize(int32 bps)
 BSoundFile::SetByteOrder(int32 bord)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -211,9 +195,8 @@ BSoundFile::SetByteOrder(int32 bord)
 BSoundFile::SetSampleFormat(int32 fmt)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -221,9 +204,8 @@ BSoundFile::SetSampleFormat(int32 fmt)
 BSoundFile::SetCompressionType(int32 type)
 {
 	UNIMPLEMENTED();
-	int32 dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -239,9 +221,8 @@ BSoundFile::SetCompressionName(char *name)
 BSoundFile::SetIsCompressed(bool tf)
 {
 	UNIMPLEMENTED();
-	bool dummy;
 
-	return dummy;
+	return false;
 }
 
 
@@ -249,9 +230,8 @@ BSoundFile::SetIsCompressed(bool tf)
 BSoundFile::SetDataLocation(off_t offset)
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -259,9 +239,8 @@ BSoundFile::SetDataLocation(off_t offset)
 BSoundFile::SetFrameCount(off_t count)
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -270,9 +249,8 @@ BSoundFile::ReadFrames(char *buf,
 					   size_t count)
 {
 	UNIMPLEMENTED();
-	size_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -281,9 +259,8 @@ BSoundFile::WriteFrames(char *buf,
 						size_t count)
 {
 	UNIMPLEMENTED();
-	size_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -291,9 +268,8 @@ BSoundFile::WriteFrames(char *buf,
 BSoundFile::SeekToFrame(off_t n)
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -301,9 +277,8 @@ off_t
 BSoundFile::FrameIndex() const
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 
@@ -311,9 +286,8 @@ off_t
 BSoundFile::FramesRemaining() const
 {
 	UNIMPLEMENTED();
-	off_t dummy;
 
-	return dummy;
+	return 0;
 }
 
 /*************************************************************
@@ -336,9 +310,8 @@ status_t
 BSoundFile::_ref_to_file(const entry_ref *ref)
 {
 	UNIMPLEMENTED();
-	status_t dummy;
 
-	return dummy;
+	return B_ERROR;
 }
 
 
