@@ -19,8 +19,7 @@ init_hardware (void)
 status_t
 init_driver (void)
 {
-	get_module(B_ACPI_MODULE_NAME,(module_info **)&acpi);
-	return B_OK;
+	return get_module(B_ACPI_MODULE_NAME,(module_info **)&acpi);
 }
 
 void
@@ -61,7 +60,21 @@ acpi_button_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 		return B_IO_ERROR;
 		
 	*((uint8 *)(buf)) = acpi->read_acpi_reg((uint32)(cookie));
-	acpi->write_acpi_reg((uint32)(cookie),0); //--- Clear sticky status reg
+	
+	/* acpi->write_acpi_reg((uint32)(cookie),0); */
+	
+	/* The above simple clearing of the status register doesn't seem to work.
+	   So we toggle the ENABLE bit instead. Hopefully this doesn't interfere
+	   with the debounce logic and result in two events */
+	   
+	if ((uint32)(cookie) == ACPI_BITREG_POWER_BUTTON_STATUS) {
+		acpi->write_acpi_reg(ACPI_BITREG_POWER_BUTTON_ENABLE,1);
+		acpi->write_acpi_reg(ACPI_BITREG_POWER_BUTTON_ENABLE,0);
+	} else if ((uint32)(cookie) == ACPI_BITREG_SLEEP_BUTTON_STATUS) {
+		acpi->write_acpi_reg(ACPI_BITREG_SLEEP_BUTTON_ENABLE,1);
+		acpi->write_acpi_reg(ACPI_BITREG_SLEEP_BUTTON_ENABLE,0);
+	}
+	
 	*num_bytes = 1;
 	return B_OK;
 }
