@@ -147,3 +147,6 @@ BBlockCache::Save(void *pointer, size_t blockSize)
 	}
 	fLocker.Unlock();
 }
+
+void BBlockCache::_ReservedBlockCache1() {}
+void BBlockCache::_ReservedBlockCache2() {}
