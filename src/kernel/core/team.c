@@ -99,7 +99,7 @@ dump_team_info(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		num = atoul(argv[1]);
+		num = strtoul(argv[1], NULL, 16);
 		if (num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
 			_dump_team_info((struct team*)num);
