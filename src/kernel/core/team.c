@@ -322,7 +322,7 @@ bool
 team_is_valid(team_id id)
 {
 	struct team *team;
-	int state;
+	cpu_status state;
 
 	if (id <= 0)
 		return false;
@@ -957,7 +957,7 @@ team_create_thread_start(void *args)
 
 	// ToDo: don't use fixed paths!
 	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
-	if (err < 0) {
+	if (err < B_OK) {
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process
 		return err;
@@ -1587,7 +1587,7 @@ wait_for_team(team_id id, status_t *_returnCode)
 status_t
 kill_team(team_id id)
 {
-	int state;
+	cpu_status state;
 	struct team *team;
 //	struct thread *t;
 	thread_id tid = -1;
@@ -1650,7 +1650,7 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 status_t
 _get_team_info(team_id id, team_info *info, size_t size)
 {
-	int state;
+	cpu_status state;
 	status_t rc = B_OK;
 	struct team *team;
 
@@ -1683,17 +1683,17 @@ _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 	status_t status = B_BAD_TEAM_ID;
 	struct team *team = NULL;
 	int32 slot = *cookie;
-	team_id teamIDEnd;
+	team_id lastTeamID;
 
-	int state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	teamIDEnd = peek_next_thread_id();
-	if (slot >= teamIDEnd)
+	lastTeamID = peek_next_thread_id();
+	if (slot >= lastTeamID)
 		goto err;
 
 	// get next valid team
-	while ((slot < teamIDEnd) && !(team = team_get_team_struct_locked(slot)))
+	while (slot < lastTeamID && !(team = team_get_team_struct_locked(slot)))
 		slot++;
 
 	if (team) {
