@@ -41,7 +41,7 @@
 #include "tiffvers.h"
 
 #include "TIFFTranslator.h"
-#include "TIFFTranslatorSettings.h"
+#include "TranslatorSettings.h"
 
 #include "TIFFView.h"
 
@@ -74,15 +74,16 @@ add_menu_item(BMenu* menu,
 // Returns:
 // ---------------------------------------------------------------
 TIFFView::TIFFView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, TIFFTranslatorSettings* settings)
-	:	BView(frame, name, resize, flags),
-		fSettings(settings)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
+	:	BView(frame, name, resize, flags)
 {
+	fSettings = settings;
+
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
-	uint32 currentCompression = fSettings->SetGetCompression();
+	uint32 currentCompression = fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
 	add_menu_item(menu, COMPRESSION_NONE, "None", currentCompression);
 	menu->AddSeparatorItem();
@@ -137,9 +138,9 @@ TIFFView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_COMPRESSION_CHANGED: {
-			uint32 value;
-			if (message->FindInt32("value", (int32*)&value) >= B_OK) {
-				fSettings->SetGetCompression(&value);
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
 			break;
@@ -203,9 +204,10 @@ TIFFView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(TIFF_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((TIFF_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(TIFF_TRANSLATOR_VERSION & 0xf), __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(TIFF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(TIFF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(TIFF_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	
 	int32 lineno = 6;

@@ -2,6 +2,9 @@ SubDir OBOS_TOP src add-ons translators libtifftranslator ;
 
 UseLibraryHeaders zlib ;
 
+# Include BaseTranslator code from shared directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
 Translator TIFFTranslator : 
 	# libtiff
 	tif_aux.c
@@ -38,12 +41,15 @@ Translator TIFFTranslator :
 	tif_write.c
 	tif_zip.c 
 
-	# TIFFTranslator
-	TIFFTranslatorSettings.cpp
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	# TIFFTranslator classes
 	TIFFMain.cpp
 	TIFFTranslator.cpp
-	TIFFView.cpp
-	TIFFWindow.cpp ;
+	TIFFView.cpp ;
 
 LinkSharedOSLibs TIFFTranslator : be translation libz.a ;
 

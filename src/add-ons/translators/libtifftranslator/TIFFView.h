@@ -33,14 +33,13 @@
 #define TIFFVIEW_H
 
 #include <View.h>
-
-class BMenuField;
-class TIFFTranslatorSettings;
+#include <MenuField.h>
+#include "TranslatorSettings.h"
 
 class TIFFView : public BView {
 public:
 	TIFFView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags, TIFFTranslatorSettings* psettings);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~TIFFView();
@@ -59,7 +58,7 @@ public:
 private:
 	BMenuField*				fCompressionMF;
 
-	TIFFTranslatorSettings*	fSettings;
+	TranslatorSettings *fSettings;
 		// the actual settings for the translator,
 		// shared with the translator
 };
