@@ -250,10 +250,7 @@ void ServerWindow::Show(void)
 		int32 wksCount;
 
 		desktop->fGeneralLock.Lock();
-		STRACE(("ServerWindow(%s)::Show() - General lock acquired\n", fWinBorder->GetName()));
-
 		rl->fMainLock.Lock();
-		STRACE(("ServerWindow(%s)::Show() - Main lock acquired\n", fWinBorder->GetName()));
 
 		// make WinBorder unhidden, but *do not* rebuild and redraw! We'll do that
 		// after we bring it (its modal and floating windows also) in front.
@@ -305,10 +302,7 @@ void ServerWindow::Show(void)
 		}
 
 		rl->fMainLock.Unlock();
-		STRACE(("ServerWindow(%s)::Show() - Main lock released\n", fWinBorder->GetName()));
-		
 		desktop->fGeneralLock.Unlock();
-		STRACE(("ServerWindow(%s)::Show() - General lock released\n", fWinBorder->GetName()));
 	}
 	else
 	{
@@ -332,10 +326,7 @@ void ServerWindow::Hide(void)
 		Workspace *ws = NULL;
 		
 		desktop->fGeneralLock.Lock();
-		STRACE(("ServerWindow(%s)::Hide() - General lock acquired\n", fWinBorder->GetName()));
-		
 		rl->fMainLock.Lock();
-		STRACE(("ServerWindow(%s)::Hide() - Main lock acquired\n", fWinBorder->GetName()));
 		
 		fWinBorder->Hide();
 		
@@ -360,10 +351,7 @@ void ServerWindow::Hide(void)
 			}
 		}
 		rl->fMainLock.Unlock();
-		STRACE(("ServerWindow(%s)::Hide() - Main lock released\n", fWinBorder->GetName()));
-
 		desktop->fGeneralLock.Unlock();
-		STRACE(("ServerWindow(%s)::Hide() - General lock released\n", fWinBorder->GetName()));
 	}
 }
 //------------------------------------------------------------------------------
@@ -693,6 +681,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		printf("ServerWindow %s received unexpected code - message offset %lx before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
 		return;
 	}
+	
 	switch(code)
 	{
 		//--------- BView Messages -----------------
@@ -1528,6 +1517,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_ADD_TO_SUBSET:
 		{
+			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n",fTitle.String()));
 			WinBorder *wb;
 			int32 mainToken;
 			team_id	teamID;
@@ -1552,6 +1542,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_REM_FROM_SUBSET:
 		{
+			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n",fTitle.String()));
 			WinBorder *wb;
 			int32 mainToken;
 			team_id teamID;
@@ -1618,6 +1609,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_WINDOW_RESIZE:
 		{
+			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE\n",fTitle.String()));
 			float xResizeBy;
 			float yResizeBy;
 			
@@ -1630,6 +1622,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_WINDOW_MOVE:
 		{
+			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE\n",fTitle.String()));
 			float xMoveBy;
 			float yMoveBy;
 			
@@ -1707,6 +1700,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_LINE:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fTitle.String()));
+			
 			// TODO: Add clipping TO AS_STROKE_LINE
 			float x1, y1, x2, y2;
 			
@@ -1721,11 +1716,17 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				BPoint p2(x2,y2);
 				desktop->GetDisplayDriver()->StrokeLine(cl->ConvertToTop(p1),cl->ConvertToTop(p2),
 						cl->fLayerData);
+				
+				// We update the pen here because many DisplayDriver calls which do not update the
+				// pen position actually call StrokeLine
+				cl->fLayerData->penlocation=p2;
 			}
 			break;
 		}
 		case AS_STROKE_RECT:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fTitle.String()));
+			
 			// TODO: Add clipping TO AS_STROKE_RECT
 			float left, top, right, bottom;
 			link.Read<float>(&left);
@@ -1733,20 +1734,26 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&right);
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
-
+debugger("STROKERECT");
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->StrokeRect(cl->ConvertToTop(rect),cl->fLayerData);
+			break;
 		}
 		case AS_FILL_RECT:
 		{
-			// TODO: Add clipping TO AS_STROKE_RECT
+			STRACE(("ServerWindow %s: Message AS_FILL_RECT\n",fTitle.String()));
+			
+			// TODO: Add clipping TO AS_FILL_RECT
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rect),cl->fLayerData);
+			break;
 		}
 		case AS_STROKE_ARC:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_ARC\n",fTitle.String()));
+			
 			// TODO: Add clipping to AS_STROKE_ARC
 			float angle, span;
 			BRect r;
@@ -1760,7 +1767,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_ARC:
 		{
-			// TODO: Add clipping to AS_STROKE_ARC
+			STRACE(("ServerWindow %s: Message AS_FILL_ARC\n",fTitle.String()));
+			
+			// TODO: Add clipping to AS_FILL_ARC
 			float angle, span;
 			BRect r;
 			
@@ -1773,6 +1782,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_BEZIER:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n",fTitle.String()));
+			
 			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
 			int i;
@@ -1793,6 +1804,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_BEZIER:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n",fTitle.String()));
+			
 			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
 			int i;
@@ -1813,6 +1826,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_ELLIPSE:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n",fTitle.String()));
+			
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
 			link.Read<BRect>(&rect);
@@ -1822,6 +1837,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_ELLIPSE:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n",fTitle.String()));
+			
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
 			link.Read<BRect>(&rect);
@@ -1831,6 +1848,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_ROUNDRECT:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n",fTitle.String()));
+			
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
@@ -1844,6 +1863,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_ROUNDRECT:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n",fTitle.String()));
+			
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
@@ -1857,6 +1878,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_TRIANGLE:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n",fTitle.String()));
+			
 			// TODO:: Add clipping to AS_STROKE_TRIANGLE
 			BPoint pts[3];
 			BRect rect;
@@ -1877,6 +1900,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_TRIANGLE:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n",fTitle.String()));
+			
 			// TODO:: Add clipping to AS_FILL_TRIANGLE
 			BPoint pts[3];
 			BRect rect;
@@ -1897,6 +1922,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_POLYGON:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n",fTitle.String()));
+			
 			BRect polyframe;
 			bool isclosed;
 			int32 pointcount;
@@ -1922,6 +1949,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_POLYGON:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n",fTitle.String()));
+			
 			BRect polyframe;
 			int32 pointcount;
 			BPoint *pointlist;
@@ -1944,6 +1973,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_SHAPE:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n",fTitle.String()));
+			
 			BRect shaperect;
 			int32 opcount;
 			int32 ptcount;
@@ -1971,6 +2002,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_SHAPE:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n",fTitle.String()));
+			
 			BRect shaperect;
 			int32 opcount;
 			int32 ptcount;
@@ -1999,6 +2032,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_FILL_REGION:
 		{
+			STRACE(("ServerWindow %s: Message AS_FILL_REGION\n",fTitle.String()));
+			
 			int32 rectcount;
 			BRect *rectlist;
 			
@@ -2023,6 +2058,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_STROKE_LINEARRAY:
 		{
+			STRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n",fTitle.String()));
+			
 			// Attached Data:
 			// 1) int32 Number of lines in the array
 			// 2) array of struct _array_data_ objects, as defined in ViewAux.h
@@ -2046,19 +2083,21 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 					
 					index->pt1=cl->ConvertToTop(index->pt1);
 					index->pt2=cl->ConvertToTop(index->pt2);
-				}
-				
+				}				
 				desktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,cl->fLayerData);
 			}
 			break;
 		}
 		case AS_DRAW_STRING:
 		{
+			STRACE(("ServerWindow %s: Message AS_DRAW_STRING\n",fTitle.String()));
+			
 			char *string;
 			int32 length;
 			BPoint location;
 			escapement_delta delta;
 			
+			link.Read<int32>(&length);
 			link.Read<BPoint>(&location);
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
@@ -2072,6 +2111,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_MOVEPENTO:
 		{
+			STRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fTitle.String()));
+			
 			float x,y;
 			
 			link.Read<float>(&x);
@@ -2083,6 +2124,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_SETPENSIZE:
 		{
+			STRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fTitle.String()));
 			float size;
 			
 			link.Read<float>(&size);
@@ -2093,16 +2135,19 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_SET_FONT:
 		{
+			STRACE(("ServerWindow %s: Message AS_SET_FONT\n",fTitle.String()));
 			// TODO: Implement AS_SET_FONT?
 			break;
 		}
 		case AS_SET_FONT_SIZE:
 		{
+			STRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fTitle.String()));
 			// TODO: Implement AS_SET_FONT_SIZE?
 			break;
 		}
 		case AS_AREA_MESSAGE:
 		{
+			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n",fTitle.String()));
 			// This occurs in only one kind of case: a message is too big to send over a port. This
 			// is really an edge case, so this shouldn't happen *too* often
 			

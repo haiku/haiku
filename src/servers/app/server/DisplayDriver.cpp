@@ -451,7 +451,7 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	performed by the driver itself.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
-void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, const DrawData *d)
+void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, DrawData *d)
 {
 	if(!string || !d)
 		return;
@@ -469,8 +469,6 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	
 	BPoint point(pt);
 	
-	point.y--;	// because of Be's backward compatibility hack
-
 	const ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
@@ -488,9 +486,11 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	int16 error=0;
 	int32 strlength,i;
 	Angle rotation(font->Rotation()), shear(font->Shear());
-
-	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
-		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
+	
+	bool antialias=true;
+	
+	if(font->Size()<18 && (font->Flags()& B_DISABLE_ANTIALIASING==1))
+		antialias=false;
 
 	// Originally, I thought to do this shear checking here, but it really should be
 	// done in BFont::SetShear()
@@ -610,6 +610,10 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	fCursorHandler->DriverShow();
 	Invalidate(r);
 	
+	// Update the caller's pen position
+	d->penlocation.x=pen.x / 64;
+	d->penlocation.y=pen.y / 64;
+	
 	FT_Done_Face(face);
 
 	Unlock();
@@ -716,7 +720,7 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 	
 	if(!AcquireBuffer(&framebuffer))
 	{
-		printf("Couldn't acquire framebuffer in DisplayDriver::BlitGray2RGB32");
+		printf("Couldn't acquire framebuffer in DisplayDriver::BlitGray2RGB32\n");
 		return;
 	}
 	

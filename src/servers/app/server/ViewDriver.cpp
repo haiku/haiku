@@ -620,6 +620,7 @@ void ViewDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *lin
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
+	
 	drawview->SetPenSize(d->pensize);
 	drawview->SetDrawingMode(d->draw_mode);
 
