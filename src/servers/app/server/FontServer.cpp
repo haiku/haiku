@@ -441,7 +441,6 @@ FontStyle *FontServer::GetStyle(const char *family, const char *style)
 */
 FontStyle *FontServer::GetStyle(const uint16 &familyid, const uint16 &styleid)
 {
-	// TODO: Implement FontServer::GetStyle(id,id)
 	FontFamily *fam=GetFamily(familyid);
 	if(fam)
 	{
@@ -470,12 +469,7 @@ FontFamily *FontServer::GetFamily(const uint16 &familyid) const
 */
 ServerFont *FontServer::GetSystemPlain(void)
 {
-	if(plain)
-	{
-		ServerFont *f=new ServerFont(*plain);
-		return f;
-	}
-	return NULL;
+	return plain;
 }
 
 /*!
@@ -486,12 +480,7 @@ ServerFont *FontServer::GetSystemPlain(void)
 */
 ServerFont *FontServer::GetSystemBold(void)
 {
-	if(bold)
-	{
-		ServerFont *f=new ServerFont(*bold);
-		return f;
-	}
-	return NULL;
+	return bold;
 }
 
 /*!
@@ -502,12 +491,7 @@ ServerFont *FontServer::GetSystemBold(void)
 */
 ServerFont *FontServer::GetSystemFixed(void)
 {
-	if(fixed)
-	{
-		ServerFont *f=new ServerFont(*fixed);
-		return f;
-	}
-	return NULL;
+	return fixed;
 }
 
 /*!

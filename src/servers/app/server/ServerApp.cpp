@@ -1430,7 +1430,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			fontserver->Unlock();
 			
-			delete sf;
 			break;
 		}
 		case AS_GET_FONT_HEIGHT:
@@ -1506,7 +1505,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			fontserver->Unlock();
 			
-			delete sf;
 			break;
 		}
 		case AS_SET_SYSFONT_FIXED:
@@ -1546,7 +1544,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			fontserver->Unlock();
 			
-			delete sf;
 			break;
 		}
 		default:
