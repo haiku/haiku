@@ -4726,12 +4726,17 @@ MimeTypeTest::SniffingTest()
 		SniffingTestFile(string(testDir) + "/file13", "", "",
 						 "LNNO"),
 		// meta mime test
-#if !TEST_R5
-		SniffingTestFile(string(testDir) + "/file14.html",
-						 "text/html", "application/x-vnd.be-meta-mime",
-						 "<html>\n<body>\n</body></html>\n", -1,
-						 "fake-meta-mime-string"),
-#endif	// !TEST_R5
+// bonefish: TODO: Now that content sniffing is enabled again, this doesn't
+// work properly anymore, since there are actually three types involved: The
+// extension type ("text/html"), the content type (also "text/html") and the
+// real type ("application/x-vnd.be-meta-mime") which is concluded from the
+// existence of the "META:TYPE" attribute rather than the extension or content.
+//#if !TEST_R5
+//		SniffingTestFile(string(testDir) + "/file14.html",
+//						 "text/html", "application/x-vnd.be-meta-mime",
+//						 "<html>\n<body>\n</body></html>\n", -1,
+//						 "fake-meta-mime-string"),
+//#endif	// !TEST_R5
 	};
 	int fileCount = sizeof(files) / sizeof(SniffingTestFile);
 	for (int32 i = 0; i < fileCount; i++) {
@@ -4747,9 +4752,9 @@ MimeTypeTest::SniffingTest()
 		// GuessMimeType(const char*,)
 		BMimeType type;
 		CHK(BMimeType::GuessMimeType(filename, &type) == B_OK);
+//printf("type: `%s', extensionType: `%s'\n", type.Type(), extensionType);
 		CHK(type == extensionType);
 		type.Unset();
-/*
 		// GuessMimeType(const void*, int32,)
 		if (file.data != NULL) {
 			CHK(BMimeType::GuessMimeType(file.data, file.size, &type) == B_OK);
@@ -4758,7 +4763,6 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 			CHK(type == contentType);
 			type.Unset();
 		}
-*/
 		CHK(file.Create() == B_OK);
 		// set BEOS:TYPE to something confusing ;-)
 		BNode node;
@@ -4767,9 +4771,6 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 		// GuessMimeType(const ref*,)
 		entry_ref ref;
 		CHK(get_ref_for_path(filename, &ref) == B_OK);
-		char thing[1024];
-		sprintf(thing, "cat %s > /boot/home/Desktop/out.txt", filename);
-		system(thing);
 		CHK(BMimeType::GuessMimeType(&ref, &type) == B_OK);
 if (!(type == realType))
 printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filename);
@@ -4781,7 +4782,7 @@ printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filena
 	// GuessMimeType(const ref*,), invalid/abstract entry
 	{
 		NextSubTest();
-		const char *filename = (string(testDir) + "/file100.cpp").c_str();
+		string filename = string(testDir) + "/file100.cpp";
 		BMimeType type;
 		entry_ref ref;
 // invalid entry_ref: R5: Is fine! OBOS: no dice
@@ -4792,7 +4793,7 @@ printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filena
 		CHK(BMimeType::GuessMimeType(&ref, &type) != B_OK);
 #endif
 		// abstract entry_ref
-		CHK(get_ref_for_path(filename, &ref) == B_OK);
+		CHK(get_ref_for_path(filename.c_str(), &ref) == B_OK);
 		// R5: B_NAME_NOT_FOUND, OBOS: 
 		CHK(BMimeType::GuessMimeType(&ref, &type) != B_OK);
 	}
