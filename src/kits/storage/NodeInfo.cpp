@@ -283,8 +283,10 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 		}
 		if (otherColorSpace) {
 			// other color space than stored in attribute
-			if (error == B_OK)
-				icon->SetBits(buffer, attrSize, 0, B_CMAP8);
+			if (error == B_OK) {
+				error = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
+										 0, B_CMAP8);
+			}
 			delete[] buffer;
 		}
 	}
@@ -351,8 +353,9 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 			if (otherColorSpace) {
 				BBitmap bitmap(bounds, B_CMAP8);
 				error = bitmap.InitCheck();
+				if (error == B_OK)
+					error = bitmap.ImportBits(icon);
 				if (error == B_OK) {
-					bitmap.SetBits(icon->Bits(), 0, attrSize, B_CMAP8);
 					written = fNode->WriteAttr(attribute, attrType, 0,
 											   bitmap.Bits(), attrSize);
 				}

@@ -802,8 +802,10 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 			error = B_ERROR;
 		if (otherColorSpace) {
 			// other color space than stored in attribute
-			if (error == B_OK)
-				icon->SetBits(buffer, attrSize, 0, B_CMAP8);
+			if (error == B_OK) {
+				error = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
+										 0, B_CMAP8);
+			}
 			delete[] buffer;
 		}
 	}
@@ -889,8 +891,9 @@ BAppFileInfo::SetIconForType(const char *type, const BBitmap *icon,
 			if (otherColorSpace) {
 				BBitmap bitmap(bounds, B_CMAP8);
 				error = bitmap.InitCheck();
+				if (error == B_OK)
+					error = bitmap.ImportBits(icon);
 				if (error == B_OK) {
-					bitmap.SetBits(icon->Bits(), 0, attrSize, B_CMAP8);
 					error = _WriteData(attribute, resourceID, attrType,
 									   bitmap.Bits(), attrSize, true);
 				}

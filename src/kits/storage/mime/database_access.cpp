@@ -270,8 +270,8 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 			err = (err == attrSize) ? B_OK : B_FILE_ERROR;
 		if (otherColorSpace) {
 			if (!err) {
-				icon->SetBits(buffer, attrSize, 0, B_CMAP8);
-				err = icon->InitCheck();
+				err = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
+									   0, B_CMAP8);
 			}
 			delete[] buffer;
 		}
@@ -374,33 +374,8 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 			icon8 = new(nothrow) BBitmap(bounds, B_CMAP8);
 			if (!icon8)
 				err = B_NO_MEMORY;
-			if (!err) {
-				switch (icon->ColorSpace()) {
-					case B_RGB32:
-					{
-						// Set each pixel individually, since SetBits() for B_RGB32 takes
-						// 24-bit rgb pixel data...
-						char *bgra = (char*)icon->Bits();
-						for (int32 i = 0; i*4+3 < icon->BitsLength(); bgra += 4, i++) {
-							char rgb[3];
-							rgb[0] = bgra[2];	// red
-							rgb[1] = bgra[1];	// green
-							rgb[2] = bgra[0];	// blue
-							icon8->SetBits(rgb, 3, i, B_RGB32);
-						}
-						break;
-					}
-					case B_GRAY1:
-					{
-						icon8->SetBits(icon->Bits(), icon->BitsLength(), 0, B_GRAY1);
-						break;
-					}
-					default:
-						err = B_BAD_VALUE;
-				}
-				if (!err)
-					err = icon8->InitCheck();	// I don't think this is actually useful, even if SetBits() fails...
-			}
+			if (!err)
+				err = icon8->ImportBits(icon);
 			if (!err) {
 				srcData = icon8->Bits();
 				*dataSize = icon8->BitsLength();
