@@ -16,10 +16,12 @@
 #include <ScrollView.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
+#include <Bitmap.h>
 #include <Alert.h>
 #include <Autolock.h>
 #include <Mime.h>
 #include <fs_attr.h>
+#include <TranslationUtils.h>
 
 #include <stdio.h>
 
@@ -121,6 +123,25 @@ class BooleanEditor : public BView {
 };
 
 
+class ImageView : public BView {
+	public:
+		ImageView(BRect rect, DataEditor &editor);
+		virtual ~ImageView();
+
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+		virtual void MessageReceived(BMessage *message);
+		virtual void Draw(BRect updateRect);
+
+		void UpdateImage();
+
+	private:
+		DataEditor	&fEditor;
+		BBitmap		*fBitmap;
+		BStringView	*fDescriptionView;
+};
+
+
 //-----------------
 
 
@@ -149,6 +170,11 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 		case B_OFF_T_TYPE:
 		case B_POINTER_TYPE:
 			return new NumberEditor(rect, editor);
+		case 'MICN':
+		case 'ICON':
+		case 'PNG ':
+		case 'MSGG':
+			return new ImageView(rect, editor);
 	}
 
 	return NULL;
@@ -880,7 +906,6 @@ BooleanEditor::UpdateMenuField()
 
 		fEditor.Unlock();
 	}
-
 }
 
 
@@ -918,6 +943,225 @@ BooleanEditor::MessageReceived(BMessage *message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+//	#pragma mark -
+
+
+ImageView::ImageView(BRect rect, DataEditor &editor)
+	: BView(rect, "Image View", B_FOLLOW_NONE, B_WILL_DRAW),
+	fEditor(editor),
+	fBitmap(NULL)
+{
+	if (editor.Type() == 'MICN' || editor.Type() == 'ICON')
+		SetName("Icon View");
+
+	fDescriptionView = new BStringView(Bounds(), "", "Could not read image", B_FOLLOW_NONE);
+	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
+
+	AddChild(fDescriptionView);
+}
+
+
+ImageView::~ImageView()
+{
+	delete fBitmap;
+}
+
+
+void 
+ImageView::AttachedToWindow()
+{
+	if (Parent() != NULL)
+		SetViewColor(Parent()->ViewColor());
+	else
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fEditor.StartWatching(this);
+	UpdateImage();
+}
+
+
+void 
+ImageView::DetachedFromWindow()
+{
+	fEditor.StopWatching(this);
+}
+
+
+void 
+ImageView::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgDataEditorUpdate:
+			UpdateImage();
+			break;
+
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
+void 
+ImageView::Draw(BRect updateRect)
+{
+	if (fBitmap != NULL)
+		DrawBitmap(fBitmap, BPoint((Bounds().Width() - fBitmap->Bounds().Width()) / 2, 0));
+}
+
+
+void 
+ImageView::UpdateImage()
+{
+	// ToDo: add scroller if necessary?!
+
+	BAutolock locker(fEditor);
+
+	// we need all the data...
+
+	size_t viewSize = fEditor.ViewSize();
+	// that may need some more memory...
+	if (viewSize < fEditor.FileSize())
+		fEditor.SetViewSize(fEditor.FileSize());
+
+	const char *data;
+	if (fEditor.GetViewBuffer((const uint8 **)&data) != B_OK) {
+		fEditor.SetViewSize(viewSize);
+		return;
+	}
+
+	if (fBitmap != NULL && (fEditor.Type() == 'MICN' || fEditor.Type() == 'ICON')) {
+		// optimize icon update...
+		fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
+		fEditor.SetViewSize(viewSize);
+		return;
+	}
+
+	delete fBitmap;
+	fBitmap = NULL;
+
+	switch (fEditor.Type()) {
+		case 'MICN':
+			fBitmap = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
+			if (fBitmap->InitCheck() == B_OK)
+				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
+			break;
+		case 'ICON':
+			fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+			if (fBitmap->InitCheck() == B_OK)
+				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
+			break;
+		case 'PNG ':
+		{
+			BMemoryIO stream(data, fEditor.FileSize());
+			fBitmap = BTranslationUtils::GetBitmap(&stream);
+			break;
+		}
+		case 'MSGG':
+		{
+			BMessage message;
+			// ToDo: this could be problematic if the data is not large
+			//		enough to contain the message...
+			if (message.Unflatten(data) == B_OK)
+				fBitmap = new BBitmap(&message);
+			break;
+		}
+	}
+
+	// Update the bitmap description. If no image can be displayed,
+	// we will show our "unsupported" message
+
+	if (fBitmap->InitCheck() != B_OK) {
+		delete fBitmap;
+		fBitmap = NULL;
+	}
+
+	if (fBitmap != NULL) {
+		char buffer[256];
+		const char *type;
+		switch (fEditor.Type()) {
+			case 'MICN':
+			case 'ICON':
+				type = "Icon";
+				break;
+			case 'PNG ':
+				type = "PNG Format";
+				break;
+			case 'MSGG':
+				type = "Flattened Bitmap";
+				break;
+			default:	
+				type = "Unknown Type";
+				break;
+		}
+		const char *colorSpace;
+		switch (fBitmap->ColorSpace()) {
+			case B_GRAY1:
+			case B_GRAY8:
+				colorSpace = "Gray Scale";
+				break;
+			case B_CMAP8:
+				colorSpace = "8 Bit Palette";
+				break;
+			case B_RGB32:
+			case B_RGBA32:
+			case B_RGB32_BIG:
+			case B_RGBA32_BIG:
+				colorSpace = "32 Bit";
+				break;
+			case B_RGB15:
+			case B_RGBA15:
+			case B_RGB15_BIG:
+			case B_RGBA15_BIG:
+				colorSpace = "15 Bit";
+				break;
+			case B_RGB16:
+			case B_RGB16_BIG:
+				colorSpace = "16 Bit";
+				break;
+			default:
+				colorSpace = "Unknown Format";
+				break;
+		}
+		snprintf(buffer, sizeof(buffer), "%s, %g x %g, %s", type,
+			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1, colorSpace);
+		fDescriptionView->SetText(buffer);
+	} else
+		fDescriptionView->SetText("Could not read image");
+
+	// Update the view size to match the image and its description
+
+	fDescriptionView->ResizeToPreferred();
+
+	BRect rect = fDescriptionView->Bounds();
+	if (fBitmap != NULL) {
+		BRect bounds = fBitmap->Bounds();
+		rect.bottom += bounds.Height() + 5;
+
+		float x = 0;
+		if (bounds.Width() > rect.Width()) {
+			rect.right = bounds.right;
+			x = (bounds.Width() - rect.Width()) / 2;
+		}
+
+		// center description below the bitmap
+		fDescriptionView->MoveTo(x, bounds.Height() + 5);
+	}
+
+	ResizeTo(rect.Width(), rect.Height());
+	if (Parent()) {
+		// center within parent view
+		BRect parentBounds = Parent()->Bounds();
+		MoveTo((parentBounds.Width() - rect.Width()) / 2,
+			(parentBounds.Height() - rect.Height()) / 2);
+	}
+
+	Invalidate();
+
+	// restore old view size
+	fEditor.SetViewSize(viewSize);
 }
 
 

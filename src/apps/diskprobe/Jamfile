@@ -15,4 +15,4 @@ App DiskProbe :
 	OpenWindow.cpp
 	;
 
-LinkSharedOSLibs DiskProbe : be tracker ;
+LinkSharedOSLibs DiskProbe : be tracker translation ;
