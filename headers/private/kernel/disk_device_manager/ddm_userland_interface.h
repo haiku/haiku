@@ -46,6 +46,14 @@ struct user_partitionable_space_data {
 	off_t	size;
 };
 
+// userland partitionable space representation
+struct user_disk_system_info {
+	disk_system_id	id;
+	char			name[B_FILE_NAME_LENGTH];	// better B_PATH_NAME_LENGTH?
+	char			pretty_name[B_OS_NAME_LENGTH];
+	bool			file_system;
+};
+
 // userland disk device job representation
 struct user_disk_device_job_info {
 	disk_job_id		id;
@@ -70,13 +78,15 @@ status_t _kern_get_partitionable_spaces(partition_id partitionID, bool shadow,
 	// Pass the partition change counter? If GetPartitionInfo() is only
 	// allowed, when the device is locked, then we wouldn't need it.
 
+// disk systems
+status_t _kern_get_disk_system_info(disk_system_id id,
+									user_disk_system_info *info);
+status_t _kern_get_next_disk_system_info(int32 *cookie,
+										 user_disk_system_info *info);
+status_t _kern_find_disk_system(const char *name, user_disk_system_info *info);
+
 #if 0
 
-// disk systems
-status_t find_disk_system(const char *name, disk_system_id *id);
-status_t get_next_disk_system(disk_system_id *id, char *name, int32 *cookie);
-	// TODO: Add pretty name. Maybe better put all that into a
-	// user_disk_system structure.
 bool supports_partition_operation(uint32 operation, void *parameters);
 bool validate_partition_operation(uint32 operation, void *parameters);
 	// TODO: Sorry, I was too lazy: supports_validates_parameters.h is only
