@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons print transports shared ;
 
+UsePrivateHeaders net ;
+
 SetupObjectsDir ;
 
 Objects
