@@ -36,7 +36,12 @@ vm_region *vm_get_region_by_id(region_id rid);
 void vm_put_region(vm_region *region);
 #define vm_aspace_swap(aspace) arch_vm_aspace_swap(aspace)
 
-region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address, int addr_type,
+// private kernel only extension (should be moved somewhere else):
+struct team;
+area_id create_area_etc(struct team *team, char *name, void **address, uint32 addressSpec,
+	uint32 size, uint32 lock, uint32 protection);
+
+region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
 region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int addr_type,
 	addr size, int lock, addr phys_addr);
@@ -59,8 +64,9 @@ int user_strncpy(char *to, const char *from, size_t size);
 int user_strlcpy(char *to, const char *from, size_t size);
 int user_memset(void *s, char c, size_t count);
 
-region_id user_vm_create_anonymous_region(char *uname, void **uaddress, int addr_type,
-	addr size, int wiring, int lock);
+area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
+	size_t size, uint32 lock, uint32 protection);
+status_t _user_delete_area(area_id area);
 region_id user_vm_clone_region(char *uname, void **uaddress, int addr_type,
 	region_id source_region, int mapping, int lock);
 region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
