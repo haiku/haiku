@@ -1,11 +1,28 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: MediaTheme.cpp
- *  DESCR: 
- ***********************************************************************/
+/* Author: Marcus Overhagen
+**         Axel Dörfler, axeld@pinc-software.de
+**
+** This file may be used under the terms of the OpenBeOS License.
+*/
+
 #include <MediaTheme.h>
 #include <StringView.h>
+#include <Locker.h>
+#include <Autolock.h>
+
+#include <string.h>
+
+#include "DefaultMediaTheme.h"
 #include "debug.h"
+
+
+static BLocker sLock;
+
+/*************************************************************
+ * static BMediaTheme variables
+ *************************************************************/
+
+BMediaTheme * BMediaTheme::_mDefaultTheme;
+
 
 /*************************************************************
  * public BMediaTheme
@@ -13,32 +30,31 @@
 
 BMediaTheme::~BMediaTheme()
 {
-	UNIMPLEMENTED();
+	CALLED();
+
+	free(_mName);
+	free(_mInfo);
 }
 
 
 const char *
 BMediaTheme::Name()
 {
-	UNIMPLEMENTED();
-	return "";
+	return _mName;
 }
 
 
 const char *
 BMediaTheme::Info()
 {
-	UNIMPLEMENTED();
-	return "";
+	return _mInfo;
 }
 
 
 int32
 BMediaTheme::ID()
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	return _mID;
 }
 
 
@@ -52,29 +68,73 @@ BMediaTheme::GetRef(entry_ref *out_ref)
 
 
 BView *
-BMediaTheme::ViewFor(BParameterWeb *web,
-					 const BRect *hintRect,
-					 BMediaTheme *using_theme)
+BMediaTheme::ViewFor(BParameterWeb *web, const BRect *hintRect, BMediaTheme *usingTheme)
 {
-	UNIMPLEMENTED();
-	return new BStringView(BRect(0,0,200,30), "", "No BMediaTheme, sorry!");
+	CALLED();
+
+	// use default theme if none was specified
+
+	if (usingTheme == NULL) {
+		BAutolock locker(sLock);
+
+		if (_mDefaultTheme == NULL)
+			_mDefaultTheme = new BPrivate::DefaultMediaTheme();
+
+		//usingTheme = _mDefaultTheme;
+	}
+
+	if (usingTheme == NULL)
+		return new BStringView(BRect(0, 0, 200, 30), "", "No BMediaTheme available, sorry!");
+
+	return usingTheme->MakeViewFor(web, hintRect);
 }
 
 
 status_t
-BMediaTheme::SetPreferredTheme(BMediaTheme *default_theme)
+BMediaTheme::SetPreferredTheme(BMediaTheme *defaultTheme)
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return B_ERROR;
+	// ToDo: this method should probably set some global settings file
+	//	to make the new preferred theme available to all applications
+
+	BAutolock locker(sLock);
+
+	if (defaultTheme == NULL) {
+		// if the current preferred theme is not the default media theme,
+		// delete it, and set it back to the default
+		if (dynamic_cast<BPrivate::DefaultMediaTheme *>(_mDefaultTheme) == NULL)
+			_mDefaultTheme = new BPrivate::DefaultMediaTheme();
+
+		return B_OK;
+	}
+
+	// this method takes possession of the BMediaTheme passed, even
+	// if it fails, so it has to delete it
+	if (defaultTheme != _mDefaultTheme)
+		delete _mDefaultTheme;
+
+	_mDefaultTheme = defaultTheme;
+
+	return B_OK;
 }
 
 
 BMediaTheme *
 BMediaTheme::PreferredTheme()
 {
-	UNIMPLEMENTED();
-	return NULL;
+	CALLED();
+
+	BAutolock locker(sLock);
+
+	// ToDo: should look in the global prefs file for the preferred
+	//	add-on and load this from disk - in the meantime, just use
+	//	the default theme
+
+	if (_mDefaultTheme == NULL)
+		_mDefaultTheme = new BPrivate::DefaultMediaTheme();
+
+	return _mDefaultTheme;
 }
 
 
@@ -90,7 +150,7 @@ rgb_color
 BMediaTheme::BackgroundColorFor(bg_kind bg)
 {
 	UNIMPLEMENTED();
-	rgb_color dummy = {0,0,0};
+	rgb_color dummy = {0, 0, 0};
 
 	return dummy;
 }
@@ -100,30 +160,43 @@ rgb_color
 BMediaTheme::ForegroundColorFor(fg_kind fg)
 {
 	UNIMPLEMENTED();
-	rgb_color dummy = {255,255,255};
+	rgb_color dummy = {255, 255, 255};
 
 	return dummy;
 }
+
 
 /*************************************************************
  * protected BMediaTheme
  *************************************************************/
 
-BMediaTheme::BMediaTheme(const char *name,
-						 const char *info,
-						 const entry_ref *add_on,
-						 int32 theme_id)
+
+BMediaTheme::BMediaTheme(const char *name, const char *info, const entry_ref *ref, int32 id)
+	:
+	_mID(id)
 {
-	UNIMPLEMENTED();
+	_mName = strdup(name);
+	_mInfo = strdup(info);
+
+	// ToDo: is there something else here, which has to be done?
+
+	if (ref) {
+		_mAddOn = true;
+		_mAddOnRef = *ref;
+	} else
+		_mAddOn = false;
 }
 
 
 BControl *
-BMediaTheme::MakeFallbackViewFor(BParameter *control)
+BMediaTheme::MakeFallbackViewFor(BParameter *parameter)
 {
-	UNIMPLEMENTED();
-	return NULL;
+	if (parameter == NULL)
+		return NULL;
+
+	return BPrivate::DefaultMediaTheme::MakeViewFor(parameter);
 }
+
 
 /*************************************************************
  * private BMediaTheme
@@ -145,8 +218,3 @@ status_t BMediaTheme::_Reserved_ControlTheme_5(void *) { return B_ERROR; }
 status_t BMediaTheme::_Reserved_ControlTheme_6(void *) { return B_ERROR; }
 status_t BMediaTheme::_Reserved_ControlTheme_7(void *) { return B_ERROR; }
 
-/*************************************************************
- * static BMediaTheme variables
- *************************************************************/
-
-BMediaTheme * BMediaTheme::_mDefaultTheme;
