@@ -14,8 +14,5 @@
 
 int   heap_init(addr new_heap_base);
 int   heap_init_postsem(kernel_args *ka);
-void *kmalloc(unsigned int size);
-void  kfree(void *address);
-char *kstrdup(const char*text);
 
-#endif /* _KERNEL_MEMHEAP_H */
+#endif	/* _KERNEL_MEMHEAP_H */
