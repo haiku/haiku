@@ -21,7 +21,7 @@
 Shell::Shell()
 	// The following settings are essentially default values
 	// for all the command-line options.
-	: fVerbosityLevel(VERBOSITY_HIGH)
+	: fVerbosityLevel(VERBOSITY_LOW)
 	, fBlockSize(2048)
 	, fDoUdf(true)
 	, fDoIso(true)
@@ -110,8 +110,8 @@ Shell::_PrintHelp() {
 	printf("VALID ARGUMENTS:\n");
 	printf("  --help:   Displays this help text\n");
 	printf("  -v0:      Sets verbosity level to 0 (silent)\n"); 
-	printf("  -v1:      Sets verbosity level to 1 (low)\n"); 
+	printf("  -v1:      Sets verbosity level to 1 (low, *default*)\n"); 
 	printf("  -v2:      Sets verbosity level to 2 (medium)\n"); 
-	printf("  -v3:      Sets verbosity level to 3 (high, *default*)\n");
+	printf("  -v3:      Sets verbosity level to 3 (high)\n");
 	printf("\n");
 }
