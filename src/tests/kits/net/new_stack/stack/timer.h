@@ -28,7 +28,7 @@ extern net_timer *	new_net_timer(void);
 extern status_t 	delete_net_timer(net_timer *nt);
 extern status_t		start_net_timer(net_timer *nt, net_timer_func hook, void *cookie, bigtime_t period);
 extern status_t		cancel_net_timer(net_timer *nt);
-extern status_t		get_net_timer_appointment(net_timer *nt, bigtime_t *period, bigtime_t *when);
+extern status_t		net_timer_appointment(net_timer *nt, bigtime_t *period, bigtime_t *when);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@
 #include "memory_pool.h"
 
 #include "datalink.h"
-#include "data.h"
+#include "buffer.h"
 #include "timer.h"
 
 /* Defines we need */
@@ -36,7 +36,7 @@ static status_t start(void)
 
 	puts("stack: starting...");
 
-	start_data_service();
+	start_buffers_service();
 	start_timers_service();
 
 	start_datalink_layer();
@@ -54,7 +54,7 @@ static status_t stop(void)
 	stop_datalink_layer();
 
 	stop_timers_service();
-	stop_data_service();
+	stop_buffers_service();
 
 
 	puts("stack: stopped.");
@@ -79,36 +79,36 @@ struct net_stack_module_info nsmi = {
 	register_interface,
 	unregister_interface,
 	
-	// net_data support
-	new_data,
-	delete_data,
-	duplicate_data,
-	clone_data,
+	// net_buffer support
+	new_buffer,
+	delete_buffer,
+	duplicate_buffer,
+	clone_buffer,
+	split_buffer,
 	
-	prepend_data,
-	append_data,
-	insert_data,
-	remove_data,
+	add_to_buffer,
+	remove_from_buffer,
 
-	add_data_free_node,
+	attach_buffer_free_element,
 	
-	copy_from_data,
+	read_buffer,
+	write_buffer,
 
-	dump_data,
+	dump_buffer,
 	
-	// net_data_queue support
-	new_data_queue,
-	delete_data_queue,
-	empty_data_queue,
-	enqueue_data,
-	dequeue_data,
+	// net_buffer_queue support
+	new_buffer_queue,
+	delete_buffer_queue,
+	empty_buffer_queue,
+	enqueue_buffer,
+	dequeue_buffer,
 	
 	// Timers support
 	new_net_timer,
 	delete_net_timer,
 	start_net_timer,
 	cancel_net_timer,
-	get_net_timer_appointment
+	net_timer_appointment
 };
 
 status_t std_ops(int32 op, ...) 

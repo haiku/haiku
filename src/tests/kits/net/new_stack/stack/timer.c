@@ -57,7 +57,7 @@ status_t start_timers_service()
 	set_sem_owner(g_timers.wait, B_SYSTEM_TEAM);
 #endif
 
-	g_timers_thread = spawn_kernel_thread(timers_thread, "net timers runner", B_URGENT_DISPLAY_PRIORITY, &g_timers);
+	g_timers_thread = spawn_kernel_thread(timers_thread, "net timers lone runner", B_URGENT_DISPLAY_PRIORITY, &g_timers);
 	if (g_timers_thread < B_OK)
 		return g_timers_thread;
 
@@ -128,7 +128,7 @@ status_t cancel_net_timer(net_timer *nt)
 
 
 // --------------------------------------------------
-status_t get_net_timer_appointment(net_timer *nt, bigtime_t *period, bigtime_t *when)
+status_t net_timer_appointment(net_timer *nt, bigtime_t *period, bigtime_t *when)
 {
 	return 0;
 }

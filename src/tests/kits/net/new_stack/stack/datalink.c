@@ -12,7 +12,7 @@
 #include <OS.h>
 
 #include "datalink.h"
-#include "data.h"
+#include "buffer.h"
 
 /* Defines we need */
 #define NETWORK_INTERFACES	"network/interfaces"
@@ -233,19 +233,20 @@ status_t enable_interface(ifnet_t *iface, bool enable)
 status_t interface_reader(void *args)
 {
 	ifnet_t 	*iface = args;
-	net_data 	*nd;
+	net_buffer 	*buffer;
 	status_t 	status;
 	
 	if (!iface || iface->module == NULL)
 		return B_ERROR;
 		
 	while(iface->if_flags & IFF_UP) {
-		status = iface->module->receive_data(iface, &nd);
-		if (status < B_OK || nd == NULL)
+		buffer = NULL;
+		status = iface->module->receive_buffer(iface, &buffer);
+		if (status < B_OK || buffer == NULL)
 			continue;
 
-		dump_data(nd);
-		delete_data(nd, false);
+		dump_buffer(buffer);
+		delete_buffer(buffer, false);
 	};
 	
 	return B_OK;
