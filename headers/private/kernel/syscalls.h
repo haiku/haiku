@@ -42,7 +42,7 @@ int    sys_set_sem_owner(sem_id id, team_id proc);
 void sys_exit(int retcode);
 team_id sys_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 
-thread_id sys_spawn_thread(int32 (*func)(void*), const char *, int32, void *);
+thread_id sys_spawn_thread(int32 (*func)(thread_func, void *), const char *, int32, void *, void *);
 thread_id sys_get_current_thread_id(void);
 int       sys_suspend_thread(thread_id tid);
 int       sys_resume_thread(thread_id tid);

@@ -113,7 +113,7 @@ struct thread {
 		/* this field may only stay in debug builds in the future*/
 
 	thread_func		entry;
-	void			*args;
+	void			*args1, *args2;
 	struct team		*team;
 	status_t		return_code;
 	sem_id			return_code_sem;

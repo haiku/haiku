@@ -71,7 +71,7 @@ int user_team_wait_for_team(team_id id, int *uretcode);
 status_t user_set_thread_priority(thread_id thread, int32 newPriority);
 status_t user_suspend_thread(thread_id thread);
 status_t user_resume_thread(thread_id thread);
-thread_id user_spawn_thread(thread_func func, const char *name, int32 priority, void *arg);
+thread_id user_spawn_thread(thread_func func, const char *name, int32 priority, void *arg1, void *arg2);
 status_t user_wait_for_thread(thread_id id, status_t *returnCode);
 status_t user_wait_for_team(team_id id, status_t *returnCode);
 status_t user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags);
