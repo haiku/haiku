@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -84,7 +84,7 @@ class Volume {
 
 		Inode			*Lookup(vnode_id id);
 		Inode			*FindNode(const char *name);
-		Inode			*CreateNode(const char *name, int32 type);
+		Inode			*CreateNode(Inode *parent, const char *name, int32 type);
 		status_t		DeleteNode(Inode *inode, bool forceDelete = false);
 		status_t		RemoveNode(Inode *directory, const char *name);
 
@@ -116,13 +116,23 @@ class Volume {
 
 class Inode {
 	public:
-		Inode(Volume *volume, const char *name, int32 type);
+		Inode(Volume *volume, Inode *parent, const char *name, int32 type);
 		~Inode();
 
 		status_t	InitCheck();
 		vnode_id	ID() const { return fID; }
 		const char	*Name() const { return fName; }
+
 		int32		Type() const { return fType; }
+		void		SetMode(mode_t mode) { fType = (fType & ~S_IUMSK) | (mode & S_IUMSK); }
+		gid_t		GroupID() const { return fGroupID; }
+		void		SetGroupID(gid_t gid) { fGroupID = gid; }
+		uid_t		UserID() const { return fUserID; }
+		void		SetUserID(uid_t uid) { fUserID = uid; }
+		time_t		CreationTime() const { return fCreationTime; }
+		void		SetCreationTime(time_t creationTime) { fCreationTime = creationTime; }
+		time_t		ModificationTime() const { return fModificationTime; }
+		void		SetModificationTime(time_t modificationTime) { fModificationTime = modificationTime; }
 
 		Inode		*Next() const { return fNext; }
 		void		SetNext(Inode *inode) { fNext = inode; }
@@ -150,6 +160,10 @@ class Inode {
 		vnode_id	fID;
 		int32		fType;
 		const char	*fName;
+		gid_t		fGroupID;
+		uid_t		fUserID;
+		time_t		fCreationTime;
+		time_t		fModificationTime;
 
 		cbuf		*fBufferChain;
 
@@ -202,7 +216,7 @@ Volume::Volume(mount_id id)
 		return;
 
 	// create the root vnode
-	fRootNode = CreateNode("", S_IFDIR);
+	fRootNode = CreateNode(NULL, "", S_IFDIR | 0777);
 	if (fRootNode == NULL)
 		return;
 }
@@ -258,9 +272,9 @@ Volume::Unlock()
 
 
 Inode *
-Volume::CreateNode(const char *name, int32 type)
+Volume::CreateNode(Inode *parent, const char *name, int32 type)
 {
-	Inode *inode = new Inode(this, name, type);
+	Inode *inode = new Inode(this, parent, name, type);
 	if (inode == NULL)
 		return NULL;
 
@@ -269,11 +283,14 @@ Volume::CreateNode(const char *name, int32 type)
 		return NULL;
 	}
 
-	if (type == S_IFIFO)
+	if (S_ISFIFO(type))
 		InsertNode(inode);
 
 	hash_insert(fNodeHash, inode);
 	new_vnode(ID(), inode->ID(), inode);
+
+	if (fRootNode != NULL)
+		fRootNode->SetModificationTime(time(NULL));
 
 	return inode;
 }
@@ -284,6 +301,9 @@ Volume::DeleteNode(Inode *inode, bool forceDelete)
 {
 	// remove it from the global hash table
 	hash_remove(fNodeHash, inode);
+
+	if (fRootNode != NULL)
+		fRootNode->SetModificationTime(time(NULL));
 
 	delete inode;
 	return 0;
@@ -394,7 +414,7 @@ Volume::RemoveNode(Inode *directory, const char *name)
 	Inode *inode = FindNode(name);
 	if (inode == NULL)
 		status = B_ENTRY_NOT_FOUND;
-	else if (inode->Type() == S_IFDIR)
+	else if (S_ISDIR(inode->Type()))
 		status = B_NOT_ALLOWED;
 
 	if (status < B_OK)
@@ -416,7 +436,7 @@ err:
 //	#pragma mark -
 
 
-Inode::Inode(Volume *volume, const char *name, int32 type)
+Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
 	:
 	fNext(NULL),
 	fHashNext(NULL),
@@ -429,10 +449,15 @@ Inode::Inode(Volume *volume, const char *name, int32 type)
 	fID = volume->GetNextNodeID();
 	fType = type;
 
-	if (type == S_IFIFO) {
+	if (S_ISFIFO(type)) {
 		fWriteLock = create_sem(1, "pipe write");
 		benaphore_init(&fRequestLock, "pipe request");
 	}
+
+	fUserID = geteuid();
+	fGroupID = parent ? parent->GroupID() : getegid();
+
+	fCreationTime = fModificationTime = time(NULL);
 }
 
 
@@ -440,7 +465,7 @@ Inode::~Inode()
 {
 	free(const_cast<char *>(fName));
 
-	if (fType == S_IFIFO) {
+	if (S_ISFIFO(fType)) {
 		delete_sem(fWriteLock);
 		benaphore_destroy(&fRequestLock);
 	}
@@ -451,7 +476,7 @@ status_t
 Inode::InitCheck()
 {
 	if (fName == NULL
-		|| fType == S_IFIFO && (fRequestLock.sem < B_OK || fWriteLock < B_OK))
+		|| S_ISFIFO(fType) && (fRequestLock.sem < B_OK || fWriteLock < B_OK))
 		return B_ERROR;
 
 	return B_OK;
@@ -805,7 +830,7 @@ pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name, vnode_id *_id,
 	TRACE(("pipefs_lookup: entry dir %p, name '%s'\n", _dir, name));
 
 	Inode *directory = (Inode *)_dir;
-	if (directory->Type() != S_IFDIR)
+	if (!S_ISDIR(directory->Type()))
 		return B_NOT_A_DIRECTORY;
 
 	volume->Lock();
@@ -909,7 +934,7 @@ pipefs_remove_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 
 
 static status_t
-pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, int perms,
+pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, int mode,
 	fs_cookie *_cookie, vnode_id *_newVnodeID)
 {
 	Volume *volume = (Volume *)_volume;
@@ -932,7 +957,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 		goto err;
 	}
 
-	inode = volume->CreateNode(name, S_IFIFO);
+	inode = volume->CreateNode(directory, name, S_IFIFO | mode);
 	if (inode == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
@@ -1096,7 +1121,7 @@ pipefs_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
 	TRACE(("pipefs_open_dir(): vnode = %p\n", _node));
 
 	Inode *inode = (Inode *)_node;
-	if (inode->Type() != S_IFDIR)
+	if (!S_ISDIR(inode->Type()))
 		return B_BAD_VALUE;
 
 	if (inode != &volume->RootNode())
@@ -1280,14 +1305,60 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 	Volume *volume = (Volume *)_volume;
 	Inode *inode = (Inode *)_node;
 
-	TRACE(("pipefs_rstat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
+	TRACE(("pipefs_read_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
 
 	stat->st_dev = volume->ID();
 	stat->st_ino = inode->ID();
 	stat->st_size = inode->BytesInChain();
-	stat->st_mode = inode->Type() | 0777;
+	stat->st_mode = inode->Type();
 
-	return 0;
+	stat->st_nlink = 1;
+	stat->st_blksize = 4096;
+
+	stat->st_uid = inode->UserID();
+	stat->st_gid = inode->GroupID();
+
+	stat->st_atime = time(NULL);
+	stat->st_mtime = stat->st_ctime = inode->ModificationTime();
+	stat->st_crtime = inode->CreationTime();
+
+	return B_OK;
+}
+
+
+static status_t
+pipefs_write_stat(fs_volume _volume, fs_vnode _node, const struct stat *stat, uint32 statMask)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
+	TRACE(("pipefs_write_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
+
+	// we cannot change the size of anything
+	if (statMask & FS_WRITE_STAT_SIZE)
+		return B_BAD_VALUE;
+
+	volume->Lock();
+		// the inode's locks don't exist for the root node
+		// (but would be more appropriate to use here)
+
+	if (statMask & FS_WRITE_STAT_MODE)
+		inode->SetMode(stat->st_mode);
+
+	if (statMask & FS_WRITE_STAT_UID)
+		inode->SetUserID(stat->st_uid);
+	if (statMask & FS_WRITE_STAT_GID)
+		inode->SetGroupID(stat->st_gid);
+
+	if (statMask & FS_WRITE_STAT_MTIME)
+		inode->SetModificationTime(stat->st_mtime);
+	if (statMask & FS_WRITE_STAT_CRTIME) 
+		inode->SetCreationTime(stat->st_crtime);
+
+	volume->Unlock();
+
+	notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+	return B_OK;
 }
 
 
@@ -1349,7 +1420,7 @@ file_system_info gPipeFileSystem = {
 
 	NULL,	// fs_access()
 	&pipefs_read_stat,
-	NULL,	// fs_write_stat()
+	&pipefs_write_stat,
 
 	/* file */
 	&pipefs_create,
