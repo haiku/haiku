@@ -32,6 +32,7 @@ public:
 			uint32				CountChildren(void) const;
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(const BPoint &pt);
+			bool				IsTopLayer() { return fIsTopLayer; }
 
 	virtual	Layer*				VirtualTopChild() const;
 	virtual	Layer*				VirtualLowerSibling() const;
@@ -44,7 +45,7 @@ public:
 			void				FullInvalidate(const BRegion &region);
 			void				Invalidate(const BRegion &region);
 
-			void				RebuildFullRegion(void);
+	virtual	void				RebuildFullRegion(void);
 			void				StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt);
 			void				RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset);
 			uint32				ResizeOthers(float x, float y,  BPoint coords[], BPoint *ptOffset);
@@ -88,6 +89,7 @@ public:
 	// server "private" - should not be used
 			void				SetRootLayer(RootLayer* rl){ fRootLayer = rl; }
 			void				SetServerWindow(ServerWindow *win);
+			void				SetAsTopLayer(bool option) { fIsTopLayer = option; }
 
 private:
 			void				RequestClientUpdate(const BRegion &reg, Layer *startFrom);
@@ -128,8 +130,8 @@ protected:
 			uint32				_resize_mode;
 			bool				_hidden;
 			bool				_is_updating;
+			bool				fIsTopLayer;
 			
-//			MyDriver			*fDriver;
 			DisplayDriver		*fDriver;
 			LayerData			*_layerdata;
 			RGBColor			fBackColor;
