@@ -58,7 +58,9 @@ struct fs_calls {
 	int (*fs_fsync)(fs_cookie fs, fs_vnode v);
 
 	int (*fs_read_link)(fs_cookie fs, fs_vnode link, char *buffer, size_t bufferSize);
-	int (*fs_symlink)(fs_cookie fs, fs_vnode dir, const char *name, const char *path);
+	int (*fs_write_link)(fs_cookie fs, fs_vnode link, char *toPath);
+	int (*fs_symlink)(fs_cookie fs, fs_vnode dir, const char *name, const char *path, int mode);
+
 	int (*fs_unlink)(fs_cookie fs, fs_vnode dir, const char *name);
 	int (*fs_rename)(fs_cookie fs, fs_vnode olddir, const char *oldname, fs_vnode newdir, const char *newname);
 
@@ -159,7 +161,7 @@ int sys_create(const char *path, int omode, int perms);
 int sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int sys_create_dir(const char *path, int perms);
 int sys_read_link(const char *path, char *buffer, size_t bufferSize);
-int sys_create_symlink(const char *path, const char *toPath);
+int sys_create_symlink(const char *path, const char *toPath, int mode);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
 int sys_read_stat(const char *path, bool traverseLink, struct stat *stat);
@@ -183,7 +185,7 @@ int user_create(const char *path, int omode, int perms);
 int user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int user_create_dir(const char *path, int perms);
 int user_read_link(const char *path, char *buffer, size_t bufferSize);
-int user_create_symlink(const char *path, const char *toPath);
+int user_create_symlink(const char *path, const char *toPath, int mode);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
 int user_read_stat(const char *path, bool traverseLink, struct stat *stat);

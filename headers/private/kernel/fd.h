@@ -26,7 +26,7 @@ struct io_context {
 };
 
 struct fd_ops {
-	char *fs_name;
+	char *fs_name;	// can be removed, it's not used anywhere
 	ssize_t		(*fd_read) (struct file_descriptor *, void *buffer, off_t pos, size_t *length);
 	ssize_t		(*fd_write)(struct file_descriptor *, const void *buffer, off_t pos, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
@@ -45,6 +45,7 @@ struct file_descriptor {
 	struct fd_ops *ops;
 	struct vnode *vnode;
 	void	*cookie;
+	int32	open_mode;
 };
 
 
