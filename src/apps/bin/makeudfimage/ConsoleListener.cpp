@@ -45,8 +45,19 @@ ConsoleListener::OnWarning(const char *message) const
 void
 ConsoleListener::OnUpdate(VerbosityLevel level, const char *message) const
 {
-	if (Level() > VERBOSITY_NONE && level <= Level())
+	if (Level() > VERBOSITY_NONE && level <= Level()) {
+		switch (level) {
+			case VERBOSITY_MEDIUM:
+				printf("  ");
+				break;
+			case VERBOSITY_HIGH:
+				printf("    ");
+				break;
+			default:
+				break;
+		}
 		printf("%s\n", message);
+	}
 }
 
 void
