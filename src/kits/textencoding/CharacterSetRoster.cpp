@@ -1,3 +1,4 @@
+#include <string.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include "character_sets.h"
@@ -79,9 +80,9 @@ BCharacterSetRoster::GetCharacterSetByMIBenum(uint32 MIBenum)
 }
 
 const BCharacterSet * 
-BCharacterSetRoster::FindCharacterSetByPrintName(char * name)
+BCharacterSetRoster::FindCharacterSetByPrintName(const char * name)
 {
-	for (int id = 0 ; (id < character_sets_by_id_count) ; id++) {
+	for (uint id = 0 ; (id < character_sets_by_id_count) ; id++) {
 		if (strcmp(character_sets_by_id[id]->GetPrintName(),name) == 0) {
 			return character_sets_by_id[id];
 		}
@@ -90,22 +91,22 @@ BCharacterSetRoster::FindCharacterSetByPrintName(char * name)
 }
 
 const BCharacterSet * 
-BCharacterSetRoster::FindCharacterSetByName(char * name)
+BCharacterSetRoster::FindCharacterSetByName(const char * name)
 {
 	// first search standard names and mime names
-	for (int id = 0 ; (id < character_sets_by_id_count) ; id++) {
-		if (strcmp(character_sets_by_id[id]->GetName(),name) == 0) {
+	for (uint id = 0 ; (id < character_sets_by_id_count) ; id++) {
+		if (strcasecmp(character_sets_by_id[id]->GetName(),name) == 0) {
 			return character_sets_by_id[id];
 		}
 		const char * mime = character_sets_by_id[id]->GetMIMEName();
-		if ((mime != NULL) && (strcmp(mime,name) == 0)) {
+		if ((mime != NULL) && (strcasecmp(mime,name) == 0)) {
 			return character_sets_by_id[id];
 		}
 	}
 	// only after searching all the above names do we look at aliases
-	for (int id = 0 ; (id < character_sets_by_id_count) ; id++) {
+	for (uint id = 0 ; (id < character_sets_by_id_count) ; id++) {
 		for (int alias = 0 ; (alias < character_sets_by_id[id]->CountAliases()) ; alias++) {
-			if (strcmp(character_sets_by_id[id]->AliasAt(alias),name) == 0) {
+			if (strcasecmp(character_sets_by_id[id]->AliasAt(alias),name) == 0) {
 				return character_sets_by_id[id];
 			}
 		}

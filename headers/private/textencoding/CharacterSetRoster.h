@@ -74,14 +74,14 @@ public:
      * This function executes in linear time.
      * @return the character set with the given print name, or NULL if none exists
      **/
-    static const BCharacterSet * FindCharacterSetByPrintName(char * name);
+    static const BCharacterSet * FindCharacterSetByPrintName(const char * name);
     /**
      * @brief return the character set with the given name, or NULL if none exists
      * This function will match aliases as well.
      * This function executes in linear time.
      * @return the character set with the given name, or NULL if none exists
      **/
-    static const BCharacterSet * FindCharacterSetByName(char * name);
+    static const BCharacterSet * FindCharacterSetByName(const char * name);
 private:
     uint32 index; //! the state variable for iteration
 };
