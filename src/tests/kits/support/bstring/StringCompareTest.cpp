@@ -120,8 +120,28 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	
 	//operator>=(const char *) const;
+	NextSubTest();
+	string1 = new BString("BBBBB");
+	CPPUNIT_ASSERT(*string1 >= "AAAAA");
+	CPPUNIT_ASSERT(*string1 >= "BBBBB");
+	delete string1;
+	
 	//operator>(const char *) const;
+	NextSubTest();
+	string1 = new BString("BBBBB");
+	CPPUNIT_ASSERT(*string1 > "AAAAA");
+	delete string1;
+	
 	//operator!=(const char *) const;
+	NextSubTest();
+	string1 = new BString("AAAAA");
+	CPPUNIT_ASSERT((*string1 != "AAAAA") == false);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("AAAAA");
+	CPPUNIT_ASSERT(*string1 != "BBBB");
+	delete string1;
 }
 
 
