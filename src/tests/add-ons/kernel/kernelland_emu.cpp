@@ -75,7 +75,7 @@ ModuleAddOn::~ModuleAddOn()
 status_t
 ModuleAddOn::Load(const char *path, const char *dirPath)
 {
-TRACE(("ModuleAddOn::Load(): searching module `%s'...\n", path));
+	TRACE(("ModuleAddOn::Load(): searching module `%s'...\n", path));
 	Unload();
 	status_t error = (path && dirPath ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -224,7 +224,7 @@ Module::Uninit()
 void
 Module::Get()
 {
-	if (fAddOn >= 0)
+	if (fAddOn != NULL)
 		fReferenceCount++;
 }
 
@@ -232,9 +232,10 @@ Module::Get()
 bool
 Module::Put()
 {
-	if (fAddOn >= 0)
-		fReferenceCount--;
-	return (fReferenceCount == 0 && !(fInfo->flags & B_KEEP_LOADED));
+	if (fAddOn == NULL)
+		return false;
+
+	return (--fReferenceCount == 0 && !(fInfo->flags & B_KEEP_LOADED));
 }
 
 
@@ -318,7 +319,7 @@ public:
 	ModuleManager();
 	~ModuleManager();
 
-	static ModuleManager *Default() { return &fDefaultManager; }
+	static ModuleManager *Default() { return &sDefaultManager; }
 
 	status_t GetModule(const char *path, module_info **infop);
 	status_t PutModule(const char *path);
@@ -331,6 +332,8 @@ public:
 								size_t *bufferSize);
 	status_t CloseModuleList(module_name_list *list);
 
+	status_t AddBuiltInModule(module_info *info);
+
 private:
 	void _FindModules(BDirectory &dir, const char *moduleDir,
 					  module_name_list *list);
@@ -339,7 +342,7 @@ private:
 	void _PutAddOn(ModuleAddOn *addon);
 
 private:
-	static ModuleManager		fDefaultManager;
+	static ModuleManager		sDefaultManager;
 	ModuleList					fModules;
 	BObjectList<ModuleAddOn>	fAddOns;
 };
@@ -475,6 +478,7 @@ ModuleManager::ReadNextModuleName(module_name_list *list, char *buffer,
 	return error;
 }
 
+
 // CloseModuleList
 status_t
 ModuleManager::CloseModuleList(module_name_list *list)
@@ -484,6 +488,16 @@ ModuleManager::CloseModuleList(module_name_list *list)
 		delete list;
 	return error;
 }
+
+
+status_t 
+ModuleManager::AddBuiltInModule(module_info *info)
+{
+	BAutolock _lock(fModules);
+
+	return fModules.AddModule(new Module(NULL, info)) ? B_OK : B_ERROR;
+}
+
 
 // _FindModules
 void
@@ -571,10 +585,23 @@ ModuleManager::_PutAddOn(ModuleAddOn *addon)
 
 
 // singleton instance
-ModuleManager ModuleManager::fDefaultManager;
+ModuleManager ModuleManager::sDefaultManager;
 
 
-// the functions to be emulated follow
+//	#pragma mark -
+//	private emulation functions
+
+
+extern "C" status_t
+_add_builtin_module(module_info *info)
+{
+	return ModuleManager::Default()->AddBuiltInModule(info);
+}
+
+
+//	#pragma mark -
+//	the functions to be emulated follow
+
 
 // get_module
 status_t
@@ -626,6 +653,21 @@ close_module_list(void *cookie)
 	return ModuleManager::Default()->CloseModuleList(
 		(module_name_list*)cookie);
 }
+
+
+void
+panic(const char *format, ...)
+{
+	va_list args;
+
+	puts("*** PANIC ***");
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+
+	exit(-1);
+}
+
 
 // dprintf
 void
@@ -690,5 +732,16 @@ user_strlcpy(char *to, const char *from, size_t size)
 		from_length++;
 
 	return from_length;
+}
+
+
+/*! Needed for locking */
+
+bool kernel_startup = false;
+
+extern "C" bool
+arch_int_are_interrupts_enabled(void)
+{
+	return true;
 }
 

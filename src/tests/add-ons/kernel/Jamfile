@@ -1,10 +1,27 @@
 SubDir OBOS_TOP src tests add-ons kernel ;
 
+UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders shared ;
+SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
-SharedLibrary kernelland_emu : kernelland_emu.cpp : be stdc++.r4 ;
+SharedLibrary kernelland_emu :
+	kernelland_emu.cpp
+	lock.c
+	list.c
+
+	: be stdc++.r4 ;
+
 AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;
+
+SEARCH on [ FGristFiles 
+		lock.c
+	] = [ FDirName $(OBOS_TOP) src kernel core ] ;
+
+SEARCH on [ FGristFiles
+		list.c
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 # SubInclude OBOS_TOP src tests add-ons kernel disk_scanner ;
 SubInclude OBOS_TOP src tests add-ons kernel file_systems ;
