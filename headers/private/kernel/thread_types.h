@@ -56,8 +56,11 @@ struct image;
 
 struct team {
 	struct team		*next;			/* next team in the hash */
+	struct team		*siblings_next;
+	struct team		*parent;
+	struct team		*children;
 	team_id			id;
-	char			name[SYS_MAX_OS_NAME_LEN];
+	char			name[B_OS_NAME_LENGTH];
 	int				num_threads;	/* number of threads in this team */
 	int				state;			/* current team state, see above */
 	int				pending_signals;
@@ -66,7 +69,7 @@ struct team {
 	aspace_id		_aspace_id;		/* address space pointer */
 	vm_address_space *aspace;
 	vm_address_space *kaspace;
-	addr			user_env_base;
+	addr_t			user_env_base;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
 	struct list		image_list;
@@ -79,7 +82,7 @@ struct thread {
 	struct thread	*queue_next;	/* i.e. run queue, release queue, etc. */
 	timer			alarm;
 	thread_id		id;
-	char			name[SYS_MAX_OS_NAME_LEN];
+	char			name[B_OS_NAME_LENGTH];
 	int				priority;
 	int				state;
 	int				next_state;
@@ -107,9 +110,9 @@ struct thread {
 		cbuf		*buffer;
 	} msg;
 
-	addr			fault_handler;
+	addr_t			fault_handler;
 	int32			page_faults_allowed;
-		/* this field may only stay in debug builds in the future*/
+		/* this field may only stay in debug builds in the future */
 
 	thread_func		entry;
 	void			*args1, *args2;
@@ -120,11 +123,11 @@ struct thread {
 
 	// stack
 	region_id		kernel_stack_region_id;
-	addr			kernel_stack_base;
+	addr_t			kernel_stack_base;
 	region_id		user_stack_region_id;
-	addr			user_stack_base;
+	addr_t			user_stack_base;
 
-	addr			user_local_storage;
+	addr_t			user_local_storage;
 		// usually allocated at the safe side of the stack
 	int				kernel_errno;
 		// kernel "errno" differs from its userspace alter ego
@@ -133,7 +136,7 @@ struct thread {
 	bigtime_t		kernel_time;
 	bigtime_t		last_time;
 	int				last_time_type;	// KERNEL_TIME or USER_TIME
-	
+
 	// architecture dependant section
 	struct arch_thread arch_info;
 };
