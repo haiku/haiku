@@ -22,6 +22,7 @@ INTERFACE_KIT_SOURCE =
 	Region.cpp
 	RegionSupport.cpp
 	ScrollBar.cpp
+	ScrollView.cpp
 	StatusBar.cpp
 	StringView.cpp
 	TextControl.cpp
