@@ -28,6 +28,7 @@
 #include <Errors.h>
 #include <stage2.h>
 #include <string.h>
+#include <kimage.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <resource.h>
@@ -995,11 +996,15 @@ thread_exit(void)
 			delete_sem(team->death_sem);
 		}
 		cached_death_sem = -1;
+
+		// free team resources
 		vm_put_aspace(team->aspace);
 		vm_delete_aspace(team->_aspace_id);
 		delete_owned_ports(team->id);
 		sem_delete_owned_sems(team->id);
+		remove_images(team);
 		vfs_free_io_context(team->io_context);
+
 		free(team);
 	}
 
