@@ -59,10 +59,8 @@ void dump_buffer(char *buffer, int len)
 	printf("\n\n");
 }
 
-int compare_sockaddr(struct sockaddr *a, struct sockaddr *b)
+int compare_sockaddr(struct sockaddr *a, struct sockaddr *b) // XXX this function is not used at all
 {
-	if (a->sa_len == 4) /* IPv4 address, basically a uint32 */
-		return (*(a->sa_data) = *(b->sa_data));
-	return memcmp((void*)a->sa_data, (void*)b->sa_data, a->sa_len);
+	return memcmp(a->sa_data, b->sa_data, a->sa_len);
 }
 
