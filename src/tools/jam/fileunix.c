@@ -101,8 +101,6 @@ struct ar_hdr		/* archive file member header - printable ascii */
 
 # ifdef OPT_STAT_CACHE_SERVER_EXT
 # include "beos_stat_cache.h"
-inline int stat(const char *filename, struct stat *st)
-	{ return beos_stat_cache_stat(filename, st); }
 # define opendir	beos_stat_cache_opendir
 # define readdir	beos_stat_cache_readdir
 # define closedir	beos_stat_cache_closedir
@@ -174,8 +172,13 @@ file_time(
 {
 	struct stat statbuf;
 
+# ifdef OPT_STAT_CACHE_SERVER_EXT
+	if( beos_stat_cache_stat( filename, &statbuf ) < 0 )
+	    return -1;
+# else
 	if( stat( filename, &statbuf ) < 0 )
 	    return -1;
+# endif
 
 	*time = statbuf.st_mtime;
 	return 0;
