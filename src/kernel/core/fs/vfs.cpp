@@ -2531,9 +2531,12 @@ vfs_new_io_context(void *_parentContext)
 			inc_vnode_ref_count(context->cwd);
 
 		for (i = 0; i < tableSize; i++) {
-			if (parentContext->fds[i] && (parentContext->fds[i]->open_mode & O_CLOEXEC) == 0) {
-				context->fds[i] = parentContext->fds[i];
-				atomic_add(&context->fds[i]->ref_count, 1);
+			struct file_descriptor *descriptor = parentContext->fds[i];
+
+			if (descriptor != NULL && (descriptor->open_mode & O_CLOEXEC) == 0) {
+				context->fds[i] = descriptor;
+				atomic_add(&descriptor->ref_count, 1);
+				atomic_add(&descriptor->open_count, 1);
 			}
 		}
 
@@ -2554,7 +2557,7 @@ vfs_new_io_context(void *_parentContext)
 }
 
 
-int
+status_t
 vfs_free_io_context(void *_ioContext)
 {
 	struct io_context *context = (struct io_context *)_ioContext;
@@ -2566,8 +2569,10 @@ vfs_free_io_context(void *_ioContext)
 	mutex_lock(&context->io_mutex);
 
 	for (i = 0; i < context->table_size; i++) {
-		if (context->fds[i])
-			put_fd(context->fds[i]);
+		if (struct file_descriptor *descriptor = context->fds[i]) {
+			close_fd(descriptor);
+			put_fd(descriptor);
+		}
 	}
 
 	mutex_unlock(&context->io_mutex);
@@ -2578,11 +2583,11 @@ vfs_free_io_context(void *_ioContext)
 	free(context->fds);
 	free(context);
 
-	return 0;
+	return B_OK;
 }
 
 
-static int
+static status_t
 vfs_resize_fd_table(struct io_context *context, const int newSize)
 {
 	void *fds;

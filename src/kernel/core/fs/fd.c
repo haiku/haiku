@@ -1,6 +1,6 @@
 /* Operations on file descriptors
  *
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -114,6 +114,16 @@ put_fd(struct file_descriptor *descriptor)
 			descriptor->ops->fd_free(descriptor);
 
 		free(descriptor);
+	}
+}
+
+
+void
+close_fd(struct file_descriptor *descriptor)
+{
+	if (atomic_add(&descriptor->open_count, -1) == 1) {
+		if (descriptor->ops->fd_close)
+			descriptor->ops->fd_close(descriptor);
 	}
 }
 
@@ -313,11 +323,7 @@ common_close(int fd, bool kernel)
 			TRACE(("_user_close(descriptor = %p)\n", descriptor));
 	#endif
 
-	if (atomic_add(&descriptor->open_count, -1) == 1) {
-		if (descriptor->ops->fd_close)
-			descriptor->ops->fd_close(descriptor);
-	}
-
+	close_fd(descriptor);
 	put_fd(descriptor);
 		// the reference associated with the slot
 

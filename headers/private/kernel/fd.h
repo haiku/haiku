@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FD_H
@@ -68,8 +68,8 @@ extern struct file_descriptor *alloc_fd(void);
 extern int new_fd_etc(struct io_context *, struct file_descriptor *, int firstIndex);
 extern int new_fd(struct io_context *, struct file_descriptor *);
 extern struct file_descriptor *get_fd(struct io_context *, int);
-extern void put_fd(struct file_descriptor *);
-extern void free_fd(struct file_descriptor *);
+extern void close_fd(struct file_descriptor *descriptor);
+extern void put_fd(struct file_descriptor *descriptor);
 extern status_t select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel);
 extern status_t deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel);
 extern bool fd_is_valid(int fd, bool kernel);
