@@ -1,0 +1,90 @@
+BRoster()
+none
+
+bool IsRunning(const char *signature) const
+case 1:	signature is NULL =>
+		Should return false.
+case 2:	signature is not NULL, but no app with this signature is running =>
+		Should return false.
+case 3:	signature is not NULL and an (two) app(s) with this signature is (are)
+		running; quit one; quit the second one =>
+		Should return true; true; false.
+
+bool IsRunning(entry_ref *ref) const
+case 1:	ref is NULL =>
+		Should return false.
+case 2:	ref is not NULL, but no app with this ref is running =>
+		Should return false.
+case 3:	ref is not NULL and an (two) app(s) with this ref is (are)
+		running; quit one; quit the second one =>
+		Should return true; true; false.
+
+team_id TeamFor(const char *signature) const
+case 1:	signature is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	signature is not NULL, but no app with this signature is running =>
+		Should return B_ERROR.
+case 3:	signature is not NULL and an (two) app(s) with this signature is (are)
+		running; quit one; quit the second one =>
+		Should return the ID of one of the teams; the ID of the second teams;
+		B_ERROR.
+
+team_id TeamFor(entry_ref *ref) const
+case 1:	ref is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	ref is not NULL, but no app with this ref is running =>
+		Should return B_ERROR.
+case 3:	ref is not NULL and an (two) app(s) with this ref is (are)
+		running; quit one; quit the second one =>
+		Should return the ID of one of the teams; the ID of the second teams;
+		B_ERROR.
+
+status_t GetAppInfo(const char *signature, app_info *info) const
+case 1:	signature is NULL or info is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	signature/info are not NULL, but no app with this signature is
+		running =>
+		Should return B_ERROR.
+case 3:	signature/info are not NULL and an (two) app(s) with this signature
+		is (are) running; quit one; quit the second one =>
+		Should
+		- fill the app info with the data of one of the apps and return B_OK;
+		- fill the app info with the data of the second apps and return B_OK;
+		- return B_ERROR.
+
+status_t GetAppInfo(entry_ref *ref, app_info *info) const
+case 1:	ref is NULL or info is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	ref/info are not NULL, but no app with this ref is running =>
+		Should return B_ERROR.
+case 3:	ref/info are not NULL and an (two) app(s) with this ref
+		is (are) running; quit one; quit the second one =>
+		Should
+		- fill the app info with the data of one of the apps and return B_OK;
+		- fill the app info with the data of the second apps and return B_OK;
+		- return B_ERROR.
+
+status_t GetRunningAppInfo(team_id team, app_info *info) const
+case 1:	info is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	info is not NULL, but no app with the team ID is running =>
+		Should return B_BAD_TEAM_ID.
+case 3:	info is not NULL, and an app with the team ID is running =>
+		Should fill the app info and return B_OK.
+
+void GetAppList(BList *teamIDList) const
+case 1:	teamIDList is NULL =>
+		Should return B_BAD_VALUE.
+case 2:	teamIDList is not NULL and not empty =>
+		Should append the team IDs of all running apps to teamIDList.
+
+void GetAppList(const char *signature, BList *teamIDList) const
+case 1:	signature or teamIDList are NULL =>
+		Should return B_BAD_VALUE.
+case 2:	teamIDList is not NULL and not empty, signature is not NULL, but no
+		app with this signature is running =>
+		Should not modify teamIDList.
+case 3:	teamIDList is not NULL and not empty, signature is not NULL, but no
+		app with this signature is running =>
+		Should append the team IDs of all running apps with the supplied
+		signature to teamIDList.
