@@ -7,6 +7,7 @@
 #include "blocker/LockerTest.h"
 #include "bmemoryio/MemoryIOTest.h"
 #include "bmemoryio/MallocIOTest.h"
+#include "bstring/StringTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Support");
@@ -17,6 +18,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BLocker", LockerTestSuite());
 	suite->addTest("BMemoryIO", MemoryIOTestSuite());
 	suite->addTest("BMallocIO", MallocIOTestSuite());
-	
+	suite->addTest("BString", StringTestSuite());
+		
 	return suite;
 }

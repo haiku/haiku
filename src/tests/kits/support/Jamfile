@@ -5,7 +5,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) barchivable ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bautolock ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blocker ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmemoryio ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) bmallocio ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bstring ] ;
 
 CommonTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
@@ -50,6 +50,11 @@ CommonTestLib libsupporttest.so
 		#MallocSetSizeTest.cpp
 		MallocBufferLengthTest.cpp
 		
+		#BString
+		StringTest.cpp
+		StringConstructionTest.cpp
+		StringCountCharTest.cpp
+
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
 	: be stdc++.r4
