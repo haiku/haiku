@@ -1170,6 +1170,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 		skip_in_buffer(&buffer, parameterSize);
 
 		// add the item to the list
+		parameter->mGroup = this;
 		mControls->AddItem(parameter);
 
 		// add it's old pointer value to the RefFix list kept by the owner web
