@@ -718,7 +718,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 		// somebody deleted the port
 		return B_BAD_PORT_ID;
 	}
-	if (status == B_TIMED_OUT || B_WOULD_BLOCK)
+	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 		return status;
 
 	state = disable_interrupts();
