@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1840,7 +1840,8 @@ Inode::NeedsTrimming()
 {
 	// We never trim preallocated index blocks to make them grow as smooth as possible.
 	// There are only few indices anyway, so this doesn't hurt
-	if (IsIndex())
+	// Also, if an inode is already in deleted state, we don't bother trimming it
+	if (IsIndex() || IsDeleted())
 		return false;
 
 	off_t roundedSize = (Size() + fVolume->BlockSize() - 1) & ~(fVolume->BlockSize() - 1);
@@ -2054,7 +2055,7 @@ Inode::Remove(Transaction &transaction, const char *name, off_t *_id, bool isDir
 			// Deleted inodes won't be visible in queries anyway.
 	}
 
-	if ((inode->Mode() & (S_FILE | S_SYMLINK)) != 0) {
+	if (inode->IsFile() || inode->IsSymLink()) {
 		if (inode->IsFile())
 			index.RemoveSize(transaction, inode);
 		index.RemoveLastModified(transaction, inode);

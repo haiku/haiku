@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -74,6 +74,8 @@ class Inode {
 		bool IsSymLink() const { return S_ISLNK(Mode()); }
 		bool HasUserAccessableStream() const { return S_ISREG(Mode()); }
 			// currently only files can be accessed with bfs_read()/bfs_write()
+
+		bool IsDeleted() const { return (Flags() & INODE_DELETED) != 0; }
 
 		mode_t Mode() const { return fNode.Mode(); }
 		uint32 Type() const { return fNode.Type(); }

@@ -698,11 +698,13 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 			// fill the new blocks (if any) with zeros
 			inode->FillGapWithZeros(inode->OldSize(), inode->Size());
 
-			Index index(volume);
-			index.UpdateSize(transaction, inode);
+			if (!inode->IsDeleted()) {
+				Index index(volume);
+				index.UpdateSize(transaction, inode);
 
-			if ((mask & FS_WRITE_STAT_MTIME) == 0)
-				index.UpdateLastModified(transaction, inode);
+				if ((mask & FS_WRITE_STAT_MTIME) == 0)
+					index.UpdateLastModified(transaction, inode);
+			}
 		}
 	}
 
@@ -717,10 +719,12 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
 
 	if (mask & FS_WRITE_STAT_MTIME) {
-		// Index::UpdateLastModified() will set the new time in the inode
-		Index index(volume);
-		index.UpdateLastModified(transaction, inode,
-			(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		if (!inode->IsDeleted()) {
+			// Index::UpdateLastModified() will set the new time in the inode
+			Index index(volume);
+			index.UpdateLastModified(transaction, inode,
+				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		}
 	}
 	if (mask & FS_WRITE_STAT_CRTIME) {
 		node.create_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
@@ -1182,7 +1186,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	if (status == B_OK) {
 		// periodically notify if the file size has changed
 		// ToDo: should we better test for a change in the last_modified time only?
-		if (cookie->last_size != inode->Size()
+		if (!inode->IsDeleted() && cookie->last_size != inode->Size()
 			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
 			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
 			cookie->last_size = inode->Size();
@@ -1224,8 +1228,11 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 
 	bool needsTrimming = inode->NeedsTrimming();
 
-	if (cookie->open_mode & O_RWMASK
-		&& (needsTrimming || inode->OldLastModified() != inode->LastModified())) {
+	if ((cookie->open_mode & O_RWMASK) != 0
+		&& !inode->IsDeleted()
+		&& (needsTrimming
+			|| inode->OldLastModified() != inode->LastModified()
+			|| inode->OldSize() != inode->Size())) {
 #ifdef UNSAFE_GET_VNODE
 		RecursiveLocker locker(volume->Lock());
 #endif
@@ -1243,7 +1250,8 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 			status = inode->TrimPreallocation(transaction);
 			if (status < B_OK)
 				FATAL(("Could not trim preallocated blocks!"));
-	
+		}
+		if (needsTrimming || inode->OldSize() != inode->Size()) {
 			index.UpdateSize(transaction, inode);
 			changed = true;
 		}
