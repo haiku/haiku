@@ -42,7 +42,7 @@ operator new(size_t size)
 
 
 inline void *
-operator new(size_t size, const nothrow_t&) throw()
+operator new(size_t size, const nothrow_t&) 
 {
 	return malloc(size);
 }
@@ -56,7 +56,7 @@ operator new[](size_t size)
  
 
 inline void *
-operator new[](size_t size, const nothrow_t&) throw()
+operator new[](size_t size, const nothrow_t&)
 {
 	return malloc(size);
 }
