@@ -481,7 +481,10 @@ static status_t
 rootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 {
 	// allow to open the file, but it can't be done anything with it
-	*_cookie = NULL;	// help rootfs_free_cookie() to knows if a rootfs_cookie should be free() or not!
+
+	*_cookie = NULL;
+		// initialize the cookie, because rootfs_free_cookie() relies on it
+
 	return B_OK;
 }
 
