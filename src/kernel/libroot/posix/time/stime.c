@@ -4,14 +4,16 @@
 */
 
 #include <time.h>
-#include <OS.h>
 #include <errno.h>
+#include "syscalls.h"
 
 // ToDo: replace zero by a ROOT_UID when usergroup.c is implemented
 
 int
 stime(const time_t *tp)
 {
+	status_t status;
+
 	if (tp == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -20,7 +22,11 @@ stime(const time_t *tp)
 		errno = EPERM;
 		return -1;
 	}
-	set_real_time_clock(*tp);
-	return B_OK;
+	status = _kern_set_real_time_clock(*tp);
+	if (status < B_OK) {
+		errno = status;
+		return -1;
+	}
+	return 0;
 }
 
