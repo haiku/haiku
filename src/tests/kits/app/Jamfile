@@ -11,6 +11,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagerunner ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpropertyinfo ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) broster ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) broster testapps ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
 CommonTestLib libapptest.so
@@ -98,9 +99,11 @@ CommonTestLib libapptest.so
 		FindAppTester.cpp
 		GetAppInfoTester.cpp
 		GetAppListTester.cpp
+		GetRecentTester.cpp
 		IsRunningTester.cpp
 		LaunchTester.cpp
 		LaunchTesterHelper.cpp
+		RecentAppsTestApp.cpp
 		TeamForTester.cpp
 		
 		# RegistrarThreadManager
