@@ -14,12 +14,13 @@ extern "C" {
 #endif
 
 status_t rtc_init(kernel_args *args);
-bigtime_t rtc_boot_time(void);
-	// Returns the time at which the system was booted in microseconds since Jan 1, 1970.
+bigtime_t rtc_system_time_offset(void);
+	// Returns the time at which the system was booted in microseconds since Jan 1, 1970 (local or GMT).
 
 status_t _user_set_real_time_clock(uint32 time);
 status_t _user_set_tzspecs(int32 timezone_offset, bool dst_observed);
-status_t _user_set_tzfilename(const char* filename, size_t length, bool isGMT);
+status_t _user_set_tzfilename(const char* filename, size_t length, bool is_gmt);
+status_t _user_get_tzfilename(char *filename, size_t length, bool *is_gmt);
 
 #ifdef __cplusplus
 }
