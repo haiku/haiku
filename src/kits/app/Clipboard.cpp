@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -36,16 +36,11 @@
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
 // Globals ---------------------------------------------------------------------
+BClipboard *be_clipboard;
+	// ToDo: this has to be initialized!
 
 
-//------------------------------------------------------------------------------
 BClipboard::BClipboard(const char *name, bool transient)
 {
   if ( name )
