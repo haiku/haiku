@@ -49,7 +49,7 @@
  */
 #define CTOR_INIT_LIST \
     BArchivable( ), \
-    fInitialized( B_NO_INIT ), \
+    m_init( B_NO_INIT ), \
     fFamily( AF_INET ), \
     fPort( 0 ), \
     fAddress( INADDR_ANY )
@@ -70,32 +70,32 @@
 BNetAddress::BNetAddress( const char* hostname, unsigned short port )
             : CTOR_INIT_LIST
 {
-    fInitialized = SetTo( hostname, port );
+    m_init = SetTo( hostname, port );
 }
 
 BNetAddress::BNetAddress( const struct sockaddr_in& sa )
             : CTOR_INIT_LIST
 {
-    fInitialized = SetTo( sa );
+    m_init = SetTo( sa );
 }
 
 BNetAddress::BNetAddress( in_addr addr, int port )
             : CTOR_INIT_LIST
 {
-    fInitialized = SetTo( addr, port );
+    m_init = SetTo( addr, port );
 }
 
 BNetAddress::BNetAddress( uint32 addr, int port )
             : CTOR_INIT_LIST
 {
-    fInitialized = SetTo( addr, port );
+    m_init = SetTo( addr, port );
 }
 
 BNetAddress::BNetAddress( const char* hostname, const char* protocol,
                           const char* service )
             : CTOR_INIT_LIST
 {
-    fInitialized = SetTo( hostname, protocol, service );
+    m_init = SetTo( hostname, protocol, service );
 }
 
 
@@ -110,7 +110,7 @@ BNetAddress::BNetAddress( const char* hostname, const char* protocol,
 BNetAddress::BNetAddress( const BNetAddress& refparam )
             : CTOR_INIT_LIST
 {
-    fInitialized = clone( refparam );
+    m_init = clone( refparam );
 }
 
 
@@ -146,7 +146,7 @@ BNetAddress::BNetAddress( BMessage* archive )
     }
     fAddress = int32_val;
 
-    fInitialized = B_OK;
+    m_init = B_OK;
 }
 
 
@@ -175,7 +175,7 @@ BNetAddress& BNetAddress::operator=( const BNetAddress& refparam )
 BNetAddress::~BNetAddress( void )
 {
     fFamily = fPort = fAddress = 0;
-    fInitialized = B_NO_INIT;
+    m_init = B_NO_INIT;
 }
 
 
@@ -211,7 +211,7 @@ BNetAddress::~BNetAddress( void )
  */
 status_t BNetAddress::GetAddr( char* hostname, unsigned short* port ) const
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -258,7 +258,7 @@ status_t BNetAddress::GetAddr( char* hostname, unsigned short* port ) const
  */
 status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -289,7 +289,7 @@ status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
  */
 status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -315,7 +315,7 @@ status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
  */
 status_t BNetAddress::InitCheck( void )
 {
-    return ( fInitialized == B_OK ) ? B_OK : B_ERROR;
+    return ( m_init == B_OK ) ? B_OK : B_ERROR;
 }
 
 
@@ -336,7 +336,7 @@ status_t BNetAddress::InitCheck( void )
  */
 status_t BNetAddress::Archive( BMessage* into, bool deep ) const
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -547,7 +547,7 @@ status_t BNetAddress::SetTo( const char* hostname, const char* protocol,
     {
         return B_ERROR;
     }
-    // endservent( );
+    // endservent( ); ???
 
     return SetTo( hostname, ServiceEntry->s_port );
 }
@@ -566,7 +566,7 @@ status_t BNetAddress::SetTo( const char* hostname, const char* protocol,
  */
 status_t BNetAddress::clone( const BNetAddress& RefParam )
 {
-    if ( !RefParam.fInitialized )
+    if ( !RefParam.m_init )
     {
         return B_NO_INIT;
     }
@@ -576,6 +576,32 @@ status_t BNetAddress::clone( const BNetAddress& RefParam )
     fAddress = RefParam.fAddress;
 
     return B_OK;
+}
+
+/* Reserved methods, for future evolution */
+
+void BNetAddress::_ReservedBNetAddressFBCCruft1()
+{
+}
+
+void BNetAddress::_ReservedBNetAddressFBCCruft2()
+{
+}
+
+void BNetAddress::_ReservedBNetAddressFBCCruft3()
+{
+}
+
+void BNetAddress::_ReservedBNetAddressFBCCruft4()
+{
+}
+
+void BNetAddress::_ReservedBNetAddressFBCCruft5()
+{
+}
+
+void BNetAddress::_ReservedBNetAddressFBCCruft6()
+{
 }
 
 /*=------------------------------------------------------------------- End -=*/

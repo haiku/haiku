@@ -47,7 +47,7 @@
  */
 #define CTOR_INIT_LIST \
     BArchivable( ), \
-    fInitialized( B_NO_INIT ), \
+    m_init( B_NO_INIT ), \
     fData( NULL ), \
     fDataSize( 0 ), \
     fStackSize( 0 ), \
@@ -75,7 +75,7 @@
 BNetBuffer::BNetBuffer( size_t size )
            : CTOR_INIT_LIST
 {
-    fInitialized = ( resize( size ) == B_OK ) ? B_OK : B_NO_INIT;
+    m_init = ( resize( size ) == B_OK ) ? B_OK : B_NO_INIT;
 }
 
 
@@ -90,7 +90,7 @@ BNetBuffer::BNetBuffer( size_t size )
 BNetBuffer::BNetBuffer( const BNetBuffer& refparam )
             : CTOR_INIT_LIST
 {
-    fInitialized = ( clone( refparam ) == B_OK ) ? B_OK : B_NO_INIT;
+    m_init = ( clone( refparam ) == B_OK ) ? B_OK : B_NO_INIT;
 }
 
 
@@ -148,7 +148,7 @@ BNetBuffer::BNetBuffer( BMessage* archive )
     fStackSize = stackSize;
     fCapacity = capacity;
 
-    fInitialized = B_OK;
+    m_init = B_OK;
 }
 
 
@@ -167,7 +167,7 @@ BNetBuffer::~BNetBuffer( void )
 
     fDataSize = fStackSize = fCapacity = 0;
 
-    fInitialized = B_NO_INIT;
+    m_init = B_NO_INIT;
 }
 
 
@@ -181,7 +181,7 @@ BNetBuffer::~BNetBuffer( void )
  */
 BNetBuffer& BNetBuffer::operator=( const BNetBuffer& refparam )
 {
-    fInitialized = clone( refparam );
+    m_init = clone( refparam );
 
     return *this;
 }
@@ -197,7 +197,7 @@ BNetBuffer& BNetBuffer::operator=( const BNetBuffer& refparam )
  */
 status_t BNetBuffer::InitCheck( void )
 {
-    return ( fInitialized == B_OK ) ? B_OK : B_ERROR;
+    return ( m_init == B_OK ) ? B_OK : B_ERROR;
 }
 
 
@@ -218,7 +218,7 @@ status_t BNetBuffer::InitCheck( void )
  */
 status_t BNetBuffer::Archive( BMessage* into, bool deep ) const
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -593,7 +593,7 @@ size_t BNetBuffer::BytesRemaining( void ) const
  */
 status_t BNetBuffer::clone( const BNetBuffer& RefParam )
 {
-    if ( !RefParam.fInitialized )
+    if ( !RefParam.m_init )
     {
         return B_NO_INIT;
     }
@@ -635,7 +635,7 @@ status_t BNetBuffer::clone( const BNetBuffer& RefParam )
  */
 status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -751,7 +751,7 @@ status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
  */
 status_t BNetBuffer::dpush( int32 Type, int32 Length, const void* Data )
 {
-    if ( fInitialized != B_OK )
+    if ( m_init != B_OK )
     {
         return B_NO_INIT;
     }
@@ -874,6 +874,33 @@ status_t BNetBuffer::resize( int32 NewSize, bool RegenStack )
     return B_OK;
 
 #undef GRANULARITY
+}
+
+
+/* Reserved methods, for future evolution */
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft1()
+{
+}
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft2()
+{
+}
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft3()
+{
+}
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft4()
+{
+}
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft5()
+{
+}
+
+void BNetBuffer::_ReservedBNetBufferFBCCruft6()
+{
 }
 
 
