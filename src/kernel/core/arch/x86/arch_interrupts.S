@@ -48,6 +48,7 @@ TRAP_ERRC(trap14, 14)
 TRAP(trap16, 16)
 TRAP_ERRC(trap17, 17)
 TRAP(trap18, 18)
+TRAP(trap19, 19)
 
 TRAP(trap32, 32)
 TRAP(trap33, 33)
@@ -85,6 +86,7 @@ int_bottom:
 	movl	$KERNEL_DATA_SEG,%eax
 	cld
 	movl	%eax,%ds
+	movl	%eax,%es
 	movl	%ss,%ebx
 	movl	%esp,%esi
 	cmpl	%eax,%ebx  // check if we changed the stack
