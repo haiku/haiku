@@ -1,4 +1,7 @@
 #include "DecoderPlugin.h"
+#include "speex.h"
+#include "speex_header.h"
+#include "speex_callbacks.h"
 
 class speexDecoder : public Decoder
 {
@@ -22,6 +25,14 @@ public:
 private:
 	void		CopyInfoToEncodedFormat(media_format * format);
 	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);
+
+	SpeexBits		fBits;
+	void *			fDecoderState;
+	SpeexHeader	*	fHeader;
+
+	int				fSpeexFrameSize;
+	float *			fSpeexBuffer;
+	int				fSpeexBytesRemaining;
 
 	bigtime_t		fStartTime;
 	int				fFrameSize;
