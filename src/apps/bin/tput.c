@@ -30,6 +30,7 @@
  */
 
 //#include <sys/cdefs.h>
+#define __P(x) x
 #ifndef lint
 static char copyright[] ="@(#) Copyright (c) 1980, 1988, 1993\n\
 	The Regents of the University of California.  All rights reserved.\n";
