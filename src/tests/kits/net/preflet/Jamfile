@@ -3,5 +3,6 @@ SubDir OBOS_TOP src tests kits net preflet ;
 SimpleTest Network : 
 	Network.cpp 
 	NetworkWindow.cpp
+	NetworkSetupAddOn.cpp
 	: be root
 ;

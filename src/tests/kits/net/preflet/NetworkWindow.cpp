@@ -8,7 +8,8 @@
 #include <StorageKit.h>
 #include <SupportKit.h>
 
-#include <BoneyardAddOn.h>
+#include "BoneyardAddOn.h"
+#include "NetworkSetupAddOn.h"
 
 #include "NetworkWindow.h"
 
@@ -165,17 +166,25 @@ void NetworkWindow::MessageReceived
 	
 	case SHOW_MSG: {
 		BYAddon *by;
+		NetworkSetupAddOn *addon;
 
 		if (fShowView)
 			fShowView->RemoveSelf();
 		
 		fShowView = NULL;
 		
-		if (msg->FindPointer("byaddon", (void **) &by) != B_OK)
-			break;
+		by = NULL;
+		addon = NULL;
+		if (msg->FindPointer("addon", (void **) &addon) != B_OK) {
+			if (msg->FindPointer("byaddon", (void **) &by) != B_OK) 
+				break;
+		};
 		
 		fShowRect = fPanel->Bounds();
-		fShowView = by->CreateView(&fShowRect);
+		if (addon)
+			fShowView = addon->CreateView(&fShowRect);
+		else
+			fShowView = by->CreateView(&fShowRect);
 		if (fShowView) {
 			fPanel->AddChild(fShowView);
 			// fShowView->SetViewColor((rand() % 256), (rand() % 256), (rand() % 256));
@@ -311,11 +320,11 @@ void NetworkWindow::BuildShowMenu
 			path.Append(search_path + 3);
 		} else {
 			path.SetTo(search_path);
+			path.Append("boneyard");
 		};
 
 		search_path = strtok_r(NULL, ":", &next_path_token);
 
-		path.Append("boneyard");
 		printf("Looking into %s\n", path.Path());
 		
 		dir.SetTo(path.Path());
@@ -336,21 +345,39 @@ void NetworkWindow::BuildShowMenu
 	
 			printf("Addon %s loaded.\n", addon_path.Path());
 		
-			by_instantiate_func func;
+			by_instantiate_func by_func;
+			network_setup_addon_instantiate ns_func;
 			status_t status;
 			
-			status = get_image_symbol(addon_id, "instantiate", B_SYMBOL_TYPE_TEXT, (void **) &func);
-			if (status != B_OK) {
-				//  No "modules" symbol found in this addon
-				printf("Symbol \"instantiate\" not found in %s addon: not a module addon!\n", addon_path.Path());
-			} else {
-				BYAddon *by = func();
+			status = get_image_symbol(addon_id, "get_addon", B_SYMBOL_TYPE_TEXT, (void **) &ns_func);
+			if (status == B_OK) {
+				NetworkSetupAddOn *addon;
+
+				addon = ns_func();
 				BMessage *msg = new BMessage(msg_what);
 				msg->AddInt32("image_id", addon_id);
 				msg->AddString("addon_path", addon_path.Path());
-				msg->AddPointer("byaddon", by);
-				menu->AddItem(new BMenuItem(by->Name(), msg));
+				msg->AddPointer("addon", addon);
+				menu->AddItem(new BMenuItem(addon->Name(), msg));
+				continue;
 			};
+
+			status = get_image_symbol(addon_id, "instantiate", B_SYMBOL_TYPE_TEXT, (void **) &by_func);
+			if (status == B_OK) {
+				BYAddon *addon;
+
+				addon = by_func();
+				BMessage *msg = new BMessage(msg_what);
+				msg->AddInt32("image_id", addon_id);
+				msg->AddString("addon_path", addon_path.Path());
+				msg->AddPointer("byaddon", addon);
+				menu->AddItem(new BMenuItem(addon->Name(), msg));
+				continue;
+			};
+	
+			//  No "modules" symbol found in this addon
+			printf("Symbol \"instantiate\" not found in %s addon: not a module addon!\n", addon_path.Path());
+			unload_add_on(addon_id);
 		};
 		
 	};
