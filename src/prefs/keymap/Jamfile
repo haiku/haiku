@@ -7,4 +7,5 @@ Preference Keymap :
 	KeymapWindow.cpp
 	KeymapListItem.cpp
 	Keymap.cpp
+	KeymapTextView.cpp
 	: be ;

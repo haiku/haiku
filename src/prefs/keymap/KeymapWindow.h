@@ -19,6 +19,7 @@
 #include <interface/Window.h>
 #include <support/List.h>
 #include <interface/MenuBar.h>
+#include "KeymapTextView.h"
 #include "Keymap.h"
 
 #define WINDOW_TITLE				"Keymap"
@@ -48,7 +49,7 @@ private:
 	BFont fCurrentFont;
 	
 	Keymap				*fCurrentMap;
-	BTextView 			*fTextView;
+	KeymapTextView		*fTextView;
 };
 
 

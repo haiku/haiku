@@ -17,6 +17,7 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -57,9 +58,9 @@ KeymapWindow::KeymapWindow( BRect frame )
 	// The view to hold all but the menu bar
 	BRect bounds = Bounds();
 	bounds.top = menubar->Bounds().bottom + 1;
-	BView *placeholderView = new BView( bounds, "placeholderView", 
-		B_FOLLOW_NONE, 0 );
-	placeholderView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	BBox *placeholderView = new BBox(bounds, "placeholderView", 
+		B_FOLLOW_ALL);
+	placeholderView->SetBorder(B_NO_BORDER);
 	AddChild( placeholderView );
 
 	// Create the Maps box and contents
@@ -708,7 +709,7 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 	BRect textRect = frameRect;
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(1,1);
-	fTextView = new BTextView(frameRect, "testzone", textRect,
+	fTextView = new KeymapTextView(frameRect, "testzone", textRect,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
 	fTextView->MakeEditable(true);
 	fTextView->MakeSelectable(true);
@@ -1208,16 +1209,25 @@ MapView::MessageReceived(BMessage *msg)
 						fOldKeyInfo.key_states[i] = states[i];
 					Invalidate();
 				} else {
-				
+					int32 keyCode = -1;
 					for (int8 i=0; i<16; i++)
 						if (fOldKeyInfo.key_states[i] != states[i]) {
 							uint8 stbits = fOldKeyInfo.key_states[i] ^ states[i];
 							fOldKeyInfo.key_states[i] = states[i];
 							for (int8 j=7; stbits; j--,stbits>>=1)
-								if (stbits & 1)
-									DrawKey(i*8 + j);
+								if (stbits & 1) {
+									keyCode = i*8 + j;
+									DrawKey(keyCode);
+								}
 														
 						}
+					if (Window()->IsActive() && keyCode >= 0 
+						&& msg->what == B_KEY_DOWN) {
+						fTextView->MakeFocus();
+						char *str;
+						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str);
+						fTextView->FakeKeyDown(str, 1);
+					}
 				}											
 			}
 			
