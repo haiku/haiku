@@ -461,7 +461,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		t->sem.acquire_status = B_NO_ERROR;
 		thread_enqueue(t, &gSems[slot].u.used.q);
 
-		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
+		if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
 			TRACE(("sem_acquire_etc: setting timeout sem for %Ld usecs, semid %d, tid %d\n",
 				timeout, id, t->id));
 
@@ -469,8 +469,8 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 			args.blocked_sem_id = id;
 			args.blocked_thread = t->id;
 			args.sem_count = count;
-			
-			// another evil hack: pass the args into timer->entry.prev
+
+			// ToDo: another evil hack: pass the args into timer->entry.prev
 			timeout_timer.entry.prev = (qent *)&args;
 			add_timer(&timeout_timer, &sem_timeout, timeout,
 				flags & B_RELATIVE_TIMEOUT ?
@@ -668,9 +668,13 @@ fill_sem_info(struct sem_entry *sem, sem_info *info, size_t size)
 	info->team = sem->u.used.owner;
 	strlcpy(info->name, sem->u.used.name, sizeof(info->name));
 	info->count = sem->u.used.count;
-	info->latest_holder	= sem->u.used.q.head->id;
-		// ToDo: not sure if this is the latest holder, or the next
-		// holder...
+
+	// ToDo: not sure if this is the latest holder, or the next
+	// holder...
+	if (sem->u.used.q.head != NULL)
+		info->latest_holder	= sem->u.used.q.head->id;
+	else
+		info->latest_holder = -1;
 }
 
 
