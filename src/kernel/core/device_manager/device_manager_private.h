@@ -18,6 +18,7 @@
 #define GENERIC_SUBDIR "/generic"
 
 // driver registration directories
+#define PNP_DIR
 #define SYSTEM_DRIVER_REGISTRATION "/boot/beos/add-ons/kernel/"PNP_DIR"registration/"
 #define COMMON_DRIVER_REGISTRATION "/boot/home/config/add-ons/kernel/"PNP_DIR"registration/"
 
