@@ -710,6 +710,18 @@ BTranslationUtils::WriteStyledEditFile(BTextView *fromView, BFile *intoFile)
 		&nalignment, sizeof(int32));
 	if (amtWritten != sizeof(int32))
 		return B_ERROR;
+		
+	// be:encoding
+	// how the text is encoded, StyledEdit's list of encoding options
+	// is listed under the Encoding menu in the Save As dialog box
+	// default is Unicode UTF8 (65535)
+	// note that the B_UNICODE_UTF8 constant is 0 and not appropriate
+	// for use here
+	int32 nencoding = 65535;
+	amtWritten = intoFile->WriteAttr("be:encoding", B_INT32_TYPE, 0,
+		&nencoding, sizeof(int32));
+	if (amtWritten != sizeof(int32))
+		return B_ERROR;
 	
 	text_run_array *pRunArray = fromView->RunArray(0, fromView->TextLength());
 	if (pRunArray == NULL)
