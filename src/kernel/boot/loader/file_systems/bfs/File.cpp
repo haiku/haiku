@@ -59,7 +59,7 @@ File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 status_t 
 File::GetName(char *nameBuffer, size_t bufferSize) const
 {
-	return B_ERROR;
+	return fStream.GetName(nameBuffer, bufferSize);
 }
 
 
