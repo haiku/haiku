@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef B_BAD_DATA
+#	define B_BAD_DATA B_ERROR
+#endif
 
 #define DUMPED_BLOCK_SIZE 16
 #define Print printf
