@@ -59,6 +59,8 @@ struct array<uint8, arrayLength> {
 				SIMPLE_PRINT(("\n"));
 		}
 	}
+	uint32 length() const { return arrayLength; }
+	uint32 size() const { return arrayLength; }
 	uint8 data[arrayLength];
 };
 
@@ -82,6 +84,8 @@ struct array<char, arrayLength> {
 				SIMPLE_PRINT(("\n"));
 		}
 	}
+	uint32 length() const { return arrayLength; }
+	uint32 size() const { return arrayLength; }
 	uint8 data[arrayLength];
 };
 
