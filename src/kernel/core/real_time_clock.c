@@ -15,46 +15,6 @@
 static bigtime_t sBootTime;
 
 
-static void
-rtc_print(void)
-{
-	uint32 currentTime;
-
-	currentTime = (sBootTime + system_time()) / 1000000;
-	dprintf("system_time:  %u\n", (unsigned)system_time());
-	dprintf("boot_time:    %u\n", (unsigned)sBootTime);
-	dprintf("current_time: %u\n", (unsigned)currentTime);
-}
-
-
-static int
-rtc_debug(int argc, char **argv)
-{
-	if (argc < 2) {
-		// If no arguments were given, output all usefull data.
-		rtc_print();
-	} else {
-		// If there was an argument, reset the system and hw time.
-		rtc_set_system_time(strtoul(argv[1], NULL, 10));
-		rtc_system_to_hw();
-	}
-
-	return 0;
-}
-
-
-status_t
-rtc_init(kernel_args *ka)
-{
-	//dprintf("rtc_init: entry\n");
-	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
-
-	rtc_hw_to_system();
-
-	return B_OK;
-}
-
-
 void
 rtc_set_system_time(uint32 current_time)
 {
@@ -94,3 +54,44 @@ rtc_boot_time(void)
 {
 	return sBootTime;
 }
+
+
+static void
+rtc_print(void)
+{
+	uint32 currentTime;
+
+	currentTime = (sBootTime + system_time()) / 1000000;
+	dprintf("system_time:  %u\n", (unsigned)system_time());
+	dprintf("boot_time:    %u\n", (unsigned)sBootTime);
+	dprintf("current_time: %u\n", (unsigned)currentTime);
+}
+
+
+static int
+rtc_debug(int argc, char **argv)
+{
+	if (argc < 2) {
+		// If no arguments were given, output all usefull data.
+		rtc_print();
+	} else {
+		// If there was an argument, reset the system and hw time.
+		rtc_set_system_time(strtoul(argv[1], NULL, 10));
+		rtc_system_to_hw();
+	}
+
+	return 0;
+}
+
+
+status_t
+rtc_init(kernel_args *ka)
+{
+	//dprintf("rtc_init: entry\n");
+	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
+
+	rtc_hw_to_system();
+
+	return B_OK;
+}
+

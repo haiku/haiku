@@ -173,7 +173,7 @@ cmos_to_secs(const cmos_time *cmos)
 {
 	uint32 wholeYear;
 	uint32 time = 0;
-	int i;
+	uint32 i;
 
 	wholeYear = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year);
 
@@ -206,7 +206,6 @@ secs_to_cmos(uint32 seconds, cmos_time *cmos)
 	uint32 secsThisYear;
 	bool keepLooping;
 	bool isLeapYear;
-	int i;
 	int temp;
 	int month;
 
