@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -175,9 +175,7 @@ bfs_initialize(const char *deviceName, void *parms, size_t len)
 {
 	FUNCTION_START(("deviceName = %s, parameter len = %ld\n", deviceName, len));
 
-	// This function is not available from the outside in BeOS
-	// It will be similarly implemented in OpenBeOS, though - the
-	// backend (to create the file system) is already done; just
+	// The backend (to create the file system) is already done; just
 	// call Volume::Initialize().
 
 	return B_ERROR;
@@ -1693,10 +1691,10 @@ static status_t
 bfs_rename_attr(fs_volume _fs, fs_vnode fromFile, const char *fromName,
 	fs_vnode toFile, const char *toName)
 {
-	FUNCTION_START(("name = \"%s\", to = \"%s\"\n", oldname, newname));
+	FUNCTION_START(("name = \"%s\", to = \"%s\"\n", fromName, toName));
 
 	// ToDo: implement bfs_rename_attr()!
-	// I'll skip the implementation here, and will do it for OpenBeOS - at least
+	// I'll skip the implementation here, and will do it for Haiku - at least
 	// there will be an API to move one attribute to another file, making that
 	// function much more complicated - oh joy ;-)
 
