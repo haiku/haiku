@@ -1,0 +1,160 @@
+This is the current media_seek_type from MediaTrack.h:
+
+enum media_seek_type {
+	B_MEDIA_SEEK_CLOSEST_FORWARD = 1,
+	B_MEDIA_SEEK_CLOSEST_BACKWARD = 2,
+	B_MEDIA_SEEK_DIRECTION_MASK = 3
+};
+
+It is used as an argument to these BMediaTrack functions:
+
+status_t SeekToFrame(int64 *ioFrame, int32 flags = 0) 
+status_t SeekToTime(bigtime_t *ioTime, int32 flags = 0)
+
+Those int32 should be changed to media_seek_type?
+
+============================
+
+Here are some aspects of seeking:
+
+A. Where are you seeking from?
+	1. the start of the file
+		Currently is done always now.
+	2. the current position
+		Suggested for streams, or other situations where you might lose track of your position.
+	3. the end of the file
+		Suggested for completeness.
+
+B. Which direction are you seeking in?
+	1. backwards
+		This is most useful for A2, A3.
+		If you seek to before the beginning of the stream you could reasonably wait until enough time elapsed that you should be at the start of the stream, and then begin playing the beginning of the stream.
+	2. forwards
+		This is most useful for A1, A2.
+		If you seek past the end of the stream you can only hope that you receive data on the stream faster than time elapses.  At that point you could begin playing.
+
+C. How far are you seeking?
+	1. specify by time
+		Currently supported via SeekToTime
+	2. specify by frame
+		Currently supported via SeekToFrame
+	3. specify by chunk
+		Suggested for completeness.  This may prevent someone from having to loop over ReadChunk in order to get to a position.
+	4. specify by percentage
+		Suggested for efficiency.  For applications such as players which do not require precise time/frame based seeking, this may allow fast seeking. (especially for nonindexed tracks)  After seeking like this absolute time/frame information maybe not be available.
+
+------------
+
+D. What constitutes a usable position?
+	0. track's discretion
+	1. a frame that can be decoded in 1 step
+		Currently supported by most tracks AFAIK.
+	2. a frame that can be decoded in multiple steps
+		Suggested to allow exact but slow searching.
+	3. any frame
+		Suggested to allow very fast searching.
+
+E. What should the track do if you specified a position that is not usable?
+	0. track's discretion
+		Currently supported by supplying no seek flags.
+	1. go backward until you reach a usable position
+		Currently supported by supplying B_MEDIA_SEEK_CLOSEST_BACKWARD as a seek flag.
+	2. go forward until you reach a usable position
+		Currently supported by supplying B_MEDIA_SEEK_CLOSEST_FORWARD as a seek flag.
+	3. go whichever direction has the nearest usable position
+		Suggested to get as close to the specified time/frame as possible.
+
+F. What state should the decoder for this track be left in?
+	1. whatever state it was in before
+		Not recommended.  May even not be possible since the decoder's help may be required for seeking.
+	2. track's discretion
+		Suggested for efficiency.
+	3. prepared to return a correct, decoded frame
+		Currently supported by supplying no seek flags.
+	4. prepared to return meaningless frames until a usable position is reached
+		Not recommended: doubtful anyone would want to supply such a flag.
+		Only meaningful in conjunction with D3.
+	5. prepared to return empty frames until a usable position is reached
+		Not recommended.  Requires some meaningful "empty" frame to be supplied: probably from the decoder.  For video this would probably be a black colored frame (in whatever colorspace you are in).  For audio this would probably be silence.  Advantage: no work for app.  Disadvantages: work for decoder, no way for app to know that this isn't the "real" frame.
+	6. prepared to return non-frames until a usable position is reached
+		Suggested for efficiency.  Requires some sort of flag to be returned.  Could be implemented by a status_t (B_EMPTY_FRAME or B_EMPTY_FRAMES) which would be returned from a subsequent call to ReadFrames()
+		Only meaningful in conjunction with D3.
+
+G. How much information must be reliable after the seek?
+	1. the current frame
+	2. the current time
+	3. the current percentage
+	4. the current chunk
+	5. track's discretion
+
+"<marcus_o> B_MEDIA_SEEK_LAZY -> resulting seek is inaccourate, timing information might be wrong after doing it, but it's very fast way to seek in files
+<marcus_o> used for display purposes, when you want to seek to about 85% of a MPEG video or something similar"
+
+H. What should be done about other tracks that are also from the same source as this track?
+	1. do nothing
+		Currently supported by suppling no seek flags.
+	2. seek the open tracks to whatever time this track ends up at
+		Suggested for convenience, efficiency.  The track would seek itself first and then seek the other open tracks to the resulting position.
+	3. seek all other tracks to whatever time this track ends up at
+		Not recommended: may be uselessly costly if there are a lot of nonopen tracks.	
+	4. seek the open tracks to the same time
+		Not recommended: this is just asking for trouble and if someone wants to do this then can simply loop over all the tracks.
+	5. seek all other tracks to the same time
+		Not recommended: this is just asking for trouble and maybe very costly if there are a lot of nonopen tracks
+
+"<marcus_o> B_MEDIA_SEEK_ALL_TRACKS -> seeks all tracks (audio and video) that belong to the file that this track belongs to
+<marcus_o> makes sure you can seek a file without introducing loss of sync betewwn audio/video/subtitles, whatever"
+
+============================
+
+Andrew Bachmann's proposal:
+
+A: provide all by another parameter on each seek function.  use the posix SEEK_SET, SEEK_CUR, SEEK_END
+
+B: use the sign of the first parameter (+=forward, -=backward)
+
+C: provide all by adding two new functions:
+SeekToChunk(int64 * ioChunk, media_seek_type flags)
+	same as calling ReadChunk for ioChunk times.  not sure the flags are necessary.
+SeekToPercentage(int64 * ioNumerator, media_seek_type flags)
+	similar to SeekToTime(Duration()*(ioNumerator/MAX_INT64),flags) or
+	SeekToFrame(CountFrames()*(ioNumerator/MAX_INT64),flags) but
+	possibly much more efficient
+
+D: provide all by using new seek bits
+   supplying no bits is the same as supplying all bits (ANY)
+   ANY = IMMEDIATE | SLOW | IGNORE
+    B_MEDIA_SEEK_DECODABILITY_ANY       (per D0)
+    B_MEDIA_SEEK_DECODABILITY_IMMEDIATE (per D1)
+    B_MEDIA_SEEK_DECODABILITY_SLOW      (per D2)
+    B_MEDIA_SEEK_DECODABILITY_IGNORE    (per D3)
+
+E: provide all by using the existing seek bits + new bit
+   supplying no bits is the same as suppling all bits (ANY)
+   ANY = BACKWARD | FORWARD | NEAREST
+   B_MEDIA_SEEK_DIRECTION_ANY           (per E0)
+   B_MEDIA_SEEK_CLOSEST_BACKWARD        (per E1)
+   B_MEDIA_SEEK_CLOSEST_FORWARD         (per E2)
+   B_MEDIA_SEEK_DIRECTION_NEAREST       (per E3)
+   
+F: support F3 and F6
+   if B_MEDIA_SEEK_DECODABILITY_IMMEDIATE or B_MEDIA_SEEK_DECODABILITY_SLOW
+      then the decoder should be ready. (we want meaningful frames)
+   if B_MEDIA_SEEK_DECODABILITY_IGNORE
+      then if the decoder is not ready
+             ReadFrames() will return B_EMPTY_FRAMES until it is ready.
+
+G: provide all by using new seek bits
+   supplying no bits means is the same as suppling NOTHING
+   ALL = FRAME | TIME | PERCENTAGE | CHUNK
+   B_MEDIA_SEEK_CURRENT_NOTHING 
+   B_MEDIA_SEEK_CURRENT_FRAME      (H1)
+   B_MEDIA_SEEK_CURRENT_TIME       (H2)
+   B_MEDIA_SEEK_CURRENT_PERCENTAGE (H3)
+   B_MEDIA_SEEK_CURRENT_CHUNK      (H4)
+   B_MEDIA_SEEK_CURRENT_ALL
+
+H: support H1 and H2 by using a new seek bit
+   supplying no bits means don't seek open tracks
+   B_MEDIA_SEEK_SYNC_OPEN_TRACKS (per G2)
+
