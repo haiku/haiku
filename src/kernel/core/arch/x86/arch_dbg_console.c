@@ -26,7 +26,9 @@
 
 static const int dbg_baud_rate = 115200;
 
-int arch_dbg_con_init(kernel_args *ka)
+
+int
+arch_dbg_con_init(kernel_args *ka)
 {
 	short divisor = 115200 / dbg_baud_rate;
 
@@ -45,7 +47,9 @@ int arch_dbg_con_init(kernel_args *ka)
 	return 0;
 }
 
-char arch_dbg_con_read(void)
+
+char
+arch_dbg_con_read(void)
 {
 #if BOCHS_DEBUG_HACK
 	/* polling the keyboard, similar to code in keyboard
@@ -102,7 +106,9 @@ char arch_dbg_con_read(void)
 #endif
 }
 
-static void _arch_dbg_con_putch(const char c)
+
+static void
+_arch_dbg_con_putch(const char c)
 {
 #if BOCHS_DEBUG_HACK
 	out8(c, 0xe9);
@@ -120,7 +126,9 @@ static void _arch_dbg_con_putch(const char c)
 #endif
 }
 
-char arch_dbg_con_putch(const char c)
+
+char
+arch_dbg_con_putch(const char c)
 {
 	if (c == '\n') {
 		_arch_dbg_con_putch('\r');
@@ -131,9 +139,11 @@ char arch_dbg_con_putch(const char c)
 	return c;
 }
 
-void arch_dbg_con_puts(const char *s)
+
+void
+arch_dbg_con_puts(const char *s)
 {
-	while(*s != '\0') {
+	while (*s != '\0') {
 		arch_dbg_con_putch(*s);
 		s++;
 	}
