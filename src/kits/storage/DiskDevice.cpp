@@ -3,7 +3,12 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <new.h>
+
 #include <DiskDevice.h>
+#include <Message.h>
+#include <Partition.h>
+#include <Session.h>
 
 /*!	\class BDiskDevice
 	\brief A BDiskDevice object represents a storage device.
@@ -13,7 +18,18 @@
 /*!	\brief Creates an uninitialized BDiskDevice object.
 */
 BDiskDevice::BDiskDevice()
+	: fSessions(10, true),
+	  fUniqueID(-1),
+	  fChangeCounter(0),
+	  fMediaStatus(B_ERROR),
+	  fSize(0),
+	  fBlockSize(0),
+	  fType(0),
+	  fReadOnly(false),
+	  fRemovable(false)//,
+//	  fIsFloppy(false)
 {
+	fPath[0] = '\0';
 }
 
 // destructor
@@ -23,6 +39,23 @@ BDiskDevice::~BDiskDevice()
 {
 }
 
+// Unset
+void
+BDiskDevice::Unset()
+{
+	fSessions.MakeEmpty();
+	fUniqueID = -1;
+	fChangeCounter = 0;
+	fMediaStatus = B_ERROR;
+	fSize = 0;
+	fBlockSize = 0;
+	fType = 0;
+	fReadOnly = false;
+	fRemovable = false;
+//	fIsFloppy = false;
+	fPath[0] = '\0';
+}
+
 // Size
 /*!	\brief Returns the size of the device.
 	\return The size of the device in bytes.
@@ -30,7 +63,7 @@ BDiskDevice::~BDiskDevice()
 off_t
 BDiskDevice::Size() const
 {
-	return 0;	// not implemented
+	return fSize;
 }
 
 // BlockSize
@@ -40,7 +73,7 @@ BDiskDevice::Size() const
 int32
 BDiskDevice::BlockSize() const
 {
-	return 0;	// not implemented
+	return fBlockSize;
 }
 
 // CountSessions
@@ -50,7 +83,7 @@ BDiskDevice::BlockSize() const
 int32
 BDiskDevice::CountSessions() const
 {
-	return 0;	// not implemented
+	return fSessions.CountItems();
 }
 
 // SessionAt
@@ -62,7 +95,7 @@ BDiskDevice::CountSessions() const
 BSession *
 BDiskDevice::SessionAt(int32 index) const
 {
-	return NULL;	// not implemented
+	return fSessions.ItemAt(index);
 }
 
 // CountPartitions
@@ -72,17 +105,20 @@ BDiskDevice::SessionAt(int32 index) const
 int32
 BDiskDevice::CountPartitions() const
 {
-	return 0;	// not implemented
+	int32 count = 0;
+	for (int32 i = 0; BSession *session = SessionAt(i); i++)
+		count += session->CountPartitions();
+	return count;
 }
 
-// DevicePath
+// Path
 /*!	\brief Returns the path to the device.
 	\return The path to the device.
 */
 const char *
-BDiskDevice::DevicePath() const
+BDiskDevice::Path() const
 {
-	return NULL;	// not implemented
+	return (fPath[0] != '\0' ? fPath : NULL);
 }
 
 // GetName
@@ -102,6 +138,7 @@ BDiskDevice::DevicePath() const
 void
 BDiskDevice::GetName(BString *name, bool includeBusID, bool includeLUN) const
 {
+	// not implemented
 }
 
 // GetName
@@ -121,6 +158,7 @@ BDiskDevice::GetName(BString *name, bool includeBusID, bool includeLUN) const
 void
 BDiskDevice::GetName(char *name, bool includeBusID, bool includeLUN) const
 {
+	// not implemented
 }
 
 // IsReadOnly
@@ -130,7 +168,7 @@ BDiskDevice::GetName(char *name, bool includeBusID, bool includeLUN) const
 bool
 BDiskDevice::IsReadOnly() const
 {
-	return false;	// not implemented
+	return fReadOnly;
 }
 
 // IsRemovable
@@ -140,7 +178,7 @@ BDiskDevice::IsReadOnly() const
 bool
 BDiskDevice::IsRemovable() const
 {
-	return false;	// not implemented
+	return fRemovable;
 }
 
 // HasMedia
@@ -150,7 +188,7 @@ BDiskDevice::IsRemovable() const
 bool
 BDiskDevice::HasMedia() const
 {
-	return false;	// not implemented
+	return (fMediaStatus == B_OK);
 }
 
 // IsFloppy
@@ -160,7 +198,7 @@ BDiskDevice::HasMedia() const
 bool
 BDiskDevice::IsFloppy() const
 {
-	return false;	// not implemented
+	return !strcmp(fPath, "/dev/disk/floppy/raw");
 }
 
 // Type
@@ -183,7 +221,7 @@ BDiskDevice::IsFloppy() const
 uint8
 BDiskDevice::Type() const
 {
-	return 0;	// not implemented
+	return fType;
 }
 
 // UniqueID
@@ -199,7 +237,7 @@ BDiskDevice::Type() const
 int32
 BDiskDevice::UniqueID() const
 {
-	return -1;	// not implemented
+	return fUniqueID;
 }
 
 // Eject
@@ -309,5 +347,90 @@ BDiskDevice &
 BDiskDevice::operator=(const BDiskDevice &)
 {
 	return *this;
+}
+
+// find_string
+static
+status_t
+find_string(BMessage *message, const char *name, char *buffer)
+{
+	const char *str;
+	status_t error = message->FindString(name, &str);
+	if (error != B_OK)
+		strcpy(buffer, str);
+	return error;
+}
+
+// _Unarchive
+status_t
+BDiskDevice::_Unarchive(BMessage *archive)
+{
+	Unset();
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// ID and change counter
+		if (error == B_OK)
+			error = archive->FindInt32("id", &fUniqueID);
+		if (error == B_OK)
+			error = archive->FindInt32("change_counter", &fChangeCounter);
+		// geometry
+		if (error == B_OK)
+			error = archive->FindInt64("size", &fSize);
+		if (error == B_OK)
+			error = archive->FindInt32("block_size", &fBlockSize);
+		if (error == B_OK)
+			error = archive->FindInt8("type", (int8*)&fType);
+		if (error == B_OK)
+			error = archive->FindBool("removable", &fRemovable);
+		if (error == B_OK)
+			error = archive->FindBool("read_only", fReadOnly);
+//		if (error == B_OK)
+//			error = archive->FindBool("write_once", fGeometry.write_once);
+		// other data
+		if (error == B_OK)
+			error = find_string(archive, "path", fPath);
+		if (error == B_OK)
+			error = archive->FindInt32("media_status", &fMediaStatus);
+		// sessions
+		type_code fieldType;
+		int32 count = 0;
+		if (error == B_OK)
+			error = archive->GetInfo("sessions", &fieldType, &count);
+		for (int32 i = 0; error == B_OK && i < count; i++) {
+			// get the archived session
+			BMessage sessionArchive;
+			error = archive->FindMessage("sessions", i, &sessionArchive);
+			// allocate a session object
+			BSession *session = NULL;
+			if (error == B_OK) {
+				session = new(nothrow) BSession;
+				if (!session)
+					error = B_NO_MEMORY;
+			}
+			// unarchive the session
+			if (error == B_OK)
+				error = session->_Unarchive(&sessionArchive);
+			// add the session
+			if (error == B_OK && !_AddSession(session))
+				error = B_NO_MEMORY;
+			// cleanup on error
+			if (error != B_OK && session)
+				delete session;
+		}
+	}
+	// cleanup on error
+	if (error != B_OK)
+		Unset();
+	return error;
+}
+
+// _AddSession
+bool
+BDiskDevice::_AddSession(BSession *session)
+{
+	bool result = fSessions.AddItem(session);
+	if (result)
+		session->_SetDevice(this);
+	return result;
 }
 

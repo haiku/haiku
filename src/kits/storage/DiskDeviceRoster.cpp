@@ -3,7 +3,14 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <new.h>
+
 #include <DiskDeviceRoster.h>
+#include <DiskDevice.h>
+#include <Message.h>
+#include <Partition.h>
+#include <RegistrarDefs.h>
+#include <Session.h>
 
 /*!	\class BDiskDeviceRoster
 	\brief An interface for iterating through the disk devices known to the
@@ -17,7 +24,15 @@
 	The object is ready to be used after construction.
 */
 BDiskDeviceRoster::BDiskDeviceRoster()
+	: fManager(),
+	  fCookie(0)
 {
+	BMessage request(B_REG_GET_DISK_DEVICE_MESSENGER);
+	BMessage reply;
+	if (_send_to_roster_(&request, &reply, false) == B_OK
+		&& reply.what == B_REG_SUCCESS) {
+		reply.FindMessenger("messenger", &fManager);
+	}
 }
 
 // destructor
@@ -40,7 +55,33 @@ BDiskDeviceRoster::~BDiskDeviceRoster()
 status_t
 BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 {
-	return B_ERROR;	// not implemented
+	status_t error = (device ? B_OK : B_BAD_VALUE);
+	// compose request message
+	BMessage request(B_REG_NEXT_DISK_DEVICE);
+	if (error == B_OK)
+		error = request.AddInt32("cookie", fCookie);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = fManager.SendMessage(&request, &reply);
+	// analyze reply
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+		// cookie
+		if (error == B_OK)
+			error = reply.FindInt32("cookie", &fCookie);
+		// device
+		BMessage archive;
+		if (error == B_OK)
+			error = reply.FindMessage("device", &archive);
+		if (error == B_OK)
+			error = device->_Unarchive(&archive);
+	}
+	return error;
 }
 
 // Rewind
@@ -50,7 +91,8 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 status_t
 BDiskDeviceRoster::Rewind()
 {
-	return B_ERROR;	// not implemented
+	fCookie = 0;
+	return B_OK;
 }
 
 // VisitEachDevice

@@ -4,6 +4,11 @@
 //---------------------------------------------------------------------
 
 #include <Partition.h>
+#include <DiskDevice.h>
+#include <Message.h>
+#include <Mime.h>
+#include <Session.h>
+#include <Volume.h>
 
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
@@ -15,6 +20,13 @@
 	(\see IsEmpty()).
 */
 
+// destructor
+/*!	\brief Frees all resources associated with this object.
+*/
+BPartition::~BPartition()
+{
+}
+
 // Session
 /*!	\brief Returns the session this partition resides on.
 	\return The session this partition resides on.
@@ -22,7 +34,7 @@
 BSession *
 BPartition::Session() const
 {
-	return NULL;	// not implemented
+	return fSession;
 }
 
 // Device
@@ -32,7 +44,7 @@ BPartition::Session() const
 BDiskDevice *
 BPartition::Device() const
 {
-	return NULL;	// not implemented
+	return (fSession ? fSession->Device() : NULL);
 }
 
 // Offset
@@ -44,7 +56,7 @@ BPartition::Device() const
 off_t
 BPartition::Offset() const
 {
-	return 0;	// not implemented
+	return fInfo.info.offset;
 }
 
 // Size
@@ -54,7 +66,7 @@ BPartition::Offset() const
 off_t
 BPartition::Size() const
 {
-	return 0;	// not implemented
+	return fInfo.info.size;
 }
 
 // BlockSize
@@ -64,7 +76,7 @@ BPartition::Size() const
 int32
 BPartition::BlockSize() const
 {
-	return 0;	// not implemented
+	return (fSession ? fSession->BlockSize() : 0);
 }
 
 // Index
@@ -75,7 +87,7 @@ BPartition::BlockSize() const
 int32
 BPartition::Index() const
 {
-	return -1;	// not implemented
+	return fIndex;
 }
 
 // Flags
@@ -95,7 +107,7 @@ BPartition::Index() const
 uint32
 BPartition::Flags() const
 {
-	return 0;	// not implemented
+	return fInfo.flags;
 }
 
 // IsHidden
@@ -107,7 +119,7 @@ BPartition::Flags() const
 bool
 BPartition::IsHidden() const
 {
-	return false;	// not implemented
+	return (fInfo.flags & B_HIDDEN_PARTITION);
 }
 
 // IsVirtual
@@ -119,7 +131,7 @@ BPartition::IsHidden() const
 bool
 BPartition::IsVirtual() const
 {
-	return false;	// not implemented
+	return (fInfo.flags & B_VIRTUAL_PARTITION);
 }
 
 // IsEmpty
@@ -130,7 +142,7 @@ BPartition::IsVirtual() const
 bool
 BPartition::IsEmpty() const
 {
-	return false;	// not implemented
+	return (fInfo.flags & B_EMPTY_PARTITION);
 }
 
 // ContainsFileSystem
@@ -142,7 +154,7 @@ BPartition::IsEmpty() const
 bool
 BPartition::ContainsFileSystem() const
 {
-	return false;	// not implemented
+	return (fInfo.file_system_short_name[0] != '\0');
 }
 
 // Name
@@ -157,7 +169,7 @@ BPartition::ContainsFileSystem() const
 const char *
 BPartition::Name() const
 {
-	return NULL;	// not implemented
+	return (fInfo.partition_name[0] != '\0' ? fInfo.partition_name : NULL);
 }
 
 // Type
@@ -167,7 +179,7 @@ BPartition::Name() const
 const char *
 BPartition::Type() const
 {
-	return NULL;	// not implemented
+	return fInfo.partition_type;
 }
 
 // FileSystemShortName
@@ -183,7 +195,7 @@ BPartition::Type() const
 const char *
 BPartition::FileSystemShortName() const
 {
-	return NULL;	// not implemented
+	return (ContainsFileSystem() ? fInfo.file_system_short_name : NULL);
 }
 
 // FileSystemLongName
@@ -199,7 +211,7 @@ BPartition::FileSystemShortName() const
 const char *
 BPartition::FileSystemLongName() const
 {
-	return NULL;	// not implemented
+	return (ContainsFileSystem() ? fInfo.file_system_long_name : NULL);
 }
 
 // VolumeName
@@ -214,7 +226,7 @@ BPartition::FileSystemLongName() const
 const char *
 BPartition::VolumeName() const
 {
-	return NULL;	// not implemented
+	return (ContainsFileSystem() ? fInfo.volume_name : NULL);
 }
 
 // FileSystemFlags
@@ -236,7 +248,7 @@ BPartition::VolumeName() const
 uint32
 BPartition::FileSystemFlags() const
 {
-	return 0;	// not implemented
+	return fInfo.file_system_flags;
 }
 
 // IsMounted
@@ -246,7 +258,7 @@ BPartition::FileSystemFlags() const
 bool
 BPartition::IsMounted() const
 {
-	return false;	// not implemented
+	return (fVolumeID >= 0);
 }
 
 // UniqueID
@@ -262,7 +274,7 @@ BPartition::IsMounted() const
 int32
 BPartition::UniqueID() const
 {
-	return 0;	// not implemented
+	return fUniqueID;
 }
 
 // GetVolume
@@ -278,7 +290,10 @@ BPartition::UniqueID() const
 status_t
 BPartition::GetVolume(BVolume *volume) const
 {
-	return B_ERROR;	// not implemented
+	status_t error = (volume ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = volume->SetTo(fVolumeID);
+	return error;
 }
 
 // GetIcon
@@ -297,7 +312,25 @@ BPartition::GetVolume(BVolume *volume) const
 status_t
 BPartition::GetIcon(BBitmap *icon, icon_size which) const
 {
-	return B_ERROR;	// not implemented
+	status_t error = (icon ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		if (IsMounted()) {
+			// mounted: get the icon from the volume
+			BVolume volume;
+			error = GetVolume(&volume);
+			if (error == B_OK)
+				error = volume.GetIcon(icon, which);
+		} else {
+			// not mounted: retrieve the icon ourselves
+			if (BDiskDevice *device = Device()) {
+				// get the icon
+				if (error == B_OK)
+					error = get_device_icon(device->Path(), icon, which);
+			} else 
+				error = B_ERROR;
+		}
+	}
+	return error;
 }
 
 // Mount
@@ -438,20 +471,27 @@ BPartition::GetFileSystemList(BObjectList<BString> *list)
 /*!	\brief Creates an uninitialized BPartition object.
 */
 BPartition::BPartition()
+	: fSession(NULL),
+	  fUniqueID(-1),
+	  fChangeCounter(0),
+	  fIndex(-1),
+	  fVolumeID(-1)
 {
+	fInfo.info.offset = 0;
+	fInfo.info.size = 0;
+	fInfo.flags = 0;
+	fInfo.partition_name[0] = '\0';
+	fInfo.partition_type[0] = '\0';
+	fInfo.file_system_short_name[0] = '\0';
+	fInfo.file_system_long_name[0] = '\0';
+	fInfo.volume_name[0] = '\0';
+	fInfo.file_system_flags = 0;
 }
 
 // constructor
 /*!	\brief Privatized copy constructor to avoid usage.
 */
 BPartition::BPartition(const BPartition &)
-{
-}
-
-// destructor
-/*!	\brief Frees all resources associated with this object.
-*/
-BPartition::~BPartition()
 {
 }
 
@@ -462,5 +502,96 @@ BPartition &
 BPartition::operator=(const BPartition &)
 {
 	return *this;
+}
+
+// _Unset
+void
+BPartition::_Unset()
+{
+	fSession = NULL;
+	fUniqueID = -1;
+	fChangeCounter = 0;
+	fIndex = -1;
+	fInfo.info.offset = 0;
+	fInfo.info.size = 0;
+	fInfo.flags = 0;
+	fInfo.partition_name[0] = '\0';
+	fInfo.partition_type[0] = '\0';
+	fInfo.file_system_short_name[0] = '\0';
+	fInfo.file_system_long_name[0] = '\0';
+	fInfo.volume_name[0] = '\0';
+	fInfo.file_system_flags = 0;
+	fVolumeID = -1;
+}
+
+// find_string
+static
+status_t
+find_string(BMessage *message, const char *name, char *buffer)
+{
+	const char *str;
+	status_t error = message->FindString(name, &str);
+	if (error != B_OK)
+		strcpy(buffer, str);
+	return error;
+}
+
+// _Unarchive
+status_t
+BPartition::_Unarchive(BMessage *archive)
+{
+	_Unset();
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// ID, change counter and index
+		if (error == B_OK)
+			error = archive->FindInt32("id", &fUniqueID);
+		if (error == B_OK)
+			error = archive->FindInt32("change_counter", &fChangeCounter);
+		if (error == B_OK)
+			error = archive->FindInt32("index", &fIndex);
+		// fInfo.info.*
+		if (error == B_OK)
+			error = archive->FindInt64("offset", &fInfo.info.offset);
+		if (error == B_OK)
+			error = archive->FindInt64("size", &fInfo.info.size);
+		// fInfo.*
+		if (error == B_OK)
+			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
+		if (error == B_OK)
+			error = find_string(archive, "name", fInfo.partition_name);
+		if (error == B_OK)
+			error = find_string(archive, "type", fInfo.partition_type);
+		if (error == B_OK) {
+			error = find_string(archive, "fs_short_name",
+								fInfo.file_system_short_name);
+		}
+		if (error == B_OK) {
+			error = find_string(archive, "fs_long_name",
+								fInfo.file_system_long_name);
+		}
+		if (error == B_OK)
+			error = find_string(archive, "volume_name", fInfo.volume_name);
+		if (error == B_OK) {
+			error = archive->FindInt32("fs_flags",
+									   (int32*)&fInfo.file_system_flags);
+		}
+		// dev_t, if mounted
+		if (error == B_OK) {
+			if (archive->FindInt32("volume_id", &fVolumeID) != B_OK)
+				fVolumeID = -1;
+		}
+	}
+	// cleanup on error
+	if (error != B_OK)
+		_Unset();
+	return error;
+}
+
+// _SetSession
+void
+BPartition::_SetSession(BSession *session)
+{
+	fSession = session;
 }
 

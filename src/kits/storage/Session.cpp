@@ -3,7 +3,12 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <new.h>
+
 #include <Session.h>
+#include <DiskDevice.h>
+#include <Message.h>
+#include <Partition.h>
 
 /*!	\class BSession
 	\brief A BSession object represent a session and provides a lot of
@@ -19,6 +24,13 @@
 */
 const char *B_INTEL_PARTITIONING = "intel";
 
+// destructor
+/*!	\brief Frees all resources associated with this object.
+*/
+BSession::~BSession()
+{
+}
+
 // Device
 /*!	\brief Returns the device this session resides on.
 	\return The device this session resides on.
@@ -26,7 +38,7 @@ const char *B_INTEL_PARTITIONING = "intel";
 BDiskDevice *
 BSession::Device() const
 {
-	return NULL;	// not implemented
+	return fDevice;
 }
 
 // Offset
@@ -38,7 +50,7 @@ BSession::Device() const
 off_t
 BSession::Offset() const
 {
-	return 0;	// not implemented
+	return fInfo.offset;
 }
 
 // Size
@@ -48,7 +60,17 @@ BSession::Offset() const
 off_t
 BSession::Size() const
 {
-	return 0;	// not implemented
+	return fInfo.offset;
+}
+
+// BlockSize
+/*!	\brief Returns the block size of the device.
+	\return The block size of the device in bytes.
+*/
+int32
+BSession::BlockSize() const
+{
+	return (fDevice ? fDevice->BlockSize() : 0);
 }
 
 // CountPartitions
@@ -58,7 +80,7 @@ BSession::Size() const
 int32
 BSession::CountPartitions() const
 {
-	return 0;	// not implemented
+	return fPartitions.CountItems();
 }
 
 // PartitionAt
@@ -70,7 +92,7 @@ BSession::CountPartitions() const
 BPartition *
 BSession::PartitionAt(int32 index) const
 {
-	return NULL;	// not implemented
+	return fPartitions.ItemAt(index);
 }
 
 // Index
@@ -80,7 +102,7 @@ BSession::PartitionAt(int32 index) const
 int32
 BSession::Index() const
 {
-	return -1;	// not implemented
+	return fIndex;
 }
 
 // Flags
@@ -97,7 +119,7 @@ BSession::Index() const
 uint32
 BSession::Flags() const
 {
-	return 0;	// not implemented
+	return fInfo.flags;
 }
 
 // IsAudio
@@ -107,7 +129,7 @@ BSession::Flags() const
 bool
 BSession::IsAudio() const
 {
-	return false;	// not implemented
+	return !IsData();
 }
 
 // IsData
@@ -117,7 +139,7 @@ BSession::IsAudio() const
 bool
 BSession::IsData() const
 {
-	return false;	// not implemented
+	return (fInfo.flags & B_DATA_SESSION);
 }
 
 // IsVirtual
@@ -129,7 +151,7 @@ BSession::IsData() const
 bool
 BSession::IsVirtual() const
 {
-	return false;	// not implemented
+	return (fInfo.flags & B_VIRTUAL_SESSION);
 }
 
 // PartitioningSystem
@@ -144,7 +166,8 @@ BSession::IsVirtual() const
 const char *
 BSession::PartitioningSystem() const
 {
-	return NULL;	// not implemented
+	return (fPartitioningSystem.Length() > 0
+			? fPartitioningSystem.String() : NULL);
 }
 
 // UniqueID
@@ -160,7 +183,7 @@ BSession::PartitioningSystem() const
 int32
 BSession::UniqueID() const
 {
-	return 0;	// not implemented
+	return fUniqueID;
 }
 
 // VisitEachPartition
@@ -286,14 +309,16 @@ BSession::GetPartitioningSystemList(BObjectList<BString> *list)
 /*!	\brief Creates an uninitialized BSession object.
 */
 BSession::BSession()
+	: fDevice(NULL),
+	  fPartitions(10, true),
+	  fUniqueID(-1),
+	  fChangeCounter(0),
+	  fIndex(-1),
+	  fPartitioningSystem()
 {
-}
-
-// destructor
-/*!	\brief Frees all resources associated with this object.
-*/
-BSession::~BSession()
-{
+	fInfo.offset = 0;
+	fInfo.size = 0;
+	fInfo.flags = 0;
 }
 
 // copy constructor
@@ -309,6 +334,95 @@ BSession::BSession(const BSession &)
 BSession &
 BSession::operator=(const BSession &)
 {
-	return *this;	// not implemented
+	return *this;
+}
+
+// _Unset
+void
+BSession::_Unset()
+{
+	fDevice = NULL;
+	fPartitions.MakeEmpty();
+	fUniqueID = -1;
+	fChangeCounter = 0;
+	fIndex = -1;
+	fInfo.offset = 0;
+	fInfo.size = 0;
+	fInfo.flags = 0;
+	fPartitioningSystem.SetTo("");
+}
+
+// _Unarchive
+status_t
+BSession::_Unarchive(BMessage *archive)
+{
+	_Unset();
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// ID, change counter and index
+		if (error == B_OK)
+			error = archive->FindInt32("id", &fUniqueID);
+		if (error == B_OK)
+			error = archive->FindInt32("change_counter", &fChangeCounter);
+		if (error == B_OK)
+			error = archive->FindInt32("index", &fIndex);
+		// fInfo.*
+		if (error == B_OK)
+			error = archive->FindInt64("offset", &fInfo.offset);
+		if (error == B_OK)
+			error = archive->FindInt64("size", &fInfo.size);
+		if (error == B_OK)
+			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
+		// other data
+		if (error == B_OK)
+			error = archive->FindString("partitioning", &fPartitioningSystem);
+		// partitions
+		type_code fieldType;
+		int32 count = 0;
+		if (error == B_OK)
+			error = archive->GetInfo("partitions", &fieldType, &count);
+		for (int32 i = 0; error == B_OK && i < count; i++) {
+			// get the archived partitions
+			BMessage partitionArchive;
+			error = archive->FindMessage("partitions", i, &partitionArchive);
+			// allocate a partition object
+			BPartition *partition = NULL;
+			if (error == B_OK) {
+				partition = new(nothrow) BPartition;
+				if (!partition)
+					error = B_NO_MEMORY;
+			}
+			// unarchive the partition
+			if (error == B_OK)
+				error = partition->_Unarchive(&partitionArchive);
+			// add the partition
+			if (error == B_OK && !_AddPartition(partition))
+				error = B_NO_MEMORY;
+			// cleanup on error
+			if (error != B_OK && partition)
+				delete partition;
+		}
+	}
+	// cleanup on error
+	if (error != B_OK)
+		_Unset();
+	return error;
+}
+
+// _SetDevice
+void
+BSession::_SetDevice(BDiskDevice *device)
+{
+	fDevice = device;
+}
+
+// _AddPartition
+bool
+BSession::_AddPartition(BPartition *partition)
+{
+	bool result = fPartitions.AddItem(partition);
+	if (result)
+		partition->_SetSession(this);
+	return result;
 }
 
