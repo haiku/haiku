@@ -1168,6 +1168,9 @@ load_kernel_add_on(const char *path)
 	struct Elf32_Phdr *pheaders;
 	struct elf_image_info *image;
 	void *vnode = NULL;
+	void *reservedAddress;
+	addr_t start;
+	size_t reservedSize;
 	int fd;
 	int err;
 	int i;
@@ -1244,8 +1247,26 @@ load_kernel_add_on(const char *path)
 		goto error3;
 	}
 
+	// determine how much space we need for all loaded segments
+
+	reservedSize = 0;
+
 	for (i = 0; i < eheader->e_phnum; i++) {
-		char region_name[64];
+		if (pheaders[i].p_type != PT_LOAD)
+			continue;
+
+		reservedSize += ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+	}
+
+	// reserve that space and allocate the areas from that one
+	if (vm_reserve_address_range(vm_get_kernel_aspace_id(), &reservedAddress,
+			B_ANY_KERNEL_ADDRESS, reservedSize) < B_OK)
+		goto error3;
+
+	start = (addr_t)reservedAddress;
+
+	for (i = 0; i < eheader->e_phnum; i++) {
+		char regionName[B_OS_NAME_LENGTH];
 		int image_region;
 		int protection;
 
@@ -1272,7 +1293,7 @@ load_kernel_add_on(const char *path)
 			rw_segment_handled = true;
 			image_region = 1;
 			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-			sprintf(region_name, "%s_data", path);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", path);
 		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
 			// this is the non-writable segment
 			if (ro_segment_handled) {
@@ -1286,22 +1307,26 @@ load_kernel_add_on(const char *path)
 				// so it has to be writeable at this point;
 				// ToDo: we should change the area protection later.
 
-			sprintf(region_name, "%s_text", path);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", path);
 		} else {
 			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
 			continue;
 		}
 
+		// ToDo: this won't work if the on-disk order of the sections doesn't
+		//		fit the in-memory order...
+		image->regions[image_region].start = start;
 		image->regions[image_region].size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
-		image->regions[image_region].id = create_area(region_name,
-			(void **)&image->regions[image_region].start, B_ANY_KERNEL_ADDRESS,
+		image->regions[image_region].id = create_area(regionName,
+			(void **)&image->regions[image_region].start, B_EXACT_ADDRESS,
 			image->regions[image_region].size, B_FULL_LOCK, protection);
 		if (image->regions[image_region].id < 0) {
 			dprintf("error allocating region!\n");
 			err = B_NOT_AN_EXECUTABLE;
-			goto error3;
+			goto error4;
 		}
 		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
+		start += image->regions[image_region].size;
 
 		TRACE(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
 
@@ -1311,16 +1336,16 @@ load_kernel_add_on(const char *path)
 		if (len < 0) {
 			err = len;
 			dprintf("error reading in seg %d\n", i);
-			goto error4;
+			goto error5;
 		}
 	}
 
 	if (image->regions[1].start != 0
 		&& image->regions[0].delta != image->regions[1].delta) {
-		dprintf("could not load binary, fix the region problem!\n");
+		dprintf("deltas do not match!\n");
 		dump_image_info(image);
-		err = B_NO_MEMORY;
-		goto error4;
+		err = B_ERROR;
+		goto error5;
 	}
 
 	// modify the dynamic ptr by the delta of the regions
@@ -1328,11 +1353,11 @@ load_kernel_add_on(const char *path)
 
 	err = elf_parse_dynamic_section(image);
 	if (err < 0)
-		goto error4;
+		goto error5;
 
 	err = elf_relocate(image, "");
 	if (err < 0)
-		goto error4;
+		goto error5;
 
 	err = 0;
 
@@ -1350,11 +1375,13 @@ done:
 	
 	return image->id;
 
-error4:
+error5:
 	if (image->regions[1].id >= 0)
 		delete_area(image->regions[1].id);
 	if (image->regions[0].id >= 0)
 		delete_area(image->regions[0].id);
+error4:
+	vm_unreserve_address_range(vm_get_kernel_aspace_id(), reservedAddress, reservedSize);
 error3:
 	free(pheaders);
 error2:
