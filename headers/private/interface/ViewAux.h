@@ -42,7 +42,12 @@ enum {
 	B_VIEW_EVMASK_BIT			= 0x00004000
 };
 
-struct _view_attr_{
+
+//struct _view_attr_{
+class ViewAttr
+{
+public:
+			ViewAttr(void);
 			BFont				font;
 			uint16				fontFlags;
 
