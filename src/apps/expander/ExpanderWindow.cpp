@@ -399,7 +399,7 @@ ExpanderWindow::RefsReceived(BMessage *msg)
 			fSourceChanged = true;
 			fSourceRef = ref;
 			fSourceText->SetText(path.Path());
-			if (destination_folder==0x63 && strcmp(fDestText->Text(), "")==0) {
+			if (destination_folder==0x63) {
 				BPath parent;
 				path.GetParent(&parent);
 				fDestText->SetText(parent.Path());
@@ -410,9 +410,14 @@ ExpanderWindow::RefsReceived(BMessage *msg)
 				BPath dPath(&dEntry);
 				fDestText->SetText(dPath.Path());
 			}
+			
+			BEntry dEntry(&fDestRef, true);
+			if (dEntry.Exists()) {
+				fExpandButton->SetEnabled(true);
+				fExpandItem->SetEnabled(true);
+			}
+				
 			fShowContents->SetEnabled(true);
-			fExpandButton->SetEnabled(true);
-			fExpandItem->SetEnabled(true);
 			fShowItem->SetEnabled(true);
 			
 			bool fromApp;
@@ -516,7 +521,6 @@ ExpanderWindow::StartListing()
 	}
 	message.AddString("cmd", rule->ListingCmd());
 	message.AddRef("srcRef", &fSourceRef);
-	message.AddRef("destRef", &fDestRef);
 	
 	fShowContents->SetEnabled(true);
 	fSourceItem->SetEnabled(false);
