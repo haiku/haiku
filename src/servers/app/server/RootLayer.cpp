@@ -88,31 +88,10 @@ void RootLayer::Draw(const BRect &r)
 
 	STRACE(("*RootLayer(%s)::Draw(r)\n", GetName()));
 	
-	// NOTE: fMainLock MUST be locked when this method is called
-	if (!fMainLock.IsLocked())
-		printf("\n\n\tWARNING: fMainLock MUST be locked when calling RootLayer::Draw\n\n");
-		
-	// NOTE: desktop->fGeneralLock MUST be locked when this method is called!!!
-	if (!desktop->fGeneralLock.IsLocked())
-		printf("\n\n\tWARNING: desktop->fGeneralLock MUST be locked when calling RootLayer::Draw()\n\n");
-
-	// NOTE: in case you have problems - ActiveWorkspace()->opLock was 
-	// acquired in Workspace::Invalidate()
-
 	RGBColor		c(51,102,152);
+	fDriver->FillRect(r, c);
 
-	fDriver->FillRect(Bounds(), c);
-
-	Workspace	*as = ActiveWorkspace();
-	WinBorder	*wb = NULL;
-	for (wb = as->GoToTopItem(); wb; wb = as->GoToLowerItem())
-	{
-		STRACE(("requesting draw? %s from %s\n", wb->IsHidden()?"NO":"YES", wb->GetName()));
-		if (!(wb->IsHidden()))
-			wb->Draw(wb->Bounds());
-	}
-
-	 STRACE(("#RootLayer(%s)::Draw(r) END\n", GetName()));
+	STRACE(("#RootLayer(%s)::Draw(r) END\n", GetName()));
 
 #ifdef DISPLAYDRIVER_TEST_HACK
 	DisplayDriver	*_driver = fDriver;
@@ -185,6 +164,7 @@ void RootLayer::MoveBy(float x, float y)
 //---------------------------------------------------------------------------
 void RootLayer::ResizeBy(float x, float y)
 {
+	// TODO: implement
 }
 //---------------------------------------------------------------------------
 Layer* RootLayer::VirtualTopChild() const
@@ -505,9 +485,8 @@ void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 	fColumns	= columns;
 	fScreenXResolution	= (int32)(screen[0]->Resolution().x);
 	fScreenYResolution	= (int32)(screen[0]->Resolution().y);
-	
-//	RebuildRegions(Frame());
-//	Invalidate(Frame());
+
+// NOTE: a RebuildFullRegion() followed by FullInvalidate() are required after calling this method!
 }
 //---------------------------------------------------------------------------
 Screen** RootLayer::Screens()
