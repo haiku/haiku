@@ -6,8 +6,7 @@
 #define _KERNEL_DEBUG_H
 
 
-#include <kernel.h>
-#include <arch/smp.h>
+#include <OS.h>
 
 struct kernel_args;
 
@@ -19,7 +18,7 @@ struct kernel_args;
 #	define ASSERT(x) 
 #endif
 
-extern int dbg_register_file[SMP_MAX_CPUS][14];
+extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
 #ifdef __cplusplus

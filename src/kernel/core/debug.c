@@ -10,14 +10,11 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
 #include <debug.h>
 #include <arch/int.h>
 #include <smp.h>
 #include <console.h>
-#include <memheap.h>
 #include <gdb.h>
-#include <Errors.h>
 #include <int.h>
 #include <vm.h>
 
@@ -27,7 +24,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -39,7 +36,7 @@ typedef struct debugger_command {
 	const char *description;
 } debugger_command;
 
-int dbg_register_file[SMP_MAX_CPUS][14];
+int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
 static bool sSerialDebugEnabled = false;
