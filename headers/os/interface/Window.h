@@ -48,8 +48,6 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-//#include <PortLink.h>
-class PortLink;	// tweak for compatibility with our build system --DW
 
 // Local Defines ---------------------------------------------------------------
 
@@ -122,7 +120,7 @@ enum {
 
 //----------------------------------------------------------------
 
-class PortLink;
+class BSession;
 class BButton;
 class BMenuBar;
 class BMenuItem;
@@ -448,7 +446,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 		BView			*top_view;					// used
 		BView			*fFocus;					// used
 		BView			*fLastMouseMovedView;		// used
-		PortLink		*serverLink;				// used
+		BSession		*session;				// used
 		BMenuBar		*fKeyMenuBar;				// used
 		BButton			*fDefaultButton;			// used
 		BList			accelList;					// used
@@ -476,11 +474,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 		BMessageRunner	*fPulseRunner;				// used
 		BRect			fCurrentFrame;
 
-		// dedicated for graphic calls
-		PortLink		*srvGfxLink;				// used
-		uint32			_reserved;
-		
-//		uint32			_reserved[2];	// was 8
+		uint32			_reserved[2];	// was 8
 #if !_PR3_COMPATIBLE_
 		uint32			_more_reserved[4];
 #endif

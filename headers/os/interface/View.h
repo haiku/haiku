@@ -522,6 +522,9 @@ public:
 
 	virtual	void			DrawAfterChildren(BRect r);
 
+		// added by OBOS - DO NOT use this when programming BeOS R5!!!
+			float			Scale();
+
 private:
 
 	friend class BScrollBar;
@@ -531,7 +534,7 @@ private:
 	friend class BShelf;
 	friend class BTabView;
 
-	virtual	void			_ReservedView2();
+//	virtual	void			_ReservedView2();
 	virtual	void			_ReservedView3();
 	virtual	void			_ReservedView4();
 	virtual	void			_ReservedView5();
@@ -556,7 +559,7 @@ private:
 			void		InitData(BRect f, const char* name, uint32 rs, uint32 fl);
 			status_t	ArchiveChildren(BMessage* data, bool deep) const;
 			status_t	UnarchiveChildren(BMessage* data, BWindow* w = NULL);
-			status_t	SetViewImage(const BBitmap* bitmap,BRect srcRect, BRect dstRect,
+			status_t	setViewImage(const BBitmap* bitmap,BRect srcRect, BRect dstRect,
 									 uint32 followFlags, uint32 options);
 			void		BeginPicture_pr(BPicture* a_picture, BRect r);
 			void		SetPattern(pattern pat);
@@ -564,60 +567,68 @@ private:
 			void		DoShape(int32 gr, BShape* shape, pattern p);
 			void		DoPictureClip(BPicture* picture, BPoint where, bool invert,
 									  bool sync);
-			bool		remove_from_list(BView* a_view);
-			bool		remove_self();
+//			bool		removeFromList(BView* a_view);
+			bool		removeSelf();
 			bool		do_owner_check() const;
-			void		set_owner(BWindow* the_owner);
+			void		setOwner(BWindow* the_owner);
 			void		do_activate(int32 state);
 			void		check_lock() const;
 			void		check_lock_no_pick() const;
 			void		movesize(uint32 code, int32 h, int32 v);
 			void		handle_tick();
 			char		*test_area(int32 length);
-			void		remove_comm_array();
+			void		removeCommArray();
 			_array_hdr_	*new_comm_array(int32 cnt);
 			BView		*RealParent() const;
 			void		SetScroller(BScrollBar* sb);
 			void		UnsetScroller(BScrollBar* sb);
 			void		RealScrollTo(BPoint);
-			void		init_cache();
-			void		set_cached_state();
-			void		update_cached_state();
-			void        set_font_state(const BFont* font, uint32 mask);
+			void		initCachedState();
+			void		setCachedState();
+			void		updateCachedState();
+			void        setFontState(const BFont* font, uint16 mask);
 			void		fetch_font();
 			uchar		font_encoding() const;
 			BShelf*		shelf() const;
 			void		set_shelf(BShelf* );
 
+			void		deleteView( BView* aView);
+			bool		do_owner_check_no_pick() const;
+			BView*		findView( const BView* aView, const char* viewName ) const;
+			bool		attachView( BView *aView );
+			bool		addToList( BView *aView, BView *before = NULL);
+			bool		removeFromList();
+			bool		callDetachHooks( BView *aView );			
+
 			int32			server_token;
-			uint32			f_type;
-			float			origin_h;
-			float			origin_v;
-			BWindow*		owner;
-			BView*			parent;
-			BView*			next_sibling;
-			BView*			prev_sibling;
-			BView*			first_child;
+			uint32			fFlags;			// used		// was: f_type
+			float			originX;		// used		// was: origin_h
+			float			originY;		// used		// was: origin_v
+			BWindow*		owner;			// used
+			BView*			parent;			// used
+			BView*			next_sibling;	// used
+			BView*			prev_sibling;	// used
+			BView*			first_child;	// used
 
-			int16 			fShowLevel;
-			bool			top_level_view;
+			int16 			fShowLevel;		// used
+			bool			top_level_view;	// used
 			bool			fNoISInteraction;
-			BPicture*		cpicture;
-			_array_data_*	comm;
+			BPicture*		cpicture;		// used
+			_array_data_*	comm;			// used
 
-			BScrollBar*		fVerScroller;
-			BScrollBar*		fHorScroller;
+			BScrollBar*		fVerScroller;	// used
+			BScrollBar*		fHorScroller;	// used
 			bool			f_is_printing;
-			bool			attached;
+			bool			_unused_bool0;				// was: attached;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
-			_view_attr_*	fPermanentState;
-			_view_attr_*	fState;
-			BRect			fCachedBounds;
-			BShelf*			fShelf;
+			_view_attr_*	fPermanentState;// used
+			_view_attr_*	fState;			// used
+			BRect			fBounds;		// used
+			BShelf*			fShelf;			// used
 			void*			pr_state;
-			uint32			fEventMask;
-			uint32			fEventOptions;
+			uint32			fEventMask;		// used
+			uint32			fEventOptions;	// used
 			uint32			_reserved[4];
 #if !_PR3_COMPATIBLE_
 			uint32			_more_reserved[3];
