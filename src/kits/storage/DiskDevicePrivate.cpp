@@ -22,6 +22,8 @@ PartitionFilterVisitor::PartitionFilterVisitor(BDiskDeviceVisitor *visitor,
 bool
 PartitionFilterVisitor::Visit(BDiskDevice *device)
 {
+	if (fFilter->Filter(device, 0))
+		return fVisitor->Visit(device);
 	return false;
 }
 
