@@ -13,6 +13,14 @@
 #define IS_INVALID_SOURCE(_src)			((_src).port <= 0)
 #define IS_INVALID_DESTINATION(_dest) 	((_dest).port <= 0)
 
+#define NODE_UNREGISTERED_ID	-2
+
 #define ROUND_UP_TO_PAGE(size)			(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
+
+namespace BPrivate { namespace media {
+	extern team_id team;
+} } // BPrivate::media
+
+using namespace BPrivate::media;
 
 #endif
