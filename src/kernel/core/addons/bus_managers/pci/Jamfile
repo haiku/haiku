@@ -9,7 +9,7 @@ KernelLd
 	<$(SOURCE_GRIST)>pci_bus.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:

@@ -6,7 +6,7 @@ KernelLd
 	<$(SOURCE_GRIST)!kernel!drivers!common>zero.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:
@@ -20,7 +20,7 @@ KernelLd
 	<$(SOURCE_GRIST)!kernel!drivers!common>null.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:
@@ -34,7 +34,7 @@ KernelLd
 #	<$(SOURCE_GRIST)!kernel!drivers!common>digit.o
 #	kernel.so
 #	:
-#	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+#	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 #	:
 #	-Bdynamic -shared
 #	:
@@ -48,7 +48,7 @@ KernelLd
 	<$(SOURCE_GRIST)!kernel!drivers!random>driver.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:
@@ -69,7 +69,7 @@ KernelLd
 #	<$(SOURCE_GRIST)!kernel!drivers!audio!ac97!ich>util.o   
 #	kernel.so
 #	:
-#	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+#	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 #	:
 #	-Bdynamic -shared
 #	:

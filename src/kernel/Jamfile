@@ -10,7 +10,7 @@ KernelLd stage2 :
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
 	:
-	$(SUBDIR)/boot/arch/$(OBOS_ARCH)/stage2.ld 
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
 	:
 	-dN
 	:
@@ -40,7 +40,7 @@ KernelLd kernel :
 	kernel_posix_unistd.o
 	posix_string.o
 	:
-	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
 	:
 	-Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	:
@@ -72,7 +72,7 @@ KernelLd kernel.so :
 	kernel_posix_unistd.o
 	posix_string.o
 	:
-	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
 	:
 	-Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
