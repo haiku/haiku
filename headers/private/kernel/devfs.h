@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _DEVFS_H
 #define _DEVFS_H
 
@@ -23,6 +23,7 @@ status_t devfs_unpublish_partition(const char *path);
 status_t devfs_publish_partition(const char *path, const partition_info *info);
 
 status_t devfs_publish_device(const char *path, void *ident, device_hooks *calls);
+status_t devfs_publish_directory(const char *path);
 
 #ifdef __cplusplus
 }
