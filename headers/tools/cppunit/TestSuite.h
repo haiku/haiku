@@ -1,6 +1,7 @@
 #ifndef _beos_test_suite_h_
 #define _beos_test_suite_h_
 
+#include <BeBuild.h>
 #include <cppunit/Test.h>
 #include <map>
 #include <string>

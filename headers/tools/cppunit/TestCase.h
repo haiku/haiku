@@ -1,6 +1,7 @@
 #ifndef _beos_test_case_h_
 #define _beos_test_case_h_
 
+#include <BeBuild.h>
 #include <cppunit/TestCase.h>
 #include <StorageDefs.h>
 #include <SupportDefs.h>
