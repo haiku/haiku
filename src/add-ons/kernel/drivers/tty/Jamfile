@@ -5,6 +5,7 @@ UsePrivateHeaders kernel ;
 KernelAddon tty : kernel drivers dev :
 	driver.cpp
 	tty.cpp
+	line_buffer.cpp
 	master.cpp
 	slave.cpp
 	;

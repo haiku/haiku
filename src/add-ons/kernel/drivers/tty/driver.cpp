@@ -40,8 +40,8 @@ init_driver(void)
 {
 	TRACE((DRIVER_NAME ": init_driver()\n"));
 
-	// create driver name array
-	
+	// create driver name array and initialize basic TTY structures
+
 	char letter = 'p';
 	int8 digit = 0;
 
@@ -59,14 +59,12 @@ init_driver(void)
 
 		if (++digit > 15)
 			digit = 0, letter++;
+
+		reset_tty(&gMasterTTYs[i], i);
+		reset_tty(&gSlaveTTYs[i], i);
 	}
 
 	sDeviceNames[kNumTTYs * 2] = NULL;
-
-	// initialize TTY structures
-	
-	memset(gMasterTTYs, 0, kNumTTYs * sizeof(struct tty));
-	memset(gSlaveTTYs, 0, kNumTTYs * sizeof(struct tty));
 
 	return B_OK;
 }
