@@ -83,8 +83,8 @@ private:
 	union type_and_timezone_accessor {
 		uint16 type_and_timezone;
 		struct {
-			uint16 type:4,
-			       timezone:12;
+			uint16 timezone:12,
+			       type:4;
 		} bits;
 	};
 
@@ -220,7 +220,7 @@ public:
 	void set_udf_revision(uint16 revision) { _udf_revision = B_HOST_TO_LENDIAN_INT16(revision); }
 	void set_domain_flags(uint8 flags) { _domain_flags = flags; }
 private:
-	uint8 _udf_revision;
+	uint16 _udf_revision;
 	uint8 _domain_flags;
 	array<uint8, 5> _reserved;
 };
@@ -778,6 +778,7 @@ private:
 */
 struct anchor_volume_descriptor {
 public:
+	anchor_volume_descriptor() { memset(_reserved.data, 0, _reserved.size()); }
 	void dump() const;
 	
 	descriptor_tag & tag() { return _tag; }
@@ -792,7 +793,7 @@ private:
 	descriptor_tag  _tag;
 	extent_address _main_vds;	//!< min length of 16 sectors
 	extent_address _reserve_vds;	//!< min length of 16 sectors
-	char _reserved[480];	
+	array<uint8, 480> _reserved;	
 } __attribute__((packed));
 
 
@@ -1265,15 +1266,15 @@ private:
 	See also: ECMA-167 3/10.9
 */
 struct terminating_descriptor {
+	terminating_descriptor() { memset(_reserved.data, 0, _reserved.size()); }
 	void dump() const;
 
 	// Get functions
 	const descriptor_tag & tag() const { return _tag; }
 	descriptor_tag & tag() { return _tag; }
-
 private:
 	descriptor_tag  _tag;
-	uint8 _reserved[496];
+	array<uint8, 496> _reserved;	
 } __attribute__((packed));
 
 
@@ -1285,7 +1286,9 @@ struct logical_volume_integrity_descriptor {
 public:
 	static const uint32 minimum_implementation_use_length = 46;
 
-	void dump() const; 
+	void dump() const;
+	uint32 descriptor_size() const { return sizeof(*this)+implementation_use_length()
+	                                 + partition_count()*sizeof(uint32)*2; }
 
 	descriptor_tag& tag() { return _tag; }
 	const descriptor_tag& tag() const { return _tag; }
@@ -1888,8 +1891,10 @@ struct file_icb_entry {
 	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
 	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
-	uint8* extended_attributes() const { return ((uint8*)(this))+sizeof(file_icb_entry); }
-	uint8* allocation_descriptors() const { return ((uint8*)(this))+sizeof(file_icb_entry)+extended_attributes_length(); }
+	uint8* extended_attributes() { return _end(); }
+	const uint8* extended_attributes() const { return _end(); }
+	uint8* allocation_descriptors() { return _end()+extended_attributes_length(); }
+	const uint8* allocation_descriptors() const { return _end()+extended_attributes_length(); }
 	
 	// set functions
 	void set_uid(uint32 uid) { _uid = B_HOST_TO_LENDIAN_INT32(uid); }
@@ -1912,6 +1917,10 @@ struct file_icb_entry {
 	void set_allocation_descriptors_length(uint32 length) { _allocation_descriptors_length = B_HOST_TO_LENDIAN_INT32(length); }
 
 private:
+	static const uint32 _descriptor_length = 176;
+	uint8* _end() { return reinterpret_cast<uint8*>(this)+_descriptor_length; }
+	const uint8* _end() const { return reinterpret_cast<const uint8*>(this)+_descriptor_length; }
+
 	descriptor_tag  _tag;
 	icb_entry_tag _icb_tag;
 	uint32 _uid;
@@ -1959,6 +1968,8 @@ private:
 */
 struct extended_file_icb_entry {
 	void dump() const;
+	uint32 descriptor_size() const { return sizeof(*this)+extended_attributes_length()
+	                                 +allocation_descriptors_length(); }
 
 	// get functions
 	descriptor_tag & tag() { return _tag; }
@@ -1973,8 +1984,9 @@ struct extended_file_icb_entry {
 	uint16 file_link_count() const { return B_LENDIAN_TO_HOST_INT16(_file_link_count); }
 	uint8 record_format() const { return _record_format; }
 	uint8 record_display_attributes() const { return _record_display_attributes; }
-	uint8 record_length() const { return _record_length; }
+	uint32 record_length() const { return _record_length; }
 	uint64 information_length() const { return B_LENDIAN_TO_HOST_INT64(_information_length); }
+	uint64 object_size() const { return B_LENDIAN_TO_HOST_INT64(_object_size); }
 	uint64 logical_blocks_recorded() const { return B_LENDIAN_TO_HOST_INT64(_logical_blocks_recorded); }
 
 	timestamp& access_date_and_time() { return _access_date_and_time; }
@@ -2004,8 +2016,10 @@ struct extended_file_icb_entry {
 	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
 	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
-	uint8* extended_attributes() const { return (uint8*)(this+sizeof(extended_file_icb_entry)); }
-	uint8* allocation_descriptors() const { return (uint8*)(this+sizeof(sizeof(extended_file_icb_entry))+extended_attributes_length()); }
+	uint8* extended_attributes() { return _end(); }
+	const uint8* extended_attributes() const { return _end(); }
+	uint8* allocation_descriptors() { return _end()+extended_attributes_length(); }
+	const uint8* allocation_descriptors() const { return _end()+extended_attributes_length(); }
 	
 	// set functions
 	void set_uid(uint32 uid) { _uid = B_HOST_TO_LENDIAN_INT32(uid); }
@@ -2015,9 +2029,10 @@ struct extended_file_icb_entry {
 	void set_file_link_count(uint16 count) { _file_link_count = B_HOST_TO_LENDIAN_INT16(count); }
 	void set_record_format(uint8 format) { _record_format = format; }
 	void set_record_display_attributes(uint8 attributes) { _record_display_attributes = attributes; }
-	void set_record_length(uint8 length) { _record_length = length; }
+	void set_record_length(uint32 length) { _record_length = B_HOST_TO_LENDIAN_INT32(length); }
 
 	void set_information_length(uint64 length) { _information_length = B_HOST_TO_LENDIAN_INT64(length); }
+	void set_object_size(uint64 size) { _object_size = B_HOST_TO_LENDIAN_INT64(size); }
 	void set_logical_blocks_recorded(uint64 blocks) { _logical_blocks_recorded = B_HOST_TO_LENDIAN_INT64(blocks); }
 
 	void set_checkpoint(uint32 checkpoint) { _checkpoint = B_HOST_TO_LENDIAN_INT32(checkpoint); }
@@ -2029,6 +2044,10 @@ struct extended_file_icb_entry {
 	void set_allocation_descriptors_length(uint32 length) { _allocation_descriptors_length = B_HOST_TO_LENDIAN_INT32(length); }
 
 private:
+	static const uint32 _descriptor_length = 216;
+	uint8* _end() { return reinterpret_cast<uint8*>(this)+_descriptor_length; }
+	const uint8* _end() const { return reinterpret_cast<const uint8*>(this)+_descriptor_length; }
+
 	descriptor_tag  _tag;
 	icb_entry_tag _icb_tag;
 	uint32 _uid;
@@ -2041,8 +2060,9 @@ private:
 	uint16 _file_link_count;
 	uint8 _record_format;				//!< To be set to 0 per UDF-2.01 2.3.6.1
 	uint8 _record_display_attributes;	//!< To be set to 0 per UDF-2.01 2.3.6.2
-	uint8 _record_length;				//!< To be set to 0 per UDF-2.01 2.3.6.3
+	uint32 _record_length;				//!< To be set to 0 per UDF-2.01 2.3.6.3
 	uint64 _information_length;
+	uint64 _object_size;
 	uint64 _logical_blocks_recorded;		//!< To be 0 for files and dirs with embedded data
 	timestamp _access_date_and_time;
 	timestamp _modification_date_and_time;
