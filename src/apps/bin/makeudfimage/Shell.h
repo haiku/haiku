@@ -27,6 +27,9 @@ private:
 	void _PrintHelp();
 	
 	VerbosityLevel fVerbosityLevel;
+	uint32 fBlockSize;
+	bool fDoUdf;
+	bool fDoIso;
 };
 
 

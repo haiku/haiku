@@ -19,7 +19,12 @@
 #include "UdfBuilder.h"
 
 Shell::Shell()
+	// The following settings are essentially default values
+	// for all the command-line options.
 	: fVerbosityLevel(VERBOSITY_HIGH)
+	, fBlockSize(2048)
+	, fDoUdf(true)
+	, fDoIso(false)
 {
 }
 
@@ -30,11 +35,16 @@ Shell::Run(int argc, char *argv[])
 	status_t error = _ProcessArguments(argc, argv);
 	if (!error) {
 		ConsoleListener listener(fVerbosityLevel);
-		UdfBuilder builder(listener);
-		builder.Build();
-	} else {
-		_PrintHelp();
+		UdfBuilder builder("./output.img", fBlockSize, fDoUdf, fDoIso,
+		                   listener);
+		error = builder.InitCheck();
+		if (!error)
+			error = builder.Build();
 	}
+	
+	if (error)
+		_PrintHelp();
+
 	RETURN(error);
 }
 
