@@ -106,8 +106,10 @@ VDView::VDView(BRect bounds)
 VDView::~VDView(void)
 {
 	delete serverlink;
-	delete viewbmp;
 	delete cursor;
+
+	viewbmp->Lock();
+	delete viewbmp;
 }
 
 void VDView::AttachedToWindow(void)
@@ -581,6 +583,9 @@ void ViewDriver::Shutdown(void)
 
 void ViewDriver::SetMode(const display_mode &mode)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	
 	BBitmap *tempbmp=new BBitmap(BRect(0,0,mode.virtual_width-1,mode.virtual_height-1),
@@ -620,6 +625,9 @@ void ViewDriver::SetMode(const display_mode &mode)
 
 void ViewDriver::SetMode(int32 space)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	int16 w=640,h=480;
 	color_space s=B_CMAP8;
@@ -696,6 +704,9 @@ void ViewDriver::SetMode(int32 space)
 
 void ViewDriver::CopyBits(BRect src, BRect dest)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	framebuffer->Lock();
 	drawview->CopyBits(src,dest);
@@ -708,6 +719,9 @@ void ViewDriver::CopyBits(BRect src, BRect dest)
 
 void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
+	if(!is_initialized)
+		return;
+		
 STRACE(("ViewDriver:: CopyRegion not completely tested\n"));
 	
 	screenwin->Lock();
@@ -801,11 +815,17 @@ printf("Overlap\n");
 
 void ViewDriver::DrawBitmap(ServerBitmap *bitmap, BRect src, BRect dest)
 {
+	if(!is_initialized)
+		return;
+		
 STRACE(("ViewDriver:: DrawBitmap unimplemented()\n"));
 }
 
 void ViewDriver::DrawChar(char c, BPoint pt, LayerData *d)
 {
+	if(!is_initialized)
+		return;
+		
 	char str[2];
 	str[0]=c;
 	str[1]='\0';
@@ -814,6 +834,9 @@ void ViewDriver::DrawChar(char c, BPoint pt, LayerData *d)
 
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
+	if(!is_initialized)
+		return;
+		
 STRACE(("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y));
 	if(!d)
 		return;
@@ -846,6 +869,9 @@ STRACE(("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x
 
 bool ViewDriver::DumpToFile(const char *path)
 {
+	if(!is_initialized)
+		return false;
+		
 	// Dump to PNG
 	Lock();
 	SaveToPNG(path,framebuffer->Bounds(),framebuffer->ColorSpace(), 
@@ -860,6 +886,9 @@ bool ViewDriver::DumpToFile(const char *path)
 
 void ViewDriver::FillArc(const BRect r, float angle, float span, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -878,6 +907,9 @@ void ViewDriver::FillArc(const BRect r, float angle, float span, RGBColor& color
 
 void ViewDriver::FillArc(const BRect r, float angle, float span, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -896,6 +928,9 @@ void ViewDriver::FillArc(const BRect r, float angle, float span, const Pattern& 
 
 void ViewDriver::FillBezier(BPoint *pts, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	if(!pts)
 		return;
 	Lock();
@@ -917,6 +952,9 @@ void ViewDriver::FillBezier(BPoint *pts, RGBColor& color)
 
 void ViewDriver::FillBezier(BPoint *pts, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	if(!pts)
 		return;
 	Lock();
@@ -938,6 +976,9 @@ void ViewDriver::FillBezier(BPoint *pts, const Pattern& pat, RGBColor& high_colo
 
 void ViewDriver::FillEllipse(BRect r, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -954,6 +995,9 @@ void ViewDriver::FillEllipse(BRect r, RGBColor& color)
 
 void ViewDriver::FillEllipse(BRect r, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -970,6 +1014,9 @@ void ViewDriver::FillEllipse(BRect r, const Pattern& pat, RGBColor& high_color, 
 
 void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -986,6 +1033,9 @@ void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
 
 void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1002,6 +1052,9 @@ void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pat, R
 
 void ViewDriver::FillRect(const BRect r, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1025,6 +1078,9 @@ void ViewDriver::FillRect(const BRect r, RGBColor& color)
 */
 void ViewDriver::FillRect(const BRect r, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1041,6 +1097,9 @@ void ViewDriver::FillRect(const BRect r, const Pattern& pat, RGBColor& high_colo
 
 void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1057,6 +1116,9 @@ void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
 
 void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1073,6 +1135,9 @@ void ViewDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& p
 
 void ViewDriver::FillTriangle(BPoint *pts, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1102,6 +1167,9 @@ void ViewDriver::FillTriangle(BPoint *pts, RGBColor& color)
 
 void ViewDriver::FillTriangle(BPoint *pts, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1131,6 +1199,9 @@ void ViewDriver::FillTriangle(BPoint *pts, const Pattern& pat, RGBColor& high_co
 
 void ViewDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1148,6 +1219,9 @@ void ViewDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBC
 
 void ViewDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1165,6 +1239,9 @@ void ViewDriver::StrokeArc(BRect r, float angle, float span, float pensize, cons
 
 void ViewDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1182,6 +1259,9 @@ void ViewDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
 
 void ViewDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1199,6 +1279,9 @@ void ViewDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pat, RG
 
 void ViewDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1216,6 +1299,9 @@ void ViewDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
 
 void ViewDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1233,6 +1319,9 @@ void ViewDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pat, RGBCo
 
 void ViewDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1250,6 +1339,9 @@ void ViewDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& c
 
 void ViewDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1267,6 +1359,9 @@ void ViewDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Patte
 
 void ViewDriver::StrokePoint(BPoint& pt, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	Unlock();
 }
@@ -1309,11 +1404,17 @@ void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBC
 
 void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color, bool is_closed)
 {
+	if(!is_initialized)
+		return;
+		
 	StrokePolygon(ptlist,numpts,pensize,high_color,is_closed);
 }
 
 void ViewDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1331,6 +1432,9 @@ void ViewDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
 
 void ViewDriver::StrokeRect(BRect r, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1348,6 +1452,9 @@ void ViewDriver::StrokeRect(BRect r, float pensize, const Pattern& pat, RGBColor
 
 void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1365,6 +1472,9 @@ void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize,
 
 void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pat, RGBColor& high_color, RGBColor& low_color)
 {
+	if(!is_initialized)
+		return;
+		
 	Lock();
 	screenwin->Lock();
 	framebuffer->Lock();
@@ -1389,6 +1499,9 @@ void ViewDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize,
 */
 void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors)
 {
+	if(!is_initialized)
+		return;
+		
 	if( !numlines || !pts || !colors)
 		return;
 	
@@ -1426,6 +1539,9 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGB
 
 void ViewDriver::HideCursor(void)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	Lock();
 
@@ -1438,6 +1554,9 @@ void ViewDriver::HideCursor(void)
 
 void ViewDriver::InvertRect(BRect r)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	framebuffer->Lock();
 	drawview->InvertRect(r);
@@ -1449,6 +1568,9 @@ void ViewDriver::InvertRect(BRect r)
 
 bool ViewDriver::IsCursorHidden(void)
 {
+	if(!is_initialized)
+		return false;
+		
 	screenwin->Lock();
 	bool value=(hide_cursor>0)?true:false;
 	screenwin->Unlock();
@@ -1457,6 +1579,9 @@ bool ViewDriver::IsCursorHidden(void)
 
 void ViewDriver::ObscureCursor(void)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	screenwin->PostMessage(VDWIN_OBSCURECURSOR);
 	screenwin->Unlock();
@@ -1464,6 +1589,9 @@ void ViewDriver::ObscureCursor(void)
 
 void ViewDriver::MoveCursorTo(float x, float y)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	BMessage *msg=new BMessage(VDWIN_MOVECURSOR);
 	msg->AddFloat("x",x);
@@ -1474,6 +1602,9 @@ void ViewDriver::MoveCursorTo(float x, float y)
 
 void ViewDriver::SetCursor(ServerCursor *cursor)
 {
+	if(!is_initialized)
+		return;
+		
 	if(cursor!=NULL)
 	{
 		screenwin->Lock();
@@ -1499,6 +1630,9 @@ void ViewDriver::SetCursor(ServerCursor *cursor)
 
 void ViewDriver::ShowCursor(void)
 {
+	if(!is_initialized)
+		return;
+		
 	screenwin->Lock();
 	if(hide_cursor>0)
 	{
@@ -1511,6 +1645,9 @@ void ViewDriver::ShowCursor(void)
 
 void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 {
+	if(!is_initialized)
+		return;
+		
 	if(!d)
 		return;
 
@@ -1552,7 +1689,7 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 
 float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d )
+	if(!string || !d || !is_initialized)
 		return 0.0;
 	screenwin->Lock();
 
@@ -1616,7 +1753,7 @@ float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 
 float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d )
+	if(!string || !d || !is_initialized)
 		return 0.0;
 	screenwin->Lock();
 
@@ -1666,6 +1803,9 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 /*
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
+	if(!is_initialized)
+		return;
+		
 	if(!string || !d )
 		return;
 	screenwin->Lock();
@@ -1810,6 +1950,9 @@ void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerDa
 */
 void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 {
+	if(!is_initialized)
+		return;
+		
 	rgb_color color=d->highcolor.GetColor32();
 	
 	// pointers to the top left corner of the area to be copied in each bitmap
@@ -1895,6 +2038,9 @@ void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 
 void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 {
+	if(!is_initialized)
+		return;
+		
 	// pointers to the top left corner of the area to be copied in each bitmap
 	uint8 *srcbuffer=NULL, *destbuffer=NULL;
 	
@@ -2010,8 +2156,9 @@ void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
+
 	int16 value;
-	if(!d)
+	if(!d || !is_initialized)
 		return returncolor;
 	
 	switch(d->draw_mode)
@@ -2111,6 +2258,9 @@ rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, 
 
 status_t ViewDriver::SetDPMSMode(const uint32 &state)
 {
+	if(!is_initialized)
+		return B_ERROR;
+		
 	// TODO: Implement software DPMS
 	return B_ERROR;
 }
@@ -2129,7 +2279,7 @@ uint32 ViewDriver::DPMSCapabilities(void) const
 
 status_t ViewDriver::GetDeviceInfo(accelerant_device_info *info)
 {
-	if(!info)
+	if(!info || !is_initialized)
 		return B_ERROR;
 
 	// We really don't have to provide anything here because this is strictly
@@ -2147,7 +2297,7 @@ status_t ViewDriver::GetDeviceInfo(accelerant_device_info *info)
 
 status_t ViewDriver::GetModeList(display_mode **modes, uint32 *count)
 {
-	if(!count)
+	if(!count || !is_initialized)
 		return B_ERROR;
 
 	screenwin->Lock();
@@ -2214,16 +2364,25 @@ status_t ViewDriver::GetModeList(display_mode **modes, uint32 *count)
 
 status_t ViewDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
+	if(!is_initialized)
+		return B_ERROR;
+		
 	return B_ERROR;
 }
 
 status_t ViewDriver::GetTimingConstraints(display_timing_constraints *dtc)
 {
+	if(!is_initialized)
+		return B_ERROR;
+		
 	return B_ERROR;
 }
 
 status_t ViewDriver::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
 {
+	if(!is_initialized)
+		return B_ERROR;
+		
 	// TODO: Unhack
 
 	// We should be able to get away with this because we're not dealing with any
@@ -2234,6 +2393,9 @@ status_t ViewDriver::ProposeMode(display_mode *candidate, const display_mode *lo
 
 status_t ViewDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
 {
+	if(!is_initialized)
+		return B_ERROR;
+		
 	// Locking shouldn't be necessary here - R5 should handle this for us. :)
 	BScreen screen;
 	return screen.WaitForRetrace(timeout);

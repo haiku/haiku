@@ -65,114 +65,104 @@ class Layer;
 class ServerWindow
 {
 public:
-								ServerWindow(BRect rect, const char *string,
-									uint32 wlook, uint32 wfeel, uint32 wflags,
-									ServerApp *winapp,  port_id winport,
-									port_id looperPort, port_id replyport, uint32 index,
-									int32 handlerID);
-								~ServerWindow(void);
+	ServerWindow(BRect rect, const char *string, uint32 wlook, uint32 wfeel, uint32 wflags,
+		ServerApp *winapp,  port_id winport, port_id looperPort, port_id replyport, 
+		uint32 index, int32 handlerID);
+	~ServerWindow(void);
 	
-			void				ReplaceDecorator(void);
-			void				Quit(void);
-			const char*			GetTitle(void);
-			ServerApp*			GetApp(void);
-			void				Show(void);
-			void				Hide(void);
-			bool				IsHidden(void);
-			void				Minimize(bool status);
-			void				Zoom(void);
-			void				SetFocus(bool value);
-			bool				HasFocus(void);
-			void				RequestDraw(BRect rect);
-			void				RequestDraw(void);
+	void ReplaceDecorator(void);
+	void Quit(void);
+	void Show(void);
+	void Hide(void);
+	bool IsHidden(void);
+	void Minimize(bool status);
+	void Zoom(void);
+	void SetFocus(bool value);
+	bool HasFocus(void);
+	void RequestDraw(BRect rect);
+	void RequestDraw(void);
 	
-			void				WorkspaceActivated(int32 workspace, bool active);
-			void				WorkspacesChanged(int32 oldone,int32 newone);
-			void				WindowActivated(bool active);
-			void				ScreenModeChanged(const BRect frame, const color_space cspace);
+	void WorkspaceActivated(int32 workspace, bool active);
+	void WorkspacesChanged(int32 oldone,int32 newone);
+	void WindowActivated(bool active);
+	void ScreenModeChanged(const BRect frame, const color_space cspace);
 	
-			void				SetFrame(const BRect &rect);
-			BRect				Frame(void);
+	void SetFrame(const BRect &rect);
+	BRect Frame(void);
 	
-			status_t			Lock(void);
-			void				Unlock(void);
-			bool				IsLocked(void);
-			thread_id			ThreadID() const { return _monitorthread;}
+	status_t Lock(void);
+	void Unlock(void);
+	bool IsLocked(void);
+	thread_id ThreadID(void) const { return fMonitorThreadID;}
 	
-			void				DispatchMessage(int32 code);
-			void				DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
-	static	int32				MonitorWin(void *data);
-	static	void				HandleMouseEvent(PortMessage *msg);
-	static	void				HandleKeyEvent(int32 code, int8 *buffer);
+	void DispatchMessage(int32 code);
+	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
+	static int32 MonitorWin(void *data);
+	static void HandleMouseEvent(PortMessage *msg);
+	static void HandleKeyEvent(int32 code, int8 *buffer);
+	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
 	
 	//! Returns the index of the workspaces to which it belongs
-			int32				GetWorkspaceIndex(void) { return fWorkspaces; }
-			Workspace*			GetWorkspace(void);
-			void				SetWorkspace(Workspace *wkspc);
-
-	//! Returns the window's title
-			const char*			Title(void) { return _title->String(); }
+	int32 GetWorkspaceIndex(void) { return fWorkspaces; }
+	Workspace *GetWorkspace(void);
+	void SetWorkspace(Workspace *wkspc);
 	
-			Layer*				FindLayer(const Layer* start, int32 token) const;
-			void				SendMessageToClient( const BMessage* msg ) const;
-
-			int32				Look() const { return _look; }
-			int32				Feel() const { return _feel; }
-			uint32				Flags() const { return _flags; }
-			team_id				ClientTeamID() const { return fClientTeamID; }
-			ServerApp*			App() const { return _app; }
-			uint32				Workspaces() const { return fWorkspaces; }
-			WinBorder*			GetWinBorder() const { return _winborder; }
-
+	//! Returns the window's title
+	const char *Title(void) { return fTitle.String(); }
+	
+	Layer* FindLayer(const Layer* start, int32 token) const;
+	void SendMessageToClient( const BMessage* msg ) const;
+	
+	int32 Look(void) const { return fLook; }
+	int32 Feel(void) const { return fFeel; }
+	uint32 Flags(void) const { return fFlags; }
+	team_id ClientTeamID(void) const { return fClientTeamID; }
+	ServerApp *App(void) const { return fServerApp; }
+	uint32 Workspaces(void) const { return fWorkspaces; }
+	WinBorder *GetWinBorder(void) const { return fWinBorder; }
+	
 	// server "private" - try not to use
-			void				QuietlySetWorkspaces(uint32 wks)
-									{ fWorkspaces = wks; }
-			void				QuietlySetFeel(int32 feel)
-									{ _feel = feel; }
-			int32				ClientToken() const { return _handlertoken; }
-
-			FMWList				fWinFMWList;
+	void QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }
+	void QuietlySetFeel(int32 feel) { fFeel = feel; }
+	int32 ClientToken(void) const { return fHandlerToken; }
+	
+	FMWList fWinFMWList;
 protected:	
 	friend class ServerApp;
 	friend class WinBorder;
-	friend class Screen;
+	friend class Screen; 
 	friend class Layer;
 	
-			BString				*_title;
-			int32				_look,
-								_feel,
-								_flags;
-			uint32				fWorkspaces;
-			Workspace			*_workspace;
-			bool				_active;
+	BString fTitle;
+	int32 fLook,
+		  fFeel,
+		  fFlags;
+	uint32 fWorkspaces;
+	Workspace *fWorkspace;
+	bool fIsActive;
 	
-			ServerApp			*_app;
-			WinBorder			*_winborder;
+	ServerApp *fServerApp;
+	WinBorder *fWinBorder;
 	
-			team_id				fClientTeamID;
-			thread_id			_monitorthread;
-			port_id				_receiver;	// Messages from window
-			port_id				_sender; // Messages to window
-			PortLink			*_winlink;
+	team_id fClientTeamID;
+	thread_id fMonitorThreadID;
 
-			BLocker				_locker;
-			BRect				_frame;
-			uint32				_token;
-			int32				_handlertoken;
+	port_id fMessagePort;
+	port_id fClientWinPort;
+	port_id fClientLooperPort;
+
+	PortLink *fWinLink;
 	
-			BSession			*ses;
-			port_id				winLooperPort;
-			Layer				*top_layer;
-			Layer				*cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
+	BLocker fLocker;
+	BRect fFrame;
+	uint32 fToken;
+	int32 fHandlerToken;
+	
+	BSession *fSession;
+	Layer *fTopLayer;
+	Layer *cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
 };
 
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);
 
-
 #endif
-/*
- @log
-	* added Layer as a friend.
-	* added a new member: port_id winLooperPort; We'll use it to send flattened BMessages(like _UPDATE_ / B_VIEW_RESIZED(MOVED)) to our BWindow counterpart.
-	* SendMessageToClient( BMessage ) sends that message BWindow's looper port.
-*/

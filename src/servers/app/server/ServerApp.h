@@ -21,6 +21,7 @@
 //
 //	File Name:		ServerApp.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@myrealbox.com>
 //	Description:	Server-side BApplication counterpart
 //  
 //------------------------------------------------------------------------------
@@ -46,60 +47,60 @@ class ServerCursor;
 class ServerApp
 {
 public:
-								ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
-									team_id clientTeamID, int32 handlerID, char *signature);
+	ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
+		team_id clientTeamID, int32 handlerID, char *signature);
 	virtual						~ServerApp(void);
-
-			bool				Run(void);
-			static				int32 MonitorApp(void *data);	
-			void				Lock(void);
-			void				Unlock(void);
-			bool				IsLocked(void);
+	
+	bool Run(void);
+	static int32 MonitorApp(void *data);	
+	void Lock(void);
+	void Unlock(void);
+	bool IsLocked(void);
 	
 	/*!
 		\brief Determines whether the application is the active one
 		\return true if active, false if not.
 	*/
-			bool				IsActive(void) const { return _isactive; }
-
-			void				Activate(bool value);
-			bool				PingTarget(void);
+	bool IsActive(void) const { return fIsActive; }
 	
-			void				PostMessage(int32 code, size_t size=0,
-									int8 *buffer=NULL);
-			void				SendMessageToClient( const BMessage* msg ) const;
-
-			void				SetAppCursor(void);
-
-			team_id				ClientTeamID();
-
-			FMWList				fAppFMWList;
+	void Activate(bool value);
+	bool PingTarget(void);
+	
+	void PostMessage(int32 code, size_t size=0,int8 *buffer=NULL);
+	void WindowBroadcast(int32 code);
+	
+	void SendMessageToClient( const BMessage* msg ) const;
+	void SetAppCursor(void);
+	
+	team_id	ClientTeamID();
+	
+	FMWList fAppFMWList;
+	
 protected:
 	friend class AppServer;
 	friend class ServerWindow;
-
-			void				_DispatchMessage(PortMessage *msg);
-			ServerBitmap*		_FindBitmap(int32 token);
-
-			port_id				_sender,
-								_receiver,
-								fClientLooperPort;
-
-			BString				_signature;
-			thread_id			_monitor_thread;
-
-			team_id				fClientTeamID;
-
-			team_id				_target_id;
-			PortLink*			_applink;
-			BList				*_winlist,
-								*_bmplist,
-								*_piclist;
-			ServerCursor*		_appcursor;
-			sem_id				_lock;
-			bool				_cursorhidden;
-			bool				_isactive;
-			int32				_handlertoken;
+	
+	void _DispatchMessage(PortMessage *msg);
+	ServerBitmap *_FindBitmap(int32 token);
+	
+	port_id	fClientAppPort,
+			fMessagePort,
+			fClientLooperPort;
+	
+	BString fSignature;
+	thread_id fMonitorThreadID;
+	
+	team_id fClientTeamID;
+	
+	PortLink *fAppLink;
+	BList *fSWindowList,
+		  *fBitmapList,
+		  *fPictureList;
+	ServerCursor *fAppCursor;
+	sem_id fLockSem;
+	bool fCursorHidden;
+	bool fIsActive;
+	int32 fHandlerToken;
 };
 
 #endif

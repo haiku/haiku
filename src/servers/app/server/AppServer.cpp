@@ -58,9 +58,10 @@
 #else
 #	define STRACE(x) ;
 #endif
+
 // Globals
 
-Desktop*	desktop;
+Desktop *desktop;
 
 //! Used to access the app_server from new_decorator
 AppServer *app_server=NULL;
@@ -83,14 +84,17 @@ AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 AppServer::AppServer(void)
 #endif
 {
-	_mouseport		= create_port(200,SERVER_INPUT_PORT);
-	_messageport	= create_port(200,SERVER_PORT_NAME);
+	fMousePort= create_port(200,SERVER_INPUT_PORT);
+	_fMessagePort= create_port(200,SERVER_PORT_NAME);
 
-	_applist		= new BList(0);
-	_quitting_server= false;
-	_exit_poller	= false;
-	_ssindex		= 1;
-	make_decorator	= NULL;
+	fAppList= new BList(0);
+	fQuittingServer= false;
+	fExitPoller= false;
+	fScreenShotIndex= 1;
+	make_decorator= NULL;
+	
+	// We need this in order for new_decorator to be able to instantiate new decorators
+	app_server=this;
 
 	// Create the font server and scan the proper directories.
 	fontserver=new FontServer;
@@ -125,36 +129,36 @@ AppServer::AppServer(void)
 	InitDecorators();
 		
 	// Set up the Desktop
-	desktop			= new Desktop();
+	desktop= new Desktop();
 	desktop->Init();
 
 	// Create the cursor manager. Object declared in CursorManager.cpp
-	cursormanager	= new CursorManager();
+	cursormanager= new CursorManager();
 	cursormanager->SetCursor(B_CURSOR_DEFAULT);
 	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
-	bitmapmanager	= new BitmapManager();
+	bitmapmanager= new BitmapManager();
 
 	// This is necessary to mediate access between the Poller and app_server threads
-	_active_lock	= create_sem(1,"app_server_active_sem");
+	fActiveAppLock= create_sem(1,"app_server_active_sem");
 
 	// This locker is for app_server and Picasso to vy for control of the ServerApp list
-	_applist_lock	= create_sem(1,"app_server_applist_sem");
+	fAppListLock= create_sem(1,"app_server_applist_sem");
 
 	// This locker is to mediate access to the make_decorator pointer
-	_decor_lock		= create_sem(1,"app_server_decor_sem");
+	fDecoratorLock= create_sem(1,"app_server_decor_sem");
 	
 	// Spawn our input-polling thread
-	_poller_id		= spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);
-	if (_poller_id >= 0)
-		resume_thread(_poller_id);
+	fPollerThreadID= spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);
+	if (fPollerThreadID >= 0)
+		resume_thread(fPollerThreadID);
 
 	// Spawn our thread-monitoring thread
-	_picasso_id		= spawn_thread(PicassoThread,"Picasso", B_NORMAL_PRIORITY, this);
-	if (_picasso_id >= 0)
-		resume_thread(_picasso_id);
+	fPicassoThreadID= spawn_thread(PicassoThread,"Picasso", B_NORMAL_PRIORITY, this);
+	if (fPicassoThreadID >= 0)
+		resume_thread(fPicassoThreadID);
 
-	decorator_name	= "Default";
+	fDecoratorName="Default";
 }
 
 /*!
@@ -168,15 +172,15 @@ AppServer::~AppServer(void)
 
 	ServerApp *tempapp;
 	int32 i;
-	acquire_sem(_applist_lock);
-	for(i=0;i<_applist->CountItems();i++)
+	acquire_sem(fAppListLock);
+	for(i=0;i<fAppList->CountItems();i++)
 	{
-		tempapp=(ServerApp *)_applist->ItemAt(i);
+		tempapp=(ServerApp *)fAppList->ItemAt(i);
 		if(tempapp!=NULL)
 			delete tempapp;
 	}
-	delete _applist;
-	release_sem(_applist_lock);
+	delete fAppList;
+	release_sem(fAppListLock);
 
 	delete bitmapmanager;
 	delete cursormanager;
@@ -186,8 +190,8 @@ AppServer::~AppServer(void)
 	// If these threads are still running, kill them - after this, if exit_poller
 	// is deleted, who knows what will happen... These things will just return an
 	// error and fail if the threads have already exited.
-	kill_thread(_poller_id);
-	kill_thread(_picasso_id);
+	kill_thread(fPollerThreadID);
+	kill_thread(fPicassoThreadID);
 
 	delete fontserver;
 	
@@ -202,8 +206,8 @@ AppServer::~AppServer(void)
 int32 AppServer::PollerThread(void *data)
 {
 	// This thread handles nothing but input messages for mouse and keyboard
-	AppServer		*appserver = (AppServer*)data;
-	PortQueue		mousequeue(appserver->_mouseport);
+	AppServer		*appserver=(AppServer*)data;
+	PortQueue		mousequeue(appserver->fMousePort);
 	PortMessage		*msg;
 
 	for(;;)
@@ -213,7 +217,7 @@ int32 AppServer::PollerThread(void *data)
 		else
 			mousequeue.GetMessagesFromPort(false);
 
-		msg		= mousequeue.GetMessageFromQueue();
+		msg= mousequeue.GetMessageFromQueue();
 		if(!msg)
 			continue;
 
@@ -244,7 +248,7 @@ int32 AppServer::PollerThread(void *data)
 		
 		delete msg;
 		
-		if(appserver->_exit_poller)
+		if(appserver->fExitPoller)
 			break;
 	}
 	return 0;
@@ -258,14 +262,14 @@ int32 AppServer::PollerThread(void *data)
 int32 AppServer::PicassoThread(void *data)
 {
 	int32		i;
-	AppServer	*appserver = (AppServer*)data;
+	AppServer	*appserver=(AppServer*)data;
 	ServerApp	*app;
 	for(;;)
 	{
-		acquire_sem(appserver->_applist_lock);
-		for(i = 0; i < appserver->_applist->CountItems(); i++)
+		acquire_sem(appserver->fAppListLock);
+		for(i= 0; i < appserver->fAppList->CountItems(); i++)
 		{
-			app		= (ServerApp*)appserver->_applist->ItemAt(i);
+			app=(ServerApp*)appserver->fAppList->ItemAt(i);
 			if(!app)
 			{
 				printf("PANIC: NULL app in app list\n");
@@ -273,11 +277,11 @@ int32 AppServer::PicassoThread(void *data)
 			}
 			app->PingTarget();
 		}
-		release_sem(appserver->_applist_lock);
+		release_sem(appserver->fAppListLock);
 		
 		// if poller thread has to exit, so do we - I just was too lazy
 		// to rename the variable name. ;)
-		if(appserver->_exit_poller)
+		if(appserver->fExitPoller)
 			break;
 
 		// we do this every other second so as not to suck *too* many CPU cycles
@@ -300,13 +304,13 @@ thread_id AppServer::Run(void)
 //! Main message-monitoring loop for the regular message port - no input messages!
 void AppServer::MainLoop(void)
 {
-	PortMessage		pmsg;
+	PortMessage pmsg;
 	
-	for(;;)
+	while(1)
 	{
-		if(pmsg.ReadFromPort(_messageport) == B_OK)
+		if(pmsg.ReadFromPort(_fMessagePort)== B_OK)
 		{
-			if(pmsg.Protocol() == B_QUIT_REQUESTED)
+			if(pmsg.Protocol()== B_QUIT_REQUESTED)
 				pmsg.SetCode(B_QUIT_REQUESTED);
 			
 			switch(pmsg.Code())
@@ -336,7 +340,7 @@ void AppServer::MainLoop(void)
 
 		if(pmsg.Code()==AS_DELETE_APP || (pmsg.Protocol()==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
 		{
-			if(_quitting_server == true && _applist->CountItems() == 0)
+			if(fQuittingServer== true && fAppList->CountItems()== 0)
 				break;
 		}
 	}
@@ -361,15 +365,15 @@ bool AppServer::LoadDecorator(const char *path)
 	// internal one
 	if(!path)
 	{
-		make_decorator	= NULL;
+		make_decorator= NULL;
 		return true;
 	}
 	
-	create_decorator	*pcreatefunc = NULL;
+	create_decorator	*pcreatefunc= NULL;
 	status_t			stat;
 	image_id			addon;
 	
-	addon		= load_add_on(path);
+	addon= load_add_on(path);
 	if(addon < 0)
 		return false;
 
@@ -379,19 +383,19 @@ bool AppServer::LoadDecorator(const char *path)
 	// go here.
 		
 	// Get the instantiation function
-	stat		= get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
+	stat= get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
 	if(stat != B_OK){
 		unload_add_on(addon);
 		return false;
 	}
 	
 	BPath			temppath(path);
-	decorator_name	= temppath.Leaf();
+	fDecoratorName= temppath.Leaf();
 	
-	acquire_sem(_decor_lock);
-	make_decorator	= pcreatefunc;
-	_decorator_id	= addon;
-	release_sem(_decor_lock);
+	acquire_sem(fDecoratorLock);
+	make_decorator=pcreatefunc;
+	fDecoratorID=addon;
+	release_sem(fDecoratorLock);
 	return true;
 }
 
@@ -467,26 +471,26 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&reply_port);
 			
 			// Create the ServerApp subthread for this app
-			acquire_sem(_applist_lock);
+			acquire_sem(fAppListLock);
 			
-			port_id		r = create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
-			if(r == B_NO_MORE_PORTS || r == B_BAD_VALUE)
+			port_id		r= create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
+			if(r== B_NO_MORE_PORTS || r== B_BAD_VALUE)
 			{
-				release_sem(_applist_lock);
+				release_sem(fAppListLock);
 				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
 			ServerApp	*newapp;
-			newapp		= new ServerApp(app_port, r, clientLooperPort, clientTeamID, htoken, app_signature);
+			newapp= new ServerApp(app_port, r, clientLooperPort, clientTeamID, htoken, app_signature);
 
 				// add the new ServerApp to the known list of ServerApps
-			_applist->AddItem(newapp);
+			fAppList->AddItem(newapp);
 			
-			release_sem(_applist_lock);
+			release_sem(fAppListLock);
 
 			PortLink replylink(reply_port);
 			replylink.SetOpCode(AS_SET_SERVER_PORT);
-			replylink.Attach<int32>(newapp->_receiver);
+			replylink.Attach<int32>(newapp->fMessagePort);
 			replylink.Flush();
 
 			// This is necessary because PortLink::ReadString allocates memory
@@ -503,33 +507,33 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// 1) thread_id - thread ID of the ServerApp to be deleted
 			
 			int32		i,
-						appnum = _applist->CountItems();
+						appnum= fAppList->CountItems();
 			ServerApp	*srvapp;
 
 			thread_id	srvapp_id;
 			msg->Read<thread_id>(&srvapp_id);
 
-			acquire_sem(_applist_lock);
+			acquire_sem(fAppListLock);
 
 			// Run through the list of apps and nuke the proper one
-			for(i = 0; i < appnum; i++)
+			for(i= 0; i < appnum; i++)
 			{
-				srvapp		= (ServerApp *)_applist->ItemAt(i);
+				srvapp=(ServerApp *)fAppList->ItemAt(i);
 
-				if(srvapp != NULL && srvapp->_monitor_thread == srvapp_id)
+				if(srvapp != NULL && srvapp->fMonitorThreadID== srvapp_id)
 				{
-					srvapp		= (ServerApp *)_applist->RemoveItem(i);
+					srvapp=(ServerApp *)fAppList->RemoveItem(i);
 					if(srvapp){
 						status_t		temp;
 						wait_for_thread(srvapp_id, &temp);
 						delete srvapp;
-						srvapp	= NULL;
+						srvapp= NULL;
 					}
 					break;	// jump out of our for() loop
 				}
 			}
 
-			release_sem(_applist_lock);
+			release_sem(fAppListLock);
 			break;
 		}
 		case AS_UPDATED_CLIENT_FONTLIST:
@@ -615,7 +619,7 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			msg->Read<port_id>(&replyport);
 			PortLink replylink(replyport);
 			replylink.SetOpCode(AS_GET_DECORATOR);
-			replylink.AttachString(decorator_name.String());
+			replylink.AttachString(fDecoratorName.String());
 			replylink.Flush();
 			break;
 		}
@@ -666,9 +670,9 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			
 			PortLink replylink(replyport);
 			replylink.SetOpCode(AS_GET_SCREEN_MODE);
-			replylink.Attach<int16>(_driver->GetWidth());
-			replylink.Attach<int16>(_driver->GetHeight());
-			replylink.Attach<int16>(_driver->GetDepth());
+			replylink.Attach<int16>(fDriver->GetWidth());
+			replylink.Attach<int16>(fDriver->GetHeight());
+			replylink.Attach<int16>(fDriver->GetDepth());
 			replylink.Flush();
 			break;
 		}
@@ -680,35 +684,59 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
-			if(DISPLAYDRIVER == HWDRIVER)
+			if(DISPLAYDRIVER== HWDRIVER)
 				break;
 			
 			Broadcast(AS_QUIT_APP);
 
-				// we have to wait until *all* threads have finished!
-			ServerApp	*app = NULL;
-			status_t	rv;
-			acquire_sem(_applist_lock);
-			for(int32 i = 0; i < _applist->CountItems(); i++)
+			// we have to wait until *all* threads have finished!
+			ServerApp	*app= NULL;
+			acquire_sem(fAppListLock);
+			thread_info tinfo;
+			
+			for(int32 i= 0; i < fAppList->CountItems(); i++)
 			{
-				app		= (ServerApp*)_applist->ItemAt(i);
+				app=(ServerApp*)fAppList->ItemAt(i);
 				if(!app)
-					{ printf("PANIC in AppServer::Broadcast()\n"); continue; }
-
-				wait_for_thread(app->_monitor_thread, &rv);
+					continue;
+				
+				// Instead of calling wait_for_thread, we will wait a bit, check for the
+				// thread_id. We will only wait so long, because then the app is probably crashed
+				// or hung. Seeing that being the case, we'll kill its BApp team and fake the
+				// quit message
+				if(get_thread_info(app->fMonitorThreadID, &tinfo)==B_OK)
+				{
+					bool killteam=true;
+					
+					for(int32 j=0; j<5; j++)
+					{
+						snooze(1000);	// wait half a second for it to quit
+						if(get_thread_info(app->fMonitorThreadID, &tinfo)!=B_OK)
+						{
+							killteam=false;
+							break;
+						}
+					}
+					
+					if(killteam)
+					{
+						kill_team(app->ClientTeamID());
+						app->PostMessage(B_QUIT_REQUESTED);
+					}
+				}
 			}
-			release_sem(_applist_lock);
+			release_sem(fAppListLock);
 
 			// When we delete the last ServerApp, we can exit the server
-			_quitting_server	= true;
-			_exit_poller		= true;
+			fQuittingServer=true;
+			fExitPoller=true;
 
 			// also wait for picasso thread
-			kill_thread(_picasso_id);
+			kill_thread(fPicassoThreadID);
 
 			// poller thread is stuck reading messages from its input port
 			// so, there is no cleaner way to make it quit, other than killing it!
-			kill_thread(_poller_id);
+			kill_thread(fPollerThreadID);
 
 			// we are now clear to exit
 			break;
@@ -732,17 +760,17 @@ void AppServer::DispatchMessage(PortMessage *msg)
 */
 void AppServer::Broadcast(int32 code)
 {
-	ServerApp	*app = NULL;
+	ServerApp	*app= NULL;
 	
-	acquire_sem(_applist_lock);
-	for(int32 i = 0; i < _applist->CountItems(); i++)
+	acquire_sem(fAppListLock);
+	for(int32 i= 0; i < fAppList->CountItems(); i++)
 	{
-		app		= (ServerApp*)_applist->ItemAt(i);
+		app=(ServerApp*)fAppList->ItemAt(i);
 		if(!app)
 			{ printf("PANIC in AppServer::Broadcast()\n"); continue; }
 		app->PostMessage(code, sizeof(int32), (int8*)&code);
 	}
-	release_sem(_applist_lock);
+	release_sem(fAppListLock);
 }
 
 /*!
@@ -783,7 +811,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			int32 modifiers=*((int32*)index); index+=sizeof(int32) + (sizeof(int8) * 3);
 			int8 stringlength=*index; index+=stringlength;
 			STRACE(("Key Down: 0x%lx\n",scancode));
-			if(DISPLAYDRIVER == HWDRIVER)
+			if(DISPLAYDRIVER==HWDRIVER)
 			{
 				// Check for workspace change or safe video mode
 				if(scancode>0x01 && scancode<0x0e)
@@ -803,7 +831,8 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 				if(modifiers & B_CONTROL_KEY)
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
-//TODO: change		SetWorkspace(scancode-2);
+					//TODO: change		
+					//SetWorkspace(scancode-2);
 					break;
 				}	
 
@@ -821,21 +850,21 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 				// PrintScreen
 				if(scancode==0xe)
 				{
-					if(_driver)
+					if(fDriver)
 					{
 						char filename[128];
 						BEntry entry;
 						
-						sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
 						entry.SetTo(filename);
 						
 						while(entry.Exists())
 						{
-							_ssindex++;
-							sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+							fScreenShotIndex++;
+							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
 						}
-						_ssindex++;
-						_driver->DumpToFile(filename);
+						fScreenShotIndex++;
+						fDriver->DumpToFile(filename);
 						break;
 					}
 				}
@@ -857,7 +886,8 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 					{
 						STRACE(("Set Workspace %ld\n",scancode-1));
-//TODO: resolve			SetWorkspace(scancode-2);
+						//TODO: resolve			
+						//SetWorkspace(scancode-2);
 						break;
 					}	
 				}
@@ -877,22 +907,22 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 				// Pause/Break
 				if(scancode==0x7f)
 				{
-					if(_driver)
+					if(fDriver)
 					{
 						char filename[128];
 						BEntry entry;
 						
-						sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
 						entry.SetTo(filename);
 						
 						while(entry.Exists())
 						{
-							_ssindex++;
-							sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+							fScreenShotIndex++;
+							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
 						}
-						_ssindex++;
+						fScreenShotIndex++;
 
-						_driver->DumpToFile(filename);
+						fDriver->DumpToFile(filename);
 						break;
 					}
 				}
@@ -1026,19 +1056,19 @@ ServerApp *AppServer::FindApp(const char *sig)
 
 	ServerApp *foundapp=NULL;
 
-	acquire_sem(_applist_lock);
+	acquire_sem(fAppListLock);
 
-	for(int32 i=0; i<_applist->CountItems();i++)
+	for(int32 i=0; i<fAppList->CountItems();i++)
 	{
-		foundapp=(ServerApp*)_applist->ItemAt(i);
-		if(foundapp && foundapp->_signature==sig)
+		foundapp=(ServerApp*)fAppList->ItemAt(i);
+		if(foundapp && foundapp->fSignature==sig)
 		{
-			release_sem(_applist_lock);
+			release_sem(fAppListLock);
 			return foundapp;
 		}
 	}
 
-	release_sem(_applist_lock);
+	release_sem(fAppListLock);
 	
 	// couldn't find a match
 	return NULL;
@@ -1059,13 +1089,13 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 	int32 wflags, DisplayDriver *ddriver)
 {
 	Decorator *dec=NULL;
-// Temporary solution!
+
 	dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
-/*	if(!app_server->make_decorator)
+	if(!app_server->make_decorator)
 		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
 	else
 		dec=app_server->make_decorator(rect,wlook,wfeel,wflags);
-*/
+
 	gui_colorset.Lock();
 	dec->SetDriver(ddriver);
 	dec->SetColors(gui_colorset);
@@ -1088,11 +1118,6 @@ int main( int argc, char** argv )
 	if(find_port(SERVER_PORT_NAME)!=B_NAME_NOT_FOUND)
 		return -1;
 
-// why on the heap?
-/*	app_server=new AppServer();
-	app_server->Run();
-	delete app_server;
-*/
 	AppServer	app_server;
 	app_server.Run();
 	return 0;

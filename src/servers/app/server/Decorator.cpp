@@ -308,18 +308,15 @@ int32 Decorator::_ClipTitle(float width)
 	{
 		int32 strlength=_title_string->CountChars();
 		float pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
-//		printf("Initial width = %f\n", width );
-//		printf("DEC: strlen = %ld\t pixwidth = %f\n", strlength, pixwidth);
+
 		while(strlength>=0)
 		{
 			if(pixwidth<width)
-				break;
+				return strlength;
+
 			strlength--;
 			pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
-//			printf("DEC: strlen = %ld\t pixwidth = %f\n", strlength, pixwidth);			
 		}
-		
-		return strlength;
 	}
 	return 0;
 }

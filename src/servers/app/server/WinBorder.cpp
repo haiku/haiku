@@ -96,7 +96,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_decorator		= NULL;
 
 	if (feel == B_NO_BORDER_WINDOW_LOOK){
-		_full			= _win->top_layer->_full;
+		_full			= _win->fTopLayer->_full;
 		fDecFull		= NULL;
 		fDecFullVisible	= NULL;
 		fDecVisible		= NULL;
@@ -109,8 +109,8 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 		_decorator->GetFootprint( fDecFull );
 
-			// our full region is the union between decorator's region and top_layer's region
-		_full			= _win->top_layer->_full;
+			// our full region is the union between decorator's region and fTopLayer's region
+		_full			= _win->fTopLayer->_full;
 		_full.Include( fDecFull );
 	}
 
@@ -193,7 +193,7 @@ void WinBorder::MouseDown(int8 *buffer)
 			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
 			msg.what		= B_MOUSE_DOWN;
 			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->top_layer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
+			msg.AddPoint("where", (_win->fTopLayer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("modifiers", modifiers);
 			msg.AddInt32("buttons", buttons);
 			msg.AddInt32("clicks", 1);
@@ -246,7 +246,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
 			msg.what		= B_MOUSE_MOVED;
 			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->top_layer->ConvertFromTop(helpRect)).LeftTop() );
+			msg.AddPoint("where", (_win->fTopLayer->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("buttons", buttons);
 			
 			_win->SendMessageToClient( &msg );
@@ -311,7 +311,7 @@ STRACE_MOUSE(("WinBorder %s: MouseUp() \n",GetName()));
 			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
 			msg.what		= B_MOUSE_UP;
 			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->top_layer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
+			msg.AddPoint("where", (_win->fTopLayer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("modifiers", modifiers);
 			
 			_win->SendMessageToClient( &msg );
@@ -373,25 +373,25 @@ void WinBorder::RebuildRegions( const BRect& r ){
 	}
 
 		// rebuild top_layer:
-	if ( _win->top_layer->_full.Intersects( r ) ){
+	if ( _win->fTopLayer->_full.Intersects( r ) ){
 			// build top_layer's visible region by intersecting its _full with winborder's _visible region.
-		_win->top_layer->_visible		= _win->top_layer->_full;
-		_win->top_layer->_visible.IntersectWith( &(_visible) );
+		_win->fTopLayer->_visible		= _win->fTopLayer->_full;
+		_win->fTopLayer->_visible.IntersectWith( &(_visible) );
 
 			// then exclude it from winborder's _visible... 
-		_visible.Exclude( &(_win->top_layer->_visible) );
+		_visible.Exclude( &(_win->fTopLayer->_visible) );
 
-		_win->top_layer->_fullVisible	= _win->top_layer->_visible;
+		_win->fTopLayer->_fullVisible	= _win->fTopLayer->_visible;
 
 			// Rebuild regions for children...
-		for(Layer *lay = _win->top_layer->_bottomchild; lay != NULL; lay = lay->_uppersibling){
+		for(Layer *lay = _win->fTopLayer->_bottomchild; lay != NULL; lay = lay->_uppersibling){
 			if ( !(lay->_hidden) ){
 				lay->RebuildRegions( r );
 			}
 		}
 	}
 	else{
-		_visible.Exclude( &(_win->top_layer->_fullVisible) );
+		_visible.Exclude( &(_win->fTopLayer->_fullVisible) );
 	}
 
 		// rebuild decorator.
@@ -431,9 +431,9 @@ printf("#WinBorder(%s)::Draw() ENDED\n", GetName());
 
 		// draw the top_layer
 	reg.Set( r );
-	reg.IntersectWith( &(_win->top_layer->_visible) );
+	reg.IntersectWith( &(_win->fTopLayer->_visible) );
 	if (reg.CountRects() > 0){
-		_win->top_layer->RequestClientUpdate( reg.Frame() );
+		_win->fTopLayer->RequestClientUpdate( reg.Frame() );
 	}
 }
 
@@ -445,8 +445,8 @@ void WinBorder::MoveBy(float x, float y)
 	_frame.OffsetBy(x, y);
 	_full.OffsetBy(x, y);
 
-	_win->top_layer->_frame.OffsetBy(x, y);
-	_win->top_layer->MoveRegionsBy(x, y);
+	_win->fTopLayer->_frame.OffsetBy(x, y);
+	_win->fTopLayer->MoveRegionsBy(x, y);
 
 	if (_decorator){
 			// allow decorator to make its internal calculations.
@@ -526,9 +526,9 @@ void WinBorder::ResizeBy(float x, float y)
 	_frame.right	= _frame.right + x;
 	_frame.bottom	= _frame.bottom + y;
 
-	_win->top_layer->ResizeRegionsBy(x, y);
+	_win->fTopLayer->ResizeRegionsBy(x, y);
 
-	_full			= _win->top_layer->_full;
+	_full			= _win->fTopLayer->_full;
 
 	if (_decorator){
 			// allow decorator to make its internal calculations.

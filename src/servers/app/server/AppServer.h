@@ -60,27 +60,27 @@ private:
 	// global function pointer
 	create_decorator	*make_decorator;
 	
-	port_id	_messageport,
-			_mouseport;
+	port_id	_fMessagePort,
+			fMousePort;
 	
-	image_id _decorator_id;
+	image_id fDecoratorID;
 	
-	BString decorator_name;
+	BString fDecoratorName;
 	
-	bool _quitting_server,
-		_exit_poller;
+	bool fQuittingServer,
+		fExitPoller;
 	
-	BList *_applist;
-	thread_id _poller_id,
-			  _picasso_id;
+	BList *fAppList;
+	thread_id fPollerThreadID,
+			  fPicassoThreadID;
 	
-	sem_id 	_active_lock,
-			_applist_lock,
-			_decor_lock;
+	sem_id 	fActiveAppLock,
+			fAppListLock,
+			fDecoratorLock;
 	
-	DisplayDriver *_driver;
+	DisplayDriver *fDriver;
 	
-	int32 _ssindex;
+	int32 fScreenShotIndex;
 };
 
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,

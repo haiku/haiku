@@ -385,7 +385,7 @@ void Layer::MouseTransit(uint32 transit)
 		else
 		{
 			if(_serverwin)
-				_serverwin->GetApp()->SetAppCursor();
+				_serverwin->App()->SetAppCursor();
 			else
 				cursormanager->SetCursor(B_CURSOR_DEFAULT);
 		}

@@ -70,78 +70,80 @@
 	\brief Constructor
 	\param sendport port ID for the BApplication which will receive the ServerApp's messages
 	\param rcvport port by which the ServerApp will receive messages from its BApplication.
-	\param _signature NULL-terminated string which contains the BApplication's
-	MIME _signature.
+	\param fSignature NULL-terminated string which contains the BApplication's
+	MIME fSignature.
 */
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, char *signature)
 {
-		// it will be of *very* musch use in correct window order
+	// it will be of *very* musch use in correct window order
 	fClientTeamID		= clientTeamID;
-		// what to send a message to the client? Write a BMessage to this port.
+
+	// what to send a message to the client? Write a BMessage to this port.
 	fClientLooperPort	= clientLooperPort;
 
-	// need to copy the _signature because the message buffer
+	// need to copy the fSignature because the message buffer
 	// owns the copy which we are passed as a parameter.
-	_signature=(signature)?signature:"application/x-vnd.NULL-application-signature";
+	fSignature=(signature)?signature:"application/x-vnd.NULL-application-signature";
 	
 	// token ID of the BApplication's BHandler object. Used for BMessage target specification
-	_handlertoken=handlerID;
+	fHandlerToken=handlerID;
 
-	// _sender is the our BApplication's event port
-	_sender=sendport;
-	_applink=new PortLink(_sender);
-	_applink->SetPort(_sender);
+	// fClientAppPort is the our BApplication's event port
+	fClientAppPort=sendport;
+	fAppLink=new PortLink(fClientAppPort);
 
-	// Gotta get the team ID so we can ping the application
-	_target_id			= clientTeamID;
-	
-	// _receiver is the port we receive messages from our BApplication
-	_receiver=rcvport;
+	// fMessagePort is the port we receive messages from our BApplication
+	fMessagePort=rcvport;
 
-	_winlist=new BList(0);
-	_bmplist=new BList(0);
-	_piclist=new BList(0);
-	_isactive=false;
+	fSWindowList=new BList(0);
+	fBitmapList=new BList(0);
+	fPictureList=new BList(0);
+	fIsActive=false;
 
 	ServerCursor *defaultc=cursormanager->GetCursor(B_CURSOR_DEFAULT);
 	
-	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
-	_lock=create_sem(1,"ServerApp sem");
+	fAppCursor=(defaultc)?new ServerCursor(defaultc):NULL;
+	fLockSem=create_sem(1,"ServerApp sem");
 
 	// Does this even belong here any more? --DW
 //	_driver=desktop->GetDisplayDriver();
 
-	_cursorhidden=false;
+	fCursorHidden=false;
 
 	Run();
 
-	STRACE(("ServerApp %s:\n",_signature.String()));
-	STRACE(("\tBApp port: %ld\n",_sender));
-	STRACE(("\tReceiver port: %ld\n",_receiver));
+	STRACE(("ServerApp %s:\n",fSignature.String()));
+	STRACE(("\tBApp port: %ld\n",fClientAppPort));
+	STRACE(("\tReceiver port: %ld\n",fMessagePort));
 }
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-	STRACE(("*ServerApp %s:~ServerApp()\n",_signature.String()));
+	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
 	int32 i;
-
+	
+	WindowBroadcast(AS_QUIT_APP);
+	
 	// wait for our ServerWindow threads
-	bool	ready = true;
+	bool ready=true;
 	desktop->fLayerLock.Lock();
 	do{
 		ready	= true;
 
 		int32	count = desktop->fWinBorderList.CountItems();
-		for( int32 i = 0; i < count; i++){
-			ServerWindow	*sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
-			if (ClientTeamID() == sw->ClientTeamID()){
+		for( int32 i = 0; i < count; i++)
+		{
+			ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
+			if (ClientTeamID() == sw->ClientTeamID())
+			{
 				thread_id		tid = sw->ThreadID();
 				status_t		temp;
 
 				desktop->fLayerLock.Unlock();
-printf("waiting for thread %s\n", sw->Title());
+				
+				printf("waiting for thread %s\n", sw->Title());
 				wait_for_thread(tid, &temp);
 
 				desktop->fLayerLock.Lock();
@@ -150,54 +152,56 @@ printf("waiting for thread %s\n", sw->Title());
 				break;
 			}
 		}
-	}while(!ready);
+	} while(!ready);
 	desktop->fLayerLock.Unlock();
+
 /*	
 	ServerWindow *tempwin;
-	for(i=0;i<_winlist->CountItems();i++)
+	for(i=0;i<fSWindowList->CountItems();i++)
 	{
-		tempwin=(ServerWindow*)_winlist->ItemAt(i);
+		tempwin=(ServerWindow*)fSWindowList->ItemAt(i);
 		if(tempwin)
 			delete tempwin;
 	}
-	_winlist->MakeEmpty();
-	delete _winlist;
+	fSWindowList->MakeEmpty();
+	delete fSWindowList;
 */
+
 	ServerBitmap *tempbmp;
-	for(i=0;i<_bmplist->CountItems();i++)
+	for(i=0;i<fBitmapList->CountItems();i++)
 	{
-		tempbmp=(ServerBitmap*)_bmplist->ItemAt(i);
+		tempbmp=(ServerBitmap*)fBitmapList->ItemAt(i);
 		if(tempbmp)
 			delete tempbmp;
 	}
-	_bmplist->MakeEmpty();
-	delete _bmplist;
+	fBitmapList->MakeEmpty();
+	delete fBitmapList;
 
 	ServerPicture *temppic;
-	for(i=0;i<_piclist->CountItems();i++)
+	for(i=0;i<fPictureList->CountItems();i++)
 	{
-		temppic=(ServerPicture*)_piclist->ItemAt(i);
+		temppic=(ServerPicture*)fPictureList->ItemAt(i);
 		if(temppic)
 			delete temppic;
 	}
-	_piclist->MakeEmpty();
-	delete _piclist;
+	fPictureList->MakeEmpty();
+	delete fPictureList;
 
-	delete _applink;
-	_applink=NULL;
-	if(_appcursor)
-		delete _appcursor;
+	delete fAppLink;
+	fAppLink=NULL;
+	if(fAppCursor)
+		delete fAppCursor;
 
 
-	cursormanager->RemoveAppCursors(_signature.String());
-	delete_sem(_lock);
+	cursormanager->RemoveAppCursors(fSignature.String());
+	delete_sem(fLockSem);
 	
-	STRACE(("#ServerApp %s:~ServerApp()\n",_signature.String()));
+	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
 
 	// Kill the monitor thread if it exists
 	thread_info info;
-	if(get_thread_info(_monitor_thread,&info)==B_OK)
-		kill_thread(_monitor_thread);
+	if(get_thread_info(fMonitorThreadID,&info)==B_OK)
+		kill_thread(fMonitorThreadID);
 
 }
 
@@ -209,11 +213,11 @@ bool ServerApp::Run(void)
 {
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.
-	_monitor_thread=spawn_thread(MonitorApp,_signature.String(),B_NORMAL_PRIORITY,this);
-	if(_monitor_thread==B_NO_MORE_THREADS || _monitor_thread==B_NO_MEMORY)
+	fMonitorThreadID=spawn_thread(MonitorApp,fSignature.String(),B_NORMAL_PRIORITY,this);
+	if(fMonitorThreadID==B_NO_MORE_THREADS || fMonitorThreadID==B_NO_MEMORY)
 		return false;
 
-	resume_thread(_monitor_thread);
+	resume_thread(fMonitorThreadID);
 	return true;
 }
 
@@ -233,18 +237,18 @@ bool ServerApp::Run(void)
 bool ServerApp::PingTarget(void)
 {
 	team_info tinfo;
-	if(get_team_info(_target_id,&tinfo)==B_BAD_TEAM_ID)
+	if(get_team_info(fClientTeamID,&tinfo)==B_BAD_TEAM_ID)
 	{
 		port_id serverport=find_port(SERVER_PORT_NAME);
 		if(serverport==B_NAME_NOT_FOUND)
 		{
-			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",_signature.String());
+			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",fSignature.String());
 			return false;
 		}
-		_applink->SetPort(serverport);
-		_applink->SetOpCode(AS_DELETE_APP);
-		_applink->Attach(&_monitor_thread,sizeof(thread_id));
-		_applink->Flush();
+		fAppLink->SetPort(serverport);
+		fAppLink->SetOpCode(AS_DELETE_APP);
+		fAppLink->Attach(&fMonitorThreadID,sizeof(thread_id));
+		fAppLink->Flush();
 		return false;
 	}
 	return true;
@@ -256,20 +260,41 @@ bool ServerApp::PingTarget(void)
 */
 void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
 {
-	write_port(_receiver,code, buffer, size);
+	write_port(fMessagePort,code, buffer, size);
 }
 
-void ServerApp::SendMessageToClient(const BMessage* msg) const{
-	ssize_t		size;
-	char		*buffer;
-	
-	size		= msg->FlattenedSize();
-	buffer		= new char[size];
-	if (msg->Flatten(buffer, size) == B_OK){
-		write_port(fClientLooperPort, msg->what, buffer, size);
+/*!
+	\brief Send a simple message to all of the ServerApp's ServerWindows
+	\param msg The message code to broadcast
+*/
+void ServerApp::WindowBroadcast(int32 code)
+{
+	desktop->fLayerLock.Lock();
+	int32 count=desktop->fWinBorderList.CountItems();
+	for(int32 i=0; i<count; i++)
+	{
+		ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
+		sw->PostMessage(code);
 	}
+	desktop->fLayerLock.Unlock();
+}
+
+/*!
+	\brief Send a message to the ServerApp's BApplication
+	\param msg The message to send
+*/
+void ServerApp::SendMessageToClient(const BMessage *msg) const
+{
+	ssize_t size;
+	char *buffer;
+	
+	size=msg->FlattenedSize();
+	buffer=new char[size];
+	
+	if (msg->Flatten(buffer, size) == B_OK)
+		write_port(fClientLooperPort, msg->what, buffer, size);
 	else
-		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", _signature.String());
+		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", fSignature.String());
 
 	delete buffer;
 }
@@ -283,15 +308,15 @@ void ServerApp::SendMessageToClient(const BMessage* msg) const{
 */
 void ServerApp::Activate(bool value)
 {
-	_isactive=value;
+	fIsActive=value;
 	SetAppCursor();
 }
  
 //! Sets the cursor to the application cursor, if any.
 void ServerApp::SetAppCursor(void)
 {
-	if(_appcursor)
-		cursormanager->SetCursor(_appcursor->ID());
+	if(fAppCursor)
+		cursormanager->SetCursor(fAppCursor->ID());
 	else
 		cursormanager->SetCursor(B_CURSOR_DEFAULT);
 }
@@ -301,23 +326,23 @@ void ServerApp::SetAppCursor(void)
 	\param data Pointer to the thread's ServerApp object
 	\return Throwaway value - always 0
 */
-		int32 ServerApp::MonitorApp(void *data)
+int32 ServerApp::MonitorApp(void *data)
 {
 	// Message-dispatching loop for the ServerApp
 
-	ServerApp		*app = (ServerApp *)data;
-	PortQueue		msgqueue(app->_receiver);
-	PortMessage		*msg;
-	bool			quiting = false;
+	ServerApp *app = (ServerApp *)data;
+	PortQueue msgqueue(app->fMessagePort);
+	PortMessage *msg;
+	bool quitting = false;
 	
-	for( ; !quiting; )
+	for( ; !quitting; )
 	{
 		if(!msgqueue.MessagesWaiting())
 			msgqueue.GetMessagesFromPort(true);
 		else
 			msgqueue.GetMessagesFromPort(false);
 
-		msg		= msgqueue.GetMessageFromQueue();
+		msg	= msgqueue.GetMessageFromQueue();
 		if(!msg)
 			continue;
 					
@@ -325,52 +350,53 @@ void ServerApp::SetAppCursor(void)
 		{
 			case AS_QUIT_APP:
 			{
-				STRACE(("ServerApp %s:Server shutdown notification received\n",app->_signature.String()));
-/*
+				// This message is received only when the app_server is asked to shut down in
+				// test/debug mode. Of course, if we are testing while using AccelerantDriver, we do
+				// NOT want to shut down client applications. The server can be quit o in this fashion
+				// through the driver's interface, such as closing the ViewDriver's window.
+				
+				STRACE(("ServerApp %s:Server shutdown notification received\n",app->fSignature.String()));
+
 				// If we are using the real, accelerated version of the
 				// DisplayDriver, we do NOT want the user to be able shut down
 				// the server. The results would NOT be pretty
 				if(DISPLAYDRIVER!=HWDRIVER)
 				{
-					// This message is received from the app_server thread
-					// because the server was asked to quit. Thus, we
-					// ask all apps to quit. This is NOT the same as system
-					// shutdown and will happen only in testing
-					
-					BMessage 	pleaseQuit(_QUIT_);
+					BMessage pleaseQuit(B_QUIT_REQUESTED);
 					app->SendMessageToClient(&pleaseQuit);
 				}
-* Adi: I do not agree here! I think this is a reminiscence(?) since the "old" days...
-*/
-				BMessage 	pleaseQuit(_QUIT_);
-				app->SendMessageToClient(&pleaseQuit);
 				break;
 			}
 			
+			// TODO: Fix
+			// Using this case is a hack. The ServerApp is receiving a message with a '0' code after
+			// it sends the quit message on server shutdown and I can't find what's sending it. This
+			// must be found and fixed!
+			case 0:
 			case B_QUIT_REQUESTED:
 			{
-				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->_signature.String()));
+				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete our monitor
 				// ADI: No! This is a bad solution. A thead should continue its
 				// execution until its exit point, and this can *very* easily be done
-				quiting		= true;
+				quitting=true;
 				// see... no need to ask the main thread to kill us.
 				// still... it will delete this ServerApp object.
 				port_id		serverport = find_port(SERVER_PORT_NAME);
 				if(serverport == B_NAME_NOT_FOUND){
-					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->_signature.String());
+					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
 					break;
 				}
-				app->_applink->SetPort(serverport);
-				app->_applink->SetOpCode(AS_DELETE_APP);
-				app->_applink->Attach(&app->_monitor_thread, sizeof(thread_id));
-				app->_applink->Flush();
+				app->fAppLink->SetPort(serverport);
+				app->fAppLink->SetOpCode(AS_DELETE_APP);
+				app->fAppLink->Attach(&app->fMonitorThreadID, sizeof(thread_id));
+				app->fAppLink->Flush();
 				break;
 			}
 			default:
 			{
-				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->_signature.String()));
+				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->fSignature.String()));
 				app->_DispatchMessage(msg);
 				break;
 			}
@@ -378,7 +404,8 @@ void ServerApp::SetAppCursor(void)
 
 		delete msg;
 	} // end for 
-		// clean exit.
+
+	// clean exit.
 	return 0;
 }
 
@@ -398,7 +425,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
-			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",_signature.String()));
+			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",fSignature.String()));
 			
 			// received when the client-side global font list has been
 			// refreshed
@@ -409,47 +436,47 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
-			STRACE(("ServerApp %s: Received global UI color update notification\n",_signature.String()));
+/*			STRACE(("ServerApp %s: Received global UI color update notification\n",fSignature.String()));
 			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
-			for(int32 i=0; i<_winlist->CountItems(); i++)
+			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
-				win=(ServerWindow*)_winlist->ItemAt(i);
+				win=(ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
-				win->_winborder->UpdateColors();
+				win->fWinBorder->UpdateColors();
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-			break;
+*/			break;
 		}
 		case AS_UPDATE_FONTS:
 		{
-			STRACE(("ServerApp %s: Received global font update notification\n",_signature.String()));
+/*			STRACE(("ServerApp %s: Received global font update notification\n",fSignature.String()));
 			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
 			
-			for(int32 i=0; i<_winlist->CountItems(); i++)
+			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
-				win=(ServerWindow*)_winlist->ItemAt(i);
+				win=(ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
-				win->_winborder->UpdateFont();
+				win->fWinBorder->UpdateFont();
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-			break;
+*/			break;
 		}
 		case AS_UPDATE_DECORATOR:
 		{
-			STRACE(("ServerApp %s: Received decorator update notification\n",_signature.String()));
+			STRACE(("ServerApp %s: Received decorator update notification\n",fSignature.String()));
 
 			ServerWindow *win;
 			
-			for(int32 i=0; i<_winlist->CountItems(); i++)
+			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
-				win=(ServerWindow*)_winlist->ItemAt(i);
+				win=(ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
-				win->_winborder->UpdateDecorator();
+				win->fWinBorder->UpdateDecorator();
 				win->Unlock();
 			}
 			break;
@@ -490,7 +517,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->ReadString(&title);
 			msg->Read<port_id>(&replyport);
 
-			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",_signature.String()));
+			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
 			new ServerWindow(frame, title, look, feel, flags, this,
@@ -499,7 +526,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// We don't have to do anything here...
 
 			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
+					fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
 			delete title;
 
@@ -507,7 +534,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_CREATE_BITMAP:
 		{
-			STRACE(("ServerApp %s: Received BBitmap creation request\n",_signature.String()));
+			STRACE(("ServerApp %s: Received BBitmap creation request\n",fSignature.String()));
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
@@ -541,7 +568,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
-						_signature.String(),r.left,r.top,r.right,r.bottom));
+						fSignature.String(),r.left,r.top,r.right,r.bottom));
 
 			if(sbmp)
 			{
@@ -563,7 +590,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_DELETE_BITMAP:
 		{
-			STRACE(("ServerApp %s: received BBitmap delete request\n",_signature.String()));
+			STRACE(("ServerApp %s: received BBitmap delete request\n",fSignature.String()));
 			// Delete a bitmap's allocated memory
 
 			// Attached Data:
@@ -581,9 +608,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			ServerBitmap *sbmp=_FindBitmap(bmp_id);
 			if(sbmp)
 			{
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),bmp_id));
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
 
-				_bmplist->RemoveItem(sbmp);
+				fBitmapList->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
 				write_port(replyport,SERVER_TRUE,NULL,0);
 			}
@@ -595,34 +622,34 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Implement
-			STRACE(("ServerApp %s: Create Picture unimplemented\n",_signature.String()));
+			STRACE(("ServerApp %s: Create Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
 			// TODO: Implement
-			STRACE(("ServerApp %s: Delete Picture unimplemented\n",_signature.String()));
+			STRACE(("ServerApp %s: Delete Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
 			// TODO: Implement
-			STRACE(("ServerApp %s: Clone Picture unimplemented\n",_signature.String()));
+			STRACE(("ServerApp %s: Clone Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
 			// TODO; Implement
-			STRACE(("ServerApp %s: Download Picture unimplemented\n",_signature.String()));
+			STRACE(("ServerApp %s: Download Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_SET_SCREEN_MODE:
 		{
-			STRACE(("ServerApp %s: Set Screen Mode\n",_signature.String()));
+			STRACE(("ServerApp %s: Set Screen Mode\n",fSignature.String()));
 
 			// Attached data
 			// 1) int32 workspace #
@@ -642,7 +669,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_ACTIVATE_WORKSPACE:
 		{
-			STRACE(("ServerApp %s: Activate Workspace\n",_signature.String()));
+			STRACE(("ServerApp %s: Activate Workspace\n",fSignature.String()));
 			// Attached data
 			// 1) int32 workspace index
 			
@@ -659,39 +686,39 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
-			STRACE(("ServerApp %s: Show Cursor\n",_signature.String()));
+			STRACE(("ServerApp %s: Show Cursor\n",fSignature.String()));
 			cursormanager->ShowCursor();
-			_cursorhidden=false;
+			fCursorHidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
-			STRACE(("ServerApp %s: Hide Cursor\n",_signature.String()));
+			STRACE(("ServerApp %s: Hide Cursor\n",fSignature.String()));
 			cursormanager->HideCursor();
-			_cursorhidden=true;
+			fCursorHidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
-			STRACE(("ServerApp %s: Obscure Cursor\n",_signature.String()));
+			STRACE(("ServerApp %s: Obscure Cursor\n",fSignature.String()));
 			cursormanager->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
-			STRACE(("ServerApp %s: Received IsCursorHidden request\n",_signature.String()));
+			STRACE(("ServerApp %s: Received IsCursorHidden request\n",fSignature.String()));
 			// Attached data
 			// 1) int32 port to reply to
 			int32 replyport;
 			msg->Read<int32>(&replyport);
 			
-			write_port(replyport,(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
+			write_port(replyport,(fCursorHidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
 			break;
 		}
 		case AS_SET_CURSOR_DATA:
 		{
-			STRACE(("ServerApp %s: SetCursor via cursor data\n",_signature.String()));
-			// Attached data: 68 bytes of _appcursor data
+			STRACE(("ServerApp %s: SetCursor via cursor data\n",fSignature.String()));
+			// Attached data: 68 bytes of fAppCursor data
 			
 			int8 cdata[68];
 			msg->Read(cdata,68);
@@ -700,18 +727,18 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// cursors, we will delete them if there is an existing one. It would
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
-			if(_appcursor)
-				cursormanager->DeleteCursor(_appcursor->ID());
+			if(fAppCursor)
+				cursormanager->DeleteCursor(fAppCursor->ID());
 
-			_appcursor=new ServerCursor(cdata);
-			_appcursor->SetAppSignature(_signature.String());
-			cursormanager->AddCursor(_appcursor);
-			cursormanager->SetCursor(_appcursor->ID());
+			fAppCursor=new ServerCursor(cdata);
+			fAppCursor->SetAppSignature(fSignature.String());
+			cursormanager->AddCursor(fAppCursor);
+			cursormanager->SetCursor(fAppCursor->ID());
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
 		{
-			STRACE(("ServerApp %s: SetCursor via BCursor\n",_signature.String()));
+			STRACE(("ServerApp %s: SetCursor via BCursor\n",fSignature.String()));
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
@@ -738,9 +765,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_CREATE_BCURSOR:
 		{
-			STRACE(("ServerApp %s: Create BCursor\n",_signature.String()));
+			STRACE(("ServerApp %s: Create BCursor\n",fSignature.String()));
 			// Attached data:
-			// 1) 68 bytes of _appcursor data
+			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
 			
 			port_id replyport;
@@ -749,33 +776,33 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read(cdata,68);
 			msg->Read<int32>(&replyport);
 
-			_appcursor=new ServerCursor(cdata);
-			_appcursor->SetAppSignature(_signature.String());
-			cursormanager->AddCursor(_appcursor);
+			fAppCursor=new ServerCursor(cdata);
+			fAppCursor->SetAppSignature(fSignature.String());
+			cursormanager->AddCursor(fAppCursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			PortLink link(replyport);
-			link.Attach<int32>(_appcursor->ID());
+			link.Attach<int32>(fAppCursor->ID());
 			link.Flush();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
 		{
-			STRACE(("ServerApp %s: Delete BCursor\n",_signature.String()));
+			STRACE(("ServerApp %s: Delete BCursor\n",fSignature.String()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
 			int32 ctoken;
 			msg->Read<int32>(&ctoken);
 			
-			if(_appcursor && _appcursor->ID()==ctoken)
-				_appcursor=NULL;
+			if(fAppCursor && fAppCursor->ID()==ctoken)
+				fAppCursor=NULL;
 			
 			cursormanager->DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Get ScrollBar info\n",_signature.String()));
+			STRACE(("ServerApp %s: Get ScrollBar info\n",fSignature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
@@ -792,7 +819,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Set ScrollBar info\n",_signature.String()));
+			STRACE(("ServerApp %s: Set ScrollBar info\n",fSignature.String()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
@@ -803,7 +830,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n",_signature.String()));
+			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n",fSignature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
@@ -818,7 +845,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n",_signature.String()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n",fSignature.String()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
@@ -829,7 +856,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",_signature.String()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",fSignature.String()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
@@ -840,7 +867,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_GET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",_signature.String()));
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",fSignature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
@@ -857,7 +884,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_GET_UI_COLOR:
 		{
-			STRACE(("ServerApp %s: Get UI color\n",_signature.String()));
+			STRACE(("ServerApp %s: Get UI color\n",fSignature.String()));
 
 			RGBColor color;
 			int32 whichcolor;
@@ -878,7 +905,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		default:
 		{
-			STRACE(("ServerApp %s received unhandled message code offset %s\n",_signature.String(),MsgCodeToString(msg->Code())));
+			STRACE(("ServerApp %s received unhandled message code offset %s\n",fSignature.String(),
+				MsgCodeToBString(msg->Code()).String()));
 
 			break;
 		}
@@ -893,15 +921,16 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 ServerBitmap *ServerApp::_FindBitmap(int32 token)
 {
 	ServerBitmap *temp;
-	for(int32 i=0; i<_bmplist->CountItems();i++)
+	for(int32 i=0; i<fBitmapList->CountItems();i++)
 	{
-		temp=(ServerBitmap*)_bmplist->ItemAt(i);
+		temp=(ServerBitmap*)fBitmapList->ItemAt(i);
 		if(temp && temp->Token()==token)
 			return temp;
 	}
 	return NULL;
 }
 
-team_id ServerApp::ClientTeamID(){
+team_id ServerApp::ClientTeamID()
+{
 	return fClientTeamID;
 }

@@ -123,39 +123,40 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	port_id looperPort, port_id replyport, uint32 index, int32 handlerID)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n",string? string: "NULL"));
-	_app			= winapp;
-	_title			= new BString;
+	fServerApp			= winapp;
+
 	if(string)
-		_title->SetTo(string);
-	_frame			= rect;
-	_flags			= wflags;
-	_look			= wlook;
-	_feel			= wfeel;
-	_handlertoken	= handlerID;
-	winLooperPort	= looperPort;
+		fTitle.SetTo(string);
+	fFrame			= rect;
+	fFlags			= wflags;
+	fLook			= wlook;
+	fFeel			= wfeel;
+	fHandlerToken	= handlerID;
+	fClientLooperPort	= looperPort;
 	fWorkspaces		= index;
 	fClientTeamID	= winapp->ClientTeamID();
-	_workspace		= NULL;
-	_token			= win_token_handler.GetToken();
+	fWorkspace		= NULL;
+	fToken			= win_token_handler.GetToken();
 
 	
-	// _sender is the port to which the app awaits messages from the server
-	_sender			= winport;
-	// _receiver is the port to which the app sends messages for the server
-	_receiver		= create_port(30,_title->String());
+	// fClientWinPort is the port to which the app awaits messages from the server
+	fClientWinPort			= winport;
 
-	ses				= new BSession(_receiver, _sender);
+	// fMessagePort is the port to which the app sends messages for the server
+	fMessagePort		= create_port(30,fTitle.String());
+
+	fSession= new BSession(fMessagePort, fClientWinPort);
 	
-	// Send a reply to our window - it is expecting _receiver port.
+	// Send a reply to our window - it is expecting fMessagePort port.
 	
 	// Temporarily use winlink to save time and memory
-	_winlink=new PortLink(replyport);
+	fWinLink=new PortLink(replyport);
 
-	_winlink->SetOpCode(AS_CREATE_WINDOW);
-	_winlink->Attach<port_id>(_receiver);
-	_winlink->Flush();
+	fWinLink->SetOpCode(AS_CREATE_WINDOW);
+	fWinLink->Attach<port_id>(fMessagePort);
+	fWinLink->Flush();
 
-	_winlink->SetPort(winport);
+	fWinLink->SetPort(winport);
 
 	// Wait for top_view data and create ServerWindow's top most Layer
 	int32			vToken;
@@ -165,7 +166,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	char*			vName = NULL;
 	
 	PortMessage pmsg;
-	pmsg.ReadFromPort(_receiver);
+	pmsg.ReadFromPort(fMessagePort);
 	if(pmsg.Code() != AS_LAYER_CREATE_ROOT)
 		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received!\n");
 
@@ -175,56 +176,55 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	pmsg.Read<uint32>(&vFlags);
 	pmsg.ReadString(&vName);
 
-	top_layer		= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, this);
+	fTopLayer		= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, this);
 	delete vName;
 
-	cl = top_layer;
+	cl = fTopLayer;
 			
 	// Create a WindoBorder object for our ServerWindow.
-	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
+	fWinBorder		= new WinBorder(fFrame,fTitle.String(),wlook,wfeel,wflags,this);
 
 	// NOTE: this MUST be before the monitor thread is spawned!
-	desktop->AddWinBorder(_winborder);
+	desktop->AddWinBorder(fWinBorder);
 
-	// Spawn our message-monitoring _monitorthread
-	_monitorthread	= spawn_thread(MonitorWin, _title->String(), B_NORMAL_PRIORITY, this);
-	if(_monitorthread != B_NO_MORE_THREADS && _monitorthread != B_NO_MEMORY)
-		resume_thread(_monitorthread);
+	// Spawn our message-monitoring fMonitorThreadID
+	fMonitorThreadID	= spawn_thread(MonitorWin, fTitle.String(), B_NORMAL_PRIORITY, this);
+	if(fMonitorThreadID != B_NO_MORE_THREADS && fMonitorThreadID != B_NO_MEMORY)
+		resume_thread(fMonitorThreadID);
 
-	STRACE(("ServerWindow %s:\n",_title->String()));
+	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
-	STRACE(("\tPort: %ld\n",_receiver));
+	STRACE(("\tPort: %ld\n",fMessagePort));
 	STRACE(("\tWorkspace: %ld\n",index));
 }
 
 //!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
-STRACE(("*ServerWindow (%s):~ServerWindow()\n",_title->String()));
+STRACE(("*ServerWindow (%s):~ServerWindow()\n",fTitle.String()));
 
 	desktop->fGeneralLock.Lock();
 
-	desktop->RemoveWinBorder(_winborder);
-printf("SW(%s) Successfuly removed from the desktop\n", _title->String());
-	if(ses){
-		delete ses;
-		ses = NULL;
+	desktop->RemoveWinBorder(fWinBorder);
+	STRACE(("SW(%s) Successfuly removed from the desktop\n", fTitle.String()));
+	if(fSession){
+		delete fSession;
+		fSession = NULL;
 	}
-	if (_winlink){
-		delete _winlink;
-		_winlink = NULL;
+	if (fWinLink){
+		delete fWinLink;
+		fWinLink = NULL;
 	}
-	if (_winborder){
-		delete _winborder;
-		_winborder = NULL;
+	if (fWinBorder){
+		delete fWinBorder;
+		fWinBorder = NULL;
 	}
 	cl		= NULL;
-	if (top_layer)
-		delete top_layer;
+	if (fTopLayer)
+		delete fTopLayer;
 
 	desktop->fGeneralLock.Unlock();
-printf("#ServerWindow(%s) will exit NOW!!!\n", _title->String());
-	delete _title;
+	STRACE(("#ServerWindow(%s) will exit NOW!!!\n", fTitle.String()));
 }
 
 /*!
@@ -235,7 +235,7 @@ printf("#ServerWindow(%s) will exit NOW!!!\n", _title->String());
 */
 void ServerWindow::RequestDraw(BRect rect)
 {
-STRACE(("ServerWindow %s: Request Draw\n",_title->String()));
+STRACE(("ServerWindow %s: Request Draw\n",fTitle.String()));
 	BMessage		msg;
 	
 	msg.what		= _UPDATE_;
@@ -247,20 +247,20 @@ STRACE(("ServerWindow %s: Request Draw\n",_title->String()));
 //! Requests an update for the entire window
 void ServerWindow::RequestDraw(void)
 {
-	RequestDraw(_frame);
+	RequestDraw(fFrame);
 }
 
 //! Forces the window border to update its decorator
 void ServerWindow::ReplaceDecorator(void)
 {
-STRACE(("ServerWindow %s: Replace Decorator\n",_title->String()));
-	_winborder->UpdateDecorator();
+STRACE(("ServerWindow %s: Replace Decorator\n",fTitle.String()));
+	fWinBorder->UpdateDecorator();
 }
 
 //! Requests that the ServerWindow's BWindow quit
 void ServerWindow::Quit(void)
 {
-STRACE(("ServerWindow %s: Quit\n",_title->String()));
+STRACE(("ServerWindow %s: Quit\n",fTitle.String()));
 	BMessage		msg;
 	
 	msg.what		= B_QUIT_REQUESTED;
@@ -268,98 +268,83 @@ STRACE(("ServerWindow %s: Quit\n",_title->String()));
 	SendMessageToClient(&msg);
 }
 
-/*!
-	\brief Gets the title for the window
-	\return The title for the window
-*/
-const char *ServerWindow::GetTitle(void)
-{
-	return _title->String();
-}
-
-/*!
-	\brief Gets the window's ServerApp
-	\return The ServerApp for the window
-*/
-ServerApp *ServerWindow::GetApp(void)
-{
-	return _app;
-}
-
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
-	if(!_winborder->IsHidden())
+	if(!fWinBorder->IsHidden())
 		return;
 
-STRACE(("ServerWindow %s: Show\n",_title->String()));
-	if(_winborder)
+	STRACE(("ServerWindow %s: Show\n",fTitle.String()));
+	if(fWinBorder)
 	{
-		RootLayer	*rl = _winborder->GetRootLayer();
+		RootLayer	*rl = fWinBorder->GetRootLayer();
 		int32		wksCount;
 
 		desktop->fGeneralLock.Lock();
-printf("ServerWindow(%s)::Show() - General lock acquired\n", _winborder->GetName());
-		rl->fMainLock.Lock();
-printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Show() - General lock acquired\n", fWinBorder->GetName()));
 
-		_winborder->Show();
+		rl->fMainLock.Lock();
+		STRACE(("ServerWindow(%s)::Show() - Main lock acquired\n", fWinBorder->GetName()));
 		
-		if ((_feel == B_FLOATING_SUBSET_WINDOW_FEEL || _feel == B_MODAL_SUBSET_WINDOW_FEEL)
-			 && _winborder->MainWinBorder() == NULL)
+		fWinBorder->Show();
+		
+		if ((fFeel == B_FLOATING_SUBSET_WINDOW_FEEL || fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
+			 && fWinBorder->MainWinBorder() == NULL)
 		{
 			// This window hasn't been added to a normal window subset,
 			//	so don't call placement or redrawing methods!
 			goto goOut;
 		}
-
+		
 		wksCount	= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
 			if (fWorkspaces & (0x00000001UL << i)){
 				Workspace		*ws = rl->WorkspaceAt(i+1);
-				ws->BringToFrontANormalWindow(_winborder);
-				ws->SearchAndSetNewFront(_winborder);
-				ws->SetFocusLayer(_winborder);
+				ws->BringToFrontANormalWindow(fWinBorder);
+				ws->SearchAndSetNewFront(fWinBorder);
+				ws->SetFocusLayer(fWinBorder);
 			}
 		}
 
 		goOut:
 
 		rl->fMainLock.Unlock();
-printf("ServerWindow(%s)::Show() - Main lock released\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Show() - Main lock released\n", fWinBorder->GetName()));
 		desktop->fGeneralLock.Unlock();
-printf("ServerWindow(%s)::Show() - General lock released\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Show() - General lock released\n", fWinBorder->GetName()));
 	}
 }
 
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
-	if(_winborder->IsHidden())
+debugger("");
+	if(fWinBorder->IsHidden())
 		return;
 
-STRACE(("ServerWindow %s: Hide\n",_title->String()));
-	if(_winborder){
-		RootLayer	*rl		= _winborder->GetRootLayer();
+	STRACE(("ServerWindow %s: Hide\n",fTitle.String()));
+	if(fWinBorder){
+		RootLayer	*rl		= fWinBorder->GetRootLayer();
 		Workspace	*ws		= NULL;
 
 		desktop->fGeneralLock.Lock();
-printf("ServerWindow(%s)::Hide() - General lock acquired\n", _winborder->GetName());
-		rl->fMainLock.Lock();
-printf("ServerWindow(%s)::Hide() - Main lock acquired\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Hide() - General lock acquired\n", fWinBorder->GetName()));
 
-		_winborder->Hide();
+		rl->fMainLock.Lock();
+		STRACE(("ServerWindow(%s)::Hide() - Main lock acquired\n", fWinBorder->GetName()));
+
+		fWinBorder->Hide();
 
 		int32		wksCount= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
 			ws		= rl->WorkspaceAt(i+1);
-			if (ws->FrontLayer() == _winborder){
-				ws->HideSubsetWindows(_winborder);
+			if (ws->FrontLayer() == fWinBorder){
+				ws->HideSubsetWindows(fWinBorder);
 				ws->SetFocusLayer(ws->FrontLayer());
 			}
 			else{
-				if (ws->FocusLayer() == _winborder){
-					ws->SetFocusLayer(_winborder);
+				if (ws->FocusLayer() == fWinBorder){
+					ws->SetFocusLayer(fWinBorder);
 				}
 				else{
 					ws->Invalidate();
@@ -367,9 +352,10 @@ printf("ServerWindow(%s)::Hide() - Main lock acquired\n", _winborder->GetName())
 			}
 		}
 		rl->fMainLock.Unlock();
-printf("ServerWindow(%s)::Hide() - Main lock released\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Hide() - Main lock released\n", fWinBorder->GetName()));
+
 		desktop->fGeneralLock.Unlock();
-printf("ServerWindow(%s)::Hide() - General lock released\n", _winborder->GetName());
+		STRACE(("ServerWindow(%s)::Hide() - General lock released\n", fWinBorder->GetName()));
 	}
 }
 
@@ -379,8 +365,8 @@ printf("ServerWindow(%s)::Hide() - General lock released\n", _winborder->GetName
 */
 bool ServerWindow::IsHidden(void)
 {
-	if(_winborder)
-		return _winborder->IsHidden();
+	if(fWinBorder)
+		return fWinBorder->IsHidden();
 	return true;
 }
 
@@ -423,12 +409,12 @@ void ServerWindow::Zoom(){
 */
 void ServerWindow::SetFocus(bool value)
 {
-STRACE(("ServerWindow %s: Set Focus to %s\n",_title->String(),value?"true":"false"));
-	if(_active!=value)
+STRACE(("ServerWindow %s: Set Focus to %s\n",fTitle.String(),value?"true":"false"));
+	if(fIsActive!=value)
 	{
-		_active=value;
-		_winborder->SetFocus(value);
-//		_winborder->RequestDraw();
+		fIsActive=value;
+		fWinBorder->SetFocus(value);
+//		fWinBorder->RequestDraw();
 	}
 }
 
@@ -438,7 +424,7 @@ STRACE(("ServerWindow %s: Set Focus to %s\n",_title->String(),value?"true":"fals
 */
 bool ServerWindow::HasFocus(void)
 {
-	return _active;
+	return fIsActive;
 }
 
 /*!
@@ -448,7 +434,7 @@ bool ServerWindow::HasFocus(void)
 */
 void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 {
-STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspace,(active)?"active":"inactive"));
+STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",fTitle.String(),workspace,(active)?"active":"inactive"));
 	BMessage		msg;
 	
 	msg.what		= B_WORKSPACE_ACTIVATED;
@@ -465,7 +451,7 @@ STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspa
 */
 void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
 {
-STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,newone));
+STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",fTitle.String(),oldone,newone));
 	BMessage		msg;
 	
 	msg.what		= B_WORKSPACES_CHANGED;
@@ -481,7 +467,7 @@ STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,
 */
 void ServerWindow::WindowActivated(bool active)
 {
-STRACE(("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"active":"inactive"));
+STRACE(("ServerWindow %s: WindowActivated(%s)\n",fTitle.String(),(active)?"active":"inactive"));
 	BMessage		msg;
 	
 	msg.what		= B_WINDOW_ACTIVATED;
@@ -497,7 +483,7 @@ STRACE(("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"acti
 */
 void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace)
 {
-STRACE(("ServerWindow %s: ScreenModeChanged\n",_title->String()));
+STRACE(("ServerWindow %s: ScreenModeChanged\n",fTitle.String()));
 	BMessage		msg;
 	
 	msg.what		= B_SCREEN_CHANGED;
@@ -513,9 +499,9 @@ STRACE(("ServerWindow %s: ScreenModeChanged\n",_title->String()));
 */
 void ServerWindow::SetFrame(const BRect &rect)
 {
-STRACE(("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",_title->String(),
+STRACE(("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",fTitle.String(),
 			rect.left,rect.top,rect.right,rect.bottom));
-	_frame=rect;
+	fFrame=rect;
 }
 
 /*!
@@ -524,7 +510,7 @@ STRACE(("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",_title->String()
 */
 BRect ServerWindow::Frame(void)
 {
-	return _frame;
+	return fFrame;
 }
 
 /*!
@@ -533,15 +519,15 @@ BRect ServerWindow::Frame(void)
 */
 status_t ServerWindow::Lock(void)
 {
-STRACE(("ServerWindow %s: Lock\n",_title->String()));
-	return (_locker.Lock())?B_OK:B_ERROR;
+STRACE(("ServerWindow %s: Lock\n",fTitle.String()));
+	return (fLocker.Lock())?B_OK:B_ERROR;
 }
 
 //! Unlocks the window
 void ServerWindow::Unlock(void)
 {
-STRACE(("ServerWindow %s: Unlock\n",_title->String()));
-	_locker.Unlock();
+STRACE(("ServerWindow %s: Unlock\n",fTitle.String()));
+	fLocker.Unlock();
 }
 
 /*!
@@ -550,7 +536,7 @@ STRACE(("ServerWindow %s: Unlock\n",_title->String()));
 */
 bool ServerWindow::IsLocked(void)
 {
-	return _locker.IsLocked();
+	return fLocker.IsLocked();
 }
 
 void ServerWindow::DispatchMessage(int32 code)
@@ -565,13 +551,13 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			msg.Read<int32>(&token);
 			
-			Layer *current = FindLayer(top_layer, token);
+			Layer *current = FindLayer(fTopLayer, token);
 			if (current)
 				cl		= current;
 			else // hope this NEVER happens! :-)
 				debugger("Server PANIC: window cannot find Layer with ID\n");
 
-			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", _title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CREATE:
@@ -583,7 +569,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// us to attach a layer in the tree in the same manner and invalidate
 			// the area in which the new layer resides assuming that it is
 			// visible.
-			STRACE(("ServerWindow %s: AS_LAYER_CREATE...\n", _title->String()));
+			STRACE(("ServerWindow %s: AS_LAYER_CREATE...\n", fTitle.String()));
 			Layer		*oldCL = cl;
 			
 			int32		token;
@@ -629,7 +615,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl			= oldCL;
 			
-			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", _title->String(), cl->_name->String(), name));
+			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), cl->_name->String(), name));
 */
 			break;
 		}
@@ -639,7 +625,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// the less taxing operation - we call PruneTree() on the removed
 			// layer, detach the layer itself, delete it, and invalidate the
 			// area assuming that the view was visible when removed
-			STRACE(("SW %s: AS_LAYER_DELETE(self)...\n", _title->String()));			
+			STRACE(("SW %s: AS_LAYER_DELETE(self)...\n", fTitle.String()));			
 			Layer		*parent;
 			parent		= cl->_parent;
 			
@@ -650,7 +636,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			cl->PruneTree();
 
 			parent->PrintTree();
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", _title->String(), parent->_name->String(), cl->_name->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle.String(), parent->_name->String(), cl->_name->String()));
 
 			delete cl;
 
@@ -711,7 +697,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				}
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
@@ -770,13 +756,14 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				cl->_layerdata->font.SetFlags(flags);
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_STATE:
 		{
 			LayerData	*ld;
-				// these 4 are here because of a compiler warning. Maybe he's right... :-)
+			
+			// these 4 are here because of a compiler warning. Maybe he's right... :-)
 			rgb_color	hc, lc, vc; // high, low and view colors
 			uint64		patt;		// current pattern as a uint64
 
@@ -787,48 +774,48 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			patt		= ld->patt.GetInt64();
 			
 			// TODO: DW implement such a method in ServerFont class!
-			_winlink->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
-			_winlink->Attach<float>(ld->font.Size());
-			_winlink->Attach<float>(ld->font.Shear());
-			_winlink->Attach<float>(ld->font.Rotation());
-			_winlink->Attach<uint8>(ld->font.Spacing());
-			_winlink->Attach<uint8>(ld->font.Encoding());
-			_winlink->Attach<uint16>(ld->font.Face());
-			_winlink->Attach<uint32>(ld->font.Flags());
+			fWinLink->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
+			fWinLink->Attach<float>(ld->font.Size());
+			fWinLink->Attach<float>(ld->font.Shear());
+			fWinLink->Attach<float>(ld->font.Rotation());
+			fWinLink->Attach<uint8>(ld->font.Spacing());
+			fWinLink->Attach<uint8>(ld->font.Encoding());
+			fWinLink->Attach<uint16>(ld->font.Face());
+			fWinLink->Attach<uint32>(ld->font.Flags());
 			
-			_winlink->Attach<BPoint>(ld->penlocation);
-			_winlink->Attach<float>(ld->pensize);
-			_winlink->Attach<rgb_color>(hc);
-			_winlink->Attach<rgb_color>(lc);
-			_winlink->Attach<rgb_color>(vc);
+			fWinLink->Attach<BPoint>(ld->penlocation);
+			fWinLink->Attach<float>(ld->pensize);
+			fWinLink->Attach<rgb_color>(hc);
+			fWinLink->Attach<rgb_color>(lc);
+			fWinLink->Attach<rgb_color>(vc);
 			// TODO: fix this to use the templatized version
-			_winlink->Attach(&patt,sizeof(pattern));
-			_winlink->Attach<BPoint>(ld->coordOrigin);
-			_winlink->Attach<uint8>((uint8)(ld->draw_mode));
-			_winlink->Attach<uint8>((uint8)(ld->lineCap));
-			_winlink->Attach<uint8>((uint8)(ld->lineJoin));
-			_winlink->Attach<float>(ld->miterLimit);
-			_winlink->Attach<uint8>((uint8)(ld->alphaSrcMode));
-			_winlink->Attach<uint8>((uint8)(ld->alphaFncMode));
-			_winlink->Attach<float>(ld->scale);
-			_winlink->Attach<bool>(ld->fontAliasing);
+			fWinLink->Attach(&patt,sizeof(pattern));
+			fWinLink->Attach<BPoint>(ld->coordOrigin);
+			fWinLink->Attach<uint8>((uint8)(ld->draw_mode));
+			fWinLink->Attach<uint8>((uint8)(ld->lineCap));
+			fWinLink->Attach<uint8>((uint8)(ld->lineJoin));
+			fWinLink->Attach<float>(ld->miterLimit);
+			fWinLink->Attach<uint8>((uint8)(ld->alphaSrcMode));
+			fWinLink->Attach<uint8>((uint8)(ld->alphaFncMode));
+			fWinLink->Attach<float>(ld->scale);
+			fWinLink->Attach<bool>(ld->fontAliasing);
 			
 			int32		noOfRects = 0;
 			if (ld->clippReg)
 				noOfRects = ld->clippReg->CountRects();
 
-			_winlink->Attach<int32>(noOfRects);
+			fWinLink->Attach<int32>(noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
-				_winlink->Attach<BRect>(ld->clippReg->RectAt(i));
+				fWinLink->Attach<BRect>(ld->clippReg->RectAt(i));
 			}
 			
-			_winlink->Attach<float>(cl->_frame.left);
-			_winlink->Attach<float>(cl->_frame.top);
-			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
-			_winlink->Flush();
+			fWinLink->Attach<float>(cl->_frame.left);
+			fWinLink->Attach<float>(cl->_frame.top);
+			fWinLink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
+			fWinLink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_MOVETO:
@@ -840,7 +827,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->MoveBy(x, y);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZETO:
@@ -849,22 +836,23 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<float>(&newWidth);
 			msg.Read<float>(&newHeight);
-		/* TODO: check for minimum alowed. WinBorder should provide such
-		 *	a method, based on its decorator.
-		 */
+
+			// TODO: check for minimum alowed. WinBorder should provide such
+			// a method, based on its decorator.
+			
 			cl->ResizeBy(newWidth, newHeight);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			_winlink->Attach<float>(cl->_frame.left);
-			_winlink->Attach<float>(cl->_frame.top);
-			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
-			_winlink->Flush();
+			fWinLink->Attach<float>(cl->_frame.left);
+			fWinLink->Attach<float>(cl->_frame.top);
+			fWinLink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
+			fWinLink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -876,22 +864,22 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->coordOrigin.Set(x, y);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
-			_winlink->Attach<BPoint>(cl->_layerdata->coordOrigin);
-			_winlink->Flush();
+			fWinLink->Attach<BPoint>(cl->_layerdata->coordOrigin);
+			fWinLink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
 			msg.Read<uint32>(&(cl->_resize_mode));
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CURSOR:
@@ -902,38 +890,39 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cursormanager->SetCursor(token);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
 			msg.Read<uint32>(&(cl->_flags));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_HIDE:
 		{
 			cl->Hide();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
 			cl->Show();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LINE_MODE:
 		{
 			int8		lineCap, lineJoin;
-/* TODO: speak with DW! Shouldn't we lock before modifying certain memebers?
- *	Because redraw code might use an updated value instead of one for witch
- *		it was called. e.g.: different lineCap or lineJoin. Strange result
- *		would appear.
- */
+
+			// TODO: speak with DW! Shouldn't we lock before modifying certain memebers?
+			// Because redraw code might use an updated value instead of one for witch
+			// it was called. e.g.: different lineCap or lineJoin. Strange result
+			// would appear.
+
 			msg.Read<int8>(&lineCap);
 			msg.Read<int8>(&lineJoin);
 			msg.Read<float>(&(cl->_layerdata->miterLimit));
@@ -941,17 +930,17 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			cl->_layerdata->lineCap		= (cap_mode)lineCap;
 			cl->_layerdata->lineJoin	= (join_mode)lineJoin;
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			_winlink->Attach<int8>((int8)(cl->_layerdata->lineCap));
-			_winlink->Attach<int8>((int8)(cl->_layerdata->lineJoin));
-			_winlink->Attach<float>(cl->_layerdata->miterLimit);
-			_winlink->Flush();
+			fWinLink->Attach<int8>((int8)(cl->_layerdata->lineCap));
+			fWinLink->Attach<int8>((int8)(cl->_layerdata->lineJoin));
+			fWinLink->Attach<float>(cl->_layerdata->miterLimit);
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PUSH_STATE:
@@ -962,13 +951,13 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			cl->RebuildFullRegion();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_POP_STATE:
 		{
 			if (!(cl->_layerdata->prevState)) {
-				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", _title->String(), cl->_name->String()));
+				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fTitle.String(), cl->_name->String()));
 				break;
 			}
 
@@ -978,14 +967,14 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			cl->RebuildFullRegion();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
 		{
 			msg.Read<float>(&(cl->_layerdata->scale));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -996,10 +985,10 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			while((ld = ld->prevState))
 				scale		*= ld->scale;
 			
-			_winlink->Attach<float>(scale);
-			_winlink->Flush();
+			fWinLink->Attach<float>(scale);
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
 			break;
 		}
 		case AS_LAYER_SET_PEN_LOC:
@@ -1011,30 +1000,30 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->penlocation.Set(x, y);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			_winlink->Attach<BPoint>(cl->_layerdata->penlocation);
-			_winlink->Flush();
+			fWinLink->Attach<BPoint>(cl->_layerdata->penlocation);
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
 			msg.Read<float>(&(cl->_layerdata->pensize));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			_winlink->Attach<float>(cl->_layerdata->pensize);
-			_winlink->Flush();
+			fWinLink->Attach<float>(cl->_layerdata->pensize);
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_HIGH_COLOR:
@@ -1045,7 +1034,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->highcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
@@ -1056,7 +1045,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->lowcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
@@ -1067,7 +1056,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->viewcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
@@ -1078,12 +1067,12 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			lowColor		= cl->_layerdata->lowcolor.GetColor32();
 			viewColor		= cl->_layerdata->viewcolor.GetColor32();
 			
-			_winlink->Attach<rgb_color>(highColor);
-			_winlink->Attach<rgb_color>(lowColor);
-			_winlink->Attach<rgb_color>(viewColor);
-			_winlink->Flush();
+			fWinLink->Attach<rgb_color>(highColor);
+			fWinLink->Attach<rgb_color>(lowColor);
+			fWinLink->Attach<rgb_color>(viewColor);
+			fWinLink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_BLEND_MODE:
@@ -1096,16 +1085,16 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			cl->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
 			cl->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaSrcMode));
-			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaFncMode));
-			_winlink->Flush();
+			fWinLink->Attach<int8>((int8)(cl->_layerdata->alphaSrcMode));
+			fWinLink->Attach<int8>((int8)(cl->_layerdata->alphaFncMode));
+			fWinLink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_DRAW_MODE:
@@ -1116,27 +1105,27 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cl->_layerdata->draw_mode	= (drawing_mode)drawingMode;
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			_winlink->Attach<int8>((int8)(cl->_layerdata->draw_mode));
-			_winlink->Flush();
+			fWinLink->Attach<int8>((int8)(cl->_layerdata->draw_mode));
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
 			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
-// TODO: watch out for the coordinate system
+			// TODO: watch out for the coordinate system
 			int32		pictureToken;
 			BPoint		where;
 			
@@ -1157,14 +1146,15 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				// search for a picture with the specified token.
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
-			for(;;){
-				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
+			while(1)
+			{
+				sp=static_cast<ServerPicture*>(cl->_serverwin->fServerApp->fPictureList->ItemAt(i++));
 				if (!sp)
 					break;
 					
 				if(sp->GetToken() == pictureToken){
 //					cl->clipToPicture	= sp;
-// TODO: increase that picture's reference count.(~ allocate a picture)
+					// TODO: increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
 			}
@@ -1199,7 +1189,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				cl->Invalidate(reg);
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
@@ -1214,8 +1204,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
 
-			for(;;){
-				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
+			while(1)
+			{
+				sp= static_cast<ServerPicture*>(cl->_serverwin->fServerApp->fPictureList->ItemAt(i++));
 				if (!sp)
 					break;
 					
@@ -1238,7 +1229,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				cl->RequestDraw(cl->clipToPicture->Frame());
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_CLIP_REGION:
@@ -1259,15 +1250,15 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 					reg.IntersectWith(ld->clippReg);
 
 			noOfRects	= reg.CountRects();
-			_winlink->Attach<int32>(noOfRects);
+			fWinLink->Attach<int32>(noOfRects);
 
 			for(int i = 0; i < noOfRects; i++){
-				_winlink->Attach<BRect>(reg.RectAt(i));
+				fWinLink->Attach<BRect>(reg.RectAt(i));
 			}
 
-			_winlink->Flush();
+			fWinLink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_CLIP_REGION:
@@ -1292,7 +1283,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			cl->RequestDraw(cl->clipToPicture->Frame());
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		
@@ -1307,7 +1298,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			cl->RequestDraw(invalRect);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
@@ -1328,7 +1319,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			cl->RequestDraw(invalReg.Frame());
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 
@@ -1341,50 +1332,50 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// Received when a window deletes its internal top view
 			
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",fTitle.String()));
 
 			break;
 		}
 		case AS_SHOW_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_SHOW\n",_title->String()));
+			STRACE(("ServerWindow %s: Message AS_SHOW\n",fTitle.String()));
 			Show();
 			break;
 		}
 		case AS_HIDE_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_HIDE\n",_title->String()));		
+			STRACE(("ServerWindow %s: Message AS_HIDE\n",fTitle.String()));		
 			Hide();
 			break;
 		}
 		case AS_SEND_BEHIND:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_WINDOW_TITLE:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_ADD_TO_SUBSET:
@@ -1393,22 +1384,22 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		mainToken;
 			team_id		teamID;
 			
-			ses->ReadInt32(&mainToken);
-			ses->ReadData(&teamID, sizeof(team_id));
+			fSession->ReadInt32(&mainToken);
+			fSession->ReadData(&teamID, sizeof(team_id));
 			
 			wb			= desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb){
-				ses->WriteInt32(SERVER_TRUE);
-				ses->Sync();
+				fSession->WriteInt32(SERVER_TRUE);
+				fSession->Sync();
 				
-				_winborder->AddToSubsetOf(wb);
+				fWinBorder->AddToSubsetOf(wb);
 			}
 			else{
-				ses->WriteInt32(SERVER_FALSE);
-				ses->Sync();
+				fSession->WriteInt32(SERVER_FALSE);
+				fSession->Sync();
 			}
 			// TODO: Implement
-			STRACE(("\n\n\n\n\n\nServerWindow %s: Message ADD_TO_SUBSET unimplemented\n",_title->String()));
+			STRACE(("\n\n\n\n\n\nServerWindow %s: Message ADD_TO_SUBSET unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_REM_FROM_SUBSET:
@@ -1417,105 +1408,105 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		mainToken;
 			team_id		teamID;
 			
-			ses->ReadInt32(&mainToken);
-			ses->ReadData(&teamID, sizeof(team_id));
+			fSession->ReadInt32(&mainToken);
+			fSession->ReadData(&teamID, sizeof(team_id));
 			
 			wb			= desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb){
-				ses->WriteInt32(SERVER_TRUE);
-				ses->Sync();
+				fSession->WriteInt32(SERVER_TRUE);
+				fSession->Sync();
 				
-				_winborder->RemoveFromSubsetOf(wb);
+				fWinBorder->RemoveFromSubsetOf(wb);
 			}
 			else{
-				ses->WriteInt32(SERVER_FALSE);
-				ses->Sync();
+				fSession->WriteInt32(SERVER_FALSE);
+				fSession->Sync();
 			}
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Remove_From_Subset unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Remove_From_Subset unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_LOOK:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_FLAGS:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_FEEL:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Feel unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Feel unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_ALIGNMENT:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_GET_ALIGNMENT:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_GET_WORKSPACES:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_WORKSPACES:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_WINDOW_RESIZE:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Resize unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Resize unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_MINIMIZE:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Minimize unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Minimize unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_WINDOW_ACTIVATED:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_ZOOM:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_WINDOW_MOVE_TO:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Move_To unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Move_To unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_WINDOW_MOVE_BY:
 		{
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Move_By unimplemented\n",_title->String()));
+			STRACE(("ServerWindow %s: Message Move_By unimplemented\n",fTitle.String()));
 			break;
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(), msg.Code() - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), msg.Code() - SERVER_TRUE);
 			break;
 		}
 	}
@@ -1543,8 +1534,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	if (IsHidden())
 		return;
 
-	WindowClipRegion.Set(_winborder->Frame());
-	sibling = _winborder->UpperSibling();
+	WindowClipRegion.Set(fWinBorder->Frame());
+	sibling = fWinBorder->UpperSibling();
 	while (sibling)
 	{
 		WindowClipRegion.Exclude(sibling->Frame());
@@ -1562,7 +1553,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		code = read_from_buffer<int32>(&msgbuffer);
 		view_token = read_from_buffer<int32>(&msgbuffer);
 //TODO: fix!
-		layer = NULL;//_workspace->GetRoot()->FindLayer(view_token);
+		layer = NULL;//fWorkspace->GetRoot()->FindLayer(view_token);
 		if (layer)
 		{
 			layerdata = layer->GetLayerData();
@@ -1573,7 +1564,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		else
 		{
 			layerdata = NULL;
-			printf("ServerWindow %s received invalid view token %lx",_title->String(),view_token);
+			STRACE(("ServerWindow %s received invalid view token %lx",fTitle.String(),view_token));
 		}
 		switch (code)
 		{
@@ -1592,7 +1583,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1612,7 +1603,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1632,7 +1623,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1654,12 +1645,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
+						//fServerApp->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ARC_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1680,13 +1671,13 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//if (layerdata)
-						//_app->_driver->StrokeBezier(pts,layerdata,pattern);
+						//fServerApp->_driver->StrokeBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_BEZIER_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1705,12 +1696,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->StrokeEllipse(rect,layerdata,pattern);
+						//fServerApp->_driver->StrokeEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ELLIPSE_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1730,12 +1721,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					//BPoint p1(x1,y1);
 					//BPoint p2(x2,y2);
 					//if (layerdata)
-						//_app->_driver->StrokeLine(p1,p2,layerdata,pattern);
+						//fServerApp->_driver->StrokeLine(p1,p2,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_LINE_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1764,12 +1755,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->StrokeRect(rect,layerdata,pattern);
+						//fServerApp->_driver->StrokeRect(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_RECT_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1790,12 +1781,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
+						//fServerApp->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ROUNDRECT_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1827,13 +1818,13 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
+						//fServerApp->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_TRIANGLE_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1854,12 +1845,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->FillArc(rect,angle,span,layerdata,pattern);
+						//fServerApp->_driver->FillArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ARC_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1880,13 +1871,13 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//if (layerdata)
-						//_app->_driver->FillBezier(pts,layerdata,pattern);
+						//fServerApp->_driver->FillBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_BEZIER_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1905,12 +1896,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->FillEllipse(rect,layerdata,pattern);
+						//fServerApp->_driver->FillEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ELLIPSE_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1935,19 +1926,19 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					BRect rect(left,top,right,bottom);
 					if (layerdata && numRects)
 						if (numRects == 1)
-							_app->_driver->FillRect(rect,layerdata,pattern);
+							fServerApp->_driver->FillRect(rect,layerdata,pattern);
 						else
 						{
 							int i;
 							for (i=0; i<numRects; i++)
-								_app->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
+								fServerApp->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
 						}
 						*/
 					sizeRemaining -= AS_FILL_RECT_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -1973,12 +1964,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
+						//fServerApp->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ROUNDRECT_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -2010,13 +2001,13 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
 					//if (layerdata)
-						//_app->_driver->FillTriangle(pts,rect,layerdata,pattern);
+						//fServerApp->_driver->FillTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_TRIANGLE_MSG_SIZE;
 				}
 				else
 				{
-					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					STRACE(("ServerWindow %s received truncated graphics code %lx",fTitle.String(),code));
 					sizeRemaining = 0;
 				}
 				break;
@@ -2054,7 +2045,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			default:
 			{
 				sizeRemaining -= sizeof(int32);
-				printf("ServerWindow %s received unexpected graphics code %lx",_title->String(),code);
+				printf("ServerWindow %s received unexpected graphics code %lx",fTitle.String(),code);
 				break;
 			}
 		}
@@ -2071,30 +2062,49 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	bool			quiting = false;
+	bool			quitting = false;
 	int32			code;
 	
-	for( ; !quiting; )
+	while(!quitting)
 	{
 		code		= 0;
-		win->ses->ReadInt32(&code);
-		switch(code){
+		win->fSession->ReadInt32(&code);
+		switch(code)
+		{
+			case AS_QUIT_APP:
+			{
+				// Received when the app_server is told to shut down
+				
+				STRACE(("ServerWindow %s received server shutdown notification\n",win->Title()));
+				if(DISPLAYDRIVER!=HWDRIVER)
+				{
+					BMessage pleaseQuit(B_QUIT_REQUESTED);
+					win->SendMessageToClient(&pleaseQuit);
+				}
+				break;
+			}
+			case 0:
+			{
 				// this means the client has been killed
-			case 0:{
+
+				// TODO: A message code should *never* be 0. The source sending this message
+				// needs to be changed to something like AS_CLIENT_DEAD or something.
+				
 				STRACE(("ServerWindow %s received '0' message code\n",win->Title()));
-				quiting = true;
+				quitting = true;
 				delete win;
 				break;
 			}
-			case B_QUIT_REQUESTED:{
+			case B_QUIT_REQUESTED:
+			{
 				STRACE(("ServerWindow %s received Quit request\n",win->Title()));
-				quiting = true;
+				quitting = true;
 				delete win;
 				break;
 			}
-			default:{
-				printf("SW(%s): got a message to dispatch...\n",win->Title());
-//				snooze(3000000);
+			default:
+			{
+				STRACE(("ServerWindow %s: got a message to dispatch\n",win->Title()));
 				win->DispatchMessage(code);
 				break;
 			}
@@ -2111,13 +2121,14 @@ int32 ServerWindow::MonitorWin(void *data)
 //void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 void ServerWindow::HandleMouseEvent(PortMessage *msg)
 {
-	ServerWindow *mousewin=NULL;
+/*	ServerWindow *mousewin=NULL;
 //	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
+	
 //TODO: resolve
 	Layer *root=NULL;//GetRootLayer(CurrentWorkspace(),ActiveScreen());
-	WinBorder *_winborder;
+	WinBorder *fWinBorder;
 	
 	// activeborder is used to remember windows when resizing/moving windows
 	// or sliding a tab
@@ -2155,11 +2166,11 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 //			BPoint pt(x,y);
 			
 			// If we have clicked on a window, 			
-			active_winborder = _winborder = NULL;
-			if(_winborder)
+			active_winborder = fWinBorder = NULL;
+			if(fWinBorder)
 			{
-				mousewin=_winborder->Window();
-				_winborder->MouseDown((int8*)msg->Buffer());
+				mousewin=fWinBorder->Window();
+				fWinBorder->MouseDown((int8*)msg->Buffer());
 			}
 			break;
 		}
@@ -2184,20 +2195,20 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 //TODO: resolve
 //			BPoint pt(x,y);
 			
-/*			set_is_sliding_tab(false);
-			set_is_moving_window(false);
-			set_is_resizing_window(false);
-*/
+//			set_is_sliding_tab(false);
+//			set_is_moving_window(false);
+//			set_is_resizing_window(false);
+
 //TODO: resolve
-			_winborder	= NULL;//WindowContainsPoint(pt);
+			fWinBorder	= NULL;//WindowContainsPoint(pt);
 			active_winborder=NULL;
-			if(_winborder)
+			if(fWinBorder)
 			{
-				mousewin=_winborder->Window();
+				mousewin=fWinBorder->Window();
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
-				_winborder->MouseUp((int8*)msg->Buffer());
+				fWinBorder->MouseUp((int8*)msg->Buffer());
 			}
 			break;
 		}
@@ -2218,28 +2229,29 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read(&dummy);
 			msg->Read(&x);
 			msg->Read(&y);
-/*			BPoint pt(x,y);
-
-			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
-			{
-				active_winborder->MouseMoved((int8*)msg->Buffer());
-			}
-			else
-			{
-				_winborder = WindowContainsPoint(pt);
-				if(_winborder)
-				{
-					mousewin=_winborder->Window();
-					_winborder->MouseMoved((int8*)msg->Buffer());
-				}
-			}				
-*/			break;
+//			BPoint pt(x,y);
+//
+//			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
+//			{
+//				active_winborder->MouseMoved((int8*)msg->Buffer());
+//			}
+//			else
+//			{
+//				fWinBorder = WindowContainsPoint(pt);
+//				if(fWinBorder)
+//				{
+//					mousewin=fWinBorder->Window();
+//					fWinBorder->MouseMoved((int8*)msg->Buffer());
+//				}
+//			}				
+			break;
 		}
 		default:
 		{
 			break;
 		}
 	}
+*/
 }
 
 /*!
@@ -2249,19 +2261,31 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 */
 void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
 {
+/*
 STRACE_KEY(("ServerWindow::HandleKeyEvent unimplemented\n"));
-/*	ServerWindow *keywin=NULL;
+	ServerWindow *keywin=NULL;
 	
 	// Dispatch the key event to the active window
 	keywin=GetActiveWindow();
 	if(keywin)
 	{
 		keywin->Lock();
-		keywin->_winlink->SetOpCode(code);
-		keywin->_winlink
+		keywin->fWinLink->SetOpCode(code);
+		keywin->fWinLink
 		keywin->Unlock();
 	}
 */
+}
+
+/*!
+	\brief Send a message to the ServerWindow
+	\param code ID code of the message to post
+	\param size size of the data buffer
+	\param buffer Any attached data
+*/
+void ServerWindow::PostMessage(int32 code, size_t size, int8 *buffer)
+{
+	write_port(fMessagePort,code, buffer, size);
 }
 
 /*!
@@ -2271,8 +2295,8 @@ STRACE_KEY(("ServerWindow::HandleKeyEvent unimplemented\n"));
 */
 Workspace *ServerWindow::GetWorkspace(void)
 {
+	//TODO: resolve
 	if(fWorkspaces==B_ALL_WORKSPACES)
-//TODO: resolve
 		return NULL;//fWorkspaces->GetScreen()->GetActiveWorkspace();
 
 	return NULL;
@@ -2284,24 +2308,23 @@ Workspace *ServerWindow::GetWorkspace(void)
 */
 void ServerWindow::SetWorkspace(Workspace *wkspc)
 {
-STRACE(("ServerWindow %s: Set Workspace\n",_title->String()));
-	_workspace=wkspc;
+STRACE(("ServerWindow %s: Set Workspace\n",fTitle.String()));
+	fWorkspace=wkspc;
 }
-
-//-----------------------------------------------------------------------
 
 Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 {
 	if(!start)
 		return NULL;
 	
-		// see if we're looking for 'start'
+	// see if we're looking for 'start'
 	if(start->_view_token == token)
 		return const_cast<Layer*>(start);
 
-	Layer		*c = start->_topchild; //c = short for: current
+	Layer *c = start->_topchild; //c = short for: current
 	if(c != NULL)
-		while(true){
+		while(true)
+		{
 			// action block
 			{
 				if(c->_view_token == token)
@@ -2309,21 +2332,25 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 			}
 
 				// go deep
-			if(	c->_topchild){
+			if(	c->_topchild)
+			{
 				c = c->_topchild;
 			}
-				// go right or up
+			// go right or up
 			else
-					// go right
-				if(c->_lowersibling){
+				// go right
+				if(c->_lowersibling)
+				{
 					c = c->_lowersibling;
 				}
-					// go up
-				else{
-					while(!c->_parent->_lowersibling && c->_parent != start){
+				// go up
+				else
+				{
+					while(!c->_parent->_lowersibling && c->_parent != start)
+					{
 						c = c->_parent;
 					}
-						// that enough! We've reached the start layer.
+					// that enough! We've reached the start layer.
 					if(c->_parent == start)
 						break;
 						
@@ -2334,24 +2361,21 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 	return NULL;
 }
 
-//-----------------------------------------------------------------------
-
-void ServerWindow::SendMessageToClient(const BMessage* msg) const{
+void ServerWindow::SendMessageToClient(const BMessage* msg) const
+{
 	ssize_t		size;
 	char		*buffer;
 	
 	size		= msg->FlattenedSize();
 	buffer		= new char[size];
-	if (msg->Flatten(buffer, size) == B_OK){
-		write_port(winLooperPort, msg->what, buffer, size);
-	}
+
+	if (msg->Flatten(buffer, size) == B_OK)
+		write_port(fClientLooperPort, msg->what, buffer, size);
 	else
-		printf("PANIC: SW: '%s': can't flatten message in 'SendMessageToClient()'\n", _title->String());
+		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle.String());
 
 	delete buffer;
 }
-
-//-----------------------------------------------------------------------
 
 /*!
 	\brief Handles window activation stuff. Called by Desktop functions
