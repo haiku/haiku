@@ -59,7 +59,8 @@ extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 /* team & thread syscalls */
 
 extern thread_id	_kern_load_image(int32 argCount, const char **args,
-						int32 envCount, const char **envp, int32 priority);
+						int32 envCount, const char **envp, int32 priority,
+						uint32 flags);
 extern void			_kern_exit_team(status_t returnValue);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
@@ -103,6 +104,8 @@ extern bigtime_t	_kern_set_alarm(bigtime_t time, uint32 mode);
 // image functions
 extern image_id		_kern_register_image(image_info *info, size_t size);
 extern status_t		_kern_unregister_image(image_id id);
+extern void			_kern_image_relocated(image_id id);
+extern void			_kern_loading_app_failed(status_t error);
 extern status_t		_kern_get_image_info(image_id id, image_info *info, size_t size);
 extern status_t		_kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
 
