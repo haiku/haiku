@@ -977,7 +977,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					msg.AddInt32("buttons", evt.buttons);
 					msg.AddInt32("clicks", evt.clicks);
 
-					Window()->SendMessageToClient(&msg, target->fViewToken, false);
+					target->Window()->SendMessageToClient(&msg, fLastMouseMoved->fViewToken, false);
 				}
 			}
 
@@ -1246,7 +1246,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			int8 keystates[16];
 			int32 raw_char;
 			int32 repeatcount;
-			int8 strlength;
 			
 			*((int32*)utf)=0;
 			
@@ -1256,7 +1255,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&repeatcount);
 			msg.Read<int32>(&modifiers);
 			msg.Read(utf, sizeof(utf));
-			msg.Read<int8>(&strlength);
 			msg.ReadString(&string);
 			msg.Read(keystates,sizeof(int8)*16);
 			
@@ -1399,12 +1397,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			Workspace *ws=ActiveWorkspace();
-			
-			WinBorder *target=ws->Focus();
-			if(target)
+			if(FocusWinBorder())
 			{
-				ServerWindow *win=target->Window();
+				ServerWindow *win = FocusWinBorder()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_KEY_DOWN);
@@ -1449,7 +1444,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			char *string = NULL;
 			int8 keystates[16];
 			int32 raw_char;
-			int8 strlength;
 			
 			*((int32*)utf)=0;
 			
@@ -1458,7 +1452,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&raw_char);
 			msg.Read<int32>(&modifiers);
 			msg.Read(utf, sizeof(utf));
-			msg.Read<int8>(&strlength);
 			msg.ReadString(&string);
 			msg.Read(keystates,sizeof(int8)*16);
 	
@@ -1493,12 +1486,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 			
-			Workspace *ws=ActiveWorkspace();
-			
-			WinBorder *target=ws->Focus();
-			if(target)
+			if(FocusWinBorder())
 			{
-				ServerWindow *win=target->Window();
+				ServerWindow *win = FocusWinBorder()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_KEY_UP);
@@ -1541,12 +1531,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 	
 			STRACE(("Unmapped Key Down: 0x%lx\n",scancode));
 			
-			Workspace *ws=ActiveWorkspace();
-			
-			WinBorder *target=ws->Focus();
-			if(target)
+			if(FocusWinBorder())
 			{
-				ServerWindow *win=target->Window();
+				ServerWindow *win = FocusWinBorder()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_UNMAPPED_KEY_DOWN);
@@ -1585,7 +1572,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
-				ServerWindow *win=target->Window();
+				ServerWindow *win = FocusWinBorder()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_UNMAPPED_KEY_UP);
@@ -1617,12 +1604,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&oldmodifiers);
 			msg.Read(keystates,sizeof(int8)*16);
 
-			Workspace *ws=ActiveWorkspace();
-			
-			WinBorder *target=ws->Focus();
-			if(target)
+			if(FocusWinBorder())
 			{
-				ServerWindow *win=target->Window();
+				ServerWindow *win = FocusWinBorder()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_MODIFIERS_CHANGED);
