@@ -26,6 +26,7 @@ status_t vm_init_postthread(struct kernel_args *ka);
 status_t vm_aspace_init(void);
 status_t vm_aspace_init_post_sem(void);
 
+void vm_delete_aspace(vm_address_space *aspace);
 status_t vm_create_aspace(const char *name, addr base, addr size, bool kernel, vm_address_space **_aspace);
 status_t vm_delete_areas(struct vm_address_space *aspace);
 vm_address_space *vm_get_kernel_aspace(void);
