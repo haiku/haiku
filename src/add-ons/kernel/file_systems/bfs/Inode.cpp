@@ -1843,7 +1843,7 @@ Inode::NeedsTrimming()
 	if (IsIndex())
 		return false;
 
-	off_t roundedSize = (Size() + fVolume->BlockSize() - 1) >> fVolume->BlockShift();
+	off_t roundedSize = (Size() + fVolume->BlockSize() - 1) & ~(fVolume->BlockSize() - 1);
 
 	return Node().data.MaxDirectRange() > roundedSize
 		|| Node().data.MaxIndirectRange() > roundedSize
