@@ -16,7 +16,7 @@
 #endif
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
-
+#define DECODE_AS_INT16		1
 
 inline size_t
 AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
@@ -60,10 +60,10 @@ VorbisDecoder::~VorbisDecoder()
 
 
 void
-VorbisDecoder::GetCodecInfo(media_codec_info &info)
+VorbisDecoder::GetCodecInfo(media_codec_info *info)
 {
-	strncpy(info.short_name, "vorbis-libvorbis", sizeof(info.short_name));
-	strncpy(info.pretty_name, "vorbis decoder [libvorbis], by Andrew Bachmann", sizeof(info.pretty_name));
+	strncpy(info->short_name, "vorbis-libvorbis", sizeof(info->short_name));
+	strncpy(info->pretty_name, "vorbis decoder [libvorbis], by Andrew Bachmann", sizeof(info->pretty_name));
 }
 
 
@@ -128,6 +128,9 @@ VorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	// Be R5 behavior seems to be that we can never fail.  If we
 	// don't support the requested format, just return one we do.
 	media_format format = vorbis_decoded_media_format();
+#if DECODE_AS_INT16
+	format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
+#endif
 	format.u.raw_audio.frame_rate = (float)fInfo.rate;
 	format.u.raw_audio.channel_count = fInfo.channels;
 	format.u.raw_audio.channel_mask = B_CHANNEL_LEFT | (fInfo.channels != 1 ? B_CHANNEL_RIGHT : 0);
@@ -198,13 +201,28 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		}
 		// reduce samples to the amount of samples we will actually consume
 		samples = min_c(samples,out_bytes_needed/fFrameSize);
+#if DECODE_AS_INT16
+		for (int sample = 0; sample < samples ; sample++) {
+			for (int channel = 0; channel < fInfo.channels; channel++) {
+				int32 thesample = (int32)(pcm[channel][sample] * 32767.0f);
+				if (thesample > 32767)
+					*(int16*)out_buffer = 32767;
+				else if (thesample < -32767)
+					*(int16*)out_buffer = -32767;
+				else
+					*(int16*)out_buffer = thesample;
+				out_buffer += 2;
+			}
+		}
+#else
 		for (int sample = 0; sample < samples ; sample++) {
 			for (int channel = 0; channel < fInfo.channels; channel++) {
 				*((float*)out_buffer) = pcm[channel][sample];
 				out_buffer += sizeof(float);
 			}
 		}
-		out_bytes_needed -= samples * fInfo.channels * sizeof(float);
+#endif
+		out_bytes_needed -= samples * fFrameSize;
 		// report back how many samples we consumed
 		vorbis_synthesis_read(&fDspState,samples);
 		
