@@ -6,6 +6,7 @@
 
 #include <ScrollView.h>
 #include <Message.h>
+#include <Window.h>
 
 
 static const float kFancyBorderSize = 2;
@@ -143,6 +144,26 @@ void
 BScrollView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
+
+	if ((fHorizontalScrollBar == NULL && fVerticalScrollBar == NULL)
+		|| (fHorizontalScrollBar != NULL && fVerticalScrollBar != NULL))
+		return;
+
+	// If we have only one bar, we need to check if we are in the
+	// bottom right edge of a window with the B_DOCUMENT_LOOK to
+	// adjust the size of the bar to acknowledge the resize knob.
+
+	BRect bounds = ConvertToScreen(Bounds());
+	BRect windowBounds = Window()->Frame();
+
+	if (bounds.right - BorderSize(fBorder) != windowBounds.right
+		|| bounds.bottom - BorderSize(fBorder) != windowBounds.bottom)
+		return;
+
+	if (fHorizontalScrollBar)
+		fHorizontalScrollBar->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
+	else if (fVerticalScrollBar)
+		fVerticalScrollBar->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 }
 
 
