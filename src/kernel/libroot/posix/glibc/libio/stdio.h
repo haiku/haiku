@@ -69,6 +69,16 @@ typedef struct _IO_FILE __FILE;
 
 
 #ifdef	_STDIO_H
+/*
+ * [zooey]: operations on cin/cout/cerr and stdin/stdout/stderr should support
+ *          being mixed on a character by character basis:
+ *            printf("this is "); cout << "a string" << endl;
+ *          should yield "this is a string" on a single line.
+ *          This never worked on BeOS, as the supposedly unique stream-symbols
+ *				existed in libroot as well as in libstdc++.
+ *          Since we do no longer have this problem, activating 
+ *          _STDIO_USES_IOSTREAM does no harm.
+ */
 #define _STDIO_USES_IOSTREAM
 
 #include <libio.h>
