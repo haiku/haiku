@@ -1,6 +1,7 @@
 #include <Application.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <Path.h>
 
 #include "ScreenSaverPrefsApp.h"
