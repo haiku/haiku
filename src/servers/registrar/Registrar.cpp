@@ -12,7 +12,16 @@
 #include "Registrar.h"
 #include "TRoster.h"
 
+/*!
+	\class Registrar
+	\brief The application class of the registrar.
+
+	Glues the registrar services together and dispatches the roster messages.
+*/
+
 // constructor
+/*!	\brief Creates the registrar application class.
+*/
 Registrar::Registrar()
 		 : BApplication(kRegistrarSignature),
 		   fRoster(NULL),
@@ -20,16 +29,14 @@ Registrar::Registrar()
 		   fMIMEManager(NULL)
 {
 	FUNCTION_START();
-	// move the following code to ReadyToRun() once it works.
-	fRoster = new TRoster;
-	fClipboardHandler = new ClipboardHandler;
-	AddHandler(fClipboardHandler);
-	fMIMEManager = new MIMEManager;
-	fMIMEManager->Run();
-	FUNCTION_END();
 }
 
 // destructor
+/*!	\brief Frees all resources associated with the registrar.
+
+	All registrar services, that haven't been shut down earlier, are
+	terminated.
+*/
 Registrar::~Registrar()
 {
 	FUNCTION_START();
@@ -42,6 +49,10 @@ Registrar::~Registrar()
 }
 
 // MessageReceived
+/*!	\brief Overrides the super class version to dispatch roster specific
+		   messages.
+	\param message The message to be handled
+*/
 void
 Registrar::MessageReceived(BMessage *message)
 {
@@ -100,24 +111,41 @@ Registrar::MessageReceived(BMessage *message)
 }
 
 // ReadyToRun
+/*!	\brief Overrides the super class version to initialize the registrar
+		   services.
+*/
 void
 Registrar::ReadyToRun()
 {
 	FUNCTION_START();
+	fRoster = new TRoster;
+	fClipboardHandler = new ClipboardHandler;
+	AddHandler(fClipboardHandler);
+	fMIMEManager = new MIMEManager;
+	fMIMEManager->Run();
+	FUNCTION_END();
 }
 
 // QuitRequested
+/*!	\brief Overrides the super class version to avoid termination of the
+		   registrar until the system shutdown.
+*/
 bool
 Registrar::QuitRequested()
 {
 	FUNCTION_START();
 	// The final registrar must not quit. At least not that easily. ;-)
 	return BApplication::QuitRequested();
-	FUNCTION_END();
 }
 
 
 // main
+/*!	\brief Creates and runs the registrar application.
+
+	The main thread is renamed.
+
+	\return 0.
+*/
 int
 main()
 {
