@@ -57,7 +57,7 @@ timeout(timeout_func func, void *cookie, bigtime_t timeout)
 	h.func = func;
 	h.cookie = cookie;
 	
-	add_timer(&h.t, timer_dispatch_hook, timeout, B_ONE_SHOT_RELATIVE_TIMER);
+//	add_timer(&h.t, timer_dispatch_hook, timeout, B_ONE_SHOT_RELATIVE_TIMER);
 
 	return h;
 }
@@ -65,7 +65,7 @@ timeout(timeout_func func, void *cookie, bigtime_t timeout)
 void
 untimeout(timeout_func func, void *cookie, struct callout_handle handle)
 {
-	cancel_timer(&handle.t);
+//	cancel_timer(&handle.t);
 }
 
 struct resource *

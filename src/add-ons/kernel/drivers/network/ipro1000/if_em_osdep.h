@@ -221,6 +221,15 @@ void  driver_free(void *p, int p2);
 #define E1000_WRITE_REG_ARRAY(hw, reg, index, value) \
     E1000_WRITE_OFFSET(hw, E1000_REG_OFFSET(hw, reg) + ((index) << 2), value)
 
+
+/*
+#define TAILQ_FIRST(head)       ((head)->tqh_first)
+#define TAILQ_NEXT(elm, field) ((elm)->field.tqe_next)
+#define TAILQ_FOREACH(var, head, field)		\
+	for ((var) = TAILQ_FIRST((head));		\
+		(var);								\
+		(var) = TAILQ_NEXT((var), field))
+*/
 // used only for multicast setup, fix later...
 #define TAILQ_FOREACH(a, b, c) for (a = 0; a != 0; a = 0)
 
