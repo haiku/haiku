@@ -20,7 +20,9 @@
 #define __DEVICE_H
 
 #include <PCI.h>
+#include "debug.h"
 #include "hardware.h"
+#include "timer.h"
 
 #define TX_TIMEOUT		6000000		// 6 seconds
 #define FRAME_SIZE		1536		// must be multiple of 8
@@ -42,6 +44,20 @@ typedef struct {
 	
 	volatile bool		nonblocking;
 	volatile bool		closed;
+
+	#ifdef PROFILING	
+		volatile int	intTotalCount;
+		volatile int	intTotalCountOld;
+		volatile int	intRxTotalCount;
+		volatile int	intTxTotalCount;
+		volatile int	intTimerTotalCount;
+		volatile int	intCurrentCount;
+		volatile int	intRxCurrentCount;
+		volatile int	intTxCurrentCount;
+		volatile int	intTimerCurrentCount;
+	#endif // PROFILING
+
+	timer_id			timer;
 	
 	spinlock			txSpinlock;
 	sem_id				txFreeSem;

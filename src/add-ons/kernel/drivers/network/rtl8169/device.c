@@ -205,6 +205,35 @@ print_link_status(rtl8169_device *device)
 }
 
 
+#ifdef PROFILING
+static void
+print_debug_info(void *cookie)
+{
+	rtl8169_device *device = (rtl8169_device *)cookie;
+
+	// only print if interrupt count changed
+	if (device->intTotalCount == device->intTotalCountOld)
+		return;
+
+	PRINT("Int %10d, %6d/s Rx: %10d, %6d/s Tx: %10d, %6d/s Tmr %10d, %6d/s\n",
+		device->intTotalCount,
+		device->intCurrentCount,
+		device->intRxTotalCount,
+		device->intRxCurrentCount,
+		device->intTxTotalCount,
+		device->intTxCurrentCount,
+		device->intTimerTotalCount,
+		device->intTimerCurrentCount);
+		
+	device->intTotalCountOld = device->intTotalCount;
+	device->intCurrentCount = 0;
+	device->intRxCurrentCount = 0;
+	device->intTxCurrentCount = 0;
+	device->intTimerCurrentCount = 0;
+}
+#endif // PROFILING
+
+
 static status_t
 init_buf_desc(rtl8169_device *device)
 {
@@ -319,23 +348,34 @@ rtl8169_int(void *data)
 	write16(REG_INT_STAT, stat);
 	ret = B_HANDLED_INTERRUPT;
 
+	PROFILING_ONLY(device->intTotalCount++);
+	PROFILING_ONLY(device->intCurrentCount++);
+	
 	if (stat & INT_FOVW) {
 		TRACE("INT_FOVW\n");
 	}
 
+	if (stat & INT_TimeOut) {
+		PROFILING_ONLY(device->intTimerTotalCount++);
+		PROFILING_ONLY(device->intTimerCurrentCount++);
+	}
+
 	if (stat & INT_PUN) {
-		TRACE("INT_PUN\n");
 		dump_phy_stat(device);
 		print_link_status(device);
 	}
 
 	if (stat & (INT_TOK | INT_TER)) {
 		rtl8169_tx_int(device);
+		PROFILING_ONLY(device->intTxTotalCount++);
+		PROFILING_ONLY(device->intTxCurrentCount++);
 		ret = B_INVOKE_SCHEDULER;
 	}
 
 	if (stat & (INT_ROK | INT_RER)) {
 		rtl8169_rx_int(device);
+		PROFILING_ONLY(device->intRxTotalCount++);
+		PROFILING_ONLY(device->intRxCurrentCount++);
 		ret = B_INVOKE_SCHEDULER;
 	}
 
@@ -381,7 +421,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->pciInfo = gDevList[dev_id];
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	device->closed = false;
-	
+
 	device->rxSpinlock = 0;
 	device->rxNextIndex = 0;
 	device->rxIntIndex = 0;
@@ -481,6 +521,19 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 		goto err;
 	}
 	
+	#ifdef PROFILING
+		device->intTotalCount = 0;
+		device->intTotalCountOld = 0;
+		device->intRxTotalCount = 0;
+		device->intTxTotalCount = 0;
+		device->intTimerTotalCount = 0;
+		device->intCurrentCount = 0;
+		device->intRxCurrentCount = 0;
+		device->intTxCurrentCount = 0;
+		device->intTimerCurrentCount = 0;
+	  	device->timer = create_timer(print_debug_info, device, 1000000, B_PERIODIC_TIMER);
+	#endif // PROFILING
+	
 	write16(0xe0, read16(0xe0)); // write CR+ command
 
 	write16(0xe0, read16(0xe0) | 0x0003); // don't know what this does, BSD says "enable C+ Tx/Rx"
@@ -572,6 +625,8 @@ rtl8169_free(void* cookie)
 
 	// disable interrupts
   	write16(REG_INT_MASK, 0);
+  	
+	PROFILING_ONLY(delete_timer(device->timer));
   	
   	// well...
   	remove_io_interrupt_handler (device->irq, rtl8169_int, device);
