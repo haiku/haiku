@@ -6,8 +6,8 @@
 #define KERNEL_BOOT_ELF_H
 
 
+#include <boot/addr_range.h>
 #include <elf_priv.h>
-#include <boot/kernel_args.h>
 
 
 struct preloaded_image {
