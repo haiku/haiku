@@ -19,6 +19,7 @@ Server app_server :
 	RectUtils.cpp
 	RGBColor.cpp
 	SystemPalette.cpp
+	Utils.cpp
 
 	# Manager Classes
 	AppServer.cpp

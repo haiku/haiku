@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ServerProtocol.h>
-#include "SMessage.h"
 
 #include "BitmapManager.h"
 #include "CursorManager.h"
@@ -247,9 +246,8 @@ printf("ServerApp %s:Server shutdown notification received\n",app->_signature.St
 						// because the server was asked to quit. Thus, we
 						// ask all apps to quit. This is NOT the same as system
 						// shutdown and will happen only in testing
-						BMessage *shutdown=new BMessage(B_QUIT_REQUESTED);
-						shutdown->fPreferred=true;
-						SendMessage(app->_sender,shutdown);
+//						BMessage *shutdown=new BMessage(B_QUIT_REQUESTED);
+//						SendMessage(app->_sender,shutdown);
 #ifdef DEBUG_SERVERAPP
 printf("ServerApp %s:Sent server shutdown message to BApp\n",app->_signature.String());
 #endif
