@@ -363,7 +363,7 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 			i++;
 		}
 		if (i >= MAX_ASIDS)
-			panic("vm_translation_map_create: out of ASIDS\n");
+			panic("vm_translation_map_create: out of ASIDs\n");
 		new_map->arch_data->asid_base = i;
 	}
 
@@ -379,7 +379,7 @@ vm_translation_map_module_init(kernel_args *args)
 {
 	sPageTable = (page_table_entry_group *)args->arch_args.page_table.start;
 	sPageTableSize = args->arch_args.page_table.size;
-	sPageTableHashMask = (sPageTableSize >> 6) - 1;
+	sPageTableHashMask = sPageTableSize / sizeof(page_table_entry_group) - 1;
 
 	return B_OK;
 }
