@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src tests kits net preflet ;
+
+SimpleTest Network : 
+	Network.cpp 
+	NetworkWindow.cpp
+	: be root
+;
