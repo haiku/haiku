@@ -1,6 +1,18 @@
 SubDir OBOS_TOP src add-ons translators stxttranslator ;
 
-Translator STXTTranslator : STXTMain.cpp STXTTranslator.cpp STXTView.cpp STXTWindow.cpp ;
+# Include BaseTranslator code from shared directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
+Translator STXTTranslator :
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	# STXTTranslator classes
+	STXTMain.cpp
+	STXTTranslator.cpp
+	STXTView.cpp ;
 
 LinkSharedOSLibs STXTTranslator : be translation ;
 

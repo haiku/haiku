@@ -41,8 +41,9 @@
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>
+#include "BaseTranslator.h"
 
-#define STXT_TRANSLATOR_VERSION 0x100
+#define STXT_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
 #define STXT_IN_QUALITY 0.5
 #define STXT_IN_CAPABILITY 0.5
 #define STXT_OUT_QUALITY 0.5
@@ -53,29 +54,10 @@
 #define TEXT_OUT_QUALITY 0.4
 #define TEXT_OUT_CAPABILITY 0.6
 
-class STXTTranslator : public BTranslator {
+class STXTTranslator : public BaseTranslator {
 public:
 	STXTTranslator();
 	
-	virtual const char *TranslatorName() const;
-		// returns the short name of the translator
-		
-	virtual const char *TranslatorInfo() const;
-		// returns a verbose name/description for the translator
-	
-	virtual int32 TranslatorVersion() const;
-		// returns the version of the translator
-
-	virtual const translation_format *InputFormats(int32 *out_count)
-		const;
-		// returns the input formats and the count of input formats
-		// that this translator supports
-		
-	virtual const translation_format *OutputFormats(int32 *out_count)
-		const;
-		// returns the output formats and the count of output formats
-		// that this translator supports
-
 	virtual status_t Identify(BPositionIO *inSource,
 		const translation_format *inFormat, BMessage *ioExtension,
 		translator_info *outInfo, uint32 outType);
@@ -89,10 +71,7 @@ public:
 		// it translates the data in inSource to outDestination
 		// using the format outType
 		
-	virtual status_t MakeConfigurationView(BMessage *ioExtension,
-		BView **outView, BRect *outExtent);
-		// creates and returns the view for displaying information
-		// about this translator
+	virtual BView *NewConfigView(TranslatorSettings *settings);
 
 protected:
 	virtual ~STXTTranslator();
@@ -101,8 +80,6 @@ protected:
 		// the user
 		
 private:
-	char fName[30];
-	char fInfo[100];
 };
 
 #endif // #ifndef STXT_TRANSLATOR_H

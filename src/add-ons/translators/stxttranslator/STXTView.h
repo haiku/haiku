@@ -34,18 +34,21 @@
 #include <View.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include "TranslatorSettings.h"
 
 class STXTView : public BView {
 public:
 	STXTView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~STXTView();
-		// does nothing
+		// releases settings
 
 	virtual	void Draw(BRect area);
 		// draws information about the STXTTranslator
+private:
+	TranslatorSettings *fSettings;
 };
 
 #endif // #ifndef STXTVIEW_H

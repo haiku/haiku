@@ -34,9 +34,6 @@
 #include "STXTTranslator.h"
 #include "STXTView.h"
 
-#define min(x,y) ((x < y) ? x : y)
-#define max(x,y) ((x > y) ? x : y)
-
 #define READ_BUFFER_SIZE 2048
 #define DATA_BUFFER_SIZE 64
 
@@ -78,6 +75,12 @@ translation_format gOutputFormats[] = {
 		"text/x-vnd.Be-stxt",
 		"Be styled text file"
 	}
+};
+
+// Default settings for the Translator
+TranSetting gDefaultSettings[] = {
+	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
 
 // ---------------------------------------------------------------
@@ -126,13 +129,14 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 STXTTranslator::STXTTranslator()
-	:	BTranslator()
+	: BaseTranslator("StyledEdit Files", "StyledEdit files translator",
+		STXT_TRANSLATOR_VERSION,
+		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
+		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		"STXTTranslator_Settings",
+		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		B_TRANSLATOR_TEXT, B_STYLED_TEXT_FORMAT)
 {
-	strcpy(fName, "StyledEdit Files");
-	sprintf(fInfo, "StyledEdit file translator v%d.%d.%d %s",
-		static_cast<int>(STXT_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((STXT_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(STXT_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
@@ -150,119 +154,6 @@ STXTTranslator::STXTTranslator()
 // ---------------------------------------------------------------
 STXTTranslator::~STXTTranslator()
 {
-}
-
-// ---------------------------------------------------------------
-// TranslatorName
-//
-// Returns the short name of the translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the short name of the translator
-// ---------------------------------------------------------------	
-const char *
-STXTTranslator::TranslatorName() const
-{
-	return fName;
-}
-
-// ---------------------------------------------------------------
-// TranslatorInfo
-//
-// Returns a more verbose name for the translator than the one
-// TranslatorName() returns. This usually includes version info.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the verbose name of the translator
-// ---------------------------------------------------------------
-const char *
-STXTTranslator::TranslatorInfo() const
-{
-	return fInfo;
-}
-
-// ---------------------------------------------------------------
-// TranslatorVersion
-//
-// Returns the integer representation of the current version of
-// this translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-int32 
-STXTTranslator::TranslatorVersion() const
-{
-	return STXT_TRANSLATOR_VERSION;
-}
-
-// ---------------------------------------------------------------
-// InputFormats
-//
-// Returns a list of input formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of input formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of input formats and the number of input
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------
-const translation_format *
-STXTTranslator::InputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gInputFormats) /
-			sizeof(translation_format);
-		return gInputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// OutputFormats
-//
-// Returns a list of output formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of output formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of output formats and the number of output
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------	
-const translation_format *
-STXTTranslator::OutputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gOutputFormats) /
-			sizeof(translation_format);
-		return gOutputFormats;
-	} else
-		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -930,43 +821,10 @@ STXTTranslator::Translate(BPositionIO *inSource,
 		return result;
 }
 
-// ---------------------------------------------------------------
-// MakeConfigurationView
-//
-// Makes a BView object for configuring / displaying info about
-// this translator. 
-//
-// Preconditions:
-//
-// Parameters:	ioExtension,	configuration options for the
-//								translator
-//
-//				outView,		the view to configure the
-//								translator is stored here
-//
-//				outExtent,		the bounds of the view are
-//								stored here
-//
-// Postconditions:
-//
-// Returns:  B_BAD_VALUE if ioExtension or outView are NULL,
-//           B_NO_MEMORY if a view can't be allocated,
-//           B_OK if all goes well 
-// ---------------------------------------------------------------
-status_t
-STXTTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
-	BRect *outExtent)
+BView *
+STXTTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	if (!outView || !outExtent)
-		return B_BAD_VALUE;
-
-	STXTView *view = new STXTView(BRect(0, 0, 225, 175),
-		"STXTTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
-	if (!view)
-		return B_NO_MEMORY;
-		
-	*outView = view;
-	*outExtent = view->Bounds();
-
-	return B_OK;
+	return new STXTView(BRect(0, 0, 225, 175), "STXTTranslator Settings",
+		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
+

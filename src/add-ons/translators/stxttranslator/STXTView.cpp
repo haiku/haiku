@@ -47,10 +47,12 @@
 // Returns:
 // ---------------------------------------------------------------
 STXTView::STXTView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
 	:	BView(frame, name, resize, flags)
 {
-	SetViewColor(220,220,220,0);
+	fSettings = settings;
+
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 // ---------------------------------------------------------------
@@ -68,6 +70,7 @@ STXTView::STXTView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 STXTView::~STXTView()
 {
+	fSettings->Release();
 }
 
 // ---------------------------------------------------------------
@@ -104,9 +107,10 @@ STXTView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(STXT_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((STXT_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(STXT_TRANSLATOR_VERSION & 0xf), __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(STXT_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(STXT_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(STXT_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 /*	char copyright[] = "© 2002 OpenBeOS Project";
 	DrawString(copyright, BPoint(xbold, yplain * 2 + ybold));
