@@ -140,12 +140,14 @@ status_t _kern_validate_initialize_partition(partition_id partitionID,
 											 int32 changeCounter,
 											 const char *diskSystemName,
 											 char *name,
-											 const char *parameters);
+											 const char *parameters,
+											 size_t parametersSize);
 status_t _kern_validate_create_child_partition(partition_id partitionID,
 											   int32 changeCounter,
 											   off_t *offset, off_t *size,
 											   const char *type,
-											   const char *parameters);
+											   const char *parameters,
+											   size_t parametersSize);
 status_t _kern_get_partitionable_spaces(partition_id partitionID,
 										int32 changeCounter,
 										partitionable_space_data *buffer,
@@ -182,20 +184,24 @@ status_t _kern_set_partition_type(partition_id partitionID,
 								  int32 changeCounter, const char *type);
 status_t _kern_set_partition_parameters(partition_id partitionID,
 										int32 changeCounter,
-										const char *parameters);
+										const char *parameters,
+										size_t parametersSize);
 status_t _kern_set_partition_content_parameters(partition_id partitionID,
 												int32 changeCounter,
-												const char *parameters);
+												const char *parameters,
+												size_t parametersSize);
 status_t _kern_initialize_partition(partition_id partitionID,
 									int32 changeCounter,
 									const char *diskSystemName,
-									const char *name, const char *parameters);
+									const char *name, const char *parameters,
+									size_t parametersSize);
 status_t _kern_uninitialize_partition(partition_id partitionID,
 									  int32 changeCounter);
 status_t _kern_create_child_partition(partition_id partitionID,
 									  int32 changeCounter, off_t offset,
 									  off_t size, const char *type,
 									  const char *parameters,
+									  size_t parametersSize,
 									  partition_id *childID);
 status_t _kern_delete_partition(partition_id partitionID, int32 changeCounter);
 

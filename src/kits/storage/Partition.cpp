@@ -742,7 +742,10 @@ BPartition::SetParameters(const char *parameters)
 		return B_BAD_VALUE;
 	status_t error = _kern_set_partition_parameters(_ShadowID(),
 													_ChangeCounter(),
-													parameters);
+													parameters,
+													(parameters
+													 ? strlen(parameters)+1
+													 : 0));
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
@@ -773,7 +776,10 @@ BPartition::SetContentParameters(const char *parameters)
 		return B_BAD_VALUE;
 	status_t error = _kern_set_partition_content_parameters(_ShadowID(),
 															_ChangeCounter(),
-															parameters);
+															parameters,
+															(parameters
+															 ? strlen(parameters)+1
+															 : 0));
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
@@ -806,7 +812,8 @@ BPartition::ValidateInitialize(const char *diskSystem, char *name,
 	if (!fPartitionData || !_IsShadow() || !diskSystem || !name)
 		return B_BAD_VALUE;
 	return _kern_validate_initialize_partition(_ShadowID(), _ChangeCounter(),
-											   diskSystem, name, parameters);
+											   diskSystem, name, parameters,
+											   (parameters ? strlen(parameters)+1 : 0));
 }
 
 // Initialize
@@ -817,7 +824,8 @@ BPartition::Initialize(const char *diskSystem, const char *name,
 	if (!fPartitionData || !_IsShadow() || !diskSystem || !name)
 		return B_BAD_VALUE;
 	status_t error = _kern_initialize_partition(_ShadowID(), _ChangeCounter(),
-												diskSystem, name, parameters);
+												diskSystem, name, parameters,
+												(parameters ? strlen(parameters)+1 : 0));
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
@@ -863,7 +871,8 @@ BPartition::ValidateCreateChild(off_t *offset, off_t *size, const char *type,
 		return B_BAD_VALUE;
 	return _kern_validate_create_child_partition(_ShadowID(), _ChangeCounter(),
 												 offset, size, type,
-												 parameters);
+												 parameters,
+												 (parameters ? strlen(parameters)+1 : 0));
 }
 
 // CreateChild
@@ -877,7 +886,7 @@ BPartition::CreateChild(off_t offset, off_t size, const char *type,
 	partition_id childID = -1;
 	status_t error = _kern_create_child_partition(_ShadowID(),
 							_ChangeCounter(), offset, size, type, parameters,
-							&childID);
+							(parameters ? strlen(parameters)+1 : 0), &childID);
 	// update the device
 	if (error == B_OK)
 		error = Device()->Update();
