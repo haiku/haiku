@@ -230,6 +230,18 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 		case B_CPU_AMD_DURON:
 			strcpy(processor, "Duron");
 			break;
+		case B_CPU_AMD_ATHLON_64:
+		case B_CPU_AMD_ATHLON_64_MODEL2:
+		case B_CPU_AMD_ATHLON_64_MODEL3:
+		case B_CPU_AMD_ATHLON_64_MODEL4:
+		case B_CPU_AMD_ATHLON_64_MODEL5:
+		case B_CPU_AMD_ATHLON_64_MODEL6:
+		case B_CPU_AMD_ATHLON_64_MODEL7:
+			strcpy(processor, "Athlon 64");
+			break;
+		case B_CPU_AMD_OPTERON:
+			strcpy(processor, "Opteron");
+			break;
 #endif
 		case B_CPU_CYRIX_GXm:
 			strcpy(processor, "GXm");
