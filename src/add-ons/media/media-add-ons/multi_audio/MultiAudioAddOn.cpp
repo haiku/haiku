@@ -64,7 +64,7 @@ MultiAudioAddOn::~MultiAudioAddOn()
 	
 	void *device = NULL;
 	for ( int32 i = 0; (device = fDevices.ItemAt(i)); i++ )
-		delete device;
+		delete (MultiAudioDevice *)device;
 		
 	SaveSettings();
 }

@@ -46,6 +46,9 @@
 
 #include "MultiAudioNode.h"
 #include "driver_io.h"
+#ifdef DEBUG
+  #define PRINTING
+#endif
 #include "debug.h"
 
 #include <stdio.h>
@@ -299,7 +302,9 @@ void MultiAudioNode::NodeRegistered(void)
 	SetParameterWeb(fWeb);
 	
 	/* apply configuration */
+#ifdef PRINTING
 	bigtime_t start = system_time();
+#endif
 		
 	int32 index = 0;
 	int32 parameterID = 0;
