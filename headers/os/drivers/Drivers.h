@@ -22,9 +22,9 @@ typedef status_t (*device_close_hook) (void *cookie);
 typedef status_t (*device_free_hook) (void *cookie);
 typedef status_t (*device_control_hook) (void *cookie, uint32 op, void *data,
                                          size_t len);
-typedef ssize_t  (*device_read_hook) (void *cookie, off_t position, void *data,
+typedef status_t  (*device_read_hook) (void *cookie, off_t position, void *data,
                                       size_t *numBytes);
-typedef ssize_t  (*device_write_hook) (void *cookie, off_t position,
+typedef status_t  (*device_write_hook) (void *cookie, off_t position,
                                        const void *data, size_t *numBytes);
 typedef status_t (*device_select_hook) (void *cookie, uint8 event, uint32 ref,
                                         selectsync *sync);
