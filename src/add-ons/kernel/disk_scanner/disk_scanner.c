@@ -274,7 +274,7 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 					sessionInfo->size = deviceSize;
 					sessionInfo->logical_block_size = blockSize;
 					sessionInfo->index = 0;
-					sessionInfo->flags = B_VIRTUAL_SESSION;
+					sessionInfo->flags = B_VIRTUAL_SESSION | B_DATA_SESSION;
 				} else
 					error = B_ENTRY_NOT_FOUND;
 			}
