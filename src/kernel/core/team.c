@@ -120,12 +120,12 @@ team_init(kernel_args *ka)
 
 	// create the kernel team
 	kernel_team = create_team_struct("kernel_team", true);
-	if(kernel_team == NULL)
+	if (kernel_team == NULL)
 		panic("could not create kernel team!\n");
 	kernel_team->state = TEAM_STATE_NORMAL;
 
 	kernel_team->ioctx = vfs_new_io_context(NULL);
-	if(kernel_team->ioctx == NULL)
+	if (kernel_team->ioctx == NULL)
 		panic("could not create ioctx for kernel team!\n");
 
 	//XXX should initialize kernel_team->path here. Set it to "/"?
@@ -134,14 +134,18 @@ team_init(kernel_args *ka)
 	hash_insert(team_hash, kernel_team);
 
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
+	return 0;
 }
 
 
-// Frees an array of strings in kernel space
-// Parameters
-//		strings		strings array
-//		strc		number of strings in array
-static void kfree_strings_array(char **strings, int strc)
+/**	Frees an array of strings in kernel space
+ *	Parameters
+ *		strings		strings array
+ *		strc		number of strings in array
+ */
+
+static void
+kfree_strings_array(char **strings, int strc)
 {
 	int cnt = strc;
 
@@ -153,13 +157,17 @@ static void kfree_strings_array(char **strings, int strc)
 	}
 }
 
-// Copy an array of strings from user space to kernel space
-// Parameters
-//		strings		userspace strings array
-//		strc		number of strings in array
-//		kstrings	pointer to the kernel copy
-// Returns < 0 on error and **kstrings = NULL
-static int user_copy_strings_array(char **strings, int strc, char ***kstrings)
+
+/**	Copy an array of strings from user space to kernel space
+ *	Parameters
+ *		strings		userspace strings array
+ *		strc		number of strings in array
+ *		kstrings	pointer to the kernel copy
+ *	Returns < 0 on error and **kstrings = NULL
+ */
+
+static int
+user_copy_strings_array(char **strings, int strc, char ***kstrings)
 {
 	char **lstrings;
 	int err;
@@ -212,7 +220,9 @@ error:
 	return err;
 }
 
-int user_team_wait_on_team(team_id id, int *uretcode)
+
+int
+user_team_wait_on_team(team_id id, int *uretcode)
 {
 	int retcode;
 	int rc, rc2;
@@ -231,7 +241,9 @@ int user_team_wait_on_team(team_id id, int *uretcode)
 	return rc;
 }
 
-int team_wait_on_team(team_id id, int *retcode)
+
+int
+team_wait_on_team(team_id id, int *retcode)
 {
 	struct team *p;
 	thread_id tid;
@@ -255,7 +267,8 @@ int team_wait_on_team(team_id id, int *retcode)
 }
 
 
-struct team *team_get_team_struct(team_id id)
+struct team *
+team_get_team_struct(team_id id)
 {
 	struct team *p;
 	int state;
@@ -272,7 +285,8 @@ struct team *team_get_team_struct(team_id id)
 }
 
 
-struct team *team_get_team_struct_locked(team_id id)
+struct team *
+team_get_team_struct_locked(team_id id)
 {
 	struct team_key key;
 
@@ -281,7 +295,9 @@ struct team *team_get_team_struct_locked(team_id id)
 	return hash_lookup(team_hash, &key);
 }
 
-static int team_struct_compare(void *_p, const void *_key)
+
+static int
+team_struct_compare(void *_p, const void *_key)
 {
 	struct team *p = _p;
 	const struct team_key *key = _key;
@@ -290,47 +306,60 @@ static int team_struct_compare(void *_p, const void *_key)
 	else return 1;
 }
 
-static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range)
+
+static unsigned int
+team_struct_hash(void *_p, const void *_key, unsigned int range)
 {
 	struct team *p = _p;
 	const struct team_key *key = _key;
 
-	if(p != NULL)
+	if (p != NULL)
 		return (p->id % range);
-	else
-		return (key->id % range);
+
+	return (key->id % range);
 }
 
-void team_remove_team_from_hash(struct team *team)
+
+void
+team_remove_team_from_hash(struct team *team)
 {
 	hash_remove(team_hash, team);
 }
 
-struct team *team_get_kernel_team(void)
+
+struct team *
+team_get_kernel_team(void)
 {
 	return kernel_team;
 }
 
-team_id team_get_kernel_team_id(void)
+
+team_id
+team_get_kernel_team_id(void)
 {
-	if(!kernel_team)
+	if (!kernel_team)
 		return 0;
-	else
-		return kernel_team->id;
+
+	return kernel_team->id;
 }
 
-team_id team_get_current_team_id(void)
+
+team_id
+team_get_current_team_id(void)
 {
 	return thread_get_current_thread()->team->id;
 }
 
-static struct team *create_team_struct(const char *name, bool kernel)
+
+static struct team *
+create_team_struct(const char *name, bool kernel)
 {
 	struct team *p;
 
 	p = (struct team *)kmalloc(sizeof(struct team));
-	if(p == NULL)
+	if (p == NULL)
 		goto error;
+
 	p->id = atomic_add(&next_team_id, 1);
 	strncpy(&p->name[0], name, SYS_MAX_OS_NAME_LEN-1);
 	p->name[SYS_MAX_OS_NAME_LEN-1] = 0;
@@ -348,7 +377,7 @@ static struct team *create_team_struct(const char *name, bool kernel)
 	p->death_sem = -1;
 	p->user_env_base = NULL;
 
-	if(arch_team_init_team_struct(p, kernel) < 0)
+	if (arch_team_init_team_struct(p, kernel) < 0)
 		goto error1;
 
 	return p;
@@ -359,13 +388,16 @@ error:
 	return NULL;
 }
 
-static void delete_team_struct(struct team *p)
+
+static void
+delete_team_struct(struct team *p)
 {
 	kfree(p);
 }
 
 
-static int get_arguments_data_size(char **args,int argc)
+static int
+get_arguments_data_size(char **args,int argc)
 {
 	int cnt;
 	int tot_size = 0;
@@ -377,7 +409,9 @@ static int get_arguments_data_size(char **args,int argc)
 	return tot_size + sizeof(struct uspace_prog_args_t);
 }
 
-static int team_create_team2(void *args)
+
+static int
+team_create_team2(void *args)
 {
 	int err;
 	struct thread *t;
@@ -470,7 +504,9 @@ static int team_create_team2(void *args)
 	return 0;
 }
 
-team_id team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
+
+team_id
+team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
 	struct team *p;
 	thread_id tid;
@@ -483,7 +519,7 @@ team_id team_create_team(const char *path, const char *name, char **args, int ar
 	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
 
 	p = create_team_struct(name, false);
-	if(p == NULL)
+	if (p == NULL)
 		return ENOMEM;
 
 	pid = p->id;
@@ -496,12 +532,12 @@ team_id team_create_team(const char *path, const char *name, char **args, int ar
 
 	// copy the args over
 	pargs = (struct team_arg *)kmalloc(sizeof(struct team_arg));
-	if(pargs == NULL){
+	if (pargs == NULL){
 		err = ENOMEM;
 		goto err1;
 	}
 	pargs->path = (char *)kstrdup(path);
-	if(pargs->path == NULL){
+	if (pargs->path == NULL){
 		err = ENOMEM;
 		goto err2;
 	}
@@ -512,7 +548,7 @@ team_id team_create_team(const char *path, const char *name, char **args, int ar
 
 	// create a new ioctx for this team
 	p->ioctx = vfs_new_io_context(thread_get_current_thread()->team->ioctx);
-	if(!p->ioctx) {
+	if (!p->ioctx) {
 		err = ENOMEM;
 		goto err3;
 	}
@@ -559,7 +595,9 @@ err1:
 	return err;
 }
 
-team_id user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
+
+team_id
+user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
 	char name[SYS_MAX_OS_NAME_LEN];
@@ -606,7 +644,8 @@ error:
 }
 
 
-int team_kill_team(team_id id)
+int
+team_kill_team(team_id id)
 {
 	int state;
 	struct team *p;
@@ -762,19 +801,20 @@ err:
 }
 
 
-int user_setenv(const char *uname, const char *uvalue, int overwrite)
+int
+user_setenv(const char *uname, const char *uvalue, int overwrite)
 {
 	char name[SYS_THREAD_STRING_LENGTH_MAX];
 	char value[SYS_THREAD_STRING_LENGTH_MAX];
 	int rc;
 
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
+	if ((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 
 	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
@@ -788,7 +828,9 @@ int user_setenv(const char *uname, const char *uvalue, int overwrite)
 	return sys_setenv(name, value, overwrite);
 }
 
-int sys_setenv(const char *name, const char *value, int overwrite)
+
+int
+sys_setenv(const char *name, const char *value, int overwrite)
 {
 	char var[SYS_THREAD_STRING_LENGTH_MAX];
 	int state;
@@ -870,7 +912,9 @@ int sys_setenv(const char *name, const char *value, int overwrite)
 	return rc;
 }
 
-int user_getenv(const char *uname, char **uvalue)
+
+int
+user_getenv(const char *uname, char **uvalue)
 {
 	char name[SYS_THREAD_STRING_LENGTH_MAX];
 	char *value;
@@ -898,7 +942,9 @@ int user_getenv(const char *uname, char **uvalue)
 	return 0;
 }
 
-int sys_getenv(const char *name, char **value)
+
+int
+sys_getenv(const char *name, char **value)
 {
 	char **envp;
 	char *p;
