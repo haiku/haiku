@@ -64,22 +64,42 @@ typedef struct
 	uint16  Length; 
 } usb_request_data;
 
-// Describes the internal organs of an usb packet
-typedef struct usb_packet_t
-{
-	uint16 pipe;
-	uint8 *requestdata;
-	uint8 *buffer;
-	int16 bufferlength;
-	size_t *actual_length;
-	int16 address;		//!!!! TEMPORARY ... or is it?
-} usb_packet_t;
+// Describes the internals of a pipe
+enum Direction 	{ In , Out , Default };
+enum Speed		{ LowSpeed , NormalSpeed };
 
+typedef struct usb_pipe_t
+{
+	enum Direction	direction;
+	enum Speed		speed;
+	int8		deviceid;
+	uint8		endpoint;
+} usb_pipe_t;
+
+
+// Describes the internal organs of an usb packet
+typedef struct usb_transfer_t
+{
+	//Data that is related to the transfer
+	usb_pipe_t  *pipe;
+	uint8 		*buffer;
+	size_t 		bufferlength;
+	size_t 		*actual_length;
+	bigtime_t 	timeout;
+	status_t	status;
+
+	//For control transfers
+	usb_request_data	*request;
+} usb_transfer_t;
+
+//
+//
 typedef struct host_controller_info 
 {
 	module_info info;
 	status_t (*hwstart)(void);
-	status_t (*SubmitPacket)(usb_packet_t *); 
+	status_t (*SubmitPacket)(usb_transfer_t *); 
 } host_controller_info;
 
 #endif //HOST_CONTROLLER_INFO_H
+

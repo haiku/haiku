@@ -21,7 +21,7 @@
 
 #include "usb_p.h"
 
-Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum )
+Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum , bool lowspeed )
 {
 	status_t retval;
 	
@@ -45,13 +45,15 @@ Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc ,
 	//2. Set the free entry free entry in the device map (for the device number)
 	m_devicenum = devicenum;
 	
-	//3. Get the device descriptor
-	// We already have a part of it, but we want it all
-	m_device_descriptor = desc;
-	
+	//3. Set up the pipe stuff
 	//Set the maximum transfer numbers for the incoming and the outgoing packets on endpoint 0
 	m_maxpacketin[0] = m_maxpacketout[0] = m_device_descriptor.max_packet_size_0; 
-	
+	m_device_descriptor = desc;
+	m_lowspeed = lowspeed;
+	m_defaultPipe = new ControlPipe( this , Default , 0 );
+		
+	//4. Get the device descriptor
+	// We already have a part of it, but we want it all
 	retval = GetDescriptor( USB_DESCRIPTOR_DEVICE , 0 ,
 	                        (void *)&m_device_descriptor , sizeof(m_device_descriptor ) );
 	
@@ -95,8 +97,7 @@ int16 Device::GetDescriptor( uint8 descriptor_type , uint16 index ,
                                 void *buffer , size_t size )
 {
 	size_t actual_length;
-	m_bus->SendRequest( this ,
-	             USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
+	m_defaultPipe->SendRequest(USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
 	             USB_REQUEST_GET_DESCRIPTOR ,					//Request
 	             ( descriptor_type << 8 ) | index ,				//Value
 	             0 ,											//Index
@@ -112,8 +113,7 @@ status_t Device::SetConfiguration( uint8 value )
 	if ( value >= m_device_descriptor.num_configurations )
 		return EINVAL;
 	
-	m_bus->SendRequest( this ,
-	             USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD , //Type
+	m_defaultPipe->SendRequest( USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD , //Type
 	             USB_REQUEST_SET_CONFIGURATION ,				//Request
 	             value ,										//Value
 	             0 ,											//Index

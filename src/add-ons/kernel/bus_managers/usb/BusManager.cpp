@@ -34,7 +34,7 @@ int32 usb_explore_thread( void *data )
 	{
 		//Go to the hubs
 		roothub->Explore();
-		snooze(10000); //Wait one second before continueing
+		snooze(1000000); //Wait one second before continueing
 	}
 	return B_OK;
 }
@@ -55,8 +55,12 @@ BusManager::BusManager( host_controller_info *info )
 	// Clear the device map
 	memset( &m_devicemap , false , 128 );
 	
+	// Set up the default pipes
+	m_defaultPipe = new ControlPipe( this , 0 , Default , NormalSpeed , 0 );
+	m_defaultLowSpeedPipe = new ControlPipe( this , 0 , Default , LowSpeed , 0 );
+	
 	// Set up the new root hub
-	AllocateNewDevice( 0 );
+	AllocateNewDevice( 0 , false );
 	
 	if( m_roothub == 0 )
 		return;
@@ -82,7 +86,7 @@ status_t BusManager::InitCheck()
 		return B_ERROR;
 }
 
-Device * BusManager::AllocateNewDevice( Device *parent )
+Device * BusManager::AllocateNewDevice( Device *parent , bool lowspeed )
 {
 	int8 devicenum;
 	status_t retval;
@@ -96,9 +100,9 @@ Device * BusManager::AllocateNewDevice( Device *parent )
 		return 0;
 	}
 	
+	
 	//2. Set the address of the device USB 1.1 spec p202 (bepdf)
-	retval = SendRequest( 0 ,
-				 USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD , //host->device
+	retval = m_defaultPipe->SendRequest( USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD , //host->device
 	             USB_REQUEST_SET_ADDRESS , 						//request
 	             devicenum ,									//value
 	             0 ,											//index
@@ -113,6 +117,9 @@ Device * BusManager::AllocateNewDevice( Device *parent )
 		return 0; 
 	}
 	
+	//Create a temporary pipe
+	ControlPipe pipe( this , devicenum , Default , LowSpeed , 0 );
+	
 	//3. Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
 	// size of any device, plus it is enough, because the device type is in
@@ -120,8 +127,7 @@ Device * BusManager::AllocateNewDevice( Device *parent )
 	
 	size_t actual_length;
 	
-	SendRequest( 0 ,
-	             USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
+	pipe.SendRequest( USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
 	             USB_REQUEST_GET_DESCRIPTOR ,					//Request
 	             ( USB_DESCRIPTOR_DEVICE << 8 ),				//Value
 	             0 ,											//Index
@@ -140,21 +146,21 @@ Device * BusManager::AllocateNewDevice( Device *parent )
 	if ( device_descriptor.device_class == 0x09 )
 	{
 		dprintf( "usb Busmanager [new device]: New hub\n" );
-		Device *ret = new Hub( this , parent , device_descriptor , devicenum );
+		Device *ret = new Hub( this , parent , device_descriptor , devicenum , lowspeed );
 		if ( parent == 0 ) //root hub!!
 			m_roothub = ret;
 		return ret;
 	}
 	
 	dprintf( "usb Busmanager [new device]: New normal device\n" );
-	return new Device( this , parent , device_descriptor , devicenum );
+	return new Device( this , parent , device_descriptor , devicenum , lowspeed);
 }
 
 int8 BusManager::AllocateAddress()
 {
 	acquire_sem_etc( m_lock , 1 , B_CAN_INTERRUPT , 0 );
 	int8 devicenum = -1;
-	for( int i = 0 ; i < 128 ; i++ )
+	for( int i = 1 ; i < 128 ; i++ )
 	{
 		if ( m_devicemap[i] == false )
 		{
@@ -165,44 +171,5 @@ int8 BusManager::AllocateAddress()
 	}
 	release_sem( m_lock );
 	return devicenum;
-}
-
-status_t BusManager::SendRequest( Device * dev , uint8 request_type , uint8 request , uint16 value ,
-	                  uint16 index , uint16 length , void *data ,
-	                  size_t data_len , size_t *actual_len )
-{
-	//todo: het moet speciaal soort geheugen worden
-	usb_request_data *req = (usb_request_data *)malloc( sizeof( usb_request_data) );
-	
-	req->RequestType = request_type;
-	req->Request = request;
-	req->Value = value;
-	req->Index = index;
-	req->Length = length;
-	
-	//Nicen up the second argument: the default pipe
-	//1) set up the pipe stuff a little nicer
-	//2) don't assume it's a low speed device :-(
-	return SendControlMessage( dev , ( 2 << 30 | 1 << 26 ) , req ,
-	                                   data , data_len , actual_len , 3 * 1000 * 1000 ); 
-}
-
-status_t BusManager::SendControlMessage( Device *dev , uint16 pipe , 
-	                             usb_request_data *command , void *data ,
-	                             size_t data_length , size_t *actual_length , 
-	                             bigtime_t timeout )
-{
-	// this method should build an usb packet (new class) with the needed data
-	Packet packet;
-	
-	packet.SetPipe( pipe );
-	packet.SetRequestData( (uint8 *)command );
-	packet.SetBuffer( (uint8 *)data );
-	packet.SetBufferLength( data_length );
-	packet.SetActualLength( actual_length );
-	packet.SetAddress( 0 );
-	
-	status_t retval = hcpointer->SubmitPacket( packet.GetData() );
-	return retval;
 }
 

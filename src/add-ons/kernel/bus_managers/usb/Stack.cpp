@@ -1,6 +1,8 @@
 //------------------------------------------------------------------------------
 //	Copyright (c) 2003, Niels S. Reedijk
 //
+//  AllocArea implementation (c) 2002 Marcus Overhagen <marcus@overhagen.de>
+//
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
 //	to deal in the Software without restriction, including without limitation
@@ -51,6 +53,57 @@ Stack::Stack()
 	
 	if( m_busmodules.Count() == 0 )
 		return;
+
+	//Initialise the memory chunks: create 8, 16 and 32 byte-heaps
+	//NOTE: This is probably the most ugly code you will see in the
+	//whole stack. Unfortunately this is needed because of the fact
+	//that the compiler doesn't like us to apply pointer arithmethic
+	//to (void *) pointers. 
+	
+	
+	uint16 size = 0;
+	for ( int i = 0 ; i < 3 ; i++ )
+	{
+		size = 2^(3+i);
+		dprintf( "USB: Initialising %u-byte chunk area\n" , size );
+		m_areafreecount[i] = 0;
+	
+		if ( AllocArea(0) < B_OK )
+		{
+			dprintf( "USB: %u-byte chunk area failed to initialise\n" , size );
+			return;
+		}
+		
+		void *listhead;
+		
+		switch (size)
+		{
+		case 8:
+			listhead = m_8_listhead;
+			break;
+		case 16:
+			listhead = m_16_listhead;
+			break;
+		case 32:
+			listhead = m_32_listhead;
+			break;
+		default:
+			dprintf( "USB: Strange error: %u-byte chunks don't exist\n", size );
+			return;
+		}
+
+		listhead = m_logical[i];
+
+		for ( int j = 0 ; j < B_PAGE_SIZE/size ; j++ )
+		{
+			memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[i] + size * j);
+			chunk->physical = (void *)((uint32)m_physical[i] + size * j);
+			if ( j != B_PAGE_SIZE / size - 1 )
+				chunk->next_item = (void *)((uint32)m_logical[i] + size * ( j + 1 ) );
+			else
+				chunk->next_item = NULL;
+		}
+	}
 }
 
 Stack::~Stack()
@@ -68,4 +121,119 @@ status_t Stack::InitCheck()
 	return B_OK;
 }
 
+void Stack::Lock()
+{
+	acquire_sem( m_master );
+}
+
+void Stack::Unlock()
+{
+	release_sem( m_master );
+}
+
+status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
+{
+	Lock();
+
+	void *listhead;
+	if ( size <= 8 )
+		listhead = m_8_listhead;
+	else if ( size <= 16 )
+		listhead = m_16_listhead;
+	else if ( size <= 32 )
+		listhead = m_32_listhead;
+	else
+	{
+		dprintf ( "USB Stack: Chunk size %i to big\n" , size );
+		Unlock();
+		return B_ERROR;
+	}
+
+	if ( listhead == NULL )
+	{
+		Unlock();
+		return B_ERROR;
+	}
+	
+	memory_chunk *chunk = (memory_chunk *)listhead;
+	*log = listhead;
+	*phy = chunk->physical;
+	if ( chunk->next_item == NULL )
+		//TODO: allocate more memory
+		listhead = NULL;
+	else
+		m_8_listhead = chunk->next_item;
+	Unlock();
+	return B_OK;
+}
+
+status_t Stack::FreeChunk( void *log , void *phy , uint8 size )
+{	
+	Lock();
+	void *listhead;
+	if ( size <= 8 )
+		listhead = m_8_listhead;
+	else if ( size <= 16 )
+		listhead = m_16_listhead;
+	else if ( size <= 32 )
+		listhead = m_32_listhead;
+	else
+	{
+		dprintf ( "USB Stack: Chunk size %i invalid\n" , size );
+		Unlock();
+		return B_ERROR;
+	}
+	
+	memory_chunk *chunk = (memory_chunk *)log;
+	
+	chunk->next_item = listhead;
+	chunk->physical = phy;
+	listhead = log;
+	Unlock();
+	return B_OK;
+}
+
+area_id Stack::AllocArea( void **log , void **phy , size_t size , const char *name )
+{
+	physical_entry pe;
+	void * logadr;
+	area_id areaid;
+	status_t rv;
+	
+	dprintf("allocating %ld bytes for %s\n",size,name);
+
+	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	if (areaid < B_OK) {
+		dprintf("couldn't allocate area %s\n",name);
+		return B_ERROR;
+	}
+	rv = get_memory_map(logadr,size,&pe,1);
+	if (rv < B_OK) {
+		delete_area(areaid);
+		dprintf("couldn't map %s\n",name);
+		return B_ERROR;
+	}
+	memset(logadr,0,size);
+	if (log)
+		*log = logadr;
+	if (phy)
+		*phy = pe.address;
+	dprintf("area = %ld, size = %ld, log = %#08lX, phy = %#08lX\n",areaid,size,(uint32)logadr,(uint32)(pe.address));
+	return areaid;
+}
+
+//Wrapper for the above, but it works on our internal data structures
+status_t Stack::AllocArea( uint8 id )
+{
+	if ( id > USB_MAX_AREAS )
+		return B_ERROR;
+	
+	m_areas[id] = AllocArea( &m_logical[id] , &m_physical[id] , B_PAGE_SIZE , "internal USB stack area" );
+	
+	if ( m_areas[id] < B_OK )
+		return B_ERROR;
+	return B_OK;
+}
+	
 Stack *data = 0;

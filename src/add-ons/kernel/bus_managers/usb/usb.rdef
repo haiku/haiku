@@ -14,7 +14,7 @@ resource app_version {
 	middle = 0,
 	minor  = 1,
 	variety = 0,
-	internal = 0,
+	internal = 1,
 	short_info = "USB system software",
 	long_info = "OpenBeOS - This driver is (c) 2003-2004 Niels Sascha Reedijk"
 };

@@ -10,5 +10,6 @@ R5KernelAddon usb : [ FDirName kernel bus_managers ] :
 	Device.cpp
 	Hub.cpp
 	BusManager.cpp
-	Packet.cpp
+	Transfer.cpp
+	Pipe.cpp
 	;

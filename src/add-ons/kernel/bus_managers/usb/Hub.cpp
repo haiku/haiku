@@ -21,8 +21,8 @@
 
 #include "usb_p.h"
 
-Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum )
-   : Device ( bus , parent , desc , devicenum )
+Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum , bool lowspeed )
+   : Device ( bus , parent , desc , devicenum , lowspeed )
 {
 	dprintf( "USB Hub is being initialised\n" );
 	m_initok = false; // We're not yet ready!
@@ -82,7 +82,7 @@ Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8
 	
 	// Enable port power on all ports
 	for ( int i = 0 ; i < m_hub_descriptor.bNbrPorts ; i++ )
-		m_bus->SendRequest( this , USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
+		m_defaultPipe->SendRequest( USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
 		                    USB_REQUEST_SET_FEATURE ,
 		                    PORT_POWER , 
 		                    i + 1 , //index
@@ -104,7 +104,7 @@ void Hub::Explore()
 	for ( int i = 0 ; i < m_hub_descriptor.bNbrPorts ; i++ )
 	{
 		// Get the current port status
-		m_bus->SendRequest( this , USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN ,
+		m_defaultPipe->SendRequest( USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN ,
 		                    USB_REQUEST_GET_STATUS ,
 		                    0 , //Value
 		                    i + 1 , //Index
@@ -119,6 +119,21 @@ void Hub::Explore()
 		}
 	
 		//We need to test the port change against a number of things
+		
+		if ( m_port_status[i].status & PORT_RESET )
+		{
+			//We didn't do this!
+			m_defaultPipe->SendRequest( USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
+		                    USB_REQUEST_CLEAR_FEATURE ,
+		                    PORT_RESET , 
+		                    i + 1 , //index
+		                    0 ,
+		                    NULL ,
+		                    0 ,
+		                    &actual_length );
+		}
+		
+					
 		if ( m_port_status[i].change & PORT_STATUS_CONNECTION )
 		{
 			if ( m_port_status[i].status & PORT_STATUS_CONNECTION )
@@ -137,7 +152,7 @@ void Hub::Explore()
 			}
 		
 			//Clear status
-			m_bus->SendRequest( this , USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
+			m_defaultPipe->SendRequest( USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
 		                    USB_REQUEST_CLEAR_FEATURE ,
 		                    C_PORT_CONNECTION , 
 		                    i + 1 , //index
