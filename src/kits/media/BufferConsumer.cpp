@@ -395,8 +395,10 @@ BBufferConsumer::HandleMessage(int32 message,
 				
 		case CONSUMER_DISCONNECTED:
 		{
-			const xfer_consumer_disconnected *request = (const xfer_consumer_disconnected *)rawdata;
-			Disconnected(request->producer, request->where);
+			const consumer_disconnected_request *request = (const consumer_disconnected_request *)rawdata;
+			consumer_disconnected_reply reply;
+			Disconnected(request->source, request->destination);
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;
 		}
 

@@ -157,6 +157,7 @@ void
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
 	status_t rv;
+	printf("ServerApp::HandleMessage %#lx\n", code);
 	switch (code) {
 		case SERVER_GET_MEDIAADDON_REF:
 		{
@@ -169,39 +170,103 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
+		case SERVER_NODE_ID_FOR:
+		{
+			const server_node_id_for_request *request = reinterpret_cast<const server_node_id_for_request *>(data);
+			server_node_id_for_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_GET_LIVE_NODE_INFO:
+		{
+			const server_get_live_node_info_request *request = reinterpret_cast<const server_get_live_node_info_request *>(data);
+			server_get_live_node_info_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_GET_LIVE_NODES:
+		{
+			const server_get_live_nodes_request *request = reinterpret_cast<const server_get_live_nodes_request *>(data);
+			server_get_live_nodes_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_GET_NODE_FOR:
+		{
+			const server_get_node_for_request *request = reinterpret_cast<const server_get_node_for_request *>(data);
+			server_get_node_for_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_RELEASE_NODE:
+		{
+			const server_release_node_request *request = reinterpret_cast<const server_release_node_request *>(data);
+			server_release_node_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_REGISTER_NODE:
+		{
+			const server_register_node_request *request = reinterpret_cast<const server_register_node_request *>(data);
+			server_register_node_reply reply;
+			reply.nodeid = 1234;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_UNREGISTER_NODE:
+		{
+			const server_unregister_node_request *request = reinterpret_cast<const server_unregister_node_request *>(data);
+			server_unregister_node_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+
 		case SERVER_PUBLISH_INPUTS:
 		{
-			server_publish_inputs_request *request = (server_publish_inputs_request *)data;
+			const server_publish_inputs_request *request = reinterpret_cast<const server_publish_inputs_request *>(data);
 			server_publish_inputs_reply reply;
 			// XXX do something here
-			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
 		
 		case SERVER_PUBLISH_OUTPUTS:
 		{
-			server_publish_outputs_request *request = (server_publish_outputs_request *)data;
+			const server_publish_outputs_request *request = reinterpret_cast<const server_publish_outputs_request *>(data);
 			server_publish_outputs_reply reply;
 			// XXX do something here
-			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_NODE:
 		{
-			server_get_node_request *request = (server_get_node_request *)data;
+			const server_get_node_request *request = reinterpret_cast<const server_get_node_request *>(data);
 			server_get_node_reply reply;
 			// XXX do something here
-			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_SET_NODE:
 		{
-			server_set_node_request *request = (server_set_node_request *)data;
+			const server_set_node_request *request = reinterpret_cast<const server_set_node_request *>(data);
 			server_set_node_reply reply;
 			// XXX do something here
-			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
 

@@ -149,8 +149,10 @@ BBufferProducer::HandleMessage(int32 message,
 
 		case PRODUCER_DISCONNECT:
 		{
-			const xfer_producer_disconnect *request = (const xfer_producer_disconnect *)rawdata;
+			const producer_disconnect_request *request = (const producer_disconnect_request *)rawdata;
+			producer_disconnect_reply reply;
 			Disconnect(request->source, request->destination);
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;
 		}
 

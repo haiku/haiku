@@ -13,6 +13,7 @@
 #include <TimeSource.h>
 #undef 	DEBUG
 #define	DEBUG 3
+#include <Debug.h>
 #include "debug.h"
 #include "TStack.h"
 #include "PortPool.h"
@@ -58,6 +59,7 @@ GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * o
 	status_t rv;
 
 	request.type = type;
+	request.team = team;
 	rv = QueryServer(SERVER_GET_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK)
 		return rv;
@@ -380,8 +382,25 @@ status_t
 BMediaRoster::GetNodeFor(media_node_id node,
 						 media_node * clone)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (clone == NULL)
+		return B_BAD_VALUE;	
+	if (node <= 0)
+		return B_MEDIA_BAD_NODE;
+
+	server_get_node_for_request request;
+	server_get_node_for_reply reply;
+	status_t rv;
+	
+	request.nodeid = node;
+	request.team = team;
+	
+	rv = QueryServer(SERVER_GET_NODE_FOR, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*clone = reply.clone;
+	return B_OK;
 }
 
 
@@ -396,10 +415,18 @@ BMediaRoster::GetSystemTimeSource(media_node * clone)
 status_t 
 BMediaRoster::ReleaseNode(const media_node & node)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
+	CALLED();
+	if (node.node <= 0)
+		return B_MEDIA_BAD_NODE;
 
+	server_release_node_request request;
+	server_release_node_reply reply;
+	
+	request.node = node;
+	request.team = team;
+	
+	return QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply, sizeof(reply));
+}
 
 
 BTimeSource *
@@ -433,10 +460,14 @@ BMediaRoster::Connect(const media_source & from,
 	CALLED();
 	if (io_format == NULL || out_output == NULL || out_input == NULL)
 		return B_BAD_VALUE;
-	if (from == media_source::null)
+	if (from == media_source::null) {
+		TRACE("BMediaRoster::Connect: media_source invalid\n");
 		return B_MEDIA_BAD_SOURCE;
-	if (to == media_destination::null)
+	}
+	if (to == media_destination::null) {
+		TRACE("BMediaRoster::Connect: media_destination invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
+	}
 
 	status_t rv;
 	producer_format_proposal_request request1;
@@ -537,23 +568,89 @@ BMediaRoster::Connect(const media_source & from,
 	
 	
 	// XXX register connection with server
+	// XXX we should just send a notification, instead of republishing all endpoints
+	Stack<media_output> outstack;
+	Stack<media_input> instack;
+	if (B_OK == GetAllOutputs(out_output->node , &outstack))
+		PublishOutputs(out_output->node , &outstack);
+	if (B_OK == GetAllInputs(out_input->node , &instack))
+		PublishInputs(out_input->node, &instack);
 
 
 	// XXX if (mute) BBufferProducer::EnableOutput(false)
+	if (in_flags & B_CONNECT_MUTED) {
+	}
 
+
+	// send a notification
+	BPrivate::media::notifications::ConnectionMade(*out_input, *out_output, *io_format);
 
 	return B_OK;
 };
 
 
 status_t 
-BMediaRoster::Disconnect(media_node_id source_node,
+BMediaRoster::Disconnect(media_node_id source_nodeid,
 						 const media_source & source,
-						 media_node_id destination_node,
+						 media_node_id destination_nodeid,
 						 const media_destination & destination)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (source_nodeid <= 0) {
+		TRACE("BMediaRoster::Disconnect: source media_node_id invalid\n");
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (destination_nodeid <= 0) {
+		TRACE("BMediaRoster::Disconnect: source media_node_id invalid\n");
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	if (source == media_source::null) {
+		TRACE("BMediaRoster::Disconnect: media_source invalid\n");
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (destination == media_destination::null) {
+		TRACE("BMediaRoster::Disconnect: media_destination invalid\n");
+		return B_MEDIA_BAD_DESTINATION;
+	}
+
+	producer_disconnect_request request2;
+	producer_disconnect_reply reply2;
+	consumer_disconnected_request request1;
+	consumer_disconnected_reply reply1;
+	status_t rv1, rv2;
+
+	// XXX we should ask the server if this connection really exists
+
+	request1.source = source;
+	request1.destination = destination;
+	request2.source = source;
+	request2.destination = destination;
+
+	rv1 = QueryPort(source.port, PRODUCER_DISCONNECT, &request1, sizeof(request1), &reply1, sizeof(reply1));
+	rv2 = QueryPort(destination.port, CONSUMER_DISCONNECTED, &request2, sizeof(request2), &reply2, sizeof(reply2));
+
+	// XXX unregister connection with server
+	// XXX we should just send a notification, instead of republishing all endpoints
+	Stack<media_output> outstack;
+	Stack<media_input> instack;
+	media_node sourcenode; 
+	media_node destnode;
+	if (B_OK == GetNodeFor(source_nodeid, &sourcenode)) {
+		if (B_OK == GetAllOutputs(sourcenode , &outstack))
+			PublishOutputs(sourcenode , &outstack);
+		ReleaseNode(sourcenode);
+	} else TRACE("BMediaRoster::Disconnect: source GetNodeFor failed\n");
+	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
+		if (B_OK == GetAllInputs(destnode , &instack))
+			PublishInputs(destnode, &instack);
+		ReleaseNode(destnode);
+	} else TRACE("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
+	
+
+	// send a notification
+	BPrivate::media::notifications::ConnectionBroken(source, destination);
+
+	return (rv1 != B_OK || rv2 != B_OK) ? B_ERROR : B_OK;
 }
 
 
@@ -562,7 +659,7 @@ BMediaRoster::StartNode(const media_node & node,
 						bigtime_t at_performance_time)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
 	xfer_node_start msg;
@@ -578,7 +675,7 @@ BMediaRoster::StopNode(const media_node & node,
 					   bool immediate)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
 	xfer_node_stop msg;
@@ -595,7 +692,7 @@ BMediaRoster::SeekNode(const media_node & node,
 					   bigtime_t at_performance_time)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
 	xfer_node_seek msg;
@@ -611,7 +708,7 @@ BMediaRoster::StartTimeSource(const media_node & node,
 							  bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 	if ((node.kind & B_TIME_SOURCE) == 0)
 		return B_MEDIA_BAD_NODE;
@@ -630,7 +727,7 @@ BMediaRoster::StopTimeSource(const media_node & node,
 							 bool immediate)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 	if ((node.kind & B_TIME_SOURCE) == 0)
 		return B_MEDIA_BAD_NODE;
@@ -649,7 +746,7 @@ BMediaRoster::SeekTimeSource(const media_node & node,
 							 bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 	if ((node.kind & B_TIME_SOURCE) == 0)
 		return B_MEDIA_BAD_NODE;
@@ -678,7 +775,7 @@ BMediaRoster::SetRunModeNode(const media_node & node,
 							 BMediaNode::run_mode mode)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
 	xfer_node_set_run_mode msg;
@@ -692,7 +789,7 @@ status_t
 BMediaRoster::PrerollNode(const media_node & node)
 {
 	CALLED();
-	if (node.node == 0)
+	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
 	char dummy;
@@ -751,7 +848,6 @@ BMediaRoster::SetProducerRate(const media_node & producer,
 }
 
 
-
 /* Nodes will have available inputs/outputs as long as they are capable */
 /* of accepting more connections. The node may create an additional */
 /* output or input as the currently available is taken into usage. */
@@ -759,8 +855,24 @@ status_t
 BMediaRoster::GetLiveNodeInfo(const media_node & node,
 							  live_node_info * out_live_info)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (out_live_info == NULL)
+		return B_BAD_VALUE;	
+	if (node.node <= 0)
+		return B_MEDIA_BAD_NODE;
+
+	server_get_live_node_info_request request;
+	server_get_live_node_info_reply reply;
+	status_t rv;
+	
+	request.node = node;
+	
+	rv = QueryAddonServer(SERVER_GET_LIVE_NODE_INFO, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*out_live_info = reply.live_info;
+	return B_OK;
 }
 
 
@@ -772,8 +884,65 @@ BMediaRoster::GetLiveNodes(live_node_info * out_live_nodes,
 						   const char * name,
 						   uint64 node_kinds)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (out_live_nodes == NULL || io_total_count == NULL)
+		return B_BAD_VALUE;
+	if (*io_total_count <= 0)
+		return B_BAD_VALUE;
+
+	// XXX we also support the wildcard search as GetDormantNodes does. This needs to be documented
+
+	server_get_live_nodes_request request;
+	server_get_live_nodes_reply reply;
+	status_t rv;
+	
+	request.maxcount = *io_total_count;
+	request.has_input = (bool) has_input;
+	if (has_input)
+		request.inputformat = *has_input; // XXX we should not make a flat copy of media_format
+	request.has_output = (bool) has_output;
+	if (has_output)
+		request.outputformat = *has_output; // XXX we should not make a flat copy of media_format
+	request.has_name = (bool) name;
+	if (name) {
+		int len = strlen(name);
+		len = min_c(len, (int)sizeof(request.name) - 1);
+		memcpy(request.name, name, len);
+		request.name[len] = 0;
+	}
+	request.require_kinds = node_kinds;
+
+	rv = QueryServer(SERVER_GET_LIVE_NODES, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::GetLiveNodes failed\n");
+		return rv;
+	}
+
+	if (reply.count > MAX_LIVE_INFO) {
+		live_node_info *live_info;
+		area_id clone;
+
+		clone = clone_area("live_node_info clone", reinterpret_cast<void **>(&live_info), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, reply.area);
+		if (clone < B_OK) {
+			TRACE("BMediaRoster::GetLiveNodes failed to clone area, %#lx\n", clone);
+			delete_area(reply.area);
+			return B_ERROR;
+		}
+
+		for (int32 i = 0; i < reply.count; i++) {
+			out_live_nodes[i] = live_info[i];
+		}
+
+		delete_area(clone);
+		delete_area(reply.area);
+	} else {
+		for (int32 i = 0; i < reply.count; i++) {
+			out_live_nodes[i] = reply.live_info[i];
+		}
+	}
+	*io_total_count = reply.count;
+
+	return B_OK;
 }
 
 
@@ -785,7 +954,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 							   media_type filter_type)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_free_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -823,7 +992,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 									int32 * out_total_count)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_active_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -859,7 +1028,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 							  int32 * out_total_count)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -894,7 +1063,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 								media_type filter_type)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_free_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -932,7 +1101,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 									 int32 * out_total_count)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_active_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -968,7 +1137,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 							   int32 * out_total_count)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1034,7 +1203,7 @@ BMediaRoster::StartWatching(const BMessenger & where,
 		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
-	if (node.node == 0) {
+	if (node.node <= 0) {
 		TRACE("BMediaRoster::StartWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -1076,7 +1245,7 @@ BMediaRoster::StopWatching(const BMessenger & where,
 {
 	CALLED();
 	// messenger may already be invalid, so we don't check this
-	if (node.node == 0) {
+	if (node.node <= 0) {
 		TRACE("BMediaRoster::StopWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -1096,13 +1265,38 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 		return B_BAD_VALUE;
 		
 	status_t rv;
+	BMediaAddOn *addon;
+	int32 addon_flavor_id;
+	media_addon_id addon_id;
+	
+	addon_flavor_id = 0;
+	addon = node->AddOn(&addon_flavor_id);
+	addon_id = addon ? addon->AddonID() : -1;
 
-	// XXX fix node registration
-	xfer_node_registered msg;
-	msg.node_id = 1;
+	server_register_node_request request;
+	server_register_node_reply reply;
 	
-	rv = node->HandleMessage(NODE_REGISTERED,&msg,sizeof(msg));
+	request.addon_id = addon_id;
+	request.addon_flavor_id = addon_flavor_id;
+	strcpy(request.name, node->Name());
+	request.kinds = node->Kinds();
+	request.port = node->ControlPort();
+	request.team = team;
 	
+	rv = QueryServer(SERVER_REGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::RegisterNode: failed to register node %s (error %#lx)\n", node->Name(), rv);
+		return rv;
+	}
+	
+	// we are a friend class of BMediaNode and initilize this member variable
+	node->fNodeID = reply.nodeid;
+	ASSERT(reply.nodeid == node->Node().node);
+	ASSERT(reply.nodeid == node->ID());
+
+	// call the callback
+	node->NodeRegistered();
+
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
 	// with created, but unconnected nodes.
@@ -1116,15 +1310,48 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 			PublishInputs(node->Node(), &stack);
 	}
 
-	return rv;
+	TRACE("BMediaRoster::RegisterNode: registered node %s, id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
+
+	return B_OK;
 }
 
 
 status_t 
 BMediaRoster::UnregisterNode(BMediaNode * node)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node == NULL)
+		return B_BAD_VALUE;
+	
+	if (node->fRefCount != 0) {
+		TRACE("BMediaRoster::UnregisterNode: Warning node %s has local reference count of %ld\n", node->Name(), node->fRefCount);
+		// no return here, we continue and unregister!
+	}
+	if (node->ID() == -2) {
+		TRACE("BMediaRoster::UnregisterNode: Warning node %s already unregistered\n", node->Name());
+		return B_OK;
+	}
+		
+	server_unregister_node_request request;
+	server_unregister_node_reply reply;
+	status_t rv;
+
+	request.nodeid = node->ID();
+	request.team = team;
+
+	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::UnregisterNode: failed to unregister node %s (error %#lx)\n", node->Name(), rv);
+		return rv;
+	}
+	
+	if (reply.addon_id != -1)
+		_DormantNodeManager->PutAddon(reply.addon_id);
+
+	// we are a friend class of BMediaNode and initilize this member variable
+	node->fNodeID = -2;
+	
+	return B_OK;
 }
 
 
@@ -1219,8 +1446,9 @@ BMediaRoster::GetDormantNodes(dormant_node_info * out_info,
 		msg.outputformat = *has_output;; // XXX we should not make a flat copy of media_format
 	msg.has_name = (bool) name;
 	if (name) {
-		int len = min_c(strlen(name),sizeof(msg.name) - 1);
-		memcpy(msg.name,name,len);
+		int len = strlen(name);
+		len = min_c(len, (int)sizeof(msg.name) - 1);
+		memcpy(msg.name, name, len);
 		msg.name[len] = 0;
 	}
 	msg.require_kinds = require_kinds;
@@ -1350,6 +1578,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	// XXX we must remember in_info.addon and call
 	// XXX _DormantNodeManager->PutAddon when the
 	// XXX node is unregistered
+	// should be handled by RegisterNode() and UnegisterNode() now
 	
 	*out_node = node->Node();
 	return B_OK;
@@ -1574,8 +1803,21 @@ BMediaRoster::GetNodeAttributesFor(const media_node & node,
 media_node_id 
 BMediaRoster::NodeIDFor(port_id source_or_destination_port)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	
+	server_node_id_for_request request;
+	server_node_id_for_reply reply;
+	status_t rv;
+
+	request.port = source_or_destination_port;
+	
+	rv = QueryServer(SERVER_NODE_ID_FOR, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::NodeIDFor: failed (error %#lx)\n", rv);
+		return -1;
+	}
+	
+	return reply.nodeid;
 }
 
 
@@ -1586,6 +1828,7 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 							  int32 * io_count)
 {
 	UNIMPLEMENTED();
+	// flavor
 	return B_ERROR;
 }
 
@@ -1687,6 +1930,7 @@ BMediaRoster::SetOutputBuffersFor(const media_source & output,
 								  bool will_reclaim )
 {
 	UNIMPLEMENTED();
+	debugger("BMediaRoster::SetOutputBuffersFor missing\n");
 	return B_ERROR;
 }
 	

@@ -277,7 +277,7 @@ extern "C" void __10BMediaNodePCclUl(BMediaNode *self, const char *name, media_n
 BMediaNode::BMediaNode(const char *name)
 {
 	CALLED();
-	__10BMediaNodePCclUl(this,name,0,0);
+	__10BMediaNodePCclUl(this,name,-1,0);
 }
 
 
@@ -415,44 +415,44 @@ BMediaNode::SetTimeSource(BTimeSource *time_source)
 
 /* virtual */ status_t
 BMediaNode::HandleMessage(int32 message,
-						  const void *rawdata,
+						  const void *data,
 						  size_t size)
 {
 	CALLED();
 	switch (message) {
 		case NODE_START:
 		{
-			const xfer_node_start *data = (const xfer_node_start *)rawdata;
-			Start(data->performance_time);
+			const xfer_node_start *request = (const xfer_node_start *)data;
+			Start(request->performance_time);
 			return B_OK;
 		}
 
 		case NODE_STOP:
 		{
-			const xfer_node_stop *data = (const xfer_node_stop *)rawdata;
-			Stop(data->performance_time, data->immediate);
+			const xfer_node_stop *request = (const xfer_node_stop *)data;
+			Stop(request->performance_time, request->immediate);
 			return B_OK;
 		}
 
 		case NODE_SEEK:
 		{
-			const xfer_node_seek *data = (const xfer_node_seek *)rawdata;
-			Seek(data->media_time, data->performance_time);
+			const xfer_node_seek *request = (const xfer_node_seek *)data;
+			Seek(request->media_time, request->performance_time);
 			return B_OK;
 		}
 
 		case NODE_SET_RUN_MODE:
 		{
-			const xfer_node_set_run_mode *data = (const xfer_node_set_run_mode *)rawdata;
-			fRunMode = data->mode;
+			const xfer_node_set_run_mode *request = (const xfer_node_set_run_mode *)data;
+			fRunMode = request->mode;
 			SetRunMode(fRunMode);
 			return B_OK;
 		}
 
 		case NODE_TIME_WARP:
 		{
-			const xfer_node_time_warp *data = (const xfer_node_time_warp *)rawdata;
-			TimeWarp(data->at_real_time,data->to_performance_time);
+			const xfer_node_time_warp *request = (const xfer_node_time_warp *)data;
+			TimeWarp(request->at_real_time,request->to_performance_time);
 			return B_OK;
 		}
 
@@ -461,22 +461,14 @@ BMediaNode::HandleMessage(int32 message,
 			Preroll();
 			return B_OK;
 		}
-
-		case NODE_REGISTERED:
-		{
-			const xfer_node_registered *data = (const xfer_node_registered *)rawdata;
-			fNodeID = data->node_id;
-			NodeRegistered();
-			return B_OK;
-		}
 		
 		case NODE_SET_TIMESOURCE:
 		{
-			const xfer_node_set_timesource *data = (const xfer_node_set_timesource *)rawdata;
+			const xfer_node_set_timesource *request = (const xfer_node_set_timesource *)data;
 			bool first = (fTimeSourceID == 0);
 			if (fTimeSource)
 				fTimeSource->Release();
-			fTimeSourceID = data->timesource_id;
+			fTimeSourceID = request->timesource_id;
 			fTimeSource = 0; // XXX create timesource object here
 			fTimeSource = new _SysTimeSource;
 			if (!first)
@@ -486,8 +478,8 @@ BMediaNode::HandleMessage(int32 message,
 
 		case NODE_REQUEST_COMPLETED:
 		{
-			const xfer_node_request_completed *data = (const xfer_node_request_completed *)rawdata;
-			RequestCompleted(data->info);
+			const xfer_node_request_completed *request = (const xfer_node_request_completed *)data;
+			RequestCompleted(request->info);
 			return B_OK;
 		}
 		

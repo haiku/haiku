@@ -59,13 +59,11 @@ enum {
 	NODE_SET_RUN_MODE,
 	NODE_TIME_WARP,
 	NODE_PREROLL,
-	NODE_REGISTERED,
 	NODE_SET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
 	CONSUMER_BUFFER_RECEIVED,
 	CONSUMER_PRODUCER_DATA_STATUS,
 	CONSUMER_GET_LATENCY_FOR,
-	CONSUMER_DISCONNECTED,
 	CONSUMER_FORMAT_CHANGED,
 	CONSUMER_SEEK_TAG_REQUESTED,
 	PRODUCER_LATE_NOTICE_RECEIVED,
@@ -77,7 +75,6 @@ enum {
 	PRODUCER_GET_LATENCY,
 	PRODUCER_GET_INITIAL_LATENCY,
 	PRODUCER_FORMAT_SUGGESTION_REQUESTED,
-	PRODUCER_DISCONNECT,
 	PRODUCER_SET_PLAY_RATE,
 	PRODUCER_ENABLE_OUTPUT,	
 	ADDONSERVER_INSTANTIATE_DORMANT_NODE,
@@ -213,12 +210,6 @@ struct xfer_producer_format_suggestion_requested_reply
 	status_t result;
 };
 
-struct xfer_producer_disconnect
-{
-	media_source source;
-	media_destination destination;
-};
-
 struct xfer_producer_set_play_rate
 {
 	int32 numer;
@@ -349,11 +340,6 @@ struct xfer_node_time_warp
 	bigtime_t to_performance_time;
 };
 
-struct xfer_node_registered
-{
-	media_node_id node_id;
-};
-
 struct xfer_node_set_timesource
 {
 	media_node_id timesource_id;
@@ -385,13 +371,6 @@ struct xfer_consumer_get_latency_for_reply
 	status_t result;
 };
 	
-
-struct xfer_consumer_disconnected
-{
-	media_source producer;
-	media_destination where;
-};
-
 struct xfer_consumer_format_changed
 {
 	media_source producer;

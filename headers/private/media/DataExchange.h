@@ -71,15 +71,24 @@ enum {
 	SERVER_SET_NODE,
 	SERVER_PUBLISH_INPUTS,
 	SERVER_PUBLISH_OUTPUTS,
+	SERVER_NODE_ID_FOR,
+	SERVER_GET_LIVE_NODE_INFO,
+	SERVER_GET_LIVE_NODES,
+	SERVER_GET_NODE_FOR,
+	SERVER_RELEASE_NODE,
+	SERVER_REGISTER_NODE,
+	SERVER_UNREGISTER_NODE,
 	CONSUMER_GET_NEXT_INPUT = 0x2000,
 	CONSUMER_DISPOSE_INPUT_COOKIE,
 	CONSUMER_ACCEPT_FORMAT,
 	CONSUMER_CONNECTED,
+	CONSUMER_DISCONNECTED,
 	PRODUCER_GET_NEXT_OUTPUT = 0x3000,
 	PRODUCER_DISPOSE_OUTPUT_COOKIE,
 	PRODUCER_FORMAT_PROPOSAL,
 	PRODUCER_PREPARE_TO_CONNECT,
 	PRODUCER_CONNECT,
+	PRODUCER_DISCONNECT,
 };
 
 // used by SERVER_GET_NODE and SERVER_SET_NODE
@@ -100,6 +109,12 @@ enum
 {
 	MAX_OUTPUTS = 48,
 	MAX_INPUTS = 48,
+};
+
+// used by SERVER_GET_LIVE_NODES
+enum
+{
+	MAX_LIVE_INFO = 62,
 };
 
 struct addonserver_instantiate_dormant_node_request : public request_data
@@ -130,6 +145,7 @@ struct server_set_node_reply : public reply_data
 struct server_get_node_request : public request_data
 {
 	node_type type;
+	team_id team;
 };
 
 struct server_get_node_reply : public reply_data
@@ -208,7 +224,9 @@ struct server_publish_inputs_request : public request_data
 {
 	media_node node;
 	int32 count;
-	area_id area; // if count > MAX_INPUTS, inputs are in the area
+	area_id area;	// if count > MAX_INPUTS, inputs are in the area
+					// area is created in the server, and also deleted
+					// in the server after the reply has been received
 	media_input inputs[MAX_INPUTS];
 };
 
@@ -267,5 +285,113 @@ struct consumer_dispose_input_cookie_request : public request_data
 struct consumer_dispose_input_cookie_reply : public reply_data
 {
 };
+
+struct consumer_disconnected_request : public request_data
+{
+	media_source source;
+	media_destination destination;
+};
+
+struct consumer_disconnected_reply : public reply_data
+{
+};
+
+struct producer_disconnect_request : public request_data
+{
+	media_source source;
+	media_destination destination;
+};
+
+struct producer_disconnect_reply : public reply_data
+{
+};
+
+struct server_register_node_request : public request_data
+{
+	media_addon_id addon_id;
+	int32 addon_flavor_id;
+	char name[B_MEDIA_NAME_LENGTH];
+	uint64 kinds;
+	port_id port;
+	team_id team;
+};
+
+struct server_register_node_reply : public reply_data
+{
+	media_node_id nodeid;
+};
+
+struct server_unregister_node_request : public request_data
+{
+	media_node_id nodeid;
+	team_id team;
+};
+
+struct server_unregister_node_reply : public reply_data
+{
+	media_addon_id addon_id;
+};
+
+struct server_get_live_node_info_request : public request_data
+{
+	media_node node;
+};
+
+struct server_get_live_node_info_reply : public reply_data
+{
+	live_node_info live_info;
+};
+
+struct server_get_live_nodes_request : public request_data
+{
+	int32 maxcount;
+	bool has_input;
+	bool has_output;
+	bool has_name;
+	media_format inputformat;
+	media_format outputformat;
+	char name[B_MEDIA_NAME_LENGTH + 1]; // 1 for a trailing "*"
+	uint64 require_kinds;
+};
+
+struct server_get_live_nodes_reply : public reply_data
+{
+	int32 count;
+	area_id area; 	// if count > MAX_LIVE_INFO, live_node_infos are in the area
+					// area is created in the server, but deleted in the application
+	live_node_info live_info[MAX_LIVE_INFO]; 
+};
+
+struct server_node_id_for_request : public request_data
+{
+	port_id port;
+};
+
+struct server_node_id_for_reply : public reply_data
+{
+	media_node_id nodeid;
+};
+
+struct server_get_node_for_request : public request_data
+{
+	media_node_id nodeid;
+	team_id team;
+};
+
+struct server_get_node_for_reply : public reply_data
+{
+	media_node clone;
+};
+
+struct server_release_node_request : public request_data
+{
+	media_node node;
+	team_id team;
+};
+
+struct server_release_node_reply : public reply_data
+{
+};
+
 
 #endif // _DATA_EXCHANGE_H
