@@ -5,10 +5,16 @@
 
 
 #include "amiga_rdb.h"
+
 #include <ByteOrder.h>
-#include <ddm_modules.h>
-#include <DiskDeviceTypes.h>
 #include <KernelExport.h>
+#include <ddm_modules.h>
+#ifdef _BOOT_MODE
+#	include <boot/partitions.h>
+#else
+#	include <DiskDeviceTypes.h>
+#endif
+#include <util/kernel_cpp.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -18,13 +24,16 @@
 
 #define TRACE_AMIGA_RDB 0
 #if TRACE_AMIGA_RDB
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
-
+#ifdef _BOOT_MODE
 static const char *kPartitionModuleName = "partitioning_systems/amiga_rdb/v1";
+#else
+static const char *kPartitionModuleName = NULL;
+#endif
 
 
 template<typename Type> bool
@@ -204,7 +213,11 @@ amiga_rdb_free_identify_partition_cookie(partition_data *partition, void *_cooki
 }
 
 
+#ifndef _BOOT_MODE
 static partition_module_info amiga_rdb_partition_module = {
+#else
+partition_module_info gAmigaPartitionModule = {
+#endif
 	{
 		kPartitionModuleName,
 		0,
@@ -222,8 +235,10 @@ static partition_module_info amiga_rdb_partition_module = {
 //	amiga_rdb_free_partition_content_cookie,	// free_partition_content_cookie
 };
 
+#ifndef _BOOT_MODE
 partition_module_info *modules[] = {
 	&amiga_rdb_partition_module,
 	NULL
 };
+#endif
 
