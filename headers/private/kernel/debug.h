@@ -30,4 +30,11 @@ int  remove_debugger_command(const char * name, int (*func)(int, char **));
 
 extern void dbg_save_registers(int *);	/* arch provided */
 
+#if DEBUG 
+#	define ASSERT(x) \ 
+	{ if (!(x)) panic("ASSERT FAILED (%s:%d): %s", __FILE__, __LINE__, #x); } 
+#else 
+#	define ASSERT(x) 
 #endif
+
+#endif	/* _KERNEL_DEBUG_H */
