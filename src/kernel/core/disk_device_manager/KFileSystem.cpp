@@ -119,11 +119,11 @@ KFileSystem::SupportsResizing(KPartition *partition, bool *whileMounted)
 
 // SupportsMoving
 bool
-KFileSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
+KFileSystem::SupportsMoving(KPartition *partition, bool *isNoOp)
 {
 	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
+	if (isNoOp)
+		*isNoOp = false;
 	return false;
 }
 
@@ -131,6 +131,15 @@ KFileSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
 bool
 KFileSystem::SupportsSettingContentName(KPartition *partition,
 										bool *whileMounted)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsSettingContentParameters
+bool
+KFileSystem::SupportsSettingContentParameters(KPartition *partition,
+											  bool *whileMounted)
 {
 	// to be implemented
 	return false;
@@ -176,19 +185,19 @@ KFileSystem::ValidateSetContentName(KPartition *partition, char *name)
 	return false;
 }
 
-// ValidateInitialize
+// ValidateSetContentParameters
 bool
-KFileSystem::ValidateInitialize(KPartition *partition, char *name,
-								const char *parameters)
+KFileSystem::ValidateSetContentParameters(KPartition *child,
+										  const char *parameters)
 {
 	// to be implemented
 	return false;
 }
 
-// ValidateSetContentParameters
+// ValidateInitialize
 bool
-KFileSystem::ValidateSetContentParameters(KPartition *child,
-										  const char *parameters)
+KFileSystem::ValidateInitialize(KPartition *partition, char *name,
+								const char *parameters)
 {
 	// to be implemented
 	return false;
@@ -235,19 +244,19 @@ KFileSystem::SetContentName(KPartition *partition, char *name,
 	return B_ERROR;
 }
 
-// Initialize
+// SetContentParameters
 status_t
-KFileSystem::Initialize(KPartition *partition, const char *name,
-						const char *parameters, KDiskDeviceJob *job)
+KFileSystem::SetContentParameters(KPartition *partition,
+								  const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;
 }
 
-// SetContentParameters
+// Initialize
 status_t
-KFileSystem::SetContentParameters(KPartition *partition,
-								  const char *parameters, KDiskDeviceJob *job)
+KFileSystem::Initialize(KPartition *partition, const char *name,
+						const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;

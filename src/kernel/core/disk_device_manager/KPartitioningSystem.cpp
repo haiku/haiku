@@ -127,7 +127,7 @@ KPartitioningSystem::SupportsResizingChild(KPartition *child)
 
 // SupportsMoving
 bool
-KPartitioningSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
+KPartitioningSystem::SupportsMoving(KPartition *partition, bool *isNoOp)
 {
 	// to be implemented
 	return false;
@@ -166,17 +166,18 @@ KPartitioningSystem::SupportsSettingType(KPartition *partition)
 	return false;
 }
 
-// SupportsCreatingChild
+// SupportsSettingParameters
 bool
-KPartitioningSystem::SupportsCreatingChild(KPartition *partition)
+KPartitioningSystem::SupportsSettingParameters(KPartition *partition)
 {
 	// to be implemented
 	return false;
 }
 
-// SupportsDeletingChild
+// SupportsSettingContentParameters
 bool
-KPartitioningSystem::SupportsDeletingChild(KPartition *child)
+KPartitioningSystem::SupportsSettingContentParameters(KPartition *partition,
+													  bool *whileMounted)
 {
 	// to be implemented
 	return false;
@@ -194,6 +195,22 @@ KPartitioningSystem::SupportsInitializing(KPartition *partition)
 bool
 KPartitioningSystem::SupportsInitializingChild(KPartition *child,
 											   const char *diskSystem)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsCreatingChild
+bool
+KPartitioningSystem::SupportsCreatingChild(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsDeletingChild
+bool
+KPartitioningSystem::SupportsDeletingChild(KPartition *child)
 {
 	// to be implemented
 	return false;
@@ -263,11 +280,19 @@ KPartitioningSystem::ValidateSetType(KPartition *partition, const char *type)
 	return false;
 }
 
-// ValidateCreateChild
+// ValidateSetParameters
 bool
-KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
-										 off_t *size, const char *type,
-										 const char *parameters)
+KPartitioningSystem::ValidateSetParameters(KPartition *partition,
+										   const char *parameters)
+{
+	// to be implemented
+	return false;
+}
+
+// ValidateSetContentParameters
+bool
+KPartitioningSystem::ValidateSetContentParameters(KPartition *child,
+												  const char *parameters)
 {
 	// to be implemented
 	return false;
@@ -282,19 +307,11 @@ KPartitioningSystem::ValidateInitialize(KPartition *partition, char *name,
 	return false;
 }
 
-// ValidateSetParameters
+// ValidateCreateChild
 bool
-KPartitioningSystem::ValidateSetParameters(KPartition *partition,
-										   const char *parameters)
-{
-	// to be implemented
-	return false;
-}
-
-// ValidateSetContentParameters
-bool
-KPartitioningSystem::ValidateSetContentParameters(KPartition *child,
-												  const char *parameters)
+KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
+										 off_t *size, const char *type,
+										 const char *parameters)
 {
 	// to be implemented
 	return false;
@@ -407,34 +424,6 @@ KPartitioningSystem::SetType(KPartition *partition, char *type,
 	return B_ERROR;
 }
 
-// CreateChild
-status_t
-KPartitioningSystem::CreateChild(KPartition *partition, off_t offset,
-								 off_t size, const char *type,
-								 const char *parameters, KDiskDeviceJob *job,
-								 KPartition **child, partition_id childID)
-{
-	// to be implemented
-	return B_ERROR;
-}
-
-// DeleteChild
-status_t
-KPartitioningSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
-{
-	// to be implemented
-	return B_ERROR;
-}
-
-// Initialize
-status_t
-KPartitioningSystem::Initialize(KPartition *partition, const char *name,
-								const char *parameters, KDiskDeviceJob *job)
-{
-	// to be implemented
-	return B_ERROR;
-}
-
 // SetParameters
 status_t
 KPartitioningSystem::SetParameters(KPartition *partition,
@@ -449,6 +438,34 @@ status_t
 KPartitioningSystem::SetContentParameters(KPartition *partition,
 										  const char *parameters,
 										  KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// Initialize
+status_t
+KPartitioningSystem::Initialize(KPartition *partition, const char *name,
+								const char *parameters, KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// CreateChild
+status_t
+KPartitioningSystem::CreateChild(KPartition *partition, off_t offset,
+								 off_t size, const char *type,
+								 const char *parameters, KDiskDeviceJob *job,
+								 KPartition **child, partition_id childID)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// DeleteChild
+status_t
+KPartitioningSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;

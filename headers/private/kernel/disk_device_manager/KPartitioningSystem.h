@@ -31,17 +31,20 @@ public:
 								   bool *whileMounted);
 	virtual bool SupportsResizing(KPartition *partition, bool *whileMounted);
 	virtual bool SupportsResizingChild(KPartition *child);
-	virtual bool SupportsMoving(KPartition *partition, bool *whileMounted);
+	virtual bool SupportsMoving(KPartition *partition, bool *isNoOp);
 	virtual bool SupportsMovingChild(KPartition *child);
 	virtual bool SupportsSettingName(KPartition *partition);
 	virtual bool SupportsSettingContentName(KPartition *partition,
 											bool *whileMounted);
 	virtual bool SupportsSettingType(KPartition *partition);
-	virtual bool SupportsCreatingChild(KPartition *partition);
-	virtual bool SupportsDeletingChild(KPartition *child);
+	virtual bool SupportsSettingParameters(KPartition *partition);
+	virtual bool SupportsSettingContentParameters(KPartition *partition,
+												  bool *whileMounted);
 	virtual bool SupportsInitializing(KPartition *partition);
 	virtual bool SupportsInitializingChild(KPartition *child,
 										   const char *diskSystem);
+	virtual bool SupportsCreatingChild(KPartition *partition);
+	virtual bool SupportsDeletingChild(KPartition *child);
 	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
@@ -51,15 +54,15 @@ public:
 	virtual bool ValidateSetName(KPartition *partition, char *name);
 	virtual bool ValidateSetContentName(KPartition *partition, char *name);
 	virtual bool ValidateSetType(KPartition *partition, const char *type);
-	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
-									 off_t *size, const char *type,
-									 const char *parameters);
-	virtual bool ValidateInitialize(KPartition *partition, char *name,
-									const char *parameters);
 	virtual bool ValidateSetParameters(KPartition *partition,
 									   const char *parameters);
 	virtual bool ValidateSetContentParameters(KPartition *child,
 											  const char *parameters);
+	virtual bool ValidateInitialize(KPartition *partition, char *name,
+									const char *parameters);
+	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
+									 off_t *size, const char *type,
+									 const char *parameters);
 	virtual int32 CountPartitionableSpaces(KPartition *partition);
 	virtual bool GetPartitionableSpaces(KPartition *partition,
 										partitionable_space_data *spaces,
@@ -89,6 +92,12 @@ public:
 									KDiskDeviceJob *job);
 	virtual status_t SetType(KPartition *partition, char *type,
 							 KDiskDeviceJob *job);
+	virtual status_t SetParameters(KPartition *partition,
+								   const char *parameters,
+								   KDiskDeviceJob *job);
+	virtual status_t SetContentParameters(KPartition *partition,
+										  const char *parameters,
+										  KDiskDeviceJob *job);
 	virtual status_t CreateChild(KPartition *partition, off_t offset,
 								 off_t size, const char *type,
 								 const char *parameters, KDiskDeviceJob *job,
@@ -97,12 +106,6 @@ public:
 	virtual status_t DeleteChild(KPartition *child, KDiskDeviceJob *job);
 	virtual status_t Initialize(KPartition *partition, const char *name,
 								const char *parameters, KDiskDeviceJob *job);
-	virtual status_t SetParameters(KPartition *partition,
-								   const char *parameters,
-								   KDiskDeviceJob *job);
-	virtual status_t SetContentParameters(KPartition *partition,
-										  const char *parameters,
-										  KDiskDeviceJob *job);
 
 protected:
 	virtual status_t LoadModule();

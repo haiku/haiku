@@ -277,15 +277,15 @@ static fs_module_info bfs_module = {
 	NULL,								// supports_resizing_partition
 	NULL,								// supports_moving_partition
 	NULL,								// supports_setting_content_name
+	NULL,								// supports_setting_content_parameters
 	NULL,								// supports_initializing_partition
 	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
 	NULL,								// validate_move_partition
 	NULL,								// validate_set_content_name
+	NULL,						// validate_set_partition_content_parameters
 	NULL,								// validate_initialize_partition
-	NULL,
-								// validate_set_partition_content_parameters
 
 	// writing
 	NULL,								// defragment_partition
@@ -293,8 +293,8 @@ static fs_module_info bfs_module = {
 	NULL,								// resize_partition
 	NULL,								// move_partition
 	NULL,								// set_content_name
-	NULL,								// initialize_partition
 	NULL,								// set_partition_content_parameters
+	NULL,								// initialize_partition
 };
 
 

@@ -316,10 +316,12 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// supports_setting_name
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_setting_type
-	NULL,								// supports_creating_child_partition
-	NULL,								// supports_deleting_child_partition
+	NULL,								// supports_setting_parameters
+	NULL,								// supports_setting_content_parameters
 	NULL,								// supports_initializing_partition
 	NULL,							// supports_initializing_child_partition
+	NULL,								// supports_creating_child_partition
+	NULL,								// supports_deleting_child_partition
 	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
@@ -329,10 +331,10 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// validate_set_name
 	NULL,								// validate_set_content_name
 	NULL,								// validate_set_type
-	NULL,								// validate_create_child_partition
-	NULL,								// validate_initialize_partition
 	NULL,								// validate_set_partition_parameters
 	NULL,						// validate_set_partition_content_parameters
+	NULL,								// validate_initialize_partition
+	NULL,								// validate_create_child_partition
 	NULL,								// get_partitionable_spaces
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
@@ -346,11 +348,11 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// set_name
 	NULL,								// set_content_name
 	NULL,								// set_type
-	NULL,								// create_child_partition
-	NULL,								// delete_child_partition
-	NULL,								// initialize_partition
 	NULL,								// set_parameters_partition
 	NULL,								// set_partition_content_parameters
+	NULL,								// initialize_partition
+	NULL,								// create_child_partition
+	NULL,								// delete_child_partition
 };
 
 
@@ -394,10 +396,12 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// supports_setting_name
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_setting_type
-	NULL,								// supports_creating_child_partition
-	NULL,								// supports_deleting_child_partition
+	NULL,								// supports_setting_parameters
+	NULL,								// supports_setting_content_parameters
 	NULL,								// supports_initializing_partition
 	NULL,							// supports_initializing_child_partition
+	NULL,								// supports_creating_child_partition
+	NULL,								// supports_deleting_child_partition
 	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
@@ -407,10 +411,10 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// validate_set_name
 	NULL,								// validate_set_content_name
 	NULL,								// validate_set_type
-	NULL,								// validate_create_child_partition
-	NULL,								// validate_initialize_partition
 	NULL,								// validate_set_partition_parameters
 	NULL,						// validate_set_partition_content_parameters
+	NULL,								// validate_initialize_partition
+	NULL,								// validate_create_child_partition
 	NULL,								// get_partitionable_spaces
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
@@ -424,11 +428,11 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// set_name
 	NULL,								// set_content_name
 	NULL,								// set_type
-	NULL,								// create_child_partition
-	NULL,								// delete_child_partition
-	NULL,								// initialize_partition
 	NULL,								// set_parameters_partition
 	NULL,								// set_partition_content_parameters
+	NULL,								// initialize_partition
+	NULL,								// create_child_partition
+	NULL,								// delete_child_partition
 };
 
 

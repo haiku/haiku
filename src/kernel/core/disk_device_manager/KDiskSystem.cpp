@@ -205,7 +205,7 @@ KDiskSystem::SupportsResizingChild(KPartition *child)
 
 // SupportsMoving
 bool
-KDiskSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
+KDiskSystem::SupportsMoving(KPartition *partition, bool *isNoOp)
 {
 	// to be implemented by derived classes
 	return false;
@@ -244,17 +244,18 @@ KDiskSystem::SupportsSettingType(KPartition *partition)
 	return false;
 }
 
-// SupportsCreatingChild
+// SupportsSettingParameters
 bool
-KDiskSystem::SupportsCreatingChild(KPartition *parent)
+KDiskSystem::SupportsSettingParameters(KPartition *partition)
 {
 	// to be implemented by derived classes
 	return false;
 }
 
-// SupportsDeletingChild
+// SupportsSettingContentParameters
 bool
-KDiskSystem::SupportsDeletingChild(KPartition *child)
+KDiskSystem::SupportsSettingContentParameters(KPartition *partition,
+											  bool *whileMounted)
 {
 	// to be implemented by derived classes
 	return false;
@@ -272,6 +273,22 @@ KDiskSystem::SupportsInitializing(KPartition *partition)
 bool
 KDiskSystem::SupportsInitializingChild(KPartition *child,
 									   const char *diskSystem)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// SupportsCreatingChild
+bool
+KDiskSystem::SupportsCreatingChild(KPartition *parent)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// SupportsDeletingChild
+bool
+KDiskSystem::SupportsDeletingChild(KPartition *child)
 {
 	// to be implemented by derived classes
 	return false;
@@ -341,11 +358,19 @@ KDiskSystem::ValidateSetType(KPartition *partition, const char *type)
 	return false;
 }
 
-// ValidateCreateChild
+// ValidateSetParameters
 bool
-KDiskSystem::ValidateCreateChild(KPartition *partition, off_t *start,
-								 off_t *size, const char *type,
-								 const char *parameters)
+KDiskSystem::ValidateSetParameters(KPartition *partition,
+								   const char *parameters)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// ValidateSetContentParameters
+bool
+KDiskSystem::ValidateSetContentParameters(KPartition *child,
+										  const char *parameters)
 {
 	// to be implemented by derived classes
 	return false;
@@ -360,19 +385,11 @@ KDiskSystem::ValidateInitialize(KPartition *partition, char *name,
 	return false;
 }
 
-// ValidateSetParameters
+// ValidateCreateChild
 bool
-KDiskSystem::ValidateSetParameters(KPartition *partition,
-								   const char *parameters)
-{
-	// to be implemented by derived classes
-	return false;
-}
-
-// ValidateSetContentParameters
-bool
-KDiskSystem::ValidateSetContentParameters(KPartition *child,
-										  const char *parameters)
+KDiskSystem::ValidateCreateChild(KPartition *partition, off_t *start,
+								 off_t *size, const char *type,
+								 const char *parameters)
 {
 	// to be implemented by derived classes
 	return false;
@@ -487,20 +504,19 @@ KDiskSystem::SetType(KPartition *partition, char *type, KDiskDeviceJob *job)
 	return B_ERROR;
 }
 
-// CreateChild
+// SetParameters
 status_t
-KDiskSystem::CreateChild(KPartition *partition, off_t offset, off_t size,
-						 const char *type, const char *parameters,
-						 KDiskDeviceJob *job, KPartition **child,
-						 partition_id childID)
+KDiskSystem::SetParameters(KPartition *partition, const char *parameters,
+						   KDiskDeviceJob *job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
 }
 
-// DeleteChild
+// SetContentParameters
 status_t
-KDiskSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
+KDiskSystem::SetContentParameters(KPartition *partition,
+								  const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -515,19 +531,20 @@ KDiskSystem::Initialize(KPartition *partition, const char *name,
 	return B_ERROR;
 }
 
-// SetParameters
+// CreateChild
 status_t
-KDiskSystem::SetParameters(KPartition *partition, const char *parameters,
-						   KDiskDeviceJob *job)
+KDiskSystem::CreateChild(KPartition *partition, off_t offset, off_t size,
+						 const char *type, const char *parameters,
+						 KDiskDeviceJob *job, KPartition **child,
+						 partition_id childID)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
 }
 
-// SetContentParameters
+// DeleteChild
 status_t
-KDiskSystem::SetContentParameters(KPartition *partition,
-								  const char *parameters, KDiskDeviceJob *job)
+KDiskSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
