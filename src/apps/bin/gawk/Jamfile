@@ -20,4 +20,10 @@ BinCommand pgawk :
 	:  libintl.a
 	: gawk.rdef ;
 
+MakeLocate awk : $(OBOS_BIN_DIR) ;
+RelSymLink awk : gawk ;
+MakeLocate igawk : $(OBOS_BIN_DIR) ;
+RelSymLink igawk : gawk ;
+
 SubInclude OBOS_TOP src apps bin gawk intl ;
+
