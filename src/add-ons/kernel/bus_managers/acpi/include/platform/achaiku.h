@@ -150,6 +150,10 @@
 #define ACPI_INTERNAL_XFACE
 #define ACPI_INTERNAL_VAR_XFACE
 
+
+#define ACPI_FLUSH_CPU_CACHE()
+/* Implement ACPI_FLUSH_CPU_CACHE to do something! */
+
 #ifdef ACPI_DEBUG
 #define ACPI_DEBUG_OUTPUT
 #define ACPI_DBG_TRACK_ALLOCATIONS
@@ -170,6 +174,7 @@
 
 /* Not building kernel code, so use libc */
 #define ACPI_USE_STANDARD_HEADERS
+#define ACPI_FLUSH_CPU_CACHE()
 
 #define __cli()
 #define __sti()

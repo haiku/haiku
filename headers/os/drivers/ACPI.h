@@ -10,7 +10,7 @@
 #include <KernelExport.h>
 
 typedef struct acpi_module_info acpi_module_info;
-typedef struct acpi_object_info acpi_object_info;
+typedef struct acpi_object_type acpi_object_type;
 
 struct acpi_module_info {
 	bus_manager_info	binfo;
@@ -30,12 +30,25 @@ struct acpi_module_info {
 	/* Namespace Access */
 	
 	status_t			(*get_next_entry) (uint32 object_type, const char *base, char *result, size_t len, void **counter);
+	status_t			(*get_device) (const char *hid, uint32 index, char *result);
+	
 	status_t			(*get_device_hid) (const char *path, char *hid);
 	uint32				(*get_object_type) (const char *path);
 	
 	/* Control method execution and data acquisition */
 	
-	status_t			(*evaluate_object) (const char *object, void *return_value, size_t buf_len);
+	status_t			(*evaluate_object) (const char *object, acpi_object_type *return_value, size_t buf_len);
+	status_t			(*evaluate_method) (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args);
+	/* Power state setting */
+	
+	status_t			(*enter_sleep_state) (uint8 state);
+		/* Sleep state values:
+			0: On (Working)
+			1: Sleep
+			2: Software Off
+			3: Mechanical Off
+			4: Hibernate
+			5: Software Off */
 };
 
 
@@ -69,6 +82,37 @@ enum {
 	ACPI_TYPE_PROCESSOR,
 	ACPI_TYPE_THERMAL,
 	ACPI_TYPE_BUFFER_FIELD
+};
+
+/* ACPI control method arg type */
+
+struct acpi_object_type {
+	uint32 object_type;
+	union {
+		uint32 integer;
+		struct {
+			uint32 len;
+			char *string; /* You have to allocate string space yourself */
+		} string;
+		struct {
+			size_t length;
+			void *buffer;
+		} buffer;
+		struct {
+			uint32 count;
+			acpi_object_type *objects;
+		} package;
+		struct {
+			uint32 cpu_id;
+			
+			int pblk_address;
+			size_t pblk_length;
+		} processor;
+		struct {
+			uint32 min_power_state;
+			uint32 resource_order;
+		} power_resource;
+	} data;
 };
 
 #endif

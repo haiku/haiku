@@ -1,6 +1,7 @@
 #include <ACPI.h>
 #include <KernelExport.h>
 #include <stdio.h>
+#include <malloc.h>
 
 #include "acpi.h"
 #include "acpixf.h"
@@ -18,10 +19,15 @@ status_t install_fixed_event_handler	(uint32 event, interrupt_handler *handler, 
 status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler); 
 
 status_t get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter);
+status_t get_device (const char *hid, uint32 index, char *result);
+
 status_t get_device_hid (const char *path, char *hid);
 uint32 get_object_type (const char *path);
 
-status_t evaluate_object (const char *object, void *return_value, size_t buf_len);
+status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len);
+status_t evaluate_method (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args);
+
+status_t enter_sleep_state (uint8 state);
 
 struct acpi_module_info acpi_module = {
 	{
@@ -41,8 +47,12 @@ struct acpi_module_info acpi_module = {
 	install_fixed_event_handler,
 	remove_fixed_event_handler,
 	get_next_entry,
+	get_device,
 	get_device_hid,
-	get_object_type
+	get_object_type,
+	evaluate_object,
+	evaluate_method,
+	enter_sleep_state
 };
 
 _EXPORT module_info *modules[] = {
@@ -155,6 +165,44 @@ status_t get_next_entry (uint32 object_type, const char *base, char *result, siz
 	return B_OK;
 }
 
+static ACPI_STATUS get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void *context, void **return_val) {
+	ACPI_STATUS result;
+	ACPI_BUFFER buffer;
+	uint32 *counter = (uint32 *)(context);
+		
+	buffer.Length = 255;
+	buffer.Pointer = malloc(255);
+	
+	*return_val = NULL;
+	
+	if (counter[0] == counter[1]) {
+		result = AcpiGetName(object,ACPI_FULL_PATHNAME,&buffer);
+		if (result != AE_OK)
+			return result;
+		
+		((char*)(buffer.Pointer))[buffer.Length] = '\0';
+		*return_val = buffer.Pointer;
+		return AE_CTRL_TERMINATE;
+	}
+	
+	counter[1]++;
+	return AE_OK;
+}
+
+status_t get_device (const char *hid, uint32 index, char *result) {
+	ACPI_STATUS status;
+	uint32 counter[2] = {index,0};
+	char *result2;
+	
+	status = AcpiGetDevices((char *)hid,&get_device_by_hid_callback,counter,&result2);
+	if ((status != AE_OK) || (result2 == NULL))
+		return B_ENTRY_NOT_FOUND;
+		
+	strcpy(result,result2);
+	free(result2);
+	return B_OK;
+}
+
 status_t get_device_hid (const char *path, char *hid) {
 	ACPI_HANDLE handle;
 	ACPI_DEVICE_INFO info;
@@ -180,7 +228,7 @@ uint32 get_object_type (const char *path) {
 	return type;
 }
 
-status_t evaluate_object (const char *object, void *return_value, size_t buf_len) {
+status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len) {
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 	
@@ -189,4 +237,47 @@ status_t evaluate_object (const char *object, void *return_value, size_t buf_len
 	
 	status = AcpiEvaluateObject(NULL,object,NULL,(return_value != NULL) ? &buffer : NULL);
 	return (status == AE_OK) ? B_OK : B_ERROR;
+}
+
+status_t evaluate_method (const char *object, const char *method, acpi_object_type *return_value, size_t buf_len, acpi_object_type *args, int num_args) {
+	ACPI_BUFFER buffer;
+	ACPI_STATUS status;
+	ACPI_OBJECT_LIST acpi_args;
+	ACPI_HANDLE handle;
+	
+	if (AcpiGetHandle(NULL,object,&handle) != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+	
+	buffer.Pointer = return_value;
+	buffer.Length = buf_len;
+	
+	acpi_args.Count = num_args;
+	acpi_args.Pointer = args;
+	
+	status = AcpiEvaluateObject(handle,method,(args != NULL) ? &acpi_args : NULL,(return_value != NULL) ? &buffer : NULL);
+	return (status == AE_OK) ? B_OK : B_ERROR;
+}
+
+status_t enter_sleep_state (uint8 state) {
+	ACPI_STATUS status;
+	cpu_status cpu;
+	
+	status = AcpiEnterSleepStatePrep(state);
+	if (status != AE_OK)
+		return B_ERROR;
+	
+	/* NOT SMP SAFE (!!!!!!!!!!!) */
+	
+	cpu = disable_interrupts();
+	status = AcpiEnterSleepState(state);
+	restore_interrupts(cpu);
+	
+	if (status != AE_OK)
+		return B_ERROR;
+	
+	status = AcpiLeaveSleepState(state);
+	if (status != AE_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
