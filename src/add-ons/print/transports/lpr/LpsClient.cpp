@@ -162,11 +162,7 @@ void LpsClient::transferData(istream &is, int size) throw(LPSException)
 
 		if (size < 0) {
 			is.seekg(0, ios::end);
-#if __MWERKS__
-			size = is.tellg().offset();
-#else
 			size = is.tellg();
-#endif
 			is.seekg(0, ios::beg);
 		}
 
