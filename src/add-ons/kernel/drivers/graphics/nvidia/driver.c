@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-4/2004.
+	Rudolf Cornelissen 3/2002-6/2004.
 */
 
 /* standard kernel driver stuff */
@@ -264,6 +264,7 @@ static settings current_settings = { // see comments in nv.settings
 	false,      // usebios
 	false,      // hardcursor
 	false,		// switchhead
+	false,		// force_pci
 };
 
 static void dumprom (void *rom, size_t size)
@@ -382,6 +383,7 @@ init_driver(void) {
 		current_settings.hardcursor = get_driver_boolean_parameter (settings_handle, "hardcursor", false, false);
 		current_settings.usebios = get_driver_boolean_parameter (settings_handle, "usebios", false, false);
 		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
+		current_settings.force_pci = get_driver_boolean_parameter (settings_handle, "force_pci", false, false);
 
 		unload_driver_settings (settings_handle);
 	}

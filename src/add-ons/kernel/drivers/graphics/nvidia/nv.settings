@@ -18,5 +18,5 @@ hardcursor true			# if true use on-chip cursor capabilities
 #logmask 	0xffffffff		# log everything
 dumprom    false        		# dump bios rom in ~/nv.rom: probably not functional yet
 switchhead false			# switch head assignment (dualhead cards only)
-
+force_pci	false			# block AGP mode use if true (AGP cards only)
 #--------- that's all.
