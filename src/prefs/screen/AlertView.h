@@ -8,10 +8,10 @@ class AlertView : public BView
 {
 
 public:
-					AlertView(BRect frame, char *name);
-	virtual void	AttachedToWindow();
-	virtual void	Draw(BRect updateRect);
-	int32			Count;
+	AlertView(BRect frame, char *name);
+	virtual void AttachedToWindow();
+	virtual void Draw(BRect updateRect);
+	int32 Count;
 	
 private:
 	BBitmap			*fBitmap;

@@ -7,9 +7,9 @@ class ScreenApplication : public BApplication
 {
 
 public:
-					ScreenApplication();
-	virtual void	MessageReceived(BMessage *message);
-	virtual void	AboutRequested();
+	ScreenApplication();
+	virtual void MessageReceived(BMessage *message);
+	virtual void AboutRequested();
 	
 private:
 	ScreenWindow	*fScreenWindow;

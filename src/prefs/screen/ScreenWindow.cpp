@@ -1,32 +1,37 @@
-// Note:
-// The program has been tested with a 17" Monitor only.
-// Do not distribute this program at this state.
-
-#include <InterfaceDefs.h>
+#include <Alert.h>
 #include <Application.h>
-#include <MenuItem.h>
-#include <Window.h>
 #include <Button.h>
+#include <InterfaceDefs.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <Messenger.h>
 #include <String.h>
 #include <Screen.h>
-#include <Messenger.h>
-#include <Menu.h>
+#include <Window.h>
 
+
+#include <math.h>
 #include <cstring>
 #include <cstdlib>
-
-#include <Alert.h>
 
 #include "ScreenWindow.h"
 #include "ScreenDrawView.h"
 #include "ScreenView.h"
 #include "AlertWindow.h"
 #include "Constants.h"
-	
+#include "Utility.h"
+		 	
 ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
-	BRect frame = Bounds();
+	BRect frame(Bounds());
+	BScreen screen(B_MAIN_SCREEN_ID);
+	
+	if (!screen.IsValid()) {
+		//What could we do?
+		//debugger() ?
+	}
+	screen.GetModeList(&fSupportedModes, &fTotalModes);
 	
 	fScreenView = new ScreenView(frame, "ScreenView");
 	
@@ -51,14 +56,13 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fScreenDrawView = new ScreenDrawView(ScreenDrawViewRect, "ScreenDrawView");
 	
-	int32 Count;
-	
 	BString String;
 	
 	String << count_workspaces();
 	
 	fWorkspaceCountMenu = new BPopUpMenu(String.String(), true, true);
-	for (Count = 1; Count <= 32; Count++)
+	
+	for (int32 Count = 1; Count <= 32; Count++)
 	{
 		String.Truncate(0);
 		String << Count;
@@ -112,12 +116,13 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fControlsBox->AddChild(fApplyButton);
 	
 	fResolutionMenu = new BPopUpMenu("640 x 480", true, true);
-	fResolutionMenu->AddItem(new BMenuItem("640 x 480", new BMessage(POP_RESOLUTION_MSG)));
-	fResolutionMenu->AddItem(new BMenuItem("800 x 600", new BMessage(POP_RESOLUTION_MSG)));
-	fResolutionMenu->AddItem(new BMenuItem("1024 x 768", new BMessage(POP_RESOLUTION_MSG)));
-	fResolutionMenu->AddItem(new BMenuItem("1152 x 864", new BMessage(POP_RESOLUTION_MSG)));
-	fResolutionMenu->AddItem(new BMenuItem("1280 x 1024", new BMessage(POP_RESOLUTION_MSG)));
-	fResolutionMenu->AddItem(new BMenuItem("1600 x 1200", new BMessage(POP_RESOLUTION_MSG)));
+	for (uint32 c = 0; c < fTotalModes; c++) {
+		BString mode;
+		mode << (int32)fSupportedModes[c].virtual_width << " x " << (int32)fSupportedModes[c].virtual_height;
+		if (!fResolutionMenu->FindItem(mode.String()))
+			fResolutionMenu->AddItem(new BMenuItem(mode.String(),
+				new BMessage(POP_RESOLUTION_MSG)));
+	}
 	
 	ControlMenuRect.Set(33.0, 30.0, 171.0, 48.0);
 	
@@ -145,8 +150,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fColorsField->SetDivider(38.0);
 	
-	fControlsBox->AddChild(fColorsField);
-	
+	fControlsBox->AddChild(fColorsField);	
 	
 	fRefreshMenu = new BPopUpMenu("60 Hz", true, true);
 	fRefreshMenu->AddItem(new BMenuItem("56 Hz", new BMessage(POP_REFRESH_MSG)));
@@ -172,7 +176,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	ButtonRect.Set(10.0, 167, 100.0, 200.0);
 	
 	fDefaultsButton = new BButton(ButtonRect, "DefaultsButton", "Defaults", 
-	new BMessage(BUTTON_DEFAULTS_MSG));
+		new BMessage(BUTTON_DEFAULTS_MSG));
 	
 	fDefaultsButton->AttachedToWindow();
 	fDefaultsButton->ResizeToPreferred();
@@ -182,48 +186,42 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	ButtonRect.Set(95.0, 167, 160.0, 200.0);
 	
 	fRevertButton = new BButton(ButtonRect, "RevertButton", "Revert", 
-	new BMessage(BUTTON_REVERT_MSG));
+		new BMessage(BUTTON_REVERT_MSG));
 	
 	fRevertButton->AttachedToWindow();
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
 	
 	fScreenView->AddChild(fRevertButton);
-	
-	BScreen *Screen = new BScreen(B_MAIN_SCREEN_ID);
-	
+		
 	display_mode mode;
 	
-	Screen->GetMode(&mode);
+	screen.GetMode(&mode);
 	
 	fInitialMode = mode;
 	
 	String.Truncate(0);
 	
-	String << (int32)mode.virtual_width << " x " << (int32)mode.virtual_height;
+	String << (uint32)mode.virtual_width << " x " << (uint32)mode.virtual_height;
 
 	Marked = fResolutionMenu->FindItem(String.String());
 	Marked->SetMarked(true);
 	
 	fInitialResolution = Marked;
 	
-	if (mode.space == B_CMAP8)
-	{
+	if (mode.space == B_CMAP8){
 		Marked = fColorsMenu->FindItem("8 Bits/Pixel");
 		Marked->SetMarked(true);
-	}
-	if (mode.space == B_RGB15)
-	{
+	
+	} else if (mode.space == B_RGB15) {
 		Marked = fColorsMenu->FindItem("15 Bits/Pixel");
 		Marked->SetMarked(true);
-	}
-	if (mode.space == B_RGB16)
-	{
+		
+	} else if (mode.space == B_RGB16) {
 		Marked = fColorsMenu->FindItem("16 Bits/Pixel");
 		Marked->SetMarked(true);
-	}
-	if (mode.space == B_RGB32)
-	{
+		
+	} else if (mode.space == B_RGB32) {
 		Marked = fColorsMenu->FindItem("32 Bits/Pixel");
 		Marked->SetMarked(true);
 	}
@@ -232,13 +230,13 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	String.Truncate(0);
 	
-	int32 total_size = mode.timing.h_total * mode.timing.v_total;
+	float total_size = mode.timing.h_total * mode.timing.v_total;
 	
-	fInitialRefreshN = (mode.timing.pixel_clock * 1000) / total_size;
+	fInitialRefreshN = round((mode.timing.pixel_clock * 1000) / total_size, 1);
 	
 	fCustomRefresh = fInitialRefreshN;
 	
-	String << (int32)fInitialRefreshN << " Hz";
+	String << fInitialRefreshN << " Hz";
 	
 	Marked = fRefreshMenu->FindItem(String.String());
 	if (Marked != NULL)
@@ -246,16 +244,12 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 		Marked->SetMarked(true);
 		
 		fInitialRefresh = Marked;
-	}
-	else
-	{
+	} else {
 		BMenuItem *Other = fRefreshMenu->FindItem("Other...");
 		
 		String.Truncate(0);
 	
-		float total_sizef = mode.timing.h_total * mode.timing.v_total;
-	
-		String << ((int32)mode.timing.pixel_clock * 1000) / total_sizef;
+		String << fInitialRefreshN;
 		
 		String.Truncate(4);
 		
@@ -277,76 +271,75 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 ScreenWindow::~ScreenWindow()
 {
 	delete fSettings;
+	delete[] fSupportedModes;
 }
 
-bool ScreenWindow::QuitRequested()
+
+bool
+ScreenWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	
-	return(true);
+	return BWindow::QuitRequested();
 }
 
-void ScreenWindow::FrameMoved(BPoint position)
+
+void
+ScreenWindow::FrameMoved(BPoint position)
 {
 	fSettings->SetWindowFrame(Frame());
 }
 
-void ScreenWindow::ScreenChanged(BRect frame, color_space mode)
+
+void
+ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 {
 	if (frame.right <= Frame().right
 				&& frame.bottom <= Frame().bottom)
 		MoveTo(((frame.right / 2) - 178), ((frame.right / 2) - 101));
 }
 
-void ScreenWindow::WorkspaceActivated(int32 ws, bool state)
+
+void
+ScreenWindow::WorkspaceActivated(int32 ws, bool state)
 {
 	PostMessage(new BMessage(UPDATE_DESKTOP_COLOR_MSG), fScreenDrawView);
 }
 
-void ScreenWindow::CheckApplyEnabled()
+
+void
+ScreenWindow::CheckApplyEnabled()
 {
 	int equals = 0;
 
 	if (fResolutionMenu->FindMarked() == fInitialResolution)
-	{
-		equals = equals + 1;
-	}
+		equals++;
 	else
-	{
-		equals = equals - 1;
-	}
+		equals--;
 	
 	if (fColorsMenu->FindMarked() == fInitialColors)
-	{
-		equals = equals + 1;
-	}
+		equals++;
 	else
-	{
-		equals = equals - 1;
-	}
+		equals--;
 	
 	if (fRefreshMenu->FindMarked() == fInitialRefresh)
-	{
-		equals = equals + 1;
-	}
+		equals++;
 	else
-	{
-		equals = equals - 1;
-	}
-	
+		equals--;
+		
 	if(equals != 3)
 	{
 		fApplyButton->SetEnabled(true);
 		fRevertButton->SetEnabled(true);
-	}
-	else
-	{
+	} else {
 		fApplyButton->SetEnabled(false);
 		fRevertButton->SetEnabled(false);
 	}
 }
 
-void ScreenWindow::MessageReceived(BMessage* message)
+
+void
+ScreenWindow::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
@@ -372,9 +365,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 		
 			BMessage *Message = new BMessage(UPDATE_DESKTOP_MSG);
 			
-			const char *Resolution;
-			
-			Resolution = fResolutionMenu->FindMarked()->Label();
+			const char *Resolution = fResolutionMenu->FindMarked()->Label();
 			
 			Message->AddString("resolution", Resolution);
 		
@@ -402,12 +393,11 @@ void ScreenWindow::MessageReceived(BMessage* message)
 		case POP_OTHER_REFRESH_MSG:
 		{
 			CheckApplyEnabled();
-		
-			int32 Value;
-			
-			Value = (int32)fCustomRefresh;
-					
-			fRefreshWindow = new RefreshWindow(BRect((Frame().left + 201.0), (Frame().top + 34.0), (Frame().left + 509.0), (Frame().top + 169.0)), Value);
+			int32 value = (int32)(fCustomRefresh * 10);		
+
+			fRefreshWindow = new RefreshWindow(BRect((Frame().left + 201.0),
+				(Frame().top + 34.0), (Frame().left + 509.0),
+				(Frame().top + 169.0)), value);
 		
 			BMenuItem *Other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
 			
@@ -445,19 +435,19 @@ void ScreenWindow::MessageReceived(BMessage* message)
 			
 			if (fInitialRefresh == Other)
 			{
-				BString String;
+				BString string;
 				
-				String << fInitialRefreshN;
+				string << fInitialRefreshN;
 			
-				String.Truncate(4);
+				string.Truncate(4);
 			
-				String << " Hz/Other...";
+				string << " Hz/Other...";
 			
-				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
+				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
 			
-				String.Truncate(7);
+				string.Truncate(7);
 			
-				fRefreshMenu->Superitem()->SetLabel(String.String());
+				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
 			
 			break;
@@ -465,607 +455,39 @@ void ScreenWindow::MessageReceived(BMessage* message)
 			
 		case BUTTON_APPLY_MSG:
 		{	
-			BScreen *Screen;
+			BScreen screen(B_MAIN_SCREEN_ID);
 			
-			Screen = new BScreen(B_MAIN_SCREEN_ID);
-			
-			display_mode *modelist;
+			if (!screen.IsValid())
+				break;
+							
 			display_mode *mode = NULL;
+			BString string;
+			int32 height;
+			int32 width;
+			float refresh;
+								
+			BString menuLabel = fResolutionMenu->FindMarked()->Label();
+			int32 space = menuLabel.FindFirst(' ');
+			menuLabel.MoveInto(string, 0, space);
+			menuLabel.Remove(0, 3);		
+			width = atoi(string.String());
+			height = atoi(menuLabel.String());
+			refresh = atof(fRefreshMenu->FindMarked()->Label());
 			
-			uint32 count;
-			
-			Screen->GetModeList(&modelist, &count);
-			
-			uint32 loop = 0;
-			
-			count = count - 1;
-					
-			if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("640 x 480"))
-			{	
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 0)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 2)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 3)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 3)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 4)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 3)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
-			}
-			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("800 x 600"))
+			for(uint32 c = 0; c < fTotalModes; c++)
 			{
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 6)
-							mode = modelist;
-				
-						modelist++;
-					}
+				if ((fSupportedModes[c].virtual_width == width)
+					&& (fSupportedModes[c].virtual_height == height))
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 8)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 9)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 9)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 10)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 8)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
+				mode = &fSupportedModes[c];
 			}
-			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1024 x 768"))
-			{	
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
 							
-						if (loop == 11)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 13)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 14)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 14)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 15)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 13)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
-			}
-			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1152 x 864"))
-			{	
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 16)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 16)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 17)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 17)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 17)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 16)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
-			}
-			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1280 x 1024"))
-			{	
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 18)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 20)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 20)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 20)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 20)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 19)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
-			}
-			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1600 x 1200"))
-			{	
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("56 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 21)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 56 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("60 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 23)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 60 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("70 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 24)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 70 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("72 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 24)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 72 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem("75 Hz"))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 25)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * 75 / 1000;
-				}
-				
-				if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				{
-					for (loop = 0; loop <= count; loop++)
-					{
-						if (mode != NULL)
-							break;
-							
-						if (loop == 22)
-							mode = modelist;
-				
-						modelist++;
-					}
-					
-					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-				}
-			}
+			if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
+				mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
+			else
+				mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);
+			
+			
 			
 			if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("8 Bits/Pixel"))
 			{	
@@ -1098,32 +520,31 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
  				if (button == 1)
  					break;
 			
-				int32 count, old;
+				int32 old = current_workspace();
+				int32 totalWorkspaces = count_workspaces();
 				
-				old = current_workspace();
-				
-				for (count = 0; count < count_workspaces(); count ++)
+				for (int32 count = 0; count < totalWorkspaces; count ++)
 				{
 					activate_workspace(count);
-					Screen->SetMode(mode);
+					screen.SetMode(mode);
 				}
 				
 				activate_workspace(old);
 			}
 			else
-				Screen->SetMode(mode);
+				screen.SetMode(mode);
 				
-			BRect Rect;
-	
-			Rect.Set(100.0, 100.0, 400.0, 193.0);
+			BRect Rect(100.0, 100.0, 400.0, 193.0);
 			
-			Rect.left = (Screen->Frame().right / 2) - 150;
-			Rect.top = (Screen->Frame().bottom / 2) - 42;
+			Rect.left = (screen.Frame().right / 2) - 150;
+			Rect.top = (screen.Frame().bottom / 2) - 42;
 			Rect.right = Rect.left + 300.0;
 			Rect.bottom = Rect.top + 93.0;
 			
 			new AlertWindow(Rect);
-				
+			
+			fApplyButton->SetEnabled(false);
+			
 			break;
 		}
 		
@@ -1149,11 +570,8 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
 			
 				fRefreshMenu->Superitem()->SetLabel(String.String());
 			}
-			BScreen *Screen;
-			
-			Screen = new BScreen(B_MAIN_SCREEN_ID);
-			
-			Screen->SetMode(&fInitialMode);
+			BScreen screen(B_MAIN_SCREEN_ID);			
+			screen.SetMode(&fInitialMode);
 		
 			break;
 		}
@@ -1191,13 +609,10 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
 		
 		case MAKE_INITIAL_MSG:
 		{
-			BScreen *Screen;
+			BScreen screen(B_MAIN_SCREEN_ID);		
+			display_mode mode;		
 			
-			display_mode mode;
-			
-			Screen = new BScreen(B_MAIN_SCREEN_ID);
-			
-			Screen->GetMode(&mode);
+			screen.GetMode(&mode);
 		
 			fInitialRefreshN = fCustomRefresh;
 			fInitialResolution = fResolutionMenu->FindMarked();
@@ -1209,8 +624,7 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
 		}
 		
 		default:
-			BWindow::MessageReceived(message);
-		
+			BWindow::MessageReceived(message);		
 			break;
 	}
 }

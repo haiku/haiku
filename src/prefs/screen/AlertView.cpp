@@ -4,27 +4,29 @@
 
 #include "AlertView.h"
 #include "Bitmaps.h"
+#include "Constants.h"
+#include "Utility.h"
 
 AlertView::AlertView(BRect frame, char *name)
 	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	Count = 10;
+	Count = 8;
 	
 	fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_COLOR_8_BIT);
 	fBitmap->SetBits(BitmapBits, 32 * 32, 0, B_COLOR_8_BIT);
 }
 
-void AlertView::AttachedToWindow()
+
+void
+AlertView::AttachedToWindow()
 {
-	rgb_color greyColor = {216, 216, 216, 255};
 	SetViewColor(greyColor);
 }
 
-void AlertView::Draw(BRect updateRect)
-{
-	rgb_color darkColor = {184, 184, 184, 255};
-	rgb_color blackColor = {0, 0, 0, 255};
-	
+
+void
+AlertView::Draw(BRect updateRect)
+{	
 	SetHighColor(darkColor);
 	
 	FillRect(BRect(0.0, 0.0, 30.0, 100.0));
@@ -39,9 +41,7 @@ void AlertView::Draw(BRect updateRect)
 	
 	SetFont(be_bold_font);
 	
-	MovePenTo(60.0, 20.0);
-	
-	DrawString("Do you wish to keep these settings?");
+	DrawString("Do you wish to keep these settings?", BPoint(60.0, 20.0));
 	
 	MovePenTo(60.0, 37.0);
 	

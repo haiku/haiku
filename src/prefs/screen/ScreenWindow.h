@@ -16,13 +16,13 @@ class ScreenWindow : public BWindow
 {
 
 public:
-						ScreenWindow(ScreenSettings *Settings);
-	virtual				~ScreenWindow();
-	virtual	bool		QuitRequested();
-	virtual void 		MessageReceived(BMessage *message);
-	virtual void		WorkspaceActivated(int32 ws, bool state);
-	virtual void 		FrameMoved(BPoint position);
-	virtual void		ScreenChanged(BRect frame, color_space mode);
+	ScreenWindow(ScreenSettings *Settings);
+	virtual ~ScreenWindow();
+	virtual	bool QuitRequested();
+	virtual void MessageReceived(BMessage *message);
+	virtual void WorkspaceActivated(int32 ws, bool state);
+	virtual void FrameMoved(BPoint position);
+	virtual void ScreenChanged(BRect frame, color_space mode);
 
 private:
 	void				CheckApplyEnabled();
@@ -51,6 +51,8 @@ private:
 	BMenuItem			*fInitialColors;
 	BMenuItem			*fInitialRefresh;
 	display_mode		fInitialMode;
+	display_mode		*fSupportedModes;
+	uint32				fTotalModes;
 	float				fCustomRefresh;
 	float				fInitialRefreshN;
 };

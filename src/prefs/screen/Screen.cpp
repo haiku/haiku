@@ -1,6 +1,7 @@
-// Screen V0.9 build 1 by Rafael Romo for the OpenBeOS Preferences team.
+// Screen V1.00 by Rafael Romo for the OpenBeOS Preferences team.
 // web.tiscalinet.it/rockman
 // rockman@tiscalinet.it
+// Modified by Stefano Ceccherini ( burton666@freemail.it ) 
 
 #include <Application.h>
 #include <Alert.h>
@@ -14,21 +15,25 @@
 #include "Constants.h"
 
 ScreenApplication::ScreenApplication()
-	: BApplication("application/x-vnd.RR-SCRN")
+	:
+		BApplication(kAppSignature),
+		fScreenWindow(new ScreenWindow(new ScreenSettings()))
 {
-	fScreenWindow = new ScreenWindow(new ScreenSettings());
 }
 
-void ScreenApplication::AboutRequested()
+
+void
+ScreenApplication::AboutRequested()
 {
-	BAlert *AboutAlert = new BAlert("About", "Screen by Rafael Romo\nThe OBOS place to configure your monitor",
-	"Ok", NULL, NULL, 
-	B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
+	BAlert *AboutAlert = new BAlert("About", "Screen by Rafael Romo, Stefano Ceccherini\nThe OBOS place to configure your monitor",
+		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	AboutAlert->SetShortcut(0, B_OK);
 	AboutAlert->Go();
 }
 
-void ScreenApplication::MessageReceived(BMessage* message)
+
+void
+ScreenApplication::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
@@ -41,17 +46,15 @@ void ScreenApplication::MessageReceived(BMessage* message)
 		
 		case SET_CUSTOM_REFRESH_MSG:
 		{
-			BMessage *Message;
-			
-			Message = new BMessage(SET_CUSTOM_REFRESH_MSG);
+			BMessage message(SET_CUSTOM_REFRESH_MSG);
 			
 			float Value;
 		
-			message->FindFloat("refresh", &Value);
+			message.FindFloat("refresh", &Value);
 		
-			Message->AddFloat("refresh", Value);
+			message.AddFloat("refresh", Value);
 		
-			fScreenWindow->PostMessage(Message);
+			fScreenWindow->PostMessage(&message);
 			
 			break;
 		}
@@ -64,17 +67,18 @@ void ScreenApplication::MessageReceived(BMessage* message)
 		}
 	
 		default:
-			BApplication::MessageReceived(message);
-			
+			BApplication::MessageReceived(message);			
 			break;
 	}
 }
 
-int main()
+
+int
+main()
 {
-	ScreenApplication	MyApplication;
+	ScreenApplication Application;
 	
-	MyApplication.Run();
+	Application.Run();
 	
 	return(0);
 }

@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+//Messages
 #define WORKSPACE_CHECK_MSG			'wchk'
 #define BUTTON_DEFAULTS_MSG			'bdef'
 #define BUTTON_REVERT_MSG			'brev'
@@ -22,4 +23,7 @@
 #define DIM_COUNT_MSG				'scrf'
 #define MAKE_INITIAL_MSG			'mkin'
 
-#endif
+//Constants
+static const char kAppSignature[] = "application/x-vnd.RR-SCRN";
+
+#endif //CONSTANTS_H

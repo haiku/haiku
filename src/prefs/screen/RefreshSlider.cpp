@@ -11,41 +11,40 @@
 #include "Constants.h"
 
 RefreshSlider::RefreshSlider(BRect frame)
-	: BSlider(frame, "Screen", "Refresh Rate:", new BMessage(SLIDER_INVOKE_MSG), 450, 845)
-{
-	fStatus = (char*)malloc(64);
+	: BSlider(frame, "Screen", "Refresh Rate:", new BMessage(SLIDER_INVOKE_MSG), 450, 900),
+	fStatus(new char[64])
+{	
 }
+
 
 RefreshSlider::~RefreshSlider()
 {
-	if (fStatus)
-		free(fStatus);
+	delete[] fStatus;
 }
 
-void RefreshSlider::DrawFocusMark()
+
+void
+RefreshSlider::DrawFocusMark()
 {
 	if (IsFocus())
 	{
-		rgb_color blueColor = {0, 0, 229, 255};
+		rgb_color blueColor = { 0, 0, 229, 255 };
 		
-		BRect Rect;
+		BRect rect(ThumbFrame());		
+		BView *view = OffscreenView();
+				
+		rect.InsetBy(2.0, 2.0);
+		rect.right--;
+		rect.bottom--;
 		
-		BView *View;
-		
-		Rect = ThumbFrame();
-		
-		View = OffscreenView();
-		
-		Rect.InsetBy(2.0, 2.0);
-		Rect.right = Rect.right - 1;
-		Rect.bottom = Rect.bottom - 1;
-		
-		View->SetHighColor(blueColor);
-		View->StrokeRect(Rect);
+		view->SetHighColor(blueColor);
+		view->StrokeRect(rect);
 	}
 }
 
-void RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
+
+void
+RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 {
 	switch ( *bytes )
 	{
@@ -72,30 +71,25 @@ void RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 	}
 }
 
-char* RefreshSlider::UpdateText() const
+
+char*
+RefreshSlider::UpdateText() const
 {
 	if (fStatus && Window()->Lock())
 	{
 		BString String;
 	
 		String << Value();
-	
-		int32 Len = String.Length()+1;
-		strcpy(fStatus, String.LockBuffer(Len));
-			
-		char Last = fStatus[2];
+		String.CopyInto(fStatus, 0, String.Length() + 1);
 		
-		String.UnlockBuffer(Len);
-			
-		String.Truncate(2);
-			
+		char Last = fStatus[2];
+				
+		String.Truncate(2);		
 		String << "." << Last << " Hz";
-	
-		strcpy(fStatus, String.LockBuffer(Len));
-	
-		String.UnlockBuffer(Len);
-	
-		return(fStatus);
+		
+		String.CopyInto(fStatus, 0, String.Length() + 1);
+		
+		return fStatus;
 	}
 	else
 	{

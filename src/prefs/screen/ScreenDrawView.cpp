@@ -1,46 +1,55 @@
 #include <InterfaceDefs.h>
 #include <Message.h>
-#include <Screen.h>
 #include <Roster.h>
+#include <Screen.h>
+#include <String.h>
 #include <View.h>
 
-#include <cstring>
+#include <cstdlib>
 
 #include "ScreenDrawView.h"
 #include "Constants.h"
+#include "Utility.h"
 
 ScreenDrawView::ScreenDrawView(BRect rect, char *name)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
+	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
+	fScreen(new BScreen(B_MAIN_SCREEN_ID))
+	
 {
-	fScreen = new BScreen(B_MAIN_SCREEN_ID);
-
+	if (!fScreen->IsValid())
+		; //Debugger() ?
+		
 	desktopColor = fScreen->DesktopColor(current_workspace());
 
-	display_mode Mode;
-	
-	fScreen->GetMode(&Mode);
+	display_mode mode;	
+	fScreen->GetMode(&mode);
 
-	fResolution = Mode.virtual_width;
+	fResolution = mode.virtual_width;
 }
 
-void ScreenDrawView::AttachedToWindow()
+
+void
+ScreenDrawView::AttachedToWindow()
 {
-	rgb_color greyColor = {216, 216, 216, 255};
+	rgb_color greyColor = { 216, 216, 216, 255 };
 	SetViewColor(greyColor);
 }
 
-void ScreenDrawView::MouseDown(BPoint point)
+
+void
+ScreenDrawView::MouseDown(BPoint point)
 {
 	be_roster->Launch("application/x-vnd.Be-BACK");
 }
 
-void ScreenDrawView::Draw(BRect updateRect)
+
+void
+ScreenDrawView::Draw(BRect updateRect)
 {
+	//FIXME: Make the draw code resolution independent
 	if (fResolution == 1600)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
-		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
 	
@@ -65,8 +74,6 @@ void ScreenDrawView::Draw(BRect updateRect)
 	else if(fResolution == 1280)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
-		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
 	
@@ -91,8 +98,6 @@ void ScreenDrawView::Draw(BRect updateRect)
 	else if(fResolution == 1152)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
-		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
 	
@@ -117,8 +122,6 @@ void ScreenDrawView::Draw(BRect updateRect)
 	else if(fResolution == 1024)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
-		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
 	
@@ -143,7 +146,6 @@ void ScreenDrawView::Draw(BRect updateRect)
 	else if(fResolution == 800)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
 		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
@@ -169,8 +171,6 @@ void ScreenDrawView::Draw(BRect updateRect)
 	else if(fResolution == 640)
 	{
 		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color blackColor = {0, 0, 0, 255};
-		rgb_color redColor = {228, 0, 0, 255};
 		
 		SetHighColor(darkColor);
 	
@@ -194,31 +194,18 @@ void ScreenDrawView::Draw(BRect updateRect)
 	}
 }
 
-void ScreenDrawView::MessageReceived(BMessage* message)
+
+void
+ScreenDrawView::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
 		case UPDATE_DESKTOP_MSG:
 		{
-			const char *Resolution;
-			int32 NextfResolution;
-			
+			BString Resolution;		
 			message->FindString("resolution", &Resolution);
 			
-			if (strcmp(Resolution, "640 x 480") == 0)
-				NextfResolution = 640;
-			else if (strcmp(Resolution, "800 x 600") == 0)
-				NextfResolution = 800;
-			else if (strcmp(Resolution, "1024 x 768") == 0)
-				NextfResolution = 1024;
-			else if (strcmp(Resolution, "1152 x 864") == 0)
-				NextfResolution = 1152;
-			else if (strcmp(Resolution, "1280 x 1024") == 0)
-				NextfResolution = 1280;
-			else if (strcmp(Resolution, "1600 x 1200") == 0)
-				NextfResolution = 1600;
-			else
-				NextfResolution = 640;
+			int32 NextfResolution = atoi(Resolution.String());
 			
 			if (fResolution != NextfResolution)
 			{

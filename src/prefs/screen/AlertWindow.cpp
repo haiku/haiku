@@ -49,16 +49,20 @@ AlertWindow::AlertWindow(BRect frame)
 	Show();
 }
 
-bool AlertWindow::QuitRequested()
+
+bool
+AlertWindow::QuitRequested()
 {
 	delete fRunner;
-
+	
 	Quit();
 	
-	return(true);
+	return true;
 }
 
-void AlertWindow::MessageReceived(BMessage *message)
+
+void
+AlertWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what)
 	{

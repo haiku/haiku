@@ -13,8 +13,6 @@
 RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	: BWindow(frame, "Refresh Rate", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
-	int32 Value = value * 10;
-
 	frame = Bounds();
 	
 	fRefreshView = new RefreshView(frame, "RefreshView");
@@ -29,20 +27,18 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	
 	fRefreshSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fRefreshSlider->SetHashMarkCount(10);
-	fRefreshSlider->SetLimitLabels("45.0", "84.5");
+	fRefreshSlider->SetLimitLabels("45.0", "90.0");
 	fRefreshSlider->SetKeyIncrementValue(1);
-	fRefreshSlider->SetValue(Value);
+	fRefreshSlider->SetValue(value);
 	fRefreshSlider->SetSnoozeAmount(1);
 	fRefreshSlider->SetModificationMessage(new BMessage(SLIDER_MODIFICATION_MSG));
 	
 	fRefreshView->AddChild(fRefreshSlider);
 	
-	BRect ButtonRect;
-	
-	ButtonRect.Set(219.0, 97.0, 230.0, 120.0);
+	BRect ButtonRect(219.0, 97.0, 230.0, 120.0);
 	
 	fDoneButton = new BButton(ButtonRect, "DoneButton", "Done", 
-	new BMessage(BUTTON_DONE_MSG));
+		new BMessage(BUTTON_DONE_MSG));
 	
 	fDoneButton->ResizeToPreferred();
 	fDoneButton->MakeDefault(true);
@@ -52,7 +48,7 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	ButtonRect.Set(130.0, 97.0, 200.0, 120.0);
 	
 	fCancelButton = new BButton(ButtonRect, "CancelButton", "Cancel", 
-	new BMessage(BUTTON_CANCEL_MSG));
+		new BMessage(BUTTON_CANCEL_MSG));
 	
 	fCancelButton->ResizeToPreferred();
 	
@@ -63,32 +59,25 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	PostMessage(SLIDER_INVOKE_MSG);
 }
 
-bool RefreshWindow::QuitRequested()
+
+void
+RefreshWindow::WindowActivated(bool active)
 {
-	return(true);
+	fRefreshSlider->MakeFocus(active);
 }
 
-void RefreshWindow::WindowActivated(bool active)
-{
-	if (active == true)
-		fRefreshSlider->MakeFocus(true);
-	else
-		fRefreshSlider->MakeFocus(false);
-}
 
-void RefreshWindow::MessageReceived(BMessage* message)
+void
+RefreshWindow::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
 		case BUTTON_DONE_MSG:
 		{
-			BMessenger Messenger("application/x-vnd.RR-SCRN");
-	
+			BMessenger Messenger(kAppSignature);	
 			BMessage Message(SET_CUSTOM_REFRESH_MSG);
 			
-			float Value;
-			
-			Value = (float)fRefreshSlider->Value() / 10;
+			float Value = (float)fRefreshSlider->Value() / 10;
 					
 			Message.AddFloat("refresh", Value);
 			
@@ -114,8 +103,7 @@ void RefreshWindow::MessageReceived(BMessage* message)
 		}
 	
 		default:
-			BWindow::MessageReceived(message);
-		
+			BWindow::MessageReceived(message);		
 			break;
 	}
 }

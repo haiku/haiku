@@ -10,10 +10,9 @@ class RefreshWindow : public BWindow
 {
 
 public:
-						RefreshWindow(BRect frame, int32 value);
-	virtual	bool		QuitRequested();
-	virtual void 		MessageReceived(BMessage *message);
-	virtual void		WindowActivated(bool active);
+	RefreshWindow(BRect frame, int32 value);
+	virtual void MessageReceived(BMessage *message);
+	virtual void WindowActivated(bool active);
 
 private:
 	RefreshView			*fRefreshView;
