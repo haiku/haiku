@@ -132,6 +132,6 @@ Shell::_PrintHelp() {
 	printf("\n");
 	printf("VALID ARGUMENTS:\n");
 	printf("  --help:   Displays this help text\n");
-	printf("  --quiet:  Turns off program output\n");
+	printf("  --quiet:  Turns off console output\n");
 	printf("\n");
 }
