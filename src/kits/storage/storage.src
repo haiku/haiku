@@ -51,3 +51,16 @@ STORAGE_KIT_SOURCE =
 	RPatternList.cpp	
 	Rule.cpp			
 ;
+
+STORAGE_KIT_SOURCE_HAIKU_ONLY =
+	# storage: DiskDevice API
+	DiskDevice.cpp
+	DiskDeviceJob.cpp
+	DiskDevicePrivate.cpp
+	DiskDeviceRoster.cpp
+	DiskDeviceTypes.cpp
+	DiskDeviceVisitor.cpp
+	DiskSystem.cpp
+	Partition.cpp
+	PartitioningInfo.cpp
+;

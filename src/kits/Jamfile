@@ -27,8 +27,8 @@ for subdir in $(subdirs) {
 }
 
 UsePrivateHeaders shared app [ FDirName servers app ] ;
-UsePrivateHeaders kernel ;
-	# for syscalls.h
+UsePrivateHeaders kernel ;	# for syscalls.h
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders input ;
 
 # Add subsubdirs to the SEARCH_SOURCE.
@@ -43,8 +43,12 @@ LIBBE_SOURCE =
 	$(STORAGE_KIT_SOURCE)
 ;
 
+LIBBE_SOURCE_HAIKU_ONLY =
+	$(STORAGE_KIT_SOURCE_HAIKU_ONLY)
+;
+
 SharedLibrary be :
-	$(LIBBE_SOURCE)
+	$(LIBBE_SOURCE) $(LIBBE_SOURCE_HAIKU_ONLY)
 ;
 
 SharedLibraryFromObjects openbeos :
