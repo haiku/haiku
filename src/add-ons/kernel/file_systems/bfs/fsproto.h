@@ -60,7 +60,11 @@ typedef ino_t		vnode_id;
 // B_CUR_FS_API_VERSION is 2 for R5, but 3 on Dano, because of the
 // added calls for power management - so it's set to 3 here because
 // that's a requirement to let Dano boot from our fs...
-#define		B_CUR_FS_API_VERSION	3
+#ifdef B_BEOS_VERSION_DANO
+#	define B_CUR_FS_API_VERSION	3
+#else
+#	define B_CUR_FS_API_VERSION 2
+#endif
 
 struct attr_info;
 struct index_info;
