@@ -26,64 +26,64 @@ static const int cache_desc_values[] = {
 };
 
 static const char *cache_desc_strings[] = {
-"code TLB, 4K pages, 4-way set associative, 32 entries",
-"code TLB, 4M pages, fully associative, 2 entries",
-"data TLB, 4K pages, 4-way set associative, 64 entries",
-"data TLB, 4M pages, 4-way set associative, 8 entries",
-"code L1 cache, 8 KB, 4-way set associative, 32 byte lines",
-"code L1 cache, 16 KB, 4-way set associative, 32 byte lines",
-"data L1 cache, 8 KB, 2-way set associative, 32 byte lines",
-"data L1 cache, 16 KB, 4-way set associative, 32 byte lines",
-"data L1 cache, 16 KB, 4-way set associative, 32 byte lines (IA-64)",
-"code L1 cache, 16 KB, 4-way set associative, 32 byte lines (IA-64)",
-"code and data L2 cache, 96 KB, 6-way set associative, 64 byte lines (IA-64)",
-"code and data L3 cache, 512 KB, 4-way set associative (!), 64 byte lines, dual-sectored",
-"code and data L3 cache, 1024 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L3 cache, 2048 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L3 cache, 4096 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L2 cache, 128 KB, 4-way set associative, 64 byte lines, sectored",
-"code and data L2 cache, 128 KB, 2-way set associative, 64 byte lines, sectored",
-"code and data L2 cache, 256 KB, 4-way set associative, 64 byte lines, sectored",
-"no integrated L2 cache (P6 core) or L3 cache (P4 core)",
-"code and data L2 cache, 128 KB, 4-way set associative, 32 byte lines",
-"code and data L2 cache, 256 KB, 4-way set associative, 32 byte lines",
-"code and data L2 cache, 512 KB, 4-way set associative, 32 byte lines",
-"code and data L2 cache, 1024 KB, 4-way set associative, 32 byte lines",
-"code and data L2 cache, 2048 KB, 4-way set associative, 32 byte lines",
-"code TLB, 4K/4M/2M pages, fully associative, 64 entries",
-"code TLB, 4K/4M/2M pages, fully associative, 128 entries",
-"code TLB, 4K/4M/2M pages, fully associative, 256 entries",
-"data TLB, 4K/4M pages, fully associative, 64 entries",
-"data TLB, 4K/4M pages, fully associative, 128 entries",
-"data TLB, 4K/4M pages, fully associative, 256 entries",
-"data L1 cache, 8 KB, 4-way set associative, 64 byte lines, sectored",
-"data L1 cache, 16 KB, 4-way set associative, 64 byte lines, sectored",
-"data L1 cache, 32 KB, 4-way set associative, 64 byte lines, sectored",
-"trace L1 cache, 12 K킣Ps, 8-way set associative",
-"trace L1 cache, 16 K킣Ps, 8-way set associative",
-"trace L1 cache, 32 K킣Ps, 8-way set associative",
-"code L1 cache, 16 KB, 4-way set associative, 64 byte lines, sectored (IA-64)",
-"code and data L2 cache, 128 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L2 cache, 256 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L2 cache, 512 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L2 cache, 1024 KB, 8-way set associative, 64 byte lines, dual-sectored",
-"code and data L2 cache, 256 KB, 8-way set associative, 128 byte lines, sect. (IA-64)",
-"code and data L2 cache, 128 KB, 8-way set associative, 32 byte lines",
-"code and data L2 cache, 256 KB, 8-way set associative, 32 byte lines",
-"code and data L2 cache, 512 KB, 8-way set associative, 32 byte lines",
-"code and data L2 cache, 1024 KB, 8-way set associative, 32 byte lines",
-"code and data L2 cache, 2048 KB, 8-way set associative, 32 byte lines",
-"code and data L3 cache, 2048 KB, 4-way set associative, 64 byte lines (IA-64)",
-"code and data L3 cache, 4096 KB, 4-way set associative, 64 byte lines (IA-64)",
-"code and data L3 cache, 8192 KB, 4-way set associative, 64 byte lines (IA-64)",
-"code and data L3 cache, 3096 KB, 12-way set associative, 128 byte lines (IA-64)",
-"code TLB, 4K...256M pages, fully associative, 64 entries (IA-64)",
-"data L1 TLB, 4K...256M pages, fully associative, 32 entries (IA-64)",
-"data L2 TLB, 4K...256M pages, fully associative, 96 entries (IA-64)",
-"Cyrix specific: code and data TLB, 4K pages, 4-way set associative, 32 entries",
+"Instruction TLB: 4k-byte pages, 4-way set associative, 32 entries",
+"Instruction TLB: 4M-byte pages, fully associative, 2 entries",
+"Data TLB: 4k-byte pages, 4-way set associative, 64 entries",
+"Data TLB: 4M-byte pages, 4-way set associative, 8 entries",
+"L1I cache: 8 kbytes, 4-way set associative, 32 bytes/line",
+"L1I cache: 16 kbytes, 4-way set associative, 32 bytes/line",
+"L1D cache: 8 kbytes, 2-way set associative, 32 bytes/line",
+"L1D cache: 16 kbytes, 4-way set associative, 32 bytes/line",
+"L1D cache: 16 kbytes, 4-way set associative, 32 bytes/line (IA-64)",
+"L1I cache: 16 kbytes, 4-way set associative, 32 bytes/line (IA-64)",
+"L2 cache: 96 kbytes, 6-way set associative, 64 bytes/line (IA-64)",
+"L3 cache: 512 kbytes, 4-way set associative (!), 64 bytes/line, dual-sectored",
+"L3 cache: 1024 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L3 cache: 2048 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L3 cache: 4096 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L2 cache: 128 kbytes, 4-way set associative, 64 bytes/line, sectored",
+"L2 cache: 128 kbytes, 2-way set associative, 64 bytes/line, sectored",
+"L2 cache: 256 kbytes, 4-way set associative, 64 bytes/line, sectored",
+"No integrated L2 cache (P6 core) or L3 cache (P4 core)",
+"L2 cache: 128 kbytes, 4-way set associative, 32 bytes/line",
+"L2 cache: 256 kbytes, 4-way set associative, 32 bytes/line",
+"L2 cache: 512 kbytes, 4-way set associative, 32 bytes/line",
+"L2 cache: 1024 kbytes, 4-way set associative, 32 bytes/line",
+"L2 cache: 2048 kbytes, 4-way set associative, 32 bytes/line",
+"Instruction TLB: 4K/4M/2M-bytes pages, fully associative, 64 entries",
+"Instruction TLB: 4K/4M/2M-bytes pages, fully associative, 128 entries",
+"Instruction TLB: 4K/4M/2M-bytes pages, fully associative, 256 entries",
+"Data TLB: 4K/4M-bytes pages, fully associative, 64 entries",
+"Data TLB: 4K/4M-bytes pages, fully associative, 128 entries",
+"Data TLB: 4K/4M-bytes pages, fully associative, 256 entries",
+"L1D cache: 8 kbytes, 4-way set associative, 64 bytes/line, sectored",
+"L1D cache: 16 kbytes, 4-way set associative, 64 bytes/line, sectored",
+"L1D cache: 32 kbytes, 4-way set associative, 64 bytes/line, sectored",
+"trace L1 cache: 12 K킣Ps, 8-way set associative",
+"trace L1 cache: 16 K킣Ps, 8-way set associative",
+"trace L1 cache: 32 K킣Ps, 8-way set associative",
+"L1I cache: 16 kbytes, 4-way set associative, 64 bytes/line, sectored (IA-64)",
+"L2 cache: 128 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L2 cache: 256 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L2 cache: 512 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L2 cache: 1024 kbytes, 8-way set associative, 64 bytes/line, dual-sectored",
+"L2 cache: 256 kbytes, 8-way set associative, 128 bytes/line, sect. (IA-64)",
+"L2 cache: 128 kbytes, 8-way set associative, 32 bytes/line",
+"L2 cache: 256 kbytes, 8-way set associative, 32 bytes/line",
+"L2 cache: 512 kbytes, 8-way set associative, 32 bytes/line",
+"L2 cache: 1024 kbytes, 8-way set associative, 32 bytes/line",
+"L2 cache: 2048 kbytes, 8-way set associative, 32 bytes/line",
+"L3 cache: 2048 kbytes, 4-way set associative, 64 bytes/line (IA-64)",
+"L3 cache: 4096 kbytes, 4-way set associative, 64 bytes/line (IA-64)",
+"L3 cache: 8192 kbytes, 4-way set associative, 64 bytes/line (IA-64)",
+"L3 cache: 3096 kbytes, 12-way set associative, 128 bytes/line (IA-64)",
+"Instruction TLB: 4K...256M-bytes pages, fully associative, 64 entries (IA-64)",
+"L1D TLB: 4K...256M-bytes pages, fully associative, 32 entries (IA-64)",
+"L2D TLB: 4K...256M-bytes pages, fully associative, 96 entries (IA-64)",
+"Cyrix specific: Code and data TLB: 4k-bytes pages, 4-way set associative, 32 entries",
 "Cyrix specific: ???",
 "Cyrix specific: ???",
-"Cyrix specific: code and data L1 cache, 16 KB, 4-way set associative, 16 byte lines",
+"Cyrix specific: L1 cache: 16 kbytes, 4-way set associative, 16 bytes/line",
 "Cyrix specific: ???",
 "Cyrix specific: ???",
 NULL
@@ -93,11 +93,11 @@ static void print_cache_descriptors(cpuid_info *cpuii)
 {
 	int i, j;
 	for (i = 0; i < 15; i++) {
-		printf("cache desc %ld: 0x%02x\n", cpuii->eax_2.cache_descriptors);
-		
+		if (cpuii->eax_2.cache_descriptors[i] == 0)
+			continue;
 		for (j = 0; cache_desc_values[j]; j++) {
 			if (cpuii->eax_2.cache_descriptors[i] == cache_desc_values[j]) {
-				printf("\t%s\n", cpuii->eax_2.cache_descriptors[i]);
+				printf("\t%s\n", cache_desc_strings[j]);
 				break;
 			}
 		}
@@ -258,9 +258,10 @@ static void dump_cpu(system_info *info)
 		/* Extended CPUID - XXX: add more checks -- are they really needed ? */
 
 		if ((!strncmp(cpuii[0].eax_0.vendorid, "AuthenticAMD", 12) 
-					&& cpuii[1].eax_1.family >= 5, cpuii[1].eax_1.model >= 1))
+					&& cpuii[1].eax_1.family >= 5 && cpuii[1].eax_1.model >= 1))
 			check_extended = 1;
-		check_extended = 1; // until we get into problems :)
+		// check_extended = 1; // until we get into problems :)
+		// actually I ran into problems on my dual :^)
 
 		if (check_extended) {
 			ret = get_cpuid(&cpuiie[0], 0x80000000, i);
@@ -278,11 +279,11 @@ static void dump_cpu(system_info *info)
 			}
 		}
 
-//printf("max_eax=%ld, max_eeax=%ld\n", max_eax, max_eeax);
+		//printf("max_eax=%ld, max_eeax=%ld\n", max_eax, max_eeax);
 
 		printf("CPU #%d: %.12s\n", i, cpuii[0].eax_0.vendorid);
 		if (max_eax == 0)
-			break;
+			continue;
 		printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08x\n", 
 				cpuii[1].eax_1.type, 
 				cpuii[1].eax_1.family, 
@@ -328,7 +329,7 @@ static void dump_cpu(system_info *info)
 		}
 
 		if (max_eax == 1)
-			break;
+			continue;
 		while (cpuii[2].eax_2.call_num > 0) {
 			print_cache_descriptors(&cpuii[2]);
 			if (cpuii[2].eax_2.call_num == 1)
@@ -341,10 +342,10 @@ static void dump_cpu(system_info *info)
 			
 		}
 		if (max_eax == 2)
-			break;
+			continue;
 //Serial number: %04X-%04X-%04X-%04X-%04X-%04X
 		if (max_eax == 3)
-			break;
+			continue;
 
 
 		/* TODO: printf("CPU #%d: %s\n", i, ); */
