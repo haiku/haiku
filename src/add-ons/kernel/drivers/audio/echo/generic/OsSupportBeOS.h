@@ -57,7 +57,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "util/kernel_cpp.h"
+#include "kernel_cpp.h"
 
 #if DEBUG > 0
 // BeOS debug printf macro
