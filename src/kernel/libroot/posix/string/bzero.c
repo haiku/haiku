@@ -3,12 +3,20 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <sys/types.h>
 #include <string.h>
 
+
+#ifdef bzero
+#	undef bzero
+#endif
+
+void bzero(void *dest, size_t count);
+
 void
-bzero(void *dst, size_t count)
+bzero(void *dest, size_t count)
 {
-	memset(dst, 0, count);
+	memset(dest, 0, count);
 }
 

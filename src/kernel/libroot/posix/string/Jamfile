@@ -1,34 +1,37 @@
 SubDir OBOS_TOP src kernel libroot posix string ;
 
 KernelMergeObject posix_string.o :
-	<$(SOURCE_GRIST)>memchr.c
-	<$(SOURCE_GRIST)>memcmp.c
-	<$(SOURCE_GRIST)>memcpy.c
-	<$(SOURCE_GRIST)>memmove.c
-	<$(SOURCE_GRIST)>memset.c
-	<$(SOURCE_GRIST)>strcasecmp.c
-	<$(SOURCE_GRIST)>strcasestr.c
-	<$(SOURCE_GRIST)>strcat.c
-	<$(SOURCE_GRIST)>strchr.c
-	<$(SOURCE_GRIST)>strchrnul.c
-	<$(SOURCE_GRIST)>strcmp.c
-	<$(SOURCE_GRIST)>strcpy.c
-	<$(SOURCE_GRIST)>strcspn.c
-	<$(SOURCE_GRIST)>strdup.c
-	<$(SOURCE_GRIST)>strerror.c
-	<$(SOURCE_GRIST)>strlcat.c
-	<$(SOURCE_GRIST)>strlcpy.c
-	<$(SOURCE_GRIST)>strlen.c
-	<$(SOURCE_GRIST)>strncat.c
-	<$(SOURCE_GRIST)>strncmp.c
-	<$(SOURCE_GRIST)>strncpy.c
-	<$(SOURCE_GRIST)>strnicmp.c
-	<$(SOURCE_GRIST)>strnlen.c
-	<$(SOURCE_GRIST)>strpbrk.c
-	<$(SOURCE_GRIST)>strrchr.c
-	<$(SOURCE_GRIST)>strspn.c
-	<$(SOURCE_GRIST)>strstr.c
-	<$(SOURCE_GRIST)>strtok.c
-	:
-	-fPIC -DPIC
+	bcopy.c
+	bzero.c
+	memchr.c
+	memcmp.c
+	memcpy.c
+	memmove.c
+	memset.c
+	strcasecmp.c
+	strcasestr.c
+	strcat.c
+	strchr.c
+	strchrnul.c
+	strcmp.c
+	strcoll.c
+	strcpy.c
+	strcspn.c
+	strdup.c
+	strerror.c
+	strlcat.c
+	strlcpy.c
+	strlen.c
+	strncat.c
+	strncmp.c
+	strncpy.c
+	strnicmp.c
+	strnlen.c
+	strpbrk.c
+	strrchr.c
+	strspn.c
+	strstr.c
+	strtok.c
+
+	: -fPIC -DPIC
 	;
