@@ -28,6 +28,7 @@
 #include "bget.h"
 #include <stdio.h>
 
+void set_area_buffer_management(void);
 void * expand_area_storage(long size);
 void contract_area_storage(void *buffer);
 
