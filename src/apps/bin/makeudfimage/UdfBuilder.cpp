@@ -148,6 +148,7 @@ UdfBuilder::Build()
 	Udf::extent_address integrityExtent;
 	Udf::file_set_descriptor fileset;
 	Udf::long_address rootIcbAddress;
+	Udf::extent_address rootIcbExtent;
 
 	_OutputFile().Seek(0, SEEK_SET);		
 	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
@@ -159,8 +160,11 @@ UdfBuilder::Build()
 	if (!error) {
 		const int reservedAreaSize = 32 * 1024;
 		Udf::extent_address extent(0, reservedAreaSize);
+		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for reserved area");
 		error = _Allocator().GetExtent(extent);
 		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             extent.location(), extent.length());
 			ssize_t bytes = _OutputFile().Zero(reservedAreaSize);
 			error = check_size_error(bytes, reservedAreaSize);
 		}
@@ -188,10 +192,13 @@ UdfBuilder::Build()
 	if (!error && _DoUdf()) {
 		Udf::extent_address extent;
 		// Bea
-		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing beginning extended area descriptor");
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing bea descriptor");
+		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for bea descriptor");
 		Udf::volume_structure_descriptor_header bea(0, Udf::kVSDID_BEA, 1);
 		error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
 		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             extent.location(), extent.length());
 			ssize_t bytes = _OutputFile().Write(&bea, sizeof(bea));
 			error = check_size_error(bytes, sizeof(bea));
 			if (!error) {
@@ -202,9 +209,13 @@ UdfBuilder::Build()
 		// Nsr
 		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing nsr descriptor");
 		Udf::volume_structure_descriptor_header nsr(0, Udf::kVSDID_ECMA167_3, 1);
-		if (!error)
-			error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
 		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for nsr descriptor");
+			_Allocator().GetNextExtent(vrsBlockSize, true, extent);
+		}
+		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             extent.location(), extent.length());
 			ssize_t bytes = _OutputFile().Write(&nsr, sizeof(nsr));
 			error = check_size_error(bytes, sizeof(nsr));
 			if (!error) {
@@ -215,9 +226,13 @@ UdfBuilder::Build()
 		// Tea
 		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing terminating extended area descriptor");
 		Udf::volume_structure_descriptor_header tea(0, Udf::kVSDID_TEA, 1);
-		if (!error)
-			error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
 		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for tea descriptor");
+			error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
+		}
+		if (!error) {
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             extent.location(), extent.length());
 			ssize_t bytes = _OutputFile().Write(&tea, sizeof(tea));
 			error = check_size_error(bytes, sizeof(tea));
 			if (!error) {
@@ -234,15 +249,19 @@ UdfBuilder::Build()
 	
 	// Write the udf anchor256 and volume descriptor sequences
 	if (!error && _DoUdf()) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing anchor256");
 		// reserve anchor256
-		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for anchor256 at block 256");
+		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for anchor256");
 		error = _Allocator().GetBlock(256);
+		if (!error) 
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
+			             256, _BlockSize());
 		// reserve primary vds (min length = 16 blocks, which is plenty for us)
 		if (!error) {
-			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for primary vds");
+			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for primary vds");
 			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, primaryVdsExtent);
 			if (!error) 
-				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
+				_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
 				             primaryVdsExtent.location(), primaryVdsExtent.length());
 		}
 		// reserve reserve vds. try to grab the 16 blocks preceding block 256. if
@@ -250,19 +269,18 @@ UdfBuilder::Build()
 		// vds immediately following the primary vds, which seems a bit stupid to me,
 		// now that I think about it... 
 		if (!error) {
-			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for reserve vds");
+			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for reserve vds");
 			reserveVdsExtent.set_location(256-16);
 			reserveVdsExtent.set_length(16 << _BlockShift());
 			error = _Allocator().GetExtent(reserveVdsExtent);
 			if (error)
 				error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveVdsExtent);
 			if (!error) 
-				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
+				_PrintUpdate(VERBOSITY_HIGH, "udf: (location: %ld, length: %ld)",
 				             reserveVdsExtent.location(), reserveVdsExtent.length());
 		}
 		// write anchor_256
 		if (!error) {
-			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing anchor256");
 			anchor256.main_vds() = primaryVdsExtent;
 			anchor256.reserve_vds() = reserveVdsExtent;
 			Udf::descriptor_tag &tag = anchor256.tag();
@@ -445,8 +463,16 @@ UdfBuilder::Build()
 				memset(logical.logical_volume_contents_use().data, 0,
 				       logical.logical_volume_contents_use().size());			
 				// Allocate a block for the file set descriptor
+				_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for file set descriptor");
 				error = _PartitionAllocator().GetNextExtent(_BlockSize(), true,
 				                                            filesetAddress, filesetExtent);
+				if (!error) {				                                            
+					_PrintUpdate(VERBOSITY_HIGH, "udf: (partition: %d, location: %ld, "
+					             "length: %ld) => (location: %ld, length: %ld)",
+					             filesetAddress.partition(), filesetAddress.block(),
+					             filesetAddress.length(), filesetExtent.location(),
+					             filesetExtent.length());
+				}	             
 			}
 			if (!error) {
 				logical.file_set_address() = filesetAddress;
@@ -514,6 +540,7 @@ UdfBuilder::Build()
 	
 	// Write the file set descriptor
 	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing file set descriptor");
 		fileset.recording_date_and_time() = _BuildTimeStamp();
 		fileset.set_interchange_level(3);
 		fileset.set_max_interchange_level(3);
@@ -538,7 +565,16 @@ UdfBuilder::Build()
 		memset(fileset.abstract_file_id().data, 0,
 		       fileset.abstract_file_id().size());
 		// Allocate space for the root icb
-		error = _PartitionAllocator().GetNextExtent(_BlockSize(), true, rootIcbAddress);
+		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for root icb");
+		error = _PartitionAllocator().GetNextExtent(_BlockSize(), true, rootIcbAddress,
+		                                            rootIcbExtent);
+		if (!error) {				                                            
+			_PrintUpdate(VERBOSITY_HIGH, "udf: (partition: %d, location: %ld, "
+			             "length: %ld) => (location: %ld, length: %ld)",
+			             rootIcbAddress.partition(), rootIcbAddress.block(),
+			             rootIcbAddress.length(), rootIcbExtent.location(),
+			             rootIcbExtent.length());
+		}	             
 		if (!error) {
 			fileset.root_directory_icb() = rootIcbAddress;
 			fileset.domain_id() = kDomainId;
