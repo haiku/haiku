@@ -37,7 +37,7 @@ static const uint32 kSerialBaudRate = 115200;
 
 static uint16 *sScreenBase = (uint16 *)0xb8000;
 static uint32 sScreenWidth = 80;
-static uint32 sScreenHeight = 24;
+static uint32 sScreenHeight = 25;
 static uint32 sScreenOffset = 0;
 static uint16 sColor = 0x0f00;
 
@@ -133,7 +133,7 @@ scroll_up()
 	sScreenOffset = (sScreenHeight - 1) * sScreenWidth;
 
 	for (uint32 i = 0; i < sScreenWidth; i++)
-		sScreenBase[sScreenOffset + i] = 0x0720;
+		sScreenBase[sScreenOffset + i] = sColor | ' ';
 }
 
 
@@ -191,7 +191,7 @@ console_clear_screen(void)
 		return;
 
 	for (uint32 i = 0; i < sScreenWidth * sScreenHeight; i++)
-		sScreenBase[i] = 0xf20;
+		sScreenBase[i] = sColor;
 
 	// reset cursor position as well
 	sScreenOffset = 0;
@@ -222,7 +222,7 @@ console_set_cursor(int32 x, int32 y)
 void 
 console_set_color(int32 foreground, int32 background)
 {
-	sColor = (background & 0xf) << 12 | (foreground & 0xf) << 8;
+	sColor = (background & 0x7) << 12 | (foreground & 0xf) << 8;
 }
 
 
