@@ -108,7 +108,7 @@ bool ClipboardTree::AddWatcher(BMessenger *watcher)
 
 bool ClipboardTree::RemoveWatcher(BMessenger *watcher)
 {
-  return fWatchingService.RemoveWatcher(*watcher,true);
+  return fWatchingService.RemoveWatcher(*watcher,false);
 }
 
 void ClipboardTree::NotifyWatchers()
@@ -116,4 +116,5 @@ void ClipboardTree::NotifyWatchers()
   BMessage message(B_CLIPBOARD_CHANGED);
   fWatchingService.NotifyWatchers(&message,NULL);
 }
+
 

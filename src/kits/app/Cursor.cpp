@@ -21,6 +21,7 @@
 //
 //	File Name:		Cursor.cpp
 //	Author:			Frans van Nispen (xlr8@tref.nl)
+//				Gabe Yoder (gyoder@stny.rr.com)
 //	Description:	BCursor describes a view-wide or application-wide cursor.
 //------------------------------------------------------------------------------
 /**
@@ -29,12 +30,19 @@
  */
 
 // Standard Includes -----------------------------------------------------------
-#include <stdio.h>
 
 // System Includes -------------------------------------------------------------
 #include <Cursor.h>
+#include <PortLink.h>
+#include <AppServerLink.h>
 
 // Project Includes ------------------------------------------------------------
+// Needed from app server
+#if 0
+#include <ServerProtocol.h>
+#else
+#define SET_CURSOR_BCURSOR 'sscb'
+#endif
 
 // Local Includes --------------------------------------------------------------
 
@@ -46,13 +54,39 @@
 //------------------------------------------------------------------------------
 BCursor::BCursor(const void *cursorData)
 {
-//	uint8 data[68];
-//	memcpy(&data, cursorData, 68);
+  int8 *data = (int8 *)cursorData;
+  m_serverToken = 0;
+  if ( sizeof(cursorData) < 68 )
+    return;
+  if ( data[0] != 16 )
+    return;
+  if ( data[1] != 1 )
+    return;
+  if ( (data[2] >= 16) || (data[3] >= 16) )
+    return;
+
+  ssize_t buffersize;
+  status_t status;
+  int32 returncode;
+  int8 *buffer;
+
+  // Send data directly to server
+  BPrivate::BAppServerLink *serverlink = new BPrivate::BAppServerLink;
+  serverlink->Init();
+  serverlink->portlink->SetOpCode(SET_CURSOR_BCURSOR);
+  serverlink->portlink->Attach((void *)cursorData,68);
+
+  //Rumor has it that this API will be cleaned up later
+  buffer=serverlink->portlink->FlushWithReply(&returncode,&status,&buffersize);
+  m_serverToken=*((int32*)buffer);
+
+  delete serverlink;
 }
 //------------------------------------------------------------------------------
 // undefined on BeOS
 BCursor::BCursor(BMessage *data)
 {
+  m_serverToken = 0;
 }
 //------------------------------------------------------------------------------
 BCursor::~BCursor()
@@ -73,7 +107,9 @@ BArchivable	*BCursor::Instantiate(BMessage *data)
 //------------------------------------------------------------------------------
 status_t BCursor::Perform(perform_code d, void *arg)
 {
+  /*
 	printf("perform %d\n", (int)d);
+  */
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -100,4 +136,5 @@ void BCursor::_ReservedCursor4()
  * $Id  $
  *
  */
+
 

@@ -47,7 +47,10 @@
 //------------------------------------------------------------------------------
 BClipboard::BClipboard(const char *name, bool transient = false)
 {
-  fName = strdup(name);
+  if ( name )
+    fName = strdup(name);
+  else
+    fName = strdup("system");
   fData = new BMessage();
   fCount = 0;
   fSystemCount = 0;

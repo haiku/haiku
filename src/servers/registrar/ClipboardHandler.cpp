@@ -40,12 +40,12 @@ ClipboardHandler::MessageReceived(BMessage *message)
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
 				fClipboardTree.AddNode(name);
-				reply.AddInt32("result",1);
+				reply.AddInt32("result",B_OK);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -55,7 +55,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
@@ -63,10 +63,10 @@ ClipboardHandler::MessageReceived(BMessage *message)
 				if ( node )
 				{
 					reply.AddInt32("count",(uint32)(node->GetCount()));
-					reply.AddInt32("result",1);
+					reply.AddInt32("result",B_OK);
 				}
 				else
-					reply.AddInt32("result",0);
+					reply.AddInt32("result",B_BAD_VALUE);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -78,15 +78,15 @@ ClipboardHandler::MessageReceived(BMessage *message)
 	  		if ( (message->FindString("name",&name) != B_OK) ||
 			     (message->FindMessenger("target",&target) != B_OK) )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
 				ClipboardTree *node = fClipboardTree.GetNode(name);
 				if ( node && node->AddWatcher(&target) )
-					reply.AddInt32("result",1);
+					reply.AddInt32("result",B_OK);
 				else
-					reply.AddInt32("result",0);
+					reply.AddInt32("result",B_BAD_VALUE);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -98,15 +98,15 @@ ClipboardHandler::MessageReceived(BMessage *message)
 	  		if ( (message->FindString("name",&name) != B_OK) ||
 			     (message->FindMessenger("target",&target) != B_OK) )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
 				ClipboardTree *node = fClipboardTree.GetNode(name);
 				if ( node && node->RemoveWatcher(&target) )
-					reply.AddInt32("result",1);
+					reply.AddInt32("result",B_OK);
 				else
-					reply.AddInt32("result",0);
+					reply.AddInt32("result",B_BAD_VALUE);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -116,7 +116,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
@@ -126,10 +126,10 @@ ClipboardHandler::MessageReceived(BMessage *message)
 					reply.AddMessage("data",node->GetData());
 					reply.AddMessenger("data source",*node->GetDataSource());
 					reply.AddInt32("count",(uint32)(node->GetCount()));
-					reply.AddInt32("result",1);
+					reply.AddInt32("result",B_OK);
 				}
 				else
-					reply.AddInt32("result",0);
+					reply.AddInt32("result",B_BAD_VALUE);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -144,7 +144,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			     (message->FindMessage("data",&data) != B_OK) ||
 			     (message->FindMessenger("data source",&dataSource) != B_OK) )
 			{
-				reply.AddInt32("result",0);
+				reply.AddInt32("result",B_BAD_VALUE);
 			}
 			else
 			{
@@ -154,10 +154,10 @@ ClipboardHandler::MessageReceived(BMessage *message)
 					node->SetData(&data);
 					node->SetDataSource(&dataSource);
 					reply.AddInt32("count",(uint32)(node->IncrementCount()));
-					reply.AddInt32("result",1);
+					reply.AddInt32("result",B_OK);
 				}
 				else
-					reply.AddInt32("result",0);
+					reply.AddInt32("result",B_BAD_VALUE);
 			}
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
@@ -170,5 +170,6 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			break;
 	}
 }
+
 
 
