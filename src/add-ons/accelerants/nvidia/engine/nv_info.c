@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-4/2004
+   Rudolf Cornelissen 7/2003-5/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -861,14 +861,31 @@ static void pinsnv10_arch_fake(void)
 	si->ps.max_dac1_clock_32 = 280;
 	si->ps.max_dac1_clock_32dh = 250;
 	/* secondary head */
-	//fixme? assuming...
-	si->ps.max_dac2_clock = 200;
-	si->ps.max_dac2_clock_8 = 200;
-	si->ps.max_dac2_clock_16 = 200;
-	si->ps.max_dac2_clock_24 = 200;
-	si->ps.max_dac2_clock_32 = 200;
-	/* 'failsave' values */
-	si->ps.max_dac2_clock_32dh = 180;
+	if (si->ps.card_type < NV17)
+	{
+		/* if a GeForce2 has analog VGA dualhead capability,
+		 * it uses an external secondary DAC probably with limited capability. */
+		/* (called twinview technology) */
+		si->ps.max_dac2_clock = 200;
+		si->ps.max_dac2_clock_8 = 200;
+		si->ps.max_dac2_clock_16 = 200;
+		si->ps.max_dac2_clock_24 = 200;
+		si->ps.max_dac2_clock_32 = 200;
+		/* 'failsave' values */
+		si->ps.max_dac2_clock_32dh = 180;
+	}
+	else
+	{
+		/* GeForce4 cards have dual integrated DACs with identical capaability */
+		/* (called nview technology) */
+		si->ps.max_dac2_clock = 350;
+		si->ps.max_dac2_clock_8 = 350;
+		si->ps.max_dac2_clock_16 = 350;
+		/* 'failsave' values */
+		si->ps.max_dac2_clock_24 = 320;
+		si->ps.max_dac2_clock_32 = 280;
+		si->ps.max_dac2_clock_32dh = 250;
+	}
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
@@ -894,14 +911,15 @@ static void pinsnv20_arch_fake(void)
 	si->ps.max_dac1_clock_32 = 280;
 	si->ps.max_dac1_clock_32dh = 250;
 	/* secondary head */
-	//fixme? assuming...
-	si->ps.max_dac2_clock = 200;
-	si->ps.max_dac2_clock_8 = 200;
-	si->ps.max_dac2_clock_16 = 200;
-	si->ps.max_dac2_clock_24 = 200;
-	si->ps.max_dac2_clock_32 = 200;
+	/* GeForce4 cards have dual integrated DACs with identical capaability */
+	/* (called nview technology) */
+	si->ps.max_dac2_clock = 350;
+	si->ps.max_dac2_clock_8 = 350;
+	si->ps.max_dac2_clock_16 = 350;
 	/* 'failsave' values */
-	si->ps.max_dac2_clock_32dh = 180;
+	si->ps.max_dac2_clock_24 = 320;
+	si->ps.max_dac2_clock_32 = 280;
+	si->ps.max_dac2_clock_32dh = 250;
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
@@ -927,14 +945,15 @@ static void pinsnv30_arch_fake(void)
 	si->ps.max_dac1_clock_32 = 280;
 	si->ps.max_dac1_clock_32dh = 250;
 	/* secondary head */
-	//fixme? assuming...
-	si->ps.max_dac2_clock = 200;
-	si->ps.max_dac2_clock_8 = 200;
-	si->ps.max_dac2_clock_16 = 200;
-	si->ps.max_dac2_clock_24 = 200;
-	si->ps.max_dac2_clock_32 = 200;
+	/* GeForceFX cards have dual integrated DACs with identical capaability */
+	/* (called nview technology) */
+	si->ps.max_dac2_clock = 350;
+	si->ps.max_dac2_clock_8 = 350;
+	si->ps.max_dac2_clock_16 = 350;
 	/* 'failsave' values */
-	si->ps.max_dac2_clock_32dh = 180;
+	si->ps.max_dac2_clock_24 = 320;
+	si->ps.max_dac2_clock_32 = 280;
+	si->ps.max_dac2_clock_32dh = 250;
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;

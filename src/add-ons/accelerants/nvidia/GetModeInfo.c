@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson
-	Rudolf Cornelissen 9-11/2002
+	Rudolf Cornelissen 9/2002-5/2003
 */
 
 #define MODULE_BIT 0x02000000
@@ -35,10 +35,9 @@ status_t GET_FRAME_BUFFER_CONFIG(frame_buffer_config *afb)
 }
 
 /* Return the maximum and minium pixelclock limits for the specified mode. */
-/* Rewritten / fixed by Rudolf */
 /* NOTE:
  * Due to BeOS constraints output for all heads will be limited to the head with
- * the least capabilities. (BeOS should ask for seperate constraints for all heads.) */
+ * the least capabilities. */
 status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high) 
 {
 	uint32 max_pclk = 0;
@@ -58,7 +57,8 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 				*low = ((si->ps.min_video_vco * 1000) / 16);
 				break;
 		}
-		/* find max. value */
+		/* find max. value:
+		 * using decondary DAC specs because they could be narrower (twinview) */
 		switch (dm->space)
 		{
 			case B_CMAP8:
@@ -93,26 +93,52 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 				*low = ((si->ps.min_pixel_vco * 1000) / 16);
 				break;
 		}
-		/* find max. value */
-		switch (dm->space)
+		/* find max. value: depends on which head is used as primary head */
+		if (!si->ps.crtc2_prim)
 		{
-			case B_CMAP8:
-				max_pclk = si->ps.max_dac1_clock_8;
-				break;
-			case B_RGB15_LITTLE:
-			case B_RGB16_LITTLE:
-				max_pclk = si->ps.max_dac1_clock_16;
-				break;
-			case B_RGB24_LITTLE:
-				max_pclk = si->ps.max_dac1_clock_24;
-				break;
-			case B_RGB32_LITTLE:
-				max_pclk = si->ps.max_dac1_clock_32;
-				break;
-			default:
-				/* use fail-safe value */
-				max_pclk = si->ps.max_dac1_clock_32;
-				break;
+			switch (dm->space)
+			{
+				case B_CMAP8:
+					max_pclk = si->ps.max_dac1_clock_8;
+					break;
+				case B_RGB15_LITTLE:
+				case B_RGB16_LITTLE:
+					max_pclk = si->ps.max_dac1_clock_16;
+					break;
+				case B_RGB24_LITTLE:
+					max_pclk = si->ps.max_dac1_clock_24;
+					break;
+				case B_RGB32_LITTLE:
+					max_pclk = si->ps.max_dac1_clock_32;
+					break;
+				default:
+					/* use fail-safe value */
+					max_pclk = si->ps.max_dac1_clock_32;
+					break;
+			}
+		}
+		else
+		{
+			switch (dm->space)
+			{
+				case B_CMAP8:
+					max_pclk = si->ps.max_dac2_clock_8;
+					break;
+				case B_RGB15_LITTLE:
+				case B_RGB16_LITTLE:
+					max_pclk = si->ps.max_dac2_clock_16;
+					break;
+				case B_RGB24_LITTLE:
+					max_pclk = si->ps.max_dac2_clock_24;
+					break;
+				case B_RGB32_LITTLE:
+					max_pclk = si->ps.max_dac2_clock_32;
+					break;
+				default:
+					/* use fail-safe value */
+					max_pclk = si->ps.max_dac2_clock_32;
+					break;
+			}
 		}
 		/* return values in kHz */
 		*high = max_pclk * 1000;
