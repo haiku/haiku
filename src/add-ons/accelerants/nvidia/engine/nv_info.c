@@ -979,16 +979,18 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				offset32));
 			if (offset32 < 0x80)
 			{
+				bool double_f = true;
 				LOG(8,("INFO: Do subcmd ($39); "));
-				exec_cmd_39_type2(rom, offset32, tabs, &exec);
-				LOG(8,("INFO: ---Doubling PLL frequency to be set for cmd $34.\n"));
-				data2 <<= 1;
+				exec_cmd_39_type2(rom, offset32, tabs, &double_f);
+				LOG(8,("INFO: (cont. cmd $34) Doubling PLL frequency to be set for cmd $34.\n"));
+				if (double_f) data2 <<= 1;
+				LOG(8,("INFO: Reverting to pre-subcmd ($39) 'execution' mode.\n"));
 			}
 			else
 			{
 				LOG(8,("INFO: table index is negative, not executing subcmd ($39).\n"));
 			}
-			LOG(8,("INFO: (cont. cmd $34) 'calc and set PLL 32bit reg $%08x for %.3fMHz'\n",
+			LOG(8,("INFO: (cont.) 'calc and set PLL 32bit reg $%08x for %.3fMHz'\n",
 				reg2, (data2 / 100.0)));
 			if (exec && reg2)
 			{
