@@ -730,7 +730,7 @@ status_t BMessage::AddString(const char* name, const BString& a_string)
 //------------------------------------------------------------------------------
 status_t BMessage::AddPointer(const char* name, const void* ptr)
 {
-	return fBody->AddData<const void*>(name, ptr, B_POINTER_TYPE);
+	return fBody->AddData<void*>(name, (void*)ptr, B_POINTER_TYPE);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddMessenger(const char* name, BMessenger messenger)
@@ -874,7 +874,7 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 			err = AddMessenger(name, *(BMessenger*)data);
 			break;
 		case B_POINTER_TYPE:
-			err = AddPointer(name, (void**)data);
+			err = AddPointer(name, *(void**)data);
 			break;
 		case B_STRING_TYPE:
 			err = AddString(name, (const char*)data);
@@ -942,6 +942,7 @@ status_t BMessage::FindPointer(const char* name, void** ptr) const
 //------------------------------------------------------------------------------
 status_t BMessage::FindPointer(const char* name, int32 index, void** ptr) const
 {
+	*ptr = NULL;
 	return fBody->FindData<void*>(name, index, ptr, B_POINTER_TYPE);
 }
 //------------------------------------------------------------------------------
@@ -1062,7 +1063,7 @@ status_t BMessage::ReplacePointer(const char* name, const void* ptr)
 status_t BMessage::ReplacePointer(const char* name, int32 index,
 								  const void* ptr)
 {
-	return fBody->ReplaceData<const void*>(name, index, ptr, B_POINTER_TYPE);
+	return fBody->ReplaceData<void*>(name, index, (void*)ptr, B_POINTER_TYPE);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
