@@ -338,7 +338,7 @@ main (int argc, char **argv)
 						index %= 75;
 						read_cd.start_f = index;
 
-						index = min_c(frames, length);
+						index = min_c((int)frames, length);
 						read_cd.buffer_length = index * 2352;
 						length -= index;
 						start += index;

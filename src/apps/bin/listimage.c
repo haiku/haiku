@@ -42,8 +42,8 @@ list_images_for_team_by_id(team_id id)
 		printf("%5ld %64s 0x%08lx 0x%08lx %4ld %10lu\n",
 			imageInfo.id,
 			imageInfo.name,
-			imageInfo.text,
-			imageInfo.data,
+			(addr_t)imageInfo.text,
+			(addr_t)imageInfo.data,
 			imageInfo.sequence,
 			imageInfo.init_order);
 	}
