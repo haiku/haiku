@@ -45,18 +45,15 @@
 #define CHECK_X(a) ( (a >= 0) || (a <= mDisplayMode.virtual_width-1) )
 #define CHECK_Y(a) ( (a >= 0) || (a <= mDisplayMode.virtual_height-1) )
 
-/* Stuff to investigate:
-   Effect of pensize on fill operations
-   Pattern details - start point, rectangles drawn counter-clockwise?
-                     Maybe the pattern is always relative to (0,0)
-   Do I need to deal with things that may be clipped entirely?
-*/
-/* Need to check which functions should move the pen position */
+/* TODO: Need to check which functions should move the pen position */
+/* TODO: Add handling of draw modes */
 
 class AccLineCalc
 {
 public:
+	AccLineCalc();
 	AccLineCalc(const BPoint &pta, const BPoint &ptb);
+	void SetPoints(const BPoint &pta, const BPoint &ptb);
 	float GetX(float y);
 	float GetY(float x);
 	float Slope(void) { return slope; }
@@ -65,6 +62,7 @@ public:
 	float MinY();
 	float MaxX();
 	float MaxY();
+	void Swap(AccLineCalc &from);
 private:
 	float slope;
 	float offset;
@@ -74,6 +72,10 @@ private:
 	float maxx;
 	float maxy;
 };
+
+AccLineCalc::AccLineCalc()
+{
+}
 
 AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
 {
@@ -85,6 +87,27 @@ AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
 	maxx = MAX(start.x,end.x);
 	miny = MIN(start.y,end.y);
 	maxy = MAX(start.y,end.y);
+}
+
+void AccLineCalc::SetPoints(const BPoint &pta, const BPoint &ptb)
+{
+	start=pta;
+	end=ptb;
+	slope=(start.y-end.y)/(start.x-end.x);
+	offset=start.y-(slope * start.x);
+	minx = MIN(start.x,end.x);
+	maxx = MAX(start.x,end.x);
+	miny = MIN(start.y,end.y);
+	maxy = MAX(start.y,end.y);
+}
+
+void AccLineCalc::Swap(AccLineCalc &from)
+{
+	BPoint pta, ptb;
+	pta = start;
+	ptb = end;
+	SetPoints(from.start,from.end);
+	from.SetPoints(pta,ptb);
 }
 
 float AccLineCalc::GetX(float y)
@@ -308,9 +331,8 @@ void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, Laye
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	\param delta Extra character padding
 */
-void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
+void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
 {
-#if 0
 	if(!string || !d || !d->font)
 		return;
 
@@ -436,12 +458,15 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 
 		if(!error)
 		{
+		  //TODO: Replace BlitGray2RGB32 and BlitMono2RGB32
+		  /*
 			if(antialias)
 				BlitGray2RGB32(&slot->bitmap,
 					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
 			else
 				BlitMono2RGB32(&slot->bitmap,
 					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
+					*/
 		}
 		else
 			printf("Couldn't load character %c\n", string[i]);
@@ -453,7 +478,6 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	}
 	FT_Done_Face(face);
 	_Unlock();
-#endif
 }
 
 /*!
@@ -821,8 +845,113 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	   all pairs of intersections.  Watch out for horizontal line segments.
 	*/
 	_Lock();
+	if ( !ptlist || (numpts < 3) || (sizeof(ptlist) < numpts*sizeof(BPoint)) )
+	{
+		_Unlock();
+		return;
+	}
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
+
+        BPoint *currentPoint, *nextPoint;
+	BPoint tempNextPoint;
+	BPoint tempCurrentPoint;
+	int currentIndex, bestIndex, i, j, y;
+	AccLineCalc *segmentArray = new AccLineCalc[2*numpts];
+	int numSegments = 0;
+
+	/* Generate the segment list */
+        currentPoint = ptlist;
+	currentIndex = 0;
+	nextPoint = &ptlist[1];
+        while (currentPoint)
+	{
+		for (i=0; i<numpts; i++)
+		{
+			if ( ((ptlist[i].y > currentPoint->y) && (ptlist[i].y < nextPoint->y)) ||
+				((ptlist[i].y < currentPoint->y) && (ptlist[i].y > nextPoint->y)) )
+			{
+				tempNextPoint.x = ptlist[i].x;
+				tempNextPoint.y = ptlist[i].y;
+				nextPoint = &tempNextPoint;
+			}
+		}
+		if ( numSegments >= 2*numpts )
+		{
+			printf("ERROR: Insufficient memory allocated to segment array\n");
+			return;
+		}
+		segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
+		numSegments++;
+		if ( nextPoint == &tempNextPoint )
+		{
+			tempCurrentPoint = tempNextPoint;
+			currentPoint = &tempCurrentPoint;
+			nextPoint = &ptlist[(currentIndex+1)%numpts];
+		}
+		else if ( nextPoint == ptlist )
+		{
+			currentPoint = NULL;
+		}
+		else
+		{
+			currentPoint = nextPoint;
+			currentIndex++;
+			nextPoint = &ptlist[(currentIndex+1)%numpts];
+		}
+	}
+
+	/* Selection sort the segments.  Probably should replace this later. */
+	for (i=0; i<numSegments; i++)
+	{
+		bestIndex = i;
+		for (j=i+1; j<numSegments; j++)
+		{
+			if ( (segmentArray[j].MinY() < segmentArray[i].MinY()) ||
+				((segmentArray[j].MinY() == segmentArray[i].MinY()) &&
+				 (segmentArray[j].MinX() < segmentArray[i].MinX())) )
+				bestIndex = j;
+		}
+		if (bestIndex != i)
+			segmentArray[i].Swap(segmentArray[bestIndex]);
+	}
+
+	/* Draw the lines */
+	for (y=ROUND(rect.top); y<=ROUND(rect.bottom); y++)
+	{
+		if ( CHECK_Y(y) )
+		{
+			i = 0;
+			while (i<numSegments)
+			{
+				if (segmentArray[i].MinY() > y)
+					break;
+				if (segmentArray[i].MaxY() < y)
+				{
+					i++;
+					continue;
+				}
+				if (segmentArray[i].MinY() == segmentArray[i].MaxY())
+				{
+					if ( (segmentArray[i].MinX() < mDisplayMode.virtual_width) &&
+						(segmentArray[i].MaxX() >= 0) )
+						HLine(CLIP_X(ROUND(segmentArray[i].MinX())),
+						      CLIP_X(ROUND(segmentArray[i].MaxX())),
+						      y, &pattern);
+					i++;
+				}
+				else
+				{
+					if ( (segmentArray[i].GetX(y) < mDisplayMode.virtual_width) &&
+						(segmentArray[i+1].GetX(y) >= 0) )
+						HLine(CLIP_X(ROUND(segmentArray[i].GetX(y))),
+						      CLIP_X(ROUND(segmentArray[i+1].GetX(y))),
+						      y, &pattern);
+					i+=2;
+				}
+			}
+		}
+	}
 
 	_Unlock();
 }
@@ -1137,24 +1266,67 @@ void AccelerantDriver::InvertRect(BRect r)
 					index[j]^=0xFFFFFF00L;
 				index = (uint32 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
 			}
-			break;
 		}
+			break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
-			// TODO: Implement
-			printf("ScreenDriver::16-bit mode unimplemented\n");
+		{
+			uint16 width=r.IntegerWidth();
+			uint16 height=r.IntegerHeight();
+			uint16 *start=(uint16*)mFrameBufferConfig.frame_buffer;
+			uint16 *index;
+			start = (uint16 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
+			start+=(int32)r.left;
+				
+			index = start;
+			for(int32 i=0;i<height;i++)
+			{
+				for(int32 j=0; j<width; j++)
+					index[j]^=0xFFFF;
+				index = (uint16 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
+			}
+		}
 			break;
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
-			// TODO: Implement
-			printf("ScreenDriver::15-bit mode unimplemented\n");
+		{
+			uint16 width=r.IntegerWidth();
+			uint16 height=r.IntegerHeight();
+			uint16 *start=(uint16*)mFrameBufferConfig.frame_buffer;
+			uint16 *index;
+			start = (uint16 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
+			start+=(int32)r.left;
+				
+			index = start;
+			for(int32 i=0;i<height;i++)
+			{
+				/* TODO: Where is the alpha bit */
+				for(int32 j=0; j<width; j++)
+					index[j]^=0xFFFF;
+				index = (uint16 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
+			}
+		}
 			break;
 		case B_CMAP8:
 		case B_GRAY8:
-			// TODO: Implement
-			printf("ScreenDriver::8-bit mode unimplemented\n");
+		{
+			uint16 width=r.IntegerWidth();
+			uint16 height=r.IntegerHeight();
+			uint8 *start=(uint8*)mFrameBufferConfig.frame_buffer;
+			uint8 *index;
+			start = (uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row;
+			start+=(int32)r.left;
+				
+			index = start;
+			for(int32 i=0;i<height;i++)
+			{
+				for(int32 j=0; j<width; j++)
+					index[j]^=0xFF;
+				index = (uint8 *)index+mFrameBufferConfig.bytes_per_row;
+			}
+		}
 			break;
 		default:
 			break;
@@ -1724,6 +1896,9 @@ void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *
 void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
 	/* If this is called from userland, why does it include a layerdata parameter? */
+	_Lock();
+	
+	_Unlock();
 }
 
 /*!
@@ -2255,6 +2430,14 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 	}
 }
 
+/*!
+	\brief Copies a bitmap to the screen
+	\param sourcebmp The bitmap containing the data to blit to the screen
+	\param sourcerect The rectangle defining the section of the bitmap to blit
+	\param destrect The rectangle defining the section of the screen to be blitted
+	\param mode The drawing mode to use when blitting the bitmap
+	The bitmap and the screen must have the same color depth, or this will do nothing.
+*/
 void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
 {
 	/* Need to check for hardware support for this. */
@@ -2377,6 +2560,13 @@ void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRe
 
 }
 
+/*!
+	\brief Copies a bitmap to the screen
+	\param destbmp The bitmap receing the data from the screen
+	\param destrect The rectangle defining the section of the bitmap to receive data
+	\param sourcerect The rectangle defining the section of the screen to be copied
+	The bitmap and the screen must have the same color depth or this will do nothing.
+*/
 void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect)
 {
 	/* Need to check for hardware support for this. */
@@ -2457,6 +2647,7 @@ void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BR
 /*!
 	\brief Opens a graphics device for read-write access
 	\param deviceNumber Number identifying which graphics card to open (1 for first card)
+	\return The file descriptor for the opened graphics device
 	
 	The deviceNumber is relative to the number of graphics devices that can be successfully
 	opened.  One represents the first card that can be successfully opened (not necessarily
@@ -2506,6 +2697,13 @@ int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 	return current_card_fd;
 }
 
+/*!
+	\brief Determines a display mode constant from display size and depth
+	\param width The display width
+	\param height The display height
+	\param depth The color depth
+	\return The display mode constant
+*/
 int AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
 {
 	int mode = 0;
@@ -2610,6 +2808,11 @@ int AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
 	return mode;
 }
 
+/*!
+	\brief Determines the display width from a display mode constant
+	\param mode The display mode
+	\return The display height (640, 800, 1024, 1152, 1280, or 1600)
+*/
 int AccelerantDriver::GetWidthFromMode(int mode)
 {
 	int width=0;
@@ -2657,6 +2860,11 @@ int AccelerantDriver::GetWidthFromMode(int mode)
 	return width;
 }
 
+/*!
+	\brief Determines the display height from a display mode constant
+	\param mode The display mode
+	\return The display height (400, 480, 600, 768, 900, 1024, or 1200)
+*/
 int AccelerantDriver::GetHeightFromMode(int mode)
 {
 	int height=0;
@@ -2706,6 +2914,11 @@ int AccelerantDriver::GetHeightFromMode(int mode)
 	return height;
 }
 
+/*!
+	\brief Determines the color depth from a display mode constant
+	\param mode The display mode
+	\return The color depth (8,15,16 or 32)
+*/
 int AccelerantDriver::GetDepthFromMode(int mode)
 {
 	int depth=0;
@@ -2749,6 +2962,11 @@ int AccelerantDriver::GetDepthFromMode(int mode)
 	return depth;
 }
 
+/*!
+	\brief Determines the color depth from a color space constant
+	\param mode The color space constant
+	\return The color depth (1,8,16 or 32)
+*/
 int AccelerantDriver::GetDepthFromColorspace(int space)
 {
 	int depth=0;

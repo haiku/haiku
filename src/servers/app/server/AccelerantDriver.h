@@ -66,7 +66,7 @@ public:
 	// Settings functions
 	virtual void CopyBits(BRect src, BRect dest);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
-	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
+	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL);
 
 	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
 	virtual void FillBezier(BPoint *pts, LayerData *d, int8 *pat);
@@ -110,12 +110,9 @@ public:
 	virtual void GetHasGlyphs(const char *string, int32 charcount, bool *hasarray);
 	virtual void GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings);
 protected:
-	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
-	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
-	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
 	void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
