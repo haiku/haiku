@@ -7,10 +7,9 @@
 
 #include <SupportDefs.h>
 
-struct partition_info;
-struct session_info;
-
 class BDiskScannerParameterEditor;
+class BPartition;
+class BSession;
 class BString;
 
 // BDiskScannerPartitionAddOn
@@ -22,8 +21,8 @@ public:
 	virtual const char *ShortName() = 0;
 	virtual const char *LongName() = 0;
 
-	virtual BDiskScannerParameterEditor *CreateEditor(
-		const session_info *sessionInfo, const char *parameters) = 0;
+	virtual BDiskScannerParameterEditor *CreateEditor(const BSession *session,
+		const char *parameters) = 0;
 
 private:
 	virtual	void _ReservedDiskScannerPartitionAddOn1();
@@ -45,7 +44,7 @@ public:
 	virtual const char *LongName() = 0;
 
 	virtual BDiskScannerParameterEditor *CreateEditor(
-		const partition_info *partitionInfo, const char *parameters) = 0;
+		const BPartition *partition, const char *parameters) = 0;
 
 private:
 	virtual	void _ReservedDiskScannerFSAddOn1();
@@ -64,6 +63,7 @@ public:
 	virtual ~BDiskScannerParameterEditor();
 
 	virtual BView *View();
+	virtual bool EditingDone();
 	virtual status_t GetParameters(BString *parameters);
 
 private:
