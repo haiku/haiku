@@ -252,14 +252,14 @@ Inode::RemoveIterator(AttributeIterator *iterator)
  */
 
 status_t
-Inode::MakeSpaceForSmallData(Transaction *transaction,const char *name,int32 bytes)
+Inode::MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 bytes)
 {
 	while (bytes > 0) {
-		small_data *item = Node()->small_data_start,*max = NULL;
-		int32 index = 0,maxIndex = 0;
-		for (;!item->IsLast(Node());item = item->Next(),index++) {
+		small_data *item = Node()->small_data_start, *max = NULL;
+		int32 index = 0, maxIndex = 0;
+		for (; !item->IsLast(Node()); item = item->Next(), index++) {
 			// should not remove those
-			if (*item->Name() == FILE_NAME_NAME || !strcmp(name,item->Name()))
+			if (*item->Name() == FILE_NAME_NAME || !strcmp(name, item->Name()))
 				continue;
 
 			if (max == NULL || max->Size() < item->Size()) {
@@ -281,12 +281,12 @@ Inode::MakeSpaceForSmallData(Transaction *transaction,const char *name,int32 byt
 		// Luckily, this doesn't cause any index updates
 
 		Inode *attribute;
-		status_t status = CreateAttribute(transaction,item->Name(),item->type,&attribute);
+		status_t status = CreateAttribute(transaction, item->Name(), item->type, &attribute);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
 		size_t length = item->data_size;
-		status = attribute->WriteAt(transaction,0,item->Data(),&length);
+		status = attribute->WriteAt(transaction, 0, item->Data(), &length);
 
 		ReleaseAttribute(attribute);
 
@@ -294,14 +294,14 @@ Inode::MakeSpaceForSmallData(Transaction *transaction,const char *name,int32 byt
 			Vnode vnode(fVolume,Attributes());
 			Inode *attributes;
 			if (vnode.Get(&attributes) < B_OK
-				|| attributes->Remove(transaction,name) < B_OK) {
+				|| attributes->Remove(transaction, name) < B_OK) {
 				FATAL(("Could not remove newly created attribute!\n"));
 			}
 
 			RETURN_ERROR(status);
 		}
 
-		RemoveSmallData(max,maxIndex);
+		RemoveSmallData(max, maxIndex);
 	}
 	return B_OK;
 }
@@ -313,7 +313,7 @@ Inode::MakeSpaceForSmallData(Transaction *transaction,const char *name,int32 byt
  */
 
 status_t 
-Inode::RemoveSmallData(small_data *item,int32 index)
+Inode::RemoveSmallData(small_data *item, int32 index)
 {
 	small_data *next = item->Next();
 	if (!next->IsLast(Node())) {
@@ -326,19 +326,19 @@ Inode::RemoveSmallData(small_data *item,int32 index)
 		if (size < 0 || size > (uint8 *)Node() + fVolume->BlockSize() - (uint8 *)next)
 			return B_BAD_DATA;
 
-		memmove(item,next,size);
+		memmove(item, next, size);
 
 		// Move the "last" one to its new location and
 		// correctly terminate the small_data section
 		last = (small_data *)((uint8 *)last - ((uint8 *)next - (uint8 *)item));
-		memset(last,0,(uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
+		memset(last, 0, (uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
 	} else
-		memset(item,0,item->Size());
+		memset(item, 0, item->Size());
 
 	// update all current iterators
 	AttributeIterator *iterator = NULL;
 	while ((iterator = fIterators.Next(iterator)) != NULL)
-		iterator->Update(index,-1);
+		iterator->Update(index, -1);
 
 	return B_OK;
 }
@@ -350,7 +350,7 @@ Inode::RemoveSmallData(small_data *item,int32 index)
  */
 
 status_t
-Inode::RemoveSmallData(Transaction *transaction,const char *name)
+Inode::RemoveSmallData(Transaction *transaction, const char *name)
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
@@ -361,7 +361,7 @@ Inode::RemoveSmallData(Transaction *transaction,const char *name)
 
 	small_data *item = Node()->small_data_start;
 	int32 index = 0;
-	while (!item->IsLast(Node()) && strcmp(item->Name(),name)) {
+	while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 		item = item->Next();
 		index++;
 	}
@@ -369,7 +369,7 @@ Inode::RemoveSmallData(Transaction *transaction,const char *name)
 	if (item->IsLast(Node()))
 		return B_ENTRY_NOT_FOUND;
 
-	return RemoveSmallData(item,index);
+	return RemoveSmallData(item, index);
 }
 
 
@@ -386,7 +386,8 @@ Inode::RemoveSmallData(Transaction *transaction,const char *name)
  */
 
 status_t
-Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const uint8 *data,size_t length,bool force)
+Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
+	const uint8 *data, size_t length, bool force)
 {
 	if (name == NULL || data == NULL || type == 0)
 		return B_BAD_VALUE;
@@ -401,7 +402,7 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 
 	small_data *item = Node()->small_data_start;
 	int32 index = 0;
-	while (!item->IsLast(Node()) && strcmp(item->Name(),name)) {
+	while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 		item = item->Next();
 		index++;
 	}
@@ -426,13 +427,13 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 				uint32 needed = length - item->data_size -
 						(uint32)((uint8 *)Node() + fVolume->InodeSize() - (uint8 *)last);
 
-				if (MakeSpaceForSmallData(transaction,name,needed) < B_OK)
+				if (MakeSpaceForSmallData(transaction, name, needed) < B_OK)
 					return B_ERROR;
 				
 				// reset our pointers
 				item = Node()->small_data_start;
 				index = 0;
-				while (!item->IsLast(Node()) && strcmp(item->Name(),name)) {
+				while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 					item = item->Next();
 					index++;
 				}
@@ -445,17 +446,17 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 			// move the attributes after the current one
 			small_data *next = item->Next();
 			if (!next->IsLast(Node()))
-				memmove((uint8 *)item + spaceNeeded,next,(uint8 *)last - (uint8 *)next);
+				memmove((uint8 *)item + spaceNeeded, next, (uint8 *)last - (uint8 *)next);
 
 			// Move the "last" one to its new location and
 			// correctly terminate the small_data section
 			last = (small_data *)((uint8 *)last - ((uint8 *)next - ((uint8 *)item + spaceNeeded)));
 			if ((uint8 *)last < (uint8 *)Node() + fVolume->BlockSize())
-				memset(last,0,(uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
+				memset(last, 0, (uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
 
 			item->type = type;
 			item->data_size = length;
-			memcpy(item->Data(),data,length);
+			memcpy(item->Data(), data, length);
 			item->Data()[length] = '\0';
 
 			return B_OK;
@@ -463,7 +464,7 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 
 		// Could not replace the old attribute, so remove it to let
 		// let the calling function create an attribute file for it
-		if (RemoveSmallData(item,index) < B_OK)
+		if (RemoveSmallData(item, index) < B_OK)
 			return B_ERROR;
 
 		return B_DEVICE_FULL;
@@ -477,7 +478,7 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 			return B_DEVICE_FULL;
 
 		// make room for the new attribute
-		if (MakeSpaceForSmallData(transaction,name,spaceNeeded) < B_OK)
+		if (MakeSpaceForSmallData(transaction, name, spaceNeeded) < B_OK)
 			return B_ERROR;
 
 		// get new last item!
@@ -489,12 +490,12 @@ Inode::AddSmallData(Transaction *transaction,const char *name,uint32 type,const 
 		}
 	}
 
-	memset(item,0,spaceNeeded);
+	memset(item, 0, spaceNeeded);
 	item->type = type;
 	item->name_size = nameLength;
 	item->data_size = length;
-	strcpy(item->Name(),name);
-	memcpy(item->Data(),data,length);
+	strcpy(item->Name(), name);
+	memcpy(item->Data(), data, length);
 
 	// correctly terminate the small_data section
 	item = item->Next();
@@ -556,7 +557,7 @@ Inode::FindSmallData(const char *name) const
 {
 	small_data *smallData = NULL;
 	while (GetNextSmallData(&smallData) == B_OK) {
-		if (!strcmp(smallData->Name(),name))
+		if (!strcmp(smallData->Name(), name))
 			return smallData;
 	}
 	return NULL;
@@ -585,14 +586,14 @@ Inode::Name() const
  */
 
 status_t 
-Inode::SetName(Transaction *transaction,const char *name)
+Inode::SetName(Transaction *transaction, const char *name)
 {
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
 	const char nameTag[2] = {FILE_NAME_NAME, 0};
 
-	return AddSmallData(transaction,nameTag,FILE_NAME_TYPE,(uint8 *)name,strlen(name),true);
+	return AddSmallData(transaction, nameTag, FILE_NAME_TYPE, (uint8 *)name, strlen(name), true);
 }
 
 
@@ -650,10 +651,11 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, siz
  */
 
 status_t
-Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t pos,const uint8 *buffer,size_t *_length)
+Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, off_t pos,
+	const uint8 *buffer, size_t *_length)
 {
 	// needed to maintain the index
-	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH],*oldData = NULL;
+	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
 	size_t oldLength = 0;
 
 	Index index(fVolume);
@@ -661,7 +663,7 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
 
 	Inode *attribute = NULL;
 	status_t status;
-	if (GetAttribute(name,&attribute) < B_OK) {
+	if (GetAttribute(name, &attribute) < B_OK) {
 		// save the old attribute data
 		if (hasIndex) {
 			fSmallDataLock.Lock();
@@ -671,7 +673,7 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
 				oldLength = smallData->data_size;
 				if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
 					oldLength = BPLUSTREE_MAX_KEY_LENGTH;
-				memcpy(oldData = oldBuffer,smallData->Data(),oldLength);
+				memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
 			}
 			fSmallDataLock.Unlock();
 		}
@@ -679,9 +681,9 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
 		// if the attribute doesn't exist yet (as a file), try to put it in the
 		// small_data section first - if that fails (due to insufficent space),
 		// create a real attribute file
-		status = AddSmallData(transaction,name,type,buffer,*_length);
+		status = AddSmallData(transaction, name, type, buffer, *_length);
 		if (status == B_DEVICE_FULL) {
-			status = CreateAttribute(transaction,name,type,&attribute);
+			status = CreateAttribute(transaction, name, type, &attribute);
 			if (status < B_OK)
 				RETURN_ERROR(status);
 		} else if (status == B_OK)
@@ -693,10 +695,10 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
 			// save the old attribute data (if this fails, oldLength will reflect it)
 			if (hasIndex) {
 				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
-				if (attribute->ReadAt(0,oldBuffer,&oldLength) == B_OK)
+				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
 			}
-			status = attribute->WriteAt(transaction,pos,buffer,_length);
+			status = attribute->WriteAt(transaction, pos, buffer, _length);
 	
 			attribute->Lock().UnlockWrite();
 		} else
@@ -714,7 +716,7 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
 			if (length > BPLUSTREE_MAX_KEY_LENGTH)
 				length = BPLUSTREE_MAX_KEY_LENGTH;
 
-			index.Update(transaction,name,0,oldData,oldLength,buffer,length,this);
+			index.Update(transaction, name, 0, oldData, oldLength, buffer, length, this);
 		}
 	}
 	return status;
@@ -727,7 +729,7 @@ Inode::WriteAttribute(Transaction *transaction,const char *name,int32 type,off_t
  */
 
 status_t
-Inode::RemoveAttribute(Transaction *transaction,const char *name)
+Inode::RemoveAttribute(Transaction *transaction, const char *name)
 {
 	Index index(fVolume);
 	bool hasIndex = index.SetTo(name) == B_OK;
@@ -741,45 +743,45 @@ Inode::RemoveAttribute(Transaction *transaction,const char *name)
 			uint32 length = smallData->data_size;
 			if (length > BPLUSTREE_MAX_KEY_LENGTH)
 				length = BPLUSTREE_MAX_KEY_LENGTH;
-			index.Update(transaction,name,0,smallData->Data(),length,NULL,0,this);
+			index.Update(transaction, name, 0, smallData->Data(), length, NULL, 0, this);
 		}
 		fSmallDataLock.Unlock();
 	}
 
-	status_t status = RemoveSmallData(transaction,name);
+	status_t status = RemoveSmallData(transaction, name);
 	if (status == B_OK) {
 		status = WriteBack(transaction);
 	} else if (status == B_ENTRY_NOT_FOUND && !Attributes().IsZero()) {
 		// remove the attribute file if it exists
-		Vnode vnode(fVolume,Attributes());
+		Vnode vnode(fVolume, Attributes());
 		Inode *attributes;
 		if ((status = vnode.Get(&attributes)) < B_OK)
 			return status;
 
 		// update index
 		Inode *attribute;
-		if (hasIndex && GetAttribute(name,&attribute) == B_OK) {
+		if (hasIndex && GetAttribute(name, &attribute) == B_OK) {
 			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
 			size_t length = BPLUSTREE_MAX_KEY_LENGTH;
-			if (attribute->ReadAt(0,data,&length) == B_OK)
-				index.Update(transaction,name,0,data,length,NULL,0,this);
+			if (attribute->ReadAt(0, data, &length) == B_OK)
+				index.Update(transaction, name, 0, data, length, NULL, 0, this);
 
 			ReleaseAttribute(attribute);
 		}
 
-		if ((status = attributes->Remove(transaction,name)) < B_OK)
+		if ((status = attributes->Remove(transaction, name)) < B_OK)
 			return status;
 
 		if (attributes->IsEmpty()) {
 			// remove attribute directory (don't fail if that can't be done)
-			if (remove_vnode(fVolume->ID(),attributes->ID()) == B_OK) {
+			if (remove_vnode(fVolume->ID(), attributes->ID()) == B_OK) {
 				// update the inode, so that no one will ever doubt it's deleted :-)
 				attributes->Node()->flags |= INODE_DELETED;
 				if (attributes->WriteBack(transaction) == B_OK) {
-					Attributes().SetTo(0,0,0);
+					Attributes().SetTo(0, 0, 0);
 					WriteBack(transaction);
 				} else
-					unremove_vnode(fVolume->ID(),attributes->ID());
+					unremove_vnode(fVolume->ID(), attributes->ID());
 			}
 		}
 	}
@@ -826,12 +828,12 @@ Inode::ReleaseAttribute(Inode *attribute)
 	if (attribute == NULL)
 		return;
 
-	put_vnode(fVolume->ID(),attribute->ID());
+	put_vnode(fVolume->ID(), attribute->ID());
 }
 
 
 status_t
-Inode::CreateAttribute(Transaction *transaction,const char *name,uint32 type,Inode **attribute)
+Inode::CreateAttribute(Transaction *transaction, const char *name, uint32 type, Inode **attribute)
 {
 	// do we need to create the attribute directory first?
 	if (Attributes().IsZero()) {
@@ -839,7 +841,7 @@ Inode::CreateAttribute(Transaction *transaction,const char *name,uint32 type,Ino
 		if (status < B_OK)
 			RETURN_ERROR(status);
 	}
-	Vnode vnode(fVolume,Attributes());
+	Vnode vnode(fVolume, Attributes());
 	Inode *attributes;
 	if (vnode.Get(&attributes) < B_OK)
 		return B_ERROR;
@@ -900,11 +902,11 @@ Inode::IsEmpty()
 	char name[BPLUSTREE_MAX_KEY_LENGTH];
 	uint16 length;
 	vnode_id id;
-	while (iterator.GetNextEntry(name,&length,B_FILE_NAME_LENGTH,&id) == B_OK) {
+	while (iterator.GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id) == B_OK) {
 		if (Mode() & (S_ATTR_DIR | S_INDEX_DIR))
 			return false;
 
-		if (++count > 2 || strcmp(".",name) && strcmp("..",name))
+		if (++count > 2 || strcmp(".", name) && strcmp("..", name))
 			return false;
 	}
 	return true;
@@ -944,7 +946,7 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 
 status_t 
-Inode::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_length)
+Inode::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer, size_t *_length)
 {
 	// call the right WriteAt() method, depending on the inode flags
 
@@ -1192,7 +1194,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 					if ((runs = (block_run *)cached.SetTo(block + i)) == NULL)
 						return B_IO_ERROR;
 
-					for (free = 0;free < numberOfRuns;free++)
+					for (free = 0; free < numberOfRuns; free++)
 						if (runs[free].IsZero())
 							break;
 
@@ -1370,7 +1372,8 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 
 
 status_t
-Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,off_t size,off_t offset,off_t &max)
+Inode::FreeStaticStreamArray(Transaction *transaction, int32 level, block_run run,
+	off_t size, off_t offset, off_t &max)
 {
 	int32 indirectSize;
 	if (level == 0)
@@ -1394,12 +1397,12 @@ Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,
 	// set the file offset to the current block run
 	offset += (off_t)index * indirectSize;
 
-	for (int32 i = index / runsPerBlock;i < run.length;i++) {
+	for (int32 i = index / runsPerBlock; i < run.length; i++) {
 		block_run *array = (block_run *)cached.SetTo(blockNumber + i);
 		if (array == NULL)
 			RETURN_ERROR(B_ERROR);
 
-		for (index = index % runsPerBlock;index < runsPerBlock;index++) {
+		for (index = index % runsPerBlock; index < runsPerBlock; index++) {
 			if (array[index].IsZero()) {
 				// we also want to break out of the outer loop
 				i = run.length;
@@ -1408,9 +1411,9 @@ Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,
 
 			status_t status = B_OK;
 			if (level == 0)
-				status = FreeStaticStreamArray(transaction,1,array[index],size,offset,max);
+				status = FreeStaticStreamArray(transaction, 1, array[index], size, offset, max);
 			else if (offset >= size)
-				status = fVolume->Free(transaction,array[index]);
+				status = fVolume->Free(transaction, array[index]);
 			else
 				max = offset + indirectSize;
 
@@ -1418,7 +1421,7 @@ Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,
 				RETURN_ERROR(status);
 
 			if (offset >= size)
-				array[index].SetTo(0,0,0);
+				array[index].SetTo(0, 0, 0);
 
 			offset += indirectSize;
 		}
@@ -1438,11 +1441,12 @@ Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,
  */
 
 status_t
-Inode::FreeStreamArray(Transaction *transaction,block_run *array,uint32 arrayLength,off_t size,off_t &offset,off_t &max)
+Inode::FreeStreamArray(Transaction *transaction, block_run *array, uint32 arrayLength,
+	off_t size, off_t &offset, off_t &max)
 {
 	off_t newOffset = offset;
 	uint32 i = 0;
-	for (;i < arrayLength;i++,offset = newOffset) {
+	for (; i < arrayLength; i++, offset = newOffset) {
 		if (array[i].IsZero())
 			break;
 
@@ -1466,13 +1470,13 @@ Inode::FreeStreamArray(Transaction *transaction,block_run *array,uint32 arrayLen
 			max = offset + ((off_t)array[i].length << fVolume->BlockShift());
 		} else {
 			// free the whole block_run
-			array[i].SetTo(0,0,0);
-			
+			array[i].SetTo(0, 0, 0);
+
 			if (max > offset)
 				max = offset;
 		}
 
-		if (fVolume->Free(transaction,run) < B_OK)
+		if (fVolume->Free(transaction, run) < B_OK)
 			return B_IO_ERROR;
 	}
 	return B_OK;
@@ -1485,11 +1489,12 @@ Inode::ShrinkStream(Transaction *transaction, off_t size)
 	data_stream *data = &Node()->data;
 
 	if (data->max_double_indirect_range > size) {
-		FreeStaticStreamArray(transaction,0,data->double_indirect,size,data->max_indirect_range,data->max_double_indirect_range);
-		
+		FreeStaticStreamArray(transaction, 0, data->double_indirect, size,
+			data->max_indirect_range, data->max_double_indirect_range);
+
 		if (size <= data->max_indirect_range) {
-			fVolume->Free(transaction,data->double_indirect);
-			data->double_indirect.SetTo(0,0,0);
+			fVolume->Free(transaction, data->double_indirect);
+			data->double_indirect.SetTo(0, 0, 0);
 			data->max_double_indirect_range = 0;
 		}
 	}
@@ -1498,23 +1503,25 @@ Inode::ShrinkStream(Transaction *transaction, off_t size)
 		off_t block = fVolume->ToBlock(data->indirect);
 		off_t offset = data->max_direct_range;
 
-		for (int32 i = 0;i < data->indirect.length;i++) {
+		for (int32 i = 0; i < data->indirect.length; i++) {
 			block_run *array = (block_run *)cached.SetTo(block + i);
 			if (array == NULL)
 				break;
 
-			if (FreeStreamArray(transaction,array,fVolume->BlockSize() / sizeof(block_run),size,offset,data->max_indirect_range) == B_OK)
+			if (FreeStreamArray(transaction, array, fVolume->BlockSize() / sizeof(block_run),
+					size, offset, data->max_indirect_range) == B_OK)
 				cached.WriteBack(transaction);
 		}
 		if (data->max_direct_range == data->max_indirect_range) {
-			fVolume->Free(transaction,data->indirect);
-			data->indirect.SetTo(0,0,0);
+			fVolume->Free(transaction, data->indirect);
+			data->indirect.SetTo(0, 0, 0);
 			data->max_indirect_range = 0;
 		}
 	}
 	if (data->max_direct_range > size) {
 		off_t offset = 0;
-		FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS, size, offset, data->max_direct_range);
+		FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS, size, offset,
+			data->max_direct_range);
 	}
 
 	data->size = size;
@@ -1540,15 +1547,15 @@ Inode::SetFileSize(Transaction *transaction, off_t size)
 	// should the data stream grow or shrink?
 	status_t status;
 	if (size > oldSize) {
-		status = GrowStream(transaction,size);
+		status = GrowStream(transaction, size);
 		if (status < B_OK) {
 			// if the growing of the stream fails, the whole operation
 			// fails, so we should shrink the stream to its former size
-			ShrinkStream(transaction,oldSize);
+			ShrinkStream(transaction, oldSize);
 		}
 	}
 	else
-		status = ShrinkStream(transaction,size);
+		status = ShrinkStream(transaction, size);
 
 	if (status < B_OK)
 		return status;
@@ -1558,7 +1565,7 @@ Inode::SetFileSize(Transaction *transaction, off_t size)
 
 
 status_t 
-Inode::Append(Transaction *transaction,off_t bytes)
+Inode::Append(Transaction *transaction, off_t bytes)
 {
 	return SetFileSize(transaction, Size() + bytes);
 }
@@ -1621,7 +1628,8 @@ Inode::Sync()
 		if (data->direct[i].IsZero())
 			return B_OK;
 		
-		status = flush_blocks(fVolume->Device(),fVolume->ToBlock(data->direct[i]),data->direct[i].length);
+		status = flush_blocks(fVolume->Device(), fVolume->ToBlock(data->direct[i]),
+			data->direct[i].length);
 		if (status != B_OK)
 			return status;
 	}
@@ -1635,52 +1643,53 @@ Inode::Sync()
 	off_t block = fVolume->ToBlock(data->indirect);
 	int32 count = fVolume->BlockSize() / sizeof(block_run);
 
-	for (int32 j = 0;j < data->indirect.length;j++) {
+	for (int32 j = 0; j < data->indirect.length; j++) {
 		block_run *runs = (block_run *)cached.SetTo(block + j);
 		if (runs == NULL)
 			break;
 
-		for (int32 i = 0;i < count;i++) {
+		for (int32 i = 0; i < count; i++) {
 			if (runs[i].IsZero())
 				return B_OK;
 
-			status = flush_blocks(fVolume->Device(),fVolume->ToBlock(runs[i]),runs[i].length);
+			status = flush_blocks(fVolume->Device(), fVolume->ToBlock(runs[i]), runs[i].length);
 			if (status != B_OK)
 				return status;
 		}
 	}
 
 	// flush double indirect range
-	
+
 	if (data->max_double_indirect_range == 0)
 		return B_OK;
 
 	off_t indirectBlock = fVolume->ToBlock(data->double_indirect);
 	
-	for (int32 l = 0;l < data->double_indirect.length;l++) {
+	for (int32 l = 0; l < data->double_indirect.length; l++) {
 		block_run *indirectRuns = (block_run *)cached.SetTo(indirectBlock + l);
 		if (indirectRuns == NULL)
 			return B_FILE_ERROR;
 
 		CachedBlock directCached(fVolume);
 
-		for (int32 k = 0;k < count;k++) {
+		for (int32 k = 0; k < count; k++) {
 			if (indirectRuns[k].IsZero())
 				return B_OK;
 
 			block = fVolume->ToBlock(indirectRuns[k]);			
-			for (int32 j = 0;j < indirectRuns[k].length;j++) {
+			for (int32 j = 0; j < indirectRuns[k].length; j++) {
 				block_run *runs = (block_run *)directCached.SetTo(block + j);
 				if (runs == NULL)
 					return B_FILE_ERROR;
-				
-				for (int32 i = 0;i < count;i++) {
+
+				for (int32 i = 0; i < count; i++) {
 					if (runs[i].IsZero())
 						return B_OK;
 
 					// ToDo: combine single block_runs to bigger ones when
 					// they are adjacent
-					status = flush_blocks(fVolume->Device(),fVolume->ToBlock(runs[i]),runs[i].length);
+					status = flush_blocks(fVolume->Device(), fVolume->ToBlock(runs[i]),
+						runs[i].length);
 					if (status != B_OK)
 						return status;
 				}
@@ -1893,7 +1902,8 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	if (status < B_OK)
 		RETURN_ERROR(status);		
 
-	// update the main indices (name, size & last_modified)
+	// Update the main indices (name, size & last_modified)
+	// (live queries might want to access us after this)
 
 	Index index(volume);
 	if (inode->IsRegularNode()) {
@@ -2006,7 +2016,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 		}
 
 		if (!item->IsLast(fInode->Node())) {
-			strncpy(name,item->Name(),B_FILE_NAME_LENGTH);
+			strncpy(name, item->Name(), B_FILE_NAME_LENGTH);
 			*_type = item->type;
 			*_length = item->name_size;
 			*_id = (vnode_id)fCurrentSmallData;
@@ -2033,7 +2043,8 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
-		if (get_vnode(volume->ID(),volume->ToVnode(fInode->Attributes()),(void **)&fAttributes) != 0
+		if (get_vnode(volume->ID(), volume->ToVnode(fInode->Attributes()),
+				(void **)&fAttributes) != 0
 			|| fAttributes == NULL) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(vnode_id = %Ld,name = \"%s\")\n",fInode->ID(),name));
 			return B_ENTRY_NOT_FOUND;
@@ -2050,7 +2061,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 	block_run run;
 	uint16 length;
 	vnode_id id;
-	status_t status = fIterator->GetNextEntry(name,&length,B_FILE_NAME_LENGTH,&id);
+	status_t status = fIterator->GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id);
 	if (status < B_OK)
 		return status;
 
