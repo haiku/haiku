@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-5/2004
+   Rudolf Cornelissen 11/2002-6/2004
 */
 
 #define MODULE_BIT 0x00020000
@@ -528,12 +528,12 @@ status_t nv_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 	*h = !(CRTC2R(REPAINT1) & 0x80);
 	*v = !(CRTC2R(REPAINT1) & 0x40);
 
-	LOG(4,("CTRC2: fetched DPMS state:"));
-	if (display) LOG(4,("display on, "));
+	LOG(4,("CTRC2: fetched DPMS state: "));
+	if (*display) LOG(4,("display on, "));
 	else LOG(4,("display off, "));
-	if (h) LOG(4,("hsync enabled, "));
+	if (*h) LOG(4,("hsync enabled, "));
 	else LOG(4,("hsync disabled, "));
-	if (v) LOG(4,("vsync enabled\n"));
+	if (*v) LOG(4,("vsync enabled\n"));
 	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
