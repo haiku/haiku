@@ -31,6 +31,7 @@ extern "C" {
 
 #ifdef NEWOS
 
+#include <OS.h>
 #include <stdio.h>
 #include <syscalls.h>
 
@@ -41,7 +42,7 @@ status_t release_sem(sem_id id);
 
 int hoardGetThreadID (void)
 {
-  return find_thread(NULL);
+	return find_thread(NULL);
 }
 
 
@@ -74,8 +75,8 @@ int hoardGetNumProcessors (void)
   return 1;
 }
 
-static region_id heap_region = -1;
-static addr brk;
+static area_id heap_region = -1;
+static addr_t brk;
 
 int
 __heap_init()
