@@ -126,3 +126,11 @@ void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], co
 		}
 	}
 }
+
+BRect ScaleRect(BRect rect, float scale) {
+	rect.left *= scale;
+	rect.right *= scale;
+	rect.top *= scale;
+	rect.bottom *= scale;
+	return rect;
+}
