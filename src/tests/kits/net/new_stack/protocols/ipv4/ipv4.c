@@ -14,10 +14,7 @@
 
 #include "net_stack.h"
 
-typedef struct ipv4_addr { 
-        uint8 byte[4]; 
-} _PACKED ipv4_addr; 
-
+typedef uint32 ipv4_addr; 
 
 typedef struct ipv4_header {
 	uint8 	version_header_length;
@@ -46,14 +43,23 @@ static struct net_stack_module_info *g_stack = NULL;
 string_token ethernet_protocol_attr;
 static uint32 g_next_ipv4_id = 0;
 
+static void dump_ipv4_addr(ipv4_addr *addr)
+{
+	uint8 *bytes = (uint8 *) addr;
+
+	// NOTE: addr should point to a Network Byte Order'ed (aka Big Endian) IPv4 address
+	
+	dprintf("%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
+}
+	
 static void dump_ipv4_header(net_buffer *buffer)
 {
-	ipv4_header iph;
+	ipv4_header ip;
 	const char *pname;
 
-	g_stack->read_buffer(buffer, 0, &iph, sizeof(iph)); 
+	g_stack->read_buffer(buffer, 0, &ip, sizeof(ip)); 
 
-	switch(iph.protocol) {
+	switch(ip.protocol) {
 	case 1: 	pname = "ICMP"; break;
 	case 6: 	pname = "TCP"; break;
 	case 17: 	pname = "UDP"; break;
@@ -62,19 +68,22 @@ static void dump_ipv4_header(net_buffer *buffer)
 		
 	dprintf("========== Internet Protocol (IPv4) =============\n");
 
-	dprintf("Station: %d.%d.%d.%d ----> %d.%d.%d.%d\n",
-			iph.src.byte[3], iph.src.byte[2], iph.src.byte[1], iph.src.byte[0],
-			iph.dst.byte[3], iph.dst.byte[2], iph.dst.byte[1], iph.dst.byte[0]);
-	dprintf("Protocol: %d (%s)\n", iph.protocol, pname);
-	dprintf("Version:  %d\n", iph.version_header_length >> 4);
-	dprintf("Header Length (32 bit words): %d\n", iph.version_header_length & 0x0f);
+	dprintf("Station: ");
+	dump_ipv4_addr(&ip.src);
+	dprintf(" ----> ");
+	dump_ipv4_addr(&ip.dst);
+	dprintf("Protocol: %d (%s)\n", ip.protocol, pname);
+	dprintf("Version:  %d\n", ip.version_header_length >> 4);
+	dprintf("Header Length (32 bit words): %d (%d bytes)\n",
+		ip.version_header_length & 0x0f,
+		4 * (ip.version_header_length & 0x0f));
 	// TODO: dprintf("Precedence: \n");
-	dprintf("Total length: %d\n", ntohs(iph.total_length));
-	dprintf("Identification: %d\n", ntohs(iph.identification));
+	dprintf("Total length: %d\n", ntohs(ip.total_length));
+	dprintf("Identification: %d\n", ntohs(ip.identification));
 	// TODO: dprintf("Fragmentation allowed, Last fragment\n");
-	dprintf("Fragment Offset: %d\n", ntohs(iph.flags_frag_offset) & 0x1fff);
-	dprintf("Time to Live: %d second(s)\n", iph.ttl);
-	dprintf("Checksum: 0x%X (%s)\n", ntohs(iph.header_checksum), "Valid");	// TODO: check the checksum!
+	dprintf("Fragment Offset: %d\n", ntohs(ip.flags_frag_offset) & 0x1fff);
+	dprintf("Time to Live: %d second(s)\n", ip.ttl);
+	dprintf("Checksum: 0x%X (%s)\n", ntohs(ip.header_checksum), "Valid");	// TODO: check the checksum!
 }
 
 // #pragma mark -
