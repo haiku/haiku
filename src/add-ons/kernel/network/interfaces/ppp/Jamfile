@@ -7,6 +7,11 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 
+{
+	SubDirC++Flags -fno-rtti ;
+}
+
+
 R5KernelAddon ppp : kernel obos_network interfaces :
 	ppp.cpp
 	PPPManager.cpp
