@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
@@ -30,8 +30,8 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "linereader.h"
+#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -126,7 +126,7 @@ time_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-time_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+time_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_time_t *time = locale->categories[LC_TIME].time;
   int nothing = 0;
@@ -157,8 +157,7 @@ time_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (time == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_TIME"));
+	    error (0, 0, _("No definition for %s category found"), "LC_TIME");
 	  time_startup (NULL, locale, 0);
 	  time = locale->categories[LC_TIME].time;
 	  nothing = 1;
@@ -173,8 +172,7 @@ No definition for %s category found"), "LC_TIME"));
       int i;								      \
 									      \
       if (! be_quiet && ! nothing)					      \
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),	      \
-				"LC_TIME", #cat));          		      \
+	error (0, 0, _("%s: field `%s' not defined"), "LC_TIME", #cat);	      \
 									      \
       for (i = 0; i < sizeof (initval) / sizeof (initval[0]); ++i)	      \
 	time->cat[i] = initval[i];					      \
@@ -194,8 +192,7 @@ No definition for %s category found"), "LC_TIME"));
   if (time->cat == NULL)						      \
     {									      \
       if (! be_quiet && ! nothing)					      \
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),	      \
-				"LC_TIME", #cat));          		      \
+	error (0, 0, _("%s: field `%s' not defined"), "LC_TIME", #cat);	      \
 									      \
       time->cat = initval;						      \
     }
@@ -245,9 +242,10 @@ No definition for %s category found"), "LC_TIME"));
 	  if (*str != '+' && *str != '-')
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
-%s: direction flag in string %Zd in `era' field is not '+' nor '-'"),
-					"LC_TIME", idx + 1));
+		error (0, 0,
+		       _("%s: direction flag in string %Zd in `era' field"
+			 " is not '+' nor '-'"),
+		       "LC_TIME", idx + 1);
 	      /* Default arbitrarily to '+'.  */
 	      time->era_entries[idx].direction = '+';
 	    }
@@ -256,9 +254,10 @@ No definition for %s category found"), "LC_TIME"));
 	  if (*++str != ':')
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
-%s: direction flag in string %Zd in `era' field is not a single character"),
-					"LC_TIME", idx + 1));
+		error (0, 0,
+		       _("%s: direction flag in string %Zd in `era' field"
+			 " is not a single character"),
+		       "LC_TIME", idx + 1);
 	      (void) strsep (&str, ":");
 	    }
 	  else
@@ -269,17 +268,17 @@ No definition for %s category found"), "LC_TIME"));
 	  if (endp == str)
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
-%s: invalid number for offset in string %Zd in `era' field"),
-					"LC_TIME", idx + 1));
+		error (0, 0, _("%s: invalid number for offset in string %Zd in"
+			       " `era' field"),
+		       "LC_TIME", idx + 1);
 	      (void) strsep (&str, ":");
 	    }
 	  else if (*endp != ':')
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
-%s: garbage at end of offset value in string %Zd in `era' field"),
-					"LC_TIME", idx + 1));
+		error (0, 0, _("%s: garbage at end of offset value in"
+			       " string %Zd in `era' field"),
+		       "LC_TIME", idx + 1);
 	      (void) strsep (&str, ":");
 	    }
 	  else
@@ -328,18 +327,18 @@ No definition for %s category found"), "LC_TIME"));
 		{
 		invalid_start_date:
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: invalid starting date in string %Zd in `era' field"),
-					    "LC_TIME", idx + 1));
+		    error (0, 0, _("%s: invalid starting date in string %Zd in"
+				   " `era' field"),
+			   "LC_TIME", idx + 1);
 		  (void) strsep (&str, ":");
 		}
 	      else if (*endp != ':')
 		{
 		garbage_start_date:
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: garbage at end of starting date in string %Zd in `era' field "),
-					    "LC_TIME", idx + 1));
+		    error (0, 0, _("%s: garbage at end of starting date "
+				   "in string %Zd in `era' field "),
+			   "LC_TIME", idx + 1);
 		  (void) strsep (&str, ":");
 		}
 	      else
@@ -356,9 +355,9 @@ No definition for %s category found"), "LC_TIME"));
 			   && time->era_entries[idx].start_date[2] == 29
 			   && !__isleap (time->era_entries[idx].start_date[0])))
 		      && !be_quiet)
-			  WITH_CUR_LOCALE (error (0, 0, _("\
-%s: starting date is invalid in string %Zd in `era' field"),
-						  "LC_TIME", idx + 1));
+			  error (0, 0, _("%s: starting date is invalid in"
+					 " string %Zd in `era' field"),
+				 "LC_TIME", idx + 1);
 		}
 	    }
 
@@ -405,18 +404,18 @@ No definition for %s category found"), "LC_TIME"));
 		{
 		invalid_stop_date:
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: invalid stopping date in string %Zd in `era' field"),
-					    "LC_TIME", idx + 1));
+		    error (0, 0, _("%s: invalid stopping date in string %Zd in"
+				   " `era' field"),
+			   "LC_TIME", idx + 1);
 		  (void) strsep (&str, ":");
 		}
 	      else if (*endp != ':')
 		{
 		garbage_stop_date:
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: garbage at end of stopping date in string %Zd in `era' field"),
-					    "LC_TIME", idx + 1));
+		    error (0, 0, _("%s: garbage at end of stopping date "
+				   "in string %Zd in `era' field"),
+			   "LC_TIME", idx + 1);
 		  (void) strsep (&str, ":");
 		}
 	      else
@@ -433,17 +432,17 @@ No definition for %s category found"), "LC_TIME"));
 			   && time->era_entries[idx].stop_date[2] == 29
 			   && !__isleap (time->era_entries[idx].stop_date[0])))
 		      && !be_quiet)
-			  WITH_CUR_LOCALE (error (0, 0, _("\
-%s: stopping date is invalid in string %Zd in `era' field"),
-						  "LC_TIME", idx + 1));
+			  error (0, 0, _("%s: stopping date is invalid in"
+					 " string %Zd in `era' field"),
+				 "LC_TIME", idx + 1);
 		}
 	    }
 
 	  if (str == NULL || *str == '\0')
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
-%s: missing era name in string %Zd in `era' field"), "LC_TIME", idx + 1));
+		error (0, 0, _("%s: missing era name in string %Zd in `era'"
+			       " field"), "LC_TIME", idx + 1);
 	      time->era_entries[idx].name =
 		time->era_entries[idx].format = "";
 	    }
@@ -454,9 +453,9 @@ No definition for %s category found"), "LC_TIME"));
 	      if (str == NULL || *str == '\0')
 		{
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: missing era format in string %Zd in `era' field"),
-					    "LC_TIME", idx + 1));
+		    error (0, 0, _("%s: missing era format in string %Zd"
+				   " in `era' field"),
+			   "LC_TIME", idx + 1);
 		  time->era_entries[idx].name =
 		    time->era_entries[idx].format = "";
 		}
@@ -483,33 +482,33 @@ No definition for %s category found"), "LC_TIME"));
     time->week_1stday = 19971130;
 
   if (time->week_1stweek > time->week_ndays)
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("\
 %s: third operand for value of field `%s' must not be larger than %d"),
-			    "LC_TIME", "week", 7));
+	   "LC_TIME", "week", 7);
 
   if (time->first_weekday == '\0')
     /* The definition does not specify this so the default is used.  */
     time->first_weekday = 1;
   else if (time->first_weekday > time->week_ndays)
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("\
 %s: values of field `%s' must not be larger than %d"),
-			    "LC_TIME", "first_weekday", 7));
+	   "LC_TIME", "first_weekday", 7);
 
   if (time->first_workday == '\0')
     /* The definition does not specify this so the default is used.  */
     time->first_workday = 1;
   else if (time->first_workday > time->week_ndays)
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("\
 %s: values of field `%s' must not be larger than %d"),
-			    "LC_TIME", "first_workday", 7));
+	   "LC_TIME", "first_workday", 7);
 
   if (time->cal_direction == '\0')
     /* The definition does not specify this so the default is used.  */
     time->cal_direction = 1;
   else if (time->cal_direction > 3)
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("\
 %s: values for field `%s' must not be larger than %d"),
-			    "LC_TIME", "cal_direction", 3));
+	   "LC_TIME", "cal_direction", 3);
 
   /* XXX We don't perform any tests on the timezone value since this is
      simply useless, stupid $&$!@...  */
@@ -524,7 +523,7 @@ No definition for %s category found"), "LC_TIME"));
 
 
 void
-time_output (struct localedef_t *locale, const struct charmap_t *charmap,
+time_output (struct localedef_t *locale, struct charmap_t *charmap,
 	     const char *output_path)
 {
   struct locale_time_t *time = locale->categories[LC_TIME].time;
@@ -906,14 +905,14 @@ time_output (struct localedef_t *locale, const struct charmap_t *charmap,
 		  + 2 + time->num_era * 10 - 1));
   assert (last_idx  == _NL_ITEM_INDEX (_NL_NUM_LC_TIME));
 
-  write_locale_data (output_path, LC_TIME, "LC_TIME", 2 + cnt, iov);
+  write_locale_data (output_path, "LC_TIME", 2 + cnt, iov);
 }
 
 
 /* The parser for the LC_TIME section of the locale definition.  */
 void
 time_read (struct linereader *ldfile, struct localedef_t *result,
-	   const struct charmap_t *charmap, const char *repertoire_name,
+	   struct charmap_t *charmap, const char *repertoire_name,
 	   int ignore_content)
 {
   struct repertoire_t *repertoire = NULL;
@@ -932,7 +931,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, repertoire, verbose);
+      now = lr_token (ldfile, charmap, repertoire, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -958,7 +957,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ingore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -977,7 +976,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 									      \
 	  for (cnt = 0; cnt < max; ++cnt)				      \
 	    {								      \
-	      now = lr_token (ldfile, charmap, result, repertoire, verbose);  \
+	      now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	      if (now->tok == tok_eol)					      \
 		{							      \
 		  if (cnt < min)					      \
@@ -1009,7 +1008,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 		}							      \
 									      \
 	      /* Match the semicolon.  */				      \
-	      now = lr_token (ldfile, charmap, result, repertoire, verbose);  \
+	      now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	      if (now->tok != tok_semicolon && now->tok != tok_eol)	      \
 		break;							      \
 	    }								      \
@@ -1023,8 +1022,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	      								      \
 	      if (now->tok == tok_semicolon)				      \
 		{							      \
-		  now = lr_token (ldfile, charmap, result, repertoire,	      \
-				  verbose);				      \
+		  now = lr_token (ldfile, charmap, repertoire, verbose);      \
 		  if (now->tok == tok_eol)				      \
 		    lr_error (ldfile, _("extra trailing semicolon"));	      \
 		  else if (now->tok == tok_string)			      \
@@ -1060,7 +1058,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	    }
 	  do
 	    {
-	      now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	      now = lr_token (ldfile, charmap, repertoire, verbose);
 	      if (now->tok != tok_string)
 		goto err_label;
 	      if (!ignore_content && (now->val.str.startmb == NULL
@@ -1082,7 +1080,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 					 * sizeof (char *));
 		  time->wera[time->num_era++] = now->val.str.startwc;
 		}
-	      now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	      now = lr_token (ldfile, charmap, repertoire, verbose);
 	      if (now->tok != tok_eol && now->tok != tok_semicolon)
 		goto err_label;
 	    }
@@ -1099,7 +1097,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);      \
+	  now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	  if (now->tok != tok_string)					      \
 	    goto err_label;						      \
 	  else if (time->cat != NULL)					      \
@@ -1141,7 +1139,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);      \
+	  now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	  if (now->tok != tok_number)					      \
 	    goto err_label;						      \
 	  else if (time->cat != 0)					      \
@@ -1164,25 +1162,25 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;
 	    }
 
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok != tok_number)
 	    goto err_label;
 	  time->week_ndays = now->val.num;
 
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok != tok_semicolon)
 	    goto err_label;
 
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok != tok_number)
 	    goto err_label;
 	  time->week_1stday = now->val.num;
 
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok != tok_semicolon)
 	    goto err_label;
 
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok != tok_number)
 	    goto err_label;
 	  time->week_1stweek = now->val.num;
@@ -1192,7 +1190,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_TIME'.  */
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	  if (now->tok == tok_eof)
 	    break;
 	  if (now->tok == tok_eol)
@@ -1209,7 +1207,7 @@ time_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, repertoire, verbose);
+      now = lr_token (ldfile, charmap, repertoire, verbose);
       nowtok = now->tok;
     }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 1995,1996,1997,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1996, 1997, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1995.
 
@@ -21,20 +21,20 @@
 
 /* This table's entries are taken from POSIX.2 Table 2-10
    ``LC_NUMERIC Category Definition in the POSIX Locale''.  */
-const struct locale_data _nl_C_LC_NUMERIC attribute_hidden =
+const struct locale_data _nl_C_LC_NUMERIC =
 {
   _nl_C_name,
-  NULL, 0, 0,			/* no file mapped */
-  { NULL, },			/* no cached data */
+  NULL, 0, 0, /* no file mapped */
   UNDELETABLE,
   0,
+  NULL,
   6,
   {
-    { .string = "." },
-    { .string = "" },
-    { .string = "" },
-    { .word = (unsigned int) L'.' },
-    { .word = (unsigned int) L'\0' },
-    { .string = _nl_C_codeset }
+    { string: "." },
+    { string: "" },
+    { string: "" },
+    { word: (unsigned int) L'.' },
+    { word: (unsigned int) L'\0' },
+    { string: _nl_C_codeset }
   }
 };

@@ -1,5 +1,5 @@
 /* Free data allocated by a call to setlocale_r
-   Copyright (C) 1996, 1997, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -26,7 +26,7 @@
 
 
 /* Lock for protecting global data.  */
-__libc_lock_define (extern , __libc_setlocale_lock attribute_hidden)
+__libc_lock_define (extern , __libc_setlocale_lock)
 
 
 void
@@ -34,11 +34,7 @@ __freelocale (__locale_t dataset)
 {
   int cnt;
 
-  /* This static object is returned for newlocale (LC_ALL_MASK, "C").  */
-  if (dataset == &_nl_C_locobj)
-    return;
-
-  /* We modify global data (the usage counts).  */
+  /* We modify global data.  */
   __libc_lock_lock (__libc_setlocale_lock);
 
   for (cnt = 0; cnt < __LC_LAST; ++cnt)
@@ -46,10 +42,9 @@ __freelocale (__locale_t dataset)
       /* We can remove the data.  */
       _nl_remove_locale (cnt, dataset->__locales[cnt]);
 
-  /* It's done.  */
-  __libc_lock_unlock (__libc_setlocale_lock);
-
   /* Free the locale_t handle itself.  */
   free (dataset);
+
+  /* It's done.  */
+  __libc_lock_unlock (__libc_setlocale_lock);
 }
-weak_alias (__freelocale, freelocale)

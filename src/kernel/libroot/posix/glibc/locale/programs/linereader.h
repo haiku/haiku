@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996,1997,1998,1999,2000,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper, <drepper@gnu.org>.
 
@@ -33,7 +33,7 @@
 
 typedef const struct keyword_t *(*kw_hash_fct_t) (const char *, unsigned int);
 struct charset_t;
-struct localedef_t;
+
 
 struct token
 {
@@ -85,20 +85,18 @@ struct linereader
 
 /* Functions defined in linereader.c.  */
 extern struct linereader *lr_open (const char *fname, kw_hash_fct_t hf);
-extern struct linereader *lr_create (FILE *fp, const char *fname,
-				     kw_hash_fct_t hf);
+extern struct linereader *lr_create (FILE *fp, const char *fname, kw_hash_fct_t hf);
 extern int lr_eof (struct linereader *lr);
 extern void lr_close (struct linereader *lr);
 extern int lr_next (struct linereader *lr);
 extern struct token *lr_token (struct linereader *lr,
 			       const struct charmap_t *charmap,
-			       struct localedef_t *locale,
 			       const struct repertoire_t *repertoire,
 			       int verbose);
 
 
 #define lr_error(lr, fmt, args...) \
-  WITH_CUR_LOCALE (error_at_line (0, 0, lr->fname, lr->lineno, fmt, ## args))
+  error_at_line (0, 0, lr->fname, lr->lineno, fmt, ## args)
 
 
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
@@ -30,8 +30,8 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "linereader.h"
+#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -159,7 +159,7 @@ monetary_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-monetary_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+monetary_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_monetary_t *monetary
     = locale->categories[LC_MONETARY].monetary;
@@ -191,8 +191,8 @@ monetary_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (monetary == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_MONETARY"));
+	    error (0, 0, _("No definition for %s category found"),
+		   "LC_MONETARY");
 	  monetary_startup (NULL, locale, 0);
 	  monetary = locale->categories[LC_MONETARY].monetary;
 	  nothing = 1;
@@ -203,8 +203,8 @@ No definition for %s category found"), "LC_MONETARY"));
   if (monetary->cat == NULL)						      \
     {									      \
       if (! be_quiet && ! nothing)					      \
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),	      \
-				"LC_MONETARY", #cat));			      \
+	error (0, 0, _("%s: field `%s' not defined"),			      \
+	       "LC_MONETARY", #cat);					      \
       monetary->cat = initval;						      \
     }
 
@@ -221,18 +221,18 @@ No definition for %s category found"), "LC_MONETARY"));
       if (strlen (monetary->int_curr_symbol) != 4)
 	{
 	  if (! be_quiet && ! nothing)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: value of field `int_curr_symbol' has wrong length"),
-				    "LC_MONETARY"));
+		   "LC_MONETARY");
 	}
       else if (bsearch (monetary->int_curr_symbol, valid_int_curr,
 			NR_VALID_INT_CURR, sizeof (const char *),
 			(comparison_fn_t) curr_strcmp) == NULL
 	       && !be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: value of field `int_curr_symbol' does \
 not correspond to a valid name in ISO 4217"),
-				"LC_MONETARY"));
+	       "LC_MONETARY");
     }
 
   /* The decimal point must not be empty.  This is not said explicitly
@@ -241,15 +241,15 @@ not correspond to a valid name in ISO 4217"),
   if (monetary->mon_decimal_point == NULL)
     {
       if (! be_quiet && ! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_MONETARY", "mon_decimal_point"));
+	error (0, 0, _("%s: field `%s' not defined"),
+	       "LC_MONETARY", "mon_decimal_point");
       monetary->mon_decimal_point = ".";
     }
   else if (monetary->mon_decimal_point[0] == '\0' && ! be_quiet && ! nothing)
     {
-      WITH_CUR_LOCALE (error (0, 0, _("\
+      error (0, 0, _("\
 %s: value for field `%s' must not be the empty string"),
-			      "LC_MONETARY", "mon_decimal_point"));
+	     "LC_MONETARY", "mon_decimal_point");
     }
   if (monetary->mon_decimal_point_wc == L'\0')
     monetary->mon_decimal_point_wc = L'.';
@@ -257,8 +257,8 @@ not correspond to a valid name in ISO 4217"),
   if (monetary->mon_grouping_len == 0)
     {
       if (! be_quiet && ! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_MONETARY", "mon_grouping"));
+	error (0, 0, _("%s: field `%s' not defined"),
+	       "LC_MONETARY", "mon_grouping");
 
       monetary->mon_grouping = (char *) "\177";
       monetary->mon_grouping_len = 1;
@@ -269,15 +269,15 @@ not correspond to a valid name in ISO 4217"),
   if (monetary->cat == -2)						      \
     {									      \
        if (! be_quiet && ! nothing)					      \
-	 WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),	      \
-				 "LC_MONETARY", #cat));			      \
+	 error (0, 0, _("%s: field `%s' not defined"),			      \
+	        "LC_MONETARY", #cat);					      \
        monetary->cat = initval;						      \
     }									      \
   else if ((monetary->cat < min || monetary->cat > max)			      \
 	   && !be_quiet && !nothing)					      \
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("							      \
 %s: value for field `%s' must be in range %d...%d"),			      \
-			    "LC_MONETARY", #cat, min, max))
+	   "LC_MONETARY", #cat, min, max)
 
   TEST_ELEM (int_frac_digits, -128, 127, -1);
   TEST_ELEM (frac_digits, -128, 127, -1);
@@ -305,9 +305,9 @@ not correspond to a valid name in ISO 4217"),
     monetary->cat = monetary->alt;					      \
   else if ((monetary->cat < min || monetary->cat > max) && !be_quiet	      \
 	   && ! nothing)						      \
-    WITH_CUR_LOCALE (error (0, 0, _("\
+    error (0, 0, _("\
 %s: value for field `%s' must be in range %d...%d"),			      \
-			    "LC_MONETARY", #cat, min, max))
+	   "LC_MONETARY", #cat, min, max)
 
   TEST_ELEM (int_p_cs_precedes, p_cs_precedes, -1, 1);
   TEST_ELEM (int_p_sep_by_space, p_sep_by_space, -1, 2);
@@ -353,7 +353,7 @@ not correspond to a valid name in ISO 4217"),
 
 
 void
-monetary_output (struct localedef_t *locale, const struct charmap_t *charmap,
+monetary_output (struct localedef_t *locale, struct charmap_t *charmap,
 		 const char *output_path)
 {
   struct locale_monetary_t *monetary
@@ -612,7 +612,7 @@ monetary_output (struct localedef_t *locale, const struct charmap_t *charmap,
 
   assert (cnt == 3 + _NL_ITEM_INDEX (_NL_NUM_LC_MONETARY));
 
-  write_locale_data (output_path, LC_MONETARY, "LC_MONETARY",
+  write_locale_data (output_path, "LC_MONETARY",
 		     3 + _NL_ITEM_INDEX (_NL_NUM_LC_MONETARY), iov);
 }
 
@@ -627,7 +627,7 @@ curr_strcmp (const char *s1, const char **s2)
 /* The parser for the LC_MONETARY section of the locale definition.  */
 void
 monetary_read (struct linereader *ldfile, struct localedef_t *result,
-	       const struct charmap_t *charmap, const char *repertoire_name,
+	       struct charmap_t *charmap, const char *repertoire_name,
 	       int ignore_content)
 {
   struct repertoire_t *repertoire = NULL;
@@ -644,7 +644,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -670,7 +670,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ignore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -687,7 +687,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);	      \
+	  now = lr_token (ldfile, charmap, NULL, verbose);		      \
 	  if (now->tok != tok_string)					      \
 	    goto err_label;						      \
 	  else if (monetary->cat != NULL)				      \
@@ -722,7 +722,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	    }								      \
 									      \
 	  ldfile->return_widestr = 1;					      \
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);      \
+	  now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	  if (now->tok != tok_string)					      \
 	    goto err_label;						      \
 	  if (monetary->cat != NULL)					      \
@@ -763,7 +763,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);	      \
+	  now = lr_token (ldfile, charmap, NULL, verbose);		      \
 	  if (now->tok != tok_minus1 && now->tok != tok_number)		      \
 	    goto err_label;						      \
 	  else if (monetary->cat != -2)					      \
@@ -815,7 +815,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;
 	    }
 
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok != tok_minus1 && now->tok != tok_number)
 	    goto err_label;
 	  else
@@ -863,11 +863,11 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 		    grouping[act++] = now->val.num;
 
 		  /* Next must be semicolon.  */
-		  now = lr_token (ldfile, charmap, result, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		  if (now->tok != tok_semicolon)
 		    break;
 
-		  now = lr_token (ldfile, charmap, result, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		}
 	      while (now->tok == tok_minus1 || now->tok == tok_number);
 
@@ -893,7 +893,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;
 	    }
 
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok != tok_number)
 	    goto err_label;
 	  if (now->val.num == 0)
@@ -910,11 +910,11 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	  if (!ignore_content)
 	    monetary->conversion_rate[0] = now->val.num;
 	  /* Next must be a semicolon.  */
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok != tok_semicolon)
 	    goto err_label;
 	  /* And another number.  */
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok != tok_number)
 	    goto err_label;
 	  if (now->val.num == 0)
@@ -927,7 +927,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_MONETARY'.  */
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok == tok_eof)
 	    break;
 	  if (now->tok == tok_eol)
@@ -944,7 +944,7 @@ monetary_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 

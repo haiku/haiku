@@ -1,5 +1,5 @@
 /* Define current locale data for LC_CTYPE category.
-   Copyright (C) 1995-1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -25,62 +25,29 @@
 _NL_CURRENT_DEFINE (LC_CTYPE);
 
 /* We are called after loading LC_CTYPE data to load it into
-   the variables used by the ctype.h macros.  */
+   the variables used by the ctype.h macros.
 
-
+   There are three arrays of short ints which need to be indexable
+   from -128 to 255 inclusive.  Stored in the locale data file are
+   a copy of each for each byte order.  */
 
 void
 _nl_postload_ctype (void)
 {
+#define paste(a,b) paste1(a,b)
+#define paste1(a,b) a##b
+
 #define current(type,x,offset) \
-  ((const type *) _NL_CURRENT (LC_CTYPE, _NL_CTYPE_##x) + offset)
-
-/* These are defined in ctype-info.c.
-   The declarations here must match those in localeinfo.h.
-
-   These point into arrays of 384, so they can be indexed by any `unsigned
-   char' value [0,255]; by EOF (-1); or by any `signed char' value
-   [-128,-1).  ISO C requires that the ctype functions work for `unsigned
-   char' values and for EOF; we also support negative `signed char' values
-   for broken old programs.  The case conversion arrays are of `int's
-   rather than `unsigned char's because tolower (EOF) must be EOF, which
-   doesn't fit into an `unsigned char'.  But today more important is that
-   the arrays are also used for multi-byte character sets.  */
-
-  if (_NL_CURRENT_LOCALE == &_nl_global_locale)
-    {
-      __libc_tsd_set (CTYPE_B, (void *) current (uint16_t, CLASS, 128));
-      __libc_tsd_set (CTYPE_TOUPPER, (void *) current (int32_t, TOUPPER, 128));
-      __libc_tsd_set (CTYPE_TOLOWER, (void *) current (int32_t, TOLOWER, 128));
-    }
-
-#include <shlib-compat.h>
-#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_3)
-  /* We must use the exported names to access these so we are sure to
-     be accessing the main executable's copy if it has COPY relocs.  */
-
-  extern __const unsigned short int *__ctype_b; /* Characteristics.  */
-  extern __const __int32_t *__ctype_tolower; /* Case conversions.  */
-  extern __const __int32_t *__ctype_toupper; /* Case conversions.  */
+  ((const type *) _NL_CURRENT (LC_CTYPE, paste(_NL_CTYPE_,x)) + offset)
 
   extern const uint32_t *__ctype32_b;
   extern const uint32_t *__ctype32_toupper;
   extern const uint32_t *__ctype32_tolower;
+  extern const char *__ctype32_wctype[12];
+  extern const char *__ctype32_wctrans[2];
+  extern const char *__ctype32_width;
 
-  /* We need the .symver declarations these macros generate so that
-     our references are explicitly bound to the versioned symbol names
-     rather than the unadorned names that are not exported.  When the
-     linker sees these bound to local symbols (as the unexported names are)
-     then it doesn't generate a proper relocation to the global symbols.
-     We need those relocations so that a versioned definition with a COPY
-     reloc in an executable will override the libc.so definition.  */
-
-compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
-compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
-compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
-compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
-compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
-compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
+  size_t offset, cnt;
 
   __ctype_b = current (uint16_t, CLASS, 128);
   __ctype_toupper = current (uint32_t, TOUPPER, 128);
@@ -88,5 +55,14 @@ compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
   __ctype32_b = current (uint32_t, CLASS32, 0);
   __ctype32_toupper = current (uint32_t, TOUPPER32, 0);
   __ctype32_tolower = current (uint32_t, TOLOWER32, 0);
-#endif
+
+  offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_CLASS_OFFSET);
+  for (cnt = 0; cnt < 12; cnt++)
+    __ctype32_wctype[cnt] = _nl_current_LC_CTYPE->values[offset + cnt].string;
+
+  offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_MAP_OFFSET);
+  for (cnt = 0; cnt < 2; cnt++)
+    __ctype32_wctrans[cnt] = _nl_current_LC_CTYPE->values[offset + cnt].string;
+
+  __ctype32_width = current (char, WIDTH, 0);
 }

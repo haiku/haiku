@@ -29,7 +29,7 @@ __localeconv (void)
   result.decimal_point = (char *) _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
   result.thousands_sep = (char *) _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
   result.grouping = (char *) _NL_CURRENT (LC_NUMERIC, GROUPING);
-  if (*result.grouping == CHAR_MAX || *result.grouping == (char) -1)
+  if (*result.grouping == CHAR_MAX || *result.grouping == -1)
     result.grouping = (char *) "";
 
   result.int_curr_symbol = (char *) _NL_CURRENT (LC_MONETARY, INT_CURR_SYMBOL);
@@ -39,7 +39,7 @@ __localeconv (void)
   result.mon_thousands_sep = (char *) _NL_CURRENT (LC_MONETARY,
 						   MON_THOUSANDS_SEP);
   result.mon_grouping = (char *) _NL_CURRENT (LC_MONETARY, MON_GROUPING);
-  if (*result.mon_grouping == CHAR_MAX || *result.mon_grouping == (char) -1)
+  if (*result.mon_grouping == CHAR_MAX || *result.mon_grouping == -1)
     result.mon_grouping = (char *) "";
   result.positive_sign = (char *) _NL_CURRENT (LC_MONETARY, POSITIVE_SIGN);
   result.negative_sign = (char *) _NL_CURRENT (LC_MONETARY, NEGATIVE_SIGN);

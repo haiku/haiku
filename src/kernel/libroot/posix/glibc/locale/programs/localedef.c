@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-2002, 2003 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1995.
 
@@ -27,16 +27,14 @@
 #include <libintl.h>
 #include <locale.h>
 #include <mcheck.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <error.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-#include "localedef.h"
+#include "error.h"
 #include "charmap.h"
 #include "locfile.h"
 
@@ -57,8 +55,7 @@ int verbose;
 /* If not zero suppress warnings and information messages.  */
 int be_quiet;
 
-/* If not zero, produce old-style hash table instead of 3-level access
-   tables.  */
+/* If not zero, produce old-style hash table instead of 3-level access tables.  */
 int oldstyle_tables;
 
 /* If not zero force output even if warning were issued.  */
@@ -76,44 +73,18 @@ static const char *input_file;
 /* Name of the repertoire map file.  */
 const char *repertoire_global;
 
-/* Name of the locale.alias file.  */
-const char *alias_file;
-
 /* List of all locales.  */
 static struct localedef_t *locales;
-
-/* If true don't add locale data to archive.  */
-bool no_archive;
-
-/* If true add named locales to archive.  */
-static bool add_to_archive;
-
-/* If true delete named locales from archive.  */
-static bool delete_from_archive;
-
-/* If true replace archive content when adding.  */
-static bool replace_archive;
-
-/* If true list archive content.  */
-static bool list_archive;
-
-/* Maximum number of retries when opening the locale archive.  */
-int max_locarchive_open_retry = 10;
 
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
 void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
 
-#define OPT_POSIX 301
-#define OPT_QUIET 302
-#define OPT_OLDSTYLE 303
-#define OPT_PREFIX 304
-#define OPT_NO_ARCHIVE 305
-#define OPT_ADD_TO_ARCHIVE 306
-#define OPT_REPLACE 307
-#define OPT_DELETE_FROM_ARCHIVE 308
-#define OPT_LIST_ARCHIVE 309
+#define OPT_POSIX 1
+#define OPT_QUIET 2
+#define OPT_OLDSTYLE 3
+#define OPT_PREFIX 4
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
@@ -134,17 +105,6 @@ static const struct argp_option options[] =
   { "quiet", OPT_QUIET, NULL, 0,
     N_("Suppress warnings and information messages") },
   { "verbose", 'v', NULL, 0, N_("Print more messages") },
-  { NULL, 0, NULL, 0, N_("Archive control:") },
-  { "no-archive", OPT_NO_ARCHIVE, NULL, 0,
-    N_("Don't add new data to archive") },
-  { "add-to-archive", OPT_ADD_TO_ARCHIVE, NULL, 0,
-    N_("Add locales named by parameters to archive") },
-  { "replace", OPT_REPLACE, NULL, 0, N_("Replace existing archive content") },
-  { "delete-from-archive", OPT_DELETE_FROM_ARCHIVE, NULL, 0,
-    N_("Remove locales named by parameters from archive") },
-  { "list-archive", OPT_LIST_ARCHIVE, NULL, 0, N_("List content of archive") },
-  { "alias-file", 'A', "FILE", 0,
-    N_("locale.alias file to consult when making archive")},
   { NULL, 0, NULL, 0, NULL }
 };
 
@@ -152,10 +112,7 @@ static const struct argp_option options[] =
 static const char doc[] = N_("Compile locale specification");
 
 /* Strings for arguments in help texts.  */
-static const char args_doc[] = N_("\
-NAME\n\
-[--add-to-archive|--delete-from-archive] FILE...\n\
---list-archive [FILE]");
+static const char args_doc[] = N_("NAME");
 
 /* Prototype for option handler.  */
 static error_t parse_opt (int key, char *arg, struct argp_state *state);
@@ -205,15 +162,6 @@ main (int argc, char *argv[])
   argp_err_exit_status = 4;
   argp_parse (&argp, argc, argv, 0, &remaining, NULL);
 
-  /* Handle a few special cases.  */
-  if (list_archive)
-    show_archive_content (verbose);
-  if (add_to_archive)
-    return add_locales_to_archive (argc - remaining, &argv[remaining],
-				   replace_archive);
-  if (delete_from_archive)
-    return delete_locales_from_archive (argc - remaining, &argv[remaining]);
-
   /* POSIX.2 requires to be verbose about missing characters in the
      character map.  */
   verbose |= posix_conformance;
@@ -229,8 +177,6 @@ main (int argc, char *argv[])
   /* The parameter describes the output path of the constructed files.
      If the described files cannot be written return a NULL pointer.  */
   output_path  = construct_output_path (argv[remaining]);
-  if (output_path == NULL && ! no_archive)
-    error (4, errno, _("cannot create directory for output files"));
   cannot_write_why = errno;
 
   /* Now that the parameters are processed we have to reset the local
@@ -241,8 +187,7 @@ main (int argc, char *argv[])
      defines error code 3 for this situation so I think it must be
      a fatal error (see P1003.2 4.35.8).  */
   if (sysconf (_SC_2_LOCALEDEF) < 0)
-    WITH_CUR_LOCALE (error (3, 0, _("\
-FATAL: system does not define `_POSIX2_LOCALEDEF'")));
+    error (3, 0, _("FATAL: system does not define `_POSIX2_LOCALEDEF'"));
 
   /* Process charmap file.  */
   charmap = charmap_read (charmap_file, verbose, be_quiet, 1);
@@ -255,8 +200,7 @@ FATAL: system does not define `_POSIX2_LOCALEDEF'")));
 
   /* Now read the locale file.  */
   if (locfile_read (&global, charmap) != 0)
-    WITH_CUR_LOCALE (error (4, errno, _("\
-cannot open locale definition file `%s'"), input_file));
+    error (4, errno, _("cannot open locale definition file `%s'"), input_file);
 
   /* Perhaps we saw some `copy' instructions.  */
   while (1)
@@ -271,8 +215,8 @@ cannot open locale definition file `%s'"), input_file));
 	break;
 
       if (locfile_read (runp, charmap) != 0)
-	WITH_CUR_LOCALE (error (4, errno, _("\
-cannot open locale definition file `%s'"), runp->name));
+	error (4, errno, _("cannot open locale definition file `%s'"),
+	       runp->name);
     }
 
   /* Check the categories we processed in source form.  */
@@ -283,14 +227,13 @@ cannot open locale definition file `%s'"), runp->name));
   if (error_message_count == 0 || force_output != 0)
     {
       if (cannot_write_why != 0)
-	WITH_CUR_LOCALE (error (4, cannot_write_why, _("\
-cannot write output files to `%s'"), output_path));
+	error (4, cannot_write_why, _("cannot write output files to `%s'"),
+	       output_path);
       else
-	write_all_categories (locales, charmap, argv[remaining], output_path);
+	write_all_categories (locales, charmap, output_path);
     }
   else
-    WITH_CUR_LOCALE (error (4, 0, _("\
-no output file produced because warning were issued")));
+    error (4, 0, _("no output file produced because warning were issued"));
 
   /* This exit status is prescribed by POSIX.2 4.35.7.  */
   exit (error_message_count != 0);
@@ -315,29 +258,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case OPT_PREFIX:
       output_prefix = arg;
       break;
-    case OPT_NO_ARCHIVE:
-      no_archive = true;
-      break;
-    case OPT_ADD_TO_ARCHIVE:
-      add_to_archive = true;
-      break;
-    case OPT_REPLACE:
-      replace_archive = true;
-      break;
-    case OPT_DELETE_FROM_ARCHIVE:
-      delete_from_archive = true;
-      break;
-    case OPT_LIST_ARCHIVE:
-      list_archive = true;
-      break;
     case 'c':
       force_output = 1;
       break;
     case 'f':
       charmap_file = arg;
-      break;
-    case 'A':
-      alias_file = arg;
       break;
     case 'i':
       input_file = arg;
@@ -387,7 +312,7 @@ print_version (FILE *stream, struct argp_state *state)
 Copyright (C) %s Free Software Foundation, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2003");
+"), "2002");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
@@ -449,9 +374,6 @@ construct_output_path (char *path)
 		      output_prefix ?: "", LOCALEDIR,
 		      (int) (startp - path), path, normal, endp, '\0');
 
-      if (n < 0)
-	return NULL;
-
       endp = result + n - 1;
     }
   else
@@ -461,21 +383,16 @@ construct_output_path (char *path)
       size_t len = strlen (path) + 1;
       result = xmalloc (len + 1);
       endp = mempcpy (result, path, len) - 1;
-
-      /* If the user specified an output path we cannot add the output
-	 to the archive.  */
-      no_archive = true;
     }
 
   errno = 0;
 
-  if (no_archive && euidaccess (result, W_OK) == -1)
+  if (euidaccess (result, W_OK) == -1)
     /* Perhaps the directory does not exist now.  Try to create it.  */
     if (errno == ENOENT)
       {
 	errno = 0;
-	if (mkdir (result, 0777) < 0)
-	  return NULL;
+	mkdir (result, 0777);
       }
 
   *endp++ = '/';
@@ -561,17 +478,14 @@ add_to_readlist (int locale, const char *name, const char *repertoire_name,
 	}
     }
 
-  if (generate
-      && (runp->needed & (1 << locale)) != 0
-      && (runp->avail & (1 << locale)) == 0)
-    WITH_CUR_LOCALE (error (5, 0, _("\
-circular dependencies between locale definitions")));
+  if (generate && (runp->needed & (1 << locale)) != 0)
+    error (5, 0, _("circular dependencies between locale definitions"));
 
   if (copy_locale != NULL)
     {
       if (runp->categories[locale].generic != NULL)
-	WITH_CUR_LOCALE (error (5, 0, _("\
-cannot add already read locale `%s' a second time"), name));
+	error (5, 0, _("cannot add already read locale `%s' a second time"),
+	       name);
       else
 	runp->categories[locale].generic =
 	  copy_locale->categories[locale].generic;
@@ -585,7 +499,7 @@ cannot add already read locale `%s' a second time"), name));
 
 struct localedef_t *
 find_locale (int locale, const char *name, const char *repertoire_name,
-	     const struct charmap_t *charmap)
+	     struct charmap_t *charmap)
 {
   struct localedef_t *result;
 
@@ -596,8 +510,8 @@ find_locale (int locale, const char *name, const char *repertoire_name,
 
   if ((result->avail & (1 << locale)) == 0
       && locfile_read (result, charmap) != 0)
-    WITH_CUR_LOCALE (error (4, errno, _("\
-cannot open locale definition file `%s'"), result->name));
+    error (4, errno, _("cannot open locale definition file `%s'"),
+	   result->name);
 
   return result;
 }
@@ -605,7 +519,7 @@ cannot open locale definition file `%s'"), result->name));
 
 struct localedef_t *
 load_locale (int locale, const char *name, const char *repertoire_name,
-	     const struct charmap_t *charmap, struct localedef_t *copy_locale)
+	     struct charmap_t *charmap, struct localedef_t *copy_locale)
 {
   struct localedef_t *result;
 
@@ -616,8 +530,8 @@ load_locale (int locale, const char *name, const char *repertoire_name,
 
   if ((result->avail & (1 << locale)) == 0
       && locfile_read (result, charmap) != 0)
-    WITH_CUR_LOCALE (error (4, errno, _("\
-cannot open locale definition file `%s'"), result->name));
+    error (4, errno, _("cannot open locale definition file `%s'"),
+	   result->name);
 
   return result;
 }

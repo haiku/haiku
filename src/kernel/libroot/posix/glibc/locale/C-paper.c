@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -24,17 +24,17 @@
 /* This table's entries are taken from ISO 14652, the table in section
    4.8 "LC_PAPER".  */
 
-const struct locale_data _nl_C_LC_PAPER attribute_hidden =
+const struct locale_data _nl_C_LC_PAPER =
 {
   _nl_C_name,
-  NULL, 0, 0,			/* no file mapped */
-  { NULL, },			/* no cached data */
+  NULL, 0, 0, /* no file mapped */
   UNDELETABLE,
   0,
+  NULL,
   3,
   {
-    { .word = 297 },
-    { .word = 210 },
-    { .string = _nl_C_codeset }
+    { word: 297 },
+    { word: 210 },
+    { string: _nl_C_codeset }
   }
 };

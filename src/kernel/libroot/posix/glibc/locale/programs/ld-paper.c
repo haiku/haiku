@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -28,7 +28,6 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -58,7 +57,7 @@ paper_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-paper_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+paper_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_paper_t *paper = locale->categories[LC_PAPER].paper;
   int nothing = 0;
@@ -89,8 +88,7 @@ paper_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (paper == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_PAPER"));
+	    error (0, 0, _("No definition for %s category found"), "LC_PAPER");
 	  paper_startup (NULL, locale, 0);
 	  paper = locale->categories[LC_PAPER].paper;
 	  nothing = 1;
@@ -100,8 +98,7 @@ No definition for %s category found"), "LC_PAPER"));
   if (paper->height == 0)
     {
       if (! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_PAPER", "height"));
+	error (0, 0, _("%s: field `%s' not defined"), "LC_PAPER", "height");
       /* Use as default values the values from the i18n locale.  */
       paper->height = 297;
     }
@@ -109,8 +106,7 @@ No definition for %s category found"), "LC_PAPER"));
   if (paper->width == 0)
     {
       if (! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_PAPER", "width"));
+	error (0, 0, _("%s: field `%s' not defined"), "LC_PAPER", "width");
       /* Use as default values the values from the i18n locale.  */
       paper->width = 210;
     }
@@ -118,7 +114,7 @@ No definition for %s category found"), "LC_PAPER"));
 
 
 void
-paper_output (struct localedef_t *locale, const struct charmap_t *charmap,
+paper_output (struct localedef_t *locale, struct charmap_t *charmap,
 	      const char *output_path)
 {
   struct locale_paper_t *paper = locale->categories[LC_PAPER].paper;
@@ -154,7 +150,7 @@ paper_output (struct localedef_t *locale, const struct charmap_t *charmap,
 
   assert (cnt == 2 + _NL_ITEM_INDEX (_NL_NUM_LC_PAPER));
 
-  write_locale_data (output_path, LC_PAPER, "LC_PAPER",
+  write_locale_data (output_path, "LC_PAPER",
 		     2 + _NL_ITEM_INDEX (_NL_NUM_LC_PAPER), iov);
 }
 
@@ -162,7 +158,7 @@ paper_output (struct localedef_t *locale, const struct charmap_t *charmap,
 /* The parser for the LC_PAPER section of the locale definition.  */
 void
 paper_read (struct linereader *ldfile, struct localedef_t *result,
-	    const struct charmap_t *charmap, const char *repertoire_name,
+	    struct charmap_t *charmap, const char *repertoire_name,
 	    int ignore_content)
 {
   struct locale_paper_t *paper;
@@ -175,7 +171,7 @@ paper_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -201,7 +197,7 @@ paper_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ingore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -218,7 +214,7 @@ paper_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);	      \
+	  arg = lr_token (ldfile, charmap, NULL, verbose);		      \
 	  if (arg->tok != tok_number)					      \
 	    goto err_label;						      \
 	  else if (paper->cat != 0)					      \
@@ -233,7 +229,7 @@ paper_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_PAPER'.  */
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);
+	  arg = lr_token (ldfile, charmap, NULL, verbose);
 	  if (arg->tok == tok_eof)
 	    break;
 	  if (arg->tok == tok_eol)
@@ -250,7 +246,7 @@ paper_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
@@ -37,17 +37,15 @@ extern int init_hash (hash_table *htab, unsigned long int init_size) __THROW;
 extern int delete_hash (hash_table *htab) __THROW;
 extern int insert_entry (hash_table *htab, const void *key, size_t keylen,
 			 void *data) __THROW;
-extern int find_entry (const hash_table *htab, const void *key, size_t keylen,
+extern int find_entry (hash_table *htab, const void *key, size_t keylen,
 		       void **result) __THROW;
 extern int set_entry (hash_table *htab, const void *key, size_t keylen,
 		      void *newval) __THROW;
 
-extern int iterate_table (const hash_table *htab, void **ptr,
+extern int iterate_table (hash_table *htab, void **ptr,
 			  const void **key, size_t *keylen, void **data)
      __THROW;
 
-extern unsigned long int compute_hashval (const void *key, size_t keylen)
-     __THROW;
 extern unsigned long int next_prime (unsigned long int seed) __THROW;
 
 #endif /* simple-hash.h */

@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 92, 95-99, 2000, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 92, 95-99, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,42 +27,41 @@
 
 #include "localeinfo.h"
 
-#ifdef NL_CURRENT_INDIRECT
+/* For each category declare two external variables (with weak references):
+     extern const struct locale_data *_nl_current_CATEGORY;
+   This points to the current locale's in-core data for CATEGORY.
+     extern const struct locale_data _nl_C_CATEGORY;
+   This contains the built-in "C"/"POSIX" locale's data for CATEGORY.
+   Both are weak references; if &_nl_current_CATEGORY is zero,
+   then nothing is using the locale data.  */
+#define DEFINE_CATEGORY(category, category_name, items, a) \
+extern struct locale_data *_nl_current_##category;			      \
+extern struct locale_data _nl_C_##category;
+#include "categories.def"
+#undef	DEFINE_CATEGORY
 
-/* For each category declare a special external symbol
-   _nl_current_CATEGORY_used with a weak reference.
-   This symbol will is defined in lc-CATEGORY.c and will be linked in
-   if anything uses _nl_current_CATEGORY (also defined in that module).
-   Also use a weak reference for the _nl_current_CATEGORY thread variable.  */
-
-# define DEFINE_CATEGORY(category, category_name, items, a) \
-    extern char _nl_current_##category##_used; \
-    weak_extern (_nl_current_##category##_used) \
-    weak_extern (_nl_current_##category)
-# include "categories.def"
-# undef	DEFINE_CATEGORY
-
-/* Now define a table of flags based on those special weak symbols' values.
-   _nl_current_used[CATEGORY] will be zero if _nl_current_CATEGORY is not
-   linked in.  */
-static char *const _nl_current_used[] =
+/* Array indexed by category of pointers to _nl_current_CATEGORY slots.
+   Elements are zero for categories whose data is never used.  */
+struct locale_data * *const _nl_current[] =
   {
-# define DEFINE_CATEGORY(category, category_name, items, a) \
-    [category] = &_nl_current_##category##_used,
-# include "categories.def"
-# undef	DEFINE_CATEGORY
+#define DEFINE_CATEGORY(category, category_name, items, a) \
+    [category] = &_nl_current_##category,
+#include "categories.def"
+#undef	DEFINE_CATEGORY
+    /* We need this additional element to simplify the code.  It must
+       simply be != NULL.  */
+    [LC_ALL] = (struct locale_data **) ~0ul
   };
 
-# define CATEGORY_USED(category)	(_nl_current_used[category] != 0)
-
-#else
-
-/* The shared library always loads all the categories,
-   and the current global settings are kept in _nl_global_locale.  */
-
-# define CATEGORY_USED(category)	(1)
-
-#endif
+/* Array indexed by category of pointers to _nl_C_CATEGORY slots.
+   Elements are zero for categories whose data is never used.  */
+struct locale_data *const _nl_C[] =
+  {
+#define DEFINE_CATEGORY(category, category_name, items, a) \
+    [category] = &_nl_C_##category,
+#include "categories.def"
+#undef	DEFINE_CATEGORY
+  };
 
 
 /* Define an array of category names (also the environment variable names),
@@ -86,17 +85,11 @@ const size_t _nl_category_name_sizes[] =
   };
 
 
-#ifdef NL_CURRENT_INDIRECT
-# define WEAK_POSTLOAD(postload) weak_extern (postload)
-#else
-# define WEAK_POSTLOAD(postload) /* Need strong refs in static linking.  */
-#endif
-
 /* Declare the postload functions used below.  */
 #undef	NO_POSTLOAD
 #define NO_POSTLOAD _nl_postload_ctype /* Harmless thing known to exist.  */
 #define DEFINE_CATEGORY(category, category_name, items, postload) \
-extern void postload (void); WEAK_POSTLOAD (postload)
+extern void postload (void);
 #include "categories.def"
 #undef	DEFINE_CATEGORY
 #undef	NO_POSTLOAD
@@ -112,8 +105,20 @@ static void (*const _nl_category_postload[]) (void) =
   };
 
 
+/* Name of current locale for each individual category.
+   Each is malloc'd unless it is nl_C_name.  */
+static const char *_nl_current_names[] =
+  {
+#define DEFINE_CATEGORY(category, category_name, items, a) \
+    [category] = _nl_C_name,
+#include "categories.def"
+#undef	DEFINE_CATEGORY
+    [LC_ALL] = _nl_C_name		/* For LC_ALL.  */
+  };
+
+
 /* Lock for protecting global data.  */
-__libc_lock_define_initialized (, __libc_setlocale_lock attribute_hidden)
+__libc_lock_define_initialized (, __libc_setlocale_lock)
 
 /* Defined in loadmsgcat.c.  */
 extern int _nl_msg_cat_cntr;
@@ -142,7 +147,7 @@ new_composite_name (int category, const char *newnames[__LC_LAST])
       {
 	const char *name = (category == LC_ALL ? newnames[i] :
 			    category == i ? newnames[0] :
-			    _nl_global_locale.__names[i]);
+			    _nl_current_names[i]);
 	last_len = strlen (name);
 	cumlen += _nl_category_name_sizes[i] + 1 + last_len + 1;
 	if (i > 0 && same && strcmp (name, newnames[0]) != 0)
@@ -171,7 +176,7 @@ new_composite_name (int category, const char *newnames[__LC_LAST])
 	/* Add "CATEGORY=NAME;" to the string.  */
 	const char *name = (category == LC_ALL ? newnames[i] :
 			    category == i ? newnames[0] :
-			    _nl_global_locale.__names[i]);
+			    _nl_current_names[i]);
 	p = __stpcpy (p, _nl_category_names[i]);
 	*p++ = '=';
 	p = __stpcpy (p, name);
@@ -182,30 +187,32 @@ new_composite_name (int category, const char *newnames[__LC_LAST])
 }
 
 
-/* Put NAME in _nl_global_locale.__names.  */
+/* Put NAME in _nl_current_names.  */
 static inline void
 setname (int category, const char *name)
 {
-  if (_nl_global_locale.__names[category] == name)
+  if (_nl_current_names[category] == name)
     return;
 
-  if (_nl_global_locale.__names[category] != _nl_C_name)
-    free ((char *) _nl_global_locale.__names[category]);
+  if (_nl_current_names[category] != _nl_C_name)
+    free ((char *) _nl_current_names[category]);
 
-  _nl_global_locale.__names[category] = name;
+  _nl_current_names[category] = name;
 }
+
 
 /* Put DATA in *_nl_current[CATEGORY].  */
 static inline void
 setdata (int category, struct locale_data *data)
 {
-  if (CATEGORY_USED (category))
+  if (_nl_current[category] != NULL)
     {
-      _nl_global_locale.__locales[category] = data;
+      *_nl_current[category] = data;
       if (_nl_category_postload[category])
 	(*_nl_category_postload[category]) ();
     }
 }
+
 
 char *
 setlocale (int category, const char *locale)
@@ -222,31 +229,27 @@ setlocale (int category, const char *locale)
 
   /* Does user want name of current locale?  */
   if (locale == NULL)
-    return (char *) _nl_global_locale.__names[category];
+    return (char *) _nl_current_names[category];
 
-  if (strcmp (locale, _nl_global_locale.__names[category]) == 0)
+  if (strcmp (locale, _nl_current_names[category]) == 0)
     /* Changing to the same thing.  */
-    return (char *) _nl_global_locale.__names[category];
+    return (char *) _nl_current_names[category];
 
   /* We perhaps really have to load some data.  So we determine the
      path in which to look for the data now.  The environment variable
      `LOCPATH' must only be used when the binary has no SUID or SGID
-     bit set.  If using the default path, we tell _nl_find_locale
-     by passing null and it can check the canonical locale archive.  */
+     bit set.  */
   locale_path = NULL;
   locale_path_len = 0;
 
   locpath_var = getenv ("LOCPATH");
   if (locpath_var != NULL && locpath_var[0] != '\0')
-    {
-      if (__argz_create_sep (locpath_var, ':',
-			     &locale_path, &locale_path_len) != 0)
-	return NULL;
+    if (__argz_create_sep (locpath_var, ':',
+			   &locale_path, &locale_path_len) != 0)
+      return NULL;
 
-      if (__argz_add_sep (&locale_path, &locale_path_len,
-			  _nl_default_locale_path, ':') != 0)
-	return NULL;
-    }
+  if (__argz_add_sep (&locale_path, &locale_path_len, LOCALEDIR, ':') != 0)
+    return NULL;
 
   if (category == LC_ALL)
     {
@@ -313,14 +316,7 @@ setlocale (int category, const char *locale)
 						 &newnames[category]);
 
 	    if (newdata[category] == NULL)
-	      {
-#ifdef NL_CURRENT_INDIRECT
-		if (newnames[category] == _nl_C_name)
-		  /* Null because it's the weak value of _nl_C_LC_FOO.  */
-		  continue;
-#endif
-		break;
-	      }
+	      break;
 
 	    /* We must not simply free a global locale since we have no
 	       control over the usage.  So we mark it as un-deletable.  */
@@ -330,7 +326,7 @@ setlocale (int category, const char *locale)
 	    /* Make a copy of locale name.  */
 	    if (newnames[category] != _nl_C_name)
 	      {
-		newnames[category] = __strdup (newnames[category]);
+		newnames[category] = strdup (newnames[category]);
 		if (newnames[category] == NULL)
 		  break;
 	      }
@@ -375,7 +371,7 @@ setlocale (int category, const char *locale)
       /* Protect global data.  */
       __libc_lock_lock (__libc_setlocale_lock);
 
-      if (CATEGORY_USED (category))
+      if (_nl_current[category] != NULL)
 	{
 	  /* Only actually load the data if anything will use it.  */
 	  newdata = _nl_find_locale (locale_path, locale_path_len, category,
@@ -395,7 +391,7 @@ setlocale (int category, const char *locale)
       /* Make a copy of locale name.  */
       if (newname[0] != _nl_C_name)
 	{
-	  newname[0] = __strdup (newname[0]);
+	  newname[0] = strdup (newname[0]);
 	  if (newname[0] == NULL)
 	    goto abort_single;
 	}
@@ -413,7 +409,7 @@ setlocale (int category, const char *locale)
 	}
       else
 	{
-	  if (CATEGORY_USED (category))
+	  if (_nl_current[category] != NULL)
 	    setdata (category, newdata);
 
 	  setname (category, newname[0]);
@@ -433,63 +429,44 @@ setlocale (int category, const char *locale)
       return (char *) newname[0];
     }
 }
-libc_hidden_def (setlocale)
 
-static void
-free_category (int category,
-	       struct locale_data *here, struct locale_data *c_data)
+extern struct loaded_l10nfile *_nl_locale_file_list[];
+
+static void __attribute__ ((unused))
+free_mem (void)
 {
-  struct loaded_l10nfile *runp = _nl_locale_file_list[category];
-
-  /* If this category is already "C" don't do anything.  */
-  if (here != c_data)
-    {
-      /* We have to be prepared that sometime later we still
-	 might need the locale information.  */
-      setdata (category, c_data);
-      setname (category, _nl_C_name);
-    }
-
-  while (runp != NULL)
-    {
-      struct loaded_l10nfile *curr = runp;
-      struct locale_data *data = (struct locale_data *) runp->data;
-
-      if (data != NULL && data != c_data)
-	_nl_unload_locale (data);
-      runp = runp->next;
-      free ((char *) curr->filename);
-      free (curr);
-    }
-}
-
-libc_freeres_fn (free_mem)
-{
-#ifdef NL_CURRENT_INDIRECT
-  /* We don't use the loop because we want to have individual weak
-     symbol references here.  */
-# define DEFINE_CATEGORY(category, category_name, items, a)		      \
-  if (CATEGORY_USED (category))						      \
-    {									      \
-      extern struct locale_data _nl_C_##category;			      \
-      weak_extern (_nl_C_##category)					      \
-      free_category (category, *_nl_current_##category, &_nl_C_##category);   \
-    }
-# include "categories.def"
-# undef	DEFINE_CATEGORY
-#else
   int category;
 
   for (category = 0; category < __LC_LAST; ++category)
     if (category != LC_ALL)
-      free_category (category, _NL_CURRENT_DATA (category),
-		     _nl_C_locobj.__locales[category]);
-#endif
+      {
+	struct locale_data *here = *_nl_current[category];
+	struct loaded_l10nfile *runp = _nl_locale_file_list[category];
+
+	/* If this category is already "C" don't do anything.  */
+	if (here != _nl_C[category])
+	  {
+	    /* We have to be prepared that sometime later me still
+	       might need the locale information.  */
+	    setdata (category, _nl_C[category]);
+	    setname (category, _nl_C_name);
+
+	    _nl_unload_locale (here);
+	  }
+
+	while (runp != NULL)
+	  {
+	    struct loaded_l10nfile *curr = runp;
+	    struct locale_data *data = (struct locale_data *) runp->data;
+
+	    if (data != NULL && data != here && data != _nl_C[category])
+	      _nl_unload_locale (data);
+	    runp = runp->next;
+	    free ((char *) curr->filename);
+	    free (curr);
+	  }
+      }
 
   setname (LC_ALL, _nl_C_name);
-
-  /* This frees the data structures associated with the locale archive.
-     The locales from the archive are not in the file list, so we have
-     not called _nl_unload_locale on them above.  */
-  _nl_archive_subfreeres ();
 }
+text_set_element (__libc_subfreeres, free_mem);

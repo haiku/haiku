@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -28,7 +28,6 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -60,7 +59,7 @@ telephone_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-telephone_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+telephone_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_telephone_t *telephone =
     locale->categories[LC_TELEPHONE].telephone;
@@ -92,8 +91,8 @@ telephone_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (telephone == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_TELEPHONE"));
+	    error (0, 0, _("No definition for %s category found"),
+		   "LC_TELEPHONE");
 	  telephone_startup (NULL, locale, 0);
 	  telephone = locale->categories[LC_TELEPHONE].telephone;
 	  nothing = 1;
@@ -103,8 +102,8 @@ No definition for %s category found"), "LC_TELEPHONE"));
   if (telephone->tel_int_fmt == NULL)
     {
       if (! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_TELEPHONE", "tel_int_fmt"));
+	error (0, 0, _("%s: field `%s' not defined"),
+	       "LC_TELEPHONE", "tel_int_fmt");
       /* Use as the default value the value of the i18n locale.  */
       telephone->tel_int_fmt = "+%c %a %l";
     }
@@ -115,8 +114,8 @@ No definition for %s category found"), "LC_TELEPHONE"));
       const char *cp = telephone->tel_int_fmt;
 
       if (*cp == '\0')
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' must not be empty"),
-				"LC_TELEPHONE", "tel_int_fmt"));
+	error (0, 0, _("%s: field `%s' must not be empty"),
+	       "LC_TELEPHONE", "tel_int_fmt");
       else
 	while (*cp != '\0')
 	  {
@@ -124,8 +123,9 @@ No definition for %s category found"), "LC_TELEPHONE"));
 	      {
 		if (strchr ("aAlc", *++cp) == NULL)
 		  {
-		    WITH_CUR_LOCALE (error (0, 0, _("\
-%s: invalid escape sequence in field `%s'"), "LC_TELEPHONE", "tel_int_fmt"));
+		    error (0, 0, _("\
+%s: invalid escape sequence in field `%s'"),
+			   "LC_TELEPHONE", "tel_int_fmt");
 		    break;
 		  }
 	      }
@@ -147,8 +147,8 @@ No definition for %s category found"), "LC_TELEPHONE"));
 	    {
 	      if (strchr ("aAlc", *++cp) == NULL)
 		{
-		  WITH_CUR_LOCALE (error (0, 0, _("\
-%s: invalid escape sequence in field `%s'"), "LC_TELEPHONE", "tel_dom_fmt"));
+		  error (0, 0, _("%s: invalid escape sequence in field `%s'"),
+			 "LC_TELEPHONE", "tel_dom_fmt");
 		  break;
 		}
 	    }
@@ -160,8 +160,7 @@ No definition for %s category found"), "LC_TELEPHONE"));
   if (telephone->cat == NULL)						      \
     {									      \
       if (verbose && ! nothing)						      \
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),	      \
-				"LC_TELEPHONE", #cat));     		      \
+	error (0, 0, _("%s: field `%s' not defined"), "LC_TELEPHONE", #cat);  \
       telephone->cat = "";						      \
     }
 
@@ -171,7 +170,7 @@ No definition for %s category found"), "LC_TELEPHONE"));
 
 
 void
-telephone_output (struct localedef_t *locale, const struct charmap_t *charmap,
+telephone_output (struct localedef_t *locale, struct charmap_t *charmap,
 		  const char *output_path)
 {
   struct locale_telephone_t *telephone =
@@ -218,7 +217,7 @@ telephone_output (struct localedef_t *locale, const struct charmap_t *charmap,
 
   assert (cnt == 2 + _NL_ITEM_INDEX (_NL_NUM_LC_TELEPHONE));
 
-  write_locale_data (output_path, LC_TELEPHONE, "LC_TELEPHONE",
+  write_locale_data (output_path, "LC_TELEPHONE",
 		     2 + _NL_ITEM_INDEX (_NL_NUM_LC_TELEPHONE), iov);
 }
 
@@ -226,7 +225,7 @@ telephone_output (struct localedef_t *locale, const struct charmap_t *charmap,
 /* The parser for the LC_TELEPHONE section of the locale definition.  */
 void
 telephone_read (struct linereader *ldfile, struct localedef_t *result,
-		const struct charmap_t *charmap, const char *repertoire_name,
+		struct charmap_t *charmap, const char *repertoire_name,
 		int ignore_content)
 {
   struct locale_telephone_t *telephone;
@@ -239,7 +238,7 @@ telephone_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -265,7 +264,7 @@ telephone_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ingore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -282,7 +281,7 @@ telephone_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);	      \
+	  arg = lr_token (ldfile, charmap, NULL, verbose);		      \
 	  if (arg->tok != tok_string)					      \
 	    goto err_label;						      \
 	  if (telephone->cat != NULL)					      \
@@ -305,7 +304,7 @@ telephone_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_TELEPHONE'.  */
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);
+	  arg = lr_token (ldfile, charmap, NULL, verbose);
 	  if (arg->tok == tok_eof)
 	    break;
 	  if (arg->tok == tok_eol)
@@ -322,7 +321,7 @@ telephone_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 

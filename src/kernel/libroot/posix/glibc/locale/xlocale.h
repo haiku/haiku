@@ -1,5 +1,5 @@
 /* Definition of locale datatype.
-   Copyright (C) 1997,2000,02 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -34,9 +34,6 @@ typedef struct __locale_struct
   const unsigned short int *__ctype_b;
   const int *__ctype_tolower;
   const int *__ctype_toupper;
-
-  /* Note: LC_ALL is not a valid index into this array.  */
-  const char *__names[13];
 } *__locale_t;
 
 #endif /* xlocale.h */

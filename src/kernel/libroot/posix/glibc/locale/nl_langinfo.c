@@ -1,5 +1,5 @@
 /* User interface for extracting locale-dependent parameters.
-   Copyright (C) 1995,96,97,99,2000,01,02 Free Software Foundation, Inc.
+   Copyright (C) 1995,1996,1997,1999,2000,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -47,20 +47,8 @@ nl_langinfo (item)
 
 #ifdef USE_IN_EXTENDED_LOCALE_MODEL
   data = l->__locales[category];
-#elif defined NL_CURRENT_INDIRECT
-  /* Make direct reference to every _nl_current_CATEGORY symbol,
-     since we know only at runtime which categories are used.  */
-  switch (category)
-    {
-# define DEFINE_CATEGORY(category, category_name, items, a) \
-      case category: data = *_nl_current_##category; break;
-# include "categories.def"
-# undef	DEFINE_CATEGORY
-    default:			/* Should be impossible.  */
-      return (char *) "";
-    }
 #else
-  data = _NL_CURRENT_DATA (category);
+  data = *_nl_current[category];
 #endif
 
   if (index >= data->nstrings)
@@ -70,8 +58,3 @@ nl_langinfo (item)
   /* Return the string for the specified item.  */
   return (char *) data->values[index].string;
 }
-#ifdef USE_IN_EXTENDED_LOCALE_MODEL
-weak_alias (__nl_langinfo_l, nl_langinfo_l)
-#else
-libc_hidden_def (nl_langinfo)
-#endif

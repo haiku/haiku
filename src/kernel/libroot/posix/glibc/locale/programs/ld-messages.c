@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
@@ -29,8 +29,8 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "linereader.h"
+#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -63,7 +63,7 @@ messages_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-messages_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+messages_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_messages_t *messages
     = locale->categories[LC_MESSAGES].messages;
@@ -95,8 +95,8 @@ messages_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (messages == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_MESSAGES"));
+	    error (0, 0, _("No definition for %s category found"),
+		   "LC_MESSAGES");
 	  messages_startup (NULL, locale, 0);
 	  messages = locale->categories[LC_MESSAGES].messages;
 	  nothing = 1;
@@ -112,16 +112,15 @@ No definition for %s category found"), "LC_MESSAGES"));
   if (messages->yesexpr == NULL)
     {
       if (! be_quiet && ! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' undefined"),
-				"LC_MESSAGES", "yesexpr"));
+	error (0, 0, _("%s: field `%s' undefined"), "LC_MESSAGES", "yesexpr");
       messages->yesexpr = "^[yY]";
     }
   else if (messages->yesexpr[0] == '\0')
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: value for field `%s' must not be an empty string"),
-				"LC_MESSAGES", "yesexpr"));
+	       "LC_MESSAGES", "yesexpr");
     }
   else
     {
@@ -135,9 +134,9 @@ No definition for %s category found"), "LC_MESSAGES"));
 	  char errbuf[BUFSIZ];
 
 	  (void) regerror (result, &re, errbuf, BUFSIZ);
-	  WITH_CUR_LOCALE (error (0, 0, _("\
+	  error (0, 0, _("\
 %s: no correct regular expression for field `%s': %s"),
-				  "LC_MESSAGES", "yesexpr", errbuf));
+		 "LC_MESSAGES", "yesexpr", errbuf);
 	}
       else if (result != 0)
 	regfree (&re);
@@ -146,16 +145,15 @@ No definition for %s category found"), "LC_MESSAGES"));
   if (messages->noexpr == NULL)
     {
       if (! be_quiet && ! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' undefined"),
-				"LC_MESSAGES", "noexpr"));
+	error (0, 0, _("%s: field `%s' undefined"), "LC_MESSAGES", "noexpr");
       messages->noexpr = "^[nN]";
     }
   else if (messages->noexpr[0] == '\0')
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: value for field `%s' must not be an empty string"),
-				"LC_MESSAGES", "noexpr"));
+	       "LC_MESSAGES", "noexpr");
     }
   else
     {
@@ -169,9 +167,9 @@ No definition for %s category found"), "LC_MESSAGES"));
 	  char errbuf[BUFSIZ];
 
 	  (void) regerror (result, &re, errbuf, BUFSIZ);
-	  WITH_CUR_LOCALE (error (0, 0, _("\
+	  error (0, 0, _("\
 %s: no correct regular expression for field `%s': %s"),
-				  "LC_MESSAGES", "noexpr", errbuf));
+		 "LC_MESSAGES", "noexpr", errbuf);
 	}
       else if (result != 0)
 	regfree (&re);
@@ -180,7 +178,7 @@ No definition for %s category found"), "LC_MESSAGES"));
 
 
 void
-messages_output (struct localedef_t *locale, const struct charmap_t *charmap,
+messages_output (struct localedef_t *locale, struct charmap_t *charmap,
 		 const char *output_path)
 {
   struct locale_messages_t *messages
@@ -226,7 +224,7 @@ messages_output (struct localedef_t *locale, const struct charmap_t *charmap,
 
   assert (cnt + 1 == 2 + _NL_ITEM_INDEX (_NL_NUM_LC_MESSAGES));
 
-  write_locale_data (output_path, LC_MESSAGES, "LC_MESSAGES",
+  write_locale_data (output_path, "LC_MESSAGES",
 		     2 + _NL_ITEM_INDEX (_NL_NUM_LC_MESSAGES), iov);
 }
 
@@ -234,7 +232,7 @@ messages_output (struct localedef_t *locale, const struct charmap_t *charmap,
 /* The parser for the LC_MESSAGES section of the locale definition.  */
 void
 messages_read (struct linereader *ldfile, struct localedef_t *result,
-	       const struct charmap_t *charmap, const char *repertoire_name,
+	       struct charmap_t *charmap, const char *repertoire_name,
 	       int ignore_content)
 {
   struct repertoire_t *repertoire = NULL;
@@ -252,7 +250,7 @@ messages_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -280,7 +278,7 @@ messages_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ignore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -304,7 +302,7 @@ messages_read (struct linereader *ldfile, struct localedef_t *result,
 	      lr_ignore_rest (ldfile, 0);				      \
 	      break;							      \
 	    }								      \
-	  now = lr_token (ldfile, charmap, result, repertoire, verbose);      \
+	  now = lr_token (ldfile, charmap, repertoire, verbose);	      \
 	  if (now->tok != tok_string)					      \
 	    goto syntax_error;						      \
 	  else if (!ignore_content && now->val.str.startmb == NULL)	      \
@@ -324,7 +322,7 @@ messages_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_MESSAGES'.  */
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);
+	  arg = lr_token (ldfile, charmap, NULL, verbose);
 	  if (arg->tok == tok_eof)
 	    break;
 	  if (arg->tok == tok_eol)
@@ -341,7 +339,7 @@ messages_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 

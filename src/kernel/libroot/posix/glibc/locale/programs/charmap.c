@@ -1,4 +1,4 @@
-/* Copyright (C) 1996,1998,1999,2000,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996,1998,1999,2000,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1996.
 
@@ -29,9 +29,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <error.h>
 
-#include "localedef.h"
+#include "error.h"
 #include "linereader.h"
 #include "charmap.h"
 #include "charmap-dir.h"
@@ -43,6 +42,8 @@
 /* Define the lookup function.  */
 #include "charmap-kw.h"
 
+
+extern void *xmalloc (size_t __n);
 
 /* Prototypes for local functions.  */
 static struct charmap_t *parse_charmap (struct linereader *cmfile,
@@ -116,14 +117,18 @@ charmap_read (const char *filename, int verbose, int be_quiet, int use_default)
 		      cmfile = cmlr_open (path, filename, charmap_hash);
 
 		      if (cmfile == NULL)
-			/* Try without the "/charmaps" part.  */
-			cmfile = cmlr_open (next, filename, charmap_hash);
+			{
+			  /* Try without the "/charmaps" part.  */
+			  cmfile = cmlr_open (next, filename, charmap_hash);
+			}
 		    }
 		}
 
 	      if (cmfile == NULL)
-		/* Try the default directory.  */
-		cmfile = cmlr_open (CHARMAP_PATH, filename, charmap_hash);
+		{
+		  /* Try the default directory.  */
+		  cmfile = cmlr_open (CHARMAP_PATH, filename, charmap_hash);
+		}
 	    }
 	}
 
@@ -132,8 +137,7 @@ charmap_read (const char *filename, int verbose, int be_quiet, int use_default)
 	  result = parse_charmap (cmfile, verbose, be_quiet);
 
 	  if (result == NULL && !be_quiet)
-	    WITH_CUR_LOCALE (error (0, errno, _("\
-character map file `%s' not found"), filename));
+	    error (0, errno, _("character map file `%s' not found"), filename);
 	}
     }
 
@@ -190,14 +194,9 @@ character map file `%s' not found"), filename));
 	result = parse_charmap (cmfile, verbose, be_quiet);
 
       if (result == NULL)
-	WITH_CUR_LOCALE (error (4, errno, _("\
-default character map file `%s' not found"), DEFAULT_CHARMAP));
+	error (4, errno, _("default character map file `%s' not found"),
+	       DEFAULT_CHARMAP);
     }
-
-  if (result != NULL && result->code_set_name == NULL)
-    /* The input file does not specify a code set name.  This
-       shouldn't happen but we should cope with it.  */
-    result->code_set_name = basename (filename);
 
   /* Test of ASCII compatibility of locale encoding.
 
@@ -244,17 +243,17 @@ default character map file `%s' not found"), DEFAULT_CHARMAP));
 
       do
 	{
-	  struct charseq *seq = charmap_find_symbol (result, p, 1);
+	  struct charseq * seq = charmap_find_symbol (result, p, 1);
 
-	  if (seq == NULL || seq->ucs4 != (uint32_t) *p)
+	  if (seq == NULL || seq->ucs4 != *p)
 	    failed = 1;
 	}
       while (*p++ != '\0');
 
       if (failed)
-	WITH_CUR_LOCALE (fprintf (stderr, _("\
+	fprintf (stderr, _("\
 character map `%s' is not ASCII compatible, locale not ISO C compliant\n"),
-				  result->code_set_name));
+		 result->code_set_name);
     }
 
   return result;
@@ -299,7 +298,7 @@ parse_charmap (struct linereader *cmfile, int verbose, int be_quiet)
   while (1)
     {
       /* What's on?  */
-      struct token *now = lr_token (cmfile, NULL, NULL, NULL, verbose);
+      struct token *now = lr_token (cmfile, NULL, NULL, verbose);
       enum token_t nowtok = now->tok;
       struct token *arg;
 
@@ -329,9 +328,9 @@ parse_charmap (struct linereader *cmfile, int verbose, int be_quiet)
 	      if (result->mb_cur_min > result->mb_cur_max)
 		{
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
+		    error (0, 0, _("\
 %s: <mb_cur_max> must be greater than <mb_cur_min>\n"),
-					    cmfile->fname));
+			   cmfile->fname);
 
 		  result->mb_cur_min = result->mb_cur_max;
 		}
@@ -357,7 +356,7 @@ parse_charmap (struct linereader *cmfile, int verbose, int be_quiet)
 	    }
 
 	  /* We know that we need an argument.  */
-	  arg = lr_token (cmfile, NULL, NULL, NULL, verbose);
+	  arg = lr_token (cmfile, NULL, NULL, verbose);
 
 	  switch (nowtok)
 	    {
@@ -834,16 +833,14 @@ only WIDTH definitions are allowed to follow the CHARMAP definition"));
 	  continue;
 
 	default:
-	  WITH_CUR_LOCALE (error (5, 0, _("%s: error in state machine"),
-				  __FILE__));
+	  error (5, 0, _("%s: error in state machine"), __FILE__);
 	  /* NOTREACHED */
 	}
       break;
     }
 
   if (state != 91 && !be_quiet)
-    WITH_CUR_LOCALE (error (0, 0, _("%s: premature end of file"),
-			    cmfile->fname));
+    error (0, 0, _("%s: premature end of file"), cmfile->fname);
 
   lr_close (cmfile);
 
@@ -873,16 +870,6 @@ new_width (struct linereader *cmfile, struct charmap_t *result,
       if (to_val == NULL)
 	{
 	  lr_error (cmfile, _("unknown character `%s'"), to);
-	  return;
-	}
-
-      /* Make sure the number of bytes for the end points of the range
-	 is correct.  */
-      if (from_val->nbytes != to_val->nbytes)
-	{
-	  lr_error (cmfile, _("\
-number of bytes for byte sequence of beginning and end of range not the same: %d vs %d"),
-		    from_val->nbytes, to_val->nbytes);
 	  return;
 	}
     }
@@ -962,7 +949,7 @@ charmap_new_char (struct linereader *lr, struct charmap_t *cm,
 	  errno = 0;
 	  newp->ucs4 = strtoul (from + 1, &endp, 16);
 	  if (endp - from != len1
-	      || (newp->ucs4 == ~((uint32_t) 0) && errno == ERANGE)
+	      || (newp->ucs4 == ULONG_MAX && errno == ERANGE)
 	      || newp->ucs4 >= 0x80000000)
 	    /* This wasn't successful.  Signal this name cannot be a
 	       correct UCS value.  */
@@ -1008,9 +995,9 @@ hexadecimal range format should use only capital characters"));
 
   errno = 0;
   from_nr = strtoul (&from[prefix_len], &from_end, decimal_ellipsis ? 10 : 16);
-  if (*from_end != '\0' || (from_nr == UINT_MAX && errno == ERANGE)
+  if (*from_end != '\0' || (from_nr == ULONG_MAX && errno == ERANGE)
       || ((to_nr = strtoul (&to[prefix_len], &to_end,
-			    decimal_ellipsis ? 10 : 16)) == UINT_MAX
+			    decimal_ellipsis ? 10 : 16)) == ULONG_MAX
 	  && errno == ERANGE)
       || *to_end != '\0')
     {
@@ -1057,7 +1044,7 @@ hexadecimal range format should use only capital characters"));
 	  errno = 0;
 	  newp->ucs4 = strtoul (name_end + 1, &endp, 16);
 	  if (endp - name_end != len1
-	      || (newp->ucs4 == ~((uint32_t) 0) && errno == ERANGE)
+	      || (newp->ucs4 == ULONG_MAX && errno == ERANGE)
 	      || newp->ucs4 >= 0x80000000)
 	    /* This wasn't successful.  Signal this name cannot be a
 	       correct UCS value.  */

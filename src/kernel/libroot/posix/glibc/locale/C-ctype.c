@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1995.
 
@@ -30,7 +30,7 @@
    In the `_nl_C_LC_CTYPE_class' array the value for EOF (== -1)
    is set to always return 0 and the conversion arrays return EOF.  */
 
-const char _nl_C_LC_CTYPE_class[768] attribute_hidden =
+const char _nl_C_LC_CTYPE_class[768] =
   /* 0x80 */ "\000\000" "\000\000" "\000\000" "\000\000" "\000\000" "\000\000"
   /* 0x86 */ "\000\000" "\000\000" "\000\000" "\000\000" "\000\000" "\000\000"
   /* 0x8c */ "\000\000" "\000\000" "\000\000" "\000\000" "\000\000" "\000\000"
@@ -96,7 +96,7 @@ const char _nl_C_LC_CTYPE_class[768] attribute_hidden =
   /* 0xf4 */ "\000\000" "\000\000" "\000\000" "\000\000" "\000\000" "\000\000"
   /* 0xfa */ "\000\000" "\000\000" "\000\000" "\000\000" "\000\000" "\000\000"
 ;
-const char _nl_C_LC_CTYPE_class32[1024] attribute_hidden =
+const char _nl_C_LC_CTYPE_class32[1024] =
   /* 0x00 */ "\000\000\002\000" "\000\000\002\000" "\000\000\002\000"
   /* 0x03 */ "\000\000\002\000" "\000\000\002\000" "\000\000\002\000"
   /* 0x06 */ "\000\000\002\000" "\000\000\002\000" "\000\000\002\000"
@@ -184,7 +184,7 @@ const char _nl_C_LC_CTYPE_class32[1024] attribute_hidden =
   /* 0xfc */ "\000\000\000\000" "\000\000\000\000" "\000\000\000\000"
   /* 0xff */ "\000\000\000\000"
 ;
-const uint32_t _nl_C_LC_CTYPE_toupper[384] attribute_hidden =
+const uint32_t _nl_C_LC_CTYPE_toupper[384] =
 {
   /* 0x80 */ 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
   /* 0x88 */ 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
@@ -235,7 +235,7 @@ const uint32_t _nl_C_LC_CTYPE_toupper[384] attribute_hidden =
   /* 0xf0 */ 0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
   /* 0xf8 */ 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
-const uint32_t _nl_C_LC_CTYPE_tolower[384] attribute_hidden =
+const uint32_t _nl_C_LC_CTYPE_tolower[384] =
 {
   /* 0x80 */ 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
   /* 0x88 */ 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
@@ -297,7 +297,7 @@ const uint32_t _nl_C_LC_CTYPE_tolower[384] attribute_hidden =
       uint32_t level3[1 << p];                                                \
     }
 
-const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_upper attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_upper =
 {
   { 0x00000000, 0x00000000, 0x07fffffe, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -310,7 +310,7 @@ const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_upper attribute_hidden =
   /* 3rd-level table */
   { 0x07fffffe, 0x00000000 }
 };
-const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_lower attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_lower =
 {
   { 0x00000000, 0x00000000, 0x00000000, 0x07fffffe,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -323,7 +323,7 @@ const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_lower attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0x07fffffe }
 };
-const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_alpha attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_alpha =
 {
   { 0x00000000, 0x00000000, 0x07fffffe, 0x07fffffe,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -336,7 +336,7 @@ const STRUCT_CTYPE_CLASS(1, 1) _nl_C_LC_CTYPE_class_alpha attribute_hidden =
   /* 3rd-level table */
   { 0x07fffffe, 0x07fffffe }
 };
-const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_digit attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_digit =
 {
   { 0x00000000, 0x03ff0000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -349,7 +349,7 @@ const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_digit attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0x03ff0000 }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_xdigit attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_xdigit =
 {
   { 0x00000000, 0x03ff0000, 0x0000007e, 0x0000007e,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -362,7 +362,7 @@ const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_xdigit attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0x03ff0000, 0x0000007e, 0x0000007e }
 };
-const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_space attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_space =
 {
   { 0x00003e00, 0x00000001, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -375,7 +375,7 @@ const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_space attribute_hidden =
   /* 3rd-level table */
   { 0x00003e00, 0x00000001 }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_print attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_print =
 {
   { 0x00000000, 0xffffffff, 0xffffffff, 0x7fffffff,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -388,7 +388,7 @@ const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_print attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0xffffffff, 0xffffffff, 0x7fffffff }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_graph attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_graph =
 {
   { 0x00000000, 0xfffffffe, 0xffffffff, 0x7fffffff,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -401,7 +401,7 @@ const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_graph attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0xfffffffe, 0xffffffff, 0x7fffffff }
 };
-const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_blank attribute_hidden =
+const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_blank =
 {
   { 0x00000200, 0x00000001, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -414,7 +414,7 @@ const STRUCT_CTYPE_CLASS(1, 0) _nl_C_LC_CTYPE_class_blank attribute_hidden =
   /* 3rd-level table */
   { 0x00000200, 0x00000001 }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_cntrl attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_cntrl =
 {
   { 0xffffffff, 0x00000000, 0x00000000, 0x80000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -427,7 +427,7 @@ const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_cntrl attribute_hidden =
   /* 3rd-level table */
   { 0xffffffff, 0x00000000, 0x00000000, 0x80000000 }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_punct attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_punct =
 {
   { 0x00000000, 0xfc00fffe, 0xf8000001, 0x78000001,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -440,7 +440,7 @@ const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_punct attribute_hidden =
   /* 3rd-level table */
   { 0x00000000, 0xfc00fffe, 0xf8000001, 0x78000001 }
 };
-const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_alnum attribute_hidden =
+const STRUCT_CTYPE_CLASS(2, 0) _nl_C_LC_CTYPE_class_alnum =
 {
   { 0x00000000, 0x03ff0000, 0x07fffffe, 0x07fffffe,
     0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -461,7 +461,7 @@ const struct
   uint32_t level2[4];
   int32_t level3[32];
 }
-_nl_C_LC_CTYPE_map_toupper attribute_hidden =
+_nl_C_LC_CTYPE_map_toupper =
 {
   { 7, 1, 5, 3, 31 },
   /* 1st-level table */
@@ -480,7 +480,7 @@ _nl_C_LC_CTYPE_map_toupper attribute_hidden =
     0x00000000, 0x00000000, 0x00000000, 0x00000000
   }
 },
-_nl_C_LC_CTYPE_map_tolower attribute_hidden =
+_nl_C_LC_CTYPE_map_tolower =
 {
   { 7, 1, 5, 3, 31 },
   /* 1st-level table */
@@ -507,7 +507,7 @@ const struct
   uint32_t level2[8];
   int8_t level3[33];
 }
-_nl_C_LC_CTYPE_width attribute_hidden =
+_nl_C_LC_CTYPE_width =
 {
   { 7, 1, 4, 7, 15 },
   /* 1st-level table */
@@ -538,37 +538,37 @@ _nl_C_LC_CTYPE_width attribute_hidden =
    NR_FIXED == _NL_ITEM_INDEX (_NL_CTYPE_EXTRA_MAP_1). */
 typedef int assertion1[1 - 2 * (NR_FIXED != _NL_ITEM_INDEX (_NL_CTYPE_EXTRA_MAP_1))];
 
-const struct locale_data _nl_C_LC_CTYPE attribute_hidden =
+const struct locale_data _nl_C_LC_CTYPE =
 {
   _nl_C_name,
-  NULL, 0, 0,			/* no file mapped */
-  { NULL, },			/* no cached data */
+  NULL, 0, 0,	/* no file mapped */
   UNDELETABLE,
   1,		/* Enable transliteration by default.  */
+  NULL,
   NR_FIXED + NR_CLASSES + NR_MAPS,
   {
     /* _NL_CTYPE_CLASS */
-    { .string = _nl_C_LC_CTYPE_class },
+    { string: _nl_C_LC_CTYPE_class },
     /* _NL_CTYPE_TOUPPER */
-    { .string = (const char *) _nl_C_LC_CTYPE_toupper },
+    { string: (const char *) _nl_C_LC_CTYPE_toupper },
     /* _NL_CTYPE_GAP1 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_TOLOWER */
-    { .string = (const char *) _nl_C_LC_CTYPE_tolower },
+    { string: (const char *) _nl_C_LC_CTYPE_tolower },
     /* _NL_CTYPE_GAP2 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_CLASS32 */
-    { .string = _nl_C_LC_CTYPE_class32 },
+    { string: _nl_C_LC_CTYPE_class32 },
     /* _NL_CTYPE_GAP3 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_GAP4 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_GAP5 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_GAP6 */
-    { .string = NULL },
+    { string: NULL },
     /* _NL_CTYPE_CLASS_NAMES */
-    { .string = "upper\0" "lower\0" "alpha\0" "digit\0" "xdigit\0" "space\0"
+    { string: "upper\0" "lower\0" "alpha\0" "digit\0" "xdigit\0" "space\0"
 	      "print\0" "graph\0" "blank\0" "cntrl\0" "punct\0"  "alnum\0"
 #ifdef PREDEFINED_CLASSES
 	      "left_to_right\0" "right_to_left\0" "num_terminator\0"
@@ -580,106 +580,106 @@ const struct locale_data _nl_C_LC_CTYPE attribute_hidden =
 #endif
     },
     /* _NL_CTYPE_MAP_NAMES */
-    { .string = "toupper\0" "tolower\0"
+    { string: "toupper\0" "tolower\0"
 #ifdef PREDEFINED_CLASSES
       "tosymmetric\0"
 #endif
     },
     /* _NL_CTYPE_WIDTH */
-    { .string = (const char *) _nl_C_LC_CTYPE_width.header },
+    { string: (const char *) _nl_C_LC_CTYPE_width.header },
     /* _NL_CTYPE_MB_CUR_MAX */
-    { .word = 1 },
+    { word: 1 },
     /* _NL_CTYPE_CODESET_NAME */
-    { .string = _nl_C_codeset },
+    { string: _nl_C_codeset },
     /* _NL_CTYPE_TOUPPER32 */
-    { .string = (const char *) &_nl_C_LC_CTYPE_toupper[128] },
+    { string: (const char *) &_nl_C_LC_CTYPE_toupper[128] },
     /* _NL_CTYPE_TOLOWER32 */
-    { .string = (const char *) &_nl_C_LC_CTYPE_tolower[128] },
+    { string: (const char *) &_nl_C_LC_CTYPE_tolower[128] },
     /* _NL_CTYPE_CLASS_OFFSET */
-    { .word = NR_FIXED },
+    { word: NR_FIXED },
     /* _NL_CTYPE_MAP_OFFSET */
-    { .word = NR_FIXED + NR_CLASSES },
+    { word: NR_FIXED + NR_CLASSES },
     /* _NL_CTYPE_INDIGITS_MB_LEN */
-    { .word = 1 },
+    { word: 1 },
     /* _NL_CTYPE_INDIGITS0_MB .. _NL_CTYPE_INDIGITS9_MB */
-    { .string = "0" },
-    { .string = "1" },
-    { .string = "2" },
-    { .string = "3" },
-    { .string = "4" },
-    { .string = "5" },
-    { .string = "6" },
-    { .string = "7" },
-    { .string = "8" },
-    { .string = "9" },
+    { string: "0" },
+    { string: "1" },
+    { string: "2" },
+    { string: "3" },
+    { string: "4" },
+    { string: "5" },
+    { string: "6" },
+    { string: "7" },
+    { string: "8" },
+    { string: "9" },
     /* _NL_CTYPE_INDIGITS_WC_LEN */
-    { .word = 1 },
+    { word: 1 },
     /* _NL_CTYPE_INDIGITS0_WC .. _NL_CTYPE_INDIGITS9_WC */
-    { .wstr = (uint32_t *) L"0" },
-    { .wstr = (uint32_t *) L"1" },
-    { .wstr = (uint32_t *) L"2" },
-    { .wstr = (uint32_t *) L"3" },
-    { .wstr = (uint32_t *) L"4" },
-    { .wstr = (uint32_t *) L"5" },
-    { .wstr = (uint32_t *) L"6" },
-    { .wstr = (uint32_t *) L"7" },
-    { .wstr = (uint32_t *) L"8" },
-    { .wstr = (uint32_t *) L"9" },
+    { wstr: (uint32_t *) L"0" },
+    { wstr: (uint32_t *) L"1" },
+    { wstr: (uint32_t *) L"2" },
+    { wstr: (uint32_t *) L"3" },
+    { wstr: (uint32_t *) L"4" },
+    { wstr: (uint32_t *) L"5" },
+    { wstr: (uint32_t *) L"6" },
+    { wstr: (uint32_t *) L"7" },
+    { wstr: (uint32_t *) L"8" },
+    { wstr: (uint32_t *) L"9" },
     /* _NL_CTYPE_OUTDIGIT0_MB .. _NL_CTYPE_OUTDIGIT9_MB */
-    { .string = "0" },
-    { .string = "1" },
-    { .string = "2" },
-    { .string = "3" },
-    { .string = "4" },
-    { .string = "5" },
-    { .string = "6" },
-    { .string = "7" },
-    { .string = "8" },
-    { .string = "9" },
+    { string: "0" },
+    { string: "1" },
+    { string: "2" },
+    { string: "3" },
+    { string: "4" },
+    { string: "5" },
+    { string: "6" },
+    { string: "7" },
+    { string: "8" },
+    { string: "9" },
     /* _NL_CTYPE_OUTDIGIT0_WC .. _NL_CTYPE_OUTDIGIT9_WC */
-    { .word = L'0' },
-    { .word = L'1' },
-    { .word = L'2' },
-    { .word = L'3' },
-    { .word = L'4' },
-    { .word = L'5' },
-    { .word = L'6' },
-    { .word = L'7' },
-    { .word = L'8' },
-    { .word = L'9' },
+    { word: L'0' },
+    { word: L'1' },
+    { word: L'2' },
+    { word: L'3' },
+    { word: L'4' },
+    { word: L'5' },
+    { word: L'6' },
+    { word: L'7' },
+    { word: L'8' },
+    { word: L'9' },
     /* _NL_CTYPE_TRANSLIT_TAB_SIZE */
-    { .word = NTRANSLIT },
+    { word: NTRANSLIT },
     /* _NL_CTYPE_TRANSLIT_FROM_IDX */
-    { .wstr = translit_from_idx },
+    { wstr: translit_from_idx },
     /* _NL_CTYPE_TRANSLIT_FROM_TBL */
-    { .wstr = (uint32_t *) translit_from_tbl },
+    { wstr: (uint32_t *) translit_from_tbl },
     /* _NL_CTYPE_TRANSLIT_TO_IDX */
-    { .wstr = translit_to_idx },
+    { wstr: translit_to_idx },
     /* _NL_CTYPE_TRANSLIT_TO_TBL */
-    { .wstr = (uint32_t *) translit_to_tbl },
+    { wstr: (uint32_t *) translit_to_tbl },
     /* _NL_CTYPE_TRANSLIT_DEFAULT_MISSING_LEN */
-    { .word = 1 },
+    { word: 1 },
     /* _NL_CTYPE_TRANSLIT_DEFAULT_MISSING */
-    { .wstr = (uint32_t *) L"?" },
+    { wstr: (uint32_t *) L"?" },
     /* _NL_CTYPE_TRANSLIT_IGNORE_LEN */
-    { .word = 0 },
+    { word: 0 },
     /* _NL_CTYPE_TRANSLIT_IGNORE */
-    { .wstr = NULL },
+    { wstr: NULL },
     /* NR_CLASSES wctype_tables */
-    { .string = (const char *) _nl_C_LC_CTYPE_class_upper.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_lower.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_alpha.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_digit.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_xdigit.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_space.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_print.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_graph.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_blank.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_cntrl.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_punct.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_class_alnum.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_upper.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_lower.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_alpha.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_digit.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_xdigit.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_space.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_print.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_graph.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_blank.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_cntrl.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_punct.header },
+    { string: (const char *) _nl_C_LC_CTYPE_class_alnum.header },
     /* NR_MAPS wctrans_tables */
-    { .string = (const char *) _nl_C_LC_CTYPE_map_toupper.header },
-    { .string = (const char *) _nl_C_LC_CTYPE_map_tolower.header }
+    { string: (const char *) _nl_C_LC_CTYPE_map_toupper.header },
+    { string: (const char *) _nl_C_LC_CTYPE_map_tolower.header }
   }
 };

@@ -1,5 +1,5 @@
 /* Definition of all available locale categories and their items.  -*- C -*-
-   Copyright (C) 1995-2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -247,7 +247,7 @@ DEFINE_CATEGORY
   DEFINE_ELEMENT (_DATE_FMT,                "date_fmt",            opt, string)
   DEFINE_ELEMENT (_NL_W_DATE_FMT,           "wide-date_fmt",       opt, wstring)
   DEFINE_ELEMENT (_NL_TIME_CODESET,	    "time-codeset",	   std, string)
-  ), NO_POSTLOAD)
+  ), _nl_postload_time)
 
 
 DEFINE_CATEGORY
@@ -335,7 +335,7 @@ DEFINE_CATEGORY
   DEFINE_ELEMENT (_NL_IDENTIFICATION_LANGUAGE,     "language",     std, string)
   DEFINE_ELEMENT (_NL_IDENTIFICATION_TERRITORY,    "territory",    std, string)
   DEFINE_ELEMENT (_NL_IDENTIFICATION_AUDIENCE,     "audience",     std, string)
-  DEFINE_ELEMENT (_NL_IDENTIFICATION_APPLICATION,  "application",  std, string)
+  DEFINE_ELEMENT (_NL_IDENTIFICATION_APPLICATION,  "applcation",   std, string)
   DEFINE_ELEMENT (_NL_IDENTIFICATION_ABBREVIATION, "abbreviation", std, string)
   DEFINE_ELEMENT (_NL_IDENTIFICATION_REVISION,     "revision",     std, string)
   DEFINE_ELEMENT (_NL_IDENTIFICATION_DATE,         "date",         std, string)

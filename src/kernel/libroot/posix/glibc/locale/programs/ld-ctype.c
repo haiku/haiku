@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
@@ -33,13 +33,13 @@
 #include <wctype.h>
 #include <sys/uio.h>
 
-#include "localedef.h"
 #include "charmap.h"
 #include "localeinfo.h"
 #include "langinfo.h"
 #include "linereader.h"
 #include "locfile-token.h"
 #include "locfile.h"
+#include "localedef.h"
 
 #include <assert.h>
 
@@ -205,7 +205,6 @@ struct locale_ctype_t
   struct obstack mempool;
 };
 
-
 /* Marker for an empty slot.  This has the value 0xFFFFFFFF, regardless
    whether 'int' is 16 bit, 32 bit, or 64 bit.  */
 #define EMPTY ((uint32_t) ~0)
@@ -217,21 +216,21 @@ struct locale_ctype_t
 
 /* Prototypes for local functions.  */
 static void ctype_startup (struct linereader *lr, struct localedef_t *locale,
-			   const struct charmap_t *charmap,
+			   struct charmap_t *charmap,
 			   struct localedef_t *copy_locale,
 			   int ignore_content);
 static void ctype_class_new (struct linereader *lr,
 			     struct locale_ctype_t *ctype, const char *name);
 static void ctype_map_new (struct linereader *lr,
 			   struct locale_ctype_t *ctype,
-			   const char *name, const struct charmap_t *charmap);
+			   const char *name, struct charmap_t *charmap);
 static uint32_t *find_idx (struct locale_ctype_t *ctype, uint32_t **table,
 			   size_t *max, size_t *act, unsigned int idx);
 static void set_class_defaults (struct locale_ctype_t *ctype,
-				const struct charmap_t *charmap,
+				struct charmap_t *charmap,
 				struct repertoire_t *repertoire);
 static void allocate_arrays (struct locale_ctype_t *ctype,
-			     const struct charmap_t *charmap,
+			     struct charmap_t *charmap,
 			     struct repertoire_t *repertoire);
 
 
@@ -250,8 +249,8 @@ static const unsigned char digits[] = "0123456789";
 
 static void
 ctype_startup (struct linereader *lr, struct localedef_t *locale,
-	       const struct charmap_t *charmap,
-	       struct localedef_t *copy_locale, int ignore_content)
+	       struct charmap_t *charmap, struct localedef_t *copy_locale,
+	       int ignore_content)
 {
   unsigned int cnt;
   struct locale_ctype_t *ctype;
@@ -348,7 +347,7 @@ ctype_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-ctype_finish (struct localedef_t *locale, const struct charmap_t *charmap)
+ctype_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   /* See POSIX.2, table 2-6 for the meaning of the following table.  */
 #define NCLASS 12
@@ -413,8 +412,7 @@ ctype_finish (struct localedef_t *locale, const struct charmap_t *charmap)
       if (ctype == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_CTYPE"));
+	    error (0, 0, _("No definition for %s category found"), "LC_CTYPE");
 	  ctype_startup (NULL, locale, charmap, NULL, 0);
 	  ctype = locale->categories[LC_CTYPE].ctype;
 	}
@@ -432,8 +430,7 @@ No definition for %s category found"), "LC_CTYPE"));
   if (ctype->codeset_name == NULL)
     {
       if (! be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
-No character set name specified in charmap")));
+	error (0, 0, _("No character set name specified in charmap"));
       ctype->codeset_name = "//UNKNOWN//";
     }
 
@@ -461,12 +458,11 @@ No character set name specified in charmap")));
 			    uint32_t value = ctype->charnames[cnt];
 
 			    if (!be_quiet)
-			      WITH_CUR_LOCALE (error (0, 0, _("\
+			      error (0, 0, _("\
 character L'\\u%0*x' in class `%s' must be in class `%s'"),
-						      value > 0xffff ? 8 : 4,
-						      value,
-						      valid_table[cls1].name,
-						      valid_table[cls2].name));
+				     value > 0xffff ? 8 : 4, value,
+				     valid_table[cls1].name,
+				     valid_table[cls2].name);
 			  }
 			break;
 
@@ -476,12 +472,11 @@ character L'\\u%0*x' in class `%s' must be in class `%s'"),
 			    uint32_t value = ctype->charnames[cnt];
 
 			    if (!be_quiet)
-			      WITH_CUR_LOCALE (error (0, 0, _("\
+			      error (0, 0, _("\
 character L'\\u%0*x' in class `%s' must not be in class `%s'"),
-						      value > 0xffff ? 8 : 4,
-						      value,
-						      valid_table[cls1].name,
-						      valid_table[cls2].name));
+				     value > 0xffff ? 8 : 4, value,
+				     valid_table[cls1].name,
+				     valid_table[cls2].name);
 			  }
 			break;
 
@@ -490,8 +485,8 @@ character L'\\u%0*x' in class `%s' must not be in class `%s'"),
 			break;
 
 		      default:
-			WITH_CUR_LOCALE (error (5, 0, _("\
-internal error in %s, line %u"), __FUNCTION__, __LINE__));
+			error (5, 0, _("internal error in %s, line %u"),
+			       __FUNCTION__, __LINE__);
 		      }
 		  }
 	}
@@ -519,11 +514,10 @@ internal error in %s, line %u"), __FUNCTION__, __LINE__));
 			    snprintf (buf, sizeof buf, "\\%Zo", cnt);
 
 			    if (!be_quiet)
-			      WITH_CUR_LOCALE (error (0, 0, _("\
+			      error (0, 0, _("\
 character '%s' in class `%s' must be in class `%s'"),
-						      buf,
-						      valid_table[cls1].name,
-						      valid_table[cls2].name));
+				     buf, valid_table[cls1].name,
+				     valid_table[cls2].name);
 			  }
 			break;
 
@@ -535,11 +529,10 @@ character '%s' in class `%s' must be in class `%s'"),
 			    snprintf (buf, sizeof buf, "\\%Zo", cnt);
 
 			    if (!be_quiet)
-			      WITH_CUR_LOCALE (error (0, 0, _("\
+			      error (0, 0, _("\
 character '%s' in class `%s' must not be in class `%s'"),
-						      buf,
-						      valid_table[cls1].name,
-						      valid_table[cls2].name));
+				     buf, valid_table[cls1].name,
+				     valid_table[cls2].name);
 			  }
 			break;
 
@@ -548,8 +541,8 @@ character '%s' in class `%s' must not be in class `%s'"),
 			break;
 
 		      default:
-			WITH_CUR_LOCALE (error (5, 0, _("\
-internal error in %s, line %u"), __FUNCTION__, __LINE__));
+			error (5, 0, _("internal error in %s, line %u"),
+			       __FUNCTION__, __LINE__);
 		      }
 		  }
 	}
@@ -565,8 +558,8 @@ internal error in %s, line %u"), __FUNCTION__, __LINE__));
 	    & BITw (tok_blank)) == 0)))
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("<SP> character not in class `%s'"),
-				valid_table[cnt].name));
+	error (0, 0, _("<SP> character not in class `%s'"),
+	       valid_table[cnt].name);
     }
   else if (((cnt = BITPOS (tok_punct),
 	     (ELEM (ctype, class_collection, , space_value)
@@ -577,9 +570,8 @@ internal error in %s, line %u"), __FUNCTION__, __LINE__));
 		!= 0)))
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
-<SP> character must not be in class `%s'"),
-				valid_table[cnt].name));
+	error (0, 0, _("<SP> character must not be in class `%s'"),
+	       valid_table[cnt].name);
     }
   else
     ELEM (ctype, class_collection, , space_value) |= BITw (tok_print);
@@ -592,8 +584,7 @@ internal error in %s, line %u"), __FUNCTION__, __LINE__));
   if (space_seq == NULL || space_seq->nbytes != 1)
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
-character <SP> not defined in character map")));
+	error (0, 0, _("character <SP> not defined in character map"));
     }
   else if (((cnt = BITPOS (tok_space),
 	     (ctype->class256_collection[space_seq->bytes[0]]
@@ -603,8 +594,8 @@ character <SP> not defined in character map")));
 		 & BIT (tok_blank)) == 0)))
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("<SP> character not in class `%s'"),
-				valid_table[cnt].name));
+	error (0, 0, _("<SP> character not in class `%s'"),
+	       valid_table[cnt].name);
     }
   else if (((cnt = BITPOS (tok_punct),
 	     (ctype->class256_collection[space_seq->bytes[0]]
@@ -614,9 +605,8 @@ character <SP> not defined in character map")));
 		 & BIT (tok_graph)) != 0)))
     {
       if (!be_quiet)
-	WITH_CUR_LOCALE (error (0, 0, _("\
-<SP> character must not be in class `%s'"),
-				valid_table[cnt].name));
+	error (0, 0, _("<SP> character must not be in class `%s'"),
+	       valid_table[cnt].name);
     }
   else
     ctype->class256_collection[space_seq->bytes[0]] |= BIT (tok_print);
@@ -706,8 +696,7 @@ character <SP> not defined in character map")));
       assert (ctype->mbdigits_act == ctype->wcdigits_act);
       ctype->wcdigits_act -= ctype->mbdigits_act % 10;
       ctype->mbdigits_act -= ctype->mbdigits_act % 10;
-      WITH_CUR_LOCALE (error (0, 0, _("\
-`digit' category has not entries in groups of ten")));
+      error (0, 0, _("`digit' category has not entries in groups of ten"));
     }
 
   /* Check the input digits.  There must be a multiple of ten available.
@@ -738,7 +727,7 @@ character <SP> not defined in character map")));
     {
       if (ctype->mbdigits_max == 0)
 	{
-	  ctype->mbdigits = obstack_alloc (&((struct charmap_t *) charmap)->mem_pool,
+	  ctype->mbdigits = obstack_alloc (&charmap->mem_pool,
 					   10 * sizeof (struct charseq *));
 	  ctype->mbdigits_max = 10;
 	}
@@ -755,10 +744,10 @@ character <SP> not defined in character map")));
 	      if (ctype->mbdigits[cnt] == NULL)
 		{
 		  /* Hum, this ain't good.  */
-		  WITH_CUR_LOCALE (error (0, 0, _("\
-no input digits defined and none of the standard names in the charmap")));
+		  error (0, 0, _("\
+no input digits defined and none of the standard names in the charmap"));
 
-		  ctype->mbdigits[cnt] = obstack_alloc (&((struct charmap_t *) charmap)->mem_pool,
+		  ctype->mbdigits[cnt] = obstack_alloc (&charmap->mem_pool,
 							sizeof (struct charseq) + 1);
 
 		  /* This is better than nothing.  */
@@ -800,7 +789,7 @@ no input digits defined and none of the standard names in the charmap")));
     {
       if (ctype->wcdigits_max == 0)
 	{
-	  ctype->wcdigits = obstack_alloc (&((struct charmap_t *) charmap)->mem_pool,
+	  ctype->wcdigits = obstack_alloc (&charmap->mem_pool,
 					   10 * sizeof (uint32_t));
 	  ctype->wcdigits_max = 10;
 	}
@@ -820,8 +809,8 @@ no input digits defined and none of the standard names in the charmap")));
 
 	if (!warned)
 	  {
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-not all characters used in `outdigit' are available in the charmap")));
+	    error (0, 0, _("\
+not all characters used in `outdigit' are available in the charmap"));
 	    warned = 1;
 	  }
 
@@ -837,8 +826,8 @@ not all characters used in `outdigit' are available in the charmap")));
       {
 	if (!warned)
 	  {
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-not all characters used in `outdigit' are available in the repertoire")));
+	    error (0, 0, _("\
+not all characters used in `outdigit' are available in the repertoire"));
 	    warned = 1;
 	  }
 
@@ -875,7 +864,7 @@ not all characters used in `outdigit' are available in the repertoire")));
 
 
 void
-ctype_output (struct localedef_t *locale, const struct charmap_t *charmap,
+ctype_output (struct localedef_t *locale, struct charmap_t *charmap,
 	      const char *output_path)
 {
   static const char nulbytes[4] = { 0, 0, 0, 0 };
@@ -1214,8 +1203,7 @@ ctype_output (struct localedef_t *locale, const struct charmap_t *charmap,
   assert (2 + elem + offset == (nelems + 2 * ctype->nr_charclass
 				+ ctype->map_collection_nr + 4 + 2));
 
-  write_locale_data (output_path, LC_CTYPE, "LC_CTYPE", 2 + elem + offset,
-		     iov);
+  write_locale_data (output_path, "LC_CTYPE", 2 + elem + offset, iov);
 }
 
 
@@ -1238,9 +1226,9 @@ ctype_class_new (struct linereader *lr, struct locale_ctype_t *ctype,
 
   if (ctype->nr_charclass == MAX_NR_CHARCLASS)
     /* Exit code 2 is prescribed in P1003.2b.  */
-    WITH_CUR_LOCALE (error (2, 0, _("\
+    error (2, 0, _("\
 implementation limit: no more than %Zd character classes allowed"),
-			    MAX_NR_CHARCLASS));
+	   MAX_NR_CHARCLASS);
 
   ctype->classnames[ctype->nr_charclass++] = name;
 }
@@ -1248,7 +1236,7 @@ implementation limit: no more than %Zd character classes allowed"),
 
 static void
 ctype_map_new (struct linereader *lr, struct locale_ctype_t *ctype,
-	       const char *name, const struct charmap_t *charmap)
+	       const char *name, struct charmap_t *charmap)
 {
   size_t max_chars = 0;
   size_t cnt;
@@ -1270,9 +1258,9 @@ ctype_map_new (struct linereader *lr, struct locale_ctype_t *ctype,
 
   if (ctype->map_collection_nr == MAX_NR_CHARMAP)
     /* Exit code 2 is prescribed in P1003.2b.  */
-    WITH_CUR_LOCALE (error (2, 0, _("\
+    error (2, 0, _("\
 implementation limit: no more than %d character maps allowed"),
-			    MAX_NR_CHARMAP));
+	   MAX_NR_CHARMAP);
 
   ctype->mapnames[cnt] = name;
 
@@ -1358,7 +1346,7 @@ find_idx (struct locale_ctype_t *ctype, uint32_t **table, size_t *max,
 
 
 static int
-get_character (struct token *now, const struct charmap_t *charmap,
+get_character (struct token *now, struct charmap_t *charmap,
 	       struct repertoire_t *repertoire,
 	       struct charseq **seqp, uint32_t *wchp)
 {
@@ -1442,7 +1430,7 @@ get_character (struct token *now, const struct charmap_t *charmap,
 static void
 charclass_symbolic_ellipsis (struct linereader *ldfile,
 			     struct locale_ctype_t *ctype,
-			     const struct charmap_t *charmap,
+			     struct charmap_t *charmap,
 			     struct repertoire_t *repertoire,
 			     struct token *now,
 			     const char *last_str,
@@ -1554,7 +1542,7 @@ charclass_symbolic_ellipsis (struct linereader *ldfile,
 static void
 charclass_ucs4_ellipsis (struct linereader *ldfile,
 			 struct locale_ctype_t *ctype,
-			 const struct charmap_t *charmap,
+			 struct charmap_t *charmap,
 			 struct repertoire_t *repertoire,
 			 struct token *now, uint32_t last_wch,
 			 unsigned long int class256_bit,
@@ -1679,7 +1667,7 @@ to-value <U%0*X> of range is smaller than from-value <U%0*X>"),
 static void
 charclass_charcode_ellipsis (struct linereader *ldfile,
 			     struct locale_ctype_t *ctype,
-			     const struct charmap_t *charmap,
+			     struct charmap_t *charmap,
 			     struct repertoire_t *repertoire,
 			     struct token *now, char *last_charcode,
 			     uint32_t last_charcode_len,
@@ -1787,104 +1775,10 @@ to-value character sequence is smaller than from-value sequence"));
 }
 
 
-static uint32_t *
-find_translit2 (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
-		uint32_t wch)
-{
-  struct translit_t *trunp = ctype->translit;
-  struct translit_ignore_t *tirunp = ctype->translit_ignore;
-
-  while (trunp != NULL)
-    {
-      /* XXX We simplify things here.  The transliterations we look
-	 for are only allowed to have one character.  */
-      if (trunp->from[0] == wch && trunp->from[1] == 0)
-	{
-	  /* Found it.  Now look for a transliteration which can be
-	     represented with the character set.  */
-	  struct translit_to_t *torunp = trunp->to;
-
-	  while (torunp != NULL)
-	    {
-	      int i;
-
-	      for (i = 0; torunp->str[i] != 0; ++i)
-		{
-		  char utmp[10];
-
-		  snprintf (utmp, sizeof (utmp), "U%08X", torunp->str[i]);
-		  if (charmap_find_value (charmap, utmp, 9) == NULL)
-		    /* This character cannot be represented.  */
-		    break;
-		}
-
-	      if (torunp->str[i] == 0)
-		return torunp->str;
-
-	      torunp = torunp->next;
-	    }
-
-	  break;
-	}
-
-      trunp = trunp->next;
-    }
-
-  /* Check for ignored chars.  */
-  while (tirunp != NULL)
-    {
-      if (tirunp->from <= wch && tirunp->to >= wch)
-	{
-	  uint32_t wi;
-
-	  for (wi = tirunp->from; wi <= wch; wi += tirunp->step)
-	    if (wi == wch)
-	      return (uint32_t []) { 0 };
-	}
-    }
-
-  /* Nothing found.  */
-  return NULL;
-}
-
-
-uint32_t *
-find_translit (struct localedef_t *locale, const struct charmap_t *charmap,
-	       uint32_t wch)
-{
-  struct locale_ctype_t *ctype;
-  uint32_t *result = NULL;
-
-  assert (locale != NULL);
-  ctype = locale->categories[LC_CTYPE].ctype;
-
-  if (ctype->translit != NULL)
-    result = find_translit2 (ctype, charmap, wch);
-
-  if (result == NULL)
-    {
-      struct translit_include_t *irunp = ctype->translit_include;
-
-      while (irunp != NULL && result == NULL)
-	{
-	  result = find_translit (find_locale (CTYPE_LOCALE,
-					       irunp->copy_locale,
-					       irunp->copy_repertoire,
-					       charmap),
-				  charmap, wch);
-	  irunp = irunp->next;
-	}
-    }
-
-  return result;
-}
-
-
 /* Read one transliteration entry.  */
 static uint32_t *
 read_widestring (struct linereader *ldfile, struct token *now,
-		 const struct charmap_t *charmap,
-		 struct repertoire_t *repertoire)
+		 struct charmap_t *charmap, struct repertoire_t *repertoire)
 {
   uint32_t *wstr;
 
@@ -1954,7 +1848,7 @@ read_widestring (struct linereader *ldfile, struct token *now,
 
 static void
 read_translit_entry (struct linereader *ldfile, struct locale_ctype_t *ctype,
-		     struct token *now, const struct charmap_t *charmap,
+		     struct token *now, struct charmap_t *charmap,
 		     struct repertoire_t *repertoire)
 {
   uint32_t *from_wstr = read_widestring (ldfile, now, charmap, repertoire);
@@ -1985,7 +1879,7 @@ read_translit_entry (struct linereader *ldfile, struct locale_ctype_t *ctype,
 
       /* Next we have one or more transliterations.  They are
 	 separated by semicolons.  */
-      now = lr_token (ldfile, charmap, NULL, repertoire, verbose);
+      now = lr_token (ldfile, charmap, repertoire, verbose);
 
       if (!first && (now->tok == tok_semicolon || now->tok == tok_eol))
 	{
@@ -2038,7 +1932,7 @@ read_translit_entry (struct linereader *ldfile, struct locale_ctype_t *ctype,
 static void
 read_translit_ignore_entry (struct linereader *ldfile,
 			    struct locale_ctype_t *ctype,
-			    const struct charmap_t *charmap,
+			    struct charmap_t *charmap,
 			    struct repertoire_t *repertoire)
 {
   /* We expect a semicolon-separated list of characters we ignore.  We are
@@ -2046,8 +1940,7 @@ read_translit_ignore_entry (struct linereader *ldfile,
      single characters, possibly defining a range when an ellipsis is used.  */
   while (1)
     {
-      struct token *now = lr_token (ldfile, charmap, NULL, repertoire,
-				    verbose);
+      struct token *now = lr_token (ldfile, charmap, repertoire, verbose);
       struct translit_ignore_t *newp;
       uint32_t from;
 
@@ -2091,7 +1984,7 @@ read_translit_ignore_entry (struct linereader *ldfile,
 
       /* Now we expect either a semicolon, an ellipsis, or the end of the
 	 line.  */
-      now = lr_token (ldfile, charmap, NULL, repertoire, verbose);
+      now = lr_token (ldfile, charmap, repertoire, verbose);
 
       if (now->tok == tok_ellipsis2 || now->tok == tok_ellipsis2_2)
 	{
@@ -2100,7 +1993,7 @@ read_translit_ignore_entry (struct linereader *ldfile,
 	  uint32_t to;
 	  int step = now->tok == tok_ellipsis2_2 ? 2 : 1;
 
-	  now = lr_token (ldfile, charmap, NULL, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 
 	  if (now->tok == tok_eol || now->tok == tok_eof)
 	    {
@@ -2141,7 +2034,7 @@ to-value <U%0*X> of range is smaller than from-value <U%0*X>"),
 	    }
 
 	  /* And the next token.  */
-	  now = lr_token (ldfile, charmap, NULL, repertoire, verbose);
+	  now = lr_token (ldfile, charmap, repertoire, verbose);
 	}
 
       if (now->tok == tok_eol || now->tok == tok_eof)
@@ -2163,7 +2056,7 @@ to-value <U%0*X> of range is smaller than from-value <U%0*X>"),
 /* The parser for the LC_CTYPE section of the locale definition.  */
 void
 ctype_read (struct linereader *ldfile, struct localedef_t *result,
-	    const struct charmap_t *charmap, const char *repertoire_name,
+	    struct charmap_t *charmap, const char *repertoire_name,
 	    int ignore_content)
 {
   struct repertoire_t *repertoire = NULL;
@@ -2192,7 +2085,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -2200,18 +2093,18 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
   /* If we see `copy' now we are almost done.  */
   if (nowtok == tok_copy)
     {
-      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       if (now->tok != tok_string)
 	{
 	  SYNTAX_ERROR (_("%s: syntax error"), "LC_CTYPE");
 
 	skip_category:
 	  do
-	    now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	    now = lr_token (ldfile, charmap, NULL, verbose);
 	  while (now->tok != tok_eof && now->tok != tok_end);
 
 	  if (now->tok != tok_eof
-	      || (now = lr_token (ldfile, charmap, NULL, NULL, verbose),
+	      || (now = lr_token (ldfile, charmap, NULL, verbose),
 		  now->tok == tok_eof))
 	    lr_error (ldfile, _("%s: premature end of file"), "LC_CTYPE");
 	  else if (now->tok != tok_lc_ctype)
@@ -2241,7 +2134,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 
       lr_ignore_rest (ldfile, 1);
 
-      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 
@@ -2266,7 +2159,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ingore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -2274,14 +2167,14 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
       switch (nowtok)
 	{
 	case tok_charclass:
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  while (now->tok == tok_ident || now->tok == tok_string)
 	    {
 	      ctype_class_new (ldfile, ctype, now->val.str.startmb);
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok != tok_semicolon)
 		break;
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	    }
 	  if (now->tok != tok_eol)
 	    SYNTAX_ERROR (_("\
@@ -2289,14 +2182,14 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 	  break;
 
 	case tok_charconv:
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  while (now->tok == tok_ident || now->tok == tok_string)
 	    {
 	      ctype_map_new (ldfile, ctype, now->val.str.startmb, charmap);
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok != tok_semicolon)
 		break;
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	    }
 	  if (now->tok != tok_eol)
 	    SYNTAX_ERROR (_("\
@@ -2314,7 +2207,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 
 	  /* We simply forget the `class' keyword and use the following
 	     operand to determine the bit.  */
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok == tok_ident || now->tok == tok_string)
 	    {
 	      /* Must can be one of the predefined class names.  */
@@ -2360,7 +2253,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 	    }
 
 	  /* The next character must be a semicolon.  */
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok != tok_semicolon)
 	    goto err_label;
 	  goto read_charclass;
@@ -2392,7 +2285,7 @@ ctype_read (struct linereader *ldfile, struct localedef_t *result,
 	  last_token = tok_none;
 	  ellipsis_token = tok_none;
 	  step = 1;
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  while (now->tok != tok_eol && now->tok != tok_eof)
 	    {
 	      uint32_t wch;
@@ -2529,7 +2422,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 		}
 
 	      /* Next we expect a semicolon or the end of the line.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok == tok_eol || now->tok == tok_eof)
 		break;
 
@@ -2549,7 +2442,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 
 		  ellipsis_token = now->tok;
 
-		  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		  continue;
 		}
 
@@ -2557,7 +2450,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 		goto err_label;
 
 	      /* And get the next character.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 
 	      ellipsis_token = tok_none;
 	      step = 1;
@@ -2632,7 +2525,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 
 	  /* We simply forget the `map' keyword and use the following
 	     operand to determine the mapping.  */
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok == tok_ident || now->tok == tok_string)
 	    {
 	      size_t cnt;
@@ -2654,7 +2547,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 	  else
 	    mapidx = now->tok - tok_toupper;
 
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  /* This better should be a semicolon.  */
 	  if (now->tok != tok_semicolon)
 	    goto err_label;
@@ -2670,7 +2563,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 	    }
 	  ctype->tomap_done[mapidx] = 1;
 
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  while (now->tok != tok_eol && now->tok != tok_eof)
 	    {
 	      struct charseq *from_seq;
@@ -2683,24 +2576,24 @@ with character code range values one must use the absolute ellipsis `...'"));
 		goto err_label;
 
 	      /* Next comes the from-value.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (get_character (now, charmap, repertoire, &from_seq,
 				 &from_wch) != 0)
 		goto err_label;
 
 	      /* The next is a comma.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok != tok_comma)
 		goto err_label;
 
 	      /* And the other value.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (get_character (now, charmap, repertoire, &to_seq,
 				 &to_wch) != 0)
 		goto err_label;
 
 	      /* And the last thing is the closing brace.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok != tok_close_brace)
 		goto err_label;
 
@@ -2722,9 +2615,9 @@ with character code range values one must use the absolute ellipsis `...'"));
 		}
 
 	      /* Now comes a semicolon or the end of the line/file.  */
-	      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	      now = lr_token (ldfile, charmap, NULL, verbose);
 	      if (now->tok == tok_semicolon)
-		now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		now = lr_token (ldfile, charmap, NULL, verbose);
 	    }
 	  break;
 
@@ -2736,7 +2629,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 	      do
 		{
 		  lr_ignore_rest (ldfile, 0);
-		  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		}
 	      while (now->tok != tok_translit_end && now->tok != tok_eof);
 
@@ -2759,7 +2652,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 	  ldfile->return_widestr = 1;
 
 	  /* We proceed until we see the `translit_end' token.  */
-	  while (now = lr_token (ldfile, charmap, NULL, repertoire, verbose),
+	  while (now = lr_token (ldfile, charmap, repertoire, verbose),
 		 now->tok != tok_translit_end && now->tok != tok_eof)
 	    {
 	      if (now->tok == tok_eol)
@@ -2773,7 +2666,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 		  const char *repertoire_name;
 		  struct translit_include_t *include_stmt, **include_ptr;
 
-		  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		  /* This should be a string or an identifier.  In any
 		     case something to name a locale.  */
 		  if (now->tok != tok_string && now->tok != tok_ident)
@@ -2786,19 +2679,16 @@ with character code range values one must use the absolute ellipsis `...'"));
 		  locale_name = now->val.str.startmb;
 
 		  /* Next should be a semicolon.  */
-		  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		  if (now->tok != tok_semicolon)
 		    goto translit_syntax;
 
 		  /* Now the repertoire name.  */
-		  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		  now = lr_token (ldfile, charmap, NULL, verbose);
 		  if ((now->tok != tok_string && now->tok != tok_ident)
 		      || now->val.str.startmb == NULL)
 		    goto translit_syntax;
 		  repertoire_name = now->val.str.startmb;
-		  if (repertoire_name[0] == '\0')
-		    /* Ignore the empty string.  */
-		    repertoire_name = NULL;
 
 		  /* Save the include statement for later processing.  */
 		  include_stmt = (struct translit_include_t *)
@@ -2828,7 +2718,7 @@ with character code range values one must use the absolute ellipsis `...'"));
 		    {
 		      /* We expect a single character or string as the
 			 argument.  */
-		      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		      now = lr_token (ldfile, charmap, NULL, verbose);
 		      wstr = read_widestring (ldfile, now, charmap,
 					      repertoire);
 
@@ -2838,11 +2728,10 @@ with character code range values one must use the absolute ellipsis `...'"));
 			    {
 			      lr_error (ldfile, _("\
 %s: duplicate `default_missing' definition"), "LC_CTYPE");
-			      WITH_CUR_LOCALE (error_at_line (0, 0,
-							      ctype->default_missing_file,
-							      ctype->default_missing_lineno,
-							      _("\
-previous definition was here")));
+			      error_at_line (0, 0, ctype->default_missing_file,
+					     ctype->default_missing_lineno,
+					     _("\
+previous definition was here"));
 			    }
 			  else
 			    {
@@ -2859,7 +2748,7 @@ previous definition was here")));
 			break;
 
 		      /* Maybe there is another replacement we can use.  */
-		      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+		      now = lr_token (ldfile, charmap, NULL, verbose);
 		      if (now->tok == tok_eol || now->tok == tok_eof)
 			{
 			  /* Nothing found.  We tell the user.  */
@@ -2950,7 +2839,7 @@ previous definition was here")));
 
 	case tok_end:
 	  /* Next we assume `LC_CTYPE'.  */
-	  now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  if (now->tok == tok_eof)
 	    break;
 	  if (now->tok == tok_eol)
@@ -2969,7 +2858,7 @@ previous definition was here")));
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, NULL, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 
@@ -2979,8 +2868,7 @@ previous definition was here")));
 
 
 static void
-set_class_defaults (struct locale_ctype_t *ctype,
-		    const struct charmap_t *charmap,
+set_class_defaults (struct locale_ctype_t *ctype, struct charmap_t *charmap,
 		    struct repertoire_t *repertoire)
 {
   size_t cnt;
@@ -3016,14 +2904,14 @@ set_class_defaults (struct locale_ctype_t *ctype,
 	  if (seq == NULL)
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
+		error (0, 0, _("\
 %s: character `%s' not defined in charmap while needed as default value"),
-					"LC_CTYPE", tmp));
+		       "LC_CTYPE", tmp);
 	    }
 	  else if (seq->nbytes != 1)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				    "LC_CTYPE", tmp));
+		   "LC_CTYPE", tmp);
 	  else
 	    ctype->class256_collection[seq->bytes[0]] |= bit;
 
@@ -3100,14 +2988,14 @@ set_class_defaults (struct locale_ctype_t *ctype,
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<space>"));
+		   "LC_CTYPE", "<space>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<space>"));
+	       "LC_CTYPE", "<space>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3120,14 +3008,14 @@ set_class_defaults (struct locale_ctype_t *ctype,
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<form-feed>"));
+		   "LC_CTYPE", "<form-feed>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<form-feed>"));
+	       "LC_CTYPE", "<form-feed>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3141,14 +3029,14 @@ set_class_defaults (struct locale_ctype_t *ctype,
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 character `%s' not defined while needed as default value"),
-				    "<newline>"));
+		   "<newline>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<newline>"));
+	       "LC_CTYPE", "<newline>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3162,14 +3050,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<carriage-return>"));
+		   "LC_CTYPE", "<carriage-return>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<carriage-return>"));
+	       "LC_CTYPE", "<carriage-return>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3183,14 +3071,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<tab>"));
+		   "LC_CTYPE", "<tab>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<tab>"));
+	       "LC_CTYPE", "<tab>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3204,14 +3092,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<vertical-tab>"));
+		   "LC_CTYPE", "<vertical-tab>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<vertical-tab>"));
+	       "LC_CTYPE", "<vertical-tab>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_space);
 
@@ -3244,14 +3132,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<space>"));
+		   "LC_CTYPE", "<space>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<space>"));
+	       "LC_CTYPE", "<space>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_blank);
 
@@ -3265,14 +3153,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<tab>"));
+		   "LC_CTYPE", "<tab>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<tab>"));
+	       "LC_CTYPE", "<tab>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_blank);
 
@@ -3332,14 +3220,14 @@ character `%s' not defined while needed as default value"),
       if (seq == NULL)
 	{
 	  if (!be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
+	    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-				    "LC_CTYPE", "<space>"));
+		   "LC_CTYPE", "<space>");
 	}
       else if (seq->nbytes != 1)
-	WITH_CUR_LOCALE (error (0, 0, _("\
+	error (0, 0, _("\
 %s: character `%s' in charmap not representable with one byte"),
-				"LC_CTYPE", "<space>"));
+	       "LC_CTYPE", "<space>");
       else
 	ctype->class256_collection[seq->bytes[0]] |= BIT (tok_print);
 
@@ -3374,16 +3262,16 @@ character `%s' not defined while needed as default value"),
 	  if (seq_from == NULL)
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
+		error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-					"LC_CTYPE", tmp));
+		       "LC_CTYPE", tmp);
 	    }
 	  else if (seq_from->nbytes != 1)
 	    {
 	      if (!be_quiet)
-		WITH_CUR_LOCALE (error (0, 0, _("\
+		error (0, 0, _("\
 %s: character `%s' needed as default value not representable with one byte"),
-					"LC_CTYPE", tmp));
+		       "LC_CTYPE", tmp);
 	    }
 	  else
 	    {
@@ -3399,16 +3287,16 @@ character `%s' not defined while needed as default value"),
 	      if (seq_to == NULL)
 		{
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
+		    error (0, 0, _("\
 %s: character `%s' not defined while needed as default value"),
-					    "LC_CTYPE", tmp));
+			   "LC_CTYPE", tmp);
 		}
 	      else if (seq_to->nbytes != 1)
 		{
 		  if (!be_quiet)
-		    WITH_CUR_LOCALE (error (0, 0, _("\
+		    error (0, 0, _("\
 %s: character `%s' needed as default value not representable with one byte"),
-					    "LC_CTYPE", tmp));
+			   "LC_CTYPE", tmp);
 		}
 	      else
 		/* The index [0] is determined by the order of the
@@ -3440,9 +3328,8 @@ character `%s' not defined while needed as default value"),
   if (ctype->outdigits_act != 10)
     {
       if (ctype->outdigits_act != 0)
-	WITH_CUR_LOCALE (error (0, 0, _("\
-%s: field `%s' does not contain exactly ten entries"),
-				"LC_CTYPE", "outdigit"));
+	error (0,0, _("%s: field `%s' does not contain exactly ten entries"),
+	       "LC_CTYPE", "outdigit");
 
       for (cnt = ctype->outdigits_act; cnt < 10; ++cnt)
 	{
@@ -3461,10 +3348,10 @@ character `%s' not defined while needed as default value"),
 	  if (ctype->mboutdigits[cnt] == NULL)
 	    {
 	      /* Provide a replacement.  */
-	      WITH_CUR_LOCALE (error (0, 0, _("\
-no output digits defined and none of the standard names in the charmap")));
+	      error (0, 0, _("\
+no output digits defined and none of the standard names in the charmap"));
 
-	      ctype->mboutdigits[cnt] = obstack_alloc (&((struct charmap_t *) charmap)->mem_pool,
+	      ctype->mboutdigits[cnt] = obstack_alloc (&charmap->mem_pool,
 						       sizeof (struct charseq)
 						       + 1);
 
@@ -3734,8 +3621,7 @@ wctrans_table_add (struct wctrans_table *t, uint32_t wc, uint32_t mapped_wc)
 /* Flattens the included transliterations into a translit list.
    Inserts them in the list at `cursor', and returns the new cursor.  */
 static struct translit_t **
-translit_flatten (struct locale_ctype_t *ctype,
-		  const struct charmap_t *charmap,
+translit_flatten (struct locale_ctype_t *ctype, struct charmap_t *charmap,
 		  struct translit_t **cursor)
 {
   while (ctype->translit_include != NULL)
@@ -3752,9 +3638,9 @@ translit_flatten (struct locale_ctype_t *ctype,
 
       if (other == NULL)
 	{
-	  WITH_CUR_LOCALE (error (0, 0, _("\
+	  error (0, 0, _("\
 %s: transliteration data from locale `%s' not available"),
-				  "LC_CTYPE", copy_locale));
+		 "LC_CTYPE", copy_locale);
 	}
       else
 	{
@@ -3789,7 +3675,7 @@ translit_flatten (struct locale_ctype_t *ctype,
 }
 
 static void
-allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+allocate_arrays (struct locale_ctype_t *ctype, struct charmap_t *charmap,
 		 struct repertoire_t *repertoire)
 {
   size_t idx, nr;
@@ -3848,10 +3734,9 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
       wctype_table_finalize (&t);
 
       if (verbose)
-	WITH_CUR_LOCALE (fprintf (stderr, _("\
-%s: table for class \"%s\": %lu bytes\n"),
-				 "LC_CTYPE", ctype->classnames[nr],
-				 (unsigned long int) t.result_size));
+	fprintf (stderr, _("%s: table for class \"%s\": %lu bytes\n"),
+		 "LC_CTYPE", ctype->classnames[nr],
+		 (unsigned long int) t.result_size);
 
       ctype->class_3level[nr].iov_base = t.result;
       ctype->class_3level[nr].iov_len = t.result_size;
@@ -3917,10 +3802,9 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
       wctrans_table_finalize (&t);
 
       if (verbose)
-	WITH_CUR_LOCALE (fprintf (stderr, _("\
-%s: table for map \"%s\": %lu bytes\n"),
-				 "LC_CTYPE", ctype->mapnames[nr],
-				 (unsigned long int) t.result_size));
+	fprintf (stderr, _("%s: table for map \"%s\": %lu bytes\n"),
+		 "LC_CTYPE", ctype->mapnames[nr],
+		 (unsigned long int) t.result_size);
 
       ctype->map_3level[nr].iov_base = t.result;
       ctype->map_3level[nr].iov_len = t.result_size;
@@ -4050,8 +3934,8 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
     wcwidth_table_finalize (&t);
 
     if (verbose)
-      WITH_CUR_LOCALE (fprintf (stderr, _("%s: table for width: %lu bytes\n"),
-			       "LC_CTYPE", (unsigned long int) t.result_size));
+      fprintf (stderr, _("%s: table for width: %lu bytes\n"),
+	       "LC_CTYPE", (unsigned long int) t.result_size);
 
     ctype->width.iov_base = t.result;
     ctype->width.iov_len = t.result_size;

@@ -1,5 +1,5 @@
 /* Access to locale-dependent parameters.
-   Copyright (C) 1995-99,2000,01,02 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -23,11 +23,11 @@
 /* Get the type definition.  */
 #include <nl_types.h>
 
-#include <misc/sys/cdefs.h>
 #include <bits/locale.h>	/* Define the __LC_* category names.  */
 
+
 __BEGIN_DECLS
-struct TTTE;
+
 /* Construct an `nl_item' value for `nl_langinfo' from a locale category
    (LC_*) and an item index within the category.  Some code may depend on
    the item values within a category increasing monotonically with the
@@ -38,7 +38,6 @@ struct TTTE;
 #define _NL_ITEM_CATEGORY(item)		((int) (item) >> 16)
 #define _NL_ITEM_INDEX(item)		((int) (item) & 0xffff)
 
-struct TTTE;
 
 /* Enumeration of locale items that can be queried with `nl_langinfo'.  */
 enum
@@ -584,7 +583,7 @@ extern char *nl_langinfo (nl_item __item) __THROW;
 # include <xlocale.h>
 
 /* Just like nl_langinfo but get the information from the locale object L.  */
-extern char *nl_langinfo_l (nl_item __item, __locale_t l);
+extern char *__nl_langinfo_l (nl_item __item, __locale_t l);
 #endif
 
 __END_DECLS

@@ -1,5 +1,5 @@
 /* C locale object.
-   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 2001.
 
@@ -27,27 +27,27 @@ extern struct locale_data _nl_C_##category;
 #undef	DEFINE_CATEGORY
 
 /* Defined in locale/C-ctype.c.  */
-extern const char _nl_C_LC_CTYPE_class[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_toupper[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_tolower[] attribute_hidden;
+extern const char _nl_C_LC_CTYPE_class[];
+extern const char _nl_C_LC_CTYPE_toupper[];
+extern const char _nl_C_LC_CTYPE_tolower[];
 
 
-struct __locale_struct _nl_C_locobj attribute_hidden =
+struct __locale_struct _nl_C_locobj =
   {
     .__locales =
     {
-#define DEFINE_CATEGORY(category, category_name, items, a) \
-      [category] = &_nl_C_##category,
-#include "categories.def"
-#undef	DEFINE_CATEGORY
-    },
-    .__names =
-    {
-      [LC_ALL] = _nl_C_name,
-#define DEFINE_CATEGORY(category, category_name, items, a) \
-      [category] = _nl_C_name,
-#include "categories.def"
-#undef	DEFINE_CATEGORY
+      [LC_CTYPE] = &_nl_C_LC_CTYPE,
+      [LC_NUMERIC] = &_nl_C_LC_NUMERIC,
+      [LC_TIME] = &_nl_C_LC_TIME,
+      [LC_COLLATE] = &_nl_C_LC_COLLATE,
+      [LC_MONETARY] = &_nl_C_LC_MONETARY,
+      [LC_MESSAGES] = &_nl_C_LC_MESSAGES,
+      [LC_PAPER] = &_nl_C_LC_PAPER,
+      [LC_NAME] = &_nl_C_LC_NAME,
+      [LC_ADDRESS] = &_nl_C_LC_ADDRESS,
+      [LC_TELEPHONE] = &_nl_C_LC_TELEPHONE,
+      [LC_MEASUREMENT] = &_nl_C_LC_MEASUREMENT,
+      [LC_IDENTIFICATION] = &_nl_C_LC_IDENTIFICATION
     },
     .__ctype_b = (const unsigned short int *) _nl_C_LC_CTYPE_class + 128,
     .__ctype_tolower = (const int *) _nl_C_LC_CTYPE_tolower + 128,

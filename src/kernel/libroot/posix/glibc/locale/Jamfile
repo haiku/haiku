@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src kernel libroot posix glibc locale ;
+
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+
+KernelMergeObject posix_gnu_locale.o :
+	C-ctype.c
+	C-monetary.c
+	C_name.c
+	C-numeric.c
+	lc-ctype.c
+	lc-monetary.c
+	lc-numeric.c
+	mb_cur_max.c
+	: -fPIC -DPIC
+	;

@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -24,27 +24,27 @@
 /* This table's entries are taken from ISO 14652, the table in section
    4.10 "LC_ADDRESS".  */
 
-const struct locale_data _nl_C_LC_ADDRESS attribute_hidden =
+const struct locale_data _nl_C_LC_ADDRESS =
 {
   _nl_C_name,
-  NULL, 0, 0,			/* no file mapped */
-  { NULL, },			/* no cached data */
+  NULL, 0, 0, /* no file mapped */
   UNDELETABLE,
   0,
+  NULL,
   13,
   {
-    { .string = "%a%N%f%N%d%N%b%N%s %h %e %r%N%C-%z %T%N%c%N" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = "" },
-    { .string = _nl_C_codeset }
+    { string: "%a%N%f%N%d%N%b%N%s %h %e %r%N%C-%z %T%N%c%N" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: "" },
+    { string: _nl_C_codeset }
   }
 };

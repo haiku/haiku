@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996,1997,1998,1999,2000,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -30,36 +30,16 @@
 #include "../iconv/gconv_charset.h"
 
 
-#ifdef NL_CURRENT_INDIRECT
-# define DEFINE_CATEGORY(category, category_name, items, a) \
-extern struct locale_data _nl_C_##category; \
-weak_extern (_nl_C_##category)
-# include "categories.def"
-# undef	DEFINE_CATEGORY
-
-/* Array indexed by category of pointers to _nl_C_CATEGORY slots.
-   Elements are zero for categories whose data is never used.  */
-struct locale_data *const _nl_C[] attribute_hidden =
-  {
-# define DEFINE_CATEGORY(category, category_name, items, a) \
-    [category] = &_nl_C_##category,
-# include "categories.def"
-# undef	DEFINE_CATEGORY
-  };
-#else
-# define _nl_C		(_nl_C_locobj.__locales)
-#endif
+/* Constant data defined in setlocale.c.  */
+extern struct locale_data *const _nl_C[];
 
 
 /* For each category we keep a list of records for the locale files
    which are somehow addressed.  */
 struct loaded_l10nfile *_nl_locale_file_list[__LC_LAST];
 
-const char _nl_default_locale_path[] attribute_hidden = LOCALEDIR;
-
 
 struct locale_data *
-internal_function
 _nl_find_locale (const char *locale_path, size_t locale_path_len,
 		 int category, const char **name)
 {
@@ -71,6 +51,9 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
   const char *territory;
   const char *codeset;
   const char *normalized_codeset;
+  const char *special;
+  const char *sponsor;
+  const char *revision;
   struct loaded_l10nfile *locale_file;
 
   if ((*name)[0] == '\0')
@@ -98,19 +81,6 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
       return _nl_C[category];
     }
 
-  /* We really have to load some data.  First we try the archive,
-     but only if there was no LOCPATH environment variable specified.  */
-  if (__builtin_expect (locale_path == NULL, 1))
-    {
-      struct locale_data *data = _nl_load_locale_from_archive (category, name);
-      if (__builtin_expect (data != NULL, 1))
-	return data;
-
-      /* Nothing in the archive.  Set the default path to search below.  */
-      locale_path = _nl_default_locale_path;
-      locale_path_len = sizeof _nl_default_locale_path;
-    }
-
   /* We really have to load some data.  First see whether the name is
      an alias.  Please note that this makes it impossible to have "C"
      or "POSIX" as aliases.  */
@@ -126,24 +96,33 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
 
 		language[_territory[.codeset]][@modifier]
 
+     and six parts for the CEN syntax:
+
+	language[_territory][+audience][+special][,[sponsor][_revision]]
+
      Beside the first all of them are allowed to be missing.  If the
      full specified locale is not found, the less specific one are
-     looked for.  The various part will be stripped off according to
+     looked for.  The various part will be stripped of according to
      the following order:
-		(1) codeset
-		(2) normalized codeset
-		(3) territory
-		(4) modifier
+		(1) revision
+		(2) sponsor
+		(3) special
+		(4) codeset
+		(5) normalized codeset
+		(6) territory
+		(7) audience/modifier
    */
   mask = _nl_explode_name (loc_name, &language, &modifier, &territory,
-			   &codeset, &normalized_codeset);
+			   &codeset, &normalized_codeset, &special,
+			   &sponsor, &revision);
 
   /* If exactly this locale was already asked for we have an entry with
      the complete name.  */
   locale_file = _nl_make_l10nflist (&_nl_locale_file_list[category],
 				    locale_path, locale_path_len, mask,
 				    language, territory, codeset,
-				    normalized_codeset, modifier,
+				    normalized_codeset, modifier, special,
+				    sponsor, revision,
 				    _nl_category_names[category], 0);
 
   if (locale_file == NULL)
@@ -153,7 +132,8 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
       locale_file = _nl_make_l10nflist (&_nl_locale_file_list[category],
 					locale_path, locale_path_len, mask,
 					language, territory, codeset,
-					normalized_codeset, modifier,
+					normalized_codeset, modifier, special,
+					sponsor, revision,
 					_nl_category_names[category], 1);
       if (locale_file == NULL)
 	/* This means we are out of core.  */
@@ -250,7 +230,8 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
     }
 
   /* Determine whether the user wants transliteration or not.  */
-  if (modifier != NULL && __strcasecmp (modifier, "TRANSLIT") == 0)
+  if ((modifier != NULL && __strcasecmp (modifier, "TRANSLIT") == 0)
+      || (special != NULL && __strcasecmp (special, "TRANSLIT") == 0))
     ((struct locale_data *) locale_file->data)->use_translit = 1;
 
   /* Increment the usage count.  */
@@ -265,28 +246,44 @@ _nl_find_locale (const char *locale_path, size_t locale_path_len,
 /* Calling this function assumes the lock for handling global locale data
    is acquired.  */
 void
-internal_function
 _nl_remove_locale (int locale, struct locale_data *data)
 {
   if (--data->usage_count == 0)
     {
-      if (data->alloc != ld_archive)
+      /* First search the entry in the list of loaded files.  */
+      struct loaded_l10nfile *ptr = _nl_locale_file_list[locale];
+
+      /* Search for the entry.  It must be in the list.  Otherwise it
+	 is a bug and we crash badly.  */
+      while ((struct locale_data *) ptr->data != data)
+	ptr = ptr->next;
+
+      /* Mark the data as not available anymore.  So when the data has
+	 to be used again it is reloaded.  */
+      ptr->decided = 0;
+      ptr->data = NULL;
+
+      /* Free the name.  */
+      free ((char *) data->name);
+
+#ifdef _POSIX_MAPPED_FILES
+      /* Really delete the data.  First delete the real data.  */
+      if (__builtin_expect (data->mmaped, 1))
 	{
-	  /* First search the entry in the list of loaded files.  */
-	  struct loaded_l10nfile *ptr = _nl_locale_file_list[locale];
-
-	  /* Search for the entry.  It must be in the list.  Otherwise it
-	     is a bug and we crash badly.  */
-	  while ((struct locale_data *) ptr->data != data)
-	    ptr = ptr->next;
-
-	  /* Mark the data as not available anymore.  So when the data has
-	     to be used again it is reloaded.  */
-	  ptr->decided = 0;
-	  ptr->data = NULL;
+	  /* Try to unmap the area.  If this fails we mark the area as
+	     permanent.  */
+	  if (__munmap ((caddr_t) data->filedata, data->filesize) != 0)
+	    {
+	      data->usage_count = UNDELETABLE;
+	      return;
+	    }
 	}
+      else
+#endif	/* _POSIX_MAPPED_FILES */
+	/* The memory was malloced.  */
+	free ((void *) data->filedata);
 
-      /* This does the real work.  */
-      _nl_unload_locale (data);
+      /* Now free the structure itself.  */
+      free (data);
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -28,7 +28,6 @@
 
 #include <assert.h>
 
-#include "localedef.h"
 #include "localeinfo.h"
 #include "locfile.h"
 
@@ -58,8 +57,7 @@ measurement_startup (struct linereader *lr, struct localedef_t *locale,
 
 
 void
-measurement_finish (struct localedef_t *locale,
-		    const struct charmap_t *charmap)
+measurement_finish (struct localedef_t *locale, struct charmap_t *charmap)
 {
   struct locale_measurement_t *measurement =
     locale->categories[LC_MEASUREMENT].measurement;
@@ -92,8 +90,8 @@ measurement_finish (struct localedef_t *locale,
       if (measurement == NULL)
 	{
 	  if (! be_quiet)
-	    WITH_CUR_LOCALE (error (0, 0, _("\
-No definition for %s category found"), "LC_MEASUREMENT"));
+	    error (0, 0, _("No definition for %s category found"),
+		   "LC_MEASUREMENT");
 	  measurement_startup (NULL, locale, 0);
 	  measurement = locale->categories[LC_MEASUREMENT].measurement;
 	  nothing = 1;
@@ -103,23 +101,23 @@ No definition for %s category found"), "LC_MEASUREMENT"));
   if (measurement->measurement == 0)
     {
       if (! nothing)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: field `%s' not defined"),
-				"LC_MEASUREMENT", "measurement"));
+	error (0, 0, _("%s: field `%s' not defined"),
+	       "LC_MEASUREMENT", "measurement");
       /* Use as the default value the value of the i18n locale.  */
       measurement->measurement = 1;
     }
   else
     {
       if (measurement->measurement > 3)
-	WITH_CUR_LOCALE (error (0, 0, _("%s: invalid value for field `%s'"),
-				"LC_MEASUREMENT", "measurement"));
+	error (0, 0, _("%s: invalid value for field `%s'"),
+	       "LC_MEASUREMENT", "measurement");
     }
 }
 
 
 void
-measurement_output (struct localedef_t *locale,
-		    const struct charmap_t *charmap, const char *output_path)
+measurement_output (struct localedef_t *locale, struct charmap_t *charmap,
+		    const char *output_path)
 {
   struct locale_measurement_t *measurement =
     locale->categories[LC_MEASUREMENT].measurement;
@@ -143,14 +141,14 @@ measurement_output (struct localedef_t *locale,
   iov[cnt].iov_len = 1;
   ++cnt;
 
-  idx[cnt - 2] = idx[cnt - 3] + iov[cnt - 1].iov_len;
+  idx[cnt - 2] = iov[0].iov_len + iov[1].iov_len;
   iov[cnt].iov_base = (void *) charmap->code_set_name;
   iov[cnt].iov_len = strlen (iov[cnt].iov_base) + 1;
   ++cnt;
 
   assert (cnt == 2 + _NL_ITEM_INDEX (_NL_NUM_LC_MEASUREMENT));
 
-  write_locale_data (output_path, LC_MEASUREMENT, "LC_MEASUREMENT",
+  write_locale_data (output_path, "LC_MEASUREMENT",
 		     2 + _NL_ITEM_INDEX (_NL_NUM_LC_MEASUREMENT), iov);
 }
 
@@ -158,7 +156,7 @@ measurement_output (struct localedef_t *locale,
 /* The parser for the LC_MEASUREMENT section of the locale definition.  */
 void
 measurement_read (struct linereader *ldfile, struct localedef_t *result,
-		  const struct charmap_t *charmap, const char *repertoire_name,
+		  struct charmap_t *charmap, const char *repertoire_name,
 		  int ignore_content)
 {
   struct locale_measurement_t *measurement;
@@ -171,7 +169,7 @@ measurement_read (struct linereader *ldfile, struct localedef_t *result,
 
   do
     {
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
   while (nowtok == tok_eol);
@@ -198,7 +196,7 @@ measurement_read (struct linereader *ldfile, struct localedef_t *result,
       /* Ingore empty lines.  */
       if (nowtok == tok_eol)
 	{
-	  now = lr_token (ldfile, charmap, result, NULL, verbose);
+	  now = lr_token (ldfile, charmap, NULL, verbose);
 	  nowtok = now->tok;
 	  continue;
 	}
@@ -215,7 +213,7 @@ measurement_read (struct linereader *ldfile, struct localedef_t *result,
 	      break;							      \
 	    }								      \
 									      \
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);	      \
+	  arg = lr_token (ldfile, charmap, NULL, verbose);		      \
 	  if (arg->tok != tok_number)					      \
 	    goto err_label;						      \
 	  else if (measurement->cat != 0)				      \
@@ -229,7 +227,7 @@ measurement_read (struct linereader *ldfile, struct localedef_t *result,
 
 	case tok_end:
 	  /* Next we assume `LC_MEASUREMENT'.  */
-	  arg = lr_token (ldfile, charmap, result, NULL, verbose);
+	  arg = lr_token (ldfile, charmap, NULL, verbose);
 	  if (arg->tok == tok_eof)
 	    break;
 	  if (arg->tok == tok_eol)
@@ -247,7 +245,7 @@ measurement_read (struct linereader *ldfile, struct localedef_t *result,
 	}
 
       /* Prepare for the next round.  */
-      now = lr_token (ldfile, charmap, result, NULL, verbose);
+      now = lr_token (ldfile, charmap, NULL, verbose);
       nowtok = now->tok;
     }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2001, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996,1997,1998,1999,2000,2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1996.
 
@@ -21,7 +21,6 @@
 # include <config.h>
 #endif
 
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <libintl.h>
@@ -29,11 +28,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "localedef.h"
 #include "charmap.h"
 #include "error.h"
 #include "linereader.h"
-#include "locfile.h"
+
+/* Prototypes for a few program-wide used functions.  */
+extern void *xmalloc (size_t __n);
+extern void *xrealloc (void *__p, size_t __n);
+extern char *xstrdup (const char *__str);
+
 
 /* Prototypes for local functions.  */
 static struct token *get_toplvl_escape (struct linereader *lr);
@@ -41,7 +44,6 @@ static struct token *get_symname (struct linereader *lr);
 static struct token *get_ident (struct linereader *lr);
 static struct token *get_string (struct linereader *lr,
 				 const struct charmap_t *charmap,
-				 struct localedef_t *locale,
 				 const struct repertoire_t *repertoire,
 				 int verbose);
 
@@ -56,7 +58,7 @@ lr_open (const char *fname, kw_hash_fct_t hf)
     return lr_create (stdin, "<stdin>", hf);
   else
     {
-      fp = fopen (fname, "rm");
+      fp = fopen (fname, "r");
       if (fp == NULL)
 	return NULL;
       return lr_create (fp, fname, hf);
@@ -161,8 +163,7 @@ extern char *program_name;
 
 struct token *
 lr_token (struct linereader *lr, const struct charmap_t *charmap,
-	  struct localedef_t *locale, const struct repertoire_t *repertoire,
-	  int verbose)
+	  const struct repertoire_t *repertoire, int verbose)
 {
   int ch;
 
@@ -294,7 +295,7 @@ lr_token (struct linereader *lr, const struct charmap_t *charmap,
       return &lr->token;
 
     case '"':
-      return get_string (lr, charmap, locale, repertoire, verbose);
+      return get_string (lr, charmap, repertoire, verbose);
 
     case '-':
       ch = lr_getc (lr);
@@ -381,7 +382,7 @@ get_toplvl_escape (struct linereader *lr)
       bytes[nbytes++] = byte;
     }
   while (ch == lr->escape_char
-	 && nbytes < (int) sizeof (lr->token.val.charcode.bytes));
+	 && nbytes < sizeof (lr->token.val.charcode.bytes));
 
   if (!isspace (ch))
     lr_error (lr, _("garbage at end of character code specification"));
@@ -567,8 +568,7 @@ get_ident (struct linereader *lr)
 
 static struct token *
 get_string (struct linereader *lr, const struct charmap_t *charmap,
-	    struct localedef_t *locale, const struct repertoire_t *repertoire,
-	    int verbose)
+	    const struct repertoire_t *repertoire, int verbose)
 {
   int return_widestr = lr->return_widestr;
   char *buf;
@@ -690,6 +690,7 @@ non-symbolic character value should not be used"));
 	      if (cp == &buf[bufact])
 		{
 		  char utmp[10];
+		  const char *symbol = NULL;
 
 		  /* Yes, it is.  */
 		  ADDC ('\0');
@@ -711,65 +712,21 @@ non-symbolic character value should not be used"));
 			the repertoire the name of the character and
 			find it in the charmap.  */
 		      if (repertoire != NULL)
+			symbol = repertoire_find_symbol (repertoire, wch);
+
+		      if (symbol == NULL)
+			/* We cannot generate a string since we
+			   cannot map from the Unicode number to the
+			   character symbol.  */
+			illegal_string = 1;
+		      else
 			{
-			  const char *symbol;
+			  seq = charmap_find_value (charmap, symbol,
+						    strlen (symbol));
 
-			  symbol = repertoire_find_symbol (repertoire, wch);
-
-			  if (symbol != NULL)
-			    seq = charmap_find_value (charmap, symbol,
-						      strlen (symbol));
-			}
-
-		      if (seq == NULL)
-			{
-#ifndef NO_TRANSLITERATION
-			  /* Transliterate if possible.  */
-			  if (locale != NULL)
-			    {
-			      uint32_t *translit;
-
-			      if ((locale->avail & CTYPE_LOCALE) == 0)
-				{
-				  /* Load the CTYPE data now.  */
-				  int old_needed = locale->needed;
-
-				  locale->needed = 0;
-				  locale = load_locale (LC_CTYPE,
-							locale->name,
-							locale->repertoire_name,
-							charmap, locale);
-				  locale->needed = old_needed;
-				}
-
-			      if ((locale->avail & CTYPE_LOCALE) != 0
-				  && ((translit = find_translit (locale,
-								 charmap, wch))
-				      != NULL))
-				/* The CTYPE data contains a matching
-				   transliteration.  */
-				{
-				  int i;
-
-				  for (i = 0; translit[i] != 0; ++i)
-				    {
-				      char utmp[10];
-
-				      snprintf (utmp, sizeof (utmp), "U%08X",
-						translit[i]);
-				      seq = charmap_find_value (charmap, utmp,
-								9);
-				      assert (seq != NULL);
-				      ADDS (seq->bytes, seq->nbytes);
-				    }
-
-				  continue;
-				}
-			    }
-#endif	/* NO_TRANSLITERATION */
-
-			  /* Not a known name.  */
-			  illegal_string = 1;
+			  if (seq == NULL)
+			    /* Not a known name.  */
+			    illegal_string = 1;
 			}
 		    }
 

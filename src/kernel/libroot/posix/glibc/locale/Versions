@@ -7,7 +7,9 @@ libBrokenLocale {
 libc {
   GLIBC_2.0 {
     # global variables
-    _libc_intl_domainname;
+    __collate_element_hash; __collate_element_strings;
+    __collate_symbol_classes; __collate_symbol_hash; __collate_symbol_strings;
+    _libc_intl_domainname; _nl_current_LC_COLLATE; _nl_current_LC_CTYPE;
 
     # functions used in inline functions or macros
     __ctype_get_mb_cur_max;
@@ -45,30 +47,5 @@ libc {
 
     # missing function from the experimental locale implementation
     __nl_langinfo_l;
-  }
-  GLIBC_2.3 {
-    # the new "experimental" interface is now public
-    newlocale; duplocale; freelocale; uselocale;
-
-    # this name is used by libstdc++ as well as libpthread
-    __uselocale;
-
-    isalnum_l; isalpha_l; isascii_l; isblank_l; iscntrl_l;
-    isdigit_l; isgraph_l; islower_l; isprint_l; ispunct_l;
-    isspace_l; isupper_l; iswalnum_l; iswalpha_l; iswblank_l;
-    iswcntrl_l; iswctype_l; iswdigit_l; iswgraph_l; iswlower_l;
-    iswprint_l; iswpunct_l; iswspace_l; iswupper_l; iswxdigit_l;
-    isxdigit_l; strcasecmp_l; strcoll_l; strfmon_l; strncasecmp_l;
-    strtod_l; strtof_l; strtol_l; strtold_l; strtoul_l;
-    strxfrm_l; toascii_l; tolower_l; toupper_l;
-    towctrans_l; towlower_l; towupper_l; wcscasecmp_l; wcscoll_l;
-    wcsncasecmp_l; wcstod_l; wcstof_l; wcstol_l; wcstold_l;
-    wcstoll_l; wcstoul_l; wcstoull_l; wcsxfrm_l; wctype_l;
-    wctrans_l; nl_langinfo_l;
-  }
-  GLIBC_PRIVATE {
-    # global variables
-    __collate_element_hash; __collate_element_strings;
-    __collate_symbol_classes; __collate_symbol_hash; __collate_symbol_strings;
   }
 }

@@ -1,5 +1,5 @@
 /* Implement simple hashing table with string based keys.
-   Copyright (C) 1994-1997, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1994, 1995, 1996, 1997, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, October 1994.
 
@@ -46,11 +46,13 @@
 # define BITSPERBYTE 8
 #endif
 
+#ifndef	LONGBITS
+# define LONGBITS (sizeof (long) * BITSPERBYTE)
+#endif
+
 #ifndef bcopy
 # define bcopy(s, d, n)	memcpy ((d), (s), (n))
 #endif
-
-#include "hashval.h"
 
 extern void *xmalloc (size_t __n);
 extern void *xcalloc (size_t __n, size_t __m);
@@ -68,8 +70,11 @@ hash_entry;
 /* Prototypes for local functions.  */
 static void insert_entry_2 (hash_table *htab, const void *key, size_t keylen,
 			    unsigned long hval, size_t idx, void *data);
-static size_t lookup (const hash_table *htab, const void *key, size_t keylen,
+static size_t lookup (hash_table *htab, const void *key, size_t keylen,
 		      unsigned long int hval);
+static size_t lookup_2 (hash_table *htab, const void *key, size_t keylen,
+			unsigned long int hval);
+static unsigned long compute_hashval (const void *key, size_t keylen);
 static int is_prime (unsigned long int candidate);
 
 
@@ -158,11 +163,9 @@ insert_entry_2 (htab, key, keylen, hval, idx, data)
     }
 
   ++htab->filled;
-  if (100 * htab->filled > 75 * htab->size)
+  if (100 * htab->filled > 90 * htab->size)
     {
-      /* Table is filled more than 75%.  Resize the table.
-	 Experiments have shown that for best performance, this threshold
-	 must lie between 40% and 85%.  */
+      /* Table is filled more than 90%.  Resize the table.  */
       unsigned long int old_size = htab->size;
 
       htab->size = next_prime (htab->size * 2);
@@ -174,8 +177,8 @@ insert_entry_2 (htab, key, keylen, hval, idx, data)
 	if (table[idx].used)
 	  insert_entry_2 (htab, table[idx].key, table[idx].keylen,
 			  table[idx].used,
-			  lookup (htab, table[idx].key, table[idx].keylen,
-				  table[idx].used),
+			  lookup_2 (htab, table[idx].key, table[idx].keylen,
+				    table[idx].used),
 			  table[idx].data);
 
       free (table);
@@ -185,7 +188,7 @@ insert_entry_2 (htab, key, keylen, hval, idx, data)
 
 int
 find_entry (htab, key, keylen, result)
-     const hash_table *htab;
+     hash_table *htab;
      const void *key;
      size_t keylen;
      void **result;
@@ -221,7 +224,7 @@ set_entry (htab, key, keylen, newval)
 
 int
 iterate_table (htab, ptr, key, keylen, data)
-     const hash_table *htab;
+     hash_table *htab;
      void **ptr;
      const void **key;
      size_t *keylen;
@@ -247,13 +250,56 @@ iterate_table (htab, ptr, key, keylen, data)
 }
 
 
+static size_t
+lookup (htab, key, keylen, hval)
+     hash_table *htab;
+     const void *key;
+     size_t keylen;
+     unsigned long hval;
+{
+  unsigned long hash;
+  size_t idx;
+  hash_entry *table = (hash_entry *) htab->table;
+
+  /* First hash function: simply take the modul but prevent zero.  */
+  hash = 1 + hval % htab->size;
+
+  idx = hash;
+
+  if (table[idx].used)
+    {
+      if (table[idx].used == hval && table[idx].keylen == keylen
+	  && memcmp (key, table[idx].key, keylen) == 0)
+	return idx;
+
+      /* Second hash function as suggested in [Knuth].  */
+      hash = 1 + hval % (htab->size - 2);
+
+      do
+	{
+	  if (idx <= hash)
+	    idx = htab->size + idx - hash;
+	  else
+	    idx -= hash;
+
+	  /* If entry is found use it.  */
+	  if (table[idx].used == hval && table[idx].keylen == keylen
+	      && memcmp (key, table[idx].key, keylen) == 0)
+	    return idx;
+	}
+      while (table[idx].used);
+    }
+  return idx;
+}
+
+
 /* References:
    [Aho,Sethi,Ullman] Compilers: Principles, Techniques and Tools, 1986
    [Knuth]	      The Art of Computer Programming, part3 (6.4) */
 
 static size_t
-lookup (htab, key, keylen, hval)
-     const hash_table *htab;
+lookup_2 (htab, key, keylen, hval)
+     hash_table *htab;
      const void *key;
      size_t keylen;
      unsigned long int hval;
@@ -294,7 +340,34 @@ lookup (htab, key, keylen, hval)
 }
 
 
-unsigned long int
+static unsigned long
+compute_hashval (key, keylen)
+     const void *key;
+     size_t keylen;
+{
+  size_t cnt;
+  unsigned long int hval, g;
+
+  /* Compute the hash value for the given string.  The algorithm
+     is taken from [Aho,Sethi,Ullman].  */
+  cnt = 0;
+  hval = keylen;
+  while (cnt < keylen)
+    {
+      hval <<= 4;
+      hval += (unsigned long int) *(((char *) key) + cnt++);
+      g = hval & ((unsigned long) 0xf << (LONGBITS - 4));
+      if (g != 0)
+	{
+	  hval ^= g >> (LONGBITS - 8);
+	  hval ^= g;
+	}
+    }
+  return hval != 0 ? hval : ~((unsigned long) 0);
+}
+
+
+unsigned long
 next_prime (seed)
      unsigned long int seed;
 {
