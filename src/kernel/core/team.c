@@ -15,6 +15,7 @@
 #include <user_runtime.h>
 #include <Errors.h>
 #include <kerrors.h>
+#include <kimage.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -355,6 +356,7 @@ create_team_struct(const char *name, bool kernel)
 	team->pending_signals = 0;
 	team->death_sem = -1;
 	team->user_env_base = 0;
+	initque(&team->image_queue);
 
 	if (arch_team_init_team_struct(team, kernel) < 0)
 		goto error1;
@@ -376,16 +378,14 @@ delete_team_struct(struct team *team)
 
 
 static int
-get_arguments_data_size(char **args,int argc)
+get_arguments_data_size(char **args, int argc)
 {
-	int cnt;
-	int tot_size = 0;
+	uint32 size = 0, count;
 
-	for(cnt = 0; cnt < argc; cnt++)
-		tot_size += strlen(args[cnt]) + 1;
-	tot_size += (argc + 1) * sizeof(char *);
+	for (count = 0; count < argc; count++)
+		size += strlen(args[count]) + 1;
 
-	return tot_size + sizeof(struct uspace_prog_args_t);
+	return size + (argc + 1) * sizeof(char *) + sizeof(struct uspace_program_args);
 }
 
 
@@ -395,7 +395,7 @@ team_create_team2(void *args)
 	int err;
 	struct thread *t;
 	struct team *team;
-	struct team_arg *pargs = args;
+	struct team_arg *teamArgs = args;
 	char *path;
 	addr entry;
 	char ustack_name[128];
@@ -403,7 +403,7 @@ team_create_team2(void *args)
 	char **uargs;
 	char **uenv;
 	char *udest;
-	struct uspace_prog_args_t *uspa;
+	struct uspace_program_args *uspa;
 	unsigned int arg_cnt;
 	unsigned int env_cnt;
 
@@ -419,7 +419,7 @@ team_create_team2(void *args)
 	//		the bottom of the USER_STACK_REGION.
 
 	totalSize = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
-		get_arguments_data_size(pargs->args, pargs->argc));
+		get_arguments_data_size(teamArgs->args, teamArgs->argc));
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - totalSize;
 		// the exact location at the end of the user stack region
 
@@ -434,42 +434,42 @@ team_create_team2(void *args)
 	// now that the TLS area is allocated, initialize TLS
 	arch_thread_init_tls(t);
 
-	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
+	uspa = (struct uspace_program_args *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
-	udest = (char  *)(uargs + pargs->argc + 1);
+	udest = (char  *)(uargs + teamArgs->argc + 1);
 //	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
 
-	for (arg_cnt = 0; arg_cnt < pargs->argc; arg_cnt++) {
+	for (arg_cnt = 0; arg_cnt < teamArgs->argc; arg_cnt++) {
 		uargs[arg_cnt] = udest;
-		user_strcpy(udest, pargs->args[arg_cnt]);
-		udest += (strlen(pargs->args[arg_cnt]) + 1);
+		user_strcpy(udest, teamArgs->args[arg_cnt]);
+		udest += (strlen(teamArgs->args[arg_cnt]) + 1);
 	}
 	uargs[arg_cnt] = NULL;
 
 	team->user_env_base = t->user_stack_base + STACK_SIZE + TLS_SIZE;
 	uenv  = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
-//	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
-	for (env_cnt=0; env_cnt<pargs->envc; env_cnt++) {
-		udest -= (strlen(pargs->envp[env_cnt]) + 1);
+//	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp);
+	for (env_cnt = 0; env_cnt < teamArgs->envc; env_cnt++) {
+		udest -= (strlen(teamArgs->envp[env_cnt]) + 1);
 		uenv[env_cnt] = udest;
-		user_strcpy(udest, pargs->envp[env_cnt]);
+		user_strcpy(udest, teamArgs->envp[env_cnt]);
 	}
 	uenv[env_cnt] = NULL;
 
-	user_memcpy(uspa->prog_name, team->name, sizeof(uspa->prog_name));
-	user_memcpy(uspa->prog_path, pargs->path, sizeof(uspa->prog_path));
+	user_memcpy(uspa->program_name, team->name, sizeof(uspa->program_name));
+	user_memcpy(uspa->program_path, teamArgs->path, sizeof(uspa->program_path));
 	uspa->argc = arg_cnt;
 	uspa->argv = uargs;
 	uspa->envc = env_cnt;
 	uspa->envp = uenv;
 
-	if (pargs->args != NULL)
-		kfree_strings_array(pargs->args, pargs->argc);
-	if (pargs->envp != NULL)
-		kfree_strings_array(pargs->envp, pargs->envc);
+	if (teamArgs->args != NULL)
+		kfree_strings_array(teamArgs->args, teamArgs->argc);
+	if (teamArgs->envp != NULL)
+		kfree_strings_array(teamArgs->envp, teamArgs->envc);
 
-	path = pargs->path;
+	path = teamArgs->path;
 	dprintf("team_create_team2: loading elf binary '%s'\n", path);
 
 	err = elf_load_uspace("/boot/libexec/rld.so", team, 0, &entry);
@@ -479,8 +479,8 @@ team_create_team2(void *args)
 	}
 
 	// free the args
-	free(pargs->path);
-	free(pargs);
+	free(teamArgs->path);
+	free(teamArgs);
 
 	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
 
@@ -503,7 +503,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	int err;
 	unsigned int state;
 //	int sem_retcode;
-	struct team_arg *pargs;
+	struct team_arg *teamArgs;
 
 	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
 
@@ -520,20 +520,20 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	restore_interrupts(state);
 
 	// copy the args over
-	pargs = (struct team_arg *)malloc(sizeof(struct team_arg));
-	if (pargs == NULL){
+	teamArgs = (struct team_arg *)malloc(sizeof(struct team_arg));
+	if (teamArgs == NULL){
 		err = ENOMEM;
 		goto err1;
 	}
-	pargs->path = strdup(path);
-	if (pargs->path == NULL){
+	teamArgs->path = strdup(path);
+	if (teamArgs->path == NULL){
 		err = ENOMEM;
 		goto err2;
 	}
-	pargs->argc = argc;
-	pargs->args = args;
-	pargs->envp = envp;
-	pargs->envc = envc;
+	teamArgs->argc = argc;
+	teamArgs->args = args;
+	teamArgs->envp = envp;
+	teamArgs->envc = envc;
 
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
@@ -551,7 +551,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
 	// create a kernel thread, but under the context of the new team
-	tid = thread_create_kernel_thread_etc(name, team_create_team2, pargs, team);
+	tid = thread_create_kernel_thread_etc(name, team_create_team2, teamArgs, team);
 	if (tid < 0) {
 		err = tid;
 		goto err5;
@@ -567,9 +567,9 @@ err5:
 err4:
 	vfs_free_io_context(team->io_context);
 err3:
-	free(pargs->path);
+	free(teamArgs->path);
 err2:
-	free(pargs);
+	free(teamArgs);
 err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
@@ -613,6 +613,11 @@ team_kill_team(team_id id)
 }
 
 
+/** Fills the team_info structure with information from the specified
+ *	team.
+ *	Team lock must be hold when called.
+ */
+
 static status_t
 fill_team_info(struct team *team, team_info *info, size_t size)
 {
@@ -624,7 +629,7 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 
 	info->team = team->id;
 	info->thread_count = team->num_threads;
-	//info->image_count = 
+	info->image_count = count_images(team);
 	//info->area_count = 
 	//info->debugger_nub_thread = 
 	//info->debugger_nub_port = 
