@@ -11,6 +11,7 @@
 #include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
@@ -38,12 +39,17 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-static const char *sHaikuDBDir	= "/boot/home/config/settings/beos_mime";
+static const char *get_user_settings_dir(BPath &path);
+
+static BPath sSettingsDirPath;
+static const std::string sSettingsDir = get_user_settings_dir(sSettingsDirPath);
+
+static const char *sHaikuDBDirName	= "beos_mime";
 	// when running natively under Haiku
-static const char *sBeOSDBDir	= "/boot/home/config/settings/obos_mime";
+static const char *sBeOSDBDirName	= "obos_mime";
 	// when running under BeOS
-const std::string kDatabaseDir
-	= (is_running_on_haiku() ? sHaikuDBDir : sBeOSDBDir);
+const std::string kDatabaseDir = sSettingsDir + "/"
+	+ (is_running_on_haiku() ? sHaikuDBDirName : sBeOSDBDirName);
 const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
 
 #define ATTR_PREFIX "META:"
@@ -97,6 +103,21 @@ const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
+
+// get_settings_dir
+/*!	\brief Sets the supplied BPath to the user settings directory and returns
+		   it as C string.
+	\param path BPath to be set to the user settings path.
+	\return the user settings path as C string (\code path.Path() \endcode).
+*/
+static
+const char*
+get_user_settings_dir(BPath &path)
+{
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		path.SetTo("/boot/home/config/settings");
+	return path.Path();
+}
 
 // type_to_filename
 //! Converts the given MIME type to an absolute path in the MIME database.
