@@ -313,7 +313,7 @@ static void detect_panels()
 		 * are used!
 		 * Currently we'd loose the panel setup while not being able to restore it. */
 		/* Note:
-		 * NV11 cards can't distinquish between head 1 and head 2. */
+		 * NV11 and NV17 cards can't distinquish between head 1 and head 2. */
 		if (slaved_for_dev1 && !tvout1)
 		{
 			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -326,7 +326,8 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if ((si->ps.card_type != NV11) &&
+		//fixme?!?: how about NV18??, CRTC2 has panel instead of CRTC1???
+		if ((si->ps.card_type != NV11) && (si->ps.card_type != NV17) &&
 			si->ps.secondary_head && slaved_for_dev2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -351,7 +352,8 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if ((si->ps.card_type != NV11) &&
+		//fixme?!?: how about NV18??, CRTC2 has panel instead of CRTC1???
+		if ((si->ps.card_type != NV11) && (si->ps.card_type != NV17) &&
 			si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
