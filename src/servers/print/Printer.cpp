@@ -59,6 +59,7 @@
 typedef BMessage* (*config_func_t)(BNode*, const BMessage*);
 typedef BMessage* (*take_job_func_t)(BFile*, BNode*, const BMessage*);
 typedef char* (*add_printer_func_t)(const char* printer_name);
+typedef BMessage* (*default_settings_t)(BNode*);
 
 // ---------------------------------------------------------------
 BObjectList<Printer> Printer::sPrinters;
@@ -227,6 +228,9 @@ status_t Printer::ConfigurePage(BMessage& settings)
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if (new_settings != NULL && new_settings->what != 'baad')
 				settings = *new_settings;
+			else
+				rc = B_ERROR;
+			delete new_settings;
 		}
 		
 		::unload_add_on(id);
@@ -285,6 +289,44 @@ void Printer::HandleSpooledJob() {
 		StartPrintThread();
 	}
 }
+ 
+
+// ---------------------------------------------------------------
+// GetDefaultSettings
+//
+// Retrieve the default configuration message from printer add-on
+//
+// Parameters:
+//   settings, output paramter.
+//
+// Returns:
+//    B_OK if successful or errorcode otherwise.
+// ---------------------------------------------------------------
+status_t Printer::GetDefaultSettings(BMessage& settings) {
+	image_id id;
+	status_t rc;
+	
+	if ((rc=LoadPrinterAddon(id)) == B_OK) {
+			// Addon was loaded, so try and get the default_settings symbol
+		default_settings_t func;
+
+		if ((rc=get_image_symbol(id, "default_settings", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
+				// call the function and check its result
+			BMessage* new_settings = (*func)(SpoolDir());
+			if (new_settings) {
+				settings = *new_settings; 
+			} else {
+				rc = B_ERROR;
+			}
+			delete new_settings;
+		}
+		
+		::unload_add_on(id);
+	}
+	
+	return rc;
+}
+ 
  
 void Printer::AbortPrintThread() {
 	fAbort = true;

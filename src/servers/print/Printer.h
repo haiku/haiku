@@ -80,6 +80,7 @@ public:
 	status_t ConfigurePrinter();
 	status_t ConfigureJob(BMessage& ioSettings);
 	status_t ConfigurePage(BMessage& ioSettings);
+	status_t GetDefaultSettings(BMessage& configuration);
 
 		// Try to start processing of next spooled job
 	void HandleSpooledJob();
