@@ -14,10 +14,11 @@
 int
 pipe(int streams[2])
 {
-	// ToDo: if the thread manages to call this function during the
-	//	the same microsecond twice, we're doomed :)
+	static int32 counter = 0;
+		// ToDo: a way without this variable would be even cooler
+
 	char pipeName[64];
-	sprintf(pipeName, "/pipe/%lx-%Ld\n", find_thread(NULL), system_time());
+	sprintf(pipeName, "/pipe/%03lx-%03ld", find_thread(NULL), atomic_add(&counter, 1));
 
 	streams[0] = open(pipeName, O_CREAT | O_RDONLY, 0777);
 	if (streams[0] < 0)
