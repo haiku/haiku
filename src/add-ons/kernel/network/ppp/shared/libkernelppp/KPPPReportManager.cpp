@@ -1,22 +1,14 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <KPPPReportManager.h>
 #include <LockerHelper.h>
 
 #include <KPPPUtils.h>
-
-#ifdef _KERNEL_MODE
-	#include <KernelExport.h>
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 PPPReportManager::PPPReportManager(BLocker& lock)
@@ -88,7 +80,7 @@ bool
 PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
 #if DEBUG
-	printf("PPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
+	dprintf("PPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
 		type, code, length, fReportRequests.CountItems());
 #endif
 	
@@ -127,7 +119,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 		
 #if DEBUG
 	if(result == B_TIMED_OUT)
-		printf("PPPReportManager::Report(): timed out sending\n");
+		dprintf("PPPReportManager::Report(): timed out sending\n");
 #endif
 		
 		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
@@ -144,22 +136,30 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 					// always check if the thread still exists
 					while(sender != request->thread
 							&& get_thread_info(request->thread, &info)
-								!= B_BAD_THREAD_ID)
+								!= B_BAD_THREAD_ID) {
 						result = receive_data_with_timeout(&sender, &code, NULL, 0,
 							PPP_REPORT_TIMEOUT);
+						
+						if(request->flags & PPP_ALLOW_ANY_REPLY_THREAD)
+							sender = request->thread;
+					}
 				} else {
 					sender = -1;
 					result = B_OK;
-					while(sender != request->thread && result == B_OK)
+					while(sender != request->thread && result == B_OK) {
 						result = receive_data_with_timeout(&sender, &code, NULL, 0,
 							PPP_REPORT_TIMEOUT);
+						
+						if(request->flags & PPP_ALLOW_ANY_REPLY_THREAD)
+							sender = request->thread;
+					}
 				}
 				
 				if(result == B_OK && code != B_OK)
 					acceptable = false;
 #if DEBUG
 				if(result == B_TIMED_OUT)
-					printf("PPPReportManager::Report(): reply timed out\n");
+					dprintf("PPPReportManager::Report(): reply timed out\n");
 #endif
 			}
 		}
@@ -171,7 +171,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 	}
 	
 #if DEBUG
-	printf("PPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
+	dprintf("PPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
 #endif
 	
 	return acceptable;

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <cstdio>
 
@@ -18,11 +18,6 @@
 #include <settings_tools.h>
 #include <LockerHelper.h>
 
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#endif
-
 
 #if DEBUG
 static char sDigits[] = "0123456789ABCDEF";
@@ -36,7 +31,7 @@ dump_packet(struct mbuf *packet)
 	uint8 buffer[33];
 	uint8 bufferIndex = 0;
 	
-	printf("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
+	dprintf("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
 		packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
 	
 	for(uint32 index = 0; index < packet->m_len; index++) {
@@ -44,7 +39,7 @@ dump_packet(struct mbuf *packet)
 		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
 		if(bufferIndex == 32 || index == packet->m_len - 1) {
 			buffer[bufferIndex] = 0;
-			printf("%s\n", buffer);
+			dprintf("%s\n", buffer);
 			bufferIndex = 0;
 		}
 	}
@@ -193,9 +188,9 @@ ModemDevice::ModemDevice(PPPInterface& interface, driver_parameter *settings)
 	fState(INITIAL)
 {
 #if DEBUG
-	printf("ModemDevice: Constructor\n");
+	dprintf("ModemDevice: Constructor\n");
 	if(!settings || !settings->parameters)
-		printf("ModemDevice::ctor: No settings!\n");
+		dprintf("ModemDevice::ctor: No settings!\n");
 #endif
 	
 	fACFC = new ACFCHandler(REQUEST_ACFC | ALLOW_ACFC, interface);
@@ -215,7 +210,7 @@ ModemDevice::ModemDevice(PPPInterface& interface, driver_parameter *settings)
 	fDialString = get_parameter_value(MODEM_DIAL_KEY, settings);
 	
 #if DEBUG
-	printf("ModemDevice::ctor: interfaceName: %s\n", interfaceName);
+	dprintf("ModemDevice::ctor: interfaceName: %s\n", interfaceName);
 #endif
 }
 
@@ -223,7 +218,7 @@ ModemDevice::ModemDevice(PPPInterface& interface, driver_parameter *settings)
 ModemDevice::~ModemDevice()
 {
 #if DEBUG
-	printf("ModemDevice: Destructor\n");
+	dprintf("ModemDevice: Destructor\n");
 #endif
 }
 
@@ -242,7 +237,7 @@ bool
 ModemDevice::Up()
 {
 #if DEBUG
-	printf("ModemDevice: Up()\n");
+	dprintf("ModemDevice: Up()\n");
 #endif
 	
 	if(InitCheck() != B_OK)
@@ -269,7 +264,7 @@ ModemDevice::Up()
 	fState = DIALING;
 	
 	if(fWorkerThread == -1) {
-		fWorkerThread = spawn_thread(worker_thread, "Modem: worker_thread",
+		fWorkerThread = spawn_kernel_thread(worker_thread, "Modem: worker_thread",
 			B_NORMAL_PRIORITY, this);
 		resume_thread(fWorkerThread);
 	}
@@ -282,7 +277,7 @@ bool
 ModemDevice::Down()
 {
 #if DEBUG
-	printf("ModemDevice: Down()\n");
+	dprintf("ModemDevice: Down()\n");
 #endif
 	
 	if(InitCheck() != B_OK)
@@ -415,7 +410,7 @@ status_t
 ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 {
 #if DEBUG
-	printf("ModemDevice: Send()\n");
+	dprintf("ModemDevice: Send()\n");
 	dump_packet(packet);
 #endif
 	

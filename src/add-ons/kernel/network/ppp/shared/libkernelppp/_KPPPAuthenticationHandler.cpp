@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "_KPPPAuthenticationHandler.h"
 
@@ -11,15 +11,6 @@
 #include <KPPPDevice.h>
 
 #include <netinet/in.h>
-
-
-#ifdef _KERNEL_MODE
-	#include <KernelExport.h>
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#elif DEBUG
-	#include <cstdio>
-#endif
 
 
 #define AUTHENTICATION_TYPE				0x3
@@ -109,7 +100,7 @@ _PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
 		// no problem because the suggested authenticator will be accepted (hopefully)
 	
 #if DEBUG
-	printf("PPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
+	dprintf("PPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
 #endif
 	
 	authenticator->SetEnabled(true);
@@ -203,7 +194,7 @@ _PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
 			// no authentication requested by peer (index > request.CountItems())
 	
 #if DEBUG
-	printf("PPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
+	dprintf("PPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
 #endif
 	
 	// try to find the requested protocol

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _K_PPP_OPTION_HANDLER__H
 #define _K_PPP_OPTION_HANDLER__H

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "Protocol.h"
 #include <KPPPConfigurePacket.h>
@@ -17,14 +17,6 @@
 #include <sys/sockio.h>
 
 
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
-
-
 #define PPP_STATE_MACHINE_TIMEOUT			3000000
 	// 3 seconds
 
@@ -32,6 +24,7 @@
 IPCP::IPCP(PPPInterface& interface, driver_parameter *settings)
 	: PPPProtocol("IPCP", PPP_NCP_PHASE, IPCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
 		AF_INET, 0, interface, settings, PPP_INCLUDES_NCP),
+	fDefaultRoute(NULL),
 	fRequestPrimaryDNS(false),
 	fRequestSecondaryDNS(false),
 	fState(PPP_INITIAL_STATE),
@@ -64,6 +57,7 @@ IPCP::IPCP(PPPInterface& interface, driver_parameter *settings)
 
 IPCP::~IPCP()
 {
+	RemoveRoutes();
 }
 
 
@@ -71,7 +65,7 @@ status_t
 IPCP::StackControl(uint32 op, void *data)
 {
 #if DEBUG
-	printf("IPCP: StackControl(op=%ld)\n", op);
+	dprintf("IPCP: StackControl(op=%ld)\n", op);
 #endif
 	
 	// TODO:
@@ -91,7 +85,7 @@ IPCP::StackControl(uint32 op, void *data)
 		break;
 		
 		default:
-			printf("IPCP: Unknown ioctl: %ld\n", op);
+			dprintf("IPCP: Unknown ioctl: %ld\n", op);
 			return PPPProtocol::StackControl(op, data);
 	}
 	
@@ -103,7 +97,7 @@ bool
 IPCP::Up()
 {
 #if DEBUG
-	printf("IPCP: Up() state=%d\n", State());
+	dprintf("IPCP: Up() state=%d\n", State());
 #endif
 	
 	// Servers do not send a configure-request when Up() is called. They wait until
@@ -133,7 +127,7 @@ bool
 IPCP::Down()
 {
 #if DEBUG
-	printf("IPCP: Down() state=%d\n", State());
+	dprintf("IPCP: Down() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -180,14 +174,14 @@ status_t
 IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 {
 #if DEBUG
-	printf("IPCP: Send(0x%X)\n", protocolNumber);
+	dprintf("IPCP: Send(0x%X)\n", protocolNumber);
 #endif
 	
 	if((protocolNumber == IP_PROTOCOL && State() == PPP_OPENED_STATE)
 			|| protocolNumber == IPCP_PROTOCOL)
 		return SendToNext(packet, protocolNumber);
 	
-	printf("IPCP: Send() failed because of wrong state or protocol number!\n");
+	dprintf("IPCP: Send() failed because of wrong state or protocol number!\n");
 	
 	m_freem(packet);
 	return B_ERROR;
@@ -198,7 +192,7 @@ status_t
 IPCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 #if DEBUG
-	printf("IPCP: Receive(0x%X)\n", protocolNumber);
+	dprintf("IPCP: Receive(0x%X)\n", protocolNumber);
 #endif
 	
 	if(!packet)
@@ -272,7 +266,7 @@ IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 		gProto[IPPROTO_IP]->pr_input(packet, 0);
 		return B_OK;
 	} else {
-		printf("IPCP: Error: Could not find input function for IP!\n");
+		dprintf("IPCP: Error: Could not find input function for IP!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -366,15 +360,17 @@ IPCP::ParseSideRequests(driver_parameter *requests, ppp_side side)
 void
 IPCP::UpdateAddresses()
 {
+	RemoveRoutes();
+	
 	if(State() != PPP_OPENED_STATE && !Interface().DoesDialOnDemand())
 		return;
 	
-	struct sockaddr_in gateway;
 	struct in_aliasreq inreq;
 	struct ifreq ifreqAddress, ifreqDestination;
 	memset(&inreq, 0, sizeof(struct in_aliasreq));
 	memset(&ifreqAddress, 0, sizeof(struct ifreq));
 	memset(&ifreqDestination, 0, sizeof(struct ifreq));
+	memset(&fGateway, 0, sizeof(struct sockaddr_in));
 	
 	// create local address
 	inreq.ifra_addr.sin_family = AF_INET;
@@ -388,15 +384,15 @@ IPCP::UpdateAddresses()
 	memcpy(&ifreqAddress.ifr_addr, &inreq.ifra_addr, sizeof(struct sockaddr_in));
 	
 	// create destination address
-	gateway.sin_family = AF_INET;
+	fGateway.sin_family = AF_INET;
 	if(fPeerRequests.address != INADDR_ANY)
-		gateway.sin_addr.s_addr = fPeerRequests.address;
+		fGateway.sin_addr.s_addr = fPeerRequests.address;
 	else if(fPeerConfiguration.address == INADDR_ANY)
-		gateway.sin_addr.s_addr = INADDR_BROADCAST;
+		fGateway.sin_addr.s_addr = INADDR_BROADCAST;
 	else
-		gateway.sin_addr.s_addr = fPeerConfiguration.address;
-	gateway.sin_len = sizeof(struct sockaddr_in);
-	memcpy(&inreq.ifra_dstaddr, &gateway,
+		fGateway.sin_addr.s_addr = fPeerConfiguration.address;
+	fGateway.sin_len = sizeof(struct sockaddr_in);
+	memcpy(&inreq.ifra_dstaddr, &fGateway,
 		sizeof(struct sockaddr_in));
 	memcpy(&ifreqDestination.ifr_dstaddr, &inreq.ifra_dstaddr,
 		sizeof(struct sockaddr_in));
@@ -409,34 +405,49 @@ IPCP::UpdateAddresses()
 	// tell stack to use these values
 	if(in_control(NULL, SIOCAIFADDR, (caddr_t) &inreq,
 			Interface().Ifnet()) != B_OK)
-		printf("IPCP: UpdateAddress(): SIOCAIFADDR returned error!\n");
+		dprintf("IPCP: UpdateAddress(): SIOCAIFADDR returned error!\n");
 	if(in_control(NULL, SIOCSIFADDR, (caddr_t) &ifreqAddress,
 			Interface().Ifnet()) != B_OK)
-		printf("IPCP: UpdateAddress(): SIOCSIFADDR returned error!\n");
+		dprintf("IPCP: UpdateAddress(): SIOCSIFADDR returned error!\n");
 	if(in_control(NULL, SIOCSIFDSTADDR, (caddr_t) &ifreqDestination,
 			Interface().Ifnet()) != B_OK)
-		printf("IPCP: UpdateAddress(): SIOCSIFDSTADDR returned error!\n");
+		dprintf("IPCP: UpdateAddress(): SIOCSIFDSTADDR returned error!\n");
 	memcpy(&inreq.ifra_addr, &inreq.ifra_mask, sizeof(struct sockaddr_in));
 		// SIOCISFNETMASK wants the netmask to be in ifra_addr
 	if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq,
 			Interface().Ifnet()) != B_OK)
-		printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
+		dprintf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
 	
 	// add default/subnet route
-	struct rtentry *rt;
-	struct sockaddr_in destination;
-	destination.sin_family = AF_INET;
-	destination.sin_addr.s_addr = fLocalRequests.netmask;
-	if(fLocalRequests.netmask == INADDR_ANY)
-		destination.sin_len = 0;
-	else
-		destination.sin_len = sizeof(struct sockaddr_in);
+	if(rtrequest(RTM_ADD, (struct sockaddr*) &inreq.ifra_mask,
+			(struct sockaddr*) &fGateway, (struct sockaddr*) &inreq.ifra_mask,
+			RTF_UP | RTF_GATEWAY, &fDefaultRoute) != B_OK)
+		dprintf("IPCP: UpdateAddress(): could not add default/subnet route!\n");
 	
-	if(rtrequest(RTM_ADD, (struct sockaddr*) &destination, (struct sockaddr*) &gateway,
-			(struct sockaddr*) &inreq.ifra_mask, RTF_UP | RTF_GATEWAY, &rt) != B_OK)
-		printf("IPCP: UpdateAddress(): could not add default route!\n");
+	--fDefaultRoute->rt_refcnt;
+}
+
+
+void
+IPCP::RemoveRoutes()
+{
+	// note: netstack creates and deletes destination route automatically
 	
-	--rt->rt_refcnt;
+	if(fDefaultRoute) {
+		struct sockaddr_in netmask;
+		memset(&netmask, 0, sizeof(struct sockaddr_in));
+		
+		netmask.sin_family = AF_INET;
+		netmask.sin_addr.s_addr = fLocalRequests.netmask;
+		netmask.sin_len = sizeof(struct sockaddr_in);
+		
+		if(rtrequest(RTM_DELETE, (struct sockaddr*) &netmask,
+				(struct sockaddr*) &fGateway, (struct sockaddr*) &netmask,
+				RTF_GATEWAY, &fDefaultRoute) != B_OK)
+			dprintf("IPCP: RemoveRoutes(): could not remove default/subnet route!\n");
+		
+		fDefaultRoute = NULL;
+	}
 }
 
 
@@ -451,7 +462,7 @@ void
 IPCP::NewState(ppp_state next)
 {
 #if DEBUG
-	printf("IPCP: NewState(%d) state=%d\n", next, State());
+	dprintf("IPCP: NewState(%d) state=%d\n", next, State());
 #endif
 	
 	// report state changes
@@ -472,7 +483,7 @@ void
 IPCP::TOGoodEvent()
 {
 #if DEBUG
-	printf("IPCP: TOGoodEvent() state=%d\n", State());
+	dprintf("IPCP: TOGoodEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -502,7 +513,7 @@ void
 IPCP::TOBadEvent()
 {
 #if DEBUG
-	printf("IPCP: TOBadEvent() state=%d\n", State());
+	dprintf("IPCP: TOBadEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -532,7 +543,7 @@ void
 IPCP::RCREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RCREvent() state=%d\n", State());
+	dprintf("IPCP: RCREvent() state=%d\n", State());
 #endif
 	
 	PPPConfigurePacket request(packet);
@@ -640,7 +651,7 @@ void
 IPCP::RCRGoodEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RCRGoodEvent() state=%d\n", State());
+	dprintf("IPCP: RCRGoodEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -686,7 +697,7 @@ void
 IPCP::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
 #if DEBUG
-	printf("IPCP: RCRBadEvent() state=%d\n", State());
+	dprintf("IPCP: RCRBadEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -728,7 +739,7 @@ void
 IPCP::RCAEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RCAEvent() state=%d\n", State());
+	dprintf("IPCP: RCAEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -838,7 +849,7 @@ void
 IPCP::RCNEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RCNEvent() state=%d\n", State());
+	dprintf("IPCP: RCNEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -956,7 +967,7 @@ void
 IPCP::RTREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RTREvent() state=%d\n", State());
+	dprintf("IPCP: RTREvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1001,7 +1012,7 @@ void
 IPCP::RTAEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RTAEvent() state=%d\n", State());
+	dprintf("IPCP: RTAEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1047,7 +1058,7 @@ void
 IPCP::RUCEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RUCEvent() state=%d\n", State());
+	dprintf("IPCP: RUCEvent() state=%d\n", State());
 #endif
 	
 	SendCodeReject(packet);
@@ -1058,7 +1069,7 @@ void
 IPCP::RXJBadEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: RXJBadEvent() state=%d\n", State());
+	dprintf("IPCP: RXJBadEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1102,7 +1113,7 @@ void
 IPCP::IllegalEvent(ppp_event event)
 {
 	// TODO: update error statistics
-	printf("IPCP: IllegalEvent(event=%d) state=%d\n", event, State());
+	dprintf("IPCP: IllegalEvent(event=%d) state=%d\n", event, State());
 }
 
 
@@ -1163,7 +1174,7 @@ bool
 IPCP::SendConfigureRequest()
 {
 #if DEBUG
-	printf("IPCP: SendConfigureRequest() state=%d\n", State());
+	dprintf("IPCP: SendConfigureRequest() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1186,7 +1197,7 @@ IPCP::SendConfigureRequest()
 	request.AddItem((ppp_configure_item*) &ipItem);
 	
 #if DEBUG
-	printf("IPCP: SCR: confaddr=%lX; reqaddr=%lX; addr=%lX\n",
+	dprintf("IPCP: SCR: confaddr=%lX; reqaddr=%lX; addr=%lX\n",
 		fLocalConfiguration.address, fLocalRequests.address,
 		((ip_item*)request.ItemAt(0))->address);
 #endif
@@ -1218,7 +1229,7 @@ bool
 IPCP::SendConfigureAck(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: SendConfigureAck() state=%d\n", State());
+	dprintf("IPCP: SendConfigureAck() state=%d\n", State());
 #endif
 	
 	if(!packet)
@@ -1289,7 +1300,7 @@ bool
 IPCP::SendConfigureNak(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: SendConfigureNak() state=%d\n", State());
+	dprintf("IPCP: SendConfigureNak() state=%d\n", State());
 #endif
 	
 	if(!packet)
@@ -1312,7 +1323,7 @@ bool
 IPCP::SendTerminateRequest()
 {
 #if DEBUG
-	printf("IPCP: SendTerminateRequest() state=%d\n", State());
+	dprintf("IPCP: SendTerminateRequest() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1342,7 +1353,7 @@ bool
 IPCP::SendTerminateAck(struct mbuf *request = NULL)
 {
 #if DEBUG
-	printf("IPCP: SendTerminateAck() state=%d\n", State());
+	dprintf("IPCP: SendTerminateAck() state=%d\n", State());
 #endif
 	
 	struct mbuf *reply = request;
@@ -1373,7 +1384,7 @@ bool
 IPCP::SendCodeReject(struct mbuf *packet)
 {
 #if DEBUG
-	printf("IPCP: SendCodeReject() state=%d\n", State());
+	dprintf("IPCP: SendCodeReject() state=%d\n", State());
 #endif
 	
 	if(!packet)

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <core_funcs.h>
 #include <KernelExport.h>
@@ -87,8 +87,8 @@ ppp_control(uint32 op, void *data, size_t length)
 
 
 static
-interface_id
-CreateInterface(const driver_settings *settings, interface_id parent)
+ppp_interface_id
+CreateInterface(const driver_settings *settings, ppp_interface_id parent)
 {
 	if(sManager)
 		return sManager->CreateInterface(settings, parent);
@@ -99,7 +99,7 @@ CreateInterface(const driver_settings *settings, interface_id parent)
 
 static
 bool
-DeleteInterface(interface_id ID)
+DeleteInterface(ppp_interface_id ID)
 {
 	if(sManager)
 		return sManager->DeleteInterface(ID);
@@ -110,7 +110,7 @@ DeleteInterface(interface_id ID)
 
 static
 bool
-RemoveInterface(interface_id ID)
+RemoveInterface(ppp_interface_id ID)
 {
 	if(sManager)
 		return sManager->RemoveInterface(ID);
@@ -121,7 +121,7 @@ RemoveInterface(interface_id ID)
 
 static
 ifnet*
-RegisterInterface(interface_id ID)
+RegisterInterface(ppp_interface_id ID)
 {
 	if(sManager)
 		return sManager->RegisterInterface(ID);
@@ -132,7 +132,7 @@ RegisterInterface(interface_id ID)
 
 static
 bool
-UnregisterInterface(interface_id ID)
+UnregisterInterface(ppp_interface_id ID)
 {
 	if(sManager)
 		return sManager->UnregisterInterface(ID);
@@ -143,7 +143,7 @@ UnregisterInterface(interface_id ID)
 
 static
 status_t
-ControlInterface(interface_id ID, uint32 op, void *data, size_t length)
+ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t length)
 {
 	if(sManager)
 		return sManager->ControlInterface(ID, op, data, length);
@@ -154,7 +154,7 @@ ControlInterface(interface_id ID, uint32 op, void *data, size_t length)
 
 static
 int32
-GetInterfaces(interface_id *interfaces, int32 count,
+GetInterfaces(ppp_interface_id *interfaces, int32 count,
 	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 {
 	if(sManager)

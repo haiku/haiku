@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <KernelExport.h>
 #include <driver_settings.h>
@@ -15,14 +15,6 @@
 #include <LockerHelper.h>
 
 #include "ModemDevice.h"
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 #define MODEM_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/modem"
@@ -50,7 +42,7 @@ add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	}
 	
 #if DEBUG
-	printf("Modem: add_to(): %s\n",
+	dprintf("Modem: add_to(): %s\n",
 		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
 #endif
 	

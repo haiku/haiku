@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _PPP_REPORT_DEFS__H
 #define _PPP_REPORT_DEFS__H
@@ -20,13 +20,15 @@
 
 // report flags
 enum ppp_report_flags {
-	PPP_WAIT_FOR_REPLY = 0x1,
-	PPP_REMOVE_AFTER_REPORT = 0x2,
-	PPP_NO_REPLY_TIMEOUT = 0x4
+	PPP_WAIT_FOR_REPLY = 0x01,
+	PPP_REMOVE_AFTER_REPORT = 0x02,
+	PPP_NO_REPLY_TIMEOUT = 0x04,
+	PPP_ALLOW_ANY_REPLY_THREAD = 0x08,
 };
 
 // report types
-// the first 16 report types are reserved for the interface manager
+// the first 15 report types are reserved for the interface manager
+#define PPP_INTERFACE_REPORT_TYPE_MIN	16
 enum ppp_report_type {
 	PPP_ALL_REPORTS = -1,
 		// used only when disabling reports
@@ -64,6 +66,7 @@ typedef struct ppp_report_packet {
 	int32 type;
 	int32 code;
 	uint8 length;
+		// length of data
 	char data[PPP_REPORT_DATA_LIMIT];
 } ppp_report_packet;
 

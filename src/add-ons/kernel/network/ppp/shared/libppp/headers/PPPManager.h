@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _PPP_MANAGER__H
 #define _PPP_MANAGER__H
@@ -25,17 +25,17 @@ class PPPManager {
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
 		
-		interface_id CreateInterface(const driver_settings *settings) const;
-		bool DeleteInterface(interface_id ID) const;
+		ppp_interface_id CreateInterface(const driver_settings *settings) const;
+		bool DeleteInterface(ppp_interface_id ID) const;
 		
-		interface_id *Interfaces(int32 *count,
+		ppp_interface_id *Interfaces(int32 *count,
 			ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const;
 				// the user is responsible for deleting the returned array!
-		int32 GetInterfaces(interface_id *interfaces, int32 count,
+		int32 GetInterfaces(ppp_interface_id *interfaces, int32 count,
 			ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const;
 				// make sure interfaces has enough space for count items
-		interface_id InterfaceWithSettings(const driver_settings *settings) const;
-		interface_id InterfaceWithUnit(int32 if_unit);
+		ppp_interface_id InterfaceWithSettings(const driver_settings *settings) const;
+		ppp_interface_id InterfaceWithUnit(int32 if_unit);
 		int32 CountInterfaces(ppp_interface_filter filter =
 			PPP_REGISTERED_INTERFACES) const;
 		

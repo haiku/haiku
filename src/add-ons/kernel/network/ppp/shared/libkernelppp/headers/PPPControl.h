@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _PPP_CONTROL__H
 #define _PPP_CONTROL__H
@@ -84,13 +84,13 @@ enum ppp_control_ops {
 
 typedef struct ppp_interface_settings_info {
 	const driver_settings *settings;
-	interface_id interface;
+	ppp_interface_id interface;
 		// only when creating: this is the id of the created interface
 } ppp_interface_settings_info;
 
 
 typedef struct ppp_get_interfaces_info {
-	interface_id *interfaces;
+	ppp_interface_id *interfaces;
 	int32 count;
 	ppp_interface_filter filter;
 	int32 resultCount;

@@ -1,25 +1,109 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "PPPInterfaceListener.h"
 
+#include "PPPInterface.h"
+
+#include <Messenger.h>
 #include <Handler.h>
 #include <LockerHelper.h>
 
 
+#define REPORT_FLAGS		PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
+
+#define QUIT_REPORT_THREAD	'QUIT'
+
+
+class PPPInterfaceListenerThread {
+	public:
+		PPPInterfaceListenerThread(PPPInterfaceListener *listener)
+			: fListener(listener) {}
+		
+		status_t Run();
+
+	private:
+		PPPInterfaceListener *fListener;
+};
+
+
+status_t
+PPPInterfaceListenerThread::Run()
+{
+	ppp_report_packet packet;
+	ppp_interface_id *interfaceID;
+	int32 code;
+	thread_id sender;
+	
+	BMessage message;
+	bool sendMessage;
+	
+	while(true) {
+		code = receive_data(&sender, &packet, sizeof(packet));
+		
+		if(code == QUIT_REPORT_THREAD)
+			break;
+		else if(code != PPP_REPORT_CODE)
+			continue;
+		
+		BMessenger messenger(fListener->Target());
+		sendMessage = messenger.IsValid();
+		
+		if(sendMessage) {
+			message.MakeEmpty();
+			
+			message.what = PPP_REPORT_MESSAGE;
+			message.AddInt32("sender", sender);
+			message.AddInt32("type", packet.type);
+			message.AddInt32("code", packet.code);
+			
+			if(packet.length >= sizeof(ppp_interface_id)
+					&& ((packet.type == PPP_MANAGER_REPORT
+							&& packet.code == PPP_REPORT_INTERFACE_CREATED)
+						|| packet.type >= PPP_INTERFACE_REPORT_TYPE_MIN)) {
+				interfaceID = reinterpret_cast<ppp_interface_id*>(packet.data);
+				message.AddInt32("interface", static_cast<int32>(*interfaceID));
+			}
+			
+			messenger.SendMessage(&message);
+		}
+	}
+	
+	return B_OK;
+}
+
+
+static
+status_t
+report_thread(void *data)
+{
+	// Create BMessage for each report and send it to the target BHandler.
+	// The target must send a reply to the interface!
+	
+	PPPInterfaceListenerThread *thread
+		= static_cast<PPPInterfaceListenerThread*>(data);
+	
+	return thread->Run();
+}
+
+
 PPPInterfaceListener::PPPInterfaceListener(BHandler *target)
-	: fTarget(target)
+	: fTarget(target),
+	fDoesWatch(false),
+	fWatchingInterface(PPP_UNDEFINED_INTERFACE_ID)
 {
 	Construct();
 }
 
 
 PPPInterfaceListener::PPPInterfaceListener(const PPPInterfaceListener& copy)
-	: fTarget(copy.Target())
+	: fTarget(copy.Target()),
+	fDoesWatch(false),
+	fWatchingInterface(PPP_UNDEFINED_INTERFACE_ID)
 {
 	Construct();
 }
@@ -27,9 +111,14 @@ PPPInterfaceListener::PPPInterfaceListener(const PPPInterfaceListener& copy)
 
 PPPInterfaceListener::~PPPInterfaceListener()
 {
-	// TODO: send exit code to thread
-//	int32 tmp;
-//	wait_for_thread(fReportThread, &tmp);
+	// disable all report messages
+	StopWatchingInterfaces();
+	Manager().DisableReports(PPP_ALL_REPORTS, fReportThread);
+	
+	// tell thread to quit
+	send_data(fReportThread, QUIT_REPORT_THREAD, NULL, 0);
+	int32 tmp;
+	wait_for_thread(fReportThread, &tmp);
 }
 
 
@@ -39,7 +128,7 @@ PPPInterfaceListener::InitCheck() const
 	if(fReportThread < 0)
 		return B_ERROR;
 	
-	return Manager()->InitCheck();
+	return Manager().InitCheck();
 }
 
 
@@ -53,8 +142,75 @@ PPPInterfaceListener::SetTarget(BHandler *target)
 
 
 void
+PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
+{
+	StopWatchingInterfaces();
+	
+	// enable reports
+	PPPInterface interface(ID);
+	interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS);
+	
+	fDoesWatch = true;
+	fWatchingInterface = ID;
+}
+
+
+void
+PPPInterfaceListener::WatchAllInterfaces()
+{
+	StopWatchingInterfaces();
+	
+	// enable interface reports
+	int32 count;
+	PPPInterface interface;
+	ppp_interface_id *interfaceList;
+	
+	interfaceList = Manager().Interfaces(&count);
+	if(!interfaceList)
+		return;
+	
+	for(int32 index = 0; index < count; index++) {
+		interface.SetTo(interfaceList[index]);
+		interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS);
+	}
+	delete interfaceList;
+	
+	fDoesWatch = true;
+	fWatchingInterface = PPP_UNDEFINED_INTERFACE_ID;
+		// this means watching all
+}
+
+
+void
+PPPInterfaceListener::StopWatchingInterfaces()
+{
+	// disable reports
+	int32 count;
+	PPPInterface interface;
+	ppp_interface_id *interfaceList;
+	
+	interfaceList = Manager().Interfaces(&count);
+	if(!interfaceList)
+		return;
+	
+	for(int32 index = 0; index < count; index++) {
+		interface.SetTo(interfaceList[index]);
+		interface.DisableReports(PPP_ALL_REPORTS, fReportThread);
+	}
+	delete interfaceList;
+	
+	fDoesWatch = false;
+	fWatchingInterface = PPP_UNDEFINED_INTERFACE_ID;
+}
+
+
+void
 PPPInterfaceListener::Construct()
 {
-	// TODO:
-	// create report thread and register it as a receiver using PPPManager
+	fReportThread = spawn_thread(report_thread, "report_thread",
+		B_NORMAL_PRIORITY, new PPPInterfaceListenerThread(this));
+	resume_thread(fReportThread);
+	
+	// enable manager reports
+	Manager().EnableReports(PPP_MANAGER_REPORT, fReportThread, REPORT_FLAGS);
 }

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "PPPManager.h"
 #include "PPPInterface.h"
@@ -51,7 +51,7 @@ PPPManager::Control(uint32 op, void *data, size_t length) const
 	return ioctl(fFD, NET_STACK_CONTROL_NET_MODULE, &args);
 }
 
-interface_id
+ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings) const
 {
 	ppp_interface_settings_info info;
@@ -65,7 +65,7 @@ PPPManager::CreateInterface(const driver_settings *settings) const
 
 
 bool
-PPPManager::DeleteInterface(interface_id ID) const
+PPPManager::DeleteInterface(ppp_interface_id ID) const
 {
 	if(Control(PPPC_DELETE_INTERFACE, &ID, sizeof(ID)) != B_OK)
 		return false;
@@ -74,12 +74,12 @@ PPPManager::DeleteInterface(interface_id ID) const
 }
 
 
-interface_id*
+ppp_interface_id*
 PPPManager::Interfaces(int32 *count,
 	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const
 {
 	int32 requestCount;
-	interface_id *interfaces;
+	ppp_interface_id *interfaces;
 	
 	// loop until we get all interfaces
 	while(true) {
@@ -89,7 +89,7 @@ PPPManager::Interfaces(int32 *count,
 		
 		requestCount += 10;
 			// request some more interfaces in case some are added in the mean time
-		interfaces = new interface_id[requestCount];
+		interfaces = new ppp_interface_id[requestCount];
 		*count = GetInterfaces(interfaces, requestCount, filter);
 		if(*count == -1) {
 			delete interfaces;
@@ -107,7 +107,7 @@ PPPManager::Interfaces(int32 *count,
 
 
 int32
-PPPManager::GetInterfaces(interface_id *interfaces, int32 count,
+PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
 	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const
 {
 	ppp_get_interfaces_info info;
@@ -122,16 +122,16 @@ PPPManager::GetInterfaces(interface_id *interfaces, int32 count,
 }
 
 
-interface_id
+ppp_interface_id
 PPPManager::InterfaceWithSettings(const driver_settings *settings) const
 {
 	int32 count;
-	interface_id *interfaces = Interfaces(&count, PPP_ALL_INTERFACES);
+	ppp_interface_id *interfaces = Interfaces(&count, PPP_ALL_INTERFACES);
 	
 	if(!interfaces)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	interface_id id = PPP_UNDEFINED_INTERFACE_ID;
+	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
 	ppp_interface_info_t info;
 	
@@ -150,16 +150,16 @@ PPPManager::InterfaceWithSettings(const driver_settings *settings) const
 }
 
 
-interface_id
+ppp_interface_id
 PPPManager::InterfaceWithUnit(int32 if_unit)
 {
 	int32 count;
-	interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
+	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
 	
 	if(!interfaces)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	interface_id id = PPP_UNDEFINED_INTERFACE_ID;
+	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
 	ppp_interface_info_t info;
 	

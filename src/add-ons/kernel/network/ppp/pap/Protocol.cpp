@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "Protocol.h"
 #include <KPPPConfigurePacket.h>
@@ -15,14 +15,6 @@
 #include <netinet/in.h>
 #include <core_funcs.h>
 #include <sys/sockio.h>
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#elif DEBUG
-	#include <cstdio>
-#endif
 
 
 #define PAP_TIMEOUT			3000000
@@ -153,7 +145,7 @@ bool
 PAP::Up()
 {
 #if DEBUG
-	printf("PAP: Up() state=%d\n", State());
+	dprintf("PAP: Up() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -187,7 +179,7 @@ bool
 PAP::Down()
 {
 #if DEBUG
-	printf("PAP: Down() state=%d\n", State());
+	dprintf("PAP: Down() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -343,7 +335,7 @@ void
 PAP::NewState(pap_state next)
 {
 #if DEBUG
-	printf("PAP: NewState(%d) state=%d\n", next, State());
+	dprintf("PAP: NewState(%d) state=%d\n", next, State());
 #endif
 	
 	//  state changes
@@ -369,7 +361,7 @@ void
 PAP::TOGoodEvent()
 {
 #if DEBUG
-	printf("PAP: TOGoodEvent() state=%d\n", State());
+	dprintf("PAP: TOGoodEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -394,7 +386,7 @@ void
 PAP::TOBadEvent()
 {
 #if DEBUG
-	printf("PAP: TOBadEvent() state=%d\n", State());
+	dprintf("PAP: TOBadEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -422,7 +414,7 @@ void
 PAP::RREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PAP: RREvent() state=%d\n", State());
+	dprintf("PAP: RREvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -463,7 +455,7 @@ void
 PAP::RAEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PAP: RAEvent() state=%d\n", State());
+	dprintf("PAP: RAEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -496,7 +488,7 @@ void
 PAP::RNEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PAP: RNEvent() state=%d\n", State());
+	dprintf("PAP: RNEvent() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -536,7 +528,7 @@ bool
 PAP::SendRequest()
 {
 #if DEBUG
-	printf("PAP: SendRequest() state=%d\n", State());
+	dprintf("PAP: SendRequest() state=%d\n", State());
 #endif
 	
 	LockerHelper locker(fLock);
@@ -571,7 +563,7 @@ bool
 PAP::SendAck(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PAP: SendAck() state=%d\n", State());
+	dprintf("PAP: SendAck() state=%d\n", State());
 #endif
 	
 	if(!packet)
@@ -594,7 +586,7 @@ bool
 PAP::SendNak(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PAP: SendNak() state=%d\n", State());
+	dprintf("PAP: SendNak() state=%d\n", State());
 #endif
 	
 	if(!packet)

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "PPPInterface.h"
 
@@ -11,7 +11,7 @@
 #include "_libppputils.h"
 
 
-PPPInterface::PPPInterface(interface_id ID = PPP_UNDEFINED_INTERFACE_ID)
+PPPInterface::PPPInterface(ppp_interface_id ID = PPP_UNDEFINED_INTERFACE_ID)
 {
 	fFD = open(get_stack_driver_path(), O_RDWR);
 	
@@ -45,7 +45,7 @@ PPPInterface::InitCheck() const
 
 
 status_t
-PPPInterface::SetTo(interface_id ID)
+PPPInterface::SetTo(ppp_interface_id ID)
 {
 	if(fFD < 0)
 		return B_ERROR;

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef PROTOCOL__H
 #define PROTOCOL__H
@@ -80,6 +80,7 @@ class IPCP : public PPPProtocol {
 	private:
 		bool ParseSideRequests(driver_parameter *requests, ppp_side side);
 		void UpdateAddresses();
+		void RemoveRoutes();
 		
 		// for state machine
 		void NewState(ppp_state next);
@@ -116,6 +117,10 @@ class IPCP : public PPPProtocol {
 	private:
 		ipcp_configuration fLocalConfiguration, fPeerConfiguration;
 		ipcp_requests fLocalRequests, fPeerRequests;
+		
+		// default route
+		struct sockaddr_in fGateway;
+		rtentry *fDefaultRoute;
 		
 		// used for local requests
 		bool fRequestPrimaryDNS, fRequestSecondaryDNS;

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "PPPManager.h"
 #include <PPPControl.h>
@@ -13,14 +13,6 @@
 
 #include <cstdlib>
 #include <sys/sockio.h>
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 static const char sPPPIfNameBase[] =	"ppp";
@@ -43,7 +35,7 @@ static
 status_t
 bring_interface_up(ppp_interface_entry *entry)
 {
-	thread_id upThread = spawn_thread(interface_up_thread,
+	thread_id upThread = spawn_kernel_thread(interface_up_thread,
 		"PPPManager: up_thread", B_NORMAL_PRIORITY, entry);
 	resume_thread(upThread);
 	
@@ -71,7 +63,7 @@ status_t
 bring_interface_down(ppp_interface_entry *entry)
 {
 #if DOWN_AS_THREAD
-	thread_id downThread = spawn_thread(interface_down_thread,
+	thread_id downThread = spawn_kernel_thread(interface_down_thread,
 		"PPPManager: down_thread", B_NORMAL_PRIORITY, entry);
 	resume_thread(downThread); */
 #else
@@ -116,10 +108,10 @@ PPPManager::PPPManager()
 	fNextID(1)
 {
 #if DEBUG
-	printf("PPPManager: Constructor\n");
+	dprintf("PPPManager: Constructor\n");
 #endif
 	
-	fDeleterThread = spawn_thread(deleter_thread, "PPPManager: deleter_thread",
+	fDeleterThread = spawn_kernel_thread(deleter_thread, "PPPManager: deleter_thread",
 		B_NORMAL_PRIORITY, this);
 	resume_thread(fDeleterThread);
 	fPulseTimer = net_add_timer(pulse_timer, this, PPP_PULSE_RATE);
@@ -129,7 +121,7 @@ PPPManager::PPPManager()
 PPPManager::~PPPManager()
 {
 #if DEBUG
-	printf("PPPManager: Destructor\n");
+	dprintf("PPPManager: Destructor\n");
 #endif
 	
 	int32 tmp;
@@ -153,14 +145,14 @@ int32
 PPPManager::Stop(ifnet *ifp)
 {
 #if DEBUG
-	printf("PPPManager: Stop(%s)\n", ifp ? ifp->if_name : "Unknown");
+	dprintf("PPPManager: Stop(%s)\n", ifp ? ifp->if_name : "Unknown");
 #endif
 	
 	LockerHelper locker(fLock);
 	
 	ppp_interface_entry *entry = EntryFor(ifp);
 	if(!entry) {
-		printf("PPPManager: Stop(): Could not find interface!\n");
+		dprintf("PPPManager: Stop(): Could not find interface!\n");
 		return B_ERROR;
 	}
 	
@@ -175,7 +167,7 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	struct rtentry *rt0)
 {
 #if DEBUG
-	printf("PPPManager: Output(%s)\n", ifp ? ifp->if_name : "Unknown");
+	dprintf("PPPManager: Output(%s)\n", ifp ? ifp->if_name : "Unknown");
 #endif
 	
 	if(dst->sa_family == AF_UNSPEC)
@@ -184,7 +176,7 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	LockerHelper locker(fLock);
 	ppp_interface_entry *entry = EntryFor(ifp);
 	if(!entry) {
-		printf("PPPManager: Output(): Could not find interface!\n");
+		dprintf("PPPManager: Output(): Could not find interface!\n");
 		return B_ERROR;
 	}
 	
@@ -225,13 +217,13 @@ int32
 PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 {
 #if DEBUG
-	printf("PPPManager: Control(%s)\n", ifp ? ifp->if_name : "Unknown");
+	dprintf("PPPManager: Control(%s)\n", ifp ? ifp->if_name : "Unknown");
 #endif
 	
 	LockerHelper locker(fLock);
 	ppp_interface_entry *entry = EntryFor(ifp);
 	if(!entry || entry->deleting) {
-		printf("PPPManager: Control(): Could not find interface!\n");
+		dprintf("PPPManager: Control(): Could not find interface!\n");
 		return B_ERROR;
 	}
 	
@@ -260,12 +252,12 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 }
 
 
-interface_id
+ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings,
-	interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
+	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
 {
 #if DEBUG
-	printf("PPPManager: CreateInterface()\n");
+	dprintf("PPPManager: CreateInterface()\n");
 #endif
 	
 	LockerHelper locker(fLock);
@@ -274,7 +266,11 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	if(parentID != PPP_UNDEFINED_INTERFACE_ID && !parentEntry)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	interface_id id = NextID();
+	// the day when NextID() returns 0 will come, be prepared! ;)
+	ppp_interface_id id = NextID();
+	if(id == PPP_UNDEFINED_INTERFACE_ID)
+		id = NextID();
+	
 	ppp_interface_entry *entry = new ppp_interface_entry;
 	entry->accessing = 1;
 	entry->deleting = false;
@@ -290,9 +286,10 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	}
 	
 	locker.UnlockNow();
+		// it is safe to access the manager from userland
 	
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
-			&id, sizeof(interface_id))) {
+			&id, sizeof(ppp_interface_id))) {
 		DeleteInterface(id);
 		--entry->accessing;
 		return PPP_UNDEFINED_INTERFACE_ID;
@@ -309,10 +306,10 @@ PPPManager::CreateInterface(const driver_settings *settings,
 
 
 bool
-PPPManager::DeleteInterface(interface_id ID)
+PPPManager::DeleteInterface(ppp_interface_id ID)
 {
 #if DEBUG
-	printf("PPPManager: DeleteInterface(%ld)\n", ID);
+	dprintf("PPPManager: DeleteInterface(%ld)\n", ID);
 #endif
 	
 	// This only marks the interface for deletion.
@@ -336,10 +333,10 @@ PPPManager::DeleteInterface(interface_id ID)
 
 
 bool
-PPPManager::RemoveInterface(interface_id ID)
+PPPManager::RemoveInterface(ppp_interface_id ID)
 {
 #if DEBUG
-	printf("PPPManager: RemoveInterface(%ld)\n", ID);
+	dprintf("PPPManager: RemoveInterface(%ld)\n", ID);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -359,10 +356,10 @@ PPPManager::RemoveInterface(interface_id ID)
 
 
 ifnet*
-PPPManager::RegisterInterface(interface_id ID)
+PPPManager::RegisterInterface(ppp_interface_id ID)
 {
 #if DEBUG
-	printf("PPPManager: RegisterInterface(%ld)\n", ID);
+	dprintf("PPPManager: RegisterInterface(%ld)\n", ID);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -389,7 +386,7 @@ PPPManager::RegisterInterface(interface_id ID)
 	ifp->ioctl = ppp_ifnet_ioctl;
 	
 #if DEBUG
-	printf("PPPManager::RegisterInterface(): Created new ifnet: %s%d\n",
+	dprintf("PPPManager::RegisterInterface(): Created new ifnet: %s%d\n",
 		ifp->name, ifp->if_unit);
 #endif
 	
@@ -399,10 +396,10 @@ PPPManager::RegisterInterface(interface_id ID)
 
 
 bool
-PPPManager::UnregisterInterface(interface_id ID)
+PPPManager::UnregisterInterface(ppp_interface_id ID)
 {
 #if DEBUG
-	printf("PPPManager: UnregisterInterface(%ld)\n", ID);
+	dprintf("PPPManager: UnregisterInterface(%ld)\n", ID);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -424,7 +421,7 @@ status_t
 PPPManager::Control(uint32 op, void *data, size_t length)
 {
 #if DEBUG
-	printf("PPPManager: Control(%ld)\n", op);
+	dprintf("PPPManager: Control(%ld)\n", op);
 #endif
 	
 	// this method is intended for use by userland applications
@@ -444,20 +441,20 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 		} break;
 		
 		case PPPC_DELETE_INTERFACE:
-			if(length != sizeof(interface_id) || !data)
+			if(length != sizeof(ppp_interface_id) || !data)
 				return B_ERROR;
 			
-			if(!DeleteInterface(*(interface_id*)data))
+			if(!DeleteInterface(*(ppp_interface_id*)data))
 				return B_ERROR;
 		break;
 		
 		case PPPC_BRING_INTERFACE_UP: {
-			if(length != sizeof(interface_id) || !data)
+			if(length != sizeof(ppp_interface_id) || !data)
 				return B_ERROR;
 			
 			LockerHelper locker(fLock);
 			
-			ppp_interface_entry *entry = EntryFor(*(interface_id*)data);
+			ppp_interface_entry *entry = EntryFor(*(ppp_interface_id*)data);
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
@@ -467,12 +464,12 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 		} break;
 		
 		case PPPC_BRING_INTERFACE_DOWN: {
-			if(length != sizeof(interface_id) || !data)
+			if(length != sizeof(ppp_interface_id) || !data)
 				return B_ERROR;
 			
 			LockerHelper locker(fLock);
 			
-			ppp_interface_entry *entry = EntryFor(*(interface_id*)data);
+			ppp_interface_entry *entry = EntryFor(*(ppp_interface_id*)data);
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
@@ -542,10 +539,10 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPManager::ControlInterface(interface_id ID, uint32 op, void *data, size_t length)
+PPPManager::ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t length)
 {
 #if DEBUG
-	printf("PPPManager: ControlInterface(%ld)\n", ID);
+	dprintf("PPPManager: ControlInterface(%ld)\n", ID);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -559,11 +556,11 @@ PPPManager::ControlInterface(interface_id ID, uint32 op, void *data, size_t leng
 
 
 int32
-PPPManager::GetInterfaces(interface_id *interfaces, int32 count,
+PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
 	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 {
 #if DEBUG
-	printf("PPPManager: GetInterfaces()\n");
+	dprintf("PPPManager: GetInterfaces()\n");
 #endif
 	
 	LockerHelper locker(fLock);
@@ -606,7 +603,7 @@ int32
 PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 {
 #if DEBUG
-	printf("PPPManager: CountInterfaces()\n");
+	dprintf("PPPManager: CountInterfaces()\n");
 #endif
 	
 	LockerHelper locker(fLock);
@@ -644,10 +641,10 @@ PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFA
 
 
 ppp_interface_entry*
-PPPManager::EntryFor(interface_id ID, int32 *saveIndex = NULL) const
+PPPManager::EntryFor(ppp_interface_id ID, int32 *saveIndex = NULL) const
 {
 #if DEBUG
-	printf("PPPManager: EntryFor(%ld)\n", ID);
+	dprintf("PPPManager: EntryFor(%ld)\n", ID);
 #endif
 	
 	if(ID == PPP_UNDEFINED_INTERFACE_ID)
@@ -674,7 +671,7 @@ PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 		return NULL;
 	
 #if DEBUG
-	printf("PPPManager: EntryFor(%s%d)\n", ifp->name, ifp->if_unit);
+	dprintf("PPPManager: EntryFor(%s%d)\n", ifp->name, ifp->if_unit);
 #endif
 	
 	ppp_interface_entry *entry;

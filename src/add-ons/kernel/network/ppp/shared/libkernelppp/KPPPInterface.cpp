@@ -1,12 +1,12 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 // cstdio must be included before PPPModule.h/PPPManager.h because
-// dprintf is defined twice with different return values, once with
+// ddprintf is defined twice with different return values, once with
 // void (KernelExport.h) and once with int (stdio.h).
 #include <cstdio>
 #include <cstring>
@@ -34,12 +34,6 @@
 #include "_KPPPMRUHandler.h"
 #include "_KPPPAuthenticationHandler.h"
 #include "_KPPPPFCHandler.h"
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#endif
 
 
 // TODO:
@@ -107,7 +101,7 @@ PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
 	_PPPMRUHandler *mruHandler =
 		new _PPPMRUHandler(*this);
 	if(!LCP().AddOptionHandler(mruHandler) || mruHandler->InitCheck() != B_OK) {
-		printf("PPPInterface: Could not add MRU handler!\n");
+		dprintf("PPPInterface: Could not add MRU handler!\n");
 		delete mruHandler;
 	}
 	// authentication
@@ -115,14 +109,14 @@ PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
 		new _PPPAuthenticationHandler(*this);
 	if(!LCP().AddOptionHandler(authenticationHandler)
 			|| authenticationHandler->InitCheck() != B_OK) {
-		printf("PPPInterface: Could not add authentication handler!\n");
+		dprintf("PPPInterface: Could not add authentication handler!\n");
 		delete authenticationHandler;
 	}
 	// PFC
 	_PPPPFCHandler *pfcHandler =
 		new _PPPPFCHandler(fLocalPFCState, fPeerPFCState, *this);
 	if(!LCP().AddOptionHandler(pfcHandler) || pfcHandler->InitCheck() != B_OK) {
-		printf("PPPInterface: Could not add PFC handler!\n");
+		dprintf("PPPInterface: Could not add PFC handler!\n");
 		delete pfcHandler;
 	}
 	
@@ -133,7 +127,7 @@ PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
 		// 1s delay between lost connection and redial
 	
 	if(get_module(PPP_INTERFACE_MODULE_NAME, (module_info**) &fManager) != B_OK)
-		printf("PPPInterface: Manager module not found!\n");
+		dprintf("PPPInterface: Manager module not found!\n");
 	
 	// are we a multilink subinterface?
 	if(parent && parent->IsMultilink()) {
@@ -186,7 +180,7 @@ PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
 	
 	// load all protocols and the device
 	if(!LoadModules(fSettings, 0, fSettings->parameter_count)) {
-		printf("PPPInterface: Error loading modules!\n");
+		dprintf("PPPInterface: Error loading modules!\n");
 		fInitStatus = B_ERROR;
 	}
 }
@@ -195,7 +189,7 @@ PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
 PPPInterface::~PPPInterface()
 {
 #if DEBUG
-	printf("PPPInterface: Destructor\n");
+	dprintf("PPPInterface: Destructor\n");
 #endif
 	
 	++fDeleteCounter;
@@ -216,7 +210,7 @@ PPPInterface::~PPPInterface()
 		fLock.Unlock();
 	}
 	
-	Report(PPP_DESTRUCTION_REPORT, 0, &fID, sizeof(interface_id));
+	Report(PPP_DESTRUCTION_REPORT, 0, &fID, sizeof(ppp_interface_id));
 		// tell all listeners that we are being destroyed
 	
 	int32 tmp;
@@ -267,8 +261,9 @@ PPPInterface::Delete()
 	else {
 		// We were not created by the manager.
 		// Spawn a thread that will delete us.
-		thread_id interfaceDeleterThread = spawn_thread(interface_deleter_thread,
-			"PPPInterface: interface_deleter_thread", B_NORMAL_PRIORITY, this);
+		thread_id interfaceDeleterThread
+			= spawn_kernel_thread(interface_deleter_thread,
+				"PPPInterface: interface_deleter_thread", B_NORMAL_PRIORITY, this);
 		resume_thread(interfaceDeleterThread);
 	}
 }
@@ -298,7 +293,7 @@ bool
 PPPInterface::SetMRU(uint32 MRU)
 {
 #if DEBUG
-	printf("PPPInterface: SetMRU(%ld)\n", MRU);
+	dprintf("PPPInterface: SetMRU(%ld)\n", MRU);
 #endif
 	
 	if(Device() && MRU > Device()->MTU() - 2)
@@ -481,7 +476,7 @@ bool
 PPPInterface::SetDevice(PPPDevice *device)
 {
 #if DEBUG
-	printf("PPPInterface: SetDevice(%p)\n", device);
+	dprintf("PPPInterface: SetDevice(%p)\n", device);
 #endif
 	
 	if(device && &device->Interface() != this)
@@ -520,7 +515,7 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	// with the same level.
 	
 #if DEBUG
-	printf("PPPInterface: AddProtocol(%X)\n",
+	dprintf("PPPInterface: AddProtocol(%X)\n",
 		protocol ? protocol->ProtocolNumber() : 0);
 #endif
 	
@@ -578,7 +573,7 @@ bool
 PPPInterface::RemoveProtocol(PPPProtocol *protocol)
 {
 #if DEBUG
-	printf("PPPInterface: RemoveProtocol(%X)\n",
+	dprintf("PPPInterface: RemoveProtocol(%X)\n",
 		protocol ? protocol->ProtocolNumber() : 0);
 #endif
 	
@@ -649,7 +644,7 @@ PPPProtocol*
 PPPInterface::ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) const
 {
 #if DEBUG
-	printf("PPPInterface: ProtocolFor(%X), p&=%X\n", protocolNumber,
+	dprintf("PPPInterface: ProtocolFor(%X), p&=%X\n", protocolNumber,
 		protocolNumber & 0x7FFF);
 #endif
 	
@@ -657,7 +652,7 @@ PPPInterface::ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) cons
 	
 	for(; current; current = current->NextProtocol()) {
 #if DEBUG
-		printf("PPPInterface: ProtocolFor(): c=%X, c&=%X\n", current->ProtocolNumber(),
+		dprintf("PPPInterface: ProtocolFor(): c=%X, c&=%X\n", current->ProtocolNumber(),
 			current->ProtocolNumber() & 0x7FFF);
 #endif
 		
@@ -676,7 +671,7 @@ bool
 PPPInterface::AddChild(PPPInterface *child)
 {
 #if DEBUG
-	printf("PPPInterface: AddChild(%lX)\n",
+	dprintf("PPPInterface: AddChild(%lX)\n",
 		child ? child->ID() : 0);
 #endif
 	
@@ -698,7 +693,7 @@ bool
 PPPInterface::RemoveChild(PPPInterface *child)
 {
 #if DEBUG
-	printf("PPPInterface: RemoveChild(%lX)\n",
+	dprintf("PPPInterface: RemoveChild(%lX)\n",
 		child ? child->ID() : 0);
 #endif
 	
@@ -721,7 +716,7 @@ PPPInterface*
 PPPInterface::ChildAt(int32 index) const
 {
 #if DEBUG
-		printf("PPPInterface: ChildAt(%ld)\n", index);
+		dprintf("PPPInterface: ChildAt(%ld)\n", index);
 #endif
 	
 	PPPInterface *child = fChildren.ItemAt(index);
@@ -737,7 +732,7 @@ void
 PPPInterface::SetAutoRedial(bool autoRedial = true)
 {
 #if DEBUG
-	printf("PPPInterface: SetAutoRedial(%s)\n", autoRedial ? "true" : "false");
+	dprintf("PPPInterface: SetAutoRedial(%s)\n", autoRedial ? "true" : "false");
 #endif
 	
 	if(Mode() != PPP_CLIENT_MODE)
@@ -756,13 +751,13 @@ PPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 	// interface went down. This is the only situation where a change is relevant.
 	
 #if DEBUG
-	printf("PPPInterface: SetDialOnDemand(%s)\n", dialOnDemand ? "true" : "false");
+	dprintf("PPPInterface: SetDialOnDemand(%s)\n", dialOnDemand ? "true" : "false");
 #endif
 	
 	// Only clients support DialOnDemand.
 	if(Mode() != PPP_CLIENT_MODE) {
 #if DEBUG
-		printf("PPPInterface::SetDialOnDemand(): Wrong mode!\n");
+		dprintf("PPPInterface::SetDialOnDemand(): Wrong mode!\n");
 #endif
 		fDialOnDemand = false;
 		return;
@@ -801,7 +796,7 @@ bool
 PPPInterface::SetPFCOptions(uint8 pfcOptions)
 {
 #if DEBUG
-	printf("PPPInterface: SetPFCOptions(0x%X)\n", pfcOptions);
+	dprintf("PPPInterface: SetPFCOptions(0x%X)\n", pfcOptions);
 #endif
 	
 	if(PFCOptions() & PPP_FREEZE_PFC_OPTIONS)
@@ -816,7 +811,7 @@ bool
 PPPInterface::Up()
 {
 #if DEBUG
-	printf("PPPInterface: Up()\n");
+	dprintf("PPPInterface: Up()\n");
 #endif
 	
 	if(InitCheck() != B_OK || Phase() == PPP_TERMINATION_PHASE)
@@ -845,7 +840,7 @@ PPPInterface::Up()
 			int32 tmp;
 			wait_for_thread(fOpenEventThread, &tmp);
 		}
-		fOpenEventThread = spawn_thread(call_open_event_thread,
+		fOpenEventThread = spawn_kernel_thread(call_open_event_thread,
 			"PPPInterface: call_open_event_thread", B_NORMAL_PRIORITY, this);
 		resume_thread(fOpenEventThread);
 	}
@@ -864,7 +859,7 @@ PPPInterface::Up()
 			continue;
 		
 //#if DEBUG
-//		printf("PPPInterface::Up(): Report: Type = %ld Code = %ld\n", report.type,
+//		dprintf("PPPInterface::Up(): Report: Type = %ld Code = %ld\n", report.type,
 //			report.code);
 //#endif
 		
@@ -950,7 +945,7 @@ PPPInterface::Up()
 			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
 				if(fDialRetry >= fDialRetriesLimit) {
 #if DEBUG
-					printf("PPPInterface::Up(): DEVICE_UP_FAILED: >=maxretries!\n");
+					dprintf("PPPInterface::Up(): DEVICE_UP_FAILED: >=maxretries!\n");
 #endif
 					fDialRetry = 0;
 					fUpThread = -1;
@@ -963,12 +958,12 @@ PPPInterface::Up()
 					return false;
 				} else {
 #if DEBUG
-					printf("PPPInterface::Up(): DEVICE_UP_FAILED: <maxretries\n");
+					dprintf("PPPInterface::Up(): DEVICE_UP_FAILED: <maxretries\n");
 #endif
 					++fDialRetry;
 					PPP_REPLY(sender, B_OK);
 #if DEBUG
-					printf("PPPInterface::Up(): DEVICE_UP_FAILED: replied\n");
+					dprintf("PPPInterface::Up(): DEVICE_UP_FAILED: replied\n");
 #endif
 					Redial(DialRetryDelay());
 					continue;
@@ -1007,7 +1002,7 @@ bool
 PPPInterface::Down()
 {
 #if DEBUG
-	printf("PPPInterface: Down()\n");
+	dprintf("PPPInterface: Down()\n");
 #endif
 	
 	if(InitCheck() != B_OK)
@@ -1032,7 +1027,7 @@ PPPInterface::Down()
 		wait_for_thread(fCloseEventThread, &tmp);
 	}
 	
-	fCloseEventThread = spawn_thread(call_close_event_thread,
+	fCloseEventThread = spawn_kernel_thread(call_close_event_thread,
 		"PPPInterface: call_close_event_thread", B_NORMAL_PRIORITY, this);
 	resume_thread(fCloseEventThread);
 	locker.UnlockNow();
@@ -1075,7 +1070,7 @@ bool
 PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 {
 #if DEBUG
-	printf("PPPInterface: LoadModules()\n");
+	dprintf("PPPInterface: LoadModules()\n");
 #endif
 	
 	if(Phase() != PPP_DOWN_PHASE)
@@ -1139,7 +1134,7 @@ PPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 	ppp_module_key_type type)
 {
 #if DEBUG
-	printf("PPPInterface: LoadModule(%s)\n", name ? name : "XXX: NO NAME");
+	dprintf("PPPInterface: LoadModule(%s)\n", name ? name : "XXX: NO NAME");
 #endif
 	
 	if(Phase() != PPP_DOWN_PHASE)
@@ -1176,7 +1171,7 @@ status_t
 PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 #if DEBUG
-	printf("PPPInterface: Send(0x%X)\n", protocolNumber);
+	dprintf("PPPInterface: Send(0x%X)\n", protocolNumber);
 #endif
 	
 	if(!packet)
@@ -1207,21 +1202,21 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	
 #if DEBUG
 	if(!protocol)
-		printf("PPPInterface::Send(): no protocol found!\n");
+		dprintf("PPPInterface::Send(): no protocol found!\n");
 	else if(!Device()->IsUp())
-		printf("PPPInterface::Send(): device is not up!\n");
+		dprintf("PPPInterface::Send(): device is not up!\n");
 	else if(!protocol->IsEnabled())
-		printf("PPPInterface::Send(): protocol not enabled!\n");
+		dprintf("PPPInterface::Send(): protocol not enabled!\n");
 	else if(!IsProtocolAllowed(*protocol))
-		printf("PPPInterface::Send(): protocol not allowed to send!\n");
+		dprintf("PPPInterface::Send(): protocol not allowed to send!\n");
 	else
-		printf("PPPInterface::Send(): protocol allowed\n");
+		dprintf("PPPInterface::Send(): protocol allowed\n");
 #endif
 	
 	// make sure that protocol is allowed to send and everything is up
 	if(!Device()->IsUp() || !protocol || !protocol->IsEnabled()
 			|| !IsProtocolAllowed(*protocol)) {
-		printf("PPPInterface::Send(): cannot send!\n");
+		dprintf("PPPInterface::Send(): cannot send!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1270,7 +1265,7 @@ status_t
 PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 #if DEBUG
-	printf("PPPInterface: Receive(0x%X)\n", protocolNumber);
+	dprintf("PPPInterface: Receive(0x%X)\n", protocolNumber);
 #endif
 	
 	if(!packet)
@@ -1298,7 +1293,7 @@ PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 			protocol = protocol->NextProtocol() ?
 				ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL) {
 #if DEBUG
-		printf("PPPInterface::Receive(): trying protocol\n");
+		dprintf("PPPInterface::Receive(): trying protocol\n");
 #endif
 		
 		if(!protocol->IsEnabled() || !IsProtocolAllowed(*protocol))
@@ -1313,7 +1308,7 @@ PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	}
 	
 #if DEBUG
-	printf("PPPInterface::Receive(): trying parent\n");
+	dprintf("PPPInterface::Receive(): trying parent\n");
 #endif
 	
 	// maybe the parent interface can handle the packet
@@ -1334,7 +1329,7 @@ status_t
 PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPInterface: ReceiveFromDevice()\n");
+	dprintf("PPPInterface: ReceiveFromDevice()\n");
 #endif
 	
 	if(!packet)
@@ -1379,7 +1374,7 @@ bool
 PPPInterface::RegisterInterface()
 {
 #if DEBUG
-	printf("PPPInterface: RegisterInterface()\n");
+	dprintf("PPPInterface: RegisterInterface()\n");
 #endif
 	
 	if(fIfnet)
@@ -1414,7 +1409,7 @@ bool
 PPPInterface::UnregisterInterface()
 {
 #if DEBUG
-	printf("PPPInterface: UnregisterInterface()\n");
+	dprintf("PPPInterface: UnregisterInterface()\n");
 #endif
 	
 	if(!fIfnet)
@@ -1443,7 +1438,7 @@ status_t
 PPPInterface::StackControl(uint32 op, void *data)
 {
 #if DEBUG
-	printf("PPPInterface: StackControl(0x%lX)\n", op);
+	dprintf("PPPInterface: StackControl(0x%lX)\n", op);
 #endif
 	
 	switch(op) {
@@ -1486,7 +1481,7 @@ status_t
 PPPInterface::StackControlEachHandler(uint32 op, void *data)
 {
 #if DEBUG
-	printf("PPPInterface: StackControlEachHandler(0x%lX)\n", op);
+	dprintf("PPPInterface: StackControlEachHandler(0x%lX)\n", op);
 #endif
 	
 	status_t result = B_BAD_VALUE, tmp;
@@ -1513,7 +1508,7 @@ void
 PPPInterface::CalculateInterfaceMTU()
 {
 #if DEBUG
-	printf("PPPInterface: CalculateInterfaceMTU()\n");
+	dprintf("PPPInterface: CalculateInterfaceMTU()\n");
 #endif
 	
 	fInterfaceMTU = fMRU;
@@ -1542,7 +1537,7 @@ void
 PPPInterface::CalculateBaudRate()
 {
 #if DEBUG
-	printf("PPPInterface: CalculateBaudRate()\n");
+	dprintf("PPPInterface: CalculateBaudRate()\n");
 #endif
 	
 	if(!Ifnet())
@@ -1564,7 +1559,7 @@ void
 PPPInterface::Redial(uint32 delay)
 {
 #if DEBUG
-	printf("PPPInterface: Redial(%ld)\n", delay);
+	dprintf("PPPInterface: Redial(%ld)\n", delay);
 #endif
 	
 	if(fRedialThread != -1)
@@ -1576,7 +1571,7 @@ PPPInterface::Redial(uint32 delay)
 	info.thread = &fRedialThread;
 	info.delay = delay;
 	
-	fRedialThread = spawn_thread(redial_thread, "PPPInterface: redial_thread",
+	fRedialThread = spawn_kernel_thread(redial_thread, "PPPInterface: redial_thread",
 		B_NORMAL_PRIORITY, NULL);
 	
 	resume_thread(fRedialThread);
@@ -1597,9 +1592,9 @@ redial_thread(void *data)
 	// we try to receive data instead of snooze, so we can quit on destruction
 	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
 		*info.thread = -1;
-		interface_id id = info.interface->ID();
+		ppp_interface_id id = info.interface->ID();
 		info.interface->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_ABORTED,
-			&id, sizeof(interface_id));
+			&id, sizeof(ppp_interface_id));
 		return B_OK;
 	}
 	

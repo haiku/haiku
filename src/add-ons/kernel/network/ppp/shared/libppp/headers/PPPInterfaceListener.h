@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _PPP_INTERFACE_LISTENER__H
 #define _PPP_INTERFACE_LISTENER__H
@@ -19,6 +19,8 @@ class BHandler;
 
 
 class PPPInterfaceListener {
+		friend class PPPInterfaceListenerThread;
+
 	public:
 		PPPInterfaceListener(BHandler *target);
 		PPPInterfaceListener(const PPPInterfaceListener& copy);
@@ -30,8 +32,17 @@ class PPPInterfaceListener {
 			{ return fTarget; }
 		void SetTarget(BHandler *target);
 		
-		const PPPManager *Manager() const
-			{ return &fManager; }
+		bool DoesWatch() const
+			{ return fDoesWatch; }
+		ppp_interface_id WatchingInterface() const
+			{ return fWatchingInterface; }
+		
+		const PPPManager& Manager() const
+			{ return fManager; }
+		
+		void WatchInterface(ppp_interface_id ID);
+		void WatchAllInterfaces();
+		void StopWatchingInterfaces();
 		
 		PPPInterfaceListener& operator= (const PPPInterfaceListener& copy)
 			{ SetTarget(copy.Target()); return *this; }
@@ -43,6 +54,9 @@ class PPPInterfaceListener {
 	private:
 		BHandler *fTarget;
 		thread_id fReportThread;
+		
+		bool fDoesWatch;
+		ppp_interface_id fWatchingInterface;
 		
 		PPPManager fManager;
 		BLocker fLock;

@@ -8,7 +8,9 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 R5KernelAddon ipcp : kernel obos_network ppp :
+	# imported from libnet
 	inet_addr.c
+	
 	ipcp.cpp
 	Protocol.cpp
 ;

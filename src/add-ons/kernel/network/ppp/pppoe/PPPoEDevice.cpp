@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include "PPPoEDevice.h"
 #include "DiscoveryPacket.h"
@@ -14,13 +14,6 @@
 // from libkernelppp
 #include <settings_tools.h>
 #include <LockerHelper.h>
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 #if DEBUG
@@ -35,7 +28,7 @@ dump_packet(struct mbuf *packet)
 	uint8 buffer[33];
 	uint8 bufferIndex = 0;
 	
-	printf("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
+	dprintf("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
 		packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
 	
 	for(uint32 index = 0; index < packet->m_len; index++) {
@@ -43,7 +36,7 @@ dump_packet(struct mbuf *packet)
 		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
 		if(bufferIndex == 32 || index == packet->m_len - 1) {
 			buffer[bufferIndex] = 0;
-			printf("%s\n", buffer);
+			dprintf("%s\n", buffer);
 			bufferIndex = 0;
 		}
 	}
@@ -63,9 +56,9 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 	fState(INITIAL)
 {
 #if DEBUG
-	printf("PPPoEDevice: Constructor\n");
+	dprintf("PPPoEDevice: Constructor\n");
 	if(!settings || !settings->parameters)
-		printf("PPPoEDevice::ctor: No settings!\n");
+		dprintf("PPPoEDevice::ctor: No settings!\n");
 #endif
 	
 	interface.SetPFCOptions(PPP_ALLOW_PFC);
@@ -80,7 +73,7 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 	if(!interfaceName)
 		return;
 #if DEBUG
-	printf("PPPoEDevice::ctor: interfaceName: %s\n", interfaceName);
+	dprintf("PPPoEDevice::ctor: interfaceName: %s\n", interfaceName);
 #endif
 	
 	ifnet *current = get_interfaces();
@@ -88,7 +81,7 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 		if(current->if_type == IFT_ETHER && current->if_name
 				&& !strcmp(current->if_name, interfaceName)) {
 #if DEBUG
-			printf("PPPoEDevice::ctor: found ethernet interface\n");
+			dprintf("PPPoEDevice::ctor: found ethernet interface\n");
 #endif
 			fEthernetIfnet = current;
 			break;
@@ -97,7 +90,7 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 	
 #if DEBUG
 	if(!fEthernetIfnet)
-		printf("PPPoEDevice::ctor: could not find ethernet interface\n");
+		dprintf("PPPoEDevice::ctor: could not find ethernet interface\n");
 #endif
 	
 	add_device(this);
@@ -107,7 +100,7 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 PPPoEDevice::~PPPoEDevice()
 {
 #if DEBUG
-	printf("PPPoEDevice: Destructor\n");
+	dprintf("PPPoEDevice: Destructor\n");
 #endif
 	
 	remove_device(this);
@@ -129,7 +122,7 @@ bool
 PPPoEDevice::Up()
 {
 #if DEBUG
-	printf("PPPoEDevice: Up()\n");
+	dprintf("PPPoEDevice: Up()\n");
 #endif
 	
 	if(InitCheck() != B_OK)
@@ -190,7 +183,7 @@ PPPoEDevice::Up()
 	if(EthernetIfnet()->output(EthernetIfnet(), packet, &destination, NULL) != B_OK) {
 		fState = INITIAL;
 		fAttempts = 0;
-		printf("PPPoEDevice::Up(): EthernetIfnet()->output() failed!\n");
+		dprintf("PPPoEDevice::Up(): EthernetIfnet()->output() failed!\n");
 		return false;
 	}
 	
@@ -204,7 +197,7 @@ bool
 PPPoEDevice::Down()
 {
 #if DEBUG
-	printf("PPPoEDevice: Down()\n");
+	dprintf("PPPoEDevice: Down()\n");
 #endif
 	
 	if(InitCheck() != B_OK)
@@ -231,7 +224,7 @@ PPPoEDevice::Down()
 	
 	struct mbuf *packet = discovery.ToMbuf(MTU());
 	if(!packet) {
-		printf("PPPoEDevice::Down(): ToMbuf() failed; MTU=%ld\n", MTU());
+		dprintf("PPPoEDevice::Down(): ToMbuf() failed; MTU=%ld\n", MTU());
 		DownEvent();
 		return false;
 	}
@@ -285,13 +278,13 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	// Send() is only for PPP packets. PPPoE packets are sent directly to ethernet.
 	
 #if DEBUG
-	printf("PPPoEDevice: Send()\n");
+	dprintf("PPPoEDevice: Send()\n");
 #endif
 	
 	if(!packet)
 		return B_ERROR;
 	else if(InitCheck() != B_OK || protocolNumber != 0) {
-		printf("PPPoEDevice::Send(): InitCheck() != B_OK!\n");
+		dprintf("PPPoEDevice::Send(): InitCheck() != B_OK!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -299,7 +292,7 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	LockerHelper locker(fLock);
 	
 	if(!IsUp()) {
-		printf("PPPoEDevice::Send(): no connection!\n");
+		dprintf("PPPoEDevice::Send(): no connection!\n");
 		m_freem(packet);
 		return PPP_NO_CONNECTION;
 	}
@@ -328,7 +321,7 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	locker.UnlockNow();
 	
 	if(EthernetIfnet()->output(EthernetIfnet(), packet, &destination, NULL) != B_OK) {
-		printf("PPPoEDevice::Send(): EthernetIfnet()->output() failed!\n");
+		dprintf("PPPoEDevice::Send(): EthernetIfnet()->output() failed!\n");
 		DownEvent();
 			// DownEvent() without DownStarted() indicates connection lost
 		return PPP_NO_CONNECTION;

@@ -1,24 +1,19 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
+
+#ifdef _KERNEL_MODE
+	#include <kernel_cpp.h>
+#endif
 
 #include <KPPPLayer.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <core_funcs.h>
-
-
-#ifdef _KERNEL_MODE
-	#include <kernel_cpp.h>
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 PPPLayer::PPPLayer(const char *name, ppp_level level, uint32 overhead)
@@ -61,7 +56,7 @@ PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 		else
 			return Next()->SendToNext(packet, protocolNumber);
 	} else {
-		printf("PPPLayer: SendToNext() failed because there is no next handler!\n");
+		dprintf("PPPLayer: SendToNext() failed because there is no next handler!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}

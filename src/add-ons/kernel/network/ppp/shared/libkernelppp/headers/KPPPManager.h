@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _K_PPP_MANAGER__H
 #define _K_PPP_MANAGER__H
@@ -30,21 +30,21 @@ typedef struct ppp_interface_entry {
 typedef struct ppp_interface_module_info {
 	kernel_net_module_info knminfo;
 	
-	interface_id (*CreateInterface)(const driver_settings *settings,
-		interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
+	ppp_interface_id (*CreateInterface)(const driver_settings *settings,
+		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 			// you should always create interfaces using this function
-	bool (*DeleteInterface)(interface_id ID);
+	bool (*DeleteInterface)(ppp_interface_id ID);
 		// this marks the interface for deletion
-	bool (*RemoveInterface)(interface_id ID);
+	bool (*RemoveInterface)(ppp_interface_id ID);
 		// remove the interface from database (make sure you can delete it yourself!)
 	
-	ifnet *(*RegisterInterface)(interface_id ID);
-	bool (*UnregisterInterface)(interface_id ID);
+	ifnet *(*RegisterInterface)(ppp_interface_id ID);
+	bool (*UnregisterInterface)(ppp_interface_id ID);
 	
-	status_t (*ControlInterface)(interface_id ID, uint32 op, void *data,
+	status_t (*ControlInterface)(ppp_interface_id ID, uint32 op, void *data,
 		size_t length);
 	
-	int32 (*GetInterfaces)(interface_id *interfaces, int32 count,
+	int32 (*GetInterfaces)(ppp_interface_id *interfaces, int32 count,
 		ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
 			// make sure interfaces has enough space for count items
 	int32 (*CountInterfaces)(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <OS.h>
 
@@ -15,14 +15,6 @@
 
 #include <net/if.h>
 #include <core_funcs.h>
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 #define PPP_STATE_MACHINE_TIMEOUT			3000000
@@ -71,7 +63,7 @@ void
 PPPStateMachine::NewState(ppp_state next)
 {
 #if DEBUG
-	printf("PPPSM: NewState(%d) state=%d\n", next, State());
+	dprintf("PPPSM: NewState(%d) state=%d\n", next, State());
 #endif
 	
 	// maybe we do not need the timer anymore
@@ -90,7 +82,7 @@ PPPStateMachine::NewPhase(ppp_phase next)
 {
 #if DEBUG
 	if(next <= PPP_ESTABLISHMENT_PHASE || next == PPP_ESTABLISHED_PHASE)
-		printf("PPPSM: NewPhase(%d) phase=%d\n", next, Phase());
+		dprintf("PPPSM: NewPhase(%d) phase=%d\n", next, Phase());
 #endif
 	
 	// there is nothing after established phase and nothing before down phase
@@ -120,7 +112,7 @@ PPPStateMachine::NewPhase(ppp_phase next)
 			Interface().Ifnet()->if_flags |= IFF_UP | IFF_RUNNING;
 		
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL,
-			&fInterface.fID, sizeof(interface_id));
+			&fInterface.fID, sizeof(ppp_interface_id));
 	}
 }
 
@@ -130,7 +122,7 @@ bool
 PPPStateMachine::Reconfigure()
 {
 #if DEBUG
-	printf("PPPSM: Reconfigure() state=%d phase=%d\n",
+	dprintf("PPPSM: Reconfigure() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -156,7 +148,7 @@ bool
 PPPStateMachine::SendEchoRequest()
 {
 #if DEBUG
-	printf("PPPSM: SendEchoRequest() state=%d phase=%d\n",
+	dprintf("PPPSM: SendEchoRequest() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -186,7 +178,7 @@ bool
 PPPStateMachine::SendDiscardRequest()
 {
 #if DEBUG
-	printf("PPPSM: SendDiscardRequest() state=%d phase=%d\n",
+	dprintf("PPPSM: SendDiscardRequest() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -216,7 +208,7 @@ void
 PPPStateMachine::LocalAuthenticationRequested()
 {
 #if DEBUG
-	printf("PPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
+	dprintf("PPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -232,7 +224,7 @@ void
 PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 {
 #if DEBUG
-	printf("PPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
+	dprintf("PPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -247,7 +239,7 @@ PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
 		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
-		sizeof(interface_id));
+		sizeof(ppp_interface_id));
 }
 
 
@@ -255,7 +247,7 @@ void
 PPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
 #if DEBUG
-	printf("PPPSM: LocalAuthenticationDenied() state=%d phase=%d\n",
+	dprintf("PPPSM: LocalAuthenticationDenied() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -274,7 +266,7 @@ void
 PPPStateMachine::PeerAuthenticationRequested()
 {
 #if DEBUG
-	printf("PPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
+	dprintf("PPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -290,7 +282,7 @@ void
 PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
 #if DEBUG
-	printf("PPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
+	dprintf("PPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -305,7 +297,7 @@ PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
 		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
-		sizeof(interface_id));
+		sizeof(ppp_interface_id));
 }
 
 
@@ -313,7 +305,7 @@ void
 PPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
 #if DEBUG
-	printf("PPPSM: PeerAuthenticationDenied() state=%d phase=%d\n",
+	dprintf("PPPSM: PeerAuthenticationDenied() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -334,7 +326,7 @@ void
 PPPStateMachine::UpFailedEvent(PPPInterface& interface)
 {
 #if DEBUG
-	printf("PPPSM: UpFailedEvent(interface) state=%d phase=%d\n",
+	dprintf("PPPSM: UpFailedEvent(interface) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -347,7 +339,7 @@ void
 PPPStateMachine::UpEvent(PPPInterface& interface)
 {
 #if DEBUG
-	printf("PPPSM: UpEvent(interface) state=%d phase=%d\n",
+	dprintf("PPPSM: UpEvent(interface) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -377,7 +369,7 @@ void
 PPPStateMachine::DownEvent(PPPInterface& interface)
 {
 #if DEBUG
-	printf("PPPSM: DownEvent(interface) state=%d phase=%d\n",
+	dprintf("PPPSM: DownEvent(interface) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -423,7 +415,7 @@ void
 PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
 #if DEBUG
-	printf("PPPSM: UpFailedEvent(protocol) state=%d phase=%d\n",
+	dprintf("PPPSM: UpFailedEvent(protocol) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -448,7 +440,7 @@ void
 PPPStateMachine::UpEvent(PPPProtocol *protocol)
 {
 #if DEBUG
-	printf("PPPSM: UpEvent(protocol) state=%d phase=%d\n",
+	dprintf("PPPSM: UpEvent(protocol) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -463,7 +455,7 @@ void
 PPPStateMachine::DownEvent(PPPProtocol *protocol)
 {
 #if DEBUG
-	printf("PPPSM: DownEvent(protocol) state=%d phase=%d\n",
+	dprintf("PPPSM: DownEvent(protocol) state=%d phase=%d\n",
 		State(), Phase());
 #endif
 }
@@ -478,7 +470,7 @@ bool
 PPPStateMachine::TLSNotify()
 {
 #if DEBUG
-	printf("PPPSM: TLSNotify() state=%d phase=%d\n",
+	dprintf("PPPSM: TLSNotify() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -503,7 +495,7 @@ bool
 PPPStateMachine::TLFNotify()
 {
 #if DEBUG
-	printf("PPPSM: TLFNotify() state=%d phase=%d\n",
+	dprintf("PPPSM: TLFNotify() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -520,7 +512,7 @@ void
 PPPStateMachine::UpFailedEvent()
 {
 #if DEBUG
-	printf("PPPSM: UpFailedEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: UpFailedEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -529,7 +521,7 @@ PPPStateMachine::UpFailedEvent()
 	switch(State()) {
 		case PPP_STARTING_STATE:
 			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DEVICE_UP_FAILED,
-				&fInterface.fID, sizeof(interface_id));
+				&fInterface.fID, sizeof(ppp_interface_id));
 			if(Interface().Parent())
 				Interface().Parent()->StateMachine().UpFailedEvent(Interface());
 			
@@ -548,7 +540,7 @@ void
 PPPStateMachine::UpEvent()
 {
 #if DEBUG
-	printf("PPPSM: UpEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: UpEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -613,7 +605,7 @@ void
 PPPStateMachine::DownEvent()
 {
 #if DEBUG
-	printf("PPPSM: DownEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: DownEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -674,12 +666,12 @@ PPPStateMachine::DownEvent()
 				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
 				PPP_REPORT_LOCAL_AUTHENTICATION_FAILED, &fInterface.fID,
-				sizeof(interface_id));
+				sizeof(ppp_interface_id));
 		else if(fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
 				PPP_REPORT_PEER_AUTHENTICATION_FAILED, &fInterface.fID,
-				sizeof(interface_id));
+				sizeof(ppp_interface_id));
 		else {
 			// if we are going up and lost connection the redial attempt becomes
 			// a dial retry which is managed by the main thread in Interface::Up()
@@ -689,7 +681,7 @@ PPPStateMachine::DownEvent()
 			// test if UpFailedEvent() was not called
 			if(oldPhase != PPP_DOWN_PHASE)
 				Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
-					&fInterface.fID, sizeof(interface_id));
+					&fInterface.fID, sizeof(ppp_interface_id));
 		}
 		
 		if(Interface().Parent())
@@ -704,7 +696,7 @@ PPPStateMachine::DownEvent()
 			Interface().Delete();
 	} else {
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL,
-			&fInterface.fID, sizeof(interface_id));
+			&fInterface.fID, sizeof(ppp_interface_id));
 		
 		if(!Interface().DoesDialOnDemand())
 			Interface().Delete();
@@ -717,7 +709,7 @@ void
 PPPStateMachine::OpenEvent()
 {
 #if DEBUG
-	printf("PPPSM: OpenEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: OpenEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -732,7 +724,7 @@ PPPStateMachine::OpenEvent()
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			if(!Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP,
-					&fInterface.fID, sizeof(interface_id)))
+					&fInterface.fID, sizeof(ppp_interface_id)))
 				return;
 			
 			if(Interface().Mode() == PPP_SERVER_MODE) {
@@ -783,7 +775,7 @@ void
 PPPStateMachine::CloseEvent()
 {
 #if DEBUG
-	printf("PPPSM: CloseEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: CloseEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -852,7 +844,7 @@ void
 PPPStateMachine::TOGoodEvent()
 {
 #if DEBUG
-	printf("PPPSM: TOGoodEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: TOGoodEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -885,7 +877,7 @@ void
 PPPStateMachine::TOBadEvent()
 {
 #if DEBUG
-	printf("PPPSM: TOBadEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: TOBadEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -920,7 +912,7 @@ void
 PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RCRGoodEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RCRGoodEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -981,7 +973,7 @@ void
 PPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
 #if DEBUG
-	printf("PPPSM: RCRBadEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RCRBadEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1042,7 +1034,7 @@ void
 PPPStateMachine::RCAEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RCAEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RCAEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1122,7 +1114,7 @@ void
 PPPStateMachine::RCNEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RCNEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RCNEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1205,7 +1197,7 @@ void
 PPPStateMachine::RTREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RTREvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RTREvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1258,7 +1250,7 @@ void
 PPPStateMachine::RTAEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RTAEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RTAEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1318,7 +1310,7 @@ PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 	uint8 code = PPP_PROTOCOL_REJECT)
 {
 #if DEBUG
-	printf("PPPSM: RUCEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RUCEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1343,7 +1335,7 @@ void
 PPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RXJGoodEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RXJGoodEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1372,7 +1364,7 @@ void
 PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RXJBadEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RXJBadEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1425,7 +1417,7 @@ void
 PPPStateMachine::RXREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RXREvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RXREvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1462,7 +1454,7 @@ PPPStateMachine::TimerEvent()
 {
 #if DEBUG
 	if(fNextTimeout != 0)
-		printf("PPPSM: TimerEvent()\n");
+		dprintf("PPPSM: TimerEvent()\n");
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1502,7 +1494,7 @@ void
 PPPStateMachine::RCREvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RCREvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RCREvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1525,14 +1517,14 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		optionHandler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
 		if(!optionHandler || !optionHandler->IsEnabled()) {
-			printf("PPPSM::RCREvent(): unknown type:%d\n", request.ItemAt(index)->type);
+			dprintf("PPPSM::RCREvent(): unknown type:%d\n", request.ItemAt(index)->type);
 			// unhandled items should be added to the reject
 			reject.AddItem(request.ItemAt(index));
 			continue;
 		}
 		
 #if DEBUG
-		printf("PPPSM::RCREvent(): OH=%s\n", optionHandler->Name());
+		dprintf("PPPSM::RCREvent(): OH=%s\n", optionHandler->Name());
 #endif
 		result = optionHandler->ParseRequest(request, index, nak, reject);
 		
@@ -1543,7 +1535,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		} else if(result != B_OK) {
 			// the request contains a value that has been sent more than
 			// once or the value is corrupted
-			printf("PPPSM::RCREvent(): OptionHandler returned parse error!\n");
+			dprintf("PPPSM::RCREvent(): OptionHandler returned parse error!\n");
 			m_freem(packet);
 			CloseEvent();
 			return;
@@ -1562,7 +1554,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 				if(result != B_OK) {
 					// the request contains a value that has been sent more than
 					// once or the value is corrupted
-					printf("PPPSM::RCREvent(): OptionHandler returned append error!\n");
+					dprintf("PPPSM::RCREvent(): OptionHandler returned append error!\n");
 					m_freem(packet);
 					CloseEvent();
 					return;
@@ -1589,7 +1581,7 @@ void
 PPPStateMachine::RXJEvent(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: RXJEvent() state=%d phase=%d\n",
+	dprintf("PPPSM: RXJEvent() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1658,7 +1650,7 @@ PPPStateMachine::IllegalEvent(ppp_event event)
 {
 	// TODO:
 	// update error statistics
-	printf("PPPSM: IllegalEvent(event=%d) state=%d phase=%d\n",
+	dprintf("PPPSM: IllegalEvent(event=%d) state=%d phase=%d\n",
 		event, State(), Phase());
 }
 
@@ -1667,7 +1659,7 @@ void
 PPPStateMachine::ThisLayerUp()
 {
 #if DEBUG
-	printf("PPPSM: ThisLayerUp() state=%d phase=%d\n",
+	dprintf("PPPSM: ThisLayerUp() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1692,7 +1684,7 @@ void
 PPPStateMachine::ThisLayerDown()
 {
 #if DEBUG
-	printf("PPPSM: ThisLayerDown() state=%d phase=%d\n",
+	dprintf("PPPSM: ThisLayerDown() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1705,7 +1697,7 @@ void
 PPPStateMachine::ThisLayerStarted()
 {
 #if DEBUG
-	printf("PPPSM: ThisLayerStarted() state=%d phase=%d\n",
+	dprintf("PPPSM: ThisLayerStarted() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1718,7 +1710,7 @@ void
 PPPStateMachine::ThisLayerFinished()
 {
 #if DEBUG
-	printf("PPPSM: ThisLayerFinished() state=%d phase=%d\n",
+	dprintf("PPPSM: ThisLayerFinished() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1749,7 +1741,7 @@ bool
 PPPStateMachine::SendConfigureRequest()
 {
 #if DEBUG
-	printf("PPPSM: SendConfigureRequest() state=%d phase=%d\n",
+	dprintf("PPPSM: SendConfigureRequest() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1779,7 +1771,7 @@ bool
 PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: SendConfigureAck() state=%d phase=%d\n",
+	dprintf("PPPSM: SendConfigureAck() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1806,7 +1798,7 @@ bool
 PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 {
 #if DEBUG
-	printf("PPPSM: SendConfigureNak() state=%d phase=%d\n",
+	dprintf("PPPSM: SendConfigureNak() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1830,7 +1822,7 @@ bool
 PPPStateMachine::SendTerminateRequest()
 {
 #if DEBUG
-	printf("PPPSM: SendTerminateRequest() state=%d phase=%d\n",
+	dprintf("PPPSM: SendTerminateRequest() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1861,7 +1853,7 @@ bool
 PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 {
 #if DEBUG
-	printf("PPPSM: SendTerminateAck() state=%d phase=%d\n",
+	dprintf("PPPSM: SendTerminateAck() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	
@@ -1893,7 +1885,7 @@ bool
 PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code)
 {
 #if DEBUG
-	printf("PPPSM: SendCodeReject(protocolNumber=%X;code=%d) state=%d phase=%d\n",
+	dprintf("PPPSM: SendCodeReject(protocolNumber=%X;code=%d) state=%d phase=%d\n",
 		protocolNumber, code, State(), Phase());
 #endif
 	
@@ -1940,7 +1932,7 @@ bool
 PPPStateMachine::SendEchoReply(struct mbuf *request)
 {
 #if DEBUG
-	printf("PPPSM: SendEchoReply() state=%d phase=%d\n",
+	dprintf("PPPSM: SendEchoReply() state=%d phase=%d\n",
 		State(), Phase());
 #endif
 	

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #ifndef _K_PPP_INTERFACE__H
 #define _K_PPP_INTERFACE__H
@@ -45,7 +45,7 @@ class PPPInterface : public PPPLayer {
 		PPPInterface& operator= (const PPPInterface& copy);
 		
 		// only PPPManager may construct us!
-		PPPInterface(ppp_interface_entry *entry, interface_id ID,
+		PPPInterface(ppp_interface_entry *entry, ppp_interface_id ID,
 			const driver_settings *settings, PPPInterface *parent = NULL);
 		~PPPInterface();
 
@@ -54,7 +54,7 @@ class PPPInterface : public PPPLayer {
 		
 		virtual status_t InitCheck() const;
 		
-		interface_id ID() const
+		ppp_interface_id ID() const
 			{ return fID; }
 		
 		driver_settings* Settings() const
@@ -204,7 +204,7 @@ class PPPInterface : public PPPLayer {
 			{ fParent = parent; }
 
 	private:
-		interface_id fID;
+		ppp_interface_id fID;
 			// the manager assigns an ID to every interface
 		driver_settings *fSettings;
 		struct ifnet *fIfnet;

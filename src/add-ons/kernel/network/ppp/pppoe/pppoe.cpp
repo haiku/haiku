@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <KernelExport.h>
 #include <driver_settings.h>
@@ -18,14 +18,6 @@
 
 #include "PPPoEDevice.h"
 #include "DiscoveryPacket.h"
-
-
-#ifdef _KERNEL_MODE
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
-#else
-	#include <cstdio>
-#endif
 
 
 #define PPPoE_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/pppoe"
@@ -50,7 +42,7 @@ void
 add_device(PPPoEDevice *device)
 {
 #if DEBUG
-	printf("PPPoE: add_device()\n");
+	dprintf("PPPoE: add_device()\n");
 #endif
 	
 	LockerHelper locker(sLock);
@@ -62,7 +54,7 @@ void
 remove_device(PPPoEDevice *device)
 {
 #if DEBUG
-	printf("PPPoE: remove_device()\n");
+	dprintf("PPPoE: remove_device()\n");
 #endif
 	
 	LockerHelper locker(sLock);
@@ -90,7 +82,7 @@ pppoe_input(struct mbuf *packet)
 			if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOE
 					&& header->pppoeHeader.sessionID == device->SessionID()) {
 #if DEBUG
-				printf("PPPoE: session packet\n");
+				dprintf("PPPoE: session packet\n");
 #endif
 				device->Receive(packet);
 				return;
@@ -99,11 +91,11 @@ pppoe_input(struct mbuf *packet)
 					&& header->pppoeHeader.code != PADR
 					&& !device->IsDown()) {
 #if DEBUG
-				printf("PPPoE: discovery packet\n");
+				dprintf("PPPoE: discovery packet\n");
 #endif
 				DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
 				if(discovery.InitCheck() != B_OK) {
-					printf("PPPoE: received corrupted discovery packet!\n");
+					dprintf("PPPoE: received corrupted discovery packet!\n");
 					return;
 				}
 				
@@ -117,7 +109,7 @@ pppoe_input(struct mbuf *packet)
 		}
 	}
 	
-	printf("PPPoE: No device found for packet from: %s\n", sourceIfnet->if_name);
+	dprintf("PPPoE: No device found for packet from: %s\n", sourceIfnet->if_name);
 	m_freem(packet);
 }
 
@@ -141,7 +133,7 @@ add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	}
 	
 #if DEBUG
-	printf("PPPoE: add_to(): %s\n",
+	dprintf("PPPoE: add_to(): %s\n",
 		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
 #endif
 	
@@ -180,7 +172,7 @@ std_ops(int32 op, ...)
 			sEthernet->set_pppoe_receiver(pppoe_input);
 			
 #if DEBUG
-			printf("PPPoE: Registered PPPoE receiver.\n");
+			dprintf("PPPoE: Registered PPPoE receiver.\n");
 #endif
 		return B_OK;
 		
@@ -188,7 +180,7 @@ std_ops(int32 op, ...)
 			delete sDevices;
 			sEthernet->unset_pppoe_receiver();
 #if DEBUG
-			printf("PPPoE: Unregistered PPPoE receiver.\n");
+			dprintf("PPPoE: Unregistered PPPoE receiver.\n");
 #endif
 			put_module(NET_CORE_MODULE_NAME);
 			put_module(NET_ETHERNET_MODULE_NAME);
