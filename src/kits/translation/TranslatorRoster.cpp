@@ -157,7 +157,7 @@ BTranslatorRoster::BTranslatorRoster(BMessage *model) : BArchivable()
 // ---------------------------------------------------------------
 void BTranslatorRoster::Initialize()
 {
-	fpTranslators = NULL;
+	fpTranslators = fpLastTranslator = NULL;
 	fSem = create_sem(1, "BTranslatorRoster Lock");
 }
 
@@ -212,7 +212,7 @@ BTranslatorRoster::~BTranslatorRoster()
 			delete pDelTranNode;
 		}		
 		
-		fpTranslators = NULL;
+		fpTranslators = fpLastTranslator = NULL;
 	}
 	
 	delete_sem(fSem);
@@ -823,12 +823,11 @@ BTranslatorRoster::GetAllTranslators(
 		translator_node *pTranNode = NULL;
 		for (pTranNode = fpTranslators; pTranNode; pTranNode = pTranNode->next)
 			(*outCount)++;
-		// because translators are stored in the list backwards,
-		// populate the outList backwards to produce the original order
+		// populate the outList
 		*outList = new translator_id[*outCount];
-		int32 i = (*outCount) - 1;
+		int32 i = 0;
 		for (pTranNode = fpTranslators; pTranNode; pTranNode = pTranNode->next)
-			(*outList)[i--] = pTranNode->id;
+			(*outList)[i++] = pTranNode->id;
 			
 		result = B_NO_ERROR;
 		release_sem(fSem);
@@ -1606,15 +1605,20 @@ BTranslatorRoster::AddTranslatorToList(BTranslator *translator,
 		pTranNode->translator = translator;
 		
 	if (fpTranslators)
-		pTranNode->id = fpTranslators->id + 1;
+		pTranNode->id = fpLastTranslator->id + 1;
 	else
 		pTranNode->id = 1;
 	
 	pTranNode->path = new char[strlen(path) + 1];
 	strcpy(pTranNode->path, path);
 	pTranNode->image = image;
-	pTranNode->next = fpTranslators;
-	fpTranslators = pTranNode;
+	pTranNode->next = NULL;
+	if (!fpTranslators)
+		fpTranslators = fpLastTranslator = pTranNode;
+	else {
+		fpLastTranslator->next = pTranNode;
+		fpLastTranslator = pTranNode;
+	}
 	
 	return B_OK;
 }

@@ -218,14 +218,17 @@ private:
 
 	static	BTranslatorRoster *fspDefaultTranslators;
 		// object that contains the default translators
+
+	// list of translators maintained by this object
 	translator_node *fpTranslators;
-		// list of translators maintained by this object
+	translator_node *fpLastTranslator;
+		
 	sem_id fSem;
 		// semaphore used to lock this object
 		
 	// used to maintain binary combatibility with
 	// past and future versions of this object
-	int32 fUnused[5];
+	int32 fUnused[4];
 	virtual	void ReservedTranslatorRoster1();
 	virtual	void ReservedTranslatorRoster2();
 	virtual	void ReservedTranslatorRoster3();
