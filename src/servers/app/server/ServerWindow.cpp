@@ -1183,9 +1183,8 @@ int32 ServerWindow::MonitorWin(void *data)
 	PortMessage msg;
 	int32 msgstat;
 	
-	int32 msgcode;
 	int8 *msgbuffer=NULL;
-	ssize_t buffersize,bytesread;
+	ssize_t buffersize;
 	
 	for(;;)
 	{

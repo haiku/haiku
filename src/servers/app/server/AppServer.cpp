@@ -27,12 +27,15 @@
 #include <AppDefs.h>
 #include <PortMessage.h>
 #include <Entry.h>
+#include <Directory.h>
 #include <PortMessage.h>
+#include <PortLink.h>
+#include <File.h>
+#include <Message.h>
 #include "AppServer.h"
 #include "ColorSet.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
-#include "PortLink.h"
 #include "ServerApp.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
@@ -75,6 +78,7 @@ AppServer::AppServer(void)
 	_quitting_server=false;
 	_exit_poller=false;
 	_ssindex=1;
+	make_decorator=NULL;
 
 	// Create the font server and scan the proper directories.
 	fontserver=new FontServer;
@@ -103,7 +107,9 @@ AppServer::AppServer(void)
 	// is not possible, set colors to the defaults
 	if(!LoadGUIColors(&gui_colorset))
 		SetDefaultGUIColors(&gui_colorset);
-	
+
+	InitDecorators();
+		
 	// Set up the Desktop
 	InitDesktop();
 
@@ -147,8 +153,6 @@ AppServer::AppServer(void)
 
 	_active_app=-1;
 	_p_active_app=NULL;
-
-	make_decorator=NULL;
 }
 
 /*!
@@ -384,13 +388,13 @@ bool AppServer::LoadDecorator(const char *path)
 	// Loads a window decorator based on the supplied path and forces a decorator update.
 	// If it cannot load the specified decorator, it will retain the current one and
 	// return false.
-	
 	create_decorator *pcreatefunc=NULL;
-	get_version *pversionfunc=NULL;
 	status_t stat;
 	image_id addon;
 	
 	addon=load_add_on(path);
+	if(addon<0)
+		return false;
 
 	// As of now, we do nothing with decorator versions, but the possibility exists
 	// that the API will change even though I cannot forsee any reason to do so. If
@@ -398,17 +402,52 @@ bool AppServer::LoadDecorator(const char *path)
 	// go here.
 		
 	// Get the instantiation function
-	stat=get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pversionfunc);
+	stat=get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
 	if(stat!=B_OK)
 	{
 		unload_add_on(addon);
 		return false;
 	}
+
 	acquire_sem(_decor_lock);
 	make_decorator=pcreatefunc;
 	_decorator_id=addon;
 	release_sem(_decor_lock);
 	return true;
+}
+
+//! Loads decorator settings on disk or the default if settings are invalid
+void AppServer::InitDecorators(void)
+{
+	BMessage settings;
+
+	BDirectory dir,newdir;
+	if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
+		create_directory(SERVER_SETTINGS_DIR,0777);
+
+	BString path(SERVER_SETTINGS_DIR);
+	path+="DecoratorSettings";
+	BFile file(path.String(),B_READ_ONLY);
+
+	if(file.InitCheck()==B_OK)
+	{
+		if(settings.Unflatten(&file)==B_OK)
+		{
+			BString itemtext;
+			if(settings.FindString("decorator",&itemtext)==B_OK)
+			{
+				path.SetTo(DECORATORS_DIR);
+				path+=itemtext;
+				if(LoadDecorator(path.String()))
+					return;
+			}
+		}
+	}
+
+	// We got this far, so something must have gone wrong. We set make_decorator
+	// to NULL so that the decorator allocation routine knows to utilize the included
+	// default decorator instead of an addon.
+	make_decorator=NULL;
 }
 
 /*!
@@ -942,7 +981,8 @@ ServerApp *AppServer::FindApp(const char *sig)
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
-	Decorator *dec;
+debugger("");
+	Decorator *dec=NULL;
 	if(!app_server->make_decorator)
 		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
 	else
