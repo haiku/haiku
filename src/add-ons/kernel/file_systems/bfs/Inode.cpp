@@ -733,7 +733,7 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
 			}
-			// ToDo: check if the data fits in the inode now and delete the file if so
+			// ToDo: check if the data fits in the inode now and delete the attribute file if so
 			status = attribute->WriteAt(transaction, pos, buffer, _length);
 
 			attribute->Lock().UnlockWrite();
@@ -743,17 +743,18 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 		ReleaseAttribute(attribute);
 	}
 
-	if (status == B_OK) {
-		// ToDo: find a better way for that "pos" thing...
-		// Update index
-		if (hasIndex && pos == 0) {
-			// index only the first BPLUSTREE_MAX_KEY_LENGTH bytes
-			uint16 length = *_length;
-			if (length > BPLUSTREE_MAX_KEY_LENGTH)
-				length = BPLUSTREE_MAX_KEY_LENGTH;
+	// ToDo: find a better way than this "pos" thing (the begin of the old key
+	//	must be copied to the start of the new one for a comparison)
+	if (status == B_OK && pos == 0) {
+		// index only the first BPLUSTREE_MAX_KEY_LENGTH bytes
+		uint16 length = *_length;
+		if (length > BPLUSTREE_MAX_KEY_LENGTH)
+			length = BPLUSTREE_MAX_KEY_LENGTH;
 
-			index.Update(transaction, name, 0, oldData, oldLength, buffer, length, this);
-		}
+		// Update index. Note, Index::Update() may be called even if initializing
+		// the index failed - it will just update the live queries in this case
+		if (pos < length || pos < oldLength)
+			index.Update(transaction, name, type, oldData, oldLength, buffer, length, this);
 	}
 	return status;
 }
