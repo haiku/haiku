@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include "hid.h"
 #include "kb_mouse_driver.h"
+#include "usbdevs.h"
 
 static int keyboard_device_number = 0;
 static int mouse_device_number = 0;
@@ -611,6 +612,13 @@ hid_device_added(const usb_device *dev, void **cookie)
 	DPRINTF_INFO ((MY_ID "device_added()\n"));
 
 	dev_desc = usb->get_device_descriptor (dev);
+
+	if (dev_desc->vendor_id == USB_VENDOR_WACOM) {
+		DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
+			dev_desc->vendor_id, dev_desc->product_id));
+		return B_ERROR;
+	}
+
 	DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
 		dev_desc->vendor_id, dev_desc->product_id));
 

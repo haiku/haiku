@@ -8,6 +8,10 @@ R5KernelAddon hid : kernel drivers bin :
 	devlist.c
 ;
 
+ObjectHdrs [ FGristFiles hid$(SUFOBJ) ] : [ FObjectsDir src prefs devices ] ;
+
+Includes [ FGristFiles hid.c ] : <src!prefs!devices>usbdevs.h <src!prefs!devices>usbdevs_data.h ;
+
 # Link to kernel/drivers/dev/input/
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
