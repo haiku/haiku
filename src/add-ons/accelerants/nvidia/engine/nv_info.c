@@ -240,7 +240,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
 			data2 = *((uint16*)(&(rom[data])));
-			LOG(8,("cmd 'calculate indirect and set PLL 32bit REG $%08x for %fMHz'\n",
+			LOG(8,("cmd 'calculate indirect and set PLL 32bit REG $%08x for %.3fMHz'\n",
 				reg, ((float)data2)));
 			if (exec)
 			{
@@ -483,7 +483,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 4;
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
-			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %fMHz'\n", reg, (data / 100.0)));
+			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (exec)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
