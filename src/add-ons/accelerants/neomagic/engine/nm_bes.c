@@ -1,5 +1,5 @@
 /* NeoMagic Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-07/2004 */
+/* Written by Rudolf Cornelissen 05/2002-08/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -197,10 +197,11 @@ status_t nm_configure_bes
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)4096 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.width) << 12) / 1024) > bi.hiscalv)
+	/* the upscaling limit is 8.0 (see official Neomagic specsheets) */
+	if (bi.hiscalv < 0x00000200)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		bi.hiscalv = ((((uint32)my_ov.width) << 12) / 1024);
+		bi.hiscalv = 0x00000200;
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)4096 / bi.hiscalv));
 	}
 	/* horizontal downscaling cannot be done by NM BES hardware */
@@ -245,8 +246,6 @@ status_t nm_configure_bes
 	}
 	/* take zoom into account */
 	bi.hsrcstv += ((uint32)my_ov.h_start) << 16;
-	/* AND below required by hardware */
-	bi.hsrcstv &= 0x03fffffc;
 	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", bi.hsrcstv / (float)65536));
 
 
@@ -292,13 +291,6 @@ status_t nm_configure_bes
 	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", bi.hsrcendv / (float)65536));
 
 
-	/* setup horizontal source last position excluding slopspace: 
-	 * this is the last pixel that will be used for calculating interpolated pixels */
-	bi.hsrclstv = ((ob->width - 1) - si->overlay.myBufInfo[offset].slopspace) << 16; 
-	/* AND below required by hardware */
-	bi.hsrclstv &= 0x03ff0000;
-
-
 	/*******************************************
 	 *** setup vertical scaling and clipping ***
 	 *******************************************/
@@ -314,10 +306,11 @@ status_t nm_configure_bes
 	bi.viscalv = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.height) << 12) / 1024) > bi.viscalv)
+	/* the upscaling limit is 8.0 (see official Neomagic specsheets) */
+	if (bi.viscalv < 0x00000200)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		bi.viscalv = ((((uint32)my_ov.height) << 12) / 1024);
+		bi.viscalv = 0x00000200;
 		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)4096 / bi.viscalv));
 	}
 	/* vertical downscaling cannot be done by NM BES hardware */
@@ -374,22 +367,14 @@ status_t nm_configure_bes
 	/* take zoom into account */
 	bi.a1orgv += (my_ov.v_start * ob->bytes_per_row);
 	bi.weight += (((uint32)my_ov.v_start) << 16);
+
+	/* now include 'pixel precise' left clipping...
+	 * (subpixel precision is not supported by NeoMagic cards) */
+	bi.a1orgv += ((bi.hsrcstv >> 16) * 2);
+	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+	bi.a1orgv &= ~0x03;
 	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n",bi.a1orgv));
 	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", bi.weight / (float)65536));
-
-	/* AND below is required by NM hardware. */
-	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
-	bi.a1orgv &= 0x00fffff0;
-
-	/* field 1 weight: AND below required by hardware, also make sure 'sign' is always 'positive' */
-	bi.v1wghtv = bi.weight & 0x0000fffc;
-
-
-	/* setup field 1 (is our complete frame) vertical source last position.
-	 * this is the last pixel that will be used for calculating interpolated pixels */
-	bi.v1srclstv = (ob->height - 1);
-	/* AND below required by hardware */
-	bi.v1srclstv &= 0x000003ff;
 
 
 	/*****************************
@@ -460,13 +445,13 @@ status_t nm_configure_bes
 		LOG(4,("Overlay: accelerant is programming BES\n"));
 		/* unlock card overlay sequencer registers (b5 = 1) */
 		PCIGRPHW(GENLOCK, (PCIGRPHR(GENLOCK) | 0x20));
-		/* destination rectangle */
-		PCIGRPHW(HDCOORD1L, ((bi.hcoordv >> 16) & 0xff));
-		PCIGRPHW(HDCOORD2L, (bi.hcoordv & 0xff));
-		PCIGRPHW(HDCOORD21H, (((bi.hcoordv >> 4) & 0xf0) | ((bi.hcoordv >> 24) & 0x0f)));
-		PCIGRPHW(VDCOORD1L, ((bi.vcoordv >> 16) & 0xff));
-		PCIGRPHW(VDCOORD2L, (bi.vcoordv & 0xff));
-		PCIGRPHW(VDCOORD21H, (((bi.vcoordv >> 4) & 0xf0) | ((bi.vcoordv >> 24) & 0x0f)));
+		/* destination rectangle #1 (output window position and size) */
+		PCIGRPHW(HD1COORD1L, ((bi.hcoordv >> 16) & 0xff));
+		PCIGRPHW(HD1COORD2L, (bi.hcoordv & 0xff));
+		PCIGRPHW(HD1COORD21H, (((bi.hcoordv >> 4) & 0xf0) | ((bi.hcoordv >> 24) & 0x0f)));
+		PCIGRPHW(VD1COORD1L, ((bi.vcoordv >> 16) & 0xff));
+		PCIGRPHW(VD1COORD2L, (bi.vcoordv & 0xff));
+		PCIGRPHW(VD1COORD21H, (((bi.vcoordv >> 4) & 0xf0) | ((bi.vcoordv >> 24) & 0x0f)));
 		/* scaling */
 		PCIGRPHW(XSCALEL, (bi.hiscalv & 0xff));
 		PCIGRPHW(XSCALEH, ((bi.hiscalv >> 8) & 0xff));
@@ -474,16 +459,11 @@ status_t nm_configure_bes
 		PCIGRPHW(YSCALEH, ((bi.viscalv >> 8) & 0xff));
 		/* inputbuffer #1 origin */
 		/* (we don't program buffer #2 as it's unused.) */
-		/* first include 'pixel precise' left clipping...
-		 * (subpixel precision is not supported by NeoMagic cards) */
-		bi.a1orgv += ((bi.hsrcstv >> 16) * 2);
-		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-		bi.a1orgv &= ~0x03;
-		/* now setup buffer startadress and horizontal source end (minimizes used bandwidth) */
 		if (si->ps.card_type < NM2200)
 		{
 			bi.a1orgv >>= 1;
 			/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+			/* (horizontal source end minimizes used bandwidth) */
 			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 7) & ~8) / 8) - 1));
 		}
 		else
@@ -491,6 +471,7 @@ status_t nm_configure_bes
 			/* NM2200 and later cards use bytes to define buffer pitch */
 			buf_pitch <<= 1;
 			/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
+			/* (horizontal source end minimizes used bandwidth) */
 			//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
 			//fixme? check if overlaybuffer width should also have granularity of 16 now!
 			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 15) & ~16) / 16) - 1));
@@ -504,11 +485,8 @@ status_t nm_configure_bes
 		/* b2 = 0: don't use horizontal mirroring (NM2160) */
 		/* other bits do ??? */
 		PCIGRPHW(0xbf, 0x02);
-		/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
-		 * so we do 'pixel precise' left clipping via modification of buffer
-		 * startadress above instead.
-		 * (pixel precise top clipping is also done this way..) */
-		//fixme: checkout real pixel precise clipping on NM2200 and later cards!!!
+
+		/* destination rectangle #2 (output window position and size) */
 /*
 	{
 		uint16 left = 0;
@@ -516,17 +494,12 @@ status_t nm_configure_bes
 		uint16 top = 0;
 		uint16 bottom = 128;
 
-		left = (bi.hsrcstv >> 16);
-		right = (bi.hsrclstv >> 16);
-		top = (bi.weight >> 16);
-		bottom = (bi.v1srclstv >> 16);
-
-		PCISEQW(HSCOORD1L, (left & 0xff));
-		PCISEQW(HSCOORD2L, (right & 0xff));
-		PCISEQW(HSCOORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
-		PCISEQW(VSCOORD1L, (top & 0xff));
-		PCISEQW(VSCOORD2L, (bottom & 0xff));
-		PCISEQW(VSCOORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
+		PCISEQW(HD2COORD1L, (left & 0xff));
+		PCISEQW(HD2COORD2L, (right & 0xff));
+		PCISEQW(HD2COORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
+		PCISEQW(VD2COORD1L, (top & 0xff));
+		PCISEQW(VD2COORD2L, (bottom & 0xff));
+		PCISEQW(VD2COORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
 	}
 */
 		/* ??? */
@@ -537,8 +510,10 @@ status_t nm_configure_bes
  		/* b1 = 0: disable alternating hardware buffers (NM2160) */
 		/* other bits do ??? */
  		PCISEQW(0x09, 0x11);
-		/* ??? */
-		PCISEQW(0x0a, 0x00);
+		/* we don't use PCMCIA Zoomed Video port capturing, set 1:1 scale just in case */
+		/* (b6-4 = Y downscale = 100%, b2-0 = X downscale = 100%;
+		 *  downscaling selectable in 12.5% steps on increasing setting by 1) */
+		PCISEQW(ZVCAP_DSCAL, 0x00);
 		/* global BES control */
 		PCIGRPHW(BESCTRL1, (bi.globctlv & 0xff));
 		PCISEQW(BESCTRL2, ((bi.globctlv >> 8) & 0xff));

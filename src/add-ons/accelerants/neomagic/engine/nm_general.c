@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-7/2004
+   Rudolf Cornelissen 4/2003-8/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -485,8 +485,8 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* check if we can setup this mode with acceleration: */
 	*acc_mode = true;
 
-	/* NM2230 and later cards only support accelerated 24bit modes */
-	if ((si->ps.card_type < NM2230) && (target->space == B_RGB24)) *acc_mode = false;
+	/* pre-NM2200 cards don't support accelerated 24bit modes */
+	if ((si->ps.card_type < NM2200) && (target->space == B_RGB24)) *acc_mode = false;
 
 	/* virtual_width */
 	if (si->ps.card_type == NM2070)
@@ -500,17 +500,8 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		if (target->virtual_width > 1600) *acc_mode = false;
 	}
 
-	/* virtual_height */
-	if (si->ps.card_type < NM2200)
-	{
-		/* confirmed NM2070, NM2097 and NM2160 */
-		if (target->virtual_height > 1024) *acc_mode = false;
-	}
-	else
-	{
-		/* fixme: needs confirmation, assuming this height will still work.. */
-		if (target->virtual_height > 2048) *acc_mode = false;
-	}
+	/* virtual_height (confirmed NM2070, NM2097, NM2160 and NM2200 */
+	if (target->virtual_height > 1024) *acc_mode = false;
 
 	/* now check virtual_size based on CRTC constraints and modify if needed */
 //fixme: checkout cardspecs here!! (NM2160 can do 8192 _bytes_ at least (in theory))

@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/03-2004 */
+/* Written by Rudolf Cornelissen 05-2002/08-2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -423,11 +423,11 @@ status_t GET_OVERLAY_CONSTRAINTS
 		}
 
 		/* NeoMagic scaling restrictions */
-		/* Note: NM BES does not support downscaling! */
+		/* Note: official max is 8.0, and NM BES does not support downscaling! */
 		oc->h_scale.min = 1.0;
-		oc->h_scale.max = 1024/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
+		oc->h_scale.max = 8.0;
 		oc->v_scale.min = 1.0;
-		oc->v_scale.max = 1024/(float)ob->height;
+		oc->v_scale.max = 8.0;
 
 		return B_OK;
 	}

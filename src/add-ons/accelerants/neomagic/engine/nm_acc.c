@@ -1,7 +1,7 @@
 /* nm Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 3/2004-7/2004.
+   Rudolf Cornelissen 3/2004-8/2004.
 */
 
 /*
@@ -170,10 +170,10 @@ status_t nm_acc_init()
 //		so:
 		nm_acc_wait_idle();
 
-		/* setup engine depth and pixel pitch */
+		/* setup engine depth and engine destination-pitch */
 		ACCW(STATUS, ((si->engine.control & 0x0000ffff) << 16));
-		/* setup memory pitch */
-		ACCW(2200_PITCH,
+		/* setup engine source-pitch */
+		ACCW(2200_SRC_PITCH,
 			((si->fbc.bytes_per_row << 16) | (si->fbc.bytes_per_row & 0x0000ffff)));
 		break;
 	default:
