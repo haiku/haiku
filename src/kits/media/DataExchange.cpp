@@ -98,7 +98,7 @@ QueryServer(BMessage &request, BMessage &reply)
 	if (status != B_OK) {
 		ERROR("QueryServer: SendMessage failed, error 0x%08lx (%s)\n", status, strerror(status));
 		DEBUG_ONLY(request.PrintToStream());
-		DEBUG_ONLY(reply.PrintToStream);
+		DEBUG_ONLY(reply.PrintToStream());
 	}
 	return status;
 }
