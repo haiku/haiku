@@ -10,12 +10,11 @@
 
 
 #include <kernel.h>
-#include <defines.h>
-#include <vfs.h>
+#include <sys/uio.h>
 #include <arch/vm_translation_map.h>
 
 
-typedef int32  aspace_id;
+typedef int32 aspace_id;
 
 // vm page
 typedef struct vm_page {
@@ -179,8 +178,6 @@ enum {
 	// "execute" protection is currently ignored, but nevertheless, you
 	// should use it if you require to execute code in that area.
 
-#define B_KERNEL_READ_AREA		16
-#define B_KERNEL_WRITE_AREA		32
 #define B_KERNEL_EXECUTE_AREA	64
 #define B_KERNEL_STACK_AREA		128
 
