@@ -7,6 +7,7 @@
 #include "openfirmware.h"
 
 #include <platform_arch.h>
+#include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <arch_cpu.h>
@@ -16,26 +17,84 @@
 #include <OS.h>
 
 
+segment_descriptor sSegments[16];
 page_table_entry_group *sPageTable;
 uint32 sPageTableHashMask;
 
 
+static void
+remove_range_index(address_range *ranges, uint32 &numRanges, uint32 index)
+{
+	if (index + 1 == numRanges) {
+		// remove last range
+		numRanges--;
+		return;
+	}
+
+	memmove(&ranges[index], &ranges[index + 1], sizeof(address_range) * (numRanges - 1 - index));
+	numRanges--;
+}
+
+
 static status_t
 insert_memory_range(address_range *ranges, uint32 &numRanges, uint32 maxRanges,
-	const void *start, uint32 size)
+	const void *_start, uint32 size)
 {
+	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
 	size = ROUNDUP(size, B_PAGE_SIZE);
+	addr_t end = start + size;
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		if ((uint32)start == ranges[i].start + ranges[i].size) {
-			// append to the existing range
-			ranges[i].size += size;
-			return B_OK;
-		} else if ((uint32)start + size == ranges[i].start) {
-			// preprend before the existing range
-			ranges[i].start = (uint32)start;
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = rangeStart + ranges[i].size;
+
+		if (end < rangeStart || start > rangeEnd) {
+			// ranges don't intersect or touch each other
+			continue;
+		}
+		if (start >= rangeStart && end <= rangeEnd) {
+			// range is already completely covered
 			return B_OK;
 		}
+
+		if (start < rangeStart) {
+			// prepend to the existing range
+			ranges[i].start = start;
+			ranges[i].size += rangeStart - start;
+		}
+		if (end > ranges[i].start + ranges[i].size) {
+			// append to the existing range
+			ranges[i].size = end - ranges[i].start;
+		}
+
+		// join ranges if possible
+
+		for (uint32 j = 0; j < numRanges; j++) {
+			if (i == j)
+				continue;
+
+			rangeStart = ranges[i].start;
+			rangeEnd = rangeStart + ranges[i].size;
+			addr_t joinStart = ranges[j].start;
+			addr_t joinEnd = joinStart + ranges[j].size;
+
+			if (rangeStart <= joinEnd && joinEnd <= rangeEnd) {
+				// join range that used to be before the current one, or
+				// the one that's now entirely included by the current one
+				if (joinStart < rangeStart) {
+					ranges[i].size += rangeStart - joinStart;
+					ranges[i].start = joinStart;
+				}
+
+				remove_range_index(ranges, numRanges, j--);
+			} else if (joinStart <= rangeEnd && joinEnd > rangeEnd) {
+				// join range that used to be after the current one
+				ranges[i].size += joinEnd - rangeEnd;
+
+				remove_range_index(ranges, numRanges, j--);
+			}
+		}
+		return B_OK;
 	}
 
 	// no range matched, we need to create a new one
@@ -43,7 +102,7 @@ insert_memory_range(address_range *ranges, uint32 &numRanges, uint32 maxRanges,
 	if (numRanges >= maxRanges)
 		return B_ENTRY_NOT_FOUND;
 
-	ranges[numRanges].start = (uint32)start;
+	ranges[numRanges].start = (addr_t)start;
 	ranges[numRanges].size = size;
 	numRanges++;
 
@@ -116,12 +175,12 @@ find_physical_memory_ranges(size_t &total)
 static bool
 is_in_range(address_range *ranges, uint32 numRanges, void *address, size_t size)
 {
-	uint32 start = (uint32)address;
-	uint32 end = start + size;
+	addr_t start = (addr_t)address;
+	addr_t end = start + size;
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		uint32 rangeStart = ranges[i].start;
-		uint32 rangeEnd = rangeStart + ranges[i].size;
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = rangeStart + ranges[i].size;
 
 		if ((start >= rangeStart && start < rangeEnd)
 			|| (end >= rangeStart && end < rangeEnd))
@@ -186,7 +245,7 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID, void *vi
 
 	// upper 32 bit
 	entry->virtual_segment_id = virtualSegmentID;
-	entry->hash = secondaryHash;
+	entry->secondary_hash = secondaryHash;
 	entry->abbr_page_index = ((uint32)virtualAddress >> 22) & 0x3f;
 	entry->valid = true;
 }
@@ -195,7 +254,7 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID, void *vi
 static void
 map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 {
-	uint32 virtualSegmentID = get_sr(virtualAddress) & 0xffffff;
+	uint32 virtualSegmentID = sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
 
 	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
 	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
@@ -206,6 +265,7 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 			continue;
 
 		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, mode, false);
+		//printf("map: va = %p -> %p, mode = %d, hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
 
@@ -217,8 +277,11 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 			continue;
 
 		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, mode, true);
+		//printf("map: va = %p -> %p, mode = %d, second hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
+
+	panic("out of page table entries! (you would think this could not happen in a boot loader...)\n");
 }
 
 
@@ -233,15 +296,18 @@ map_range(void *virtualAddress, void *physicalAddress, size_t size, uint8 mode)
 
 
 static status_t
-find_allocated_ranges(void *pageTable, void **_physicalPageTable)
+find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTable,
+	void **_exceptionHandlers)
 {
 	// we have to preserve the OpenFirmware established mappings
 	// if we want to continue to use its service after we've
 	// taken over (we will probably need less translations once
 	// we have proper driver support for the target hardware).
 	int mmu;
-	if (of_getprop(gChosen, "mmu", &mmu, sizeof(int)) == OF_FAILED)
+	if (of_getprop(gChosen, "mmu", &mmu, sizeof(int)) == OF_FAILED) {
+		puts("no OF mmu");
 		return B_ERROR;
+	}
 	mmu = of_instance_to_package(mmu);
 
 	struct translation_map {
@@ -251,8 +317,10 @@ find_allocated_ranges(void *pageTable, void **_physicalPageTable)
 		int		mode;
 	} translations[64];
 	int length = of_getprop(mmu, "translations", &translations, sizeof(translations));
-	if (length == OF_FAILED)
+	if (length == OF_FAILED) {
+		puts("no OF translations");
 		return B_ERROR;
+	}
 	length = length / sizeof(struct translation_map);
 	uint32 total = 0;
 	printf("found %d translations\n", length);
@@ -272,7 +340,12 @@ find_allocated_ranges(void *pageTable, void **_physicalPageTable)
 
 		if (map->virtual_address == pageTable) {
 			puts("found page table!");
-			*_physicalPageTable = map->physical_address;
+			*_physicalPageTable = (page_table_entry_group *)map->physical_address;
+		}
+		if ((addr_t)map->physical_address <= 0x100 
+			&& (addr_t)map->physical_address + map->length >= 0x1000) {
+			puts("found exception handlers!");
+			*_exceptionHandlers = map->virtual_address;
 		}
 
 		// insert range in virtual allocated
@@ -373,7 +446,7 @@ arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 	if (protection & B_WRITE_AREA)
 		protection = 0x23;
 	else
-		protection = 0x21;
+		protection = 0x22;
 
 	if (virtualAddress == NULL) {
 		// find free address large enough to hold "size"
@@ -396,7 +469,7 @@ arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 
 	// everything went fine, so lets mark the space as used.
 
-printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress, physicalAddress, size);
+	printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress, physicalAddress, size);
 	insert_virtual_allocated_range(virtualAddress, size);
 	insert_physical_allocated_range(physicalAddress, size);
 
@@ -414,19 +487,39 @@ arch_mmu_free(void *address, size_t size)
 }
 
 
+static inline void
+invalidate_tlb(void)
+{
+	//asm volatile("tlbia");
+		// "tlbia" is obviously not available on every CPU...
+
+	// Note: this flushes the whole 4 GB address space - it
+	//		would probably be a good idea to do less here
+
+	addr_t address = 0;
+	for (uint32 i = 0; i < 0x100000; i++) {
+		asm volatile("tlbie %0" :: "r" (address));
+		address += B_PAGE_SIZE;
+	}
+	tlbsync();
+}
+
+
 extern "C" status_t
 arch_mmu_init(void)
 {
 	// get map of physical memory (fill in kernel_args structure)
 	
 	size_t total;
-	if (find_physical_memory_ranges(total) < B_OK)
+	if (find_physical_memory_ranges(total) < B_OK) {
+		puts("could not find physical memory ranges!");
 		return B_ERROR;
+	}
 	printf("total physical memory = %u MB\n", total / (1024*1024));
 
 	// get OpenFirmware's current page table
 
-	void *table;
+	page_table_entry_group *table;
 	size_t tableSize;
 	ppc_get_page_table(&table, &tableSize);
 	printf("-> table = %p, size = %u\n", table, tableSize);
@@ -440,31 +533,99 @@ arch_mmu_init(void)
 	if (tableSize < suggestedTableSize) {
 		// nah, we need a new one!
 		printf("need new page table, size = %u!\n", suggestedTableSize);
-		table = of_claim(0, suggestedTableSize, suggestedTableSize);
+		table = (page_table_entry_group *)of_claim(0, suggestedTableSize, suggestedTableSize);
 			// KERNEL_BASE would be better as virtual address, but
 			// at least with Apple's OpenFirmware, it makes no
 			// difference - we will have to remap it later
-		if (table == (void *)OF_FAILED)
+		if (table == (void *)OF_FAILED) {
+			panic("Could not allocate new page table (size = %ld)!!\n", suggestedTableSize);
 			return B_NO_MEMORY;
+		}
 		printf("new table at: %p\n", table);
 		sPageTable = (page_table_entry_group *)table;
-		sPageTableHashMask = (suggestedTableSize >> 6) - 1;
+		tableSize = suggestedTableSize;
 	} else {
 		// ToDo: we could check if the page table is much too large
 		//	and create a smaller one in this case (in order to save 
 		//	memory).
 		sPageTable = (page_table_entry_group *)table;
-		sPageTableHashMask = (tableSize >> 6) - 1;
 	}
+	sPageTableHashMask = tableSize / sizeof(page_table_entry_group) - 1;
+	memset(sPageTable, 0, tableSize);
+
+	// set OpenFirmware callbacks - it will ask us for memory after that
+	// instead of maintaining it itself
+
+	// ToDo: !
+
+	// turn off address translation via the page table/segment mechanism,
+	// identity map the first 256 MB (where our code/data reside)
+
+	printf("MSR: %p\n", (void *)get_msr());
+
+//	block_address_translation bat;
+
+/*	bat.length = BAT_LENGTH_256MB;
+	bat.kernel_valid = true;
+	bat.memory_coherent = true;
+	bat.protection = BAT_READ_WRITE;
+
+	set_ibat0(&bat);
+	set_dbat0(&bat);
+	isync();
+puts("2");*/
+
+	// initialize segment descriptors, but don't set the registers
+	// until we're about to take over the page table - we're mapping
+	// pages into our table using these values
+
+	for (int32 i = 0; i < 16; i++)
+		sSegments[i].virtual_segment_id = i;
 
 	// find already allocated ranges of physical memory
 	// and the virtual address space
 
-	void *physicalTable;
-	if (find_allocated_ranges(table, &physicalTable) < B_OK)
-		return B_ERROR;
+	page_table_entry_group *physicalTable;
+	void *exceptionHandlers = (void *)-1;
+	if (find_allocated_ranges(table, &physicalTable, &exceptionHandlers) < B_OK) {
+		puts("find_allocated_ranges() failed!");
+		//return B_ERROR;
+	}
 
-	// ToDo: take over control of MMU
+	if (exceptionHandlers == (void *)-1) {
+		// ToDo: create mapping for the exception handlers
+		puts("no mapping for the exception handlers!");
+	}
+
+	// set up new page table and turn on translation again
+
+	for (int32 i = 0; i < 16; i++) {
+		ppc_set_segment_register((void *)(i * 0x10000000), sSegments[i]);
+			// one segment describes 256 MB of memory
+	}
+
+	ppc_set_page_table(physicalTable, tableSize);
+	invalidate_tlb();
+
+	// clear BATs
+	reset_ibats();
+	reset_dbats();
+
+	set_msr(MSR_MACHINE_CHECK_ENABLED | MSR_FP_AVAILABLE 
+			| MSR_INST_ADDRESS_TRANSLATION 
+			| MSR_DATA_ADDRESS_TRANSLATION);
+
+	// set kernel args
+
+	printf("virt_allocated: %lu\n", gKernelArgs.num_virtual_allocated_ranges);
+	printf("phys_allocated: %lu\n", gKernelArgs.num_physical_allocated_ranges);
+	printf("phys_memory: %lu\n", gKernelArgs.num_physical_memory_ranges);
+
+	gKernelArgs.arch_args.page_table.start = (addr_t)sPageTable;
+	gKernelArgs.arch_args.page_table.size = tableSize;
+
+	gKernelArgs.arch_args.exception_handlers.start = (addr_t)exceptionHandlers;
+	gKernelArgs.arch_args.exception_handlers.size = B_PAGE_SIZE;
 
 	return B_OK;
 }
