@@ -30,7 +30,6 @@ StdBinCommands
 	fmt.c
 	fold.c
 	head.c
-	hostname.c
 	id.c
 	join.c
 	kill.c
@@ -61,7 +60,6 @@ StdBinCommands
 	sum.c
 	sync.c
 	tac.c
-	tail.c
 	tee.c
 	test.c
 	touch.c
@@ -69,7 +67,6 @@ StdBinCommands
 	true.c
 	tsort.c
 	tty.c
-	uname.c
 	unexpand.c
 	uniq.c
 	unlink.c
@@ -77,6 +74,14 @@ StdBinCommands
 	whoami.c
 	yes.c
 	: libfetish.a : $(coreutils_rsrc) ;
+
+# commands requiring select, uname, etc.
+
+StdBinCommands
+	hostname.c
+	tail.c
+	uname.c
+	: libfetish.a $(SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
 
 # stat.c
 # chroot.c

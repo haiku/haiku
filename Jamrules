@@ -110,8 +110,10 @@ switch $(TARGET_PLATFORM)
 }
 if $(BONE_COMPATIBLE) {
 	NETWORK_LIBS = libsocket.so libbind.so ;
+	SELECT_UNAME_ETC_LIB = libroot.so ;
 } else {
 	NETWORK_LIBS = libnet.so ;
+	SELECT_UNAME_ETC_LIB = libnet.so ;
 }
 
 # Determine if we're building on PPC or x86

@@ -9,7 +9,7 @@ ResComp $(sharutils_rsrc) : [ FGristFiles sharutils.rdef ] ;
 
 BinCommand shar : 
   	shar.c encode.c 
-  	: libsharutils.a
+  	: libsharutils.a $(SELECT_UNAME_ETC_LIB)
   	: sharutils.rsrc ;
 
 BinCommand unshar : 
