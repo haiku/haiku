@@ -248,7 +248,11 @@ MMediaFilesManager::RewindRefs(const char* type, BString ***items, int32 *count)
 	entry_ref *ref;
 	BString *item;
 	
-	fRegistryMap->Get(BString(type), &map);
+	*count = 0;
+	*items = NULL;
+	
+	if (!fRegistryMap->Get(BString(type), &map))
+		return B_OK;
 	
 	*count = map->CountItems();
 	*items = new (BString*)[*count];
