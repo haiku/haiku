@@ -27,8 +27,10 @@ capacity - contains the storage capacity of the target port.
 #include <stdio.h>
 #include <malloc.h>
 
-//#define PLDEBUG
+#define PLDEBUG
 //#define PLD_DEBUG
+
+//#define CAPACITY_CHECKING
 
 #ifdef PLDEBUG
 #include <stdio.h>
@@ -68,6 +70,10 @@ printf("PortLink(%lu)\n",port);
 	opcode=0;
 	bufferlength=0;
 	replyport=create_port(30,"PortLink reply port");
+#ifdef PLDEBUG
+printf("\tPort valid: %s\n",(port_ok)?"true":"false");
+printf("\tReply port: %lu\n",replyport);
+#endif
 	
 	// TODO: initialize all attachments pointers to NULL
 }
@@ -88,6 +94,13 @@ printf("PortLink(PortLink*)\n");
 	num_attachments=0;
 	replyport=create_port(30,"PortLink reply port");
 
+#ifdef PLDEBUG
+printf("\tOpcode: %lu\n",opcode);
+printf("\tTarget port: %lu\n",target);
+printf("\tCapacity: %lu\n",capacity);
+printf("\tPort valid: %s\n",(port_ok)?"true":"false");
+printf("\tReply port: %lu\n",replyport);
+#endif
 	// TODO: initialize all attachments pointers to NULL
 }
 
@@ -110,7 +123,11 @@ printf("~PortLink()\n");
 void PortLink::SetOpCode(int32 code)
 {
 #ifdef PLDEBUG
-printf("PortLink::SetOpCode(%lu)\n",code);
+printf("PortLink::SetOpCode(%c%c%c%c)\n",
+(char)((code & 0xFF000000) >>  24),
+(char)((code & 0x00FF0000) >>  16),
+(char)((code & 0x0000FF00) >>  8),
+(char)((code & 0x000000FF)) );
 #endif
 	// Sets the message code. This does not change once the message is sent.
 	// Another call to SetOpCode() is required for such things.
@@ -247,6 +264,7 @@ printf("PortLink::FlushWithReply(): bad port\n");
 	delete buffer;
 	
 	// Now we wait for the reply
+	buffer=NULL;
 	if(timeout==B_INFINITE_TIMEOUT)
 	{
 		*buffersize=port_buffer_size(replyport);
@@ -388,6 +406,7 @@ printf("\tAttach(): size invalid -> size=0\n");
 		return B_ERROR;
 	}
 	
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 	{
 #ifdef PLDEBUG
@@ -395,6 +414,7 @@ printf("\tAttach(): bufferlength+size > port capacity\n");
 #endif
 		return B_NO_MEMORY;
 	}
+#endif
 
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
@@ -434,12 +454,14 @@ printf("Attach(%ld)\n",data);
 
 	int32 size=sizeof(int32);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -463,12 +485,14 @@ printf("Attach(%d)\n",data);
 
 	int32 size=sizeof(int16);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -492,12 +516,14 @@ printf("Attach(%d)\n",data);
 
 	int32 size=sizeof(int8);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -521,12 +547,14 @@ printf("Attach(%f)\n",data);
 
 	int32 size=sizeof(float);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -550,12 +578,14 @@ printf("Attach(%s)\n",(data)?"true":"false");
 
 	int32 size=sizeof(bool);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -579,12 +609,14 @@ printf("Attach(BRect(%f,%f,%f,%f))\n",data.left,data.top,data.right,data.bottom)
 
 	int32 size=sizeof(BRect);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
@@ -608,12 +640,14 @@ printf("Attach(BPoint(%f,%f))\n",data.x,data.y);
 
 	int32 size=sizeof(BPoint);
 
+#ifdef CAPACITY_CHECKING
 	if(bufferlength+size>capacity)
 		return B_NO_MEMORY;
+#endif
 	
 	// create a new storage object and stash the data
 	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size))
+	if(pld->Set(&data,size)==B_OK)
 	{
 		num_attachments++;
 		attachments[num_attachments-1]=pld;
