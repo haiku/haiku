@@ -286,8 +286,8 @@ oggReader::Seek(void *cookie,
 	*time = filePositionToTime(position);
 
 	// TODO: use B_MEDIA_SEEK_CLOSEST_BACKWARD, B_MEDIA_SEEK_CLOSEST_FORWARD to find key frame
-	if (ogg_sync_clear(&fSync) != 0) {
-		TRACE("oggReader::Seek: ogg_sync_clear failed?: error\n");
+	if (ogg_sync_reset(&fSync) != 0) {
+		TRACE("oggReader::Seek: ogg_sync_reset failed?: error\n");
 		return B_ERROR;
 	}
 	if (ogg_stream_reset(stream) != 0) {
