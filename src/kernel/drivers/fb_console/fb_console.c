@@ -1,4 +1,7 @@
 /*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -42,8 +45,8 @@ enum {
 
 struct console_desc {
 	// describe the framebuffer
-	addr fb;
-	addr fb_size;
+	addr_t fb;
+	addr_t fb_size;
 	int fb_x;
 	int fb_y;
 	int fb_pixel_bytes;
@@ -77,6 +80,38 @@ struct console_desc {
 
 static struct console_desc console;
 
+
+static void
+render_line8(char *line, int line_num)
+{
+	int x;
+	int y;
+	int i;
+	uint8 *fb_spot = (uint8 *)(console.fb + line_num * CHAR_HEIGHT * console.fb_x);
+
+	for(y = 0; y < CHAR_HEIGHT; y++) {
+		uint8 *render_spot = console.render_buf;
+		for(x = 0; x < console.columns; x++) {
+			if(line[x]) {
+				uint8 bits = FONT[CHAR_HEIGHT * line[x] + y];
+				for(i = 0; i < CHAR_WIDTH; i++) {
+					if(bits & 1) *render_spot = console.color;
+					else *render_spot = console.bcolor;
+					bits >>= 1;
+					render_spot++;
+				}
+			} else {
+				// null character, ignore the rest of the line
+				memset(render_spot, console.bcolor, (console.columns - x) * CHAR_WIDTH);
+				break;
+			}
+		}
+		memcpy(fb_spot, console.render_buf, console.fb_x);
+		fb_spot += console.fb_x;
+	}
+}
+
+
 static void
 render_line16(char *line, int line_num)
 {
@@ -98,7 +133,7 @@ render_line16(char *line, int line_num)
 				}
 			} else {
 				// null character, ignore the rest of the line
-				memset(render_spot, 0, (console.columns - x) * CHAR_WIDTH * 2);
+				memset(render_spot, console.bcolor, (console.columns - x) * CHAR_WIDTH * 2);
 				break;
 			}
 		}
@@ -129,10 +164,9 @@ render_line32(char *line, int line_num)
 				}
 			} else {
 				// null character, ignore the rest of the line
-				memset(render_spot, 0, (console.columns - x) * CHAR_WIDTH * 4);
+				memset(render_spot, console.bcolor, (console.columns - x) * CHAR_WIDTH * 4);
 				break;
 			}
-
 		}
 		memcpy(fb_spot, console.render_buf, console.fb_x * 4);
 		fb_spot += console.fb_x;
@@ -288,7 +322,7 @@ console_close(void * cookie)
 static status_t
 console_read(void * cookie, off_t pos, void *buffer, size_t *_length)
 {
-	ssize_t bytesRead = sys_read(console.keyboard_fd, 0, buffer, *_length);
+	ssize_t bytesRead = _kern_read(console.keyboard_fd, 0, buffer, *_length);
 	if (bytesRead >= 0) {
 		*_length = bytesRead;
 		return B_OK;
@@ -408,7 +442,7 @@ fb_console_dev_init(kernel_args *ka)
 
 		memset(&console, 0, sizeof(console));
 
-		if(ka->fb.already_mapped) {
+		if (ka->fb.already_mapped) {
 			console.fb = ka->fb.mapping.start;
 		} else {
 			vm_map_physical_memory(vm_get_kernel_aspace_id(), "vesa_fb", (void *)&console.fb, B_ANY_KERNEL_ADDRESS,
@@ -420,7 +454,12 @@ fb_console_dev_init(kernel_args *ka)
 		console.fb_pixel_bytes = ka->fb.bit_depth / 8;
 		console.fb_size = ka->fb.mapping.size;
 
-		switch(console.fb_pixel_bytes) {
+		switch (console.fb_pixel_bytes) {
+			case 1:
+				console.render_line = &render_line8;
+				console.color = 0;		// black
+				console.bcolor = 63;	// white
+				break;
 			case 2:
 				console.render_line = &render_line16;
 				console.color = 0xffff;
@@ -431,7 +470,7 @@ fb_console_dev_init(kernel_args *ka)
 				console.color = 0x00ffffff;
 				console.bcolor = 0;
 				break;
-			case 1:
+
 			default:
 				return 0;
 		}
@@ -452,14 +491,14 @@ fb_console_dev_init(kernel_args *ka)
 
 		// allocate some memory for this
 		console.render_buf = malloc(console.fb_x * console.fb_pixel_bytes);
-		memset((void *)console.render_buf, 0, console.fb_x * console.fb_pixel_bytes);
+		memset((void *)console.render_buf, console.bcolor, console.fb_x * console.fb_pixel_bytes);
 		console.buf = malloc(console.rows * (console.columns+1));
 		memset(console.buf, 0, console.rows * (console.columns+1));
 		console.lines = malloc(console.rows * sizeof(char *));
 		console.dirty_lines = malloc(console.rows);
 		// set up the line pointers
 		for (i = 0; i < console.rows; i++) {
-			console.lines[i] = (char *)((addr)console.buf + i*(console.columns+1));
+			console.lines[i] = (char *)((addr_t)console.buf + i*(console.columns+1));
 			console.dirty_lines[i] = 1;
 		}
 		console.num_lines = console.rows;
@@ -468,12 +507,30 @@ fb_console_dev_init(kernel_args *ka)
 		repaint();
 
 		mutex_init(&console.lock, "console_lock");
-		console.keyboard_fd = sys_open("/dev/keyboard", 0);
+		console.keyboard_fd = _kern_open("/dev/keyboard", 0);
 		if (console.keyboard_fd < 0)
 			panic("fb_console_dev_init: error opening /dev/keyboard\n");
 
 		// create device node
 		devfs_publish_device("console", NULL, &fb_console_hooks);
+
+#if 0
+{
+	// displays the palette in 8 bit mode
+#define BAR_WIDTH 8
+	int x, y, i;
+	int width = (console.fb_x - BAR_WIDTH - 1) / BAR_WIDTH;
+	for (y = 0; y < console.fb_y; y++) {
+		for (i = 0; i < width; i++) {
+			uint8 field[BAR_WIDTH];
+			for (x = 0; x < BAR_WIDTH; x++) {
+				field[x] = i;
+			}
+			memcpy(console.fb + i*BAR_WIDTH + y*console.fb_x, field, BAR_WIDTH);
+		}
+	}
+}
+#endif
 
 #if 0
 {
