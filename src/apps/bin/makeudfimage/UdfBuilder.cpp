@@ -101,6 +101,7 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	, fBuildTime(0)		// set at start of Build()
 	, fBuildTimeStamp()	// ditto
 	, fNextUniqueId(16)	// Starts at 16 thanks to MacOS... See UDF-2.50 3.2.1
+	, f32BitIdsNoLongerUnique(false) // Set to true once fNextUniqueId requires > 32bits
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("blockSize: %ld, doUdf: %s, doIso: %s",
 	               blockSize, bool_to_string(doUdf), bool_to_string(doIso)));
@@ -725,6 +726,62 @@ UdfBuilder::Build()
 		}
 	}
 	
+	// Write the integrity sequence
+	if (!error && _DoUdf()) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing logical volume integrity sequence");
+		Udf::MemoryChunk chunk(_BlockSize());
+		error = chunk.InitCheck();
+		// write closed integrity descriptor
+		if (!error) {
+			memset(chunk.Data(), 0, _BlockSize());
+			Udf::logical_volume_integrity_descriptor *lvid =
+				reinterpret_cast<Udf::logical_volume_integrity_descriptor*>(chunk.Data());
+			lvid->recording_time() = _BuildTimeStamp();
+			lvid->set_integrity_type(Udf::INTEGRITY_CLOSED);
+			lvid->next_integrity_extent() = kNullExtent;
+			memset(lvid->logical_volume_contents_use().data, 0,
+			       lvid->logical_volume_contents_use().size());
+			lvid->set_next_unique_id(_NextUniqueId());
+			lvid->set_partition_count(1);
+			lvid->set_implementation_use_length(
+				Udf::logical_volume_integrity_descriptor::minimum_implementation_use_length);
+			lvid->free_space_table()[0] = 0;
+			lvid->size_table()[0] = _PartitionAllocator().Length();
+			lvid->implementation_id() = Udf::kImplementationId;
+			lvid->set_file_count(_Stats().Files());
+			lvid->set_directory_count(_Stats().Directories());
+			lvid->set_minimum_udf_read_revision(0x0201);
+			lvid->set_minimum_udf_write_revision(0x0201);
+			lvid->set_maximum_udf_write_revision(0x0201);
+			lvid->tag().set_id(Udf::TAGID_LOGICAL_VOLUME_INTEGRITY_DESCRIPTOR);
+			lvid->tag().set_version(3);
+			lvid->tag().set_serial_number(0);
+			lvid->tag().set_location(integrityExtent.location());
+			lvid->tag().set_checksums(*lvid);
+			PDUMP(lvid);
+			// write lvid				                             
+			ssize_t bytes = _OutputFile().WriteAt(integrityExtent.location() << _BlockShift(),
+	       			                              lvid, _BlockSize());
+			error = check_size_error(bytes, _BlockSize());
+		}
+		// write terminating descriptor
+		if (!error) {
+			memset(chunk.Data(), 0, _BlockSize());
+			Udf::terminating_descriptor *terminator	=
+				reinterpret_cast<Udf::terminating_descriptor*>(chunk.Data());
+			terminator->tag().set_id(Udf::TAGID_TERMINATING_DESCRIPTOR);
+			terminator->tag().set_version(3);
+			terminator->tag().set_serial_number(0);
+			terminator->tag().set_location(integrityExtent.location()+1);
+			terminator->tag().set_checksums(*terminator);
+			PDUMP(terminator);
+			// write terminator				                             
+			ssize_t bytes = _OutputFile().WriteAt((integrityExtent.location()+1) << _BlockShift(),
+	       			                              terminator, _BlockSize());
+			error = check_size_error(bytes, _BlockSize());
+		}
+	}
+	
 	// Pad the end of the file to an even multiple of the block
 	// size, if necessary
 	if (!error) {
@@ -754,6 +811,20 @@ UdfBuilder::Build()
 	
 	fListener.OnCompletion(error, _Stats());
 	RETURN(error);
+}
+
+/*! \brief Returns the next unique id, then increments the id (the lower
+	32-bits of which wrap to 16 instead of 0, per UDF-2.50 3.2.1.1).
+*/
+uint64
+UdfBuilder::_NextUniqueId()
+{
+	uint64 result = fNextUniqueId++;	
+	if ((fNextUniqueId & 0xffffffff) == 0) {
+		fNextUniqueId |= 0x10;
+		f32BitIdsNoLongerUnique = true;
+	}
+	return result;
 }
 
 /*! \brief Sets the time at which image building began.

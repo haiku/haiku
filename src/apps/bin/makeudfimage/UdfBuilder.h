@@ -61,7 +61,8 @@ private:
 	Statistics& _Stats() { return fStatistics; }
 	time_t _BuildTime() const { return fBuildTime; }
 	Udf::timestamp& _BuildTimeStamp() { return fBuildTimeStamp; }
-	uint64 _NextUniqueId() { return fNextUniqueId++; }
+	uint64 _NextUniqueId();
+	bool _32BitIdsNoLongerUnique() const { return f32BitIdsNoLongerUnique; }
 
 	void _SetBuildTime(time_t time);
 
@@ -96,6 +97,7 @@ private:
 	time_t fBuildTime;
 	Udf::timestamp fBuildTimeStamp;
 	uint64 fNextUniqueId;
+	bool f32BitIdsNoLongerUnique;
 };
 
 
