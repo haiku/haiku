@@ -681,17 +681,6 @@ void Layer::RebuildRegions(bool include_children)
 	// 3) Clip each child to its siblings, going front to back
 	// 4) Remove the visible regions of the children from the current one
 	
-	// Reset visible regions
-	if(_full)
-		_full->Include(Frame());
-	else
-		_full=new BRegion(Frame());
-
-	if(_visible)
-		_visible->Include(Frame());
-	else
-		_visible=new BRegion(Frame());
-
 	// Reset children to fully visible and clip to this layer's visible region
 	for(Layer *childlay=_topchild; childlay!=NULL; childlay=childlay->_lowersibling)
 	{
