@@ -7,8 +7,6 @@ SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
-SubDirCcFlags -imacrolibc-symbols.h ;
-
 # ToDo: for now, all wide character functions are disabled
 
 KernelMergeObject posix_gnu_stdio.o : #_common.o :
