@@ -193,6 +193,7 @@ AGGTextRenderer::PostScriptName() const
 // RenderString
 void
 AGGTextRenderer::RenderString(const char* string,
+							  uint32 length,
 							  font_renderer_solid_type* solidRenderer,
 							  font_renderer_bin_type* binRenderer,
 							  const Transformable& transform,
@@ -217,7 +218,7 @@ AGGTextRenderer::RenderString(const char* string,
 	conv_font_trans_type ftrans(fcurves, transform);
 
 
-	int32 srcLength = strlen(string);
+	int32 srcLength = min_c(length, strlen(string));
 	int32 dstLength = srcLength * 4;
 
 	char* buffer = new char[dstLength];

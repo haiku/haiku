@@ -30,6 +30,7 @@ class AGGTextRenderer : public TextRenderer {
 	virtual	const char*			PostScriptName() const;
 
 	virtual	void				RenderString(const char* utf8String,
+											 uint32 length,
 											 font_renderer_solid_type* solidRenderer,
 											 font_renderer_bin_type* binRenderer,
 											 const Transformable& transform,
