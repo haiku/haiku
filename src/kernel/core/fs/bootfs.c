@@ -339,13 +339,13 @@ bootfs_create_vnode_tree(struct bootfs *fs, struct bootfs_vnode *root)
 	boot_entry *entry;
 	struct bootfs_vnode *new_vnode;
 	struct bootfs_vnode *dir;
-	char path[SYS_MAX_PATH_LEN];
+	char path[B_PATH_NAME_LENGTH];
 	char *leaf;
 
 	entry = (boot_entry *)bootdir;
 	for (i = 0; i < BOOTDIR_MAX_ENTRIES; i++) {
 		if (entry[i].be_type != BE_TYPE_NONE && entry[i].be_type != BE_TYPE_DIRECTORY) {
-			strlcpy(path, entry[i].be_name, SYS_MAX_PATH_LEN);
+			strlcpy(path, entry[i].be_name, sizeof(path));
 
 			dir = bootfs_create_path(fs, path, root, &leaf);
 			if (!dir)
