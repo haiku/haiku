@@ -364,7 +364,7 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	// Convert the magic numbers to the various byte orders so that
 	// I won't have to convert the data read in to see whether or not
 	// it is a supported type
-	uint32 nbits = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
+	const uint32 kBitsMagic = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
 	
 	// Read in the magic number and determine if it
 	// is a supported type
@@ -379,9 +379,9 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
 		return B_BAD_VALUE;
 	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	if (n32ch == nbits)
+	uint32 sourceMagic;
+	memcpy(&sourceMagic, ch, sizeof(uint32));
+	if (sourceMagic == kBitsMagic)
 		return B_OK;
 	else
 		return B_OK + 1;
