@@ -10,7 +10,7 @@
 
 
 static media_format_description
-tobias_description()
+tobias_video_description()
 {
 	media_format_description description;
 	description.family = B_AVI_FORMAT_FAMILY;
@@ -21,15 +21,15 @@ tobias_description()
 static void
 init_tobias_media_raw_video_format(media_raw_video_format * output)
 {
+	
 }
 
 
 static media_format
-tobias_encoded_media_format()
+tobias_video_encoded_media_format()
 {
 	media_format format;
 	format.type = B_MEDIA_ENCODED_VIDEO;
-	format.u.encoded_audio.frame_size = sizeof(ogg_packet);
 	init_tobias_media_raw_video_format(&format.u.encoded_video.output);
 	return format;
 }

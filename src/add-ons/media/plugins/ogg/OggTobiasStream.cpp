@@ -104,28 +104,42 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	void * data = &(packet.packet[1]);
 	tobias_stream_header * header = (tobias_stream_header *)data;
 
-	// get the format for the description
-	media_format_description description = tobias_description();
-	description.u.avi.codec = header->subtype[3] << 24 | header->subtype[2] << 16 
-	                        | header->subtype[1] <<  8 | header->subtype[0];
-	BMediaFormats formats;
-	result = formats.InitCheck();
-	if (result == B_OK) {
-		result = formats.GetFormatFor(description, format);
-	}
-	if (result != B_OK) {
-		*format = tobias_encoded_media_format();
-		// ignore error, allow user to use ReadChunk interface
-	}
+	if (strcmp(header->streamtype, "video") == 0) {
+		// get the format for the description
+		media_format_description description = tobias_video_description();
+		description.u.avi.codec = header->subtype[3] << 24 | header->subtype[2] << 16 
+		                        | header->subtype[1] <<  8 | header->subtype[0];
+		BMediaFormats formats;
+		result = formats.InitCheck();
+		if (result == B_OK) {
+			result = formats.GetFormatFor(description, format);
+		}
+		if (result != B_OK) {
+			*format = tobias_video_encoded_media_format();
+			// ignore error, allow user to use ReadChunk interface
+		}
+	
+		// fill out format from header packet
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		strncpy((char*)format->user_data, header->subtype, 4);
+		format->u.encoded_video.frame_size
+		   = header->video.width * header->video.height;
+		format->u.encoded_video.output.field_rate = 10000000.0 / header->time_unit;
+		format->u.encoded_video.output.interlace = 1;
+		format->u.encoded_video.output.first_active = 0;
+		format->u.encoded_video.output.last_active = header->video.height - 1;
+		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+		format->u.encoded_video.output.pixel_width_aspect = 1;
+		format->u.encoded_video.output.pixel_height_aspect = 1;
+		format->u.encoded_video.output.display.line_width = header->video.width;
+		format->u.encoded_video.output.display.line_count = header->video.height;
+		format->u.encoded_video.output.display.bytes_per_row = 0;
+		format->u.encoded_video.output.display.pixel_offset = 0;
+		format->u.encoded_video.output.display.line_offset = 0;
+		format->u.encoded_video.output.display.flags = 0;
 
-	// fill out format from header packet
-	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data, header->subtype, 4);
-	format->u.encoded_video.frame_size
-	   = header->video.width * header->video.height;
-	format->u.encoded_video.output.display.line_width = header->video.width;
-	format->u.encoded_video.output.display.line_count = header->video.height;
-	// TODO: wring more info out of the headers
+		// TODO: wring more info out of the headers
+	}
 
 	// get comment packet
 	if (GetHeaderPackets().size() < 2) {
@@ -137,8 +151,9 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
-	*duration = 80000000;
-	*frameCount = 60000;
+	*frameCount = 2000000;
+	*duration = *frameCount * format->u.encoded_video.output.field_rate;
+	fMediaFormat = *format;
 	return B_OK;
 }
 
@@ -153,5 +168,17 @@ OggTobiasStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	}
 	*chunkBuffer = fChunkPacket.packet;
 	*chunkSize = fChunkPacket.bytes;
+//	bool keyframe = fChunkPacket.packet[0] & (1 << 3); // ??
+	if (mediaHeader->type == B_MEDIA_ENCODED_VIDEO) {
+		mediaHeader->type = fMediaFormat.type;
+		mediaHeader->start_time = fCurrentTime;
+//		mediaHeader->u.encoded_video.field_flags = (keyframe ? B_MEDIA_KEY_FRAME : 0);
+		mediaHeader->u.encoded_video.first_active_line
+		   = fMediaFormat.u.encoded_video.output.first_active;
+		mediaHeader->u.encoded_video.line_count
+		   = fMediaFormat.u.encoded_video.output.display.line_count;
+		fCurrentFrame++;
+		fCurrentTime = 1000000LL * fCurrentFrame / fMediaFormat.u.encoded_video.output.field_rate;
+	}
 	return B_OK;
 }
