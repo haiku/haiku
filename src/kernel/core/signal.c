@@ -12,8 +12,8 @@
 #include <arch/thread.h>
 #include <int.h>
 #include <sem.h>
+#include <ksignal.h>
 #include <string.h>
-#include <signal.h>
 #include <syscalls.h>
 
 
@@ -103,75 +103,79 @@ handle_signals(struct thread *t, int state)
 
 
 int
-send_signal_etc(pid_t tid, uint sig, uint32 flags)
+send_signal_etc(pid_t team, uint sig, uint32 flags)
 {
-	int state;
-	struct thread *t, *main_t;
-	
-	if ((sig < 1) || (sig > MAX_SIGNO))
+	struct thread *thread;
+	cpu_status state;
+
+	if (sig < 1 || sig > MAX_SIGNO)
 		return B_BAD_VALUE;
-	
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	
-	t = thread_get_thread_struct_locked(tid);
-	if (!t) {
+
+	thread = thread_get_thread_struct_locked(team);
+	if (!thread) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 		return B_BAD_THREAD_ID;
 	}
 	// XXX check permission
-	
+
 	// Signals to kernel threads will only wake them up
-	if (t->team == team_get_kernel_team()) {
-		if (t->state == B_THREAD_SUSPENDED) {
-			t->state = t->next_state = B_THREAD_READY;
-			thread_enqueue_run_q(t);
+	if (thread->team == team_get_kernel_team()) {
+		if (thread->state == B_THREAD_SUSPENDED) {
+			thread->state = thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(thread);
 		}
 	}
 	else {
-		t->sig_pending |= (1L << (sig - 1));
-		
+		thread->sig_pending |= (1L << (sig - 1));
+
 		switch (sig) {
 			case SIGKILL:
+			{
+				struct thread *mainThread = thread->team->main_thread;
 				// Forward KILLTHR to the main thread of the team
-				main_t = t->team->main_thread;
-				main_t->sig_pending |= (1L << (SIGKILLTHR - 1));
+
+				mainThread->sig_pending |= (1L << (SIGKILLTHR - 1));
 				// Wake up main thread
-				if (main_t->state == B_THREAD_SUSPENDED) {
-					main_t->state = main_t->next_state = B_THREAD_READY;
-					thread_enqueue_run_q(main_t);
-				} else if (main_t->state == B_THREAD_WAITING)
-					sem_interrupt_thread(main_t);
-				// Fallthrough
+				if (mainThread->state == B_THREAD_SUSPENDED) {
+					mainThread->state = mainThread->next_state = B_THREAD_READY;
+					scheduler_enqueue_in_run_queue(mainThread);
+				} else if (mainThread->state == B_THREAD_WAITING)
+					sem_interrupt_thread(mainThread);
+
+				// Supposed to fall through
+			}
 			case SIGKILLTHR:
 				// Wake up suspended threads and interrupt waiting ones
-				if (t->state == B_THREAD_SUSPENDED) {
-					t->state = t->next_state = B_THREAD_READY;
-					thread_enqueue_run_q(t);
-				} else if (t->state == B_THREAD_WAITING)
-					sem_interrupt_thread(t);
+				if (thread->state == B_THREAD_SUSPENDED) {
+					thread->state = thread->next_state = B_THREAD_READY;
+					scheduler_enqueue_in_run_queue(thread);
+				} else if (thread->state == B_THREAD_WAITING)
+					sem_interrupt_thread(thread);
 				break;
 			case SIGCONT:
 				// Wake up thread if it was suspended
-				if (t->state == B_THREAD_SUSPENDED) {
-					t->state = t->next_state = B_THREAD_READY;
-					thread_enqueue_run_q(t);
+				if (thread->state == B_THREAD_SUSPENDED) {
+					thread->state = thread->next_state = B_THREAD_READY;
+					scheduler_enqueue_in_run_queue(thread);
 				}
 				break;
 			default:
-				if (t->sig_pending & ((~t->sig_block_mask) | (1L << (SIGCHLD - 1)))) {
+				if (thread->sig_pending & ((~thread->sig_block_mask) | (1L << (SIGCHLD - 1)))) {
 					// Interrupt thread if it was waiting
-					if (t->state == B_THREAD_WAITING)
-						sem_interrupt_thread(t);
+					if (thread->state == B_THREAD_WAITING)
+						sem_interrupt_thread(thread);
 				}
 				break;
 		}
 	}
 	
 	if (!(flags & B_DO_NOT_RESCHEDULE))
-		resched(); //XXX really here, while interrupts are disabled?
-	
+		scheduler_reschedule();
+
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 	
@@ -180,109 +184,124 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 
 
 int
-sys_send_signal(pid_t tid, uint sig)
+send_signal(pid_t team, uint sig)
 {
-	return send_signal_etc(tid, sig, 0);
+	return send_signal_etc(team, sig, 0);
 }
 
 
 int
-has_signals_pending(void *thr)
+has_signals_pending(void *_thread)
 {
-	struct thread *t = (struct thread *)thr;
-	if (!t)
-		t = thread_get_current_thread();
-	return (t->sig_pending & ~t->sig_block_mask);
+	struct thread *thread = (struct thread *)_thread;
+	if (thread == NULL)
+		thread = thread_get_current_thread();
+
+	return thread->sig_pending & ~thread->sig_block_mask;
 }
 
 
 int
-user_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
-{
-	struct sigaction kact;
-	struct sigaction koact;
-	int rc;
-	
-	if ((!act) || (!oact))
-		return EINVAL;
-	
-	rc = user_memcpy(&kact, act, sizeof(struct sigaction));
-	if (rc < 0)
-		return rc;
-	rc = user_memcpy(&koact, oact, sizeof(struct sigaction));
-	if (rc < 0)
-		return rc;
-	rc = sys_sigaction(sig, &kact, &koact);
-	if (rc < 0)
-		return rc;
-	rc = user_memcpy(oact, &koact, sizeof(struct sigaction));
-	return rc;
-}
-
-
-int
-sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
+sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 {
 	struct thread *t;
 	int state;
-	
-	if ((sig < 1) || (sig > MAX_SIGNO))
+
+	if (sig < 1 || sig > MAX_SIGNO
+		|| sig == SIGKILL || sig == SIGKILLTHR || sig == SIGSTOP)
 		return EINVAL;
-	if ((sig == SIGKILL) || (sig == SIGKILLTHR) || (sig == SIGSTOP))
-		return EINVAL;
-	
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	
+
 	t = thread_get_current_thread();
-	
-	memcpy(oact, &t->sig_action[sig - 1], sizeof(struct sigaction));
-	memcpy(&t->sig_action[sig - 1], act, sizeof(struct sigaction));
-	
-	if (act->sa_handler == SIG_IGN)
+
+	if (oact)
+		memcpy(oact, &t->sig_action[sig - 1], sizeof(struct sigaction));
+	if (act)
+		memcpy(&t->sig_action[sig - 1], act, sizeof(struct sigaction));
+
+	if (act && act->sa_handler == SIG_IGN)
 		t->sig_pending &= ~(1L << (sig - 1));
-	else if (act->sa_handler == SIG_DFL) {
+	else if (act && act->sa_handler == SIG_DFL) {
 		if ((sig == SIGCONT) || (sig == SIGCHLD) || (sig == SIGWINCH))
 			t->sig_pending &= ~(1L << (sig - 1));
-	}
-	else
-		dprintf("### custom signal handler set\n");
-	
+	} /*else
+		dprintf("### custom signal handler set\n");*/
+
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	
+
 	return 0;
 }
 
 
 // Triggers a SIGALRM to the thread that issued the timer and reschedules
+
 static int32
 alarm_event(timer *t)
 {
 	send_signal_etc(thread_get_current_thread()->id, SIGALRM, B_DO_NOT_RESCHEDULE);
-	
+
 	return B_INVOKE_SCHEDULER;
 }
 
 
 bigtime_t
-sys_set_alarm(bigtime_t time, uint32 mode)
+set_alarm(bigtime_t time, uint32 mode)
 {
 	struct thread *t = thread_get_current_thread();
 	int state;
 	bigtime_t rv = 0;
-	
+
 	state = disable_interrupts(); //XXX really here? and what about a spinlock?
 
-	
 	if (t->alarm.period)
 		rv = (bigtime_t)t->alarm.entry.key - system_time();
 	cancel_timer(&t->alarm);
 	if (time != B_INFINITE_TIMEOUT)
 		add_timer(&t->alarm, &alarm_event, time, mode);
-	
+
 	restore_interrupts(state);
-	
+
 	return rv;
+}
+
+
+//	#pragma mark -
+
+
+bigtime_t
+user_set_alarm(bigtime_t time, uint32 mode)
+{
+	return set_alarm(time, mode);
+}
+
+
+int
+user_send_signal(pid_t team, uint signal)
+{
+	return send_signal(team, signal);
+}
+
+
+int
+user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *userOldAction)
+{
+	struct sigaction act, oact;
+	int rc;
+
+	if ((userAction != NULL && user_memcpy(&act, userAction, sizeof(struct sigaction)) < B_OK)
+		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction, sizeof(struct sigaction)) < B_OK))
+		return B_BAD_ADDRESS;
+
+	rc = sigaction(sig, userAction ? &act : NULL, userOldAction ? &oact : NULL);
+
+	// only copy the old action if a pointer has been given
+	if (rc >= 0 && userOldAction != NULL
+		&& user_memcpy(userOldAction, &oact, sizeof(struct sigaction)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return rc;
 }
 
