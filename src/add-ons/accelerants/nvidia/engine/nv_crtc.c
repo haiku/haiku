@@ -111,8 +111,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		LOG(2,("CRTC: DFP active: tuning modeline\n"));
 
 		/* horizontal timing */
-		target.timing.h_total = target.timing.h_display + 56;
-		target.timing.h_sync_start = target.timing.h_total - 40;
+		target.timing.h_total = target.timing.h_display + 128;
+		target.timing.h_sync_start = target.timing.h_total - 112;
 		target.timing.h_sync_end = target.timing.h_total - 16;
 
 		/* vertical timing */
