@@ -47,6 +47,7 @@
 #define SHOW_CURSOR 'srsc'
 #define HIDE_CURSOR 'srhc'
 #define OBSCURE_CURSOR 'sroc'
+#define QUERY_CURSOR_HIDDEN 'qcuh'
 
 #define GFX_COUNT_WORKSPACES 'gcws'
 #define GFX_SET_WORKSPACE_COUNT 'ggwc'
