@@ -216,6 +216,7 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	fMediaFormat = *format;
 	fMicrosecPerFrame = header->time_unit / 10.0;
+	fFrameRate = 1000000.0 / fMicrosecPerFrame;
 	
 	// TODO: count the frames in the first page.. somehow.. :-/
 	int64 frames = 0;
@@ -226,13 +227,8 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	if (result != B_OK) {
 		return result;
 	}
-	int64 first_granulepos = ogg_page_granulepos(&page);
-	if (first_granulepos < 0) {
-		// negative start granulepos indicates that we discard that many frames
-		frames -= first_granulepos;
-		first_granulepos = 0;
-	}
-
+	int64 fFirstGranulepos = ogg_page_granulepos(&page);
+	TRACE("OggVorbisSeekable::GetStreamInfo: first granulepos: %lld\n", fFirstGranulepos);
 	// read our last page
 	off_t last = inherited::Seek(GetLastPagePosition(), SEEK_SET);
 	if (last < 0) {
@@ -253,22 +249,11 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// compute frame count and duration from sample count
-	frames += last_granulepos - first_granulepos;
+	frames = last_granulepos - fFirstGranulepos;
+
 	*frameCount = frames;
-	*duration = (bigtime_t)(*frameCount * fMicrosecPerFrame);
+	*duration = (1000000LL * frames) / (long long)fFrameRate;
 	return B_OK;
-}
-
-
-status_t
-OggTobiasSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
-{
-	status_t status = inherited::Seek(seekTo, frame, time);
-	if (status == B_OK) {
-		fCurrentFrame = *frame;
-		fCurrentTime = *time;
-	}
-	return status;
 }
 
 

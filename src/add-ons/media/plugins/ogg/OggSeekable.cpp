@@ -51,6 +51,7 @@ OggSeekable::OggSeekable(long serialno)
 	ogg_stream_init(&fStreamState,serialno);
 	fPosition = 0;
 	fLastPagePosition = 0;
+	fFrameRate = 0;
 }
 
 
@@ -142,6 +143,12 @@ status_t
 OggSeekable::ReadPage(ogg_page * page, int read_size)
 {
 //	TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
+	int result;
+	while ((result = ogg_sync_pageout(&fSync, page)) == 1) {
+		if (ogg_page_serialno(page) == GetSerial()) {
+			return B_OK;
+		}
+	}
 	BAutolock autolock(fPositionLock);
 	// align to page boundary
 	int offset;
@@ -257,37 +264,163 @@ OggSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	return B_OK;
 }
 
-
 status_t
 OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 {
-	if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
-		if (*frame != 0) {
+	int64 granulepos;
+	if (seekTo & B_MEDIA_SEEK_TO_TIME) {
+		TRACE("OggSeekable::Seek: seek to time: %lld\n", *time);
+		if ((fFrameRate == 0) && (*time != 0)) {
+			TRACE("OggSeekable::Seek: fFrameRate unset, seek to non-zero time unsupported\n");
 			return B_UNSUPPORTED;
 		}
+		granulepos = fFirstGranulepos + (int64) (*time * (long long)fFrameRate) / 1000000LL;
+	} else if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+		granulepos = fFirstGranulepos + *frame;
+	} else {
+		TRACE("OggSeekable::Seek: bad seekTo");
+		return B_BAD_VALUE;
 	}
-	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
-		if (*time != 0) {
-			return B_UNSUPPORTED;
-		}
-	}
-	off_t result = Seek(0, SEEK_SET);
-	if (result < 0) {
-		return result;
-	}
+	TRACE("OggSeekable::Seek: seek to granulepos: %lld\n", granulepos);
 
-	for(uint i = 0 ; i < GetHeaderPackets().size() ; i++) {
-		ogg_packet packet;
-		status_t status = GetPacket(&packet);
+	// find the first packet with data in it
+	ogg_page page;
+	off_t left = 0;
+	Seek(0, SEEK_SET);
+	uint header_packets_left = GetHeaderPackets().size();
+	while (header_packets_left > 0) {
+		status_t status = ReadPage(&page, B_PAGE_SIZE);
 		if (status != B_OK) {
+			TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
 			return status;
 		}
+		header_packets_left -= ogg_page_packets(&page);
+		left += page.header_len + page.body_len;
+	}
+	if (ogg_page_continued(&page)) {
+		TRACE("OggSeekable::Seek: warning: data packet began in header page!\n");
+		// how to handle this?
+	}
+	
+	// binary search to find our place
+	int64 left_granulepos = 0;
+	off_t right = GetLastPagePosition();
+	int64 right_granulepos = 0;
+	bool done = false;
+	while (!done) {
+		TRACE("  Seek: [%llu,%llu]: ", left, right);
+		ogg_sync_reset(&fSync);
+		ogg_stream_reset(&fStreamState);
+		if (right - left > B_PAGE_SIZE) {
+			fPosition = (right + left) / 2;
+		} else {
+			fPosition = left;
+			done = true;
+		}
+		do {
+			status_t status = ReadPage(&page, B_PAGE_SIZE);
+			if (status != B_OK) {
+				TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
+				return status;
+			}
+			if (ogg_stream_pagein(&fStreamState, &page) != 0) {
+				TRACE("OggSeekable::Seek: ogg_stream_pagein: failed??\n");
+				return B_ERROR;
+			}
+		} while (ogg_page_granulepos(&page) == -1);
+		TRACE("granulepos = %lld, ", ogg_page_granulepos(&page));
+		TRACE("fPosition = %llu\n", fPosition);
+		// check the granulepos of the page against the requested frame
+		if (ogg_page_granulepos(&page) < granulepos) {
+			// The packet that the frame is in is someplace after
+			// the last complete packet in this page.  (It may yet
+			// be in this page, but in a packet completed on the
+			// next page.)
+			left = (right + left) / 2;
+			left_granulepos = ogg_page_granulepos(&page);
+			continue;
+		} else {
+			right = (right + left) / 2;
+			right_granulepos = ogg_page_granulepos(&page);
+			continue;
+		}
 	}
 
-	*frame = 0;
-	*time = 0;
+	// if not zero, look for a granulepos in a packet
+	if (*frame != 0) {
+		ogg_packet packet;
+		do {
+			status_t status = GetPacket(&packet);
+			if (status != B_OK) {
+				TRACE("OggSeekable::Seek: GetPacket = %s\n", strerror(status));
+				return status;
+			}
+		} while (packet.granulepos == -1);
+		granulepos = packet.granulepos;
+		fCurrentFrame = granulepos - fFirstGranulepos;
+		fCurrentTime = (1000000LL * fCurrentFrame) / (long long)fFrameRate;
+	} else {
+		fCurrentFrame = 0;
+		fCurrentTime = 0;
+	}
+	TRACE("OggSeekable::Seek done: ");
+	TRACE("[%lld,%lld] => ", left_granulepos, right_granulepos);
+	TRACE("found frame %lld at time %llu\n", fCurrentFrame, fCurrentTime);
+	*frame = fCurrentFrame;
+	*time = fCurrentTime;
 	return B_OK;
 }
+
+		// The packet that the frame is in is someplace before or
+		// in the last complete packet in this page. (It may be in
+		// a prior page)
+/*		ogg_packet packet;
+		do {
+			switch (ogg_stream_packetpeek(&fStreamState, &packet)) {
+			case 1: // a packet found
+				break;
+			case 0: { // no packets found
+				status_t status = ReadPage(&page, B_PAGE_SIZE);
+				if (status != B_OK) {
+					TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
+					return status;
+				}
+				if (ogg_stream_pagein(&fStreamState, &page) != 0) {
+					TRACE("OggSeekable::Seek: ogg_stream_pagein: failed??\n");
+					return B_ERROR;
+				}
+				continue;
+			default: // error condition
+				TRACE("OggSeekable::Seek: error peeking for packet\n");
+				continue;
+			}
+			if (packet.granulepos == -1) {
+				// useless packet with no seek info, eat it
+				ogg_stream_packetout(&fStreamState, &packet);
+			}
+		} while (packet.granulepos == -1);
+		if (packet.granulepos 
+*/
+/*		if (ogg_page_granulepos(&page) == *frame) {
+			// The frame is in the last packet to end on this page.
+			// If the last packet on this page was continued from
+			// the prior page, we might need to go back farther to 
+			// get the whole packet.
+			if ((ogg_page_packets(&page) == 1) &&
+			    (ogg_page_continued(&page)) &&
+				(ogg_stream_packetpeek(&fStreamState, NULL) != 1)) {
+				right = (right + left) / 2;
+				continue;
+			}
+			// The frame is the last frame in the last packet on 
+			// this page.  If there are more than 1 packet, discard 
+			// all but the last and return.
+			for (int i = 0 ; i < packets - 1 ; i++) {
+				ogg_packet packet;
+				GetPacket(&packet);
+			}
+			return B_OK;
+		}*/
 
 
 // the default chunk is an ogg packet
@@ -313,22 +446,12 @@ OggSeekable::GetPacket(ogg_packet * packet)
 	// at the end, pull the packet
 	while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
 		ogg_page page;
-		do {
-			int result = ogg_sync_pageout(&fSync, &page);
-			if (result == 0) {
-				status_t status = ReadPage(&page);
-				if (status != B_OK) {
-					TRACE("OggSeekable::GetPacket: GetNextPage = %s\n", strerror(status));
-					return status;
-				}
-			}
-			if (result == -1) {
-				TRACE("OggSeekable::GetPacket: ogg_sync_pageout: not synced??\n");
-				return B_ERROR;
-			}
-		} while (ogg_page_serialno(&page) != GetSerial());
+		status_t status = ReadPage(&page);
+		if (status != B_OK) {
+			TRACE("OggSeekable::GetPacket: ReadPage = %s\n", strerror(status));
+			return status;
+		}
 		if (ogg_stream_pagein(&fStreamState, &page) != 0) {
-			debugger("huh?");
 			TRACE("OggSeekable::GetPacket: ogg_stream_pagein: failed??\n");
 			return B_ERROR;
 		}

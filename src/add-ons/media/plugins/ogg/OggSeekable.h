@@ -46,6 +46,9 @@ protected:
 	int64				fCurrentFrame;
 	bigtime_t			fCurrentTime;
 
+	int64				fFirstGranulepos;
+	float				fFrameRate;
+
 private:
 	off_t				fPosition;
 	std::vector<off_t>	fPagePositions;

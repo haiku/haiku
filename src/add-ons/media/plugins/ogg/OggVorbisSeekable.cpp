@@ -165,7 +165,7 @@ OggVorbisSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	} else {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 	}
-	format->u.encoded_audio.output.frame_rate = (float)info.rate;
+	fFrameRate = format->u.encoded_audio.output.frame_rate = (float)info.rate;
 	format->u.encoded_audio.output.channel_count = info.channels;
 	format->u.encoded_audio.output.buffer_size
 	  = AudioBufferSize(&format->u.encoded_audio.output);
@@ -199,15 +199,10 @@ OggVorbisSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	if (result != B_OK) {
 		return result;
 	}
-	int64 first_granulepos = ogg_page_granulepos(&page);
-	if (first_granulepos < 0) {
-		// negative start granulepos indicates that we discard that many frames
-		frames -= first_granulepos;
-		first_granulepos = 0;
-	}
-
+	int64 fFirstGranulepos = ogg_page_granulepos(&page);
+	TRACE("OggVorbisSeekable::GetStreamInfo: first granulepos: %lld\n", fFirstGranulepos);
 	// read our last page
-	off_t last = Seek(GetLastPagePosition(), SEEK_SET);
+	off_t last = inherited::Seek(GetLastPagePosition(), SEEK_SET);
 	if (last < 0) {
 		return last;
 	}
@@ -226,9 +221,10 @@ OggVorbisSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// compute frame count and duration from sample count
-	frames += last_granulepos - first_granulepos;
+	frames = last_granulepos - fFirstGranulepos;
+
 	*frameCount = frames;
-	*duration = (1000000LL * frames) / (long long)format->u.encoded_audio.output.frame_rate;
+	*duration = (1000000LL * frames) / (long long)fFrameRate;
 
 	return B_OK;
 }
