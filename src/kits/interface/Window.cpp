@@ -34,6 +34,7 @@
 #include <Button.h>
 #include <Point.h>
 #include <Message.h>
+#include <MessageQueue.h>
 #include <View.h>
 #include <stdio.h>
 // Project Includes -----------------------------------------------------------
@@ -57,11 +58,15 @@ BWindow::BWindow(BRect frame,
 
 	if(title)
 	{
-		fTitle=new char[strlen(title)];
+		fTitle=new char[strlen(title)+1];
 		strcpy(fTitle,title);
 	}
 	else
-		fTitle=NULL;
+	{
+		fTitle=new char[2];
+		fTitle[0]=' ';
+		fTitle[1]='\0';
+	}
 	fFlags=flags;
 	
 	// Create a port on which to listen to messages
@@ -77,14 +82,15 @@ BWindow::BWindow(BRect frame,
 	serverlink->Flush();
 	
 	fShowLevel=0;	// Hidden to start with.
+	fUnused1=true;	// to signal having not been shown for the first time yet.
 
 	// We create our serverlink utilizing our application's server port
 	// because the server's ServerApp will handle window creation
-	serverlink->SetPort(be_app->fServerTo);
+	serverlink->SetPort(be_app->fServerFrom);
 
 	// make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
 	// OBApplication couldn't find the server
-	if(be_app->fServerTo!=B_NAME_NOT_FOUND)
+	if(be_app->fServerFrom!=B_NAME_NOT_FOUND)
 	{
 		// Notify server of window's existence
 		serverlink->SetOpCode(AS_CREATE_WINDOW);
@@ -134,7 +140,11 @@ BWindow::BWindow(BRect frame,
 		strcpy(fTitle,title);
 	}
 	else
-		fTitle=NULL;
+	{
+		fTitle=new char[2];
+		fTitle[0]=' ';
+		fTitle[1]='\0';
+	}
 	fFlags=flags;
 	fLook=look;
 	fFeel=feel;
@@ -152,14 +162,15 @@ BWindow::BWindow(BRect frame,
 	serverlink->Flush();
 	
 	fShowLevel = 0;	// Hidden to start with.
+	fUnused1=true;	// to signal having not been shown for the first time yet.
 
 	// We create our serverlink utilizing our application's server port
 	// because the server's ServerApp will handle window creation
-	serverlink->SetPort(be_app->fServerTo);
+	serverlink->SetPort(be_app->fServerFrom);
 
 	// make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
 	// OBApplication couldn't find the server
-	if(be_app->fServerTo!=B_NAME_NOT_FOUND)
+	if(be_app->fServerFrom!=B_NAME_NOT_FOUND)
 	{
 		// Notify server of window's existence
 		serverlink->SetOpCode(AS_CREATE_WINDOW);
@@ -170,15 +181,20 @@ BWindow::BWindow(BRect frame,
 		serverlink->Attach(&receive_port,sizeof(port_id));
 		serverlink->Attach((int32)workspace);
 		if(fTitle)
-			serverlink->Attach(fTitle,sizeof(fTitle));
+			serverlink->Attach(fTitle,strlen(fTitle)+1);
 		else
 			serverlink->Attach(0L);
 	   
 		// Send and wait for ServerWindow port. Necessary here so we can respond to
 		// messages as soon as Show() is called.
 		PortLink::ReplyData replydata;
+		int8*index;
 		serverlink->FlushWithReply(&replydata);
-		send_port=*((port_id*)replydata.buffer);
+		index=replydata.buffer;
+		send_port=*((port_id*)index);
+		index+=sizeof(port_id);
+		server_token=*((int32*)index);
+		
 		serverlink->SetPort(send_port);
 		
 		top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
@@ -578,7 +594,7 @@ BWindow::Show()
 {
 	if(fUnused1)	// This is the first Show() for this window, so Unlock.
 	{
-		fUnused1 = false;
+		fUnused1=false;
 		Unlock();
 	}
 	fShowLevel++;		
@@ -1014,11 +1030,125 @@ BWindow::BitmapClose()
 	
 }
 //---------------------------------------------------------------------------------
-/* Virtual */
-void	
-BWindow::task_looper()
+void BWindow::task_looper()
 {
-	
+// Erik's Looper code shamelessly pasted here. ;)
+
+	//	Check that looper is locked (should be)
+	AssertLocked();
+	//	Unlock the looper
+	Unlock();
+
+	//	loop: As long as we are not terminating.
+	while (!fTerminating)
+	{
+		//	Read from message port (how do we determine what the timeout is?)
+		BMessage* msg = MessageFromPort();
+
+		//	Did we get a message?
+		if (msg)
+		{
+			//	Add to queue
+			fQueue->AddMessage(msg);
+		}
+
+		//	Get message count from port
+		int32 msgCount = port_count(fMsgPort);
+		for (int32 i = 0; i < msgCount; ++i)
+		{
+			//	Read 'count' messages from port (so we will not block)
+			//	We use zero as our timeout since we know there is stuff there
+			msg = MessageFromPort(0);
+			//	Add messages to queue
+			if (msg)
+			{
+				fQueue->AddMessage(msg);
+			}
+		}
+
+		//	loop: As long as there are messages in the queue and the port is
+		//		  empty... and we are not terminating, of course.
+		bool dispatchNextMessage = true;
+		while (!fTerminating && dispatchNextMessage)
+		{
+			//	Get next message from queue (assign to fLastMessage)
+			fLastMessage = fQueue->NextMessage();
+
+			//	Lock the looper
+			Lock();
+			if (!fLastMessage)
+			{
+				// No more messages: Unlock the looper and terminate the
+				// dispatch loop.
+				dispatchNextMessage = false;
+			}
+			else
+			{
+				//	Get the target handler
+				//	Use BMessage friend functions to determine if we are using the
+				//	preferred handler, or if a target has been specified
+				BHandler* handler;
+				if (_use_preferred_target_(fLastMessage))
+				{
+					handler = fPreferred;
+				}
+				else
+				{
+					/**
+						@note	Here is where all the token stuff starts to
+								make sense.  How, exactly, do we determine
+								what the target BHandler is?  If we look at
+								BMessage, we see an int32 field, fTarget.
+								Amazingly, we happen to have a global mapping
+								of BHandler pointers to int32s!
+					 */
+				}
+
+				if (!handler)
+				{
+					handler = this;
+				}
+
+				//	Is this a scripting message? (BMessage::HasSpecifiers())
+				if (fLastMessage->HasSpecifiers())
+				{
+					int32 index = 0;
+					// Make sure the current specifier is kosher
+					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
+					{
+						handler = resolve_specifier(handler, fLastMessage);
+					}
+				}
+				
+				if (handler)
+				{
+					//	Do filtering
+					handler = top_level_filter(fLastMessage, handler);
+					if (handler && handler->Looper() == this)
+					{
+						DispatchMessage(fLastMessage, handler);
+					}
+				}
+			}
+
+			//	Unlock the looper
+			Unlock();
+
+			//	Delete the current message (fLastMessage)
+			if (fLastMessage)
+			{
+				delete fLastMessage;
+				fLastMessage = NULL;
+			}
+
+			//	Are any messages on the port?
+			if (port_count(fMsgPort) > 0)
+			{
+				//	Do outer loop
+				dispatchNextMessage = false;
+			}
+		}
+	}
 }
 //---------------------------------------------------------------------------------
 void	
@@ -1074,10 +1204,28 @@ BWindow::extract_drop(BMessage* an_event, BHandler* *target)
 	return an_event;
 }
 //---------------------------------------------------------------------------------
-BMessage*	
-BWindow::ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT)
+BMessage* BWindow::ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT)
 {
-	return BLooper::ReadMessageFromPort(tout);	// Is this right?
+	BMessage *msg;
+	int32 msgcode;
+	int8 *msgbuffer=NULL;
+	ssize_t buffersize,bytesread;
+	
+	buffersize=port_buffer_size_etc(receive_port,B_TIMEOUT,tout);
+	if(buffersize==B_TIMED_OUT)
+		return NULL;
+	
+	if(buffersize>0)
+		msgbuffer=new int8[buffersize];
+
+	bytesread=read_port(receive_port,&msgcode,msgbuffer,buffersize);
+
+	msg=ConvertToMessage(msgbuffer, msgcode);
+
+	if(buffersize>0)
+		delete msgbuffer;
+
+	return msg;
 }
 //---------------------------------------------------------------------------------
 int32	
@@ -1148,10 +1296,25 @@ BWindow::do_draw_views()
 }
 //---------------------------------------------------------------------------------
 /* Virtual */
-BMessage*
-BWindow::ConvertToMessage(void* raw, int32 code)
+BMessage* BWindow::ConvertToMessage(void* raw, int32 code)
 {
-	BLooper::ConvertToMessage(raw,code);		// Is This right?
+	BMessage *msg=new BMessage;
+	
+	switch(code)
+	{
+		// any messages requested by the app_server get converted here
+		case B_QUIT_REQUESTED:
+		{
+			msg->what=code;
+			break;
+		}
+		default:
+		{
+			delete msg;
+			msg=NULL;
+		}
+	}
+	return msg;
 }
 //---------------------------------------------------------------------------------
 _cmd_key_*
