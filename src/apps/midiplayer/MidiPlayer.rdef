@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.OpenBeOS.MidiPlayer";
+resource app_signature "application/x-vnd.haiku.MidiPlayer";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -8,10 +8,10 @@ resource app_version
 	major      = 1, 
 	middle     = 0,
 	minor      = 0,
-	variety    = B_APPV_ALPHA,
+	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "MidiPlayer",
-	long_info  = "OpenBeOS - MidiPlayer"
+	long_info  = "Haiku MIDI Player"
 };
 
 resource file_types message

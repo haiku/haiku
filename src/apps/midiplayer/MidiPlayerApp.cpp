@@ -46,7 +46,12 @@ void MidiPlayerApp::ReadyToRun()
 void MidiPlayerApp::AboutRequested()
 {
 	(new BAlert(
-		NULL, "OpenBeOS MidiPlayer\n\n", "Okay", NULL, NULL,
+		NULL,
+		"Haiku MIDI Player\n\n"
+		"This tiny program\n"
+		"Knows how to play thousands of\n"
+		"Cheesy sounding songs",
+		"Okay", NULL, NULL,
 		B_WIDTH_AS_USUAL, B_INFO_ALERT))->Go();
 }
 

@@ -25,7 +25,7 @@
 
 #include <Application.h>
 
-#define MIDI_PLAYER_SIGNATURE  "application/x-vnd.OpenBeOS.MidiPlayer"
+#define MIDI_PLAYER_SIGNATURE  "application/x-vnd.haiku.MidiPlayer"
 
 class MidiPlayerWindow;
 
