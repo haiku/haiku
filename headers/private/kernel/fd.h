@@ -72,7 +72,6 @@ enum fd_types {
 struct file_descriptor *alloc_fd(void);
 int new_fd(struct io_context *, struct file_descriptor *);
 struct file_descriptor *get_fd(struct io_context *, int);
-void remove_fd(struct io_context *, int);
 void put_fd(struct file_descriptor *);
 void free_fd(struct file_descriptor *);
 static struct io_context *get_current_io_context(bool kernel);
