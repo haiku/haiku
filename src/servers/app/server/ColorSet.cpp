@@ -232,7 +232,7 @@ bool LoadGUIColors(ColorSet *set)
 	rgb_color *col;
 	ssize_t size;
 	
-	if(msg.FindData("Panel Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+	if(msg.FindData("Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->panel_background=*col;
 	if(msg.FindData("Panel Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->panel_text=*col;
@@ -256,9 +256,9 @@ bool LoadGUIColors(ColorSet *set)
 		set->menu_background=*col;
 	if(msg.FindData("Selected Menu Item Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->menu_selected_background=*col;
-	if(msg.FindData("Keyboard Navigation Base",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+	if(msg.FindData("Navigation Base",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->keyboard_navigation_base=*col;
-	if(msg.FindData("Keyboard Navigation Pulse",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+	if(msg.FindData("Navigation Pulse",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->keyboard_navigation_pulse=*col;
 	if(msg.FindData("Menu Item Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->menu_text=*col;

@@ -44,6 +44,7 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_close_state=false;
 	_minimize_state=false;
 	_zoom_state=false;
+	_has_focus=false;
 	_title_string=new BString;
 	_driver=NULL;
 	
@@ -84,6 +85,7 @@ Decorator::~Decorator(void)
 void Decorator::SetColors(const ColorSet &cset)
 {
 	_colors->SetColors(cset);
+	_SetColors();
 }
 
 /*!
@@ -483,6 +485,16 @@ void Decorator::_DrawTitle(BRect r)
 	to check the update rectangle.
 */
 void Decorator::_DrawZoom(BRect r)
+{
+}
+
+/*!
+	\brief Hook function for when the color set is updated
+	
+	This function is called after the decorator's color set is updated. Quite useful 
+	if the decorator uses colors based on those in the system.
+*/
+void Decorator::_SetColors(void)
 {
 }
 

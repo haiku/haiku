@@ -110,6 +110,7 @@ protected:
 	virtual void _DrawZoom(BRect r);
 	virtual void _SetFocus(void)=0;
 	virtual void _DoLayout(void)=0;
+	virtual void _SetColors(void);
 	
 	ColorSet *_colors;
 	DisplayDriver *_driver;

@@ -42,7 +42,6 @@ public:
 	void Draw(void);
 	BRegion *GetFootprint(void);
 	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
-
 protected:
 	void _DrawClose(BRect r);
 	void _DrawFrame(BRect r);
@@ -51,6 +50,7 @@ protected:
 	void _DrawZoom(BRect r);
 	void _DoLayout(void);
 	void _SetFocus(void);
+	void _SetColors(void);
 	void DrawBlendedRect(BRect r, bool down);
 	uint32 taboffset;
 

@@ -66,8 +66,8 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	solidhigh=0xFFFFFFFFFFFFFFFFLL;
 	solidlow=0;
 
-	tab_highcol=_colors->window_tab;
-	tab_lowcol=_colors->window_tab;
+//	tab_highcol=_colors->window_tab;
+//	tab_lowcol=_colors->window_tab;
 
 #ifdef DEBUG_DECORATOR
 printf("DefaultDecorator:\n");
@@ -278,8 +278,10 @@ void DefaultDecorator::_SetFocus(void)
 	}
 	else
 	{
-		tab_highcol.SetColor(235,235,235);
-		tab_lowcol.SetColor(160,160,160);
+//		tab_highcol.SetColor(235,235,235);
+//		tab_lowcol.SetColor(160,160,160);
+		tab_highcol=_colors->inactive_window_tab;
+		tab_lowcol=_colors->inactive_window_tab;
 
 		button_highcol.SetColor(229,229,229);
 		button_lowcol.SetColor(153,153,153);
@@ -353,7 +355,7 @@ void DefaultDecorator::_DrawTab(BRect r)
 	_layerdata.highcolor=frame_lowcol;
 	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
 
-	_layerdata.highcolor=_colors->window_tab;
+	_layerdata.highcolor=tab_highcol;
 	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
 
 //	UpdateTitle(layer->name->String());
@@ -364,6 +366,11 @@ void DefaultDecorator::_DrawTab(BRect r)
 		_DrawClose(_closerect);
 	if(!(_flags & B_NOT_ZOOMABLE))
 		_DrawZoom(_zoomrect);
+}
+
+void DefaultDecorator::_SetColors(void)
+{
+	_SetFocus();
 }
 
 void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
