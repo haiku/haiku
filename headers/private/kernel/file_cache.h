@@ -22,8 +22,8 @@ struct cache_module_info {
 extern "C" {
 #endif
 
-extern void cache_node_opened(void *ref, mount_id mountID, vnode_id vnodeID);
-extern void cache_node_closed(void *ref, mount_id mountID, vnode_id vnodeID);
+extern void cache_node_opened(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID);
+extern void cache_node_closed(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID);
 extern void cache_prefetch(mount_id mountID, vnode_id vnodeID);
 extern status_t file_cache_init(void);
 
