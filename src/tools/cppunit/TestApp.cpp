@@ -1,5 +1,7 @@
 // TestApp.cpp
 
+#include <Autolock.h>
+
 #include <TestApp.h>
 
 // TestHandler
@@ -29,10 +31,18 @@ BTestHandler::Queue()
 BTestApp::BTestApp(const char *signature)
 	   : BApplication(signature),
 		 fAppThread(B_ERROR),
-		 fHandler()
+		 fHandlers()
 {
-	AddHandler(&fHandler);
+	CreateTestHandler();
 	Unlock();
+}
+
+// destructor
+BTestApp::~BTestApp()
+{
+	int32 count = fHandlers.CountItems();
+	for (int32 i = count - 1; i >= 0; i--)
+		DeleteTestHandler(TestHandlerAt(i));
 }
 
 // Init
@@ -69,11 +79,48 @@ BTestApp::ReadyToRun()
 {
 }
 
+// CreateTestHandler
+BTestHandler *
+BTestApp::CreateTestHandler()
+{
+	BTestHandler *handler = new BTestHandler;
+	Lock();
+	AddHandler(handler);
+	fHandlers.AddItem(handler);
+	Unlock();
+	return handler;
+}
+
+// DeleteTestHandler
+bool
+BTestApp::DeleteTestHandler(BTestHandler *handler)
+{
+	bool result = false;
+	Lock();
+	result = fHandlers.RemoveItem(handler);
+	if (result)
+		RemoveHandler(handler);
+	Unlock();
+	if (result)
+		delete handler;
+	return result;
+}
+
 // Handler
 BTestHandler &
 BTestApp::Handler()
 {
-	return fHandler;
+	// The returned handler must never passed to DeleteTestHandler() by the
+	// caller!
+	return *TestHandlerAt(0);
+}
+
+// TestHandlerAt
+BTestHandler *
+BTestApp::TestHandlerAt(int32 index)
+{
+	BAutolock _lock(this);
+	return (BTestHandler*)fHandlers.ItemAt(index);
 }
 
 // _AppThreadStart
