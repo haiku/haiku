@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-1/2005
+   Rudolf Cornelissen 10/2002-2/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.35 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.36 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1281,12 +1281,19 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	uint32 max_crtc_width, max_acc_width;
 	uint8 depth = 8;
 
-	/* determine pixel multiple based on 2D/3D engine constraints */
+	/* determine pixel multiple based on acceleration engine constraints */
+	/* note:
+	 * because of the seemingly 'random' variations in these constraints we take
+	 * a reasonable 'lowest common denominator' instead of always true constraints. */
 	switch (si->ps.card_arch)
 	{
-	default:
+	case NV04A:
 		/* confirmed for:
-		 * TNT1, TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
+		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64), GeForce2 MX400 (NV11),
+		 * GeForce4 MX440 (NV18), GeForceFX 5200 (NV34) in PIO acc mode;
+		 * confirmed for:
+		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64), GeForce4 Ti4200 (NV28),
+		 * GeForceFX 5200 (NV34) in DMA acc mode. */
 		switch (target->space)
 		{
 			case B_CMAP8: acc_mask = 0x0f; depth =  8; break;
@@ -1298,12 +1305,13 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
-		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
-		 * So let it fall through... */
-		if (si->ps.card_type != NV31) break;
-	case NV20A:
+		break;
+	default:
 		/* confirmed for:
-		 * GeForce4 Ti4200 */
+		 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
+		 * confirmed for:
+		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
+		 * GeForcePCX 6600 GT (NV43) in DMA acc mode. */
 		switch (target->space)
 		{
 			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
@@ -1370,11 +1378,14 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 */	}
 
 	/* set virtual_width limit for accelerated modes */
+	/* note:
+	 * because of the seemingly 'random' variations in these constraints we take
+	 * a reasonable 'lowest common denominator' instead of always true constraints. */
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
 		/* confirmed for:
-		 * TNT1, TNT2, TNT2-M64 */
+		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64) in both PIO and DMA acc mode. */
 		switch(target->space)
 		{
 			case B_CMAP8: max_acc_width = 8176; break;
@@ -1389,24 +1400,14 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		break;
 	default:
 		/* confirmed for:
-		 * GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
-		switch(target->space)
-		{
-			case B_CMAP8: max_acc_width = 16368; break;
-			case B_RGB15: max_acc_width =  8184; break;
-			case B_RGB16: max_acc_width =  8184; break;
-			case B_RGB24: max_acc_width =  5456; break;
-			case B_RGB32: max_acc_width =  4092; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
-		 * So let it fall through... */
-		if (si->ps.card_type != NV31) break;
-	case NV20A:
-		/* confirmed for:
-		 * GeForce4 Ti4200 */
+		 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
+		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForceFX 5200 (NV34) can do
+		 * 16368/8184/8184/5456/4092, so a bit better in PIO acc mode;
+		 * confirmed for:
+		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
+		 * GeForcePCX 6600 GT (NV43) in DMA acc mode;
+		 * GeForce4 Ti4200 (NV28), GeForceFX 5200 (NV34) can do
+		 * 16368/8184/8184/5456/4092, so a bit better in DMA acc mode. */
 		switch(target->space)
 		{
 			case B_CMAP8: max_acc_width = 16320; break;
