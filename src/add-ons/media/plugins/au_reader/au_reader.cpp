@@ -204,6 +204,7 @@ auReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 				break;
 			case SND_FORMAT_LINEAR_24:
+				// XXX broken
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
 				break;
 			case SND_FORMAT_LINEAR_32:
@@ -213,8 +214,12 @@ auReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 				break;
 			case SND_FORMAT_DOUBLE:
+				// XXX broken
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 				break;
+			default:
+				TRACE("WavReader::Sniff: unhandled raw format\n");
+				return B_ERROR;
 		}
 		fFormat.u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
 		fFormat.u.raw_audio.buffer_size = fBufferSize;

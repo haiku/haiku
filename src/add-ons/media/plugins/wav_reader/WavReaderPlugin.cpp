@@ -140,7 +140,7 @@ WavReader::Sniff(int32 *streamCount)
 				}
 				break;
 			default:
-				TRACE("WavReader::Sniff: ignoring chunk 0x%08lx of %lu bytes\n", UINT32(chunk.fourcc), chunk.len);
+				TRACE("WavReader::Sniff: ignoring chunk 0x%08lx of %lu bytes\n", UINT32(chunk.fourcc), UINT32(chunk.len));
 				break;
 		}
 		pos += UINT32(chunk.len);
