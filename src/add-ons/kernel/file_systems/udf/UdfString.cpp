@@ -1,4 +1,4 @@
-#include "CS0String.h"
+#include "UdfString.h"
 
 #include "ByteOrder.h"
 
@@ -30,40 +30,52 @@ Udf::unicode_to_utf8(uint32 c, char **out)
 
 using namespace Udf;
 
-CS0String::CS0String()
-	: fUtf8String(NULL)
+/*! \brief Creates an empty string object.
+*/
+String::String()
+	: fCs0String(NULL)
+	, fUtf8String(NULL)
 {
 }
 
-CS0String::CS0String(const char *cs0)
-	: fUtf8String(NULL)
+/*! \brief Creates a new String object from the given Utf8 string.
+*/
+String::String(const char *utf8)
+	: fCs0String(NULL)
+	, fUtf8String(NULL)
 {
-	SetTo(cs0);
+	SetTo(utf8);
 }
 
-CS0String::CS0String(const char *cs0, uint32 length)
-	: fUtf8String(NULL)
+/*! \brief Creates a new String object from the given Cs0 string.
+*/
+String::String(const char *cs0, uint32 length)
+	: fCs0String(NULL)
+	, fUtf8String(NULL)
 {
 	SetTo(cs0, length);
 }
 
-CS0String::~CS0String()
+String::~String()
 {
-	DEBUG_INIT("CS0String");	
+	DEBUG_INIT("String");	
 
 	_Clear();
 }
 
+/*! \brief Assignment from a Utf8 string.
+*/
 void
-CS0String::SetTo(const char *cs0)
+String::SetTo(const char *utf8)
 {
-	SetTo(cs0, strlen(cs0)+1);
 }
 
+/*! \brief Assignment from a Cs0 string.
+*/
 void
-CS0String::SetTo(const char *cs0, uint32 length)
+String::SetTo(const char *cs0, uint32 length)
 {
-	DEBUG_INIT("CS0String");	
+	DEBUG_INIT_ETC("String", ("cs0: %p, length: %ld", cs0, length));	
 
 	_Clear();
 
@@ -123,10 +135,12 @@ CS0String::SetTo(const char *cs0, uint32 length)
 }
 
 void
-CS0String::_Clear()
+String::_Clear()
 {
-	DEBUG_INIT("CS0String");	
+	DEBUG_INIT("String");	
 
+	delete [] fCs0String;
+	fCs0String = NULL;
 	delete [] fUtf8String;
 	fUtf8String = NULL;
 }
