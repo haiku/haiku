@@ -1,0 +1,79 @@
+SubDir OBOS_TOP src tests kits app broster testapps ;
+
+#SubDirHdrs [ FDirName $(OBOS_TOP) src tests kits app common ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src tests kits app broster ] ;
+
+UsePrivateHeaders app ;
+
+#local commonObjects = <src!tests!kits!app!common>CommonTestApp$(SUFOBJ) ;
+
+rule SimpleBRosterTestApp
+{
+	# SimpleBRosterTestApp <sources> : <resources> : <use objects> ;
+	local sources = $(1) ;
+	local resources = $(2) ;
+	local useObjects = $(3) ;
+	local name = $(sources[1]) ;
+	name = $(name:B) ;
+	SimpleBRosterTestApp2 $(name) : $(sources) : $(resources) : $(useObjects) ;
+}
+
+rule SimpleBRosterTestApp2
+{
+	# SimpleBRosterTestApp <name> : <sources> : <resources> : <use objects> ;
+	local name = $(1) ;
+	local sources = $(2) ;
+	local resources = $(3) ;
+	local useObjects = $(4) ;
+	local r5name = $(name)_r5 ;
+
+	local useR5Objects ;
+	local object ;
+	for object in $(useObjects) {
+		useR5Objects += $(object:B=$(object:B)_r5) ;
+	}
+
+	if $(resources) {
+		AddResources $(name) : $(resources) ;
+		AddResources $(r5name) : $(resources) ;
+	}
+	CommonUnitTest $(name)
+		: $(sources)
+		: kits app
+		: <boot!home!config!lib>libopenbeos.so be stdc++.r4 $(useObjects)
+		: be stdc++.r4 $(useR5Objects)
+		: app support
+	;
+}
+
+rule CopyBRosterTestApp
+{
+	# CopyBRosterTestApp  <target> : <source> ;
+	local target = $(1) ;
+	local source = $(2) ;
+	local r5target = $(target)_r5 ;
+	local r5source = $(source)_r5 ;
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	MakeLocate $(r5target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	File $(target) : $(source) ;
+	File $(r5target) : $(r5source) ;
+	local file ;
+	for file in $(target) $(r5target) {
+		MODE on $(file) = $(EXEMODE) ;
+		MimeSet $(file) ;
+	}
+}
+
+# BRoster::Launch() test apps
+#
+
+#local runTestApp1 = [ FGristFiles AppRunTestApp1$(SUFOBJ) ] ;
+
+SimpleBRosterTestApp RosterLaunchTestApp1.cpp ;
+#SimpleBRosterTestApp RosterLaunchTestApp1.cpp : AppRunTestApp1.rsrc
+#				   : $(commonObjects) ;
+#SimpleBRosterTestApp2 AppRunTestApp2 : $(runTestApp1) : AppRunTestApp2.rsrc
+#				   : $(commonObjects) ;
+
+#CopyBRosterTestApp AppRunTestApp3a : AppRunTestApp3 ;
+
