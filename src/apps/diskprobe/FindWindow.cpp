@@ -184,9 +184,10 @@ FindTextView::KeyDown(const char *bytes, int32 numBytes)
 				GetSelection(&start, &end);
 
 				if (bytes[0] == B_BACKSPACE) {
-					start--;
-					if (start < 0)
+					if (--start < 0 && end == 0)
 						return;
+
+					start = 0;
 				}
 
 				if (Text()[start] == ' ')
