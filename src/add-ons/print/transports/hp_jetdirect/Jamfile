@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons print transports hp_jetdirect ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-Addon HP\ JetDirect : print transport : 
+Addon HP\ JetDirect : Print transport : 
 	print_transport.cpp 
 	HPJetDirectTransport.cpp
 	SetupWindow.cpp
@@ -10,3 +10,7 @@ Addon HP\ JetDirect : print transport :
 
 LinkSharedOSLibs HP\ JetDirect : be netapi ;  # for net_server 
 # LinkSharedOSLibs HP\ JetDirect : be bnetapi ;  # for BONE
+
+Package haiku-printingkit-cvs :
+	HP\ JetDirect :
+	boot home config add-ons Print transport ;

@@ -6,11 +6,7 @@ AddResources PDF\ Writer :
 	PDFWriter.rdef
 ;
 
-Addon 
-	PDF\ Writer
-	:
-	print
-	:
+Addon PDF\ Writer : Print :
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp
 	Bookmark.cpp
@@ -44,18 +40,20 @@ Addon
 	SubPath.cpp
 	Utils.cpp
 	XReferences.cpp	
-	;
+;
 
-LinkSharedOSLibs   
-	PDF\ Writer
-	: 
+LinkSharedOSLibs PDF\ Writer : 
 	be 
 	textencoding 
 	translation
 	/boot/develop/lib/x86/libpdf.a 
-	libprint.a
-	;
+	libprint.a 
+;
 
-Package openbeos-pdf_writer-cvs :
+Package haiku-pdf_writer-cvs :
+	PDF\ Writer :
+	boot home config add-ons Print ;
+
+Package haiku-printingkit-cvs :
 	PDF\ Writer :
 	boot home config add-ons Print ;

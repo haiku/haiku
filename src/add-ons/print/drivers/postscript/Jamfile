@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 
 AddResources PS\ Compatible : PS.rsrc ;
 
-Addon PS\ Compatible : print :
+Addon PS\ Compatible : Print :
 	PSEntry.cpp
 	PS.cpp
 	PSCap.cpp
@@ -12,3 +12,6 @@ Addon PS\ Compatible : print :
 
 LinkSharedOSLibs PS\ Compatible : be stdc++.r4 libprint.a ;
 
+Package haiku-printingkit-cvs :
+	PS\ Compatible :
+	boot home config add-ons Print ;

@@ -2,18 +2,17 @@ SubDir OBOS_TOP src add-ons print transports ipp ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-Addon IPP
-	: print transport
-	: Ipp.cpp
-	  IppSetupDlg.cpp
-	  IppTransport.cpp
-	  HttpURLConnection.cpp
-	  IppContent.cpp
-	  IppURLConnection.cpp
-	  URL.cpp
-	  Socket.o
-	  SocketStream2.o
-	  DbgMsg.o
+Addon IPP : Print transport : 
+	Ipp.cpp
+	IppSetupDlg.cpp
+	IppTransport.cpp
+	HttpURLConnection.cpp
+	IppContent.cpp
+	IppURLConnection.cpp
+	URL.cpp
+	Socket.o
+	SocketStream2.o
+	DbgMsg.o
 ;
 
 ObjectReferences
@@ -24,3 +23,6 @@ ObjectReferences
 
 LinkSharedOSLibs IPP : be libsocket.so libbind.so stdc++.r4  ;
 
+Package haiku-printingkit-cvs :
+	IPP :
+	boot home config add-ons Print transport ;

@@ -4,11 +4,12 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
 UsePrivateHeaders interface print ;
 
-Addon Serial\ Port
-	: print transport
-	: print_transport.cpp
+Addon Serial\ Port : Print transport : 
+	print_transport.cpp
 ;
 
-LinkSharedOSLibs Serial\ Port : be libprinttransportaddon.a
- ;
+LinkSharedOSLibs Serial\ Port : be libprinttransportaddon.a ;
 
+Package haiku-printingkit-cvs :
+	Serial\ Port :
+	boot home config add-ons Print transport ;

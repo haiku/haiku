@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src add-ons print drivers pdf ;
 
-Package openbeos-pdf_writer-cvs :
+Package haiku-pdf_writer-cvs :
 	README TODO CHANGES ;
 
 SubInclude OBOS_TOP src add-ons print drivers pdf source ;

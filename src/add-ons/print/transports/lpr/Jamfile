@@ -2,15 +2,14 @@ SubDir OBOS_TOP src add-ons print transports lpr ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-Addon LPR
-	: print transport
-	: Lpr.cpp
-	  LprSetupDlg.cpp
-	  LprTransport.cpp
-	  LpsClient.cpp
-	  Socket.o
-	  SocketStream2.o
-	  DbgMsg.o
+Addon LPR : Print transport : 
+	Lpr.cpp
+	LprSetupDlg.cpp
+	LprTransport.cpp
+	LpsClient.cpp
+	Socket.o
+	SocketStream2.o
+	DbgMsg.o
 ;
 
 ObjectReferences
@@ -21,3 +20,6 @@ ObjectReferences
 
 LinkSharedOSLibs LPR : be libsocket.so libbind.so stdc++.r4 ;
 
+Package haiku-printingkit-cvs :
+	LPR :
+	boot home config add-ons Print transport ;

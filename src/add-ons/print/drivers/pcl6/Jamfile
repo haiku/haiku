@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 
 AddResources PCL6\ Compatible : PCL6.rsrc ;
 
-Addon PCL6\ Compatible : print :
+Addon PCL6\ Compatible : Print :
 	PCL6Entry.cpp
 	PCL6.cpp
 	PCL6Cap.cpp
@@ -13,3 +13,6 @@ Addon PCL6\ Compatible : print :
 
 LinkSharedOSLibs PCL6\ Compatible : be stdc++.r4 libprint.a ;
 
+Package haiku-printingkit-cvs :
+	PCL6\ Compatible :
+	boot home config add-ons Print ;

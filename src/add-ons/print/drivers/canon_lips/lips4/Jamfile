@@ -4,11 +4,15 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 
 AddResources Canon\ LIPS4\ Compatible : Lips4.rsrc ;
 
-Addon Canon\ LIPS4\ Compatible : print :
+Addon Canon\ LIPS4\ Compatible : Print :
 	Lips4Entry.cpp
 	Lips4.cpp
 	Lips4Cap.cpp
 ;
 
 LinkSharedOSLibs Canon\ LIPS4\ Compatible : be stdc++.r4 libprint.a ;
+
+Package haiku-printingkit-cvs :
+	Canon\ LIPS4\ Compatible :
+	boot home config add-ons Print ;
 

@@ -1,9 +1,12 @@
 SubDir OBOS_TOP src add-ons print transports print_to_file ;
 
-Addon Print\ To\ File : print transport : 
+Addon Print\ To\ File : Print transport : 
 	print_transport.cpp
 	FileSelector.cpp
 ;
 
 LinkSharedOSLibs Print\ To\ File : be tracker ;
 
+Package haiku-printingkit-cvs :
+	Print\ To\ File :
+	boot home config add-ons Print transport ;

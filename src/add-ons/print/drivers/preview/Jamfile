@@ -4,7 +4,7 @@ UsePrivateHeaders interface print ;
 
 AddResources Preview : Preview.rsrc ;
 
-Addon Preview : print :
+Addon Preview : Print :
 	Utils.cpp
 	InterfaceUtils.cpp
 	MarginView.cpp
@@ -19,3 +19,6 @@ Addon Preview : print :
 
 LinkSharedOSLibs Preview : be root libprint.a  ;
 
+Package haiku-printingkit-cvs :
+	Preview :
+	boot home config add-ons Print ;

@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 
 AddResources PCL5\ Compatible : PCL5.rsrc ;
 
-Addon PCL5\ Compatible : print :
+Addon PCL5\ Compatible : Print :
 	PCL5Entry.cpp
 	PCL5.cpp
 	PCL5Cap.cpp
@@ -12,3 +12,6 @@ Addon PCL5\ Compatible : print :
 
 LinkSharedOSLibs PCL5\ Compatible : be stdc++.r4 libprint.a ;
 
+Package haiku-printingkit-cvs :
+	PCL5\ Compatible :
+	boot home config add-ons Print ;

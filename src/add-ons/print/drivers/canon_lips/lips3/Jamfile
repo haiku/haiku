@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 
 AddResources Canon\ LIPS3\ Compatible : Lips3.rsrc ;
 
-Addon Canon\ LIPS3\ Compatible : print :
+Addon Canon\ LIPS3\ Compatible : Print :
 	Lips3Entry.cpp
 	Lips3.cpp
 	Lips3Cap.cpp
@@ -13,3 +13,6 @@ Addon Canon\ LIPS3\ Compatible : print :
 
 LinkSharedOSLibs Canon\ LIPS3\ Compatible : be stdc++.r4 libprint.a ;
 
+Package haiku-printingkit-cvs :
+	Canon\ LIPS3\ Compatible :
+	boot home config add-ons Print ;
