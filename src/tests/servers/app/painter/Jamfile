@@ -1,0 +1,59 @@
+SubDir OBOS_TOP src tests servers app painter ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders [ FDirName servers app ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter drawing_modes ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter font_support ] ;
+UseFreeTypeHeaders ;
+
+SimpleTest Painter :
+	BitmapBuffer.cpp
+	BitmapView.cpp
+	main.cpp
+	Painter.cpp
+	ShapeConverter.cpp
+	Transformable.cpp
+	DrawingModeFactory.cpp
+	agg_font_freetype.cpp
+	AGGTextRenderer.cpp
+	FontManager.cpp
+	TextRenderer.cpp
+	PatternHandler.cpp
+	RGBColor.cpp
+	SystemPalette.cpp
+	ColorUtils.cc
+	: be libagg.so libfreetype.so textencoding ;
+
+SEARCH on [ FGristFiles
+	ColorUtils.cc
+	]
+	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+
+SEARCH on [ FGristFiles
+	PatternHandler.cpp
+	RGBColor.cpp
+	SystemPalette.cpp
+	]
+	= [ FDirName $(OBOS_TOP) src servers app server ] ;
+
+SEARCH on [ FGristFiles
+	Painter.cpp
+	ShapeConverter.cpp
+	Transformable.cpp
+	]
+	= [ FDirName $(OBOS_TOP) src servers app server Painter ] ;
+
+SEARCH on [ FGristFiles
+	DrawingModeFactory.cpp
+	]
+	= [ FDirName $(OBOS_TOP) src servers app server Painter drawing_modes ] ;
+
+SEARCH on [ FGristFiles
+	agg_font_freetype.cpp
+	AGGTextRenderer.cpp
+	FontManager.cpp
+	TextRenderer.cpp
+	]
+	= [ FDirName $(OBOS_TOP) src servers app server Painter font_support ] ;
+
