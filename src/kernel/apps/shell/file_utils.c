@@ -77,7 +77,7 @@ find_file_in_path(const char *file_name, char *found_name, unsigned int max_size
 
 
 int
-exec_file(int argc, char *argv[], int *retcode)
+exec_file(int argc, char *argv[], status_t *retcode)
 {
 	char filename[255];
 	int pid;

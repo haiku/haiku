@@ -359,7 +359,7 @@ handle_exec(scan_info *info,shell_value **out)
 	char redirect_in[SCAN_SIZE+1];
 	char redirect_out[SCAN_SIZE+1];
 	int err = SHE_NO_ERROR;
-	int retcode;
+	status_t retcode;
 	char *statement;
 
 	*out = NULL;
