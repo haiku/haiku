@@ -837,15 +837,11 @@ pix_bits_to_tga(uint8 *pbits, uint8 *ptga, color_space fromspace,
 		}
 					
 		case B_GRAY8:
-			bytescopied = width * 3;
-			while (width--) {
-				ptga[0] = pbits[0];
-				ptga[1] = pbits[0];
-				ptga[2] = pbits[0];
-				
-				ptga += 3;
-				pbits++;
-			}
+			// NOTE: this code assumes that the
+			// destination TGA color space is either
+			// 8 bit indexed color or 8 bit grayscale
+			bytescopied = width;
+			memcpy(ptga, pbits, bytescopied);
 			break;
 						
 		default:
@@ -878,7 +874,7 @@ copy_raw_packet(uint8 *ptga, uint8 *praw, uint8 count,
 {
 	// copy packet header
 	// (made of type and count)
-	uint8 packethead = (count - 1);
+	uint8 packethead = count - 1;
 	memcpy(ptga, &packethead, 1);
 	ptga++;
 	
@@ -893,7 +889,7 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	if (width == 0)
 		return B_ERROR;
 	
-	uint32 pixel = 0, lastpixel = 0, nextpixel = 0;
+	uint32 current = 0, next = 0, aftnext = 0;
 	uint16 nread = 0;
 	status_t result, bytescopied = 0;
 	uint8 *prawbuf, *praw;
@@ -903,51 +899,95 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 		return B_ERROR;
 	
 	uint8 rlecount = 1, rawcount = 0;
+	bool bJustWroteRLE = false;
 	
-	memcpy(&pixel, pbits, bitsBytesPerPixel);
+	memcpy(&current, pbits, bitsBytesPerPixel);
 	pbits += bitsBytesPerPixel;
+	if (width == 1) {
+		result = copy_raw_packet(ptga, (uint8 *) &current, 1,
+			fromspace, pmap, bitsBytesPerPixel);
+						
+		ptga += result;
+		bytescopied += result;
+		nread++;
+			// don't enter the while loop
+
+	} else {
+		memcpy(&next, pbits, bitsBytesPerPixel);
+		pbits += bitsBytesPerPixel;
+		nread++;
+	}
 	
 	while (nread < width) {
 	
 		if (nread < width - 1) {
-			memcpy(&nextpixel, pbits, bitsBytesPerPixel);
+			memcpy(&aftnext, pbits, bitsBytesPerPixel);
 			pbits += bitsBytesPerPixel;
 		}
 		nread++;	
 		
-		if (nread > 1 && lastpixel == pixel) {
+		// RLE Packet Creation
+		if (current == next && !bJustWroteRLE) {
 			rlecount++;
 			
-			if (rlecount == 128 || nread == width || pixel != nextpixel) {
-				result = copy_rle_packet(ptga, pixel, rlecount,
+			if (next != aftnext || nread == width || rlecount == 128) {
+				result = copy_rle_packet(ptga, current, rlecount,
 					fromspace, pmap, bitsBytesPerPixel);
-
+					
 				ptga += result;
 				bytescopied += result;
 				rlecount = 1;
+				bJustWroteRLE = true;
 			}
 			
+		// RAW Packet Creation
 		} else {
-			if ((nread < width && pixel != nextpixel) || nread == width) {
+		
+			if (!bJustWroteRLE) {
+				// output the current pixel only if
+				// it was not just written out in an RLE packet	
 				rawcount++;
-				memcpy(praw, &pixel, bitsBytesPerPixel);
+				memcpy(praw, &current, bitsBytesPerPixel);
 				praw += bitsBytesPerPixel;
 			}
 			
-			if (rawcount == 128 || nread == width || (pixel == nextpixel && rawcount > 0)) {
-				result = copy_raw_packet(ptga,
-					prawbuf, rawcount, fromspace, pmap,
-					bitsBytesPerPixel);
+			if (nread == width) {
+				// if in the last iteration of the loop,
+				// "next" will be the last pixel in the row,
+				// and will need to be written out for this
+				// special case
+			
+				if (rawcount == 128) {
+					result = copy_raw_packet(ptga, prawbuf, rawcount,
+						fromspace, pmap, bitsBytesPerPixel);
+						
+					ptga += result;
+					bytescopied += result;
+					praw = prawbuf;
+					rawcount = 0;
+				}
 				
+				rawcount++;
+				memcpy(praw, &next, bitsBytesPerPixel);
+				praw += bitsBytesPerPixel;
+			}
+				
+			if ((!bJustWroteRLE && next == aftnext) ||
+				nread == width || rawcount == 128) {
+				result = copy_raw_packet(ptga, prawbuf, rawcount,
+					fromspace, pmap, bitsBytesPerPixel);
+						
 				ptga += result;
 				bytescopied += result;
-				rawcount = 0;
 				praw = prawbuf;
+				rawcount = 0;
 			}
+			
+			bJustWroteRLE = false;
 		}
-	
-		lastpixel = pixel;
-		pixel = nextpixel;
+
+		current = next;
+		next = aftnext;
 	}
 	
 	delete[] prawbuf;
@@ -1062,56 +1102,8 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 		rd = inSource->Read(bitsRowData, bitsRowBytes);
 	} // while (rd == bitsRowBytes)
 	
+	delete[] bitsRowData;
 	delete[] tgaRowData;
-	delete[] bitsRowData;
-
-	return B_OK;
-}
-
-// ---------------------------------------------------------------
-// translate_from_bits8_to_tga8
-//
-// Converts 8-bit Be Bitmaps ('bits') to the 8-bit TGA format
-//
-// Preconditions:
-//
-// Parameters:	inSource,	contains the bits data to convert
-//
-//				outDestination,	where the TGA data will be written
-//
-//				bitsRowBytes,	number of bytes in one row of
-//								bits data
-//
-// Postconditions:
-//
-// Returns: B_ERROR,	if memory couldn't be allocated or another
-//						error occured
-//
-// B_OK,	if no errors occurred
-// ---------------------------------------------------------------
-status_t
-translate_from_bits8_to_tga8(BPositionIO *inSource,
-	BPositionIO *outDestination, int32 bitsRowBytes,
-	uint16 height, bool brle)
-{
-	uint32 tgapixrow = 0;
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
-	if (!bitsRowData)
-		return B_ERROR;
-	ssize_t rd = inSource->Read(bitsRowData, bitsRowBytes);
-	while (rd == bitsRowBytes) {
-		outDestination->Write(bitsRowData, bitsRowBytes);
-		tgapixrow++;
-		// if I've read all of the pixel data, break
-		// out of the loop so I don't try to read 
-		// non-pixel data
-		if (tgapixrow == height)
-			break;
-
-		rd = inSource->Read(bitsRowData, bitsRowBytes);
-	}
-	
-	delete[] bitsRowData;
 
 	return B_OK;
 }
@@ -1145,16 +1137,37 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 	BPositionIO *outDestination, int32 bitsRowBytes,
 	TGAImageSpec &imagespec, bool brle)
 {
-	int32 tgaRowBytes = imagespec.width;
+	uint8 tgaBytesPerPixel = 1;
+	int32 tgaRowBytes = (imagespec.width * tgaBytesPerPixel) +
+		(imagespec.width / 128) + ((imagespec.width % 128) ? 1 : 0);
 	uint32 tgapixrow = 0;
 	uint8 *tgaRowData = new uint8[tgaRowBytes];
 	if (!tgaRowData)
 		return B_ERROR;
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
-	if (!bitsRowData) {
+		
+	uint8 *medRowData = new uint8[imagespec.width];
+	if (!medRowData) {
 		delete[] tgaRowData;
 		return B_ERROR;
 	}
+	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	if (!bitsRowData) {
+		delete[] medRowData;
+		delete[] tgaRowData;
+		return B_ERROR;
+	}
+	
+	// conversion function pointer, points to either
+	// RLE or normal TGA conversion function
+	status_t (*convert_to_tga)(uint8 *pbits, uint8 *ptga,
+		color_space fromspace, uint16 width, const color_map *pmap,
+		int32 bitsBytesPerPixel);
+		
+	if (brle)
+		convert_to_tga = pix_bits_to_tgarle;
+	else
+		convert_to_tga = pix_bits_to_tga;
+		
 	ssize_t rd = inSource->Read(bitsRowData, bitsRowBytes);
 	while (rd == bitsRowBytes) {
 		uint32 tgapixcol = 0;
@@ -1168,15 +1181,19 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 				// index and store that in the tgaRowData
 				if (pixels & compbit)
 					// black
-					tgaRowData[tgapixcol] = 0;
+					medRowData[tgapixcol] = 0;
 				else
 					// white
-					tgaRowData[tgapixcol] = 255;
+					medRowData[tgapixcol] = 255;
 				tgapixcol++;
 			}
 		}
+		
+		status_t bytescopied;
+		bytescopied = convert_to_tga(medRowData, tgaRowData, B_GRAY8,
+			imagespec.width, NULL, 1);
 				
-		outDestination->Write(tgaRowData, tgaRowBytes);
+		outDestination->Write(tgaRowData, bytescopied);
 		tgapixrow++;
 		// if I've read all of the pixel data, break
 		// out of the loop so I don't try to read 
@@ -1187,8 +1204,9 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 		rd = inSource->Read(bitsRowData, bitsRowBytes);
 	} // while (rd == bitsRowBytes)
 	
-	delete[] tgaRowData;
 	delete[] bitsRowData;
+	delete[] medRowData;
+	delete[] tgaRowData;
 
 	return B_OK;
 }
@@ -1543,14 +1561,14 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 				if (outDestination->Write(pal, 1024) != 1024)
 					return B_ERROR;
 
-				result = translate_from_bits8_to_tga8(inSource, outDestination,
-					bitsHeader.rowBytes, imagespec.height, brle);
+				result = translate_from_bits_to_tgatc(inSource, outDestination,
+					B_GRAY8, imagespec, brle);
 				break;
 			}
 			
 			case B_GRAY8:
-				result = translate_from_bits8_to_tga8(inSource, outDestination,
-					bitsHeader.rowBytes, imagespec.height, brle);
+				result = translate_from_bits_to_tgatc(inSource, outDestination,
+					B_GRAY8, imagespec, brle);
 				break;
 				
 			case B_GRAY1:
