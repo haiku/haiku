@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src kernel libroot posix glibc getopt ;
+
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+
+KernelMergeObject posix_gnu_getopt.o :
+	getopt.c
+	getopt1.c
+	getopt_init.c
+	: -fPIC -DPIC
+	;

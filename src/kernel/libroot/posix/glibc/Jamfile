@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src kernel libroot posix glibc ;
 
+SubInclude OBOS_TOP src kernel libroot posix glibc getopt ;
 #SubInclude OBOS_TOP src kernel libroot posix glibc locale ;
 SubInclude OBOS_TOP src kernel libroot posix glibc libio ;
 SubInclude OBOS_TOP src kernel libroot posix glibc stdio-common ;
