@@ -75,14 +75,14 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	// Add menubar
 	fMenuBar = new BMenuBar(BRect(0,0,0,0),"menubar");
 	
-	AddChild(fMenuBar);
+	view->AddChild(fMenuBar);
 
 	// Add shell view and scroll view
 	BRect shellFrame;
-	shellFrame.top = fMenuBar->Bounds().Height();
-	shellFrame.right = Bounds().Width() - B_V_SCROLL_BAR_WIDTH;
+	shellFrame.top = fMenuBar->Bounds().Height()+1;
+	shellFrame.right = view->Bounds().Width() - B_V_SCROLL_BAR_WIDTH;
 	shellFrame.left = 0;
-	shellFrame.bottom = Bounds().Height();
+	shellFrame.bottom = view->Bounds().Height();
 	
 	fShellView = new BView(shellFrame,"shellview",B_FOLLOW_ALL, B_FRAME_EVENTS|B_WILL_DRAW);
 	rgb_color red = {170,80,80,0};
