@@ -1163,18 +1163,17 @@ __vfscanf (FILE *s, const char *format, va_list argptr)
 	  ADDW (L_('\0'));
 	  if (need_longlong && (flags & LONGDBL))
 	    {
-	    // ToDo: Aaaaaaaaarrrrgh! Fix me!
 	      if (number_signed)
-		num.q = 42; //__strtoll_internal (wp, &tw, base, flags & GROUP);
+		num.q = __strtoll_internal (wp, &tw, base, flags & GROUP);
 	      else
-		num.uq = 42; //__strtoull_internal (wp, &tw, base, flags & GROUP);
+		num.uq = __strtoull_internal (wp, &tw, base, flags & GROUP);
 	    }
 	  else
 	    {
 	      if (number_signed)
-		num.l = 42; //__strtol_internal (wp, &tw, base, flags & GROUP);
+		num.l = __strtol_internal (wp, &tw, base, flags & GROUP);
 	      else
-		num.ul = 42; //__strtoul_internal (wp, &tw, base, flags & GROUP);
+		num.ul = __strtoul_internal (wp, &tw, base, flags & GROUP);
 	    }
 	  if (wp == tw)
 	    conv_error ();
