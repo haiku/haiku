@@ -1,8 +1,9 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Based on code written by Travis Geiselbrecht for NewOS.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Based on code written by Travis Geiselbrecht for NewOS.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "mmu.h"
@@ -21,8 +22,8 @@
 
 
 /** The (physical) memory layout of the boot loader is currently as follows:
- *	     0x0 - 0x10000	protected mode stack
- *	     0x0 - 0x09000	real mode stack
+ *	  0x0500 - 0x10000	protected mode stack
+ *	  0x0500 - 0x09000	real mode stack
  *	 0x10000 - ?		code
  *	0x101000			1st temporary page table (identity maps 0-4 MB)
  *	0x102000			2nd (4-8 MB)
