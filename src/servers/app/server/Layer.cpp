@@ -46,7 +46,6 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 
 	_name			= new BString(name);
 	_layerdata		= new LayerData();
-	fBackColor.SetColor(rand()%256, rand()%256, rand()%256);
 
 	// driver init
 	if (!driver)
@@ -495,7 +494,7 @@ printf("Layer::Draw() Called\n");
 //	RGBColor	col(152,102,51);
 //	DRIVER->FillRect_(r, 1, col, &fUpdateReg);
 //snooze(1000000);
-	fDriver->FillRect(r, fBackColor);
+	fDriver->FillRect(r, _layerdata->viewcolor);
 
 	// empty HOOK function.
 }
@@ -986,33 +985,26 @@ void Layer::ResizeBy(float x, float y)
 
 void Layer::PrintToStream(void)
 {
-	printf("-----------\nLayer %s\n",_name->String());
-	if(_parent)
-		printf("Parent: %s (%p)\n",_parent->_name->String(), _parent);
-	else
-		printf("Parent: NULL\n");
-	if(_uppersibling)
-		printf("Upper sibling: %s (%p)\n",_uppersibling->_name->String(), _uppersibling);
-	else
-		printf("Upper sibling: NULL\n");
-	if(_lowersibling)
-		printf("Lower sibling: %s (%p)\n",_lowersibling->_name->String(), _lowersibling);
-	else
-		printf("Lower sibling: NULL\n");
-	if(_topchild)
-		printf("Top child: %s (%p)\n",_topchild->_name->String(), _topchild);
-	else
-		printf("Top child: NULL\n");
-	if(_bottomchild)
-		printf("Bottom child: %s (%p)\n",_bottomchild->_name->String(), _bottomchild);
-	else
-		printf("Bottom child: NULL\n");
-	printf("Frame: "); _frame.PrintToStream();
+	printf("\n----------- Layer %s -----------\n",_name->String());
+	printf("\t Parent: %s\n", _parent? _parent->_name->String():"NULL");
+	printf("\t us: %s\t ls: %s\n",
+				_uppersibling? _uppersibling->_name->String():"NULL",
+				_lowersibling? _lowersibling->_name->String():"NULL");
+	printf("\t topChild: %s\t bottomChild: %s\n",
+				_topchild? _topchild->_name->String():"NULL",
+				_bottomchild? _bottomchild->_name->String():"NULL");
+						
+	printf("Frame: (%f, %f, %f, %f)", _frame.left, _frame.top, _frame.right, _frame.bottom);
 	printf("Token: %ld\n",_view_token);
 	printf("Hidden - direct: %s\n", _hidden?"true":"false");
 	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
-	printf("Visible Areas: "); _visible.PrintToStream();
-	printf("Is updating = %s\n",(_is_updating)?"yes":"no");
+	printf("ResizingMode: %lx\n", _resize_mode);
+	printf("Flags: %lx\n", _flags);
+
+	if (_layerdata)
+		_layerdata->PrintToStream();
+	else
+		printf(" NO LayerData valid pointer\n");
 }
 
 void Layer::PrintNode(void)
