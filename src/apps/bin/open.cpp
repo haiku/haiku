@@ -18,6 +18,7 @@ int
 main(int argc, char **argv)
 {
 	char *progName = argv[0];
+	char *openWith = "application/x-vnd.Be-TRAK";
 	if (strrchr(progName, '/'))
 		progName = strrchr(progName, '/') + 1;
 
@@ -27,24 +28,36 @@ main(int argc, char **argv)
 	BRoster roster;
 
 	while (*++argv) {
-		status_t rc;
+		status_t rc = B_OK;
+		argc--;
 
 		BEntry entry(*argv);
 		if ((rc = entry.InitCheck()) == B_OK && entry.Exists()) {
 			entry_ref ref;
 			entry.GetRef(&ref);
 
-			BMessenger tracker("application/x-vnd.Be-TRAK");
-			if (tracker.IsValid()) {
+			BMessenger target(openWith);
+			if (target.IsValid()) {
 				BMessage message(B_REFS_RECEIVED);
 				message.AddRef("refs", &ref);
-
-				tracker.SendMessage(&message);
+				/* tell the app to open the file */
+				rc = target.SendMessage(&message);
 			} else
 				rc = roster.Launch(&ref);
 		} else if (!strncasecmp("application/", *argv, 12)) {
 			// maybe it's an application-mimetype?
-			rc = roster.Launch(*argv);
+			
+			// subsequent files are open with that app
+			openWith = *argv;
+			
+			// in the case the app is already started, 
+			// don't start it twice if we have other args
+			BList teams;
+			if (argc > 1) {
+				roster.GetAppList(*argv, &teams);
+			}
+			if (teams.IsEmpty())
+				rc = roster.Launch(*argv);
 		} else if (strstr(*argv, ":")) {
 			BString mimetype = "application/x-vnd.Be.URL.";
 			BString arg(*argv);
