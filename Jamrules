@@ -174,15 +174,17 @@ if ! $(OBOS_BUILD_DESCRIPTION) {
 	OBOS_BUILD_DESCRIPTION ?= "Unknown Build" ;
 }
 
-# Relative subdirs for distro dir (these are for *INTERNAL* use by the following rules only!)
+# Relative subdirs for distro dir
+OBOS_ADDON_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system add-ons ] ;
 OBOS_APPS_DIR   ?= [ FDirName $(OBOS_DISTRO_TARGET) beos apps ] ;
 OBOS_BIN_DIR    ?= [ FDirName $(OBOS_DISTRO_TARGET) beos bin ] ;
+OBOS_ETC_DIR    ?= [ FDirName $(OBOS_DISTRO_TARGET) beos etc ] ;
+OBOS_FONTS_DIR  ?= [ FDirName $(OBOS_ETC_DIR) fonts ] ;
+OBOS_KERNEL_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system ] ;
 OBOS_PREFS_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos preferences ] ;
 OBOS_SERVER_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system servers ] ;
-OBOS_ADDON_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system add-ons ] ;
 OBOS_SHLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
 OBOS_STLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
-OBOS_KERNEL_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system ] ;
 OBOS_TEST_DIR   ?= [ FDirName $(OBOS_TOP) tests ] ;
 
 OBOS_KERNEL_CONFIG = config.$(OBOS_ARCH).ini ;
