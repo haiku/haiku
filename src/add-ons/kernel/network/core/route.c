@@ -273,7 +273,7 @@ int rt_setgate(struct rtentry *rt0,
         struct rtentry *rt = rt0;
 
 
-        if (rt->rt_gateway == NULL || glen > ROUNDUP(rt->rt_gateway->sa_len)) {
+        if (rt->rt_gateway == NULL || glen > (int) ROUNDUP(rt->rt_gateway->sa_len)) {
                 old = (caddr_t)rt_key(rt);
                 R_Malloc(new, caddr_t, dlen + glen);
                 if (new == NULL)
@@ -413,7 +413,7 @@ int rtinit(struct ifaddr *ifa, int cmd, int flags)
 	return (error);
 }
 
-void rtable_init(void **table)
+static void rtable_init(void **table)
 {
 	struct domain *dom;
 	

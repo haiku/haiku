@@ -106,7 +106,7 @@ struct mbuf *m_prepend(struct mbuf *m, int len)
 			M_MOVE_PKTHDR(mnew, m);
 		mnew->m_next = m;
 		m = mnew;
-		if (len < MHLEN)
+		if (len < (int) MHLEN)
 			MH_ALIGN(m, len);
 		m->m_len = len;
 	}
@@ -154,7 +154,7 @@ struct mbuf *m_devget(char *buf, int totlen, int off0,
                         m->m_len = MLEN;
                 }
                 len = min(totlen, epkt - cp);
-                if (len >= MINCLSIZE) {
+                if (len >= (int) MINCLSIZE) {
                         MCLGET(m);
                         if (m->m_flags & M_EXT)
                                 m->m_len = len = min(len, MCLBYTES);
@@ -164,9 +164,9 @@ struct mbuf *m_devget(char *buf, int totlen, int off0,
                         /*
                          * Place initial small packet/header at end of mbuf.
                          */
-                        if (len < m->m_len) {
+                        if (len < (int) m->m_len) {
                                 if (top == NULL &&
-                                    len + max_linkhdr <= m->m_len)
+                                    len + max_linkhdr <= (int) m->m_len)
                                         m->m_data += max_linkhdr;
                                 m->m_len = len;
                         } else
@@ -191,7 +191,7 @@ void m_reserve(struct mbuf *mp, int len)
 	if (mp->m_len == 0) {
 		/* empty buffer! */
 		if (mp->m_flags & M_PKTHDR) {
-			if (len < MHLEN) {
+			if (len < (int) MHLEN) {
 				mp->m_data += len;
 				mp->m_len -= len;
 				mp->m_pkthdr.len -= len;
@@ -199,7 +199,7 @@ void m_reserve(struct mbuf *mp, int len)
 			}
 			/* ?? */
 		} else {
-			if (len <= MLEN) {
+			if (len <= (int) MLEN) {
 				mp->m_data += len;
 				mp->m_len -= len;
 				return;
@@ -208,7 +208,7 @@ void m_reserve(struct mbuf *mp, int len)
 	}
 
 	if (len > 0) {
-		if (len <= mp->m_len) {
+		if (len <= (int) mp->m_len) {
 			mp->m_data += len;
 			mp->m_len -= len;
 		}
@@ -246,7 +246,7 @@ void m_adj(struct mbuf *mp, int req_len)
 	if (len >= 0) {
 		/* trim from the head */
 		while (m!= NULL && len > 0) {
-			if (m->m_len <= len) {
+			if ((int) m->m_len <= len) {
 				/* this whole mbuf isn't enough... */
 				len -= m->m_len;
 				m->m_len = 0;
@@ -271,7 +271,7 @@ void m_adj(struct mbuf *mp, int req_len)
 				break;
 			m = m->m_next;
 		}
-		if (m->m_len >= len) {
+		if ((int) m->m_len >= len) {
 			m->m_len -= len;
 			if (mp->m_flags & M_PKTHDR)
 				mp->m_pkthdr.len -= len;
@@ -288,7 +288,7 @@ void m_adj(struct mbuf *mp, int req_len)
 		if (m->m_flags & M_PKTHDR)
 			m->m_pkthdr.len = count;
 		for (; m; m= m->m_next) {
-			if (m->m_len >= count) {
+			if ((int) m->m_len >= count) {
 				m->m_len = count;
 				break;
 			}
@@ -316,7 +316,7 @@ void m_copydata(struct mbuf *m, int off, int len, caddr_t cp)
 			printf("m_copydata: null mbuf in skip");
 			return;
 		}
-		if (off < m->m_len)
+		if (off < (int) m->m_len)
 			break;
 		off -= m->m_len;
 		m = m->m_next;
@@ -326,7 +326,7 @@ void m_copydata(struct mbuf *m, int off, int len, caddr_t cp)
 			printf("m_copydata: null mbuf");
 			return;
 		}
-		count = min(m->m_len - off, len);
+		count = min((int) m->m_len - off, len);
 		memcpy(cp, (void*)(mtod(m, char *) + off), count);
 		len -= count;
 		cp += count;
@@ -353,7 +353,7 @@ struct mbuf *m_copym(struct mbuf *m, int off0, int len)
 			printf("PANIC: m_copym: null mbuf\n");
 			return NULL;
 		}
-		if (off < m->m_len)
+		if (off < (int) m->m_len)
 			break;
 		off -= m->m_len;
 		m = m->m_next;
@@ -380,7 +380,7 @@ struct mbuf *m_copym(struct mbuf *m, int off0, int len)
 				n->m_pkthdr.len = len;
 			copyhdr = 0;
 		}
-		n->m_len = min(len, m->m_len - off);
+		n->m_len = min(len, (int) m->m_len - off);
 		if (m->m_flags & M_EXT) {
 			/*
 			 * we are unsure about the way m was allocated.
@@ -389,7 +389,7 @@ struct mbuf *m_copym(struct mbuf *m, int off0, int len)
 			MCLGET(n);
 			n->m_len = 0;
 			n->m_len = M_TRAILINGSPACE(n);
-			n->m_len = min(n->m_len, len);
+			n->m_len = min((int) n->m_len, len);
 			n->m_len = min(n->m_len, m->m_len - off);
 			memcpy(mtod(n, caddr_t), (void *)(mtod(m, char *) + off),
                               (unsigned)n->m_len);
@@ -399,7 +399,7 @@ struct mbuf *m_copym(struct mbuf *m, int off0, int len)
 		if (len != M_COPYALL)
 			len -= n->m_len;
 		off += n->m_len;
-		if (off == m->m_len) {
+		if (off == (int) m->m_len) {
 			m = m->m_next;
 			off = 0;
 		}
@@ -425,7 +425,7 @@ struct mbuf *m_pullup(struct mbuf *n, int len)
 	int count;
 	int space;
 
-	if (n->m_len <= len)
+	if ((int) n->m_len <= len)
 		return n;
 
 	/*
@@ -435,13 +435,13 @@ struct mbuf *m_pullup(struct mbuf *n, int len)
 	 */
 	if ((n->m_flags & M_EXT) == 0 &&
 	    n->m_data + len < &n->m_dat[MLEN] && n->m_next) {
-		if (n->m_len >= len)
+		if ((int) n->m_len >= len)
 			return (n);
 		m = n;
 		n = n->m_next;
 		len -= m->m_len;
 	} else {
-		if (len > MHLEN)
+		if (len > (int) MHLEN)
 			goto bad;
 		MGET(m, n->m_type);
 		if (m == NULL)
@@ -453,7 +453,7 @@ struct mbuf *m_pullup(struct mbuf *n, int len)
 	}
 	space = &m->m_dat[MLEN] - (m->m_data + m->m_len);
 	do {
-		count = min(min(max(len, max_protohdr), space), n->m_len);
+		count = min(min(max(len, max_protohdr), space), (int) n->m_len);
 		memcpy((void *)(mtod(m, caddr_t) + m->m_len), mtod(n, void *), (uint)count);
 		len -= count;
 		m->m_len += count;
@@ -499,13 +499,13 @@ void m_copyback(struct mbuf *m0, int off, int len, caddr_t cp)
                         n = m_getclr(m->m_type);
                         if (n == 0)
                                 goto out;
-                        n->m_len = min(MLEN, len + off);
+                        n->m_len = min((int) MLEN, len + off);
                         m->m_next = n;
                 }
                 m = m->m_next;
         }
         while (len > 0) {
-                mlen = min (m->m_len - off, len);
+                mlen = min ((int) m->m_len - off, len);
                 memcpy(off + mtod(m, caddr_t), cp, (unsigned)mlen);
                 cp += mlen;
                 len -= mlen;
@@ -518,7 +518,7 @@ void m_copyback(struct mbuf *m0, int off, int len, caddr_t cp)
                         n = m_get(m->m_type);
                         if (n == 0)
                                 break;
-                        n->m_len = min(MLEN, len);
+                        n->m_len = min((int) MLEN, len);
                         m->m_next = n;
                 }
                 m = m->m_next;

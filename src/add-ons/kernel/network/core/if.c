@@ -3,6 +3,7 @@
 #include <kernel/OS.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef _KERNEL_MODE
   #include <KernelExport.h>
@@ -27,6 +28,9 @@ struct ifaddr **ifnet_addrs;
 /* Private variables */
 static int if_index;
 static int if_indexlim;
+
+void dump_sockaddr(void *ptr);
+void *protocol_address(struct ifnet *ifa, int family);
 
 
 static inline bool
@@ -412,7 +416,7 @@ int ifconf(int cmd, caddr_t data)
 	ifrp = ifc->ifc_req;
 	ep = ifr.ifr_name + sizeof(ifr.ifr_name) - 2;
 	
-	for (; space > sizeof(ifr) && ifp; ifp = ifp->if_next) {
+	for (; space > (int) sizeof(ifr) && ifp; ifp = ifp->if_next) {
 		strncpy(ifr.ifr_name, ifp->if_name, sizeof(ifr.ifr_name) - 2);
 		for (cp = ifr.ifr_name;cp < ep && *cp; cp++)
 			continue;
@@ -424,7 +428,7 @@ int ifconf(int cmd, caddr_t data)
 				break;
 			space -= sizeof(ifr), ifrp++;
 		} else {
-			for (; space > sizeof(ifr) && ifa; ifa = ifa->ifa_next) {
+			for (; space > (int) sizeof(ifr) && ifa; ifa = ifa->ifa_next) {
 				struct sockaddr *sa = ifa->ifa_addr;
 				if (sa->sa_len <= sizeof(*sa)) {
 					printf("sa->sa_len = %d compared to %ld, sa->sa_family = %d\n", 
@@ -435,7 +439,7 @@ int ifconf(int cmd, caddr_t data)
 					ifrp++;
 				} else {
 					space -= sa->sa_len - sizeof(*sa);
-					if (space < sizeof(ifr))
+					if (space < (int) sizeof(ifr))
 						break;
 					copyptr = memcpy((caddr_t)ifrp, (caddr_t)&ifr, sizeof(ifr.ifr_name));
 					if (copyptr != NULL)

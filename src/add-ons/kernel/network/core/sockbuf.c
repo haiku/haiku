@@ -54,7 +54,7 @@ void sockbuf_drop(struct sockbuf *sb, int len)
 			next = m->m_nextpkt;
 			continue;
 		}
-		if (m->m_len > len) {
+		if ((int) m->m_len > len) {
 			m->m_len -= len;
 			m->m_data += len;
 			sb->sb_cc -= len;
@@ -163,7 +163,7 @@ int sockbuf_appendaddr(struct sockbuf *sb, struct sockaddr *asa,
 		if (n->m_next == 0)     /* keep pointer to last control buf */
 			break;
 	}
-	if (space > sbspace(sb))
+	if (space > (int) sbspace(sb))
 		return (0);
 	if (asa->sa_len > MLEN)
 		return (0);

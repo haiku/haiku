@@ -73,14 +73,14 @@ void sockets_shutdown(void)
 int uiomove(caddr_t cp, int n, struct uio *uio)
 {
 	struct iovec *iov;
-	uint cnt;
+	int cnt;
 	int error = 0;
 	void *ptr = NULL;
-
+	
 	while (n > 0 && uio->uio_resid) {
 		iov = uio->uio_iov;
 		cnt = iov->iov_len;
-
+		
 		if (cnt == 0) {
 			uio->uio_iov++;
 			uio->uio_iovcnt--;
@@ -88,7 +88,7 @@ int uiomove(caddr_t cp, int n, struct uio *uio)
 		}
 		if (cnt > n)
 			cnt = n;
-
+		
 		switch (uio->uio_segflg) {
 			/* XXX - once "properly" in kernel space, revisit and
 			 * fix this for kernel moves...
@@ -99,7 +99,7 @@ int uiomove(caddr_t cp, int n, struct uio *uio)
 					ptr = memcpy(iov->iov_base, cp, cnt);
 				else
 					ptr = memcpy(cp, iov->iov_base, cnt);
-
+				
 //				if (!ptr)
 //					return (errno);			
 				break;
@@ -370,10 +370,10 @@ int socket_send(struct socket *so, struct msghdr *mp, int flags, int *retsize)
 {
 	struct uio auio;
 	struct iovec *iov;
-	int i;
+	uint32 i;
 	struct mbuf *to;
 	struct mbuf *control;
-	int len;
+	uint len;
 	int error;
 
 	auio.uio_iov = mp->msg_iov;
@@ -512,10 +512,10 @@ restart:
 		if (flags & MSG_OOB)
 			space += 1024;
 
-		if ((atomic && resid > so->so_snd.sb_hiwat) || clen > so->so_snd.sb_hiwat)
+		if ((atomic && resid > (uint64) so->so_snd.sb_hiwat) || clen > so->so_snd.sb_hiwat)
 			snderr(EMSGSIZE);
 
-		if (space < resid + clen && uio && 
+		if ((uint64) space < resid + clen && uio && 
 		    (atomic || space < so->so_snd.sb_lowat || space < clen)) {
 			if ((so->so_state & SS_NBIO)) { /* non blocking set */
 				printf("so->so_state & SS_NBIO (%d)\n", so->so_state & SS_NBIO);
@@ -555,14 +555,14 @@ restart:
 
 					mlen = MCLBYTES;
 					if (atomic && !top) {
-						len = min(MCLBYTES - max_hdr, resid);
+						len = min((uint64) (MCLBYTES - max_hdr), resid);
 						m->m_data += max_hdr;
 					} else
 						len = min(MCLBYTES, resid);
 					space -= len;
 				} else {
 nopages:
-					len = min(min(mlen, resid), space);
+					len = min(min((uint64) mlen, resid), (uint64) space);
 					space -= len;
 					/* leave room for headers if required */
 					if (atomic && !top && len < mlen)
@@ -639,8 +639,9 @@ int socket_recv(struct socket *so, struct msghdr *mp, caddr_t namelenp, int *ret
 	struct iovec *iov;
 	struct mbuf *control = NULL;
 	struct mbuf *from = NULL;
-	int error = 0, i, len = 0;
-
+	int error = 0, len = 0;
+	uint32 i;
+	
 	auio.uio_iov = mp->msg_iov;
 	auio.uio_iovcnt = mp->msg_iovlen;
 	auio.uio_segflg = UIO_USERSPACE;
@@ -660,7 +661,7 @@ int socket_recv(struct socket *so, struct msghdr *mp, caddr_t namelenp, int *ret
 	if ((error = soreceive(so, &from, &auio,
 				NULL, mp->msg_control ? &control : NULL, 
 				&mp->msg_flags)) != 0) {
-		if (auio.uio_resid != len && (error == EINTR || error == EWOULDBLOCK))
+		if (auio.uio_resid != (uint) len && (error == EINTR || error == EWOULDBLOCK))
 			error = 0;
 	}
 
@@ -675,7 +676,7 @@ int socket_recv(struct socket *so, struct msghdr *mp, caddr_t namelenp, int *ret
 		if (len <= 0 || !from) {
 			len = 0;
 		} else {
-			if (len > from->m_len)
+			if (len > (int) from->m_len)
 				len = from->m_len;
 			memcpy((caddr_t)mp->msg_name, mtod(from, caddr_t), len);
 		}
@@ -703,7 +704,7 @@ static int soreceive(struct socket *so, struct mbuf **paddr, struct uio *uio, st
 	int len, error = 0, offset;
 	struct mbuf *nextrecord;
 	int moff, type = 0;
-	int orig_resid = uio->uio_resid;
+	uint orig_resid = uio->uio_resid;
 	struct protosw *pr = so->so_proto;
 
 	mp = mp0;
@@ -751,9 +752,9 @@ restart:
 	 * a short count if a timeout or signal occurs after we start.
 	 */
 	if (m == NULL || (((flags & MSG_DONTWAIT) == 0 &&
-	    so->so_rcv.sb_cc < uio->uio_resid) &&
+	    (uint) so->so_rcv.sb_cc < uio->uio_resid) &&
 	    (so->so_rcv.sb_cc < so->so_rcv.sb_lowat ||
-	    ((flags & MSG_WAITALL) && uio->uio_resid <= so->so_rcv.sb_hiwat)) &&
+	    ((flags & MSG_WAITALL) && uio->uio_resid <= (uint) so->so_rcv.sb_hiwat)) &&
 	    m->m_nextpkt == 0 && (pr->pr_flags & PR_ATOMIC) == 0)) {
 
 		if (so->so_error) {
@@ -857,15 +858,15 @@ dontblock:
 		}
 		so->so_state &= ~SS_RCVATMARK;
 		len = uio->uio_resid;
-		if (so->so_oobmark && len > so->so_oobmark - offset)
+		if (so->so_oobmark && (uint) len > so->so_oobmark - offset)
 			len = so->so_oobmark - offset;
-		if (len > m->m_len - moff)
+		if (len > (int) m->m_len - moff)
 			len = m->m_len - moff;
 		if (!mp)
 			error = uiomove(mtod(m, caddr_t) + moff, (int)len, uio);
 		else
 			uio->uio_resid -= len;
-		if (len == m->m_len - moff) {
+		if (len == (int) m->m_len - moff) {
 			if (m->m_flags & M_EOR)
 				flags |= MSG_EOR;
 			if (flags & MSG_PEEK) {
@@ -906,7 +907,7 @@ dontblock:
 				}
 			} else {
 				offset += len;
-				if (offset == so->so_oobmark)
+				if ((uint) offset == so->so_oobmark)
 					break;
 			}
 		}
@@ -1479,7 +1480,7 @@ int socket_getsockname(struct socket *so, struct sockaddr *sa, int *alen)
 	memcpy(&len, alen, sizeof(len));
 	error = (*so->so_proto->pr_userreq)(so, PRU_SOCKADDR, NULL, m, NULL);
 	if (error == 0) {
-		if (len > m->m_len)
+		if (len > (int) m->m_len)
 			len = m->m_len;
 		memcpy(sa, mtod(m, caddr_t), len);
 		memcpy(alen, &len, sizeof(len));
@@ -1501,7 +1502,7 @@ int socket_getpeername(struct socket *so, struct sockaddr *sa, int * alen)
         memcpy(&len, alen, sizeof(len));
         error = (*so->so_proto->pr_userreq)(so, PRU_PEERADDR, NULL, m, NULL);
         if (error == 0) {
-                if (len > m->m_len)
+                if (len > (int) m->m_len)
                         len = m->m_len;
                 memcpy(sa, mtod(m, caddr_t), len);
                 memcpy(alen, &len, sizeof(len));
@@ -1548,7 +1549,7 @@ int socket_accept(struct socket *so, struct socket **nso, void *data, int *alen)
 	so->so_state &= ~SS_NOFDREF;
 	error = (*so->so_proto->pr_userreq)(so, PRU_ACCEPT, NULL, nam, NULL);
 	if (data) {
-		if (len > nam->m_len)
+		if (len > (int) nam->m_len)
 			len = nam->m_len;
 		if (memcpy(data, mtod(nam, caddr_t), len) == NULL)
 			memcpy(alen, (caddr_t)&len, sizeof(len));

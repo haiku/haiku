@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <strings.h>
+#include <stdlib.h>
 
 #ifdef _KERNEL_MODE
 #include <KernelExport.h>

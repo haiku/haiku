@@ -40,7 +40,6 @@
 /* Defines we need */
 #define NETWORK_INTERFACES	"network/interfaces"
 #define NETWORK_PROTOCOLS	"network/protocols"
-#define PPP_DEVICES "ppp/devices"
 
 /* Variables used in other core modules */
 int ndevs = 0;
@@ -61,6 +60,10 @@ status_t std_ops(int32 op, ...);
 static int start_stack(void);
 static int stop_stack(void);
 
+static int32 count_net_modules(void);
+static const char *get_net_module_name(int32 index);
+static status_t control_net_module(int32 index, uint32 op, void *data, size_t length);
+
 static void add_protosw(struct protosw *[], int layer);
 static struct net_module *module_list = NULL;
 
@@ -69,6 +72,10 @@ static void set_max_linkhdr(int maxLinkHdr);
 static int get_max_linkhdr(void);
 static void set_max_protohdr(int maxProtoHdr);
 static int get_max_protohdr(void);
+
+#ifdef SHOW_DEBUG
+void walk_protocols(void);
+#endif
 
 /* Wider scoped prototypes */
 int net_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
@@ -86,6 +93,11 @@ struct core_module_info core_info = {
 
 	start_stack,
 	stop_stack,
+	
+	count_net_modules,
+	get_net_module_name,
+	control_net_module,
+	
 	add_domain,
 	remove_domain,
 	add_protocol,
@@ -203,6 +215,63 @@ struct core_module_info core_info = {
 	socket_set_event_callback,
 	socket_shutdown
 };
+
+
+static
+struct net_module*
+net_module_at(int32 index)
+{
+	int32 currentIndex;
+	struct net_module *current = module_list;
+	
+	currentIndex = 0;
+	for(; current && currentIndex != index; current = current->next)
+		++currentIndex;
+	
+	return current;
+}
+
+
+static
+int32
+count_net_modules(void)
+{
+	int32 count;
+	struct net_module *current = module_list;
+	
+	count = 0;
+	for(; current; current = current->next)
+		++count;
+	
+	return count;
+}
+
+
+static
+const char*
+get_net_module_name(int32 index)
+{
+	struct net_module *module = net_module_at(index);
+	
+	if(!module)
+		return NULL;
+	
+	return module->name;
+}
+
+
+static
+status_t
+control_net_module(int32 index, uint32 op, void *data, size_t length)
+{
+	struct net_module *module = net_module_at(index);
+	
+	if(!module || !module->ptr->control)
+		return B_ERROR;
+	
+	return module->ptr->control(op, data, length);
+}
+
 
 static int32 if_thread(void *data)
 {
@@ -634,8 +703,8 @@ static void walk_domains(void)
 
 void remove_domain(int fam)
 {
-	struct domain *dmp = domains, *opr;
-
+	struct domain *dmp = domains, *opr = NULL;
+	
 	for (; dmp; dmp = dmp->dom_next) {
 		if (dmp->dom_family == fam)
 			break;
@@ -643,7 +712,7 @@ void remove_domain(int fam)
 	}
 	if (!dmp || dmp->dom_protosw != NULL)
 		return;
-
+	
 	acquire_sem_etc(dom_lock, 1, B_CAN_INTERRUPT, 0);
 	/* we're ok to remove it! */
 	if (opr)

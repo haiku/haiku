@@ -10,6 +10,13 @@
 
 #define MAX_INITIAL 15;
 
+
+net_hash_index *nhash_next(net_hash_index *hi);
+net_hash_index *nhash_first(net_hash *nh);
+void nhash_this(net_hash_index *hi, const void **key, ssize_t *klen,
+	void **val);
+
+
 net_hash *nhash_make(void)
 {
 	net_hash *nn;

@@ -1,6 +1,7 @@
 /* in.c */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <netinet/in.h>
 #include <netinet/in_var.h>
 #include <sys/socketvar.h>
@@ -211,7 +212,7 @@ int in_control(struct socket *so, int cmd, caddr_t data, struct ifnet *ifp)
 					    ia->ia_addr.sin_addr.s_addr == ifra->ifra_addr.sin_addr.s_addr)
 						break;
 				}
-			if (cmd == SIOCDIFADDR && ia == NULL)
+			if (cmd == (int) SIOCDIFADDR && ia == NULL)
 				return EADDRNOTAVAIL;
 		case SIOCSIFADDR:
 			printf("SIOCSIFADDR\n");

@@ -37,6 +37,7 @@
 #include <kernel/OS.h>
 #include <strings.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "net_malloc.h"
 
@@ -409,7 +410,7 @@ on1:
 			x = x->rn_right;
 		else
 			x = x->rn_left;
-	} while (b > (unsigned) x->rn_bit);
+	} while (b > abs(x->rn_bit));
 				/* x->rn_bit < b && x->rn_bit >= 0 */
 #ifdef RN_DEBUG
 	if (rn_debug)
