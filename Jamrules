@@ -1540,7 +1540,7 @@ rule SetupKernel
 
 	#Setup Kernel header directories
 	local public_kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
-	local private_kernel_includes = kernel libroot ;
+	local private_kernel_includes = kernel libroot kernel/boot/platform/$(OBOS_BOOT_PLATFORM) ;
 	# Use posix headers directory
 	HDRS = [ FDirName $(OBOS_TOP) headers posix ] ;
 	# Use public OS header directories
