@@ -76,6 +76,7 @@ rule SetupIncludes
 {
 	OBOS_INCLUDES ?= . add-ons app be_apps device drivers game interface kernel mail media midi midi2 net opengl storage support translation ;
 	UsePublicHeaders $(OBOS_INCLUDES) ;
+    UsePosixHeaders ;
 }
 
 #-------------------------------------------------------------------------------
@@ -492,6 +493,28 @@ rule UseArchObjectHeaders
 	ObjectCcFlags $(targets) : $(opt)  ;
 	ObjectC++Flags $(targets) : $(opt)  ;
 	ObjectHdrs $(targets) : $(headers) ;
+}
+
+rule UsePosixHeaders
+{
+	# UsePrivateHeaders <group list> ;
+	#
+	# Adds the POSIX header dir to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+}
+
+rule UsePosixObjectHeaders
+{
+	# UsePosixObjectHeaders <sources_or_objects> ;
+	#
+	# Adds the POSIX header dir to the header search
+	# dirs of <sources_or_objects>.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	ObjectHdrs $(1) : [ FDirName $(OBOS_TOP) headers posix ] ;
 }
 
 rule SplitPath
