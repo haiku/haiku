@@ -97,11 +97,20 @@ struct devfs_cookie {
 			struct devfs_cookie *next;
 			struct devfs_cookie *prev;
 			struct devfs_vnode *ptr;
+			int state;	// iteration state
 		} dir;
 		struct cookie_dev {
 			void *dcookie;
 		} dev;
 	} u;
+};
+
+// directory iteration states
+enum {
+	ITERATION_STATE_DOT		= 0,
+	ITERATION_STATE_DOT_DOT	= 1,
+	ITERATION_STATE_OTHERS	= 2,
+	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
 /* the one and only allowed devfs instance */
@@ -961,6 +970,7 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 	mutex_lock(&fs->lock);
 
 	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
+	cookie->u.dir.state = ITERATION_STATE_BEGIN;
 	*_cookie = cookie;
 
 	mutex_unlock(&fs->lock);
@@ -975,6 +985,10 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent 
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 	struct devfs *fs = (struct devfs *)_fs;
 	status_t status = B_OK;
+	struct devfs_vnode *childNode = NULL;
+	const char *name = NULL;
+	struct devfs_vnode *nextChildNode = NULL;
+	int nextState = cookie->u.dir.state;
 
 	TRACE(("devfs_read_dir: vnode %p, cookie %p, buffer %p, size %ld\n", _vnode, cookie, dirent, bufferSize));
 
@@ -983,25 +997,49 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent 
 
 	mutex_lock(&fs->lock);
 
-	if (cookie->u.dir.ptr == NULL) {
+	switch (cookie->u.dir.state) {
+		case ITERATION_STATE_DOT:
+			childNode = vnode;
+			name = ".";
+			nextChildNode = vnode->stream.u.dir.dir_head;
+			nextState = cookie->u.dir.state + 1;
+			break;
+		case ITERATION_STATE_DOT_DOT:
+			childNode = vnode->parent;
+			name = "..";
+			nextChildNode = vnode->stream.u.dir.dir_head;
+			nextState = cookie->u.dir.state + 1;
+			break;
+		default:
+			childNode = cookie->u.dir.ptr;
+			if (childNode) {
+				name = childNode->name;
+				nextChildNode = childNode->dir_next;
+			}
+			break;
+	}
+
+	if (!childNode) {
 		*_num = 0;
 		goto err;
 	}
 
 	dirent->d_dev = fs->id;
-	dirent->d_ino = cookie->u.dir.ptr->id;
-	dirent->d_reclen = strlen(cookie->u.dir.ptr->name) + sizeof(struct dirent);
+	dirent->d_ino = childNode->id;
+	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
 
 	if (dirent->d_reclen > bufferSize) {
 		status = ENOBUFS;
 		goto err;
 	}
 
-	status = user_strlcpy(dirent->d_name, cookie->u.dir.ptr->name, bufferSize - sizeof(struct dirent));
+	status = user_strlcpy(dirent->d_name, name,
+		bufferSize - sizeof(struct dirent));
 	if (status < B_OK)
 		goto err;
 
-	cookie->u.dir.ptr = cookie->u.dir.ptr->dir_next;
+	cookie->u.dir.ptr = nextChildNode;
+	cookie->u.dir.state = nextState;
 	status = B_OK;
 
 err:
@@ -1026,6 +1064,7 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 	mutex_lock(&fs->lock);
 
 	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
+	cookie->u.dir.state = ITERATION_STATE_BEGIN;
 
 	mutex_unlock(&fs->lock);
 	return B_OK;
