@@ -787,8 +787,12 @@ status_t BMessage::AddFlat(const char* name, BFlattenable* obj, int32 count)
 	char* buffer = new(nothrow) char[size];
 	if (buffer)
 	{
-		err = AddData(name, obj->TypeCode(), (void*)buffer, size,
-					  obj->IsFixedSize(), count);
+		err = obj->Flatten((void*)buffer, size);
+		if (!err)
+		{
+			err = AddData(name, obj->TypeCode(), (void*)buffer, size,
+						  obj->IsFixedSize(), count);
+		}
 		delete[] buffer;
 	}
 	else
@@ -1147,7 +1151,11 @@ status_t BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* obj)
 	char* buffer = new(nothrow) char[size];
 	if (buffer)
 	{
-		err = ReplaceData(name, obj->TypeCode(), index, (void*)buffer, size);
+		err = obj->Flatten(buffer, size);
+		if (!err)
+		{
+			err = ReplaceData(name, obj->TypeCode(), index, (void*)buffer, size);
+		}
 		delete[] buffer;
 	}
 
