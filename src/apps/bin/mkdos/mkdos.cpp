@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include <getopt.h>
 #include "fat.h"
 
+#define WITH_FLOPPY_SUPPORT
+
 void PrintUsage();
 void CreateVolumeLabel(void *sector, const char *label);
 status_t Initialize(int fatbits, const char *device, const char *label, bool noprompt, bool testmode);
@@ -135,6 +137,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		return B_ERROR;
 	}
 	//XXX the following two checks can be removed when this is fixed:
+#ifndef WITH_FLOPPY_SUPPORT
 	if (0 != strstr(device,"floppy")) {
 		fprintf(stderr,"Error: floppy B_GET_GEOMETRY and B_GET_BIOS_GEOMETRY calls are broken, floppy not supported\n");
 		return B_ERROR;
@@ -143,6 +146,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		fprintf(stderr,"Error: can't create a 12 bit fat on a device other than floppy\n");
 		return B_ERROR;
 	}
+#endif
 
 	printf("device = %s\n",device);
 
@@ -429,8 +433,15 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		printf("Initializing will erase all existing data on the drive.\n");
 		printf("Do you wish to proceed? ");
 		char answer[1000];
-		scanf("%s",answer); //XXX who wants to fix this buffer overflow?
-		if (0 != strcasecmp(answer,"yes")) {
+		char *p = answer;
+		memset(answer, 0, 1000);
+		fflush(stdout);
+		while ((p < answer + 1000) && (read(0, p, 1) == 1) && (*p != '\n') && (*p != '\r'))
+			p++;
+		*p = '\0';
+		
+		//scanf("%s",answer); //XXX who wants to fix this buffer overflow?
+		if ((strlen(answer) < 1) || (0 != strncasecmp(answer, "yes", strlen(answer)))) {
 			printf("drive NOT initialized\n");
 			close(fd);
 			return B_OK;
