@@ -287,7 +287,7 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 					  const media_format &with_format, media_input *out_input)
 {
 	// a BBufferProducer is connection to our BBufferConsumer
-
+	
 	// incoming connections should always have an incoming ID=0,
 	// and the port number must match our ControlPort()
 	if (where.id != 0 || where.port != ControlPort())
@@ -561,7 +561,11 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	// we also create the new output connection and return it in out_source.
 
 	PRINT_FORMAT("AudioMixer::PrepareToConnect: suggested format", *format);
-	
+
+	// avoid loop connections
+	if (where.port == ControlPort())
+		return B_MEDIA_BAD_SOURCE;
+
 	// is the source valid?
 	if (what.port != ControlPort() || what.id != 0)
 		return B_MEDIA_BAD_SOURCE;
