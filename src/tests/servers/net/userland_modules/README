@@ -1,0 +1,24 @@
+KERNEL MODULES USERLAND EMULATION TESTBED
+
+A quick testbed to code, debug and stress the userland emulation of kernel modules support we need 
+for the net_server-like debugging environment to support addons as they were modules, exactly like in kernel space.
+
+The network stack modules can be compiled as kernel modules *or* userland addons. 
+The userland versions of these modules will be searched there, in this order:
+
+./add-ons
+/boot/home/config/add-ons/net_server
+/boot/beos/system/add-ons/net_server
+
+As they rely on kernel modules API to works, we have to implement an userland version of 
+this API :
+
+// loading / unloading modules:
+status_t get_module(const char *module_name, module_info **mi);
+status_t put_module(const char *module_info);
+
+// querying modules:
+void * open_module_list(const char *prefix);
+status_t read_next_module_name(void *cookie,  char *buf, size_t *bufsize);
+status_t close_module_list(void *cookie);
+status_t get_next_loaded_module_name(uint32 *cookie, char *buf, size_t *bufsize);
