@@ -1092,7 +1092,7 @@ bootstrap_devfs(void)
 
 	TRACE(("bootstrap_devfs: entry\n"));
 
-	return vfs_register_filesystem("devfs", &devfs_ops);
+	return vfs_register_file_system("devfs", &devfs_ops);
 }
 
 

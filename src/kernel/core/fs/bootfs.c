@@ -994,6 +994,6 @@ bootstrap_bootfs(void)
 
 	TRACE(("bootstrap_bootfs: found bootdir at %p\n", bootdir));
 
-	return vfs_register_filesystem("bootfs", &bootfs_ops);
+	return vfs_register_file_system("bootfs", &bootfs_ops);
 }
 

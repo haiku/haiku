@@ -1315,5 +1315,5 @@ bootstrap_pipefs(void)
 {
 	TRACE(("bootstrap_pipefs: entry\n"));
 
-	return vfs_register_filesystem("pipefs", &pipefs::pipefs_ops);
+	return vfs_register_file_system("pipefs", &pipefs::pipefs_ops);
 }
