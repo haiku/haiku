@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -195,7 +195,7 @@ list_remove_tail_item(struct list *list)
  *	this is a very fast operation.
  */
 
-void *
+void
 list_move_to_list(struct list *sourceList, struct list *targetList)
 {
 	*targetList = *sourceList;

@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef KERNEL_LIST_H
@@ -52,7 +52,7 @@ extern void list_add_item(struct list *list, void *item);
 extern void list_remove_item(struct list *list, void *item);
 extern void *list_remove_head_item(struct list *list);
 extern void *list_remove_tail_item(struct list *list);
-extern void *list_move_to_list(struct list *sourceList, struct list *targetList);
+extern void list_move_to_list(struct list *sourceList, struct list *targetList);
 
 static inline bool
 list_is_empty(struct list *list)
