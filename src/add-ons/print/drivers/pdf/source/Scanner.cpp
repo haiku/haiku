@@ -136,11 +136,8 @@ bool Scanner::ReadFloat(float *value)
 bool Scanner::NextChar(char ch) {
 	SkipSpaces();
 	int c = GetCh();
-	if (c == ch) {
-		return true;
-	} else {
-		UngetCh(c);
-		return false;
-	}
+	bool match = c == ch;
+	if (!match) UngetCh(c);
+	return match;
 }
 
