@@ -107,6 +107,19 @@ status_t PrintServerApp::async_thread(void* data)
 			}
 			break;
 
+			// Retrieve default configuration message from printer add-on
+		case PSRV_GET_DEFAULT_SETTINGS:
+			if (printer != NULL) {
+				BMessage reply;
+				if (printer->GetDefaultSettings(reply) == B_OK) {
+					msg->SendReply(&reply);
+					break;
+				}
+			}
+			BMessage reply('stop');
+			msg->SendReply(&reply);
+			break;
+
 	}	
 
 	if (printer) printer->Release();
@@ -129,24 +142,8 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 	}
 }
 
-#include <be/app/Roster.h>
-
-void PrintSender(BMessage* msg) {
-	BMessenger msgr = msg->ReturnAddress();
-//	if (msgr.InitCheck() == B_OK) {
-		team_id team = msgr.Team();
-		app_info info;
-		if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
-			fprintf(stderr, "PrintSender signature = %s\n", info.signature);
-		} else
-			fprintf(stderr, "PrintSender could not get app_info\n");
-//	} else 
-//		fprintf(stderr, "PrintSender invalid BMessenger\n");
-}
-
 void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 {
-	PrintSender(msg);
 	switch(msg->what) {
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {
@@ -196,8 +193,9 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			}
 			break;
 
-		case PSRV_SHOW_PAGE_SETUP: 
-		case PSRV_SHOW_PRINT_SETUP: 
+		case PSRV_SHOW_PAGE_SETUP:
+		case PSRV_SHOW_PRINT_SETUP:
+		case PSRV_GET_DEFAULT_SETTINGS:
 			AsyncHandleMessage(DetachCurrentMessage());
 			break;
 

@@ -83,18 +83,24 @@ typedef char* (*add_printer_func_t)(const char* printer_name);
 int
 main()
 {
-	gLock = new BLocker();
-		// Create our application object
 	status_t rc = B_OK;
-	PrintServerApp print_server(&rc);
-	
-		// If all went fine, let's start it
-	if (rc == B_OK) {
-		print_server.Run();
+
+	if (!be_roster->IsRunning(PSRV_SIGNATURE_TYPE)) {
+		gLock = new BLocker();
+			// Create our application object
+		PrintServerApp print_server(&rc);
+		
+			// If all went fine, let's start it
+		if (rc == B_OK) {
+			print_server.Run();
+		}
+		
+		delete gLock;
+	} else {
+		// restart print server
+		// As we load the printer addon everytime we need it
+		// and unload it afterwards, we have nothing to do here! 
 	}
-	
-	delete gLock;
-	
 	return rc;
 }
 
@@ -111,23 +117,26 @@ main()
 
 PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
-	fSelectedIconMini(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8),
-	fSelectedIconLarge(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8),
+	fSelectedIconMini(NULL),
+	fSelectedIconLarge(NULL),
 	fNumberOfPrinters(0),
 	fNoPrinterAvailable(0)
 {
 		// If our superclass initialized ok
-	if (*err == B_OK) {
+	if (*err == B_OK) { 
 		fNoPrinterAvailable = create_sem(1, "");
 		
 			// let us try as well
 		SetupPrinterList();
 		RetrieveDefaultPrinter();
 		
+		fSelectedIconMini = new BBitmap(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8);
+		fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
+		
 			// Cache icons for selected printer
 		BMimeType type(PRNT_SIGNATURE_TYPE);
-		type.GetIcon(&fSelectedIconMini, B_MINI_ICON);
-		type.GetIcon(&fSelectedIconLarge, B_LARGE_ICON);
+		type.GetIcon(fSelectedIconMini, B_MINI_ICON);
+		type.GetIcon(fSelectedIconLarge, B_LARGE_ICON);
 		
 			// Start handling of spooled files
 		PostMessage(PSRV_PRINT_SPOOLED_JOB);
@@ -163,6 +172,11 @@ bool PrintServerApp::QuitRequested()
 			delete_sem(fNoPrinterAvailable);
 			fNoPrinterAvailable = 0;
 		}
+
+		ASSERT(fSelectedIconMini != NULL);
+
+		delete fSelectedIconMini; fSelectedIconMini = NULL;
+		delete fSelectedIconLarge; fSelectedIconLarge = NULL;
 	}
 	
 	return rc;
@@ -296,6 +310,7 @@ PrintServerApp::MessageReceived(BMessage* msg)
 		case PSRV_SHOW_PAGE_SETUP:
 		case PSRV_SHOW_PRINT_SETUP:
 		case PSRV_PRINT_SPOOLED_JOB:
+		case PSRV_GET_DEFAULT_SETTINGS:
 			Handle_BeOSR5_Message(msg);
 			break;
 
@@ -425,8 +440,8 @@ PrintServerApp::SelectPrinter(const char* printerName)
 	if ((rc=FindPrinterNode(printerName, node)) == B_OK) {
 			// and add the custom icon
 		BNodeInfo info(&node);
-		info.SetIcon(&fSelectedIconMini, B_MINI_ICON);
-		info.SetIcon(&fSelectedIconLarge, B_LARGE_ICON);
+		info.SetIcon(fSelectedIconMini, B_MINI_ICON);
+		info.SetIcon(fSelectedIconLarge, B_LARGE_ICON);
 	}
 	
 	fDefaultPrinter = Printer::Find(printerName);

@@ -94,11 +94,11 @@ private:
 	
 	ResourceManager fResourceManager;
 	Printer* fDefaultPrinter;
-	BBitmap fSelectedIconMini;
-	BBitmap fSelectedIconLarge;
+	BBitmap* fSelectedIconMini;
+	BBitmap* fSelectedIconLarge;
 	int     fNumberOfPrinters;    // number of existing Printer objects
 	sem_id  fNoPrinterAvailable;  // can be acquired if number of printers == 0
-
+	
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 	static status_t async_thread(void* data);
 	void AsyncHandleMessage(BMessage* msg);
