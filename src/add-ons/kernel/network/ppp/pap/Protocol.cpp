@@ -36,7 +36,7 @@
 typedef struct authentication_item {
 	uint8 type;
 	uint8 length;
-	uint16 protocolNumber;
+	uint16 protocolNumber _PACKED;
 } authentication_item;
 
 
@@ -120,7 +120,7 @@ PAPHandler::Reset()
 // PAP
 PAP::PAP(PPPInterface& interface, driver_parameter *settings)
 	: PPPProtocol("PAP", PPP_AUTHENTICATION_PHASE, PAP_PROTOCOL, PPP_PROTOCOL_LEVEL,
-		AF_INET, 0, interface, settings, PPP_NO_FLAGS,
+		AF_INET, 0, interface, settings, PPP_ALWAYS_ALLOWED,
 		AUTHENTICATOR_TYPE_STRING, new PAPHandler(*this, interface)),
 	fState(INITIAL),
 	fID(system_time() & 0xFF),
@@ -404,6 +404,11 @@ PAP::TOBadEvent()
 		case WAITING_FOR_REQ:
 			NewState(INITIAL);
 			locker.UnlockNow();
+			if(State() == REQ_SENT)
+				Interface().StateMachine().LocalAuthenticationDenied(fUser);
+			else
+				Interface().StateMachine().PeerAuthenticationDenied(fUser);
+			
 			UpFailedEvent();
 		break;
 		
@@ -556,7 +561,7 @@ PAP::SendRequest()
 	data[0] = strlen(fUser);
 	memcpy(data + 1, fUser, strlen(fUser));
 	data[1 + data[0]] = strlen(fPassword);
-	memcpy(data + 2 + data[0], fUser, strlen(fUser));
+	memcpy(data + 2 + data[0], fPassword, strlen(fPassword));
 	
 	return Interface().Send(packet, PAP_PROTOCOL) == B_OK;
 }

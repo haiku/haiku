@@ -13,13 +13,22 @@
 #include <netinet/in.h>
 
 
+#ifdef _KERNEL_MODE
+	#include <KernelExport.h>
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#elif DEBUG
+	#include <cstdio>
+#endif
+
+
 #define AUTHENTICATION_TYPE				0x3
 #define AUTHENTICATOR_TYPE_STRING		"Authenticator"
 
 typedef struct authentication_item {
 	uint8 type;
 	uint8 length;
-	uint16 protocolNumber;
+	uint16 protocolNumber _PACKED;
 } authentication_item;
 
 
@@ -98,6 +107,10 @@ _PPPAuthenticationHandler::AddToRequest(PPPConfigurePacket& request)
 	fPeerAuthenticator = authenticator;
 		// this could omit some authenticators when we get a suggestion, but that is
 		// no problem because the suggested authenticator will be accepted (hopefully)
+	
+#if DEBUG
+	printf("PPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
+#endif
 	
 	authenticator->SetEnabled(true);
 	return authenticator->OptionHandler()->AddToRequest(request);
@@ -188,6 +201,10 @@ _PPPAuthenticationHandler::ParseRequest(const PPPConfigurePacket& request,
 	if(!item)
 		return B_OK;
 			// no authentication requested by peer (index > request.CountItems())
+	
+#if DEBUG
+	printf("PPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
+#endif
 	
 	// try to find the requested protocol
 	fLocalAuthenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));

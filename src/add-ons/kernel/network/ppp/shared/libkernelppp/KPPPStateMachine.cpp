@@ -102,9 +102,6 @@ PPPStateMachine::NewPhase(ppp_phase next)
 	// Report a down event to parent if we are not usable anymore.
 	// The report threads get their notification later.
 	if(Phase() == PPP_ESTABLISHED_PHASE && next != Phase()) {
-		if(!Interface().DoesDialOnDemand())
-			Interface().UnregisterInterface();
-		
 		if(Interface().Ifnet()) {
 			Interface().Ifnet()->if_flags &= ~IFF_RUNNING;
 			
@@ -1980,6 +1977,7 @@ PPPStateMachine::BringProtocolsUp()
 		else if(Phase() == PPP_ESTABLISHED_PHASE) {
 			if(Interface().Parent())
 				Interface().Parent()->StateMachine().UpEvent(Interface());
+			break;
 		} else
 			NewPhase((ppp_phase) (Phase() + 1));
 	}

@@ -19,15 +19,23 @@
 	// create_interface() returns this value on failure
 
 
+class PPPInterface;
+typedef struct ppp_interface_entry {
+	PPPInterface *interface;
+	vint32 accessing;
+	bool deleting;
+} ppp_interface_entry;
+
+
 typedef struct ppp_interface_module_info {
 	kernel_net_module_info knminfo;
 	
 	interface_id (*CreateInterface)(const driver_settings *settings,
 		interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 			// you should always create interfaces using this function
-	void (*DeleteInterface)(interface_id ID);
+	bool (*DeleteInterface)(interface_id ID);
 		// this marks the interface for deletion
-	void (*RemoveInterface)(interface_id ID);
+	bool (*RemoveInterface)(interface_id ID);
 		// remove the interface from database (make sure you can delete it yourself!)
 	
 	ifnet *(*RegisterInterface)(interface_id ID);

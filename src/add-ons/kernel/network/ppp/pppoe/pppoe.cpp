@@ -30,18 +30,18 @@
 #define PPPoE_MODULE_NAME		"network/ppp/pppoe"
 
 struct core_module_info *core = NULL;
-static struct ethernet_module_info *ethernet;
-static int32 host_uniq = 0;
+static struct ethernet_module_info *sEthernet;
+static int32 sHostUniq = 0;
 status_t std_ops(int32 op, ...);
 
-static BLocker lock;
-static List<PPPoEDevice*> *devices;
+static BLocker sLock;
+static List<PPPoEDevice*> *sDevices;
 
 
 uint32
 NewHostUniq()
 {
-	return (uint32) atomic_add(&host_uniq, 1);
+	return (uint32) atomic_add(&sHostUniq, 1);
 }
 
 
@@ -52,8 +52,8 @@ add_device(PPPoEDevice *device)
 	printf("PPPoE: add_device()\n");
 #endif
 	
-	LockerHelper locker(lock);
-	devices->AddItem(device);
+	LockerHelper locker(sLock);
+	sDevices->AddItem(device);
 }
 
 
@@ -64,8 +64,8 @@ remove_device(PPPoEDevice *device)
 	printf("PPPoE: remove_device()\n");
 #endif
 	
-	LockerHelper locker(lock);
-	devices->RemoveItem(device);
+	LockerHelper locker(sLock);
+	sDevices->RemoveItem(device);
 }
 
 
@@ -76,18 +76,14 @@ pppoe_input(struct mbuf *packet)
 	if(!packet)
 		return;
 	
-#if DEBUG
-//	dump_packet(packet);
-#endif
-	
 	ifnet *sourceIfnet = packet->m_pkthdr.rcvif;
 	complete_pppoe_header *header = mtod(packet, complete_pppoe_header*);
 	PPPoEDevice *device;
 	
-	LockerHelper locker(lock);
+	LockerHelper locker(sLock);
 	
-	for(int32 index = 0; index < devices->CountItems(); index++) {
-		device = devices->ItemAt(index);
+	for(int32 index = 0; index < sDevices->CountItems(); index++) {
+		device = sDevices->ItemAt(index);
 		
 		if(device && device->EthernetIfnet() == sourceIfnet) {
 			if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOE
@@ -173,14 +169,14 @@ std_ops(int32 op, ...)
 				return B_ERROR;
 			
 			if(get_module(NET_ETHERNET_MODULE_NAME,
-					(module_info**) &ethernet) != B_OK) {
+					(module_info**) &sEthernet) != B_OK) {
 				put_module(NET_CORE_MODULE_NAME);
 				return B_ERROR;
 			}
 			
-			devices = new List<PPPoEDevice*>;
+			sDevices = new List<PPPoEDevice*>;
 			
-			ethernet->set_pppoe_receiver(pppoe_input);
+			sEthernet->set_pppoe_receiver(pppoe_input);
 			
 #if DEBUG
 			printf("PPPoE: Registered PPPoE receiver.\n");
@@ -188,8 +184,8 @@ std_ops(int32 op, ...)
 		return B_OK;
 		
 		case B_MODULE_UNINIT:
-			delete devices;
-			ethernet->unset_pppoe_receiver();
+			delete sDevices;
+			sEthernet->unset_pppoe_receiver();
 #if DEBUG
 			printf("PPPoE: Unregistered PPPoE receiver.\n");
 #endif

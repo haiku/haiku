@@ -62,8 +62,8 @@ status_t call_open_event_thread(void *data);
 status_t call_close_event_thread(void *data);
 
 
-PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
-		PPPInterface *parent = NULL)
+PPPInterface::PPPInterface(ppp_interface_entry *entry, uint32 ID,
+		const driver_settings *settings, PPPInterface *parent = NULL)
 	: PPPLayer("PPPInterface", PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
 	fSettings(dup_driver_settings(settings)),
@@ -95,6 +95,8 @@ PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
 	fLock(StateMachine().fLock),
 	fDeleteCounter(0)
 {
+	entry->interface = this;
+	
 	// add internal modules
 	// LCP
 	if(!AddProtocol(&LCP())) {
@@ -518,7 +520,8 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	// with the same level.
 	
 #if DEBUG
-	printf("PPPInterface: AddProtocol()\n");
+	printf("PPPInterface: AddProtocol(%X)\n",
+		protocol ? protocol->ProtocolNumber() : 0);
 #endif
 	
 	if(!protocol || &protocol->Interface() != this
@@ -575,7 +578,8 @@ bool
 PPPInterface::RemoveProtocol(PPPProtocol *protocol)
 {
 #if DEBUG
-	printf("PPPInterface: RemoveProtocol()\n");
+	printf("PPPInterface: RemoveProtocol(%X)\n",
+		protocol ? protocol->ProtocolNumber() : 0);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -661,7 +665,8 @@ bool
 PPPInterface::AddChild(PPPInterface *child)
 {
 #if DEBUG
-	printf("PPPInterface: AddChild()\n");
+	printf("PPPInterface: AddChild(%lX)\n",
+		child ? child->ID() : 0);
 #endif
 	
 	if(!child)
@@ -682,7 +687,8 @@ bool
 PPPInterface::RemoveChild(PPPInterface *child)
 {
 #if DEBUG
-	printf("PPPInterface: RemoveChild()\n");
+	printf("PPPInterface: RemoveChild(%lX)\n",
+		child ? child->ID() : 0);
 #endif
 	
 	LockerHelper locker(fLock);
@@ -1014,6 +1020,7 @@ PPPInterface::Down()
 		int32 tmp;
 		wait_for_thread(fCloseEventThread, &tmp);
 	}
+	
 	fCloseEventThread = spawn_thread(call_close_event_thread,
 		"PPPInterface: call_close_event_thread", B_NORMAL_PRIORITY, this);
 	resume_thread(fCloseEventThread);
@@ -1307,11 +1314,12 @@ PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 	
 	// decode ppp frame and recognize PFC
 	uint16 protocolNumber = *mtod(packet, uint8*);
-	if(protocolNumber == 0)
-		m_adj(packet, 1);
-	else {
+	if(protocolNumber & 0x80 || protocolNumber == 0) {
 		protocolNumber = ntohs(*mtod(packet, uint16*));
 		m_adj(packet, 2);
+	} else {
+		m_adj(packet, 1);
+		protocolNumber = *mtod(packet, uint8*);
 	}
 	
 	return Receive(packet, protocolNumber);

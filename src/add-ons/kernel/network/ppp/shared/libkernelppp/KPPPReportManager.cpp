@@ -88,8 +88,8 @@ bool
 PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
 #if DEBUG
-	printf("PPPReportManager: Report(type=%d code=%ld length=%ld)\n",
-		type, code, length);
+	printf("PPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
+		type, code, length, fReportRequests.CountItems());
 #endif
 	
 	if(length > PPP_REPORT_DATA_LIMIT)

@@ -23,14 +23,14 @@
 #endif
 
 
-static const char ppp_if_name_base[] =	"ppp";
+static const char sPPPIfNameBase[] =	"ppp";
 
 
 static
 status_t
 interface_up_thread(void *data)
 {
-	interface_entry *entry = (interface_entry*) data;
+	ppp_interface_entry *entry = (ppp_interface_entry*) data;
 	
 	entry->interface->Up();
 	--entry->accessing;
@@ -41,7 +41,7 @@ interface_up_thread(void *data)
 
 static
 status_t
-bring_interface_up(interface_entry *entry)
+bring_interface_up(ppp_interface_entry *entry)
 {
 	thread_id upThread = spawn_thread(interface_up_thread,
 		"PPPManager: up_thread", B_NORMAL_PRIORITY, entry);
@@ -56,7 +56,7 @@ static
 status_t
 interface_down_thread(void *data)
 {
-	interface_entry *entry = (interface_entry*) data;
+	ppp_interface_entry *entry = (ppp_interface_entry*) data;
 	
 	entry->interface->Down();
 	--entry->accessing;
@@ -68,7 +68,7 @@ interface_down_thread(void *data)
 
 static
 status_t
-bring_interface_down(interface_entry *entry)
+bring_interface_down(ppp_interface_entry *entry)
 {
 #if DOWN_AS_THREAD
 	thread_id downThread = spawn_thread(interface_down_thread,
@@ -139,7 +139,7 @@ PPPManager::~PPPManager()
 	net_remove_timer(fPulseTimer);
 	
 	// now really delete the interfaces (the deleter_thread is not running)
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry)
@@ -158,9 +158,11 @@ PPPManager::Stop(ifnet *ifp)
 	
 	LockerHelper locker(fLock);
 	
-	interface_entry *entry = EntryFor(ifp);
-	if(!entry)
+	ppp_interface_entry *entry = EntryFor(ifp);
+	if(!entry) {
+		printf("PPPManager: Stop(): Could not find interface!\n");
 		return B_ERROR;
+	}
 	
 	DeleteInterface(entry->interface->ID());
 	
@@ -180,9 +182,11 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		return B_ERROR;
 	
 	LockerHelper locker(fLock);
-	interface_entry *entry = EntryFor(ifp);
-	if(!entry)
+	ppp_interface_entry *entry = EntryFor(ifp);
+	if(!entry) {
+		printf("PPPManager: Output(): Could not find interface!\n");
 		return B_ERROR;
+	}
 	
 	++entry->accessing;
 	locker.UnlockNow();
@@ -225,9 +229,11 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 #endif
 	
 	LockerHelper locker(fLock);
-	interface_entry *entry = EntryFor(ifp);
-	if(!entry || entry->deleting)
+	ppp_interface_entry *entry = EntryFor(ifp);
+	if(!entry || entry->deleting) {
+		printf("PPPManager: Control(): Could not find interface!\n");
 		return B_ERROR;
+	}
 	
 	int32 status = B_OK;
 	++entry->accessing;
@@ -264,34 +270,37 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	
 	LockerHelper locker(fLock);
 	
-	interface_entry *parentEntry = EntryFor(parentID);
+	ppp_interface_entry *parentEntry = EntryFor(parentID);
 	if(parentID != PPP_UNDEFINED_INTERFACE_ID && !parentEntry)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
 	interface_id id = NextID();
-	interface_entry *entry = new interface_entry;
+	ppp_interface_entry *entry = new ppp_interface_entry;
 	entry->accessing = 1;
 	entry->deleting = false;
-	fRegisterRequestor = PPP_UNDEFINED_INTERFACE_ID;
-	entry->interface = new PPPInterface(id, settings,
-		parentEntry ? parentEntry->interface : NULL);
+	fEntries.AddItem(entry);
+		// nothing bad can happen because we are in a locked section here
 	
+	new PPPInterface(entry, id, settings, parentEntry ? parentEntry->interface : NULL);
+		// PPPInterface will add itself to the entry (no need to do it here)
 	if(entry->interface->InitCheck() != B_OK) {
 		delete entry->interface;
 		delete entry;
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
-	fEntries.AddItem(entry);
-	if(fRegisterRequestor == id)
-		entry->interface->RegisterInterface();
 	
 	locker.UnlockNow();
 	
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
 			&id, sizeof(interface_id))) {
 		DeleteInterface(id);
-		id = PPP_UNDEFINED_INTERFACE_ID;
+		--entry->accessing;
+		return PPP_UNDEFINED_INTERFACE_ID;
 	}
+	
+	// notify handlers that interface has been created and they can initialize it now
+	entry->interface->StateMachine().DownProtocols();
+	entry->interface->StateMachine().ResetLCPHandlers();
 	
 	--entry->accessing;
 	
@@ -299,7 +308,7 @@ PPPManager::CreateInterface(const driver_settings *settings,
 }
 
 
-void
+bool
 PPPManager::DeleteInterface(interface_id ID)
 {
 #if DEBUG
@@ -310,14 +319,23 @@ PPPManager::DeleteInterface(interface_id ID)
 	// Our deleter_thread does the real work.
 	LockerHelper locker(fLock);
 	
-	interface_entry *entry = EntryFor(ID);
+	ppp_interface_entry *entry = EntryFor(ID);
+	if(!entry)
+		return false;
+	
+	++entry->accessing;
+	
+	locker.UnlockNow();
 	entry->interface->Down();
-	if(entry)
-		entry->deleting = true;
+	entry->deleting = true;
+	
+	--entry->accessing;
+	
+	return true;
 }
 
 
-void
+bool
 PPPManager::RemoveInterface(interface_id ID)
 {
 #if DEBUG
@@ -327,14 +345,16 @@ PPPManager::RemoveInterface(interface_id ID)
 	LockerHelper locker(fLock);
 	
 	int32 index;
-	interface_entry *entry = EntryFor(ID, &index);
+	ppp_interface_entry *entry = EntryFor(ID, &index);
 	if(!entry || entry->deleting)
-		return;
+		return false;
 	
 	UnregisterInterface(ID);
 	
 	delete entry;
 	fEntries.RemoveItem(index);
+	
+	return true;
 }
 
 
@@ -347,9 +367,7 @@ PPPManager::RegisterInterface(interface_id ID)
 	
 	LockerHelper locker(fLock);
 	
-	fRegisterRequestor = ID;
-	
-	interface_entry *entry = EntryFor(ID);
+	ppp_interface_entry *entry = EntryFor(ID);
 	if(!entry || entry->deleting)
 		return NULL;
 	
@@ -361,7 +379,7 @@ PPPManager::RegisterInterface(interface_id ID)
 	memset(ifp, 0, sizeof(ifnet));
 	ifp->devid = -1;
 	ifp->if_type = IFT_PPP;
-	ifp->name = ppp_if_name_base;
+	ifp->name = sPPPIfNameBase;
 	ifp->if_unit = FindUnit();
 	ifp->if_flags = IFF_POINTOPOINT;
 	ifp->rx_thread = ifp->tx_thread = -1;
@@ -389,10 +407,7 @@ PPPManager::UnregisterInterface(interface_id ID)
 	
 	LockerHelper locker(fLock);
 	
-	if(fRegisterRequestor == ID)
-		fRegisterRequestor = PPP_UNDEFINED_INTERFACE_ID;
-	
-	interface_entry *entry = EntryFor(ID);
+	ppp_interface_entry *entry = EntryFor(ID);
 	if(!entry)
 		return false;
 	
@@ -432,7 +447,8 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(length != sizeof(interface_id) || !data)
 				return B_ERROR;
 			
-			DeleteInterface(*(interface_id*)data);
+			if(!DeleteInterface(*(interface_id*)data))
+				return B_ERROR;
 		break;
 		
 		case PPPC_BRING_INTERFACE_UP: {
@@ -441,7 +457,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			
 			LockerHelper locker(fLock);
 			
-			interface_entry *entry = EntryFor(*(interface_id*)data);
+			ppp_interface_entry *entry = EntryFor(*(interface_id*)data);
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
@@ -456,7 +472,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			
 			LockerHelper locker(fLock);
 			
-			interface_entry *entry = EntryFor(*(interface_id*)data);
+			ppp_interface_entry *entry = EntryFor(*(interface_id*)data);
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
@@ -472,7 +488,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			LockerHelper locker(fLock);
 			
 			ppp_control_info *control = (ppp_control_info*) data;
-			interface_entry *entry = EntryFor(control->index);
+			ppp_interface_entry *entry = EntryFor(control->index);
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
@@ -534,7 +550,7 @@ PPPManager::ControlInterface(interface_id ID, uint32 op, void *data, size_t leng
 	
 	LockerHelper locker(fLock);
 	
-	interface_entry *entry = EntryFor(ID);
+	ppp_interface_entry *entry = EntryFor(ID);
 	if(entry && !entry->deleting)
 		return entry->interface->Control(op, data, length);
 	
@@ -554,7 +570,7 @@ PPPManager::GetInterfaces(interface_id *interfaces, int32 count,
 	
 	int32 item = 0;
 		// the current item in 'interfaces' (also the number of ids copied)
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	
 	for(int32 index = 0; item < count && index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
@@ -599,7 +615,7 @@ PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFA
 		return fEntries.CountItems();
 	
 	int32 count = 0;
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
@@ -627,7 +643,7 @@ PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFA
 }
 
 
-interface_entry*
+ppp_interface_entry*
 PPPManager::EntryFor(interface_id ID, int32 *saveIndex = NULL) const
 {
 #if DEBUG
@@ -637,7 +653,7 @@ PPPManager::EntryFor(interface_id ID, int32 *saveIndex = NULL) const
 	if(ID == PPP_UNDEFINED_INTERFACE_ID)
 		return NULL;
 	
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry && entry->interface->ID() == ID) {
@@ -651,7 +667,7 @@ PPPManager::EntryFor(interface_id ID, int32 *saveIndex = NULL) const
 }
 
 
-interface_entry*
+ppp_interface_entry*
 PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 {
 	if(!ifp)
@@ -661,7 +677,7 @@ PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 	printf("PPPManager: EntryFor(%s%d)\n", ifp->name, ifp->if_unit);
 #endif
 	
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry && entry->interface->Ifnet() == ifp) {
@@ -689,7 +705,7 @@ PPPManager::FindUnit() const
 	// Find the smallest unused unit.
 	int32 *units = new int32[fEntries.CountItems()];
 	
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry && entry->interface->Ifnet())
@@ -718,7 +734,7 @@ PPPManager::DeleterThreadEvent()
 	LockerHelper locker(fLock);
 	
 	// delete and remove marked interfaces
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(!entry) {
@@ -742,7 +758,7 @@ PPPManager::Pulse()
 {
 	LockerHelper locker(fLock);
 	
-	interface_entry *entry;
+	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry)

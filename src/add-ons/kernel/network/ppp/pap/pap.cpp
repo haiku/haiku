@@ -49,7 +49,7 @@ add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	}
 	
 #if DEBUG
-	printf("IPCP: add_to(): %s\n",
+	printf("PAP: add_to(): %s\n",
 		success && pap && pap->InitCheck() == B_OK ? "OK" : "ERROR");
 #endif
 	

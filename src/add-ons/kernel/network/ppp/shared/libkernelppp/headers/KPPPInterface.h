@@ -31,6 +31,7 @@ class PPPOptionHandler;
 
 struct ppp_interface_module_info;
 struct ppp_module_info;
+struct ppp_interface_entry;
 
 
 class PPPInterface : public PPPLayer {
@@ -44,8 +45,8 @@ class PPPInterface : public PPPLayer {
 		PPPInterface& operator= (const PPPInterface& copy);
 		
 		// only PPPManager may construct us!
-		PPPInterface(interface_id ID, const driver_settings *settings,
-			PPPInterface *parent = NULL);
+		PPPInterface(ppp_interface_entry *entry, interface_id ID,
+			const driver_settings *settings, PPPInterface *parent = NULL);
 		~PPPInterface();
 
 	public:

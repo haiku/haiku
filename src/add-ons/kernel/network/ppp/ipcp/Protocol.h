@@ -23,7 +23,7 @@
 typedef struct ip_item {
 	uint8 type;
 	uint8 length;
-	in_addr_t address;
+	in_addr_t address _PACKED;
 } ip_item;
 
 
@@ -54,7 +54,7 @@ typedef struct ipcp_configuration {
 } ipcp_configuration;
 
 
-extern struct protosw *proto[];
+extern struct protosw *gProto[];
 	// defined in ipcp.cpp
 
 
@@ -65,6 +65,8 @@ class IPCP : public PPPProtocol {
 		
 		ppp_state State() const
 			{ return fState; }
+		
+		virtual status_t StackControl(uint32 op, void *data);
 		
 		virtual bool Up();
 		virtual bool Down();

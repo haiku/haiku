@@ -24,7 +24,7 @@
 
 
 #if DEBUG
-static char digits[] = "0123456789ABCDEF";
+static char sDigits[] = "0123456789ABCDEF";
 void
 dump_packet(struct mbuf *packet)
 {
@@ -39,8 +39,8 @@ dump_packet(struct mbuf *packet)
 		packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
 	
 	for(uint32 index = 0; index < packet->m_len; index++) {
-		buffer[bufferIndex++] = digits[data[index] >> 4];
-		buffer[bufferIndex++] = digits[data[index] & 0x0F];
+		buffer[bufferIndex++] = sDigits[data[index] >> 4];
+		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
 		if(bufferIndex == 32 || index == packet->m_len - 1) {
 			buffer[bufferIndex] = 0;
 			printf("%s\n", buffer);

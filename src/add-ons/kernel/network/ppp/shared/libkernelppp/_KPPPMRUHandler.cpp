@@ -18,7 +18,7 @@
 typedef struct mru_item {
 	uint8 type;
 	uint8 length;
-	uint16 MRU;
+	uint16 MRU _PACKED;
 } mru_item;
 
 status_t ParseRequestedItem(mru_item *item, PPPInterface& interface);

@@ -12,7 +12,8 @@
 #include <LockerHelper.h>
 
 #include <cstring>
-#include <netinet/in.h>
+//#include <netinet/in.h>
+#include <netinet/in_var.h>
 #include <core_funcs.h>
 #include <sys/sockio.h>
 
@@ -59,13 +60,43 @@ IPCP::IPCP(PPPInterface& interface, driver_parameter *settings)
 		else if(!strcasecmp(settings->parameters[index].name, "Peer"))
 			ParseSideRequests(&settings->parameters[index], PPP_PEER_SIDE);
 	}
-	
-	UpdateAddresses();
 }
 
 
 IPCP::~IPCP()
 {
+}
+
+
+status_t
+IPCP::StackControl(uint32 op, void *data)
+{
+#if DEBUG
+	printf("IPCP: StackControl(op=%ld)\n", op);
+#endif
+	
+	// TODO:
+	// check values
+	
+	switch(op) {
+		case SIOCSIFADDR:
+		break;
+		
+		case SIOCSIFFLAGS:
+		break;
+		
+		case SIOCSIFDSTADDR:
+		break;
+		
+		case SIOCSIFNETMASK:
+		break;
+		
+		default:
+			printf("IPCP: Unknown ioctl: %ld\n", op);
+			return PPPProtocol::StackControl(op, data);
+	}
+	
+	return B_OK;
 }
 
 
@@ -149,12 +180,12 @@ IPCP::Down()
 status_t
 IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 {
-	if(protocolNumber != IPCP_PROTOCOL && protocolNumber != IP_PROTOCOL) {
-		m_freem(packet);
-		return B_ERROR;
-	}
+	if((protocolNumber == IP_PROTOCOL && State() == PPP_OPENED_STATE)
+			|| protocolNumber == IPCP_PROTOCOL)
+		return SendToNext(packet, protocolNumber);
 	
-	return SendToNext(packet, protocolNumber);
+	m_freem(packet);
+	return B_ERROR;
 }
 
 
@@ -182,7 +213,6 @@ IPCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 	
 	if(ntohs(data->length) < 4)
 		return B_ERROR;
-	
 	
 	// packet is freed by event methods
 	switch(data->code) {
@@ -224,7 +254,7 @@ IPCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 status_t
 IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 {
-	if(protocolNumber != IP_PROTOCOL)
+	if(protocolNumber != IP_PROTOCOL || State() != PPP_OPENED_STATE)
 		return PPP_UNHANDLED;
 	
 	if(!packet)
@@ -232,8 +262,8 @@ IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 	
 	// TODO: add VJC support (the packet would be decoded here)
 	
-	if (proto[IPPROTO_IP] && proto[IPPROTO_IP]->pr_input) {
-		proto[IPPROTO_IP]->pr_input(packet, 0);
+	if (gProto[IPPROTO_IP] && gProto[IPPROTO_IP]->pr_input) {
+		gProto[IPPROTO_IP]->pr_input(packet, 0);
 		return B_OK;
 	} else {
 		printf("IPCP: Error: Could not find input function for IP!\n");
@@ -333,19 +363,53 @@ IPCP::UpdateAddresses()
 	if(!Interface().IsUp() && !Interface().DoesDialOnDemand())
 		return;
 	
-	struct sockaddr_in *address;
-	struct ifreq ifreq;
-	memset(&ifreq, 0, sizeof(ifreq));
+	in_addr_t netmask;
+	struct in_aliasreq inreq;
+	struct ifreq ifreqAddress, ifreqDestination;
 	
-	address = (struct sockaddr_in*) &ifreq.ifr_addr;
-	address->sin_family = AF_INET;
-	address->sin_addr.s_addr = fLocalConfiguration.address;
-	in_control(NULL, SIOCSIFADDR, (caddr_t) &ifreq, Interface().Ifnet());
+	inreq.ifra_addr.sin_family = AF_INET;
+	if(fLocalRequests.address != INADDR_ANY)
+		inreq.ifra_addr.sin_addr.s_addr = fLocalRequests.address;
+	else if(fLocalConfiguration.address == INADDR_ANY)
+		inreq.ifra_addr.sin_addr.s_addr = INADDR_BROADCAST;
+	else
+		inreq.ifra_addr.sin_addr.s_addr = fLocalConfiguration.address;
+	inreq.ifra_addr.sin_len = sizeof(sockaddr_in);
+	memcpy(&ifreqAddress.ifr_addr, &inreq.ifra_addr, sizeof(sockaddr_in));
 	
-	address = (struct sockaddr_in*) &ifreq.ifr_dstaddr;
-	address->sin_family = AF_INET;
-	address->sin_addr.s_addr = fPeerConfiguration.address;
-	in_control(NULL, SIOCSIFDSTADDR, (caddr_t) &ifreq, Interface().Ifnet());
+	inreq.ifra_dstaddr.sin_family = AF_INET;
+	if(fPeerRequests.address != INADDR_ANY)
+		inreq.ifra_dstaddr.sin_addr.s_addr = fPeerRequests.address;
+	else if(fPeerConfiguration.address == INADDR_ANY)
+		inreq.ifra_dstaddr.sin_addr.s_addr = INADDR_BROADCAST;
+	else
+		inreq.ifra_dstaddr.sin_addr.s_addr = fPeerConfiguration.address;
+	inreq.ifra_dstaddr.sin_len = sizeof(sockaddr_in);
+	memcpy(&ifreqDestination.ifr_dstaddr, &inreq.ifra_dstaddr, sizeof(sockaddr_in));
+	
+	inreq.ifra_mask.sin_family = AF_INET;
+	if(fLocalRequests.netmask != INADDR_ANY)
+		netmask = fLocalRequests.netmask;
+	else if(State() != PPP_OPENED_STATE)
+		netmask = INADDR_BROADCAST;
+	else if(IN_CLASSA(fLocalConfiguration.address))
+		netmask = IN_CLASSA_NET;
+	else if(IN_CLASSB(fLocalConfiguration.address))
+		netmask = IN_CLASSB_NET;
+	else
+		netmask = IN_CLASSC_NET;
+	inreq.ifra_mask.sin_addr.s_addr = netmask;
+	inreq.ifra_mask.sin_len = sizeof(sockaddr_in);
+	
+	if(in_control(NULL, SIOCSIFADDR, (caddr_t) &ifreqAddress,
+			Interface().Ifnet()) != B_OK)
+		printf("IPCP: UpdateAddress(): SIOCSIFADDR returned error!\n");
+	if(in_control(NULL, SIOCSIFDSTADDR, (caddr_t) &ifreqDestination,
+			Interface().Ifnet()) != B_OK)
+		printf("IPCP: UpdateAddress(): SIOCSIFDSTADDR returned error!\n");
+	if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq.ifra_mask,
+			Interface().Ifnet()) != B_OK)
+		printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
 }
 
 
@@ -490,7 +554,8 @@ IPCP::RCREvent(struct mbuf *packet)
 				if(item->length != 6) {
 					// the packet is invalid
 					m_freem(packet);
-					Down();
+					NewState(PPP_INITIAL_STATE);
+					ReportUpFailedEvent();
 					return;
 				}
 				
@@ -499,7 +564,8 @@ IPCP::RCREvent(struct mbuf *packet)
 					if(*requestedAddress == INADDR_ANY) {
 						// we do not have an address for you
 						m_freem(packet);
-						Down();
+						NewState(PPP_INITIAL_STATE);
+						ReportUpFailedEvent();
 						return;
 					}
 				} else if(*requestedAddress != *wishedAddress) {
@@ -828,7 +894,8 @@ IPCP::RCNEvent(struct mbuf *packet)
 				default:
 					// DNS and addresses must be supported if we set them to auto
 					m_freem(packet);
-					Down();
+					NewState(PPP_INITIAL_STATE);
+					ReportUpFailedEvent();
 					return;
 			}
 		}
@@ -1085,8 +1152,17 @@ IPCP::SendConfigureRequest()
 	
 	// add address
 	ipItem.type = IPCP_ADDRESS;
-	ipItem.address = fLocalRequests.address;
+	if(fLocalRequests.address == INADDR_ANY)
+		ipItem.address = fLocalConfiguration.address;
+	else
+		ipItem.address = fLocalRequests.address;
 	request.AddItem((ppp_configure_item*) &ipItem);
+	
+#if DEBUG
+	printf("IPCP: SCR: confaddr=%lX; reqaddr=%lX; addr=%lX\n",
+		fLocalConfiguration.address, fLocalRequests.address,
+		((ip_item*)request.ItemAt(0))->address);
+#endif
 	
 	// add primary DNS (if needed)
 	if(fRequestPrimaryDNS && fLocalRequests.primaryDNS == INADDR_ANY) {

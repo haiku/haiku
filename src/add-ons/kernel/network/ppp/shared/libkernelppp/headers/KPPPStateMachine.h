@@ -22,6 +22,7 @@ class PPPProtocol;
 class PPPStateMachine {
 		friend class PPPInterface;
 		friend class PPPLCP;
+		friend class PPPManager;
 
 	private:
 		// may only be constructed/destructed by PPPInterface

@@ -26,11 +26,9 @@
 
 #define IPCP_MODULE_NAME		"network/ppp/ipcp"
 
-struct protosw *proto[IPPROTO_MAX];
+struct protosw *gProto[IPPROTO_MAX];
 struct core_module_info *core = NULL;
 status_t std_ops(int32 op, ...);
-
-static BLocker lock;
 
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -91,8 +89,8 @@ std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			if(get_module(NET_CORE_MODULE_NAME, (module_info**) &core) != B_OK)
 				return B_ERROR;
-			memset(proto, 0, sizeof(struct protosw*) * IPPROTO_MAX);
-			add_protosw(proto, NET_LAYER1);
+			memset(gProto, 0, sizeof(struct protosw*) * IPPROTO_MAX);
+			add_protosw(gProto, NET_LAYER1);
 		return B_OK;
 		
 		case B_MODULE_UNINIT:

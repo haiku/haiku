@@ -15,7 +15,7 @@
 
 
 static void copy_parameter(const driver_parameter *from, driver_parameter *to);
-static void free_driver_parameter(driver_parameter *p);
+static void free_driver_parameter(driver_parameter *parameter);
 
 
 driver_settings*
@@ -85,19 +85,19 @@ free_driver_settings(driver_settings *settings)
 
 static
 void
-free_driver_parameter(driver_parameter *p)
+free_driver_parameter(driver_parameter *parameter)
 {
-	free(p->name);
+	free(parameter->name);
 	
-	for(int32 index = 0; index < p->value_count; index++)
-		free(p->values[index]);
+	for(int32 index = 0; index < parameter->value_count; index++)
+		free(parameter->values[index]);
 	
-	free(p->values);
+	free(parameter->values);
 	
-	for(int32 index = 0; index < p->parameter_count; index++)
-		free_driver_parameter(&p->parameters[index]);
+	for(int32 index = 0; index < parameter->parameter_count; index++)
+		free_driver_parameter(&parameter->parameters[index]);
 	
-	free(p->parameters);
+	free(parameter->parameters);
 }
 
 

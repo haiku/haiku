@@ -20,13 +20,6 @@ extern int ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 extern int ppp_ifnet_ioctl(ifnet *ifp, ulong cmd, caddr_t data);
 
 
-typedef struct interface_entry {
-	PPPInterface *interface;
-	vint32 accessing;
-	bool deleting;
-} interface_entry;
-
-
 class PPPManager {
 	public:
 		PPPManager();
@@ -39,8 +32,8 @@ class PPPManager {
 		
 		interface_id CreateInterface(const driver_settings *settings,
 			interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
-		void DeleteInterface(interface_id ID);
-		void RemoveInterface(interface_id ID);
+		bool DeleteInterface(interface_id ID);
+		bool RemoveInterface(interface_id ID);
 		
 		ifnet *RegisterInterface(interface_id ID);
 		bool UnregisterInterface(interface_id ID);
@@ -59,8 +52,8 @@ class PPPManager {
 			{ return ReportManager().Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
-		interface_entry *EntryFor(interface_id ID, int32 *saveIndex = NULL) const;
-		interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
+		ppp_interface_entry *EntryFor(interface_id ID, int32 *saveIndex = NULL) const;
+		ppp_interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
 		
 		interface_id NextID()
 			{ return (interface_id) atomic_add((int32*) &fNextID, 1); }
@@ -74,8 +67,8 @@ class PPPManager {
 	private:
 		BLocker fLock, fReportLock;
 		PPPReportManager fReportManager;
-		List<interface_entry*> fEntries;
-		interface_id fNextID, fRegisterRequestor;
+		List<ppp_interface_entry*> fEntries;
+		interface_id fNextID;
 		thread_id fDeleterThread, fPulseTimer;
 };
 

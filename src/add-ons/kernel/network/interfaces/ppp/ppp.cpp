@@ -16,14 +16,14 @@
 status_t std_ops(int32 op, ...);
 
 struct core_module_info *core = NULL;
-static PPPManager *manager = NULL;
+static PPPManager *sManager = NULL;
 
 
 int
 ppp_ifnet_stop(ifnet *ifp)
 {
-	if(manager)
-		return manager->Stop(ifp);
+	if(sManager)
+		return sManager->Stop(ifp);
 	else
 		return B_ERROR;
 }
@@ -33,8 +33,8 @@ int
 ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	struct rtentry *rt0)
 {
-	if(manager)
-		return manager->Output(ifp, buf, dst, rt0);
+	if(sManager)
+		return sManager->Output(ifp, buf, dst, rt0);
 	else
 		return B_ERROR;
 }
@@ -43,8 +43,8 @@ ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 int
 ppp_ifnet_ioctl(ifnet *ifp, ulong cmd, caddr_t data)
 {
-	if(manager)
-		return manager->Control(ifp, cmd, data);
+	if(sManager)
+		return sManager->Control(ifp, cmd, data);
 	else
 		return B_ERROR;
 }
@@ -57,7 +57,7 @@ ppp_start(void *cpp)
 	if(cpp)
 		core = (core_module_info*) cpp;
 	
-	manager = new PPPManager;
+	sManager = new PPPManager;
 	
 	return B_OK;
 }
@@ -67,8 +67,8 @@ static
 int
 ppp_stop()
 {
-	delete manager;
-	manager = NULL;
+	delete sManager;
+	sManager = NULL;
 	
 	return B_OK;
 }
@@ -79,8 +79,8 @@ static
 status_t
 ppp_control(uint32 op, void *data, size_t length)
 {
-	if(manager)
-		return manager->Control(op, data, length);
+	if(sManager)
+		return sManager->Control(op, data, length);
 	else
 		return B_ERROR;
 }
@@ -90,28 +90,32 @@ static
 interface_id
 CreateInterface(const driver_settings *settings, interface_id parent)
 {
-	if(manager)
-		return manager->CreateInterface(settings, parent);
+	if(sManager)
+		return sManager->CreateInterface(settings, parent);
 	else
 		return PPP_UNDEFINED_INTERFACE_ID;
 }
 
 
 static
-void
+bool
 DeleteInterface(interface_id ID)
 {
-	if(manager)
-		manager->DeleteInterface(ID);
+	if(sManager)
+		return sManager->DeleteInterface(ID);
+	else
+		return false;
 }
 
 
 static
-void
+bool
 RemoveInterface(interface_id ID)
 {
-	if(manager)
-		manager->RemoveInterface(ID);
+	if(sManager)
+		return sManager->RemoveInterface(ID);
+	else
+		return false;
 }
 
 
@@ -119,8 +123,8 @@ static
 ifnet*
 RegisterInterface(interface_id ID)
 {
-	if(manager)
-		return manager->RegisterInterface(ID);
+	if(sManager)
+		return sManager->RegisterInterface(ID);
 	else
 		return NULL;
 }
@@ -130,8 +134,8 @@ static
 bool
 UnregisterInterface(interface_id ID)
 {
-	if(manager)
-		return manager->UnregisterInterface(ID);
+	if(sManager)
+		return sManager->UnregisterInterface(ID);
 	else
 		return false;
 }
@@ -141,8 +145,8 @@ static
 status_t
 ControlInterface(interface_id ID, uint32 op, void *data, size_t length)
 {
-	if(manager)
-		return manager->ControlInterface(ID, op, data, length);
+	if(sManager)
+		return sManager->ControlInterface(ID, op, data, length);
 	else
 		return B_ERROR;
 }
@@ -153,8 +157,8 @@ int32
 GetInterfaces(interface_id *interfaces, int32 count,
 	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 {
-	if(manager)
-		return manager->GetInterfaces(interfaces, count, filter);
+	if(sManager)
+		return sManager->GetInterfaces(interfaces, count, filter);
 	else
 		return 0;
 }
@@ -164,8 +168,8 @@ static
 int32
 CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 {
-	if(manager)
-		return manager->CountInterfaces(filter);
+	if(sManager)
+		return sManager->CountInterfaces(filter);
 	else
 		return 0;
 }
@@ -175,8 +179,8 @@ static
 void
 EnableReports(ppp_report_type type, thread_id thread, int32 flags = PPP_NO_FLAGS)
 {
-	if(manager)
-		manager->ReportManager().EnableReports(type, thread, flags);
+	if(sManager)
+		sManager->ReportManager().EnableReports(type, thread, flags);
 }
 
 
@@ -184,8 +188,8 @@ static
 void
 DisableReports(ppp_report_type type, thread_id thread)
 {
-	if(manager)
-		manager->ReportManager().DisableReports(type, thread);
+	if(sManager)
+		sManager->ReportManager().DisableReports(type, thread);
 }
 
 
@@ -193,8 +197,8 @@ static
 bool
 DoesReport(ppp_report_type type, thread_id thread)
 {
-	if(manager)
-		return manager->ReportManager().DoesReport(type, thread);
+	if(sManager)
+		return sManager->ReportManager().DoesReport(type, thread);
 	else
 		return false;
 }
