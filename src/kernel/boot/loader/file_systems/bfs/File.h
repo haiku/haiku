@@ -29,6 +29,7 @@ class File : public Node {
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
 		virtual int32 Type() const;
 		virtual off_t Size() const;
+		virtual ino_t Inode() const;
 
 	protected:
 		Stream		fStream;

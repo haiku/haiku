@@ -35,6 +35,7 @@ class Directory : public ::Directory {
 		virtual bool IsEmpty();
 
 		virtual status_t GetName(char *name, size_t size) const;
+		virtual ino_t Inode() const;
 
 	private:
 		Volume			&fVolume;

@@ -134,7 +134,7 @@ Directory::GetNextNode(void *cookie, Node **_node)
 }
 
 
-status_t 
+status_t
 Directory::Rewind(void *cookie)
 {
 	HashIterator *iterator = (HashIterator *)cookie;
@@ -144,7 +144,7 @@ Directory::Rewind(void *cookie)
 }
 
 
-bool 
+bool
 Directory::IsEmpty()
 {
 	int32 index;
@@ -152,10 +152,17 @@ Directory::IsEmpty()
 }
 
 
-status_t 
+status_t
 Directory::GetName(char *name, size_t size) const
 {
 	return fNode.GetName(name, size);
+}
+
+
+ino_t
+Directory::Inode() const
+{
+	return fNode.HeaderKey();
 }
 
 }	// namespace FFS

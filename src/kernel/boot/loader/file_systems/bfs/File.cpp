@@ -62,24 +62,31 @@ File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 }
 
 
-status_t 
+status_t
 File::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return fStream.GetName(nameBuffer, bufferSize);
 }
 
 
-int32 
+int32
 File::Type() const
 {
 	return S_IFREG;
 }
 
 
-off_t 
+off_t
 File::Size() const
 {
 	return fStream.Size();
+}
+
+
+ino_t
+File::Inode() const
+{
+	return fStream.ID();
 }
 
 }	// namespace BFS

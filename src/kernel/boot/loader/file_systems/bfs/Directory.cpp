@@ -179,7 +179,7 @@ Directory::IsEmpty()
 }
 
 
-status_t 
+status_t
 Directory::GetName(char *name, size_t size) const
 {
 	if (fStream.inode_num == fStream.GetVolume().Root()) {
@@ -188,6 +188,13 @@ Directory::GetName(char *name, size_t size) const
 	}
 
 	return fStream.GetName(name, size);
+}
+
+
+ino_t
+Directory::Inode() const
+{
+	return fStream.ID();
 }
 
 }	// namespace BFS

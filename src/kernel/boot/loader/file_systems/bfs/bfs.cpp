@@ -150,6 +150,7 @@ bfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 
 
 file_system_module_info gBFSFileSystemModule = {
+	"file_systems/bfs/v1",
 	kPartitionTypeBFS,
 	bfs_get_file_system
 };

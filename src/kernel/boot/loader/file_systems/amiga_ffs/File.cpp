@@ -247,4 +247,11 @@ File::Size() const
 	return fNode.Size();
 }
 
+
+ino_t
+File::Inode() const
+{
+	return fNode.HeaderKey();
+}
+
 }	// namespace FFS
