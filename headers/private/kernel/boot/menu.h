@@ -95,6 +95,7 @@ class Menu {
 		int32 IndexOf(MenuItem *item);
 		int32 CountItems() const;
 
+		MenuItem *FindItem(const char *label);
 		MenuItem *FindMarked();
 		MenuItem *FindSelected(int32 *_index = NULL);
 
@@ -103,6 +104,9 @@ class Menu {
 
 		MenuItem *RemoveItemAt(int32 index);
 		void RemoveItem(MenuItem *item);
+
+		MenuItem *Superitem() const { return fSuperItem; }
+		Menu *Supermenu() const { return fSuperItem ? fSuperItem->fMenu : NULL; }
 
 		const char *Title() const { return fTitle; }
 
@@ -117,6 +121,7 @@ class Menu {
 		bool			fIsHidden;
 		MenuItemList	fItems;
 		menu_type		fType;
+		MenuItem		*fSuperItem;
 };
 
 #endif	/* KERNEL_BOOT_MENU_H */
