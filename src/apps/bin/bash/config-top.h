@@ -74,7 +74,6 @@
 
 /* System-wide .bashrc file for interactive shells. */
 /* #define SYS_BASHRC "/etc/bash.bashrc" */
-#define SYS_BASHRC "/boot/beos/etc/profile"
 
 /* System-wide .bash_logout for login shells. */
 /* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */
