@@ -263,11 +263,13 @@ show_details(const char *name)
 	// ID
 	printf("ID: %ld\n", interface.ID());
 	
-	// DialOnDemand
-	printf("DialOnDemand: %s\n", info.info.doesDialOnDemand ? "Enabled" : "Disabled");
+	// ConnectOnDemand
+	printf("ConnectOnDemand: %s\n", info.info.doesConnectOnDemand ?
+		"Enabled" : "Disabled");
 	
-	// AutoRedial
-	printf("AutoRedial: %s\n", info.info.doesAutoRedial ? "Enabled" : "Disabled");
+	// AutoReconnect
+	printf("AutoReconnect: %s\n", info.info.doesAutoReconnect ?
+		"Enabled" : "Disabled");
 	
 	// MRU and interfaceMTU
 	printf("MRU: %ld\n", info.info.MRU);

@@ -26,6 +26,8 @@ class PPPUpAddon : public DialUpAddon {
 		
 		bool IsNew() const
 			{ return fIsNew; }
+		bool AskBeforeConnecting() const
+			{ return fAskBeforeConnecting; }
 		
 		const char *DeviceName() const
 			{ return fDeviceName.String(); }
@@ -71,7 +73,7 @@ class PPPUpAddon : public DialUpAddon {
 		bool MarkAuthenticatorAsValid(const BString& moduleName);
 
 	private:
-		bool fIsNew, fHasPassword;
+		bool fIsNew, fAskBeforeConnecting, fHasPassword;
 		BString fDeviceName, fAuthenticatorName, fUsername, fPassword;
 		DialUpAddon *fDeviceAddon;
 		int32 fAuthenticatorsCount;

@@ -159,8 +159,8 @@ ConnectionView::AttachedToWindow()
 	fCancelButton->SetTarget(this);
 	fSettings.LoadSettings(fInterfaceName.String(), false);
 	
-	if(fAddon->CountAuthenticators() == 0 || fAddon->HasPassword())
-	// TODO: || AskBeforeDialing == true
+	if(fAddon->CountAuthenticators() == 0 || fAddon->HasPassword()
+			|| fAddon->AskBeforeConnecting())
 		Connect();
 }
 
@@ -256,8 +256,8 @@ ConnectionView::Cancel()
 		interface->GetInterfaceInfo(&info);
 		
 		if(info.info.phase < PPP_ESTABLISHED_PHASE) {
-			thread_id down = spawn_thread(down_thread, "up_thread", B_NORMAL_PRIORITY,
-				interface);
+			thread_id down = spawn_thread(down_thread, "down_thread",
+				B_NORMAL_PRIORITY, interface);
 			resume_thread(down);
 		} else
 			delete interface;
@@ -282,8 +282,8 @@ ConnectionView::AttemptString() const
 	ppp_interface_info_t info;
 	interface.GetInterfaceInfo(&info);
 	BString attempt;
-	attempt << "Attempt " << info.info.dialRetry << " of " <<
-		info.info.dialRetriesLimit;
+	attempt << "Attempt " << info.info.connectRetry << " of " <<
+		info.info.connectRetriesLimit;
 	
 	return attempt;
 }

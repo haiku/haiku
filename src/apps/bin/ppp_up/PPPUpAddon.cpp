@@ -7,6 +7,7 @@
 
 #include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
+#include "settings_tools.h"
 
 #include <Box.h>
 #include <Button.h>
@@ -20,6 +21,7 @@
 
 PPPUpAddon::PPPUpAddon(BMessage *addons, ConnectionView *connectionView)
 	: DialUpAddon(addons),
+	fAskBeforeConnecting(false),
 	fHasPassword(false),
 	fAuthenticatorsCount(0),
 	fSettings(NULL),
@@ -51,7 +53,7 @@ bool
 PPPUpAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 {
 	fIsNew = isNew;
-	fHasPassword = false;
+	fAskBeforeConnecting = fHasPassword = false;
 	fDeviceName = fUsername = fPassword = "";
 	fDeviceAddon = NULL;
 	fAuthenticatorsCount = 0;
@@ -62,6 +64,18 @@ PPPUpAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	
 	if(!settings || !profile || isNew)
 		return true;
+	
+	BMessage parameter;
+	int32 index = 0;
+	const char *value;
+	if(FindMessageParameter(PPP_ASK_BEFORE_CONNECTING_KEY, *fSettings, &parameter,
+			&index) && parameter.FindString(MDSU_VALUES, &value) == B_OK) {
+		if(get_boolean_value(value, false))
+			fAskBeforeConnecting = true;
+		
+		parameter.AddBool(MDSU_VALID, true);
+		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
+	}
 	
 	if(!LoadDeviceSettings())
 		return false;
