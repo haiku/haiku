@@ -2154,12 +2154,15 @@ user_memcpy(void *to, const void *from, size_t size)
 }
 
 
-int
-user_strcpy(char *to, const char *from)
-{
-	return arch_cpu_user_strcpy(to, from, &thread_get_current_thread()->fault_handler);
-}
-
+/**	\brief Copies at most (\a size - 1) characters from the string in \a from to
+ *	the string in \a to, NULL-terminating the result.
+ *
+ *	\param to Pointer to the destination C-string.
+ *	\param from Pointer to the source C-string.
+ *	\param size Size in bytes of the string buffer pointed to by \a to.
+ *	
+ *	\return strlen(\a from).
+ */
 
 int
 user_strlcpy(char *to, const char *from, size_t size)
