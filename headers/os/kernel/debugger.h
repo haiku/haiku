@@ -131,7 +131,11 @@ typedef enum {
 	B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,	// clear a breakpoint
 	B_DEBUG_MESSAGE_SET_WATCHPOINT,		// set a watchpoint
 	B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,	// clear a watchpoint
-	
+
+	B_DEBUG_MESSAGE_PREPARE_HANDOVER,	// prepares the debugged team for being
+										// handed over to another debugger;
+										// the new debugger can just invoke
+										// install_team_debugger()
 } debug_nub_message;
 
 // maximal number of bytes to read/write via B_{READ,WRITE]_MEMORY
@@ -249,6 +253,12 @@ typedef struct {
 typedef struct {
 	void		*address;		// watchpoint address
 } debug_nub_clear_watchpoint;
+
+// B_DEBUG_MESSAGE_PREPARE_HANDOVER
+
+typedef struct {
+	status_t	error;			// B_OK, if the everything went fine
+} debug_nub_prepare_handover_reply;
 
 // union of all messages structures sent to the debug nub thread
 typedef union {
