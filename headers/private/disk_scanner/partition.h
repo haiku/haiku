@@ -29,15 +29,22 @@ typedef status_t (*partition_partition_hook)(int deviceFD,
 
 typedef struct partition_module_info {
 	module_info								module;
+	const char								*short_name;
 
 	partition_identify_hook					identify;
 	partition_get_nth_info_hook				get_nth_info;
-	partition_identify_module_hook			identify_module;
 	partition_get_partitioning_params_hook	get_partitioning_params;
 	partition_partition_hook				partition;
 } partition_module_info;
 
 /*
+	short_name:
+	----------
+
+	Identifies the module. That's the identifier to be passed to
+	partition_session().
+
+
 	identify():
 	----------
 
@@ -74,18 +81,6 @@ typedef struct partition_module_info {
 
 	Returns B_OK, if successful, B_ENTRY_NOT_FOUND, if the index is out of
 	range.
-
-
-	identify_module():
-	-----------------
-
-	Returns whether the module knows the supplied identifier. The module to
-	be used to partition a session is identified by this identifier.
-
-	params:
-	identifier: the identifier
-
-	Returns true, if the module knows the identifier, false otherwise.
 
 
 	get_partitioning_params():

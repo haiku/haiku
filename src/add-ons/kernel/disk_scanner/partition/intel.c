@@ -21,6 +21,10 @@
 
 #define INTEL_PARTITION_MODULE_NAME "disk_scanner/partition/intel/v1"
 
+// partition module identifier
+//static const char *const kShortModuleName = "intel";
+#define kShortModuleName "intel"
+
 // the maximal number of partitions we support (size of some static arrays)
 static const int32 MAX_PARTITION_COUNT = 64;
 
@@ -427,14 +431,6 @@ intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
 	return error;
 }
 
-// intel_identify_module
-static
-bool
-intel_identify_module(const char *identifier)
-{
-	return (identifier && !strcmp(identifier, "intel"));
-}
-
 // intel_get_partitioning_params
 static
 status_t
@@ -466,9 +462,10 @@ static partition_module_info intel_partition_module =
 		0,	// better B_KEEP_LOADED?
 		std_ops
 	},
+	kShortModuleName,
+
 	intel_identify,
 	intel_get_nth_info,
-	intel_identify_module,
 	intel_get_partitioning_params,
 	intel_partition,
 };
