@@ -161,7 +161,7 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	fWorkspaceMenu->AddSeparatorItem();
 	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Default folder", 
 		new BMessage(DEFAULT_FOLDER)));
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Other folder...", 
+	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Other folder" B_UTF8_ELLIPSIS, 
 		new BMessage(OTHER_FOLDER)));
 	fWorkspaceMenu->AddSeparatorItem();
 	
@@ -169,7 +169,7 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(NONE_IMAGE)));
 	fImageMenu->AddSeparatorItem();
 	fImageMenu->AddSeparatorItem();
-	fImageMenu->AddItem(new BMenuItem("Other...", new BMessage(OTHER_IMAGE)));
+	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(OTHER_IMAGE)));
 	
 	fPlacementMenu = new BPopUpMenu("pick one");
 	fPlacementMenu->AddItem(new BMenuItem("Manual", 
