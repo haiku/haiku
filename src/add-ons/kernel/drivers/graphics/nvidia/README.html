@@ -2,19 +2,54 @@
 <head>
 	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
 	<meta name="GENERATOR" content="The DarkSite">
-	<title>Readme for (open)BeOS Nvidia TNT/GeForce driver V0.07</title>
+	<title>Readme for (open)BeOS Unified Nvidia graphics driver</title>
 </head>
 <body>
-<h2 align="center">Nvidia TNT/GeForce graphics driver for (open)BeOS</h2></align><br><br>
-<h2>Installation:</h2>
-This is the 0.07 release of the (open)BeOS Nvidia TNT/GeForce display driver.<br>
+<h2 align="center">Unified Nvidia graphics driver for (open)BeOS</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
 You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!<br>
 <br>
 Especially owners of laptops are encouraged to be extra carefull with their internal panels. A refresh setting higher than 60Hz might destroy the panel!</h3>
 <hr>
+<h2>Supported cards (as far as is known):</h2>
+<ul>
+	<li>TNT 1/2;
+	<li>TNT 2-M64;
+	<li>Vanta/Aladdin TNT2;
+	<li>GeForce 256;
+	<li>GeForce 2 MX/Ti/GTS/Go (Go only with external monitor);
+	<li>GeForce 2 Integrated GPU (Nforce) (setup RAM amount manually for now);
+	<li>GeForce 3 (Ti);
+	<li>GeForce 4 MX/Ti/Go (Go only with external monitor);
+	<li>GeForce 4 Integrated GPU (Nforce 2) (setup RAM amount manually for now);
+	<li>GeForce FX 5200/5600/5800/5900/Go (Go only with external monitor);
+	<li>Quadro (2/4/FX/Go) (Go only with external monitor).
+</ul>
 <br>
+<hr>
+<h2>Features:</h2>
+<ul>
+	<li>Hardware cursor support;
+	<li>Full 2D acceleration;
+	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
+	<li>DPMS support;
+	<li>B_YCbCr422 hardware overlay support on all cards (so on both TNT and GeForce series).
+</ul>
+<strong>Known limitations:</strong> 
+<ul>
+	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>If the driver seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site);
+	<li>256Mb RAM detection is still missing for cards that have that much of it: Please set the amount manually for now via the nv.settings file (driver defaults to 16Mb if you don't);
+	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
+	<li>No DVI support: you have to use a standard VGA cable to connect external flatpanels;
+	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file (driver probably defaults to 1Mb if you don't). If you have overlay trouble, set a slightly smaller amount of RAM than you actually specified in the system BIOS (1Mb less or so);
+	<li>A few cards have hardcursor trouble. If you encounter this use the softcursor: select this via the nv.settings file;
+	<li>GeForce FX 5700 and FX 5950 are not yet supported (mail me if you own such a card!).
+</ul>
+<br>
+<hr>
+<h2>Installation:</h2>
 If you encounter bugs, please checkout the driver's <a href="http://web.inter.nl.net/users/be-hold/BeOS/NVdriver/index.html">website</a> to see if it's already on the todo list. You can also checkout the <a href="UPDATE.html">UPDATE</a> file included with this driver to see if it should have been fixed. If you think it's prudent, or if you are unsure, then please fill out the <a href="http://web.inter.nl.net/users/be-hold/BeOS/NVdriver/bugreport.html">bugreport form</a> on the site or send me an <a href="mailto:rag.cornelissen@inter.nl.net">Email</a>. Make sure you are as precise as possible because that will make things easier to trackdown and fix...<br>
 <br>
 <br>
@@ -27,35 +62,25 @@ BeOS first checks (during boot) if there are 'user-addons' that should be loaded
 <br><br>
 <strong>actual INSTALLATION:</strong><br>
 <br>
-In a terminal switch to the 'openBeOS_Nvidia_V0.07_src' folder and type:<br>
-make install<br>
-<br>
-You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
-<br>
-<br>
-<strong>DE-INSTALLATION:</strong><br>
-<br>
-In a terminal switch to the 'openBeOS_Nvidia_V0.07_src' folder and type:<br>
-make uninstall<br>
-<br>
-You have to reboot in order to apply the original configuration.<br>
+Doubleclick on the install.sh file and follow the instructions. You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
 <br>
 <br>
 <strong>alternate INSTALLATION method:</strong><br>
 <br>
-In order for the install to work as described above you need to have the developer tools installed. If you don't have that, you can still do a manual install by copying some files from the <strong>obj/</strong> folder:<br> 
-<br>
-Copy the <strong>nv.accelerant</strong> file to <strong>home/config/add-ons/accelerants/</strong><br>
-Copy the <strong>nv.driver</strong> file to <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
-Copy the <strong>nv.settings</strong> file to <strong>home/config/settings/kernel/drivers/</strong><br>
-Create a <strong>shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which points to the file <strong>nv.driver</strong> you just installed.<br>
-<br>
-Now reboot and you should be using the new driver.<br>
+Unzip the zip file that contains the driver to the root folder. Now reboot and you should be using the new driver.<br>
 <br>
 <br>
-<strong>alternate DE-INSTALLATION method:</strong><br>
+<strong>DE-INSTALLATION:</strong><br>
 <br>
-Just delete the three files and the shortcut created as described in the <strong>alternate INSTALLATION method</strong>. When you're done, reboot. The original configuration will now be in effect again.<br> 
+Currently there's no uninstall script included. Just do it manually:<br>
+<br>
+Delete the <strong>nv.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>nv.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>nv.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>nv.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>nv.driver</strong>.<br>
+<br>
+You have to reboot in order to apply the original configuration.<br>
+<br>
 <br>
 <hr>
 <a name="settings"></a><h2>Settings:</h2><br>
@@ -72,14 +97,15 @@ Please read this information carefully *before* installing and using the (open)B
 		This option enables you to override the 'memory amount autodetection' of the driver. If autodetection is working incorrect, you can manually set the amount this way. You could also lower the amount of RAM to a lower value than actually there to test with for instance overlay use in applications. So this option is probably mostly of interest to developers. Specify the RAM amount in Mb (use only 'whole' numbers!).<br>
 This option is disabled by default (preceded by a '#').<br>
 <li><strong>hardcursor:</strong><br>
+	A hardcursor is nessesary for DirectWindow windowed mode support.
 	<ul>
 		<li><strong>false:</strong><br>
 		If you have trouble with the hardcursor, select <strong>hardcursor false</strong>. Make sure you let me know about the hardcursor trouble also: this should not happen!
 		<li><strong>true:</strong> (default setting)<br>
-		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting.
+		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
 	</ul>
 <li><strong>logmask:</strong> (set to minimal by default)<br>
-The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nv.accelerant.log</strong> in hour <strong>~ (home)</strong> folder.<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nv.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>nv.accelerant.1.log</strong>, and it will also be in your home folder.<br>
 <strong>Note:</strong>
 <ul>
 <li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
@@ -97,6 +123,6 @@ Dumprom is another 'tool' for bug-tracking purposes.
 <hr>
 <br>
 <a href="mailto:rag.cornelissen@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on October 28, 2003)</p>
+<p>(Page last updated on January 8, 2004)</p>
 </body>
 </html>

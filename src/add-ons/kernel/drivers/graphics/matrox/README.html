@@ -2,24 +2,74 @@
 <head>
 	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
 	<meta name="GENERATOR" content="The DarkSite">
-	<title>Readme for (open)BeOS MATROX MGA driver V0.14</title>
+	<title>Readme for (open)BeOS Unified Matrox graphics driver</title>
 </head>
 <body>
-<h2 align="center">Matrox G100/G200/G400/G450/G550 driver for (open)BeOS</h2></align><br><br>
-<h2>Installation:</h2>
-This is the 0.14 release of the (open)BeOS Matrox display driver.<br>
+<h2 align="center">Unified Matrox graphics driver for (open)BeOS</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
 You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
 <hr>
+<h2>Supported cards:</h2>
+<ul>
+	<li>Millenium I (preliminary)
+	<li>Millenium II (preliminary)
+	<li>G100
+	<li>G200
+	<li>G400
+	<li>G450
+	<li>G550
+</ul>
 <br>
+<hr>
+<h2>Features:</h2>
+<ul>
+	<li>Millenium I/II (preliminary):
+	<ul>
+		<li>Hardware cursor support;
+		<li>Full 2D acceleration;
+		<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
+		<li>Sync_on_green support;
+		<li>DPMS support;
+	</ul>
+	<li>G100-G550:
+	<ul>
+ 		<li>Hardware cursor support on one head;
+		<li>Full 2D acceleration;
+		<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
+		<li>Full card coldstart support (important if you use such a card as secondary videocard);
+		<li>Sync_on_green support: G400, G450 and G550 apparantly miss the needed board wiring to actually support this fully though;
+		<li>DPMS support on both heads;
+	</ul>
+	<li>G200-G550:
+	<ul>
+		<li>B_YCbCr422 hardware overlay support on one head (including 'hardware zoom');
+	</ul>
+	<li>G400-G550:
+	<ul>
+ 		<li>Dualhead functionality;<br>
+			<strong>Note:</strong> You need <strong>Dualhead Setup</strong> for use of dualhead modes.
+		<li>TVout support: Desktop modes: G400 only for now; Video modes: G400-G550.<br>
+            <strong>Note:</strong> You need <strong>Dualhead Setup</strong> for use of Desktop TVout modes, and you need <strong>VideoScreen V6</strong> for use of Video TVout modes (for now).
+	</ul>
+</ul>
+<strong>current MGA driver limitations:</strong><br><br>
+<ul>
+	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>Expansion RAM modules are not supported as far as I know;
+	<li>Special versions of G200 apparantly have colorpalette problems (Marvel, Matrox MMS cards like the HP VisualizeFX ). Use them in 32bit mode; overlay and hardware cursor should be OK.
+	<li>G400 cards have overscanning rubbish visible on the top of the screen if spaces with virtual height are used on the secondary head in monitor mode. This cannot be fixed decently, and is caused by a MAVEN hardware design fault.
+</ul>
+<br>
+<hr>
+<h2>Installation:</h2>
 If you encounter bugs, please checkout the driver's <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/index.html">website</a> to see if it's already on the todo list. You can also checkout the <a href="UPDATE.html">UPDATE</a> file included with this driver to see if it should have been fixed. If you think it's prudent, or if you are unsure, then please fill out the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/bugreport.html">bugreport</a> on the site or send me an <a href="mailto:rag.cornelissen@inter.nl.net">Email</a>. Make sure you are as precise as possible because that will make things easier to trackdown and fix...<br>
 <br>
 <br>
 OK, now that's all said let's get to it ;-)<br>
 <br>
 In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
-BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the (open)BeOS Matrox MGA driver.<br>
+BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the (open)BeOS Matrox graphics driver.<br>
 <br>
 Since BeOS only supports all Matrox cards upto and including G400 you will end up in VGA grayscale videomode if you have a G450 or G550. Otherwise, you will have a normal colorfull Desktop. Only BeOS will be using it's own official drivers in this case...<br>
 <strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the mga.settings file...<br>
@@ -38,19 +88,34 @@ In order to do this, you need to delete two files (and reboot afterwards). Here'
 	<li>In: <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
 		delete: <strong>gx00.driver</strong> 
 		(You *should* find 'mga.driver' there if you already installed the openBeOS driver V0.13 alpha2 or up.)
-	<li>You can also delete the <strong>mgaGx00.log</strong> logfile which is generated by Mark's driver in your <strong>home</strong> folder. (The logfile called 'mga.accelerant.log' the new driver generates is located there also. You may delete that if it gets too big: the (open)BeOS driver simply creates a new one from scratch when needed.)
+	<li>You can also delete the <strong>mgaGx00.log</strong> logfile which is generated by Mark's driver in your <strong>home</strong> folder. (The logfile called 'mga.accelerant.0.log' the new driver generates is located there also. You may delete that if it gets too big: the (open)BeOS driver simply creates a new one from scratch when needed. The same applies for a possibly existing 'mga.accelerant.1.log' file, generated by clone accelerants.)
 </ul>
-If you install a new version of the (open)BeOS MGA driver later on you won't encounter this manual thing again: it's a one-time thing only. The install script Apsed wrote for the (open)BeOS MGA driver uninstalls the previous version automatically. It just does not check for the G400 driver Mark wrote...<br>
+If you install a new version of the (open)BeOS MGA driver later on you won't encounter this manual thing again: it's a one-time thing only.<br>
 <br>
 <br>
 <strong>actual INSTALLATION, part 2:</strong><br>
 <br>
-In a terminal switch to the 'openBeOS_Matrox_V0.14_src' or 'openBeOS_Matrox_V0.14_bin' folder (depending on downloaded version) and type:<br>
-make install<br>
+Doubleclick on the install.sh file and follow the instructions. You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
 <br>
-You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
+<br>
+<strong>alternate INSTALLATION (part 2) method:</strong><br>
+<br>
+Unzip the zip file that contains the driver to the root folder. Now reboot and you should be using the new driver.<br>
+<br>
+<br>
+<strong>DE-INSTALLATION:</strong><br>
+<br>
+Currently there's no uninstall script included. Just do it manually:<br>
+<br>
+Delete the <strong>mga.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>mga.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>mga.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>mga.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>mga.driver</strong>.<br>
+<br>
+You have to reboot in order to apply the original configuration.<br>
+<br>
+<br>
 <hr>
-<br>
 <a name="settings"></a><h2>Settings:</h2><br>
 Please read this information carefully *before* installing and using the (open)BeOS Matrox MGA driver. It might spare you some trouble afterwards..<br>
 <p>The driver uses a file named <strong>mga.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
@@ -83,12 +148,12 @@ This option is disabled by default (preceded by a '#').<br>
 		<li>Memory detection does not work (yet) on Millenium I and II cards. Millenium I is preset to having 2Mb RAM, while Millenium II is preset to having 4Mb RAM. If you have more and want to use it, use the <strong>memory</strong> option to set the driver to the correct amount of RAM.
 	</ul>
 <li><strong>hardcursor:</strong><br>
-	The hardcursor capabilities of the MGA cards are limited to one head only.
+	The hardcursor capabilities of the MGA cards are limited to one head only. A hardcursor is nessesary though for DirectWindow windowed mode support.
 	<ul>
-		<li><strong>false:</strong> (default setting in V0.13 beta2 and later)<br>
+		<li><strong>false:</strong> (default setting in V0.13 beta2 and V0.14)<br>
 		If you want to use dualhead and also want a visible cursor on both heads, select <strong>hardcursor false</strong>. This setting is used by default these days because it's a 'failsafe' setting that works independently of the selected videomode.
-		<li><strong>true:</strong> (default setting in V0.13 beta1)<br>
-		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So for use in singlehead mode <strong>hardcursor true</strong> is the preferred setting.
+		<li><strong>true:</strong> (default setting in V0.13 beta1 and V0.15 and later)<br>
+		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So for use in singlehead mode <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
 	</ul>
 	<strong>Notes:</strong>
  	<ul>
@@ -96,7 +161,7 @@ This option is disabled by default (preceded by a '#').<br>
  		<li>Driverversion V0.14 also introduces Millenium I and II hardcursor support.
 	</ul>
 <li><strong>logmask:</strong> (set to minimal by default)<br>
-The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>mga.accelerant.log</strong> in hour <strong>~ (home)</strong> folder.<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>mga.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>mga.accelerant.1.log</strong>, and it will also be in your home folder.<br>
 <strong>Note:</strong>
 <ul>
 <li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
@@ -125,12 +190,12 @@ Greensync is used to enable an alternate monitor signal synchronisation setup us
 <br>
 <strong>Notes:</strong>
 <ul>
- <li>If you want to use standard TVout or dualhead modes, you need <strong>dualheadSetup</strong>. You can download this <a href="http://www.bebits.com/app/1401" target="blank">application</a> from BeBits.
- <li>If you want to use the VCD or DVD dualhead clone TVout modes on G450 or G550 with driver V0.14 and up, you can download a simple command-line tool called <strong>VideoScreen</strong> for now from the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/tools.html#tools">tools</a> page on the (open)BeOS Matrox MGA driver site.
+ <li>If you want to use standard (Desktop) TVout or dualhead modes, you need <strong>dualheadSetup</strong>. You can download this <a href="http://www.bebits.com/app/1401" target="blank">application</a> from BeBits.
+ <li>If you want to use the VCD or DVD dualhead clone (Video) TVout modes on G400 with driver V0.15 and up, or on G450 or G550 with driver V0.14 and up, you can download a simple command-line tool called <strong>VideoScreen</strong> for now from the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/tools.html#tools">tools</a> page on the (open)BeOS Matrox MGA driver site. For driver V0.15 and up you need the updated V6 version of this tool.
 </ul>
 <hr>
 <br>
 <a href="mailto:rag.cornelissen@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on April 20, 2003)</p>
+<p>(Page last updated on January 8, 2004)</p>
 </body>
 </html>

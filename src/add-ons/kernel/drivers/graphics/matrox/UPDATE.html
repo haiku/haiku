@@ -4,6 +4,48 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head (0.16-1, Rudolf)</h1></p>
+<ul>
+	<li><strong>General:</strong>
+		<ul>
+			<li>Expanded modelist to include suggested modes above 1600x1200 upto 2048x1536 resolution: Done by Andrew Bachmann;
+			<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1600x1200, while the newest cards support upto and including 2048x1536 resolution.
+		</ul>
+</ul>
+<p><h1>mga_driver 0.15 (Rudolf)</h1></p>
+<ul>
+	<li><strong>G400/G400MAX:</strong>
+		<ul>
+			<li>Secondary head (maven) sync polarity programming fixed/implemented for monitor mode: this never worked correctly yet;
+			<li>Fixed TVout aspect ratio, size, position and distortions; also removed refreshrate dependancies. This means the PAL and NTSC Desktop modes 640x480, 800x600 and 1024x768 are fully OK now;
+			<li>Implemented the PAL and NTSC Video VCD and DVD TVout modes: being 640x480 and 720x480 for NTSC; 768x576 and 720x576 for PAL. Checkout the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/tools.html#tools">tools</a> and <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/dvdvideo.html">VCD/DVD on TV</a> stuff;
+			<li>Checked out the overscanning rubbish visible on the top of the screen on the secondary head if spaces with virtual height are used. This cannot be fixed decently for monitor mode due to a MAVEN hardware design fault; fixed TVout modes via a vertical sync 'tweak' though. Also updated the workaround code for non-virtual and virtual-width-only modes to respect RAM size and non-accelerated modes;
+			<li>Updated ProposeMode RAM and virtual width requirement checks for dualhead modes.
+		</ul>
+	<li><strong>G450:</strong>
+		<ul>
+			<li>Updated ProposeMode RAM and virtual width requirement checks for dualhead modes;
+			<li>Added full DPMS support for secondary head;
+			<li>Disabled G400 MAVEN design fault workaround code as the new 'on die MAVEN' is OK.
+		</ul>
+	<li><strong>G550:</strong>
+		<ul>
+			<li>Updated ProposeMode RAM and virtual width requirement checks for dualhead modes;
+			<li>Added full DPMS support for secondary head;
+			<li>Disabled G400 MAVEN design fault workaround code as the new 'on die MAVEN' is OK.
+		</ul>
+	<li><strong>General:</strong>
+		<ul>
+			<li>Retrace sync fix: sync now actually happens during retrace;
+			<li>BWindowScreen R3-style function update for acceleration and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants, fixed acceleration in clones;
+			<li>CRTC timing restriction checking updated;
+			<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
+			<li>Primary head sync polarity programming fixed: this never worked correctly;
+			<li>Fixed/updated DPMS functionality on primary head as only part of it was working;
+			<li>DPMS compatibility update for use with sync_on_green: Secondary head DPMS remains operational; primary head will only blank the display while keeping it's sync in place;
+			<li>Modified the default settings file for use of the hardcursor ('hardcursor true'). It turns out BDirectWindow windowed mode needs this setting for it to be enabled ('Chart' demo app for instance). If you want a cursor on both heads using dualhead you need to change the settings file back to 'hardcursor false' yourself now.
+		</ul>
+</ul>
 <p><h1>mga_driver 0.14 (Rudolf)</h1></p>
 <ul>
 	<li><strong>Millenium I:</strong>

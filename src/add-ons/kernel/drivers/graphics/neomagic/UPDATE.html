@@ -4,6 +4,13 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head (0.06-1, Rudolf)</h1></p>
+<ul>
+	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
+	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
+	<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
+	<li>BWindowScreen R3-style function update for acceleration (once setup) and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants.
+</ul>
 <p><h1>nm_driver 0.05 (Rudolf)</h1></p>
 <ul> 
         <li>Prevent system or video freeze on dragging files or so in tracker windows; 
@@ -11,30 +18,10 @@
 		<li>Sync polarity setup now actually works (external monitor only mode);
 		<li>Power-up register unlocking narrowed down to overlay engine only. This should fix the screen rubbish trouble most users had with V0.04 which did not exist for them on V0.03. 
 </ul>
-<strong>Known limitations:</strong>
-<ul>
-	<li>NeoMagic cards do not support overlay downscaling. You won't be able to select for instance 50% scaled output, nor will you be able to resize the video output window below 100% by dragging.<br>
-(In Windows downscaling works: this is done by scaling down the overlay input bitmaps in the application software: so this is a 'trick' solution not done by the driver!)
-	<li>Stretching modes for the laptop display panel will not be setup. In stretched modes no hardcursor is supported, and overlay output requires tweaking to get going...
-	<li>Apparantly it's not possible to boot into modes with a resolution above 800x600 pixels on some cards. If you encounter this please report it, and only use high resolution modes on other workspaces for now.<br>
-A fix for this behaviour will be attempted in the future.
-	<li>The keyboard 'shortcut key' for changing output devices bypasses the videodriver and directly uses the cardBIOS. Sometimes using this key will have unwanted results. Please use with care! Or better yet: just preset the output device(s) you want in the system BIOS...<br>
-A fix for this behaviour will also be attempted in the future (sort of getting the driver and the BIOS in 'sync'). 
-</ul>
 <p><h1>nm_driver 0.04 (Rudolf)</h1></p>
 <ul>
 	<li>included hardware overlay for the B_YCbCr422 (FourCC: YUY2) colorspace;
 	<li>added CRTC registers unlock command on startup.
-</ul>
-<strong>Known limitations:</strong>
-<ul>
-	<li>NeoMagic cards do not support overlay downscaling. You won't be able to select for instance 50% scaled output, nor will you be able to resize the video output window below 100% by dragging.<br>
-(In Windows downscaling works: this is done by scaling down the overlay input bitmaps in the application software: so this is a 'trick' solution not done by the driver!)
-	<li>Stretching modes for the laptop display panel will not be setup. In stretched modes no hardcursor is supported, and overlay output requires tweaking to get going...
-	<li>Apparantly it's not possible to boot into modes with a resolution above 800x600 pixels on some cards. If you encounter this please report it, and only use high resolution modes on other workspaces for now.<br>
-A fix for this behaviour will be attempted in the future.
-	<li>The keyboard 'shortcut key' for changing output devices bypasses the videodriver and directly uses the cardBIOS. Sometimes using this key will have unwanted results. Please use with care! Or better yet: just preset the output device(s) you want in the system BIOS...<br>
-A fix for this behaviour will also be attempted in the future (sort of getting the driver and the BIOS in 'sync'). 
 </ul>
 <p><h1>nm_driver 0.03 (Rudolf)</h1></p>
 <ul>
@@ -52,7 +39,8 @@ A fix for this behaviour will also be attempted in the future (sort of getting t
 	<li>updates needed for LCD centering support;
 	<li>fix for trouble with booting into modes above 800x600 resolution on some cards (please report this behaviour!);
 	<li>shadowregister programming needed for 'full' KB switch BIOS support;
-	<li>2D acceleration.
+	<li>2D acceleration;
+	<li>MagicMedia series overlay update: still contains errors apparantly.
 </ul>
 </p>
 </body>

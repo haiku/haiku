@@ -2,17 +2,54 @@
 <head>
 	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
 	<meta name="GENERATOR" content="The DarkSite">
-	<title>Readme for (open)BeOS NeoMagic MagicGraph/MagicMedia graphics driver V0.05</title>
+	<title>Readme for (open)BeOS Unified NeoMagic MagicGraph/MagicMedia graphics driver</title>
 </head>
 <body>
-<h2 align="center">NeoMagic MagicGraph/MagicMedia graphics driver for (open)BeOS</h2></align><br><br>
-<h2>Installation:</h2>
-This is the 0.05 release of the (open)BeOS NeoMagic display driver.<br>
+<h2 align="center">Unified NeoMagic MagicGraph/MagicMedia graphics driver for (open)BeOS</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
 You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
 <hr>
 <br>
+Note please:<br>
+This driver is still alpha quality. 2D acceleration is still lacking, overlay does not work correctly yet on MagicMedia cards and there may be additional trouble. While you are encouraged to test and use the driver (if it works at all for you then it will probably be stable as well), don't delete the old one(s) just yet!<br>
+<h2>Supported cards:</h2>
+<ul>
+	<li>MagicGraph 128 (NM2070)
+	<li>MagicGraph 128V (NM2090)
+	<li>MagicGraph 128ZV (NM2093)
+	<li>MagicGraph 128ZV+ (NM2097)
+	<li>MagicGraph 128XD (NM2160)
+	<li>MagicMedia 256AV (NM2200)
+	<li>MagicMedia 256AV+ (NM2230)
+	<li>MagicMedia 256ZX (NM2360)
+	<li>MagicMedia 256XL+ (NM2380)
+</ul>
+<br>
+<hr>
+<h2>Features:</h2>
+<ul>
+	<li>Hardware cursor support;
+	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
+	<li>B_YCbCr422 hardware overlay support (except on MagicGraph 128, so NM2070 cards).
+</ul>
+<strong>Known limitations:</strong> 
+<ul> 
+	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>NeoMagic cards do not support overlay downscaling. You won't be able to select for instance 50% scaled output, nor will you be able to resize the video output window below 100% by dragging.
+<br> 
+(In Windows downscaling works: this is done by scaling down the overlay input bitmaps in the application software: so this is a 'trick' solution not done by the driver!) 
+	<li>Stretching modes for the laptop display panel will not be setup. In stretched modes no hardcursor is supported, and overlay output requires tweaking to get going... 
+	<li>Apparantly it's not possible to boot into modes with a resolution above 800x600 pixels on some cards. If you encounter this please report it, and only use high resolution modes on other workspaces for now.
+<br> 
+A fix for this behaviour will be attempted in the future. 
+	<li>The keyboard 'shortcut key' for changing output devices bypasses the videodriver and directly uses the cardBIOS. Sometimes using this key will have unwanted results. Please use with care! Or better yet: just preset the output device(s) you want in the system BIOS...
+<br> 
+A fix for this behaviour will also be attempted in the future (sort of getting the driver and the BIOS in 'sync'). 
+</ul>
+<br>
+<hr>
+<h2>Installation:</h2>
 If you encounter bugs, please checkout the driver's <a href="http://web.inter.nl.net/users/be-hold/BeOS/NMdriver/index.html">website</a> to see if it's already on the todo list. You can also checkout the <a href="UPDATE.html">UPDATE</a> file included with this driver to see if it should have been fixed. If you think it's prudent, or if you are unsure, then please fill out the <a href="http://web.inter.nl.net/users/be-hold/BeOS/NMdriver/bugreport.html">bugreport</a> on the site or send me an <a href="mailto:rag.cornelissen@inter.nl.net">Email</a>. Make sure you are as precise as possible because that will make things easier to trackdown and fix...<br>
 <br>
 <br>
@@ -23,42 +60,27 @@ BeOS first checks (during boot) if there are 'user-addons' that should be loaded
 <br>
 <strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the nm.settings file...<br>
 <br><br>
-<strong>actual INSTALLATION:</strong><br> 
-<br> 
-In a terminal switch to the 'openBeOS_Neomagic_V0.05_src' or 'openBeOS_Neomagic_V0.05_bin' folder (depending on downloaded version) and type:<br>
-make install<br> 
-<br> 
-You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...
-<br> 
-<br> 
-<br> 
-<strong>DE-INSTALLATION:</strong><br> 
-<br> 
-In a terminal switch to the 'openBeOS_Neomagic_V0.05_src' or 'openBeOS_Neomagic_V0.05_bin' folder (depending on downloaded version) and type:
-<br> 
-make uninstall<br> 
-<br> 
-You have to reboot in order to apply the original configuration.<br> 
-<br> 
-<br> 
-<strong>alternate INSTALLATION method:</strong><br> 
-<br> 
-In order for the install to work as described above you need to have the developer tools installed. If you don't have that, you can still do a manual install by copying some files from the 
-<strong>obj/</strong> folder:<br> 
-<br> 
-Copy the <strong>nm.accelerant</strong> file to <strong>home/config/add-ons/accelerants/</strong><br> 
-Copy the <strong>nm.driver</strong> file to <strong>home/config/add-ons/kernel/drivers/bin/</strong><br> 
-Copy the <strong>nm.settings</strong> file to <strong>home/config/settings/kernel/drivers/</strong><br> 
-Create a <strong>shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which points to the file 
-<strong>nm.driver</strong> you just installed.<br> 
-<br> 
-Now reboot and you should be using the new driver.<br> 
-<br> 
-<br> 
-<strong>alternate DE-INSTALLATION method:</strong><br> 
-<br> 
-Just delete the three files and the shortcut created as described in the <strong>alternate INSTALLATION method
-</strong>. When you're done, reboot. The original configuration will now be in effect again.<br> 
+<strong>actual INSTALLATION:</strong><br>
+<br>
+Doubleclick on the install.sh file and follow the instructions. You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
+<br>
+<br>
+<strong>alternate INSTALLATION method:</strong><br>
+<br>
+Unzip the zip file that contains the driver to the root folder. Now reboot and you should be using the new driver.<br>
+<br>
+<br>
+<strong>DE-INSTALLATION:</strong><br>
+<br>
+Currently there's no uninstall script included. Just do it manually:<br>
+<br>
+Delete the <strong>nm.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>nm.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>nm.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>nm.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>nm.driver</strong>.<br>
+<br>
+You have to reboot in order to apply the original configuration.<br>
+<br>
 <br> 
 <hr> 
 <a name="settings"></a><h2>Settings:</h2><br>
@@ -75,14 +97,15 @@ Please read this information carefully *before* installing and using the (open)B
 		This option enables you to override the 'memory amount autodetection' of the driver. The driver does not need this because it's well known how much RAM every specific card contains, but you could limit the amount of RAM to a lower value than actually there to test with for instance overlay use in applications. So this option is probably only of interest to developers. Specify the RAM amount in Kb (use only 'whole' numbers!).<br>
 This option is disabled by default (preceded by a '#').<br>
 <li><strong>hardcursor:</strong><br>
+	A hardcursor is nessesary for DirectWindow windowed mode support.
 	<ul>
 		<li><strong>false:</strong><br>
 		If you have trouble with the hardcursor, select <strong>hardcursor false</strong>. Make sure you let me know about the hardcursor trouble also: this should not happen!
 		<li><strong>true:</strong> (default setting)<br>
-		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting.
+		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
 	</ul>
 <li><strong>logmask:</strong> (set to minimal by default)<br>
-The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nm.accelerant.log</strong> in hour <strong>~ (home)</strong> folder.<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nm.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>nm.accelerant.1.log</strong>, and it will also be in your home folder.<br>
 <strong>Note:</strong>
 <ul>
 <li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
@@ -100,6 +123,6 @@ Dumprom is another 'tool' for bug-tracking purposes.
 <hr>
 <br>
 <a href="mailto:rag.cornelissen@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on August 14, 2003)</p>
+<p>(Page last updated on January 8, 2004)</p>
 </body>
 </html>
