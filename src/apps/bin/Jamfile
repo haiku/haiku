@@ -41,17 +41,21 @@ StdBinCommands
 	catattr.cpp
 	roster.cpp
 	: be stdc++.r4 ;
-	
+
+StdBinCommands
+	top.c
+	: /boot/develop/lib/x86/libtermcap.a ;
+
 StdBinCommands
 	mail.cpp
 	: be /boot/beos/system/lib/libmail.so ;
 
 StdBinCommands
 	chop.c
-#	clear.c
+	clear.c
 #	csplit.c
 	driveinfo.c
-	echo.c
+#	echo.c
 	eject.c
 	hd.c
 	listarea.c
