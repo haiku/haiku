@@ -28,10 +28,12 @@ class Volume {
 
 		int					Device() const { return fDevice; }
 		Directory			*Root() { return fRoot; }
+		int32				Type() const { return fType; }
 		int32				BlockSize() const { return fRootNode.BlockSize(); }
 
 	protected:
 		int					fDevice;
+		int32				fType;
 		RootBlock			fRootNode;
 		Directory			*fRoot;
 };

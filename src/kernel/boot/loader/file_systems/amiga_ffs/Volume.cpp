@@ -27,16 +27,12 @@ Volume::Volume(boot::Partition *partition)
 	if ((fDevice = open_node(partition, O_RDONLY)) < B_OK)
 		return;
 
-	char *buffer = (char *)malloc(4096);
-	if (buffer == NULL)
+	if (read_pos(fDevice, 0, &fType, sizeof(int32)) < B_OK)
 		return;
 
-	if (read_pos(fDevice, 0, buffer, sizeof(uint32)) < B_OK) {
-		free(buffer);
-		return;
-	}
+	fType = B_BENDIAN_TO_HOST_INT32(fType);
 
-	switch (B_BENDIAN_TO_HOST_INT32(*(uint32 *)buffer)) {
+	switch (fType) {
 		case DT_AMIGA_FFS:
 		case DT_AMIGA_FFS_INTL:
 		case DT_AMIGA_FFS_DCACHE:
@@ -46,9 +42,12 @@ Volume::Volume(boot::Partition *partition)
 			printf("The Amiga OFS is not yet supported.\n");
 		default:
 			// unsupported file system
-			free(buffer);
 			return;
 	}
+
+	char *buffer = (char *)malloc(4096);
+	if (buffer == NULL)
+		return;
 
 	int32 blockSize = partition->block_size;
 	if (get_root_block(fDevice, buffer, blockSize, partition->size) != B_OK) {
