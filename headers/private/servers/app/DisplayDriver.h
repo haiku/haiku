@@ -153,6 +153,7 @@ public:
 	void ShowCursor(void);
 	void ObscureCursor(void);
 	void SetCursor(ServerCursor *cursor);
+	BPoint GetCursorPosition(void);
 
 	void StrokeArc(const BRect &r, const float &angle, const float &span, const RGBColor &color);
 	void StrokeArc(const BRect &r, const float &angle, const float &span, const DrawData *d);
@@ -286,7 +287,7 @@ friend CursorHandler;
 	accelerant_device_info fAccDeviceInfo;
 	display_mode fDisplayMode;
 	
-	CursorHandler *fCursorHandler;
+	CursorHandler fCursorHandler;
 	
 //	BRect oldcursorframe, cursorframe, saveframe;
 	DrawData fDrawData;
