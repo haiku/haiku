@@ -694,11 +694,27 @@ BString::FindLast(const BString &string, int32 beforeOffset) const
 
 
 int32
+BString::FindLast(const char *str, int32 beforeOffset) const
+{
+	return _FindBefore(str, beforeoffset, -1);
+}
+
+
+int32
 BString::FindLast(char c) const
 {
 	char tmp[2] = { c, '\0' };
 	
 	return _FindBefore(tmp, Length(), -1);
+}
+
+
+int32
+BString::FindLast(char c, int32 beforeOffset) const
+{
+	char tmp[2] = { c, '\0' };
+	
+	return _FindBefore(tmp, beforeOffset, -1);	
 }
 
 
