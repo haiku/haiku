@@ -54,6 +54,9 @@ void PrinterDriver::About()
 
 char* PrinterDriver::AddPrinter(char* printerName)
 {
+	// print_server has created a spool folder with name printerName in
+	// folder B_USER_PRINTERS_DIRECTORY. It can be used to store
+	// settings in the folder attributes.
 	DBGMSG((">%s: add_printer\n", GetDriverName()));
 	DBGMSG(("\tprinter_name: %s\n", printerName));
 	DBGMSG(("<%s: add_printer\n", GetDriverName()));
