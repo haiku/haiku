@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps bin ;
 
 UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
 
 # standard commands that don't need any additional library
 StdBinCommands
