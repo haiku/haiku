@@ -57,7 +57,7 @@ namespace Udf {
 */
 struct udf_charspec {
 public:
-	void dump();
+	void dump() const;
 
 	uint8 character_set_type() const { return _character_set_type; } 
 	const char* character_set_info() const { return _character_set_info; }
@@ -88,7 +88,7 @@ private:
 	};
 
 public:
-	void dump();
+	void dump() const;
 
 	// Get functions
 	uint16 type_and_timezone() const { return B_LENDIAN_TO_HOST_INT16(_type_and_timezone); }
@@ -157,7 +157,7 @@ private:
 */
 struct udf_entity_id {
 public:
-	void dump();
+	void dump() const;
 
 	// Get functions
 	uint8 flags() const { return _flags; }
@@ -237,10 +237,10 @@ extern const char* kVSDID_ECMA168;
 */
 struct udf_extent_address {
 public:
-	void dump();
+	void dump() const;
 
-	uint32 length() { return B_LENDIAN_TO_HOST_INT32(_length); }	
-	uint32 location() { return B_LENDIAN_TO_HOST_INT32(_location); }
+	uint32 length() const { return B_LENDIAN_TO_HOST_INT32(_length); }	
+	uint32 location() const { return B_LENDIAN_TO_HOST_INT32(_location); }
 	
 	void set_length(int32 length) { _length = B_HOST_TO_LENDIAN_INT32(length); }
 	void set_location(int32 location) { _location = B_HOST_TO_LENDIAN_INT32(location); }
@@ -256,7 +256,7 @@ private:
 */
 struct udf_logical_block_address {
 public:
-	void dump();
+	void dump() const;
 
 	uint32 block() const { return B_LENDIAN_TO_HOST_INT32(_block); }
 	uint16 partition() const { return B_LENDIAN_TO_HOST_INT16(_partition); }
@@ -299,7 +299,7 @@ private:
 	};
 	
 public:
-	void dump();
+	void dump() const;
 
 	uint8 type() const {
 		type_and_length_accessor t;
@@ -350,7 +350,7 @@ private:
 	};
 	
 public:
-	void dump();
+	void dump() const;
 
 	uint8 type() const {
 		type_and_length_accessor t;
@@ -413,17 +413,17 @@ private:
 */
 struct udf_tag {
 public:
-	void dump();	
+	void dump() const;	
 
 	status_t init_check(uint32 diskBlock);
 
-	uint16 id() { return B_LENDIAN_TO_HOST_INT16(_id); }
-	uint16 version() { return B_LENDIAN_TO_HOST_INT16(_version); }
-	uint8 checksum() { return _checksum; }
-	uint16 serial_number() { return B_LENDIAN_TO_HOST_INT16(_serial_number); }
-	uint16 crc() { return B_LENDIAN_TO_HOST_INT16(_crc); }
-	uint16 crc_length() { return B_LENDIAN_TO_HOST_INT16(_crc_length); }
-	uint32 location() { return B_LENDIAN_TO_HOST_INT32(_location); }
+	uint16 id() const { return B_LENDIAN_TO_HOST_INT16(_id); }
+	uint16 version() const { return B_LENDIAN_TO_HOST_INT16(_version); }
+	uint8 checksum() const { return _checksum; }
+	uint16 serial_number() const { return B_LENDIAN_TO_HOST_INT16(_serial_number); }
+	uint16 crc() const { return B_LENDIAN_TO_HOST_INT16(_crc); }
+	uint16 crc_length() const { return B_LENDIAN_TO_HOST_INT16(_crc_length); }
+	uint32 location() const { return B_LENDIAN_TO_HOST_INT32(_location); }
 
 	void set_id(uint16 id) { _id = B_HOST_TO_LENDIAN_INT16(id); }
 	void set_version(uint16 version) { _version = B_HOST_TO_LENDIAN_INT16(version); }
@@ -497,7 +497,7 @@ enum udf_tag_id {
 */
 struct udf_primary_descriptor {
 public:
-	void dump();	
+	void dump() const;	
 
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -625,11 +625,16 @@ private:
 */
 struct udf_anchor_descriptor {
 public:
-	void dump();
+	void dump() const;
 	
 	udf_tag& tag() { return _tag; }
+	const udf_tag& tag() const { return _tag; }
+
 	udf_extent_address& main_vds() { return _main_vds; }
+	const udf_extent_address& main_vds() const { return _main_vds; }
+
 	udf_extent_address& reserve_vds() { return _reserve_vds; }
+	const udf_extent_address& reserve_vds() const { return _reserve_vds; }
 private:
 	udf_tag _tag;
 	udf_extent_address _main_vds;	//!< min length of 16 sectors
@@ -657,7 +662,7 @@ struct udf_descriptor_pointer {
 */
 struct udf_implementation_use_descriptor {
 public:
-	void dump();
+	void dump() const;
 
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -696,7 +701,7 @@ private:
 	};
 
 public:
-	void dump();
+	void dump() const;
 	
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -783,7 +788,7 @@ enum partition_access_type {
 	See also: ECMA 167 3/10.6, UDF-2.01 2.2.4
 */
 struct udf_logical_descriptor {
-	void dump();
+	void dump() const;
 	
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -936,7 +941,7 @@ struct udf_virtual_partition_map {
 	See also: ECMA-167 3/10.8
 */
 struct udf_unallocated_space_descriptor {
-	void dump();
+	void dump() const;
 
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -961,7 +966,7 @@ private:
 	See also: ECMA-167 3/10.9
 */
 struct udf_terminating_descriptor {
-	void dump();
+	void dump() const;
 
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -1021,7 +1026,7 @@ enum {
 	  reference actual file data extents that are also referenced by other file sets.
 */
 struct udf_file_set_descriptor {
-	void dump();
+	void dump() const;
 
 	// Get functions
 	const udf_tag& tag() const { return _tag; }
@@ -1136,7 +1141,7 @@ struct udf_partition_header_descriptor {
 */
 struct udf_file_id_descriptor {
 public:
-	void dump();
+	void dump() const;
 
 	udf_tag& tag() { return _tag; }
 	const udf_tag& tag() const { return _tag; }
@@ -1189,10 +1194,11 @@ public:
 	*/
 	uint8* implementation_use() { return ((uint8*)this)+38; }
 	char* id() { return ((char*)this)+38+implementation_use_length(); }	
+	const char* id() const { return ((const char*)this)+38+implementation_use_length(); }	
 	
-	uint16 structure_length() { return 38 + id_length() + implementation_use_length(); }
-	uint16 padding_length() { return ((structure_length()+3)/4)*4 - structure_length(); }
-	uint16 total_length() { return structure_length() + padding_length(); }
+	uint16 structure_length() const { return 38 + id_length() + implementation_use_length(); }
+	uint16 padding_length() const { return ((structure_length()+3)/4)*4 - structure_length(); }
+	uint16 total_length() const { return structure_length() + padding_length(); }
 	
 	// Set functions
 	void set_version_number(uint16 number) { _version_number = B_HOST_TO_LENDIAN_INT16(number); }
@@ -1349,16 +1355,16 @@ private:
 	};
 	
 public:
-	void dump();
+	void dump() const;
  
-	uint32 prior_recorded_number_of_direct_entries() { return B_LENDIAN_TO_HOST_INT32(_prior_recorded_number_of_direct_entries); }
-	uint16 strategy_type() { return B_LENDIAN_TO_HOST_INT16(_strategy_type); }
+	uint32 prior_recorded_number_of_direct_entries() const { return B_LENDIAN_TO_HOST_INT32(_prior_recorded_number_of_direct_entries); }
+	uint16 strategy_type() const { return B_LENDIAN_TO_HOST_INT16(_strategy_type); }
 
 	array<uint8, 2>& strategy_parameters() { return _strategy_parameters; }
 	const array<uint8, 2>& strategy_parameters() const { return _strategy_parameters; }
 
-	uint16 entry_count() { return B_LENDIAN_TO_HOST_INT16(_entry_count); }
-	uint8 file_type() { return _file_type; }
+	uint16 entry_count() const { return B_LENDIAN_TO_HOST_INT16(_entry_count); }
+	uint8 file_type() const { return _file_type; }
 	udf_logical_block_address& parent_icb_location() { return _parent_icb_location; }
 	const udf_logical_block_address& parent_icb_location() const { return _parent_icb_location; }
 
@@ -1399,7 +1405,7 @@ private:
 */
 struct udf_icb_header {
 public:
-	void dump();
+	void dump() const;
 	
 	udf_tag &tag() { return _tag; }
 	const udf_tag &tag() const { return _tag; }

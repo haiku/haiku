@@ -55,7 +55,7 @@ udf_volume_structure_descriptor_header::id_matches(const char *id)
 //----------------------------------------------------------------------
 
 void
-udf_charspec::dump()
+udf_charspec::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_charspec");
 	PRINT(("character_set_type: %d\n", character_set_type()));
@@ -68,7 +68,7 @@ udf_charspec::dump()
 //----------------------------------------------------------------------
 
 void
-udf_timestamp::dump()
+udf_timestamp::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_timestamp");
 	PRINT(("type:                %d\n", type()));
@@ -89,7 +89,7 @@ udf_timestamp::dump()
 //----------------------------------------------------------------------
 
 void
-udf_entity_id::dump()
+udf_entity_id::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_entity_id");
 	PRINT(("flags:             %d\n", flags()));
@@ -103,7 +103,7 @@ udf_entity_id::dump()
 //----------------------------------------------------------------------
 
 void
-udf_extent_address::dump()
+udf_extent_address::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_extent_address");
 	PRINT(("length:   %ld\n", length()));
@@ -111,7 +111,7 @@ udf_extent_address::dump()
 }
 
 void
-udf_logical_block_address::dump()
+udf_logical_block_address::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_logical_block_address");
 	PRINT(("block:     %ld\n", block()));
@@ -119,7 +119,7 @@ udf_logical_block_address::dump()
 }
 
 void
-udf_long_address::dump()
+udf_long_address::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_long_address");
 	PRINT(("length:   %ld\n", length()));
@@ -134,7 +134,7 @@ udf_long_address::dump()
 //----------------------------------------------------------------------
 
 void
-udf_tag::dump()
+udf_tag::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_descriptor_tag");
 	PRINT(("id:            %d\n", id()));
@@ -156,8 +156,8 @@ status_t
 udf_tag::init_check(uint32 diskBlock)
 {
 	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "udf_descriptor_tag");
-	PRINT(("diskLocation == %ld\n", diskBlock));
-	PRINT(("location() == %ld\n", location()));
+	PRINT(("location (paramater)    == %ld\n", diskBlock));
+	PRINT(("location (in structure) == %ld\n", location()));
 	status_t err = (diskBlock == location()) ? B_OK : B_NO_INIT;
 	// checksum
 	if (!err) {
@@ -179,7 +179,7 @@ udf_tag::init_check(uint32 diskBlock)
 //----------------------------------------------------------------------
 
 void
-udf_primary_descriptor::dump()
+udf_primary_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_primary_descriptor");
 	
@@ -223,7 +223,7 @@ udf_primary_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_anchor_descriptor::dump()
+udf_anchor_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_anchor_descriptor");
 	PRINT(("tag:\n"));
@@ -240,7 +240,7 @@ udf_anchor_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_implementation_use_descriptor::dump()
+udf_implementation_use_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_implementation_use_descriptor");
 	PRINT(("tag:\n"));
@@ -258,7 +258,7 @@ udf_implementation_use_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_partition_descriptor::dump()
+udf_partition_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_partition_descriptor");
 	PRINT(("tag:\n"));
@@ -285,7 +285,7 @@ udf_partition_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_logical_descriptor::dump()
+udf_logical_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_logical_descriptor");
 	PRINT(("tag:\n"));
@@ -319,7 +319,7 @@ udf_logical_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_unallocated_space_descriptor::dump()
+udf_unallocated_space_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_unallocated_space_descriptor");
 	PRINT(("tag:\n"));
@@ -335,7 +335,7 @@ udf_unallocated_space_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_terminating_descriptor::dump()
+udf_terminating_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_terminating_descriptor");
 	PRINT(("tag:\n"));
@@ -347,7 +347,7 @@ udf_terminating_descriptor::dump()
 //----------------------------------------------------------------------
 
 void
-udf_file_set_descriptor::dump()
+udf_file_set_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_file_set_descriptor");
 	PRINT(("tag:\n"));
@@ -383,7 +383,7 @@ udf_file_set_descriptor::dump()
 }
 
 void
-udf_file_id_descriptor::dump()
+udf_file_id_descriptor::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS, "udf_file_id_descriptor");
 	PRINT(("tag:\n"));
@@ -405,7 +405,7 @@ udf_file_id_descriptor::dump()
 }
 
 void
-udf_icb_entry_tag::dump()
+udf_icb_entry_tag::dump() const
 {
 	DUMP_INIT(CF_PUBLIC, "udf_icb_entry_tag");
 	PRINT(("prior_entries: %ld\n", prior_recorded_number_of_direct_entries()));
@@ -450,7 +450,7 @@ udf_icb_entry_tag::dump()
 }
 
 void
-udf_icb_header::dump()
+udf_icb_header::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_icb_header");
 

@@ -27,15 +27,15 @@ public:
 	CS0String();
 	CS0String(const char *cs0, uint32 length);
 	template <uint32 length>	
-		CS0String(array<char, length> &cs0);		
+		CS0String(const array<char, length> &cs0);		
 	~CS0String();
 	
 	void SetTo(const char *cs0, uint32 length);
 	template <uint32 length>
-		void SetTo(array<char, length> &cs0);
+		void SetTo(const array<char, length> &cs0);
 		
 	template <uint32 length>
-		CS0String& operator=(array<char, length> &cs0); 
+		CS0String& operator=(const array<char, length> &cs0); 
 	
 	const char* String() const { return fUtf8String; }
 	uint32 Length() const { return fUtf8String ? strlen(fUtf8String) : 0; }
@@ -49,7 +49,7 @@ private:
 void unicode_to_utf8(uint32 c, char **out);
 
 template <uint32 length>
-CS0String::CS0String(array<char, length> &cs0)
+CS0String::CS0String(const array<char, length> &cs0)
 	: fUtf8String(NULL)
 {
 	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
@@ -59,14 +59,14 @@ CS0String::CS0String(array<char, length> &cs0)
 
 template <uint32 length>
 void
-CS0String::SetTo(array<char, length> &cs0)
+CS0String::SetTo(const array<char, length> &cs0)
 {
-	SetTo(reinterpret_cast<char*>(cs0.data), length);
+	SetTo(reinterpret_cast<const char*>(cs0.data), length);
 }
 
 template <uint32 length>
 CS0String&
-CS0String::operator=(array<char, length> &cs0)
+CS0String::operator=(const array<char, length> &cs0)
 {
 	SetTo(cs0);
 	return *this;

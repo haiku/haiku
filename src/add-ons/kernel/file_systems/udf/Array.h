@@ -24,7 +24,7 @@ namespace Udf {
 template<typename DataType, uint32 arrayLength>
 struct array {
 public:
-	void dump() {
+	void dump() const {
 		for (uint32 i = 0; i < arrayLength; i++)
 			data[i].print();
 	}
@@ -42,7 +42,7 @@ public:
 */
 template<uint32 arrayLength>
 struct array<uint8, arrayLength> {
-	void dump()
+	void dump() const
 	{
 		const uint8 bytesPerRow = 8;
 		char classname[40];
@@ -65,7 +65,7 @@ struct array<uint8, arrayLength> {
 */
 template<uint32 arrayLength>
 struct array<char, arrayLength> {
-	void dump()
+	void dump() const
 	{
 		const uint8 bytesPerRow = 8;
 		char classname[40];
