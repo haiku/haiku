@@ -11,10 +11,10 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 	int i;
 	struct Elf32_Sym *sym;
 	int vlErr;
-	addr S;
-	addr final_val;
+	addr_t S;
+	addr_t final_val;
 
-# define P         ((addr *)(image->regions[0].delta + rel[i].r_offset))
+# define P         ((addr_t *)(image->regions[0].delta + rel[i].r_offset))
 # define A         (*(P))
 # define B         (image->regions[0].delta)
 
@@ -42,14 +42,14 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 				final_val = S + A;
 				break;
 			case R_386_PC32:
-				final_val = S + A - (addr)P;
+				final_val = S + A - (addr_t)P;
 				break;
 #if 0
 			case R_386_GOT32:
 				final_val = G + A;
 				break;
 			case R_386_PLT32:
-				final_val = L + A - (addr)P;
+				final_val = L + A - (addr_t)P;
 				break;
 #endif
 			case R_386_COPY:
