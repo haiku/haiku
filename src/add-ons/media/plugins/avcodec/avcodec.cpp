@@ -1,19 +1,15 @@
-/******************************************************************************
-/
-/	File:			avCodec.cpp
-/
-/	Description:	FFMpeg Generic Decoder for BeOS Release 5.
-/
-/	Disclaimer:		This decoder is based on undocumented APIs.
-/					Therefore it is likely, if not certain, to break in future
-/					versions of BeOS. This piece of software is in no way
-/					connected to or even supported by Be, Inc.
-/
-/	Copyright (C) 2001 François Revol. All Rights Reserved.
-/   Some code from MPEG I Decoder from Carlos Hasan.
-/   Had some help from Axeld
-/
-******************************************************************************/
+/*
+** File avcodec.cpp
+**
+** libavcodec based decoder for OpenBeOS
+**
+** Copyright (C) 2001 Carlos Hasan. All Rights Reserved.
+** Copyright (C) 2001 François Revol. All Rights Reserved.
+** Copyright (C) 2001 Axel Dörfler. All Rights Reserved.
+** Copyright (C) 2004 Marcus Overhagen. All Rights Reserved.
+**
+** Distributed under the terms of the MIT License.
+*/
 
 #include <Debug.h>
 #include <OS.h>
@@ -38,106 +34,13 @@ struct wave_format_ex
  */
 //#define UNREAL
 
-#define CLOSE_ON_RESET
-
-const char *media_type_name(int type)
-{
-	switch (type) {
-		case B_MEDIA_NO_TYPE:
-			return "B_MEDIA_NO_TYPE";
-		case B_MEDIA_RAW_AUDIO:
-			return "B_MEDIA_RAW_AUDIO";
-		case B_MEDIA_RAW_VIDEO:
-			return "B_MEDIA_RAW_VIDEO";
-		case B_MEDIA_VBL:
-			return "B_MEDIA_VBL";
-		case B_MEDIA_TIMECODE:
-			return "B_MEDIA_TIMECODE";
-		case B_MEDIA_MIDI:
-			return "B_MEDIA_MIDI";
-		case B_MEDIA_TEXT:
-			return "B_MEDIA_TEXT";
-		case B_MEDIA_HTML:
-			return "B_MEDIA_HTML";
-		case B_MEDIA_MULTISTREAM:
-			return "B_MEDIA_MULTISTREAM";
-		case B_MEDIA_PARAMETERS:
-			return "B_MEDIA_PARAMETERS";
-		case B_MEDIA_ENCODED_AUDIO:
-			return "B_MEDIA_ENCODED_AUDIO";
-		case B_MEDIA_ENCODED_VIDEO:
-			return "B_MEDIA_ENCODED_VIDEO";
-		case B_MEDIA_UNKNOWN_TYPE:
-		default:
-			return "B_MEDIA_UNKNOWN_TYPE";
-	}
-}
-
-char make_printable_char(uchar c)
-{
-//	c &= 0x7F;
-	if (c >= 0x20 && c < 0x7F)
-		return c;
-	return '.';
-}
-
-void print_hex(unsigned char *buff, int len)
-{
-	int i, j;
-	for(i=0; i<len+7;i+=8) {
-		for (j=0; j<8; j++) {
-			if (i+j < len)
-				printf("%02X", buff[i+j]);
-			else
-				printf("  ");
-			if (j==3)
-				printf(" ");
-		}
-		printf("\t");
-		for (j=0; j<8; j++) {
-			if (i+j < len)
-				printf("%c", make_printable_char(buff[i+j]));
-			else
-				printf(" ");
-		}
-		printf("\n");
-	}
-
-}
-
-void print_media_header(media_header *mh)
-{
-	printf("media_header {%s, size_used: %ld, start_time: %lld (%02d:%02d.%02d), field_sequence=%lu, user_data_type: .4s, file_pos: %ld, orig_size: %ld, data_offset: %ld}\n", 
-				media_type_name(mh->type), mh->size_used, mh->start_time, 
-				int((mh->start_time / 60000000) % 60),
-				int((mh->start_time / 1000000) % 60),
-				int((mh->start_time / 10000) % 100), 
-				(long)mh->u.raw_video.field_sequence,
-				//&(mh->user_data_type), 
-				(long)mh->file_pos,
-				(long)mh->orig_size,
-				mh->data_offset);
-}
-
-void print_media_decode_info(media_decode_info *info)
-{
-	if (info)
-		printf("media_decode_info {time_to_decode: %lld, file_format_data_size: %ld, codec_data_size: %ld}\n", info->time_to_decode, info->file_format_data_size, info->codec_data_size);
-	else
-		printf("media_decode_info (null)\n");
-}
-
 avCodec::avCodec()
 	:	fHeader(),
 		fInfo(),
 		fInputFormat(),
 		fOutputVideoFormat(),
-		fOutputAudioFormat(),
 		fFrame(0),
 		isAudio(false),
-		fData(NULL),
-		fOffset(0L),
-		fSize(0L),
 		fCodec(NULL),
 		ffc(NULL),
 		fCodecInitDone(false),
@@ -149,29 +52,22 @@ avCodec::avCodec()
 {
 	PRINT(("[%c] avCodec::avCodec()\n", isAudio?('a'):('v')));
 
-
+	// prevent multiple inits
 	static volatile vint32 ff_init_count = 0;
 	static bool ff_init_done = false;
-	PRINT(("avCodec::register_decoder()\n"));
-
-	// prevent multiple inits
 	if (atomic_add(&ff_init_count, 1) > 1) {
-	puts("NOT first init !");
 		atomic_add(&ff_init_count, -1);
 		// spin until the thread that is initing is done
 		while (!ff_init_done)
 			snooze(20000);
 	} else {
-	puts("first init !");
 		avcodec_init();
 		avcodec_register_all();
 		ff_init_done = true;
 	}
 
-//	memset(&opicture, 0, sizeof(AVPicture));
 	ffc = avcodec_alloc_context();
 	ffpicture = avcodec_alloc_frame();
-//	ffpicture->type = FF_BUFFER_TYPE_USER;
 	opicture = avcodec_alloc_frame();
 }
 
@@ -192,21 +88,23 @@ avCodec::~avCodec()
 }
 
 
-void avCodec::GetCodecInfo(media_codec_info *mci)
+void
+avCodec::GetCodecInfo(media_codec_info *mci)
 {
 	sprintf(mci->short_name, "ff:%s", fCodec->name);
 	sprintf(mci->pretty_name, "%s (libavcodec %s)", gCodecTable[ffcodec_index_in_table].prettyname, fCodec->name);
 }
 
 
-status_t avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
+status_t
+avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 {
 	if (input_format->type != B_MEDIA_ENCODED_AUDIO && input_format->type != B_MEDIA_ENCODED_VIDEO)
 		return B_ERROR;
 		
 	isAudio = (input_format->type == B_MEDIA_ENCODED_AUDIO);
 
-	if (isAudio)
+	if (isAudio && !fOutputBuffer)
 		fOutputBuffer = new char[100000];
 
 #if DEBUG
@@ -214,18 +112,12 @@ status_t avCodec::Setup(media_format *input_format, const void *in_info, int32 i
 	string_for_format(*input_format, buffer, sizeof(buffer));
 	PRINT(("[%c]   input_format=%s\n", isAudio?('a'):('v'), buffer));
 	PRINT(("[%c]   in_info_size=%ld\n", isAudio?('a'):('v'), in_size));
-	print_hex((uchar *)in_info, in_size);
 	PRINT(("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'), input_format->user_data_type));
-	print_hex((uchar *)input_format->user_data, 48);
 //	PRINT(("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), input_format->meta_data_size));
-#else
-	(void)(in_info);
-	(void)(in_size);
 #endif
 
 	media_format_description descr;
-	for (int32 i = 0; gCodecTable[i].id; i++)
-	{
+	for (int32 i = 0; gCodecTable[i].id; i++) {
 		ffcodec_index_in_table = i;
 		uint32 cid;
 		
@@ -282,36 +174,26 @@ status_t avCodec::Setup(media_format *input_format, const void *in_info, int32 i
 	return B_ERROR;
 }
 
-status_t avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
-	bigtime_t in_requiredTime, bigtime_t *inout_time)
-{
 
+status_t
+avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
+			  bigtime_t in_requiredTime, bigtime_t *inout_time)
+{
 	// reset the ffmpeg codec
 	// to flush buffers, so we keep the sync
-
-#ifdef CLOSE_ON_RESET
-
-	if (isAudio && fCodecInitDone)
-	{
+	if (isAudio && fCodecInitDone) {
 		fCodecInitDone = false;
 		avcodec_close(ffc);
 		fCodecInitDone = (avcodec_open(ffc, fCodec) >= 0);
-		fData = NULL;
-		fSize = 0LL;
-		fOffset = 0;
 	}
-
-#endif /* CLOSE_ON_RESET */
-
 	fFrame = *inout_frame;
-
 	return B_OK;
 }
 
 
-status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
+status_t
+avCodec::NegotiateOutputFormat(media_format *inout_format)
 {
-//	int ffPixelFmt;
 	enum PixelFormat ffPixelFmt;
 	
 	PRINT(("[%c] avCodec::Format()\n", isAudio?('a'):('v')));
@@ -329,14 +211,15 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 	}
 
 	if (isAudio) {
-		fOutputAudioFormat = media_raw_audio_format::wildcard;
-		fOutputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
-		fOutputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
-		fOutputAudioFormat.frame_rate = fInputFormat.u.encoded_audio.output.frame_rate;
-		fOutputAudioFormat.channel_count = fInputFormat.u.encoded_audio.output.channel_count;
-		fOutputAudioFormat.buffer_size = 1024 * fInputFormat.u.encoded_audio.output.channel_count;
+		media_multi_audio_format outputAudioFormat;
+		outputAudioFormat = media_raw_audio_format::wildcard;
+		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+		outputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
+		outputAudioFormat.frame_rate = fInputFormat.u.encoded_audio.output.frame_rate;
+		outputAudioFormat.channel_count = fInputFormat.u.encoded_audio.output.channel_count;
+		outputAudioFormat.buffer_size = 1024 * fInputFormat.u.encoded_audio.output.channel_count;
 		inout_format->type = B_MEDIA_RAW_AUDIO;
-		inout_format->u.raw_audio = fOutputAudioFormat;
+		inout_format->u.raw_audio = outputAudioFormat;
 
 		ffc->bit_rate = (int) fInputFormat.u.encoded_audio.bit_rate;
 		ffc->sample_rate = (int) fInputFormat.u.encoded_audio.output.frame_rate;
@@ -354,8 +237,8 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 		PRINT(("audio: bit_rate = %d, sample_rate = %d, chans = %d\n", ffc->bit_rate, ffc->sample_rate, ffc->channels));
 
 		fStartTime = 0;
-		fOutputFrameCount = fOutputAudioFormat.buffer_size / (2 * fOutputAudioFormat.channel_count);
-		fOutputFrameRate = fOutputAudioFormat.frame_rate;
+		fOutputFrameCount = outputAudioFormat.buffer_size / (2 * outputAudioFormat.channel_count);
+		fOutputFrameRate = outputAudioFormat.frame_rate;
 		fChunkBuffer = 0;
 		fChunkBufferOffset = 0;
 		fChunkBufferSize = 0;
@@ -385,14 +268,8 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 			conv_func = resolve_colorspace(fOutputVideoFormat.display.format, &ffPixelFmt);
 			PRINT(("ffc = %08lx, fCodec = %08lx, conv_func = %08lx\n", ffc, fCodec, conv_func));
 			if (!conv_func)
-			{
 				PRINT(("no conv_func (1) !\n"));
-//				return B_ERROR;
-			}
-//			ffc->pix_fmt = ffPixelFmt = 0; // DEBUG !!!
-//			ffc->pix_fmt = 
-//			ffPixelFmt = PIX_FMT_YUV420P; // DEBUG !!!
-//			ffc->pix_fmt = ffPixelFmt = PIX_FMT_YUV420P; // DEBUG !!!
+
 			if (avcodec_open(ffc, fCodec) >= 0)
 				fCodecInitDone = true;
 			else
@@ -400,8 +277,7 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 
 			conv_func = resolve_colorspace(fOutputVideoFormat.display.format, &ffc->pix_fmt);
 			PRINT(("ffc = %08lx, fCodec = %08lx, conv_func = %08lx, ffcolspace= %s\n", ffc, fCodec, conv_func, pixfmt_to_string(ffc->pix_fmt)));
-			if (!conv_func)
-			{
+			if (!conv_func)	{
 				PRINT(("no conv_func (2) !\n"));
 				return B_ERROR;
 			}
@@ -415,7 +291,6 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 
 		inout_format->type = B_MEDIA_RAW_VIDEO;
 		inout_format->u.raw_video = fOutputVideoFormat;
-	
 	}
 
 	inout_format->require_flags = 0;
@@ -429,15 +304,14 @@ status_t avCodec::NegotiateOutputFormat(media_format *inout_format)
 	return B_OK;
 }
 
-status_t avCodec::Decode(void *out_buffer, int64 *out_frameCount, media_header *mh,
-	media_decode_info *info)
+
+status_t
+avCodec::Decode(void *out_buffer, int64 *out_frameCount,
+				media_header *mh, media_decode_info *info)
 {
-	if (out_buffer == NULL || out_frameCount == NULL || mh == NULL || !fCodecInitDone)
+	if (!fCodecInitDone)
 		return B_BAD_VALUE;
 
-	int len = 0;
-	int got_picture = 0;
-	
 #ifdef DO_PROFILING
 	bigtime_t prof_t1, prof_t2, prof_t3;
 	static bigtime_t diff1 = 0, diff2 = 0;
@@ -449,10 +323,6 @@ status_t avCodec::Decode(void *out_buffer, int64 *out_frameCount, media_header *
 #endif
 
 	PRINT(("[%c] avCodec::Decode()\n", isAudio?('a'):('v')));
-
-#if DEBUG
-//		asm("int     $0x0");
-#endif
 
 	if (isAudio) {
 
@@ -483,16 +353,18 @@ status_t avCodec::Decode(void *out_buffer, int64 *out_frameCount, media_header *
 				continue;
 			}
 			if (fChunkBufferSize == 0) {
-				media_header mh;
+				media_header chunk_mh;
 				status_t err;
-				err = GetNextChunk((void **)&fChunkBuffer, &fChunkBufferSize, &mh);
+				err = GetNextChunk((void **)&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
 				if (err != B_OK || fChunkBufferSize < 0) {
 					printf("GetNextChunk error\n");
 					fChunkBufferSize = 0;
 					break;
 				}
 				fChunkBufferOffset = 0;
-				fStartTime = mh.start_time;
+				fStartTime = chunk_mh.start_time;
+				if (*out_frameCount == 0)
+					mh->start_time = chunk_mh.start_time;
 				continue;
 			}
 			if (fOutputBufferSize == 0) {
@@ -513,65 +385,45 @@ status_t avCodec::Decode(void *out_buffer, int64 *out_frameCount, media_header *
 			}
 		}
 
-	} else {	// no AUDIO_CODEC
-	// VIDEO
-		status_t err;
+	} else {	// Video
 
-#ifdef DEBUG
-//print_media_header(mh);
-//print_media_decode_info(info);
-#endif
+		media_header chunk_mh;
+		status_t err;
+		void *data;
+		int32 size;
+
+		err = GetNextChunk(&data, &size, &chunk_mh);
+		if (err != B_OK) {
+			PRINT(("avCodec::Decode(): error 0x%08lx from GetNextChunk()\n", err));
+			return err;
+		}
+
 		mh->type = B_MEDIA_RAW_VIDEO;
 //		mh->start_time = (bigtime_t) (1000000.0 * fFrame / fOutputVideoFormat.field_rate);
-		mh->start_time = fHeader.start_time;
-		mh->file_pos = mh->orig_size = 0;
+		mh->start_time = chunk_mh.start_time;
+		mh->file_pos = 0;
+		mh->orig_size = 0;
 		mh->u.raw_video.field_gamma = 1.0;
 		mh->u.raw_video.field_sequence = fFrame;
 		mh->u.raw_video.field_number = 0;
 		mh->u.raw_video.pulldown_number = 0;
 		mh->u.raw_video.first_active_line = 1;
 		mh->u.raw_video.line_count = fOutputVideoFormat.display.line_count;
-/**/
+
 		PRINT(("[%c] start_time=%02d:%02d.%02d field_sequence=%u\n",
 				isAudio?('a'):('v'),
 				int((mh->start_time / 60000000) % 60),
 				int((mh->start_time / 1000000) % 60),
 				int((mh->start_time / 10000) % 100),
 				mh->u.raw_video.field_sequence));
-/**/			
-		fSize = 0L;
-		err = GetNextChunk(&fData, &fSize, &fHeader);
-		if (err != B_OK) {
-			PRINT(("avCodec::Decode(): error 0x%08lx from GetNextChunk()\n", err));
-			return B_ERROR;
-		}
-	PRINT(("avCodec::Decode(): passed GetNextChunk(), fSize=%ld\n", fSize));
-
-#ifdef DEBUG
-/*
-	puts("Chunk:");
-	for(i=0; i<2;i+=8) {
-		char *buff = (char *)fData;
-		printf("%08lX %08lX\t", *(long *)&buff[i], *(long *)&buff[i+4]);
-		printf("%c%c%c%c%c%c%c%c\n", (buff[i] & 0x7F), (buff[i+1] & 0x7F), (buff[i+2] & 0x7F), (buff[i+3] & 0x7F), (buff[i+4] & 0x7F), (buff[i+5] & 0x7F), (buff[i+6] & 0x7F), (buff[i+7] & 0x7F));
-	}
-*/
-#endif
-
-		// mmu_man 11/15/2002
-		//ffc->frame_number = fFrame;
 
 #ifdef DO_PROFILING
 		prof_t1 = system_time();
 #endif
-
-//	PRINT(("avCodec::Decode(): before avcodec_decode_video()\n"));
-
-
-//		len = avcodec_decode_video(ffc, &ffpicture, &got_picture, (uint8_t *)fData, fSize);
-		len = avcodec_decode_video(ffc, ffpicture, &got_picture, (uint8_t *)fData, fSize);
-
-//	PRINT(("avCodec::Decode(): after avcodec_decode_video()\n"));
+	
+		int got_picture = 0;
+		int len;
+		len = avcodec_decode_video(ffc, ffpicture, &got_picture, (uint8_t *)data, size);
 
 //printf("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffc->pts / (60*60*1000000)), (int)(ffc->pts / (60*1000000)), (int)(ffc->pts / (1000000)), (int)(ffc->pts % 1000000), ffc->frame_number, ffc->frame_rate);
 //printf("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffpicture->pts / (60*60*1000000)), (int)(ffpicture->pts / (60*1000000)), (int)(ffpicture->pts / (1000000)), (int)(ffpicture->pts % 1000000), ffc->frame_number, ffc->frame_rate);

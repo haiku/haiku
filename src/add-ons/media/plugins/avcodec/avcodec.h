@@ -1,23 +1,18 @@
-/******************************************************************************
-/
-/	File:			avCodec.h
-/
-/	Description:	FFMpeg based Decoder for BeOS Release 5.
-/
-/	Disclaimer:		This decoder is based on undocumented APIs.
-/					Therefore it is likely, if not certain, to break in future
-/					versions of BeOS. This piece of software is in no way
-/					connected to or even supported by Be, Inc.
-/
-/	Copyright (C) 2001 François Revol. All Rights Reserved.
-/   Some code from MPEG I Decoder from Carlos Hasan.
-/   Had some help from Axeld
-/
-******************************************************************************/
+/*
+** File avcodec.h
+**
+** libavcodec based decoder for OpenBeOS
+**
+** Copyright (C) 2001 Carlos Hasan. All Rights Reserved.
+** Copyright (C) 2001 François Revol. All Rights Reserved.
+** Copyright (C) 2001 Axel Dörfler. All Rights Reserved.
+** Copyright (C) 2004 Marcus Overhagen. All Rights Reserved.
+**
+** Distributed under the terms of the MIT License.
+*/
 
-
-#ifndef __FF_DECODER_H__
-#define __FF_DECODER_H__
+#ifndef __AVCODEC_PLUGIN_H__
+#define __AVCODEC_PLUGIN_H__
 
 #include <MediaFormats.h>
 #include "ReaderPlugin.h"
@@ -63,35 +58,25 @@ class avCodec : public Decoder
 		
 	private:
 		media_format fInputFormat;
-	//	media_raw_video_format fOutputFormat;
 		media_raw_video_format fOutputVideoFormat;
-		media_multi_audio_format fOutputAudioFormat;
-	//	avCodecInputStream fStream;
-	//	FFVideoStream fVideo;
-		int64 fFrame;
 
+		int64 fFrame;
 		bool isAudio;
 	
 		int ffcodec_index_in_table; // helps to find codecpretty
 		
-		void *fData;
-		size_t fOffset;
-		int32 fSize;
-
 		// ffmpeg related datas
 		AVCodec *fCodec;
-		AVCodecContext /*fCodecContext,*/ *ffc;
-//		AVPicture ffpicture, opicture;
+		AVCodecContext *ffc;
 		AVFrame *ffpicture, *opicture;
 		
-		bool fCodecInitDone;
-
+		bool 		fCodecInitDone;
 
 		gfx_convert_func conv_func; // colorspace convert func
 
-		void *	fExtraData;
-		int		fExtraDataSize;
-		int		fBlockAlign;
+		void *		fExtraData;
+		int			fExtraDataSize;
+		int			fBlockAlign;
 		
 		bigtime_t	fStartTime;
 		int32		fOutputFrameCount;
