@@ -1997,7 +1997,6 @@ void BWindow::Hide()
 	if (fShowLevel == 0)
 	{
 		Lock();
-		top_view->Hide();
 		fLink->StartMessage( AS_HIDE_WINDOW );
 		fLink->Flush();
 		Unlock();
