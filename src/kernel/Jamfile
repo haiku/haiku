@@ -728,6 +728,7 @@ KernelLd ps :
 	libglue2.o
         <$(SOURCE_GRIST)!apps!ps>main.o
         libc.so
+        libroot.so
         :
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
         :

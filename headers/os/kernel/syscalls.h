@@ -60,8 +60,6 @@ int    sys_get_sem_info(sem_id, struct sem_info *, size_t);
 int    sys_get_next_sem_info(team_id, uint32 *, struct sem_info *, size_t);
 int    sys_set_sem_owner(sem_id id, team_id proc);
 
-
-//int sys_team_get_table(struct proc_info *pi, size_t len);
 void sys_exit(int retcode);
 team_id sys_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 
@@ -76,6 +74,11 @@ int sys_kill_team(team_id tid);
 
 team_id sys_get_current_team_id();
 int sys_wait_on_team(team_id tid, int *retcode);
+
+status_t sys_get_thread_info(thread_id id, thread_info *info);
+status_t sys_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
+status_t sys_get_team_info(team_id id, team_info *info);
+status_t sys_get_next_team_info(int32 *cookie, team_info *info);
 
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);

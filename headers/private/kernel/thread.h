@@ -58,6 +58,7 @@ team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
+struct team *team_get_team_struct(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 
 // used in syscalls.c
@@ -68,11 +69,11 @@ int user_team_wait_on_team(team_id id, int *uretcode);
 thread_id user_thread_create_user_thread(addr, team_id, const char*, 
                                          int, void *);
 
+status_t user_get_thread_info(thread_id id, thread_info *info);
+status_t user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
 status_t user_get_team_info(team_id id, team_info *info);
 status_t user_get_next_team_info(int32 *cookie, team_info *info);
 
-
-//int user_proc_get_table(struct proc_info *pi, size_t len);
 int user_getrlimit(int resource, struct rlimit * rlp);
 int user_setrlimit(int resource, const struct rlimit * rlp);
 

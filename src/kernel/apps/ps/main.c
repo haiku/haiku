@@ -1,83 +1,38 @@
 /*
-** Copyright 2002, Dan Sinclair. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
-/*
- * This code was originally in the shell/command.c file and
- * was written by:
- *  Damien Guard
- * I just split it out into its own file
-*/
+ * PS command
+ * Rewritten for OpenBeOS by Angelo Mottola, Aug 2002.
+ */
 
+#include <OS.h>
+#include <Errors.h>
 #include <syscalls.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#if 0
-
-#define MAX_PROCESSES 1024
-
-typedef struct proc_info proc_info;
-
-
-inline const char *proc_state_string (int state);
-
-inline
-const char *
-proc_state_string (int state)
-{
-	switch (state) {
-		case 0: return "normal";
-		case 1: return "birth";
-		case 2: return "death";
-		default:
-			return "???";
-	}
-}
-
-
-int
-main(int argc, char ** argv)
-{	
-	size_t     table_size = MAX_PROCESSES * sizeof(proc_info);
-	proc_info *table      = (proc_info *) malloc(table_size);
-
-	if (table) {
-		int num_procs = sys_proc_get_table(table, table_size);
-	
-		if (num_procs <= 0)
-			printf("ps: sys_get_proc_table() returned error %s!\n", strerror(num_procs));
-		
-		else {
-			int        n = num_procs;
-			proc_info *p = table;
-			
-			printf("process list\n\n");
-			printf("id\tstate\tthreads\tname\n");
-			
-			while (n--) {
-				printf("%d\t%s\t%d\t%s\n",
-					p->id,
-					proc_state_string(p->state),
-					p->num_threads,
-					p->name);
-				p += sizeof(proc_info);
-			}
-			printf("\n%d processes listed\n", num_procs);
-		}
-
-		free(table);
-	}
-	
-	return 0;
-}
-
-#else
 
 int main(int argc, char **argv)
 {
+	int32 thread_num;
+	int32 team_num = 0;
+	thread_info thread;
+	team_info team;
+	
+	printf("\n thread           name      state prio   user  kernel semaphore\n");
+	printf("-----------------------------------------------------------------------\n");
+	
+	while (get_next_team_info(&team_num, &team) == B_OK) {
+		printf("%s (team %d) (uid %d) (gid %d)\n",
+			team.args, team.team, team.uid, team.gid);
+		thread_num = 0;
+		while (get_next_thread_info(team.team, &thread_num, &thread) == B_OK) {
+			// Fix thread state and sem output once states are BeOS compatible
+			printf(" %6d %20s  %s %3d %7d %7d %s\n",
+				thread.thread, thread.name, "???", thread.priority,
+				(int)thread.user_time, (int)thread.kernel_time, "");
+		}
+	}
+	printf("\n");
+	
 	return 0;
 }
-
-#endif

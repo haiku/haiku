@@ -330,6 +330,18 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_GETENV:
 			*call_ret = user_getenv((const char *)arg0, (char **)arg1);
 			break;
+		case SYSCALL_GET_THREAD_INFO:
+			*call_ret = user_get_thread_info((thread_id)arg0, (thread_info *)arg1);
+			break;
+		case SYSCALL_GET_NEXT_THREAD_INFO:
+			*call_ret = user_get_next_thread_info((team_id)arg0, (int32 *)arg1, (thread_info *)arg2);
+			break;
+		case SYSCALL_GET_TEAM_INFO:
+			*call_ret = user_get_team_info((team_id)arg0, (team_info *)arg1);
+			break;
+		case SYSCALL_GET_NEXT_TEAM_INFO:
+			*call_ret = user_get_next_team_info((int32 *)arg0, (team_info *)arg1);
+			break;
 		default:
 			*call_ret = -1;
 	}

@@ -1289,6 +1289,149 @@ void thread_atkernel_exit(void)
 	restore_interrupts(state);
 }
 
+
+status_t
+user_get_thread_info(thread_id id, thread_info *info)
+{
+	thread_info kinfo;
+	status_t rc = B_OK;
+	status_t rc2;
+	
+	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+		
+	rc = _get_thread_info(id, &kinfo, sizeof(thread_info));
+	if (rc != B_OK)
+		return rc;
+	
+	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	if (rc2 < 0)
+		return rc2;
+	
+	return rc;
+}
+
+
+status_t
+_get_thread_info(thread_id id, thread_info *info, size_t size)
+{
+	int state;
+	status_t rc = B_OK;
+	struct thread *t;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	
+	t = thread_get_thread_struct_locked(id);
+	if (!t) {
+		rc = B_BAD_VALUE;
+		goto err;
+	}
+	info->thread = t->id;
+	info->team = t->team->id;
+	strncpy(info->name, t->name, B_OS_NAME_LENGTH);
+	info->name[B_OS_NAME_LENGTH - 1] = '\0';
+	// XXX- Fix me
+	info->state = t->state;
+	info->priority = t->priority;
+	info->sem = t->sem_blocking;
+	info->user_time = t->user_time;
+	info->kernel_time = t->kernel_time;
+	info->stack_base = (void *)t->user_stack_base;
+	info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
+err:
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	return rc;
+}
+
+
+status_t
+user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info)
+{
+	int32 kcookie;
+	thread_info kinfo;
+	status_t rc = B_OK;
+	status_t rc2;
+	
+	if ((addr)cookie >= KERNEL_BASE && (addr)cookie <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	
+	rc2 = user_memcpy(&kcookie, cookie, sizeof(int32));
+	if (rc2 < 0)
+		return rc2;
+	
+	rc = _get_next_thread_info(team, &kcookie, &kinfo, sizeof(team_info));
+	if (rc != B_OK)
+		return rc;
+	
+	rc2 = user_memcpy(cookie, &kcookie, sizeof(int32));
+	if (rc2 < 0)
+		return rc2;
+	
+	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	if (rc2 < 0)
+		return rc2;
+	
+	return rc;
+}
+
+
+status_t
+_get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size)
+{
+	int state;
+	int slot;
+	status_t rc = B_BAD_VALUE;
+	struct team *team;
+	struct thread *t = NULL;
+	
+	if (tid == 0)
+		tid = team_get_current_team_id();
+	team = team_get_team_struct(tid);
+	if (!team)
+		return B_BAD_VALUE;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	
+	if (*cookie == 0)
+		slot = 0;
+	else {
+		slot = *cookie;
+		if (slot >= next_thread_id)
+			goto err;
+	}
+	while (!(t = thread_get_thread_struct_locked(slot)) && (t->team->id != tid) && (slot < next_thread_id))
+		slot++;
+	if (t) {
+		info->thread = t->id;
+		info->team = t->team->id;
+		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
+		info->name[B_OS_NAME_LENGTH - 1] = '\0';
+		// XXX- Fix me
+		info->state = t->state;
+		info->priority = t->priority;
+		info->sem = t->sem_blocking;
+		info->user_time = t->user_time;
+		info->kernel_time = t->kernel_time;
+		info->stack_base = (void *)t->user_stack_base;
+		info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
+		slot++;
+		*cookie = slot;
+		rc = B_OK;
+	}
+err:
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	return rc;
+}
+
+
 int user_getrlimit(int resource, struct rlimit * urlp)
 {
 	int				ret;

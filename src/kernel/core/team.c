@@ -254,8 +254,8 @@ int team_wait_on_team(team_id id, int *retcode)
 	return thread_wait_on_thread(tid, retcode);
 }
 
-/*
-static struct team *team_get_team_struct(team_id id)
+
+struct team *team_get_team_struct(team_id id)
 {
 	struct team *p;
 	int state;
@@ -270,7 +270,7 @@ static struct team *team_get_team_struct(team_id id)
 
 	return p;
 }
-*/
+
 
 struct team *team_get_team_struct_locked(team_id id)
 {

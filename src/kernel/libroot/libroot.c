@@ -176,18 +176,25 @@ status_t	wait_for_thread (thread_id thread, status_t *thread_return_value)
 
 // TO DO
 status_t	on_exit_thread(void (*callback)(void *), void *data);
-// TO DO
-status_t	_get_thread_info(thread_id thread, thread_info *info, size_t size);
-// TO DO
-status_t	_get_next_thread_info(team_id tmid, int32 *cookie, thread_info *info, size_t size);
+
+// OK
+status_t	_get_thread_info(thread_id thread, thread_info *info, size_t size)
+	{ return sys_get_thread_info(thread, info); }
+
+// OK
+status_t	_get_next_thread_info(team_id tmid, int32 *cookie, thread_info *info, size_t size)
+	{ return sys_get_next_thread_info(tmid, cookie, info); }
+
 // TO DO
 status_t 	_get_team_usage_info(team_id tmid, int32 who, team_usage_info *ti, size_t size);
 // TO DO
 thread_id	find_thread(const char *name); 
 
+/*
 #define get_thread_info(thread, info) _get_thread_info((thread), (info), sizeof(*(info)))
 #define get_next_thread_info(tmid, cookie, info) _get_next_thread_info((tmid), (cookie), (info), sizeof(*(info)))
 #define get_team_usage_info(tmid, who, info) _get_team_usage_info((tmid), (who), (info), sizeof(*(info)))
+*/
 
 // TO DO
 status_t	send_data(thread_id thread, int32 code, const void *buf, size_t buffer_size);
@@ -204,12 +211,18 @@ status_t	snooze_until(bigtime_t time, int timebase);
 status_t	kill_team(team_id team)  
 	{ return sys_kill_team(team); }
 
-// TO DO
-status_t	_get_team_info(team_id team, team_info *info, size_t size);
-// TO DO
-status_t	_get_next_team_info(int32 *cookie, team_info *info, size_t size);
-//#define get_team_info(team, info) _get_team_info((team), (info), sizeof(*(info)))
-//#define get_next_team_info(cookie, info)   _get_next_team_info((cookie), (info), sizeof(*(info)))
+// OK
+status_t	_get_team_info(team_id team, team_info *info, size_t size)
+	{ return sys_get_team_info(team, info); }
+
+// OK
+status_t	_get_next_team_info(int32 *cookie, team_info *info, size_t size)
+	{ return sys_get_next_team_info(cookie, info); }
+
+/*
+#define get_team_info(team, info) _get_team_info((team), (info), sizeof(*(info)))
+#define get_next_team_info(cookie, info)   _get_next_team_info((cookie), (info), sizeof(*(info)))
+*/
 
 // TO DO
 status_t get_cpuid(cpuid_info* info, uint32 eax_register, uint32 cpu_num);

@@ -96,6 +96,10 @@ enum {
 	SYSCALL_CREATE_DIR_ENTRY_REF,
 	SYSCALL_CREATE_SYMLINK,
 	SYSCALL_READ_LINK,
+	SYSCALL_GET_THREAD_INFO,
+	SYSCALL_GET_NEXT_THREAD_INFO,
+	SYSCALL_GET_TEAM_INFO, /* 90 */
+	SYSCALL_GET_NEXT_TEAM_INFO,
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);
