@@ -997,6 +997,71 @@ do_tracker(int argc, char **argv)
 }
 
 
+//	#pragma mark -
+
+
+static bool sRunStatTest;
+static const char *sStatTestFile = "/myfs/stattest-file";
+
+
+static int32
+stat_thread(void *data)
+{
+	(void)data;
+
+	while (sRunStatTest) {
+		struct stat st;
+		sys_rstat(1, -1, sStatTestFile, &st, 0);
+	}
+	return 0;
+}
+
+
+static int32
+create_remove_thread(void *data)
+{
+	(void)data;
+
+	while (sRunStatTest) {
+		int fd;
+		if ((fd = sys_open(1, -1, sStatTestFile, O_RDWR | O_CREAT, S_IFREG | S_IRWXU, 0)) >= 0)
+			sys_close(1, fd);
+
+		snooze(10000);
+		sys_unlink(1, -1, sStatTestFile);
+	}
+	return 0;
+}
+
+
+static void
+do_stattest(int argc, char **argv)
+{
+	thread_id a = spawn_thread(stat_thread, "stat_thread", B_NORMAL_PRIORITY, NULL);
+	thread_id b = spawn_thread(create_remove_thread, "create_remove_thread", B_NORMAL_PRIORITY, NULL);
+	char buffer[1];
+	status_t status;
+
+	sRunStatTest = true;
+	
+	resume_thread(a);
+	resume_thread(b);
+
+	printf("This test will stop when you press <Enter>: ");
+	fflush(stdout);
+
+	fgets(buffer, 1, stdin);
+
+	sRunStatTest = false;
+	
+	wait_for_thread(a, &status);
+	wait_for_thread(b, &status);
+}
+
+
+//	#pragma mark -
+
+
 static void
 do_attrtest(int argc, char **argv)
 {
@@ -1433,6 +1498,7 @@ cmd_entry fsh_cmds[] =
     { "mfile",	 do_threadfiletest, "copies several big files simulaneously" },
     { "tracker", do_tracker, "starts a Tracker like background thread that will listen to fs updates" },
     { "cio",	 do_cio, "does a I/O speed test" },
+    { "stattest", do_stattest, "does an \"early\"/\"late\" stat test for files that are created or deleted" },
 
 // additional commands from the file system will be included here
 #	include "additional_commands.h"
