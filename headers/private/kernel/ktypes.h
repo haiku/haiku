@@ -14,7 +14,7 @@ extern "C" {
 typedef int32  region_id;
 typedef int32  aspace_id;
 typedef uint32 addr;
-typedef uint32 addr_t;
+	// ToDo: to be faded out
 
 #ifdef __cplusplus
 }
