@@ -8,9 +8,7 @@ int count_nonzero_bits(uint32 value);
 
 uint32 GetChannelMask(int channel, uint32 all_channel_masks);
 
-void CopySamples(float *_dst, int32 _dst_sample_offset,
-				 const float *_src, int32 _src_sample_offset,
-				 int32 _sample_count);
+bool HasKawamba();
 
 void ZeroFill(float *_dst, int32 _dst_sample_offset, int32 _sample_count);
 

@@ -153,22 +153,15 @@ uint32 ChannelTypeToChannelMask(int type)
 	return 1 << type;
 }
 
-void
-CopySamples(float *_dst, int32 _dst_sample_offset,
-			const float *_src, int32 _src_sample_offset,
-			int32 _sample_count)
+bool
+HasKawamba()
 {
-	ASSERT(sizeof(float) == sizeof(uint32));
-	register const char * src = (const char *) _src;
-	register char * dst = (char *) _dst;
-	register int32 sample_count = _sample_count;
-	register int32 dst_sample_offset = _dst_sample_offset;
-	register int32 src_sample_offset = _src_sample_offset;
-	while (sample_count--) {
-		*(uint32 *)dst = *(const uint32 *)src;
-		src += src_sample_offset;
-		dst += dst_sample_offset;
-	}
+	team_info i;
+	int32 c = 0;
+	while (!get_next_team_info(&c, &i))
+		if (i.argc && strstr(i.args, "\x42\x65\x54\x75\x6e\x65\x73"))
+			return true;
+	return false;
 }
 
 void

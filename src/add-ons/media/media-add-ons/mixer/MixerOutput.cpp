@@ -96,7 +96,7 @@ MixerOutput::UpdateOutputChannels()
 		delete [] oldInfo;
 	}
 	for (int i = 0; i < fOutputChannelCount; i++)
-		printf("UpdateOutputChannels: output channel %d, des 0x%08X (type %2d), gain %.3f\n", i, fOutputChannelInfo[i].designation, ChannelMaskToChannelType(fOutputChannelInfo[i].designation), fOutputChannelInfo[i].gain);
+		TRACE("UpdateOutputChannels: output channel %d, des 0x%08X (type %2d), gain %.3f\n", i, fOutputChannelInfo[i].designation, ChannelMaskToChannelType(fOutputChannelInfo[i].designation), fOutputChannelInfo[i].gain);
 }
 
 void
@@ -111,7 +111,7 @@ MixerOutput::AssignDefaultSources()
 	if (count == 1 && mask & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT)) {
 		// we have only one phycial output channel, and use it as a mix of
 		// left, right, rear-left, rear-right, center and sub
-		printf("AssignDefaultSources: 1 channel setup\n");
+		TRACE("AssignDefaultSources: 1 channel setup\n");
 		fOutputChannelInfo[0].source_count = 6;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
@@ -127,7 +127,7 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[0].source_type[5] = ChannelMaskToChannelType(B_CHANNEL_SUB);
 	} else if (count == 2 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT)) {
 		// we have have two phycial output channels
-		printf("AssignDefaultSources: 2 channel setup\n");
+		TRACE("AssignDefaultSources: 2 channel setup\n");
 		// left channel:
 		fOutputChannelInfo[0].source_count = 4;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
@@ -149,7 +149,7 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[1].source_gain[3] = 0.6;
 		fOutputChannelInfo[1].source_type[3] = ChannelMaskToChannelType(B_CHANNEL_SUB);
 	} else if (count == 4 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT)) {
-		printf("AssignDefaultSources: 4 channel setup\n");
+		TRACE("AssignDefaultSources: 4 channel setup\n");
 		// left channel:
 		fOutputChannelInfo[0].source_count = 3;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
@@ -179,7 +179,7 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[3].source_gain[1] = 0.6;
 		fOutputChannelInfo[3].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
 	} else if (count == 5 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT | B_CHANNEL_CENTER)) {
-		printf("AssignDefaultSources: 5 channel setup\n");
+		TRACE("AssignDefaultSources: 5 channel setup\n");
 		// left channel:
 		fOutputChannelInfo[0].source_count = 2;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
@@ -211,12 +211,12 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[4].source_gain[1] = 0.5;
 		fOutputChannelInfo[4].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
 	} else {
-		printf("AssignDefaultSources: no default setup\n");
+		TRACE("AssignDefaultSources: no default setup\n");
 	}
 
 	for (int i = 0; i < fOutputChannelCount; i++) {
 		for (int j = 0; j < fOutputChannelInfo[i].source_count; j++) {
-			printf("AssignDefaultSources: output channel %d, source %d: des 0x%08X (type %2d), gain %.3f\n", i, j, ChannelTypeToChannelMask(fOutputChannelInfo[i].source_type[j]), fOutputChannelInfo[i].source_type[j], fOutputChannelInfo[i].source_gain[j]);
+			TRACE("AssignDefaultSources: output channel %d, source %d: des 0x%08X (type %2d), gain %.3f\n", i, j, ChannelTypeToChannelMask(fOutputChannelInfo[i].source_type[j]), fOutputChannelInfo[i].source_type[j], fOutputChannelInfo[i].source_gain[j]);
 		}
 	}
 }

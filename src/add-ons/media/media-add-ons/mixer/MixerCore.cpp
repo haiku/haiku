@@ -16,7 +16,11 @@
 
 #define DOUBLE_RATE_MIXING 	0
 
-#define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
+#if DEBUG > 1
+	#define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
+#else
+	#define ASSERT_LOCKED()		((void)0)
+#endif
 
 /* Mixer channels are identified by a type number, each type number corresponds
  * to the one of the channel masks of enum media_multi_channels.
@@ -83,7 +87,10 @@ bool
 MixerCore::AddInput(const media_input &input)
 {
 	ASSERT_LOCKED();
-	fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount));
+	if (HasKawamba())
+		fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate * 1.5, fMixBufferFrameCount * 2));
+	else
+		fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount));
 	return true;
 }
 
@@ -166,14 +173,14 @@ MixerCore::BufferReceived(BBuffer *buffer, bigtime_t lateness)
 			return;
 		}
 	}
-	printf("MixerCore::BufferReceived: received buffer for unknown id %ld\n", id);
+	ERROR("MixerCore::BufferReceived: received buffer for unknown id %ld\n", id);
 }
 	
 void
 MixerCore::InputFormatChanged(int32 inputID, const media_multi_audio_format &format)
 {
 	ASSERT_LOCKED();
-	printf("MixerCore::InputFormatChanged not handled\n");
+	ERROR("MixerCore::InputFormatChanged not handled\n");
 }
 
 void
@@ -232,12 +239,12 @@ MixerCore::ApplyOutputFormat()
 	for (int i = 0; i < fMixBufferChannelCount; i++)
 		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, format.format);
 	
-	printf("MixerCore::OutputFormatChanged:\n");
-	printf("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
-	printf("  fMixBufferFrameCount %ld\n", fMixBufferFrameCount);
-	printf("  fMixBufferChannelCount %ld\n", fMixBufferChannelCount);
+	TRACE("MixerCore::OutputFormatChanged:\n");
+	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
+	TRACE("  fMixBufferFrameCount %ld\n", fMixBufferFrameCount);
+	TRACE("  fMixBufferChannelCount %ld\n", fMixBufferChannelCount);
 	for (int i = 0; i < fMixBufferChannelCount; i++)
-		printf("  fMixBufferChannelTypes[%i] %ld\n", i, fMixBufferChannelTypes[i]);
+		TRACE("  fMixBufferChannelTypes[%i] %ld\n", i, fMixBufferChannelTypes[i]);
 
 	MixerInput *input;
 	for (int i = 0; (input = Input(i)); i++)
@@ -263,14 +270,14 @@ MixerCore::SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency)
 	fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
 	fDownstreamLatency = downstream_latency;
 
-	printf("MixerCore::SetTimingInfo, now = %Ld, downstream latency %Ld\n", fTimeSource->Now(), fDownstreamLatency);
+	TRACE("MixerCore::SetTimingInfo, now = %Ld, downstream latency %Ld\n", fTimeSource->Now(), fDownstreamLatency);
 }
 
 void
 MixerCore::EnableOutput(bool enabled)
 {
 	ASSERT_LOCKED();
-	printf("MixerCore::EnableOutput %d\n", enabled);
+	TRACE("MixerCore::EnableOutput %d\n", enabled);
 	fOutputEnabled = enabled;
 
 	if (fRunning && !fOutputEnabled)
@@ -291,7 +298,7 @@ bool
 MixerCore::Start()
 {
 	ASSERT_LOCKED();
-	printf("MixerCore::Start\n");
+	TRACE("MixerCore::Start\n");
 	if (fStarted)
 		return false;
 		
@@ -310,7 +317,7 @@ bool
 MixerCore::Stop()
 {
 	ASSERT_LOCKED();
-	printf("MixerCore::Stop\n");
+	TRACE("MixerCore::Stop\n");
 	if (!fStarted)
 		return false;
 		
@@ -384,8 +391,8 @@ MixerCore::MixThread()
 	start = fTimeSource->Now();
 	Unlock();
 	while (start <= 0) {
-		printf("MixerCore: delaying MixThread start, timesource is at %Ld\n", start);
-		snooze(1000);
+		TRACE("MixerCore: delaying MixThread start, timesource is at %Ld\n", start);
+		snooze(5000);
 		if (!LockFromMixThread())
 			return;
 		start = fTimeSource->Now();
@@ -396,7 +403,7 @@ MixerCore::MixThread()
 		return;
 	latency = bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio));
 	
-	printf("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
+	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
 
 	/* We must read from the input buffer at a position (pos) that is always a multiple of fMixBufferFrameCount.
 	 */
@@ -405,7 +412,7 @@ MixerCore::MixThread()
 	time_base = duration_for_frames(fMixBufferFrameRate, frame_base);
 	Unlock();
 	
-	printf("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
+	TRACE("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
 
 	#define MAX_TYPES	18
 	RtList<chan_info> InputChanInfos[MAX_TYPES];
@@ -520,11 +527,11 @@ MixerCore::MixThread()
 		
 			// send the buffer
 			if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {
-				printf("MixerCore: #### SendBuffer failed\n");
+				ERROR("MixerCore: SendBuffer failed\n");
 				buf->Recycle();
 			}
 		} else {
-			printf("MixerCore: #### RequestBuffer failed\n");
+			ERROR("MixerCore: RequestBuffer failed\n");
 		}
 
 		// make all lists empty

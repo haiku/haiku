@@ -96,7 +96,7 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	bigtime_t start;
 	
 	if (!fMixBuffer) {
-		printf("MixerInput::BufferReceived: dropped incoming buffer as we don't have a mix buffer\n");
+		ERROR("MixerInput::BufferReceived: dropped incoming buffer as we don't have a mix buffer\n");
 		return;
 	}
 	
@@ -104,7 +104,7 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	size = buffer->SizeUsed();
 	start = buffer->Header()->start_time;
 	if (start < 0) {
-		printf("MixerInput::BufferReceived: buffer with negative start time of %Ld dropped\n", start);
+		ERROR("MixerInput::BufferReceived: buffer with negative start time of %Ld dropped\n", start);
 		return;
 	}
 
@@ -285,7 +285,7 @@ MixerInput::UpdateChannelDesignations()
 	if (fUserOverridesChannelDesignations)
 		return;
 
-	printf("UpdateChannelDesignations: enter\n");
+	TRACE("UpdateChannelDesignations: enter\n");
 
 	// first apply a 1:1 mapping
 	for (int i = 0; i < fInputChannelCount; i++)
@@ -323,9 +323,9 @@ MixerInput::UpdateChannelDesignations()
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++)
-		printf("UpdateChannelDesignations: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateChannelDesignations: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 
-	printf("UpdateChannelDesignations: enter\n");
+	TRACE("UpdateChannelDesignations: leave\n");
 }
 
 void
@@ -338,20 +338,20 @@ MixerInput::UpdateMixerChannels()
 	mixer_chan_info *old_mixer_channel_info;
 	uint32 old_mixer_channel_count;
 
-	printf("UpdateMixerChannels: enter\n");
+	TRACE("UpdateMixerChannels: enter\n");
 	
 	for (int i = 0; i < fInputChannelCount; i++)
-		printf("UpdateMixerChannels: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateMixerChannels: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 	
 	all_bits = 0;
 	for (int i = 0; i < fInputChannelCount; i++)
 		all_bits |= fInputChannelInfo[i].designations;
 
-	printf("UpdateMixerChannels: all_bits = %08x\n", all_bits);
+	TRACE("UpdateMixerChannels: all_bits = %08x\n", all_bits);
 	
 	channel_count = count_nonzero_bits(all_bits);
 		
-	printf("UpdateMixerChannels: %ld input channels, %ld mixer channels (%ld old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
+	TRACE("UpdateMixerChannels: %ld input channels, %ld mixer channels (%ld old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
 
 	// If we resize the channel info array, we preserve the gain setting
 	// by saving the old array until new assignments are finished, and
@@ -386,7 +386,7 @@ MixerInput::UpdateMixerChannels()
 			}
 		}
 		if (j == fInputChannelCount) {
-			printf("buffer assignment failed for mixer chan %d\n", i);
+			ERROR("buffer assignment failed for mixer chan %d\n", i);
 			fMixerChannelInfo[i].buffer_base = fMixBuffer;
 		}
 	}
@@ -406,9 +406,9 @@ MixerInput::UpdateMixerChannels()
 	}
 
 	for (int i = 0; i < fMixerChannelCount; i++)
-		printf("UpdateMixerChannels: mixer channel %d, type %2d, des 0x%08X, base %p, gain %.3f\n", i, fMixerChannelInfo[i].type, ChannelTypeToChannelMask(fMixerChannelInfo[i].type), fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].gain);
+		TRACE("UpdateMixerChannels: mixer channel %d, type %2d, des 0x%08X, base %p, gain %.3f\n", i, fMixerChannelInfo[i].type, ChannelTypeToChannelMask(fMixerChannelInfo[i].type), fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].gain);
 
-	printf("UpdateMixerChannels: leave\n");
+	TRACE("UpdateMixerChannels: leave\n");
 }
 
 uint32
@@ -438,7 +438,7 @@ MixerInput::GetMixerChannelGain(int channel)
 void
 MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 {
-	printf("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld\n", framerate, frames);
+	TRACE("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld\n", framerate, frames);
 
 	fMixBufferFrameRate = framerate;
 	debugMixBufferFrames = frames;
@@ -467,10 +467,10 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	int temp = frames_for_duration(framerate, mixerBufferLength);
 	fMixBufferFrameCount = ((temp / frames) + 1) * frames;
 	
-	printf("  inputBufferLength  %10Ld\n", inputBufferLength);
-	printf("  outputBufferLength %10Ld\n", outputBufferLength);
-	printf("  mixerBufferLength  %10Ld\n", mixerBufferLength);
-	printf("  fMixBufferFrameCount   %10ld\n", fMixBufferFrameCount);
+	TRACE("  inputBufferLength  %10Ld\n", inputBufferLength);
+	TRACE("  outputBufferLength %10Ld\n", outputBufferLength);
+	TRACE("  mixerBufferLength  %10Ld\n", mixerBufferLength);
+	TRACE("  fMixBufferFrameCount   %10ld\n", fMixBufferFrameCount);
 	
 	ASSERT((fMixBufferFrameCount % frames) == 0);
 	

@@ -85,7 +85,7 @@ AudioMixer::DisableNodeStop()
 void AudioMixer::Stop(bigtime_t performance_time, bool immediate)
 {
 	if (fDisableStop) {
-		printf("AudioMixer STOP is disabled\n");
+		TRACE("AudioMixer STOP is disabled\n");
 		return;
 	} else {
 		BMediaEventLooper::Stop(performance_time, immediate);
@@ -190,13 +190,13 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 {
 
 	if (buffer->Header()->type == B_MEDIA_PARAMETERS) {
-		printf("Control Buffer Received\n");
+		TRACE("Control Buffer Received\n");
 		ApplyParameterData(buffer->Data(), buffer->SizeUsed());
 		buffer->Recycle();
 		return;
 	}
 
-	//printf("buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
+	//PRINT(4, "buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
 
 //	HandleInputBuffer(buffer, 0);
 //	buffer->Recycle();
@@ -343,7 +343,7 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 	// at some point in the future (indicated by change_tag and RequestCompleted()),
 	// we will receive buffers in a different format
 
-	printf("AudioMixer::FormatChanged\n");
+	TRACE("AudioMixer::FormatChanged\n");
 	
 	if (consumer.port != ControlPort() || consumer.id == 0)
 		return B_MEDIA_BAD_DESTINATION;
@@ -385,7 +385,7 @@ AudioMixer::FormatProposal(const media_source &output, media_format *ioFormat)
 	// in the format are wildcards, and we have a specific requirement, adjust
 	// those fields to match our requirements before returning.
 
-	printf("AudioMixer::FormatProposal\n");
+	TRACE("AudioMixer::FormatProposal\n");
 	
 	// we only have one output (id=0, port=ControlPort())
 	if (output.id != 0 || output.port != ControlPort())
@@ -414,7 +414,7 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	
 	fCore->Lock();
 	
-	printf("AudioMixer::FormatChangeRequested\n");
+	TRACE("AudioMixer::FormatChangeRequested\n");
 	
 	MixerOutput *output = fCore->Output();
 	if (!output) {
@@ -450,15 +450,15 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	
 	media_node_id id;
 	FindLatencyFor(destination, &fDownstreamLatency, &id);
-	printf("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
+	TRACE("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
 
 	// SetDuration of one buffer
 	SetBufferDuration(buffer_duration(io_format->u.raw_audio));
-	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
+	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
 	fInternalLatency = bigtime_t(1.6 * BufferDuration());
-	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
+	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
@@ -544,7 +544,7 @@ AudioMixer::GetLatency(bigtime_t *out_latency)
 	// report our *total* latency:  internal plus downstream plus scheduling
 	*out_latency = EventLatency() + SchedulingLatency();
 
-	printf("AudioMixer::GetLatency %Ld\n", *out_latency);
+	TRACE("AudioMixer::GetLatency %Ld\n", *out_latency);
 
 	return B_OK;
 }
@@ -615,7 +615,7 @@ void
 AudioMixer::Connect(status_t error, const media_source &source, const media_destination &dest, 
 					const media_format &format, char *io_name)
 {
-	printf("AudioMixer::Connect\n");
+	TRACE("AudioMixer::Connect\n");
 
 	fCore->Lock();
 	// are we still connected?
@@ -628,7 +628,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 
 	if (error != B_OK) {
 		// if an error occured, remove output from core
-		printf("AudioMixer::Connect failed with error 0x%08lX, removing connction\n", error);
+		ERROR("AudioMixer::Connect failed with error 0x%08lX, removing connection\n", error);
 		fCore->Lock();
 		fCore->RemoveOutput();
 		fCore->Unlock();
@@ -642,16 +642,16 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	// Now that we're connected, we can determine our downstream latency.
 	media_node_id id;
 	FindLatencyFor(dest, &fDownstreamLatency, &id);
-	printf("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
+	TRACE("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
 
 	// SetDuration of one buffer
 	SetBufferDuration(buffer_duration(format.u.raw_audio));
 
-	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
+	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
 	fInternalLatency = bigtime_t(1.6 * BufferDuration());
-	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
+	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
@@ -689,7 +689,7 @@ void
 AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 {
 
-	printf("AudioMixer::Disconnect\n");
+	TRACE("AudioMixer::Disconnect\n");
 	
 	fCore->Lock();
 
@@ -721,7 +721,7 @@ AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, big
 	// We've produced some late buffers... Increase Latency 
 	// is the only runmode in which we can do anything about this
 
-	printf("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
+	ERROR("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
 
 /*	
 	if (what == fOutput.source) {
@@ -773,7 +773,7 @@ AudioMixer::NodeRegistered()
 void
 AudioMixer::SetTimeSource(BTimeSource * time_source)
 {
-	printf("AudioMixer::SetTimeSource: timesource is now %ld\n", time_source->ID());
+	TRACE("AudioMixer::SetTimeSource: timesource is now %ld\n", time_source->ID());
 	fCore->Lock();
 	fCore->SetTimingInfo(time_source, fDownstreamLatency);
 	fCore->Unlock();
@@ -794,7 +794,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 
 		case BTimedEventQueue::B_START:
 		{
-			printf("AudioMixer::HandleEvent: B_START\n");
+			TRACE("AudioMixer::HandleEvent: B_START\n");
 			if (RunState() != B_STARTED) {
 				fCore->Lock();
 				fCore->Start();
@@ -805,7 +805,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 			
 		case BTimedEventQueue::B_STOP:
 		{
-			printf("AudioMixer::HandleEvent: B_STOP\n");
+			TRACE("AudioMixer::HandleEvent: B_STOP\n");
 			// stopped - don't process any more buffers, flush all buffers from eventqueue
 			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
 			fCore->Lock();
@@ -816,7 +816,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 
 		case BTimedEventQueue::B_DATA_STATUS:
 		{
-			printf("DataStatus message\n");
+			ERROR("DataStatus message\n");
 			break;
 		}
 		
@@ -840,7 +840,7 @@ AudioMixer::CreateBufferGroup()
 	uint32 size = fCore->Output()->MediaOutput().format.u.raw_audio.buffer_size;
 	fCore->Unlock();
 	
-	printf("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);
+	TRACE("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);
 	return new BBufferGroup(size, count);
 }
 
