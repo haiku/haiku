@@ -17,8 +17,8 @@ StaticLibrary
 	;
 
 
-StaticLibrary
-	printerdriveraddon
-	:
-	PrinterDriverAddOn.cpp
-	;
+#StaticLibrary
+#	printerdriveraddon
+#	:
+#	PrinterDriverAddOn.cpp
+#	;
