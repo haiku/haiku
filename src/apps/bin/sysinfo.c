@@ -192,6 +192,14 @@ print_cache_descriptors(int32 cpu)
 
 
 static void
+print_transmeta_features(uint32 features)
+{
+	if (features & (1 << 16))
+		printf("\t\tFCMOV\n");
+}
+
+
+static void
 print_amd_features(uint32 features)
 {
 	static const char *kFeatures[32] = {
@@ -248,6 +256,19 @@ print_features(uint32 features)
 
 	if (found != 0)
 		putchar('\n');
+}
+
+
+static void
+print_processor_signature(cpuid_info *info, const char *prefix)
+{
+	printf("\t%stype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+		prefix ? prefix : "",
+		info->eax_1.type,
+		info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
+		info->eax_1.model + (info->eax_1.model == 0xf ? info->eax_1.extended_model << 4 : 0),
+		info->eax_1.stepping,
+		info->eax_1.features);
 }
 
 
@@ -322,21 +343,18 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	get_cpuid(&cpuInfo, 1, cpu);
-	printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08lx\n", 
-			cpuInfo.eax_1.type,
-			cpuInfo.eax_1.family,
-			cpuInfo.eax_1.model,
-			cpuInfo.eax_1.stepping,
-			cpuInfo.eax_1.features);
+	print_processor_signature(&cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
 
 	/* Extended CPUID */
-	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
+	if (max_extended_eax >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		printf("\textended: generation %lu, model %lu, stepping %lu, features 0x%08lx\n",
-			(cpuInfo.regs.eax >> 8) & 0xf, (cpuInfo.regs.eax >> 4) & 0xf,
-			cpuInfo.regs.eax & 0xf, cpuInfo.regs.edx);
-		print_amd_features(cpuInfo.regs.edx);
+		print_processor_signature(&cpuInfo, "extended: ");
+
+		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86)
+			print_amd_features(cpuInfo.regs.edx);
+		else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_TRANSMETA_x86)
+			print_transmeta_features(cpuInfo.regs.edx);
 	}
 
 	/* Cache/TLB descriptors */
