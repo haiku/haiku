@@ -774,11 +774,11 @@ rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	if (bufferSize < link->stream.symlink.length)
+	if (bufferSize <= link->stream.symlink.length)
 		return B_NAME_TOO_LONG;
 
 	memcpy(buffer, link->stream.symlink.path, link->stream.symlink.length + 1);
-	return link->stream.symlink.length;
+	return B_OK;
 }
 
 

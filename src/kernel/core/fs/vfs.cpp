@@ -2220,11 +2220,9 @@ vfs_mount_boot_file_system()
 {
 	// make the boot partition (and probably others) available
 	KDiskDeviceManager::CreateDefault();
-
-	status_t status;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
-	status = manager->InitialDeviceScan();
+	status_t status = manager->InitialDeviceScan();
 	if (status == B_OK) {
 		// ToDo: do this for real... (no hacks allowed :))
 		for (;;) {
@@ -2948,7 +2946,7 @@ common_unlock_node(int fd, bool kernel)
 }
 
 
-static ssize_t
+static status_t
 common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
 	bool kernel)
 {
@@ -2965,15 +2963,6 @@ common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
 		status = B_BAD_VALUE;
 
 	put_vnode(vnode);
-
-	// null terminate the result
-	if (status >= 0 && bufferSize > 0) {
-		if (status < (int)bufferSize)
-			buffer[status] = '\0';
-		else
-			buffer[bufferSize - 1] = '\0';
-	}
-
 	return status;
 }
 
@@ -4543,32 +4532,40 @@ _kern_remove_dir(const char *path)
 
 
 /**	\brief Reads the contents of a symlink referred to by a FD + path pair.
+ *
+ *	At least one of \a fd and \a path must be specified.
+ *	If only \a fd is given, the function the symlink to be read is the node
+ *	identified by this FD. If only a path is given, this path identifies the
+ *	symlink to be read. If both are given and the path is absolute, \a fd is
+ *	ignored; a relative path is reckoned off of the directory (!) identified
+ *	by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. May be \c NULL.
+ *	\param buffer The buffer into which the contents of the symlink shall be
+ *		   written.
+ *	\param bufferSize The size of the supplied buffer.
+ *	\return The length of the link on success or an appropriate error code
+ */
 
-	At least one of \a fd and \a path must be specified.
-	If only \a fd is given, the function the symlink to be read is the node
-	identified by this FD. If only a path is given, this path identifies the
-	symlink to be read. If both are given and the path is absolute, \a fd is
-	ignored; a relative path is reckoned off of the directory (!) identified
-	by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. May be \c NULL.
-	\param buffer The buffer into which the contents of the symlink shall be
-		   written.
-	\param bufferSize The size of the supplied buffer.
-	\return A FD referring to the newly opened node, or an error code,
-			if an error occurs.
-*/
 ssize_t
 _kern_read_link(int fd, const char *path, char *buffer, size_t bufferSize)
 {
-	if (path) {
-		char pathBuffer[SYS_MAX_PATH_LEN + 1];
-		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
-		return common_read_link(fd, pathBuffer, buffer, bufferSize, true);
-	}
+	status_t status;
 
-	return common_read_link(fd, NULL, buffer, bufferSize, true);
+	if (path) {
+		char pathBuffer[B_PATH_NAME_LENGTH + 1];
+		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+
+		status = common_read_link(fd, pathBuffer, buffer, bufferSize, true);
+	} else
+		status = common_read_link(fd, NULL, buffer, bufferSize, true);
+	
+	if (status < B_OK)
+		return status;
+
+	// Unlike what POSIX wants, our file systems must always null terminate links
+	return strlen(buffer);
 }
 
 
@@ -5358,8 +5355,8 @@ _user_remove_dir(const char *userPath)
 ssize_t
 _user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSize)
 {
-	char path[SYS_MAX_PATH_LEN + 1];
-	char buffer[SYS_MAX_PATH_LEN + 1];
+	char path[B_PATH_NAME_LENGTH + 1];
+	char buffer[B_PATH_NAME_LENGTH];
 	int status;
 
 	if (!IS_USER_ADDRESS(userBuffer))
@@ -5369,12 +5366,12 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSiz
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
 
-		status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
+		status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
 		if (status < 0)
 			return status;
 
-		if (bufferSize > SYS_MAX_PATH_LEN)
-			bufferSize = SYS_MAX_PATH_LEN;
+		if (bufferSize > B_PATH_NAME_LENGTH)
+			bufferSize = B_PATH_NAME_LENGTH;
 
 		status = common_read_link(fd, path, buffer, bufferSize, false);
 	} else
