@@ -22,6 +22,7 @@
 #include <syscall_process_info.h>
 #include <tls.h>
 
+#include <sys/resource.h>
 #include <sys/wait.h>
 #include <string.h>
 #include <stdio.h>
@@ -651,9 +652,14 @@ create_team_struct(const char *name, bool kernel)
 	team->death_sem = -1;
 	team->user_env_base = 0;
 
+	team->dead_threads_kernel_time = 0;
+	team->dead_threads_user_time = 0;
+
 	list_init(&team->dead_children.list);
 	team->dead_children.count = 0;
 	team->dead_children.wait_for_any = 0;
+	team->dead_children.kernel_time = 0;
+	team->dead_children.user_time = 0;
 	team->dead_children.sem = create_sem(0, "dead children");
 	if (team->dead_children.sem < B_OK)
 		goto error1;
@@ -1643,14 +1649,72 @@ err:
 
 
 status_t
-_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size)
+_get_team_usage_info(team_id id, int32 who, team_usage_info *info, size_t size)
 {
-	if (size != sizeof(team_usage_info))
+	bigtime_t kernelTime = 0, userTime = 0;
+	status_t status = B_OK;
+	struct team *team;
+	cpu_status state;
+
+	if (size != sizeof(team_usage_info)
+		|| (who != RUSAGE_SELF && who != RUSAGE_CHILDREN))
 		return B_BAD_VALUE;
 
-	// implement me!
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
 
-	return B_ERROR;
+	team = team_get_team_struct_locked(id);
+	if (team == NULL) {
+		status = B_BAD_TEAM_ID;
+		goto out;
+	}
+
+	switch (who) {
+		case RUSAGE_SELF:
+		{
+			struct thread *thread = team->thread_list;
+
+			for (; thread != NULL; thread = thread->team_next) {
+				kernelTime += thread->kernel_time;
+				userTime += thread->user_time;
+			}
+
+			kernelTime += team->dead_threads_kernel_time;
+			userTime += team->dead_threads_user_time;
+			break;
+		}
+
+		case RUSAGE_CHILDREN:
+		{
+			struct team *child = team->children;
+			for (; child != NULL; child = child->siblings_next) {
+				struct thread *thread = team->thread_list;
+
+				for (; thread != NULL; thread = thread->team_next) {
+					kernelTime += thread->kernel_time;
+					userTime += thread->user_time;
+				}
+
+				kernelTime += child->dead_threads_kernel_time;
+				userTime += child->dead_threads_user_time;
+			}
+
+			kernelTime += team->dead_children.kernel_time;
+			userTime += team->dead_children.user_time;
+			break;
+		}
+	}
+
+out:
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (status == B_OK) {
+		info->kernel_time = kernelTime;
+		info->user_time = userTime;
+	}
+
+	return status;
 }
 
 

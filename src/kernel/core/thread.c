@@ -809,6 +809,10 @@ thread_exit(void)
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 
+		// remember how long this thread lasted
+		team->dead_threads_kernel_time += thread->kernel_time;
+		team->dead_threads_user_time += thread->user_time;
+
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(team_get_kernel_team(), thread);
 
@@ -831,6 +835,10 @@ thread_exit(void)
 				parentDeadSem = parent->dead_children.sem;
 				groupDeadSem = team->group->dead_child_sem;
 			}
+
+			// remember how long this team lasted
+			parent->dead_children.kernel_time += team->dead_threads_kernel_time;
+			parent->dead_children.user_time += team->dead_threads_user_time;
 
 			team_remove_team(team, &freeGroup);
 		}
