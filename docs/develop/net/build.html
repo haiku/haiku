@@ -22,87 +22,119 @@ body
 </STYLE> 
 </head>
 
-<body>
+<BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
 <h1>OpenBeOS Network Kit: Build &amp; installation instructions</h1>
-<p>Although the stack isn't quite finished, you can already test some basics. 
-  You'll have to get the code, build it, install it and run it. There isn't yet 
-  an easier way of getting the network stack, we're far from ready to release 
+<p>Although the stack isn't quite finished, you can already test some basics. <br>
+  You'll have to get the code, build it, install it and run it. <br>
+  There isn't yet an easier way of getting the network stack, we're far from ready to release 
   a binary package. </p>
 <p>So, if you accept your mission :</p>
-<h4>a) First, go to <a href="http://open-beos.sourceforge.net/tms/team.php?id=7">team 
-  web page</a>.</h4>
-<blockquote>
-  <p>Have a look around and see the current status of the stack. Have a glance 
-    over the jobs, perhaps there's something that interests you?</p>
-</blockquote>
-<h4>b) Get the <a href="http://open-beos.sourceforge.net/dev.php">build tools 
-  suite</a>.</h4>
-<blockquote>
-  <p>You'll need CVS, JAM, the fixed LD linker</p>
-</blockquote>
-<h4>c) Then, you should checkout (anonymously) the full OBOS CVS. </h4>
-<blockquote> 
-  <p>SourceForge has some <a href="http://sourceforge.net/cvs/?group_id=33869">information 
-    on CVS</a>. If you don't want to fight with 'cvs' command line syntax, I recommand 
-    you using <a href="http://www.bebits.com/app/3407">CheckItOut</a> tool.</p>
-  <p> Enter these values: <br>
-    <em>Projet Name</em>: open-beos <br>
-    <em>Location</em>: /path/to/where/you/want/to/store/OBOS/cvs/tree/locally<br>
-    <em>Module Name</em>: current <br>
-    Only check <em>&quot;Open Tracker once Completed&quot;</em> option, if you 
-    want. <br>
-    There, click &quot;<em>Go</em>&quot;. Patience, it take time (and bandwidth!)</p>
-  <p>Other solution: download and unzip the current CVS <a href="http://cvs.sourceforge.net/cvstarballs/open-beos-cvsroot.tar.gz%20">snapshot 
-    tarball</a> from: Expect around 13MB.</p>
-</blockquote>
-<h4>d) Open a Terminal, cd to your all new local CVS current directory. </h4>
-<blockquote> 
-  <p> Then:</p>
-  <pre>
-     $ ./configure
-     $ jam NetworkingKit</pre>
+
+<ol>
+<li><b>Get familiar</b>
+  <p>First, go to <a href="http://open-beos.sourceforge.net/tms/team.php?id=7">team 
+  web page</a>.<br>
+  Have a look around and see the current status of the stack. Have a glance 
+    over the jobs, perhaps there's something that interests you?
+  </p>
+</li>
+
+<li><b>Furbish your tools</b>
+  <p>Get the <a href="http://open-beos.sourceforge.net/dev.php">build tools 
+  suite</a>.<br>
+  You'll need CVS, JAM, the fixed LD linker
+  </p>
+</li>
+
+<li><b>May the code be with you</b>
+  <p>For dark reason, you should have the source code to build.<br>
+  So, you must checkout (anonymously) the full OBOS CVS:
+  <ul>
+  <li>Using CVS tool: follow the SourceForge <a href="http://sourceforge.net/cvs/?group_id=33869">information 
+    on CVS</a>.
+  <li>If you don't want to fight with 'cvs' command line syntax, I recommand 
+    you using <a href="http://www.bebits.com/app/3407">CheckItOut</a> tool, with these settings values:
+      <p>
+      <table border=0 cellspacing=4> 
+      <tr><td align="right"><i>Project Name:</i></td><td><tt>open-beos</tt></td></tr>
+      <tr><td align="right"><i>Location:</i></td><td><tt>/path/to/where/you/want/to/store/OBOS/cvs/tree/locally</tt></td></tr>
+      <tr><td aligb="right"><i>Module Name:</i></td><td><tt>current</tt></td></tr>
+      </table>
+      </p>
+      
+      <p>Only check <em>&quot;Open Tracker once Completed&quot;</em> option, if you 
+      want. <br>
+      There, click &quot;<em>Go</em>&quot;. Patience, it take time (and bandwidth!)</p>
+      
+  <li>Other solution: download and unzip the current CVS <a href="http://cvs.sourceforge.net/cvstarballs/open-beos-cvsroot.tar.gz%20">snapshot 
+    tarball</a> from SourceForge. <br>
+    Beware, it's huge, expect around 13MB.
+  </ul>
+  </p>  
+</li>
+
+<li><b>Build</b>
+<p>Building the whole Networking Kit stuffs was made easy by Jam rules.<BR> 
+Simply run these commands from a Terminal:</p>
+  <p>
+  <TABLE cellpadding=6 bgcolor=#E5E5E5 border=0> 
+  <TR> 
+  <TD><TT>$ cd /path/to/your/local/openbeos/current<BR>
+  $ ./configure
+  $ jam NetworkingKit</TT> 
+  </TD> 
+  </TR> 
+  </TABLE> 
+  </p>
   <p>It should build all networking kit stuffs. If you encount any compile or 
     link errors, report it to the network team mailing list.</p>
-</blockquote>
-<h4>e) Installation</h4>
-<blockquote> 
+</li>
+
+<li><b>Install</b>
   <p>Installation script or jam rule is a task uncompleted. So, currently, you 
-    have to install by hands. It sucks, I know.</p>
-  <p>The network stuff binaries are now under your local <em>current/distro/x86.R1/*</em></p>
-  <p>To install:</p>
-</blockquote>
-<ul>
-  <li> open your <em>current/distro/x86.R1/beos/system/add-ons/kernel/drivers/bin</em><br>
+    have to install by hands. It sucks, we know.</p>
+  <p>The network stuff binaries are now under your local <tt>current/distro/x86.R1/*</tt><br>
+  To install:
+  <ul>
+  <li>open your <tt>current/distro/x86.R1/beos/system/add-ons/kernel/drivers/bin</tt> folder<br>
   </li>
-  <li> copy the <em>net_stack_driver</em> and <em>net_server_driver</em> into 
-    your <em>/boot/home/config/add-ons/kernel/drivers/bin</em><br>
+  <li>copy the <tt>net_stack_driver</tt> and <tt>net_server_driver</tt> into 
+    your <tt>/boot/home/config/add-ons/kernel/drivers/bin</tt><br>
   </li>
-  <li> create in your <em>/boot/home/config/add-ons/kernel/drivers/dev/net</em> 
-    two symlinks <em>&quot;net_stack_driver&quot;</em> and <em>&quot;net_server_driver&quot;</em>, 
-    targetting the ones in ../../bin/net_{stack|server}_driver (create this 'dev/net' 
-    directory if needed)<br>
+  <li>create in your <tt>/boot/home/config/add-ons/kernel/drivers/dev/net</tt> 
+    two symlinks <tt>&quot;net_stack_driver&quot;</tt> and <tt>&quot;net_server_driver&quot;</tt>, 
+    targetting the ones in <tt>../../bin/net_{stack|server}_driver</tt> (create this 'dev/net' 
+    directory if it don't exists yet)
   </li>
-  <li> copy the whole <em>current/distro/x86.R1/beos/system/add-ons/kernel/</em><br>
-    network folder to your <em>/boot/home/config/add-ons/kernel</em><br>
+  <li>copy the whole <tt>current/distro/x86.R1/beos/system/add-ons/kernel/</tt>
+    network folder to your <tt>/boot/home/config/add-ons/kernel</tt><br>
+    <font color="red">BEWARE</font>: BONE users, you should disabled BONE own <tt>/boot/beos/system/add-ons/kernel/network</tt>
+    modules folder, as our stack try to load these modules too, which currently throw you into KDL heaven...<br>
+    So, rename this folder into anything that make sense, like <tt>network.bone</tt>. It'll disabled BONE after a reboot, which is required
+    anyway to test the OBOS stack...
   </li>
-  <li> copy the <em>libnet.so</em> and <em>libnetapi.so</em> libraries from current/distro/ 
-    x86.R1/beos/system/lib to a <em>lib</em> where your networking kit binaries are
-    located.<br>
+  <li>copy the <tt>libnet.so</tt> and <tt>libnetapi.so</tt> libraries from your <tt>current/distro/x86.R1/beos/system/lib</tt>
+    to a <tt>lib</tt> folder you should create into your <tt>current/distro/x86.R1/beos/bin</tt>, where the command line
+    OBOS networking kit apps are located.<br>
   </li>
-  <li> copy the command line net apps from <em>current/distro/x86.R1/beos/bin</em> 
-    <br>
-    into your <em>/boot/home/config/bin</em> (or another folder of your choice)</li>
-</ul>
-<h4>f) Test the stack</h4>
-<blockquote> 
+  </ul>
+  </p>
+</li>
+
+<li><b>Test, test, test</b>
   <p>You should free one of your /dev/net/*/0 network card (by disable in BONEyard, 
-    or by disabling in Network for net_server) Then, run the ifconfig tool from 
+    or by disabling in Network for net_server) Then, run the OBOS ifconfig tool from 
     Terminal to see (and start) the stack detected interface(s) Last, play with 
     ping, arp, traceroute, etc. Also check out the details on the <a href="http://philippe.houdoin.free.fr/phil/beos/openbeos/network_kit/">stack 
     design.</a></p>
-</blockquote>
-<h6>This document is written by <a href="mailto:philippe.houdoin@free.fr">Philippe 
+</li>
+
+</ol>
+
+<hr>
+<h6>This document is written by <a href="mailto:philippe_[DOT]_houdoin_[AT]_free_[DOT]_fr">Philippe 
   Houdoin</a> and edited by <a href="mailto:n.reedijk@planet.nl">Niels Reedijk</a>. 
-  Last updated on June 15th, 2003</h6>
+  Last updated on June 16th, 2003</h6>
+
 </body>
 </html>
