@@ -25,4 +25,4 @@ Package haiku-maildaemon-cvs :
 	boot beos system servers ;
 
 Packages haiku-maildaemon-cvs :
-	README LICENSE install.sh ;
+	README LICENSE HISTORY install.sh ;
