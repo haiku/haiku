@@ -145,8 +145,8 @@ OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
 
 rule SetupIncludes
 {
-	# XXX add "mail" and "opengl" later
-	local os_includes = add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
+	# XXX add "opengl" later
+	local os_includes = add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media mail midi midi2 net storage support translation ;
 
 	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
 
