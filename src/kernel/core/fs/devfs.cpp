@@ -1068,7 +1068,8 @@ devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 	TRACE(("devfs_canpage: vnode %p\n", vnode));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
-		|| vnode->stream.u.dev.node == NULL)
+		|| vnode->stream.u.dev.node == NULL
+		|| cookie == NULL)
 		return false;
 
 	return vnode->stream.u.dev.info->read_pages != NULL;
@@ -1084,7 +1085,8 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, c
 	TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
-		|| vnode->stream.u.dev.info->read_pages == NULL)
+		|| vnode->stream.u.dev.info->read_pages == NULL
+		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
 	if (vnode->stream.u.dev.part_map)
@@ -1103,7 +1105,8 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, 
 	TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
-		|| vnode->stream.u.dev.info->write_pages == NULL)
+		|| vnode->stream.u.dev.info->write_pages == NULL
+		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
 	if (vnode->stream.u.dev.part_map)
