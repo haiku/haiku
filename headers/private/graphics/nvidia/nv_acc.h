@@ -52,8 +52,7 @@ typedef struct {
 	uint16 Nop;					/* little endian (FIFO internal register) */
 	uint32 reserved01[0x00fa];
 	uint32 Color1A;				/* b0-31 is color */
-	struct
-	{
+	struct {
 		uint32 LeftTop;			/* b0-15 is top, b16-31 is left */
 		uint32 WidthHeight;		/* b0-15 is height, b16-31 is width */
 	} UnclippedRectangle[0x40];	/* command can handle upto 64 unclipped rects */
@@ -108,6 +107,35 @@ typedef struct {
 } cmd_nv3_gdi_rectangle_text;
 
 typedef struct {
+	uint32 reserved00[0x0004];
+	uint16 FifoFree;			/* little endian (FIFO internal register) */
+	uint16 Nop;					/* little endian (FIFO internal register) */
+	uint32 reserved01[0x00bb];
+	uint32 Colorkey;			/* texture colorkey */
+	uint32 Offset;				/* texture offset */
+	uint32 Format;				/* texture colorspace, size, and a lot more */
+	uint32 Filter;				/* texture filtering modes (used for scaling) */
+	uint32 Blend;				/* triangle blend: shade, perspective, specular.. */
+	uint32 Control;				/* triangle control: Z-enable, culling, dither.. */	
+	uint32 FogColor;			/* fog colorvalue */
+	uint32 reserved02[0x0039];
+	struct {
+		uint32 ScreenX;			/* X */
+		uint32 ScreenY;			/* Y */
+		uint32 ScreenZ;			/* depth */
+		uint32 RWH;				/* eyeM */
+		uint32 Color;			/* b24-31 Alpha, b16-23 Red, b8-15 Green, b0-7 Blue */
+		uint32 Specular;		/* b24-31 Fog, b16-23 Red, b8-15 Green, b0-7 Blue */
+		uint32 TU;				/* texture S */
+		uint32 TV;				/* texture T */
+	} TLVertex[0x10];			/* command can handle upto 16 textured, lit(?) vertexes */
+	uint32 TLVDrawPrim[0x40];	/* b20-31 is I5, b16-19 is I4, b12-15 is I3,
+								 * b8-11 is I2, 4-7 is I1, b0-3 is I0:
+								 * Ix is a TLVertex[Ix].
+								 * So: define your vertexes, and then program
+								 * TLVDrawPrim with the order to draw them.
+								 * You can draw primitives consisting of upto 6 out of
+								 * 16 defined vertexes this way. */
 } cmd_nv_dx5_texture_triangle;
 
 #endif
