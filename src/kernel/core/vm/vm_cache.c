@@ -206,9 +206,11 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 vm_page *
 vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 {
-	vm_page *page;
-	int state;
 	struct page_lookup_key key;
+	cpu_status state;
+	vm_page *page;
+
+	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
 	key.offset = offset;
 	key.cache = cache_ref->cache;
@@ -228,9 +230,10 @@ vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 void
 vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 {
-	int state;
+	cpu_status state;
 
 	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cache_ref, page, offset));
+	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
 	page->offset = offset;
 
@@ -262,7 +265,7 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 void
 vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 {
-	int state;
+	cpu_status state;
 
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache_ref, page));
 	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
