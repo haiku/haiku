@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems befs array ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 
 {
 	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
