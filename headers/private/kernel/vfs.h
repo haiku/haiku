@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -51,12 +54,12 @@ typedef struct io_context {
 extern "C" {
 #endif 
 
-int vfs_init(struct kernel_args *ka);
-int vfs_bootstrap_all_filesystems(void);
-int vfs_register_filesystem(const char *name, struct fs_ops *calls);
+status_t vfs_init(struct kernel_args *ka);
+status_t vfs_bootstrap_file_systems(void);
+status_t vfs_mount_boot_file_system(void);
+status_t vfs_register_file_system(const char *name, struct fs_ops *calls);
 void *vfs_new_io_context(void *parent_ioctx);
 int vfs_free_io_context(void *ioctx);
-int vfs_test(void);
 
 struct rlimit;
 int vfs_getrlimit(int resource, struct rlimit * rlp);
