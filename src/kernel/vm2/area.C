@@ -49,7 +49,7 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int page
 		default: // should never happen
 			throw ("Unknown type passed to mapAddressSpecToAddress");
 		}
-//	error ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n", ((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"), requested,pageCount);
+	error ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n", ((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"), requested,pageCount);
 	return base;
 }
 
@@ -58,6 +58,13 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %lx, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
 					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
 	vpage *newPage;
+
+	// We need RAM - let's fail if we don't have enough... This is Be's way. I probably would do this differently...
+	if (!originalArea && (inState!=LAZY) && (inState!=NO_LOCK) && (pageCount>(vmBlock->pageMan->freePageCount())))
+			return B_NO_MEMORY;
+//	else
+//		error ("origArea = %d, instate = %d, LAZY = %d, NO_LOCK = %d, pageCountIn = %d, free pages = %d\n",
+//			originalArea, inState,LAZY ,NO_LOCK,pageCount,(vmBlock->pageMan->freePageCount()));
 
 	// Get an address to start this area at
 	unsigned long base=mapAddressSpecToAddress(type,*address,pageCount);
@@ -96,8 +103,8 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 			vpages.add(newPage);
 			base+=PAGE_SIZE;
 			}
-	error ("Dumping the area's hashtable");
-	dump();
+	//error ("Dumping the area's hashtable");
+	//dump();
 	vmBlock->areas.add(this);
 	return B_OK;
 }
@@ -137,15 +144,15 @@ void area::freeArea(void) {
 		vpage *page=reinterpret_cast<vpage *>(cur);
 		if (finalWrite)  {
 			page->flush(); 
-			error ("area::freeArea: flushed page %x\n",page);
+//			error ("area::freeArea: flushed page %x\n",page);
 		}
 		page->cleanup();
 		//page->next=NULL;
 		vmBlock->vpagePool->put(page);
 		}
 	vpages.~hashTable();
-	error ("area::freeArea ----------------------------------------------------------------\n");
-	vmBlock->vnodeMan->dump();
+//	error ("area::freeArea ----------------------------------------------------------------\n");
+//	vmBlock->vnodeMan->dump();
 //error ("area::freeArea: unlocking \n");
 //error ("area::freeArea: ending \n");
 	}

@@ -145,7 +145,21 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
 	int retVal;
-	//error ("vmInterface::createArea: Creating an area!\n");
+	error ("vmInterface::createArea: Creating an area!\n");
+	if (!AreaName)
+		return B_BAD_ADDRESS;
+	if (!address)
+		return B_BAD_ADDRESS;
+	if (strlen(AreaName)>=B_OS_NAME_LENGTH)
+		return B_BAD_VALUE;
+	if (pageCount<=0)
+		return B_BAD_VALUE;
+	if (addType>=CLONE || addType < EXACT)
+		return B_BAD_VALUE;
+	if (state>LOMEM || state < FULL)
+		return B_BAD_VALUE;
+	if (protect>copyOnWrite || protect < none)
+		return B_BAD_VALUE;
 	retVal = getAM()->createArea(AreaName,pageCount,address,addType,state,protect);
 	//error ("vmInterface::createArea: Done creating an area!\n");
 	return retVal;

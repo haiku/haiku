@@ -137,21 +137,23 @@ long areaManager::nextAreaID=0;
 
 // Create an area; get a new structure, call setup, create the guts, set its ID, add it to our list 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) {
-	//error ("areaManager::createArea - Creating an area\n");
+	error ("areaManager::createArea - Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
-    //error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
+    error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
     newArea->setup(this);
-    //error ("areaManager::createArea - setup complete\n");
-    newArea->createArea(AreaName,pageCount,address,addType,state,protect);
-    //error ("areaManager::createArea - new area's createArea called\n");
- 	atomic_add(&nextAreaID,1);
-    newArea->setAreaID(nextAreaID);
-    //error ("areaManager::createArea - new area's setAreaID called\n");
-    addArea(newArea);
-    //error ("areaManager::createArea - new area added to list\n");
-	int retVal=newArea->getAreaID();  
+    error ("areaManager::createArea - setup complete\n");
+    int retVal = newArea->createArea(AreaName,pageCount,address,addType,state,protect);
+    error ("areaManager::createArea - new area's createArea called\n");
+	if (retVal==B_OK) {
+	 	atomic_add(&nextAreaID,1);
+   	 	newArea->setAreaID(nextAreaID);
+    	//error ("areaManager::createArea - new area's setAreaID called\n");
+    	addArea(newArea);
+    	//error ("areaManager::createArea - new area added to list\n");
+		retVal=newArea->getAreaID();  
     //error ("areaManager::createArea - new area id found\n");
+	}
 	unlock();
 	//error ("areaManager::createArea - Done Creating an area\n");
     return  retVal;

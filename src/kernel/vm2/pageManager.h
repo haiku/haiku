@@ -16,6 +16,7 @@ class pageManager {
 
 		// Accessors
 		int desperation(void);
+		int freePageCount(void) {return clean.count()+unused.count();}
 
 		// External methods for "server" type calls
 		void cleaner(void);

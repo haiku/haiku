@@ -29,7 +29,7 @@ vpage *vnodeManager::findVnode(vnode &target) {
 // This method will make a new vnode object
 vpage *vnodeManager::addVnode(vnode &target,vpage &vp, vnode **newOne) {
 	vpage *retVal;
-	error ("vnodeManager::addVnode : Adding by reference node %x, fd = %d, offset = %d\n",&target,target.fd,target.offset);
+	//error ("vnodeManager::addVnode : Adding by reference node %x, fd = %d, offset = %d\n",&target,target.fd,target.offset);
 	vnode *found=reinterpret_cast<vnode *>(vnodes.find(&target));
 	if (!found)	{
 		found=new (vmBlock->vnodePool->get()) vnode;  
@@ -45,7 +45,7 @@ vpage *vnodeManager::addVnode(vnode &target,vpage &vp, vnode **newOne) {
 		*newOne=retVal->getBacking();
 		}
 	found->vpages.add(&vp);
-	error ("vnodeManager::addVnode returning %x, newOne = %x \n");
+	//error ("vnodeManager::addVnode returning %x, newOne = %x \n");
 
 	return retVal;
 }
@@ -54,7 +54,7 @@ vpage *vnodeManager::addVnode(vnode &target,vpage &vp, vnode **newOne) {
 // This method will NOT make a new vnode object
 vpage *vnodeManager::addVnode(vnode *target,vpage &vp) {
 	vpage *retVal;
-	error ("vnodeManager::addVnode : Adding by pointer node %x, fd = %d, offset = %d\n",target,target->fd,target->offset);
+	//error ("vnodeManager::addVnode : Adding by pointer node %x, fd = %d, offset = %d\n",target,target->fd,target->offset);
 	vnode *found=reinterpret_cast<vnode *>(vnodes.find(target));
 	if (!found)	{
 		found=target;
@@ -64,13 +64,13 @@ vpage *vnodeManager::addVnode(vnode *target,vpage &vp) {
 	else
 		retVal=reinterpret_cast<vpage *>(found->vpages.top());
 	found->vpages.add(&vp);
-	found->vpages.dump();
-	vnodes.dump();
+//	found->vpages.dump();
+//	vnodes.dump();
 }
 
 // Remove a vpage from the manager; return "is this the last one"
 bool vnodeManager::remove(vnode &target,vpage &vp) {
-	error ("vnodeManager::remove : Removing by reference node %x, fd = %d, offset = %d\n",&target,target.fd,target.offset);
+	//error ("vnodeManager::remove : Removing by reference node %x, fd = %d, offset = %d\n",&target,target.fd,target.offset);
 	vnode *found=reinterpret_cast<vnode *>(vnodes.find(&target));
 	if (!found) {
 		vnodes.dump();

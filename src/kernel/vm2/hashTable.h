@@ -27,7 +27,7 @@ class hashTable : public list
 		
 		// Get the block for the page of pointers
 		page *newPage=vmBlock->pageMan->getPage();
-		error ("hashTable::hashTable - Got Page %x\n",newPage);
+		//error ("hashTable::hashTable - Got Page %x\n",newPage);
 		pageList.add(newPage);
 
 		if (!newPage) {
@@ -42,7 +42,7 @@ class hashTable : public list
 		for (int pageCount=0;pageCount<pages;pageCount++) {
 			// Allocate a page of lists
 			page *newPage=vmBlock->pageMan->getPage();
-			error ("hashTable::hashTable - Got Page %x\n",newPage);
+			//error ("hashTable::hashTable - Got Page %x\n",newPage);
 			if (!newPage)
 				throw ("Out of pages to allocate a pool!");
 			for (int i=0;i<listsPerPage;i++)
@@ -52,7 +52,7 @@ class hashTable : public list
 		} 
 	~hashTable() {
 		while (struct page *cur=reinterpret_cast<page *>(pageList.next())) {
-			error ("hashTable::~hashTable; freeing page %x\n",cur);
+			//error ("hashTable::~hashTable; freeing page %x\n",cur);
 			vmBlock->pageMan->freePage(cur);
 		}
 	}
