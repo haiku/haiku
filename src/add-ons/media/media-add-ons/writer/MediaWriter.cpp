@@ -504,11 +504,10 @@ status_t MediaWriter::HandleBuffer(
 				bool realTimeEvent = false)
 {
 	fprintf(stderr,"MediaWriter::HandleBuffer\n");
-	status_t status = B_OK;
 	BBuffer * buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
 	WriteFileBuffer(buffer);
 	buffer->Recycle();
-	return status;
+	return B_OK;
 }
 
 status_t MediaWriter::HandleDataStatus(
