@@ -333,13 +333,13 @@ void
 NodeInfoTest::TypeTest()
 {
 	// status_t GetType(char *type) const
-	// * NULL type => B_BAD_ADDRESS
+	// * NULL type => B_BAD_ADDRESS/B_BAD_VALUE
 	NextSubTest();
 	{
 		BNode node(testFile1);
 		BNodeInfo nodeInfo;
 		CHK(nodeInfo.SetTo(&node) == B_OK);
-		CHK(nodeInfo.GetType(NULL) == B_BAD_ADDRESS);
+		CHK(equals(nodeInfo.GetType(NULL), B_BAD_ADDRESS, B_BAD_VALUE));
 	}
 	// * uninitialized => B_NO_INIT
 	NextSubTest();
@@ -410,21 +410,28 @@ NodeInfoTest::TypeTest()
 		CHK(strcmp(invalidTestType, type) == 0);
 		CheckTypeAttr(node, invalidTestType);
 	}
-	// * type string too long => B_OK
+	// * type string too long => B_OK/B_BAD_VALUE
 	NextSubTest();
 	{
 		BNode node(testFile1);
 		BNodeInfo nodeInfo;
 		CHK(nodeInfo.SetTo(&node) == B_OK);
+		// remove attr first
+		CHK(nodeInfo.SetType(NULL) == B_OK);
+// R5: Doesn't complain when setting a too long string.
+// OBOS: Handles this as an error case.
+#ifdef TEST_R5
 		CHK(nodeInfo.SetType(tooLongTestType) == B_OK);
 		// get
 		char type[1024];
 		CHK(nodeInfo.GetType(type) == B_OK);
 // R5: Returns a string one character shorter than the original string
-#ifndef TEST_R5
-		CHK(strcmp(tooLongTestType, type) == 0);
-#endif
+//		CHK(strcmp(tooLongTestType, type) == 0);
 		CheckTypeAttr(node, tooLongTestType);
+#else
+		CHK(nodeInfo.SetType(tooLongTestType) == B_BAD_VALUE);
+		CheckNoAttr(node, kTypeAttribute);
+#endif
 	}
 }
 
@@ -583,13 +590,14 @@ void
 NodeInfoTest::PreferredAppTest()
 {
 	// status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const
-	// * NULL signature => B_BAD_ADDRESS
+	// * NULL signature => B_BAD_ADDRESS/B_BAD_VALUE
 	NextSubTest();
 	{
 		BNode node(testFile1);
 		BNodeInfo nodeInfo;
 		CHK(nodeInfo.SetTo(&node) == B_OK);
-		CHK(nodeInfo.GetPreferredApp(NULL) == B_BAD_ADDRESS);
+		CHK(equals(nodeInfo.GetPreferredApp(NULL), B_BAD_ADDRESS,
+				   B_BAD_VALUE));
 	}
 	// * uninitialized => B_NO_INIT
 	NextSubTest();
