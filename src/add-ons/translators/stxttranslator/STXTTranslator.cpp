@@ -947,7 +947,9 @@ STXTTranslator::Translate(BPositionIO *inSource,
 //
 // Postconditions:
 //
-// Returns:
+// Returns:  B_BAD_VALUE if ioExtension or outView are NULL,
+//           B_NO_MEMORY if a view can't be allocated,
+//           B_OK if all goes well 
 // ---------------------------------------------------------------
 status_t
 STXTTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
@@ -958,6 +960,9 @@ STXTTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 
 	STXTView *view = new STXTView(BRect(0, 0, 225, 175),
 		"STXTTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+	if (!view)
+		return B_NO_MEMORY;
+		
 	*outView = view;
 	*outExtent = view->Bounds();
 
