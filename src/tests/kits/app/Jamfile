@@ -142,6 +142,14 @@ CommonTestLib libapptest.so
 	: app support
 ;
 
+CommonTestLib libappteststub.so
+	: AppKitTestStub.cpp
+	: libapptest.so stdc++.r4
+	: libapptest_r5.so stdc++.r4
+	:
+	:
+;
+
 SubInclude OBOS_TOP src tests kits app bapplication ;
 SubInclude OBOS_TOP src tests kits app bclipboard ;
 SubInclude OBOS_TOP src tests kits app bcursor ;

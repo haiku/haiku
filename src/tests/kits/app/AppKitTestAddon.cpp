@@ -15,7 +15,7 @@
 #include "broster/RosterTest.h"
 #include "RegistrarThreadManagerTest.h"
 
-BTestSuite* getTestSuite() {
+BTestSuite* getTestSuite2() {
 	BTestSuite *suite = new BTestSuite("App");
 
 	// ##### Add test suites here #####
