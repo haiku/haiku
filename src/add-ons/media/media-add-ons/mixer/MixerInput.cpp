@@ -142,8 +142,6 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
 
 		for (int i = 0; i < fInputChannelCount; i++) {
-
-
 			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
 									bytes_per_frame(fInput.format.u.raw_audio),
 									in_frames1,
@@ -152,14 +150,13 @@ MixerInput::BufferReceived(BBuffer *buffer)
 									out_frames1,
 									fInputChannelInfo[i].gain);
 									
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio) + in_frames1 * bytes_per_frame(fInput.format.u.raw_audio),
 									bytes_per_frame(fInput.format.u.raw_audio),
 									in_frames2,
 									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
 									fInputChannelCount * sizeof(float),
 									out_frames2,
 									fInputChannelInfo[i].gain);
-									
 		}
 	} else {
 
