@@ -30,5 +30,5 @@ BinCommand tar :
 
 BinCommand rmt :
 	rmt.c
-	: libtar.a : tar.rdef
+	: libtar.a $(NETWORK_LIBS) : tar.rdef
 ;
