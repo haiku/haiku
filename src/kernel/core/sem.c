@@ -124,7 +124,7 @@ dump_sem_info(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = atoul(argv[1]);
+		unsigned long num = strtoul(argv[1], NULL, 16);
 
 		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
@@ -375,7 +375,7 @@ sem_timeout(timer *data)
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
 
-	TRACE(("sem_timeout: called on 0x%x sem %d, tid %d\n", to, to->sem_id, to->thread_id));
+	TRACE(("sem_timeout: called on 0x%x sem %ld, tid %ld\n", data, args->blocked_sem_id, args->blocked_thread));
 
 	if (gSems[slot].id != args->blocked_sem_id) {
 		// this thread was not waiting on this semaphore
@@ -470,8 +470,8 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		thread_enqueue(t, &gSems[slot].u.used.q);
 
 		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
-			TRACE(("sem_acquire_etc: setting timeout sem for %d %d usecs, semid %d, tid %d\n",
-				timeout, sem_id, t->id));
+			TRACE(("sem_acquire_etc: setting timeout sem for %Ld usecs, semid %d, tid %d\n",
+				timeout, id, t->id));
 
 			// set up an event to go off with the thread struct as the data
 			args.blocked_sem_id = id;

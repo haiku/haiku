@@ -122,7 +122,7 @@ _dump_port_info(struct port_entry *port)
 	dprintf("tail: %d\n", port->tail);
  	get_sem_count(port->read_sem, &cnt);
  	dprintf("read_sem:  %ld\n", cnt);
- 	get_sem_count(port->read_sem, &cnt);
+ 	get_sem_count(port->write_sem, &cnt);
 	dprintf("write_sem: %ld\n", cnt);
 }
 
@@ -139,7 +139,7 @@ dump_port_info(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = atoul(argv[1]);
+		unsigned long num = strtoul(argv[1], NULL, 16);
 
 		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
