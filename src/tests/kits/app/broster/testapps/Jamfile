@@ -77,3 +77,9 @@ SimpleBRosterTestApp RosterLaunchTestApp1.cpp ;
 
 #CopyBRosterTestApp AppRunTestApp3a : AppRunTestApp3 ;
 
+# GetRecentAppsTest apps
+SimpleBRosterTestApp RecentAppsTestQualifyingApp.cpp RecentAppsTestApp.cpp ;
+SimpleBRosterTestApp RecentAppsTestNonQualifyingApp.cpp RecentAppsTestApp.cpp ;
+SimpleBRosterTestApp RecentAppsTestEmptyApp.cpp RecentAppsTestApp.cpp ;
+SimpleBRosterTestApp RecentAppsTestControlApp.cpp RecentAppsTestApp.cpp ;
+
