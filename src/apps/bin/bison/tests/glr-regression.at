@@ -1,0 +1,220 @@
+# Checking GLR Parsing: Regression Tests           -*- Autotest -*-
+# Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+AT_BANNER([[GLR Regression Tests]])
+
+## --------------------------- ##
+## Badly Collapsed GLR States. ##
+## --------------------------- ##
+
+AT_SETUP([Badly Collapsed GLR States])
+
+AT_DATA_GRAMMAR([glr-regr1.y],
+[[/* Regression Test: Improper state compression */
+/* Reported by Scott McPeak */
+
+%{
+#include <stdio.h>
+
+#define YYSTYPE int
+static YYSTYPE exprMerge (YYSTYPE x0, YYSTYPE x1);
+int yylex (void);
+int yyerror (char const *msg);
+%}
+
+
+%glr-parser
+
+
+/* -------- productions ------ */
+%%
+
+StartSymbol: E  { $$=0; }                   %merge <exprMerge>
+           ;
+
+E: E 'P' E { $$=1; printf("E -> E 'P' E\n"); }  %merge <exprMerge>
+ | 'B'     { $$=2; printf("E -> 'B'\n"); }      %merge <exprMerge>
+ ;
+
+
+
+/* ---------- C code ----------- */
+%%
+
+static YYSTYPE exprMerge (YYSTYPE x0, YYSTYPE x1)
+{
+  (void) x0;
+  (void) x1;
+  printf ("<OR>\n");
+  return 0;
+}
+
+int
+main (void)
+{
+  return yyparse ();
+}
+
+int
+yyerror (char const *msg)
+{
+  fprintf (stderr, "%s\n", msg);
+  exit (4);
+}
+
+
+int
+yylex (void)
+{
+  for (;;)
+    {
+      int ch = getchar ();
+      if (ch == EOF)
+	return 0;
+      else if (ch == 'B' || ch == 'P')
+	return ch;
+    }
+}
+]])
+
+AT_CHECK([[bison -o glr-regr1.c glr-regr1.y]], 0, [],
+[glr-regr1.y: conflicts: 1 shift/reduce
+])
+AT_COMPILE([glr-regr1])
+AT_CHECK([[echo BPBPB | ./glr-regr1]], 0,
+[[E -> 'B'
+E -> 'B'
+E -> E 'P' E
+E -> 'B'
+E -> E 'P' E
+E -> 'B'
+E -> E 'P' E
+E -> E 'P' E
+<OR>
+]], [])
+
+AT_CLEANUP
+
+## ------------------------------------------------------------ ##
+## Improper handling of embedded actions and $-N in GLR parsers ##
+## ------------------------------------------------------------ ##
+
+AT_SETUP([Improper handling of embedded actions and $-N in GLR parsers])
+
+AT_DATA_GRAMMAR([glr-regr2a.y],
+[[/* Regression Test: Improper handling of embedded actions and $-N  */
+/* Reported by S. Eken */
+
+%{
+  #define YYSTYPE char const *
+  #define yyfalse 0
+  #define yytrue 1
+
+  #include <ctype.h>
+  #include <stdio.h>
+  #include <string.h>
+  int yylex (void);
+  void yyerror (char const *);
+%}
+
+%glr-parser
+
+%%
+
+command:
+    's' var 't'
+       { printf ("Variable: '%s'\n", $2); } 
+    'v' 'x' 'q'
+  | 's' var_list 't' 'e'
+       { printf ("Varlist: '%s'\n", $2); }
+  | 's' var 't' var_printer 'x'
+  ;
+
+var:
+  'V'
+     { $$ = $1; }
+  ;
+
+var_list:
+  var
+    { $$ = $1; }
+  | var ',' var_list
+    {
+      char buffer[50];
+      strcpy (buffer, $1); 
+      strcat (buffer, ",");
+      strcat (buffer, $3);
+      $$ = strdup (buffer);
+    }	
+  ;
+
+var_printer: 'v'
+   { printf ("Variable: '%s'\n", $-1); }
+
+%%
+
+FILE *yyin = NULL;
+
+int
+yylex (void)
+{ 
+  char buf[50];
+  switch (fscanf (yyin, " %1[a-z,]", buf)) {
+  case 1:
+    return buf[0];
+  case EOF:
+    return 0;
+  default:
+    break;
+  }
+  fscanf (yyin, "%s", buf);
+  yylval = strdup (buf);
+  return 'V';
+}
+
+void
+yyerror (char const *s)
+{ printf ("%s\n", s);
+}
+
+int
+main (int argc, char **argv)
+{ 
+  yyin = stdin;
+  if (argc == 2 && !(yyin = fopen (argv[1], "r"))) return 1;
+  return yyparse ();
+}
+]])
+
+AT_CHECK([[bison -o glr-regr2a.c glr-regr2a.y]], 0, [],
+[glr-regr2a.y: conflicts: 2 shift/reduce
+])
+AT_COMPILE([glr-regr2a])
+
+AT_CHECK([[echo s VARIABLE_1 t v x q | ./glr-regr2a]], 0,
+[[Variable: 'VARIABLE_1'
+]], [])
+AT_CHECK([[echo s VARIABLE_1 , ANOTHER_VARIABLE_2 t e | ./glr-regr2a]], 0,
+[[Varlist: 'VARIABLE_1,ANOTHER_VARIABLE_2'
+]])
+AT_CHECK([[echo s VARIABLE_3 t v x | ./glr-regr2a]], 0,
+[[Variable: 'VARIABLE_3'
+]], [])
+
+
+AT_CLEANUP

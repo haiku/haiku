@@ -1,0 +1,743 @@
+# Mesajele în limba românã pentru GNU Bison.
+# Copyright (C) 2003 Free Software Foundation, Inc.
+# Acest fiºier este distribuit sub aceeaºi licenþã ca ºi pachetul bison.
+# Laurentiu Buzdugan <buzdugan@voyager.net>, 2003.
+#
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bison 1.875a\n"
+"Report-Msgid-Bugs-To: bug-bison@gnu.org\n"
+"POT-Creation-Date: 2004-05-21 10:26-0700\n"
+"PO-Revision-Date: 2003-03-01 21:43-0500\n"
+"Last-Translator: Laurentiu Buzdugan <buzdugan@voyager.net>\n"
+"Language-Team: Romanian <translation-team-ro@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/complain.c:51 src/complain.c:66
+msgid "warning: "
+msgstr "avertisment:"
+
+#: src/complain.c:122 src/complain.c:138
+msgid "fatal error: "
+msgstr "eroare fatalã:"
+
+#: src/conflicts.c:76
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as shift"
+msgstr "    Conflict între regula %d ºi elementul (token) %s rezolvat ca shift"
+
+#: src/conflicts.c:84
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as reduce"
+msgstr ""
+"    Conflict între regula %d ºi elementul (token) %s rezolvat ca reduce"
+
+#: src/conflicts.c:91
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as an error"
+msgstr ""
+"    Conflict între regula %d ºi elementul (token) %s rezolvat ca eroare"
+
+#: src/conflicts.c:399
+#, c-format
+msgid "conflicts: %d shift/reduce, %d reduce/reduce\n"
+msgstr "conflicte: %d shift/reduce, %d reduce/reduce\n"
+
+#: src/conflicts.c:402
+#, c-format
+msgid "conflicts: %d shift/reduce\n"
+msgstr "conflicte: %d shift/reduce\n"
+
+#: src/conflicts.c:404
+#, c-format
+msgid "conflicts: %d reduce/reduce\n"
+msgstr "conflicte: %d reduce/reduce\n"
+
+#: src/conflicts.c:422
+#, c-format
+msgid "State %d "
+msgstr "Stare %d"
+
+#: src/conflicts.c:487
+#, fuzzy, c-format
+msgid "%%expect-rr applies only to GLR parsers"
+msgstr "%s afecteazã numai parsere GLR"
+
+#: src/conflicts.c:511
+#, c-format
+msgid "expected %d shift/reduce conflict"
+msgid_plural "expected %d shift/reduce conflicts"
+msgstr[0] "am aºteptat %d conflict shift/reduce"
+msgstr[1] "am aºteptat %d conflicte shift/reduce"
+
+#: src/conflicts.c:515
+#, fuzzy, c-format
+msgid "expected %d reduce/reduce conflict"
+msgid_plural "expected %d reduce/reduce conflicts"
+msgstr[0] "am aºteptat 0 conflicte reduce/reduce"
+msgstr[1] "am aºteptat 0 conflicte reduce/reduce"
+
+#: src/files.c:100
+#, c-format
+msgid "cannot open file `%s'"
+msgstr "nu am putut deschide fiºierul `%s'"
+
+#: src/files.c:116
+msgid "I/O error"
+msgstr "Eroare I/O"
+
+#: src/files.c:119
+msgid "cannot close file"
+msgstr "nu pot închide fiºierul"
+
+#: src/files.c:337
+#, c-format
+msgid "conflicting outputs to file %s"
+msgstr "ieºiri în conflict în fiºierul %s"
+
+#: src/getargs.c:186
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Încercaþi `%s --help' pentru informaþii suplimentare.\n"
+
+#: src/getargs.c:192
+msgid "GNU bison generates parsers for LALR(1) grammars.\n"
+msgstr "GNU bison genereazã parsere pentru gramatici LALR(1).\n"
+
+#: src/getargs.c:196
+#, c-format
+msgid "Usage: %s [OPTION]... FILE\n"
+msgstr "Folosire: %s [OPÞIUNE]... FIªIER\n"
+
+#: src/getargs.c:200
+msgid ""
+"If a long option shows an argument as mandatory, then it is mandatory\n"
+"for the equivalent short option also.  Similarly for optional arguments.\n"
+msgstr ""
+"Dacã o opþiune lungã aratã un argument ca necesar, atunci el este necesar\n"
+"ºi pentru opþiunea scurtã echivalentã. Similar pentru argumentele "
+"opþionale.\n"
+
+#: src/getargs.c:206
+msgid ""
+"Operation modes:\n"
+"  -h, --help      display this help and exit\n"
+"  -V, --version   output version information and exit\n"
+"  -y, --yacc      emulate POSIX yacc\n"
+msgstr ""
+"Moduri de operare:\n"
+"  -h, --help      afiºeazã acest mesaj ºi terminã\n"
+"  -V, --version   afiºeazã informaþii despre versiune ºi terminã\n"
+"  -y, --yacc      emuleazã POSIX yacc\n"
+
+#: src/getargs.c:213
+msgid ""
+"Parser:\n"
+"  -S, --skeleton=FILE        specify the skeleton to use\n"
+"  -t, --debug                instrument the parser for debugging\n"
+"      --locations            enable locations computation\n"
+"  -p, --name-prefix=PREFIX   prepend PREFIX to the external symbols\n"
+"  -l, --no-lines             don't generate `#line' directives\n"
+"  -n, --no-parser            generate the tables only\n"
+"  -k, --token-table          include a table of token names\n"
+msgstr ""
+"Parser:\n"
+"  -S, --skeleton=FIªIER      specificã scheletul de folosit\n"
+"  -t, --debug                instrumenteazã parserul pentru depanare\n"
+"      --locations            activeazã calculul locaþiilor\n"
+"  -p, --name-prefix=PREFIX   pune prefix PREFIX la simbolurile externe\n"
+"  -l, --no-lines             nu genera directive `#line'\n"
+"  -n, --no-parser            genereazã numai tabelele\n"
+"  -k, --token-table          include un tabel cu nume de elemente\n"
+
+#: src/getargs.c:225
+msgid ""
+"Output:\n"
+"  -d, --defines              also produce a header file\n"
+"  -r, --report=THINGS        also produce details on the automaton\n"
+"  -v, --verbose              same as `--report=state'\n"
+"  -b, --file-prefix=PREFIX   specify a PREFIX for output files\n"
+"  -o, --output=FILE          leave output to FILE\n"
+"  -g, --graph                also produce a VCG description of the "
+"automaton\n"
+msgstr ""
+"Ieºire:\n"
+"  -d, --defines              creazã ºi un fiºier header\n"
+"  -r, --report=LUCRURI       creazã ºi detalii despre automaton\n"
+"  -v, --verbose              la fel ca `--report=state'\n"
+"  -b, --file-prefix=PREFIX   specificã un PREFIX pentru fiºierele ieºire\n"
+"  -o, --output=FIªIER        creazã ieºire în FIªIER\n"
+"  -g, --graph                creazã ºi o descriere VCG a automaton-ului\n"
+
+#: src/getargs.c:236
+msgid ""
+"THINGS is a list of comma separated words that can include:\n"
+"  `state'        describe the states\n"
+"  `itemset'      complete the core item sets with their closure\n"
+"  `lookahead'    explicitly associate lookaheads to items\n"
+"  `solved'       describe shift/reduce conflicts solving\n"
+"  `all'          include all the above information\n"
+"  `none'         disable the report\n"
+msgstr ""
+"LUCRURI este o listã de cuvinte separate de virgulã ce pot fi:\n"
+"  `state'        descrie stãrile\n"
+"  `itemset'      completeazã seturile de elemente nucleu cu închiderea lor\n"
+"  `lookahead'    asociazã explicit lookaheads la elemente\n"
+"  `solved'       descrie rezolvarea conflictelor shift/reduce\n"
+"  `all'          include toatã informaþia de deasupra\n"
+"  `none'         deactiveazã raportarea\n"
+
+#: src/getargs.c:247
+msgid "Report bugs to <bug-bison@gnu.org>.\n"
+msgstr "Raportaþi bug-uri la <bug-bison@gnu.org>.\n"
+
+#: src/getargs.c:264
+#, c-format
+msgid "bison (GNU Bison) %s"
+msgstr "bison (GNU Bison) %s"
+
+#: src/getargs.c:266
+msgid "Written by Robert Corbett and Richard Stallman.\n"
+msgstr "Scris de Robert Corbett ºi Richard Stallman.\n"
+
+#: src/getargs.c:270
+#, c-format
+msgid "Copyright (C) %d Free Software Foundation, Inc.\n"
+msgstr "Copyright (C) %d Free Software Foundation, Inc.\n"
+
+#: src/getargs.c:272
+msgid ""
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"Acesta este software liber; vedeþi codul sursã pentru condiþii despre "
+"copiere.\n"
+"Nu existã nici o garanþie; nici chiar pentru COMERCIALIZARE sau de "
+"POTRIVIRE\n"
+"PENTRU UN SCOP ANUME.\n"
+
+#: src/getargs.c:438
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "operator lipsã dupã `%s'"
+
+#: src/getargs.c:440
+#, c-format
+msgid "extra operand `%s'"
+msgstr "extra operator `%s'"
+
+#: src/gram.c:139
+msgid "empty"
+msgstr "goleºte"
+
+#: src/gram.c:233
+msgid "Grammar"
+msgstr "Gramaticã"
+
+#: src/gram.c:321 src/reduce.c:394
+msgid "warning"
+msgstr "avertisment"
+
+#: src/main.c:124
+msgid "rule never reduced because of conflicts"
+msgstr "regula nu este redusã niciodatã din cauza conflictelor"
+
+#: src/parse-gram.y:363
+msgid "POSIX forbids declarations in the grammar"
+msgstr "POSIX interzice declaraþii în gramaticã"
+
+#: src/parse-gram.y:486
+msgid "missing identifier in parameter declaration"
+msgstr "identificator lipsã în declaraþia parametrului"
+
+#: src/print.c:49
+#, c-format
+msgid " type %d is %s\n"
+msgstr " tipul %d este %s\n"
+
+#: src/print.c:165
+#, c-format
+msgid "shift, and go to state %d\n"
+msgstr "shift, ºi mergi în starea %d\n"
+
+#: src/print.c:167
+#, c-format
+msgid "go to state %d\n"
+msgstr "mergi în starea %d\n"
+
+#: src/print.c:204
+msgid "error (nonassociative)\n"
+msgstr "eroare (ne-asociativitate)\n"
+
+#: src/print.c:292
+#, c-format
+msgid "reduce using rule %d (%s)"
+msgstr "reduce folosind regula %d (%s)"
+
+#: src/print.c:294
+#, c-format
+msgid "accept"
+msgstr "accept"
+
+#: src/print.c:325 src/print.c:391
+msgid "$default"
+msgstr "$implicit"
+
+#: src/print.c:420
+#, c-format
+msgid "state %d"
+msgstr "stare %d"
+
+#: src/print.c:456
+msgid "Terminals, with rules where they appear"
+msgstr "Terminale, cu reguli acolo unde acestea apar"
+
+#: src/print.c:483
+msgid "Nonterminals, with rules where they appear"
+msgstr "Non-terminale, cu reguli acolo unde acestea apar"
+
+#: src/print.c:512
+#, c-format
+msgid " on left:"
+msgstr " pe stânga:"
+
+#: src/print.c:527
+#, c-format
+msgid " on right:"
+msgstr " pe dreapta:"
+
+#: src/print.c:555
+msgid "Rules never reduced"
+msgstr "Regulile nu au fost reduse"
+
+#: src/reader.c:56
+#, c-format
+msgid "multiple %s declarations"
+msgstr "declaraþii %s multiple"
+
+#: src/reader.c:118
+#, c-format
+msgid "result type clash on merge function %s: <%s> != <%s>"
+msgstr ""
+"tipul rezultatului în conflict cu funcþia de combinare %s: <%s> != <%s>"
+
+#: src/reader.c:216
+#, c-format
+msgid "rule given for %s, which is a token"
+msgstr "regula datã pentru %s, care este un element (token)"
+
+#: src/reader.c:245
+#, c-format
+msgid "type clash on default action: <%s> != <%s>"
+msgstr "conflict de tip pentru acþiunea implicitã: <%s> != <%s>"
+
+#: src/reader.c:251
+msgid "empty rule for typed nonterminal, and no action"
+msgstr "regulã vidã pentru nonterminal cu tip, ºi nici o acþiune"
+
+#: src/reader.c:321 src/reader.c:335 src/reader.c:348
+#, c-format
+msgid "only one %s allowed per rule"
+msgstr "un singur %s permis pe fiecare regulã"
+
+#: src/reader.c:331 src/reader.c:346
+#, c-format
+msgid "%s affects only GLR parsers"
+msgstr "%s afecteazã numai parsere GLR"
+
+#: src/reader.c:333
+#, c-format
+msgid "%s must be followed by positive number"
+msgstr "%s trebuie sã fie urmat de numere pozitive"
+
+#: src/reader.c:490
+msgid "no rules in the input grammar"
+msgstr "nici o regulã în gramatica furnizatã"
+
+#: src/reduce.c:242
+msgid "useless rule"
+msgstr "regulã fãrã rost"
+
+#: src/reduce.c:303
+#, c-format
+msgid "useless nonterminal: %s"
+msgstr "nonterminal fãrã rost: %s"
+
+#: src/reduce.c:351
+msgid "Useless nonterminals"
+msgstr "Nonterminale fãrã rost"
+
+#: src/reduce.c:364
+msgid "Terminals which are not used"
+msgstr "Terminale care nu sunt folosite"
+
+#: src/reduce.c:373
+msgid "Useless rules"
+msgstr "Reguli fãrã rost"
+
+#: src/reduce.c:389
+#, c-format
+msgid "%d rule never reduced\n"
+msgid_plural "%d rules never reduced\n"
+msgstr[0] "%d regulã niciodatã redusã\n"
+msgstr[1] "%d reguli niciodatã reduse\n"
+
+#: src/reduce.c:397
+#, c-format
+msgid "%d useless nonterminal"
+msgid_plural "%d useless nonterminals"
+msgstr[0] "%d nonterminal fãrã rost"
+msgstr[1] "%d nonterminale fãrã rost"
+
+#: src/reduce.c:403
+#, c-format
+msgid " and "
+msgstr " ºi "
+
+#: src/reduce.c:406
+#, c-format
+msgid "%d useless rule"
+msgid_plural "%d useless rules"
+msgstr[0] "%d regulã fãrã rost"
+msgstr[1] "%d reguli fãrã rost"
+
+#: src/reduce.c:436
+#, c-format
+msgid "start symbol %s does not derive any sentence"
+msgstr "simbol de start %s nu deriveazã nici o propoziþie"
+
+#: src/scan-gram.l:162
+msgid "stray `,' treated as white space"
+msgstr "Virgulã `,' rãtãcitã tratatã ca spaþiu gol"
+
+#: src/scan-gram.l:225
+#, c-format
+msgid "invalid directive: %s"
+msgstr "directivã invalidã: %s"
+
+#: src/scan-gram.l:283
+#, c-format
+msgid "invalid character: %s"
+msgstr "caracter invalid: %s"
+
+#: src/scan-gram.l:402
+#, fuzzy
+msgid "invalid null character"
+msgstr "caracter invalid: %s"
+
+#: src/scan-gram.l:415 src/scan-gram.l:427 src/scan-gram.l:448
+#, c-format
+msgid "invalid escape sequence: %s"
+msgstr "secvenþã escape invalidã: %s"
+
+#: src/scan-gram.l:417 src/scan-gram.l:429 src/scan-gram.l:450
+#, fuzzy, c-format
+msgid "invalid null character: %s"
+msgstr "caracter invalid: %s"
+
+#: src/scan-gram.l:455
+#, c-format
+msgid "unrecognized escape sequence: %s"
+msgstr "secvenþã escape nerecunoscutã: %s"
+
+#: src/scan-gram.l:537
+#, c-format
+msgid "missing `{' in `%s'"
+msgstr "`{' lipsã în `%s'"
+
+#: src/scan-gram.l:782
+#, c-format
+msgid "$$ of `%s' has no declared type"
+msgstr "$$ a lui `%s' nu are nici un tip declarat"
+
+#: src/scan-gram.l:803
+#, c-format
+msgid "$%d of `%s' has no declared type"
+msgstr "$%d a lui `%s' nu are nici un tip declarat"
+
+#: src/scan-gram.l:812 src/scan-gram.l:881 src/scan-gram.l:932
+#, c-format
+msgid "integer out of range: %s"
+msgstr "întreg în afara domeniului: %s"
+
+#: src/scan-gram.l:848 src/scan-gram.l:916
+#, c-format
+msgid "invalid value: %s"
+msgstr "valoare invalidã: %s"
+
+#: src/scan-gram.l:1036
+#, c-format
+msgid "missing `%s' at end of file"
+msgstr "`%s' lipsã la sfârºitul fiºierului"
+
+#: src/scan-gram.l:1047
+#, fuzzy, c-format
+msgid "missing `%s' at end of line"
+msgstr "`%s' lipsã la sfârºitul fiºierului"
+
+#: src/symlist.c:97 src/symlist.c:108
+msgid "invalid $ value"
+msgstr "valoare $ invalidã"
+
+#: src/symtab.c:85
+#, c-format
+msgid "type redeclaration for %s"
+msgstr "redeclarare de tip pentru %s"
+
+#: src/symtab.c:102 src/symtab.c:120
+#, c-format
+msgid "%s redeclaration for %s"
+msgstr "redeclarare %s pentru %s"
+
+#: src/symtab.c:139
+#, c-format
+msgid "redefining precedence of %s"
+msgstr "precedenþã redefinitã pentru %s"
+
+#: src/symtab.c:157
+#, c-format
+msgid "symbol %s redefined"
+msgstr "simbol %s redefinit"
+
+#: src/symtab.c:180
+#, c-format
+msgid "redefining user token number of %s"
+msgstr "numãrul elementului (token) definit de utilizator redefinit pentru %s"
+
+#: src/symtab.c:207
+#, c-format
+msgid "symbol %s is used, but is not defined as a token and has no rules"
+msgstr ""
+"simbolul %s e folosit, dar nu este definit ca element (token) ºi nu are nici "
+"o regulã"
+
+#: src/symtab.c:232
+#, c-format
+msgid "symbol `%s' used more than once as a literal string"
+msgstr "simbolul `%s' este folosit de mai multe ori ca ºir literar"
+
+#: src/symtab.c:235
+#, c-format
+msgid "symbol `%s' given more than one literal string"
+msgstr "simbolului `%s' îi este dat mai mult de un singur ºir literar"
+
+#: src/symtab.c:271
+#, c-format
+msgid "conflicting precedences for %s and %s"
+msgstr "precedenþe în conflict pentru %s ºi %s"
+
+#: src/symtab.c:283
+#, c-format
+msgid "conflicting associativities for %s (%s) and %s (%s)"
+msgstr "asoaciativitãþi în conflict pentru %s (%s) ºi %s (%s)"
+
+#: src/symtab.c:368
+#, c-format
+msgid "tokens %s and %s both assigned number %d"
+msgstr "ambelor elementele (tokens) %s ºi %s le sunt alocate acelaºi numãr %d"
+
+#: src/symtab.c:591
+#, c-format
+msgid "the start symbol %s is undefined"
+msgstr "simbolul de start %s nu este definit"
+
+#: src/symtab.c:595
+#, c-format
+msgid "the start symbol %s is a token"
+msgstr "simbolul de start %s este un element (token)"
+
+#: lib/argmatch.c:133
+#, c-format
+msgid "invalid argument %s for %s"
+msgstr "argument invalid %s pentru %s"
+
+#: lib/argmatch.c:134
+#, c-format
+msgid "ambiguous argument %s for %s"
+msgstr "argument ambiguu %s pentru %s"
+
+#: lib/argmatch.c:153
+#, c-format
+msgid "Valid arguments are:"
+msgstr "Argumente valide sunt:"
+
+#: lib/bitset_stats.c:179
+#, c-format
+msgid "%u bitset_allocs, %u freed (%.2f%%).\n"
+msgstr "%u bitset_allocs, %u eliberate (%.2f%%).\n"
+
+#: lib/bitset_stats.c:182
+#, c-format
+msgid "%u bitset_sets, %u cached (%.2f%%)\n"
+msgstr "%u bitset_sets, %u stocate (cached) (%.2f%%)\n"
+
+#: lib/bitset_stats.c:185
+#, c-format
+msgid "%u bitset_resets, %u cached (%.2f%%)\n"
+msgstr "%u bitset_resets, %u stocate (cached) (%.2f%%)\n"
+
+#: lib/bitset_stats.c:188
+#, c-format
+msgid "%u bitset_tests, %u cached (%.2f%%)\n"
+msgstr "%u bitset_tests, %u stocate (cached) (%.2f%%)\n"
+
+#: lib/bitset_stats.c:192
+#, c-format
+msgid "%u bitset_lists\n"
+msgstr "%u bitset_lists\n"
+
+#: lib/bitset_stats.c:194
+msgid "count log histogram\n"
+msgstr "numãrã histograma jurnal\n"
+
+#: lib/bitset_stats.c:197
+msgid "size log histogram\n"
+msgstr "dimensiune histogramã jurnal\n"
+
+#: lib/bitset_stats.c:200
+msgid "density histogram\n"
+msgstr "densitate histogramã\n"
+
+#: lib/bitset_stats.c:214
+#, c-format
+msgid ""
+"Bitset statistics:\n"
+"\n"
+msgstr ""
+"Statistici bitset:\n"
+"\n"
+
+#: lib/bitset_stats.c:217
+#, c-format
+msgid "Accumulated runs = %u\n"
+msgstr "Rulãri acumulate = %u\n"
+
+#: lib/bitset_stats.c:261 lib/bitset_stats.c:266
+msgid "Could not read stats file."
+msgstr "Nu am putut citi fiºierul de statistici."
+
+#: lib/bitset_stats.c:263
+#, c-format
+msgid "Bad stats file size.\n"
+msgstr "Dimensiune fiºier cu statistici incorectã.\n"
+
+#: lib/bitset_stats.c:289 lib/bitset_stats.c:291
+msgid "Could not write stats file."
+msgstr "Nu am putut scrie fiºier statistici."
+
+#: lib/bitset_stats.c:294
+msgid "Could not open stats file for writing."
+msgstr "Nu am putut deschide fiºierul de statistici pentru scriere."
+
+#: lib/error.c:127
+msgid "Unknown system error"
+msgstr "Eroare de sistem necunoscutã"
+
+#: lib/getopt.c:570 lib/getopt.c:589
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: opþiunea `%s' este ambiguã\n"
+
+#: lib/getopt.c:622 lib/getopt.c:626
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: opþiunea `--%s' nu permite un argument\n"
+
+#: lib/getopt.c:635 lib/getopt.c:640
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: opþiunea `%c%s' nu permite un argument\n"
+
+#: lib/getopt.c:686 lib/getopt.c:708 lib/getopt.c:1039 lib/getopt.c:1061
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: opþiunea `%s' necesitã un argument\n"
+
+#: lib/getopt.c:746 lib/getopt.c:749
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: opþiune nerecunoscutã `--%s'\n"
+
+#: lib/getopt.c:757 lib/getopt.c:760
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: opþiune nerecunoscutã `%c%s'\n"
+
+#: lib/getopt.c:815 lib/getopt.c:818
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: opþiune ilegalã -- %c\n"
+
+#: lib/getopt.c:824 lib/getopt.c:827
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: opþiune ilegalã -- %c\n"
+
+#: lib/getopt.c:882 lib/getopt.c:901 lib/getopt.c:1114 lib/getopt.c:1135
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: opþiunea necesitã un argument -- %c\n"
+
+#: lib/getopt.c:954 lib/getopt.c:973
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: opþiunea `-W %s' este ambiguã\n"
+
+#: lib/getopt.c:997 lib/getopt.c:1018
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: opþiunea `-W %s' nu permite un argument\n"
+
+#: lib/obstack.c:417 lib/obstack.c:420 lib/xmalloc.c:53
+msgid "memory exhausted"
+msgstr "memorie epuizatã"
+
+#: lib/quotearg.c:238
+msgid "`"
+msgstr "`"
+
+#: lib/quotearg.c:239
+msgid "'"
+msgstr "'"
+
+#: lib/subpipe.c:171
+#, c-format
+msgid "subsidiary program `%s' could not be invoked"
+msgstr "programul auxiliar `%s' nu poate fi invocat"
+
+#: lib/subpipe.c:173
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "programul auxiliar `%s' nu a fost gãsit"
+
+#: lib/subpipe.c:175
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "programul auxiliar `%s' a eºuat"
+
+#: lib/subpipe.c:176
+#, c-format
+msgid "subsidiary program `%s' failed (exit status %d)"
+msgstr "programul auxiliar `%s' a eºuat (stare de terminare %d)"
+
+#: lib/timevar.c:475
+msgid ""
+"\n"
+"Execution times (seconds)\n"
+msgstr ""
+"\n"
+"Timp de execuþie (secunde)\n"
+
+#: lib/timevar.c:525
+msgid " TOTAL                 :"
+msgstr " TOTAL                 :"
+
+#: lib/timevar.c:561
+#, c-format
+msgid "time in %s: %ld.%06ld (%ld%%)\n"
+msgstr "timp în %s: %ld.%06ld (%ld%%)\n"

@@ -1,0 +1,740 @@
+# Danish messages for bison.
+# Copyright © 2001, 2002 Free Software Foundation, Inc.
+# Keld Simonsen <keld@dkuug.dk>, 2002.
+# Byrial Ole Jensen <byrial@image.dk>, 2002-2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bison 1.875a\n"
+"Report-Msgid-Bugs-To: bug-bison@gnu.org\n"
+"POT-Creation-Date: 2004-05-21 10:26-0700\n"
+"PO-Revision-Date: 2003-04-12 22:57+0200\n"
+"Last-Translator: Byrial Ole Jensen <byrial@image.dk>\n"
+"Language-Team: Danish <dansk@klid.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/complain.c:51 src/complain.c:66
+msgid "warning: "
+msgstr "advarsel: "
+
+#: src/complain.c:122 src/complain.c:138
+msgid "fatal error: "
+msgstr "fatal fejl: "
+
+#: src/conflicts.c:76
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as shift"
+msgstr "    Konflikt mellem regel %d og element %s løstes som skift"
+
+#: src/conflicts.c:84
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as reduce"
+msgstr "    Konflikt mellem regel %d og element %s løstes som reducér"
+
+#: src/conflicts.c:91
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as an error"
+msgstr "    Konflikt mellem regel %d og element %s løstes som en fejl"
+
+#: src/conflicts.c:399
+#, c-format
+msgid "conflicts: %d shift/reduce, %d reduce/reduce\n"
+msgstr "konflikter: %d skift/reducér, %d reducér/reducér\n"
+
+#: src/conflicts.c:402
+#, c-format
+msgid "conflicts: %d shift/reduce\n"
+msgstr "konflikter:  %d skift/reducér\n"
+
+#: src/conflicts.c:404
+#, c-format
+msgid "conflicts: %d reduce/reduce\n"
+msgstr "konflikter:  %d reducér/reducér\n"
+
+#: src/conflicts.c:422
+#, c-format
+msgid "State %d "
+msgstr "Tilstand %d "
+
+#: src/conflicts.c:487
+#, fuzzy, c-format
+msgid "%%expect-rr applies only to GLR parsers"
+msgstr "%s påvirker kun GLR-fortolkere"
+
+#: src/conflicts.c:511
+#, c-format
+msgid "expected %d shift/reduce conflict"
+msgid_plural "expected %d shift/reduce conflicts"
+msgstr[0] "forventede %d skift/reducér-konflikt"
+msgstr[1] "forventede %d skift/reducér-konflikter"
+
+#: src/conflicts.c:515
+#, fuzzy, c-format
+msgid "expected %d reduce/reduce conflict"
+msgid_plural "expected %d reduce/reduce conflicts"
+msgstr[0] "forventede 0 reducér/reducér-konflikter"
+msgstr[1] "forventede 0 reducér/reducér-konflikter"
+
+#: src/files.c:100
+#, c-format
+msgid "cannot open file `%s'"
+msgstr "kan ikke åbne filen \"%s\""
+
+#: src/files.c:116
+msgid "I/O error"
+msgstr "Fejl ved ind- eller udlæsning"
+
+#: src/files.c:119
+msgid "cannot close file"
+msgstr "kan ikke lukke fil"
+
+#: src/files.c:337
+#, c-format
+msgid "conflicting outputs to file %s"
+msgstr "konfliktende uddata til filen %s"
+
+#: src/getargs.c:186
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Prøv med \"%s --help\" for mere information.\n"
+
+#: src/getargs.c:192
+msgid "GNU bison generates parsers for LALR(1) grammars.\n"
+msgstr "GNU bison genererer fortolkere til LALR(1)-grammatiker.\n"
+
+#: src/getargs.c:196
+#, c-format
+msgid "Usage: %s [OPTION]... FILE\n"
+msgstr "Brug: %s [FLAG]... FIL\n"
+
+#: src/getargs.c:200
+msgid ""
+"If a long option shows an argument as mandatory, then it is mandatory\n"
+"for the equivalent short option also.  Similarly for optional arguments.\n"
+msgstr ""
+"Hvis et lang flag viser et argument som obligatorisk, er det også\n"
+"obligatorisk for det tilsvarende korte flag. Tilsvarende\n"
+"for valgfrie argumenter.\n"
+
+#: src/getargs.c:206
+msgid ""
+"Operation modes:\n"
+"  -h, --help      display this help and exit\n"
+"  -V, --version   output version information and exit\n"
+"  -y, --yacc      emulate POSIX yacc\n"
+msgstr ""
+"Arbejdstilstande:\n"
+"  -h, --help      vis denne hjælpetekst og afslut\n"
+"  -V, --version   vis versionsinformation og afslut\n"
+"  -y, --yacc      emulér POSIX-yacc\n"
+
+#: src/getargs.c:213
+msgid ""
+"Parser:\n"
+"  -S, --skeleton=FILE        specify the skeleton to use\n"
+"  -t, --debug                instrument the parser for debugging\n"
+"      --locations            enable locations computation\n"
+"  -p, --name-prefix=PREFIX   prepend PREFIX to the external symbols\n"
+"  -l, --no-lines             don't generate `#line' directives\n"
+"  -n, --no-parser            generate the tables only\n"
+"  -k, --token-table          include a table of token names\n"
+msgstr ""
+"Fortolker:\n"
+"  -S, --skeleton=FIL         angiv skeletfilen som skal bruges\n"
+"  -t, --debug                instrumentér fortolkeren for fejlsøgning\n"
+"      --locations            aktivér tilstandsberegning\n"
+"  -p, --name-prefix=PRÆFIKS  tilføj PRÆFIKS for eksterne symboler\n"
+"  -l, --no-lines             generér ikke \"#line\"-direktiver\n"
+"  -n, --no-parser            generér kun tabellerne\n"
+"  -k, --token-table          inkludér en tabel over elementnavne\n"
+
+#: src/getargs.c:225
+msgid ""
+"Output:\n"
+"  -d, --defines              also produce a header file\n"
+"  -r, --report=THINGS        also produce details on the automaton\n"
+"  -v, --verbose              same as `--report=state'\n"
+"  -b, --file-prefix=PREFIX   specify a PREFIX for output files\n"
+"  -o, --output=FILE          leave output to FILE\n"
+"  -g, --graph                also produce a VCG description of the "
+"automaton\n"
+msgstr ""
+"Uddata:\n"
+"  -d, --defines              lav også en hovedfil\n"
+"  -r, --report=SAGER         lav også detaljer om automaten\n"
+"  -v, --verbose              samme som \"--report=state\"\n"
+"  -b, --file-prefix=PRÆFIKS  angiv et PRÆFIKS for uddatafiler\n"
+"  -o, --output=FIL           læg uddata i FIL\n"
+"  -g, --graph                lav også en VCG-beskrivelse af automaten\n"
+
+#: src/getargs.c:236
+msgid ""
+"THINGS is a list of comma separated words that can include:\n"
+"  `state'        describe the states\n"
+"  `itemset'      complete the core item sets with their closure\n"
+"  `lookahead'    explicitly associate lookaheads to items\n"
+"  `solved'       describe shift/reduce conflicts solving\n"
+"  `all'          include all the above information\n"
+"  `none'         disable the report\n"
+msgstr ""
+"TING er en liste med kommaseparerede ord som kan indeholde:\n"
+"  \"state\"        beskriv tilstandene\n"
+"  \"itemset\"      komplettér kerneobjektmængderne med deres afslutninger\n"
+"  \"lookahead\"    kobl udtrykkeligt fremadkig til objekter\n"
+"  \"solved\"       beskriv løsninger af skift/reducér-konflikter\n"
+"  \"all\"          inkludér al ovenstående information\n"
+"  \"none\"         deaktivér rapporten\n"
+
+#: src/getargs.c:247
+msgid "Report bugs to <bug-bison@gnu.org>.\n"
+msgstr ""
+"Rapportér fejl til <bug-bison@gnu.org>.\n"
+"Rapportér synpunkter om oversættelsen til <dansk@klid.dk>.\n"
+
+#: src/getargs.c:264
+#, c-format
+msgid "bison (GNU Bison) %s"
+msgstr "bison (GNU Bison) %s"
+
+#: src/getargs.c:266
+msgid "Written by Robert Corbett and Richard Stallman.\n"
+msgstr "Skrevet af Robert Corbett og Richard Stallman.\n"
+
+#: src/getargs.c:270
+#, c-format
+msgid "Copyright (C) %d Free Software Foundation, Inc.\n"
+msgstr "Copyright © %d Free Software Foundation, Inc.\n"
+
+#: src/getargs.c:272
+msgid ""
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"Dette er frit programmel, se kildekoden for kopieringsbetingelser. Der\n"
+"gives INGEN garanti, endog ikke for SALGBARHED eller EGNETHED FOR NOGET\n"
+"BESTEMT FORMÅL.\n"
+
+#: src/getargs.c:438
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "manglende operand efter \"%s\""
+
+#: src/getargs.c:440
+#, c-format
+msgid "extra operand `%s'"
+msgstr "overtallig operand \"%s\""
+
+#: src/gram.c:139
+msgid "empty"
+msgstr "tom"
+
+#: src/gram.c:233
+msgid "Grammar"
+msgstr "Grammatik"
+
+#: src/gram.c:321 src/reduce.c:394
+msgid "warning"
+msgstr "advarsel"
+
+#: src/main.c:124
+msgid "rule never reduced because of conflicts"
+msgstr "regel aldrig reduceret på grund af konflikter"
+
+#: src/parse-gram.y:363
+msgid "POSIX forbids declarations in the grammar"
+msgstr "POSIX forbyder deklarationer i grammatikken"
+
+#: src/parse-gram.y:486
+msgid "missing identifier in parameter declaration"
+msgstr "manglende identifikator i parameterdeklaration"
+
+#: src/print.c:49
+#, c-format
+msgid " type %d is %s\n"
+msgstr " type %d er %s\n"
+
+#: src/print.c:165
+#, c-format
+msgid "shift, and go to state %d\n"
+msgstr "skift, og gå til tilstand %d\n"
+
+#: src/print.c:167
+#, c-format
+msgid "go to state %d\n"
+msgstr "gå til tilstand %d\n"
+
+#: src/print.c:204
+msgid "error (nonassociative)\n"
+msgstr "fejl (ikke-associativ)\n"
+
+#: src/print.c:292
+#, c-format
+msgid "reduce using rule %d (%s)"
+msgstr "reducér med regel %d (%s)"
+
+#: src/print.c:294
+#, c-format
+msgid "accept"
+msgstr "acceptér"
+
+#: src/print.c:325 src/print.c:391
+msgid "$default"
+msgstr "$default"
+
+#: src/print.c:420
+#, c-format
+msgid "state %d"
+msgstr "tilstand %d"
+
+#: src/print.c:456
+msgid "Terminals, with rules where they appear"
+msgstr "Terminaler, med regler hvor de forekommer"
+
+#: src/print.c:483
+msgid "Nonterminals, with rules where they appear"
+msgstr "Ikke-terminaler, med regler hvor de forekommer"
+
+#: src/print.c:512
+#, c-format
+msgid " on left:"
+msgstr " til venstre:"
+
+#: src/print.c:527
+#, c-format
+msgid " on right:"
+msgstr " til højre:"
+
+#: src/print.c:555
+msgid "Rules never reduced"
+msgstr "Aldrig reducerede regler"
+
+#: src/reader.c:56
+#, c-format
+msgid "multiple %s declarations"
+msgstr "flere %s-deklarationer"
+
+#: src/reader.c:118
+#, c-format
+msgid "result type clash on merge function %s: <%s> != <%s>"
+msgstr "resultattypekonflikt ved sammenfletningsfunktion %s: <%s> != <%s>"
+
+#: src/reader.c:216
+#, c-format
+msgid "rule given for %s, which is a token"
+msgstr "regel givet for %s som er et element"
+
+#: src/reader.c:245
+#, c-format
+msgid "type clash on default action: <%s> != <%s>"
+msgstr "typekonflikt for standardhandling: <%s> != <%s>"
+
+#: src/reader.c:251
+msgid "empty rule for typed nonterminal, and no action"
+msgstr "tom regel for typet ikke-terminal, og ingen handling"
+
+#: src/reader.c:321 src/reader.c:335 src/reader.c:348
+#, c-format
+msgid "only one %s allowed per rule"
+msgstr "kun en %s tilladt per regel"
+
+#: src/reader.c:331 src/reader.c:346
+#, c-format
+msgid "%s affects only GLR parsers"
+msgstr "%s påvirker kun GLR-fortolkere"
+
+#: src/reader.c:333
+#, c-format
+msgid "%s must be followed by positive number"
+msgstr "%s skal følges af et positivt tal"
+
+#: src/reader.c:490
+msgid "no rules in the input grammar"
+msgstr "ingen regler i inddatagrammatikken"
+
+#: src/reduce.c:242
+msgid "useless rule"
+msgstr "ubrugelig regel"
+
+#: src/reduce.c:303
+#, c-format
+msgid "useless nonterminal: %s"
+msgstr "ubrugelig ikke-terminal: %s"
+
+#: src/reduce.c:351
+msgid "Useless nonterminals"
+msgstr "Ubrugelige ikke-terminaler"
+
+#: src/reduce.c:364
+msgid "Terminals which are not used"
+msgstr "Terminaler som ikke bruges"
+
+#: src/reduce.c:373
+msgid "Useless rules"
+msgstr "Ubrugelige regler"
+
+#: src/reduce.c:389
+#, c-format
+msgid "%d rule never reduced\n"
+msgid_plural "%d rules never reduced\n"
+msgstr[0] "%d regel reduceres aldrig\n"
+msgstr[1] "%d regler reduceres aldrig\n"
+
+#: src/reduce.c:397
+#, c-format
+msgid "%d useless nonterminal"
+msgid_plural "%d useless nonterminals"
+msgstr[0] "%d ubrugelig ikke-terminal"
+msgstr[1] "%d ubrugelige ikke-terminaler"
+
+#: src/reduce.c:403
+#, c-format
+msgid " and "
+msgstr " og "
+
+#: src/reduce.c:406
+#, c-format
+msgid "%d useless rule"
+msgid_plural "%d useless rules"
+msgstr[0] "%d ubrugelig regel"
+msgstr[1] "%d ubrugelige regler"
+
+#: src/reduce.c:436
+#, c-format
+msgid "start symbol %s does not derive any sentence"
+msgstr "startsymbolet %s genererer ingen sætninger"
+
+#: src/scan-gram.l:162
+msgid "stray `,' treated as white space"
+msgstr "Malplaceret \",\" behandlet som blanktegn"
+
+#: src/scan-gram.l:225
+#, c-format
+msgid "invalid directive: %s"
+msgstr "ugyldigt direktiv: %s"
+
+#: src/scan-gram.l:283
+#, c-format
+msgid "invalid character: %s"
+msgstr "ugyldigt tegn: %s"
+
+#: src/scan-gram.l:402
+#, fuzzy
+msgid "invalid null character"
+msgstr "ugyldigt tegn: %s"
+
+#: src/scan-gram.l:415 src/scan-gram.l:427 src/scan-gram.l:448
+#, c-format
+msgid "invalid escape sequence: %s"
+msgstr "ugyldig undvigesekvens: %s"
+
+#: src/scan-gram.l:417 src/scan-gram.l:429 src/scan-gram.l:450
+#, fuzzy, c-format
+msgid "invalid null character: %s"
+msgstr "ugyldigt tegn: %s"
+
+#: src/scan-gram.l:455
+#, c-format
+msgid "unrecognized escape sequence: %s"
+msgstr "ukendt undvigesekvens: %s"
+
+#: src/scan-gram.l:537
+#, c-format
+msgid "missing `{' in `%s'"
+msgstr "manglende \"{\" i \"%s\""
+
+#: src/scan-gram.l:782
+#, c-format
+msgid "$$ of `%s' has no declared type"
+msgstr "$$ for \"%s\" har ingen erklæret type"
+
+#: src/scan-gram.l:803
+#, c-format
+msgid "$%d of `%s' has no declared type"
+msgstr "$%d for \"%s\" har ingen erklæret type"
+
+#: src/scan-gram.l:812 src/scan-gram.l:881 src/scan-gram.l:932
+#, c-format
+msgid "integer out of range: %s"
+msgstr "heltal uden for gyldigshedsområdet: %s"
+
+#: src/scan-gram.l:848 src/scan-gram.l:916
+#, c-format
+msgid "invalid value: %s"
+msgstr "fejlagtig værdi: %s"
+
+#: src/scan-gram.l:1036
+#, c-format
+msgid "missing `%s' at end of file"
+msgstr "manglende \"%s\" ved slutningen af filen"
+
+#: src/scan-gram.l:1047
+#, fuzzy, c-format
+msgid "missing `%s' at end of line"
+msgstr "manglende \"%s\" ved slutningen af filen"
+
+#: src/symlist.c:97 src/symlist.c:108
+msgid "invalid $ value"
+msgstr "fejlagtig $-værdi"
+
+#: src/symtab.c:85
+#, c-format
+msgid "type redeclaration for %s"
+msgstr "gentagen typeerklæring for %s"
+
+#: src/symtab.c:102 src/symtab.c:120
+#, c-format
+msgid "%s redeclaration for %s"
+msgstr "gentagen %s-erklæring for %s"
+
+#: src/symtab.c:139
+#, c-format
+msgid "redefining precedence of %s"
+msgstr "redefinition af præcedens for %s"
+
+#: src/symtab.c:157
+#, c-format
+msgid "symbol %s redefined"
+msgstr "symbol %s redefineret"
+
+#: src/symtab.c:180
+#, c-format
+msgid "redefining user token number of %s"
+msgstr "redefinition af elementnummer for %s"
+
+#: src/symtab.c:207
+#, c-format
+msgid "symbol %s is used, but is not defined as a token and has no rules"
+msgstr ""
+"symbol %s bruges, men er ikke defineret som et element og har ingen regler"
+
+#: src/symtab.c:232
+#, c-format
+msgid "symbol `%s' used more than once as a literal string"
+msgstr "symbol \"%s\" bruges mere end en gang som en bogstavelig streng"
+
+#: src/symtab.c:235
+#, c-format
+msgid "symbol `%s' given more than one literal string"
+msgstr "symbol \"%s\" har fået mere end én bogstavelig streng"
+
+#: src/symtab.c:271
+#, c-format
+msgid "conflicting precedences for %s and %s"
+msgstr "modstridige præcedenser mellem %s og %s"
+
+#: src/symtab.c:283
+#, c-format
+msgid "conflicting associativities for %s (%s) and %s (%s)"
+msgstr "modstridige associativiteter for %s (%s) og %s (%s)"
+
+#: src/symtab.c:368
+#, c-format
+msgid "tokens %s and %s both assigned number %d"
+msgstr "elementerne %s og %s har begge fået nummer %d"
+
+#: src/symtab.c:591
+#, c-format
+msgid "the start symbol %s is undefined"
+msgstr "startsymbolet %s er udefineret"
+
+#: src/symtab.c:595
+#, c-format
+msgid "the start symbol %s is a token"
+msgstr "startsymbolet %s er et element"
+
+#: lib/argmatch.c:133
+#, c-format
+msgid "invalid argument %s for %s"
+msgstr "ugyldigt argument %s til %s"
+
+#: lib/argmatch.c:134
+#, c-format
+msgid "ambiguous argument %s for %s"
+msgstr "flertydigt argument %s til %s"
+
+#: lib/argmatch.c:153
+#, c-format
+msgid "Valid arguments are:"
+msgstr "Gyldige argumenter er:"
+
+#: lib/bitset_stats.c:179
+#, c-format
+msgid "%u bitset_allocs, %u freed (%.2f%%).\n"
+msgstr "%u bitmængdeallokeringer, %u frigjort (%.2f%%).\n"
+
+#: lib/bitset_stats.c:182
+#, c-format
+msgid "%u bitset_sets, %u cached (%.2f%%)\n"
+msgstr "%u bitmængdeindstillinger, %u cachede (%.2f%%)\n"
+
+#: lib/bitset_stats.c:185
+#, c-format
+msgid "%u bitset_resets, %u cached (%.2f%%)\n"
+msgstr "%u bitmængdenulstillinger, %u cachede (%.2f%%)\n"
+
+#: lib/bitset_stats.c:188
+#, c-format
+msgid "%u bitset_tests, %u cached (%.2f%%)\n"
+msgstr "%u bitmængdetest, %u cachede (%.2f%%)\n"
+
+#: lib/bitset_stats.c:192
+#, c-format
+msgid "%u bitset_lists\n"
+msgstr "%u bitmængdelister\n"
+
+#: lib/bitset_stats.c:194
+msgid "count log histogram\n"
+msgstr "kaldsloghistogram\n"
+
+#: lib/bitset_stats.c:197
+msgid "size log histogram\n"
+msgstr "størrelsesloghistogram\n"
+
+#: lib/bitset_stats.c:200
+msgid "density histogram\n"
+msgstr "densitetshistogram\n"
+
+#: lib/bitset_stats.c:214
+#, c-format
+msgid ""
+"Bitset statistics:\n"
+"\n"
+msgstr ""
+"Bitmængdestatistik:\n"
+"\n"
+
+#: lib/bitset_stats.c:217
+#, c-format
+msgid "Accumulated runs = %u\n"
+msgstr "Akkumulerede kørsler = %u\n"
+
+#: lib/bitset_stats.c:261 lib/bitset_stats.c:266
+msgid "Could not read stats file."
+msgstr "Kunne ikke læse statistikfil."
+
+#: lib/bitset_stats.c:263
+#, c-format
+msgid "Bad stats file size.\n"
+msgstr "Dårlig statistikfilstørrelse.\n"
+
+#: lib/bitset_stats.c:289 lib/bitset_stats.c:291
+msgid "Could not write stats file."
+msgstr "Kunne ikke skrive statistikfil."
+
+#: lib/bitset_stats.c:294
+msgid "Could not open stats file for writing."
+msgstr "Kunne ikke åbne statistikfil for skrivning."
+
+#: lib/error.c:127
+msgid "Unknown system error"
+msgstr "Ukendt systemfejl"
+
+#: lib/getopt.c:570 lib/getopt.c:589
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: flaget \"%s\" er flertydigt\n"
+
+#: lib/getopt.c:622 lib/getopt.c:626
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: flaget \"--%s\" tager intet argument\n"
+
+#: lib/getopt.c:635 lib/getopt.c:640
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: flaget \"%c%s\" tager intet argument\n"
+
+#: lib/getopt.c:686 lib/getopt.c:708 lib/getopt.c:1039 lib/getopt.c:1061
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: flaget \"%s\" behøver et argument\n"
+
+#: lib/getopt.c:746 lib/getopt.c:749
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: ukendt flag \"--%s\"\n"
+
+#: lib/getopt.c:757 lib/getopt.c:760
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: ukendt flag \"%c%s\"\n"
+
+#: lib/getopt.c:815 lib/getopt.c:818
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: ikke tilladt flag -- %c\n"
+
+#: lib/getopt.c:824 lib/getopt.c:827
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: ugyldigt flag --%c\n"
+
+#: lib/getopt.c:882 lib/getopt.c:901 lib/getopt.c:1114 lib/getopt.c:1135
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: flaget behøver et argument -- %c\n"
+
+#: lib/getopt.c:954 lib/getopt.c:973
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: flaget \"-W %s\" er flertydigt\n"
+
+#: lib/getopt.c:997 lib/getopt.c:1018
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: flaget \"-W %s\" tager intet argument\n"
+
+#: lib/obstack.c:417 lib/obstack.c:420 lib/xmalloc.c:53
+msgid "memory exhausted"
+msgstr "hukommelsen opbrugt"
+
+# Når vi går over til Unicode mere allmænt måske vi bør oversættta båda disse
+# med U+201D (RIGHT DOUBLE QUOTATION MARK) på svenska.  Eller?
+#
+#: lib/quotearg.c:238
+msgid "`"
+msgstr "\""
+
+#: lib/quotearg.c:239
+msgid "'"
+msgstr "\""
+
+#: lib/subpipe.c:171
+#, c-format
+msgid "subsidiary program `%s' could not be invoked"
+msgstr "hjælpeprogrammet \"%s\" kunne ikke startes"
+
+#: lib/subpipe.c:173
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "hjælpeprogrammet \"%s\" ikke fundet"
+
+#: lib/subpipe.c:175
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "hjælpeprogrammet \"%s\" fejlede"
+
+#: lib/subpipe.c:176
+#, c-format
+msgid "subsidiary program `%s' failed (exit status %d)"
+msgstr "hjælpeprogrammet \"%s\" fejlede med afslutningskode %d"
+
+#: lib/timevar.c:475
+msgid ""
+"\n"
+"Execution times (seconds)\n"
+msgstr ""
+"\n"
+"Udførelsestider (sekunder)\n"
+
+#: lib/timevar.c:525
+msgid " TOTAL                 :"
+msgstr " TOTALT                :"
+
+#: lib/timevar.c:561
+#, c-format
+msgid "time in %s: %ld.%06ld (%ld%%)\n"
+msgstr "tid i %s: %ld.%06ld (%ld%%)\n"

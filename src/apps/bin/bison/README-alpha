@@ -1,0 +1,38 @@
+-*- text -*-
+
+This is a test release of this package.  Using it more or less
+implicitly signs you up to help us find whatever problems you report.
+
+The documentation still needs more work.  Suggestions welcome.
+Patches even more welcome.
+
+Please send comments and problem reports about this test release to
+bug-bison@gnu.org.  This program will get better only if you report
+the problems you encounter.
+
+Please, *do not package this*, *do not distribute it* widely, it is
+not ready for full scale use.  Because it is not fully functional, if
+you distribute this package, we will be buried under bug reports from
+panicked users.  We don't have time to spend on this, and nor do the
+users.
+
+-----
+
+Copyright (C) 2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bison.
+
+GNU Bison is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Bison is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Bison; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.

@@ -1,0 +1,42 @@
+SubDir OBOS_TOP src apps bin bison lib ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+StaticLibrary bison : 
+	abitset.c
+#alloca.c
+argmatch.c
+basename.c
+bitset.c
+bitset_stats.c
+bitsetv-print.c
+bitsetv.c
+dirname.c
+ebitset.c
+error.c
+exitfail.c
+get-errno.c
+getopt.c
+getopt1.c
+hard-locale.c
+hash.c
+lbitset.c
+malloc.c
+mbswidth.c
+obstack.c
+quote.c
+quotearg.c
+realloc.c
+stpcpy.c
+stripslash.c
+strndup.c
+strnlen.c
+subpipe.c
+timevar.c
+vbitset.c
+xmalloc.c
+xstrdup.c
+xstrndup.c
+;

@@ -1,0 +1,2753 @@
+# Exercising Bison on actual grammars.                   -*- Autotest -*-
+
+# Copyright (C) 1989, 1990, 1991, 1992, 2000, 2001, 2002, 2003, 2004
+# Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+AT_BANNER([[Existing Grammars.]])
+## ----------------- ##
+## GNU AWK Grammar.  ##
+## ----------------- ##
+
+AT_SETUP([GNU AWK Grammar])
+
+# We have been careful to strip all the actions excepts the
+# mid-rule actions.  We rely on %expect to check that there are
+# indeed 65 SR conflicts.
+#
+# Bison was once wrong, due to an incorrect computation of nullable.
+# It reported 485 SR conflicts!
+
+AT_DATA([[input.y]],
+[[%expect 65
+
+%token FUNC_CALL NAME REGEXP
+%token ERROR
+%token YNUMBER YSTRING
+%token RELOP APPEND_OP
+%token ASSIGNOP MATCHOP NEWLINE CONCAT_OP
+%token LEX_BEGIN LEX_END LEX_IF LEX_ELSE LEX_RETURN LEX_DELETE
+%token LEX_WHILE LEX_DO LEX_FOR LEX_BREAK LEX_CONTINUE
+%token LEX_PRINT LEX_PRINTF LEX_NEXT LEX_EXIT LEX_FUNCTION
+%token LEX_GETLINE LEX_NEXTFILE
+%token LEX_IN
+%token LEX_AND LEX_OR INCREMENT DECREMENT
+%token LEX_BUILTIN LEX_LENGTH
+
+/* Lowest to highest */
+%right ASSIGNOP
+%right '?' ':'
+%left LEX_OR
+%left LEX_AND
+%left LEX_GETLINE
+%nonassoc LEX_IN
+%left FUNC_CALL LEX_BUILTIN LEX_LENGTH
+%nonassoc ','
+%nonassoc MATCHOP
+%nonassoc RELOP '<' '>' '|' APPEND_OP TWOWAYIO
+%left CONCAT_OP
+%left YSTRING YNUMBER
+%left '+' '-'
+%left '*' '/' '%'
+%right '!' UNARY
+%right '^'
+%left INCREMENT DECREMENT
+%left '$'
+%left '(' ')'
+%%
+
+start
+	: opt_nls program opt_nls
+	;
+
+program
+	: rule
+	| program rule
+	| error
+	| program error
+	| /* empty */
+	;
+
+rule
+	: LEX_BEGIN {} action
+	| LEX_END {}   action
+	| LEX_BEGIN statement_term
+	| LEX_END statement_term
+	| pattern action
+	| action
+	| pattern statement_term
+	| function_prologue function_body
+	;
+
+func_name
+	: NAME
+	| FUNC_CALL
+	| lex_builtin
+	;
+
+lex_builtin
+	: LEX_BUILTIN
+	| LEX_LENGTH
+	;
+
+function_prologue
+	: LEX_FUNCTION {} func_name '(' opt_param_list r_paren opt_nls
+	;
+
+function_body
+	: l_brace statements r_brace opt_semi opt_nls
+	| l_brace r_brace opt_semi opt_nls
+	;
+
+
+pattern
+	: exp
+	| exp ',' exp
+	;
+
+regexp
+	/*
+	 * In this rule, want_regexp tells yylex that the next thing
+	 * is a regexp so it should read up to the closing slash.
+	 */
+	: '/' {} REGEXP '/'
+	;
+
+action
+	: l_brace statements r_brace opt_semi opt_nls
+	| l_brace r_brace opt_semi opt_nls
+	;
+
+statements
+	: statement
+	| statements statement
+	| error
+	| statements error
+	;
+
+statement_term
+	: nls
+	| semi opt_nls
+	;
+
+statement
+	: semi opt_nls
+	| l_brace r_brace
+	| l_brace statements r_brace
+	| if_statement
+	| LEX_WHILE '(' exp r_paren opt_nls statement
+	| LEX_DO opt_nls statement LEX_WHILE '(' exp r_paren opt_nls
+	| LEX_FOR '(' NAME LEX_IN NAME r_paren opt_nls statement
+	| LEX_FOR '(' opt_exp semi opt_nls exp semi opt_nls opt_exp r_paren opt_nls statement
+	| LEX_FOR '(' opt_exp semi opt_nls semi opt_nls opt_exp r_paren opt_nls statement
+	| LEX_BREAK statement_term
+	| LEX_CONTINUE statement_term
+	| print '(' expression_list r_paren output_redir statement_term
+	| print opt_rexpression_list output_redir statement_term
+	| LEX_NEXT statement_term
+	| LEX_NEXTFILE statement_term
+	| LEX_EXIT opt_exp statement_term
+	| LEX_RETURN {} opt_exp statement_term
+	| LEX_DELETE NAME '[' expression_list ']' statement_term
+	| LEX_DELETE NAME  statement_term
+	| exp statement_term
+	;
+
+print
+	: LEX_PRINT
+	| LEX_PRINTF
+	;
+
+if_statement
+	: LEX_IF '(' exp r_paren opt_nls statement
+	| LEX_IF '(' exp r_paren opt_nls statement
+	     LEX_ELSE opt_nls statement
+	;
+
+nls
+	: NEWLINE
+	| nls NEWLINE
+	;
+
+opt_nls
+	: /* empty */
+	| nls
+	;
+
+input_redir
+	: /* empty */
+	| '<' simp_exp
+	;
+
+output_redir
+	: /* empty */
+	| '>' exp
+	| APPEND_OP exp
+	| '|' exp
+	| TWOWAYIO exp
+	;
+
+opt_param_list
+	: /* empty */
+	| param_list
+	;
+
+param_list
+	: NAME
+	| param_list comma NAME
+	| error
+	| param_list error
+	| param_list comma error
+	;
+
+/* optional expression, as in for loop */
+opt_exp
+	: /* empty */
+	| exp
+	;
+
+opt_rexpression_list
+	: /* empty */
+	| rexpression_list
+	;
+
+rexpression_list
+	: rexp
+	| rexpression_list comma rexp
+	| error
+	| rexpression_list error
+	| rexpression_list error rexp
+	| rexpression_list comma error
+	;
+
+opt_expression_list
+	: /* empty */
+	| expression_list
+	;
+
+expression_list
+	: exp
+	| expression_list comma exp
+	| error
+	| expression_list error
+	| expression_list error exp
+	| expression_list comma error
+	;
+
+/* Expressions, not including the comma operator.  */
+exp	: variable ASSIGNOP {} exp
+	| '(' expression_list r_paren LEX_IN NAME
+	| exp '|' LEX_GETLINE opt_variable
+	| exp TWOWAYIO LEX_GETLINE opt_variable
+	| LEX_GETLINE opt_variable input_redir
+	| exp LEX_AND exp
+	| exp LEX_OR exp
+	| exp MATCHOP exp
+	| regexp
+	| '!' regexp %prec UNARY
+	| exp LEX_IN NAME
+	| exp RELOP exp
+	| exp '<' exp
+	| exp '>' exp
+	| exp '?' exp ':' exp
+	| simp_exp
+	| exp simp_exp %prec CONCAT_OP
+	;
+
+rexp
+	: variable ASSIGNOP {} rexp
+	| rexp LEX_AND rexp
+	| rexp LEX_OR rexp
+	| LEX_GETLINE opt_variable input_redir
+	| regexp
+	| '!' regexp %prec UNARY
+	| rexp MATCHOP rexp
+	| rexp LEX_IN NAME
+	| rexp RELOP rexp
+	| rexp '?' rexp ':' rexp
+	| simp_exp
+	| rexp simp_exp %prec CONCAT_OP
+	;
+
+simp_exp
+	: non_post_simp_exp
+	/* Binary operators in order of decreasing precedence.  */
+	| simp_exp '^' simp_exp
+	| simp_exp '*' simp_exp
+	| simp_exp '/' simp_exp
+	| simp_exp '%' simp_exp
+	| simp_exp '+' simp_exp
+	| simp_exp '-' simp_exp
+	| variable INCREMENT
+	| variable DECREMENT
+	;
+
+non_post_simp_exp
+	: '!' simp_exp %prec UNARY
+	| '(' exp r_paren
+	| LEX_BUILTIN
+	  '(' opt_expression_list r_paren
+	| LEX_LENGTH '(' opt_expression_list r_paren
+	| LEX_LENGTH
+	| FUNC_CALL '(' opt_expression_list r_paren
+	| variable
+	| INCREMENT variable
+	| DECREMENT variable
+	| YNUMBER
+	| YSTRING
+	| '-' simp_exp    %prec UNARY
+	| '+' simp_exp    %prec UNARY
+	;
+
+opt_variable
+	: /* empty */
+	| variable
+	;
+
+variable
+	: NAME
+	| NAME '[' expression_list ']'
+	| '$' non_post_simp_exp
+	;
+
+l_brace
+	: '{' opt_nls
+	;
+
+r_brace
+	: '}' opt_nls
+	;
+
+r_paren
+	: ')'
+	;
+
+opt_semi
+	: /* empty */
+	| semi
+	;
+
+semi
+	: ';'
+	;
+
+comma	: ',' opt_nls
+	;
+
+%%
+]])
+
+# Pass plenty of options, to exercise plenty of code, even if we
+# don't actually check the output.  But SEGV is watching us, and
+# so might do dmalloc.
+AT_CHECK([[bison --verbose --defines input.y]])
+
+AT_CLEANUP
+
+
+## ----------------- ##
+## GNU Cim Grammar.  ##
+## ----------------- ##
+
+AT_SETUP([GNU Cim Grammar])
+
+# GNU Cim, the GNU Simula 87 Compiler.
+
+# Bison was once wrong, due to an incorrect computation of the RR conflicts.
+# It reported 80 SR && 99 RR conflicts instead of 78/10!!!
+
+AT_DATA([[input.y]],
+[[%union {
+	long int token;
+	long int ival;
+	long int arrdim;
+	double rval;
+	char *ident;
+	char *tval;
+	char stat_decl;
+       }
+
+%token
+        HACTIVATE HAFTER /*HAND*/ HARRAY HAT
+        HBEFORE HBEGIN HBOOLEAN
+        HCHARACTER HCLASS /*HCOMMENT*/ HCONC
+        HDELAY HDO
+        HELSE HEND HEQ /*HEQV*/ HEXTERNAL
+        HFOR
+        HGE HGO HGOTO HGT
+        HHIDDEN
+        HIF /*HIMP*/ HIN HINNER HINSPECT HINTEGER HIS
+        HLABEL HLE HLONG HLT
+        HNAME HNE HNEW HNONE /*HNOT*/ HNOTEXT
+        /*HOR*/ HOTHERWISE
+        HPRIOR HPROCEDURE HPROTECTED
+        HQUA
+        HREACTIVATE HREAL HREF
+        HSHORT HSTEP HSWITCH
+        HTEXT HTHEN HTHIS HTO
+        HUNTIL
+        HVALUE HVAR HVIRTUAL
+        HWHEN HWHILE
+
+        HASSIGNVALUE HASSIGNREF
+        /*HDOT*/ HPAREXPSEPARATOR HLABELSEPARATOR HSTATEMENTSEPARATOR
+        HBEGPAR HENDPAR
+        HEQR HNER
+        HADD HSUB HMUL HDIV HINTDIV HEXP
+  	HDOTDOTDOT
+
+%token <ident> HIDENTIFIER
+%token <ival> HBOOLEANKONST HINTEGERKONST HCHARACTERKONST
+%token <rval> HREALKONST
+%token <tval> HTEXTKONST
+
+%type <tval> EXT_IDENT
+%type <stat_decl> DECLSTATEMENT MODULSTATEMENT MBEE_DECLSTMS MBEE_DECLSTMSU
+%type <stat_decl> MODULS
+%type <ident> EXPRESSION_SIMP MBEE_ARG_R_PT
+%type <arrdim> BAUND_PAIR_LIST
+
+%right <token> HASSIGN
+%left   HORELSE
+%left   HANDTHEN
+%left   HEQV
+%left   HIMP
+%left   HOR
+%left   HAND
+
+%left   HNOT
+
+%left <token> HVALRELOPERATOR HREFRELOPERATOR HOBJRELOPERATOR
+
+%left	HCONC
+
+%left <token> HTERMOPERATOR
+%left <token> UNEAR
+%left <token> HFACTOROPERATOR
+%left         HPRIMARYOPERATOR
+
+%left   HQUA
+
+%left   HDOT
+
+%start  MAIN_MODULE
+%%
+/* GRAMATIKK FOR PROGRAM MODULES */
+MAIN_MODULE     :       {	  categ=CLOCAL; mout(MBLOCK);
+                                  beginBlock(KBLOKK);separat_comp=FALSE;}
+			MODULS	{ endBlock(NULL,CCNO);   mout(MENDBLOCK);}
+  		|	error HSTATEMENTSEPARATOR MBEE_DECLSTMS
+		;
+EXT_DECLARATION	:	HEXTERNAL
+			MBEE_TYPE
+			HPROCEDURE
+				{ MBEENEWBLOCK();
+				  kind=KPROC;}
+			EXT_LIST
+		|
+			HEXTERNAL
+			HIDENTIFIER
+			HPROCEDURE
+				{ MBEENEWBLOCK();
+				  type=TNOTY;
+				  kind=KPROC;
+				  if($2==Ckind)categ=CCPROC;else
+				  yerror (1);
+                                  ysensitive=sensitive;
+                                  sensitive=ON;}
+			HIDENTIFIER { $<ident>$=$5;
+                                  sensitive=ysensitive;}
+			EXTERNAL_KIND_ITEM
+			        { categ=CLOCAL;}
+		|	HEXTERNAL
+			HCLASS
+				{ MBEENEWBLOCK();
+				  kind=KCLASS;}
+			EXT_LIST
+
+		;
+EXTERNAL_KIND_ITEM:	EXT_IDENT
+			HOBJRELOPERATOR
+				{ if($2!=HIS)yerror (2);}
+		        MBEE_TYPE HPROCEDURE
+			HIDENTIFIER
+				{         regDecl($6, type, KPROC, CCPROC);
+                                          beginBlock(kind);}
+                        HEADING EMPTY_BLOCK
+				{ categ=CLOCAL;
+				  endBlock($1==NULL?$<ident>0:tag($1),CCCPROC);}
+/*		|
+			EXT_IDENT
+				{ if($1!=NULL)yerror (3);
+				  regDecl($0, type, kind, categ);}
+			MBEE_REST_EXT_LIST
+				{ endBlock(NULL,CCNO);}
+		;
+MBEE_REST_EXT_LIST:	/* EMPTY
+		|	HPAREXPSEPARATOR EXT_KIND_LIST
+		;
+EXT_KIND_LIST	:	EXT_KIND_ITEM
+		|	EXT_KIND_LIST HPAREXPSEPARATOR EXT_KIND_ITEM
+		;
+EXT_KIND_ITEM	:	HIDENTIFIER
+			EXT_IDENT
+				{ if($2!=NULL)yerror (3);
+				  regDecl($1, type, kind, categ);}*/
+		;
+EMPTY_BLOCK	:	/*EMPT*/
+		|	HBEGIN HEND
+		;
+EXT_LIST	:	EXT_ITEM
+		|	EXT_LIST HPAREXPSEPARATOR EXT_ITEM
+		;
+EXT_ITEM	:	HIDENTIFIER
+			EXT_IDENT
+				{ lesinn_external_spec($1,$2, kind);}
+		;
+EXT_IDENT	:	/* EMPTY */ { $$=NULL;}
+		|	HVALRELOPERATOR { if($1!=HEQ)yerror (9);
+                                          external=TRUE;}
+			HTEXTKONST { $$=$3;external=FALSE;}
+		;
+/* GRAMATIKK FOR TYPER */
+NO_TYPE         :       /*EMPT*/        { type=TNOTY;}
+                ;
+MBEE_TYPE       :       NO_TYPE
+                |       TYPE
+                ;
+TYPE            :       HREF HBEGPAR
+                        HIDENTIFIER
+                                { prefquantident=$3;
+                                          type=TREF;}
+                        HENDPAR
+                |       HTEXT           { type=TTEXT;}
+                |       HBOOLEAN        { type=TBOOL;}
+                |       HCHARACTER      { type=TCHAR;}
+                |       HSHORT HINTEGER { type=TSHORT;}
+                |       HINTEGER        { type=TINTG;}
+                |       HREAL           { type=TREAL;}
+                |       HLONG HREAL     { type=TLONG;}
+                ;
+
+/* GRAMATIKK FOR DEL AV SETNINGER */
+MBEE_ELSE_PART  :       /*EMPT*/
+/*		|	HELSE
+			HIF
+                        EXPRESSION
+                        HTHEN   { 		  mout(MELSE);
+						  mout(MIF);
+                                  OBSBLOCK();}
+                        BLOCK   { MBEEENDBLOCK();}
+                        MBEE_ELSE_PART          { mout(MENDIF);}*/
+                |       HELSE   { OBSBLOCK();     mout(MELSE);}
+                        BLOCK   { MBEEENDBLOCK();}
+                ;
+FOR_LIST        :       FOR_LIST_ELEMENT        { mout(MENDSEP);
+                                                  mout(MLISTSEP);}
+                |       FOR_LIST_ELEMENT
+                        HPAREXPSEPARATOR
+                        FOR_LIST                { mout(MLISTSEP);}
+                ;
+FOR_LIST_ELEMENT:       EXPRESSION
+                        MBEE_F_L_EL_R_PT
+                ;
+MBEE_F_L_EL_R_PT:       /*EMPT*/
+                |       HWHILE
+                        EXPRESSION              { mout(MFORWHILE);}
+                |       HSTEP
+                        EXPRESSION
+                        HUNTIL
+                        EXPRESSION              { mout(MUNTIL);
+                                                  mout(MSTEP);}
+                ;
+GOTO            :       HGO
+                        HTO
+                |       HGOTO
+                ;
+CONN_STATE_R_PT :       WHEN_CLAUSE_LIST
+                |       HDO   {   beginBlock(KCON);   mout(MDO);
+                              OBSBLOCK(); }
+                        BLOCK {   endBlock(NULL,CCNO);
+                                  MBEEENDBLOCK();  mout(MENDDO);}
+                ;
+WHEN_CLAUSE_LIST:       HWHEN
+                        HIDENTIFIER
+                        HDO    {   beginBlock(KCON);  mout(MIDENTIFIER);
+                                   OBSBLOCK();     moutId($2);
+				   		   mout(MWHEN);}
+                        BLOCK  {   endBlock(NULL,CCNO);
+                              MBEEENDBLOCK(); mout(MENDWHEN);}
+                |       WHEN_CLAUSE_LIST
+                        HWHEN
+                        HIDENTIFIER
+                        HDO    { beginBlock(KCON);	   mout(MIDENTIFIER);
+                                 OBSBLOCK();       moutId($3);
+				 		   mout(MWHEN);}
+                        BLOCK  { endBlock(NULL,CCNO);
+                              MBEEENDBLOCK();    mout(MENDWHEN);}
+                ;
+MBEE_OTWI_CLAUS :       /*EMPT*/
+                |       HOTHERWISE {OBSBLOCK();    mout(MOTHERWISE);}
+
+                        BLOCK      {MBEEENDBLOCK();mout(MENDOTHERWISE);}
+                ;
+ACTIVATOR	:	HACTIVATE		{ mout(MBOOLEANKONST);
+						  moutIval(FALSE);}
+		|	HREACTIVATE		{ mout(MBOOLEANKONST);
+						  moutIval(TRUE);}
+		;
+SCHEDULE	:	/*EMPT*/		{ mout(MCHARACTERKONST);
+						  moutIval(DIRECT);
+						  mout(MINTEGERKONST);
+						  moutIval(0);
+						  mout(MNONE);
+						  mout(MBOOLEANKONST);
+						  moutIval(FALSE);}
+		|	ATDELAY EXPRESSION	{ mout(MNONE);}
+			PRIOR
+		|	BEFOREAFTER		{ mout(MINTEGERKONST);
+						  moutIval(0);}
+			EXPRESSION		{ mout(MBOOLEANKONST);
+						  moutIval(FALSE);}
+		;
+ATDELAY		:	HAT			{ mout(MCHARACTERKONST);
+						  moutIval(AT);}
+		|	HDELAY			{ mout(MCHARACTERKONST);
+						  moutIval(DELAYS);}
+		;
+BEFOREAFTER	:	HBEFORE			{ mout(MCHARACTERKONST);
+						  moutIval(BEFORE);}
+		|	HAFTER			{ mout(MCHARACTERKONST);
+						  moutIval(AFTER);}
+		;
+PRIOR		:	/*EMPT*/		{ mout(MBOOLEANKONST);
+						  moutIval(FALSE);}
+		|	HPRIOR			{ mout(MBOOLEANKONST);
+						  moutIval(TRUE);}
+		;
+/* GRAMATIKK FOR SETNINGER OG DEKLARASJONER */
+MODULSTATEMENT  :       HWHILE
+                        EXPRESSION
+                        HDO     { STOPOBSBLOCK(); mout(MWHILE);
+                                  OBSBLOCK();}
+                        BLOCK   { MBEEENDBLOCK(); mout(MENDWHILE);
+					  	          $$=STATEMENT;}
+	    	|       HIF
+                        EXPRESSION
+                        HTHEN   { STOPOBSBLOCK(); mout(MIF);
+                                  OBSBLOCK();}
+                        BLOCK   { MBEEENDBLOCK();}
+                        MBEE_ELSE_PART          { mout(MENDIF);
+							  $$=STATEMENT;}
+		|       HFOR
+                        HIDENTIFIER
+                        HASSIGN { STOPOBSBLOCK(); mout(MIDENTIFIER);
+                                                  moutId($2);}
+                        FOR_LIST
+                        HDO     { beginBlock(KFOR);
+                        if($3==HASSIGNVALUE)      mout(MFOR);
+                                        else      mout(MFORR);
+                                  OBSBLOCK();     mout(MFORDO);}
+                        BLOCK   { MBEEENDBLOCK();
+                                  endBlock(NULL,CCNO); mout(MENDFOR);
+							  $$=STATEMENT;}
+		|       GOTO
+                        EXPRESSION              { mout(MGOTO);
+                                  STOPOBSBLOCK();	  $$=STATEMENT;}
+		|       HINSPECT
+                        EXPRESSION              { mout(MINSPECT);
+                                  STOPOBSBLOCK();
+                                  beginBlock(KINSP);}
+                        CONN_STATE_R_PT
+                                { endBlock(NULL,CCNO);}
+                        MBEE_OTWI_CLAUS         { mout(MENDINSPECT);
+							  $$=STATEMENT;}
+		|       HINNER  { STOPOBSBLOCK(); mout(MINNER);
+                                  regInner();		  $$=STATEMENT;}
+                |       HIDENTIFIER
+                        HLABELSEPARATOR
+                                { STOPOBSBLOCK();
+                                  regDecl($1, TLABEL, KSIMPLE, categ);    mout(MLABEL);
+                                                  moutId($1);
+                                                  mout(MENDLABEL);}
+                        DECLSTATEMENT   { if($4<=DECLARATION)
+                                            { yerror (27);
+                                              $$=DECLARATION;}
+                                          else $$=$4;}
+                |       EXPRESSION_SIMP
+                        HBEGIN
+                                { $<ident>$=$1; }
+			IMPORT_SPEC_MODULE
+				{ mout(MPRBLOCK);
+				  prefquantident=$1;
+                                  beginBlock(KPRBLK);}
+                        MBEE_DECLSTMS
+                        HEND    { endBlock(NULL,CCNO); mout(MENDPRBLOCK);
+                                                          $$=STATEMENT;}
+		|	EXPRESSION_SIMP HBEGIN error HSTATEMENTSEPARATOR
+                        MBEE_DECLSTMS HEND              { $$=STATEMENT;
+			         endBlock(NULL,CCNO); mout(MENDPRBLOCK);}
+		|	EXPRESSION_SIMP HBEGIN error HEND
+						        { $$=STATEMENT;
+			         endBlock(NULL,CCNO); mout(MENDPRBLOCK);}
+
+                |       EXPRESSION_SIMP
+                                { STOPOBSBLOCK();         $$=STATEMENT;
+                                                  mout(MENDASSIGN);}
+		|	ACTIVATOR EXPRESSION SCHEDULE
+						{      	  $$=STATEMENT;
+						  mout(MENDSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENTSEP);
+						  mout(MARGUMENT);
+						  moutId(activateid);
+						  mout(MENDASSIGN);}
+                |       HBEGIN
+                                { STOPOBSBLOCK();
+                                  OBSBLOCK();}
+                        MBEE_DECLSTMS
+                        HEND    { MBEEENDBLOCK();         $$=STATEMENT;}
+		|       MBEE_TYPE HPROCEDURE
+                        HIDENTIFIER
+                                { MBEENEWBLOCK(); mout(MPROCEDURE);
+                                          regDecl($3, type, KPROC, categ);
+                                          beginBlock(KPROC);}
+                        HEADING BLOCK   { endBlock(NULL,CCNO); $$=DECLARATION;
+                                                  mout(MENDPROCEDURE);}
+		|       HIDENTIFIER
+			HCLASS
+                        NO_TYPE
+				{ $<ident>$=$1; }
+			IMPORT_SPEC_MODULE
+                        HIDENTIFIER
+				{ prefquantident=$1;
+				  mout(MCLASS);
+                                          regDecl($6, TNOTY, KCLASS, categ);
+                                          beginBlock(KCLASS);}
+                        HEADING
+                        BLOCK           { endBlock(NULL,CCNO); $$=DECLARATION;
+                                                  mout(MENDCLASS);}
+                |       HCLASS
+                        NO_TYPE
+                        HIDENTIFIER
+                                { prefquantident=0;
+                                  MBEENEWBLOCK(); mout(MCLASS);
+                                          regDecl($3, TNOTY, KCLASS, categ);
+                                          beginBlock(KCLASS);}
+                        HEADING
+                        BLOCK           { endBlock(NULL,CCNO); $$=DECLARATION;
+                                                  mout(MENDCLASS);}
+                |       EXT_DECLARATION			{ $$=EXTDECLARATION;}
+		|       /*EMPT*/{ STOPOBSBLOCK();	  $$=EMPTYSTATEMENT;}
+                ;
+IMPORT_SPEC_MODULE:		{ MBEENEWBLOCK();
+                                  kind=KCLASS;
+				  if($<ident>0==simsetident &&
+				     findDecl(simsetident,cblock,FALSE)==NULL)
+				    lesinn_external_spec(simsetident,
+					SIMSETATRFILE, kind);
+				  if($<ident>0==simulationident && findDecl(
+				    simulationident,cblock,FALSE)==NULL)
+				    lesinn_external_spec(simulationident,
+					SIMULATIONATRFILE, kind);
+				  if(($<ident>0==fileident && findDecl(
+				      fileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==outfileident && findDecl(
+				      outfileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==infileident && findDecl(
+				      infileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==directfileident && findDecl(
+				      directfileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==printfileident && findDecl(
+				      printfileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==bytefileident && findDecl(
+				      bytefileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==inbytefileident && findDecl(
+				      inbytefileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==outbytefileident && findDecl(
+				      outbytefileident,cblock,FALSE)==NULL) ||
+				     ($<ident>0==directbytefileident && findDecl(
+				      directbytefileident,cblock,FALSE)==NULL))
+				    lesinn_external_spec(fileident,
+					FILEATRFILE, kind);}
+		;
+DECLSTATEMENT	:	MODULSTATEMENT
+		|       TYPE
+                        HIDENTIFIER
+			MBEE_CONSTANT
+                        HPAREXPSEPARATOR
+                                { MBEENEWBLOCK();
+                                          kind=KSIMPLE;
+                                          regDecl($2, type, KSIMPLE, categ);
+					  categ=CLOCAL;}
+                        IDENTIFIER_LISTC                { $$=DECLARATION;}
+                |       TYPE
+                        HIDENTIFIER
+			MBEE_CONSTANT
+                                { MBEENEWBLOCK();
+                                          regDecl($2, type, KSIMPLE, categ);
+					  categ=CLOCAL;	  $$=DECLARATION;}
+                |       MBEE_TYPE
+                        HARRAY  { MBEENEWBLOCK();
+                                          kind=KARRAY;}
+                        ARR_SEGMENT_LIST                { $$=DECLARATION;}
+                |       HSWITCH
+                        HIDENTIFIER
+                        HASSIGN { MBEENEWBLOCK(); mout(MIDENTIFIER);
+                                                  moutId($2);
+                                          regDecl($2, TLABEL, KARRAY, categ);}
+                        SWITCH_LIST                     { $$=DECLARATION;
+                                                   mout(MSWITCH);
+                                                   mout(MENDSWITCH);}
+                ;
+BLOCK           :       DECLSTATEMENT   { if($1<=DECLARATION)yerror (29);}
+                |       HBEGIN MBEE_DECLSTMS HEND
+		|	HBEGIN error HSTATEMENTSEPARATOR MBEE_DECLSTMS HEND
+		|	HBEGIN error HEND
+		;
+MBEE_DECLSTMS   :       MBEE_DECLSTMSU  { if($1<=DECLARATION)yerror (28);
+					  $$=$1;}
+                ;
+MBEE_DECLSTMSU  :       DECLSTATEMENT   { $$=$1;}
+                |       MBEE_DECLSTMSU
+                        HSTATEMENTSEPARATOR
+                        DECLSTATEMENT   { if($1>=STATEMENT && $3<=DECLARATION)
+                                            yerror (26);
+                                          $$=$3;}
+                ;
+MODULS		:	MODULSTATEMENT	{ if($1==DECLARATION)
+					  {separat_comp=TRUE;gettimestamp();}
+                                          $$=$1;}
+  		|	MODULS HSTATEMENTSEPARATOR MODULSTATEMENT
+					{ if($1>=STATEMENT && $3<=DECLARATION)
+                                            yerror (26);else
+       					  if($1>=STATEMENT
+					     && $3!=EMPTYSTATEMENT)yerror (25);
+                                          if(separat_comp && $3==STATEMENT)
+                                             yerror (25);
+                                          if($3==DECLARATION && !separat_comp)
+					  {separat_comp=TRUE;gettimestamp();}
+					  $$=$3;}
+		;
+/* GRAMATIKK FOR DEL AV DEKLARASJONER */
+ARR_SEGMENT_LIST:       ARR_SEGMENT
+                |       ARR_SEGMENT_LIST
+                        HPAREXPSEPARATOR
+                        ARR_SEGMENT
+                ;
+ARR_SEGMENT	:       ARRAY_SEGMENT
+                        HBEGPAR
+                        BAUND_PAIR_LIST HENDPAR { mout(MARRAY);
+                                                  mout(MENDARRAY);
+                                                  setArrayDim($3);}
+                ;
+ARRAY_SEGMENT   :       ARRAY_SEGMENT_EL        { mout(MENDSEP);
+                                                  mout(MARRAYSEP);}
+
+                |       ARRAY_SEGMENT_EL
+                        HPAREXPSEPARATOR
+                        ARRAY_SEGMENT           { mout(MARRAYSEP);}
+                ;
+ARRAY_SEGMENT_EL:       HIDENTIFIER             { mout(MIDENTIFIER);
+                                                  moutId($1);
+                                                  regDecl($1, type, kind, categ);
+				   if(lastArray==NULL)
+                                     lastArray=cblock->lastparloc;}
+                ;
+BAUND_PAIR_LIST :       BAUND_PAIR              { mout(MENDSEP);
+                                                  mout(MBOUNDSEP);
+                                                  $$=1;}
+                |       BAUND_PAIR
+                        HPAREXPSEPARATOR
+                        BAUND_PAIR_LIST         { mout(MBOUNDSEP);
+                                                  $$=$3+1;}
+                ;
+BAUND_PAIR      :       EXPRESSION
+                        HLABELSEPARATOR
+                        EXPRESSION              { mout(MBOUNDPARSEP);}
+                ;
+SWITCH_LIST     :       EXPRESSION              { mout(MENDSEP);
+                                                  mout(MSWITCHSEP);}
+                |       EXPRESSION
+                        HPAREXPSEPARATOR
+                        SWITCH_LIST             { mout(MSWITCHSEP);}
+                ;
+HEADING         :       MBEE_FMAL_PAR_P HSTATEMENTSEPARATOR { kind=KNOKD;}
+                        MBEE_MODE_PART  { categ=CSPEC;}
+                        MBEE_SPEC_PART  { kind=KNOKD;}
+                        MBEE_PROT_PART  { categ=CVIRT;}
+                        MBEE_VIRT_PART
+                                        { categ=CLOCAL;}
+                ;
+MBEE_FMAL_PAR_P :       /*EMPT*/
+                |       FMAL_PAR_PART
+                ;
+FMAL_PAR_PART   :       HBEGPAR NO_TYPE
+                        MBEE_LISTV HENDPAR
+                ;
+MBEE_LISTV      :       /*EMPT*/
+                |       LISTV
+                ;
+LISTV           :       HIDENTIFIER     { regDecl($1, type, KNOKD, CDEFLT);}
+                |	FPP_CATEG HDOTDOTDOT      { regDecl(varargsid, TVARARGS, KNOKD, categ);}
+                |       HIDENTIFIER     { regDecl($1, type, KNOKD, CDEFLT);}
+                        HPAREXPSEPARATOR LISTV {}
+                |       FPP_SPEC
+                |       FPP_SPEC
+                        HPAREXPSEPARATOR LISTV
+                ;
+FPP_HEADING     :       HBEGPAR NO_TYPE
+                        FPP_MBEE_LISTV HENDPAR
+                ;
+FPP_MBEE_LISTV  :       /*EMPT*/
+                |       FPP_LISTV
+                ;
+FPP_LISTV       :	FPP_CATEG HDOTDOTDOT      { regDecl(varargsid, TVARARGS, KNOKD, categ);}
+                |       FPP_SPEC
+                |       FPP_SPEC
+                        HPAREXPSEPARATOR LISTV
+                ;
+FPP_SPEC        :       FPP_CATEG SPECIFIER HIDENTIFIER
+                                       { regDecl($3, type, kind, categ);}
+		|	FPP_CATEG FPP_PROC_DECL_IN_SPEC
+		;
+FPP_CATEG       :       HNAME HLABELSEPARATOR
+                                       { categ=CNAME;}
+                |       HVALUE HLABELSEPARATOR
+                                       { categ=CVALUE;}
+                |       HVAR HLABELSEPARATOR
+                                       { categ=CVAR;}
+                |       /*EMPT*/       { categ=CDEFLT;}
+                ;
+FPP_PROC_DECL_IN_SPEC:	MBEE_TYPE HPROCEDURE
+                        HIDENTIFIER
+                                	{ $<ival>$=categ;
+                                          regDecl($3, type, KPROC, categ);
+                                          beginBlock(KPROC);}
+                        FPP_HEADING
+					{ categ=$<ival>4; /* M} settes tilbake*/}
+				{ endBlock(NULL,CCNO);}
+		;
+IDENTIFIER_LISTV:       HIDENTIFIER     { regDecl($1, type, kind, categ);}
+                |	HDOTDOTDOT {	  regDecl(varargsid, TVARARGS, kind, categ);}
+                |       HIDENTIFIER     { regDecl($1, type, kind, categ);}
+                        HPAREXPSEPARATOR IDENTIFIER_LISTV {}
+                ;
+MBEE_MODE_PART  :       /*EMPT*/
+                |       MODE_PART
+                ;
+MODE_PART       :       NAME_PART
+                |       VALUE_PART
+                |       VAR_PART
+                |       NAME_PART VALUE_PART
+                |       VALUE_PART NAME_PART
+                |       NAME_PART VAR_PART
+                |       VAR_PART NAME_PART
+                |       VALUE_PART VAR_PART
+                |       VAR_PART VALUE_PART
+                |       VAR_PART NAME_PART VALUE_PART
+                |       NAME_PART VAR_PART VALUE_PART
+                |       NAME_PART VALUE_PART VAR_PART
+                |       VAR_PART VALUE_PART NAME_PART
+                |       VALUE_PART VAR_PART NAME_PART
+                |       VALUE_PART NAME_PART VAR_PART
+                ;
+NAME_PART       :       HNAME           { categ=CNAME;}
+                        IDENTIFIER_LISTV
+                        HSTATEMENTSEPARATOR
+                ;
+VAR_PART        :       HVAR            { categ=CVAR;}
+                        IDENTIFIER_LISTV
+                        HSTATEMENTSEPARATOR
+                ;
+VALUE_PART      :       HVALUE          { categ=CVALUE;}
+                        IDENTIFIER_LISTV HSTATEMENTSEPARATOR
+                ;
+MBEE_SPEC_PART  :       /*EMPT*/
+                |       SPEC_PART
+                ;
+SPEC_PART       :       ONE_SPEC
+                |       SPEC_PART ONE_SPEC
+                ;
+ONE_SPEC	:	SPECIFIER IDENTIFIER_LIST HSTATEMENTSEPARATOR
+		|	NO_TYPE HPROCEDURE HIDENTIFIER HOBJRELOPERATOR
+			  { if($4!=HIS) yerror (8);}
+			PROC_DECL_IN_SPEC HSTATEMENTSEPARATOR
+                |       FPP_PROC_DECL_IN_SPEC HSTATEMENTSEPARATOR
+                |       MBEE_TYPE HPROCEDURE HIDENTIFIER HSTATEMENTSEPARATOR
+					{ yerror (45);}
+                |       MBEE_TYPE HPROCEDURE HIDENTIFIER HPAREXPSEPARATOR
+                        IDENTIFIER_LIST HSTATEMENTSEPARATOR
+					{ yerror (45);}
+		;
+SPECIFIER       :       TYPE            { kind=KSIMPLE;}
+                |       MBEE_TYPE
+                        HARRAY          { kind=KARRAY;}
+                |       HLABEL          { type=TLABEL;
+                                          kind=KSIMPLE;}
+                |       HSWITCH         { type=TLABEL;
+                                          kind=KARRAY;}
+                ;
+PROC_DECL_IN_SPEC:	MBEE_TYPE HPROCEDURE
+                        HIDENTIFIER
+                                	{ $<ival>$=categ;
+                                          regDecl($3, type, KPROC, categ);
+                                          beginBlock(KPROC);}
+                        HEADING
+					{ categ=$<ival>4; /* M} settes tilbake*/}
+			MBEE_BEGIN_END
+				{ endBlock(NULL,CCNO);}
+		;
+MBEE_BEGIN_END	:	/* EMPTY */
+		|	HBEGIN HEND
+		;
+MBEE_PROT_PART  :       /*EMPT*/
+                |       PROTECTION_PART
+                ;
+PROTECTION_PART :       PROT_SPECIFIER IDENTIFIER_LIST
+                        HSTATEMENTSEPARATOR
+                |       PROTECTION_PART  PROT_SPECIFIER
+                        IDENTIFIER_LIST HSTATEMENTSEPARATOR
+                ;
+PROT_SPECIFIER  :       HHIDDEN         { categ=CHIDEN;}
+                |       HPROTECTED      { categ=CPROT;}
+                |       HHIDDEN
+                        HPROTECTED      { categ=CHIPRO;}
+                |       HPROTECTED
+                        HHIDDEN         { categ=CHIPRO;}
+                ;
+MBEE_VIRT_PART  :       /*EMPT*/
+                |       VIRTUAL_PART
+                ;
+VIRTUAL_PART    :       HVIRTUAL
+                        HLABELSEPARATOR
+                        MBEE_SPEC_PART
+                ;
+IDENTIFIER_LIST :       HIDENTIFIER     { regDecl($1, type, kind, categ);}
+                |       IDENTIFIER_LIST HPAREXPSEPARATOR
+                        HIDENTIFIER     { regDecl($3, type, kind, categ);}
+                ;
+IDENTIFIER_LISTC:       HIDENTIFIER
+			MBEE_CONSTANT   { regDecl($1, type, kind, categ);
+					  categ=CLOCAL;}
+                |       IDENTIFIER_LISTC HPAREXPSEPARATOR
+                        HIDENTIFIER
+			MBEE_CONSTANT   { regDecl($3, type, kind, categ);
+					  categ=CLOCAL;}
+                ;
+MBEE_CONSTANT	:	/* EMPTY */
+		|	HVALRELOPERATOR
+				{ MBEENEWBLOCK();
+			    if($1!=HEQ) yerror (8);
+					  if(type==TREF)yerror (7);
+					  categ=CCONSTU;
+						  mout(MIDENTIFIER);
+						  moutId($<token>0);}
+			EXPRESSION		{ mout(MASSIGN);
+						  mout(MCONST);}
+		;
+
+/* GRAMATIKK FOR UTTRYKK */
+EXPRESSION      :       EXPRESSION_SIMP {}
+                |       HIF
+                        EXPRESSION
+                        HTHEN
+                        EXPRESSION
+                        HELSE
+                        EXPRESSION              { mout(MELSEE);
+                                                  mout(MIFE);}
+                ;
+EXPRESSION_SIMP :	EXPRESSION_SIMP
+			HASSIGN
+			EXPRESSION { if($2==HASSIGNREF)mout(MASSIGNR);
+                                          else    mout(MASSIGN);$$=NULL;}
+		|
+
+			EXPRESSION_SIMP
+                        HCONC
+                        EXPRESSION_SIMP         { mout(MCONC);$$=NULL;}
+                |       EXPRESSION_SIMP HOR
+                        HELSE
+                        EXPRESSION_SIMP
+                        %prec HORELSE           { mout(MORELSEE);$$=NULL;}
+                |       EXPRESSION_SIMP HAND
+                        HTHEN
+                        EXPRESSION_SIMP
+                        %prec HANDTHEN          { mout(MANDTHENE);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HEQV EXPRESSION_SIMP    { mout(MEQV);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HIMP EXPRESSION_SIMP    { mout(MIMP);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HOR EXPRESSION_SIMP     { mout(MOR);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HAND EXPRESSION_SIMP    { mout(MAND);$$=NULL;}
+                |       HNOT EXPRESSION_SIMP    { mout(MNOT);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HVALRELOPERATOR
+                        EXPRESSION_SIMP
+                                { switch($2)
+                                    {   case HEQ: mout(MEQ);break;
+                                        case HNE: mout(MNE);break;
+                                        case HLT: mout(MLT);break;
+                                        case HLE: mout(MLE);break;
+                                        case HGT: mout(MGT);break;
+                                        case HGE: mout(MGE);break;
+                                    }$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HREFRELOPERATOR
+                        EXPRESSION_SIMP
+                                { if($2==HNER)    mout(MNER);
+                                        else      mout(MEQR);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HOBJRELOPERATOR
+                        EXPRESSION_SIMP
+                                { if($2==HIS)     mout(MIS);
+                                        else      mout(MINS);$$=NULL;}
+                |       HTERMOPERATOR
+                        EXPRESSION_SIMP %prec UNEAR
+                                { if($1==HADD)    mout(MUADD);
+                                        else      mout(MUSUB);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HTERMOPERATOR
+                        EXPRESSION_SIMP
+                                { if($2==HADD)    mout(MADD);
+                                        else      mout(MSUB);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HFACTOROPERATOR
+                        EXPRESSION_SIMP
+                                { if($2==HMUL)    mout(MMUL); else
+                                  if($2==HDIV)    mout(MDIV);
+                                        else      mout(MINTDIV);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HPRIMARYOPERATOR
+                        EXPRESSION_SIMP         { mout(MPRIMARY);$$=NULL;}
+                |       HBEGPAR
+                        EXPRESSION HENDPAR      { mout(MNOOP);$$=NULL;}
+                |       HTEXTKONST              { mout(MTEXTKONST);
+                                                  moutTval($1);$$=NULL;}
+                |       HCHARACTERKONST         { mout(MCHARACTERKONST);
+                                                  moutIval($1);$$=NULL;}
+                |       HREALKONST              { mout(MREALKONST);
+                                                  moutRval($1);$$=NULL;}
+                |       HINTEGERKONST           { mout(MINTEGERKONST);
+                                                  moutIval($1);$$=NULL;}
+                |       HBOOLEANKONST           { mout(MBOOLEANKONST);
+                                                  moutIval($1);$$=NULL;}
+                |       HNONE                   { mout(MNONE);$$=NULL;}
+                |       HIDENTIFIER
+                                { $<ident>$=$1;}
+                        MBEE_ARG_R_PT {}
+                |       HTHIS HIDENTIFIER       { mout(MTHIS);
+                                                  moutId($2);$$=NULL;}
+                |       HNEW
+                        HIDENTIFIER
+                        ARG_R_PT                { mout(MNEWARG);
+                                                  moutId($2);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HDOT
+                        EXPRESSION_SIMP         { mout(MDOT);$$=NULL;}
+                |       EXPRESSION_SIMP
+                        HQUA HIDENTIFIER        { mout(MQUA);
+                                                  moutId($3);$$=NULL;}
+                ;
+ARG_R_PT        :       /*EMPTY*/               { mout(MENDSEP);}
+                |       HBEGPAR
+                        ARGUMENT_LIST HENDPAR
+                ;
+MBEE_ARG_R_PT   :       /*EMPTY*/               { mout(MIDENTIFIER);
+                                                  moutId($<ident>0);
+						  $$=$<ident>0;}
+                |       HBEGPAR
+                        ARGUMENT_LIST HENDPAR   { mout(MARGUMENT);
+                                                  moutId($<ident>0);}
+                ;
+ARGUMENT_LIST   :       EXPRESSION              { mout(MENDSEP);
+                                                  mout(MARGUMENTSEP);}
+                |       EXPRESSION
+                        HPAREXPSEPARATOR
+                        ARGUMENT_LIST           { mout(MARGUMENTSEP);}
+                ;
+%%
+]])
+
+# Pass plenty of options, to exercise plenty of code, even if we
+# don't actually check the output.  But SEGV is watching us, and
+# so might do dmalloc.
+AT_CHECK([[bison --verbose --defines input.y]], 0, [],
+[[input.y: conflicts: 78 shift/reduce, 10 reduce/reduce
+]])
+
+AT_CHECK([[grep '^State.*conflicts:' input.output]], 0,
+[[State 64 conflicts: 14 shift/reduce
+State 164 conflicts: 1 shift/reduce
+State 201 conflicts: 33 shift/reduce, 4 reduce/reduce
+State 206 conflicts: 1 shift/reduce
+State 240 conflicts: 1 shift/reduce
+State 335 conflicts: 9 shift/reduce, 2 reduce/reduce
+State 356 conflicts: 1 shift/reduce
+State 360 conflicts: 9 shift/reduce, 2 reduce/reduce
+State 427 conflicts: 9 shift/reduce, 2 reduce/reduce
+]])
+
+AT_CLEANUP
+
+
+## ----------------- ##
+## GNU pic Grammar.  ##
+## ----------------- ##
+
+AT_SETUP([GNU pic Grammar])
+
+# GNU pic, part of groff.
+
+# Bison once reported shift/reduce conflicts that it shouldn't have.
+
+AT_DATA([[input.y]],
+[[%union {
+	char *str;
+	int n;
+	double x;
+	struct { double x, y; } pair;
+	struct { double x; char *body; } if_data;
+	struct { char *str; const char *filename; int lineno; } lstr;
+	struct { double *v; int nv; int maxv; } dv;
+	struct { double val; int is_multiplicative; } by;
+	place pl;
+	object *obj;
+	corner crn;
+	path *pth;
+	object_spec *spec;
+	saved_state *pstate;
+	graphics_state state;
+	object_type obtype;
+}
+
+%token <str> LABEL
+%token <str> VARIABLE
+%token <x> NUMBER
+%token <lstr> TEXT
+%token <lstr> COMMAND_LINE
+%token <str> DELIMITED
+%token <n> ORDINAL
+%token TH
+%token LEFT_ARROW_HEAD
+%token RIGHT_ARROW_HEAD
+%token DOUBLE_ARROW_HEAD
+%token LAST
+%token UP
+%token DOWN
+%token LEFT
+%token RIGHT
+%token BOX
+%token CIRCLE
+%token ELLIPSE
+%token ARC
+%token LINE
+%token ARROW
+%token MOVE
+%token SPLINE
+%token HEIGHT
+%token RADIUS
+%token WIDTH
+%token DIAMETER
+%token FROM
+%token TO
+%token AT
+%token WITH
+%token BY
+%token THEN
+%token SOLID
+%token DOTTED
+%token DASHED
+%token CHOP
+%token SAME
+%token INVISIBLE
+%token LJUST
+%token RJUST
+%token ABOVE
+%token BELOW
+%token OF
+%token THE
+%token WAY
+%token BETWEEN
+%token AND
+%token HERE
+%token DOT_N
+%token DOT_E	
+%token DOT_W
+%token DOT_S
+%token DOT_NE
+%token DOT_SE
+%token DOT_NW
+%token DOT_SW
+%token DOT_C
+%token DOT_START
+%token DOT_END
+%token DOT_X
+%token DOT_Y
+%token DOT_HT
+%token DOT_WID
+%token DOT_RAD
+%token SIN
+%token COS
+%token ATAN2
+%token LOG
+%token EXP
+%token SQRT
+%token K_MAX
+%token K_MIN
+%token INT
+%token RAND
+%token SRAND
+%token COPY
+%token THRU
+%token TOP
+%token BOTTOM
+%token UPPER
+%token LOWER
+%token SH
+%token PRINT
+%token CW
+%token CCW
+%token FOR
+%token DO
+%token IF
+%token ELSE
+%token ANDAND
+%token OROR
+%token NOTEQUAL
+%token EQUALEQUAL
+%token LESSEQUAL
+%token GREATEREQUAL
+%token LEFT_CORNER
+%token RIGHT_CORNER
+%token NORTH
+%token SOUTH
+%token EAST
+%token WEST
+%token CENTER
+%token END
+%token START
+%token RESET
+%token UNTIL
+%token PLOT
+%token THICKNESS
+%token FILL
+%token COLORED
+%token OUTLINED
+%token SHADED
+%token ALIGNED
+%token SPRINTF
+%token COMMAND
+
+%left '.'
+
+/* this ensures that plot 17 "%g" parses as (plot 17 "%g") */
+%left PLOT
+%left TEXT SPRINTF
+
+/* give text adjustments higher precedence than TEXT, so that
+box "foo" above ljust == box ("foo" above ljust)
+*/
+
+%left LJUST RJUST ABOVE BELOW
+
+%left LEFT RIGHT
+/* Give attributes that take an optional expression a higher
+precedence than left and right, so that eg `line chop left'
+parses properly. */
+%left CHOP SOLID DASHED DOTTED UP DOWN FILL COLORED OUTLINED
+%left LABEL
+
+%left VARIABLE NUMBER '(' SIN COS ATAN2 LOG EXP SQRT K_MAX K_MIN INT RAND SRAND LAST 
+%left ORDINAL HERE '`'
+
+%left BOX CIRCLE ELLIPSE ARC LINE ARROW SPLINE '[' /* ] */
+
+/* these need to be lower than '-' */
+%left HEIGHT RADIUS WIDTH DIAMETER FROM TO AT THICKNESS
+
+/* these must have higher precedence than CHOP so that `label %prec CHOP'
+works */
+%left DOT_N DOT_E DOT_W DOT_S DOT_NE DOT_SE DOT_NW DOT_SW DOT_C
+%left DOT_START DOT_END TOP BOTTOM LEFT_CORNER RIGHT_CORNER
+%left UPPER LOWER NORTH SOUTH EAST WEST CENTER START END
+
+%left ','
+%left OROR
+%left ANDAND
+%left EQUALEQUAL NOTEQUAL
+%left '<' '>' LESSEQUAL GREATEREQUAL
+
+%left BETWEEN OF
+%left AND
+
+%left '+' '-'
+%left '*' '/' '%'
+%right '!'
+%right '^'
+
+%type <x> expr any_expr text_expr
+%type <by> optional_by
+%type <pair> expr_pair position_not_place
+%type <if_data> simple_if
+%type <obj> nth_primitive
+%type <crn> corner
+%type <pth> path label_path relative_path
+%type <pl> place label element element_list middle_element_list
+%type <spec> object_spec
+%type <pair> position
+%type <obtype> object_type
+%type <n> optional_ordinal_last ordinal
+%type <str> until
+%type <dv> sprintf_args
+%type <lstr> text print_args print_arg
+
+%%
+
+top:
+	optional_separator
+	| element_list
+		{
+		  if (olist.head)
+		    print_picture(olist.head);
+		}
+	;
+
+
+element_list:
+	optional_separator middle_element_list optional_separator
+		{ $$ = $2; }
+	;
+
+middle_element_list:
+	element
+		{ $$ = $1; }
+	| middle_element_list separator element
+		{ $$ = $1; }
+	;
+
+optional_separator:
+	/* empty */
+	| separator
+	;
+
+separator:
+	';'
+	| separator ';'
+	;
+
+placeless_element:
+	VARIABLE '=' any_expr
+		{
+		  define_variable($1, $3);
+		  a_delete $1;
+		}
+	| VARIABLE ':' '=' any_expr
+		{
+		  place *p = lookup_label($1);
+		  if (!p) {
+		    lex_error("variable `%1' not defined", $1);
+		    YYABORT;
+		  }
+		  p->obj = 0;
+		  p->x = $4;
+		  p->y = 0.0;
+		  a_delete $1;
+		}
+	| UP
+		{ current_direction = UP_DIRECTION; }
+	| DOWN
+		{ current_direction = DOWN_DIRECTION; }
+	| LEFT
+		{ current_direction = LEFT_DIRECTION; }
+	| RIGHT
+		{ current_direction = RIGHT_DIRECTION; }
+	| COMMAND_LINE
+		{
+		  olist.append(make_command_object($1.str, $1.filename,
+						   $1.lineno));
+		}
+	| COMMAND print_args
+		{
+		  olist.append(make_command_object($2.str, $2.filename,
+						   $2.lineno));
+		}
+	| PRINT print_args
+		{
+		  fprintf(stderr, "%s\n", $2.str);
+		  a_delete $2.str;
+		  fflush(stderr);
+		}
+	| SH
+		{ delim_flag = 1; }
+	  DELIMITED
+		{
+		  delim_flag = 0;
+		  if (safer_flag)
+		    lex_error("unsafe to run command `%1'", $3);
+		  else
+		    system($3);
+		  a_delete $3;
+		}
+	| COPY TEXT
+		{
+		  if (yychar < 0)
+		    do_lookahead();
+		  do_copy($2.str);
+		  // do not delete the filename
+		}
+	| COPY TEXT THRU
+		{ delim_flag = 2; }
+	  DELIMITED 
+		{ delim_flag = 0; }
+	  until
+		{
+		  if (yychar < 0)
+		    do_lookahead();
+		  copy_file_thru($2.str, $5, $7);
+		  // do not delete the filename
+		  a_delete $5;
+		  a_delete $7;
+		}
+	| COPY THRU
+		{ delim_flag = 2; }
+	  DELIMITED
+		{ delim_flag = 0; }
+	  until
+		{
+		  if (yychar < 0)
+		    do_lookahead();
+		  copy_rest_thru($4, $6);
+		  a_delete $4;
+		  a_delete $6;
+		}
+	| FOR VARIABLE '=' expr TO expr optional_by DO
+	  	{ delim_flag = 1; }
+	  DELIMITED
+	  	{
+		  delim_flag = 0;
+		  if (yychar < 0)
+		    do_lookahead();
+		  do_for($2, $4, $6, $7.is_multiplicative, $7.val, $10); 
+		}
+	| simple_if
+		{
+		  if (yychar < 0)
+		    do_lookahead();
+		  if ($1.x != 0.0)
+		    push_body($1.body);
+		  a_delete $1.body;
+		}
+	| simple_if ELSE
+		{ delim_flag = 1; }
+	  DELIMITED
+		{
+		  delim_flag = 0;
+		  if (yychar < 0)
+		    do_lookahead();
+		  if ($1.x != 0.0)
+		    push_body($1.body);
+		  else
+		    push_body($4);
+		  a_delete $1.body;
+		  a_delete $4;
+		}
+	| reset_variables
+	| RESET
+		{ define_variable("scale", 1.0); }
+	;
+
+reset_variables:
+	RESET VARIABLE
+		{
+		  reset($2);
+		  a_delete $2;
+		}
+	| reset_variables VARIABLE
+		{
+		  reset($2);
+		  a_delete $2;
+		}
+	| reset_variables ',' VARIABLE
+		{
+		  reset($3);
+		  a_delete $3;
+		}
+	;
+
+print_args:
+	print_arg
+		{ $$ = $1; }
+	| print_args print_arg
+		{
+		  $$.str = new char[strlen($1.str) + strlen($2.str) + 1];
+		  strcpy($$.str, $1.str);
+		  strcat($$.str, $2.str);
+		  a_delete $1.str;
+		  a_delete $2.str;
+		  if ($1.filename) {
+		    $$.filename = $1.filename;
+		    $$.lineno = $1.lineno;
+		  }
+		  else if ($2.filename) {
+		    $$.filename = $2.filename;
+		    $$.lineno = $2.lineno;
+		  }
+		}
+	;
+
+print_arg:
+  	expr							%prec ','
+		{
+		  $$.str = new char[GDIGITS + 1];
+		  sprintf($$.str, "%g", $1);
+		  $$.filename = 0;
+		  $$.lineno = 0;
+		}
+	| text
+		{ $$ = $1; }
+	| position						%prec ','
+		{
+		  $$.str = new char[GDIGITS + 2 + GDIGITS + 1];
+		  sprintf($$.str, "%g, %g", $1.x, $1.y);
+		  $$.filename = 0;
+		  $$.lineno = 0;
+		}
+	;
+
+simple_if:
+	IF any_expr THEN
+		{ delim_flag = 1; }
+	DELIMITED
+		{
+		  delim_flag = 0;
+		  $$.x = $2;
+		  $$.body = $5;
+		}
+	;
+
+until:
+	/* empty */
+		{ $$ = 0; }
+	| UNTIL TEXT
+		{ $$ = $2.str; }
+	;
+	
+any_expr:
+	expr
+		{ $$ = $1; }
+	| text_expr
+		{ $$ = $1; }
+	;
+	
+text_expr:
+	text EQUALEQUAL text
+		{
+		  $$ = strcmp($1.str, $3.str) == 0;
+		  a_delete $1.str;
+		  a_delete $3.str;
+		}
+	| text NOTEQUAL text
+		{
+		  $$ = strcmp($1.str, $3.str) != 0;
+		  a_delete $1.str;
+		  a_delete $3.str;
+		}
+	| text_expr ANDAND text_expr
+		{ $$ = ($1 != 0.0 && $3 != 0.0); }
+	| text_expr ANDAND expr
+		{ $$ = ($1 != 0.0 && $3 != 0.0); }
+	| expr ANDAND text_expr
+		{ $$ = ($1 != 0.0 && $3 != 0.0); }
+	| text_expr OROR text_expr
+		{ $$ = ($1 != 0.0 || $3 != 0.0); }
+	| text_expr OROR expr
+		{ $$ = ($1 != 0.0 || $3 != 0.0); }
+	| expr OROR text_expr
+		{ $$ = ($1 != 0.0 || $3 != 0.0); }
+	| '!' text_expr
+		{ $$ = ($2 == 0.0); }
+	;
+
+
+optional_by:
+	/* empty */
+		{
+		  $$.val = 1.0;
+		  $$.is_multiplicative = 0;
+		}
+	| BY expr
+		{
+		  $$.val = $2;
+		  $$.is_multiplicative = 0;
+		}
+	| BY '*' expr
+		{
+		  $$.val = $3;
+		  $$.is_multiplicative = 1;
+		}
+	;
+
+element:
+	object_spec
+		{
+		  $$.obj = $1->make_object(&current_position,
+					   &current_direction);
+		  if ($$.obj == 0)
+		    YYABORT;
+		  delete $1;
+		  if ($$.obj)
+		    olist.append($$.obj);
+		  else {
+		    $$.x = current_position.x;
+		    $$.y = current_position.y;
+		  }
+		}
+	| LABEL ':' optional_separator element
+		{
+		  $$ = $4;
+		  define_label($1, & $$);
+		  a_delete $1;
+		}
+	| LABEL ':' optional_separator position_not_place
+		{
+		  $$.obj = 0;
+		  $$.x = $4.x;
+		  $$.y = $4.y;
+		  define_label($1, & $$);
+		  a_delete $1;
+		}
+	| LABEL ':' optional_separator place
+		{
+		  $$ = $4;
+		  define_label($1, & $$);
+		  a_delete $1;
+		}
+	| '{'
+		{
+		  $<state>$.x = current_position.x;
+		  $<state>$.y = current_position.y;
+		  $<state>$.dir = current_direction;
+		}
+	  element_list '}'
+		{
+		  current_position.x = $<state>2.x;
+		  current_position.y = $<state>2.y;
+		  current_direction = $<state>2.dir;
+		}
+	  optional_element
+		{
+		  $$ = $3;
+		}
+	| placeless_element
+		{
+		  $$.obj = 0;
+		  $$.x = current_position.x;
+		  $$.y = current_position.y;
+		}
+	;
+
+optional_element:
+	/* empty */
+		{}
+	| element
+		{}
+	;
+
+object_spec:
+	BOX
+		{ $$ = new object_spec(BOX_OBJECT); }
+	| CIRCLE
+		{ $$ = new object_spec(CIRCLE_OBJECT); }
+	| ELLIPSE
+		{ $$ = new object_spec(ELLIPSE_OBJECT); }
+	| ARC
+		{
+		  $$ = new object_spec(ARC_OBJECT);
+		  $$->dir = current_direction;
+		}
+	| LINE
+		{
+		  $$ = new object_spec(LINE_OBJECT);
+		  lookup_variable("lineht", & $$->segment_height);
+		  lookup_variable("linewid", & $$->segment_width);
+		  $$->dir = current_direction;
+		}
+	| ARROW
+		{
+		  $$ = new object_spec(ARROW_OBJECT);
+		  lookup_variable("lineht", & $$->segment_height);
+		  lookup_variable("linewid", & $$->segment_width);
+		  $$->dir = current_direction;
+		}
+	| MOVE
+		{
+		  $$ = new object_spec(MOVE_OBJECT);
+		  lookup_variable("moveht", & $$->segment_height);
+		  lookup_variable("movewid", & $$->segment_width);
+		  $$->dir = current_direction;
+		}
+	| SPLINE
+		{
+		  $$ = new object_spec(SPLINE_OBJECT);
+		  lookup_variable("lineht", & $$->segment_height);
+		  lookup_variable("linewid", & $$->segment_width);
+		  $$->dir = current_direction;
+		}
+	| text							%prec TEXT
+		{
+		  $$ = new object_spec(TEXT_OBJECT);
+		  $$->text = new text_item($1.str, $1.filename, $1.lineno);
+		}
+	| PLOT expr
+		{
+		  $$ = new object_spec(TEXT_OBJECT);
+		  $$->text = new text_item(format_number(0, $2), 0, -1);
+		}
+	| PLOT expr text
+		{
+		  $$ = new object_spec(TEXT_OBJECT);
+		  $$->text = new text_item(format_number($3.str, $2),
+					   $3.filename, $3.lineno);
+		  a_delete $3.str;
+		}
+	| '[' 
+		{
+		  saved_state *p = new saved_state;
+		  $<pstate>$ = p;
+		  p->x = current_position.x;
+		  p->y = current_position.y;
+		  p->dir = current_direction;
+		  p->tbl = current_table;
+		  p->prev = current_saved_state;
+		  current_position.x = 0.0;
+		  current_position.y = 0.0;
+		  current_table = new PTABLE(place);
+		  current_saved_state = p;
+		  olist.append(make_mark_object());
+		}
+	  element_list ']'
+		{
+		  current_position.x = $<pstate>2->x;
+		  current_position.y = $<pstate>2->y;
+		  current_direction = $<pstate>2->dir;
+		  $$ = new object_spec(BLOCK_OBJECT);
+		  olist.wrap_up_block(& $$->oblist);
+		  $$->tbl = current_table;
+		  current_table = $<pstate>2->tbl;
+		  current_saved_state = $<pstate>2->prev;
+		  delete $<pstate>2;
+		}
+	| object_spec HEIGHT expr
+		{
+		  $$ = $1;
+		  $$->height = $3;
+		  $$->flags |= HAS_HEIGHT;
+		}
+	| object_spec RADIUS expr
+		{
+		  $$ = $1;
+		  $$->radius = $3;
+		  $$->flags |= HAS_RADIUS;
+		}
+	| object_spec WIDTH expr
+		{
+		  $$ = $1;
+		  $$->width = $3;
+		  $$->flags |= HAS_WIDTH;
+		}
+	| object_spec DIAMETER expr
+		{
+		  $$ = $1;
+		  $$->radius = $3/2.0;
+		  $$->flags |= HAS_RADIUS;
+		}
+	| object_spec expr					%prec HEIGHT
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_SEGMENT;
+		  switch ($$->dir) {
+		  case UP_DIRECTION:
+		    $$->segment_pos.y += $2;
+		    break;
+		  case DOWN_DIRECTION:
+		    $$->segment_pos.y -= $2;
+		    break;
+		  case RIGHT_DIRECTION:
+		    $$->segment_pos.x += $2;
+		    break;
+		  case LEFT_DIRECTION:
+		    $$->segment_pos.x -= $2;
+		    break;
+		  }
+		}
+	| object_spec UP
+		{
+		  $$ = $1;
+		  $$->dir = UP_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.y += $$->segment_height;
+		}
+	| object_spec UP expr
+		{
+		  $$ = $1;
+		  $$->dir = UP_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.y += $3;
+		}
+	| object_spec DOWN
+		{
+		  $$ = $1;
+		  $$->dir = DOWN_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.y -= $$->segment_height;
+		}
+	| object_spec DOWN expr
+		{
+		  $$ = $1;
+		  $$->dir = DOWN_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.y -= $3;
+		}
+	| object_spec RIGHT
+		{
+		  $$ = $1;
+		  $$->dir = RIGHT_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x += $$->segment_width;
+		}
+	| object_spec RIGHT expr
+		{
+		  $$ = $1;
+		  $$->dir = RIGHT_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x += $3;
+		}
+	| object_spec LEFT
+		{
+		  $$ = $1;
+		  $$->dir = LEFT_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x -= $$->segment_width;
+		}
+	| object_spec LEFT expr
+		{
+		  $$ = $1;
+		  $$->dir = LEFT_DIRECTION;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x -= $3;
+		}
+	| object_spec FROM position
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_FROM;
+		  $$->from.x = $3.x;
+		  $$->from.y = $3.y;
+		}
+	| object_spec TO position
+		{
+		  $$ = $1;
+		  if ($$->flags & HAS_SEGMENT)
+		    $$->segment_list = new segment($$->segment_pos,
+						   $$->segment_is_absolute,
+						   $$->segment_list);
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x = $3.x;
+		  $$->segment_pos.y = $3.y;
+		  $$->segment_is_absolute = 1;
+		  $$->flags |= HAS_TO;
+		  $$->to.x = $3.x;
+		  $$->to.y = $3.y;
+		}
+	| object_spec AT position
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_AT;
+		  $$->at.x = $3.x;
+		  $$->at.y = $3.y;
+		  if ($$->type != ARC_OBJECT) {
+		    $$->flags |= HAS_FROM;
+		    $$->from.x = $3.x;
+		    $$->from.y = $3.y;
+		  }
+		}
+	| object_spec WITH path
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_WITH;
+		  $$->with = $3;
+		}
+	| object_spec WITH position				%prec ','
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_WITH;
+		  position pos;
+		  pos.x = $3.x;
+		  pos.y = $3.y;
+		  $$->with = new path(pos);
+		}
+	| object_spec BY expr_pair
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_SEGMENT;
+		  $$->segment_pos.x += $3.x;
+		  $$->segment_pos.y += $3.y;
+		}
+	| object_spec THEN
+  		{
+		  $$ = $1;
+		  if ($$->flags & HAS_SEGMENT) {
+		    $$->segment_list = new segment($$->segment_pos,
+						   $$->segment_is_absolute,
+						   $$->segment_list);
+		    $$->flags &= ~HAS_SEGMENT;
+		    $$->segment_pos.x = $$->segment_pos.y = 0.0;
+		    $$->segment_is_absolute = 0;
+		  }
+		}
+	| object_spec SOLID
+		{
+		  $$ = $1;	// nothing
+		}
+	| object_spec DOTTED
+		{
+		  $$ = $1;
+		  $$->flags |= IS_DOTTED;
+		  lookup_variable("dashwid", & $$->dash_width);
+		}
+	| object_spec DOTTED expr
+		{
+		  $$ = $1;
+		  $$->flags |= IS_DOTTED;
+		  $$->dash_width = $3;
+		}
+	| object_spec DASHED
+		{
+		  $$ = $1;
+		  $$->flags |= IS_DASHED;
+		  lookup_variable("dashwid", & $$->dash_width);
+		}
+	| object_spec DASHED expr
+		{
+		  $$ = $1;
+		  $$->flags |= IS_DASHED;
+		  $$->dash_width = $3;
+		}
+	| object_spec FILL
+		{
+		  $$ = $1;
+		  $$->flags |= IS_DEFAULT_FILLED;
+		}
+	| object_spec FILL expr
+		{
+		  $$ = $1;
+		  $$->flags |= IS_FILLED;
+		  $$->fill = $3;
+		}
+	| object_spec SHADED text
+		{
+		  $$ = $1;
+		  $$->flags |= (IS_SHADED | IS_FILLED);
+		  $$->shaded = new char[strlen($3.str)+1];
+		  strcpy($$->shaded, $3.str);
+		}
+	| object_spec COLORED text
+		{
+		  $$ = $1;
+		  $$->flags |= (IS_SHADED | IS_OUTLINED | IS_FILLED);
+		  $$->shaded = new char[strlen($3.str)+1];
+		  strcpy($$->shaded, $3.str);
+		  $$->outlined = new char[strlen($3.str)+1];
+		  strcpy($$->outlined, $3.str);
+		}
+	| object_spec OUTLINED text
+		{
+		  $$ = $1;
+		  $$->flags |= IS_OUTLINED;
+		  $$->outlined = new char[strlen($3.str)+1];
+		  strcpy($$->outlined, $3.str);
+		}
+	| object_spec CHOP
+  		{
+		  $$ = $1;
+		  // line chop chop means line chop 0 chop 0
+		  if ($$->flags & IS_DEFAULT_CHOPPED) {
+		    $$->flags |= IS_CHOPPED;
+		    $$->flags &= ~IS_DEFAULT_CHOPPED;
+		    $$->start_chop = $$->end_chop = 0.0;
+		  }
+		  else if ($$->flags & IS_CHOPPED) {
+		    $$->end_chop = 0.0;
+		  }
+		  else {
+		    $$->flags |= IS_DEFAULT_CHOPPED;
+		  }
+		}
+	| object_spec CHOP expr
+		{
+		  $$ = $1;
+		  if ($$->flags & IS_DEFAULT_CHOPPED) {
+		    $$->flags |= IS_CHOPPED;
+		    $$->flags &= ~IS_DEFAULT_CHOPPED;
+		    $$->start_chop = 0.0;
+		    $$->end_chop = $3;
+		  }
+		  else if ($$->flags & IS_CHOPPED) {
+		    $$->end_chop = $3;
+		  }
+		  else {
+		    $$->start_chop = $$->end_chop = $3;
+		    $$->flags |= IS_CHOPPED;
+		  }
+		}
+	| object_spec SAME
+		{
+		  $$ = $1;
+		  $$->flags |= IS_SAME;
+		}
+	| object_spec INVISIBLE
+		{
+		  $$ = $1;
+		  $$->flags |= IS_INVISIBLE;
+		}
+	| object_spec LEFT_ARROW_HEAD
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_LEFT_ARROW_HEAD;
+		}
+	| object_spec RIGHT_ARROW_HEAD
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_RIGHT_ARROW_HEAD;
+		}
+	| object_spec DOUBLE_ARROW_HEAD
+		{
+		  $$ = $1;
+		  $$->flags |= (HAS_LEFT_ARROW_HEAD|HAS_RIGHT_ARROW_HEAD);
+		}
+	| object_spec CW
+		{
+		  $$ = $1;
+		  $$->flags |= IS_CLOCKWISE;
+		}
+	| object_spec CCW
+		{
+		  $$ = $1;
+		  $$->flags &= ~IS_CLOCKWISE;
+		}
+	| object_spec text					%prec TEXT
+		{
+		  $$ = $1;
+		  text_item **p;
+		  for (p = & $$->text; *p; p = &(*p)->next)
+		    ;
+		  *p = new text_item($2.str, $2.filename, $2.lineno);
+		}
+	| object_spec LJUST
+		{
+		  $$ = $1;
+		  if ($$->text) {
+		    text_item *p;
+		    for (p = $$->text; p->next; p = p->next)
+		      ;
+		    p->adj.h = LEFT_ADJUST;
+		  }
+		}
+	| object_spec RJUST
+		{
+		  $$ = $1;
+		  if ($$->text) {
+		    text_item *p;
+		    for (p = $$->text; p->next; p = p->next)
+		      ;
+		    p->adj.h = RIGHT_ADJUST;
+		  }
+		}
+	| object_spec ABOVE
+		{
+		  $$ = $1;
+		  if ($$->text) {
+		    text_item *p;
+		    for (p = $$->text; p->next; p = p->next)
+		      ;
+		    p->adj.v = ABOVE_ADJUST;
+		  }
+		}
+	| object_spec BELOW
+		{
+		  $$ = $1;
+		  if ($$->text) {
+		    text_item *p;
+		    for (p = $$->text; p->next; p = p->next)
+		      ;
+		    p->adj.v = BELOW_ADJUST;
+		  }
+		}
+	| object_spec THICKNESS expr
+		{
+		  $$ = $1;
+		  $$->flags |= HAS_THICKNESS;
+		  $$->thickness = $3;
+		}
+	| object_spec ALIGNED
+		{
+		  $$ = $1;
+		  $$->flags |= IS_ALIGNED;
+		}
+	;
+
+text:
+	TEXT
+		{ $$ = $1; }
+	| SPRINTF '(' TEXT sprintf_args ')'
+		{
+		  $$.filename = $3.filename;
+		  $$.lineno = $3.lineno;
+		  $$.str = do_sprintf($3.str, $4.v, $4.nv);
+		  a_delete $4.v;
+		  a_delete $3.str;
+		}
+	;
+
+sprintf_args:
+	/* empty */
+		{
+		  $$.v = 0;
+		  $$.nv = 0;
+		  $$.maxv = 0;
+		}
+	| sprintf_args ',' expr
+		{
+		  $$ = $1;
+		  if ($$.nv >= $$.maxv) {
+		    if ($$.nv == 0) {
+		      $$.v = new double[4];
+		      $$.maxv = 4;
+		    }
+		    else {
+		      double *oldv = $$.v;
+		      $$.maxv *= 2;
+		      $$.v = new double[$$.maxv];
+		      memcpy($$.v, oldv, $$.nv*sizeof(double));
+		      a_delete oldv;
+		    }
+		  }
+		  $$.v[$$.nv] = $3;
+		  $$.nv += 1;
+		}
+	;
+
+position:
+  	position_not_place
+		{ $$ = $1; }
+	| place
+  		{
+		  position pos = $1;
+		  $$.x = pos.x;
+		  $$.y = pos.y;
+		}
+	;
+
+position_not_place:
+	expr_pair
+		{ $$ = $1; }
+	| position '+' expr_pair
+		{
+		  $$.x = $1.x + $3.x;
+		  $$.y = $1.y + $3.y;
+		}
+	| position '-' expr_pair
+		{
+		  $$.x = $1.x - $3.x;
+		  $$.y = $1.y - $3.y;
+		}
+	| '(' position ',' position ')'
+		{
+		  $$.x = $2.x;
+		  $$.y = $4.y;
+		}
+	| expr between position AND position
+		{
+		  $$.x = (1.0 - $1)*$3.x + $1*$5.x;
+		  $$.y = (1.0 - $1)*$3.y + $1*$5.y;
+		}
+	| expr '<' position ',' position '>'
+		{
+		  $$.x = (1.0 - $1)*$3.x + $1*$5.x;
+		  $$.y = (1.0 - $1)*$3.y + $1*$5.y;
+		}
+	;
+
+between:
+	BETWEEN
+	| OF THE WAY BETWEEN
+	;
+
+expr_pair:
+	expr ',' expr
+		{
+		  $$.x = $1;
+		  $$.y = $3;
+		}
+	| '(' expr_pair ')'
+		{ $$ = $2; }
+	;
+
+place:
+	/* line at A left == line (at A) left */
+	label							%prec CHOP
+		{ $$ = $1; }
+	| label corner
+		{
+		  path pth($2);
+		  if (!pth.follow($1, & $$))
+		    YYABORT;
+		}
+	| corner label
+		{
+		  path pth($1);
+		  if (!pth.follow($2, & $$))
+		    YYABORT;
+		}
+	| corner OF label
+		{
+		  path pth($1);
+		  if (!pth.follow($3, & $$))
+		    YYABORT;
+		}
+	| HERE
+		{
+		  $$.x = current_position.x;
+		  $$.y = current_position.y;
+		  $$.obj = 0;
+		}
+	;
+
+label:
+	LABEL
+		{
+		  place *p = lookup_label($1);
+		  if (!p) {
+		    lex_error("there is no place `%1'", $1);
+		    YYABORT;
+		  }
+		  $$ = *p;
+		  a_delete $1;
+		}
+	| nth_primitive
+		{ $$.obj = $1; }
+	| label '.' LABEL
+		{
+		  path pth($3);
+		  if (!pth.follow($1, & $$))
+		    YYABORT;
+		}
+	;
+
+ordinal:
+	ORDINAL
+		{ $$ = $1; }
+	| '`' any_expr TH
+		{
+		  // XXX Check for overflow (and non-integers?).
+		  $$ = (int)$2;
+		}
+	;
+
+optional_ordinal_last:
+	LAST
+		{ $$ = 1; }
+  	| ordinal LAST
+		{ $$ = $1; }
+	;
+
+nth_primitive:
+	ordinal object_type
+		{
+		  int count = 0;
+		  object *p;
+		  for (p = olist.head; p != 0; p = p->next)
+		    if (p->type() == $2 && ++count == $1) {
+		      $$ = p;
+		      break;
+		    }
+		  if (p == 0) {
+		    lex_error("there is no %1%2 %3", $1, ordinal_postfix($1),
+			      object_type_name($2));
+		    YYABORT;
+		  }
+		}
+	| optional_ordinal_last object_type
+		{
+		  int count = 0;
+		  object *p;
+		  for (p = olist.tail; p != 0; p = p->prev)
+		    if (p->type() == $2 && ++count == $1) {
+		      $$ = p;
+		      break;
+		    }
+		  if (p == 0) {
+		    lex_error("there is no %1%2 last %3", $1,
+			      ordinal_postfix($1), object_type_name($2));
+		    YYABORT;
+		  }
+		}
+	;
+
+object_type:
+	BOX
+  		{ $$ = BOX_OBJECT; }
+	| CIRCLE
+		{ $$ = CIRCLE_OBJECT; }
+	| ELLIPSE
+		{ $$ = ELLIPSE_OBJECT; }
+	| ARC
+		{ $$ = ARC_OBJECT; }
+	| LINE
+		{ $$ = LINE_OBJECT; }
+	| ARROW
+		{ $$ = ARROW_OBJECT; }
+	| SPLINE
+		{ $$ = SPLINE_OBJECT; }
+	| '[' ']'
+		{ $$ = BLOCK_OBJECT; }
+	| TEXT
+		{ $$ = TEXT_OBJECT; }
+	;
+
+label_path:
+ 	'.' LABEL
+		{ $$ = new path($2); }
+	| label_path '.' LABEL
+		{
+		  $$ = $1;
+		  $$->append($3);
+		}
+	;
+
+relative_path:
+	corner							%prec CHOP
+		{ $$ = new path($1); }
+	/* give this a lower precedence than LEFT and RIGHT so that
+	   [A: box] with .A left == [A: box] with (.A left) */
+  	| label_path						%prec TEXT
+		{ $$ = $1; }
+	| label_path corner
+		{
+		  $$ = $1;
+		  $$->append($2);
+		}
+	;
+
+path:
+	relative_path
+		{ $$ = $1; }
+	| '(' relative_path ',' relative_path ')'
+		{
+		  $$ = $2;
+		  $$->set_ypath($4);
+		}
+	/* The rest of these rules are a compatibility sop. */
+	| ORDINAL LAST object_type relative_path
+		{
+		  lex_warning("`%1%2 last %3' in `with' argument ignored",
+			      $1, ordinal_postfix($1), object_type_name($3));
+		  $$ = $4;
+		}
+	| LAST object_type relative_path
+		{
+		  lex_warning("`last %1' in `with' argument ignored",
+			      object_type_name($2));
+		  $$ = $3;
+		}
+	| ORDINAL object_type relative_path
+		{
+		  lex_warning("`%1%2 %3' in `with' argument ignored",
+			      $1, ordinal_postfix($1), object_type_name($2));
+		  $$ = $3;
+		}
+	| LABEL relative_path
+		{
+		  lex_warning("initial `%1' in `with' argument ignored", $1);
+		  a_delete $1;
+		  $$ = $2;
+		}
+	;
+
+corner:
+	DOT_N
+		{ $$ = &object::north; }
+	| DOT_E	
+		{ $$ = &object::east; }
+	| DOT_W
+		{ $$ = &object::west; }
+	| DOT_S
+		{ $$ = &object::south; }
+	| DOT_NE
+		{ $$ = &object::north_east; }
+	| DOT_SE
+		{ $$ = &object:: south_east; }
+	| DOT_NW
+		{ $$ = &object::north_west; }
+	| DOT_SW
+		{ $$ = &object::south_west; }
+	| DOT_C
+		{ $$ = &object::center; }
+	| DOT_START
+		{ $$ = &object::start; }
+	| DOT_END
+		{ $$ = &object::end; }
+  	| TOP
+		{ $$ = &object::north; }
+	| BOTTOM
+		{ $$ = &object::south; }
+	| LEFT
+		{ $$ = &object::west; }
+	| RIGHT
+		{ $$ = &object::east; }
+	| UPPER LEFT
+		{ $$ = &object::north_west; }
+	| LOWER LEFT
+		{ $$ = &object::south_west; }
+	| UPPER RIGHT
+		{ $$ = &object::north_east; }
+	| LOWER RIGHT
+		{ $$ = &object::south_east; }
+	| LEFT_CORNER
+		{ $$ = &object::west; }
+	| RIGHT_CORNER
+		{ $$ = &object::east; }
+	| UPPER LEFT_CORNER
+		{ $$ = &object::north_west; }
+	| LOWER LEFT_CORNER
+		{ $$ = &object::south_west; }
+	| UPPER RIGHT_CORNER
+		{ $$ = &object::north_east; }
+	| LOWER RIGHT_CORNER
+		{ $$ = &object::south_east; }
+	| NORTH
+		{ $$ = &object::north; }
+	| SOUTH
+		{ $$ = &object::south; }
+	| EAST
+		{ $$ = &object::east; }
+	| WEST
+		{ $$ = &object::west; }
+	| CENTER
+		{ $$ = &object::center; }
+	| START
+		{ $$ = &object::start; }
+	| END
+		{ $$ = &object::end; }
+	;
+
+expr:
+	VARIABLE
+		{
+		  if (!lookup_variable($1, & $$)) {
+		    lex_error("there is no variable `%1'", $1);
+		    YYABORT;
+		  }
+		  a_delete $1;
+		}
+	| NUMBER
+		{ $$ = $1; }
+	| place DOT_X
+  		{
+		  if ($1.obj != 0)
+		    $$ = $1.obj->origin().x;
+		  else
+		    $$ = $1.x;
+		}			
+	| place DOT_Y
+		{
+		  if ($1.obj != 0)
+		    $$ = $1.obj->origin().y;
+		  else
+		    $$ = $1.y;
+		}
+	| place DOT_HT
+		{
+		  if ($1.obj != 0)
+		    $$ = $1.obj->height();
+		  else
+		    $$ = 0.0;
+		}
+	| place DOT_WID
+		{
+		  if ($1.obj != 0)
+		    $$ = $1.obj->width();
+		  else
+		    $$ = 0.0;
+		}
+	| place DOT_RAD
+		{
+		  if ($1.obj != 0)
+		    $$ = $1.obj->radius();
+		  else
+		    $$ = 0.0;
+		}
+	| expr '+' expr
+		{ $$ = $1 + $3; }
+	| expr '-' expr
+		{ $$ = $1 - $3; }
+	| expr '*' expr
+		{ $$ = $1 * $3; }
+	| expr '/' expr
+		{
+		  if ($3 == 0.0) {
+		    lex_error("division by zero");
+		    YYABORT;
+		  }
+		  $$ = $1/$3;
+		}
+	| expr '%' expr
+		{
+		  if ($3 == 0.0) {
+		    lex_error("modulus by zero");
+		    YYABORT;
+		  }
+		  $$ = fmod($1, $3);
+		}
+	| expr '^' expr
+		{
+		  errno = 0;
+		  $$ = pow($1, $3);
+		  if (errno == EDOM) {
+		    lex_error("arguments to `^' operator out of domain");
+		    YYABORT;
+		  }
+		  if (errno == ERANGE) {
+		    lex_error("result of `^' operator out of range");
+		    YYABORT;
+		  }
+		}
+	| '-' expr						%prec '!'
+		{ $$ = -$2; }
+	| '(' any_expr ')'
+		{ $$ = $2; }
+	| SIN '(' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = sin($3);
+		  if (errno == ERANGE) {
+		    lex_error("sin result out of range");
+		    YYABORT;
+		  }
+		}
+	| COS '(' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = cos($3);
+		  if (errno == ERANGE) {
+		    lex_error("cos result out of range");
+		    YYABORT;
+		  }
+		}
+	| ATAN2 '(' any_expr ',' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = atan2($3, $5);
+		  if (errno == EDOM) {
+		    lex_error("atan2 argument out of domain");
+		    YYABORT;
+		  }
+		  if (errno == ERANGE) {
+		    lex_error("atan2 result out of range");
+		    YYABORT;
+		  }
+		}
+	| LOG '(' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = log10($3);
+		  if (errno == ERANGE) {
+		    lex_error("log result out of range");
+		    YYABORT;
+		  }
+		}
+	| EXP '(' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = pow(10.0, $3);
+		  if (errno == ERANGE) {
+		    lex_error("exp result out of range");
+		    YYABORT;
+		  }
+		}
+	| SQRT '(' any_expr ')'
+		{
+		  errno = 0;
+		  $$ = sqrt($3);
+		  if (errno == EDOM) {
+		    lex_error("sqrt argument out of domain");
+		    YYABORT;
+		  }
+		}
+	| K_MAX '(' any_expr ',' any_expr ')'
+		{ $$ = $3 > $5 ? $3 : $5; }
+	| K_MIN '(' any_expr ',' any_expr ')'
+		{ $$ = $3 < $5 ? $3 : $5; }
+	| INT '(' any_expr ')'
+		{ $$ = floor($3); }
+	| RAND '(' any_expr ')'
+		{ $$ = 1.0 + floor(((rand()&0x7fff)/double(0x7fff))*$3); }
+	| RAND '(' ')'
+		{
+		  /* return a random number in the range >=0, <1 */
+		  /* portable, but not very random */
+		  $$ = (rand() & 0x7fff) / double(0x8000);
+		}
+	| SRAND '(' any_expr ')'
+		{
+		  $$ = 0;
+		  srand((unsigned int)$3);
+		}
+	| expr '<' expr
+		{ $$ = ($1 < $3); }
+	| expr LESSEQUAL expr
+		{ $$ = ($1 <= $3); }
+	| expr '>' expr
+		{ $$ = ($1 > $3); }
+	| expr GREATEREQUAL expr
+		{ $$ = ($1 >= $3); }
+	| expr EQUALEQUAL expr
+		{ $$ = ($1 == $3); }
+	| expr NOTEQUAL expr
+		{ $$ = ($1 != $3); }
+	| expr ANDAND expr
+		{ $$ = ($1 != 0.0 && $3 != 0.0); }
+	| expr OROR expr
+		{ $$ = ($1 != 0.0 || $3 != 0.0); }
+	| '!' expr
+		{ $$ = ($2 == 0.0); }
+
+	;
+]])
+
+# Pass plenty of options, to exercise plenty of code, even if we
+# don't actually check the output.  But SEGV is watching us, and
+# so might do dmalloc.
+AT_CHECK([[bison --verbose --defines input.y]], 0, [], [])
+
+AT_CLEANUP

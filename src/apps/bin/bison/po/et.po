@@ -1,0 +1,734 @@
+# Estonian translations for bison.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Toomas Soome <tsoome@ut.ee>, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bison 1.875\n"
+"Report-Msgid-Bugs-To: bug-bison@gnu.org\n"
+"POT-Creation-Date: 2004-05-21 10:26-0700\n"
+"PO-Revision-Date: 2003-01-02 11:59+0200\n"
+"Last-Translator: Toomas Soome <Toomas.Soome@microlink.ee>\n"
+"Language-Team: Estonian <et@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/complain.c:51 src/complain.c:66
+msgid "warning: "
+msgstr "hoiatus: "
+
+#: src/complain.c:122 src/complain.c:138
+msgid "fatal error: "
+msgstr "fataalne viga: "
+
+#: src/conflicts.c:76
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as shift"
+msgstr "    Konflikt reegli %d ja märgi %s vahel lahendatud nihkega"
+
+#: src/conflicts.c:84
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as reduce"
+msgstr "    Konflikt reegli %d ja märgi %s vahel lahendatud redutseerimisega"
+
+#: src/conflicts.c:91
+#, c-format
+msgid "    Conflict between rule %d and token %s resolved as an error"
+msgstr "    Konflikt reegli %d ja märgi %s vahel lahendatud veana"
+
+#: src/conflicts.c:399
+#, c-format
+msgid "conflicts: %d shift/reduce, %d reduce/reduce\n"
+msgstr ""
+"konfliktid: %d nihutamine/redutseerimine, %d redutseerimine/redutseerimine\n"
+
+#: src/conflicts.c:402
+#, c-format
+msgid "conflicts: %d shift/reduce\n"
+msgstr "konfliktid:  %d nihutamine/redutseerimine\n"
+
+#: src/conflicts.c:404
+#, c-format
+msgid "conflicts: %d reduce/reduce\n"
+msgstr "konfliktid: %d redutseerimine/redutseerimine\n"
+
+#: src/conflicts.c:422
+#, c-format
+msgid "State %d "
+msgstr "Olek %d "
+
+#: src/conflicts.c:487
+#, fuzzy, c-format
+msgid "%%expect-rr applies only to GLR parsers"
+msgstr "%s puudutab ainult GLR parsereid"
+
+#: src/conflicts.c:511
+#, c-format
+msgid "expected %d shift/reduce conflict"
+msgid_plural "expected %d shift/reduce conflicts"
+msgstr[0] "eeldasime %d nihutamine/redutseerimine konflikti"
+msgstr[1] "eeldasime %d nihutamine/redutseerimine konflikti"
+
+#: src/conflicts.c:515
+#, fuzzy, c-format
+msgid "expected %d reduce/reduce conflict"
+msgid_plural "expected %d reduce/reduce conflicts"
+msgstr[0] "eeldasin 0 redutseerimine/redutseerimine konflikti"
+msgstr[1] "eeldasin 0 redutseerimine/redutseerimine konflikti"
+
+#: src/files.c:100
+#, c-format
+msgid "cannot open file `%s'"
+msgstr "faili `%s' ei saa avada"
+
+#: src/files.c:116
+msgid "I/O error"
+msgstr "S/V viga"
+
+#: src/files.c:119
+msgid "cannot close file"
+msgstr "faili ei õnnestu sulgeda"
+
+#: src/files.c:337
+#, c-format
+msgid "conflicting outputs to file %s"
+msgstr "konfliktsed väljundid faili %s"
+
+#: src/getargs.c:186
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Lisainfo saamiseks proovige `%s --help'.\n"
+
+#: src/getargs.c:192
+msgid "GNU bison generates parsers for LALR(1) grammars.\n"
+msgstr "GNU bison genereerib parsereid LALR(1) grammatikatele.\n"
+
+#: src/getargs.c:196
+#, c-format
+msgid "Usage: %s [OPTION]... FILE\n"
+msgstr "Kasuta: %s [VÕTI]...FAIL\n"
+
+#: src/getargs.c:200
+msgid ""
+"If a long option shows an argument as mandatory, then it is mandatory\n"
+"for the equivalent short option also.  Similarly for optional arguments.\n"
+msgstr ""
+"Kui pikk võti näitab, et argument on kohustuslik, siis on see kohustuslik \n"
+"ka lühikese võtme korral. Sama ka vabalt valitavate võtmete korral.\n"
+
+#: src/getargs.c:206
+msgid ""
+"Operation modes:\n"
+"  -h, --help      display this help and exit\n"
+"  -V, --version   output version information and exit\n"
+"  -y, --yacc      emulate POSIX yacc\n"
+msgstr ""
+"Töömoodid:\n"
+"  -h, --help      esita see abiinfo ja lõpeta töö\n"
+"  -V, --version   esita versiooniinfo ja lõpeta töö\n"
+"  -y, --yacc      emuleeri POSIX yacc\n"
+
+#: src/getargs.c:213
+msgid ""
+"Parser:\n"
+"  -S, --skeleton=FILE        specify the skeleton to use\n"
+"  -t, --debug                instrument the parser for debugging\n"
+"      --locations            enable locations computation\n"
+"  -p, --name-prefix=PREFIX   prepend PREFIX to the external symbols\n"
+"  -l, --no-lines             don't generate `#line' directives\n"
+"  -n, --no-parser            generate the tables only\n"
+"  -k, --token-table          include a table of token names\n"
+msgstr ""
+"Parser:\n"
+"  -S, --skeleton=FAIL        kasutatava skeleti kirjeldus\n"
+"  -t, --debug                varusta parser silumisinfoga\n"
+"      --locations            luba asukohtade arvestamine\n"
+"  -p, --name-prefix=PREFIKS  lisa välissümbolite nimedele PREFIKS\n"
+"  -l, --no-lines             ära genereeri `#line' direktiive\n"
+"  -n, --no-parser            genereeri ainult tabelid\n"
+"  -k, --token-table          lisa ka sümbolite nimede tabel\n"
+
+#: src/getargs.c:225
+msgid ""
+"Output:\n"
+"  -d, --defines              also produce a header file\n"
+"  -r, --report=THINGS        also produce details on the automaton\n"
+"  -v, --verbose              same as `--report=state'\n"
+"  -b, --file-prefix=PREFIX   specify a PREFIX for output files\n"
+"  -o, --output=FILE          leave output to FILE\n"
+"  -g, --graph                also produce a VCG description of the "
+"automaton\n"
+msgstr ""
+"Väljund:\n"
+"  -d, --defines              loo ka päisfail\n"
+"  -r, --report=ASJAD         väljasta automaadi kohta selgitusi\n"
+"  -v, --verbose              sama, kui `--report=state'\n"
+"  -b, --file-prefix=PREFIKS  kasuta väljundfailide nimedes PREFIKSit\n"
+"  -o, --output-file=FAIL     jäta väljund FAILi\n"
+"  -g, --graph                loo automaadi kirjeldus VCG graafina\n"
+
+#: src/getargs.c:236
+msgid ""
+"THINGS is a list of comma separated words that can include:\n"
+"  `state'        describe the states\n"
+"  `itemset'      complete the core item sets with their closure\n"
+"  `lookahead'    explicitly associate lookaheads to items\n"
+"  `solved'       describe shift/reduce conflicts solving\n"
+"  `all'          include all the above information\n"
+"  `none'         disable the report\n"
+msgstr ""
+"ASJAD on loend komadega eraldatud järgnevaid sõnu:\n"
+"  `state'        olekute kirjeldus\n"
+"  `itemset'      täienda põhilisi elemente nende sulunditega\n"
+"  `lookahead'    seo ettevaatamised elementidega\n"
+"  `solved'       kirjelda nihuta/redutseeri konfliktide lahendamisi\n"
+"  `all'          kogu ülaltoodud info\n"
+"  `none'         blokeeri raport\n"
+
+#: src/getargs.c:247
+msgid "Report bugs to <bug-bison@gnu.org>.\n"
+msgstr "Teatage palun vigadest aadressil <bug-bison@gnu.org>.\n"
+
+#: src/getargs.c:264
+#, c-format
+msgid "bison (GNU Bison) %s"
+msgstr "bison (GNU Bison) %s"
+
+#: src/getargs.c:266
+msgid "Written by Robert Corbett and Richard Stallman.\n"
+msgstr "Kirjutanud Robert Corbett ja Richard Stallman.\n"
+
+#: src/getargs.c:270
+#, c-format
+msgid "Copyright (C) %d Free Software Foundation, Inc.\n"
+msgstr "Autoriõigus © %d Free Software Foundation, Inc.\n"
+
+#: src/getargs.c:272
+msgid ""
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"See on vaba tarkvara; kopeerimistingimused leiate lähtetekstidest. Garantii\n"
+"PUUDUB; ka müügiks või mingil eesmärgil kasutamiseks.\n"
+
+#: src/getargs.c:438
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "`%s' järel puudub operand"
+
+#: src/getargs.c:440
+#, c-format
+msgid "extra operand `%s'"
+msgstr "Liigne operand `%s'"
+
+#: src/gram.c:139
+msgid "empty"
+msgstr "tühi"
+
+#: src/gram.c:233
+msgid "Grammar"
+msgstr "Grammatika"
+
+#: src/gram.c:321 src/reduce.c:394
+msgid "warning"
+msgstr "hoiatus"
+
+#: src/main.c:124
+msgid "rule never reduced because of conflicts"
+msgstr "reeglit ei redutseerita konfliktide tõttu kunagi"
+
+#: src/parse-gram.y:363
+msgid "POSIX forbids declarations in the grammar"
+msgstr "POSIX keelab deklareerimised grammatikas"
+
+#: src/parse-gram.y:486
+msgid "missing identifier in parameter declaration"
+msgstr "parameetri deklaratsioonis puudub identifikaator"
+
+#: src/print.c:49
+#, c-format
+msgid " type %d is %s\n"
+msgstr " tüüp %d on %s\n"
+
+#: src/print.c:165
+#, c-format
+msgid "shift, and go to state %d\n"
+msgstr "nihuta ja liigu olekule %d\n"
+
+#: src/print.c:167
+#, c-format
+msgid "go to state %d\n"
+msgstr "liigu olekule %d\n"
+
+#: src/print.c:204
+msgid "error (nonassociative)\n"
+msgstr "viga (mitteassotsiatiivne)\n"
+
+#: src/print.c:292
+#, c-format
+msgid "reduce using rule %d (%s)"
+msgstr "redutseerin kasutades reeglit %d (%s)"
+
+#: src/print.c:294
+#, c-format
+msgid "accept"
+msgstr "nõustun"
+
+#: src/print.c:325 src/print.c:391
+msgid "$default"
+msgstr "$default"
+
+#: src/print.c:420
+#, c-format
+msgid "state %d"
+msgstr "olek %d"
+
+#: src/print.c:456
+msgid "Terminals, with rules where they appear"
+msgstr "Terminalid, koos reeglitega kus nad ilmuvad"
+
+#: src/print.c:483
+msgid "Nonterminals, with rules where they appear"
+msgstr "Mitteterminalid, koos reeglitega kus nad ilmuvad"
+
+#: src/print.c:512
+#, c-format
+msgid " on left:"
+msgstr " vasakul:"
+
+#: src/print.c:527
+#, c-format
+msgid " on right:"
+msgstr " paremal:"
+
+#: src/print.c:555
+msgid "Rules never reduced"
+msgstr "Mitteredutseeruvad reeglid"
+
+#: src/reader.c:56
+#, c-format
+msgid "multiple %s declarations"
+msgstr "korduvad %s deklaratsioonid"
+
+#: src/reader.c:118
+#, c-format
+msgid "result type clash on merge function %s: <%s> != <%s>"
+msgstr "tulemuse tüübikonflikt mestimise funktsioonis %s: <%s> != <%s>"
+
+#: src/reader.c:216
+#, c-format
+msgid "rule given for %s, which is a token"
+msgstr "%s jaoks on antud reegel, aga see on märk"
+
+#: src/reader.c:245
+#, c-format
+msgid "type clash on default action: <%s> != <%s>"
+msgstr "vaikimisi tegevuse tüübikonflikt: <%s> != <%s>"
+
+#: src/reader.c:251
+msgid "empty rule for typed nonterminal, and no action"
+msgstr "tüübiga mitteterminalil on tühi reegel ja puudub tegevus"
+
+#: src/reader.c:321 src/reader.c:335 src/reader.c:348
+#, c-format
+msgid "only one %s allowed per rule"
+msgstr "reeglis on lubatud ainult üks %s"
+
+#: src/reader.c:331 src/reader.c:346
+#, c-format
+msgid "%s affects only GLR parsers"
+msgstr "%s puudutab ainult GLR parsereid"
+
+#: src/reader.c:333
+#, c-format
+msgid "%s must be followed by positive number"
+msgstr "%s järel peab olema positiivne number"
+
+#: src/reader.c:490
+msgid "no rules in the input grammar"
+msgstr "sisendgrammatikas pole reegleid"
+
+#: src/reduce.c:242
+msgid "useless rule"
+msgstr "kasutamata reegel"
+
+#: src/reduce.c:303
+#, c-format
+msgid "useless nonterminal: %s"
+msgstr "kasutamata mitteterminal: %s"
+
+#: src/reduce.c:351
+msgid "Useless nonterminals"
+msgstr "Kasutamata mitteterminalid"
+
+#: src/reduce.c:364
+msgid "Terminals which are not used"
+msgstr "Terminalid, mida ei kasutatud"
+
+#: src/reduce.c:373
+msgid "Useless rules"
+msgstr "Kasutamata reeglid"
+
+#: src/reduce.c:389
+#, c-format
+msgid "%d rule never reduced\n"
+msgid_plural "%d rules never reduced\n"
+msgstr[0] "%d reegel ei redutseeru\n"
+msgstr[1] "%d reeglit ei redutseeru\n"
+
+#: src/reduce.c:397
+#, c-format
+msgid "%d useless nonterminal"
+msgid_plural "%d useless nonterminals"
+msgstr[0] "%d kasutamata mitteterminal"
+msgstr[1] "%d kasutamata mitteterminali"
+
+#: src/reduce.c:403
+#, c-format
+msgid " and "
+msgstr " ja "
+
+#: src/reduce.c:406
+#, c-format
+msgid "%d useless rule"
+msgid_plural "%d useless rules"
+msgstr[0] "%d kasutamata reegel"
+msgstr[1] "%d kasutamata reeglit"
+
+#: src/reduce.c:436
+#, c-format
+msgid "start symbol %s does not derive any sentence"
+msgstr "stardisümbolist %s ei tuletata ühtegi lauset"
+
+#: src/scan-gram.l:162
+msgid "stray `,' treated as white space"
+msgstr "käsitlen juhuslikku `,' kui tühikut"
+
+#: src/scan-gram.l:225
+#, c-format
+msgid "invalid directive: %s"
+msgstr "vigane juhus: %s"
+
+#: src/scan-gram.l:283
+#, c-format
+msgid "invalid character: %s"
+msgstr "vigased sümbolid: %s"
+
+#: src/scan-gram.l:402
+#, fuzzy
+msgid "invalid null character"
+msgstr "vigased sümbolid: %s"
+
+#: src/scan-gram.l:415 src/scan-gram.l:427 src/scan-gram.l:448
+#, c-format
+msgid "invalid escape sequence: %s"
+msgstr "vigane paojada: %s"
+
+#: src/scan-gram.l:417 src/scan-gram.l:429 src/scan-gram.l:450
+#, fuzzy, c-format
+msgid "invalid null character: %s"
+msgstr "vigased sümbolid: %s"
+
+#: src/scan-gram.l:455
+#, c-format
+msgid "unrecognized escape sequence: %s"
+msgstr "tundmatu paojada: %s"
+
+#: src/scan-gram.l:537
+#, c-format
+msgid "missing `{' in `%s'"
+msgstr "`%s' juures puudub `{'"
+
+#: src/scan-gram.l:782
+#, c-format
+msgid "$$ of `%s' has no declared type"
+msgstr "`%s' $$ ei oma deklareeritud tüüpi"
+
+#: src/scan-gram.l:803
+#, c-format
+msgid "$%d of `%s' has no declared type"
+msgstr "$%d `%s' ei oma deklareeritud tüüpi"
+
+#: src/scan-gram.l:812 src/scan-gram.l:881 src/scan-gram.l:932
+#, c-format
+msgid "integer out of range: %s"
+msgstr "number piiridest väljas: %s"
+
+#: src/scan-gram.l:848 src/scan-gram.l:916
+#, c-format
+msgid "invalid value: %s"
+msgstr "vigane väärtus: %s"
+
+#: src/scan-gram.l:1036
+#, c-format
+msgid "missing `%s' at end of file"
+msgstr "faili lõpus puudub `%s'"
+
+#: src/scan-gram.l:1047
+#, fuzzy, c-format
+msgid "missing `%s' at end of line"
+msgstr "faili lõpus puudub `%s'"
+
+#: src/symlist.c:97 src/symlist.c:108
+msgid "invalid $ value"
+msgstr "vigane $ väärtus"
+
+#: src/symtab.c:85
+#, c-format
+msgid "type redeclaration for %s"
+msgstr "%s tüübi uuesti deklareerimine"
+
+#: src/symtab.c:102 src/symtab.c:120
+#, c-format
+msgid "%s redeclaration for %s"
+msgstr "%s uuesti deklareerimine %s jaoks"
+
+#: src/symtab.c:139
+#, c-format
+msgid "redefining precedence of %s"
+msgstr "%s prioriteedi uus definitsioon"
+
+#: src/symtab.c:157
+#, c-format
+msgid "symbol %s redefined"
+msgstr "sümbol %s on uuesti defineeritud"
+
+#: src/symtab.c:180
+#, c-format
+msgid "redefining user token number of %s"
+msgstr "%s kasutaja märgi numbri uuesti defineerimine"
+
+#: src/symtab.c:207
+#, c-format
+msgid "symbol %s is used, but is not defined as a token and has no rules"
+msgstr ""
+"kasutatakse sümbolit %s, mis ei ole defineeritud märgina ja millel puuduvad "
+"reeglid"
+
+#: src/symtab.c:232
+#, c-format
+msgid "symbol `%s' used more than once as a literal string"
+msgstr "sümbolit `%s' on kasutatud enam kui kord literaal sõnena"
+
+#: src/symtab.c:235
+#, c-format
+msgid "symbol `%s' given more than one literal string"
+msgstr "sümbolile `%s' on antud enam kui üks literaal sõne"
+
+#: src/symtab.c:271
+#, c-format
+msgid "conflicting precedences for %s and %s"
+msgstr "%s ja %s omavad konfliktseid prioriteete"
+
+#: src/symtab.c:283
+#, c-format
+msgid "conflicting associativities for %s (%s) and %s (%s)"
+msgstr "%s (%s) ja %s (%s) omavad konfliktseid assotsiatiivseid väärtuseid"
+
+#: src/symtab.c:368
+#, c-format
+msgid "tokens %s and %s both assigned number %d"
+msgstr "märkidele %s ja %s on mõlemale omistatud number %d"
+
+#: src/symtab.c:591
+#, c-format
+msgid "the start symbol %s is undefined"
+msgstr "stardisümbol %s ei ole defineeritud"
+
+#: src/symtab.c:595
+#, c-format
+msgid "the start symbol %s is a token"
+msgstr "stardisümbol %s on märk"
+
+#: lib/argmatch.c:133
+#, c-format
+msgid "invalid argument %s for %s"
+msgstr "vigane argument %s %s'le"
+
+#: lib/argmatch.c:134
+#, c-format
+msgid "ambiguous argument %s for %s"
+msgstr "segane argument %s %s'le"
+
+#: lib/argmatch.c:153
+#, c-format
+msgid "Valid arguments are:"
+msgstr "Lubatud argumendid on:"
+
+#: lib/bitset_stats.c:179
+#, c-format
+msgid "%u bitset_allocs, %u freed (%.2f%%).\n"
+msgstr "%u bitset_allocs, %u vabastatud (%.2f%%).\n"
+
+#: lib/bitset_stats.c:182
+#, c-format
+msgid "%u bitset_sets, %u cached (%.2f%%)\n"
+msgstr "%u bitset_sets, %u puhverdatud (%.2f%%)\n"
+
+#: lib/bitset_stats.c:185
+#, c-format
+msgid "%u bitset_resets, %u cached (%.2f%%)\n"
+msgstr "%u bitset_resets, %u puhverdatud (%.2f%%)\n"
+
+#: lib/bitset_stats.c:188
+#, c-format
+msgid "%u bitset_tests, %u cached (%.2f%%)\n"
+msgstr "%u bitset_tests, %u puhverdatud (%.2f%%)\n"
+
+#: lib/bitset_stats.c:192
+#, c-format
+msgid "%u bitset_lists\n"
+msgstr "%u bitset_lists\n"
+
+#: lib/bitset_stats.c:194
+msgid "count log histogram\n"
+msgstr "loenduri logi histogramm\n"
+
+#: lib/bitset_stats.c:197
+msgid "size log histogram\n"
+msgstr "suuruste logi histogramm\n"
+
+#: lib/bitset_stats.c:200
+msgid "density histogram\n"
+msgstr "tiheduse histogramm\n"
+
+#: lib/bitset_stats.c:214
+#, c-format
+msgid ""
+"Bitset statistics:\n"
+"\n"
+msgstr ""
+"Bitset statistika:\n"
+"\n"
+
+#: lib/bitset_stats.c:217
+#, c-format
+msgid "Accumulated runs = %u\n"
+msgstr "Salvestatud läbimisi = %u\n"
+
+#: lib/bitset_stats.c:261 lib/bitset_stats.c:266
+msgid "Could not read stats file."
+msgstr "Statistika faili ei saa lugeda."
+
+#: lib/bitset_stats.c:263
+#, c-format
+msgid "Bad stats file size.\n"
+msgstr "Vigane statistika faili suurus.\n"
+
+#: lib/bitset_stats.c:289 lib/bitset_stats.c:291
+msgid "Could not write stats file."
+msgstr "Statistika faili ei saa kirjutada."
+
+#: lib/bitset_stats.c:294
+msgid "Could not open stats file for writing."
+msgstr "Statistika faili ei saa kirjutamiseks avada."
+
+#: lib/error.c:127
+msgid "Unknown system error"
+msgstr "Tundmatu süsteemi viga"
+
+#: lib/getopt.c:570 lib/getopt.c:589
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: võti `%s' on segane\n"
+
+#: lib/getopt.c:622 lib/getopt.c:626
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: võti `--%s' ei luba argumenti\n"
+
+#: lib/getopt.c:635 lib/getopt.c:640
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: võti `%c%s' ei luba argumenti\n"
+
+#: lib/getopt.c:686 lib/getopt.c:708 lib/getopt.c:1039 lib/getopt.c:1061
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: võti `%s' nõuab argumenti\n"
+
+#: lib/getopt.c:746 lib/getopt.c:749
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: tundmatu võti `--%s'\n"
+
+#: lib/getopt.c:757 lib/getopt.c:760
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: tundmatu võti `%c%s'\n"
+
+#: lib/getopt.c:815 lib/getopt.c:818
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: lubamatu võti -- %c\n"
+
+#: lib/getopt.c:824 lib/getopt.c:827
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: vigane võti -- %c\n"
+
+#: lib/getopt.c:882 lib/getopt.c:901 lib/getopt.c:1114 lib/getopt.c:1135
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: võti nõuab argumenti -- %c\n"
+
+#: lib/getopt.c:954 lib/getopt.c:973
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: võti `-W %s' on segane\n"
+
+#: lib/getopt.c:997 lib/getopt.c:1018
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: võti `-W %s' ei luba argumenti\n"
+
+#: lib/obstack.c:417 lib/obstack.c:420 lib/xmalloc.c:53
+msgid "memory exhausted"
+msgstr "mälu on otsas"
+
+#: lib/quotearg.c:238
+msgid "`"
+msgstr "`"
+
+#: lib/quotearg.c:239
+msgid "'"
+msgstr "'"
+
+#: lib/subpipe.c:171
+#, c-format
+msgid "subsidiary program `%s' could not be invoked"
+msgstr "abiprogrammi `%s' ei saa käivitada"
+
+#: lib/subpipe.c:173
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "ei leia abiprogrammi `%s'"
+
+#: lib/subpipe.c:175
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "abiprogramm `%s' ebaõnnestus"
+
+#: lib/subpipe.c:176
+#, c-format
+msgid "subsidiary program `%s' failed (exit status %d)"
+msgstr "abiprogramm `%s' ebaõnnestus (lõpetamise kood %d)"
+
+#: lib/timevar.c:475
+msgid ""
+"\n"
+"Execution times (seconds)\n"
+msgstr ""
+"\n"
+"Täitmise ajad (sekundites)\n"
+
+#: lib/timevar.c:525
+msgid " TOTAL                 :"
+msgstr " KOKKU                 :"
+
+#: lib/timevar.c:561
+#, c-format
+msgid "time in %s: %ld.%06ld (%ld%%)\n"
+msgstr "aeg %s: %ld.%06ld (%ld%%)\n"

@@ -1,0 +1,237 @@
+# Checking the Bison scanner.                    -*- Autotest -*-
+# Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+AT_BANNER([[Input Processing.]])
+
+# Mostly test that we are robust to mistakes.
+
+
+## ------------ ##
+## Invalid $n.  ##
+## ------------ ##
+
+AT_SETUP([Invalid $n])
+
+AT_DATA([input.y],
+[[%%
+exp: { $$ = $1 ; };
+]])
+
+AT_CHECK([bison input.y], [1], [],
+[[input.y:2.13-14: integer out of range: `$1'
+]])
+
+AT_CLEANUP
+
+
+## ------------ ##
+## Invalid @n.  ##
+## ------------ ##
+
+AT_SETUP([Invalid @n])
+
+AT_DATA([input.y],
+[[%%
+exp: { @$ = @1 ; };
+]])
+
+AT_CHECK([bison input.y], [1], [],
+[[input.y:2.13-14: integer out of range: `@1'
+]])
+
+AT_CLEANUP
+
+
+## -------------- ##
+## Type Clashes.  ##
+## -------------- ##
+
+AT_SETUP([Type Clashes])
+
+AT_DATA([input.y],
+[[%token foo
+%type <bar> exp
+%%
+exp: foo {} foo
+   | foo
+   | /* Empty. */
+   ;
+]])
+
+AT_CHECK([bison input.y], [], [],
+[[input.y:4.6-15: warning: type clash on default action: <bar> != <>
+input.y:5.6-8: warning: type clash on default action: <bar> != <>
+input.y:6.5: warning: empty rule for typed nonterminal, and no action
+]])
+
+AT_CLEANUP
+
+
+
+## ----------------------- ##
+## Torturing the Scanner.  ##
+## ----------------------- ##
+
+# Be sure to compile and run, so that the C compiler checks what
+# we do.
+
+AT_SETUP([Torturing the Scanner])
+
+
+AT_DATA([input.y], [])
+AT_CHECK([bison input.y], [1], [],
+[[input.y:1.1: syntax error, unexpected "end of file"
+]])
+
+
+AT_DATA_GRAMMAR([input.y],
+[[%{
+/* This is seen in GCC: a %{ and %} in middle of a comment. */
+const char *foo = "So %{ and %} can be here too.";
+
+#if 0
+/* These examples test Bison while not stressing C compilers too much.
+   Many C compilers mishandle backslash-newlines, so this part of the
+   test is inside "#if 0".  The comment and string are written so that
+   the "#endif" will be seen regardless of the C compiler bugs that we
+   know about, namely:
+
+     HP C (as of late 2002) mishandles *\[newline]\[newline]/ within a
+     comment.
+
+     The Apple Darwin compiler (as of late 2002) mishandles
+     \\[newline]' within a character constant.
+
+   */
+
+/\
+* A comment with backslash-newlines in it. %} *\
+\
+/
+/* { Close the above comment, if the C compiler mishandled it.  */
+
+char str[] = "\\
+" A string with backslash-newlines in it %{ %} \\
+\
+"";
+
+char apostrophe = '\'';
+#endif
+
+#include <stdio.h>
+%}
+/* %{ and %} can be here too. */
+
+%{
+/* Exercise pre-prologue dependency to %union.  */
+typedef int value;
+%}
+
+/* Exercise M4 quoting: '@:>@@:>@', 0.  */
+
+/* Also exercise %union. */
+%union
+{
+  value ival; /* A comment to exercise an old bug. */
+};
+
+
+/* Exercise post-prologue dependency to %union.  */
+%{
+static YYSTYPE value_as_yystype (value val);
+
+/* Exercise quotes in declarations.  */
+char quote[] = "@:>@@:>@,";
+%}
+
+%{
+static void yyerror (const char *s);
+static int yylex (void);
+%}
+
+%type <ival> '@<:@'
+
+/* Exercise quotes in strings.  */
+%token FAKE "fake @<:@@:>@ \a\b\f\n\r\t\v\"\'\?\\\u005B\U0000005c ??!??'??(??)??-??/??<??=??> \x1\1"
+
+%%
+/* Exercise M4 quoting: '@:>@@:>@', @<:@, 1.  */
+exp: '@<:@' '\1' two '$' '@' '{' oline output.or.oline.opt
+  {
+    /* Exercise quotes in braces.  */
+    char tmp[] = "@<:@%c@:>@,\n";
+    printf (tmp, $1);
+  }
+;
+
+two: '\x000000000000000000000000000000000000000000000000000000000000000000002';
+oline: '@' 'o' 'l' 'i' 'n' 'e' '@' '_' '_' 'o' 'l' 'i' 'n' 'e' '_' '_';
+output.or.oline.opt: ;|oline;;|output;;;
+output: '#' 'o' 'u' 't' 'p' 'u' 't' ' ';
+%%
+/* Exercise M4 quoting: '@:>@@:>@', @<:@, 2.  */
+
+static YYSTYPE
+value_as_yystype (value val)
+{
+  YYSTYPE res;
+  res.ival = val;
+  return res;
+}
+
+static int
+yylex (void)
+{
+  static const char *input = "@<:@\1\2$@{@oline@__@&t@oline__\
+#output "; /* "
+  */
+  yylval = value_as_yystype (*input);
+  return *input++;
+}
+
+static void
+yyerror (const char *msg)
+{
+  fprintf (stderr, "%s\n", msg);
+}
+]])
+
+# Pacify Emacs'font-lock-mode: "
+
+AT_DATA([main.c],
+[[typedef int value;
+#include "input.h"
+
+int yyparse (void);
+
+int
+main (void)
+{
+  return yyparse ();
+}
+]])
+
+AT_CHECK([bison -d -v -o input.c input.y])
+AT_COMPILE([input.o], [-c input.c])
+AT_COMPILE([main.o], [-c main.c])
+AT_COMPILE([input], [input.o main.o])
+AT_PARSER_CHECK([./input], 0,
+[[[@<:@],
+]])
+
+AT_CLEANUP

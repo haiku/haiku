@@ -1,0 +1,560 @@
+# Executing Actions.                               -*- Autotest -*-
+# Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+AT_BANNER([[User Actions.]])
+
+## ------------------ ##
+## Mid-rule actions.  ##
+## ------------------ ##
+
+AT_SETUP([Mid-rule actions])
+
+# Bison once forgot the mid-rule actions.  It was because the action
+# was attached to the host rule (the one with the mid-rule action),
+# instead of being attached to the empty rule dedicated to this
+# action.
+
+AT_DATA_GRAMMAR([[input.y]],
+[[%{
+# include <stdio.h>
+# include <stdlib.h>
+  static void yyerror (const char *msg);
+  static int yylex (void);
+# define YYDEBUG         1
+# define YYERROR_VERBOSE 1
+%}
+%%
+exp:     { putchar ('0'); }
+     '1' { putchar ('1'); }
+     '2' { putchar ('2'); }
+     '3' { putchar ('3'); }
+     '4' { putchar ('4'); }
+     '5' { putchar ('5'); }
+     '6' { putchar ('6'); }
+     '7' { putchar ('7'); }
+     '8' { putchar ('8'); }
+     '9' { putchar ('9'); }
+         { putchar ('\n'); }
+   ;
+%%
+static int
+yylex (void)
+{
+  static const char *input = "123456789";
+  return *input++;
+}
+
+static void
+yyerror (const char *msg)
+{
+  fprintf (stderr, "%s\n", msg);
+}
+
+int
+main (void)
+{
+  return yyparse ();
+}
+]])
+
+AT_CHECK([bison -d -v -o input.c input.y])
+AT_COMPILE([input])
+AT_PARSER_CHECK([./input], 0,
+[[0123456789
+]])
+
+AT_CLEANUP
+
+
+
+## ---------------------- ##
+## Actions after errors.  ##
+## ---------------------- ##
+
+AT_SETUP([Actions after errors])
+
+
+
+AT_DATA_GRAMMAR([[input.y]],
+[[%{
+#include <stdio.h>
+#include <stdlib.h>
+
+static int yylex (void);
+static void yyerror (char const *);
+
+#define YYDEBUG 1
+%}
+%union { int ival; }
+%type <ival> 'x' ';' thing line input
+
+%%
+input:
+  /* Nothing. */
+    {
+      $$ = 0;
+      printf ("input (%d): /* Nothing */\n", $$);
+    }
+| line input /* Right recursive to load the stack so that popping at
+		EOF can	be exercised.  */
+    {
+      $$ = 2;
+      printf ("input (%d): line (%d) input (%d)\n", $$, $1, $2);
+    }
+;
+
+line:
+  thing thing thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d): thing (%d) thing (%d) thing (%d) ';' (%d)\n",
+	      $$, $1, $2, $3, $4);
+    }
+| thing thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d): thing (%d) thing (%d) ';' (%d)\n", $$, $1, $2, $3);
+    }
+| thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d): thing (%d) ';' (%d)\n", $$, $1, $2);
+    }
+| error ';'
+    {
+      $$ = -1;
+      printf ("line (%d): error ';' (%d)\n", $$, $2);
+    }
+;
+
+thing:
+  'x'
+    {
+      $$ = $1;
+      printf ("thing (%d): 'x' (%d)\n", $$, $1);
+    }
+;
+%%
+static size_t counter;
+
+static int
+yylex (void)
+{
+  static char const input[] =
+    {
+      /* Exercise the discarding of stack top and input until `error'
+         can be reduced.  */
+      'x', 'x', 'x', 'x', 'x', 'x', ';',
+
+      /* Load the stack and provoke an error that cannot be caught by
+         the grammar, to check that the stack is cleared. */
+      'x', 'x', ';',
+      'x', ';',
+      'y'
+    };
+
+  if (counter < sizeof input)
+    {
+       yylval.ival = counter;
+       printf ("sending: '%c' (%d)\n", input[counter], yylval.ival);
+       return input[counter++];
+    }
+  else
+    {
+      printf ("sending: EOF\n");
+      return EOF;
+    }
+}
+
+static void
+yyerror (char const *msg)
+{
+  printf ("%lu: %s\n", (unsigned long int) counter, msg);
+}
+
+int
+main (void)
+{
+  yydebug = !!getenv ("YYDEBUG");
+  return yyparse ();
+}
+]])
+
+AT_CHECK([bison -o input.c input.y])
+AT_COMPILE([input])
+AT_PARSER_CHECK([./input], 1,
+[[sending: 'x' (0)
+thing (0): 'x' (0)
+sending: 'x' (1)
+thing (1): 'x' (1)
+sending: 'x' (2)
+thing (2): 'x' (2)
+sending: 'x' (3)
+4: syntax error
+sending: 'x' (4)
+sending: 'x' (5)
+sending: ';' (6)
+line (-1): error ';' (6)
+sending: 'x' (7)
+thing (7): 'x' (7)
+sending: 'x' (8)
+thing (8): 'x' (8)
+sending: ';' (9)
+line (7): thing (7) thing (8) ';' (9)
+sending: 'x' (10)
+thing (10): 'x' (10)
+sending: ';' (11)
+line (10): thing (10) ';' (11)
+sending: 'y' (12)
+13: syntax error
+sending: EOF
+]])
+
+AT_CLEANUP
+
+
+
+## ---------------- ##
+## Exotic Dollars.  ##
+## ---------------- ##
+
+AT_SETUP([Exotic Dollars])
+
+AT_DATA_GRAMMAR([[input.y]],
+[[%{
+# include <stdio.h>
+# include <stdlib.h>
+  static void yyerror (const char *msg);
+  static int yylex (void);
+# define YYDEBUG         1
+# define YYERROR_VERBOSE 1
+%}
+
+%union
+{
+  int val;
+};
+
+%type <val> a_1 a_2 a_5
+            sum_of_the_five_previous_values
+
+%%
+exp: a_1 a_2 { $<val>$ = 3; } { $<val>$ = $<val>3 + 1; } a_5
+     sum_of_the_five_previous_values
+    {
+       printf ("%d\n", $6);
+    }
+;
+a_1: { $$ = 1; };
+a_2: { $$ = 2; };
+a_5: { $$ = 5; };
+
+sum_of_the_five_previous_values:
+    {
+       $$ = $<val>0 + $<val>-1 + $<val>-2 + $<val>-3 + $<val>-4;
+    }
+;
+
+%%
+static int
+yylex (void)
+{
+  return EOF;
+}
+
+static void
+yyerror (const char *msg)
+{
+  fprintf (stderr, "%s\n", msg);
+}
+
+int
+main (void)
+{
+  return yyparse ();
+}
+]])
+
+AT_CHECK([bison -d -v -o input.c input.y])
+AT_COMPILE([input])
+AT_PARSER_CHECK([./input], 0,
+[[15
+]])
+
+AT_CLEANUP
+
+
+
+## -------------------------- ##
+## Printers and Destructors.  ##
+## -------------------------- ##
+
+# _AT_CHECK_PRINTER_AND_DESTRUCTOR($1, $2, $3, $4, BISON-DIRECTIVE)
+# -----------------------------------------------------------------
+m4_define([_AT_CHECK_PRINTER_AND_DESTRUCTOR],
+[m4_if([$1$2$3], $[1]$[2]$[3], [],
+       [m4_fatal([$0: Invalid arguments: $@])])dnl
+
+AT_SETUP([Printers and Destructors: $5])
+
+# Make sure complex $n work.
+
+AT_BISON_OPTION_PUSHDEFS([$5])
+AT_DATA_GRAMMAR([[input.y]],
+[[$5
+%{
+#include <stdio.h>
+#include <stdlib.h>
+]AT_LALR1_CC_IF(
+  [#define RANGE(Location) (Location).begin.line, (Location).end.line],
+  [#define RANGE(Location) (Location).first_line, (Location).last_line])
+[%}
+%error-verbose
+%debug
+%verbose
+%locations
+%union
+{
+  int ival;
+}
+
+%{
+]AT_LALR1_CC_IF([typedef yy::Location YYLTYPE;])
+[static int yylex (]AT_LEX_FORMALS[);
+]AT_LALR1_CC_IF([], [static void yyerror (const char *msg);])
+[%}
+
+%type <ival> 'x' ';' thing line input
+
+%printer { fprintf (yyoutput, "%d@%d-%d", $$, RANGE (@$)); }
+   input line thing 'x'
+
+%destructor
+  { printf ("Freeing nterm input (%d@%d-%d)\n", $$, RANGE (@$)); }
+  input
+
+%destructor
+  { printf ("Freeing nterm line (%d@%d-%d)\n", $$, RANGE (@$)); }
+  line
+
+%destructor
+  { printf ("Freeing nterm thing (%d@%d-%d)\n", $$, RANGE (@$)); }
+  thing
+
+%destructor
+  { printf ("Freeing token 'x' (%d@%d-%d)\n", $$, RANGE (@$)); }
+  'x'
+
+%%
+input:
+  /* Nothing. */
+    {
+      $$ = 0;
+      printf ("input (%d@%d-%d): /* Nothing */\n", $$, RANGE (@$));
+    }
+| line input /* Right recursive to load the stack so that popping at
+		EOF can	be exercised.  */
+    {
+      $$ = 2;
+      printf ("input (%d@%d-%d): line (%d@%d-%d) input (%d@%d-%d)\n",
+	      $$, RANGE (@$), $1, RANGE (@1), $2, RANGE (@2));
+    }
+;
+
+line:
+  thing thing thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d@%d-%d): thing (%d@%d-%d) thing (%d@%d-%d) thing (%d@%d-%d) ';' (%d@%d-%d)\n",
+              $$, RANGE (@$), $1, RANGE (@1), $2, RANGE (@2),
+              $3, RANGE (@3), $4, RANGE (@4));
+    }
+| thing thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d@%d-%d): thing (%d@%d-%d) thing (%d@%d-%d) ';' (%d@%d-%d)\n",
+              $$, RANGE (@$), $1, RANGE (@1), $2, RANGE (@2), $3, RANGE (@3));
+    }
+| thing ';'
+    {
+      $$ = $1;
+      printf ("line (%d@%d-%d): thing (%d@%d-%d) ';' (%d@%d-%d)\n",
+              $$, RANGE (@$), $1, RANGE (@1), $2, RANGE (@2));
+    }
+| error ';'
+    {
+      $$ = -1;
+      printf ("line (%d@%d-%d): error (@%d-%d) ';' (%d@%d-%d)\n",
+              $$, RANGE (@$), RANGE (@1), $2, RANGE (@2));
+    }
+;
+
+thing:
+  'x'
+    {
+      $$ = $1;
+      printf ("thing (%d@%d-%d): 'x' (%d@%d-%d)\n",
+              $$, RANGE (@$), $1, RANGE (@1));
+    }
+;
+%%
+static int
+yylex (]AT_LEX_FORMALS[)
+{
+  static const unsigned int input[] =
+    {
+      /* Exercise the discarding of stack top and input until `error'
+         can be reduced.  */
+      'x', 'x', 'x', 'x', 'x', 'x', ';',
+
+      /* Load the stack and provoke an error that cannot be caught by
+         the grammar, to check that the stack is cleared. */
+      'x', 'x', ';',
+      'x', ';',
+      'y'
+    };
+  static unsigned int counter = 0;
+
+  if (counter < (sizeof(input) / sizeof (input[0])))
+    {
+]AT_LALR1_CC_IF(
+[       yylval->ival = counter;
+       /* As in BASIC, line numbers go from 10 to 10.  */
+       yylloc->begin.line = yylloc->begin.column = 10 * counter;
+       yylloc->end.line = yylloc->end.column = yylloc->begin.line + 9;
+       printf ("sending: '%c' (%d@%d-%d)\n",
+               input[[counter]], yylval->ival, RANGE (*yylloc));
+       return (int) input[[counter++]];
+],
+[       yylval.ival = counter;
+       /* As in BASIC, line numbers go from 10 to 10.  */
+       yylloc.first_line = yylloc.first_column = 10 * counter;
+       yylloc.last_line = yylloc.last_column = yylloc.first_line + 9;
+       printf ("sending: '%c' (%d@%d-%d)\n",
+               input[[counter]], yylval.ival, RANGE (yylloc));
+       return (int) input[[counter++]];
+])[
+    }
+  else
+    {
+      printf ("sending: EOF\n");
+      return EOF;
+    }
+}
+
+]AT_LALR1_CC_IF(
+[/* Currently, print_ is required in C++. */
+void
+yy::Parser::print_ ()
+{
+  std::cerr << location;
+}
+
+/* A C++ error reporting function. */
+void
+yy::Parser::error_ ()
+{
+  printf ("%d-%d: %s\n", RANGE (location), message.c_str());
+}
+
+static bool yydebug;
+int
+yyparse ()
+{
+  yy::Parser parser (yydebug, yy::Location::Location ());
+  return parser.parse ();
+}
+],
+[static void
+yyerror (const char *msg)
+{
+  printf ("%d-%d: %s\n", RANGE (yylloc), msg);
+}])[
+
+int
+main (void)
+{
+  yydebug = !!getenv ("YYDEBUG");
+  if (yyparse ())
+    {
+      printf ("Parsing FAILED.\n");
+      exit (1);
+    }
+  printf ("Successful parse.\n");
+  return 0;
+}
+]])
+
+AT_CHECK([bison -o input.c input.y])
+AT_LALR1_CC_IF([AT_COMPILE_CXX([input])],
+               [AT_COMPILE([input])])
+AT_PARSER_CHECK([./input], 1,
+[[sending: 'x' (0@0-9)
+thing (0@0-9): 'x' (0@0-9)
+sending: 'x' (1@10-19)
+thing (1@10-19): 'x' (1@10-19)
+sending: 'x' (2@20-29)
+thing (2@20-29): 'x' (2@20-29)
+sending: 'x' (3@30-39)
+30-39: syntax error, unexpected 'x', expecting ';'
+Freeing nterm thing (2@20-29)
+Freeing nterm thing (1@10-19)
+Freeing nterm thing (0@0-9)
+Freeing token 'x' (3@30-39)
+sending: 'x' (4@40-49)
+Freeing token 'x' (4@40-49)
+sending: 'x' (5@50-59)
+Freeing token 'x' (5@50-59)
+sending: ';' (6@60-69)
+line (-1@0-69): error (@0-59) ';' (6@60-69)
+sending: 'x' (7@70-79)
+thing (7@70-79): 'x' (7@70-79)
+sending: 'x' (8@80-89)
+thing (8@80-89): 'x' (8@80-89)
+sending: ';' (9@90-99)
+line (7@70-99): thing (7@70-79) thing (8@80-89) ';' (9@90-99)
+sending: 'x' (10@100-109)
+thing (10@100-109): 'x' (10@100-109)
+sending: ';' (11@110-119)
+line (10@100-119): thing (10@100-109) ';' (11@110-119)
+sending: 'y' (12@120-129)
+120-129: syntax error, unexpected $undefined, expecting $end or 'x'
+sending: EOF
+Freeing nterm line (10@100-119)
+Freeing nterm line (7@70-99)
+Freeing nterm line (-1@0-69)
+Parsing FAILED.
+]])
+
+AT_CLEANUP
+])
+
+
+# AT_CHECK_PRINTER_AND_DESTRUCTOR([BISON-OPTIONS])
+# ------------------------------------------------
+# Produce `calc.y'.
+m4_define([AT_CHECK_PRINTER_AND_DESTRUCTOR],
+[_AT_CHECK_PRINTER_AND_DESTRUCTOR($[1], $[2], $[3], $[4], [$1])
+])
+
+
+AT_CHECK_PRINTER_AND_DESTRUCTOR()
+AT_CHECK_PRINTER_AND_DESTRUCTOR([%locations %defines %skeleton "lalr1.cc"])
+
+# FIXME.  This test case fails.
+#AT_CHECK_PRINTER_AND_DESTRUCTOR([%glr-parser])

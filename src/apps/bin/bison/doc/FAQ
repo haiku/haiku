@@ -1,0 +1,109 @@
+Frequently Asked Questions about Bison:
+
+----------------------------------------------------------------------
+
+Q1.  Is Bison Y2K compliant?
+
+A1.  If you're looking for a guarantee or certification, I can't
+     provide it.  With a little thought you can answer this one for
+     yourself, though.  (Hint: does a parser generator rely on the
+     date or time for anything?)  If you're still confused, see
+     http://www.gnu.org/software/year2000.html for more information.
+
+----------------------------------------------------------------------
+
+Q2.  I can't build Bison because "make" complains that "msgfmt" is not
+     found.  What should I do?
+
+A2.  Like most GNU packages with internationalization support, that
+     feature is turned on by default.  If you have problems building
+     in the "po" subdirectory, it indicates that your system's
+     internationalization support is lacking.  You can re-configure
+     Bison with "--disable-nls" to turn off this support, or you can
+     install GNU gettext from ftp://ftp.gnu.org/gnu/gettext/ and
+     re-configure Bison.  See the file "ABOUT-NLS" for more
+     information.
+
+----------------------------------------------------------------------
+
+Q3.  I'm having trouble using Bison.  Where can I find help?
+
+A3.  First, read the fine manual which comes with bison.  Beyond that,
+     you can send mail to <help-bison@gnu.org>.  This mailing list is
+     intended to be populated with people who are willing to answer
+     questions about using and installing Bison.  Please keep in mind
+     that (most of) the people on the list have aspects of their lives
+     which are not related to Bison (!), so you may not receive an
+     answer to your question right away.  This can be frustrating, but
+     please try not to honk them off; remember that any help they
+     provide is purely voluntary and out of the kindness of their
+     hearts.
+
+----------------------------------------------------------------------
+
+Q4.  I found a bug.  What should I include in the bug report?
+
+A4.  Before you send a bug report, make sure you are using the latest
+     version.  Check ftp://ftp.gnu.org/pub/gnu/bison/ or one of its
+     mirrors.  Be sure to include the version number in your bug
+     report.  If the bug is present in the latest version but not in a
+     previous version, try to determine the most recent version which
+     did not contain the bug.
+
+     If the bug is parser-related, you should include the smallest
+     grammar you can which demonstrates the bug.  The grammar file
+     should also be complete (i.e., I should be able to run it through
+     Bison without having to edit or add anything).  The smaller and
+     simpler the grammar, the easier it will be to fix the bug.
+
+     Include information about your compilation environment, including
+     your operating system's name and version and your compiler's name
+     and version.  If you have trouble compiling, you should also
+     include a transcript of the build session, starting with the
+     invocation of `configure'.  Depending on the nature of the bug,
+     you may be asked to send additional files as well (such as
+     `config.h' or `config.cache').
+
+     Patches are most welcome, but not required.  That is, do not
+     hesitate to send a bug report just because you can not provide a
+     fix.
+
+     Send bug reports to <bug-bison@gnu.org>.
+
+----------------------------------------------------------------------
+
+Q5.  Will Bison ever have C++ support?
+
+A5.  Yes, it's in the works.  Things are very chaotic right now, but
+     what little information floats around is posted to the bug-bison
+     mailing list.  If you're interested in testing C++ support when
+     it becomes available, please consider subscribing to the list,
+     especially if you are willing to beta test other releases as
+     well.
+
+----------------------------------------------------------------------
+
+Q6.  What is involved in being a beta tester?
+
+A6.  It's not terribly involved.  Basically, you would download a test
+     release, compile it, and use it to build and run a parser or two.
+     After that, you would submit either a bug report or a message
+     saying that everything is okay.  It is important to report
+     successes as well as failures because test releases eventually
+     become mainstream releases, but only if they are adequately
+     tested.  If no one tests, development is essentially halted.
+
+     Beta testers are particularly needed for operating systems to
+     which I do not have access.  I currently have easy access to
+     Linux (x86 glibc 2.1), Solaris (SPARC) 2.6 and 2.7, and HP-UX
+     10.20.  Reports about other operating systems are especially
+     welcome.
+
+----------------------------------------------------------------------
+
+Q7.  How do I join the help-bison and bug-bison mailing lists?
+
+A7.  See http://www.gnu.org/ (the section about "GNU mailing lists")
+     for more information.
+
+----------------------------------------------------------------------
