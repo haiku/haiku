@@ -19,7 +19,6 @@
 #include "ServerWindow.h"
 #include "ServerBitmap.h"
 #include "ServerProtocol.h"
-#include "ServerCursor.h"
 #include "PortLink.h"
 #include <stdio.h>
 #include <iostream.h>
