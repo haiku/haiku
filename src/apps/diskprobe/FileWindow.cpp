@@ -13,6 +13,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <Volume.h>
 #include <be_apps/Tracker/RecentItems.h>
 
 
@@ -23,9 +24,16 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	BEntry entry(ref);
 	struct stat stat;
-	if (entry.GetStat(&stat) == B_OK && (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0) {
+	if (entry.GetStat(&stat) == B_OK && (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode))) {
 		BPath path(ref);
 		SetTitle(path.Path());
+	} else if (entry.IsDirectory()) {
+		BVolume volume(stat.st_dev);
+		if (volume.InitCheck() == B_OK) {
+			char name[B_FILE_NAME_LENGTH];
+			if (volume.GetName(name) == B_OK)
+				SetTitle(name);
+		}
 	}
 
 	// add the menu
@@ -79,7 +87,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 }
 
 
-bool 
+bool
 FileWindow::QuitRequested()
 {
 	bool quit = fProbeView->QuitRequested();
