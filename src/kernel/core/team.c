@@ -689,7 +689,7 @@ create_team_struct(const char *name, bool kernel)
 
 	list_init(&team->image_list);
 
-	clear_team_debug_info(&team->debug_info);
+	clear_team_debug_info(&team->debug_info, true);
 
 	if (arch_team_init_team_struct(team, kernel) < 0)
 		goto error2;
@@ -747,12 +747,8 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 void
 team_delete_team(struct team *team)
 {
-	// if the team was being debugged, stop that now
 	team_id teamID = team->id;
-	port_id debuggerPort
-		= (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED
-			? team->debug_info.debugger_port : -1);
-	destroy_team_debug_info(&team->debug_info);
+	port_id debuggerPort = -1;
 
 	if (team->num_threads > 0) {
 		// there are other threads still in this team,
@@ -769,6 +765,19 @@ team_delete_team(struct team *team)
 
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
+
+		// If the team was being debugged, that will stop with the termination
+		// of the nub thread. The team structure has already been removed from
+		// the team hash table at this point, so noone can install a debugger
+		// anymore. We fetch the debugger's port to send it a message at the
+		// bitter end.
+		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+			debuggerPort = team->debug_info.debugger_port;
+
+		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
 		// we can safely walk the list because of the lock. no new threads can be created
 		// because of the TEAM_STATE_DEATH flag on the team
 		temp_thread = team->thread_list;
