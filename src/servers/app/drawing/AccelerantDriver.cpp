@@ -83,12 +83,9 @@ AccelerantDriver::AccelerantDriver()
 */
 AccelerantDriver::~AccelerantDriver()
 {
-	if (cursor)
-		delete cursor;
-	if (under_cursor)
-		delete under_cursor;
-	if (mode_list)
-		free(mode_list);
+	delete cursor;
+	delete under_cursor;
+	free(mode_list);
 }
 
 /*!
@@ -215,6 +212,9 @@ AccelerantDriver::Initialize()
 void
 AccelerantDriver::Shutdown()
 {
+	if (card_fd < 0)
+		return;
+
 #ifdef RUN_UNDER_R5
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	if ( SetDisplayMode )
