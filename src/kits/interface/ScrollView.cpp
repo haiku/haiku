@@ -291,12 +291,12 @@ BScrollView::Border() const
 status_t
 BScrollView::SetBorderHighlighted(bool state)
 {
-	if (fBorder != B_FANCY_BORDER)
-		return B_ERROR;
-
 	if (fHighlighted == state)
-		// no change
 		return B_OK;
+
+	if (fBorder != B_FANCY_BORDER)
+		// highlighting only works for B_FANCY_BORDER
+		return B_ERROR;
 
 	fHighlighted = state;
 
@@ -329,21 +329,30 @@ BScrollView::IsBorderHighlighted() const
 void
 BScrollView::SetTarget(BView *target)
 {
+	if (fTarget == target)
+		return;
+
 	if (fTarget != NULL) {
 		fTarget->TargetedByScrollView(NULL);
 		RemoveChild(fTarget);
 
-		// ToDo: investigate if we are supposed to delete it
-		//delete fTarget;
+		// we are not supposed to delete the view
 	}
 
 	fTarget = target;
+	if (fHorizontalScrollBar != NULL)
+		fHorizontalScrollBar->SetTarget(target);
+	if (fVerticalScrollBar != NULL)
+		fVerticalScrollBar->SetTarget(target);
+
 	if (target != NULL) {
+		target->MoveTo(BorderSize(fBorder), BorderSize(fBorder));
+		target->TargetedByScrollView(this);
+
 		AddChild(target, ChildAt(0));
 			// This way, we are making sure that the target will
 			// be added top most in the list (which is important
 			// for unarchiving)
-		target->TargetedByScrollView(this);
 	}
 }
 
