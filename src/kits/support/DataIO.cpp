@@ -341,16 +341,18 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		
 	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
 	
-	if (newSize > fMallocSize)
-		if (SetSize(newSize) != B_OK)
-			size = 0;
+	status_t error = B_OK;
 	
-	if (size > 0) {
+	if (newSize > fMallocSize)
+		error = SetSize(newSize);
+			
+	if (error == B_OK) {
 		memcpy(fData + pos, buffer, size);
 		if (pos + size > fLength)
 				fLength = pos + size;
 	}
-	return size;
+	
+	return error != B_OK ? error : size;
 }
 
 
