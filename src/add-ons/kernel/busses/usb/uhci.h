@@ -22,6 +22,11 @@
 #ifndef UHCI_H
 #define UHCI_H
 
+/************************************************************
+ * The Registers                                            *
+ ************************************************************/
+
+
 // R/W -- Read/Write
 // R/WC -- Read/Write Clear
 // ** -- Only writable with words!
@@ -64,5 +69,38 @@
 #define UHCI_PORTSC_CURSTAT 0x1	// Current connect status
 #define UHCI_PORTSC_STATCHA 0x2 // Current connect status change
 #define UHCI_PORTSC_ENABLED 0x4 // Port enabled/disabled
+
+/************************************************************
+ * Hardware structs                                         *
+ ************************************************************/
+ 
+//Represents a Transfer Descriptor (TD)
+
+struct uhci_td
+{
+	void * link;			// Link to the next TD/QH
+	uint32 status;			// Status field
+	uint32 token;			// Contains the packet header (where it needs to be sent)
+	void * buffer;			// A pointer to the buffer with the actual packet
+};
+
+//Represents a Queue Head (QH)
+
+struct uhci_qh
+{
+	void * link;			//Link to the next TD/QH
+	void * element;			//Link to the first element pointer in the queue
+};
+
+/************************************************************
+ * Roothub Emulation                                        *
+ ************************************************************/
+#define RH_GET_DESCRIPTOR 6
+#define RH_SET_ADDRESS 5
+#define RH_SET_CONFIG 9
+
+//Descriptors (in usb_request_data->Value)
+#define RH_DEVICE_DESCRIPTOR ( 1 << 8 )
+#define RH_CONFIG_DESCRIPTOR ( 2 << 8 )
 
 #endif

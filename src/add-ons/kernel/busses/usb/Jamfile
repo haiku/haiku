@@ -4,6 +4,3 @@ R5KernelAddon uhci : [ FDirName kernel busses usb ] :
 	uhci.c
 	;
 
-R5KernelAddon ehci :  [ FDirName kernel busses usb ] :
-	ehci.c
-	;
