@@ -1,3 +1,6 @@
+// ToDo: do we really need sysctl? And if so, for what?
+//	It is not part of the POSIX spec.
+
 #include <kernel.h>
 #include <ktypes.h>
 #include <string.h>
@@ -38,88 +41,12 @@ char kernel[] = "DEV";
 char machine[] = "Intel";
 char model[] =	"MODEL";
 
-int
-sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
-{
-	sysctlfn *fn = NULL;
-	int error = 0;
 
-	switch (name[0]) {
-		case CTL_KERN:
-			fn = sys_sysctl;
-			break;
-		case CTL_HW:
-			fn = hw_sysctl;
-			break;
-		default:
-			dprintf("sysctl: no suppport added yet for %d\n", name[0]);
-			return EOPNOTSUPP;
-	}
-	error = (fn)(name + 1, namelen - 1, oldp, oldlenp, newp, newlen);
-	
-	return B_NO_ERROR;
+typedef int (sysctlfn)(int *, uint, void *, size_t *, void *, size_t);
 
-}
-
-
-int
-sys_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
-	void *newp, size_t newlen)
-{
-	int error = 0;
-/* This will need to be uncommented when the definitions above have been removed and
- * we have these defined elsewhere...
-	extern char ostype[], osrelease[], osversion[], version[];
- */	
-	switch (name[0]) {
-		case KERN_OSTYPE:
-			return sysctl_rdstring(oldp, oldlenp, newp, ostype);
-		case KERN_OSRELEASE:
-			return sysctl_rdstring(oldp, oldlenp, newp, osrelease);
-		case KERN_OSVERSION:
-			return sysctl_rdstring(oldp, oldlenp, newp, osversion);
-		case KERN_HOSTNAME:
-			error = sysctl_tstring(oldp, oldlenp, newp, newlen, 
-			                       hostname, sizeof(hostname));
-			if (newp && !error)
-				hostnamelen = newlen;
-			return (error);
-		case KERN_DOMAINNAME:
-			error = sysctl_tstring(oldp, oldlenp, newp, newlen, 
-			                       domainname, sizeof(domainname));
-			if (newp && !error)
-				domainnamelen = newlen;
-			return (error);
-		case KERN_VERSION:
-			return sysctl_rdstring(oldp, oldlenp, newp, kernel);
-		default:
-			return EOPNOTSUPP;
-	}
-	/* If we get here we're in trouble... */
-}
-
-
-int
-hw_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
-{
-/* This will need to be uncommented when the definitions above have been removed and
- * we have these defined elsewhere...
-        extern char machine[], model[];
- */
-
-        switch (name[0]) {
-		case HW_MACHINE:
-			return  sysctl_rdstring(oldp, oldlenp, newp, machine);
-		case HW_MODEL:
-			return  sysctl_rdstring(oldp, oldlenp, newp, model);
-		default:
-			return  EOPNOTSUPP;
-	}
-	/* If we get here we're in trouble... */
-}
-
-
-int
+// currently unused
+#if 0
+static int
 sysctl_int(void *oldp, size_t *oldlenp, void *newp, size_t newlen, int *valp)
 {
 	if (oldp && *oldlenp < sizeof(int))
@@ -137,7 +64,7 @@ sysctl_int(void *oldp, size_t *oldlenp, void *newp, size_t newlen, int *valp)
 }
 
 
-int
+static int
 sysctl_rdint(void *oldp, size_t *oldlenp, void *newp, int val)
 {
 	if (oldp && *oldlenp < sizeof(int))
@@ -151,20 +78,13 @@ sysctl_rdint(void *oldp, size_t *oldlenp, void *newp, int val)
 
 	return 0;
 }
+#endif
 
-/* Copy string, truncating if required */
-int
-sysctl_tstring(void *oldp, size_t *oldlenp, void *newp, size_t newlen, char *str, int maxlen)
-{
-	return sysctl__string(oldp, oldlenp, newp, newlen, str, maxlen, 1);
-}
-
-
-int
+static int
 sysctl__string(void *oldp, size_t *oldlenp, void *newp, size_t newlen,
-	char *str, int maxlen, int trunc)
+	char *str, size_t maxlen, int trunc)
 {
-	int len = strlen(str) + 1;
+	size_t len = strlen(str) + 1;
 	int c;
 
 	if (oldp && *oldlenp < len) {
@@ -195,10 +115,19 @@ sysctl__string(void *oldp, size_t *oldlenp, void *newp, size_t newlen,
 }
 
 
-int
+/** Copy string, truncating if required */
+
+static int
+sysctl_tstring(void *oldp, size_t *oldlenp, void *newp, size_t newlen, char *str, int maxlen)
+{
+	return sysctl__string(oldp, oldlenp, newp, newlen, str, maxlen, 1);
+}
+
+
+static int
 sysctl_rdstring(void *oldp, size_t *oldlenp, void *newp, char *str)
 {
-	int len = strlen(str) + 1;
+	size_t len = strlen(str) + 1;
 	if (oldp && *oldlenp < len)
 		return ENOMEM;
 	if (newp)
@@ -207,6 +136,79 @@ sysctl_rdstring(void *oldp, size_t *oldlenp, void *newp, char *str)
 	if (oldp)
 		memcpy(oldp, str, len);
 	return 0;
+}
+
+
+static int
+sys_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
+	void *newp, size_t newlen)
+{
+	int error = 0;
+
+	switch (name[0]) {
+		case KERN_OSTYPE:
+			return sysctl_rdstring(oldp, oldlenp, newp, ostype);
+		case KERN_OSRELEASE:
+			return sysctl_rdstring(oldp, oldlenp, newp, osrelease);
+		case KERN_OSVERSION:
+			return sysctl_rdstring(oldp, oldlenp, newp, osversion);
+		case KERN_HOSTNAME:
+			error = sysctl_tstring(oldp, oldlenp, newp, newlen, 
+			                       hostname, sizeof(hostname));
+			if (newp && !error)
+				hostnamelen = newlen;
+			return (error);
+		case KERN_DOMAINNAME:
+			error = sysctl_tstring(oldp, oldlenp, newp, newlen, 
+			                       domainname, sizeof(domainname));
+			if (newp && !error)
+				domainnamelen = newlen;
+			return (error);
+		case KERN_VERSION:
+			return sysctl_rdstring(oldp, oldlenp, newp, kernel);
+		default:
+			return EOPNOTSUPP;
+	}
+	/* If we get here we're in trouble... */
+}
+
+
+static int
+hw_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
+{
+	switch (name[0]) {
+		case HW_MACHINE:
+			return  sysctl_rdstring(oldp, oldlenp, newp, machine);
+		case HW_MODEL:
+			return  sysctl_rdstring(oldp, oldlenp, newp, model);
+		default:
+			return  EOPNOTSUPP;
+	}
+	/* If we get here we're in trouble... */
+}
+
+
+int
+sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
+{
+	sysctlfn *fn = NULL;
+	int error = 0;
+
+	switch (name[0]) {
+		case CTL_KERN:
+			fn = sys_sysctl;
+			break;
+		case CTL_HW:
+			fn = hw_sysctl;
+			break;
+		default:
+			dprintf("sysctl: no suppport added yet for %d\n", name[0]);
+			return EOPNOTSUPP;
+	}
+	error = (fn)(name + 1, namelen - 1, oldp, oldlenp, newp, newlen);
+	
+	return B_NO_ERROR;
+
 }
 
 
@@ -264,4 +266,5 @@ bailout:
 	free(ov);
 
 	return rc;
-}			
+}
+
