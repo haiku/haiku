@@ -137,9 +137,13 @@ Shell::_PrintHelp() {
 	printf("\n");
 }
 
+#ifndef MAKEUDFIMAGE_VERSION
+#	define MAKEUDFIMAGE_VERSION ("development version " __DATE__ ", " __TIME__)
+#endif
+
 void
 Shell::_PrintTitle() {
-	printf("makeudfimage v1.0.0 beta 1\n");
+	printf("makeudfimage %s\n", MAKEUDFIMAGE_VERSION);
 	printf("Copyright © 2004 Tyler Dauwalder\n");
 	printf("\n");
 }
