@@ -58,6 +58,8 @@
 #include <MessageUtils.h>
 #include <Session.h>
 #include <ColorUtils.h>
+#include <AppServerLink.h>
+#include <PortMessage.h>
 #include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
@@ -388,7 +390,7 @@ BRect BView::Bounds() const{
 	if (fState->flags & B_VIEW_COORD_BIT)
 	if (owner){
 		check_lock();
-
+		
 		owner->session->WriteInt32( AS_LAYER_GET_COORD );
 		owner->session->Sync();
 		
@@ -706,12 +708,12 @@ BRect BView::Frame() const {
 void
 BView::Hide()
 {
-// TODO: You may hide it by relocating with -17000 coord units to the left???
-//	"I don't think you want to do that" - axeld.
 	if (owner && fShowLevel == 0) {
 		check_lock();
 
-		owner->session->WriteInt32(AS_LAYER_HIDE);
+		owner->fServerLink->SetOpCode(AS_LAYER_HIDE);
+		// TODO: this probably needs the view's handler ID attached
+		owner->Flush();
 	}
 
 	fShowLevel++;
@@ -726,7 +728,9 @@ void BView::Show(){
 	if (owner && fShowLevel == 0){
 		check_lock();
 			
-		owner->session->WriteInt32( AS_LAYER_SHOW );
+		owner->fServerLink->SetOpCode(AS_LAYER_SHOW);
+		// TODO: this probably needs the view's handler ID attached
+		owner->Flush();
 	}
 }
 
@@ -861,20 +865,20 @@ void BView::SetViewCursor(const BCursor *cursor, bool sync) {
 	if (!cursor)
 		return;
 
+	if (!owner)
+		debugger("View method requires owner and doesn't have one");
+
 	check_lock();
-// TODO: test: what happens if a view is NOT attached to a window? 
-//		will this method have any effect???
-//		Info: I cannot test now... BApplication's looper must be started
-	if (owner)
-		if (sync){
-			owner->session->WriteInt32( AS_LAYER_CURSOR );
-			owner->session->WriteInt32( cursor->m_serverToken );
-			owner->session->Sync();
-		}
-		else{
-			owner->session->WriteInt32( AS_LAYER_CURSOR );
-			owner->session->WriteInt32( cursor->m_serverToken );
-		}
+	
+	if (sync){
+		owner->session->WriteInt32( AS_LAYER_CURSOR );
+		owner->session->WriteInt32( cursor->m_serverToken );
+		owner->session->Sync();
+	}
+	else{
+		owner->session->WriteInt32( AS_LAYER_CURSOR );
+		owner->session->WriteInt32( cursor->m_serverToken );
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -1072,13 +1076,13 @@ void BView::DragMessage(BMessage* aMessage, BRect dragRect,
 	int32		bufSize		= aMessage->FlattenedSize();
 	char		*buffer		= new char[ bufSize ];
 	aMessage->Flatten( buffer, bufSize );
-
-	owner->session->WriteInt32( AS_LAYER_DRAG_RECT );
-	owner->session->WriteRect( dragRect );
-	owner->session->WritePoint( offset );	
-	owner->session->WriteInt32( bufSize );
-	owner->session->WriteData( buffer, bufSize );
-	owner->session->Sync();
+	
+	owner->fServerLink->SetOpCode( AS_LAYER_DRAG_RECT );
+	owner->fServerLink->Attach<BRect>( dragRect );
+	owner->fServerLink->Attach<BPoint>( offset );	
+	owner->fServerLink->Attach<int32>( bufSize );
+	owner->fServerLink->Attach( buffer, bufSize );
+	owner->fServerLink->Flush();
 
 	delete buffer;
 }
@@ -1133,12 +1137,12 @@ void BView::DragMessage(BMessage* aMessage, BBitmap* anImage,
 	char		*buffer		= new char[ bufSize ];
 	aMessage->Flatten( buffer, bufSize );
 
-	owner->session->WriteInt32( AS_LAYER_DRAG_IMAGE );
-	owner->session->WriteInt32( anImage->get_server_token() );
-	owner->session->WriteInt32( (int32)dragMode );	
-	owner->session->WritePoint( offset );
-	owner->session->WriteInt32( bufSize );
-	owner->session->WriteData( buffer, bufSize );
+	owner->fServerLink->SetOpCode( AS_LAYER_DRAG_IMAGE );
+	owner->fServerLink->Attach<int32>( anImage->get_server_token() );
+	owner->fServerLink->Attach<int32>( (int32)dragMode );	
+	owner->fServerLink->Attach<BPoint>( offset );
+	owner->fServerLink->Attach<int32>( bufSize );
+	owner->fServerLink->Attach( buffer, bufSize );
 
 	delete buffer;
 /* TODO: in app_server the bitmap refCount must be incremented
