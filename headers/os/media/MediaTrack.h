@@ -81,7 +81,7 @@ public:
 	// The data returned through ReadFrames() will be in the format that's
  	// returned by this function.
 
-	status_t		DecodedFormat(media_format *inout_format);
+	status_t		DecodedFormat(media_format *inout_format, int32 flags = 0);
 
 	// CountFrames and Duration return the total number of frame and the
 	// total duration (expressed in microseconds) of a track.
@@ -206,9 +206,16 @@ private:
 								BPrivate::media::Encoder *encoder,
 								media_codec_info *mci);
 
+#ifdef __BUILDING_MEDIA_TRACK_CPP
+	status_t		DecodedFormat(media_format *inout_format);
+#endif
+
+	void			SetupWorkaround();
+	bool			SetupFormatTranslation(const media_format &from, media_format *to);
+
 	status_t				fErr;
 	BPrivate::media::Decoder *fDecoder;
-	int32					__unused__fDecoderID;
+	BPrivate::media::Decoder *fRawDecoder;
 	BPrivate::media::MediaExtractor *fExtractor;
 
 	int32					fStream;
@@ -221,7 +228,8 @@ private:
 	int32					fEncoderID;
 	BPrivate::MediaWriter	*fWriter;
 	media_format			fWriterFormat;
-	void					*__unused__fExtractorCookie;
+	
+	uint32					fWorkaroundFlags;
 
 protected:
 	int32			EncoderID() { return fEncoderID; };
