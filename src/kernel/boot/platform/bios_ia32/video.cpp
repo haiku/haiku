@@ -335,6 +335,11 @@ platform_switch_to_logo(void)
 		gKernelArgs.fb.mapping.size = gKernelArgs.fb.x_size * gKernelArgs.fb.y_size * (gKernelArgs.fb.bit_depth/8);
 		gKernelArgs.fb.mapping.start = mmu_map_physical_memory(modeInfo.physical_base, gKernelArgs.fb.mapping.size, 0x03);
 		gKernelArgs.fb.already_mapped = 1;
+
+		// clear the video memory
+		// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
+		//	at least booting with Qemu looks ugly when this is missing
+		memset((void *)gKernelArgs.fb.mapping.start, 0, gKernelArgs.fb.mapping.size);
 	}
 
 	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
