@@ -24,8 +24,9 @@
 #	define _IMPEXP_KERNEL
 #endif
 
+#include <fsproto.h>
+
 extern "C" {
-	#include <fsproto.h>
 	#include <lock.h>
 	#include <cache.h>
 }
