@@ -80,7 +80,7 @@ class PPPProtocol {
 			// report up/down events
 
 	private:
-		char *fName;
+		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPP_PHASE fPhase;
 		uint16 fProtocol;
 		int32 fAddressFamily;

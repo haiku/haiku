@@ -16,7 +16,11 @@ PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
 	: fOverhead(overhead), fInterface(interface),
 	fSettings(settings)
 {
-	fName = name ? strdup(name) : NULL;
+	if(name) {
+		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
+		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
+	} else
+		strcpy(fName, "");
 	
 	SetMTU(1500);
 	
@@ -27,8 +31,6 @@ PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
 
 PPPDevice::~PPPDevice()
 {
-	free(fName);
-	
 	if(Interface())
 		Interface()->SetDevice(NULL);
 }

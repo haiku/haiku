@@ -7,7 +7,7 @@
 
 #include <OS.h>
 
-#include "KPPPUtils.h"
+#include <KPPPUtils.h>
 
 
 // These are very simple send/receive_data functions with a timeout

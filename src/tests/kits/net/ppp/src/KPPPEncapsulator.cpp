@@ -18,7 +18,11 @@ PPPEncapsulator::PPPEncapsulator(const char *name, PPP_PHASE phase,
 	fSettings(settings), fFlags(flags), fEnabled(true),
 	fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
 {
-	fName = name ? strdup(name) : NULL;
+	if(name) {
+		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
+		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
+	} else
+		strcpy(fName, "");
 	
 	if(interface)
 		interface->AddEncapsulator(this);
@@ -27,8 +31,6 @@ PPPEncapsulator::PPPEncapsulator(const char *name, PPP_PHASE phase,
 
 PPPEncapsulator::~PPPEncapsulator()
 {
-	free(fName);
-	
 	if(Interface())
 		Interface()->RemoveEncapsulator(this);
 }

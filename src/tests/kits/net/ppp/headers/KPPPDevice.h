@@ -84,7 +84,7 @@ class PPPDevice {
 		bool fIsUp;
 
 	private:
-		char *fName;
+		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		uint32 fOverhead;
 		PPPInterface *fInterface;
 		driver_parameter *fSettings;

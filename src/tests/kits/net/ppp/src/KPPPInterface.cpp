@@ -20,12 +20,12 @@
 #include <KPPPEncapsulator.h>
 #include <KPPPModule.h>
 #include <KPPPManager.h>
+#include <KPPPUtils.h>
 
 // general helper classes not only belonging to us
 #include <LockerHelper.h>
 
 // tools only for us :)
-#include "KPPPUtils.h"
 #include "settings_tools.h"
 
 

@@ -8,7 +8,7 @@
 #include <KPPPReportManager.h>
 #include <LockerHelper.h>
 
-#include "KPPPUtils.h"
+#include <KPPPUtils.h>
 
 #include <new.h>
 

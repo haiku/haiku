@@ -104,7 +104,7 @@ class PPPEncapsulator {
 		uint32 fOverhead;
 
 	private:
-		char *fName;
+		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPP_PHASE fPhase;
 		PPP_ENCAPSULATION_LEVEL fLevel;
 		uint16 fProtocol;

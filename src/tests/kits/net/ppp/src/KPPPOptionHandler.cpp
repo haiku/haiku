@@ -12,7 +12,11 @@ PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface *interface,
 		driver_parameter *settings)
 	: fInterface(interface), fSettings(settings)
 {
-	fName = name ? strdup(name) : NULL;
+	if(name) {
+		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
+		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
+	} else
+		strcpy(fName, "");
 	
 	if(interface)
 		interface->LCP().AddOptionHandler(this);
@@ -21,8 +25,6 @@ PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface *interface,
 
 PPPOptionHandler::~PPPOptionHandler()
 {
-	free(fName);
-	
 	if(Interface())
 		Interface()->LCP().RemoveOptionHandler(this);
 }

@@ -17,7 +17,11 @@ PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
 	fInterface(interface), fSettings(settings), fFlags(flags),
 	fEnabled(true), fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
 {
-	fName = name ? strdup(name) : NULL;
+	if(name) {
+		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
+		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
+	} else
+		strcpy(fName, "");
 	
 	if(interface)
 		interface->AddProtocol(this);
@@ -26,8 +30,6 @@ PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
 
 PPPProtocol::~PPPProtocol()
 {
-	free(fName);
-	
 	if(Interface())
 		Interface()->RemoveProtocol(this);
 }

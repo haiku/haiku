@@ -60,7 +60,7 @@ class PPPOptionHandler {
 			// notification that we ack these values
 
 	private:
-		char *fName;
+		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPPInterface *fInterface;
 		driver_parameter *fSettings;
 		
