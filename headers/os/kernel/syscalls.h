@@ -49,7 +49,7 @@ int       sys_suspend_thread(thread_id tid);
 int       sys_resume_thread(thread_id tid);
 int       sys_kill_thread(thread_id tid);
 
-int sys_wait_on_thread(thread_id tid, int *retcode);
+status_t sys_wait_on_thread(thread_id tid, int *retcode);
 int sys_kill_team(team_id tid);
 
 team_id sys_get_current_team_id();
