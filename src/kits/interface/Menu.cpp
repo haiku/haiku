@@ -1085,10 +1085,11 @@ BMenu::_hide()
 BMenuItem *
 BMenu::_track(int *action, long start)
 {
-	// TODO: Take Sticky mode into account, handle submenus
+	// TODO: Take Sticky mode into account
 	BPoint location;
 	ulong buttons;
 	BMenuItem *item = NULL;
+	int localAction = 0;
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
@@ -1102,9 +1103,29 @@ BMenu::_track(int *action, long start)
 			// TODO: Sometimes the menu flickers a bit.
 			// try to be smarter and suggest an update area, 
 			// instead of invalidating the whole view.
-			if (item != NULL && item != fSelected) {
-				SelectItem(item);
-				Invalidate();
+			if (item != NULL) {
+				if (item != fSelected) {
+					SelectItem(item);
+					Invalidate();
+				}
+				
+				int submenuAction = 0;
+				BMenuItem *submenuItem = NULL;	
+				// TODO: Review this as it doesn't work very well,
+				// BMenu::_track() isn't always called when needed.
+				if (item->Submenu() != NULL) {
+					UnlockLooper();
+					
+					submenuItem = item->Submenu()->_track(&submenuAction);
+					if (submenuAction == 5) {
+						item = submenuItem;
+						localAction = submenuAction;
+						break;
+					}
+					
+					if (!LockLooper())
+						break;
+				}
 			}
 																	
 			UnlockLooper();
@@ -1117,12 +1138,15 @@ BMenu::_track(int *action, long start)
 	// would be nice. Consider building an enum
 	// with the possible actions, and putting it in a
 	// private, shared header (BMenuBar needs to know about them too).
-	if (action != NULL) {
+	if (localAction == 0) {
 		if (buttons != 0)
-			*action = 0;
+			localAction = 0;
 		else 
-			*action = 5;
+			localAction = 5;
 	}
+	
+	if (action != NULL)
+		*action = localAction;
 	
 	if (LockLooper()) {
 		SelectItem(NULL);
