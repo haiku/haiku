@@ -36,8 +36,17 @@ class Painter {
 			void				SetPenSize(float size);
 			void				SetOrigin(const BPoint& origin);
 			void				SetDrawingMode(drawing_mode mode);
+			void				SetBlendingMode(source_alpha alphaSrcMode,
+												alpha_function alphaFncMode);
 			void				SetPenLocation(const BPoint& location);
 			void				SetFont(const BFont& font);
+
+								// BView API compatibility (for easier testing)
+			void				Sync() {}
+	inline	void				MovePenTo(const BPoint& location)
+									{ SetPenLocation(location); }
+	inline	void				SetFont(const BFont* font)
+									{ if (font) SetFont(*font); }
 
 								// painting functions
 
@@ -241,6 +250,8 @@ class Painter {
 	BPoint						fOrigin;
 	BRegion*					fClippingRegion; // NULL indicates no clipping at all
 	drawing_mode				fDrawingMode;
+	source_alpha				fAlphaSrcMode;
+	alpha_function				fAlphaFncMode;
 	BPoint						fPenLocation;
 	PatternHandler*				fPatternHandler;
 
