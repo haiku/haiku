@@ -17,6 +17,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
 if ( $(TARGET_PLATFORM) = haiku ) {
 	# This overrides the definition in private/servers/app/ServerConfig.h
 	defines = [ FDefines DISPLAYDRIVER=HWDRIVER ] ;
+	defines = [ FDefines TEST_MODE=0 ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 	
