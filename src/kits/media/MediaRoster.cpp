@@ -1044,12 +1044,17 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		
 	// XXX we should not trust the values passed in by the user, 
 	// XXX and ask the server to determine where to insta
-		
-	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) == 0 && (flags & B_FLAVOR_IS_LOCAL)) {
+	
+	
+// XXX SOMETHING IS VERY WRONG HERE
+//	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) == 0 && (flags & B_FLAVOR_IS_LOCAL)) {
+	if (flags & B_FLAVOR_IS_LOCAL) {
 		return InstantiateDormantNode(in_info,out_node);
 	}
 
-	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) || (flags & B_FLAVOR_IS_GLOBAL)) {
+// XXX SOMETHING IS VERY WRONG HERE
+//	if ((in_info.flavor_flags & B_FLAVOR_IS_GLOBAL) || (flags & B_FLAVOR_IS_GLOBAL)) {
+	if (flags & B_FLAVOR_IS_GLOBAL) {
 		// forward this request into the media_addon_server,
 		// which in turn will call InstantiateDormantNode()
 		// to create it there localy
@@ -1076,7 +1081,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		return reply.result;
 	}
 
-	printf("Error: BMediaRoster::InstantiateDormantNode in_info.flavor_flags = %#08lx, flags = %#08lx\n", in_info.flavor_flags, flags);
+// XXX SOMETHING IS VERY WRONG HERE
+//	printf("Error: BMediaRoster::InstantiateDormantNode in_info.flavor_flags = %#08lx, flags = %#08lx\n", in_info.flavor_flags, flags);
 
 	return B_ERROR;
 }
@@ -1087,8 +1093,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 									 media_node * out_node)
 {
 	UNIMPLEMENTED();
-	in_info
-	
+
 	// to instantiate a dormant node in the current address space, we need to
 	// either load the add-on from file and create a new BMediaAddOn class, or
 	// reuse the cached BMediaAddOn from a previous call

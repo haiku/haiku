@@ -3,6 +3,7 @@
  *   FILE: MediaNode.cpp
  *  DESCR: 
  ***********************************************************************/
+#include <MediaRoster.h>
 #include <MediaNode.h>
 #include <TimeSource.h>
 #include <BufferConsumer.h>
