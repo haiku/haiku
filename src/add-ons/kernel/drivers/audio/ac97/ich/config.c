@@ -121,6 +121,10 @@ status_t probe_device(void)
 			config->sample_size = 1;
 		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x01B1) {
 			config->name = "Nvidia nForce AC97";
+		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x006A) {
+			config->name = "Nvidia nForce2 AC97";
+		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x00DA) {
+			config->name = "Nvidia nForce3 AC97";
 		} else if (pciinfo->vendor_id == 0x1022 && pciinfo->device_id == 0x764d) {
 			config->name = "AMD AMD8111";
 		} else if (pciinfo->vendor_id == 0x1022 && pciinfo->device_id == 0x7445) {
