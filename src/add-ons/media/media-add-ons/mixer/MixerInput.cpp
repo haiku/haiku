@@ -8,8 +8,6 @@
 #include "ByteSwap.h"
 #include "debug.h"
 
-template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
-
 MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount)
  :	fCore(core),
  	fInput(input),

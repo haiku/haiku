@@ -7,6 +7,9 @@
 	#define PRINT_CHANNEL_MASK(fmt) ((void)0)
 #endif
 
+template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
+template<class t> const t & min(const t &t1, const t &t2) { return (t1 < t2) ?  t1 : t2; }
+
 void string_for_channel_mask(char *str, uint32 mask);
 void fix_multiaudio_format(media_multi_audio_format *format);
 
