@@ -1,3 +1,8 @@
+/*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,7 +12,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-#define FORTUNES "/boot/etc/fortunes"
+#define FORTUNES "/etc/fortunes"
 
 int
 main(void)
@@ -27,13 +32,17 @@ main(void)
 
 	rc = fstat(fd, &stat);
 	if (rc < 0) {
-		printf("Cookie monster was here!!!\n");
-		exit(1);
+		printf("stat() failed: %s\n", strerror(errno));
+		return -1;
 	}
 
 	buf = malloc(stat.st_size + 1);
-	
-	read(fd, buf, stat.st_size);
+	rc = read(fd, buf, stat.st_size);
+	if (rc < 0) {
+		printf("Could not read from fortune file: %s\n", strerror(errno));
+		return -1;
+	}
+
 	buf[stat.st_size] = 0;
 	close(fd);
 
@@ -43,7 +52,12 @@ main(void)
 			found += 1;
 	}
 
-	found = 1 + (system_time() % found);
+	if (found > 0)
+		found = 1 + ((system_time() + 3) % found);
+	else {
+		printf("Out of cookies...\n");
+		return -1;
+	}
 
 	for (i = 0; i < stat.st_size; i++) {
 		if (!strncmp(buf + i, "#@#", 3))
