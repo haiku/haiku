@@ -2953,9 +2953,7 @@ out:
 
 
 /**	Transfers the specified area to a new team. The caller must be the owner
- *	of the area (not yet enforced).
- *	If the transfer fails for whatever reason, the area may have been relocated
- *	in the owning team, or even deleted if the relocation failed.
+ *	of the area (not yet enforced but probably should be).
  *	This function is currently not exported to the kernel namespace, but is
  *	only accessible using the _kern_transfer_area() syscall.
  */
@@ -2965,7 +2963,8 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 {
 	vm_address_space *sourceAddressSpace, *targetAddressSpace;
 	vm_translation_map *map;
-	vm_area *area;
+	vm_area *area, *reserved;
+	void *reservedAddress;
 	status_t status;
 
 	area = vm_get_area(id);
@@ -2978,8 +2977,26 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 	if (status != B_OK)
 		goto err1;
 
+	// We will first remove the area, and then reserve its former
+	// address range so that we can later reclaim it if the
+	// transfer failed.
+
 	sourceAddressSpace = area->aspace;
-	remove_area_from_virtual_map(sourceAddressSpace, area, false);
+
+	reserved = _vm_create_reserved_region_struct(&sourceAddressSpace->virtual_map);
+	if (reserved == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	acquire_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
+	reservedAddress = (void *)area->base;
+	remove_area_from_virtual_map(sourceAddressSpace, area, true);
+	insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS, area->size, reserved);
+		// famous last words: this cannot fail :)
+
+	release_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
 
 	// unmap the area in the source address space
 	map = &sourceAddressSpace->translation_map;
@@ -2995,18 +3012,19 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 		// okay, someone is trying to delete this aspace now, so we can't
 		// insert the area, so back out
 		status = B_BAD_TEAM_ID;
-		goto err2;
+		goto err3;
 	}
 
 	status = insert_area(targetAddressSpace, _address, addressSpec, area->size, area);
 	if (status < B_OK)
-		goto err2;
+		goto err3;
 
 	// The area was successfully transferred to the new team when we got here
 	area->aspace = targetAddressSpace;
 
 	release_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
 
+	vm_unreserve_address_range(sourceAddressSpace->id, reservedAddress, area->size);
 	vm_put_aspace(sourceAddressSpace);
 		// we keep the reference of the target address space for the
 		// area, so we only have to put the one from the source
@@ -3014,15 +3032,14 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	return B_OK;
 
-err2:
+err3:
 	release_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
-	vm_put_aspace(targetAddressSpace);
 
 	// insert the area again into the source address space
 	acquire_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
 	// check to see if this aspace has entered DELETE state
 	if (sourceAddressSpace->state == VM_ASPACE_STATE_DELETION
-		|| insert_area(sourceAddressSpace, _address, B_ANY_ADDRESS, area->size, area) != B_OK) {
+		|| insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS, area->size, area) != B_OK) {
 		// We can't insert the area anymore - we have to delete it manually
 		vm_cache_remove_area(area->cache_ref, area);
 		vm_cache_release_ref(area->cache_ref);
@@ -3031,7 +3048,8 @@ err2:
 		area = NULL;
 	}
 	release_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
-
+err2:
+	vm_put_aspace(targetAddressSpace);
 err1:
 	if (area != NULL)
 		vm_put_area(area);
