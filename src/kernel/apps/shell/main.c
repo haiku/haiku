@@ -19,7 +19,8 @@
 #include "shell_history.h"
 
 
-static int readline(char *buf, int len)
+static int
+readline(char *buf, int len)
 {	
 	int  i = 0;
 	char ch;
@@ -64,7 +65,8 @@ static int readline(char *buf, int len)
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	char buf[1024];
 
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 	if (af_script_file_name) {
 		run_script(af_script_file_name);
 		if (af_exit_after_script)
-			sys_exit(0);
+			exit(0);
 	}
 
 	printf("Welcome to the OpenBeOS shell\n");
@@ -86,9 +88,8 @@ int main(int argc, char *argv[])
 		printf("$ ");
 
 		chars_read = readline(buf, sizeof(buf));
- 		if (chars_read > 0) {
+ 		if (chars_read > 0)
 			parse_string(buf);
-		}
 	}
 
 	printf("shell exiting\n");

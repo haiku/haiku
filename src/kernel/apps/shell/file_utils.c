@@ -1,4 +1,3 @@
-//#include <types.h>
 #include <string.h>
 #include <ctype.h>
 #include <syscalls.h>
@@ -6,12 +5,15 @@
 #include <stdlib.h>
 #include <Errors.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "file_utils.h"
 #include "statements.h"
 #include "shell_defs.h"
 
-bool combine_path(const char *path1,const char *path2,char *out,unsigned int max_len)
+
+bool
+combine_path(const char *path1,const char *path2,char *out,unsigned int max_len)
 {
 	unsigned int cur_len = 0;
 
@@ -27,61 +29,74 @@ bool combine_path(const char *path1,const char *path2,char *out,unsigned int max
 			cur_len++;
 		}
 	}
-	if(strlen(path2)+cur_len > max_len) return false;
+	if (strlen(path2)+cur_len > max_len)
+		return false;
+
 	strcat(out,path2);
 	return true;
 }
 
-bool exists_file(const char *file_name)
+
+bool
+exists_file(const char *file_name)
 {
-	int handle = sys_open(file_name,0);
+	int handle = open(file_name, 0);
 	bool exists;
-	exists =( handle >= 0);
-	if(exists) sys_close(handle);
+	exists = (handle >= 0);
+	if (exists)
+		close(handle);
+
 	return exists;
 }
 
-bool find_file_in_path(const char *file_name,char *found_name,unsigned int max_size)
-{
-	char path[SCAN_SIZE+1];
-	int  cnt=0;
 
-	if(strchr(file_name,'/') != NULL){
+bool
+find_file_in_path(const char *file_name, char *found_name, unsigned int max_size)
+{
+	char path[SCAN_SIZE + 1];
+	int cnt = 0;
+
+	if (strchr(file_name, '/') != NULL) {
 		strncpy(found_name,file_name,max_size);
 		found_name[max_size] = 0;
-		if(exists_file(found_name)) return true;
+		if (exists_file(found_name))
+			return true;
 		found_name[0] = 0;
 		return false;
 	}
-	while(get_path(cnt,path,SCAN_SIZE)){
-		if(combine_path(path,file_name,found_name,max_size)){
-			if(exists_file(found_name)) return true;
+	while (get_path(cnt, path, SCAN_SIZE)) {
+		if (combine_path(path, file_name, found_name, max_size)) {
+			if (exists_file(found_name))
+				return true;
 		}
 		cnt++;
 	}
-	found_name[0] =0;
-	return(false);
+	found_name[0] = 0;
+	return false;
 }
 
 
-int exec_file(int argc,char *argv[],int *retcode)
+int
+exec_file(int argc, char *argv[], int *retcode)
 {
 	char filename[255];
 	int pid;
 
-	if( !find_file_in_path(argv[0],filename,SCAN_SIZE)) return SHE_FILE_NOT_FOUND;
+	if (!find_file_in_path(argv[0], filename, SCAN_SIZE))
+		return SHE_FILE_NOT_FOUND;
 
-	pid = sys_create_team(filename,filename, argv, argc, NULL, 0, 5);
+	pid = _kern_create_team(filename, filename, argv, argc, NULL, 0, 5);
+    if (pid < 0)
+    	return SHE_CANT_EXECUTE;
 
-    if(pid < 0) return SHE_CANT_EXECUTE;
-
-	sys_wait_on_team(pid, retcode);
+	_kern_wait_for_team(pid, retcode);
 
 	return SHE_NO_ERROR;
 }
 
 
-int read_file_in_buffer(const char *filename,char **buffer)
+int
+read_file_in_buffer(const char *filename,char **buffer)
 {
 	struct stat stat;
 	int file_no;
@@ -102,9 +117,9 @@ int read_file_in_buffer(const char *filename,char **buffer)
 	if (*buffer == NULL)
 		return ENOMEM;
 
-	size = sys_read(file_no, 0, *buffer, stat.st_size);
+	size = read(file_no, *buffer, stat.st_size);
 
-	sys_close(file_no);
+	close(file_no);
 
 	if (size < 0)
 		free(*buffer);

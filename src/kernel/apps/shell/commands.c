@@ -27,12 +27,16 @@ struct command cmds[] = {
 	{NULL, NULL}
 };
 
-int cmd_exec(int argc, char *argv[])
+
+int
+cmd_exec(int argc, char *argv[])
 {
 	return cmd_create_proc(argc - 1,argv+1);
 }
 
-int cmd_create_proc(int argc,char *argv[])
+
+int
+cmd_create_proc(int argc,char *argv[])
 {
 	bool must_wait=true;
 	team_id pid;
@@ -41,7 +45,7 @@ int cmd_create_proc(int argc,char *argv[])
 	char *tmp;
 	char filename[SCAN_SIZE+1];
 
-	if(argc  <1){
+	if (argc < 1) {
 		printf("not enough args to exec\n");
 		return 0;
 	}
@@ -70,13 +74,10 @@ int cmd_create_proc(int argc,char *argv[])
 		}
 	}
 
-	pid = sys_create_team(filename,filename, argv, argc, NULL, 0, 5);
-	if(pid >= 0) {
-		int retcode;
-
-		if(must_wait) {
-			sys_wait_on_team(pid, &retcode);
-		}
+	pid = _kern_create_team(filename,filename, argv, argc, NULL, 0, 5);
+	if (pid >= 0) {
+		if (must_wait)
+			_kern_wait_for_team(pid, NULL);
 	} else {
 		printf("Error: cannot execute '%s'\n", filename);
 		return 0; // should be -1, but the shell would exit
@@ -85,7 +86,9 @@ int cmd_create_proc(int argc,char *argv[])
 	return 0;
 }
 
-int cmd_mkdir(int argc, char *argv[])
+
+int
+cmd_mkdir(int argc, char *argv[])
 {
 	int rc;
 
@@ -104,38 +107,42 @@ int cmd_mkdir(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_cat(int argc, char *argv[])
+
+int
+cmd_cat(int argc, char *argv[])
 {
 	int rc;
 	int fd;
 	char buf[257];
 
-	if(argc < 2) {
+	if (argc < 2) {
 		printf("not enough arguments to cat\n");
 		return 0;
 	}
 
-	fd = sys_open(argv[1], 0);
-	if(fd < 0) {
+	fd = open(argv[1], 0);
+	if (fd < 0) {
 		printf("cat: sys_open() returned error: %s!\n", strerror(fd));
 		goto done_cat;
 	}
 
 	for(;;) {
-		rc = sys_read(fd, -1, buf, sizeof(buf) -1);
-		if(rc <= 0)
+		rc = read_pos(fd, -1, buf, sizeof(buf) - 1);
+		if (rc <= 0)
 			break;
 
 		buf[rc] = '\0';
 		printf("%s", buf);
 	}
-	sys_close(fd);
+	close(fd);
 
 done_cat:
 	return 0;
 }
 
-int cmd_cd(int argc, char *argv[])
+
+int
+cmd_cd(int argc, char *argv[])
 {
 	int rc;
 
@@ -151,7 +158,9 @@ int cmd_cd(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_pwd(int argc, char *argv[])
+
+int
+cmd_pwd(int argc, char *argv[])
 {
 	char buffer[SYS_MAX_PATH_LEN];
 
@@ -165,7 +174,9 @@ int cmd_pwd(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_stat(int argc, char *argv[])
+
+int
+cmd_stat(int argc, char *argv[])
 {
 	int rc;
 	struct stat st;
@@ -187,7 +198,9 @@ int cmd_stat(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_kill(int argc, char *argv[])
+
+int
+cmd_kill(int argc, char *argv[])
 {
 	int rc;
 	
@@ -195,13 +208,15 @@ int cmd_kill(int argc, char *argv[])
 		printf("not enough arguments to kill\n");
 		return 0;
 	}
-	rc = sys_send_signal(atoi(argv[2]), atoi(argv[1]));
+	rc = send_signal(atoi(argv[2]), atoi(argv[1]));
 	if (rc)
 		printf("kill failed\n");
 	return 0;
 }
 
-int cmd_help(int argc, char *argv[])
+
+int
+cmd_help(int argc, char *argv[])
 {
 	printf("command list:\n\n");
 	printf("exit : quits this copy of the shell\n");
@@ -218,5 +233,4 @@ int cmd_help(int argc, char *argv[])
 
 	return 0;
 }
-
 

@@ -24,109 +24,96 @@ typedef struct _oper_level oper_level;
 
 #define MAX_LEVEL 3
 
-oper_level oper_levels[]=
-{{SVO_EQUAL,3}
-,{SVO_LESS,3}
-,{SVO_LESS_E,3}
-,{SVO_BIGGER,3}
-,{SVO_BIGGER_E,3}
-,{SVO_NOT_EQUAL,3}
-,{SVO_ADD,2}
-,{SVO_SUB,2}
-,{SVO_MUL,1}
-,{SVO_DIV,1}
-,{0,-1}
+oper_level oper_levels[] = {
+	{SVO_EQUAL,3},
+	{SVO_LESS,3},
+	{SVO_LESS_E,3},
+	{SVO_BIGGER,3},
+	{SVO_BIGGER_E,3},
+	{SVO_NOT_EQUAL,3},
+	{SVO_ADD,2},
+	{SVO_SUB,2},
+	{SVO_MUL,1},
+	{SVO_DIV,1},
+	{0,-1}
 };
 
 
-static int get_oper_level(int oper)
+static int
+get_oper_level(int oper)
 {
 	int cnt = 0;
-	while((oper_levels[cnt].level != 0) && (oper_levels[cnt].sym_code != oper)) cnt++;
+	while ((oper_levels[cnt].level != 0) && (oper_levels[cnt].sym_code != oper))
+		cnt++;
+
 	return oper_levels[cnt].level;
 }
 
 
-static int parse_neg(scan_info *info,shell_value **out)
+static int
+parse_neg(scan_info *info,shell_value **out)
 {
 	int err;
 	bool do_neg = false;
 
-	if(info->sym_code == SVO_SUB){
-
+	if (info->sym_code == SVO_SUB){
 		do_neg = true;
-		if(scan(info)) return SHE_SCAN_ERROR;
-
+		if (scan(info))
+			return SHE_SCAN_ERROR;
 	}
 
 	err = parse_value(info,out);
-	if(err != SHE_NO_ERROR) return err;
+	if (err != SHE_NO_ERROR)
+		return err;
 
-	if(do_neg){
-
+	if (do_neg) {
 		err = shell_value_neg(*out);
-		if(err != SHE_NO_ERROR) {
-
+		if (err != SHE_NO_ERROR) {
 			shell_value_free(*out);
 			*out = NULL;
-
 		}
-
 	}
 
 	return err;
 }
 
 
-static int parse_oper(scan_info *info,shell_value **out,int level)
+static int
+parse_oper(scan_info *info,shell_value **out,int level)
 {
 	int err;
 	int oper_code;
 	shell_value *other;
 
+	if (level > 1)
+		err = parse_oper(info, out, level - 1);
+	else
+		err = parse_neg(info, out);
 
-	if(level > 1){
-
-		err = parse_oper(info,out,level - 1);
-
-	} else {
-
-		err = parse_neg(info,out);
-
-	}
-
-
-	if(err != SHE_NO_ERROR) return err;
-
+	if (err != SHE_NO_ERROR)
+		return err;
 
 	oper_code = info->sym_code;
 
-	while(get_oper_level(info->sym_code) == level){
-
-		if(scan(info)){
-
+	while (get_oper_level(info->sym_code) == level) {
+		if (scan(info)) {
 			err = SHE_SCAN_ERROR;
 			goto err;
-
 		}
 
-		if(level > 1){
-
+		if (level > 1)
 			err = parse_oper(info,&other,level - 1);
-
-		} else {
-
+		else
 			err = parse_neg(info,&other);
 
-		}
+		if (err != SHE_NO_ERROR)
+			goto err;
 
-      if(err != SHE_NO_ERROR) goto err;
-
-      err = shell_value_do_operation(*out,other,oper_code);
-		if(err != SHE_NO_ERROR) goto err_2;
+		err = shell_value_do_operation(*out,other,oper_code);
+		if (err != SHE_NO_ERROR)
+			goto err_2;
 
 		shell_value_free(other);
-
 	}
 
 	return SHE_NO_ERROR;
@@ -142,56 +129,57 @@ err:
 }
 
 
-static int parse_expr(scan_info *info,shell_value **out)
+static int
+parse_expr(scan_info *info,shell_value **out)
 {
 	(*out) = NULL;
 	return parse_oper(info,out,MAX_LEVEL);
 }
 
 
-static int parse_cast(scan_info * info,shell_value **out)
+static int
+parse_cast(scan_info * info,shell_value **out)
 {
 	int err;
 	long int dummy;
 	char *text;
 	bool to_number = info->sym_code == SVO_NUMBER_CAST;
 
-	if(scan(info)) return SHE_SCAN_ERROR;
-
+	if (scan(info))
+		return SHE_SCAN_ERROR;
 
 	err = parse_rvl_expr(info,out);
-	if(err != SHE_NO_ERROR) return err;
+	if (err != SHE_NO_ERROR)
+		return err;
 
-//place cast in shell_vars=>change type direct
+	// place cast in shell_vars=>change type direct
 
-	if(to_number){
-
+	if (to_number) {
 		err = shell_value_to_number(*out,&dummy);
-		if(err != SHE_NO_ERROR) goto err;
+		if (err != SHE_NO_ERROR)
+			goto err;
 
 		err = shell_value_set_number(*out,dummy);
-		if(err != SHE_NO_ERROR) goto err;
-
+		if (err != SHE_NO_ERROR)
+			goto err;
 	} else {
-
 		text = shell_value_to_char(*out);
-
 		err = shell_value_set_text(*out,text);
 
 		free(text);
-
 	}
-   return SHE_NO_ERROR;
+	return SHE_NO_ERROR;
 
 err:
-
 	shell_value_free(*out);
 	*out = NULL;
 	
 	return err;
 }
 
-static int parse_value(scan_info *info,shell_value **out)
+
+static int
+parse_value(scan_info *info,shell_value **out)
 {
 	char buf2[SCAN_SIZE+1];
 	int err = SHE_NO_ERROR;
@@ -200,10 +188,8 @@ static int parse_value(scan_info *info,shell_value **out)
 
 	*out = NULL;
 
-	switch(info->sym_code){
-
+	switch (info->sym_code){
 		case SVO_DQ_STRING:
-
 			parse_vars_in_string(info->token,buf2,SCAN_SIZE);
 			*out = shell_value_init_text(buf2);
 			break;
@@ -214,7 +200,6 @@ static int parse_value(scan_info *info,shell_value **out)
 			break;
 
 		case  SVO_SQ_STRING:
-
 			*out = shell_value_init_text(info->token);
 			break;
 
@@ -229,118 +214,110 @@ static int parse_value(scan_info *info,shell_value **out)
 
 		case SVO_PARENL:
 			err = parse_rvl_expr(info,out);
-			if(err) return err;
-
+			if (err)
+				return err;
 			break;
 
-
 		case SVO_DOLLAR:
-			if(scan(info)) return SHE_SCAN_ERROR;
+			if (scan(info))
+				return SHE_SCAN_ERROR;
 
-			if(info->sym_code == SVO_IDENT){
-
-			value =get_value_by_name(info->token);
-
-				if(value != NULL){
-
+			if (info->sym_code == SVO_IDENT) {
+				value = get_value_by_name(info->token);
+				if (value != NULL)
 					 *out = shell_value_clone(value);
-
-				} else {
-
+				else
 					*out = shell_value_init_text("");
-
-				}
-
-			}  else {
-
+			} else
 				err = SVO_IDENT;
-
-			}
 			break;
 
 		default:
 			return SHE_PARSE_ERROR;
 	}
 
-
-
-	if(err == SHE_NO_ERROR){
-
-		if(scan(info)){
-			if(*out != NULL) shell_value_free(*out);
-			 return SHE_SCAN_ERROR;
+	if (err == SHE_NO_ERROR) {
+		if (scan(info)) {
+			if (*out != NULL)
+				shell_value_free(*out);
+			return SHE_SCAN_ERROR;
 		}
 
-		if(*out == NULL) err = SHE_NO_MEMORY;
-
+		if (*out == NULL)
+			err = SHE_NO_MEMORY;
 	}
 
 	return err;
 }
 
-static int handle_exit(scan_info *info)
+
+static int
+handle_exit(scan_info *info)
 {
 	long int exit_value = 0;
 	int err = SHE_NO_ERROR;
 	shell_value *expr;
 
-	if(info->sym_code == SVO_PARENL){
+	if (info->sym_code == SVO_PARENL) {
+		if (scan(info))
+			return SHE_SCAN_ERROR;
 
-		if(scan(info)) return SHE_SCAN_ERROR;
+		err = parse_expr(info, &expr);
+		if (err != SHE_NO_ERROR)
+			return err;
 
-		err = parse_expr(info,&expr);
-		if(err != SHE_NO_ERROR) return err;
-
-		if(!(expr->isnumber)){
+		if (!(expr->isnumber)) {
 			err = SHE_INVALID_TYPE;
 			goto err;
 		}
 
-		err = shell_value_get_number(expr,&exit_value);
-		if(err != SHE_NO_ERROR) goto err;
+		err = shell_value_get_number(expr, &exit_value);
+		if (err != SHE_NO_ERROR)
+			goto err;
 
-		if(expect(info,SVO_PARENR)){
+		if (expect(info, SVO_PARENR)) {
 			err = SVO_PARENR;
 			goto err;
 		}
-
 	}
 
-	sys_exit(exit_value);
-
+	exit(exit_value);
 
 err:
 	shell_value_free(expr);
 	return err;
 }
 
-static int parse_rvl_expr(scan_info *info,shell_value **out)
+
+static int
+parse_rvl_expr(scan_info *info,shell_value **out)
 {
 	int err = SHE_NO_ERROR;
 
 	*out = NULL;
 
-	if(expect(info,SVO_PARENL)) return SVO_PARENL;
+	if (expect(info, SVO_PARENL))
+		return SVO_PARENL;
 
-	err = parse_expr(info,out);
+	err = parse_expr(info, out);
+	if (err != SHE_NO_ERROR)
+		return err;
 
-	if(err != SHE_NO_ERROR) return err;
-
-	if(expect(info,SVO_PARENR)) {
-
+	if (expect(info, SVO_PARENR)) {
 		err = SVO_PARENR;
 		goto err;
-
 	}
 
 	return SHE_NO_ERROR;
+
 err:
 	shell_value_free(*out);
-
 	return err;
 }
 
-static int handle_if(scan_info *info)
+
+static int
+handle_if(scan_info *info)
 {
 	int err = SHE_NO_ERROR;
 	long int value;
@@ -348,19 +325,20 @@ static int handle_if(scan_info *info)
 	shell_value *expr;
 
 	err = parse_rvl_expr(info,&expr);
-	if(err != SHE_NO_ERROR) return err;
+	if (err != SHE_NO_ERROR)
+		return err;
 
-	if(!expr->isnumber){
-
+	if (!expr->isnumber) {
 		err = SHE_INVALID_TYPE;
 		goto err;
-
 	}
 
 	err = shell_value_get_number(expr,&value);
-	if(err != SHE_NO_ERROR) goto err;
+	if (err != SHE_NO_ERROR)
+		goto err;
 
- 	if(value != 0) err = parse_info(info);
+	if (value != 0)
+		err = parse_info(info);
 
 err:
 	shell_value_free(expr);
@@ -372,7 +350,8 @@ err:
 // Parse exec function
 //
 
-static int handle_exec(scan_info *info,shell_value **out)
+static int
+handle_exec(scan_info *info,shell_value **out)
 {
 	shell_value *state;
 	int argc;
@@ -385,19 +364,22 @@ static int handle_exec(scan_info *info,shell_value **out)
 
 	*out = NULL;
 
-	if(scan(info)) return SHE_SCAN_ERROR;
+	if (scan(info))
+		return SHE_SCAN_ERROR;
 
-	err = parse_rvl_expr(info,&state);
-	if(err != SHE_NO_ERROR) return err;
+	err = parse_rvl_expr(info, &state);
+	if (err != SHE_NO_ERROR)
+		return err;
 
-	err = shell_value_get_text(state,&statement);
-	if(err != SHE_NO_ERROR) return err;
+	err = shell_value_get_text(state, &statement);
+	if (err != SHE_NO_ERROR)
+		return err;
 
-	argc = parse_line(statement,argv,64,redirect_in,redirect_out);
+	argc = parse_line(statement, argv, 64, redirect_in, redirect_out);
+	err = exec_file(argc, argv, &retcode);
 
-	err = exec_file(argc,argv,&retcode);
-
-	if(err != SHE_NO_ERROR) goto err;
+	if (err != SHE_NO_ERROR)
+		goto err;
 
 	*out = shell_value_init_number(retcode);
 
@@ -406,11 +388,13 @@ err:
 	return err;
 }
 
+
 //
 // Parse load statement
 //
 
-static int handle_load(scan_info *info)
+static int
+handle_load(scan_info *info)
 {
 	char var_name[SCAN_SIZE+1];
 	shell_value *value;
