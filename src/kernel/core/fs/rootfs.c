@@ -20,7 +20,7 @@
 #include "rootfs.h"
 
 
-#define ROOTFS_TRACE 1
+#define ROOTFS_TRACE 0
 
 #if ROOTFS_TRACE
 #define TRACE(x) dprintf x

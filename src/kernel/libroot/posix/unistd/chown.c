@@ -25,7 +25,7 @@ chown(const char *path, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_stat(-1, path, true, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -39,7 +39,7 @@ lchown(const char *path, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_stat(-1, path, false, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = sys_write_path_stat(path, false, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -53,7 +53,7 @@ fchown(int fd, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_stat(fd, NULL, true, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = sys_write_stat(fd, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }

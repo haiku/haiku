@@ -3,8 +3,6 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-// 280202 TK: added partition support
-
 #include <kernel.h>
 #include <vfs.h>
 #include <debug.h>
@@ -24,7 +22,7 @@
 #include <stdio.h>
 
 
-#define DEVFS_TRACE 1
+#define DEVFS_TRACE 0
 
 #if DEVFS_TRACE
 #	define TRACE(x) dprintf x

@@ -398,7 +398,6 @@ static int
 recurse_directory(const char *path, const char *match)
 {
 	/* ToDo: should just use opendir(), readdir(), ... */
-	struct stat stat;
 	int res = 0, dir;
 	int bufferSize = sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1;
 	struct dirent *dirent;
@@ -414,6 +413,7 @@ recurse_directory(const char *path, const char *match)
 
 	/* loop until we have a match or we run out of entries */
 	while (res <= 0) {
+		struct stat st;
 		char *newpath;
 		size_t slen = 0;
 		SHOW_FLOW(3, "scanning %s\n", path);
@@ -429,7 +429,7 @@ recurse_directory(const char *path, const char *match)
 		strlcat(newpath, "/", slen);
 		strlcat(newpath, dirent->d_name, slen);
 
-		if ((res = sys_read_stat(newpath, true, &stat)) != B_NO_ERROR) {
+		if ((res = stat(newpath, &st)) != B_NO_ERROR) {
 			kfree(newpath);
 			break;
 		}
@@ -439,7 +439,7 @@ recurse_directory(const char *path, const char *match)
 		 *  If we don't, then load the file and record it's details.
 		 *  If it matches our search path we'll return afterwards.
 		 */
-		if (S_ISREG(stat.st_mode)) {
+		if (S_ISREG(st.st_mode)) {
 			/* do we already know about this file? 
 			 * If we do res = 0 and we'll just carry on, if
 			 * not, it's a new file so we need to read in the
@@ -450,7 +450,7 @@ recurse_directory(const char *path, const char *match)
 			else
 				res = recurse_check_file(newpath, match);
 
-		} else if (S_ISDIR(stat.st_mode)) {
+		} else if (S_ISDIR(st.st_mode)) {
 			res = recurse_directory(newpath, match);
 		}
 		kfree(newpath);
@@ -746,21 +746,21 @@ static void compose_path( char *path, module_iterator *iter, const char *name, b
 static inline int
 module_traverse_dir(module_iterator *iter)
 {
-	int res;
-	struct stat stat;
+	struct stat st;
 	char buffer[SYS_MAX_NAME_LEN + sizeof(struct dirent)];
 	struct dirent *dirent = (struct dirent *)buffer;
 	char path[SYS_MAX_PATH_LEN];
+	int res;
 
 	/* If (*iter->cur_header) != NULL we have another module within
 	 * the existing file to return, so just return.
 	 * Otherwise, actually find the next file to read.
 	 */ 
 	if (iter->cur_header) {
-		if (*iter->cur_header == NULL)
-			unload_module_file(iter->cur_path);
-		else
-			return B_NO_ERROR;
+		if (*iter->cur_header != NULL)
+			return B_OK;
+
+		unload_module_file(iter->cur_path);
 	}
 
 	SHOW_FLOW( 3, "scanning %s\n", iter->cur_dir->name);
@@ -772,8 +772,8 @@ module_traverse_dir(module_iterator *iter)
 
 	SHOW_FLOW(3, "got %s\n", dirent->d_name);
 
-	if (strcmp(dirent->d_name, ".") == 0 ||
-		strcmp(dirent->d_name, "..") == 0 )
+	if (strcmp(dirent->d_name, ".") == 0
+		|| strcmp(dirent->d_name, "..") == 0 )
 		return B_NO_ERROR;
 
 	compose_path(path, iter, dirent->d_name, true);
@@ -783,11 +783,11 @@ module_traverse_dir(module_iterator *iter)
 	 */
 	iter->cur_header = NULL;
 	iter->module_pos = 0;
-		
-	if ((res = sys_read_stat(path, true, &stat)) != B_NO_ERROR)
+
+	if ((res = stat(path, &st)) != B_NO_ERROR)
 		return res;
 
-	if (S_ISREG(stat.st_mode)) {
+	if (S_ISREG(st.st_mode)) {
 		module_info **hdrs = NULL;
 		if ((hdrs = load_module_file(path)) != NULL) {
 			iter->cur_header = hdrs;
@@ -797,7 +797,7 @@ module_traverse_dir(module_iterator *iter)
 		return EINVAL; /* not sure what we should return here */
 	}
 
-	if (S_ISDIR(stat.st_mode))
+	if (S_ISDIR(st.st_mode))
 		return module_enter_dir(iter, path);
 
 	SHOW_FLOW(3, "entry %s not a file nor a directory - ignored\n", dirent->d_name);

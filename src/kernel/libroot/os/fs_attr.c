@@ -69,7 +69,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	if (attr < 0)
 		return attr;
 
-	status = sys_fstat(attr, &stat);
+	status = sys_read_stat(attr, &stat);
 	if (status == B_OK) {
 		attrInfo->type = stat.st_type;
 		attrInfo->size = stat.st_size;

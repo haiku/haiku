@@ -166,22 +166,22 @@ int cmd_pwd(int argc, char *argv[])
 int cmd_stat(int argc, char *argv[])
 {
 	int rc;
-	struct stat stat;
+	struct stat st;
 
 	if (argc < 2) {
 		printf("not enough arguments to stat\n");
 		return 0;
 	}
 
-	rc = sys_read_stat(argv[1], true, &stat);
+	rc = stat(argv[1], &st);
 	if (rc >= 0) {
 		printf("stat of file '%s': \n", argv[1]);
-		printf("vnid 0x%x\n", (unsigned int)stat.st_ino);
-//		printf("type %d\n", stat.type);
-		printf("size %d\n", (int)stat.st_size);
-	} else {
+		printf("vnid 0x%x\n", (unsigned int)st.st_ino);
+		printf("type %d\n", st.st_type);
+		printf("size %d\n", (int)st.st_size);
+	} else
 		printf("stat failed for file '%s'\n", argv[1]);
-	}
+
 	return 0;
 }
 

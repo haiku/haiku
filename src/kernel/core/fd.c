@@ -382,28 +382,57 @@ user_rewind_dir(int fd)
 
 
 int
-user_fstat(int fd, struct stat *stat)
+user_read_stat(int fd, struct stat *userStat)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
 
 	/* This is a user_function, so abort if we have a kernel address */
-	CHECK_USER_ADDR(stat)
+	CHECK_USER_ADDR(userStat)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("user_fstat(descriptor = %p)\n",descriptor));
+	TRACE(("user_read_stat(descriptor = %p)\n",descriptor));
 
-	if (descriptor->ops->fd_stat) {
+	if (descriptor->ops->fd_read_stat) {
 		// we're using the stat buffer on the stack to not have to
 		// lock the given stat buffer in memory
-		struct stat kstat;
+		struct stat stat;
 
-		status = descriptor->ops->fd_stat(descriptor, &kstat);
+		status = descriptor->ops->fd_read_stat(descriptor, &stat);
 		if (status >= 0)
-			status = user_memcpy(stat, &kstat, sizeof(*stat));
+			status = user_memcpy(userStat, &stat, sizeof(stat));
+	} else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+int
+user_write_stat(int fd, const struct stat *userStat, int statMask)
+{
+	struct file_descriptor *descriptor;
+	status_t status;
+
+	CHECK_USER_ADDR(userStat)
+
+	descriptor = get_fd(get_current_io_context(false), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	TRACE(("user_write_stat(descriptor = %p)\n", descriptor));
+
+	if (descriptor->ops->fd_write_stat) {
+		// we're using the stat buffer on the stack to not have to
+		// lock the given stat buffer in memory
+		struct stat stat;
+		status = user_memcpy(&stat, userStat, sizeof(stat));
+		if (status == B_OK)
+			status = descriptor->ops->fd_write_stat(descriptor, &stat, statMask);
 	} else
 		status = EOPNOTSUPP;
 
@@ -583,7 +612,7 @@ sys_rewind_dir(int fd)
 
 
 int
-sys_fstat(int fd, struct stat *stat)
+sys_read_stat(int fd, struct stat *stat)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
@@ -592,10 +621,32 @@ sys_fstat(int fd, struct stat *stat)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("sys_fstat(descriptor = %p)\n",descriptor));
+	TRACE(("sys_read_stat(descriptor = %p)\n",descriptor));
 
-	if (descriptor->ops->fd_stat)
-		status = descriptor->ops->fd_stat(descriptor, stat);
+	if (descriptor->ops->fd_read_stat)
+		status = descriptor->ops->fd_read_stat(descriptor, stat);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+int
+sys_write_stat(int fd, const struct stat *stat, int statMask)
+{
+	struct file_descriptor *descriptor;
+	status_t status;
+
+	descriptor = get_fd(get_current_io_context(true), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	TRACE(("sys_write_stat(descriptor = %p)\n", descriptor));
+
+	if (descriptor->ops->fd_write_stat)
+		status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
 	else
 		status = EOPNOTSUPP;
 

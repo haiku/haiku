@@ -26,7 +26,8 @@ static bus *bus_list;
 static mutex bus_lock;
 
 
-int bus_man_init(kernel_args *ka)
+int
+bus_man_init(kernel_args *ka)
 {
 	mutex_init(&bus_lock, "bus_lock");
 
@@ -35,7 +36,9 @@ int bus_man_init(kernel_args *ka)
 	return 0;
 }
 
-static bus *find_bus(const char *path)
+
+static bus *
+find_bus(const char *path)
 {
 	bus *b;
 
@@ -46,7 +49,9 @@ static bus *find_bus(const char *path)
 	return b;
 }
 
-int bus_register_bus(const char *path)
+
+int
+bus_register_bus(const char *path)
 {
 	bus *b;
 	int err = 0;
@@ -74,6 +79,7 @@ int bus_register_bus(const char *path)
 		bus_list = b;
 	} else {
 		err = ENODEV;
+		goto err;
 	}
 
 	err = 0;
@@ -82,16 +88,18 @@ err:
 	return err;
 }
 
-static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, int base_fd, id_list *vendor_ids, id_list *device_ids)
+
+static int
+bus_find_device_recurse(int *n, char *base_path, int max_path_len, int base_fd, id_list *vendor_ids, id_list *device_ids)
 {
 	char buffer[sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1];
 	struct dirent *dirent = (struct dirent *)buffer;
 	int base_path_len = strlen(base_path);
 	ssize_t len;
 	int err;
-	struct stat stat;
 
 	while ((len = sys_read_dir(base_fd, dirent, sizeof(buffer), 1)) > 0) {
+		struct stat st;
 		int fd;
 
 		// reset the base_path to the original string passed in
@@ -99,11 +107,11 @@ static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, in
 		dirent->d_name[dirent->d_reclen] = '\0';
 		strlcat(base_path, dirent->d_name, max_path_len);
 
-		err = sys_read_stat(base_path, true, &stat);
+		err = stat(base_path, &st);
 		if (err < 0)
 			continue;
 
-		if (S_ISDIR(stat.st_mode)) {
+		if (S_ISDIR(st.st_mode)) {
 			fd = sys_open_dir(base_path);
 			if (fd < 0)
 				continue;
@@ -114,7 +122,7 @@ static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, in
 			if (err >= 0)
 				return err;
 			continue;
-		} else if (S_ISREG(stat.st_mode)) {
+		} else if (S_ISREG(st.st_mode)) {
 			// we opened the device
 			// XXX assumes PCI
 			struct pci_cfg cfg;
@@ -146,7 +154,9 @@ static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, in
 	return ENODEV;
 }
 
-int bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev)
+
+int
+bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev)
 {
 	int base_fd;
 	int fd;
@@ -188,5 +198,4 @@ int bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev
 
 	return err;
 }
-
 

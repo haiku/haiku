@@ -20,7 +20,7 @@
 int
 stat(const char *path, struct stat *stat)
 {
-	int status = sys_read_stat(path, true, stat);
+	int status = sys_read_path_stat(path, true, stat);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -29,7 +29,7 @@ stat(const char *path, struct stat *stat)
 int
 lstat(const char *path, struct stat *stat)
 {
-	int status = sys_read_stat(path, false, stat);
+	int status = sys_read_path_stat(path, false, stat);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -38,7 +38,7 @@ lstat(const char *path, struct stat *stat)
 int
 fstat(int fd, struct stat *stat)
 {
-	int status = sys_fstat(fd, stat);
+	int status = sys_read_stat(fd, stat);
 
 	RETURN_AND_SET_ERRNO(status);
 }

@@ -27,6 +27,8 @@
 /* or make it more intelligent... it's really boring to maintain this one. */
 
 SYSCALL0(sys_null, 0)
+
+/* VFS calls */
 SYSCALL4(sys_mount, 1)
 SYSCALL1(sys_unmount, 2)
 SYSCALL0(sys_sync, 3)
@@ -53,40 +55,55 @@ SYSCALL3(sys_create, 11)
 SYSCALL6(sys_create_entry_ref, 84)
 SYSCALL1(sys_unlink, 12)
 SYSCALL2(sys_rename, 13)
-SYSCALL3(sys_read_stat, 14)
-SYSCALL5(sys_write_stat, 15)
-SYSCALL0(sys_system_time, 16)
-SYSCALL2(sys_snooze, 17)
+SYSCALL2(sys_access, 73);
+SYSCALL2(sys_read_stat, 74)
+SYSCALL3(sys_write_stat, 100)
+SYSCALL3(sys_read_path_stat, 14)
+SYSCALL4(sys_write_path_stat, 15)
+SYSCALL2(sys_getcwd, 41)
+SYSCALL2(sys_setcwd, 42)
+SYSCALL1(sys_dup, 61)
+SYSCALL2(sys_dup2, 62)
+
+/* VFS attribute calls */
+SYSCALL2(sys_open_attr_dir, 97)
+SYSCALL4(sys_create_attr, 98)
+SYSCALL3(sys_open_attr, 99)
+SYSCALL2(sys_remove_attr, 101)
+SYSCALL4(sys_rename_attr, 102)
+
+/* semaphore calls */
 SYSCALL2(sys_create_sem, 18)
 SYSCALL1(sys_delete_sem, 19)
 SYSCALL1(sys_acquire_sem, 20)
 SYSCALL4(sys_acquire_sem_etc, 21)
 SYSCALL1(sys_release_sem, 22)
 SYSCALL3(sys_release_sem_etc, 23)
+SYSCALL2(sys_sem_get_count, 57)
+SYSCALL3(sys_get_sem_info, 58)
+SYSCALL4(sys_get_next_sem_info, 59)
+SYSCALL2(sys_set_sem_owner, 60)
 
-/* VFS attribute calls */
-SYSCALL2(sys_open_attr_dir, 97)
-SYSCALL4(sys_create_attr, 98)
-SYSCALL3(sys_open_attr, 99)
-SYSCALL3(sys_write_attr_stat, 100)
-SYSCALL2(sys_remove_attr, 101)
-SYSCALL4(sys_rename_attr, 102)
-
-/* Thread calls */
+/* thread/team calls */
 SYSCALL0(sys_get_current_thread_id, 24)
 SYSCALL4(sys_spawn_thread, 35)
 SYSCALL1(sys_kill_thread, 36)
 SYSCALL1(sys_suspend_thread, 37)
 SYSCALL1(sys_resume_thread, 38)
-
+SYSCALL2(sys_snooze, 17)
 SYSCALL4(send_data, 94)
 SYSCALL3(receive_data, 95)
 SYSCALL1(has_data, 96)
-
 SYSCALL1(sys_exit, 25)
 SYSCALL5(sys_create_team, 26)
 SYSCALL2(sys_wait_on_thread, 27)
 SYSCALL2(sys_wait_on_team, 28)
+SYSCALL2(sys_get_thread_info, 88)
+SYSCALL3(sys_get_next_thread_info, 89)
+SYSCALL2(sys_get_team_info, 90)
+SYSCALL2(sys_get_next_team_info, 91)
+
+/* VM calls */
 SYSCALL6(sys_vm_create_anonymous_region, 29)
 SYSCALL6(sys_vm_clone_region, 30)
 SYSCALL9(sys_vm_map_file, 31)
@@ -95,8 +112,8 @@ SYSCALL2(sys_vm_get_region_info, 33)
 SYSCALL1(sys_find_region_by_name, 34)
 SYSCALL1(sys_kill_team, 39)
 SYSCALL0(sys_get_current_team_id, 40)
-SYSCALL2(sys_getcwd, 41)
-SYSCALL2(sys_setcwd, 42)
+
+/* port syscalls */
 SYSCALL2(sys_port_create, 43)
 SYSCALL1(sys_port_close, 44)
 SYSCALL1(sys_port_delete, 45)
@@ -111,12 +128,9 @@ SYSCALL7(sys_port_read_etc, 53)
 SYSCALL2(sys_port_set_owner, 54)
 SYSCALL4(sys_port_write, 55)
 SYSCALL7(sys_port_write_etc, 56)
-SYSCALL2(sys_sem_get_count, 57)
-SYSCALL3(sys_get_sem_info, 58)
-SYSCALL4(sys_get_next_sem_info, 59)
-SYSCALL2(sys_set_sem_owner, 60)
-SYSCALL1(sys_dup, 61)
-SYSCALL2(sys_dup2, 62)
+
+/* misc calls */
+SYSCALL0(sys_system_time, 16)
 //SYSCALL2(sys_team_get_table, 63)
 SYSCALL2(sys_getrlimit, 64)
 SYSCALL2(sys_setrlimit, 65)
@@ -127,12 +141,6 @@ SYSCALL2(sys_atomic_set, 69)
 SYSCALL3(sys_test_and_set, 70)
 SYSCALL6(sys_sysctl, 71)
 //SYSCALL3(sys_socket, 72)
-SYSCALL2(sys_access, 73);
-SYSCALL2(sys_fstat, 74)
 SYSCALL3(sys_setenv, 79)
 SYSCALL2(sys_getenv, 80)
-SYSCALL2(sys_get_thread_info, 88)
-SYSCALL3(sys_get_next_thread_info, 89)
-SYSCALL2(sys_get_team_info, 90)
-SYSCALL2(sys_get_next_team_info, 91)
 

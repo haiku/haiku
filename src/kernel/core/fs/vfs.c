@@ -46,7 +46,7 @@
 #include <fs_info.h>
 
 #ifndef TRACE_VFS
-#	define TRACE_VFS 1
+#	define TRACE_VFS 0
 #endif
 #if TRACE_VFS
 #	define PRINT(x) dprintf x
@@ -141,11 +141,11 @@ static ssize_t file_write(struct file_descriptor *, off_t pos, const void *buffe
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
 static status_t file_close(struct file_descriptor *);
-static status_t dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
+static status_t dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
 static void dir_free_fd(struct file_descriptor *);
 static status_t dir_close(struct file_descriptor *);
-static status_t attr_dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
+static status_t attr_dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t attr_dir_rewind(struct file_descriptor *);
 static void attr_dir_free_fd(struct file_descriptor *);
 static status_t attr_dir_close(struct file_descriptor *);
@@ -155,13 +155,15 @@ static off_t attr_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void attr_free_fd(struct file_descriptor *);
 static status_t attr_close(struct file_descriptor *);
 static status_t attr_read_stat(struct file_descriptor *, struct stat *);
-static status_t index_dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
+static status_t attr_write_stat(struct file_descriptor *, const struct stat *, int statMask);
+static status_t index_dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t index_dir_rewind(struct file_descriptor *);
 static void index_dir_free_fd(struct file_descriptor *);
 static status_t index_dir_close(struct file_descriptor *);
 
 static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
 static status_t common_read_stat(struct file_descriptor *, struct stat *);
+static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
 static int vfs_open(char *path, int omode, bool kernel);
 static int vfs_open_dir(char *path, bool kernel);
@@ -178,6 +180,7 @@ struct fd_ops gFileOps = {
 	NULL,
 	NULL,
 	common_read_stat,
+	common_write_stat,
 	file_close,
 	file_free_fd
 };
@@ -190,6 +193,7 @@ struct fd_ops gDirectoryOps = {
 	dir_read,
 	dir_rewind,
 	common_read_stat,
+	common_write_stat,
 	dir_close,
 	dir_free_fd
 };
@@ -202,6 +206,7 @@ struct fd_ops gAttributeDirectoryOps = {
 	attr_dir_read,
 	attr_dir_rewind,
 	common_read_stat,
+	common_write_stat,
 	attr_dir_close,
 	attr_dir_free_fd
 };
@@ -214,18 +219,20 @@ struct fd_ops gAttributeOps = {
 	NULL,
 	NULL,
 	attr_read_stat,
+	attr_write_stat,
 	attr_close,
 	attr_free_fd
 };
 
 struct fd_ops gIndexDirectoryOps = {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	NULL,		// read()
+	NULL,		// write()
+	NULL,		// seek()
+	NULL,		// ioctl()
 	index_dir_read,
 	index_dir_rewind,
-	NULL,
+	NULL,		// read_stat()
+	NULL,		// write_stat()
 	index_dir_close,
 	index_dir_free_fd
 };
@@ -2462,20 +2469,52 @@ common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
-	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
+	FUNCTION(("common_read_stat: stat %p\n", stat));
 	return FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
 }
 
 
 static status_t
-common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
+common_write_stat(struct file_descriptor *descriptor, const struct stat *stat, int statMask)
+{
+	struct vnode *vnode = descriptor->u.vnode;
+	
+	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n", vnode, stat, statMask));
+	if (!FS_CALL(vnode, write_stat))
+		return EROFS;
+
+	return FS_CALL(vnode, write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
+}
+
+
+static status_t
+common_path_read_stat(char *path, bool traverseLeafLink, struct stat *stat, bool kernel)
+{
+	struct vnode *vnode;
+	status_t status;
+
+	FUNCTION(("common_path_read_stat: path '%s', stat %p,\n", path, stat));
+
+	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
+	if (status < 0)
+		return status;
+
+	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+
+	put_vnode(vnode);
+	return status;
+}
+
+
+static status_t
+common_path_write_stat(char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
 	FUNCTION(("common_write_stat: path '%s', stat %p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
 
-	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
+	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -2746,26 +2785,16 @@ attr_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 
 
 static status_t
-attr_write_stat(int fd, const struct stat *stat, int statMask, bool kernel)
+attr_write_stat(struct file_descriptor *descriptor, const struct stat *stat, int statMask)
 {
-	struct file_descriptor *descriptor;
-	struct vnode *vnode;
-	int status;
+	struct vnode *vnode = descriptor->u.vnode;
 
-	FUNCTION(("attr_write_stat: fd = %d, stat = %p, statMask %d, kernel %d\n", fd, stat, statMask, kernel));
+	FUNCTION(("attr_write_stat: stat = %p, statMask %d\n", stat, statMask));
 
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
+	if (!FS_CALL(vnode, write_attr_stat))
+		return EROFS;
 
-	if (FS_CALL(vnode, write_attr_stat))
-		status = FS_CALL(vnode, write_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat, statMask);
-	else
-		status = EROFS;
-
-	put_vnode(vnode);
-
-	return status;
+	return FS_CALL(vnode, write_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat, statMask);
 }
 
 
@@ -3514,36 +3543,22 @@ sys_access(const char *path, int mode)
 
 
 int
-sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
+sys_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	struct vnode *vnode;
-	int status;
-
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	FUNCTION(("sys_read_stat: path '%s', stat %p,\n", path, stat));
-
-	status = path_to_vnode(pathBuffer, traverseLeafLink, &vnode, true);
-	if (status < 0)
-		return status;
-
-	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
-
-	put_vnode(vnode);
-	return status;
+	return common_path_read_stat(pathBuffer, traverseLeafLink, stat, true);
 }
 
 
 int
-sys_write_stat(int fd, const char *path, bool traverseLeafLink, struct stat *stat, int statMask)
+sys_write_path_stat(const char *path, bool traverseLeafLink, const struct stat *stat, int statMask)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	if (fd == -1)
-		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
-
-	return common_write_stat(fd, pathBuffer, traverseLeafLink, stat, statMask, true);
+	return common_path_write_stat(pathBuffer, traverseLeafLink, stat, statMask, true);
 }
 
 
@@ -3570,13 +3585,6 @@ int
 sys_open_attr(int fd, const char *name, int openMode)
 {
 	return attr_open(fd, name, openMode, true);
-}
-
-
-int
-sys_write_attr_stat(int fd, const struct stat *stat, int statMask)
-{
-	return attr_write_stat(fd, stat, statMask, true);
 }
 
 
@@ -4015,58 +4023,38 @@ user_access(const char *userPath, int mode)
 
 
 int
-user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
+user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	struct vnode *vnode = NULL;
 	struct stat stat;
-	int rc;
+	int status;
 
 	if (!CHECK_USER_ADDRESS(userPath)
-		|| !CHECK_USER_ADDRESS(userStat))
+		|| !CHECK_USER_ADDRESS(userStat)
+		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
 		return B_BAD_ADDRESS;
 
-	rc = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-
-	FUNCTION(("user_read_stat(path = %s, traverseLeafLink = %d)\n", path, traverseLink));
-
-	rc = path_to_vnode(path, traverseLink, &vnode, false);
-	if (rc < 0)
-		return rc;
-
-	if (FS_CALL(vnode, read_stat))
-		rc = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
-
-	put_vnode(vnode);
-
-	if (rc < 0)
-		return rc;
+	status = common_path_read_stat(path, traverseLink, &stat, false);
+	if (status < 0)
+		return status;
 
 	return user_memcpy(userStat, &stat, sizeof(struct stat));
 }
 
 
 int
-user_write_stat(int fd, const char *userPath, bool traverseLeafLink, struct stat *userStat, int statMask)
+user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct stat *userStat, int statMask)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
 
-	if (!CHECK_USER_ADDRESS(userStat))
+	if (!CHECK_USER_ADDRESS(userStat)
+		|| !CHECK_USER_ADDRESS(userPath)
+		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK
+		|| user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (fd == -1) {
-		if (!CHECK_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
-			return B_BAD_ADDRESS;
-	}
-
-	if (user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
-		return B_BAD_ADDRESS;
-
-	return common_write_stat(fd, path, traverseLeafLink, &stat, statMask, false);
+	return common_path_write_stat(path, traverseLeafLink, &stat, statMask, false);
 }
 
 
@@ -4109,19 +4097,6 @@ user_open_attr(int fd, const char *userName, int openMode)
 		return B_BAD_ADDRESS;
 
 	return attr_open(fd, name, openMode, false);
-}
-
-
-int
-user_write_attr_stat(int fd, const struct stat *userStat, int statMask)
-{
-	struct stat stat;
-
-	if (!CHECK_USER_ADDRESS(userStat)
-		|| user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
-		return B_BAD_ADDRESS;
-
-	return attr_write_stat(fd, &stat, statMask, false);
 }
 
 

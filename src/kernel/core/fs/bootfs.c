@@ -23,7 +23,7 @@
 #include "bootfs.h"
 
 
-#define BOOTFS_TRACE 1
+#define BOOTFS_TRACE 0
 
 #if BOOTFS_TRACE
 #define TRACE(x) dprintf x

@@ -24,7 +24,7 @@ chmod(const char *path, mode_t mode)
 	status_t status;
 
 	stat.st_mode = mode;
-	status = sys_write_stat(-1, path, true, &stat, FS_WRITE_STAT_MODE);
+	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_MODE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -37,7 +37,7 @@ fchmod(int fd, mode_t mode)
 	status_t status;
 
 	stat.st_mode = mode;
-	status = sys_write_stat(fd, NULL, true, &stat, FS_WRITE_STAT_MODE);
+	status = sys_write_stat(fd, &stat, FS_WRITE_STAT_MODE);
 
 	RETURN_AND_SET_ERRNO(status);
 }

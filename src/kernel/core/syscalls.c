@@ -129,14 +129,17 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_RENAME:
 			*call_ret = user_rename((const char *)arg0, (const char *)arg1);
 			break;
-		case SYSCALL_READ_STAT:
-			*call_ret = user_read_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2);
+		case SYSCALL_READ_PATH_STAT:
+			*call_ret = user_read_path_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2);
 			break;
-		case SYSCALL_READ_STAT_FD:
-			*call_ret = user_fstat((int)arg0, (struct stat*)arg1);
+		case SYSCALL_WRITE_PATH_STAT:
+			*call_ret = user_write_path_stat((const char *)arg0, (bool)arg1, (const struct stat *)arg2, (int)arg3);
+			break;
+		case SYSCALL_READ_STAT:
+			*call_ret = user_read_stat((int)arg0, (struct stat*)arg1);
 			break;
 		case SYSCALL_WRITE_STAT:
-			*call_ret = user_write_stat((int)arg0, (const char *)arg1, (bool)arg2, (struct stat *)arg3, (int)arg4);
+			*call_ret = user_write_stat((int)arg0, (const struct stat *)arg1, (int)arg2);
 			break;
 		case SYSCALL_ACCESS:
 			*call_ret = user_access((const char *)arg0, (int)arg1);
@@ -149,9 +152,6 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			break;
 		case SYSCALL_OPEN_ATTR:
 			*call_ret = user_open_attr((int)arg0, (const char *)arg1, (int)arg2);
-			break;
-		case SYSCALL_WRITE_ATTR_STAT:
-			*call_ret = user_write_attr_stat((int)arg0, (const struct stat *)arg1, (int)arg2);
 			break;
 		case SYSCALL_REMOVE_ATTR:
 			*call_ret = user_remove_attr((int)arg0, (const char *)arg1);

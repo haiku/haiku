@@ -24,7 +24,7 @@ truncate(const char *path, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = sys_write_stat(-1, path, true, &stat, FS_WRITE_STAT_SIZE);
+	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -37,7 +37,7 @@ ftruncate(int fd, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = sys_write_stat(fd, NULL, true, &stat, FS_WRITE_STAT_SIZE);
+	status = sys_write_stat(fd, &stat, FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
