@@ -11,6 +11,7 @@
 #include <OS.h>
 #include <String.h>
 #include <TimeSource.h>
+#include <ParameterWeb.h>
 #include "debug.h"
 #include "MediaRosterEx.h"
 #include "MediaMisc.h"
@@ -52,7 +53,8 @@ BMediaRosterEx::SaveNodeConfiguration(BMediaNode *node)
 	int32 flavorid;
 	addon = node->AddOn(&flavorid);
 	if (!addon) {
-		FATAL("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated from BMediaAddOn!\n");
+		// XXX this check incorrectly triggers on BeOS R5 BT848 node
+		FATAL("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated from BMediaAddOn!\n", node->ID());
 		return B_ERROR;
 	}
 	addonid = addon->AddonID();
@@ -521,7 +523,7 @@ BMediaRoster::ReleaseNode(const media_node & node)
 	request.node = node;
 	request.team = team;
 	
-	printf("BMediaRoster::ReleaseNode, node %ld, port %ld, team %ld\n", node.node, node.port, team);
+	TRACE("BMediaRoster::ReleaseNode, node %ld, port %ld, team %ld\n", node.node, node.port, team);
 	
 	rv = QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
@@ -537,10 +539,10 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 	
 	BTimeSource *source;
 
-//	printf("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
+	TRACE("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
 	
 	if (0 == (for_node.kind & B_TIME_SOURCE)) {
-		FATAL("BMediaRoster::MakeTimeSourceFor, node %ld is not a timesource!\n", for_node.node);
+		//FATAL("BMediaRoster::MakeTimeSourceFor, node %ld is not a timesource!\n", for_node.node);
 		// XXX It appears that Cortex calls this function on every node, and expects
 		// XXX to be returned a system time source if the for_node is not a timesource
 		media_node clone;
@@ -551,7 +553,7 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 		source = _TimeSourceObjectManager->GetTimeSource(for_node);
 	}
 
-//	printf("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
+	TRACE("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
 
 	return source;
 }
@@ -782,7 +784,7 @@ BMediaRoster::StartNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 		
-	printf("BMediaRoster::StartNode, node %ld, at perf %Ld\n", node.node, at_performance_time);
+	TRACE("BMediaRoster::StartNode, node %ld, at perf %Ld\n", node.node, at_performance_time);
 
 	node_start_command command;
 	command.performance_time = at_performance_time;
@@ -800,7 +802,7 @@ BMediaRoster::StopNode(const media_node & node,
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
-	printf("BMediaRoster::StopNode, node %ld, at perf %Ld %s\n", node.node, at_performance_time, immediate ? "NOW" : "");
+	TRACE("BMediaRoster::StopNode, node %ld, at perf %Ld %s\n", node.node, at_performance_time, immediate ? "NOW" : "");
 
 	node_stop_command command;
 	command.performance_time = at_performance_time;
@@ -819,7 +821,7 @@ BMediaRoster::SeekNode(const media_node & node,
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
-	printf("BMediaRoster::SeekNode, node %ld, at perf %Ld, to perf %Ld\n", node.node, at_performance_time, to_media_time);
+	TRACE("BMediaRoster::SeekNode, node %ld, at perf %Ld, to perf %Ld\n", node.node, at_performance_time, to_media_time);
 
 	node_seek_command command;
 	command.media_time = to_media_time;
@@ -834,16 +836,26 @@ BMediaRoster::StartTimeSource(const media_node & node,
 							  bigtime_t at_real_time)
 {
 	CALLED();
+	if (IS_SYSTEM_TIMESOURCE(node)) {
+		// XXX debug this
+		//FATAL("BMediaRoster::StartTimeSource node %ld is system timesource\n", node.node);
+		return B_OK;
+	}
+	if (IS_SHADOW_TIMESOURCE(node)) {
+		// XXX debug this
+		FATAL("BMediaRoster::StartTimeSource node %ld is shadow timesource\n", node.node);
+		return B_OK;
+	}
 	if (IS_INVALID_NODE(node)) {
-		FATAL("BMediaRoster::StartTimeSource node invalid\n");
+		FATAL("BMediaRoster::StartTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 	if ((node.kind & B_TIME_SOURCE) == 0) {
-		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
+		FATAL("BMediaRoster::StartTimeSource node %ld is no timesource\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 
-	printf("BMediaRoster::StartTimeSource, node %ld, at real %Ld\n", node.node, at_real_time);
+	TRACE("BMediaRoster::StartTimeSource, node %ld, at real %Ld\n", node.node, at_real_time);
 		
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_START;
@@ -859,16 +871,26 @@ BMediaRoster::StopTimeSource(const media_node & node,
 							 bool immediate)
 {
 	CALLED();
+	if (IS_SYSTEM_TIMESOURCE(node)) {
+		// XXX debug this
+		//FATAL("BMediaRoster::StopTimeSource node %ld is system timesource\n", node.node);
+		return B_OK;
+	}
+	if (IS_SHADOW_TIMESOURCE(node)) {
+		// XXX debug this
+		FATAL("BMediaRoster::StopTimeSource node %ld is shadow timesource\n", node.node);
+		return B_OK;
+	}
 	if (IS_INVALID_NODE(node)) {
-		FATAL("BMediaRoster::StartTimeSource node invalid\n");
+		FATAL("BMediaRoster::StopTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 	if ((node.kind & B_TIME_SOURCE) == 0) {
-		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
+		FATAL("BMediaRoster::StopTimeSource node %ld is no timesource\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 
-	printf("BMediaRoster::StopTimeSource, node %ld, at real %Ld %s\n", node.node, at_real_time, immediate ? "NOW" : "");
+	TRACE("BMediaRoster::StopTimeSource, node %ld, at real %Ld %s\n", node.node, at_real_time, immediate ? "NOW" : "");
 		
 	BTimeSource::time_source_op_info msg;
 	msg.op = immediate ? BTimeSource::B_TIMESOURCE_STOP_IMMEDIATELY : BTimeSource::B_TIMESOURCE_STOP;
@@ -884,16 +906,28 @@ BMediaRoster::SeekTimeSource(const media_node & node,
 							 bigtime_t at_real_time)
 {
 	CALLED();
+	if (IS_SYSTEM_TIMESOURCE(node)) {
+		// XXX debug this
+		// FATAL("BMediaRoster::SeekTimeSource node %ld is system timesource\n", node.node);
+		// you can't seek the system time source, but
+		// returning B_ERROR would break StampTV
+		return B_OK;
+	}
+	if (IS_SHADOW_TIMESOURCE(node)) {
+		// XXX debug this
+		FATAL("BMediaRoster::SeekTimeSource node %ld is shadow timesource\n", node.node);
+		return B_OK;
+	}
 	if (IS_INVALID_NODE(node)) {
-		FATAL("BMediaRoster::StartTimeSource node invalid\n");
+		FATAL("BMediaRoster::SeekTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 	if ((node.kind & B_TIME_SOURCE) == 0) {
-		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
+		FATAL("BMediaRoster::SeekTimeSource node %ld is no timesource\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
 
-	printf("BMediaRoster::SeekTimeSource, node %ld, at real %Ld, to perf %Ld\n", node.node, at_real_time, to_performance_time);
+	TRACE("BMediaRoster::SeekTimeSource, node %ld, at real %Ld, to perf %Ld\n", node.node, at_real_time, to_performance_time);
 
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_SEEK;
@@ -910,7 +944,7 @@ BMediaRoster::SyncToNode(const media_node & node,
 						 bigtime_t timeout)
 {
 	UNIMPLEMENTED();
-	return B_ERROR;
+	return B_OK;
 }
 
 						 
@@ -957,8 +991,17 @@ BMediaRoster::SetProducerRunModeDelay(const media_node & node,
 									  bigtime_t delay,
 									  BMediaNode::run_mode mode)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+	if ((node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+		
+	producer_set_run_mode_delay_command command;
+	command.mode = mode;
+	command.delay = delay;
+
+	return SendToPort(node.port, PRODUCER_SET_RUN_MODE_DELAY, &command, sizeof(command));
 }
 
 
@@ -1513,10 +1556,11 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 status_t 
 BMediaRoster::UnregisterNode(BMediaNode * node)
 {
-	printf("BMediaRoster::UnregisterNode %p\n", node);
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
+
+	TRACE("BMediaRoster::UnregisterNode %ld (%p)\n", node->ID(), node);
 
 	if (node->fKinds & NODE_KIND_NO_REFCOUNTING) {
 		printf("BMediaRoster::UnregisterNode, trying to unregister reference counting disabled timesource, node %ld, port %ld, team %ld\n", node->ID(), node->ControlPort(), team);
@@ -1620,7 +1664,7 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 		return B_ERROR;
 	}
 
-	printf("#### BMediaRoster::SetTimeSourceFor: node %ld will be assigned time source %ld\n", node, time_source);
+	TRACE("BMediaRoster::SetTimeSourceFor: node %ld will be assigned time source %ld\n", node, time_source);
 	
 	// we just send the request to set time_source-id as timesource to the node,
 	// the NODE_SET_TIMESOURCE handler code will do the real assignment
@@ -1633,7 +1677,7 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 		result = B_ERROR;
 	}
 
-	// we release the colone
+	// we release the clone
 	rv = ReleaseNode(clone);
 	if (rv != B_OK) {
 		FATAL("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %ld\n", node);
@@ -1649,7 +1693,9 @@ BMediaRoster::GetParameterWebFor(const media_node & node,
 								 BParameterWeb ** out_web)
 {
 	UNIMPLEMENTED();
-	return B_ERROR;
+//	return B_ERROR;
+	*out_web = new BParameterWeb;
+	return B_OK;
 }
 
 								 
@@ -1758,7 +1804,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 	//				it will contain (while called in media_addon_server context) the team-id of
 	// 				the team that requested the instantiation.
 	
-	printf("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld\n", addonid, flavorid);
+	TRACE("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld\n", addonid, flavorid);
 
 	// Get flavor_info from the server
 	dormant_flavor_info node_info;
@@ -1846,7 +1892,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 
 	*out_node = node->Node();
 
-	printf("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld instanciated as node %ld, port %ld in team %ld\n", addonid, flavorid, out_node->node, out_node->port, team);
+	TRACE("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld instanciated as node %ld, port %ld in team %ld\n", addonid, flavorid, out_node->node, out_node->port, team);
 
 	return B_OK;
 }
@@ -2023,12 +2069,31 @@ BMediaRoster::GetDormantFlavorInfoFor(const dormant_node_info & in_dormant,
 	return MediaRosterEx(this)->GetDormantFlavorInfo(in_dormant.addon, in_dormant.flavor_id, out_flavor);
 }
 
+// Reports in outLatency the maximum latency found downstream from
+// the specified BBufferProducer, producer, given the current connections.
 status_t 
 BMediaRoster::GetLatencyFor(const media_node & producer,
 							bigtime_t * out_latency)
 {
-	UNIMPLEMENTED();
-	*out_latency = 2000;
+	CALLED();
+	if (out_latency == NULL)
+		return B_BAD_VALUE;
+	if (IS_INVALID_NODE(producer))
+		return B_MEDIA_BAD_NODE;
+	if ((producer.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	
+	producer_get_latency_request request;
+	producer_get_latency_reply reply;
+	status_t rv;
+
+	rv = QueryPort(producer.port, PRODUCER_GET_LATENCY, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*out_latency = reply.latency;
+	
+	printf("BMediaRoster::GetLatencyFor producer %ld has maximum latency %Ld\n", producer.node, *out_latency);
 	return B_OK;
 }
 
@@ -2039,7 +2104,7 @@ BMediaRoster::GetInitialLatencyFor(const media_node & producer,
 								   uint32 * out_flags /* = NULL */)
 {
 	UNIMPLEMENTED();
-	*out_latency = 1000;
+	*out_latency = 5000;
 	if (out_flags)
 		*out_flags = 0;
 	return B_OK;

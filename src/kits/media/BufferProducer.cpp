@@ -4,6 +4,7 @@
  *  DESCR: 
  ***********************************************************************/
 #include <BufferProducer.h>
+#include <BufferConsumer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
 #include "debug.h"
@@ -53,7 +54,8 @@ BBufferProducer::BBufferProducer(media_type producer_type) :
 	BMediaNode("called by BBufferProducer"),
 	fProducerType(producer_type),
 	fInitialLatency(0),
-	fInitialFlags(0)
+	fInitialFlags(0),
+	fDelay(0)
 {
 	CALLED();
 
@@ -77,13 +79,45 @@ BBufferProducer::VideoClippingChanged(const media_source &for_source,
 status_t
 BBufferProducer::GetLatency(bigtime_t *out_lantency)
 {
-	UNIMPLEMENTED();
-
-	// XXX The default implementation of GetLatency() finds the maximum
+	CALLED();
+	// The default implementation of GetLatency() finds the maximum
 	// latency of your currently-available outputs by iterating over 
 	// them, and returns that value in outLatency
-
-	return B_ERROR;
+	
+	int32 cookie;
+	bigtime_t latency;
+	media_output output;
+	media_node_id unused;
+	
+	*out_lantency = 0;
+	cookie = 0;
+	while (B_OK == GetNextOutput(&cookie, &output)) {
+		cookie++;
+		
+		if (output.destination == media_destination::null)
+			continue;
+		
+		if (output.node.node == fNodeID) { // avoid port writes (deadlock) if loopback connection
+			if (!fConsumerThis)
+				fConsumerThis = dynamic_cast<BBufferConsumer *>(this);
+			if (!fConsumerThis)
+				continue;
+			latency = 0;
+			if (B_OK == fConsumerThis->GetLatencyFor(output.destination, &latency, &unused)) {
+				if (latency > *out_lantency) {
+					*out_lantency = latency;
+				}
+			}
+		} else {
+			if (B_OK == FindLatencyFor(output.destination, &latency, &unused)) {
+				if (latency > *out_lantency) {
+					*out_lantency = latency;
+				}
+			}
+		}
+	}
+	printf("BBufferProducer::GetLatency: node %ld, name \"%s\" has max latency %Ld\n", fNodeID, fName, *out_lantency);
+	return B_OK;
 }
 
 
@@ -105,6 +139,15 @@ BBufferProducer::HandleMessage(int32 message,
 	INFO("BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	status_t rv;
 	switch (message) {
+		case PRODUCER_SET_RUN_MODE_DELAY:
+		{
+			const producer_set_run_mode_delay_command *command = static_cast<const producer_set_run_mode_delay_command *>(data);
+			// when changing this, also change NODE_SET_RUN_MODE
+			fDelay = command->delay;
+			fRunMode = command->mode;
+			SetRunMode(fRunMode);
+			return B_OK;
+		}
 
 		case PRODUCER_FORMAT_SUGGESTION_REQUESTED:
 		{
@@ -241,7 +284,6 @@ BBufferProducer::HandleMessage(int32 message,
 			return B_OK;
 		}
 
-
 		case PRODUCER_VIDEO_CLIPPING_CHANGED:
 		{
 			const producer_video_clipping_changed_command *command = static_cast<const producer_video_clipping_changed_command *>(data);
@@ -344,6 +386,7 @@ BBufferProducer::SendBuffer(BBuffer *buffer,
 	command.header = *(buffer->Header());
 	command.header.buffer = command.buffer; // buffer->ID();
 	command.header.destination = destination.id;
+	command.header.start_time += fDelay; // time compensation as set by BMediaRoster::SetProducerRunModeDelay()
 
 	return SendToPort(destination.port, CONSUMER_BUFFER_RECEIVED, &command, sizeof(command));
 }

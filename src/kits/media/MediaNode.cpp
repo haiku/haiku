@@ -570,6 +570,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_SET_RUN_MODE:
 		{
 			const node_set_run_mode_command *command = static_cast<const node_set_run_mode_command *>(data);
+			// when changing this, also change PRODUCER_SET_RUN_MODE_DELAY
 			fRunMode = command->mode;
 			SetRunMode(fRunMode);
 			return B_OK;
@@ -595,7 +596,7 @@ BMediaNode::HandleMessage(int32 message,
 			BTimeSource *newsource;
 			media_node clone;
 			status_t rv;
-			printf("NODE_SET_TIMESOURCE, node %ld, timesource %ld\n", fNodeID, command->timesource_id);
+			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld\n", fNodeID, command->timesource_id);
 			roster = BMediaRoster::Roster();
 			
 			// Time sources are not reference counted. But since
@@ -632,7 +633,7 @@ BMediaNode::HandleMessage(int32 message,
 				// we add this node to the time source controll
 				fTimeSource->AddMe(this);
 			}
-			printf("#### BMediaNode::HandleMessage NODE_SET_TIMESOURCE: node %ld has been assigned time source %ld\n", ID(), fTimeSource->ID());
+			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE: node %ld has been assigned time source %ld\n", ID(), fTimeSource->ID());
 			
 			//roster->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
 			return B_OK;
@@ -910,5 +911,3 @@ BMediaNode::NewChangeTag()
 	// BBufferConsumer::SetVideoClippingFor()
 	return atomic_add(&BMediaNode::_m_changeTag,1);
 }
-
-

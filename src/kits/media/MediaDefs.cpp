@@ -359,13 +359,16 @@ bool operator==(const media_format & a, const media_format & b)
 bool format_is_compatible(const media_format & a, const media_format & b)	/* a is the format you want to feed to something accepting b */
 {
 	UNIMPLEMENTED();
-	return true;
+	if (a.type == b.type)
+		return true;
+	return false;
 }
 
 bool string_for_format(const media_format & f, char * buf, size_t size)
 {
 	UNIMPLEMENTED();
-	return false;
+	strcpy(buf, "No string_for_format string!");
+	return true;
 }
 
 /*************************************************************
