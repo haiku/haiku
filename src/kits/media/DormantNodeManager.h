@@ -1,4 +1,4 @@
-
+/*
 class DormantNodeManager
 	InstantiateDormantNode(const dormant_node_info & in_info, bool global,
 									 media_node * out_node)
@@ -6,3 +6,4 @@ class DormantNodeManager
 									 
 									 
 extern DormantNodeManager *_DormantNodeManager;									 
+*/
