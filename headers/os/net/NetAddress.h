@@ -42,7 +42,7 @@ class BNetAddress : public BArchivable
 {
 public:
     BNetAddress( BMessage* archive );
-    virtual ~BNetAddress( void );
+    virtual ~BNetAddress();
 
     virtual  status_t Archive( BMessage* into, bool deep = true ) const;
     static   BArchivable* Instantiate( BMessage* archive );
@@ -56,7 +56,7 @@ public:
 
     BNetAddress& operator=( const BNetAddress& );
 
-    status_t InitCheck( void );
+    status_t InitCheck();
 
     status_t SetTo( const char* hostname, const char* protocol, const char* service );
     status_t SetTo( const char* hostname = NULL, unsigned short port = 0 );
@@ -68,32 +68,34 @@ public:
     status_t GetAddr( struct sockaddr_in& sa ) const;
     status_t GetAddr( in_addr& addr, unsigned short* port = NULL ) const;
 
-    inline NLAddress *GetImpl( void ) const;
+    inline NLAddress *GetImpl() const;
 
 protected:
-// Attributes.
-    status_t fInitialized;
+    status_t m_init;
 
-    // Class-specific attributes.  Basically re-encapsulate the saddr_in
-    // struct (the POSiX version, hopefully).  We can be inheritance-friendly
-    // here and still not break binary compatibility with R5.
+private:
+    virtual void _ReservedBNetAddressFBCCruft1();
+    virtual void _ReservedBNetAddressFBCCruft2();
+    virtual void _ReservedBNetAddressFBCCruft3();
+    virtual void _ReservedBNetAddressFBCCruft4();
+    virtual void _ReservedBNetAddressFBCCruft5();
+    virtual void _ReservedBNetAddressFBCCruft6();
+
+// Private copy helper.
+    status_t clone( const BNetAddress& RefParam );
+
     int32    fFamily;   // Encapsulation of sockaddr::sin_family
     int32    fPort;     // Encapsulation of sockaddr::sin_port
     int32    fAddress;  // Encapsulation of sockaddr::sin_addr.s_addr
     
-private:
-// Private copy helper.
-    status_t clone( const BNetAddress& RefParam );
-
 // Not used, here to maintain R5 binary compatiblilty.
     int32   fPrivateData[6];
 };
 
 
-// WARNING: This method, as it stands, breaks R5 compatibility  *STM*.
 inline NLAddress* BNetAddress::GetImpl( void ) const
 {
-    return NULL; // Cheeky, yes; but no Nettle stuff is allowed...
+    return NULL;
 }
 
 #endif // <-- #ifndef _NETADDRESS_H

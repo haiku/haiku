@@ -91,29 +91,38 @@ public:
 
 protected:
 // Attributes.
-    status_t        fInitialized;
+    status_t        m_init;
+    
+private:
+    virtual void _ReservedBNetBufferFBCCruft1();
+    virtual void _ReservedBNetBufferFBCCruft2();
+    virtual void _ReservedBNetBufferFBCCruft3();
+    virtual void _ReservedBNetBufferFBCCruft4();
+    virtual void _ReservedBNetBufferFBCCruft5();
+    virtual void _ReservedBNetBufferFBCCruft6();
+
     unsigned char*  fData;
     int32           fDataSize;
     int32           fStackSize;
     int32           fCapacity;
-    
-private:
+
+// Not used, here to maintain R5 binary compatiblilty.
+    int32   fPrivateData[5];
+
 // Private class helpers.
     status_t clone( const BNetBuffer& );
     status_t dpop( int32, int32, void* );
     status_t dpush( int32, int32, const void* );
     status_t resize( int32 NewSize, bool RegenStack = false );
-
-// Not used, here to maintain R5 binary compatiblilty.
-    int32   fPrivateData[5];
 };
 
 
-// WARNING: This method, as it stands, breaks R5 compatibility  *STM*.
 inline NLPacket* BNetBuffer::GetImpl( void ) const
 {
-    return NULL; // Cheeky, yes; but no Nettle stuff is allowed...
+    return NULL;
 }
 
 #endif // <-- #ifndef _NETBUFFER_H
+
+/*=------------------------------------------------------------------- End -=*/
 
