@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kernel core fs ;
 
 UsePublicHeaders storage ;
+UsePublicHeaders app ;
 
 KernelMergeObject kernel_fs.o : 
 	<$(SOURCE_GRIST)>bootfs.c
@@ -8,6 +9,8 @@ KernelMergeObject kernel_fs.o :
 	<$(SOURCE_GRIST)>rootfs.c
 	<$(SOURCE_GRIST)>vfs.c
 	<$(SOURCE_GRIST)>vfs_select.c
+	<$(SOURCE_GRIST)>message.c
+	<$(SOURCE_GRIST)>node_monitor.c
 	:
 	-fno-pic -Wno-unused -D_KERNEL_MODE
 	;

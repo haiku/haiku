@@ -13,7 +13,9 @@
 #include <Errors.h>
 #include <kerrors.h>
 #include <sys/stat.h>
+
 #include <KernelExport.h>
+#include <NodeMonitor.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -24,9 +26,9 @@
 #define ROOTFS_TRACE 0
 
 #if ROOTFS_TRACE
-#define TRACE(x) dprintf x
+#	define TRACE(x) dprintf x
 #else
-#define TRACE(x)
+#	define TRACE(x)
 #endif
 
 typedef enum {
@@ -251,6 +253,7 @@ rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, boo
 		goto err;
 
 	rootfs_remove_from_dir(dir, vnode);
+	notify_listener(B_ENTRY_REMOVED, fs->id, dir->id, 0, vnode->id, name);
 
 	// schedule this vnode to be removed when it's ref goes to zero
 	vfs_remove_vnode(fs->id, vnode->id);
@@ -554,7 +557,7 @@ rootfs_seek(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, int st)
 
 
 static status_t
-rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vnode_id *_newID)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
@@ -593,7 +596,9 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	vnode->stream.dir.dir_head = NULL;
 	vnode->stream.dir.jar_head = NULL;
 
-	mutex_unlock(&fs->lock);
+	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
+
+	mutex_unlock(&fs->lock);	
 	return 0;
 
 err1:
@@ -795,6 +800,8 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	}
 	vnode->stream.symlink.length = strlen(path);
 
+	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
+
 	mutex_unlock(&fs->lock);
 	return 0;
 
@@ -894,11 +901,13 @@ err:
 static status_t
 rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 {
+	struct rootfs *fs = _fs;
 	struct rootfs_vnode *vnode = _v;
 
 	TRACE(("rootfs_rstat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
 
 	// stream exists, but we know to return size 0, since we can only hold directories
+	stat->st_dev = fs->id;
 	stat->st_ino = vnode->id;
 	stat->st_size = 0;
 	stat->st_mode = vnode->stream.type | DEFFILEMODE;
