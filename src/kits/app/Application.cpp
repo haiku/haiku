@@ -759,7 +759,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			link->SetOpCode(AS_CREATE_APP);
 			link->Attach((int32)fServerTo);
 			link->Attach(_get_object_token_(this));
-			link->Attach((char*)signature,strlen(signature));
+			link->Attach((char*)signature,strlen(signature)+1);
 			status_t replyerr=link->FlushWithReply(&replydata);
 			if(replyerr==B_OK)
 			{
