@@ -81,6 +81,7 @@ public:
 
 	// manager must be locked
 	status_t AddJobQueue(KDiskDeviceJobQueue *jobQueue);
+		// the device must be write locked
 	status_t RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
 	status_t DeleteJobQueue(KDiskDeviceJobQueue *jobQueue);
 		// called when the execution is done
@@ -88,6 +89,11 @@ public:
 	KDiskDeviceJobQueue *NextJobQueue(int32 *cookie);
 
 	KDiskDeviceJobFactory *JobFactory() const;
+
+	// manager must *not* be locked
+	status_t UpdateBusyPartitions(KDiskDevice *device);
+	status_t UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
+							 bool updateBusyPartitions);
 
 	// Disk Systems
 
@@ -118,8 +124,13 @@ private:
 
 	bool _RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
 
+	status_t _UpdateBusyPartitions(KDiskDevice *device);
+	status_t _UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
+							  bool updateBusyPartitions);
+
 	status_t _Scan(const char *path);
 	status_t _ScanPartition(KPartition *partition);
+		// the manager must be locked and the device write locked
 
 	struct DeviceMap;
 	struct DiskSystemMap;

@@ -22,6 +22,8 @@
 #include "KFileSystem.h"
 #include "KPartition.h"
 #include "KPartitioningSystem.h"
+#include "KPartitionVisitor.h"
+#include "KShadowPartition.h"
 
 // debugging
 //#define DBG(x)
@@ -35,6 +37,15 @@ using BPrivate::DiskDevice::KDiskDeviceJobQueue;
 // directories for partitioning and file system modules
 static const char *kPartitioningSystemPrefix	= "partitioning_systems";
 static const char *kFileSystemPrefix			= "file_systems";
+
+// is_active_job_status
+static
+bool
+is_active_job_status(uint32 status)
+{
+	return (status == B_DISK_DEVICE_JOB_SCHEDULED
+			|| status == B_DISK_DEVICE_JOB_IN_PROGRESS);
+}
 
 // GetPartitionID
 struct GetPartitionID {
@@ -494,6 +505,11 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath)
 			return B_NO_MEMORY;
 		// initialize and add the device
 		error = device->SetTo(filePath);
+		// Note: Here we are allowed to lock a device although already having
+		// the manager locked, since it is not yet added to the manager.
+		DeviceWriteLocker deviceLocker(device);
+		if (error == B_OK && !deviceLocker.IsLocked())
+			error = B_ERROR;
 		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
 		// scan device
@@ -650,11 +666,20 @@ KDiskDeviceManager::AddJobQueue(KDiskDeviceJobQueue *jobQueue)
 			return error;
 		}
 	}
-	// TODO: mark the concerned partitions busy /descendant busy
-	// start its execution
+	// mark the jobs scheduled
+	for (int32 i = 0; KDiskDeviceJob *job = jobQueue->JobAt(i); i++)
+		_UpdateJobStatus(job, B_DISK_DEVICE_JOB_SCHEDULED, false);
+	_UpdateBusyPartitions(jobQueue->Device());
+	// start the execution of the queue
 	error = jobQueue->Execute();
-	if (error != B_OK)
+	if (error != B_OK) {
+		// resuming the execution failed -- mark all jobs failed and 
+		// remove the queue
+		for (int32 i = 0; KDiskDeviceJob *job = jobQueue->JobAt(i); i++)
+			_UpdateJobStatus(job, B_DISK_DEVICE_JOB_FAILED, false);
 		_RemoveJobQueue(jobQueue);
+		_UpdateBusyPartitions(jobQueue->Device());
+	}
 	return error;
 }
 
@@ -702,6 +727,39 @@ KDiskDeviceJobFactory *
 KDiskDeviceManager::JobFactory() const
 {
 	return fJobFactory;
+}
+
+// UpdateBusyPartitions
+status_t
+KDiskDeviceManager::UpdateBusyPartitions(KDiskDevice *device)
+{
+	if (!device)
+		return B_BAD_VALUE;
+	if (DeviceWriteLocker deviceLocker = device) {
+		if (ManagerLocker locker = this)
+			return _UpdateBusyPartitions(device);
+	}
+	return B_ERROR;
+}
+
+// UpdateJobStatus
+status_t
+KDiskDeviceManager::UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
+									bool updateBusyPartitions)
+{
+	// check parameters
+	if (!job)
+		return B_BAD_VALUE;
+	KDiskDeviceJobQueue *jobQueue = job->JobQueue();
+	KDiskDevice *device = (jobQueue ? jobQueue->Device() : NULL);
+	if (!device)
+		return B_BAD_VALUE;
+	// lock device and manager
+	if (DeviceWriteLocker deviceLocker = device) {
+		if (ManagerLocker locker = this)
+			return _UpdateJobStatus(job, status, updateBusyPartitions);
+	}
+	return B_ERROR;
 }
 
 // FindDiskSystem
@@ -801,13 +859,20 @@ KDiskDeviceManager::InitialDeviceScan()
 		error = _Scan("/dev/disk");
 		if (error != B_OK)
 			return error;
-		// scan the devices for partitions
-		int32 cookie = 0;
-		while (KDiskDevice *device = NextDevice(&cookie)) {
-			error = _ScanPartition(device);
-			if (error != B_OK)
-				break;
-		}
+	}
+	// scan the devices for partitions
+	int32 cookie = 0;
+	while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
+		PartitionRegistrar _(device, true);
+		if (DeviceWriteLocker deviceLocker = device) {
+			if (ManagerLocker locker = this) {
+				error = _ScanPartition(device);
+				if (error != B_OK)
+					break;
+			} else
+				return B_ERROR;
+		} else
+			return B_ERROR;
 	}
 	return error;
 }
@@ -891,6 +956,88 @@ KDiskDeviceManager::_RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
 		fJobs->Remove(job->ID());
 	}
 	return true;
+}
+
+// _UpdateBusyPartitions
+status_t
+KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
+{
+	if (!device)
+		return B_BAD_VALUE;
+	// mark all partitions un-busy
+	struct UnmarkBusyVisitor : KPartitionVisitor {
+		virtual bool VisitPre(KPartition *partition)
+		{
+			partition->ClearFlags(B_PARTITION_BUSY
+								  | B_PARTITION_DESCENDANT_BUSY);
+			return false;
+		}
+	} visitor;
+	device->VisitEachDescendant(&visitor);
+	if (device->ShadowPartition())
+		device->ShadowPartition()->VisitEachDescendant(&visitor);
+	// Iterate through all job queues and all jobs scheduled or in
+	// progress and mark their scope busy.
+	for (int32 cookie = 0;
+		 KDiskDeviceJobQueue *jobQueue = NextJobQueue(&cookie); ) {
+		if (jobQueue->Device() != device)
+			continue;
+		for (int32 i = jobQueue->ActiveJobIndex();
+			 KDiskDeviceJob *job = jobQueue->JobAt(i); i++) {
+			if (job->Status() != B_DISK_DEVICE_JOB_IN_PROGRESS
+				&& job->Status() == B_DISK_DEVICE_JOB_SCHEDULED) {
+				continue;
+			}
+			KPartition *partition = FindPartition(job->ScopeID());
+			if (!partition || partition->Device() != device)
+				continue;
+			partition->AddFlags(B_PARTITION_BUSY);
+			if (KPartition *shadow = partition->ShadowPartition())
+				shadow->AddFlags(B_PARTITION_BUSY);
+		}
+	}
+	// mark all anscestors of busy partitions descendant busy
+	struct MarkBusyVisitor : KPartitionVisitor {
+		virtual bool VisitPost(KPartition *partition)
+		{
+			if ((partition->IsBusy() || partition->IsDescendantBusy())
+				&& partition->Parent()) {
+				partition->Parent()->AddFlags(
+					B_PARTITION_DESCENDANT_BUSY);
+			}
+			return false;
+		}
+	} visitor2;
+	device->VisitEachDescendant(&visitor2);
+	if (device->ShadowPartition())
+		device->ShadowPartition()->VisitEachDescendant(&visitor2);
+	return B_OK;
+}
+
+// _UpdateJobStatus
+status_t
+KDiskDeviceManager::_UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
+									 bool updateBusyPartitions)
+{
+	// check parameters
+	if (!job)
+		return B_BAD_VALUE;
+	KDiskDeviceJobQueue *jobQueue = job->JobQueue();
+	KDiskDevice *device = (jobQueue ? jobQueue->Device() : NULL);
+	if (!device)
+		return B_BAD_VALUE;
+	if (job->Status() == status)
+		return B_OK;
+	// check migration of a schedule/in progress to a terminal state
+	// or vice versa
+	updateBusyPartitions &= (is_active_job_status(job->Status())
+							 != is_active_job_status(status));
+	// set new state and update the partitions' busy flags
+	job->SetStatus(status);
+	if (updateBusyPartitions)
+		return _UpdateBusyPartitions(device);
+	// TODO: notifications
+	return B_OK;
 }
 
 // _Scan

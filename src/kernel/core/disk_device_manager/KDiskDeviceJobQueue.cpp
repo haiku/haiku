@@ -187,9 +187,8 @@ KDiskDeviceJobQueue::Execute()
 		fSyncSemaphore = -1;
 		return fThread;
 	}
+	fFlags |= JOB_QUEUE_EXECUTING;
 	resume_thread(fThread);
-	// wait till the thread has resumed its work
-	acquire_sem(fSyncSemaphore);
 	return B_OK;
 }
 
@@ -301,45 +300,45 @@ KDiskDeviceJobQueue::IsPauseRequested() const
 int32
 KDiskDeviceJobQueue::_ThreadLoop()
 {
-// TODO: notifications
-	// mark all jobs scheduled
-	for (int32 i = 0; KDiskDeviceJob *job = JobAt(i); i++)
-		job->SetStatus(B_DISK_DEVICE_JOB_SCHEDULED);
-	// mark the queue executing and notify the thread waiting in Execute()
-	fFlags |= JOB_QUEUE_EXECUTING;
-	release_sem(fSyncSemaphore);
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// main loop: process all jobs
+	bool failed = false;
 	while (KDiskDeviceJob *activeJob = ActiveJob()) {
-		activeJob->SetStatus(B_DISK_DEVICE_JOB_IN_PROGRESS);
+		manager->UpdateJobStatus(activeJob, B_DISK_DEVICE_JOB_IN_PROGRESS,
+								 true);
 		status_t error = activeJob->Do();
 		if (error == B_OK) {
 			if (ManagerLocker locker = manager) {
-				// if canceled, mark this and all succeeding jobs canceled
-				if (IsCanceled()) {
-					for (int32 i = fActiveJob; KDiskDeviceJob *job = JobAt(i);
-						 i++) {
-						job->SetStatus(B_DISK_DEVICE_JOB_CANCELED);
-					}
+				// if canceled, simply bail out -- this and all succeeding
+				// jobs will be canceled
+				if (IsCanceled())
 					break;
-				}
 				// if pause was requested ignore the request
 				if (IsPauseRequested())
 					Continue();
-				// mark the job succeeded and go to the next one
-				activeJob->SetStatus(B_DISK_DEVICE_JOB_SUCCEEDED);
+				// go to the next job
 				fActiveJob++;
 			} else
 				break;
+			// mark the job succeeded
+			manager->UpdateJobStatus(activeJob, B_DISK_DEVICE_JOB_SUCCEEDED,
+									 true);
 		} else {
-			// job failed: mark this and all succeeding jobs failed
-			if (ManagerLocker locker = manager) {
-				for (int32 i = fActiveJob; KDiskDeviceJob *job = JobAt(i); i++)
-					job->SetStatus(B_DISK_DEVICE_JOB_FAILED);
-			}
+			// job failed: this and all succeeding jobs will be marked failed
+			failed = true;
 			break;
 		}
 	}
+	// All jobs that remain need to be marked failed or canceled.
+	bool updatePartitions = false;
+	for (int32 i = fActiveJob; KDiskDeviceJob *job = JobAt(i); i++) {
+		manager->UpdateJobStatus(job, (failed ? B_DISK_DEVICE_JOB_FAILED
+											  : B_DISK_DEVICE_JOB_CANCELED),
+								 false);
+		updatePartitions = true;
+	}
+	if (updatePartitions)
+		manager->UpdateBusyPartitions(Device());
 	// tell the manager, that we are done.
 	if (ManagerLocker locker = manager) {
 		fFlags &= ~(uint32)JOB_QUEUE_EXECUTING;
