@@ -10,6 +10,13 @@
 #include <KDiskDeviceUtils.h>
 #include <KFileDiskDevice.h>
 
+#include "virtualdrive.h"
+
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
+
 static const char *kFileDevicesDir = "/dev/disk/virtual/files";
 
 // constructor
@@ -58,9 +65,6 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 	char tmpDevicePath[B_PATH_NAME_LENGTH];
 	if (!devicePath) {
 		// no device path: we shall create a new device entry
-		// create the device entry
-		// TODO: Now we simply create a link. Replace that with the
-		// respective kernel magic!
 		// make the file devices dir
 		if (mkdir(kFileDevicesDir, 0777) != 0) {
 			if (errno != B_FILE_EXISTS)
@@ -73,8 +77,10 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 		// get the device path name
 		sprintf(tmpDevicePath, "%s/%ld/raw", kFileDevicesDir, ID());
 		devicePath = tmpDevicePath;
-		if (symlink(filePath, devicePath) != 0)
-			return errno;
+		// register the file as virtual drive
+		status_t error = _RegisterDevice(filePath, devicePath);
+		if (error != B_OK)
+			return error;
 	}
 	status_t error = set_string(fFilePath, filePath);
 	if (error != B_OK)
@@ -86,6 +92,14 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 void
 KFileDiskDevice::Unset()
 {
+	// remove the device and the directory it resides in
+	if (Path() && ID() >= 0) {
+		_UnregisterDevice(Path());
+		char dirPath[B_PATH_NAME_LENGTH];
+		sprintf(dirPath, "%s/%ld", kFileDevicesDir, ID());
+		rmdir(dirPath);
+	}
+	// free file path
 	free(fFilePath);
 	fFilePath = NULL;
 }
@@ -112,41 +126,76 @@ KFileDiskDevice::CreateShadowPartition()
 	return NULL;
 }
 
-// GetMediaStatus
+// _RegisterDevice
 status_t
-KFileDiskDevice::GetMediaStatus(status_t *mediaStatus)
+KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 {
-	*mediaStatus = B_OK;
-	return B_OK;
+	// TODO: For now we use the virtualdrive driver to register a file
+	// as a device and then simply symlink the assigned device to the
+	// desired device location. Replace that with the
+	// respective kernel magic for the OBOS kernel!
+
+	// open the virtualdrive control device
+	int fd = open(VIRTUAL_DRIVE_CONTROL_DEVICE, O_RDONLY);
+	if (fd < 0) {
+		DBG(OUT("Failed to open virtualdrive control device: %s\n",
+				strerror(errno)));
+		return errno;
+	}
+	// set up the info
+	virtual_drive_info info;
+	strcpy(info.file_name, file);
+	info.use_geometry = false;
+	status_t error = B_OK;
+	if (ioctl(fd, VIRTUAL_DRIVE_REGISTER_FILE, &info) != 0) {
+		error = errno;
+		DBG(OUT("Failed to install file device: %s\n", strerror(error)));
+	}
+	// close the control device
+	close(fd);
+	// create a symlink
+	if (error == B_OK) {
+		if (symlink(info.device_name, device) != 0) {
+			DBG(OUT("Failed to create file device symlink: %s\n",
+					strerror(error)));
+			error = errno;
+			// unregister the file device
+			// open the device
+			int deviceFD = open(info.device_name, O_RDONLY);
+			if (deviceFD >= 0) {
+				ioctl(deviceFD, VIRTUAL_DRIVE_UNREGISTER_FILE);
+				close(deviceFD);
+			}
+		}
+	}
+	return error;
 }
 
-// GetGeometry
+// _UnregisterDevice
 status_t
-KFileDiskDevice::GetGeometry(device_geometry *geometry)
+KFileDiskDevice::_UnregisterDevice(const char *_device)
 {
-	// get the file size
-	struct stat st;
-	if (stat(fFilePath, &st) != 0)
+	// read the symlink to get the path of the virtualdrive device
+	char device[B_PATH_NAME_LENGTH];
+	ssize_t bytesRead = readlink(_device, device, sizeof(device) - 1);
+	if (bytesRead < 0)
 		return errno;
-	// default to 512 bytes block size
-	off_t size = st.st_size;
-	uint32 blockSize = 512;
-	// Optimally we have only 1 block per sector and only one head.
-	// Since we have only a uint32 for the cylinder count, this won't work
-	// for files > 2TB. So, we set the head count to the minimally possible
-	// value.
-	off_t blocks = size / blockSize;
-	uint32 heads = (blocks + ULONG_MAX - 1) / ULONG_MAX;
-	if (heads == 0)
-		heads = 1;
-	geometry->bytes_per_sector = blockSize;
-    geometry->sectors_per_track = 1;
-    geometry->cylinder_count = blocks / heads;
-    geometry->head_count = heads;
-    geometry->device_type = B_DISK;	// TODO: Add a new constant.
-    geometry->removable = false;
-    geometry->read_only = false;
-    geometry->write_once = false;
-	return B_OK;
+	device[bytesRead] = '\0';
+	// open the device
+	int fd = open(device, O_RDONLY);
+	if (fd < 0)
+		return errno;
+	// issue the ioctl
+	status_t error = B_OK;
+	if (ioctl(fd, VIRTUAL_DRIVE_UNREGISTER_FILE) != 0)
+		error = errno;
+	// close the control device
+	close(fd);
+	// remove the symlink
+	if (error == B_OK) {
+		if (remove(_device) < 0)
+			error = errno;
+	}
+	return error;
 }
 

@@ -53,7 +53,7 @@ public:
 	KFileDiskDevice *RegisterFileDevice(const char *filePath,
 										bool noShadow = true);
 
-	status_t CreateFileDevice(const char *filePath, int32 *device = 0);
+	status_t CreateFileDevice(const char *filePath, partition_id *device = 0);
 	status_t DeleteFileDevice(const char *filePath);
 
 	// manager must be locked
@@ -62,6 +62,7 @@ public:
 
 	bool PartitionAdded(KPartition *partition);		// implementation internal
 	bool PartitionRemoved(KPartition *partition);	//
+	bool DeletePartition(KPartition *partition);	//
 
 	// Jobs
 
@@ -106,9 +107,10 @@ private:
 	status_t _ScanPartition(KPartition *partition);
 
 	BLocker						fLock;
-	List<KDiskDevice*>			fDevices;		// TODO: Optimize!
-	List<KPartition*>			fPartitions;	//
-	List<KDiskSystem*>			fDiskSystems;	//
+	List<KDiskDevice*>			fDevices;				// TODO: Optimize!
+	List<KPartition*>			fPartitions;			//
+	List<KDiskSystem*>			fDiskSystems;			//
+	List<KPartition*>			fObsoletePartitions;	//
 
 	static KDiskDeviceManager	*fDefaultManager;
 };

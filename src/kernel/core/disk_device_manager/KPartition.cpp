@@ -10,11 +10,6 @@
 #include <Drivers.h>
 #include <Errors.h>
 
-// debugging
-//#define DBG(x)
-#define DBG(x) x
-#define OUT printf
-
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
@@ -24,14 +19,19 @@
 using namespace std;
 
 // constructor
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
+
 KPartition::KPartition(partition_id id)
 	: fPartitionData(),
 	  fChildren(),
 	  fDevice(NULL),
 	  fParent(NULL),
 	  fDiskSystem(NULL),
-	  fParentDiskSystem(NULL),
-	  fReferenceCount(0)
+	  fReferenceCount(0),
+	  fObsolete(false)
 {
 	fPartitionData.id = (id >= 0 ? id : _NextID());
 	fPartitionData.offset = 0;
@@ -55,6 +55,7 @@ KPartition::KPartition(partition_id id)
 // destructor
 KPartition::~KPartition()
 {
+	SetDiskSystem(NULL);
 	free(fPartitionData.name);
 	free(fPartitionData.content_name);
 	free(fPartitionData.type);
@@ -74,8 +75,13 @@ KPartition::Register()
 void
 KPartition::Unregister()
 {
-	ManagerLocker locker(KDiskDeviceManager::Default());
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	ManagerLocker locker(manager);
 	fReferenceCount--;
+	if (IsObsolete() && fReferenceCount == 0) {
+		// let the manager delete object
+		manager->DeletePartition(this);
+	}
 }
 
 // CountReferences
@@ -83,6 +89,36 @@ int32
 KPartition::CountReferences() const
 {
 	return fReferenceCount;
+}
+
+// MarkObsolete
+void
+KPartition::MarkObsolete()
+{
+	fObsolete = true;
+}
+
+// IsObsolete
+bool
+KPartition::IsObsolete() const
+{
+	return fObsolete;
+}
+
+// PrepareForRemoval
+bool
+KPartition::PrepareForRemoval()
+{
+	bool result = RemoveAllChildren();
+	UnpublishDevice();
+	return result;
+}
+
+// PrepareForDeletion
+bool
+KPartition::PrepareForDeletion()
+{
+	return true;
 }
 
 // Open
@@ -566,26 +602,51 @@ KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
 }
 
 // RemoveChild
-KPartition *
+bool
 KPartition::RemoveChild(int32 index)
 {
-	KPartition *partition = NULL;
-	if (index >= 0 && index < fPartitionData.child_count) {
-		KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-		if (ManagerLocker locker = manager) {
-			partition = fChildren.ItemAt(index);
-			if (!partition || !manager->PartitionRemoved(partition))
-				return NULL;
-			if (fChildren.RemoveItem(index)) {
-				_UpdateChildIndices(index + 1);
-				partition->SetIndex(-1);
-				fPartitionData.child_count--;
-				partition->SetParent(NULL);
-				partition->SetDevice(NULL);
-			}
+	if (index < 0 || index >= fPartitionData.child_count)
+		return false;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		KPartition *partition = fChildren.ItemAt(index);
+		PartitionRegistrar _(partition);
+		if (!partition || !manager->PartitionRemoved(partition)
+			|| !fChildren.RemoveItem(index)) {
+			return false;
 		}
+		_UpdateChildIndices(index + 1);
+		partition->SetIndex(-1);
+		fPartitionData.child_count--;
+		partition->SetParent(NULL);
+		partition->SetDevice(NULL);
+		return true;
 	}
-	return partition;
+	return false;
+}
+
+// RemoveChild
+bool
+KPartition::RemoveChild(KPartition *child)
+{
+	if (child) {
+		int32 index = fChildren.IndexOf(child);
+		if (index >= 0)
+			return RemoveChild(index);
+	}
+	return false;
+}
+
+// RemoveAllChildren
+bool
+KPartition::RemoveAllChildren()
+{
+	int32 count = CountChildren();
+	for (int32 i = count - 1; i >= 0; i--) {
+		if (!RemoveChild(i))
+			return false;
+	}
+	return true;
 }
 
 // ChildAt
@@ -655,26 +716,11 @@ KPartition::DiskSystem() const
 	return fDiskSystem;
 }
 
-// SetParentDiskSystem
-void
-KPartition::SetParentDiskSystem(KDiskSystem *diskSystem)
-{
-	// unload former disk system
-	if (fParentDiskSystem) {
-		fParentDiskSystem->Unload();
-		fParentDiskSystem = NULL;
-	}
-	// set and load new one
-	fParentDiskSystem = diskSystem;
-	if (fParentDiskSystem)
-		fParentDiskSystem->Load();
-}
-
 // ParentDiskSystem
 KDiskSystem *
 KPartition::ParentDiskSystem() const
 {
-	return fParentDiskSystem;
+	return (Parent() ? Parent()->DiskSystem() : NULL);
 }
 
 // SetCookie

@@ -35,7 +35,8 @@ KDiskDeviceManager::KDiskDeviceManager()
 	: fLock("disk device manager"),
 	  fDevices(20),
 	  fPartitions(100),
-	  fDiskSystems(20)
+	  fDiskSystems(20),
+	  fObsoletePartitions(20)
 {
 	// add partitioning systems
 	if (void *list = open_module_list(kPartitioningSystemPrefix)) {
@@ -66,9 +67,35 @@ DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 // destructor
 KDiskDeviceManager::~KDiskDeviceManager()
 {
-	// unpublish all partitions (only needed for testing)
-	for (int32 i = 0; KPartition *partition = fPartitions.ItemAt(i); i++)
-		partition->UnpublishDevice();
+	// remove all devices
+	int32 count = CountDevices();
+	for (int32 i = count - 1; i >= 0; i--) {
+		if (KDiskDevice *device = DeviceAt(i)) {
+			PartitionRegistrar _(device);
+			_RemoveDevice(device);
+		}
+	}
+	// some sanity checks
+	if (fPartitions.CountItems() > 0) {
+		DBG(OUT("WARNING: There are still %ld unremoved partitions!\n",
+				fPartitions.CountItems()));
+	}
+	if (fObsoletePartitions.CountItems() > 0) {
+		DBG(OUT("WARNING: There are still %ld obsolete partitions!\n",
+				fObsoletePartitions.CountItems()));
+	}
+	// remove all disk systems
+	count = CountDiskSystems();
+	for (int32 i = count - 1; i >= 0; i--) {
+		if (KDiskSystem *diskSystem = DiskSystemAt(i)) {
+			fDiskSystems.RemoveItem(i);
+			if (diskSystem->IsLoaded()) {
+				DBG(OUT("WARNING: Disk system `%s' (%ld) is still loaded!\n",
+						diskSystem->Name(), diskSystem->ID()));
+			} else
+				delete diskSystem;
+		}
+	}
 }
 
 // InitCheck
@@ -280,7 +307,8 @@ KDiskDeviceManager::RegisterFileDevice(const char *filePath, bool noShadow)
 
 // CreateFileDevice
 status_t
-KDiskDeviceManager::CreateFileDevice(const char *filePath, int32 *deviceID)
+KDiskDeviceManager::CreateFileDevice(const char *filePath,
+									 partition_id *deviceID)
 {
 	if (!filePath)
 		return B_BAD_VALUE;
@@ -296,7 +324,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath, int32 *deviceID)
 			return B_NO_MEMORY;
 		// initialize and add the device
 		error = device->SetTo(filePath);
-		if (error == B_OK && !fDevices.AddItem(device))
+		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
 		// set result / cleanup und failure
 		if (error != B_OK) {
@@ -319,7 +347,13 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath, int32 *deviceID)
 status_t
 KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 {
-	// not implemented
+	if (KFileDiskDevice *device = RegisterFileDevice(filePath)) {
+		PartitionRegistrar _(device, true);
+		if (DeviceWriteLocker locker = device) {
+			if (_RemoveDevice(device))
+				return B_OK;
+		}
+	}
 	return B_ERROR;
 }
 
@@ -352,7 +386,29 @@ KDiskDeviceManager::PartitionAdded(KPartition *partition)
 bool
 KDiskDeviceManager::PartitionRemoved(KPartition *partition)
 {
-	return (partition && fPartitions.RemoveItem(partition));
+	if (partition && partition->PrepareForRemoval()
+		&& fPartitions.RemoveItem(partition)) {
+		// If adding the partition to the obsolete list fails (due to lack
+		// of memory), we can't do anything about it. We will leak memory then.
+		fObsoletePartitions.AddItem(partition);
+		partition->MarkObsolete();
+		return true;
+	}
+	return false;
+}
+
+// DeletePartition
+bool
+KDiskDeviceManager::DeletePartition(KPartition *partition)
+{
+	if (partition && partition->IsObsolete()
+		&& partition->CountReferences() == 0
+		&& partition->PrepareForDeletion()
+		&& fObsoletePartitions.RemoveItem(partition)) {
+		delete partition;
+		return true;
+	}
+	return false;
 }
 
 // JobWithID
@@ -551,7 +607,7 @@ KDiskDeviceManager::_AddDevice(KDiskDevice *device)
 bool
 KDiskDeviceManager::_RemoveDevice(KDiskDevice *device)
 {
-	return (device && PartitionRemoved(device) && fDevices.RemoveItem(device));
+	return (device && fDevices.RemoveItem(device) && PartitionRemoved(device));
 }
 
 // _Scan
@@ -667,13 +723,9 @@ DBG(OUT("  returned: %f\n", priority));
 DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 		error = bestDiskSystem->Scan(partition, bestCookie);
 		if (error == B_OK) {
-// TODO: Maybe better move setting the partition's and children's disk system
-// in K{File,Partitioning}System::Scan()?
 			partition->SetDiskSystem(bestDiskSystem);
-			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
-				child->SetParentDiskSystem(bestDiskSystem);
+			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
 				_ScanPartition(child);
-			}
 		} else {
 			// TODO: Handle the error.
 DBG(OUT("  scanning failed: %s\n", strerror(error)));

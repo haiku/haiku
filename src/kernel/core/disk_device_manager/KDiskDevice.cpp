@@ -111,6 +111,13 @@ KDiskDevice::ReadUnlock()
 	fLocker.ReadUnlock();
 }
 
+// IsReadLocked
+bool
+KDiskDevice::IsReadLocked(bool orWriteLocked)
+{
+	return fLocker.IsReadLocked(orWriteLocked);
+}
+
 // WriteLock
 bool
 KDiskDevice::WriteLock()
@@ -123,6 +130,13 @@ void
 KDiskDevice::WriteUnlock()
 {
 	fLocker.WriteUnlock();
+}
+
+// IsWriteLocked
+bool
+KDiskDevice::IsWriteLocked()
+{
+	return fLocker.IsWriteLocked();
 }
 
 // SetID

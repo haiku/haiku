@@ -26,9 +26,9 @@ public:
 
 //	virtual void Dump(bool deep = true, int32 level = 0);
 
-protected:
-	virtual status_t GetMediaStatus(status_t *mediaStatus);
-	virtual status_t GetGeometry(device_geometry *geometry);
+private:
+	static status_t _RegisterDevice(const char *file, const char *device);
+	static status_t _UnregisterDevice(const char *device);
 
 private:
 	char			*fFilePath;

@@ -36,6 +36,13 @@ public:
 	void Unregister();
 	int32 CountReferences() const;
 
+	void MarkObsolete();
+		// called by the manager only
+	bool IsObsolete() const;
+
+	virtual bool PrepareForRemoval();
+	virtual bool PrepareForDeletion();
+
 	status_t Open(int flags, int *fd);
 	virtual status_t PublishDevice();
 	virtual status_t UnpublishDevice();
@@ -122,7 +129,9 @@ public:
 	status_t AddChild(KPartition *partition, int32 index = -1);
 	status_t CreateChild(partition_id id, int32 index,
 						 KPartition **child = NULL);
-	KPartition *RemoveChild(int32 index);
+	bool RemoveChild(int32 index);
+	bool RemoveChild(KPartition *child);
+	bool RemoveAllChildren();
 	KPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
 
@@ -137,7 +146,6 @@ public:
 
 	void SetDiskSystem(KDiskSystem *diskSystem);
 	KDiskSystem *DiskSystem() const;
-	void SetParentDiskSystem(KDiskSystem *diskSystem);
 	KDiskSystem *ParentDiskSystem() const;
 		// When setting a disk system, it must already be loaded.
 		// The partition will load it too, hence it won't be unloaded before
@@ -161,8 +169,8 @@ protected:
 	KDiskDevice			*fDevice;
 	KPartition			*fParent;
 	KDiskSystem			*fDiskSystem;
-	KDiskSystem			*fParentDiskSystem;
 	int32				fReferenceCount;
+	bool				fObsolete;
 	static int32		fNextID;
 };
 

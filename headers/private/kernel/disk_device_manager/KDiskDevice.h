@@ -36,8 +36,10 @@ public:
 	// manager lock owners can be sure, that it won't change.
 	bool ReadLock();
 	void ReadUnlock();
+	bool IsReadLocked(bool orWriteLocked = true);
 	bool WriteLock();
 	void WriteUnlock();
+	bool IsWriteLocked();
 
 	virtual void SetID(partition_id id);
 
