@@ -1498,12 +1498,54 @@ BMenu::IsStickyMode() const
 void
 BMenu::CalcTriggers()
 {
+	BList triggersList;
+	
+	// Gathers the existing triggers
+	// TODO: Oh great, reinterpret_cast.
+	for (int32 i = 0; i < CountItems(); i++) {
+		char trigger = ItemAt(i)->Trigger();
+		if (trigger != 0)
+			triggersList.AddItem(reinterpret_cast<void *>((uint32)trigger));
+	}
+
+	// Set triggers for items which don't have one yet
+	for (int32 i = 0; i < CountItems(); i++) {
+		BMenuItem *item = ItemAt(i);
+		if (item->Trigger() == 0) {
+			const char *newTrigger = ChooseTrigger(item->Label(), &triggersList);
+			if (newTrigger != NULL) {
+				item->SetSysTrigger(*newTrigger);			
+				// TODO: This is crap. I'd prefer to have 
+				// BMenuItem::SetSysTrigger(const char *) update fTriggerIndex.
+				// This isn't the case on beos, but it will probably be like that on haiku.
+				item->fTriggerIndex = newTrigger - item->Label();
+			}
+		}
+	}
 }
 
 
 const char *
 BMenu::ChooseTrigger(const char *title, BList *chars)
 {
+	ASSERT(chars != NULL);
+	
+	if (title == NULL)
+		return NULL;
+		
+	char *titlePtr = const_cast<char *>(title);
+	
+	char trigger;
+	// TODO: Oh great, reinterpret_cast all around
+	while ((trigger = *titlePtr) != '\0') {
+		if (!chars->HasItem(reinterpret_cast<void *>((uint32)trigger)))	{
+			chars->AddItem(reinterpret_cast<void *>((uint32)trigger));
+			return titlePtr;
+		}
+				
+		titlePtr++;
+	}
+
 	return NULL;
 }
 
