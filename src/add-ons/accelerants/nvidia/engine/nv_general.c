@@ -52,7 +52,7 @@ static void nv_dump_configuration_space (void)
 	DUMP_CFG (CFG_17,	0);
 	DUMP_CFG (CFG_18,	0);
 	DUMP_CFG (CFG_19,	0);
-	DUMP_CFG (CFG_19,	0);
+	DUMP_CFG (CFG_20,	0);
 	DUMP_CFG (CFG_21,	0);
 	DUMP_CFG (CFG_22,	0);
 	DUMP_CFG (CFG_23,	0);
@@ -63,6 +63,16 @@ static void nv_dump_configuration_space (void)
 	DUMP_CFG (CFG_28,	0);
 	DUMP_CFG (CFG_29,	0);
 	DUMP_CFG (CFG_30,	0);
+	DUMP_CFG (CFG_31,	0);
+	DUMP_CFG (CFG_32,	0);
+	DUMP_CFG (CFG_33,	0);
+	DUMP_CFG (CFG_34,	0);
+	DUMP_CFG (CFG_35,	0);
+	DUMP_CFG (CFG_36,	0);
+	DUMP_CFG (CFG_37,	0);
+	DUMP_CFG (CFG_38,	0);
+	DUMP_CFG (CFG_39,	0);
+	DUMP_CFG (CFG_40,	0);
 	DUMP_CFG (CFG_41,	0);
 	DUMP_CFG (CFG_42,	0);
 	DUMP_CFG (CFG_43,	0);
