@@ -157,7 +157,7 @@ status_t find_directory (directory_which which, dev_t device, bool create_it, ch
 	dev_t bootdev = -1;
 	struct fs_info finfo;
 	struct stat st;
-	char *buffer;
+	char *buffer = NULL;
 	char *home = NULL;
 	const char *template = NULL;
 
@@ -214,7 +214,7 @@ status_t find_directory (directory_which which, dev_t device, bool create_it, ch
 			} else
 				err = ENODEV;
 #else
-			strncat(buffer, "/wincrash", 9); // XXX: TODO
+			err = _kern_entry_ref_to_path(device, finfo.root, /*"."*/ NULL, buffer, path_length);
 #endif
 		} else {
 			/* use the user id to find the home folder */
@@ -225,6 +225,10 @@ status_t find_directory (directory_which which, dev_t device, bool create_it, ch
 	default:
 		strncat(buffer, "/boot", path_length);
 		break;
+	}
+	if (err < B_OK) {
+		free(buffer);
+		return err;
 	}
 	
 	switch (which) {
@@ -350,10 +354,31 @@ status_t find_directory (directory_which which, dev_t device, bool create_it, ch
 	return err;
 }
 
-#if 0
+/* <AbsFab>
+ * testing testing testing... I can hear you darling!
+ * This is big-mother speaking !!!
+ * <AbsFab>
+ * cc  -DMAIN_FOR_TEST -DCOMPILE_FOR_R5   find_directory.c   -o find_directory
+ */
+
+#ifdef MAIN_FOR_TEST
 int main(int argc, char **argv)
 {
-	printf("mkdir %d\n", mkdir_p(argv[1], 0755));
-	perror("mkdir");
+	status_t err;
+	int i;
+	dev_t dev = -1;
+	char buffer[B_PATH_NAME_LENGTH];
+	//printf("mkdir %d\n", mkdir_p(argv[1], 0755));
+	//perror("mkdir");
+	
+	if (argc > 1)
+		dev = dev_for_path(argv[1]);
+	for (i = B_DESKTOP_DIRECTORY; i < B_UTILITIES_DIRECTORY; i++) {
+		err = find_directory((directory_which)i, dev, false, buffer, B_PATH_NAME_LENGTH);
+		if (err)
+			continue;
+		printf("dir[%04d] = '%s'\n", i, buffer);
+	}
+	return 0;
 }
 #endif
