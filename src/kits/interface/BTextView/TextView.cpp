@@ -3058,15 +3058,15 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			if (ScrollBar(B_VERTICAL) != NULL)
 				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() - delta);
 			
-			int32 newOffset = OffsetAt(LineAt(PointAt(currentOffset - delta)));
+			fClickOffset = OffsetAt(LineAt(PointAt(currentOffset - delta)));
 			
 			if (shiftDown) {
-				if (newOffset <= fSelStart)
-					Select(newOffset, fSelEnd);
+				if (fClickOffset <= fSelStart)
+					Select(fClickOffset, fSelEnd);
 				else
-					Select(fSelStart, newOffset);
+					Select(fSelStart, fClickOffset);
 			} else
-				Select(newOffset, newOffset);
+				Select(fClickOffset, fClickOffset);
 			
 			break;
 		}
@@ -3079,16 +3079,15 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			if (ScrollBar(B_VERTICAL) != NULL)
 				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() + delta);
 			
-			int32 newOffset = OffsetAt(LineAt(PointAt(currentOffset + delta)));
+			fClickOffset = OffsetAt(LineAt(PointAt(currentOffset + delta)));
 			
 			if (shiftDown) {
-				if (newOffset >= fSelEnd)
-					Select(fSelStart, newOffset);
+				if (fClickOffset >= fSelEnd)
+					Select(fSelStart, fClickOffset);
 				else
-					Select(newOffset, fSelEnd);
+					Select(fClickOffset, fSelEnd);
 			} else
-				Select(newOffset, newOffset);
-
+				Select(fClickOffset, fClickOffset);
 			
 			break;
 		}
@@ -3635,7 +3634,29 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 								break;
 						}
 					}
-
+					
+					// TODO: Revisit this as it isn't working so good, and it looks ugly
+					// and add clauses support (red highlighing)
+					if (fInline && fInline->IsActive() && (fInline->Offset() >= offset
+							&& fInline->Offset() + fInline->Length() <= offset + length)) {
+						float height;
+						BPoint leftTop = PointAt(fInline->Offset(), &height);
+						BPoint rightBottom = PointAt(fInline->Offset() + fInline->Length());
+						rightBottom.y += height;
+						BRect rect(leftTop, rightBottom);
+						
+						PushState();
+						
+						rgb_color blue = {152, 203, 255};
+						//rgb_color red = {255, 152, 152};
+						SetHighColor(blue);						
+						SetLowColor(blue);
+						FillRect(rect);
+						
+						PopState();
+					}
+					
+					
 					DrawString(fText->GetString(offset, tabChars), tabChars);
 					
 					if (foundTab) {
@@ -3672,6 +3693,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	}
 
 	ConstrainClippingRegion(NULL);
+	Flush();
 }
 
 
@@ -4236,8 +4258,6 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	if (!fInline)
 		return;
 	
-	// TODO: Highlight in blue/red the various clauses
-		
 	const char *string = NULL;
 	if (message->FindString("be:string", &string) < B_OK || string == NULL)
 		return;
@@ -4261,8 +4281,6 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
 
-	Refresh(0, fSelEnd, true, false);
-	
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current _BInlineInput_ object
 	// should become inactive
@@ -4271,6 +4289,8 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 		fInline->SetActive(true);
 	else
 		fInline->SetActive(false);
+	
+	Refresh(0, fSelEnd, true, false);
 }
 
 
