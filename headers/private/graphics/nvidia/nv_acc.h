@@ -67,7 +67,9 @@ typedef struct {
 	uint32 reserved01[0x000b];
 	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
 	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
-	uint32 reserved02[0x00ed];
+	uint32 reserved02[0x00ae];
+	uint32 SetColorFormat;		/* colorspace */
+	uint32 reserved03[0x003e];
 	uint32 Color1A;				/* b0-31 is color */
 	struct {
 		uint32 LeftTop;			/* b0-15 is top, b16-31 is left */
@@ -284,24 +286,27 @@ typedef struct {
 /************ DMA command defines ***********/
 
 /* FIFO channels */
-#define NV_GENERAL_FIFO_CH0					0x0000
-#define NV_GENERAL_FIFO_CH1					0x2000
-#define NV_GENERAL_FIFO_CH2					0x4000
-#define NV_GENERAL_FIFO_CH3					0x6000
-#define NV_GENERAL_FIFO_CH4					0x8000
-#define NV_GENERAL_FIFO_CH5					0xa000
-#define NV_GENERAL_FIFO_CH6					0xc000
-#define NV_GENERAL_FIFO_CH7					0xe000
+#define NV_GENERAL_FIFO_CH0		0x0000
+#define NV_GENERAL_FIFO_CH1		0x2000
+#define NV_GENERAL_FIFO_CH2		0x4000
+#define NV_GENERAL_FIFO_CH3		0x6000
+#define NV_GENERAL_FIFO_CH4		0x8000
+#define NV_GENERAL_FIFO_CH5		0xa000
+#define NV_GENERAL_FIFO_CH6		0xc000
+#define NV_GENERAL_FIFO_CH7		0xe000
 
 /* sub-command offsets within FIFO channels */
-#define NV_GENERAL_DMAPUT					0x0040
-#define NV_GENERAL_DMAGET					0x0044
-#define NV_ROP5_SOLID_SETROP5				0x0300
-#define NV_IMAGE_BLACK_RECTANGLE_TOPLEFT	0x0300
-#define NV_IMAGE_PATTERN_SETCOLORFORMAT		0x0300
-#define NV_IMAGE_PATTERN_SETSHAPE			0x0308
-#define NV_IMAGE_PATTERN_SETCOLOR0			0x0310
-#define NV_IMAGE_BLIT_SOURCEORG				0x0300
-#define NV4_SURFACE_FORMAT					0x0300
+#define NV_GENERAL_DMAPUT						0x0040
+#define NV_GENERAL_DMAGET						0x0044
+#define NV_ROP5_SOLID_SETROP5					0x0300
+#define NV_IMAGE_BLACK_RECTANGLE_TOPLEFT		0x0300
+#define NV_IMAGE_PATTERN_SETCOLORFORMAT			0x0300
+#define NV_IMAGE_PATTERN_SETSHAPE				0x0308
+#define NV_IMAGE_PATTERN_SETCOLOR0				0x0310
+#define NV_IMAGE_BLIT_SOURCEORG					0x0300
+#define NV3_GDI_RECTANGLE_TEXT_SETCOLORFORMAT	0x0300
+#define NV3_GDI_RECTANGLE_TEXT_COLOR1A			0x03fc
+#define NV3_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP		0x0400
+#define NV4_SURFACE_FORMAT						0x0300
 
 #endif
