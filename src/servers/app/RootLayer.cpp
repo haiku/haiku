@@ -804,11 +804,6 @@ WinBorder* RootLayer::WinBorderAt(const BPoint& pt) const{
 	return NULL;
 }
 
-WinBorder* RootLayer::FocusWinBorder() const
-{
-	return ActiveWorkspace()->Focus();
-}
-
 void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 {
 	// NOTE: All screens *must* have the same resolution

@@ -35,9 +35,9 @@
 #include "FMWList.h"
 #include "CursorHandler.h"
 #include "CursorManager.h"
+#include "Workspace.h"
 
 class RGBColor;
-class Workspace;
 class Screen;
 class WinBorder;
 class Desktop;
@@ -55,127 +55,127 @@ class BPortLink;
 class RootLayer : public Layer
 {
 public:
-	RootLayer(const char *name, int32 workspaceCount, Desktop *desktop, 
-			DisplayDriver *driver);
-	virtual	~RootLayer(void);
+								RootLayer(const char *name,	int32 workspaceCount,
+										Desktop *desktop, DisplayDriver *driver);
+	virtual						~RootLayer(void);
 	
-	virtual	void MoveBy(float x, float y);
-	virtual	void ResizeBy(float x, float y);
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
 	
 	// For the active workspaces
-	virtual	Layer *VirtualTopChild(void) const;
-	virtual	Layer *VirtualLowerSibling(void) const;
-	virtual	Layer *VirtualUpperSibling(void) const;
-	virtual	Layer *VirtualBottomChild(void) const;
+	virtual	Layer*				VirtualTopChild(void) const;
+	virtual	Layer*				VirtualLowerSibling(void) const;
+	virtual	Layer*				VirtualUpperSibling(void) const;
+	virtual	Layer*				VirtualBottomChild(void) const;
 
-	void HideWinBorder(WinBorder* winBorder);
-	void ShowWinBorder(WinBorder* winBorder);
-	void SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex);
-	WinBorder* WinBorderAt(const BPoint& pt) const;
-	WinBorder* FocusWinBorder() const;
+			void				HideWinBorder(WinBorder* winBorder);
+			void				ShowWinBorder(WinBorder* winBorder);
+			void				SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex);
+			WinBorder*			WinBorderAt(const BPoint& pt) const;
+	inline	WinBorder*			FocusWinBorder() const { return fWorkspace[fActiveWksIndex]->Focus(); }
+	inline	WinBorder*			FrontWinBorder() const { return fWorkspace[fActiveWksIndex]->Front(); }
 
-	void SetWorkspaceCount(int32 wksCount);
-	int32 WorkspaceCount() const { return fWsCount; }
-	Workspace* WorkspaceAt(int32 index) const { return fWorkspace[index]; }
-	Workspace* ActiveWorkspace() const { return fWorkspace[fActiveWksIndex]; }
-	int32 ActiveWorkspaceIndex() const { return fActiveWksIndex; }
-	void SetActiveWorkspace(int32 index);
+	inline	void				SetWorkspaceCount(int32 wksCount);
+	inline	int32				WorkspaceCount() const { return fWsCount; }
+	inline	Workspace*			WorkspaceAt(int32 index) const { return fWorkspace[index]; }
+	inline	Workspace*			ActiveWorkspace() const { return fWorkspace[fActiveWksIndex]; }
+	inline	int32				ActiveWorkspaceIndex() const { return fActiveWksIndex; }
+			void				SetActiveWorkspace(int32 index);
 
-	void ReadWorkspaceData(const char *path);
-	void SaveWorkspaceData(const char *path);
+			void				ReadWorkspaceData(const char *path);
+			void				SaveWorkspaceData(const char *path);
 	
-	void SetScreens(Screen *screen[], int32 rows, int32 columns);
-	Screen **Screens(void);
-	bool SetScreenResolution(int32 width, int32 height, uint32 colorspace);
-	int32 ScreenRows(void) const { return fRows; }
-	int32 ScreenColumns(void) const { return fColumns; }
+			void				SetScreens(Screen *screen[], int32 rows, int32 columns);
+			Screen**			Screens(void);
+			bool				SetScreenResolution(int32 width, int32 height, uint32 colorspace);
+			int32				ScreenRows(void) const { return fRows; }
+			int32				ScreenColumns(void) const { return fColumns; }
 
-	void SetBGColor(const RGBColor &col);
-	RGBColor BGColor(void) const;
+			void				SetBGColor(const RGBColor &col);
+			RGBColor			BGColor(void) const;
 	
-	int32 Buttons(void) { return fButtons; }
-	virtual bool HasClient(void) { return false; }
+	inline	int32				Buttons(void) { return fButtons; }
+	virtual bool				HasClient(void) { return false; }
 	
-	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
+			void				SetDragMessage(BMessage *msg);
+			BMessage*			DragMessage(void) const;
 
-	void SetDragMessage(BMessage *msg);
-	BMessage *DragMessage(void) const;
+	static	int32				WorkingThread(void *data);
 
-	static int32 WorkingThread(void *data);
+			CursorManager&		GetCursorManager() { return fCursorManager; }
 
-	CursorManager& GetCursorManager() { return fCursorManager; }
+			// Other methods
+			bool				Lock() { return fAllRegionsLock.Lock(); }
+			void				Unlock() { fAllRegionsLock.Unlock(); }
+			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
+			void				RunThread();
+			status_t			EnqueueMessage(BPortLink &message);
+			void				GoInvalidate(const Layer *layer, const BRegion &region);
+			void				GoRedraw(const Layer *layer, const BRegion &region);
 
-	// Other methods
-	bool Lock() { return fAllRegionsLock.Lock(); }
-	void Unlock() { fAllRegionsLock.Unlock(); }
-	bool IsLocked() { return fAllRegionsLock.IsLocked(); }
-	void RunThread();
-	status_t EnqueueMessage(BPortLink &message);
-	void GoInvalidate(const Layer *layer, const BRegion &region);
-	void GoRedraw(const Layer *layer, const BRegion &region);
-
-	// Debug methods
-	void PrintToStream(void);
+			// Debug methods
+			void			PrintToStream(void);
 	
-	BRegion			fRedrawReg;
-	BList			fCopyRegList;
-	BList			fCopyList;
+			BRegion				fRedrawReg;
+			BList				fCopyRegList;
+			BList				fCopyList;
 
 private:
 friend class Desktop;
-	// these are meant for Desktop class only!
-	void AddWinBorder(WinBorder* winBorder);
-	void RemoveWinBorder(WinBorder* winBorder);
-	void AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder);
-	void RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder);
 
-			void			show_winBorder(WinBorder* winBorder);
-			void			hide_winBorder(WinBorder* winBorder);
+			// these are meant for Desktop class only!
+			void				AddWinBorder(WinBorder* winBorder);
+			void				RemoveWinBorder(WinBorder* winBorder);
+			void				AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder);
+			void				RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder);
 
-			bool			get_workspace_windows();
-			void 			draw_window_tab(WinBorder *exFocus, WinBorder *focus);
-			void			empty_visible_regions(Layer *layer);
+			void				show_winBorder(WinBorder* winBorder);
+			void				hide_winBorder(WinBorder* winBorder);
 
-			void			invalidate_layer(Layer *layer, const BRegion &region);
-			void			redraw_layer(Layer *layer, const BRegion &region);
+			bool				get_workspace_windows();
+			void 				draw_window_tab(WinBorder *exFocus, WinBorder *focus);
+			void				empty_visible_regions(Layer *layer);
 
-	// Input related methods
-	void MouseEventHandler(int32 code, BPortLink& link);
-	void KeyboardEventHandler(int32 code, BPortLink& link);
+			void				invalidate_layer(Layer *layer, const BRegion &region);
+			void				redraw_layer(Layer *layer, const BRegion &region);
 
-			Desktop			*fDesktop;
-			BMessage		*fDragMessage;
-			Layer			*fLastMouseMoved;
-			int32			fViewAction;
-			Layer			*fEventMaskLayer;
-			CursorManager	fCursorManager;
-			BLocker			fAllRegionsLock;
+			// Input related methods
+			void				MouseEventHandler(int32 code, BPortLink& link);
+			void				KeyboardEventHandler(int32 code, BPortLink& link);
 
-			thread_id		fThreadID;
-			port_id			fListenPort;
+			Desktop				*fDesktop;
+			BMessage			*fDragMessage;
+			Layer				*fLastMouseMoved;
+			int32				fViewAction;
+			Layer				*fEventMaskLayer;
+			CursorManager		fCursorManager;
+			BLocker				fAllRegionsLock;
 
-			BList			fScreenPtrList;
-			int32			fRows;
-			int32			fColumns;
-			int32			fScreenXResolution;
-			int32			fScreenYResolution;
-			uint32			fColorSpace;
-			int32			fButtons;
-			BPoint			fLastMousePossition;
-			bool			fMovingWindow;
-			bool			fResizingWindow;
+			thread_id			fThreadID;
+			port_id				fListenPort;
+
+			BList				fScreenPtrList;
+			int32				fRows;
+			int32				fColumns;
+			int32				fScreenXResolution;
+			int32				fScreenYResolution;
+			uint32				fColorSpace;
+			int32				fButtons;
+			BPoint				fLastMousePossition;
+			bool				fMovingWindow;
+			bool				fResizingWindow;
 	
-			int32			fActiveWksIndex;
-			int32			fWsCount;
-			Workspace*		fWorkspace[32];
-			WinBorder**		fWinBorderList2;
-			WinBorder**		fWinBorderList;
-			int32			fWinBorderCount;
-	mutable int32			fWinBorderIndex;
-			int32			fWinBorderListLength;
+			int32				fActiveWksIndex;
+			int32				fWsCount;
+			Workspace*			fWorkspace[32];
+			WinBorder**			fWinBorderList2;
+			WinBorder**			fWinBorderList;
+			int32				fWinBorderCount;
+	mutable int32				fWinBorderIndex;
+			int32				fWinBorderListLength;
 
-			int32			fScreenShotIndex;
-			bool			fQuiting;
+			int32				fScreenShotIndex;
+			bool				fQuiting;
 };
 
 #endif
