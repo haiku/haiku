@@ -24,106 +24,13 @@ body
 </HEAD> 
 <BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
 
-<H1>OpenBeOS Network Kit</H1>
+<H1>OpenBeOS Network Kit: Network apps</H1>
 
-  <P>
-  <UL>
-  <LI><A href="overview.html">Overview</A>
-  <LI>Implementation:
-	<UL>
-	<LI><A href="libs.html">The shared libraries</A>
-		<UL>
-		<LI><A href="libs.html#libnet">libnet.so</A>
-			<UL>
-			<LI><A href="libs.html#sockets_api">POSIX/BSD sockets support</A>
-			<LI><A href="libs.html#dns_resolver">DNS resolver</A>
-			<LI><A href="libs.html#libnet_misc">Misc functions</A>
-			</UL>
-		<LI><A href="libs.html#libnetapi">libnetapi.so</A>
-		</UL>
-	<LI><A href="stack_driver.html">The stack driver</A>
-	<LI><A href="stack.html">The network stack</A>
-		<UL>
-		<LI><A href="stack.html#core">Core module
-		<LI><A href="stack.html#interfaces">Interfaces modules</A>
-		<LI><A href="stack.html#protocols">Protocols modules</A>
-		</UL>
-	<LI><A href="apps.html">Network apps</A>
-		<UL>
-		<LI><A href="apps.html#preflet">The Network GUI preference app</A>
-		<LI><A href="apps.html#ping">ping</A>
-		<LI><A href="apps.html#ifconfig">ifconfig</A>
-		<LI><A href="apps.html#route">route</A>
-		<LI><A href="apps.html#traceroute">traceroute</A>
-		<LI><A href="apps.html#arp">arp</A>
-		</UL>
-	</UL>
-  </UL>
-  </P>
-
-<HR>
-
-<!-------------------->
-<A name="overview">
-<H2>Overview</H2>
-
-<P>The OpenBeOS Network Kit consists of:
-  <UL>
-  <LI>a modular, add-ons based <A href="#stack">network stack</A>
-  <LI>two shared libraries, <A href="#libnet">libnet.so</A> and <A href="#libnetapi">libnetapi.so</A>
-  <LI>a <A href="#stack_driver">stack driver</A>, acting as interface between the
-     <A href="#stack">network stack</A> and <A href="#libnet">libnet.so</A>
-  <LI>basic network utilities
-  <LI>a modular GUI <A href="#preflet">preflet</A>
-  </UL>
-</P>
-
-<H3>Let's picture(s) talk</H3>
-<P>The following image shows the overall network design:</P>
-
-<IMG ALT="OpenBeOS Network Kit block diagram" SRC="obos_net_stack_design_1.gif"><BR>
-
-<HR>
-
-<H2>Implementation</H2>
-
-<UL>
-
-<LI><A name="stack">
-<H3>The network stack</H3>
-<I>Location</I>: <CODE>src/add-ons/kernel/network</CODE>
-<P>Todo...</P>
-
-<LI><A name="stack_driver">
-<H3>The stack driver</H3>
-<I>Location</I>: <CODE>src/add-ons/kernel/drivers/net/stack</CODE>
-<P>The stack driver is the interface between <A href="#libnet">libnet</A> and the real stack behind him,
-host by the <A href="#stack">network stack</A> kernel modules.</P>
-His purpose is multiple:
-	<OL>
-	<LI>Provide the sockets == file descriptors support
-	<LI>Provide a support for select() on sockets
-	<LI>Load the network stack at first access, and keep it that way then...
-	</OL>
-</P>
-
-<LI><A name="libnet">
-<H3>The libnet.so shared library</H3>
-<I>Location</I>: <CODE>src/kits/net/libnet</CODE>
-<P>This shared library is the way BeOS R5 provide the sockets POSIX/BSD API to apps. Being
-binary compatible with R5 make this library implementation tedious.</P>
-
-<LI><A name="libnetapi">
-<H3>The libnetapi.so shared library</H3>
-<I>Location</I>: <CODE>src/kits/net/libnetapi</CODE>
-<P>This shared library contains thin C++ classes wrapping the C sockets POSIX/BSD API into
-these BNet* classes we're used under BeOS: look at them in your <A href="file:///boot/beos/documentation/Be%20Book/The%20Network%20Kit/index.html">
-BeBook</A></P>
-
-<LI><A name="bin">
-<H3>Basic network utilities</H3>
+<H2>The OpenBeOS Network Kit comes with some basic network utilities:</H2>
 
 	<UL>
+	<LI><B>The Network GUI preference app</B><BR>
+		<I>Location</I>: No one yet, as nothing exist yet!
 	<LI><B>ping</B><BR>
 		<I>Location</I>: <CODE>src/apps/bin/ping</CODE>
 	<LI><B>ifconfig</B><BR>
@@ -140,7 +47,7 @@ BeBook</A></P>
 
 <HR>
 
-<H6>Philippe Houdoin, March 24rd, 2003</H6>
+<H6>Philippe Houdoin, March 31rd, 2003</H6>
 
 </BODY>
 </HTML>
