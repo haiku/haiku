@@ -134,6 +134,7 @@ class Inode {
 
 		status_t	WriteBufferToChain(const void *buffer, size_t bufferSize);
 		status_t	ReadBufferFromChain(void *buffer, size_t *_bufferSize);
+		off_t		BytesInChain() const { return cbuf_get_length(fBufferChain); }
 
 		static int32 HashNextOffset();
 		static uint32 hash_func(void *_node, const void *_key, uint32 range);
@@ -487,7 +488,7 @@ Inode::ReadBufferFromChain(void *buffer, size_t *_bufferSize)
 		return B_OK;
 	}
 
-	size_t length = cbuf_get_length(fBufferChain);
+	size_t length = BytesInChain();
 
 	// we read *_bufferSize bytes at maximum - but never
 	// more than there are in the chain
@@ -1208,7 +1209,7 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 
 	stat->st_dev = volume->ID();
 	stat->st_ino = inode->ID();
-	stat->st_size = cbuf_get_length(fBufferChain);
+	stat->st_size = inode->BytesInChain();
 	stat->st_mode = inode->Type() | 0777;
 
 	return 0;
