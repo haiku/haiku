@@ -191,6 +191,9 @@ rule SetupIncludes
 
 	# Used as a fallback, the R5 header directories (we should remove this as soon as possible)
 	HDRS += /boot/develop/headers/posix /boot/develop/headers/cpp ;
+
+	# The platform dependent headers.
+	HDRS += $(PLATFORM_HEADERS) ;
 }
 
 rule SetupR5Includes
@@ -1373,6 +1376,8 @@ rule SetupKernel
 	HDRS += [ PublicHeaders $(public_kernel_includes) ] ;
 	# Use private directories
 	HDRS += [ PrivateHeaders $(private_kernel_includes) ] ;
+	# The platform dependent headers.
+	HDRS += $(PLATFORM_HEADERS) ;
 
 	UseArchHeaders $(OBOS_ARCH) ;
 
@@ -1415,9 +1420,9 @@ rule KernelLd
 	
 	MakeLocate $(1) : $(LOCATE_TARGET) ; 
 
-	# Add libgcc.a - NB this should be detected not hard coded!
+	# Add the platform specific static libs (libgcc.a).
 	if ! $(5) {
-		LINKLIBS on $(1) += -L $(GCC_PATH) -lgcc ;
+		LINKLIBS on $(1) += $(PLATFORM_LINKLIBS) ;
 	}
 }
 
