@@ -14,8 +14,10 @@
 #include <vfs.h>
 #include <vm.h>
 #include <thread.h>
+#include <team.h>
 #include <debug.h>
 #include <kimage.h>
+#include <khash.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
@@ -37,6 +39,10 @@
 #endif
 
 
+#define IMAGE_HASH_SIZE 16
+
+static hash_table *sImagesHash;
+
 // XXX TK this shall contain a list of linked images
 //        (don't know enough about ELF how to get this list)
 typedef struct elf_linked_image {
@@ -44,19 +50,72 @@ typedef struct elf_linked_image {
 	struct elf_image_info *image;
 } elf_linked_image;
 
-static struct elf_image_info *kernel_images = NULL;
 static struct elf_image_info *kernel_image = NULL;
 static mutex image_lock;
 static mutex image_load_lock;
-static image_id next_image_id = 0;
 
 static status_t elf_unload_image(struct elf_image_info *image);
+
+
+/** calculates hash for an image using its ID */
+
+static uint32
+image_hash(void *_image, const void *_key, uint32 range)
+{
+	struct elf_image_info *image = (struct elf_image_info *)_image;
+	image_id id = (image_id)_key;
+
+	if (image != NULL)
+		return image->id % range;
+
+	return id % range;
+}
+
+
+/** compares an image to a given ID */
+
+static int
+image_compare(void *_image, const void *_key)
+{
+	struct elf_image_info *image = (struct elf_image_info *)_image;
+	image_id id = (image_id)_key;
+
+	return id - image->id;
+}
+
+
+static void
+unregister_elf_image(struct elf_image_info *image)
+{
+	hash_remove(sImagesHash, image);
+}
+
+
+static void
+register_elf_image(struct elf_image_info *image)
+{
+	image_info imageInfo;
+
+	image->id = register_image(team_get_kernel_team(), &imageInfo, sizeof(image_info));
+
+	memset(&imageInfo, 0, sizeof(image_info));
+	imageInfo.id = image->id;
+	imageInfo.type = B_SYSTEM_IMAGE;
+	strlcpy(imageInfo.name, image->name, sizeof(imageInfo.name));
+	
+	imageInfo.text = (void *)image->regions[0].start;
+	imageInfo.text_size = image->regions[0].size;
+	imageInfo.data = (void *)image->regions[1].start;
+	imageInfo.data_size = image->regions[1].size;
+
+	hash_insert(sImagesHash, image);
+}
 
 
 status_t
 elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
 {
-	struct elf_image_info **ptr;
+	struct hash_iterator iterator;
 	struct elf_image_info *image;
 	struct Elf32_Sym *sym;
 	struct elf_image_info *found_image;
@@ -68,14 +127,13 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 	PRINT(("looking up %p\n",(void *)address));
 
 	mutex_lock(&image_lock);
+	hash_open(sImagesHash, &iterator);
 
 	found_sym = 0;
 	found_image = 0;
 	found_delta = 0x7fffffff;
 
-	for (ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
-		image = *ptr;
-
+	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
 		PRINT((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
 		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
 			continue;
@@ -120,7 +178,9 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 		rv = B_ENTRY_NOT_FOUND;
 	}
 
+	hash_close(sImagesHash, &iterator, false);
 	mutex_unlock(&image_lock);
+
 	return rv;
 }
 
@@ -144,65 +204,28 @@ print_address_info(int argc, char **argv)
 }
 
 
-static void
-insert_image_in_list(struct elf_image_info *image)
-{
-	mutex_lock(&image_lock);
-
-	image->next = kernel_images;
-	kernel_images = image;
-
-	mutex_unlock(&image_lock);
-}
-
-
-static void
-remove_image_from_list(struct elf_image_info *image)
-{
-	struct elf_image_info **ptr;
-
-	mutex_lock(&image_lock);
-
-	for(ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
-		if(*ptr == image) {
-			*ptr = image->next;
-			image->next = 0;
-			break;
-		}
-	}
-
-	mutex_unlock(&image_lock);
-}
-
-
 static struct elf_image_info *
 find_image(image_id id)
 {
-	struct elf_image_info *image;
-
-	mutex_lock(&image_lock);
-
-	for(image = kernel_images; image; image = image->next) {
-		if(image->id == id)
-			break;
-	}
-	mutex_unlock(&image_lock);
-
-	return image;
+	return hash_lookup(sImagesHash, (void *)id);
 }
 
 
 static struct elf_image_info *
 find_image_by_vnode(void *vnode)
 {
+	struct hash_iterator iterator;
 	struct elf_image_info *image;
 
 	mutex_lock(&image_lock);
+	hash_open(sImagesHash, &iterator);
 
-	for (image = kernel_images; image; image = image->next) {
+	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
 		if (image->vnode == vnode)
 			break;
 	}
+
+	hash_close(sImagesHash, &iterator, false);
 	mutex_unlock(&image_lock);
 
 	return image;
@@ -220,7 +243,6 @@ create_image_struct()
 
 	image->regions[0].id = -1;
 	image->regions[1].id = -1;
-	image->id = atomic_add(&next_image_id, 1);
 	image->ref_count = 1;
 	image->linked_images = NULL;
 
@@ -270,6 +292,43 @@ dump_image_info(struct elf_image_info *image)
 	dprintf(" pltrel %p\n", image->pltrel);
 	dprintf(" pltrel_len 0x%x\n", image->pltrel_len);
 }
+
+
+static int
+dump_image(int argc, char **argv)
+{
+	struct hash_iterator iterator;
+	struct elf_image_info *image;
+
+	// if the argument looks like a hex number, treat it as such
+	if (argc > 1) {
+		uint32 num = strtoul(argv[1], NULL, 0);
+
+		if (IS_KERNEL_ADDRESS(num)) {
+			// semi-hack
+			dump_image_info((struct elf_image_info *)num);
+		} else {
+			image = hash_lookup(sImagesHash, (void *)num);
+			if (image == NULL)
+				dprintf("image 0x%lx doesn't exist in the kernel!\n", num);
+			else
+				dump_image_info(image);
+		}
+		return 0;
+	}
+
+	dprintf("loaded kernel images:\n");
+
+	hash_open(sImagesHash, &iterator);
+
+	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+		dprintf("%p (%ld) %s\n", image, image->id, image->name);
+	}
+
+	hash_close(sImagesHash, &iterator, false);
+	return 0;
+}
+
 
 /* XXX - Currently unused
 static void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
@@ -851,7 +910,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	free(pheaders);
 	sys_close(fd);
 
-	insert_image_in_list(image);
+	register_elf_image(image);
 
 done:
 	mutex_unlock(&image_load_lock);
@@ -907,7 +966,8 @@ elf_unload_image_final(struct elf_image_info *image)
 	if (image->vnode)
 		vfs_put_vnode_ptr(image->vnode);
 
-	remove_image_from_list(image);
+	unregister_elf_image(image);
+
 	free(image->eheader);
 	free(image->name);	
 	free(image);
@@ -1003,7 +1063,7 @@ insert_preloaded_image(struct preloaded_image *preloadedImage)
 	if (status < B_OK)
 		goto error2;
 
-	insert_image_in_list(image);
+	register_elf_image(image);
 	return B_OK;
 
 error2:
@@ -1025,6 +1085,10 @@ elf_init(kernel_args *ka)
 
 	mutex_init(&image_lock, "kimages_lock");
 	mutex_init(&image_load_lock, "kimages_load_lock");
+
+	sImagesHash = hash_init(IMAGE_HASH_SIZE, 0, image_compare, image_hash);
+	if (sImagesHash == NULL)
+		return B_NO_MEMORY;
 
 	// Build a image structure for the kernel, which has already been loaded.
 	// The VM has created areas for it under a known name already
@@ -1058,7 +1122,7 @@ elf_init(kernel_args *ka)
 		dprintf("elf_init: WARNING elf_parse_dynamic_section couldn't find dynamic section.\n");
 
 	// insert it first in the list of kernel images loaded
-	insert_image_in_list(kernel_image);
+	register_elf_image(kernel_image);
 
 	// Build image structures for all preloaded images.
 	// Again, the VM has already created areas for them.
@@ -1067,6 +1131,7 @@ elf_init(kernel_args *ka)
 	}
 
 	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
+	add_debugger_command("image", &dump_image, "dump image info");
 	return B_OK;
 }
 
