@@ -23,6 +23,7 @@ void team_delete_team(struct team *team);
 struct team *team_get_kernel_team(void);
 team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
+status_t team_get_address_space(team_id id, struct vm_address_space **_addressSpace);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
 bool team_is_valid(team_id id);
