@@ -208,7 +208,7 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 
 	_get_format_for_description(&data->format, description);
 	
-	data->format.u.encoded_audio.encoding = media_encoded_audio_format::B_ANY;
+//	data->format.u.encoded_audio.encoding = media_encoded_audio_format::B_ANY;
 	data->format.u.encoded_audio.bit_rate = bit_rate;
 	data->format.u.encoded_audio.frame_size = frame_size;
 //	data->format.u.encoded_audio.output.frame_rate = data->frameRate;

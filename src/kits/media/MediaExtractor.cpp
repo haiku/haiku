@@ -49,21 +49,6 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 			fStreamInfo[i].status = B_ERROR;
 			printf("MediaExtractor::MediaExtractor: GetStreamInfo for stream %ld failed\n", i);
 		}
-		
-		char sz[1024];
-		string_for_format(fStreamInfo[i].encodedFormat, sz, sizeof(sz));
-		printf("MediaExtractor::MediaExtractor: stream %d has format %s\n", i, sz);
-		fStreamInfo[i].encodedFormat.type = B_MEDIA_ENCODED_AUDIO;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.encoding = (enum media_encoded_audio_format::audio_encoding) 1;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.bit_rate = 128000;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.frame_size = 3000;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.frame_rate = 44100;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.channel_count = 2;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.format = 2;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.byte_order = B_MEDIA_LITTLE_ENDIAN;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.buffer_size = 4 * 1024;
-		string_for_format(fStreamInfo[i].encodedFormat, sz, sizeof(sz));
-		printf("MediaExtractor::MediaExtractor: stream %d has new format %s\n", i, sz);
 	}
 }
 

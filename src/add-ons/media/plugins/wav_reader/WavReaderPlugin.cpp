@@ -128,7 +128,7 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	
 	_get_format_for_description(&data->format, description);
 
-	data->format.type = B_MEDIA_RAW_AUDIO;
+	//data->format.type = B_MEDIA_RAW_AUDIO;
 	data->format.u.raw_audio.frame_rate = data->fps;
 	data->format.u.raw_audio.channel_count = B_LENDIAN_TO_HOST_INT16(fRawHeader.common.channels);
 	data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT; // XXX fixme
