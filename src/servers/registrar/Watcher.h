@@ -22,7 +22,7 @@
 //	File Name:		Watcher.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
 //	Description:	A Watcher represents a target of a watching service.
-//					A WatcherFilter represents a predicate on a Watcher.
+//					A WatcherFilter represents a predicate on Watchers.
 //------------------------------------------------------------------------------
 
 #ifndef WATCHER_H
@@ -38,7 +38,7 @@ public:
 
 	const BMessenger &Target() const;
 
-	status_t SendMessage(BMessage *message);
+	virtual status_t SendMessage(BMessage *message);
 
 private:
 	BMessenger	fTarget;
