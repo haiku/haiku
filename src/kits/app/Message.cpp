@@ -77,7 +77,7 @@
 // Globals ---------------------------------------------------------------------
 
 #ifdef USING_TEMPLATE_MADNESS
-using BPrivate::BDataBuffer;
+using namespace BPrivate;
 #endif	// USING_TEMPLATE_MADNESS
 const char* B_SPECIFIER_ENTRY = "specifiers";
 const char* B_PROPERTY_ENTRY = "property";
@@ -740,17 +740,43 @@ status_t BMessage::AddMessenger(const char* name, BMessenger messenger)
 //------------------------------------------------------------------------------
 status_t BMessage::AddRef(const char* name, const entry_ref* ref)
 {
+#if 0
 	return fBody->AddData<entry_ref>(name, *ref, B_REF_TYPE);
+#endif
+	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
+	size_t size;
+	status_t err = entry_ref_flatten(buffer, &size, ref);
+	if (!err)
+	{
+		BDataBuffer DB((void*)buffer, size);
+		err = fBody->AddData<BDataBuffer>(name, DB, B_REF_TYPE);
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddMessage(const char* name, const BMessage* msg)
 {
-	BMessage* data = new BMessage(*msg);
-	status_t err = fBody->AddData<const BMessage*>(name, msg, B_MESSAGE_TYPE);
-	if (err)
+#if 0
+	return fBody->AddData<BMessage>(name, *msg, B_MESSAGE_TYPE);
+#endif
+	status_t err = B_OK;
+	ssize_t size = msg->FlattenedSize();
+	char* buffer = new(nothrow) char[size];
+	if (buffer)
 	{
-		delete data;
+		err = msg->Flatten(buffer, size);
+		if (!err)
+		{
+			BDataBuffer DB((void*)buffer, size);
+			err = fBody->AddData<BDataBuffer>(name, DB, B_MESSAGE_TYPE);
+		}
 	}
+	else
+	{
+		err = B_NO_MEMORY;
+	}
+
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -764,6 +790,10 @@ status_t BMessage::AddFlat(const char* name, BFlattenable* obj, int32 count)
 		err = AddData(name, obj->TypeCode(), (void*)buffer, size,
 					  obj->IsFixedSize(), count);
 		delete[] buffer;
+	}
+	else
+	{
+		err = B_NO_MEMORY;
 	}
 
 	return err;
@@ -825,14 +855,19 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 			break;
 		case B_REF_TYPE:
 		{
-			err = AddRef(name, (entry_ref*)data);
+//			err = AddRef(name, (entry_ref*)data);
+			BDataBuffer DB((void*)data, numBytes, true);
+			err = fBody->AddData<BDataBuffer>(name, DB, type);
 			break;
 		}
 		case B_MESSAGE_TYPE:
 		{
-			BMessage msg;
-			msg.Unflatten((const char*)data);
-			err = AddMessage(name, &msg);
+//			BMessage msg;
+//			msg.Unflatten((const char*)data);
+//			err = AddMessage(name, &msg);
+//			err = AddMessage(name, (BMessage*)data);
+			BDataBuffer DB((void*)data, numBytes, true);
+			err = fBody->AddData<BDataBuffer>(name, DB, type);
 			break;
 		}
 		case B_MESSENGER_TYPE:
@@ -847,7 +882,7 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 		default:
 			// TODO: test
 			// Using the mythical BDataBuffer
-			BDataBuffer DB((void*)data, numBytes);
+			BDataBuffer DB((void*)data, numBytes, true);
 			err = fBody->AddData<BDataBuffer>(name, DB, type);
 			break;
 	}
@@ -927,7 +962,18 @@ status_t BMessage::FindRef(const char* name, entry_ref* ref) const
 //------------------------------------------------------------------------------
 status_t BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
 {
+#if 0
 	return fBody->FindData<entry_ref>(name, index, ref, B_REF_TYPE);
+#endif
+	void* data = NULL;
+	ssize_t size = 0;
+	status_t err = FindData(name, B_REF_TYPE, index, (const void**)&data, &size);
+	if (!err)
+	{
+		err = entry_ref_unflatten(ref, (char*)data, size);
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindMessage(const char* name, BMessage* msg) const
@@ -937,7 +983,19 @@ status_t BMessage::FindMessage(const char* name, BMessage* msg) const
 //------------------------------------------------------------------------------
 status_t BMessage::FindMessage(const char* name, int32 index, BMessage* msg) const
 {
+#if 0
 	return fBody->FindData<BMessage>(name, index, msg, B_MESSAGE_TYPE);
+#endif
+	void* data = NULL;
+	ssize_t size = 0;
+	status_t err = FindData(name, B_MESSAGE_TYPE, index,
+							(const void**)&data, &size);
+	if (!err)
+	{
+		err = msg->Unflatten((const char*)data);
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindFlat(const char* name, BFlattenable* obj) const
@@ -1028,7 +1086,19 @@ status_t BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* re
 {
 	// TODO: test
 	// Use voidref's theoretical BDataBuffer
+#if 0
 	return fBody->ReplaceData<entry_ref>(name, index, *ref, B_REF_TYPE);
+#endif
+	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
+	size_t size;
+	status_t err = entry_ref_flatten(buffer, &size, ref);
+	if (!err)
+	{
+		BDataBuffer DB((void*)buffer, size);
+		err = fBody->ReplaceData<BDataBuffer>(name, index, DB, B_REF_TYPE);
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceMessage(const char* name, const BMessage* msg)
@@ -1039,7 +1109,28 @@ status_t BMessage::ReplaceMessage(const char* name, const BMessage* msg)
 status_t BMessage::ReplaceMessage(const char* name, int32 index,
 								  const BMessage* msg)
 {
+#if 0
 	return fBody->ReplaceData<BMessage>(name, index, *msg, B_MESSAGE_TYPE);
+#endif
+	status_t err = B_OK;
+	ssize_t size = msg->FlattenedSize();
+	char* buffer = new(nothrow) char[size];
+	if (buffer)
+	{
+		err = msg->Flatten(buffer, size);
+		if (!err)
+		{
+			BDataBuffer DB((void*)buffer, size);
+			err = fBody->ReplaceData<BDataBuffer>(name, index, DB,
+												  B_MESSAGE_TYPE);
+		}
+	}
+	else
+	{
+		err = B_NO_MEMORY;
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceFlat(const char* name, BFlattenable* obj)
@@ -1121,7 +1212,7 @@ status_t BMessage::ReplaceData(const char* name, type_code type, int32 index,
 		default:
 			// TODO: test
 			// Using the mythical BDataBuffer
-			BDataBuffer DB((void*)data, data_size);
+			BDataBuffer DB((void*)data, data_size, true);
 			err = fBody->ReplaceData<BDataBuffer>(name, index, DB, type);
 			break;
 	}
@@ -1132,6 +1223,11 @@ status_t BMessage::ReplaceData(const char* name, type_code type, int32 index,
 void* BMessage::operator new(size_t size)
 {
 	return ::new char[size];
+}
+//------------------------------------------------------------------------------
+void* BMessage::operator new(size_t, void* p)
+{
+	return p;
 }
 //------------------------------------------------------------------------------
 void BMessage::operator delete(void* ptr, size_t size)
@@ -1282,10 +1378,19 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 	{
 		swap = true;
 	}
-	else
+	else if (data == 'FOB1')
 	{
 		swap = false;
 	}
+	else
+	{
+		// This is *not* a message
+		return B_NOT_A_MESSAGE;
+	}
+
+	// Make way for the new data
+	MakeEmpty();
+
 	read_helper.SetSwap(swap);
 	
 	// get the checksum

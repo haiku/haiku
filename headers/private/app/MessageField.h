@@ -141,6 +141,13 @@ struct BMessageFieldFlattenPolicy
 	}
 };
 //------------------------------------------------------------------------------
+template<class T>
+struct BMessageFieldGetDataPolicy
+{
+	inline static const void* GetData(const T* data)
+		{ return (const void*)data; }
+};
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 template
@@ -149,7 +156,8 @@ template
 	class StoragePolicy = BMessageFieldStoragePolicy<T1>,
 	class SizePolicy = BMessageFieldSizePolicy<T1>,
 	class PrintPolicy = BMessageFieldPrintPolicy<T1>,
-	class FlattenPolicy = BMessageFieldFlattenPolicy<T1>
+	class FlattenPolicy = BMessageFieldFlattenPolicy<T1>,
+	class GetDataPolicy = BMessageFieldGetDataPolicy<T1>
 >
 class BMessageFieldImpl : public BMessageField
 {
@@ -192,10 +200,11 @@ template
 	class StoragePolicy,
 	class SizePolicy,
 	class PrintPolicy,
-	class FlattenPolicy
+	class FlattenPolicy,
+	class GetDataPolicy
 >
 ssize_t 
-BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy>::
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 FlattenedSize() const
 {
 	ssize_t size = 0;
@@ -220,10 +229,11 @@ template
 	class StoragePolicy,
 	class SizePolicy,
 	class PrintPolicy,
-	class FlattenPolicy
+	class FlattenPolicy,
+	class GetDataPolicy
 >
 status_t 
-BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy>::
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 Flatten(BDataIO& stream) const
 {
 	status_t	err = B_OK;
@@ -271,10 +281,11 @@ template
 	class StoragePolicy,
 	class SizePolicy,
 	class PrintPolicy,
-	class FlattenPolicy
+	class FlattenPolicy,
+	class GetDataPolicy
 >
 void 
-BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy>::
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 AddItem(const T1& data)
 {
 	fData.Add(data);
@@ -311,10 +322,11 @@ template
 	class StoragePolicy,
 	class SizePolicy,
 	class PrintPolicy,
-	class FlattenPolicy
+	class FlattenPolicy,
+	class GetDataPolicy
 >
 const void*
-BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy>::
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 DataAt(int32 index, ssize_t* size) const
 {
 	if (index > CountItems())
@@ -323,8 +335,8 @@ DataAt(int32 index, ssize_t* size) const
 	*size = SizePolicy::Size(fData[index]);
 	const T1& ref = fData[index];
 	const T1* data = &ref;
-	
-	return (const void*)data;
+
+	return GetDataPolicy::GetData(data);//(const void*)data;
 }
 //------------------------------------------------------------------------------
 template
@@ -333,10 +345,11 @@ template
 	class StoragePolicy,
 	class SizePolicy,
 	class PrintPolicy,
-	class FlattenPolicy
+	class FlattenPolicy,
+	class GetDataPolicy
 >
 void 
-BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy>::
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 PrintDataItem(int32 index) const
 {
 	if (index && FixedSize())
@@ -568,6 +581,13 @@ struct BMessageFieldFlattenPolicy<BMessage*>
 			err = B_OK;
 		return err;
 	}
+};
+// GetData policy specializations ----------------------------------------------
+template<>
+struct BMessageFieldGetDataPolicy<BDataBuffer>
+{
+	inline static const void* GetData(const BDataBuffer* data)
+		{ return data->Buffer(); }
 };
 //------------------------------------------------------------------------------
 

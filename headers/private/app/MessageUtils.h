@@ -26,6 +26,14 @@
 
 uint32 _checksum_(const uchar *buf, int32 size);
 
+namespace BPrivate {	// Only putting these here because Be did
+
+status_t entry_ref_flatten(char* buffer, size_t* size, const entry_ref* ref);
+status_t entry_ref_unflatten(entry_ref* ref, const char* buffer, size_t size);
+status_t entry_ref_swap(char* buffer, size_t size);
+
+}	// namespace BPrivate
+
 //------------------------------------------------------------------------------
 // _set_message_target_
 /*!	\brief Sets the target of a message.

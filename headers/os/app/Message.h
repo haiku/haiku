@@ -260,6 +260,7 @@ virtual				~BMessage();
 								const void *data, ssize_t data_size);
 
 		void		*operator new(size_t size);
+		void		*operator new(size_t, void* p);
 		void		operator delete(void *ptr, size_t size);
 
 // Private, reserved, or obsolete ----------------------------------------------
