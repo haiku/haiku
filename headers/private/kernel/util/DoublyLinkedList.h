@@ -227,7 +227,7 @@ public:
 		Iterator(List *list)
 			: fList(list),
 			  fCurrent(NULL),
-			  fNext(fList->GetFirst())
+			  fNext(fList->First())
 		{
 		}
 
@@ -277,7 +277,7 @@ public:
 	public:
 		ConstIterator(const List *list)
 			: fList(list),
-			  fNext(list->GetFirst())
+			  fNext(list->First())
 		{
 		}
 
@@ -511,7 +511,7 @@ int32
 DOUBLY_LINKED_LIST_CLASS_NAME::Size() const
 {
 	int32 count = 0;
-	for (Element* element = GetFirst(); element; element = GetNext(element))
+	for (Element* element = First(); element; element = GetNext(element))
 		count++;
 	return count;
 }
