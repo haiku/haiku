@@ -45,7 +45,7 @@ struct TFloatInitPolicy : public ArrayTypeBase<float>
 	}
 };
 
-struct TInt8AssertPolicy
+struct TFloatAssertPolicy
 {
 	inline static float Zero()		{ return 0; }
 	inline static float Invalid()	{ return 0;}

@@ -28,6 +28,8 @@
 //					the scripting mechanisms.
 //------------------------------------------------------------------------------
 
+#define USING_TEMPLATE_MADNESS
+
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
@@ -313,13 +315,15 @@ status_t BMessage::SendReply(uint32 command, BHandler* reply_to)
 status_t BMessage::SendReply(BMessage* the_reply, BHandler* reply_to,
 							 bigtime_t timeout)
 {
-	// TODO: implement
+	BMessenger messenger(fReplyTo.team, fReplyTo.port, fReplyTo.target,
+						 fReplyTo.preferred);
+	return SendReply(the_reply, messenger, timeout);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
 							 bigtime_t timeout)
 {
-	// TODO: implement
+	// TODO: implement *
 }
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(uint32 command, BMessage* reply_to_reply)
@@ -331,7 +335,7 @@ status_t BMessage::SendReply(uint32 command, BMessage* reply_to_reply)
 status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
 							 bigtime_t send_timeout, bigtime_t reply_timeout)
 {
-	// TODO: implement
+	// TODO: implement *
 }
 //------------------------------------------------------------------------------
 ssize_t BMessage::FlattenedSize() const
@@ -588,7 +592,7 @@ status_t BMessage::AddSpecifier(const BMessage* specifier)
 	return err;
 }
 //------------------------------------------------------------------------------
-status_t SetCurrentSpecifier(int32 index)
+status_t BMessage::SetCurrentSpecifier(int32 index)
 {
 	type_code	type;
 	int32		count;

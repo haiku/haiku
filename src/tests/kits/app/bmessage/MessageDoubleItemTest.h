@@ -45,7 +45,7 @@ struct TDoubleInitPolicy : public ArrayTypeBase<double>
 	}
 };
 
-struct TInt8AssertPolicy
+struct TDoubleAssertPolicy
 {
 	inline static double Zero()		{ return 0; }
 	inline static double Invalid()	{ return 0;}
