@@ -317,6 +317,7 @@ simple_module_info(module_info *mod, const char *file, int offset)
 	/* Record where the module_info can be found */
 	m->offset = offset;
 	m->file = (char*)kstrdup(file);
+	m->ref_cnt = 0;
 	/* set the keep_loaded flag */
 	if (mod->flags & B_KEEP_LOADED) {
 		dprintf("module %s wants to be kept loaded\n", m->name);
