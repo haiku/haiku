@@ -581,7 +581,7 @@ bool BLooper::IsLocked() const
 //------------------------------------------------------------------------------
 status_t BLooper::LockWithTimeout(bigtime_t timeout)
 {
-	return _Lock(this, -1, B_INFINITE_TIMEOUT);
+	return _Lock(this, -1, timeout);
 }
 //------------------------------------------------------------------------------
 thread_id BLooper::Thread() const
