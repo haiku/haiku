@@ -30,9 +30,15 @@
 
 #include "PrivateScreen.h"
 
+// TODO: As you'll have seen, we sometimes include the screen_id to the app server
+// request, sometimes not. I think the screen_id is not needed if we send the workspace
+// index.
+
 
 // TODO: We should define this somewhere else
 // We could find how R5 defines this, though it's not strictly necessary
+// AFAIK, R5 here keeps also the screen width, height, colorspace, and some other things
+// (it's 48 bytes big)
 struct screen_desc {
 	void *base_address;
 	uint32 bytes_per_row;
@@ -46,6 +52,8 @@ extern BPrivateScreen *gPrivateScreen;
 BPrivateScreen *
 BPrivateScreen::CheckOut(BWindow *win)
 {
+	// TODO: If we start supporting multiple monitors, we
+	// should return the right screen for the passed BWindow
 	return gPrivateScreen;
 }
 
@@ -53,6 +61,8 @@ BPrivateScreen::CheckOut(BWindow *win)
 BPrivateScreen *
 BPrivateScreen::CheckOut(screen_id id)
 {
+	// TODO: If we start supporting multiple monitors, we
+	// should return the right object for the given screen_id
 	return gPrivateScreen;
 }
 
@@ -60,6 +70,9 @@ BPrivateScreen::CheckOut(screen_id id)
 void
 BPrivateScreen::Return(BPrivateScreen *screen)
 {
+	// Not much to do here. I guess it's some legacy from pre-R5,
+	// where BScreen could not be used for long time,
+	// as they blocked the BApplication
 }
 
 	
@@ -85,18 +98,20 @@ BPrivateScreen::ColorSpace()
 BRect
 BPrivateScreen::Frame()
 {
+	// If something goes wrong, we just return this rectangle.
+	BRect rect(0, 0, 0, 0);
 	display_mode mode;
-	if (GetMode(B_ALL_WORKSPACES, &mode) == B_OK) {
-		BRect frame(0, 0, (float)mode.virtual_width - 1, (float)mode.virtual_height - 1);
-		return frame;
-	}
-	return BRect();
+	if (GetMode(B_ALL_WORKSPACES, &mode) == B_OK)
+		rect.Set(0, 0, (float)mode.virtual_width - 1, (float)mode.virtual_height - 1);
+		
+	return rect;
 }
 
 
 screen_id 
 BPrivateScreen::ID()
 {
+	// TODO: Change this if we start supporting multiple screens
 	return B_MAIN_SCREEN_ID;
 }
 	
@@ -123,6 +138,14 @@ BPrivateScreen::RetraceSemaphore()
 {
 	sem_id id = B_BAD_SEM_ID;
 	// TODO: Implement
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_GET_RETRACE_SEMAPHORE);
+	link.Attach<screen_id>(ID());
+	link.FlushWithReply(&reply);
+	reply.Read<sem_id>(&id);
+	*/
 	return id;
 }
 
@@ -190,22 +213,32 @@ BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bound)
 
 		
 rgb_color
-BPrivateScreen::DesktopColor(uint32 index)
+BPrivateScreen::DesktopColor(uint32 workspace)
 {
-	if (fColorMap) {
-	
-	}
-
-	return rgb_color();
+	rgb_color color;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_GET_DESKTOP_COLOR);
+	link.Attach<int32>(workspace);
+	link.FlushWithReply(&reply);
+	reply.Read<rgb_color>(&color);
+	*/
+	return color;
 }
 
 
 void
-BPrivateScreen::SetDesktopColor(rgb_color, uint32, bool)
+BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace, bool makeDefault)
 {
-	if (fColorMap) {
-	
-	}
+	/*
+	BAppServerLink link;
+	link.SetOpCode(AS_SET_DESKTOP_COLOR);
+	link.Attach<rgb_color>(color);
+	link.Attach<int32>(workspace);
+	link.Attach<bool>(makeDefault);
+	link.Flush();
+	*/
 }
 
 
@@ -229,7 +262,21 @@ status_t
 BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 {
 	// TODO: Implement
-	return B_ERROR;
+	status_t status = B_ERROR;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	display_mode currentMode;
+	link.SetOpCode(AS_GET_MODE);
+	link.Attach<uint32>(workspace);
+	
+	link.FlushWithReply(&reply);
+	reply.Read<display_mode>(&currentMode);
+	reply.Read<status_t>(&status);
+	if (status == B_OK && mode)
+		*mode = currentMode; 
+	*/
+	return status;
 }
 
 
@@ -237,7 +284,18 @@ status_t
 BPrivateScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 {
 	// TODO: Implement
-	return B_ERROR;
+	status_t status = B_ERROR;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_SET_MODE);
+	link.Attach<uint32>(workspace);
+	link.Attach<display_mode>(*mode);
+	link.Attach<bool>(makeDefault);
+	link.FlushWithReply(&reply);
+	reply.Read<status_t>(&status);
+	*/
+	return status;
 }
 
 
@@ -268,8 +326,17 @@ BPrivateScreen::GetTimingConstraints(display_timing_constraints *dtc)
 status_t
 BPrivateScreen::SetDPMS(uint32 dpmsState)
 {
-	// TODO: Implement
-	return B_ERROR;
+	status_t status = B_ERROR;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_SET_DPMS);
+	link.Attach<screen_id>(ID());
+	link.Attach<uint32>(dpmsState);
+	link.FlushWithReply(&reply);
+	reply.Read<status_t>(&status);
+	*/
+	return status;
 }
 
 
@@ -277,7 +344,16 @@ uint32
 BPrivateScreen::DPMSState()
 {
 	// TODO: Implement
-	return B_ERROR;
+	uint32 state = 0;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_GET_DPMS_STATE);
+	link.Attach<screen_id>(ID());
+	link.FlushWithReply(&reply);
+	reply.Read<uint32>(&state);
+	*/
+	return state;
 }
 
 
@@ -285,7 +361,16 @@ uint32
 BPrivateScreen::DPMSCapabilites()
 {
 	// TODO: Implement
-	return B_ERROR;
+	uint32 capabilities = 0;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_GET_DPMS_CAPABILITIES);
+	link.Attach<screen_id>(ID());
+	link.FlushWithReply(&reply);
+	reply.Read<uint32>(&capabilities);
+	*/
+	return capabilities;
 }
 
 
@@ -313,7 +398,17 @@ BPrivateScreen::BytesPerRow()
 status_t
 BPrivateScreen::get_screen_desc(screen_desc *desc)
 {
-	return B_ERROR;
+	status_t status = B_ERROR;
+	/*
+	BAppServerLink link;
+	PortMessage reply;
+	link.SetOpCode(AS_GET_SCREEN_DESC);
+	link.Attach<screen_id>(ID());
+	link.FlushWithReply(&reply);
+	reply.Read<screen_desc>(*desc);
+	reply.Read<status_t>(&status);
+	*/
+	return status;
 }
 
 	
@@ -325,6 +420,10 @@ BPrivateScreen::BPrivateScreen()
 	fOwnsColorMap(false)
 {
 	// TODO: Get a pointer or a copy of the colormap from the app server
+	// if we only have one screen (one card, one monitor),
+	// it's better to get only a pointer (with BApplication::ro_offset_to_ptr() ?)
+	// otherwise every BApplication will keep a copy of the same colormap,
+	// and we would waste memory for nothing
 }
 
 
