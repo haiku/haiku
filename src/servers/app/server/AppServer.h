@@ -39,19 +39,16 @@ public:
 
 	static	int32 PollerThread(void *data);
 	static	int32 PicassoThread(void *data);
-	thread_id			Run(void);
-	void				MainLoop(void);
+	thread_id Run(void);
+	void MainLoop(void);
 	
-	bool				LoadDecorator(const char *path);
-	void				InitDecorators(void);
+	bool LoadDecorator(const char *path);
+	void InitDecorators(void);
 	
-	void				DispatchMessage(PortMessage *msg);
-	void				Broadcast(int32 code);
+	void DispatchMessage(PortMessage *msg);
+	void Broadcast(int32 code);
 
-	// TODO: remove shortly!
-	void				HandleKeyMessage(int32 code, int8 *buffer);
-	
-	ServerApp*			FindApp(const char *sig);
+	ServerApp* FindApp(const char *sig);
 
 private:
 	friend	Decorator*	new_decorator(BRect rect, const char *title,
@@ -79,8 +76,6 @@ private:
 			fDecoratorLock;
 	
 	DisplayDriver *fDriver;
-	
-	int32 fScreenShotIndex;
 };
 
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
@@ -89,5 +84,6 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 extern CursorManager *cursormanager;
 extern BitmapManager *bitmapmanager;
 extern ColorSet gui_colorset;
+extern AppServer *app_server;
 
 #endif
