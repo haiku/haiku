@@ -13,14 +13,26 @@
 #include "TimeSourceObject.h"
 #include "TimeSourceObjectManager.h"
 
-TimeSourceObject::TimeSourceObject(media_node_id id) :
-	BMediaNode("some timesource object", id, B_TIME_SOURCE),
-	BTimeSource(id)
+TimeSourceObject::TimeSourceObject(const media_node &node)
+ :	BMediaNode("some timesource object", node.node, node.kind),
+	BTimeSource(node.node)
 {
 //	printf("TimeSourceObject::TimeSourceObject enter, id = %ld\n", id);
-	delete_port(fControlPort);
-	fControlPort = -999666; // must match value in BMediaNode::~BMediaNode()
-	ASSERT(id == fNodeID);
+	if (fControlPort > 0)
+		delete_port(fControlPort);
+	fControlPort = node.port;
+	ASSERT(fNodeID == node.node);
+	ASSERT(fKinds == node.kind);
+
+	live_node_info lni;
+	if (B_OK == BMediaRoster::Roster()->GetLiveNodeInfo(node, &lni)) {
+		strcpy(fName, lni.name);
+	} else {
+		sprintf(fName, "timesource %ld", node.node);
+	}
+
+	AddNodeKind(NODE_KIND_SHADOW_TIMESOURCE);
+	fControlPort = -1234;
 //	printf("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
 }
 
@@ -52,12 +64,13 @@ TimeSourceObject::DeleteHook(BMediaNode *node)
 }
 
 
-SystemTimeSourceObject::SystemTimeSourceObject(media_node_id id)
- : 	BMediaNode("System Time Source", id, B_TIME_SOURCE),
-	TimeSourceObject(id)
+SystemTimeSourceObject::SystemTimeSourceObject(const media_node &node)
+ : 	BMediaNode("System Clock", node.node, node.kind),
+	TimeSourceObject(node)
 {
 //	printf("SystemTimeSourceObject::SystemTimeSourceObject enter, id = %ld\n", id);
 	fIsRealtime = true;
+	AddNodeKind(NODE_KIND_SYSTEM_TIMESOURCE);
 //	printf("SystemTimeSourceObject::SystemTimeSourceObject leave, node id %ld\n", ID());
 }
 

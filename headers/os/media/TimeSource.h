@@ -121,7 +121,7 @@ virtual		status_t _Reserved_TimeSource_3(void *);
 virtual		status_t _Reserved_TimeSource_4(void *);
 virtual		status_t _Reserved_TimeSource_5(void *);
 
-		bool fStopped;
+		bool fStarted;
 		area_id fArea;
 		volatile BPrivate::media::TimeSourceTransmit *fBuf;
 		_BSlaveNodeStorageP * _mSlaveNodes;

@@ -23,6 +23,7 @@ TimeSourceObjectManager::TimeSourceObjectManager()
  :	fSystemTimeSource(0),
  	fSystemTimeSourceID(0)
 {
+	CALLED();
 	fLock = new BLocker("timesource object manager locker");
 	fMap = new Map<media_node_id,BTimeSource *>;
 }
@@ -30,6 +31,7 @@ TimeSourceObjectManager::TimeSourceObjectManager()
 
 TimeSourceObjectManager::~TimeSourceObjectManager()
 {
+	CALLED();
 	delete fLock;
 
 	// force unloading all currently loaded 
@@ -48,6 +50,7 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 BTimeSource *
 TimeSourceObjectManager::GetTimeSource(const media_node &node)
 {
+	CALLED();
 	BAutolock lock(fLock);
 
 //	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
@@ -55,14 +58,14 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	if (fSystemTimeSource == 0) {
 		media_node clone;
 		status_t rv;
-		rv = BMediaRoster::Roster()->GetSystemTimeSource(&clone);
+		// XXX this clone is never released
+		rv = BMediaRoster::Roster()->GetSystemTimeSource(&clone); 
 		if (rv != B_OK) {
 			FATAL("TimeSourceObjectManager::GetTimeSource, GetSystemTimeSource failed\n");
 			return NULL;
 		}
-		fSystemTimeSourceID = clone.node;
-		fSystemTimeSource = new SystemTimeSourceObject(fSystemTimeSourceID);
-		ASSERT(fSystemTimeSourceID == fSystemTimeSource->ID());
+		fSystemTimeSource = new SystemTimeSourceObject(clone);
+		fSystemTimeSourceID = fSystemTimeSource->ID();
 	}
 	
 	if (node.node == fSystemTimeSourceID)
@@ -82,7 +85,7 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	}
 		
 	BTimeSource *ts;
-	ts = new TimeSourceObject(clone.node);
+	ts = new TimeSourceObject(clone);
 	fMap->Insert(clone.node, ts);
 	return ts;
 }
@@ -90,6 +93,7 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 void
 TimeSourceObjectManager::ObjectDeleted(BTimeSource *timesource)
 {
+	CALLED();
 	BAutolock lock(fLock);
 
 //	printf("TimeSourceObjectManager::ObjectDeleted, node id %ld\n", timesource->ID());

@@ -10,11 +10,12 @@
 
 namespace BPrivate { namespace media {
 
-struct TimeSourceTransmit
+struct TimeSourceTransmit // sizeof() must be <= 4096
 {
 	#define INDEX_COUNT 128
 	int32 readindex;
 	int32 writeindex;
+	int32 isrunning;
 	bigtime_t realtime[INDEX_COUNT];
 	bigtime_t perftime[INDEX_COUNT];
 	float drift[INDEX_COUNT];
@@ -102,8 +103,11 @@ bool
 BTimeSource::IsRunning()
 {
 	CALLED();
-	printf("BTimeSource::IsRunning() node %ld, port %ld, %s\n", fNodeID, fControlPort, fStopped ? "no" : "yes");
-	return !fStopped;
+	bool isrunning;
+	isrunning = fBuf ? atomic_add(&fBuf->isrunning, 0) : fStarted;
+	
+	printf("BTimeSource::IsRunning() node %ld, port %ld, %s\n", fNodeID, fControlPort, isrunning ? "yes" : "no");
+	return isrunning;
 }
 
 
@@ -166,7 +170,7 @@ BTimeSource::GetStartLatency(bigtime_t *out_latency)
 
 BTimeSource::BTimeSource() : 
 	BMediaNode("This one is never called"),
-	fStopped(false),
+	fStarted(false),
 	fArea(-1),
 	fBuf(NULL),
 	fIsRealtime(false)
@@ -224,8 +228,11 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 						 float drift)
 {
 	printf("BTimeSource::PublishTime timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), performance_time, real_time, drift);
-	if (0 == fBuf)
+	if (0 == fBuf) {
+		FATAL("BTimeSource::PublishTime timesource %ld, fBuf = NULL\n", ID());
+		fStarted = true;
 		return;
+	}
 
 	int32 index;
 	index = atomic_add(&fBuf->writeindex, 1) & (INDEX_COUNT - 1);
@@ -280,7 +287,7 @@ status_t BTimeSource::_Reserved_TimeSource_5(void *) { return B_ERROR; }
 /* explicit */
 BTimeSource::BTimeSource(media_node_id id) :
 	BMediaNode("This one is never called"),
-	fStopped(false),
+	fStarted(false),
 	fArea(-1),
 	fBuf(NULL),
 	fIsRealtime(false)
@@ -300,7 +307,8 @@ BTimeSource::BTimeSource(media_node_id id) :
 		FATAL("BTimeSource::BTimeSource couldn't find area, node %ld\n", id);
 		return;
 	}
-	fArea = clone_area("__some_timesource_buf", reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+	sprintf(name, "__cloned_timesource_buf_%ld", id);
+	fArea = clone_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
 	if (fArea <= 0) {
 		FATAL("BTimeSource::BTimeSource couldn't clone area, node %ld\n", id);
 		return;
@@ -327,6 +335,7 @@ BTimeSource::FinishCreate()
 	fBuf->realtime[0] = 0;
 	fBuf->perftime[0] = 0;
 	fBuf->drift[0] = 1.0f;
+	fBuf->isrunning = fStarted;
 }
 
 
@@ -352,7 +361,10 @@ void
 BTimeSource::DirectStart(bigtime_t at)
 {
 	UNIMPLEMENTED();
-	fStopped = false;
+	if (fBuf)
+		atomic_or(&fBuf->isrunning, 1);
+	else
+		fStarted = true;
 }
 
 
@@ -361,7 +373,10 @@ BTimeSource::DirectStop(bigtime_t at,
 						bool immediate)
 {
 	UNIMPLEMENTED();
-	fStopped = true;
+	if (fBuf)
+		atomic_and(&fBuf->isrunning, 0);
+	else
+		fStarted = false;
 }
 
 

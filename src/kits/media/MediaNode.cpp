@@ -15,6 +15,7 @@
 #include "DataExchange.h"
 #include "ServerInterface.h"
 #include "Notifications.h"
+#include "TimeSourceObject.h"
 
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;
@@ -101,12 +102,17 @@ BMediaNode::~BMediaNode()
 	// BeBook: UnregisterNode() unregisters a node from the Media Server. It's called automatically 
 	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before 
 	// BeBook: you delete your node instance, depending on your implementation and circumstances.
-	// ATT! We do not unregister TimeSourceObject nodes (identified by fControlPort == -999666)
-	if (fControlPort != -999666)  // must match value in TimeSourceObject::TimeSourceObject()
-		(BMediaRoster::Roster())->UnregisterNode(this);
+
+	// Attention! We do not unregister TimeSourceObject nodes,
+	// or delete their control ports, since they are only a
+	// shadow object, and the real one still exists
+	if (0 == (fKinds & NODE_KIND_SHADOW_TIMESOURCE)) {
+		BMediaRoster::Roster()->UnregisterNode(this);
 	
-	if (fControlPort > 0)
-		delete_port(fControlPort);
+		if (fControlPort > 0)
+			delete_port(fControlPort);
+	}
+
 	if (fTimeSource)
 		fTimeSource->Release();
 }
@@ -159,7 +165,7 @@ uint64
 BMediaNode::Kinds() const
 {
 	CALLED();
-	return fKinds;
+	return fKinds & NODE_KIND_USER_MASK;
 }
 
 
@@ -200,13 +206,14 @@ BMediaNode::TimeSource() const
 		return NULL;
 	}
 	self->fTimeSource = roster->MakeTimeSourceFor(clone);
+	ASSERT(fTimeSource == self->fTimeSource);
 	if (fTimeSource == 0) {
 		FATAL("BMediaNode::TimeSource: Error, MakeTimeSourceFor failed\n");
 	} else {
 		fTimeSource->AddMe(self);
 	}
 	rv = roster->ReleaseNode(clone);
-	if (fTimeSource == 0) {
+	if (rv != B_OK) {
 		FATAL("BMediaNode::TimeSource: Error, ReleaseNode failed\n");
 	}
 
@@ -479,6 +486,7 @@ BMediaNode::SetTimeSource(BTimeSource *time_source)
 		newsource->AddMe(this);
 	}
 	fTimeSource = newsource;
+	//BMediaRoster::Roster()->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
 }
 
 /*************************************************************
@@ -567,6 +575,7 @@ BMediaNode::HandleMessage(int32 message,
 				fTimeSource = newsource;
 			}
 			fTimeSource->AddMe(this);
+			//roster->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
 			return B_OK;
 		}
 
@@ -791,7 +800,7 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 	TRACE("BMediaNode::_InitObject: nodeid %ld, this %p\n", id, this);
 
 	fNodeID = id;
-	fTimeSource = 0;
+	fTimeSource = NULL;
 	fRefCount = 1;
 	fName[0] = 0;
 	if (name) {
