@@ -47,7 +47,6 @@
 #include <Beep.h>
 
 #include <Autolock.h>
-#include <stdio.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -55,7 +54,7 @@
 
 // Local Defines ---------------------------------------------------------------
 // Default size of the Alert window.
-#define DEFAULT_RECT	BRect(0, 0, 320, 75)
+#define DEFAULT_RECT	BRect(0, 0, 310, 75)
 #define max(LHS, RHS)	((LHS) > (RHS) ? (LHS) : (RHS))
 
 // Globals ---------------------------------------------------------------------
@@ -67,6 +66,7 @@ const int kDefButtonBottomOffset	=   6;
 const int kButtonRightOffset		=   6;
 const int kButtonSpaceOffset		=   6;
 const int kButtonOffsetSpaceOffset	=  26;
+const int kButtonMinOffsetSpaceOffset	=  kButtonOffsetSpaceOffset / 2;
 const int kButtonLeftOffset			=  62;
 const int kButtonUsualWidth			=  75;
 
@@ -549,9 +549,27 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 				fButtons[i]->Frame().Width() - kButtonSpaceOffset;
 			buttonY -= kButtonBottomOffset;
 			if (i == 0) {
-				if (spacing == B_OFFSET_SPACING)
-					buttonX -= kButtonOffsetSpaceOffset;
-				else if (buttonCount == 3)
+				if (spacing == B_OFFSET_SPACING) {
+					if (buttonCount == 3)
+						buttonX -= kButtonOffsetSpaceOffset;
+					else {
+						// If there are two buttons, the left wall of
+						// button0 needs to line up with the left wall
+						// of the TextView.
+						buttonX = (MasterView->Bitmap()) ?
+							kTextIconOffset : kTextLeftOffset;
+						if (fButtons[i + 1]->Frame().left - 
+						    (buttonX + fButtons[i]->Frame().Width()) <
+						    kButtonMinOffsetSpaceOffset) {
+						    // Recompute buttonX using min offset space
+						    // if using the current buttonX would not
+						    // provide enough space or cause an overlap.
+						    buttonX = fButtons[i + 1]->Frame().left -
+								fButtons[i]->Frame().Width() -
+								kButtonMinOffsetSpaceOffset;
+						}
+					}
+				} else if (buttonCount == 3)
 					buttonX -= 3;
 			}
 		}
@@ -567,14 +585,18 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 	else
 		totalWidth += kWindowMinOffset;
 
-	if (spacing == B_OFFSET_SPACING)
-		totalWidth = max(kWindowOffsetMinWidth, totalWidth);
-	else {
+	if (spacing == B_OFFSET_SPACING) {
+		totalWidth -= 2;
+		if (buttonCount == 3)
+			totalWidth = max(kWindowOffsetMinWidth, totalWidth);
+		else
+			totalWidth = max(kWindowMinWidth, totalWidth);
+	} else {
 		totalWidth += 5;
 		totalWidth = max(kWindowMinWidth, totalWidth);
 	}
 	ResizeTo(totalWidth, Bounds().Height());
-
+	
 	// Set up the text view
 	BRect TextViewRect(kTextLeftOffset, kTextTopOffset,
 		Bounds().right - kTextRightOffset,
@@ -592,7 +614,7 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 	fTextView->MakeSelectable(false);
 	fTextView->SetWordWrap(true);
 
-	// Now resize the window vertically so that all the text is visible
+	// Now resize the TextView vertically so that all the text is visible
 	float textHeight = fTextView->TextHeight(0, fTextView->CountLines());
 	TextViewRect.OffsetTo(0, 0);
 	textHeight -= TextViewRect.Height();
