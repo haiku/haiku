@@ -30,7 +30,10 @@ Depends NetworkingKit :
 NotFile MediaKit ;
 Depends MediaKit :
 	libmedia.so 
-	media_server media_addon_server 
+
+	desklink
+	media_addon_server 
+	media_server
 
 	# add-ons
 	mixer.media_addon 	
