@@ -60,8 +60,9 @@ Server input_server :
 ;
 
 if $(COMPILE_FOR_R5) {
+	LinkSharedOSLibs input_server : stdc++.r4 ;
 } else {
-	LinkSharedOSLibs input_server : <boot!home!config!lib>libopenbeos.so ;
+	LinkSharedOSLibs input_server : <boot!home!config!lib>libopenbeos.so stdc++.r4 ;
 }
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
