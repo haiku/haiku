@@ -41,10 +41,23 @@ const char * const sigstr[NSIG] = {
 
 
 static bool
-notify_debugger(int signal, struct sigaction *handler, bool deadly,
-	cpu_status *state)
+notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
+	bool deadly, cpu_status *state)
 {
 	bool result;
+	uint64 signalMask = SIGNAL_TO_MASK(signal);
+
+	// first check the ignore signal masks the debugger specified for the thread
+
+	if (thread->debug_info.ignore_signals_once & signalMask) {
+		thread->debug_info.ignore_signals_once &= ~signalMask;
+		return true;
+	}
+
+	if (thread->debug_info.ignore_signals & signalMask)
+		return true;
+
+	// deliver the event
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(*state);
@@ -108,7 +121,7 @@ handle_signals(struct thread *thread, cpu_status *state)
 
 				// notify the debugger
 				if (debugSignal)
-					notify_debugger(sig, handler, false, state);
+					notify_debugger(thread, sig, handler, false, state);
 				continue;
 			}
 			if (handler->sa_handler == SIG_DFL) {
@@ -121,15 +134,18 @@ handle_signals(struct thread *thread, cpu_status *state)
 					case SIGTTOU:
 					case SIGCONT:
 						// notify the debugger
-						if (debugSignal)
-							notify_debugger(sig, handler, false, state);
+						if (debugSignal) {
+							notify_debugger(thread, sig, handler, false, state);
+						}
 						continue;
 
 					case SIGSTOP:
 						// notify the debugger
 						if (debugSignal) {
-							if (!notify_debugger(sig, handler, false, state))
+							if (!notify_debugger(thread, sig, handler, false,
+								state)) {
 								continue;
+							}
 						}
 
 						thread->next_state = B_THREAD_SUSPENDED;
@@ -152,8 +168,10 @@ handle_signals(struct thread *thread, cpu_status *state)
 						// notify the debugger
 						if (debugSignal && sig != SIGKILL
 								&& sig != SIGKILLTHR) {
-							if (!notify_debugger(sig, handler, true, state))
+							if (!notify_debugger(thread, sig, handler, true,
+								state)) {
 								continue;
+							}
 						}
 
 						RELEASE_THREAD_LOCK();
@@ -173,7 +191,7 @@ handle_signals(struct thread *thread, cpu_status *state)
 
 			// notify the debugger
 			if (debugSignal) {
-				if (!notify_debugger(sig, handler, false, state))
+				if (!notify_debugger(thread, sig, handler, false, state))
 					continue;
 			}
 
@@ -413,11 +431,18 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 }
 
 
+/**	\brief Similar to sigaction(), just for a specified thread.
+ *
+ *	A \a threadID is < 0 specifies the current thread.
+ *
+ */
 int
-sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
+sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
+	struct sigaction *oact)
 {
 	struct thread *thread;
 	cpu_status state;
+	status_t error = B_OK;
 
 	if (signal < 1 || signal > MAX_SIGNO
 		|| signal == SIGKILL || signal == SIGKILLTHR || signal == SIGSTOP)
@@ -426,25 +451,44 @@ sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	thread = thread_get_current_thread();
+	thread = (threadID < 0
+		? thread_get_current_thread()
+		: thread_get_thread_struct_locked(threadID));
 
-	if (oact)
-		memcpy(oact, &thread->sig_action[signal - 1], sizeof(struct sigaction));
-	if (act)
-		memcpy(&thread->sig_action[signal - 1], act, sizeof(struct sigaction));
+	if (thread) {
+		if (oact) {
+			memcpy(oact, &thread->sig_action[signal - 1],
+				sizeof(struct sigaction));
+		}
 
-	if (act && act->sa_handler == SIG_IGN)
-		thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
-	else if (act && act->sa_handler == SIG_DFL) {
-		if (signal == SIGCONT || signal == SIGCHLD || signal == SIGWINCH)
+		if (act) {
+			memcpy(&thread->sig_action[signal - 1], act,
+				sizeof(struct sigaction));
+		}
+
+		if (act && act->sa_handler == SIG_IGN)
 			thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
-	} /*else
-		dprintf("### custom signal handler set\n");*/
+		else if (act && act->sa_handler == SIG_DFL) {
+			if (signal == SIGCONT || signal == SIGCHLD
+				|| signal == SIGWINCH) {
+				thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
+			}
+		} /*else
+			dprintf("### custom signal handler set\n");*/
+	} else
+		error = B_BAD_THREAD_ID;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	return 0;
+	return error;
+}
+
+
+int
+sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
+{
+	return sigaction_etc(-1, signal, act, oact);
 }
 
 
