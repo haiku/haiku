@@ -42,6 +42,7 @@ status_t nm_crtc_depth(int mode);
 status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp); 
 status_t nm_crtc_set_display_pitch(void);
 status_t nm_crtc_center(display_mode target, bool crt_only);
+status_t nm_crtc_prg_panel(void);
 
 status_t nm_crtc_dpms(bool, bool, bool);
 status_t nm_crtc_dpms_fetch(bool*, bool*, bool*);

@@ -615,6 +615,192 @@ status_t nm_crtc_center(display_mode target, bool crt_only)
 	return B_OK;
 }
 
+/* program panel modeline if needed */
+status_t nm_crtc_prg_panel()
+{
+status_t stat = B_ERROR;
+
+	/* only NM2070 requires this apparantly (because it's BIOS doesn't do it OK) */
+	if (si->ps.card_type > NM2070) return B_OK;
+
+	switch(si->ps.panel_width)
+	{
+	case 640:
+		/* 640x480 panels are only used on NM2070 */
+		ISACRTCW(PANEL_0x40, 0x5f);
+		ISACRTCW(PANEL_0x41, 0x50);
+		ISACRTCW(PANEL_0x42, 0x02);
+		ISACRTCW(PANEL_0x43, 0x55);
+		ISACRTCW(PANEL_0x44, 0x81);
+		ISACRTCW(PANEL_0x45, 0x0b);
+		ISACRTCW(PANEL_0x46, 0x2e);
+		ISACRTCW(PANEL_0x47, 0xea);
+		ISACRTCW(PANEL_0x48, 0x0c);
+		ISACRTCW(PANEL_0x49, 0xe7);
+		ISACRTCW(PANEL_0x4a, 0x04);
+		ISACRTCW(PANEL_0x4b, 0x2d);
+		ISACRTCW(PANEL_0x4c, 0x28);
+		ISACRTCW(PANEL_0x4d, 0x90);
+		ISACRTCW(PANEL_0x4e, 0x2b);
+		ISACRTCW(PANEL_0x4f, 0xa0);
+		stat = B_OK;
+		break;
+	case 800:
+		switch(si->ps.panel_height)
+		{
+		case 600:
+			/* 800x600 panels are used on all cards... */
+			ISACRTCW(PANEL_0x40, 0x7f);
+			ISACRTCW(PANEL_0x41, 0x63);
+			ISACRTCW(PANEL_0x42, 0x02);
+			ISACRTCW(PANEL_0x43, 0x6c);
+			ISACRTCW(PANEL_0x44, 0x1c);
+			ISACRTCW(PANEL_0x45, 0x72);
+			ISACRTCW(PANEL_0x46, 0xe0);
+			ISACRTCW(PANEL_0x47, 0x58);
+			ISACRTCW(PANEL_0x48, 0x0c);
+			ISACRTCW(PANEL_0x49, 0x57);
+			ISACRTCW(PANEL_0x4a, 0x73);
+			ISACRTCW(PANEL_0x4b, 0x3d);
+			ISACRTCW(PANEL_0x4c, 0x31);
+			ISACRTCW(PANEL_0x4d, 0x01);
+			ISACRTCW(PANEL_0x4e, 0x36);
+			ISACRTCW(PANEL_0x4f, 0x1e);
+			if (si->ps.card_type > NM2070)
+			{
+				ISACRTCW(PANEL_0x50, 0x6b);
+				ISACRTCW(PANEL_0x51, 0x4f);
+				ISACRTCW(PANEL_0x52, 0x0e);
+				ISACRTCW(PANEL_0x53, 0x58);
+				ISACRTCW(PANEL_0x54, 0x88);
+				ISACRTCW(PANEL_0x55, 0x33);
+				ISACRTCW(PANEL_0x56, 0x27);
+				ISACRTCW(PANEL_0x57, 0x16);
+				ISACRTCW(PANEL_0x58, 0x2c);
+				ISACRTCW(PANEL_0x59, 0x94);
+			}
+			stat = B_OK;
+			break;
+		case 480:
+			/* ...while 800x480 widescreen panels are not used on NM2070. */
+			ISACRTCW(PANEL_0x40, 0x7f);
+			ISACRTCW(PANEL_0x41, 0x63);
+			ISACRTCW(PANEL_0x42, 0x02);
+			ISACRTCW(PANEL_0x43, 0x6b);
+			ISACRTCW(PANEL_0x44, 0x1b);
+			ISACRTCW(PANEL_0x45, 0x72);
+			ISACRTCW(PANEL_0x46, 0xe0);
+			ISACRTCW(PANEL_0x47, 0x1c);
+			ISACRTCW(PANEL_0x48, 0x00);
+			ISACRTCW(PANEL_0x49, 0x57);
+			ISACRTCW(PANEL_0x4a, 0x73);
+			ISACRTCW(PANEL_0x4b, 0x3e);
+			ISACRTCW(PANEL_0x4c, 0x31);
+			ISACRTCW(PANEL_0x4d, 0x01);
+			ISACRTCW(PANEL_0x4e, 0x36);
+			ISACRTCW(PANEL_0x4f, 0x1e);
+			ISACRTCW(PANEL_0x50, 0x6b);
+			ISACRTCW(PANEL_0x51, 0x4f);
+			ISACRTCW(PANEL_0x52, 0x0e);
+			ISACRTCW(PANEL_0x53, 0x57);
+			ISACRTCW(PANEL_0x54, 0x87);
+			ISACRTCW(PANEL_0x55, 0x33);
+			ISACRTCW(PANEL_0x56, 0x27);
+			ISACRTCW(PANEL_0x57, 0x16);
+			ISACRTCW(PANEL_0x58, 0x2c);
+			ISACRTCW(PANEL_0x59, 0x94);
+			stat = B_OK;
+			break;
+		}
+		break;
+	case 1024:
+		switch(si->ps.panel_height)
+		{
+		case 768:
+			/* 1024x768 panels are only used on later cards
+			 * (NM2097 and later ?) */
+			ISACRTCW(PANEL_0x40, 0xa3);
+			ISACRTCW(PANEL_0x41, 0x7f);
+			ISACRTCW(PANEL_0x42, 0x06);
+			ISACRTCW(PANEL_0x43, 0x85);
+			ISACRTCW(PANEL_0x44, 0x96);
+			ISACRTCW(PANEL_0x45, 0x24);
+			ISACRTCW(PANEL_0x46, 0xe5);
+			ISACRTCW(PANEL_0x47, 0x02);
+			ISACRTCW(PANEL_0x48, 0x08);
+			ISACRTCW(PANEL_0x49, 0xff);
+			ISACRTCW(PANEL_0x4a, 0x25);
+			ISACRTCW(PANEL_0x4b, 0x4f);
+			ISACRTCW(PANEL_0x4c, 0x40);
+			ISACRTCW(PANEL_0x4d, 0x00);
+			ISACRTCW(PANEL_0x4e, 0x44);
+			ISACRTCW(PANEL_0x4f, 0x0c);
+			ISACRTCW(PANEL_0x50, 0x7a);
+			ISACRTCW(PANEL_0x51, 0x56);
+			ISACRTCW(PANEL_0x52, 0x00);
+			ISACRTCW(PANEL_0x53, 0x5d);
+			ISACRTCW(PANEL_0x54, 0x0e);
+			ISACRTCW(PANEL_0x55, 0x3b);
+			ISACRTCW(PANEL_0x56, 0x2b);
+			ISACRTCW(PANEL_0x57, 0x00);
+			ISACRTCW(PANEL_0x58, 0x2f);
+			ISACRTCW(PANEL_0x59, 0x18);
+			ISACRTCW(PANEL_0x60, 0x88);
+			ISACRTCW(PANEL_0x61, 0x63);
+			ISACRTCW(PANEL_0x62, 0x0b);
+			ISACRTCW(PANEL_0x63, 0x69);
+			ISACRTCW(PANEL_0x64, 0x1a);
+			stat = B_OK;
+			break;
+	    case 480:
+			/* 1024x480 widescreen panels are only used on later cards
+			 * (NM2097 and later ?) */
+			ISACRTCW(PANEL_0x40, 0xa3);
+			ISACRTCW(PANEL_0x41, 0x7f);
+			ISACRTCW(PANEL_0x42, 0x1b);
+			ISACRTCW(PANEL_0x43, 0x89);
+			ISACRTCW(PANEL_0x44, 0x16);
+			ISACRTCW(PANEL_0x45, 0x0b);
+			ISACRTCW(PANEL_0x46, 0x2c);
+			ISACRTCW(PANEL_0x47, 0xe8);
+			ISACRTCW(PANEL_0x48, 0x0c);
+			ISACRTCW(PANEL_0x49, 0xe7);
+			ISACRTCW(PANEL_0x4a, 0x09);
+			ISACRTCW(PANEL_0x4b, 0x4f);
+			ISACRTCW(PANEL_0x4c, 0x40);
+			ISACRTCW(PANEL_0x4d, 0x00);
+			ISACRTCW(PANEL_0x4e, 0x44);
+			ISACRTCW(PANEL_0x4f, 0x0c);
+			ISACRTCW(PANEL_0x50, 0x7a);
+			ISACRTCW(PANEL_0x51, 0x56);
+			ISACRTCW(PANEL_0x52, 0x00);
+			ISACRTCW(PANEL_0x53, 0x5d);
+			ISACRTCW(PANEL_0x54, 0x0e);
+			ISACRTCW(PANEL_0x55, 0x3b);
+			ISACRTCW(PANEL_0x56, 0x2a);
+			ISACRTCW(PANEL_0x57, 0x00);
+			ISACRTCW(PANEL_0x58, 0x2f);
+			ISACRTCW(PANEL_0x59, 0x18);
+			ISACRTCW(PANEL_0x60, 0x88);
+			ISACRTCW(PANEL_0x61, 0x63);
+			ISACRTCW(PANEL_0x62, 0x0b);
+			ISACRTCW(PANEL_0x63, 0x69);
+			ISACRTCW(PANEL_0x64, 0x1a);
+			stat = B_OK;
+			break;
+		}
+		break;
+	case 1280:
+		/* no info available */
+		break;
+	}
+
+	if (stat != B_OK)
+		LOG(2,("CRTC: unable to program panel: unknown modeline needed.\n"));
+
+	return stat;
+}
+
 status_t nm_crtc_cursor_init()
 {
 	int i;

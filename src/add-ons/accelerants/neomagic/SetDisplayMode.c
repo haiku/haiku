@@ -128,6 +128,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/* always setup centering so a KB BIOS switch to flatpanel will go OK... */
 		nm_crtc_center(target, crt_only);
+		/* program panel modeline if needed */
+		if (!crt_only) nm_crtc_prg_panel();
 	}
 
 	/* update driver's mode store */
