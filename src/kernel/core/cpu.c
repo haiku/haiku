@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -47,3 +47,21 @@ cpu_preboot_init(kernel_args *args)
 {
 	return arch_cpu_preboot_init(args);
 }
+
+
+void
+clear_caches(void *address, size_t length, uint32 flags)
+{
+	// ToDo: implement me!
+}
+
+
+//	#pragma mark -
+
+
+void
+_user_clear_caches(void *address, size_t length, uint32 flags)
+{
+	clear_caches(address, length, flags);
+}
+

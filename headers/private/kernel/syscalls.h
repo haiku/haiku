@@ -271,6 +271,8 @@ extern area_id		_kern_register_messaging_service(sem_id lockingSem,
 						sem_id counterSem);
 extern status_t		_kern_unregister_messaging_service();
 
+extern void			_kern_clear_caches(void *address, size_t length, uint32 flags);
+
 #ifdef __INTEL__
 // our only x86 only syscall
 extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
