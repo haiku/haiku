@@ -6,6 +6,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
 CommonTestLib libapptest.so
 	: AppKitTestAddon.cpp
@@ -14,10 +15,8 @@ CommonTestLib libapptest.so
 		ApplicationTest.cpp
 		AppQuitRequestedTester.cpp
 		AppQuitTester.cpp
-		AppRunner.cpp
 		AppRunTester.cpp
 		BApplicationTester.cpp
-		PipedAppRunner.cpp
 
 		# BHandler
 		HandlerTest.cpp
@@ -71,7 +70,11 @@ CommonTestLib libapptest.so
 		SMReplyTarget.cpp
 		SMTarget.cpp
 		TargetTester.cpp
-		
+
+		# common
+		AppRunner.cpp
+		PipedAppRunner.cpp
+
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
 	: be stdc++.r4
@@ -84,3 +87,4 @@ SubInclude OBOS_TOP src tests kits app bapplication ;
 #SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
 SubInclude OBOS_TOP src tests kits app bmessenger ;
+SubInclude OBOS_TOP src tests kits app common ;
