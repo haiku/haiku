@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tools resattr ;
+
+BuildPlatformMain resattr : resattr.cpp ;
+LinkSharedOSLibs resattr : be ;
