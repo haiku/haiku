@@ -26,7 +26,7 @@ typedef struct partition_data {
 	uint32			block_size;
 	int32			child_count;
 	int32			index;			// [sys]
-	uint32			status;			// [sys]
+	uint32			status;
 	uint32			flags;
 	dev_t			volume;			// [sys]
 	void			*mount_cookie;	// [sys] 
