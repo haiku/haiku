@@ -19,51 +19,34 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		PortLink.h
+//	File Name:		LinkMsgSender.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Pahtz <pahtz@yahoo.com.au>
-//	Description:	Class for low-overhead port-based messaging
+//	Description:	Class for sending low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
-#ifndef _PORTLINK_H
-#define _PORTLINK_H
+#ifndef LINKMSGSENDER_H
+#define LINKMSGSENDER_H
 
 #include <OS.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
 
-/*
-	Error checking rules: (for if you don't want to check every return code)
-	
-	Calling EndMessage() is optional, implied by Flush() or StartMessage().
-
-	If you are sending just one message you only need to test Flush() == B_OK
-
-	If you are buffering multiple messages without calling Flush() you must
-		check EndMessage() == B_OK, or the last Attach() for each message. Check
-		Flush() at the end.
-
-	If you are reading, check the last Read() or ReadString() you perform.
-
-*/
-
-class BPortLink
+class LinkMsgSender
 {
 public:
-	BPortLink(port_id send = -1, port_id reply = -1);
-	virtual ~BPortLink();
+	LinkMsgSender(port_id sendport);
+	virtual ~LinkMsgSender(void);
 
 	status_t StartMessage(int32 code);
-	void CancelMessage();
-	status_t EndMessage();
+	void CancelMessage(void);
+	status_t EndMessage(void);
 
 	status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT);
 	
-	void SetSendPort(port_id port);
-	port_id	GetSendPort();
-	
-	void SetReplyPort(port_id port);
-	port_id	GetReplyPort();
+	// see BPrivate::BAppServerLink which inherits from BPortLink
+	//status_t FlushWithReply(int32 *code);
+
+	void SetPort(port_id port);
+	port_id	GetPort();
 
 	status_t Attach(const void *data, ssize_t size);
 	status_t AttachString(const char *string);
@@ -72,17 +55,28 @@ public:
 		return Attach(&data, sizeof(Type));
 	}
 
-	status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t Read(void *data, ssize_t size);
-	status_t ReadString(char **string);
-	template <class T> status_t Read(T *data)
-	{
-		return fReader->Read(data,sizeof(T));
-	}
-	
 protected:
-	LinkMsgReader *fReader;
-	LinkMsgSender *fSender;
+	status_t FlushCompleted(ssize_t newbuffersize);
+	status_t AdjustReplyBuffer(bigtime_t timeout);
+	void ResetReplyBuffer();
+	
+	port_id	fSendPort;
+
+	char	*fSendBuffer;
+
+	int32	fSendPosition;	//current append position
+
+	int32	fSendStart;	//start of current message
+	
+	int32	fSendBufferSize;
+
+	int32	fSendCount;	//number of completed messages in buffer
+
+	int32	fDataSize;	//size of data in recv buffer
+	int32	fReplySize;	//size of current reply message
+	
+	status_t fWriteError;	//Attach failed for current message
 };
+
 
 #endif
