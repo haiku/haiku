@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -30,19 +31,6 @@
 
 #ifndef SPAWN_H
 #define SPAWN_H
-
-/*
- * allow for mobility of the pty master/slave directories
- */
-
-#define	PTYDEV		"/dev/pt/%c%c"
-#define TTYDEV		"/dev/tt/%c%c"
-
-#define PTYCHAR1	"pqrs"
-#define	PTYCHAR2	"0123456789abcdef"
-
-#define TTYFORMAT "/dev/tt/%d"
-#define PTYFORMAT "/dev/pt/%d"
 
 #define MAXPTTYS 16 * 4
 
