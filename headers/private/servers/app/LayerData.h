@@ -37,7 +37,8 @@ public:
 			alphaFncMode	= B_ALPHA_OVERLAY;
 			scale			= 1.0;
 			fontAliasing	= true;
-			font			= *(fontserver->GetSystemPlain());
+			if(fontserver)
+				font		= *(fontserver->GetSystemPlain());
 			
 			clippReg		= NULL;
 		
