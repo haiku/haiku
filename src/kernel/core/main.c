@@ -148,12 +148,12 @@ main2(void *unused)
 
 	TRACE(("start of main2: initializing devices\n"));
 
+	TRACE(("Init modules\n"));
+	module_init(&ka);
+
 	/* bootstrap all the filesystems */
 	TRACE(("Bootstrap file systems\n"));
 	vfs_bootstrap_file_systems();
-
-	TRACE(("Init modules\n"));
-	module_init(&ka);
 
 	TRACE(("Init Device Manager\n"));
 	device_manager_init(&ka);
