@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src kernel apps uname ;
-
-KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;
