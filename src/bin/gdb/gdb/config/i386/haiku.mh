@@ -1,0 +1,7 @@
+# Host: Intel 586 running Haiku
+
+NAT_FILE= nm-haiku.h
+NATDEPFILES= haiku-nat.o i386-haiku-nat.o inf-child.o fork-child.o
+
+# No core file support yet.
+# corelow.o core-aout.o
