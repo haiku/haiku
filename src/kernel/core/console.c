@@ -70,7 +70,7 @@ con_init(kernel_args *ka)
 {
 	dprintf("con_init: entry\n");
 
-	console_fd = open("/dev/console", O_RDRW);
+	console_fd = open("/dev/console", O_RDWR);
 	dprintf("console_fd = %d\n", console_fd);
 
 	return 0;
