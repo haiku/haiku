@@ -157,11 +157,13 @@ class DisplayDriver
 public:
 	DisplayDriver(void);
 	virtual ~DisplayDriver(void);
-	
+
 	// Graphics calls implemented in DisplayDriver
 	void CopyBits(const BRect &src, const BRect &dest);
 	void CopyRegion(BRegion *src, const BPoint &lefttop);
 	void DrawBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+		// one more:
+	void CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg);
 
 	void FillArc(const BRect &r, const float &angle, const float &span, RGBColor &color);
 	void FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d);
