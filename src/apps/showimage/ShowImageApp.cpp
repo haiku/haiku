@@ -56,7 +56,7 @@ void
 ShowImageApp::AboutRequested()
 {
 	BAlert* pAlert = new BAlert("About ShowImage",
-		"OBOS ShowImage\n\nby Fernando F. Oliveira, Michael Wilber and Michael Pfeiffer", "OK");
+		"Haiku ShowImage\n\nby Fernando F. Oliveira, Michael Wilber and Michael Pfeiffer", "OK");
 	pAlert->Go();
 }
 
