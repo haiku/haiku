@@ -2,7 +2,7 @@ SubDir OBOS_TOP src libs termcap ;
 
 # set some additional defines
 {
-	SubDirCcFlags -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1  -DTERMCAP_FILE=\'\"/etc/termcap\"\' ;
+	SubDirCcFlags -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1  -DTERMCAP_FILE=\'\"/etc/termcap\"\' -w ;
 }
 
 StaticLibrary termcap : 

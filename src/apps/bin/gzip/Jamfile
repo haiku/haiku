@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src apps bin gzip ;
 
+SubDirCcFlags -w ;
+
 BinCommand gzip :
 	gzip.c
 	zip.c
