@@ -305,11 +305,11 @@ mount_boot_file_systems()
 		if (fd < B_OK)
 			continue;
 
-//#if TRACE_VFS
+#if TRACE_VFS
 		char name[B_FILE_NAME_LENGTH];
 		if (device->GetName(name, sizeof(name)) == B_OK)
 			printf("add partitions for \"%s\"\n", name);
-//#endif
+#endif
 
 		status_t status = add_partitions_for(fd);
 		if (status < B_OK)
@@ -333,6 +333,26 @@ mount_boot_file_systems()
 	if (list_is_empty(&gPartitions))
 		return B_ENTRY_NOT_FOUND;
 
+	TRACE(("Found supported file systems:\n"));
+
+	void *cookie;
+	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
+		Directory *dir;
+		while (gRoot->GetNextNode(cookie, (Node **)&dir) == B_OK) {
+			char name[B_FILE_NAME_LENGTH];
+			if (dir->GetName(name, sizeof(name)) == B_OK)
+				printf("/%s\n", name);
+
+			void *subCookie;
+			if (dir->Open(&subCookie, O_RDONLY) == B_OK) {
+				while (dir->GetNextEntry(subCookie, name, sizeof(name)) == B_OK)
+					printf("\t%s\n", name);
+
+				dir->Close(subCookie);
+			}
+		}
+		gRoot->Close(cookie);
+	}
 	return B_OK;
 }
 
