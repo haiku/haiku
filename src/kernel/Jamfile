@@ -348,6 +348,8 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!system>wrappers.o
 	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
 
+	<$(SOURCE_GRIST)!libc!unistd>access.o
+	<$(SOURCE_GRIST)!libc!unistd>chown.o
 	<$(SOURCE_GRIST)!libc!unistd>close.o
 	<$(SOURCE_GRIST)!libc!unistd>dup.o
 	<$(SOURCE_GRIST)!libc!unistd>dup2.o
@@ -360,6 +362,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!unistd>write.o
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
+	<$(SOURCE_GRIST)!libc!unistd>truncate.o
 	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
 	<$(SOURCE_GRIST)!libc!unistd>mount.o
 	<$(SOURCE_GRIST)!libc!unistd>conf.o
@@ -466,6 +469,8 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!system>wrappers.o
 	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
 
+	<$(SOURCE_GRIST)!libc!unistd>access.o
+	<$(SOURCE_GRIST)!libc!unistd>chown.o
 	<$(SOURCE_GRIST)!libc!unistd>close.o
 	<$(SOURCE_GRIST)!libc!unistd>dup.o
 	<$(SOURCE_GRIST)!libc!unistd>dup2.o
@@ -478,6 +483,7 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!unistd>write.o
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
+	<$(SOURCE_GRIST)!libc!unistd>truncate.o
 	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
 	<$(SOURCE_GRIST)!libc!unistd>mount.o
 	<$(SOURCE_GRIST)!libc!unistd>conf.o

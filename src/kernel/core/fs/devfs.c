@@ -1072,6 +1072,7 @@ static struct fs_calls devfs_calls = {
 	&devfs_unlink,
 	&devfs_rename,
 
+	NULL,	// access
 	&devfs_read_stat,
 	&devfs_write_stat,
 

@@ -1034,6 +1034,7 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_unlink,
 	&bootfs_rename,
 
+	NULL,	// access
 	&bootfs_read_stat,
 	&bootfs_write_stat,
 

@@ -2112,6 +2112,27 @@ common_unlink(char *path, bool kernel)
 
 
 static int
+common_access(char *path, int mode, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	status = path_to_vnode(path, true, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(vnode,fs_access) != NULL)
+		status = FS_CALL(vnode,fs_access)(vnode->mount->cookie, vnode->private_node, mode);
+	else
+		status = EOPNOTSUPP;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
 common_rename(char *path, char *newPath, bool kernel)
 {
 	struct vnode *vnode1, *vnode2;
@@ -2750,6 +2771,18 @@ sys_rename(const char *oldpath, const char *newpath)
 
 
 int
+sys_access(const char *path, int mode)
+{
+	char pathCopy[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	strlcpy(pathCopy, path, SYS_MAX_PATH_LEN - 1);
+
+	return common_access(pathCopy, mode, true);
+}
+
+
+int
 sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 {
 	char buffer[SYS_MAX_PATH_LEN + 1];
@@ -3127,18 +3160,18 @@ user_create_symlink(const char *userPath, const char *userToPath, int mode)
 
 
 int
-user_unlink(const char *upath)
+user_unlink(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	int rc;
+	int status;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return common_unlink(path, false);
 }
@@ -3168,6 +3201,24 @@ user_rename(const char *uoldpath, const char *unewpath)
 	newpath[SYS_MAX_PATH_LEN] = 0;
 
 	return common_rename(oldpath, newpath, false);
+}
+
+
+int
+user_access(const char *userPath, int mode)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
+
+	return common_access(path, mode, false);
 }
 
 

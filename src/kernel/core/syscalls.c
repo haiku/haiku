@@ -126,11 +126,14 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_READ_STAT:
 			*call_ret = user_read_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2);
 			break;
-		case SYSCALL_FD_STAT:
+		case SYSCALL_READ_STAT_FD:
 			*call_ret = user_fstat((int)arg0, (struct stat*)arg1);
 			break;
 		case SYSCALL_WRITE_STAT:
 			*call_ret = user_write_stat((int)arg0, (const char *)arg1, (bool)arg2, (struct stat *)arg3, (int)arg4);
+			break;
+		case SYSCALL_ACCESS:
+			*call_ret = user_access((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();

@@ -67,7 +67,7 @@ extern "C" {
 // ToDo: unimplemented functions are commented out
 
 /* file functions */
-//extern int		access(const char *path, int amode);
+extern int		access(const char *path, int accessMode);
 
 extern int		chdir(const char *path);
 extern int		fchdir(int fd);
@@ -84,8 +84,8 @@ extern int		close(int fd);
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
 extern int      symlink(const char *from, const char *to);
 
-//extern int      ftruncate(int fd, off_t newsize);
-//extern int      truncate(const char *path, off_t newsize);
+extern int      ftruncate(int fd, off_t newSize);
+extern int      truncate(const char *path, off_t newSize);
 extern int		ioctl(int fd, unsigned long op, ...);
 
 extern ssize_t	read(int fd, void *buffer, size_t count);
@@ -99,9 +99,9 @@ extern off_t	lseek(int fd, off_t offset, int whence);
 //extern int		sync(void);
 //extern int		fsync(int fd);
 
-//extern int		chown(const char *path, uid_t owner, gid_t group);
-//extern int		fchown(int fd, uid_t owner, gid_t group);
-//extern int		lchown(const char *path, uid_t owner, gid_t group);
+extern int		chown(const char *path, uid_t owner, gid_t group);
+extern int		fchown(int fd, uid_t owner, gid_t group);
+extern int		lchown(const char *path, uid_t owner, gid_t group);
 
 //extern int		mknod(const char *name, mode_t mode, dev_t dev);
 
@@ -121,19 +121,19 @@ extern long		pathconf(const char *path, int name);
 /* process functions */
 //extern pid_t	fork(void);
 //extern int		execve(const char *path, char * const argv[], char * const envp[]);
-//extern int      execl(const char *path, const char *arg, ...);
-//extern int      execv(const char *path, char *const *argv);
-//extern int      execlp(const char *file, const char *arg, ...);
-//extern int      execle(const char *path, const char *arg , ... /*, char **envp */);
-//extern int      exect(const char *path, char *const *argv);
-//extern int      execvp(const char *file, char *const *argv);
+//extern int		execl(const char *path, const char *arg, ...);
+//extern int		execv(const char *path, char *const *argv);
+//extern int		execlp(const char *file, const char *arg, ...);
+//extern int		execle(const char *path, const char *arg , ... /*, char **envp */);
+//extern int		exect(const char *path, char *const *argv);
+//extern int		execvp(const char *file, char *const *argv);
 
 //extern void		_exit(int status);
 
 //extern int		system(const char *string);
-//extern pid_t    tcgetpgrp(int fd);
-//extern int      tcsetpgrp(int fd, pid_t pgrpid);
-//extern void     *sbrk(long incr);
+//extern pid_t	tcgetpgrp(int fd);
+//extern int		tcsetpgrp(int fd, pid_t pgrpid);
+//extern void		*sbrk(long incr);
 
 //extern uint		alarm(unsigned int seconds);
 //extern uint		ualarm(unsigned int microSeconds);
@@ -164,13 +164,13 @@ extern int		usleep(unsigned int microSeconds);
 
 /* tty */
 //extern int		isatty(int fd);
-//extern char     *ttyname(int fd);
+//extern char		*ttyname(int fd);
 //extern int		ttyname_r(int fd, char *buf, size_t buflen);
-//extern char     *ctermid(char *s);
+//extern char		*ctermid(char *s);
 
 /* misc */
 //extern char 	*crypt(const char *key, const char *salt);
-extern int 		getopt(int argc, char *const *argv, const char *shortopts);
+extern int		getopt(int argc, char *const *argv, const char *shortopts);
 
 /* getopt() related external variables */
 extern char *optarg;

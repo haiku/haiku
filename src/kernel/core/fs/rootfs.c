@@ -925,6 +925,7 @@ static struct fs_calls rootfs_calls = {
 	&rootfs_unlink,
 	&rootfs_rename,
 
+	NULL,	// fs_access()
 	&rootfs_read_stat,
 	&rootfs_write_stat,
 
