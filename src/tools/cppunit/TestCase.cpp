@@ -1,4 +1,5 @@
 #include <TestCase.h>
+#include <TestShell.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -16,13 +17,18 @@ BTestCase::tearDown() {
 
 void
 BTestCase::NextSubTest() {
-	printf("[%ld]", fSubTestNum++);
-	fflush(stdout);
+	BTestShell *shell = BTestShell::Shell();
+	if (shell && shell->BeVerbose()) {
+		printf("[%ld]", fSubTestNum++);
+		fflush(stdout);
+	}
 }
 
 void
 BTestCase::NextSubTestBlock() {
-	printf("\n");
+	BTestShell *shell = BTestShell::Shell();
+	if (shell && shell->BeVerbose()) 
+		printf("\n");
 }
 
 /*! To return to the last saved working directory, call RestoreCWD(). */
