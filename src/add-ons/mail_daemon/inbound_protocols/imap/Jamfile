@@ -6,20 +6,23 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
 SubDirC++Flags -DBONE ;
 
-#OpenSSL testing should be automated somehow
-#SubDirC++Flags -DBONE -DUSESSL ;
-#SubDirHdrs [ FDirName / boot home config include ] ;
+if $(USESSL) {
+	SubDirC++Flags -DBONE -DUSESSL ;
+	SubDirHdrs [ FDirName / boot home config include ] ;
+}
 
 Addon IMAP : mail_daemon inbound_protocols :
 	imap_client.cpp
 	imap_config.cpp
 	NestedString.cpp ;
 
-LinkSharedOSLibs IMAP :
-	 be libmail.so socket bind ;
-
-#LinkSharedOSLibs IMAP :
-#	be libmail.so socket bind ssl crypto ;
+if $(USESSL) {
+	LinkSharedOSLibs IMAP :
+		be libmail.so socket bind ssl crypto ;
+} else {
+	LinkSharedOSLibs IMAP :
+		 be libmail.so socket bind ;
+}
 
 Package haiku-maildaemon-cvs :
 	IMAP : 

@@ -5,9 +5,10 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
 SubDirC++Flags -DBONE ;
 
-#OpenSSL testing should be automated somehow
-#SubDirC++Flags -DBONE -DUSESSL ;
-#SubDirHdrs [ FDirName / boot home config include ] ;
+if $(USESSL) {
+	SubDirC++Flags -DBONE -DUSESSL ;
+	SubDirHdrs [ FDirName / boot home config include ] ;
+}
 
 Addon POP3 : mail_daemon inbound_protocols :
 	MessageIO.cpp
@@ -15,11 +16,13 @@ Addon POP3 : mail_daemon inbound_protocols :
 	SimpleMailProtocol.cpp
 	md5c.c ;
 
-LinkSharedOSLibs POP3 :
-	 be libmail.so socket bind ;
-
-#LinkSharedOSLibs POP3 :
-#	be libmail.so socket bind ssl crypto ;
+if $(USESSL) {
+	LinkSharedOSLibs POP3 :
+		be libmail.so socket bind ssl crypto ;
+} else {
+	LinkSharedOSLibs POP3 :
+	 	be libmail.so socket bind ;
+}
 
 Package haiku-maildaemon-cvs :
 	POP3 : 
