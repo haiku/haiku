@@ -34,8 +34,11 @@ public:
 	Module();
 	~Module();
 
-	status_t Init(const char *name, bool isPath = false);
-	void Unset();
+	status_t Load(const char *name, bool isPath = false, bool init = true);
+	void Unload();
+
+	status_t Init();
+	status_t Uninit();
 
 	void Get();
 	bool Put();
@@ -43,7 +46,7 @@ public:
 	module_info *Info() const { return fInfo; }
 
 private:
-	bool _Load(const char *path, const char *name, bool isPath);
+	bool _Load(const char *path, const char *name, bool isPath, bool init);
 
 private:
 	image_id	fAddOn;
@@ -64,30 +67,30 @@ Module::Module()
 // constructor
 Module::~Module()
 {
-	Unset();
+	Unload();
 }
 
-// Init
+// Load
 status_t
-Module::Init(const char *name, bool isPath)
+Module::Load(const char *name, bool isPath, bool init)
 {
-TRACE(("Module::Init(): searching module `%s'...\n", name));
-	Unset();
+TRACE(("Module::Load(): searching module `%s'...\n", name));
+	Unload();
 	status_t error = (name ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		error = B_ENTRY_NOT_FOUND;
 		if (isPath) {
 			// name is a path name: try to load it
-			if (_Load(name, name, isPath))
+			if (_Load(name, name, isPath, init))
 				error = B_OK;
 		} else {
 			// name is a relative module name: search in the module dirs
 			for (int32 i = 0; gModuleDirs[i]; i++) {
-TRACE(("Module::Init(): ...in `%s'\n", gModuleDirs[i]));
+TRACE(("Module::Load(): ...in `%s'\n", gModuleDirs[i]));
 				BPath path;
 				if (path.SetTo(gModuleDirs[i]) == B_OK
 					&& path.SetTo(path.Path(), name) == B_OK) {
-					if (_Load(path.Path(), name, isPath)) {
+					if (_Load(path.Path(), name, isPath, init)) {
 						error = B_OK;
 						break;
 					}
@@ -98,19 +101,43 @@ TRACE(("Module::Init(): ...in `%s'\n", gModuleDirs[i]));
 	return error;
 }
 
-// Unset
+// Unload
 void
-Module::Unset()
+Module::Unload()
 {
 	if (fAddOn >= 0) {
-		if (fInfo)
-			fInfo->std_ops(B_MODULE_UNINIT);
+		Uninit();
 		unload_add_on(fAddOn);
 	}
 	fAddOn = -1;
 	fInfo = NULL;
 	fReferenceCount = 0;
 	fInitialized = false;
+}
+
+// Init
+status_t
+Module::Init()
+{
+	status_t error = (fInfo ? B_OK : B_NO_INIT);
+	if (error == B_OK && !fInitialized) {
+		error = fInfo->std_ops(B_MODULE_INIT);
+		if (error == B_OK)
+			fInitialized = true;
+	}
+	return error;
+}
+
+// Uninit
+status_t
+Module::Uninit()
+{
+	status_t error = (fInfo ? B_OK : B_NO_INIT);
+	if (error == B_OK && fInitialized) {
+		error = fInfo->std_ops(B_MODULE_UNINIT);
+		fInitialized = false;
+	}
+	return error;
 }
 
 // Get
@@ -132,7 +159,7 @@ Module::Put()
 
 // _Load
 bool
-Module::_Load(const char *path, const char *name, bool isPath)
+Module::_Load(const char *path, const char *name, bool isPath, bool init)
 {
 	TRACE(("Module::_Load(): trying to load `%s'\n", path));
 	BEntry entry;
@@ -145,10 +172,11 @@ Module::_Load(const char *path, const char *name, bool isPath)
 			&& infos != NULL) {
 			for (int32 i = 0; module_info *info = infos[i]; i++) {
 				if ((isPath || !strcmp(name, info->name))
-					&& info->std_ops(B_MODULE_INIT) == B_OK) {
+					&& (!init || info->std_ops(B_MODULE_INIT) == B_OK)) {
 					fAddOn = image;
 					fInfo = info;
 					fReferenceCount = 0;
+					fInitialized = init;
 					return true;
 				}
 			}
@@ -157,7 +185,7 @@ Module::_Load(const char *path, const char *name, bool isPath)
 		// entry does not exist -- try loading the parent path
 		BPath parentPath;
 		if (BPath(path).GetParent(&parentPath) == B_OK)
-			return _Load(parentPath.Path(), name, isPath);
+			return _Load(parentPath.Path(), name, isPath, init);
 	}
 	return false;
 }
@@ -288,7 +316,7 @@ ModuleManager::GetModule(const char *path, module_info **infop)
 		if (!module) {
 			// module not yet loaded, try to get it
 			module = new Module;
-			error = module->Init(path);
+			error = module->Load(path);
 			if (error == B_OK && !fModules.AddModule(module))
 				error = B_NO_MEMORY;
 			if (error != B_OK) {
@@ -408,7 +436,7 @@ ModuleManager::_FindModules(BDirectory &dir, module_name_list *list)
 			Module module;
 			BPath path;
 			if (entry.GetPath(&path) == B_OK
-				&& module.Init(path.Path(), true) == B_OK) {
+				&& module.Load(path.Path(), true, false) == B_OK) {
 				list->names.insert(module.Info()->name);
 			}
 		} else if (entry.IsDirectory()) {
