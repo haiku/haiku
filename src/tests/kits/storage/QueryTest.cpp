@@ -1008,7 +1008,10 @@ TestFetchPredicate(const char *mountPoint, const char *predicate,
 							   entryCount);
 		BEntry entry;
 		while (query.GetNextEntry(&entry) == B_OK) {
+// Haiku supports rewinding queries, R5 does not.
+#ifdef TEST_R5
 			CPPUNIT_ASSERT( query.Rewind() == B_ERROR );
+#endif
 			CPPUNIT_ASSERT( query.CountEntries() == B_ERROR );
 			BPath path;
 			CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -1026,7 +1029,10 @@ TestFetchPredicate(const char *mountPoint, const char *predicate,
 							   entryCount);
 		entry_ref ref;
 		while (query.GetNextRef(&ref) == B_OK) {
+// Haiku supports rewinding queries, R5 does not.
+#ifdef TEST_R5
 			CPPUNIT_ASSERT( query.Rewind() == B_ERROR );
+#endif
 			CPPUNIT_ASSERT( query.CountEntries() == B_ERROR );
 			BPath path(&ref);
 			CPPUNIT_ASSERT( path.InitCheck() == B_OK );
@@ -1045,7 +1051,10 @@ TestFetchPredicate(const char *mountPoint, const char *predicate,
 		char buffer[bufSize];
 		dirent *ents = (dirent *)buffer;
 		while (query.GetNextDirents(ents, bufSize, 1) == 1) {
+// Haiku supports rewinding queries, R5 does not.
+#ifdef TEST_R5
 			CPPUNIT_ASSERT( query.Rewind() == B_ERROR );
+#endif
 			CPPUNIT_ASSERT( query.CountEntries() == B_ERROR );
 			entry_ref ref(ents->d_pdev, ents->d_pino, ents->d_name);
 			BPath path(&ref);
@@ -1067,7 +1076,10 @@ TestFetchPredicate(const char *mountPoint, const char *predicate,
 		entry_ref ref;
 		BEntry entry;
 		while (query.GetNextDirents(ents, bufSize, 1) == 1) {
+// Haiku supports rewinding queries, R5 does not.
+#ifdef TEST_R5
 			CPPUNIT_ASSERT( query.Rewind() == B_ERROR );
+#endif
 			CPPUNIT_ASSERT( query.CountEntries() == B_ERROR );
 			entry_ref entref(ents->d_pdev, ents->d_pino, ents->d_name);
 			BPath entpath(&entref);
