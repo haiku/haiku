@@ -151,6 +151,7 @@ struct stack_driver_args {
 		struct transfer_args			transfer;
 		struct sysctl_args				sysctl;
 		struct select_args				select;
+		struct control_net_module_args	control;
 	} u;
 };
 

@@ -378,10 +378,8 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				return B_OK;
 			}
 			case NET_STACK_CONTROL_NET_MODULE: {
-				struct control_net_module_args *control_args =
-					(struct control_net_module_args*) data;
-				return core->control_net_module(control_args->name, control_args->op,
-					control_args->data, control_args->length);
+				return core->control_net_module(args->u.control.name, args->u.control.op,
+					args->u.control.data, args->u.control.length);
 			}
 		};
 	} else {
