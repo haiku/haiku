@@ -47,10 +47,10 @@
 // Returns:
 // ---------------------------------------------------------------
 TGAView::TGAView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, TGATranslatorSettings *psettings)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
 	:	BView(frame, name, resize, flags)
 {
-	fpsettings = psettings;
+	fSettings = settings;
 	
 	SetViewColor(220,220,220,0);
 	
@@ -61,7 +61,7 @@ TGAView::TGAView(const BRect &frame, const char *name,
 	fpchkIgnoreAlpha = new BCheckBox(BRect(10, 45, 180, 62),
 		"Ignore TGA alpha channel",
 		"Ignore TGA alpha channel", pmsg);
-	val = (psettings->SetGetIgnoreAlpha()) ? 1 : 0;
+	val = (fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA)) ? 1 : 0;
 	fpchkIgnoreAlpha->SetValue(val);
 	fpchkIgnoreAlpha->SetViewColor(ViewColor());
 	AddChild(fpchkIgnoreAlpha);
@@ -70,7 +70,7 @@ TGAView::TGAView(const BRect &frame, const char *name,
 	fpchkRLE = new BCheckBox(BRect(10, 67, 180, 84),
 		"Save with RLE Compression",
 		"Save with RLE Compression", pmsg);
-	val = (psettings->SetGetRLE()) ? 1 : 0;
+	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
 	fpchkRLE->SetValue(val);
 	fpchkRLE->SetViewColor(ViewColor());
 	AddChild(fpchkRLE);
@@ -91,7 +91,7 @@ TGAView::TGAView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 TGAView::~TGAView()
 {
-	fpsettings->Release();
+	fSettings->Release();
 }
 
 // ---------------------------------------------------------------
@@ -138,8 +138,8 @@ TGAView::MessageReceived(BMessage *message)
 				bnewval = true;
 			else
 				bnewval = false;
-			fpsettings->SetGetIgnoreAlpha(&bnewval);
-			fpsettings->SaveSettings();
+			fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA, &bnewval);
+			fSettings->SaveSettings();
 			break;
 		
 		case CHANGE_RLE:
@@ -147,8 +147,8 @@ TGAView::MessageReceived(BMessage *message)
 				bnewval = true;
 			else
 				bnewval = false;
-			fpsettings->SetGetRLE(&bnewval);
-			fpsettings->SaveSettings();
+			fSettings->SetGetBool(TGA_SETTING_RLE, &bnewval);
+			fSettings->SaveSettings();
 			break;
 		
 		default:
@@ -191,9 +191,10 @@ TGAView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(TGA_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((TGA_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(TGA_TRANSLATOR_VERSION & 0xf), __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(TGA_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(TGA_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(TGA_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 /*	char copyright[] = "© 2002 OpenBeOS Project";
 	DrawString(copyright, BPoint(xbold, yplain * 2 + ybold));

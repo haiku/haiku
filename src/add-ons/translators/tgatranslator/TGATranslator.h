@@ -38,9 +38,9 @@
 #include <InterfaceDefs.h>
 #include <DataIO.h>
 #include <ByteOrder.h>
-#include "TGATranslatorSettings.h"
+#include "BaseTranslator.h"
 
-#define TGA_TRANSLATOR_VERSION 0x100
+#define TGA_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
 #define TGA_IN_QUALITY 0.7
 #define TGA_IN_CAPABILITY 0.8
 #define TGA_OUT_QUALITY 0.7
@@ -50,6 +50,10 @@
 #define BBT_IN_CAPABILITY 0.6
 #define BBT_OUT_QUALITY 0.6
 #define BBT_OUT_CAPABILITY 0.8
+
+// TGA Translator Settings
+#define TGA_SETTING_RLE "tga /rle"
+#define TGA_SETTING_IGNORE_ALPHA "tga /ignore_alpha"
 
 // TGA files are stored in the Intel byte order :)
 struct TGAFileHeader {
@@ -125,52 +129,19 @@ struct TGAImageSpec {
 
 #define TGA_STREAM_BUFFER_SIZE 1024
 
-class TGATranslator : public BTranslator {
+class TGATranslator : public BaseTranslator {
 public:
 	TGATranslator();
 	
-	virtual const char *TranslatorName() const;
-		// returns the short name of the translator
-		
-	virtual const char *TranslatorInfo() const;
-		// returns a verbose name/description for the translator
-	
-	virtual int32 TranslatorVersion() const;
-		// returns the version of the translator
-
-	virtual const translation_format *InputFormats(int32 *out_count)
-		const;
-		// returns the input formats and the count of input formats
-		// that this translator supports
-		
-	virtual const translation_format *OutputFormats(int32 *out_count)
-		const;
-		// returns the output formats and the count of output formats
-		// that this translator supports
-
-	virtual status_t Identify(BPositionIO *inSource,
+	virtual status_t DerivedIdentify(BPositionIO *inSource,
 		const translation_format *inFormat, BMessage *ioExtension,
 		translator_info *outInfo, uint32 outType);
-		// determines whether or not this translator can convert the
-		// data in inSource to the type outType
-
-	virtual status_t Translate(BPositionIO *inSource,
+		
+	virtual status_t DerivedTranslate(BPositionIO *inSource,
 		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination);
-		// this function is the whole point of the Translation Kit,
-		// it translates the data in inSource to outDestination
-		// using the format outType
+		uint32 outType, BPositionIO *outDestination, int32 baseType);
 		
-	virtual status_t GetConfigurationMessage(BMessage *ioExtension);
-		// write the current state of the translator into
-		// the supplied BMessage object
-		
-	virtual status_t MakeConfigurationView(BMessage *ioExtension,
-		BView **outView, BRect *outExtent);
-		// creates and returns the view for displaying information
-		// about this translator
-		
-	TGATranslatorSettings *AcquireSettings();
+	virtual BView *NewConfigView(TranslatorSettings *settings);
 
 protected:
 	virtual ~TGATranslator();
@@ -179,10 +150,28 @@ protected:
 		// the user
 		
 private:
-	TGATranslatorSettings *fpsettings;
+	uint8 tga_alphabits(TGAFileHeader &filehead, TGAColorMapSpec &mapspec,
+		TGAImageSpec &imagespec);
+		
+	status_t translate_from_bits(BPositionIO *inSource, uint32 outType,
+		BPositionIO *outDestination);
+		
+	status_t translate_from_tganm_to_bits(BPositionIO *inSource,
+		BPositionIO *outDestination, TGAFileHeader &filehead,
+		TGAColorMapSpec &mapspec, TGAImageSpec &imagespec);
+		
+	status_t translate_from_tganmrle_to_bits(BPositionIO *inSource,
+		BPositionIO *outDestination, TGAFileHeader &filehead,
+		TGAColorMapSpec &mapspec, TGAImageSpec &imagespec);
+		
+	status_t translate_from_tgamrle_to_bits(BPositionIO *inSource,
+		BPositionIO *outDestination, TGAFileHeader &filehead,
+		TGAColorMapSpec &mapspec, TGAImageSpec &imagespec, uint8 *pmap);
+		
+	status_t translate_from_tga(BPositionIO *inSource, uint32 outType,
+		BPositionIO *outDestination);
 
-	char fName[30];
-	char fInfo[100];
 };
 
 #endif // #ifndef TGA_TRANSLATOR_H
+

@@ -33,12 +33,12 @@
 
 #include <View.h>
 #include <CheckBox.h>
-#include "TGATranslatorSettings.h"
+#include "TranslatorSettings.h"
 
 class TGAView : public BView {
 public:
 	TGAView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags, TGATranslatorSettings *psettings);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~TGAView();
@@ -55,7 +55,7 @@ private:
 	BCheckBox *fpchkIgnoreAlpha;
 	BCheckBox *fpchkRLE;
 	
-	TGATranslatorSettings *fpsettings;
+	TranslatorSettings *fSettings;
 		// the actual settings for the translator,
 		// shared with the translator
 };
