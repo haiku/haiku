@@ -140,6 +140,7 @@ unlock_tmap(vm_translation_map *map)
 		// we're about to release it for the last time
 		flush_tmap(map);
 	}
+
 	recursive_lock_unlock(&map->lock);
 	return 0;
 }
@@ -270,7 +271,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 		// put it in the pgdir
 		put_pgtable_in_pgdir(&pd[index], pgtable, attributes
-			| (attributes & B_KERNEL_PROTECTION ? B_KERNEL_WRITE_AREA : B_WRITE_AREA));
+			| (attributes & B_USER_PROTECTION ? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
 
 		// update any other page directories, if it maps kernel space
 		if (index >= FIRST_KERNEL_PGDIR_ENT && index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
