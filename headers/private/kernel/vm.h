@@ -40,8 +40,6 @@ vm_address_space *vm_get_current_user_aspace(void);
 aspace_id vm_get_current_user_aspace_id(void);
 vm_address_space *vm_get_aspace_by_id(aspace_id aid);
 void vm_put_aspace(vm_address_space *aspace);
-vm_region *vm_get_region_by_id(region_id rid);
-void vm_put_region(vm_region *region);
 #define vm_aspace_swap(aspace) arch_vm_aspace_swap(aspace)
 
 // private kernel only extension (should be moved somewhere else):
@@ -64,7 +62,6 @@ area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address
 region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 	region_id source_region, int mapping, int lock);
 status_t vm_delete_region(aspace_id aid, region_id id);
-region_id vm_find_region_by_name(aspace_id aid, const char *name);
 status_t vm_create_vnode_cache(void *vnode, void **_cache);
 
 status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
