@@ -102,18 +102,18 @@ struct fs_calls {
 	status_t (*fs_rewind_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
 
 	/* attribute operations */
-	status_t (*fs_create_attr)(fs_volume fs, fs_vnode file, const char *name, vnode_id *_newAttrID);
+	status_t (*fs_create_attr)(fs_volume fs, fs_vnode file, const char *name);
 	status_t (*fs_open_attr)(fs_volume fs, fs_vnode file, const char *name, int oflags, fs_cookie *_cookie, vnode_id *_attrID);
-	status_t (*fs_close_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie);
-	status_t (*fs_free_attr_cookie)(fs_volume fs, fs_vnode attr, fs_cookie cookie);
-	ssize_t (*fs_read_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, void *buffer, off_t pos, size_t *len);
-	ssize_t (*fs_write_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, const void *buffer, off_t pos, size_t *len);
-	status_t (*fs_seek_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, off_t pos, int seekType);
+	status_t (*fs_close_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie);
+	status_t (*fs_free_attr_cookie)(fs_volume fs, fs_vnode file, fs_cookie cookie);
+	ssize_t (*fs_read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, void *buffer, off_t pos, size_t *len);
+	ssize_t (*fs_write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, const void *buffer, off_t pos, size_t *len);
+	status_t (*fs_seek_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, int seekType);
 
 	status_t (*fs_rename_attr)(fs_volume fs, fs_vnode file, const char *oldName, const char *newName);
 	status_t (*fs_remove_attr)(fs_volume fs, fs_vnode file, const char *name);
-	status_t (*fs_read_attr_stat)(fs_volume fs, fs_vnode attr, fs_cookie cookie, struct stat *stat);
-	status_t (*fs_write_attr_stat)(fs_volume fs, fs_vnode attr, fs_cookie cookie, struct stat *stat, int statMask);
+	status_t (*fs_read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
+	status_t (*fs_write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat, int statMask);
 
 	/* index directory & index operations */
 	status_t (*fs_open_index_dir)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);
