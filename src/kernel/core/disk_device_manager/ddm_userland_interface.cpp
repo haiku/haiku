@@ -189,6 +189,33 @@ _kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 	return B_ENTRY_NOT_FOUND;
 }
 
+// _kern_get_partitionable_spaces
+status_t
+_kern_get_partitionable_spaces(partition_id partitionID,
+							   partitionable_space_data *buffer,
+							   int32 count, int32 *actualCount)
+{
+	if (!buffer && count > 0)
+		return B_BAD_VALUE;
+	// get the partition
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	return diskSystem->GetPartitionableSpaces(partition, buffer, count,
+											  actualCount);
+}
+
 // _kern_register_file_device
 partition_id
 _kern_register_file_device(const char *filename)

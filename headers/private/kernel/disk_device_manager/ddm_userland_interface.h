@@ -4,6 +4,7 @@
 #define _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 
 #include <DiskDeviceDefs.h>
+#include <disk_device_manager.h>
 #include <OS.h>
 
 #ifdef __cplusplus
@@ -42,12 +43,6 @@ struct user_disk_device_data {
 };
 
 // userland partitionable space representation
-struct user_partitionable_space_data {
-	off_t	offset;
-	off_t	size;
-};
-
-// userland partitionable space representation
 struct user_disk_system_info {
 	disk_system_id	id;
 	char			name[B_FILE_NAME_LENGTH];	// better B_PATH_NAME_LENGTH?
@@ -77,11 +72,6 @@ status_t _kern_get_partition_data(partition_id partitionID, bool shadow,
 								  user_partition_data *buffer,
 								  size_t bufferSize, size_t *neededSize);
 	// Dangerous?!
-status_t _kern_get_partitionable_spaces(partition_id partitionID, bool shadow,
-										user_partitionable_space_data *buffer,
-										size_t bufferSize, size_t *neededSize);
-	// Pass the partition change counter? If GetPartitionInfo() is only
-	// allowed, when the device is locked, then we wouldn't need it.
 
 partition_id _kern_register_file_device(const char *filename);
 status_t _kern_unregister_file_device(partition_id deviceID,
@@ -138,6 +128,9 @@ status_t _kern_validate_create_child_partition(partition_id partitionID,
 											   off_t *offset, off_t *size,
 											   const char *type,
 											   const char *parameters);
+status_t _kern_get_partitionable_spaces(partition_id partitionID,
+										partitionable_space_data *buffer,
+										int32 count, int32 *actualCount);
 status_t _kern_get_next_supported_partition_type(partition_id partitionID,
 												 int32 *cookie, char *type);
 status_t _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
