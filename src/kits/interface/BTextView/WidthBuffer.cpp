@@ -109,7 +109,7 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 								currentOffset < fromOffset + length;
 								currentOffset += charLen) {
 			
-			charLen = UTF8NextCharLen(inText + fromOffset);
+			charLen = UTF8NextCharLen(inText + currentOffset);
 			// End of string, bail out
 			if (charLen == 0)
 				break;
