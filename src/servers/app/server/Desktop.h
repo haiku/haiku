@@ -41,8 +41,8 @@ void AddWorkspace(int32 index=-1);
 void DeleteWorkspace(int32 index);
 int32 CountWorkspaces(void);
 void SetWorkspaceCount(int32 count);
-int32 CurrentWorkspace(screen_id screen=B_MAIN_SCREEN_ID);
-void SetWorkspace(int32 workspace, screen_id screen=B_MAIN_SCREEN_ID);
+int32 CurrentWorkspace(void);
+void SetWorkspace(int32 workspace);
 
 void SetScreen(screen_id id);
 int32 CountScreens(void);

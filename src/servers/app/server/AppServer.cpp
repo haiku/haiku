@@ -33,6 +33,9 @@
 #include "ServerConfig.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
+#include "DefaultDecorator.h"
+
+AppServer *app_server=NULL;
 
 /*!
 	\brief Constructor
@@ -99,7 +102,7 @@ AppServer::AppServer(void)
 	_active_app=-1;
 	_p_active_app=NULL;
 
-	make_decorator=NULL;	
+	make_decorator=NULL;
 }
 
 /*!
@@ -751,12 +754,17 @@ ServerApp *AppServer::FindApp(const char *sig)
 	\param wlook Window look type. See Window.h
 	\param wfeel Window feel type. See Window.h
 	\param wflags Window flags. See Window.h
+	
+	If a decorator has not been set, we use the default one packaged in with the app_server 
+	being that we can't do anything with a window without one.
 */
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
+	if(!app_server->make_decorator)
+		return new DefaultDecorator(rect,wlook,wfeel,wflags);
 	
-	return NULL;
+	return app_server->make_decorator(rect,wlook,wfeel,wflags);
 }
 
 /*!
@@ -771,7 +779,7 @@ int main( int argc, char** argv )
 	if(find_port(SERVER_PORT_NAME)!=B_NAME_NOT_FOUND)
 		return -1;
 
-	AppServer *app_server = new AppServer();
+	app_server=new AppServer();
 	app_server->Run();
 	delete app_server;
 	return 0;
