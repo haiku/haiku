@@ -21,6 +21,7 @@
 //
 //	File Name:		WinBorder.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@myrealbox.com>
 //	Description:	Layer subclass which handles window management
 //  
 //------------------------------------------------------------------------------

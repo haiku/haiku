@@ -21,7 +21,9 @@
 //
 //	File Name:		Layer.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Shadow BView class
+//					Adi Oanca <adioanca@myrealbox.com>
+//	Description:	Class used for rendering to the frame buffer. One layer per 
+//					view on screen and also for window decorators
 //  
 //------------------------------------------------------------------------------
 #ifndef _LAYER_H_

@@ -21,6 +21,7 @@
 //
 //	File Name:		Layer.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@myrealbox.com>
 //	Description:	Class used for rendering to the frame buffer. One layer per 
 //					view on screen and also for window decorators
 //  

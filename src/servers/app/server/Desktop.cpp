@@ -1,3 +1,29 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		Desktop.cpp
+//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Description:	Class used to encapsulate desktop management
+//
+//------------------------------------------------------------------------------
 #include <stdio.h>
 #include <Region.h>
 #include <Message.h>
@@ -232,7 +258,7 @@ void Desktop::SetFrontWinBorder(WinBorder* winBorder){
 }
 //---------------------------------------------------------------------------
 // TODO: remove shortly?
-void Desktop::SetFoooocusWinBorder(WinBorder* winBorder){
+void Desktop::SetFocusWinBorder(WinBorder* winBorder){
 	if (FocusWinBorder() == winBorder && (winBorder && !winBorder->IsHidden()))
 		return;
 
@@ -300,7 +326,7 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			msg->Read<float>(&pt.x);
 			msg->Read<float>(&pt.y);
 
-			printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
+//			printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
 			
 			WinBorder	*target;
 			RootLayer	*rl;
@@ -333,7 +359,7 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			msg->Read<float>(&pt.x);
 			msg->Read<float>(&pt.y);
 
-			printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
+//			printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
 
 			break;
 		}

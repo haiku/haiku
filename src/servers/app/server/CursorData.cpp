@@ -48,6 +48,10 @@ Then comes the pixel transparency bitmask, given left-to-right and top-to-bottom
 transparent. Transparency only applies to white pixels—black pixels are always opaque. 
 */
 
+
+// TODO: Make the default cursor lose some weight to make it easier
+// to see where it's pointing
+
 // Impressive ASCII art, eh?
 
 int8 default_cursor_data[] = {

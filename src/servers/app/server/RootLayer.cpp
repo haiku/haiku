@@ -1,3 +1,31 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2003, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		RootLayer.cpp
+//	Author:			Gabe Yoder <gyoder@stny.rr.com>
+//					DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@myrealbox.com>
+//	Description:	Class used for the top layer of each workspace's Layer tree
+//  
+//------------------------------------------------------------------------------
 
 #include <stdio.h>
 #include <Window.h>
@@ -15,6 +43,14 @@
 #include "FMWList.h"
 #include "DisplayDriver.h"
 
+//#define DEBUG_ROOTLAYER
+
+#ifdef DEBUG_ROOTLAYER
+	#define STRACE(a) printf(a)
+#else
+	#define STRACE(a) /* nothing */
+#endif
+
 //#define DISPLAYDRIVER_TEST_HACK
 
 //---------------------------------------------------------------------------
@@ -25,7 +61,8 @@ RootLayer::RootLayer(const char *layername, int32 workspaceCount, Desktop *deskt
 	fActiveWorkspace	= NULL;
 	fRows				= 0;
 	fColumns			= 0;
-// TODO: read these 3 from a configuration file.
+	
+	// TODO: read these 3 from a configuration file.
 	fScreenXResolution	= 0;
 	fScreenYResolution	= 0;
 	fColorSpace			= B_RGB32;
@@ -36,23 +73,28 @@ RootLayer::RootLayer(const char *layername, int32 workspaceCount, Desktop *deskt
 	SetWorkspaceCount(workspaceCount);
 }
 //---------------------------------------------------------------------------
-RootLayer::~RootLayer(){
+RootLayer::~RootLayer()
+{
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
 //---------------------------------------------------------------------------
-void RootLayer::Draw(const BRect &r){
-/* THIS method is here because of DisplayDriver testing!
- *	It SHOULD BE REMOVED as soon as testing is done!!!!
- */
-printf("*RootLayer(%s)::Draw(r)\n", GetName());
-	// NOTE: (!!!) fMainLock MUST be locked when this method is called!!!
-	if (!fMainLock.IsLocked())
-		printf("\n\n\tWARNING: fMainLock MUST be locked!!!\n\n");
-	// NOTE: (!!!) desktop->fGeneralLock MUST be locked when this method is called!!!
-	if (!desktop->fGeneralLock.IsLocked())
-		printf("\n\n\tWARNING: desktop->fGeneralLock MUST be locked!!!\n\n");
+void RootLayer::Draw(const BRect &r)
+{
+	// REMOVEME: This method is here because of DisplayDriver testing ONLY. 
+	// It should be removed when testing is finished
 
-// NOTE: in case you have problems - ActiveWorkspace()->opLock was acquired in Workspace::Invalidate()!!!
+	STRACE(("*RootLayer(%s)::Draw(r)\n", GetName()));
+	
+	// NOTE: fMainLock MUST be locked when this method is called
+	if (!fMainLock.IsLocked())
+		printf("\n\n\tWARNING: fMainLock MUST be locked when calling RootLayer::Draw\n\n");
+		
+	// NOTE: desktop->fGeneralLock MUST be locked when this method is called!!!
+	if (!desktop->fGeneralLock.IsLocked())
+		printf("\n\n\tWARNING: desktop->fGeneralLock MUST be locked when calling RootLayer::Draw()\n\n");
+
+	// NOTE: in case you have problems - ActiveWorkspace()->opLock was 
+	// acquired in Workspace::Invalidate()
 
 	RGBColor		c(51,102,152);
 
@@ -60,13 +102,15 @@ printf("*RootLayer(%s)::Draw(r)\n", GetName());
 
 	Workspace	*as = ActiveWorkspace();
 	WinBorder	*wb = NULL;
-	for (wb = as->GoToTopItem(); wb; wb = as->GoToLowerItem()){
-printf("requesting draw? %s from %s\n", wb->IsHidden()?"NO":"YES", wb->GetName());
+	for (wb = as->GoToTopItem(); wb; wb = as->GoToLowerItem())
+	{
+		STRACE(("requesting draw? %s from %s\n", wb->IsHidden()?"NO":"YES", wb->GetName()));
 		if (!(wb->IsHidden()))
 			wb->Draw(wb->Bounds());
 	}
- printf("#RootLayer(%s)::Draw(r) END\n", GetName());
-//--------REMOVE ABOVE--------------
+
+	 STRACE(("#RootLayer(%s)::Draw(r) END\n", GetName()));
+
 #ifdef DISPLAYDRIVER_TEST_HACK
 	DisplayDriver	*_driver = fDriver;
 	int8 pattern[8];
@@ -132,74 +176,93 @@ printf("requesting draw? %s from %s\n", wb->IsHidden()?"NO":"YES", wb->GetName()
 
 }
 //---------------------------------------------------------------------------
-void RootLayer::MoveBy(float x, float y){
+void RootLayer::MoveBy(float x, float y)
+{
 }
 //---------------------------------------------------------------------------
-void RootLayer::ResizeBy(float x, float y){
+void RootLayer::ResizeBy(float x, float y)
+{
 }
 //---------------------------------------------------------------------------
-Layer* RootLayer::VirtualTopChild() const{
+Layer* RootLayer::VirtualTopChild() const
+{
 	return fActiveWorkspace->GoToTopItem();
 }
 //---------------------------------------------------------------------------
-Layer* RootLayer::VirtualLowerSibling() const{
+Layer* RootLayer::VirtualLowerSibling() const
+{
 	return fActiveWorkspace->GoToLowerItem();
 }
 //---------------------------------------------------------------------------
-Layer* RootLayer::VirtualUpperSibling() const{
+Layer* RootLayer::VirtualUpperSibling() const
+{
 	return fActiveWorkspace->GoToUpperItem();
 }
 //---------------------------------------------------------------------------
-Layer* RootLayer::VirtualBottomChild() const{
+Layer* RootLayer::VirtualBottomChild() const
+{
 	return fActiveWorkspace->GoToBottomItem();
 }
 //---------------------------------------------------------------------------
-void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks){
+void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
+{
 	if (!(fMainLock.IsLocked()))
 		debugger("RootLayer::AddWinBorderToWorkspaces - fMainLock has to be locked!\n");
 
-	if (wks == B_CURRENT_WORKSPACE){
+	if (wks == B_CURRENT_WORKSPACE)
+	{
 		ActiveWorkspace()->AddLayerPtr(winBorder);
 		return;
 	}
 
-	for( int32 i=0; i < 32; i++){
-		if( wks & (0x00000001 << i) && i < WorkspaceCount()){
+	for( int32 i=0; i < 32; i++)
+	{
+		if( wks & (0x00000001 << i) && i < WorkspaceCount())
 			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
-		}
 	}
 }
-/* The main job, beside adding winBorder as a child, is to determine
- *	in witch workspaces to add this window.
- */
 //---------------------------------------------------------------------------
-void RootLayer::AddWinBorder(WinBorder* winBorder){
-printf("*RootLayer::AddWinBorder(%s)\n", winBorder->GetName());
-desktop->fGeneralLock.Lock();
-printf("*RootLayer::AddWinBorder(%s) - General lock acquired\n", winBorder->GetName());
-fMainLock.Lock();
-printf("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName());
-		// add winBorder to the known list of WinBorders so we can keep track of it.
+void RootLayer::AddWinBorder(WinBorder* winBorder)
+{
+	// The main job of this function, besides adding winBorder as a child, is to determine
+	// in which workspaces to add this window.
+
+	STRACE(("*RootLayer::AddWinBorder(%s)\n", winBorder->GetName()));
+	desktop->fGeneralLock.Lock();
+	
+	STRACE(("*RootLayer::AddWinBorder(%s) - General lock acquired\n", winBorder->GetName()));
+	fMainLock.Lock();
+	
+	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName()));
+	
+	// add winBorder to the known list of WinBorders so we can keep track of it.
 	AddChild(winBorder, this);
-		// add winBorder to the desired workspaces
-	switch(winBorder->Window()->Feel()){
-		case B_MODAL_SUBSET_WINDOW_FEEL:{
-			/* this kind of window isn't added anywhere. It *will* be added
-				to main window's subset when winBorder::AddToSubsetOf(main)
-				will be called.*/
+
+	// add winBorder to the desired workspaces
+	switch(winBorder->Window()->Feel())
+	{
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+		{
+			// this kind of window isn't added anywhere. It will be added
+			//	to main window's subset when winBorder::AddToSubsetOf(main)
+			//	will be called.
 			break;
 		}
 			
-		case B_MODAL_APP_WINDOW_FEEL:{
-				// add to ***app's*** list of Floating/Modal Windows.
+		case B_MODAL_APP_WINDOW_FEEL:
+		{
+			// add to app's list of Floating/Modal windows (as opposed to the system's)
 			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
 
-				// determine in witch workspaces to add this winBorder.
+			// determine in witch workspaces to add this winBorder.
 			uint32		wks = 0;
-// TODO: change later when you put this code into the server
-			for (int32 i=0; i<WorkspaceCount(); i++){
+
+			// TODO: change later when you put this code into the server
+			for (int32 i=0; i<WorkspaceCount(); i++)
+			{
 				Workspace	*ws = WorkspaceAt(i+1);
-				for (WinBorder *wb = ws->GoToBottomItem(); wb!=NULL; wb = ws->GoToUpperItem()){
+				for (WinBorder *wb = ws->GoToBottomItem(); wb!=NULL; wb = ws->GoToUpperItem())
+				{
 					if ( !(wb->IsHidden()) &&
 						 winBorder->Window()->ClientTeamID() == wb->Window()->ClientTeamID())
 					{
@@ -208,30 +271,34 @@ printf("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName
 					}
 				}
 			}
-// by using _bottomchild and _uppersibling.
+			// by using _bottomchild and _uppersibling.
 
 			AddWinBorderToWorkspaces(winBorder, wks);
 			break;
 		}
 				
-		case B_MODAL_ALL_WINDOW_FEEL:{
-				// add to ***system's*** list of Floating/Modal Windows.
+		case B_MODAL_ALL_WINDOW_FEEL:
+		{
+			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
 			fMainFMWList.AddItem(winBorder);
-				// add this winBorder to all workspaces
+			
+			// add this winBorder to all workspaces
 			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
 			break;
 		}
 
-		case B_FLOATING_SUBSET_WINDOW_FEEL:{
-			/* this kind of window isn't added anywhere. It *will* be added to WS's list
-				when its main window will become the front one.
-				Also, it will be added to MainWinBorder's list when
-				winBorder::AddToSubset(main) is called.*/
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+		{
+			// this kind of window isn't added anywhere. It *will* be added to WS's list
+			//	when its main window will become the front one.
+			//	Also, it will be added to MainWinBorder's list when
+			//	winBorder::AddToSubset(main) is called.
 			break;
 		}
 				
-		case B_FLOATING_APP_WINDOW_FEEL:{
-				// add to ***app's*** list of Floating/Modal Windows.
+		case B_FLOATING_APP_WINDOW_FEEL:
+		{
+			// add to app's list of Floating/Modal windows (as opposed to the system's)
 			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
 			
 			for (int32 i=0; i<WorkspaceCount(); i++){
@@ -247,49 +314,62 @@ printf("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName
 			break;
 		}
 				
-		case B_FLOATING_ALL_WINDOW_FEEL:{
-				// add to ***system's*** list of Floating/Modal Windows.
+		case B_FLOATING_ALL_WINDOW_FEEL:
+		{
+			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
 			fMainFMWList.AddItem(winBorder);
-				// add this winBorder to all workspaces
+			
+			// add this winBorder to all workspaces
 			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
 			break;
 		}
 		
-		case B_NORMAL_WINDOW_FEEL:{
-				// add this winBorder to the specified workspaces
+		case B_NORMAL_WINDOW_FEEL:
+		{
+			// add this winBorder to the specified workspaces
 			AddWinBorderToWorkspaces(winBorder, winBorder->Window()->Workspaces());
 			break;
 		}
 		
 		case B_SYSTEM_LAST:
-		case B_SYSTEM_FIRST:{
-				// add this winBorder to all workspaces
+		case B_SYSTEM_FIRST:
+		{
+			// add this winBorder to all workspaces
 			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
 			break;
 		}
 		default:
 			break;
-	}
-fMainLock.Unlock();
-printf("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName());
-desktop->fGeneralLock.Unlock();
-printf("*RootLayer::AddWinBorder(%s) - General lock released\n", winBorder->GetName());
-printf("#RootLayer::AddWinBorder(%s)\n", winBorder->GetName());
+	}	// end switch(winborder->Feel())
+	
+	fMainLock.Unlock();
+	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName()));
+
+	desktop->fGeneralLock.Unlock();
+	STRACE(("*RootLayer::AddWinBorder(%s) - General lock released\n", winBorder->GetName()));
+
+	STRACE(("#RootLayer::AddWinBorder(%s)\n", winBorder->GetName()));
 }
-/* This method does 3 things:
- *	1) Removes MODAL/SUBSET windows from system/app/window subset list.
- *	2) Removes this window from any workspace it appears in.
- *	3) Removes this window from RootLayer's list of chilren.
- */
+
 //---------------------------------------------------------------------------
-void RootLayer::RemoveWinBorder(WinBorder* winBorder){
-desktop->fGeneralLock.Lock();
-fMainLock.Lock();
+void RootLayer::RemoveWinBorder(WinBorder* winBorder)
+{
+// This method does 3 things:
+// 1) Removes MODAL/SUBSET windows from system/app/window subset list.
+// 2) Removes this window from any workspace it appears in.
+// 3) Removes this window from RootLayer's list of chilren.
+
+
+	desktop->fGeneralLock.Lock();
+	fMainLock.Lock();
+	
 	int32		feel = winBorder->Window()->Feel();
-	if(feel == B_MODAL_SUBSET_WINDOW_FEEL || feel == B_FLOATING_SUBSET_WINDOW_FEEL){
+	if(feel == B_MODAL_SUBSET_WINDOW_FEEL || feel == B_FLOATING_SUBSET_WINDOW_FEEL)
+	{
 		desktop->RemoveSubsetWindow(winBorder);
 	}
-	else if (feel == B_MODAL_APP_WINDOW_FEEL || feel == B_FLOATING_APP_WINDOW_FEEL){
+	else if (feel == B_MODAL_APP_WINDOW_FEEL || feel == B_FLOATING_APP_WINDOW_FEEL)
+	{
 		RemoveAppWindow(winBorder);
 	}
 	else if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL
@@ -302,60 +382,75 @@ fMainLock.Lock();
 		for(int32 i=0; i < count; i++)
 			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
 	}
-	else{ // for B_NORMAL_WINDOW_FEEL
+	else
+	{	// for B_NORMAL_WINDOW_FEEL
 		uint32		workspaces	= winBorder->Window()->Workspaces();
 		int32		count		= WorkspaceCount();
 		for( int32 i=0; i < 32 && i < count; i++)
-			if( workspaces & (0x00000001UL << i)){
-					WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
-			}
+			if( workspaces & (0x00000001UL << i))
+				WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
 	}
 
 	RemoveChild(winBorder);
-fMainLock.Unlock();
-desktop->fGeneralLock.Unlock();
+
+	fMainLock.Unlock();
+	desktop->fGeneralLock.Unlock();
 }
 //---------------------------------------------------------------------------
-void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces){
-		// only NORMAL windows are affected by this change
+void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
+{
+	// only normal windows are affected by this change
 	if(!winBorder->_level != B_NORMAL_FEEL)
 		return;
 
 	uint32		oldWorkspaces = winBorder->Window()->Workspaces();
-	for(int32 i=0; i < WorkspaceCount(); i++){
-		if ((oldWorkspaces & (0x00000001 << i)) && (newWorkspaces & (0x00000001 << i))){
+	for(int32 i=0; i < WorkspaceCount(); i++)
+	{
+		if ((oldWorkspaces & (0x00000001 << i)) && (newWorkspaces & (0x00000001 << i)))
+		{
 			// do nothing.
 		}
-		else if(oldWorkspaces & (0x00000001 << i)){
+		else if(oldWorkspaces & (0x00000001 << i))
+		{
 			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
 		}
-		else if (newWorkspaces & (0x00000001 << i)){
+		else if (newWorkspaces & (0x00000001 << i))
+		{
 			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
 		}
 	}
 }
 //---------------------------------------------------------------------------
-bool RootLayer::SetFrontWinBorder(WinBorder* winBorder){
-// TODO: watch out for a NULL value
-printf("*RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL");
-fMainLock.Lock();
-printf("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? winBorder->GetName():"NULL");
-	if (!winBorder){
+bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
+{
+	if(!winBorder)
+		return false;
+
+	STRACE(("*RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
+
+	fMainLock.Lock();
+	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? winBorder->GetName():"NULL"));
+
+	if (!winBorder)
+	{
 		ActiveWorkspace()->SetFrontLayer(NULL);
 		return true;
 	}
 
-	uint32		workspaces	= winBorder->Window()->Workspaces();
-	int32		count		= WorkspaceCount();
-	int32		newWorkspace= 0;
+	uint32 workspaces	= winBorder->Window()->Workspaces();
+	int32 count		= WorkspaceCount();
+	int32 newWorkspace= 0;
 
-	if (workspaces & (0x00000001UL << (ActiveWorkspaceIndex()-1)) ){
+	if (workspaces & (0x00000001UL << (ActiveWorkspaceIndex()-1)) )
+	{
 		newWorkspace = ActiveWorkspaceIndex();
 	}
-	else{
+	else
+	{
 		int32	i;
 		for( i = 0; i < 32 && i < count; i++)
-			if( workspaces & (0x00000001UL << i)){
+			if( workspaces & (0x00000001UL << i))
+			{
 				newWorkspace	= i+1;
 				break;
 			}
@@ -364,7 +459,8 @@ printf("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? wi
 			newWorkspace = ActiveWorkspaceIndex();
 	}
 
-	if(newWorkspace != ActiveWorkspaceIndex()){
+	if(newWorkspace != ActiveWorkspaceIndex())
+	{
 		WorkspaceAt(newWorkspace)->SetFrontLayer(winBorder);
 		SetActiveWorkspaceByIndex(newWorkspace);
 	}
@@ -372,23 +468,25 @@ printf("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? wi
 		ActiveWorkspace()->SetFrontLayer(winBorder);
 	}
 
-fMainLock.Unlock();
-printf("*RootLayer::SetFrontWinBorder(%s) - main lock released\n", winBorder? winBorder->GetName():"NULL");
-printf("#RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL");
+	fMainLock.Unlock();
+	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock released\n", winBorder? winBorder->GetName():"NULL"));
+	STRACE(("#RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
 	return true;
 }
 //---------------------------------------------------------------------------
-void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns){
-// NOTE: *All* Screens *MUST* have the same resolution.
+void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
+{
+	// NOTE: All screens *must* have the same resolution
 	fScreenPtrList.MakeEmpty();
 	BRect	newFrame(0, 0, 0, 0);
-	for (int32 i=0; i < rows; i++){
+	for (int32 i=0; i < rows; i++)
+	{
 		if (i==0)
-		for(int32 j=0; j < columns; j++){
-			fScreenPtrList.AddItem(screen[i*rows + j]);
-
-			newFrame.right		+= screen[i*rows + j]->Resolution().x;
-		}
+			for(int32 j=0; j < columns; j++)
+			{
+				fScreenPtrList.AddItem(screen[i*rows + j]);
+				newFrame.right		+= screen[i*rows + j]->Resolution().x;
+			}
 		newFrame.bottom		+= screen[i*rows]->Resolution().y;
 	}
 
@@ -405,30 +503,34 @@ void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns){
 //	Invalidate(Frame());
 }
 //---------------------------------------------------------------------------
-Screen** RootLayer::Screens(){
+Screen** RootLayer::Screens()
+{
 	return (Screen**)fScreenPtrList.Items();
 }
 //---------------------------------------------------------------------------
-bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace){
-		// if there is no need to change resolution... exit
+bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace)
+{
 	if (fScreenXResolution == width && fScreenYResolution == height &&
 		fColorSpace == colorspace)
 		return false;
 
-	bool		accepted = true;
+	bool accepted = true;
 
-	for (int i=0; i < fScreenPtrList.CountItems(); i++){
-		Screen		*screen;
-		screen		= static_cast<Screen*>(fScreenPtrList.ItemAt(i));
+	for (int i=0; i < fScreenPtrList.CountItems(); i++)
+	{
+		Screen *screen;
+		screen = static_cast<Screen*>(fScreenPtrList.ItemAt(i));
 		
 		if ( !(screen->SupportsResolution(BPoint(width, height), colorspace)) )
-			accepted	= false;
+			accepted = false;
 	}
 	
-	if (accepted){
-		for (int i=0; i < fScreenPtrList.CountItems(); i++){
-			Screen		*screen;
-			screen		= static_cast<Screen*>(fScreenPtrList.ItemAt(i));
+	if (accepted)
+	{
+		for (int i=0; i < fScreenPtrList.CountItems(); i++)
+		{
+			Screen *screen;
+			screen = static_cast<Screen*>(fScreenPtrList.ItemAt(i));
 
 			screen->SetResolution(BPoint(width, height), colorspace);
 		}
@@ -442,75 +544,86 @@ bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace
 	return false;
 }
 //---------------------------------------------------------------------------
-void RootLayer::SetWorkspaceCount(const int32 count){
-printf("*RootLayer::SetWorkspaceCount(%ld)\n", count);
+void RootLayer::SetWorkspaceCount(const int32 count)
+{
+	STRACE(("*RootLayer::SetWorkspaceCount(%ld)\n", count));
+	
 	if ((count < 1 && count > 32) || count == WorkspaceCount())
 		return;
 	
-	int32		exActiveWorkspaceIndex = ActiveWorkspaceIndex();
+	int32 	exActiveWorkspaceIndex = ActiveWorkspaceIndex();
 
-	BList		newWSPtrList;
-	void		*workspacePtr;
+	BList newWSPtrList;
+	void *workspacePtr;
 
-fMainLock.Lock();
-printf("*RootLayer::SetWorkspaceCount(%ld) - main lock acquired\n", count);
-	for(int i=0; i < count; i++){
+	fMainLock.Lock();
+	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock acquired\n", count));
+	
+	for(int i=0; i < count; i++)
+	{
 		workspacePtr	= fWSPtrList.ItemAt(i);
-		if (workspacePtr){
+		if (workspacePtr)
 			newWSPtrList.AddItem(workspacePtr);
-		}
-		else{
+		else
+		{
 			Workspace	*ws;
-			ws			= new Workspace(fColorSpace, i+1, BGColor(), this);
+			ws = new Workspace(fColorSpace, i+1, BGColor(), this);
 			newWSPtrList.AddItem(ws);
 		}
 	}
 	
-		// delete other Workspace objects if WS count is smaller than current one.
-	for (int j=count; j < fWSPtrList.CountItems(); j++){
+	// delete other Workspace objects if the count is smaller than current one.
+	for (int j=count; j < fWSPtrList.CountItems(); j++)
+	{
 		Workspace	*ws = NULL;
-		ws			= static_cast<Workspace*>(fWSPtrList.ItemAt(j));
-		if (ws){
+		ws = static_cast<Workspace*>(fWSPtrList.ItemAt(j));
+		if (ws)
 			delete ws;
-		}
-		else{
-			printf("\nSERVER: PANIC: in RootLayer::SetWorkspaceCount()\n\n");
+		else
+		{
+			STRACE(("\nSERVER: PANIC: in RootLayer::SetWorkspaceCount()\n\n"));
 			return;
 		}
 	}
 	
-	fWSPtrList		= newWSPtrList;
+	fWSPtrList = newWSPtrList;
 
-fMainLock.Unlock();
-printf("*RootLayer::SetWorkspaceCount(%ld) - main lock released\n", count);
+	fMainLock.Unlock();
+	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock released\n", count));
+	
 	if (exActiveWorkspaceIndex > count)
 		SetActiveWorkspaceByIndex(count); 
 
-		// if true, this is the first time this method is called.
+	// if true, this is the first time this method is called.
 	if (exActiveWorkspaceIndex == -1)
 		SetActiveWorkspaceByIndex(1); 		
-printf("#RootLayer::SetWorkspaceCount(%ld)\n", count);
+
+	STRACE(("#RootLayer::SetWorkspaceCount(%ld)\n", count));
 }
 //---------------------------------------------------------------------------
-int32 RootLayer::WorkspaceCount() const{
+int32 RootLayer::WorkspaceCount() const
+{
 	return fWSPtrList.CountItems();
 }
 //---------------------------------------------------------------------------
-Workspace* RootLayer::WorkspaceAt(const int32 index) const{
-	Workspace		*ws = NULL;
-	ws				= static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
+Workspace* RootLayer::WorkspaceAt(const int32 index) const
+{
+	Workspace *ws = NULL;
+	ws = static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
 
 	return ws;
 }
 //---------------------------------------------------------------------------
-void RootLayer::SetActiveWorkspaceByIndex(const int32 index){
-	Workspace		*ws = NULL;
-	ws				= static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
+void RootLayer::SetActiveWorkspaceByIndex(const int32 index)
+{
+	Workspace *ws = NULL;
+	ws = static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
 	if (ws)
 		SetActiveWorkspace(ws);
 }
 //---------------------------------------------------------------------------
-void RootLayer::SetActiveWorkspace(Workspace *ws){
+void RootLayer::SetActiveWorkspace(Workspace *ws)
+{
 	if (fActiveWorkspace == ws || !ws)
 		return;
 
@@ -527,11 +640,13 @@ int32 RootLayer::ActiveWorkspaceIndex() const{
 		return -1;
 }
 //---------------------------------------------------------------------------
-Workspace* RootLayer::ActiveWorkspace() const{
+Workspace* RootLayer::ActiveWorkspace() const
+{
 	return fActiveWorkspace;
 }
 //---------------------------------------------------------------------------
-void RootLayer::SetBGColor(const RGBColor &col){
+void RootLayer::SetBGColor(const RGBColor &col)
+{
 	ActiveWorkspace()->SetBGColor(col);
 	
 	_layerdata->viewcolor	= col;
@@ -539,29 +654,32 @@ void RootLayer::SetBGColor(const RGBColor &col){
 //	Invalidate(Frame());
 }
 //---------------------------------------------------------------------------
-RGBColor RootLayer::BGColor(void) const{	
+RGBColor RootLayer::BGColor(void) const
+{
 	return _layerdata->viewcolor;
 }
 //---------------------------------------------------------------------------
-void RootLayer::RemoveAppWindow(WinBorder *wb){
+void RootLayer::RemoveAppWindow(WinBorder *wb)
+{
 	wb->Window()->App()->fAppFMWList.RemoveItem(wb);
 
 	int32		count = WorkspaceCount();
-	for(int32 i=0; i < count; i++){
+	for(int32 i=0; i < count; i++)
 		WorkspaceAt(i+1)->RemoveLayerPtr(wb);
-	}
 }
 //---------------------------------------------------------------------------
-void RootLayer::PrintToStream(){
+void RootLayer::PrintToStream()
+{
 	printf("\nRootLayer '%s' internals:\n", GetName());
 	printf("Screen list:\n");
-	for(int32 i=0; i<fScreenPtrList.CountItems(); i++){
+	for(int32 i=0; i<fScreenPtrList.CountItems(); i++)
 		printf("\t%ld\n", ((Screen*)fScreenPtrList.ItemAt(i))->ScreenNumber());
-	}
+
 	printf("Screen rows: %ld\nScreen columns: %ld\n", fRows, fColumns);
 	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenXResolution, fScreenYResolution, fColorSpace);
 	printf("Workspace list:\n");
-	for(int32 i=0; i<fWSPtrList.CountItems(); i++){
+	for(int32 i=0; i<fWSPtrList.CountItems(); i++)
+	{
 		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWSPtrList.ItemAt(i))->ID());
 		((Workspace*)fWSPtrList.ItemAt(i))->PrintToStream();
 		printf("~~~~~~~~\n");

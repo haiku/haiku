@@ -21,7 +21,7 @@
 //
 //	File Name:		FMWList.cpp
 //	Author:			Adi Oanca <adioanca@myrealbox.com>
-//	Description:	List class for something or other (according to DW)
+//	Description:	List class for tracking floating and modal windows
 //  
 //------------------------------------------------------------------------------
 #include <stdio.h>

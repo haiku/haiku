@@ -702,12 +702,15 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// When we delete the last ServerApp, we can exit the server
 			_quitting_server	= true;
 			_exit_poller		= true;
-				// also wait for picasso thread
-			wait_for_thread(_picasso_id, &rv);
-				// poller thread is stuck reading messages from its input port
-				// so, there is no cleaner way to make it quit, other than killing it!
+
+			// also wait for picasso thread
+			kill_thread(_picasso_id);
+
+			// poller thread is stuck reading messages from its input port
+			// so, there is no cleaner way to make it quit, other than killing it!
 			kill_thread(_poller_id);
-				// we are now clear to exit
+
+			// we are now clear to exit
 			break;
 		}
 		case AS_SET_SYSCURSOR_DEFAULTS:

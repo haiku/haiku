@@ -34,11 +34,14 @@
 
 #include <Session.h>
 
+#include <ColorSet.h>
+#include <RGBColor.h>
 #include <stdio.h>
 #include <string.h>
 #include <ScrollBar.h>
 #include <ServerProtocol.h>
 
+#include "AppServer.h"
 #include "BitmapManager.h"
 #include "CursorManager.h"
 #include "Desktop.h"
@@ -80,7 +83,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 
 	// need to copy the _signature because the message buffer
 	// owns the copy which we are passed as a parameter.
-	_signature=(signature)?signature:"application/x-vnd.unregistered-application";
+	_signature=(signature)?signature:"application/x-vnd.NULL-application-signature";
 	
 	// token ID of the BApplication's BHandler object. Used for BMessage target specification
 	_handlertoken=handlerID;
@@ -106,8 +109,9 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	_lock=create_sem(1,"ServerApp sem");
 
-//TODO: resolve
-//	_driver=GetGfxDriver(ActiveScreen());
+	// Does this even belong here any more? --DW
+//	_driver=desktop->GetDisplayDriver();
+
 	_cursorhidden=false;
 
 	Run();
@@ -345,6 +349,7 @@ void ServerApp::SetAppCursor(void)
 			
 			case B_QUIT_REQUESTED:
 			{
+				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->_signature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete our monitor
 				// ADI: No! This is a bad solution. A thead should continue its
@@ -393,6 +398,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
+			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",_signature.String()));
+			
 			// received when the client-side global font list has been
 			// refreshed
 			fontserver->Lock();
@@ -402,6 +409,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
+			STRACE(("ServerApp %s: Received global UI color update notification\n",_signature.String()));
 			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
@@ -417,6 +425,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_FONTS:
 		{
+			STRACE(("ServerApp %s: Received global font update notification\n",_signature.String()));
 			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
 			
@@ -432,6 +441,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_DECORATOR:
 		{
+			STRACE(("ServerApp %s: Received decorator update notification\n",_signature.String()));
+
 			ServerWindow *win;
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
@@ -479,8 +490,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->ReadString(&title);
 			msg->Read<port_id>(&replyport);
 
-			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
-					_signature.String()));
+			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",_signature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
 			new ServerWindow(frame, title, look, feel, flags, this,
@@ -497,6 +507,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_CREATE_BITMAP:
 		{
+			STRACE(("ServerApp %s: Received BBitmap creation request\n",_signature.String()));
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
@@ -552,6 +563,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_DELETE_BITMAP:
 		{
+			STRACE(("ServerApp %s: received BBitmap delete request\n",_signature.String()));
 			// Delete a bitmap's allocated memory
 
 			// Attached Data:
@@ -610,6 +622,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_SCREEN_MODE:
 		{
+			STRACE(("ServerApp %s: Set Screen Mode\n",_signature.String()));
+
 			// Attached data
 			// 1) int32 workspace #
 			// 2) uint32 screen mode
@@ -620,21 +634,24 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&workspace);
 			msg->Read<uint32>(&mode);
 			msg->Read<bool>(&stick);
-//TODO: Resolve			
-//			SetSpace(workspace,mode,ActiveScreen(),stick);
+
+			//TODO: Resolve			
+			//SetSpace(workspace,mode,ActiveScreen(),stick);
 
 			break;
 		}
 		case AS_ACTIVATE_WORKSPACE:
 		{
+			STRACE(("ServerApp %s: Activate Workspace\n",_signature.String()));
 			// Attached data
 			// 1) int32 workspace index
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
 			msg->Read<int32>(&workspace);
-//TODO: Resolve
-//			SetWorkspace(workspace);
+
+			//TODO: Resolve
+			//SetWorkspace(workspace);
 			break;
 		}
 		
@@ -642,23 +659,27 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
+			STRACE(("ServerApp %s: Show Cursor\n",_signature.String()));
 			cursormanager->ShowCursor();
 			_cursorhidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
+			STRACE(("ServerApp %s: Hide Cursor\n",_signature.String()));
 			cursormanager->HideCursor();
 			_cursorhidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
+			STRACE(("ServerApp %s: Obscure Cursor\n",_signature.String()));
 			cursormanager->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
+			STRACE(("ServerApp %s: Received IsCursorHidden request\n",_signature.String()));
 			// Attached data
 			// 1) int32 port to reply to
 			int32 replyport;
@@ -669,6 +690,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_CURSOR_DATA:
 		{
+			STRACE(("ServerApp %s: SetCursor via cursor data\n",_signature.String()));
 			// Attached data: 68 bytes of _appcursor data
 			
 			int8 cdata[68];
@@ -689,6 +711,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_CURSOR_BCURSOR:
 		{
+			STRACE(("ServerApp %s: SetCursor via BCursor\n",_signature.String()));
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
@@ -715,6 +738,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_CREATE_BCURSOR:
 		{
+			STRACE(("ServerApp %s: Create BCursor\n",_signature.String()));
 			// Attached data:
 			// 1) 68 bytes of _appcursor data
 			// 2) port_id reply port
@@ -737,6 +761,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_DELETE_BCURSOR:
 		{
+			STRACE(("ServerApp %s: Delete BCursor\n",_signature.String()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
 			int32 ctoken;
@@ -750,32 +775,35 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
+			STRACE(("ServerApp %s: Get ScrollBar info\n",_signature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-//TODO: resolve
-//			scroll_bar_info sbi=GetScrollBarInfo();
+
+			scroll_bar_info sbi=desktop->ScrollBarInfo();
 
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
 			PortLink link(replyport);
-//TODO: resolve
-//			link.Attach<scroll_bar_info>(sbi);
+
+			link.Attach<scroll_bar_info>(sbi);
 			link.Flush();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
 		{
+			STRACE(("ServerApp %s: Set ScrollBar info\n",_signature.String()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-//TODO: resolve
-//			SetScrollBarInfo(sbi);
+
+			desktop->SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
 		{
+			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n",_signature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
@@ -783,51 +811,69 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&replyport);
 
 			PortLink link(replyport);
-//TODO: resolve
-//			link.Attach<bool>(GetFFMouse());
+
+			link.Attach<bool>(desktop->FFMouseInUse());
 			link.Flush();
 			break;
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
+			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n",_signature.String()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-//TODO: resolve
-//			SetScrollBarInfo(sbi);
+
+			desktop->SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
 		{
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",_signature.String()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
 			msg->Read<mode_mouse>(&mmode);
-//TODO: resolve
-//			SetFFMouseMode(mmode);
+
+			desktop->SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",_signature.String()));
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-//TODO: resolve
-//			mode_mouse mmode=GetFFMouseMode();
+
+			mode_mouse mmode=desktop->FFMouseMode();
 			
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
 			PortLink link(replyport);
-//TODO: resolve
-//			link.Attach<mode_mouse>(mmode);
+
+			link.Attach<mode_mouse>(mmode);
 			link.Flush();
 			break;
 		}
 		case AS_GET_UI_COLOR:
 		{
-			// TODO: get a partiular UI color and return it to the sender
-			printf("ServerApp::AS_GET_UI_COLOR unimplemented\n");
+			STRACE(("ServerApp %s: Get UI color\n",_signature.String()));
+
+			RGBColor color;
+			int32 whichcolor;
+			port_id replyport;
+			
+			msg->Read<int32>(&whichcolor);
+			msg->Read<port_id>(&replyport);
+			
+			gui_colorset.Lock();
+			color=gui_colorset.AttributeToColor(whichcolor);
+			gui_colorset.Unlock();
+			
+			PortLink replylink(replyport);
+			replylink.SetOpCode(SERVER_TRUE);
+			replylink.Attach<rgb_color>(color.GetColor32());
+			replylink.Flush();
 			break;
 		}
 		default:

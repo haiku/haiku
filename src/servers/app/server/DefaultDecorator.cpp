@@ -468,7 +468,10 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 	// Note that it is not part of the Decorator API - it's specific
 	// to just the DefaultDecorator. Called by DrawZoom and DrawClose
 
-	_layerdata.highcolor = RGBColor( 175, 123, 0 );						 
+	// TODO: Fix this function so that the close button on inactive window tabs
+	// is drawn correctly. Currently, a yellow "halo" appears around them.
+
+	_layerdata.highcolor = RGBColor( 175, 123, 0 );
 	_driver->StrokeLine( r.LeftTop(),
 						 BPoint( r.left, r.bottom - 1 ),
 						 _layerdata.pensize,_layerdata.highcolor);
