@@ -1,10 +1,16 @@
 // KDiskSystem.cpp
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
+
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
 
 // constructor
 KDiskSystem::KDiskSystem(const char *name)
