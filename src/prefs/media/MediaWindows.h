@@ -12,8 +12,14 @@ Media Windows Header by Sikosis
 #include "Media.h"
 #include "MediaViews.h"
 
+class BParameterWeb;
+class BContinuousParameter;
+class BMultiChannelControl;
+
 class MediaView;
 class IconView;
+class AudioSettingsView;
+class AudioMixerView;
 
 class MediaWindow : public BWindow
 {
@@ -26,8 +32,16 @@ class MediaWindow : public BWindow
 	private:
 		void InitWindow(void);
 		
-	    MediaView*	 ptrMediaView;
-	    IconView*    ptrIconView;
+	    MediaView*				ptrMediaView;
+	    IconView*  				ptrIconView;
+	    AudioSettingsView*		ptrAudioSettingsView;
+	    AudioMixerView*         ptrAudioMixerView;
+	    
+	    BParameterWeb* 			mParamWeb;
+		BMultiChannelControl* 	mGainControl;
+		BContinuousParameter* 	mGainParam;
+		float 					mScale, mOffset;
+		int32 					mControlMin;
 };
 
 #endif

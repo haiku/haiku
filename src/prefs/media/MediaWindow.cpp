@@ -12,7 +12,9 @@ Media - MediaWindow by Sikosis
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Font.h>
 #include <ListView.h>
+#include <math.h>
 #include <OutlineListView.h>
 #include <Path.h>
 #include <Screen.h>
@@ -26,6 +28,13 @@ Media - MediaWindow by Sikosis
 #include <TextControl.h>
 #include <Window.h>
 #include <View.h>
+
+// Media Includes
+#include <ParameterWeb.h>
+#include <TimeSource.h>
+#include <MediaRoster.h>
+#include <MediaTheme.h>
+#include <MultiChannelControl.h>
 
 #include "Media.h"
 #include "MediaViews.h"
@@ -67,18 +76,32 @@ void MediaWindow::InitWindow(void)
 	BRect r;
 	r = Bounds(); // the whole view
 	
+	// Grab Media Info
+	media_node mixerNode;
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->GetAudioMixer(&mixerNode);
+	roster->GetParameterWebFor(mixerNode, &mParamWeb);
+
+	// we look up the global BMediaRoster object, 
+	// ask it for a reference to the global system mixer's node, 
+	// then get a copy of the node's BParameterWeb.
+	BMediaTheme* theme = BMediaTheme::PreferredTheme();
+	BView* paramView = theme->ViewFor(mParamWeb);
+		
 	// Create the OutlineView
 	BRect outlinerect(r.left+12,r.top+12,r.left+146,r.bottom-10);
+	BRect AvailableRect(r.left+160,r.top+12,r.right-10,r.bottom-10);
+	BRect AudioMixerRect(r.left+160,r.top+41,r.right-10,r.bottom-10);
 	BOutlineListView *outline;
 	BListItem 		 *topmenu;
 	BListItem 		 *submenu;
 	BScrollView 	 *outlinesv;
 
-	outline = new BOutlineListView(outlinerect,"audio_list", B_MULTIPLE_SELECTION_LIST);
+	outline = new BOutlineListView(outlinerect,"audio_list", B_SINGLE_SELECTION_LIST);
 	outline->AddItem(topmenu = new BStringItem("Audio Settings"));
 	outline->AddUnder(submenu = new BStringItem("Audio Mixer"), topmenu);
-	outline->AddUnder(new BStringItem("None In"), submenu);
 	outline->AddUnder(new BStringItem("None Out"), submenu);
+	outline->AddUnder(new BStringItem("None In"), submenu);
 	outline->AddItem(topmenu = new BStringItem("Video Settings"));
 	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);
 	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
@@ -90,14 +113,23 @@ void MediaWindow::InitWindow(void)
 	
 	// Setup the OutlineView 
 	outlinesv->SetBorderHighlighted(true);
+	
 	outline->SetHighColor(0,0,0,0);
 	outline->SetLowColor(255,255,255,0);
+	
+	BFont OutlineFont;
+	OutlineFont.SetSpacing(B_CHAR_SPACING);
+	OutlineFont.SetSize(12);
+	outline->SetFont(&OutlineFont,B_FONT_SHEAR | B_FONT_SPACING);
 	
 	// Create the Views	
 	AddChild(ptrMediaView = new MediaView(r));
 	
 	// Add Child(ren)
 	ptrMediaView->AddChild(outlinesv);
+	//AddChild(ptrAudioSettingsView = mew AudioSettingsView(AvailableRect));
+	ptrMediaView->AddChild(ptrAudioMixerView = new AudioMixerView(AudioMixerRect));
+	ptrAudioMixerView->AddChild(paramView);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 

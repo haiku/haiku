@@ -34,6 +34,8 @@ void MediaView::Draw(BRect updateRect)
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+
+
 // IconView - Constructor
 IconView::IconView (BRect frame) : BView (frame, "IconView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
 {
@@ -43,6 +45,38 @@ IconView::IconView (BRect frame) : BView (frame, "IconView", B_FOLLOW_ALL_SIDES,
 
 
 void IconView::Draw(BRect updateRect)
+{
+	BRect r;
+	r = Bounds();
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+
+// AudioSettingsView - Constructor
+AudioSettingsView::AudioSettingsView (BRect frame) : BView (frame, "AudioSettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+
+void AudioSettingsView::Draw(BRect updateRect)
+{
+	BRect r;
+	r = Bounds();
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+
+// AudioMixerView - Constructor
+AudioMixerView::AudioMixerView (BRect frame) : BView (frame, "AudioMixerView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+
+void AudioMixerView::Draw(BRect updateRect)
 {
 	BRect r;
 	r = Bounds();

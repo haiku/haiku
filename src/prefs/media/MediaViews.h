@@ -26,5 +26,19 @@ class IconView : public BView
     	virtual	void	Draw(BRect updateRect);	
 };
 
+class AudioSettingsView : public BView
+{
+	public:
+    	AudioSettingsView(BRect frame);
+    	virtual	void	Draw(BRect updateRect);	
+};
+
+class AudioMixerView : public BView
+{
+	public:
+    	AudioMixerView(BRect frame);
+    	virtual	void	Draw(BRect updateRect);	
+};
+
 
 #endif
