@@ -176,6 +176,10 @@ class Inode : public CachedBlock {
 		off_t OldSize() { return fOldSize; }
 		off_t OldLastModified() { return fOldLastModified; }
 
+		// file cache
+		void *FileCache() const { return fCache; }
+		void SetFileCache(void *cache) { fCache = cache; }
+
 	private:
 		Inode(const Inode &);
 		Inode &operator=(const Inode &);
@@ -205,6 +209,7 @@ class Inode : public CachedBlock {
 		ReadWriteLock	fLock;
 		off_t			fOldSize;			// we need those values to ensure we will remove
 		off_t			fOldLastModified;	// the correct keys from the indices
+		void			*fCache;
 
 		mutable SimpleLock	fSmallDataLock;
 		Chain<AttributeIterator> fIterators;

@@ -1,7 +1,7 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
 **
 ** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the Haiku License.
 */
 
 
@@ -21,6 +21,7 @@
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 #include <fs_interface.h>
+#include <fs_cache.h>
 
 #ifndef _IMPEXP_KERNEL
 #	define _IMPEXP_KERNEL
@@ -241,8 +242,12 @@ restartIfBusy:
 	} else
 		status = inode->InitCheck(false);
 
-	if (status == B_OK)
+	if (status == B_OK) {
+		if (inode->IsFile() && inode->FileCache() == NULL)
+			inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(), inode->Size(), volume->Device()));
+
 		*_node = inode;
+	}
 
 	return status;
 }
@@ -307,7 +312,7 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 
 
 static bool
-bfs_can_page(fs_volume _fs, fs_vnode _v)
+bfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	// ToDo: we're obviously not even asked...
 	return false;
@@ -315,7 +320,7 @@ bfs_can_page(fs_volume _fs, fs_vnode _v)
 
 
 static status_t
-bfs_read_pages(fs_volume _fs, fs_vnode _node, off_t pos,
+bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	Inode *inode = (Inode *)_node;
@@ -324,7 +329,8 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, off_t pos,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	ReadLocked locked(inode->Lock());
-
+	return file_cache_read_pages(inode->FileCache(), pos, vecs, count, _numBytes);
+#if 0
 	for (uint32 i = 0; i < count; i++) {
 		if (pos >= inode->Size()) {
 			memset(vecs[i].iov_base, 0, vecs[i].iov_len);
@@ -347,13 +353,61 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, off_t pos,
 	}
 
 	return B_OK;
+#endif
 }
 
 
 static status_t
-bfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+bfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
+}
+
+
+static status_t
+bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
+	struct file_io_vec *vecs, size_t *_count)
+{
+	Volume *volume = (Volume *)_fs;
+	Inode *inode = (Inode *)_node;
+
+	int32 blockShift = volume->BlockShift();
+	size_t index = 0, max = *_count;
+	block_run run;
+	off_t fileOffset;
+
+	FUNCTION_START(("offset = %Ld, size = %lu\n", offset, size));
+
+	while (true) {
+		status_t status = inode->FindBlockRun(offset, run, fileOffset);
+		if (status != B_OK)
+			return status;
+
+		vecs[index].offset = volume->ToOffset(run) + offset - fileOffset;
+		vecs[index].length = (run.Length() << blockShift) - offset + fileOffset;
+
+		offset += vecs[index].length;
+
+		// are we already done?
+		if (size <= vecs[index].length
+			|| offset >= inode->Size()) {
+			*_count = index + 1;
+			return B_OK;
+		}
+
+		size -= vecs[index].length;
+		index++;
+
+		if (index >= max) {
+			// we're out of file_io_vecs; let's bail out
+			*_count = index;
+			return B_BUFFER_OVERFLOW;
+		}
+	}
+
+	// can never get here
+	return B_ERROR;
 }
 
 
@@ -1090,7 +1144,7 @@ bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t 
 	}
 
 	ReadLocked locked(inode->Lock());
-	return inode->ReadAt(pos, (uint8 *)buffer, _length);
+	return file_cache_read(inode->FileCache(), pos, buffer, _length);
 }
 
 
@@ -2006,8 +2060,8 @@ static file_system_info sBeFileSystem = {
 	&bfs_can_page,
 	&bfs_read_pages,
 	&bfs_write_pages,
-	
-	NULL,						// get_file_map()
+
+	&bfs_get_file_map,			// get file map
 
 	&bfs_ioctl,					// ioctl
 	&bfs_fsync,					// sync

@@ -11,6 +11,7 @@
 #include "Stream.h"
 #include "Index.h"
 
+#include <fs_cache.h>
 #include <util/kernel_cpp.h>
 
 #include <string.h>
@@ -223,6 +224,8 @@ Inode::Initialize()
 
 	if (IsContainer())
 		fTree = new BPlusTree(this);
+
+	fCache = NULL;
 }
 
 
