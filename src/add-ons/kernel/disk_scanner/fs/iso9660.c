@@ -130,21 +130,15 @@ std_ops(int32 op, ...)
 // read_block
 static
 status_t
-read_block(int fd, off_t offset, size_t size, uchar **block)
+read_block(fs_get_buffer get_buffer, struct fs_buffer_cache *cache,
+		   off_t offset, size_t size, uchar **block)
 {
-	status_t error = (block && size > 0 ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		*block = malloc(size);
-		if (*block) {
-			if (read_pos(fd, offset, *block, size) != (ssize_t)size) {
-				error = errno;
-				if (error == B_OK)
-					error = B_ERROR;
-				free(*block);
-				*block = NULL;
-			}
-		} else
-			error = B_NO_MEMORY;
+	size_t actualSize = 0;
+	status_t error = get_buffer(cache, offset, size, (void**)block,
+								&actualSize);
+	if (error == B_OK && actualSize != size) {
+		error = B_ERROR;
+		free(*block);
 	}
 	return error;
 }
@@ -159,7 +153,8 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 static
 bool
 iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
-                    float *priority)
+                    float *priority, fs_get_buffer get_buffer,
+					struct fs_buffer_cache *cache)
 {
 	bool result = false;
 	uchar *buffer = NULL;
@@ -180,7 +175,7 @@ iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 		iso9660_common_volume_descriptor *common = NULL;
 		
 		// Read the block containing the current descriptor
-		error = read_block(deviceFD, offset, blockSize, &buffer);
+		error = read_block(get_buffer, cache, offset, blockSize, &buffer);
 		offset += blockSize;
 		if (!error) {
 			common = (iso9660_common_volume_descriptor*)buffer;

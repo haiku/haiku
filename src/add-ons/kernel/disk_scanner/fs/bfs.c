@@ -23,9 +23,10 @@ const char *kModuleDebugName = "fs/bfs";
 //#define TRACE(x) dprintf x
 
 // prototypes
-static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
+//static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
 static bool bfs_fs_identify(int deviceFD,
-	struct extended_partition_info *partitionInfo, float *priority);
+	struct extended_partition_info *partitionInfo, float *priority,
+	fs_get_buffer get_buffer, struct fs_buffer_cache *cache);
 
 //----------------------------------------------------------------------
 // Stolen from src/add-ons/kernel/file_systems/bfs/bfs.h
@@ -147,21 +148,15 @@ std_ops(int32 op, ...)
 // read_block
 static
 status_t
-read_block(int fd, off_t offset, size_t size, uchar **block)
+read_block(fs_get_buffer get_buffer, struct fs_buffer_cache *cache,
+		   off_t offset, size_t size, uchar **block)
 {
-	status_t error = (block && size > 0 ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		*block = malloc(size);
-		if (*block) {
-			if (read_pos(fd, offset, *block, size) != (ssize_t)size) {
-				error = errno;
-				if (error == B_OK)
-					error = B_ERROR;
-				free(*block);
-				*block = NULL;
-			}
-		} else
-			error = B_NO_MEMORY;
+	size_t actualSize = 0;
+	status_t error = get_buffer(cache, offset, size, (void**)block,
+								&actualSize);
+	if (error == B_OK && actualSize != size) {
+		error = B_ERROR;
+		free(*block);
 	}
 	return error;
 }
@@ -176,7 +171,8 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 static
 bool
 bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
-				float *priority)
+				float *priority, fs_get_buffer get_buffer,
+				struct fs_buffer_cache *cache)
 {
 	bool result = false;
 	TRACE(("%s: identify(%d, %p, offset: %lld)\n", kModuleDebugName, deviceFD,
@@ -185,8 +181,8 @@ bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 	if (partitionInfo) {
 		uchar *buffer = NULL;
 		disk_super_block *superBlock = NULL;
-		status_t error = read_block(deviceFD, partitionInfo->info.offset,
-		                            1024, &buffer);
+		status_t error = read_block(get_buffer, cache,
+									partitionInfo->info.offset, 1024, &buffer);
 		if (!error && buffer) {
 			superBlock = (disk_super_block*)(buffer+512);
 //			dump_super_block(superBlock);
