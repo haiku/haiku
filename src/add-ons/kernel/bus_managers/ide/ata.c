@@ -55,7 +55,7 @@ ata_dpc_PIO(ide_qrequest *qrequest)
 	SHOW_FLOW0(3, "");
 
 	if (check_rw_error(device, qrequest)
-		|| !check_rw_status(device, qrequest->is_write ? device->left_blocks > 1 : true)) 
+		|| !check_rw_status(device, qrequest->is_write ? device->left_blocks > 0 : true)) 
 	{
 		// failure reported by device
 		SHOW_FLOW0( 3, "command finished unsuccessfully" );
@@ -68,7 +68,7 @@ ata_dpc_PIO(ide_qrequest *qrequest)
 		if (device->left_blocks == 0) {
 			// this was the end-of-transmission IRQ
 			SHOW_FLOW0(3, "write access finished");
-			if (!wait_for_drq(device)) {
+			if (!wait_for_drqdown(device)) {
 				SHOW_ERROR0(3, "device wants to transmit data though command is finished");
 				goto finish;
 			}
@@ -88,8 +88,7 @@ ata_dpc_PIO(ide_qrequest *qrequest)
 		// so we better start waiting too early; as we are in service thread,
 		// a DPC initiated by IRQ cannot overtake us, so there is no need to block
 		// IRQs during sent
-		if (device->left_blocks > 1)
-			start_waiting_nolock(device->bus, timeout, ide_state_async_waiting);
+		start_waiting_nolock(device->bus, timeout, ide_state_async_waiting);
 
 		// having a too short data buffer shouldn't happen here
 		// anyway - we are prepared
