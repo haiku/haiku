@@ -25,10 +25,10 @@ ScreenApplication::ScreenApplication()
 void
 ScreenApplication::AboutRequested()
 {
-	BAlert *AboutAlert = new BAlert("About", "Screen by Rafael Romo, Stefano Ceccherini\nThe OBOS place to configure your monitor",
+	BAlert *aboutAlert = new BAlert("About", "Screen by Rafael Romo, Stefano Ceccherini\nThe OBOS place to configure your monitor",
 		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
-	AboutAlert->SetShortcut(0, B_OK);
-	AboutAlert->Go();
+	aboutAlert->SetShortcut(0, B_OK);
+	aboutAlert->Go();
 }
 
 

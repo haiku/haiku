@@ -10,7 +10,7 @@ public:
 	AlertView(BRect frame, char *name);
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
-	int32 count;
+	uint32 count;
 	
 private:	
 	BBitmap	*fBitmap;

@@ -1,19 +1,19 @@
 #include <Bitmap.h>
-#include <InterfaceDefs.h>
 #include <Message.h>
+#include <Picture.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
 #include <TranslationUtils.h>
-#include <View.h>
 
 #include <cstdlib>
+#include <cstdio>
 
 #include "Constants.h"
 #include "ScreenDrawView.h"
 
 ScreenDrawView::ScreenDrawView(BRect rect, char *name)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)	
+	:BBox(rect, name)	
 {
 	BScreen screen(B_MAIN_SCREEN_ID);
 	if (!screen.IsValid())
@@ -39,14 +39,6 @@ ScreenDrawView::~ScreenDrawView()
 	delete fScreen1;
 	delete fScreen2;
 #endif
-}
-
-
-void
-ScreenDrawView::AttachedToWindow()
-{
-	rgb_color greyColor = { 216, 216, 216, 255 };
-	SetViewColor(greyColor);
 }
 
 
@@ -199,24 +191,32 @@ ScreenDrawView::Draw(BRect updateRect)
 		StrokeLine(BPoint(35.0, 53.0), BPoint(36.0, 53.0));
 	}
 #else
+	BRect bounds(Bounds());
+	
 	SetHighColor(desktopColor);
-	FillRect(Bounds()); 
+	
+	FillRect(bounds);
+	
+	
+	SetDrawingMode(B_OP_OVER);
+	 
 	BRect bitmapBounds(fScreen1->Bounds());
 	BRect dest;
-	dest.left = Bounds().left;
-	dest.top = Bounds().top;
-	dest.right = Bounds().left + (bitmapBounds.Width() * 100) / fWidth;
-	dest.bottom = Bounds().top + (bitmapBounds.Height() * 100) / fHeight;
-	DrawBitmap(fScreen1, dest);
+	dest.left = bounds.left;
+	dest.top = bounds.top;
+	dest.right = bounds.left + (bitmapBounds.Width() * 100) / fWidth;
+	dest.bottom = bounds.top + (bitmapBounds.Height() * 100) / fHeight;
+	DrawBitmapAsync(fScreen1, dest);
 	
 	BRect bitmapBounds2(fScreen2->Bounds());
 	BRect dest2;
-	dest2.top = Bounds().top;
-	dest2.right = Bounds().right;
-	dest2.bottom = Bounds().top + (bitmapBounds2.Height() * 100) / fHeight;
-	dest2.left = Bounds().right - (bitmapBounds2.Width() * 100) / fWidth;
+	dest2.top = bounds.top;
+	dest2.right = bounds.right;
+	dest2.bottom = bounds.top + (bitmapBounds2.Height() * 100) / fHeight;
+	dest2.left = bounds.right - (bitmapBounds2.Width() * 100) / fWidth;
 	
-	DrawBitmap(fScreen2, dest2);
+	DrawBitmapAsync(fScreen2, dest2);
+	Flush();
 #endif
 
 }
@@ -229,11 +229,11 @@ ScreenDrawView::MessageReceived(BMessage* message)
 	{
 		case UPDATE_DESKTOP_MSG:
 		{
-			BString resolution;		
+			BString resolution;	
 			message->FindString("resolution", &resolution);
 			
 			int32 nextWidth = atoi(resolution.String());
-			resolution.Truncate(resolution.FindFirst('x') + 1); 
+			resolution.Remove(0, resolution.FindFirst('x') + 1); 
 			
 			if (fWidth != nextWidth)	{
 				fWidth = nextWidth;

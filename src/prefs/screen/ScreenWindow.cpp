@@ -1,22 +1,24 @@
 #include <Alert.h>
 #include <Application.h>
+#include <Box.h>
 #include <Button.h>
 #include <InterfaceDefs.h>
-#include <Menu.h>
 #include <MenuItem.h>
+#include <MenuField.h>
 #include <Messenger.h>
+#include <PopUpMenu.h>
 #include <String.h>
 #include <Screen.h>
 #include <Window.h>
 
-#include <math.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
 
+#include "RefreshWindow.h"
 #include "ScreenWindow.h"
 #include "ScreenDrawView.h"
-#include "ScreenView.h"
+#include "ScreenSettings.h"
 #include "AlertWindow.h"
 #include "Constants.h"
 #include "Utility.h"
@@ -38,13 +40,26 @@ colorspace_to_string(uint32 colorspace)
 }
 
 
-static const char*
-mode_to_string(display_mode mode)
+static uint32
+string_to_colorspace(const char* string)
 {
-	char string[128];
-	sprintf(string, "%d x %d", mode.virtual_width, mode.virtual_height);
+	if (!strcmp(string, "8 Bits/Pixel"))
+		return B_CMAP8;
+	else if (!strcmp(string, "15 Bits/Pixel"))
+		return B_RGB15;
+	else if (!strcmp(string, "16 Bits/Pixel"))	
+		return B_RGB16;
+	else if (!strcmp(string, "32 Bits/Pixel"))
+		return B_RGB32;
 	
-	return string;	
+	return B_CMAP8; //Should return an error?
+}
+
+
+static void
+mode_to_string(display_mode mode, char dest[])
+{
+	sprintf(dest, "%d x %d", mode.virtual_width, mode.virtual_height);
 }
 
 		 	
@@ -59,26 +74,21 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 		
 	screen.GetModeList(&fSupportedModes, &fTotalModes);
 	
-	fScreenView = new ScreenView(frame, "ScreenView");
+	frame.InsetBy(-1, -1);
+	fScreenView = new BBox(frame, "ScreenView");
+	fScreenDrawView = new ScreenDrawView(BRect(20.0, 16.0, 122.0, 93.0), "ScreenDrawView");	
+		
 	AddChild(fScreenView);
 	
 	fSettings = Settings;
 	
-	BRect ScreenBoxRect(11.0, 18.0, 153.0, 155.0);
-	BRect ScreenDrawViewRect(20.0, 16.0, 122.0, 93.0);
-	BRect ControlsBoxRect;
-	BRect WorkspaceMenuRect;
-	BRect WorkspaceCountMenuRect;
-	BRect ControlMenuRect;
-	BRect ButtonRect;
-		
-	BBox *screenBox = new BBox(ScreenBoxRect);
+	BRect screenBoxRect(11.0, 18.0, 153.0, 155.0);	
+	BBox *screenBox = new BBox(screenBoxRect);
 	screenBox->SetBorder(B_FANCY_BORDER);
-		
-	fScreenDrawView = new ScreenDrawView(ScreenDrawViewRect, "ScreenDrawView");
-		
-	fWorkspaceCountMenu = new BPopUpMenu("", true, true);
 	
+	fWorkspaceCountMenu = new BPopUpMenu("", true, true);
+	fWorkspaceCountField = new BMenuField(BRect(7.0, 107.0, 135.0, 127.0), "WorkspaceCountMenu", "Workspace count:", fWorkspaceCountMenu, true);
+
 	for (int32 count = 1; count <= 32; count++) {
 		BString workspaceCount;
 		workspaceCount << count;
@@ -91,11 +101,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	BMenuItem *marked = fWorkspaceCountMenu->FindItem(string.String());
 	marked->SetMarked(true);
-	
-	WorkspaceCountMenuRect.Set(7.0, 107.0, 135.0, 127.0);
-	
-	fWorkspaceCountField = new BMenuField(WorkspaceCountMenuRect, "WorkspaceCountMenu", "Workspace count:", fWorkspaceCountMenu, true);
-	
+			
 	fWorkspaceCountField->SetDivider(91.0);
 	
 	screenBox->AddChild(fScreenDrawView);	
@@ -109,18 +115,15 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fCurrentWorkspaceItem->SetMarked(true);
 	fWorkspaceMenu->AddItem(fCurrentWorkspaceItem);
 	
-	WorkspaceMenuRect.Set(0.0, 0.0, 132.0, 18.0);
+	BRect workspaceMenuRect(0.0, 0.0, 132.0, 18.0);
+	fWorkspaceField = new BMenuField(workspaceMenuRect, "WorkspaceMenu", NULL, fWorkspaceMenu, true);
 	
-	fWorkspaceField = new BMenuField(WorkspaceMenuRect, "WorkspaceMenu", NULL, fWorkspaceMenu, true);
-	
-	ControlsBoxRect.Set(164.0, 7.0, 345.0, 155.0);
-	
-	BBox *controlsBox = new BBox(ControlsBoxRect);
+	BRect controlsBoxRect(164.0, 7.0, 345.0, 155.0);	
+	BBox *controlsBox = new BBox(controlsBoxRect);
 	controlsBox->SetBorder(B_FANCY_BORDER);
 	controlsBox->SetLabel(fWorkspaceField);
 	
-	ButtonRect.Set(88.0, 114.0, 200.0, 150.0);
-	
+	BRect ButtonRect(88.0, 114.0, 200.0, 150.0);	
 	fApplyButton = new BButton(ButtonRect, "ApplyButton", "Apply", 
 		new BMessage(BUTTON_APPLY_MSG));
 	
@@ -135,9 +138,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	CheckUpdateDisplayModes();
 	
-	ControlMenuRect.Set(33.0, 30.0, 171.0, 48.0);
-	
-	fResolutionField = new BMenuField(ControlMenuRect, "ResolutionMenu", "Resolution:", fResolutionMenu, true);
+	BRect controlMenuRect(33.0, 30.0, 171.0, 48.0);	
+	fResolutionField = new BMenuField(controlMenuRect, "ResolutionMenu", "Resolution:", fResolutionMenu, true);
 	
 	marked = fResolutionMenu->ItemAt(0);
 	marked->SetMarked(true);
@@ -146,9 +148,9 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	controlsBox->AddChild(fResolutionField);
 	
-	ControlMenuRect.Set(50.0, 58.0, 171.0, 76.0);
+	controlMenuRect.Set(50.0, 58.0, 171.0, 76.0);
 	
-	fColorsField = new BMenuField(ControlMenuRect, "ColorsMenu", "Colors:", fColorsMenu, true);
+	fColorsField = new BMenuField(controlMenuRect, "ColorsMenu", "Colors:", fColorsMenu, true);
 	
 	marked = fColorsMenu->ItemAt(0);
 	marked->SetMarked(true);
@@ -169,10 +171,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fRefreshMenu->AddItem(new BMenuItem("100 Hz", new BMessage(POP_REFRESH_MSG)));
 	
 	fRefreshMenu->AddItem(new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG)));
-		
-	ControlMenuRect.Set(19.0, 86.0, 171.0, 104.0);
 	
-	fRefreshField = new BMenuField(ControlMenuRect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
+		
+	controlMenuRect.Set(19.0, 86.0, 171.0, 104.0);
+	
+	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
 	
 	marked = fRefreshMenu->FindItem("60 Hz");
 	marked->SetMarked(true);
@@ -204,10 +207,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fScreenView->AddChild(fRevertButton);
 		
-	display_mode mode;
-	
+	display_mode mode;	
 	screen.GetMode(&mode);
-	
 	fInitialMode = mode;
 	
 	string.Truncate(0);
@@ -316,9 +317,9 @@ ScreenWindow::MessageReceived(BMessage* message)
 	
 		case POP_WORKSPACE_CHANGED_MSG:
 		{		
-			BMenuItem *Item = fWorkspaceCountMenu->FindMarked();
+			BMenuItem *item = fWorkspaceCountMenu->FindMarked();
 		
-			set_workspace_count(fWorkspaceCountMenu->IndexOf(Item) + 1);
+			set_workspace_count(fWorkspaceCountMenu->IndexOf(item) + 1);
 		
 			break;
 		}
@@ -326,11 +327,12 @@ ScreenWindow::MessageReceived(BMessage* message)
 		case POP_RESOLUTION_MSG:
 		{
 			CheckApplyEnabled();
-		
+			
 			BMessage newMessage(UPDATE_DESKTOP_MSG);
 			
 			const char *resolution = fResolutionMenu->FindMarked()->Label();
 			
+			//CheckModesByResolution(resolution);
 			newMessage.AddString("resolution", resolution);
 		
 			PostMessage(&newMessage, fScreenDrawView);
@@ -420,7 +422,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 				BScreen screen(B_MAIN_SCREEN_ID);
 				if (!screen.IsValid())
 					break;
-							
+						
 				screen.SetMode(&fInitialMode, true);
 			}
 			break;
@@ -452,25 +454,16 @@ ScreenWindow::MessageReceived(BMessage* message)
 			else
 				refresh = atof(fRefreshMenu->FindMarked()->Label());
 			
-			for (uint32 c = 0; c < fTotalModes; c++) {
-				
+			for (uint32 c = 0; c < fTotalModes; c++) {			
 				if ((fSupportedModes[c].virtual_width == width)
-					&& (fSupportedModes[c].virtual_height == height))
-					
+					&& (fSupportedModes[c].virtual_height == height)
+					&& (fSupportedModes[c].space == string_to_colorspace(fColorsMenu->FindMarked()->Label())))
 				mode = &fSupportedModes[c];
 			}
 							
 			mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);					
 			
-			if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("8 Bits/Pixel"))	
-				mode->space = B_CMAP8;
-			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("15 Bits/Pixel"))		
-				mode->space = B_RGB15;
-			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("16 Bits/Pixel"))	
-				mode->space = B_RGB16;
-			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("32 Bits/Pixel"))
-				mode->space = B_RGB32;
-			
+			//mode->space = string_to_colorspace(fColorsMenu->FindMarked()->Label());			
 			mode->h_display_start = 0;
 			mode->v_display_start = 0;
 
@@ -486,19 +479,8 @@ ScreenWindow::MessageReceived(BMessage* message)
  					break;
  				}
  					
-			
-				int32 old = current_workspace();
-				int32 totalWorkspaces = count_workspaces();
-				
-				for (int32 count = 0; count < totalWorkspaces; count ++) {
-					activate_workspace(count);
-					screen.SetMode(mode, true);
-				}
-				
-				activate_workspace(old);
 			}
-			else
-				screen.SetMode(mode);
+			screen.SetMode(mode);
 				
 			BRect rect(100.0, 100.0, 400.0, 193.0);
 			
@@ -521,14 +503,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);	
 				
 			other->SetMarked(true);
-				
+			
 			BString string;			
 			string << fCustomRefresh;
 			int32 point = string.FindFirst('.');
 			string.Truncate(point + 2);
 			
 			string << " Hz/Other...";
-			
 			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
 			
 			point = string.FindFirst('/');
@@ -552,7 +533,22 @@ ScreenWindow::MessageReceived(BMessage* message)
 				
 			display_mode mode;					
 			screen.GetMode(&mode);
-			screen.SetMode(&mode, true);
+			
+			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
+			
+				int32 old = current_workspace();
+				int32 totalWorkspaces = count_workspaces();
+				fRevertButton->SetEnabled(false);
+				
+				for (int32 count = 1; count <= totalWorkspaces; count++) {
+					activate_workspace(count);
+					screen.SetMode(&mode, true);
+				}
+					
+				activate_workspace(old);
+						
+			} else
+				screen.SetMode(&mode, true);
 		
 			fInitialRefreshN = fCustomRefresh;
 			fInitialResolution = fResolutionMenu->FindMarked();
@@ -581,7 +577,8 @@ ScreenWindow::CheckApplyEnabled()
 	} else {
 		fApplyButton->SetEnabled(false);
 		fRevertButton->SetEnabled(false);
-	}
+	}			
+			
 }
 
 
@@ -591,8 +588,9 @@ ScreenWindow::CheckUpdateDisplayModes()
 	uint32 c;
 	
 	// Add supported resolutions to the menu
+	char mode[128];
 	for (c = 0; c < fTotalModes; c++) {
-		const char *mode = mode_to_string(fSupportedModes[c]);
+		mode_to_string(fSupportedModes[c], mode);
 		
 		if (!fResolutionMenu->FindItem(mode))
 			fResolutionMenu->AddItem(new BMenuItem(mode, new BMessage(POP_RESOLUTION_MSG)));
@@ -605,14 +603,44 @@ ScreenWindow::CheckUpdateDisplayModes()
 		if (!fColorsMenu->FindItem(colorSpace))
 			fColorsMenu->AddItem(new BMenuItem(colorSpace, new BMessage(POP_COLORS_MSG)));		
 	}
-/* 
-	XXX: BeOS's BScreen limits the refresh to 85 hz. I hope that OpenBeOS BScreen will remove
+ 
+	/*XXX: BeOS's BScreen limits the refresh to 85 hz (or is it the nvidia driver?).
+	I hope that OpenBeOS BScreen will remove
 	this limitation. 
 	
 	for (c = 0; c < fTotalModes; c++) {
 		display_mode *mode = &fSupportedModes[c];
 		int32 refresh = (mode->timing.pixel_clock * 1000) / (mode->timing.h_total * mode->timing.v_total);
-		printf("%d\n", refresh);	
+		printf("width %d, height %d, refresh %d\n", mode->virtual_width, mode->virtual_height, refresh);	
 	}
 */
+}
+
+
+void
+ScreenWindow::CheckModesByResolution(const char *res)
+{
+	BString resolution(res);
+	
+	bool found = false;
+	uint32 c;
+	int32 width = atoi(resolution.String());
+	resolution.Remove(0, resolution.FindFirst('x') + 1);
+	int32 height = atoi(resolution.String());
+	
+	for (c = 0; c < fTotalModes; c++) {
+		if ((fSupportedModes[c].virtual_width == width) 
+			&& (fSupportedModes[c].virtual_height == height)) {
+			if (string_to_colorspace(fColorsMenu->FindMarked()->Label())
+						== fSupportedModes[c].space) {
+				found = true;
+				break;
+			}				
+		}
+	}
+	
+	if (!found) {
+		fColorsMenu->ItemAt(fColorsMenu->IndexOf(fColorsMenu->FindMarked()) - 1)->SetMarked(true);	
+		printf("not found\n");
+	}
 }

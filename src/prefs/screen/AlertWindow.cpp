@@ -1,11 +1,7 @@
-#include <MessageRunner.h>
 #include <Application.h>
-#include <Messenger.h>
-#include <Message.h>
 #include <Button.h>
+#include <MessageRunner.h>
 #include <Window.h>
-
-#include <Beep.h>
 
 #include "AlertWindow.h"
 #include "AlertView.h"
@@ -20,31 +16,28 @@ AlertWindow::AlertWindow(BRect frame)
 	
 	AddChild(fAlertView);
 	
-	BRect ButtonRect;
+	BRect buttonRect;	
+	buttonRect.Set(215.0, 59.0, 400.0, 190.0);
 	
-	ButtonRect.Set(215.0, 59.0, 400.0, 190.0);
-	
-	fKeepButton = new BButton(ButtonRect, "KeepButton", "Keep", 
-	new BMessage(BUTTON_KEEP_MSG));
+	fKeepButton = new BButton(buttonRect, "KeepButton", "Keep", 
+		new BMessage(BUTTON_KEEP_MSG));
 	
 	fKeepButton->AttachedToWindow();
 	fKeepButton->ResizeToPreferred();
 	
 	fAlertView->AddChild(fKeepButton);
 	
-	ButtonRect.Set(130.0, 59.0, 400.0, 190.0);
+	buttonRect.Set(130.0, 59.0, 400.0, 190.0);
 	
-	fRevertButton = new BButton(ButtonRect, "RevertButton", "Revert", 
-	new BMessage(BUTTON_REVERT_MSG));
+	fRevertButton = new BButton(buttonRect, "RevertButton", "Revert", 
+		new BMessage(BUTTON_REVERT_MSG));
 	
 	fRevertButton->AttachedToWindow();
 	fRevertButton->ResizeToPreferred();
 	
 	fAlertView->AddChild(fRevertButton);
 	
-	BMessenger Messenger(this);
-	
-	fRunner = new BMessageRunner(Messenger, new BMessage(DIM_COUNT_MSG), 1000000, 10);
+	fRunner = new BMessageRunner(this, new BMessage(DIM_COUNT_MSG), 1000000, 10);
 }
 
 
@@ -53,9 +46,7 @@ AlertWindow::QuitRequested()
 {
 	delete fRunner;
 	
-	Quit();
-	
-	return true;
+	return BWindow::QuitRequested();
 }
 
 

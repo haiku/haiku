@@ -1,13 +1,12 @@
 #ifndef __REFRESHVIEW_H
 #define __REFRESHVIEW_H
 
-#include <View.h>
+#include <Box.h>
 
-class RefreshView : public BView
+class RefreshView : public BBox
 {
 public:
 	RefreshView(BRect frame, char *name);
-	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
 };
 

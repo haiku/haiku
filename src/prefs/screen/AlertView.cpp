@@ -7,12 +7,12 @@
 #include "Constants.h"
 
 AlertView::AlertView(BRect frame, char *name)
-	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW)
+	:BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	count = 8;
 	
 	fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_COLOR_8_BIT);
-	fBitmap->SetBits(BitmapBits, 32 * 32, 0, B_COLOR_8_BIT);
+	fBitmap->SetBits(bitmapBits, 32 * 32, 0, B_COLOR_8_BIT);
 }
 
 

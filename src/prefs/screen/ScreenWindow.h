@@ -1,22 +1,20 @@
 #ifndef __SCREENWINDOW_H
 #define __SCREENWINDOW_H
 
-#include <PopUpMenu.h>
-#include <MenuField.h>
-#include <Window.h>
 #include <Screen.h>
-#include <Box.h>
+#include <Window.h>
 
-#include "ScreenView.h"
-#include "ScreenDrawView.h"
-#include "RefreshWindow.h"
-#include "ScreenSettings.h"
-
+class BBox;
+class BPopUpMenu;
+class BMenuField;
+class RefreshWindow;
+class ScreenDrawView;
+class ScreenSettings;
 class ScreenWindow : public BWindow
 {
 
 public:
-	ScreenWindow(ScreenSettings *Settings);
+	ScreenWindow(ScreenSettings *settings);
 	virtual ~ScreenWindow();
 	virtual	bool QuitRequested();
 	virtual void MessageReceived(BMessage *message);
@@ -27,10 +25,12 @@ public:
 private:
 	void CheckApplyEnabled();
 	void CheckUpdateDisplayModes();
+	void CheckModesByResolution(const char*);
 	
+	BBox *fScreenView;
 	ScreenSettings *fSettings;
-	ScreenView *fScreenView;
 	ScreenDrawView *fScreenDrawView;
+	
 	BPopUpMenu *fWorkspaceMenu;
 	BMenuField *fWorkspaceField;
 	BPopUpMenu *fWorkspaceCountMenu;
@@ -46,12 +46,15 @@ private:
 	BButton	*fDefaultsButton;
 	BButton	*fApplyButton;
 	BButton	*fRevertButton;
+	
 	BMenuItem *fInitialResolution;
 	BMenuItem *fInitialColors;
 	BMenuItem *fInitialRefresh;
+	
 	display_mode fInitialMode;
 	display_mode *fSupportedModes;
 	uint32 fTotalModes;
+	
 	float fCustomRefresh;
 	float fInitialRefreshN;
 };

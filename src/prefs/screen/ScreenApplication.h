@@ -1,8 +1,7 @@
 #ifndef __SCREENAPPLICATION_H
 #define __SCREENAPPLICATION_H
 
-#include "ScreenWindow.h"
-
+class ScreenWindow;
 class ScreenApplication : public BApplication
 {
 public:

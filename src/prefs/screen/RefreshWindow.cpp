@@ -1,9 +1,8 @@
-#include <Locker.h>
-#include <Window.h>
-#include <String.h>
-#include <Button.h>
-
 #include <Alert.h>
+#include <Application.h>
+#include <Button.h>
+#include <String.h>
+#include <Window.h>
 
 #include "RefreshWindow.h"
 #include "RefreshView.h"
@@ -14,18 +13,18 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	: BWindow(frame, "Refresh Rate", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
 	BRect bounds(Bounds());
+	bounds.InsetBy(-1, -1);
 	
 	fRefreshView = new RefreshView(bounds, "RefreshView");
-	
 	AddChild(fRefreshView);
 	
-	BRect SliderRect;
+	BRect sliderRect;
 	BString maxRefresh;
 	maxRefresh << gMaxRefresh;
 	
-	SliderRect.Set(10.0, 35.0, 299.0, 60.0);
+	sliderRect.Set(10.0, 35.0, 299.0, 60.0);
 	
-	fRefreshSlider = new RefreshSlider(SliderRect);
+	fRefreshSlider = new RefreshSlider(sliderRect);
 	
 	fRefreshSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fRefreshSlider->SetHashMarkCount(10);
@@ -55,8 +54,6 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	fCancelButton->ResizeToPreferred();
 	
 	fRefreshView->AddChild(fCancelButton);
-		
-	PostMessage(SLIDER_INVOKE_MSG);
 }
 
 
@@ -74,13 +71,12 @@ RefreshWindow::MessageReceived(BMessage* message)
 	{
 		case BUTTON_DONE_MSG:
 		{
-			BMessenger messenger(kAppSignature);	
 			BMessage message(SET_CUSTOM_REFRESH_MSG);
-			
+		
 			float value = (float)fRefreshSlider->Value() / 10;
 					
 			message.AddFloat("refresh", value);
-			messenger.SendMessage(&message);
+			be_app->PostMessage(&message);
 			
 			PostMessage(B_QUIT_REQUESTED);
 			
