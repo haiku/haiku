@@ -233,11 +233,22 @@ void Folder::AttributeChanged(BMessage* msg) {
 }
 
 void Folder::HandleNodeMonitorMessage(BMessage* msg) {
+	ino_t node; node_ref ref;
 	BAutolock lock(gLock);
 	if (!lock.IsLocked()) return;
 	int32 opcode;
 	if (msg->FindInt32("opcode", &opcode) != B_OK) return;
 	switch (opcode) {
+		case B_ENTRY_MOVED:
+			fSpoolDir.GetNodeRef(&ref);
+			if (msg->FindInt64("to directory", &node) == B_OK &&
+				ref.node == node) {
+				EntryCreated(msg);
+			} else if (msg->FindInt64("from directory", &node) == B_OK &&
+				ref.node == node) {
+				EntryRemoved(msg);
+			}
+			break;
 		case B_ENTRY_CREATED: // add to fJobs
 			EntryCreated(msg);
 			break;
