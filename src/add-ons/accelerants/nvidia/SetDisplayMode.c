@@ -86,7 +86,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* find current DPMS state, then turn off screen(s) */
 	nv_crtc_dpms_fetch(&display, &h, &v);
 	nv_crtc_dpms(false, false, false);
-//	if (si->ps.secondary_head) g400_crtc2_dpms(0,0,0);
+	if (si->ps.secondary_head) nv_crtc2_dpms(false, false, false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
@@ -145,12 +145,12 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		case B_RGB16_LITTLE:
 			colour_depth2 = 16;
 			nv_maven_mode(BPP16, 1.0);
-			g400_crtc2_depth(BPP16);
+			nv_crtc2_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth2 = 32;
 			nv_maven_mode(BPP32DIR, 1.0);
-			g400_crtc2_depth(BPP32DIR);
+			nv_crtc2_depth(BPP32DIR);
 			break;
 		}
 
@@ -163,7 +163,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		nv_crtc_set_display_pitch ();
 		//fixme: seperate for real dualhead modes:
 		//we need a secondary si->fbc!
-		g400_crtc2_set_display_pitch ();
+		nv_crtc2_set_display_pitch ();
 
 		/*work out where the "right" screen starts*/
 		startadd_right=startadd+(target.timing.h_display * (colour_depth1 >> 3));
@@ -304,18 +304,18 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
 			nv_crtc_set_display_start(startadd,colour_depth1);
-			g400_crtc2_set_display_start(startadd_right,colour_depth2);
+			nv_crtc2_set_display_start(startadd_right,colour_depth2);
 			break;
 		case DUALHEAD_CLONE:
 			nv_crtc_set_display_start(startadd,colour_depth1);
-			g400_crtc2_set_display_start(startadd,colour_depth2);
+			nv_crtc2_set_display_start(startadd,colour_depth2);
 			break;
 		}
 
 		/* set the timing */
 		nv_crtc_set_timing(target);
 		/* we do not need to setup CRTC2 here for a head that's in TVout mode */
-		if (!(target2.flags & TV_BITS))	result = g400_crtc2_set_timing(target2);
+		if (!(target2.flags & TV_BITS))	result = nv_crtc2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
 		if (si->ps.tvout && (target2.flags & TV_BITS))
@@ -384,7 +384,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* turn screen one on */
 	nv_crtc_dpms(display, h, v);
 	/* turn screen two on if a dualhead mode is active */
-//	if (target.flags & DUALHEAD_BITS) g400_crtc2_dpms(display,h,v);
+	if (target.flags & DUALHEAD_BITS) nv_crtc2_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
 	nv_acc_init();
@@ -494,19 +494,19 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 
 	interrupt_enable(false);
 
-	switch (si->dm.flags&DUALHEAD_BITS)
+	switch (si->dm.flags & DUALHEAD_BITS)
 	{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
 			nv_crtc_set_display_start(startadd,colour_depth);
-			g400_crtc2_set_display_start(startadd_right,colour_depth);
+			nv_crtc2_set_display_start(startadd_right,colour_depth);
 			break;
 		case DUALHEAD_OFF:
 			nv_crtc_set_display_start(startadd,colour_depth);
 			break;
 		case DUALHEAD_CLONE:
 			nv_crtc_set_display_start(startadd,colour_depth);
-			g400_crtc2_set_display_start(startadd,colour_depth);
+			nv_crtc2_set_display_start(startadd,colour_depth);
 			break;
 	}
 
@@ -560,19 +560,19 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 		{
 		case B_DPMS_ON:	/* H: on, V: on, display on */
 			nv_crtc_dpms(true, true, true);
-			if (si->ps.secondary_head) g400_crtc2_dpms(1,1,1);
+			if (si->ps.secondary_head) nv_crtc2_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
 			nv_crtc_dpms(false, false, true);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,0,1);
+			if (si->ps.secondary_head) nv_crtc2_dpms(false, false, true);
 			break;
 		case B_DPMS_SUSPEND:
 			nv_crtc_dpms(false, true, false);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,1,0);
+			if (si->ps.secondary_head) nv_crtc2_dpms(false, true, false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
 			nv_crtc_dpms(false, false, false);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,0,0);
+			if (si->ps.secondary_head) nv_crtc2_dpms(false, false, false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));

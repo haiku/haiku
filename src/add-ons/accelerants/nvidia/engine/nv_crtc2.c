@@ -1,247 +1,574 @@
-/* second CTRC functionality
-
-   Authors:
-   Mark Watson 6/2000,
-   Rudolf Cornelissen 12/2002 - 4/2003
+/* second CTRC functionality for GeForce cards */
+/* Author:
+   Rudolf Cornelissen 11/2002-1/2004
 */
 
 #define MODULE_BIT 0x00020000
 
 #include "nv_std.h"
 
-/*set a mode line - inputs are in pixels/scanlines*/
-status_t g400_crtc2_set_timing(display_mode target)
+/*Adjust passed parameters to a valid mode line*/
+status_t nv_crtc2_validate_timing(
+	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
+	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
+)
 {
-	uint32 temp;
+/* horizontal */
+	/* make all parameters multiples of 8 */
+	*hd_e &= 0xfff8;
+	*hs_s &= 0xfff8;
+	*hs_e &= 0xfff8;
+	*ht   &= 0xfff8;
+
+	/* confine to required number of bits, taking logic into account */
+	if (*hd_e > ((0x01ff - 2) << 3)) *hd_e = ((0x01ff - 2) << 3);
+	if (*hs_s > ((0x01ff - 1) << 3)) *hs_s = ((0x01ff - 1) << 3);
+	if (*hs_e > ( 0x01ff      << 3)) *hs_e = ( 0x01ff      << 3);
+	if (*ht   > ((0x01ff + 5) << 3)) *ht   = ((0x01ff + 5) << 3);
+
+	/* NOTE: keep horizontal timing at multiples of 8! */
+	/* confine to a reasonable width */
+	if (*hd_e < 640) *hd_e = 640;
+	if (*hd_e > 2048) *hd_e = 2048;
+
+	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
+	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
+
+	/* make sure sync pulse is not during display */
+	if (*hs_e > (*ht - 8)) *hs_e = (*ht - 8);
+	if (*hs_s < (*hd_e + 8)) *hs_s = (*hd_e + 8);
+
+	/* correct sync pulse if it is too long:
+	 * there are only 5 bits available to save this in the card registers! */
+	if (*hs_e > (*hs_s + 0xf8)) *hs_e = (*hs_s + 0xf8);
+
+/*vertical*/
+	/* confine to required number of bits, taking logic into account */
+	//fixme if needed: on GeForce cards there are 12 instead of 11 bits...
+	if (*vd_e > (0x7ff - 2)) *vd_e = (0x7ff - 2);
+	if (*vs_s > (0x7ff - 1)) *vs_s = (0x7ff - 1);
+	if (*vs_e >  0x7ff     ) *vs_e =  0x7ff     ;
+	if (*vt   > (0x7ff + 2)) *vt   = (0x7ff + 2);
+
+	/* confine to a reasonable height */
+	if (*vd_e < 480) *vd_e = 480;
+	if (*vd_e > 1536) *vd_e = 1536;
+
+	/*if vertical total does not leave room for a sync pulse, increase it!*/
+	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
+
+	/* make sure sync pulse is not during display */
+	if (*vs_e > (*vt - 1)) *vs_e = (*vt - 1);
+	if (*vs_s < (*vd_e + 1)) *vs_s = (*vd_e + 1);
+
+	/* correct sync pulse if it is too long:
+	 * there are only 4 bits available to save this in the card registers! */
+	if (*vs_e > (*vs_s + 0x0f)) *vs_e = (*vs_s + 0x0f);
+
+	return B_OK;
+}
+
+/*set a mode line - inputs are in pixels*/
+status_t nv_crtc2_set_timing(display_mode target)
+{
+	uint8 temp;
+
+	uint32 htotal;		/*total horizontal total VCLKs*/
+	uint32 hdisp_e;            /*end of horizontal display (begins at 0)*/
+	uint32 hsync_s;            /*begin of horizontal sync pulse*/
+	uint32 hsync_e;            /*end of horizontal sync pulse*/
+	uint32 hblnk_s;            /*begin horizontal blanking*/
+	uint32 hblnk_e;            /*end horizontal blanking*/
+
+	uint32 vtotal;		/*total vertical total scanlines*/
+	uint32 vdisp_e;            /*end of vertical display*/
+	uint32 vsync_s;            /*begin of vertical sync pulse*/
+	uint32 vsync_e;            /*end of vertical sync pulse*/
+	uint32 vblnk_s;            /*begin vertical blanking*/
+	uint32 vblnk_e;            /*end vertical blanking*/
+
+	uint32 linecomp;	/*split screen and vdisp_e interrupt*/
 
 	LOG(4,("CRTC2: setting timing\n"));
 
-//	if ((!(target.flags & TV_BITS)) || (si->ps.card_type <= G400MAX))
+	/* Modify parameters as required by standard VGA */
+	htotal = ((target.timing.h_total >> 3) - 5);
+	hdisp_e = ((target.timing.h_display >> 3) - 1);
+	hblnk_s = hdisp_e;
+	hblnk_e = (htotal + 4);//0;
+	hsync_s = (target.timing.h_sync_start >> 3);
+	hsync_e = (target.timing.h_sync_end >> 3);
+
+	vtotal = target.timing.v_total - 2;
+	vdisp_e = target.timing.v_display - 1;
+	vblnk_s = vdisp_e;
+	vblnk_e = (vtotal + 1);
+	vsync_s = target.timing.v_sync_start;//-1;
+	vsync_e = target.timing.v_sync_end;//-1;
+
+	/* prevent memory adress counter from being reset (linecomp may not occur) */
+	linecomp = target.timing.v_display;
+
+//fixme: flatpanel 'don't touch' update needed for 'Go' cards!?!
+	if (true)
 	{
-		/* G450/G550 monitor mode, and all modes on older cards */
+		LOG(4,("CRTC2: CRT only mode, setting full timing...\n"));
 
-		/* check horizontal timing parameters are to nearest 8 pixels */
-		if ((target.timing.h_display & 0x07) | (target.timing.h_sync_start & 0x07) |
-			(target.timing.h_sync_end & 0x07) | (target.timing.h_total & 0x07))
+		/* log the mode that will be set */
+		LOG(2,("CRTC2:\n\tHTOT:%x\n\tHDISPEND:%x\n\tHBLNKS:%x\n\tHBLNKE:%x\n\tHSYNCS:%x\n\tHSYNCE:%x\n\t",htotal,hdisp_e,hblnk_s,hblnk_e,hsync_s,hsync_e));
+		LOG(2,("VTOT:%x\n\tVDISPEND:%x\n\tVBLNKS:%x\n\tVBLNKE:%x\n\tVSYNCS:%x\n\tVSYNCE:%x\n",vtotal,vdisp_e,vblnk_s,vblnk_e,vsync_s,vsync_e));
+
+		/* actually program the card! */
+		/* unlock CRTC registers at index 0-7 */
+		CRTC2W(VSYNCE, (CRTC2R(VSYNCE) & 0x7f));
+		/* horizontal standard VGA regs */
+		CRTC2W(HTOTAL, (htotal & 0xff));
+		CRTC2W(HDISPE, (hdisp_e & 0xff));
+		CRTC2W(HBLANKS, (hblnk_s & 0xff));
+		/* also unlock vertical retrace registers in advance */
+		CRTC2W(HBLANKE, ((hblnk_e & 0x1f) | 0x80));
+		CRTC2W(HSYNCS, (hsync_s & 0xff));
+		CRTC2W(HSYNCE, ((hsync_e & 0x1f) | ((hblnk_e & 0x20) << 2)));
+
+		/* vertical standard VGA regs */
+		CRTC2W(VTOTAL, (vtotal & 0xff));
+		CRTC2W(OVERFLOW,
+		(
+			((vtotal & 0x100) >> (8 - 0)) | ((vtotal & 0x200) >> (9 - 5)) |
+			((vdisp_e & 0x100) >> (8 - 1)) | ((vdisp_e & 0x200) >> (9 - 6)) |
+			((vsync_s & 0x100) >> (8 - 2)) | ((vsync_s & 0x200) >> (9 - 7)) |
+			((vblnk_s & 0x100) >> (8 - 3)) | ((linecomp & 0x100) >> (8 - 4))
+		));
+		CRTC2W(PRROWSCN, 0x00); /* not used */
+		CRTC2W(MAXSCLIN, (((vblnk_s & 0x200) >> (9 - 5)) | ((linecomp & 0x200) >> (9 - 6))));
+		CRTC2W(VSYNCS, (vsync_s & 0xff));
+		CRTC2W(VSYNCE, ((CRTC2R(VSYNCE) & 0xf0) | (vsync_e & 0x0f)));
+		CRTC2W(VDISPE, (vdisp_e & 0xff));
+		CRTC2W(VBLANKS, (vblnk_s & 0xff));
+		CRTC2W(VBLANKE, (vblnk_e & 0xff));
+		CRTC2W(LINECOMP, (linecomp & 0xff));
+
+		/* horizontal extended regs */
+		//fixme: we reset bit4. is this correct??
+		CRTC2W(HEB, (CRTC2R(HEB) & 0xe0) |
+			(
+		 	((htotal & 0x100) >> (8 - 0)) |
+			((hdisp_e & 0x100) >> (8 - 1)) |
+			((hblnk_s & 0x100) >> (8 - 2)) |
+			((hsync_s & 0x100) >> (8 - 3))
+			));
+
+		/* (mostly) vertical extended regs */
+		CRTC2W(LSR,
+			(
+		 	((vtotal & 0x400) >> (10 - 0)) |
+			((vdisp_e & 0x400) >> (10 - 1)) |
+			((vsync_s & 0x400) >> (10 - 2)) |
+			((vblnk_s & 0x400) >> (10 - 3)) |
+			((hblnk_e & 0x040) >> (6 - 4))
+			//fixme: we still miss one linecomp bit!?! is this it??
+			//| ((linecomp & 0x400) >> 3)	
+			));
+
+		/* more vertical extended regs */
+		CRTC2W(EXTRA,
+			(
+		 	((vtotal & 0x800) >> (11 - 0)) |
+			((vdisp_e & 0x800) >> (11 - 2)) |
+			((vsync_s & 0x800) >> (11 - 4)) |
+			((vblnk_s & 0x800) >> (11 - 6))
+			//fixme: do we miss another linecomp bit!?!
+			));
+
+		/* setup 'large screen' mode */
+		if (target.timing.h_display >= 1280)
+			CRTC2W(REPAINT1, (CRTC2R(REPAINT1) & 0xfb));
+		else
+			CRTC2W(REPAINT1, (CRTC2R(REPAINT1) | 0x04));
+
+		/* setup HSYNC & VSYNC polarity */
+		LOG(2,("CRTC2: sync polarity: "));
+//fixme: how is sync polarity programmed for CRTC2?
+//		temp = NV_REG8(NV8_MISCR);
+temp = 0;
+		if (target.timing.flags & B_POSITIVE_HSYNC)
 		{
-			LOG(8,("CRTC2: Horizontal timings are not multiples of 8 pixels\n"));
-			return B_ERROR;
+			LOG(2,("H:pos "));
+			temp &= ~0x40;
 		}
+		else
+		{
+			LOG(2,("H:neg "));
+			temp |= 0x40;
+		}
+		if (target.timing.flags & B_POSITIVE_VSYNC)
+		{
+			LOG(2,("V:pos "));
+			temp &= ~0x80;
+		}
+		else
+		{
+			LOG(2,("V:neg "));
+			temp |= 0x80;
+		}
+//		NV_REG8(NV8_MISCW) = temp;
 
-		/* make sure NTSC clock killer circuitry is disabled */
-		CR2W(DATACTL, (CR2R(DATACTL) & ~0x00000010));
-
-		/* make sure CRTC2 is set to progressive scan for monitor mode */
-		CR2W(CTL, (CR2R(CTL) & ~0x02001000));
-
-		/* program the second CRTC */
-		CR2W(HPARAM, ((((target.timing.h_display - 8) & 0x0fff) << 16) | 
-										((target.timing.h_total - 8) & 0x0fff)));
-		CR2W(HSYNC, ((((target.timing.h_sync_end - 8) & 0x0fff) << 16) |
-										((target.timing.h_sync_start - 8) & 0x0fff)));
-		CR2W(VPARAM, ((((target.timing.v_display - 1) & 0x0fff) << 16) |
-										((target.timing.v_total - 1) & 0x0fff)));
-		CR2W(VSYNC, ((((target.timing.v_sync_end - 1) & 0x0fff) << 16) |
-										((target.timing.v_sync_start - 1) & 0x0fff)));
-		//Mark: (wrong AFAIK, warning: SETMODE MAVEN-CRTC delay is now tuned to new setup!!)
-		//CR2W(PRELOAD, (((target.timing.v_sync_start & 0x0fff) << 16) |
-		//								(target.timing.h_sync_start & 0x0fff)));
-		CR2W(PRELOAD, ((((target.timing.v_sync_start - 1) & 0x0fff) << 16) |
-										((target.timing.h_sync_start - 8) & 0x0fff)));
-
-		temp = (0xfff << 16);
-		if (!(target.timing.flags & B_POSITIVE_HSYNC)) temp |= (0x01 << 8);
-		if (!(target.timing.flags & B_POSITIVE_VSYNC)) temp |= (0x01 << 9);
-		CR2W(MISC, temp);
-
-		/* On <= G400MAX dualhead cards we need to send a copy to the MAVEN;
-		 * unless TVout is active */
-		if ((si->ps.secondary_head) && (!(target.flags & TV_BITS)))
-													nv_maven_set_timing(target);
+//		LOG(2,(", MISC reg readback: $%02x\n", NV_REG8(NV8_MISCR)));
 	}
-//	else
-	{
-		/* G450/G550 TVout mode */
-		display_mode tv_mode = target;
-		uint8 frame;
-		unsigned int vcount, prev_vcount;
 
-		LOG(4,("CRTC2: setting up G450/G550 TVout mode\n"));
-
-		/* check horizontal timing parameters are to nearest 8 pixels */
-		if ((tv_mode.timing.h_display & 0x07) | (tv_mode.timing.h_sync_start & 0x07) |
-			(tv_mode.timing.h_sync_end & 0x07))
-		{
-			LOG(8,("CRTC2: Horizontal timings are not multiples of 8 pixels\n"));
-			return B_ERROR;
-		}
-
-		/* disable NTSC clock killer circuitry */
-		CR2W(DATACTL, (CR2R(DATACTL) & ~0x00000010));
-
-		if (tv_mode.timing.h_total & 0x07)
-		{
-			/* we rely on this for both PAL and NTSC modes if h_total is 'illegal' */
-			LOG(4,("CRTC2: enabling clock killer circuitry\n"));
-			CR2W(DATACTL, (CR2R(DATACTL) | 0x00000010));
-		}
-
-		/* make sure h_total is valid for TVout mode */
-		tv_mode.timing.h_total &= ~0x07;
-
-		/* modify tv_mode for interlaced use */
-		tv_mode.timing.v_display >>= 1;
-		tv_mode.timing.v_sync_start >>= 1;
-		tv_mode.timing.v_sync_end >>= 1;
-		tv_mode.timing.v_total >>= 1;
-
-		/*program the second CRTC*/
-		CR2W(HPARAM, ((((tv_mode.timing.h_display - 8) & 0x0fff) << 16) | 
-										((tv_mode.timing.h_total - 8) & 0x0fff)));
-		CR2W(HSYNC, ((((tv_mode.timing.h_sync_end - 8) & 0x0fff) << 16) |
-										((tv_mode.timing.h_sync_start - 8) & 0x0fff)));
-		CR2W(VPARAM, ((((tv_mode.timing.v_display - 1) & 0x0fff) << 16) |
-										((tv_mode.timing.v_total - 1) & 0x0fff)));
-		CR2W(VSYNC, ((((tv_mode.timing.v_sync_end - 1) & 0x0fff) << 16) |
-										((tv_mode.timing.v_sync_start - 1) & 0x0fff)));
-		//Mark: (wrong AFAIK, warning: SETMODE MAVEN-CRTC delay is now tuned to new setup!!)
-		//CR2W(PRELOAD, (((tv_mode.timing.v_sync_start & 0x0fff) << 16) |
-		//								(tv_mode.timing.h_sync_start & 0x0fff)));
-		CR2W(PRELOAD, ((((tv_mode.timing.v_sync_start - 1) & 0x0fff) << 16) |
-										((tv_mode.timing.h_sync_start - 8) & 0x0fff)));
-
-		/* set CRTC2 to interlaced mode:
-		 * First enable progressive scan mode while making sure
-		 * CRTC2 is setup for TVout mode use... */
-		CR2W(CTL, ((CR2R(CTL) & ~0x02000000) | 0x00001000));
-		/* now synchronize to the start of a frame... */
-		prev_vcount = 0;
-		for (frame = 0; frame < 2; frame++)
-		{
-			for (;;)
-			{
-				vcount = (CR2R(VCOUNT) & 0x00000fff);
-				if (vcount >= prev_vcount)
-					prev_vcount = vcount;
-				else
-					break;
-			}
-		}
-		/* and start interlaced mode now! */
-		CR2W(CTL, (CR2R(CTL) | 0x02000000));
-
-		temp = (0xfff << 16);
-		if (!(tv_mode.timing.flags & B_POSITIVE_HSYNC)) temp |= (0x01 << 8);
-		if (!(tv_mode.timing.flags & B_POSITIVE_VSYNC)) temp |= (0x01 << 9);
-		CR2W(MISC, temp);
-	}
+	/* always disable interlaced operation */
+	/* (interlace is only supported on upto and including NV15 except for NV11) */
+	CRTC2W(INTERLACE, 0xff);
 
 	return B_OK;
 }
 
-status_t g400_crtc2_depth(int mode)
+status_t nv_crtc2_depth(int mode)
 {
-	/* validate bit depth and set mode */
-	/* also clears TVout mode (b12) */
+	uint8 viddelay = 0;
+	uint32 genctrl = 0;
+
+	/* set VCLK scaling */
 	switch(mode)
 	{
-	case BPP16:case BPP32DIR:
-		CR2W(CTL,(CR2R(CTL)&0xFF10077F)|(mode<<21));
+	case BPP8:
+		viddelay = 0x01;
+		/* genctrl b4 & b5 reset: 'direct mode' */
+		genctrl = 0x00101100;
 		break;
-	case BPP8:case BPP15:case BPP24:case BPP32:default:
-		LOG(8,("CRTC2:Invalid bit depth\n"));
-		return B_ERROR;
+	case BPP15:
+		viddelay = 0x02;
+		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
+		genctrl = 0x00100130;
+		break;
+	case BPP16:
+		viddelay = 0x02;
+		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
+		genctrl = 0x00101130;
+		break;
+	case BPP24:
+		viddelay = 0x03;
+		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
+		genctrl = 0x00100130;
+		break;
+	case BPP32:
+		viddelay = 0x03;
+		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
+		genctrl = 0x00101130;
 		break;
 	}
+	CRTC2W(PIXEL, ((CRTC2R(PIXEL) & 0xfc) | viddelay));
+//fixme: check if this works..
+	DAC2W(GENCTRL, genctrl);
 
 	return B_OK;
 }
 
-status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v)
+status_t nv_crtc2_dpms(bool display, bool h, bool v)
 {
-	if (display & h & v)
+//	uint8 temp;
+
+	LOG(4,("CRTC2: setting DPMS: "));
+
+	/* start synchronous reset: required before turning screen off! */
+//fixme: howto switch display on/off?
+//	SEQW(RESET, 0x01);
+
+	/* turn screen off */
+//	temp = SEQR(CLKMODE);
+	if (display)
 	{
-		/* enable CRTC2 and don't touch the rest */
-		CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
+//		SEQW(CLKMODE, (temp & ~0x20));
+
+		/* end synchronous reset if display should be enabled */
+//		SEQW(RESET, 0x03);
+
+		LOG(4,("display on, "));
 	}
 	else
 	{
-		/* disable CRTC2 and don't touch the rest */
-		CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
+//		SEQW(CLKMODE, (temp | 0x20));
+
+		LOG(4,("display off, "));
 	}
 
-//	if (si->ps.card_type >= G450)
-//	{
-		//fixme:
-		/* setup monitor mode DPMS: G450 and later fully support this on CRTC2 */
-		//for now:
-		//enable 'straight-through' sync outputs on both analog output connectors...
-//		DXIW(SYNCCTRL,0x00); 
-//	}
-
-	/* On <= G400MAX dualhead cards we always need to send a 'copy' to the MAVEN */
-	if (si->ps.secondary_head) nv_maven_dpms(display, h, v);
+	if (h)
+	{
+		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) & 0x7f));
+		LOG(4,("hsync enabled, "));
+	}
+	else
+	{
+		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) | 0x80));
+		LOG(4,("hsync disabled, "));
+	}
+	if (v)
+	{
+		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) & 0xbf));
+		LOG(4,("vsync enabled\n"));
+	}
+	else
+	{
+		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) | 0x40));
+		LOG(4,("vsync disabled\n"));
+	}
 
 	return B_OK;
 }
 
-status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v)
+status_t nv_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	*display=CR2R(CTL)&1;
+//fixme:
+//	*display = !(SEQR(CLKMODE) & 0x20);
+	*display = true;
+	*h = !(CRTC2R(REPAINT1) & 0x80);
+	*v = !(CRTC2R(REPAINT1) & 0x40);
 
-	*h=*v=1; /*h/vsync always enabled on second CRTC, does not support other*/
+	LOG(4,("CTRC2: fetched DPMS state:"));
+	if (display) LOG(4,("display on, "));
+	else LOG(4,("display off, "));
+	if (h) LOG(4,("hsync enabled, "));
+	else LOG(4,("hsync disabled, "));
+	if (v) LOG(4,("vsync enabled\n"));
+	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }
 
-status_t g400_crtc2_set_display_pitch() 
+status_t nv_crtc2_set_display_pitch() 
 {
 	uint32 offset;
 
 	LOG(4,("CRTC2: setting card pitch (offset between lines)\n"));
 
 	/* figure out offset value hardware needs */
-	offset = si->fbc.bytes_per_row;
-	if (si->interlaced_tv_mode)
-	{
-		LOG(4,("CRTC2: setting interlaced mode\n"));
-		/* double the CRTC2 linelength so fields are displayed instead of frames */
-		offset *= 2;
-	}
-	else
-		LOG(4,("CRTC2: setting progressive scan mode\n"));
+	offset = si->fbc.bytes_per_row / 8;
 
-	LOG(2,("CRTC2: offset set to %d bytes\n", offset));
+	LOG(2,("CRTC2: offset register set to: $%04x\n", offset));
 
-	/* program the head */
-	CR2W(OFFSET,offset);
+	/*program the card!*/
+	CRTC2W(PITCHL, (offset & 0x00ff));
+	CRTC2W(REPAINT0, ((CRTC2R(REPAINT0) & 0x1f) | ((offset & 0x0700) >> 3)));
+
 	return B_OK;
 }
 
-status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp) 
+status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp) 
 {
-	LOG(4,("CRTC2: setting card RAM to be displayed for %d bits per pixel\n", bpp));
+	uint8 temp;
 
-	LOG(2,("CRTC2: startadd: $%x\n",startadd));
-	LOG(2,("CRTC2: frameRAM: $%x\n",si->framebuffer));
-	LOG(2,("CRTC2: framebuffer: $%x\n",si->fbc.frame_buffer));
+	LOG(4,("CRTC2: setting card RAM to be displayed bpp %d\n", bpp));
 
-	if (si->interlaced_tv_mode)
+	LOG(2,("CRTC2: startadd: $%08x\n", startadd));
+	LOG(2,("CRTC2: frameRAM: $%08x\n", si->framebuffer));
+	LOG(2,("CRTC2: framebuffer: $%08x\n", si->fbc.frame_buffer));
+
+//fixme? on TNT1, TNT2, and GF2MX400 not needed. How about the rest??
+	/* make sure we are in retrace on MIL cards (if possible), because otherwise
+	 * distortions might occur during our reprogramming them (no double buffering) */
+//	if (si->ps.card_type < G100)
+//	{
+		/* we might have no retraces during setmode! */
+//		uint32 timeout = 0;
+		/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
+//		while ((!(ACCR(STATUS) & 0x08)) && (timeout < (25000/4)))
+//		{
+//			snooze(4);
+//			timeout++;
+//		}
+//	}
+
+//	if (si->ps.card_arch == NV04A)
+//	{
+		/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
+
+		/* set standard registers */
+		/* (NVidia: startadress in 32bit words (b2 - b17) */
+//		CRTC2W(FBSTADDL, ((startadd & 0x000003fc) >> 2));
+//		CRTC2W(FBSTADDH, ((startadd & 0x0003fc00) >> 10));
+
+		/* set extended registers */
+		/* NV4 extended bits: (b18-22) */
+//		temp = (CRTC2R(REPAINT0) & 0xe0);
+//		CRTC2W(REPAINT0, (temp | ((startadd & 0x007c0000) >> 18)));
+		/* NV4 extended bits: (b23-24) */
+//		temp = (CRTC2R(HEB) & 0x9f);
+//		CRTC2W(HEB, (temp | ((startadd & 0x01800000) >> 18)));
+//	}
+//	else
 	{
-		LOG(4,("CRTC2: setting up fields for interlaced mode\n"));
-		/* program the head for interlaced use */
-		//fixme: seperate both heads: we need a secondary si->fbc!
-		/* setup field 0 startadress in buffer to read picture's odd lines */
-		CR2W(STARTADD0,	(startadd + si->fbc.bytes_per_row));
-		/* setup field 1 startadress in buffer to read picture's even lines */
-		CR2W(STARTADD1, startadd);
+		/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+		/* NOTE:
+		 * While this register also exists on pre-NV10 cards, it will
+		 * wrap-around at 16Mb boundaries!! */
+
+		/* 30bit adress in 32bit words */
+		NV_REG32(NV32_NV10FB2STADD32) = (startadd & 0xfffffffc);
+	}
+
+	/* set NV4/NV10 byte adress: (b0 - 1) */
+	temp = (ATB2R(HORPIXPAN) & 0xf9);
+	ATB2W(HORPIXPAN, (temp | ((startadd & 0x00000003) << 1)));
+
+	return B_OK;
+}
+
+status_t nv_crtc2_cursor_init()
+{
+	int i;
+	uint32 * fb;
+	/* cursor bitmap will be stored at the start of the framebuffer */
+	const uint32 curadd = 0;
+
+	/* set cursor bitmap adress ... */
+	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
+	{
+		/* must be used this way on pre-NV10 and on all 'Go' cards! */
+
+		/* cursorbitmap must start on 2Kbyte boundary: */
+		/* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */
+		CRTC2W(CURCTL0, ((curadd & 0x0001f800) >> 9));
+		/* set adress bit17-23, and set graphics mode cursor(?) (registerbit 7 = 1) */
+		CRTC2W(CURCTL1, (((curadd & 0x00fe0000) >> 17) | 0x80));
+		/* set adress bit24-31 */
+		CRTC2W(CURCTL2, ((curadd & 0xff000000) >> 24));
 	}
 	else
 	{
-		LOG(4,("CRTC2: setting up frames for progressive scan mode\n"));
-		/* program the head for non-interlaced use */
-		CR2W(STARTADD0, startadd);
+		/* upto 4Gb RAM adressing:
+		 * can be used on NV10 and later (except for 'Go' cards)! */
+		/* NOTE:
+		 * This register does not exist on pre-NV10 and 'Go' cards. */
+
+		/* cursorbitmap must still start on 2Kbyte boundary: */
+		NV_REG32(NV32_NV10CUR2ADD32) = (curadd & 0xfffff800);
 	}
+
+	/* set cursor colour: not needed because of direct nature of cursor bitmap. */
+
+	/*clear cursor*/
+	fb = (uint32 *) si->framebuffer + curadd;
+	for (i=0;i<(2048/4);i++)
+	{
+		fb[i]=0;
+	}
+
+	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
+	NV_REG32(NV32_2CURCONF) = 0x02000100;
+
+	/* activate hardware cursor */
+	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
+
+	return B_OK;
+}
+
+status_t nv_crtc2_cursor_show()
+{
+	/* b0 = 1 enables cursor */
+	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
+
+	return B_OK;
+}
+
+status_t nv_crtc2_cursor_hide()
+{
+	/* b0 = 0 disables cursor */
+	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) & 0xfe));
+
+	return B_OK;
+}
+
+/*set up cursor shape*/
+status_t nv_crtc2_cursor_define(uint8* andMask,uint8* xorMask)
+{
+	int x, y;
+	uint8 b;
+	uint16 *cursor;
+	uint16 pixel;
+
+	/* get a pointer to the cursor */
+	cursor = (uint16*) si->framebuffer;
+
+	/* draw the cursor */
+	/* (Nvidia cards have a RGB15 direct color cursor bitmap, bit #16 is transparancy) */
+	for (y = 0; y < 16; y++)
+	{
+		b = 0x80;
+		for (x = 0; x < 8; x++)
+		{
+			/* preset transparant */
+			pixel = 0x0000;
+			/* set white if requested */
+			if ((!(*andMask & b)) && (!(*xorMask & b))) pixel = 0xffff;
+			/* set black if requested */
+			if ((!(*andMask & b)) &&   (*xorMask & b))  pixel = 0x8000;
+			/* set invert if requested */
+			if (  (*andMask & b)  &&   (*xorMask & b))  pixel = 0x7fff;
+			/* place the pixel in the bitmap */
+			cursor[x + (y * 32)] = pixel;
+			b >>= 1;
+		}
+		xorMask++;
+		andMask++;
+		b = 0x80;
+		for (; x < 16; x++)
+		{
+			/* preset transparant */
+			pixel = 0x0000;
+			/* set white if requested */
+			if ((!(*andMask & b)) && (!(*xorMask & b))) pixel = 0xffff;
+			/* set black if requested */
+			if ((!(*andMask & b)) &&   (*xorMask & b))  pixel = 0x8000;
+			/* set invert if requested */
+			if (  (*andMask & b)  &&   (*xorMask & b))  pixel = 0x7fff;
+			/* place the pixel in the bitmap */
+			cursor[x + (y * 32)] = pixel;
+			b >>= 1;
+		}
+		xorMask++;
+		andMask++;
+	}
+
+	return B_OK;
+}
+
+/* position the cursor */
+status_t nv_crtc2_cursor_position(uint16 x, uint16 y)
+{
+	uint16 yhigh;
+
+	/* make sure we are beyond the first line of the cursorbitmap being drawn during
+	 * updating the position to prevent distortions: no double buffering feature */
+	/* Note:
+	 * we need to return as quick as possible or some apps will exhibit lagging.. */
+
+	/* read the old cursor Y position */
+	yhigh = ((DAC2R(CURPOS) & 0x0fff0000) >> 16); 
+	/* make sure we will wait until we are below both the old and new Y position:
+	 * visible cursorbitmap drawing needs to be done at least... */
+	if (y > yhigh) yhigh = y;
+
+	if (yhigh < (si->dm.timing.v_display - 16))
+	{
+		/* we have vertical lines below old and new cursorposition to spare. So we
+		 * update the cursor postion 'mid-screen', but below that area. */
+		while (((uint16)(NV_REG32(NV32_RASTER2) & 0x000007ff)) < (yhigh + 16))
+		{
+			snooze(10);
+		}
+	}
+	else
+	{
+		/* no room to spare, just wait for retrace (is relatively slow) */
+		while ((NV_REG32(NV32_RASTER2) & 0x000007ff) < si->dm.timing.v_display)
+		{
+			/* don't snooze much longer or retrace might get missed! */
+			snooze(10);
+		}
+	}
+
+	/* update cursorposition */
+	DAC2W(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
 
 	return B_OK;
 }

@@ -55,7 +55,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 	uint8 * m_result, uint8 * n_result, uint8 * p_result);
 int maventv_init(display_mode target);
 
-/*CRTC1 functions*/
+/* CRTC1 functions */
 status_t nv_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
@@ -75,15 +75,25 @@ status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc_cursor_show(void);
 status_t nv_crtc_cursor_hide(void);
 
-/*CRTC2 functions*/
-/*XXX - validate_timing*/
-status_t g400_crtc2_set_timing(display_mode target);
-status_t g400_crtc2_depth(int mode);
-status_t g400_crtc2_set_display_pitch(void); 
-status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
+/* CRTC2 functions */
+status_t nv_crtc2_validate_timing(
+	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
+	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
+);
+status_t nv_crtc2_set_timing(display_mode target);
+status_t nv_crtc2_depth(int mode);
+status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
+status_t nv_crtc2_set_display_pitch(void);
 
-status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v);
-status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v);
+status_t nv_crtc2_dpms(bool, bool, bool);
+status_t nv_crtc2_dpms_fetch(bool*, bool*, bool*);
+status_t nv_crtc2_mem_priority(uint8);
+
+status_t nv_crtc2_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t nv_crtc2_cursor_define(uint8*,uint8*);
+status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
+status_t nv_crtc2_cursor_show(void);
+status_t nv_crtc2_cursor_hide(void);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
