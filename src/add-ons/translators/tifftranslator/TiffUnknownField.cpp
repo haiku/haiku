@@ -1,11 +1,11 @@
 /*****************************************************************************/
-// TIFFWindow
+// TiffUnknownField
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// TIFFWindow.h
+// TiffUnknownField.cpp
 //
-// This BWindow based object is used to hold the TIFFView object when the
-// user runs the TIFFTranslator as an application.
+// This object is for storing TIFF fields that the translator doesn't know
+// or doesn't care about
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -29,20 +29,18 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef TIFFWINDOW_H
-#define TIFFWINDOW_H
+#include <stdio.h>
+#include "TiffUnknownField.h"
 
-#include <Application.h>
-#include <Window.h>
-#include <View.h>
+TiffUnknownField::TiffUnknownField(IFDEntry &entry)
+	: TiffField(entry)
+{
+	finitStatus = B_OK;
+	
+	printf("TiffUnknownField::finitStatus: %d\n",
+		static_cast<int>(finitStatus));
+}
 
-class TIFFWindow : public BWindow {
-public:
-	TIFFWindow(BRect area);
-		// Sets up a BWindow with bounds area
-		
-	~TIFFWindow();
-		// Posts a quit message so that the application closes properly
-};
-
-#endif // #define TIFFWINDOW_H
+TiffUnknownField::~TiffUnknownField()
+{
+}

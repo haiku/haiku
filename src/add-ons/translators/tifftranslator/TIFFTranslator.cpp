@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include "TIFFTranslator.h"
 #include "TIFFView.h"
+#include "TiffIfd.h"
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -259,6 +260,201 @@ TIFFTranslator::OutputFormats(int32 *out_count) const
 }
 
 // ---------------------------------------------------------------
+// identify_bits_header
+//
+// Determines if the data in inSource is in the
+// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns 
+// info about the data in inSource to outInfo and pheader.
+//
+// Preconditions:
+//
+// Parameters:	inSource,	The source of the image data
+//
+//				outInfo,	Information about the translator
+//							is copied here
+//
+//				amtread,	Amount of data read from inSource
+//							before this function was called
+//
+//				read,		Pointer to the data that was read
+// 							in before this function was called
+//
+//				pheader,	The bits header is copied here after
+//							it is read in from inSource
+//
+// Postconditions:
+//
+// Returns: B_NO_TRANSLATOR,	if the data does not look like
+//								bits format data
+//
+// B_ERROR,	if the header data could not be converted to host
+//			format
+//
+// B_OK,	if the data looks like bits data and no errors were
+//			encountered
+// ---------------------------------------------------------------
+status_t 
+identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
+	ssize_t amtread, uint8 *read, TranslatorBitmap *pheader = NULL)
+{
+	TranslatorBitmap header;
+		
+	memcpy(&header, read, amtread);
+		// copy portion of header already read in
+	// read in the rest of the header
+	ssize_t size = sizeof(TranslatorBitmap) - amtread;
+	if (inSource->Read(
+		(reinterpret_cast<uint8 *> (&header)) + amtread, size) != size)
+		return B_NO_TRANSLATOR;
+		
+	// convert to host byte order
+	if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
+		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+		return B_ERROR;
+		
+	// check if header values are reasonable
+	if (header.colors != B_RGB32 &&
+		header.colors != B_RGB32_BIG &&
+		header.colors != B_RGBA32 &&
+		header.colors != B_RGBA32_BIG &&
+		header.colors != B_RGB24 &&
+		header.colors != B_RGB24_BIG &&
+		header.colors != B_RGB16 &&
+		header.colors != B_RGB16_BIG &&
+		header.colors != B_RGB15 &&
+		header.colors != B_RGB15_BIG &&
+		header.colors != B_RGBA15 &&
+		header.colors != B_RGBA15_BIG &&
+		header.colors != B_CMAP8 &&
+		header.colors != B_GRAY8 &&
+		header.colors != B_GRAY1 &&
+		header.colors != B_CMYK32 &&
+		header.colors != B_CMY32 &&
+		header.colors != B_CMYA32 &&
+		header.colors != B_CMY24)
+		return B_NO_TRANSLATOR;
+	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
+		return B_NO_TRANSLATOR;
+			
+	if (outInfo) {
+		outInfo->type = B_TRANSLATOR_BITMAP;
+		outInfo->group = B_TRANSLATOR_BITMAP;
+		outInfo->quality = BBT_IN_QUALITY;
+		outInfo->capability = BBT_IN_CAPABILITY;
+		strcpy(outInfo->name, "Be Bitmap Format (TGATranslator)");
+		strcpy(outInfo->MIME, "image/x-be-bitmap");
+	}
+	
+	if (pheader) {
+		pheader->magic = header.magic;
+		pheader->bounds = header.bounds;
+		pheader->rowBytes = header.rowBytes;
+		pheader->colors = header.colors;
+		pheader->dataSize = header.dataSize;
+	}
+	
+	return B_OK;
+}
+
+// If this TIFF has unsupported features,
+// return B_NO_TRANSLATOR, otherwise, 
+// return B_OK
+status_t
+check_tiff_fields(TiffIfd &ifd)
+{
+	uint32 value;
+	TiffUintField *pfield = NULL;
+	
+	// Only the default values are supported for the
+	// following fields
+	if (ifd.GetUintField(TAG_FILL_ORDER, pfield) == B_OK &&
+		pfield->GetUint(value) == B_OK &&
+		value != 1)
+		return B_NO_TRANSLATOR;
+	
+	if (ifd.GetUintField(TAG_ORIENTATION, pfield) == B_OK &&
+		pfield->GetUint(value) == B_OK &&
+		value != 1)
+		return B_NO_TRANSLATOR;
+	
+	if (ifd.GetUintField(TAG_PLANAR_CONFIGURATION, pfield) == B_OK &&
+		pfield->GetUint(value) == B_OK &&
+		value != 1)
+		return B_NO_TRANSLATOR;
+		
+	if (ifd.GetUintField(TAG_SAMPLE_FORMAT, pfield) == B_OK &&
+		pfield->GetUint(value) == B_OK &&
+		value != 1)
+		return B_NO_TRANSLATOR;
+		
+	// Only uncompressed images are supported
+	if (ifd.GetUintField(TAG_COMPRESSION, pfield) != B_OK)
+		return B_NO_TRANSLATOR;
+	if (pfield->GetUint(value) != B_OK)
+		return B_NO_TRANSLATOR;
+	
+		
+	return B_OK;
+}
+
+status_t
+identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
+	ssize_t amtread, uint8 *read, swap_action swp)
+{
+	if (amtread != 4)
+		return B_ERROR;
+		
+	uint32 firstIFDOffset = 0;
+	ssize_t nread = inSource->Read(&firstIFDOffset, 4);
+	if (nread != 4) {
+		printf("Unable to read first IFD offset\n");
+		return B_NO_TRANSLATOR;
+	}
+	if (swap_data(B_UINT32_TYPE, &firstIFDOffset, sizeof(uint32), swp) != B_OK) {
+		printf("swap_data() error\n");
+		return B_ERROR;
+	}
+	printf("First IFD: 0x%.8lx\n", firstIFDOffset);
+	TiffIfd ifd(firstIFDOffset, *inSource, swp);
+	
+	status_t initcheck;
+	initcheck = ifd.InitCheck();
+	printf("Init Check: %d\n",
+		static_cast<int>(initcheck));
+		
+	// Read in some fields in order to determine whether or not
+	// this particular TIFF image is supported by this translator
+	
+	// Get some stats and print them out
+	if (initcheck == B_OK) {
+		uint32 value;
+		TiffUintField *pfield = NULL;
+		
+		if (ifd.GetUintField(TAG_IMAGE_WIDTH, pfield) == B_OK) {
+			if (pfield->GetUint(value) == B_OK)
+				printf("image width: %d\n", value);
+		}
+		if (ifd.GetUintField(TAG_IMAGE_HEIGHT, pfield) == B_OK) {
+			if (pfield->GetUint(value) == B_OK)
+				printf("image height: %d\n", value);
+		}
+		if (ifd.GetUintField(TAG_COMPRESSION, pfield) == B_OK) {
+			if (pfield->GetUint(value) == B_OK)
+				printf("compression: %d\n", value);
+		}
+		
+		return check_tiff_fields(ifd);
+	}
+		
+	if (initcheck != B_OK && initcheck != B_ERROR && initcheck != B_NO_MEMORY)
+		// return B_NO_TRANSLATOR if unexpected data was encountered
+		return B_NO_TRANSLATOR;
+	else
+		// return B_OK, B_ERROR or B_NO_MEMORY
+		return initcheck;
+}
+
+// ---------------------------------------------------------------
 // Identify
 //
 // Examines the data from inSource and determines if it is in a
@@ -306,9 +502,65 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 		outType = B_TRANSLATOR_BITMAP;
 	if (outType != B_TRANSLATOR_BITMAP && outType != B_TIFF_FORMAT)
 		return B_NO_TRANSLATOR;
-
-	return B_NO_TRANSLATOR;
-		// translator isn't implemented yet
+	
+	// Convert the magic numbers to the various byte orders so that
+	// I won't have to convert the data read in to see whether or not
+	// it is a supported type
+	uint32 nbits = B_TRANSLATOR_BITMAP;
+	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
+		B_SWAP_HOST_TO_BENDIAN) != B_OK)
+		return B_ERROR;
+	
+	// Read in the magic number and determine if it
+	// is a supported type
+	uint8 ch[4];
+	inSource->Seek(0, SEEK_SET);
+	if (inSource->Read(ch, 4) != 4)
+		return B_NO_TRANSLATOR;
+		
+	// Read settings from ioExtension
+	bool bheaderonly = false, bdataonly = false;
+	if (ioExtension) {
+		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
+			// if failed, make sure bool is default value
+			bheaderonly = false;
+		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
+			// if failed, make sure bool is default value
+			bdataonly = false;
+			
+		if (bheaderonly && bdataonly)
+			// can't both "only write the header" and "only write the data"
+			// at the same time
+			return B_BAD_VALUE;
+	}
+	
+	uint32 n32ch;
+	memcpy(&n32ch, ch, sizeof(uint32));
+	// if B_TRANSLATOR_BITMAP type	
+	if (n32ch == nbits)
+		return identify_bits_header(inSource, outInfo, 4, ch);
+		
+	// Might be TIFF image
+	else {
+		// TIFF Byte Order / Magic
+		const uint8 kleSig[] = { 0x49, 0x49, 0x2a, 0x00 };
+		const uint8 kbeSig[] = { 0x4d, 0x4d, 0x00, 0x2a };
+		
+		swap_action swp;
+		if (memcmp(ch, kleSig, 4) == 0) {
+			swp = B_SWAP_LENDIAN_TO_HOST;
+			printf("Byte Order: little endian\n");
+		} else if (memcmp(ch, kbeSig, 4) == 0) {
+			swp = B_SWAP_BENDIAN_TO_HOST;
+			printf("Byte Order: big endian\n");		
+		} else {
+			// If not a TIFF or a Be Bitmap image
+			printf("Invalid byte order value\n");
+			return B_NO_TRANSLATOR;
+		}
+		
+		return identify_tiff_header(inSource, outInfo, 4, ch, swp);
+	}
 }
 
 // ---------------------------------------------------------------
@@ -375,7 +627,9 @@ TIFFTranslator::Translate(BPositionIO *inSource,
 //
 // Postconditions:
 //
-// Returns:
+// Returns: B_BAD_VALUE if outView or outExtent is NULL,
+//			B_NO_MEMORY if the view couldn't be allocated,
+//			B_OK if no errors
 // ---------------------------------------------------------------
 status_t
 TIFFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
@@ -386,6 +640,9 @@ TIFFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 
 	TIFFView *view = new TIFFView(BRect(0, 0, 225, 175),
 		"TIFFTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+	if (!view)
+		return B_NO_MEMORY;
+
 	*outView = view;
 	*outExtent = view->Bounds();
 

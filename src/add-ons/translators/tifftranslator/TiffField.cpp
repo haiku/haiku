@@ -1,11 +1,10 @@
 /*****************************************************************************/
-// TIFFWindow
+// TiffField
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// TIFFWindow.h
+// TiffField.cpp
 //
-// This BWindow based object is used to hold the TIFFView object when the
-// user runs the TIFFTranslator as an application.
+// This object is for storing TIFF fields
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -29,20 +28,21 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef TIFFWINDOW_H
-#define TIFFWINDOW_H
+#include <Errors.h>
+#include <stdio.h>
+#include "TiffField.h"
 
-#include <Application.h>
-#include <Window.h>
-#include <View.h>
-
-class TIFFWindow : public BWindow {
-public:
-	TIFFWindow(BRect area);
-		// Sets up a BWindow with bounds area
-		
-	~TIFFWindow();
-		// Posts a quit message so that the application closes properly
-};
-
-#endif // #define TIFFWINDOW_H
+TiffField::TiffField(IFDEntry &entry)
+{
+	finitStatus = B_ERROR;
+		// responsibility of derived class to set this properly
+	
+	ftag = entry.tag;
+	ffieldType = entry.fieldType;
+	fcount = entry.count;
+	
+	printf("TiffField::ftag: %d\n", ftag);
+	printf("TiffField::ffieldType: %d\n", ffieldType);
+	printf("TiffField::fcount: %d\n",
+		static_cast<int>(fcount));
+}

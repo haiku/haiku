@@ -1,5 +1,13 @@
 SubDir OBOS_TOP src add-ons translators tifftranslator ;
 
-Translator TIFFTranslator : TIFFMain.cpp TIFFTranslator.cpp TIFFView.cpp TIFFWindow.cpp ;
+Translator TIFFTranslator : 
+	TiffField.cpp
+	TiffUintField.cpp
+	TiffUnknownField.cpp
+	TiffIfd.cpp
+	TIFFMain.cpp
+	TIFFTranslator.cpp
+	TIFFView.cpp
+	TIFFWindow.cpp ;
 
 LinkSharedOSLibs TIFFTranslator : be translation ;

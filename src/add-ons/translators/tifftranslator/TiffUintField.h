@@ -1,11 +1,10 @@
 /*****************************************************************************/
-// TIFFWindow
+// TiffUintField
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// TIFFWindow.h
+// TiffUintField.h
 //
-// This BWindow based object is used to hold the TIFFView object when the
-// user runs the TIFFTranslator as an application.
+// This object is for storing Unsigned Integer TIFF fields
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -29,20 +28,30 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef TIFFWINDOW_H
-#define TIFFWINDOW_H
+#ifndef TIFF_UNIT_FIELD_H
+#define TIFF_UNIT_FIELD_H
 
-#include <Application.h>
-#include <Window.h>
-#include <View.h>
+#include <DataIO.h>
+#include <ByteOrder.h>
+#include "TiffField.h"
 
-class TIFFWindow : public BWindow {
+class TiffUintField : public TiffField {
 public:
-	TIFFWindow(BRect area);
-		// Sets up a BWindow with bounds area
-		
-	~TIFFWindow();
-		// Posts a quit message so that the application closes properly
+	TiffUintField(IFDEntry &entry, BPositionIO &io, swap_action swp);
+	virtual ~TiffUintField();
+	
+	status_t GetUint(uint32 &out, uint32 index = 0);
+	
+private:
+	void LoadByte(IFDEntry &entry, BPositionIO &io, swap_action swp);
+	void LoadShort(IFDEntry &entry, BPositionIO &io, swap_action swp);
+	void LoadLong(IFDEntry &entry, BPositionIO &io, swap_action swp);
+	
+	union {
+		uint8	*fpByte;
+		uint16	*fpShort;
+		uint32	*fpLong;
+	};
 };
 
-#endif // #define TIFFWINDOW_H
+#endif // #define TIFF_UNIT_FIELD_H

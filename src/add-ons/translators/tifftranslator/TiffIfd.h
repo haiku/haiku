@@ -1,11 +1,10 @@
 /*****************************************************************************/
-// TIFFWindow
+// TiffIfd
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// TIFFWindow.h
+// TiffIfd.h
 //
-// This BWindow based object is used to hold the TIFFView object when the
-// user runs the TIFFTranslator as an application.
+// This object is for storing a TIFF Image File Directory
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -29,20 +28,29 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef TIFFWINDOW_H
-#define TIFFWINDOW_H
+#ifndef TIFF_IFD_H
+#define TIFF_IFD_H
 
-#include <Application.h>
-#include <Window.h>
-#include <View.h>
+#include <ByteOrder.h>
+#include <DataIO.h>
+#include "TiffField.h"
+#include "TiffUintField.h"
 
-class TIFFWindow : public BWindow {
+class TiffIfd {
 public:
-	TIFFWindow(BRect area);
-		// Sets up a BWindow with bounds area
-		
-	~TIFFWindow();
-		// Posts a quit message so that the application closes properly
+	TiffIfd(uint32 offset, BPositionIO &io, swap_action swp);
+	~TiffIfd();
+	
+	status_t InitCheck() { return finitStatus; };
+	status_t GetUintField(uint16 tag, TiffUintField *&poutField);
+
+private:
+	void LoadFields(uint32 offset, BPositionIO &io, swap_action swp);
+	
+	TiffField **fpfields;
+	status_t finitStatus;
+	uint32 fnextIFDOffset;
+	uint16 ffieldCount;
 };
 
-#endif // #define TIFFWINDOW_H
+#endif // TIFF_IFD_H
