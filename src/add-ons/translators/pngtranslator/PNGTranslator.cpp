@@ -658,9 +658,12 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 				outDestination->Write(prow, width * kbytes);
 			}
 			
-			// finish reading, pass NULL for info because I 
-			// don't need the extra data
-			png_read_end(ppng, NULL);
+			// Here would be the place to call
+			// png_read_end(). However, since this program
+			// is not interested in PNG comments or
+			// date / time info and errors found by
+			// png_read_end() will cause translation to fail,
+			// png_read_end() is not called here.
 			
 			result = B_OK;
 			break;
