@@ -1,5 +1,3 @@
-#ifndef _STDARG_H_
-#define _STDARG_H_
 /*
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -9,7 +7,6 @@
  * It contains the actual platform dependent varargs definitions.
  */
 
-#include_next <stdarg.h>
-
-#endif	/* _STDARG_H_ */
-
+#ifndef	_STDARG_H
+#	include_next <stdarg.h>
+#endif
