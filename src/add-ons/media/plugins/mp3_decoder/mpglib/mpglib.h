@@ -4,11 +4,11 @@
 #include "mpg123.h"
 
 struct buf {
-        unsigned char *pnt;
+	unsigned char *pnt;
 	long size;
 	long pos;
-        struct buf *next;
-        struct buf *prev;
+	struct buf *next;
+	struct buf *prev;
 };
 
 struct framebuf {
@@ -46,7 +46,7 @@ extern "C" {
 void InitMpgLib(void);  
 void InitMP3(struct mpstr *mp);
 int decodeMP3(struct mpstr *mp,char *inmemory,int inmemsize,
-     char *outmemory,int outmemsize,int *done);
+              char *outmemory,int outmemsize,int *done);
 void ExitMP3(struct mpstr *mp);
 
 #ifdef __cplusplus

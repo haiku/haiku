@@ -6,3 +6,10 @@
   - modified for usage with OpenBeOS
   - removed global variable struct mpstr *gmp
   - moved initialization into separate function
+
+25/Nov/2003: (by Marcus Overhagen)
+  - removed global variables bitindex and wordpointer
+  - cleanup
+
+29/Nov/2003: (by Marcus Overhagen)
+  - cleanup

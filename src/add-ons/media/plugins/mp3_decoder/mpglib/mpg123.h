@@ -29,7 +29,6 @@
 
 #define         SCALE_BLOCK             12
 
-
 #define         MPG_MD_STEREO           0
 #define         MPG_MD_JOINT_STEREO     1
 #define         MPG_MD_DUAL_CHANNEL     2
@@ -67,15 +66,13 @@ struct frame {
 extern unsigned int   get1bit(struct mpstr *mp);
 extern unsigned int   getbits(struct mpstr *mp, int);
 extern unsigned int   getbits_fast(struct mpstr *mp, int);
-extern int set_pointer(struct mpstr *mp, long backstep);
+extern int            set_pointer(struct mpstr *mp, long backstep);
 
 extern void make_decode_tables(long scaleval);
 extern int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
 extern int do_layer2(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
 extern int do_layer1(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
 extern int decode_header(struct frame *fr,unsigned long newhead);
-
-
 
 struct gr_info_s {
       int scfsi;
@@ -108,44 +105,13 @@ struct III_sideinfo
 };
 
 extern int synth_1to1 (struct mpstr *mp, real *,int,unsigned char *,int *);
-extern int synth_1to1_8bit (real *,int,unsigned char *,int *);
 extern int synth_1to1_mono (struct mpstr *mp, real *,unsigned char *,int *);
-extern int synth_1to1_mono2stereo (real *,unsigned char *,int *);
-extern int synth_1to1_8bit_mono (real *,unsigned char *,int *);
-extern int synth_1to1_8bit_mono2stereo (real *,unsigned char *,int *);
-
-extern int synth_2to1 (real *,int,unsigned char *,int *);
-extern int synth_2to1_8bit (real *,int,unsigned char *,int *);
-extern int synth_2to1_mono (real *,unsigned char *,int *);
-extern int synth_2to1_mono2stereo (real *,unsigned char *,int *);
-extern int synth_2to1_8bit_mono (real *,unsigned char *,int *);
-extern int synth_2to1_8bit_mono2stereo (real *,unsigned char *,int *);
-
-extern int synth_4to1 (real *,int,unsigned char *,int *);
-extern int synth_4to1_8bit (real *,int,unsigned char *,int *);
-extern int synth_4to1_mono (real *,unsigned char *,int *);
-extern int synth_4to1_mono2stereo (real *,unsigned char *,int *);
-extern int synth_4to1_8bit_mono (real *,unsigned char *,int *);
-extern int synth_4to1_8bit_mono2stereo (real *,unsigned char *,int *);
-
-extern int synth_ntom (real *,int,unsigned char *,int *);
-extern int synth_ntom_8bit (real *,int,unsigned char *,int *);
-extern int synth_ntom_mono (real *,unsigned char *,int *);
-extern int synth_ntom_mono2stereo (real *,unsigned char *,int *);
-extern int synth_ntom_8bit_mono (real *,unsigned char *,int *);
-extern int synth_ntom_8bit_mono2stereo (real *,unsigned char *,int *);
-
-extern void rewindNbits(int bits);
-extern int  hsstell(void);
-extern int get_songlen(struct frame *fr,int no);
 
 extern void init_layer3(int);
 extern void init_layer2(void);
 extern void make_decode_tables(long scale);
-extern void make_conv16to8_table(int);
 extern void dct64(real *,real *,real *);
 
-extern unsigned char *conv16to8;
 extern long freqs[9];
 extern real muls[27][64];
 extern real decwin[512+32];
