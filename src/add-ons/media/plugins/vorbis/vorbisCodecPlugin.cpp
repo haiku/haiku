@@ -162,80 +162,43 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 	//TRACE("vorbisDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 	
 	while (out_bytes_needed > 0) {
-		if (fResidualBytes) {
-			int32 bytes = min_c(fResidualBytes, out_bytes_needed);
-			memcpy(out_buffer, fResidualBuffer, bytes);
-			fResidualBuffer += bytes;
-			fResidualBytes -= bytes;
-			out_buffer += bytes;
-			out_bytes_needed -= bytes;
-			
-			fStartTime += (1000000LL * (bytes / fFrameSize)) / fInfo.rate;
-
-			//TRACE("vorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
-			continue;
+		int samples;
+		float **pcm;
+		while ((samples = vorbis_synthesis_pcmout(&fDspState,&pcm)) == 0) {
+			// get a new packet
+			void *chunkBuffer;
+			int32 chunkSize;
+			media_header mh;
+			if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
+				TRACE("vorbisDecoder::Decode: GetNextChunk failed\n");
+				return B_ERROR;
+			}
+			if (chunkSize != sizeof(ogg_packet)) {
+				TRACE("vorbisDecoder::Decode: chunk not ogg_packet-sized\n");
+				return B_ERROR;
+			}
+			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
+			if (vorbis_synthesis(&fBlock,packet)==0) {
+				vorbis_synthesis_blockin(&fDspState,&fBlock);
+			}
 		}
+		// reduce samples to the amount of samples we will actually consume
+		samples = min_c(samples,out_bytes_needed/fFrameSize);
+		int bytes = samples*fFrameSize;
+		memcpy(out_buffer,pcm,bytes);
+		out_buffer += bytes;
+		out_bytes_needed -= bytes;
+		// report back how many samples we consumed
+		vorbis_synthesis_read(&fDspState,samples);
 		
-		if (B_OK != DecodeNextChunk())
-			break;
+		fStartTime += (1000000LL * (bytes / fFrameSize)) / fInfo.rate;
+		//TRACE("vorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
-
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 
 	// XXX this doesn't guarantee that we always return B_LAST_BUFFER_ERROR bofore returning B_ERROR
 	return (out_bytes_needed == 0) ? B_OK : (out_bytes_needed == fOutputBufferSize) ? B_ERROR : B_LAST_BUFFER_ERROR;
 }
-
-status_t
-vorbisDecoder::DecodeNextChunk()
-{
-	debugger("vorbisDecoder::DecodeNextChunk");
-	TRACE("vorbisDecoder::DecodeNextChunk\n");
-	void *chunkBuffer;
-	int32 chunkSize;
-	media_header mh;
-	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
-		TRACE("vorbisDecoder::Decode: GetNextChunk failed\n");
-		return B_ERROR;
-	}
-	if (chunkSize != sizeof(ogg_packet)) {
-		TRACE("vorbisDecoder::Decode: chunk not ogg_packet-sized\n");
-		return B_ERROR;
-	}
-	ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
-	
-	//fStartTime = mh.start_time;
-
-	//TRACE("vorbisDecoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
-
-	if (vorbis_synthesis(&fBlock,packet)==0) {
-		vorbis_synthesis_blockin(&fDspState,&fBlock);
-	}
-	int convsize = DECODE_BUFFER_SIZE / fInfo.channels;
-	int samples;
-	float **pcm;
-	ogg_int16_t * ptr;
-	while ((samples = vorbis_synthesis_pcmout(&fDspState,&pcm)) > 0) {
-		int bout = (samples < convsize ? samples : convsize) ;
-		for(int i = 0; (i < fInfo.channels) ; i++) {
-			ptr = (ogg_int16_t *)fDecodeBuffer;
-			float * mono = pcm[i];
-			for(int j = 0; (j < bout) ; j++) {
-				*ptr = *reinterpret_cast<ogg_int16_t*>(&mono[j]);
-				ptr += fInfo.channels;
-			}
-		}
-		vorbis_synthesis_read(&fDspState,bout);
-	}
-	
-	//printf("vorbisDecoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
-		
-	fResidualBuffer = fDecodeBuffer;
-	fResidualBytes = (uint8 *)ptr - fDecodeBuffer;
-	
-	return B_OK;
-}
-
 
 Decoder *
 vorbisDecoderPlugin::NewDecoder()

@@ -21,8 +21,6 @@ public:
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
 					   
-	status_t	DecodeNextChunk();
-	
 private:
 	void		CopyInfoToEncodedFormat(media_format * format);
 	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);

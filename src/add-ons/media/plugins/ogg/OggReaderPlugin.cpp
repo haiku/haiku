@@ -214,7 +214,7 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
 	*frameCount = 1024*1024; // don't know
-	*duration = 1024*1024; // don't know
+	*duration = 1024*1024*1024; // don't know
 	ogg_packet * packet = &fInitialHeaderPackets[stream->serialno];
 	*infoBuffer = (void*)packet;
 	*infoSize = sizeof(ogg_packet);
