@@ -34,7 +34,7 @@ main(int argc, char *argv[])
 	int padding = 0;
 	int infd;
 	int outfd;
-	char opt;
+	signed char opt;
 	int err;
 
 	char *progName = argv[0];
