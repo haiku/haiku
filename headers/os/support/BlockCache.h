@@ -41,7 +41,7 @@ enum {
 class BBlockCache
 {
 public:
-				BBlockCache(size_t cacheSize,
+				BBlockCache(uint32 blockCount,
 							size_t blockSize,
 							uint32 allocationType);
 	virtual		~BBlockCache();

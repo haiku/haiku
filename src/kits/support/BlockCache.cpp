@@ -37,11 +37,7 @@
 // are allocated than available, the variable fExcessBlocks is used to avoid
 // growing the pool of free buffers
 
-// XXX the BeBook describes the first parameter of the constructor as
-// XXX "size_t count", while the original BeOS header uses "size_t cache_size"
-// XXX this are very different meanings
-
-BBlockCache::BBlockCache(size_t cacheSize,
+BBlockCache::BBlockCache(uint32 blockCount,
 						 size_t blockSize,
 						 uint32 allocationType)
  :	fFreeList(0),
@@ -51,9 +47,6 @@ BBlockCache::BBlockCache(size_t cacheSize,
 	fAlloc(0),
 	fFree(0) 
 {
-	if (cacheSize < blockSize)
-		debugger("Error, you can't create a BBlockCache with cacheSize < blockSize\n");
-
 	switch (allocationType) {
 		case B_OBJECT_CACHE:
 			fAlloc = &operator new[];
@@ -71,10 +64,13 @@ BBlockCache::BBlockCache(size_t cacheSize,
 	// large enough to contain the _FreeBlock struct that is used.
 	if (blockSize < sizeof(_FreeBlock))
 		blockSize = sizeof(_FreeBlock);
+	
+	// should have at least one block
+	if (blockCount == 0)
+		blockCount = 1;
 		
 	// create blocks and put them into the free list
-	int count = cacheSize / blockSize;
-	for (int i = 0; i < count; i++) {
+	for (int32 i = 0; i < (int32)blockCount; i++) {
 		_FreeBlock *block = reinterpret_cast<_FreeBlock *>(fAlloc(blockSize));
 		if (!block)
 			break;
