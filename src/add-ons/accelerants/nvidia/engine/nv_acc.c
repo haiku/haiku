@@ -108,6 +108,11 @@ status_t nv_acc_init()
 
 	/*** PRAMIN ***/
 	/* RAMHT space (hash-table(?)) */
+	/* note:
+	 * 'instance' tells you where the engine command is stored in 'PR_CTXx_x' sets
+	 * below: instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000).
+	 * That command is linked to the handle noted here. This handle is then used to
+	 * tell the FIFO to which engine command it is connected! */
 	/* (first set) */
 	ACCW(HT_HANDL_00, 0x80000010); /* 32bit handle */
 	ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
@@ -167,7 +172,7 @@ status_t nv_acc_init()
 	ACCW(PR_CTX0_2, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
-	/* (setup set '3') */
+	/* setup set '3' for cmd NV1_IMAGE_FROM_CPU (not used?) */
 	ACCW(PR_CTX0_3, 0x01008021); /* NVclass $021, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_3, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_3, 0x00000000); /* method traps disabled */
@@ -179,7 +184,7 @@ status_t nv_acc_init()
 	ACCW(PR_CTX0_5, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
-	/* (setup set '6') */
+	/* setup set '6' for cmd NV_RENDER_D3D0_TRIANGLE_ZETA (not used?) */
 	ACCW(PR_CTX0_6, 0x0100a048); /* NVclass $048, patchcfg ROP_AND, userclip enable,
 								  * nv10+: little endian */
 	ACCW(PR_CTX1_6, 0x00000d01); /* format is A8RGB24, MSB mono */
@@ -201,43 +206,59 @@ status_t nv_acc_init()
 	ACCW(PR_CTX1_7, 0x00000d01); /* format is A8RGB24, MSB mono */
 	ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
-	/* (setup set '8') */
+	/* setup set '8' ... */
 	if (si->ps.card_arch != NV04A)
+	{
+		/* ... for cmd NV10_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
 		ACCW(PR_CTX0_8, 0x0300a095); /* NVclass $095, patchcfg ROP_AND, userclip enable,
 									  * context surface0 valid, nv10+: little endian */
+	}
 	else
+	{
+		/* ... for cmd NV4_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
 		ACCW(PR_CTX0_8, 0x0300a055); /* NVclass $055, patchcfg ROP_AND, userclip enable,
 									  * context surface0 valid */
+	}
 	ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
 	ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-	/* (setup set '9') */
+	/* setup set '9' for cmd NV3_SURFACE_0 (not used) */
 	ACCW(PR_CTX0_9, 0x00000058); /* NVclass $058, nv10+: little endian */
 	ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
-	/* (setup set 'A') */
+	/* setup set 'A' for cmd NV3_SURFACE_1 (not used) */
 	ACCW(PR_CTX0_A, 0x00000059); /* NVclass $059, nv10+: little endian */
 	ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
-	/* (setup set 'B') */
+	/* setup set 'B' for cmd NV3_SURFACE_2 (not used) */
 	ACCW(PR_CTX0_B, 0x0000005a); /* NVclass $05a, nv10+: little endian */
 	ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
-	/* (setup set 'C') */
+	/* setup set 'C' for cmd NV3_SURFACE_3 (not used) */
 	ACCW(PR_CTX0_C, 0x0000005b); /* NVclass $05b, nv10+: little endian */
 	ACCW(PR_CTX2_C, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_C, 0x00000000); /* method traps disabled */
-	/* (setup set 'D') */
-	if (si->ps.card_arch != NV04A)
-		ACCW(PR_CTX0_D, 0x00000093); /* NVclass $093, nv10+: little endian */
-	else
-		ACCW(PR_CTX0_D, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
-									  * context surface0 valid */
-	ACCW(PR_CTX2_D, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-	ACCW(PR_CTX3_D, 0x00000000); /* method traps disabled */
-	/* (setup set 'E' if needed) */
+	/* notes for set 'D' and set 'E':
+	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS for set 'D' as well??
+	 * NV1_RENDER_SOLID_LIN could be moved to set 'E'?? */
+	/* setup set 'D' ... */
 	if (si->ps.card_arch != NV04A)
 	{
+		/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS (not used) */
+		ACCW(PR_CTX0_D, 0x00000093); /* NVclass $093, nv10+: little endian */
+	}
+	else
+	{
+		/* ... for cmd NV1_RENDER_SOLID_LIN (not used) */
+		ACCW(PR_CTX0_D, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
+									  * context surface0 valid */
+	}
+	ACCW(PR_CTX2_D, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+	ACCW(PR_CTX3_D, 0x00000000); /* method traps disabled */
+	/* setup set 'E' if needed ... */
+	if (si->ps.card_arch != NV04A)
+	{
+		/* ... for cmd NV1_RENDER_SOLID_LIN (not used) */
 		ACCW(PR_CTX0_E, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
 									  * context surface0 valid, nv10+: little endian */
 		ACCW(PR_CTX2_E, 0x11401140); /* DMA0, DMA1 instance = $1140 */
@@ -705,7 +726,11 @@ status_t nv_acc_init()
 	nv_init_for_3D();
 
 	/*** setup acceleration engine command shortcuts (so via fifo) ***/
-	/* (b31 = 1 selects 'config' function?) */
+	/* set object handles (b31 = 1 selects 'config' function?) */
+	/* note:
+	 * probably depending on some other setup, there are 8 or 32 FIFO channels
+	 * available. Assuming the current setup only has 8 channels because the 'rest'
+	 * isn't setup here... */
 	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
 	ACCW(FIFO_00802000, 0x80000001); /* Clip */
 	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
