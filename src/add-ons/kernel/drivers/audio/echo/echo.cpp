@@ -125,7 +125,7 @@ extern char *      pStatusStrs[ECHOSTATUS_LAST];
 
 status_t
 echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
-     uint8 bitsPerSample, uint32 sample_rate)
+     uint8 bitsPerSample, uint32 sample_rate, uint8 index)
 {
 	int32 			i;
 	uint8 			sample_size, frame_size;
@@ -145,7 +145,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	}
 	
 	open_params.bIsCyclic = TRUE;
-	open_params.Pipe.nPipe = 0;
+	open_params.Pipe.nPipe = index;
 	open_params.Pipe.bIsInput = stream->use == ECHO_USE_RECORD ? TRUE : FALSE;
 	open_params.Pipe.wInterleave = channels;
 	open_params.ProcessId = NULL;
@@ -153,7 +153,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : OpenAudio failed\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 
@@ -161,7 +161,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->VerifyAudioOpen(stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : VerifyAudioOpen failed\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
@@ -178,14 +178,14 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->QueryAudioFormat(stream->pipe, &format_params);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when querying\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
 	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
@@ -193,7 +193,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->QueryAudioSampleRate(sample_rate);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad sample rate when querying\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 		
@@ -393,6 +393,18 @@ int32 echo_int(void *arg)
 	return B_INVOKE_SCHEDULER;
 }
 
+/* dumps card capabilities */
+void
+echo_dump_caps(echo_dev *card)
+{
+	PECHOGALS_CAPS caps = &card->caps;
+	PRINT(("name: %s\n", caps->szName));
+	PRINT(("out pipes: %d, in pipes: %d, out busses: %d, in busses: %d, out midi: %d, in midi: %d\n", 
+		caps->wNumPipesOut, caps->wNumPipesIn, caps->wNumBussesOut, caps->wNumBussesIn, caps->wNumMidiOut, caps->wNumMidiIn));
+
+}
+
+
 /* detect presence of our hardware */
 status_t 
 init_hardware(void)
@@ -532,6 +544,7 @@ echo_setup(echo_dev * card)
 {
 	status_t err = B_OK;
 	unsigned char cmd;
+	char *name;
 	
 	PRINT(("echo_setup(%p)\n", card));
 	
@@ -551,32 +564,41 @@ echo_setup(echo_dev * card)
 #ifdef ECHOGALS_FAMILY
 		case DARLA:
 			card->pEG = new CDarla(card->pOSS);
+			name = "Echo Darla";
 			break;
 		case GINA:
 			card->pEG = new CGina(card->pOSS);
+			name = "Echo Gina";
 			break;
 		case LAYLA:
 			card->pEG = new CLayla(card->pOSS);
+			name = "Echo Layla";
 			break;
 		case DARLA24:
 			card->pEG = new CDarla24(card->pOSS);
+			name = "Echo Darla24";
 			break;
 #endif
 #ifdef ECHO24_FAMILY
 		case GINA24:
 			card->pEG = new CGina24(card->pOSS);
+			name = "Echo Gina24";
 			break;
 		case LAYLA24:
 			card->pEG = new CLayla24(card->pOSS);
+			name = "Echo Gina24";
 			break;
 		case MONA:
 			card->pEG = new CMona(card->pOSS);
+			name = "Echo Mona";
 			break;
 		case MIA:
 			card->pEG = new CMia(card->pOSS);
+			name = "Echo Mia";
 			break;
 		case ECHO3G:
 			card->pEG = new C3g(card->pOSS);
+			name = "Echo 3g";
 			break;
 #endif
 		default:
@@ -602,13 +624,15 @@ echo_setup(echo_dev * card)
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
 
-	card->pEG->AssignResources(card->log_bmbar, "no name");
+	card->pEG->AssignResources(card->log_bmbar, name);
 
 	ECHOSTATUS status;
 	status = card->pEG->InitHw();
 	if(status != ECHOSTATUS_OK)
 		return B_ERROR;
-		
+
+	card->pEG->GetCapabilities(&card->caps);
+
 	/* Init streams list */
 	LIST_INIT(&(card->streams));
 			
@@ -620,13 +644,25 @@ echo_setup(echo_dev * card)
 	
 	PRINT(("echo_setup done\n"));
 
+	echo_dump_caps(card);
+
+	status = card->pEG->OpenMixer(card->mixer);
+	if (status != ECHOSTATUS_OK)
+		return B_ERROR;
+
 	return err;
 }
 
 static void
 echo_shutdown(echo_dev *card)
 {
+	ECHOSTATUS status;
+
 	PRINT(("shutdown(%p)\n", card));
+	status = card->pEG->CloseMixer(card->mixer);
+	if (status != ECHOSTATUS_OK)
+		PRINT(("echo_shutdown: error when CloseMixer\n"));
+
 	remove_io_interrupt_handler(card->irq, echo_int, card);
 	
 	delete card->pEG;

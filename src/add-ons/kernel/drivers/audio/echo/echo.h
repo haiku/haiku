@@ -86,6 +86,8 @@ typedef struct _echo_dev {
 	uint16	type;
 	
 	PCEchoGals	pEG;
+	ECHOGALS_CAPS	caps;
+	NUINT		mixer;
 	PCOsSupport pOSS;
 		
 	void	*ptb_log_base;
@@ -97,7 +99,7 @@ typedef struct _echo_dev {
 	LIST_HEAD(, _echo_stream) streams;
 	LIST_HEAD(, _echo_mem) mems;
 	
-	echo_stream		*pstream;
+	echo_stream		*pstream, *pstream2;
 	echo_stream		*rstream;
 	
 	/* multi_audio */
@@ -112,7 +114,7 @@ extern "C" {
 #endif
 
 status_t echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
-			     uint8 bitsPerSample, uint32 sample_rate);
+			     uint8 bitsPerSample, uint32 sample_ratei, uint8 index);
 status_t echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf, 
 					char** buffer, size_t *stride);
 void echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam);
