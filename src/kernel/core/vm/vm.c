@@ -2385,7 +2385,7 @@ map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 	if (convertAddressSpec(&addressSpec) < B_OK)
 		return B_BAD_VALUE;
 
-	protection = PROTECTION_TO_LOCK(protection) | LOCK_KERNEL;
+	protection = PROTECTION_TO_LOCK(protection) | LOCK_KERNEL | LOCK_RW;
 
 	return vm_map_physical_memory(vm_get_kernel_aspace_id(), name, _virtualAddress,
 		addressSpec, numBytes, protection, (addr)physicalAddress);
@@ -2433,7 +2433,7 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 		case B_ANY_KERNEL_ADDRESS:
 		case B_EXACT_KERNEL_ADDRESS:
 			areaSpace = vm_get_kernel_aspace_id();
-			protection |= LOCK_KERNEL;
+			protection |= LOCK_KERNEL | LOCK_RW;
 				// That's required for BeOS compatibility...
 				// create_area_etc() doesn't do this, though
 			break;
