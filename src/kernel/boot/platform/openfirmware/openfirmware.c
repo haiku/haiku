@@ -10,12 +10,19 @@
 
 // OpenFirmware entry function
 static int (*gCallOpenFirmware)(void *) = 0; 
+int gChosen;
 
 
-void
+status_t
 of_init(int (*openFirmwareEntry)(void *))
 {
 	gCallOpenFirmware = openFirmwareEntry;
+
+	gChosen = of_finddevice("/chosen");
+	if (gChosen == OF_FAILED)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 
@@ -395,7 +402,7 @@ of_release(void *virtual, int size)
 
 
 void *
-of_claim(void *virtual, int size)
+of_claim(void *virtual, int size, int align)
 {
 	struct {
 		const char	*name;
@@ -405,7 +412,7 @@ of_claim(void *virtual, int size)
 		int			size;
 		int			align;
 		void		*address;
-	} args = {"claim", 3, 1, virtual, size, 64};
+	} args = {"claim", 3, 1, virtual, size, align};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
 		return NULL;

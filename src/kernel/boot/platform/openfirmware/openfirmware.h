@@ -15,11 +15,17 @@
 extern int gChosen;
 
 
+struct of_region {
+	void	*base;
+	uint32	size;
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void of_init(int (*openFirmwareEntry)(void *));
+extern status_t of_init(int (*openFirmwareEntry)(void *));
 
 /* device tree functions */
 extern int of_finddevice(const char *device);
@@ -43,9 +49,10 @@ extern int of_seek(int handle, off_t pos);
 
 /* memory functions */
 extern int of_release(void *virtualAddress, int size);
-extern void *of_claim(void *virtualAddress, int size);
+extern void *of_claim(void *virtualAddress, int size, int align);
 
 /* misc functions */
+extern int of_call_method(const char *method, int numArgs, int numReturns, ...);
 extern int of_test(const char *service);
 extern int of_milliseconds(void);
 extern void of_exit(void);
