@@ -1,5 +1,5 @@
 //
-//	$Id: MessageQueue.h,v 1.1 2002/07/09 12:24:32 ejakowatz Exp $
+//	$Id: MessageQueue.h,v 1.2 2002/10/26 18:59:16 beveloper Exp $
 //
 //	This is the BMessageQueue interface for OpenBeOS.  It has been created
 //  to be source and binary compatible with the BeOS version of
@@ -11,10 +11,8 @@
 #define	_OPENBEOS_MESSAGEQUEUE_H
 
 
-#include "Locker.h"
-
-
-class BMessage;
+#include <Locker.h>
+#include <Message.h>	/* For convenience */
 
 
 #ifdef USE_OPENBEOS_NAMESPACE
