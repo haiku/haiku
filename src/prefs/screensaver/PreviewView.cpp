@@ -6,6 +6,40 @@
 #include <iostream>
 #include <ScreenSaver.h>
 #include <Errors.h>
+#include <Screen.h>
+
+struct
+{
+	int32 			previewThreadId;
+	BView*			previewArea;
+	BScreenSaver* 	saver;
+	bool			stopMe;
+} previewData;
+
+// viewer thread?
+int32 previewThread(void* data)
+{
+	int cycleNumber = 0;
+	if (previewData.saver == 0)
+	{
+		std::cout << "saver not there!\n";
+		return 0;
+	}
+	
+	// TODO: implement lood counting
+	int32 loopOnCount = previewData.saver->LoopOnCount();
+	int32 loopOffCount = previewData.saver->LoopOffCount();
+	
+	while (!previewData.stopMe)
+	{
+		previewData.previewArea->Window()->Lock();
+		previewData.saver->Draw( previewData.previewArea, cycleNumber );
+		previewData.previewArea->Window()->Unlock();
+		previewData.previewArea->Flush();
+		snooze( previewData.saver->TickSize() );
+		cycleNumber++;
+	}
+} // end previewThread()
 
 inline BPoint scaleDirect(float x, float y,BRect area)
 {
@@ -17,12 +51,6 @@ inline BRect scaleDirect (float x1,float x2,float y1,float y2,BRect area)
 	return BRect(area.Width()*x1+area.left,area.Height()*y1+area.top, area.Width()*x2+area.left,area.Height()*y2+area.top);
 }
 
-//float positionalX[]= {0,.1,.25,.3,.7,.75,.9,1.0};
-//float positionalY[]= {0,.1,.7,.8,.9,1.0};
-
-//inline BPoint scale(int x, int y,BRect area) { return scaleDirect(positionalX[x],positionalY[y],area); }
-//inline BRect scale(int x1, int x2, int y1, int y2,BRect area) { return scaleDirect(positionalX[x1],positionalX[x2],positionalY[y1],positionalY[y2],area); }
-
 float sampleX[]= {0,.025,.25,.6,.625,.7,.725,.75,.975,1.0};
 float sampleY[]= {0,.05,.8,.9,.933,.966,1.0};
 inline BPoint scale2(int x, int y,BRect area) { return scaleDirect(sampleX[x],sampleY[y],area); }
@@ -32,12 +60,69 @@ PreviewView::PreviewView(BRect frame, const char *name)
 : BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW),
   addonImage (0),
   saver (0),
-  settingsBoxPtr (0) 
+  settingsBoxPtr (0),
+  configView (0),
+  messageRunner (0),
+  stopSaver (false),
+  stopConfigView (false),
+  removeConfigView (false),
+  deleteSaver (false),
+  removePreviewArea (false),
+  unloadAddon (false)
 {
    SetViewColor(216,216,216);
-   AddChild(previewArea=new BView (scale2(1,8,1,2,Bounds()),"sampleScreen",B_FOLLOW_NONE,0));
-   previewArea->SetViewColor(lightBlue);
-}
+   AddChild(previewArea=new BView (scale2(1,8,1,2,Bounds()),"sampleScreen",B_FOLLOW_NONE,B_WILL_DRAW));
+   previewArea->SetViewColor(0,0,0);
+   previewData.previewArea = previewArea;
+   previewData.previewThreadId = 0;
+   previewData.saver = 0;
+   previewData.stopMe = false;
+} // end PreviewView::PreviewView()
+
+PreviewView::~PreviewView()
+{
+	if (previewData.previewThreadId != 0)
+	{
+		previewData.stopMe = true;
+		snooze( saver->TickSize() );
+		kill_thread( previewData.previewThreadId );
+		previewData.stopMe = false;
+	}
+	
+	if (stopSaver)
+	{
+		saver->StopSaver();
+		stopSaver = false;
+	}
+	
+	if (stopConfigView)
+	{
+		saver->StopConfig();
+		stopConfigView = false;
+	}
+		
+	if (deleteSaver)
+	{
+		delete saver;
+		saver = 0;
+		deleteSaver = false;
+	}
+	
+	if (removeConfigView)
+	{
+		settingsBoxPtr->RemoveChild(configView);
+		delete configView;
+		settingsBoxPtr->Draw(settingsBoxPtr->Bounds());
+		removeConfigView = false;
+	}
+	
+	if (removePreviewArea)
+	{
+		previewArea->RemoveSelf();
+		delete previewArea;
+	}
+		
+} // end PreviewView::~PreviewView()
 
 void PreviewView::Draw(BRect update)
 {
@@ -59,56 +144,74 @@ void PreviewView::Draw(BRect update)
 	FillRect(scale2(5,6,4,5,Bounds()));
 }
 
-void removeChildren(BView* view)
-{
-	int children = view->CountChildren();
-	std::cout << "Removing " << children << " child(ren) from view\n";
-	BView* child = view->ChildAt(0);
-	while( child != NULL )
-	{
-		removeChildren( child );
-		view->RemoveChild(child);
-		delete child;
-		child = view->ChildAt(0);
-	}
-}
-
 void PreviewView::LoadNewAddon(const char* addOnFilename)
 {
+	if (previewData.previewThreadId != 0)
+	{
+		previewData.stopMe = true;
+		snooze( saver->TickSize() );
+		kill_thread( previewData.previewThreadId );
+		previewData.stopMe = false;
+	}
+	
 	status_t lastOpStatus;
 	
+	//screen saver's exported instantiation function
 	BScreenSaver *(*instantiate)(BMessage *, image_id );
-	if (saver != 0)
+	
+	if (stopSaver)
 	{
-		// tell module the show's over
 		saver->StopSaver();
+		stopSaver = false;
+	}
+	
+	if (stopConfigView)
+	{
 		saver->StopConfig();
-		// get rid of the settings elements
-		removeChildren( settingsBoxPtr );
-		settingsBoxPtr->Draw(settingsBoxPtr->Bounds());
-		// get rid of the module
+		stopConfigView = false;
+	}
+		
+	if (deleteSaver)
+	{
 		delete saver;
 		saver = 0;
-		
-		// clean up preview area
-		previewArea->ClearViewOverlay();
-		previewArea->ClearViewBitmap();
+		deleteSaver = false;
 	}
-	if (addonImage != 0)
+	
+	if (removeConfigView)
+	{
+		settingsBoxPtr->RemoveChild(configView);
+		delete configView;
+		settingsBoxPtr->Draw(settingsBoxPtr->Bounds());
+		removeConfigView = false;
+	}
+	
+	if (removePreviewArea)
+	{
+		previewArea->RemoveSelf();
+		delete previewArea;
+		previewArea=new BView (scale2(1,8,1,2,Bounds()),"sampleScreen",B_FOLLOW_NONE,B_WILL_DRAW);
+		previewArea->SetViewColor( 0,0,0 );
+		AddChild(previewArea);
+		previewData.previewArea = previewArea;
+		removePreviewArea = false;
+	}
+		
+	if (unloadAddon)
 	{
 		unload_add_on(addonImage);
 		addonImage = 0;
+		unloadAddon = false;
 	}
 
-	std::cout << "Loading add-on: " << addOnFilename << '\n';
 	addonImage = load_add_on(addOnFilename);
 	if (addonImage < 0 )
 	{
-		std::cout << "Unable to open the add-on\n"
+		std::cout << "Unable to open the add-on " << addOnFilename << "\n"
 					 "load_add_on returned " << std::hex << addonImage << std::dec << "!\n";
 		return;
 	}
-	std::cout << "Add-on loaded properly! image = " << addonImage << '\n';
+	unloadAddon = true;
 
 	lastOpStatus = get_image_symbol(addonImage, "instantiate_screen_saver", B_SYMBOL_TYPE_TEXT,(void **) &instantiate);
 	if (lastOpStatus != B_OK)
@@ -119,11 +222,15 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 		return;
 	}
 
-	std::cout << "Add-on supports correct functionality!\n";
 	saver = instantiate(new BMessage, addonImage);
-	std::cout << "instantiate() called correctly!\n";
-		
-	std::cout << "setting up screen saver for preview\n";
+	if (saver == 0)
+	{
+		std::cout << "Saver not instantiated.\n";
+		return;
+	}
+	deleteSaver = true;
+	previewData.saver = saver;
+			
 	lastOpStatus = saver->InitCheck();
 	if ( lastOpStatus != B_OK )
 	{
@@ -131,25 +238,27 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 	 	return;
 	}
 	
-	std::cout << "InitCheck() returned B_OK, calling StartSaver()\n";
 	lastOpStatus = saver->StartSaver(previewArea, true);
 	if ( lastOpStatus != B_OK )
-	{
 	 	std::cout << "StartSaver() said no go, returned " << lastOpStatus << '\n';
-	 	return;
-	}
+	else 
+		stopSaver = true;
 	
-	std::cout << "StartSaver() returned B_OK, calling StartConfig()\n";
-	if ( settingsBoxPtr == 0 )
-	{
-		std::cout << "Settings box not instantiated yet!\n";
-	}
-	else
-	{
-		saver->StartConfig( settingsBoxPtr );
-	}
+	// make config view
+	BRect configViewBounds = settingsBoxPtr->Bounds();
+	configViewBounds.InsetBy( 4, 16 );
+	configView = new BView(configViewBounds, "settings", B_FOLLOW_ALL_SIDES, 0);
+	configView->SetViewColor(216,216,216);
+	settingsBoxPtr->AddChild( configView );
+	saver->StartConfig( configView );
+	stopConfigView = true;
+	removeConfigView = true;
+
+	previewData.previewThreadId = spawn_thread( previewThread, "preview_thread", 50, NULL );
+	resume_thread( previewData.previewThreadId );
 	
-	std::cout << "StartConfig() called, drawing first frame for now.\n";
-	saver->Draw(previewArea, 0);
+	removePreviewArea = true;
 		
-}
+} // end PreviewView::LoadNewAddon()
+
+
