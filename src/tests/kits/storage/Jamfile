@@ -41,5 +41,4 @@ CommonTestLib libstoragetest.so
 	DEPENDS libstoragetest_r5.so : $(resdir_r5) ;
 }
 
-SubInclude OBOS_TOP src tests kits storage disk_device ;
 SubInclude OBOS_TOP src tests kits storage virtualdrive ;
