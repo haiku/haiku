@@ -280,27 +280,19 @@ protected:
 	// framebuffer to be updated
 	virtual void Invalidate(const BRect &r);
 	
-	void FillArc(const BRect &r, const float &angle, const float &span, DisplayDriver*, SetHorizontalLineFuncType setLine);
 	void FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
-	void FillEllipse(const BRect &r, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
-	void FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
 	void FillRegion(BRegion &r, DisplayDriver* driver, SetRectangleFuncType setRect);
-	void FillRoundRect(const BRect &r, const float &xrad, const float &yrad, DisplayDriver* driver, SetRectangleFuncType setRect, SetHorizontalLineFuncType setLine);
-	void FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
 	void StrokeArc(const BRect &r, const float &angle, const float &span, DisplayDriver* driver, SetPixelFuncType setPixel);
 	void StrokeBezier(BPoint *pts, DisplayDriver* driver, SetPixelFuncType setPixel);
 	void StrokeEllipse(const BRect &r, DisplayDriver* driver, SetPixelFuncType setPixel);
 	void StrokeLine(const BPoint &start, const BPoint &end, DisplayDriver* driver, SetPixelFuncType setPixel);
-	void StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetPixelFuncType setPixel, bool is_closed=true);
-	void StrokeRect(const BRect &r, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine);
-	void StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine, SetPixelFuncType setPixel);
 	
 	// Support functions for the rest of the driver
 	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
 	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
 	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
+	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
 	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
 	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source);
