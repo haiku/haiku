@@ -9,13 +9,24 @@
 **            by Michael Pfeiffer.
 */
 
+// TODO: 
+//   - Rewrite to use STL
+//   - Include ObjectList.h
+//   - Test if building with jam works
+
 // Note: Method Owning() is inlined in header file ObjectList.h
+
+#include <stl.h>
 
 #include <assert.h>
 #include <List.h>
 
+// If USE_STL is 1 binary search and sort are used from STL.
+// The implementation of _PointerList_ should be completely rewritten to
+// use STL in a more efficent way!
+#define USE_STL 1
 
-// Declaration of class _PointerList_ is inlined to be independet of the
+// Declaration of class _PointerList_ is inlined to be independent of the
 // header file ObjectList.h
 
 #ifndef __OBJECT_LIST__
@@ -53,6 +64,8 @@ protected:
 };
 #endif
 
+struct comparator;
+
 class AbstractPointerListHelper {
 public:
 	AbstractPointerListHelper() {};
@@ -78,6 +91,10 @@ public:
 	*/
 	void HSortItems(BList *list);
 
+#if USE_STL
+	friend struct comparator;
+#endif
+
 private:
 	enum {
 		// Use insertion sort if number of elements in list is less than 
@@ -92,16 +109,30 @@ private:
 	inline void Swap(void **items, int32 i, int32 j);
 
 	void* BinarySearch(const void *key, const void **items, int32 numItems, int32 &index);
+#if !USE_STL
 	void InsertionSort(void **items, int32 numItems);
 	inline void InsertionSort(void **items, int32 low, int32 high);
 	int32 ChoosePivot(void **items, int32 low, int32 high);
 	int32 Partition(void **items, int32 low, int32 high, bool &isSorted);
+#endif
 	void QuickSort(void **items, int32 low, int32 high);
 	
 	// Method to be implemented by sub classes
 	int virtual Compare(const void *key, const void* item) = 0;
 };
 
+#if USE_STL
+struct comparator : public binary_function<const void*, const void*, bool>
+{
+	comparator(AbstractPointerListHelper* helper) : helper(helper) {}
+	
+	bool operator()(const void* a, const void* b) {
+		return helper->Compare(b, a) > 0;
+	}
+	
+	AbstractPointerListHelper* helper;
+};
+#endif
 
 void
 AbstractPointerListHelper::Swap(void **items, int32 i, int32 j)
@@ -156,6 +187,17 @@ AbstractPointerListHelper::HSortItems(BList *list)
 void *
 AbstractPointerListHelper::BinarySearch(const void *key, const void **items, int32 numItems, int32 &index)
 {
+#if USE_STL
+	const void** end = &items[numItems];
+	const void** found = lower_bound(items, end, key, comparator(this));
+	index = found - items;
+	if (index != numItems && Compare(key, *found) == 0) {
+		return const_cast<void*>(*found);
+	} else {
+		index = -(index + 1);
+		return NULL;
+	}
+#else
 	int32 low = 0;
 	int32 high = numItems-1;
 	int result = 0;
@@ -185,9 +227,10 @@ AbstractPointerListHelper::BinarySearch(const void *key, const void **items, int
 
 	index = -(index+1);
 	return NULL;
+#endif
 }
 
-
+#if !USE_STL
 int32
 AbstractPointerListHelper::ChoosePivot(void **items, int32 low, int32 high)
 {
@@ -318,11 +361,16 @@ AbstractPointerListHelper::InsertionSort(void **items, int32 low, int32 high)
 {
 	InsertionSort(&items[low], high - low + 1);
 }
-
+#endif
 
 void
 AbstractPointerListHelper::QuickSort(void **items, int32 low, int32 high)
 {
+#if USE_STL
+	if (low <= high) {
+		sort(&items[low], &items[high+1], comparator(this));
+	}
+#else
 	if (low < high) {
 		if (high - low < kQuickSortThreshold) {
 			InsertionSort(items, low, high);
@@ -335,6 +383,7 @@ AbstractPointerListHelper::QuickSort(void **items, int32 low, int32 high)
 			QuickSort(items, pivot + 1, high);
 		}
 	}	
+#endif
 }
 
 
