@@ -27,6 +27,7 @@
 /*****************************************************************************/
 
 #include <stdio.h>
+#include <math.h>
 #include <Debug.h>
 #include <Message.h>
 #include <ScrollBar.h>
@@ -152,7 +153,7 @@ ShowImageView::Pulse()
 	// animate marching ants
 	if (HasSelection() && fAnimateSelection && Window()->IsActive()) {	
 		RotatePatterns();
-		DrawSelectionBox(fSelectionRect);
+		DrawSelectionBox();
 	}
 	if (fSlideShow) {
 		fSlideShowCountDown --;
@@ -163,6 +164,14 @@ ShowImageView::Pulse()
 			}
 		}
 	}
+#if DELAYED_SCALING
+	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
+		fScalingCountDown --;
+		if (fScalingCountDown == 0) {
+			GetScaler(AlignBitmap());
+		}
+	}
+#endif	
 }
 
 ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
@@ -192,6 +201,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fMovesImage = false;
 	fScaleBilinear = false;
 	fScaler = NULL;
+#if DELAYED_SCALING
+	fScalingCountDown = 10;
+#endif
 
 	if (settings->Lock()) {
 		fDither = settings->GetBool("Dither", fDither);
@@ -264,6 +276,9 @@ ShowImageView::DeleteScaler()
 		delete fScaler;
 		fScaler = NULL;
 	}
+#if DELAYED_SCALING
+	fScalingCountDown = 3; // delay for 3/10 seconds
+#endif
 }
 
 void
@@ -564,25 +579,25 @@ ShowImageView::AlignBitmap()
 void
 ShowImageView::Setup(BRect rect)
 {
-	fLeft = rect.left;
-	fTop = rect.top;
-	fScaleX = rect.Width() / fBitmap->Bounds().Width();
-	fScaleY = rect.Height() / fBitmap->Bounds().Height();
+	fLeft = floorf(rect.left);
+	fTop = floorf(rect.top);
+	fScaleX = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
+	fScaleY = (rect.Height()+1.0) / (fBitmap->Bounds().Height()+1.0);
 }
 
 BPoint
 ShowImageView::ImageToView(BPoint p) const
 {
-	p.x = fScaleX * p.x + fLeft;
-	p.y = fScaleY * p.y + fTop;
+	p.x = floorf(fScaleX * p.x + fLeft);
+	p.y = floorf(fScaleY * p.y + fTop);
 	return p;
 }
 
 BPoint
 ShowImageView::ViewToImage(BPoint p) const
 {
-	p.x = (p.x - fLeft) / fScaleX;
-	p.y = (p.y - fTop) / fScaleY;
+	p.x = floorf((p.x - fLeft) / fScaleX);
+	p.y = floorf((p.y - fTop) / fScaleY);
 	return p;
 }
 
@@ -590,7 +605,10 @@ BRect
 ShowImageView::ImageToView(BRect r) const
 {
 	BPoint leftTop(ImageToView(BPoint(r.left, r.top)));
-	BPoint rightBottom(ImageToView(BPoint(r.right, r.bottom)));
+	BPoint rightBottom(r.right, r.bottom);
+	rightBottom += BPoint(1, 1);
+	rightBottom = ImageToView(rightBottom);
+	rightBottom -= BPoint(1, 1);
 	return BRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
 }
 
@@ -690,7 +708,14 @@ void
 ShowImageView::DrawImage(BRect rect)
 {
 	if (fScaleBilinear || fDither) {
+#if DELAYED_SCALING
+		Scaler* scaler = fScaler;
+		if (scaler != NULL && !scaler->Matches(rect, fDither)) {
+			DeleteScaler(); scaler = NULL;
+		}
+#else
 		Scaler* scaler = GetScaler(rect);
+#endif
 		if (scaler != NULL && !scaler->IsRunning()) {
 			BBitmap* bitmap = scaler->GetBitmap();
 			if (bitmap) {
@@ -735,7 +760,7 @@ ShowImageView::Draw(BRect updateRect)
 					destRect = ImageToView(destRect);
 					DrawBitmap(fSelBitmap, srcBits, destRect);
 				}
-				DrawSelectionBox(fSelectionRect);
+				DrawSelectionBox();
 			}
 		} else {
 			DrawBitmap(fBitmap);
@@ -744,15 +769,16 @@ ShowImageView::Draw(BRect updateRect)
 }
 
 void
-ShowImageView::DrawSelectionBox(BRect &rect)
+ShowImageView::DrawSelectionBox()
 {
-	BRect r = rect;
+	BRect r(fSelectionRect);
 	ConstrainToImage(r);
-
+	r = ImageToView(r);
+	// draw selection box *around* selection
+	r.InsetBy(-1, -1);
 	PushState();
 	rgb_color white = {255, 255, 255};
 	SetLowColor(white);
-	r = ImageToView(r);
 	StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top), fPatternLeft);
 	StrokeLine(BPoint(r.right, r.top+1), BPoint(r.right, r.bottom-1), fPatternUp);
 	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom), fPatternRight);
@@ -789,13 +815,18 @@ ShowImageView::ConstrainToImage(BRect &rect)
 }
 
 BBitmap*
-ShowImageView::CopySelection(uchar alpha)
+ShowImageView::CopySelection(uchar alpha, bool imageSize)
 {
 	bool hasAlpha = alpha != 255;
 	
 	if (!HasSelection()) return NULL;
 	
 	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
+	if (!imageSize) {
+		// scale image to view size
+		rect.right = floorf((rect.right + 1.0) * fScaleX - 1.0); 
+		rect.bottom = floorf((rect.bottom + 1.0) * fScaleY - 1.0);
+	}
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
 	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
 	if (bitmap == NULL) return NULL;
@@ -854,7 +885,7 @@ ShowImageView::AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 void
 ShowImageView::BeginDrag(BPoint sourcePoint)
 {
-	BBitmap* bitmap = CopySelection(128);
+	BBitmap* bitmap = CopySelection(128, false);
 	if (bitmap == NULL) return;
 
 	SetMouseEventMask(B_POINTER_EVENTS);
@@ -875,9 +906,12 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		// we also support "Passing Data via File" protocol
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		// avoid flickering of dragged bitmap caused by drawing into the window
-		AnimateSelection(false); 
+		AnimateSelection(false);
+		sourcePoint -= leftTop;
+		sourcePoint.x *= fScaleX;
+		sourcePoint.y *= fScaleY;
 		// DragMessage takes ownership of bitmap
-		DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint - leftTop);
+		DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
 	}
 }
 
@@ -1146,7 +1180,7 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final) {
 	fSelectionRect = fCopyFromRect;
 	if (final) {
 		// selection must contain a few pixels
-		if (fCopyFromRect.Width() * fCopyFromRect.Height() <= 1) {
+		if ((fCopyFromRect.Width()+1.0) * (fCopyFromRect.Height()+1.0) < 1) {
 			SetHasSelection(false);
 		}
 	}
@@ -1283,6 +1317,8 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 					BMessenger msgr(Window());
 					msgr.SendMessage(MSG_SLIDE_SHOW);
 				}
+				ClearSelection();
+				break;
 			case 'T':
 			case 't':
 				SetIcon(*bytes == 't');

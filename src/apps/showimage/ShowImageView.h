@@ -38,6 +38,8 @@
 
 #include "Filter.h"
 
+#define DELAYED_SCALING 1
+
 class ShowImageView : public BView {
 public:
 	ShowImageView(BRect rect, const char *name, uint32 resizingMode,
@@ -152,7 +154,7 @@ private:
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
 	void ConstrainToImage(BRect &rect);
-	BBitmap* CopySelection(uchar alpha = 255);
+	BBitmap* CopySelection(uchar alpha = 255, bool imageSize = true);
 	bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
 	void BeginDrag(BPoint sourcePoint);
 	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format);
@@ -166,7 +168,7 @@ private:
 	void LayoutCaption(BFont &font, BPoint &textPos, BRect &background);
 	void DrawCaption();
 	void UpdateCaption();
-	void DrawSelectionBox(BRect &rect);
+	void DrawSelectionBox();
 	Scaler* GetScaler(BRect rect);
 	void DrawImage(BRect rect);
 	float LimitToRange(float v, orientation o, bool absolute);
@@ -210,6 +212,9 @@ private:
 	bool fSlideShow; // is slide show enabled?
 	int fSlideShowDelay; // in pulse rate units
 	int fSlideShowCountDown; // shows next image if it reaches zero
+#if DELAYED_SCALING
+	int fScalingCountDown;
+#endif
 	
 	bool fShowCaption; // display caption?
 	BString fCaption; // caption text

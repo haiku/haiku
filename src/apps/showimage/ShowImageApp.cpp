@@ -97,7 +97,7 @@ ShowImageApp::Pulse()
 		// all windows are closed except for the file open panel,
 		// quit the application
 		PostMessage(B_QUIT_REQUESTED);
-}
+}	
 
 void
 ShowImageApp::ArgvReceived(int32 argc, char **argv)
