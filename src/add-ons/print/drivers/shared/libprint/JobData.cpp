@@ -119,11 +119,14 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	fMsg = msg;
 	fSettings = settings;
 
+	const PaperCap *paperCap = NULL;
+ 
 	if (msg->HasInt32(kJDPaper))
 		fPaper = (Paper)msg->FindInt32(kJDPaper);
-	else if (cap->isSupport(PrinterCap::kPaper))
-		fPaper = ((const PaperCap *)cap->getDefaultCap(PrinterCap::kPaper))->paper;
-	else
+	else if (cap->isSupport(PrinterCap::kPaper)) {
+		paperCap = (const PaperCap *)cap->getDefaultCap(PrinterCap::kPaper);
+		fPaper = paperCap->paper;
+	} else
 		fPaper = kA4;
 
 	if (msg->HasInt64(kJDXRes)) {
@@ -160,26 +163,38 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 
 	if (msg->HasRect(kJDPaperRect)) {
 		fPaperRect = msg->FindRect(kJDPaperRect);
+	} else if (paperCap != NULL) {
+		fPaperRect = paperCap->paper_rect;
 	}
 
 	if (msg->HasRect(kJDScaledPaperRect)) {
 		fScaledPaperRect = msg->FindRect(kJDScaledPaperRect);
+	} else {
+		fScaledPaperRect = fPaperRect;
 	}
 
 	if (msg->HasRect(kJDPrintableRect)) {
 		fPrintableRect = msg->FindRect(kJDPrintableRect);
+	} else if (paperCap != NULL) {
+		fPrintableRect = paperCap->physical_rect;
 	}
 
 	if (msg->HasRect(kJDScaledPrintableRect)) {
 		fScaledPrintableRect = msg->FindRect(kJDScaledPrintableRect);
+	} else {
+		fScaledPrintableRect = fPrintableRect;
 	}
 
 	if (msg->HasRect(kJDPhysicalRect)) {
 		fPhysicalRect = msg->FindRect(kJDPhysicalRect);
+	} else if (paperCap != NULL) {
+		fPhysicalRect = paperCap->physical_rect;
 	}
 
 	if (msg->HasRect(kJDScaledPhysicalRect)) {
 		fScaledPhysicalRect = msg->FindRect(kJDScaledPhysicalRect);
+	} else {
+		fScaledPhysicalRect = fPhysicalRect;
 	}
 
 	if (msg->HasInt32(kJDFirstPage))
