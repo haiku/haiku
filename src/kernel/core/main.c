@@ -35,6 +35,7 @@
 #include <kdevice_manager.h>
 #include <real_time_clock.h>
 #include <kernel_daemon.h>
+#include <messaging.h>
 
 #include <string.h>
 
@@ -192,6 +193,10 @@ main2(void *unused)
 		// with the kernel args ranges it contains (and which are freed here).
 		vm_free_kernel_args(&ka);
 	}
+
+	// init the messaging service
+	TRACE(("Init Messaging Service\n"));
+	init_messaging_service();
 
 	/* bootstrap all the filesystems */
 	TRACE(("Bootstrap file systems\n"));
