@@ -18,7 +18,6 @@ media_destination::media_destination(port_id port,
 	: port(port),
 	id(id)
 {
-	CALLED();
 }
 
 // final
@@ -26,14 +25,12 @@ media_destination::media_destination(const media_destination &clone)
 	: port(clone.port),
 	id(clone.id)
 {
-	CALLED();
 }
 
 // final
 media_destination &
 media_destination::operator=(const media_destination &clone)
 {
-	CALLED();
 	port = clone.port;
 	id = clone.id;
 	return *this;
@@ -44,13 +41,11 @@ media_destination::media_destination()
 	: port(-1),
 	id(-1)
 {
-	CALLED();
 }
 
 // final
 media_destination::~media_destination()
 {
-	CALLED();
 }
 
 // final & verfied
@@ -66,7 +61,6 @@ media_source::media_source(port_id port,
 	: port(port),
 	id(id)
 {
-	CALLED();
 }
 
 // final
@@ -74,14 +68,12 @@ media_source::media_source(const media_source &clone)
 	: port(clone.port),
 	id(clone.id)
 {
-	CALLED();
 }
 
 // final
 media_source &
 media_source::operator=(const media_source &clone)
 {
-	CALLED();
 	port = clone.port;
 	id = clone.id;
 	return *this;
@@ -92,13 +84,11 @@ media_source::media_source()
 	: port(-1),
 	id(-1)
 {
-	CALLED();
 }
 
 // final
 media_source::~media_source()
 {
-	CALLED();
 }
 
 // final & verfied
@@ -111,14 +101,12 @@ media_source media_source::null(-1,-1);
 // final
 bool operator==(const media_destination & a, const media_destination & b)
 {
-	CALLED();
 	return (a.port == b.port) && (a.id == b.id);
 }
 
 // final
 bool operator!=(const media_destination & a, const media_destination & b)
 {
-	CALLED();
 	return (a.port != b.port) || (a.id != b.id);
 }
 
@@ -131,14 +119,12 @@ bool operator<(const media_destination & a, const media_destination & b)
 // final
 bool operator==(const media_source & a, const media_source & b)
 {
-	CALLED();
 	return (a.port == b.port) && (a.id == b.id);
 }
 
 // final
 bool operator!=(const media_source & a, const media_source & b)
 {
-	CALLED();
 	return (a.port != b.port) || (a.id != b.id);
 }
 
@@ -151,14 +137,12 @@ bool operator<(const media_source & a, const media_source & b)
 // final
 bool operator==(const media_node & a, const media_node & b)
 {
-	CALLED();
 	return (a.node == b.node) && (a.port == b.port) && (a.kind == b.kind);
 }
 
 // final
 bool operator!=(const media_node & a, const media_node & b)
 {
-	CALLED();
 	return (a.node != b.node) || (a.port != b.port) || (a.kind != b.kind);
 }
 
@@ -237,7 +221,7 @@ media_format::MetaDataSize() const
 media_format::media_format()
 {
 	CALLED();
-	memset(this,0x00,sizeof(*this));
+	memset(this, 0x00, sizeof(*this));
 	//meta_data, meta_data_size, meta_data_area, use_area, 
 	//team, and thisPtr are currently only used by decoders
 	//when communicating with the file reader; they're not
@@ -250,14 +234,12 @@ media_format::media_format()
 // final
 media_format::media_format(const media_format &other)
 {
-	CALLED();
 	*this = other;
 }
 
 // final
 media_format::~media_format()
 {
-	CALLED();
 }
 
 
@@ -265,18 +247,17 @@ media_format::~media_format()
 media_format &
 media_format::operator=(const media_format &clone)
 {
-	CALLED();
-	memset(this,0x00,sizeof(*this));
+	memset(this, 0x00, sizeof(*this));
 
 	type = clone.type;
 	user_data_type = clone.user_data_type;
 
-	memcpy(user_data,clone.user_data,sizeof(media_format::user_data));
+	memcpy(user_data, clone.user_data, sizeof(media_format::user_data));
 
 	require_flags = clone.require_flags;
 	deny_flags = clone.deny_flags;
 
-	memcpy(u._reserved_,clone.u._reserved_,sizeof(media_format::u._reserved_));
+	memcpy(u._reserved_, clone.u._reserved_, sizeof(media_format::u._reserved_));
 	return *this;
 }
 
