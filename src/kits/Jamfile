@@ -26,8 +26,8 @@ LinkSharedOSLibs libopenbeos.so :
 # Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
 # rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
 # libopenbeos.so.
-File <boot!home!config!lib>/boot/home/config/lib/libopenbeos.so
-	: libopenbeos.so ;
+LOCATE on <boot!home!config!lib>libopenbeos.so = /boot/home/config/lib ;
+File <boot!home!config!lib>libopenbeos.so : libopenbeos.so ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
