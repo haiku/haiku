@@ -21,6 +21,7 @@
 //
 //	File Name:		Globals.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Caz <turok2@currantbun.com>
 //	Description:	Global functions and variables for the Interface Kit
 //
 //------------------------------------------------------------------------------
@@ -28,23 +29,22 @@
 #include <AppServerLink.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
-#include <Menu.h>
 #include <ServerProtocol.h>
 #include <Screen.h>
 #include <PortMessage.h>
 #include <Roster.h>
-#include <TextView.h>
-
-#include <WidthBuffer.h>
+#include <stdlib.h>
 
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
+extern status_t _control_input_server_(BMessage *command, BMessage *reply);
 
 using namespace BPrivate;
 
 
 // InterfaceDefs.h
+
 _IMPEXP_BE const color_map *
 system_colors()
 {
@@ -86,159 +86,288 @@ set_scroll_bar_info(scroll_bar_info *info)
 _IMPEXP_BE status_t
 get_mouse_type(int32 *type)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igmt');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("mouse_type", type) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_mouse_type(int32 type)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Ismt');
+	BMessage reply;
+
+	command.AddInt32("mouse_type", type);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_map(mouse_map *map)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igmm');
+	BMessage reply;
+	const void *data = 0;
+	int32 count;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindData("mousemap", B_ANY_TYPE, &data, &count) != B_OK)
+		return B_ERROR;
+	
+	memcpy(map, data, count);
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_mouse_map(mouse_map *map)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Ismm');
+	BMessage reply;
+	
+	command.AddData("mousemap", B_ANY_TYPE, map, sizeof(mouse_map));
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 _IMPEXP_BE status_t
 get_click_speed(bigtime_t *speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igcs');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt64("speed", speed) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_click_speed(bigtime_t speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Iscs');
+	BMessage reply;
+	command.AddInt64("speed", speed);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_speed(int32 *speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igms');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("speed", speed) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_mouse_speed(int32 speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Isms');
+	BMessage reply;
+	command.AddInt32("speed", speed);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_acceleration(int32 *speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igma');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("speed", speed) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_mouse_acceleration(int32 speed)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Isma');
+	BMessage reply;
+	command.AddInt32("speed", speed);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE status_t
 get_key_repeat_rate(int32 *rate)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igrr');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("rate", rate) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_key_repeat_rate(int32 rate)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Isrr');
+	BMessage reply;
+	command.AddInt32("rate", rate);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE status_t
 get_key_repeat_delay(bigtime_t *delay)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igrd');
+	BMessage reply;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt64("delay", delay) != B_OK)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE status_t
 set_key_repeat_delay(bigtime_t  delay)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Isrd');
+	BMessage reply;
+	command.AddInt64("delay", delay);
+	return _control_input_server_(&command, &reply) == B_OK;
 }
 
 
 _IMPEXP_BE uint32
 modifiers()
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igmd');
+	BMessage reply;
+	int32 err, modifier;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("status", &err) != B_OK)
+		return 0;
+	
+	if(reply.FindInt32("modifiers", &modifier) != B_OK)
+		return 0;
+
+	return modifier;
 }
 
 
 _IMPEXP_BE status_t
 get_key_info(key_info *info)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igki');
+	BMessage reply;
+	const void *data = 0;
+	int32 count, err;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindInt32("status", &err) != B_OK)
+		return B_ERROR;
+	
+	if(reply.FindData("key_info", B_ANY_TYPE, &data, &count) != B_OK)
+		return B_ERROR;
+	
+	memcpy(info, data, count);
+	return B_OK;
 }
 
 
 _IMPEXP_BE void
 get_key_map(key_map **map, char **key_buffer)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igkm');
+	BMessage reply;
+	int32 map_count, key_count;
+	const void *map_array = 0, *key_array = 0;
+	
+	_control_input_server_(&command, &reply);
+	
+	if(reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK)
+	{
+		*map = 0; *key_buffer = 0;
+		return;
+	}
+	
+	if(reply.FindData("key_buffer", B_ANY_TYPE, &key_array, &key_count) != B_OK)
+	{
+		*map = 0; *key_buffer = 0;
+		return;
+	}
+	
+	*map = (key_map *)malloc(map_count);
+	memcpy(*map, map_array, map_count);
+	*key_buffer = (char *)malloc(key_count);
+	memcpy(*key_buffer, key_array, key_count);
 }
 
 
 _IMPEXP_BE status_t
 get_keyboard_id(uint16 *id)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Igid');
+	BMessage reply;
+	uint16 kid;
+	
+	_control_input_server_(&command, &reply);
+	
+	reply.FindInt16("id", (int16 *)&kid);
+	*id = kid;
+	
+	return B_OK;
 }
 
 
 _IMPEXP_BE void
 set_modifier_key(uint32 modifier, uint32 key)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Ismk');
+	BMessage reply;
+	
+	command.AddInt32("modifier", modifier);
+	command.AddInt32("key", key);
+	_control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE void
 set_keyboard_locks(uint32 modifiers)
 {
-	// Contacts the input_server via _control_input_server_(BMessage *, BMessage *)
-	// TODO: Implement
+	BMessage command('Iskl');
+	BMessage reply;
+	
+	command.AddInt32("locks", modifiers);
+	_control_input_server_(&command, &reply);
 }
 
 
@@ -405,59 +534,22 @@ ui_color(color_which which)
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {
-	rgb_color result;
-
-	#define LIGHTEN(x) ((uint8)(255.0f - (255.0f - x) * tint))
-	#define DARKEN(x)  ((uint8)(x * (2 - tint)))
-
-	if (tint < 1.0f)
-	{
-		result.red   = LIGHTEN(color.red);
-		result.green = LIGHTEN(color.green);
-		result.blue  = LIGHTEN(color.blue);
-		result.alpha = color.alpha;
-	}
-	else
-	{
-		result.red   = DARKEN(color.red);
-		result.green = DARKEN(color.green);
-		result.blue  = DARKEN(color.blue);
-		result.alpha = color.alpha;
-	}
-
-	#undef LIGHTEN
-	#undef DARKEN
-
-	return result;
+	// Internally calculates the color
+	// TODO: Implement
 }
 
 
 extern "C" status_t
 _init_interface_kit_()
 {
-	sem_id widthSem = create_sem(1, "TextView WidthBuffer Sem");
-	if (widthSem < 0)
-		return widthSem;
-	BTextView::sWidthSem = widthSem;
-	BTextView::sWidthAtom = 0;
-	BTextView::sWidths = new _BWidthBuffer_;
-		
-	status_t result = get_menu_info(&BMenu::sMenuInfo);
-	if (result != B_OK)  
-		return result;
-	
-	//TODO: fill the other static members
-		
-	return B_OK;
+	// TODO: Find out what this does and when it's called
 }
 
 
 extern "C" status_t
 _fini_interface_kit_()
 {
-	//TODO: Implement ?
-	
-	return B_OK;
+	// TODO: Find out what this does and when it's called
 }
 
 
