@@ -158,7 +158,7 @@ static void insert_in_buf(char c)
 static int handle_keyboard_interrupt(void* data)
 {
 	unsigned char key;
-	int retval = B_UNHANDLED_INTERRUPT;
+	int retval = B_HANDLED_INTERRUPT;
 
 	key = in8(0x60);
 //	dprintf("handle_keyboard_interrupt: key = 0x%x\n", key);
@@ -306,7 +306,7 @@ static int setup_keyboard(void)
 status_t init_hardware()
 {
 	setup_keyboard();
-	install_io_interrupt_handler(0x21, &handle_keyboard_interrupt, NULL, 0);
+	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
 
 	return 0;
 }

@@ -55,7 +55,7 @@
 #include <string.h>
 
 #define _PS2MOUSE_
-#include <arch/x86/ps2mouse.h>
+#include "ps2mouse.h"
 
 #define DEVICE_NAME "ps2mouse"
 int32	api_version = B_CUR_DRIVER_API_VERSION;
@@ -304,11 +304,11 @@ status_t init_hardware()
 	memset(&md_int, 0, sizeof(mouse_data));
 
 	// register interrupt handler
-	install_io_interrupt_handler(INT_BASE + INT_PS2_MOUSE,
+	install_io_interrupt_handler(INT_PS2_MOUSE,
 	                             &handle_mouse_interrupt, NULL, 0);
 
 	// must enable the cascade interrupt
-	arch_int_enable_io_interrupt(INT_BASE + INT_CASCADE);
+	arch_int_enable_io_interrupt(INT_CASCADE);
 
 	// enable auxilary device, IRQs and PS/2 mouse
 	write_command_byte(PS2_CMD_DEV_INIT);
