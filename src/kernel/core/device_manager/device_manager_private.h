@@ -251,6 +251,11 @@ void pnp_defer_probing_of_children( pnp_node_info *node );
 void pnp_probe_waiting_children_nolock( pnp_node_info *node );
 void pnp_probe_waiting_children( pnp_node_info *node );
 
+// root_node.c
+
+extern void pnp_root_init_root(void);
+extern void pnp_root_destroy_root(void);
+extern void pnp_root_rescan_root(void);
 
 // scan.c
 
