@@ -2130,6 +2130,7 @@ MatroskaFile  *mkv_Open(FileCache *io,
   return mkv_OpenEx(io,0,err_msg,msgsize);
 }
 
+#if 0
 MatroskaFile  *mkv_OpenFile(const char *filename,
 			    unsigned cache_size,
 			    unsigned flags,
@@ -2161,6 +2162,7 @@ MatroskaFile  *mkv_OpenFile(const char *filename,
 
   return mkv_OpenEx(cc,flags,err_msg,msgsize);
 }
+#endif
 
 void	      mkv_Close(MatroskaFile *mf) {
   unsigned  i,j;
