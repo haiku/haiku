@@ -58,7 +58,6 @@ typedef my_ino_t		vnode_id;
 #	define B_CUR_FS_API_VERSION 2
 #endif
 
-struct attr_info;
 struct index_info;
 
 typedef int	op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
@@ -135,7 +134,7 @@ typedef int	op_remove_attr(void *ns, void *node, const char *name);
 typedef	int	op_rename_attr(void *ns, void *node, const char *oldname,
 					const char *newname);
 typedef int	op_stat_attr(void *ns, void *node, const char *name,
-					struct attr_info *buf);
+					my_attr_info *buf);
 
 typedef int	op_write_attr(void *ns, void *node, const char *name, int type,
 					const void *buf, size_t *len, fs_off_t pos);
