@@ -128,8 +128,9 @@ void StyledEditWindow::InitWindow(){
 	
 	viewFrame= Bounds();
 	
-	viewFrame.top = MENU_BAR_HEIGHT+1;
+	viewFrame.top = MENU_BAR_HEIGHT; //021021
 	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
+	viewFrame.left = B_V_SCROLL_BAR_WIDTH-15; //021021
 	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT; 
 	
 	
@@ -141,11 +142,11 @@ void StyledEditWindow::InitWindow(){
 	fTextView= new StyledEditView(viewFrame, textBounds, this);
 	fTextView-> SetDoesUndo(true);
 	fTextView-> SetStylable(true);
-	fTextView-> MakeFocus(true);
+	
 	
 	fScrollView= new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0, true, true, B_NO_BORDER);
 	AddChild(fScrollView);
-	
+	fTextView-> MakeFocus(true);
 	
 		
 	//Add "File"-menu:
@@ -157,17 +158,17 @@ void StyledEditWindow::InitWindow(){
 	fMenuBar-> AddItem(menu);
 	
 	menu-> AddItem(menuItem= new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
-	menu-> AddItem(menuItem= new BMenuItem("Open..", new BMessage(MENU_OPEN)));
+	menu-> AddItem(menuItem= new BMenuItem("Open...", new BMessage(MENU_OPEN), 'O'));
 	menuItem->SetTarget(be_app);
 	menu-> AddSeparatorItem(); 
 	
 	menu-> AddItem(fSaveItem= new BMenuItem("Save", new BMessage(MENU_SAVE), 'S')); 
 	fSaveItem-> SetEnabled(false); 
-	menu-> AddItem(menuItem= new BMenuItem("Save as", new BMessage(MENU_SAVEAS)));
+	menu-> AddItem(menuItem= new BMenuItem("Save as...", new BMessage(MENU_SAVEAS)));
 	menuItem-> SetEnabled(true);				
 	
-	menu-> AddItem(menuItem= new BMenuItem("Revert to Saved", new BMessage(MENU_REVERT))); 
-	menuItem-> SetEnabled(true); 									
+	menu-> AddItem(fRevertItem= new BMenuItem("Revert to Saved", new BMessage(MENU_REVERT))); 
+	fRevertItem-> SetEnabled(false); 									
 	menu-> AddItem(menuItem= new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
 	
 	menu-> AddSeparatorItem();
@@ -206,10 +207,10 @@ void StyledEditWindow::InitWindow(){
 	menuItem-> SetTarget(fTextView);
 	
 	menu-> AddSeparatorItem();
-	menu-> AddItem(menuItem= new BMenuItem("Find", new BMessage(MENU_FIND),'F'));
+	menu-> AddItem(menuItem= new BMenuItem("Find...", new BMessage(MENU_FIND),'F'));
 	menu-> AddItem(menuItem= new BMenuItem("Find Again",new BMessage(MENU_FIND_AGAIN),'G'));
 	menu-> AddItem(menuItem= new BMenuItem("Find Selection", new BMessage(MENU_FIND_SELECTION),'H'));
-	menu-> AddItem(menuItem= new BMenuItem("Replace", new BMessage(MENU_REPLACE),'R'));
+	menu-> AddItem(menuItem= new BMenuItem("Replace...", new BMessage(MENU_REPLACE),'R'));
 	menu-> AddItem(menuItem= new BMenuItem("Replace Same", new BMessage(MENU_REPLACE_SAME),'T'));
 	
 	//Add the "Font"-menu:
@@ -312,7 +313,7 @@ void StyledEditWindow::InitWindow(){
 	
 	fSavePanel= new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false);
 	Register(true);
-	Minimize(true);	
+		
 	}  /***StyledEditWindow::Initwindow()***/
 	
 	void StyledEditWindow::MessageReceived(BMessage *message){
@@ -654,6 +655,7 @@ status_t StyledEditWindow::Save(BMessage *message){
 		
 		fSaveItem-> SetEnabled(false); 
 		fTextSaved= true;
+		fRevertItem-> SetEnabled(true);
 		return err;						
 } /***Save()***/
 
@@ -682,6 +684,7 @@ void StyledEditWindow::OpenFile(entry_ref *ref){
 				fSaveMessage->AddRef("directory",&parentRef);
 				fSaveMessage->AddString("name", name);
 				SetTitle(name);
+				fRevertItem-> SetEnabled(true);
 			}	
 		}
 	}				

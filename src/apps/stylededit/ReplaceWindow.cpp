@@ -30,11 +30,13 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 				: BWindow(frame, "", B_MODAL_WINDOW, B_NOT_RESIZABLE,B_CURRENT_WORKSPACE) 
 			{
 	
-	fReplaceView=new BView(Bounds(),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	fReplaceView= new BView(Bounds(),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 	fReplaceView->SetViewColor(216,216,216);
+	
 	fReplaceView->AddChild (fSearchString= new BTextControl(BRect(5,10,290,50), "", "Find:",NULL, NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fSearchString->SetDivider(65);
+	fSearchString-> SetDivider(65);
+	
 	fReplaceView->AddChild(fReplaceString=new BTextControl(BRect(5,35,290,50), "", "Replace with:",NULL,
 		 NULL,B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
 	fReplaceString->SetDivider(65);
@@ -59,13 +61,14 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 	fReplaceButton->MakeDefault(true);
 	
 	AddChild(fReplaceView);
-	fHandler=_handler;
+	fHandler= _handler;
 	
 	const char *searchtext= searchString->String();
 	const char *replacetext= replaceString->String(); 
 	
 	fSearchString->SetText(searchtext);
 	fReplaceString->SetText(replacetext);
+	fSearchString-> MakeFocus(true); //021021
 	
 	if(*caseState== true)
 		fCaseSensBox->SetValue(B_CONTROL_ON);

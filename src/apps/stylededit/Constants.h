@@ -10,7 +10,12 @@
 #include <SupportDefs.h>
 #endif
 
-#define APP_SIGNATURE  "application/x-vnd.obos-stylededit"
+//See if this takes care of some problems with closing the application
+//by clicking the windowtab
+//#define APP_SIGNATURE  "application/x-vnd.obos-stylededit"
+//application signature consistent with with the one in StyledEdit.rdef
+//seems to work, 021021
+#define APP_SIGNATURE  "application/x-vnd.obos.styled-edit"
 
 const float MENU_BAR_HEIGHT= 19.0;
 const float TEXT_INSET= 3.0;

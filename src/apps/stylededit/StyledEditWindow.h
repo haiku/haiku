@@ -69,6 +69,7 @@ class StyledEditWindow: public BWindow{
 		BMessage		*fPrintSettings;
 		BMessage		*fSaveMessage; 
 		BMenuItem		*fSaveItem;
+		BMenuItem		*fRevertItem;
 		BMenuItem		*fUndoItem;
 		BMenuItem		*fCutItem;
 		BMenuItem		*fCopyItem;

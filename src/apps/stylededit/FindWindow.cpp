@@ -38,7 +38,7 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, b
 															
 	fFindView->AddChild(fSearchString= new BTextControl(BRect(14,12,277,30), "", "Find:", NULL, NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fSearchString->SetDivider(27);
+		fSearchString->SetDivider(27);
 	fFindView->AddChild(fCaseSensBox= new BCheckBox(BRect(44,36,162,52),"","Case-sensitive", NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
 	fFindView->AddChild(fWrapBox= new BCheckBox(BRect(44,58,190,73),"","Wrap-around search", NULL,
@@ -56,7 +56,8 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, b
 	
 	const char *text= searchString->String();
 	
-	fSearchString->SetText(text);
+    fSearchString->SetText(text);
+	fSearchString-> MakeFocus(true); //021021
 	
 	if(*caseState== true)
 		fCaseSensBox->SetValue(B_CONTROL_ON);
