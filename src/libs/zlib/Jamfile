@@ -8,12 +8,10 @@ SharedLibrary z :
 	crc32.c
 	deflate.c
 	gzio.c
-	infblock.c
-	infcodes.c
+	infback.c
 	inffast.c
 	inflate.c
 	inftrees.c
-	infutil.c
 	trees.c
 	uncompr.c
 	zutil.c
