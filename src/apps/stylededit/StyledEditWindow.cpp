@@ -12,6 +12,7 @@
 #include <ScrollView.h>
 #include <stdlib.h>
 #include <String.h>
+#include <TextControl.h>
 #include <TranslationUtils.h>
 #include <Window.h>
 
@@ -274,7 +275,16 @@ StyledEditWindow::InitWindow()
 	/***************************MENUS ADDED***********************/
 	
 	fSavePanel= new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false);
-
+	fSavePanelTextView = 
+	   dynamic_cast<BTextControl*>(fSavePanel->Window()->FindView("text view"));
+	BMenuBar * menuBar =
+	   dynamic_cast<BMenuBar*>(fSavePanel->Window()->FindView("MenuBar"));
+	   
+	fSavePanelEncodingMenu= new BMenu("Encoding");
+	menuBar->AddItem(fSavePanelEncodingMenu);
+	
+	// TODO: add encodings
+	
 }  /***StyledEditWindow::Initwindow()***/
 	
 void
@@ -656,18 +666,15 @@ StyledEditWindow::Save(BMessage *message)
 	return err;						
 } /***Save()***/
 
-#include <TextControl.h>
-#include <Autolock.h>
-
 status_t
 StyledEditWindow::SaveAs()
 {
-	BWindow * saveWindow = fSavePanel->Window();
-	BTextControl * textView = 
-	   dynamic_cast<BTextControl*>(saveWindow->FindView("text view"));
-	if (textView) {
-		BAutolock lock(saveWindow);
-		textView->SetText(Title());
+	// it's own scope allows the lock to be released before Show()
+	{
+		BAutolock lock(fSavePanel->Window());
+		if (lock.IsLocked()) {
+			fSavePanelTextView->SetText(Title());
+		}
 	}
 	fSavePanel->Show();
 }

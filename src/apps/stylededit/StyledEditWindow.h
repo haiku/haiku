@@ -73,7 +73,10 @@ private:
 	
 	StyledEditView  *fTextView;
 	BScrollView		*fScrollView;
+	
 	BFilePanel		*fSavePanel;
+	BTextControl	*fSavePanelTextView;
+	BMenu			*fSavePanelEncodingMenu;
 		
 };
 

@@ -11,7 +11,15 @@ StyledEditApp * styled_edit_app;
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE)
 {
-	fOpenPanel= new BFilePanel;
+	fOpenPanel= new BFilePanel();
+	BMenuBar * menuBar =
+	   dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
+	   
+	fOpenPanelEncodingMenu= new BMenu("Encoding");
+	menuBar->AddItem(fOpenPanelEncodingMenu);
+
+	// TODO: add encodings
+	
 	fWindowCount= 0;
 	fNext_Untitled_Window= 1;
 	styled_edit_app = this;
@@ -38,7 +46,7 @@ void
 StyledEditApp::OpenDocument()
 {
 	new StyledEditWindow(windowRect,fNext_Untitled_Window++);
-	windowRect.OffsetBy(15,15); // todo: wrap around screen
+	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }
 
@@ -46,7 +54,7 @@ void
 StyledEditApp::OpenDocument(entry_ref * ref)
 {
 	new StyledEditWindow(windowRect,ref);
-	windowRect.OffsetBy(15,15); // todo: wrap around screen
+	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }
 
