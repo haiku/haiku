@@ -942,7 +942,7 @@ sem_used_sems(void)
 
 
 sem_id
-user_create_sem(int32 count, const char *userName)
+_user_create_sem(int32 count, const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
 
@@ -958,49 +958,49 @@ user_create_sem(int32 count, const char *userName)
 
 
 status_t
-user_delete_sem(sem_id id)
+_user_delete_sem(sem_id id)
 {
 	return delete_sem(id);
 }
 
 
 status_t
-user_delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
+_user_delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 {
 	return delete_sem_etc(id, return_code, interrupted);
 }
 
 
 status_t
-user_acquire_sem(sem_id id)
+_user_acquire_sem(sem_id id)
 {
-	return user_acquire_sem_etc(id, 1, 0, 0);
+	return _user_acquire_sem_etc(id, 1, 0, 0);
 }
 
 
 status_t
-user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
+_user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
 	return acquire_sem_etc(id, count, flags | B_CAN_INTERRUPT, timeout);
 }
 
 
 status_t
-user_release_sem(sem_id id)
+_user_release_sem(sem_id id)
 {
 	return release_sem_etc(id, 1, 0);
 }
 
 
 status_t
-user_release_sem_etc(sem_id id, int32 count, uint32 flags)
+_user_release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
 	return release_sem_etc(id, count, flags);
 }
 
 
 status_t
-user_get_sem_count(sem_id id, int32 *userCount)
+_user_get_sem_count(sem_id id, int32 *userCount)
 {
 	status_t status;
 	int32 count;
@@ -1017,7 +1017,7 @@ user_get_sem_count(sem_id id, int32 *userCount)
 
 
 status_t
-user_get_sem_info(sem_id id, struct sem_info *userInfo, size_t size)
+_user_get_sem_info(sem_id id, struct sem_info *userInfo, size_t size)
 {
 	struct sem_info info;
 	status_t status;
@@ -1034,7 +1034,7 @@ user_get_sem_info(sem_id id, struct sem_info *userInfo, size_t size)
 
 
 status_t
-user_get_next_sem_info(team_id team, int32 *userCookie, struct sem_info *userInfo,
+_user_get_next_sem_info(team_id team, int32 *userCookie, struct sem_info *userInfo,
 	size_t size)
 {
 	struct sem_info info;
@@ -1059,7 +1059,7 @@ user_get_next_sem_info(team_id team, int32 *userCookie, struct sem_info *userInf
 
 
 status_t
-user_set_sem_owner(sem_id id, team_id team)
+_user_set_sem_owner(sem_id id, team_id team)
 {
 	return set_sem_owner(id, team);
 }

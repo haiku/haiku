@@ -780,7 +780,7 @@ register_image(image_t *image, int fd, const char *path)
 	info.init_routine = (void *)image->init_routine;
 	info.term_routine = (void *)image->term_routine;
 	
-	if (_kern_read_stat(fd, &stat, sizeof(struct stat)) == B_OK) {
+	if (_kern_read_stat(fd, NULL, false, &stat, sizeof(struct stat)) == B_OK) {
 		info.device = stat.st_dev;
 		info.node = stat.st_ino;
 	} else {
@@ -819,7 +819,7 @@ load_container(char const *path, char const *name, image_type type)
 		return found;
 	}
 
-	fd = _kern_open(path, 0);
+	fd = _kern_open(-1, path, 0);
 	FATAL((fd < 0), "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));

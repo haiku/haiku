@@ -303,21 +303,21 @@ set_alarm(bigtime_t time, uint32 mode)
 
 
 bigtime_t
-user_set_alarm(bigtime_t time, uint32 mode)
+_user_set_alarm(bigtime_t time, uint32 mode)
 {
 	return set_alarm(time, mode);
 }
 
 
 int
-user_send_signal(pid_t team, uint signal)
+_user_send_signal(pid_t team, uint signal)
 {
 	return send_signal(team, signal);
 }
 
 
 int
-user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *userOldAction)
+_user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *userOldAction)
 {
 	struct sigaction act, oact;
 	int rc;

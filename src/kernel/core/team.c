@@ -1090,7 +1090,7 @@ _user_get_current_team(void)
 
 
 int
-user_getenv(const char *userName, char **_userValue)
+_user_getenv(const char *userName, char **_userValue)
 {
 	char name[SYS_THREAD_STRING_LENGTH_MAX];
 	char *value;
@@ -1113,7 +1113,7 @@ user_getenv(const char *userName, char **_userValue)
 
 
 int
-user_setenv(const char *userName, const char *userValue, int overwrite)
+_user_setenv(const char *userName, const char *userValue, int overwrite)
 {
 	char name[SYS_THREAD_STRING_LENGTH_MAX];
 	char value[SYS_THREAD_STRING_LENGTH_MAX];

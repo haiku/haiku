@@ -213,7 +213,7 @@ sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp, void *newp, size_t 
 
 
 int
-user_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
+_user_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
            void *newp, size_t newlen)
 {
 	void *a1 = NULL, *a2 = NULL;

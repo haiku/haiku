@@ -1086,7 +1086,7 @@ set_port_owner(port_id id, team_id team)
 
 
 port_id
-user_create_port(int32 queueLength, const char *userName)
+_user_create_port(int32 queueLength, const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
 
@@ -1102,21 +1102,21 @@ user_create_port(int32 queueLength, const char *userName)
 
 
 status_t
-user_close_port(port_id id)
+_user_close_port(port_id id)
 {
 	return close_port(id);
 }
 
 
 status_t
-user_delete_port(port_id id)
+_user_delete_port(port_id id)
 {
 	return delete_port(id);
 }
 
 
 port_id
-user_find_port(const char *userName)
+_user_find_port(const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
 
@@ -1131,7 +1131,7 @@ user_find_port(const char *userName)
 
 
 status_t
-user_get_port_info(port_id id, struct port_info *userInfo)
+_user_get_port_info(port_id id, struct port_info *userInfo)
 {
 	struct port_info info;
 	status_t status;
@@ -1152,7 +1152,7 @@ user_get_port_info(port_id id, struct port_info *userInfo)
 
 
 status_t
-user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *userInfo)
+_user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *userInfo)
 {
 	struct port_info info;
 	status_t status;
@@ -1176,21 +1176,21 @@ user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *userI
 
 
 ssize_t
-user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
+_user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
 {
 	return port_buffer_size_etc(port, flags | B_CAN_INTERRUPT, timeout);
 }
 
 
 ssize_t
-user_port_count(port_id port)
+_user_port_count(port_id port)
 {
 	return port_count(port);
 }
 
 
 status_t
-user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
+_user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
 	int32 messageCode;
@@ -1212,14 +1212,14 @@ user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 
 
 status_t
-user_set_port_owner(port_id port, team_id team)
+_user_set_port_owner(port_id port, team_id team)
 {
 	return set_port_owner(port, team);
 }
 
 
 status_t
-user_write_port_etc(port_id port, int32 messageCode, void *userBuffer,
+_user_write_port_etc(port_id port, int32 messageCode, const void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
 	if (userBuffer == NULL)
