@@ -166,7 +166,7 @@ public:
 	status_t DeleteIconForType(const char *type, icon_size which);
 	status_t DeletePreferredApp(app_verb verb = B_OPEN);
 	status_t DeleteSnifferRule();
-	status_t DeleteSupportedTypes();
+	status_t DeleteSupportedTypes(bool fullSync = true);
 
 private:
 	BMimeType(const char *mimeType, const char *mimePath);

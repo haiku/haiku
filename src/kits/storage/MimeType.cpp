@@ -606,7 +606,7 @@ BMimeType::GetLongDescription(char *description) const
 		</tr>
 	</table>
 	
-	The \c BMessage::what value is set to decimal \c 0, but is otherwise meaningless.
+	The \c BMessage::what value is meaningless and should be ignored.
 	
 	\param signatures Pointer to a pre-allocated BMessage into which the signatures
 	                  of the supporting applications will be copied.
@@ -619,11 +619,13 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 {
 	status_t err = signatures ? B_OK : B_BAD_VALUE;
 
-	BMessage msg(B_REG_MIME_GET_SUPPORTING_APPS);
-	BMessage reply;
+	BMessage &msg = *signatures;
+	BMessage &reply = *signatures;
 	status_t result;
 	
 	// Build and send the message, read the reply
+	if (!err)
+		msg.what = B_REG_MIME_GET_SUPPORTING_APPS;
 	if (!err)
 		err = msg.AddString("type", Type());
 	if (!err) 
@@ -634,8 +636,8 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 		err = reply.FindInt32("result", &result);
 	if (!err) 
 		err = result;
-	if (!err)
-		err = reply.FindMessage("signatures", signatures);
+//	if (!err)
+//		err = reply.FindMessage("signatures", signatures);
 	return err;	
 }
 
@@ -946,11 +948,13 @@ BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 {
 	status_t err = supertypes ? B_OK : B_BAD_VALUE;
 
-	BMessage msg(B_REG_MIME_GET_INSTALLED_SUPERTYPES);
-	BMessage reply;
+	BMessage &msg = *supertypes;
+	BMessage &reply = *supertypes;
 	status_t result;
 	
 	// Build and send the message, read the reply
+	if (!err)
+		msg.what = B_REG_MIME_GET_INSTALLED_SUPERTYPES;
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
@@ -959,8 +963,6 @@ BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
 		err = result;
-	if (!err)
-		err = reply.FindMessage("types", supertypes);
 	return err;	
 }
 
@@ -1003,11 +1005,13 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 {
 	status_t err = types ? B_OK : B_BAD_VALUE;
 
-	BMessage msg(B_REG_MIME_GET_INSTALLED_TYPES);
-	BMessage reply;
+	BMessage &msg = *types;
+	BMessage &reply = *types;
 	status_t result;
 	
 	// Build and send the message, read the reply
+	if (!err)
+		msg.what = B_REG_MIME_GET_INSTALLED_TYPES;
 	if (!err && supertype)
 		err = msg.AddString("supertype", supertype);
 	if (!err) 
@@ -1018,8 +1022,6 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
 		err = result;
-	if (!err)
-		err = reply.FindMessage("types", types);
 	return err;	
 }
 
@@ -1301,7 +1303,10 @@ BMimeType::SetIconForType(const char *type, const BBitmap *icon, icon_size which
 status_t
 BMimeType::GetSnifferRule(BString *result) const
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();
+	if (!err)
+		err = get_sniffer_rule(Type(), result);
+	return err;
 }
 
 // SetSnifferRule
@@ -1324,7 +1329,30 @@ BMimeType::GetSnifferRule(BString *result) const
 status_t
 BMimeType::SetSnifferRule(const char *rule)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();
+	if (!err && rule)
+		err = CheckSnifferRule(rule, NULL);
+
+	BMessage msg(rule ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_SNIFFER_RULE);
+	if (!err && rule) 
+		err = msg.AddString("sniffer rule", rule);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // CheckSnifferRule
@@ -1618,9 +1646,9 @@ BMimeType::DeleteSnifferRule()
 // DeleteSupportedTypes
 //! Deletes the mime type's supported types
 status_t
-BMimeType::DeleteSupportedTypes()
+BMimeType::DeleteSupportedTypes(bool fullSync)
 {
-	return SetSupportedTypes(NULL);
+	return SetSupportedTypes(NULL, fullSync);
 }
 
 void BMimeType::_ReservedMimeType1() {}
@@ -1653,7 +1681,36 @@ BMimeType::GetSupportedTypes(BMessage *types)
 }
 
 // SetSupportedTypes
-//! For the moment, see BAppFileInfo::SetSupportedTypes()
+/*!	\brief Sets the list of MIME types supported by the MIME type (which is
+	assumed to be an application signature).
+	
+	If \a types is \c NULL the application's supported types are unset.
+
+	The supported MIME types must be stored in a field "types" of type
+	\c B_STRING_TYPE in \a types.
+
+	For each supported type the result of BMimeType::GetSupportingApps() will
+	afterwards include the signature of this application. 
+
+	\a fullSync specifies whether or not any types that are no longer
+	listed as supported types as of this call to SetSupportedTypes() shall be
+	updated as well, i.e. whether this application shall be removed from their
+	lists of supporting applications.
+	
+	If \a fullSync is \c false, this application will not be removed from the
+	previously supported types' supporting apps lists until the next call
+	to BMimeType::SetSupportedTypes() or BMimeType::DeleteSupportedTypes()
+	with a \c true \a fullSync parameter, the next call to BMimeType::Delete(),
+	or the next reboot.
+
+	\param types The supported types to be assigned to the file.
+		   May be \c NULL.
+	\param syncAll \c true to also synchronize the previously supported
+		   types, \c false otherwise.
+	\return
+	- \c B_OK: success
+	- other error codes: failure
+*/
 status_t
 BMimeType::SetSupportedTypes(const BMessage *types, bool fullSync)
 {
