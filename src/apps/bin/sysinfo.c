@@ -10,6 +10,7 @@
  * (one char options, except -te, and "-" is like -id)
  */
 
+#define OBOS_CPU_TYPES
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -175,20 +176,26 @@ static char *get_cpu_type_string(uint32 cpu_type, char *buffer)
 		cpu_type == B_CPU_INTEL_CELERON ? "Celeron" :
 		cpu_type == B_CPU_INTEL_PENTIUM_III ? "Pentium III" :
 		cpu_type == B_CPU_INTEL_PENTIUM_III_MODEL_8 ? "Pentium III" :
+		cpu_type == B_CPU_INTEL_PENTIUM_IV ? "Pentium IV" :
+		cpu_type == B_CPU_INTEL_PENTIUM_IV_MODEL2 ? "Pentium IV" :
 		(cpu_type >= B_CPU_AMD_K5_MODEL0 && cpu_type <= B_CPU_AMD_K5_MODEL3) ? "K5" :
 		(cpu_type >= B_CPU_AMD_K6_MODEL6 && cpu_type <= B_CPU_AMD_K6_MODEL7) ? "K6" :
 		cpu_type == B_CPU_AMD_K6_2 ? "K6-2" :
 		cpu_type == B_CPU_AMD_K6_III ? "K6-III" :
+		cpu_type == B_CPU_AMD_K6_III_MODEL2 ? "K6-III" :
 		cpu_type == B_CPU_AMD_ATHLON_MODEL1 ? "Athlon" :
+		cpu_type == B_CPU_AMD_ATHLON_MODEL2 ? "Athlon" :
+		cpu_type == B_CPU_AMD_DURON ? "Duron" :
+		cpu_type == B_CPU_AMD_ATHLON_THUNDERBIRD ? "Athlon TBird" :
+		cpu_type == B_CPU_AMD_ATHLON_XP ? "Athlon XP" :
+		cpu_type == B_CPU_AMD_ATHLON_XP_MODEL2 ? "Athlon XP" :
+		cpu_type == B_CPU_AMD_ATHLON_XP_MODEL3 ? "Athlon XP" :
 		cpu_type == B_CPU_CYRIX_GXm ? "GXm" :
 		cpu_type == B_CPU_CYRIX_6x86MX ? "6x86MX" :
 		cpu_type == B_CPU_IDT_WINCHIP_C6 ? "WinChip C6" :
 		cpu_type == B_CPU_IDT_WINCHIP_2 ? "WinChip 2" :
 		cpu_type == B_CPU_RISE_mP6 ? "mP6" :
-#ifdef B_CPU_AMD_ATHLON_THUNDERBIRD /* R5 doesn't have those defines */
-		cpu_type == B_CPU_AMD_ATHLON_THUNDERBIRD ? "Athlon TBird" :
 		cpu_type == B_CPU_NATIONAL_GEODE_GX1 ? "Geode GX1" :
-#endif
 		NULL;
 	if (cpuname)
 		return cpuname;
