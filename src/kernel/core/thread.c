@@ -1381,6 +1381,38 @@ find_thread(const char *name)
 
 
 status_t
+rename_thread(thread_id id, const char *name)
+{
+	status_t status = B_OK;
+	struct thread *thread;
+
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	thread = thread_get_current_thread();
+	if (thread->id == id) {
+		// it's ourself, so we know we aren't in the run queue, and we can manipulate
+		// our structure directly
+		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
+	} else {
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread) {
+			strlcpy(thread->name, name, B_OS_NAME_LENGTH);
+		} else
+			status = B_BAD_THREAD_ID;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+
+	return status;
+}
+
+
+status_t
 set_thread_priority(thread_id id, int32 priority)
 {
 	struct thread *thread;
@@ -1596,6 +1628,20 @@ status_t
 _user_suspend_thread(thread_id thread)
 {
 	return suspend_thread(thread);
+}
+
+
+status_t
+_user_rename_thread(thread_id thread, const char *userName)
+{
+	char name[B_OS_NAME_LENGTH];
+
+	if (!IS_USER_ADDRESS(userName)
+		|| userName == NULL
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return rename_thread(thread, name);
 }
 
 
