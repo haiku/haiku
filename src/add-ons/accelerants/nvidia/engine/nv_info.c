@@ -211,7 +211,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 	bool end = false;
 	bool exec = true;
 	uint8 index, byte, safe;
-	uint32 reg, data, and_out, or_in;
+	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
 
@@ -265,8 +265,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			break;
 		case 0x65:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 13;
 			if (*size < 0)
 			{
@@ -276,7 +274,25 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 13;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data2 = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'WR 32bit REG $%08x with $%08x, then with $%08x'\n", reg, data, data2));
+			if (exec)
+			{
+				/* alternate NV-specific access to PCI config space registers: */
+				safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
+				NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
+				NV_REG32(reg) = data;
+				NV_REG32(reg) = data2;
+				NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
+				NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+			}
 			break;
 		case 0x66: /* new on NV11 */
 			LOG(8,("NV11+ xxx cmd, skipping...\n"));
@@ -430,8 +446,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			}
 			break;
 		case 0x79:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 7;
 			if (*size < 0)
 			{
@@ -441,7 +455,60 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 7;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %fMHz'\n", reg, (data / 100.0)));
+			if (exec)
+			{
+				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
+				display_mode target;
+				float calced_clk;
+				uint8 m, n, p;
+				target.timing.pixel_clock = (data * 10);
+				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
+//fixme?
+				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+//					DACW(PIXPLLC2, 0x80000401);
+			}
+			if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+				LOG(8,("\nINFO: ---WARNING: check/update PLL programming script code!!!"));
+			switch (reg)
+			{
+			case NV32_MEMPLL:
+				LOG(8,("\nINFO: ---Memory PLL accessed.\n\n"));
+				break;
+			case NV32_COREPLL:
+				LOG(8,("\nINFO: ---Core PLL accessed.\n\n"));
+				break;
+			case NVDAC_PIXPLLC:
+				LOG(8,("\nINFO: ---DAC1 PLL accessed.\n\n"));
+				break;
+			case NVDAC2_PIXPLLC:
+				LOG(8,("\nINFO: ---DAC2 PLL accessed.\n\n"));
+				break;
+			/* unexpected cases, here for learning goals... */
+			case NV32_MEMPLL2:
+				LOG(8,("\nINFO: ---NV31/NV36 extension to memory PLL accessed only!\n\n"));
+				break;
+			case NV32_COREPLL2:
+				LOG(8,("\nINFO: ---NV31/NV36 extension to core PLL accessed only!\n\n"));
+				break;
+			case NVDAC_PIXPLLC2:
+				LOG(8,("\nINFO: ---NV31/NV36 extension to DAC1 PLL accessed only!\n\n"));
+				break;
+			case NVDAC2_PIXPLLC2:
+				LOG(8,("\nINFO: ---NV31/NV36 extension to DAC2 PLL accessed only!\n\n"));
+				break;
+			default:
+				LOG(8,("\nINFO: ---Unknown PLL accessed!\n\n"));
+				break;
+			}
 			break;
 		case 0x7a:
 			*size -= 9;
