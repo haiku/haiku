@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <image.h>
 #include <OS.h>
 
@@ -21,23 +22,21 @@
 void list_image_info (team_id id);
 
 
-
 int
 main(int argc, char **argv)
 {
 	if (argc == 1) {
-		int32     cookie = 0;
+		int32 cookie = 0;
 		team_info info;
-		
+
 		// list for all teams
 		while (get_next_team_info(&cookie, &info) >= B_OK)
 			list_image_info(info.team);
-	}
-	else
+	} else {
 		// list for each team_id on the command line
 		while (--argc)
 			list_image_info(atoi(*++argv));
-	
+	}
 	return 0;
 }
 
@@ -45,27 +44,31 @@ main(int argc, char **argv)
 void
 list_image_info(team_id id)
 {
-	int32      cookie = 0;
-	team_info  this_team;
-	image_info this_image;
-	
-	if (get_team_info(id, &this_team) == B_BAD_TEAM_ID) {
-		printf("\nteam %d unknown\n", id);
+	team_info teamInfo;
+	image_info imageInfo;
+	int32 cookie = 0;
+	status_t status;
+
+	status = get_team_info(id, &teamInfo);
+	if (status < B_OK) {
+		printf("\nCould not retrieve information about team %ld: \n", id, strerror(status));
 		return;
 	}
 
-	printf("\nTEAM %4d (%s):\n", id, this_team.args);
+	printf("\nTEAM %4d (%s):\n", id, teamInfo.args);
 	printf("   ID                                                             name     text     data seq#      init#\n");
 	printf("--------------------------------------------------------------------------------------------------------\n");
-	
-	while (get_next_image_info(id, &cookie, &this_image) == B_OK) {
+
+	while ((status = get_next_image_info(id, &cookie, &imageInfo)) == B_OK) {
 		printf("%5d %64s %.8x %.8x %4d %10u\n",
-		        this_image.id,
-		        this_image.name,
-		        this_image.text,
-		        this_image.data,
-		        this_image.sequence,
-		        this_image.init_order);
+			imageInfo.id,
+			imageInfo.name,
+			imageInfo.text,
+			imageInfo.data,
+			imageInfo.sequence,
+			imageInfo.init_order);
 	}
+	if (status != B_ENTRY_NOT_FOUND)
+		printf("get images failed: %s\n", strerror(status));
 }
 
