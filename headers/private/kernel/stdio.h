@@ -9,9 +9,12 @@
 #include <stdarg.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
+
+#define L_ctermid  		32
+#define L_cuserid  		32
+#define	L_tmpnam		512
 
 typedef off_t fpos_t;  /* stdio file position type */
 
