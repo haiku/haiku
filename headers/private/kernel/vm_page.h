@@ -27,6 +27,10 @@ status_t vm_mark_page_inuse(addr_t page);
 status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);
 status_t vm_page_set_state(vm_page *page, int state);
 
+// get some data about the number of pages in the system
+addr_t vm_page_num_pages(void);
+addr_t vm_page_num_free_pages(void);
+
 vm_page *vm_page_allocate_page(int state);
 vm_page *vm_page_allocate_page_run(int state, addr_t length);
 vm_page *vm_page_allocate_specific_page(addr_t page_num, int state);

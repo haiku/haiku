@@ -148,7 +148,6 @@ vm_cache_acquire_ref(vm_cache_ref *cache_ref, bool acquire_store_ref)
 void
 vm_cache_release_ref(vm_cache_ref *cache_ref)
 {
-	off_t store_committed_size = 0;
 	vm_page *page;
 
 	TRACE(("vm_cache_release_ref: cache_ref 0x%x, ref will be %d\n", cache_ref, cache_ref->ref_count - 1));
@@ -166,10 +165,8 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 	// delete this cache
 
 	// delete the cache's backing store, if it has one
-	if (cache_ref->cache->store) {
-		store_committed_size = cache_ref->cache->store->committed_size;
+	if (cache_ref->cache->store)
 		(*cache_ref->cache->store->ops->destroy)(cache_ref->cache->store);
-	}
 
 	// free all of the pages in the cache
 	page = cache_ref->cache->page_list;
@@ -191,7 +188,6 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 		TRACE(("vm_cache_release_ref: freeing page 0x%x\n", oldPage->ppn));
 		vm_page_set_state(oldPage, PAGE_STATE_FREE);
 	}
-	vm_increase_max_commit(cache_ref->cache->virtual_size - store_committed_size);
 
 	// remove the ref to the source
 	if (cache_ref->cache->source)
@@ -289,6 +285,29 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 }
 
 
+status_t
+vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
+{
+	status_t status = B_OK;
+	vm_store *store;
+
+	mutex_lock(&ref->lock);
+	store = ref->cache->store;
+
+	// If we don't have enough committed space to cover through to the new end of region...
+	if (store->committed_size < commitment) {
+		// ToDo: should we check if the cache's virtual size is large
+		//	enough for a commitment of that size?
+
+		// try to commit more memory
+		status = (store->ops->commit)(store, commitment);
+	}
+
+	mutex_unlock(&ref->lock);
+	return status;
+}
+
+
 /**	This function updates the size field of the vm_cache structure.
  *	If needed, it will free up all pages that don't belong to the cache anymore.
  *	The vm_cache_ref lock must be held when you call it.
@@ -298,11 +317,18 @@ status_t
 vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 {
 	vm_cache *cache = cacheRef->cache;
+	status_t status;
 	size_t oldSize;
+
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	// ToDo: only cache's with an anonymous memory store should be resizable!
 	if (!cache->temporary)
 		return B_NOT_ALLOWED;
+
+	status = cache->store->ops->commit(cache->store, newSize);
+	if (status != B_OK)
+		return status;
 
 	oldSize = cache->virtual_size;
 	if (newSize < oldSize) {
@@ -321,8 +347,6 @@ vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 	}
 
 	cache->virtual_size = newSize;
-	vm_increase_max_commit(oldSize - newSize);
-
 	return B_OK;
 }
 

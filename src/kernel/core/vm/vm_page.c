@@ -263,9 +263,6 @@ vm_page_init(kernel_args *ka)
 			ka->physical_allocated_range[i].size / B_PAGE_SIZE);
 	}
 
-	// set the global max_commit variable
-	vm_increase_max_commit(num_pages * B_PAGE_SIZE);
-
 	TRACE(("vm_page_init: exit\n"));
 
 	return B_OK;

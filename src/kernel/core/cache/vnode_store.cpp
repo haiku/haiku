@@ -20,13 +20,13 @@ store_destroy(struct vm_store *store)
 }
 
 
-static off_t
+static status_t
 store_commit(struct vm_store *_store, off_t size)
 {
 	vnode_store *store = (vnode_store *)_store;
 
 	store->vm.committed_size = size;
-	return size;
+	return B_OK;
 }
 
 

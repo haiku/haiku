@@ -37,17 +37,14 @@
 #define PAGE_PRESENT  256
 
 // Should only be used by vm internals
-int vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser, addr_t *newip);
-void vm_increase_max_commit(addr_t delta);
-int vm_daemon_init(void);
+status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser, addr_t *newip);
+void vm_unreserve_memory(size_t bytes);
+status_t vm_try_reserve_memory(size_t bytes);
+status_t vm_daemon_init(void);
 
 // used by the page daemon to walk the list of address spaces
 int vm_aspace_walk_start(struct hash_iterator *i);
 vm_address_space *vm_aspace_walk_next(struct hash_iterator *i);
-
-// get some data about the number of pages in the system
-addr_t vm_page_num_pages(void);
-addr_t vm_page_num_free_pages(void);
 
 // allocates memory from the kernel_args structure
 addr_t vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock);

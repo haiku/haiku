@@ -23,11 +23,11 @@ device_destroy(struct vm_store *store)
 }
 
 
-static off_t
+static status_t
 device_commit(struct vm_store *store, off_t size)
 {
 	store->committed_size = size;
-	return size;
+	return B_OK;
 }
 
 

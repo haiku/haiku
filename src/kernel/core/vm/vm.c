@@ -63,14 +63,14 @@ static region_id next_region_id;
 static void *region_table;
 static sem_id region_hash_sem;
 
-static int max_commit;
-static spinlock max_commit_lock;
+static off_t sAvailableMemory;
+static benaphore sAvailableMemoryLock;
 
 // function declarations
 static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);
-static int map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
+static status_t map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
-static int vm_soft_fault(addr_t address, bool is_write, bool is_user);
+static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
 
 
@@ -448,7 +448,7 @@ insert_area(vm_address_space *addressSpace, void **_address,
 
 
 // a ref to the cache holding this store must be held before entering here
-static int
+static status_t
 map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddress,
 	off_t offset, addr_t size, int addressSpec, int wiring, int lock,
 	int mapping, vm_region **_region, const char *region_name)
@@ -496,41 +496,12 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 		cache = nu_cache;
 		cache_ref = cache->ref;
 		store = nu_store;
+		cache->virtual_size = offset + size;
 	}
 
-	mutex_lock(&cache_ref->lock);
-	// If we don't have enough committed space to cover through to the new end of region...
-	if (store->committed_size < offset + size) {
-		// try to commit more memory
-		off_t old_store_commitment = store->committed_size; // Note what we had
-		off_t commitment = (store->ops->commit)(store, offset + size); // Commit through to the new end
-		if (commitment < offset + size) { // Uh oh - didn't work
-			if (cache->temporary) {
-				// If this is a temporary cache, Check to see if we ran out of space and return error.
-				int state = disable_interrupts();
-				acquire_spinlock(&max_commit_lock);
-
-				if (max_commit - old_store_commitment + commitment < offset + size) {
-					release_spinlock(&max_commit_lock);
-					restore_interrupts(state);
-					mutex_unlock(&cache_ref->lock);
-					err = ERR_VM_WOULD_OVERCOMMIT;
-					goto err1a;
-				}
-
-				max_commit += (commitment - old_store_commitment) - (offset + size - cache->virtual_size);
-				cache->virtual_size = offset + size;
-				release_spinlock(&max_commit_lock);
-				restore_interrupts(state);
-			} else {
-				mutex_unlock(&cache_ref->lock);
-				err = ENOMEM;
-				goto err1a;
-			}
-		}
-	}
-
-	mutex_unlock(&cache_ref->lock);
+	err = vm_cache_set_minimal_commitment(cache_ref, offset + size);
+	if (err != B_OK)
+		goto err1a;
 
 	vm_cache_acquire_ref(cache_ref, true);
 
@@ -565,8 +536,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
 	*_region = region;
-
-	return B_NO_ERROR;
+	return B_OK;
 
 err1b:
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
@@ -1741,22 +1711,6 @@ vm_delete_areas(struct vm_address_space *aspace)
 }
 
 
-static int32
-vm_thread_dump_max_commit(void *unused)
-{
-	int oldmax = -1;
-
-	(void)(unused);
-
-	for (;;) {
-		snooze(1000000);
-		if (oldmax != max_commit)
-			TRACE(("max_commit 0x%x\n", max_commit));
-		oldmax = max_commit;
-	}
-}
-
-
 static void
 unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 {
@@ -1946,8 +1900,6 @@ vm_init(kernel_args *args)
 	// initialize some globals
 	next_region_id = 0;
 	region_hash_sem = -1;
-	max_commit = 0; // will be increased in vm_page_init
-	max_commit_lock = 0;
 
 	// map in the new heap and initialize it
 	heap_base = vm_alloc_from_kernel_args(args, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1956,6 +1908,7 @@ vm_init(kernel_args *args)
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
+	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
 	// initialize the hash table that stores the pages mapped to caches
 	vm_cache_init(args);
@@ -2037,6 +1990,7 @@ vm_init_post_sem(kernel_args *args)
 	// since we're still single threaded and only the kernel address space exists,
 	// it isn't that hard to find all of the ones we need to create
 
+	benaphore_init(&sAvailableMemoryLock, "available memory lock");
 	arch_vm_translation_map_init_post_sem(args);
 	vm_aspace_init_post_sem();
 
@@ -2058,12 +2012,6 @@ status_t
 vm_init_post_thread(kernel_args *args)
 {
 	vm_page_init_post_thread(args);
-
-	{
-		thread_id thread = spawn_kernel_thread(&vm_thread_dump_max_commit, "max_commit_thread", B_NORMAL_PRIORITY, NULL);
-		resume_thread(thread);
-	}
-
 	vm_daemon_init();
 
 	return heap_init_post_thread(args);
@@ -2088,7 +2036,7 @@ forbid_page_faults(void)
 }
 
 
-int
+status_t
 vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user, addr_t *newip)
 {
 	int err;
@@ -2123,7 +2071,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 }
 
 
-static int
+static status_t
 vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 {
 	vm_address_space *aspace;
@@ -2202,7 +2150,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// See if this cache has a fault handler - this will do all the work for us
 	if (top_cache_ref->cache->store->ops->fault) {
 		// Note, since the page fault is resolved with interrupts enabled, the
-		// fault handler could be called more than one for the same reason -
+		// fault handler could be called more than once for the same reason -
 		// the store must take this into account
 		int err = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, aspace, cache_offset);
 		vm_cache_release_ref(top_cache_ref);
@@ -2460,17 +2408,30 @@ vm_put_physical_page(addr_t vaddr)
 
 
 void
-vm_increase_max_commit(addr_t delta)
+vm_unreserve_memory(size_t amount)
 {
-	int state;
+	benaphore_lock(&sAvailableMemoryLock);
 
-//	dprintf("vm_increase_max_commit: delta 0x%x\n", delta);
+	sAvailableMemory += amount;
 
-	state = disable_interrupts();
-	acquire_spinlock(&max_commit_lock);
-	max_commit += delta;
-	release_spinlock(&max_commit_lock);
-	restore_interrupts(state);
+	benaphore_unlock(&sAvailableMemoryLock);
+}
+
+
+status_t
+vm_try_reserve_memory(size_t amount)
+{
+	status_t status;
+	benaphore_lock(&sAvailableMemoryLock);
+
+	if (sAvailableMemory > amount) {
+		sAvailableMemory -= amount;
+		status = B_OK;
+	} else
+		status = B_NO_MEMORY;
+
+	benaphore_unlock(&sAvailableMemoryLock);
+	return status;
 }
 
 
@@ -2725,8 +2686,8 @@ resize_area(area_id areaID, size_t newSize)
 {
 	vm_cache_ref *cache;
 	vm_region *area, *current;
+	status_t status = B_OK;
 	size_t oldSize;
-	bool failed = false;
 
 	// is newSize a multiple of B_PAGE_SIZE?
 	if (newSize & (B_PAGE_SIZE - 1))
@@ -2751,8 +2712,10 @@ resize_area(area_id areaID, size_t newSize)
 		// We need to check if all areas of this cache can be resized
 
 		for (current = cache->region_list; current; current = current->cache_next) {
-			if (current->aspace_next && current->aspace_next->base <= (current->base + newSize))
-				goto err;
+			if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
+				status = B_ERROR;
+				goto out;
+			}
 		}
 	}
 
@@ -2760,7 +2723,7 @@ resize_area(area_id areaID, size_t newSize)
 
 	for (current = cache->region_list; current; current = current->cache_next) {
 		if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
-			failed = true;
+			status = B_ERROR;
 			break;
 		}
 
@@ -2776,23 +2739,20 @@ resize_area(area_id areaID, size_t newSize)
 		}
 	}
 
-	if (failed) {
+	if (status == B_OK)
+		status = vm_cache_resize(cache, newSize);
+
+	if (status < B_OK) {
 		// This shouldn't really be possible, but hey, who knows
 		for (current = cache->region_list; current; current = current->cache_next)
 			current->size = oldSize;
-
-		goto err;
 	}
-		
-	vm_cache_resize(cache, newSize);
+
+out:
 	mutex_unlock(&cache->lock);
 
 	// ToDo: we must honour the lock restrictions of this region
-	return B_OK;
-
-err:
-	mutex_unlock(&cache->lock);
-	return B_ERROR;
+	return status;
 }
 
 

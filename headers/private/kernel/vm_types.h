@@ -133,7 +133,7 @@ typedef struct vm_store {
 // vm_store_ops
 typedef struct vm_store_ops {
 	void (*destroy)(struct vm_store *backing_store);
-	off_t (*commit)(struct vm_store *backing_store, off_t size);
+	status_t (*commit)(struct vm_store *backing_store, off_t size);
 	bool (*has_page)(struct vm_store *backing_store, off_t offset);
 	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
 	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);

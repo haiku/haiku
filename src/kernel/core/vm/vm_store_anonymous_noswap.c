@@ -1,4 +1,7 @@
 /* 
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -6,6 +9,7 @@
 
 #include <KernelExport.h>
 #include <vm_store_anonymous_noswap.h>
+#include <vm_priv.h>
 
 #include <stdlib.h>
 
@@ -21,20 +25,28 @@
 static void
 anonymous_destroy(struct vm_store *store)
 {
+	vm_unreserve_memory(store->committed_size);
 	free(store);
 }
 
 
-/* anonymous_commit
- * As this store provides anonymous memory that is simply discarded
- * when finished with, we don't bother recording the changes
- * here, so we just return 0.
- */
-
-static off_t
+static status_t
 anonymous_commit(struct vm_store *store, off_t size)
 {
-	return 0;
+	// Check to see how much we could commit - we need real memory
+
+	if (size > store->committed_size) {
+		// try to commit
+		if (vm_try_reserve_memory(size - store->committed_size) != B_OK)
+			return B_NO_MEMORY;
+		
+		store->committed_size = size;
+	} else {
+		// we can release some
+		vm_unreserve_memory(store->committed_size - size);
+	}
+
+	return B_OK;
 }
 
 

@@ -1,4 +1,7 @@
 /*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -201,7 +204,7 @@ page_daemon(void *unused)
 }
 
 
-int
+status_t
 vm_daemon_init()
 {
 	thread_id thread;
