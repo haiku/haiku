@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "driver.h"
 #include "device.h"
 #include "debug.h"
+#include "timer.h"
 
 #define DBG 0
 
@@ -159,18 +160,14 @@ static inline unsigned long vtophys(unsigned long virtual_addr)
 #define PAGE_SIZE 4096
 
 
-typedef void (*timeout_func)(void *);
-
 struct callout_handle
 {
-	struct timer t; // must be on top
-	timeout_func func;
-	void *cookie;
+	timer_id timer;
 };
 
 void callout_handle_init(struct callout_handle *handle);
-struct callout_handle timeout(timeout_func func, void *cookie, bigtime_t timeout);
-void untimeout(timeout_func func, void *cookie, struct callout_handle handle);
+struct callout_handle timeout(timer_function func, void *cookie, bigtime_t timeout);
+void untimeout(timer_function func, void *cookie, struct callout_handle handle);
 
 
 // resource management

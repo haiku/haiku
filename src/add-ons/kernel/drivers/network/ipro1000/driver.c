@@ -25,6 +25,7 @@
 //#define DEBUG
 
 #include "debug.h"
+#include "timer.h"
 #include "device.h"
 #include "driver.h"
 #include "mempool.h"
@@ -130,7 +131,7 @@ init_driver(void)
 		if (info) {
 			char name[64];
 			sprintf(name, "net/ipro1000/%d", cards);
-			TRACE("/dev/%s is a %s\n", name, info);
+			PRINT("/dev/%s is a %s\n", name, info);
 			gDevList[cards] = item;
 			gDevNameList[cards] = strdup(name);
 			gDevNameList[cards + 1] = NULL;
@@ -148,16 +149,24 @@ init_driver(void)
 	free(item);
 
 	if (!cards)
-		goto err;
+		goto err_cards;
+		
+	if (initialize_timer() != B_OK) {
+		ERROR("timer init failed\n");
+		goto err_timer;
+	}
 
-	if (mempool_init(cards * 768) != 0) {
-		TRACE("mempool init failed\n");
-		goto err;
+	if (mempool_init(cards * 768) != B_OK) {
+		ERROR("mempool init failed\n");
+		goto err_mempool;
 	}
 	
 	return B_OK;
 
-err:
+err_mempool:
+	terminate_timer();
+err_timer:
+err_cards:
 	put_module(B_PCI_MODULE_NAME);
 	return B_ERROR;
 }
@@ -169,6 +178,8 @@ uninit_driver(void)
 	int32 i;
 
 	TRACE("uninit_driver()\n");
+
+	terminate_timer();
 	
 	mempool_exit();
 	

@@ -50,38 +50,24 @@ contigfree(void *p, int p1, int p2)
 	delete_area(area_for(p));
 }
 
-static int32 
-timer_dispatch_hook(timer *t)
-{
-	struct callout_handle *h = (struct callout_handle *)t;
-	TRACE("timer_dispatch_hook\n");
-	h->func(h->cookie);
-	return 0;
-}
-
 void
 callout_handle_init(struct callout_handle *handle)
 {
-	memset(handle, 0, sizeof(*handle));
+	handle->timer = -1;
 }
 
 struct callout_handle
-timeout(timeout_func func, void *cookie, bigtime_t timeout)
+timeout(timer_function func, void *cookie, bigtime_t timeout)
 {
-	struct callout_handle h;
-
-	h.func = func;
-	h.cookie = cookie;
-	
-//	add_timer(&h.t, timer_dispatch_hook, timeout, B_ONE_SHOT_RELATIVE_TIMER);
-
-	return h;
+	struct callout_handle handle;
+	handle.timer = create_timer(func, cookie, timeout, B_ONE_SHOT_RELATIVE_TIMER);
+	return handle;
 }
 
 void
-untimeout(timeout_func func, void *cookie, struct callout_handle handle)
+untimeout(timer_function func, void *cookie, struct callout_handle handle)
 {
-//	cancel_timer(&handle.t);
+	delete_timer(handle.timer);
 }
 
 struct resource *

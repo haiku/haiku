@@ -7,13 +7,14 @@ SubDirCcFlags -Wall ;
 UsePrivateHeaders net ;
 
 R5KernelAddon ipro1000 : kernel drivers bin :
-	driver.c 
-	device.c 
-	if_compat.c 
+	driver.c
+	device.c
+	if_compat.c
 	if_em.c
 	if_em_hw.c
-	if_em_osdep.c 
-	mempool.c 
+	if_em_osdep.c
+	mempool.c
+	timer.c
 	util.c
 	;
 
