@@ -13,7 +13,6 @@
 #define SYS_MAX_OS_NAME_LEN   32
 
 #define SYS_THREAD_ARG_LENGTH_MAX 255
-
 #define SYS_THREAD_STRING_LENGTH_MAX 2048
 
-#endif
+#endif	/* _SYS_DEFINES_H */

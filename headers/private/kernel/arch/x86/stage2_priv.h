@@ -2,20 +2,22 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #ifndef _STAGE2_PRIV_H
 #define _STAGE2_PRIV_H
 
 #include <stage2.h>
+#include <ktypes.h>
 
 extern void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr);
 extern void clearscreen(void);
 extern void kputs(const char *str);
 extern int dprintf(const char *fmt, ...);
-extern void sleep(long long time);
-extern long long system_time(void);
+extern void sleep(uint64 time);
+extern uint64 system_time(void);
 extern void execute_n_instructions(int count);
 void system_time_setup(long a);
-long long rdtsc();
+uint64 rdtsc();
 unsigned int get_eflags(void);
 void set_eflags(unsigned int val);
 void cpuid(unsigned int selector, unsigned int *data);
@@ -36,8 +38,6 @@ void cpuid(unsigned int selector, unsigned int *data);
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 24
 #define ADDR_MASK 0xfffff000
-
-#define NULL ((void *)0)
 
 #define _PACKED __attribute__((packed))
 
@@ -196,5 +196,4 @@ struct mp_ext_bus
 	char          name[6];
 };
 
-#endif
-
+#endif	/* _STAGE2_PRIV_H */
