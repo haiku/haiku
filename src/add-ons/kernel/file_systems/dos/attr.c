@@ -23,7 +23,7 @@
 
 #include "dosfs.h"
 #include "attr.h"
-#include "mime_table/mime_table.h"
+#include "mime_table.h"
 
 #define DPRINTF(a,b) if (debug_attr > (a)) dprintf b
 
