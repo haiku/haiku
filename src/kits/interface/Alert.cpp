@@ -38,7 +38,7 @@
 #include <Button.h>
 // TODO: Fix
 // This is hacked in because something in Accelerant.h or SupportDefs.h is lame!
-typedef unsigned int			uint;
+//typedef unsigned int			uint;
 #include <Screen.h>
 #include <TextView.h>
 #include <View.h>
@@ -47,6 +47,7 @@ typedef unsigned int			uint;
 #include <FindDirectory.h>
 #include <Path.h>
 #include <Resources.h>
+#include <Beep.h>
 
 #include <Autolock.h>
 
@@ -255,7 +256,8 @@ char BAlert::Shortcut(int32 index) const
 //------------------------------------------------------------------------------
 int32 BAlert::Go()
 {
-	// TODO: Add sound?
+	system_beep(NULL);	// forces the "beep" event
+	
 	fAlertSem = create_sem(0, "AlertSem");
 	if (fAlertSem < B_OK)
 	{
@@ -424,9 +426,9 @@ BPoint BAlert::AlertPosition(float width, float height)
 	BScreen Screen(Window);
 	if (!Screen.IsValid())
 	{
-		// ... then we're in deep trouble
-		// But what to say about it?
-		// debugger(???);
+		// We should never be here because a BScreen object will return
+		// a valid screen. 
+		debugger("Couldn't find the screen!");
 	}
 
 	BRect screenRect = Screen.Frame();
