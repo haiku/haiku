@@ -893,107 +893,61 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	if (width == 0)
 		return B_ERROR;
 	
-	uint32 keypixel = 0, pixel = 0;
+	uint32 pixel = 0, lastpixel = 0, nextpixel = 0;
 	uint16 nread = 0;
 	status_t result, bytescopied = 0;
 	uint8 *prawbuf, *praw;
 	prawbuf = new uint8[bitsBytesPerPixel * 128];
+	praw = prawbuf;
 	if (!prawbuf)
 		return B_ERROR;
 	
-	memcpy(&keypixel, pbits, bitsBytesPerPixel);
+	uint8 rlecount = 1, rawcount = 0;
+	
+	memcpy(&pixel, pbits, bitsBytesPerPixel);
 	pbits += bitsBytesPerPixel;
-	nread++;
 	
-	// special case
-	if (width == 1) {
-		result = copy_raw_packet(ptga,
-			(uint8 *) &keypixel, 1,	fromspace,
-			pmap, bitsBytesPerPixel);
-		ptga += result;
-		bytescopied += result;
-	}
-	
-	uint8 count = 1;
 	while (nread < width) {
 	
-		memcpy(&pixel, pbits, bitsBytesPerPixel);
-		pbits += bitsBytesPerPixel;
-		nread++;
-	
-		//////
-		// RLE
-		//////
-		
-		// Read while string of pixels is identical
-		while (keypixel == pixel && count < 128) {
-			count++;
-			if (nread == width)
-				break;
-			
-			memcpy(&pixel, pbits, bitsBytesPerPixel);
+		if (nread < width - 1) {
+			memcpy(&nextpixel, pbits, bitsBytesPerPixel);
 			pbits += bitsBytesPerPixel;
-			nread++;
 		}
+		nread++;	
 		
-		// if there are some adjacent identical pixels
-		if (count > 1) {
-			result = copy_rle_packet(ptga, keypixel,
-				count, fromspace, pmap, bitsBytesPerPixel);
-			ptga += result;
-			bytescopied += result;
+		if (nread > 1 && lastpixel == pixel) {
+			rlecount++;
 			
-			// If last pixel in row does not match
-			// with current RLE packet, write out
-			// RAW packet for the last pixel on the line
-			if (nread == width && keypixel != pixel) {
-				result = copy_raw_packet(ptga, (uint8 *) &pixel,
-					1, fromspace, pmap, bitsBytesPerPixel);
+			if (rlecount == 128 || nread == width || pixel != nextpixel) {
+				result = copy_rle_packet(ptga, pixel, rlecount,
+					fromspace, pmap, bitsBytesPerPixel);
+
 				ptga += result;
 				bytescopied += result;
+				rlecount = 1;
 			}
 			
-			count = 1;
-			keypixel = pixel;
-		}
-		
-		//////
-		// RAW
-		//////
-		
-		praw = prawbuf;
-		memcpy(praw, &keypixel, bitsBytesPerPixel);
-		praw += bitsBytesPerPixel;
+		} else {
+			if ((nread < width && pixel != nextpixel) || nread == width) {
+				rawcount++;
+				memcpy(praw, &pixel, bitsBytesPerPixel);
+				praw += bitsBytesPerPixel;
+			}
 			
-		// Read while adjacent pixels do not match
-		while (keypixel != pixel && count < 128) {
-			memcpy(praw, &pixel, bitsBytesPerPixel);
-			praw += bitsBytesPerPixel;
-			count++;
-			if (nread == width)
-				break;
-
-			keypixel = pixel;
-			memcpy(&pixel, pbits, bitsBytesPerPixel);
-			pbits += bitsBytesPerPixel;
-			nread++;
-		}
-		
-		if (count > 1) {	
-			if (keypixel == pixel)
-				count--;
-			result = copy_raw_packet(ptga, prawbuf, count,
-				fromspace, pmap, bitsBytesPerPixel);
-			ptga += result;
-			bytescopied += result;
-			
-			if (keypixel == pixel)
-				count = 2;
-			else {
-				count = 1;
-				keypixel = pixel;
+			if (rawcount == 128 || nread == width || (pixel == nextpixel && rawcount > 0)) {
+				result = copy_raw_packet(ptga,
+					prawbuf, rawcount, fromspace, pmap,
+					bitsBytesPerPixel);
+				
+				ptga += result;
+				bytescopied += result;
+				rawcount = 0;
+				praw = prawbuf;
 			}
 		}
+	
+		lastpixel = pixel;
+		pixel = nextpixel;
 	}
 	
 	delete[] prawbuf;
