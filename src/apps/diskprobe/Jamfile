@@ -11,6 +11,7 @@ App DiskProbe :
 	ProbeWindow.cpp
 	FileWindow.cpp
 	AttributeWindow.cpp
+	AttributeEditors.cpp
 	ProbeView.cpp
 	OpenWindow.cpp
 	;
