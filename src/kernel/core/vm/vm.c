@@ -35,8 +35,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define HEAP_SIZE	0x00400000
-
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
@@ -1667,7 +1665,7 @@ int vm_init(kernel_args *ka)
 	// map in the new heap and initialize it
 	heap_base = vm_alloc_from_ka_struct(ka, HEAP_SIZE, LOCK_KERNEL|LOCK_RW);
 	dprintf("heap at 0x%lx\n", heap_base);
-	heap_init(heap_base, HEAP_SIZE);
+	heap_init(heap_base);
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(ka);

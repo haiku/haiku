@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -8,7 +8,9 @@
 #include <kernel.h>
 #include <stage2.h>
 
-int   heap_init(addr new_heap_base, unsigned int new_heap_size);
+#define HEAP_SIZE	0x00400000
+
+int   heap_init(addr new_heap_base);
 int   heap_init_postsem(kernel_args *ka);
 void *kmalloc(unsigned int size);
 void  kfree(void *address);

@@ -1,5 +1,3 @@
-/* Heap + other assorted stuff. Needs cleanup */
-
 /*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -108,15 +106,13 @@ dump_bin_list(int argc, char **argv)
  */
 
 int
-heap_init(addr new_heap_base, unsigned int new_heap_size)
+heap_init(addr new_heap_base)
 {
-	// ToDo: the heap size may overflow in certain circumstances, but I didn't like
-	// the NewOS fix for this... -- axeld.
-
+	const unsigned int page_entries = PAGE_SIZE / sizeof(struct heap_page);
 	// set some global pointers
 	heap_alloc_table = (struct heap_page *)new_heap_base;
-	heap_size = new_heap_size;
-	heap_base = PAGE_ALIGN((unsigned int)heap_alloc_table + (heap_size / PAGE_SIZE) * sizeof(struct heap_page));
+	heap_size = ((uint64)HEAP_SIZE * page_entries / (page_entries + 1)) & ~(PAGE_SIZE-1);
+	heap_base = (unsigned int)heap_alloc_table + PAGE_ALIGN(heap_size / page_entries);
 	heap_base_ptr = heap_base;
 	dprintf("heap_alloc_table = %p, heap_base = 0x%lx, heap_size = 0x%lx\n", heap_alloc_table, heap_base, heap_size);
 
