@@ -189,6 +189,8 @@ get_memory_map(extended_memory **_extendedMemory)
 	bios_regs regs = { 0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
 	uint32 count = 0;
 
+	TRACE(("get_memory_map()\n"));
+
 	do {
 		regs.eax = 0xe820;
 		regs.edx = 'SMAP';
@@ -203,11 +205,13 @@ get_memory_map(extended_memory **_extendedMemory)
 
 	*_extendedMemory = block;
 
+#ifdef TRACE_MMU
 	dprintf("extended memory info (from 0xe820):\n");
 	for (uint32 i = 0; i < count; i++) {
 		dprintf("    base 0x%Lx, len 0x%Lx, type %lu\n", 
 			block[i].base_addr, block[i].length, block[i].type);
 	}
+#endif
 
 	return count;
 }
@@ -507,6 +511,7 @@ mmu_init(void)
 		}
 	} else {
 		// ToDo: for now!
+		dprintf("No extended memory block - using 32 MB (fix me!)\n");
 		uint32 memSize = 32 * 1024 * 1024;
 
 		// we dont have an extended map, assume memory is contiguously mapped at 0x0
