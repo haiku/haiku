@@ -17,7 +17,7 @@ SimpleTest udf_shell
 	sysdep.c hexdump.c argv.c tracker.cpp
 
 	udf.cpp
-	DirectoryIterator.cpp Icb.cpp
+	DirectoryIterator.cpp DString.cpp Icb.cpp
 	MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
 	UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp
 	SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
@@ -27,7 +27,7 @@ SimpleTest udf_shell
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		udf.cpp 
-		CS0String.cpp DirectoryIterator.cpp Icb.cpp
+		CS0String.cpp DirectoryIterator.cpp DString.cpp Icb.cpp
 		MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
 		UdfDebug.cpp  UdfString.cpp UdfStructures.cpp Utils.cpp
 		SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
