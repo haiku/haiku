@@ -81,6 +81,8 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_workspace_index=index;
 	_workspace=NULL;
 
+	_token=win_token_handler.GetToken();
+
 	AddWindowToDesktop(this,index);
 }
 

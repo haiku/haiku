@@ -325,6 +325,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			PortLink *replylink=new PortLink(reply_port);
 			replylink->SetOpCode(AS_SET_SERVER_PORT);
 			replylink->Attach((int32)newwin->_receiver);
+			replylink->Attach((int32)newwin->_token);
 			replylink->Flush();
 
 			delete replylink;
