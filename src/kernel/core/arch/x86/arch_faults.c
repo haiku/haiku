@@ -2,24 +2,13 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#include <kernel.h>
+
+#include <KernelExport.h>
 #include <faults.h>
 #include <faults_priv.h>
-#include <vm.h>
-#include <debug.h>
-#include <console.h>
-#include <int.h>
+#include <boot/kernel_args.h>
 
-#include <arch/cpu.h>
-#include <arch/int.h>
 #include <arch/faults.h>
-
-#include <arch/x86/interrupts.h>
-#include <arch/x86/faults.h>
-
-#include <boot/stage2.h>
-
-#include <string.h>
 
 // XXX this module is largely outdated. Will probably be removed later.
 

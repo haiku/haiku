@@ -66,7 +66,7 @@ dbg_stack_trace(int argc, char **argv)
 		} else {
 			uint32 eip = *((uint32 *)ebp + 1);
 			const char *symbol, *image;
-			addr baseAddress;
+			addr_t baseAddress;
 			bool exactMatch;
 
 			if (eip == 0 || ebp == 0)

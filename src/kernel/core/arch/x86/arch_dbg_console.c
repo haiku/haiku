@@ -6,6 +6,7 @@
 ** Modified 2001/09/05 by Rob Judd<judd@ob-wan.com>
 ** Modified 2002/09/28 by Marcus Overhagen <marcus@overhagen.de>
 */
+
 #include <kernel.h>
 #include <int.h>
 #include <arch/cpu.h>

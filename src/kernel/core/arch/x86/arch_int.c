@@ -1,23 +1,15 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
 #include <vm.h>
-#include <debug.h>
-#include <console.h>
 #include <int.h>
 #include <thread.h>
 #include <smp.h>
-#include <syscalls.h>
-#include <Errors.h>
-#include <kerrors.h>
 #include <vm_priv.h>
 #include <ksyscalls.h>
 
@@ -30,8 +22,6 @@
 #include <arch/x86/interrupts.h>
 #include <arch/x86/faults.h>
 #include <arch/x86/descriptors.h>
-
-#include <boot/stage2.h>
 
 #include <string.h>
 
@@ -195,7 +185,7 @@ i386_handle_trap(struct iframe frame)
 		case 14:	// page fault
 		{
 			unsigned int cr2;
-			addr newip;
+			addr_t newip;
 
 			asm("movl %%cr2, %0" : "=r" (cr2));
 
@@ -223,7 +213,6 @@ i386_handle_trap(struct iframe frame)
 		{
 			uint64 retcode;
 			unsigned int args[MAX_ARGS];
-			int rc;
 
 			thread_atkernel_entry();
 #if 0
@@ -243,15 +232,11 @@ i386_handle_trap(struct iframe frame)
 			** each is verified to make sure someone doesn't try to clobber it
 			*/
 			if (frame.ecx <= MAX_ARGS) {
-				if ((addr)frame.edx >= KERNEL_BASE && (addr)frame.edx <= KERNEL_TOP) {
-					retcode =  ERR_VM_BAD_USER_MEMORY;
-				} else {
-					rc = user_memcpy(args, (void *)frame.edx, frame.ecx * sizeof(unsigned int));
-					if (rc < 0)
-						retcode = ERR_VM_BAD_USER_MEMORY;
-					else
-						ret = syscall_dispatcher(frame.eax, (void *)args, &retcode);
-				}
+				if (IS_KERNEL_ADDRESS(frame.edx)
+					|| user_memcpy(args, (void *)frame.edx, frame.ecx * sizeof(unsigned int)) < B_OK) {
+					retcode =  B_BAD_ADDRESS;
+				} else
+					ret = syscall_dispatcher(frame.eax, (void *)args, &retcode);
 			} else {
 				// want to pass too many args into the system
 				retcode = EINVAL;
@@ -361,7 +346,7 @@ arch_int_init2(kernel_args *ka)
 {
 	idt = (desc_table *)ka->arch_args.vir_idt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "idt", (void *)&idt,
-		B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
+		B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	return 0;
 }

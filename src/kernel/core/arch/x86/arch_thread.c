@@ -1,22 +1,18 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-
-#include <kernel.h>
-#include <boot/stage2.h>
-#include <debug.h>
-#include <vm.h>
-#include <memheap.h>
 #include <thread.h>
 #include <arch/thread.h>
 #include <arch_cpu.h>
 #include <int.h>
-#include <string.h>
-#include <Errors.h>
-#include <signal.h>
 #include <tls.h>
+
+#include <string.h>
 
 
 //#define TRACE_ARCH_THREAD
@@ -77,6 +73,7 @@ arch_thread_init_thread_struct(struct thread *t)
 	// set up an initial state (stack & fpu)
 	memset(&t->arch_info, 0, sizeof(t->arch_info));
 
+	// ToDo: note, this has to be done only once
 	// let the asm function know the offset to the interrupt stack within struct thread
 	// I know no better ( = static) way to tell the asm function the offset
 	i386_stack_init(&((struct thread *)0)->arch_info.interrupt_stack);
@@ -146,13 +143,11 @@ arch_thread_init_tls(struct thread *thread)
 	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
 	tls[TLS_THREAD_ID_SLOT] = thread->id;
 	tls[TLS_ERRNO_SLOT] = 0;
-
-	set_tls_context(thread);
 }
 
 
 void
-arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
+arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack, void (*func)(void *), void *arg)
 {
 	i386_switch_stack_and_call(new_kstack, func, arg);
 }
@@ -206,7 +201,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
-	i386_context_switch(&t_from->arch_info, &t_to->arch_info, (addr)new_pgdir);
+	i386_context_switch(&t_from->arch_info, &t_to->arch_info, (addr_t)new_pgdir);
 }
 
 
@@ -225,9 +220,9 @@ arch_thread_dump_info(void *info)
  */
 
 void
-arch_thread_enter_uspace(struct thread *t, addr entry, void *args1, void *args2)
+arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args2)
 {
-	addr ustack_top = t->user_stack_base + STACK_SIZE;
+	addr_t ustack_top = t->user_stack_base + STACK_SIZE;
 
 	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
 		entry, args1, args2, ustack_top));

@@ -5,12 +5,9 @@
 
 
 #include <KernelExport.h>
-#include <kernel.h>
-#include <console.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
-#include <debug.h>
 
 #include <arch/vm.h>
 #include <arch/int.h>
@@ -18,8 +15,8 @@
 
 #include <arch/x86/interrupts.h>
 
-#define TRACE_ARCH_VM 0
-#if TRACE_ARCH_VM
+#define TRACE_ARCH_VM
+#ifdef TRACE_ARCH_VM
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;

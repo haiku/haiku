@@ -1,9 +1,11 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <OS.h>
 #include <boot/kernel_args.h>
 #include <vm.h>
 #include <int.h>
@@ -111,10 +113,10 @@ arch_smp_init(kernel_args *ka)
 
 		// setup regions that represent the apic & ioapic
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "local_apic", (void *)&apic,
-			B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
+			B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "ioapic", (void *)&ioapic,
-			B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
+			B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 		// set up the local apic on the boot cpu
