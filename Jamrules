@@ -59,6 +59,7 @@ if ! $(OBOS_BUILD_DESCRIPTION) {
 }
 
 # Relative subdirs for distro dir (these are for *INTERNAL* use by the following rules only!)
+OBOS_APPS_DIR   ?= [ FDirName $(OBOS_DISTRO_TARGET) beos apps ] ;
 OBOS_PREFS_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos preferences ] ;
 OBOS_SERVER_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system servers ] ;
 OBOS_ADDON_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system add-ons ] ;
@@ -105,6 +106,14 @@ actions C++
 #-------------------------------------------------------------------------------
 # General High-level OBOS target rules
 #-------------------------------------------------------------------------------
+
+rule App
+{
+	# App <name> : <sources> ;
+	SetupObjectsDir ;
+	Main $(<) : $(>) ;
+	MakeLocate $(<) : $(OBOS_APPS_DIR) ;
+}
 
 rule Preference
 {

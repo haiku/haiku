@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src add-ons input_server ;
+
+SubInclude OBOS_TOP src add-ons input_server filters ;
