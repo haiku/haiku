@@ -240,12 +240,10 @@ BTextView::BTextView(BMessage *archive)
 	InitObject(rect, NULL, NULL); 
 	
 	const char *text = NULL;
-
 	if (archive->FindString("_text", &text) == B_OK)
 		SetText(text);
 
 	int32 flag, flag2;
-
 	if (archive->FindInt32("_align", &flag) == B_OK)
 		SetAlignment((alignment)flag);
 
@@ -1145,16 +1143,6 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	if (inLength < 1)
 		return;
 	
-	// hide the caret/unhilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (fCaretVisible)
-				InvertCaret();
-		}
-	}
-
 	if (startOffset > TextLength())
 		startOffset = TextLength();
 
@@ -1168,16 +1156,6 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 
 	// recalc line breaks and draw the text
 	Refresh(saveStart, startOffset, true, true);
-
-	// draw the caret/hilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (!fCaretVisible)
-				InvertCaret();
-		}
-	}
 }
 
 
@@ -1341,8 +1319,8 @@ BTextView::Copy(BClipboard *clipboard)
 	if (clipboard->Lock()) {
 		clipboard->Clear(); 
    
-		BMessage *clip = NULL;
-		if ((clip = clipboard->Data()) != NULL) {
+		BMessage *clip = clipboard->Data();
+		if (clip != NULL) {
 			clip->AddData("text/plain", B_MIME_TYPE, Text() + fSelStart,
 				fSelEnd - fSelStart);
 			
@@ -3847,9 +3825,9 @@ BTextView::InvertCaret()
 }
 
 
-/*! \brief Place the blinking caret at the given offset.
+/*! \brief Place the dragging caret at the given offset.
 	\param offset The offset (zero based within the object's text) where to place
-	the blinking caret. If it's -1, hide the caret.
+	the dragging caret. If it's -1, hide the caret.
 */
 void
 BTextView::DragCaret(int32 offset)
