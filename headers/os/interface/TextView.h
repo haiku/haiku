@@ -343,7 +343,7 @@ virtual void			_ReservedTextView12();
 									   BPoint	offset);
 											
 		void			UpdateScrollbars();
-		void			AutoResize();
+		void			AutoResize(bool doredraw=true);
 		
 		void			NewOffscreen(float padding = 0.0F);
 		void			DeleteOffscreen();
