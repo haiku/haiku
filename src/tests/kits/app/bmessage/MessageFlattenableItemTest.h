@@ -103,6 +103,10 @@ struct TFlattenableFuncPolicy
 	{
 		return msg.FindFlat(name, index, val);
 	}
+	static status_t ShortFind(BMessage& msg, const char* name, MyFlattenableType* val)
+	{
+		return msg.FindFlat(name, val);
+	}
 	static MyFlattenableType QuickFind(BMessage& msg, const char* name, int32 index)
 	{
 		MyFlattenableType mft;

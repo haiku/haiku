@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddInt64,
 	&BMessage::FindInt64,
 	&BMessage::FindInt64,
+	&BMessage::FindInt64,
 	&BMessage::HasInt64,
 	&BMessage::ReplaceInt64
 >

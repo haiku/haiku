@@ -26,6 +26,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddString,
 	&BMessage::FindString,
 	&BMessage::FindString,
+	&BMessage::FindString,
 	&BMessage::HasString,
 	&BMessage::ReplaceString
 >

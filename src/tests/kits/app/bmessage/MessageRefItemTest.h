@@ -33,6 +33,10 @@ struct TRefFuncPolicy
 	{
 		return msg.FindRef(name, index, val);
 	}
+	static status_t ShortFind(BMessage& msg, const char* name, entry_ref* val)
+	{
+		return msg.FindRef(name, val);
+	}
 	static entry_ref QuickFind(BMessage& msg, const char* name, int32 index);
 	static bool Has(BMessage& msg, const char* name, int32 index)
 	{

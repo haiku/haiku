@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddPoint,
 	&BMessage::FindPoint,
 	&BMessage::FindPoint,
+	&BMessage::FindPoint,
 	&BMessage::HasPoint,
 	&BMessage::ReplacePoint
 >

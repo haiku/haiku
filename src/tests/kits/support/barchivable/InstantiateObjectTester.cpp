@@ -45,7 +45,7 @@ const char* gValidSig			= gRemoteSig;
 #if !TEST_R5
 const char* gRemoteLib			= "/lib/libsupporttest_RemoteTestObject.so";
 #else
-const char* gRemoteLib			= "/lib_r5/libsupporttest_RemoteTestObject_r5.so";
+const char* gRemoteLib			= "/lib/libsupporttest_RemoteTestObject_r5.so";
 #endif
 
 void FormatAndThrow(int line, const char* file, const char* msg, int err);
@@ -255,10 +255,10 @@ void TInstantiateObjectTester::Case7()
 					errno is set to B_BAD_VALUE.
  */
 void TInstantiateObjectTester::Case8()
-{
+{debugger(__PRETTY_FUNCTION__);
 	errno = B_OK;
 	BMessage Archive;
-	Archive.AddString("class", gRemoteClassName);
+	CPPUNIT_ASSERT(Archive.AddString("class", gRemoteClassName) == B_OK);
 	image_id id = B_OK;
 	TRemoteTestObject* Test = (TRemoteTestObject*)instantiate_object(&Archive,
 																	 &id);
@@ -283,8 +283,8 @@ void TInstantiateObjectTester::Case9()
 {
 	errno = B_OK;
 	BMessage Archive;
-	Archive.AddString("class", gLocalClassName);
-	Archive.AddString("add_on", gInvalidSig);
+	CPPUNIT_ASSERT(Archive.AddString("class", gLocalClassName) == B_OK);
+	CPPUNIT_ASSERT(Archive.AddString("add_on", gInvalidSig) == B_OK);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
 	CPPUNIT_ASSERT(Test == NULL);
@@ -448,8 +448,8 @@ CppUnit::Test* TInstantiateObjectTester::Suite()
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case4);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case5);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case6);
-	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case7);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case8);
+	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case7);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case9);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case10);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case11);

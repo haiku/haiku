@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddDouble,
 	&BMessage::FindDouble,
 	&BMessage::FindDouble,
+	&BMessage::FindDouble,
 	&BMessage::HasDouble,
 	&BMessage::ReplaceDouble
 >

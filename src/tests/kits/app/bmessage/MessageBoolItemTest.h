@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddBool,
 	&BMessage::FindBool,
 	&BMessage::FindBool,
+	&BMessage::FindBool,
 	&BMessage::HasBool,
 	&BMessage::ReplaceBool
 >

@@ -31,6 +31,8 @@ struct TMessengerFuncPolicy
 	static status_t Find(BMessage& msg, const char* name, int32 index,
 						 BMessenger* val)
 		{ return msg.FindMessenger(name, index, val); }
+	static status_t ShortFind(BMessage& msg, const char* name, BMessenger* val)
+		{ return msg.FindMessenger(name, val); }
 	static BMessenger QuickFind(BMessage& msg, const char* name, int32 index)
 	{
 		BMessenger msngr;

@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddRect,
 	&BMessage::FindRect,
 	&BMessage::FindRect,
+	&BMessage::FindRect,
 	&BMessage::HasRect,
 	&BMessage::ReplaceRect
 >

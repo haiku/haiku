@@ -82,6 +82,7 @@ template
 	typename Type,
 	status_t (BMessage::*AddFunc)(const char*, Type),
 	status_t (BMessage::*FindFunc)(const char*, int32, Type*) const,
+	status_t (BMessage::*ShortFindFunc)(const char*, Type*) const,
 	Type (BMessage::*QuickFindFunc)(const char*, int32) const,
 	bool (BMessage::*HasFunc)(const char*, int32) const,
 	status_t (BMessage::*ReplaceFunc)(const char*, int32, Type),
@@ -104,6 +105,10 @@ struct TMessageItemFuncPolicy : public TypePolicy<Type>
 	static status_t Find(BMessage& msg, const char* name, int32 index, Type* val)
 	{
 		return (msg.*FindFunc)(name, index, val);
+	}
+	static status_t ShortFind(BMessage& msg, const char* name, Type* val)
+	{
+		return (msg.*ShortFindFunc)(name, val);
 	}
 	static Type QuickFind(BMessage& msg, const char* name, int32 index)
 	{
@@ -207,6 +212,7 @@ MessageItemTest1()
 {
 	BMessage msg;
 	Type out = InitPolicy::Zero();
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_NAME_NOT_FOUND);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_NAME_NOT_FOUND);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, AssertPolicy::Invalid()));
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0),
@@ -238,6 +244,7 @@ MessageItemTest2()
 	CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", 0));
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0), in));
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
 	TypePtr pout = NULL;
@@ -270,6 +277,7 @@ MessageItemTest3()
 	CPPUNIT_ASSERT(FuncPolicy::Replace(msg, "item", 0, in2) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", 0));
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0), in2));
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in2));
 	out = InitPolicy::Zero();
@@ -407,6 +415,7 @@ MessageItemTest7()
 	CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", 0));
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", 0),
 										  in));
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", 0, &out) == B_OK);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(out, in));
 	TypePtr pout = NULL;
@@ -495,6 +504,7 @@ MessageItemTest10()
 	CPPUNIT_ASSERT(FuncPolicy::Has(msg, NULL, 0) == false);
 	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, NULL, 0),
 										  AssertPolicy::Invalid()));
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, NULL, &out) == B_BAD_VALUE);
 	CPPUNIT_ASSERT(FuncPolicy::Find(msg, NULL, 0, &out) == B_BAD_VALUE);
 	TypePtr pout = NULL;
 	ssize_t size;

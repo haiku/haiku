@@ -28,6 +28,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddInt32,
 	&BMessage::FindInt32,
 	&BMessage::FindInt32,
+	&BMessage::FindInt32,
 	&BMessage::HasInt32,
 	&BMessage::ReplaceInt32
 >

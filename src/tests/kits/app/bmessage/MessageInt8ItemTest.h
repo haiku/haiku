@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddInt8,
 	&BMessage::FindInt8,
 	&BMessage::FindInt8,
+	&BMessage::FindInt8,
 	&BMessage::HasInt8,
 	&BMessage::ReplaceInt8
 >

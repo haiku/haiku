@@ -29,6 +29,8 @@ struct TPointerFuncPolicy
 	static status_t Find(BMessage& msg, const char* name, int32 index,
 						 const void** val)
 		{ return msg.FindPointer(name, index, (void**)val); }
+	static status_t ShortFind(BMessage& msg, const char* name, const void** val)
+		{ return msg.FindPointer(name, (void**)val); }
 	static const void* QuickFind(BMessage& msg, const char* name, int32 index)
 	{
 		const void* ptr;

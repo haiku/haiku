@@ -25,7 +25,8 @@ struct TBStringFuncPolicy
 {
 	static status_t Add(BMessage& msg, const char* name, BString& data);
 	static status_t Find(BMessage& msg, const char* name, int32 index,
-					  BString* data);
+						 BString* data);
+	static status_t ShortFind(BMessage& msg, const char* name, BString* data);
 	static BString QuickFind(BMessage& msg, const char* name, int32 index);
 	static bool Has(BMessage& msg, const char* name, int32 index);
 	static status_t Replace(BMessage& msg, const char* name, int32 index,
@@ -50,6 +51,12 @@ status_t TBStringFuncPolicy::Find(BMessage& msg, const char* name,
 									  int32 index, BString* data)
 {
 	return msg.FindString(name, index, data);
+}
+//------------------------------------------------------------------------------
+inline status_t TBStringFuncPolicy::ShortFind(BMessage& msg, const char* name,
+											  BString* data)
+{
+	return msg.FindString(name, data);
 }
 //------------------------------------------------------------------------------
 BString TBStringFuncPolicy::QuickFind(BMessage& msg, const char* name,

@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddInt16,
 	&BMessage::FindInt16,
 	&BMessage::FindInt16,
+	&BMessage::FindInt16,
 	&BMessage::HasInt16,
 	&BMessage::ReplaceInt16
 >

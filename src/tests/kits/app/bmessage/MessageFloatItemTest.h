@@ -25,6 +25,7 @@ typedef TMessageItemFuncPolicy
 	&BMessage::AddFloat,
 	&BMessage::FindFloat,
 	&BMessage::FindFloat,
+	&BMessage::FindFloat,
 	&BMessage::HasFloat,
 	&BMessage::ReplaceFloat
 >

@@ -28,6 +28,7 @@ struct TMessageFuncPolicy
 							BMessage* data, ssize_t size, bool);
 	static status_t Find(BMessage& msg, const char* name, int32 index,
 						 BMessage* val);
+	static status_t ShortFind(BMessage& msg, const char* name, BMessage* val);
 	static BMessage QuickFind(BMessage& msg, const char* name, int32 index);
 	static bool Has(BMessage& msg, const char* name, int32 index);
 	static status_t Replace(BMessage& msg, const char* name, int32 index,
@@ -64,6 +65,12 @@ inline status_t TMessageFuncPolicy::Find(BMessage& msg, const char* name,
 										 int32 index, BMessage* val)
 {
 	return msg.FindMessage(name, index, val);
+}
+//------------------------------------------------------------------------------
+inline status_t TMessageFuncPolicy::ShortFind(BMessage& msg, const char* name,
+											  BMessage* val)
+{
+	return msg.FindMessage(name, val);
 }
 //------------------------------------------------------------------------------
 BMessage TMessageFuncPolicy::QuickFind(BMessage& msg, const char* name,
