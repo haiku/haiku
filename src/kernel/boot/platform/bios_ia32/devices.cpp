@@ -161,30 +161,30 @@ dumpBlock(const char *buffer, int size, const char *prefix)
 	for (i = 0; i < size;) {
 		int start = i;
 
-		printf(prefix);
+		dprintf(prefix);
 		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
-				printf(" ");
+				dprintf(" ");
 
 			if (i >= size)
-				printf("  ");
+				dprintf("  ");
 			else
-				printf("%02x", *(unsigned char *)(buffer + i));
+				dprintf("%02x", *(unsigned char *)(buffer + i));
 		}
-		printf("  ");
+		dprintf("  ");
 
 		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (i < size) {
 				char c = buffer[i];
 
 				if (c < 30)
-					printf(".");
+					dprintf(".");
 				else
-					printf("%c", c);
+					dprintf("%c", c);
 			} else
 				break;
 		}
-		printf("\n");
+		dprintf("\n");
 	}
 }
 
@@ -198,16 +198,16 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 {
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// ToDo: old style CHS support
-		printf("%d requires CHS support - not yet implemented...\n", driveID);
+		dprintf("%d requires CHS support - not yet implemented...\n", driveID);
 		fBlockSize = 512;
 		fSize = 0;
 		fLBA = false;
 	} else {
-		printf("host bus: %4s, interface: %8s\n", fParameters.host_bus, fParameters.interface_type);
-		printf("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+		dprintf("host bus: %4s, interface: %8s\n", fParameters.host_bus, fParameters.interface_type);
+		dprintf("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector);
-		printf("total sectors: %Ld\n", fParameters.sectors);
+		dprintf("total sectors: %Ld\n", fParameters.sectors);
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -317,15 +317,15 @@ BIOSDrive::Size() const
 status_t 
 platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
-	printf("boot drive ID: %x\n", gBootDriveID);
+	dprintf("boot drive ID: %x\n", gBootDriveID);
 
 	BIOSDrive *drive = new BIOSDrive(gBootDriveID);
 	if (drive->InitCheck() != B_OK) {
-		puts("no boot drive!");
+		dprintf("no boot drive!\n");
 		return B_ERROR;
 	}
 
-	printf("drive size: %Ld bytes\n", drive->Size());
+	dprintf("drive size: %Ld bytes\n", drive->Size());
 
 	*_device = drive;
 	return B_OK;
@@ -339,11 +339,12 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 	BIOSDrive *drive = static_cast<BIOSDrive *>(bootDevice);
 	off_t offset = (off_t)gBootPartitionOffset * drive->BlockSize();
 
-	printf("boot partition offset: %Ld\n", offset);
+	dprintf("boot partition offset: %Ld\n", offset);
 
 	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
+		dprintf("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size);
 		// search for the partition that contains the partition
 		// offset as reported by the BFS boot block
 		if (offset >= partition->offset
@@ -362,7 +363,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
 	uint8 driveCount;
 	if (get_number_of_drives(&driveCount) == B_OK)
-		printf("number of drives: %d\n", driveCount);
+		dprintf("number of drives: %d\n", driveCount);
 
 	return B_OK; 
 }
