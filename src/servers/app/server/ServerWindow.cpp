@@ -1480,8 +1480,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			int32 mainToken;
 			team_id teamID;
 
-printf("ServerWindow %s: Message AS_REM_FROM_SUBSET UNIMPLEMENTED\n",fTitle.String());
-			
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
@@ -1491,7 +1489,11 @@ printf("ServerWindow %s: Message AS_REM_FROM_SUBSET UNIMPLEMENTED\n",fTitle.Stri
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Flush();
 				
-//				fWinBorder->RemoveFromSubsetOf(wb);
+				BPortLink	msg(-1, -1);
+				msg.StartMessage(AS_ROOTLAYER_REMOVE_FROM_SUBSET);
+				msg.Attach<WinBorder*>(fWinBorder);
+				msg.Attach<WinBorder*>(wb);
+				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			}
 			else
 			{

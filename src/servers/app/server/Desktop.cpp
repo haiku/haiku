@@ -343,16 +343,18 @@ void Desktop::RemoveWinBorder(WinBorder *winBorder)
 		return;
 	}
 
-	// unlock!
-	Unlock();
-
 	// Tell to winBorder's RootLayer about this.
 	ActiveRootLayer()->RemoveWinBorder(winBorder);
 
+	// unlock!
+	Unlock();
 }
 
 void Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 {
+	// NOTE: we can safely lock the entire method body, because this method is called from
+	//		 RootLayer's thread only.
+
 	// we're playing with window list. lock first.
 	Lock();
 
@@ -380,15 +382,18 @@ void Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 		return;
 	}
 
-	// hey, unlock!
-	Unlock();
-
 	// send WinBorder to be added to workspaces, if not already in there.
 	ActiveRootLayer()->AddSubsetWinBorder(winBorder, toWinBorder);
+
+	// hey, unlock!
+	Unlock();
 }
 
 void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder)
 {
+	// NOTE: we can safely lock the entire method body, because this method is called from
+	//		 RootLayer's thread only.
+
 	// we're playing with window list. lock first.
 	Lock();
 
@@ -399,6 +404,9 @@ void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWin
 		debugger("RemoveWinBorderFromSubset: NULL WinBorder or not found in Desktop list\n");
 		return;
 	}
+
+	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
+	ActiveRootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
 
 	if (fromWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
 	{
@@ -414,9 +422,6 @@ void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWin
 
 	// hey, unlock!
 	Unlock();
-
-	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
-	ActiveRootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
 }
 
 inline

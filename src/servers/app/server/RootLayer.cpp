@@ -262,6 +262,15 @@ int32 RootLayer::WorkingThread(void *data)
 				desktop->AddWinBorderToSubset(winBorder, toWinBorder);
 				break;
 			}
+			case AS_ROOTLAYER_REMOVE_FROM_SUBSET:
+			{
+				WinBorder	*winBorder = NULL;
+				WinBorder	*fromWinBorder = NULL;
+				messageQueue.Read<WinBorder*>(&winBorder);
+				messageQueue.Read<WinBorder*>(&fromWinBorder);
+				desktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), code));
 				break;
