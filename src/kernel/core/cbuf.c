@@ -956,17 +956,15 @@ cbuf_init(void)
 
 	// errors are fatal, that's why we don't clean up here
 
-	sBufferArea = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "cbuf region",
-		(void **)&sBuffer, REGION_ADDR_ANY_ADDRESS, CBUF_REGION_SIZE,
-		REGION_WIRING_LAZY, LOCK_RW|LOCK_KERNEL);
+	sBufferArea = create_area("cbuf region", (void **)&sBuffer, B_ANY_KERNEL_ADDRESS,
+		CBUF_REGION_SIZE, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (sBufferArea < 0) {
 		panic("cbuf_init: error creating cbuf region\n");
 		return B_NO_MEMORY;
 	}
 
-	sBitmapArea = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "cbuf bitmap region",
-		(void **)&sBitmap, REGION_ADDR_ANY_ADDRESS,
-		CBUF_BITMAP_SIZE / 8, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
+	sBitmapArea = create_area("cbuf bitmap region", (void **)&sBitmap, B_ANY_KERNEL_ADDRESS,
+		CBUF_BITMAP_SIZE / 8, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (sBitmapArea < 0) {
 		panic("cbuf_init: error creating cbuf bitmap region\n");
 		return B_NO_MEMORY;

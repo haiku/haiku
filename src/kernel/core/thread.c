@@ -334,9 +334,9 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	}
 
 	sprintf(stack_name, "%s_kstack", name);
-	t->kernel_stack_region_id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), stack_name,
-		(void **)&t->kernel_stack_base, REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE,
-		REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
+	t->kernel_stack_region_id = create_area(stack_name, (void **)&t->kernel_stack_base,
+		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		
 	if (t->kernel_stack_region_id < 0)
 		panic("_create_thread: error creating kernel stack!\n");
 
@@ -672,7 +672,7 @@ thread_exit2(void *_args)
 
 	// delete the old kernel stack region
 	TRACE(("thread_exit2: deleting old kernel stack id 0x%x for thread 0x%x\n", args.old_kernel_stack, args.t->id));
-	vm_delete_region(vm_get_kernel_aspace_id(), args.old_kernel_stack);
+	delete_area(args.old_kernel_stack);
 
 	// remove this thread from all of the global lists
 	TRACE(("thread_exit2: removing thread 0x%x from global lists\n", args.t->id));
@@ -1094,9 +1094,8 @@ thread_init(kernel_args *ka)
 
 		for (i = 0; i < num_death_stacks; i++) {
 			sprintf(temp, "death_stack%d", i);
-			death_stacks[i].rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp,
-				(void **)&death_stacks[i].address,
-				REGION_ADDR_ANY_ADDRESS, KSTACK_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
+			death_stacks[i].rid = create_area(temp, (void **)&death_stacks[i].address,
+				B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 			if (death_stacks[i].rid < 0) {
 				panic("error creating death stacks\n");
 				return death_stacks[i].rid;

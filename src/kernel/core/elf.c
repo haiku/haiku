@@ -755,7 +755,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		bool ro_segment_handled = false;
 		bool rw_segment_handled = false;
 		int image_region;
-		int lock;
+		int protection;
 
 		PRINT(("looking at program header %d\n", i));
 
@@ -773,24 +773,26 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		// we're here, so it must be a PT_LOAD segment
 		if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_W)) {
 			// this is the writable segment
-			if(rw_segment_handled) {
+			if (rw_segment_handled) {
 				// we've already created this segment
 				continue;
 			}
 			rw_segment_handled = true;
 			image_region = 1;
-			lock = LOCK_RW|LOCK_KERNEL;
+			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 			sprintf(region_name, "%s_rw", path);
 		} else if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_X)) {
 			// this is the non-writable segment
-			if(ro_segment_handled) {
+			if (ro_segment_handled) {
 				// we've already created this segment
 				continue;
 			}
 			ro_segment_handled = true;
 			image_region = 0;
-//			lock = LOCK_RO|LOCK_KERNEL;
-			lock = LOCK_RW|LOCK_KERNEL;
+			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+				// ToDo: why is this? Right now, the kernel crashes without
+				//	it, so go, investigate!
+
 			sprintf(region_name, "%s_ro", path);
 		} else {
 			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
@@ -798,9 +800,9 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		}
 
 		image->regions[image_region].size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
-		image->regions[image_region].id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), region_name,
-			(void **)&image->regions[image_region].start, REGION_ADDR_ANY_ADDRESS,
-			image->regions[image_region].size, REGION_WIRING_WIRED, lock);
+		image->regions[image_region].id = create_area(region_name,
+			(void **)&image->regions[image_region].start, B_ANY_KERNEL_ADDRESS,
+			image->regions[image_region].size, B_FULL_LOCK, protection);
 		if (image->regions[image_region].id < 0) {
 			dprintf("error allocating region!\n");
 			err = ERR_INVALID_BINARY;
@@ -853,9 +855,9 @@ done:
 
 error4:
 	if (image->regions[1].id >= 0)
-		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[1].id);
+		delete_area(image->regions[1].id);
 	if (image->regions[0].id >= 0)
-		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[0].id);
+		delete_area(image->regions[0].id);
 error3:
 	free(image);
 error2:
@@ -895,7 +897,7 @@ elf_unload_image_final(struct elf_image_info *image)
 	int i;
 	
 	for (i = 0; i < 2; ++i) {
-		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[i].id);
+		delete_area(image->regions[i].id);
 	}
 
 	if (image->vnode)

@@ -185,9 +185,8 @@ sem_init(kernel_args *ka)
 	TRACE(("sem_init: entry\n"));
 
 	// create and initialize semaphore table
-	gSemRegion = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "sem_table",
-		(void **)&gSems, REGION_ADDR_ANY_ADDRESS, sizeof(struct sem_entry) * MAX_SEMS,
-		REGION_WIRING_WIRED, LOCK_RW | LOCK_KERNEL);
+	gSemRegion = create_area("sem_table", (void **)&gSems, B_ANY_KERNEL_ADDRESS,
+		sizeof(struct sem_entry) * MAX_SEMS, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (gSemRegion < 0)
 		panic("unable to allocate semaphore table!\n");
 

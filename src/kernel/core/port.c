@@ -68,18 +68,16 @@ status_t
 port_init(kernel_args *ka)
 {
 	int i;
-	int sz;
-
-	sz = sizeof(struct port_entry) * MAX_PORTS;
+	int size = sizeof(struct port_entry) * MAX_PORTS;
 
 	// create and initialize semaphore table
-	port_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "port_table", (void **)&ports,
-		REGION_ADDR_ANY_ADDRESS, sz, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
+	port_region = create_area("port_table", (void **)&ports, B_ANY_KERNEL_ADDRESS,
+		size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (port_region < 0) {
 		panic("unable to allocate kernel port table!\n");
 	}
 
-	memset(ports, 0, sz);
+	memset(ports, 0, size);
 	for (i = 0; i < MAX_PORTS; i++)
 		ports[i].id = -1;
 
