@@ -20,7 +20,11 @@ struct syslog_context {
 	int32	options;
 };
 
-static syslog_context sTeamContext;
+static syslog_context sTeamContext = {
+	"",
+	-1,
+	0
+};
 static int32 sThreadContextSlot = -1;
 
 
@@ -128,7 +132,8 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 
 
 //	#pragma mark -
-//	public API
+//	public Be API
+// ToDo: it would probably be better to export these symbols as weak symbols only
 
 
 void 
@@ -151,7 +156,12 @@ openlog_team(const char *ident, int options, int facility)
 int 
 setlogmask_team(int priorityMask)
 {
-	sTeamContext.mask = priorityMask;
+	int oldMask = sTeamContext.mask;
+
+	if (priorityMask != 0)
+		sTeamContext.mask = priorityMask;
+
+	return oldMask;
 }
 
 
@@ -193,7 +203,12 @@ int
 setlogmask_thread(int priorityMask)
 {
 	syslog_context *context = get_context();
-	context->mask = priorityMask;	
+	int oldMask = context->mask;
+
+	if (priorityMask != 0)
+		context->mask = priorityMask;
+
+	return oldMask;
 }
 
 
@@ -229,7 +244,7 @@ openlog(const char *ident, int options, int facility)
 int 
 setlogmask(int priorityMask)
 {
-	setlogmask_thread(priorityMask);
+	return setlogmask_thread(priorityMask);
 }
 
 
