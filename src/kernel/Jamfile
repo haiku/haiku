@@ -713,18 +713,6 @@ KernelLd envtest :
 	bin/envtest
 	;
 
-KernelLd loop :
-	<$(SOURCE_GRIST)!add-ons!net!loopback>loop.o
-	kernel.so
-	:
-	$(SUBDIR)/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	addons/network/interface/loop
-	;
-
 #if $(OS) = "BEOS" 
 #{
 #	KernelConfigSection addons/drivers/dev/misc/pcspeaker 
@@ -808,5 +796,4 @@ SubInclude OBOS_TOP src kernel glue ;
 SubInclude OBOS_TOP src kernel libc ;
 SubInclude OBOS_TOP src kernel libm ;
 SubInclude OBOS_TOP src kernel apps ;
-SubInclude OBOS_TOP src kernel add-ons ;
 SubInclude OBOS_TOP src kernel libroot ;
