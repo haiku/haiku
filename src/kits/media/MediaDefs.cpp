@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <Roster.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -1003,7 +1004,8 @@ status_t get_next_file_format(int32 *cookie, media_file_format *mfi)
  *************************************************************/
 
 // final & verified
-const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
+const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.OpenBeOS-media-server";
+const char * B_MEDIA_ADDON_SERVER_SIGNATURE = "application/x-vnd.OpenBeOS-addon-host";
 
 const type_code B_CODEC_TYPE_INFO = 0x040807b2;
 
@@ -1030,15 +1032,73 @@ struct buffer_clone_info
 //	The callback should always return TRUE for the time being.
 status_t shutdown_media_server(bigtime_t timeout = B_INFINITE_TIMEOUT, bool (*progress)(int stage, const char * message, void * cookie) = NULL, void * cookie = NULL)
 {
-	UNIMPLEMENTED();
+	status_t err = B_OK;
+	BMessage msg(B_QUIT_REQUESTED), reply;
+	if((err = msg.AddBool("be:_user_request", true))!=B_OK)
+		return err;
+	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE);
+		progress(10, "Telling media_server to quit.", cookie);
+		
+		if((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000))!=B_OK)
+			return err;
+		int32 rv;
+		if(((err = reply.FindInt32("error", &rv))==B_OK) && (rv != B_OK))
+			return err;
+	}
+	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
+		progress(20, "Telling media_addon_server to quit.", cookie);
+		
+		if((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000))!=B_OK)
+			return err;
+		int32 rv;
+		if(((err = reply.FindInt32("error", &rv))==B_OK) && (rv != B_OK))
+			return err;
+	}
+	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+		progress(40, "Waiting for media_server to quit.", cookie);
+		snooze(200000);
+	}
+	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		progress(50, "Waiting for media_addon_server to quit.", cookie);
+		snooze(200000);
+	}
+	
+	progress(70, "Cleaning Up.", cookie);
+	snooze(2000000);
+	kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
+	kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
+	
+	progress(100, "Done Shutting Down.", cookie);
+	snooze(1000000);
+	
 	return B_OK;
 }
 
 status_t launch_media_server(uint32 flags = 0)
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	status_t err = B_OK;
+	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE) 
+		|| be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
+		return B_ALREADY_RUNNING;
+	err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
+	if (err == B_OK) {
+		for(int32 i=0; i<15; i++) {
+			snooze(2000000);
+			BMessage msg(1), reply;
+			BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
+			err = B_MEDIA_SYSTEM_FAILURE;
+			if (messenger.IsValid()) {
+				messenger.SendMessage(&msg, &reply, 2000000, 2000000);
+				err = B_OK;
+				break;
+			}
+		}
+	} 
+	return err;
 }
+
 
 //	Given an image_id, prepare that image_id for realtime media
 //	If the kind of media indicated by "flags" is not enabled for real-time,
