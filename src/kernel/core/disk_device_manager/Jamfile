@@ -16,6 +16,7 @@ SharedLibrary disk_device_manager :
 	KDiskDevice.cpp
 	KDiskDeviceJob.cpp
 	KDiskDeviceJobFactory.cpp
+	KDiskDeviceJobGenerator.cpp
 	KDiskDeviceJobQueue.cpp
 	KDiskDeviceManager.cpp
 	KFileDiskDevice.cpp
