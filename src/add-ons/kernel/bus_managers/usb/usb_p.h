@@ -35,6 +35,12 @@ class Device;
 class BusManager;
 
 /* ++++++++++
+Important data from the USB spec (not interesting for drivers)
+++++++++++ */
+
+#define POWER_DELAY 
+
+/* ++++++++++
 Internal classes
 ++++++++++ */
 
@@ -81,6 +87,14 @@ class Hub : public Device
 public:
 	Hub( BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum);
 	virtual bool IsHub()	{ return true; };
+
+	void Explore();
+private: 
+	usb_interface_descriptor m_interrupt_interface;
+	usb_endpoint_descriptor m_interrupt_endpoint;
+	usb_hub_descriptor m_hub_descriptor;
+	
+	usb_port_status     m_port_status[8]; //Max of 8 ports, for the moment
 };
 
 /*
@@ -99,8 +113,8 @@ public:
 	
 	Device *AllocateNewDevice( Device *parent );
 	int8 AllocateAddress();
-	status_t SendRequest( Device *dev, uint8 request_type , uint8 request , uint16 value ,
-	                  uint16 index , uint16 length , void *data ,
+	status_t SendRequest( Device *dev, uint8 request_type , uint8 request , 
+	                  uint16 value , uint16 index , uint16 length , void *data ,
 	                  size_t data_len , size_t *actual_len );
 private:
 	status_t SendControlMessage( Device *dev , uint16 pipe , 
@@ -113,7 +127,11 @@ private:
 	bool m_devicemap[128];
 	sem_id m_lock;
 	Device *m_roothub;
+	thread_id m_explore_thread;
 };
+
+// Located in the BusManager.cpp
+int32 usb_explore_thread( void *data );
 
 /*
  * This class is more like an utility class that performs all functions on

@@ -21,6 +21,25 @@
 
 #include "usb_p.h"
 
+
+/* +++++++++
+This is the 'main' function of the explore thread, which keeps track of
+the hub statuses.
++++++++++ */
+int32 usb_explore_thread( void *data )
+{
+	Hub *roothub = (Hub *)data;
+	
+	while (true )
+	{
+		//Go to the hubs
+		roothub->Explore();
+		snooze(10000); //Wait one second before continueing
+	}
+	return B_OK;
+}
+
+
 BusManager::BusManager( host_controller_info *info )
 {
 	hcpointer = info;
@@ -41,6 +60,11 @@ BusManager::BusManager( host_controller_info *info )
 	
 	if( m_roothub == 0 )
 		return;
+		
+	// Start the 'explore thread'
+	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
+	                     B_LOW_PRIORITY , (void *)m_roothub );
+	resume_thread( m_explore_thread );
 	
 	m_initok = true;
 }

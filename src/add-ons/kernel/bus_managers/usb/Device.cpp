@@ -121,4 +121,7 @@ status_t Device::SetConfiguration( uint8 value )
 	             NULL ,											//Buffer
 	             0 ,											//Bufferlength
 	             0 );											//length
+
+	//Set current configuration
+	m_current_configuration = m_configurations + value;
 }
