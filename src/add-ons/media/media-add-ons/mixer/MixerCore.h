@@ -26,6 +26,7 @@ public:
 	MixerOutput *Output();
 	
 	void Lock();
+	bool LockWithTimeout(bigtime_t timeout);
 	void Unlock();
 	
 	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
@@ -34,17 +35,17 @@ public:
 	void OutputFormatChanged(const media_multi_audio_format &format);
 
 	void SetOutputBufferGroup(BBufferGroup *group);
-	void SetTimeSource(BTimeSource *ts);
+	void SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency);
 	void EnableOutput(bool enabled);
 	void Start(bigtime_t time);
 	void Stop();
 
-	uint32 OutputBufferSize();
 	bool IsStarted();
 	
 	uint32 OutputChannelCount();
 
 private:
+	void ApplyOutputFormat();
 	static int32 _mix_thread_(void *arg);
 	void MixThread();
 	
@@ -56,7 +57,7 @@ private:
 	int32		fNextInputID;
 	bool		fRunning;
 
-	Resampler		**fResampler; // array
+	Resampler	**fResampler; // array
 
 	float		*fMixBuffer;
 	int32		fMixBufferFrameRate;
@@ -64,7 +65,9 @@ private:
 	int32		fMixBufferChannelCount;
 	int32		*fMixBufferChannelTypes; //array
 	bool		fDoubleRateMixing;
-	bigtime_t	fMixStartTime;
+	bigtime_t	fDownstreamLatency;
+	
+	friend class MixerInput; // XXX debug only
 	
 	AudioMixer *fNode;
 	BBufferGroup *fBufferGroup;
@@ -77,6 +80,11 @@ private:
 inline void MixerCore::Lock()
 {
 	fLocker->Lock();
+}
+
+inline bool MixerCore::LockWithTimeout(bigtime_t timeout)
+{
+	return B_OK == fLocker->LockWithTimeout(timeout);
 }
 
 inline void MixerCore::Unlock()

@@ -16,6 +16,7 @@
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
+#include "MixerUtils.h"
 #include "debug.h"
 
 #define USE_MEDIA_FORMAT_WORKAROUND 1
@@ -334,6 +335,8 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 {
 	// at some point in the future (indicated by change_tag and RequestCompleted()),
 	// we will receive buffers in a different format
+
+	printf("AudioMixer::FormatChanged\n");
 	
 	if (consumer.port != ControlPort() || consumer.id == 0)
 		return B_MEDIA_BAD_DESTINATION;
@@ -400,7 +403,12 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	// another format, we need to check if the format is acceptable and
 	// remove any wildcards before returning OK.
 	
+	return B_ERROR;
+	
 	fCore->Lock();
+	
+	printf("AudioMixer::FormatChangeRequested\n");
+	
 	MixerOutput *output = fCore->Output();
 	if (!output) {
 		ERROR("AudioMixer::FormatChangeRequested: no output\n");
@@ -411,8 +419,15 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 		goto err;
 	}
 	if (destination != output->MediaOutput().destination) {
-		ERROR("AudioMixer::FormatChangeRequested: wrong output destination\n");
-		goto err;
+		ERROR("AudioMixer::FormatChangeRequested: wrong output destination (port %ld, id %ld), our is (port %ld, id %ld)\n", destination.port, destination.id, output->MediaOutput().destination.port, output->MediaOutput().destination.id);
+		if (destination.port == output->MediaOutput().destination.port && destination.id == output->MediaOutput().destination.id + 1) {
+			ERROR("AudioMixer::FormatChangeRequested: this might be the broken R5 multi audio add-on\n");
+			goto err;
+//			fCore->Unlock();
+//			return B_OK;
+		} else {
+			goto err;
+		}
 	}
 	if (io_format->type != B_MEDIA_RAW_AUDIO && io_format->type != B_MEDIA_UNKNOWN_TYPE) {
 		ERROR("AudioMixer::FormatChangeRequested: wrong format type\n");
@@ -426,11 +441,34 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 		io_format->SpecializeTo(&fDefaultFormat);
 	#endif
 	
-	// apply format change
-	fCore->Lock();
-	fCore->OutputFormatChanged(io_format->u.raw_audio);
-	fCore->Unlock();
+	media_node_id id;
+	FindLatencyFor(destination, &fDownstreamLatency, &id);
+	printf("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
+
+	// SetDuration of one buffer
+	SetBufferDuration(buffer_duration(io_format->u.raw_audio));
+	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
+
+	// Our internal latency is at least the length of a full output buffer
+	fInternalLatency = bigtime_t(1.2 * BufferDuration());
+	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
+	SetEventLatency(fDownstreamLatency + fInternalLatency);
+	
+	//printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
+	//SendLatencyChange(source, destination, EventLatency());
+
+	delete fBufferGroup;
+	fBufferGroup = CreateBufferGroup();
+	fCore->SetOutputBufferGroup(fBufferGroup);
+	
+	// apply latency change
+	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
+
+	// apply format change
+	fCore->OutputFormatChanged(io_format->u.raw_audio);
+
+	fCore->Unlock();
 	return B_OK;
 
 err:
@@ -473,6 +511,7 @@ AudioMixer::DisposeOutputCookie(int32 cookie)
 status_t 
 AudioMixer::SetBufferGroup(const media_source &for_source, BBufferGroup *newGroup)
 {
+	printf("#############################AudioMixer::SetBufferGroup\n");
 	// the downstream consumer (soundcard) node asks us to use another
 	// BBufferGroup (might be NULL). We only have one output (id 0)
 	if (for_source.port != ControlPort() || for_source.id != 0)
@@ -590,19 +629,18 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	printf("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
 
 	// SetDuration of one buffer
-	SetBufferDuration((1000000 * (format.u.raw_audio.buffer_size / ((format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK) * format.u.raw_audio.channel_count))) / format.u.raw_audio.frame_rate);
+	SetBufferDuration(buffer_duration(format.u.raw_audio));
 
 	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	// XXX we use two for now
-	fInternalLatency = 2 * BufferDuration();
+	fInternalLatency = bigtime_t(1.2 * BufferDuration());
 	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
-	printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
-	SendLatencyChange(source, dest, EventLatency());
+	//printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
+	//SendLatencyChange(source, dest, EventLatency());
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
@@ -625,7 +663,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	fCore->Output()->MediaOutput().destination = dest;
 
 	fCore->EnableOutput(true);
-	fCore->SetTimeSource(TimeSource());
+	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
 	fCore->SetOutputBufferGroup(fBufferGroup);
 	fCore->Unlock();
 }
@@ -709,8 +747,8 @@ void
 AudioMixer::NodeRegistered()
 {
 		Run();
-		SetPriority(8);
 //		SetPriority(120);
+		SetPriority(12);
 }
 
 void
@@ -718,7 +756,7 @@ AudioMixer::SetTimeSource(BTimeSource * time_source)
 {
 	printf("AudioMixer::SetTimeSource: timesource is now %ld\n", time_source->ID());
 	fCore->Lock();
-	fCore->SetTimeSource(time_source);
+	fCore->SetTimingInfo(time_source, fDownstreamLatency);
 	fCore->Unlock();
 }
 
@@ -780,7 +818,7 @@ AudioMixer::CreateBufferGroup()
 	int32 count = int32(fDownstreamLatency / BufferDuration()) + 2;
 	
 	fCore->Lock();
-	uint32 size = fCore->OutputBufferSize();
+	uint32 size = fCore->Output()->MediaOutput().format.u.raw_audio.buffer_size;
 	fCore->Unlock();
 	
 	printf("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);

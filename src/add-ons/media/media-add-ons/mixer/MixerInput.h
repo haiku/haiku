@@ -8,7 +8,7 @@ class Resampler;
 class MixerInput
 {
 public:
-	MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount, bigtime_t mixStartTime);
+	MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount);
 	~MixerInput();
 	
 	int32 ID();
@@ -31,7 +31,7 @@ public:
 
 protected:
 	friend class MixerCore;
-	void SetMixBufferFormat(int32 framerate, int32 frames, bigtime_t starttime);
+	void SetMixBufferFormat(int32 framerate, int32 frames);
 	
 private:
 	void UpdateChannelDesignations();
@@ -65,7 +65,6 @@ private:
 	
 	float 			fMixBufferFrameRate;
 	uint32			fMixBufferFrameCount;
-	bigtime_t		fMixBufferStartTime;
 	
 	Resampler		**fResampler; // array
 
