@@ -1119,6 +1119,7 @@ StyledEditWindow::PageSetup(const char *documentname)
 		
 	if (fPrintSettings != NULL) {
 		printJob.SetSettings(fPrintSettings);
+		fPrintSettings = NULL;
 	}
 	
 	result = printJob.ConfigPage();
@@ -1144,6 +1145,7 @@ StyledEditWindow::Print(const char *documentname)
 	
 	BPrintJob printJob(documentname);
 	printJob.SetSettings(fPrintSettings);
+	fPrintSettings = NULL;
 	result = printJob.ConfigJob();
 	if (result != B_OK) {
 		return;
