@@ -61,24 +61,19 @@ enum {
 	PCI_CARDBUS
 };
 
-
-
 // forward declarations
-static char    *decode_class(uint8 base, uint8 sub_class);
-static void    pci_scan_bus(uint8 bus);
-static void    scan_pci(void);
-static void    pci_bridge(uint8 bus, uint8 dev, uint8 func);
-static void    fill_basic_pci_structure(pci_info *pciInfo);
-static uint32  read_pci_config(uchar, uchar, uchar, uchar, uchar);
-static void    write_pci_config (uchar, uchar, uchar, uchar, uchar, uint32);
-
-
-
+static char *decode_class(uint8 base, uint8 sub_class);
+static void pci_scan_bus(uint8 bus);
+//static void scan_pci(void);
+static void pci_bridge(uint8 bus, uint8 dev, uint8 func);
+static void fill_basic_pci_structure(pci_info *pciInfo);
+static uint32 read_pci_config(uchar, uchar, uchar, uchar, uchar);
+static void write_pci_config (uchar, uchar, uchar, uchar, uchar, uint32);
 
 /** globals **/
 
 static pci_device *gPCI_Devices = NULL;
-static pci_bus    *gPCI_Busses  = NULL;
+static pci_bus *gPCI_Busses = NULL;
 
 static spinlock   gConfigLock = 0;      /* lock for config space access */
 static int        gConfigMechanism = 1; /* The pci config mechanism we're using.
@@ -94,8 +89,6 @@ static int        gMaxBusDetected = 0;  /* maximum bus we've found/configured */
 
 static region_id  gPCI_Region;           /* pci_bios region we map */
 static addr       gPCI_BIOS_Address = 0; /* virtual address of memory we map */
-
-
 
 
 /* ToDo: move these to a header file */
@@ -127,7 +120,6 @@ static addr       gPCI_BIOS_Address = 0; /* virtual address of memory we map */
 	release_spinlock(&gConfigLock); \
 	restore_interrupts(cpu_status); \
 }
-
 
 
 /* decode_class
@@ -562,10 +554,10 @@ pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
 }
 
 
-/* This used to be fixup_host_bridges, but some PCI-PCI bridges need
- * to be adjusted as well so I'll make it more general.
+/** This used to be fixup_host_bridges, but some PCI-PCI bridges need
+ *	to be adjusted as well so I'll make it more general.
  *
- * Partially borrowed from NetBSD.
+ *	Partially borrowed from NetBSD.
  */
 
 static void
@@ -1133,6 +1125,7 @@ pci_scan_bus(uint8 bus)
 }
 
 
+#if 0
 static void
 scan_pci(void)
 {
@@ -1207,6 +1200,7 @@ scan_pci(void)
 		}
 	}
 }
+#endif
 
 
 static void
@@ -1350,21 +1344,13 @@ pci_write_io_32(int mapped_io_addr, uint32 value)
 static void
 pci_module_init(void)
 {
-	
 	struct pir_table *pirTable = NULL;
 
 	TRACE(("pci_module_init()\n"));
 
-	// ToDo: remove this dummy if statement -- it's only here to
-	//       shut up the compiler which complains about 'scan_pci'
-	//       being defined but not used...
-	if (0)
-		scan_pci();
-	
-	
 	if (!set_pci_mechanism())
 		return;
-	
+
 	check_pci();
 
 	gPCI_Region = vm_map_physical_memory(vm_get_kernel_aspace_id(),
@@ -1374,7 +1360,7 @@ pci_module_init(void)
 	                                    0x10000,
 	                                    LOCK_RO | LOCK_KERNEL,
 	                                    (addr)0xf0000);
-	
+
 	pirTable = find_pir_table();
 	if (pirTable) {
 		dprintf("PCI IRQ Routing table found\n");
@@ -1382,7 +1368,7 @@ pci_module_init(void)
 		print_pir_table(pirTable);
 #endif
 	}
-	
+
 	pci_scan_bus(0);
 }
 
@@ -1394,7 +1380,7 @@ pci_module_init(void)
 static void
 pci_module_uninit(void)
 {
-	vm_delete_region(vm_get_kernel_aspace_id(), gPCI_Region);
+	delete_area(gPCI_Region);
 }
 
 
@@ -1406,7 +1392,7 @@ std_ops(int32 op, ...)
 			dprintf("PCI: init\n");
 			pci_module_init();
 			return B_OK;
-		
+
 		case B_MODULE_UNINIT:
 			dprintf("PCI: uninit\n");
 			pci_module_uninit();
