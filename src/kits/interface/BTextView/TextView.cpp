@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -1915,7 +1915,7 @@ BTextView::SetTextRect(BRect rect)
 	fTextRect = rect;
 	
 	if (Window() != NULL)
-		Refresh(0, LONG_MAX, true, false);
+		Refresh(0, fLines->NumLines(), true, false);
 }
 //------------------------------------------------------------------------------
 BRect
@@ -1949,7 +1949,7 @@ BTextView::SetTabWidth(float width)
 	fTabWidth = width;
 	
 	if (Window() != NULL)
-		Refresh(0, LONG_MAX, true, false);
+		Refresh(0, fLines->NumLines(), true, false);
 }
 //------------------------------------------------------------------------------
 float
@@ -2030,11 +2030,11 @@ BTextView::SetWordWrap(bool wrap)
 			}
 		}
 		
-		Refresh(0, LONG_MAX, true, false);
+		Refresh(0, fLines->NumLines(), true, false);
 		
 		if (fActive) {
 			// show the caret, hilite the selection
-			if (fSelStart != fSelEnd)
+			if (fSelStart != fSelEnd && fSelectable)
 				Highlight(fSelStart, fSelEnd);
 			else {
 				if (!fCaretVisible)
@@ -2087,7 +2087,18 @@ void
 BTextView::SetAlignment(alignment flag)
 {
 	CALLED();
-	fAlignment = flag;
+	
+	// Do a reality check
+	if (fAlignment != flag && flag >= 0 && flag <= 2) {
+		fAlignment = flag;
+		
+		// After setting new alignment, update the view/window
+		BWindow *window = Window();
+		if (window) {
+			Invalidate();
+			window->UpdateIfNeeded();
+		}
+	}
 }
 //------------------------------------------------------------------------------
 alignment
@@ -2133,12 +2144,35 @@ void
 BTextView::MakeResizable(bool resize, BView *resizeView)
 {
 	CALLED();
-	fResizable = resize;
-	fContainerView = resizeView;
+	if (resize) {
+		fResizable = true;
+		fContainerView = resizeView;
+		
+		// Wrapping mode and resizable mode can't live together
+		if (fWrap) {
+			fWrap = false;
+			
+			if (fActive && Window() != NULL) {	
+				if (fSelStart != fSelEnd && fSelectable)
+					Highlight(fSelStart, fSelEnd);
+
+				else if (fCaretVisible) {
+					InvertCaret();
+					Refresh(0, fLines->NumLines(), true, false);
+				}		
+			}	
+		}
+	} else {
+		fResizable = false;
+		fContainerView = NULL;
+		if (fOffscreen)
+			DeleteOffscreen();
+		NewOffscreen();
+	}
 }
 //------------------------------------------------------------------------------
 bool
-BTextView::IsResizable () const
+BTextView::IsResizable() const
 {
 	CALLED();
 	return fResizable;
@@ -3347,14 +3381,14 @@ BTextView::NewOffscreen(float padding)
 	CALLED();
 	if (fOffscreen != NULL)
 		DeleteOffscreen();
-	/*
+	
 	BRect bitmapRect(0, 0, fTextRect.Width() + padding, fTextRect.Height());
 	fOffscreen = new BBitmap(bitmapRect, fColorSpace, true, false);
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
 		BView *bufferView = new BView(bitmapRect, "buffer view", 0, 0);
 		fOffscreen->AddChild(bufferView);
 		fOffscreen->Unlock();
-	}*/
+	}
 }
 //------------------------------------------------------------------------------
 void
@@ -3373,6 +3407,8 @@ BTextView::Activate()
 	CALLED();
 	fActive = true;
 	
+	NewOffscreen();
+
 	if (fSelStart != fSelEnd) {
 		if (fSelectable)
 			Highlight(fSelStart, fSelEnd);

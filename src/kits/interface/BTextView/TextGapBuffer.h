@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include "SupportDefs.h"
+#include <SupportDefs.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -68,7 +68,6 @@ virtual				~_BTextGapBuffer_();
 		
 		char	RealCharAt(int32 offset) const;
 				
-//		void	InsertText(BFile *, int32, int32, int32); 
 		bool	PasswordMode() const;
 		void	SetPasswordMode(bool);
 
