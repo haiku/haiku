@@ -47,13 +47,15 @@
 #include <Beep.h>
 
 #include <Autolock.h>
+#include <stdio.h>
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-#define DEFAULT_RECT	BRect(100, 100, 100, 100)
+// Default size of the Alert window.
+#define DEFAULT_RECT	BRect(0, 0, 320, 75)
 #define max(LHS, RHS)	((LHS) > (RHS) ? (LHS) : (RHS))
 
 // Globals ---------------------------------------------------------------------
@@ -520,7 +522,7 @@ void BAlert::InitObject(const char* text, const char* button0,
 		// in AttachedToWindow()
 		for (int i = 0; i < buttonCount; ++i)
 		{
-			MasterView->AddChild(fButtons[i]);
+			AddChild(fButtons[i]);
 		}
 
 		for (int i = buttonCount - 1; i >= 0; --i)
@@ -616,7 +618,7 @@ void BAlert::InitObject(const char* text, const char* button0,
 								  TextViewRect,
 								  B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
  		AddChild(MasterView);
- 		MasterView->AddChild(fTextView);
+ 		AddChild(fTextView);
 		
 		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fTextView->SetText(text, strlen(text));
