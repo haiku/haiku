@@ -54,6 +54,31 @@ public:
 	bool	fArray;
 };
 
+// compare_string
+/*!	\brief \c NULL aware strcmp().
+
+	\c NULL is considered the least of all strings. \c NULL equals \c NULL.
+
+	\param str1 First string.
+	\param str2 Second string.
+	\return A value less than 0, if \a str1 is less than \a str2,
+			0, if they are equal, or a value greater than 0, if
+			\a str1 is greater \a str2.
+*/
+static inline
+int
+compare_string(const char *str1, const char *str2)
+{
+	if (str1 == NULL) {
+		if (str2 == NULL)
+			return 0;
+		return 1;
+	} else if (str2 == NULL)
+		return -1;
+	return strcmp(str1, str2);
+}
+
+
 // constructor
 BPartition::BPartition()
 	: fDevice(NULL),
@@ -975,20 +1000,6 @@ BPartition::_RemoveObsoleteDescendants(user_partition_data *data,
 		}
 	}
 	return B_OK;
-}
-
-// compare_string
-static
-int
-compare_string(const char *str1, const char *str2)
-{
-	if (str1 == NULL) {
-		if (str2 == NULL)
-			return 0;
-		return 1;
-	} else if (str2 == NULL)
-		return -1;
-	return strcmp(str1, str2);
 }
 
 // _Update
