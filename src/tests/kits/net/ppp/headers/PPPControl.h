@@ -15,32 +15,27 @@
 // starting values and other values for control ops
 #define PPP_RESERVE_OPS_COUNT				0xFFFF
 #define PPP_OPS_START						B_DEVICE_OP_CODES_END + 1
+#define PPP_INTERFACE_OPS_START				PPP_OPS_START + PPP_RESERVE_OPS_COUNT
 #define PPP_DEVICE_OPS_START				PPP_OPS_START + 2 * PPP_RESERVE_OPS_COUNT
 #define PPP_PROTOCOL_OPS_START				PPP_OPS_START + 3 * PPP_RESERVE_OPS_COUNT
 #define PPP_ENCAPSULATOR_OPS_START			PPP_OPS_START + 4 * PPP_RESERVE_OPS_COUNT
 #define PPP_OPTION_HANDLER_OPS_START		PPP_OPS_START + 5 * PPP_RESERVE_OPS_COUNT
 #define PPP_LCP_EXTENSION_OPS_START			PPP_OPS_START + 6 * PPP_RESERVE_OPS_COUNT
-#define PPP_COMMON_PROTO_ENCAPS_OPS_START	PPP_OPS_START + 10 * PPP_RESERVE_OPS_COUNT
+#define PPP_COMMON_OPS_START				PPP_OPS_START + 10 * PPP_RESERVE_OPS_COUNT
+#define PPP_COMMON_PROTO_ENCAPS_OPS_START	PPP_OPS_START + 11 * PPP_RESERVE_OPS_COUNT
 #define PPP_USER_OPS_START					PPP_OPS_START + 32 * PPP_RESERVE_OPS_COUNT
 
 
 enum PPP_CONTROL_OPS {
 	// -----------------------------------------------------
 	// PPPInterface
-	PPPC_GET_STATUS = PPP_OPS_START,
-	PPPC_GET_MRU,
+	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
 	PPPC_SET_MRU,
-	PPPC_GET_LINK_MTU,
-	PPPC_SET_LINK_MTU,
-	PPPC_GET_DIAL_ON_DEMAND,
 	PPPC_SET_DIAL_ON_DEMAND,
-	PPPC_GET_AUTO_REDIAL,
 	PPPC_SET_AUTO_REDIAL,
-	PPPC_GET_PROTOCOLS_COUNT,
-	PPPC_GET_ENCAPSULATORS_COUNT,
-	PPPC_GET_OPTION_HANDLERS_COUNT,
-	PPPC_GET_LCP_EXTENSIONS_COUNT,
-	PPPC_GET_CHILDREN_COUNT,
+	
+	// handler access
+	PPPC_CONTROL_DEVICE,
 	PPPC_CONTROL_PROTOCOL,
 	PPPC_CONTROL_ENCAPSULATOR,
 	PPPC_CONTROL_OPTION_HANDLER,
@@ -50,9 +45,8 @@ enum PPP_CONTROL_OPS {
 	
 	// -----------------------------------------------------
 	// PPPDevice
-	PPPC_GET_MTU = PPP_DEVICE_OPS_START,
+	PPPC_GET_DEVICE_INFO = PPP_DEVICE_OPS_START,
 	PPPC_SET_MTU,
-	PPPC_GET_PREFERRED_MTU,
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
@@ -65,6 +59,7 @@ enum PPP_CONTROL_OPS {
 	
 	// -----------------------------------------------------
 	// PPPOptionHandler
+	PPPC_GET_OPTION_HANDLER_INFO = PPP_OPTION_HANDLER_OPS_START,
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
@@ -72,45 +67,116 @@ enum PPP_CONTROL_OPS {
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
-	// PPPProtocol and PPPEncapsulator
-	PPPC_GET_NAME,
-	PPPC_GET_ENABLED = PPP_COMMON_PROTO_ENCAPS_OPS_START,
+	// Common/mixed ops
+	PPPC_GET_HANDLER_INFO = PPP_COMMON_OPS_START,
 	PPPC_SET_ENABLED,
+	// -----------------------------------------------------
+	
+	// -----------------------------------------------------
+	// PPPProtocol and PPPEncapsulator
 	// -----------------------------------------------------
 	
 	PPP_CONTROL_OPS_END = B_DEVICE_OP_CODES_END + 0xFFFF
 };
 
 
-typedef struct ppp_control_structure {
+typedef struct ppp_control_info {
 	uint32 index;
 		// index of interface/protocol/encapsulator/etc.
 	uint32 op;
 		// the Control()/ioctl() opcode
-	
-	union {
-		void *data;
-		ppp_control_struct *subcontrol;
-	} pointer;
-		// either a pointer to the data or a pointer to a control structure for
-		// accessing protocols/encapsulators/etc.
-	
+	void *data;
 	size_t length;
-		// not always needed
-} ppp_control_structure;
+		// should always be set
+} ppp_control_info;
 
 
-typedef struct ppp_status_structure {
+// -----------------------------------------------------------
+// structures for storing information about interface/handlers
+// use the xxx_info_t structures when allocating memory (they
+// reserve memory for future implementations)
+// -----------------------------------------------------------
+#define _PPP_INFO_T_SIZE_								256
+
+typedef struct ppp_interface_info {
+	const driver_settings *settings;
+	
 	PPP_MODE mode;
 	PPP_STATE state;
 	PPP_PHASE phase;
 	PPP_AUTHENTICATION_STATUS authenticationStatus, peerAuthenticationStatus;
 	
-	bigtime_t idle_since;
+	uint32 protocolsCount, encapsulatorsCount, optionHandlersCount,
+		LCPExtensionsCount, childrenCount;
+	uint32 MRU, interfaceMTU;
 	
-	uint8 _reserved_[64 - (sizeof(PPP_MODE) + sizeof(PPP_STATE) + sizeof(PPP_PHASE)
-						+ 2 * sizeof(PPP_AUTHENTICATION_STATUS) + sizeof(bigtime_t))];
-} ppp_status_structure;
+	bigtime_t idleSince, disconnectAfterIdleSince;
+	
+	bool doesDialOnDemand, doesAutoRedial, hasDevice, isMultilink, hasParent;
+} ppp_interface_info;
+typedef struct ppp_interface_info_t {
+	ppp_interface_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_interface_info)];
+} ppp_interface_info_t;
+
+
+// devices are special handlers, so they have their own structure
+typedef struct ppp_device_info {
+	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+	
+	const driver_parameter *settings;
+	
+	uint32 MTU, preferredMTU;
+	uint32 inputTransferRate, outputTransferRate, outputBytesCount;
+} ppp_device_info;
+typedef struct ppp_device_info_t {
+	ppp_device_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_device_info)];
+} ppp_device_info_t;
+
+
+typedef struct ppp_handler_info {
+	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+	
+	// general
+	const driver_parameter *settings;
+	
+	PPP_PHASE phase;
+	int32 addressFamily, flags;
+	uint16 protocol;
+	
+	bool isEnabled;
+	
+	// only protocol and encapsulator
+	bool isUpRequested;
+	PPP_PHASE connectionStatus;
+		// there are four possible states:
+		// PPP_ESTABLISHED_PHASE	-		IsUp() == true
+		// PPP_DOWN_PHASE			-		IsDown() == true
+		// PPP_ESTABLISHMENT_PHASE	-		IsGoingUp() == true
+		// PPP_TERMINATION_PHASE	-		IsGoingDown() == true
+	
+	// only encapsulator
+	PPP_ENCAPSULATION_LEVEL level;
+	uint32 overhead;
+} ppp_handler_info;
+typedef struct ppp_handler_info_t {
+	ppp_handler_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_handler_info)];
+} ppp_handler_info_t;
+
+
+typedef struct ppp_option_handler_info {
+	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+	
+	const driver_parameter *settings;
+	
+	bool isEnabled;
+} ppp_option_handler_info;
+typedef struct ppp_option_handler_info_t {
+	ppp_option_handler_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_option_handler_info)];
+} ppp_option_handler_info_t;
 
 
 #endif

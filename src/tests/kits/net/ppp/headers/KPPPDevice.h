@@ -19,7 +19,7 @@
 
 class PPPDevice {
 	public:
-		PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
+		PPPDevice(const char *name, PPPInterface& interface,
 			driver_parameter *settings);
 		virtual ~PPPDevice();
 		
@@ -28,10 +28,7 @@ class PPPDevice {
 		const char *Name() const
 			{ return fName; }
 		
-		uint32 Overhead() const
-			{ return fOverhead; }
-		
-		PPPInterface *Interface() const
+		PPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -85,8 +82,7 @@ class PPPDevice {
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
-		uint32 fOverhead;
-		PPPInterface *fInterface;
+		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		
 		uint32 fMTU;

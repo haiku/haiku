@@ -185,12 +185,12 @@ PPPStateMachine::UpEvent(PPPInterface *interface)
 	
 	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
 		// this is the first interface that went up
-		Interface()->SetLinkMTU(interface->LinkMTU());
+		Interface()->SetMRU(interface->MRU());
 		locker.UnlockNow();
 		ThisLayerUp();
-	} else if(Interface()->LinkMTU() > interface->LinkMTU())
-		Interface()->SetLinkMTU(interface->LinkMTU());
-			// linkMTU should always be the smallest value of all children
+	} else if(Interface()->MRU() > interface->MRU())
+		Interface()->SetMRU(interface->MRU());
+			// MRU should always be the smallest value of all children
 	
 	NewState(PPP_OPENED_STATE);
 }
@@ -201,8 +201,8 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 {
 	LockerHelper locker(fLock);
 	
-	uint32 linkMTU = 0;
-		// the new linkMTU
+	uint32 MRU = 0;
+		// the new MRU
 	
 	Interface()->CalculateBaudRate();
 	
@@ -214,17 +214,17 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 			child = Interface()->ChildAt(index);
 			
 			if(child && child->IsUp()) {
-				// set linkMTU to the smallest value of all children
-				if(linkMTU == 0)
-					linkMTU = child->LinkMTU();
-				else if(linkMTU > child->LinkMTU())
-					linkMTU = child->LinkMTU();
+				// set MRU to the smallest value of all children
+				if(MRU == 0)
+					MRU = child->MRU();
+				else if(MRU > child->MRU())
+					MRU = child->MRU();
 				
 				++count;
 			}
 		}
 		
-		Interface()->SetLinkMTU(linkMTU);
+		Interface()->SetMRU(MRU);
 		
 		if(count == 0) {
 			locker.UnlockNow();
@@ -1463,10 +1463,10 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type
 	int32 adjust = 0;
 		// adjust packet size by this value if packet is too big
 	if(packet->m_flags & M_PKTHDR) {
-		if((uint32) packet->m_pkthdr.len > Interface()->LinkMTU())
-			adjust = Interface()->LinkMTU() - packet->m_pkthdr.len;
-	} else if(packet->m_len > Interface()->LinkMTU())
-		adjust = Interface()->LinkMTU() - packet->m_len;
+		if((uint32) packet->m_pkthdr.len > Interface()->MRU())
+			adjust = Interface()->MRU() - packet->m_pkthdr.len;
+	} else if(packet->m_len > Interface()->MRU())
+		adjust = Interface()->MRU() - packet->m_len;
 	
 	if(adjust != 0)
 		m_adj(packet, adjust);

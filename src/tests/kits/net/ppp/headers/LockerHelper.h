@@ -31,7 +31,7 @@ class LockerHelper {
 	public:
 		LockerHelper(BLocker& lock) : fLock(&lock)
 		{
-			if(fLock->Lock() != B_OK)
+			if(!fLock->Lock())
 				fLock = NULL;
 		}
 		

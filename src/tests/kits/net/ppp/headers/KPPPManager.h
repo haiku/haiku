@@ -28,6 +28,7 @@ typedef struct ppp_manager_info {
 			// you should always create interfaces using this function
 	void (*delete_interface)(interface_id ID);
 		// this marks the interface for deletion
+	void (*remove_interface)(interface_id ID);
 	
 	ifnet* (*register_interface)(interface_id ID);
 	bool (*unregister_interface)(interface_id ID);

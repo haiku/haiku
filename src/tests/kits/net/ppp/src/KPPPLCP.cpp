@@ -25,7 +25,7 @@
 
 PPPLCP::PPPLCP(PPPInterface& interface)
 	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
-		AF_UNSPEC, &interface, NULL, PPP_ALWAYS_ALLOWED),
+		AF_UNSPEC, interface, NULL, PPP_ALWAYS_ALLOWED),
 	fStateMachine(interface.StateMachine()), fTarget(NULL)
 {
 	SetUpRequested(false);
@@ -87,8 +87,6 @@ PPPLCP::AdditionalOverhead() const
 	
 	if(Target())
 		overhead += Target()->Overhead();
-	if(Interface()->Device())
-		overhead += Interface()->Device()->Overhead();
 	
 	return overhead;
 }
@@ -113,10 +111,8 @@ PPPLCP::Send(struct mbuf *packet)
 {
 	if(Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);
-	else if(Interface())
-		return Interface()->Send(packet, PPP_LCP_PROTOCOL);
 	else
-		return B_ERROR;
+		return Interface().Send(packet, PPP_LCP_PROTOCOL);
 }
 
 
@@ -171,7 +167,7 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 		break;
 		
 		default:
-			return B_ERROR;
+			StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
 	}
 	
 	return B_OK;

@@ -74,12 +74,13 @@ class PPPInterface {
 		bigtime_t DisconnectAfterIdleSince() const
 			{ return fDisconnectAfterIdleSince; }
 		
-		void SetLinkMTU(uint32 linkMTU);
-		uint32 LinkMTU() const
-			{ return fLinkMTU; }
-				// this is the smallest MTU that we and the peer have
+		void SetMRU(uint32 MRU);
 		uint32 MRU() const
 			{ return fMRU; }
+				// this is the smallest MRU that we and the peer have
+		uint32 InterfaceMTU() const
+			{ return fInterfaceMTU; }
+				// this is the MRU including encapsulator overhead
 		
 		status_t Control(uint32 op, void *data, size_t length);
 		
@@ -92,12 +93,14 @@ class PPPInterface {
 		int32 CountProtocols() const
 			{ return fProtocols.CountItems(); }
 		PPPProtocol *ProtocolAt(int32 index) const;
-		PPPProtocol *ProtocolFor(uint16 protocol, int32 start = 0) const;
+		PPPProtocol *ProtocolFor(uint16 protocol, int32 *start = NULL) const;
 		int32 IndexOfProtocol(PPPProtocol *protocol) const
 			{ return fProtocols.IndexOf(protocol); }
 		
 		bool AddEncapsulator(PPPEncapsulator *encapsulator);
 		bool RemoveEncapsulator(PPPEncapsulator *encapsulator);
+		int32 CountEncapsulators() const;
+		PPPEncapsulator *EncapsulatorAt(int32 index) const;
 		PPPEncapsulator *FirstEncapsulator() const
 			{ return fFirstEncapsulator; }
 		PPPEncapsulator *EncapsulatorFor(uint16 protocol,
@@ -144,7 +147,7 @@ class PPPInterface {
 		bool LoadModules(driver_settings *settings,
 			int32 start, int32 count);
 		bool LoadModule(const char *name, driver_parameter *parameter,
-			int32 type);
+			PPP_MODULE_KEY_TYPE type);
 		
 		status_t Send(struct mbuf *packet, uint16 protocol);
 		status_t Receive(struct mbuf *packet, uint16 protocol);
@@ -164,7 +167,7 @@ class PPPInterface {
 			// saves the returned ifnet structure
 		bool UnregisterInterface();
 		
-		void CalculateMRU();
+		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
 		
 		void Redial();
@@ -191,7 +194,7 @@ class PPPInterface {
 		ppp_manager_info *fManager;
 		
 		bigtime_t fIdleSince, fDisconnectAfterIdleSince;
-		uint32 fLinkMTU, fMRU, fHeaderLength;
+		uint32 fMRU, fInterfaceMTU, fHeaderLength;
 		
 		PPPInterface *fParent;
 		List<PPPInterface*> fChildren;
@@ -211,6 +214,7 @@ class PPPInterface {
 		BLocker& fLock;
 		
 		status_t fInitStatus;
+		int32 fDeleteCounter;
 };
 
 

@@ -24,7 +24,7 @@ class PPPEncapsulator {
 		PPPEncapsulator(const char *name, PPP_PHASE phase,
 			PPP_ENCAPSULATION_LEVEL level, uint16 protocol,
 			int32 addressFamily, uint32 overhead,
-			PPPInterface *interface, driver_parameter *settings,
+			PPPInterface& interface, driver_parameter *settings,
 			int32 flags = PPP_NO_FLAGS);
 		virtual ~PPPEncapsulator();
 		
@@ -41,7 +41,7 @@ class PPPEncapsulator {
 		uint32 Overhead() const
 			{ return fOverhead; }
 		
-		PPPInterface *Interface() const
+		PPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -58,8 +58,6 @@ class PPPEncapsulator {
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
-		void SetUpRequested(bool requested = true)
-			{ fUpRequested = requested; }
 		bool IsUpRequested() const
 			{ return fUpRequested; }
 		
@@ -92,6 +90,9 @@ class PPPEncapsulator {
 		virtual void Pulse();
 
 	protected:
+		void SetUpRequested(bool requested = true)
+			{ fUpRequested = requested; }
+		
 		void UpStarted();
 		void DownStarted();
 		
@@ -109,7 +110,7 @@ class PPPEncapsulator {
 		PPP_ENCAPSULATION_LEVEL fLevel;
 		uint16 fProtocol;
 		int32 fAddressFamily;
-		PPPInterface *fInterface;
+		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		int32 fFlags;
 		

@@ -25,11 +25,11 @@ enum PPP_REPORT_FLAGS {
 };
 
 // report types
+// the first 16 report types are reserved for the interface manager
 enum PPP_REPORT_TYPE {
-	PPP_DESTRUCTION_REPORT = 0,
+	PPP_DESTRUCTION_REPORT = 16,
 		// the interface is being destroyed (no code is needed)
-	PPP_CONNECTION_REPORT = 1,
-	PPP_AUTHENTICATION_REPORT = 2
+	PPP_CONNECTION_REPORT = 17
 };
 
 // report codes (type-specific)

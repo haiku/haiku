@@ -10,36 +10,33 @@
 #include <net/if.h>
 #include <mbuf.h>
 
+#include <PPPControl.h>
 
-PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
+
+PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 		driver_parameter *settings)
-	: fOverhead(overhead), fInterface(interface),
-	fSettings(settings)
+	: fInterface(interface), fSettings(settings), fMTU(1500)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
 		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
 	} else
-		strcpy(fName, "");
+		strcpy(fName, "???");
 	
-	SetMTU(1500);
-	
-	if(interface)
-		interface->SetDevice(this);
+	interface.SetDevice(this);
 }
 
 
 PPPDevice::~PPPDevice()
 {
-	if(Interface())
-		Interface()->SetDevice(NULL);
+	Interface().SetDevice(NULL);
 }
 
 
 status_t
 PPPDevice::InitCheck() const
 {
-	if(!Interface() || !Settings())
+	if(!Settings())
 		return B_ERROR;
 	
 	return B_OK;
@@ -50,37 +47,43 @@ status_t
 PPPDevice::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
-		// TODO:
-		// get:
-		// - name
-		// - mtu (+ preferred)
-		// - status
-		// - transfer rates
+		case PPPC_GET_DEVICE_INFO: {
+			if(length < sizeof(ppp_device_info_t) || !data)
+				return B_NO_MEMORY;
+			
+			ppp_device_info *info = (ppp_device_info*) data;
+			memset(info, 0, sizeof(ppp_device_info_t));
+			strcpy(info->name, Name());
+			info->settings = Settings();
+			info->MTU = MTU();
+			info->preferredMTU = PreferredMTU();
+			info->inputTransferRate = InputTransferRate();
+			info->outputTransferRate = OutputTransferRate();
+			info->outputBytesCount = CountOutputBytes();
+		} break;
+		
+		case PPPC_SET_MTU:
+			if(length < sizeof(uint32) || !data)
+				return B_ERROR;
+			
+			return SetMTU(*((uint32*)data)) ? B_OK : B_ERROR;
+		break;
 		
 		default:
-			return B_ERROR;
+			return PPP_UNHANDLED;
 	}
 	
 	return B_OK;
 }
 
 
-bool
-PPPDevice::SetMTU(uint32 MTU)
-{
-	fMTU = MTU;
-	
-	return true;
-}
-
-
 status_t
 PPPDevice::PassToInterface(struct mbuf *packet)
 {
-	if(!Interface() || !Interface()->InQueue())
+	if(!Interface().InQueue())
 		return B_ERROR;
 	
-	IFQ_ENQUEUE(Interface()->InQueue(), packet);
+	IFQ_ENQUEUE(Interface().InQueue(), packet);
 	
 	return B_OK;
 }
@@ -96,20 +99,14 @@ PPPDevice::Pulse()
 bool
 PPPDevice::UpStarted() const
 {
-	if(!Interface())
-		return false;
-	
-	return Interface()->StateMachine().TLSNotify();
+	return Interface().StateMachine().TLSNotify();
 }
 
 
 bool
 PPPDevice::DownStarted() const
 {
-	if(!Interface())
-		return false;
-	
-	return Interface()->StateMachine().TLFNotify();
+	return Interface().StateMachine().TLFNotify();
 }
 
 
@@ -118,10 +115,7 @@ PPPDevice::UpFailedEvent()
 {
 	fIsUp = false;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().UpFailedEvent();
+	Interface().StateMachine().UpFailedEvent();
 }
 
 
@@ -130,10 +124,7 @@ PPPDevice::UpEvent()
 {
 	fIsUp = true;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().UpEvent();
+	Interface().StateMachine().UpEvent();
 }
 
 
@@ -142,8 +133,5 @@ PPPDevice::DownEvent()
 {
 	fIsUp = false;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().DownEvent();
+	Interface().StateMachine().DownEvent();
 }

@@ -21,23 +21,25 @@ class PPPConfigurePacket;
 
 class PPPOptionHandler {
 	public:
-		PPPOptionHandler(const char *name, PPPInterface *interface,
+		PPPOptionHandler(const char *name, PPPInterface& interface,
 			driver_parameter *settings);
 		virtual ~PPPOptionHandler();
 		
 		virtual status_t InitCheck() const;
 		
+		const char *Name() const
+			{ return fName; }
+		
+		PPPInterface& Interface() const
+			{ return fInterface; }
+		driver_parameter *Settings() const
+			{ return fSettings; }
+		
 		void SetEnabled(bool enabled = true);
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
-		const char *Name() const
-			{ return fName; }
-		
-		PPPInterface *Interface() const
-			{ return fInterface; }
-		driver_parameter *Settings() const
-			{ return fSettings; }
+		virtual status_t Control(uint32 op, void *data, size_t length);
 		
 		virtual void Reset() = 0;
 			// e.g.: remove list of rejected values
@@ -61,7 +63,7 @@ class PPPOptionHandler {
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
-		PPPInterface *fInterface;
+		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		
 		bool fEnabled;

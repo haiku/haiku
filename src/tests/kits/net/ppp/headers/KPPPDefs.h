@@ -18,8 +18,9 @@ typedef uint32 interface_id;
 
 
 // module key types (used when loading a module)
-enum {
-	PPP_LOAD_MODULE_TYPE,
+enum PPP_MODULE_KEY_TYPE {
+	PPP_UNDEFINED_KEY_TYPE = -1,
+	PPP_LOAD_MODULE_TYPE = 0,
 	PPP_DEVICE_TYPE,
 	PPP_PROTOCOL_TYPE,
 	PPP_AUTHENTICATOR_TYPE,

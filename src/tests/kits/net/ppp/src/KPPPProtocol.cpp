@@ -7,11 +7,13 @@
 
 #include <KPPPInterface.h>
 
+#include <PPPControl.h>
+
 #include <cstring>
 
 
 PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
-		int32 addressFamily, PPPInterface *interface,
+		int32 addressFamily, PPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS)
 	: fPhase(phase), fProtocol(protocol), fAddressFamily(addressFamily),
 	fInterface(interface), fSettings(settings), fFlags(flags),
@@ -21,24 +23,22 @@ PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
 		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
 	} else
-		strcpy(fName, "");
+		strcpy(fName, "???");
 	
-	if(interface)
-		interface->AddProtocol(this);
+	interface.AddProtocol(this);
 }
 
 
 PPPProtocol::~PPPProtocol()
 {
-	if(Interface())
-		Interface()->RemoveProtocol(this);
+	Interface().RemoveProtocol(this);
 }
 
 
 status_t
 PPPProtocol::InitCheck() const
 {
-	if(!Interface() || !Settings())
+	if(!Settings())
 		return B_ERROR;
 	
 	return B_OK;
@@ -50,13 +50,10 @@ PPPProtocol::SetEnabled(bool enabled = true)
 {
 	fEnabled = enabled;
 	
-	if(!Interface())
-		return;
-	
 	if(!enabled) {
 		if(IsUp() || IsGoingUp())
 			Down();
-	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface()->IsUp())
+	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface().IsUp())
 		Up();
 }
 
@@ -65,16 +62,32 @@ status_t
 PPPProtocol::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
-		// TODO:
-		// get:
-		// - name
-		// - protocol, address family
-		// - status (Is(Going)Up/Down/UpRequested/Enabled)
-		// set:
-		// - enabled
+		case PPPC_GET_HANDLER_INFO: {
+			if(length < sizeof(ppp_handler_info_t) || !data)
+				return B_ERROR;
+			
+			ppp_handler_info *info = (ppp_handler_info*) data;
+			memset(info, 0, sizeof(ppp_handler_info_t));
+			strcpy(info->name, Name());
+			info->settings = Settings();
+			info->phase = Phase();
+			info->addressFamily = AddressFamily();
+			info->flags = Flags();
+			info->protocol = Protocol();
+			info->isEnabled = IsEnabled();
+			info->isUpRequested = IsUpRequested();
+			info->connectionStatus = fConnectionStatus;
+		} break;
+		
+		case PPPC_SET_ENABLED:
+			if(length < sizeof(uint32) || !data)
+				return B_ERROR;
+			
+			SetEnabled(*((uint32*)data));
+		break;
 		
 		default:
-			return B_ERROR;
+			return PPP_UNHANDLED;
 	}
 	
 	return B_OK;
@@ -107,10 +120,7 @@ PPPProtocol::UpFailedEvent()
 {
 	fConnectionStatus = PPP_DOWN_PHASE;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().UpFailedEvent(this);
+	Interface().StateMachine().UpFailedEvent(this);
 }
 
 
@@ -119,10 +129,7 @@ PPPProtocol::UpEvent()
 {
 	fConnectionStatus = PPP_ESTABLISHED_PHASE;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().UpEvent(this);
+	Interface().StateMachine().UpEvent(this);
 }
 
 
@@ -131,8 +138,5 @@ PPPProtocol::DownEvent()
 {
 	fConnectionStatus = PPP_DOWN_PHASE;
 	
-	if(!Interface())
-		return;
-	
-	Interface()->StateMachine().DownEvent(this);
+	Interface().StateMachine().DownEvent(this);
 }

@@ -18,7 +18,7 @@ class PPPInterface;
 class PPPProtocol {
 	public:
 		PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
-			int32 addressFamily, PPPInterface *interface,
+			int32 addressFamily, PPPInterface& interface,
 			driver_parameter *settings, int32 flags = PPP_NO_FLAGS);
 		virtual ~PPPProtocol();
 		
@@ -30,7 +30,7 @@ class PPPProtocol {
 		PPP_PHASE Phase() const
 			{ return fPhase; }
 		
-		PPPInterface *Interface() const
+		PPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
@@ -47,8 +47,6 @@ class PPPProtocol {
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
-		void SetUpRequested(bool requested = true)
-			{ fUpRequested = requested; }
 		bool IsUpRequested() const
 			{ return fUpRequested; }
 		
@@ -71,6 +69,9 @@ class PPPProtocol {
 		virtual void Pulse();
 
 	protected:
+		void SetUpRequested(bool requested = true)
+			{ fUpRequested = requested; }
+		
 		void UpStarted();
 		void DownStarted();
 		
@@ -84,7 +85,7 @@ class PPPProtocol {
 		PPP_PHASE fPhase;
 		uint16 fProtocol;
 		int32 fAddressFamily;
-		PPPInterface *fInterface;
+		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		int32 fFlags;
 		
