@@ -33,11 +33,9 @@ void thread_atkernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);
 
-int thread_init(kernel_args *ka);
-int thread_init_percpu(int cpu_num);
+status_t thread_init(kernel_args *ka);
+status_t thread_per_cpu_init(int32 cpu_num);
 void thread_exit(void);
-int thread_kill_thread(thread_id id);
-int thread_kill_thread_nowait(thread_id id);
 
 #define thread_get_current_thread arch_thread_get_current_thread
 
