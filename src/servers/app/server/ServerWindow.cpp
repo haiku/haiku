@@ -571,7 +571,481 @@ printf("ServerWindow %s: Message Move_By unimplemented\n",_title->String());
 */
 void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 {
+        int msgPos;
+	LayerData *layerdata;
+	int32 code;
+
+	if ( !msgsize || !msgbuffer )
+		return;
 	
+	msgPos = 0;
+	layerdata = _workspace->GetRoot()->GetLayerData();
+	while (msgPos < msgsize)
+	{
+		code = *((int32 *)(msgbuffer+msgPos));
+		switch (code)
+		{
+			case AS_SET_HIGH_COLOR:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_SET_LOW_COLOR:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_SET_VIEW_COLOR:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_STROKE_ARC:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_ARC_MSG_SIZE )
+				{
+					float left, top, right, bottom, angle, span;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					angle = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					span = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->StrokeArc(rect,angle,span,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_BEZIER:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_BEZIER_MSG_SIZE )
+				{
+					BPoint *pts;
+					int i;
+					pts = new BPoint[4];
+					msgPos+=4;
+					for (i=0; i<4; i++)
+					{
+						pts[i].x = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+						pts[i].y = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+					}
+					_app->_driver->StrokeBezier(pts,layerdata,&msgbuffer[msgPos]);
+					delete[] pts;
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_ELLIPSE:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_ELLIPSE_MSG_SIZE )
+				{
+					float left, top, right, bottom;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->StrokeEllipse(rect,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_LINE:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_LINE_MSG_SIZE )
+				{
+					float x1, y1, x2, y2;
+					msgPos+=4;
+					x1 = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					y1 = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					x2 = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					y2 = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BPoint p1(x1,y1);
+					BPoint p2(x2,y2);
+					_app->_driver->StrokeLine(p1,p2,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_LINEARRAY:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_STROKE_POLYGON:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_STROKE_RECT:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_RECT_MSG_SIZE )
+				{
+					float left, top, right, bottom;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->StrokeRect(rect,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_ROUNDRECT:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_ROUNDRECT_MSG_SIZE )
+				{
+					float left, top, right, bottom, xrad, yrad;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					xrad = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					yrad = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_STROKE_SHAPE:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_STROKE_TRIANGLE:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_STROKE_TRIANGLE_MSG_SIZE )
+				{
+					BPoint *pts;
+					float left, top, right, bottom;
+					int i;
+					pts = new BPoint[3];
+					msgPos+=4;
+					for (i=0; i<3; i++)
+					{
+						pts[i].x = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+						pts[i].y = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+					}
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->StrokeTriangle(pts,rect,layerdata,&msgbuffer[msgPos]);
+					delete[] pts;
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_ARC:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_ARC_MSG_SIZE )
+				{
+					float left, top, right, bottom, angle, span;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					angle = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					span = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->FillArc(rect,angle,span,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_BEZIER:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_BEZIER_MSG_SIZE )
+				{
+					BPoint *pts;
+					int i;
+					pts = new BPoint[4];
+					msgPos+=4;
+					for (i=0; i<4; i++)
+					{
+						pts[i].x = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+						pts[i].y = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+					}
+					_app->_driver->FillBezier(pts,layerdata,&msgbuffer[msgPos]);
+					delete[] pts;
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_ELLIPSE:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_ELLIPSE_MSG_SIZE )
+				{
+					float left, top, right, bottom;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->FillEllipse(rect,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_POLYGON:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_FILL_RECT:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_RECT_MSG_SIZE )
+				{
+					float left, top, right, bottom;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->FillRect(rect,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_REGION:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_FILL_ROUNDRECT:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_ROUNDRECT_MSG_SIZE )
+				{
+					float left, top, right, bottom, xrad, yrad;
+					msgPos+=4;
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					xrad = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					yrad = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->FillRoundRect(rect,xrad,yrad,layerdata,&msgbuffer[msgPos]);
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_FILL_SHAPE:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_FILL_TRIANGLE:
+			{
+				// TODO:: Add clipping
+				if ( msgsize-msgPos >= AS_FILL_TRIANGLE_MSG_SIZE )
+				{
+					BPoint *pts;
+					float left, top, right, bottom;
+					int i;
+					pts = new BPoint[3];
+					msgPos+=4;
+					for (i=0; i<3; i++)
+					{
+						pts[i].x = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+						pts[i].y = *((float *)&msgbuffer[msgPos]);
+						msgPos += sizeof(float);
+					}
+					left = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					top = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					right = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					bottom = *((float *)&msgbuffer[msgPos]);
+					msgPos += sizeof(float);
+					BRect rect(left,top,right,bottom);
+					_app->_driver->FillTriangle(pts,rect,layerdata,&msgbuffer[msgPos]);
+					delete[] pts;
+					msgPos += AS_PATTERN_SIZE;
+				}
+				else
+				{
+					printf("ServerWindow %s received truncated graphics code %lx",_title->String(),code);
+					msgPos = msgsize;
+				}
+				break;
+			}
+			case AS_MOVEPENBY:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_MOVEPENTO:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_SETPENSIZE:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_DRAW_STRING:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_SET_FONT:
+			{
+				// TODO: Implement
+				break;
+			}
+			case AS_SET_FONT_SIZE:
+			{
+				// TODO: Implement
+				break;
+			}
+			default:
+			{
+				printf("ServerWindow %s received unexpected graphics code %lx",_title->String(),code);
+				break;
+			}
+		}
+	}
 }
 
 /*!
@@ -630,7 +1104,7 @@ printf("ServerWindow %s received Quit request\n",win->Title());
 		}
 	
 		if(buffersize>0)
-			delete msgbuffer;
+			delete[] msgbuffer;
 
 		if(msgcode==B_QUIT_REQUESTED)
 			break;
