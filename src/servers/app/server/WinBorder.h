@@ -21,6 +21,7 @@
 //
 //	File Name:		WinBorder.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Adi Oanca <adioanca@mymail.ro>
 //	Description:	Layer subclass which handles window management
 //  
 //------------------------------------------------------------------------------
@@ -38,80 +39,59 @@ class DisplayDriver;
 class WinBorder : public Layer
 {
 public:
-	WinBorder(const BRect &r, const char *name, const int32 look,
-		const int32 feel, const int32 flags, ServerWindow *win);
-	virtual ~WinBorder(void);
+								WinBorder(const BRect &r, const char *name, const int32 look,
+									const int32 feel, const int32 flags, ServerWindow *win,
+									DisplayDriver *driver);
+	virtual						~WinBorder(void);
 	
-	virtual	void RebuildRegions( const BRect& r );
-	virtual	void Draw(const BRect &r);
+	virtual	void				Draw(const BRect &r);
 	
-	virtual	void MoveBy(float x, float y);
-	virtual	void ResizeBy(float x, float y);
-	bool HasPoint(BPoint pt) const;
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
+
+			void				MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers);
+			void				MouseMoved(const BPoint &pt, const int32 &buttons);
+			void				MouseUp(const BPoint &pt, const int32 &modifiers);
 	
-	void MoveToBack();
-	void MoveToFront();
+			void				UpdateColors(void);
+			void				UpdateDecorator(void);
+			void				UpdateFont(void);
+			void				UpdateScreen(void);
 	
-	void MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers);
-	void MouseMoved(const BPoint &pt, const int32 &buttons);
-	void MouseUp(const BPoint &pt, const int32 &modifiers);
+			ServerWindow*		Window(void) const { return fWindow; }
+			Decorator*			GetDecorator(void) const { return fDecorator; }
+			WinBorder*			MainWinBorder() const;
+
+			void				SetLevel();
+			void				HighlightDecorator(const bool &active);
+
+			bool				HasPoint(BPoint &pt) const;
 	
-	virtual	void Hide();
-	virtual	void Show();
+			void				AddToSubsetOf(WinBorder* main);
+			void				RemoveFromSubsetOf(WinBorder* main);
 	
-	void UpdateColors(void);
-	void UpdateDecorator(void);
-	void UpdateFont(void);
-	void UpdateScreen(void);
-	
-	void SetFocus(const bool &active);
-	ServerWindow* Window(void) const { return _win; }
-	Decorator* 	GetDecorator(void) const { return _decorator; }
-	
-	WinBorder*			MainWinBorder() const;
-	void SetLevel();
-	
-	void AddToSubsetOf(WinBorder* main);
-	void RemoveFromSubsetOf(WinBorder* main);
-	
-	void PrintToStream();
+			void				PrintToStream();
 	
 	// Server "private" :-) - should not be used
-	void SetMainWinBorder(WinBorder *newMain);	
-	
+			void				SetMainWinBorder(WinBorder *newMain);	
+
 protected:
-	ServerWindow		*_win;
-	//BString			*_title;
-	Decorator			*_decorator;
-	int32 _flags;
-	BRect _clientframe;
-	int32 _mbuttons,
-		_kmodifiers;
-	BPoint fLastMousePosition;
-	bool _update;
-	bool _hresizewin,_vresizewin;
+			ServerWindow		*fWindow;
+			Decorator			*fDecorator;
+			int32				fFlags;
+			int32				fMouseButtons,
+								fKeyModifiers;
+			BPoint				fLastMousePosition;
 
-	BRegion *fDecFull,
-		*fDecFullVisible,
-		*fDecVisible;
+			BRegion				*fDecFull;
 
-	WinBorder *fMainWinBorder;
-/*	bool fIsMoving;
-	bool fIsResizing;
-	bool fIsClosing;
-	bool fIsMinimizing;
-	bool fIsZooming
+			WinBorder			*fMainWinBorder;
+/*			bool				fIsMoving;
+			bool				fIsResizing;
+			bool				fIsClosing;
+			bool				fIsMinimizing;
+			bool				fIsZooming;
 */
 };
-
-bool		is_moving_window(void);
-void		set_is_moving_window(bool state);
-bool		is_resizing_window(void);
-void		set_is_resizing_window(bool state);
-void		set_active_winborder(WinBorder *win);
-WinBorder*	get_active_winborder(void);
-void		set_is_resizing_window(bool state);
-void		set_is_sliding_tab(bool state);
-bool		is_sliding_tab(void);
 
 #endif
