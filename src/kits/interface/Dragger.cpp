@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <ViewAux.h>
 
 bool BDragger::sVisible;
 bool BDragger::sInited;
@@ -277,7 +278,7 @@ BDragger::MessageReceived(BMessage *msg)
 {
 	if (msg->what == B_TRASH_TARGET) {
 		if (fShelf)
-			Window()->PostMessage('JAHA', fTarget, NULL); // TODO: 'JAHA' ? What's that ?
+			Window()->PostMessage(kDeleteDragger, fTarget, NULL);
 		else
 			(new BAlert("??",
 				"Can't delete this replicant from its original application. Life goes on.",
@@ -555,14 +556,14 @@ BDragger::BuildDefaultPopUp()
 
 	char about[B_OS_NAME_LENGTH];
 	snprintf(about, B_OS_NAME_LENGTH, "About %s", name);
-
+	
 	fPopUp->AddItem(new BMenuItem(about, msg));
 
 	// Separator
 	fPopUp->AddItem(new BSeparatorItem());
 
 	// Delete
-	fPopUp->AddItem(new BMenuItem("Delete", new BMessage('JAHA')));
+	fPopUp->AddItem(new BMenuItem("Delete", new BMessage(kDeleteDragger)));
 }
 
 

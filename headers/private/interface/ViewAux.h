@@ -2,15 +2,14 @@
 #define _VIEWAUX_H_
 
 #include <BeBuild.h>
-#include <InterfaceDefs.h>
-#include <Rect.h>
-#include <Point.h>
-#include <Region.h>
 #include <Font.h>
-/*
-	URGENT: Move this structure in a private header.
-		This one is copied from Shape.cpp.
-*/
+#include <InterfaceDefs.h>
+#include <Point.h>
+#include <Rect.h>
+#include <Region.h>
+
+const static uint32 kDeleteDragger = 'JAHA';
+
 struct shape_data {
 	uint32	*opList;
 	int32	opCount;
@@ -43,6 +42,7 @@ enum {
 };
 
 
+// JB: Is there any reason why this can't be a struct ?
 //struct _view_attr_{
 class ViewAttr
 {
