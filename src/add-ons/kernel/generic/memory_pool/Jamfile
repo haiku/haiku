@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src add-ons kernel generic memory_pool ;
+
+# R5KernelAddon memory_pool : kernel generic :
+#	memory_pool.c
+# ;
+
