@@ -44,8 +44,6 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
-//static char _GlobalRoster[sizeof(BRoster)];
-
 // _init_roster_
 int
 _init_roster_()
@@ -61,6 +59,30 @@ _delete_roster_()
 	delete be_roster;
 	return 0;
 }
+
+
+/*-------------------------------------------------------------*/
+/* --------- app_info Struct and Values ------------------------ */
+
+// constructor
+app_info::app_info()
+		: thread(-1),
+		  team(-1),
+		  port(-1),
+		  flags(B_MULTIPLE_LAUNCH | B_ARGV_ONLY | _B_APP_INFO_RESERVED1_),
+		  ref()
+{
+	signature[0] = '\0';
+}
+
+// destructor
+app_info::~app_info()
+{
+}
+
+
+/*-------------------------------------------------------------*/
+/* --------- BRoster class----------------------------------- */
 
 // constructor
 BRoster::BRoster()
