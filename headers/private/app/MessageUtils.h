@@ -153,7 +153,7 @@ class TChecksumHelper
 	public:
 		TChecksumHelper(uchar* buffer) : fBuffer(buffer), fBufPtr(buffer) {;}
 
-		template<class T> inline void Cache(T& data)
+		template<class T> inline void Cache(const T& data)
 		{
 			*((T*)fBufPtr) = data;
 			fBufPtr += sizeof (T);
