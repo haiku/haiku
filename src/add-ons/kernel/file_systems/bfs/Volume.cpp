@@ -401,7 +401,6 @@ Volume::ToBlockRun(off_t block) const
 	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(block >> AllocationGroupShift());
 	run.start = HOST_ENDIAN_TO_BFS_INT16(block & ((1LL << AllocationGroupShift()) - 1));
 	run.length = HOST_ENDIAN_TO_BFS_INT16(1);
-	__out("block %Ld -> (%lu, %u) %ld (%lu)\n", block, run.AllocationGroup(), run.Start(), AllocationGroupShift(), ((1UL << AllocationGroupShift()) - 1));
 	return run;
 }
 
@@ -559,7 +558,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 
 	off_t id;
 	status_t status = Inode::Create(&transaction, NULL, NULL,
-		S_DIRECTORY | 0777, 0, 0, &id, &fRootNode);
+		S_DIRECTORY | 0755, 0, 0, &id, &fRootNode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
