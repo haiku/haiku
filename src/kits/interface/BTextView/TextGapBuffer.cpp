@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -25,14 +25,15 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 // System Includes -------------------------------------------------------------
+#include "TextGapBuffer.h"
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "TextGapBuffer.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -40,94 +41,179 @@
 
 //------------------------------------------------------------------------------
 _BTextGapBuffer_::_BTextGapBuffer_()
-	:	fText(NULL),
-		fLogicalBytes(0),
-		fPhysicalBytes(2048)
+	:	fExtraCount(2048),
+		fItemCount(0),
+		fBuffer(NULL),
+		fBufferCount(fExtraCount + fItemCount),
+		fGapIndex(fItemCount),
+		fGapCount(fBufferCount - fGapIndex),
+		fScratchBuffer(NULL),
+		fScratchSize(0)
 {
-	fText = new char[fPhysicalBytes];
-	*fText = '\0';
+	fBuffer = (char *)malloc(fExtraCount + fItemCount);
+	fScratchBuffer = (char*)malloc(0);
 }
 //------------------------------------------------------------------------------
 _BTextGapBuffer_::~_BTextGapBuffer_()
 {
-	delete[] fText;
+	free(fBuffer);
+	free(fScratchBuffer);
 }
 //------------------------------------------------------------------------------
-void _BTextGapBuffer_::InsertText(const char *text, int32 length, int32 offset)
+void
+_BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems,
+								  int32 inAtIndex)
 {
-	// If needed, resize buffer
-	if (fPhysicalBytes < fLogicalBytes + length + 1)
-		Resize(fLogicalBytes + length + 1);
-
-	// Move text after insertion point
-	memcpy(fText + offset + length, fText + offset,
-		fLogicalBytes + 1 - offset);
-
-	// Copy new text
-	memcpy(fText + offset, text, length);
-
-	// Update used bytes
-	fLogicalBytes += length;
+	if (inNumItems < 1)
+		return;
+	
+	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
+	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
+		
+	if (inAtIndex != fGapIndex)
+		MoveGapTo(inAtIndex);
+	
+	if (fGapCount < inNumItems)
+		SizeGapTo(inNumItems + fExtraCount);
+		
+	memcpy(fBuffer + fGapIndex, inText, inNumItems);
+	
+	fGapCount -= inNumItems;
+	fGapIndex += inNumItems;
+	fItemCount += inNumItems;
 }
 //------------------------------------------------------------------------------
-void _BTextGapBuffer_::RemoveRange(int32 from, int32 to)
+void
+_BTextGapBuffer_::RemoveRange(int32 start, int32 end)
 {
-	// Move text after deletion point
-	memcpy(fText + from, fText + to, fLogicalBytes + 1 - to);
-
-	// Update used bytes
-	fLogicalBytes -= to - from;
+	long inAtIndex = start;
+	long inNumItems = end - start;
+	
+	if (inNumItems < 1)
+		return;
+	
+	inAtIndex = (inAtIndex > fItemCount - 1) ? (fItemCount - 1) : inAtIndex;
+	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
+	
+	MoveGapTo(inAtIndex);
+	
+	fGapCount += inNumItems;
+	fItemCount -= inNumItems;
+	
+	if (fGapCount > fExtraCount)
+		SizeGapTo(fExtraCount);	
 }
 //------------------------------------------------------------------------------
-char *_BTextGapBuffer_::Text()
+void
+_BTextGapBuffer_::MoveGapTo(int32 toIndex)
 {
-	if (fLogicalBytes == 0 || fText[fLogicalBytes - 1] != '\0')
-	{
-		if (fPhysicalBytes < fLogicalBytes + 1)
-		{
-			char *new_text = new char[fLogicalBytes + 1];
-
-			if (fText)
-			{
-				memcpy(new_text, fText, fLogicalBytes );
-				delete fText;
-			}
-
-			fText = new_text;
-		}
-
-		fText[fLogicalBytes] = '\0';
+	if (toIndex == fGapIndex)
+		return;
+	
+	long gapEndIndex = fGapIndex + fGapCount;
+	long srcIndex = 0;
+	long dstIndex = 0;
+	long count = 0;
+	if (toIndex > fGapIndex) {
+		long trailGapCount = fBufferCount - gapEndIndex;
+		srcIndex = toIndex + (gapEndIndex - toIndex);
+		dstIndex =  fGapIndex;
+		count = fGapCount + (toIndex - srcIndex);
+		count = (count > trailGapCount) ? trailGapCount : count;
 	}
-
-	return fText;
-}
-//------------------------------------------------------------------------------
-char *_BTextGapBuffer_::RealText()
-{
-	return fText;
-}
-//------------------------------------------------------------------------------
-char _BTextGapBuffer_::RealCharAt(int32 offset) const
-{
-	return *(fText + offset);
-}
-//------------------------------------------------------------------------------
-void _BTextGapBuffer_::Resize(int32 size)
-{
-	if (fPhysicalBytes < size)
-	{
-		char *text = new char[size];
-
-		if (fText)
-		{
-			memcpy(text, fText, fLogicalBytes);
-			delete fText;
-		}
-
-		fText = text;
-		fPhysicalBytes = size;
+	else {
+		srcIndex = toIndex;
+		dstIndex = toIndex + (gapEndIndex - fGapIndex);
+		count = gapEndIndex - dstIndex;
 	}
+	
+	if (count > 0)
+		memmove(fBuffer + dstIndex, fBuffer + srcIndex, count);	
+
+	fGapIndex = toIndex;
 }
+//------------------------------------------------------------------------------
+void
+_BTextGapBuffer_::SizeGapTo(long inCount)
+{
+	if (inCount == fGapCount)
+		return;
+		
+	fBuffer = (char *)realloc(fBuffer, fItemCount + inCount);
+	memmove(fBuffer + fGapIndex + inCount, 
+			fBuffer + fGapIndex + fGapCount, 
+			fBufferCount - (fGapIndex + fGapCount));
+
+	fGapCount = inCount;
+	fBufferCount = fItemCount + fGapCount;
+}
+//------------------------------------------------------------------------------
+const char *
+_BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
+{
+	char *result = "";
+	
+	if (numChars < 1)
+		return (result);
+	
+	bool isStartBeforeGap = (fromOffset < fGapIndex);
+	bool isEndBeforeGap = ((fromOffset + numChars - 1) < fGapIndex);
+
+	if (isStartBeforeGap == isEndBeforeGap) {
+		result = fBuffer + fromOffset;
+		if (!isStartBeforeGap)
+			result += fGapCount;
+	}
+	else {
+		if (fScratchSize < numChars) {
+			fScratchBuffer = (char *)realloc(fScratchBuffer, numChars);
+			fScratchSize = numChars;
+		}
+		
+		for (long i = 0; i < numChars; i++)
+			fScratchBuffer[i] = (*this)[fromOffset + i];
+
+		result = fScratchBuffer;
+	}
+	
+	return result;
+}
+//------------------------------------------------------------------------------
+bool 
+_BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
+{
+	long numChars = *ioDelta;
+	for (long i = 0; i < numChars; i++) {
+		if (((*this)[fromIndex + i] & 0xc0) == 0x80)
+			continue;
+		if ((*this)[fromIndex + i] == inChar) {
+			*ioDelta = i;
+			return (true);
+		}
+	}
+	
+	return false;
+}
+//------------------------------------------------------------------------------
+const char *
+_BTextGapBuffer_::Text()
+{
+	MoveGapTo(fItemCount);
+	fBuffer[fItemCount] = '\0';
+	
+	return fBuffer;
+}
+//------------------------------------------------------------------------------
+/*char *_BTextGapBuffer_::RealText()
+{
+	return fText;
+}*/
+//------------------------------------------------------------------------------
+/*char 
+_BTextGapBuffer_::RealCharAt(int32 offset) const
+{
+	return *(fBuffer + offset);
+}*/
 //------------------------------------------------------------------------------
 
 /*

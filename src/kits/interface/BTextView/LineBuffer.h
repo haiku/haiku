@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -27,44 +27,55 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include "SupportDefs.h"
+#include <SupportDefs.h>
+#include "TextViewSupportBuffer.h"
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-struct STELine {
-	int32	fOffset;
-	float	fHeight;
-	float	fLineHeight;
-	float	fWidth;
-};
+typedef struct STELine {
+	long			offset;		// offset of first character of line
+	float			origin;		// pixel position of top of line
+	float			ascent;		// maximum ascent for line
+	float			width;		// width of line
+} STELine, *STELinePtr;
 
 // Globals ---------------------------------------------------------------------
 
 // _BLineBuffer_ class ---------------------------------------------------------
-class _BLineBuffer_ {
+class _BLineBuffer_ : public _BTextViewSupportBuffer_<STELine> {
 
 public:
-				_BLineBuffer_();
-virtual			~_BLineBuffer_();
+						_BLineBuffer_();
+virtual					~_BLineBuffer_();
 
-		void	InsertLine(STELine *line, int32);
-		void	RemoveLines(int32 index, int32 count);
-		void	RemoveLineRange(int32 from, int32 to);
+		void			InsertLine(STELine *inLine, int32 index);
+		void			RemoveLines(int32 index, int32 count = 1);
+		void			RemoveLineRange(int32 fromOffset, int32 toOffset);
 
-		int32	OffsetToLine(int32 offset) const;
-		int32	PixelToLine(float height) const;
+		int32			OffsetToLine(int32 offset) const;
+		int32			PixelToLine(float pixel) const;
 			
-		void	BumpOffset(int32 line, int32 offset);
-		void	BumpOrigin(float, int32);
+		void			BumpOrigin(float delta, int32 index);
+		void			BumpOffset(int32 delta, int32 index);
 
-		int32	fBlockSize;
-		int32	fItemCount;
-		size_t	fPhysicalSize;
-		STELine	*fObjectList;
+		long			NumLines() const;
+		const STELinePtr operator[](int32 index) const;
 };
+//------------------------------------------------------------------------------
+inline int32
+_BLineBuffer_::NumLines() const
+{
+	return fItemCount - 1;
+}
+//------------------------------------------------------------------------------
+inline const STELinePtr
+_BLineBuffer_::operator[](int32 index) const
+{
+	return &fBuffer[index];
+}
 //------------------------------------------------------------------------------
 
 /*

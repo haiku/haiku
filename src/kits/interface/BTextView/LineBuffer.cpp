@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -25,7 +25,6 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include "LineBuffer.h"
@@ -40,90 +39,94 @@
 
 //------------------------------------------------------------------------------
 _BLineBuffer_::_BLineBuffer_()
-	:	fBlockSize(20),
-		fItemCount(2),
-		fPhysicalSize(22),
-		fObjectList(NULL)
+	:	_BTextViewSupportBuffer_<STELine>(20, 2)
 {
-	fObjectList = new STELine[fPhysicalSize];
-
-	memset(fObjectList, 0, fPhysicalSize * sizeof(STELine));
 }
 //------------------------------------------------------------------------------
 _BLineBuffer_::~_BLineBuffer_()
 {
-	delete[] fObjectList;
 }
 //------------------------------------------------------------------------------
-void _BLineBuffer_::InsertLine(STELine *line, int32 index)
+void
+_BLineBuffer_::InsertLine(STELine *inLine, int32 index)
 {
-	if (fItemCount == fPhysicalSize - 1)
-	{
-		STELine *new_list = new STELine[fPhysicalSize + fBlockSize];
+	InsertItemsAt(1, index, inLine);
+}
+//------------------------------------------------------------------------------
+void
+_BLineBuffer_::RemoveLines(int32 index, int32 count)
+{
+	RemoveItemsAt(count, index);
+}
+//------------------------------------------------------------------------------
+void
+_BLineBuffer_::RemoveLineRange(int32 fromOffset, int32 toOffset)
+{
+	int32 fromLine = OffsetToLine(fromOffset);
+	int32 toLine = OffsetToLine(toOffset);
 
-		memcpy(new_list, fObjectList, fPhysicalSize * sizeof(STELine));
-		delete fObjectList;
-		fObjectList = new_list;
+	int32 count = toLine - fromLine;
+	if (count > 0)
+		RemoveLines(fromLine + 1, count);
 
-		fPhysicalSize += fBlockSize;
+	BumpOffset(fromOffset - toOffset, fromLine + 1);
+}
+//------------------------------------------------------------------------------
+int32
+_BLineBuffer_::OffsetToLine(int32 offset) const
+{
+	int32 minIndex = 0;
+	int32 maxIndex = fItemCount - 1;
+	int32 index = 0;
+	
+	while (minIndex < maxIndex) {
+		index = (minIndex + maxIndex) >> 1;
+		if (offset >= fBuffer[index].offset) {
+			if (offset < fBuffer[index + 1].offset)
+				break;
+			else
+				minIndex = index + 1;
+		}
+		else
+			maxIndex = index;
 	}
-
-	if (index < fItemCount)
-		memmove(fObjectList + index + 1, fObjectList + index,
-			(fItemCount - index) * sizeof(STELine));
-	memcpy(fObjectList + index, line, sizeof(STELine));
-
-	fItemCount++;
+	
+	return index;
 }
 //------------------------------------------------------------------------------
-void _BLineBuffer_::RemoveLines(int32 index, int32 count)
+int32 _BLineBuffer_::PixelToLine(float pixel) const
 {
-	memmove(fObjectList + index, fObjectList + index + count,
-		(fItemCount - index - count) * sizeof(STELine));
-
-	fItemCount -= count;
-}
-//------------------------------------------------------------------------------
-void _BLineBuffer_::RemoveLineRange(int32 from, int32 to)
-{
-	int32 linefrom = OffsetToLine(from);
-	int32 lineto = OffsetToLine(to);
-
-	if (linefrom < lineto)
-		RemoveLines(linefrom + 1, lineto - linefrom);
-
-	BumpOffset(linefrom + 1, from - to);
-}
-//------------------------------------------------------------------------------
-int32 _BLineBuffer_::OffsetToLine(int32 offset) const
-{
-	if (offset == 0)
-		return 0;
-
-	for (int i = 0; i < fItemCount; i++)
-	{
-		if (offset < fObjectList[i].fOffset)
-			return i - 1;
+	int32 minIndex = 0;
+	int32 maxIndex = fItemCount - 1;
+	int32 index = 0;
+	
+	while (minIndex < maxIndex) {
+		index = (minIndex + maxIndex) >> 1;
+		if (pixel >= fBuffer[index].origin) {
+			if (pixel < fBuffer[index + 1].origin)
+				break;
+			else
+				minIndex = index + 1;
+		}
+		else
+			maxIndex = index;
 	}
-
-	return fItemCount - 2;
+	
+	return index;
 }
 //------------------------------------------------------------------------------
-int32 _BLineBuffer_::PixelToLine(float height) const
-{
-	for (int i = 0; i < fItemCount; i++)
-	{
-		if (height < fObjectList[i].fHeight)
-			return i - 1;
-	}
-
-	return fItemCount - 2;
+void
+_BLineBuffer_::BumpOrigin(float delta, long index)
+{	
+	for (long i = index; i < fItemCount; i++)
+		fBuffer[i].origin += delta;
 }
 //------------------------------------------------------------------------------
-void _BLineBuffer_::BumpOffset(int32 line, int32 offset)
+void
+_BLineBuffer_::BumpOffset(int32 delta, int32 index)
 {
-	for (int i = line; i < fItemCount; i++)
-		fObjectList[i].fOffset += offset;
+	for (long i = index; i < fItemCount; i++)
+		fBuffer[i].offset += delta;
 }
 //------------------------------------------------------------------------------
 

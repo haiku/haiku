@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -25,8 +25,12 @@
 //					buffer classes.
 //------------------------------------------------------------------------------
 
+#ifndef __TEXT_VIEW_SUPPORT_BUFFER__H__
+#define __TEXT_VIEW_SUPPORT_BUFFER__H__
+
 // Standard Includes -----------------------------------------------------------
-#include <malloc.h>
+#include <cstdlib>
+#include <cstring>
 
 // System Includes -------------------------------------------------------------
 #include "SupportDefs.h"
@@ -44,57 +48,99 @@ template <class T>
 class _BTextViewSupportBuffer_ {
 
 public:
-				_BTextViewSupportBuffer_(int32 count, int32	blockSize);
+				_BTextViewSupportBuffer_(long inExtraCount = 0, 
+									  long inCount = 0);
 virtual			~_BTextViewSupportBuffer_();
 
-		void	InsertItemsAt(int32 offset, int32 count, const T *items);
-		void	RemoveItemsAt(int32 offset, int32 count);
+		void	InsertItemsAt(int32 inNumItems, int32 inAtIndex, const T *inItem);
+		void	RemoveItemsAt(int32 inNumItems, int32 inAtIndex);
 
-		int32	fBlockSize;
-		int32	fCount;
-		int32	fPhysicalSize;
-		T		*fItems;
-		int32	fReserved;
+		int32	ItemCount() const;
+
+//protected:
+		int32	fExtraCount;	
+		int32	fItemCount;		
+		T*		fBuffer;		
+		int32	fBufferCount;
 };
 //------------------------------------------------------------------------------
 template <class T>
-_BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(int32 count, int32 blockSize)
-	:
-		fBlockSize(blockSize),
-		fCount(count),
-		fPhysicalSize(count + blockSize),
-		fItems(NULL)
+_BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(long inExtraCount,
+														 long inCount)
+	:	fExtraCount(inExtraCount),
+		fItemCount(inCount),
+		fBuffer(NULL),
+		fBufferCount(fExtraCount + fItemCount)
 {
-	fItems = (T*)malloc(fPhysicalSize * sizeof(T));
+	fBuffer = (T *)calloc(fExtraCount + fItemCount, sizeof(T));
 }
 //------------------------------------------------------------------------------
 template <class T>
 _BTextViewSupportBuffer_<T>::~_BTextViewSupportBuffer_()
 {
-	free(fItems);
+	free(fBuffer);
 }
 //------------------------------------------------------------------------------
 template <class T>
-void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 offset, int32 count,
-											  const T *items)
+void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
+												int32 inAtIndex,
+												const T *inItem)
 {
-	if (fPhysicalSize < fCount + count)
-	{
-		int32 new_size = (((fCount + count) / fBlockSize) + 1) * fBlockSize;
+	if (inNumItems < 1)
+		return;
+	
+	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
+	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
-		fItems = realloc(fItems, new_size);
+	long delta = inNumItems * sizeof(T);
+	long logSize = fItemCount * sizeof(T);
+	if ((logSize + delta) >= fBufferCount) {
+		fBufferCount = logSize + delta + (fExtraCount * sizeof(T));
+		fBuffer = (T *)realloc(fBuffer, fBufferCount);
 	}
-
-	memcpy(fItems + offset, items, count);
-	fCount += count;
+	
+	T *loc = fBuffer + inAtIndex;
+	memmove(loc + inNumItems, loc, (fItemCount - inAtIndex) * sizeof(T));
+	memcpy(loc, inItem, delta);
+	
+	fItemCount += inNumItems;
 }
 //------------------------------------------------------------------------------
 template <class T>
-void _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 offset, int32 count)
+void
+_BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
+												int32 inAtIndex)
 {
-
+	if (inNumItems < 1)
+		return;
+	
+	inAtIndex = (inAtIndex > fItemCount - 1) ? (fItemCount - 1) : inAtIndex;
+	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
+	
+	T *loc = fBuffer + inAtIndex;
+	memmove(loc, loc + inNumItems, 
+			(fItemCount - (inNumItems + inAtIndex)) * sizeof(T));
+	
+	long delta = inNumItems * sizeof(T);
+	long logSize = fItemCount * sizeof(T);
+	long extraSize = fBufferCount - (logSize - delta);
+	if (extraSize > (fExtraCount * sizeof(T))) {
+		fBufferCount = (logSize - delta) + (fExtraCount * sizeof(T));
+		fBuffer = (T *)realloc(fBuffer, fBufferCount);
+	}
+	
+	fItemCount -= inNumItems;
 }
 //------------------------------------------------------------------------------
+template<class T>
+inline int32
+_BTextViewSupportBuffer_<T>::ItemCount() const
+{
+	return fItemCount;
+}
+//------------------------------------------------------------------------------
+
+#endif // __TEXT_VIEW_SUPPORT_BUFFER__H__
 
 /*
  * $Log $

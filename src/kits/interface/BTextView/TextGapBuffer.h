@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -41,34 +41,57 @@
 class _BTextGapBuffer_ {
 
 public:
-				_BTextGapBuffer_();
-virtual			~_BTextGapBuffer_();
+					_BTextGapBuffer_();
+virtual				~_BTextGapBuffer_();
 
-		void	InsertText(const char *text, int32 length, int32 offset);
-		void	RemoveRange(int32 from, int32 to);
-
-		char 	*Text();
-		char 	*RealText();
-		void	GetString(int32 offset, int32 length, char *buffer);
-		void	GetString(int32, int32 *);
+		void		InsertText(const char *inText, int32 inNumItems, int32 inAtIndex);
+		void		RemoveRange(int32 start, int32 end);
 		
-		char	RealCharAt(int32 offset) const;
-		bool	FindChar(char c, int32 inOffset, int32 *outOffset);
+		void		MoveGapTo(int32 toIndex);
+		void		SizeGapTo(int32 inCount);
+
+		const char *GetString(int32 fromOffset, int32 numChars);
+		bool		FindChar(char inChar, int32 fromIndex, int32 *ioDelta);
+
+		const char *Text();
+		int32		Length() const;
+		char		operator[](int32 index) const;
+
+		
+//		char 	*RealText();
+//		void	GetString(int32 offset, int32 length, char *buffer);
+//		void	GetString(int32, int32 *);
+		
+//		char	RealCharAt(int32 offset) const;
 				
-		void	SizeGapTo(int32);
-		void	MoveGapTo(int32);
-		void	InsertText(BFile *, int32, int32, int32); 
-		bool	PasswordMode() const;
-		void	SetPasswordMode(bool);
+//		void	InsertText(BFile *, int32, int32, int32); 
+//		bool	PasswordMode() const;
+//		void	SetPasswordMode(bool);
 
-		void	Resize(int32 size);
+//		void	Resize(int32 size);
 
-		char	*fText;
-		int32	fLogicalBytes;
-		int32	fPhysicalBytes;
+protected:
+		int32	fExtraCount;		// when realloc()-ing
+		int32	fItemCount;			// logical count
+		char	*fBuffer;			// allocated memory
+		int32	fBufferCount;		// physical count
+		int32	fGapIndex;			// gap position
+		int32	fGapCount;			// gap count
+		char	*fScratchBuffer;	// for GetString
+		int32	fScratchSize;		// scratch size
 };
 //------------------------------------------------------------------------------
-
+inline int32 
+_BTextGapBuffer_::Length() const
+{
+	return fItemCount;
+}
+//------------------------------------------------------------------------------
+inline char 
+_BTextGapBuffer_::operator[](long index) const
+{
+	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
+}
 /*
  * $Log $
  *
