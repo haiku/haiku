@@ -49,6 +49,7 @@ public:
 	bool ConvertFromMessage(const BMessage *msg);
 	void SetToDefaults(void);
 	RGBColor StringToColor(const char *string);
+	RGBColor AttributeToColor(int32 which);
 	status_t SetColor(const char *string, rgb_color value);
 	
 	BString name;
