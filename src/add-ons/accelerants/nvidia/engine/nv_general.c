@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-final running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.11 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -988,6 +988,8 @@ status_t nv_general_head_select(bool cross)
  * Should work from VGA BIOS POST init state. */
 static status_t nv_general_bios_to_powergraphics()
 {
+	uint32 agp_ident, agp_stat, agp_cmd;
+
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
 	/* let acc engine make power off/power on cycle to start 'fresh' */
@@ -1124,6 +1126,58 @@ static status_t nv_general_bios_to_powergraphics()
 	/* turn on DAC2 if it exists
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
 	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+
+	/* check for card's AGP capabilities... */
+	agp_ident = CFGR(AGPREF);
+
+	if (agp_ident & 0x00ff0000)
+	{
+		LOG(4,("INIT: card is AGP type, supporting specification %d.%d\n",
+			((agp_ident & 0x00f00000) >> 20), ((agp_ident & 0x000f0000) >> 16)));
+
+		/*  ... list them... */
+		agp_stat = CFGR(AGPSTAT);
+		if (agp_stat & 0x00000001) LOG(4,("INIT: AGP 1x mode is supported\n"));
+		if (agp_stat & 0x00000002) LOG(4,("INIT: AGP 2x mode is supported\n"));
+		if (agp_stat & 0x00000004) LOG(4,("INIT: AGP 4x mode is supported\n"));
+		if (agp_stat & 0x00000008) LOG(4,("INIT: AGP 8x mode is supported\n"));
+		if (agp_stat & 0x00000010) LOG(4,("INIT: fastwrite transfers are supported\n"));
+		if (agp_stat & 0x00000200) LOG(4,("INIT: sideband adressing is supported\n"));
+		LOG(4,("INIT: %d outstanding AGP requests can be handled.\n", ((agp_stat & 0xff000000) >> 24)));
+
+		/* ... and activate them. */
+		if (agp_stat & 0x0000000f)
+		{
+			LOG(4,("INIT: enabling AGP\n"));
+
+			/* select highest AGP mode */
+			if (agp_stat & 0x00000008) agp_cmd = 0x00000008;
+			else
+				if (agp_stat & 0x00000004) agp_cmd = 0x00000004;
+				else
+					if (agp_stat & 0x00000002) agp_cmd = 0x00000002;
+					else
+						agp_cmd = 0x00000001;
+
+			/* acticate sideband adressing if supported */
+			if (agp_stat & 0x00000200) agp_cmd |= 0x00000200;
+
+			/* set request depth: using maximum */
+			agp_cmd |= (agp_stat & 0xff000000);
+
+			/* enable AGP use */
+			agp_cmd |= 0x00000100;
+		}
+		else
+		{
+			LOG(1,("INIT: AGP status register has illegal content, aborting AGP setup!\n"));
+			/* make sure AGP is disabled */
+			agp_cmd = 0;
+		}
+		CFGW(AGPCMD, agp_cmd);
+
+		LOG(4,("INIT: AGPCMD register readback &%08x\n", CFGR(AGPCMD)));
+	}
 
 	/* turn screen one on */
 	head1_dpms(true, true, true);
