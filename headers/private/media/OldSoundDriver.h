@@ -25,14 +25,14 @@ enum {
   SOUND_GET_PLAYBACK_PREFERRED_BUF_SIZE 
 };
 
-typedef struct audio_buffer_header { 
-  int32 buffer_number; 
-  int32 subscriber_count; 
-  bigtime_t time; 
-  int32 reserved_1 
-  int32 reserved_2; 
-  bigtime_t sample_clock; 
-} audio_buffer_header
+typedef struct audio_buffer_header {
+  int32 buffer_number;
+  int32 subscriber_count;
+  bigtime_t time;
+  int32 reserved_1;
+  int32 reserved_2;
+  bigtime_t sample_clock;
+} audio_buffer_header;
 
 enum adc_source { 
   line = 0, cd, mic, loopback 
