@@ -232,6 +232,7 @@ extern port_id		_kern_install_team_debugger(team_id team,
 						port_id debuggerPort);
 extern status_t		_kern_remove_team_debugger(team_id team);
 extern status_t		_kern_debug_thread(thread_id thread);
+extern void			_kern_wait_for_debugger(void);
 
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
