@@ -41,9 +41,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
-static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
-static void write_RMA(uint32 reg, uint32 data);
-static uint32 read_RMA(uint32 reg);
+static void	setup_ram_config_nv10_up(uint8* rom);
 static status_t translate_ISA_PCI(uint32* reg);
 static status_t	nv_crtc_setup_fifo(void);
 
@@ -1217,7 +1215,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
 			/* always done */
-			setup_ram_config_nv10_up(rom, ram_tab);
+			setup_ram_config_nv10_up(rom);
 			break;
 		case 0x65: /* identical to type1 */
 			*size -= 13;
@@ -1614,9 +1612,9 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 }
 
 //fixme: it looks like NV28 (at least) needs a different setup version!
-static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
+static void	setup_ram_config_nv10_up(uint8* rom)
 {
-	uint32 data;
+	uint32 data, dummy;
 	uint8 cnt = 0;
 	status_t stat = B_ERROR;
 
@@ -1626,23 +1624,24 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 	/* check RAM for 256bits buswidth(?) */
 	while ((cnt < 4) && (stat != B_OK))
 	{
-		/* reset RAM adress 128Mb + $1c four times */
-		write_RMA(0x8800001c, 0x00000000);
-		write_RMA(0x8800001c, 0x00000000);
-		write_RMA(0x8800001c, 0x00000000);
-		write_RMA(0x8800001c, 0x00000000);
+		/* reset RAM bits at offset 224-255 bits four times */
+		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
 		/* write testpattern */
-		write_RMA(0x8800001c, 0x4e563131);
-		/* reset RAM adress 128Mb + $1c + 256bits */
-		write_RMA(0x8800003c, 0x00000000);
+		((uint32 *)si->framebuffer)[0x07] = 0x4e563131;
+		/* reset RAM bits at offset 480-511 bits */
+		((uint32 *)si->framebuffer)[0x0f] = 0x00000000;
 		/* check testpattern to have survived */
-		if (read_RMA(0x8800001c) == 0x4e563131) stat = B_OK;
+		if (((uint32 *)si->framebuffer)[0x07] == 0x4e563131) stat = B_OK;
 		cnt++;
 	}
 
 	/* if pattern did not hold modify RAM-type setup */
 	if (stat != B_OK)
 	{
+		LOG(8,("INFO: ---RAM test #1 done: access errors, modified setup.\n"));
 		data = NV_REG32(NV32_PFB_CONFIG_0);
 		if (data & 0x00000010)
 		{
@@ -1655,6 +1654,10 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 		}
 		NV_REG32(NV32_PFB_CONFIG_0) = data;
 	}
+	else
+	{
+		LOG(8,("INFO: ---RAM test #1 done: access is OK.\n"));
+	}
 
 	/* check RAM bankswitching stuff(?) */
 	cnt = 0;
@@ -1665,77 +1668,30 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 		data = NV_REG32(NV32_NV10STRAPINFO);
 		/* subtract 1MB */
 		data -= 0x00100000;
-		/* generate testadress by adding 128Mb */
-		data += 0x08000000;
 		/* write testpattern at generated RAM adress */
-		write_RMA((0x80000000 + data), 0x4e564441);
-		/* reset RAM adress 128Mb */
-		write_RMA(0x88000000, 0x00000000);
-		/* dummyread RAM adress 128Mb four times */
-		read_RMA(0x88000000);
-		read_RMA(0x88000000);
-		read_RMA(0x88000000);
-		read_RMA(0x88000000);
+		((uint32 *)si->framebuffer)[(data >> 2)] = 0x4e564441;
+		/* reset first RAM adress */
+		((uint32 *)si->framebuffer)[0x00] = 0x00000000;
+		/* dummyread first RAM adress four times */
+		dummy = ((uint32 *)si->framebuffer)[0x00];
+		dummy = ((uint32 *)si->framebuffer)[0x00];
+		dummy = ((uint32 *)si->framebuffer)[0x00];
+		dummy = ((uint32 *)si->framebuffer)[0x00];
 		/* check testpattern to have survived */
-		if (read_RMA(0x80000000 + data) == 0x4e564441) stat = B_OK;
+		if (((uint32 *)si->framebuffer)[(data >> 2)] == 0x4e564441) stat = B_OK;
 		cnt++;
 	}
 
 	/* if pattern did not hold modify RAM-type setup */
 	if (stat != B_OK)
 	{
+		LOG(8,("INFO: ---RAM test #2 done: access errors, modified setup.\n"));
 		NV_REG32(NV32_PFB_CONFIG_0) &= 0xffffefff;
 	}
-}
-
-/* this function is very handy for RAM size testing (doesn't need mapping) */
-/* RMA is a port that allows access to all of the cards 32bit registers and all
- * of the cards RAM from old ISA I/O space via the GPU.
- * RAM starts at 'offset' $80000000 */
-/* Note:
- * RMA is a ISA-only function */
-//fixme: fix access as secondary card or translate to PCI version somehow...
-static void write_RMA(uint32 reg, uint32 data)
-{
-	/* select RMA port 'set adress' mode */
-	ISAWW(0x03d4, 0x0338);
-	/* set adress in RMA port */
-	ISAWW(0x03d0, (reg & 0x0000ffff));
-	ISAWW(0x03d2, (reg >> 16));
-	/* select RMA port 'write data' mode */
-	ISAWW(0x03d4, 0x0738);
-	/* send data through RMA port */
-	ISAWW(0x03d0, (data & 0x0000ffff));
-	ISAWW(0x03d2, (data >> 16));
-	/* re-select RMA port 'set adress' mode (just to be sure) */
-	ISAWW(0x03d4, 0x0338);
-}
-
-/* this function is very handy for RAM size testing (doesn't need mapping) */
-/* RMA is a port that allows access to all of the cards 32bit registers and all
- * of the cards RAM from old ISA I/O space via the GPU.
- * RAM starts at 'offset' $80000000 */
-/* Note:
- * RMA is a ISA-only function */
-//fixme: fix access as secondary card or translate to PCI version somehow...
-static uint32 read_RMA(uint32 reg)
-{
-	uint32 data;
-
-	/* select RMA port 'set adress' mode */
-	ISAWW(0x03d4, 0x0338);
-	/* set adress in RMA port */
-	ISAWW(0x03d0, (reg & 0x0000ffff));
-	ISAWW(0x03d2, (reg >> 16));
-	/* select RMA port 'read data' mode */
-	ISAWW(0x03d4, 0x0538);
-	/* read data from RMA port */
-	data = ISARW(0x03d0);
-	data |= ((ISARW(0x03d2)) << 16);
-	/* re-select RMA port 'set adress' mode (just to be sure) */
-	ISAWW(0x03d4, 0x0338);
-
-	return data;
+	else
+	{
+		LOG(8,("INFO: ---RAM test #2 done: access is OK.\n"));
+	}
 }
 
 static status_t translate_ISA_PCI(uint32* reg)
