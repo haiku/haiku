@@ -578,8 +578,10 @@ status_t
 BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 {
 	status_t error = (ref && app ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = resolve_app(NULL, ref, app, NULL, NULL, NULL);
+	if (error == B_OK) {
+		entry_ref _ref(*ref);
+		error = resolve_app(NULL, &_ref, app, NULL, NULL, NULL);
+	}
 	return error;
 }
 
@@ -1069,12 +1071,36 @@ BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
 }
 
 // SetSignature
-/*!
-	\todo Really needed?
+/*!	\brief Sets an application's signature.
+
+	The application must be registered or at pre-registered with a valid
+	team ID.
+
+	\param team The app's team ID.
+	\param mimeSig The app's new signature.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_REG_APP_NOT_REGISTERED: The supplied team ID does not identify a
+	  registered application.
 */
-void
+status_t
 BRoster::SetSignature(team_id team, const char *mimeSig) const
 {
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_SET_SIGNATURE);
+	if (error == B_OK && team >= 0)
+		error = request.AddInt32("team", team);
+	if (error == B_OK && mimeSig)
+		error = request.AddString("signature", mimeSig);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // SetThread
@@ -1328,13 +1354,20 @@ BRoster::xLaunchAppPrivate(const char *mimeType, const entry_ref *ref,
 {
 DBG(OUT("BRoster::xLaunchAppPrivate()"));
 	status_t error = (mimeType || ref ? B_OK : B_BAD_VALUE);
+	// use a mutable copy of the document entry_ref
+	entry_ref _docRef;
+	entry_ref *docRef = NULL;
+	if (error == B_OK && ref) {
+		_docRef = *ref;
+		docRef = &_docRef;
+	}
 	// find the app
 	entry_ref appRef;
 	char signature[B_MIME_TYPE_LENGTH];
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	bool wasDocument = true;
 	if (error == B_OK) {
-		error = resolve_app(mimeType, ref, &appRef, signature, &appFlags,
+		error = resolve_app(mimeType, docRef, &appRef, signature, &appFlags,
 						 &wasDocument);
 	}
 DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
@@ -1342,7 +1375,7 @@ DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
 	ArgVector argVector;
 	if (error == B_OK) {
 		error = argVector.Init(argc, args, &appRef,
-							   (wasDocument ? ref : NULL));
+							   (wasDocument ? docRef : NULL));
 	}
 DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
 	// pre-register the app
@@ -1412,7 +1445,7 @@ DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
 		// don't send ref, if it refers to the app or is included in the
 		// argument vector
 		const entry_ref *_ref = (argvOnly || !wasDocument
-								 || argVector.Count() > 1 ? NULL : ref);
+								 || argVector.Count() > 1 ? NULL : docRef);
 		if (!(argvOnly && alreadyRunning)) {
 			send_to_running(targetTeam, argVector.Count(), argVector.Args(),
 							_messageList, _ref, !alreadyRunning);
@@ -1456,6 +1489,9 @@ BRoster::DumpRoster() const
 	At least one of \a inType or \a ref must not be \c NULL. If \a inType is
 	supplied, \a ref is ignored.
 
+	If \a ref refers to a link, it is updated with the entry_ref for the
+	resolved entry.
+
 	\see FindApp() for how the application is searched.
 
 	\a appSig is set to a string with length 0, if the found application
@@ -1482,7 +1518,7 @@ BRoster::DumpRoster() const
 	- \see FindApp() for other error codes.
 */
 status_t
-BRoster::resolve_app(const char *inType, const entry_ref *ref,
+BRoster::resolve_app(const char *inType, entry_ref *ref,
 					 entry_ref *appRef, char *appSig, uint32 *appFlags,
 					 bool *wasDocument) const
 {
@@ -1513,18 +1549,22 @@ BRoster::resolve_app(const char *inType, const entry_ref *ref,
 	if (error == B_OK) {
 		char signature[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.SetTo(&appFile) == B_OK
-			&& appFileInfo.GetSignature(signature) == B_OK
-			&& strcmp(appMeta.Type(), signature)) {
-			appMeta.SetAppHint(NULL);
+			&& appFileInfo.GetSignature(signature) == B_OK) {
+			if (!strcmp(appMeta.Type(), signature))
+				appMeta.SetAppHint(&_appRef);
+			else {
+				appMeta.SetAppHint(NULL);
+				appMeta.SetTo(signature);
+			}
 		} else
-			appMeta.SetAppHint(&_appRef);
+			appMeta.SetAppHint(NULL);
 	}
 	// set the return values
 	if (error == B_OK) {
 		if (appRef)
 			*appRef = _appRef;
 		if (appSig) {
-			// there's no warranty, the appMeta is valid
+			// there's no warranty, that appMeta is valid
 			if (appMeta.IsValid())
 				strcpy(appSig, appMeta.Type());
 			else
@@ -1554,6 +1594,9 @@ BRoster::resolve_app(const char *inType, const entry_ref *ref,
 
 	\see FindApp() for how the application is searched.
 
+	If \a ref refers to a link, it is updated with the entry_ref for the
+	resolved entry.
+
 	\param ref The file for which an application shall be found.
 	\param appMeta A pointer to a pre-allocated BMimeType to be set to the
 		   signature of the found application.
@@ -1570,12 +1613,25 @@ BRoster::resolve_app(const char *inType, const entry_ref *ref,
 	- \see FindApp() for other error codes.
 */
 status_t
-BRoster::translate_ref(const entry_ref *ref, BMimeType *appMeta,
+BRoster::translate_ref(entry_ref *ref, BMimeType *appMeta,
 					   entry_ref *appRef, BFile *appFile,
 					   bool *wasDocument) const
 {
 	status_t error = (ref && appMeta && appRef && appFile ? B_OK
 														  : B_BAD_VALUE);
+	// resolve ref, if necessary
+	if (error == B_OK) {
+		BEntry entry;
+		error = entry.SetTo(ref, false);
+		if (error == B_OK && entry.IsSymLink()) {
+			// ref refers to a link
+			error = entry.SetTo(ref, true);
+			if (error == B_OK)
+				error = entry.GetRef(ref);
+			if (error != B_OK)
+				error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
+		}
+	}
 	// init node
 	BNode node;
 	if (error == B_OK)
@@ -1689,10 +1745,11 @@ BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
 	if (error == B_OK && appMeta->GetAppHint(appRef) == B_OK) {
 		// resolve symbolic links, if necessary
 		BEntry entry;
-		if (entry.SetTo(appRef) == B_OK && entry.IsFile()
+		if (entry.SetTo(appRef, true) == B_OK && entry.IsFile()
 			&& entry.GetRef(appRef) == B_OK) {
 			appFound = true;
-		}
+		} else
+			appMeta->SetAppHint(NULL);	// bad app hint -- remove it
 	}
 	// in case there is no app hint or it is invalid, we need to query for the
 	// app
