@@ -434,7 +434,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 			return status;
 
 		fIsReadOnly = true;
-	}
+	} else
+		fIsReadOnly = false;
 
 	entry.GetRef(&fRef);
 
