@@ -5,7 +5,10 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPDevice.h"
+#include <KPPPDevice.h>
+
+#include <net/if.h>
+#include <mbuf.h>
 
 
 PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
@@ -15,7 +18,7 @@ PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
 {
 	fName = name ? strdup(name) : NULL;
 	
-	SetMTU(PreferredMTU());
+	SetMTU(1500);
 	
 	if(interface)
 		interface->SetDevice(this);
@@ -59,13 +62,25 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 	return B_OK;
 }
 
+
+bool
+PPPDevice::SetMTU(uint32 MTU)
+{
+	fMTU = MTU;
+	
+	return true;
+}
+
+
 status_t
-PPPDevice::PassToInterface(mbuf *packet)
+PPPDevice::PassToInterface(struct mbuf *packet)
 {
 	if(!Interface() || !Interface()->InQueue())
 		return B_ERROR;
 	
 	IFQ_ENQUEUE(Interface()->InQueue(), packet);
+	
+	return B_OK;
 }
 
 

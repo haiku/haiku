@@ -8,13 +8,22 @@
 #ifndef _K_PPP_ENCAPSULATOR__H
 #define _K_PPP_ENCAPSULATOR__H
 
-#include "KPPPInterface.h"
+#include <driver_settings.h>
+
+#include <KPPPDefs.h>
+
+class PPPInterface;
+
+#ifndef _K_PPP_INTERFACE__H
+#include <KPPPInterface.h>
+#endif
 
 
 class PPPEncapsulator {
 	public:
-		PPPEncapsulator(const char *name, PPP_ENCAPSULATION_LEVEL level,
-			uint16 protocol, int32 addressFamily, uint32 overhead,
+		PPPEncapsulator(const char *name, PPP_PHASE phase,
+			PPP_ENCAPSULATION_LEVEL level, uint16 protocol,
+			int32 addressFamily, uint32 overhead,
 			PPPInterface *interface, driver_parameter *settings,
 			int32 flags = PPP_NO_FLAGS);
 		virtual ~PPPEncapsulator();
@@ -24,6 +33,9 @@ class PPPEncapsulator {
 		const char *Name() const
 			{ return fName; }
 		
+		PPP_PHASE Phase() const
+			{ return fPhase; }
+		
 		PPP_ENCAPSULATION_LEVEL Level() const
 			{ return fLevel; }
 		uint32 Overhead() const
@@ -31,7 +43,7 @@ class PPPEncapsulator {
 		
 		PPPInterface *Interface() const
 			{ return fInterface; }
-		driver_parameter *Settings()
+		driver_parameter *Settings() const
 			{ return fSettings; }
 		
 		uint16 Protocol() const
@@ -62,17 +74,17 @@ class PPPEncapsulator {
 		virtual bool Down() = 0;
 		bool IsUp() const
 			{ return fConnectionStatus == PPP_ESTABLISHED_PHASE; }
-		bool IsDown const
-			{ return fConectionStatus == PPP_DOWN_PHASE; }
+		bool IsDown() const
+			{ return fConnectionStatus == PPP_DOWN_PHASE; }
 		bool IsGoingUp() const
 			{ return fConnectionStatus == PPP_ESTABLISHMENT_PHASE; }
 		bool IsGoingDown() const
 			{ return fConnectionStatus == PPP_TERMINATION_PHASE; }
 		
-		virtual status_t Send(mbuf *packet, uint16 protocol) = 0;
-		virtual status_t Receive(mbuf *packet, uint16 protocol) = 0;
+		virtual status_t Send(struct mbuf *packet, uint16 protocol) = 0;
+		virtual status_t Receive(struct mbuf *packet, uint16 protocol) = 0;
 		
-		status_t SendToNext(mbuf *packet, uint16 protocol) const;
+		status_t SendToNext(struct mbuf *packet, uint16 protocol) const;
 			// this will send your packet to the next (up) encapsulator
 			// if there is no next encapsulator (==NULL), it will
 			// call the interface's SendToDevice function
@@ -93,6 +105,7 @@ class PPPEncapsulator {
 
 	private:
 		char *fName;
+		PPP_PHASE fPhase;
 		PPP_ENCAPSULATION_LEVEL fLevel;
 		uint16 fProtocol;
 		int32 fAddressFamily;
@@ -105,7 +118,7 @@ class PPPEncapsulator {
 		bool fEnabled;
 		bool fUpRequested;
 		PPP_PHASE fConnectionStatus;
-}:
+};
 
 
 #endif

@@ -8,7 +8,13 @@
 #ifndef _K_PPP_DEVICE__H
 #define _K_PPP_DEVICE__H
 
-#include "KPPPInterface.h"
+#include <driver_settings.h>
+
+#include <KPPPDefs.h>
+
+#ifndef _K_PPP_INTERFACE__H
+#include <KPPPInterface.h>
+#endif
 
 
 class PPPDevice {
@@ -27,12 +33,12 @@ class PPPDevice {
 		
 		PPPInterface *Interface() const
 			{ return fInterface; }
-		driver_parameter *Settings()
+		driver_parameter *Settings() const
 			{ return fSettings; }
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
-		virtual bool SetMTU(uint32 mtu) = 0;
+		virtual bool SetMTU(uint32 MTU);
 		uint32 MTU() const
 			{ return fMTU; }
 		virtual uint32 PreferredMTU() const = 0;
@@ -52,10 +58,10 @@ class PPPDevice {
 		virtual uint32 CountOutputBytes() const = 0;
 			// how many bytes are waiting to be sent?
 		
-		virtual status_t Send(mbuf *packet) = 0;
+		virtual status_t Send(struct mbuf *packet) = 0;
 			// This should enqueue the packet and return immediately.
 			// The device is responsible for freeing the packet.
-		status_t PassToInterface(mbuf *packet);
+		status_t PassToInterface(struct mbuf *packet);
 			// This will pass the packet to the interface's queue.
 			// Do not call Interface::ReceiveFromDevice directly
 			// if this can block a Send()!
@@ -70,9 +76,9 @@ class PPPDevice {
 		bool DownStarted() const;
 		
 		// report up/down events
-		void UpFailedEvent() const;
-		void UpEvent() const;
-		void DownEvent() const;
+		void UpFailedEvent();
+		void UpEvent();
+		void DownEvent();
 
 	protected:
 		bool fIsUp;

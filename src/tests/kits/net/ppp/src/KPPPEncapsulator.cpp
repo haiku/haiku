@@ -5,14 +5,15 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPEncapsulator.h"
+#include <KPPPEncapsulator.h>
 
 
-PPPEncapsulator::PPPEncapsulator(const char *name, PPP_ENCAPSULATION_LEVEL level,
-		uint16 protocol, int32 addressFamily, uint32 overhead,
+PPPEncapsulator::PPPEncapsulator(const char *name, PPP_PHASE phase,
+		PPP_ENCAPSULATION_LEVEL level, uint16 protocol,
+		int32 addressFamily, uint32 overhead,
 		PPPInterface *interface, driver_parameter *settings,
 		int32 flags = PPP_NO_FLAGS)
-	: fOverhead(overhead), fLevel(level), fProtocol(protocol),
+	: fOverhead(overhead), fPhase(phase), fLevel(level), fProtocol(protocol),
 	fAddressFamily(addressFamily), fInterface(interface),
 	fSettings(settings), fFlags(flags), fEnabled(true),
 	fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
@@ -52,7 +53,7 @@ PPPEncapsulator::SetEnabled(bool enabled = true)
 		return;
 	
 	if(!enabled) {
-		if(IsUp() || IsGoingUp()))
+		if(IsUp() || IsGoingUp())
 			Down();
 	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface()->IsUp())
 		Up();
@@ -80,7 +81,7 @@ PPPEncapsulator::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPEncapsulator::SendToNext(mbuf *packet, uint16 protocol) const
+PPPEncapsulator::SendToNext(struct mbuf *packet, uint16 protocol) const
 {
 	if(Next())
 		return Next()->Send(packet, protocol);

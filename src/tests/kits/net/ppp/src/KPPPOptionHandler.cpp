@@ -5,7 +5,7 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPOptionHandler.h"
+#include <KPPPOptionHandler.h>
 
 
 PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface *interface,

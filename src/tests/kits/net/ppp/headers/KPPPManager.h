@@ -8,7 +8,7 @@
 #ifndef _K_PPP_MANAGER__H
 #define _K_PPP_MANAGER__H
 
-#include <net_module.h>
+#include "net_module.h"
 
 
 #define PPP_MANAGER_MODULE_NAME "network/interfaces/ppp"
@@ -23,8 +23,9 @@ enum PPP_INTERFACE_FILTER {
 typedef struct ppp_manager_info {
 	kernel_net_module_info knminfo;
 	
-	uint32 (*create_interface)(driver_settings *settings, interface_id parent);
-		// you should always create interfaces using this function
+	interface_id (*create_interface)(const driver_settings *settings,
+		interface_id parent);
+			// you should always create interfaces using this function
 	void (*delete_interface)(interface_id ID);
 		// this marks the interface for deletion
 	

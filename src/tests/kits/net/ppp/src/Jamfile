@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src tests kits net ppp src ;
+
+LOCATE_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net ppp headers ] ;
+
+R5KernelStaticLibrary kernelppp :
+	KPPPConfigurePacket.cpp
+	KPPPDevice.cpp
+	KPPPEncapsulator.cpp
+	KPPPInterface.cpp
+	KPPPLCP.cpp
+	KPPPOptionHandler.cpp
+	KPPPProtocol.cpp
+	KPPPReportManager.cpp
+	KPPPStateMachine.cpp
+	KPPPUtils.cpp
+	Locker.cpp
+	settings_tools.cpp
+	cpp.cpp
+;

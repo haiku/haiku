@@ -8,7 +8,11 @@
 #ifndef _K_PPP_PROTOCOL__H
 #define _K_PPP_PROTOCOL__H
 
-#include "KPPPInterface.h"
+#include <driver_settings.h>
+
+#include <KPPPDefs.h>
+
+class PPPInterface;
 
 
 class PPPProtocol {
@@ -26,7 +30,9 @@ class PPPProtocol {
 		PPP_PHASE Phase() const
 			{ return fPhase; }
 		
-		driver_parameter *Settings()
+		PPPInterface *Interface() const
+			{ return fInterface; }
+		driver_parameter *Settings() const
 			{ return fSettings; }
 		
 		uint16 Protocol() const
@@ -52,15 +58,15 @@ class PPPProtocol {
 		virtual bool Down() = 0;
 		bool IsUp() const
 			{ return fConnectionStatus == PPP_ESTABLISHED_PHASE; }
-		bool IsDown const
-			{ return fConectionStatus == PPP_DOWN_PHASE; }
+		bool IsDown() const
+			{ return fConnectionStatus == PPP_DOWN_PHASE; }
 		bool IsGoingUp() const
 			{ return fConnectionStatus == PPP_ESTABLISHMENT_PHASE; }
 		bool IsGoingDown() const
 			{ return fConnectionStatus == PPP_TERMINATION_PHASE; }
 		
-		virtual status_t Send(mbuf *packet) = 0;
-		virtual status_t Receive(mbuf *packet, uint16 protocol) = 0;
+		virtual status_t Send(struct mbuf *packet) = 0;
+		virtual status_t Receive(struct mbuf *packet, uint16 protocol) = 0;
 		
 		virtual void Pulse();
 
@@ -74,12 +80,12 @@ class PPPProtocol {
 			// report up/down events
 
 	private:
-		char *name;
+		char *fName;
 		PPP_PHASE fPhase;
 		uint16 fProtocol;
 		int32 fAddressFamily;
-		PPPInterface fInterface;
-		driver_parameter fSettings;
+		PPPInterface *fInterface;
+		driver_parameter *fSettings;
 		int32 fFlags;
 		
 		bool fEnabled;

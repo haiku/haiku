@@ -8,6 +8,7 @@
 #ifndef _K_PPP_REPORT_DEFS__H
 #define _K_PPP_REPORT_DEFS__H
 
+
 #define PPP_REPORT_DATA_LIMIT		128
 	// how much optional data can be added to the report
 #define PPP_REPORT_CODE				'_3PR'
@@ -47,7 +48,7 @@ enum PPP_CONNECTION_REPORT_CODES {
 typedef struct ppp_report_packet {
 	int32 type;
 	int32 code;
-	uint8 len;
+	uint8 length;
 	char data[PPP_REPORT_DATA_LIMIT];
 } ppp_report_packet;
 
@@ -59,7 +60,7 @@ typedef struct ppp_report_packet {
 #define PPP_REPORT_TIMEOUT				10
 
 typedef struct ppp_report_request {
-	port_id port;
+	thread_id thread;
 	int32 type;
 	int32 flags;
 } ppp_report_request;

@@ -5,26 +5,33 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPInterface.h"
+// Stdio.h must be included before PPPModule.h/PPPManager.h because
+// dprintf is defined twice with different return values, once with
+// void (KernelExport.h) and once with int (stdio.h).
+#include <cstdio>
+#include <cstring>
+#include <new.h>
+
+// now our headers...
+#include <KPPPInterface.h>
 
 // our other classes
-#include "KPPPModule.h"
-#include "KPPPManager.h"
+#include <KPPPDevice.h>
+#include <KPPPEncapsulator.h>
+#include <KPPPModule.h>
+#include <KPPPManager.h>
 
 // general helper classes not only belonging to us
-#include "LockerHelper.h"
+#include <LockerHelper.h>
 
 // tools only for us :)
 #include "KPPPUtils.h"
 #include "settings_tools.h"
 
-#include <cstring>
-#include <new.h>
-
 
 // TODO:
 // - implement timers with support for settings next time instead of receiving timer
-//    events
+//    events periodically
 
 
 // needed for redial:
@@ -42,7 +49,7 @@ status_t in_queue_thread(void *data);
 PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		PPPInterface *parent = NULL)
 	: fID(ID), fSettings(dup_driver_settings(settings)),
-	fStateMachine(*this), fLCP(*this), ReportManager()(StateMachine().Locker()),
+	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
 	fIfnet(NULL), fUpThread(-1), fRedialThread(-1), fDialRetry(0),
 	fDialRetriesLimit(0), fIdleSince(0), fLinkMTU(1500), fDevice(NULL),
 	fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
@@ -144,10 +151,14 @@ PPPInterface::~PPPInterface()
 	while(FirstEncapsulator())
 		delete FirstEncapsulator();
 	
-	for(int32 index = 0; index < fModules.CountItems(); index++)
-		put_module((module_info**) &fModules.ItemAt(index));
+	for(int32 index = 0; index < fModules.CountItems(); index++) {
+		put_module(fModules.ItemAt(index));
+		free(fModules.ItemAt(index));
+	}
 	
-	put_module((module_info**) &fManager);
+	put_module(PPP_MANAGER_MODULE_NAME);
+	
+	free_driver_settings(fSettings);
 }
 
 
@@ -231,6 +242,8 @@ PPPInterface::SetDevice(PPPDevice *device)
 	
 	CalculateMRU();
 	CalculateBaudRate();
+	
+	return true;
 }
 
 
@@ -250,6 +263,8 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	
 	if(IsUp() || Phase() >= protocol->Phase())
 		protocol->Up();
+	
+	return true;
 }
 
 
@@ -357,7 +372,7 @@ PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
 		return false;
 			// a running connection may not change
 	
-	PPPEncapsulator *current = fFirstEncapsulator, previous = NULL;
+	PPPEncapsulator *current = fFirstEncapsulator, *previous = NULL;
 	
 	while(current) {
 		if(current == encapsulator) {
@@ -386,7 +401,7 @@ PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
 
 PPPEncapsulator*
 PPPInterface::EncapsulatorFor(uint16 protocol,
-	PPPEncapsulator start = NULL) const
+	PPPEncapsulator *start = NULL) const
 {
 	PPPEncapsulator *current = start ? start : fFirstEncapsulator;
 	
@@ -433,11 +448,23 @@ PPPInterface::RemoveChild(PPPInterface *child)
 }
 
 
+PPPInterface*
+PPPInterface::ChildAt(int32 index) const
+{
+	PPPInterface *child = fChildren.ItemAt(index);
+	
+	if(child == fChildren.GetDefaultItem())
+		return NULL;
+	
+	return child;
+}
+
+
 void
 PPPInterface::SetAutoRedial(bool autoredial = true)
 {
 	if(Mode() == PPP_CLIENT_MODE)
-		return false;
+		return;
 	
 	LockerHelper locker(fLock);
 	
@@ -449,7 +476,7 @@ void
 PPPInterface::SetDialOnDemand(bool dialondemand = true)
 {
 	if(Mode() != PPP_CLIENT_MODE)
-		return false;
+		return;
 	
 	LockerHelper locker(fLock);
 	
@@ -516,7 +543,6 @@ PPPInterface::Up()
 			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 			return true;
 		}
-		
 		
 		if(report.type == PPP_DESTRUCTION_REPORT) {
 			if(me == fUpThread) {
@@ -676,13 +702,12 @@ PPPInterface::IsUp() const
 {
 	LockerHelper locker(fLock);
 	
-	return StateMachine().Phase() == PPP_ESTABLISHED_PHASE;
+	return Phase() == PPP_ESTABLISHED_PHASE;
 }
 
 
 bool
-PPPInterface::LoadModules(const driver_settings *settings,
-	int32 start, int32 count)
+PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 {
 	if(Phase() != PPP_DOWN_PHASE)
 		return false;
@@ -698,8 +723,8 @@ PPPInterface::LoadModules(const driver_settings *settings,
 			i < settings->parameter_count && i < start + count; i++) {
 		if(!strcasecmp(settings->parameters[i].name, PPP_MULTILINK_KEY)
 				&& settings->parameters[i].value_count > 0) {
-			if(!LoadModule(settings->parameters[i].value[0],
-					parameters[i].parameters, PPP_MULTILINK_TYPE))
+			if(!LoadModule(settings->parameters[i].values[0],
+					settings->parameters[i].parameters, PPP_MULTILINK_TYPE))
 				return false;
 			break;
 		}
@@ -734,7 +759,7 @@ PPPInterface::LoadModules(const driver_settings *settings,
 		if(type >= 0)
 			for(int32 value_id = 0; value_id < settings->parameters[i].value_count;
 					value_id++)
-				if(!LoadModule(settings->parameters[i].value[value_id],
+				if(!LoadModule(settings->parameters[i].values[value_id],
 						settings->parameters[i].parameters, type))
 					return false;
 	}
@@ -744,7 +769,7 @@ PPPInterface::LoadModules(const driver_settings *settings,
 
 
 bool
-PPPInterface::LoadModule(const char *name, const driver_parameter *parameter,
+PPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 	int32 type)
 {
 	if(Phase() != PPP_DOWN_PHASE)
@@ -754,7 +779,7 @@ PPPInterface::LoadModule(const char *name, const driver_parameter *parameter,
 	if(!name || strlen(name) > B_FILE_NAME_LENGTH)
 		return false;
 	
-	char module_name[B_PATH_NAME_LENGTH];
+	char *module_name = (char*) malloc(B_PATH_NAME_LENGTH);
 	
 	sprintf(module_name, "%s/%s", PPP_MODULES_PATH, name);
 	
@@ -762,17 +787,16 @@ PPPInterface::LoadModule(const char *name, const driver_parameter *parameter,
 	if(get_module(module_name, (module_info**) &module) != B_OK)
 		return false;
 	
-	if(!module->add_to(Parent()?Parent():this, this, parameter, type))
-		return false;
-	
 	// add the module to the list of loaded modules
 	// for putting them on our destruction
-	return fModules.AddItem(module);
+	fModules.AddItem(module_name);
+	
+	return module->add_to(Parent()?Parent():this, this, parameter, type);
 }
 
 
 status_t
-PPPInterface::Send(mbuf *packet, uint16 protocol)
+PPPInterface::Send(struct mbuf *packet, uint16 protocol)
 {
 	if(!packet)
 		return B_ERROR;
@@ -815,14 +839,14 @@ PPPInterface::Send(mbuf *packet, uint16 protocol)
 		return SendToDevice(packet, protocol);
 	
 	if(!fFirstEncapsulator->IsEnabled())
-		return fFirstEncapsulator->SendToNext();
+		return fFirstEncapsulator->SendToNext(packet, protocol);
 	
 	return fFirstEncapsulator->Send(packet, protocol);
 }
 
 
 status_t
-PPPInterface::Receive(mbuf *packet, uint16 protocol)
+PPPInterface::Receive(struct mbuf *packet, uint16 protocol)
 {
 	if(!packet)
 		return B_ERROR;
@@ -877,20 +901,20 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 	
 	// maybe the parent interface can handle it
 	if(Parent())
-		return Parent->Receive(packet, protocol);
+		return Parent()->Receive(packet, protocol);
 	
-	if(result == PPP_UNHANDLED)
+	if(result == PPP_UNHANDLED) {
 		m_freem(packet);
 		return PPP_DISCARDED;
-	else {
-		StateMachine()->RUCEvent(packet, protocol);
+	} else {
+		StateMachine().RUCEvent(packet, protocol);
 		return PPP_REJECTED;
 	}
 }
 
 
 status_t
-PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
+PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 {
 	if(!packet)
 		return B_ERROR;
@@ -930,7 +954,7 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	}
 	
 	// encode in ppp frame
-	M_PREPEND(packet, sizeof(uint16));
+	M_PREPEND(packet, 2);
 	
 	if(packet == NULL)
 		return B_ERROR;
@@ -945,7 +969,7 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	// pass to device/children
 	if(!IsMultilink() || Parent()) {
 		// check if packet is too big for device
-		if((packet->m_flags & M_PKTHDR && packet->m_pkthdr.len > LinkMTU())
+		if((packet->m_flags & M_PKTHDR && (uint32) packet->m_pkthdr.len > LinkMTU())
 				|| packet->m_len > LinkMTU()) {
 			m_freem(packet);
 			return B_ERROR;
@@ -961,7 +985,7 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 
 
 status_t
-PPPInterface::ReceiveFromDevice(mbuf *packet)
+PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 {
 	if(!packet)
 		return B_ERROR;
@@ -984,7 +1008,7 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 	if(packet->m_flags & M_PKTHDR)
 		packet->m_pkthdr.rcvif = Ifnet();
 	
-	return Receive(packet, protocol);
+	return Receive(packet, *protocol);
 }
 
 
@@ -1068,7 +1092,7 @@ PPPInterface::CalculateMRU()
 	// sum all headers
 	fHeaderLength = sizeof(uint16);
 	
-	PPPEncapsulator encapsulator = fFirstEncapsulator;
+	PPPEncapsulator *encapsulator = fFirstEncapsulator;
 	for(; encapsulator; encapsulator = encapsulator->Next())
 		fHeaderLength += encapsulator->Overhead();
 	
@@ -1091,7 +1115,7 @@ PPPInterface::CalculateBaudRate()
 		return;
 	
 	if(Device())
-		fIfnet->if_baudrate = max(Device()->InputTransferRate(),
+		fIfnet->if_baudrate = max_c(Device()->InputTransferRate(),
 			Device()->OutputTransferRate());
 	else {
 		fIfnet->if_baudrate = 0;
@@ -1110,8 +1134,8 @@ PPPInterface::Redial()
 	
 	// start a new thread that calls our Up() method
 	redial_info *info = new redial_info;
-	info.interface = this;
-	info.thread = &fRedialThread;
+	info->interface = this;
+	info->thread = &fRedialThread;
 	
 	fRedialThread = spawn_kernel_thread(redial_func, "PPPInterface: redial_thread",
 		B_NORMAL_PRIORITY, info);
@@ -1129,6 +1153,8 @@ redial_func(void *data)
 	*info->thread = -1;
 	
 	delete info;
+	
+	return B_OK;
 }
 
 
@@ -1137,7 +1163,7 @@ in_queue_thread(void *data)
 {
 	PPPInterface *interface = (PPPInterface*) data;
 	struct ifq *queue = interface->InQueue();
-	mbuf *packet;
+	struct mbuf *packet;
 	status_t error;
 	
 	while(true) {

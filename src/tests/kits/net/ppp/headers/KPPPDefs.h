@@ -118,12 +118,6 @@ enum PPP_MODE {
 	PPP_SERVER_MODE
 };
 
-// report types
-enum PPP_REPORT {
-	PPP_CONNECTION_REPORT = 0x01,
-	PPP_ERROR_REPORT = 0x02,
-};
-
 // authentication status
 enum PPP_AUTHENTICATION_STATUS {
 	PPP_AUTHENTICATION_FAILED = -1,

@@ -8,9 +8,17 @@
 #ifndef _K_PPP_STATE_MACHINE__H
 #define _K_PPP_STATE_MACHINE__H
 
-#include "KPPPLCP.h"
+#include <KPPPDefs.h>
 
-#include "Locker.h"
+class PPPEncapsulator;
+class PPPInterface;
+class PPPProtocol;
+
+#ifndef _K_PPP_INTERFACE__H
+#include <KPPPInterface.h>
+#endif
+
+#include <Locker.h>
 
 
 class PPPStateMachine {
@@ -30,7 +38,7 @@ class PPPStateMachine {
 		PPPInterface *Interface() const
 			{ return fInterface; }
 		PPPLCP& LCP() const
-			{ return Interface()->LCP(); }
+			{ return fLCP; }
 		
 		PPP_STATE State() const
 			{ return fState; }
@@ -44,16 +52,16 @@ class PPPStateMachine {
 		void AuthenticationRequested();
 		void AuthenticationAccepted(const char *name);
 		void AuthenticationDenied(const char *name);
-		const char *AuthenticationName() const;
-			// returns NULL if not authenticated
+		const char *AuthenticationName() const
+			{ return fAuthenticationName; }
 		PPP_AUTHENTICATION_STATUS AuthenticationStatus() const
 			{ return fAuthenticationStatus; }
 		
 		void PeerAuthenticationRequested();
 		void PeerAuthenticationAccepted(const char *name);
 		void PeerAuthenticationDenied(const char *name);
-		const char *PeerAuthenticationName() const;
-			// returns NULL if not authenticated
+		const char *PeerAuthenticationName() const
+			{ return fPeerAuthenticationName; }
 		PPP_AUTHENTICATION_STATUS PeerAuthenticationStatus() const
 			{ return fPeerAuthenticationStatus; }
 		
@@ -92,21 +100,21 @@ class PPPStateMachine {
 		void CloseEvent();
 		void TOGoodEvent();
 		void TOBadEvent();
-		void RCRGoodEvent(mbuf *packet);
-		void RCRBadEvent(mbuf *nak, mbuf *reject);
-		void RCAEvent(mbuf *packet);
-		void RCNEvent(mbuf *packet);
-		void RTREvent(mbuf *packet);
-		void RTAEvent(mbuf *packet);
-		void RUCEvent(mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT);
-		void RXJGoodEvent(mbuf *packet);
-		void RXJBadEvent(mbuf *packet);
-		void RXREvent(mbuf *packet);
+		void RCRGoodEvent(struct mbuf *packet);
+		void RCRBadEvent(struct mbuf *nak, struct mbuf *reject);
+		void RCAEvent(struct mbuf *packet);
+		void RCNEvent(struct mbuf *packet);
+		void RTREvent(struct mbuf *packet);
+		void RTAEvent(struct mbuf *packet);
+		void RUCEvent(struct mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT);
+		void RXJGoodEvent(struct mbuf *packet);
+		void RXJBadEvent(struct mbuf *packet);
+		void RXREvent(struct mbuf *packet);
 		
 		// general events (for Good/Bad events)
 		void TimerEvent();
-		void RCREvent(mbuf *packet);
-		void RXJEvent(mbuf *packet);
+		void RCREvent(struct mbuf *packet);
+		void RXJEvent(struct mbuf *packet);
 		
 		// actions
 		void IllegalEvent(PPP_EVENT event);
@@ -117,12 +125,12 @@ class PPPStateMachine {
 		void InitializeRestartCount();
 		void ZeroRestartCount();
 		void SendConfigureRequest();
-		void SendConfigureAck(mbuf *packet);
-		void SendConfigureNak(mbuf *packet);
+		void SendConfigureAck(struct mbuf *packet);
+		void SendConfigureNak(struct mbuf *packet);
 		void SendTerminateRequest();
-		void SendTerminateAck(mbuf *request);
-		void SendCodeReject(mbuf *packet, uint16 protocol, uint8 type);
-		void SendEchoReply(mbuf *request);
+		void SendTerminateAck(struct mbuf *request);
+		void SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type);
+		void SendEchoReply(struct mbuf *request);
 		
 		void BringHandlersUp();
 		uint32 BringPhaseUp();
@@ -133,6 +141,7 @@ class PPPStateMachine {
 
 	private:
 		PPPInterface *fInterface;
+		PPPLCP& fLCP;
 		
 		PPP_PHASE fPhase;
 		PPP_STATE fState;
@@ -141,7 +150,7 @@ class PPPStateMachine {
 		
 		PPP_AUTHENTICATION_STATUS fAuthenticationStatus,
 			fPeerAuthenticationStatus;
-		int32 fAuthenticatorIndex, fPeerAuthenticatorIndex;
+		char *fAuthenticationName, *fPeerAuthenticationName;
 		
 		BLocker fLock;
 		

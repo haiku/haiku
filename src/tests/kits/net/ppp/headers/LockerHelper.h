@@ -19,7 +19,7 @@
 #ifndef _LOCKER_HELPER__H
 #define _LOCKER_HELPER__H
 
-#include "Locker.h"
+#include <Locker.h>
 
 
 class LockerHelper {

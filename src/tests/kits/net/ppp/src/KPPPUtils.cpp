@@ -5,9 +5,9 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPUtils.h"
-
 #include <OS.h>
+
+#include "KPPPUtils.h"
 
 
 // These are very simple send/receive_data functions with a timeout
@@ -17,9 +17,7 @@ status_t
 send_data_with_timeout(thread_id thread, int32 code, void *buffer,
 	size_t buffer_size, uint32 timeout)
 {
-	int32 tries;
-	
-	for(tries = 0; tries < timeout; tries++) {
+	for(uint32 tries = 0; tries < timeout; tries++) {
 		if(has_data(thread))
 			snooze(1000);
 	}
@@ -35,9 +33,7 @@ status_t
 receive_data_with_timeout(thread_id *sender, int32 *code, void *buffer,
 	size_t buffer_size, uint32 timeout)
 {
-	int32 tries;
-	
-	for(tries = 0; tries < timeout; tries++) {
+	for(uint32 tries = 0; tries < timeout; tries++) {
 		if(!has_data(find_thread(NULL))) {
 			snooze(1000);
 			continue;

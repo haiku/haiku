@@ -8,15 +8,30 @@
 #ifndef _K_PPP_LCP__H
 #define _K_PPP_LCP__H
 
-#include "KPPPProtocol.h"
+#include <List.h>
+
+#ifndef _K_PPP_PROTOCOL__H
+#include <KPPPProtocol.h>
+#endif
+
+#ifndef _K_PPP_INTERFACE__H
+#include <KPPPInterface.h>
+#endif
+
+#ifndef _K_PPP_STATE_MACHINE__H
+#include <KPPPStateMachine.h>
+#endif
+
+class PPPEncapsulator;
+class PPPOptionHandler;
 
 
-typedef struct lcp_packet {
+typedef struct ppp_lcp_packet {
 	uint8 code;
 	uint8 id;
 	uint16 length;
 	int8 data[0];
-} lcp_packet;
+} ppp_lcp_packet;
 
 
 class PPPLCP : public PPPProtocol {
@@ -25,7 +40,7 @@ class PPPLCP : public PPPProtocol {
 	private:
 		// may only be constructed/destructed by PPPInterface
 		PPPLCP(PPPInterface& interface);
-		~PPPLCP();
+		virtual ~PPPLCP();
 		
 		// copies are not allowed!
 		PPPLCP(const PPPLCP& copy);
@@ -33,7 +48,7 @@ class PPPLCP : public PPPProtocol {
 
 	public:
 		PPPStateMachine& StateMachine() const
-			{ return Interface()->StateMachine(); }
+			{ return fStateMachine; }
 		
 		bool AddOptionHandler(PPPOptionHandler *handler);
 		bool RemoveOptionHandler(PPPOptionHandler *handler);
@@ -54,12 +69,14 @@ class PPPLCP : public PPPProtocol {
 		virtual bool Up();
 		virtual bool Down();
 		
-		virtual status_t Send(mbuf *packet);
-		virtual status_t Receive(mbuf *packet, uint16 protocol);
+		virtual status_t Send(struct mbuf *packet);
+		virtual status_t Receive(struct mbuf *packet, uint16 protocol);
 		
 		virtual void Pulse();
 
 	private:
+		PPPStateMachine& fStateMachine;
+		
 		List<PPPOptionHandler*> fOptionHandlers;
 		
 		PPPEncapsulator *fTarget;

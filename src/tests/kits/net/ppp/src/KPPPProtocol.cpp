@@ -5,7 +5,9 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPProtocol.h"
+#include <KPPPInterface.h>
+
+#include <cstring>
 
 
 PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
@@ -50,7 +52,7 @@ PPPProtocol::SetEnabled(bool enabled = true)
 		return;
 	
 	if(!enabled) {
-		if(IsUp() || IsGoingUp()))
+		if(IsUp() || IsGoingUp())
 			Down();
 	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface()->IsUp())
 		Up();

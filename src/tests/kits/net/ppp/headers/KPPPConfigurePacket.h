@@ -28,7 +28,7 @@ class PPPConfigurePacket {
 
 	public:
 		PPPConfigurePacket(uint8 code);
-		PPPConfigurePacket(mbuf *packet);
+		PPPConfigurePacket(struct mbuf *packet);
 		~PPPConfigurePacket();
 		
 		bool SetCode(uint8 code);
@@ -46,7 +46,7 @@ class PPPConfigurePacket {
 			{ return fItems.CountItems(); }
 		ppp_configure_item *ItemAt(int32 index) const;
 		
-		mbuf *ToMbuf(uint32 reserve = 0);
+		struct mbuf *ToMbuf(uint32 reserve = 0);
 			// the user is responsible for freeing the mbuf
 
 	private:

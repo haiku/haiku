@@ -10,19 +10,28 @@
 
 #include <driver_settings.h>
 
-#include "KPPPDefs.h"
+#include <KPPPDefs.h>
 
-#include "KPPPStateMachine.h"
-#include "KPPPLCP.h"
-#include "KPPPReportManager.h"
+#ifndef _K_PPP_LCP__H
+#include <KPPPLCP.h>
+#endif
 
-#include "List.h"
-#include "LockerHelper.h"
+#include <KPPPReportManager.h>
+
+#ifndef _K_PPP_STATE_MACHINE__H
+#include <KPPPStateMachine.h>
+#endif
+
+#include <List.h>
+#include <LockerHelper.h>
 
 class PPPDevice;
 class PPPProtocol;
 class PPPEncapsulator;
 class PPPOptionHandler;
+
+struct ppp_manager_info;
+struct ppp_module_info;
 
 
 class PPPInterface {
@@ -45,12 +54,12 @@ class PPPInterface {
 		interface_id ID() const
 			{ return fID; }
 		
-		driver_settings* Settings()
+		driver_settings* Settings() const
 			{ return fSettings; }
 		
-		PPPStateMachine& StateMachine() const
+		PPPStateMachine& StateMachine()
 			{ return fStateMachine; }
-		PPPLCP& LCP() const
+		PPPLCP& LCP()
 			{ return fLCP; }
 		
 		struct ifnet *Ifnet() const
@@ -75,6 +84,8 @@ class PPPInterface {
 		status_t Control(uint32 op, void *data, size_t length);
 		
 		bool SetDevice(PPPDevice *device);
+		PPPDevice *Device() const
+			{ return fDevice; }
 		
 		bool AddProtocol(PPPProtocol *protocol);
 		bool RemoveProtocol(PPPProtocol *protocol);
@@ -82,7 +93,7 @@ class PPPInterface {
 			{ return fProtocols.CountItems(); }
 		PPPProtocol *ProtocolAt(int32 index) const;
 		PPPProtocol *ProtocolFor(uint16 protocol, int32 start = 0) const;
-		int32 IndexOfProtocol(const PPPProtocol *protocol) const
+		int32 IndexOfProtocol(PPPProtocol *protocol) const
 			{ return fProtocols.IndexOf(protocol); }
 		
 		bool AddEncapsulator(PPPEncapsulator *encapsulator);
@@ -90,13 +101,14 @@ class PPPInterface {
 		PPPEncapsulator *FirstEncapsulator() const
 			{ return fFirstEncapsulator; }
 		PPPEncapsulator *EncapsulatorFor(uint16 protocol,
-			PPPEncapsulator start = NULL) const;
+			PPPEncapsulator *start = NULL) const;
 		
 		// multilink methods
-		void AddChild(PPPInterface *child);
-		void RemoveChild(PPPInterface *child);
+		bool AddChild(PPPInterface *child);
+		bool RemoveChild(PPPInterface *child);
 		int32 CountChildren() const
 			{ return fChildren.CountItems(); }
+		PPPInterface *ChildAt(int32 index) const;
 		PPPInterface *Parent() const
 			{ return fParent; }
 		bool IsMultilink() const
@@ -114,30 +126,31 @@ class PPPInterface {
 			{ return fMode; }
 			// client or server mode?
 		PPP_STATE State() const
-			{ return StateMachine().State(); }
+			{ return fStateMachine.State(); }
 		PPP_PHASE Phase() const
-			{ return StateMachine().Phase(); }
+			{ return fStateMachine.Phase(); }
 		
 		bool Up();
 			// in server mode Up() listens for an incoming connection
 		bool Down();
 		bool IsUp() const;
 		
-		PPPReportManager& ReportManager() const
+		PPPReportManager& ReportManager()
 			{ return fReportManager; }
 		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
-			{ fReportManager.Report(type, code, data, length); }
+			{ return fReportManager.Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
-		bool LoadModules(const driver_settings *settings,
+		bool LoadModules(driver_settings *settings,
 			int32 start, int32 count);
-		bool LoadModule(const char *name, const driver_parameter *parameter);
+		bool LoadModule(const char *name, driver_parameter *parameter,
+			int32 type);
 		
-		status_t Send(mbuf *packet, uint16 protocol);
-		status_t Receive(mbuf *packet, uint16 protocol);
+		status_t Send(struct mbuf *packet, uint16 protocol);
+		status_t Receive(struct mbuf *packet, uint16 protocol);
 		
-		status_t SendToDevice(mbuf *packet, uint16 protocol);
-		status_t ReceiveFromDevice(mbuf *packet);
+		status_t SendToDevice(struct mbuf *packet, uint16 protocol);
+		status_t ReceiveFromDevice(struct mbuf *packet);
 			// This is called by the receive-thread.
 			// Only call this if it does not block Send() or
 			// SendToDevice()!
@@ -193,7 +206,7 @@ class PPPInterface {
 		PPPDevice *fDevice;
 		PPPEncapsulator *fFirstEncapsulator;
 		List<PPPProtocol*> fProtocols;
-		List<ppp_module_info*> fModules;
+		List<char*> fModules;
 		
 		BLocker& fLock;
 		

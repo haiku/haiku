@@ -5,7 +5,16 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPLCP.h"
+#include <KPPPInterface.h>
+#include <KPPPDevice.h>
+#include <KPPPEncapsulator.h>
+#include <KPPPOptionHandler.h>
+
+#include <LockerHelper.h>
+
+#include <netinet/in.h>
+#include <mbuf.h>
+#include <sys/socket.h>
 
 
 #define PPP_PROTOCOL_OVERHEAD				2
@@ -17,7 +26,7 @@
 PPPLCP::PPPLCP(PPPInterface& interface)
 	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
 		AF_UNSPEC, &interface, NULL, PPP_ALWAYS_ALLOWED),
-	fTarget(NULL)
+	fStateMachine(interface.StateMachine()), fTarget(NULL)
 {
 	SetUpRequested(false);
 		// the state machine does everything for us
@@ -35,7 +44,7 @@ bool
 PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
 {
 	if(!handler)
-		return false
+		return false;
 	
 	LockerHelper locker(StateMachine().Locker());
 	
@@ -43,7 +52,7 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
 		return false;
 			// a running connection may not change
 	
-	fOptionHandlers.AddItem(handler);
+	return fOptionHandlers.AddItem(handler);
 }
 
 
@@ -65,7 +74,7 @@ PPPLCP::OptionHandlerAt(int32 index) const
 {
 	PPPOptionHandler *handler = fOptionHandlers.ItemAt(index);
 	
-	if(handler == fOptionHandlers.DefaultItem())
+	if(handler == fOptionHandlers.GetDefaultItem())
 		return NULL;
 	
 	return handler;
@@ -74,7 +83,7 @@ PPPLCP::OptionHandlerAt(int32 index) const
 uint32
 PPPLCP::AdditionalOverhead() const
 {
-	uint32 overhead += PPP_PROTOCOL_OVERHEAD;
+	uint32 overhead = PPP_PROTOCOL_OVERHEAD;
 	
 	if(Target())
 		overhead += Target()->Overhead();
@@ -88,17 +97,19 @@ PPPLCP::AdditionalOverhead() const
 bool
 PPPLCP::Up()
 {
+	return true;
 }
 
 
 bool
 PPPLCP::Down()
 {
+	return true;
 }
 
 
 status_t
-PPPLCP::Send(mbuf *packet)
+PPPLCP::Send(struct mbuf *packet)
 {
 	if(!Interface())
 		return B_ERROR;
@@ -108,12 +119,12 @@ PPPLCP::Send(mbuf *packet)
 
 
 status_t
-PPPLCP::Receive(mbuf *packet, uint16 protocol)
+PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 {
 	if(protocol != PPP_LCP_PROTOCOL)
 		return PPP_UNHANDLED;
 	
-	lcp_packet *data = mtod(packet, lcp_packet*);
+	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
 	if(ntohs(data->length) < 4)
 		return B_ERROR;

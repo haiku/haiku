@@ -8,8 +8,15 @@
 #ifndef _K_PPP_OPTION_HANDLER__H
 #define _K_PPP_OPTION_HANDLER__H
 
-#include "KPPPConfigurePacket.h"
-#include "KPPPInterface.h"
+#include <driver_settings.h>
+
+#include <KPPPDefs.h>
+
+#ifndef _K_PPP_INTERFACE__H
+#include <KPPPInterface.h>
+#endif
+
+class PPPConfigurePacket;
 
 
 class PPPOptionHandler {
@@ -29,7 +36,7 @@ class PPPOptionHandler {
 		
 		PPPInterface *Interface() const
 			{ return fInterface; }
-		driver_parameter *Settings()
+		driver_parameter *Settings() const
 			{ return fSettings; }
 		
 		virtual void Reset() = 0;
@@ -53,9 +60,9 @@ class PPPOptionHandler {
 			// notification that we ack these values
 
 	private:
-		const char *fName;
+		char *fName;
 		PPPInterface *fInterface;
-		driver_parameters *fSettings;
+		driver_parameter *fSettings;
 		
 		bool fEnabled;
 };

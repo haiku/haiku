@@ -5,10 +5,12 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
+#include <driver_settings.h>
+
 #include "settings_tools.h"
 
 #include <cstring>
-#include <driver_settings.h>
+#include <malloc.h>
 
 
 static void copy_parameter(const driver_parameter *from, driver_parameter *to);
@@ -17,7 +19,7 @@ static void free_driver_parameter(driver_parameter *p);
 
 driver_settings *dup_driver_settings(const driver_settings *dup)
 {
-	if(!settings)
+	if(!dup)
 		return NULL; // we got a NULL pointer, so return nothing
 	
 	driver_settings *ret = (driver_settings*) malloc(sizeof(driver_settings));
@@ -37,7 +39,7 @@ static void copy_parameter(const driver_parameter *from, driver_parameter *to)
 	to->name = strdup(from->name);
 	to->value_count = from->value_count;
 	
-	to->values = (char**) malloc(values * sizeof(char*));
+	to->values = (char**) malloc(to->value_count * sizeof(char*));
 	
 	for(int32 i=0; i < to->value_count; i++)
 		to->values[i] = strdup(from->values[i]);
@@ -77,38 +79,25 @@ void free_driver_parameter(driver_parameter *p)
 }
 
 
-void add_settings(const driver_settings *from, driver_settings *to)
-{
-	if(!from || !to)
-		return;
-	
-	to->parameters = realloc(to->parameters,
-		(to->parameter_count + from->parameter_count) * sizeof(driver_parameter));
-	
-	for(int32 i=0; i < from->parameter_count; i++)
-		copy_parameters(&from->parameters[i], &to->parameters[to->parameter_count++]);
-}
-
-
-bool get_boolean_value(const char *string, bool unknownValue)
+bool get_string_value(const char *string, bool unknownValue)
 {
 	if(!string)
 		return unknownValue;
 	
-	if (!strcmp(boolean, "1")
-		|| !strcasecmp(boolean, "true")
-		|| !strcasecmp(boolean, "yes")
-		|| !strcasecmp(boolean, "on")
-		|| !strcasecmp(boolean, "enable")
-		|| !strcasecmp(boolean, "enabled"))
+	if (!strcmp(string, "1")
+		|| !strcasecmp(string, "true")
+		|| !strcasecmp(string, "yes")
+		|| !strcasecmp(string, "on")
+		|| !strcasecmp(string, "enable")
+		|| !strcasecmp(string, "enabled"))
 		return true;
 
-	if (!strcmp(boolean, "0")
-		|| !strcasecmp(boolean, "false")
-		|| !strcasecmp(boolean, "no")
-		|| !strcasecmp(boolean, "off")
-		|| !strcasecmp(boolean, "disable")
-		|| !strcasecmp(boolean, "disabled"))
+	if (!strcmp(string, "0")
+		|| !strcasecmp(string, "false")
+		|| !strcasecmp(string, "no")
+		|| !strcasecmp(string, "off")
+		|| !strcasecmp(string, "disable")
+		|| !strcasecmp(string, "disabled"))
 		return false;
 	
 	// no correct value has been found => return default value

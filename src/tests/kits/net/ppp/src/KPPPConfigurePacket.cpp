@@ -5,7 +5,8 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include "KPPPConfigurePacket.h"
+#include <KPPPConfigurePacket.h>
+#include <KPPPInterface.h>
 
 
 PPPConfigurePacket::PPPConfigurePacket(uint8 code)
@@ -14,10 +15,10 @@ PPPConfigurePacket::PPPConfigurePacket(uint8 code)
 }
 
 
-PPPConfigurePacket::PPPConfigurePacket(mbuf *packet)
+PPPConfigurePacket::PPPConfigurePacket(struct mbuf *packet)
 {
 	// decode packet
-	lcp_packet *data = mtod(packet, lcp_packet*);
+	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
 	if(!SetCode(data->code))
 		return;
@@ -30,7 +31,7 @@ PPPConfigurePacket::PPPConfigurePacket(mbuf *packet)
 	ppp_configure_item *item;
 	
 	while(position <= data->length - 4) {
-		item = data->data + position;
+		item = (ppp_configure_item*) (data->data + position);
 		position += item->length;
 		
 		AddItem(item);
@@ -64,7 +65,7 @@ PPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 	if(item->length < 2)
 		return false;
 	
-	ppp_configure_item *add = malloc(item->length);
+	ppp_configure_item *add = (ppp_configure_item*) malloc(item->length);
 	memcpy(add, item, item->length);
 	
 	bool status;
@@ -106,13 +107,13 @@ PPPConfigurePacket::ItemAt(int32 index) const
 }
 
 
-mbuf*
+struct mbuf*
 PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
 {
-	mbuf *packet = m_gethdr(MT_DATA);
+	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;
 	
-	lcp_packet *data = mtod(packet, lcp_packet*);
+	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
 	data->code = Code();
 	

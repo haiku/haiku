@@ -8,17 +8,19 @@
 #ifndef _K_PPP_REPORT_MANAGER__H
 #define _K_PPP_REPORT_MANAGER__H
 
-#include "KPPPReportDefs.h"
+#include <OS.h>
 
-#include "List.h"
-#include "LockerHelper.h"
+#include <KPPPReportDefs.h>
+
+#include <List.h>
 
 
-#define PPP_REPLY(sender, value) send_data_with_timeout((sender), (value), NULL, 0, B_REPORT_TIMEOUT)
+#define PPP_REPLY(sender, value) send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
 
 class PPPReportManager {
 	public:
 		PPPReportManager(BLocker& lock);
+		~PPPReportManager();
 		
 		void EnableReports(PPP_REPORT_TYPE type, thread_id thread,
 				int32 flags = PPP_NO_REPORT_FLAGS);
@@ -29,7 +31,7 @@ class PPPReportManager {
 
 	private:
 		BLocker& fLock;
-		List<ppp_report_request> fReportRequests;
+		List<ppp_report_request*> fReportRequests;
 };
 
 
