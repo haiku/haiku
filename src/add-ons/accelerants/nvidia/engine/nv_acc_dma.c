@@ -46,6 +46,12 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
+	//fixme: move to shared info:
+	uint32 *cmdbuffer;
+	uint32 put = 0;
+	uint32 current;
+	uint32 max;
+	uint32 free;
 
 //chk power-up cycle if probs
 
@@ -537,6 +543,62 @@ status_t nv_acc_init_dma()
 	ACCW(PF_CACH1_PUL1, 0x00000001);
 	/* enable PFIFO caches reassign */
 	ACCW(PF_CACHES, 0x00000001);
+
+	/* init DMA command buffer pointer */
+	/*si->dma.*/cmdbuffer = (uint32 *)((char *)si->framebuffer +
+		((si->ps.memory_size - 1) & 0xffff8000));
+	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n", ((uint32)cmdbuffer)));
+
+	/* init FIFO via DMA command buffer: */
+	/* set number of cmd words (b18 - ??) and FIFO offset for first cmd word (b0 - 17) */
+	/* note:
+	 * this system uses auto-increments for the FIFO offset adresses. Make sure
+	 * to set new adresses if jumps are needed. */
+	cmdbuffer[0x00] = (1 << 18) | 0x00000;
+	/* send actual cmd word */
+	cmdbuffer[0x01] = NV_ROP5_SOLID;
+
+	/* etc.. */
+	cmdbuffer[0x02] = (1 << 18) | 0x02000;
+	cmdbuffer[0x03] = NV_IMAGE_BLACK_RECTANGLE;
+
+	cmdbuffer[0x04] = (1 << 18) | 0x04000;
+	cmdbuffer[0x05] = NV_IMAGE_PATTERN;
+
+	cmdbuffer[0x06] = (1 << 18) | 0x06000;
+//	cmdbuffer[0x07] = NV1_IMAGE_FROM_CPU;
+//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
+	cmdbuffer[0x07] = NV_ROP5_SOLID;
+
+	cmdbuffer[0x08] = (1 << 18) | 0x08000;
+	cmdbuffer[0x09] = NV_IMAGE_BLIT;
+
+	cmdbuffer[0x0a] = (1 << 18) | 0x0a000;
+	cmdbuffer[0x0b] = NV3_GDI_RECTANGLE_TEXT;
+
+	cmdbuffer[0x0c] = (1 << 18) | 0x0c000;
+//	cmdbuffer[0x0d] = NV1_RENDER_SOLID_LIN;
+//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
+	cmdbuffer[0x0d] = NV_ROP5_SOLID;
+
+	cmdbuffer[0x0e] = (1 << 18) | 0x0e000;
+//	cmdbuffer[0x0f] = NV4_DX5_TEXTURE_TRIANGLE;
+//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
+	cmdbuffer[0x0f] = NV_ROP5_SOLID;
+
+	/* we have put no cmd's in the DMA buffer yet (the above one's execute instantly) */
+	/*si->dma.*/put = 0;
+	/* the current first free adress in the DMA buffer is at offset 16 */
+	/*si->dma.*/current = 16;
+	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size) */
+	/*si->dma.*/max = 8191;
+	/* note the current free space we have left in the DMA buffer */
+	/*si->dma.*/free = /*si->dma.*/max - /*si->dma.*/current + 1;
+
+	//fixme: actually start DMA..
+	//fixme: add colorspace and buffer config cmd's or predefine in the non-DMA way.
+	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
+	//       space in between both functions as errors might hang the engine!
 
 	return B_OK;
 }
