@@ -16,7 +16,7 @@
 #include <string.h>
 #include <errno.h>
 
-#define TRACE_AMIGA_RDB 1
+#define TRACE_AMIGA_RDB 0
 #if TRACE_AMIGA_RDB
 #	define TRACE(x) printf x
 #else
@@ -25,6 +25,28 @@
 
 
 static const char *kPartitionModuleName = "partitioning_systems/amiga_rdb/v1";
+
+
+template<typename Type> bool
+validate_check_sum(Type *type)
+{
+	if (type->SummedLongs() != sizeof(*type) / sizeof(uint32))
+		return false;
+
+	// check checksum
+	uint32 *longs = (uint32 *)type;
+	uint32 sum = 0;
+	for (uint32 i = 0; i < type->SummedLongs(); i++)
+		sum += B_BENDIAN_TO_HOST_INT32(longs[i]);
+
+#if TRACE_AMIGA_RDB
+	if (sum != 0)
+		TRACE(("search_rdb: check sum is incorrect!\n"));
+#endif
+
+	return sum == 0;
+}
+
 
 #if TRACE_AMIGA_RDB
 static char *
@@ -52,18 +74,18 @@ get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_bloc
 {
 	if (cookie == 0) {
 		// first entry
-		cookie = rdb.partition_list;
+		cookie = rdb.FirstPartition();
 	} else if (cookie == 0xffffffff) {
 		// last entry
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	ssize_t bytesRead = read_pos(fd, (off_t)cookie * rdb.block_size, (void *)&partition,
+	ssize_t bytesRead = read_pos(fd, (off_t)cookie * rdb.BlockSize(), (void *)&partition,
 							sizeof(partition_block));
 	if (bytesRead < (ssize_t)sizeof(partition_block))
 		return B_ERROR;
 
-	cookie = partition.next;
+	cookie = partition.Next();
 	return B_OK;
 }
 
@@ -71,8 +93,6 @@ get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_bloc
 bool
 search_rdb(int fd, rigid_disk_block **_rdb)
 {
-	TRACE(("search_rdb()\n"));
-
 	for (int32 sector = 0; sector < RDB_LOCATION_LIMIT; sector++) {
 		uint8 buffer[512];
 		ssize_t bytesRead = read_pos(fd, sector * 512, buffer, sizeof(buffer));
@@ -82,19 +102,7 @@ search_rdb(int fd, rigid_disk_block **_rdb)
 		}
 
 		rigid_disk_block *rdb = (rigid_disk_block *)buffer;
-		if (rdb->id == RDB_DISK_ID
-			&& rdb->summed_longs == sizeof(rigid_disk_block) / sizeof(uint32)) {
-			// check checksum
-			uint32 *longs = (uint32 *)buffer;
-			uint32 sum = 0;
-			for (uint32 i = 0; i < rdb->summed_longs; i++)
-				sum += longs[i];
-
-			if (sum != 0) {
-				TRACE(("search_rdb: check sum is incorrect!\n"));
-				return false;
-			}
-
+		if (rdb->ID() == RDB_DISK_ID && validate_check_sum<rigid_disk_block>(rdb)) {
 			// copy the RDB to a new piece of memory
 			rdb = new rigid_disk_block();
 			memcpy(rdb, buffer, sizeof(rigid_disk_block));
@@ -128,13 +136,10 @@ amiga_rdb_std_ops(int32 op, ...)
 static float
 amiga_rdb_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	TRACE(("amiga_rdb_identify_partition()\n"));
-
 	rigid_disk_block *rdb;
 	if (!search_rdb(fd, &rdb))
 		return B_ERROR;
 
-	TRACE(("amiga_rdb: found rdb!\n"));
 	*_cookie = (void *)rdb;
 	return 0.5f;
 }
@@ -143,6 +148,8 @@ amiga_rdb_identify_partition(int fd, partition_data *partition, void **_cookie)
 static status_t
 amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
+	TRACE(("amiga_rdb_scan_partition(cookie = %p)\n", _cookie));
+
 	rigid_disk_block &rdb = *(rigid_disk_block *)_cookie;
 
 	partition->status = B_PARTITION_VALID;
@@ -157,17 +164,27 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 	status_t status;
 
 	while ((status = get_next_partition(fd, rdb, cookie, partitionBlock)) == B_OK) {
+		if (partitionBlock.ID() != RDB_PARTITION_ID
+			||!validate_check_sum<partition_block>(&partitionBlock))
+			continue;
+
 		disk_environment &environment = *(disk_environment *)&partitionBlock.environment[0];
-		TRACE(("amiga_rdb: file system: %s\n", get_tupel(environment.dos_type)));
+		TRACE(("amiga_rdb: file system: %s\n", get_tupel(B_BENDIAN_TO_HOST_INT32(environment.dos_type))));
+
+		if ((uint64)partition->offset + environment.Start()
+			+ environment.Size() > (uint64)partition->size) {
+			TRACE(("amiga_rdb: child partition exceeds existing space (%Ld bytes)\n", environment.Size()));
+			continue;
+		}
 
 		partition_data *child = create_child_partition(partition->id, index++, -1);
 		if (child == NULL) {
-			TRACE(("Creating child at index %ld failed\n", index - 1));
+			TRACE(("amiga_rdb: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
 		}
 
 		child->offset = partition->offset + environment.Start();
-		child->size = environment.Size();
+		child->size = environment.Size();			
 		child->block_size = partition->block_size;
 	}
 
