@@ -523,7 +523,7 @@ public:
 	virtual	void			DrawAfterChildren(BRect r);
 
 		// added by OBOS - DO NOT use this when programming BeOS R5!!!
-			float			Scale();
+			float			Scale() const;
 
 private:
 
@@ -567,7 +567,7 @@ private:
 			void		DoShape(int32 gr, BShape* shape, pattern p);
 			void		DoPictureClip(BPicture* picture, BPoint where, bool invert,
 									  bool sync);
-//			bool		removeFromList(BView* a_view);
+			bool		removeFromList(BView* a_view);
 			bool		removeSelf();
 			bool		do_owner_check() const;
 			void		setOwner(BWindow* the_owner);
