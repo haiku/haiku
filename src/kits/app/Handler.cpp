@@ -120,6 +120,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <algorithm>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <map>
@@ -162,7 +163,7 @@ static property_info gHandlerPropInfo[] =
 		// extra data
 		0,
 		// types
-		{ },
+		{ 0 },
 		// ctypes (compound_type)
 		{
 			// ctypes[0]
@@ -191,7 +192,7 @@ static property_info gHandlerPropInfo[] =
 			}
 		},
 		// reserved
-		{}
+		{ 0 }
 	},
 	{
 		"Messenger",
@@ -199,8 +200,8 @@ static property_info gHandlerPropInfo[] =
 			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_MESSENGER_TYPE },
-			{},
-			{}
+			{ 0 },
+			{ 0 }
 	},
 	{
 		"InternalName",
@@ -208,10 +209,10 @@ static property_info gHandlerPropInfo[] =
 			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_STRING_TYPE },
-			{},
-			{}
+			{ 0 },
+			{ 0 }
 	},
-	{}
+	{ 0 }
 };
 
 bool FilterDeleter(void* filter);
@@ -292,62 +293,56 @@ status_t BHandler::Archive(BMessage* data, bool deep) const
 //------------------------------------------------------------------------------
 void BHandler::MessageReceived(BMessage* message)
 {
-	switch (message->what)
-	{
+	BMessage reply(B_REPLY);
+
+	switch (message->what) {
 		case B_GET_PROPERTY:
 		{
-			BMessage	Specifier;
-			int32		form;
-			const char*	prop;
-			int32		cur;
-			status_t	err;
+			int32 cur;
+			BMessage specifier;
+			int32 form;
+			const char *prop;
+			
+			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
+			if (err == B_OK) {
+				if (strcmp(prop, "Suites") == 0) {
+					if (GetSupportedSuites(&reply) == B_OK
+							&& reply.AddInt32("error", B_OK) == B_OK)
+						message->SendReply(&reply);
+				
+				} else if (strcmp(prop, "Messenger") == 0) {
+					if (reply.AddMessenger("result", this) == B_OK
+							&& reply.AddInt32("error", B_OK) == B_OK)
+						message->SendReply(&reply);
+				
+				} else if (strcmp(prop, "InternalName") == 0) {
+					if (reply.AddString("result", Name()) == B_OK
+							&& reply.AddInt32("error", B_OK) == B_OK)
 
-			err = message->GetCurrentSpecifier(&cur, &Specifier, &form, &prop);
-			if (!err)
-			{
-				BMessage Reply(B_REPLY);
-				if (strcmp(prop, "Suites") == 0)
-				{
-					if (GetSupportedSuites(&Reply) == B_OK &&
-						Reply.AddInt32("error", B_OK) == B_OK)
-					{
-						message->SendReply(&Reply);
-					}
-				}
-				else if (strcmp(prop, "Messenger") == 0)
-				{
-					if (Reply.AddMessenger("result", this) == B_OK &&
-						Reply.AddInt32("error", B_OK) == B_OK)
-
-					{
-						message->SendReply(&Reply);
-					}
-				}
-				else if (strcmp(prop, "InternalName") == 0)
-				{
-					if (Reply.AddString("result", Name()) == B_OK &&
-						Reply.AddInt32("error", B_OK) == B_OK)
-
-					{
-						message->SendReply(&Reply);
-					}
-				}
-				else
-				{
+					message->SendReply(&reply);
+				
+				} else {
 					// Should never be here
-					debugger("We are *not* supposed to be here");
+					debugger("BHandler::MessageReceived(): We are *not* supposed to be here");
 				}
 			}
+
 			break;
 		}
-
+		
+		case B_GET_SUPPORTED_SUITES:
+		{
+			reply.AddInt32("error", GetSupportedSuites(&reply));
+			message->SendReply(&reply);
+			break;
+		}
+		
 		default:
 			if (fNextHandler)
-			{
 				fNextHandler->MessageReceived(message);
-			}
-			else
-			{
+			else {
+				printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
+				message->PrintToStream();
 				message->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 			}
 			break;
