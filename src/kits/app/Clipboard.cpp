@@ -46,7 +46,7 @@
 
 
 //------------------------------------------------------------------------------
-BClipboard::BClipboard(const char *name, bool transient = false)
+BClipboard::BClipboard(const char *name, bool transient)
 {
   if ( name )
     fName = strdup(name);
