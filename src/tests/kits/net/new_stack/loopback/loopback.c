@@ -85,8 +85,9 @@ struct net_layer_module_info nlmi = {
 	init,
 	uninit,
 	enable,
+	NULL,	// no control()
 	output_buffer,
-	NULL	// interface layer: no input_buffer
+	NULL	// interface layer: no input_buffer()
 };
 
 _EXPORT module_info *modules[] = {
