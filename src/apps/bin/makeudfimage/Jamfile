@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src apps bin makeudfimage ;
+
+BinCommand makeudfimage 
+	: makeudfimage.cpp
+	  Debug.cpp
+	  Shell.cpp
+	: stdc++.r4
+	
+;
+
