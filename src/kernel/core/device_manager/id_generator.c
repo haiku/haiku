@@ -1,19 +1,19 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of the Device Manager
 
 	ID generator.
-	
+
 	Generators are created on demand and deleted if all their
 	IDs are freed. They have a ref_count which is increased
 	whenever someone messes with the generator. 
-	
-	Whenever a generator is search for, generator_lock is hold.
-	
+
+	Whenever a generator is searched for, generator_lock is held.
+
 	To find out which ID are allocated, a bitmap is used that
 	contain up to GENERATOR_MAX_ID bits. This is a hard limit,
 	but it's simple to implement. If someone really needs lots of
@@ -44,8 +44,9 @@ struct list sGenerators;
 static benaphore sGeneratorLock;
 
 
-// create new generator
-// sGeneratorLock must be hold
+/**	Create new generator
+ *	sGeneratorLock must be held
+ */
 
 static id_generator *
 create_generator(const char *name)
@@ -69,12 +70,11 @@ create_generator(const char *name)
 	generator->ref_count = 1;
 
 	list_add_link_to_head(&sGenerators, generator);
-//	ADD_DL_LIST_HEAD( generator, generator_list, );
 	return generator;
 }
 
 
-// allocate id
+/** allocate id */
 
 static int32
 create_id_internal(id_generator *generator)
@@ -105,14 +105,15 @@ create_id_internal(id_generator *generator)
 }
 
 
-// find generator by name
-// sGeneratorLock must be hold
+/**	Find generator by name
+ *	sGeneratorLock must be held
+ */
 
 static id_generator *
 find_generator(const char *name)
 {
 	id_generator *generator = NULL;
-	
+
 	TRACE(("find_generator(name: %s)\n", name));
 
 	while ((generator = list_get_next_item(&sGenerators, generator)) != NULL) {
@@ -127,7 +128,7 @@ find_generator(const char *name)
 }
 
 
-// decrease ref_count, deleting generator if not used anymore
+/** Decrease ref_count, deleting generator if not used anymore */
 
 static void
 release_generator(id_generator *generator)
@@ -137,12 +138,11 @@ release_generator(id_generator *generator)
 	benaphore_lock(&sGeneratorLock);
 
 	if (--generator->ref_count == 0) {
-		// noone messes with generator
+		// no one messes with generator
 		if (generator->num_ids == 0) {
 			TRACE(("Destroy %s\n", generator->name));
 			// no IDs is allocated - destroy generator
 			list_remove_link(generator);
-			//REMOVE_DL_LIST( generator, generator_list, );
 			free(generator->name);
 			free(generator);
 		}
@@ -152,7 +152,23 @@ release_generator(id_generator *generator)
 }
 
 
-// public: create automatic ID			
+//	#pragma mark -
+//	Private kernel API
+
+
+status_t
+id_generator_init(void)
+{
+	list_init(&sGenerators);
+	return benaphore_init(&sGeneratorLock, "id generator");
+}
+
+
+//	#pragma mark -
+//	Public API
+
+
+/** Create automatic ID */
 
 int32
 pnp_create_id(const char *name)
@@ -182,7 +198,7 @@ pnp_create_id(const char *name)
 }
 
 
-// public: free automatically generated ID
+/**	Free automatically generated ID */
 
 status_t
 pnp_free_id(const char *name, uint32 id)
@@ -220,13 +236,5 @@ pnp_free_id(const char *name, uint32 id)
 	release_generator(generator);
 
 	return B_OK;
-}
-
-
-status_t
-id_generator_init(void)
-{
-	list_init(&sGenerators);
-	return benaphore_init(&sGeneratorLock, "id generator");
 }
 
