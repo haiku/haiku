@@ -1661,16 +1661,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 	BRegion		rreg(cl->fVisible);
 	if (fWinBorder->fInUpdate)
 		rreg.IntersectWith(&fWinBorder->yUpdateReg);
-//if (!fWinBorder->yUpdateReg.Frame().IsValid() && fWinBorder->fInUpdate)
-//{
-//	printf("ADi: FRAME INVALID!!!!\n");
-//	fWinBorder->yUpdateReg.PrintToStream();
-//}
+
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
 //	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
-//	snooze(500000);
+
 	switch (code)
 	{
 		case AS_LAYER_SET_HIGH_COLOR:
