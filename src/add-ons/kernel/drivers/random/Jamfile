@@ -1,9 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel drivers random ;
 
-KernelObjects 
-	<$(SOURCE_GRIST)>driver.c 
-	:
-	-fno-pic -D_KERNEL_MODE -Wno-missing-prototypes
+KernelAddon random : kernel drivers dev :
+	driver.c
 	;
 
 # CFLAGS was arch dependent:
