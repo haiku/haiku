@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons kernel disk_scanner partition ;
 
 UsePrivateHeaders $(DOT) ;
 
-R5KernelAddon intel : kernel disk_scanner partition :
-	intel.c
-;
+#R5KernelAddon intel : kernel disk_scanner partition :
+#	intel.cpp
+#;
 
