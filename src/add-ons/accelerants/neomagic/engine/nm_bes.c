@@ -1,5 +1,5 @@
 /* NeoMagic Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-06/2003 */
+/* Written by Rudolf Cornelissen 05/2002-06/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -419,11 +419,11 @@ status_t nm_configure_bes
 
 	/* enable auto-alternating hardware buffers if alternating buffers is enabled (NM2160) */
 	bi.globctlv |= 1 << 8;
-	/* ??? */
+	/* disable capture */
 	bi.globctlv |= 1 << 13;
-	/* display one buffer (no alternating buffers) (NM2160: no effect) */
+	/* capture: display one buffer (no alternating buffers) */
 	bi.globctlv |= 0 << 14;
-	/* display frame (no field) (NM2160: no effect) */
+	/* capture: display frame (no field) */
 	bi.globctlv |= 0 << 15;
 
 	/* BTW: horizontal and vertical filtering are always turned on in NM hardware. */
@@ -493,12 +493,12 @@ status_t nm_configure_bes
 		PCIGRPHW(BUF1ORGL, (bi.a1orgv & 0xff));
 		PCIGRPHW(BUF1ORGM, ((bi.a1orgv >> 8) & 0xff));
 		PCIGRPHW(BUF1ORGH, ((bi.a1orgv >> 16) & 0xff));
-		/* b2 = 0: don't use horizontal mirroring (NM2160) */
-		/* other bits do ??? */
-		PCIGRPHW(0xbf, 0x02);
 		/* ??? */
 		PCIGRPHW(0xbd, 0x02);
 		PCIGRPHW(0xbe, 0x00);
+		/* b2 = 0: don't use horizontal mirroring (NM2160) */
+		/* other bits do ??? */
+		PCIGRPHW(0xbf, 0x02);
 		/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
 		 * so we do 'pixel precise' left clipping via modification of buffer
 		 * startadress above instead.
