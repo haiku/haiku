@@ -1,7 +1,11 @@
 SubDir OBOS_TOP src prefs keyboard ;
 
-AddResources Keyboard : Keyboard.rsrc ;
+AddResources Keyboard : Keyboard.rdef ;
 
-Preference Keyboard : Keyboard.cpp KeyboardSettings.cpp KeyboardView.cpp KeyboardWindow.cpp ;
-
-LinkSharedOSLibs Keyboard : translation be root ;
+Preference Keyboard : 
+	Keyboard.cpp 
+	KeyboardSettings.cpp 
+	KeyboardView.cpp 
+	KeyboardWindow.cpp
+	: translation be
+	;

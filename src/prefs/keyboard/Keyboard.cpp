@@ -1,15 +1,14 @@
 /*
- * Keyboard.cpp
- * Keyboard mccall@digitalparadise.co.uk
- *
- */
+** Copyright 2004, the Haiku project. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
+** Author : mccall@digitalparadise.co.uk, Jérôme Duval
+*/
 
 #include <Alert.h>
-#include <Screen.h>
 
 #include "Keyboard.h"
 #include "KeyboardWindow.h"
-#include "KeyboardSettings.h"
 #include "KeyboardMessages.h"
 
 const char KeyboardApplication::kKeyboardApplicationSig[] = "application/x-vnd.OpenBeOS-KYBD";
@@ -27,12 +26,7 @@ KeyboardApplication::KeyboardApplication()
 					:BApplication(kKeyboardApplicationSig)
 {
 
-	KeyboardWindow		*window;
-	
-	fSettings = new KeyboardSettings();
-		
-	window = new KeyboardWindow();
-
+	new KeyboardWindow();
 }
 
 void
@@ -52,31 +46,9 @@ KeyboardApplication::MessageReceived(BMessage *message)
 	}
 }
 
-void
-KeyboardApplication::SetWindowCorner(BPoint corner)
-{
-	fSettings->SetWindowCorner(corner);
-}
-
-void
-KeyboardApplication::SetKeyboardRepeatRate(int32 rate)
-{
-	fSettings->SetKeyboardRepeatRate(rate);
-}
-
-void
-KeyboardApplication::SetKeyboardRepeatDelay(int32 rate)
-{
-	fSettings->SetKeyboardRepeatDelay(rate);
-}
 
 void
 KeyboardApplication::AboutRequested(void)
 {
 	(new BAlert("about", "...by Andrew Edward McCall", "Dig Deal"))->Go();
-}
-
-KeyboardApplication::~KeyboardApplication()
-{
-	delete fSettings;
 }
