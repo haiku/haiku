@@ -421,31 +421,45 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 	PageData *page_data;
 	int page_index;
 	int nup;
+	int copy;
+	int copies;
 
-	more = false;
+	more = true;
 	success = true;
 	page_index = 0;
-
+	if (fPrinterCap->isSupport(PrinterCap::kCopyCommand)) {
+		copies = 1;
+	} else {
+		copies = fRealJobData->getCopies();
+	}
 	if (spool_data->startEnum()) {
+		nup = fOrgJobData->getNup();
 		do {
 			DBGMSG(("page index = %d\n", page_index));
-			if (!(success = startPage(page_index)))
-				break;
-			nup = fOrgJobData->getNup();
+
 			PageDataList pages;
 			do {
 				more = spool_data->enumObject(&page_data);
 				pages.push_back(page_data);
 			} while (more && --nup);
-			fView->Window()->Lock();
-			success = printPage(&pages);
-			fView->Window()->Unlock();
-			if (!success)
-				break;
-			if (!(success = endPage(page_index)))
-				break;
+
+			// print each physical page "copies" of times
+			for (copy = 0; success && copy < copies; copy ++) {
+				success = startPage(page_index);
+				if (!success)
+					break;
+			
+				fView->Window()->Lock();
+				success = printPage(&pages);
+				fView->Window()->Unlock();
+
+				if (success) {
+					success = endPage(page_index);
+				}
+			}
+				
 			page_index++;
-		} while (more);
+		} while (success && more);
 	}
 
 #ifndef USE_PREVIEW_FOR_DEBUG
@@ -454,12 +468,12 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 		&& (fOrgJobData->getPrintStyle() != JobData::kSimplex)
 		&& (((page_index + fOrgJobData->getNup() - 1) / fOrgJobData->getNup()) % 2))
 	{
-		success = startPage(page_index);
-		if (success) {
-			success = printPage(NULL);
-			if (success) {
-				success = endPage(page_index);
-			}
+		// print each physical page "copies" of times
+		for (copy = 0; success && copy < copies; copy ++) {
+			success = 
+				startPage(page_index) &&
+				printPage(NULL) &&
+				endPage(page_index);
 		}
 	}
 #endif
@@ -487,7 +501,7 @@ bool GraphicsDriver::printJob(BFile *spool_file)
 
 	if (fTransport->check_abort()) {
 		success = false;
-	} else {
+	} else if (!fTransport->is_print_to_file_canceled()) {
 		setupData(spool_file, pfh.page_count);
 		setupBitmap();
 		SpoolData spool_data(spool_file, pfh.page_count, fOrgJobData->getNup(), fOrgJobData->getReverse());

@@ -37,6 +37,7 @@ public:
 	~Transport();
 	void write(const void *buffer, size_t size) throw(TransportException);
 	bool check_abort() const;
+	bool is_print_to_file_canceled() const;
 	const string &last_error() const;
 
 protected:

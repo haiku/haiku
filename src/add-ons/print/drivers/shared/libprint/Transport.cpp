@@ -7,6 +7,7 @@
 #include <Message.h>
 #include <Directory.h>
 #include <DataIO.h>
+#include <File.h>
 #include <Path.h>
 #include <image.h>
 
@@ -91,6 +92,14 @@ bool Transport::check_abort() const
 const string &Transport::last_error() const
 {
 	return fLastErrorString;
+}
+
+bool Transport::is_print_to_file_canceled() const
+{
+	// The BeOS "Print To File" transport add-on returns a non-NULL BDataIO *
+	// even after user filepanel cancellation!
+	BFile* file = dynamic_cast<BFile*>(fDataStream);
+	return file != NULL && file->InitCheck() != B_OK;
 }
 
 void Transport::set_last_error(const char *e)

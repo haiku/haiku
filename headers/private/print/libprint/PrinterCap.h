@@ -88,7 +88,10 @@ public:
 		kOrientation,
 		kPrintStyle,
 		kBindingLocation,
-		kColor
+		kColor,
+		// Static boolean settings follow.
+		// For them isSupport() has to be implemented only.
+		kCopyCommand       // supports printer page copy command?
 	};
 
 	virtual int countCap(CapID) const = 0;
