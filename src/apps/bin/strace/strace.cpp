@@ -59,7 +59,7 @@ static const char *kUsage =
 "                   respectively the loaded executable's main thread.\n"
 "  -T             - Trace all threads of the supplied or loaded executable's\n"
 "                   team. If an ID is supplied, it is interpreted as a team\n"
-"                   ID."
+"                   ID.\n"
 ;
 
 // terminal color escape sequences
