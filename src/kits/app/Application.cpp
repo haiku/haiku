@@ -363,6 +363,7 @@ bool BApplication::QuitRequested()
 	// to quit them.
 	
 	return BLooper::QuitRequested();
+}
 //------------------------------------------------------------------------------
 void BApplication::Pulse()
 {
