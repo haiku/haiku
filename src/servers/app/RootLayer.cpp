@@ -105,13 +105,15 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fClassID = AS_ROOTLAYER_CLASS;
 	fHidden	= false;
 
-	fListenPort = find_port(SERVER_INPUT_PORT);
-	if (fListenPort == B_NAME_NOT_FOUND)
-		return;
-	
 	// Spawn our working thread
 //	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
 	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
+	
+	fListenPort = find_port(SERVER_INPUT_PORT);
+	if (fListenPort == B_NAME_NOT_FOUND) {
+		fListenPort = -1;
+		return;
+	}
 }
 
 RootLayer::~RootLayer()

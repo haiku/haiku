@@ -99,6 +99,13 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGB32;
+	
+	// TODO: Move this to a more general place
+	// we need this under Haiku too, as it is where the input_server
+	// sends it's data to.
+	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (serverInputPort == B_NO_MORE_PORTS)
+		debugger("AccelerantDriver: out of ports\n");
 }
 
 // destructor
