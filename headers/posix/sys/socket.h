@@ -4,6 +4,7 @@
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H
 
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -12,7 +13,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef uint32 socklen_t;
+typedef uint32_t socklen_t;
 
 /* These are the address/protocol families we'll be using... */
 /* NB these should be added to as required... */
@@ -88,23 +89,23 @@ struct linger {
 };
 
 struct sockaddr {
-	uint8	sa_len;	
-	uint8	sa_family;
-	uint8	sa_data[30];
+	uint8_t	sa_len;	
+	uint8_t	sa_family;
+	uint8_t	sa_data[30];
 };
 
 /* this can hold ANY sockaddr we care to throw at it! */
 struct sockaddr_storage {
-	uint8       ss_len;         /* total length */
-	uint8       ss_family;      /* address family */
-	uint8       __ss_pad1[6];   /* align to quad */
-	uint64      __ss_pad2;      /* force alignment for stupid compilers */
-	uint8       __ss_pad3[240]; /* pad to a total of 256 bytes */
+	uint8_t       ss_len;         /* total length */
+	uint8_t       ss_family;      /* address family */
+	uint8_t       __ss_pad1[6];   /* align to quad */
+	uint64_t      __ss_pad2;      /* force alignment for stupid compilers */
+	uint8_t       __ss_pad3[240]; /* pad to a total of 256 bytes */
 };
 
 struct sockproto {
-	uint16 sp_family;
-	uint16 sp_protocol;
+	uint16_t sp_family;
+	uint16_t sp_protocol;
 };
 
 #define CTL_NET         4
