@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <KernelExport.h>
 #include <driver_settings.h>
@@ -34,7 +32,7 @@ static struct ethernet_module_info *sEthernet;
 static int32 sHostUniq = 0;
 status_t std_ops(int32 op, ...);
 
-static BLocker sLock;
+static BLocker sLock("PPPoEList");
 static TemplateList<PPPoEDevice*> *sDevices;
 static TemplateList<pppoe_query*> *sQueries;
 
@@ -94,6 +92,7 @@ FindPPPoEInterface(const char *name)
 	return NULL;
 }
 
+
 uint32
 NewHostUniq()
 {
@@ -104,9 +103,7 @@ NewHostUniq()
 void
 add_device(PPPoEDevice *device)
 {
-#if DEBUG
-	dprintf("PPPoE: add_device()\n");
-#endif
+	TRACE("PPPoE: add_device()\n");
 	
 	LockerHelper locker(sLock);
 	sDevices->AddItem(device);
@@ -116,9 +113,7 @@ add_device(PPPoEDevice *device)
 void
 remove_device(PPPoEDevice *device)
 {
-#if DEBUG
-	dprintf("PPPoE: remove_device()\n");
-#endif
+	TRACE("PPPoE: remove_device()\n");
 	
 	LockerHelper locker(sLock);
 	sDevices->RemoveItem(device);
@@ -148,7 +143,7 @@ pppoe_input(struct mbuf *packet)
 				if(header->pppoeHeader.code == PADO) {
 					DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
 					if(discovery.InitCheck() != B_OK) {
-						dprintf("PPPoE: received corrupted discovery packet!\n");
+						ERROR("PPPoE: received corrupted discovery packet!\n");
 						m_freem(packet);
 						return;
 					}
@@ -171,21 +166,17 @@ pppoe_input(struct mbuf *packet)
 		if(device && device->EthernetIfnet() == sourceIfnet) {
 			if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOE
 					&& header->pppoeHeader.sessionID == device->SessionID()) {
-#if DEBUG
-				dprintf("PPPoE: session packet\n");
-#endif
+				TRACE("PPPoE: session packet\n");
 				device->Receive(packet);
 				return;
 			} else if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOEDISC
 					&& header->pppoeHeader.code != PADI
 					&& header->pppoeHeader.code != PADR
 					&& !device->IsDown()) {
-#if DEBUG
-				dprintf("PPPoE: discovery packet\n");
-#endif
+				TRACE("PPPoE: discovery packet\n");
 				DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
 				if(discovery.InitCheck() != B_OK) {
-					dprintf("PPPoE: received corrupted discovery packet!\n");
+					ERROR("PPPoE: received corrupted discovery packet!\n");
 					m_freem(packet);
 					return;
 				}
@@ -200,7 +191,7 @@ pppoe_input(struct mbuf *packet)
 		}
 	}
 	
-	dprintf("PPPoE: No device found for packet from: %s\n", sourceIfnet->if_name);
+	ERROR("PPPoE: No device found for packet from: %s\n", sourceIfnet->if_name);
 	m_freem(packet);
 }
 
@@ -223,10 +214,8 @@ add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 		success = mainInterface.SetDevice(device);
 	}
 	
-#if DEBUG
-	dprintf("PPPoE: add_to(): %s\n",
+	TRACE("PPPoE: add_to(): %s\n",
 		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
-#endif
 	
 	return success && device && device->InitCheck() == B_OK;
 }
@@ -319,22 +308,19 @@ std_ops(int32 op, ...)
 				return B_ERROR;
 			}
 			
-			set_max_linkhdr(PPPoE_HEADER_SIZE + ETHER_HDR_LEN);
+			set_max_linkhdr(2 + PPPoE_HEADER_SIZE + ETHER_HDR_LEN);
+				// 2 bytes for PPP header
 			sDevices = new TemplateList<PPPoEDevice*>;
 			sQueries = new TemplateList<pppoe_query*>;
 			sEthernet->set_pppoe_receiver(pppoe_input);
 			
-#if DEBUG
-			dprintf("PPPoE: Registered PPPoE receiver.\n");
-#endif
+			TRACE("PPPoE: Registered PPPoE receiver.\n");
 		return B_OK;
 		
 		case B_MODULE_UNINIT:
 			delete sDevices;
 			sEthernet->unset_pppoe_receiver();
-#if DEBUG
-			dprintf("PPPoE: Unregistered PPPoE receiver.\n");
-#endif
+			TRACE("PPPoE: Unregistered PPPoE receiver.\n");
 			put_module(NET_CORE_MODULE_NAME);
 			put_module(NET_ETHERNET_MODULE_NAME);
 		break;

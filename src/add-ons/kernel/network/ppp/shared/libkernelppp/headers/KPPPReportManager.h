@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _K_PPP_REPORT_MANAGER__H
 #define _K_PPP_REPORT_MANAGER__H
@@ -15,10 +13,6 @@
 
 #include <TemplateList.h>
 
-
-//!	Sends a reply to the report message sender.
-#define PPP_REPLY(sender, value) \
-	send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
 
 class KPPPReportManager {
 	public:

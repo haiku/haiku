@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <cstdio>
 
@@ -33,7 +31,7 @@ dump_packet(struct mbuf *packet)
 	uint8 buffer[33];
 	uint8 bufferIndex = 0;
 	
-	dprintf("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
+	TRACE("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
 		packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
 	
 	for(uint32 index = 0; index < packet->m_len; index++) {
@@ -41,7 +39,7 @@ dump_packet(struct mbuf *packet)
 		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
 		if(bufferIndex == 32 || index == packet->m_len - 1) {
 			buffer[bufferIndex] = 0;
-			dprintf("%s\n", buffer);
+			TRACE("%s\n", buffer);
 			bufferIndex = 0;
 		}
 	}
@@ -187,12 +185,13 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	fHandle(-1),
 	fWorkerThread(-1),
 	fOutputBytes(0),
-	fState(INITIAL)
+	fState(INITIAL),
+	fLock("ModemDevice")
 {
 #if DEBUG
-	dprintf("ModemDevice: Constructor\n");
+	TRACE("ModemDevice: Constructor\n");
 	if(!settings || !settings->parameters)
-		dprintf("ModemDevice::ctor: No settings!\n");
+		TRACE("ModemDevice::ctor: No settings!\n");
 #endif
 	
 	fACFC = new ACFCHandler(REQUEST_ACFC | ALLOW_ACFC, interface);
@@ -211,17 +210,13 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	fInitString = get_parameter_value(MODEM_INIT_KEY, settings);
 	fDialString = get_parameter_value(MODEM_DIAL_KEY, settings);
 	
-#if DEBUG
-	dprintf("ModemDevice::ctor: interfaceName: %s\n", fPortName);
-#endif
+	TRACE("ModemDevice::ctor: interfaceName: %s\n", fPortName);
 }
 
 
 ModemDevice::~ModemDevice()
 {
-#if DEBUG
-	dprintf("ModemDevice: Destructor\n");
-#endif
+	TRACE("ModemDevice: Destructor\n");
 }
 
 
@@ -239,9 +234,7 @@ ModemDevice::InitCheck() const
 bool
 ModemDevice::Up()
 {
-#if DEBUG
-	dprintf("ModemDevice: Up()\n");
-#endif
+	TRACE("ModemDevice: Up()\n");
 	
 	if(InitCheck() != B_OK)
 		return false;
@@ -279,9 +272,7 @@ ModemDevice::Up()
 bool
 ModemDevice::Down()
 {
-#if DEBUG
-	dprintf("ModemDevice: Down()\n");
-#endif
+	TRACE("ModemDevice: Down()\n");
 	
 	if(InitCheck() != B_OK)
 		return false;
@@ -355,7 +346,7 @@ ModemDevice::OpenModem()
 	// init port
 	struct termios options;
 	if(ioctl(fHandle, TCGETA, &options) != B_OK) {
-		dprintf("ModemDevice: Could not retrieve port options!\n");
+		ERROR("ModemDevice: Could not retrieve port options!\n");
 		return;
 	}
 	
@@ -370,7 +361,7 @@ ModemDevice::OpenModem()
 	
 	// set new options
 	if(ioctl(fHandle, TCSETA, &options) != B_OK) {
-		dprintf("ModemDevice: Could not init port!\n");
+		ERROR("ModemDevice: Could not init port!\n");
 		return;
 	}
 }
@@ -433,7 +424,7 @@ status_t
 ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 {
 #if DEBUG
-	dprintf("ModemDevice: Send()\n");
+	TRACE("ModemDevice: Send()\n");
 	dump_packet(packet);
 #endif
 	

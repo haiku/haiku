@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _PPP_MANAGER__H
 #define _PPP_MANAGER__H
@@ -59,6 +57,7 @@ class PPPManager {
 		ppp_interface_entry *EntryFor(ppp_interface_id ID,
 			int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
+		ppp_interface_entry *EntryFor(const char *name, int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(const driver_settings *settings) const;
 		
 		ppp_interface_id NextID()

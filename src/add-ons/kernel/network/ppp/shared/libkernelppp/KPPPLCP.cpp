@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class KPPPLCP
 	\brief The LCP protocol.
@@ -279,7 +277,7 @@ KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	
 	if(protocolNumber != PPP_LCP_PROTOCOL) {
-		dprintf("KPPPLCP::Receive(): wrong protocol number!\n");
+		ERROR("KPPPLCP::Receive(): wrong protocol number!\n");
 		return PPP_UNHANDLED;
 	}
 	

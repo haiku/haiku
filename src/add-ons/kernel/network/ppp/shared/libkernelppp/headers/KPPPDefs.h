@@ -1,15 +1,22 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _K_PPP_DEFS__H
 #define _K_PPP_DEFS__H
 
 #include <KernelExport.h>
 #include <PPPDefs.h>
+
+
+// debugging macros
+#define ERROR(format, args...)	dprintf(format, ## args)
+#ifdef DEBUG
+#define TRACE(format, args...)	dprintf(format, ## args)
+#else
+#define TRACE(format, args...)
+#endif
 
 
 extern struct core_module_info *core;
@@ -19,6 +26,8 @@ extern struct core_module_info *core;
 // various constants
 #define PPP_PULSE_RATE						500000
 	//!< Rate at which Pulse() is called (in microseconds).
+#define PPP_RESPONSE_TEST_CODE		'_3PT'
+	// private code used to test if ppp_up did not crash
 
 
 //!	Module key types used when loading a module.

@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class KPPPReportManager
 	\brief Manager for PPP reports and report requests.
@@ -117,10 +115,8 @@ KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 bool
 KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
-#if DEBUG
-	dprintf("KPPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
+	TRACE("KPPPReportManager: Report(type=%d code=%ld length=%ld) to %ld receivers\n",
 		type, code, length, fReportRequests.CountItems());
-#endif
 	
 	if(length > PPP_REPORT_DATA_LIMIT)
 		return false;
@@ -157,7 +153,7 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 		
 #if DEBUG
 		if(result == B_TIMED_OUT)
-			dprintf("KPPPReportManager::Report(): timed out sending\n");
+			TRACE("KPPPReportManager::Report(): timed out sending\n");
 #endif
 		
 		thread_info info;
@@ -194,31 +190,29 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 			}
 			
 			if(sender != request->thread) {
-#if DEBUG
-				dprintf("KPPPReportManager::Report(): sender != requested\n");
-#endif
+				TRACE("KPPPReportManager::Report(): sender != requested\n");
 				continue;
 			}
 			
-			if(result == B_OK && code != B_OK)
+			if(result == B_OK && code != B_OK && code != PPP_OK_DISABLE_REPORTS)
 				acceptable = false;
+			
 #if DEBUG
 			if(result == B_TIMED_OUT)
-				dprintf("KPPPReportManager::Report(): reply timed out\n");
+				TRACE("KPPPReportManager::Report(): reply timed out\n");
 #endif
 		}
 		
 		// remove thread if it is not existant or if remove-flag is set
 		if(request->flags & PPP_REMOVE_AFTER_REPORT
-				|| get_thread_info(request->thread, &info) != B_OK) {
+				|| get_thread_info(request->thread, &info) != B_OK
+				|| code == PPP_OK_DISABLE_REPORTS) {
 			fReportRequests.RemoveItem(request);
 			--index;
 		}
 	}
 	
-#if DEBUG
-	dprintf("KPPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
-#endif
+	TRACE("KPPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
 	
 	return acceptable;
 }

@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class PPPInterfaceListener
 	\brief This class simplifies the process of monitoring PPP interfaces.
@@ -29,6 +27,7 @@
 #include <Messenger.h>
 #include <Handler.h>
 #include <LockerHelper.h>
+#include <KPPPUtils.h>
 
 
 static const uint32 kReportFlags = PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
@@ -92,9 +91,9 @@ PPPInterfaceListenerThread::Run()
 			BHandler *noHandler = NULL;
 				// needed to tell compiler which version of SendMessage we want
 			if(messenger.SendMessage(&message, noHandler, 100000) != B_OK)
-				send_data(sender, B_OK, NULL, 0);
+				PPP_REPLY(sender, B_OK);
 		} else
-			send_data(sender, B_OK, NULL, 0);
+			PPP_REPLY(sender, B_OK);
 	}
 	
 	return B_OK;

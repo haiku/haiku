@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class KPPPStateMachine
 	\brief PPP state machine belonging to the LCP protocol
@@ -49,7 +47,8 @@ KPPPStateMachine::KPPPStateMachine(KPPPInterface& interface)
 	fRequestID(0),
 	fTerminateID(0),
 	fEchoID(0),
-	fNextTimeout(0)
+	fNextTimeout(0),
+	fLock("KPPPStateMachine")
 {
 }
 
@@ -78,9 +77,7 @@ KPPPStateMachine::NextID()
 void
 KPPPStateMachine::NewState(ppp_state next)
 {
-#if DEBUG
-	dprintf("KPPPSM: NewState(%d) state=%d\n", next, State());
-#endif
+	TRACE("KPPPSM: NewState(%d) state=%d\n", next, State());
 	
 	// maybe we do not need the timer anymore
 	if(next < PPP_CLOSING_STATE || next == PPP_OPENED_STATE)
@@ -103,7 +100,7 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 {
 #if DEBUG
 	if(next <= PPP_ESTABLISHMENT_PHASE || next == PPP_ESTABLISHED_PHASE)
-		dprintf("KPPPSM: NewPhase(%d) phase=%d\n", next, Phase());
+		TRACE("KPPPSM: NewPhase(%d) phase=%d\n", next, Phase());
 #endif
 	
 	// there is nothing after established phase and nothing before down phase
@@ -117,9 +114,7 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 	if(Phase() == PPP_ESTABLISHED_PHASE && next != Phase()) {
 		if(Interface().Ifnet()) {
 			Interface().Ifnet()->if_flags &= ~IFF_RUNNING;
-			
-			if(!Interface().DoesDialOnDemand())
-				Interface().Ifnet()->if_flags &= ~IFF_UP;
+			Interface().Ifnet()->if_flags &= ~IFF_UP;
 		}
 		
 		if(Interface().Parent())
@@ -144,10 +139,7 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 bool
 KPPPStateMachine::Reconfigure()
 {
-#if DEBUG
-	dprintf("KPPPSM: Reconfigure() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: Reconfigure() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -171,10 +163,7 @@ KPPPStateMachine::Reconfigure()
 bool
 KPPPStateMachine::SendEchoRequest()
 {
-#if DEBUG
-	dprintf("KPPPSM: SendEchoRequest() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendEchoRequest() state=%d phase=%d\n", State(), Phase());
 	
 	if(State() != PPP_OPENED_STATE)
 		return false;
@@ -202,10 +191,7 @@ KPPPStateMachine::SendEchoRequest()
 bool
 KPPPStateMachine::SendDiscardRequest()
 {
-#if DEBUG
-	dprintf("KPPPSM: SendDiscardRequest() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendDiscardRequest() state=%d phase=%d\n", State(), Phase());
 	
 	if(State() != PPP_OPENED_STATE)
 		return false;
@@ -237,10 +223,8 @@ KPPPStateMachine::SendDiscardRequest()
 void
 KPPPStateMachine::LocalAuthenticationRequested()
 {
-#if DEBUG
-	dprintf("KPPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
+	TRACE("KPPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
-#endif
 	
 	LockerHelper locker(fLock);
 	
@@ -263,10 +247,8 @@ KPPPStateMachine::LocalAuthenticationRequested()
 void
 KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 {
-#if DEBUG
-	dprintf("KPPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
+	TRACE("KPPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
-#endif
 	
 	LockerHelper locker(fLock);
 	
@@ -292,10 +274,7 @@ KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 void
 KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
-#if DEBUG
-	dprintf("KPPPSM: LocalAuthenticationDenied() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: LocalAuthenticationDenied() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -314,10 +293,8 @@ KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 void
 KPPPStateMachine::PeerAuthenticationRequested()
 {
-#if DEBUG
-	dprintf("KPPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
+	TRACE("KPPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
-#endif
 	
 	LockerHelper locker(fLock);
 	
@@ -340,10 +317,8 @@ KPPPStateMachine::PeerAuthenticationRequested()
 void
 KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
-#if DEBUG
-	dprintf("KPPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
+	TRACE("KPPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
-#endif
 	
 	LockerHelper locker(fLock);
 	
@@ -369,10 +344,7 @@ KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 void
 KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
-#if DEBUG
-	dprintf("KPPPSM: PeerAuthenticationDenied() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: PeerAuthenticationDenied() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -393,10 +365,7 @@ KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 void
 KPPPStateMachine::UpFailedEvent(KPPPInterface& interface)
 {
-#if DEBUG
-	dprintf("KPPPSM: UpFailedEvent(interface) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpFailedEvent(interface) state=%d phase=%d\n", State(), Phase());
 	
 	// TODO:
 	// log that an interface did not go up
@@ -407,10 +376,7 @@ KPPPStateMachine::UpFailedEvent(KPPPInterface& interface)
 void
 KPPPStateMachine::UpEvent(KPPPInterface& interface)
 {
-#if DEBUG
-	dprintf("KPPPSM: UpEvent(interface) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpEvent(interface) state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -438,10 +404,7 @@ KPPPStateMachine::UpEvent(KPPPInterface& interface)
 void
 KPPPStateMachine::DownEvent(KPPPInterface& interface)
 {
-#if DEBUG
-	dprintf("KPPPSM: DownEvent(interface) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: DownEvent(interface) state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -489,10 +452,7 @@ KPPPStateMachine::DownEvent(KPPPInterface& interface)
 void
 KPPPStateMachine::UpFailedEvent(KPPPProtocol *protocol)
 {
-#if DEBUG
-	dprintf("KPPPSM: UpFailedEvent(protocol) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpFailedEvent(protocol) state=%d phase=%d\n", State(), Phase());
 	
 	if((protocol->Flags() & PPP_NOT_IMPORTANT) == 0) {
 		if(Interface().Mode() == PPP_CLIENT_MODE) {
@@ -519,10 +479,7 @@ KPPPStateMachine::UpFailedEvent(KPPPProtocol *protocol)
 void
 KPPPStateMachine::UpEvent(KPPPProtocol *protocol)
 {
-#if DEBUG
-	dprintf("KPPPSM: UpEvent(protocol) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpEvent(protocol) state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -539,10 +496,7 @@ KPPPStateMachine::UpEvent(KPPPProtocol *protocol)
 void
 KPPPStateMachine::DownEvent(KPPPProtocol *protocol)
 {
-#if DEBUG
-	dprintf("KPPPSM: DownEvent(protocol) state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: DownEvent(protocol) state=%d phase=%d\n", State(), Phase());
 }
 
 
@@ -557,10 +511,7 @@ KPPPStateMachine::DownEvent(KPPPProtocol *protocol)
 bool
 KPPPStateMachine::TLSNotify()
 {
-#if DEBUG
-	dprintf("KPPPSM: TLSNotify() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: TLSNotify() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -586,10 +537,7 @@ KPPPStateMachine::TLSNotify()
 bool
 KPPPStateMachine::TLFNotify()
 {
-#if DEBUG
-	dprintf("KPPPSM: TLFNotify() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: TLFNotify() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -604,10 +552,7 @@ KPPPStateMachine::TLFNotify()
 void
 KPPPStateMachine::UpFailedEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: UpFailedEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpFailedEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -633,10 +578,7 @@ KPPPStateMachine::UpFailedEvent()
 void
 KPPPStateMachine::UpEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: UpEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: UpEvent() state=%d phase=%d\n", State(), Phase());
 	
 	// This call is public, thus, it might not only be called by the device.
 	// We must recognize these attempts to fool us and handle them correctly.
@@ -703,10 +645,7 @@ KPPPStateMachine::UpEvent()
 void
 KPPPStateMachine::DownEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: DownEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: DownEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -788,14 +727,13 @@ KPPPStateMachine::DownEvent()
 		if(Interface().DoesAutoRedial()) {
 			if(needsRedial)
 				Interface().Redial(Interface().RedialDelay());
-		} else if(!Interface().DoesDialOnDemand())
+		} else
 			Interface().Delete();
 	} else {
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL,
 			&fInterface.fID, sizeof(ppp_interface_id));
 		
-		if(!Interface().DoesDialOnDemand())
-			Interface().Delete();
+		Interface().Delete();
 	}
 	
 	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
@@ -807,10 +745,7 @@ KPPPStateMachine::DownEvent()
 void
 KPPPStateMachine::OpenEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: OpenEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: OpenEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -873,10 +808,7 @@ KPPPStateMachine::OpenEvent()
 void
 KPPPStateMachine::CloseEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: CloseEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: CloseEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -942,10 +874,7 @@ KPPPStateMachine::CloseEvent()
 void
 KPPPStateMachine::TOGoodEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: TOGoodEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: TOGoodEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -975,10 +904,7 @@ KPPPStateMachine::TOGoodEvent()
 void
 KPPPStateMachine::TOBadEvent()
 {
-#if DEBUG
-	dprintf("KPPPSM: TOBadEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: TOBadEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1010,10 +936,7 @@ KPPPStateMachine::TOBadEvent()
 void
 KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RCRGoodEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RCRGoodEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1071,10 +994,7 @@ KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 void
 KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
-#if DEBUG
-	dprintf("KPPPSM: RCRBadEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RCRBadEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1132,10 +1052,7 @@ KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 void
 KPPPStateMachine::RCAEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RCAEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RCAEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1212,10 +1129,7 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 void
 KPPPStateMachine::RCNEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RCNEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RCNEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1295,10 +1209,7 @@ KPPPStateMachine::RCNEvent(struct mbuf *packet)
 void
 KPPPStateMachine::RTREvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RTREvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RTREvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1348,10 +1259,7 @@ KPPPStateMachine::RTREvent(struct mbuf *packet)
 void
 KPPPStateMachine::RTAEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RTAEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RTAEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1408,10 +1316,7 @@ void
 KPPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 	uint8 code = PPP_PROTOCOL_REJECT)
 {
-#if DEBUG
-	dprintf("KPPPSM: RUCEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RUCEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1433,10 +1338,7 @@ KPPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 void
 KPPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RXJGoodEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RXJGoodEvent() state=%d phase=%d\n", State(), Phase());
 	
 	// This method does not m_freem(packet) because the acceptable rejects are
 	// also passed to the parent. RXJEvent() will m_freem(packet) when needed.
@@ -1462,10 +1364,7 @@ KPPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 void
 KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RXJBadEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RXJBadEvent() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1515,10 +1414,7 @@ KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 void
 KPPPStateMachine::RXREvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RXREvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RXREvent() state=%d phase=%d\n", State(), Phase());
 	
 	ppp_lcp_packet *echo = mtod(packet, ppp_lcp_packet*);
 	
@@ -1553,7 +1449,7 @@ KPPPStateMachine::TimerEvent()
 {
 #if DEBUG
 	if(fNextTimeout != 0)
-		dprintf("KPPPSM: TimerEvent()\n");
+		TRACE("KPPPSM: TimerEvent()\n");
 #endif
 	
 	// We might cause a dead-lock. Thus, abort if we cannot get the lock.
@@ -1596,10 +1492,7 @@ KPPPStateMachine::TimerEvent()
 void
 KPPPStateMachine::RCREvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RCREvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RCREvent() state=%d phase=%d\n", State(), Phase());
 	
 	KPPPConfigurePacket request(packet);
 	KPPPConfigurePacket nak(PPP_CONFIGURE_NAK);
@@ -1620,16 +1513,14 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 		optionHandler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
 		if(!optionHandler || !optionHandler->IsEnabled()) {
-			dprintf("KPPPSM::RCREvent(): unknown type:%d\n", request.ItemAt(index)->type);
+			ERROR("KPPPSM::RCREvent():unknown type:%d\n", request.ItemAt(index)->type);
 			// unhandled items should be added to the reject
 			reject.AddItem(request.ItemAt(index));
 			continue;
 		}
 		
-#if DEBUG
-		dprintf("KPPPSM::RCREvent(): OH=%s\n",
+		TRACE("KPPPSM::RCREvent(): OH=%s\n",
 			optionHandler->Name() ? optionHandler->Name() : "Unknown");
-#endif
 		result = optionHandler->ParseRequest(request, index, nak, reject);
 		
 		if(result == PPP_UNHANDLED) {
@@ -1639,7 +1530,7 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 		} else if(result != B_OK) {
 			// the request contains a value that has been sent more than
 			// once or the value is corrupted
-			dprintf("KPPPSM::RCREvent(): OptionHandler returned parse error!\n");
+			ERROR("KPPPSM::RCREvent(): OptionHandler returned parse error!\n");
 			m_freem(packet);
 			CloseEvent();
 			return;
@@ -1658,7 +1549,7 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 				if(result != B_OK) {
 					// the request contains a value that has been sent more than
 					// once or the value is corrupted
-					dprintf("KPPPSM::RCREvent(): OptionHandler returned append error!\n");
+					ERROR("KPPPSM::RCREvent():OptionHandler returned append error!\n");
 					m_freem(packet);
 					CloseEvent();
 					return;
@@ -1684,10 +1575,7 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 void
 KPPPStateMachine::RXJEvent(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: RXJEvent() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: RXJEvent() state=%d phase=%d\n", State(), Phase());
 	
 	ppp_lcp_packet *reject = mtod(packet, ppp_lcp_packet*);
 	
@@ -1754,7 +1642,7 @@ KPPPStateMachine::IllegalEvent(ppp_event event)
 {
 	// TODO:
 	// update error statistics
-	dprintf("KPPPSM: IllegalEvent(event=%d) state=%d phase=%d\n",
+	ERROR("KPPPSM: IllegalEvent(event=%d) state=%d phase=%d\n",
 		event, State(), Phase());
 }
 
@@ -1762,10 +1650,7 @@ KPPPStateMachine::IllegalEvent(ppp_event event)
 void
 KPPPStateMachine::ThisLayerUp()
 {
-#if DEBUG
-	dprintf("KPPPSM: ThisLayerUp() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: ThisLayerUp() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	
@@ -1787,10 +1672,7 @@ KPPPStateMachine::ThisLayerUp()
 void
 KPPPStateMachine::ThisLayerDown()
 {
-#if DEBUG
-	dprintf("KPPPSM: ThisLayerDown() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: ThisLayerDown() state=%d phase=%d\n", State(), Phase());
 	
 	// KPPPProtocol::Down() should block if needed.
 	DownProtocols();
@@ -1800,10 +1682,7 @@ KPPPStateMachine::ThisLayerDown()
 void
 KPPPStateMachine::ThisLayerStarted()
 {
-#if DEBUG
-	dprintf("KPPPSM: ThisLayerStarted() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: ThisLayerStarted() state=%d phase=%d\n", State(), Phase());
 	
 	if(Interface().Device() && !Interface().Device()->Up())
 		Interface().Device()->UpFailedEvent();
@@ -1813,10 +1692,7 @@ KPPPStateMachine::ThisLayerStarted()
 void
 KPPPStateMachine::ThisLayerFinished()
 {
-#if DEBUG
-	dprintf("KPPPSM: ThisLayerFinished() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: ThisLayerFinished() state=%d phase=%d\n", State(), Phase());
 	
 	if(Interface().Device())
 		Interface().Device()->Down();
@@ -1844,10 +1720,7 @@ KPPPStateMachine::ZeroRestartCount()
 bool
 KPPPStateMachine::SendConfigureRequest()
 {
-#if DEBUG
-	dprintf("KPPPSM: SendConfigureRequest() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendConfigureRequest() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	--fRequestCounter;
@@ -1874,10 +1747,7 @@ KPPPStateMachine::SendConfigureRequest()
 bool
 KPPPStateMachine::SendConfigureAck(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: SendConfigureAck() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendConfigureAck() state=%d phase=%d\n", State(), Phase());
 	
 	if(!packet)
 		return false;
@@ -1901,10 +1771,7 @@ KPPPStateMachine::SendConfigureAck(struct mbuf *packet)
 bool
 KPPPStateMachine::SendConfigureNak(struct mbuf *packet)
 {
-#if DEBUG
-	dprintf("KPPPSM: SendConfigureNak() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendConfigureNak() state=%d phase=%d\n", State(), Phase());
 	
 	if(!packet)
 		return false;
@@ -1925,10 +1792,7 @@ KPPPStateMachine::SendConfigureNak(struct mbuf *packet)
 bool
 KPPPStateMachine::SendTerminateRequest()
 {
-#if DEBUG
-	dprintf("KPPPSM: SendTerminateRequest() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendTerminateRequest() state=%d phase=%d\n", State(), Phase());
 	
 	LockerHelper locker(fLock);
 	--fTerminateCounter;
@@ -1956,10 +1820,7 @@ KPPPStateMachine::SendTerminateRequest()
 bool
 KPPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 {
-#if DEBUG
-	dprintf("KPPPSM: SendTerminateAck() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendTerminateAck() state=%d phase=%d\n", State(), Phase());
 	
 	struct mbuf *reply = request;
 	
@@ -1988,10 +1849,8 @@ KPPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 bool
 KPPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code)
 {
-#if DEBUG
-	dprintf("KPPPSM: SendCodeReject(protocolNumber=%X;code=%d) state=%d phase=%d\n",
+	TRACE("KPPPSM: SendCodeReject(protocolNumber=%X;code=%d) state=%d phase=%d\n",
 		protocolNumber, code, State(), Phase());
-#endif
 	
 	if(!packet)
 		return false;
@@ -2035,10 +1894,7 @@ KPPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uin
 bool
 KPPPStateMachine::SendEchoReply(struct mbuf *request)
 {
-#if DEBUG
-	dprintf("KPPPSM: SendEchoReply() state=%d phase=%d\n",
-		State(), Phase());
-#endif
+	TRACE("KPPPSM: SendEchoReply() state=%d phase=%d\n", State(), Phase());
 	
 	if(!request)
 		return false;

@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "_KPPPAuthenticationHandler.h"
 
@@ -99,9 +97,7 @@ _KPPPAuthenticationHandler::AddToRequest(KPPPConfigurePacket& request)
 		// this could omit some authenticators when we get a suggestion, but that is
 		// no problem because the suggested authenticator will be accepted (hopefully)
 	
-#if DEBUG
-	dprintf("KPPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
-#endif
+	TRACE("KPPPAuthHandler: AddToRequest(%X)\n", authenticator->ProtocolNumber());
 	
 	authenticator->SetEnabled(true);
 	return authenticator->OptionHandler()->AddToRequest(request);
@@ -193,9 +189,7 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 		return B_OK;
 			// no authentication requested by peer (index > request.CountItems())
 	
-#if DEBUG
-	dprintf("KPPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
-#endif
+	TRACE("KPPPAuthHandler: ParseRequest(%X)\n", ntohs(item->protocolNumber));
 	
 	// try to find the requested protocol
 	fLocalAuthenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));

@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <KernelExport.h>
 #include <driver_settings.h>
@@ -12,7 +10,6 @@
 
 #include <KPPPInterface.h>
 #include <KPPPModule.h>
-#include <LockerHelper.h>
 
 #include "Protocol.h"
 
@@ -54,10 +51,8 @@ add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 		success = mainInterface.AddProtocol(ipcp);
 	}
 	
-#if DEBUG
-	dprintf("IPCP: add_to(): %s\n",
+	TRACE("IPCP: add_to(): %s\n",
 		success && ipcp && ipcp->InitCheck() == B_OK ? "OK" : "ERROR");
-#endif
 	
 	return success && ipcp && ipcp->InitCheck() == B_OK;
 }

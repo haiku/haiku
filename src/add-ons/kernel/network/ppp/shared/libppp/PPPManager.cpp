@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class PPPManager
 	\brief Allows controlling the PPP stack.
@@ -134,12 +132,13 @@ PPPManager::CreateInterface(const driver_settings *settings,
 
 /*!	\brief Creates an interface with the given name and profile.
 	
-	Every PPP interface has a profile. By it looks if the pppidf/profile folder
-	contains a profile with the interface's name. Otherwise the interface's settings
-	become its profile. This has the advantage that you can put the profile and the
-	settings into the same file which simplifies your PPP configuration if you edit
-	your PPP interface definitions by hand. In this case PAP, for example, would
-	still find the username and password although you specify them in the same
+	If the interface already exists its ID will be returned.
+	Every PPP interface has a profile. By default it checks if the pppidf/profile
+	folder contains a profile with the interface's name. Otherwise the interface's
+	settings become its profile. This has the advantage that you can put the profile
+	and the settings into the same file which simplifies your PPP configuration if
+	you edit your PPP interface definitions by hand. In this case PAP, for example,
+	would still find the username and password although you specify them in the same
 	parameter that loads the PAP module.
 	
 	\param name The PPP interface description file's name.

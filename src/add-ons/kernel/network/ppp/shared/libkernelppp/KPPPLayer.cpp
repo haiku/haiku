@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 /*!	\class KPPPLayer
 	\brief An abstract layer that can encapsulate/send and receive packets.
@@ -84,7 +82,7 @@ KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 		else
 			return Next()->SendToNext(packet, protocolNumber);
 	} else {
-		dprintf("KPPPLayer: SendToNext() failed because there is no next handler!\n");
+		ERROR("KPPPLayer: SendToNext() failed because there is no next handler!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}

@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _K_PPP_MANAGER__H
 #define _K_PPP_MANAGER__H
@@ -20,11 +18,15 @@
 
 
 class KPPPInterface;
-//!	Private structure used by PPP interface manager.
+//!	Private structure shared by PPP manager and KPPPInterface.
 typedef struct ppp_interface_entry {
+	char *name;
 	KPPPInterface *interface;
 	vint32 accessing;
 	bool deleting;
+	
+	// ppp_up communication
+	thread_id requestThread;
 } ppp_interface_entry;
 
 

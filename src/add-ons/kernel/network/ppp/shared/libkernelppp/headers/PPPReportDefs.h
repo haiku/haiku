@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2003-2004, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _PPP_REPORT_DEFS__H
 #define _PPP_REPORT_DEFS__H
@@ -17,6 +15,13 @@
 	// how much optional data can be added to the report
 #define PPP_REPORT_CODE				'_3PR'
 	// the code of receive_data() must have this value
+
+//!	Sends a reply to the report message sender.
+#define PPP_REPLY(sender, value) \
+	send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
+
+#define PPP_OK_DISABLE_REPORTS		'OKDR'
+	// additional reply code (B_OK should be used)
 
 //!	Report flags.
 enum ppp_report_flags {
