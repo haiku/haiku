@@ -48,6 +48,7 @@ ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
 	_space=space;
 	_area=B_ERROR;
 	_buffer=NULL;
+	_flags=flags;
 
 	_HandleSpace(space, bytesperline);
 }
