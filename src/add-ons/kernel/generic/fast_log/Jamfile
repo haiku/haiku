@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src add-ons kernel generic fast_log ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon fast_log : kernel generic :
+	clients.c
+	device.c
+	long_buffers.c
+	;
+
