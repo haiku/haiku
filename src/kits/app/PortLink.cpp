@@ -136,7 +136,7 @@ status_t PortLink::FlushToSession()
 
 status_t PortLink::Attach(const void *data, size_t size)
 {
-	if (size <= 0)
+	if (!data || size <= 0)
 		return B_ERROR;
   
 	if (SESSION_BUFFER_SIZE - fSendPosition > (int32)size)
