@@ -1,7 +1,10 @@
 SubDir OBOS_TOP src kernel libroot posix stdlib ;
 
+UsePrivateHeaders libroot ;
+
 KernelMergeObject posix_stdlib.o :
 	abs.c
+	atfork.c
 	atof.c 
 	atoi.c 
 	bsearch.c
