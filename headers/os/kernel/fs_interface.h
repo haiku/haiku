@@ -12,8 +12,6 @@
 struct dirent;
 struct stat;
 struct fs_info;
-struct attr_info;
-struct index_info;
 
 
 /* the file system's private data structures */
@@ -108,11 +106,14 @@ struct fs_calls {
 	status_t (*fs_open_attr)(fs_volume fs, fs_vnode file, const char *name, int oflags, fs_cookie *_cookie, vnode_id *_attrID);
 	status_t (*fs_close_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie);
 	status_t (*fs_free_attr_cookie)(fs_volume fs, fs_vnode attr, fs_cookie cookie);
-	ssize_t (*fs_read_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, void *buf, off_t pos, size_t *len);
-	ssize_t (*fs_write_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, const void *buf, off_t pos, size_t *len);
-	status_t (*fs_seek_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, off_t pos, int st);
+	ssize_t (*fs_read_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, void *buffer, off_t pos, size_t *len);
+	ssize_t (*fs_write_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, const void *buffer, off_t pos, size_t *len);
+	status_t (*fs_seek_attr)(fs_volume fs, fs_vnode attr, fs_cookie cookie, off_t pos, int seekType);
+
 	status_t (*fs_rename_attr)(fs_volume fs, fs_vnode file, const char *oldName, const char *newName);
 	status_t (*fs_remove_attr)(fs_volume fs, fs_vnode file, const char *name);
+	status_t (*fs_read_attr_stat)(fs_volume fs, fs_vnode attr, fs_cookie cookie, struct stat *stat);
+	status_t (*fs_write_attr_stat)(fs_volume fs, fs_vnode attr, fs_cookie cookie, struct stat *stat, int statMask);
 
 	/* index directory & index operations */
 	status_t (*fs_open_index_dir)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);
@@ -120,6 +121,10 @@ struct fs_calls {
 	status_t (*fs_free_index_dir_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
 	status_t (*fs_read_index_dir)(fs_volume fs, fs_vnode v, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	status_t (*fs_rewind_index_dir)(fs_volume fs, fs_vnode v, fs_cookie cookie);
+
+	status_t (*fs_create_index)(fs_volume fs, const char *name, uint32 type, int flags);
+	status_t (*fs_remove_index)(fs_volume fs, const char *name);
+	status_t (*fs_read_index_stat)(fs_volume fs, const char *name, struct stat *stat);
 
 	/* query operations */
 	status_t (*fs_open_query)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);

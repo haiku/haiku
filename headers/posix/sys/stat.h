@@ -2,27 +2,28 @@
 #define _SYS_STAT_H_
 
 #include <OS.h>
-//#include <sys/types.h>
-#include <ktypes.h>
+#include <sys/types.h>
 
 /*
  * stat structure
  */
 
 struct stat {
-    dev_t			st_dev;        /* "device" that this file resides on */
-    ino_t			st_ino;        /* this file's inode #, unique per device */
-    mode_t			st_mode;       /* mode bits (rwx for user, group, etc) */
-    nlink_t			st_nlink;      /* number of hard links to this file */
-    uid_t			st_uid;        /* user id of the owner of this file */
-    gid_t			st_gid;        /* group id of the owner of this file */
-    off_t			st_size;       /* size in bytes of this file */
-    dev_t			st_rdev;       /* device type (not used) */
-    size_t			st_blksize;    /* preferred block size for i/o */
-    time_t			st_atime;      /* last access time */
-    time_t			st_mtime;      /* last modification time */
-    time_t			st_ctime;      /* last change time, not creation time */
-    time_t			st_crtime;     /* creation time */
+	dev_t			st_dev;			/* "device" that this file resides on */
+	ino_t			st_ino;			/* this file's inode #, unique per device */
+	mode_t			st_mode;		/* mode bits (rwx for user, group, etc) */
+	nlink_t			st_nlink;		/* number of hard links to this file */
+	uid_t			st_uid;			/* user id of the owner of this file */
+	gid_t			st_gid;			/* group id of the owner of this file */
+	off_t			st_size;		/* size in bytes of this file */
+	// ToDo: st_type is new for OpenBeOS - it replaces the unused st_rdev field
+	unsigned int	st_type;		/* attribute/index type */
+	//dev_t			st_rdev;		/* device type (not used) */
+	size_t			st_blksize;		/* preferred block size for i/o */
+	time_t			st_atime;		/* last access time */
+	time_t			st_mtime;		/* last modification time */
+	time_t			st_ctime;		/* last change time, not creation time */
+	time_t			st_crtime;		/* creation time */
 };
 
 /* extended file types */

@@ -1,6 +1,7 @@
 /* fs_info.h
 **
-** functions/definitions for general file system information
+** functions/definitions for general file system information.
+** Distributed under the terms of the OpenBeOS License.
 */
 
 #ifndef _FS_INFO_H
@@ -8,9 +9,6 @@
 
 #include <OS.h>
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
 
 /* fs_info.flags */
 #define	B_FS_IS_READONLY		0x00000001
@@ -25,12 +23,12 @@ extern "C" {
 #define B_FS_HAS_ALIASES				0x00100000
 #define B_FS_SUPPORTS_NODE_MONITORING	0x00200000
 
-struct fs_info {
-	dev_t	dev;								/* fs dev_t */
+typedef struct fs_info {
+	dev_t	dev;								/* volume dev_t */
 	ino_t	root;								/* root ino_t */
-	uint32	flags;								/* file system flags */
+	uint32	flags;								/* flags (see above) */
 	off_t	block_size;							/* fundamental block size */
-	off_t	io_size;							/* optimal io size */
+	off_t	io_size;							/* optimal i/o size */
 	off_t	total_blocks;						/* total number of blocks */
 	off_t	free_blocks;						/* number of free blocks */
 	off_t	total_nodes;						/* total number of nodes */
@@ -38,9 +36,12 @@ struct fs_info {
 	char	device_name[128];					/* device holding fs */
 	char	volume_name[B_FILE_NAME_LENGTH];	/* volume name */
 	char	fsh_name[B_OS_NAME_LENGTH];			/* name of fs handler */
-};
+} fs_info;
 
-typedef struct fs_info fs_info;
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 extern dev_t	dev_for_path(const char *path);
 extern dev_t	next_dev(int32 *pos);
