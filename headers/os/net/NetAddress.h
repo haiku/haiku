@@ -95,7 +95,7 @@ private:
 
 inline NLAddress* BNetAddress::GetImpl( void ) const
 {
-    return NULL;
+	return NULL;	// No Nettle backward compatibility
 }
 
 #endif // <-- #ifndef _NETADDRESS_H

@@ -119,7 +119,7 @@ private:
 
 inline NLPacket* BNetBuffer::GetImpl( void ) const
 {
-    return NULL;
+	return NULL;	// No Nettle backward compatibility
 }
 
 #endif // <-- #ifndef _NETBUFFER_H
