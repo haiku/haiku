@@ -2415,7 +2415,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			|| area->cache_ref != top_cache_ref
 			|| (address - area->base + area->cache_offset) != cache_offset) {
 			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
-			err = ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
+			err = B_BAD_ADDRESS;
 		}
 	}
 
