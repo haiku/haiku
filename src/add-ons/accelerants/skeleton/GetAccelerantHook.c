@@ -70,9 +70,9 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		HOOK(SET_DPMS_MODE);
 
 		/* cursor managment */
-		HRDC(SET_CURSOR_SHAPE);
-		HRDC(MOVE_CURSOR);
-		HRDC(SHOW_CURSOR);
+//		HRDC(SET_CURSOR_SHAPE);
+//		HRDC(MOVE_CURSOR);
+//		HRDC(SHOW_CURSOR);
 
 		/* synchronization */
 		HOOK(ACCELERANT_ENGINE_COUNT);
@@ -90,15 +90,15 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		*/
 
 		/* only export video overlay functions if card is capable of it */
-		CHKO(OVERLAY_COUNT);
-		CHKO(OVERLAY_SUPPORTED_SPACES);
-		CHKO(OVERLAY_SUPPORTED_FEATURES);
-		CHKO(ALLOCATE_OVERLAY_BUFFER);
-		CHKO(RELEASE_OVERLAY_BUFFER);
-		CHKO(GET_OVERLAY_CONSTRAINTS);
-		CHKO(ALLOCATE_OVERLAY);
-		CHKO(RELEASE_OVERLAY);
-		CHKO(CONFIGURE_OVERLAY);
+//		CHKO(OVERLAY_COUNT);
+//		CHKO(OVERLAY_SUPPORTED_SPACES);
+//		CHKO(OVERLAY_SUPPORTED_FEATURES);
+//		CHKO(ALLOCATE_OVERLAY_BUFFER);
+//		CHKO(RELEASE_OVERLAY_BUFFER);
+//		CHKO(GET_OVERLAY_CONSTRAINTS);
+//		CHKO(ALLOCATE_OVERLAY);
+//		CHKO(RELEASE_OVERLAY);
+//		CHKO(CONFIGURE_OVERLAY);
 
 		/*
 		When requesting an acceleration hook, the calling application provides a
