@@ -1,0 +1,28 @@
+resource(2, "BEOS:TYPE") #'MIMS' "application/x-be-executable";
+
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-MAIL";
+
+resource(1, "BEOS:FILE_TYPES") message
+{
+	"types" = "text/x-email",
+	"types" = "application/x-person",
+	"types" = "text/x-vnd.Be-MailDraft"
+};
+
+resource app_version
+{
+	major  = 3, 
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 5,
+
+	internal = 3,
+
+	short_info = "BeMail 3.0",
+	long_info = "BeMail 3.0.0 ©2004 Haiku"
+};
+
+resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";
