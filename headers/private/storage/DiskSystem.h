@@ -40,14 +40,6 @@ public:
 	bool SupportsInitializingChild(BPartition *child,
 								   const char *diskSystem) const;
 
-	bool SupportsParentSystem(BPartition *child) const;
-	bool SupportsParentSystem(const char *system) const;
-		// True in most cases. NULL == raw device.
-	bool SupportsChildSystem(BPartition *child, const char *system) const;
-	bool SupportsChildSystem(const char *system) const;
-		// False for most file systems, true for most partitioning
-		// systems.
-
 	status_t ValidateResize(BPartition *partition, off_t *size) const;
 	status_t ValidateResizeChild(BPartition *child, off_t *size) const;
 	status_t ValidateMove(BPartition *partition, off_t *start) const;
@@ -58,6 +50,8 @@ public:
 	status_t ValidateCreateChild(BPartition *partition, off_t *start,
 								 off_t *size, const char *type,
 								 const char *parameters) const;
+	status_t ValidateInitialize(BPartition *partition, char *name,
+								const char *parameters) const;
 
 	status_t GetNextSupportedType(BPartition *partition, int32 *cookie,
 								  char *type) const;
@@ -70,10 +64,12 @@ public:
 	bool IsSubSystemFor(BPartition *parent) const;
 
 private:
+	status_t _SetTo(disk_system_id id);
 	status_t _SetTo(user_disk_system_info *info);
 	void _Unset();
 
 	friend class BDiskDeviceRoster;
+	friend class BPartition;
 
 	disk_system_id	fID;
 	BString			fName;

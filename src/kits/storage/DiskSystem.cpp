@@ -301,6 +301,20 @@ BDiskSystem::ValidateCreateChild(BPartition *partition, off_t *start,
 				start, size, type, parameters);
 }
 
+// ValidateInitialize
+status_t
+BDiskSystem::ValidateInitialize(BPartition *partition, char *name,
+								const char *parameters) const
+{
+	if (InitCheck() != B_OK)
+		return InitCheck();
+// parameters may be NULL
+	if (!name || !partition || !partition->_IsShadow())
+		return B_BAD_VALUE;
+	return _kern_validate_initialize_partition(fID, partition->_ShadowID(),
+											   name, parameters);
+}
+
 // GetNextSupportedType
 status_t
 BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
@@ -349,6 +363,20 @@ BDiskSystem::IsSubSystemFor(BPartition *parent) const
 	return (InitCheck() == B_OK
 			&& parent && parent->_IsShadow()
 			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID()));
+}
+
+// _SetTo
+status_t
+BDiskSystem::_SetTo(disk_system_id id)
+{
+	_Unset();
+	if (id < 0)
+		return fID;
+	user_disk_system_info info;
+	status_t error = _kern_get_disk_system_info(id, &info);
+	if (error != B_OK)
+		return (fID = error);
+	return _SetTo(&info);
 }
 
 // _SetTo
