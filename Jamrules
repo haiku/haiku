@@ -610,11 +610,12 @@ rule SimpleTest
 
 rule Addon
 {
-	# Addon <name> : <relpath> : <sources> : <is executable> ;
+	# Addon <name> : <relpath> : <sources> : <is executable> : <libraries> ;
 	# <name>: Name of the add-on.
 	# <relpath>: Path where the add-on shall live relative to the add-on dir.
 	# <sources>: Source files.
-	# <is executable>: true, if the target shall be executable as well
+	# <is executable>: true, if the target shall be executable as well.
+	# <libraries>: Libraries to be linked against.
 
 	local isExecutable = $(4) ;
 	
@@ -633,6 +634,7 @@ rule Addon
 		linkFlags = -nostart $(linkFlags) ;
 	}
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] $(linkFlags) ;
+	LinkSharedOSLibs $(1) : $(5) ;
 }
 
 rule R5KernelAddon
