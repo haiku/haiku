@@ -149,7 +149,9 @@ STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 	{
 		s->Activate();
 		desktop_private::activescreen=s;
+#ifdef TEST_MODE
 		s->SetSpace(0,B_32_BIT_640x480,true);
+#endif
 	}
 }
 
