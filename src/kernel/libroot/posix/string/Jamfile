@@ -25,7 +25,6 @@ KernelMergeObject posix_string.o :
 	strncat.c
 	strncmp.c
 	strncpy.c
-	strnicmp.c
 	strnlen.c
 	strpbrk.c
 	strrchr.c
