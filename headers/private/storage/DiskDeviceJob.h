@@ -9,15 +9,24 @@
 #include <DiskDeviceDefs.h>
 #include <String.h>
 
+struct user_disk_device_job_info;
+
 class BDiskDeviceJob {
 public:
-	disk_job_id ID() const;
-	uint32 Type() const;	
-	partition_id PartitionID() const;
+	BDiskDeviceJob();
+	~BDiskDeviceJob();
 
-	float Progress() const;		// [0.0, 1.0]
-	uint32 Status() const;	
+	status_t SetTo(disk_job_id id);
+	void Unset();
+	status_t InitCheck() const;
+
+	disk_job_id ID() const;
+	uint32 Type() const;
+	partition_id PartitionID() const;
 	const char *Description() const;
+
+	uint32 Status() const;	
+	float Progress() const;		// [0.0, 1.0]
 	status_t GetProgressInfo(disk_device_job_progress_info *info) const;
 	uint32 InterruptProperties() const;
 
@@ -25,7 +34,11 @@ public:
 	status_t Pause();
 	
 private:
-	disk_job_id		fJobID;
+	status_t _SetTo(user_disk_device_job_info *info);
+
+	friend class BDiskDeviceRoster;
+
+	disk_job_id		fID;
 	uint32			fType;
 	partition_id	fPartitionID;
 	BString			fDescription;
