@@ -1345,23 +1345,23 @@ vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 }
 
 
-int
+status_t
 vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 {
 	struct vnode *vnode;
-	int err;
-	char buf[SYS_MAX_PATH_LEN+1];
+	status_t status;
+	char buffer[SYS_MAX_PATH_LEN + 1];
 
 	PRINT(("vfs_get_vnode_from_path: entry. path = '%s', kernel %d\n", path, kernel));
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
+	strlcpy(buffer, path, sizeof(buffer));
 
-	err = path_to_vnode(buf, true, &vnode, kernel);
-	if (err >= 0)
-		*_vnode = vnode;
+	status = path_to_vnode(buffer, true, &vnode, kernel);
+	if (status < B_OK)
+		return status;
 
-	return err;
+	*_vnode = vnode;
+	return B_OK;
 }
 
 
