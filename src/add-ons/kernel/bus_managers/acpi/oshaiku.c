@@ -422,13 +422,9 @@ AcpiOsVprintf (
     }
 
 #else
-	char acpi_err_string[512];
-	int debug_fd = open("/boot/acpi_log",O_WRONLY | O_APPEND | O_CREAT);
-	vsprintf(acpi_err_string, Fmt, Args);
-	write(debug_fd,acpi_err_string,strlen(acpi_err_string));
-	write(debug_fd,"\n",1);
-	close(debug_fd);
-	//kernel_debugger(acpi_err_string);
+	//char acpi_err_string[512];
+	//vsprintf(acpi_err_string, Fmt, Args);
+	//dprintf("ACPI: %s\n",acpi_err_string);
 #endif
 
     return;
@@ -452,10 +448,11 @@ UINT32
 AcpiOsGetLine (
     char                    *Buffer)
 {
-    UINT8                   Temp;
     UINT32                  i = 0;
-
+    
 #ifndef _KERNEL_MODE
+    UINT8                   Temp;
+    
     for (i = 0; ; i++)
     {
         scanf ("%1c", &Temp);
@@ -502,13 +499,14 @@ AcpiOsMapMemory (
 
 #ifdef _KERNEL_MODE
 	int page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
-	void *map_base = ACPI_PTR_ADD(void,where,0 - page_offset);
+	void *map_base = ACPI_PTR_ADD(void,where,0L - page_offset);
 	area_id area;
 	
     area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
 	
 	*there += page_offset;
-#endif
+	
+	#endif
 
     return (area > 0 ? AE_OK : AE_BAD_ADDRESS);
 }
@@ -691,14 +689,15 @@ AcpiOsCreateLock (
     ACPI_HANDLE             *OutHandle)
 {
 
-    return (AcpiOsCreateSemaphore (1, 1, OutHandle));
+    *OutHandle = (ACPI_HANDLE)memalign(sizeof(spinlock),sizeof(spinlock));
+    return AE_OK;
 }
 
 void
 AcpiOsDeleteLock (
     ACPI_HANDLE             Handle)
 {
-    AcpiOsDeleteSemaphore (Handle);
+	free(Handle);
 }
 
 
@@ -707,7 +706,15 @@ AcpiOsAcquireLock (
     ACPI_HANDLE             Handle,
     UINT32                  Flags)
 {
-    AcpiOsWaitSemaphore (Handle, 1, 0xFFFF);
+	cpu_status cpu;
+		
+	if (Flags == ACPI_NOT_ISR)
+		cpu = disable_interrupts();
+		
+    acquire_spinlock ((spinlock *)(Handle));
+    
+    if (Flags == ACPI_NOT_ISR)
+    	restore_interrupts(cpu);
 }
 
 
@@ -716,7 +723,15 @@ AcpiOsReleaseLock (
     ACPI_HANDLE             Handle,
     UINT32                  Flags)
 {
-    AcpiOsSignalSemaphore (Handle, 1);
+    cpu_status cpu;
+		
+	if (Flags == ACPI_NOT_ISR)
+		cpu = disable_interrupts();
+		
+    release_spinlock ((spinlock *)(Handle));
+    
+    if (Flags == ACPI_NOT_ISR)
+    	restore_interrupts(cpu);
 }
 
 
@@ -744,7 +759,7 @@ AcpiOsInstallInterruptHandler (
 
 #ifdef _KERNEL_MODE
 	
-	install_io_interrupt_handler(InterruptNumber,ServiceRoutine,Context,0);
+	install_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,Context,0);
 		/* It so happens that the Haiku and ACPI-CA interrupt handler routines
 		   return the same values with the same meanings */
 #endif
@@ -773,7 +788,7 @@ AcpiOsRemoveInterruptHandler (
 
 #ifdef _KERNEL_MODE
 
-	remove_io_interrupt_handler(InterruptNumber,ServiceRoutine,NULL);
+	remove_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,NULL);
 		/* Crap. We don't get the Context argument back. */
 	#warning Sketchy code!
 	
@@ -819,7 +834,7 @@ AcpiOsQueueForExecution (
 		#define spawn_kernel_thread spawn_thread
 	#endif
 
-	spawn_kernel_thread(Function,"ACPI Worker Thread",priority,Context);
+	spawn_kernel_thread((thread_func)(Function),"ACPI Worker Thread",priority,Context);
 		/* We're going to cheerfully ignore the fact that ACPI_OSD_EXEC_CALLBACK
 		   routines don't give canonical return values, as we aren't going to
 		   check up on them, and the kernel doesn't care */
@@ -840,6 +855,7 @@ AcpiOsQueueForExecution (
  *
  *****************************************************************************/
 
+#if 0
 ACPI_STATUS
 AcpiOsBreakpoint (
     char                    *Msg)
@@ -849,17 +865,17 @@ AcpiOsBreakpoint (
 
     if (Msg)
     {
-        AcpiOsPrintf ("AcpiOsBreakpoint: %s ****\n", Msg);
+        kernel_debugger ("AcpiOsBreakpoint: %s ****\n", Msg);
     }
     else
     {
-        AcpiOsPrintf ("At AcpiOsBreakpoint ****\n");
+        kernel_debugger ("At AcpiOsBreakpoint ****\n");
     }
 
 
     return AE_OK;
 }
-
+#endif
 
 /******************************************************************************
  *
