@@ -57,6 +57,7 @@ system_colors()
 	return BScreen(B_MAIN_SCREEN_ID).ColorMap();
 }
 
+#ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 res, bool stick)
@@ -104,6 +105,7 @@ set_scroll_bar_info(scroll_bar_info *info)
 	return B_OK;
 }
 
+#endif // COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
 get_mouse_type(int32 *type)
@@ -393,6 +395,16 @@ set_keyboard_locks(uint32 modifiers)
 }
 
 
+_IMPEXP_BE status_t
+_restore_key_map_()
+{
+	BMessage message(IS_RESTORE_KEY_MAP);
+	BMessage reply;
+
+	return _control_input_server_(&message, &reply);	
+}
+
+
 _IMPEXP_BE rgb_color
 keyboard_navigation_color()
 {
@@ -400,6 +412,8 @@ keyboard_navigation_color()
 	return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 }
 
+
+#ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE int32
 count_workspaces()
@@ -637,12 +651,4 @@ void __set_window_decor(int32 theme)
 	link.Flush();
 }
 
-
-_IMPEXP_BE status_t
-_restore_key_map_()
-{
-	BMessage message(IS_RESTORE_KEY_MAP);
-	BMessage reply;
-
-	return _control_input_server_(&message, &reply);	
-}
+#endif // COMPILE_FOR_R5

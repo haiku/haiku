@@ -285,8 +285,9 @@ status_t _control_input_server_(BMessage *command, BMessage *reply)
 		input_server = new BMessenger;
 
 	if (!input_server->IsValid())
-		*input_server = BMessenger("Application/x-vnd.Be-input_server", -1, NULL);
-
+		*input_server = BMessenger("application/x-vnd.Be-input_server", -1, NULL);
+		//*input_server = BMessenger("application/x-vnd.OBOS-input_server", -1, NULL);
+	
 	status_t err = input_server->SendMessage(command, reply);
 
 	if (err != B_OK)
