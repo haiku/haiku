@@ -6,7 +6,7 @@ public:
 	status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 					  const void *infoBuffer, int32 infoSize);
 	
-	status_t	Seek(media_seek_type seekTo,
+	status_t	Seek(uint32 seekTo,
 					 int64 seekFrame, int64 *frame,
 					 bigtime_t seekTime, bigtime_t *time);
 							 

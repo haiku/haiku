@@ -5,6 +5,9 @@
  ***********************************************************************/
 #include <MediaFile.h>
 #include <MediaTrack.h>
+#include <File.h>
+#include <string.h>
+#include "MediaExtractor.h"
 #include "debug.h"
 
 
@@ -14,66 +17,78 @@
 
 BMediaFile::BMediaFile(const entry_ref *ref)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitReader(new BFile(ref, O_RDONLY));
 }
 
 BMediaFile::BMediaFile(BDataIO * source)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitReader(source);
 }
 
 BMediaFile::BMediaFile(const entry_ref * ref,
 					   int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitReader(new BFile(ref, O_RDONLY), flags);
 }
 
 BMediaFile::BMediaFile(BDataIO * source,
 					   int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitReader(source, flags);
 }
 
 BMediaFile::BMediaFile(const entry_ref *ref,
 					   const media_file_format * mfi,
 					   int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitWriter(new BFile(ref, O_WRONLY), mfi, flags);
 }
 					   
 BMediaFile::BMediaFile(BDataIO	*destination,
 					   const media_file_format * mfi,
 					   int32 flags)
 {
-	UNIMPLEMENTED();
-}
-
-
-BMediaFile::BMediaFile(const media_file_format * mfi,
-					   int32 flags)
-{
-	UNIMPLEMENTED();
+	CALLED();
+	Init();
+	InitWriter(destination, mfi, flags);
 }
 
 /* virtual */
 BMediaFile::~BMediaFile()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	
+	ReleaseAllTracks();
+	delete fTrackList;
+	delete fExtractor;
+	delete fSource;
 }
 
 status_t 
 BMediaFile::InitCheck() const
 {
-	UNIMPLEMENTED();
-
-	return B_OK;
+	CALLED();
+	return fErr;
 }
 
 // Get info about the underlying file format.
 status_t 
 BMediaFile::GetFileFormatInfo(media_file_format *mfi) const
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (fErr)
+		return B_ERROR;
+	*mfi = fMFI;
 	return B_OK;
 }
 
@@ -81,14 +96,13 @@ const char *
 BMediaFile::Copyright(void) const
 {
 	UNIMPLEMENTED();
-	return "";
+	return "BMediaFile::Copyright";
 }
 
 int32
 BMediaFile::CountTracks() const
 {
-	UNIMPLEMENTED();
-	return 1;
+	return fTrackNum;
 }
 
 
@@ -97,8 +111,12 @@ BMediaFile::CountTracks() const
 BMediaTrack	*
 BMediaFile::TrackAt(int32 index)
 {
-	UNIMPLEMENTED();
-	return new BMediaTrack(0, 0);
+	CALLED();
+	if (!fTrackList || !fExtractor || index < 0 || index >= fTrackNum)
+		return 0;
+	if (!fTrackList[index])
+		fTrackList[index] = new BMediaTrack(fExtractor, index);
+	return fTrackList[index];
 }
 
 
@@ -109,14 +127,31 @@ BMediaFile::TrackAt(int32 index)
 status_t
 BMediaFile::ReleaseTrack(BMediaTrack *track)
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	CALLED();
+	if (!fTrackList || !track)
+		return B_ERROR;
+	for (int32 i = 0; i < fTrackNum; i++) {
+		if (fTrackList[i] == track) {
+			delete track;
+			fTrackList[i] = 0;
+			return B_OK;
+		}
+	}
+	return B_ERROR;
 }
 
 status_t 
 BMediaFile::ReleaseAllTracks(void)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fTrackList)
+		return B_ERROR;
+	for (int32 i = 0; i < fTrackNum; i++) {
+		if (fTrackList[i]) {
+			delete fTrackList[i];
+			fTrackList[i] = 0;
+		}
+	}
 	return B_OK;
 }
 
@@ -219,19 +254,44 @@ BMediaFile::Perform(int32 selector, void * data)
 void 
 BMediaFile::Init()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	fSource = 0;
+	fTrackNum = 0;
+	fTrackList = 0;
+	fExtractor = 0;
+	fErr = B_OK;
+
+	// not used so far:
+	fEncoderMgr = 0;
+	fWriterMgr = 0;
+	fWriter = 0;
+	fWriterID = 0;
+	fFileClosed = 0;
 }
 
 void 
-BMediaFile::InitReader(BDataIO *source, int32 flags /* = 0 */)
+BMediaFile::InitReader(BDataIO *source, int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	
+	fSource = source;
+	fExtractor = new MediaExtractor(source, flags);
+	fErr = fExtractor->InitCheck();
+	if (fErr)
+		return;
+		
+	fExtractor->GetFileFormatInfo(&fMFI);
+	fTrackNum = fExtractor->StreamCount();
+	fTrackList = new BMediaTrack *[fTrackNum];
+	memset(fTrackList, 0, fTrackNum * sizeof(BMediaTrack *));
 }
 
 void
 BMediaFile::InitWriter(BDataIO *source, const media_file_format * mfi,  int32 flags)
 {
 	UNIMPLEMENTED();
+	fSource = source;
+	fErr = B_NOT_ALLOWED;
 }
 
 

@@ -4,6 +4,8 @@
  *  DESCR: 
  ***********************************************************************/
 #include <MediaTrack.h>
+#include "MediaExtractor.h"
+#include "ReaderPlugin.h"
 #include "debug.h"
 
 /*************************************************************
@@ -12,7 +14,8 @@
 
 BMediaTrack::~BMediaTrack()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	delete fDecoder;
 }
 
 /*************************************************************
@@ -22,25 +25,33 @@ BMediaTrack::~BMediaTrack()
 status_t
 BMediaTrack::InitCheck() const
 {
-	UNIMPLEMENTED();
-
-	return B_OK;
+	CALLED();
+	return fErr;
 }
 
 
 status_t
 BMediaTrack::GetCodecInfo(media_codec_info *mci) const
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fDecoder)
+		return B_NO_INIT;
 
-	return B_ERROR;
+	*mci = fMCI;
+	return B_OK;
 }
 
 
 status_t
 BMediaTrack::EncodedFormat(media_format *out_format) const
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!out_format)
+		return B_BAD_VALUE;
+	if (!fExtractor)
+		return B_NO_INIT;
+
+	out_format = fExtractor->EncodedFormat(fStream);
 
 	return B_OK;
 }
@@ -49,45 +60,44 @@ BMediaTrack::EncodedFormat(media_format *out_format) const
 status_t
 BMediaTrack::DecodedFormat(media_format *inout_format)
 {
-	UNIMPLEMENTED();
-
-	return B_OK;
+	CALLED();
+	if (!inout_format)
+		return B_BAD_VALUE;
+	if (!fExtractor || !fDecoder)
+		return B_NO_INIT;
+		
+	return fDecoder->Setup(fExtractor->EncodedFormat(fStream), inout_format,
+						   fExtractor->InfoBuffer(fStream), fExtractor->InfoBufferSize(fStream));
 }
 
 
 int64
 BMediaTrack::CountFrames() const
 {
-	UNIMPLEMENTED();
-
-	return 100000;
+	CALLED();
+	return fExtractor ? fExtractor->CountFrames(fStream) : 0;
 }
 
 
 bigtime_t
 BMediaTrack::Duration() const
 {
-	UNIMPLEMENTED();
-
-	return 1000000;
+	CALLED();
+	return fExtractor ? fExtractor->Duration(fStream) : 0;
 }
 
 
 int64
 BMediaTrack::CurrentFrame() const
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	return fCurFrame;
 }
 
 
 bigtime_t
 BMediaTrack::CurrentTime() const
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	return fCurTime;
 }
 
 
@@ -96,21 +106,35 @@ BMediaTrack::ReadFrames(void *out_buffer,
 						int64 *out_frameCount,
 						media_header *mh)
 {
-	UNIMPLEMENTED();
-
-	return B_OK;
+	return ReadFrames(out_buffer, out_frameCount, mh, 0);
 }
 
 
 status_t
 BMediaTrack::ReadFrames(void *out_buffer,
 						int64 *out_frameCount,
-						media_header *mh,
-						media_decode_info *info)
+						media_header *mh /* = 0 */,
+						media_decode_info *info /* = 0 */)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fDecoder)
+		return B_NO_INIT;
+	if (!out_buffer || !out_frameCount)
+		return B_BAD_VALUE;
+	
+	status_t result;	
 
-	return B_OK;
+	media_header temp_header;
+	if (!mh)
+		mh = &temp_header;
+	
+	*out_frameCount = 0;
+	result = fDecoder->Decode(out_buffer, out_frameCount, mh, info);
+
+	fCurFrame += *out_frameCount;
+	fCurTime = mh->start_time;
+
+	return result;
 }
 
 
@@ -129,7 +153,34 @@ status_t
 BMediaTrack::SeekToTime(bigtime_t *inout_time,
 						int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fDecoder || !fExtractor)
+		return B_NO_INIT;
+	if (!inout_time || !(flags & B_MEDIA_SEEK_DIRECTION_MASK))
+		return B_BAD_VALUE;
+
+	status_t result;
+	uint32 seekTo;
+	bigtime_t seekTime;
+	
+	int64 frame;
+	bigtime_t time;
+	
+	seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_TIME;
+	seekTime = *inout_time;
+	
+	time = seekTime;
+	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
+	if (result != B_OK)
+		return result;
+		
+	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
+	if (result != B_OK)
+		return result;
+		
+	*inout_time = time;
+	fCurFrame = frame;
+	fCurTime = time;
 
 	return B_OK;
 }
@@ -139,7 +190,34 @@ status_t
 BMediaTrack::SeekToFrame(int64 *inout_frame,
 						 int32 flags)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fDecoder || !fExtractor)
+		return B_NO_INIT;
+	if (!inout_frame || !(flags & B_MEDIA_SEEK_DIRECTION_MASK))
+		return B_BAD_VALUE;
+
+	status_t result;
+	uint32 seekTo;
+	int64 seekFrame;
+	
+	int64 frame;
+	bigtime_t time;
+	
+	seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_FRAME;
+	seekFrame = *inout_frame;
+	
+	frame = seekFrame;
+	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
+	if (result != B_OK)
+		return result;
+		
+	result = fDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
+	if (result != B_OK)
+		return result;
+		
+	*inout_frame = frame;
+	fCurFrame = frame;
+	fCurTime = time;
 
 	return B_OK;
 }
@@ -168,11 +246,24 @@ BMediaTrack::FindKeyFrameForFrame(int64 *inout_frame,
 status_t
 BMediaTrack::ReadChunk(char **out_buffer,
 					   int32 *out_size,
-					   media_header *mh)
+					   media_header *mh /* = 0 */)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (!fExtractor)
+		return B_NO_INIT;
+	if (!out_buffer || !out_size)
+		return B_BAD_VALUE;
 
-	return B_OK;
+	status_t result;
+	media_header temp_header;
+	if (!mh)
+		mh = &temp_header;
+
+	result = fExtractor->GetNextChunk(fStream, (void **)out_buffer, out_size, mh);
+
+	fCurTime = mh->start_time;
+
+	return result;
 }
 
 
@@ -337,31 +428,34 @@ BMediaTrack::Perform(int32 selector,
  * private BMediaTrack
  *************************************************************/
 
-BMediaTrack::BMediaTrack(BPrivate::MediaExtractor *extractor,
+BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 						 int32 stream)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	fExtractor = extractor;
+	fStream = stream;
+	
+	if (B_OK != fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI))
+		fDecoder = 0;
+
+	fCurFrame = 0;
+	fCurTime = 0;
+	fErr = B_OK;
+	
+	// not used:
+	fEncoder = 0;
+	fEncoderID = 0;
+	fWriter = 0;
 }
 
 
 BMediaTrack::BMediaTrack(BPrivate::MediaWriter *writer,
 						 int32 stream_num,
 						 media_format *in_format,
-						 BPrivate::Encoder *encoder,
+						 BPrivate::media::Encoder *encoder,
 						 media_codec_info *mci)
 {
 	UNIMPLEMENTED();
-}
-
-
-status_t
-BMediaTrack::TrackInfo(media_format *out_format,
-					   void **out_info,
-					   int32 *out_infoSize)
-{
-	UNIMPLEMENTED();
-
-	return B_ERROR;
 }
 
 /*
@@ -370,15 +464,6 @@ BMediaTrack::BMediaTrack()
 BMediaTrack::BMediaTrack(const BMediaTrack &)
 BMediaTrack &BMediaTrack::operator=(const BMediaTrack &)
 */
-
-BPrivate::Decoder *
-BMediaTrack::find_decoder(BMediaTrack *track,
-						  int32 *id)
-{
-	UNIMPLEMENTED();
-	return NULL;
-}
-
 
 status_t BMediaTrack::_Reserved_BMediaTrack_0(int32 arg, ...) { return B_ERROR; }
 status_t BMediaTrack::_Reserved_BMediaTrack_1(int32 arg, ...) { return B_ERROR; }

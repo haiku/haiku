@@ -1,6 +1,7 @@
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
+#include "ReaderPlugin.h"
 
 namespace BPrivate { namespace media {
 
@@ -14,19 +15,20 @@ public:
 	virtual status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 							  const void *infoBuffer, int32 infoSize) = 0;
 	
-	virtual status_t	Seek(media_seek_type seekTo,
+	virtual status_t	Seek(uint32 seekTo,
 							 int64 seekFrame, int64 *frame,
 							 bigtime_t seekTime, bigtime_t *time) = 0;
 							 
 	virtual status_t	Decode(void *buffer, int64 *frameCount,
-							   media_header *mediaHeader, media_decode_info *info) = 0;
+							   media_header *mediaHeader, media_decode_info *info = 0) = 0;
 							   
 	status_t			GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 									 media_header *mediaHeader);
 
 private:
-	void				Setup(BMediaTrack *reader);
-	BMediaTrack *		fReader;
+	void				Setup(Reader *reader, void *readerCookie);
+	Reader *			fReader;
+	void *				fReaderCookie;
 };
 
 

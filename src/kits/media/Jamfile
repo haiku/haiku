@@ -73,6 +73,7 @@ SharedLibrary media :
 	MediaPlugin.cpp
 	ReaderPlugin.cpp
 	DecoderPlugin.cpp
+	MediaExtractor.cpp
 ;
 
 LinkSharedOSLibs libmedia.so :

@@ -15,15 +15,15 @@ status_t
 Decoder::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 					  media_header *mediaHeader)
 {
-	return fReader->ReadChunk((char **)chunkBuffer, chunkSize, mediaHeader);
+	return fReader->GetNextChunk(fReaderCookie, chunkBuffer, chunkSize, mediaHeader);
 }
 
 void
-Decoder::Setup(BMediaTrack *reader)
+Decoder::Setup(Reader *reader, void *readerCookie)
 {
 	fReader = reader;
+	fReaderCookie = readerCookie;
 }
-
 
 DecoderPlugin::DecoderPlugin()
 {

@@ -30,7 +30,7 @@ RawDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 
 
 status_t
-RawDecoder::Seek(media_seek_type seekTo,
+RawDecoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
@@ -40,7 +40,7 @@ RawDecoder::Seek(media_seek_type seekTo,
 
 status_t
 RawDecoder::Decode(void *buffer, int64 *frameCount,
-				   media_header *mediaHeader, media_decode_info *info)
+				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
 	void *chunkBuffer;
 	int32 chunkSize;

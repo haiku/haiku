@@ -10,7 +10,9 @@
 
 
 namespace BPrivate {
-	class MediaExtractor;
+	namespace media {
+		class MediaExtractor;
+	}
 	class _IMPEXP_MEDIA MediaWriter;
 	class _AddonManager;
 }
@@ -60,13 +62,7 @@ public:
 					BMediaFile(BDataIO	*destination,  // BFile is a BDataIO
 							   const media_file_format * mfi,
 							   int32 flags=0);
-
-/* modified by Marcus Overhagen */
-BMediaFile(const media_file_format * mfi,
-					   int32 flags);
-/* modified by Marcus Overhagen */
-					   
-					   
+		   
 	virtual			~BMediaFile();
 
 	status_t		InitCheck() const;
@@ -123,7 +119,7 @@ BMediaFile(const media_file_format * mfi,
 	virtual	status_t Perform(int32 selector, void * data);
 
 private:
-	BPrivate::MediaExtractor *fExtractor;
+	BPrivate::media::MediaExtractor *fExtractor;
 	int32					_reserved_BMediaFile_was_fExtractorID;
 	int32					fTrackNum;
 	status_t				fErr;
@@ -136,7 +132,7 @@ private:
 
 	bool					fFileClosed;
 	bool					_reserved_was_fUnused[3];
-	BList					*fTrackList;
+	BMediaTrack				**fTrackList;
 
 	void					Init();
 	void					InitReader(BDataIO *source, int32 flags = 0);
@@ -147,12 +143,12 @@ private:
 	BMediaFile(const BMediaFile&);
 	BMediaFile& operator=(const BMediaFile&);
 
-	BFile					*fFile;
+	BDataIO					*fSource;
 
 
 	/* fbc data and virtuals */
 
-	uint32 _reserved_BMediaFile_[32];
+		uint32 _reserved_BMediaFile_[32];
 
 virtual	status_t _Reserved_BMediaFile_0(int32 arg, ...);
 virtual	status_t _Reserved_BMediaFile_1(int32 arg, ...);

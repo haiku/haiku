@@ -1,0 +1,44 @@
+#ifndef _MEDIA_EXTRACTOR_H
+#define _MEDIA_EXTRACTOR_H
+
+#include "ReaderPlugin.h"
+#include "DecoderPlugin.h"
+
+namespace BPrivate {
+namespace media {
+
+class MediaExtractor
+{
+public:
+					MediaExtractor(BDataIO * source, int32 flags);
+					~MediaExtractor();
+
+	status_t		InitCheck();
+			
+	void			GetFileFormatInfo(media_file_format *mfi) const;
+
+	int32			StreamCount();
+	
+	media_format *	EncodedFormat(int32 stream);
+	int64			CountFrames(int32 stream) const;
+	bigtime_t		Duration(int32 stream) const;
+	void *			InfoBuffer(int32 stream) const;
+	int32			InfoBufferSize(int32 stream) const;
+
+	status_t		Seek(int32 stream, uint32 seekTo,
+						 int64 *frame, bigtime_t *time);
+	
+	status_t		GetNextChunk(int32 stream,
+								 void **chunkBuffer, int32 *chunkSize,
+								 media_header *mediaHeader);
+
+	status_t		CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci);
+	
+};
+
+}; // namespace media
+}; // namespace BPrivate
+
+using namespace BPrivate::media;
+
+#endif
