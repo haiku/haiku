@@ -285,12 +285,12 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 
 		switch (format[0]) {
 			case 'c':
-				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth))
+				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth - 1))
 					goto out;
 
 				put_character(&string, &bytesLeft, (char)va_arg(args, int));
 
-				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth))
+				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth - 1))
 					goto out;
 				continue;
 
@@ -303,6 +303,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 					argument = "<NULL>";
 
 				length = strnlen(argument, precision);
+				fieldWidth -= length;
 
 				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth))
 					goto out;
