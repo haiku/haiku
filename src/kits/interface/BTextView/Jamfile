@@ -2,6 +2,10 @@ SubDir OBOS_TOP src kits interface BTextView ;
 
 UsePrivateHeaders interface ;
 
+if ! $(HAIKU_COMPATIBLE) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
 StaticLibrary haiku :
 	InlineInput.cpp
 	LineBuffer.cpp
