@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources tests kits app BHandler ;
+SubDir OBOS_TOP src tests kits app bhandler ;
 
 CommonUnitTest BHandlerTester
 	: main.cpp

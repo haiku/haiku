@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources tests kits app BMessageQueue ;
+SubDir OBOS_TOP src tests kits app bmessagequeue ;
 
 UsePublicHeaders app support ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources test kits ;
+SubDir OBOS_TOP src tests kits ;
 
-SubInclude OBOS_TOP sources tests kits app ;
+SubInclude OBOS_TOP src tests kits app ;
 

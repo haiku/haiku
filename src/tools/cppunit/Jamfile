@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources tools cppunit ;
+SubDir OBOS_TOP src tools cppunit ;
 
 rule CppUnitLibrary
 {

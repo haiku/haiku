@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources tests kits app BLooper ;
+SubDir OBOS_TOP src tests kits app blooper ;
 
 UsePublicHeaders app support ;
 
