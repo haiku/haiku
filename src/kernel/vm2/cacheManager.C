@@ -3,10 +3,11 @@
 #include <vpagePool.h>
 
 extern poolvpage vpagePool;
-
+// TODO - we need to (somehow) make sure that the same vnodes here are shared with mmap.
+// Maybe a vnode manager...
 cacheManager::cacheManager(void) : area ()
 {
-	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
+	myLock=create_sem(1,"Cache Manager Semaphore"); 
 }
 
 void *cacheManager::findBlock(vnode *target,bool readOnly)

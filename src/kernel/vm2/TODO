@@ -1,6 +1,7 @@
 1) Need to make the paging daemon load the pages in, using semaphores.
-2) See how unresolvable page faults and permissions errors are handled - need to properly handle
-3) Tests are not done. 
+2) Make the caching and the VM (mmap) work together so that an mmap'ed file and a cached file will not race.
+3) Change the architecture so that instead of multiple static globals, everything is stored in pages.
+4) Tests are not done. 
 	Test:
 		getNextAreaInfo
 		cloneArea
@@ -10,7 +11,7 @@
 		paging
 		disk caching
 
-4) Improve locking (remains to be seen - works ok so far)
-5) I use new and delete. I know that doesn't work in kernel land. Not too tough to change, though.  
-	- Pooling is now used for everything but pages
-6) There is no arch-level integration. This is to be tested (to death) in user land first.  * == can not be done in user land.
+5) Improve locking (remains to be seen - works ok so far)
+6) See how unresolvable page faults and permissions errors are handled - need to properly handle
+	- This may have to come at HW integration time, since they will be app signals, etc...
+7) There is no arch-level integration. This is to be tested (to death) in user land first.  * == can not be done in user land.
