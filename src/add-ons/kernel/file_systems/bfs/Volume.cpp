@@ -566,7 +566,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	// cannot use BlockAllocator::BitmapSize() here
 	fSuperBlock.log_blocks = ToBlockRun(AllocationGroups()
 		* fSuperBlock.BlocksPerAllocationGroup() + 1);
-	fSuperBlock.log_blocks.length = 4096;
+	fSuperBlock.log_blocks.length = 2048;
 		// ToDo: set the log size depending on the disk size
 	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(ToBlock(Log()));
 
@@ -602,6 +602,8 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	if ((flags & VOLUME_NO_INDICES) == 0) {
 		if ((status = CreateIndicesRoot(&transaction)) < B_OK)
 			return status;
+
+		// ToDo: add "name", "last_modified", and "size" indices
 	}
 
 	WriteSuperBlock();
