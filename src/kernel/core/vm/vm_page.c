@@ -889,6 +889,10 @@ vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
 }
 
 
+/**	This one uses the kernel_args' physical and virtual memory ranges to
+ *	allocate some pages before the VM is completely up.
+ */
+
 addr_t
 vm_alloc_from_ka_struct(kernel_args *ka, unsigned int size, int lock)
 {
