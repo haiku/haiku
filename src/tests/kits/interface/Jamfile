@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests kits interface ;
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
 
 UsePublicHeaders interface support ;
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
@@ -21,6 +22,11 @@ CommonTestLib libinterfacetest.so
 		DeskbarGetItemTest.cpp
 		DeskbarLocationTest.cpp
 		DeskbarAddItemTest.cpp
+
+		# BPolygon
+		PolygonTest.cpp
+		DummyPolygon.cpp
+		CreatePolygonTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
