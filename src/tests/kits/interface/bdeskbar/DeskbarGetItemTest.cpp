@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarGetItemTest.cpp,v 1.2 2002/09/13 03:51:09 jrand Exp $
+	$Id: DeskbarGetItemTest.cpp,v 1.3 2002/09/25 03:24:17 jrand Exp $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Count Items
@@ -68,8 +68,17 @@
 		if (myDeskbar.HasItem(id)) {
 			itemCount--;
 			
+			/* In Be's implementation, if the char * points to NULL, it
+			   returns B_BAD_VALUE.  However, no matter what it points to
+			   before you start, it is changed by the call to GetItemInfo().
+			   So, if it points to allocated memory, there is a good chance
+			   for a leak.  I would argue that Be should return B_BAD_VALUE
+			   if it points to non-NULL.  The OpenBeOS implementation does
+			   not return B_BAD_VALUE in this case so this assert would fail
+			   from OpenBeOS.  However, this is considered to be an acceptable
+			   deviation from Be's implementation.
 			name = NULL;
-			assert(myDeskbar.GetItemInfo(id, &name) == B_BAD_VALUE);
+			assert(myDeskbar.GetItemInfo(id, &name) == B_BAD_VALUE); */
 			
 			name = buffer;
 			assert(myDeskbar.GetItemInfo(id, &name) == B_OK);

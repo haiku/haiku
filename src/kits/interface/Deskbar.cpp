@@ -139,6 +139,38 @@ status_t BDeskbar::Expand(bool expand)
 //------------------------------------------------------------------------------
 status_t BDeskbar::GetItemInfo(int32 id, const char **name) const
 {
+	/* NOTE: Be's implementation returned B_BAD_VALUE if *name was NULL,
+	   not just if name was NULL.  This doesn't make much sense.  Be's
+	   implementation means you cannot do the following:
+	   		
+	   		const char *buffer = NULL;
+	   		myDeskbar.GetItemInfo(id, &buffer);
+	   
+	   Instead, you are forced to write code that looks like:
+	   
+	   		char tmpBuf[10];
+	   		const char *buffer = tmpBuf;
+	   		myDeskbar.GetItemInfo(id, &buffer);
+	   		
+	   There are a couple of issues with this:
+	   	- Be's implementation does not use the space pointed to in buffer.
+	   	  It cannot since it can't tell how big that space is and it won't
+	   	  know whether the item's name will fit without overflowing the
+	   	  buffer.
+	   	- Worse, if the code looked like:
+	   	
+	   		const char *buffer = new char[5];
+	   		myDeskbar.GetItemInfo(id, &buffer);
+	      
+	       The code will result in a memory leak.  The problem here is that
+	       what buffer points to is changed by GetItemInfo().  If buffer
+	       points to dynamically allocated memory, there is a good chance
+	       the result is a memory leak.
+	   
+	   The OpenBeOS implementation will allow *name to point to NULL or
+	   non-NULL.  If anything, we should consider forcing *name to point to
+	   NULL for safety.
+	 */
 	if (name == NULL) {
 		return(B_BAD_VALUE);
 	}
