@@ -25,6 +25,24 @@ Addon <userland>disk_scanner : userland disk_scanner :
 ;
 LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
 
+# for convenience: this target builds all userland modules
+#
+NotFile userland_disk_scanner_modules ;
+Depends userland_disk_scanner_modules :
+	# the main module
+	<userland>disk_scanner
+
+	# FS modules
+	<userland>bfs
+	<userland>iso9660
+
+	# partition modules
+	<userland>intel
+
+	# session modules
+	<userland>cdrom
+;
+
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
