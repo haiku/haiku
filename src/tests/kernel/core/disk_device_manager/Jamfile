@@ -4,6 +4,7 @@ SubDir OBOS_TOP src tests kernel core disk_device_manager ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders storage ;
 UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 
 SimpleTest DiskDeviceManagerTest
@@ -18,8 +19,13 @@ AbsSymLink <boot!home!config!lib>libdisk_device_manager.so
 Depends DiskDeviceManagerTest : <boot!home!config!lib>libkernelland_emu.so ;
 
 # Also build all modules:
-Depends DiskDeviceManagerTest :
+Depends DiskDeviceManagerTest : userland_disk_system_modules ;
+
+# Pseudo target for disk system modules.
+NotFile userland_disk_system_modules ;
+Depends userland_disk_system_modules :
 	<boot!home!config!lib>libkernelland_emu.so
 	<file_system>bfs
 	<partitioning_system>intel
 ;
+
