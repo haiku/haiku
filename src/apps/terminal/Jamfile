@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src apps terminal ;
 
-# AddResources Terminal :
-#	Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
-#	;
+AddResources Terminal :
+	Terminal.rdef
+	;
 
 App Terminal :
 	ToggleScrollView.cpp
