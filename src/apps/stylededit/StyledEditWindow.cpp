@@ -902,8 +902,6 @@ StyledEditWindow::SaveAs(BMessage *message)
 		}
 		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), directory, B_FILE_NODE, false);
 		
-		fSavePanelTextView = 
-		   dynamic_cast<BTextControl*>(fSavePanel->Window()->FindView("text view"));
 		BMenuBar * menuBar =
 		   dynamic_cast<BMenuBar*>(fSavePanel->Window()->FindView("MenuBar"));
    
@@ -930,13 +928,7 @@ StyledEditWindow::SaveAs(BMessage *message)
 		}
 	}
 	
-	// its own scope allows the lock to be released before Show()
-	{
-		BAutolock lock(fSavePanel->Window());
-		if (lock.IsLocked()) {
-			fSavePanelTextView->SetText(Title());
-		}
-	}
+	fSavePanel->SetSaveText(Title()); 
 	if (message != 0) {
 		fSavePanel->SetMessage(message);
 	}

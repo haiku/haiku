@@ -13,18 +13,11 @@ App StyledEdit :
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
-	# OBOS textencodings
-	CharacterSet.cpp
-	CharacterSetRoster.cpp
-	character_sets.cpp
 	# OBOS String
 	String.cpp
 	string_helper.cpp
 	;
 
-SEARCH on <src!apps!stylededit>CharacterSet.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
-SEARCH on <src!apps!stylededit>CharacterSetRoster.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
-SEARCH on <src!apps!stylededit>character_sets.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
 SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 SEARCH on <src!apps!stylededit>string_helper.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 
