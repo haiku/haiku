@@ -624,6 +624,11 @@ static struct ignore_pattern *ignore_patterns;
    want to mess up the terminal if control chars get sent to it, and some
    quoting methods pass through control chars as-is.  */
 static int qmark_funny_chars;
+#ifdef __BEOS__  /* Default to show UTF8 chars in BeOS terminal. */
+#define QMARK_FUNNY_CHARS_TTY 0
+#else
+#define QMARK_FUNNY_CHARS_TTY 1
+#endif
 
 /* Quoting options for file and dir name output.  */
 
@@ -1243,7 +1248,7 @@ decode_switches (int argc, char **argv)
   /* Record whether there is an option specifying sort type.  */
   int sort_type_specified = 0;
 
-  qmark_funny_chars = 0;
+  qmark_funny_chars = QMARK_FUNNY_CHARS_TTY;
 
   /* initialize all switches to default settings */
 
