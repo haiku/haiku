@@ -127,7 +127,9 @@ sem_id BTextView::sWidthSem = B_BAD_SEM_ID;
 int32 BTextView::sWidthAtom = 0;
 #endif
 
-
+const static rgb_color kBlueInputColor = { 152, 203, 255 };			
+const static rgb_color kRedInputColor = { 255, 152, 152 };	
+															
 static property_info
 sPropertyList[] = {
 	{
@@ -457,7 +459,8 @@ BTextView::MouseDown(BPoint where)
 	if (fCaretVisible)
 		InvertCaret();
 	
-	int32 mouseOffset = OffsetAt(where);	
+	int32 oldOffset = fClickOffset;
+	fClickOffset = OffsetAt(where);	
 	bool shiftDown = modifiers() & B_SHIFT_KEY;
 
 	// TODO: Asynchronous mouse tracking
@@ -471,7 +474,7 @@ BTextView::MouseDown(BPoint where)
 		// since dragging works also with the primary button.
 		if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 			// was the click within the selection range?
-			if (mouseOffset >= fSelStart && mouseOffset <= fSelEnd) {
+			if (fClickOffset >= fSelStart && fClickOffset <= fSelEnd) {
 				InitiateDrag();
 				return;
 			}
@@ -492,7 +495,7 @@ BTextView::MouseDown(BPoint where)
 
 	// is this a double/triple click, or is it a new click?
 	if (clickSpeed > (system_time() - fClickTime) &&
-		 mouseOffset == fClickOffset ) {
+		 oldOffset == fClickOffset ) {
 		if (fClickCount > 1) {
 			// triple click
 			fClickCount = 0;
@@ -504,12 +507,11 @@ BTextView::MouseDown(BPoint where)
 		}
 	} else {
 		// new click
-		fClickOffset = mouseOffset;
 		fClickCount = 1;
 		fClickTime = system_time();
 	
 		if (!shiftDown) {
-			Select(mouseOffset, mouseOffset);
+			Select(fClickOffset, fClickOffset);
 			if (fEditable)
 				InvertCaret();
 		}
@@ -522,15 +524,15 @@ BTextView::MouseDown(BPoint where)
 	// track the mouse while it's down
 	long start = 0;
 	long end = 0;
-	long anchor = (mouseOffset > fSelStart) ? fSelStart : fSelEnd;
+	long anchor = (fClickOffset > fSelStart) ? fSelStart : fSelEnd;
 	BPoint curMouse = where;
 	ulong buttons = 0;
 	do {
-		if (mouseOffset > anchor) {
+		if (fClickOffset > anchor) {
 			start = anchor;
-			end = mouseOffset;
+			end = fClickOffset;
 		} else {
-			start = mouseOffset;
+			start = fClickOffset;
 			end = anchor;
 		}
 		
@@ -543,7 +545,7 @@ BTextView::MouseDown(BPoint where)
 												
 			case 2:
 				// double click, select word by word
-				FindWord(mouseOffset, &start, &end);			
+				FindWord(fClickOffset, &start, &end);			
 				break;
 				
 			default:
@@ -552,7 +554,7 @@ BTextView::MouseDown(BPoint where)
 		}
 
 		if (shiftDown) {
-			if (mouseOffset > anchor)
+			if (fClickOffset > anchor)
 				start = anchor;
 			else
 				end = anchor;
@@ -590,7 +592,7 @@ BTextView::MouseDown(BPoint where)
 		snooze(30000);
 		
 		GetMouse(&curMouse, &buttons);
-		mouseOffset = OffsetAt(curMouse);		
+		fClickOffset = OffsetAt(curMouse);		
 	} while (buttons != 0);
 }
 
@@ -2099,7 +2101,8 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
-
+	height = ceil(height);
+	
 	return height;
 }
 
@@ -2952,12 +2955,15 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 		case B_LEFT_ARROW:
 			if (fClickOffset > 0)
 				fClickOffset = PreviousInitialByte(fClickOffset);
-			
+			else if (shiftDown)
+				return;
+				
 			if (shiftDown) {
 				if (fClickOffset >= fSelStart)
 					selEnd = fClickOffset;
 				else
-					selStart = fClickOffset;
+					selStart = fClickOffset; 
+							
 			} else
 				selStart = selEnd = fClickOffset;
 	
@@ -2967,7 +2973,9 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 		case B_RIGHT_ARROW:
 			if (fClickOffset < fText->Length())
 				fClickOffset = NextInitialByte(fClickOffset);
-			
+			else if (shiftDown)
+				return;
+				
 			if (shiftDown) {
 				if (fClickOffset <= fSelEnd)
 					selStart = fClickOffset;
@@ -3019,8 +3027,9 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 	// invalidate the null style
 	fStyles->InvalidateNullStyle();
 	
-	Select(selStart, selEnd);
-	
+	if (selEnd != fSelEnd || selStart != fSelStart)
+		Select(selStart, selEnd);
+		
 	// scroll if needed
 	ScrollToOffset(scrollToOffset);
 }
@@ -3217,7 +3226,8 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 	
 	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
 
-	Refresh(fSelStart, fSelEnd, refresh, true);
+	if (Window())
+		Refresh(fSelStart, fSelEnd, refresh, true);
 }
 
 
@@ -3235,6 +3245,11 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 {
 	// TODO: Cleanup
 	CALLED();
+	
+	ASSERT(Window() != NULL);
+	if (!Window())
+		return;
+		
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
 	int32 toLine = LineAt(toOffset);
@@ -3705,8 +3720,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		
 		// do we have any text to draw?
 		if (length > 0) {
-			// iterate through each style on this line
-			//BPoint		startPenLoc;
 			bool foundTab = false;
 			long tabChars = 0;
 			long numTabs = 0;
@@ -3714,15 +3727,13 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			const BFont *font = NULL;
 			const rgb_color *color = NULL;
 			int32 numChars;
+			// iterate through each style on this line
 			while ((numChars = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
 				SetFont(font);
 				SetHighColor(*color);
 				
 				tabChars = numChars;
 				do {
-					//if (style->underline)
-					//	startPenLoc = PenLocation();
-					
 					foundTab = fText->FindChar(B_TAB, offset, &tabChars);
 					if (foundTab) {
 						for (numTabs = 0; (tabChars + numTabs) < numChars; numTabs++) {
@@ -3731,26 +3742,37 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						}
 					}
 					
-					// TODO: Revisit this as it looks ugly
-					// and add clauses support (red highlighing)
+					// TODO: Revisit this as it looks ugly, and it's not even efficient,
+					// as the red highlight is drawn over the blue one.
 					if (fInline && fInline->IsActive()) {
 						int32 inlineOffset = fInline->Offset();
 						int32 inlineLength = fInline->Length();
 						if (inlineOffset >= offset &&
 								inlineOffset + inlineLength <= offset + length) {
+							
 							float height;
 							BPoint rightBottom = PointAt(inlineOffset + inlineLength, &height);
 							rightBottom.y += height;
 							BRect rect(PointAt(inlineOffset), rightBottom);
 							
-							PushState();
-							
-							rgb_color blue = {152, 203, 255};
-							//rgb_color red = {255, 152, 152};				
-							SetLowColor(blue);
+							// Highlight in blue the inputted text
+							PushState();	
+							SetLowColor(kBlueInputColor);
 							FillRect(rect, B_SOLID_LOW);
-							
 							PopState();
+							
+							// Highlight in red the selected part
+							if (fInline->SelectionLength() > 0) {
+								rightBottom = PointAt(inlineOffset + fInline->SelectionOffset() +
+													fInline->SelectionLength(), &height);
+								rightBottom.y += height;
+								rect.SetLeftTop(PointAt(inlineOffset + fInline->SelectionOffset()));
+								rect.SetRightBottom(rightBottom);
+								PushState();
+								SetLowColor(kRedInputColor);
+								FillRect(rect, B_SOLID_LOW);
+								PopState();
+							}		
 						}
 					}
 					
@@ -3767,17 +3789,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						tabChars += numTabs;
 					}
 					
-					/*if (style->underline) {
-						BPoint savePenLoc = PenLocation();
-						BPoint curPenLoc = savePenLoc;
-						startPenLoc.y += 1.0;
-						curPenLoc.y += 1.0;
-
-						StrokeLine(startPenLoc, curPenLoc);
-						
-						MovePenTo(savePenLoc);
-					}*/
-
 					offset += tabChars;
 					length -= tabChars;
 					numChars -= tabChars;
@@ -4374,6 +4385,9 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fInline->ResetClauses();
 	
 	// Get the clauses, and pass them to the _BInlineInput_ object
+	// TODO: Find out if what we did it's ok, currently we don't consider clauses
+	// at all, while the bebook says we should; though the visual effect we obtained
+	// seems correct. Weird.
 	int32 clauseCount = 0;
 	int32 clauseStart;
 	int32 clauseEnd;
@@ -4383,12 +4397,13 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 		clauseCount++;	
 	}
 	
-	int32 selCount = 0;
-	int32 selection;
-	while (message->FindInt32("be:selection", selCount, &selection) == B_OK) {
-		// TODO: Do something with the selection
-		selCount++;	
-	}
+	int32 selectionStart = 0;
+	int32 selectionEnd = 0;
+	message->FindInt32("be:selection", 0, &selectionStart);
+	message->FindInt32("be:selection", 1, &selectionEnd);
+	
+	fInline->SetSelectionOffset(selectionStart);
+	fInline->SetSelectionLength(selectionEnd - selectionStart);
 	
 	if (clauseCount > 0) {
 		// Insert the new text
@@ -4458,7 +4473,8 @@ BTextView::CancelInputMethod()
 	delete fInline;
 	fInline = NULL;
 	
-	Refresh(0, fText->Length(), true, false);
+	if (Window())
+		Refresh(0, fText->Length(), true, false);
 }
 
 

@@ -23,6 +23,11 @@
 //	Author:			Stefano Ceccherini (burton666@libero.it)
 //	Description:	Helper class to handle input method requests
 //------------------------------------------------------------------------------
+
+// TODO: he bebook says we should highlight in blue/red different "clauses".
+// Though it looks like what really matters is the "selection" field in
+// the BMessage sent by the input method addon. Have I missed something ?
+
 #include "InlineInput.h"
 
 #include <cstdlib>
@@ -43,6 +48,8 @@ _BInlineInput_::_BInlineInput_(BMessenger messenger)
 	fActive(false),
 	fOffset(0),
 	fLength(0),
+	fSelectionOffset(0),
+	fSelectionLength(0),
 	fNumClauses(0),
 	fClauses(NULL)
 {
@@ -120,6 +127,34 @@ _BInlineInput_::SetOffset(int32 offset)
 }
 
 
+int32
+_BInlineInput_::SelectionLength() const
+{
+	return fSelectionLength;
+}
+
+
+void
+_BInlineInput_::SetSelectionLength(int32 length)
+{
+	fSelectionLength = length;
+}
+
+
+int32
+_BInlineInput_::SelectionOffset() const
+{
+	return fSelectionOffset;
+}
+
+
+void
+_BInlineInput_::SetSelectionOffset(int32 offset)
+{
+	fSelectionOffset = offset;
+}
+
+
 /*! \brief Adds a clause (see "The Input Server" sez. for details).
 	\param start The offset into the string where the clause starts.
 	\param end The offset into the string where the clause finishes.
@@ -155,7 +190,14 @@ _BInlineInput_::GetClause(int32 index, int32 *start, int32 *end) const
 	return result;
 }
 
-	
+
+int32
+_BInlineInput_::CountClauses() const
+{
+	return fNumClauses;
+}
+
+
 /*! \brief Deletes any added clause.
 */
 void

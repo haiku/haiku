@@ -44,9 +44,16 @@ public:
 	
 	int32 Offset() const;
 	void SetOffset(int32 offset);
+		
+	int32 SelectionLength() const;
+	void SetSelectionLength(int32);
+	
+	int32 SelectionOffset() const;
+	void SetSelectionOffset(int32 offset);
 	
 	void AddClause(int32, int32);
 	bool GetClause(int32 index, int32 *start, int32 *end) const;
+	int32 CountClauses() const;
 	
 	void ResetClauses();
 	
@@ -57,6 +64,9 @@ private:
 		
 	int32 fOffset;
 	int32 fLength;
+	
+	int32 fSelectionOffset;
+	int32 fSelectionLength;
 	
 	int32 fNumClauses;
 	clause *fClauses;
