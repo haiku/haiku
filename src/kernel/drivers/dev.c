@@ -71,7 +71,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 {
 	image_id id;
 	char path[SYS_MAX_PATH_LEN];
-	// uint32 * api_version;
+	uint32 *api_version;
 	status_t (*init_hardware)(void);
 	status_t (*init_driver)(void);
 	status_t (*uninit_driver)(void);
@@ -82,15 +82,23 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 		
 	sprintf(path, "%s/%s", dirpath, name);
 
+	/* Load the module, return error if unable */
 	id = elf_load_kspace(path, "");
 	if(id < 0)
 		return id;
 
-	// get device driver API symbols
-	// api_version = (uint32 *) elf_lookup_symbol(id, "api_version");
-	init_hardware = (void *) elf_lookup_symbol(id, "init_hardware");
-	init_driver = (void *) elf_lookup_symbol(id, "init_driver");
-	uninit_driver = (void *) elf_lookup_symbol(id, "uninit_driver");
+	/* Don't get all the symbols we will require initially. Just get the
+	 * ones we need to check we have a valid module.
+	 * elf_find_symbol is an extra call and so we don't make it more often
+	 * than we have to.
+	 */
+	/* For a valid device driver we MUST have the publish_devices and 
+	 * find_device functions available
+	 */
+	/* XXX - very few drivers have the api_version symbol defined yet.
+	 *       Add api_version to the rest of the drivers!
+	 */
+	api_version = (uint32 *) elf_lookup_symbol(id, "api_version");
 	publish_devices = (void *) elf_lookup_symbol(id, "publish_devices");
 	find_device = (void *) elf_lookup_symbol(id, "find_device");
 
@@ -100,44 +108,81 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 		goto error;
 	} 
 
+	/* Next, do we have an init_hardware function? If we do run it and
+	 * if it fails simply fall through to the exit...
+	 */
+	init_hardware = (void *) elf_lookup_symbol(id, "init_hardware");
 	if (init_hardware && init_hardware() != 0) {
 		dprintf("DEV: %s: init_hardware failed :(\n", name);
 		id = ENXIO;
 		goto error;
 	}
 
+	/* OK, so we now have what appears to be a valid module that has
+	 * completed init_hardware and thus thinks it should be used.
+	 * XXX - this is bogus!
+	 * XXX - the driver init routines should be called by devfs and 
+	 *       only when the driver is first needed. However, that level
+	 *       level of support is not yet in devfs, so we have a hack
+	 *       here that calls the init_driver function at this point.
+	 *       As a result we will check to see if we actually manage to
+	 *       publish the device, and if we do we will keep the module
+	 *       loaded.
+	 * XXX - remove this when devfs is fixed!
+	 */
+	init_driver = (void *) elf_lookup_symbol(id, "init_driver");
 	if (init_driver && init_driver() != 0) {
 		dprintf("DEV: %s: init_driver failed :(\n", name);
 		id = ENXIO;
 		goto error;
-		}
-		
-//	dprintf("DEV: Well alright - %s init'd OK!\n", name);
+	}
 
-	/* Should really cycle through these... */
-	devfs_paths = publish_devices();
+	/* Start of with the keep_loaded as false. If we have a successful
+	 * call to devfs_publish_device we will set this to true.
+	 */
 	keep_loaded = false;
+	devfs_paths = publish_devices();
 	for (; *devfs_paths; devfs_paths++) {
-		device_hooks * hooks;
-
-		hooks = find_device(*devfs_paths);
-		dprintf("DEV: %s: publishing %s\n", name, *devfs_paths);
+		device_hooks *hooks = find_device(*devfs_paths);
 		if (hooks) {
+			dprintf("DEV: %s: publishing %s with hooks %p\n", 
+			        name, *devfs_paths, hooks);
 			if (devfs_publish_device(*devfs_paths, NULL, hooks) == 0)
 				keep_loaded = true;
 		}
 	}
 	
+	/* If we've managed to publish at least one of the device entry
+	 * points that the driver wished us to then we MUST keep the driver in
+	 * memory or the pointer that devfs has will become invalid.
+	 * XXX - This is bogus, see above
+	 */
 	if (keep_loaded)
-		// okay, keep this driver image in memory, as he publish *something*
 		return id;
 	
-	// no need to keep this driver image loaded... 
+	/* If the fucntion gets here then the following has happenned...
+	 * - the driver has been loaded
+	 * - it has appeared valid
+	 * - init_hardware has returned saying it should be used
+	 * - init_driver has been run OK
+	 * - devfs_publish_devices has for some reason failed.
+	 * The error value we're about to return is 0, which probably
+	 * means we're loosing error information here :(
+	 * XXX - what error code should we be returning
+	 *
+	 * However, before we unload ourselves we will try to find and run
+	 * the uninit routine.
+	 */
+
+	uninit_driver = (void *) elf_lookup_symbol(id, "uninit_driver");
 	if (uninit_driver)
 		uninit_driver();
 	id = 0;
 
 error:
+	/* If we've gotten here then the driver will be unloaded and an
+	 * error code returned.
+	 */
 	elf_unload_kspace(path);
 	return id;
 }
