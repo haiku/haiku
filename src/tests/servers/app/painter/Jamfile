@@ -15,7 +15,8 @@ SimpleTest Painter :
 	ShapeConverter.cpp
 	Transformable.cpp
 	DrawingModeFactory.cpp
-	agg_font_freetype.cpp
+	# already included in libagg.a build
+	#agg_font_freetype.cpp
 	AGGTextRenderer.cpp
 	FontFamily.cpp
 	FontManager.cpp
@@ -26,7 +27,7 @@ SimpleTest Painter :
 	ServerFont.cpp
 	SystemPalette.cpp
 	ColorUtils.cc
-	: be libagg.so libfreetype.so textencoding ;
+	: be libagg.a libfreetype.so textencoding ;
 
 SEARCH on [ FGristFiles
 	ColorUtils.cc
@@ -61,7 +62,7 @@ SEARCH on [ FGristFiles
 	= [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
 
 SEARCH on [ FGristFiles
-	agg_font_freetype.cpp
+#	agg_font_freetype.cpp
 	AGGTextRenderer.cpp
 	FontManager.cpp
 	TextRenderer.cpp
