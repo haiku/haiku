@@ -6,7 +6,6 @@ KernelMergeObject kernel_util.o :
 	cbuf.c
 	kernel_cpp.cpp
 	khash.c
-	KMessage.cpp
 	list.c
 	queue.c
 

@@ -9,6 +9,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 	# for "Locker.h"
 
 KernelMergeObject kernel_messaging.o :
+	KMessage.cpp
 	MessagingService.cpp
 
 	: -fno-pic -Wno-unused -D_KERNEL_MODE
