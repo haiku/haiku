@@ -2,4 +2,5 @@ SubDir OBOS_TOP src add-ons mail_daemon inbound_filters ;
 
 SubInclude OBOS_TOP src add-ons mail_daemon inbound_filters r5_filter ;
 SubInclude OBOS_TOP src add-ons mail_daemon inbound_filters match_header ;
+SubInclude OBOS_TOP src add-ons mail_daemon inbound_filters spam_filter ;
 
