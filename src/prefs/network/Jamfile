@@ -5,3 +5,8 @@ AddResources Network : Network.rsrc ;
 Preference Network : Network.cpp funcs.cpp ;
 
 LinkSharedOSLibs Network : be root ;
+
+Package haiku-networkingkit-cvs :
+	Network :
+#	boot beos preferences ;
+	boot home Desktop haiku-networkingkit ;
