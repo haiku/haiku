@@ -313,7 +313,7 @@ DynamicScrollView::UpdateBars()
 
 
 GroupView::GroupView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -334,7 +334,6 @@ GroupView::AttachedToWindow()
 
 		control->SetTarget(control);
 	}
-
 }
 
 
@@ -703,9 +702,13 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 		if (groupView == NULL)
 			continue;
 
-		// the top-level group views must not be larger than their hintRect
-		if (GroupView *view = dynamic_cast<GroupView *>(groupView))
+		if (GroupView *view = dynamic_cast<GroupView *>(groupView)) {
+			// the top-level group views must not be larger than their hintRect,
+			// but unlike their children, they should follow all sides when
+			// their parent is resized
 			view->ResizeTo(rect.Width() - 10, rect.Height() - 10);
+			view->SetResizingMode(B_FOLLOW_ALL);
+		}
 
 		if (tabView == NULL) {
 			// if we don't need a container to put that view into,
@@ -767,8 +770,8 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 
 	// Add the sub-group views
 
-	rect.right = rect.left + 50;
-	rect.bottom = rect.top + 10;
+	rect.right = rect.left + 20;
+	rect.bottom = rect.top + 20;
 	float lastHeight = 0;
 
 	for (int32 i = 0; i < group.CountGroups(); i++) {
