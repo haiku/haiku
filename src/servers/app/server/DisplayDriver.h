@@ -42,7 +42,7 @@ class ServerBitmap;
 class LayerData;
 
 #ifndef ROUND
-	#define ROUND(a)	( (a-long(a))>=.5)?(long(a)+1):(long(a))
+	#define ROUND(a)	( (long)(a+.5) )
 #endif
 
 /*!
