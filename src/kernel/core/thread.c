@@ -35,6 +35,14 @@
 #include <kerrors.h>
 #include <syscalls.h>
 
+#define TRACE_THREAD 0
+#if TRACE_THREAD
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 #define THREAD_MAX_MESSAGE_SIZE		65536
 
 struct thread_key {
@@ -180,16 +188,16 @@ thread_struct_compare(void *_t, const void *_key)
 }
 
 
-static unsigned int
-thread_struct_hash(void *_t, const void *_key, unsigned int range)
+static uint32
+thread_struct_hash(void *_t, const void *_key, uint32 range)
 {
 	struct thread *t = _t;
 	const struct thread_key *key = _key;
 
 	if (t != NULL)
-		return (t->id % range);
+		return t->id % range;
 
-	return (key->id % range);
+	return key->id % range;
 }
 
 
@@ -831,23 +839,25 @@ static void
 thread_exit2(void *_args)
 {
 	struct thread_exit_args args;
-//	char *temp;
 
 	// copy the arguments over, since the source is probably on the kernel stack we're about to delete
 	memcpy(&args, _args, sizeof(struct thread_exit_args));
 
 	// restore the interrupts
-	restore_interrupts(args.int_state);
+	enable_interrupts();
+	// ToDo: was:
+	// restore_interrupts(args.int_state);
+	// we probably don't want to let the interrupts disabled at this point??
 
-//	dprintf("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base);
+	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
 
 	// delete the old kernel stack region
-//	dprintf("thread_exit2: deleting old kernel stack id 0x%x for thread 0x%x\n", args.old_kernel_stack, args.t->id);
+	TRACE(("thread_exit2: deleting old kernel stack id 0x%x for thread 0x%x\n", args.old_kernel_stack, args.t->id));
 	vm_delete_region(vm_get_kernel_aspace_id(), args.old_kernel_stack);
 
-//	dprintf("thread_exit2: removing thread 0x%x from global lists\n", args.t->id);
-
 	// remove this thread from all of the global lists
+	TRACE(("thread_exit2: removing thread 0x%x from global lists\n", args.t->id));
+
 	disable_interrupts();
 	GRAB_TEAM_LOCK();
 	remove_thread_from_team(team_get_kernel_team(), args.t);
@@ -856,7 +866,10 @@ thread_exit2(void *_args)
 	hash_remove(thread_hash, args.t);
 	RELEASE_THREAD_LOCK();
 
-//	dprintf("thread_exit2: done removing thread from lists\n");
+	// ToDo: is this correct at this point?
+	restore_interrupts(args.int_state);
+
+	TRACE(("thread_exit2: done removing thread from lists\n"));
 
 	if (args.death_sem >= 0)
 		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
@@ -881,9 +894,12 @@ thread_exit(void)
 	unsigned int death_stack;
 	sem_id cached_death_sem;
 
-	dprintf("thread 0x%lx exiting %s w/return code 0x%x\n", t->id,
+	if (!are_interrupts_enabled())
+		dprintf("thread_exit() called with interrupts disabled!\n");
+
+	TRACE(("thread 0x%lx exiting %s w/return code 0x%x\n", t->id,
 		t->return_flags & THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
-		(int)t->return_code);
+		(int)t->return_code));
 
 	// boost our priority to get this over with
 	t->priority = B_FIRST_REAL_TIME_PRIORITY;
