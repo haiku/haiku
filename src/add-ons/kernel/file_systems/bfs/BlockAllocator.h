@@ -52,7 +52,8 @@ class BlockAllocator {
 		Volume			*fVolume;
 		Semaphore		fLock;
 		AllocationGroup	*fGroups;
-		int32			fNumGroups, fBlocksPerGroup;
+		int32			fNumGroups;
+		uint32			fBlocksPerGroup;
 		uint32			*fCheckBitmap;
 		check_cookie	*fCheckCookie;
 };

@@ -61,11 +61,11 @@ class AllocationBlock : public CachedBlock {
 
 		status_t SetTo(AllocationGroup &group, uint16 block);
 
-		int32 NumBlockBits() const { return fNumBits; }
+		uint32 NumBlockBits() const { return fNumBits; }
 		uint32 &Block(int32 index) { return ((uint32 *)fBlock)[index]; }
 
 	private:
-		int32 fNumBits;
+		uint32 fNumBits;
 };
 
 
@@ -79,7 +79,7 @@ class AllocationGroup {
 		status_t Allocate(Transaction *transaction, uint16 start, int32 length);
 		status_t Free(Transaction *transaction, uint16 start, int32 length);
 
-		int32 fNumBits;
+		uint32 fNumBits;
 		int32 fStart;
 		int32 fFirstFree, fLargest, fLargestFirst;
 			// ToDo: fLargest & fLargestFirst are not maintained (and therefore used) yet!
@@ -122,8 +122,8 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 	ASSERT(start < fNumBits);
 	ASSERT(start + numBlocks <= fNumBits);
 
-	if (start + numBlocks > fNumBits) {
-		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %u)!\n", numBlocks, fNumBits));
+	if (uint32(start + numBlocks) > fNumBits) {
+		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
 		DIE(("Allocation::Allocate(): tried to allocate too many blocks"));
 	}
 
@@ -153,8 +153,8 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 	ASSERT(start < fNumBits);
 	ASSERT(start + numBlocks <= fNumBits);
 
-	if (start + numBlocks > fNumBits) {
-		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %u)!\n", numBlocks, fNumBits));
+	if (uint32(start + numBlocks) > fNumBits) {
+		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
 		DIE(("Allocation::Free(): tried to free too many blocks"));
 	}
 
@@ -290,7 +290,7 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 			RETURN_ERROR(B_IO_ERROR);
 
 		uint16 freeLength = length;
-		if (start + length > cached.NumBlockBits())
+		if (uint32(start + length) > cached.NumBlockBits())
 			freeLength = cached.NumBlockBits() - start;
 
 		cached.Free(start, freeLength);
@@ -371,7 +371,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 		groups[i].fStart = offset;
 
 		// finds all free ranges in this allocation group
-		int32 start,range = 0;
+		int32 start = -1, range = 0;
 		int32 size = groups[i].fNumBits, num = 0;
 
 		for (int32 k = 0;k < (size >> 2);k++) {
@@ -466,12 +466,12 @@ BlockAllocator::AllocateBlocks(Transaction *transaction, int32 group, uint16 sta
 		uint32 block = start / (fVolume->BlockSize() << 3);
 		int32 range = 0, rangeStart = 0;
 
-		for (;block < fBlocksPerGroup;block++) {
+		for (; block < fBlocksPerGroup; block++) {
 			if (cached.SetTo(fGroups[group], block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
 			// find a block large enough to hold the allocation
-			for (int32 bit = start % cached.NumBlockBits(); bit < cached.NumBlockBits(); bit++) {
+			for (uint32 bit = start % cached.NumBlockBits(); bit < cached.NumBlockBits(); bit++) {
 				if (!cached.IsUsed(bit)) {
 					if (range == 0) {
 						// start new range
@@ -610,14 +610,14 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 	// against the group size (the last group may have a different length)
 	if (group < 0 || group >= fNumGroups
 		|| start > fGroups[group].fNumBits
-		|| start + length > fGroups[group].fNumBits
+		|| uint32(start + length) > fGroups[group].fNumBits
 		|| length == 0) {
 		FATAL(("tried to free an invalid block_run (%ld, %u, %u)\n", group, start, length));
 		DEBUGGER(("tried to free invalid block_run"));
 		return B_BAD_VALUE;
 	}
 	// check if someone tries to free reserved areas at the beginning of the drive
-	if (group == 0 && start < fVolume->Log().start + fVolume->Log().length) {
+	if (group == 0 && start < uint32(fVolume->Log().start + fVolume->Log().length)) {
 		FATAL(("tried to free a reserved block_run (%ld, %u, %u)\n", group, start, length));
 		DEBUGGER(("tried to free reserved block"));
 		return B_BAD_VALUE;
@@ -877,7 +877,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 				|| (cookie->parent_mode & S_INDEX_DIR && !inode->IsIndex())
 				|| ((cookie->parent_mode & S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR) == S_DIRECTORY
 					&& inode->Mode() & (S_ATTR | S_ATTR_DIR | S_INDEX_DIR))) {
-				FATAL(("inode at %Ld is of wrong type: %lo (parent %lo at %Ld)!\n",
+				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!\n",
 					inode->BlockNumber(), inode->Mode(), cookie->parent_mode, cookie->parent->BlockNumber()));
 
 				// if we are allowed to fix errors, we should remove the file
@@ -949,7 +949,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 {
 	if (run.allocation_group < 0 || run.allocation_group >= fNumGroups
 		|| run.start > fGroups[run.allocation_group].fNumBits
-		|| run.start + run.length > fGroups[run.allocation_group].fNumBits
+		|| uint32(run.start + run.length) > fGroups[run.allocation_group].fNumBits
 		|| run.length == 0) {
 		PRINT(("%s: block_run(%ld, %u, %u) is invalid!\n", type, run.allocation_group, run.start, run.length));
 		if (control == NULL)
