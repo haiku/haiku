@@ -136,6 +136,33 @@ Registrar::MessageReceived(BMessage *message)
 			break;
 		case B_REG_STOP_WATCHING:
 			fRoster->HandleStopWatching(message);
+			break;	
+		case B_REG_GET_RECENT_DOCUMENTS:
+			fRoster->HandleGetRecentDocuments(message);
+			break;
+		case B_REG_GET_RECENT_FOLDERS:
+			fRoster->HandleGetRecentFolders(message);
+			break;
+		case B_REG_GET_RECENT_APPS:
+			fRoster->HandleGetRecentApps(message);
+			break;
+		case B_REG_ADD_TO_RECENT_DOCUMENTS:
+			fRoster->HandleAddToRecentDocuments(message);
+			break;
+		case B_REG_ADD_TO_RECENT_FOLDERS:
+			fRoster->HandleAddToRecentFolders(message);
+			break;
+		case B_REG_ADD_TO_RECENT_APPS:
+			fRoster->HandleAddToRecentApps(message);
+			break;
+		case B_REG_CLEAR_RECENT_DOCUMENTS:
+			fRoster->HandleClearRecentDocuments(message);
+			break;
+		case B_REG_CLEAR_RECENT_FOLDERS:
+			fRoster->HandleClearRecentFolders(message);
+			break;
+		case B_REG_CLEAR_RECENT_APPS:
+			fRoster->HandleClearRecentApps(message);
 			break;
 		// message runner requests
 		case B_REG_REGISTER_MESSAGE_RUNNER:
