@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 ps2mouse ;
 
+if $(COMPILE_FOR_R5) {
+	SubDirCcFlags -DCOMPILE_FOR_R5 ;
+}
+
 UsePrivateHeaders input ;
 
 KernelObjects
@@ -19,3 +23,28 @@ KernelLd ps2mouse :
 	:
 	drivers/dev/ps2mouse
 	; 
+
+R5KernelAddon <driver>ps2mouse : kernel drivers bin :
+	ps2mouse.c
+;
+
+# Link to kernel/drivers/dev/input
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
+	local instDriver = <kernel!drivers!dev!input>ps2mouse ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : <driver>ps2mouse ;
+}
+
+#Package haiku-inputkit-cvs
+#	:
+#	<driver>ps2mouse
+#	:
+#	boot home config add-ons kernel drivers bin ;
+
+#Package haiku-inputkit-cvs
+#	:
+#	<kernel!drivers!dev!input>ps2mouse
+#	:
+#	boot home config add-ons kernel drivers dev input ;
+
