@@ -195,7 +195,7 @@ set_test_app_attributes(const entry_ref *app, const char *sig, const int32 *flag
 	if (!err) {
 		if (sig) {
 			// Set the attribute
-			ssize_t bytes = node.WriteAttr(kSigAttr, B_STRING_TYPE, 0, sig, strlen(sig)+1);
+			ssize_t bytes = node.WriteAttr(kSigAttr, B_MIME_STRING_TYPE, 0, sig, strlen(sig)+1);
 			if (bytes >= 0)
 				err = bytes == (ssize_t)strlen(sig)+1 ? B_OK : B_FILE_ERROR;
 			else
@@ -234,14 +234,21 @@ launch_test_app(RecentAppsTestAppId id, const int32 *flags)
 {
 	entry_ref ref;
 	status_t err = get_test_app_ref(id, &ref);
-	
+	std::string sig;
 	// Set the attributes
-	if (!err)
-		err = set_test_app_attributes(&ref, kRecentAppsTestAppSigs[id], flags);	
+	if (!err) {
+#ifdef TEST_R5
+		sig = std::string(kRecentAppsTestAppSigs[id]) + "-r5";
+#else
+		sig = kRecentAppsTestAppSigs[id];
+#endif
+		err = set_test_app_attributes(&ref, sig.c_str(), flags);	
+	}
 	// Launch the app
 	if (!err) {
 		BRoster roster;
 		err = roster.Launch(&ref);
+//		err = roster.Launch(sig.c_str());
 	}
 	// Give it time to do its thing
 	if (!err)
