@@ -2,6 +2,7 @@ SubDir OBOS_TOP src servers registrar ;
 
 UsePublicHeaders app ;
 UsePrivateHeaders app ;
+UsePrivateHeaders storage ;
 
 Server obos_registrar :
 	AppInfoList.cpp
@@ -12,7 +13,20 @@ Server obos_registrar :
 	TRoster.cpp
 ;
 LinkSharedOSLibs obos_registrar :
+	<$(SOURCE_GRIST)>libstorage.so
 	<boot!home!config!lib>libopenbeos.so
 	stdc++.r4
 	be root
 ;
+
+# To run the registrar, these libraries must be around.
+{
+	local libdir = [ on obos_registrar FDirName $(LOCATE[1]) lib ] ;
+	MakeLocate <$(SOURCE_GRIST)>libstorage.so : $(libdir) ;
+	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
+	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
+	RelSymLink <$(SOURCE_GRIST)>libbeadapter.so : libbeadapter.so ;
+	Includes <$(SOURCE_GRIST)>libstorage.so
+		: <$(SOURCE_GRIST)>libbeadapter.so ;
+}
+
