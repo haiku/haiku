@@ -500,9 +500,14 @@ int release_sem_etc(sem_id id, int count, int flags)
 	// pull off any items in the release queue and put them in the run queue
 	if (released_threads > 0) {
 		struct thread *t;
+		int priority;
 		GRAB_THREAD_LOCK();
 		while ((t = thread_dequeue(&release_queue)) != NULL) {
+			// temporarily place thread in a run queue with high priority to boost it up
+			priority = t->priority;
+			t->priority = t->priority >= THREAD_HIGH_PRIORITY ? t->priority : THREAD_HIGH_PRIORITY;
 			thread_enqueue_run_q(t);
+			t->priority = priority;
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
 			thread_resched();
