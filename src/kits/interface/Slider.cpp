@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Button.h
+//	File Name:		Slider.h
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	BSlider creates and displays a sliding thumb control.
 //------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 #include <Slider.h>
 #include <Message.h>
 #include <Window.h>
-#include <Errors.h>
+#include <Support/Errors.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -356,8 +356,12 @@ void BSlider::SetValue(int32 value)
 //------------------------------------------------------------------------------
 int32 BSlider::ValueForPoint(BPoint location) const
 {
-	return (int32)((location.x - _MinPosition()) * (fMaxValue - fMinValue) /
-		(_MaxPosition() - _MinPosition())) + fMinValue;
+	if (fOrientation == B_HORIZONTAL)
+		return (int32)((location.x - _MinPosition()) * (fMaxValue - fMinValue) /
+			(_MaxPosition() - _MinPosition())) + fMinValue;
+	else
+		return (int32)((location.y - _MinPosition()) * (fMaxValue - fMinValue) /
+			(_MaxPosition() - _MinPosition())) + fMinValue;
 }
 //------------------------------------------------------------------------------
 void BSlider::SetPosition(float position)
@@ -426,12 +430,9 @@ void BSlider::DrawBar()
 	}
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-//		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-//		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
 		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
 		darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
 		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-//		darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 	
 	SetHighColor(darken1);
@@ -482,18 +483,36 @@ void BSlider::DrawText()
 
 	GetFontHeight(&fheight);
 
-	if (Label())
-		DrawString(Label(), BPoint(2.0f, (float)ceil(fheight.ascent)));
+	if (Orientation() == B_HORIZONTAL)
+	{
+		if (Label())
+			DrawString(Label(), BPoint(2.0f, (float)ceil(fheight.ascent)));
 
-	if (fMinLimitStr == NULL || fMaxLimitStr == NULL)
-		return;
+		if (fMinLimitStr)
+			DrawString(fMinLimitStr, BPoint(2.0f, bounds.bottom - 4.0f));
 
-	if (fMinLimitStr)
-		DrawString(fMinLimitStr, BPoint(2.0f, bounds.bottom - 4.0f));
+		if (fMaxLimitStr)
+			DrawString(fMaxLimitStr, BPoint(bounds.right -
+				StringWidth(fMaxLimitStr) - 2.0f, bounds.bottom - 4.0f));
+	}
+	else
+	{
+		float ascent = (float)ceil(fheight.ascent);
 
-	if (fMaxLimitStr)
-		DrawString(fMaxLimitStr, BPoint(Bounds ().right -
-			StringWidth(fMaxLimitStr) - 2.0f, bounds.bottom - 4.0f));
+		if (Label())
+			DrawString(Label(), BPoint(bounds.Width() / 2.0f -
+				StringWidth(Label()) / 2.0f, ascent));
+
+		if (fMaxLimitStr)
+			DrawString(fMaxLimitStr, BPoint(bounds.Width() / 2.0f -
+				StringWidth(fMaxLimitStr) / 2.0f,
+				ascent + (Label() ? ascent : 0.0f)));
+
+		if (fMinLimitStr)
+			DrawString(fMinLimitStr, BPoint(bounds.Width() / 2.0f -
+				StringWidth(fMinLimitStr) / 2.0f,
+				bounds.bottom - 2.0f));
+	}
 }
 //------------------------------------------------------------------------------
 char *BSlider::UpdateText() const
@@ -510,11 +529,23 @@ BRect BSlider::BarFrame() const
 
 	float textHeight = (float)ceil(fheight.ascent + fheight.descent);
 	
-	frame.left = 8.0f;
-	frame.top = 10.0f + (Label() ? textHeight : 0.0f);
-	frame.right -= 8.0f;
-	frame.bottom = frame.bottom - 10.0f -
-		(MinLimitLabel() || MaxLimitLabel() ? textHeight : 0.0f);
+	if (Orientation() == B_HORIZONTAL)
+	{
+		frame.left = 8.0f;
+		frame.top = 6.0f + (Label() ? textHeight + 4.0f : 0.0f);
+		frame.right -= 8.0f;
+		frame.bottom = frame.bottom - 6.0f -
+			(fMinLimitStr || fMaxLimitStr ? textHeight + 4.0f : 0.0f);
+	}
+	else
+	{
+		frame.left = frame.Width() / 2.0f - 3;
+		frame.top = 12.0f + (Label() ? textHeight : 0.0f) +
+			(fMaxLimitStr ? textHeight : 0.0f);
+		frame.right = frame.left + 6;
+		frame.bottom = frame.bottom - 8.0f -
+			(fMinLimitStr ? textHeight + 4 : 0.0f);
+	}
 
 	return frame;
 }
@@ -534,12 +565,23 @@ BRect BSlider::ThumbFrame() const
 
 	float textHeight = (float)ceil(fheight.ascent + fheight.descent);
 
-	frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
-		_MinPosition() - 8.0f;
-	frame.top = 6.0f + (Label() ? textHeight : 0.0f);
-	frame.right = frame.left + 17.0f;
-	frame.bottom = frame.bottom - 7.0f -
-		(MinLimitLabel() || MaxLimitLabel() ? textHeight : 0.0f);
+	if (Orientation() == B_HORIZONTAL)
+	{
+		frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
+			_MinPosition() - 8.0f;
+		frame.top = 2.0f + (Label() ? textHeight + 4.0f : 0.0f);
+		frame.right = frame.left + 17.0f;
+		frame.bottom = frame.bottom - 3.0f -
+			(MinLimitLabel() || MaxLimitLabel() ? textHeight + 4.0f : 0.0f);
+	}
+	else
+	{
+		frame.left = frame.Width() / 2.0f - 7;
+		frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
+			_MinPosition() - 8.0f;
+		frame.right = frame.left + 13;
+		frame.bottom = frame.top + 17;
+	}
 
 	return frame;
 }
@@ -558,20 +600,37 @@ void BSlider::SetResizingMode(uint32 mode)
 //------------------------------------------------------------------------------
 void BSlider::GetPreferredSize(float *width, float *height)
 {
-	// TODO: It seems that the BarThickness is not taken into account in the
-	//       original implementation, maybe we should add it.
 	font_height fheight;
 
 	GetFontHeight(&fheight);
 
-	*width = (Frame().Width() < 32.0f) ? 32.0f : Frame().Width();
-	*height = 18.0f;
-	
-	if (Label())
-		*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
+	if (Orientation() == B_HORIZONTAL)
+	{
+		*width = (Frame().Width() < 32.0f) ? 32.0f : Frame().Width();
+		*height = 18.0f;
+		
+		if (Label())
+			*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
 
-	if (fMinLimitStr && fMaxLimitStr)
-		*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
+		if (MinLimitLabel() || MaxLimitLabel())
+			*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
+	}
+	else // B_VERTICAL
+	{
+		*width = (Frame().Width() < 18.0f) ? 18.0f : Frame().Width();
+		*height = 32.0f;
+		
+		if (Label())
+			*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
+
+		if (MinLimitLabel() || MaxLimitLabel())
+			*height += (float)ceil(fheight.ascent + fheight.descent) + 4.0f;
+
+		if (Label() && (MinLimitLabel() || MaxLimitLabel()))
+			*height -= 4.0f;
+
+		*height = (Frame().Height() < *height) ? *height : Frame().Height();
+	}
 }
 //------------------------------------------------------------------------------
 void BSlider::ResizeToPreferred()
@@ -679,7 +738,7 @@ void BSlider::UseFillColor(bool use_fill, const rgb_color *bar_color)
 {
 	fUseFillColor = use_fill;
 
-	if ( bar_color )
+	if (bar_color)
 		fFillColor = *bar_color;
 }
 //------------------------------------------------------------------------------
@@ -729,10 +788,7 @@ void BSlider::_DrawBlockThumb()
 	BRect frame = ThumbFrame();
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-//		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
-//		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-//		darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
 		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
 		darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
@@ -768,12 +824,26 @@ void BSlider::_DrawBlockThumb()
 		BPoint(frame.right, frame.bottom));
 	StrokeLine(BPoint(frame.right, frame.top));
 
-	StrokeLine(BPoint(frame.left + 6.0f, frame.top + 2.0f),
-		BPoint(frame.left + 6.0f, frame.top + 2.0f));
-	StrokeLine(BPoint(frame.left + 6.0f, frame.top + 4.0f),
-		BPoint(frame.left + 6.0f, frame.top + 4.0f));
-	StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
-		BPoint(frame.left + 6.0f, frame.top + 6.0f));
+	if (Orientation() == B_HORIZONTAL)
+	{
+		StrokeLine(BPoint(frame.left + 6.0f, frame.top + 2.0f),
+			BPoint(frame.left + 6.0f, frame.top + 2.0f));
+		StrokeLine(BPoint(frame.left + 6.0f, frame.top + 4.0f),
+			BPoint(frame.left + 6.0f, frame.top + 4.0f));
+		StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
+			BPoint(frame.left + 6.0f, frame.top + 6.0f));
+	}
+	else
+	{
+		StrokeLine(BPoint(frame.left + 2.0f, frame.top + 6.0f),
+			BPoint(frame.left + 6.0f, frame.top + 6.0f));
+		/*trokeLine(BPoint(frame.left + 2.0f, frame.top + 6.0f),
+			BPoint(frame.left + 2.0f, frame.top + 6.0f));
+		trokeLine(BPoint(frame.left + 4.0f, frame.top + 6.0f),
+			BPoint(frame.left + 4.0f, frame.top + 6.0f));
+		trokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
+			BPoint(frame.left + 6.0f, frame.top + 6.0f));*/
+	}
 
 	StrokeLine(BPoint(frame.right + 1.0f, frame.bottom + 1.0f),
 		BPoint(frame.right + 1.0f, frame.bottom + 1.0f));
@@ -819,12 +889,42 @@ void BSlider::_SetLocation(BPoint p)
 //------------------------------------------------------------------------------
 float BSlider::_MinPosition() const
 {
-	return 9.0f;
+	if (Orientation() == B_HORIZONTAL)
+		return 9.0f;
+	else
+	{
+		float pos = 12.0f + 1.0f;
+		font_height fh;
+		GetFontHeight(&fh);
+		float textHeight = (float)ceil(fh.ascent + fh.descent);
+
+		if (Label())
+			pos += textHeight;
+
+		if (fMaxLimitStr)
+			pos += textHeight;
+
+		return pos;
+	}
 }
 //------------------------------------------------------------------------------
 float BSlider::_MaxPosition() const
 {
-	return Bounds().Width() - 9.0f;
+	if (Orientation() == B_HORIZONTAL)
+		return Bounds().Width() - 9.0f;
+	else
+	{
+		if(fMaxLimitStr)
+		{
+			font_height fh;
+			GetFontHeight(&fh);
+
+			return Bounds().Height() - (float)ceil(fh.ascent + fh.descent)
+				- 4.0f - 9.0f;
+		}
+		else
+			return Bounds().Height() - 9.0f;
+	}
 }
 //------------------------------------------------------------------------------			
 void BSlider::_ReservedSlider4() {}
