@@ -603,7 +603,7 @@ void WinBorder::PrintToStream()
 	if (fLevel == B_NORMAL_FEEL)
 		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
-	printf("\t%s\n", IsHidden()"hidden" : "not hidden");
+	printf("\t%s\n", IsHidden()?"hidden" : "not hidden");
 }
 
 void WinBorder::UpdateColors(void)
