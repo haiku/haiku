@@ -136,7 +136,7 @@ retry:
 			}
 		};
 		fStreams[serialno] = OggStream::makeOggStream(new Interface(this, serialno), serialno, packet);
-		fCookies.push_back(fStreams[serialno]);
+		fCookies.push_back(serialno);
 	}
 	return fStreams[serialno]->AddPage(position,page);
 }
@@ -292,7 +292,7 @@ OggReader::AllocateCookie(int32 streamNumber, void **cookie)
 		TRACE("OggReader::AllocateCookie: invalid streamNumber: bail\n");
 		return B_ERROR;
 	}
-	OggStream * stream = fCookies[streamNumber];
+	OggStream * stream = fStreams[fCookies[streamNumber]];
 	// store the cookie
 	*cookie = stream;
 	return B_OK;

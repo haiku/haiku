@@ -11,7 +11,7 @@ namespace BPrivate { namespace media {
 class OggStream;
 
 typedef std::map<long,OggStream*> serialno_OggStream_map;
-typedef std::vector<OggStream*> OggStream_vector;
+typedef std::vector<long> serialno_vector;
 
 class OggReader : public Reader
 {
@@ -47,7 +47,7 @@ protected:
 
 	ogg_sync_state			fSync;
 	serialno_OggStream_map	fStreams;
-	OggStream_vector		fCookies;
+	serialno_vector			fCookies;
 	BPositionIO *			fSeekable;
 
 private:
