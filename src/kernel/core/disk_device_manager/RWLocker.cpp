@@ -435,8 +435,8 @@ RWLocker::_WriteLock(bigtime_t timeout)
 int32
 RWLocker::_AddReadLockInfo(ReadLockInfo* info)
 {
-	int32 index = fReadLockInfos.CountItems();
-	fReadLockInfos.AddItem(info, index);
+	int32 index = fReadLockInfos.Count();
+	fReadLockInfos.Insert(info, index);
 	return index;
 }
 
@@ -457,8 +457,9 @@ RWLocker::_NewReadLockInfo(thread_id thread, int32 count)
 void
 RWLocker::_DeleteReadLockInfo(int32 index)
 {
-	if (ReadLockInfo* info = fReadLockInfos.ItemAt(index)) {
-		fReadLockInfos.RemoveItem(index);
+	if (index >= 0 && index < fReadLockInfos.Count()) {
+		ReadLockInfo* info = fReadLockInfos.ElementAt(index);
+		fReadLockInfos.Erase(index);
 		delete info;
 	}
 }
@@ -467,14 +468,16 @@ RWLocker::_DeleteReadLockInfo(int32 index)
 RWLocker::ReadLockInfo*
 RWLocker::_ReadLockInfoAt(int32 index) const
 {
-	return fReadLockInfos.ItemAt(index);
+	if (index >= 0 && index < fReadLockInfos.Count())
+		return fReadLockInfos.ElementAt(index);
+	return NULL;
 }
 
 // _IndexOf
 int32
 RWLocker::_IndexOf(thread_id thread) const
 {
-	int32 count = fReadLockInfos.CountItems();
+	int32 count = fReadLockInfos.Count();
 	for (int32 i = 0; i < count; i++) {
 		if (_ReadLockInfoAt(i)->reader == thread)
 			return i;

@@ -70,7 +70,7 @@
 
 #include <OS.h>
 
-#include "List.h"
+#include <Vector.h>
 
 class RWLocker {
  public:
@@ -114,16 +114,18 @@ class RWLocker {
 	static	void				_ReleaseBenaphore(Benaphore& benaphore);
 
  private:
-	mutable	Benaphore			fLock;				// data lock
-			Benaphore			fMutex;				// critical code mutex
-			Benaphore			fQueue;				// queueing semaphore
-			int32				fReaderCount;		// total count...
-			int32				fWriterCount;		// total count...
-			List<ReadLockInfo*>	fReadLockInfos;
-			thread_id			fWriter;			// current write lock owner
-			int32				fWriterWriterCount;	// write lock owner count
-			int32				fWriterReaderCount;	// writer read lock owner
-													// count
+	mutable	Benaphore				fLock;				// data lock
+			Benaphore				fMutex;				// critical code mutex
+			Benaphore				fQueue;				// queueing semaphore
+			int32					fReaderCount;		// total count...
+			int32					fWriterCount;		// total count...
+			Vector<ReadLockInfo*>	fReadLockInfos;
+			thread_id				fWriter;			// current write lock
+														// owner
+			int32					fWriterWriterCount;	// write lock owner
+														// count
+			int32					fWriterReaderCount;	// writer read lock
+														// owner count
 };
 
 #endif	// RW_LOCKER_H
