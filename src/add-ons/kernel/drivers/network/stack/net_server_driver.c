@@ -110,19 +110,19 @@ typedef struct {
 //*****************************************************/
 
 /* device hooks */
-static status_t net_server_open(const char * name, uint32 flags, void ** cookie);
-static status_t net_server_close(void * cookie);
-static status_t net_server_free_cookie(void * cookie);
-static status_t net_server_control(void * cookie, uint32 msg,void * data, size_t datalen);
-static status_t net_server_read(void * cookie, off_t pos, void * data, size_t * datalen);
-static status_t net_server_write(void * cookie, off_t pos, const void * data, size_t * datalen);
+static status_t net_server_open(const char *name, uint32 flags, void **cookie);
+static status_t net_server_close(void *cookie);
+static status_t net_server_free_cookie(void *cookie);
+static status_t net_server_control(void *cookie, uint32 msg, void *data, size_t datalen);
+static status_t net_server_read(void *cookie, off_t pos, void *data, size_t *datalen);
+static status_t net_server_write(void *cookie, off_t pos, const void *data, size_t *datalen);
 static status_t net_server_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
 static status_t net_server_deselect(void *cookie, uint8 event, selectsync *sync);
-// static status_t net_server_readv(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
-// static status_t net_server_writev(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
+// static status_t net_server_readv(void *cookie, off_t pos, const iovec *vec, size_t count, size_t *len);
+// static status_t net_server_writev(void *cookie, off_t pos, const iovec *vec, size_t count, size_t *len);
 
 /* select() support */
-static int32 socket_event_listener(void * data);
+static int32 socket_event_listener(void *data);
 static void on_socket_event(void *socket, uint32 event, void *cookie);
 static void r5_notify_select_event(selectsync *sync, uint32 ref);
 
@@ -130,7 +130,7 @@ static void r5_notify_select_event(selectsync *sync, uint32 ref);
 static status_t init_connection(void **cookie);
 static void shutdown_connection(net_server_cookie *nsc);
 static net_command *get_command(net_server_cookie *nsc, int32 *index);
-static status_t execute_command(net_server_cookie *nsc, int32 op, void *data, uint32 length);
+static status_t execute_command(net_server_cookie *nsc, uint32 op, void *data, uint32 length);
 
 /*
  * Global variables
@@ -697,7 +697,7 @@ set_command_areas(net_command *command)
 
 
 static status_t
-execute_command(net_server_cookie *nsc, int32 op, void *data, uint32 length)
+execute_command(net_server_cookie *nsc, uint32 op, void *data, uint32 length)
 {
 	uint32 command_index;
 	net_command *command = get_command(nsc, (long *) &command_index);
@@ -751,7 +751,7 @@ init_connection(void **cookie)
 {
 	net_connection connection;
 	ssize_t bytes;
-	int32 msg;
+	uint32 msg;
 
 	net_server_cookie *nsc = (net_server_cookie *) malloc(sizeof(net_server_cookie));
 	if (nsc == NULL)
