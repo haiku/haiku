@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "keyboard.h"
@@ -467,10 +467,10 @@ platform_update_menu_item(Menu *menu, MenuItem *item)
 void
 platform_run_menu(Menu *menu)
 {
-	platform_switch_to_text_mode();
+//	platform_switch_to_text_mode();
 
 	run_menu(menu);
 
-	platform_switch_to_logo();
+//	platform_switch_to_logo();
 }
 
