@@ -18,6 +18,7 @@
 #include <stage2.h>
 
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct page_queue {
 	vm_page *head;
@@ -40,66 +41,136 @@ static spinlock_t page_lock;
 
 static sem_id modified_pages_available;
 
+static int dump_page(int argc, char **argv);
+static int dump_page_queue(int argc, char **argv);
 static int dump_page_stats(int argc, char **argv);
 static int dump_free_page_table(int argc, char **argv);
 static int vm_page_set_state_nolock(vm_page *page, int page_state);
 static void clear_page(addr pa);
 static int page_scrubber(void *);
 
+static bool gCheck = false;
+
+
+static void
+check_page_queue(const char *prefix, page_queue *queue)
+{
+	vm_page *page;
+	
+	if (!gCheck)
+		return;
+
+	for (page = queue->head; page; page = page->queue_next) {
+		if (page->queue_next == NULL && queue->tail != page)
+			panic("check_page: \"%s\", q = %p, page = %p\n", prefix, queue, page);
+	}
+}
+
+
 static vm_page *dequeue_page(page_queue *q)
 {
 	vm_page *page;
 
+	check_page_queue("dq1", q);
+//	dprintf("dequeue_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
+	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
+		panic("dequeue_page1: list at %p is corrupt (count = %d)\n", q, q->count);
+
 	page = q->tail;
-	if(page != NULL) {
-		if(q->head == page)
+	if (page != NULL) {
+		if (page->queue_prev == NULL && q->head != page)
+			panic("dp: q = %p, page = %p, page->queue_prev == NULL, but q->head != page\n", q, page);
+		if (page->queue_next == NULL && q->tail != page)
+			panic("dp: q = %p, page = %p, page->queue_next == NULL, but q->tail != page\n", q, page);
+
+		if (q->head == page) {
+			dprintf("dequeue: q = %p, set head to NULL\n", q);
 			q->head = NULL;
-		if(page->queue_prev != NULL) {
+		}
+		if (page->queue_prev != NULL) {
 			page->queue_prev->queue_next = NULL;
 		}
 		q->tail = page->queue_prev;
 		q->count--;
+	} else if (q->head != NULL)
+		panic("dequeue_page: list %p is corrupt\n", q);
+
+	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail) {
+		dprintf("page = %p, page->prev = %p, page->next = %p\n", page, page->queue_prev, page->queue_next);
+		dprintf("q = %p, q->head = %p, q->tail = %p, q->count = %d\n", q, q->head, q->tail, q->count);
+		panic("dequeue_page2: list at %p is corrupt (count = %d)\n", q, q->count);
 	}
+
+	check_page_queue("dq2", q);
+
 	return page;
 }
 
 static void enqueue_page(page_queue *q, vm_page *page)
 {
-	if(q->head != NULL)
+	check_page_queue("eq1", q);
+
+//	dprintf("enqueue_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
+	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
+		panic("enqueue_page: list at %p is corrupt (count = %d)\n", q, q->count);
+
+	if (q->head != NULL)
 		q->head->queue_prev = page;
 	page->queue_next = q->head;
 	q->head = page;
 	page->queue_prev = NULL;
-	if(q->tail == NULL)
+	if (q->tail == NULL)
 		q->tail = page;
 	q->count++;
-	if(q == &page_modified_queue) {
-		if(q->count == 1)
+	if (q == &page_modified_queue) {
+		if (q->count == 1)
 			release_sem_etc(modified_pages_available, 1, B_DO_NOT_RESCHEDULE);
 	}
+
+	if (page->queue_prev == NULL && q->head != page)
+		panic("ep: q = %p, page = %p, page->queue_prev == NULL, but q->head != page\n", q, page);
+	if (page->queue_next == NULL && q->tail != page)
+		panic("ep: q = %p, page = %p, page->queue_next == NULL, but q->tail != page\n", q, page);
+
+	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
+		panic("enqueue_page: list at %p is corrupt (count = %d)\n", q, q->count);
+
+	check_page_queue("eq2", q);
 }
 
 static void remove_page_from_queue(page_queue *q, vm_page *page)
 {
-	if(page->queue_prev != NULL) {
+//	dprintf("remove_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
+	check_page_queue("rpq1", q);
+
+	if (page->queue_prev != NULL) {
 		page->queue_prev->queue_next = page->queue_next;
 	} else {
 		q->head = page->queue_next;
 	}
-	if(page->queue_next != NULL) {
+	if (page->queue_next != NULL) {
 		page->queue_next->queue_prev = page->queue_prev;
 	} else {
 		q->tail = page->queue_prev;
 	}
 	q->count--;
+
+	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
+		panic("remove_page_from_queue: list at %p is corrupt (count = %d)\n", q, q->count);
+
+	check_page_queue("rpq2", q);
 }
 
 static void move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *page)
 {
-	if(from_q != to_q) {
+	if (from_q != to_q) {
 		remove_page_from_queue(from_q, page);
 		enqueue_page(to_q, page);
 	}
+	if ((from_q->head == NULL || from_q->tail == NULL) && from_q->head != from_q->tail)
+		panic("move_page_to_queue: from list at %p is corrupt (count = %d)\n", from_q, from_q->count);
+	if ((to_q->head == NULL || to_q->tail == NULL) && to_q->head != to_q->tail)
+		panic("move_page_to_queue: to list at %p is corrupt (count = %d)\n", to_q, to_q->count);
 }
 
 static int pageout_daemon()
@@ -234,6 +305,7 @@ int vm_page_init(kernel_args *ka)
 		vm_mark_page_range_inuse(ka->phys_alloc_range[i].start / PAGE_SIZE,
 			ka->phys_alloc_range[i].size / PAGE_SIZE);
 	}
+	gCheck = true;
 
 	// set the global max_commit variable
 	vm_increase_max_commit(num_pages*PAGE_SIZE);
@@ -253,6 +325,8 @@ int vm_page_init2(kernel_args *ka)
 
 	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
 	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");
+	add_debugger_command("page", &dump_page, "Dump page info");
+	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
 
 	return 0;
 }
@@ -417,20 +491,20 @@ vm_page *vm_page_allocate_specific_page(addr page_num, int page_state)
 			// we can't allocate this page
 			p = NULL;
 	}
-	if(p == NULL)
+	if (p == NULL)
 		goto out;
 
 	old_page_state = p->state;
 	p->state = PAGE_STATE_BUSY;
 
-	if(old_page_state != PAGE_STATE_UNUSED)
+	if (old_page_state != PAGE_STATE_UNUSED)
 		enqueue_page(&page_active_queue, p);
 
 out:
 	release_spinlock(&page_lock);
 	restore_interrupts(state);
 
-	if(p != NULL && page_state == PAGE_STATE_CLEAR &&
+	if (p != NULL && page_state == PAGE_STATE_CLEAR &&
 		(old_page_state == PAGE_STATE_FREE || old_page_state == PAGE_STATE_UNUSED)) {
 
 		clear_page(p->ppn * PAGE_SIZE);
@@ -464,12 +538,13 @@ vm_page *vm_page_allocate_page(int page_state)
 	acquire_spinlock(&page_lock);
 
 	p = dequeue_page(q);
-	if(p == NULL) {
-		// the clear queue was empty, grab one from the free queue and zero it out
+	if (p == NULL) {
+		// if the primary queue was empty, grap the page from the
+		// secondary queue
 		p = dequeue_page(q_other);
-		if(p == NULL) {
+		if (p == NULL) {
 			// XXX hmm
-			panic("vm_allocate_page: out of memory!\n");
+			panic("vm_allocate_page: out of memory! page state = %d\n", page_state);
 		}
 	}
 
@@ -481,9 +556,9 @@ vm_page *vm_page_allocate_page(int page_state)
 	release_spinlock(&page_lock);
 	restore_interrupts(state);
 
-	if(page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE) {
+	// if needed take the page from the free queue and zero it out
+	if (page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE)
 		clear_page(p->ppn * PAGE_SIZE);
-	}
 
 	return p;
 }
@@ -626,6 +701,56 @@ static int dump_free_page_table(int argc, char **argv)
 	return 0;
 }
 
+
+static int
+dump_page(int argc, char **argv)
+{
+	struct vm_page *page;
+
+	if (argc < 2
+		|| strlen(argv[1]) <= 2
+		|| argv[1][0] != '0'
+		|| argv[1][1] != 'x') {
+		dprintf("usage: page_queue <address>\n");
+		return 0;
+	}
+
+	page = (struct vm_page *)(atoul(argv[1]));
+
+	dprintf("queue_next = %p, queue_prev = %p, type = %d, state = %d\n", page->queue_next, page->queue_prev, page->type, page->state);
+	return 0;
+}
+
+
+static int
+dump_page_queue(int argc, char **argv)
+{
+	struct page_queue *queue;
+
+	if (argc < 2
+		|| strlen(argv[1]) <= 2
+		|| argv[1][0] != '0'
+		|| argv[1][1] != 'x') {
+		dprintf("usage: page_queue <address> [list]\n");
+		return 0;
+	}
+
+	queue = (struct page_queue *)(atoul(argv[1]));
+
+	dprintf("queue->head = %p, queue->tail = %p, queue->count = %d\n", queue->head, queue->tail, queue->count);
+
+	if (argc == 3) {
+		struct vm_page *page = queue->head;
+		int i;
+		
+		for (i = 0; page; i++, page = page->queue_next) {
+			dprintf("%5d. queue_next = %p, queue_prev = %p, type = %d, state = %d\n", i, page->queue_next, page->queue_prev, page->type, page->state);
+		}
+	}
+	return 0;
+}
+
+
 static int dump_page_stats(int argc, char **argv)
 {
 	unsigned int page_types[8];
@@ -642,6 +767,12 @@ static int dump_page_stats(int argc, char **argv)
 		page_types[PAGE_STATE_ACTIVE], page_types[PAGE_STATE_INACTIVE], page_types[PAGE_STATE_BUSY], page_types[PAGE_STATE_UNUSED]);
 	dprintf("modified: %d\nfree: %d\nclear: %d\nwired: %d\n",
 		page_types[PAGE_STATE_MODIFIED], page_types[PAGE_STATE_FREE], page_types[PAGE_STATE_CLEAR], page_types[PAGE_STATE_WIRED]);
+
+	dprintf("\nfree_queue: %p, count = %d\n", &page_free_queue, page_free_queue.count);
+	dprintf("clear_queue: %p, count = %d\n", &page_clear_queue, page_clear_queue.count);
+	dprintf("modified_queue: %p, count = %d\n", &page_modified_queue, page_modified_queue.count);
+	dprintf("active_queue: %p, count = %d\n", &page_active_queue, page_active_queue.count);
+
 	return 0;
 }
 

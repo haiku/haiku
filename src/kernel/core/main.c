@@ -118,12 +118,18 @@ static int main2(void *unused)
 	dprintf("start of main2: initializing devices\n");
 
 	/* bootstrap all the filesystems */
+dprintf("******************** a ********************\n");
 	vfs_bootstrap_all_filesystems();
+dprintf("******************** b ********************\n");
 
 	module_init(&ka, NULL);
+dprintf("******************** c ********************\n");
 	bus_init(&ka);
+dprintf("******************** d ********************\n");
 	dev_init(&ka);
+dprintf("******************** e ********************\n");
 	con_init(&ka);
+dprintf("******************** f ********************\n");
 	//net_init_postdev(&ka);
 
 #if 0
@@ -150,9 +156,12 @@ static int main2(void *unused)
 	{
 		team_id pid;
 		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
+dprintf("******************** g ********************\n");
 		if (pid < 0)
 			kprintf("error starting 'init' error = %ld \n", pid);
+dprintf("******************** h ********************\n");
 	}
+dprintf("******************** i ********************\n");
 
 	return 0;
 }

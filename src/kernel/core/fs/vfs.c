@@ -236,6 +236,21 @@ struct fd_ops gIndexDirectoryOps = {
 };
 
 
+static void
+check_wall(int32 line, void *address)
+{
+//	uint32 *wall = (uint32 *)((uint8 *)address - 12);
+//	uint32 size = wall[0];
+//
+//	if (wall[1] != 0xabadcafe || wall[2] != 0xabadcafe)
+//		panic("check_wall: line %ld, front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", line, address, size, wall[1], wall[2]);
+//
+//	wall = (uint32 *)((uint8 *)address + size);
+//	if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
+//		panic("check_wall: line %ld, back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", line, address, size, wall[0], wall[1]);
+}
+
+
 static int
 mount_compare(void *_m, const void *_key)
 {
@@ -508,6 +523,8 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	int err;
 	int old_ref;
 
+check_wall(__LINE__, vnode);
+
 	mutex_lock(&gVnodeMutex);
 
 	if (vnode->busy == true)
@@ -539,6 +556,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 		mutex_unlock(&gVnodeMutex);
 
 		kfree(vnode);
+
 		err = 1;
 	} else {
 		mutex_unlock(&gVnodeMutex);
@@ -598,12 +616,14 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 	} else {
 		// we need to create a new vnode and read it in
 		vnode = create_new_vnode();
+check_wall(__LINE__, vnode);
 		if (!vnode) {
-			err = ENOMEM;
+			err = B_NO_MEMORY;
 			goto err;
 		}
 		vnode->mount_id = mountID;
 		vnode->id = vnodeID;
+check_wall(__LINE__, vnode);
 		
 		mutex_lock(&gMountMutex);	
 
@@ -613,6 +633,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 			err = ERR_INVALID_HANDLE;
 			goto err;
 		}
+check_wall(__LINE__, vnode);
 		vnode->busy = true;
 		hash_insert(gVnodeTable, vnode);
 		mutex_unlock(&gVnodeMutex);
@@ -620,6 +641,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 		add_vnode_to_mount_list(vnode, vnode->mount);
 		mutex_unlock(&gMountMutex);
 
+check_wall(__LINE__, vnode);
 		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
 		if (err < 0 && vnode->private_node == NULL) {
 			remove_vnode_from_mount_list(vnode, vnode->mount);
@@ -632,6 +654,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 		vnode->busy = false;
 		vnode->ref_count = 1;
+check_wall(__LINE__, vnode);
 	}
 
 	mutex_unlock(&gVnodeMutex);
@@ -694,10 +717,12 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 }
 
 
-static int
+static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, struct vnode **_vnode, int count)
 {
-	int status = 0;
+	status_t status = 0;
+
+	FUNCTION(("vnode_path_to_vnode(path = %s)\n", path));
 
 	if (!path)
 		return EINVAL;
@@ -742,6 +767,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 			put_vnode(vnode);
 			return status;
 		}
+check_wall(__LINE__, vnode);
 
 		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
@@ -833,8 +859,8 @@ static int
 path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 {
 	struct vnode *start;
-	int linkCount = 0;
-	int status = 0;
+
+	FUNCTION(("path_to_vnode(path = %s)\n", path));
 
 	if (!path)
 		return EINVAL;
@@ -853,6 +879,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 		inc_vnode_ref_count(start);
 		mutex_unlock(&context->io_mutex);
 	}
+check_wall(__LINE__, start);
 
 	return vnode_path_to_vnode(start, path, traverseLink, _vnode, 0);
 }
@@ -867,6 +894,8 @@ static int
 path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel)
 {
 	char *p = strrchr(path, '/');
+
+	FUNCTION(("path_to_dir_vnode(path = %s)\n", path));
 
 	if (!p) {
 		// this path is single segment with no '/' in it

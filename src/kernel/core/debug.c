@@ -244,7 +244,7 @@ kernel_debugger(const char * message)
 		dprintf(message);
 		dprintf("\n");
 	};
-		
+
 	dprintf("Welcome to Kernel Debugging Land...\n");
 	kernel_debugger_loop();
 }

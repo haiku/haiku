@@ -531,7 +531,7 @@ thread_resume_thread(thread_id id)
 }
 
 #ifndef NEW_SCHEDULER
-int
+status_t
 thread_set_priority(thread_id id, int32 priority)
 {
 	struct thread *t;

@@ -49,7 +49,7 @@ struct elf_image_info {
 	struct elf_linked_image *linked_images;
 
 	struct Elf32_Ehdr *eheader;
-	
+
 	// pointer to symbol participation data structures
 	char *needed;
 	unsigned int *symhash;
@@ -1082,8 +1082,8 @@ elf_init(kernel_args *ka)
 	mutex_init(&image_load_lock, "kimages_load_lock");
 
 	// build a image structure for the kernel, which has already been loaded
+
 	kernel_image = create_image_struct();
-	
 	kernel_image->name = kstrdup("kernel");
 
 	// text segment
