@@ -82,7 +82,7 @@ public:
 	virtual	void			MessageReceived(BMessage* msg);
 	virtual	void			ArgvReceived(int32 argc, char** argv);
 	virtual	void			AppActivated(bool active);
-	virtual	void			RefsReceived(BMessage* a_message);
+	virtual	void			RefsReceived(BMessage* message);
 	virtual	void			AboutRequested();
 
 	// Scripting
@@ -107,7 +107,7 @@ public:
 			status_t		GetAppInfo(app_info* info) const;
 	static	BResources*		AppResources();
 
-	virtual	void			DispatchMessage(BMessage* an_event,
+	virtual	void			DispatchMessage(BMessage* message,
 											BHandler* handler);
 			void			SetPulseRate(bigtime_t rate);
 
