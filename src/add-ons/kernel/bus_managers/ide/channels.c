@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open IDE bus manager
@@ -29,7 +29,7 @@ ide_channel_added(pnp_node_handle parent)
 	char *str = NULL, *controller_name = NULL;
 	uint32 channel_id;
 
-	SHOW_FLOW0( 2, "" );
+	SHOW_FLOW0(2, "");
 
 	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK
 		|| strcmp(str, IDE_BUS_TYPE_NAME) != 0)

@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open IDE bus manager
@@ -66,28 +66,26 @@ static fast_log_event_type ide_events[] =
 static void disconnect_worker( ide_bus_info *bus, void *arg );
 static void set_check_condition( ide_qrequest *qrequest );
 
-// check whether this request can be within device
-static inline bool is_queuable( ide_device_info *device, scsi_ccb *request )
+
+/** check whether this request can be within device */
+
+static inline bool
+is_queuable(ide_device_info *device, scsi_ccb *request)
 {
 	int opcode = request->cdb[0];
 
 	// XXX disable queuing
-	if( !device->CQ_enabled )
+	if (!device->CQ_enabled)
 		return false;
-	
+
 	// make sure the caller allows queuing	
-	if( (request->flags & SCSI_ORDERED_QTAG) != 0 )
+	if ((request->flags & SCSI_ORDERED_QTAG) != 0)
 		return false;
-	
+
 	// for atapi, all commands could be queued, but all
 	// atapi devices I know don't support queuing anyway
-	if( opcode == SCSI_OP_READ_6 ||
-		opcode == SCSI_OP_WRITE_6 ||
-		opcode == SCSI_OP_READ_10 ||
-		opcode == SCSI_OP_WRITE_10 )
-		return true;
-	else
-		return false;
+	return opcode == SCSI_OP_READ_6 || opcode == SCSI_OP_WRITE_6
+		|| opcode == SCSI_OP_READ_10 || opcode == SCSI_OP_WRITE_10;
 }
 
 
@@ -199,7 +197,7 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 {
 	char *controller_name;
 
-	SHOW_FLOW0( 4, "" );
+	SHOW_FLOW0(4, "");
 
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
@@ -256,7 +254,7 @@ sim_scan_bus(ide_bus_info *bus)
 {
 	int i;
 
-	SHOW_FLOW0( 4, "" );
+	SHOW_FLOW0(4, "");
 
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
@@ -334,10 +332,10 @@ create_sense(ide_device_info *device, scsi_sense *sense)
 void
 finish_checksense(ide_qrequest *qrequest)
 {
-	SHOW_FLOW( 3, "%p, subsys_status=%d, sense=%x", 
+	SHOW_FLOW(3, "%p, subsys_status=%d, sense=%x", 
 		qrequest->request,
 		qrequest->request->subsys_status,
-		(int)qrequest->device->new_combined_sense );
+		(int)qrequest->device->new_combined_sense);
 
 	qrequest->request->subsys_status = qrequest->device->subsys_status;
 
@@ -416,7 +414,7 @@ set_check_condition(ide_qrequest *qrequest)
 	scsi_ccb *request = qrequest->request;
 	ide_device_info *device = qrequest->device;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	request->subsys_status = SCSI_REQ_CMP_ERR;
 	request->device_status = SCSI_STATUS_CHECK_CONDITION;
@@ -426,7 +424,7 @@ set_check_condition(ide_qrequest *qrequest)
 		scsi_sense sense;
 		int sense_len;
 
-		SHOW_FLOW0( 3, "autosense" );
+		SHOW_FLOW0(3, "autosense");
 
 		// we cannot copy sense directly as sense buffer may be too small
 		create_sense(device, &sense);

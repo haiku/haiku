@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open IDE bus manager
@@ -19,7 +19,7 @@
 
 //#define TRACE_SYNC
 #ifdef TRACE_SYNC
-#	define TRACE(x) dprintf x
+#	define TRACE(x) { dprintf("%s(): ", __FUNCTION__); dprintf x ; }
 #else
 #	define TRACE(x) ;
 #endif
@@ -34,7 +34,7 @@ ide_dpc(void *arg)
 	ide_qrequest *qrequest;
 	ide_device_info *device;
 
-	TRACE(("ide_dpc()\n"));
+	TRACE(("\n"));
 
 	//snooze(500000);
 
@@ -42,7 +42,7 @@ ide_dpc(void *arg)
 	// in idle state, so we just check whether there is an active request,
 	// which means that we were async_waiting
 	if (bus->active_qrequest != NULL) {
-		FAST_LOG1( bus->log, ev_ide_dpc_continue, (uint32)bus->active_qrequest );
+		FAST_LOG1(bus->log, ev_ide_dpc_continue, (uint32)bus->active_qrequest);
 		TRACE(("continue command\n"));
 
 		// cancel timeout
@@ -69,7 +69,6 @@ ide_dpc(void *arg)
 		FAST_LOG0(bus->log, ev_ide_dpc_service);
 
 		device = get_current_device(bus);
-
 		if (device == NULL) {
 			// got an interrupt from a non-existing device
 			// either this is a spurious interrupt or there *is* a device
@@ -99,7 +98,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 {	
 	ide_device_info *device;
 
-	TRACE(("ide_irq_handler()\n"));
+	TRACE(("\n"));
 	FAST_LOG0(bus->log, ev_ide_irq_handle);
 
 	// we need to lock bus to have a solid bus state
