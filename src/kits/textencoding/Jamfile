@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src kits textencoding ;
+
+UsePrivateHeaders textencoding ;
+
+SharedLibrary textencoding :
+	CharacterSet.cpp
+	CharacterSetRoster.cpp
+	character_sets.cpp
+	utf8_conversions.cpp
+	: libiconv.a ;
+LinkSharedOSLibs libtextencoding.so : be ;
+
+SubInclude OBOS_TOP src kits textencoding libiconv ;

@@ -1,0 +1,22 @@
+SubDir OBOS_TOP src kits textencoding libiconv ;
+
+SubDirCcFlags
+	-DLIBICONV_PLUG
+	-DLIBDIR="\\\"/boot/home/config/lib\\\""
+	-DENABLE_RELOCATABLE=1
+	-DIN_LIBRARY
+	-DINSTALLDIR="\\\"/boot/home/config/lib\\\""
+	-DNO_XMALLOC
+	-Dset_relocation_prefix=libcharset_set_relocation_prefix
+	-Drelocate=libcharset_relocate
+	-DHAVE_CONFIG_H
+	;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libcharset ] ;
+
+StaticLibrary iconv :
+	iconv.c
+	localcharset.c
+	relocatable.c
+	;
+
