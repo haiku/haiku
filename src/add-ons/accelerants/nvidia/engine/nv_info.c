@@ -380,7 +380,7 @@ static void detect_panels()
 	//we are assuming that no DVI is used as external monitor on laptops;
 	//otherwise we probably get into trouble here if the checked specs match.
 	if (si->ps.laptop && si->ps.tmds1_active && si->ps.tmds2_active &&
-		(DACR(FP_TG_CTRL) == DAC2R(FP_TG_CTRL)) &&
+		((DACR(FP_TG_CTRL) & 0x80000000) == (DAC2R(FP_TG_CTRL) & 0x80000000)) &&
 		(si->ps.panel1_width == si->ps.panel2_width) &&
 		(si->ps.panel1_height == si->ps.panel2_height))
 	{
