@@ -1,10 +1,12 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
 	Expansion of patterns.
 	Used to expand consumer/connector/device names etc.
@@ -39,9 +41,9 @@
  */
 
 static status_t
-expand_attr(pnp_node_info *node, const char **pattern, char *buffer, char *dst)
+expand_attr(device_node_info *node, const char **pattern, char *buffer, char *dst)
 {	
-	pnp_node_attr_info *attr;
+	device_attr_info *attr;
 	const char *str;
 	int buffer_len;
 
@@ -133,7 +135,7 @@ expand_attr(pnp_node_info *node, const char **pattern, char *buffer, char *dst)
  */
 
 status_t
-pnp_expand_pattern(pnp_node_info *node, const char *pattern, char *dest,
+pnp_expand_pattern(device_node_info *node, const char *pattern, char *dest,
 	char *buffer, size_t *term_array, int *num_parts)
 {
 	const char *str;
@@ -213,7 +215,7 @@ pnp_expand_pattern(pnp_node_info *node, const char *pattern, char *dest,
  */
 
 status_t
-pnp_expand_pattern_attr(pnp_node_info *node, const char *attr_name, 
+pnp_expand_pattern_attr(device_node_info *node, const char *attr_name, 
 	char **expanded)
 {
 	const char *pattern;

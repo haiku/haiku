@@ -1,7 +1,9 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef __IDE_INTERNAL_H__
+#define __IDE_INTERNAL_H__
 
 /*
 	Part of Open IDE bus manager
@@ -9,8 +11,6 @@
 	Internal structures
 */
 
-#ifndef __IDE_INTERNAL_H__
-#define __IDE_INTERNAL_H__
 
 #include <bus/IDE.h>
 #include <bus/SCSI.h>
@@ -227,7 +227,7 @@ struct ide_bus_info {
 
 	uchar path_id;
 
-	pnp_node_handle node;		// our pnp node
+	device_node_handle node;		// our pnp node
 
 	// restrictions, read from controller node
 	uint8 max_devices;
@@ -425,4 +425,4 @@ status_t ide_irq_handler(ide_bus_info *bus, uint8 status);
 status_t ide_timeout(timer *arg);
 
 
-#endif
+#endif	/* __IDE_INTERNAL_H__ */

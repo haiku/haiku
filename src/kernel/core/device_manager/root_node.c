@@ -1,19 +1,17 @@
-/* 
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002/2003, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP devfs
+	Part of Device Manager
 
-	Interface of PnP root module.
+	Interface of device root module.
 
-	This module creates the root devices (PCI and ISA) to initiate
-	the PnP device scan. It is calles by pnp_boot_helper but should 
-	probably be moved into kernel for simplification.
-
-	In the future, we want to check hardware configuration before we
-	start loading ISA and PCI bus manager.
+	This module creates the root devices (usually PCI and ISA) to
+	initiate the PnP device scan.
 */
 
 
@@ -21,10 +19,6 @@
 #include <Drivers.h>
 
 #include "device_manager_private.h"
-
-//#include <pnp/pnp_manager.h>
-/*#include <bus/ISA2.h>
-#include <bus/PCI2.h>*/
 
 
 #define TRACE_ROOT_NODE
@@ -45,13 +39,13 @@
 #define PNP_ROOT_MODULE_NAME "sys/pnp_root/v1"
 
 
-static pnp_node_handle sRootNode;
+static device_node_handle sRootNode;
 
 
 void
 pnp_root_init_root(void)
 {
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_ROOT_TYPE_NAME }},
 
@@ -105,7 +99,7 @@ pnp_root_rescan_root(void)
 
 
 static status_t
-pnp_root_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+pnp_root_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	*cookie = NULL;
 	return B_OK;
@@ -120,11 +114,11 @@ pnp_root_uninit_device(void *cookie)
 
 /*
 static status_t pnp_root_device_added( 
-	pnp_node_handle parent )
+	device_node_handle parent )
 {
 	char *tmp;
 	status_t res;
-	pnp_node_handle loader_node;
+	device_node_handle loader_node;
 	
 	// make sure parent is really root
 	if( pnp->get_attr_string( parent, PNP_DRIVER_TYPE, &tmp, false ))
@@ -140,7 +134,7 @@ static status_t pnp_root_device_added(
 	// load ISA bus manager
 	// if you don't want ISA, remove this registration
 	{
-		pnp_node_attr attrs[] = {
+		device_attr attrs[] = {
 			// info about ourself
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "pnp/isa_loader" }},
@@ -159,7 +153,7 @@ static status_t pnp_root_device_added(
 
 	// load PCI bus manager
 	{
-		pnp_node_attr attrs[] = {
+		device_attr attrs[] = {
 			// info about ourself
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "pnp/pci_loader" }},
@@ -195,7 +189,7 @@ std_ops(int32 op, ...)
 }
 
 
-pnp_driver_info gDeviceRootModule = {
+driver_module_info gDeviceRootModule = {
 	{
 		PNP_ROOT_MODULE_NAME,
 		0,

@@ -1,12 +1,14 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
-	PnP Node Registration.
+	Device Node Registration.
 */
 
 
@@ -30,9 +32,9 @@
 // decrease ref_count of unregistered nodes, specified by <node_list>
 
 void
-pnp_unref_unregistered_nodes(pnp_node_info *node_list)
+pnp_unref_unregistered_nodes(device_node_info *node_list)
 {
-	pnp_node_info *node, *next_node;
+	device_node_info *node, *next_node;
 
 	for (node = node_list; node; node = next_node) {
 		next_node = node->notify_next;
@@ -45,7 +47,7 @@ pnp_unref_unregistered_nodes(pnp_node_info *node_list)
 // mark node being registered, so it can be accessed via load_driver()
 
 static status_t
-mark_node_registered(pnp_node_info *node)
+mark_node_registered(device_node_info *node)
 {
 	status_t res;
 
@@ -74,9 +76,9 @@ mark_node_registered(pnp_node_info *node)
 // the node must not yet be linked into parent node's children list
 
 static status_t
-is_device_redetected(pnp_node_info *node, pnp_node_info *parent, bool *redetected)
+is_device_redetected(device_node_info *node, device_node_info *parent, bool *redetected)
 {
-	pnp_node_info *sibling;
+	device_node_info *sibling;
 	status_t res;
 	bool found = false;
 	bool same_device = false;
@@ -109,7 +111,7 @@ is_device_redetected(pnp_node_info *node, pnp_node_info *parent, bool *redetecte
 		TRACE(("connection: %s, device_identifier: %s\n", connection, device_identifier));
 
 		// ...and compare it with our siblings
-		for (sibling = parent->children; sibling != NULL; sibling = sibling->children_next) {
+		for (sibling = parent->children; sibling != NULL; sibling = sibling->siblings_next) {
 			char *sibling_connection, *sibling_device_identifier;
 			bool same_connection;
 
@@ -223,7 +225,7 @@ err:
 // return: true, if postponed
 
 static bool
-pnp_postpone_probing(pnp_node_info *node)
+pnp_postpone_probing(device_node_info *node)
 {
 	benaphore_lock(&gNodeLock);
 
@@ -250,10 +252,10 @@ pnp_postpone_probing(pnp_node_info *node)
 // them would be complicated
 
 status_t
-pnp_register_device(pnp_node_handle parent, const pnp_node_attr *attrs,
-	const io_resource_handle *io_resources, pnp_node_handle *node)
+pnp_register_device(device_node_handle parent, const device_attr *attrs,
+	const io_resource_handle *io_resources, device_node_handle *node)
 {
-	pnp_node_info *node_inf;
+	device_node_info *node_inf;
 	bool redetected;
 	status_t res = B_OK;
 
@@ -350,9 +352,9 @@ err:
 // public: unregister device node
 
 status_t
-pnp_unregister_device(pnp_node_info *node)
+pnp_unregister_device(device_node_info *node)
 {
-	pnp_node_info *dependency_list = NULL;
+	device_node_info *dependency_list = NULL;
 
 	TRACE(("pnp_unregister_device(%p)\n", node));
 
@@ -381,9 +383,9 @@ pnp_unregister_device(pnp_node_info *node)
 // (node_lock must be hold)
 
 void
-pnp_unregister_node_rec(pnp_node_info *node, pnp_node_info **dependency_list)
+pnp_unregister_node_rec(device_node_info *node, device_node_info **dependency_list)
 {
-	pnp_node_info *child, *next_child;
+	device_node_info *child, *next_child;
 
 	TRACE(("pnp_unregister_node_rec(%p)\n", node));
 
@@ -416,7 +418,7 @@ err:
 	
 	// unregister children recursively
 	for (child = node->children; child; child = next_child) {
-		next_child = child->children_next;
+		next_child = child->siblings_next;
 		pnp_unregister_node_rec(child, dependency_list);
 	}
 }
@@ -426,7 +428,7 @@ err:
 // node_lock must be hold
 
 void
-pnp_defer_probing_of_children_nolock(pnp_node_info *node)
+pnp_defer_probing_of_children_nolock(device_node_info *node)
 {
 	++node->defer_probing;
 }
@@ -435,7 +437,7 @@ pnp_defer_probing_of_children_nolock(pnp_node_info *node)
 // defer probing of children
 
 void
-pnp_defer_probing_of_children(pnp_node_info *node)
+pnp_defer_probing_of_children(device_node_info *node)
 {
 	benaphore_lock(&gNodeLock);
 
@@ -449,7 +451,7 @@ pnp_defer_probing_of_children(pnp_node_info *node)
 // (node_lock must be hold)
 
 void
-pnp_probe_waiting_children_nolock(pnp_node_info *node)
+pnp_probe_waiting_children_nolock(device_node_info *node)
 {
 	if (--node->defer_probing > 0 && node->unprobed_children != 0)
 		return;
@@ -457,7 +459,7 @@ pnp_probe_waiting_children_nolock(pnp_node_info *node)
 	TRACE(("execute deferred probing of parent %p\n", node));
 
 	while (node->unprobed_children) {
-		pnp_node_info *child = node->unprobed_children;
+		device_node_info *child = node->unprobed_children;
 
 		REMOVE_DL_LIST(child, node->unprobed_children, unprobed_);
 
@@ -483,7 +485,7 @@ pnp_probe_waiting_children_nolock(pnp_node_info *node)
 // execute deferred probing of children
 
 void
-pnp_probe_waiting_children(pnp_node_info *node)
+pnp_probe_waiting_children(device_node_info *node)
 {
 	benaphore_lock(&gNodeLock);
 

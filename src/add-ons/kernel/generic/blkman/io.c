@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open block device manager
@@ -31,6 +31,7 @@
 
 #include "blkman_int.h"
 #include "KernelExport_ext.h"
+#include <thread_types.h>
 
 
 /**	get sg list of iovecs, taking dma boundaries and maximum size of
@@ -661,7 +662,7 @@ blkman_readwritev(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 status_t
 blkman_readv(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, size_t *len)
-{	
+{
 /*	SHOW_FLOW( 4, "len=%d", (int)*len );
 
 	for( cur_vec = vec, left = vec_count; left > 0; ++cur_vec, --left ) {
@@ -683,8 +684,11 @@ blkman_read(blkman_handle_info *handle, off_t pos, void *buf, size_t *len)
 
 	SHOW_FLOW0( 3, "" );
 
-	// TBD: this assumes that the thread stack is not paged,
-	//      else you want to use blkman_readv
+	// This assumes that the thread stack is not paged,
+	// else you want to use blkman_readv
+	// But this is not a problem, since kernel stacks
+	// are always paged in (since they can be used by
+	// an interrupt at any time)
 	return blkman_readv_int(handle, pos, vec, 1, len, true);
 }
 

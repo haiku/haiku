@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI bus manager
@@ -55,7 +55,7 @@ status_t
 scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 {
 	physical_entry map[1];
-	void *unaligned_phys, *aligned_phys, *aligned_addr, *unaligned_addr;
+	addr_t unaligned_phys, aligned_phys, aligned_addr, unaligned_addr;
 	size_t total_size;
 
 	SHOW_FLOW0(3, "");
@@ -71,7 +71,7 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 
 	// to satisfy alignment, we must allocate a buffer twice its required size
 	// and find the properly aligned part of it, ouch!
-	device->buffer_area = create_area("ATAPI buffer", &unaligned_addr, B_ANY_KERNEL_ADDRESS, 
+	device->buffer_area = create_area("ATAPI buffer", (void *)&unaligned_addr, B_ANY_KERNEL_ADDRESS, 
 								2 * total_size, B_CONTIGUOUS, 0);
 	if (device->buffer_area < 0) {
 		SHOW_ERROR( 1, "cannot create DMA buffer (%s)", strerror(device->buffer_area));
@@ -80,21 +80,21 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 		return device->buffer_area;
 	}
 
-	get_memory_map(unaligned_addr, B_PAGE_SIZE, map, 1);
+	get_memory_map((void *)unaligned_addr, B_PAGE_SIZE, map, 1);
 
 	// get aligned part
-	unaligned_phys = (char *)map[0].address;
-	aligned_phys = (char *)(((int32)unaligned_phys + buffer_size - 1) & ~(buffer_size - 1));
+	unaligned_phys = (addr_t)map[0].address;
+	aligned_phys = (unaligned_phys + buffer_size - 1) & ~(buffer_size - 1);
 	aligned_addr = unaligned_addr + (aligned_phys - unaligned_phys);
 
-	SHOW_FLOW(3, "unaligned_phys=%p, aligned_phys=%p, unaligned_addr=%p, aligned_addr=%p", 
+	SHOW_FLOW(3, "unaligned_phys = %#lx, aligned_phys = %#lx, unaligned_addr = %#lx, aligned_addr = %#lx", 
 		unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
 
-	device->buffer = aligned_addr;
+	device->buffer = (void *)aligned_addr;
 	device->buffer_size = buffer_size;
 	// s/g list is directly after buffer
-	device->buffer_sg_list = aligned_addr + buffer_size;
-	device->buffer_sg_list[0].address = aligned_phys;
+	device->buffer_sg_list = (void *)(aligned_addr + buffer_size);
+	device->buffer_sg_list[0].address = (void *)aligned_phys;
 	device->buffer_sg_list[0].size = buffer_size;
 	device->buffer_sg_cnt = 1;
 
@@ -471,21 +471,21 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	// copy one S/G entry at a time
 	for (; size > 0 && req_size > 0 && sg_cnt > 0; ++sg_list, --sg_cnt) {
 		size_t bytes;
-		void *virt_addr;
+		addr_t virt_addr;
 
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		if (map_mainmemory((addr_t)sg_list->address, &virt_addr) != B_OK) 
+		if (map_mainmemory((addr_t)sg_list->address, (void *)&virt_addr) != B_OK) 
 			return false;
 
-		SHOW_FLOW(0, "buffer=%p, virt_addr=%p, bytes=%d, to_buffer=%d",
-			buffer, virt_addr + offset, (int)bytes, to_buffer);
+		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
+			buffer, virt_addr + offset, bytes, to_buffer);
 
 		if (to_buffer)
-			memcpy(buffer, virt_addr + offset, bytes);
+			memcpy(buffer, (void *)(virt_addr + offset), bytes);
 		else
-			memcpy(virt_addr + offset, buffer, bytes);
+			memcpy((void *)(virt_addr + offset), buffer, bytes);
 
 #if 0
 		{
@@ -504,7 +504,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		}
 #endif
 		
-		unmap_mainmemory(virt_addr);
+		unmap_mainmemory((void *)virt_addr);
 
 		(char *)buffer += bytes;
 		size -= bytes;

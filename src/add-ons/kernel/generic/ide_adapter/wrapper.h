@@ -43,15 +43,15 @@
 #endif
 
 #ifndef debug_level_flow
-#	define debug_level_flow 3
+#	define debug_level_flow 4
 #endif
 
 #ifndef debug_level_info
-#	define debug_level_info 2
+#	define debug_level_info 4
 #endif
 
 #ifndef debug_level_error
-#	define debug_level_error 1
+#	define debug_level_error 4
 #endif
 
 #define FUNC_NAME DEBUG_MSG_PREFIX __FUNCTION__ ": "

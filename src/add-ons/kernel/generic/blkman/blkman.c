@@ -140,7 +140,7 @@ err:
 static status_t
 store_bios_drive_in_node(blkman_device_info *device)
 {
-	pnp_node_attr attribute = {
+	device_attr attribute = {
 		BLKDEV_BIOS_ID, B_UINT8_TYPE, { ui8: 
 			device->bios_drive != NULL ? device->bios_drive->bios_id : 0 }
 	};
@@ -340,7 +340,7 @@ blkman_ioctl(blkman_handle_info *handle, uint32 op, void *buf, size_t len)
 
 
 static status_t
-blkman_probe(pnp_node_handle parent)
+blkman_probe(device_node_handle parent)
 {
 	char *str;
 
@@ -359,8 +359,7 @@ blkman_probe(pnp_node_handle parent)
 
 	// ready to register at devfs
 	{
-		pnp_node_attr attrs[] =
-		{
+		device_attr attrs[] = {
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
 			// we always want devfs on top of us
@@ -369,7 +368,7 @@ blkman_probe(pnp_node_handle parent)
 			{ NULL }
 		};
 
-		pnp_node_handle node;
+		device_node_handle node;
 
 		return pnp->register_device(parent, attrs, NULL, &node);
 	}
@@ -377,7 +376,7 @@ blkman_probe(pnp_node_handle parent)
 
 
 static void
-blkman_remove(pnp_node_handle node, void *cookie)
+blkman_remove(device_node_handle node, void *cookie)
 {
 	uint8 bios_id;
 	//bios_drive *drive;
@@ -403,15 +402,13 @@ blkman_remove(pnp_node_handle node, void *cookie)
 
 
 static status_t
-blkman_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	blkman_device_info *device;
 	blkdev_params params;
 	char *name, *tmp_name;
 	uint8 is_bios_drive;
 	status_t res;
-//	blkdev_interface *interface;
-//	blkdev_device_cookie dev_cookie;
 
 	TRACE(("blkman_init_device()\n"));
 
@@ -509,7 +506,7 @@ blkman_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
 	device->is_bios_drive = is_bios_drive != 0;
 
 	res = pnp->load_driver(pnp->get_parent(node), device,
-			(pnp_driver_info **)&device->interface, (void **)&device->cookie);
+			(driver_module_info **)&device->interface, (void **)&device->cookie);
 	if (res != B_OK)
 		goto err4;
 
@@ -683,7 +680,7 @@ blkman_for_driver_interface blkman_for_driver_module = {
 };
 
 module_info *modules[] = {
-	&blkman_module.dinfo.minfo,
+	&blkman_module.info.info,
 	&blkman_for_driver_module.minfo,
 	NULL
 };

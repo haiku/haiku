@@ -1,12 +1,14 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
-	PnP Driver loader.
+	device driver loader.
 */
 
 #include "device_manager_private.h"
@@ -30,7 +32,7 @@
  */
 
 void
-pnp_unblock_load(pnp_node_info *node)
+pnp_unblock_load(device_node_info *node)
 {
 	if (--node->load_block_count == 0 && node->num_blocked_loads > 0) {
 		TRACE(("Releasing blocked loads of %p\n", node));
@@ -48,7 +50,7 @@ pnp_unblock_load(pnp_node_info *node)
  */
 
 static void
-pnp_wait_load_block(pnp_node_info *node)
+pnp_wait_load_block(device_node_info *node)
 {
 	if (node->load_block_count > 0) {
 		TRACE(("Loading of %p is blocked - wait until unblock\n", node));
@@ -70,11 +72,11 @@ pnp_wait_load_block(pnp_node_info *node)
 /** load driver automatically after registration/rescan of node. */
 
 void
-pnp_load_driver_automatically(pnp_node_info *node, bool after_rescan)
+pnp_load_driver_automatically(device_node_info *node, bool after_rescan)
 {
 	uint8 always_loaded;
 	status_t res;
-	pnp_driver_info *interface;
+	driver_module_info *interface;
 	void *cookie;
 
 	benaphore_lock(&gNodeLock);
@@ -120,7 +122,7 @@ err:
 /** unload driver that got loaded automatically. */
 
 void
-pnp_unload_driver_automatically(pnp_node_info *node, bool before_rescan)
+pnp_unload_driver_automatically(device_node_info *node, bool before_rescan)
 {
 	uint8 always_loaded;
 	status_t res;
@@ -169,10 +171,10 @@ err:
  */
 
 static status_t
-load_driver_int(pnp_node_info *node, void *user_cookie)
+load_driver_int(device_node_info *node, void *user_cookie)
 {
 	char *module_name;
-	pnp_driver_info *driver;
+	driver_module_info *driver;
 	void *cookie;
 	status_t res;
 
@@ -220,8 +222,8 @@ err:
 /** public: load driver */
 
 status_t
-pnp_load_driver(pnp_node_handle node, void *user_cookie, 
-	pnp_driver_info **interface, void **cookie)
+pnp_load_driver(device_node_handle node, void *user_cookie, 
+	driver_module_info **interface, void **cookie)
 {
 	status_t res;
 
@@ -333,11 +335,11 @@ pnp_load_driver(pnp_node_handle node, void *user_cookie,
 /** unload driver for real */
 
 static status_t
-unload_driver_int(pnp_node_info *node)
+unload_driver_int(device_node_info *node)
 {
+	driver_module_info *driver = node->driver;
 	char *module_name;
 	status_t res;
-	pnp_driver_info *driver = node->driver;
 
 	res = pnp_get_attr_string(node, PNP_DRIVER_DRIVER, &module_name, false);
 	if (res != B_OK)
@@ -379,7 +381,7 @@ err:
 /** public: unload driver */
 
 status_t
-pnp_unload_driver(pnp_node_handle node)
+pnp_unload_driver(device_node_handle node)
 {
 	status_t res;
 
@@ -414,7 +416,7 @@ pnp_unload_driver(pnp_node_handle node)
 		} else {
 			// concurrent load/unload either unloaded the driver or
 			// increased load_count so unload is not necessary or forbidden
-			TRACE(("don't unload as current load_count is %d\n", 
+			TRACE(("don't unload as current load_count is %ld\n",
 				node->load_count));
 			res = B_OK;
 		}

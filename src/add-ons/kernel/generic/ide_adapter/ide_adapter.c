@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Generic IDE adapter library.
@@ -133,7 +133,7 @@ ide_adapter_write_pio(ide_adapter_channel_info *channel, uint16 *data,
 
 	if ((count & 1) != 0 || force_16bit) {
 		for (; count > 0; --count)
-			pci->write_io_16( device, ioaddr, *(data++));
+			pci->write_io_16(device, ioaddr, *(data++));
 	} else {
 		uint32 *cur_data = (uint32 *)data;
 
@@ -316,7 +316,7 @@ ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 
 
 static status_t
-ide_adapter_init_channel(pnp_node_handle node, ide_channel ide_channel,
+ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 	ide_adapter_channel_info **cookie, size_t total_data_size,
 	int32 (*inthand)(void *arg))
 {
@@ -420,7 +420,7 @@ ide_adapter_uninit_channel(ide_adapter_channel_info *channel)
 
 
 static void
-ide_adapter_channel_removed(pnp_node_handle node, ide_adapter_channel_info *channel)
+ide_adapter_channel_removed(device_node_handle node, ide_adapter_channel_info *channel)
 {
 	SHOW_FLOW0( 3, "" );
 
@@ -433,13 +433,13 @@ ide_adapter_channel_removed(pnp_node_handle node, ide_adapter_channel_info *chan
 /** publish node of ide channel */
 
 static status_t
-ide_adapter_publish_channel(pnp_node_handle controller_node, 
+ide_adapter_publish_channel(device_node_handle controller_node, 
 	const char *channel_module_name, uint16 command_block_base,
 	uint16 control_block_base, uint8 intnum, bool can_dma,
 	bool is_primary, const char *name, io_resource_handle *resources,
-	pnp_node_handle *node)
+	device_node_handle *node)
 {
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		// info about ourself and our consumer
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: channel_module_name }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: IDE_BUS_TYPE_NAME }},
@@ -469,10 +469,10 @@ ide_adapter_publish_channel(pnp_node_handle controller_node,
 
 static status_t
 ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
-	pnp_node_handle controller_node, const char *channel_module_name,
+	device_node_handle controller_node, const char *channel_module_name,
 	bool controller_can_dma, uint16 command_block_base, uint16 control_block_base,
 	uint16 bus_master_base, uint8 intnum, bool is_primary, const char *name,
-	pnp_node_handle *node, bool supports_compatibility_mode)
+	device_node_handle *node, bool supports_compatibility_mode)
 {
 	uint8 api;
 	ide_bm_status status;
@@ -545,7 +545,7 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 
 
 static status_t
-ide_adapter_init_controller(pnp_node_handle node, void *user_cookie,
+ide_adapter_init_controller(device_node_handle node, void *user_cookie,
 	ide_adapter_controller_info **cookie, size_t total_data_size)
 {
 	pci_device_module_info *pci;
@@ -557,7 +557,7 @@ ide_adapter_init_controller(pnp_node_handle node, void *user_cookie,
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_BUS_MASTER_BASE, &bus_master_base, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->load_driver(pnp->get_parent(node), NULL, (pnp_driver_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	controller = (ide_adapter_controller_info *)malloc(total_data_size);
@@ -588,7 +588,7 @@ ide_adapter_uninit_controller(ide_adapter_controller_info *controller)
 
 
 static void
-ide_adapter_controller_removed(pnp_node_handle node, ide_adapter_controller_info *controller)
+ide_adapter_controller_removed(device_node_handle node, ide_adapter_controller_info *controller)
 {
 	SHOW_FLOW0( 3, "" );
 
@@ -601,13 +601,13 @@ ide_adapter_controller_removed(pnp_node_handle node, ide_adapter_controller_info
 /** publish node of ide controller */
 
 static status_t
-ide_adapter_publish_controller(pnp_node_handle parent, uint16 bus_master_base,
+ide_adapter_publish_controller(device_node_handle parent, uint16 bus_master_base,
 	io_resource_handle *resources, const char *controller_driver,
 	const char *controller_driver_type, const char *controller_name, bool can_dma,
 	bool can_cq, uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,
-	pnp_node_handle *node)
+	device_node_handle *node)
 {
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		// info about ourself and our consumer
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: controller_driver }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: controller_driver_type }},
@@ -652,10 +652,10 @@ ide_adapter_publish_controller(pnp_node_handle parent, uint16 bus_master_base,
 
 static status_t
 ide_adapter_detect_controller(pci_device_module_info *pci, pci_device pci_device,
-	pnp_node_handle parent,	uint16 bus_master_base,	const char *controller_driver,
+	device_node_handle parent,	uint16 bus_master_base,	const char *controller_driver,
 	const char *controller_driver_type, const char *controller_name, bool can_dma,
 	bool can_cq, uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,
-	pnp_node_handle *node)
+	device_node_handle *node)
 {
 	io_resource_handle resource_handles[2];
 
@@ -683,7 +683,7 @@ ide_adapter_detect_controller(pci_device_module_info *pci, pci_device pci_device
 
 
 static status_t
-ide_adapter_probe_controller(pnp_node_handle parent, const char *controller_driver,
+ide_adapter_probe_controller(device_node_handle parent, const char *controller_driver,
 	const char *controller_driver_type, const char *controller_name,
 	const char *channel_module_name, bool can_dma, bool can_cq, uint32 dma_alignment,
 	uint32 dma_boundary, uint32 max_sg_block_size, bool supports_compatibility_mode)
@@ -693,13 +693,13 @@ ide_adapter_probe_controller(pnp_node_handle parent, const char *controller_driv
 	uint16 command_block_base[2];
 	uint16 control_block_base[2];
 	uint16 bus_master_base;
-	pnp_node_handle controller_node, channels[2];
+	device_node_handle controller_node, channels[2];
 	uint8 intnum;
 	status_t res;
 
 	SHOW_FLOW0( 3, "" );
 
-	if (pnp->load_driver(parent, NULL, (pnp_driver_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->load_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers, 4 );
@@ -801,7 +801,7 @@ static ide_adapter_interface adapter_interface = {
 #if !_BUILDING_kernel && !BOOT
 _EXPORT 
 module_info *modules[] = {
-	&adapter_interface.minfo,
+	&adapter_interface.info,
 	NULL
 };
 #endif

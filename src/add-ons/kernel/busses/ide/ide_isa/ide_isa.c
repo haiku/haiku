@@ -56,7 +56,7 @@ typedef struct channel_info {
 							// be accessed anymore
 	
 	ide_channel ide_channel;
-	pnp_node_handle	node;
+	device_node_handle	node;
 } channel_info;
 
 
@@ -224,7 +224,7 @@ finish_dma(void *channel)
 
 
 static status_t
-init_channel(pnp_node_handle node, ide_channel ide_channel, channel_info **cookie)
+init_channel(device_node_handle node, ide_channel ide_channel, channel_info **cookie)
 {
 	channel_info *channel;
 	isa2_module_info *isa;
@@ -239,7 +239,7 @@ init_channel(pnp_node_handle node, ide_channel ide_channel, channel_info **cooki
 		|| pnp->get_attr_uint8(node, IDE_ISA_INTNUM, &irq, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->load_driver(pnp->get_parent(node), NULL, (pnp_driver_info **)&isa, &dummy) != B_OK)
+	if (pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&isa, &dummy) != B_OK)
 		return B_ERROR;
 
 	channel = (channel_info *)malloc(sizeof(channel_info));
@@ -303,10 +303,10 @@ uninit_channel(channel_info *channel)
 
 // publish node of ide channel
 static status_t
-publish_channel(pnp_node_handle parent, io_resource_handle *resources, uint16 command_block_base,
+publish_channel(device_node_handle parent, io_resource_handle *resources, uint16 command_block_base,
 	uint16 control_block_base, uint8 intnum, const char *name)
 {
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		// info about ourself and our consumer
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: IDE_ISA_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: IDE_BUS_TYPE_NAME }},
@@ -333,7 +333,7 @@ publish_channel(pnp_node_handle parent, io_resource_handle *resources, uint16 co
 		{ IDE_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
 		{ NULL }
 	};
-	pnp_node_handle node;
+	device_node_handle node;
 
 	SHOW_FLOW0(2, "");
 
@@ -343,7 +343,7 @@ publish_channel(pnp_node_handle parent, io_resource_handle *resources, uint16 co
 
 // detect IDE channel
 static status_t
-probe_channel(pnp_node_handle parent,
+probe_channel(device_node_handle parent,
 	uint16 command_block_base, uint16 control_block_base, 
 	int intnum, const char *name)
 {
@@ -370,7 +370,7 @@ probe_channel(pnp_node_handle parent,
 
 
 static status_t
-scan_parent(pnp_node_handle node)
+scan_parent(device_node_handle node)
 {
 	SHOW_FLOW0( 3, "" );
 
@@ -384,7 +384,7 @@ scan_parent(pnp_node_handle node)
 
 
 static void
-channel_removed(pnp_node_handle node, channel_info *channel)
+channel_removed(device_node_handle node, channel_info *channel)
 {
 	SHOW_FLOW0( 3, "" );
 
@@ -425,10 +425,10 @@ ide_controller_interface isa_controller_interface = {
 			std_ops
 		},
 
-		(status_t (*)(pnp_node_handle, void *, void **))	init_channel,
+		(status_t (*)(device_node_handle, void *, void **))	init_channel,
 		(status_t (*)(void *))								uninit_channel,
 		scan_parent,
-		(void (*)(pnp_node_handle, void *))					channel_removed
+		(void (*)(device_node_handle, void *))				channel_removed
 	},
 
 	(status_t (*)(ide_channel_cookie,

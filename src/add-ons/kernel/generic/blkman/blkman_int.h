@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open block device manager
@@ -32,7 +32,7 @@ typedef struct blkdev_params {
 
 // device info
 typedef struct blkman_device_info {
-	pnp_node_handle node;
+	device_node_handle node;
 	blkdev_interface *interface;
 	blkdev_device_cookie cookie;
 	
@@ -80,11 +80,11 @@ extern device_manager_info *pnp;
 
 // io.c
 
-status_t blkman_readv( blkman_handle_info *handle, off_t pos, struct iovec *vec, 
-	size_t vec_count, size_t *len );
-status_t blkman_read( blkman_handle_info *handle, off_t pos, void *buf, size_t *len );
-ssize_t blkman_writev( blkman_handle_info *handle, off_t pos, struct iovec *vec, 
-	size_t vec_count, ssize_t *len );
-ssize_t blkman_write( blkman_handle_info *handle, off_t pos, void *buf, size_t *len );
-void blkman_set_media_params( blkman_device_info *device, 
-	uint32 block_size, uint32 ld_block_size, uint64 capacity );
+status_t blkman_readv(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+	size_t vec_count, size_t *len);
+status_t blkman_read(blkman_handle_info *handle, off_t pos, void *buf, size_t *len);
+ssize_t blkman_writev(blkman_handle_info *handle, off_t pos, struct iovec *vec,
+	size_t vec_count, ssize_t *len);
+ssize_t blkman_write(blkman_handle_info *handle, off_t pos, void *buf, size_t *len);
+void blkman_set_media_params(blkman_device_info *device, 
+	uint32 block_size, uint32 ld_block_size, uint64 capacity);

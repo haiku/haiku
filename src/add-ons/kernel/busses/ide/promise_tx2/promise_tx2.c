@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Promise TX2 series IDE controller driver
@@ -138,7 +138,7 @@ finish_dma(ide_adapter_channel_info *channel)
 
 
 static status_t
-init_channel(pnp_node_handle node, ide_channel ide_channel,
+init_channel(device_node_handle node, ide_channel ide_channel,
 	ide_adapter_channel_info **cookie)
 {
 	return ide_adapter->init_channel(node, ide_channel, cookie,
@@ -153,14 +153,14 @@ uninit_channel(ide_adapter_channel_info *channel)
 }
 
 
-static void channel_removed(pnp_node_handle node, ide_adapter_channel_info *channel)
+static void channel_removed(device_node_handle node, ide_adapter_channel_info *channel)
 {
 	return ide_adapter->channel_removed(node, channel);
 }
 
 
 static status_t
-init_controller(pnp_node_handle node, void *user_cookie,
+init_controller(device_node_handle node, void *user_cookie,
 	ide_adapter_controller_info **cookie)
 {
 	return ide_adapter->init_controller(node, user_cookie, cookie,
@@ -176,7 +176,7 @@ uninit_controller(ide_adapter_controller_info *controller)
 
 
 static void
-controller_removed(pnp_node_handle node, ide_adapter_controller_info *controller)
+controller_removed(device_node_handle node, ide_adapter_controller_info *controller)
 {
 	return ide_adapter->controller_removed(node, controller);
 }
@@ -185,10 +185,10 @@ controller_removed(pnp_node_handle node, ide_adapter_controller_info *controller
 // publish node of ide controller
 
 static status_t
-publish_controller(pnp_node_handle parent, uint16 bus_master_base, uint8 intnum, 
-	io_resource_handle *resources, pnp_node_handle *node)
+publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intnum, 
+	io_resource_handle *resources, device_node_handle *node)
 {
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		// info about ourself and our consumer
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_TYPE_NAME }},
@@ -233,8 +233,8 @@ publish_controller(pnp_node_handle parent, uint16 bus_master_base, uint8 intnum,
 
 static status_t
 detect_controller(pci_device_module_info *pci, pci_device pci_device,
-	pnp_node_handle parent, uint16 bus_master_base, int8 intnum,
-	pnp_node_handle *node)
+	device_node_handle parent, uint16 bus_master_base, int8 intnum,
+	device_node_handle *node)
 {
 	io_resource_handle resource_handles[2];
 
@@ -260,20 +260,20 @@ detect_controller(pci_device_module_info *pci, pci_device pci_device,
 
 	
 static status_t
-probe_controller(pnp_node_handle parent)
+probe_controller(device_node_handle parent)
 {
 	pci_device_module_info *pci;
 	pci_device device;
 	uint16 command_block_base[2];
 	uint16 control_block_base[2];
 	uint16 bus_master_base;
-	pnp_node_handle controller_node, channels[2];
+	device_node_handle controller_node, channels[2];
 	uint8 intnum;
 	status_t res;
 
 	SHOW_FLOW0(3, "");
 
-	if (pnp->load_driver(parent, NULL, (pnp_driver_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->load_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers, 4);
@@ -338,10 +338,10 @@ static ide_controller_interface channel_interface = {
 			std_ops
 		},
 
-		(status_t (*)( pnp_node_handle , void *, void ** ))	init_channel,
+		(status_t (*)( device_node_handle , void *, void ** ))	init_channel,
 		(status_t (*)( void * ))						uninit_channel,
 		NULL,
-		(void (*)( pnp_node_handle , void * ))			channel_removed
+		(void (*)( device_node_handle , void * ))			channel_removed
 	},
 
 	(status_t (*)(ide_channel_cookie,
@@ -362,17 +362,17 @@ static ide_controller_interface channel_interface = {
 };
 
 
-static pnp_driver_info controller_interface = {
+static driver_module_info controller_interface = {
 	{
 		PROMISE_TX2_CONTROLLER_MODULE_NAME,
 		0,
 		std_ops
 	},
 
-	(status_t (*)( pnp_node_handle, void *, void ** ))	init_controller,
-	(status_t (*)( void * ))						uninit_controller,
+	(status_t (*)(device_node_handle, void *, void **))	init_controller,
+	(status_t (*)(void *))								uninit_controller,
 	probe_controller,
-	(void (*)( pnp_node_handle, void * ))			controller_removed
+	(void (*)(device_node_handle, void *))				controller_removed
 };
 
 #if !_BUILDING_kernel && !BOOT

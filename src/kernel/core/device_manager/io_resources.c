@@ -1,10 +1,12 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
 	I/O resource manager.
 
@@ -130,7 +132,7 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 		// we need the "base + len - 1" trick to avoid wrap around at 4 GB
 		if (cur->resource.base >= base
 			&& cur->resource.base + len - 1 <= base + len - 1) {
-			pnp_node_info *owner = cur->owner;
+			device_node_info *owner = cur->owner;
 
 			TRACE(("collision\n"));
 
@@ -282,7 +284,7 @@ release_range(io_resource_info **list, io_resource_info *resource, io_resource_i
 
 		// we need the "base + len - 1" trick to avoid wrap around at 4 GB
 		if (cur->resource.base >= base && cur->resource.base + len - 1 <= base + len - 1) {
-			pnp_node_info *owner = cur->owner;
+			device_node_info *owner = cur->owner;
 
 			TRACE(("unblock\n"));
 
@@ -452,7 +454,7 @@ unregister_colliding_nodes(const io_resource_handle *resources)
 }
 
 
-// unregister device nodes that collide with I/O resource
+/** unregister device nodes that collide with I/O resource */
 
 static void
 unregister_colliding_node_range(io_resource_info *list, io_resource_info *resource)
@@ -470,7 +472,7 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 			// we need the "base + len - 1" trick to avoid wrap around at 4 GB
 			if (cur->resource.base >= base
 				&& cur->resource.base + len - 1 <= base + len - 1) {
-				pnp_node_handle owner = cur->owner;
+				device_node_handle owner = cur->owner;
 
 				if (owner == NULL)
 					panic("Transfer of I/O resources from temporary to device node collided with other temporary allocation");
@@ -502,7 +504,7 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 // colliding devices are unregistered
 
 void
-pnp_assign_io_resources(pnp_node_info *node, const io_resource_handle *resources)
+pnp_assign_io_resources(device_node_info *node, const io_resource_handle *resources)
 {
 	io_resource_handle *resource;
 
@@ -549,7 +551,7 @@ unblock_temporary_allocation(void)
 // node_lock must be hold
 
 void
-pnp_release_node_resources(pnp_node_info *node)
+pnp_release_node_resources(device_node_info *node)
 {
 	io_resource_handle *resource;
 

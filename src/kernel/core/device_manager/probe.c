@@ -1,10 +1,12 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 	Probing for consumers.
 
 	Here is all the core logic how consumers are found for one node.
@@ -56,7 +58,7 @@ static const char *modules_dirs[2] = {
  */
 
 static status_t
-notify_probe_by_file(pnp_node_info *node, const char *consumer_name)
+notify_probe_by_file(device_node_info *node, const char *consumer_name)
 {
 	char *type;
 	char *resolved_path;
@@ -134,7 +136,7 @@ err:
  */
 
 static status_t
-compose_driver_names(pnp_node_info *node, const char *dir,
+compose_driver_names(device_node_info *node, const char *dir,
 	const char *filename_pattern, int num_parts, 
 	char *path, char *buffer, size_t **res_term_array)
 {
@@ -184,7 +186,7 @@ err:
  */
 
 static status_t
-try_drivers(pnp_node_info *node, char *directory, 
+try_drivers(device_node_info *node, char *directory, 
 	bool tell_all, char *buffer)
 {
 	DIR *dir;
@@ -241,7 +243,7 @@ try_drivers(pnp_node_info *node, char *directory,
  */
 
 static status_t
-find_normal_consumer(pnp_node_info *node, const char *dir,
+find_normal_consumer(device_node_info *node, const char *dir,
 	const char *filename_pattern, int num_parts,
 	char *path, char *buffer, bool *found_normal_driver)
 {
@@ -406,7 +408,7 @@ preprocess_consumer_names(const char *pattern, char *buffer,
  */
 
 static status_t
-notify_dynamic_consumer(pnp_node_info *node, const char *pattern,
+notify_dynamic_consumer(device_node_info *node, const char *pattern,
 	bool *has_normal_driver)
 {	
 	status_t res;
@@ -468,7 +470,7 @@ err:
  */
 
 status_t
-pnp_notify_dynamic_consumers(pnp_node_info *node)
+pnp_notify_dynamic_consumers(device_node_info *node)
 {
 	int i;
 	char *buffer;
@@ -532,7 +534,7 @@ err:
  */
 
 status_t
-pnp_notify_fixed_consumers(pnp_node_info *node)
+pnp_notify_fixed_consumers(device_node_info *node)
 {
 	int i;
 	char *buffer;

@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Peripheral Driver
@@ -22,7 +22,7 @@
 
 
 char *
-periph_compose_device_name(pnp_node_handle node, const char *prefix)
+periph_compose_device_name(device_node_handle node, const char *prefix)
 {
 	uint8 path_id, target_id, target_lun;
 
@@ -42,7 +42,7 @@ periph_compose_device_name(pnp_node_handle node, const char *prefix)
 
 status_t
 periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks *callbacks,
-	scsi_device scsi_device, scsi_device_interface *scsi, pnp_node_handle node,
+	scsi_device scsi_device, scsi_device_interface *scsi, device_node_handle node,
 	bool removable, scsi_periph_device *driver)
 {
 	scsi_periph_device_info *device;

@@ -1,12 +1,14 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
-	PnP node handling.
+	device node handling.
 
 	To make sure that nodes persist as long as somebody is using them, we
 	maintain a reference count (ref_count) which is increased
@@ -43,7 +45,7 @@ benaphore gNodeLock;
 // increase ref_count of node
 
 void
-pnp_add_node_ref(pnp_node_info *node)
+pnp_add_node_ref(device_node_info *node)
 {
 	TRACE(("add_node_ref(%p)\n", node));
 
@@ -60,9 +62,9 @@ pnp_add_node_ref(pnp_node_info *node)
 // if an attribute is still in use, it's deletion is postponed
 
 static void
-free_node_attrs(pnp_node_info *node)
+free_node_attrs(device_node_info *node)
 {
-	pnp_node_attr_info *attr, *next_attr;
+	device_attr_info *attr, *next_attr;
 
 	for (attr = node->attributes; attr != NULL; attr = next_attr) {
 		next_attr = attr->next;
@@ -78,7 +80,7 @@ free_node_attrs(pnp_node_info *node)
 // (resources must have been released already)
 
 static void
-free_node_resources(pnp_node_info *node)
+free_node_resources(device_node_info *node)
 {
 	free(node->io_resources);
 	node->io_resources = NULL;
@@ -89,7 +91,7 @@ free_node_resources(pnp_node_info *node)
 // (node lock must be hold)
 
 static void
-free_node(pnp_node_info *node)
+free_node(device_node_info *node)
 {
 	const char *generator_name, *driver_name, *type;
 	uint32 auto_id;
@@ -114,7 +116,7 @@ free_node(pnp_node_info *node)
 	pnp_release_node_resources(node);
 
 	//list_remove_link(node);
-	REMOVE_DL_LIST( node, node_list, );
+	REMOVE_DL_LIST( node, gNodeList, );
 
 	delete_sem(node->hook_sem);
 	delete_sem(node->load_block_sem);
@@ -129,12 +131,12 @@ free_node(pnp_node_info *node)
 // (node_lock must be hold)
 
 void
-pnp_remove_node_ref_nolock(pnp_node_info *node)
+pnp_remove_node_ref_nolock(device_node_info *node)
 {
 	do {		
-		pnp_node_info *parent;
+		device_node_info *parent;
 
-		TRACE(("pnp_remove_node_ref_internal(ref_count of %p: %d)\n", node, node->ref_count - 1));
+		TRACE(("pnp_remove_node_ref_internal(ref_count of %p: %ld)\n", node, node->ref_count - 1));
 
 		// unregistered devices loose their I/O resources as soon as they
 		// are unloaded
@@ -151,7 +153,7 @@ pnp_remove_node_ref_nolock(pnp_node_info *node)
 
 		if (parent != NULL)
 //			list_remove_item(&parent->children, node);
-			REMOVE_DL_LIST(node, parent->children, children_ );
+			REMOVE_DL_LIST(node, parent->children, siblings_ );
 
 		free_node(node);
 
@@ -164,7 +166,7 @@ pnp_remove_node_ref_nolock(pnp_node_info *node)
 // remove node reference and clean it up if necessary
 
 void
-pnp_remove_node_ref(pnp_node_info *node)
+pnp_remove_node_ref(device_node_info *node)
 {
 	TRACE(("pnp_remove_node_ref(%p)\n", node));
 
@@ -177,11 +179,11 @@ pnp_remove_node_ref(pnp_node_info *node)
 // copy node attributes into node's attribute list
 
 static status_t
-copy_node_attrs(pnp_node_info *node, const pnp_node_attr *src)
+copy_node_attrs(device_node_info *node, const device_attr *src)
 {
 	status_t res;
-	const pnp_node_attr *src_attr;
-	pnp_node_attr_info *last_attr = NULL;
+	const device_attr *src_attr;
+	device_attr_info *last_attr = NULL;
 
 	node->attributes = NULL;
 
@@ -189,7 +191,7 @@ copy_node_attrs(pnp_node_info *node, const pnp_node_attr *src)
 	// this is (currently) not necessary but a naive implementation would
 	// reverse order, which looks a bit odd (at least for the driver writer)
 	for (src_attr = src; src_attr->name != NULL; ++src_attr) {
-		pnp_node_attr_info *new_attr;
+		device_attr_info *new_attr;
 
 		res = pnp_duplicate_node_attr( src_attr, &new_attr );
 		if (res != B_OK)
@@ -214,7 +216,7 @@ err:
 // later on, resources aren't transferred to node 
 
 static status_t
-allocate_node_resource_array(pnp_node_info *node, const io_resource_handle *resources)
+allocate_node_resource_array(device_node_info *node, const io_resource_handle *resources)
 {
 	const io_resource_handle *resource;
 	int num_resources = 0;
@@ -239,10 +241,10 @@ allocate_node_resource_array(pnp_node_info *node, const io_resource_handle *reso
 // initially, ref_count is one to make sure node won't get destroyed by mistake
 
 status_t
-pnp_alloc_node(const pnp_node_attr *attrs, const io_resource_handle *resources,
-	pnp_node_info **new_node)
+pnp_alloc_node(const device_attr *attrs, const io_resource_handle *resources,
+	device_node_info **new_node)
 {
-	pnp_node_info *node;
+	device_node_info *node;
 	status_t res;
 
 	TRACE(("pnp_alloc_node()\n"));
@@ -287,7 +289,7 @@ pnp_alloc_node(const pnp_node_attr *attrs, const io_resource_handle *resources,
 	// make public (well, almost: it's not officially registered yet)
 	benaphore_lock(&gNodeLock);
 
-	ADD_DL_LIST_HEAD(node, node_list, );
+	ADD_DL_LIST_HEAD(node, gNodeList, );
 
 	benaphore_unlock(&gNodeLock);
 
@@ -310,7 +312,7 @@ err:
 // create links to parent node
 
 void
-pnp_create_node_links(pnp_node_info *node, pnp_node_info *parent)
+pnp_create_node_links(device_node_info *node, device_node_info *parent)
 {
 	TRACE(("pnp_create_node_links(%p, parent=%p)\n", node, parent));
 
@@ -327,7 +329,7 @@ pnp_create_node_links(pnp_node_info *node, pnp_node_info *parent)
 
 	// tell parent about us, so we get unregistered automatically if parent
 	// gets unregistered
-	ADD_DL_LIST_HEAD(node, parent->children, children_ );
+	ADD_DL_LIST_HEAD(node, parent->children, siblings_ );
 
 	benaphore_unlock(&gNodeLock);
 }
@@ -335,8 +337,8 @@ pnp_create_node_links(pnp_node_info *node, pnp_node_info *parent)
 
 // public: get parent of node
 
-pnp_node_handle
-pnp_get_parent(pnp_node_handle node)
+device_node_handle
+pnp_get_parent(device_node_handle node)
 {
 	return node->parent;
 }
@@ -344,23 +346,23 @@ pnp_get_parent(pnp_node_handle node)
 
 // public: find node with some node attributes given
 
-pnp_node_info *
-pnp_find_device(pnp_node_info *parent, const pnp_node_attr *attrs)
+device_node_info *
+pnp_find_device(device_node_info *parent, const device_attr *attrs)
 {
-	pnp_node_info *node, *found_node;
+	device_node_info *node, *found_node;
 
 	found_node = NULL;
 
 	benaphore_lock(&gNodeLock);
 
-	for (node = node_list; node; node = node->next) {
-		const pnp_node_attr *attr;
+	for (node = gNodeList; node; node = node->next) {
+		const device_attr *attr;
 
 		// list contains removed devices too, so skip them
 		if (!node->registered)
 			continue;
 
-		if (parent != (pnp_node_info *)-1 && parent != node->parent)
+		if (parent != (device_node_info *)-1 && parent != node->parent)
 			continue;
 
 		for (attr = attrs; attr && attr->name; ++attr) {
@@ -448,7 +450,7 @@ put_level(int32 level)
 
 
 static void
-dump_attribute(pnp_node_attr_info *attr, int32 level)
+dump_attribute(device_attr_info *attr, int32 level)
 {
 	if (attr == NULL)
 		return;
@@ -481,17 +483,17 @@ dump_attribute(pnp_node_attr_info *attr, int32 level)
 
 
 void
-dump_pnp_node_info(pnp_node_info *node, int32 level)
+dump_device_node_info(device_node_info *node, int32 level)
 {
 	if (node == NULL)
 		return;
 
 	put_level(level);
-	dprintf("(%ld) @%p \"%s\"\n", level, node, node->driver ? node->driver->minfo.name : "---");
+	dprintf("(%ld) @%p \"%s\"\n", level, node, node->driver ? node->driver->info.name : "---");
 	dump_attribute(node->attributes, level);
 
-	dump_pnp_node_info(node->children, level + 1);
-	dump_pnp_node_info(node->children_next, level);
+	dump_device_node_info(node->children, level + 1);
+	dump_device_node_info(node->siblings_next, level);
 }
 
 

@@ -104,7 +104,7 @@ uint32 fast_log_buffer_offset_alloc;
 // offset of end of last write
 uint32 fast_log_buffer_offset_filled;
 // size of one half of log buffer
-int fast_log_buffer_size = /*512*/ 32*1024;
+int fast_log_buffer_size = /*512*/ 16*1024;
 	// ToDo: cut down because of current allocator...
 
 

@@ -1,10 +1,12 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
 	Execution and synchronization of driver hook calls.
 */
@@ -31,9 +33,9 @@
  */
 
 status_t
-pnp_notify_probe_by_module(pnp_node_info *node, const char *consumer_name)
+pnp_notify_probe_by_module(device_node_info *node, const char *consumer_name)
 {
-	pnp_driver_info *consumer;
+	driver_module_info *consumer;
 	status_t res;
 
 	TRACE(("pnp_notify_probe_by_module(node %p, consumer: %s)\n", node, consumer_name));
@@ -67,11 +69,11 @@ exit:
 /** notify driver that it's device got removed */
 
 static status_t
-notify_device_removed(pnp_node_info *node)
+notify_device_removed(device_node_info *node)
 {
+	driver_module_info *driver;
 	bool loaded;
 	char *module_name;
-	pnp_driver_info *driver;
 	void *cookie;
 	status_t res;
 
@@ -140,9 +142,9 @@ err:
 /** notify all drivers in <notify_list> that their node got removed */
 
 void
-pnp_notify_unregistration(pnp_node_info *notify_list)
+pnp_notify_unregistration(device_node_info *notify_list)
 {
-	pnp_node_info *node;
+	device_node_info *node;
 
 	TRACE(("pnp_notify_unregistration()\n"));
 
@@ -156,7 +158,7 @@ pnp_notify_unregistration(pnp_node_info *notify_list)
  */
 
 void
-pnp_start_hook_call(pnp_node_info *node)
+pnp_start_hook_call(device_node_info *node)
 {
 	bool blocked;
 
@@ -179,7 +181,7 @@ pnp_start_hook_call(pnp_node_info *node)
  */
 
 void
-pnp_start_hook_call_nolock(pnp_node_info *node)
+pnp_start_hook_call_nolock(device_node_info *node)
 {
 	if (++node->num_waiting_hooks > 1) {
 		benaphore_unlock(&gNodeLock);
@@ -197,7 +199,7 @@ pnp_start_hook_call_nolock(pnp_node_info *node)
  */
 
 void
-pnp_finish_hook_call(pnp_node_info *node)
+pnp_finish_hook_call(device_node_info *node)
 {
 	benaphore_lock(&gNodeLock);
 
@@ -216,7 +218,7 @@ pnp_finish_hook_call(pnp_node_info *node)
  */
 
 void
-pnp_finish_hook_call_nolock(pnp_node_info *node)
+pnp_finish_hook_call_nolock(device_node_info *node)
 {
 	if (--node->num_waiting_hooks > 1) {
 		TRACE(("Releasing other hook calls of %p\n", node));

@@ -1,7 +1,9 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef __SCSI_INTERNAL_H__
+#define __SCSI_INTERNAL_H__
 
 /*
 	Part of Open SCSI bus manager
@@ -9,8 +11,6 @@
 	Internal structures/definitions
 */
 
-#ifndef __SCSI_INTERNAL_H__
-#define __SCSI_INTERNAL_H__
 
 
 #include <bus/SCSI.h>
@@ -131,7 +131,7 @@ typedef struct scsi_bus_info {
 	
 	locked_pool_cookie ccb_pool;	// ccb pool (one per bus)
 	
-	pnp_node_handle node;		// pnp node of bus
+	device_node_handle node;		// pnp node of bus
 	
 	dma_params dma_params;		// dma restrictions of controller
 	
@@ -195,7 +195,7 @@ typedef struct scsi_device_info {
 								// and thus must be emulated
 	
 	scsi_res_inquiry inquiry_data;
-	pnp_node_handle node;		// device node
+	device_node_handle node;	// device node
 
 	benaphore dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
 	sem_id dma_buffer_owner;	// to be acquired before using DMA buffer

@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI bus manager
@@ -25,46 +25,44 @@
  */
 
 static status_t
-scsi_controller_added(pnp_node_handle parent)
+scsi_controller_added(device_node_handle parent)
 {
 	int path_id;
 	char *str, *controller_name;
-	
-	SHOW_FLOW0( 4, "" );
-	
-	if( pnp->get_attr_string( parent, PNP_DRIVER_TYPE, &str, false ) != B_OK )
+
+	SHOW_FLOW0(4, "");
+
+	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK)
 		return B_ERROR;
-		
+
 	if (strcmp(str, SCSI_SIM_TYPE_NAME) != 0) {
 		free(str);
 		return B_ERROR;
 	}
-	
-	free( str );
 
-	if( pnp->get_attr_string( parent, SCSI_DESCRIPTION_CONTROLLER_NAME, 
-		&controller_name, false ) != B_OK )
-	{
-		pnp->get_attr_string( parent, PNP_DRIVER_DRIVER, &str, false );
-		SHOW_ERROR( 0, "Ignored controller managed by %s - controller name missing",
-			str );
+	free(str);
+
+	if (pnp->get_attr_string(parent, SCSI_DESCRIPTION_CONTROLLER_NAME, 
+		&controller_name, false) != B_OK) {
+		pnp->get_attr_string(parent, PNP_DRIVER_DRIVER, &str, false);
+		SHOW_ERROR(0, "Ignored controller managed by %s - controller name missing",
+			str);
 		return B_ERROR;
 	}
-	
-	path_id = pnp->create_id( SCSI_PATHID_GENERATOR );
 
-	if( path_id < 0 ) {
-		SHOW_ERROR( 0, "Cannot register SCSI controller %s - out of path IDs",
-			controller_name );
-		free( controller_name );
+	path_id = pnp->create_id(SCSI_PATHID_GENERATOR);
+
+	if (path_id < 0) {
+		SHOW_ERROR(0, "Cannot register SCSI controller %s - out of path IDs",
+			controller_name);
+		free(controller_name);
 		return B_ERROR;
 	}
-	
+
 	free(controller_name);
-	
+
 	{
-		pnp_node_attr attrs[] =
-		{
+		device_attr attrs[] = {
 			// general information
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_BUS_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: SCSI_BUS_TYPE_NAME }},
@@ -87,9 +85,9 @@ scsi_controller_added(pnp_node_handle parent)
 			{ NULL, 0 }
 		};
 
-		pnp_node_handle node;
+		device_node_handle node;
 	
-		return pnp->register_device( parent, attrs, NULL, &node );
+		return pnp->register_device(parent, attrs, NULL, &node);
 	}
 }
 

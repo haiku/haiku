@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -539,7 +539,7 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 
 
 static status_t
-ide_sim_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
+ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 {
 	ide_bus_info *bus;
 	int res;
@@ -636,7 +636,7 @@ ide_sim_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	res = pnp->load_driver(pnp->get_parent(node), bus, 
-			(pnp_driver_info **)&bus->controller, 
+			(driver_module_info **)&bus->controller, 
 			(void **)&bus->channel);
 	if (res != B_OK)
 		goto err5;
@@ -706,7 +706,7 @@ disconnect_worker(ide_bus_info *bus, void *arg)
 
 
 static void
-ide_sim_bus_removed(pnp_node_handle node, ide_bus_info *bus)
+ide_sim_bus_removed(device_node_handle node, ide_bus_info *bus)
 {	
 	if (bus == NULL)
 		// driver not loaded - no manual intervention needed
@@ -784,11 +784,11 @@ scsi_sim_interface ide_sim_module = {
 			std_ops,
 		},
 				
-		(status_t (*)( pnp_node_handle, void *, void **))ide_sim_init_bus,
+		(status_t (*)(device_node_handle, void *, void **))ide_sim_init_bus,
 		(status_t (*)( void *)) 					ide_sim_uninit_bus,
 		
 		NULL,
-		(void (*)( pnp_node_handle , void *))		ide_sim_bus_removed
+		(void (*)(device_node_handle, void *))		ide_sim_bus_removed
 	},
 	
 	(void (*)( scsi_sim_cookie, scsi_ccb * ))		sim_scsi_io,

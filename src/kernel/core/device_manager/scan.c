@@ -1,7 +1,9 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of PnP Manager
@@ -33,7 +35,7 @@
 /** public function: rescan PnP node */
 
 status_t
-pnp_rescan(pnp_node_info *node, uint depth)
+pnp_rescan(device_node_info *node, uint32 depth)
 {
 	return pnp_rescan_int(node, depth, false);
 }
@@ -42,7 +44,7 @@ pnp_rescan(pnp_node_info *node, uint depth)
 /** execute registration of fully constructed node */
 
 status_t
-pnp_initial_scan(pnp_node_info *node)
+pnp_initial_scan(device_node_info *node)
 {
 	pnp_start_hook_call(node);
 
@@ -60,16 +62,16 @@ pnp_initial_scan(pnp_node_info *node)
  */
 
 static bool
-is_rescan_sensible(pnp_node_info *node)
+is_rescan_sensible(device_node_info *node)
 {
 	uint depth;
-	pnp_node_info *child;
+	device_node_info *child;
 
 	TRACE(("is_rescan_sensible(node: %p)\n", node));
 
 	// if a child is being scanned, abort our rescan to avoid
 	// concurrent scans by the same driver on the same device	
-	for (child = node->children; child != NULL; child = child->children_next) {
+	for (child = node->children; child != NULL; child = child->siblings_next) {
 		if (child->rescan_depth > 0) {
 			TRACE(("child %p is being scanned\n", child));
 			return false;
@@ -100,16 +102,16 @@ is_rescan_sensible(pnp_node_info *node)
  */
 
 static void
-mark_children_scanned(pnp_node_info *node)
+mark_children_scanned(device_node_info *node)
 {
-	pnp_node_info *child, *next_child;
+	device_node_info *child, *next_child;
 
 	TRACE(("mark_children_scanned()\n"));
 
 	for (child = node->children; child != NULL; child = next_child) {
 		uint8 never_rescan, no_live_rescan;
 
-		next_child = child->children_next;
+		next_child = child->siblings_next;
 
 		// ignore dead children
 		if (!child->registered)
@@ -161,16 +163,16 @@ mark_children_scanned(pnp_node_info *node)
 /** stop children verification, resetting associated flag and unblocking loads. */
 
 static void
-reset_children_verification(pnp_node_info *node)
+reset_children_verification(device_node_info *node)
 {
-	pnp_node_info *child, *next_child;
+	device_node_info *child, *next_child;
 
 	TRACE(("reset_children_verification()\n"));
 
 	benaphore_lock(&gNodeLock);
 
 	for (child = node->children; child != NULL; child = next_child) {
-		next_child = child->children_next;
+		next_child = child->siblings_next;
 
 		if (!child->verifying)
 			continue;
@@ -202,16 +204,16 @@ reset_children_verification(pnp_node_info *node)
 /** unregister child nodes that weren't detected anymore */
 
 static void
-unregister_lost_children(pnp_node_info *node)
+unregister_lost_children(device_node_info *node)
 {
-	pnp_node_info *child, *dependency_list;
+	device_node_info *child, *dependency_list;
 
 	TRACE(("unregister_lost_children()\n"));
 
 	benaphore_lock(&gNodeLock);
 
 	for (child = node->children, dependency_list = NULL; child != NULL;
-			child = child->children_next) {
+			child = child->siblings_next) {
 		if (child->verifying && !child->redetected) {
 			TRACE(("removing lost device %p\n", child));
 			// child wasn't detected anymore - put it onto remove list
@@ -239,9 +241,9 @@ unregister_lost_children(pnp_node_info *node)
  */
 
 static status_t
-recursive_scan(pnp_node_info *node, uint depth)
+recursive_scan(device_node_info *node, uint depth)
 {
-	pnp_node_info *child, *next_child;
+	device_node_info *child, *next_child;
 	status_t res;
 
 	TRACE(("recursive_scan(node: %p, depth=%d)\n", node, depth));
@@ -253,7 +255,7 @@ recursive_scan(pnp_node_info *node, uint depth)
 		++child->ref_count;
 
 	for (; child != NULL; child = next_child) {
-		next_child = child->children_next;
+		next_child = child->siblings_next;
 
 		// lock next child, so its node is still valid after rescan
 		if (next_child != NULL)
@@ -290,10 +292,10 @@ err:
 /** ask bus to (re-)scan for connected devices */
 
 static void
-rescan_bus(pnp_node_info *node)
+rescan_bus(device_node_info *node)
 {
 	// busses can register their children themselves
-	pnp_bus_info *interface;
+	bus_module_info *interface;
 	void *cookie;
 	bool defer_probe;
 	uint8 defer_probe_var;
@@ -309,7 +311,7 @@ rescan_bus(pnp_node_info *node)
 	}
 
 	// load driver during rescan
-	pnp_load_driver(node, NULL, (pnp_driver_info **)&interface, &cookie);
+	pnp_load_driver(node, NULL, (driver_module_info **)&interface, &cookie);
 
 	TRACE(("scan bus\n"));
 
@@ -336,14 +338,14 @@ rescan_bus(pnp_node_info *node)
  */
 
 status_t
-pnp_rescan_int(pnp_node_info *node, uint depth, 
+pnp_rescan_int(device_node_info *node, uint32 depth, 
 	bool ignore_fixed_consumers)
 {
 	bool is_bus;
 	uint8 dummy;
 	status_t res = B_OK;
 
-	TRACE(("pnp_rescan_int(node: %p, depth=%d)\n", node, depth));
+	TRACE(("pnp_rescan_int(node: %p, depth = %ld)\n", node, depth));
 
 	//pnp_load_boot_links();
 

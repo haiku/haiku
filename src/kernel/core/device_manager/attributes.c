@@ -1,10 +1,12 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 	Node attributes handling.
 */
 
@@ -22,7 +24,7 @@ static bool is_fixed_attribute(const char *name);
 
 
 status_t
-pnp_get_attr_uint8(pnp_node_handle node, const char *name,
+pnp_get_attr_uint8(device_node_handle node, const char *name,
 	uint8 *value, bool recursive)
 {
 	status_t status;
@@ -36,10 +38,10 @@ pnp_get_attr_uint8(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint8_nolock(pnp_node_handle node, const char *name,
+pnp_get_attr_uint8_nolock(device_node_handle node, const char *name,
 	uint8 *value, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT8_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT8_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -49,7 +51,7 @@ pnp_get_attr_uint8_nolock(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint16(pnp_node_handle node, const char *name,
+pnp_get_attr_uint16(device_node_handle node, const char *name,
 	uint16 *value, bool recursive)
 {
 	status_t status;
@@ -63,10 +65,10 @@ pnp_get_attr_uint16(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint16_nolock(pnp_node_handle node, const char *name,
+pnp_get_attr_uint16_nolock(device_node_handle node, const char *name,
 	uint16 *value, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT16_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT16_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -76,7 +78,7 @@ pnp_get_attr_uint16_nolock(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint32(pnp_node_handle node, const char *name,
+pnp_get_attr_uint32(device_node_handle node, const char *name,
 	uint32 *value, bool recursive)
 {
 	status_t status;
@@ -90,10 +92,10 @@ pnp_get_attr_uint32(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint32_nolock(pnp_node_handle node, const char *name,
+pnp_get_attr_uint32_nolock(device_node_handle node, const char *name,
 	uint32 *value, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT32_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT32_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -103,7 +105,7 @@ pnp_get_attr_uint32_nolock(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint64(pnp_node_handle node, const char *name,
+pnp_get_attr_uint64(device_node_handle node, const char *name,
 	uint64 *value, bool recursive)
 {
 	status_t status;
@@ -117,10 +119,10 @@ pnp_get_attr_uint64(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_uint64_nolock(pnp_node_handle node, const char *name, 
+pnp_get_attr_uint64_nolock(device_node_handle node, const char *name, 
 	uint64 *value, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT64_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_UINT64_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -130,7 +132,7 @@ pnp_get_attr_uint64_nolock(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_string(pnp_node_handle node, const char *name,
+pnp_get_attr_string(device_node_handle node, const char *name,
 	char **value, bool recursive)
 {
 	status_t status;
@@ -152,10 +154,10 @@ pnp_get_attr_string(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_string_nolock(pnp_node_handle node, const char *name,
+pnp_get_attr_string_nolock(device_node_handle node, const char *name,
 	const char **value, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_STRING_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_STRING_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -165,7 +167,7 @@ pnp_get_attr_string_nolock(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_raw(pnp_node_handle node, const char *name,
+pnp_get_attr_raw(device_node_handle node, const char *name,
 	void **data, size_t *len, bool recursive)
 {
 	const void *orig_data;
@@ -191,10 +193,10 @@ pnp_get_attr_raw(pnp_node_handle node, const char *name,
 
 
 status_t
-pnp_get_attr_raw_nolock(pnp_node_handle node, const char *name,
+pnp_get_attr_raw_nolock(device_node_handle node, const char *name,
 	const void **data, size_t *len, bool recursive)
 {
-	pnp_node_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_RAW_TYPE);
+	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_RAW_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
@@ -207,7 +209,7 @@ pnp_get_attr_raw_nolock(pnp_node_handle node, const char *name,
 // free node attribute
 
 void
-pnp_free_node_attr(pnp_node_attr_info *attr)
+pnp_free_node_attr(device_attr_info *attr)
 {
 	free((char *)attr->attr.name);
 
@@ -227,9 +229,9 @@ pnp_free_node_attr(pnp_node_attr_info *attr)
 // duplicate node attribute
 
 status_t
-pnp_duplicate_node_attr(const pnp_node_attr *src, pnp_node_attr_info **dest_out)
+pnp_duplicate_node_attr(const device_attr *src, device_attr_info **dest_out)
 {
-	pnp_node_attr_info *dest;
+	device_attr_info *dest;
 	status_t res;
 
 	dest = malloc(sizeof(*dest));
@@ -286,9 +288,9 @@ err:
 // public: get first/next attribute of node
 
 status_t
-pnp_get_next_attr(pnp_node_handle node, pnp_node_attr_handle *attr)
+pnp_get_next_attr(device_node_handle node, device_attr_handle *attr)
 {
-	pnp_node_attr_info *next;
+	device_attr_info *next;
 
 	benaphore_lock(&gNodeLock);
 	
@@ -314,7 +316,7 @@ pnp_get_next_attr(pnp_node_handle node, pnp_node_attr_handle *attr)
 // public: release attribute of node explicitely
 
 status_t
-pnp_release_attr(pnp_node_handle node,pnp_node_attr_handle attr)
+pnp_release_attr(device_node_handle node, device_attr_handle attr)
 {
 	benaphore_lock(&gNodeLock);
 
@@ -329,7 +331,7 @@ pnp_release_attr(pnp_node_handle node,pnp_node_attr_handle attr)
 // public: retrieve data of attribute
 
 status_t
-pnp_retrieve_attr(pnp_node_attr_handle attr, const pnp_node_attr **attr_content)
+pnp_retrieve_attr(device_attr_handle attr, const device_attr **attr_content)
 {
 	*attr_content = &attr->attr;
 	return B_OK;
@@ -340,7 +342,7 @@ pnp_retrieve_attr(pnp_node_attr_handle attr, const pnp_node_attr **attr_content)
 // node_lock must be hold
 
 void
-pnp_remove_attr_int(pnp_node_handle node, pnp_node_attr_info *attr)
+pnp_remove_attr_int(device_node_handle node, device_attr_info *attr)
 {
 	REMOVE_DL_LIST(attr, node->attributes, );
 
@@ -352,9 +354,9 @@ pnp_remove_attr_int(pnp_node_handle node, pnp_node_attr_info *attr)
 // public: remove attribute from node
 
 status_t
-pnp_remove_attr(pnp_node_handle node, const char *name)
+pnp_remove_attr(device_node_handle node, const char *name)
 {
-	pnp_node_attr_info *attr;
+	device_attr_info *attr;
 
 	// don't remove holy attributes
 	if (is_fixed_attribute(name))
@@ -378,9 +380,9 @@ pnp_remove_attr(pnp_node_handle node, const char *name)
 // public: modify attribute's content
 
 status_t
-pnp_write_attr(pnp_node_handle node, const pnp_node_attr *attr)
+pnp_write_attr(device_node_handle node, const device_attr *attr)
 {
-	pnp_node_attr_info *old_attr, *new_attr;
+	device_attr_info *old_attr, *new_attr;
 	status_t res;
 
 	// don't touch holy attributes
@@ -423,7 +425,7 @@ pnp_write_attr(pnp_node_handle node, const pnp_node_attr *attr)
 		if (node->attributes == NULL) {
 			ADD_DL_LIST_HEAD(new_attr, node->attributes, );
 		} else {
-			pnp_node_attr_info *last_attr;
+			device_attr_info *last_attr;
 
 			for (last_attr = node->attributes; last_attr->next != NULL; last_attr = last_attr->next)
 				;
@@ -465,12 +467,12 @@ is_fixed_attribute(const char *name)
 
 // same as pnp_find_attr(), but node_lock must be hold and is never released
 
-pnp_node_attr_info *
-pnp_find_attr_nolock(pnp_node_handle node, const char *name,
-	bool recursive, type_code type )
+device_attr_info *
+pnp_find_attr_nolock(device_node_handle node, const char *name,
+	bool recursive, type_code type)
 {
 	do {
-		pnp_node_attr_info *attr;
+		device_attr_info *attr;
 
 		for (attr = node->attributes; attr != NULL; attr = attr->next) {
 			if (type != B_ANY_TYPE && attr->attr.type != type)

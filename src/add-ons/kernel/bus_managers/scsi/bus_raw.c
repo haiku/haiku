@@ -27,63 +27,65 @@
 typedef struct bus_raw_info {
 	scsi_bus_interface *interface;
 	scsi_bus cookie;
-	pnp_node_handle node;
+	device_node_handle node;
 } bus_raw_info;
 
 
-static status_t scsi_bus_raw_init_device(
-	pnp_node_handle	node, void *user_cookie, void **cookie )
+static status_t
+scsi_bus_raw_init_device(device_node_handle node,
+	void *userCookie, void **cookie)
 {
 	bus_raw_info *bus;
 	scsi_bus_interface *interface;
 	scsi_bus bus_cookie;
-	status_t res;
-	
-	res = pnp->load_driver( pnp->get_parent( node ), NULL, 
-		(pnp_driver_info **)&interface, (void **)&bus_cookie );
-	if( res != B_OK )
+
+	status_t res = pnp->load_driver(pnp->get_parent(node), NULL, 
+		(driver_module_info **)&interface, (void **)&bus_cookie);
+	if (res != B_OK)
 		return res;
-		
-	bus = malloc( sizeof( *bus ));
+
+	bus = malloc(sizeof(*bus));
 	bus->interface = interface;
 	bus->cookie = bus_cookie;
 	bus->node = node;
-	
+
 	*cookie = bus;
 	return B_OK;
 }
 
 
-static status_t scsi_bus_raw_uninit_device( bus_raw_info *bus )
+static status_t
+scsi_bus_raw_uninit_device(bus_raw_info *bus)
 {
 	status_t res;
-	
-	res = pnp->unload_driver( pnp->get_parent( bus->node ));
-	if( res != B_OK )
+
+	res = pnp->unload_driver(pnp->get_parent(bus->node));
+	if (res != B_OK)
 		return res;
-		
-	free( bus );
+
+	free(bus);
 	return B_OK;
 }
 
 	
-static status_t scsi_bus_raw_probe( pnp_node_handle parent )
+static status_t
+scsi_bus_raw_probe(device_node_handle parent)
 {
 	uint8 path_id;
 	char *name;
-	
-	if( pnp->get_attr_uint8( parent, SCSI_BUS_PATH_ID_ITEM, &path_id, false ) != B_OK )
+
+	if (pnp->get_attr_uint8(parent, SCSI_BUS_PATH_ID_ITEM, &path_id, false) != B_OK)
 		return B_ERROR;
 
 	// put that on heap to not overflow the limited kernel stack	
-	name = malloc( PATH_MAX + 1 );
-	if( name == NULL )
+	name = malloc(PATH_MAX + 1);
+	if (name == NULL)
 		return B_NO_MEMORY;
-		
-	sprintf( name, "bus/scsi/%d/bus_raw", path_id );
-			
+
+	snprintf(name, PATH_MAX + 1, "bus/scsi/%d/bus_raw", path_id);
+
 	{
-		pnp_node_attr attributes[] = {
+		device_attr attributes[] = {
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
 			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
@@ -94,63 +96,67 @@ static status_t scsi_bus_raw_probe( pnp_node_handle parent )
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			{}
 		};
-		
-		pnp_node_handle node;
-		status_t res;
-		
-		res = pnp->register_device( parent, attributes, NULL, &node );
-		free( name );
-		
+
+		device_node_handle node;
+		status_t res = pnp->register_device(parent, attributes, NULL, &node);
+		free(name);
+
 		return res;
 	}
 }
 
 
-static status_t scsi_bus_raw_open( bus_raw_info *bus, uint32 flags, 
-	bus_raw_info **handle_cookie )
+static status_t
+scsi_bus_raw_open(bus_raw_info *bus, uint32 flags,
+	bus_raw_info **handle_cookie)
 {
 	*handle_cookie = bus;
 	return B_ERROR;
 }
 
 
-static status_t scsi_bus_raw_close( void *cookie )
+static status_t
+scsi_bus_raw_close(void *cookie)
 {
 	return B_OK;
 }
 
 
-static status_t scsi_bus_raw_free( void *cookie )
+static status_t
+scsi_bus_raw_free(void *cookie)
 {
 	return B_ERROR;
 }
 
 
-static status_t scsi_bus_raw_control( bus_raw_info *bus, uint32 op, void *data,
-	size_t len )
+static status_t
+scsi_bus_raw_control(bus_raw_info *bus, uint32 op, void *data,
+	size_t len)
 {
-	switch( op ) {
-	case B_SCSI_BUS_RAW_RESET:
-		return bus->interface->reset_bus( bus->cookie );
-		
-	case B_SCSI_BUS_RAW_PATH_INQUIRY:
-		return bus->interface->path_inquiry( bus->cookie, data );
+	switch (op) {
+		case B_SCSI_BUS_RAW_RESET:
+			return bus->interface->reset_bus(bus->cookie);
+
+		case B_SCSI_BUS_RAW_PATH_INQUIRY:
+			return bus->interface->path_inquiry(bus->cookie, data);
 	}
 
 	return B_ERROR;
 }
 
 
-static status_t scsi_bus_raw_read( void *cookie, off_t position, void *data,
-	size_t *numBytes )
+static status_t
+scsi_bus_raw_read(void *cookie, off_t position, void *data,
+	size_t *numBytes)
 {
 	*numBytes = 0;
 	return B_ERROR;
 }
 
 
-static status_t scsi_bus_raw_write( void *cookie, off_t position,
-	const void *data, size_t *numBytes )
+static status_t
+scsi_bus_raw_write(void *cookie, off_t position,
+	const void *data, size_t *numBytes)
 {
 	*numBytes = 0;
 	return B_ERROR;

@@ -1,10 +1,10 @@
-/* 
-** Copyright 2002, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
-
+/*
+ * Copyright 2002, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef __SCSI_PERIPH_INT_H__
 #define __SCSI_PERIPH_INT_H__
+
 
 #include <stddef.h>
 #include <bus/scsi/scsi_periph.h>
@@ -19,7 +19,7 @@ typedef struct scsi_periph_device_info {
 	scsi_device scsi_device;
 	scsi_device_interface *scsi;
 	periph_device_cookie periph_device;
-	pnp_node_handle node;
+	device_node_handle node;
 
 	bool removal_requested;
 
@@ -78,9 +78,9 @@ status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 
 status_t periph_register_device(periph_device_cookie periph_device,
 	scsi_periph_callbacks *callbacks, scsi_device scsi_device, scsi_device_interface *scsi,
-	pnp_node_handle node, bool removable, scsi_periph_device *driver);
+	device_node_handle node, bool removable, scsi_periph_device *driver);
 status_t periph_unregister_device(scsi_periph_device_info *driver);
-char *periph_compose_device_name(pnp_node_handle device_node, const char *prefix);
+char *periph_compose_device_name(device_node_handle device_node, const char *prefix);
 
 
 // io.c
@@ -107,4 +107,4 @@ status_t periph_simple_exec(scsi_periph_device_info *device, void *cdb,
 
 status_t periph_get_icon(icon_type type, device_icon *data);
 	
-#endif
+#endif	/* __SCSI_PERIPH_INT_H__ */

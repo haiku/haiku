@@ -1,12 +1,12 @@
-/* 
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-**
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of PnP Manager
+	Part of Device Manager
 
 	Main file.
 */
@@ -26,7 +26,7 @@
 #endif
 
 
-pnp_node_info *node_list;
+device_node_info *gNodeList;
 
 bool disable_useraddons;
 
@@ -63,7 +63,10 @@ std_ops(int32 op, ...)
 
 
 // ToDo: the device manager exports these for now, so that Thomas's driver
-//	can work on both R5 and OpenBeOS without too much hassle
+//	can work on both R5 and Haiku without too much hassle.
+//	We might also want to keep it in order to have the possibility to make
+//	substantial changes without breaking compatibility, and eventually
+//	separate it from the kernel for whatever reason.
 
 device_manager_info gDeviceManagerModule = {
 	{
@@ -142,10 +145,10 @@ device_manager_init(struct kernel_args *args)
 
 	{
 		// dump root node
-		pnp_node_info *node = node_list;
+		device_node_info *node = gNodeList;
 		while (node && node->parent != NULL)
 			node = node->parent;
-		dump_pnp_node_info(node, 0);
+		dump_device_node_info(node, 0);
 	}
 
 	// build initial device tree; register all root bus_managers

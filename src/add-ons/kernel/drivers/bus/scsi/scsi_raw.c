@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI raw driver.
@@ -67,7 +67,7 @@ raw_write(void *cookie, off_t position, const void *data, size_t *numBytes)
 }
 
 
-/** !!!keep this in sync with scsi_periph module!!! */
+/** !!! keep this in sync with scsi_periph module !!! */
 
 static status_t
 raw_command(raw_device_info *device, raw_device_command *cmd)
@@ -93,23 +93,23 @@ raw_command(raw_device_info *device, raw_device_command *cmd)
 	request->sort = -1;
 	request->timeout = cmd->timeout;
 
-	memcpy( request->cdb, cmd->command, SCSI_MAX_CDB_SIZE );
+	memcpy(request->cdb, cmd->command, SCSI_MAX_CDB_SIZE);
 	request->cdb_len = cmd->command_length;
-	
-	device->scsi->sync_io( request );
-	
+
+	device->scsi->sync_io(request);
+
 	// TBD: should we call standard error handler here, or may the
 	// actions done there (like starting the unit) confuse the application?
-	
+
 	cmd->cam_status = request->subsys_status;
 	cmd->scsi_status = request->device_status;
-	
-	if( (request->subsys_status & SCSI_AUTOSNS_VALID) != 0 && cmd->sense_data ) {
-		memcpy( cmd->sense_data, request->sense, 
-			min( cmd->sense_data_length, SCSI_MAX_SENSE_SIZE - request->sense_resid ));
+
+	if ((request->subsys_status & SCSI_AUTOSNS_VALID) != 0 && cmd->sense_data) {
+		memcpy(cmd->sense_data, request->sense,
+			min((int32)cmd->sense_data_length, SCSI_MAX_SENSE_SIZE - request->sense_resid));
 	}
-	
-	if( (cmd->flags & B_RAW_DEVICE_REPORT_RESIDUAL) != 0 ) {
+
+	if ((cmd->flags & B_RAW_DEVICE_REPORT_RESIDUAL) != 0) {
 		// this is a bit strange, see Be's sample code where I pinched this from;
 		// normally, residual means "number of unused bytes left"
 		// but here, we have to return "number of used bytes", which is the opposite
@@ -117,60 +117,58 @@ raw_command(raw_device_info *device, raw_device_command *cmd)
 		cmd->sense_data_length = SCSI_MAX_SENSE_SIZE - request->sense_resid;
 	}
 
-	device->scsi->free_ccb( request );
-			
+	device->scsi->free_ccb(request);
 	return B_OK;
 }
 
 
 static status_t
-raw_ioctl(raw_device_info *device, int op, void *buf, size_t len)
+raw_ioctl(raw_device_info *device, int op, void *buffer, size_t length)
 {
 	status_t res;
-	
-	switch( op ) {
-	case B_RAW_DEVICE_COMMAND:
-		res = raw_command( device, buf );
-//		__asm( "int $3" : : );
-		break;
-		
-	default:
-		res = B_DEV_INVALID_IOCTL;
+
+	switch (op) {
+		case B_RAW_DEVICE_COMMAND:
+			res = raw_command(device, buffer);
+			break;
+
+		default:
+			res = B_DEV_INVALID_IOCTL;
 	}
-	
-	SHOW_FLOW( 4, "%x: %s", op, strerror( res ));
-	
+
+	SHOW_FLOW(4, "%x: %s", op, strerror(res));
+
 	return res;
 }
 
 
 static status_t
-raw_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+raw_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	raw_device_info *device;
 	status_t res;
-	
-	SHOW_FLOW0( 3, "" );
-	
-	device = (raw_device_info *)calloc( 1, sizeof( *device ));
-	if( device == NULL )
+
+	SHOW_FLOW0(3, "");
+
+	device = (raw_device_info *)calloc(1, sizeof(*device));
+	if (device == NULL)
 		return B_NO_MEMORY;
 
 	device->node = node;
-	
-	// register it everywhere	
-	res = pnp->load_driver( pnp->get_parent( node ), NULL, 
-		(pnp_driver_info **)&device->scsi, (void **)&device->scsi_device );
-	if( res != B_OK )
+
+	// register it everywhere
+	res = pnp->load_driver(pnp->get_parent(node), NULL, 
+			(driver_module_info **)&device->scsi, (void **)&device->scsi_device);
+	if (res != B_OK)
 		goto err;
-		
-	SHOW_FLOW0( 3, "done" );
+
+	SHOW_FLOW0(3, "done");
 
 	*cookie = device;
 	return B_OK;
 
 err:
-	free( device );
+	free(device);
 	return res;
 }
 
@@ -190,45 +188,41 @@ raw_uninit_device(raw_device_info *device)
  */
 
 static status_t
-raw_device_added(pnp_node_handle node)
+raw_device_added(device_node_handle node)
 {
-	char *str;
 	uint8 path_id, target_id, target_lun;
 	char name[100];
-	
-	SHOW_FLOW0( 3, "" );
-	
+	char *str;
+
+	SHOW_FLOW0(3, "");
+
 	// make sure we can handle this parent device
-	if( pnp->get_attr_string( node, PNP_DRIVER_TYPE, &str, false ) != B_OK )
+	if (pnp->get_attr_string(node, PNP_DRIVER_TYPE, &str, false) != B_OK)
 		return B_ERROR;
-		
-	if( strcmp( str, SCSI_DEVICE_TYPE_NAME ) != 0 ) {
-		free( str );
+
+	if (strcmp(str, SCSI_DEVICE_TYPE_NAME) != 0) {
+		free(str);
 		return B_ERROR;
 	}
-	
-	free( str );
+
+	free(str);
 
 	// compose name	
-	if( pnp->get_attr_uint8( node, 
-		SCSI_BUS_PATH_ID_ITEM, &path_id, true ) != B_OK ||
-		pnp->get_attr_uint8( node, 
-		SCSI_DEVICE_TARGET_ID_ITEM, &target_id, true ) != B_OK ||
-		pnp->get_attr_uint8( node, 
-		SCSI_DEVICE_TARGET_LUN_ITEM, &target_lun, true ) != B_OK )
+	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &path_id, true) != B_OK
+		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &target_id, true) != B_OK
+		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &target_lun, true) != B_OK)
 		return B_ERROR;
 
-	sprintf( name, "bus/scsi/%d/%d/%d/raw",
-		path_id, target_id, target_lun );
+	sprintf(name, "bus/scsi/%d/%d/%d/raw",
+		path_id, target_id, target_lun);
 
-	SHOW_FLOW( 3, "name=%s", name );
+	SHOW_FLOW(3, "name=%s", name);
 
 	// ready to register
 	{
-		pnp_node_attr attrs[] =
-		{
+		device_attr attrs[] = {
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_RAW_MODULE_NAME }},
-			
+
 			// default connection is used by peripheral drivers, and as we don't
 			// want to kick them out, we use concurrent "raw" connection
 			// (btw: this shows nicely that something goes wrong: one device
@@ -244,7 +238,7 @@ raw_device_added(pnp_node_handle node)
 			{ NULL }
 		};
 
-		return pnp->register_device( node, attrs, NULL, &node );
+		return pnp->register_device(node, attrs, NULL, &node);
 	}
 }
 
@@ -281,27 +275,23 @@ pnp_devfs_driver_info scsi_raw_module = {
 		raw_device_added,
 		NULL
 	},
-	
-	(status_t (*)( void *, uint32, void ** )) 			&raw_open,
+
+	(status_t (*)(void *, uint32, void **)) 		&raw_open,
 	raw_close,
 	raw_free,
-	(status_t (*)( void *, uint32, void *, size_t ))	&raw_ioctl,
-	
+	(status_t (*)(void *, uint32, void *, size_t))	&raw_ioctl,
+
 	raw_read,
 	raw_write,
 
 	NULL,
 	NULL,
-	
+
 	NULL,
 	NULL
 };
 
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
-module_info *modules[] =
-{
+module_info *modules[] = {
 	(module_info *)&scsi_raw_module,
 	NULL
 };
-#endif

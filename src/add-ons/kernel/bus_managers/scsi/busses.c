@@ -85,7 +85,7 @@ scsi_service_threadproc(void *arg)
 
 
 static scsi_bus_info *
-scsi_create_bus(pnp_node_handle node, uint8 path_id)
+scsi_create_bus(device_node_handle node, uint8 path_id)
 {
 	scsi_bus_info *bus;
 	int res;
@@ -180,7 +180,7 @@ scsi_destroy_bus(scsi_bus_info *bus)
 
 
 static status_t
-scsi_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
+scsi_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 {
 	uint8 path_id;
 	scsi_bus_info *bus;
@@ -240,8 +240,7 @@ scsi_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	res = pnp->load_driver(pnp->get_parent(node), bus, 
-		(pnp_driver_info **)&bus->interface, 
-		(void **)&bus->sim_cookie);
+		(driver_module_info **)&bus->interface, (void **)&bus->sim_cookie);
 	if (res != B_OK)
 		goto err;
 

@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Fast logging facilities.
@@ -23,7 +23,7 @@
 
 
 // Devfs node
-pnp_node_handle fast_log_devfs_node;
+device_node_handle fast_log_devfs_node;
 
 
 static status_t
@@ -80,7 +80,7 @@ static status_t
 fast_log_create_devfs_entry(void)
 {
 	status_t res;
-	pnp_node_attr attrs[] = {
+	device_attr attrs[] = {
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: FAST_LOG_DEVFS_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
 		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
@@ -99,7 +99,7 @@ fast_log_create_devfs_entry(void)
 
 
 static status_t
-fast_log_devfs_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+fast_log_devfs_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	*cookie = NULL;
 	return B_OK;

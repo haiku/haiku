@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	ISA bus manager
@@ -137,7 +137,7 @@ unlock_isa_dma_channel(long channel)
 
 
 static status_t
-isa_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+isa_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	*cookie = NULL;
 	return B_OK;
@@ -152,9 +152,9 @@ isa_uninit_device(void *cookie)
 
 
 static status_t
-isa_device_added(pnp_node_handle parent)
+isa_device_added(device_node_handle parent)
 {
-	static const pnp_node_attr attrs[] = {
+	static const device_attr attrs[] = {
 		// info about ourself
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: ISA_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: ISA_DEVICE_TYPE_NAME }},
@@ -170,11 +170,11 @@ isa_device_added(pnp_node_handle parent)
 		{ PNP_DRIVER_DYNAMIC_CONSUMER, B_STRING_TYPE, { string: ISA_DRIVERS_DIR "/" }},
 		{ NULL }
 	};
-	
-	pnp_node_handle node;
+
+	device_node_handle node;
 	char *parent_type;
 	status_t res;
-	
+
 	// make sure parent is really pnp root
 	if (pnp->get_attr_string( parent, PNP_DRIVER_TYPE, &parent_type, false))
 		return B_ERROR;

@@ -18,7 +18,7 @@
 
 
 status_t
-das_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
+das_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
 	das_device_info *device;
 	status_t res;
@@ -41,7 +41,7 @@ das_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
 		goto err1;
 
 	// register it everywhere	
-	res = pnp->load_driver(pnp->get_parent(node), NULL, (pnp_driver_info **)&device->scsi, 
+	res = pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&device->scsi,
 		(void **)&device->scsi_device);
 	if (res != B_OK)
 		goto err2;
@@ -96,7 +96,7 @@ das_uninit_device(das_device_info *device)
  */
 
 status_t
-das_device_added(pnp_node_handle node)
+das_device_added(device_node_handle node)
 {
 	char *str = NULL;
 	scsi_res_inquiry *device_inquiry = NULL;
@@ -140,7 +140,7 @@ das_device_added(pnp_node_handle node)
 
 	// ready to register
 	{
-		pnp_node_attr attrs[] = {
+		device_attr attrs[] = {
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_DSK_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: BLKDEV_TYPE_NAME }},
 			// we always want blkdev on top of us

@@ -24,7 +24,7 @@
 /** called when an IDE channel was registered by a controller driver */
 
 static status_t
-ide_channel_added(pnp_node_handle parent)
+ide_channel_added(device_node_handle parent)
 {
 	char *str = NULL, *controller_name = NULL;
 	uint32 channel_id;
@@ -50,7 +50,7 @@ ide_channel_added(pnp_node_handle parent)
 	}
 
 	{
-		pnp_node_attr attrs[] =
+		device_attr attrs[] =
 		{
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: IDE_SIM_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: SCSI_SIM_TYPE_NAME }},
@@ -76,7 +76,7 @@ ide_channel_added(pnp_node_handle parent)
 			{ NULL }
 		};
 
-		pnp_node_handle node;
+		device_node_handle node;
 		status_t res;
 
 		res = pnp->register_device(parent, attrs, NULL, &node);
