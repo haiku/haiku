@@ -32,7 +32,6 @@
 #include <ServerProtocol.h>
 #include <ScrollBar.h>
 #include <Screen.h>
-#include <PortMessage.h>
 #include <Roster.h>
 #include <Menu.h>
 #include <stdlib.h>
@@ -43,6 +42,8 @@
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
+
+#include "InputServerTypes.h"
 extern status_t _control_input_server_(BMessage *command, BMessage *reply);
 
 using namespace BPrivate;
@@ -55,6 +56,7 @@ system_colors()
 	return BScreen(B_MAIN_SCREEN_ID).ColorMap();
 }
 
+#ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 res, bool stick)
@@ -72,7 +74,7 @@ set_screen_space(int32 index, uint32 res, bool stick)
 }
 
 
-status_t
+_IMPEXP_BE status_t
 get_scroll_bar_info(scroll_bar_info *info)
 {
 	if (info == NULL)
@@ -86,6 +88,7 @@ get_scroll_bar_info(scroll_bar_info *info)
 	
 	return B_OK;
 }
+
 
 _IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
@@ -102,11 +105,12 @@ set_scroll_bar_info(scroll_bar_info *info)
 	return B_OK;
 }
 
+#endif // COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
 get_mouse_type(int32 *type)
 {
-	BMessage command('Igmt');
+	BMessage command(IS_GET_MOUSE_TYPE);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -121,21 +125,21 @@ get_mouse_type(int32 *type)
 _IMPEXP_BE status_t
 set_mouse_type(int32 type)
 {
-	BMessage command('Ismt');
+	BMessage command(IS_SET_MOUSE_TYPE);
 	BMessage reply;
 
 	command.AddInt32("mouse_type", type);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_map(mouse_map *map)
 {
-	BMessage command('Igmm');
+	BMessage command(IS_GET_MOUSE_MAP);
 	BMessage reply;
 	const void *data = 0;
-	int32 count;
+	ssize_t count;
 	
 	_control_input_server_(&command, &reply);
 	
@@ -151,17 +155,18 @@ get_mouse_map(mouse_map *map)
 _IMPEXP_BE status_t
 set_mouse_map(mouse_map *map)
 {
-	BMessage command('Ismm');
+	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
 	
 	command.AddData("mousemap", B_ANY_TYPE, map, sizeof(mouse_map));
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
+
 
 _IMPEXP_BE status_t
 get_click_speed(bigtime_t *speed)
 {
-	BMessage command('Igcs');
+	BMessage command(IS_GET_CLICK_SPEED);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -176,17 +181,17 @@ get_click_speed(bigtime_t *speed)
 _IMPEXP_BE status_t
 set_click_speed(bigtime_t speed)
 {
-	BMessage command('Iscs');
+	BMessage command(IS_SET_CLICK_SPEED);
 	BMessage reply;
 	command.AddInt64("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_speed(int32 *speed)
 {
-	BMessage command('Igms');
+	BMessage command(IS_GET_MOUSE_SPEED);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -201,17 +206,17 @@ get_mouse_speed(int32 *speed)
 _IMPEXP_BE status_t
 set_mouse_speed(int32 speed)
 {
-	BMessage command('Isms');
+	BMessage command(IS_SET_MOUSE_SPEED);
 	BMessage reply;
 	command.AddInt32("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE status_t
 get_mouse_acceleration(int32 *speed)
 {
-	BMessage command('Igma');
+	BMessage command(IS_GET_MOUSE_ACCELERATION);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -226,17 +231,17 @@ get_mouse_acceleration(int32 *speed)
 _IMPEXP_BE status_t
 set_mouse_acceleration(int32 speed)
 {
-	BMessage command('Isma');
+	BMessage command(IS_SET_MOUSE_ACCELERATION);
 	BMessage reply;
 	command.AddInt32("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE status_t
 get_key_repeat_rate(int32 *rate)
 {
-	BMessage command('Igrr');
+	BMessage command(IS_GET_KEY_REPEAT_RATE);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -251,17 +256,17 @@ get_key_repeat_rate(int32 *rate)
 _IMPEXP_BE status_t
 set_key_repeat_rate(int32 rate)
 {
-	BMessage command('Isrr');
+	BMessage command(IS_SET_KEY_REPEAT_RATE);
 	BMessage reply;
 	command.AddInt32("rate", rate);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE status_t
 get_key_repeat_delay(bigtime_t *delay)
 {
-	BMessage command('Igrd');
+	BMessage command(IS_GET_KEY_REPEAT_DELAY);
 	BMessage reply;
 	
 	_control_input_server_(&command, &reply);
@@ -276,17 +281,17 @@ get_key_repeat_delay(bigtime_t *delay)
 _IMPEXP_BE status_t
 set_key_repeat_delay(bigtime_t  delay)
 {
-	BMessage command('Isrd');
+	BMessage command(IS_SET_KEY_REPEAT_DELAY);
 	BMessage reply;
 	command.AddInt64("delay", delay);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
 _IMPEXP_BE uint32
 modifiers()
 {
-	BMessage command('Igmd');
+	BMessage command(IS_GET_MODIFIERS);
 	BMessage reply;
 	int32 err, modifier;
 	
@@ -305,10 +310,11 @@ modifiers()
 _IMPEXP_BE status_t
 get_key_info(key_info *info)
 {
-	BMessage command('Igki');
+	BMessage command(IS_GET_KEY_INFO);
 	BMessage reply;
 	const void *data = 0;
-	int32 count, err;
+	int32 err;
+	ssize_t count;
 	
 	_control_input_server_(&command, &reply);
 	
@@ -326,9 +332,9 @@ get_key_info(key_info *info)
 _IMPEXP_BE void
 get_key_map(key_map **map, char **key_buffer)
 {
-	BMessage command('Igkm');
+	BMessage command(IS_GET_KEY_MAP);
 	BMessage reply;
-	int32 map_count, key_count;
+	ssize_t map_count, key_count;
 	const void *map_array = 0, *key_array = 0;
 	
 	_control_input_server_(&command, &reply);
@@ -355,7 +361,7 @@ get_key_map(key_map **map, char **key_buffer)
 _IMPEXP_BE status_t
 get_keyboard_id(uint16 *id)
 {
-	BMessage command('Igid');
+	BMessage command(IS_GET_KEYBOARD_ID);
 	BMessage reply;
 	uint16 kid;
 	
@@ -371,7 +377,7 @@ get_keyboard_id(uint16 *id)
 _IMPEXP_BE void
 set_modifier_key(uint32 modifier, uint32 key)
 {
-	BMessage command('Ismk');
+	BMessage command(IS_SET_MODIFIER_KEY);
 	BMessage reply;
 	
 	command.AddInt32("modifier", modifier);
@@ -383,11 +389,21 @@ set_modifier_key(uint32 modifier, uint32 key)
 _IMPEXP_BE void
 set_keyboard_locks(uint32 modifiers)
 {
-	BMessage command('Iskl');
+	BMessage command(IS_SET_KEYBOARD_LOCKS);
 	BMessage reply;
 	
 	command.AddInt32("locks", modifiers);
 	_control_input_server_(&command, &reply);
+}
+
+
+_IMPEXP_BE status_t
+_restore_key_map_()
+{
+	BMessage message(IS_RESTORE_KEY_MAP);
+	BMessage reply;
+
+	return _control_input_server_(&message, &reply);	
 }
 
 
@@ -398,6 +414,8 @@ keyboard_navigation_color()
 	return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 }
 
+
+#ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE int32
 count_workspaces()
@@ -551,6 +569,7 @@ ui_color(color_which which)
 	return color;
 }
 
+
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {
@@ -559,15 +578,12 @@ tint_color(rgb_color color, float tint)
 	#define LIGHTEN(x) ((uint8)(255.0f - (255.0f - x) * tint))
 	#define DARKEN(x)  ((uint8)(x * (2 - tint)))
 
-	if (tint < 1.0f)
-	{
+	if (tint < 1.0f) {
 		result.red   = LIGHTEN(color.red);
 		result.green = LIGHTEN(color.green);
 		result.blue  = LIGHTEN(color.blue);
 		result.alpha = color.alpha;
-	}
-	else
-	{
+	} else {
 		result.red   = DARKEN(color.red);
 		result.green = DARKEN(color.green);
 		result.blue  = DARKEN(color.blue);
@@ -590,14 +606,12 @@ _init_interface_kit_()
 	BTextView::sWidthSem = widthSem;
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
-		
-	status_t result = get_menu_info(&BMenu::sMenuInfo);
-	if (result != B_OK)  
-		return result;
 	
-	_init_global_fonts();
-	
-	//TODO: fill the other static members
+	// TODO: get_menu_info() copies the BMenu::sMenuInfo struct
+	// to the passed menu_info, so we can't use it here.
+	// We should probably load the ui settings from the disk	
+
+	// TODO: fill the other static members
 		
 	return B_OK;
 }
@@ -611,7 +625,6 @@ _fini_interface_kit_()
 	return B_OK;
 }
 
-
 /*!
 	\brief private function used by Tracker to set window decor
 	\param theme The theme to choose
@@ -621,7 +634,8 @@ _fini_interface_kit_()
 	- \c 2: Win95
 	- \c 3: MacOS
 */
-void __set_window_decor(int32 theme)
+void
+__set_window_decor(int32 theme)
 {
 	BAppServerLink link;
 	link.StartMessage(AS_R5_SET_DECORATOR);
@@ -629,12 +643,4 @@ void __set_window_decor(int32 theme)
 	link.Flush();
 }
 
-
-_IMPEXP_BE status_t
-_restore_key_map_()
-{
-	BMessage message('Iskm');
-	BMessage reply;
-
-	return _control_input_server_(&message, &reply);	
-}
+#endif // COMPILE_FOR_R5
