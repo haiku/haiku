@@ -136,9 +136,15 @@ struct TMessageItemAssertPolicy
 template<class T>
 struct TMessageItemComparePolicy
 {
-	inline static bool Compare(const T& lhs, const T& rhs)
-		{ return lhs == rhs; }
+	inline static bool Compare(const T& lhs, const T& rhs);
+//		{ return lhs == rhs; }
 };
+template<class T>
+bool 
+TMessageItemComparePolicy<T>::Compare(const T &lhs, const T &rhs)
+{
+	 return lhs == rhs;
+}
 //------------------------------------------------------------------------------
 template
 <
@@ -223,7 +229,7 @@ template
 void
 TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
 MessageItemTest2()
-{
+{debugger(__PRETTY_FUNCTION__);
 	BMessage msg;
 	Type in = InitPolicy::Test1();
 	Type out = InitPolicy::Zero();
