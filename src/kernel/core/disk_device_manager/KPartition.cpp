@@ -1,37 +1,23 @@
 // KPartition.cpp
 
+#include <errno.h>
+#include <fcntl.h>
 #include <new>
+#include <stdio.h>
 #include <stdlib.h>
+
+#include <Errors.h>
 
 //#include <Partition.h>
 	// TODO: Move the definitions needed in the kernel to a separate header.
 
+#include "KDiskDevice.h"
+#include "KDiskDeviceManager.h"
+#include "KDiskDeviceUtils.h"
 #include "KPartition.h"
 
 using namespace std;
-using BPrivate::DiskDevice::KDiskDevice;
 using BPrivate::DiskDevice::KDiskSystem;
-
-// set_string
-// simple helper
-static
-status_t
-set_string(char *&location, const char *newValue)
-{
-	// unset old value
-	if (location) {
-		free(location);
-		location = NULL;
-	}
-	// set new value
-	status_t error = B_OK;
-	if (newValue) {
-		location = strdup(newValue);
-		if (!location)
-			error = B_NO_MEMORY;
-	}
-	return error;
-}
 
 // constructor
 KPartition::KPartition(partition_id id)
@@ -74,19 +60,17 @@ KPartition::~KPartition()
 }
 
 // Register
-bool
+void
 KPartition::Register()
 {
 	fReferenceCount++;
-	return true;
 }
 
 // Unregister
-bool
+void
 KPartition::Unregister()
 {
 	fReferenceCount--;
-	return true;
 }
 
 // CountReferences
@@ -94,6 +78,24 @@ int32
 KPartition::CountReferences() const
 {
 	return fReferenceCount;
+}
+
+// Open
+status_t
+KPartition::Open(int flags, int *fd)
+{
+	if (!fd)
+		return B_BAD_VALUE;
+	// get the path
+	char path[B_PATH_NAME_LENGTH];
+	status_t error = GetPath(path);
+	if (error != B_OK)
+		return error;
+	// open the device
+	*fd = open(path, flags);
+	if (*fd < 0)
+		return errno;
+	return B_OK;
 }
 
 // SetBusy
@@ -343,8 +345,29 @@ KPartition::ChangeCounter() const
 status_t
 KPartition::GetPath(char *path) const
 {
-	// not implemented
-	return B_ERROR;
+	// For a KDiskDevice this version is never invoked, so the check for
+	// Parent() is correct.
+	if (!path || !Parent() || Index() < 0)
+		return B_BAD_VALUE;
+	// get the parent's path
+	status_t error = Parent()->GetPath(path);
+	if (error != B_OK)
+		return error;
+	// check length for safety
+	int32 len = strlen(path);
+	if (len >= B_PATH_NAME_LENGTH - 10)
+		return B_NAME_TOO_LONG;
+	if (Parent() == Device()) {
+		// Our parent is a device, so we replace `raw' by our index.
+		int32 leafLen = strlen("/raw");
+		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
+			return B_ERROR;
+		sprintf(path + len - leafLen + 1, "%ld", Index());
+	} else {
+		// Our parent is a normal partition, no device: Append our index.
+		sprintf(path + len, "_%ld", Index());
+	}
+	return error;
 }
 
 // SetVolumeID
@@ -423,6 +446,7 @@ KPartition::Device() const
 void
 KPartition::SetParent(KPartition *parent)
 {
+	// Must be called in a {Add,Remove}Child() only!
 	fParent = parent;
 }
 
@@ -444,13 +468,22 @@ KPartition::AddChild(KPartition *partition, int32 index)
 	if (index < 0 || index > count || !partition)
 		return B_BAD_VALUE;
 	// add partition
-// TODO: Lock the disk device manager!
-	if (!fChildren.AddItem(partition, index))
-		return B_NO_MEMORY;
-	fPartitionData.child_count++;
-	partition->SetParent(this);
-	partition->SetDevice(Device());
-	return B_OK;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		if (!fChildren.AddItem(partition, index))
+			return B_NO_MEMORY;
+		if (!manager->PartitionAdded(partition)) {
+			fChildren.RemoveItem(index);
+			return B_NO_MEMORY;
+		}
+		partition->SetIndex(index);
+		_UpdateChildIndices(index);
+		fPartitionData.child_count++;
+		partition->SetParent(this);
+		partition->SetDevice(Device());
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 // RemoveChild
@@ -459,12 +492,18 @@ KPartition::RemoveChild(int32 index)
 {
 	KPartition *partition = NULL;
 	if (index >= 0 && index < fPartitionData.child_count) {
-// TODO: Lock the disk device manager!
-		partition = fChildren.ItemAt(index);
-		if (partition && fChildren.RemoveItem(index)) {
-			fPartitionData.child_count--;
-			partition->SetParent(NULL);
-			partition->SetDevice(NULL);
+		KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+		if (ManagerLocker locker = manager) {
+			partition = fChildren.ItemAt(index);
+			if (!partition || !manager->PartitionRemoved(partition))
+				return NULL;
+			if (fChildren.RemoveItem(index)) {
+				_UpdateChildIndices(index + 1);
+				partition->SetIndex(-1);
+				fPartitionData.child_count--;
+				partition->SetParent(NULL);
+				partition->SetDevice(NULL);
+			}
 		}
 	}
 	return partition;
@@ -569,5 +608,13 @@ void *
 KPartition::ContentCookie() const
 {
 	return fPartitionData.content_cookie;
+}
+
+// _UpdateChildIndices
+void
+KPartition::_UpdateChildIndices(int32 index)
+{
+	for (int32 i = index; KPartition *child = fChildren.ItemAt(i); i++)
+		child->SetIndex(index);
 }
 

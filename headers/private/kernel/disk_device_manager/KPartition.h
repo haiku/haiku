@@ -6,12 +6,6 @@
 #include "disk_device_manager.h"
 #include "List.h"
 
-namespace BPrivate {
-namespace DiskDevice {
-
-class KDiskDevice;
-class KDiskSystem;
-
 // partition flags
 // TODO: move to another header (must be accessible from userland API impl.)
 enum {
@@ -24,16 +18,25 @@ enum {
 	B_PARTITION_DESCENDANT_BUSY	= 0x40,
 };
 
+namespace BPrivate {
+namespace DiskDevice {
+
+class KDiskDevice;
+class KDiskSystem;
+
 class KPartition {
+public:
 	KPartition(partition_id id = -1);
 	virtual ~KPartition();
 
 	// Reference counting. As long as there's at least one referrer, the
 	// object won't be deleted.
 	// manager must be locked
-	bool Register();
-	bool Unregister();
+	void Register();
+	void Unregister();
 	int32 CountReferences() const;
+
+	status_t Open(int flags, int *fd);
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
@@ -84,7 +87,7 @@ class KPartition {
 	partition_data *PartitionData();
 	const partition_data *PartitionData() const;
 
-	void SetID(partition_id id);
+	virtual void SetID(partition_id id);
 	partition_id ID() const;
 
 	int32 ChangeCounter() const;
@@ -138,6 +141,9 @@ class KPartition {
 
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
+
+private:
+	void _UpdateChildIndices(int32 index);
 
 protected:
 	partition_data		fPartitionData;
