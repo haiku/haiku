@@ -13,7 +13,9 @@
 #define _MULTI_AUDIO_H
 
 #include <Drivers.h>
+#ifndef ASSERT
 #include <Debug.h>
+#endif
 
 #define B_MULTI_DRIVER_BASE (B_AUDIO_DRIVER_BASE+20)
 
