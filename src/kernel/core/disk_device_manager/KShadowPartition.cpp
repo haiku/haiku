@@ -98,14 +98,17 @@ KShadowPartition::SyncWithPhysicalPartition()
 	SetDiskSystem(fPhysicalPartition->DiskSystem());
 	SetOffset(fPhysicalPartition->Offset());
 	SetSize(fPhysicalPartition->Size());
+	SetContentSize(fPhysicalPartition->ContentSize());
 	SetBlockSize(fPhysicalPartition->BlockSize());
 	SetStatus(fPhysicalPartition->Status());
 	SetFlags(fPhysicalPartition->Flags());
-	SetVolumeID(fPhysicalPartition->VolumeID());
 	SetName(fPhysicalPartition->Name());
 	SetContentName(fPhysicalPartition->ContentName());
+	SetType(fPhysicalPartition->Type());
+	SetVolumeID(fPhysicalPartition->VolumeID());
 	SetParameters(fPhysicalPartition->Parameters());
 	SetContentParameters(fPhysicalPartition->ContentParameters());
+	// Cookie, ContentCookie, MountCookie?
 }
 
 // WriteUserData
