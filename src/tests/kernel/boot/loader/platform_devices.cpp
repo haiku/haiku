@@ -18,7 +18,7 @@
 
 
 static status_t
-add_device(const char *path, struct list *list)
+get_device(const char *path, Node **_device)
 {
 	Handle *device = new Handle(path);
 	if (device == NULL)
@@ -28,6 +28,19 @@ add_device(const char *path, struct list *list)
 		delete device;
 		return B_ERROR;
 	}
+
+	*_device = device;
+	return B_OK;
+}
+
+
+static status_t
+add_device(const char *path, struct list *list)
+{
+	Node *device;
+	status_t status = get_device(path, &device);
+	if (status < B_OK)
+		return status;
 
 	printf("add \"%s\" to list of boot devices\n", path);
 	list_add_item(list, device);
@@ -67,10 +80,34 @@ recursive_add_device(const char *path, struct list *list)
 }
 
 
-status_t
-platform_get_boot_devices(struct stage2_args *args, struct list *list)
+//	#pragma mark -
+
+
+status_t 
+platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
-	add_device("/boot/home/test-file-device", list);
+	return get_device("/boot/home/test-file-device", _device);
+}
+
+
+status_t
+platform_get_boot_partition(struct stage2_args *args, struct list *list,
+	boot::Partition **_partition)
+{
+	boot::Partition *partition = NULL;
+	while ((partition = (boot::Partition *)list_get_next_item(list, partition)) != NULL) {
+		// just take the first partition
+		*_partition = partition;
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+platform_add_block_devices(struct stage2_args *args, struct list *list)
+{
 	recursive_add_device("/dev/disk/ide", list);
 	recursive_add_device("/dev/disk/scsi", list);
 	recursive_add_device("/dev/disk/virtual", list);

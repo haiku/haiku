@@ -9,12 +9,15 @@ SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
 # they will really be used instead of their POSIX counterparts
 # in libroot.so
 
-ObjectsDefines 
+ObjectsDefines
 	# boot loader
 	main.cpp
 	vfs.cpp
 	partitions.cpp
 	RootFileSystem.cpp
+	elf.cpp
+	menu.cpp
+	loader.cpp
 
 	# partitions
 	amiga_rdb.cpp
@@ -22,12 +25,16 @@ ObjectsDefines
 	intel.cpp
 	PartitionMap.cpp
 	:
-	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close
+	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close main=boot_main
 	;
 
 {
 	local defines =
 		_BOOT_MODE
+		BOOT_ARCH=\\\"intel\\\"
+			# the boot loader test application will try to load the BeOS kernel
+			# from a supported partition/file system
+
 		BOOT_SUPPORT_PARTITION_AMIGA
 		BOOT_SUPPORT_PARTITION_APPLE
 		BOOT_SUPPORT_PARTITION_INTEL
@@ -52,6 +59,7 @@ SimpleTest BootLoaderTest :
 	platform_debug.cpp
 	platform_devices.cpp
 	platform_heap.cpp
+	platform_misc.cpp
 	Handle.cpp
 
 	# boot loader
@@ -59,6 +67,9 @@ SimpleTest BootLoaderTest :
 	vfs.cpp
 	partitions.cpp
 	RootFileSystem.cpp
+	#elf.cpp
+	menu.cpp
+	loader.cpp
 
 	# partitioning systems
 	amiga_rdb.cpp
@@ -84,6 +95,7 @@ SEARCH on [ FGristFiles strlcpy.c ]
 SEARCH on [ FGristFiles 
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
+		elf.cpp menu.cpp loader.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
 
 # partitioning system modules

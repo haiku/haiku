@@ -7,12 +7,14 @@
 #include <boot/platform.h>
 
 
-extern "C" int boot(struct stage2_args *args);
+extern "C" int boot_main(struct stage2_args *args);
+
 
 int
 main(int argc, char **argv)
 {
-	boot(NULL);
+	boot_main(NULL);
+
 	return 0;
 }
 
