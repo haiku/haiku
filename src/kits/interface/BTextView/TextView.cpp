@@ -1907,7 +1907,7 @@ BTextView::OffsetAt(BPoint point) const
 	int32 offset = line->offset;
 	int32 limit = (line + 1)->offset;
 	int32 saveOffset;
-	float x = fTextRect.left;
+	float x = 0;
 	do {
 		saveOffset = offset;
 		int32 nextInitial = NextInitialByte(offset);
@@ -4442,7 +4442,8 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
 	
-	fInline->SetActive(true);
+	if (!fInline->IsActive())
+		fInline->SetActive(true);
 
 	Refresh(0, fSelEnd, true, false);
 }
