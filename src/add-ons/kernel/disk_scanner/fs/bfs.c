@@ -23,7 +23,6 @@ const char *kModuleDebugName = "fs/bfs";
 //#define TRACE(x) dprintf x
 
 // prototypes
-//static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
 static bool bfs_fs_identify(int deviceFD,
 	struct extended_partition_info *partitionInfo, float *priority,
 	fs_get_buffer get_buffer, struct fs_buffer_cache *cache);
@@ -181,8 +180,7 @@ bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 	if (partitionInfo) {
 		uchar *buffer = NULL;
 		disk_super_block *superBlock = NULL;
-		status_t error = read_block(get_buffer, cache,
-									partitionInfo->info.offset, 1024, &buffer);
+		status_t error = read_block(get_buffer, cache, 0, 1024, &buffer);
 		if (!error && buffer) {
 			superBlock = (disk_super_block*)(buffer+512);
 //			dump_super_block(superBlock);

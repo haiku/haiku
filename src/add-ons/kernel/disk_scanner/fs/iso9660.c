@@ -162,7 +162,7 @@ iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 	bool exit = false;
 	// The first 16 blocks are for "system use" only, and thus are
 	// irrelevant to us and generally just zeros
-	off_t offset = partitionInfo->info.offset + 16*blockSize;
+	off_t offset = 16 * blockSize;
 	status_t error = B_OK;
 	
 	TRACE(("%s: identify(%d, %p)\n", kModuleDebugName, deviceFD,
