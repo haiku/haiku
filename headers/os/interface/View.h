@@ -142,6 +142,7 @@ class BShape;
 class BShelf;
 class BString;
 class BWindow;
+class ViewAttr;
 struct _view_attr_;
 struct _array_data_;
 struct _array_hdr_;
@@ -626,8 +627,8 @@ private:
 			bool			_unused_bool0;				// was: attached;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
-			_view_attr_*	fPermanentState;// used
-			_view_attr_*	fState;			// used
+			ViewAttr*		fPermanentState;// used
+			ViewAttr*		fState;			// used
 			BRect			fBounds;		// used
 			BShelf*			fShelf;			// used
 			void*			pr_state;
