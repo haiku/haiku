@@ -150,12 +150,9 @@ dev_load_dev_module(const char *name, const char *dirpath)
 	devfs_paths = publish_devices();
 	for (; *devfs_paths; devfs_paths++) {
 		device_hooks *hooks = find_device(*devfs_paths);
-		if (hooks) {
-			dprintf("DEV: %s: publishing %s with hooks %p\n", 
-			        name, *devfs_paths, hooks);
-			if (devfs_publish_device(*devfs_paths, NULL, hooks) == 0)
-				keep_loaded = true;
-		}
+
+		if (hooks && devfs_publish_device(*devfs_paths, NULL, hooks) == 0)
+			keep_loaded = true;
 	}
 
 	/* If we've managed to publish at least one of the device entry
