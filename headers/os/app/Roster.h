@@ -123,7 +123,7 @@ public:
 
 	// recent documents, folders, apps
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *fileType,
+							const char *fileType = 0,
 							const char *appSig = 0) const;
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 							const char *fileTypes[], int32 fileTypesCount,
