@@ -252,7 +252,7 @@ static int user_copy_strings_array(char **strings, int strc, char ***kstrings)
 
 	lstrings = (char **)kmalloc((strc + 1) * sizeof(char *));
 	if (lstrings == NULL){
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 
 	// scan all strings and copy to kernel space
@@ -274,7 +274,7 @@ static int user_copy_strings_array(char **strings, int strc, char ***kstrings)
 
 		lstrings[cnt] = (char *)kstrdup(buf);
 		if (lstrings[cnt] == NULL){
-			err = ERR_NO_MEMORY;
+			err = ENOMEM;
 			goto error;
 		}
 	}
