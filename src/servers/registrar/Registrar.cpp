@@ -26,6 +26,8 @@
 	Glues the registrar services together and dispatches the roster messages.
 */
 
+using namespace BPrivate;
+
 //! Name of the event queue.
 static const char *kEventQueueName = "timer_thread";
 
@@ -278,9 +280,6 @@ main()
 {
 	FUNCTION_START();
 
-	// rename the main thread
-	rename_thread(find_thread(NULL), kRosterThreadName);
-
 	// create and run the registrar application
 	status_t error;
 	Registrar *app = new Registrar(&error);
@@ -289,6 +288,9 @@ main()
 			strerror(error));
 		return 1;
 	}
+
+	// rename the main thread
+	rename_thread(find_thread(NULL), kRosterThreadName);
 
 PRINT(("app->Run()...\n"));
 	app->Run();
