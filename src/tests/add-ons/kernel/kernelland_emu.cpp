@@ -655,6 +655,13 @@ close_module_list(void *cookie)
 }
 
 
+thread_id
+spawn_kernel_thread(thread_func func, const char *name, int32 priority, void *data)
+{
+	return spawn_thread(func, name, priority, data);
+}
+
+
 void
 panic(const char *format, ...)
 {
