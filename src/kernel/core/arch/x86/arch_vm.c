@@ -2,15 +2,15 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+
+#include <KernelExport.h>
 #include <kernel.h>
 #include <console.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
 #include <debug.h>
-#include <Errors.h>
-#include <kerrors.h>
-#include <KernelExport.h>
 
 #include <arch/vm.h>
 #include <arch/int.h>
@@ -72,6 +72,6 @@ arch_vm_init_endvm(kernel_args *ka)
 void
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
-	i386_swap_pgdir(vm_translation_map_get_pgdir(&aspace->translation_map));
+	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(&aspace->translation_map));
 }
 
