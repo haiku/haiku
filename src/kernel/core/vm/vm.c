@@ -623,6 +623,57 @@ err:
 
 
 status_t
+vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
+{
+	vm_address_space *addressSpace;
+	vm_region *area, *last = NULL;
+	status_t status = B_OK;
+
+	addressSpace = vm_get_aspace_by_id(aid);
+	if (addressSpace == NULL)
+		return ERR_VM_INVALID_ASPACE;
+
+	acquire_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
+	// check to see if this aspace has entered DELETE state
+	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
+		// okay, someone is trying to delete this aspace now, so we can't
+		// insert the region, so back out
+		status = ERR_VM_INVALID_ASPACE;
+		goto out;
+	}
+
+	// search region list and remove any matching reserved ranges
+
+	area = addressSpace->virtual_map.region_list;
+	while (area) {
+		// the region must be completely part of the reserved range
+		if (area->id == -1 && area->base >= (addr_t)address
+			&& area->base + area->size <= (addr_t)address + size) {
+			// remove reserved range
+			vm_region *reserved = area;
+			if (last)
+				last->aspace_next = reserved->aspace_next;
+			else
+				addressSpace->virtual_map.region_list = reserved->aspace_next;
+
+			area = reserved->aspace_next;
+			free(reserved);
+			continue;
+		}
+
+		last = area;
+		area = area->aspace_next;
+	}
+	
+out:
+	release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
+	vm_put_aspace(addressSpace);
+	return status;
+}
+
+
+status_t
 vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size)
 {
 	vm_address_space *addressSpace;
