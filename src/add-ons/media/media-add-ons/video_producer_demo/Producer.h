@@ -103,8 +103,6 @@ private:
 		void				HandleTimeWarp(bigtime_t performance_time);
 		void				HandleSeek(bigtime_t performance_time);
 
-static	int32				fInstances;
-
 		status_t			fInitStatus;
 
 		int32				fInternalID;
