@@ -8,6 +8,7 @@
 #include <Window.h>
 #include <FilePanel.h>
 #include <TranslationDefs.h>
+#include <String.h>
 
 class ShowImageView;
 
@@ -15,14 +16,14 @@ class ShowImageWindow : public BWindow
 {
 public:
 	static status_t NewWindow(const entry_ref* ref);
-	static int32 CountWindows();
 
-	ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap);
+	ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap, BString &strId);
 	virtual ~ShowImageWindow();
 	
 	virtual void WindowActivated(bool active);
 	virtual void FrameResized( float new_width, float new_height );
 	virtual void MessageReceived(BMessage* message);
+	virtual void Quit();
 	
 	status_t InitCheck();
 	ShowImageView* GetShowImageView() const { return m_PrivateView; }

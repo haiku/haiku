@@ -3,6 +3,7 @@
 */
 
 #include <algobase.h>
+#include <stdio.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
@@ -15,45 +16,42 @@
 #include <ScrollView.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
-#include <Locker.h>
 #include <Alert.h>
+#include <SupportDefs.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
 #include "ShowImageView.h"
 #include "ShowImageStatusView.h"
 
-BLocker ShowImageWindow::s_winListLocker("ShowImageWindow list lock");
-BList ShowImageWindow::s_winList;
-
 status_t ShowImageWindow::NewWindow(const entry_ref* ref)
 {
-	BBitmap* pBitmap = BTranslationUtils::GetBitmap(ref);
+	// Get identify string (image type)
+	BString strId = "Unknown";
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	if (!proster)
+		return B_ERROR;
+	BFile file(ref, B_READ_ONLY);
+	translator_info info;
+	if (proster->Identify(&file, NULL, &info) == B_OK)
+		strId = info.name;
+	
+	// Translate image data and create a new ShowImage window
+	file.Seek(0, SEEK_SET);
+	BBitmap* pBitmap = BTranslationUtils::GetBitmap(&file);
 	if (pBitmap) {
-		ShowImageWindow* pWin = new ShowImageWindow(ref, pBitmap);
+		ShowImageWindow* pWin = new ShowImageWindow(ref, pBitmap, strId);
 		return pWin->InitCheck();			
 	}
 
 	return B_ERROR;		
 }
 
-int32 ShowImageWindow::CountWindows()
-{
-	int32 count = -1;
-	if (s_winListLocker.Lock()) {
-		count = s_winList.CountItems();
-		s_winListLocker.Unlock();
-	}
-	return count;
-}
-
-ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
+ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap, BString &strId)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0),
 	m_pReferences(0)
 {
 	fpsavePanel = NULL;
-	
-	SetPulseRate( 200000.0 );
 	
 	// create menu bar	
 	pBar = new BMenuBar( BRect(0,0, Bounds().right, 20), "menu_bar");
@@ -61,7 +59,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 	AddChild(pBar);
 
 	BRect viewFrame = Bounds();
-//	viewFrame.left      += 20;
 	viewFrame.top		= pBar->Bounds().bottom+1;
 	viewFrame.right		-= B_V_SCROLL_BAR_WIDTH;
 	viewFrame.bottom	-= B_H_SCROLL_BAR_HEIGHT;
@@ -81,9 +78,10 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 
 	BRect rect;
 	
+	const int32 kstatusWidth = 190;
 	rect = Bounds();
 	rect.top	= viewFrame.bottom + 1;
-	rect.left 	= viewFrame.left   + 160;
+	rect.left 	= viewFrame.left   + kstatusWidth;
 	rect.right	= viewFrame.right;
 	
 	hor_scroll = new BScrollBar( rect, "hor_scroll", m_PrivateView, 0,150, B_HORIZONTAL );
@@ -92,11 +90,11 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 	ShowImageStatusView * status_bar;
 
 	rect.left = 0;
-	rect.right = 159;
+	rect.right = kstatusWidth - 1;
 
 	status_bar = new ShowImageStatusView( rect, "status_bar", B_FOLLOW_BOTTOM, B_WILL_DRAW );
 	status_bar->SetViewColor( ui_color( B_MENU_BACKGROUND_COLOR ) );
-	status_bar->SetCaption( "ImageShow" );
+	status_bar->SetText(strId);
 		
 	AddChild( status_bar );
 	
@@ -115,10 +113,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 	// finish creating window
 	SetRef(ref);
 	UpdateTitle();
-	if (s_winListLocker.Lock()) {
-		s_winList.AddItem(this);
-		s_winListLocker.Unlock();
-	}
 	
 	m_PrivateView->pBar = pBar;	
 
@@ -127,17 +121,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap)
 
 ShowImageWindow::~ShowImageWindow()
 {
-	if (m_pReferences) {
-		delete m_pReferences;
-	}
-	
-	if (s_winListLocker.Lock()) {
-		s_winList.RemoveItem(this);
-		s_winListLocker.Unlock();
-	}
-	if (CountWindows() < 1) {
-		be_app->PostMessage(B_QUIT_REQUESTED);
-	}
+	delete m_pReferences;
 }
 
 void ShowImageWindow::WindowActivated(bool active)
@@ -177,9 +161,6 @@ void ShowImageWindow::UpdateTitle()
 
 void ShowImageWindow::LoadMenus(BMenuBar* pBar)
 {
-	long unsigned int MSG_QUIT  = B_QUIT_REQUESTED;
-	long unsigned int MSG_ABOUT = B_ABOUT_REQUESTED;
-	
 	BMenu* pMenu = new BMenu("File");
 	
 	AddItemMenu( pMenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true );
@@ -191,11 +172,11 @@ void ShowImageWindow::LoadMenus(BMenuBar* pBar)
 		// to from the Be bitmap image format
 	pMenu->AddItem( pMenuSaveAs );
 	
-	AddItemMenu( pMenu, "Close", MSG_QUIT, 'W', 0, 'A', true);
+	AddItemMenu( pMenu, "Close", MSG_CLOSE, 'W', 0, 'W', true);
 	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "About ShowImage...", MSG_ABOUT, 0, 0, 'A', true);
+	AddItemMenu( pMenu, "About ShowImage...", B_ABOUT_REQUESTED, 0, 0, 'A', true);
 	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "Quit", MSG_QUIT, 'Q', 0, 'A', true);
+	AddItemMenu( pMenu, "Quit", B_QUIT_REQUESTED, 'Q', 0, 'A', true);
 
 	pBar->AddItem(pMenu);
 	
@@ -281,6 +262,10 @@ void ShowImageWindow::MessageReceived(BMessage* message)
 		case MSG_SAVE_PANEL:
 			// User specified where to save the output image
 			SaveToFile(message);
+			break;
+			
+		case MSG_CLOSE:
+			Quit();
 			break;
 
 	case B_UNDO :
@@ -385,5 +370,12 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 		// detach so it doesn't get deleted
 }
 
+void
+ShowImageWindow::Quit()
+{
+	// tell the app to forget about this window
+	be_app->PostMessage(MSG_WINDOW_QUIT);
+	BWindow::Quit();
+}
 
 // 		BMenu* pMenuDither = ;

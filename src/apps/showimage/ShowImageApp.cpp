@@ -17,22 +17,53 @@ int main(int, char**)
 	return 0;
 }
 
+#define WINDOWS_TO_IGNORE 1
+
 ShowImageApp::ShowImageApp()
-	: BApplication(APP_SIG), m_pOpenPanel(0)
-{ }
+	: BApplication(APP_SIG)
+{
+	fbpulseStarted = false;
+	m_pOpenPanel = new BFilePanel(B_OPEN_PANEL);
+}
 
 void ShowImageApp::AboutRequested()
 {
-	BAlert* pAlert = new BAlert( "About ShowImage", 
-								 "OBOS ShowImage\n\nRecreated by Fernando F.Oliveira", "OK");
+	BAlert* pAlert = new BAlert("About ShowImage",
+		"OBOS ShowImage\n\nby Fernando F. Oliveira and Michael Wilber", "OK");
 	pAlert->Go();
 }
 
 void ShowImageApp::ReadyToRun()
 {
-	int32 count = ShowImageWindow::CountWindows();
-	if (count < 1)
-		OnOpen();
+	if (CountWindows() == WINDOWS_TO_IGNORE)
+		m_pOpenPanel->Show();
+	else
+		// If image windows are already open
+		// (paths supplied on the command line)
+		// start checking the number of open windows
+		StartPulse();
+}
+
+void
+ShowImageApp::StartPulse()
+{
+	if (!fbpulseStarted) {
+		// Tell the app to begin checking
+		// for the number of open windows
+		fbpulseStarted = true;
+		SetPulseRate(250000);
+			// Set pulse to every 1/4 second
+	}
+}
+
+void
+ShowImageApp::Pulse()
+{
+	if (!IsLaunching() && CountWindows() <= WINDOWS_TO_IGNORE)
+		// If the application is not launching and
+		// all windows are closed except for the file open panel,
+		// quit the application
+		PostMessage(B_QUIT_REQUESTED);
 }
 
 void ShowImageApp::ArgvReceived(int32 argc, char** argv)
@@ -49,37 +80,29 @@ void ShowImageApp::ArgvReceived(int32 argc, char** argv)
 			message->AddRef("refs", &ref);
 		}
 	}
-	if (message) {
+	if (message)
 		RefsReceived(message);
-	}
 }
 
 void ShowImageApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case MSG_FILE_OPEN:
-		OnOpen();
-		break;
-	case B_CANCEL:
-		if (ShowImageWindow::CountWindows() < 1)
-			PostMessage(B_QUIT_REQUESTED);
-		break;
-	default:
-		BApplication::MessageReceived(message);
-		break;
-	}
-}
+		case MSG_FILE_OPEN:
+			m_pOpenPanel->Show();
+			break;
+		case MSG_WINDOW_QUIT:
+			break;
+			
+		case B_CANCEL:
+			// File open panel was closed,
+			// start checking count of open windows
+			StartPulse();
+			break;
 
-bool ShowImageApp::QuitRequested()
-{
-	// Attempt to close all the document windows.
-	bool ok = QuitDudeWinLoop();
-	if (ok)
-		// Everything's been saved, and only unimportant windows should remain.
-		// Now we can forcibly blow those away.
-		CloseAllWindows();
-	
-	return ok;
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
 }
 
 void ShowImageApp::RefsReceived(BMessage* message)
@@ -97,54 +120,6 @@ void ShowImageApp::RefsReceived(BMessage* message)
    			Open(&ref);
    		}
    	}
-}
-
-void ShowImageApp::OnOpen()
-{
-	if (! m_pOpenPanel) {
-		m_pOpenPanel = new BFilePanel;
-		m_pOpenPanel->Window()->SetTitle("Open Image File");
-	}
-	m_pOpenPanel->Show();
-}
-
-bool ShowImageApp::QuitDudeWinLoop()
-{
-	bool ok = true;
-	status_t err;
-	int32 i=0;
-	while (ok) {
-		BWindow* pWin = WindowAt(i++);
-		if (! pWin)
-			break;
-			
-		ShowImageWindow* pShowImageWindow = dynamic_cast<ShowImageWindow*>(pWin);
-		if (pShowImageWindow && pShowImageWindow->Lock()) {
-			BMessage quitMsg(B_QUIT_REQUESTED);
-			BMessage reply;
-			BMessenger winMsgr(pShowImageWindow);
-			pShowImageWindow->Unlock();
-			err = winMsgr.SendMessage(&quitMsg, &reply);
-			if (err == B_OK) {
-				bool result;
-				err = reply.FindBool("result", &result);
-				if (err == B_OK) {
-					ok = result;
-				}
-			}
-		}
-	}
-	return ok;
-}
-
-void ShowImageApp::CloseAllWindows()
-{
-	int32 i = 0;
-	BWindow* pWin;
-	for (pWin = WindowAt(i++); pWin && pWin->Lock(); pWin = WindowAt(i++)) {
-		// don't take no for an answer
-		pWin->Quit();
-	}
 }
 
 void ShowImageApp::Open(const entry_ref* ref)

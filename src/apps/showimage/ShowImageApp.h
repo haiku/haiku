@@ -16,18 +16,17 @@ public:
 	virtual void AboutRequested();
 	virtual void ArgvReceived(int32 argc, char** argv);
 	virtual void MessageReceived(BMessage* message);
-	virtual bool QuitRequested();
 	virtual void ReadyToRun();
+	virtual void Pulse();
 	virtual void RefsReceived(BMessage* message);
 
 private:
-	void OnOpen();
-	bool QuitDudeWinLoop();
-	void CloseAllWindows();
+	void StartPulse();
 	void Open(const entry_ref* ref);
 		
 private:
 	BFilePanel*	m_pOpenPanel;
+	bool fbpulseStarted;
 };
 
 #endif /* _ShowImageApp_h */
