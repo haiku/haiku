@@ -438,12 +438,24 @@ BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
 	CALLED();
-
-	printf("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
 	
-	BTimeSource *source = _TimeSourceObjectManager->GetTimeSource(for_node);
+	BTimeSource *source;
 
-	printf("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
+//	printf("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
+	
+	if (0 == (for_node.kind & B_TIME_SOURCE)) {
+		FATAL("BMediaRoster::MakeTimeSourceFor, node %ld is not a timesource!\n", for_node.node);
+		// XXX It appears that Cortex calls this function on every node, and expects
+		// XXX to be returned a system time source if the for_node is not a timesource
+		media_node clone;
+		GetSystemTimeSource(&clone);
+		source = _TimeSourceObjectManager->GetTimeSource(clone);
+		ReleaseNode(clone);
+	} else {
+		source = _TimeSourceObjectManager->GetTimeSource(for_node);
+	}
+
+//	printf("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
 
 	return source;
 }
@@ -673,6 +685,8 @@ BMediaRoster::StartNode(const media_node & node,
 	CALLED();
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
+		
+	printf("BMediaRoster::StartNode, node %ld, at perf %Ld\n", node.node, at_performance_time);
 
 	node_start_command command;
 	command.performance_time = at_performance_time;
@@ -689,6 +703,8 @@ BMediaRoster::StopNode(const media_node & node,
 	CALLED();
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
+
+	printf("BMediaRoster::StopNode, node %ld, at perf %Ld %s\n", node.node, at_performance_time, immediate ? "NOW" : "");
 
 	node_stop_command command;
 	command.performance_time = at_performance_time;
@@ -707,6 +723,8 @@ BMediaRoster::SeekNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
+	printf("BMediaRoster::SeekNode, node %ld, at perf %Ld, to perf %Ld\n", node.node, at_performance_time, to_media_time);
+
 	node_seek_command command;
 	command.media_time = to_media_time;
 	command.performance_time = at_performance_time;
@@ -720,10 +738,16 @@ BMediaRoster::StartTimeSource(const media_node & node,
 							  bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (node.node <= 0) {
+		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
-	if ((node.kind & B_TIME_SOURCE) == 0)
+	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
 		return B_MEDIA_BAD_NODE;
+	}
+
+	printf("BMediaRoster::StartTimeSource, node %ld, at real %Ld\n", node.node, at_real_time);
 		
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_START;
@@ -739,10 +763,16 @@ BMediaRoster::StopTimeSource(const media_node & node,
 							 bool immediate)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (node.node <= 0) {
+		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
-	if ((node.kind & B_TIME_SOURCE) == 0)
+	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
 		return B_MEDIA_BAD_NODE;
+	}
+
+	printf("BMediaRoster::StopTimeSource, node %ld, at real %Ld %s\n", node.node, at_real_time, immediate ? "NOW" : "");
 		
 	BTimeSource::time_source_op_info msg;
 	msg.op = immediate ? BTimeSource::B_TIMESOURCE_STOP_IMMEDIATELY : BTimeSource::B_TIMESOURCE_STOP;
@@ -758,11 +788,17 @@ BMediaRoster::SeekTimeSource(const media_node & node,
 							 bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (node.node <= 0) {
+		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
-	if ((node.kind & B_TIME_SOURCE) == 0)
+	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		FATAL("BMediaRoster::StartTimeSource node is no timesource invalid\n");
 		return B_MEDIA_BAD_NODE;
-		
+	}
+
+	printf("BMediaRoster::SeekTimeSource, node %ld, at real %Ld, to perf %Ld\n", node.node, at_real_time, to_performance_time);
+
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_SEEK;
 	msg.real_time = at_real_time;
@@ -1324,6 +1360,14 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 
 	// call the callback
 	node->NodeRegistered();
+	
+	// if the BMediaNode also inherits from BTimeSource, we need to call BTimeSource::FinishCreate()
+	if (node->Kinds() & B_TIME_SOURCE) {
+		BTimeSource *ts;
+		ts = dynamic_cast<BTimeSource *>(node);
+		if (ts)
+			ts->FinishCreate();
+	}
 
 /*
 	// register existing inputs and outputs with the
@@ -1731,7 +1775,7 @@ BMediaRoster::GetLatencyFor(const media_node & producer,
 							bigtime_t * out_latency)
 {
 	UNIMPLEMENTED();
-	*out_latency = 25000;
+	*out_latency = 2000;
 	return B_OK;
 }
 
@@ -1742,7 +1786,7 @@ BMediaRoster::GetInitialLatencyFor(const media_node & producer,
 								   uint32 * out_flags /* = NULL */)
 {
 	UNIMPLEMENTED();
-	*out_latency = 10000;
+	*out_latency = 1000;
 	if (out_flags)
 		*out_flags = 0;
 	return B_OK;

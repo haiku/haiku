@@ -50,7 +50,7 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 {
 	BAutolock lock(fLock);
 
-	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
+//	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
 	
 	if (fSystemTimeSource == 0) {
 		media_node clone;
@@ -92,7 +92,7 @@ TimeSourceObjectManager::ObjectDeleted(BTimeSource *timesource)
 {
 	BAutolock lock(fLock);
 
-	printf("TimeSourceObjectManager::ObjectDeleted, node id %ld\n", timesource->ID());
+//	printf("TimeSourceObjectManager::ObjectDeleted, node id %ld\n", timesource->ID());
 	
 	bool b;
 	b = fMap->Remove(timesource->ID());

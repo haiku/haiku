@@ -17,25 +17,11 @@ TimeSourceObject::TimeSourceObject(media_node_id id) :
 	BMediaNode("some timesource object", id, B_TIME_SOURCE),
 	BTimeSource(id)
 {
-	printf("TimeSourceObject::TimeSourceObject enter, id = %ld\n", id);
+//	printf("TimeSourceObject::TimeSourceObject enter, id = %ld\n", id);
 	delete_port(fControlPort);
 	fControlPort = -999666; // must match value in BMediaNode::~BMediaNode()
 	ASSERT(id == fNodeID);
-	printf("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
-}
-
-/* virtual */ status_t
-TimeSourceObject::SnoozeUntil(
-				bigtime_t performance_time,
-				bigtime_t with_latency,
-				bool retry_signals)
-{
-	bigtime_t time = performance_time - with_latency;
-	status_t err;
-	do {
-		err = snooze_until(time, B_SYSTEM_TIMEBASE);
-	} while (err == B_INTERRUPTED && retry_signals);
-	return err;
+//	printf("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
 }
 
 /* virtual */ status_t
@@ -55,12 +41,14 @@ TimeSourceObject::AddOn(int32 *internal_id) const
 }
 
 /* virtual */ status_t
-TimeSourceObject::DeleteHook(BMediaNode * node)
+TimeSourceObject::DeleteHook(BMediaNode *node)
 {
-	printf("TimeSourceObject::DeleteHook enter\n");
+	status_t status;
+//	printf("TimeSourceObject::DeleteHook enter\n");
 	_TimeSourceObjectManager->ObjectDeleted(this);
-	BTimeSource::DeleteHook(node);
-	printf("TimeSourceObject::DeleteHook leave\n");
+	status = BTimeSource::DeleteHook(node);
+//	printf("TimeSourceObject::DeleteHook leave\n");
+	return status;
 }
 
 
@@ -68,18 +56,9 @@ SystemTimeSourceObject::SystemTimeSourceObject(media_node_id id)
  : 	BMediaNode("System Time Source", id, B_TIME_SOURCE),
 	TimeSourceObject(id)
 {
-	printf("SystemTimeSourceObject::SystemTimeSourceObject enter, id = %ld\n", id);
-
-	printf("SystemTimeSourceObject::SystemTimeSourceObject leave, node id %ld\n", ID());
-}
-
-/* virtual */ status_t
-SystemTimeSourceObject::SnoozeUntil(
-				bigtime_t performance_time,
-				bigtime_t with_latency = 0,
-				bool retry_signals = false)
-{
-	return TimeSourceObject::SnoozeUntil(performance_time, with_latency, retry_signals);
+//	printf("SystemTimeSourceObject::SystemTimeSourceObject enter, id = %ld\n", id);
+	fIsRealtime = true;
+//	printf("SystemTimeSourceObject::SystemTimeSourceObject leave, node id %ld\n", ID());
 }
 
 /* virtual */ status_t

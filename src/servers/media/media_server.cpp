@@ -36,6 +36,10 @@ BufferManager *gBufferManager;
 AppManager *gAppManager;
 NodeManager *gNodeManager;
 
+namespace BPrivate { namespace media {
+	extern team_id team;
+} } // BPrivate::media
+
 
 #define REPLY_TIMEOUT ((bigtime_t)500000)
 
@@ -154,7 +158,7 @@ ServerApp::StartSystemTimeSource()
 
 	// register a dummy node 
 	media_node node;
-	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "Fake System Time Source", B_TIME_SOURCE, -1, -1);	
+	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "System Clock", B_TIME_SOURCE, -1, BPrivate::media::team);	
 	ASSERT(rv == B_OK);
 
 	printf("StartSystemTimeSource setting as default\n");

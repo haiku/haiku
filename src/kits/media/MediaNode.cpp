@@ -202,6 +202,8 @@ BMediaNode::TimeSource() const
 	self->fTimeSource = roster->MakeTimeSourceFor(clone);
 	if (fTimeSource == 0) {
 		FATAL("BMediaNode::TimeSource: Error, MakeTimeSourceFor failed\n");
+	} else {
+		fTimeSource->AddMe(self);
 	}
 	rv = roster->ReleaseNode(clone);
 	if (fTimeSource == 0) {
@@ -471,8 +473,11 @@ BMediaNode::SetTimeSource(BTimeSource *time_source)
 		newnode->Release();
 		return;
 	}
-	if (fTimeSource)
+	if (fTimeSource) {
+		fTimeSource->RemoveMe(this);
 		fTimeSource->Release();
+		newsource->AddMe(this);
+	}
 	fTimeSource = newsource;
 }
 
@@ -490,6 +495,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_START:
 		{
 			const node_start_command *command = static_cast<const node_start_command *>(data);
+			printf("NODE_START, node %ld\n", fNodeID);
 			Start(command->performance_time);
 			return B_OK;
 		}
@@ -497,6 +503,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_STOP:
 		{
 			const node_stop_command *command = static_cast<const node_stop_command *>(data);
+			printf("NODE_STOP, node %ld\n", fNodeID);
 			Stop(command->performance_time, command->immediate);
 			return B_OK;
 		}
@@ -504,6 +511,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_SEEK:
 		{
 			const node_seek_command *command = static_cast<const node_seek_command *>(data);
+			printf("NODE_SEEK, node %ld\n", fNodeID);
 			Seek(command->media_time, command->performance_time);
 			return B_OK;
 		}
@@ -531,12 +539,12 @@ BMediaNode::HandleMessage(int32 message,
 		
 		case NODE_SET_TIMESOURCE:
 		{
-			printf("NODE_SET_TIMESOURCE enter\n");
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
 			BMediaRoster *roster;
 			BTimeSource *newsource;
 			media_node clone;
 			status_t rv;
+			printf("NODE_SET_TIMESOURCE, node %ld, timesource %ld\n", fNodeID, command->timesource_id);
 			roster = BMediaRoster::Roster();
 			rv = roster->GetNodeFor(command->timesource_id, &clone);
 			if (rv != B_OK) {
@@ -551,13 +559,14 @@ BMediaNode::HandleMessage(int32 message,
 			}
 			roster->ReleaseNode(clone);
 			if (fTimeSource) {
+				fTimeSource->RemoveMe(this);
 				fTimeSource->Release();
 				fTimeSource = newsource;
 				SetTimeSource(fTimeSource);
 			} else {
 				fTimeSource = newsource;
 			}
-			printf("NODE_SET_TIMESOURCE leave\n");
+			fTimeSource->AddMe(this);
 			return B_OK;
 		}
 
@@ -793,7 +802,6 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 	_mChangeCount = 0;			//	deprecated
 	_mChangeCountReserved = 0;	//	deprecated
 	fKinds = kinds;
-//	fTimeSourceID = -1;
 	fProducerThis = 0;
 	fConsumerThis = 0;
 	fFileInterfaceThis = 0;

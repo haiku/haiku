@@ -17,8 +17,12 @@
 
 
 class _BSlaveNodeStorageP;
-struct _time_transmit_buf;
-namespace BPrivate { namespace media { class TimeSourceObject; class SystemTimeSourceObject; } }
+
+namespace BPrivate { namespace media {
+	class TimeSourceObject;
+	class SystemTimeSourceObject;
+	struct TimeSourceTransmit;
+} }
 
 
 class BTimeSource :
@@ -118,13 +122,14 @@ virtual		status_t _Reserved_TimeSource_4(void *);
 virtual		status_t _Reserved_TimeSource_5(void *);
 
 		bool fStopped;
-
-		area_id _mArea;
-volatile	_time_transmit_buf * _mBuf;
+		area_id fArea;
+		volatile BPrivate::media::TimeSourceTransmit *fBuf;
 		_BSlaveNodeStorageP * _mSlaveNodes;
 
 		area_id _mOrigArea;
-		uint32 _reserved_time_source_[11];
+		bool fIsRealtime;
+		bool _reserved_bool_[3];
+		uint32 _reserved_time_source_[10];
 
 explicit	BTimeSource(
 				media_node_id id);

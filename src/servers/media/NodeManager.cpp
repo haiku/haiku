@@ -619,6 +619,8 @@ NodeManager::CleanupTeam(team_id team)
 
 	FATAL("NodeManager::CleanupTeam: team %ld\n", team);
 
+	// XXX send notifications after removing nodes
+	
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		// if the team hosting this node is gone, remove node from database
