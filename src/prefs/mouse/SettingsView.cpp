@@ -213,26 +213,14 @@ SettingsView::UpdateFromSettings()
 {
 	int32 value = int32(fSettings.ClickSpeed() / 1000);
 		// slow = 1000000, fast = 0
-	if (value < 0)
-		value = 0;
-	else if (value > 1000)
-		value = 1000;
 	dcSpeedSlider->SetValue(value);
 
 	value = int32((log(fSettings.MouseSpeed() / 8192) / log(2)) * 1000 / 6);  
 		// slow = 8192, fast = 524287
-	if (value < 0)
-		value = 0;
-	else if (value > 1000)
-		value = 1000;
 	mouseSpeedSlider->SetValue(value);
 
 	value = int32(sqrt(fSettings.AccelerationFactor() / 16384) * 1000 / 4);
 		// slow = 0, fast = 262144
-	if (value < 0)
-		value = 0;
-	else if (value > 1000)
-		value = 1000;
 	mouseAccSlider->SetValue(value);
 
 	BMenuItem *item = fTypeMenu->ItemAt(fSettings.MouseType() - 1);
