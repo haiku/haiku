@@ -185,6 +185,17 @@ BMediaFiles::GetRefFor(const char *type,
 }
 
 
+status_t
+BMediaFiles::GetAudioGainFor(const char * type,
+							 const char * item,
+							 float * out_audio_gain)
+{
+	UNIMPLEMENTED();
+	*out_audio_gain = 1.0f;
+	return B_OK;
+}
+
+
 /* virtual */ status_t
 BMediaFiles::SetRefFor(const char *type,
 					   const char *item,
@@ -207,6 +218,16 @@ BMediaFiles::SetRefFor(const char *type,
 		return rv;
 	}
 
+	return B_OK;
+}
+
+
+status_t
+BMediaFiles::SetAudioGainFor(const char * type,
+							 const char * item,
+							 float audio_gain)
+{
+	UNIMPLEMENTED();
 	return B_OK;
 }
 

@@ -31,10 +31,18 @@ virtual		status_t GetRefFor(
 				const char * type,
 				const char * item,
 				entry_ref * out_ref);
+			status_t GetAudioGainFor(
+				const char * type,
+				const char * item,
+				float * out_audio_gain);
 virtual		status_t SetRefFor(
 				const char * type,
 				const char * item,
 				const entry_ref & ref);
+			status_t SetAudioGainFor(
+				const char * type,
+				const char * item,
+				float audio_gain);	
 virtual		status_t RemoveRefFor(		//	This might better be called "ClearRefFor"
 				const char * type,		//	but it's too late now...
 				const char * item,
