@@ -73,6 +73,7 @@ public:
 	PortLink *GetLink(void);
 	const char *GetName(void) { return (_name)?_name->String():NULL; }
 	LayerData *GetLayerData(void) { return _layerdata; }
+	LayerData *GetDrawData(void);
 	
 	void SetLayerCursor(ServerCursor *csr);
 	ServerCursor *GetLayerCursor(void) const;

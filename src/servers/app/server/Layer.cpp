@@ -1252,3 +1252,9 @@ printf("\t DONE Layer(%s)::DoResizeTo()...\n", _name->String());
 	* added 2 new methods - DoMoveTo and DoResizeTo. They move/resize the frame rectangle of Layer class.
 		In DoResizeTo() I added some code for autoresizing(based on BView's resizeMask parameter) of children. Still, the effective code for resizing need to be written. :-) I could do that, but other things have greater priority. :-)
 */
+
+LayerData* Layer::GetDrawData()
+{
+	_layerdata->fVisibleRegion = _visible;
+	return _layerdata;
+}
