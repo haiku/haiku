@@ -1,6 +1,9 @@
 /* Module manager */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001, Thomas Kurschel. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -8,20 +11,20 @@
 
 #include <kmodule.h>
 #include <lock.h>
-#include <Errors.h>
 #include <khash.h>
-#include <malloc.h>
 #include <elf.h>
-#include <string.h>
+
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 
 #define MODULE_HASH_SIZE 16
 
 static bool modules_disable_user_addons = false;
 
-#define TRACE_MODULE 0
-#if TRACE_MODULE
+#define TRACE_MODULE
+#ifdef TRACE_MODULE
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -50,6 +53,7 @@ typedef enum {
 typedef struct module_image {
 	struct module_image	*next;
 	module_info			**info;		/* the module_info we use */
+	module_dependency	*dependencies;
 	char				*path;		/* the full path for the module */
 	image_id			image;
 	int32				ref_count;	/* how many ref's to this file */
@@ -229,6 +233,9 @@ load_module_image(const char *path, module_image **_moduleImage)
 		status = B_BAD_TYPE;
 		goto err1;
 	}
+
+	moduleImage->dependencies = (module_dependency *)elf_lookup_symbol(image, "module_dependencies");
+		// this is allowed to be NULL
 
 	moduleImage->path = strdup(path);
 	if (!moduleImage->path) {
@@ -542,6 +549,46 @@ search_module(const char *name)
 }
 
 
+static status_t
+put_dependent_modules(module_dependency *dependencies)
+{
+	int32 i = 0;
+
+	if (dependencies == NULL)
+		return B_OK;
+
+	for (; dependencies[i].name != NULL; i++) {
+		status_t status = put_module(dependencies[i].name);
+		if (status < B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+get_dependent_modules(module_dependency *dependencies)
+{
+	int32 i = 0;
+
+	if (dependencies == NULL)
+		return B_OK;
+
+	TRACE(("resolving module dependencies...\n"));
+
+	for (; dependencies[i].name != NULL; i++) {
+		status_t status = get_module(dependencies[i].name, dependencies[i].info);
+		if (status < B_OK) {
+			TRACE(("loading dependent module \"%s\" failed!\n", dependencies[i].name));
+			return status;
+		}
+	}
+
+	return B_OK;
+}
+
+
 /** Initializes a loaded module depending on its state */
 
 static inline status_t
@@ -554,20 +601,32 @@ init_module(module *module)
 			status_t status;
 			module->state = MODULE_INIT;
 
+			// resolve dependencies
+
+			status = get_dependent_modules(module->module_image->dependencies);
+			if (status < B_OK) {
+				module->state = MODULE_LOADED;
+				return status;
+			}
+
+			// init module
+
 			TRACE(("initing module %s... \n", module->name));
 			status = module->info->std_ops(B_MODULE_INIT);
 			TRACE(("...done (%s)\n", strerror(status)));
 
-			if (!status) 
+			if (status >= B_OK)
 				module->state = MODULE_READY;
-			else
+			else {
+				put_dependent_modules(module->module_image->dependencies);
 				module->state = MODULE_LOADED;
+			}
 
 			return status;
 		}
 
 		case MODULE_READY:
-			return B_NO_ERROR;
+			return B_OK;
 
 		case MODULE_INIT:
 			FATAL(("circular reference to %s\n", module->name));
@@ -618,6 +677,8 @@ uninit_module(module *module)
 
 			if (status == B_NO_ERROR) {
 				module->state = MODULE_LOADED;
+
+				put_dependent_modules(module->module_image->dependencies);
 				return 0;
 			}
 
