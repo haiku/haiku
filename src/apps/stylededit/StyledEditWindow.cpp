@@ -822,9 +822,23 @@ StyledEditWindow::Save(BMessage *message)
 	if(err!= B_OK)
 		return err;
 	
-	err= fTextView->WriteStyledEditFile(&file);
-	if(err != B_OK)
+	err = fTextView->WriteStyledEditFile(&file);
+	if(err != B_OK) {
+		BAlert *saveFailedAlert;
+		BString alertText;
+		if (err == B_TRANSLATION_ERROR_BASE) {
+			alertText.SetTo("Translation error saving \"");
+		} else {
+			alertText.SetTo("Unknown error saving \"");
+		}			
+		alertText<< name;
+		alertText<<"\".";
+		saveFailedAlert= new BAlert("saveFailedAlert",alertText.String(), "Bummer", 0, 0, 
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
+		saveFailedAlert->SetShortcut(0, B_ESCAPE);
+		saveFailedAlert->Go();
 		return err;
+	}
 
 	SetTitle(name);
 	if(fSaveMessage!= message)
