@@ -324,7 +324,12 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = . midi midi2 ../../headers/os/midi2
+# General documentations and extern documentation files
+INPUT		= . midi midi2 ppp ../../headers/os/midi2
+
+# PPP
+INPUT		+= ../../src/add-ons/kernel/network/ppp/shared/libkernelppp ../../src/add-ons/kernel/network/ppp/shared/libkernelppp/headers
+INPUT		+= ../../src/add-ons/kernel/network/ppp/shared/libppp ../../src/add-ons/kernel/network/ppp/shared/libppp/headers
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -356,7 +361,7 @@ EXCLUDE_SYMLINKS       = NO
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
 # certain files from those directories.
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = */libkernelppp/_KPPP*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 

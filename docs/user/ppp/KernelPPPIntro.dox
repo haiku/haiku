@@ -1,0 +1,66 @@
+/*!
+\page kernelppp The Kernel PPP Kit (libkernelppp.a)
+
+The PPP stack is a kernel module that interfaces with the network stack.
+Thanks to its modular nature new protocols and extensions can be added without
+having to recompile the PPP stack.
+
+The kernel API is mostly intended for developers who want to write extension modules,
+but you can also create and control PPP interfaces from within your kernel module.
+
+Every instance of a PPP interface initially consists of the following classes:
+
+- KPPPInterface (the main interface class)
+- KPPPLCP (the Link Control Protocol)
+- KPPPStateMachine (the state machine for the Link Control Protocol)
+- KPPPProfile (this manages the current interface profile)
+
+KPPPLCP, KPPPStateMachine, and KPPPProfile are integrated into KPPPInterface as
+member variables. All these classes have private constructors. Only the PPP
+interface manager can create a new instance of KPPPInterface. \n
+Such an interface does nothing useful because it needs at least a device to connect
+to a PPP server. \n
+These are the base classes for extending an interface:
+
+- KPPPDevice (a PPP transport device: PPPoE, modem, cell phone, etc.)
+- KPPPLCPExtension (adds new basic codes to the LCP protocol)
+- KPPPOptionHandler (adds new configure-packet types to the LCP protocol)
+- KPPPProtocol (a base class for protocols; e.g.: LCP and IPCP)
+
+\section kppppackethandling Packet handling
+
+KPPPInterface, KPPPDevice, and KPPPProtocol derive from KPPPLayer. When sending,
+packets are passed down the stack to every layer that can handle the packet.
+This facilitates creating packet encapsulators like compression protocols. You can
+even catch packets before they arrive at the device layer. \n
+A different system is used for receiving packets: KPPPDevice passes the received
+packet to KPPPInterface which in turn tries to find the best fitting KPPPProtocol
+that can handle this kind of packet. If one is found it may pass the packet to the
+netstack or, in case of an encapsulator, it can put the packet back into the decode
+queue by calling KPPPInterface::Receive().
+
+\section kpppmultilink Multilink interfaces
+
+Interfaces can have one parent and multiple children. The first interface of a
+multilink bundle is split into a parent and a child. All other children must be added
+to the parent when they are needed. Normally, a bundle (main) interface has no parent
+and a sub-interface (child) has no children. \n
+A multilink protocol can use any desired technique for creating the additional
+children. For instance, it could save the descriptions of all children as private
+parameters in the interface description file. Alternatively, it could use internal
+bundle names to bundle all interfaces with the equal bundle names. \n
+If a received packet could not be handled by a child it is passed up to the parent.
+On the other hand, an interface without a device (no next layer after the interface)
+will \e not pass the packet to its children.
+
+\section kpppwritingmodules Writing modules
+
+PPP makes use of the kernel module API. Every module must export a \c ppp_module_info
+structure. \n
+KPPPInterface loads all specified modules and calls their \c ppp_module_info::add_to()
+function. Depending on the type of module you should add the corresponding object
+to the interface.
+
+\sa ppp_module_info
+
+*/

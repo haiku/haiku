@@ -1,0 +1,18 @@
+/*!
+\page ppp The PPP Kits
+
+The PPP stack is a kernel module that interfaces with the network stack.
+Thanks to its modular nature new protocols and extensions can be added without
+having to recompile the PPP stack.
+
+
+- \ref kernelppp
+- \ref userlandppp
+
+The kernel API is mostly intended for developers who want to write extension modules,
+but you can also create and control PPP interfaces from within your own kernel modules.
+
+You should use the userland API for your applications because it exports helper
+classes for accessing the kernel module from userland. Alternatively, you can talk
+to the PPP interface manager directly through an \c ioctl() interface.
+*/
