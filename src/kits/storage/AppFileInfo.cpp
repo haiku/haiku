@@ -1,4 +1,11 @@
-// BAppFileInfo.cpp
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file AppFileInfo.cpp
+	BAppFileInfo and related structures' implementation.
+*/
 
 #include <new>
 #include <set>
