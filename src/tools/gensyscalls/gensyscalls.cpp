@@ -11,13 +11,6 @@
 #include "gensyscalls.h"
 #include "gensyscalls_common.h"
 
-// We can't use SupportDefs.h to maintain portability
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-
-
 extern "C" gensyscall_syscall_info *gensyscall_get_infos(int *count);
 
 // usage
