@@ -7,7 +7,7 @@
 
 using namespace BPrivate;
 
-typedef const char ** input_buffer_t;
+typedef char ** input_buffer_t;
 
 status_t
 convert_encoding(const char * from, const char * to,
