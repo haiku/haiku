@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // IPCPAddon saves the loaded settings.
@@ -70,13 +53,18 @@ static const char *kKernelModuleName = "ipcp";
 IPCPAddon::IPCPAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fSettings(NULL),
-	fProfile(NULL)
+	fProfile(NULL),
+	fIPCPView(NULL)
 {
+	CreateView(BPoint(0,0));
+	fDeleteView = true;
 }
 
 
 IPCPAddon::~IPCPAddon()
 {
+	if(fDeleteView)
+		delete fIPCPView;
 }
 
 
@@ -89,9 +77,8 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fSettings = settings;
 	fProfile = profile;
 	
-	if(fIPCPView)
-		fIPCPView->Reload();
-			// reset all views (empty settings)
+	fIPCPView->Reload();
+		// reset all views (empty settings)
 	
 	if(!settings || !profile || isNew)
 		return true;
@@ -164,8 +151,7 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	protocol.AddBool(MDSU_VALID, true);
 	fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
 	
-	if(fIPCPView)
-		fIPCPView->Reload();
+	fIPCPView->Reload();
 	
 	return true;
 }
@@ -265,10 +251,12 @@ IPCPAddon::CreateView(BPoint leftTop)
 		BRect rect;
 		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
 		fIPCPView = new IPCPView(this, rect);
-		fIPCPView->Reload();
 	}
 	
+	fDeleteView = false;
+	
 	fIPCPView->MoveTo(leftTop);
+	fIPCPView->Reload();
 	return fIPCPView;
 }
 

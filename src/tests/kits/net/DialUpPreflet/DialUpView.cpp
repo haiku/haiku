@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "DialUpView.h"
 #include "DialUpAddon.h"
@@ -27,12 +10,6 @@
 #include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
 #include "TextRequestDialog.h"
-
-// built-in add-ons
-#include "ConnectionOptionsAddon.h"
-#include "GeneralAddon.h"
-#include "IPCPAddon.h"
-#include "PPPoEAddon.h"
 
 #include <PPPInterface.h>
 #include <settings_tools.h>
@@ -51,7 +28,6 @@
 
 #include <Directory.h>
 #include <Entry.h>
-#include <File.h>
 #include <Path.h>
 
 
@@ -145,7 +121,6 @@ DialUpView::DialUpView(BRect frame)
 	: BView(frame, "DialUpView", B_FOLLOW_NONE, 0),
 	fListener(this),
 	fUpDownThread(-1),
-	fDriverSettings(NULL),
 	fCurrentItem(NULL),
 	fWatching(PPP_UNDEFINED_INTERFACE_ID),
 	fKeepLabel(false)
@@ -156,7 +131,7 @@ DialUpView::DialUpView(BRect frame)
 	
 	// add messenger to us so add-ons can contact us
 	BMessenger messenger(this);
-	fAddons.AddMessenger(DUN_MESSENGER, messenger);
+	fSettings.Addons().AddMessenger(DUN_MESSENGER, messenger);
 	
 	// create pop-up with all interfaces and "New..."/"Delete current" items
 	fInterfaceMenu = new BPopUpMenu(kLabelCreateNew);
@@ -173,7 +148,7 @@ DialUpView::DialUpView(BRect frame)
 	fTabView = new BTabView(rect, "TabView", B_WIDTH_FROM_LABEL);
 	BRect tabViewRect(fTabView->Bounds());
 	tabViewRect.bottom -= fTabView->TabHeight();
-	fAddons.AddRect(DUN_TAB_VIEW_RECT, tabViewRect);
+	fSettings.Addons().AddRect(DUN_TAB_VIEW_RECT, tabViewRect);
 	
 	BRect tmpRect(rect);
 	tmpRect.top += (tmpRect.Height() - 15) / 2;
@@ -211,7 +186,7 @@ DialUpView::DialUpView(BRect frame)
 	
 	// initialize
 	LoadInterfaces();
-	LoadAddons();
+	fSettings.LoadAddons();
 	CreateTabs();
 	fCurrentItem = NULL;
 		// reset, otherwise SelectInterface will not load the settings
@@ -222,18 +197,10 @@ DialUpView::DialUpView(BRect frame)
 
 DialUpView::~DialUpView()
 {
-	SaveSettingsToFile();
+	fSettings.SaveSettingsToFile();
 	
 	int32 tmp;
 	wait_for_thread(fUpDownThread, &tmp);
-	
-	// free known add-on types (these should free their known add-on types, etc.)
-	DialUpAddon *addon;
-	for(int32 index = 0;
-			fAddons.FindPointer(DUN_DELETE_ON_QUIT, index,
-				reinterpret_cast<void**>(&addon)) == B_OK;
-			index++)
-		delete addon;
 }
 
 
@@ -285,7 +252,7 @@ DialUpView::MessageReceived(BMessage *message)
 			
 			fInterfaceMenu->RemoveItem(fCurrentItem);
 			BDirectory settings, profile;
-			GetPPPDirectories(&settings, &profile);
+			fSettings.GetPTPDirectories(&settings, &profile);
 			BEntry entry;
 			settings.FindEntry(fCurrentItem->Label(), &entry);
 			entry.Remove();
@@ -324,179 +291,12 @@ DialUpView::MessageReceived(BMessage *message)
 }
 
 
-bool
-DialUpView::SelectInterfaceNamed(const char *name)
-{
-	BMenuItem *item = fInterfaceMenu->FindItem(name);
-	
-	int32 index = fInterfaceMenu->IndexOf(item);
-	if(!item || index >= CountInterfaces())
-		return false;
-	
-	SelectInterface(index);
-	
-	return true;
-}
-
-
-bool
-DialUpView::NeedsRequest() const
-{
-	return fGeneralAddon ? fGeneralAddon->NeedsAuthenticationRequest() : false;
-}
-
-
-BView*
-DialUpView::AuthenticationView() const
-{
-	return fGeneralAddon ? fGeneralAddon->AuthenticationView() : NULL;
-}
-
-
-BView*
-DialUpView::StatusView() const
-{
-	return fStatusView;
-}
-
-
-BView*
-DialUpView::ConnectButton() const
-{
-	return fConnectButton;
-}
-
-
-bool
-DialUpView::LoadSettings(bool isNew)
-{
-	fSettings.MakeEmpty();
-	fProfile.MakeEmpty();
-	BMessage *settingsPointer = fCurrentItem ? &fSettings : NULL,
-		*profilePointer = fCurrentItem ? &fProfile : NULL;
-	
-	if(fCurrentItem && !isNew) {
-		BString name("pppidf/");
-		name << fCurrentItem->Label();
-		if(!ReadMessageDriverSettings(name.String(), &fSettings))
-			return false;
-		name = "pppidf/profile/";
-		name << fCurrentItem->Label();
-		if(!ReadMessageDriverSettings(name.String(), &fProfile))
-			profilePointer = settingsPointer;
-	}
-	
-	DialUpAddon *addon;
-	for(int32 index = 0; fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
-			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
-		if(!addon)
-			continue;
-		
-		if(!addon->LoadSettings(settingsPointer, profilePointer, isNew))
-			return false;
-	}
-	
-	// TODO: check if settings are valid
-	
-	return true;
-}
-
-
-void
-DialUpView::IsModified(bool *settings, bool *profile)
-{
-	*settings = *profile = false;
-	bool addonSettingsChanged, addonProfileChanged;
-		// for current addon
-	
-	DialUpAddon *addon;
-	for(int32 index = 0; fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
-			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
-		if(!addon)
-			continue;
-		
-		addon->IsModified(&addonSettingsChanged, &addonProfileChanged);
-		if(addonSettingsChanged)
-			*settings = true;
-		if(addonProfileChanged)
-			*profile = true;
-	}
-}
-
-
-bool
-DialUpView::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
-{
-	if(!fCurrentItem || !settings || !profile)
-		return false;
-	
-	DialUpAddon *addon;
-	TemplateList<DialUpAddon*> addons;
-	for(int32 index = 0;
-			fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
-				reinterpret_cast<void**>(&addon)) == B_OK; index++) {
-		if(!addon)
-			continue;
-		
-		int32 insertIndex = 0;
-		for(; insertIndex < addons.CountItems(); insertIndex++)
-			if(addons.ItemAt(insertIndex)->Priority() <= addon->Priority())
-				break;
-		
-		addons.AddItem(addon, insertIndex);
-	}
-	
-	settings->AddInt32("Interface", static_cast<int32>(fWatching));
-	if(fCurrentItem)
-		settings->AddString("InterfaceName", fCurrentItem->Label());
-	
-	for(int32 index = 0; index < addons.CountItems(); index++)
-		if(!addons.ItemAt(index)->SaveSettings(settings, profile, saveTemporary))
-			return false;
-	
-	return true;
-}
-
-
-bool
-DialUpView::SaveSettingsToFile()
-{
-	bool settingsChanged, profileChanged;
-	IsModified(&settingsChanged, &profileChanged);
-	if(!settingsChanged && !profileChanged)
-		return true;
-	
-	BMessage settings, profile;
-	if(!SaveSettings(&settings, &profile, false))
-		return false;
-	
-	BDirectory settingsDirectory;
-	BDirectory profileDirectory;
-	GetPPPDirectories(&settingsDirectory, &profileDirectory);
-	if(settingsDirectory.InitCheck() != B_OK || profileDirectory.InitCheck() != B_OK)
-		return false;
-	
-	BFile file;
-	if(settingsChanged) {
-		settingsDirectory.CreateFile(fCurrentItem->Label(), &file);
-		WriteMessageDriverSettings(file, settings);
-	}
-	
-	if(profileChanged) {
-		profileDirectory.CreateFile(fCurrentItem->Label(), &file);
-		WriteMessageDriverSettings(file, profile);
-	}
-	
-	return true;
-}
-
-
 void
 DialUpView::UpDownThread()
 {
-	SaveSettingsToFile();
+	fSettings.SaveSettingsToFile();
 	BMessage settings, profile;
-	SaveSettings(&settings, &profile, true);
+	fSettings.SaveSettings(&settings, &profile, true);
 		// save temporary profile
 	driver_settings *temporaryProfile = MessageToDriverSettings(profile);
 	
@@ -528,32 +328,6 @@ DialUpView::UpDownThread()
 		interface.Down();
 	
 	fUpDownThread = -1;
-}
-
-
-void
-DialUpView::GetPPPDirectories(BDirectory *settingsDirectory,
-	BDirectory *profileDirectory) const
-{
-	if(settingsDirectory) {
-		BDirectory settings(PPP_INTERFACE_SETTINGS_PATH);
-		if(settings.InitCheck() != B_OK) {
-			create_directory(PPP_INTERFACE_SETTINGS_PATH, 0750);
-			settings.SetTo(PPP_INTERFACE_SETTINGS_PATH);
-		}
-		
-		*settingsDirectory = settings;
-	}
-	
-	if(profileDirectory) {
-		BDirectory profile(PPP_INTERFACE_SETTINGS_PATH "/profile");
-		if(profile.InitCheck() != B_OK) {
-			create_directory(PPP_INTERFACE_SETTINGS_PATH "/profile", 0750);
-			profile.SetTo(PPP_INTERFACE_SETTINGS_PATH "/profile");
-		}
-		
-		*profileDirectory = profile;
-	}
 }
 
 
@@ -612,7 +386,7 @@ DialUpView::CreateTabs()
 	TemplateList<DialUpAddon*> addons;
 	
 	for(int32 index = 0;
-			fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
+			fSettings.Addons().FindPointer(DUN_TAB_ADDON_TYPE, index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
 		if(!addon || addon->Position() < 0)
@@ -763,7 +537,7 @@ DialUpView::LoadInterfaces()
 	BDirectory settingsDirectory;
 	BEntry entry;
 	BPath path;
-	GetPPPDirectories(&settingsDirectory, NULL);
+	fSettings.GetPTPDirectories(&settingsDirectory, NULL);
 	while(settingsDirectory.GetNextEntry(&entry) == B_OK) {
 		if(entry.IsFile()) {
 			entry.GetPath(&path);
@@ -774,47 +548,7 @@ DialUpView::LoadInterfaces()
 
 
 void
-DialUpView::LoadAddons()
-{
-	// Load integrated add-ons:
-	// "Connection Options" tab
-	ConnectionOptionsAddon *connectionOptionsAddon =
-		new ConnectionOptionsAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, connectionOptionsAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, connectionOptionsAddon);
-	// "General" tab
-	GeneralAddon *fGeneralAddon = new GeneralAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
-
-	// "IPCP" protocol
-	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, ipcpAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, ipcpAddon);
-	// "PPPoE" device
-	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
-	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, pppoeAddon);
-
-	// "PAP" authenticator
-	BMessage addon;
-#ifdef LANG_GERMAN
-	addon.AddString("FriendlyName", "Unverschlüsselt");
-#else
-	addon.AddString("FriendlyName", "Plain-text Authentication");
-#endif
-	addon.AddString("TechnicalName", "PAP");
-	addon.AddString("KernelModuleName", "pap");
-	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);
-	// addon.MakeEmpty(); // for next authenticator
-	
-	// TODO:
-	// load all add-ons from the add-ons folder
-}
-
-
-void
-DialUpView::AddInterface(const char *name, bool isNew)
+DialUpView::AddInterface(const char *name, bool isNew = false)
 {
 	if(fInterfaceMenu->FindItem(name)) {
 		(new BAlert(kErrorTitle, kErrorInterfaceExists, kLabelOK,
@@ -836,13 +570,13 @@ DialUpView::AddInterface(const char *name, bool isNew)
 
 
 void
-DialUpView::SelectInterface(int32 index, bool isNew)
+DialUpView::SelectInterface(int32 index, bool isNew = false)
 {
 	BMenuItem *item = fInterfaceMenu->FindMarked();
 	if(fCurrentItem && item == fCurrentItem)
 		return;
 	
-	if(fCurrentItem && !SaveSettingsToFile())
+	if(fCurrentItem && !fSettings.SaveSettingsToFile())
 		(new BAlert(kErrorTitle, kErrorSavingFailed, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 	
@@ -866,13 +600,13 @@ DialUpView::SelectInterface(int32 index, bool isNew)
 	}
 	
 	if(!fCurrentItem)
-		LoadSettings(false);
+		fSettings.LoadSettings(NULL, false);
 			// tell modules to unload all settings
-	else if(!isNew && !LoadSettings(false)) {
+	else if(!isNew && !fSettings.LoadSettings(fCurrentItem->Label(), false)) {
 		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
-		LoadSettings(true);
-	} else if(isNew && !LoadSettings(true))
+		fSettings.LoadSettings(fCurrentItem->Label(), true);
+	} else if(isNew && !fSettings.LoadSettings(fCurrentItem->Label(), true))
 		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 }

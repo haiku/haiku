@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // GeneralAddon saves the loaded settings.
@@ -81,6 +64,7 @@ static const char *kGeneralTabAuthenticators = "Authenticators";
 GeneralAddon::GeneralAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fHasPassword(false),
+	fDeleteView(false),
 	fAuthenticatorsCount(0),
 	fSettings(NULL),
 	fProfile(NULL),
@@ -91,13 +75,8 @@ GeneralAddon::GeneralAddon(BMessage *addons)
 
 GeneralAddon::~GeneralAddon()
 {
-}
-
-
-bool
-GeneralAddon::NeedsAuthenticationRequest() const
-{
-	return fGeneralView->AuthenticatorName();
+	if(fDeleteView)
+		delete fGeneralView;
 }
 
 
@@ -125,9 +104,13 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fSettings = settings;
 	fProfile = profile;
 	
-	if(fGeneralView)
-		fGeneralView->Reload();
-			// reset all views (empty settings)
+	if(!fGeneralView) {
+		CreateView(BPoint(0,0));
+		fDeleteView = true;
+	}
+	
+	fGeneralView->Reload();
+		// reset all views (empty settings)
 	
 	if(!settings || !profile || isNew)
 		return true;
@@ -138,9 +121,8 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	if(!LoadAuthenticationSettings())
 		return false;
 	
-	if(fGeneralView)
-		fGeneralView->Reload();
-			// reload new settings
+	fGeneralView->Reload();
+		// reload new settings
 	
 	return true;
 }
@@ -351,18 +333,13 @@ GeneralAddon::CreateView(BPoint leftTop)
 		BRect rect;
 		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
 		fGeneralView = new GeneralView(this, rect);
-		fGeneralView->Reload();
 	}
 	
+	fDeleteView = false;
+	
 	fGeneralView->MoveTo(leftTop);
+	fGeneralView->Reload();
 	return fGeneralView;
-}
-
-
-BView*
-GeneralAddon::AuthenticationView() const
-{
-	return fGeneralView ? fGeneralView->AuthenticationView() : NULL;
 }
 
 
@@ -439,12 +416,10 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	rect = fAuthenticationBox->Bounds();
 	rect.InsetBy(10, 5);
 	rect.top = 25;
-//	fAuthenticationView = new BControl(rect, "authenticationView", NULL, NULL,
-//		B_FOLLOW_NONE, 0);
-		// BControl automatically sets the view color when attached (we want that)
-	fAuthenticationView = new BView(rect, "authenticationView", B_FOLLOW_NONE, 0);
-	fAuthenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	rect = fAuthenticationView->Bounds();
+	BView *authenticationView = new BView(rect, "authenticationView",
+		B_FOLLOW_NONE, 0);
+	authenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	rect = authenticationView->Bounds();
 	rect.bottom = rect.top + 20;
 	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);
 	rect.top = rect.bottom + 5;
@@ -462,10 +437,10 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	rect.bottom = rect.top + 20;
 	fSavePassword = new BCheckBox(rect, "SavePassword", kLabelSavePassword, NULL);
 	
-	fAuthenticationView->AddChild(fUsername);
-	fAuthenticationView->AddChild(fPassword);
-	fAuthenticationView->AddChild(fSavePassword);
-	fAuthenticationBox->AddChild(fAuthenticationView);
+	authenticationView->AddChild(fUsername);
+	authenticationView->AddChild(fPassword);
+	authenticationView->AddChild(fSavePassword);
+	fAuthenticationBox->AddChild(authenticationView);
 	
 	AddChild(fDeviceBox);
 	AddChild(fAuthenticationBox);

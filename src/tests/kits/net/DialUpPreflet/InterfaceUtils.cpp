@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "InterfaceUtils.h"
 
@@ -28,12 +11,13 @@
 #include <MenuItem.h>
 #include <Screen.h>
 #include <String.h>
-#include <ListItem.h>	// Contains StringItem class declaration
+#include <ListItem.h>
+	// contains StringItem class declaration
 #include <Window.h>
 
 
 BPoint
-center_on_screen(BRect rect, BWindow *window)
+center_on_screen(BRect rect, BWindow *window = NULL)
 {
 	BRect screenFrame = (BScreen(window).Frame());
 	BPoint point((screenFrame.Width() - rect.Width()) / 2.0,
@@ -46,7 +30,7 @@ center_on_screen(BRect rect, BWindow *window)
 
 
 int32
-FindNextMenuInsertionIndex(BMenu *menu, const char *name, int32 index)
+FindNextMenuInsertionIndex(BMenu *menu, const char *name, int32 index = 0)
 {
 	BMenuItem *item;
 	for(; index < menu->CountItems(); index++) {

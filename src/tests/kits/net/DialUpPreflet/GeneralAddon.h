@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // GeneralAddon saves the loaded settings.
@@ -54,8 +37,6 @@ class GeneralAddon : public DialUpAddon {
 		bool HasPassword() const
 			{ return fHasPassword; }
 		
-		bool NeedsAuthenticationRequest() const;
-		
 		DialUpAddon *FindDevice(const BString& moduleName) const;
 		DialUpAddon *DeviceAddon() const
 			{ return fDeviceAddon; }
@@ -83,16 +64,13 @@ class GeneralAddon : public DialUpAddon {
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
-		
-		// used by ppp_up application
-		BView *AuthenticationView() const;
 
 	private:
 		bool GetAuthenticator(const BString& moduleName, BMessage *entry) const;
 		bool MarkAuthenticatorAsValid(const BString& moduleName);
 
 	private:
-		bool fIsNew, fHasPassword;
+		bool fIsNew, fHasPassword, fDeleteView;
 		BString fDeviceName, fUsername, fPassword;
 		DialUpAddon *fDeviceAddon;
 		int32 fAuthenticatorsCount;
@@ -130,10 +108,6 @@ class GeneralView : public BView {
 		
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
-		
-		// used by ppp_up application
-		BView *AuthenticationView() const
-			{ return fAuthenticationView; }
 
 	private:
 		void ReloadDeviceView();
@@ -146,7 +120,6 @@ class GeneralView : public BView {
 		GeneralAddon *fAddon;
 		DialUpAddon *fDeviceAddon;
 		BBox *fDeviceBox, *fAuthenticationBox;
-		BView *fAuthenticationView;
 		BMenuField *fDeviceField, *fAuthenticatorField;
 		BMenuItem *fAuthenticatorNone, *fAuthenticatorDefault;
 		BTextControl *fUsername, *fPassword;

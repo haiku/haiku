@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // PPPoEAddon saves the loaded settings.
@@ -96,13 +79,13 @@ PPPoEAddon::PPPoEAddon(BMessage *addons)
 	fHeight = 20 // interface name control
 		+ 20 // service control
 		+ 5 + 2; // space between controls and bottom
+	CreateView(BPoint(0,0));
 }
 
 
 PPPoEAddon::~PPPoEAddon()
 {
 	delete fPPPoEView;
-		// this may have been set to NULL from the view's destructor!
 }
 
 
@@ -135,8 +118,7 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fSettings = settings;
 	fProfile = profile;
 	
-	if(fPPPoEView)
-		fPPPoEView->Reload();
+	fPPPoEView->Reload();
 	
 	if(!settings || !profile || isNew)
 		return true;
@@ -175,8 +157,7 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	device.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, deviceIndex, &device);
 	
-	if(fPPPoEView)
-		fPPPoEView->Reload();
+	fPPPoEView->Reload();
 	
 	return true;
 }
@@ -249,16 +230,16 @@ PPPoEAddon::CreateView(BPoint leftTop)
 {
 	if(!fPPPoEView) {
 		float width;
-		if(!Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &width))
+		if(Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &width) != B_OK)
 			width = 270;
 				// default value
 		
 		BRect rect(0, 0, width, fHeight);
 		fPPPoEView = new PPPoEView(this, rect);
-		fPPPoEView->Reload();
 	}
 	
 	fPPPoEView->MoveTo(leftTop);
+	fPPPoEView->Reload();
 	return fPPPoEView;
 }
 

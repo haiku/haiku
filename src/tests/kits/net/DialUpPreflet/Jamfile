@@ -23,10 +23,10 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
 
 AddResources DialUpPreflet : DialUpPreflet.rdef ;
 
-StaticLibrary dunview :
-	DialUpView.cpp
+StaticLibrary ptpnet :
+	PTPSettings.cpp
 	
-	# utils
+	# utils (TODO: move into their own library)
 	InterfaceUtils.cpp
 	MessageDriverSettingsUtils.cpp
 	TextRequestDialog.cpp
@@ -40,6 +40,7 @@ StaticLibrary dunview :
 
 SimpleTest DialUpPreflet :
 	DialUpApplication.cpp
+	DialUpView.cpp
 ;
 
-LinkSharedOSLibs DialUpPreflet : libdunview.a libppp.a be ;
+LinkSharedOSLibs DialUpPreflet : libptpnet.a libppp.a be ;

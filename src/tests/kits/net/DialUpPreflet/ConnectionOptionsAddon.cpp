@@ -1,24 +1,7 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // ConnectionOptionsAddon saves the loaded settings.
@@ -46,8 +29,8 @@ static const char *kLabelAutoRedial = "Verbindung Automatisch Wiederherstellen";
 #else
 static const char *kLabelConnectionOptions = "Options";
 static const char *kLabelDialOnDemand = "Connect Automatically When Needed";
-static const char *kLabelAskBeforeDialing = "Ask Before Dialing";
-static const char *kLabelAutoRedial = "Redial Automatically";
+static const char *kLabelAskBeforeDialing = "Ask Before Connecting";
+static const char *kLabelAutoRedial = "Reconnect Automatically";
 #endif
 
 
@@ -57,11 +40,15 @@ ConnectionOptionsAddon::ConnectionOptionsAddon(BMessage *addons)
 	fProfile(NULL),
 	fConnectionOptionsView(NULL)
 {
+	CreateView(BPoint(0,0));
+	fDeleteView = true;
 }
 
 
 ConnectionOptionsAddon::~ConnectionOptionsAddon()
 {
+	if(fDeleteView)
+		delete fConnectionOptionsView;
 }
 
 
@@ -73,9 +60,8 @@ ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool
 	fSettings = settings;
 	fProfile = profile;
 	
-	if(fConnectionOptionsView)
-		fConnectionOptionsView->Reload();
-			// reset all views (empty settings)
+	fConnectionOptionsView->Reload();
+		// reset all views (empty settings)
 	
 	if(!settings || !profile || isNew)
 		return true;
@@ -112,9 +98,8 @@ ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool
 		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
-	if(fConnectionOptionsView)
-		fConnectionOptionsView->Reload();
-			// reload new settings
+	fConnectionOptionsView->Reload();
+		// reload new settings
 	
 	return true;
 }
@@ -135,7 +120,8 @@ ConnectionOptionsAddon::IsModified(bool *settings, bool *profile) const
 
 
 bool
-ConnectionOptionsAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
+ConnectionOptionsAddon::SaveSettings(BMessage *settings, BMessage *profile,
+	bool saveTemporary)
 {
 	if(!fSettings || !settings)
 		return false;
@@ -190,10 +176,12 @@ ConnectionOptionsAddon::CreateView(BPoint leftTop)
 		BRect rect;
 		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
 		fConnectionOptionsView = new ConnectionOptionsView(this, rect);
-		fConnectionOptionsView->Reload();
 	}
 	
+	fDeleteView = false;
+	
 	fConnectionOptionsView->MoveTo(leftTop);
+	fConnectionOptionsView->Reload();
 	return fConnectionOptionsView;
 }
 
