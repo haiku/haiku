@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src tests kits midi ;
 
-SimpleTest test1 : test1.cpp : libmidi.so be stdc++.r4 ;
+#SimpleTest test1 : test1.cpp : libmidi.so be stdc++.r4 ;
 
-SubInclude OBOS_TOP src tests kits midi midi_player ;
-SubInclude OBOS_TOP src tests kits midi midi_player_replacement ;
-SubInclude OBOS_TOP src tests kits midi synth_file_reader ;
+#SubInclude OBOS_TOP src tests kits midi midi_player ;
+#SubInclude OBOS_TOP src tests kits midi midi_player_replacement ;
+#SubInclude OBOS_TOP src tests kits midi synth_file_reader ;
 
