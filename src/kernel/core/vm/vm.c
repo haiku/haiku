@@ -1804,6 +1804,21 @@ int vm_init_postthread(kernel_args *ka)
 	return 0;
 }
 
+
+void
+permit_page_faults(void)
+{
+	// ToDo: implement me when TLS is there
+}
+
+
+void
+forbid_page_faults(void)
+{
+	// ToDo: implement me when TLS is there
+}
+
+
 int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user, addr *newip)
 {
 	int err;
