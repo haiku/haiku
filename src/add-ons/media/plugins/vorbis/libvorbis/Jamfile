@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons media plugins vorbis_codec libvorbis ;
+SubDir OBOS_TOP src add-ons media plugins vorbis libvorbis ;
 
-SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg_multistream libogg ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg libogg ] ;
 
 SubDirCcFlags -DPACKAGE=\"libvorbis\" -DVERSION=\"1.0\" -DHAVE_ALLOCA_H=1 -DHAVE_ALLOCA=1 -DHAVE_SQRTF=1 -DHAVE_LOGF=1 -DHAVE_EXPF=1 -DHAVE_ACOSF=1 -DHAVE_ATANF=1 -DHAVE_FREXPF=1 -DHAVE_RINTF=1 -DHAVE_FLOORF=1 ;
 SubDirCcFlags -O20 -D__NO_MATH_INLINES -fsigned-char -DUSE_MEMORY_H -DPIC ;
