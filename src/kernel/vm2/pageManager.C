@@ -34,7 +34,7 @@ page *pageManager::getPage(void)
 	{
 	page *ret=NULL;
 	//printf ("pageManager::getPage: Checking clean\n");
-	printf ("pageManager::getPage:cleanCount = %d\n", clean.nodeCount);
+	//printf ("pageManager::getPage:cleanCount = %d\n", clean.nodeCount);
 	if (clean.count())
 		{
 		//printf ("pageManager::getPage:locking clean\n");
@@ -62,7 +62,7 @@ page *pageManager::getPage(void)
 		inUse.add(ret);
 		release_sem(inUseLock);
 		}
-	printf ("pageManager::getPage:leaving with page = %x\n", ret);
+	//printf ("pageManager::getPage:leaving with page = %x\n", ret);
 	return ret;
 	}
 
@@ -82,7 +82,7 @@ void pageManager::cleaner(void)
 		{
 		if (unused.count())
 			{
-			printf ("pageManager::cleaner: About to vacuum a page\n");
+			//printf ("pageManager::cleaner: About to vacuum a page\n");
 			acquire_sem(unusedLock);
 			page *first=(page *)unused.next();   
 			first->zero();

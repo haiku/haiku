@@ -33,7 +33,7 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 				}
 	lock();
 	// Create a vnode here
-	vpage *newPage = new vpage(begin,*target,NULL,((readOnly)?readable:writable),NO_LOCK);
+	vpage *newPage = new vpage(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
 	vpages.add(newPage); 
 	cacheMembers.add(newPage);
 	unlock();

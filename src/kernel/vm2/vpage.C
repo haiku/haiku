@@ -6,33 +6,30 @@
 void vpage::flush(void)
 	{
 	if (protection==writable && dirty)
-		swapMan.write_block(backingNode,physPage, PAGE_SIZE);
+		swapMan.write_block(*backingNode,physPage, PAGE_SIZE);
 	}
 
 void vpage::refresh(void)
 	{
-		swapMan.read_block(backingNode,physPage, PAGE_SIZE);
+		swapMan.read_block(*backingNode,physPage, PAGE_SIZE);
 	}
 
 vpage *vpage::clone(unsigned long address) // The calling method will have to create this...
 	{
-	vnode node;
-	node.fd=0;
-	node.offset=0;
-	return  new vpage(address,node,physPage,(protection==readable)?protection:copyOnWrite,LAZY); // Not sure if LAZY is right or not
+	return  new vpage(address,NULL,physPage,(protection==readable)?protection:copyOnWrite,LAZY); // Not sure if LAZY is right or not
 	}
 
 // backing and/or physMem can be NULL/0.
-vpage::vpage(unsigned long start,vnode backing, page *physMem,protectType prot,pageState state) 
+vpage::vpage(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state) 
 	{ 
 	start_address=start;
 	end_address=start+PAGE_SIZE-1;
 	protection=prot;
 	swappable=(state==NO_LOCK);
-	if (backing.fd==0)
-		backingNode=swapMan.findNode();
-	else
+	if (backing)
 		backingNode=backing; 
+	else
+		backingNode=&(swapMan.findNode());
 	if (!physPage && (state!=LAZY) && (state!=NO_LOCK))
 		physPage=pageMan.getPage();
 	else
@@ -43,8 +40,8 @@ vpage::~vpage(void)
 	{
 	if (physPage) // I doubt that this is always true. Probably need to check for sharing...
 		pageMan.freePage(physPage);
-	if (backingNode.fd) 
-		swapMan.freeVNode(backingNode);
+	if (backingNode->fd) 
+		swapMan.freeVNode(*backingNode);
 	}
 
 void vpage::setProtection(protectType prot)
@@ -67,7 +64,7 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 				memcpy(newPhysPage,physPage,PAGE_SIZE);
 				physPage=newPhysPage;
 				protection=writable;
-				backingNode=swapMan.findNode(); // Need new backing store for this node, since it was copied, the original is no good...
+				backingNode=&(swapMan.findNode()); // Need new backing store for this node, since it was copied, the original is no good...
 				// Update the architecture specific stuff here...
 				}
 			return true; 

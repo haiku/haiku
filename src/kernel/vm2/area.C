@@ -38,11 +38,11 @@ status_t area::createAreaMappingFile(char *name, int pageCount,void **address, a
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	vpage *newPage;
-	vnode newVnode;
+	vnode *newVnode=new vnode;
 	for (int i=0;i<pageCount;i++)
 		{
-		newVnode.fd=fd;
-		newVnode.offset=offset+PAGE_SIZE*i;
+		newVnode->fd=fd;
+		newVnode->offset=offset+PAGE_SIZE*i;
 		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
 		}
@@ -55,18 +55,15 @@ status_t area::createAreaMappingFile(char *name, int pageCount,void **address, a
 status_t area::createArea(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
 	{
 	manager->lock();
-	printf ("area::createArea: Locked in createArea\n");
+	//printf ("area::createArea: Locked in createArea\n");
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
-	printf ("area::createArea: base address = %d\n",base);
+	//printf ("area::createArea: base address = %d\n",base);
 	vpage *newPage;
-	vnode newVnode;
-	newVnode.fd=0;
-	newVnode.offset=0;
 	for (int i=0;i<pageCount;i++)
 		{
-		printf ("in area::createArea: creating page = %d\n",i);
-		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
+		//printf ("in area::createArea: creating page = %d\n",i);
+		newPage = new vpage(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 		vpages.add(newPage);
 		}
 	state=inState;
@@ -74,15 +71,15 @@ status_t area::createArea(char *name, int pageCount,void **address, addressSpec 
 	end_address=base+pageCount*PAGE_SIZE;
 	manager->unlock();
 	*address=(void *)base;
-	printf ("area::createArea: unlocked in createArea\n");
+	//printf ("area::createArea: unlocked in createArea\n");
 	}
 
 void area::freeArea(void)
 	{
-	printf ("area::freeArea: starting \n");
+	//printf ("area::freeArea: starting \n");
 
 	manager->lock();
-	vpages.dump();
+//	vpages.dump();
 	for (struct node *cur=vpages.rock;cur;)
 		{
 		//printf ("area::freeArea: wasting a page: %x\n",cur);
@@ -94,7 +91,7 @@ void area::freeArea(void)
 		}
 	//printf ("area::freeArea: unlocking \n");
 	manager->unlock();
-	printf ("area::freeArea: ending \n");
+	//printf ("area::freeArea: ending \n");
 	}
 
 status_t area::getInfo(area_info *dest)
@@ -140,12 +137,9 @@ status_t area::resize(size_t newSize)
 		manager->lock();
 		int pageCount = (newSize-oldSize) / PAGE_SIZE;
 		vpage *newPage;
-		vnode newVnode;
-		newVnode.fd=0;
-		newVnode.offset=0;
 		for (int i=0;i<pageCount;i++)
 			{
-			newPage = new vpage(end_address+PAGE_SIZE*i-1,newVnode,NULL,protection,state);
+			newPage = new vpage(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
 			vpages.add(newPage);
 			}
 		end_address+=start_address+newSize;

@@ -14,20 +14,34 @@ class list {
 		list(void) {nodeCount=0;rock=NULL;}
 		void add (void *in)
 			{
-			struct node *newNode=(node *)in;
+			struct node *newNode=reinterpret_cast<node *>(in);
 			newNode->next=rock;
 			rock=newNode;
 			nodeCount++;
 			}
 		//int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
 		int count(void) {return nodeCount;}
-		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return n;} 
+		node *next(void) 
+			{
+			//dump();
+			node *n=rock;
+			if (rock) 
+				{
+				rock=rock->next;
+				nodeCount--;
+				}
+			//dump();
+			return n;
+			} 
 		void remove(node *toNuke)
 			{
-//			printf ("list::remove starting: nuking %x \n",toNuke);
-//			list::dump();	
+			//printf ("list::remove starting: nuking %x \n",toNuke);
+			//dump();	
 			if (rock==toNuke)
+				{
 				rock=rock->next;
+				nodeCount--;
+				}
 			else
 				{
 				bool done=false;
@@ -35,11 +49,12 @@ class list {
 					if (cur->next==toNuke)
 						{
 						cur->next=toNuke->next;
+						nodeCount--;
 						done=true;
 						}
 				}
-//			printf ("list::remove ending: \n");
-//			list::dump();	
+			//printf ("list::remove ending: \n");
+			//dump();	
 			}
 		void dump(void)
 			{

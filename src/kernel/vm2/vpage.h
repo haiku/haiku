@@ -6,7 +6,7 @@ class vpage : public node
 {
 	private:
 		page *physPage;
-		vnode backingNode;
+		vnode *backingNode;
 		protectType protection;
 		bool dirty;
 		bool swappable;
@@ -20,7 +20,7 @@ class vpage : public node
 		vpage *clone(unsigned long); // Make a new vpage that is exactly the same as this one. 
 									// If we are read only, it is read only. 
 									// If we are read/write, both pages are copy on write
-		vpage(unsigned long  start,vnode backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
+		vpage(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
 		~vpage(void);
 		void setProtection(protectType prot);
 		protectType getProtection(void) {return protection;}

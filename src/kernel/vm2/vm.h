@@ -1,8 +1,9 @@
+#include "list.h"
+
 #ifndef _VM_TYPES
 #define _VM_TYPES
-
 const int PAGE_SIZE = 4096;
-struct vnode
+struct vnode : public node
 {
 	int fd;
 	unsigned long offset;
