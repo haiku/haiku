@@ -19,8 +19,9 @@ SharedLibrary game :
 	GSUtility.cpp
 ;
 
-# Hack to have DirectWindow.cpp include the R5 <Window .h> header.
+# Hack to have DirectWindow.cpp and WindowScreen.cpp include the R5 <Window .h> header.
 PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
+PrependObjectHdrs WindowScreen.cpp : /boot/develop/headers/be/interface ;
 
 LinkSharedOSLibs libgame.so :
 	be libmedia.so
