@@ -1,19 +1,19 @@
 /* Config Manager
-** provides access to device configurations
-**
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * provides access to device configurations
+ *
+ * Copyright 2002-2004, Marcus Overhagen, marcus@overhagen.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <ktypes.h> 
+
 #include <config_manager.h>
 #include <PCI.h>
 #include <ISA.h>
 #include <bus_manager.h>
-#include <errno.h>
-#include <debug.h>
 #include <string.h>
 #include <memheap.h>
 #include <KernelExport.h>
+
 
 static pci_module_info *gPCI = NULL;
 
@@ -23,7 +23,6 @@ static pci_module_info *gPCI = NULL;
 #define TRACE(x) dprintf x
 
 
-//	#pragma mark -
 //	Driver module API
 
 
