@@ -10,30 +10,32 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 {
 	int i;
 	struct Elf32_Sym *sym;
-	int vlErr;
 	addr_t S;
 	addr_t final_val;
 
-# define P         ((addr_t *)(image->regions[0].delta + rel[i].r_offset))
-# define A         (*(P))
-# define B         (image->regions[0].delta)
+# define P	((addr_t *)(image->regions[0].delta + rel[i].r_offset))
+# define A	(*(P))
+# define B	(image->regions[0].delta)
 
 	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
-
 		unsigned type = ELF32_R_TYPE(rel[i].r_info);
 
-		switch (ELF32_R_TYPE(rel[i].r_info)) {
+		switch (type) {
 			case R_386_32:
 			case R_386_PC32:
 			case R_386_GLOB_DAT:
 			case R_386_JMP_SLOT:
 			case R_386_GOTOFF:
+			{
+				status_t status;
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
-				vlErr = resolve_symbol(image, sym, &S);
-				if(vlErr<0) {
-					return vlErr;
+				status = resolve_symbol(image, sym, &S);
+				if (status < B_OK) {
+					printf("resolve symbol returned: %ld\n", status);
+					return status;
 				}
+			}
 		}
 		switch (type) {
 			case R_386_NONE:
@@ -91,6 +93,7 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 /*
  * rldelf.c requires this function to be implemented on a per-cpu basis
  */
+
 static bool
 relocate_image(image_t *image)
 {
