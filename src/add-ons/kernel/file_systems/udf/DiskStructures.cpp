@@ -370,6 +370,31 @@ udf_logical_descriptor::dump() const
 	DUMP(implementation_use());
 	PRINT(("integrity_sequence_extent:\n"));
 	DUMP(integrity_sequence_extent());
+//	PRINT(("partition_maps:\n"));
+	const uint8 *maps = partition_maps();
+	int offset = 0;
+	for (uint i = 0; i < partition_map_count(); i++) {
+		PRINT(("partition_map #%d:\n", i));
+		uint8 type = maps[offset];
+		uint8 length = maps[offset+1];
+		PRINT(("  type: %d\n", type));
+		PRINT(("  length: %d\n", length));
+		switch (type) {
+			case 1:
+				for (int j = 0; j < length-2; j++) 
+					PRINT(("  data[%d]: %d\n", j, maps[offset+2+j]));
+				break;
+			case 2: {
+				PRINT(("  partition_number: %d\n", *reinterpret_cast<const uint16*>(&(maps[offset+38]))));
+				PRINT(("  entity_id:\n"));
+				const udf_entity_id *id = reinterpret_cast<const udf_entity_id*>(&(maps[offset+4]));
+				if (id)	// To kill warning when DEBUG==0
+					PDUMP(id);
+				break;
+			}
+		}
+		offset += maps[offset+1];
+	}
 	// \todo dump partition_maps
 }
 
