@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src add-ons kernel generic atomizer ;
+
+R5KernelAddon atomizer : kernel generic :
+	atomizer.c
+;
+
