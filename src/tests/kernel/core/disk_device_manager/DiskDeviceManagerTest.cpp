@@ -20,9 +20,9 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	manager->InitialDeviceScan();
-	status_t error = manager->CreateFileDevice(kTestFileDevice);
-	if (error != B_OK)
-		printf("creating the file device failed: %s\n", strerror(error));
+	partition_id id = manager->CreateFileDevice(kTestFileDevice);
+	if (id < B_OK)
+		printf("creating the file device failed: %s\n", strerror(id));
 	if (manager->Lock()) {
 		for (int32 cookie = 0;
 			 KDiskDevice *device = manager->NextDevice(&cookie); ) {
