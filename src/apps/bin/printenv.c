@@ -12,7 +12,7 @@
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-
+#include <OS.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,58 +20,51 @@
 
 extern char **environ;
 
-void print_env(char *);
-
-
-void
-usage()
-{
-	printf("usage: printenv [VARIABLE]\n"
-	       "If no environment VARIABLE is specified, print them all.\n");
-}
+int print_env(char *);
 
 
 int
 main(int argc, char *argv[])
 {
-	if (argc > 2)
-		usage();
+	char *arg = (argc == 2 ? argv[1] : NULL);
 	
-	else {
-		char *arg = (argc == 2 ? argv[1] : NULL);
-		
-		if (arg && !strcmp(arg, "--help"))
-			usage();
-		
-		print_env(arg);
+	if ((argc > 2) || (arg && !strcmp(arg, "--help"))) {
+		printf("usage: printenv [VARIABLE]\n"
+		       "If no environment VARIABLE is specified, print them all.\n");
+		return 1;
 	}
 	
-	return 0;
+	return print_env(arg);
 }
 
 
-void
+int
 print_env(char *arg)
 {
 	char **env = environ;
 	
-	if (arg) {
+	if (arg == NULL) {
+		// print all environment 'key=value' pairs (one per line)
+	    while (*env)
+			printf("%s\n", *env++);
+		
+		return 0;
+	}
+	else {
 		// print only the value of the specified variable
 		char *s;
-		int   len = strlen(arg);
+		int   len   = strlen(arg);
+		bool  found = false;
 		
 	    while ((s = *env++) != NULL)
 	    	if (!strncmp(s, arg, len)) {
 	    		char *p = strchr(s, '=');
 	    		if (p) {
 					printf("%s\n", p+1);
-					break;
+					found = true;
 				}
 			}
-	}
-	else {
-		// print all environment 'key=value' pairs (one per line)
-	    while (*env)
-			printf("%s\n", *env++);
+		
+		return found ? 0 : 1;
 	}
 }
