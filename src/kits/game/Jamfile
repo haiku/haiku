@@ -26,3 +26,6 @@ PrependObjectHdrs WindowScreen.cpp : /boot/develop/headers/be/interface ;
 LinkSharedOSLibs libgame.so :
 	be libmedia.so
 ;
+
+MakeLocate <develop>libgame.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libgame.so : libgame.so ;
