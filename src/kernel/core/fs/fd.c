@@ -70,7 +70,7 @@ int
 new_fd(struct io_context *context, struct file_descriptor *descriptor)
 {
 	int fd = -1;
-	int i;
+	uint32 i;
 
 	mutex_lock(&context->io_mutex);
 
@@ -127,7 +127,7 @@ get_fd(struct io_context *context, int fd)
 
 	mutex_lock(&context->io_mutex);
 
-	if (fd < context->table_size)
+	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
 	
 	if (descriptor != NULL) // fd is valid
@@ -153,7 +153,7 @@ remove_fd(struct io_context *context, int fd)
 
 	mutex_lock(&context->io_mutex);
 
-	if (fd < context->table_size)
+	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
 
 	if (descriptor)	{	// fd is valid
@@ -209,8 +209,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	// Check if the fds are valid (mutex must be locked because
 	// the table size could be changed)
-	if (oldfd >= context->table_size
-		|| newfd >= context->table_size
+	if ((uint32)oldfd >= context->table_size
+		|| (uint32)newfd >= context->table_size
 		|| context->fds[oldfd] == NULL) {
 		mutex_unlock(&context->io_mutex);
 		return B_FILE_ERROR;
