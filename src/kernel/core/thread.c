@@ -205,7 +205,7 @@ static struct thread *
 create_thread_struct(const char *name)
 {
 	struct thread *t;
-	int state;
+	cpu_status state;
 	char temp[64];
 
 	state = disable_interrupts();
@@ -227,7 +227,7 @@ create_thread_struct(const char *name)
 	t->team = NULL;
 	t->cpu = NULL;
 	t->sem_blocking = -1;
-	t->fault_handler = NULL;
+	t->fault_handler = 0;
 	t->page_faults_allowed = 1;
 	t->kernel_stack_region_id = -1;
 	t->kernel_stack_base = 0;
@@ -335,7 +335,7 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 {
 	struct thread *t;
 	struct team *p;
-	int state;
+	cpu_status state;
 	char stack_name[64];
 	bool abort = false;
 
@@ -639,9 +639,9 @@ dump_next_thread_in_team(int argc, char **argv)
 static int
 get_death_stack(void)
 {
-	int i;
+	cpu_status state;
 	unsigned int bit;
-	int state;
+	int i;
 
 	acquire_sem(death_stack_sem);
 
@@ -733,9 +733,9 @@ thread_init(kernel_args *ka)
 		sprintf(temp, "idle_thread%d_kstack", i);
 		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
 		region = vm_get_region_by_id(t->kernel_stack_region_id);
-		if (!region) {
+		if (!region)
 			panic("error finding idle kstack region\n");
-		}
+
 		t->kernel_stack_base = region->base;
 		vm_put_region(region);
 		hash_insert(thread_hash, t);
@@ -868,7 +868,7 @@ thread_exit2(void *_args)
 	RELEASE_THREAD_LOCK();
 
 	// ToDo: is this correct at this point?
-	restore_interrupts(args.int_state);
+	//restore_interrupts(args.int_state);
 
 	TRACE(("thread_exit2: done removing thread from lists\n"));
 
@@ -888,7 +888,7 @@ thread_exit2(void *_args)
 void
 thread_exit(void)
 {
-	int state;
+	cpu_status state;
 	struct thread *t = thread_get_current_thread();
 	struct team *p = t->team;
 	bool delete_team = false;
@@ -1047,7 +1047,7 @@ int
 thread_wait_on_thread(thread_id id, int *retcode)
 {
 	sem_id sem;
-	int state;
+	cpu_status state;
 	struct thread *t;
 	int rc;
 
@@ -1090,7 +1090,7 @@ struct thread *
 thread_get_thread_struct(thread_id id)
 {
 	struct thread *t;
-	int state;
+	cpu_status state;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -1120,7 +1120,7 @@ thread_get_thread_struct_locked(thread_id id)
 void
 thread_atkernel_entry(void)
 {
-	int state;
+	cpu_status state;
 	struct thread *t;
 	bigtime_t now;
 
@@ -1146,7 +1146,8 @@ thread_atkernel_entry(void)
 void
 thread_atkernel_exit(void)
 {
-	int state, global_resched;
+	cpu_status state;
+	int global_resched;
 	struct thread *t;
 	bigtime_t now;
 
@@ -1179,7 +1180,7 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 {
 	struct thread *target;
 	sem_id cached_sem;
-	int state;
+	cpu_status state;
 	status_t rv;
 	cbuf *data;
 
@@ -1288,7 +1289,7 @@ has_data(thread_id thread)
 status_t
 _get_thread_info(thread_id id, thread_info *info, size_t size)
 {
-	int state;
+	cpu_status state;
 	status_t rc = B_OK;
 	struct thread *t;
 
@@ -1331,7 +1332,7 @@ err:
 status_t
 _get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size)
 {
-	int state;
+	cpu_status state;
 	int slot;
 	status_t rc = B_BAD_VALUE;
 	struct team *team;
