@@ -91,10 +91,8 @@ BFuncTranslator::BFuncTranslator(const translator_data *kpData) : BTranslator()
 // ---------------------------------------------------------------
 BFuncTranslator::~BFuncTranslator()
 {
-	if (fpData) {
-		delete fpData;
-		fpData = NULL;
-	}
+	delete fpData;
+	fpData = NULL;
 }
 
 // ---------------------------------------------------------------

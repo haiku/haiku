@@ -101,8 +101,10 @@ BBitmapStream::~BBitmapStream()
 {
 	if (!fDetached)
 		delete fBitmap;
+	fBitmap = NULL;
 		
 	delete fpBigEndianHeader;
+	fpBigEndianHeader = NULL;
 }
 
 // ---------------------------------------------------------------
