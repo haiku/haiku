@@ -503,17 +503,10 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
-	if (Lock()) {
-
-		fPainter->SetHighColor(color);
-		fPainter->SetDrawingMode(B_OP_COPY);
-		fPainter->StrokeLine(start, end, B_SOLID_HIGH);
-
-		BRect r(start, end + BPoint(1.0, 1.0));
-		fGraphicsCard->Invalidate(r);
-
-		Unlock();
-	}
+	DrawData d;
+	d.highcolor = color;
+	d.draw_mode = B_OP_COPY;
+	StrokeLine(start, end, &d);
 }
 
 // StrokeLine
