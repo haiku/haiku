@@ -109,15 +109,15 @@ protected:
 	*/
 	int32 _TitleWidth(void) { return (_title_string)?_title_string->CountChars():0; }
 	
-	void _DrawClose(BRect r);
-	void _DrawFrame(BRect r);
-	void _DrawMinimize(BRect r);
-	void _DrawTab(BRect r);
-	void _DrawTitle(BRect r);
-	void _DrawZoom(BRect r);
-	void _SetFocus(void);
-	void _DoLayout(void);
-	void _SetColors(void);
+	virtual void _DrawClose(BRect r);
+	virtual void _DrawFrame(BRect r);
+	virtual void _DrawMinimize(BRect r);
+	virtual void _DrawTab(BRect r);
+	virtual void _DrawTitle(BRect r);
+	virtual void _DrawZoom(BRect r);
+	virtual void _SetFocus(void);
+	virtual void _DoLayout(void);
+	virtual void _SetColors(void);
 	
 	ColorSet *_colors;
 	DisplayDriver *_driver;
