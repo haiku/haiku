@@ -23,6 +23,8 @@ void _call_ctors(void);
 static char empty[1];
 char *__progname = empty;
 
+char **environ = NULL;
+
 int _start(struct uspace_prog_args_t *uspa)
 {
 	int retcode;
@@ -37,6 +39,8 @@ int _start(struct uspace_prog_args_t *uspa)
 		else
 			++__progname;
 	}
+	
+	environ = uspa->envp;
 	
 	retcode = main(uspa->argc, uspa->argv);
 

@@ -33,6 +33,8 @@
 #include <resource.h>
 #include <atomic.h>
 #include <kerrors.h>
+#include <syscalls.h>
+
 
 struct proc_key {
 	proc_id id;
@@ -45,7 +47,9 @@ struct thread_key {
 struct proc_arg {
 	char *path;
 	char **args;
+	char **envp;
 	unsigned int argc;
+	unsigned int envc;
 };
 
 static struct proc *create_proc_struct(const char *name, bool kernel);
@@ -211,81 +215,78 @@ static int thread_struct_compare(void *_t, const void *_key)
 	else return 1;
 }
 
-// Frees the argument list
+// Frees an array of strings in kernel space
 // Parameters
-// 	args  argument list.
-//  args  number of arguments
-
-static void free_arg_list(char **args, int argc)
+//		strings		strings array
+//		strc		number of strings in array
+static void kfree_strings_array(char **strings, int strc)
 {
-	int  cnt = argc;
+	int cnt = strc;
 
-	if(args != NULL) {
-		for(cnt = 0; cnt < argc; cnt++){
-			kfree(args[cnt]);
+	if(strings != NULL) {
+		for(cnt = 0; cnt < strc; cnt++){
+			kfree(strings[cnt]);
 		}
-
-	    kfree(args);
+	    kfree(strings);
 	}
 }
 
-// Copy argument list from  userspace to kernel space
+// Copy an array of strings from user space to kernel space
 // Parameters
-//			args   userspace parameters
-//       argc   number of parameters
-//       kargs  usespace parameters
-//			return < 0 on error and **kargs = NULL
-
-static int user_copy_arg_list(char **args, int argc, char ***kargs)
+//		strings		userspace strings array
+//		strc		number of strings in array
+//		kstrings	pointer to the kernel copy
+// Returns < 0 on error and **kstrings = NULL
+static int user_copy_strings_array(char **strings, int strc, char ***kstrings)
 {
-	char **largs;
+	char **lstrings;
 	int err;
 	int cnt;
 	char *source;
-	char buf[SYS_THREAD_ARG_LENGTH_MAX];
+	char buf[SYS_THREAD_STRING_LENGTH_MAX];
 
-	*kargs = NULL;
+	*kstrings = NULL;
 
-	if((addr)args >= KERNEL_BASE && (addr)args <= KERNEL_TOP)
+	if ((addr)strings >= KERNEL_BASE && (addr)strings <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	largs = (char **)kmalloc((argc + 1) * sizeof(char *));
-	if(largs == NULL){
-		return ENOMEM;
+	lstrings = (char **)kmalloc((strc + 1) * sizeof(char *));
+	if (lstrings == NULL){
+		return ERR_NO_MEMORY;
 	}
 
-	// scan all parameters and copy to kernel space
+	// scan all strings and copy to kernel space
 
-	for(cnt = 0; cnt < argc; cnt++) {
-		err = user_memcpy(&source, &(args[cnt]), sizeof(char *));
+	for (cnt = 0; cnt < strc; cnt++) {
+		err = user_memcpy(&source, &(strings[cnt]), sizeof(char *));
 		if(err < 0)
 			goto error;
 
-		if((addr)source >= KERNEL_BASE && (addr)source <= KERNEL_TOP){
+		if ((addr)source >= KERNEL_BASE && (addr)source <= KERNEL_TOP){
 			err = ERR_VM_BAD_USER_MEMORY;
 			goto error;
 		}
 
-		err = user_strncpy(buf,source, SYS_THREAD_ARG_LENGTH_MAX - 1);
-		if(err < 0)
+		err = user_strncpy(buf, source, SYS_THREAD_STRING_LENGTH_MAX - 1);
+		if (err < 0)
 			goto error;
-		buf[SYS_THREAD_ARG_LENGTH_MAX - 1] = 0;
+		buf[SYS_THREAD_STRING_LENGTH_MAX - 1] = 0;
 
-		largs[cnt] = (char *)kstrdup(buf);
-		if(largs[cnt] == NULL){
-			err = ENOMEM;
+		lstrings[cnt] = (char *)kstrdup(buf);
+		if (lstrings[cnt] == NULL){
+			err = ERR_NO_MEMORY;
 			goto error;
 		}
 	}
 
-	largs[argc] = NULL;
+	lstrings[strc] = NULL;
 
-	*kargs = largs;
+	*kstrings = lstrings;
 	return B_NO_ERROR;
 
 error:
-	free_arg_list(largs,cnt);
-	dprintf("user_copy_arg_list failed %d \n",err);
+	kfree_strings_array(lstrings, cnt);
+	dprintf("user_copy_strings_array failed %d \n", err);
 	return err;
 }
 
@@ -457,7 +458,7 @@ static thread_id _create_thread(const char *name, proc_id pid, addr entry, void 
 		// create user stack
 		// XXX make this better. For now just keep trying to create a stack
 		// until we find a spot.
-		t->user_stack_base = (USER_STACK_REGION  - STACK_SIZE) + USER_STACK_REGION_SIZE;
+		t->user_stack_base = (USER_STACK_REGION - STACK_SIZE - ENV_SIZE) + USER_STACK_REGION_SIZE;
 		while(t->user_stack_base > USER_STACK_REGION) {
 			sprintf(stack_name, "%s_stack%d", p->name, t->id);
 			t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, stack_name,
@@ -1306,7 +1307,7 @@ int user_thread_wait_on_thread(thread_id id, int *uretcode)
 
 	rc = thread_wait_on_thread(id, &retcode);
 
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(retcode));
+	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
 	if(rc2 < 0)
 		return rc2;
 
@@ -1340,10 +1341,14 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 		rc = B_NO_ERROR;
 		
 		if (retcode) {
+			state = int_disable_interrupts();
+			GRAB_THREAD_LOCK();
 			t = thread_get_current_thread();
 			dprintf("thread_wait_on_thread: thread %d got return code 0x%x\n",
 				t->id, t->sem_deleted_retcode);
 			*retcode = t->sem_deleted_retcode;
+			RELEASE_THREAD_LOCK();
+			int_restore_interrupts(state);
 		}
 	}
 
@@ -1362,7 +1367,7 @@ int user_proc_wait_on_proc(proc_id id, int *uretcode)
 	if(rc < 0)
 		return rc;
 
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(retcode));
+	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
 	if(rc2 < 0)
 		return rc2;
 
@@ -1625,6 +1630,7 @@ static struct proc *create_proc_struct(const char *name, bool kernel)
 	p->main_thread = NULL;
 	p->state = PROC_STATE_BIRTH;
 	p->pending_signals = SIG_NONE;
+	p->user_env_base = NULL;
 
 	if(arch_proc_init_proc_struct(p, kernel) < 0)
 		goto error1;
@@ -1665,9 +1671,11 @@ static int proc_create_proc2(void *args)
 	char ustack_name[128];
 	int tot_top_size;
 	char **uargs;
+	char **uenv;
 	char *udest;
 	struct uspace_prog_args_t *uspa;
-	unsigned int  cnt;
+	unsigned int arg_cnt;
+	unsigned int env_cnt;
 
 	t = thread_get_current_thread();
 	p = t->proc;
@@ -1676,8 +1684,8 @@ static int proc_create_proc2(void *args)
 
 	// create an initial primary stack region
 
-	tot_top_size = STACK_SIZE + PAGE_ALIGN(get_arguments_data_size(pargs->args,pargs->argc));
-	t->user_stack_base = ((USER_STACK_REGION  - tot_top_size) + USER_STACK_REGION_SIZE);
+	tot_top_size = STACK_SIZE + ENV_SIZE + PAGE_ALIGN(get_arguments_data_size(pargs->args, pargs->argc));
+	t->user_stack_base = ((USER_STACK_REGION - tot_top_size) + USER_STACK_REGION_SIZE);
 	sprintf(ustack_name, "%s_primary_stack", p->name);
 	t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, ustack_name, (void **)&t->user_stack_base,
 		REGION_ADDR_EXACT_ADDRESS, tot_top_size, REGION_WIRING_LAZY, LOCK_RW);
@@ -1686,27 +1694,40 @@ static int proc_create_proc2(void *args)
 		return t->user_stack_region_id;
 	}
 
-	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE);
+	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
 	udest = (char  *)(uargs + pargs->argc + 1);
 //	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
 
-	for(cnt = 0;cnt < pargs->argc;cnt++){
-		uargs[cnt] = udest;
-		user_strcpy(udest, pargs->args[cnt]);
-		udest += strlen(pargs->args[cnt]) + 1;
+	for(arg_cnt = 0; arg_cnt < pargs->argc; arg_cnt++) {
+		uargs[arg_cnt] = udest;
+		user_strcpy(udest, pargs->args[arg_cnt]);
+		udest += (strlen(pargs->args[arg_cnt]) + 1);
 	}
-	uargs[cnt] = NULL;
+	uargs[arg_cnt] = NULL;
+
+	p->user_env_base = t->user_stack_base + STACK_SIZE;
+	uenv  = (char **)p->user_env_base;
+	udest = (char *)p->user_env_base + ENV_SIZE - 1;
+//	dprintf("proc_create_proc2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
+	for (env_cnt=0; env_cnt<pargs->envc; env_cnt++) {
+		udest -= (strlen(pargs->envp[env_cnt]) + 1);
+		uenv[env_cnt] = udest;
+		user_strcpy(udest, pargs->envp[env_cnt]);
+	}
+	uenv[env_cnt] = NULL;
 
 	user_memcpy(uspa->prog_name, p->name, sizeof(uspa->prog_name));
 	user_memcpy(uspa->prog_path, pargs->path, sizeof(uspa->prog_path));
-	uspa->argc = cnt;
+	uspa->argc = arg_cnt;
 	uspa->argv = uargs;
-	uspa->envc = 0;
-	uspa->envp = 0;
+	uspa->envc = env_cnt;
+	uspa->envp = uenv;
 
-	if(pargs->args != NULL)
-		free_arg_list(pargs->args,pargs->argc);
+	if (pargs->args != NULL)
+		kfree_strings_array(pargs->args, pargs->argc);
+	if (pargs->envp != NULL)
+		kfree_strings_array(pargs->envp, pargs->envc);
 
 	path = pargs->path;
 	dprintf("proc_create_proc2: loading elf binary '%s'\n", path);
@@ -1732,7 +1753,7 @@ static int proc_create_proc2(void *args)
 	return 0;
 }
 
-proc_id proc_create_proc(const char *path, const char *name, char **args, int argc, int priority)
+proc_id proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
 	struct proc *p;
 	thread_id tid;
@@ -1769,6 +1790,8 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 	}
 	pargs->argc = argc;
 	pargs->args = args;
+	pargs->envp = envp;
+	pargs->envc = envc;
 
 	// create a new ioctx for this process
 	p->ioctx = vfs_new_io_context(thread_get_current_thread()->proc->ioctx);
@@ -1819,39 +1842,49 @@ err1:
 	return err;
 }
 
-proc_id user_proc_create_proc(const char *upath, const char *uname, char **args, int argc, int priority)
+proc_id user_proc_create_proc(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
 	char name[SYS_MAX_OS_NAME_LEN];
 	char **kargs;
+	char **kenv;
 	int rc;
 
 	dprintf("user_proc_create_proc : argc=%d \n",argc);
 
-	if((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_copy_arg_list(args, argc, &kargs);
-	if(rc < 0)
+	rc = user_copy_strings_array(args, argc, &kargs);
+	if (rc < 0)
+		goto error;
+	
+	if (envp == NULL) {
+		envp = (char **)thread_get_current_thread()->proc->user_env_base;
+		for (envc = 0; envp && (envp[envc]); envc++);
+	}
+	rc = user_copy_strings_array(envp, envc, &kenv);
+	if (rc < 0)
 		goto error;
 
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if(rc < 0)
+	if (rc < 0)
 		goto error;
 
 	path[SYS_MAX_PATH_LEN-1] = 0;
 
 	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if(rc < 0)
+	if (rc < 0)
 		goto error;
 
 	name[SYS_MAX_OS_NAME_LEN-1] = 0;
 
-	return proc_create_proc(path, name, kargs, argc, priority);
+	return proc_create_proc(path, name, kargs, argc, kenv, envc, priority);
 error:
-	free_arg_list(kargs,argc);
+	kfree_strings_array(kargs, argc);
+	kfree_strings_array(kenv, envc);
 	return rc;
 }
 
@@ -2105,3 +2138,170 @@ int setrlimit(int resource, const struct rlimit * rlp)
 
 	return 0;
 }
+
+int user_setenv(const char *uname, const char *uvalue, int overwrite)
+{
+	char name[SYS_THREAD_STRING_LENGTH_MAX];
+	char value[SYS_THREAD_STRING_LENGTH_MAX];
+	int rc;
+
+	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
+	if(rc < 0)
+		return rc;
+
+	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
+
+	rc = user_strncpy(value, uvalue, SYS_THREAD_STRING_LENGTH_MAX-1);
+	if(rc < 0)
+		return rc;
+
+	value[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
+
+	return sys_setenv(name, value, overwrite);
+}
+
+int sys_setenv(const char *name, const char *value, int overwrite)
+{
+	char var[SYS_THREAD_STRING_LENGTH_MAX];
+	int state;
+	addr env_space;
+	char **envp;
+	int envc;
+	bool var_exists = false;
+	int var_pos = 0;
+	int name_size;
+	int rc = 0;
+	int i;
+	char *p;
+	
+	dprintf("sys_setenv: entry (name=%s, value=%s)\n", name, value);
+	
+	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
+		return -1;
+	
+	state = int_disable_interrupts();
+	GRAB_PROC_LOCK();
+	
+	strcpy(var, name);
+	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
+	name_size = strlen(var);
+	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
+	
+	env_space = (addr)thread_get_current_thread()->proc->user_env_base;
+	envp = (char **)env_space;
+	for (envc=0; envp[envc]; envc++) {
+		if (!strncmp(envp[envc], var, name_size)) {
+			var_exists = true;
+			var_pos = envc;
+		}
+	}
+	if (!var_exists)
+		var_pos = envc;
+	dprintf("sys_setenv: variable does%s exist\n", var_exists ? "" : " not");
+	if ((!var_exists) || (var_exists && overwrite)) {
+		
+		// XXX- make a better allocator
+		if (var_exists) {
+			if (strlen(var) <= strlen(envp[var_pos])) {
+				strcpy(envp[var_pos], var);
+			}
+			else {
+				for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
+					if (envp[i] < p)
+						p = envp[i];
+				p -= (strlen(var) + 1);
+				if (p < (char *)env_space + (envc * sizeof(char *))) {
+					rc = -1;
+				}
+				else {
+					envp[var_pos] = p;
+					strcpy(envp[var_pos], var);
+				}
+			}
+		}
+		else {
+			for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
+				if (envp[i] < p)
+					p = envp[i];
+			p -= (strlen(var) + 1);
+			if (p < (char *)env_space + ((envc + 1) * sizeof(char *))) {
+				rc = -1;
+			}
+			else {
+				envp[envc] = p;
+				strcpy(envp[envc], var);
+				envp[envc + 1] = NULL;
+			}
+		}
+	}
+	dprintf("sys_setenv: variable set.\n");
+
+	RELEASE_PROC_LOCK();
+	int_restore_interrupts(state);
+	
+	return rc;
+}
+
+int user_getenv(const char *uname, char **uvalue)
+{
+	char name[SYS_THREAD_STRING_LENGTH_MAX];
+	char *value;
+	int rc;
+
+	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
+	if (rc < 0)
+		return rc;
+	
+	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
+	
+	rc = sys_getenv(name, &value);
+	if (rc < 0)
+		return rc;
+	
+	rc = user_memcpy(uvalue, &value, sizeof(char *));
+	if (rc < 0)
+		return rc;
+	
+	return 0;
+}
+
+int sys_getenv(const char *name, char **value)
+{
+	char **envp;
+	char *p;
+	int state;
+	int i;
+	int len = strlen(name);
+	int rc = -1;
+	
+	state = int_disable_interrupts();
+	GRAB_PROC_LOCK();
+
+	envp = (char **)thread_get_current_thread()->proc->user_env_base;
+	for (i=0; envp[i]; i++) {
+		if (!strncmp(envp[i], name, len)) {
+			p = envp[i] + len;
+			if (*p == '=') {
+				*value = (p + 1);
+				rc = 0;
+				break;
+			}
+		}
+	}
+	
+	RELEASE_PROC_LOCK();
+	int_restore_interrupts(state);
+	
+	return rc;
+}
+
