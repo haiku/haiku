@@ -94,7 +94,7 @@ SYSCALL2(sys_set_sem_owner, 60)
 
 /* thread/team calls */
 SYSCALL0(sys_get_current_thread_id, 24)
-SYSCALL4(sys_spawn_thread, 35)
+SYSCALL5(sys_spawn_thread, 35)
 SYSCALL1(sys_kill_thread, 36)
 SYSCALL1(sys_suspend_thread, 37)
 SYSCALL1(sys_resume_thread, 38)

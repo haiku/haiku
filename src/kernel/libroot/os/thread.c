@@ -1,19 +1,47 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include <OS.h>
+
+#include <stdlib.h>
 #include <stdio.h>
 
+#include "tls.h"
 #include "syscalls.h"
 
 
-thread_id
-spawn_thread(thread_func function, const char *name, int32 priority, void *data)
+#undef thread_entry
+	// thread_entry is still defined in OS.h for compatibility reasons
+
+
+typedef struct callback_node {
+	struct callback_node *next;
+	void (*function)(void *);
+	void *argument;
+} callback_node;
+
+
+void _thread_do_exit_notification(void);
+
+
+static int32
+thread_entry(thread_func entry, void *data)
 {
-	return sys_spawn_thread(function, name, priority, data);
+	int32 returnCode = entry(data);
+
+	_thread_do_exit_notification();
+
+	return returnCode;
+}
+
+
+thread_id
+spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
+{
+	return sys_spawn_thread(thread_entry, name, priority, entry, data);
 }
 
 
@@ -69,6 +97,8 @@ set_thread_priority(thread_id thread, int32 priority)
 void
 exit_thread(status_t status)
 {
+	_thread_do_exit_notification();
+
 	sys_exit(status);
 }
 
@@ -80,10 +110,40 @@ wait_for_thread(thread_id thread, status_t *thread_return_value)
 }
 
 
-status_t on_exit_thread(void (*callback)(void *), void *data)
+void
+_thread_do_exit_notification(void)
 {
-	// ToDo: on_exit_thread not implemented
-	return B_ERROR;
+	callback_node *node = tls_get(TLS_ON_EXIT_THREAD_SLOT);
+	callback_node *next;
+	
+	while (node != NULL) {
+		next = node->next;
+
+		node->function(node->argument);
+		free(node);
+
+		node = next;
+	}
+}
+
+
+status_t
+on_exit_thread(void (*callback)(void *), void *data)
+{
+	callback_node **head = (callback_node **)tls_address(TLS_ON_EXIT_THREAD_SLOT);
+
+	callback_node *node = malloc(sizeof(callback_node));
+	if (node == NULL)
+		return B_NO_MEMORY;
+
+	node->function = callback;
+	node->argument = data;
+
+	// add this node to the list
+	node->next = *head;
+	*head = node;
+
+	return B_OK;
 }
 
 
@@ -150,14 +210,5 @@ status_t
 snooze_until(bigtime_t timeout, int timeBase)
 {
 	return snooze_etc(timeout, timeBase, B_ABSOLUTE_TIMEOUT);
-}
-
-
-void _thread_do_exit_notification(void);
-void
-_thread_do_exit_notification(void)
-{
-	// this is called from the original BeOS startup code
-	// has probably to do with the on_exit stuff.
 }
 
