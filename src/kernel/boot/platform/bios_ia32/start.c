@@ -11,7 +11,7 @@
 #include <string.h>
 
 
-extern int boot(stage2_args *args);
+extern int main(stage2_args *args);
 void _start(void);
 
 
@@ -34,10 +34,10 @@ dprintf(const char *format, ...)
 }
 
 
-status_t
-platform_get_boot_devices(struct stage2_args *args, struct list *devicesList)
+bool
+platform_user_menu_requested(void)
 {
-	return B_OK;
+	return false;
 }
 
 
@@ -56,6 +56,6 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 void
 _start(void)
 {
-	boot(NULL);
+	main(NULL);
 }
 

@@ -4,6 +4,7 @@ SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM
 
 KernelMergeObject boot_platform_bios_ia32.o :
 	<$(SOURCE_GRIST)>start.c
+	<$(SOURCE_GRIST)>devices.cpp
 	:
 	;
 
