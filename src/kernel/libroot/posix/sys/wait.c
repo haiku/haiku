@@ -31,6 +31,7 @@ waitpid(pid_t pid, int *_status, int options)
 
 	if (_status != NULL) {
 		// ToDo: fill in _status!
+		*_status = 0;
 	}
 
 	if (thread < B_OK) {
