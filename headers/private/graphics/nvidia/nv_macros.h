@@ -430,8 +430,6 @@
 
 /* registers needed for 'coldstart' */
 #define NV32_PFB_DEBUG_0	0x00100080
-#define NV32_PFB_CONFIG_0	0x00100200
-#define NV32_PFB_FIFO_DATA	0x0010020c
 #define NV32_PFB_REFCTRL	0x00100210
 #define NV32_COREPLL		0x00680500
 #define NV32_MEMPLL			0x00680504
