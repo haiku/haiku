@@ -20,6 +20,7 @@ Server obos_registrar :
 	MessageEvent.cpp
 	MessageRunnerManager.cpp
 	MIMEManager.cpp
+	NodeMonitoring.cpp
 	RDiskDevice.cpp
 	RDiskDeviceList.cpp
 	RecentApps.cpp
@@ -29,6 +30,7 @@ Server obos_registrar :
 	RosterSettingsCharStream.cpp
 	RPartition.cpp
 	RSession.cpp
+	RVolumeList.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
@@ -42,3 +44,10 @@ LinkSharedOSLibs obos_registrar :
 	stdc++.r4
 	be
 ;
+
+# Helper needed for node watching
+#
+BinCommand NodeMonitor : NodeMonitor.cpp : be ;
+
+Depends obos_registrar : NodeMonitor ;
+
