@@ -1,6 +1,16 @@
+/*
+	AnalogClock.cpp
+		by Mike Berg (inseculous)
+		
+		Notes:
+		TOffscreen borrows heavily from the clock source.
+		
+*/
+
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Debug.h>
+#include <Dragger.h>
 #include <Window.h>
 
 #include "AnalogClock.h"
@@ -11,6 +21,10 @@ const BRect kClockRect(0, 0, kClockFaceWidth -1, kClockFaceHeight -1);
 const BRect kCenterRect(0, 0, kCenterWidth -1, kCenterHeight -1);
 const BRect kCapRect(0, 0, kCapWidth -1, kCapHeight -1);
 
+/*
+	TOffscreen
+		Analog Clock face rendering view.
+*/
 
 TOffscreen::TOffscreen(BRect frame, const char *name)
 	: BView(frame, name, B_NOT_RESIZABLE, B_WILL_DRAW)
@@ -69,6 +83,8 @@ TOffscreen::TOffscreen(BRect frame, const char *name)
 TOffscreen::~TOffscreen()
 {	
 	delete f_bitmap;
+	delete f_centerbmp;
+	delete f_capbmp;
 }
 
 
@@ -110,7 +126,10 @@ TOffscreen::DrawX()
 
 
 
-/*=====> TAnalogClock <=====*/
+/*
+	TAnalogClock
+		BView to display clock face of current time.
+*/
 
 TAnalogClock::TAnalogClock(BRect frame, const char *name, uint32 resizingmode, uint32 flags)
 	: BView(frame, name, resizingmode, flags|B_DRAW_ON_CHILDREN)
@@ -122,6 +141,7 @@ TAnalogClock::TAnalogClock(BRect frame, const char *name, uint32 resizingmode, u
 TAnalogClock::~TAnalogClock()
 {
 	delete f_bitmap;
+	delete f_offscreen;
 }
 
 
@@ -162,7 +182,7 @@ TAnalogClock::MessageReceived(BMessage *message)
 		case B_OBSERVER_NOTICE_CHANGE:
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
 			switch (change) {
-				case OB_TM_CHANGED:
+				case H_TM_CHANGED:
 				{
 					int32 hour = 0;
 					int32 minute = 0;

@@ -8,7 +8,7 @@ class TOffscreen: public BView {
 	public:
 		TOffscreen(BRect frame, const char *name);
 		virtual ~TOffscreen();
-
+		
 		virtual void DrawX();
 		BPoint Position();
 	
@@ -29,8 +29,8 @@ class TAnalogClock: public BView {
 		TAnalogClock(BRect frame, const char *name, uint32 resizingmode, uint32 flags);
 		virtual ~TAnalogClock();
 		
-		virtual void AttachedToWindow();
-		virtual void Draw(BRect updaterect);		
+		virtual void AttachedToWindow();		
+		virtual void Draw(BRect updaterect);
 		virtual void MessageReceived(BMessage *);
 		
 		void InitView(BRect frame);

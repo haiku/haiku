@@ -11,14 +11,14 @@
 TTZDisplay::TTZDisplay(BRect frame, const char *name, 
 		uint32 resizingmode, uint32 flags,
 		const char *label, const char *text, 
-		int32 hour, int32 minute, int32 second)
+		int32 hour, int32 minute)
 	: BView(frame, name, resizingmode, flags)
 {
 	f_label = new BString(label);
 	f_text = new BString(text);
 	f_time = new BString();
 	
-	SetTo(hour, minute, second);
+	SetTo(hour, minute);
 }
 
 
@@ -99,7 +99,7 @@ TTZDisplay::SetText(const char *text)
 }
 
 void
-TTZDisplay::SetTo(int32 hour, int32 minute, int32 second)
+TTZDisplay::SetTo(int32 hour, int32 minute)
 {
 	// format time into f_time
 	if (f_time == NULL)
@@ -115,10 +115,10 @@ TTZDisplay::SetTo(int32 hour, int32 minute, int32 second)
 		ahour = 12;
 
 	char *ap;
-	if (hour> 12)
-		ap = "pm";
+	if (hour> 11)
+		ap = "PM";
 	else
-		ap = "am";
+		ap = "AM";
 
 	char *time = f_time->LockBuffer(8);
 	sprintf(time, "%02lu:%02lu %s", ahour, minute, ap);
@@ -126,3 +126,24 @@ TTZDisplay::SetTo(int32 hour, int32 minute, int32 second)
 	
 	Draw(Bounds());
 }
+
+const char *
+TTZDisplay::Text() const
+{
+	return f_text->String();
+}
+
+const char *
+TTZDisplay::Label() const
+{
+	return f_label->String();
+}
+
+const char *
+TTZDisplay::Time() const
+{
+	return f_time->String();
+}
+
+
+

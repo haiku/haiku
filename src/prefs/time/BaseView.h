@@ -4,7 +4,6 @@
 #include <Message.h>
 #include <View.h>
 
-#include "TimeMessages.h"
 
 class TTimeBaseView: public BView {
 	public:
@@ -13,9 +12,10 @@ class TTimeBaseView: public BView {
 		
 		virtual void Pulse();
 		
-		void ChangeTime(BMessage *message);
+		void ChangeTime(BMessage *);
 		void SetGMTime(bool);
 	protected:
+		virtual void InitView();
 		virtual void DispatchMessage();
 	private:
 		BMessage *f_message;

@@ -1,101 +1,70 @@
-#ifndef DATETIME_EDIT_H
-#define DATETIME_EDIT_H
+#ifndef DATETIME_H
+#define DATETIME_H
 
-#include <Control.h>
-#include <Message.h>
+#include "SectionEdit.h"
 
-#define OB_UP_PRESS 'obUP'
-#define OB_DOWN_PRESS 'obDN'
-
-enum FieldFocus {
-	FOCUS_NONE = 0,
-	FOCUS_MONTH,
-	FOCUS_DAY,
-	FOCUS_YEAR,
-	FOCUS_HOUR,
-	FOCUS_MINUTE,
-	FOCUS_SECOND,
-	FOCUS_AMPM
-};
-
-class TDateTimeEdit: public BControl {
+// TSection descendent to hold uint32 value
+class TDateTimeSection: public TSection {
 	public:
-		TDateTimeEdit(BRect frame, const char *name);
-		virtual ~TDateTimeEdit();
+		TDateTimeSection(BRect frame, uint32 data = 0);
+		~TDateTimeSection();
 		
-		virtual void AttachedToWindow();
-		virtual void Draw(BRect updaterect);
-		virtual void MouseDown(BPoint where);
-		virtual void MessageReceived(BMessage *message);
-		
-		virtual void UpPress()=0;
-		virtual void DownPress()=0;
-	protected:
-		virtual void DispatchMessage();
-		virtual void BuildDispatch(BMessage *message)=0;
-		
-		virtual void Draw3dFrame(BRect frame, bool inset);
-		
-		BBitmap *f_up;
-		BBitmap *f_down;
-		BRect	f_uprect;
-		BRect	f_downrect;
-		
-		FieldFocus f_focus;
-		int f_holdvalue;
-};
-
-class TTimeEdit: public TDateTimeEdit {
-	public:
-		TTimeEdit(BRect frame, const char *name);
-		virtual ~TTimeEdit();
-		
-		virtual void Draw(BRect updaterect);
-		virtual void MouseDown(BPoint where);
-		virtual void KeyDown(const char *bytes, int32 numbytes);
-		virtual void UpPress();
-		virtual void DownPress();
-		
-		virtual void SetTo(int32, int32, int32);
+		uint32 Data() const;
+		void SetData(uint32 data);
 	private:
-		void BuildDispatch(BMessage *message);
-		void SetFocus(bool forward);
-		void UpdateFocus();
-		
-		BRect f_hourrect;
-		BRect f_minrect;
-		BRect f_secrect;
-		BRect f_aprect;
-		
-		int f_hour;
-		int f_minute;
-		int f_second;
-		bool f_isam;
+		uint32 f_data;
 };
 
-class TDateEdit: public TDateTimeEdit {
+// TSectionEdit descendent to edit time
+class TTimeEdit: public TSectionEdit {
 	public:
-		TDateEdit(BRect frame, const char *name);
-		virtual ~TDateEdit();
+		TTimeEdit(BRect frame, const char *name, uint32 sections);
+		~TTimeEdit();
 		
-		virtual void Draw(BRect updaterect);
-		virtual void MouseDown(BPoint where);
-		virtual void KeyDown(const char *bytes, int32 numbytes);
-		virtual void UpPress();
-		virtual void DownPress();
+		virtual void InitView();
+		virtual void DrawSection(uint32 index, bool isfocus);
+		virtual void DrawSeperator(uint32 index);
 		
-		virtual void SetTo(int32, int32, int32);
-	private:
-		void BuildDispatch(BMessage *message);
-		void SetFocus(bool forward);
-		void UpdateFocus(bool = false);
+		virtual void SetSections(BRect area);
+		virtual void SectionFocus(uint32 index);
+		virtual void GetSeperatorWidth(uint32 *width);
 		
-		BRect f_monthrect;
-		BRect f_dayrect;
-		BRect f_yearrect;
-		int f_month;
-		int f_day;
-		int f_year;
+		void CheckRange();
+		
+		virtual void DoUpPress();
+		virtual void DoDownPress();
+		
+		virtual void BuildDispatch(BMessage *message);
+		
+		void SetTo(uint32 hour, uint32 minute, uint32 second);
 };
 
-#endif //DATETIME_EDIT_H
+
+/* DATE TSECTIONEDIT */
+
+// TSectionEdit descendent to edit Date
+class TDateEdit: public TSectionEdit {
+	public:
+		TDateEdit(BRect frame, const char *name, uint32 sections);
+		~TDateEdit();
+		
+		virtual void InitView();
+		virtual void DrawSection(uint32 index, bool isfocus);
+		virtual void DrawSeperator(uint32 index);
+		
+		virtual void SetSections(BRect area);
+		virtual void SectionFocus(uint32 index);
+		virtual void GetSeperatorWidth(uint32 *width);
+		
+		void CheckRange();
+		
+		virtual void DoUpPress();
+		virtual void DoDownPress();
+		
+		virtual void BuildDispatch(BMessage *message);
+		
+		void SetTo(uint32 hour, uint32 minute, uint32 second);
+};
+
+
+#endif //DATETIME_H

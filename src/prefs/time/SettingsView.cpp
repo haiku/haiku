@@ -45,7 +45,7 @@ TSettingsView::MessageReceived(BMessage *message)
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
 			switch(change)
 			{
-				case OB_TM_CHANGED:
+				case H_TM_CHANGED:
 					UpdateDateTime(message);
 				break;
 				
@@ -79,7 +79,7 @@ TSettingsView::InitView()
 	// left side
 	frame.InsetBy(6, 6);
 	frame.bottom = frame.top +text_height +6;
-	f_dateedit = new TDateEdit(frame, "date_edit");
+	f_dateedit = new TDateEdit(frame, "date_edit", 3);
 	
 	frame.top = f_dateedit->Frame().bottom;
 	frame.bottom = bounds.bottom;
@@ -97,13 +97,14 @@ TSettingsView::InitView()
 	frame.InsetBy(26, 6);
 	frame.bottom = frame.top +text_height +6;
 	frame.right += 4;
-	f_timeedit = new TTimeEdit(frame, "time_edit");
+	f_timeedit = new TTimeEdit(frame, "time_edit", 4);
 	
 	frame.top = f_timeedit->Frame().bottom;
 	frame.bottom = bounds.bottom -(text_height *3);
 	frame.InsetBy(10, 10);
 	f_clock = new TAnalogClock(frame, "analog clock", 
 			B_FOLLOW_NONE, B_WILL_DRAW);
+	AddChild(f_timeedit);
 	
 	// clock radio buttons
 	frame = bounds.InsetByCopy(6, 10);
@@ -117,15 +118,14 @@ TSettingsView::InitView()
 	frame.OffsetBy(frame.Width() +9, -1);
 	frame.right = bounds.right-2;
 	
-	f_local = new BRadioButton(frame, "local", "Local time", new BMessage(OB_RTC_CHANGE));
+	f_local = new BRadioButton(frame, "local", "Local time", new BMessage(H_RTC_CHANGE));
 	AddChild(f_local);
 	
 	frame.OffsetBy(0, text_height +4);
-	f_gmt = new BRadioButton(frame, "gmt", "GMT", new BMessage(OB_RTC_CHANGE));
+	f_gmt = new BRadioButton(frame, "gmt", "GMT", new BMessage(H_RTC_CHANGE));
 	AddChild(f_gmt);
 	
 	AddChild(text);	
-	AddChild(f_timeedit);
 	AddChild(f_clock);
 	
 	if (f_islocal)

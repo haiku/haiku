@@ -1,56 +1,70 @@
 /*
-	TZoneView.cpp
+	ZoneView.cpp
+		by Mike Berg (inseculous)
+		
+		Status: 	mimics original Time Zone tab of Time Pref App
+		Exceptions: 	doesn't calc "Time in" time.
+		Issues: 	After experimenting with both Time Prefs, it seems the original doesn't
+				 use the link file in the users settings file to get the current Timezone.
+				 Need to find the call it uses to get its inital info so I can get exact duplication.
 */
 
 #include <Button.h>
+
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
-#include <ListView.h> 
-#include <MenuField.h>  
+#include <ListView.h>
+#include <MenuField.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
-#include <Path.h> 
-#include <PopUpMenu.h> 
+#include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <StorageDefs.h>
 #include <String.h>
 #include <View.h>
-
-#include <stdio.h>
+#include <Window.h>
 
 #include "TimeMessages.h"
 #include "ZoneView.h"
 
 
 /*=====> TZoneItem <=====*/
-
-TZoneItem::TZoneItem(const char *text, const char *zonedata)
+TZoneItem::TZoneItem(const char *text, const char *zone)
 	: BStringItem(text)
-{ 
-	f_zonedata = new BPath(zonedata); 
+{
+	f_zone = new BPath(zone);
 }
 
 
 TZoneItem::~TZoneItem()
 {
-	delete f_zonedata;
+	delete f_zone;
+}
+
+const char *
+TZoneItem::Zone() const
+{
+	return f_zone->Leaf();
 }
 
 
 const char *
-TZoneItem::GetZone() const
+TZoneItem::Path() const
 {
-	return f_zonedata->Leaf();
+	return f_zone->Path();
 }
 
 
 /*=====> TZoneView <=====*/
 
 TZoneView::TZoneView(BRect frame)
-	: BView(frame, "", B_FOLLOW_ALL, 
-	  B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP|B_PULSE_NEEDED)
-	, f_citylist(NULL)
+	: BView(frame, B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW|B_NAVIGABLE_JUMP)
+	, f_first(true)
 {
+	ReadTimeZoneLink();
 	InitView();
 }
 
@@ -60,11 +74,45 @@ TZoneView::~TZoneView()
 }
 
 
+
+void
+TZoneView::AllAttached()
+{
+	
+
+}
+
+
 void
 TZoneView::AttachedToWindow()
 {
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
+
+	if (f_first) // stupid hack
+	{
+		f_regionpopup->SetTargetForItems(this);
+		f_setzone->SetTarget(this);
+		f_citylist->SetTarget(this);
+		// update displays	
+		BPath parent;
+		f_currentzone.GetParent(&parent);
+		int czone = FillCityList(parent.Path());
+		if (czone> -1) {
+			f_citylist->Select(czone);
+			f_current->SetText( ((TZoneItem *)f_citylist->ItemAt(czone))->Text() );
+		}
+		f_first = false;
+	}
+	f_citylist->ScrollToSelection();
+}
+
+
+void
+TZoneView::Draw(BRect updaterect)
+{
+	f_current->Draw(updaterect);
+	f_preview->Draw(updaterect);
 }
 
 
@@ -76,7 +124,7 @@ TZoneView::MessageReceived(BMessage *message)
 		case B_OBSERVER_NOTICE_CHANGE:
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
 			switch(change) {
-				case OB_TM_CHANGED:
+				case H_TM_CHANGED:
 					UpdateDateTime(message);
 				break;
 				
@@ -85,34 +133,43 @@ TZoneView::MessageReceived(BMessage *message)
 				break;
 			}
 		break;
+		case H_REGION_CHANGED:
+			ChangeRegion(message);
+		break;
+		
+		case H_SET_TIME_ZONE:
+			SetTimeZone();
+		break;
+		
+		case H_CITY_CHANGED:
+			SetPreview();
+		break;	
+		
 		default:
 			BView::MessageReceived(message);
-			break;
+		break;
 	}
-}
-
-
-void
-TZoneView::Draw(BRect updaterect)
-{
-	f_currentzone->Draw(updaterect);
-	f_timeinzone->Draw(updaterect);
 }
 
 
 void
 TZoneView::UpdateDateTime(BMessage *message)
 {
-	int32 hour, minute, second;
+	// only need hour and minute
+	int32 hour, minute;
 
 	if (message->FindInt32("hour", &hour) == B_OK
-		&& message->FindInt32("minute", &minute) == B_OK
-		&& message->FindInt32("second", &second) == B_OK)
-	{
-		f_currentzone->SetTo(hour, minute, second);
+		&& message->FindInt32("minute", &minute) == B_OK) {
+		if (f_hour != hour || f_minute != minute) {
+			f_hour = hour;
+			f_minute = minute;
+			f_current->SetTo(hour, minute);
 
-		// do calc to get other zone time
-		f_timeinzone->SetTo(hour, minute, second);
+			if (f_citylist->CurrentSelection()> -1) {
+				// do calc to get other zone time
+				SetPreview();
+			}
+		}
 	}
 }
 
@@ -124,22 +181,20 @@ TZoneView:: InitView()
 	be_plain_font->GetHeight(&finfo);
 	float text_height = finfo.ascent +finfo.descent +finfo.leading;
 
-	GetCurrentRegion();
-
 	BRect bounds(Bounds().InsetByCopy(4, 2));
 	BRect frame(bounds);
 	
 	// Zone menu
-	f_zonepopup = new BPopUpMenu("", true, true, B_ITEMS_IN_COLUMN);
-	
+	f_regionpopup = new BPopUpMenu(B_EMPTY_STRING, true, true, B_ITEMS_IN_COLUMN);
+
 	float widest = 0;
-	CreateZoneMenu(&widest);
+	BuildRegionMenu(&widest);
 
 	frame.right = frame.left +widest +25;
 	frame.bottom = frame.top +text_height -1;
 	
 	BMenuField *mField;
-	mField= new BMenuField(frame, "mfield", NULL, f_zonepopup, true);
+	mField= new BMenuField(frame, "regions", NULL, f_regionpopup, true);
 	mField->MenuBar()->SetBorder(B_BORDER_CONTENTS);
 	mField->MenuBar()->ResizeToPreferred();
 	AddChild(mField);
@@ -158,55 +213,50 @@ TZoneView:: InitView()
 			B_FOLLOW_LEFT|B_FOLLOW_TOP,
 			B_WILL_DRAW|B_NAVIGABLE|B_FRAME_EVENTS);
 
-	BMessage *citychange = new BMessage(TIME_ZONE_CHANGED);
+	BMessage *citychange = new BMessage(H_CITY_CHANGED);
 	f_citylist->SetSelectionMessage(citychange);
+	
+	BMessage *cityinvoke = new BMessage(H_SET_TIME_ZONE);
+	f_citylist->SetInvocationMessage(cityinvoke);
 	
 	BScrollView *scrollList;
 	scrollList = new BScrollView("scroll_list", f_citylist, 
 			B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, true);
 	AddChild(scrollList);
 	
-	
+
 	// Time Displays
 	
 	frame.OffsetBy(scrollList->Bounds().Width() +9, 3);
 	frame.bottom = frame.top +text_height *2;
 	frame.right = bounds.right -6;
-	f_currentzone = new TTZDisplay(frame, "current", 
+	f_current = new TTZDisplay(frame, "current", 
 			B_FOLLOW_LEFT|B_FOLLOW_TOP, 0,
 			"Current time zone:", B_EMPTY_STRING);
-	f_currentzone->ResizeToPreferred();
+	f_current->ResizeToPreferred();
 	
 	frame.OffsetBy(0, (text_height *3) +2);
-	f_timeinzone = new TTZDisplay(frame, "timein", 
+	f_preview = new TTZDisplay(frame, "timein", 
 			B_FOLLOW_LEFT|B_FOLLOW_TOP, 0,
 			"Time in: ", B_EMPTY_STRING);
-	f_timeinzone->ResizeToPreferred();
+	f_preview->ResizeToPreferred();
 	
-	AddChild(f_currentzone);
-	AddChild(f_timeinzone);
-	
+	AddChild(f_current);
+	AddChild(f_preview);
 	
 	// set button
 	
 	frame.Set(bounds.right -75, bounds.bottom -24, 
 			bounds.right, bounds.bottom);
 	frame.OffsetBy(-2, -2);
-	f_settimezone = new BButton(frame, "set", "Set", new BMessage(SET_TIME_ZONE));
-	f_settimezone->SetEnabled(false);
-	AddChild(f_settimezone);
-	
-	// update displays	
-	int currentzone = FillZoneList(f_RegionStr.Leaf());
-	f_citylist->Select(currentzone);
-	f_citylist->ScrollToSelection();
-	f_citylist->Invalidate();
-	f_currentzone->SetText( ((TZoneItem *)f_citylist->ItemAt(currentzone))->Text() );
+	f_setzone = new BButton(frame, "set", "Set", new BMessage(H_SET_TIME_ZONE));
+	f_setzone->SetEnabled(false);
+	AddChild(f_setzone);
 }
 
 
 void
-TZoneView::CreateZoneMenu(float *widest)
+TZoneView::BuildRegionMenu(float *widest)
 {
 	BPath path;
 	// return if /etc directory is not found
@@ -215,138 +265,195 @@ TZoneView::CreateZoneMenu(float *widest)
 
 	path.Append("timezones");
 
+	// get current region
+	BPath region;
+	f_currentzone.GetParent(&region);
+	
 	float width = 0;
-	bool markitem;
+	bool markit;
 	BEntry entry;
-	BMenuItem *zoneItem;
+	BMenuItem *item;
 	BDirectory dir(path.Path());
 
 	dir.Rewind();
+
 	// walk timezones dir and add entries to menu
 	BString itemtext;
 	while (dir.GetNextEntry(&entry) == B_NO_ERROR) {
 		if (entry.IsDirectory()) {
 			path.SetTo(&entry);
 			itemtext = path.Leaf();
+			
+			// skip Etc directory
 			if (itemtext.Compare("Etc", 3) == 0)
-			 continue;
+			 	continue;
 			 
+			markit = itemtext.Compare(region.Leaf()) == 0;
+			
 			// add Ocean to oceans :)
-			if ((itemtext.Compare("Atlantic", 8) == 0)
-			 ||(itemtext.Compare("Pacific", 7) == 0)
-			 ||(itemtext.Compare("Indian", 6) == 0))
+			if (itemtext.Compare("Atlantic", 8) == 0
+				 ||itemtext.Compare("Pacific", 7) == 0
+				 ||itemtext.Compare("Indian", 6) == 0)
 				itemtext.Append(" Ocean");
 
-			markitem = itemtext.Compare(f_RegionStr.Leaf()) == 0;
-			itemtext = itemtext.ReplaceAll('_', ' ');
+			itemtext = itemtext.ReplaceAll('_', ' ');		// underscores are spaces
 			
 			width = be_plain_font->StringWidth(itemtext.String());
 			if (width> *widest) *widest = width;
 
-			BMessage *zoneMessage = new BMessage(REGION_CHANGED);
-			zoneMessage->AddString("region", path.Leaf());
+			BMessage *msg = new BMessage(H_REGION_CHANGED);
+			msg->AddString("region", path.Path());
 
-			zoneItem = new BMenuItem(itemtext.String(), zoneMessage);
-			zoneItem->SetMarked(markitem);
-			f_zonepopup->AddItem(zoneItem);
+			item = new BMenuItem(itemtext.String(), msg);
+			item->SetMarked(markit);
+			f_regionpopup->AddItem(item);
 		}
 	}
 }
 
 
-void
-TZoneView::ChangeRegion(BMessage *message)
-{
-	const char *area;
-	message->FindString("region", &area);
-
-	FillZoneList(area);
-}
-
-
 int
-TZoneView::FillZoneList(const char *area)
+TZoneView::FillCityList(const char *area)
 {
-	//clear listview from previous items
-	f_citylist->MakeEmpty();
-
+	// clear list
+	
+	// MakeEmpty() doesn't free items so...
+	int32 idx = f_citylist->CountItems();
+	if (idx>= 1)
+		for (; idx>= 0; idx--)
+			delete f_citylist->RemoveItem(idx);
+		
 	//Enter time zones directory. Find subdir with name that matches string stored in area.
 	//Enter subdirectory and count the items. For each item, add a StringItem to f_CityList
  	//Time zones directory 
 
 	BPath path;
+
 	// return if /etc directory is not found
 	if (!(find_directory(B_BEOS_ETC_DIRECTORY, &path) == B_OK))
 		return 0;
 
 	path.Append("timezones");
 
+	BPath Area(area);
  	BDirectory zoneDir(path.Path()); 
  	BDirectory cityDir;
  	BStringItem *city;
  	BString city_name;
- 	entry_ref ref;
- 	
-	int index = 0; // index of current setting
+ 	BEntry entry;
+	int index = -1; 
  	//locate subdirectory:
-	if ( zoneDir.Contains(area, B_DIRECTORY_NODE)) {
-		cityDir.SetTo(&zoneDir, area);  //There is a subdir with a name that matches 'area'. That's the one!!
+
+	if ( zoneDir.Contains(Area.Leaf(), B_DIRECTORY_NODE)) {
+		cityDir.SetTo(&zoneDir, Area.Leaf());  
+		//There is a subdir with a name that matches 'area'. That's the one!!
+		
+		
 		//iterate over the items in the subdir and fill the listview with TZoneItems:	
-		while(cityDir.GetNextRef(&ref) == B_NO_ERROR) {
-			city_name = ref.name;
-			city_name.ReplaceAll("__", ", ");
-			city_name.ReplaceAll("_", " ");
-			city = new TZoneItem(city_name.String(), ref.name);
-			f_citylist->AddItem(city);
-			
-			if (strcmp(f_ZoneStr.Leaf(), ref.name) == 0)
-				index = f_citylist->IndexOf(city);
+		
+		while(cityDir.GetNextEntry(&entry) == B_NO_ERROR) {
+			if (!entry.IsDirectory()) {
+				BPath zone(&entry);
+				city_name = zone.Leaf();
+				city_name.ReplaceAll("_IN", ", Indiana");
+				city_name.ReplaceAll("__Calif", ", Calif");
+				city_name.ReplaceAll("__", ", ");
+				city_name.ReplaceAll("_", " ");
+				city = new TZoneItem(city_name.String(), zone.Path());
+				f_citylist->AddItem(city);
+				if (strcmp(f_currentzone.Leaf(), zone.Leaf()) == 0)
+					index = f_citylist->IndexOf(city);
+			}
 		}
 	}
-	printf("%d\n", index);
 	return index;
 }
 
 
 void
-TZoneView::GetCurrentTZ()
+TZoneView::ChangeRegion(BMessage *message)
 {
+	BString area;
+	message->FindString("region", &area);
+
+	FillCityList(area.String());
+}
+
+
+void
+TZoneView::ReadTimeZoneLink()
+{
+	/* reads the timezone symlink from B_USER_SETTINGS_DIRECTORY
+		currently this sets f_currentzone to the symlink value.
+		this is wrong.  the original can get users timezone without 
+		a timezone symlink present.  
+		
+	  defaults are set to different values to clue in on what error was returned
+	  	GMT is set when the link is invalid
+	  	EST is set when the settings dir can't be found **should never happen**	
+	*/
+	
  	BPath path;
  	BEntry tzLink;
  	
  	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+
  		path.Append("timezone");
 		tzLink.SetTo(path.Path(), true);
-		if (!tzLink.InitCheck()) {// link is broken
+
+		if (tzLink.InitCheck() != B_OK) {// link is broken
+			tzLink.SetTo("/boot/beos/etc/timezones/Pacific/fiji");
 			// do something like set to a default GMT???
-//			return;
 		}
  	} else {
- 		// set tzlink to default
+ 		// set tzlink to a default
+ 		tzLink.SetTo("/boot/beos/etc/timezones/EST");
  	}
  				
 	// we need something in the current zone
-	f_ZoneStr.SetTo(&tzLink);
+	f_currentzone.SetTo(&tzLink);
 }
 
 
 void
-TZoneView::GetCurrentRegion()
+TZoneView::SetPreview()
 {
-	GetCurrentTZ();
-	
-	f_ZoneStr.GetParent(&f_RegionStr);
-}
-
-
-void
-TZoneView::NewTimeZone()
-{
-	BString text;
+	// calc and display time based on users selection in city list
 	int32 selection = f_citylist->CurrentSelection();
-	text = ((TZoneItem *)f_citylist->ItemAt(selection))->Text();
-	f_timeinzone->SetText(text.String());
-	f_settimezone->SetEnabled(true);
+	if (selection>= 0) {
+		TZoneItem *item = (TZoneItem *)f_citylist->ItemAt(selection);
+
+		BString text;
+		text = item->Text();
+
+		time_t current;
+		struct tm *ltime;
+		
+		// calc time to display and update
+		SetTimeZone(item->Path());
+		current = time(0);
+		ltime = localtime(&current);
+		SetTimeZone(f_currentzone.Path());
+		
+		f_preview->SetTo(ltime->tm_hour, ltime->tm_min);
+		f_preview->SetText(text.String());
+		
+		f_setzone->SetEnabled((strcmp(f_current->Text(), text.String()) != 0));
+	}
+}
+
+
+void
+TZoneView::SetCurrent(const char *text)
+{
+	time_t current;
+	struct tm *ltime;
+	SetTimeZone(f_currentzone.Path());
+	current = time(0);
+	ltime = localtime(&current);
+	
+	f_current->SetTo(ltime->tm_hour, ltime->tm_min);
+	f_current->SetText(text);
 }
 
 
@@ -355,36 +462,86 @@ TZoneView::SetTimeZone()
 {
 	/*
 		set time based on supplied timezone. How to do this?
-		replace symlink, "timezone", in B_USER_SETTINGS_DIR with a link to the new timezone
+			1) replace symlink, "timezone", in B_USER_SETTINGS_DIR with a link to the new timezone
+			2) set TZ environment var
+			3) call settz()
+			4) call set_timezone from OS.h passing path to timezone file
 	*/
 	
+	
+	// update/create timezone symlink in B_USER_SETTINGS_DIRECTORY
+
 	// get path to current link
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 		
 	path.Append("timezone");
-		
-	// build target from selection
-	BPath target;
-	target.SetTo(f_RegionStr.Path());
+	
+
+	// build target for new link
 	
 	int32 selection = f_citylist->CurrentSelection();
-	target.Append(((TZoneItem *)f_citylist->ItemAt(selection))->GetZone());
+	if (selection < 0)
+	  	// nothing selected??
+		return;
 	
-	// create dir object to create link and remove old
-	BDirectory dir(target.Path());
+	BPath target( ((TZoneItem *)f_citylist->ItemAt(selection))->Path());
+	
+	// remove old
 	BEntry entry(path.Path());
 	if (entry.Exists())
 		entry.Remove();
-		
-	if (dir.CreateSymLink(path.Path(), target.Path(), NULL) != B_OK)
-		printf("timezone not linked\n"); 
-
-	// disable button	
-	f_settimezone -> SetEnabled(false);
 	
-	/*
-		Still doesn't change runtime timezone setting.
-	*/
-} 
+	// create new
+	BDirectory dir(target.Path());
+	if (dir.CreateSymLink(path.Path(), target.Path(), NULL) != B_OK)
+		printf("timezone not linked\n");
+
+	// update environment
+	
+	char tz[B_PATH_NAME_LENGTH];
+	sprintf(tz, "TZ=%s", target.Path());
+	
+	putenv( tz);
+	tzset();
+
+	// update display
+	time_t current = time(0);
+	struct tm *ltime = localtime(&current);
+	
+	
+	char tza[B_PATH_NAME_LENGTH];
+	sprintf(tza, "%s", target.Path());
+	set_timezone(tza);
+	
+	// disable button
+	f_setzone -> SetEnabled(false);
+
+	time_t newtime = mktime(ltime);
+	ltime = localtime(&newtime);
+	stime(&newtime);
+
+	f_hour = ltime->tm_hour;
+	f_minute = ltime->tm_min;
+	f_currentzone.SetTo(target.Path());
+	SetCurrent(((TZoneItem *)f_citylist->ItemAt(selection))->Text());
+}	
+	
+
+ 
+
+
+void
+TZoneView::SetTimeZone(const char *zone)
+{
+	BString tz;
+	
+	tz << "TZ=" << zone;
+	
+	putenv(tz.String());
+	tzset();
+}
+
+
+//---//

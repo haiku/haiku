@@ -1,61 +1,69 @@
 /*
-	
-	TZoneView.h
+	ZoneView.h
+		Header file for the base class of the Time Zone tab in Time Pref App.
 */
 
 #ifndef ZONE_VIEW_H
 #define ZONE_VIEW_H
 
-#include <Path.h>
-#include <String.h>
+
 #include <ListItem.h>
+#include <Path.h>
+#include <View.h>
 
 #include "TZDisplay.h"
 
 class TZoneItem: public BStringItem {
 	public:
-		TZoneItem(const char *text, const char *zonedata);
+		TZoneItem(const char *text, const char *zone);
 		virtual ~TZoneItem();
 		
-		const char *GetZone() const;
+		const char *Zone() const;
+		const char *Path() const;
+		
 	private:
-		BPath *f_zonedata;
+		BPath *f_zone;
 };
 
-class TZoneView : public BView {
+
+
+class TZoneView: public BView{
 	public:
 		TZoneView(BRect frame);
-		~TZoneView();
+		virtual ~TZoneView();
+		
 		virtual void AttachedToWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void AllAttached();
 		virtual void Draw(BRect);
-		
-		void ChangeRegion(BMessage *region);
-		void SetTimeZone();
-		void NewTimeZone();
+		virtual void MessageReceived(BMessage *message);
 	protected:
-		virtual void UpdateDateTime(BMessage *message);
+		void UpdateDateTime(BMessage *message);
+		void ChangeRegion(BMessage *);
+		void SetTimeZone();
+		void SetTimeZone(const char *zone);
+		void SetPreview();
+		void SetCurrent(const char *text);
 	private:
-		void InitView();
-		void GetCurrentTZ();
-		void GetCurrentRegion();
+		virtual void InitView();
+		void ReadTimeZoneLink();
+		
+		// set widest to font width of longest item
+		void BuildRegionMenu(float *widest);
 
-		int FillZoneList(const char *area);
-		void CreateZoneMenu(float *widest);
-		
-	private:
-		BPopUpMenu *f_zonepopup;
+		// returns index of current zone
+		int FillCityList(const char *area);
+
+		BPopUpMenu *f_regionpopup;
 		BListView *f_citylist;
-		BButton *f_settimezone;
-		TTZDisplay *f_currentzone;
-		TTZDisplay *f_timeinzone;
-	private:
-		BPath f_ZoneStr;
-		BPath f_RegionStr;
+		BButton *f_setzone;
+		TTZDisplay *f_current;
+		TTZDisplay *f_preview;
 		
-		int f_hour;
-		int f_minutes;
-		char f_TimeStr[10];
+		BPath f_currentzone;
+		int32 f_hour;
+		int32 f_minute;
+		int32 f_diff;
+		bool f_first;
 };
 
-#endif
+#endif //Zone_View_H

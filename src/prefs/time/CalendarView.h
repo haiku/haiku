@@ -8,11 +8,12 @@ class TDay: public BControl {
 	public:
 		TDay(BRect frame, int day);
 		virtual ~TDay();
-		virtual void Draw(BRect updaterect);
 		virtual void AttachedToWindow();
+		virtual void Draw(BRect updaterect);
+		virtual void KeyDown(const char *bytes, int32 numbytes);
+		virtual void MakeFocus(bool focused);
 		virtual void MouseDown(BPoint where);
 		virtual void SetValue(int32 value);
-		virtual void MakeFocus(bool focused);
 		
 		void SetTo(BRect frame, int day);
 		void SetTo(int day, bool selected = false);
@@ -31,6 +32,7 @@ class TCalendarView: public BView {
 		virtual ~TCalendarView();
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect bounds);
+		void KeyDown(const char *bytes, int32 numbytes);
 		virtual void MessageReceived(BMessage *message);
 		
 		void SetTo(int32, int32, int32);
@@ -40,9 +42,13 @@ class TCalendarView: public BView {
 	private:
 		void InitDates();
 		void CalcFlags();
+		int32 IndexOf(BView *) const;
 		
 		TDay *f_cday;
+		TDay *f_focused;
 		BRect f_dayrect;
+		// x = index of first day; y = index of last;
+		BPoint f_daybound;
 		int f_firstday;
 		int f_month;
 		int f_day;

@@ -1,466 +1,342 @@
-#include <Bitmap.h>
-#include <String.h>
-#include <Window.h>
-
-#include "Bitmaps.h"
 #include "DateTimeEdit.h"
 #include "DateUtils.h"
-#include "TimeMessages.h"
 
-const int32 kArrowAreaWidth = 16;
+#include <String.h>
+#include <stdio.h>
 
-// number of years after 1900 to loop should be system setting
-#define YEAR_DELTA 110
-
-/*=====> TDateTimeEdit <=====*/
-
-TDateTimeEdit::TDateTimeEdit(BRect frame, const char *name)
-	: BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE|B_WILL_DRAW)
-	, f_holdvalue(0)
-{	
-	f_up = new BBitmap(BRect(0, 0, kUpArrowWidth -1, kUpArrowHeight -1), kUpArrowColorSpace);
-	f_up->SetBits(kUpArrowBits, (kUpArrowWidth) *(kUpArrowHeight+1), 0, kUpArrowColorSpace);
-	
-	f_down = new BBitmap(BRect(0, 0, kDownArrowWidth -1, kDownArrowHeight -2), kDownArrowColorSpace);
-	f_down->SetBits(kDownArrowBits, (kDownArrowWidth) *(kDownArrowHeight), 0, kDownArrowColorSpace);
-	
-}
+#define YEAR_DELTA_MAX 110
+#define YEAR_DELTA_MIN 64
 
 
-TDateTimeEdit::~TDateTimeEdit()
+TDateTimeSection::TDateTimeSection(BRect frame, uint32 data = 0)
+	: TSection(frame)
+	, f_data(data)
 {
 }
 
 
-void
-TDateTimeEdit::AttachedToWindow()
+TDateTimeSection::~TDateTimeSection()
 {
-	if (Parent()) {
-		SetViewColor(Parent()->ViewColor());
-		ReplaceTransparentColor(f_up, ViewColor());
-		ReplaceTransparentColor(f_down, ViewColor());
-	}
+}
+
+
+uint32
+TDateTimeSection::Data() const
+{
+	return f_data;
 }
 
 
 void
-TDateTimeEdit::MessageReceived(BMessage *message)
+TDateTimeSection::SetData(uint32 data)
 {
-	switch(message->what) {
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
+	f_data = data;
 }
 
 
-void
-TDateTimeEdit::MouseDown(BPoint where)
+
+
+TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
+	: TSectionEdit(frame, name, sections)
 {
-	MakeFocus(true);
-	if (f_uprect.Contains(where))
-		UpPress();
-	else if (f_downrect.Contains(where))
-		DownPress();
-}
-
-
-void
-TDateTimeEdit::Draw(BRect updaterect)
-{
-	rgb_color bgcolor = ViewColor();
-	rgb_color light = tint_color(bgcolor, B_LIGHTEN_MAX_TINT);
-	rgb_color dark = tint_color(bgcolor, B_DARKEN_1_TINT);
-	rgb_color darker = tint_color(bgcolor, B_DARKEN_3_TINT);
-
-	// draw 3d border
-	BRect bounds(Bounds());
-	SetHighColor(light);
-	SetLowColor(dark);
-	Draw3dFrame(bounds, true);
-	StrokeLine(bounds.LeftBottom(), bounds.LeftBottom(), B_SOLID_LOW);
-	
-	bounds.InsetBy(1, 1);
-	bounds.right -= kArrowAreaWidth;
-
-	if ( (IsFocus() && Window() && Window()->IsActive())) {
-		rgb_color navcolor = keyboard_navigation_color();
-	
-		SetHighColor(navcolor);
-		StrokeRect(bounds);
-	} else {
-		// draw border thickening (erase focus)
-		SetHighColor(darker);
-		SetLowColor(bgcolor);	
-		Draw3dFrame(bounds, false);
-	}
-
-	// draw up/down control
-	SetHighColor(light);
-	bounds.left = bounds.right +1;// -kArrowAreaWidth;
-	bounds.right = Bounds().right -1;
-	f_uprect.Set(bounds.left +3, bounds.top +2, bounds.right, bounds.bottom /2.0);
-	f_downrect = f_uprect.OffsetByCopy(0, f_uprect.Height()+2);
-	
-	DrawBitmap(f_up, f_uprect.LeftTop());
-	DrawBitmap(f_down, f_downrect.LeftTop());
-	
-	Draw3dFrame(bounds, false);
-	SetHighColor(dark);
-	StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
-	StrokeLine(bounds.RightBottom(), bounds.RightTop());
-	SetHighColor(light);
-	StrokeLine(bounds.RightTop(), bounds.RightTop());
-}
-
-
-void
-TDateTimeEdit::Draw3dFrame(BRect frame, bool inset)
-{
-	rgb_color color1, color2;
-	
-	if (inset) {
-		color1 = HighColor();
-		color2 = LowColor();
-	} else {
-		color1 = LowColor();
-		color2 = HighColor();
-	}
-	
-	BeginLineArray(4);
-		// left side
-		AddLine(frame.LeftBottom(), frame.LeftTop(), color2);
-		// right side
-		AddLine(frame.RightTop(), frame.RightBottom(), color1);
-		// bottom side
-		AddLine(frame.RightBottom(), frame.LeftBottom(), color1);
-		// top side
-		AddLine(frame.LeftTop(), frame.RightTop(), color2);
-	EndLineArray();
-}
-
-
-void
-TDateTimeEdit::DispatchMessage()
-{
-	// send message to update timedate
-	BMessage *msg = new BMessage(OB_USER_CHANGE);
-	BuildDispatch(msg);
-	Window()->PostMessage(msg);
-}
-
-
-/*=====> TTimeEdit <=====*/
-
-TTimeEdit::TTimeEdit(BRect frame, const char *name)
-	: TDateTimeEdit(frame, name)
-{
-	BRect bounds(Bounds().InsetByCopy(1, 2));
-
-	// all areas same width :)
-	float width = be_plain_font->StringWidth("00") +6;
-
-	// AM/PM rect
-	bounds.right = Bounds().right -(kArrowAreaWidth +3);
-	bounds.left = bounds.right -(width +5);
-	f_aprect = bounds;	
-
-	// seconds rect
-	bounds.right = bounds.left;
-	bounds.left = bounds.right -width;
-	f_secrect = bounds;
-	
-	float sep_width = 9; 
-
-	//minutes rect
-	bounds.right = bounds.left -sep_width;
-	bounds.left = bounds.right -width;	
-	f_minrect = bounds;
-	
-	//hour rect
-	bounds.right = bounds.left -sep_width;
-	bounds.left = Bounds().left +2;
-	f_hourrect = bounds;
+	InitView();
 }
 
 
 TTimeEdit::~TTimeEdit()
 {
+	TSection *section;
+	if (f_sections->CountItems() > 0)
+		for (int32 idx = 0; (section = (TSection *)f_sections->ItemAt(idx)); idx++)
+			delete section;
+	delete f_sections;
 }
 
 
 void
-TTimeEdit::Draw(BRect updaterect)
+TTimeEdit::InitView()
 {
-	TDateTimeEdit::Draw(Bounds());
+	TSectionEdit::InitView();
+	SetSections(f_sectionsarea);
+}
+
+
+void
+TTimeEdit::DrawSection(uint32 index, bool isfocus)
+{
+	if (f_sections->CountItems() == 0)
+		printf("No Sections!!!\n");
+		
+	// user defined section drawing
+	TDateTimeSection *section;
+	section = (TDateTimeSection *)f_sections->ItemAt(index);
 	
-	SetHighColor(0, 0, 0, 255);
+	BRect bounds = section->Frame();
+	
+	
+	// format value to display
+
+	uint32 value;
+	
+	if (isfocus) {
+		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		value = f_holdvalue;
+	} else {
+		SetLowColor(ViewColor());
+		value = section->Data();
+	}
 	
 	BString text;
-	BPoint drawpt;	
-	BPoint offset(0, f_hourrect.Height()/2.0 -6);
-	int value;
-	
-	// seperator
-	BString septext(":");
-	
-	float width;
-	rgb_color dark = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	
-	//draw hour
-	if (updaterect.Contains(f_hourrect)) {
+	// format value (new method?)
+	switch (index) {
+		case 0: // hour
+			if (value> 12) {
+				if (value < 22) text << "0";
+				text << value -12;
+			} else if (value == 0) {
+				text << "12";
+			} else {
+				if (value <10) text << "0";
+				text << value;
+			}			
+		break;
 		
-		if (f_focus == FOCUS_HOUR && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_hour;
-		}
-		
-		if (value> 12) {
-			if (value < 22) text << "0";
-			text << value -12;
-		} else {
-			if (value < 10) text << "0";
+		case 1: // minute
+		case 2: // second
+			if (value <10) text << "0";
 			text << value;
-		}
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_hourrect.Width()/2.0 -width/2.0) -1;
-		drawpt = f_hourrect.LeftBottom() -offset;
-	
-		FillRect(f_hourrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
-		
-		SetLowColor(ViewColor());
-		DrawString(septext.String(), f_hourrect.RightBottom() -offset);
-	}
-			
-	//draw min
-	if (updaterect.Contains(f_minrect)) {	
-		if (f_focus == FOCUS_MINUTE && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_minute;
-		}
-		
-		text = "";
-		if (value < 10) text << "0";
-		text << value;
-		
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_minrect.Width()/2.0 -width/2.0) -1;
-		drawpt = f_minrect.LeftBottom() -offset;
+		break;
 
-		FillRect(f_minrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
+		case 3: //am/pm
+			value = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
+			if (value >12 || value == 0)
+				text << "PM";
+			else 
+				text << "AM";
+		break;
 		
-		offset.x = -3;
-		SetLowColor(ViewColor());
-		DrawString(septext.String(), f_minrect.RightBottom() -offset);
+		default:
+			return;
+		break;
 	}
-			
-	//draw sec
-	if (updaterect.Contains(f_secrect)) {
-		if (f_focus == FOCUS_SECOND && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_second;
-		}
-			
-		text = "";
-		if (value < 10) text << "0";
-		text << value;
-		
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_secrect.Width()/2.0 -width/2.0) -1;
-		drawpt = f_secrect.LeftBottom() -offset;
 
-		FillRect(f_secrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
-	}
-			
-	//draw AM/PM
-	if (updaterect.Contains(f_aprect)) {
-		text = "";
-		if (f_isam)
-			text << "AM";
-		else
-			text << "PM";
-			
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_aprect.Width()/2.0 -width/2.0) -1;
-		drawpt = f_aprect.LeftBottom() -offset;
+	// calc and center text in section rect
 		
-		if (f_focus == FOCUS_AMPM && IsFocus())
-			SetLowColor(dark);
-		else
-			SetLowColor(ViewColor());
+	float width = be_plain_font->StringWidth(text.String());
 	
-		FillRect(f_aprect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
+	BPoint offset(-(bounds.Width()/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
+	
+	BPoint drawpt(bounds.LeftBottom() -offset);
+	
+	SetHighColor(0, 0, 0, 255);
+	FillRect(bounds, B_SOLID_LOW);
+	DrawString(text.String(), drawpt);	
+}
+
+
+void
+TTimeEdit::DrawSeperator(uint32 index)
+{
+	/* user drawn seperator.  section is the index of the section 
+	in f_sections or the section to the seps left
+	*/
+	
+	if (index == 3) return;  // no seperator for am/pm
+	BString text(":");
+	uint32 sep;
+	GetSeperatorWidth(&sep);
+	
+	TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(index);
+	BRect bounds = section->Frame();
+	
+	float width = be_plain_font->StringWidth(text.String());
+	BPoint offset(-(sep/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
+	BPoint drawpt(bounds.RightBottom() -offset);
+
+	DrawString(text.String(), drawpt);	
+}
+
+
+void
+TTimeEdit::SetSections(BRect area)
+{
+	// by default divie up the sections evenly
+	BRect bounds(area);
+	// no comp for sep width	
+	
+	uint32 sep_width;
+	GetSeperatorWidth(&sep_width);
+	
+	float sep_2 = ceil(sep_width/f_sectioncount +1);
+	float width = bounds.Width()/f_sectioncount -sep_2;
+	bounds.right = bounds.left +(width -sep_width/f_sectioncount);
+		
+	TDateTimeSection *section;
+
+	for (uint32 idx = 0; idx < f_sectioncount; idx++) {
+		section = new TDateTimeSection(bounds);
+		f_sections->AddItem(section);
+		
+		bounds.left = bounds.right +sep_width;
+		if (idx == f_sectioncount -2)
+			bounds.right = area.right -1;
+		else
+			bounds.right = bounds.left +(width -sep_2);
 	}
 }
 
 
 void
-TTimeEdit::MouseDown(BPoint where)
+TTimeEdit::GetSeperatorWidth(uint32 *width)
 {
-	TDateTimeEdit::MouseDown(where);
+	*width = 8;
+}
+
+
+void
+TTimeEdit::SectionFocus(uint32 index)
+{
+	f_focus = index;
+
+	// update hold value
+	f_holdvalue = ((TDateTimeSection *)f_sections->ItemAt(f_focus))->Data();
 	
-	if (f_hourrect.Contains(where)) {
-		f_focus = FOCUS_HOUR;
-		f_holdvalue = f_hour;
-	} else if (f_minrect.Contains(where)) {
-		f_focus = FOCUS_MINUTE;
-		f_holdvalue = f_minute;
-	} else if (f_secrect.Contains(where)) {
-		f_focus = FOCUS_SECOND;
-		f_holdvalue = f_second;
-	} else if (f_aprect.Contains(where)) {
-		f_focus = FOCUS_AMPM;
-	}		
 	Draw(Bounds());
 }
 
 
 void
-TTimeEdit::SetFocus(bool forward)
+TTimeEdit::SetTo(uint32 hour, uint32 minute, uint32 second)
 {
-	switch(f_focus) {
-		case FOCUS_HOUR:
-			(forward)?f_focus = FOCUS_MINUTE: f_focus = FOCUS_AMPM;
-			break;
-		case FOCUS_MINUTE:
-			(forward)?f_focus = FOCUS_SECOND: f_focus = FOCUS_HOUR;
-			break;
-		case FOCUS_SECOND:
-			(forward)?f_focus = FOCUS_AMPM: f_focus = FOCUS_MINUTE;
-			break;
-		case FOCUS_AMPM:
-			(forward)?f_focus = FOCUS_HOUR: f_focus = FOCUS_SECOND;
-			break;
-		default:
-			break;
-	}
-	
-	UpdateFocus();
-}
-
-
-void
-TTimeEdit::UpdateFocus()
-{
-	switch(f_focus) {
-		case FOCUS_HOUR:
-			f_hour = f_holdvalue;
-			Draw(f_hourrect);
-			break;
-		case FOCUS_MINUTE:
-			f_minute = f_holdvalue;
-			Draw(f_minrect);
-			break;
-		case FOCUS_SECOND:
-			f_second = f_holdvalue;
-			Draw(f_secrect);
-			break;
-		case FOCUS_AMPM:
-			f_isam = !f_isam;
-			Draw(f_aprect);
-			break;
-		default:
-			break;
+	if (f_sections->CountItems()> 0)
+	{
+		bool update = false;
+		
+		TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(0);
+		if (section->Data() != hour) {
+			section->SetData(hour);
+			update = true;
+		}
+		
+		section = (TDateTimeSection *)f_sections->ItemAt(1);
+		if (section->Data() != minute) {
+			section->SetData(minute);
+			update = true;
+		}
+			
+		section = (TDateTimeSection *)f_sections->ItemAt(2);
+		if (section->Data() != second) {
+			section->SetData(second);
+			update = true;
+		}
+		
+		if (update)
+			Draw(Bounds());
 	}
 }
 
 
 void
-TTimeEdit::KeyDown(const char *bytes, int32 numbytes)
+TTimeEdit::DoUpPress()
 {
-	switch(bytes[0]) {
-		case B_LEFT_ARROW:
-			SetFocus(false);
-		break;
-		
-		case B_RIGHT_ARROW:
-			SetFocus(true);
-		break;
-		
-		case B_UP_ARROW:
-			UpPress();
-		break;
-		
-		case B_DOWN_ARROW:
-			DownPress();
-		break;
-		
-		default:
-			BView::KeyDown(bytes, numbytes);
-		break;
-	}
-}
-
-
-void
-TTimeEdit::UpPress()
-{
+	// update displayed value
 	f_holdvalue += 1;
-	if (f_focus == FOCUS_AMPM) 
-		f_isam = !f_isam;
-
-	UpdateFocus();
-
-	// notify of change
+	
+	CheckRange();
+	
+	// send message to change time
 	DispatchMessage();
 }
 
-
+		
 void
-TTimeEdit::DownPress()
+TTimeEdit::DoDownPress()
 {
+	// update display value
 	f_holdvalue -= 1;
 	
-	if (f_focus == FOCUS_AMPM) 
-		f_isam = !f_isam;
-
-	UpdateFocus();
-
-	// notify of change
+	CheckRange();
+	
+	// send message to change time
 	DispatchMessage();
 }
-
-
-void
-TTimeEdit::SetTo(int32 hour, int32 minute, int32 second)
-{
-	if (f_hour != hour
-	  ||f_minute != minute
-	  ||f_second != second) {
-		f_hour = hour;
-		f_minute = minute;
-		f_second = second;
-		f_isam = f_hour <= 12;
-		Draw(Bounds());
-	}
-}
-
-
+		
+		
 void
 TTimeEdit::BuildDispatch(BMessage *message)
 {
+	static const char *fields[4] = {"hour", "minute", "second", "isam"};
+	
 	message->AddBool("time", true);
-	message->AddInt32("hour", f_hour);
-	message->AddInt32("minute", f_minute);
-	message->AddInt32("second", f_second);
+	
+	for (int32 idx = 0; idx < f_sections->CountItems() -1; idx++) {
+		uint32 data;
+		
+		if (f_focus == idx)
+			data = f_holdvalue;
+		else
+			data = ((TDateTimeSection *)f_sections->ItemAt(idx))->Data();
+		
+		if (idx == 3) // isam
+			message->AddBool("isam", data == 1);
+		else
+			message->AddInt32(fields[idx], data);
+	}
+}
+
+
+void
+TTimeEdit::CheckRange()
+{
+	int32 value = f_holdvalue;
+	switch (f_focus) {
+		case 0: //hour
+			if (value> 23) 
+				value = 0;
+			 else if (value < 0) 
+				value = 23;
+		break;
+		
+		case 1: //minute
+			if (value> 59)
+				value = 0;
+			else if (value < 0)
+				value = 59;
+		break;
+		
+		case 2: //second
+			if (value > 59)
+				value = 0;
+			else if (value < 0)
+				value = 59;
+			
+		break;
+		
+		case 3:
+			// modify hour value to reflect change in am/pm
+			value = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
+			if (value < 13)
+				value += 12;
+			else
+				value -= 12;
+			if (value == 24) value = 0;
+			((TDateTimeSection *)f_sections->ItemAt(0))->SetData(value);
+		break;
+		
+		default:
+		break;
+	}
+	
+	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
+	f_holdvalue = value;
+	
+	Draw(Bounds());
 }
 
 
 
-/*=====> TDateEdit <=====*/
+/* DATE TSECTIONEDIT */
+
 
 const char *months[] = 
 { "January", "Febuary", "March", "April", "May", "June",
@@ -468,291 +344,292 @@ const char *months[] =
 };
   
   
-TDateEdit::TDateEdit(BRect frame, const char *name)
-	: TDateTimeEdit(frame, name)
-{	
-	BRect bounds(Bounds().InsetByCopy(1, 2));
-	float width;
-
-	// year rect
-	width = be_plain_font->StringWidth("0000") +6;
-	bounds.right = Bounds().right -(kArrowAreaWidth +2);
-	bounds.left = bounds.right -width;
-	f_yearrect = bounds;	
-	
-	// don't know how to determine system date sep char
-	float sep_width = be_plain_font->StringWidth("/") +6; 
-	
-	// day rect
-		//day is 2 digits 0 usually widest
-	width = be_plain_font->StringWidth("00") +6;
-	bounds.right = bounds.left -sep_width;
-	bounds.left = bounds.right -width;
-	f_dayrect = bounds;
-	
-	bounds.right = bounds.left -sep_width;
-	bounds.left = Bounds().left +2;
-	
-	f_monthrect = bounds;
+TDateEdit::TDateEdit(BRect frame, const char *name, uint32 sections)
+	: TSectionEdit(frame, name, sections)
+{
+	InitView();
 }
 
 
 TDateEdit::~TDateEdit()
 {
+	TSection *section;
+	if (f_sections->CountItems() > 0)
+		for (int32 idx = 0; (section = (TSection *)f_sections->ItemAt(idx)); idx++)
+			delete section;
+	delete f_sections;
 }
 
 
 void
-TDateEdit::MouseDown(BPoint where)
+TDateEdit::InitView()
 {
-	TDateTimeEdit::MouseDown(where);
+	TSectionEdit::InitView();
+	SetSections(f_sectionsarea);
+}
+
+
+void
+TDateEdit::DrawSection(uint32 index, bool isfocus)
+{
+	if (f_sections->CountItems() == 0)
+		printf("No Sections!!!\n");
+
+	// user defined section drawing
+	TDateTimeSection *section;
+	section = (TDateTimeSection *)f_sections->ItemAt(index);
 	
-	if (f_monthrect.Contains(where)) {
-		f_focus = FOCUS_MONTH;
-		f_holdvalue = f_month;
-	} else if (f_dayrect.Contains(where)) {
-		f_focus = FOCUS_DAY;
-		f_holdvalue = f_day;
-	} else if (f_yearrect.Contains(where)) {
-		f_focus = FOCUS_YEAR;
-		f_holdvalue = f_year;
+	BRect bounds = section->Frame();
+	
+	
+	// format value to display
+
+	uint32 value;
+	
+	if (isfocus) {
+		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		value = f_holdvalue;
+	} else {
+		SetLowColor(ViewColor());
+		value = section->Data();
 	}
+	
+	BString text;
+	// format value (new method?)
+	switch (index) {
+		case 0: // month
+			text << months[value];
+		break;
+		
+		case 1: // day
+			text << value;
+		break;
+		
+		case 2: // year
+			text << value +1900;
+		break;
+		
+		default:
+			return;
+		break;
+	}
+	// calc and center text in section rect
+		
+	float width = be_plain_font->StringWidth(text.String());
+	
+	BPoint offset(-(bounds.Width()/2.0 -width/2.0) -1.0, (bounds.Height()/2.0 -6.0));
+	
+	if (index == 0)
+		offset.x = -(bounds.Width() -width) ;
+	
+	BPoint drawpt(bounds.LeftBottom() -offset);
+	
+	SetHighColor(0, 0, 0, 255);
+	FillRect(bounds, B_SOLID_LOW);
+	DrawString(text.String(), drawpt);	
+}
+
+
+void
+TDateEdit::DrawSeperator(uint32 index)
+{
+	/* user drawn seperator.  section is the index of the section 
+	in f_sections or the section to the seps left
+	*/
+	
+	if (index == 3) return;  // no seperator for am/pm
+	BString text("/");
+	uint32 sep;
+	GetSeperatorWidth(&sep);
+	
+	TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(index);
+	BRect bounds = section->Frame();
+	
+	float width = be_plain_font->StringWidth(text.String());
+	BPoint offset(-(sep/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
+	BPoint drawpt(bounds.RightBottom() -offset);
+
+	DrawString(text.String(), drawpt);	
+}
+
+
+void
+TDateEdit::SetSections(BRect area)
+{
+	TDateTimeSection *section;
+	// create sections
+	for (uint32 idx = 0; idx < f_sectioncount; idx++) {
+		section = new TDateTimeSection(area);
+		f_sections->AddItem(section);
+	}
+	
+	BRect bounds(area);
+	float width;
+	
+	// year
+	width = be_plain_font->StringWidth("0000") +6;
+	bounds.right = area.right;
+	bounds.left = bounds.right -width;
+	((TDateTimeSection *)f_sections->ItemAt(2))->SetBounds(bounds);
+	
+	uint32 sep;
+	GetSeperatorWidth(&sep);
+	
+	// day
+	width = be_plain_font->StringWidth("00") +6;
+	bounds.right = bounds.left -sep;
+	bounds.left = bounds.right -width;
+	((TDateTimeSection *)f_sections->ItemAt(1))->SetBounds(bounds);
+	
+	// month
+	bounds.right = bounds.left -sep;
+	bounds.left = area.left;
+	((TDateTimeSection *)f_sections->ItemAt(0))->SetBounds(bounds);
+}
+
+
+void
+TDateEdit::GetSeperatorWidth(uint32 *width)
+{
+	*width = 8;
+}
+
+
+void
+TDateEdit::SectionFocus(uint32 index)
+{
+	f_focus = index;
+
+	// update hold value
+	f_holdvalue = ((TDateTimeSection *)f_sections->ItemAt(f_focus))->Data();
+	
 	Draw(Bounds());
 }
 
 
 void
-TDateEdit::Draw(BRect updaterect)
+TDateEdit::SetTo(uint32 year, uint32 month, uint32 day)
 {
-	TDateTimeEdit::Draw(Bounds());
-	
-	SetHighColor(0, 0, 0, 255);
-	
-	BString text;
-	BPoint drawpt;	
-	BPoint offset(0, f_monthrect.Height()/2.0 -6);
-	int value;
-	
-	// seperator
-	BString septext("/");
-	
-	float width;
-	rgb_color dark = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	
-	//draw month
-	if (updaterect.Contains(f_monthrect)) {
-		if (f_focus == FOCUS_MONTH && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_month;
-		}
-
-		text << months[value];
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = width +3;
-		drawpt = f_monthrect.RightBottom() -offset;
-	
-		FillRect(f_monthrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
-		
-		offset.x = -3;
-		SetLowColor(ViewColor());
-		DrawString(septext.String(), f_monthrect.RightBottom() -offset);
-	}
-	
-	//draw day
-	if (updaterect.Contains(f_dayrect)) {
-		if (f_focus == FOCUS_DAY && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_day;
-		}
-		
-		text = "";
-		text << value;
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_dayrect.Width()/2.0 -width/2.0) -1;
-	
-		drawpt = f_dayrect.LeftBottom() -offset;
-		FillRect(f_dayrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
-		
-		offset.x = -3;
-		SetLowColor(ViewColor());
-		DrawString(septext.String(), f_dayrect.RightBottom() -offset);
-	}
-			
-	//draw year
-	if (updaterect.Contains(f_yearrect)) {
-		if (f_focus == FOCUS_YEAR && IsFocus()) {
-			SetLowColor(dark);
-			value = f_holdvalue;
-		} else {
-			SetLowColor(ViewColor());
-			value = f_year;
-		}
-	
-		text = "";
-		text << value +1900;
-		width = be_plain_font->StringWidth(text.String());
-		offset.x = -(f_yearrect.Width()/2.0 -width/2.0);
-		drawpt = f_yearrect.LeftBottom() -offset;
-		
-		FillRect(f_yearrect, B_SOLID_LOW);
-		DrawString(text.String(), drawpt);
-	}
-}
-
-
-void
-TDateEdit::SetFocus(bool forward)
-{
-	switch(f_focus) {
-		case FOCUS_MONTH:
-			(forward)?f_focus = FOCUS_DAY: f_focus = FOCUS_YEAR;
-			break;
-		case FOCUS_DAY:
-			(forward)?f_focus = FOCUS_YEAR: f_focus = FOCUS_MONTH;
-			break;
-		case FOCUS_YEAR:
-			(forward)?f_focus = FOCUS_MONTH: f_focus = FOCUS_DAY;
-			break;
-		default:
-			break;
-	}
-	
-	UpdateFocus();
-}
-
-
-void
-TDateEdit::UpdateFocus(bool sethold = false)
-{
-	switch(f_focus) {
-		case FOCUS_MONTH:
-		{
-			if (sethold)
-				f_holdvalue = f_month;
-			else
-			{
-				if (f_holdvalue> 11) 
-					f_holdvalue = 0;
-				else 
-				if (f_holdvalue < 0)
-					f_holdvalue = 11;
-				
-				f_month = f_holdvalue;
-			}
-			Draw(f_monthrect);
-		}
-		break;
-		case FOCUS_DAY:
-		{
-			if (sethold)
-				f_holdvalue = f_day;
-			else
-			{
-				int daycnt = getDaysInMonth(f_month, f_year);
-				if (f_holdvalue> daycnt)
-					f_holdvalue = 1;
-				else
-				if (f_holdvalue < 0)
-					f_holdvalue = daycnt;
-				f_day = f_holdvalue;
-			}
-			Draw(f_dayrect);
-		}
-		break;
-		case FOCUS_YEAR: 
-		{
-			if (sethold)
-				f_holdvalue = f_year;
-			else
-			{
-				if (f_holdvalue> YEAR_DELTA)
-					f_holdvalue = 65;
-				else
-				if (f_holdvalue < 65)
-					f_holdvalue = YEAR_DELTA;
-				f_year = f_holdvalue;
-			}
-			Draw(f_yearrect);
-		}
-		break;
-		default:
-			break;
-	}
-}
-
-
-void
-TDateEdit::KeyDown(const char *bytes, int32 numbytes)
-{
-	switch(bytes[0]) {
-		case B_LEFT_ARROW:
-			SetFocus(false);
-		break;
-		
-		case B_RIGHT_ARROW:
-			SetFocus(true);
-		break;
-		
-		case B_UP_ARROW:
-			UpPress();
-		break;
-		
-		case B_DOWN_ARROW:
-			DownPress();
-		break;
-		
-		default:
-			BView::KeyDown(bytes, numbytes);
-		break;
-	}
-}
-
-
-void
-TDateEdit::UpPress()
-{
-	f_holdvalue += 1;
-	UpdateFocus();
-	DispatchMessage();
-}
-
-
-void
-TDateEdit::DownPress()
-{
-	f_holdvalue -= 1;
-	UpdateFocus();
-	DispatchMessage();
-}
-
-
-void
-TDateEdit::SetTo(int32 year, int32 month, int32 day)
-{
-	if (f_month != month
-	 || f_day != day
-	 || f_year != year)
+	if (f_sections->CountItems()> 0)
 	{
-		f_month = month;
-		f_day = day;
-		f_year = year;
-		Draw(Bounds());
+		bool update = false;
+		
+		TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(0);
+		if (section->Data() != month) {
+			section->SetData(month);
+			update = true;
+		}
+		
+		section = (TDateTimeSection *)f_sections->ItemAt(1);
+		if (section->Data() != day) {
+			section->SetData(day);
+			update = true;
+		}
+			
+		section = (TDateTimeSection *)f_sections->ItemAt(2);
+		if (section->Data() != year) {
+			section->SetData(year);
+			update = true;
+		}
+		
+		if (update)
+			Draw(Bounds());
 	}
 }
 
+
+void
+TDateEdit::DoUpPress()
+{
+	// update displayed value
+	f_holdvalue += 1;
+	
+	CheckRange();
+	
+	// send message to change Date
+	DispatchMessage();
+}
+
+		
+void
+TDateEdit::DoDownPress()
+{
+	// update display value
+	f_holdvalue -= 1;
+	
+	CheckRange();
+	
+	// send message to change Date
+	DispatchMessage();
+}
+		
+		
 void
 TDateEdit::BuildDispatch(BMessage *message)
 {
+	static const char *fields[3] = {"month", "day", "year"};
+	
 	message->AddBool("time", false);
-	message->AddInt32("month", f_month);
-	message->AddInt32("day", f_day);
-	message->AddInt32("year", f_year);
+	
+	for (int32 idx = 0; idx < f_sections->CountItems(); idx++) {
+		uint32 data;
+		
+		if (f_focus == idx)
+			data = f_holdvalue;
+		else
+			data = ((TDateTimeSection *)f_sections->ItemAt(idx))->Data();
+		
+		message->AddInt32(fields[idx], data);
+	}
 }
+
+
+void
+TDateEdit::CheckRange()
+{
+	int32 value = f_holdvalue;
+	
+	switch (f_focus) {
+		case 0: // month
+		{
+			if (value > 11)
+				value = 0;
+			else if (value < 0)
+				value = 11;
+		}
+		break;
+		
+		case 1: //day
+		{
+			uint32 month = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
+			uint32 year = ((TDateTimeSection *)f_sections->ItemAt(2))->Data();
+			
+			int daycnt = getDaysInMonth(month, year);
+			if (value > daycnt)
+				value = 1;
+			else if (value < 1)
+				value = daycnt;
+		}
+		break;
+		
+		case 2: //year
+		{
+			if (value > YEAR_DELTA_MAX)
+				value = YEAR_DELTA_MIN;
+			else if (value < YEAR_DELTA_MIN)
+				value = YEAR_DELTA_MAX;
+		}
+		break;
+		
+		default:
+		break;
+	}
+	
+	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
+	f_holdvalue = value;
+	
+	Draw(Bounds());
+}
+
+
+//---//

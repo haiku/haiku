@@ -5,6 +5,7 @@
 #include "DateUtils.h"
 #include "TimeMessages.h"
 
+#include <stdio.h>
 
 #define SEGMENT_CHANGE 'ostd'
 
@@ -43,6 +44,14 @@ TDay::MouseDown(BPoint where)
 		//update display
 		Draw(Bounds());	
 	}
+}
+
+
+void
+TDay::KeyDown(const char *bytes, int32 numbytes)
+{
+	BControl::KeyDown(bytes, numbytes);
+	Parent()->KeyDown(bytes, numbytes);
 }
 
 
@@ -189,15 +198,25 @@ TCalendarView::TCalendarView(BRect frame, const char *name,
 	InitView();
 }
 
+
 TCalendarView::~TCalendarView()
 {
 }
+
+
+void
+TCalendarView::AttachedToWindow()
+{
+	if (Parent())
+		SetViewColor(Parent()->ViewColor());
+}
+
 
 void
 TCalendarView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case OB_DAY_CHANGED:
+		case H_DAY_CHANGED:
 		{
 			TDay *day;
 			message->FindPointer("source", (void **)&day);
@@ -217,14 +236,85 @@ TCalendarView::MessageReceived(BMessage *message)
 
 
 void
-TCalendarView::AttachedToWindow()
+TCalendarView::KeyDown(const char *bytes, int32 numbytes)
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	if (f_focused == NULL)
+		f_focused = f_cday;
+		
+	switch(bytes[0]) {
+		case B_LEFT_ARROW: {
+			TDay *newfocus = dynamic_cast<TDay *>(f_focused->PreviousSibling());
+			if (newfocus == NULL || newfocus->Day() == 0)
+				break;
+			f_focused->MakeFocus(false);
+			f_focused = newfocus;
+			f_focused->MakeFocus(true);
+		}
+		break;
+		
+		case B_RIGHT_ARROW: {
+			TDay *newfocus = dynamic_cast<TDay *>(f_focused->NextSibling());
+			if (newfocus == NULL || newfocus->Day() == 0)
+				break;
+			f_focused->MakeFocus(false);
+			f_focused = newfocus;
+			f_focused->MakeFocus(true);
+		}
+		break;
+		
+		case B_UP_ARROW: {
+			int32 idx = IndexOf(f_focused) -7;
+			if (idx> f_daybound.x -1 ) {
+				f_focused->MakeFocus(false);
+				f_focused = dynamic_cast<TDay  *>(ChildAt(idx));
+				f_focused->MakeFocus(true);
+			}
+		}
+		break;
+		
+		case B_DOWN_ARROW: {
+			int32 idx = IndexOf(f_focused) +7;
+			if (idx < f_daybound.y +1) {
+				f_focused->MakeFocus(false);
+				f_focused = dynamic_cast<TDay *>(ChildAt(idx));
+				f_focused->MakeFocus(true);
+			}
+		}
+		break;
+		
+		default:
+		break;
+	}
+}
+
+
+
+int32
+TCalendarView::IndexOf(BView *child) const
+{
+	BView *test;
+	for (int32 idx = 0; idx < CountChildren(); idx++) {
+		test = ChildAt(idx);
+		if (test == child)
+			return idx;
+	}
 }
 
 
 static const char days[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
+
+static float
+FontHeight(BView* target, bool full)
+{
+	font_height finfo;		
+	target->GetFontHeight(&finfo);
+	float h = ceil(finfo.ascent) + ceil(finfo.descent);
+
+	if (full)
+		h += ceil(finfo.leading);
+	
+	return h;
+}
 
 void
 TCalendarView::Draw(BRect updaterect)
@@ -237,11 +327,14 @@ TCalendarView::Draw(BRect updaterect)
 	BString day;
 	SetLowColor(ViewColor());
 	SetHighColor(0, 0, 0);
+	
+	float offset = FontHeight(this, true);
+	
 	for (int i = 0; i < 7; i++) {
 		day = days[i];
 		width = be_plain_font->StringWidth(day.String());
 		drawpt.x = bounds.left +(x -width/2.0 +2);
-		drawpt.y = bounds.bottom;
+		drawpt.y = bounds.bottom -offset/2.0;
 		DrawString(day.String(), drawpt);	
 		bounds.OffsetBy(bounds.Width() +1, 0);
 	}
@@ -298,11 +391,15 @@ TCalendarView::InitDates()
 			day->SetTo(label, cday);
 
 			if (label> 0) {
-				BMessage *message = new BMessage(OB_DAY_CHANGED);
+				BMessage *message = new BMessage(H_DAY_CHANGED);
 				message->AddInt32("Day", label);
 				
 				day->SetTarget(this);
 				day->SetMessage(message);
+				if (label == 1)
+					f_daybound.x = row *7 +col;
+				if (label == daycnt)
+					f_daybound.y = row *7 +col;
 			}
 			
 			if (cday) {
@@ -311,6 +408,8 @@ TCalendarView::InitDates()
 			cday = false;		
 		}
 	}
+	if (f_focused == NULL)
+		f_focused = f_cday;
 }
 
 
@@ -337,7 +436,7 @@ void
 TCalendarView::DispatchMessage()
 {
 	// send message to update timedate
-	BMessage *msg = new BMessage(OB_USER_CHANGE);
+	BMessage *msg = new BMessage(H_USER_CHANGE);
 	msg->AddBool("time", false);
 	msg->AddInt32("month", f_month);
 	if (f_cday != NULL)

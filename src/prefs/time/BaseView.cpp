@@ -1,18 +1,33 @@
+/*
+	BaseView.cpp
+		by Mike Berg (inseculous)
+*/
+
+#include <Alert.h>
 #include <OS.h>
 #include <stdio.h>
 
 #include "BaseView.h"
+#include "TimeMessages.h"
 
 
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_PULSE_NEEDED)
 {
-	f_message = new BMessage(OB_TIME_UPDATE);	
+	InitView();
 }
 
 
 TTimeBaseView::~TTimeBaseView()
 {
+}
+
+
+
+void
+TTimeBaseView::InitView()
+{
+	f_message = new BMessage(H_TIME_UPDATE);
 }
 
 
@@ -59,7 +74,7 @@ TTimeBaseView::DispatchMessage()
 	f_message->AddInt32("minute", minute);
 	f_message->AddInt32("second", second);
 
-	SendNotices(OB_TM_CHANGED, f_message);
+	SendNotices(H_TM_CHANGED, f_message);
 }
 
 
@@ -73,6 +88,7 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	time_t atime;
 	struct tm *_tm;
 	
+	
 	atime = time(0);
 	_tm = localtime(&atime);
 	
@@ -82,6 +98,7 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	int32 month = 0;
 	int32 day = 0;
 	int32 year = 0;
+	bool isam = false;
 	if (istime) {
 		if (message->FindInt32("hour", &hour) == B_OK)
 			_tm->tm_hour = hour;
@@ -89,6 +106,10 @@ TTimeBaseView::ChangeTime(BMessage *message)
 			_tm->tm_min = minute;
 		if (message->FindInt32("second", &second) == B_OK)
 			_tm->tm_sec = second;
+		if (message->FindBool("isam", &isam) == B_OK) {
+			if (!isam) 
+				_tm->tm_hour += 12;
+		}		
 	} else {
 		if (message->FindInt32("month", &month) == B_OK)
 			_tm->tm_mon = month;
@@ -102,3 +123,4 @@ TTimeBaseView::ChangeTime(BMessage *message)
 	set_real_time_clock(atime2);
 	DispatchMessage();
 }
+

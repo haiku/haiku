@@ -23,7 +23,7 @@ int main()
 
 
 TimeApplication::TimeApplication()
-		:BApplication(OBOS_APP_SIGNATURE)
+		:BApplication(HAIKU_APP_SIGNATURE)
 {
 	f_settings = new TimeSettings();
 	f_window = new TTimeWindow();

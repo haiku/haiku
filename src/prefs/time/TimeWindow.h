@@ -3,11 +3,10 @@
 
 #include <Window.h>
 
-/////////////////////////////////
+#include "BaseView.h"
 #include "SettingsView.h"
 #include "TimeSettings.h"
 #include "ZoneView.h"
-#include "BaseView.h"
 
 class TTimeWindow : public BWindow {
 	public:

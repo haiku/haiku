@@ -46,28 +46,19 @@ void
 TTimeWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case OB_USER_CHANGE:
+		case H_USER_CHANGE:
 		{
 			bool istime;
 			if (message->FindBool("time", &istime) == B_OK)
 				f_BaseView->ChangeTime(message);
 		}
 		break;
-		case OB_RTC_CHANGE:
+		case H_RTC_CHANGE:
 		{
 			f_BaseView->SetGMTime(f_TimeSettings->GMTime());
 		}
 		break;
 		
-		case REGION_CHANGED:
-			f_TimeZones->ChangeRegion(message);
-		break;
-		case SET_TIME_ZONE:
-			f_TimeZones->SetTimeZone();
-		break;
-		case TIME_ZONE_CHANGED:
-			f_TimeZones->NewTimeZone();
-		break;	
 		default:
 			BWindow::MessageReceived(message);
 		break;

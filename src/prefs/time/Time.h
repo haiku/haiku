@@ -3,8 +3,8 @@
 
 #include <Application.h>
 
-#include "TimeWindow.h"
 #include "TimeSettings.h"
+#include "TimeWindow.h"
 
 class TimeApplication : public BApplication {
 	public:
