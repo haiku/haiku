@@ -658,6 +658,7 @@ thread_exit2(void *_args)
 	// ToDo: was:
 	// restore_interrupts(args.int_state);
 	// we probably don't want to let the interrupts disabled at this point??
+	// Actually, args.int_state will always be 0, unless we fix thread_exit() 
 
 	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
 
@@ -789,7 +790,7 @@ thread_exit(void)
 	}
 
 	// TODO: get_death_stack() disables interrupts
-	// and leave them disabled, so I wonder if it's good to disable
+	// and leaves them disabled, so I wonder if it's good to disable
 	// them again a bunch of lines after this
 	death_stack = get_death_stack();
 	{
@@ -801,6 +802,7 @@ thread_exit(void)
 		args.death_sem = cached_death_sem;
 
 		// disable the interrupts. Must remain disabled until the kernel stack pointer can be officially switched
+		// TODO: interrupts are already disabled at this point
 		args.int_state = disable_interrupts();
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
