@@ -170,20 +170,21 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start)
 
 	LOG(4,("MOVE_DISPLAY: h %d, v %d\n", h_display_start, v_display_start));
 
-	/* reset lower bits, don't return an error! */
+	/* Neomagic cards support pixelprecise panning in all modes:
+	 * No stepping granularity needed! */
+
+	/* determine bits used for the colordepth */
 	switch(si->dm.space)
 	{
 	case B_CMAP8:
 		colour_depth=8;
-		h_display_start &= ~0x03;
 		break;
-	case B_RGB15_LITTLE: case B_RGB16_LITTLE:
+	case B_RGB15_LITTLE:
+	case B_RGB16_LITTLE:
 		colour_depth=16;
-		h_display_start &= ~0x01;
 		break;
 	case B_RGB24_LITTLE:
 		colour_depth=24;
-		h_display_start &= ~0x03;
 		break;
 	default:
 		return B_ERROR;

@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-6/2003
+	Rudolf Cornelissen 4/2003-5/2004
 */
 
 #define MODULE_BIT 0x20000000
@@ -54,21 +54,9 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	si->cursor.x = x;
 	si->cursor.y = y;
 
-	switch(si->dm.space)
-	{
-	case B_CMAP8:
-		h_adjust = 0x03;
-		break;
-	case B_RGB15_LITTLE:case B_RGB16_LITTLE:
-		h_adjust = 0x01;
-		break;
-	case B_RGB32_LITTLE:
-		h_adjust = 0x00;
-		break;
-	default:
-		h_adjust = 0x03;
-		break;
-	}
+	/* setting up minimum amount to scroll not needed:
+	 * Neomagic cards can always do pixelprecise panning */
+	h_adjust = 0x00;
 
 	/* if internal panel is active correct visible screensize! */
 	if (nm_general_output_read() & 0x02)

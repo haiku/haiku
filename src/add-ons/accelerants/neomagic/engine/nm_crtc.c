@@ -481,12 +481,10 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 		timeout++;
 	}
 
-	/* the neomagic framebuffer startadress is given in 32bit words */
-	startadd >>= 2;
-
 	/* set standard VGA registers */
-    ISACRTCW(FBSTADDH, ((startadd & 0x00FF00) >> 8));
-    ISACRTCW(FBSTADDL, (startadd & 0x0000FF));
+	/* (startadress in 32bit words (b2 - b17) */
+    ISACRTCW(FBSTADDH, ((startadd & 0x03fc00) >> 10));
+    ISACRTCW(FBSTADDL, ((startadd & 0x0003fc) >> 2));
 
 	/* set NM extended register */
 	//fixme: NM2380 _must_ have one more bit (has >4Mb RAM)!!
@@ -496,9 +494,27 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
 	snooze(10);
 	if (si->ps.card_type < NM2200)
-		ISAGRPHW(FBSTADDE,(((startadd >> 16) & 0x07) | (val & 0xf8)));
+		/* extended bits: (b18-20) */
+		ISAGRPHW(FBSTADDE,(((startadd >> 18) & 0x07) | (val & 0xf8)));
 	else
-		ISAGRPHW(FBSTADDE,(((startadd >> 16) & 0x0f) | (val & 0xf0)));
+		/* extended bits: (b18-21) */
+		ISAGRPHW(FBSTADDE,(((startadd >> 18) & 0x0f) | (val & 0xf0)));
+
+	/* set byte adress: (b0 - 1):
+	 * Neomagic cards work with _pixel_ offset here. */
+	switch(bpp)
+	{
+	case 8:
+		ISAATBW(HORPIXPAN, (startadd & 0x00000003));
+		break;
+	case 15:
+	case 16:
+		ISAATBW(HORPIXPAN, ((startadd & 0x00000002) >> 1));
+		break;
+	case 24:
+		ISAATBW(HORPIXPAN, ((4 - (startadd & 0x00000003)) & 0x03));
+		break;
+	}
 
 	return B_OK;
 }
