@@ -36,18 +36,32 @@ struct conversion_context {
 	bool	new_line;
 };
 
-struct group_context {
-	RTF::Group	*group;
-	text_run	*run;
-};
 
-class AppServerConnection {
+class TextOutput : public RTF::Worker {
 	public:
-		AppServerConnection();
-		~AppServerConnection();
+		TextOutput(RTF::Header &start, BDataIO *stream, bool processRuns);
+		~TextOutput();
+
+		size_t Length() const;
+		void *FlattenedRunArray(int32 &size);
+
+	protected:
+		virtual void Group(RTF::Group *group);
+		virtual void GroupEnd(RTF::Group *group);
+		virtual void Command(RTF::Command *command);
+		virtual void Text(RTF::Text *text);
 
 	private:
-		BApplication *fApplication;
+		void GetStyle(text_run *current) throw (status_t);
+
+		BDataIO				*fTarget;
+		int32				fOffset;
+		conversion_context	fContext;
+		Stack<text_run *>	fGroupStack;
+		bool				fProcessRuns;
+		BList				fRuns;
+		text_run			*fCurrentRun;
+		BApplication		*fApplication;
 };
 
 
@@ -59,28 +73,6 @@ conversion_context::Reset()
 	start_page = page;
 	first_line_indent = 0;
 	new_line = true;
-}
-
-
-//	#pragma mark -
-
-
-AppServerConnection::AppServerConnection()
-	:
-	fApplication(NULL)
-{
-	// This is not nice, but it's the only we can provide all features on command
-	// line tools that don't create a BApplication - without a BApplicatio, we
-	// could not support any text styles (colors and fonts)
-
-	if (be_app == NULL)
-		fApplication = new BApplication("application/x-vnd.Haiku-RTF-Translator");
-}
-
-
-AppServerConnection::~AppServerConnection()
-{
-	delete fApplication;
 }
 
 
@@ -206,32 +198,6 @@ process_command(conversion_context &context, RTF::Command *command,
 }
 
 
-static text_run *
-get_style(BList &runs, text_run *run, int32 offset) throw (status_t)
-{
-	static const rgb_color kBlack = {0, 0, 0, 255};
-
-	if (run != NULL && offset == run->offset)
-		return run;
-
-	text_run *newRun = new text_run();
-	if (newRun == NULL)
-		throw (status_t)B_NO_MEMORY;
-
-	// take over previous styles
-	if (run != NULL) {
-		newRun->font = run->font;
-		newRun->color = run->color;
-	} else
-		newRun->color = kBlack;
-
-	newRun->offset = offset;
-
-	runs.AddItem(newRun);
-	return newRun;
-}
-
-
 static void
 set_font_face(BFont &font, uint16 face, bool on)
 {
@@ -249,162 +215,188 @@ set_font_face(BFont &font, uint16 face, bool on)
 }
 
 
-static text_run_array *
-get_text_run_array(RTF::Header &header) throw (status_t)
+//	#pragma mark -
+
+
+TextOutput::TextOutput(RTF::Header &start, BDataIO *stream, bool processRuns)
+	: RTF::Worker(start),
+	fTarget(stream),
+	fOffset(0),
+	fProcessRuns(processRuns),
+	fCurrentRun(NULL),
+	fApplication(NULL)
 {
-	// collect styles
+	// This is not nice, but it's the only we can provide all features on command
+	// line tools that don't create a BApplication - without a BApplication, we
+	// could not support any text styles (colors and fonts)
 
-	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
-	RTF::Group *lastParent = &header;
-	Stack<group_context> stack;
-	conversion_context context;
-	text_run *current = NULL;
-	int32 offset = 0;
-	BList runs;
+	if (processRuns && be_app == NULL)
+		fApplication = new BApplication("application/x-vnd.Haiku-RTF-Translator");
+}
 
-	while (iterator.HasNext()) {
-		RTF::Element *element = iterator.Next();
 
-		if (RTF::Group *group = dynamic_cast<RTF::Group *>(element)) {
-			// add new group context
-			group_context newContext = {lastParent, current};
-			stack.Push(newContext);
+TextOutput::~TextOutput()
+{
+	delete fApplication;
+}
 
-			lastParent = group;
-			continue;
-		}
 
-		if (element->Parent() != lastParent) {
-			// a group has been closed
+size_t
+TextOutput::Length() const
+{
+	return (size_t)fOffset;
+}
 
-			lastParent = element->Parent();
 
-			group_context lastContext;
-			while (stack.Pop(&lastContext)) {
-				// find current group context
-				if (lastContext.group == lastParent)
-					break;
-			}
-
-			if (lastContext.run != NULL && current != NULL) {
-				// has the style been changed?
-				if (lastContext.run->offset != current->offset)
-					current = get_style(runs, lastContext.run, offset);
-			}
-		}
-
-		if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
-			offset += write_text(context, text->String(), text->Length());
-			continue;
-		}
-
-		RTF::Command *command = dynamic_cast<RTF::Command *>(element);
-		if (command == NULL)
-			continue;
-
-		const char *name = command->Name();
-
-		if (!strcmp(name, "cf")) {
-			// foreground color
-			current = get_style(runs, current, offset);
-			current->color = header.Color(command->Option());
-		} else if (!strcmp(name, "b")
-			|| !strcmp(name, "embo") || !strcmp(name, "impr")) {
-			// bold style ("emboss" and "engrave" are currently the same, too)
-			current = get_style(runs, current, offset);
-			set_font_face(current->font, B_BOLD_FACE, command->Option() != 0);
-		} else if (!strcmp(name, "i")) {
-			// bold style
-			current = get_style(runs, current, offset);
-			set_font_face(current->font, B_ITALIC_FACE, command->Option() != 0);
-		} else if (!strcmp(name, "ul")) {
-			// bold style
-			current = get_style(runs, current, offset);
-			set_font_face(current->font, B_UNDERSCORE_FACE, command->Option() != 0);
-		} else if (!strcmp(name, "fs")) {
-			// font size in half points
-			current = get_style(runs, current, offset);
-			current->font.SetSize(command->Option() / 2.0);
-		} else if (!strcmp(name, "plain")) {
-			// reset font to plain style
-			current = get_style(runs, current, offset);
-			current->font = be_plain_font;
-		} else if (!strcmp(name, "f")) {
-			// font number
-			RTF::Group *fonts = header.FindGroup("fonttbl");
-			if (fonts == NULL)
-				continue;
-
-			current = get_style(runs, current, offset);
-			BFont font;
-				// missing font info will be replaced by the default font
-
-			RTF::Command *info;
-			for (int32 index = 0; (info = fonts->FindDefinition("f", index)) != NULL; index++) {
-				if (info->Option() != command->Option())
-					continue;
-
-				// ToDo: really try to choose font by name and serif/sans-serif
-				// ToDo: the font list should be built before once
-
-				// For now, it only differentiates fixed fonts from proportional ones
-				if (fonts->FindDefinition("fmodern", index) != NULL)
-					font = be_fixed_font;
-			}
-
-			font_family family;
-			font_style style;
-			font.GetFamilyAndStyle(&family, &style);
-
-			current->font.SetFamilyAndFace(family, current->font.Face());
-		} else
-			offset += process_command(context, command, NULL);
-	}
-
+void *
+TextOutput::FlattenedRunArray(int32 &_size)
+{
 	// are there any styles?
-	if (runs.CountItems() == 0)
+	if (fRuns.CountItems() == 0) {
+		_size = 0;
 		return NULL;
+	}
 
 	// create array
 
 	text_run_array *array = (text_run_array *)malloc(sizeof(text_run_array)
-		+ sizeof(text_run) * (runs.CountItems() - 1));
+		+ sizeof(text_run) * (fRuns.CountItems() - 1));
 	if (array == NULL)
 		throw (status_t)B_NO_MEMORY;
 
-	array->count = runs.CountItems();
+	array->count = fRuns.CountItems();
 
 	for (int32 i = 0; i < array->count; i++) {
-		text_run *run = (text_run *)runs.RemoveItem(0L);
+		text_run *run = (text_run *)fRuns.RemoveItem(0L);
 		array->runs[i] = *run;
 		delete run;
 	}
 
-	return array;
+	return BTextView::FlattenRunArray(array, &_size);
 }
 
 
-status_t
-write_plain_text(RTF::Header &header, BDataIO &target)
+void
+TextOutput::GetStyle(text_run *run) throw (status_t)
 {
-	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
-	conversion_context context;
+	static const rgb_color kBlack = {0, 0, 0, 255};
 
-	try {
-		while (iterator.HasNext()) {
-			RTF::Element *element = iterator.Next();
-	
-			if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
-				write_text(context, text->String(), text->Length(), &target);
-			} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(element)) {
-				process_command(context, command, &target);
-			}
-		}
-	} catch (status_t status) {
-		return status;
+	if (run != NULL && fOffset == run->offset)
+		return;
+
+	text_run *newRun = new text_run();
+	if (newRun == NULL)
+		throw (status_t)B_NO_MEMORY;
+
+	// take over previous styles
+	if (run != NULL) {
+		newRun->font = run->font;
+		newRun->color = run->color;
+	} else
+		newRun->color = kBlack;
+
+	newRun->offset = fOffset;
+
+	fRuns.AddItem(newRun);
+	fCurrentRun = newRun;
+}
+
+
+void
+TextOutput::Group(RTF::Group *group)
+{
+	if (group->Destination() != RTF::TEXT_DESTINATION)
+		Skip();
+
+	fGroupStack.Push(fCurrentRun);
+}
+
+
+void
+TextOutput::GroupEnd(RTF::Group *group)
+{
+	text_run *last;
+	fGroupStack.Pop(&last);
+
+	// has the style been changed?
+	if (last != NULL && fCurrentRun != NULL
+		&& last->offset != fCurrentRun->offset)
+		GetStyle(last);
+}
+
+
+void
+TextOutput::Command(RTF::Command *command)
+{
+	if (!fProcessRuns) {
+		fOffset += process_command(fContext, command, fTarget);
+		return;
 	}
 
-	return B_OK;
+	const char *name = command->Name();
+
+	if (!strcmp(name, "cf")) {
+		// foreground color
+		GetStyle(fCurrentRun);
+		fCurrentRun->color = Start().Color(command->Option());
+	} else if (!strcmp(name, "b")
+		|| !strcmp(name, "embo") || !strcmp(name, "impr")) {
+		// bold style ("emboss" and "engrave" are currently the same, too)
+		GetStyle(fCurrentRun);
+		set_font_face(fCurrentRun->font, B_BOLD_FACE, command->Option() != 0);
+	} else if (!strcmp(name, "i")) {
+		// bold style
+		GetStyle(fCurrentRun);
+		set_font_face(fCurrentRun->font, B_ITALIC_FACE, command->Option() != 0);
+	} else if (!strcmp(name, "ul")) {
+		// bold style
+		GetStyle(fCurrentRun);
+		set_font_face(fCurrentRun->font, B_UNDERSCORE_FACE, command->Option() != 0);
+	} else if (!strcmp(name, "fs")) {
+		// font size in half points
+		GetStyle(fCurrentRun);
+		fCurrentRun->font.SetSize(command->Option() / 2.0);
+	} else if (!strcmp(name, "plain")) {
+		// reset font to plain style
+		GetStyle(fCurrentRun);
+		fCurrentRun->font = be_plain_font;
+	} else if (!strcmp(name, "f")) {
+		// font number
+		RTF::Group *fonts = Start().FindGroup("fonttbl");
+		if (fonts == NULL)
+			return;
+
+		GetStyle(fCurrentRun);
+		BFont font;
+			// missing font info will be replaced by the default font
+
+		RTF::Command *info;
+		for (int32 index = 0; (info = fonts->FindDefinition("f", index)) != NULL; index++) {
+			if (info->Option() != command->Option())
+				continue;
+
+			// ToDo: really try to choose font by name and serif/sans-serif
+			// ToDo: the font list should be built before once
+
+			// For now, it only differentiates fixed fonts from proportional ones
+			if (fonts->FindDefinition("fmodern", index) != NULL)
+				font = be_fixed_font;
+		}
+
+		font_family family;
+		font_style style;
+		font.GetFamilyAndStyle(&family, &style);
+
+		fCurrentRun->font.SetFamilyAndFace(family, fCurrentRun->font.Face());
+	} else
+		fOffset += process_command(fContext, command, fTarget);
+}
+
+
+void
+TextOutput::Text(RTF::Text *text)
+{
+	fOffset += write_text(fContext, text->String(), text->Length(), fTarget);
 }
 
 
@@ -418,18 +410,11 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	size_t textSize = 0;
 
-	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
-	conversion_context context;
-
 	try {
-		while (iterator.HasNext()) {
-			RTF::Element *element = iterator.Next();
-			if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
-				textSize += write_text(context, text->String(), text->Length(), NULL);
-			} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(element)) {
-				textSize += process_command(context, command, NULL);
-			}
-		}
+		TextOutput counter(header, NULL, false);
+
+		counter.Work();
+		textSize = counter.Length();
 	} catch (status_t status) {
 		return status;
 	}
@@ -470,29 +455,17 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	// put out main text
 
-	status = write_plain_text(header, target);
-	if (status < B_OK)
-		return status;
+	void *flattenedRuns = NULL;
+	int32 flattenedSize = 0;
 
-	// prepare styles
-
-	AppServerConnection connection;
-		// we need that for the the text_run/BFont stuff
-
-	text_run_array *runs = NULL;
 	try {
-		runs = get_text_run_array(header);
+		TextOutput output(header, &target, true);
+
+		output.Work();
+		flattenedRuns = output.FlattenedRunArray(flattenedSize);
 	} catch (status_t status) {
 		return status;
 	}
-
-	if (runs == NULL)
-		return B_OK;
-
-	int32 flattenedSize;
-	void *flattenedRuns = BTextView::FlattenRunArray(runs, &flattenedSize);
-	if (flattenedRuns == NULL)
-		return B_NO_MEMORY;
 
 	// put out styles
 
@@ -516,6 +489,9 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	// output actual style information
 	written = target.Write(flattenedRuns, flattenedSize);
+
+	free(flattenedRuns);
+
 	if (written < B_OK)
 		return written;
 	if (written != flattenedSize)
@@ -530,38 +506,26 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 {
 	// put out main text
 
-	status_t status = write_plain_text(header, target);
-	if (status < B_OK)
-		return status;
+	void *flattenedRuns = NULL;
+	int32 flattenedSize = 0;
 
 	// ToDo: this is not really nice, we should adopt the BPositionIO class
 	//	from Dano/Zeta which has meta data support
 	BNode *node = dynamic_cast<BNode *>(&target);
+
+	try {
+		TextOutput output(header, &target, node != NULL);
+
+		output.Work();
+		flattenedRuns = output.FlattenedRunArray(flattenedSize);
+	} catch (status_t status) {
+		return status;
+	}
+
 	if (node == NULL) {
 		// we can't write the styles
 		return B_OK;
 	}
-
-	// prepare styles
-
-	AppServerConnection connection;
-		// we need that for the the text_run/BFont stuff
-
-	text_run_array *runs = NULL;
-	try {
-		runs = get_text_run_array(header);
-	} catch (status_t status) {
-		// doesn't matter too much if we could write the styles or not
-		return B_OK;
-	}
-
-	if (runs == NULL)
-		return B_OK;
-
-	int32 flattenedSize;
-	void *flattenedRuns = BTextView::FlattenRunArray(runs, &flattenedSize);
-	if (flattenedRuns == NULL)
-		return B_OK;
 
 	// put out styles
 
@@ -569,5 +533,6 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 	if (written >= B_OK && written != flattenedSize)
 		node->RemoveAttr("styles");
 
+	free(flattenedRuns);
 	return B_OK;
 }
