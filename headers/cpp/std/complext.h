@@ -311,7 +311,7 @@ operator != (_FLT x, const complex<_FLT>& y)
 }
 
 // Some targets don't provide a prototype for hypot when -ansi.
-extern "C" double hypot (double, double) __attribute__ ((const));
+//extern "C" double hypot (double, double) __attribute__ ((const));
 
 template <class _FLT> inline _FLT
 abs (const complex<_FLT>& x) __attribute__ ((const));
