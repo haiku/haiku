@@ -45,16 +45,18 @@
 // Returns:
 // ---------------------------------------------------------------
 BMPView::BMPView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
 	:	BView(frame, name, resize, flags)
 {
+	fSettings = settings;
+
 	SetViewColor(220,220,220,0);
 }
 
 // ---------------------------------------------------------------
 // Destructor
 //
-// Does nothing
+// Releases the translator settings
 //
 // Preconditions:
 //
@@ -66,6 +68,7 @@ BMPView::BMPView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 BMPView::~BMPView()
 {
+	fSettings->Release();
 }
 
 // ---------------------------------------------------------------
@@ -102,9 +105,10 @@ BMPView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(BMP_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((BMP_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(BMP_TRANSLATOR_VERSION & 0xf), __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(BMP_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(BMP_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(BMP_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 
 	char writtenby[] = "Written by the OBOS Translation Kit Team";

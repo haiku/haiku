@@ -1,6 +1,18 @@
 SubDir OBOS_TOP src add-ons translators bmptranslator ;
 
-Translator BMPTranslator : BMPMain.cpp BMPTranslator.cpp BMPView.cpp BMPWindow.cpp ;
+# Include BaseTranslator code from shared directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
+Translator BMPTranslator :
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	# BMPTranslator classes
+	BMPMain.cpp
+	BMPTranslator.cpp
+	BMPView.cpp ;
 
 LinkSharedOSLibs BMPTranslator : be translation ;
 

@@ -32,18 +32,21 @@
 #include <View.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include "TranslatorSettings.h"
 
 class BMPView : public BView {
 public:
 	BMPView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~BMPView();
-		// does nothing
+		// releases settings
 
 	virtual	void Draw(BRect area);
 		// draws information about the BMPTranslator
+private:
+	TranslatorSettings *fSettings;
 };
 
 #endif // #ifndef BMPVIEW_H

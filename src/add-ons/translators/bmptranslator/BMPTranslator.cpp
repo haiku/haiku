@@ -31,9 +31,6 @@
 #include "BMPTranslator.h"
 #include "BMPView.h"
 
-#define min(x,y) ((x < y) ? x : y)
-#define max(x,y) ((x > y) ? x : y)
-
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
 	{
@@ -72,6 +69,12 @@ translation_format gOutputFormats[] = {
 		"image/x-bmp",
 		"BMP image (MS format)"
 	}
+};
+
+// Default settings for the Translator
+TranSetting gDefaultSettings[] = {
+	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
 
 // ---------------------------------------------------------------
@@ -120,13 +123,14 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 BMPTranslator::BMPTranslator()
-	:	BTranslator()
+	: BaseTranslator("BMP Images", "BMP image translator",
+		BMP_TRANSLATOR_VERSION,
+		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
+		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		"BMPTranslator_Settings",
+		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		B_TRANSLATOR_BITMAP, B_BMP_FORMAT)
 {
-	strcpy(fName, "BMP Images");
-	sprintf(fInfo, "BMP image translator v%d.%d.%d %s",
-		static_cast<int>(BMP_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((BMP_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(BMP_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
@@ -144,117 +148,6 @@ BMPTranslator::BMPTranslator()
 // ---------------------------------------------------------------
 BMPTranslator::~BMPTranslator()
 {
-}
-
-// ---------------------------------------------------------------
-// TranslatorName
-//
-// Returns the short name of the translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the short name of the translator
-// ---------------------------------------------------------------	
-const char *
-BMPTranslator::TranslatorName() const
-{
-	return fName;
-}
-
-// ---------------------------------------------------------------
-// TranslatorInfo
-//
-// Returns a more verbose name for the translator than the one
-// TranslatorName() returns. This usually includes version info.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the verbose name of the translator
-// ---------------------------------------------------------------
-const char *
-BMPTranslator::TranslatorInfo() const
-{
-	return fInfo;
-}
-
-// ---------------------------------------------------------------
-// TranslatorVersion
-//
-// Returns the integer representation of the current version of
-// this translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-int32 
-BMPTranslator::TranslatorVersion() const
-{
-	return BMP_TRANSLATOR_VERSION;
-}
-
-// ---------------------------------------------------------------
-// InputFormats
-//
-// Returns a list of input formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of input formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of input formats and the number of input
-// formats through the out_count parameter
-// ---------------------------------------------------------------
-const translation_format *
-BMPTranslator::InputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gInputFormats) /
-			sizeof(translation_format);
-		return gInputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// OutputFormats
-//
-// Returns a list of output formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of output formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of output formats and the number of output
-// formats through the out_count parameter
-// ---------------------------------------------------------------	
-const translation_format *
-BMPTranslator::OutputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gOutputFormats) /
-			sizeof(translation_format);
-		return gOutputFormats;
-	} else
-		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -336,103 +229,6 @@ get_rowbytes(uint32 width, uint16 bitsperpixel)
 }
 
 // ---------------------------------------------------------------
-// identify_bits_header
-//
-// Determines if the data in inSource is in the
-// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns 
-// info about the data in inSource to outInfo and pheader.
-//
-// Preconditions:
-//
-// Parameters:	inSource,	The source of the image data
-//
-//				outInfo,	Information about the translator
-//							is copied here
-//
-//				amtread,	Amount of data read from inSource
-//							before this function was called
-//
-//				read,		Pointer to the data that was read
-// 							in before this function was called
-//
-//				pheader,	The bits header is copied here after
-//							it is read in from inSource
-//
-// Postconditions:
-//
-// Returns: B_NO_TRANSLATOR,	if the data does not look like
-//								bits format data
-//
-// B_ERROR,	if the header data could not be converted to host
-//			format
-//
-// B_OK,	if the data looks like bits data and no errors were
-//			encountered
-// ---------------------------------------------------------------
-status_t 
-identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, TranslatorBitmap *pheader = NULL)
-{
-	TranslatorBitmap header;
-		
-	memcpy(&header, read, amtread);
-		// copy portion of header already read in
-	// read in the rest of the header
-	ssize_t size = sizeof(TranslatorBitmap) - amtread;
-	if (inSource->Read((reinterpret_cast<uint8 *> (&header)) +
-		amtread, size) != size)
-		return B_NO_TRANSLATOR;
-		
-	// convert to host byte order
-	if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
-		return B_ERROR;
-		
-	// check if header values are reasonable
-	if (header.colors != B_RGB32 &&
-		header.colors != B_RGB32_BIG &&
-		header.colors != B_RGBA32 &&
-		header.colors != B_RGBA32_BIG &&
-		header.colors != B_RGB24 &&
-		header.colors != B_RGB24_BIG &&
-		header.colors != B_RGB16 &&
-		header.colors != B_RGB16_BIG &&
-		header.colors != B_RGB15 &&
-		header.colors != B_RGB15_BIG &&
-		header.colors != B_RGBA15 &&
-		header.colors != B_RGBA15_BIG &&
-		header.colors != B_CMAP8 &&
-		header.colors != B_GRAY8 &&
-		header.colors != B_GRAY1 &&
-		header.colors != B_CMYK32 &&
-		header.colors != B_CMY32 &&
-		header.colors != B_CMYA32 &&
-		header.colors != B_CMY24)
-		return B_NO_TRANSLATOR;
-	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
-		return B_NO_TRANSLATOR;
-			
-	if (outInfo) {
-		outInfo->type = B_TRANSLATOR_BITMAP;
-		outInfo->group = B_TRANSLATOR_BITMAP;
-		outInfo->quality = BBT_IN_QUALITY;
-		outInfo->capability = BBT_IN_CAPABILITY;
-		strcpy(outInfo->name, "Be Bitmap Format (BMPTranslator)");
-		strcpy(outInfo->MIME, "image/x-be-bitmap");
-	}
-	
-	if (pheader) {
-		pheader->magic = header.magic;
-		pheader->bounds = header.bounds;
-		pheader->rowBytes = header.rowBytes;
-		pheader->colors = header.colors;
-		pheader->dataSize = header.dataSize;
-	}
-	
-	return B_OK;
-}
-
-// ---------------------------------------------------------------
 // identify_bmp_header
 //
 // Determines if the data in inSource is in the MS or OS/2 BMP
@@ -480,18 +276,21 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 // ---------------------------------------------------------------
 status_t
 identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, BMPFileHeader *pfileheader = NULL,
-	MSInfoHeader *pmsheader = NULL, bool *pfrommsformat = NULL,
-	off_t *pos2skip = NULL)
+	BMPFileHeader *pfileheader = NULL, MSInfoHeader *pmsheader = NULL,
+	bool *pfrommsformat = NULL, off_t *pos2skip = NULL)
 {
+	// read in the fileHeader
 	uint8 buf[40];
 	BMPFileHeader fileHeader;
+	ssize_t size = 14;
+	if (inSource->Read(buf, size) != size)
+		return B_NO_TRANSLATOR;
 	
-	memcpy(buf, read, amtread);
-		// copy portion of fileHeader already read in
-	// read in the rest of the fileHeader
-	ssize_t size = 14 - amtread;
-	if (inSource->Read(buf + amtread, size) != size)
+	// check BMP magic number
+	const uint16 kBmpMagic = B_HOST_TO_LENDIAN_INT16('MB');
+	uint16 sourceMagic;
+	memcpy(&sourceMagic, buf, sizeof(uint16));
+	if (sourceMagic != kBmpMagic)
 		return B_NO_TRANSLATOR;
 	
 	// convert fileHeader to host byte order
@@ -703,7 +502,7 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 }
 
 // ---------------------------------------------------------------
-// Identify
+// DerivedIdentify
 //
 // Examines the data from inSource and determines if it is in a
 // format that this translator knows how to work with.
@@ -740,63 +539,11 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 //			no errors found
 // ---------------------------------------------------------------
 status_t
-BMPTranslator::Identify(BPositionIO *inSource,
+BMPTranslator::DerivedIdentify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != B_BMP_FORMAT)
-		return B_NO_TRANSLATOR;
-
-	uint8 ch[4];
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	uint16 nbm = 'MB';
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	if (swap_data(B_UINT32_TYPE, &nbits, 4, B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	if (swap_data(B_UINT16_TYPE, &nbm, 2, B_SWAP_HOST_TO_LENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-		
-	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
-	bheaderonly = bdataonly = false;
-		// only allow writing of the entire image
-		// (fix for buggy programs that lie about what they actually need)
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	uint16 n16ch;
-	memcpy(&n16ch, ch, sizeof(uint16));
-	// if B_TRANSLATOR_BITMAP type	
-	if (n32ch == nbits)
-		return identify_bits_header(inSource, outInfo, 4, ch);
-	// if BMP type in Little Endian byte order
-	else if (n16ch == nbm)
-		return identify_bmp_header(inSource, outInfo, 4, ch);
-	else
-		return B_NO_TRANSLATOR;
+	return identify_bmp_header(inSource, outInfo);
 }
 
 // ---------------------------------------------------------------
@@ -1229,18 +976,6 @@ write_bmp_headers(BPositionIO *outDestination, BMPFileHeader &fileHeader,
 //
 // Parameters:	inSource,	the bits data to translate
 //
-// 				amtread,	the amount of data already read from
-//							inSource
-//
-//				read,		pointer to the data already read from
-//							inSource
-//
-//				bheaderonly,	true if only the header should be
-//								written out
-//
-//				bdataonly,	true if only the data should be
-//							written out
-//
 //				outType,	the type of data to convert to
 //
 //				outDestination,	where the output is written to
@@ -1256,14 +991,15 @@ write_bmp_headers(BPositionIO *outDestination, BMPFileHeader &fileHeader,
 // B_OK, if successfully translated the data from the bits format
 // ---------------------------------------------------------------
 status_t
-translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	bool bheaderonly, bool bdataonly, uint32 outType,
+BMPTranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 	BPositionIO *outDestination)
 {
+	bool bheaderonly, bdataonly;
+	bheaderonly = bdataonly = false;
+
 	TranslatorBitmap bitsHeader;
-		
 	status_t result;
-	result = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
+	result = identify_bits_header(inSource, NULL, &bitsHeader);
 	if (result != B_OK)
 		return result;
 	
@@ -1925,18 +1661,6 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 //
 // Parameters:	inSource,	the bits data to translate
 //
-// 				amtread,	the amount of data already read from
-//							inSource
-//
-//				read,		pointer to the data already read from
-//							inSource
-//
-//				bheaderonly,	true if only the header should be
-//								written out
-//
-//				bdataonly,	true if only the data should be
-//							written out
-//
 //				outType,	the type of data to convert to
 //
 //				outDestination,	where the output is written to
@@ -1952,18 +1676,20 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 // B_OK, if successfully translated the data from the bits format
 // ---------------------------------------------------------------
 status_t
-translate_from_bmp(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	bool bheaderonly, bool bdataonly, uint32 outType,
+BMPTranslator::translate_from_bmp(BPositionIO *inSource, uint32 outType,
 	BPositionIO *outDestination)
 {
+	bool bheaderonly, bdataonly;
+	bheaderonly = bdataonly = false;
+
 	BMPFileHeader fileHeader;
 	MSInfoHeader msheader;
 	bool frommsformat;
 	off_t os2skip = 0;
 
 	status_t result;
-	result = identify_bmp_header(inSource, NULL, amtread, read,
-		&fileHeader, &msheader, &frommsformat, &os2skip);
+	result = identify_bmp_header(inSource, NULL, &fileHeader, &msheader,
+		&frommsformat, &os2skip);
 	if (result != B_OK)
 		return result;
 	
@@ -2123,7 +1849,7 @@ translate_from_bmp(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 }
 
 // ---------------------------------------------------------------
-// Translate
+// DerivedTranslate
 //
 // Translates the data in inSource to the type outType and stores
 // the translated data in outDestination.
@@ -2142,6 +1868,10 @@ translate_from_bmp(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 //				outDestination,	where the translated data is
 //								put
 //
+//				baseType, indicates whether inSource is in the
+//				          bits format, not in the bits format or
+//				          is unknown
+//
 // Postconditions:
 //
 // Returns: B_BAD_VALUE, if the options in ioExtension are bad
@@ -2154,106 +1884,23 @@ translate_from_bmp(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 // B_OK, if all went well
 // ---------------------------------------------------------------
 status_t
-BMPTranslator::Translate(BPositionIO *inSource,
+BMPTranslator::DerivedTranslate(BPositionIO *inSource,
 		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination)
+		uint32 outType, BPositionIO *outDestination, int32 baseType)
 {
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != B_BMP_FORMAT)
-		return B_NO_TRANSLATOR;
-		
-	inSource->Seek(0, SEEK_SET);
-	
-	uint8 ch[4];
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	uint16 nbm = 'MB';
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
-		B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	if (swap_data(B_UINT16_TYPE, &nbm, sizeof(uint16),
-		B_SWAP_HOST_TO_LENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-		
-	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
-	bheaderonly = bdataonly = false;
-		// only allow writing of the entire image
-		// (fix for buggy programs that lie about what they actually need)
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	uint16 n16ch;
-	memcpy(&n16ch, ch, sizeof(uint16));
-	// if B_TRANSLATOR_BITMAP type	
-	if (n32ch == nbits)
-		return translate_from_bits(inSource, 4, ch, bheaderonly, bdataonly,
-			outType, outDestination);
-	// if BMP type in Little Endian byte order
-	else if (n16ch == nbm)
-		return translate_from_bmp(inSource, 4, ch, bheaderonly, bdataonly,
-			outType, outDestination);
+	if (baseType == 1)
+		// if inSource is in bits format
+		return translate_from_bits(inSource, outType, outDestination);
+	else if (baseType == 0)
+		// if inSource is NOT in bits format
+		return translate_from_bmp(inSource, outType, outDestination);
 	else
 		return B_NO_TRANSLATOR;
 }
 
-// ---------------------------------------------------------------
-// MakeConfigurationView
-//
-// Makes a BView object for configuring / displaying info about
-// this translator. 
-//
-// Preconditions:
-//
-// Parameters:	ioExtension,	configuration options for the
-//								translator
-//
-//				outView,		the view to configure the
-//								translator is stored here
-//
-//				outExtent,		the bounds of the view are
-//								stored here
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-status_t
-BMPTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
-	BRect *outExtent)
+BView *
+BMPTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	if (!outView || !outExtent)
-		return B_BAD_VALUE;
-
-	BMPView *view = new BMPView(BRect(0, 0, 225, 175),
-		"BMPTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
-	if (!view)
-		return B_NO_MEMORY;
-		
-	*outView = view;
-	*outExtent = view->Bounds();
-
-	return B_OK;
+	return new BMPView(BRect(0, 0, 225, 175), "BMPTranslator Settings",
+		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
