@@ -16,7 +16,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: inet_net_ntop.c,v 1.1 2004/04/15 16:03:28 wkornew Exp $";
+static const char rcsid[] = "$Id: inet_net_ntop.c,v 1.2 2004/05/13 00:01:39 phoudoin Exp $";
 #endif
 
 #include "port_before.h"
@@ -24,6 +24,7 @@ static const char rcsid[] = "$Id: inet_net_ntop.c,v 1.1 2004/04/15 16:03:28 wkor
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/nameser.h>
 #include <arpa/inet.h>
 
 #include <errno.h>
