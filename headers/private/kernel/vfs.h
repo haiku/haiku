@@ -83,48 +83,6 @@ int vfs_set_cache_ptr(void *vnode, void *cache);
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
 
-/* calls kernel code should make for file I/O */
-status_t _kern_mount(const char *path, const char *device, const char *fs_name, void *args);
-status_t _kern_unmount(const char *path);
-status_t _kern_read_fs_info(dev_t device, struct fs_info *info);
-status_t _kern_write_fs_info(dev_t device, const struct fs_info *info, int mask);
-status_t _kern_sync(void);
-int _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
-int _kern_open(const char *path, int omode);
-int _kern_open_dir_node_ref(dev_t device, ino_t inode);
-int _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name);
-int _kern_open_dir(const char *path);
-status_t _kern_fsync(int fd);
-off_t _kern_seek(int fd, off_t pos, int seekType);
-int _kern_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
-int _kern_create(const char *path, int omode, int perms);
-status_t _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
-status_t _kern_create_dir(const char *path, int perms);
-status_t _kern_remove_dir(const char *path);
-ssize_t _kern_read_link(const char *path, char *buffer, size_t bufferSize);
-status_t _kern_write_link(const char *path, const char *toPath);
-status_t _kern_create_symlink(const char *path, const char *toPath, int mode);
-status_t _kern_create_link(const char *path, const char *toPath);
-status_t _kern_unlink(const char *path);
-status_t _kern_rename(const char *oldpath, const char *newpath);
-status_t _kern_access(const char *path, int mode);
-status_t _kern_read_path_stat(const char *path, bool traverseLink, struct stat *stat, size_t statSize);
-status_t _kern_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, size_t statSize, int statMask);
-ssize_t _kern_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
-			bigtime_t timeout, const sigset_t *sigMask);
-ssize_t _kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
-int _kern_open_attr_dir(int fd, const char *path);
-int _kern_create_attr(int fd, const char *name, uint32 type, int openMode);
-int _kern_open_attr(int fd, const char *name, int openMode);
-status_t _kern_remove_attr(int fd, const char *name);
-status_t _kern_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
-int _kern_open_index_dir(dev_t device);
-status_t _kern_create_index(dev_t device, const char *name, uint32 type, uint32 flags);
-status_t _kern_read_index_stat(dev_t device, const char *name, struct stat *stat);
-status_t _kern_remove_index(dev_t device, const char *name);
-status_t _kern_getcwd(char *buffer, size_t size);
-status_t _kern_setcwd(int fd, const char *path);
-
 /* calls the syscall dispatcher should use for user file I/O */
 status_t _user_mount(const char *path, const char *device, const char *fs_name, void *args);
 status_t _user_unmount(const char *path);
@@ -166,18 +124,6 @@ status_t _user_read_index_stat(dev_t device, const char *name, struct stat *stat
 status_t _user_remove_index(dev_t device, const char *name);
 status_t _user_getcwd(char *buffer, size_t size);
 status_t _user_setcwd(int fd, const char *path);
-
-/* fd kernel prototypes (implementation located in fd.c) */
-extern ssize_t _kern_read(int fd, off_t pos, void *buffer, size_t bufferSize);
-extern ssize_t _kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
-extern status_t _kern_ioctl(int fd, ulong cmd, void *data, size_t length);
-extern ssize_t _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
-extern status_t _kern_rewind_dir(int fd);
-extern status_t _kern_read_stat(int fd, struct stat *stat, size_t statSize);
-extern status_t _kern_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask);
-extern status_t _kern_close(int fd);
-extern int _kern_dup(int fd);
-extern int _kern_dup2(int ofd, int nfd);
 
 /* fd user prototypes (implementation located in fd.c)  */
 extern ssize_t _user_read(int fd, off_t pos, void *buffer, size_t bufferSize);

@@ -5,19 +5,25 @@
 #ifndef _LIBSYS_SYSCALLS_H
 #define _LIBSYS_SYSCALLS_H
 
-#include <ktypes.h>
-#include <defines.h>
-#include <sys/resource.h>
-#include <vfs.h>
+
 #include <OS.h>
 #include <image.h>
-#include <sys/stat.h>
+#include <sys/select.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int     sys_null();
+struct sigaction;
+struct rlimit;
+struct stat;
+struct pollfd;
+struct fs_info;
+struct dirent;
+
+
+extern int     		_kern_null();
 
 extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
 extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
@@ -68,26 +74,80 @@ int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 bigtime_t sys_set_alarm(bigtime_t time, uint32 mode);
 
 // image functions
-image_id _kern_register_image(image_info *info, size_t size);
-status_t _kern_unregister_image(image_id id);
-status_t _kern_get_image_info(image_id id, image_info *info, size_t size);
-status_t _kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
+extern image_id		_kern_register_image(image_info *info, size_t size);
+extern status_t		_kern_unregister_image(image_id id);
+extern status_t		_kern_get_image_info(image_id id, image_info *info, size_t size);
+extern status_t		_kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
+
+// VFS functions
+extern status_t		_kern_mount(const char *path, const char *device, const char *fs_name, void *args);
+extern status_t		_kern_unmount(const char *path);
+extern status_t		_kern_read_fs_info(dev_t device, struct fs_info *info);
+extern status_t		_kern_write_fs_info(dev_t device, const struct fs_info *info, int mask);
+extern status_t		_kern_sync(void);
+extern int			_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
+extern int			_kern_open(const char *path, int omode);
+extern int			_kern_open_dir_node_ref(dev_t device, ino_t inode);
+extern int			_kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name);
+extern int			_kern_open_dir(const char *path);
+extern status_t		_kern_fsync(int fd);
+extern off_t		_kern_seek(int fd, off_t pos, int seekType);
+extern int			_kern_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
+extern int			_kern_create(const char *path, int omode, int perms);
+extern status_t		_kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
+extern status_t		_kern_create_dir(const char *path, int perms);
+extern status_t		_kern_remove_dir(const char *path);
+extern ssize_t		_kern_read_link(const char *path, char *buffer, size_t bufferSize);
+extern status_t		_kern_write_link(const char *path, const char *toPath);
+extern status_t		_kern_create_symlink(const char *path, const char *toPath, int mode);
+extern status_t		_kern_create_link(const char *path, const char *toPath);
+extern status_t		_kern_unlink(const char *path);
+extern status_t		_kern_rename(const char *oldpath, const char *newpath);
+extern status_t		_kern_access(const char *path, int mode);
+extern status_t		_kern_read_path_stat(const char *path, bool traverseLink, struct stat *stat, size_t statSize);
+extern status_t		_kern_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, size_t statSize, int statMask);
+extern ssize_t		_kern_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+						bigtime_t timeout, const sigset_t *sigMask);
+extern ssize_t		_kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
+extern int			_kern_open_attr_dir(int fd, const char *path);
+extern int			_kern_create_attr(int fd, const char *name, uint32 type, int openMode);
+extern int			_kern_open_attr(int fd, const char *name, int openMode);
+extern status_t		_kern_remove_attr(int fd, const char *name);
+extern status_t		_kern_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
+extern int			_kern_open_index_dir(dev_t device);
+extern status_t		_kern_create_index(dev_t device, const char *name, uint32 type, uint32 flags);
+extern status_t		_kern_read_index_stat(dev_t device, const char *name, struct stat *stat);
+extern status_t		_kern_remove_index(dev_t device, const char *name);
+extern status_t		_kern_getcwd(char *buffer, size_t size);
+extern status_t		_kern_setcwd(int fd, const char *path);
+
+// file descriptor functions
+extern ssize_t		_kern_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+extern ssize_t		_kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
+extern status_t		_kern_ioctl(int fd, ulong cmd, void *data, size_t length);
+extern ssize_t		_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
+extern status_t		_kern_rewind_dir(int fd);
+extern status_t		_kern_read_stat(int fd, struct stat *stat, size_t statSize);
+extern status_t		_kern_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask);
+extern status_t		_kern_close(int fd);
+extern int			_kern_dup(int fd);
+extern int			_kern_dup2(int ofd, int nfd);
 
 // node monitor functions
-status_t _kern_stop_notifying(port_id port, uint32 token);
-status_t _kern_start_watching(dev_t device, ino_t node, uint32 flags,
-			port_id port, uint32 token);
-status_t _kern_stop_watching(dev_t device, ino_t node, uint32 flags,
-			port_id port, uint32 token);
+extern status_t		_kern_stop_notifying(port_id port, uint32 token);
+extern status_t		_kern_start_watching(dev_t device, ino_t node, uint32 flags,
+						port_id port, uint32 token);
+extern status_t		_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
+						port_id port, uint32 token);
 
 // time functions
-void _kern_set_real_time_clock(uint32 time);
+extern void			_kern_set_real_time_clock(uint32 time);
 
 // area functions
 area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
-region_id sys_vm_map_file(const char *name, void **address, int addr_type,
-			addr size, int lock, int mapping, const char *path, off_t offset);
+area_id sys_vm_map_file(const char *name, void **address, int addr_type,
+			addr_t size, int lock, int mapping, const char *path, off_t offset);
 status_t _kern_delete_area(area_id area);
 area_id _kern_area_for(void *address);
 area_id _kern_find_area(const char *name);
