@@ -41,7 +41,7 @@
 #include "local.h"
 
 #ifdef FLOATING_POINT
-#include "floatio.h"
+#	include "floatio.h"
 #endif
 
 #define	BUF		513	/* Maximum length of numeric string. */
@@ -77,7 +77,7 @@
 #define	CT_CHAR		0	/* %c conversion */
 #define	CT_CCL		1	/* %[...] conversion */
 #define	CT_STRING	2	/* %s conversion */
-#define	CT_INT		3	/* integer, i.e., strtoq or strtouq */
+#define	CT_INT		3	/* integer, i.e., strtoll or strtoull */
 #define	CT_FLOAT	4	/* floating, i.e., strtod */
 
 #define u_char unsigned char
@@ -103,8 +103,8 @@ __svfscanf(fp, fmt0, ap)
 	register char *p0;	/* saves original value of p when necessary */
 	int nassigned;		/* number of fields assigned */
 	int nread;		/* number of characters consumed from fp */
-	int base;		/* base argument to strtoq/strtouq */
-	uint64 (*ccfn)();	/* conversion function (strtoq/strtouq) */
+	int base;		/* base argument to strtoll/strtoull */
+	uint64 (*ccfn)();	/* conversion function (strtoll/strtoull) */
 	char ccltab[256];	/* character class table for %[...] */
 	char buf[BUF];		/* buffer for numeric conversions */
 
@@ -184,13 +184,13 @@ literal:
 			/* FALLTHROUGH */
 		case 'd':
 			c = CT_INT;
-			ccfn = (uint64 (*)())strtoq;
+			ccfn = (uint64 (*)())strtoll;
 			base = 10;
 			break;
 
 		case 'i':
 			c = CT_INT;
-			ccfn = (uint64 (*)())strtoq;
+			ccfn = (uint64 (*)())strtoll;
 			base = 0;
 			break;
 
@@ -199,13 +199,13 @@ literal:
 			/* FALLTHROUGH */
 		case 'o':
 			c = CT_INT;
-			ccfn = strtouq;
+			ccfn = strtoull;
 			base = 8;
 			break;
 
 		case 'u':
 			c = CT_INT;
-			ccfn = strtouq;
+			ccfn = strtoull;
 			base = 10;
 			break;
 
@@ -213,7 +213,7 @@ literal:
 		case 'x':
 			flags |= PFXOK;	/* enable 0x prefixing */
 			c = CT_INT;
-			ccfn = strtouq;
+			ccfn = strtoull;
 			base = 16;
 			break;
 
@@ -245,7 +245,7 @@ literal:
 		case 'p':	/* pointer format is like hex */
 			flags |= POINTER | PFXOK;
 			c = CT_INT;
-			ccfn = strtouq;
+			ccfn = strtoull;
 			base = 16;
 			break;
 
@@ -270,7 +270,7 @@ literal:
 			if (isupper(c))
 				flags |= LONG;
 			c = CT_INT;
-			ccfn = (uint64 (*)())strtoq;
+			ccfn = (uint64 (*)())strtoll;
 			base = 10;
 			break;
 		}
@@ -412,7 +412,7 @@ literal:
 			continue;
 
 		case CT_INT:
-			/* scan an integer as if by strtoq/strtouq */
+			/* scan an integer as if by strtoll/strtoull */
 #ifdef hardway
 			if (width == 0 || width > sizeof(buf) - 1)
 				width = sizeof(buf) - 1;
