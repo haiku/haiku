@@ -642,10 +642,23 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 //	the "chkbfs" command
 
 
+bool 
+BlockAllocator::IsValidCheckControl(check_control *control)
+{
+	if (control == NULL
+		|| control->magic != BFS_IOCTL_CHECK_MAGIC) {
+		FATAL(("invalid check_control (%p)!\n", control));
+		return false;
+	}
+
+	return true;
+}
+
+
 status_t 
 BlockAllocator::StartChecking(check_control *control)
 {
-	if (control == NULL)
+	if (!IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
 	status_t status = fLock.Lock();
@@ -771,7 +784,7 @@ BlockAllocator::StopChecking(check_control *control)
 status_t
 BlockAllocator::CheckNextNode(check_control *control)
 {
-	if (control == NULL)
+	if (!IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
 	check_cookie *cookie = (check_cookie *)control->cookie;

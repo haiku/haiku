@@ -34,6 +34,7 @@ extern "C" {
  * BFS_IOCTL_START_CHECKING is called
  */
 struct check_control {
+	uint32		magic;
 	uint32		flags;
 	char		name[B_FILE_NAME_LENGTH];
 	vnode_id	inode;
@@ -68,5 +69,8 @@ struct check_control {
 #define	BFS_COULD_NOT_OPEN		8
 #define BFS_WRONG_TYPE			16
 #define BFS_NAMES_DONT_MATCH	32
+
+/* check control magic value */
+#define BFS_IOCTL_CHECK_MAGIC	'BChk'
 
 #endif	/* BFS_CONTROL_H */

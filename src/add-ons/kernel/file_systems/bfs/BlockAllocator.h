@@ -44,6 +44,7 @@ class BlockAllocator {
 		status_t CheckInode(Inode *inode, check_control *control = NULL);
 
 	private:
+		bool IsValidCheckControl(check_control *control);
 		bool CheckBitmapIsUsedAt(off_t block) const;
 		void SetCheckBitmapAt(off_t block);
 
