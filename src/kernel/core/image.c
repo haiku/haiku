@@ -161,7 +161,10 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	team = team_get_team_struct_locked(teamID);
+	if (teamID == 0)
+		team = thread_get_current_thread()->team;
+	else
+		team = team_get_team_struct_locked(teamID);
 	if (team) {
 		struct image *image = NULL;
 		int32 count = 0;
