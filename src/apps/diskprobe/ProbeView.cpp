@@ -896,6 +896,10 @@ TypeMenuItem::DrawContent()
 	point.x = Frame().right - 4 - Menu()->StringWidth(fType.String());
 	point.y += fontHeight.ascent;
 
+#ifdef COMPILE_FOR_R5
+	Menu()->SetDrawingMode(B_OP_ALPHA);
+#endif
+
 	Menu()->DrawString(fType.String(), point);
 }
 
@@ -1096,6 +1100,14 @@ ProbeView::UpdateSizeLimits()
 			200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
 	} else
 		Window()->SetSizeLimits(200, 32768, 200, 32768);
+
+#ifdef COMPILE_FOR_R5
+	BRect bounds = Window()->Bounds();
+	float minWidth, maxWidth, minHeight, maxHeight;
+	Window()->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	if (maxWidth < bounds.Width() || maxHeight < bounds.Height())
+		Window()->ResizeTo(MIN(maxWidth, bounds.Width()), MIN(maxHeight, bounds.Height()));
+#endif
 }
 
 

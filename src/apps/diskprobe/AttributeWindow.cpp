@@ -150,6 +150,9 @@ EditorTabView::SetTypeEditorTab(BView *view)
 		tab->SetView(view);
 
 	FrameResized(0, 0);
+#ifdef COMPILE_FOR_R5
+	if (Parent() != NULL)
+#endif
 	Select(0);
 }
 
