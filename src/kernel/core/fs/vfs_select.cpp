@@ -1,7 +1,7 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <vfs.h>
@@ -128,11 +128,6 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 		count += select_events(&sync, fd, fd, sync.set[fd].selected_events, kernel);
 			// array position is the same as the fd for select()
-	}
-
-	if (count < 1) {
-		count = B_BAD_VALUE;
-		goto err;
 	}
 
 	status = acquire_sem_etc(sync.sem, 1,
@@ -476,6 +471,10 @@ _kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout)
 {
 	return common_poll(fds, numfds, timeout, true);
 }
+
+
+//	#pragma mark -
+//	User syscalls
 
 
 ssize_t
