@@ -21,58 +21,93 @@
 //
 //	File Name:		PortLink.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for low-overhead packet-style port-based messaging
+//					Pahtz <pahtz@yahoo.com.au>
+//	Description:	Class for low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
 #ifndef _PORTLINK_H
 #define _PORTLINK_H
 
-#include <BeBuild.h>
 #include <OS.h>
-#include "Session.h"
 
-class PortMessage;
+/*
+	Error checking rules: (for if you don't want to check every return code)
+	
+	Calling EndMessage() is optional, implied by Flush() or StartMessage().
 
-class PortLink
+	If you are sending just one message you only need to test Flush() == B_OK
+
+	If you are buffering multiple messages without calling Flush() you must
+		check EndMessage() == B_OK, or the last Attach() for each message. Check
+		Flush() at the end.
+
+	If you are reading, check the last Read() or ReadString() you perform.
+
+*/
+
+class BPortLink
 {
 public:
-	PortLink(port_id port);
-	PortLink(const PortLink &link);
-	virtual ~PortLink(void);
+	BPortLink(port_id send = -1, port_id reply = -1);
+	virtual ~BPortLink();
 
-	void SetOpCode(int32 code);
-
-	void SetPort(port_id port);
-	port_id	GetPort();
+	status_t StartMessage(int32 code);
+	void CancelMessage();
+	status_t EndMessage();
 
 	status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT);
-	status_t FlushToSession();
+	
+	// see BPrivate::BAppServerLink which inherits from BPortLink
+	//status_t FlushWithReply(int32 *code);
 
-	void MakeEmpty();
-	status_t Attach(const void *data, size_t size);
+	void SetSendPort(port_id port);
+	port_id	GetSendPort();
+	void SetReplyPort(port_id port);
+	port_id	GetReplyPort();
+
+	status_t Attach(const void *data, ssize_t size);
 	status_t AttachString(const char *string);
-	template <class Type> status_t Attach(Type data)
+	template <class Type> status_t Attach(const Type& data)
 	{
-		int32 size	= sizeof(Type);
+		return Attach(&data, sizeof(Type));
+	}
 
-		if ( (SESSION_BUFFER_SIZE*4) - fSendPosition > size){
-			memcpy(fSendBuffer + fSendPosition, &data, size);
-			fSendPosition += size;
-			*fDataSize+=size;
-			return B_OK;
-		}
-		return B_NO_MEMORY;
+	status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+	status_t Read(void *data, ssize_t size);
+	status_t ReadString(char **string);
+	template <class Type> status_t Read(Type *data)
+	{
+		return Read(data, sizeof(Type));
 	}
 	
-private:
-	bool fPortValid;
+protected:
+	status_t FlushCompleted(ssize_t newbuffersize);
+	status_t ReadFromPort(bigtime_t timeout);
+	status_t AdjustReplyBuffer(bigtime_t timeout);
+	void ResetReplyBuffer();
+	
 	port_id	fSendPort;
 	port_id fReceivePort;
+
 	char	*fSendBuffer;
-	int32	fSendPosition;
-	int32	fSendCode;
-	int32	*fDataSize;
+	char	*fRecvBuffer;
+
+	int32	fSendPosition;	//current append position
+	int32	fRecvPosition;	//current read position
+
+	int32	fSendStart;	//start of current message
+	int32	fRecvStart;	//start of current message
+	
+	int32	fSendBufferSize;
+	int32	fRecvBufferSize;
+
+	int32	fSendCount;	//number of completed messages in buffer
+
+	int32	fDataSize;	//size of data in recv buffer
+	int32	fReplySize;	//size of current reply message
+	
+	status_t fWriteError;	//Attach failed for current message
+	status_t fReadError;	//Read failed for current message
 };
 
 #endif
