@@ -210,13 +210,13 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	dev->max_vsr = 0xffff;
 	dev->reversed_eamp_polarity = false;
 
-	/* setup register cache */
-	ac97_update_register_cache(dev);
-
 	/* reset the codec */	
 	LOG(("codec reset\n"));
 	ac97_reg_uncached_write(dev, AC97_RESET, 0x0000);
 	snooze(50000); // 50 ms
+
+	/* setup register cache */
+	ac97_update_register_cache(dev);
 
 	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
 	dev->capabilities = 0;
