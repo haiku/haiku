@@ -14,6 +14,7 @@
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
+#include "KPath.h"
 #include "KPhysicalPartition.h"
 #include "KShadowPartition.h"
 
@@ -56,12 +57,12 @@ KPhysicalPartition::Open(int flags, int *fd)
 	if (!fd)
 		return B_BAD_VALUE;
 	// get the path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
+	KPath path;
+	status_t error = GetPath(&path);
 	if (error != B_OK)
 		return error;
 	// open the device
-	*fd = open(path, flags);
+	*fd = open(path.Path(), flags);
 	if (*fd < 0)
 		return errno;
 	return B_OK;
@@ -71,8 +72,9 @@ KPhysicalPartition::Open(int flags, int *fd)
 status_t
 KPhysicalPartition::PublishDevice()
 {
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
 	if (error != B_OK)
 		return error;
 
@@ -83,23 +85,25 @@ KPhysicalPartition::PublishDevice()
 	info.logical_block_size = BlockSize();
 	info.session = 0;
 	info.partition = ID();
-	if (strlcpy(info.device, Device()->Path(), B_PATH_NAME_LENGTH) > B_PATH_NAME_LENGTH)
+	if (strlcpy(info.device, Device()->Path(), B_PATH_NAME_LENGTH)
+		>= B_PATH_NAME_LENGTH) {
 		return B_NAME_TOO_LONG;
+	}
 
-	return devfs_publish_partition(path, &info);
+	return devfs_publish_partition(path.Path(), &info);
 }
 
 // UnpublishDevice
 status_t
 KPhysicalPartition::UnpublishDevice()
 {
-	// get the entry path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
 	if (error != B_OK)
 		return error;
 
-	return devfs_unpublish_partition(path);
+	return devfs_unpublish_partition(path.Path());
 }
 
 // Mount
