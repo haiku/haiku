@@ -725,7 +725,7 @@ rule SetupKernel
 
 	local _objs = $(1:S=$(SUFOBJ)) ;
 
-	UsePublicHeaders kernel support ;
+	UsePublicHeaders kernel support drivers ;
 	UsePublicHeaders [ FDirName os kernel ] ;
 	UsePrivateHeaders kernel ;
 	UsePosixHeaders ;
