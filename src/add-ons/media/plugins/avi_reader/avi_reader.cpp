@@ -8,11 +8,14 @@
 #include "RawFormats.h"
 #include "avi_reader.h"
 
-#if 0
+//#define TRACE_AVI_READER
+#ifdef TRACE_AVI_READER
   #define TRACE printf
 #else
   #define TRACE(a...)
 #endif
+
+#define ERROR(a...) fprintf(stderr, a)
 
 // http://web.archive.org/web/20030618161228/http://www.microsoft.com/Developer/PRODINFO/directx/dxm/help/ds/FiltDev/DV_Data_AVI_File_Format.htm
 // http://mediaxw.sourceforge.net/files/doc/Video%20for%20Windows%20Reference%20-%20Chapter%204%20-%20AVI%20Files.pdf
@@ -85,7 +88,7 @@ aviReader::Sniff(int32 *streamCount)
 	
 	fFile = new OpenDMLFile();
 	if (B_OK != fFile->SetTo(pos_io_source)) {
-		TRACE("aviReader::Sniff: can't setup OpenDMLFile\n");
+		ERROR("aviReader::Sniff: can't setup OpenDMLFile\n");
 		return B_ERROR;
 	}
 	
@@ -125,7 +128,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	const avi_stream_header *stream_header;
 	stream_header = fFile->StreamFormat(cookie->stream);
 	if (!stream_header) {
-		TRACE("aviReader::GetStreamInfo: stream %d has no header\n", cookie->stream);
+		ERROR("aviReader::GetStreamInfo: stream %d has no header\n", cookie->stream);
 		delete cookie;
 		return B_ERROR;
 	}
@@ -135,7 +138,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	if (fFile->IsAudio(cookie->stream)) {
 		const wave_format_ex *audio_format = fFile->AudioFormat(cookie->stream);
 		if (!audio_format) {
-			TRACE("aviReader::GetStreamInfo: audio stream %d has no format\n", cookie->stream);
+			ERROR("aviReader::GetStreamInfo: audio stream %d has no format\n", cookie->stream);
 			delete cookie;
 			return B_ERROR;
 		}
@@ -200,7 +203,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			else if (audio_format->bits_per_sample <= 32)
 				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
 			else {
-				TRACE("WavReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
+				ERROR("WavReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
 				return B_ERROR;
 			}
 			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
@@ -236,7 +239,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	if (fFile->IsVideo(cookie->stream)) {
 		const bitmap_info_header *video_format = fFile->VideoFormat(cookie->stream);
 		if (!video_format) {
-			TRACE("aviReader::GetStreamInfo: video stream %d has no format\n", cookie->stream);
+			ERROR("aviReader::GetStreamInfo: video stream %d has no format\n", cookie->stream);
 			delete cookie;
 			return B_ERROR;
 		}

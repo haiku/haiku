@@ -3,7 +3,7 @@
 #include "io.h"
 
 status_t ichaudio_attach(audio_drv_t *drv, void **cookie);
-status_t ichaudio_powerctl(audio_drv_t *drv, void *cookie);
+status_t ichaudio_powerctl(audio_drv_t *drv, void *cookie, int op);
 status_t ichaudio_detach(audio_drv_t *drv, void *cookie);
 status_t ichaudio_stream_attach(audio_drv_t *drv, void *cookie, int stream_id);
 status_t ichaudio_stream_detach(audio_drv_t *drv, void *cookie, int stream_id);
@@ -292,11 +292,9 @@ ichaudio_detach(audio_drv_t *drv, void *_cookie)
 
 
 status_t
-ichaudio_powerctl(audio_drv_t *drv, void *_cookie)
+ichaudio_powerctl(audio_drv_t *drv, void *_cookie, int op)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
-
-	return B_OK;
+	return B_ERROR;
 }
 
 void

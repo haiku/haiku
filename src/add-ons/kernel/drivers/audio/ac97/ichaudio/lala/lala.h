@@ -37,7 +37,7 @@ typedef int32 	control_id;
 
 
 typedef status_t (*drv_attach)		(audio_drv_t *drv, void **cookie);
-typedef status_t (*drv_powerctl)	(audio_drv_t *drv, void *cookie);
+typedef status_t (*drv_powerctl)	(audio_drv_t *drv, void *cookie, int op);
 typedef status_t (*drv_detach)		(audio_drv_t *drv, void *cookie);
 
 
