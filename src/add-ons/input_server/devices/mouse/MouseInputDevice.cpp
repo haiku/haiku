@@ -117,6 +117,7 @@ MouseInputDevice::~MouseInputDevice()
 status_t
 MouseInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 {
+	CALLED();
 	mouse_device *device = (mouse_device *)cookie;
 	
 	// retrieve current values
@@ -233,41 +234,41 @@ status_t
 MouseInputDevice::HandleMonitor(BMessage *message)
 {
 	CALLED();
-        int32 opcode = 0;
-        status_t status;
-        if ((status = message->FindInt32("opcode", &opcode)) < B_OK)
-                return status;
-
-        if ((opcode != B_ENTRY_CREATED)
-                && (opcode != B_ENTRY_REMOVED))
-                return B_OK;
-
-
-        BEntry entry;
-        BPath path;
-        dev_t device;
-        ino_t directory;
-        const char *name = NULL;
-
-        message->FindInt32("device", &device);
-        message->FindInt64("directory", &directory);
-        message->FindString("name", &name);
-
-        entry_ref ref(device, directory, name);
-
-        if ((status = entry.SetTo(&ref)) != B_OK)
-                return status;
-        if ((status = entry.GetPath(&path)) != B_OK)
-                return status;
-        if ((status = path.InitCheck()) != B_OK)
-                return status;
-
-        if (opcode == B_ENTRY_CREATED)
-                AddDevice(path.Path());
-        else
-                RemoveDevice(path.Path());
-
-        return status;	
+	int32 opcode = 0;
+	status_t status;
+	if ((status = message->FindInt32("opcode", &opcode)) < B_OK)
+	        return status;
+	
+	if ((opcode != B_ENTRY_CREATED)
+	        && (opcode != B_ENTRY_REMOVED))
+	        return B_OK;
+	
+	
+	BEntry entry;
+	BPath path;
+	dev_t device;
+	ino_t directory;
+	const char *name = NULL;
+	
+	message->FindInt32("device", &device);
+	message->FindInt64("directory", &directory);
+	message->FindString("name", &name);
+	
+	entry_ref ref(device, directory, name);
+	
+	if ((status = entry.SetTo(&ref)) != B_OK)
+	        return status;
+	if ((status = entry.GetPath(&path)) != B_OK)
+	        return status;
+	if ((status = path.InitCheck()) != B_OK)
+	        return status;
+	
+	if (opcode == B_ENTRY_CREATED)
+	        AddDevice(path.Path());
+	else
+	        RemoveDevice(path.Path());
+	
+	return status;	
 }
 
 
@@ -432,12 +433,12 @@ get_short_name(const char *longName)
 	BString name;
 	
 	int32 slash = string.FindLast("/");
-	int32 previousSlash = string.FindLast("/", slash) + 1;
-	string.CopyInto(name, slash, string.Length() - slash);
+	string.CopyInto(name, slash + 1, string.Length() - slash);
+	int32 index = atoi(name.String()) + 1;
 	
-	int32 deviceIndex = atoi(name.String()) + 1;
-	string.CopyInto(name, previousSlash, slash - previousSlash); 
-	name << " mouse " << deviceIndex;
+	int32 previousSlash = string.FindLast("/", slash);
+	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1); 
+	name << " Mouse " << index;
 		
 	return strdup(name.String());
 }
