@@ -88,14 +88,15 @@ void vorbisDecoder::CopyInfoToEncodedFormat(media_format * format) {
 	format->type = B_MEDIA_ENCODED_AUDIO;
 	format->u.encoded_audio.encoding
 	 = (media_encoded_audio_format::audio_encoding)'vorb';
-	if (fInfo.bitrate_nominal) {
+	if (fInfo.bitrate_nominal > 0) {
 		format->u.encoded_audio.bit_rate = fInfo.bitrate_nominal;
-	} else if (fInfo.bitrate_upper) {
+	} else if (fInfo.bitrate_upper > 0) {
 		format->u.encoded_audio.bit_rate = fInfo.bitrate_upper;
-	} else if (fInfo.bitrate_lower) {
+	} else if (fInfo.bitrate_lower > 0) {
 		format->u.encoded_audio.bit_rate = fInfo.bitrate_lower;
 	}
 	CopyInfoToDecodedFormat(&format->u.encoded_audio.output);
+	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
 }	
 
 void vorbisDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
@@ -107,6 +108,9 @@ void vorbisDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
 	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
 		raf->buffer_size = AudioBufferSize(raf->channel_count,raf->format,raf->frame_rate);
     }
+	// setup output variables
+	fFrameSize = (raf->format & 0xf) * fInfo.channels;
+	fOutputBufferSize = raf->buffer_size;
 }
 
 status_t
@@ -118,6 +122,7 @@ vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	//    that we don't support to something more applicable
 	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
 	CopyInfoToDecodedFormat(&ioDecodedFormat->u.raw_audio);
+	// add the media_mult_audio_format fields
 	if (ioDecodedFormat->u.raw_audio.channel_mask == 0) {
 		if (fInfo.channels == 1) {
 			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT;
@@ -125,10 +130,6 @@ vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 		}
 	}
-	// setup rest of the needed variables
-	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * fInfo.channels;
-	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
-
 	return B_OK;
 }
 
