@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-5/2004.
+	Rudolf Cornelissen 10/2002-6/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -87,6 +87,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	bool   usebios;
 	bool   hardcursor;
 	bool   switchhead;
+	bool   force_pci;
 } settings;
 
 /*shared info*/
