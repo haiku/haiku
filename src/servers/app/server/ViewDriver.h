@@ -69,7 +69,7 @@ public:
 class VDWindow : public BWindow
 {
 public:
-	VDWindow(void);
+	VDWindow(BRect frame);
 	~VDWindow(void);
 	void MessageReceived(BMessage *msg);
 	bool QuitRequested(void);

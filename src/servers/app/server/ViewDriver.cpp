@@ -73,6 +73,7 @@ VDWIN_SETCURSOR,
 extern RGBColor workspace_default_color;
 
 bool is_initialized = false;
+BPoint		offset(100,50);
 
 VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
@@ -242,8 +243,8 @@ void VDView::MessageReceived(BMessage *msg)
 	}
 }
 
-VDWindow::VDWindow(void)
-	: BWindow(BRect(100,60,740,540),"OpenBeOS App Server",B_TITLED_WINDOW,
+VDWindow::VDWindow(BRect frame)
+	: BWindow(frame, "OpenBeOS App Server", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	view=new VDView(Bounds());
@@ -461,23 +462,18 @@ void VDWindow::WindowActivated(bool active)
 
 ViewDriver::ViewDriver(void)
 {
-	screenwin=new VDWindow();
+	_displaymode.virtual_width=640;
+	_displaymode.virtual_height=480;
+	_displaymode.space=B_RGBA32;
+
+	screenwin=new VDWindow(BRect(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1).OffsetToCopy(offset));
 	framebuffer=screenwin->view->viewbmp;
 	serverlink=screenwin->view->serverlink;
 	hide_cursor=0;
 	
-	_displaymode.virtual_width=640;
-	_displaymode.virtual_height=480;
-	_displaymode.space=B_RGBA32;
-	
-	// We add this because if we see the default workspace color, then we have at least
-	// a reasonable idea that everything is kosher.
 	framebuffer->Lock();
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
 	framebuffer->AddChild(drawview);
-	drawview->SetHighColor(workspace_default_color.GetColor32());
-	drawview->FillRect(drawview->Bounds());
-	drawview->Sync();
 	framebuffer->Unlock();
 }
 
@@ -494,8 +490,14 @@ ViewDriver::~ViewDriver(void)
 bool ViewDriver::Initialize(void)
 {
 	Lock();
-	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
-	framebuffer->AddChild(drawview);
+
+	// the screen should start black
+	framebuffer->Lock();
+	rgb_color	c; c.red = 0; c.blue = 0; c.green = 0; c.alpha = 255;
+	drawview->SetHighColor(c);
+	drawview->FillRect(drawview->Bounds());
+	drawview->Sync();
+	framebuffer->Unlock();
 
 	hide_cursor=0;
 	obscure_cursor=false;
@@ -520,14 +522,25 @@ void ViewDriver::SetMode(const display_mode &mode)
 {
 	if(!is_initialized)
 		return;
-		
+
+	if (_displaymode.virtual_width==mode.virtual_width &&
+		_displaymode.virtual_height==mode.virtual_height &&
+		_displaymode.space==mode.space)
+	{
+		return;
+	}
+
 	screenwin->Lock();
 	
-	BBitmap *tempbmp=new BBitmap(BRect(0,0,mode.virtual_width-1,mode.virtual_height-1),
+	BBitmap *tempbmp=new BBitmap(BRect(0,0,mode.virtual_width-1, mode.virtual_height-1),
 		(color_space)mode.space,true);
 
 	if(!tempbmp)
+	{
+		screenwin->Unlock();
+		delete tempbmp;
 		return;
+	}
 	
 	if(!tempbmp->IsValid())
 	{
@@ -537,14 +550,19 @@ void ViewDriver::SetMode(const display_mode &mode)
 	}
 	
 	delete framebuffer;
-	
+
+	screenwin->ResizeTo(mode.virtual_width-1, mode.virtual_height-1);
+
 	screenwin->view->viewbmp=tempbmp;
 	framebuffer=screenwin->view->viewbmp;
+
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
 	framebuffer->AddChild(drawview);
 
+	// the screen should start black
 	framebuffer->Lock();
-	drawview->SetHighColor(workspace_default_color.GetColor32());
+	rgb_color	c; c.red = 0; c.blue = 0; c.green = 0; c.alpha = 255;
+	drawview->SetHighColor(c);//workspace_default_color.GetColor32());
 	drawview->FillRect(drawview->Bounds());
 	drawview->Sync();
 	framebuffer->Unlock();
