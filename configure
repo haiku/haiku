@@ -50,6 +50,12 @@ standard_gcc_settings()
 	if [ "x${PLATFORM_HEADERS}" == "x" ] ; then
 		PLATFORM_HEADERS="${gccdir}/include"
 	fi
+	if [ "${LIBGCC_DIR}" == "" ] ; then
+		LIBGCC_DIR="${gccdir}"
+	fi
+	if [ "${LIBGCC_OBJECTS}" == "" ] ; then
+		LIBGCC_OBJECTS=`ar t ${gccdir}/libgcc.a`
+	fi
 }
 
 # default parameter values
@@ -105,6 +111,8 @@ FLOPPY_PATH			?= "${floppy}" ;
 PLATFORM_LINKLIBS	?= ${PLATFORM_LINKLIBS} ;
 PLATFORM_HEADERS	?= ${PLATFORM_HEADERS} ;
 GCC_RAW_VERSION		?= ${gcc_version} ;
+LIBGCC_DIR			?= ${LIBGCC_DIR} ;
+LIBGCC_OBJECTS		?= ${LIBGCC_OBJECTS} ;
 BOCHS_DEBUG_HACK	?= ${bochs_debug} ;
 INCLUDE_GPL_ADDONS	?= ${include_gpl_addons} ;
 EOF
