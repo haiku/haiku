@@ -80,9 +80,9 @@ do_div(uint64 *_number, uint32 base)
 
 
 static bool
-put_padding(char **_buffer, size_t *_bytesLeft, int32 count)
+put_padding(char **_buffer, int32 *_bytesLeft, int32 count)
 {
-	int32 left = (int32)*_bytesLeft;
+	int32 left = *_bytesLeft;
 	char *string = *_buffer;
 	int32 written;
 	bool allWritten;
@@ -104,16 +104,16 @@ put_padding(char **_buffer, size_t *_bytesLeft, int32 count)
 		*string++ = ' ';
 
 	*_buffer = string;
-	*_bytesLeft = (size_t)(left - written);
+	*_bytesLeft = left - written;
 
 	return allWritten;
 }
 
 
 static inline bool
-put_string(char **_buffer, size_t *_bytesLeft, const char *source, size_t length)
+put_string(char **_buffer, int32 *_bytesLeft, const char *source, int32 length)
 {
-	size_t left = *_bytesLeft;
+	int32 left = *_bytesLeft;
 	char *target = *_buffer;
 	bool allWritten;
 
@@ -145,9 +145,9 @@ put_string(char **_buffer, size_t *_bytesLeft, const char *source, size_t length
 
 
 static inline bool
-put_character(char **_buffer, size_t *_bytesLeft, char c)
+put_character(char **_buffer, int32 *_bytesLeft, char c)
 {
-	size_t left = *_bytesLeft;
+	int32 left = *_bytesLeft;
 	char *string = *_buffer;
 
 	if (left > 0) {
@@ -237,8 +237,9 @@ number(char *str, long long num, unsigned base, int size, int precision, int typ
 
 
 int
-vsnprintf(char *buffer, size_t bytesLeft, const char *format, va_list args)
+vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 {
+	int32 bytesLeft;
 	uint64 num;
 	int base;
 	char *string;
@@ -248,8 +249,12 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *format, va_list args)
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
-	bytesLeft--;
-		// make space for the terminating '\0' byte
+	if (buffer == NULL || bufferSize == 0)
+		return 0;
+
+	bytesLeft = ((int32)bufferSize - 1) & 0x7fffffff;
+		// make space for the terminating '\0' byte, and we
+		// only allow 2G characters :)
 
 	for (string = buffer; format[0] && bytesLeft > 0; format++) {
 		if (format[0] != '%') {
