@@ -73,9 +73,9 @@ int dev_init(kernel_args *ka)
 image_id
 dev_load_dev_module(const char *name, const char *dirpath)
 {
-	image_id id;
+	image_id image;
 	char path[SYS_MAX_PATH_LEN];
-	uint32 *api_version;
+	uint32 *api_version = NULL;
 	status_t (*init_hardware)(void);
 	status_t (*init_driver)(void);
 	status_t (*uninit_driver)(void);
@@ -83,66 +83,57 @@ dev_load_dev_module(const char *name, const char *dirpath)
 	const char **(*publish_devices)(void);
 	const char **devfs_paths;
 	bool keep_loaded;
-		
+	status_t status;
+
 	sprintf(path, "%s/%s", dirpath, name);
 
 	/* Load the module, return error if unable */
-	id = elf_load_kspace(path, "");
-	if (id < 0)
-		return id;
+	image = load_kernel_add_on(path);
+	if (image < 0)
+		return image;
 
 	/* Don't get all the symbols we will require initially. Just get the
 	 * ones we need to check we have a valid module.
-	 * elf_find_symbol is an extra call and so we don't make it more often
-	 * than we have to.
 	 */
-	/* For a valid device driver we MUST have the publish_devices and 
-	 * find_device functions available
-	 */
-	/* XXX - very few drivers have the api_version symbol defined yet.
-	 *       Add api_version to the rest of the drivers!
-	 */
-	api_version = (uint32 *) elf_lookup_symbol(id, "api_version");
-	publish_devices = (void *) elf_lookup_symbol(id, "publish_devices");
-	find_device = (void *) elf_lookup_symbol(id, "find_device");
 
-	if (publish_devices == NULL || find_device == NULL) {
+	// For a valid device driver the following exports are required
+	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT, (void **)&publish_devices) != B_OK
+		|| get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK
+		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT, (void **)&find_device) != B_OK) {
 		dprintf("DEV: %s: mandatory driver symbol(s) missing! :(\n", name);
-		id = EINVAL;
+		status = EINVAL;
 		goto error;
 	}
-	/* ToDo: we should fail if the driver doesn't export the api_version,
-	 * but right now, there are some drivers in our tree that doesn't...
-	 */
-	if (api_version == NULL)
-		dprintf("driver \"%s\" has no api_version set!\n", name);
 
 	/* Next, do we have an init_hardware function? If we do run it and
 	 * if it fails simply fall through to the exit...
 	 */
-	init_hardware = (void *) elf_lookup_symbol(id, "init_hardware");
-	if (init_hardware && init_hardware() != 0) {
+	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_hardware) == B_OK
+		&& init_hardware() != B_OK) {
 		dprintf("DEV: %s: init_hardware failed :(\n", name);
-		id = ENXIO;
+		status = ENXIO;
 		goto error;
 	}
 
 	/* OK, so we now have what appears to be a valid module that has
 	 * completed init_hardware and thus thinks it should be used.
-	 * XXX - this is bogus!
-	 * XXX - the driver init routines should be called by devfs and 
+	 * ToDo:
+	 *  - this is bogus!
+	 *  - the driver init routines should be called by devfs and 
 	 *       only when the driver is first needed. However, that level
 	 *       level of support is not yet in devfs, so we have a hack
 	 *       here that calls the init_driver function at this point.
 	 *       As a result we will check to see if we actually manage to
 	 *       publish the device, and if we do we will keep the module
 	 *       loaded.
-	 * XXX - remove this when devfs is fixed!
+	 *  - remove this when devfs is fixed!
 	 */
-	init_driver = (void *) elf_lookup_symbol(id, "init_driver");
-	if (init_driver && init_driver() != 0) {
+	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_driver) == B_OK
+		&& init_driver() != B_OK) {
 		dprintf("DEV: %s: init_driver failed :(\n", name);
-		id = ENXIO;
+		status = ENXIO;
 		goto error;
 	}
 
@@ -167,7 +158,7 @@ dev_load_dev_module(const char *name, const char *dirpath)
 	 * XXX - This is bogus, see above
 	 */
 	if (keep_loaded)
-		return id;
+		return image;
 
 	/* If the function gets here then the following has happenned...
 	 * - the driver has been loaded
@@ -178,19 +169,19 @@ dev_load_dev_module(const char *name, const char *dirpath)
 	 *   devfs_publish_device has for some reason failed on each path.
 	 */
 
-	uninit_driver = (void *) elf_lookup_symbol(id, "uninit_driver");
-	if (uninit_driver)
+	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
+			(void **)&uninit_driver) == B_OK)
 		uninit_driver();
 
 	// ToDo: That might not be the best error code
-	id = ENXIO;
+	status = ENXIO;
 
 error:
 	/* If we've gotten here then the driver will be unloaded and an
 	 * error code returned.
 	 */
-	elf_unload_kspace(path);
-	return id;
+	unload_kernel_add_on(image);
+	return status;
 }
 
 
