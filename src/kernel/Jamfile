@@ -313,6 +313,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!stdlib>radixsort.o
 	<$(SOURCE_GRIST)!libc!stdlib>rand.o
 	<$(SOURCE_GRIST)!libc!stdlib>random.o
+	<$(SOURCE_GRIST)!libc!stdlib>realpath.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
 
@@ -438,6 +439,7 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!stdlib>radixsort.o
 	<$(SOURCE_GRIST)!libc!stdlib>rand.o
 	<$(SOURCE_GRIST)!libc!stdlib>random.o
+	<$(SOURCE_GRIST)!libc!stdlib>realpath.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
 
