@@ -1,3 +1,29 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		PortLink.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	Class for low-overhead port-based messaging
+//  
+//------------------------------------------------------------------------------
 #include <ServerProtocol.h>
 #include "PortLink.h"
 #include "PortMessage.h"
@@ -60,10 +86,10 @@ status_t PortLink::Flush(bigtime_t timeout=B_INFINITE_TIMEOUT)
 		return B_BAD_VALUE;
 	
 	if(timeout!=B_INFINITE_TIMEOUT)
-		write_stat=write_port_etc(fSendPort, AS_SERVER_SESSION, fSendBuffer,
+		write_stat=write_port_etc(fSendPort, fSendCode, fSendBuffer,
 									fSendPosition, B_TIMEOUT, timeout);
 	else
-		write_stat=write_port(fSendPort, AS_SERVER_SESSION, fSendBuffer, fSendPosition);
+		write_stat=write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
 	
 	fSendPosition=4;
 
@@ -79,7 +105,7 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE
 	Attach<int32>(fReceivePort);
 
 	// Flush the thing....FOOSH! :P
-	write_port(fSendPort, AS_SERVER_SESSION, fSendBuffer, fSendPosition);
+	write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
 	fSendPosition	= 4;
 	
 	// Now we wait for the reply
@@ -88,27 +114,21 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE
 	int32 rcode;
 	
 	if( timeout == B_INFINITE_TIMEOUT )
-	{
 		rbuffersize	= port_buffer_size(fReceivePort);
-		if( rbuffersize > 0 )
-			rbuffer	= new int8[rbuffersize];
-		read_port( fReceivePort, &rcode, rbuffer, rbuffersize);
-	}
 	else
 	{
 		rbuffersize	= port_buffer_size_etc( fReceivePort, 0, timeout);
 		if( rbuffersize == B_TIMED_OUT )
 			return B_TIMED_OUT;
-			
-		if( rbuffersize > 0 )
-			rbuffer	= new int8[rbuffersize];
-		read_port( fReceivePort, &rcode, rbuffer, rbuffersize);
 	}
+
+	if( rbuffersize > 0 )
+		rbuffer	= new int8[rbuffersize];
+	read_port( fReceivePort, &rcode, rbuffer, rbuffersize);
 
 	// We got this far, so we apparently have some data
 	msg->SetCode(rcode);
 	msg->SetBuffer(rbuffer,rbuffersize,false);
-	msg->BSessionWorkaround();
 	
 	return B_OK;
 }

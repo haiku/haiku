@@ -30,6 +30,7 @@
 #include <InterfaceDefs.h>
 #include <ServerProtocol.h>
 #include <Screen.h>
+#include <PortMessage.h>
 #include <Roster.h>
 
 
@@ -52,11 +53,11 @@ _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 res, bool stick)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_SET_SCREEN_MODE);
-	link.WriteInt32(index);
-	link.WriteInt32((int32)res);
-	link.WriteBool(stick);
-	link.Sync();
+	link.SetOpCode(AS_SET_SCREEN_MODE);
+	link.Attach<int32>(index);
+	link.Attach<int32>((int32)res);
+	link.Attach<bool>(stick);
+	link.Flush();
 
 	//TODO: Read back the status from the app_server's reply
 	return B_OK;
@@ -70,10 +71,11 @@ set_scroll_bar_info(scroll_bar_info *info)
 		return B_ERROR;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_SET_SCROLLBAR_INFO);
-	link.WriteData(info, sizeof(scroll_bar_info));
-	link.Sync();
-	link.ReadData(info,sizeof(scroll_bar_info));
+	PortMessage msg;
+	
+	link.SetOpCode(AS_SET_SCROLLBAR_INFO);
+	link.Attach<scroll_bar_info>(*info);
+	link.FlushWithReply(&msg);
 	return B_OK;
 }
 
@@ -252,9 +254,10 @@ count_workspaces()
 	int32 count;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_COUNT_WORKSPACES);
-	link.Sync();
-	link.ReadInt32(&count);
+	PortMessage msg;
+	link.SetOpCode(AS_COUNT_WORKSPACES);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&count);
 	return count;
 }
 
@@ -263,9 +266,9 @@ _IMPEXP_BE void
 set_workspace_count(int32 count)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_SET_WORKSPACE_COUNT);
-	link.WriteInt32(count);
-	link.Sync();
+	link.SetOpCode(AS_SET_WORKSPACE_COUNT);
+	link.Attach<int32>(count);
+	link.Flush();
 }
 
 
@@ -275,9 +278,10 @@ current_workspace()
 	int32 index;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_CURRENT_WORKSPACE);
-	link.Sync();
-	link.ReadInt32(&index);
+	PortMessage msg;
+	link.SetOpCode(AS_CURRENT_WORKSPACE);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&index);
 	
 	return index;
 }
@@ -287,9 +291,9 @@ _IMPEXP_BE void
 activate_workspace(int32 workspace)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_ACTIVATE_WORKSPACE);
-	link.WriteInt32(workspace);
-	link.Sync();
+	link.SetOpCode(AS_ACTIVATE_WORKSPACE);
+	link.Attach<int32>(workspace);
+	link.Flush();
 }
 
 
@@ -299,9 +303,10 @@ idle_time()
 	bigtime_t idletime;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_IDLE_TIME);
-	link.Sync();
-	link.ReadInt64(&idletime);
+	PortMessage msg;
+	link.SetOpCode(AS_IDLE_TIME);
+	link.FlushWithReply(&msg);
+	msg.Read<int64>(&idletime);
 	
 	return idletime;
 }
@@ -336,9 +341,9 @@ _IMPEXP_BE void
 set_focus_follows_mouse(bool follow)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_SET_FOCUS_FOLLOWS_MOUSE);
-	link.WriteBool(follow);
-	link.Sync();
+	link.SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
+	link.Attach<bool>(follow);
+	link.Flush();
 }
 
 
@@ -348,9 +353,10 @@ focus_follows_mouse()
 	bool ffm;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_FOCUS_FOLLOWS_MOUSE);
-	link.Sync();
-	link.ReadBool(&ffm);
+	PortMessage msg;
+	link.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
+	link.FlushWithReply(&msg);
+	msg.Read<bool>(&ffm);
 	return ffm;
 }
 
@@ -359,9 +365,9 @@ _IMPEXP_BE void
 set_mouse_mode(mode_mouse mode)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_SET_MOUSE_MODE);
-	link.WriteData(&mode,sizeof(mode_mouse));
-	link.Sync();
+	link.SetOpCode(AS_SET_MOUSE_MODE);
+	link.Attach<mode_mouse>(mode);
+	link.Flush();
 }
 
 
@@ -371,9 +377,10 @@ mouse_mode()
 	mode_mouse mode;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_GET_MOUSE_MODE);
-	link.Sync();
-	link.ReadData(&mode,sizeof(mode_mouse));
+	PortMessage msg;
+	link.SetOpCode(AS_GET_MOUSE_MODE);
+	link.FlushWithReply(&msg);
+	msg.Read<mode_mouse>(&mode);
 	return mode;
 }
 
@@ -384,10 +391,11 @@ ui_color(color_which which)
 	rgb_color color;
 	
 	BAppServerLink link;
-	link.WriteInt32(AS_GET_UI_COLOR);
-	link.WriteData(&which, sizeof(which));
-	link.Sync();
-	link.ReadData(&color,sizeof(rgb_color));
+	PortMessage msg;
+	link.SetOpCode(AS_GET_UI_COLOR);
+	link.Attach<color_which>(which);
+	link.FlushWithReply(&msg);
+	msg.Read<rgb_color>(&color);
 	return color;
 }
 
@@ -448,7 +456,7 @@ bitmaps_support_space(color_space space, uint32 * support_flags)
 void __set_window_decor(int32 theme)
 {
 	BAppServerLink link;
-	link.WriteInt32(AS_R5_SET_DECORATOR);
-	link.WriteInt32(theme);
-	link.Sync();
+	link.SetOpCode(AS_R5_SET_DECORATOR);
+	link.Attach<int32>(theme);
+	link.Flush();
 }

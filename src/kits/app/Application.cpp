@@ -378,33 +378,31 @@ void BApplication::ShowCursor()
 {
 	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
 	int32 foo=AS_SHOW_CURSOR;
-	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
+	write_port(fServerTo,AS_SHOW_CURSOR,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::HideCursor()
 {
 	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
 	int32 foo=AS_HIDE_CURSOR;
-	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
+	write_port(fServerTo,AS_HIDE_CURSOR,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::ObscureCursor()
 {
 	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
 	int32 foo=AS_OBSCURE_CURSOR;
-	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
+	write_port(fServerTo,AS_OBSCURE_CURSOR,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsCursorHidden() const
 {
-	int32 replycode;
+	PortMessage msg;
 	
 	BPrivate::BAppServerLink link;
-	link.WriteInt32(AS_QUERY_CURSOR_HIDDEN);
-	link.WriteInt32(link.GetRecvPort());
-	link.Sync();
-	link.ReadInt32(&replycode);
-	return (replycode==SERVER_TRUE)?true:false;
+	link.SetOpCode(AS_QUERY_CURSOR_HIDDEN);
+	link.FlushWithReply(&msg);
+	return (msg.Code()==SERVER_TRUE)?true:false;
 }
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const void* cursor)
@@ -419,18 +417,15 @@ void BApplication::SetCursor(const void* cursor)
 void BApplication::SetCursor(const BCursor* cursor, bool sync)
 {
 	BPrivate::BAppServerLink link;
-	link.WriteInt32(AS_SET_CURSOR_BCURSOR);
-	link.WriteBool(sync);
-	link.WriteInt32(cursor->m_serverToken);
+	PortMessage msg;
+	
+	link.SetOpCode(AS_SET_CURSOR_BCURSOR);
+	link.Attach<bool>(sync);
+	link.Attach<int32>(cursor->m_serverToken);
 	if(sync)
-		link.WriteInt32(link.GetRecvPort());
-	link.Sync();
-
-	if(sync)
-	{
-		int32 foo;
-		link.ReadInt32(&foo);
-	}
+		link.FlushWithReply(&msg);
+	else
+		link.Flush();
 }
 //------------------------------------------------------------------------------
 int32 BApplication::CountWindows() const
@@ -804,16 +799,16 @@ void BApplication::InitData(const char* signature, status_t* error)
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 {
 	BPrivate::BAppServerLink link;
-	link.WriteInt32(AS_BEGIN_RECT_TRACKING);
-	link.WriteRect(r);
-	link.WriteInt32(trackWhole);
-	link.Sync();
+	link.Attach<int32>(AS_BEGIN_RECT_TRACKING);
+	link.Attach<BRect>(r);
+	link.Attach<int32>(trackWhole);
+	link.Flush();
 }
 //------------------------------------------------------------------------------
 void BApplication::EndRectTracking()
 {
 	int32 foo=AS_END_RECT_TRACKING;
-	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
+	write_port(fServerTo,AS_END_RECT_TRACKING,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::get_scs()

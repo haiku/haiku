@@ -10,7 +10,7 @@ BSession::BSession(port_id receivePort, port_id sendPort, bool isPortLink = fals
 	fSendPort		= sendPort;
 	fReceivePort	= receivePort;
 
-	fSendCode			= AS_SERVER_SESSION;
+	fSendCode			= 0;
 	fSendBuffer			= NULL;
 	fSendPosition		= 4;
 
@@ -28,7 +28,7 @@ BSession::BSession( const BSession &ses){
 	fSendPort		= ses.fSendPort;
 	fReceivePort	= ses.fReceivePort;
 
-	fSendCode			= AS_SERVER_SESSION;
+	fSendCode			= 0;
 	fSendBuffer			= NULL;
 	fSendPosition		= 4;
 
@@ -40,8 +40,7 @@ BSession::BSession( const BSession &ses){
 	fReceiveBuffer		= (char*)malloc(1024);
 }
 //------------------------------------------------------------------------------
-BSession::~BSession()
-{
+BSession::~BSession(){
 	free(fSendBuffer);
 	free(fReceiveBuffer);
 }
@@ -54,13 +53,15 @@ void BSession::SetRecvPort( port_id port ){
 	fReceivePort	= port;
 }
 //------------------------------------------------------------------------------
-bool BSession::DropInputBuffer(void)
-{
+bool BSession::DropInputBuffer(void){
 	// TODO: Implement
 }
 //------------------------------------------------------------------------------
-char *BSession::ReadString()
-{
+void BSession::SetMsgCode(int32 code){
+	fSendCode=code;
+}
+//------------------------------------------------------------------------------
+char *BSession::ReadString(){
 	int16		len = 0;
 	char		*str = NULL;
 
@@ -190,16 +191,15 @@ status_t BSession::ReadData( void *data, int32 size)
 		{
 			int32 		fRecvCode;
 			status_t	rv;
-			do{
-				while( (rv = read_port(fReceivePort, &fRecvCode, fReceiveBuffer, 1024)) ==
-					B_WOULD_BLOCK);
-			} while( fRecvCode != AS_SERVER_SESSION && rv != B_BAD_PORT_ID );
+			while( (rv = port_buffer_size(fReceivePort) ) == B_WOULD_BLOCK);
+					
+			rv=read_port(fReceivePort, &fRecvCode, fReceiveBuffer, 1024);
 			
 			if ( rv == B_BAD_PORT_ID )
 				return B_BAD_PORT_ID;
 			
-			fReceivePosition = 4;
-			fReceiveSize = *(int32*)fReceiveBuffer;
+			fReceivePosition = 0;
+			fReceiveSize = rv;
 		}
 
 		int32 copySize = fReceiveSize - fReceivePosition;
@@ -389,7 +389,7 @@ status_t BSession::Sync()
 	
 	status_t	rv;
 
-	*(int32*)fSendBuffer = fSendPosition;
+	*(int32*)fSendBuffer = fSendCode;
 	while( (rv = write_port(fSendPort, fSendCode, fSendBuffer,
 		fSendPosition)) == B_WOULD_BLOCK);
 	

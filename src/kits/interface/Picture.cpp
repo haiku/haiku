@@ -38,6 +38,7 @@
 #include <Errors.h>
 #include <List.h>
 #include <AppServerLink.h>
+#include <PortMessage.h>
 #include <ServerProtocol.h>
 
 // Project Includes ------------------------------------------------------------
@@ -84,11 +85,12 @@ BPicture::BPicture(const BPicture &picture)
 	{
 
 		BPrivate::BAppServerLink link;
+		PortMessage msg;
 
-		link.WriteInt32(AS_CLONE_PICTURE);
-		link.WriteInt32(picture.token);
-		link.Sync();
-		link.ReadInt32(&token);
+		link.Attach<int32>(AS_CLONE_PICTURE);
+		link.Attach<int32>(picture.token);
+		link.FlushWithReply(&msg);
+		msg.Read<int32>(&token);
 
 	}
 	if (picture.extent->fNewData != NULL)
@@ -158,20 +160,21 @@ BPicture::BPicture(BMessage *archive)
 		if (extent->fNewSize != 0 && extent->fNewData != 0)
 		{
 			BPrivate::BAppServerLink link;
+		PortMessage msg;
 			BPicture *pic;
 			
-			link.WriteInt32(AS_CREATE_PICTURE);
-			link.WriteInt32(extent->fPictures.CountItems());
+			link.Attach<int32>(AS_CREATE_PICTURE);
+			link.Attach<int32>(extent->fPictures.CountItems());
 			for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
 			{
 				pic=(BPicture*)extent->fPictures.ItemAt(i);
 				if(pic)
-					link.WriteInt32(pic->token);
+					link.Attach<int32>(pic->token);
 			}
-			link.WriteInt32(extent->fNewSize);
-			link.WriteData(extent->fNewData,extent->fNewSize);
-			link.Sync();
-			link.ReadInt32(&token);
+			link.Attach<int32>(extent->fNewSize);
+			link.Attach(extent->fNewData,extent->fNewSize);
+			link.FlushWithReply(&msg);
+			msg.Read<int32>(&token);
 		}
 	}
 
@@ -202,9 +205,9 @@ BPicture::~BPicture()
 	{
 		BPrivate::BAppServerLink link;
 
-		link.WriteInt32(AS_DELETE_PICTURE);
-		link.WriteInt32(token);
-		link.Sync();
+		link.Attach<int32>(AS_DELETE_PICTURE);
+		link.Attach<int32>(token);
+		link.Flush();
 	}
 
 	if (extent->fNewData != NULL)
@@ -338,20 +341,21 @@ status_t BPicture::Unflatten(BDataIO *stream)
 //	swap_data(extent->fNewData, extent->fNewSize);
 
 	BPrivate::BAppServerLink link;
+	PortMessage msg;
 	BPicture *pic;
 
-	link.WriteInt32(AS_CREATE_PICTURE);
-	link.WriteInt32(extent->fPictures.CountItems());
+	link.Attach<int32>(AS_CREATE_PICTURE);
+	link.Attach<int32>(extent->fPictures.CountItems());
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
 	{
 		pic=(BPicture*)extent->fPictures.ItemAt(i);
 		if(pic)
-			link.WriteInt32(pic->token);
+			link.Attach<int32>(pic->token);
 	}
-	link.WriteInt32(extent->fNewSize);
-	link.WriteData(extent->fNewData, extent->fNewSize);
-	link.Sync();
-	link.ReadInt32(&token);
+	link.Attach<int32>(extent->fNewSize);
+	link.Attach(extent->fNewData, extent->fNewSize);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&token);
 
 	if (extent->fNewData)
 	{
@@ -391,17 +395,18 @@ void BPicture::import_data(const void *data, int32 size, BPicture **subs,
 		return;
 
 	BPrivate::BAppServerLink link;
-
-	link.WriteInt32(AS_CREATE_PICTURE);
-	link.WriteInt32(subCount);
+	PortMessage msg;
+	
+	link.Attach<int32>(AS_CREATE_PICTURE);
+	link.Attach<int32>(subCount);
 
 	for (int32 i = 0; i < subCount; i++)
-		link.WriteInt32(subs[i]->token);
+		link.Attach<int32>(subs[i]->token);
 
-	link.WriteInt32(size);
-	link.WriteData(data, size);
-	link.Sync();
-	link.ReadInt32(&token);
+	link.Attach<int32>(size);
+	link.Attach(data, size);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&token);
 }
 //------------------------------------------------------------------------------
 void BPicture::import_old_data(const void *data, int32 size)
@@ -416,12 +421,12 @@ void BPicture::import_old_data(const void *data, int32 size)
 	convert_old_to_new(data, size, &extent->fNewData, &extent->fNewSize);
 
 	BPrivate::BAppServerLink link;
-	link.WriteInt32(AS_CREATE_PICTURE);
-	link.WriteInt32(0L);
-	link.WriteInt32(extent->fNewSize);
-	link.WriteData(extent->fNewData,extent->fNewSize);
-	link.Sync();
-	link.ReadInt32(&token)
+	link.Attach<int32>(AS_CREATE_PICTURE);
+	link.Attach<int32>(0L);
+	link.Attach<int32>(extent->fNewSize);
+	link.Attach(extent->fNewData,extent->fNewSize);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&token)
 	
 	// Do we free all data now?
 	free(extent->fNewData);
@@ -448,9 +453,9 @@ bool BPicture::assert_local_copy()
 /*	BPrivate::BAppServerLink link;
 	int32 count;
 
-	link.WriteInt32(AS_DOWNLOAD_PICTURE);
-	link.WriteInt32(token);
-	link.Sync();
+	link.Attach<int32>(AS_DOWNLOAD_PICTURE);
+	link.Attach<int32>(token);
+	link.FlushWithReply(&msg);
 	count=*((int32*)replydata.buffer);
 
 	// Read sub picture tokens
@@ -496,14 +501,14 @@ bool BPicture::assert_server_copy()
 		extent->fPictures.ItemAt(i)->assert_server_copy();
 
 	BPrivate::BAppServerLink link;
-	link.WriteInt32(AS_CREATE_PICTURE);
-	link.WriteInt32(extent->fPictures.CountItems());
+	link.Attach<int32>(AS_CREATE_PICTURE);
+	link.Attach<int32>(extent->fPictures.CountItems());
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		link.WriteInt32(extent->fPictures.ItemAt(i)->token);
-	link.WriteInt32(extent->fNewSize);
-	link.WriteData(extent->fNewData,extent->fNewSize);
-	link.Sync();
-	link.ReadInt32(&token);
+		link.Attach<int32>(extent->fPictures.ItemAt(i)->token);
+	link.Attach<int32>(extent->fNewSize);
+	link.Attach(extent->fNewData,extent->fNewSize);
+	link.FlushWithReply(&msg);
+	msg.Read<int32>(&token);
 
 	return token != -1;*/
 	return true;
@@ -543,9 +548,9 @@ void BPicture::usurp(BPicture *lameDuck)
 	{
 		BPrivate::BAppServerLink link;
 
-		link.WriteInt32(AS_DELETE_PICTURE);
-		link.WriteInt32(token);
-		link.Sync();
+		link.Attach<int32>(AS_DELETE_PICTURE);
+		link.Attach<int32>(token);
+		link.Flush();
 	}
 
 	if (extent->fNewData != NULL)
