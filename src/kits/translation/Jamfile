@@ -12,6 +12,9 @@ LinkSharedOSLibs libtranslation.so :
 	be
 ;
 
+MakeLocate <develop>libtranslation.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libtranslation.so : libtranslation.so ;
+
 Package openbeos-translationkit-cvs :
 	README.html ;
 
