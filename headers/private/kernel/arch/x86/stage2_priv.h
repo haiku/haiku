@@ -5,7 +5,7 @@
 #ifndef _STAGE2_PRIV_H
 #define _STAGE2_PRIV_H
 
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <ktypes.h>
 
 extern void _start(uint32 mem, int in_vesa, uint32 vesa_ptr);

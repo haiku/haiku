@@ -5,7 +5,7 @@
 #ifndef _KERNEL_ARCH_x86_STAGE2_H
 #define _KERNEL_ARCH_x86_STAGE2_H
 
-#include <stage2_struct.h>
+#include <boot/stage2_struct.h>
 
 #define MAX_BOOT_PTABLES 4
 
