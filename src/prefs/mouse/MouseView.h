@@ -18,47 +18,38 @@
 #define MOUSE_VIEW_H
 
 
-#include <Box.h>
+#include <View.h>
 #include <Bitmap.h>
-#include <Button.h>
-#include <Slider.h>
 #include <PopUpMenu.h>
 
 
 class MouseSettings;
 
-class MouseView : public BBox {
+class MouseView : public BView {
 	public:
-		MouseView(BRect frame, MouseSettings &settings);
+		MouseView(BRect frame, const MouseSettings &settings);
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
 		virtual void Draw(BRect frame);
 		virtual void Pulse();
+		virtual void GetPreferredSize(float *_width, float *_height);
 
-		void Init();
-
-		BSlider		*dcSpeedSlider, *mouseSpeedSlider, *mouseAccSlider;
-		BPopUpMenu	*mouseTypeMenu, *focusMenu, *mouseMapMenu;
-
-		bigtime_t 	fClickSpeed;
-		int32 		fMouseSpeed;
-		int32 		fMouseAcc;
-		int32 		fMouseType;
-		mode_mouse 	fMouseMode;
-		mouse_map 	fMouseMap, fCurrentMouseMap;
-		int32		fCurrentButton;
+		void SetMouseType(int32 type);
+		void UpdateFromSettings();
 
 	private:
-		typedef BBox inherited;
+		int32 ConvertFromVisualOrder(int32 button);
 
-		MouseSettings	&fSettings;
+		typedef BView inherited;
 
+		const MouseSettings &fSettings;
+		BBitmap		*fMouseBitmap, *fMouseDownBitmap;
+		mouse_map 	fCurrentMouseMap;
+
+		int32		fType;
 		uint32		fButtons;
 		uint32		fOldButtons;
-
-		BBitmap 		*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
-		BBitmap			*fMouseBitmap, *fMouseDownBitmap;
 };
 
 #endif	/* MOUSE_VIEW_H */
