@@ -71,13 +71,6 @@ operator delete[](void *ptr) throw ()
 	free(ptr);
 }
 
-// only needed in the boot loader
-#ifndef _BOOT_MODE
-
-extern "C" void __pure_virtual();
-
-#endif	// #if _BOOT_MODE
-
 #endif	// #if _KERNEL_MODE
 
 #endif	// __cplusplus

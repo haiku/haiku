@@ -4,10 +4,16 @@
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
-// stripped down C++ support for the boot loader
-#ifdef _BOOT_MODE
-
 #include "util/kernel_cpp.h"
+
+#ifdef _BOOT_MODE
+#	include <boot/platform.h>
+#elif defined(_KERNEL_MODE)
+#	include <KernelExport.h>
+#endif
+
+// Always define the symbols needed when not linking against libgcc.a --
+// we simply override them.
 
 const nothrow_t std::nothrow = {};
 
@@ -16,7 +22,7 @@ const nothrow_t std::nothrow = {};
 extern "C" void
 __pure_virtual()
 {
-	//printf("pure virtual function call");
+	panic("pure virtual function call\n");
 }
 
 #elif __GNUC__ >= 3
@@ -24,19 +30,15 @@ __pure_virtual()
 extern "C" void
 __cxa_pure_virtual()
 {
+	panic("pure virtual function call\n");
 }
 
 #endif
 
-
 // full C++ support in the kernel
-#elif _KERNEL_MODE	// #endif _BOOT_MODE
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 
 #include <stdio.h>
-
-#include <KernelExport.h>
-
-#include "util/kernel_cpp.h"
 
 FILE *stderr = NULL;
 
