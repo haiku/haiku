@@ -9,7 +9,7 @@ UseFreeTypeHeaders ;
 # later used in #include statements related to the cache sub-system.  It
 # needs to be parsed through a HDRMACRO rule for macro definitions.
 #
-# HDRMACRO  [ FT2_SubDir  include ftcache.h ] ;
+#HDRMACRO  [ FT2_SubDir  include ftcache.h ] ;
 
 {
   local  _sources ;

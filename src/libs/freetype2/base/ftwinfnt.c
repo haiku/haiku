@@ -1,8 +1,8 @@
 /***************************************************************************/
 /*                                                                         */
-/*  pfrcmap.h                                                              */
+/*  ftwinfnt.c                                                             */
 /*                                                                         */
-/*    FreeType PFR cmap handling (specification).                          */
+/*    FreeType API for accessing Windows FNT specific info (body).         */
 /*                                                                         */
 /*  Copyright 2002 by                                                      */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
@@ -16,31 +16,40 @@
 /***************************************************************************/
 
 
-#ifndef __PFRCMAP_H__
-#define __PFRCMAP_H__
-
 #include <ft2build.h>
+#include FT_WINFONTS_H
+#include FT_INTERNAL_FNT_TYPES_H
 #include FT_INTERNAL_OBJECTS_H
-#include "pfrtypes.h"
 
 
-FT_BEGIN_HEADER
-
-  typedef struct  PFR_CMapRec_
+  FT_EXPORT_DEF( FT_Error )
+  FT_Get_WinFNT_Header( FT_Face              face,
+                        FT_WinFNT_HeaderRec *header )
   {
-    FT_CMapRec  cmap;
-    FT_UInt     num_chars;
-    PFR_Char    chars;
-  
-  } PFR_CMapRec, *PFR_CMap;
+    FT_Error     error;
+
+    error = FT_Err_Invalid_Argument;
+
+    if ( face != NULL && face->driver != NULL )
+    {
+      FT_Module  driver = (FT_Module) face->driver;
 
 
-  FT_CALLBACK_TABLE const FT_CMap_ClassRec  pfr_cmap_class_rec;
+      if ( driver->clazz && driver->clazz->module_name              &&
+           ft_strcmp( driver->clazz->module_name, "winfonts" ) == 0 )
+      {
+        FNT_Size  size = (FNT_Size)face->size;
+        FNT_Font  font = size->font;
 
-FT_END_HEADER
-
-
-#endif /* __PFRCMAP_H__ */
+        if (font)
+        {
+          FT_MEM_COPY( header, &font->header, sizeof(*header) );
+          error    = 0;
+        }
+      }
+    }
+    return error;
+  }
 
 
 /* END */
