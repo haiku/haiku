@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src apps bin traceroute ;
 
+UsePrivateHeaders net ;
+
+BinCommand traceroute :
+	traceroute.c
+:  libnet.so ;

@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src apps bin ifconfig ;
 
+UsePrivateHeaders net ;
+
+BinCommand ifconfig :
+	ifconfig.c
+:  libnet.so ;

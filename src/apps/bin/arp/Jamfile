@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src apps bin arp ;
 
+UsePrivateHeaders net ;
+
+BinCommand arp :
+	arp.c
+:  libnet.so ;

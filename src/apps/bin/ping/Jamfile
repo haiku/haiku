@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src apps bin ping ;
 
+UsePrivateHeaders net ;
+
+BinCommand ping :
+	ping.c
+:  libnet.so ;

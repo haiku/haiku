@@ -33,7 +33,7 @@
 
 #include <sys/param.h>
 #include <kernel/OS.h>
-#include "sys/mbuf.h"
+#include "mbuf.h"
 #include "sys/socket.h"
 #include "sys/socketvar.h"
 #include "sys/protosw.h"
