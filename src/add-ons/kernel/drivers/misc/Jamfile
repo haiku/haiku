@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src add-ons kernel drivers misc ;
+
+KernelObjects config.c : -fno-pic ;
