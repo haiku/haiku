@@ -23,13 +23,15 @@
 #include "debug.h"
 #include "Synth.h"
 
-BSynth *be_synth = 0;
+BSynth* be_synth = NULL;
 
 //------------------------------------------------------------------------------
 
 BSynth::BSynth()
 {
-	UNIMPLEMENTED
+	/* not complete yet */
+
+	delete be_synth;
 	be_synth = this;
 }
 
@@ -37,7 +39,9 @@ BSynth::BSynth()
 
 BSynth::BSynth(synth_mode synth)
 {
-	UNIMPLEMENTED
+	/* not complete yet */
+
+	delete be_synth;
 	be_synth = this;
 }
 
@@ -45,8 +49,9 @@ BSynth::BSynth(synth_mode synth)
 
 BSynth::~BSynth()
 {
-	UNIMPLEMENTED
-	be_synth = 0;
+	/* not complete yet */
+	
+	be_synth = NULL;
 }
 
 //------------------------------------------------------------------------------
