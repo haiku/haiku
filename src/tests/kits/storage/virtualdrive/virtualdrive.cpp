@@ -38,8 +38,8 @@
 [2:10] <geist> cant do that
 */
 
-#define TRACE dprintf
-//#define TRACE (void)
+//#define TRACE(x) dprintf x
+#define TRACE(x) ;
 #define MB (1024LL * 1024LL)
 
 static int dev_index_for_path(const char *path);
@@ -153,7 +153,7 @@ static
 void
 clear_device_info(int32 index)
 {
-	TRACE("virtualdrive: clear_device_info(%ld)\n", index);
+	TRACE(("virtualdrive: clear_device_info(%ld)\n", index));
 
 	device_info &info = gDeviceInfos[index];
 	info.open_count = 0;
@@ -248,7 +248,7 @@ init_device_info(int32 index, virtual_drive_info *initInfo)
 		// This is a special reserved ioctl() opcode not defined anywhere in
 		// the Be headers.
 		if (ioctl(fd, 10000) != 0) {
-			TRACE("virtualdrive: disable caching ioctl failed\n");
+			dprintf("virtualdrive: disable caching ioctl failed\n");
 			return errno;
 		}
 	}
@@ -297,7 +297,7 @@ uninit_device_info(int32 index)
 status_t
 init_hardware(void)
 {
-	TRACE("virtualdrive: init_hardware\n");
+	TRACE(("virtualdrive: init_hardware\n"));
 	return B_OK;
 }
 
@@ -305,7 +305,7 @@ init_hardware(void)
 status_t
 init_driver(void)
 {
-	TRACE("virtualdrive: init\n");
+	TRACE(("virtualdrive: init\n"));
 
 	new_lock(&driverlock, "virtualdrive lock");
 
@@ -320,7 +320,7 @@ init_driver(void)
 void
 uninit_driver(void)
 {
-	TRACE("virtualdrive: uninit\n");
+	TRACE(("virtualdrive: uninit\n"));
 	free_lock(&driverlock);
 }
 
@@ -328,7 +328,7 @@ uninit_driver(void)
 const char **
 publish_devices(void)
 {
-	TRACE("virtualdrive: publish_devices\n");
+	TRACE(("virtualdrive: publish_devices\n"));
 	return sVirtualDriveName;
 }
 
@@ -336,7 +336,7 @@ publish_devices(void)
 device_hooks *
 find_device(const char* name)
 {
-	TRACE("virtualdrive: find_device(%s)\n", name);
+	TRACE(("virtualdrive: find_device(%s)\n", name));
 	return &sVirtualDriveHooks;
 }
 
@@ -348,7 +348,7 @@ find_device(const char* name)
 static status_t
 virtualdrive_open(const char *name, uint32 flags, void **cookie)
 {
-	TRACE("virtualdrive: open %s\n",name);
+	TRACE(("virtualdrive: open %s\n",name));
 
 	*cookie = (void *)-1;
 
@@ -356,22 +356,22 @@ virtualdrive_open(const char *name, uint32 flags, void **cookie)
 
 	int32 devIndex = dev_index_for_path(name);
 
-	TRACE("virtualdrive: devIndex %ld!\n", devIndex);
+	TRACE(("virtualdrive: devIndex %ld!\n", devIndex));
 
 	if (!is_valid_device_index(devIndex)) {
-		TRACE("virtualdrive: wrong index!\n");
+		TRACE(("virtualdrive: wrong index!\n"));
 		unlock_driver();
 		return B_ERROR;
 	}
 
 	if (gDeviceInfos[devIndex].unused) {
-		TRACE("virtualdrive: device is unused!\n");
+		TRACE(("virtualdrive: device is unused!\n"));
 		unlock_driver();
 		return B_ERROR;
 	}
 
 	if (!gDeviceInfos[devIndex].registered) {
-		TRACE("virtualdrive: device has been unregistered!\n");
+		TRACE(("virtualdrive: device has been unregistered!\n"));
 		unlock_driver();
 		return B_ERROR;
 	}
@@ -389,11 +389,9 @@ virtualdrive_open(const char *name, uint32 flags, void **cookie)
 static status_t
 virtualdrive_close(void *cookie)
 {
-	TRACE("virtualdrive: close\n");
-	
 	int32 devIndex = (int)cookie;
 
-	TRACE("virtualdrive: devIndex = %ld\n", devIndex);
+	TRACE(("virtualdrive: close() devIndex = %ld\n", devIndex));
 	if (!is_valid_data_device_index(devIndex))
 		return B_OK;
 
@@ -414,15 +412,17 @@ virtualdrive_close(void *cookie)
 static status_t
 virtualdrive_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE("virtualdrive: read pos = 0x%08Lx, bytes = 0x%08lx\n",position,*numBytes);
+	TRACE(("virtualdrive: read pos = 0x%08Lx, bytes = 0x%08lx\n", position, *numBytes));
+
 	// check parameters
 	int devIndex = (int)cookie;
 	if (devIndex == kControlDevice) {
-		TRACE("virtualdrive: reading from control device not allowed\n");
+		TRACE(("virtualdrive: reading from control device not allowed\n"));
 		return B_NOT_ALLOWED;
 	}
 	if (position < 0)
 		return B_BAD_VALUE;
+
 	lock_driver();
 	device_info &info = gDeviceInfos[devIndex];
 	// adjust position and numBytes according to the file size
@@ -445,15 +445,17 @@ virtualdrive_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 static status_t
 virtualdrive_write(void *cookie, off_t position, const void *buffer, size_t *numBytes)
 {
-	TRACE("virtualdrive: write pos = 0x%08Lx, bytes = 0x%08lx\n",position,*numBytes);
+	TRACE(("virtualdrive: write pos = 0x%08Lx, bytes = 0x%08lx\n", position, *numBytes));
+
 	// check parameters
 	int devIndex = (int)cookie;
 	if (devIndex == kControlDevice) {
-		TRACE("virtualdrive: writing to control device not allowed\n");
+		TRACE(("virtualdrive: writing to control device not allowed\n"));
 		return B_NOT_ALLOWED;
 	}
 	if (position < 0)
 		return B_BAD_VALUE;
+
 	lock_driver();
 	device_info &info = gDeviceInfos[devIndex];
 	// adjust position and numBytes according to the file size
@@ -476,7 +478,7 @@ virtualdrive_write(void *cookie, off_t position, const void *buffer, size_t *num
 static status_t
 virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 {
-	TRACE("virtualdrive: ioctl\n");
+	TRACE(("virtualdrive: ioctl\n"));
 
 	int devIndex = (int)cookie;
 	device_info &info = gDeviceInfos[devIndex];
@@ -504,12 +506,12 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			case B_EJECT_DEVICE:
 			case B_LOAD_MEDIA:
 			case B_GET_NEXT_OPEN_DEVICE:
-				TRACE("virtualdrive: another ioctl: %lx (%lu)\n", op, op);
+				TRACE(("virtualdrive: another ioctl: %lx (%lu)\n", op, op));
 				return B_BAD_VALUE;
 
 			case VIRTUAL_DRIVE_REGISTER_FILE:
 			{
-				TRACE("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE\n");
+				TRACE(("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE\n"));
 
 				virtual_drive_info *driveInfo = (virtual_drive_info *)arg;
 				if (devIndex != kControlDevice || driveInfo == NULL
@@ -571,44 +573,44 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 			case VIRTUAL_DRIVE_UNREGISTER_FILE:
 			case VIRTUAL_DRIVE_GET_INFO:
-				TRACE("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE/"
-					  "VIRTUAL_DRIVE_GET_INFO\n");
+				TRACE(("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE/"
+					  "VIRTUAL_DRIVE_GET_INFO on control device\n"));
 				// these are called on used data files only!
 				return B_BAD_VALUE;
 
 			default:
-				TRACE("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op);
+				TRACE(("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op));
 				return B_BAD_VALUE;
 		}
 	} else {
 		// used data device
 		switch (op) {
 			case B_GET_DEVICE_SIZE:
-				TRACE("virtualdrive: B_GET_DEVICE_SIZE\n");
+				TRACE(("virtualdrive: B_GET_DEVICE_SIZE\n"));
 				*(size_t*)arg = info.size;
 				return B_OK;
 
 			case B_SET_NONBLOCKING_IO:
-				TRACE("virtualdrive: B_SET_NONBLOCKING_IO\n");
+				TRACE(("virtualdrive: B_SET_NONBLOCKING_IO\n"));
 				return B_OK;
 
 			case B_SET_BLOCKING_IO:
-				TRACE("virtualdrive: B_SET_BLOCKING_IO\n");
+				TRACE(("virtualdrive: B_SET_BLOCKING_IO\n"));
 				return B_OK;
 
 			case B_GET_READ_STATUS:
-				TRACE("virtualdrive: B_GET_READ_STATUS\n");
+				TRACE(("virtualdrive: B_GET_READ_STATUS\n"));
 				*(bool*)arg = true;
 				return B_OK;
 
 			case B_GET_WRITE_STATUS:		
-				TRACE("virtualdrive: B_GET_WRITE_STATUS\n");
+				TRACE(("virtualdrive: B_GET_WRITE_STATUS\n"));
 				*(bool*)arg = true;
 				return B_OK;
 
 			case B_GET_ICON:
 			{
-				TRACE("virtualdrive: B_GET_ICON\n");
+				TRACE(("virtualdrive: B_GET_ICON\n"));
 				device_icon *icon = (device_icon *)arg;
 
 				if (icon->icon_size == kPrimaryImageWidth) {
@@ -622,13 +624,13 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 
 			case B_GET_GEOMETRY:
-				TRACE("virtualdrive: B_GET_GEOMETRY\n");
+				TRACE(("virtualdrive: B_GET_GEOMETRY\n"));
 				*(device_geometry *)arg = info.geometry;
 				return B_OK;
 
 			case B_GET_BIOS_GEOMETRY:
 			{
-				TRACE("virtualdrive: B_GET_BIOS_GEOMETRY\n");
+				TRACE(("virtualdrive: B_GET_BIOS_GEOMETRY\n"));
 				device_geometry *dg = (device_geometry *)arg;
 				dg->bytes_per_sector = 512;
 				dg->sectors_per_track = info.size / (512 * 1024);
@@ -642,24 +644,24 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 
 			case B_GET_MEDIA_STATUS:
-				TRACE("virtualdrive: B_GET_MEDIA_STATUS\n");
+				TRACE(("virtualdrive: B_GET_MEDIA_STATUS\n"));
 				*(status_t*)arg = B_NO_ERROR;
 				return B_OK;
 
 			case B_SET_UNINTERRUPTABLE_IO:
-				TRACE("virtualdrive: B_SET_UNINTERRUPTABLE_IO\n");
+				TRACE(("virtualdrive: B_SET_UNINTERRUPTABLE_IO\n"));
 				return B_OK;
 
 			case B_SET_INTERRUPTABLE_IO:
-				TRACE("virtualdrive: B_SET_INTERRUPTABLE_IO\n");
+				TRACE(("virtualdrive: B_SET_INTERRUPTABLE_IO\n"));
 				return B_OK;
 
 			case B_FLUSH_DRIVE_CACHE:
-				TRACE("virtualdrive: B_FLUSH_DRIVE_CACHE\n");
+				TRACE(("virtualdrive: B_FLUSH_DRIVE_CACHE\n"));
 				return B_OK;
 
 			case B_GET_BIOS_DRIVE_ID:
-				TRACE("virtualdrive: B_GET_BIOS_DRIVE_ID\n");
+				TRACE(("virtualdrive: B_GET_BIOS_DRIVE_ID\n"));
 				*(uint8*)arg = 0xF8;
 				return B_OK;
 
@@ -670,15 +672,15 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			case B_EJECT_DEVICE:
 			case B_LOAD_MEDIA:
 			case B_GET_NEXT_OPEN_DEVICE:
-				TRACE("virtualdrive: another ioctl: %lx (%lu)\n", op, op);
+				TRACE(("virtualdrive: another ioctl: %lx (%lu)\n", op, op));
 				return B_BAD_VALUE;
 
 			case VIRTUAL_DRIVE_REGISTER_FILE:
-				TRACE("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE (data)\n");
+				TRACE(("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE (data)\n"));
 				return B_BAD_VALUE;
 			case VIRTUAL_DRIVE_UNREGISTER_FILE:
 			{
-				TRACE("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE\n");
+				TRACE(("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE\n"));
 				lock_driver();
 
 				bool immediately = (bool)arg;
@@ -696,7 +698,7 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 				// if we "immediately" is true, we will stop our service immediately
 				// and close the underlying file, open it for other uses
 				if (immediately) {
-					TRACE("virtualdrive: close file descriptor\n");
+					TRACE(("virtualdrive: close file descriptor\n"));
 					// we cannot use uninit_device_info() here, since that does
 					// a little too much and would open the device for other
 					// uses.
@@ -709,7 +711,7 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 			case VIRTUAL_DRIVE_GET_INFO:
 			{
-				TRACE("virtualdrive: VIRTUAL_DRIVE_GET_INFO\n");
+				TRACE(("virtualdrive: VIRTUAL_DRIVE_GET_INFO\n"));
 
 				virtual_drive_info *driveInfo = (virtual_drive_info *)arg;
 				if (driveInfo == NULL
@@ -727,7 +729,7 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 
 			default:
-				TRACE("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op);
+				TRACE(("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op));
 				return B_BAD_VALUE;
 		}
 	}
@@ -738,7 +740,7 @@ virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 static status_t
 virtualdrive_free(void *cookie)
 {
-	TRACE("virtualdrive: free\n");
+	TRACE(("virtualdrive: free cookie()\n"));
 	return B_OK;
 }
 
