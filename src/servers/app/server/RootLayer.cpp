@@ -66,7 +66,9 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 {
 	fDesktop = desktop;
 
-	fWinBorderList	= NULL;
+	fWinBorderListLength	= 64;
+	fWinBorderList2	= (WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*));
+	fWinBorderList	= (WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*));
 	fWinBorderCount	= 0;
 	fWinBorderIndex	= 0;
 	fWsCount		= 0;
@@ -321,15 +323,6 @@ void RootLayer::ResizeBy(float x, float y)
 
 Layer* RootLayer::VirtualTopChild() const
 {
-	if (fWinBorderList)
-	{
-		free(fWinBorderList);
-		fWinBorderList = NULL;
-	}
-
-	void	**list;
-	ActiveWorkspace()->GetWinBorderList(list, &fWinBorderCount);
-	fWinBorderList	= (WinBorder**)list;
 	fWinBorderIndex	= fWinBorderCount-1;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
@@ -356,15 +349,6 @@ Layer* RootLayer::VirtualUpperSibling() const
 
 Layer* RootLayer::VirtualBottomChild() const
 {
-	if (fWinBorderList)
-	{
-		free(fWinBorderList);
-		fWinBorderList = NULL;
-	}
-
-	void	**list;
-	ActiveWorkspace()->GetWinBorderList(list, &fWinBorderCount);
-	fWinBorderList	= (WinBorder**)list;
 	fWinBorderIndex	= 0;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
@@ -906,6 +890,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 						exFocus->fDecorator->SetFocus(false);
 					if (focus && exFocus != focus && focus->fDecorator)
 						focus->fDecorator->SetFocus(true);
+
+					get_workspace_windows();
 					
 					BRegion		reg(target->fFull);
 					reg.Include(&target->fTopLayer->fFull);
@@ -1554,6 +1540,8 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 			invalidate = invalid;
 	}
 
+	get_workspace_windows();
+
 	if (invalidate)
 	{
 		BRegion		reg(winBorder->fFull);
@@ -1581,9 +1569,29 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 			invalidate = invalid;
 	}
 
+	get_workspace_windows();
+
 	if (invalidate)
 	{
 		invalidate_layer(this, winBorder->fFullVisible);
 	}
 }
 
+void RootLayer::get_workspace_windows()
+{
+	int32	bufferSize = fWinBorderListLength;
+
+	memcpy(fWinBorderList2, fWinBorderList, fWinBorderCount);
+
+	if (!(ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize)))
+	{
+		fWinBorderList2	= (WinBorder**)realloc(fWinBorderList2, bufferSize);
+		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, bufferSize);
+		fWinBorderListLength = bufferSize;
+		ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize);
+	}
+	
+	fWinBorderCount = bufferSize;
+
+	fWinBorderIndex	= 0;
+}

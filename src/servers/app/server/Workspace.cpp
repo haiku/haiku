@@ -215,7 +215,7 @@ WinBorder *Workspace::Front() const
 	\param	list The list of visible WinBorders found in this workspace.
 	\param	itemCount Number of WinBorder pointers found in the list.
 */
-void Workspace::GetWinBorderList(void **&list, int32 *itemCount ) const
+bool Workspace::GetWinBorderList(void **list, int32 *itemCount ) const
 {
 	int32		count = 0;
 	ListData	*cursor;
@@ -228,18 +228,15 @@ void Workspace::GetWinBorderList(void **&list, int32 *itemCount ) const
 		cursor = cursor->upperItem;
 	}
 
-	if (count == 0)
+	if (*itemCount < count)
 	{
-		*itemCount = 0;
-		list = NULL;
-		return;
+		// buffer not big enough. buffer must be count high
+		*itemCount = count;
+		return false;
 	}
 
-	void		**mylist;
-	mylist		= (void**)malloc(sizeof(void*) * count);
-	if (mylist)
+	if (list)
 	{
-		list		= mylist;
 		*itemCount	= count;
 
 		cursor = fBottomItem;
@@ -247,17 +244,14 @@ void Workspace::GetWinBorderList(void **&list, int32 *itemCount ) const
 		{
 			if (!cursor->layerPtr->IsHidden())
 			{
-				*mylist	= cursor->layerPtr;
-				mylist++;
+				*list	= cursor->layerPtr;
+				list++;
 			}
 			cursor = cursor->upperItem;
 		}
 	}
-	else
-	{
-		list = NULL;
-		itemCount = 0;
-	}
+
+	return false;
 }
 	
 //----------------------------------------------------------------------------------

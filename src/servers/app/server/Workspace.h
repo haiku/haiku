@@ -63,7 +63,7 @@ public:
 
 			WinBorder*			Focus(void) const;
 			WinBorder*			Front(void) const;
-			void				GetWinBorderList(void **&list, int32 *itemCount ) const;
+			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
 	
 			bool				MoveToBack(WinBorder *newLast);
 			bool				MoveToFront(WinBorder *newFront, bool doNotDisturb = false);
