@@ -312,7 +312,7 @@ KDiskSystem::ValidateResize(KPartition *partition, off_t *size)
 
 // ValidateResizeChild
 bool
-KDiskSystem::ValidateResizeChild(KPartition *partition, off_t *size)
+KDiskSystem::ValidateResizeChild(KPartition *child, off_t *size)
 {
 	// to be implemented by derived classes
 	return false;
@@ -328,7 +328,7 @@ KDiskSystem::ValidateMove(KPartition *partition, off_t *start)
 
 // ValidateMoveChild
 bool
-KDiskSystem::ValidateMoveChild(KPartition *partition, off_t *start)
+KDiskSystem::ValidateMoveChild(KPartition *child, off_t *start)
 {
 	// to be implemented by derived classes
 	return false;
@@ -369,7 +369,7 @@ KDiskSystem::ValidateSetParameters(KPartition *partition,
 
 // ValidateSetContentParameters
 bool
-KDiskSystem::ValidateSetContentParameters(KPartition *child,
+KDiskSystem::ValidateSetContentParameters(KPartition *partition,
 										  const char *parameters)
 {
 	// to be implemented by derived classes
@@ -404,13 +404,13 @@ KDiskSystem::CountPartitionableSpaces(KPartition *partition)
 }
 
 // GetPartitionableSpaces
-bool
+status_t
 KDiskSystem::GetPartitionableSpaces(KPartition *partition,
-									partitionable_space_data *spaces,
+									partitionable_space_data *buffer,
 									int32 count, int32 *actualCount)
 {
 	// to be implemented by derived classes
-	return false;
+	return B_ERROR;
 }
 
 // GetNextSupportedType

@@ -71,15 +71,15 @@ public:
 	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
-	virtual bool ValidateResizeChild(KPartition *partition, off_t *size);
+	virtual bool ValidateResizeChild(KPartition *child, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);
-	virtual bool ValidateMoveChild(KPartition *partition, off_t *start);
+	virtual bool ValidateMoveChild(KPartition *child, off_t *start);
 	virtual bool ValidateSetName(KPartition *partition, char *name);
 	virtual bool ValidateSetContentName(KPartition *partition, char *name);
 	virtual bool ValidateSetType(KPartition *partition, const char *type);
 	virtual bool ValidateSetParameters(KPartition *partition,
 									   const char *parameters);
-	virtual bool ValidateSetContentParameters(KPartition *child,
+	virtual bool ValidateSetContentParameters(KPartition *parameters,
 											  const char *parameters);
 	virtual bool ValidateInitialize(KPartition *partition, char *name,
 									const char *parameters);
@@ -87,10 +87,10 @@ public:
 									 off_t *size, const char *type,
 									 const char *parameters);
 	virtual int32 CountPartitionableSpaces(KPartition *partition);
-	virtual bool GetPartitionableSpaces(KPartition *partition,
-										partitionable_space_data *spaces,
-										int32 count,
-										int32 *actualCount = NULL);
+	virtual status_t GetPartitionableSpaces(KPartition *partition,
+											partitionable_space_data *buffer,
+											int32 count,
+											int32 *actualCount = NULL);
 
 	virtual status_t GetNextSupportedType(KPartition *partition, int32 *cookie,
 										  char *type);

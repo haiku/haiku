@@ -40,12 +40,11 @@ public:
 	virtual bool SupportsSettingContentParameters(KPartition *partition,
 												  bool *whileMounted);
 	virtual bool SupportsInitializing(KPartition *partition);
-	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);
 	virtual bool ValidateSetContentName(KPartition *partition, char *name);
-	virtual bool ValidateSetContentParameters(KPartition *child,
+	virtual bool ValidateSetContentParameters(KPartition *partition,
 											  const char *parameters);
 	virtual bool ValidateInitialize(KPartition *partition, char *name,
 									const char *parameters);

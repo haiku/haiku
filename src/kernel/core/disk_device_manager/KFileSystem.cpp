@@ -90,10 +90,15 @@ KFileSystem::FreeContentCookie(KPartition *partition)
 bool
 KFileSystem::SupportsDefragmenting(KPartition *partition, bool *whileMounted)
 {
-	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_defragmenting) {
+		return (*whileMounted = false);
+	}
+	return fModule->supports_defragmenting(partition->PartitionData(),
+										   whileMounted);
 }
 
 // SupportsRepairing
@@ -101,30 +106,44 @@ bool
 KFileSystem::SupportsRepairing(KPartition *partition, bool checkOnly,
 							   bool *whileMounted)
 {
-	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_repairing) {
+		return (*whileMounted = false);
+	}
+	return fModule->supports_repairing(partition->PartitionData(), checkOnly,
+									   whileMounted);
 }
 
 // SupportsResizing
 bool
 KFileSystem::SupportsResizing(KPartition *partition, bool *whileMounted)
 {
-	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_resizing) {
+		return (*whileMounted = false);
+	}
+	return fModule->supports_resizing(partition->PartitionData(),
+									  whileMounted);
 }
 
 // SupportsMoving
 bool
 KFileSystem::SupportsMoving(KPartition *partition, bool *isNoOp)
 {
-	// to be implemented
-	if (isNoOp)
-		*isNoOp = false;
-	return false;
+	bool _isNoOp = false;
+	if (!isNoOp)
+		isNoOp = &_isNoOp;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_moving) {
+		return (*isNoOp = false);
+	}
+	return fModule->supports_moving(partition->PartitionData(), isNoOp);
 }
 
 // SupportsSettingContentName
@@ -132,8 +151,15 @@ bool
 KFileSystem::SupportsSettingContentName(KPartition *partition,
 										bool *whileMounted)
 {
-	// to be implemented
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_setting_content_name) {
+		return (*whileMounted = false);
+	}
+	return fModule->supports_setting_content_name(partition->PartitionData(),
+												  whileMounted);
 }
 
 // SupportsSettingContentParameters
@@ -141,57 +167,62 @@ bool
 KFileSystem::SupportsSettingContentParameters(KPartition *partition,
 											  bool *whileMounted)
 {
-	// to be implemented
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_setting_content_parameters) {
+		return (*whileMounted = false);
+	}
+	return fModule->supports_setting_content_parameters(
+				partition->PartitionData(), whileMounted);
 }
 
 // SupportsInitializing
 bool
 KFileSystem::SupportsInitializing(KPartition *partition)
 {
-	// to be implemented
-	return false;
-}
-
-// IsSubSystemFor
-bool
-KFileSystem::IsSubSystemFor(KPartition *partition)
-{
-	// to be implemented
-	return false;
+	return (partition && fModule && fModule->supports_initializing
+			&& fModule->supports_initializing(partition->PartitionData()));
 }
 
 // ValidateResize
 bool
 KFileSystem::ValidateResize(KPartition *partition, off_t *size)
 {
-	// to be implemented
-	return false;
+	return (partition && size && partition->DiskSystem() == this && fModule
+			&& fModule->validate_resize
+			&& fModule->validate_resize(partition->PartitionData(), size));
 }
 
 // ValidateMove
 bool
 KFileSystem::ValidateMove(KPartition *partition, off_t *start)
 {
-	// to be implemented
-	return false;
+	return (partition && start && partition->DiskSystem() == this && fModule
+			&& fModule->validate_move
+			&& fModule->validate_move(partition->PartitionData(), start));
 }
 
 // ValidateSetContentName
 bool
 KFileSystem::ValidateSetContentName(KPartition *partition, char *name)
 {
-	// to be implemented
-	return false;
+	return (partition && name && partition->DiskSystem() == this
+			&& fModule && fModule->validate_set_content_name
+			&& fModule->validate_set_content_name(partition->PartitionData(),
+												  name));
 }
 
 // ValidateSetContentParameters
 bool
-KFileSystem::ValidateSetContentParameters(KPartition *child,
+KFileSystem::ValidateSetContentParameters(KPartition *partition,
 										  const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->DiskSystem() == this && fModule
+			&& fModule->validate_set_content_parameters
+			&& fModule->validate_set_content_parameters(
+					partition->PartitionData(), parameters));
 }
 
 // ValidateInitialize
@@ -199,8 +230,9 @@ bool
 KFileSystem::ValidateInitialize(KPartition *partition, char *name,
 								const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && name && fModule && fModule->validate_initialize
+			&& fModule->validate_initialize(partition->PartitionData(), name,
+											parameters));
 }
 
 // Defragment
