@@ -32,9 +32,14 @@
 
 struct entry_ref;
 
+namespace BPrivate {
+
 status_t get_app_path(char *buffer);
 status_t get_app_ref(entry_ref *ref, bool traverse = true);
 
+team_id current_team();
 thread_id main_thread_for(team_id team);
+
+} // namespace BPrivate
 
 #endif	// _APP_MISC_H

@@ -31,6 +31,8 @@
 #include <image.h>
 #include <OS.h>
 
+namespace BPrivate {
+
 // get_app_path
 /*!	\brief Returns the path to the application's executable.
 	\param buffer A pointer to a pre-allocated character array of at least
@@ -89,6 +91,20 @@ get_app_ref(entry_ref *ref, bool traverse)
 	return error;
 }
 
+// current_team
+/*!	\brief Returns the ID of the current team.
+	\return The ID of the current team.
+*/
+team_id
+current_team()
+{
+	team_id team = -1;
+	thread_info info;
+	if (get_thread_info(find_thread(NULL), &info) == B_OK)
+		team = info.team;
+	return team;
+}
+
 // main_thread_for
 /*!	Returns the ID of the supplied team's main thread.
 	\param team The team.
@@ -111,4 +127,6 @@ main_thread_for(team_id team)
 	}
 	return thread;
 }
+
+} // namespace BPrivate
 

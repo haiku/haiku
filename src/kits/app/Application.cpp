@@ -613,11 +613,11 @@ void BApplication::InitData(const char* signature, status_t* error)
 	bool isRegistrar = (signature && !strcmp(signature, kRegistrarSignature));
 	// get team and thread
 	team_id team = Team();
-	thread_id thread = main_thread_for(team);
+	thread_id thread = BPrivate::main_thread_for(team);
 	// get app executable ref
 	entry_ref ref;
 	if (fInitError == B_OK)
-		fInitError = get_app_ref(&ref);
+		fInitError = BPrivate::get_app_ref(&ref);
 	// get the BAppFileInfo and extract the information we need
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (fInitError == B_OK) {
