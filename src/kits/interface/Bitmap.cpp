@@ -2173,7 +2173,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		//				SERVER_FALSE if the buffer was already deleted
 		// Reply Data:
 		//		none
-		status_t freestat;
+//		status_t freestat;
 		link->SetOpCode(AS_DELETE_BITMAP);
 		link->Attach<int32>(fServerToken);
 		error=link->FlushWithReply(&replydata);

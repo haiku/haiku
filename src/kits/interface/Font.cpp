@@ -26,6 +26,133 @@
 #include <Rect.h>
 #include <stdio.h>
 #include <Font.h>
+#include <PortLink.h>
+
+//----------------------------------------------------------------------------------------
+//		Globals
+//----------------------------------------------------------------------------------------
+
+// The actual objects which the globals point to
+BFont be_plain_bfont;
+BFont be_bold_bfont;
+BFont be_fixed_bfont;
+
+const BFont *be_plain_font=&be_plain_bfont;
+const BFont *be_bold_font=&be_bold_bfont;
+const BFont *be_fixed_font=&be_fixed_bfont;
+
+
+/*!
+	\brief Private function used by Be. Exists only for compatibility. Does nothing.
+*/
+void _font_control_(BFont *font, int32 cmd, void *data)
+{
+}
+
+/*!
+	\brief Returns the number of installed font families
+	\return The number of installed font families
+*/
+int32 count_font_families(void)
+{
+	// TODO: Implement
+}
+
+/*!
+	\brief Returns the number of styles available for a font family
+	\return The number of styles available for a font family
+*/
+int32 count_font_styles(font_family name)
+{
+	// TODO: Implement
+}
+
+/*!
+	\brief Retrieves the family name at the specified index
+	\param index Unique font identifier code.
+	\param name font_family string to receive the name of the family
+	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\return B_ERROR if the index does not correspond to a font family
+*/
+status_t get_font_family(int32 index, font_family *name, uint32 *flags=NULL)
+{
+	// Fix over R5, which does not check for NULL font family names - it just crashes
+	if(!name)
+		return B_ERROR;
+	
+	// TODO: Implement
+}
+
+/*!
+	\brief Retrieves the family name at the specified index
+	\param index Unique font identifier code.
+	\param name font_family string to receive the name of the family
+	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\return B_ERROR if the index does not correspond to a font style
+*/
+status_t get_font_style(font_family family, int32 index, font_style *name, uint32 *flags)
+{
+	// Fix over R5, which does not check for NULL font style names - it just crashes
+	if(!name)
+		return B_ERROR;
+
+	// TODO: Implement
+}
+
+/*!
+	\brief Retrieves the family name at the specified index
+	\param index Unique font identifier code.
+	\param name font_family string to receive the name of the family
+	\param face recipient of font face value, such as B_REGULAR_FACE
+	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\return B_ERROR if the index does not correspond to a font style
+	
+	The face value returned by this function is not very reliable. At the same time, the value
+	returned should be fairly reliable, returning the proper flag for 90%-99% of font names.
+*/
+status_t get_font_style(font_family family, int32 index, font_style *name,
+			uint16 *face, uint32 *flags)
+{
+	// Fix over R5, which does not check for NULL font style names - it just crashes
+	if(!name || !face)
+		return B_ERROR;
+
+	// TODO: Implement
+}
+
+/*!
+	\brief Updates the font family list
+	\param check_only If true, the function only checks to see if the font list has changed
+	\return true if the font list has changed, false if not.
+
+	Because of the differences in the R5 and OpenBeOS font subsystems, this function operates 
+	slightly differently, resulting in more efficient operation. A global font list for all 
+	applications is maintained, so calling this function will still be quite expensive, 
+	but it should be unnecessary in most applications.
+*/
+bool update_font_families(bool check_only)
+{
+	// TODO: Implement
+}
+
+status_t get_font_cache_info(uint32 id, void *set)
+{
+	// TODO: Implement
+
+	// Note that the only reliable data from this function will probably be the cache size
+	// Depending on how the font cache is implemented, this function and the corresponding
+	// set function will either see major revision or completely disappear in R2.
+}
+
+status_t set_font_cache_info(uint32 id, void *set)
+{
+	// TODO: Implement
+
+	// Note that this function will likely only set the cache size in our implementation
+	// because of (a) the lack of knowledge on R5's font system and (b) the fact that it
+	// is a completely different font engine.
+}
+
 /*
 class BFontPrivate
 {
@@ -62,42 +189,25 @@ BFontPrivate & BFontPrivate::operator=(const BFontPrivate &fontdata)
 }
 */
 
+//----------------------------------------------------------------------------------------
+//		BFont Class Definition
+//----------------------------------------------------------------------------------------
+
 BFont::BFont(void)
 {
-//	private_data=new BFontPrivate();
-	if(be_plain_font)
-	{
-		fFamilyID=be_plain_font->fFamilyID;
-		fStyleID=be_plain_font->fStyleID;
-		fSize=be_plain_font->fSize;
-		fShear=be_plain_font->fShear;
-		fRotation=be_plain_font->fRotation;
-		fSpacing=be_plain_font->fSpacing;
-		fEncoding=be_plain_font->fEncoding;
-		fFace=be_plain_font->fFace;
-		fHeight=be_plain_font->fHeight;
-//		private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
-	}
-	else
-	{
-		fFamilyID=0;
-		fStyleID=0;
-		fSize=0.0;
-		fShear=90.0;
-		fRotation=0.0;
-		fSpacing=B_CHAR_SPACING;
-		fEncoding=B_UNICODE_UTF8;
-		fFace=B_REGULAR_FACE;
-		fHeight.ascent=0.0;
-		fHeight.descent=0.0;
-		fHeight.leading=0.0;
-//		private_data->fPrivateFlags=0;
-	}
+	fFamilyID=be_plain_font->fFamilyID;
+	fStyleID=be_plain_font->fStyleID;
+	fSize=be_plain_font->fSize;
+	fShear=be_plain_font->fShear;
+	fRotation=be_plain_font->fRotation;
+	fSpacing=be_plain_font->fSpacing;
+	fEncoding=be_plain_font->fEncoding;
+	fFace=be_plain_font->fFace;
+	fHeight=be_plain_font->fHeight;
 }
 
 BFont::BFont(const BFont &font)
 {
-//	private_data=new BFontPrivate();
 	fFamilyID=font.fFamilyID;
 	fStyleID=font.fStyleID;
 	fSize=font.fSize;
@@ -107,12 +217,10 @@ BFont::BFont(const BFont &font)
 	fEncoding=font.fEncoding;
 	fFace=font.fFace;
 	fHeight=font.fHeight;
-//	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
 }
 
 BFont::BFont(const BFont *font)
 {
-//	private_data=new BFontPrivate();
 	if(font)
 	{
 		fFamilyID=font->fFamilyID;
@@ -124,76 +232,69 @@ BFont::BFont(const BFont *font)
 		fEncoding=font->fEncoding;
 		fFace=font->fFace;
 		fHeight=font->fHeight;
-//		private_data->fPrivateFlags=font->private_data->fPrivateFlags;
 	}
 	else
 	{
-		if(be_plain_font)
-		{
-			fFamilyID=be_plain_font->fFamilyID;
-			fStyleID=be_plain_font->fStyleID;
-			fSize=be_plain_font->fSize;
-			fShear=be_plain_font->fShear;
-			fRotation=be_plain_font->fRotation;
-			fSpacing=be_plain_font->fSpacing;
-			fEncoding=be_plain_font->fEncoding;
-			fFace=be_plain_font->fFace;
-			fHeight=be_plain_font->fHeight;
-//			private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
-		}
-		else
-		{
-			fFamilyID=0;
-			fStyleID=0;
-			fSize=0.0;
-			fShear=90.0;
-			fRotation=0.0;
-			fSpacing=B_CHAR_SPACING;
-			fEncoding=B_UNICODE_UTF8;
-			fFace=B_REGULAR_FACE;
-			fHeight.ascent=0.0;
-			fHeight.descent=0.0;
-			fHeight.leading=0.0;
-//			private_data->fPrivateFlags=0;
-		}
+		fFamilyID=be_plain_font->fFamilyID;
+		fStyleID=be_plain_font->fStyleID;
+		fSize=be_plain_font->fSize;
+		fShear=be_plain_font->fShear;
+		fRotation=be_plain_font->fRotation;
+		fSpacing=be_plain_font->fSpacing;
+		fEncoding=be_plain_font->fEncoding;
+		fFace=be_plain_font->fFace;
+		fHeight=be_plain_font->fHeight;
 	}
 	
 }
 
-/* XXX TODO: R5 doesn't have a destructor, so we get linking errors when objects compiled with old headers with the new library
-			 (but now we leak memory here)
-BFont::~BFont(void)
-{
-	delete private_data;
-}
+/*!
+	\brief Sets the font's family and style all at once
+	\param family Font family to set
+	\param style Font style to set
+	\return B_ERROR if family or style do not exist or if style does not belong to family.
 */
-
 status_t BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
+	// R5 version always returns B_OK. That's a problem...
+	
 	// TODO: implement
-	// TODO: find out what codes are returned by this function. Be Book says this returns nothing
 
 	// Query server for the appropriate family and style IDs and then return the
 	// appropriate value
 	return B_ERROR;
 }
 
+/*!
+	\brief Sets the font's family and style all at once
+	\param code Unique font identifier obtained from the server.
+*/
 void BFont::SetFamilyAndStyle(uint32 code)
 {
 	fStyleID=code & 0xFFFF;
 	fFamilyID=(code & 0xFFFF0000) >> 16;
 }
 
+/*!
+	\brief Sets the font's family and face all at once
+	\param family Font family to set
+	\param face Font face to set.
+	\return B_ERROR if family does not exists or face is an invalid value.
+	
+	To comply with the BeBook, this function will only set valid values - i.e. passing a 
+	nonexistent family will cause only the face to be set. Additionally, if a particular 
+	face does not exist in a family, the closest match will be chosen.
+*/
 status_t BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
-	// TODO: find out what codes are returned by this function. Be Book says this returns nothing
-	fFace=face;
+	if(face & (	B_ITALIC_FACE | B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE
+			| B_STRIKEOUT_FACE | B_BOLD_FACE | B_REGULAR_FACE) != 0)
+	{
+		fFace=face;
+	}
 
 	// TODO: finish this function by adding the app_server Family query protocol code
-	if(family)
-	{
-		// Query server for family id for the specified family
-	}
+	// Query server for family id for the specified family
 	
 	return B_OK;
 }
@@ -284,6 +385,8 @@ uint32 BFont::Flags(void) const
 
 font_direction BFont::Direction(void) const
 {
+	// TODO: Query the server for the value
+	
 	return B_FONT_LEFT_TO_RIGHT;
 }
  
@@ -294,6 +397,12 @@ bool BFont::IsFixed(void) const
 	return false;
 }
 
+/*!
+	\brief Returns true if the font is fixed-width and contains both full and half-width characters
+	
+	This was left unimplemented as of R5. It was a way to work with both Kanji and Roman 
+	characters in the same fixed-width font.
+*/
 bool BFont::IsFullAndHalfFixed(void) const
 {
 	return false;
@@ -438,7 +547,6 @@ BFont &BFont::operator=(const BFont &font)
 	fEncoding=font.fEncoding;
 	fFace=font.fFace;
 	fHeight=font.fHeight;
-//	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
 	return *this;
 }
 
@@ -455,7 +563,6 @@ bool BFont::operator==(const BFont &font) const
 			fHeight.ascent!=font.fHeight.ascent ||
 			fHeight.descent!=font.fHeight.descent ||
 			fHeight.leading!=font.fHeight.leading //||
-//			private_data->fPrivateFlags!=font.private_data->fPrivateFlags 
 			)
 		return false;
 	return true;
@@ -474,7 +581,6 @@ bool BFont::operator!=(const BFont &font) const
 			fHeight.ascent!=font.fHeight.ascent ||
 			fHeight.descent!=font.fHeight.descent ||
 			fHeight.leading!=font.fHeight.leading //||
-//			private_data->fPrivateFlags!=font.private_data->fPrivateFlags 
 			)
 		return true;
 	return false;

@@ -155,9 +155,9 @@ status_t TPicture::Play(void **callBackTable, int32 tableEntries,
 	// TODO: we should probably check if the functions in the table are not 0
 	//       before calling them.
 
-	int16 op;
-	int32 size;
-	off_t pos;
+	int16 op=0;
+	int32 size=0;
+	off_t pos=0;
 
 	while (fData.Position() < size)
 	{
@@ -403,8 +403,8 @@ status_t TPicture::Play(void **callBackTable, int32 tableEntries,
 			}
 			case B_PIC_SET_BLENDING_MODE:
 			{
-				int16 alphaSrcMode = GetInt16();
-				int16 alphaFncMode = GetInt16();
+				//int16 alphaSrcMode = GetInt16();
+				//int16 alphaFncMode = GetInt16();
 				//((fnc_Pattern)callBackTable[??])(userData, alphaSrcMode,
 				//	alphaFncMode);
 				break;
