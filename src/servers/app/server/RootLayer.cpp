@@ -1055,16 +1055,20 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			int32 scancode, modifiers;
 			int8 utf[3];
 			char *string = NULL;
-			int32 keystate;
-	
+			int8 keystates[16];
+			int32 raw_char;
+			int32 repeatcount;
+			
+			*((int32*)utf)=0;
+			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&raw_char);
 			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&repeatcount);
 			msg.Read(utf, sizeof(utf));
 			msg.ReadString(&string);
-			msg.Read<int32>(&keystate);
-			if (string)
-				free(string);
+			msg.Read(keystates,sizeof(int8)*16);
 	
 			if(DISPLAYDRIVER==HWDRIVER)
 			{
@@ -1078,6 +1082,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						{
 							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
 							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							if (string)
+								free(string);
 							break;
 						}
 					}
@@ -1089,6 +1095,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					
 					//TODO: SetWorkspace in KeyboardEventHandler
 					//SetWorkspace(scancode-2);
+					if (string)
+						free(string);
 					break;
 				}	
 
@@ -1099,6 +1107,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					//if(deskbar)
 					//{
 						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						if (string)
+							free(string);
 						break;
 					//}
 				}
@@ -1121,6 +1131,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						}
 						fScreenShotIndex++;
 						GetDisplayDriver()->DumpToFile(filename);
+						if (string)
+							free(string);
 						break;
 					}
 				}
@@ -1136,6 +1148,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						{
 							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
 							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							if (string)
+								free(string);
 							break;
 						}
 					}
@@ -1144,6 +1158,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						STRACE(("Set Workspace %ld\n",scancode-1));
 						//TODO: SetWorkspace in KeyboardEventHandler
 						//SetWorkspace(scancode-2);
+						if (string)
+							free(string);
 						break;
 					}	
 				}
@@ -1156,6 +1172,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					//if(deskbar)
 					//{
 						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						if (string)
+							free(string);
 						break;
 					//}
 				}
@@ -1179,6 +1197,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						fScreenShotIndex++;
 
 						GetDisplayDriver()->DumpToFile(filename);
+						if (string)
+							free(string);
 						break;
 					}
 				}
@@ -1187,7 +1207,41 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			// TODO: Pass on key down message to client window with the focus
+			Workspace *ws=ActiveWorkspace();
+			
+			desktop->fGeneralLock.Lock();
+			fMainLock.Lock();
+			
+			WinBorder *target=ws->FocusLayer();
+			if(target)
+			{
+				ServerWindow *win=target->Window();
+				if(win)
+				{
+					BMessage keymsg(B_KEY_DOWN);
+					keymsg.AddInt64("when",time);
+					keymsg.AddInt32("key",scancode);
+					keymsg.AddInt32("be:key_repeat",scancode);
+					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
+					for(uint8 i=0;i<4; i++)
+					{
+						if(utf[i])
+							keymsg.AddInt8("byte",utf[i]);
+					}
+					keymsg.AddString("bytes",string);
+					keymsg.AddInt32("raw_char",raw_char);
+					
+					win->Lock();
+					win->SendMessageToClient(&keymsg);
+					win->Unlock();
+				}
+			}
+			
+			fMainLock.Unlock();
+			desktop->fGeneralLock.Unlock();
+			if (string)
+				free(string);
 			break;
 		}
 		case B_KEY_UP:
@@ -1204,24 +1258,21 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// 8) int8[16] state of all keys
 			
 			bigtime_t time;
-			int32 scancode;
-			int32 ascii;
-			int32 modifiers;
+			int32 scancode, modifiers;
 			int8 utf[3];
-			int8 bytes;
-			char *string;
-			int8 keystate[16];
+			char *string = NULL;
+			int8 keystates[16];
+			int32 raw_char;
+			
+			*((int32*)utf)=0;
 			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
-			msg.Read<int32>(&ascii);
+			msg.Read<int32>(&raw_char);
 			msg.Read<int32>(&modifiers);
 			msg.Read(utf, sizeof(utf));
-			msg.Read<int8>(&bytes);
 			msg.ReadString(&string);
-			msg.Read(keystate, sizeof(keystate));
-			if (string)
-				free(string);
+			msg.Read(keystates,sizeof(int8)*16);
 	
 			STRACE(("Key Up: 0x%lx\n",scancode));
 			
@@ -1254,7 +1305,40 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 			
-			// TODO: Pass on key up message to client window with the focus
+			Workspace *ws=ActiveWorkspace();
+			
+			desktop->fGeneralLock.Lock();
+			fMainLock.Lock();
+			
+			WinBorder *target=ws->FocusLayer();
+			if(target)
+			{
+				ServerWindow *win=target->Window();
+				if(win)
+				{
+					BMessage keymsg(B_KEY_UP);
+					keymsg.AddInt64("when",time);
+					keymsg.AddInt32("key",scancode);
+					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
+					for(uint8 i=0;i<4; i++)
+					{
+						if(utf[i])
+							keymsg.AddInt8("byte",utf[i]);
+					}
+					keymsg.AddString("bytes",string);
+					keymsg.AddInt32("raw_char",raw_char);
+					
+					win->Lock();
+					win->SendMessageToClient(&keymsg);
+					win->Unlock();
+				}
+			}
+			
+			fMainLock.Unlock();
+			desktop->fGeneralLock.Unlock();
+			if (string)
+				free(string);
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
@@ -1263,26 +1347,44 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// 1) int64 bigtime_t object of when the message was sent
 			// 2) int32 raw key code (scancode)
 			// 3) int32 modifiers
-			// 4) int32 number of elements in the key state array to follow
-			// 5) int8 state of all keys
+			// 4) int8 state of all keys
 
 			bigtime_t time;
-			int32 scancode;
-			int32 modifiers;
-			int32 elements;
-			//int8 keystate[16];
+			int32 scancode, modifiers;
+			int8 keystates[16];
 			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
 			msg.Read<int32>(&modifiers);
-			msg.Read<int32>(&elements);
-			//msg.Read(keystate, elements);
-
-			#ifdef DEBUG_KEYHANDLING
-			printf("Unmapped Key Down: 0x%lx\n", scancode);
-			#endif
+			msg.Read(keystates,sizeof(int8)*16);
+	
+			STRACE(("Unmapped Key Down: 0x%lx\n",scancode));
 			
-			// TODO: Pass on unmapped key down message to client window with the focus
+			Workspace *ws=ActiveWorkspace();
+			
+			desktop->fGeneralLock.Lock();
+			fMainLock.Lock();
+			
+			WinBorder *target=ws->FocusLayer();
+			if(target)
+			{
+				ServerWindow *win=target->Window();
+				if(win)
+				{
+					BMessage keymsg(B_UNMAPPED_KEY_DOWN);
+					keymsg.AddInt64("when",time);
+					keymsg.AddInt32("key",scancode);
+					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
+					
+					win->Lock();
+					win->SendMessageToClient(&keymsg);
+					win->Unlock();
+				}
+			}
+			
+			fMainLock.Unlock();
+			desktop->fGeneralLock.Unlock();
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
@@ -1291,26 +1393,44 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// 1) int64 bigtime_t object of when the message was sent
 			// 2) int32 raw key code (scancode)
 			// 3) int32 modifiers
-			// 4) int32 number of elements in the key state array to follow
-			// 5) int8 state of all keys
+			// 4) int8 state of all keys
 
 			bigtime_t time;
-			int32 scancode;
-			int32 modifiers;
-			int32 elements;
-			//int8 keystate[16];
+			int32 scancode, modifiers;
+			int8 keystates[16];
 			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
 			msg.Read<int32>(&modifiers);
-			msg.Read<int32>(&elements);
-			//msg.Read(keystate, elements);
-
-			#ifdef DEBUG_KEYHANDLING
-			printf("Unmapped Key Up: 0x%lx\n", scancode);
-			#endif
-
-			// TODO: Pass on unmapped key up message to client window with the focus
+			msg.Read(keystates,sizeof(int8)*16);
+	
+			STRACE(("Unmapped Key Up: 0x%lx\n",scancode));
+			
+			Workspace *ws=ActiveWorkspace();
+			
+			desktop->fGeneralLock.Lock();
+			fMainLock.Lock();
+			
+			WinBorder *target=ws->FocusLayer();
+			if(target)
+			{
+				ServerWindow *win=target->Window();
+				if(win)
+				{
+					BMessage keymsg(B_UNMAPPED_KEY_UP);
+					keymsg.AddInt64("when",time);
+					keymsg.AddInt32("key",scancode);
+					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
+					
+					win->Lock();
+					win->SendMessageToClient(&keymsg);
+					win->Unlock();
+				}
+			}
+			
+			fMainLock.Unlock();
+			desktop->fGeneralLock.Unlock();
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -1319,26 +1439,41 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// 1) int64 bigtime_t object of when the message was sent
 			// 2) int32 modifiers
 			// 3) int32 old modifiers
-			// 4) int32 number of elements in the key state array to follow
-			// 5) int8 state of all keys
+			// 4) int8 state of all keys
 			
 			bigtime_t time;
-			int32 scancode;
-			int32 modifiers;
-			int32 elements;
-			//int8 keystate[16];
+			int32 modifiers,oldmodifiers;
+			int8 keystates[16];
 			
 			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&scancode);
 			msg.Read<int32>(&modifiers);
-			msg.Read<int32>(&elements);
-			//msg.Read(keystate, elements);
+			msg.Read<int32>(&oldmodifiers);
+			msg.Read(keystates,sizeof(int8)*16);
 
-			#ifdef DEBUG_KEYHANDLING
-			printf("Modifiers Changed\n");
-			#endif
-
-			// TODO: Pass on modifier change message to client window with the focus
+			Workspace *ws=ActiveWorkspace();
+			
+			desktop->fGeneralLock.Lock();
+			fMainLock.Lock();
+			
+			WinBorder *target=ws->FocusLayer();
+			if(target)
+			{
+				ServerWindow *win=target->Window();
+				if(win)
+				{
+					BMessage keymsg(B_MODIFIERS_CHANGED);
+					keymsg.AddInt64("when",time);
+					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddInt32("be:old_modifiers",oldmodifiers);
+					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
+					
+					win->Lock();
+					win->SendMessageToClient(&keymsg);
+					win->Unlock();
+				}
+			}
+			fMainLock.Unlock();
+			desktop->fGeneralLock.Unlock();
 			break;
 		}
 		default:
