@@ -1390,10 +1390,12 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			WinBorder	*wb;
 			int32		mainToken;
+			team_id		teamID;
 			
 			ses->ReadInt32(&mainToken);
+			ses->ReadData(&teamID, sizeof(team_id));
 			
-			wb			= desktop->FindWinBorderByServerWindowToken(mainToken);
+			wb			= desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb){
 				ses->WriteInt32(SERVER_TRUE);
 				ses->Sync();

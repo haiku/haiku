@@ -181,13 +181,13 @@ STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(
 		}
 
 // TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
+STRACESTREAM();
 		Invalidate();
 	}
 	else{
 		// Do nothing!
 	}
 
-STRACESTREAM();
 STRACE(("\n#Workspace(%ld)::SetFOCUSLayer( %s ) ENDED\n", ID(), layer? layer->GetName(): "NULL"));
 
 	return FocusLayer();
@@ -333,8 +333,10 @@ void Workspace::RemoveItem(ListData* item){
 	item->upperItem	= NULL;
 	item->lowerItem	= NULL;
 	
-	if (fFocusItem == item)
+	if (fFocusItem == item){
+		fFocusItem->layerPtr->SetFocus(false);
 		fFocusItem = NULL;
+	}
 	if (fFrontItem == item)
 		fFrontItem = NULL;
 	if (fCurrentItem == item)
@@ -517,6 +519,8 @@ STRACE(("#WS(%ld)::SASNF(%s) ENDED 1\n", ID(), preferred? preferred->GetName(): 
 		return;
 	}
 
+//	ListData		*exFocusItem = fFocusItem;
+
 		// properly place this 'preferred' WinBorder.
 	ListData		*lastInserted;
 	lastInserted	= FindPlace(HasItem(preferred));
@@ -549,6 +553,18 @@ STRACE((" NORMAL Window '%s' -", preferred? preferred->GetName(): "NULL"));
 				// if they are in the same team...
 			if (preferred->Window()->ClientTeamID() == fFrontItem->layerPtr->Window()->ClientTeamID()){
 STRACE((" SAME TeamID\n"));
+/*
+				{
+					int32		exFeel = exFocusItem? exFocusItem->layerPtr->Window()->Feel() : 0;
+					if (exFocusItem &&
+						 (exFeel == B_FLOATING_SUBSET_WINDOW_FEEL || exFeel == B_MODAL_SUBSET_WINDOW_FEEL)
+					{
+						if ( !(fFocusItem->layerPtr->Window()->fWinFMWList.HasItem(exFocusItem->layerPtr)) ){
+							
+						}
+					}
+				}
+*/
 					// collect subset windows that are common to application's windows...
 					// NOTE: A subset window *can* be added to more than just one window.
 				FMWList	commonFMW;
@@ -683,7 +699,7 @@ STRACE((" DIFERRENT TeamID\n"));
 					// windows to be inserted
 				fFrontItem = NULL;
 				goto et1;
-			} // else - if diferrent ClientTeamID()s.
+			} // END: else - if diferrent ClientTeamID()s.
 			} // if (fFrontItem) && NORMAL_WINDOW
 			else{
 STRACE((" NO previous FRONT Item\n"));
@@ -913,7 +929,8 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 	else
 		STRACE((" The window IS Hidden\n"));
 
-	ListData	*newFrontItem = NULL;
+	ListData	*exFrontItem	= fFrontItem;
+	ListData	*newFrontItem	= NULL;
 	if(preferred){
 		int32		feel = fBottomItem->layerPtr->Window()->Feel();
 
@@ -921,7 +938,9 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 		if(preferred->_level == B_FLOATING_SUBSET_FEEL
 			|| preferred->_level == B_FLOATING_APP_FEEL
 			|| preferred->_level == B_FLOATING_ALL_FEEL)
-		{ }
+		{
+			newFrontItem	= exFrontItem;
+		}
 			// if the last in workspace's list is one of these, GIVE focus to it!
 		else if((feel == B_SYSTEM_FIRST || feel == B_MODAL_ALL_WINDOW_FEEL)
 				&& !(fBottomItem->layerPtr->IsHidden()) )

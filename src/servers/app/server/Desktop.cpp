@@ -456,11 +456,12 @@ void Desktop::PrintToStream(){
 	
 }
 //---------------------------------------------------------------------------
-WinBorder* Desktop::FindWinBorderByServerWindowToken(int32 token){
+WinBorder* Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID){
 	WinBorder*		wb;
 	fLayerLock.Lock();
 	for (int32 i = 0; (wb = (WinBorder*)fWinBorderList.ItemAt(i)); i++){
-		if (wb->Window()->ClientToken() == token)
+		if (wb->Window()->ClientToken() == token
+			&& wb->Window()->ClientTeamID() == teamID)
 			break;
 	}
 	fLayerLock.Unlock();

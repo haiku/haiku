@@ -74,7 +74,7 @@ public:
 
 // "Private" to app_server :-) - means they should not be used very much
 			void				RemoveSubsetWindow(WinBorder* wb);
-			WinBorder*			FindWinBorderByServerWindowToken(int32 token);
+			WinBorder*			FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
 
 			BLocker				fGeneralLock;
 			BLocker				fLayerLock;

@@ -91,6 +91,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
 
+	fMainWinBorder	= NULL;
 	_decorator		= NULL;
 
 	if (feel == B_NO_BORDER_WINDOW_LOOK){
@@ -734,9 +735,9 @@ void WinBorder::AddToSubsetOf(WinBorder* main){
 			RootLayer		*rl = main->GetRootLayer();
 
 			desktop->fGeneralLock.Lock();
-printf("WinBorder(%s)::AddToSubsetOf() - General lock acquired\n", GetName());
+printf("WinBorder(%s)::AddToSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName());
 			rl->fMainLock.Lock();
-printf("WinBorder(%s)::AddToSubsetOf() - Main lock acquired\n", GetName());
+printf("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName());
 
 			for(int32 i = 0; i < rl->WorkspaceCount(); i++){
 				Workspace	*ws = rl->WorkspaceAt(i+1);
@@ -745,9 +746,9 @@ printf("WinBorder(%s)::AddToSubsetOf() - Main lock acquired\n", GetName());
 			}
 
 			rl->fMainLock.Unlock();
-printf("WinBorder(%s)::AddToSubsetOf() - Main lock released\n", GetName());
+printf("WinBorder(%s)::AddToSubsetOf(%s) - Main lock released\n", GetName(), main->GetName());
 			desktop->fGeneralLock.Unlock();
-printf("WinBorder(%s)::AddToSubsetOf() - General lock released\n", GetName());
+printf("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), main->GetName());
 		}
 	}
 }
