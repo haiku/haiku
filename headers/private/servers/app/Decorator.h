@@ -37,6 +37,7 @@
 
 class DisplayDriver;
 class ServerFont;
+class BRegion;
 
 typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 	CLICK_TAB, CLICK_DRAG, CLICK_MOVETOBACK, CLICK_MOVETOFRONT, CLICK_SLIDETAB,
@@ -83,7 +84,7 @@ public:
 	ColorSet GetColors(void) { return (_colors)?*_colors:ColorSet(); }
 	
 	virtual BRect SlideTab(float dx, float dy=0);
-	virtual BRegion *GetFootprint(void);
+	virtual void GetFootprint(BRegion *region);
 	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 	virtual void MoveBy(float x, float y);
