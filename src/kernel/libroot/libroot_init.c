@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <libroot_private.h>
@@ -37,6 +37,7 @@ initialize_before(image_id imageID, struct uspace_program_args const *args)
 			__progname++;
 	}
 
+	__init_time();
 	__init_image(args);
 	__init_dlfcn(args);
 	__init_fork();
