@@ -1206,13 +1206,13 @@ status_t nv_acc_setup_rectangle(uint32 color)
 	/* setup fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 1)
+	while (((nv3_gdi_rectangle_text_ptr->FifoFree) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
-		snooze (10); 
+		snooze (10);
 	}
 	/* now setup color (writing 1 32bit word) */
-	ACCW(BMP_COLOR1A, color);
+	nv3_gdi_rectangle_text_ptr->Color1A = color;
 
 	return B_OK;
 }
@@ -1222,14 +1222,16 @@ status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	/* instruct engine what to fill:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 2)
+	while (((nv3_gdi_rectangle_text_ptr->FifoFree) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup fill (writing 2 32bit words) */
-	ACCW(BMP_UCRECTL_0, ((xs << 16) | (ys & 0x0000ffff)));
-	ACCW(BMP_UCRECSZ_0, (((xe - xs) << 16) | (yl & 0x0000ffff)));
+	nv3_gdi_rectangle_text_ptr->UnclippedRectangle[0].LeftTop =
+		((xs << 16) | (ys & 0x0000ffff));
+	nv3_gdi_rectangle_text_ptr->UnclippedRectangle[0].WidthHeight =
+		(((xe - xs) << 16) | (yl & 0x0000ffff));
 
 	return B_OK;
 }
@@ -1266,13 +1268,13 @@ status_t nv_acc_setup_rect_invert()
 	/* reset fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 1)
+	while (((nv3_gdi_rectangle_text_ptr->FifoFree) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now reset color (writing 1 32bit word) */
-	ACCW(BMP_COLOR1A, 0);
+	nv3_gdi_rectangle_text_ptr->Color1A = 0x00000000;
 
 	return B_OK;
 }
@@ -1282,14 +1284,16 @@ status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	/* instruct engine what to invert:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 2)
+	while (((nv3_gdi_rectangle_text_ptr->FifoFree) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup invert (writing 2 32bit words) */
-	ACCW(BMP_UCRECTL_0, ((xs << 16) | (ys & 0x0000ffff)));
-	ACCW(BMP_UCRECSZ_0, (((xe - xs) << 16) | (yl & 0x0000ffff)));
+	nv3_gdi_rectangle_text_ptr->UnclippedRectangle[0].LeftTop =
+		((xs << 16) | (ys & 0x0000ffff));
+	nv3_gdi_rectangle_text_ptr->UnclippedRectangle[0].WidthHeight =
+		(((xe - xs) << 16) | (yl & 0x0000ffff));
 
 	return B_OK;
 }
