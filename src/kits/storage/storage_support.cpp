@@ -8,6 +8,7 @@
 */
 
 #include <new>
+#include <ctype.h>
 #include <string.h>
 
 #include <StorageDefs.h>
@@ -313,6 +314,49 @@ check_path_name(const char *path)
 	if (error == B_OK && strlen(path) > B_PATH_NAME_LENGTH)
 		error = B_NAME_TOO_LONG;
 	return error;
+}
+
+/*! Returns "(null)" if you're a bonehead and pass in a \c NULL pointer.
+*/
+std::string
+to_lower(const char *str)
+{
+	std::string result;
+	to_lower(str, result);
+	return result;
+}
+
+/*! Returns "(null)" if you're a bonehead and pass in a \c NULL pointer.
+*/
+void
+to_lower(const char *str, std::string &result)
+{
+	if (str) {
+		result = "";
+		for (int i = 0; i < strlen(str); i++)
+			result += tolower(str[i]);
+	} else
+		result = "(null)";
+}
+
+/*! \c str and \c result may point to the same string. \c result is
+	assumed to be as long as or longer than \c str. 
+*/
+void
+to_lower(const char *str, char *result)
+{
+	if (str && result) {
+		int i;
+		for (i = 0; i < strlen(str); i++)
+			result[i] = tolower(str[i]);
+		result[i] = 0;
+	}	
+}
+
+void
+to_lower(char *str)
+{
+	to_lower(str, str);
 }
 
 

@@ -11,6 +11,7 @@
 #ifndef _STORAGE_SUPPORT_H
 #define _STORAGE_SUPPORT_H
 
+#include <string>
 
 namespace BPrivate {
 namespace Storage {
@@ -37,6 +38,18 @@ status_t check_entry_name(const char *entry);
 
 //! Checks whether a path name is a valid path name.
 status_t check_path_name(const char *path);
+
+//! Returns a copy of \c str in which all alphabetic characters are lowercase.
+std::string to_lower(const char *str);
+
+//! Places a copy of \c str in \c result in which all alphabetic characters are lowercase.
+void to_lower(const char *str, std::string &result);
+
+//! Copies \c str into \c result, converting any uppercase alphabetics to lowercase.
+void to_lower(const char *str, char *result);
+
+//! Converts \c str to lowercase.
+void to_lower(char *str);
 
 };	// namespace Storage
 };	// namespace BPrivate
