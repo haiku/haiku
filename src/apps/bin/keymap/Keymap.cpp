@@ -267,7 +267,7 @@ Keymap::Load(entry_ref &ref)
 	if (!fChars)
 		delete[] fChars;
 	fChars = new char[fCharsSize];
-	if (file.Read(fChars, fCharsSize) != fCharsSize)
+	if ((unsigned)file.Read(fChars, fCharsSize) != fCharsSize)
 		return B_BAD_VALUE;
 	
 	return B_OK;

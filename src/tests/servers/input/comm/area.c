@@ -22,4 +22,6 @@ int main(int count, char **args) {
 
 		delete_area(newArea);
 	}
+
+	return 0;
 }
