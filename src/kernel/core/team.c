@@ -2246,6 +2246,18 @@ _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 }
 
 
+void
+_user_exit_team(status_t returnValue)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	thread->exit.status = returnValue;
+	thread->exit.reason = THREAD_RETURN_EXIT;
+
+	send_signal(thread->id, SIGKILL);
+}
+
+
 status_t
 _user_kill_team(team_id team)
 {

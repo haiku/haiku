@@ -1,15 +1,14 @@
-/* Big case statement for dispatching syscalls */
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
+/* Big case statement for dispatching syscalls */
 
 #include <kernel.h>
 #include <ksyscalls.h>
 #include <syscalls.h>
 #include <int.h>
-#include <arch/int.h>
 #include <debug.h>
 #include <vfs.h>
 #include <thread.h>
@@ -32,6 +31,7 @@
 #include <sys/socket.h>
 #include <user_atomic.h>
 #include <safemode.h>
+#include <arch/system_info.h>
 
 
 static inline
@@ -41,6 +41,7 @@ _user_null()
 	return 0;
 }
 
+
 // map to the arch specific call
 static inline
 int64
@@ -49,14 +50,6 @@ _user_restore_signal_frame()
 	return arch_restore_signal_frame();
 }
 
-// XXX: _kern_exit() was formerly mapped to _user_exit_thread(). That's
-// probably not correct.
-static inline
-void
-_user_exit(int returnCode)
-{
-	_user_exit_thread(returnCode);
-}
 
 // TODO: Replace when networking code is added to the build. 
 static inline
