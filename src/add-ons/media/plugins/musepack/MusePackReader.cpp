@@ -92,8 +92,19 @@ MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_dura
 	BMediaFormats formats;
 	formats.GetFormatFor(description, format);
 
-	*_infoBuffer = NULL;
-	*_infoSize = 0;
+	// allocate and initialize internal decoder
+	MPC_decoder *decoder = new MPC_decoder(static_cast<BPositionIO *>(Source()));
+	decoder->RESET_Globals();
+	decoder->RESET_Synthesis();
+	decoder->SetStreamInfo(&fInfo);
+	if (!decoder->FileInit()) {
+		delete decoder;
+		return B_ERROR;
+	}
+
+	// we provide the stream info in this place
+	*_infoBuffer = (void *)decoder;
+	*_infoSize = sizeof(MPC_decoder);
 
 	return B_OK;
 }
@@ -102,7 +113,9 @@ MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_dura
 status_t 
 MusePackReader::Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 {
-	return B_ERROR;
+	// we don't care, let the decoder do the work...
+	// (MPC not really differentiates between decoder and container)
+	return B_OK;
 }
 
 
@@ -110,6 +123,7 @@ status_t
 MusePackReader::GetNextChunk(void *cookie, void **chunkBuffer, int32 *chunkSize,
 	media_header *mediaHeader)
 {
+	// this one will never be called by our decoder
 	return B_ERROR;
 }
 

@@ -9,6 +9,8 @@
 #include "DecoderPlugin.h"
 #include <MediaFormats.h>
 
+#include "mpc/mpc_dec.h"
+
 
 class MusePackDecoder : public Decoder {
 	public:
@@ -27,6 +29,8 @@ class MusePackDecoder : public Decoder {
 					media_header *mediaHeader, media_decode_info *info);
 
 	private:
+		MPC_decoder	*fDecoder;
+		StreamInfo	*fInfo;
 };
 
 #endif	/* MUSEPACK_DECODER_H */
