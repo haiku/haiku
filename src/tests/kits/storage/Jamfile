@@ -4,6 +4,7 @@ UsePrivateHeaders storage ;
 
 CommonTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
+		AppFileInfoTest.cpp
 		BasicTest.cpp
 		DirectoryTest.cpp
 		EntryTest.cpp
@@ -11,6 +12,7 @@ CommonTestLib libstoragetest.so
 		FileTest.cpp
 		MimeSnifferTest.cpp
 		MimeTypeTest.cpp
+		NodeInfoTest.cpp
 		NodeTest.cpp
 		PathTest.cpp
 		QueryTest.cpp
