@@ -359,7 +359,7 @@ PPPManager::RegisterInterface(ppp_interface_id ID)
 	memset(ifp, 0, sizeof(ifnet));
 	ifp->devid = -1;
 	ifp->if_type = IFT_PPP;
-	ifp->name = sKPPPIfNameBase;
+	ifp->name = (char*)sKPPPIfNameBase;
 	ifp->if_unit = FindUnit();
 	ifp->if_flags = IFF_POINTOPOINT;
 	ifp->rx_thread = ifp->tx_thread = -1;

@@ -52,8 +52,8 @@ public:
 	BRect Bounds() const { return fBounds; }
 	void SetBounds(BRect bounds);
 
-	Option Option() const { return fOption; }
-	void SetOption(Option op) { fOption = op; }
+	enum Option Option() const { return fOption; }
+	void SetOption(enum Option op) { fOption = op; }
 	// zoomFactor = 72.0 / dpi
 	float ZoomFactor() const { return fZoomFactor; }
 	void SetZoomFactor(float z);
@@ -67,7 +67,7 @@ public:
 	
 private:
 	BRect fBounds;
-	Option fOption;
+	enum Option fOption;
 	float fZoomFactor;
 	float fDPI;
 	float fWidth, fHeight; // 1/72 Inches
