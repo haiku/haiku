@@ -360,7 +360,7 @@ status_t MediaReader::GetNextOutput(	/* cookie starts as 0 */
 	if (cookie != 0) {
 		// it's valid but they already got our 1 output
 		if (*cookie != 0) {
-			fprintf(stderr,"<- B_ERROR\n");
+			fprintf(stderr,"<- B_ERROR (no more outputs)\n");
 			return B_ERROR;
 		}
 		// so next time they won't get the same output again
@@ -533,7 +533,7 @@ void MediaReader::Connect(
 	                     * output.format.u.multistream.max_chunk_size
 			             / output.format.u.multistream.max_bit_rate);
 
-	fprintf(stderr,"  max chunk size = %i, max bit rate = %f, buffer period = %i\n",
+	fprintf(stderr,"  max chunk size = %i, max bit rate = %f, buffer period = %lld\n",
 			output.format.u.multistream.max_chunk_size,
 			output.format.u.multistream.max_bit_rate,fBufferPeriod);
 
@@ -575,10 +575,10 @@ void MediaReader::Connect(
 	
 		fInternalLatency = end - start;
 		
-		fprintf(stderr,"  internal latency from disk read = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency from disk read = %lld\n",fInternalLatency);
 	} else {
 		fInternalLatency = 100; // just guess
-		fprintf(stderr,"  internal latency guessed = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency guessed = %lld\n",fInternalLatency);
 	}
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
