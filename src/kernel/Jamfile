@@ -196,19 +196,6 @@ KernelLd kernel.so
 	-Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
 
-KernelLd iso9660
-	:
-	<$(SOURCE_GRIST)!core!addons!fs!iso9660>isofs.o
-	kernel.so
-	:
-	$(SUBDIR)/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	addons/fs/iso9660
-	;
-
 KernelLd isa
 	:
 	<$(SOURCE_GRIST)!core!addons!bus_managers!isa>isa.o
