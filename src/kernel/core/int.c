@@ -137,13 +137,15 @@ install_io_interrupt_handler(long irq, interrupt_handler handler, void *data, ul
 }
 
 
-/** read notes for install_interrupt_handler */
+/**	Removes and interrupt handler.
+ *	Read the notes for install_interrupt_handler!
+ */
 
 long
 remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
 	struct io_handler *io = NULL;
-	long rv = EINVAL;
+	long status = EINVAL;
 	int state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
@@ -163,8 +165,7 @@ remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
 			remque(io);
-			free(io); // XXX free() should not be called inside a spinlock or with disabled interrupts
-			rv = 0;
+			status = B_OK;
 			break;
 		}
 	}
@@ -175,7 +176,11 @@ remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	release_spinlock(&io_vectors[vector].vector_lock);
 	restore_interrupts(state);
 
-	return rv;
+	/* if the handler could be found and removed, we still have to free it */
+	if (status == B_OK)
+		free(io);
+
+	return status;
 } 
 
 
@@ -204,46 +209,53 @@ remove_io_interrupt_handler(long irq, interrupt_handler handler, void *data)
 
 int
 int_io_interrupt_handler(int vector)
-{ 
-	int ret = B_UNHANDLED_INTERRUPT; 
+{
+	int status = B_UNHANDLED_INTERRUPT;
+	struct io_handler *io;
 
-	acquire_spinlock(&io_vectors[vector].vector_lock); 
+	acquire_spinlock(&io_vectors[vector].vector_lock);
 
-	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list) { 
-		dprintf("unhandled io interrupt %d\n", vector); 
-	} else { 
-		struct io_handler *io; 
-		/* Loop through the list of handlers. 
-		 * each handler returns as follows...
-		 * - B_UNHANDLED_INTERRUPT, the interrupt wasn't processed by the
-		 *                          fucntion, so try the next available.
-		 * - B_HANDLED_INTERRUPT, the interrupt has been handled and no further
-		 *                        attention is required
-		 * - B_INVOKE_SCHEDULER, the interrupt has been handled, but the function wants
-		 *                       the scheduler to be invoked
-		 *
-		 * XXX - this is a change of behaviour from newos where every handler registered
-		 *       be called, even if the interrupt had been "handled" by a previous
-		 *       function.
-		 *       The logic now is that if there are no handlers then we return
-		 *       B_UNHANDLED_INTERRUPT and let the system do as it will.
-		 *       When we have the first function that claims to have "handled" the
-		 *       interrupt, by returning B_HANDLED_... or B_INVOKE_SCHEDULER we simply
-		 *       stop calling further handlers and return the value from that
-		 *       handler.
-		 *       This may not be correct but appears to be what BeOS did and seems
-		 *       right.
-		 */
-		for (io = io_vectors[vector].handler_list.next; 
-		     io != &io_vectors[vector].handler_list; //XXX DOES this work for 1 entry?
-		     io = io->next) {
-			if ((ret = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
-				break;
-		} 
-	} 
+	// The list can be empty, or not initialized at this place
+	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list
+		|| io_vectors[vector].handler_list.next == NULL) {
+		dprintf("unhandled io interrupt %d\n", vector);
+		return B_UNHANDLED_INTERRUPT;
+	}
 
-	release_spinlock(&io_vectors[vector].vector_lock); 
+	/* Loop through the list of handlers. 
+	 * each handler returns as follows...
+	 * - B_UNHANDLED_INTERRUPT, the interrupt wasn't processed by the
+	 *                          fucntion, so try the next available.
+	 * - B_HANDLED_INTERRUPT, the interrupt has been handled and no further
+	 *                        attention is required
+	 * - B_INVOKE_SCHEDULER, the interrupt has been handled, but the function wants
+	 *                       the scheduler to be invoked
+	 *
+	 * This is a change of behaviour from newos where every handler registered
+	 * be called, even if the interrupt had been "handled" by a previous
+	 * function.
+	 * The logic now is that if there are no handlers then we return
+	 * B_UNHANDLED_INTERRUPT and let the system do as it will.
+	 * When we have the first function that claims to have "handled" the
+	 * interrupt, by returning B_HANDLED_... or B_INVOKE_SCHEDULER we simply
+	 * stop calling further handlers and return the value from that
+	 * handler.
+	 * This may not be correct but appears to be what BeOS did and seems
+	 * right.
+	 *
+	 *	ToDo: we might want to reenable calling all registered handlers depending
+	 *		on a flag somewhere, so that we can deal with buggy drivers
+	 */
 
-	return ret; 
+	for (io = io_vectors[vector].handler_list.next;
+		io != &io_vectors[vector].handler_list; // Are we already at the end of the list?
+		io = io->next) {
+		if ((status = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
+			break;
+	}
+
+	release_spinlock(&io_vectors[vector].vector_lock);
+
+	return status;
 }
 
