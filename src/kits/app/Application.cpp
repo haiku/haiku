@@ -655,6 +655,9 @@ void BApplication::InitData(const char* signature, status_t* error)
 			fMsgPort = appInfo.port;
 		} else
 			appInfo.port = fMsgPort;
+		// check the signature and correct it, if necessary
+		if (strcmp(appInfo.signature, fAppName))
+			be_roster->SetSignature(team, fAppName);
 		// complete the registration
 		fInitError = be_roster->CompleteRegistration(team, thread,
 													 appInfo.port);
