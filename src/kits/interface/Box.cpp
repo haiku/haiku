@@ -232,8 +232,8 @@ void BBox::FrameResized(float width, float height)
 {
 	BRect bounds(Bounds());
 
-	fBounds.right = Bounds().right;
-	fBounds.bottom = Bounds().bottom;
+	fBounds.right = bounds.right;
+	fBounds.bottom = bounds.bottom;
 
 	Invalidate();
 }
