@@ -46,35 +46,44 @@ public:
 	//				SA = B_STOP_ALERT
 	
 	////// UW_ES_IA - One Button //////
-	
 	void empty_empty_UW_ES_IA();
 	void OK_X_UW_ES_IA();
 	void OK_60X_UW_ES_IA();
 	void twentyX_60X_UW_ES_IA();
 	void fortyX_60X_UW_ES_IA();
 	
-	////// UW_ES_IA - Two Button //////
+	////// LW_ES_IA - One Button //////
+	void empty_empty_LW_ES_IA();
+	void OK_X_LW_ES_IA();
+	void twentyX_60X_LW_ES_IA();
+	void fortyX_60X_LW_ES_IA();
 	
+	////// UW_ES_EA - One Button //////
+	void OK_X_UW_ES_EA();
+	void fortyX_60X_UW_ES_EA();
+	
+	////// UW_ES_IA - Two Button //////
 	void OK_Cancel_60X_UW_ES_IA();
 	void twentyX_Cancel_60X_UW_ES_IA();
 	void twentyX_20X_60X_UW_ES_IA();
 	
-	////// UW_ES_IA - Three Button //////
-	
-	void twentyX_20X_20X_60X_UW_ES_IA();
-	
-	////// UW_ES_EA - One Button //////
-	
-	void OK_X_UW_ES_EA();
-	void fortyX_60X_UW_ES_EA();
+	////// LW_ES_IA - Two Button //////
+	void empty_empty_X_LW_ES_IA();
+	void OK_Cancel_60X_LW_ES_IA();
 	
 	////// UW_ES_EA - Two Button //////
-	
 	void OK_Cancel_60X_UW_ES_EA();
 	void twentyX_20X_60X_UW_ES_EA();
 	
-	////// UW_ES_EA - Three Button //////
+	////// UW_ES_IA - Three Button //////
+	void twentyX_20X_20X_60X_UW_ES_IA();
 	
+	////// LW_ES_IA - Three Button //////
+	void empty_empty_empty_X_LW_ES_IA();
+	void Yes_No_Cancel_X_LW_ES_IA();
+	void twentyX_20X_20X_60X_LW_ES_IA();
+	
+	////// UW_ES_EA - Three Button //////
 	void twentyX_20X_20X_60X_UW_ES_EA();
 };
 
