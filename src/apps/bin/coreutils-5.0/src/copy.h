@@ -124,6 +124,9 @@ struct cp_options
      it be zero.  */
   int require_preserve;
 
+  /* If nonzero, attributes will be ignored when copying.  */
+  int ignore_attributes;
+
   /* If nonzero, copy directories recursively and copy special files
      as themselves rather than copying their contents. */
   int recursive;

@@ -46,6 +46,12 @@
 #include "same.h"
 #include "xreadlink.h"
 
+#if __BEOS__
+#	define bool bool_t
+#	include <fs_attr.h>
+#	undef bool
+#endif
+
 #define DO_CHOWN(Chown, File, New_uid, New_gid)				\
   (Chown (File, New_uid, New_gid)					\
    /* If non-root uses -p, it's ok if we can't preserve ownership.	\
@@ -136,6 +142,63 @@ is_ancestor (const struct stat *sb, const struct dir_list *ancestors)
   return 0;
 }
 
+
+static int
+copy_attributes(int fromFd, int toFd)
+{
+	struct dirent *dirent;
+	char buffer[65536];
+
+	DIR *attributes = fs_fopen_attr_dir(fromFd);
+	if (attributes == NULL)
+		return -1;
+
+	while ((dirent = fs_read_attr_dir(attributes)) != NULL) {
+		attr_info info;
+		off_t pos = 0;
+
+		if (fs_stat_attr(fromFd, dirent->d_name, &info) != 0)
+			continue;
+
+		while (info.size > 0) {
+			ssize_t bytesRead, bytesWritten;
+			
+			bytesRead = fs_read_attr(fromFd, dirent->d_name, info.type, pos, buffer, sizeof(buffer));
+			if (bytesRead < 0)
+				continue;
+			
+			bytesWritten = fs_write_attr(toFd, dirent->d_name, info.type, pos, buffer, bytesRead);
+			if (bytesWritten != bytesRead)
+				continue;
+
+			pos += bytesRead;
+			info.size -= bytesRead;
+		}
+	}
+
+	fs_close_attr_dir(attributes);
+}
+
+
+static int
+copy_attributes_by_name(const char *from, const char *to, int resolveLinks)
+{
+	int fromFd, toFd;
+	printf("%s -> %s\n", from, to);
+	fromFd = open(from, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
+	if (fromFd < 0)
+		return -1;
+
+	toFd = open(to, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
+	if (toFd < 0) {
+		close(fromFd);
+		return -1;
+	}
+
+	return copy_attributes(fromFd, toFd);
+}
+
+
 /* Read the contents of the directory SRC_PATH_IN, and recursively
    copy the contents to DST_PATH_IN.  NEW_DST is nonzero if
    DST_PATH_IN is a directory that was created previously in the
@@ -162,6 +225,10 @@ copy_dir (const char *src_path_in, const char *dst_path_in, int new_dst,
       error (0, errno, _("cannot access %s"), quote (src_path_in));
       return -1;
     }
+
+  if (x->ignore_attributes == 0
+  	&& copy_attributes_by_name(src_path_in, dst_path_in, true) != 0)
+    fprintf(stderr, "%s: could not copy attributes\n", src_path_in);
 
   /* For cp's -H option, dereference command line arguments, but do not
      dereference symlinks that are found via recursive traversal.  */
@@ -311,6 +378,10 @@ copy_reg (const char *src_path, const char *dst_path,
 	make_holes = 1;
     }
 #endif
+
+  if (x->ignore_attributes == 0
+  	&& copy_attributes(source_desc, dest_desc) != 0)
+    fprintf(stderr, "%s: could not copy attributes\n", src_path);
 
   /* Make a buffer with space for a sentinel at the end.  */
 
@@ -1132,6 +1203,12 @@ copy_internal (const char *src_path, const char *dst_path,
 	    error (0, errno, _("cannot create hard link %s to %s"),
 		   quote_n (0, dst_path), quote_n (1, earlier_file));
 	    goto un_backup;
+	  }
+	else
+	  {
+	    if (x->ignore_attributes == 0
+	    	&& copy_attributes_by_name(earlier_file, dst_path, false) != 0)
+		fprintf(stderr, "%s: could not copy attributes\n", earlier_file);
 	  }
 
 	return 0;

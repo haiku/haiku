@@ -730,6 +730,7 @@ cp_option_init (struct cp_options *x)
   x->preserve_timestamps = 0;
 
   x->require_preserve = 0;
+  x->ignore_attributes = 0;
   x->recursive = 0;
   x->sparse_mode = SPARSE_AUTO;
   x->symbolic_link = 0;

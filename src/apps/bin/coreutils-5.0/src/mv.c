@@ -130,6 +130,7 @@ cp_option_init (struct cp_options *x)
   x->preserve_mode = 1;
   x->preserve_timestamps = 1;
   x->require_preserve = 0;  /* FIXME: maybe make this an option */
+  x->ignore_attributes = 0;
   x->recursive = 1;
   x->sparse_mode = SPARSE_AUTO;  /* FIXME: maybe make this an option */
   x->symbolic_link = 0;
