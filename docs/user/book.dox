@@ -1,9 +1,10 @@
 /*!
-\mainpage The OpenBeOS Book
+\mainpage The Haiku Book
 
 \section kits Kits and Servers
 
 - \ref midi1
 - \ref midi2
+- \ref support
 - \ref ppp
 */
