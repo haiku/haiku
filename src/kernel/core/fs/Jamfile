@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel core fs ;
 
+UsePrivateHeaders storage ;
+
 KernelMergeObject kernel_fs.o : 
 	<$(SOURCE_GRIST)>bootfs.c
 	<$(SOURCE_GRIST)>devfs.c
