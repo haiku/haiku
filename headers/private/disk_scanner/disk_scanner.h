@@ -33,7 +33,7 @@ typedef status_t (*disk_scanner_get_nth_session_info_hook)(int deviceFD,
 	struct session_module_info **sessionModule);
 typedef status_t (*disk_scanner_get_nth_partition_info_hook)(int deviceFD,
 	const struct session_info *sessionInfo, int32 partitionIndex,
-	struct extended_partition_info *partitionInfo,
+	struct extended_partition_info *partitionInfo, char *partitionMapName,
 	struct partition_module_info **partitionModule);
 typedef status_t (*disk_scanner_get_partition_fs_info_hook)(int deviceFD,
 	struct extended_partition_info *partitionInfo);
@@ -146,6 +146,11 @@ typedef struct disk_scanner_module_info {
 	sessionInfo: a complete info about the session the partition resides on
 	partitionIndex: partition index
 	partitionInfo: the partition info to be filled in
+	partitionMapName: Pointer to a pre-allocated char buffer of minimal
+					  size B_FILE_NAME_LENGTH, into which the short name of
+					  the partitioning system shall be written. The result is
+					  the empty string (""), if no partitioning system is used
+					  (e.g. for floppies). May be NULL.
 	partitionModule: pointer to partition_module_info*
 
 	The function first tries to find a suitable partition module and to
