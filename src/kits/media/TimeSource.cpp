@@ -11,6 +11,14 @@
 #include "ServerInterface.h"
 #include "TimeSourceObject.h"
 
+#define DEBUG_TIMESOURCE 0
+
+#if DEBUG_TIMESOURCE
+	#define TRACE_TIMESOURCE printf
+#else
+	#define TRACE_TIMESOURCE if (1) {} else printf
+#endif
+
 namespace BPrivate { namespace media {
 
 struct TimeSourceTransmit // sizeof() must be <= 4096
@@ -117,10 +125,15 @@ bool
 BTimeSource::IsRunning()
 {
 	CALLED();
+
 	bool isrunning;
-	isrunning = fBuf ? atomic_add(&fBuf->isrunning, 0) : fStarted;
 	
-	printf("BTimeSource::IsRunning() node %ld, port %ld, %s\n", fNodeID, fControlPort, isrunning ? "yes" : "no");
+	if (fIsRealtime)
+		isrunning = true; // The system time source is always running :)
+	else
+		isrunning = fBuf ? atomic_add(&fBuf->isrunning, 0) : fStarted;
+	
+	TRACE_TIMESOURCE("BTimeSource::IsRunning() node %ld, port %ld, %s\n", fNodeID, fControlPort, isrunning ? "yes" : "no");
 	return isrunning;
 }
 
@@ -156,7 +169,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 //		return B_OK;
 //	}
 
-	printf("BTimeSource::GetTime     timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), *performance_time, *real_time, *drift);
+	TRACE_TIMESOURCE("BTimeSource::GetTime     timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), *performance_time, *real_time, *drift);
 	return B_OK;
 }
 
@@ -266,7 +279,7 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 						 bigtime_t real_time,
 						 float drift)
 {
-	printf("BTimeSource::PublishTime timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), performance_time, real_time, drift);
+	TRACE_TIMESOURCE("BTimeSource::PublishTime timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), performance_time, real_time, drift);
 	if (0 == fBuf) {
 		FATAL("BTimeSource::PublishTime timesource %ld, fBuf = NULL\n", ID());
 		fStarted = true;
@@ -454,7 +467,7 @@ BTimeSource::DirectAddMe(const media_node &node)
 				time_source_op_info msg;
 				msg.op = B_TIMESOURCE_START;
 				msg.real_time = RealTime();
-				printf("starting time source\n");
+				TRACE_TIMESOURCE("starting time source %ld\n", ID());
 				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
 			}
 			return;
@@ -485,7 +498,7 @@ BTimeSource::DirectRemoveMe(const media_node &node)
 				time_source_op_info msg;
 				msg.op = B_TIMESOURCE_STOP_IMMEDIATELY;
 				msg.real_time = RealTime();
-				printf("stopping time source\n");
+				TRACE_TIMESOURCE("stopping time source %ld\n", ID());
 				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
 			}
 			return;
