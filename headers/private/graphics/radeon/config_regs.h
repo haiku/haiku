@@ -12,6 +12,8 @@
 
 // mmio registers
 #define RADEON_CONFIG_CNTL                  0x00e0
+#define		RADEON_CFG_ATI_REV_ID_SHIFT		16
+#define		RADEON_CFG_ATI_REV_ID_MASK		(0xf << 16)
 #define RADEON_CONFIG_MEMSIZE               0x00f8
 #       define RADEON_CONFIG_MEMSIZE_MASK   0x1ff00000
 

@@ -13,11 +13,21 @@
 #define RADEON_GEN_INT_CNTL                 0x0040
 #		define RADEON_CRTC_VBLANK_MASK		(1 <<  0)
 #		define RADEON_CRTC2_VBLANK_MASK		(1 <<  9)
+#		define RADEON_GUIDMA_MASK			(1 <<  30)
+#		define RADEON_VIDDMA_MASK			(1 <<  31)
 #define RADEON_GEN_INT_STATUS               0x0044
 #		define RADEON_CRTC_VBLANK_STAT		(1 <<  0)
 #		define RADEON_CRTC_VBLANK_STAT_AK	(1 <<  0)
+#		define RADEON_CAP0_INT_ACTIVE		(1 <<  8)
 #		define RADEON_CRTC2_VBLANK_STAT		(1 <<  9)
 #		define RADEON_CRTC2_VBLANK_STAT_AK	(1 <<  9)
+#		define RADEON_GUIDMA_STAT			(1 <<  30)
+#		define RADEON_GUIDMA_AK				(1 <<  30)
+#		define RADEON_VIDDMA_STAT			(1 <<  31)
+#		define RADEON_VIDDMA_AK				(1 <<  31)
+
+#define	RADEON_CAP_INT_CNTL					0x0908
+#define RADEON_CAP_INT_STATUS				0x090c
 
 #define RADEON_RBBM_SOFT_RESET              0x00f0
 #       define RADEON_SOFT_RESET_CP           (1 <<  0)

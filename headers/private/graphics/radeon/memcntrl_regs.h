@@ -20,5 +20,9 @@
 #       define RADEON_MEM_CFG_TYPE_MASK     (1 << 30)
 #       define RADEON_MEM_CFG_SDR           (0 << 30)
 #       define RADEON_MEM_CFG_DDR           (1 << 30)
+#define	RADEON_GC_NB_TOM					0x015c
+#define	RADEON_DISPLAY_BASE_ADDRESS			0x023c
+#define	RADEON_CRTC2_DISPLAY_BASE_ADDRESS	0x033c
+#define	RADEON_OV0_BASE_ADDRESS				0x043c
 
 #endif

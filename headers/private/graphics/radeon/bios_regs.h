@@ -19,8 +19,9 @@
 #define RADEON_BIOS_6_SCRATCH               0x0028
 #define RADEON_BIOS_7_SCRATCH               0x002c
 
-#define RADEON_TEST_DEBUG_CNTL              0x0120
-#define RADEON_TEST_DEBUG_MUX               0x0124
-#define RADEON_TEST_DEBUG_OUT               0x012c
+#define RADEON_TEST_DEBUG_CNTL					0x0120
+#		define RADEON_TEST_DEBUG_CNTL_OUT_EN	(1 << 0)
+#define RADEON_TEST_DEBUG_MUX					0x0124
+#define RADEON_TEST_DEBUG_OUT					0x012c
 
 #endif

@@ -23,7 +23,7 @@
 	do {                                                                  \
 		uint32 tmp = INREG( (regs), (addr) );                             \
 		tmp &= (mask);                                                    \
-		tmp |= (val);                                                     \
+		tmp |= (val) & ~(mask);                                           \
 		OUTREG( (regs), (addr), tmp );                                    \
 	} while (0)
 

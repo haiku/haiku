@@ -42,6 +42,8 @@
 #       define RADEON_CRTC2_HSYNC_TRISTAT    (1 <<  5)
 #       define RADEON_CRTC2_VSYNC_TRISTAT    (1 <<  6)
 #       define RADEON_CRTC2_CRT2_ON          (1 <<  7)
+#       define RADEON_CRTC2_PIX_WIDTH_SHIFT  8
+#       define RADEON_CRTC2_PIX_WIDTH_MASK   (0xf << 8)
 #       define RADEON_CRTC2_ICON_EN          (1 << 15)
 #       define RADEON_CRTC2_CUR_EN           (1 << 16)
 #       define RADEON_CRTC2_CUR_MODE_MASK    (7 << 20)
@@ -51,6 +53,13 @@
 #       define RADEON_CRTC2_HSYNC_DIS        (1 << 28)
 #       define RADEON_CRTC2_VSYNC_DIS        (1 << 29)
 #define RADEON_CRTC_GUI_TRIG_VLINE          0x0218
+#define RADEON_CRTC_MORE_CNTL					0x27C
+#		define RADEON_CRTC_HORZ_BLANK_MODE_SEL	(1 << 0)
+#		define RADEON_CRTC_VERT_BLANK_MODE_SEL	(1 << 1)
+#		define RADEON_CRTC_AUTO_HORZ_CENTER_EN	(1 << 2)
+#		define RADEON_CRTC_AUTO_VERT_CENTER_EN	(1 << 3)
+#		define RADEON_CRTC_H_CUTOFF_ACTIVE_EN	(1 << 4)
+#		define RADEON_CRTC_V_CUTOFF_ACTIVE_EN	(1 << 5)
 #define RADEON_CRTC_H_SYNC_STRT_WID         0x0204
 #       define RADEON_CRTC_H_SYNC_STRT_PIX        (0x07  <<  0)
 #       define RADEON_CRTC_H_SYNC_STRT_CHAR       (0x3ff <<  3)
@@ -127,5 +136,28 @@
 #define RADEON_CUR2_HORZ_VERT_POSN          0x0364
 #define RADEON_CUR2_OFFSET                  0x0360
 #       define RADEON_CUR2_LOCK             (1 << 31)
+
+#define RADEON_GRPH_BUFFER_CNTL             0x02f0
+#       define RADEON_GRPH_START_REQ_MASK          (0x7f)
+#       define RADEON_GRPH_START_REQ_SHIFT         0
+#       define RADEON_GRPH_STOP_REQ_MASK           (0x7f<<8)
+#       define RADEON_GRPH_STOP_REQ_SHIFT          8
+#       define RADEON_GRPH_CRITICAL_POINT_MASK     (0x7f<<16)
+#       define RADEON_GRPH_CRITICAL_POINT_SHIFT    16
+#       define RADEON_GRPH_CRITICAL_CNTL           (1<<28)
+#       define RADEON_GRPH_BUFFER_SIZE             (1<<29)
+#       define RADEON_GRPH_CRITICAL_AT_SOF         (1<<30)
+#       define RADEON_GRPH_STOP_CNTL               (1<<31)
+#define RADEON_GRPH2_BUFFER_CNTL            0x03f0
+#       define RADEON_GRPH2_START_REQ_MASK         (0x7f)
+#       define RADEON_GRPH2_START_REQ_SHIFT         0
+#       define RADEON_GRPH2_STOP_REQ_MASK          (0x7f<<8)
+#       define RADEON_GRPH2_STOP_REQ_SHIFT         8
+#       define RADEON_GRPH2_CRITICAL_POINT_MASK    (0x7f<<16)
+#       define RADEON_GRPH2_CRITICAL_POINT_SHIFT   16
+#       define RADEON_GRPH2_CRITICAL_CNTL          (1<<28)
+#       define RADEON_GRPH2_BUFFER_SIZE            (1<<29)
+#       define RADEON_GRPH2_CRITICAL_AT_SOF        (1<<30)
+#       define RADEON_GRPH2_STOP_CNTL              (1<<31)
 
 #endif

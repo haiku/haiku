@@ -4,19 +4,11 @@
 
 	Part of Radeon driver
 		
-	PLL registers and access macros
+	PLL registers
 */
 
 #ifndef _PLL_REG_H
 #define _PLL_REG_H
-
-#include "mmio.h"
-
-// atomic updates of PLL clock don't seem to always work and stick, thus
-// the bit never resets. Here - we use our own check by reading back the
-// register we've just wrote to make sure it's got the right value 
-#define RADEON_ATOMIC_UPDATE 0  // Use PLL Atomic updates (seems broken)
-
 
 // mmio registers
 #define RADEON_CLOCK_CNTL_DATA              0x000c
@@ -41,6 +33,8 @@
 #       define RADEON_PPLL_REF_DIV_MASK     0x03ff
 #       define RADEON_PPLL_ATOMIC_UPDATE_R  (1 << 15) /* same as _W */
 #       define RADEON_PPLL_ATOMIC_UPDATE_W  (1 << 15) /* same as _R */
+#		define RADEON_PPLL_REF_DIV_ACC_SHIFT 18
+#		define RADEON_PPLL_REF_DIV_ACC_MASK	(0x3ff << 18)
 #define RADEON_PPLL_DIV_0                   0x0004
 #define RADEON_PPLL_DIV_1                   0x0005
 #define RADEON_PPLL_DIV_2                   0x0006
@@ -57,6 +51,8 @@
 #       define RADEON_ECP_DIV_MASK          (3 << 8)
 #       define RADEON_ECP_DIV_VCLK          (0 << 8)
 #       define RADEON_ECP_DIV_VCLK_2        (1 << 8)
+#		define RADEON_PIXCLK_ALWAYS_ONb		(1 << 6)	// negated
+#		define RADEON_PIXCLK_DAC_ALWAYS_ONb	(1 << 7)	// negated
 #define RADEON_HTOTAL_CNTL                  0x0009
 #define RADEON_SCLK_CNTL                    0x000d
 #       define RADEON_DYN_STOP_LAT_MASK     0x00007ff8
@@ -92,29 +88,9 @@
 #       define RADEON_PIXCLK_TV_SRC_SEL_MASK     (1 << 8)
 #       define RADEON_PIXCLK_TV_SRC_SEL_PIXCLK   (0 << 8)
 #       define RADEON_PIXCLK_TV_SRC_SEL_PIX2CLK  (1 << 8)
+#       define RADEON_PIXCLK_LVDS_ALWAYS_ONb   (1 << 14)
+#       define RADEON_PIXCLK_TMDS_ALWAYS_ONb   (1 << 15)
 #define RADEON_HTOTAL2_CNTL                  0x002e
 
-// r300: to be called after each CLOCK_CNTL_INDEX access;
-// all functions declared in this header take care of that
-// (hardware bug fix suggested by XFree86)
-void R300_PLLFix( accelerator_info *ai );
-
-// in general:
-// - the PLL is connected via special port
-// - you need first to choose the PLL register and then write/read its value
-//
-// if atomic updates are not safe we:
-// - verify each time whether the right register is chosen
-// - verify all values written to PLL-registers
-
-
-// read value "val" from PLL-register "addr"
-uint32 Radeon_INPLL( accelerator_info *ai, int addr );
-
-// write value "val" to PLL-register "addr" 
-void Radeon_OUTPLL( accelerator_info *ai, uint8 addr, uint32 val );
-
-// write "val" to PLL-register "addr" keeping bits "mask"
-void Radeon_OUTPLLP( accelerator_info *ai, uint8 addr, uint32 val, uint32 mask );
 
 #endif

@@ -30,11 +30,13 @@
 #       define RADEON_FP_USE_SHADOW_EN         (1 << 24)
 #       define RADEON_FP_CRT_SYNC_ALT          (1 << 26)
 #define RADEON_FP2_GEN_CNTL                 0x0288
-#       define RADEON_FP2_FPON                  (1 <<  0)
-#       define RADEON_FP2_TMDS_EN               (1 <<  2)
-#       define RADEON_FP2_EN_TMDS               (1 <<  7)
-#       define RADEON_FP2_DETECT_SENSE          (1 <<  8)
-#       define RADEON_FP2_SEL_CRTC2             (1 << 13)
+#       define RADEON_FP2_BLANK_EN              (1 <<  1)
+#       define RADEON_FP2_FPON                  (1 <<  2)
+#       define RADEON_FP2_PANEL_FORMAT          (1 <<  3)
+#       define RADEON_FP2_SOURCE_SEL_MASK       (3 << 10)
+#       define RADEON_FP2_SOURCE_SEL_CRTC2      (1 << 10)
+#       define RADEON_FP2_SRC_SEL_MASK          (3 << 13)
+#       define RADEON_FP2_SRC_SEL_CRTC2         (1 << 13)
 #       define RADEON_FP2_FP_POL                (1 << 16)
 #       define RADEON_FP2_LP_POL                (1 << 17)
 #       define RADEON_FP2_SCK_POL               (1 << 18)
@@ -42,11 +44,13 @@
 #       define RADEON_FP2_PAD_FLOP_EN           (1 << 22)
 #       define RADEON_FP2_CRC_EN                (1 << 23)
 #       define RADEON_FP2_CRC_READ_EN           (1 << 24)
+#       define RADEON_FP2_DV0_EN                (1 << 25)
+#       define RADEON_FP2_DV0_RATE_SEL_SDR      (1 << 26)
 #define RADEON_FP_HORZ_STRETCH              0x028c
 #       define RADEON_HORZ_STRETCH_RATIO_MASK  0xffff
 #       define RADEON_HORZ_STRETCH_RATIO_MAX   4096
 #       define RADEON_HORZ_PANEL_SIZE          (0x1ff   << 16)
-#       define RADEON_HORZ_PANEL_SHIFT         16
+#       define RADEON_HORZ_PANEL_SIZE_SHIFT		16
 #       define RADEON_HORZ_STRETCH_PIXREP      (0      << 25)
 #       define RADEON_HORZ_STRETCH_BLEND       (1      << 26)
 #       define RADEON_HORZ_STRETCH_ENABLE      (1      << 25)
@@ -55,7 +59,7 @@
 #       define RADEON_HORZ_AUTO_RATIO_INC      (1      << 31)
 #define RADEON_FP_VERT_STRETCH              0x0290
 #       define RADEON_VERT_PANEL_SIZE          (0xfff << 12)
-#       define RADEON_VERT_PANEL_SHIFT         12
+#       define RADEON_VERT_PANEL_SIZE_SHIFT		12
 #       define RADEON_VERT_STRETCH_RATIO_MASK  0xfff
 #       define RADEON_VERT_STRETCH_RATIO_SHIFT 0
 #       define RADEON_VERT_STRETCH_RATIO_MAX   4096

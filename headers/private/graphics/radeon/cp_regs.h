@@ -43,6 +43,7 @@
 #       define RADEON_CSQ_PRIPIO_INDBM      (3    << 28)
 #       define RADEON_CSQ_PRIBM_INDBM       (4    << 28)
 #       define RADEON_CSQ_PRIPIO_INDPIO     (15   << 28)
+#define RADEON_CP_STAT						0x07c0
 #define RADEON_CP_CSQ_STAT                  0x07f8
 #       define RADEON_CSQ_RPTR_PRIMARY_MASK  (0xff <<  0)
 #       define RADEON_CSQ_WPTR_PRIMARY_MASK  (0xff <<  8)
@@ -96,8 +97,6 @@
 #define RADEON_CP_PACKET3_CNTL_TRANS_BITBLT         0xC0009C00
 
 
-#define RADEON_SCRATCH_REG_OFFSET	32
-
 #define RADEON_ISYNC_CNTL		0x1724
 #	define RADEON_ISYNC_ANY2D_IDLE3D	(1 << 0)
 #	define RADEON_ISYNC_ANY3D_IDLE2D	(1 << 1)
@@ -108,7 +107,7 @@
 
 
 #define CP_PACKET0( reg, n )						\
-	(RADEON_CP_PACKET0 | ((n) << 16) | ((reg) >> 2))
+	(RADEON_CP_PACKET0 | (((n) - 1) << 16) | ((reg) >> 2))
 
 
 #endif

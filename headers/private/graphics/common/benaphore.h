@@ -18,7 +18,7 @@ typedef struct {
 } benaphore;
 
  
-#define INIT_BEN(prefix, x)		x.sem = create_sem(0, #prefix " benaphore");  x.ben = 0;
+#define INIT_BEN(x, prefix)	( (x).ben = 0, (x).sem = create_sem(0, #prefix " benaphore"), (x).sem )
 #define ACQUIRE_BEN(x)	if((atomic_add(&(x.ben), 1)) >= 1) acquire_sem(x.sem);
 #define RELEASE_BEN(x)	if((atomic_add(&(x.ben), -1)) > 1) release_sem(x.sem);
 #define	DELETE_BEN(x)	delete_sem(x.sem);
