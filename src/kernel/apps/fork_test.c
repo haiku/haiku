@@ -7,6 +7,7 @@
 #include <OS.h>
 
 #include <unistd.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -16,13 +17,14 @@ int
 main(int argc, char **argv)
 {
 	pid_t child = fork();
+
 	if (child == 0) {
-		write(1, "CHILD: is awake!\n", 17);
-		exit_thread(0);
-		//printf("CHILD: we're the child!\n");
+		printf("CHILD: we're the child!\n");
+		snooze(500000);	// .5 sec
+		printf("CHILD: exit!\n");
 	} else if (child > 0) {
 		printf("PARENT: we're the parent, our child has pid %ld\n", child);
-		wait_for_thread(child, NULL);
+		waitpid(-1, NULL, 0);
 	} else
 		fprintf(stderr, "fork() failed: %s\n", strerror(errno));
 
