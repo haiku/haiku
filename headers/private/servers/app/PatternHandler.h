@@ -46,16 +46,16 @@ class Pattern {
 								Pattern(const Pattern& src)
 									{ fPattern.type64 = src.fPattern.type64; }
 
-			const int8*			GetInt8(void) const
+	inline	const int8*			GetInt8(void) const
 									{ return fPattern.type8; }
 
-			uint64				GetInt64(void) const
+	inline	uint64				GetInt64(void) const
 									{ return fPattern.type64; }
 
-			void				Set(const int8* p)
+	inline	void				Set(const int8* p)
 									{ fPattern.type64 = *((const uint64*)p); }
 
-			void				Set(const uint64& p)
+	inline	void				Set(const uint64& p)
 									{ fPattern.type64 = p; }
 
 			Pattern&			operator=(const Pattern& from)
