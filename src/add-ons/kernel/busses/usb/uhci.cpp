@@ -163,13 +163,12 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 		cmd = cmd | PCI_command_io | PCI_command_master | PCI_command_memory;
 		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_command, 2, cmd );
 		/* make sure we gain controll of the UHCI controller instead of the BIOS */
-//		TRACE( "pcii->function %u", m_pcii->function );
-//		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN );
+		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN );
 	}
 	
 	//Do a host reset
 	GlobalReset();
-	if ( Reset() != B_ERROR )
+	if ( Reset() != B_OK )
 	{
 		TRACE( "USB UHCI: init_hardare(): host failed to reset\n" );
 		m_initok = false;
