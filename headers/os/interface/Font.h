@@ -250,6 +250,9 @@ public:
 		void				PrintToStream(void) const;
 	
 private:
+
+friend	void 				_font_control_(BFont*, int32, void*);
+
 		uint16				fFamilyID;
 		uint16				fStyleID;
 		float				fSize;
