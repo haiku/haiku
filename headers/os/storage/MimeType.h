@@ -176,7 +176,7 @@ private:
 
 // Uncomment, when needed...
 
-//	friend class BAppFileInfo;
+	friend class BAppFileInfo;
 //	friend class BRoster;
 //	friend class TRosterApp;
 //	friend class TMimeWorker;
