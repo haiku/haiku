@@ -103,8 +103,7 @@ public:
 	Iterator Find(const Key &key);
 	Iterator FindClose(const Key &key, bool less);
 
-	status_t Insert(const Key &key, const Value &value,
-					Iterator &iterator = NULL);
+	status_t Insert(const Key &key, const Value &value, Iterator &iterator);
 	status_t Remove(const Key &key);
 	Iterator Erase(const Iterator &iterator);
 
