@@ -35,6 +35,7 @@
 #include <Font.h>
 #include <Rect.h>
 #include <Locker.h>
+#include <Screen.h>
 #include "RGBColor.h"
 #include <Region.h>
 #include "PatternHandler.h"
@@ -173,9 +174,6 @@ public:
 	virtual void GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, 
 			float maxwidth, char **outstrings);
 	
-	virtual status_t SetDPMSState(uint32 state);
-	uint32 GetDPMSState(void);
-	uint32 GetDPMSCapabilities(void);
 	uint8 GetDepth(void);
 	uint16 GetHeight(void);
 	uint16 GetWidth(void);
@@ -186,6 +184,16 @@ public:
 	bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
 	void Unlock(void);
 
+	virtual status_t SetDPMSMode(const uint32 &state);
+	virtual uint32 DPMSMode(void) const;
+	virtual uint32 DPMSCapabilities(void) const;
+	virtual status_t GetDeviceInfo(accelerant_device_info *info);
+	virtual status_t GetModeList(display_mode **mode_list, uint32 *count);
+	virtual status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
+	virtual status_t GetTimingConstraints(display_timing_constraints *dtc);
+	virtual status_t ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high);
+	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
+
 protected:
 	void _SetDepth(uint8 d);
 	void _SetHeight(uint16 h);
@@ -194,6 +202,7 @@ protected:
 	void _SetBytesPerRow(uint32 bpr);
 	void _SetDPMSCapabilities(uint32 caps);
 	void _SetDPMSState(uint32 state);
+	void _SetDeviceInfo(const accelerant_device_info &infO);
 	ServerCursor *_GetCursor(void);
 	virtual void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
 	virtual void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
@@ -212,6 +221,7 @@ private:
 	ServerCursor *_cursor;
 	uint32 _dpms_state;
 	uint32 _dpms_caps;
+	accelerant_device_info _acc_device_info;
 };
 
 #endif
