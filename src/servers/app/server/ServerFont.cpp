@@ -186,3 +186,18 @@ void ServerFont::SetFamilyAndStyle(const uint32 &fontID)
 	if(sty)
 		fStyle=sty;
 }
+
+/*!
+	\brief Gets the ID values for the ServerFont instance in one shot
+	\return the combination of family and style ID numbers
+*/
+uint32 ServerFont::GetFamilyAndStyle(void)
+{
+	uint32 famsty=0;
+	
+	famsty|=FamilyID() << 16;
+	famsty|=StyleID();
+	
+	return famsty;
+}
+
