@@ -621,10 +621,16 @@ main()
 		device.VisitEachDescendant(&visitor);
 	}
 	// cancel modifications
-	if (error == B_OK) {
+/*	if (error == B_OK) {
 		error = device.CancelModifications();
 		if (error != B_OK)
 			printf("Cancelling modifications failed: %s\n", strerror(error));
+	}
+*/	// cancel modifications
+	if (error == B_OK) {
+		error = device.CommitModifications();
+		if (error != B_OK)
+			printf("Committing modifications failed: %s\n", strerror(error));
 	}
 	printf("\nDevice after cancelling the changes:\n");
 	device.VisitEachDescendant(&visitor);
