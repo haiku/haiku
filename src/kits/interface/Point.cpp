@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -29,73 +29,73 @@
 #include <stdio.h>
 
 // System Includes -------------------------------------------------------------
-#include <BeBuild.h>
 #include <SupportDefs.h>
 #include <Point.h>
 #include <Rect.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
+const BPoint B_ORIGIN(0, 0);
 
 
-//------------------------------------------------------------------------------
-void BPoint::ConstrainTo(BRect r)
+void
+BPoint::ConstrainTo(BRect r)
 {
 	x = max_c(min_c(x, r.right), r.left);
 	y = max_c(min_c(y, r.bottom), r.top);
 }
-//------------------------------------------------------------------------------
-void BPoint::PrintToStream() const
+
+
+void
+BPoint::PrintToStream() const
 {
 	printf("BPoint(x:%.0f, y:%.0f)\n", x, y);
 }
-//------------------------------------------------------------------------------
-BPoint BPoint::operator+(const BPoint& p) const
+
+
+BPoint
+BPoint::operator+(const BPoint& p) const
 {
 	return BPoint(x + p.x, y + p.y);
 }
-//------------------------------------------------------------------------------
-BPoint BPoint::operator-(const BPoint& p) const
+
+
+BPoint
+BPoint::operator-(const BPoint& p) const
 {
 	return BPoint(x - p.x, y - p.y);
 }
-//------------------------------------------------------------------------------
-BPoint&	BPoint::operator+=(const BPoint& p)
+
+
+BPoint &
+BPoint::operator+=(const BPoint& p)
 {
 	x += p.x;
 	y += p.y;
 
 	return *this;
 }
-//------------------------------------------------------------------------------
-BPoint&	BPoint::operator-=(const BPoint& p)
+
+
+BPoint &
+BPoint::operator-=(const BPoint& p)
 {
 	x -= p.x;
 	y -= p.y;
 
 	return *this;
 }
-//------------------------------------------------------------------------------
-bool BPoint::operator!=(const BPoint& p) const
+
+
+bool
+BPoint::operator!=(const BPoint& p) const
 {
 	return x != p.x || y != p.y;
 }
-//------------------------------------------------------------------------------
-bool BPoint::operator==(const BPoint& p) const
+
+
+bool
+BPoint::operator==(const BPoint& p) const
 {
 	return x == p.x && y == p.y;
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
 
