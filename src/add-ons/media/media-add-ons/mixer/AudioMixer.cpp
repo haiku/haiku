@@ -152,6 +152,8 @@ AudioMixer::HandleMessage(int32 message, const void *data, size_t size)
 status_t
 AudioMixer::AcceptFormat(const media_destination &dest, media_format *ioFormat)
 {
+	PRINT_FORMAT("AudioMixer::AcceptFormat: ", *ioFormat);
+
 	// check that the specified format is reasonable for the specified destination, and
 	// fill in any wildcard fields for which our BBufferConsumer has specific requirements. 
 
@@ -189,6 +191,8 @@ AudioMixer::AcceptFormat(const media_destination &dest, media_format *ioFormat)
 status_t
 AudioMixer::GetNextInput(int32 *cookie, media_input *out_input)
 {
+	TRACE("AudioMixer::GetNextInput\n");
+	
 	// our 0th input is always a wildcard and free one
 	if (*cookie == 0) {
 		out_input->node = Node();
@@ -323,6 +327,17 @@ status_t
 AudioMixer::Connected(const media_source &producer, const media_destination &where,
 					  const media_format &with_format, media_input *out_input)
 {
+	PRINT_FORMAT("AudioMixer::Connected: ", with_format);
+
+	// workaround for a crashing bug in RealPlayer.  to be proper, RealPlayer's
+	// BBufferProducer::PrepareToConnect() should have removed all wildcards.
+	if (out_input->format.u.raw_audio.frame_rate == 0) {
+		fprintf(stderr, "WARNING: Producer (port %ld, id %ld) connected with frame_rate=0\n", producer.port, producer.id);
+		MixerOutput *output = fCore->Output();
+		float frame_rate = output ? output->MediaOutput().format.u.raw_audio.frame_rate : 44100.0f;
+		out_input->format.u.raw_audio.frame_rate = frame_rate;
+	}
+	
 	// a BBufferProducer is connection to our BBufferConsumer
 			
 	// incoming connections should always have an incoming ID=0,
@@ -414,6 +429,8 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 status_t
 AudioMixer::FormatSuggestionRequested(media_type type, int32 quality, media_format *format)
 {
+	TRACE("AudioMixer::FormatSuggestionRequested\n");
+	
 	// BBufferProducer function, a downstream consumer
 	// is asking for our output format
 
@@ -540,6 +557,8 @@ err:
 status_t 
 AudioMixer::GetNextOutput(int32 *cookie, media_output *out_output)
 {
+	TRACE("AudioMixer::GetNextOutput\n");
+
 	if (*cookie != 0)
 		return B_BAD_INDEX;
 
@@ -639,6 +658,8 @@ status_t
 AudioMixer::PrepareToConnect(const media_source &what, const media_destination &where, 
 							 media_format *format, media_source *out_source, char *out_name)
 {
+	TRACE("AudioMixer::PrepareToConnect\n");
+
 	// PrepareToConnect() is the second stage of format negotiations that happens
 	// inside BMediaRoster::Connect(). At this point, the consumer's AcceptFormat()
 	// method has been called, and that node has potentially changed the proposed
