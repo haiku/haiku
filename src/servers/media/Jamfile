@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src servers media ;
+
+UsePrivateHeaders media ;
+
+Server media_server :
+	media_server.cpp
+	AppManager.cpp
+	BufferManager.cpp
+	NodeManager.cpp
+;
+LinkSharedOSLibs media_server : be media root ;
