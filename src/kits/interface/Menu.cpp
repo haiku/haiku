@@ -126,7 +126,7 @@ BMenu::BMenu(const char *name, menu_layout layout)
 
 BMenu::BMenu(const char *name, float width, float height)
 	:	BView(BRect(0.0f, width, 0.0f, height), name,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE),
+			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE),
 		fChosenItem(NULL),
 		fSelected(NULL),
 		fCachedMenuWindow(NULL),
@@ -354,21 +354,24 @@ BMenu::AddSeparatorItem()
 bool
 BMenu::RemoveItem(BMenuItem *item)
 {
-	return fItems.RemoveItem(item);
+	// TODO: Check if item is also deleted
+	return RemoveItems(0, 0, item, false);
 }
 
 
 BMenuItem *
 BMenu::RemoveItem(int32 index)
 {
-	return static_cast<BMenuItem *>(fItems.RemoveItem(index));
+	BMenuItem *item = ItemAt(index);
+	RemoveItems(index, 1, NULL, false);
+	return item;
 }
 
 
 bool
 BMenu::RemoveItems(int32 index, int32 count, bool del)
 {
-	return false;
+	return RemoveItems(index, count, NULL, del);	
 }
 
 
@@ -377,7 +380,7 @@ BMenu::RemoveItem(BMenu *submenu)
 {
 	for (int i = 0; i < fItems.CountItems(); i++)
 		if (static_cast<BMenuItem *>(fItems.ItemAt(i))->Submenu() == submenu)
-			return fItems.RemoveItem(fItems.ItemAt(i));
+			return RemoveItems(i, 1, NULL, false);
 
 	return false;
 }
@@ -722,8 +725,7 @@ BMenu::ResolveSpecifier(BMessage *msg, int32 index,
 	BPropertyInfo propInfo(sPropList);
 	BHandler *target = NULL;
 
-	switch (propInfo.FindMatch(msg, 0, specifier, form, property))
-	{
+	switch (propInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case B_ERROR:
 			break;
 
@@ -880,13 +882,13 @@ void
 BMenu::GetItemMargins(float *left, float *top, float *right,
 						   float *bottom) const
 {
-	if (left)
+	if (left != NULL)
 		*left = fPad.left;
-	if (top)
+	if (top != NULL)
 		*top = fPad.top;
-	if (right)
+	if (right != NULL)
 		*right = fPad.right;
-	if (bottom)
+	if (bottom != NULL)
 		*bottom = fPad.bottom;
 }
 
@@ -1086,9 +1088,40 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 
 bool
-BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
+BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 {
-	return false;
+	bool result = false;
+	 
+	// The plan is simple: If we're given a BMenuItem directly, we use it
+	// and ignore index and count. Otherwise, we use them instead.
+	if (_item != NULL) {
+		// TODO: Check if this is enough.
+		fItems.RemoveItem(_item);
+		_item->Uninstall();
+		if (del)
+			delete _item;
+		result = true;
+	} else {
+		BMenuItem *item = NULL;	
+		// We iterate backwards because it's simpler
+		// TODO: We should check if index and count are in bounds.
+		for (int32 i = index + count - 1; i >= index; i--) {
+			item = static_cast<BMenuItem *>(fItems.ItemAt(index));
+			if (item != NULL) {
+				// TODO: Check if this is enough.
+				fItems.RemoveItem(item);
+				item->Uninstall();
+				if (del)
+					delete item;
+				if (!result)
+					result = true;
+			}
+		}
+	}	
+	
+	LayoutItems(0);
+	
+	return result;
 }
 
 
@@ -1114,57 +1147,71 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	float iWidth, iHeight;
 	BMenuItem *item;
 
-	if (fLayout == B_ITEMS_IN_COLUMN) {
-		frame = BRect(0.0f, 0.0f, 0.0f, 2.0f);
+	switch (fLayout) {
+		case B_ITEMS_IN_COLUMN:
+		{
+			frame = BRect(0.0f, 0.0f, 0.0f, 2.0f);
 
-		for (int i = 0; i < fItems.CountItems(); i++) {
-			item = static_cast<BMenuItem *>(fItems.ItemAt(i));
-			
-			item->GetContentSize(&iWidth, &iHeight);
+			for (int32 i = 0; i < fItems.CountItems(); i++) {
+				item = static_cast<BMenuItem *>(fItems.ItemAt(i));			
+				item->GetContentSize(&iWidth, &iHeight);
 
-			if (item->fModifiers && item->fShortcutChar)
-				iWidth += 25.0f;
+				if (item->fModifiers && item->fShortcutChar)
+					iWidth += 25.0f;
+	
+				item->fBounds.left = 2.0f;
+				item->fBounds.top = frame.bottom;
+				item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-			item->fBounds.left = 2.0f;
-			item->fBounds.top = frame.bottom;
-			item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
+				frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
+				frame.bottom = item->fBounds.bottom + 1.0f;
+			}
 
-			frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
-			frame.bottom = item->fBounds.bottom + 1.0f;
+			for (int32 i = 0; i < fItems.CountItems(); i++)
+				ItemAt(i)->fBounds.right = frame.right;
+
+			frame.right = (float)ceil(frame.right) + 2.0f;
+			frame.bottom += 1.0f;
+			break;
 		}
-
-		for (int i = 0; i < fItems.CountItems(); i++)
-			ItemAt(i)->fBounds.right = frame.right;
-
-		frame.right = (float)ceil(frame.right) + 2.0f;
-		frame.bottom += 1.0f;
 		
-	} else if (fLayout == B_ITEMS_IN_ROW) {
-		font_height fh;
-		GetFontHeight(&fh);
-		frame = BRect(0.0f, 0.0f, 0.0f,
-			(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);
+		case B_ITEMS_IN_ROW:
+		{
+			font_height fh;
+			GetFontHeight(&fh);
+			frame = BRect(0.0f, 0.0f, 0.0f,
+				(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);
 
-		for (int i = 0; i < fItems.CountItems(); i++) {
-			item = static_cast<BMenuItem *>(fItems.ItemAt(i));
-			
-			item->GetContentSize(&iWidth, &iHeight);
+			for (int32 i = 0; i < fItems.CountItems(); i++) {
+				item = static_cast<BMenuItem *>(fItems.ItemAt(i));
+				item->GetContentSize(&iWidth, &iHeight);
 
-			item->fBounds.left = frame.right;
-			item->fBounds.top = 0.0f;
-			item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
+				item->fBounds.left = frame.right;
+				item->fBounds.top = 0.0f;
+				item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
 
-			frame.right = item->fBounds.right + 1.0f;
-			frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
+				frame.right = item->fBounds.right + 1.0f;
+				frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
+			}
+
+			for (int i = 0; i < fItems.CountItems(); i++)
+				ItemAt(i)->fBounds.bottom = frame.bottom;
+
+			frame.right = (float)ceil(frame.right) + 8.0f;
+			break;
 		}
-
-		for (int i = 0; i < fItems.CountItems(); i++)
-			ItemAt(i)->fBounds.bottom = frame.bottom;
-
-		frame.right = (float)ceil(frame.right) + 8.0f;
+		
+		case B_ITEMS_IN_MATRIX:
+		{
+			printf("BMenu: B_ITEMS_IN_MATRIX not yet implemented\n");
+			break;
+		}
+		
+		default:
+			break;
 	}
-
-	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) ==  B_FOLLOW_LEFT_RIGHT) {
+	
+	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
 			*width = Parent()->Frame().Width() + 1.0f;
 		else
