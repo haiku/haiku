@@ -36,6 +36,12 @@ public:
 
 	// Disk Device / Partition Management
 
+	// manager must be locked
+	KDiskDevice *FindDevice(const char *path, bool noShadow = true);
+	KDiskDevice *FindDevice(partition_id id, bool noShadow = true);
+	KPartition *FindPartition(const char *path, bool noShadow = true);
+	KPartition *FindPartition(partition_id id, bool noShadow = true);
+
 	KDiskDevice *RegisterDevice(const char *path, bool noShadow = true);
 	KDiskDevice *RegisterDevice(partition_id id, bool noShadow = true);
 	KPartition *RegisterPartition(const char *path, bool noShadow = true);
@@ -74,11 +80,14 @@ public:
 	// by the registrar.
 
 private:
-	KPartition *_FindPartition(partition_id id) const;
+	status_t _AddPartitioningSystem(const char *name);
+	status_t _AddFileSystem(const char *name);
+	status_t _AddDiskSystem(KDiskSystem *diskSystem);
 
 	BLocker						fLock;
 	List<KDiskDevice*>			fDevices;		// TODO: Optimize!
 	List<KPartition*>			fPartitions;	//
+	List<KDiskSystem*>			fDiskSystems;	//
 
 	static KDiskDeviceManager	*fDefaultManager;
 };
