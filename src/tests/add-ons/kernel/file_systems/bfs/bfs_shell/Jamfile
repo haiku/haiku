@@ -5,11 +5,10 @@ SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
 
 {
-	# set MALLOC_DEBUG to something when doing tests against memory corruption
-	# (although this has the downside that "jam" is also debugged...)
+	# set CHECK_MALLOC to something when doing tests against memory corruption
 	local malloc_debug_defines ;
 	local malloc_debug_flags ;
-	if $(MALLOC_DEBUG) {
+	if $(CHECK_MALLOC) {
 		malloc_debug_defines = _NO_INLINE_ASM ;
 		malloc_debug_flags = -fcheck-memory-usage ;
 	}
