@@ -57,6 +57,18 @@
 
 #define MAX_SYM_LINKS SYMLINKS_MAX
 
+static struct {
+	const char *path;
+	const char *target;
+} sPredefinedLinks[] = {
+	{"/system", "/boot/beos/system"},
+	{"/bin", "/boot/beos/bin"},
+	{"/etc", "/boot/beos/etc"},
+	{"/var", "/boot/var"},
+	{"/tmp", "/boot/tmp"},
+	{NULL}
+};
+
 struct vnode {
 	struct vnode	*next;
 	struct vm_cache	*cache;
@@ -1810,13 +1822,13 @@ vfs_test(void)
 int
 vfs_bootstrap_all_filesystems(void)
 {
-	int err;
+	status_t status;
 
 	// bootstrap the root filesystem
 	bootstrap_rootfs();
 
-	err = sys_mount("/", NULL, "rootfs", NULL);
-	if (err < 0)
+	status = sys_mount("/", NULL, "rootfs", NULL);
+	if (status < B_OK)
 		panic("error mounting rootfs!\n");
 
 	sys_setcwd(-1, "/");
@@ -1825,27 +1837,45 @@ vfs_bootstrap_all_filesystems(void)
 	bootstrap_bootfs();
 
 	sys_create_dir("/boot", 0755);
-	err = sys_mount("/boot", NULL, "bootfs", NULL);
-	if (err < 0)
+	dev_t bootDevice = sNextMountID;
+	status = sys_mount("/boot", NULL, "bootfs", NULL);
+	if (status < B_OK)
 		panic("error mounting bootfs\n");
 
 	// bootstrap the devfs
 	bootstrap_devfs();
 
 	sys_create_dir("/dev", 0755);
-	err = sys_mount("/dev", NULL, "devfs", NULL);
-	if (err < 0)
+	status = sys_mount("/dev", NULL, "devfs", NULL);
+	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
 	bootstrap_pipefs();
 
 	sys_create_dir("/pipe", 0755);
-	err = sys_mount("/pipe", NULL, "pipefs", NULL);
-	if (err < 0)
+	status = sys_mount("/pipe", NULL, "pipefs", NULL);
+	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
-	return B_NO_ERROR;
+	// create some standard links on the rootfs
+
+	for (int32 i = 0; sPredefinedLinks[i].path != NULL; i++) {
+		sys_create_symlink(sPredefinedLinks[i].path, sPredefinedLinks[i].target, 0);
+			// we don't care if it will succeed or not
+	}
+
+	// create link for the name of the boot device
+
+	fs_info info;
+	if (_kern_read_fs_info(bootDevice, &info) == B_OK) {
+		char path[B_FILE_NAME_LENGTH + 1];
+		snprintf(path, sizeof(path), "/%s", info.volume_name);
+
+		sys_create_symlink(path, "/boot", 0);
+	}
+
+	return B_OK;
 }
 
 
