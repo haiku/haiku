@@ -1,64 +1,89 @@
 #ifndef _HASH_H
 #define _HASH_H
 #include "list.h"
+#include "vm.h"
+#include "page.h"
+#include "pageManager.h"
+#include "vmHeaderBlock.h"
+#include <new.h>
 
-static bool throwException (node &foo)
-{ throw ("Attempting to use an hash table without setting up a 'hash' function"); }
+extern vmHeaderBlock *vmBlock;
 
 class hashTable : public list
 {
 	public:
-	hashTable(int size)
-		{
+	hashTable(int size) {
 		nodeCount=0;
 		numRocks=size;
-		int pageCount=PAGE_SIZE*size/sizeof(list);	
+		
+		if (size*sizeof (list *)>PAGE_SIZE)
+			throw ("Hash table too big!"); 
 		page *newPage=vmBlock->pageMan->getPage();
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
-		int newCount=PAGE_SIZE/sizeof(area);
-		acquire_sem(inUse);
-		//error ("poolarea::get: Adding %d new elements to the pool!\n",newCount);
-		for (int i=0;i<newCount;i++)
-			unused.add(((node *)(newPage->getAddress()+(i*sizeof(area)))));	
-		release_sem(inUse);
+		rocks=(list **)(newPage->getAddress());
+
+		int listsPerPage=PAGE_SIZE/sizeof(list);
+		int pages=(size+(listsPerPage-1))/listsPerPage;
+		for (int pageCount=0;pageCount<pages;pageCount++)
+			{
+			page *newPage=vmBlock->pageMan->getPage();
+			if (!newPage)
+				throw ("Out of pages to allocate a pool!");
+			for (int i=0;i<listsPerPage;i++)
+				rocks[i]=new ((list *)(newPage->getAddress()+(i*sizeof(list)))) list;	
+			}
 		} 
 
 	void setHash (ulong (*hash_in)(node &)) { hash=hash_in; }
-	void setIsEqual (ulong (*isEqual_in)(node &,node &)) { isEqual=isEqual_in; }
+	void setIsEqual (bool (*isEqual_in)(node &,node &)) { isEqual=isEqual_in; }
 
 	int count(void) {return nodeCount;}
 	void add (node *newNode) { 
-			unsigned long hashValue=hash(*newNode)%numRocks;
-			// Note - no looking for duplicates; no ordering.
-			rocks[hashValue].add(newNode);	
-			}
-	node *next(void) { return NULL; // This operation doesn't make sense for this class}
-	void remove(node *toNuke) 
-		{ 
-		unsigned long hashValue=hash(*findNode)%numRocks;
-		rocks[hashValue].remove(newNode);	
+		if (!hash)
+			throw ("Attempting to use a hash table without setting up a 'hash' function");
+		unsigned long hashValue=hash(*newNode)%numRocks;
+		// Note - no looking for duplicates; no ordering.
+		rocks[hashValue]->add(newNode);	
 		}
-	void dump(void) 
-		{
+
+	node *next(void) {throw ("Next is invalid in a hash table!");} // This operation doesn't make sense for this class
+
+	void remove(node *toNuke) { 
+		if (!hash)
+			throw ("Attempting to use a hash table without setting up a 'hash' function");
+		unsigned long hashValue=hash(*toNuke)%numRocks;
+		rocks[hashValue]->remove(toNuke);	
+		}
+
+	void dump(void) {
 		for (int i=0;i<numRocks;i++)
-			for (struct node *cur=rocks[hashValue].rock;cur && !done;cur=cur->next)
-				error ("hashTable::dump: At %p, next = %p\n",cur,cur->next);
+			for (struct node *cur=rocks[i]->rock;cur;cur=cur->next)
+				error ("hashTable::dump: On bucket %d of %d, At %p, next = %p\n",i,numRocks,cur,cur->next);
 		}
-	node *find(node *findNode)
-		{
+
+	bool ensureSane (void) {
+		bool ok=true;
+		for (int i=0;i<numRocks;i++)
+			ok|=rocks[i]->ensureSane();
+		return ok;
+		}
+	node *find(node *findNode) {
+		if (!hash)
+			throw ("Attempting to use a hash table without setting up a 'hash' function");
+		if (!isEqual)
+			throw ("Attempting to use a hash table without setting up an 'isEqual' function");
 		unsigned long hashValue=hash(*findNode)%numRocks;
-		for (struct node *cur=rocks[hashValue].rock;cur && !done;cur=cur->next)
+		for (struct node *cur=rocks[hashValue]->rock;cur ;cur=cur->next)
 			if (isEqual(*findNode,*cur))
 				return cur;
 		return NULL;
 		}
+
 	private:
 	ulong (*hash)(node &a);
 	bool (*isEqual)(node &a,node &b);
-	list *rocks;
+	list **rocks;
 	int numRocks;
-
-	
 };
 #endif

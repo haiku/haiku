@@ -9,6 +9,7 @@ class pageManager {
 		pageManager(void);
 		void setup(void *memory,int pages);
 		page *getPage(void);
+		bool getContiguousPages(int pages,page **location);
 		void freePage(page *);
 		void cleaner(void);
 		int desperation(void);

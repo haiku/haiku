@@ -14,6 +14,7 @@ class vpageManager
 	private:
 
 	public:
+		vpage *getVpage(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); 
 		vpage *getVpage(vnode &vn);
 		void putVpage(vpage &vp);
 }

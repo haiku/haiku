@@ -1,6 +1,7 @@
 #include "pageManager.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void *addOffset(void *base,unsigned long offset)
 {
@@ -73,6 +74,41 @@ page *pageManager::getPage(void)
 //	error ("pageManager::getPage:leaving with page = %x\n", ret->getAddress());
 	return ret;
 	}
+
+bool pageManager::getContiguousPages(int pages,page **location)
+{
+	unsigned long current, start=0, next;
+	page *curPage;
+	int count=0; 
+	while (count<pages)		
+		{
+		curPage=getPage();
+		current=curPage->getAddress();
+		if (start==0)
+			{
+			start=current;
+			location[count++]=curPage;
+			}
+		else if (current==start+PAGE_SIZE*count) // This is the next one in line
+			location[count++]=curPage;
+		else if (current==start-PAGE_SIZE) // Found the one directly previous
+			{
+			memmove(location[1],location[0],count*sizeof(page *));
+			start=current;
+			location[0]=curPage;
+			count++;
+			}
+		else // Forget this series - it doesn't seem to be going anywhere...
+			{
+			while (--count>=0)
+				{
+				freePage(location[count]);
+				location[count]=NULL;
+				}
+			}
+		}
+	return true;
+}
 
 void pageManager::freePage(page *toFree)
 	{

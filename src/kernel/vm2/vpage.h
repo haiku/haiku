@@ -21,6 +21,7 @@ class vpage : public node
 		void flush(void); // write page to vnode, if necessary
 		void refresh(void); // Read page back in from vnode
 		vpage(void);
+		// Setup should now only be called by the vpage manager...
 		void setup(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
 		void cleanup(void);
 		void setProtection(protectType prot);
