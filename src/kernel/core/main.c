@@ -160,6 +160,11 @@ main2(void *unused)
 	TRACE(("Bootstrap file systems\n"));
 	vfs_bootstrap_file_systems();
 
+	// before we bring up the device drivers, we better wait until
+	// interrupts become available, to make sure they'll work as expected
+	while (!are_interrupts_enabled())
+		snooze(10000);
+
 	TRACE(("Init Device Manager\n"));
 	device_manager_init(&ka);
 
@@ -203,12 +208,14 @@ main2(void *unused)
 #endif
 	// start the init process
 	{
-		team_id pid;
-		pid = team_create_team("/bin/init", "init", NULL, 0, NULL, 0, B_NORMAL_PRIORITY);
+		const char *args[] = {"/bin/init", NULL};
 
-		TRACE(("Init started\n"));
-		if (pid < 0)
-			kprintf("error starting 'init' error = %ld \n", pid);
+		thread_id thread = load_image(1, args, NULL);
+		if (thread >= B_OK) {
+			resume_thread(thread);
+			TRACE(("Init started\n"));
+		} else
+			dprintf("error starting 'init' error = %ld \n", thread);
 	}
 
 	return 0;
