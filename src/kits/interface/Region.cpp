@@ -3,6 +3,9 @@
 
 #include <clipping.h>
 
+static const int32 kMaxPoints = 1024;
+static const int32 kMaxVerticalExtent = 0x10000000;
+
 /* friend functions */
 
 /*!	\brief zeroes the given region, setting its rect count to 0,
@@ -122,13 +125,42 @@ sort_rects(clipping_rect *rects, long count)
 	}
 }
 
-/*
+
 void
 sort_trans(long *lptr1, long *lptr2, long count)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));	
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+	bool again; //flag that tells we changed trans positions
+			
+	if (count == 2) {
+		if (lptr1[0] > lptr1[1]) {
+			int32 tmp = lptr1[0];
+			lptr1[0] = lptr1[1];
+			lptr1[1] = tmp;
+			
+			tmp = lptr2[0];
+			lptr2[0] = lptr2[1];
+			lptr2[1] = tmp;
+		}
+	} else if (count > 1) {
+		do {
+			again = false;
+			for (int c = 1; c < count; c++) {
+				if (lptr1[c - 1] > lptr1[c]) {
+					int32 tmp = lptr1[c - 1];
+					lptr1[c - 1] = lptr1[c];
+					lptr1[c] = tmp;
+					
+					tmp = lptr2[c - 1];
+					lptr2[c - 1] = lptr2[c];
+					lptr2[c] = tmp;
+					again = true;
+				}
+			}
+		} while (again); 
+	}
 }
-*/
+
 
 /*!	\brief Cleanup the region horizontally.
 	\param region The region to be cleaned.
@@ -329,62 +361,72 @@ void
 r_or(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *index1, long *index2)
 {
 	PRINT(("%s\n", __PRETTY_FUNCTION__));
+	
+	int32 lefts[kMaxPoints];
+	int32 rights[kMaxPoints];
+	
 	long i1 = *index1;
 	long i2 = *index2;
 	
-	if (first->count <= i1) {
-		if (second->count > i2) {
-			clipping_rect secondRect = second->data[i2];
-		
-			secondRect.top = max_c(secondRect.top, top);
-			secondRect.bottom = min_c(secondRect.bottom, bottom);
+	*index1 = -1;
+	*index2 = -1;
+	
+	long foundCount = 0;
+	long x = 0;
+	
+	for (x = i1; x < first->count; x++) {
+		if (first->data[x].bottom >= top && *index1 == -1)
+			*index1 = x;
 			
-			if (valid_rect(secondRect))
-				dest->_AddRect(secondRect);
-			if (second->data[i2].bottom <= bottom)
-				i2++;
-	 	}
-	 	
-	 } else if (second->count <= i2) {
-	 
-	 	clipping_rect firstRect = first->data[i1];
-	 	
-	 	firstRect.top = max_c(firstRect.top, top);
-	 	firstRect.bottom = min_c(firstRect.bottom, bottom);
-	 	
-	 	if (valid_rect(firstRect))
-	 		dest->_AddRect(firstRect);
-	 	if (first->data[i1].bottom <= bottom)
-	 		i1++;
-	 		
-	 } else {
-	 	clipping_rect firstRect = first->data[i1];
-	 	clipping_rect secondRect = second->data[i2];
-	 	
-	 	firstRect.top = max_c(firstRect.top, top);
-	 	firstRect.bottom = min_c(firstRect.bottom, bottom);
-	 	
-	 	secondRect.top = max_c(secondRect.top, top);
-		secondRect.bottom = min_c(secondRect.bottom, bottom);
-	 	
-	 	if (valid_rect(sect_rect(firstRect, secondRect)))
-	 		dest->_AddRect(union_rect(firstRect, secondRect));
-	 	
-	 	else {
-	 		if (valid_rect(firstRect))
-	 			dest->_AddRect(firstRect);
-	 		if (valid_rect(secondRect))
-	 			dest->_AddRect(secondRect);
-	 	}
-	 		
-	 	if (first->data[i1].bottom <= bottom)
-	 		i1++;
-	 	if (second->data[i2].bottom <= bottom)
-			i2++;
+		if (first->data[x].top <= top && first->data[x].bottom >= bottom) {
+			lefts[foundCount] = first->data[x].left;
+			rights[foundCount] = first->data[x].right;
+			foundCount++;
+		} else if (first->data[x].top > bottom)
+			break;	
 	}
+	
+	if (*index1 == -1)
+		*index1 = i1;
+					
+	for (x = i2; x < second->count; x++) {
+		if (second->data[x].bottom >= top && *index2 == -1)
+			*index2 = x;
 		
-	*index1 = i1;
-	*index2 = i2;    
+		if (second->data[x].top <= top && second->data[x].bottom >= bottom) {
+			lefts[foundCount] = second->data[x].left;
+			rights[foundCount] = second->data[x].right;
+			foundCount++;
+		} else if (second->data[x].top > bottom)
+			break;
+	}
+	
+	if (*index2 == -1)
+		*index2 = i2;
+		
+	if (foundCount > 1)
+		sort_trans(lefts, rights, foundCount);
+	
+	clipping_rect rect;
+	rect.top = top;
+	rect.bottom = bottom;
+	
+	long current = 0;
+	while (current < foundCount) {
+		long next = current + 1;
+		
+		rect.left = lefts[current];
+		rect.right = rights[current];
+		
+		while (next < foundCount && rect.right >= lefts[next]) {
+			if (rect.right < rights[next])
+				rect.right = rights[next];
+			next++;
+		}
+		
+		dest->_AddRect(rect);		
+		current = next;	
+	}		
 }
 
 
@@ -405,7 +447,7 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 	do {
 		long x;
 		top = bottom + 1;
-		bottom = 0x10000000;
+		bottom = kMaxVerticalExtent;
 		
 		for (x = a; x < first->count; x++) {
 			int32 n = first->data[x].top - 1;
@@ -423,10 +465,10 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 				bottom = second->data[x].bottom;
 		}
 		
-		// We can stand a region which extends to 0x10000000, not more
-		if (bottom >= 0x10000000)
+		// We can stand a region which extends to kMaxVerticalExtent, not more
+		if (bottom >= kMaxVerticalExtent)
 			break;
-			
+		PRINT(("a: %d, b: %d, top: %d, bottom: %d\n", a, b, top, bottom));	
 		r_or(top, bottom, first, second, dest, &a, &b);
 		
 	} while (true);
@@ -572,7 +614,7 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 	do {
 		long x;
 		top = bottom + 1;
-		bottom = 0x10000000;
+		bottom = kMaxVerticalExtent;
 		
 		for (x = a; x < first->count; x++) {
 			int32 n = first->data[x].top - 1;
@@ -590,7 +632,7 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 				bottom = second->data[x].bottom;
 		}
 		
-		if (bottom >= 0x10000000)
+		if (bottom >= kMaxVerticalExtent)
 			break;
 			
 		r_sub(top, bottom, first, second, dest, &a, &b);
