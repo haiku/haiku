@@ -11,11 +11,11 @@
 
 using namespace BPrivate;
 
-const int cascade_left = 7;
-const int cascade_top = 26;
-const int cascade_step = 15;
+const int cascade_left = 50;
+const int cascade_top = 50;
+const int cascade_step = 10;
 
-BRect windowRect(cascade_left-cascade_step,cascade_top-cascade_step,507,426);
+BRect windowRect(cascade_left-cascade_step,cascade_top-cascade_step,310,120);
 
 void cascade() {
 	BScreen screen(NULL);

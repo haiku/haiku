@@ -14,14 +14,14 @@
 using namespace BPrivate;
 
 MediaPlayerWindow::MediaPlayerWindow(BRect frame)
-	: BWindow(frame,"Media Player",B_DOCUMENT_WINDOW,0)
+	: BWindow(frame,"Media Player",B_TITLED_WINDOW,0)
 {
 	InitWindow();
 	Show();
 }
 
 MediaPlayerWindow::MediaPlayerWindow(BRect frame, entry_ref *ref)
-	: BWindow(frame,"Media Player",B_DOCUMENT_WINDOW,0)
+	: BWindow(frame,"Media Player",B_TITLED_WINDOW,0)
 {
 	InitWindow();
 	OpenFile(ref);

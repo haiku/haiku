@@ -32,6 +32,7 @@ resource app_flags B_SINGLE_LAUNCH;
    */
 
 resource file_types message {
+	"types" = "application/ogg",
 	"types" = "audio",
 	"types" = "audio/aiff",
 	"types" = "audio/riff",
