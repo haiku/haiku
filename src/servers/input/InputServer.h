@@ -233,7 +233,7 @@ public:
 #else
         #define EXIT()          ((void)0)
         #define CALLED()        ((void)0)
-		#define PRINTERR(x)		fprintf(stderr, x)
+		#define PRINTERR(x)		SERIAL_PRINT(x)
 #endif
 
 #endif
