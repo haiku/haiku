@@ -178,7 +178,7 @@ exit0:
 static status_t
 init()
 {
-	ddprintf((T_ATOMIZER_MODULE_NAME": init()\n"));
+	ddprintf((B_ATOMIZER_MODULE_NAME": init()\n"));
 	/* init the module-wide benaphore */
 	INIT_BEN(module_lock);
 	if (module_lock.sem >= 0) {
@@ -200,10 +200,10 @@ uninit()
 	/* aquire the module-wide lock.  This is pure paranoia.
 	If it fails, all hell as broken loose, but we won't contribute
 	by corrupting the heap. */
-	ddprintf((T_ATOMIZER_MODULE_NAME": uninit()\n"));
+	ddprintf((B_ATOMIZER_MODULE_NAME": uninit()\n"));
 	ACQUIRE_BEN_ON_ERROR(module_lock, return B_ERROR);
 	if (atomizer_list->next) {
-		ddprintf((T_ATOMIZER_MODULE_NAME": uninit called with non-system atomizers still active!\n"));
+		ddprintf((B_ATOMIZER_MODULE_NAME": uninit called with non-system atomizers still active!\n"));
 	}
 	/* delete all of the atomizers.  Ideally, there should only
 	be the system atomizer left */
