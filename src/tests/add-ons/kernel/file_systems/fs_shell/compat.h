@@ -35,27 +35,30 @@
 typedef struct dirent dirent_t;
 typedef struct iovec iovec;
 
+#else
+#	define _BE_ERRNO_H_
+		// in this case, we want to use our Errors.h, not both :)
+		// (this is defined by Dano/Zeta's be_errors.h header)
 #endif
-
 
 #include <dirent.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <time.h>
 
 #ifdef __BEOS__
-#include <OS.h>              /* for typedefs and prototypes */
-#include <image.h>           /* for a few typedefs */
-#include <Drivers.h>         /* for various ioctl structs, etc */
-#include <iovec.h>           /* because we're boneheads sometimes */
+#	include <OS.h>				/* for typedefs and prototypes */
+#	include <image.h>			/* for a few typedefs */
+#	include <Drivers.h>			/* for various ioctl structs, etc */
+#	include <iovec.h>			/* because we're boneheads sometimes */
 #else
-#include <sys/uio.h>
-#include <image.h>           /* for a few typedefs */
-#include <Drivers.h>         /* for various ioctl structs, etc */
+#	include <sys/uio.h>
+#	include <image.h>			/* for a few typedefs */
+#	include <Drivers.h>			/* for various ioctl structs, etc */
 #endif
 
 #include <fs_attr.h>

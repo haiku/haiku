@@ -36,6 +36,8 @@
    dbg@be.com
 */   
 
+#include "compat.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -51,7 +53,6 @@
 #include <KernelExport.h>
 #endif
 
-#include "compat.h"
 #include "lock.h"
 #include "cache.h"
 
