@@ -1068,6 +1068,35 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			log_pll(reg2, (data2 / 100));
 			*adress += size32;
 			break;
+		case 0x35: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			byte = *((uint8*)(&(rom[*adress])));
+ 			*adress += 1;
+			offset32 = (byte << 1);
+			offset32 += tabs.InitFunctionTablePtr;
+			LOG(8,("cmd 'execute fixed VGA BIOS routine #$%02x at adress $%04x'\n",
+				byte, offset32));
+			//fixme: impl. if it turns out this function is used.. (didn't see that yet)
+			LOG(8,("\n\n 'INFO: WARNING: function not yet implemented, skipping!\n\n"));
+			if (*exec)
+			{
+				switch(byte)
+				{
+				default:
+					break;
+				}
+			}
+			break;
 		case 0x37: /* new */
 			*size -= 11;
 			if (*size < 0)
@@ -1804,6 +1833,7 @@ static void	setup_ram_config_nv28(uint8* rom)
 
 static status_t translate_ISA_PCI(uint32* reg)
 {
+//fixme: add more registers...
 	switch (*reg)
 	{
 	case 0x03c4:
