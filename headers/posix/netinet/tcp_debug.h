@@ -52,10 +52,10 @@ struct	tcp_debug {
 #define	TA_RESPOND	3
 #define	TA_DROP		4
 
-#ifdef TANAMES
-char	*tanames[] =
-    { "input", "output", "user", "respond", "drop" };
-#endif /* TANAMES */
+//#ifdef TANAMES
+//char	*tanames[] =
+//    { "input", "output", "user", "respond", "drop" };
+//#endif /* TANAMES */
 
 #define	TCP_NDEBUG 100
 struct	tcp_debug tcp_debug[TCP_NDEBUG];

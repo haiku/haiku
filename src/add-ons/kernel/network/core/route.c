@@ -1,11 +1,11 @@
 /* route.c */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #endif
 #include <kernel/OS.h>
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #endif
 

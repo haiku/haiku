@@ -3,16 +3,16 @@
 #include <stdio.h>
 #include <kernel/OS.h>
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #endif
 
-#include "sys/socket.h"
-#include "sys/socketvar.h"
-#include "pools.h"
-#include "netinet/in_pcb.h"
-#include "net_misc.h"
-#include "protocols.h"
+#include <sys/socket.h>
+#include <net_socket.h>
+#include <pools.h>
+#include <netinet/in_pcb.h>
+#include <net_misc.h>
+#include <protocols.h>
 
 uint32 sb_max = SB_MAX; /* hard value, recompile needed to alter :( */
 

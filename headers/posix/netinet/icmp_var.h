@@ -37,8 +37,6 @@
 #ifndef NETINET_ICMP_VAR_H
 #define NETINET_ICMP_VAR_H
 
-#include <ByteOrder.h>
-
 #include "netinet/ip_icmp.h"
 
 struct icmpstat {
@@ -54,8 +52,8 @@ struct icmpstat {
 	int32 icps_inhist[ICMP_MAXTYPE + 1];
 };
 
-#ifdef _KERNEL_MODE
-struct icmpstat icmpstat;
-#endif
+//#ifdef _KERNEL_MODE
+//struct icmpstat icmpstat;
+//#endif
 
 #endif /* NETINET_ICMP_VAR_H */

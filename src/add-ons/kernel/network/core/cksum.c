@@ -1,10 +1,12 @@
 #include <stdio.h>
 
-#ifdef _KERNEL_
-#include <KernelExport.h>
+#ifdef _KERNEL_MODE
+  #include <KernelExport.h>
+  #define printf dprintf
 #endif
 
-#include "net_misc.h"
+#include <netinet/in.h>
+#include <mbuf.h>
 
 /* This from Stevens Vol.2 */
 #define ADDCARRY(x)	(x > 65535 ? x -= 65535 : x)

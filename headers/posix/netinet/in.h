@@ -3,16 +3,36 @@
 #ifndef _NETINET_IN_H_
 #define _NETINET_IN_H_
 
-//#include <ByteOrder.h> /* for htonl */
-
 #include <sys/types.h>
 #include <net/if.h>
+#include <endian.h>
 
-typedef uint16 in_port_t;
-typedef uint32 in_addr_t;
+typedef unsigned short	in_port_t;
+typedef unsigned long	in_addr_t;
+
+/* We can't include <ByteOrder.h> since we are a posix file,
+ * and we are not allowed to import all the BeOS types here.
+ */
+#ifndef htonl
+	extern unsigned long __swap_int32(unsigned long);	/* private */
+	extern unsigned short __swap_int16(unsigned short);	/* private */
+	#if 	BYTE_ORDER == LITTLE_ENDIAN
+		#define htonl(x) __swap_int32(x)
+		#define ntohl(x) __swap_int32(x)
+		#define htons(x) __swap_int16(x)
+		#define ntohs(x) __swap_int16(x)
+	#elif	BYTE_ORDER == BIG_ENDIAN
+		#define htonl(x) (x)
+		#define ntohl(x) (x)
+		#define htons(x) (x)
+		#define ntohs(x) (x)
+	#else
+		#error Unknown byte order.
+	#endif
+#endif
+
 
 /* Protocol definitions - add to as required... */
-
 enum {
 	IPPROTO_IP      =   0,	/* 0, IPv4 */
 	IPPROTO_ICMP    =   1,	/* 1, ICMP (v4) */
@@ -137,12 +157,15 @@ struct sockaddr_in {
   #define satosin(sa)     ((struct sockaddr_in *)(sa))
   #define sintosa(sin)    ((struct sockaddr *)(sin))
 
+  struct ifnet;	// forward declaration
+
   /* Prototypes... */
   int    in_broadcast  (struct in_addr, struct ifnet *); 
   int    in_canforward (struct in_addr);
   int    in_localaddr  (struct in_addr);
   void   in_socktrim   (struct sockaddr_in*);
-  uint16 in_cksum      (struct mbuf *, int);
+/*  uint16 in_cksum      (struct mbuf *, int); */
+  uint16 in_cksum(struct mbuf *m, int len, int off);
   
 #endif /* _KERNEL_MODE */
 #endif /* NETINET_IN_H */

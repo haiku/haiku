@@ -42,7 +42,7 @@
 
 #include "netinet/in.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #endif
 

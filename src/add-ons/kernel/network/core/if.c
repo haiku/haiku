@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _KERNEL_
-#	include <KernelExport.h>
+#ifdef _KERNEL_MODE
+  #include <KernelExport.h>
+  #define printf dprintf
 #endif
 
 #include "netinet/in.h"
@@ -52,7 +53,7 @@ if_init(void)
 
 
 int
-ifioctl(struct socket *so, int cmd, caddr_t data)
+ifioctl(struct socket *so, ulong cmd, caddr_t data)
 {
 	struct ifnet *ifp;
 	struct ifreq *ifr;
@@ -102,7 +103,7 @@ ifioctl(struct socket *so, int cmd, caddr_t data)
 struct ifnet *
 ifunit(char *name)
 {
-	ifnet *d = devices;
+	struct ifnet *d = devices;
 
 	for (d=devices;d;d = d->if_next)
 		if (strcmp(d->if_name, name) == 0)

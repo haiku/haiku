@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <Drivers.h>
 #include <module.h>
 #include <KernelExport.h>
@@ -25,7 +25,7 @@
 #include "sys/socket.h"
 #include "sys/socketvar.h"
 #include "net/if.h"	/* for ifnet definition */
-#include "net_server/net_server.h"
+//#include "net_server/net_server.h"
 #include "protocols.h"
 #include "net_module.h"
 #include "net_timer.h"
@@ -39,6 +39,7 @@
 #include "net_malloc.h"
 #include "net/if_arp.h"
 #include "netinet/if_ether.h"
+#include <net_socket.h>
 
 /* Defines we need */
 #define NETWORK_INTERFACES	"network/interface"
@@ -59,7 +60,7 @@ static int init_done = 0;
 
 /* Forward prototypes... */
 /* Private for this file */
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t core_std_ops(int32 op, ...);
 #else
 #define core_std_ops NULL
@@ -131,6 +132,7 @@ _EXPORT struct core_module_info core_info = {
 	in_setpeeraddr,
 	in_pcbnotify,
 	inetctlerr,
+	in_cksum,
 
 	m_gethdr,
 	m_get,
@@ -656,7 +658,7 @@ static void domain_init(void)
  * NB these don't have any additional functions so we just use the
  * system defined module_info structures
  */
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static void find_protocol_modules(void)
 {
 	void *ml = open_module_list(NETWORK_PROTOCOLS);
@@ -953,7 +955,7 @@ static int start_stack(void)
 	if (dom_lock == -1)
 		dom_lock =   create_sem(1, "domain_lock");
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 	set_sem_owner(dev_lock,   B_SYSTEM_TEAM);
 	set_sem_owner(proto_lock, B_SYSTEM_TEAM);
 	set_sem_owner(dom_lock,   B_SYSTEM_TEAM);
@@ -984,7 +986,7 @@ static int stop_stack(void)
 	printf("trying to unload modules\n");
 	nm = module_list;
 	do {
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 		put_module(nm->name);
 #else
 		unload_add_on(nm->iid);
@@ -1011,7 +1013,7 @@ static int stop_stack(void)
 	return 0;
 }
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t core_std_ops(int32 op, ...) 
 {
 	switch(op) {

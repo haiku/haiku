@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network protocols udp ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon udp : kernel network protocols :
+	udp.c
+;

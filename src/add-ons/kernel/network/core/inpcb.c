@@ -5,8 +5,9 @@
 
 #include <stdio.h>
 
-#ifdef _KERNEL_
-#include <KernelExport.h>
+#ifdef _KERNEL_MODE
+  #include <KernelExport.h>
+  #define printf dprintf
 #endif
 
 #include "pools.h"
@@ -16,6 +17,9 @@
 #include "net/if.h"
 #include "netinet/in_var.h"
 #include "sys/protosw.h"
+#include <net_misc.h>
+
+extern struct in_ifaddr *in_ifaddr;
 
 static struct pool_ctl *pcbpool = NULL;
 static struct in_addr zeroin_addr;

@@ -1,7 +1,7 @@
 /* udp.c
  */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #include <string.h>
 #endif
@@ -26,14 +26,14 @@
 #include "core_module.h"
 #include "net_module.h"
 #include "core_funcs.h"
-#include "ipv4/ipv4_module.h"
+#include "ipv4_module.h"
 #include "net_timer.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #define TCP_MODULE_PATH		"network/protocol/tcp"
 static status_t tcp_ops(int32 op, ...);
-#else	/* _KERNEL_ */
+#else	/* _KERNEL_MODE */
 #define tcp_ops NULL
 #define TCP_MODULE_PATH	    "modules/protocol/tcp"
 static image_id ipid = -1;
@@ -58,6 +58,20 @@ struct inpcb *tcp_last_inpcb = NULL;
 
 static uint32 tcp_sendspace = 8192;	/* size of send buffer */
 static uint32 tcp_recvspace = 8192;	/* size of recieve buffer */
+
+/* was in tcp_var.h */
+struct inpcb tcb;
+struct tcpstat tcpstat;
+int tcp_mssdflt;
+int tcp_do_rfc1323;
+unsigned long tcp_now;
+
+/* was in tcp_seq.h */
+tcp_seq	tcp_iss;                /* tcp initial send seq # */
+
+
+// XXX shared? look into sockbuf.c
+uint32 sb_max = SB_MAX;
 
 void tcp_init(void)
 {
@@ -520,7 +534,7 @@ static int tcp_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	if (!ipm) {
 		char path[PATH_MAX];
 		getcwd(path, PATH_MAX);
@@ -553,7 +567,7 @@ static int tcp_module_stop(void)
 	net_remove_timer(slowtim);
 	net_remove_timer(fasttim);
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	unload_add_on(ipid);
 #else
 	put_module(IPV4_MODULE_PATH);
@@ -575,7 +589,7 @@ _EXPORT struct kernel_net_module_info protocol_info = {
 	tcp_module_stop
 };
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t tcp_ops(int32 op, ...)
 {
 	switch(op) {

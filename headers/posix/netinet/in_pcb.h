@@ -2,7 +2,7 @@
  * internet protcol control blocks
  */
 
-#include <sys/socketvar.h>
+//#include <sys/socketvar.h>
 #include <sys/socket.h>
 #include <pools.h>
 #include <netinet/ip.h>

@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network protocols raw ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon raw : kernel network protocols :
+	raw.c
+;

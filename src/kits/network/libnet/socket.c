@@ -16,9 +16,7 @@
 
 #include "net_stack_driver.h"
 
-const char *g_stack_driver_path = "/dev/" NET_STACK_DRIVER_PATH;
-
-bool g_beos_r5_compatibility = false;
+static bool g_beos_r5_compatibility = false;
 
 struct beosr5_sockaddr_in {
 	uint16 sin_family;
@@ -37,7 +35,7 @@ _EXPORT int socket(int family, int type, int protocol)
 	int rv;
 	struct socket_args args;
 
-	sock = open(g_stack_driver_path, O_RDWR);
+	sock = open(NET_STACK_DRIVER_PATH, O_RDWR);
 	if (sock < 0)
 		return sock;
 
@@ -153,7 +151,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	int	new_sock;
 	void *cookie;
 
-	new_sock = open(g_stack_driver_path, O_RDWR);
+	new_sock = open(NET_STACK_DRIVER_PATH, O_RDWR);
 	if (new_sock < 0)
 		return new_sock;
 	

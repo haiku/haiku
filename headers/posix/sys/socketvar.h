@@ -5,9 +5,10 @@
 #define _SYS_SOCKETVAR_H
 
 #include <OS.h>
-#include <sys/mbuf.h>
 #include <sys/uio.h>
 #include <sys/socket.h>
+
+struct mbuf;
 
 struct  sockbuf {
 	uint32  sb_cc;			/* actual chars in buffer */

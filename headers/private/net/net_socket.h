@@ -2,22 +2,23 @@
 #define _NET_SOCKET_H
 
 #include <sys/socketvar.h>
+#include <mbuf.h>
 
-uint32 sb_max;
+//uint32 sb_max;
 
 /* Function prototypes */
 
 /* These are the ones we export to libnet.so */
 
-int     initsocket(void **);
-int     socreate  (int, struct socket **, int, int);
+int     initsocket(struct socket **);
+int     socreate  (int, struct socket *, int, int);//XXX
 int     soshutdown(void *, int);
 int     soclose   (void *);
 
 int     sobind    (void *, char *, int);
 int     solisten  (void *, int);
 int     soconnect (void *, char *, int);
-int     soaccept  (void *, void **, void *, int *);
+int     soaccept  (struct socket *, struct socket **, void *, int *);
 
 int     writeit   (void *, struct iovec *, int);
 int     readit    (void *, struct iovec *, int *);
@@ -28,6 +29,7 @@ int     recvit    (void *, struct msghdr *, char *, int *);
 int     sosysctl  (int *, uint, void *, size_t *, void *, size_t);
 int     sosetopt  (void *, int, int, const void *, size_t);
 int     sogetopt  (void *, int, int, void *, size_t *);
+int 	soo_ioctl(void *sp, int cmd, caddr_t data);
 
 int     sogetpeername(void *, struct sockaddr *, int *);
 int     sogetsockname(void *, struct sockaddr *, int *);

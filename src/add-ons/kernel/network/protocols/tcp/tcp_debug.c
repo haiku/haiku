@@ -71,14 +71,15 @@
 
 #ifdef TCPDEBUG
 /* load symbolic names */
+char	*tanames[] = { "input", "output", "user", "respond", "drop" };
+
 #define	PRUREQUESTS
 #define	TCPSTATES
 #define	TCPTIMERS
-#define	TANAMES
 #endif
 
 #include <sys/param.h>
-#include <sys/mbuf.h>
+#include <mbuf.h>
 #include <sys/socket.h>
 
 #include <net/route.h>

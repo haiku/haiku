@@ -19,8 +19,9 @@
 #include "net_module.h"
 #include "core_funcs.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
+#define printf dprintf
 #define LOOP_MODULE_PATH "network/interfaces/loopback"
 #else
 #define LOOP_MODULE_PATH "interfaces/loopback"
@@ -84,7 +85,7 @@ static int loopback_dev_stop(struct ifnet *dev)
 	return 0;
 }
 
-static int loopback_ioctl(struct ifnet *ifp, int cmd, caddr_t data)
+static int loopback_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 {
 	int error = 0;
 

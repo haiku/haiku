@@ -31,6 +31,7 @@
 #ifdef _KERNEL_MODE
 	#include <KernelExport.h>
 	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
 
 	/* forward prototypes */
 	int ether_dev_start(ifnet *dev);
@@ -57,11 +58,12 @@ static int32 arp_allocated = 0;	/* how many arp entries have we created? */
 int32 ether_input(void *data);
 int  ether_output(struct ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		 struct rtentry *rt0);
-static int ether_ioctl(struct ifnet *ifp, int cmd, caddr_t data);
+static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data);
 int  ether_dev_attach(ifnet *dev);
 int  ether_dev_stop(ifnet *dev);
 void arp_rtrequest(int req, struct rtentry *rt, struct sockaddr *sa);
 static void arpinput(struct mbuf *m);
+static void arpwhohas(struct arpcom *ac, struct in_addr *ia);
 
 
 #define DRIVER_DIRECTORY "/dev/net"
@@ -595,7 +597,7 @@ static void arprequest(struct arpcom *ac, uint32 *sip, uint32 *tip, uint8 *enadd
 	(*ac->ac_if.output)(&ac->ac_if, m, &sa, NULL);
 }
 
-void arpwhohas(struct arpcom *ac, struct in_addr *ia)
+static void arpwhohas(struct arpcom *ac, struct in_addr *ia)
 {
 	arprequest(ac, &ac->ac_ipaddr.s_addr, &ia->s_addr, ac->ac_enaddr);
 }
@@ -787,7 +789,7 @@ void arp_init(void)
 
 }
 
-static int ether_ioctl(struct ifnet *ifp, int cmd, caddr_t data)
+static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 {
 	struct arpcom *ac = (struct arpcom *)ifp;
 	struct ifaddr *ifa = (struct ifaddr*)data;
@@ -920,7 +922,7 @@ static int32 std_ops(int32 op, ...)
 			get_module(CORE_MODULE_PATH, (module_info**)&core);
 			if (!core)
 				return B_ERROR;
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 			load_driver_symbols("ethernet");
 #endif
 			return B_OK;

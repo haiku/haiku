@@ -1,2 +1,21 @@
 SubDir OBOS_TOP src add-ons kernel network core ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon core : kernel network :
+	cksum.c
+	core.c
+	if.c
+	ifq.c
+	in.c
+	inpcb.c
+	mbuf.c
+	misc.c
+	net_timer.c
+	nhash.c
+	pools.c
+	radix.c
+	route.c
+	sockbuf.c
+	socket.c
+;

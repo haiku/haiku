@@ -4,7 +4,6 @@
 #include <kernel/OS.h>
 #include <iovec.h>
 #include <string.h>
-#include <errno.h>
 #include <sys/time.h>
 
 #include "sys/socket.h"
@@ -17,8 +16,10 @@
 #include "netinet/in_pcb.h"
 #include "net_misc.h"
 #include "protocols.h"
-#include "sys/net_uio.h"
-#ifdef _KERNEL_
+#include "sys/uio.h"
+#include <net_socket.h>
+
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #include "core_module.h"
 #endif
@@ -91,8 +92,8 @@ int uiomove(caddr_t cp, int n, struct uio *uio)
 				else
 					ptr = memcpy(cp, iov->iov_base, cnt);
 
-				if (!ptr)
-					return (errno);			
+//				if (!ptr)
+//					return (errno);			
 				break;
 		}
 		iov->iov_base = (caddr_t)iov->iov_base + cnt;
@@ -105,7 +106,7 @@ int uiomove(caddr_t cp, int n, struct uio *uio)
 	return (error);
 }
 
-int initsocket(void **sp)
+int initsocket(struct socket **sp)
 {
 	struct socket *so;
 	
@@ -123,10 +124,10 @@ int initsocket(void **sp)
 	return 0;
 }
 
-int socreate(int dom, void *sp, int type, int proto)
+int socreate(int dom, struct socket *sp, int type, int proto)
 {
 	struct protosw *prm = NULL; /* protocol module */
-	struct socket *so = (struct socket*)sp;
+	struct socket *so = sp;
 	int error;
 
 	if (so == NULL) {
@@ -165,7 +166,7 @@ int socreate(int dom, void *sp, int type, int proto)
 	    so->so_timeo < 0)
 		return ENOMEM;
 	    
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 	set_sem_owner(so->so_rcv.sb_pop,   B_SYSTEM_TEAM);
 	set_sem_owner(so->so_snd.sb_pop,   B_SYSTEM_TEAM);
 	set_sem_owner(so->so_timeo,        B_SYSTEM_TEAM);
@@ -316,7 +317,7 @@ struct socket *sonewconn(struct socket *head, int connstatus)
 
 	if (head->so_qlen + head->so_q0len > 3 * head->so_qlimit / 2)
 		return NULL;
-	if (initsocket((void**)&so) < 0)
+	if (initsocket(&so) < 0)
 		return NULL;
 
 	so->so_type    = head->so_type;
@@ -469,7 +470,7 @@ int sosend(struct socket *so, struct mbuf *addr, struct uio *uio, struct mbuf *t
 	if (control)
 		clen = control->m_len;
 
-#define snderr(errno)	{ error = errno; /* unlock */ goto release; } 
+#define snderr(err)	{ error = err; /* unlock */ goto release; } 
 restart:
 	if ((error = sblock(&so->so_snd, SBLOCKWAIT(flags))))
 		goto out;
@@ -1512,9 +1513,8 @@ int sogetpeername(void *sp, struct sockaddr *sa, int * alen)
         return error;
 }
 
-int soaccept(void *sp, void **nsp, void *data, int *alen)
+int soaccept(struct socket *so, struct socket **nsp, void *data, int *alen)
 {
-	struct socket * so = (struct socket *)sp;
 	int len;
 	int error;
 	struct mbuf *nam;

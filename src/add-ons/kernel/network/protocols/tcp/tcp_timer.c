@@ -1,6 +1,6 @@
 /* tcp_timer.c */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #endif
 
@@ -15,11 +15,14 @@
 #include "core_module.h"
 #include "core_funcs.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #endif
 
 extern struct core_module_info *core;
+
+char *tcptimers[] =
+    { "REXMT", "PERSIST", "KEEP", "2MSL" };
 
 int	tcp_backoff[TCP_MAXRXTSHIFT + 1] =
     { 1, 2, 4, 8, 16, 32, 64, 64, 64, 64, 64, 64, 64 };

@@ -106,10 +106,11 @@
 #define TCP_LINGERTIME  120                /* at most 2 minutes... */
 #define	TCP_MAXRXTSHIFT 12                 /* maximum retransmits */
 
-#ifdef	TCPTIMERS
-char *tcptimers[] =
-    { "REXMT", "PERSIST", "KEEP", "2MSL" };
-#endif /* TCPTIMERS */
+//#ifdef	TCPTIMERS
+//char *tcptimers[] =
+//    { "REXMT", "PERSIST", "KEEP", "2MSL" };
+//#endif /* TCPTIMERS */
+extern char *tcptimers[];
 
 /*
  * Force a time value to be in a certain range.
@@ -122,7 +123,7 @@ char *tcptimers[] =
 		(tv) = (tvmax); \
 }
 
-#ifdef _NETWORK_STACK
+//#ifdef _NETWORK_STACK
 extern int tcptv_keep_init;
 extern int tcp_keepidle;        /* time before keepalive probes begin */
 extern int tcp_keepintvl;       /* time between keepalive probes */
@@ -131,6 +132,6 @@ extern int tcp_ttl;             /* time to live for TCP segs */
 extern int tcp_backoff[];
 
 
-#endif /* _NETWORK_STACK */
+//#endif /* _NETWORK_STACK */
 
 #endif /* NETINET_TCP_TIMERS_H */

@@ -1,2 +1,12 @@
 SubDir OBOS_TOP src add-ons kernel network protocols tcp ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon tcp : kernel network protocols :
+	arc4random.c
+	tcp.c
+	tcp_debug.c
+	tcp_input.c
+	tcp_output.c
+	tcp_timer.c
+;

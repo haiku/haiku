@@ -49,11 +49,13 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 		errno = area;
 		return -1;
 	};
-		
+	
 	// The area is multi-thread protected by a semaphore locker 
 	rss->lock = create_sem(1, "r5_selectsync_lock");
 	if (rss->lock < B_OK) {
 		errno = rss->lock;
+		rss->wakeup = 0;
+		n = -1;
 		goto error;
 	};
 
@@ -61,6 +63,7 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	rss->wakeup = create_sem(0, "r5_selectsync_wakeup");
 	if (rss->wakeup < B_OK) {
 		errno = rss->wakeup;
+		n = -1;
 		goto error;
 	};
 	

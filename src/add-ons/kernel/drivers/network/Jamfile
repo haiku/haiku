@@ -1,4 +1,3 @@
 SubDir OBOS_TOP src add-ons kernel drivers net ;
 
-#SubInclude OBOS_TOP src add-ons kernel drivers net stack ;
-
+SubInclude OBOS_TOP src add-ons kernel drivers net stack ;

@@ -7,7 +7,8 @@
 
 #include <sys/select.h>
 
-#define NET_STACK_DRIVER_PATH  "net/stack"
+#define NET_STACK_DRIVER_DEV	"net/stack"
+#define NET_STACK_DRIVER_PATH	"/dev/" ## NET_STACK_DRIVER_DEV
 
 enum {
 	// Paranoia mode: be far away of B_DEVICE_OP_CODES_END opcodes!!!

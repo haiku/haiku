@@ -145,8 +145,9 @@ struct protosw {
 	NET_LAYER3,
 	NET_LAYER4
   };
-  
-  void add_protosw     (struct protosw *prt[], int);
+
+//XXX conflicts with src/add-ons/kernel/network/core/core.c:69
+//  void add_protosw     (struct protosw *prt[], int); 
   void add_protocol    (struct protosw *, int);
   void remove_protocol (struct protosw *);
 #endif

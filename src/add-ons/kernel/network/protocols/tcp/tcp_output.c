@@ -1,6 +1,6 @@
 /* tcp_output.c */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #endif
 
@@ -20,9 +20,9 @@
 
 #include "core_module.h"
 #include "core_funcs.h"
-#include "ipv4/ipv4_module.h"
+#include "ipv4_module.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 
 #endif

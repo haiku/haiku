@@ -9,7 +9,7 @@
 #include <OS.h>
 #include <malloc.h>
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #endif
 
@@ -54,7 +54,7 @@ net_init_timer(void)
 	if (gTimerInfo.ti_wait < B_OK)
 		return B_ERROR;
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 	set_sem_owner(gTimerInfo.ti_lock, B_SYSTEM_TEAM);
 	set_sem_owner(gTimerInfo.ti_wait, B_SYSTEM_TEAM);
 	

@@ -241,12 +241,14 @@ struct  tcpstat {
 #define TCPCTL_RSTPPSLIMIT     12 /* RST pps limit */
 #define TCPCTL_MAXID           13  
 
-#ifdef _NETWORK_STACK
-struct inpcb tcb;
-struct tcpstat tcpstat;
-int tcp_mssdflt;
-int tcp_do_rfc1323;
-unsigned long tcp_now;
+//#ifdef _NETWORK_STACK
+
+extern struct inpcb tcb;
+extern struct tcpstat tcpstat;
+extern int tcp_mssdflt;
+extern int tcp_do_rfc1323;
+extern unsigned long tcp_now;
+
 
 void   tcp_input(struct mbuf *, int);
 int    tcp_output(struct tcpcb*);
@@ -275,6 +277,6 @@ void   tcp_fasttimer(void *data);
 
 
 
-#endif
+//#endif
 
 #endif /* NETINET_TCP_VAR_H */

@@ -80,7 +80,7 @@ struct ether_header {
 #define	ETHERMIN	(ETHER_MIN_LEN - ETHER_HDR_LEN - ETHER_CRC_LEN)
 
 
-#ifdef _NETWORK_STACK
+//#ifdef _NETWORK_STACK
 
 /*
  * Macro to map an IP multicast address to an Ethernet multicast address.
@@ -115,7 +115,7 @@ struct ether_header {
 	(enaddr)[4] = ((u_int8_t *)ip6addr)[14];			\
 	(enaddr)[5] = ((u_int8_t *)ip6addr)[15];			\
 }
-#endif
+//#endif
 
 /*
  * Structure shared between the ethernet driver modules and
@@ -179,14 +179,14 @@ struct sockaddr_inarp {
 #define	RTF_ANNOUNCE	  RTF_PROTO2	/* announce new arp entry */
 #define	RTF_PERMANENT_ARP RTF_PROTO3    /* only manual overwrite of entry */
 
-#ifdef _NETWORK_STACK
+//#ifdef _NETWORK_STACK
 
 int arpresolve(struct arpcom *ac, struct rtentry *rt, struct mbuf *m,
                struct sockaddr *dst, uint8 *desten);
-void arpwhohas(struct arpcom *ac, struct in_addr *ia);
+//void arpwhohas(struct arpcom *ac, struct in_addr *ia);
 
 
-#else
+//#else
 
 char *ether_ntoa (struct ether_addr *);
 struct ether_addr *ether_aton (char *);
@@ -194,7 +194,7 @@ int ether_ntohost (char *, struct ether_addr *);
 int ether_hostton (char *, struct ether_addr *);
 int ether_line(char *line, struct ether_addr *e, char *hostname);
 
-#endif
+//#endif
 
 #endif /* NETINET_IF_ETHER_H */
 

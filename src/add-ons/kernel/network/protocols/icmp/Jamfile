@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network protocols icmp ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon icmp : kernel network protocols :
+	icmp.c
+;

@@ -8,7 +8,6 @@
 #include <sys/param.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <ByteOrder.h> /* htonl, htons, ntohl, ntohs */
 
 #ifdef __cplusplus
 extern "C" {

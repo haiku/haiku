@@ -21,11 +21,11 @@
 #include "core_module.h"
 #include "net_module.h"
 #include "core_funcs.h"
-#include "raw/raw_module.h"
+#include "raw_module.h"
 #include "icmp_module.h"
-#include "../ipv4/ipv4_module.h"
+#include "ipv4_module.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 static status_t icmp_ops(int32 op, ...);
 #else
@@ -38,9 +38,11 @@ static struct raw_module_info *raw = NULL;
 static struct protosw* proto[IPPROTO_MAX];
 static struct in_ifaddr *ic_ifaddr = NULL;
 static struct ipv4_module_info *ipm = NULL;
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 static image_id ipid = -1;
 #endif
+
+struct icmpstat icmpstat;
 
 static struct route icmprt;
 
@@ -120,7 +122,7 @@ static void icmp_reflect(struct mbuf *m)
 		ia = (struct in_ifaddr*)ifaof_ifpforaddr((struct sockaddr*)&icmpdst,
 		                                         m->m_pkthdr.rcvif);
 	if (ia == NULL)
-		ia = in_ifaddr;
+		ia = get_primary_addr(); //XXX is this right?
 	t = IA_SIN(ia)->sin_addr;
 	ip->ip_src = t;
 	ip->ip_ttl = MAXTTL;
@@ -418,7 +420,7 @@ static int icmp_protocol_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	if (!ipm) {
 		char path[PATH_MAX];
 		getcwd(path, PATH_MAX);
@@ -453,7 +455,7 @@ static int icmp_protocol_stop(void)
 	return 0;
 }
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 void set_core(struct core_module_info *cp)
 {
 	core = cp;
@@ -470,13 +472,13 @@ _EXPORT struct icmp_module_info protocol_info = {
 		icmp_protocol_init,
 		icmp_protocol_stop
 	},
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	set_core,
 #endif
 	icmp_error
 };
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t icmp_ops(int32 op, ...)
 {
 	switch(op) {

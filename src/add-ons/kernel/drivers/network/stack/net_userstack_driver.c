@@ -138,7 +138,7 @@ static status_t execute_command(net_stack_cookie *nsc, int32 op, void *data, uin
  */
 
 const char * g_device_names_list[] = {
-        NET_STACK_DRIVER_PATH,
+        NET_STACK_DRIVER_DEV,
         NULL
 };
 

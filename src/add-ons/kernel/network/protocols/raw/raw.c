@@ -1,6 +1,6 @@
 /* raw.c */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #include <string.h>
 #endif
@@ -16,13 +16,13 @@
 #include "core_module.h"
 #include "net_module.h"
 #include "core_funcs.h"
-#include "raw/raw_module.h"
-#include "ipv4/ipv4_module.h"
+#include "raw_module.h"
+#include "ipv4_module.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 static status_t raw_ops(int32 op, ...);
-#else	/* _KERNEL_ */
+#else	/* _KERNEL_MODE */
 #define raw_ops NULL
 static image_id ipid;
 #endif
@@ -34,6 +34,8 @@ static struct inpcb rawinpcb;
 static struct sockaddr_in ripsrc;
 static int rip_sendspace = 8192;
 static int rip_recvspace = 8192;
+
+struct ipstat ipstat; //XXX might need to be shared
 
 void rip_init(void)
 {
@@ -260,7 +262,7 @@ int rip_ctloutput(int op, struct socket *so, int level,
 			break;
 		/* XXX - Add other options here */
 	}
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 	return ipm->ctloutput(op, so, level, optnum, m);
 #else
 /* XXX - get this working for app...? */
@@ -297,7 +299,7 @@ static int raw_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_protocol, AF_INET);
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	if (!ipm) {
 		char path[PATH_MAX];
 		getcwd(path, PATH_MAX);
@@ -328,7 +330,7 @@ static int raw_module_init(void *cpp)
 
 static int raw_module_stop(void)
 {
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	unload_add_on(ipid);
 #else
 	put_module(IPV4_MODULE_PATH);
@@ -353,7 +355,7 @@ _EXPORT struct raw_module_info protocol_info = {
 	&rip_input
 };
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t raw_ops(int32 op, ...)
 {
 	switch(op) {

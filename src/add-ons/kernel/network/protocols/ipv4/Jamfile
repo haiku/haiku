@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network protocols ipv4 ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon ipv4 : kernel network protocols :
+	ipv4.c
+;

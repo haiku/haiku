@@ -2,18 +2,16 @@
  * Miscellaneous networking stuff that doesn't yet have a home.
  */
 
-#ifdef _NETWORK_STACK
-
-#include <kernel/OS.h>
-#include <ByteOrder.h>
-#include <Errors.h>
-
-#include "sys/mbuf.h"
+//#ifdef _NETWORK_STACK
 
 #ifndef OBOS_NET_MISC_H
 #define OBOS_NET_MISC_H
 
-#ifdef _KERNEL_
+//#include <kernel/OS.h>
+#include <Errors.h>
+#include <mbuf.h>
+
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #define printf  dprintf
 #endif  
@@ -77,7 +75,8 @@ typedef	uint32	ipv4_addr;
  */
 
 void net_server_add_device(ifnet *ifn);
-uint16 in_cksum(struct mbuf *m, int len, int off);
+//XXX already in netinet/in.h
+//uint16 in_cksum(struct mbuf *m, int len, int off);
 void local_init(void);
 
 /* sockets and in_pcb init */
@@ -98,5 +97,5 @@ void dump_sockaddr(void *ptr);
 
 #endif /* OBOS_NET_MISC_H */
 
-#endif /* _NETWORK_STACK */
+//#endif /* _NETWORK_STACK */
 

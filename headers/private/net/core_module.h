@@ -5,13 +5,13 @@
 #ifndef OBOS_CORE_MODULE_H
 #define OBOS_CORE_MODULE_H
 
-#include "sys/mbuf.h"
-#include "sys/protosw.h"
-#include "sys/socketvar.h"
-#include "netinet/in_pcb.h"
-#include "net/if.h"
-#include "net_timer.h"
-#include "net_module.h"
+#include <mbuf.h>
+#include <sys/protosw.h>
+#include <sys/socketvar.h>
+#include <netinet/in_pcb.h>
+#include <net/if.h>
+#include <net_timer.h>
+#include <net_module.h>
 
 struct core_module_info {
 	module_info	module;
@@ -79,6 +79,8 @@ struct core_module_info {
                          uint16, struct in_addr, uint16, 
                          int, void (*)(struct inpcb *, int));
 	int  (*inetctlerrmap)(int);
+	uint16 (*in_cksum)(struct mbuf *m, int len, int off);
+
 	
 	/* mbuf routines... */
 	struct mbuf * (*m_gethdr)(int);
@@ -128,8 +130,8 @@ struct core_module_info {
 	struct in_ifaddr *(*get_primary_addr)(void);	
 
 	/* socket functions - used by socket driver */
-	int (*initsocket)(void **);
-	int (*socreate)(int, void *, int, int);
+	int (*initsocket)(struct socket **);
+	int (*socreate)(int, struct socket *, int, int);
 	int (*soclose)(void *);
 	int (*sobind)(void *, caddr_t, int);
 	int (*solisten)(void *, int);
@@ -145,7 +147,7 @@ struct core_module_info {
 	int (*set_socket_event_callback)(void *, socket_event_callback, void *, int);
 	int (*sogetpeername)(void *, struct sockaddr *, int *);
 	int (*sogetsockname)(void *, struct sockaddr *, int *);
-	int (*soaccept)(void *, void **, void *, int *);
+	int (*soaccept)(struct socket *s, struct socket **news, void *, int *);
 };
 
 #ifdef _KERNEL_MODE

@@ -5,7 +5,7 @@
 #include "poll.h"
 
 // -------------------------------
-int poll(struct pollfd * p, int nb, int timeout)
+int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 {
 	fd_set		read_set;
 	fd_set		write_set;
@@ -19,16 +19,16 @@ int poll(struct pollfd * p, int nb, int timeout)
 	FD_ZERO(&exception_set);
 
 	n = -1;
-	for(i = 0; i < nb; i++) {
-		if (p[i].fd < 0)
+	for(i = 0; i < numfds; i++) {
+		if (fds[i].fd < 0)
 			continue;
 
-		if (p[i].events & POLLIN)	FD_SET(p[i].fd, &read_set);
-		if (p[i].events & POLLOUT)	FD_SET(p[i].fd, &write_set);
-		if (p[i].events & POLLERR)	FD_SET(p[i].fd, &exception_set);
+		if (fds[i].events & POLLIN)		FD_SET(fds[i].fd, &read_set);
+		if (fds[i].events & POLLOUT)	FD_SET(fds[i].fd, &write_set);
+		if (fds[i].events & POLLERR)	FD_SET(fds[i].fd, &exception_set);
 
-		if (p[i].fd > n)
-			n = p[i].fd;
+		if (fds[i].fd > n)
+			n = fds[i].fd;
 	};
 
 	if (n == -1)
@@ -49,11 +49,11 @@ int poll(struct pollfd * p, int nb, int timeout)
 		return rc;
 
 	for(i = 0; i < n; i++) { 
-		p[i].revents = 0;
+		fds[i].revents = 0;
 
-		if (FD_ISSET(p[i].fd, &read_set))		p[i].revents |= POLLIN;
-		if (FD_ISSET(p[i].fd, &write_set))		p[i].revents |= POLLOUT;
-		if (FD_ISSET(p[i].fd, &exception_set))	p[i].revents |= POLLERR;
+		if (FD_ISSET(fds[i].fd, &read_set))		fds[i].revents |= POLLIN;
+		if (FD_ISSET(fds[i].fd, &write_set))		fds[i].revents |= POLLOUT;
+		if (FD_ISSET(fds[i].fd, &exception_set))	fds[i].revents |= POLLERR;
 	};
 
 	return rc;

@@ -58,6 +58,7 @@
 #	define in_setpeeraddr      core->in_setpeeraddr
 #   define in_pcbnotify        core->in_pcbnotify
 #   define inetctlerrmap       core->inetctlerrmap
+#	define in_cksum            core->in_cksum
 
 #	define ifa_ifwithdstaddr   core->ifa_ifwithdstaddr
 #	define ifa_ifwithaddr      core->ifa_ifwithaddr

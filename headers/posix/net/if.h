@@ -150,7 +150,7 @@ struct ifnet {
 	void (*input) (struct mbuf*);
 	int	 (*output)(struct ifnet *, struct mbuf*, 
 			  struct sockaddr*, struct rtentry *); 
-	int	 (*ioctl) (struct ifnet *, ulong, char *);
+	int	 (*ioctl) (struct ifnet *, ulong, caddr_t);
 };
 #define if_mtu          ifd.ifi_mtu
 #define if_type         ifd.ifi_type
@@ -268,7 +268,7 @@ struct ifa_msghdr {
   void    if_attach(struct ifnet *ifp);
   void    if_detach(struct ifnet *ifp);
 
-  int     ifioctl(struct socket *so, ulong cmd, char *data);
+  int     ifioctl(struct socket *so, ulong cmd, caddr_t data);
   int     ifconf(int cmd, char *data);
   void    if_init(void);
 #endif

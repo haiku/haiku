@@ -2,7 +2,7 @@
  * simple ipv4 implementation
  */
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #include <stdio.h>
 #endif
 #include <unistd.h>
@@ -25,14 +25,14 @@
 #include "core_funcs.h"
 #include "net_module.h"
 #include "ipv4_module.h"
-#include "../icmp/icmp_module.h"
+#include "icmp_module.h"
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 static status_t ipv4_ops(int32 op, ...);
 #else
 #define ipv4_ops NULL
-#endif	/* _KERNEL_ */
+#endif	/* _KERNEL_MODE */
 
 #define INA struct in_ifaddr *
 #define SA  struct sockaddr *
@@ -46,17 +46,29 @@ static uint16 ip_id = 0;
 static sem_id id_lock = -1;
 static struct in_ifaddr *ip_ifaddr = NULL;
 static struct icmp_module_info *icmp = NULL;
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 static image_id icmpid = -1;
 #endif
 static struct ipq ipq;
 static net_timer_id timerid;
 
+struct ipstat ipstat; //XXX might need to be shared
+
+static void  ipv4_input(struct mbuf *, int);
+static int   ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
+static int   ipv4_ctloutput(int, struct socket *, int, int, struct mbuf **);
+
+static int   ip_dooptions(struct mbuf *);
+static void  ip_stripoptions(struct mbuf *, struct mbuf *);
+static struct mbuf *ip_srcroute(void);
+
+
+
 /* ??? - Globals we need to remove... TLS storage? */
 struct route ipforward_rt;
 
 /* Forward prototypes */
-int ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
+//int ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
                 
 #if SHOW_DEBUG
 static void dump_ipv4_header(struct mbuf *buf)
@@ -108,7 +120,7 @@ static struct ip_srcrt {
  * will be moved, and return value is their length.
  * XXX should be deleted; last arg currently ignored.
  */
-void ip_stripoptions(struct mbuf *m, struct mbuf *mopt)
+static void ip_stripoptions(struct mbuf *m, struct mbuf *mopt)
 {
 	int i;
 	struct ip *ip = mtod(m, struct ip *);
@@ -301,7 +313,7 @@ static void ip_forward(struct mbuf *m, int srcrt)
 	icmp->error(mcopy, type, code, dest, destifp);
 }
 
-int ip_dooptions(struct mbuf *m)
+static int ip_dooptions(struct mbuf *m)
 {
 	struct ip *ip = mtod(m, struct ip*);
 	uint8 *cp;
@@ -445,7 +457,7 @@ bad:
 }
 
 
-struct mbuf * ip_srcroute(void)
+static struct mbuf * ip_srcroute(void)
 {
 	struct in_addr *p, *q;
 	struct mbuf *m;
@@ -820,7 +832,7 @@ static int ip_optcopy(struct ip *ip, struct ip *jp)
 	return (optlen);
 }
 		
-int ipv4_output(struct mbuf *m0, struct mbuf *opt, struct route *ro,
+static int ipv4_output(struct mbuf *m0, struct mbuf *opt, struct route *ro,
                 int flags, void *optp)
 {
 	struct mbuf *m = m0;
@@ -1173,7 +1185,7 @@ static int ipv4_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	if (!icmp) {
 		char path[PATH_MAX];
 		getcwd(path, PATH_MAX);
@@ -1210,7 +1222,7 @@ static int ipv4_module_stop(void)
 	return 0;
 }
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 void set_core(struct core_module_info *cp)
 {
 	core = cp;
@@ -1228,7 +1240,7 @@ _EXPORT struct ipv4_module_info protocol_info = {
 		ipv4_module_stop
 	},
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	set_core,
 #endif
 	
@@ -1240,7 +1252,7 @@ _EXPORT struct ipv4_module_info protocol_info = {
 	ip_srcroute
 };
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 static status_t ipv4_ops(int32 op, ...)
 {
 	switch (op) {

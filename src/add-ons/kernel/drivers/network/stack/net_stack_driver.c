@@ -22,7 +22,7 @@
 #include <string.h>
 
 // Private includes
-#include <protosw.h>
+#include <sys/protosw.h>
 #include <core_module.h>
 
 /* these are missing from KernelExport.h ... */
@@ -60,6 +60,8 @@ extern void notify_select_event(selectsync * sync, uint32 ref);
 
 typedef void (*notify_select_event_function)(selectsync * sync, uint32 ref);
 
+struct socket; /* forward declaration */
+
 // this struct will store one select() event to monitor per thread
 typedef struct selecter {
 	struct selecter * 	next;
@@ -71,10 +73,10 @@ typedef struct selecter {
 
 // the cookie we attach to each file descriptor opened on our driver entry
 typedef struct {
-	void *		socket;		// NULL before ioctl(fd, NET_STACK_SOCKET/_ACCEPT)
-	uint32		open_flags;	// the open() flags (mostly for storing O_NONBLOCK mode)
-	sem_id		selecters_lock;	// protect the selecters linked-list
-	selecter * 	selecters;	// the select()'ers lists (thread-aware) 
+	struct socket *	socket;			// NULL before ioctl(fd, NET_STACK_SOCKET/_ACCEPT)
+	uint32			open_flags;		// the open() flags (mostly for storing O_NONBLOCK mode)
+	sem_id			selecters_lock;	// protect the selecters linked-list
+	selecter * 		selecters;		// the select()'ers lists (thread-aware) 
 } net_stack_cookie;
 
 #if STAY_LOADED
@@ -113,7 +115,7 @@ static status_t	unload_driver();
  */
 
 const char * g_device_names_list[] = {
-        NET_STACK_DRIVER_PATH,
+        NET_STACK_DRIVER_DEV,
         NULL
 };
 
@@ -763,14 +765,14 @@ static status_t	keep_driver_loaded()
 		
 	/* force the driver to stay loaded by opening himself */
 #if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "keep_driver_loaded: internaly opening /dev/" NET_STACK_DRIVER_PATH " to stay loaded in memory...\n");
+	dprintf(LOGID "keep_driver_loaded: internaly opening " NET_STACK_DRIVER_PATH " to stay loaded in memory...\n");
 #endif
 
-	g_stay_loaded_fd = open("/dev/" NET_STACK_DRIVER_PATH, 0);
+	g_stay_loaded_fd = open(NET_STACK_DRIVER_PATH, 0);
 
 #if SHOW_INSANE_DEBUGGING
 	if (g_stay_loaded_fd < 0)
-		dprintf(LOGID ERR "keep_driver_loaded: couldn't open(/dev/" NET_STACK_DRIVER_PATH")!\n");
+		dprintf(LOGID ERR "keep_driver_loaded: couldn't open(" NET_STACK_DRIVER_PATH ")!\n");
 #endif
 
 	return B_OK;

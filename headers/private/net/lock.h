@@ -34,7 +34,7 @@ struct rw_lock {
 
 typedef struct rw_lock rw_lock;
 
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #define INIT_BENAPHORE(lock,name) \
 	{ \
 		(lock).count = 1; \
@@ -70,7 +70,7 @@ typedef struct rw_lock rw_lock;
 	}
 
 /* read/write lock */
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 #define INIT_RW_LOCK(lock,name) \
 	{ \
 		(lock).sem = create_sem(0, name); \

@@ -1,19 +1,21 @@
 /* in.c */
 
 #include <stdio.h>
+#include <netinet/in.h>
+#include <netinet/in_var.h>
+#include <sys/socketvar.h>
+#include <net/if.h>
+#include <sys/sockio.h>
+#include <net/route.h>
 
-#ifdef _KERNEL_
-#include <KernelExport.h>
+#ifdef _KERNEL_MODE
+  #include <KernelExport.h>
+  #define printf dprintf
 #endif
 
-#include "netinet/in.h"
-#include "netinet/in_var.h"
-#include "sys/socketvar.h"
-#include "net/if.h"
-#include "sys/sockio.h"
-#include "net/route.h"
-
 extern struct ifnet **ifnet_addrs;
+
+struct in_ifaddr *in_ifaddr = NULL; //XXX is this ever initialized correctly?
 
 struct in_ifaddr *get_primary_addr(void)
 {

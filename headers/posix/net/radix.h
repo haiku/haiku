@@ -142,10 +142,10 @@ struct radix_node_head {
 #define Bcopy(a, b, n) memcpy(((char *)(b)), ((char *)(a)), (unsigned)(n))
 #define Bzero(p, n) memset((char *)(p),0, (int)(n));
 #define R_Malloc(p, t, n) do { \
-	(p = (t) kmalloc((unsigned int)(n))); \
+	(p = (t) malloc((unsigned int)(n))); \
 	memset(p, 0, sizeof(*p)); \
 	} while (0)
-#define Free(p) kfree((char *)p);
+#define Free(p) free((char *)p);
 
 void	 rn_init (void);
 int	 rn_inithead (void **, int);

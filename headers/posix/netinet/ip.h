@@ -5,8 +5,6 @@
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H
 
-//#include <ByteOrder.h>
-
 #include <mbuf.h>
 #include <netinet/in_systm.h>
 #include <netinet/in.h>

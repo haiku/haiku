@@ -9,7 +9,7 @@
 #include <kernel/OS.h>
 #include <image.h>
 
-#include "sys/mbuf.h"
+#include "mbuf.h"
 #include "net_misc.h"
 #include "sys/socketvar.h"
 #include "net/if.h"
@@ -39,18 +39,19 @@ struct net_module {
 	struct net_module *next;
 	char *name;
 	struct kernel_net_module_info *ptr;
-#ifndef _KERNEL_
+#ifndef _KERNEL_MODE
 	image_id iid;
 #endif
 	int status;
 };
-	
-enum {
-	NET_LAYER1	= 1, /* link layer */
-	NET_LAYER2,	     /* network layer */
-	NET_LAYER3,	     /* transport layer */
-	NET_LAYER4	     /* socket layer */
-};
+
+//XXX already in posix/sys/protosw.h
+//enum {
+//	NET_LAYER1	= 1, /* link layer */
+//	NET_LAYER2,	     /* network layer */
+//	NET_LAYER3,	     /* transport layer */
+//	NET_LAYER4	     /* socket layer */
+//};
 
 #endif /* OBOS_NET_MODULE_H */
 

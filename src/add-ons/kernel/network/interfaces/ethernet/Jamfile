@@ -1,2 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network interfaces ethernet ;
 
+UsePrivateHeaders net ;
+
+R5KernelAddon ethernet : kernel network interfaces :
+	ethernet.c
+;

@@ -60,8 +60,8 @@
 
 #define	TCP_ISSINCR	(125*1024)  /* increment for tcp_iss each second */
 
-#ifdef _NETWORK_STACK
-tcp_seq	tcp_iss;                /* tcp initial send seq # */
-#endif /* _NETWORK_STACK */
+//#ifdef _NETWORK_STACK
+extern tcp_seq	tcp_iss;                /* tcp initial send seq # */
+//#endif /* _NETWORK_STACK */
 
 #endif /* _NETINET_TCP_SEQ_H_ */
