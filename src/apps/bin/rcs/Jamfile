@@ -1,42 +1,35 @@
 SubDir OBOS_TOP src apps bin rcs ;
 
-BinCommand ci :
-	ci.c
-	rcslex.c
-	rcssyn.c
-	rcsgen.c
-	rcsedit.c
-	rcskeys.c
-	rcsmap.c
-	rcsrev.c
+StaticLibrary rcs : 
 	rcsutil.c
 	rcsfnms.c
+	rcsmap.c
+	rcsrev.c
+	rcssyn.c
+	rcslex.c
 	maketime.c
 	partime.c
 	rcstime.c
 	rcskeep.c
-	rcsfcmp.c
+	rcskeys.c
 	version.c
+;
+
+BinCommand ci :
+	ci.c
+	rcsgen.c
+	rcsedit.c
+	rcsfcmp.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs ci : be ;
 
 BinCommand co :
 	co.c
-	rcslex.c
-	rcssyn.c
 	rcsgen.c
 	rcsedit.c
-	rcskeys.c
-	rcsmap.c
-	rcsrev.c
-	rcsutil.c
-	rcsfnms.c
-	maketime.c
-	partime.c
-	rcstime.c
-	rcskeep.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs co : be ;
@@ -52,56 +45,23 @@ LinkSharedOSLibs ident : be ;
 BinCommand merge :
 	merge.c
 	merger.c
-	rcsfnms.c
-	rcslex.c
-	rcsmap.c
-	rcsrev.c
-	rcssyn.c
-	rcsutil.c
-	rcskeep.c
-	rcskeys.c
-	maketime.c
-	partime.c
-	rcstime.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs merge : be ;
 
 BinCommand rlog :
 	rlog.c
-	rcslex.c
-	rcsmap.c
-	rcssyn.c
-	rcsrev.c
-	rcsutil.c
-	maketime.c
-	partime.c
-	rcstime.c
-	rcsfnms.c
-	rcskeep.c
-	rcskeys.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs rlog : be ;
 
 BinCommand rcs :
 	rcs.c
-	rcslex.c
-	rcssyn.c
-	rcsrev.c
-	rcsutil.c
 	rcsgen.c
 	rcsedit.c
-	rcskeys.c
-	rcsmap.c
-	rcsfnms.c
-	rcskeep.c
-	maketime.c
-	partime.c
-	rcstime.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs rcs : be ;
@@ -110,37 +70,15 @@ BinCommand rcsclean :
 	rcsclean.c
 	rcsedit.c
 	rcsfcmp.c
-	rcsfnms.c
 	rcsgen.c
-	rcskeys.c
-	rcslex.c
-	rcsmap.c
-	rcsrev.c
-	rcssyn.c
-	rcsutil.c
-	rcskeep.c
-	maketime.c
-	partime.c
-	rcstime.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs rcsclean : be ;
 
 BinCommand rcsdiff :
 	rcsdiff.c
-	rcsutil.c
-	rcsfnms.c
-	rcsmap.c
-	rcsrev.c
-	rcssyn.c
-	rcslex.c
-	maketime.c
-	partime.c
-	rcstime.c
-	rcskeep.c
-	rcskeys.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs rcsdiff : be ;
@@ -148,18 +86,7 @@ LinkSharedOSLibs rcsdiff : be ;
 BinCommand rcsmerge :
 	rcsmerge.c
 	merger.c
-	rcsutil.c
-	rcsfnms.c
-	rcsmap.c
-	rcsrev.c
-	rcssyn.c
-	rcslex.c
-	maketime.c
-	partime.c
-	rcstime.c
-	rcskeep.c
-	rcskeys.c
-	version.c
+	: librcs.a
 ;
 
 LinkSharedOSLibs rcsmerge : be ;
