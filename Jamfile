@@ -12,15 +12,14 @@ Depends NetworkingKit :
 	core
 	ethernet loopback ppp
 	raw route ipv4 icmp udp tcp
-	libnet.so libnetapi.so
+	libnet.so libnetapi.so libbind.so libsocket.so
 	ping ifconfig <bin>route traceroute arp pppconfig
 	
 	# network drivers:
 	sis900 rtl8139
 	
 	# PPP devices:
-	modem
-	pppoe
+	modem pppoe
 	# PPP protocols:
 	ipcp
 	# PPP authenticators:
