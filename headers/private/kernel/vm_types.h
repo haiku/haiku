@@ -157,7 +157,11 @@ typedef struct vm_store_ops {
 // args for the create_area funcs
 enum {
 	REGION_ADDR_ANY_ADDRESS = 0,
-	REGION_ADDR_EXACT_ADDRESS
+	REGION_ADDR_EXACT_ADDRESS,
+
+	// ToDo: these are here only temporarily - it's a private
+	//	addition to the BeOS create_area() flags
+	B_EXACT_KERNEL_ADDRESS = 5
 };
 
 enum {
@@ -169,17 +173,40 @@ enum {
 	REGION_WIRING_LAZY = 0,
 	REGION_WIRING_WIRED,
 	REGION_WIRING_WIRED_ALREADY,
-	REGION_WIRING_WIRED_CONTIG
- };
+	REGION_WIRING_WIRED_CONTIG,
+
+	// ToDo: these are here only temporarily - it's a private
+	//	addition to the BeOS create_area() flags
+	B_ALREADY_WIRED = 5
+};
 
 enum {
 	PHYSICAL_PAGE_NO_WAIT = 0,
 	PHYSICAL_PAGE_CAN_WAIT,
 };
 
-#define LOCK_RO        0x0
-#define LOCK_RW        0x1
-#define LOCK_KERNEL    0x2
-#define LOCK_MASK      0x3
+// additional protection flags
+// Note: the VM probably won't support all combinations - it will try
+// its best, but create_area() will fail if it has to.
+// Of course, the exact behaviour will be documented somewhere...
+#define B_EXECUTE_AREA			4
+	// "execute" protection is not available on x86 - but defining it
+	// doesn't hurt too much, either :-)
+	// (but don't use it right now, it's not yet supported at all)
+#define B_KERNEL_READ_AREA		8
+#define B_KERNEL_WRITE_AREA		16
+#define B_KERNEL_EXECUTE_AREA	32
+
+#define B_USER_PROTECTION		(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)
+#define B_KERNEL_PROTECTION		(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA)
+
+#define LOCK_RO		0
+#define LOCK_RW		1
+#define LOCK_KERNEL	(B_KERNEL_PROTECTION)
+
+#define PROTECTION_TO_LOCK(protection) \
+	(protection & B_KERNEL_PROTECTION ? \
+		((protection & B_KERNEL_WRITE_AREA ? LOCK_RW : LOCK_RO) | LOCK_KERNEL) \
+		: (protection & B_WRITE_AREA ? LOCK_RW : LOCK_RO))
 
 #endif	/* _KERNEL_VM_TYPES_H */
