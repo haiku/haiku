@@ -62,10 +62,10 @@ struct rigid_disk_block {
 
 	uint32	__reserved5[10];
 
-	uint32 ID() { return B_BENDIAN_TO_HOST_INT32(id); }
-	uint32 SummedLongs() { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
-	uint32 BlockSize() { return B_BENDIAN_TO_HOST_INT32(block_size); }
-	uint32 FirstPartition() { return B_BENDIAN_TO_HOST_INT32(partition_list); }
+	uint32 ID() const { return B_BENDIAN_TO_HOST_INT32(id); }
+	uint32 SummedLongs() const { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
+	uint32 BlockSize() const { return B_BENDIAN_TO_HOST_INT32(block_size); }
+	uint32 FirstPartition() const { return B_BENDIAN_TO_HOST_INT32(partition_list); }
 };
 
 #define RDB_DISK_ID			'RDSK'
@@ -111,9 +111,9 @@ struct partition_block {
 	uint32	environment[17];
 	uint32	__reserved3[15];
 
-	uint32 ID() { return B_BENDIAN_TO_HOST_INT32(id); }
-	uint32 SummedLongs() { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
-	uint32 Next() { return B_BENDIAN_TO_HOST_INT32(next); }
+	uint32 ID() const { return B_BENDIAN_TO_HOST_INT32(id); }
+	uint32 SummedLongs() const { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
+	uint32 Next() const { return B_BENDIAN_TO_HOST_INT32(next); }
 };
 
 #define RDB_PARTITION_ID	'PART'
@@ -148,22 +148,22 @@ struct disk_environment {
 	uint32	control;
 	uint32	boot_blocks;
 
-	uint32 FirstCylinder() { return B_BENDIAN_TO_HOST_INT32(first_cylinder); }
-	uint32 LastCylinder() { return B_BENDIAN_TO_HOST_INT32(last_cylinder); }
-	uint32 Surfaces() { return B_BENDIAN_TO_HOST_INT32(surfaces); }
-	uint32 BlocksPerTrack() { return B_BENDIAN_TO_HOST_INT32(blocks_per_track); }
-	uint32 LongBlockSize() { return B_BENDIAN_TO_HOST_INT32(long_block_size); }
+	uint32 FirstCylinder() const { return B_BENDIAN_TO_HOST_INT32(first_cylinder); }
+	uint32 LastCylinder() const { return B_BENDIAN_TO_HOST_INT32(last_cylinder); }
+	uint32 Surfaces() const { return B_BENDIAN_TO_HOST_INT32(surfaces); }
+	uint32 BlocksPerTrack() const { return B_BENDIAN_TO_HOST_INT32(blocks_per_track); }
+	uint32 LongBlockSize() const { return B_BENDIAN_TO_HOST_INT32(long_block_size); }
+	uint32 BlockSize() const { return LongBlockSize() << 2; }
 
 	uint64 Start() 
 	{ 
-		return uint64(FirstCylinder()) * BlocksPerTrack() * Surfaces() 
-			* LongBlockSize() * sizeof(long);
+		return uint64(FirstCylinder()) * BlocksPerTrack() * Surfaces() * BlockSize();
 	}
 
 	uint64 Size() 
 	{ 
 		return uint64(LastCylinder() + 1 - FirstCylinder()) * BlocksPerTrack() * Surfaces()
-			* LongBlockSize() * sizeof(long);
+			* BlockSize();
 	}
 };
 
