@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src tests kits game simple_game_sound_test ;
+
+SimpleTest simple_game_sound_test
+	: SimpleSoundTest.cpp
+	: game tracker be root
+;
