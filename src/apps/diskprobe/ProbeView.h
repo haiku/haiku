@@ -6,6 +6,8 @@
 #define PROBE_VIEW_H
 
 
+#include "DataEditor.h"
+
 #include <View.h>
 #include <String.h>
 #include <Path.h>
@@ -21,16 +23,16 @@ class ProbeView : public BView {
 		ProbeView(BRect rect, entry_ref *ref, const char *attribute = NULL);
 		virtual ~ProbeView();
 
+		virtual void DetachedFromWindow();
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
 
 		void AddFileMenuItems(BMenu *menu, int32 index);
 
 	private:
-		BString			fAttribute;
-		bool			fIsDevice;
+		DataEditor		fEditor;
 		HeaderView		*fHeaderView;
 		BScrollView		*fScrollView;
 };
 
-#endif	/* PROBE_WINDOW_H */
+#endif	/* PROBE_VIEW_H */

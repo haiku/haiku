@@ -5,6 +5,7 @@
 
 
 #include "ProbeView.h"
+#include "DataView.h"
 
 #define BEOS_R5_COMPATIBLE
 	// for SetLimits()
@@ -347,24 +348,12 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 
 
 ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
-	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
-	fAttribute(attribute)
+	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	BNode node(ref);
-
-	node_ref nodeRef;
-	if (node.GetNodeRef(&nodeRef) == B_OK)
-		watch_node(&nodeRef, B_WATCH_STAT, this);
-
-	struct stat stat;
-	stat.st_mode = 0;
-
-	BEntry entry(ref);
-	entry.GetStat(&stat);
-	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
+	fEditor.SetTo(*ref, attribute);
 
 	rect = Bounds();
-	fHeaderView = new HeaderView(rect, ref, fIsDevice, attribute ? fAttribute.String() : NULL);
+	fHeaderView = new HeaderView(rect, ref, fEditor.IsDevice(), fEditor.Attribute());
 	fHeaderView->ResizeToPreferred();
 	AddChild(fHeaderView);
 
@@ -372,7 +361,7 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	rect.top = rect.bottom + 3;
 	rect.bottom = Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	BView *view = new BView(rect, "text", B_FOLLOW_NONE, B_WILL_DRAW);
+	BView *view = new DataView(rect, fEditor);
 
 	fScrollView = new BScrollView("scroller", view, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(fScrollView);
@@ -381,7 +370,13 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 
 ProbeView::~ProbeView()
 {
-	stop_watching(this);
+}
+
+
+void 
+ProbeView::DetachedFromWindow()
+{
+	fEditor.StopWatching(this);
 }
 
 
@@ -399,6 +394,8 @@ ProbeView::AddFileMenuItems(BMenu *menu, int32 index)
 void 
 ProbeView::AttachedToWindow()
 {
+	fEditor.StartWatching(this);
+
 	// Add menu to window
 
 	BMenuBar *bar = Window()->KeyMenuBar();
@@ -410,7 +407,7 @@ ProbeView::AttachedToWindow()
 		MoveBy(0, bar->Bounds().Height());
 		ResizeBy(0, -bar->Bounds().Height());
 
-		BMenu *menu = new BMenu(fAttribute.Length() > 0 ? "Attribute" : fIsDevice ? "Device" : "File");
+		BMenu *menu = new BMenu(fEditor.IsAttribute() ? "Attribute" : fEditor.IsDevice() ? "Device" : "File");
 		AddFileMenuItems(menu, 0);
 		menu->AddSeparatorItem();
 
