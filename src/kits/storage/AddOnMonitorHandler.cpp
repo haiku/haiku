@@ -1,7 +1,9 @@
 #include "AddOnMonitorHandler.h"
 #include <Directory.h>
 
+#ifndef ADD_ON_STABLE_SECONDS
 #define ADD_ON_STABLE_SECONDS 15
+#endif
 
 /*
  * public functions
