@@ -31,6 +31,8 @@ class MusePackDecoder : public Decoder {
 	private:
 		MPC_decoder	*fDecoder;
 		StreamInfo	*fInfo;
+		float		fFrameRate;
+		off_t		fStartTime;
 };
 
 #endif	/* MUSEPACK_DECODER_H */
