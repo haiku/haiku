@@ -51,8 +51,7 @@ BCursor::BCursor(const void *cursorData)
 {
   int8 *data = (int8 *)cursorData;
   m_serverToken = 0;
-  if ( sizeof(cursorData) < 68 )
-    return;
+
   if ( data[0] != 16 )
     return;
   if ( data[1] != 1 )
@@ -89,7 +88,7 @@ BCursor::~BCursor()
 }
 //------------------------------------------------------------------------------
 // not implemented on BeOS
-status_t BCursor::Archive(BMessage *into, bool deep = true) const
+status_t BCursor::Archive(BMessage *into, bool deep) const
 {
 	return B_OK;
 }

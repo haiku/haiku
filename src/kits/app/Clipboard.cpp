@@ -221,7 +221,7 @@ bool BClipboard::AssertLocked() const
   return fLock.IsLocked();
 }
 //------------------------------------------------------------------------------
-status_t BClipboard::DownloadFromSystem(bool force=false)
+status_t BClipboard::DownloadFromSystem(bool force)
 {
   /* What does force mean? */
   BMessage message(B_REG_DOWNLOAD_CLIPBOARD), reply;
