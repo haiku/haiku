@@ -37,8 +37,8 @@
 
 // debugging
 //#define DBG(x) x
-#define DBG(x)
-#define OUT	printf
+#define DBG(x)	;
+#define PRINT(x)	DBG({ printf("[%6ld] ", find_thread(NULL)); printf x; })
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
@@ -262,7 +262,7 @@ status_t BLooper::PostMessage(BMessage* message, BHandler* handler,
 //------------------------------------------------------------------------------
 void BLooper::DispatchMessage(BMessage* message, BHandler* handler)
 {
-DBG(OUT("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
+PRINT(("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
 /**
 	@note	Initially, DispatchMessage() was locking the looper, calling the
 			filtering API, determining whether to use fPreferred or not, and
@@ -311,7 +311,7 @@ DBG(OUT("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
 			break;
 		}
 	}
-DBG(OUT("BLooper::DispatchMessage() done\n"));
+PRINT(("BLooper::DispatchMessage() done\n"));
 }
 //------------------------------------------------------------------------------
 void BLooper::MessageReceived(BMessage* msg)
@@ -515,7 +515,7 @@ thread_id BLooper::Run()
 //------------------------------------------------------------------------------
 void BLooper::Quit()
 {
-DBG(OUT("BLooper::Quit()\n"));
+PRINT(("BLooper::Quit()\n"));
 	if (!IsLocked())
 	{
 		const char* name = Name();
@@ -534,24 +534,24 @@ DBG(OUT("BLooper::Quit()\n"));
 		return;
 	}
 
-DBG(OUT("  is locked\n"));
+PRINT(("  is locked\n"));
 
 	if (!fRunCalled)
 	{
-DBG(OUT("  Run() has not been called yet\n"));
+PRINT(("  Run() has not been called yet\n"));
 		fTerminating = true;
 		delete this;
 	} 
 	else if (find_thread(NULL) == fTaskID)
 	{
-DBG(OUT("  We are the looper thread\n"));
+PRINT(("  We are the looper thread\n"));
 		fTerminating = true;
 		delete this;
 		exit_thread(0);
 	}
 	else
 	{
-DBG(OUT("  Run() has already been called and we are not the looper thread\n"));
+PRINT(("  Run() has already been called and we are not the looper thread\n"));
 		// As with sem in _Lock(), we need to cache this here in case the looper
 		// disappears before we get to the wait_for_thread() below
 		thread_id tid = Thread();
@@ -572,13 +572,13 @@ DBG(OUT("  Run() has already been called and we are not the looper thread\n"));
 		// when Quit() was invoked from another thread.  Makes a nice proof that
 		// this is how it's handled, too.
 		status_t err;
-DBG(OUT("  PostMessage(_QUIT_)...\n"));
+PRINT(("  PostMessage(_QUIT_)...\n"));
 //		err = PostMessage(_QUIT_);
 
 BMessage message(_QUIT_);
 message.AddInt32("testfield", 42);
 err = PostMessage(&message);
-DBG(OUT("  ... done: %lx\n", err));
+PRINT(("  ... done: %lx\n", err));
 
 		// There's a possibility that PostMessage() will return B_WOULD_BLOCK
 		// because the port is full, so we'll wait a bit and re-post until
@@ -595,11 +595,11 @@ DBG(OUT("  ... done: %lx\n", err));
 		int32 temp;
 		do
 		{
-DBG(OUT("  wait_for_thread(%ld)...\n", tid));
+PRINT(("  wait_for_thread(%ld)...\n", tid));
 			err = wait_for_thread(tid, &temp);
 		} while (err == B_INTERRUPTED);
 	}
-DBG(OUT("BLooper::Quit() done\n"));
+PRINT(("BLooper::Quit() done\n"));
 }
 //------------------------------------------------------------------------------
 bool BLooper::QuitRequested()
@@ -615,13 +615,13 @@ bool BLooper::Lock()
 //------------------------------------------------------------------------------
 void BLooper::Unlock()
 {
-DBG(OUT("BLooper::Unlock()\n"));
+PRINT(("BLooper::Unlock()\n"));
 	//	Make sure we're locked to begin with
 	AssertLocked();
 
 	//	Decrement fOwnerCount
 	--fOwnerCount;
-DBG(OUT("  fOwnerCount now: %ld\n", fOwnerCount));
+PRINT(("  fOwnerCount now: %ld\n", fOwnerCount));
 	//	Check to see if the owner still wants a lock
 	if (fOwnerCount == 0)
 	{
@@ -630,7 +630,7 @@ DBG(OUT("  fOwnerCount now: %ld\n", fOwnerCount));
 
 		//	Decrement requested lock count (using fAtomicCount for this)
 /*		int32 atomicCount =*/ atomic_add(&fAtomicCount, -1);
-DBG(OUT("  fAtomicCount now: %ld\n", fAtomicCount));
+PRINT(("  fAtomicCount now: %ld\n", fAtomicCount));
 
 		//	Check if anyone is waiting for a lock
 // bonefish: Currently _Lock() always acquires the semaphore.
@@ -640,7 +640,7 @@ DBG(OUT("  fAtomicCount now: %ld\n", fAtomicCount));
 			release_sem(fLockSem);
 		}
 	}
-DBG(OUT("BLooper::Unlock() done\n"));
+PRINT(("BLooper::Unlock() done\n"));
 }
 //------------------------------------------------------------------------------
 bool BLooper::IsLocked() const
@@ -1002,7 +1002,7 @@ status_t BLooper::_PostMessage(BMessage* msg, BHandler* handler,
 //------------------------------------------------------------------------------
 status_t BLooper::_Lock(BLooper* loop, port_id port, bigtime_t timeout)
 {
-DBG(OUT("BLooper::_Lock(%p, %lx)\n", loop, port));
+PRINT(("BLooper::_Lock(%p, %lx)\n", loop, port));
 /**
 	@note	The assumption I'm under here is that since we can get the port of
 			the BLooper directly from the BLooper itself, the port parameter is
@@ -1028,7 +1028,7 @@ DBG(OUT("BLooper::_Lock(%p, %lx)\n", loop, port));
 	//	Check params (loop, port)
 	if (!loop && port < 0)
 	{
-DBG(OUT("BLooper::_Lock() done 1\n"));
+PRINT(("BLooper::_Lock() done 1\n"));
 		return B_BAD_VALUE;
 	}
 
@@ -1049,7 +1049,7 @@ DBG(OUT("BLooper::_Lock() done 1\n"));
 		{
 			// If we can't lock, the semaphore is probably
 			// gone, which leaves us in no-man's land
-DBG(OUT("BLooper::_Lock() done 2\n"));
+PRINT(("BLooper::_Lock() done 2\n"));
 			return B_BAD_VALUE;
 		}
 	
@@ -1059,7 +1059,7 @@ DBG(OUT("BLooper::_Lock() done 2\n"));
 			loop = LooperForPort(port);
 			if (!loop)
 			{
-DBG(OUT("BLooper::_Lock() done 3\n"));
+PRINT(("BLooper::_Lock() done 3\n"));
 				return B_BAD_VALUE;
 			}
 		}
@@ -1068,7 +1068,7 @@ DBG(OUT("BLooper::_Lock() done 3\n"));
 			//	Check looper validity
 			if (!IsLooperValid(loop))
 			{
-DBG(OUT("BLooper::_Lock() done 4\n"));
+PRINT(("BLooper::_Lock() done 4\n"));
 				return B_BAD_VALUE;
 			}
 		}
@@ -1080,7 +1080,7 @@ DBG(OUT("BLooper::_Lock() done 4\n"));
 		{
 			//	Bump fOwnerCount
 			++loop->fOwnerCount;
-DBG(OUT("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
+PRINT(("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
 			return B_OK;
 		}
 	
@@ -1091,7 +1091,7 @@ DBG(OUT("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
 		//	Validate the semaphore
 		if (sem < 0)
 		{
-DBG(OUT("BLooper::_Lock() done 6\n"));
+PRINT(("BLooper::_Lock() done 6\n"));
 			return B_BAD_VALUE;
 		}
 	
@@ -1125,7 +1125,7 @@ DBG(OUT("BLooper::_Lock() done 6\n"));
 		loop->fOwnerCount = 1;
 	}
 
-DBG(OUT("BLooper::_Lock() done: %lx\n", err));
+PRINT(("BLooper::_Lock() done: %lx\n", err));
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -1189,18 +1189,18 @@ void BLooper::_AddMessagePriv(BMessage* msg)
 //------------------------------------------------------------------------------
 status_t BLooper::_task0_(void* arg)
 {
-DBG(OUT("LOOPER: _task0_()\n"));
+PRINT(("LOOPER: _task0_()\n"));
 	BLooper* obj = (BLooper*)arg;
 
-DBG(OUT("LOOPER: locking looper...\n"));
+PRINT(("LOOPER: locking looper...\n"));
 	if (obj->Lock())
 	{
-DBG(OUT("LOOPER: looper locked\n"));
+PRINT(("LOOPER: looper locked\n"));
 		obj->task_looper();
 		delete obj;
 	}
 
-DBG(OUT("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
+PRINT(("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -1208,7 +1208,7 @@ DBG(OUT("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
 void *
 BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 {
-	DBG(OUT("BLooper::ReadRawFromPort()\n"));
+	PRINT(("BLooper::ReadRawFromPort()\n"));
 	int8 *msgBuffer = NULL;
 	ssize_t bufferSize;
 
@@ -1217,7 +1217,7 @@ BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 	} while (bufferSize == B_INTERRUPTED);
 
 	if (bufferSize < B_OK) {
-		DBG(OUT("BLooper::ReadRawFromPort(): failed: %ld\n", bufferSize));
+		PRINT(("BLooper::ReadRawFromPort(): failed: %ld\n", bufferSize));
 		return NULL;
 	}
 
@@ -1227,22 +1227,22 @@ BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 	// we don't want to wait again here, since that can only mean
 	// that someone else has read our message and our bufferSize
 	// is now probably wrong
-	DBG(OUT("read_port()...\n"));
+	PRINT(("read_port()...\n"));
 	bufferSize = read_port_etc(fMsgPort, msgCode, msgBuffer, bufferSize,
 					  B_RELATIVE_TIMEOUT, 0);
 	if (bufferSize < B_OK) {
 		delete[] msgBuffer;
 		return NULL;
 	}
-	DBG(OUT("BLooper::ReadRawFromPort() read: %.4s\n", (char *)msgCode));
-	DBG(OUT("BLooper::ReadRawFromPort() done: %p\n", msgBuffer));
+	PRINT(("BLooper::ReadRawFromPort() read: %.4s\n", (char *)msgCode));
+	PRINT(("BLooper::ReadRawFromPort() done: %p\n", msgBuffer));
 	return msgBuffer;
 }
 
 //------------------------------------------------------------------------------
 BMessage* BLooper::ReadMessageFromPort(bigtime_t tout)
 {
-DBG(OUT("BLooper::ReadMessageFromPort()\n"));
+PRINT(("BLooper::ReadMessageFromPort()\n"));
 	int32 msgcode;
 	BMessage* bmsg;
 
@@ -1255,32 +1255,32 @@ DBG(OUT("BLooper::ReadMessageFromPort()\n"));
 		delete[] (int8*)msgbuffer;
 	}
 
-DBG(OUT("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
+PRINT(("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
 	return bmsg;
 }
 //------------------------------------------------------------------------------
 BMessage* BLooper::ConvertToMessage(void* raw, int32 code)
 {
-DBG(OUT("BLooper::ConvertToMessage()\n"));
+PRINT(("BLooper::ConvertToMessage()\n"));
 	BMessage* bmsg = new BMessage(code);
 
 	if (raw != NULL)
 	{
 		if (bmsg->Unflatten((const char*)raw) != B_OK)
 		{
-DBG(OUT("BLooper::ConvertToMessage(): unflattening message failed\n"));
+PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
 			delete bmsg;
 			bmsg = NULL;
 		}
 	}
 
-DBG(OUT("BLooper::ConvertToMessage(): %p\n", bmsg));
+PRINT(("BLooper::ConvertToMessage(): %p\n", bmsg));
 	return bmsg;
 }
 //------------------------------------------------------------------------------
 void BLooper::task_looper()
 {
-DBG(OUT("BLooper::task_looper()\n"));
+PRINT(("BLooper::task_looper()\n"));
 	//	Check that looper is locked (should be)
 	AssertLocked();
 	//	Unlock the looper
@@ -1289,22 +1289,22 @@ DBG(OUT("BLooper::task_looper()\n"));
 	//	loop: As long as we are not terminating.
 	while (!fTerminating)
 	{
-DBG(OUT("LOOPER: outer loop\n"));
+PRINT(("LOOPER: outer loop\n"));
 		// TODO: timeout determination algo
 		//	Read from message port (how do we determine what the timeout is?)
-DBG(OUT("LOOPER: MessageFromPort()...\n"));
+PRINT(("LOOPER: MessageFromPort()...\n"));
 		BMessage* msg = MessageFromPort();
-DBG(OUT("LOOPER: ...done\n"));
+PRINT(("LOOPER: ...done\n"));
 
 		//	Did we get a message?
 		if (msg)
 		{
-DBG(OUT("LOOPER: got message\n"));
+PRINT(("LOOPER: got message\n"));
 			//	Add to queue
 			fQueue->AddMessage(msg);
 		}
 else
-DBG(OUT("LOOPER: got no message\n"));
+PRINT(("LOOPER: got no message\n"));
 
 		//	Get message count from port
 		int32 msgCount = port_count(fMsgPort);
@@ -1325,7 +1325,7 @@ DBG(OUT("LOOPER: got no message\n"));
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage)
 		{
-DBG(OUT("LOOPER: inner loop\n"));
+PRINT(("LOOPER: inner loop\n"));
 			//	Get next message from queue (assign to fLastMessage)
 			fLastMessage = fQueue->NextMessage();
 
@@ -1339,7 +1339,7 @@ DBG(OUT("LOOPER: inner loop\n"));
 			}
 			else
 			{
-DBG(OUT("LOOPER: fLastMessage: 0x%lx: %.4s\n", fLastMessage->what,
+PRINT(("LOOPER: fLastMessage: 0x%lx: %.4s\n", fLastMessage->what,
 (char*)&fLastMessage->what));
 DBG(fLastMessage->PrintToStream());
 				//	Get the target handler
@@ -1348,12 +1348,12 @@ DBG(fLastMessage->PrintToStream());
 				BHandler* handler;
 				if (_use_preferred_target_(fLastMessage))
 				{
-DBG(OUT("LOOPER: use preferred target\n"));
+PRINT(("LOOPER: use preferred target\n"));
 					handler = fPreferred;
 				}
 				else
 				{
-DBG(OUT("LOOPER: don't use preferred target\n"));
+PRINT(("LOOPER: don't use preferred target\n"));
 					/**
 						@note	Here is where all the token stuff starts to
 								make sense.  How, exactly, do we determine
@@ -1362,16 +1362,16 @@ DBG(OUT("LOOPER: don't use preferred target\n"));
 								Amazingly, we happen to have a global mapping
 								of BHandler pointers to int32s!
 					 */
-DBG(OUT("LOOPER: use: %ld\n", _get_message_target_(fLastMessage)));
+PRINT(("LOOPER: use: %ld\n", _get_message_target_(fLastMessage)));
 					 gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
 					 						 B_HANDLER_TOKEN,
 					 						 (void**)&handler);
-DBG(OUT("LOOPER: handler: %p, this: %p\n", handler, this));
+PRINT(("LOOPER: handler: %p, this: %p\n", handler, this));
 				}
 
 				if (!handler)
 				{
-DBG(OUT("LOOPER: no target handler, use this\n"));
+PRINT(("LOOPER: no target handler, use this\n"));
 					handler = this;
 				}
 
@@ -1387,14 +1387,14 @@ DBG(OUT("LOOPER: no target handler, use this\n"));
 				}
 				else
 				{
-					DBG(OUT("LOOPER: no scripting message\n"));
+					PRINT(("LOOPER: no scripting message\n"));
 				}
 				
 				if (handler)
 				{
 					//	Do filtering
 					handler = top_level_filter(fLastMessage, handler);
-DBG(OUT("LOOPER: top_level_filter(): %p\n", handler));
+PRINT(("LOOPER: top_level_filter(): %p\n", handler));
 					if (handler && handler->Looper() == this)
 					{
 						DispatchMessage(fLastMessage, handler);
@@ -1420,7 +1420,7 @@ DBG(OUT("LOOPER: top_level_filter(): %p\n", handler));
 			}
 		}
 	}
-DBG(OUT("BLooper::task_looper() done\n"));
+PRINT(("BLooper::task_looper() done\n"));
 }
 //------------------------------------------------------------------------------
 void BLooper::do_quit_requested(BMessage* msg)
