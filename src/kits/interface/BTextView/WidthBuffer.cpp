@@ -236,7 +236,7 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 {
 	_width_table_ *table = &fBuffer[index];	
 	hashed_escapement *widths = static_cast<hashed_escapement *>(table->widths);
-	uint32 hashed = Hash(value) % table->tableCount;
+	uint32 hashed = Hash(value) & (table->tableCount - 1);
 	
 	DEBUG_ONLY(uint32 iterations = 1;)
 	uint32 found;
@@ -306,7 +306,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 			
 		uint32 value = CharToCode(inText + offset, charLen);
 				
-		uint32 hashed = Hash(value) % table->tableCount;
+		uint32 hashed = Hash(value) & (table->tableCount - 1);
 		uint32 found = widths[hashed].code;
 		
 		// Check if the value is already in the table
@@ -341,7 +341,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 					// Rehash the values, and put them into the new table
 					for (int32 oldPos = 0; oldPos < table->tableCount; oldPos++) {
 						if (widths[oldPos].code != (uint32) -1) {
-							uint32 newPos = Hash(widths[oldPos].code) % newSize;
+							uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
 							while (newWidths[newPos].code != (uint32)-1) {
 								if (++newPos >= (uint32)newSize)
 									newPos = 0;
