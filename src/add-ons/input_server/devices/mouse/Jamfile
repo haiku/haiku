@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons input_server devices mouse ;
+
+Addon mouse : input_server/devices : 
+	MouseInputDevice.cpp 
+	: false 
+	: be <nogrist>input_server ;
+
