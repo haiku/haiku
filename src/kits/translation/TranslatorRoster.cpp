@@ -577,17 +577,6 @@ BTranslatorRoster::Identify(BPositionIO *inSource,
 				
 				if (addmatch) {
 					weight = tmpInfo.quality * tmpInfo.capability;
-					
-					// Since many kinds of data can look like text,
-					// don't choose the text format if it has been identified
-					// as belonging to a different group.
-					if (bFoundMatch && outInfo->group == B_TRANSLATOR_TEXT &&
-						tmpInfo.group != B_TRANSLATOR_TEXT)
-						bestWeight = 0.0;
-					else if (bFoundMatch && tmpInfo.group == B_TRANSLATOR_TEXT &&
-						outInfo->group != B_TRANSLATOR_TEXT)
-						weight = 0.0;
-
 					if (weight > bestWeight) {
 						bFoundMatch = true;
 						bestWeight = weight;
