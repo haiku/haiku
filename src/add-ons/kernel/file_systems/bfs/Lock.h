@@ -29,7 +29,7 @@
 
 class Semaphore {
 	public:
-		Semaphore(const char *name = "bfs sem")
+		Semaphore(const char *name)
 			:
 #ifdef USE_BENAPHORE
 			fSemaphore(create_sem(0, name)),
@@ -151,14 +151,14 @@ class ReadWriteLock {
 	public:
 		ReadWriteLock(const char *name)
 			:
-			fWriteLock()
+			fWriteLock(name)
 		{
 			Initialize(name);
 		}
 
 		ReadWriteLock()
 			:
-			fWriteLock()
+			fWriteLock("bfs r/w w-lock")
 		{
 		}
 

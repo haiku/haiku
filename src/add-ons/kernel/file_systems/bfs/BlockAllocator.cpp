@@ -312,6 +312,7 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 BlockAllocator::BlockAllocator(Volume *volume)
 	:
 	fVolume(volume),
+	fLock("bfs allocator"),
 	fGroups(NULL),
 	fCheckBitmap(NULL)
 {
