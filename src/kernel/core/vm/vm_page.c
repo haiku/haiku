@@ -48,7 +48,7 @@ static int dump_page_stats(int argc, char **argv);
 static int dump_free_page_table(int argc, char **argv);
 static int vm_page_set_state_nolock(vm_page *page, int page_state);
 static void clear_page(addr pa);
-static int page_scrubber(void *);
+static int32 page_scrubber(void *);
 
 
 static vm_page *dequeue_page(page_queue *q)
@@ -254,7 +254,9 @@ int vm_page_init(kernel_args *ka)
 	return 0;
 }
 
-int vm_page_init2(kernel_args *ka)
+
+int
+vm_page_init2(kernel_args *ka)
 {
 	void *null;
 
@@ -270,14 +272,15 @@ int vm_page_init2(kernel_args *ka)
 	return 0;
 }
 
-int vm_page_init_postthread(kernel_args *ka)
+
+int
+vm_page_init_postthread(kernel_args *ka)
 {
-	thread_id tid;
+	thread_id thread;
 
 	// create a kernel thread to clear out pages
-	tid = thread_create_kernel_thread("page scrubber", &page_scrubber, NULL);
-	thread_set_priority(tid, B_LOWEST_ACTIVE_PRIORITY);
-	thread_resume_thread(tid);
+	thread = spawn_kernel_thread(&page_scrubber, "page scrubber", B_LOWEST_ACTIVE_PRIORITY, NULL);
+	resume_thread(thread);
 
 	modified_pages_available = create_sem(0, "modified_pages_avail_sem");
 #if 0
@@ -288,7 +291,9 @@ int vm_page_init_postthread(kernel_args *ka)
 	return 0;
 }
 
-static int page_scrubber(void *unused)
+
+static int32
+page_scrubber(void *unused)
 {
 #define SCRUB_SIZE 16
 	int state;
@@ -300,16 +305,16 @@ static int page_scrubber(void *unused)
 
 	dprintf("page_scrubber starting...\n");
 
-	for(;;) {
+	for (;;) {
 		snooze(100000); // 100ms
 
-		if(page_free_queue.count > 0) {
+		if (page_free_queue.count > 0) {
 			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 
-			for(i=0; i<SCRUB_SIZE; i++) {
+			for (i = 0; i < SCRUB_SIZE; i++) {
 				page[i] = dequeue_page(&page_free_queue);
-				if(page[i] == NULL)
+				if (page[i] == NULL)
 					break;
 			}
 

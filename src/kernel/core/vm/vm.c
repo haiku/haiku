@@ -1668,7 +1668,7 @@ vm_aspace_walk_next(struct hash_iterator *i)
 }
 
 
-static int
+static int32
 vm_thread_dump_max_commit(void *unused)
 {
 	int oldmax = -1;
@@ -1817,13 +1817,15 @@ int vm_init_postsem(kernel_args *ka)
 	return heap_init_postsem(ka);
 }
 
-int vm_init_postthread(kernel_args *ka)
+
+int
+vm_init_postthread(kernel_args *ka)
 {
 	vm_page_init_postthread(ka);
 
 	{
-		thread_id tid = thread_create_kernel_thread("max_commit_thread", &vm_thread_dump_max_commit, NULL);
-		thread_resume_thread(tid);
+		thread_id thread = spawn_kernel_thread(&vm_thread_dump_max_commit, "max_commit_thread", B_NORMAL_PRIORITY, NULL);
+		resume_thread(thread);
 	}
 
 	vm_daemon_init();

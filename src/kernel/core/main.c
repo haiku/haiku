@@ -46,7 +46,7 @@ bool kernel_startup;
 
 static kernel_args ka;
 
-static int main2(void *);
+static int32 main2(void *);
 
 int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
 
@@ -109,9 +109,8 @@ _start(kernel_args *oldka, int cpu_num)
 
 		// start a thread to finish initializing the rest of the system
 		{
-			thread_id tid;
-			tid = thread_create_kernel_thread("main2", &main2, NULL);
-			thread_resume_thread(tid);
+			thread_id thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
+			resume_thread(thread);
 		}
 
 		smp_wake_up_all_non_boot_cpus();
@@ -135,7 +134,7 @@ _start(kernel_args *oldka, int cpu_num)
 }
 
 
-static int
+static int32
 main2(void *unused)
 {
 	(void)(unused);

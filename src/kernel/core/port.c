@@ -942,9 +942,12 @@ delete_owned_ports(team_id owner)
 }
 
 
+#ifdef DEBUG
 /*
  * testcode
  */
+
+static int32 port_test_thread_func(void *arg);
 
 port_id test_p1, test_p2, test_p3, test_p4;
 
@@ -985,10 +988,9 @@ port_test()
 	dprintf("porttest: res=%d, %s\n", res, res == B_TIMED_OUT ? "ok" : "BAD");
 
 	dprintf("porttest: spawning thread for port 1\n");
-	t = thread_create_kernel_thread("port_test", port_test_thread_func, NULL);
-	// resume thread
-	thread_resume_thread(t);
-	
+	t = spawn_kernel_thread(port_test_thread_func, "port_test", B_NORMAL_PRIORITY, NULL);
+	resume_thread(t);
+
 	dprintf("porttest: write\n");
 	write_port(test_p1, 1, &testdata, sizeof(testdata));
 
@@ -1015,8 +1017,8 @@ port_test()
 }
 
 
-int
-port_test_thread_func(void* arg)
+static int32
+port_test_thread_func(void *arg)
 {
 	int32 msg_code;
 	int n;
@@ -1039,12 +1041,14 @@ port_test_thread_func(void* arg)
 	
 	return 0;
 }
+#endif	/* DEBUG */
 
 
 //	#pragma mark -
 /* 
  *	user level ports
  */
+
 
 port_id
 user_create_port(int32 queue_length, const char *uname)

@@ -122,7 +122,8 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 //	dprintf("exiting scan_pages\n");
 }
 
-static int page_daemon()
+static int32
+page_daemon(void *unused)
 {
 	struct hash_iterator i;
 	vm_address_space *old_aspace;
@@ -133,6 +134,7 @@ static int page_daemon()
 	bigtime_t now;
 
 	dprintf("page daemon starting\n");
+	(void)unused;
 
 	for(;;) {
 		snooze(PAGE_DAEMON_INTERVAL);
@@ -189,9 +191,11 @@ static int page_daemon()
 	}
 }
 
-int vm_daemon_init()
+
+int
+vm_daemon_init()
 {
-	thread_id tid;
+	thread_id thread;
 
 	trimming_cycle = false;
 
@@ -200,9 +204,8 @@ int vm_daemon_init()
 	free_memory_high_water = vm_page_num_pages() / 4;
 
 	// create a kernel thread to select pages for pageout
-	tid = thread_create_kernel_thread("page daemon", &page_daemon, NULL);
-	thread_set_priority(tid, B_FIRST_REAL_TIME_PRIORITY);
-	thread_resume_thread(tid);
+	thread = spawn_kernel_thread(&page_daemon, "page daemon", B_FIRST_REAL_TIME_PRIORITY, NULL);
+	resume_thread(thread);
 
 	return 0;
 }
