@@ -8,6 +8,8 @@ R5KernelAddon mga.driver : kernel drivers bin :
 ;
 
 Package openbeos-matrox-cvs :
+	README.html UPDATE.html ;
+Package openbeos-matrox-cvs :
 	mga.driver : 
 	boot home config add-ons kernel drivers bin ;
 Package openbeos-matrox-cvs :

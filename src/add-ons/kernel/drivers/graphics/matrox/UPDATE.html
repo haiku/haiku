@@ -1,0 +1,351 @@
+<html>
+<head>
+<title>Changes</title>
+</head>
+<body>
+<p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>mga_driver 0.14 (Rudolf)</h1></p>
+<ul>
+	<li><strong>Millenium I:</strong>
+		<ul>
+			<li>Enabled Millenium I support;
+			<li>Fixed the kernel driver for working Millenium I support;
+			<li>'Pins' V1 card-config BIOS test readout implemented: This is not useable yet due to lack of info;
+			<li>Implemented hardcursor support;
+			<li>Fixed 2D acceleration: added software adress linearisation switch;
+			<li>Fixed mode setup for 800x600 in 8, 15 and 16bit color, and 1600x1200 in 8 bit color by implementing framebuffer slopspace;
+			<li>Fixed output brightness (sync_on_green error);
+			<li>Fixed ScreenPrefs refreshrate trouble;
+			<li>Tuned BWindowScreen support (MOVE_DISPLAY syncs to retrace now).
+		</ul>
+	<li><strong>Millenium II:</strong>
+		<ul>
+			<li>Implemented hardcursor support;
+			<li>Fixed 2D acceleration problem: added software adress linearisation switch;
+			<li>Fixed mode setup for 800x600 in 8, 15 and 16bit color, and 1600x1200 in 8 bit color by implementing framebuffer slopspace;
+			<li>Fixed output brightness (sync_on_green error);
+			<li>Fixed ScreenPrefs refreshrate trouble;
+			<li>2D acceleration is operational now: removed read access on a write only register;
+			<li>Tuned BWindowScreen support (MOVE_DISPLAY syncs to retrace now).
+		</ul>
+	<li><strong>G100:</strong>
+		<ul>
+			<li>2D engine update (removed read access on a write only register): acceleration also works now if card is used as secondary videocard.
+		</ul>
+	<li><strong>G200:</strong>
+		<ul>
+			<li>Improved overlay support for virtual workspaces (will improve more later on).
+		</ul>
+	<li><strong>G400/G400MAX:</strong>
+		<ul>
+			<li>Re-implemented videoPLL setup for monitormode;
+			<li>Re-implemented videoPLL setup for TVout mode;
+			<li>Re-implemented TVout functionality: output quality is still the same, but some handy logging is implemented for instance now. The Linux code has gone;
+			<li>Fixed the low contrast/intensity setting of the TVout picture and tuned the colorburst signal;
+			<li>Improved non-coldstarted dualhead and TVout support;
+			<li>BWindowScreen support update for dualhead and TVout use;
+			<li>Improved hardcursor support for dualhead stretch and switch modes, in standard and virtual spaces;
+			<li>Improved overlay support for virtual workspaces and dualhead switch mode with TVout enabled (will improve more later on).
+		</ul>
+	<li><strong>G450:</strong>
+		<ul>
+			<li>Implemented videoPLL setup for monitor mode <strong>and</strong> TVout mode with 'on the fly' loopback filter configuration;
+			<li>Checked and updated pins readout for all VCO reported specs;
+			<li>Implemented basic TVout support;
+			<li>Fixed a small bug in all PLL's that prevented TVout color from working correctly. This bug was also responsible for 'jumping' refreshrate changes on moving the corresponding slider in Be's screenprefs panel. The refreshrates and system speed are thus set more accurately now;
+			<li>Fixed the low contrast/intensity setting of the TVout picture and tuned the colorburst signal;
+			<li>Improved/fixed non-coldstarted dualhead and TVout support;
+			<li>Setup TVout picture vertical sizing and positioning: the DVD and VCD modes are operational! (Checkout the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/tools.html#tools">tools</a> and <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/dvdvideo.html">VCD/DVD on TV</a> stuff);
+			<li>BWindowScreen support update for dualhead and TVout use;
+			<li>Improved hardcursor support for dualhead stretch and switch modes, in standard and virtual spaces;
+			<li>Improved overlay support for virtual workspaces and dualhead switch mode with TVout enabled (will improve more later on);
+			<li>Enabled sync signals to both the analog output connectors instead of not touching them. This might fix some 'secondary head non-working' problems, and some 'secondary card use' problems.
+		</ul>
+	<li><strong>G550:</strong>
+		<ul>
+			<li>Implemented videoPLL setup for monitor mode <strong>and</strong> TVout mode with 'on the fly' loopback filter configuration;
+			<li>Checked and updated pins readout for all VCO reported specs;
+			<li>Implemented basic TVout support;
+			<li>Fixed a small bug in all PLL's that prevented TVout color from working correctly. This bug was also responsible for 'jumping' refreshrate changes on moving the corresponding slider in Be's screenprefs panel. The refreshrates and system speed are thus set more accurately now;
+			<li>Fixed the low contrast/intensity setting of the TVout picture and tuned the colorburst signal;
+			<li>Fixed non-coldstarted dualhead and TVout support;
+			<li>Setup TVout picture vertical sizing and positioning: the DVD and VCD modes are operational!
+(Checkout the <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/tools.html#tools">tools</a> and <a href="http://web.inter.nl.net/users/be-hold/BeOS/MGAdriver/dvdvideo.html">VCD/DVD on TV</a> stuff);
+			<li>BWindowScreen support update for dualhead and TVout use;
+			<li>Improved hardcursor support for dualhead stretch and switch modes, in standard and virtual spaces;
+			<li>Improved overlay support for virtual workspaces and dualhead switch mode with TVout enabled (will improve more later on);
+			<li>Enabled sync signals to both the analog output connectors instead of not touching them. This might fix some 'secondary head non-working' problems, and some 'secondary card use' problems.
+		</ul>
+	<li><strong>General:</strong>
+		<ul>
+			<li>Implemented framebuffer slopspace. This 'feature' is needed for (decent) standard mode support on older cards (before G100), and also enables very flexible non-standard mode support on all cards (in horizontal pixel multiples of 8 pixels);
+			<li>Implemented support for primary head 'sync on green'. The driver config file mga.settings is used to enable/disable this function. Sync on green is functional on Millenium I upto and including G200 cards. G400, G450 and G550 cards apparantly miss the needed wiring on the videocard to actually support this;
+			<li>Shutdown kernel driver Matrox Mystique 170/220 recognition. These cards are not supported, so the driver may not interfere with possible other drivers that *do* support these cards;
+			<li>Prevented the driver from using the motherboard interrupts IRQ0, 1 or 2  if assigned to the Matrox card: otherwise the system may crash or hang on boot. Thanks to Sunlung Suen for nailing this one;
+			<li>Removed read access on a write only register. This fixes 2D acceleration on Millenium 2 cards and G100 acceleration not working if used as secondary videocard. Because this register was used incorrectly on all cards it might fix other (sporadic) problems also.
+			<li>Added BeOS BWindowScreen bug workaround ('ProposeMode limitation check' setup error): BWindowScreen is working fully in every valid configuration 'guaranteed' now! 
+			<li>Fixed a MOVE_DISPLAY bug: horizontal move instructions where not correctly carried out for 16 and 32bit colormodes. for 16bit moves the X-coordinate was divided by two, for 32bit moves it was divided by four. This fix definately improves support for large virtual workspaces including BWindowScreen;
+			<li>Added BWindowScreen support for extremely large virtual spaces. Overlay can always be used (on G200 and later cards), 2D acceleration functions are only exported if they support a certain size;
+			<li>Fixed errors in displaymode list exported by the driver: corrected 1152x864 modes timing errors; modes beyond cardspecs are nolonger exported.
+		</ul>
+</ul>
+<p><h1>mga_driver 0.13 beta2 (Rudolf)</h1></p>
+<ul>
+	<li><strong>Millenium II:</strong>
+		<ul>
+			<li>No improvements (for this version).
+		</ul>
+	<li><strong>G100:</strong>
+		<ul>
+			<li>Removed another hardcursor bug that prevented it to work correctly on some occasions (bitmap trouble),
+			<li>Verified and improved coldstart support via actual use as secondary videocard.
+		</ul>
+	<li><strong>G200:</strong>
+		<ul>
+			<li>Implemented 'hardware zooming' in overlay. Also fixed bottom and right-most 'line' distortions sometimes visible,
+			<li>Completed 'official' card coldstart and verified it via actual use as secondary videocard,
+			<li>Minimized 'high-resolution video on high-resolution desktop' (downscaling) distortions in overlay by setting up G200 memory access priority. Note: This is a 'known limitation' of the G200 cards, their memory bandwidth is limited. G400 and later cards do not suffer from this on overlay...
+		</ul>
+	<li><strong>G400/G400MAX:</strong>
+		<ul>
+			<li>Implemented 'hardware zooming' in overlay. Also fixed bottom and right-most 'line' distortions sometimes visible,
+			<li>Completed 'official' card coldstart and verified it via actual use as secondary videocard,
+			<li>Toggled (and verified) NTSC/PAL TV output so it matches with dualheadsetup setting,
+			<li>Included TV-adapter cable detection (currently only used on cross-connecting heads),
+			<li>Modified dualhead implementation for head cross-connecting and overlay,
+			<li>Added analog amplification setting for secondary head (monitor mode: prevents analog flat-panels from being driven into saturation which resulted in bright, distorted colors).
+		</ul>
+	<li><strong>G450:</strong>
+		<ul>
+			<li>Implemented 'hardware zooming' in overlay. Also fixed bottom and right-most 'line' distortions sometimes visible,
+			<li>System PLL is programmed according to pins reported specs, 
+			<li>Implemented full card coldstart support: Not yet verified, but should work as secondary videocard,
+			<li>Included TV-adapter cable detection: Analog VGA output connector is automatically chosen like the card's BIOS does if the card has a primary DVI connector,
+			<li>Extended/fixed/changed dualhead implementation for cross-connecting heads, overlay use, and (coldstarted) VGA-BIOS independent functionality (not yet verified, but should work OK).
+		</ul>
+	<li><strong>G550:</strong>
+		<ul>
+			<li>Implemented 'hardware zooming' in overlay. Also fixed bottom and right-most 'line' distortions sometimes visible,
+			<li>System PLL is programmed according to pins reported specs, 
+			<li>Implemented full card coldstart support and verified it via actual use as secondary videocard,
+			<li>Included TV-adapter cable detection: Analog VGA output connector is automatically chosen like the card's BIOS does if the card has a primary DVI connector,
+			<li>Extended/fixed/changed dualhead implementation for cross-connecting heads, overlay use, and (coldstarted) VGA-BIOS independent functionality.
+		</ul>
+	<li><strong>General:</strong>
+		<ul>
+			<li>Re-included the 'Be screenprefs Panel' lower-refreshrate limit at 48Hz, 'mistakenly' removed in V0.13 beta1,
+			<li>Verified the high-refreshrate limits, works nicely according to specs and pins. G200 for instance can do 1600x1200x32 in max. 60Hz,
+			<li>The 'mga.settings' file 'usebios' option default setting for the driver is (re)set to 'false', so the G100-G550 cards will be fully started now. Please report if you encounter problems!!
+			<li>The 'mga.settings' file 'hardcursor' option default setting is (re)set to 'false', so dualhead works OK 'out of the box'. This is a failsafe setting: if you only use singlehead mode you can manually re-enable it,
+			<li>Finally completed the 'migration' to the new PINS implementation. The old version is completely removed now! (pre G100 PINS readout will be implemented also, and some minor modifications might still be done in the future to support new features the driver will get.)
+		</ul>
+</ul>
+<p><h1>mga_driver 0.13 beta1 (Rudolf)</h1></p>
+<ul>
+	<li><strong>Millenium II:</strong>
+		<ul>
+			<li>No improvements.
+		</ul>
+	<li><strong>G100:</strong>
+		<ul>
+			<li>'Pins' card-config BIOS readout re-implemented / expanded,
+			<li>Complete 'official' card coldstart,
+			<li>SDRAM card CAS latency tuning included,
+			<li>Hardware cursor / 2D support fixed,
+			<li>RAM amount detection fixed,
+			<li>PLL timebase detection included,
+			<li>Improved BWindowScreen support,
+			<li>System, RAM and DAC speeds more accurately set.
+		</ul>
+	<li><strong>G200:</strong>
+		<ul>
+			<li>'Pins' card-config BIOS readout re-implemented / expanded,
+			<li>More official card coldstart,
+			<li>RAM amount detection fixed,
+			<li>B_YCbCr422 (is YUY2) hardware overlay colorkeying completed,
+			<li>PLL timebase detection included,
+			<li>Improved BWindowScreen support,
+			<li>System, RAM and DAC speeds more accurately set.
+		</ul>
+	<li><strong>G400/G400MAX:</strong>
+		<ul>
+			<li>'Pins' card-config BIOS readout re-implemented / expanded,
+			<li>Improved card coldstart,
+			<li>RAM amount detection fixed,
+			<li>B_YCbCr422 (is YUY2) hardware overlay colorkeying completed,
+			<li>PLL timebase detection included,
+			<li>Improved BWindowScreen support,
+			<li>System and DAC speeds more accurately set.
+		</ul>
+	<li><strong>G450:</strong>
+		<ul>
+			<li>'Pins' card-config BIOS readout re-implemented / expanded,
+			<li>RAM amount detection fixed,
+			<li>B_YCbCr422 (is YUY2) hardware overlay colorkeying completed,
+			<li>DAC speeds more accurately set,
+			<li>PLL timebase detection included,
+			<li>Improved BWindowScreen support,
+			<li>PLL loopback filters configured 'on the fly'.
+		</ul>
+	<li><strong>G550:</strong>
+		<ul>
+			<li>'Pins' card-config BIOS readout re-implemented / expanded,
+			<li>RAM amount detection fixed,
+			<li>B_YCbCr422 (is YUY2) hardware overlay colorkeying completed,
+			<li>DAC speeds more accurately set,
+			<li>PLL timebase detection included,
+			<li>Improved BWindowScreen support,
+			<li>PLL loopback filters configured 'on the fly'.
+		</ul>
+</ul>
+REMARK: Re-implementing Pins is something that has it's repercussions throughout the entire driver. Most improvements are at least somewhat connected to this. Pins describes the actual specifications of your videocard. It provides info on type, amount, speed and configuration of cardRAM. It tells the driver if TVout or DVI exist on your card. It also specifies largely what the other specifications are for every individual MGA card outthere.<br>
+<hr>
+<p><h1>mga_driver 0.13 alpha2 (Apsed)</h1></p>
+<p>
+<ul>
+<li> TODO cleaning code styling
+<li> TODO use of pseudo-dma
+<li> TODO g550 dual
+<li> TODO get card properties, not using fake bios setup
+<li> TODO ? remove preR5 cloning area bug turnaround
+<li> TODO implementation of GET_ACCELERANT_DEVICE_INFO following cards
+<li> 09/06/2002
+<li> merge of overlay implementation by Rudolf for G200-G550 (no colorkeying yet, but scaling and filtering work now)
+<li> Millenium2 workish with strang
+<li> 12/05/2002
+<li> Millenium2 not working
+<li> 08/05/2002
+<li> cleanup LOG scheme for efficiency?, and to log some confiruration parameters from testers
+<li> 04/05/2002
+<li> ioctl DEVICE_NAME implementation
+<li> use Be Driver Settings API instead ./config/*.h files
+<li> uses #define for registers, ? is more efficient, so mga_regs.c "moved" in mga_macros.h
+<li> corrected G200 PIXPLLP.pixplls value from Matrox doc, no visible effect
+<li> logging revisited to use vsprintf instead poor emulation
+<li> 24/04/2002
+<li> some modifications to cleanup G200 geometry and colors problems: most important: YDSTORG set to 0 and PIXRDMSK to 0xff 
+<li> Mark Watson's G400 driver renamed mga driver, because it shall work not only with G400
+<li> Mark Watson's texts or unused files from previous release moved in MarkWatson directory
+<li> mgaGx00 directory moved one level up, renamed mga  and #include cleaned 
+</ul>
+<hr>
+<p><h1>G400 driver 0.13 alpha1 (Rudolf)</h1></p>
+<p>
+<ul>
+<li>Hardware overlay, no scaling, filtering or colorkeying yet.
+</ul>
+<hr>
+</p>
+<p><h1>G400 driver 0.12 (last version done by Mark Watson)</h1></p>
+<p>
+<ul>
+<li>uses patch from Jean-Michel Batto to enable support for the G550
+</ul>
+<p><h1>G400 driver 0.11</h1></p>
+<p>
+<ul>
+<li>Dualhead support for the G450 (NOTE: no TVout though....)
+</ul>
+</p>
+<p><h1>G400 driver 0.10b</h1></p>
+<p>
+<ul>
+<li>Clears ZORG on G450, this fixes blitting crash (no reboot from win required)
+</ul>
+</p>
+<p><h1>G400 driver 0.10a</h1></p>
+<p>
+<ul>
+<li>(whistles)....This release never happened:-)
+</ul>
+</p>
+<p><h1>G400 driver 0.10</h1></p>
+<p>
+<ul>
+<li>TVout support (for medium resolution modes - picture placement still off)
+<li>G450 support (must reboot from windows to prevent crash in screen to screen blit)
+<li>Adjusted G100/G200 to use bios initialisation (colours still broken...)
+</ul>
+</p>
+<p><h1>G400 driver 0.09(a)</h1></p>
+<p>
+<ul>
+<li>0.09 was initially (well for 3 months!) released with singlehead broken...
+<li>Fixed G400 crash when cold booting (no idea why it works, but it does...)
+<li>Preliminary G100 support (you must reboot from another OS, as with G200 - also only 32-bit)
+</ul>
+</p>
+<p><h1>G400 driver 0.08</h1></p>
+<p>
+<ul>
+<li>Preliminary G200 support
+<li>Removed DMA stuff (just wastes memory ATM)
+<li>More sensible use of CRTC/DAC connection on dualhead
+<li>MAVEN border is black!
+</ul>
+</p>
+<p><h1>G400 driver 0.07</h1></p>
+<p>
+<ul>
+<li>PCI retries re-enabled (did not fix problem)
+<li>DualHead support
+<li>DMA preliminaries(just wastes 1MB RAM ATM)
+</ul>
+</p>
+<p><h1>G400 driver 0.06</h1></p>
+<p>
+<ul>
+<li>Supports custom monitor timing
+<li>PCI retries disabled
+<li>Detects amount of card RAM
+<li>SDRAM support
+<li>Uses VBI instead of VSYNC interrupt (more blanking time after waiting for retrace)
+<li>CRTC unlocked at init
+</ul>
+</p>
+<p><h1>G400 driver 0.05</h1></p>
+<p>
+<ul>
+<li>Refresh rate set much more accurately.
+<li>H-Sync, V-Sync polarity is REALLY set!
+<li>Fix for R4.5.0 implemented, but still best to upgrade.
+<li>Memory priority requests are set
+<li>Benaphore for engine synchronisation initialised properly
+<li>Synchronisation now always waits for idle if it has to wait, rather than attempting (and sometimes failing) to wait for individual operations.
+<li>Pixel clock of display mode reported accurately (so refresh rate reported correctly)
+<li>Maximum pixel clock reported correctly
+</ul>
+</p>
+<p><h1>G400 driver 0.04</h1></p>
+<p>
+<ul>
+<li>Discovered driver only works with R4.5.2, no fix (yet?) (please upgrade)
+<li>Removed MAX hack (problem was not with MAX cards, but with Be version - see above)
+<li>Adjusted vertical sync to give more precise refresh rates (still could be better)
+<li>Fixed bug with MOVE_DISPLAY (occurred when returning from fullscreen apps)
+<li>Adjusted mouse pointer positioning, so hot spot is in the correct place.
+</ul>
+</p>
+<p><h1>G400 driver 0.03a</h1></p>
+<p>
+<ul>
+<li>Reworked interrupt code, now uses correct method.
+</ul>
+</p>
+<p><h1>G400 driver 0.03</h1></p>
+<p>
+<ul>
+<li>Vertical blank interrupt fixed - no longer steals interrupts!
+<li>Polarity is set for VSYNC and HSYNC
+<li>refresh with low dot clock is now correct
+<li>logfile now has 3 levels (1 - all, 2 - info, 3 - error)
+<li>ROM is now mapped in a better way (thanx for the info)
+<li>Sounds like init is failing for some G400MAX owners. Please try new version first, but if it still fails please do the following (it sets it up as a standard G400 without using the BIOS):
+<ul>
+<li>cd accelerent/mgag400
+<li>mv mga_fake_info.c mga_info.c
+</ul>
+</ul>
+</p>
+</body>
+</html>
