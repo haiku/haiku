@@ -647,7 +647,7 @@ close(int fd)
 
 
 int
-fstat(int fd, struct stat *stat)
+_fstat(int fd, struct stat *stat, size_t statSize)
 {
 	if (stat == NULL)
 		return B_BAD_VALUE;
