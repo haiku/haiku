@@ -2,8 +2,11 @@ SubDir OBOS_TOP src kernel ;
 
 KernelLd boot_loader :
 	boot_platform_$(OBOS_BOOT_PLATFORM).o
+	boot_partitions.a
 	boot_loader.a
 
+	# file systems
+	boot_bfs.a
 
 	# libroot functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o
