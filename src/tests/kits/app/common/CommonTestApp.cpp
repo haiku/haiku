@@ -21,7 +21,14 @@ CommonTestApp::CommonTestApp(const char *signature)
 
 // constructor
 CommonTestApp::CommonTestApp(const char *signature, status_t *result)
-			 : BApplication(signature, result)
+			 : BApplication(signature, result),
+			   fQuitOnSecondTry(false),
+			   fEventThread(-1),
+			   fEventDelay(0),
+			   fEventCount(0),
+			   fEventHandler(NULL),
+			   fMessageHandler(NULL),
+			   fReportDestruction(false)
 {
 }
 
