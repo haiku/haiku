@@ -178,7 +178,7 @@ Inode::Inode(Volume *volume, vnode_id id)
 
 	if (IsContainer())
 		fTree = new BPlusTree(this);
-	if (IsFile())
+	if (IsFile() || IsAttribute())
 		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size(), fVolume->Device()));
 }
 
@@ -2255,7 +2255,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 		DIE(("new_vnode() failed for inode!"));
 	}
 
-	if (inode->IsFile())
+	if (inode->IsFile() || inode->IsAttribute())
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(), inode->Size(), volume->Device()));
 
 	if (_id != NULL)
