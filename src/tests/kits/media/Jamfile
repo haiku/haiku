@@ -10,6 +10,7 @@ SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
 	: libmedia.so be root ;
 
 
+SubInclude OBOS_TOP src tests kits media media_decoder ;
 SubInclude OBOS_TOP src tests kits media notificationtest ;
 SubInclude OBOS_TOP src tests kits media nodetest ;
 SubInclude OBOS_TOP src tests kits media playwav ;
