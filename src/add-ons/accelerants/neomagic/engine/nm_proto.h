@@ -69,6 +69,7 @@ status_t nm_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
+void nm_bes_move_overlay(void);
 status_t nm_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t nm_release_bes(void);
