@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
@@ -25,11 +25,9 @@
 #endif
 
 #include <fsproto.h>
+#include <cache.h>
+#include <lock.h>
 
-extern "C" {
-	#include <lock.h>
-	#include <cache.h>
-}
 #include <fs_index.h>
 #include <fs_query.h>
 
@@ -1134,7 +1132,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	// If anything fails now, we have to remove the inode from the
 	// new directory in any case to restore the previous state
 	status_t bailStatus = B_OK;
-	
+
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
@@ -1145,12 +1143,12 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			nameUpdated = true;
 		}
 	}
-	
+
 	if (status == B_OK) {
 		status = tree->Remove(&transaction, (const uint8 *)oldName, strlen(oldName), id);
 		if (status == B_OK) {
 			inode->Node()->parent = newDirectory->BlockRun();
-			
+
 			// if it's a directory, update the parent directory pointer
 			// in its tree if necessary
 			BPlusTree *movedTree = NULL;
@@ -1169,6 +1167,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 					return B_OK;
 				}
 			}
+			// If we get here, something has gone wrong already!
+
 			// Those better don't fail, or we switch to a read-only
 			// device for safety reasons (Volume::Panic() does this
 			// for us)
@@ -1179,8 +1179,17 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 				movedTree->Replace(&transaction, (const uint8 *)"..", 2, oldDirectory->ID());
 		}
 	}
-	if (bailStatus == B_OK && nameUpdated)
+
+	if (bailStatus == B_OK && nameUpdated) {
 		bailStatus = inode->SetName(&transaction, oldName);
+		if (status == B_OK) {
+			// update inode and index
+			inode->WriteBack(&transaction);
+
+			Index index(volume);
+			index.UpdateName(&transaction, newName, oldName, inode);
+		}
+	}
 
 	if (bailStatus == B_OK)
 		bailStatus = newTree->Remove(&transaction, (const uint8 *)newName, strlen(newName), id);
