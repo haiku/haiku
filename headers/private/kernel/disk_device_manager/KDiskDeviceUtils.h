@@ -186,5 +186,6 @@ using BPrivate::DiskDevice::AutoLocker;
 using BPrivate::DiskDevice::DeviceReadLocker;
 using BPrivate::DiskDevice::DeviceWriteLocker;
 using BPrivate::DiskDevice::ManagerLocker;
+using BPrivate::DiskDevice::PartitionRegistrar;
 
 #endif	// _K_DISK_DEVICE_H
