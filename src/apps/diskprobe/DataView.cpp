@@ -167,11 +167,30 @@ DataView::Draw(BRect updateRect)
 }
 
 
+BRect 
+DataView::DataBounds() const
+{
+	return BRect(0, 0,
+		fCharWidth * (kBlockSize * 4 + fPositionLength + 6) + 2 * kHorizontalSpace,
+		fFontHeight * ((fDataSize + kBlockSize - 1) / kBlockSize) + 2 * kVerticalSpace);
+}
+
+
 int32 
 DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 {
-	if (!Bounds().Contains(point))
-		return -1;
+	// clip the point into our data bounds
+
+	BRect bounds = DataBounds();
+	if (point.x < bounds.left)
+		point.x = bounds.left;
+	else if (point.x > bounds.right)
+		point.x = bounds.right;
+
+	if (point.y < bounds.top)
+		point.y = bounds.top;
+	else if (point.y >= bounds.bottom - kVerticalSpace)
+		point.y = bounds.bottom - kVerticalSpace - 1;
 
 	float left = fCharWidth * (fPositionLength + kBlockSpace) + kHorizontalSpace;
 	float hexWidth = fCharWidth * kBlockSize * kHexByteWidth;
@@ -662,7 +681,12 @@ DataView::MouseMoved(BPoint where, uint32 transit, const BMessage */*dragMessage
 	if (fMouseSelectionStart == -1)
 		return;
 
-	SetSelection(fMouseSelectionStart, PositionAt(fFocus, where));
+	int32 end = PositionAt(fFocus, where);
+	if (end == -1)
+		return;
+
+	SetSelection(fMouseSelectionStart, end);
+	MakeVisible(end);
 }
 
 
@@ -740,7 +764,7 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 			BRect frame = SelectionFrame(fFocus, fStart, fStart);
 			frame.OffsetBy(0, Bounds().Height());
 
-			float lastLine = fFontHeight * ((fDataSize - 1) / kBlockSize) + kVerticalSpace;
+			float lastLine = DataBounds().Height() - 1 - kVerticalSpace;
 			if (frame.top > lastLine)
 				frame.top = lastLine;
 			ScrollBy(0, Bounds().Height());
@@ -795,16 +819,12 @@ DataView::SetFontSize(float point)
 void 
 DataView::GetPreferredSize(float *_width, float *_height)
 {
-	if (_width) {
-		BFont font;
-		GetFont(&font);
-		*_width = fCharWidth * (kBlockSize * 4 + fPositionLength + 6)
-			+ 2 * kHorizontalSpace;
-	}
+	BRect bounds = DataBounds();
 
-	if (_height) {
-		*_height = fFontHeight * ((fDataSize + kBlockSize - 1) / kBlockSize)
-			 + 2 * kVerticalSpace;
-	}
+	if (_width)
+		*_width = bounds.Width();
+
+	if (_height)
+		*_height = bounds.Height();
 }
 

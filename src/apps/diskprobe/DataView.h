@@ -61,6 +61,7 @@ class DataView : public BView {
 		void SetBase(base_type type);
 
 	private:
+		BRect DataBounds() const;
 		BRect SelectionFrame(view_focus which, int32 start, int32 end);
 		int32 PositionAt(view_focus focus, BPoint point, view_focus *_newFocus = NULL);
 
