@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 #include <vm_store_device.h>
+#include <vm_priv.h>
 
 #include <stdlib.h>
 
@@ -68,23 +69,31 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 {
 	struct device_store *store = (struct device_store *)_store;
 	vm_cache_ref *cache_ref = store->vm.cache->ref;
+	vm_translation_map *map = &aspace->translation_map;
 	vm_area *area;
 
 	// figure out which page needs to be mapped where
 	mutex_lock(&cache_ref->lock);
-	(*aspace->translation_map.ops->lock)(&aspace->translation_map);
+	map->ops->lock(map);
 
 	// cycle through all of the regions that map this cache and map the page in
 	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
 		// make sure this page in the cache that was faulted on is covered in this area
 		if (offset >= area->cache_offset && (offset - area->cache_offset) < area->size) {
-			(*aspace->translation_map.ops->map)(&aspace->translation_map,
-				area->base + (offset - area->cache_offset),
+			// don't map already mapped pages
+			addr_t physicalAddress;
+			uint32 flags;
+			map->ops->query(map, area->base + (offset - area->cache_offset),
+				&physicalAddress, &flags);
+			if (flags & PAGE_PRESENT)
+				continue;
+
+			map->ops->map(map, area->base + (offset - area->cache_offset),
 				store->base_address + offset, area->protection);
 		}
 	}
 
-	(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
+	map->ops->unlock(map);
 	mutex_unlock(&cache_ref->lock);
 
 	return B_OK;
