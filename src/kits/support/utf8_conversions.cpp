@@ -15,6 +15,10 @@ convert_encoding(const char * from, const char * to,
                  char * dst, int32 * dstLen,
                  int32 * state)
 {
+	if (*srcLen == 0) {
+		// nothing to do!
+		return B_OK;
+	}
 	iconv_t conversion = iconv_open(to,from);
 	if (conversion == (iconv_t)-1) {
 		return B_ERROR;
@@ -28,14 +32,30 @@ convert_encoding(const char * from, const char * to,
 	input_buffer_t inputBuffer = const_cast<input_buffer_t>(&src);
 	size_t inputLeft = *srcLen;
 	size_t outputLeft = *dstLen;
-	size_t bytesLeft = iconv(conversion,inputBuffer,&inputLeft,&dst,&outputLeft);
+	size_t nonReversibleConversions = iconv(conversion,inputBuffer,&inputLeft,&dst,&outputLeft);
 	*srcLen -= inputLeft;
 	*dstLen -= outputLeft;
-	if ((bytesLeft != 0) && (errno != E2BIG) && (errno != EINVAL)) {
+	iconv_close(conversion);
+	if (nonReversibleConversions == -1) {
+		switch (errno) {
+		case EILSEQ: // invalid multibyte sequence in the source
+			return B_ERROR;
+		case EINVAL: // incomplete multibyte sequence in the input
+			return B_OK;
+		case E2BIG: // not enough room in the output buffer for the next converted character
+			return B_OK;
+		default:
+			// unknown error
+			int err = errno;
+		}
+	}
+	if (*srcLen != 0) {
+		// able to convert at least one character
+		return B_OK;
+	} else {
+		// not able to convert at least one character
 		return B_ERROR;
 	}
-	iconv_close(conversion);
-	return B_OK;
 }
 
 status_t

@@ -104,6 +104,14 @@ const char * iso15aliases[] =
  { "ISO_8859-14","Latin-9",NULL };
 const BCharacterSet iso15(24,111,"ISO 8859-15","ISO-8859-15","ISO-8859-15",iso15aliases);
 
+// chinese character set testing
+
+const char * big5aliases[] =
+ { "csBig5",NULL };
+const BCharacterSet big5(25,2026,"Big5","Big5","Big5",big5aliases);
+
+const BCharacterSet gb18030(26,114,"GB18030","GB18030",NULL,NULL);
+
 /**
  * The following initializes the global character set array.
  * It is organized by id for efficient retrieval using predefined constants in UTF8.h and Font.h.
@@ -122,6 +130,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	&windows1252, &unicode2, &KOI8R, &windows1251,
 	&IBM866, &IBM437, &eucKR, &iso13, &iso14, &iso15,
 	// R5 convert_to/from_utf8 encodings end here
+	&big5,&gb18030,
 };
 const uint32 character_sets_by_id_count = sizeof(character_sets_by_id)/sizeof(const BCharacterSet*);
 

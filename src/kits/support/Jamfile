@@ -8,6 +8,7 @@ SharedLibrary textencoding :
 	character_sets.cpp
 	utf8_conversions.cpp
 	;
+DEPENDS libtextencoding.so : libiconv.so ;
 LinkSharedOSLibs libtextencoding.so :
 	be
 	iconv
