@@ -21,6 +21,9 @@ int rttrash = 0;	/* routes in table that should have been freed but hevn't been 
 #define SA(p) ((struct sockaddr *)(p))
 #define ROUNDUP(a) (a >0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
+struct  rtstat  rtstat;
+struct  radix_node_head *rt_tables[AF_MAX+1];
+
 struct  radix_node_head **get_rt_tables(void)
 {
 	return (struct radix_node_head**)rt_tables;

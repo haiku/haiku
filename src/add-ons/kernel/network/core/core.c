@@ -42,8 +42,8 @@
 #include <net_socket.h>
 
 /* Defines we need */
-#define NETWORK_INTERFACES	"network/interface"
-#define NETWORK_PROTOCOLS	"network/protocol"
+#define NETWORK_INTERFACES	"network/interfaces"
+#define NETWORK_PROTOCOLS	"network/protocols"
 #define PPP_DEVICES "ppp/devices"
 
 /* Variables used in other core modules */
