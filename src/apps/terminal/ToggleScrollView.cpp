@@ -15,7 +15,7 @@ ToggleScrollView::ToggleScrollView(const char * name, BView * target,
 	_auto_hide_horizontal = auto_hide_horizontal;
 	_auto_hide_vertical = auto_hide_vertical;
 	_target = ResizeTarget(_target,_horizontal,_vertical);
-	fScrollView = new BScrollView(_name,_target,_target->ResizingMode(),_horizontal,_vertical,_border);
+	fScrollView = new BScrollView(_name,_target,_target->ResizingMode(),_flags,_horizontal,_vertical,_border);
 	AddChild(fScrollView);
 }
 
