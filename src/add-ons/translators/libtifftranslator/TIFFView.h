@@ -1,6 +1,7 @@
 /*****************************************************************************/
 // TIFFView
 // Written by Michael Wilber, OBOS Translation Kit Team
+// Picking the compression method added by Stephan Aßmus, <stippi@yellowbites.com>
 //
 // TIFFView.h
 //
@@ -32,20 +33,35 @@
 #define TIFFVIEW_H
 
 #include <View.h>
-#include <MenuField.h>
-#include <MenuItem.h>
+
+class BMenuField;
+class TIFFTranslatorSettings;
 
 class TIFFView : public BView {
 public:
 	TIFFView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags);
+		uint32 flags, TIFFTranslatorSettings* psettings);
 		// sets up the view
 		
 	~TIFFView();
-		// does nothing
+		// releases the TIFFTranslator settings
+
+	virtual void AllAttached();
+	virtual void MessageReceived(BMessage *message);
 
 	virtual	void Draw(BRect area);
 		// draws information about the TIFFTranslator
+
+	enum {
+		MSG_COMPRESSION_CHANGED	= 'cmch',
+	};
+
+private:
+	BMenuField*				fCompressionMF;
+
+	TIFFTranslatorSettings*	fSettings;
+		// the actual settings for the translator,
+		// shared with the translator
 };
 
 #endif // #ifndef TIFFVIEW_H

@@ -1,6 +1,7 @@
 /*****************************************************************************/
 // TIFFTranslator
 // Written by Michael Wilber, OBOS Translation Kit Team
+// Write support added by Stephan Aßmus <stippi@yellowbites.com>
 //
 // TIFFTranslator.cpp
 //
@@ -28,11 +29,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+//
+// How this works:
+//
+// libtiff has a special version of TIFFOpen() that gets passed custom
+// functions for reading writing etc. and a handle. This handle in our case
+// is a BPositionIO object, which libtiff passes on to the functions for reading
+// writing etc. So when operations are performed on the TIFF* handle that is
+// returned by TIFFOpen(), libtiff uses the special reading writing etc
+// functions so that all stream io happens on the BPositionIO object.
 
 #include <stdio.h>
 #include <string.h>
 #include "tiffio.h"
 #include "TIFFTranslator.h"
+#include "TIFFTranslatorSettings.h"
 #include "TIFFView.h"
 
 // The input formats that this translator supports.
@@ -64,6 +75,14 @@ translation_format gOutputFormats[] = {
 		BBT_OUT_CAPABILITY,
 		"image/x-be-bitmap",
 		"Be Bitmap Format (TIFFTranslator)"
+	},
+	{
+		B_TIFF_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		TIFF_OUT_QUALITY,
+		TIFF_OUT_CAPABILITY,
+		"image/tiff",
+		"TIFF image"
 	}
 };
 
@@ -177,8 +196,12 @@ tiff_unmap_file_proc(thandle_t stream, tdata_t base, toff_t size)
 // Returns:
 // ---------------------------------------------------------------
 TIFFTranslator::TIFFTranslator()
-	:	BTranslator()
+	:	BTranslator(),
+		fSettings(new TIFFTranslatorSettings())
 {
+	fSettings->LoadSettings();
+		// load settings from the TIFF Translator settings file
+
 	strcpy(fName, "TIFF Images");
 	sprintf(fInfo, "TIFF image translator v%d.%d.%d %s",
 		static_cast<int>(TIFF_TRANSLATOR_VERSION >> 8),
@@ -201,6 +224,7 @@ TIFFTranslator::TIFFTranslator()
 // ---------------------------------------------------------------
 TIFFTranslator::~TIFFTranslator()
 {
+	fSettings->Release();
 }
 
 // ---------------------------------------------------------------
@@ -541,25 +565,10 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 	uint8 ch[4];
 	if (inSource->Read(ch, 4) != 4)
 		return B_NO_TRANSLATOR;
-		
 	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
-	bheaderonly = bdataonly = false;
-		// only allow writing of the entire image
-		// (fix for buggy programs that lie about what they actually need)
+	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
+		return B_BAD_VALUE; // reason could be invalid settings,
+							// like header only and data only set at the same time
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
@@ -582,12 +591,569 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 	}
 }
 
+// How this works:
+// Following are a couple of functions,
+//
+// convert_buffer_*   to convert a buffer in place to the TIFF native format
+//
+// convert_buffers_*  to convert from one buffer to another to the TIFF
+//                    native format, additionally compensating for padding bytes
+//                    I don't know if libTIFF can be set up to respect padding bytes,
+//                    otherwise this whole thing could be simplified a bit.
+//
+// Additionally, there are two functions convert_buffer() and convert_buffers() that take
+// a color_space as one of the arguments and pick the correct worker functions from there.
+// This way I don't write any code more than once, for easier debugging and maintainance.
+
+
+// convert_buffer_bgra_rgba
+inline void
+convert_buffer_bgra_rgba(uint8* buffer,
+						 uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* handle = buffer;
+		for (uint32 x = 0; x < width; x++) {
+			uint8 temp = handle[0];
+			handle[0] = handle[2];
+			handle[2] = temp;
+			handle += 4;
+		}
+		buffer += bytesPerRow;
+	}
+}
+
+// convert_buffer_argb_rgba
+inline void
+convert_buffer_argb_rgba(uint8* buffer,
+						 uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* handle = buffer;
+		for (uint32 x = 0; x < width; x++) {
+			uint8 temp = handle[0];
+			handle[0] = handle[1];
+			handle[1] = handle[2];
+			handle[2] = handle[3];
+			handle[3] = temp;
+			handle += 4;
+		}
+		buffer += bytesPerRow;
+	}
+}
+
+// convert_buffers_bgra_rgba
+inline void
+convert_buffers_bgra_rgba(uint8* inBuffer, uint8* outBuffer,
+						  uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* inHandle = inBuffer;
+		uint8* outHandle = outBuffer;
+		for (uint32 x = 0; x < width; x++) {
+			outHandle[0] = inHandle[2];
+			outHandle[1] = inHandle[1];
+			outHandle[2] = inHandle[0];
+			outHandle[3] = inHandle[3];
+			inHandle += 4;
+			outHandle += 4;
+		}
+		inBuffer += bytesPerRow;
+		outBuffer += width * 4;
+	}
+}
+
+// convert_buffers_argb_rgba
+inline void
+convert_buffers_argb_rgba(uint8* inBuffer, uint8* outBuffer,
+						  uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* inHandle = inBuffer;
+		uint8* outHandle = outBuffer;
+		for (uint32 x = 0; x < width; x++) {
+			outHandle[0] = inHandle[1];
+			outHandle[1] = inHandle[2];
+			outHandle[2] = inHandle[3];
+			outHandle[3] = inHandle[0];
+			inHandle += 4;
+			outHandle += 4;
+		}
+		inBuffer += bytesPerRow;
+		outBuffer += width * 4;
+	}
+}
+
+// convert_buffers_bgrX_rgb
+inline void
+convert_buffers_bgrX_rgb(uint8* inBuffer, uint8* outBuffer,
+						 uint32 rows, uint32 width, uint32 bytesPerRow, uint32 samplesPerPixel)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* inHandle = inBuffer;
+		uint8* outHandle = outBuffer;
+		for (uint32 x = 0; x < width; x++) {
+			// the usage of temp is just in case inBuffer == outBuffer
+			// (see convert_buffer() for B_RGB24)
+			uint8 temp = inHandle[0];
+			outHandle[0] = inHandle[2];
+			outHandle[1] = inHandle[1];
+			outHandle[2] = temp;
+			inHandle += samplesPerPixel;
+			outHandle += 3;
+		}
+		inBuffer += bytesPerRow;
+		outBuffer += width * 3;
+	}
+}
+
+// convert_buffers_rgbX_rgb
+inline void
+convert_buffers_rgbX_rgb(uint8* inBuffer, uint8* outBuffer,
+						 uint32 rows, uint32 width, uint32 bytesPerRow, uint32 samplesPerPixel)
+{
+	for (uint32 y = 0; y < rows; y++) {
+		uint8* inHandle = inBuffer;
+		uint8* outHandle = outBuffer;
+		for (uint32 x = 0; x < width; x++) {
+			outHandle[0] = inHandle[0];
+			outHandle[1] = inHandle[1];
+			outHandle[2] = inHandle[2];
+			inHandle += samplesPerPixel;
+			outHandle += 3;
+		}
+		inBuffer += bytesPerRow;
+		outBuffer += width * 3;
+	}
+}
+
+
+// convert_buffers_cmap
+inline void
+convert_buffers_cmap(uint8* inBuffer, uint8* outBuffer,
+					 uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	// compensate for bytesPerRow != width (padding bytes)
+	// this function will not be called if bytesPerRow == width, btw
+	for (uint32 y = 0; y < rows; y++) {
+		_TIFFmemcpy(outBuffer, inBuffer, width);
+		inBuffer += bytesPerRow;
+		outBuffer += width;
+	}
+}
+
+// convert_buffer
+inline void
+convert_buffer(color_space format,
+			   uint8* buffer, uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	switch (format) {
+		case B_RGBA32:
+			convert_buffer_bgra_rgba(buffer, rows, width, bytesPerRow);
+			break;
+		case B_RGBA32_BIG:
+			convert_buffer_argb_rgba(buffer, rows, width, bytesPerRow);
+			break;
+//		case B_RGB32:
+//		case B_RGB32_BIG:
+//			these two cannot be encountered, since inBufferSize != bytesPerStrip
+//			(we're stripping the unused "alpha" channel 32->24 bits)
+		case B_RGB24:
+			convert_buffers_bgrX_rgb(buffer, buffer, rows, width, bytesPerRow, 3);
+			break;
+//		case B_RGB24_BIG:
+			// buffer already has the correct format
+			break;
+//		case B_CMAP8:
+//		case B_GRAY8:
+			// buffer already has the correct format
+			break;
+		default:
+			break;
+	}
+}
+
+// convert_buffers
+inline void
+convert_buffers(color_space format,
+				uint8* inBuffer, uint8* outBuffer,
+				uint32 rows, uint32 width, uint32 bytesPerRow)
+{
+	switch (format) {
+		case B_RGBA32:
+			convert_buffers_bgra_rgba(inBuffer, outBuffer, rows, width, bytesPerRow);
+			break;
+		case B_RGBA32_BIG:
+			convert_buffers_argb_rgba(inBuffer, outBuffer, rows, width, bytesPerRow);
+			break;
+		case B_RGB32:
+			convert_buffers_bgrX_rgb(inBuffer, outBuffer, rows, width, bytesPerRow, 4);
+			break;
+		case B_RGB32_BIG:
+			convert_buffers_rgbX_rgb(inBuffer, outBuffer, rows, width, bytesPerRow, 4);
+			break;
+		case B_RGB24:
+			convert_buffers_bgrX_rgb(inBuffer, outBuffer, rows, width, bytesPerRow, 3);
+			break;
+		case B_RGB24_BIG:
+			convert_buffers_rgbX_rgb(inBuffer, outBuffer, rows, width, bytesPerRow, 3);
+			break;
+		case B_CMAP8:
+		case B_GRAY8:
+			convert_buffers_cmap(inBuffer, outBuffer, rows, width, bytesPerRow);
+			break;
+		default:
+			break;
+	}
+}
+
+// Sets up any additional TIFF fields for the color spaces it supports,
+// determines if it needs one or two buffers to carry out any conversions,
+// uses the various convert routines above to do the actual conversion,
+// writes complete strips of data plus one strip of remaining data.
+//
+// write_tif_stream
+status_t
+write_tif_stream(TIFF* tif, BPositionIO* inSource, color_space format,
+				 uint32 width, uint32 height, uint32 bytesPerRow,
+				 uint32 rowsPerStrip, uint32 dataSize)
+{
+	uint32 bytesPerStrip = 0;
+
+	// set up the TIFF fields about what channels we write
+	switch (format) {
+		case B_RGBA32:
+		case B_RGBA32_BIG:
+			uint16 extraSamples[1];
+			extraSamples[0] = EXTRASAMPLE_UNASSALPHA;
+			TIFFSetField(tif, TIFFTAG_EXTRASAMPLES, 1, extraSamples);
+			TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 4);
+			// going to write rgb + alpha channels
+			bytesPerStrip = width * 4 * rowsPerStrip;
+			break;
+		case B_RGB32:
+		case B_RGB32_BIG:
+		case B_RGB24:
+		case B_RGB24_BIG:
+			TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3);
+			// going to write just the rgb channels
+			bytesPerStrip = width * 3 * rowsPerStrip;
+			break;
+		case B_CMAP8:
+		case B_GRAY8:
+			bytesPerStrip = width * rowsPerStrip;
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
+
+	uint32 remaining = dataSize;
+	status_t ret = B_OK;
+	// Write the information to the stream
+	uint32 inBufferSize = bytesPerRow * rowsPerStrip;
+	// allocate intermediate input buffer
+	uint8* inBuffer = (uint8*)_TIFFmalloc(inBufferSize);
+	ssize_t read, written = B_ERROR;
+	// bytesPerStrip is the size of the buffer that libtiff expects to write per strip
+	// it might be different to the size of the input buffer,
+	// if that one contains padding bytes at the end of each row
+	if (inBufferSize != bytesPerStrip) {
+		// allocate a second buffer
+		// (two buffers are needed since padding bytes have to be compensated for)
+		uint8* outBuffer = (uint8*)_TIFFmalloc(bytesPerStrip);
+		if (inBuffer && outBuffer) {
+//printf("using two buffers\n");
+			read = inSource->Read(inBuffer, inBufferSize);
+			uint32 stripIndex = 0;
+			while (read == (ssize_t)inBufferSize) {
+//printf("writing bytes: %ld (strip: %ld)\n", read, stripIndex);
+				// convert the buffers (channel order) and compensate
+				// for bytesPerRow != samplesPerRow (padding bytes)
+				convert_buffers(format, inBuffer, outBuffer,
+								rowsPerStrip, width, bytesPerRow);
+				// let libtiff write the encoded strip to the BPositionIO
+				written = TIFFWriteEncodedStrip(tif, stripIndex, outBuffer, bytesPerStrip);
+				stripIndex++;
+				if (written < B_OK)
+					break;
+				remaining -= inBufferSize;
+				read = inSource->Read(inBuffer, min_c(inBufferSize, remaining));
+			}
+			// write the rest of the remaining rows
+			if (read < (ssize_t)inBufferSize && read > 0) {
+//printf("writing remaining bytes: %ld\n", read);
+				// convert the buffers (channel order) and compensate
+				// for bytesPerRow != samplesPerRow (padding bytes)
+				convert_buffers(format, inBuffer, outBuffer,
+								read / bytesPerRow, width, bytesPerRow);
+				// let libtiff write the encoded strip to the BPositionIO
+				written = TIFFWriteEncodedStrip(tif, stripIndex, outBuffer, read);
+				remaining -= read;
+			}
+		} else
+			ret = B_NO_MEMORY;
+		// clean up output buffer
+		if (outBuffer)
+			_TIFFfree(outBuffer);
+	} else {
+//printf("using one buffer\n");
+		// the input buffer is all we need, we convert it in place
+		if (inBuffer) {
+			read = inSource->Read(inBuffer, inBufferSize);
+			uint32 stripIndex = 0;
+			while (read == (ssize_t)inBufferSize) {
+//printf("writing bytes: %ld (strip: %ld)\n", read, stripIndex);
+				// convert the buffer (channel order)
+				convert_buffer(format, inBuffer,
+							   rowsPerStrip, width, bytesPerRow);
+				// let libtiff write the encoded strip to the BPositionIO
+				written = TIFFWriteEncodedStrip(tif, stripIndex, inBuffer, bytesPerStrip);
+				stripIndex++;
+				if (written < 0)
+					break;
+				remaining -= inBufferSize;
+				read = inSource->Read(inBuffer, min_c(inBufferSize, remaining));
+			}
+			// write the rest of the remaining rows
+			if (read < (ssize_t)inBufferSize && read > 0) {
+//printf("writing remaining bytes: %ld (strip: %ld)\n", read, stripIndex);
+				// convert the buffers (channel order) and compensate
+				// for bytesPerRow != samplesPerRow (padding bytes)
+				convert_buffer(format, inBuffer,
+							   read / bytesPerRow, width, bytesPerRow);
+				// let libtiff write the encoded strip to the BPositionIO
+				written = TIFFWriteEncodedStrip(tif, stripIndex, inBuffer, read);
+				remaining -= read;
+			}
+		} else
+			ret = B_NO_MEMORY;
+	}
+	// clean up input buffer
+	if (inBuffer)
+		_TIFFfree(inBuffer);
+	// see if there was an error reading or writing the streams
+	if (remaining > 0)
+		// "written" may contain a more specific error
+		ret = written < 0 ? written : B_ERROR;
+	else
+		ret = B_OK;
+
+	return ret;
+}
+
+// translate_from_bits
+status_t
+translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
+	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination,
+	TIFFTranslatorSettings &settings)
+{
+	TranslatorBitmap bitsHeader;
+
+	bool bheaderonly = false, bdataonly = false;
+		// Always write out the entire image. Some programs
+		// fail when given "headerOnly", even though they requested it.
+		// These settings are not applicable when outputting TIFFs
+	uint32 compression = settings.SetGetCompression();
+
+	status_t result;
+	result = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
+	if (result != B_OK)
+		return result;
+
+	// Translate B_TRANSLATOR_BITMAP to B_TRANSLATOR_BITMAP, easy enough :)
+	if (outType == B_TRANSLATOR_BITMAP) {
+		// write out bitsHeader (only if configured to)
+		if (bheaderonly || (!bheaderonly && !bdataonly)) {
+			if (swap_data(B_UINT32_TYPE, &bitsHeader,
+				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK)
+				return B_ERROR;
+			if (outDestination->Write(&bitsHeader,
+				sizeof(TranslatorBitmap)) != sizeof(TranslatorBitmap))
+				return B_ERROR;
+		}
+		
+		// write out the data (only if configured to)
+		if (bdataonly || (!bheaderonly && !bdataonly)) {
+			uint32 size = 4096;
+			uint8* buf = new uint8[size];
+			uint32 remaining = B_BENDIAN_TO_HOST_INT32(bitsHeader.dataSize);
+			ssize_t rd, writ = B_ERROR;
+			rd = inSource->Read(buf, size);
+			while (rd > 0) {
+				writ = outDestination->Write(buf, rd);
+				if (writ < 0)
+					break;
+				remaining -= static_cast<uint32>(writ);
+				rd = inSource->Read(buf, min_c(size, remaining));
+			}
+			delete[] buf;
+		
+			if (remaining > 0)
+				// writ may contain a more specific error
+				return writ < 0 ? writ : B_ERROR;
+			else
+				return B_OK;
+		} else
+			return B_OK;
+		
+	// Translate B_TRANSLATOR_BITMAP to B_TIFF_FORMAT
+	} else if (outType == B_TIFF_FORMAT) {
+		// Set up TIFF header
+
+		// get TIFF handle	
+		TIFF* tif = TIFFClientOpen("TIFFTranslator", "w", outDestination,
+			tiff_read_proc, tiff_write_proc, tiff_seek_proc, tiff_close_proc,
+			tiff_size_proc, tiff_map_file_proc, tiff_unmap_file_proc); 
+	    if (!tif)
+	    	return B_NO_TRANSLATOR;
+
+		// common fields which are independent of the bitmap format
+		uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
+		uint32 height = bitsHeader.bounds.IntegerHeight() + 1;
+		uint32 dataSize = bitsHeader.dataSize;
+		uint32 bytesPerRow = bitsHeader.rowBytes;
+
+		TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width);
+		TIFFSetField(tif, TIFFTAG_IMAGELENGTH, height);
+		TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+/*const char* compressionString = NULL;
+switch (compression) {
+	case COMPRESSION_NONE:
+		compressionString = "None";
+		break;
+	case COMPRESSION_PACKBITS:
+		compressionString = "RLE";
+		break;
+	case COMPRESSION_DEFLATE:
+		compressionString = "Deflate";
+		break;
+	case COMPRESSION_LZW:
+		compressionString = "LZW";
+		break;
+	case COMPRESSION_JPEG:
+		compressionString = "JPEG";
+		break;
+	case COMPRESSION_JP2000:
+		compressionString = "JPEG2000";
+		break;
+}
+if (compressionString)
+printf("using compression: %s\n", compressionString);
+else
+printf("using unkown compression (%ld).\n", compression);
+*/
+		TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
+
+		// TODO: some extra fields that should also get some special attention
+		TIFFSetField(tif, TIFFTAG_XRESOLUTION, 150.0);
+		TIFFSetField(tif, TIFFTAG_YRESOLUTION, 150.0);
+		TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
+
+		// we are going to write XX row(s) of pixels (lines) per strip
+		uint32 rowsPerStrip = TIFFDefaultStripSize(tif, 0);
+//printf("recommended rows per strip: %ld\n", TIFFDefaultStripSize(tif, 0));
+		TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsPerStrip);
+
+		status_t ret = B_OK;
+		// set the rest of the fields according to the bitmap format
+		switch (bitsHeader.colors) {
+
+			// Output to 32-bit True Color TIFF (8 bits alpha)
+			case B_RGBA32:
+			case B_RGB32:
+			case B_RGB24:
+			case B_RGBA32_BIG:
+			case B_RGB32_BIG:
+			case B_RGB24_BIG:
+				// set the fields specific to this color space
+				TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+				TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+//				TIFFSetField(tif, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
+				// write the tiff stream
+				ret = write_tif_stream(tif, inSource, bitsHeader.colors,
+									   width, height, bytesPerRow,
+									   rowsPerStrip, dataSize);
+				break;
+/*
+			case B_CMYA32:
+				break;
+
+			// Output to 15-bit True Color TIFF
+			case B_RGB15:
+			case B_RGB15_BIG:
+				TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 5);
+				TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3);
+				TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+				bytesPerStrip = width * 2 * rowsPerStrip;
+				break;
+*/
+			// Output to 8-bit Color Mapped TIFF 32 bits per color map entry
+			case B_CMAP8: {
+				TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_PALETTE);
+				TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+				TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+				// convert the system palette to 16 bit values for libtiff
+				const color_map *map = system_colors();
+				if (map) {
+					uint16 red[256];
+					uint16 green[256];
+					uint16 blue[256];
+					for (uint32 i = 0; i < 256; i++) {
+						// scale 8 bits to 16 bits
+						red[i] = map->color_list[i].red * 256 + map->color_list[i].red;
+						green[i] = map->color_list[i].green * 256 + map->color_list[i].green;
+						blue[i] = map->color_list[i].blue * 256 + map->color_list[i].blue;
+					}
+					TIFFSetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue);
+					// write the tiff stream
+					ret = write_tif_stream(tif, inSource, bitsHeader.colors,
+										   width, height, bytesPerRow,
+										   rowsPerStrip, dataSize);
+				} else
+					ret = B_ERROR;
+				break;
+			}
+			// Output to 8-bit Black and White TIFF
+			case B_GRAY8:
+				TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+				TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+				TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+				ret = write_tif_stream(tif, inSource, bitsHeader.colors,
+									   width, height, bytesPerRow,
+									   rowsPerStrip, dataSize);
+				break;
+
+/*			// Output to 1-bit Black and White TIFF
+			case B_GRAY1:
+				TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 1);
+				TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 8);
+				TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+				bytesPerStrip = ((width + 7) / 8) * rowsPerStrip;
+				break;
+*/
+			default:
+				ret = B_NO_TRANSLATOR;
+		}
+		// Close the handle 
+		TIFFClose(tif);
+		return ret;
+
+	} else
+		return B_NO_TRANSLATOR;
+}
+
+// translate_from_tiff
 status_t
 translate_from_tiff(BPositionIO *inSource, BMessage *ioExtension,
-	uint32 outType, BPositionIO *outDestination, bool bheaderonly,
-	bool bdataonly)
+	uint32 outType, BPositionIO *outDestination,
+	TIFFTranslatorSettings &settings)
 {
 	status_t result = B_NO_TRANSLATOR;
+
+	bool bheaderonly = false, bdataonly = false;
+		// Always write out the entire image. Some programs
+		// fail when given "headerOnly", even though they requested it.
+		// These settings are not applicable when outputting TIFFs
 	
 	// variables needing cleanup
 	TIFF *ptif = NULL;
@@ -739,44 +1305,26 @@ TIFFTranslator::Translate(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 		
 	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
-	bheaderonly = bdataonly = false;
-		// only allow writing of the entire image
-		// (fix for buggy programs that lie about what they actually need)
+	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
+		return B_BAD_VALUE;
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
 	if (n32ch == nbits) {
 		// B_TRANSLATOR_BITMAP type
-		inSource->Seek(0, SEEK_SET);
-		
-		const size_t kbufsize = 2048;
-		uint8 buffer[kbufsize];
-		ssize_t ret = inSource->Read(buffer, kbufsize);
-		while (ret > 0) {
-			outDestination->Write(buffer, ret);
-			ret = inSource->Read(buffer, kbufsize);
-		}
-		
-		return B_OK;
-		
+		return translate_from_bits(inSource, 4, ch, ioExtension, outType,
+			outDestination, *fSettings);
 	} else
 		// Might be TIFF image
 		return translate_from_tiff(inSource, ioExtension, outType,
-			outDestination, bheaderonly, bdataonly);
+			outDestination, *fSettings);
+}
+
+// returns the current translator settings into ioExtension
+status_t
+TIFFTranslator::GetConfigurationMessage(BMessage *ioExtension)
+{
+	return fSettings->GetConfigurationMessage(ioExtension);
 }
 
 // ---------------------------------------------------------------
@@ -808,9 +1356,12 @@ TIFFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 {
 	if (!outView || !outExtent)
 		return B_BAD_VALUE;
+	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
+		return B_BAD_VALUE;
 
 	TIFFView *view = new TIFFView(BRect(0, 0, 225, 175),
-		"TIFFTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+		"TIFFTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW,
+		AcquireSettings());
 	if (!view)
 		return B_NO_MEMORY;
 
@@ -820,4 +1371,10 @@ TIFFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 	return B_OK;
 }
 
+// AcquireSettings
+TIFFTranslatorSettings *
+TIFFTranslator::AcquireSettings()
+{
+	return fSettings->Acquire();
+}
 

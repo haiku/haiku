@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffconf.h,v 1.3 2004/01/03 15:22:08 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffconf.h,v 1.4 2004/01/16 02:04:30 mwilber Exp $ */
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -96,6 +96,8 @@
 #define	THUNDER_SUPPORT
 #define	NEXT_SUPPORT
 #define LOGLUV_SUPPORT
+//#define JPEG_SUPPORT
+#define ZIP_SUPPORT
 #endif /* COMPRESSION_SUPPORT */
 
 /*

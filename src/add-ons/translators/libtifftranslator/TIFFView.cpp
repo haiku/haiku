@@ -1,6 +1,7 @@
 /*****************************************************************************/
 // TIFFView
 // Written by Michael Wilber, OBOS Translation Kit Team
+// Picking the compression method added by Stephan Aßmus, <stippi@yellowbites.com>
 //
 // TIFFView.cpp
 //
@@ -30,9 +31,34 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "TIFFView.h"
-#include "TIFFTranslator.h"
+
+#include <MenuBar.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+
+#include "tiff.h"
 #include "tiffvers.h"
+
+#include "TIFFTranslator.h"
+#include "TIFFTranslatorSettings.h"
+
+#include "TIFFView.h"
+
+// add_menu_item
+void
+add_menu_item(BMenu* menu,
+			  uint32 compression,
+			  const char* label,
+			  uint32 currentCompression)
+{
+	// COMPRESSION_NONE
+	BMessage* message = new BMessage(TIFFView::MSG_COMPRESSION_CHANGED);
+	message->AddInt32("value", compression);
+	BMenuItem* item = new BMenuItem(label, message);
+	item->SetMarked(currentCompression == compression);
+	menu->AddItem(item);
+}
 
 // ---------------------------------------------------------------
 // Constructor
@@ -48,10 +74,31 @@
 // Returns:
 // ---------------------------------------------------------------
 TIFFView::TIFFView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
-	:	BView(frame, name, resize, flags)
+	uint32 resize, uint32 flags, TIFFTranslatorSettings* settings)
+	:	BView(frame, name, resize, flags),
+		fSettings(settings)
 {
-	SetViewColor(220,220,220,0);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BPopUpMenu* menu = new BPopUpMenu("pick compression");
+
+	uint32 currentCompression = fSettings->SetGetCompression();
+	// create the menu items with the various compression methods
+	add_menu_item(menu, COMPRESSION_NONE, "None", currentCompression);
+	menu->AddSeparatorItem();
+	add_menu_item(menu, COMPRESSION_PACKBITS, "RLE (Packbits)", currentCompression);
+	add_menu_item(menu, COMPRESSION_DEFLATE, "ZIP (Deflate)", currentCompression);
+	add_menu_item(menu, COMPRESSION_LZW, "LZW", currentCompression);
+
+// TODO: the disabled compression modes are not configured in libTIFF
+//	menu->AddSeparatorItem();
+//	add_menu_item(menu, COMPRESSION_JPEG, "JPEG", currentCompression);
+// TODO ? - strip encoding is not implemented in libTIFF for this compression
+//	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
+
+	fCompressionMF = new BMenuField(BRect(20, 50, 215, 70), "compression",
+									"Use Compression:", menu, true);
+	AddChild(fCompressionMF);
 }
 
 // ---------------------------------------------------------------
@@ -69,7 +116,58 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 TIFFView::~TIFFView()
 {
+	fSettings->Release();
 }
+
+// ---------------------------------------------------------------
+// MessageReceived
+//
+// Handles state changes of the Compression menu field
+//
+// Preconditions:
+//
+// Parameters: area,	not used
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
+void
+TIFFView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_COMPRESSION_CHANGED: {
+			uint32 value;
+			if (message->FindInt32("value", (int32*)&value) >= B_OK) {
+				fSettings->SetGetCompression(&value);
+				fSettings->SaveSettings();
+			}
+			break;
+		}
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+// ---------------------------------------------------------------
+// AllAttached
+//
+// sets the target for the controls controlling the configuration
+//
+// Preconditions:
+//
+// Parameters: area,	not used
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
+void
+TIFFView::AllAttached()
+{
+	fCompressionMF->Menu()->SetTargetForItems(this);
+}
+
 
 // ---------------------------------------------------------------
 // Draw
@@ -110,7 +208,7 @@ TIFFView::Draw(BRect area)
 		static_cast<int>(TIFF_TRANSLATOR_VERSION & 0xf), __DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	
-	int32 lineno = 4;
+	int32 lineno = 6;
 	DrawString("TIFF Library:", BPoint(xbold, yplain * lineno + ybold));
 	lineno += 2;
 	

@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src add-ons translators libtifftranslator ;
 
+UseLibraryHeaders zlib ;
+
 Translator TIFFTranslator : 
+	# libtiff
 	tif_aux.c
 	tif_close.c
 	tif_codec.c
@@ -34,12 +37,15 @@ Translator TIFFTranslator :
 	tif_warning.c
 	tif_write.c
 	tif_zip.c 
+
+	# TIFFTranslator
+	TIFFTranslatorSettings.cpp
 	TIFFMain.cpp
 	TIFFTranslator.cpp
 	TIFFView.cpp
 	TIFFWindow.cpp ;
 
-LinkSharedOSLibs TIFFTranslator : be translation ;
+LinkSharedOSLibs TIFFTranslator : be translation libz.a ;
 
 Package openbeos-translationkit-cvs :
 	TIFFTranslator :
