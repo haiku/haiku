@@ -1,183 +1,338 @@
-////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
 //
-//  File:           ListItem.h
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
 //
-//  Description:    BListView represents a one-dimensional list view.
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
 //
-//  Copyright 2001, Ulrich Wimboeck
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
 //
-////////////////////////////////////////////////////////////////////////////////
+//	File Name:		ListItem.cpp
+//	Author:			Ulrich Wimboeck
+//					Marc Flerackers (mflerackers@androme.be)
+//	Description:	BListView represents a one-dimensional list view.
+//------------------------------------------------------------------------------
 
-#include <Font.h>
-#include <Message.h>
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
+#include <ListItem.h>
 #include <View.h>
-#include "MyListItem.h"
+#include <Message.h>
+#include <Errors.h>
 
-/*----------------------------------------------------------------*/
-/*----- BListItem class ------------------------------------------*/
+// Project Includes ------------------------------------------------------------
 
-/**
- * The constructors create a new BListItem object. The level and
- * expanded arguments are only used if the item is added to a 
- * BOutlineListView object; see BOutlineListView::AddItem() for
- * more information. The destructor is empty.
- *
- * @param outlineLevel Level of the 
- */
+// Local Includes --------------------------------------------------------------
 
-BListItem::BListItem(uint32 outlineLevel /* = 0 */, bool expanded /* = true */)
- : fWidth(0), fHeight(0), fLevel(outlineLevel), fSelected(false), fEnabled(true),
-   fExpanded(expanded), fHasSubItems(false), fVisible(true)
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+BListItem::BListItem(uint32 level, bool expanded)
+	:	fWidth(0),
+		fHeight(0),
+		fLevel(level),
+		fSelected(false),
+		fEnabled(true),
+		fExpanded(expanded),
+		fHasSubitems(false),
+		fVisible(true)
 {
 }
-
-BListItem::BListItem(BMessage* data)
- : BArchivable(data), // first call the constructor of the base class
-   fWidth(0), fHeight(0), fLevel(0), fSelected(false), fEnabled(true),
-   fExpanded(true), fHasSubItems(false), fVisible(true)
+//------------------------------------------------------------------------------
+BListItem::BListItem(BMessage *data)
+	:	BArchivable(data),
+		fWidth(0),
+		fHeight(0),
+		fLevel(0),
+		fSelected(false),
+		fEnabled(true),
+		fExpanded(false),
+		fHasSubitems(false),
+		fVisible(true)
 {
-  // get the data from the message
+	data->FindBool("_sel", &fSelected);
+	
+	if (data->FindBool("_disable", &fEnabled) != B_OK)
+		fEnabled = true;
+	else
+		fEnabled = false;
 
-  if (data->FindBool("_sel", &fSelected) != B_OK) 
-    fSelected = false ;
-
-  if (data->FindBool("_disable", !fEnabled) != B_OK)
-    fEnabled = true ;
-
-  if (data->FindBool("_li_expanded", fExpanded) != B_OK)
-    fExpanded = true ;
-
-  if (data->FindInt32("_li_outline_level", fLevel) != B_OK)
-    fLevel = 0 ;
+	data->FindBool("_li_expanded", &fExpanded);
+	data->FindInt32("_li_outline_level", (int32*)&fLevel);
 }
-
+//------------------------------------------------------------------------------
 BListItem::~BListItem()
 {
-  fWidth = 0 ;
-  fHeight = 0 ;
-  fLevel = 0 ;
-  fSelected = false ;
-  fEnabled = false ;
-}
 
-status_t
-BListItem::Archive(BMessage* data, bool deep /* = true */) const
+}
+//------------------------------------------------------------------------------
+status_t BListItem::Archive(BMessage *archive, bool deep) const
 {
-  status_t tReturn = BArchivable::Archive(data, deep) ;
+	BArchivable::Archive(archive, deep);
 
-  if (tReturn != B_OK)
-    return tReturn ;
+	if (fSelected)
+		archive->AddBool("_sel", true);
+	
+	if (!fEnabled)
+		archive->AddBool("_disable", true);
 
-  tReturn = data->AddString("class", "BListItem") ;
+	if (fExpanded)
+		archive->AddBool("_li_expanded", true);
 
-  if (tReturn != B_OK)
-    return tReturn ;
+	if (fLevel != 0)
+		archive->AddInt32("_li_outline_level", fLevel);
 
-  if (fSelected == true)
-  {
-    tReturn = data->AddBool("_sel", fSelected) ;
-
-    if (tReturn != B_OK)
-      return tReturn ;
-  }
-
-  if (fEnabled == false)
-  {
-    tReturn = data->AddBool("_disable", !fEnabled) ;
-
-    if (tReturn != B_OK)
-      return tReturn ;
-  }
-
-  if (!fExpanded) {
-    tReturn = data->AddInt32("_li_outline_level", fExpanded) ;
-  }
-
-  return tReturn ;
+	return B_OK;
 }
-
-float
-BListItem::Height() const
+//------------------------------------------------------------------------------
+float BListItem::Height() const
 {
-  return fHeight ;
+	return fHeight;
 }
-
-float
-BListItem::Width() const
+//------------------------------------------------------------------------------
+float BListItem::Width() const
 {
-  return fWidth ;
+	return fWidth;
 }
-
-//inline
-bool
-BListItem::IsSelected() const
+//------------------------------------------------------------------------------
+bool BListItem::IsSelected() const
 {
-  return fSelected ;
+	return fSelected;
 }
-
-//inline
-void
-BListItem::Select()
+//------------------------------------------------------------------------------
+void BListItem::Select()
 {
-  fSelected = true ;
+	fSelected = true;
 }
-
-//inline
-void
-BListItem::Deselect()
+//------------------------------------------------------------------------------
+void BListItem::Deselect()
 {
-  fSelected = false ;
+	fSelected = false;
 }
-
-//inline
-void
-BListItem::SetEnabled(bool on)
+//------------------------------------------------------------------------------
+void BListItem::SetEnabled(bool on)
 {
-  fEnabled = on ;
+	fEnabled = on;
 }
-
-//inline
-bool
-BListItem::IsEnabled() const
+//------------------------------------------------------------------------------
+bool BListItem::IsEnabled() const
 {
-  return fEnabled ;
+	return fEnabled;
 }
-
-//inline void
+//------------------------------------------------------------------------------
 void BListItem::SetHeight(float height)
 {
-  fHeight = height ;
+	fHeight = height;
 }
-
-//inline
-void
-BListItem::SetWidth(float width)
+//------------------------------------------------------------------------------
+void BListItem::SetWidth(float width)
 {
-  fWidth = width ;
+	fWidth = width;
 }
-
-void
-BListItem::Update(BView* owner, const BFont* font)
+//------------------------------------------------------------------------------
+void BListItem::Update(BView *owner, const BFont *font)
 {
-  // Set the width of the item to the width of the owner
-  BRect rect(owner->Frame()) ;
-  SetWidth(rect.right - rect.left) ;
+	font_height fh;
+	font->GetHeight(&fh);
 
-  // Set the height of the item to the height of the font
-  font_height height ;
-  font->GetHeight(&height) ;
-  SetHeight(height.leading + height.ascent + height.descent);
+	SetWidth(owner->Bounds().Width());
+	SetHeight(fh.ascent + fh.descent + fh.leading);
 }
-
-status_t
-BListItem::Perform(perform_code d, void* arg)
+//------------------------------------------------------------------------------
+status_t BListItem::Perform(perform_code d, void *arg)
 {
-  status_t tReturn = B_OK ;
-  return tReturn ;
+	return BArchivable::Perform(d, arg);
 }
-
-inline uint32
-BListItem::OutlineLevel() const
+//------------------------------------------------------------------------------
+void BListItem::SetExpanded(bool expanded)
 {
-  return fLevel ;
+	fExpanded = expanded;
 }
+//------------------------------------------------------------------------------
+bool BListItem::IsExpanded() const
+{
+	return fExpanded;
+}
+//------------------------------------------------------------------------------
+uint32 BListItem::OutlineLevel() const
+{
+	return fLevel;
+}
+//------------------------------------------------------------------------------
+bool BListItem::HasSubitems() const
+{
+	return fHasSubitems;
+}
+//------------------------------------------------------------------------------
+void BListItem::_ReservedListItem1() {}
+void BListItem::_ReservedListItem2() {}
+//------------------------------------------------------------------------------
+BListItem::BListItem(const BListItem &item)
+{
+}
+//------------------------------------------------------------------------------
+BListItem &BListItem::operator=(const BListItem &)
+{
+	return *this;
+}
+//------------------------------------------------------------------------------
+bool BListItem::IsItemVisible() const
+{
+	return fVisible;
+}
+//------------------------------------------------------------------------------
+void BListItem::SetItemVisible(bool visible)
+{
+	fVisible = visible;
+}
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+BStringItem::BStringItem(const char *text, uint32 level, bool expanded)
+	:	BListItem(level, expanded),
+		fText(NULL),
+		fBaselineOffset(0)
+{	
+	SetText(text);
+}
+//------------------------------------------------------------------------------
+BStringItem::BStringItem(BMessage *archive)
+	:	BListItem(archive),
+		fText(NULL),
+		fBaselineOffset(0)
+{
+	const char *string;
+
+	if (archive->FindString("_label", &string) == B_OK)
+		SetText(string);
+}
+//------------------------------------------------------------------------------
+BStringItem::~BStringItem()
+{
+	if (fText)
+		free(fText);
+}
+//------------------------------------------------------------------------------
+BArchivable	*BStringItem::Instantiate(BMessage *archive)
+{
+	if (validate_instantiation(archive, "BStringItem"))
+		return new BStringItem(archive);
+	else
+		return NULL;
+}
+//------------------------------------------------------------------------------
+status_t BStringItem::Archive(BMessage *archive, bool deep) const
+{
+	BListItem::Archive(archive);
+
+	if (fText)
+		archive->AddString("_label", fText);
+
+	return B_OK;
+}
+//------------------------------------------------------------------------------
+void BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
+{
+	if (fText == NULL)
+		return;
+
+	rgb_color highColor = owner->HighColor();
+	rgb_color lowColor = owner->LowColor();
+
+	if (IsSelected() || complete)
+	{
+		if (IsSelected())
+			owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
+		else
+			owner->SetHighColor(lowColor);
+
+		owner->FillRect(frame);
+	}
+
+	owner->MovePenTo(frame.left, frame.top + fBaselineOffset);
+
+	rgb_color black = {0, 0, 0, 255};
+
+	if (!IsEnabled())
+		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
+	else
+		owner->SetHighColor(black);
+
+	owner->DrawString(fText);
+
+	owner->SetHighColor(highColor);
+	owner->SetLowColor(lowColor);
+}
+//------------------------------------------------------------------------------
+void BStringItem::SetText(const char *text)
+{
+	if (fText)
+	{
+		free(fText);
+		fText = NULL;
+	}
+
+	if (text)
+		fText = strdup(text);
+}
+//------------------------------------------------------------------------------
+const char *BStringItem::Text() const
+{
+	return fText;
+}
+//------------------------------------------------------------------------------
+void BStringItem::Update(BView *owner, const BFont *font)
+{
+	if (fText)
+		SetWidth(owner->StringWidth(fText));
+
+	font_height fheight;
+
+	font->GetHeight(&fheight);
+	
+	fBaselineOffset = fheight.ascent + fheight.leading;
+	SetHeight((float)ceil(fheight.ascent + fheight.descent +
+		fheight.leading) + 4);
+}
+//------------------------------------------------------------------------------
+status_t BStringItem::Perform(perform_code d, void *arg)
+{
+	return B_ERROR;
+}
+//------------------------------------------------------------------------------
+void BStringItem::_ReservedStringItem1() {}
+void BStringItem::_ReservedStringItem2() {}
+//------------------------------------------------------------------------------
+BStringItem::BStringItem(const BStringItem &)
+{
+}
+//------------------------------------------------------------------------------
+BStringItem	&BStringItem::operator=(const BStringItem &)
+{
+	return *this;
+}
+//------------------------------------------------------------------------------
+
+/*
+ * $Log $
+ *
+ * $Id  $
+ *
+ */
