@@ -36,7 +36,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 	BString name;
 	BMessage reply;
 	switch (message->what) {
-		B_REG_ADD_CLIPBOARD:
+		case B_REG_ADD_CLIPBOARD:
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
@@ -51,7 +51,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 		}
 	  	break;
-		B_REG_GET_CLIPBOARD_COUNT:
+		case B_REG_GET_CLIPBOARD_COUNT:
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
@@ -72,7 +72,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 		}
 	  	break;
-		B_REG_CLIPBOARD_START_WATCHING:
+		case B_REG_CLIPBOARD_START_WATCHING:
 		{
 			BMessenger target;
 	  		if ( (message->FindString("name",&name) != B_OK) ||
@@ -92,7 +92,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 		}
 	  	break;
-		B_REG_CLIPBOARD_STOP_WATCHING:
+		case B_REG_CLIPBOARD_STOP_WATCHING:
 		{
 			BMessenger target;
 	  		if ( (message->FindString("name",&name) != B_OK) ||
@@ -112,7 +112,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 		}
 	  	break;
-		B_REG_DOWNLOAD_CLIPBOARD:
+		case B_REG_DOWNLOAD_CLIPBOARD:
 		{
 	  		if ( message->FindString("name",&name) != B_OK )
 			{
@@ -135,7 +135,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 		}
 	  	break;
-		B_REG_UPLOAD_CLIPBOARD:
+		case B_REG_UPLOAD_CLIPBOARD:
 		{
 			BMessage data;
 			BMessenger dataSource;
