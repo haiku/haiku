@@ -151,9 +151,6 @@ STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 		desktop_private::activescreen=s;
 		s->SetSpace(0,B_32_BIT_640x480,true);
 	}
-#ifndef DEBUG_DESKTOP
-printf("ERROR: NULL display driver\n");
-#endif
 }
 
 //! Shuts down the graphics subsystem

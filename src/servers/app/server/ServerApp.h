@@ -61,16 +61,12 @@ public:
 	*/
 	bool IsActive(void) const { return _isactive; }
 
-	/*!
-		\brief Sets the ServerApp's active status
-		\param value The new status of the ServerApp.
-		
-		Note that this function only changes a flag.
-	*/
-	void Activate(bool value) { _isactive=value; }
+	void Activate(bool value);
 	bool PingTarget(void);
 	
 	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
+
+	void SetAppCursor(void);
 protected:
 	friend class AppServer;
 	friend class ServerWindow;

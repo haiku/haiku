@@ -98,10 +98,7 @@ public:
 	Workspace *GetWorkspace(void);
 	void SetWorkspace(Workspace *wkspc);
 
-	//! Returns the window's title
-	const char *Title(void) { return _title->String(); }
-	
-			Layer*			FindLayer(const Layer* start, int32 token) const;
+	Layer *FindLayer(const Layer* start, int32 token) const;
 protected:	
 	friend class ServerApp;
 	friend class WinBorder;

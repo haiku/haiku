@@ -31,7 +31,10 @@
 #include "Layer.h"
 #include "RectUtils.h"
 #include "ServerWindow.h"
+#include "ServerApp.h"
 #include "PortLink.h"
+#include "ServerCursor.h"
+#include "CursorManager.h"
 #include "TokenHandler.h"
 #include "RectUtils.h"
 #include "RootLayer.h"
@@ -56,6 +59,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
 	_boundsLeftTop.Set( 0.0f, 0.0f );
 
 	_name			= new BString(name);
+
 	// Layer does not start out as a part of the tree
 	_parent			= NULL;
 	_uppersibling	= NULL;
@@ -77,8 +81,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
 	_layerdata		= new LayerData;
 	
 	_serverwin		= win;
-		// what's this needed for?
-	_portlink		= NULL;
+	_cursor			= NULL;
 }
 
 //! Destructor frees all allocated heap space
@@ -345,6 +348,49 @@ Layer *Layer::FindLayer(int32 token)
 	
 	// Well, we got this far in the function, so apparently there is no match to be found
 	return NULL;
+}
+
+/*!
+	\brief Sets the layer's personal cursor. See BView::SetViewCursor
+	\return The cursor associated with this layer.
+		
+*/
+void Layer::SetLayerCursor(ServerCursor *csr)
+{
+	_cursor=csr;
+}
+
+/*!
+	\brief Returns the layer's personal cursor. See BView::SetViewCursor
+	\return The cursor associated with this layer.
+	
+*/
+ServerCursor *Layer::GetLayerCursor(void) const
+{
+	return _cursor;
+}
+
+/*!
+	\brief Hook function for handling pointer transitions, much like BView::MouseMoved
+	\param transit The type of event which occurred.
+
+	The default version of this function changes the cursor to the view's cursor, if there 
+	is one. If there isn't one, the default cursor is chosen
+*/
+void Layer::MouseTransit(uint32 transit)
+{
+	if(transit==B_ENTERED_VIEW)
+	{
+		if(_cursor)
+			cursormanager->SetCursor(_cursor->ID());
+		else
+		{
+			if(_serverwin)
+				_serverwin->GetApp()->SetAppCursor();
+			else
+				cursormanager->SetCursor(B_CURSOR_DEFAULT);
+		}
+	}
 }
 
 /*!

@@ -28,6 +28,7 @@
 #include <List.h>
 #include <String.h>
 #include <PortLink.h>
+#include <SysCursor.h>
 
 #include <Session.h>
 
@@ -50,7 +51,8 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-//#define DEBUG_SERVERAPP
+#define DEBUG_SERVERAPP
+
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -218,6 +220,28 @@ void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
 }
 
 /*!
+	\brief Sets the ServerApp's active status
+	\param value The new status of the ServerApp.
+	
+	This changes an internal flag and also sets the current cursor to the one specified by
+	the application
+*/
+void ServerApp::Activate(bool value)
+{
+	_isactive=value;
+	SetAppCursor();
+}
+ 
+//! Sets the cursor to the application cursor, if any.
+void ServerApp::SetAppCursor(void)
+{
+	if(_appcursor)
+		cursormanager->SetCursor(_appcursor->ID());
+	else
+		cursormanager->SetCursor(B_CURSOR_DEFAULT);
+}
+
+/*!
 	\brief The thread function ServerApps use to monitor messages
 	\param data Pointer to the thread's ServerApp object
 	\return Throwaway value - always 0
@@ -233,7 +257,8 @@ int32 ServerApp::MonitorApp(void *data)
 	
 	for(;;)
 	{
-		if ( app->ses->ReadInt32( &msgCode ) != B_BAD_PORT_ID ){
+		if(app->ses->ReadInt32(&msgCode)!= B_BAD_PORT_ID ){
+		printf("Received message %ld\n",msgCode);
 			switch (msgCode){
 				case AS_QUIT_APP:
 				{
@@ -381,7 +406,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 				w=(ServerWindow*)_winlist->ItemAt(i);
 				if(w->_token==winid)
 				{
-					STRACE(("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title()));
+					STRACE(("ServerApp %s: Deleting window %s\n",_signature.String(),w->GetTitle()));
 					_winlist->RemoveItem(w);
 					delete w;
 					break;
@@ -567,6 +592,16 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		case AS_SET_CURSOR_BCURSOR:
 		{
 			// Attached data:
+			// 1) int32 token ID of the cursor to set
+
+			if(!index)
+				cursormanager->SetCursor(*((int32*)index));
+			break;
+		}
+		case AS_CREATE_BCURSOR:
+		{
+printf("Create BCursor\n");
+			// Attached data:
 			// 1) port_id reply port
 			// 2) 68 bytes of _appcursor data
 			
@@ -579,13 +614,23 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			_appcursor=new ServerCursor(cdata);
 			_appcursor->SetAppSignature(_signature.String());
 			cursormanager->AddCursor(_appcursor);
-			cursormanager->SetCursor(_appcursor->ID());
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			PortLink replylink(replyport);
-			replylink.SetOpCode(AS_SET_CURSOR_BCURSOR);
+			replylink.SetOpCode(AS_CREATE_BCURSOR);
 			replylink.Attach(_appcursor->ID());
 			replylink.Flush();
+			break;
+		}
+		case AS_DELETE_BCURSOR:
+		{
+			// Attached data:
+			// 1) int32 token ID of the cursor to delete
+			if(_appcursor && _appcursor->ID()==*((int32*)index))
+				_appcursor=NULL;
+			
+			if(!index)
+				cursormanager->DeleteCursor(*((int32*)index));
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
@@ -674,3 +719,4 @@ ServerBitmap *ServerApp::_FindBitmap(int32 token)
 	}
 	return NULL;
 }
+

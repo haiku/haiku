@@ -43,6 +43,7 @@ class PortLink;
 class RootLayer;
 class WinBorder;
 class Screen;
+class ServerCursor;
 
 /*!
 	\class Layer Layer.h
@@ -73,6 +74,10 @@ public:
 	const char *GetName(void) { return (_name)?_name->String():NULL; }
 	LayerData *GetLayerData(void) { return _layerdata; }
 	
+	void SetLayerCursor(ServerCursor *csr);
+	ServerCursor *GetLayerCursor(void) const;
+	virtual void MouseTransit(uint32 transit);
+
 	void Invalidate(const BRect &rect);
 	void Invalidate(BRegion& region);
 	void RebuildRegions(bool include_children=true);
@@ -106,7 +111,7 @@ public:
 	void PrintNode(void);
 	void PruneTree(void);
 	void PrintTree();
-
+	
 protected:
 	friend class RootLayer;
 	friend class WinBorder;
@@ -133,7 +138,7 @@ protected:
 	bool		_is_updating;
 	bool		_regions_invalid;
 	LayerData	*_layerdata;
-	PortLink	*_portlink;
+	ServerCursor *_cursor;
 };
 
 #endif
