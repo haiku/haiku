@@ -199,15 +199,17 @@ status_t _kern_create_child_partition(partition_id partitionID,
 									  partition_id *childID);
 status_t _kern_delete_partition(partition_id partitionID, int32 changeCounter);
 
-#if 0
-
 // jobs
-status_t get_next_disk_device_job_info(user_disk_device_job_info *info,
-									   int32 *cookie);
-status_t get_disk_device_job_info(disk_job_id id,
-								  user_disk_device_job_info *info);
-status_t get_disk_device_job_status(disk_job_id id, uint32 *status,
-									float *progress);
+status_t _kern_get_next_disk_device_job_info(int32 *cookie,
+											 user_disk_device_job_info *info);
+status_t _kern_get_disk_device_job_info(disk_job_id id,
+										user_disk_device_job_info *info);
+status_t _kern_get_disk_device_job_progress_info(disk_job_id id,
+	disk_device_job_progress_info *info);
+status_t _kern_pause_disk_device_job(disk_job_id id);
+status_t _kern_cancel_disk_device_job(disk_job_id id, bool reverse);
+
+#if 0
 
 // watching
 status_t start_disk_device_watching(port_id, int32 token, uint32 flags);

@@ -1,13 +1,15 @@
 // ddm_userland_interface.cpp
 
+#include <ddm_userland_interface.h>
 #include <KDiskDevice.h>
+#include <KDiskDeviceJob.h>
+#include <KDiskDeviceJobQueue.h>
 #include <KDiskDeviceManager.h>
 #include <KDiskDeviceUtils.h>
 #include <KDiskSystem.h>
 #include <KFileDiskDevice.h>
 #include <KShadowPartition.h>
 
-#include "ddm_userland_interface.h"
 #include "UserDataWriter.h"
 
 // get_current_team
@@ -1657,5 +1659,101 @@ _kern_delete_partition(partition_id partitionID, int32 changeCounter)
 		return B_ERROR;
 	parent->Changed(B_PARTITION_CHANGED_CHILDREN);
 	return B_OK;
+}
+
+// _kern_get_next_disk_device_job_info
+status_t
+_kern_get_next_disk_device_job_info(int32 *cookie,
+									user_disk_device_job_info *info)
+{
+	if (!cookie || !info)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		// get the next job and an info
+		while (KDiskDeviceJob *job = manager->NextJob(cookie)) {
+			// return info only on job scheduled or in progress
+			switch (job->Status()) {
+				case B_DISK_DEVICE_JOB_SCHEDULED:
+				case B_DISK_DEVICE_JOB_IN_PROGRESS:
+					return job->GetInfo(info);
+				case B_DISK_DEVICE_JOB_UNINITIALIZED:
+				case B_DISK_DEVICE_JOB_SUCCEEDED:
+				case B_DISK_DEVICE_JOB_FAILED:
+				case B_DISK_DEVICE_JOB_CANCELED:
+					break;
+			}
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
+// _kern_get_disk_device_job_info
+status_t
+_kern_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *info)
+{
+	if (!info)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		// find the job and get the info
+		if (KDiskDeviceJob *job = manager->FindJob(id))
+			return job->GetInfo(info);
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
+// _kern_get_disk_device_job_status
+status_t
+_kern_get_disk_device_job_progress_info(disk_job_id id,
+										disk_device_job_progress_info *info)
+{
+	if (!info)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		// find the job and get the info
+		if (KDiskDeviceJob *job = manager->FindJob(id))
+			return job->GetProgressInfo(info);
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
+// _kern_pause_disk_device_job
+status_t
+_kern_pause_disk_device_job(disk_job_id id)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		// get the job and the respective job queue
+		if (KDiskDeviceJob *job = manager->FindJob(id)) {
+			if (KDiskDeviceJobQueue *jobQueue = job->JobQueue()) {
+				// only the active job in progress can be paused
+				if (jobQueue->ActiveJob() != job)
+					return B_BAD_VALUE;
+				return jobQueue->Pause();
+			}
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
+// _kern_cancel_disk_device_job
+status_t
+_kern_cancel_disk_device_job(disk_job_id id, bool reverse)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		// get the job and the respective job queue
+		if (KDiskDeviceJob *job = manager->FindJob(id)) {
+			if (KDiskDeviceJobQueue *jobQueue = job->JobQueue()) {
+				// only the active job in progress can be canceled
+				if (jobQueue->ActiveJob() != job)
+					return B_BAD_VALUE;
+				return jobQueue->Cancel(reverse);
+			}
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
 }
 
