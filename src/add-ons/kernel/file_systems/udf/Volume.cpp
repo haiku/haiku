@@ -203,7 +203,7 @@ Volume::_Init(int device, off_t offset, off_t length, int blockSize)
 		uint32 block = blockSize & (uint32(1) << i);
 		if (block) {
 			if (++bitCount > 1) {
-				PRINT(("Block size must be a power of two! (blockSize = %ld)\n", blockSize));
+				PRINT(("Block size must be a power of two! (blockSize = %d)\n", blockSize));
 				RETURN(B_BAD_VALUE);
 			} else {
 				fBlockShift = i;
