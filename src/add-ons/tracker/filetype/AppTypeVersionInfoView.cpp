@@ -15,6 +15,8 @@ AppTypeVersionInfoView::AppTypeVersionInfoView(BRect viewFrame)
 	fBox->SetLabel("Version Info:");
 	AddChild(fBox);
 	
+	// Version kind row
+
 	fKindMenu = new BMenu("kind");
 	fApplicationMenuItem = new BMenuItem("Application",NULL);
 	fKindMenu->AddItem(fApplicationMenuItem);
@@ -35,11 +37,13 @@ AppTypeVersionInfoView::AppTypeVersionInfoView(BRect viewFrame)
 	fKindMenuField->MoveTo(8,10);
 	fBox->AddChild(fKindMenuField);
 	
+	// Version row
+	
 	fStringView = new BStringView(Bounds(),"version","Version:");
 	float stringViewWidth = 0, stringViewHeight = 0;
 	fStringView->GetPreferredSize(&stringViewWidth,&stringViewHeight);
 	fStringView->ResizeTo(stringViewWidth,stringViewHeight);
-	fStringView->MoveTo(9,fKindMenuField->Frame().bottom+4);
+	fStringView->MoveTo(9,fKindMenuField->Frame().bottom+5);
 	fBox->AddChild(fStringView);
 	
 	fMajorTextControl = new BTextControl(BRect(0,0,21,21),"major",NULL,NULL,NULL);
@@ -126,7 +130,43 @@ AppTypeVersionInfoView::AppTypeVersionInfoView(BRect viewFrame)
 	fInternalTextControl->MoveTo(fSlashStringView->Frame().right-2,fStringView->Frame().top-2);
 	fBox->AddChild(fInternalTextControl);
 
+	// Short description row
+
+	const char * shortTextControlLabel = "Short Description:";
+	float shortTextControlStringWidth = StringWidth(shortTextControlLabel);	
+	fShortTextControl = new BTextControl(BRect(0,0,fBox->Bounds().Width()-16,21),
+	                                     shortTextControlLabel,
+	                                     shortTextControlLabel,NULL,NULL,
+	                                     B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
+	float shortTextControlWidth = 0, shortTextControlHeight = 0;
+	fShortTextControl->GetPreferredSize(&shortTextControlWidth,&shortTextControlHeight);
+	fShortTextControl->ResizeTo(fBox->Bounds().Width()-17,shortTextControlHeight);
+	fShortTextControl->MoveTo(8,fVarietyMenuField->Frame().bottom+4);
+	fShortTextControl->SetDivider(shortTextControlStringWidth+5);
+	fBox->AddChild(fShortTextControl);
+
+	const char * longStringViewLabel = "Long Description:";
+	fLongStringView = new BStringView(Bounds(),longStringViewLabel,longStringViewLabel);
+	float longStringViewWidth = 0, longStringViewHeight = 0;
+	fLongStringView->GetPreferredSize(&longStringViewWidth,&longStringViewHeight);
+	fLongStringView->ResizeTo(longStringViewWidth,longStringViewHeight);
+	fLongStringView->MoveTo(9,fShortTextControl->Frame().bottom);
+	fBox->AddChild(fLongStringView);
 	
+	BRect leftovers = fBox->Bounds();
+	leftovers.InsetBy(8,8);
+	leftovers.left += 1;
+	leftovers.top = fLongStringView->Frame().bottom;
+	BBox * textViewBox = new BBox(leftovers,"textbox",B_FOLLOW_ALL);
+	fBox->AddChild(textViewBox);
+
+	BRect textViewFrame = textViewBox->Bounds();
+	textViewFrame.InsetBy(2,2);
+	BRect textFrame = leftovers;
+	textFrame.OffsetTo(0,0);
+	fLongTextView = new BTextView(textViewFrame,"description",textFrame,B_FOLLOW_ALL,
+	                              B_NAVIGABLE|B_WILL_DRAW|B_PULSE_NEEDED|B_FRAME_EVENTS);
+	textViewBox->AddChild(fLongTextView);
 }
 
 AppTypeVersionInfoView::~AppTypeVersionInfoView()

@@ -40,7 +40,6 @@ private:
 	BMenuField		* fVarietyMenuField;
 	BStringView		* fSlashStringView;
 	BTextControl	* fInternalTextControl;
-	BStringView		* fShortStringView;
 	BTextControl	* fShortTextControl;
 	BStringView		* fLongStringView;
 	BTextView		* fLongTextView;
