@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src add-ons translators stxttranslator ;
+
+Translator STXTTranslator : STXTMain.cpp STXTTranslator.cpp STXTView.cpp STXTWindow.cpp ;
+
+LinkSharedOSLibs STXTTranslator : be translation ;
