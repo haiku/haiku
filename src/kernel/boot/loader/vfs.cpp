@@ -18,9 +18,9 @@ class Descriptor {
 		Descriptor(Node *node, void *cookie);
 		~Descriptor();
 
-		ssize_t Read(off_t pos, void *buffer, size_t bufferSize);
+		ssize_t ReadAt(off_t pos, void *buffer, size_t bufferSize);
 		ssize_t Read(void *buffer, size_t bufferSize);
-		ssize_t Write(off_t pos, const void *buffer, size_t bufferSize);
+		ssize_t WriteAt(off_t pos, const void *buffer, size_t bufferSize);
 		ssize_t Write(const void *buffer, size_t bufferSize);
 
 		off_t Offset() const { return fOffset; }
@@ -123,7 +123,7 @@ Descriptor::Read(void *buffer, size_t bufferSize)
 
 
 ssize_t 
-Descriptor::Read(off_t pos, void *buffer, size_t bufferSize)
+Descriptor::ReadAt(off_t pos, void *buffer, size_t bufferSize)
 {
 	return fNode->ReadAt(fCookie, pos, buffer, bufferSize);
 }
@@ -141,7 +141,7 @@ Descriptor::Write(const void *buffer, size_t bufferSize)
 
 
 ssize_t
-Descriptor::Write(off_t pos, const void *buffer, size_t bufferSize)
+Descriptor::WriteAt(off_t pos, const void *buffer, size_t bufferSize)
 {
 	return fNode->WriteAt(fCookie, pos, buffer, bufferSize);
 }
@@ -302,7 +302,7 @@ read_pos(int fd, off_t offset, void *buffer, size_t bufferSize)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	return descriptor->Read(offset, buffer, bufferSize);
+	return descriptor->ReadAt(offset, buffer, bufferSize);
 }
 
 
@@ -324,7 +324,7 @@ write_pos(int fd, off_t offset, const void *buffer, size_t bufferSize)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	return descriptor->Write(offset, buffer, bufferSize);
+	return descriptor->WriteAt(offset, buffer, bufferSize);
 }
 
 
