@@ -327,9 +327,9 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 		vnode->cache = NULL;
 
 		if (vnode->delete_me)
-			FS_CALL(vnode,fs_remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 		else
-			FS_CALL(vnode,fs_put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 
 		remove_vnode_from_mount_list(vnode, vnode->mount);
 
@@ -414,7 +414,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 
 		add_vnode_to_mount_list(vnode, vnode->mount);
 
-		err = FS_CALL(vnode,fs_get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
+		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
 		if (err < 0 && vnode->private_node == NULL) {
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			if (vnode->private_node == NULL)
@@ -476,7 +476,7 @@ file_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->vnode;
 
 	if (vnode != NULL) {
-		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 		dec_vnode_ref_count(vnode, false);
 	}
 }
@@ -488,8 +488,8 @@ dir_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->vnode;
 
 	if (vnode != NULL) {
-		//FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
-		FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		//FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 		dec_vnode_ref_count(vnode, false);
 	}
 }
@@ -541,7 +541,7 @@ entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(directory,fs_lookup)(directory->mount->cookie,
+	status = FS_CALL(directory, lookup)(directory->mount->cookie,
 		directory->private_node, name, &id, &type);
 	put_vnode(directory);
 
@@ -607,7 +607,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 		}
 
 		// tell the filesystem to get the vnode of this path component
-		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
+		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
 		if (status < 0) {
 			put_vnode(vnode);
 			return status;
@@ -643,7 +643,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 				goto resolve_link_error;
 			}
 
-			status = FS_CALL(nextVnode,fs_read_link)(nextVnode->mount->cookie, nextVnode->private_node, buffer, SYS_MAX_PATH_LEN);
+			status = FS_CALL(nextVnode, read_link)(nextVnode->mount->cookie, nextVnode->private_node, buffer, SYS_MAX_PATH_LEN);
 			if (status < B_OK) {
 				kfree(buffer);
 
@@ -800,7 +800,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentID,&type);
+		status = FS_CALL(vnode, lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentID,&type);
 		if (status < B_OK)
 			goto out;
 
@@ -816,8 +816,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
-		if (status == B_OK && FS_CALL(vnode,fs_get_vnode_name))
-			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->private_node,name,B_FILE_NAME_LENGTH);
+		if (status == B_OK && FS_CALL(vnode, get_vnode_name))
+			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,vnode->private_node,name,B_FILE_NAME_LENGTH);
 
 		// ... if not, find it out later (by iterating through
 		// the parent directory, searching for the id)
@@ -845,17 +845,18 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			break;
 		}
 
-		if (!FS_CALL(vnode, fs_get_vnode_name)) {
+		if (!FS_CALL(vnode, get_vnode_name)) {
 			// If we don't got the vnode's name yet, we have to search for it
 			// in the parent directory now
 			fs_cookie cookie;
 
-			status = FS_CALL(vnode, fs_open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+			status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
 			if (status >= B_OK) {
 				struct dirent *dirent = (struct dirent *)nameBuffer;
 				while (true) {
 					uint32 num = 1;
-					status = FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->private_node,cookie,dirent,sizeof(nameBuffer),&num);
+					status = FS_CALL(vnode, read_dir)(vnode->mount->cookie, vnode->private_node,
+						cookie, dirent, sizeof(nameBuffer), &num);
 					if (status < B_OK)
 						break;
 					
@@ -863,7 +864,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 						// found correct entry!
 						break;
 				}
-				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->private_node,cookie);
+				FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
 			}
 
 			if (status < B_OK)
@@ -1099,8 +1100,8 @@ vfs_can_page(void *_v)
 
 	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
 
-	if (FS_CALL(vnode,fs_can_page))
-		return FS_CALL(vnode,fs_can_page)(vnode->mount->cookie, vnode->private_node);
+	if (FS_CALL(vnode, can_page))
+		return FS_CALL(vnode, can_page)(vnode->mount->cookie, vnode->private_node);
 
 	return 0;
 }
@@ -1113,7 +1114,7 @@ vfs_read_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_readpage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode,fs_read_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
+	return FS_CALL(vnode, read_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
@@ -1124,7 +1125,7 @@ vfs_write_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_writepage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode,fs_write_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
+	return FS_CALL(vnode, write_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
@@ -1609,10 +1610,10 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 	vnode_id newID;
 	int status;
 
-	if (FS_CALL(directory,fs_create) == NULL)
+	if (FS_CALL(directory, create) == NULL)
 		return EROFS;
 
-	status = FS_CALL(directory,fs_create)(directory->mount->cookie, directory->private_node, name, omode, perms, &cookie, &newID);
+	status = FS_CALL(directory, create)(directory->mount->cookie, directory->private_node, name, omode, perms, &cookie, &newID);
 	if (status < B_OK)
 		return status;
 
@@ -1628,11 +1629,11 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 	if ((status = new_file_fd(vnode,cookie,omode,kernel)) >= 0)
 		return status;
 		
-	FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 	put_vnode(vnode);
 
-	FS_CALL(directory,fs_unlink)(directory->mount->cookie, directory->private_node, name);
+	FS_CALL(directory, unlink)(directory->mount->cookie, directory->private_node, name);
 	
 	return status;
 }
@@ -1648,14 +1649,14 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 	fs_cookie cookie;
 	int status;
 
-	status = FS_CALL(vnode,fs_open)(vnode->mount->cookie, vnode->private_node, omode, &cookie);
+	status = FS_CALL(vnode, open)(vnode->mount->cookie, vnode->private_node, omode, &cookie);
 	if (status < 0)
 		return status;
 
 	status = new_file_fd(vnode, cookie, omode, kernel);
 	if (status < 0) {
-		FS_CALL(vnode,fs_close)(vnode->mount->cookie, vnode->private_node, cookie);
-		FS_CALL(vnode,fs_free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+		FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
+		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 	}
 	return status;
 }
@@ -1672,7 +1673,7 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 	fs_cookie cookie;
 	int status, fd;
 	
-	status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+	status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
 	if (status < 0)
 		return status;
 
@@ -1696,8 +1697,8 @@ err1:
 	kfree(descriptor);
 
 err:
-	FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode,fs_free_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 
 	return status;
 }
@@ -1797,8 +1798,8 @@ file_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("file_close(descriptor = %p)\n",descriptor));
 	
-	if (FS_CALL(vnode,fs_close))
-		return FS_CALL(vnode,fs_close)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+	if (FS_CALL(vnode, close))
+		return FS_CALL(vnode, close)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
 
 	return B_OK;
 }
@@ -1810,7 +1811,7 @@ file_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *l
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
-	return FS_CALL(vnode,fs_read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -1820,7 +1821,7 @@ file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, si
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
-	return FS_CALL(vnode,fs_write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -1830,7 +1831,7 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("file_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
-	return FS_CALL(vnode,fs_seek)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
+	return FS_CALL(vnode, seek)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
 }
 
 
@@ -1847,8 +1848,8 @@ dir_create_entry_ref(fs_id fsID, vnode_id parentID, const char *name, int perms,
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode, fs_create_dir))
-		status = FS_CALL(vnode, fs_create_dir)(vnode->mount->cookie, vnode->private_node, name, perms, &newID);
+	if (FS_CALL(vnode, create_dir))
+		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, name, perms, &newID);
 	else
 		status = EROFS;
 
@@ -1871,8 +1872,8 @@ dir_create(char *path, int perms, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode,fs_create_dir))
-		status = FS_CALL(vnode,fs_create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
+	if (FS_CALL(vnode, create_dir))
+		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
 	else
 		status = EROFS;
 
@@ -1948,8 +1949,8 @@ dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t buffe
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	if (FS_CALL(vnode,fs_read_dir))
-		return FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,buffer,bufferSize,_count);
+	if (FS_CALL(vnode, read_dir))
+		return FS_CALL(vnode, read_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,buffer,bufferSize,_count);
 	
 	return EOPNOTSUPP;
 }
@@ -1960,8 +1961,8 @@ dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	if (FS_CALL(vnode,fs_rewind_dir))
-		return FS_CALL(vnode,fs_rewind_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+	if (FS_CALL(vnode, rewind_dir))
+		return FS_CALL(vnode, rewind_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
 
 	return EOPNOTSUPP;
 }
@@ -1974,8 +1975,8 @@ dir_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("dir_close(descriptor = %p)\n",descriptor));
 	
-	if (FS_CALL(vnode,fs_close_dir))
-		return FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+	if (FS_CALL(vnode, close_dir))
+		return FS_CALL(vnode, close_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
 
 	return B_OK;
 }
@@ -1992,8 +1993,8 @@ dir_remove(char *path, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(directory, fs_remove_dir))
-		status = FS_CALL(directory, fs_remove_dir)(directory->mount->cookie, directory->private_node, name);
+	if (FS_CALL(directory, remove_dir))
+		status = FS_CALL(directory, remove_dir)(directory->mount->cookie, directory->private_node, name);
 	else
 		status = EROFS;
 
@@ -2008,7 +2009,7 @@ common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 	struct vnode *vnode = descriptor->vnode;
 
 	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
-	return FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+	return FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
 }
 
 
@@ -2017,8 +2018,8 @@ common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t 
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	if (FS_CALL(vnode,fs_ioctl))
-		return FS_CALL(vnode,fs_ioctl)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,op,buffer,length);
+	if (FS_CALL(vnode, ioctl))
+		return FS_CALL(vnode, ioctl)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,op,buffer,length);
 
 	return EOPNOTSUPP;
 }
@@ -2037,8 +2038,8 @@ common_sync(int fd, bool kernel)
 	if (descriptor == NULL)
 		return ERR_INVALID_HANDLE;
 
-	if (FS_CALL(vnode,fs_fsync) != NULL)
-		status = FS_CALL(vnode,fs_fsync)(vnode->mount->cookie, vnode->private_node);
+	if (FS_CALL(vnode, fsync) != NULL)
+		status = FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
 	else
 		status = EOPNOTSUPP;
 
@@ -2057,8 +2058,8 @@ common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode,fs_read_link) != NULL)
-		status = FS_CALL(vnode,fs_read_link)(vnode->mount->cookie, vnode->private_node, buffer, bufferSize);
+	if (FS_CALL(vnode, read_link) != NULL)
+		status = FS_CALL(vnode, read_link)(vnode->mount->cookie, vnode->private_node, buffer, bufferSize);
 	else
 		status = B_BAD_VALUE;
 
@@ -2078,8 +2079,8 @@ common_write_link(char *path, char *toPath, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode,fs_write_link) != NULL)
-		status = FS_CALL(vnode,fs_write_link)(vnode->mount->cookie, vnode->private_node, toPath);
+	if (FS_CALL(vnode, write_link) != NULL)
+		status = FS_CALL(vnode, write_link)(vnode->mount->cookie, vnode->private_node, toPath);
 	else
 		status = EOPNOTSUPP;
 
@@ -2103,8 +2104,8 @@ common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode,fs_create_symlink) != NULL)
-		status = FS_CALL(vnode,fs_create_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
+	if (FS_CALL(vnode, create_symlink) != NULL)
+		status = FS_CALL(vnode, create_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
 	else
 		status = EROFS;
 
@@ -2137,8 +2138,8 @@ common_create_link(char *path, char *toPath, bool kernel)
 		goto err1;
 	}
 
-	if (FS_CALL(vnode, fs_link) != NULL)
-		status = FS_CALL(vnode,fs_link)(directory->mount->cookie, directory->private_node, name, vnode->private_node);
+	if (FS_CALL(vnode, link) != NULL)
+		status = FS_CALL(vnode, link)(directory->mount->cookie, directory->private_node, name, vnode->private_node);
 	else
 		status = EROFS;
 
@@ -2164,8 +2165,8 @@ common_unlink(char *path, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode,fs_unlink) != NULL)
-		status = FS_CALL(vnode,fs_unlink)(vnode->mount->cookie, vnode->private_node, filename);
+	if (FS_CALL(vnode, unlink) != NULL)
+		status = FS_CALL(vnode, unlink)(vnode->mount->cookie, vnode->private_node, filename);
 	else
 		status = EROFS;
 
@@ -2185,8 +2186,8 @@ common_access(char *path, int mode, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode,fs_access) != NULL)
-		status = FS_CALL(vnode,fs_access)(vnode->mount->cookie, vnode->private_node, mode);
+	if (FS_CALL(vnode, access) != NULL)
+		status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, mode);
 	else
 		status = EOPNOTSUPP;
 
@@ -2219,8 +2220,8 @@ common_rename(char *path, char *newPath, bool kernel)
 		goto err2;
 	}
 
-	if (FS_CALL(vnode1,fs_rename) != NULL)
-		status = FS_CALL(vnode1,fs_rename)(vnode1->mount->cookie, vnode1->private_node, filename1, vnode2->private_node, filename2);
+	if (FS_CALL(vnode1, rename) != NULL)
+		status = FS_CALL(vnode1, rename)(vnode1->mount->cookie, vnode1->private_node, filename1, vnode2->private_node, filename2);
 	else
 		status = EROFS;
 
@@ -2245,8 +2246,8 @@ common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode,fs_write_stat))
-		status = FS_CALL(vnode,fs_write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
+	if (FS_CALL(vnode, write_stat))
+		status = FS_CALL(vnode, write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
 	else
 		status = EROFS;
 
@@ -2303,7 +2304,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 			goto err3;
 		}
 
-		err = mount->fs->calls->fs_mount(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = mount->fs->calls->mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
 			err = ERR_VFS_GENERAL;
 			goto err3;
@@ -2322,7 +2323,8 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 
 		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
 
-		if ((covered_vnode != root_vnode) && (covered_vnode->mount->root_vnode == covered_vnode)){
+		if (covered_vnode != root_vnode
+			&& covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
 			goto err2;
 		}
@@ -2330,7 +2332,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 		mount->covers_vnode = covered_vnode;
 
 		// mount it
-		err = mount->fs->calls->fs_mount(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = mount->fs->calls->mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0)
 			goto err4;
 	}
@@ -2358,7 +2360,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 	return 0;
 
 err5:
-	mount->fs->calls->fs_unmount(mount->cookie);
+	mount->fs->calls->unmount(mount->cookie);
 err4:
 	if (mount->covers_vnode)
 		dec_vnode_ref_count(mount->covers_vnode, false);
@@ -2447,7 +2449,7 @@ fs_unmount(char *path, bool kernel)
 
 	mutex_unlock(&gMountOpMutex);
 
-	mount->fs->calls->fs_unmount(mount->cookie);
+	mount->fs->calls->unmount(mount->cookie);
 
 	kfree(mount->mount_point);
 	kfree(mount);
@@ -2474,7 +2476,7 @@ fs_sync(void)
 
 	hash_open(mounts_table, &iter);
 	while ((mount = hash_next(mounts_table, &iter))) {
-		mount->fs->calls->fs_sync(mount->cookie);
+		mount->fs->calls->sync(mount->cookie);
 	}
 	hash_close(mounts_table, &iter, false);
 
@@ -2499,8 +2501,8 @@ fs_read_info(dev_t device, struct fs_info *info)
 		goto error;
 	}
 
-	if (mount->fs->calls->fs_read_fs_info)
-		status = mount->fs->calls->fs_read_fs_info(mount->cookie, info);
+	if (mount->fs->calls->read_fs_info)
+		status = mount->fs->calls->read_fs_info(mount->cookie, info);
 	else
 		status = EOPNOTSUPP;
 
@@ -2528,8 +2530,8 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 		goto error;
 	}
 
-	if (mount->fs->calls->fs_write_fs_info)
-		status = mount->fs->calls->fs_write_fs_info(mount->cookie, info, mask);
+	if (mount->fs->calls->write_fs_info)
+		status = mount->fs->calls->write_fs_info(mount->cookie, info, mask);
 	else
 		status = EROFS;
 
@@ -2576,7 +2578,7 @@ set_cwd(int fd, char *path, bool kernel)
 	if (rc < 0)
 		return rc;
 
-	rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+	rc = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
 	if (rc < 0)
 		goto err;
 
@@ -2840,7 +2842,7 @@ sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
 
 	put_vnode(vnode);
 	return status;
@@ -3323,8 +3325,8 @@ user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 	if (rc < 0)
 		return rc;
 
-	if (FS_CALL(vnode,fs_read_stat))
-		rc = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+	if (FS_CALL(vnode, read_stat))
+		rc = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
 
 	put_vnode(vnode);
 
