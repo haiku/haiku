@@ -63,6 +63,13 @@ public:
 							  bigtime_t *time = NULL);
 	bool CheckNextMessage(LaunchCaller &caller, team_id team, int32 &cookie,
 						  uint32 what);
+	bool CheckMainArgsMessage(LaunchCaller &caller, team_id team,
+							  int32 &cookie, const entry_ref *appRef,
+							  bool useRef = true);
+	bool CheckMainArgsMessage(LaunchCaller &caller, team_id team,
+							  int32 &cookie, const entry_ref *appRef,
+							  int32 argc, const char **argv,
+							  bool useRef = true);
 	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
 						  const entry_ref *appRef, bool useRef = true);
 	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
@@ -71,6 +78,9 @@ public:
 	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
 						  const entry_ref *appRef, const entry_ref *ref,
 						  int32 argc, const char **argv);
+	bool CheckArgsMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+						  const entry_ref *appRef, const entry_ref *ref,
+						  int32 argc, const char **argv, uint32 messageCode);
 	bool CheckMessageMessages(LaunchCaller &caller, team_id team,
 							  int32 &cookie);
 	bool CheckMessageMessage(LaunchCaller &caller, team_id team, int32 &cookie,

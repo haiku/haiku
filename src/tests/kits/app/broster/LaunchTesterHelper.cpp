@@ -245,6 +245,7 @@ LaunchContext::HandleMessage(BMessage *message)
 	switch (message->what) {
 		case MSG_STARTED:
 		case MSG_TERMINATED:
+		case MSG_MAIN_ARGS:
 		case MSG_ARGV_RECEIVED:
 		case MSG_REFS_RECEIVED:
 		case MSG_MESSAGE_RECEIVED:
@@ -337,6 +338,34 @@ LaunchContext::CheckNextMessage(LaunchCaller &caller, team_id team,
 	return (message && message->what == what);
 }
 
+// CheckMainArgsMessage
+bool
+LaunchContext::CheckMainArgsMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
+								bool useRef)
+{
+	int32 argc = 0;
+	const char **argv = NULL;
+	if (caller.SupportsArgv()) {
+		argc = kStandardArgc;
+		argv = kStandardArgv;
+	}
+	return CheckMainArgsMessage(caller, team, cookie, appRef, argc, argv,
+								useRef);
+}
+
+// CheckMainArgsMessage
+bool
+LaunchContext::CheckMainArgsMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
+								int32 argc, const char **argv, bool useRef)
+{
+	useRef &= caller.SupportsArgv() && argv && argc > 0;
+	const entry_ref *ref = (useRef ? caller.Ref() : NULL);
+	return CheckArgsMessage(caller, team, cookie, appRef, ref, argc, argv,
+							MSG_MAIN_ARGS);
+}
+
 // CheckArgvMessage
 bool
 LaunchContext::CheckArgvMessage(LaunchCaller &caller, team_id team,
@@ -368,8 +397,19 @@ LaunchContext::CheckArgvMessage(LaunchCaller &caller, team_id team,
 								const entry_ref *ref , int32 argc,
 								const char **argv)
 {
+	return CheckArgsMessage(caller, team, cookie, appRef, ref, argc, argv,
+							MSG_ARGV_RECEIVED);
+}
+
+// CheckArgsMessage
+bool
+LaunchContext::CheckArgsMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
+								const entry_ref *ref , int32 argc,
+								const char **argv, uint32 messageCode)
+{
 	BMessage *message = NextMessageFrom(team, cookie);
-	bool result = (message && message->what == MSG_ARGV_RECEIVED);
+	bool result = (message && message->what == messageCode);
 	int32 additionalRef = (ref ? 1 : 0);
 	// check argc
 	int32 foundArgc = -1;

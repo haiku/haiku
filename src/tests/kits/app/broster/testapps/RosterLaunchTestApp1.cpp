@@ -130,7 +130,7 @@ public:
 
 // main
 int
-main()
+main(int argc, char **argv)
 {
 	// find app file and get signature from resources
 	char path[B_PATH_NAME_LENGTH];
@@ -165,6 +165,12 @@ main()
 		BMessage message(MSG_STARTED);
 		message.AddString("path", path);
 		unitTesterMessenger.SendMessage(&message);
+		// send main() args message
+		BMessage argsMessage(MSG_MAIN_ARGS);
+		argsMessage.AddInt32("argc", argc);
+		for (int i = 0; i < argc; i++)
+			argsMessage.AddString("argv", argv[i]);
+		unitTesterMessenger.SendMessage(&argsMessage);
 		// run the app
 		app->Run();
 		delete app;

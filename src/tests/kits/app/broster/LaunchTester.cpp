@@ -331,6 +331,7 @@ CommonLaunchTest4(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -363,6 +364,7 @@ CommonLaunchTest5(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -395,6 +397,7 @@ CommonLaunchTest6(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -429,6 +432,7 @@ CommonLaunchTest7(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -465,6 +469,7 @@ CommonLaunchTest8(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -501,6 +506,7 @@ CommonLaunchTest9(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -539,6 +545,7 @@ CommonLaunchTest10(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -573,6 +580,7 @@ CommonLaunchTest11(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -603,6 +611,7 @@ CommonLaunchTest12(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -657,6 +666,7 @@ CommonLaunchTest13(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -708,6 +718,7 @@ CommonLaunchTest15(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -749,6 +760,7 @@ CommonLaunchTest16(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -759,6 +771,7 @@ CommonLaunchTest16(LaunchCaller &caller)
 	// checks 2
 	cookie = 0;
 	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller2, team2, cookie, &ref2));
 //	CHK(context.CheckMessageMessages(caller2, team2, cookie));
 	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -802,6 +815,7 @@ CommonLaunchTest17(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -812,6 +826,7 @@ CommonLaunchTest17(LaunchCaller &caller)
 	// checks 2
 	cookie = 0;
 	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller2, team2, cookie, &ref2));
 	CHK(context.CheckMessageMessages(caller2, team2, cookie));
 	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -851,6 +866,7 @@ CommonLaunchTest18(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -890,6 +906,7 @@ CommonLaunchTest19(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -940,6 +957,7 @@ CommonLaunchTest20(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -950,6 +968,7 @@ CommonLaunchTest20(LaunchCaller &caller)
 	// checks 2
 	cookie = 0;
 	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller2, team2, cookie, &ref2));
 //	CHK(context.CheckMessageMessages(caller2, team2, cookie));
 	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -997,6 +1016,7 @@ CommonLaunchTest21(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1007,6 +1027,7 @@ CommonLaunchTest21(LaunchCaller &caller)
 	// checks 2
 	cookie = 0;
 	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller2, team2, cookie, &ref2));
 	CHK(context.CheckMessageMessages(caller2, team2, cookie));
 	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1046,6 +1067,7 @@ CommonLaunchTest22(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1085,6 +1107,7 @@ CommonLaunchTest23(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1133,6 +1156,7 @@ CommonLaunchTest24(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1178,6 +1202,7 @@ CommonLaunchTest25(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1228,6 +1253,7 @@ CommonLaunchTest26(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1273,6 +1299,7 @@ CommonLaunchTest27(LaunchCaller &caller)
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team1, cookie, &ref1));
 //	CHK(context.CheckMessageMessages(caller, team1, cookie));
 	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
 //	if (caller.SupportsRefs() && !caller.SupportsArgv())
@@ -1382,6 +1409,7 @@ void LaunchTester::LaunchTestA4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1474,6 +1502,7 @@ void LaunchTester::LaunchTestB4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1508,6 +1537,7 @@ void LaunchTester::LaunchTestB5()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1602,6 +1632,7 @@ void LaunchTester::LaunchTestC4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref, 0, NULL));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1732,6 +1763,7 @@ void LaunchTester::LaunchTestD3()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1770,6 +1802,7 @@ void LaunchTester::LaunchTestD4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1811,6 +1844,7 @@ void LaunchTester::LaunchTestD5()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1823,8 +1857,8 @@ void LaunchTester::LaunchTestD5()
 	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
 					team_id *app_team) const
 	@case 6			ref is valid, file has type, the type's preferred app
-					type is not installed, app exists and has signature,
-					file is executable
+					type is not installed, app exists and has signature, file
+					has executable permission, but is not executable
 	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
 					Should not set the app hint on the app or file type.
 */
@@ -1877,6 +1911,7 @@ void LaunchTester::LaunchTestD7()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -1953,6 +1988,7 @@ void LaunchTester::LaunchTestD10()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2079,6 +2115,7 @@ void LaunchTester::LaunchTestE3()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2117,6 +2154,7 @@ void LaunchTester::LaunchTestE4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2158,6 +2196,7 @@ void LaunchTester::LaunchTestE5()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2170,8 +2209,8 @@ void LaunchTester::LaunchTestE5()
 	status_t Launch(const entry_ref *ref, const BList *messageList,
 					team_id *appTeam) const
 	@case 6			ref is valid, file has type, the type's preferred app
-					type is not installed, app exists and has signature,
-					file is executable
+					type is not installed, app exists and has signature, file
+					has executable permission, but is not executable
 	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
 					Should not set the app hint on the app or file type.
 */
@@ -2223,6 +2262,7 @@ void LaunchTester::LaunchTestE7()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2299,6 +2339,7 @@ void LaunchTester::LaunchTestE10()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2338,6 +2379,7 @@ void LaunchTester::LaunchTestE11()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2464,6 +2506,7 @@ void LaunchTester::LaunchTestF3()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2502,6 +2545,7 @@ void LaunchTester::LaunchTestF4()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2543,6 +2587,7 @@ void LaunchTester::LaunchTestF5()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2555,8 +2600,8 @@ void LaunchTester::LaunchTestF5()
 	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
 					team_id *appTeam) const
 	@case 6			ref is valid, file has type, the type's preferred app
-					type is not installed, app exists and has signature,
-					file is executable
+					type is not installed, app exists and has signature, file
+					has executable permission, but is not executable
 	@results		Should return B_LAUNCH_FAILED_EXECUTABLE.
 					Should not set the app hint on the app or file type.
 */
@@ -2608,6 +2653,7 @@ void LaunchTester::LaunchTestF7()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2683,6 +2729,7 @@ void LaunchTester::LaunchTestF10()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref, 0, NULL));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
@@ -2720,6 +2767,7 @@ void LaunchTester::LaunchTestF11()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref, 0, NULL));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));

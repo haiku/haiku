@@ -261,7 +261,6 @@ case 15:installed type mimeType, preferred app, app type not installed,
 		Should return B_OK and set team to the ID of the team running the
 		application's executable. Should install the app type and set the
 		app hint on it.
-
 case 16:launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY =>
 		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
 		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
@@ -385,8 +384,8 @@ case 5:	ref is valid, file has type and app hint, the type's preferred app
 		type's preferred application's executable. Should install the app
 		type and set the app hint on it.
 case 6:	ref is valid, file has type, the type's preferred app
-		type is not installed, app exists and has signature, file is
-		executable =>
+		type is not installed, app exists and has signature, file has
+		executable permission, but is not executable  =>
 		Should return B_LAUNCH_FAILED_EXECUTABLE.
 		Should not set the app hint on the app or file type.
 case 7:	ref is valid and refers to a link to a file, file has type,
@@ -428,8 +427,8 @@ case 5:	ref is valid, file has type and app hint, the type's preferred app
 		type's preferred application's executable. Should install the app
 		type and set the app hint on it.
 case 6:	ref is valid, file has type, the type's preferred app
-		type is not installed, app exists and has signature, file is
-		executable =>
+		type is not installed, app exists and has signature, file has
+		executable permission, but is not executable  =>
 		Should return B_LAUNCH_FAILED_EXECUTABLE.
 		Should not set the app hint on the app or file type.
 case 7:	ref is valid and refers to a link to a file, file has type,
@@ -479,8 +478,8 @@ case 5:	ref is valid, file has type and app hint, the type's preferred app
 		type and set the app hint on it.
 		ref is converted to path and added as additional argv.
 case 6:	ref is valid, file has type, the type's preferred app
-		type is not installed, app exists and has signature, file is
-		executable =>
+		type is not installed, app exists and has signature, file has
+		executable permission, but is not executable  =>
 		Should return B_LAUNCH_FAILED_EXECUTABLE.
 		Should not set the app hint on the app or file type.
 case 7:	ref is valid and refers to a link to a file, file has type,
