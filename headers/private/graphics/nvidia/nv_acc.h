@@ -130,15 +130,16 @@ typedef struct {
 	} Line32[0x08];				/* cmd can handle upto 8 lines with 32-bit coordinates */
 	struct {
 		uint32 Point;			/* b0-15 is X, b16-31 is Y */
-	} Polyline[0x20];			/* cmd can handle upto 32 polylines */
+	} Polyline[0x20];			/* cmd can handle upto 32 points polylines */
 	struct {
 		uint32 PointX;			/* b0-31 is X */
 		uint32 PointY;			/* b0-31 is Y */
-	} Polyline32[0x10];			/* command can handle upto 16 polylines with 32-bit coord's */
+	} Polyline32[0x10];			/* cmd can handle upto 16 point polylines with 32-bit coord's */
 	struct {
 		uint32 Color;			/* b0-31 is color */
 		uint32 Point;			/* b0-15 is X, b16-31 is Y */
-	} ColorPolyline[0x10];		/* cmd can handle upto 16 individually colored polylines */
+	} ColorPolyline[0x10];		/* cmd can handle upto 16 point polylines with individually
+								 * colored sections */
 } cmd_nv1_render_solid_lin;
 
 /* Someone defined this in XFree once (as 'RivaRectangle') but never used it:
