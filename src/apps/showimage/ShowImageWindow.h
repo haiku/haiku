@@ -52,7 +52,7 @@ public:
 	virtual void Quit();
 	
 	status_t InitCheck();
-	ShowImageView *GetShowImageView() const { return fpimageView; }
+	ShowImageView *GetShowImageView() const { return fpImageView; }
 	
 	void SetRef(const entry_ref *pref);
 	void UpdateTitle();
@@ -63,6 +63,8 @@ private:
 	BMenuItem *AddItemMenu(BMenu *pmenu, char *caption,
 		long unsigned int msg, char shortcut, uint32 modifier,
 		char target, bool enabled);
+
+	bool ToggleMenuItem(uint32 what);
 			
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
@@ -71,12 +73,12 @@ private:
 	bool CanQuit();
 		// returns true if the window can be closed safely, false if not
 
-	BFilePanel *fpsavePanel;
-	BMenuBar *fpbar;
-	BMenu *fppageMenu;
-	entry_ref *fpref;
-	ShowImageView *fpimageView;
-	ShowImageStatusView *fpstatusView;
+	BFilePanel *fpSavePanel;
+	BMenuBar *fpBar;
+	BMenu *fpPageMenu;
+	entry_ref *fpRef;
+	ShowImageView *fpImageView;
+	ShowImageStatusView *fpStatusView;
 };
 
 #endif /* _ShowImageWindow_h */

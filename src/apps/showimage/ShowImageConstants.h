@@ -46,6 +46,9 @@ const uint32 MSG_PAGE_FIRST			= 'mPGF';
 const uint32 MSG_PAGE_LAST			= 'mPGL';
 const uint32 MSG_PAGE_NEXT			= 'mPGN';
 const uint32 MSG_PAGE_PREV			= 'mPGP';
+const uint32 MSG_FILE_NEXT          = 'mFLN';
+const uint32 MSG_FILE_PREV          = 'mFLP';
+const uint32 MSG_FIT_TO_WINDOW_SIZE = 'mFWS';
 
 extern const char *APP_SIG;
 

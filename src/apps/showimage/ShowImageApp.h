@@ -47,8 +47,8 @@ private:
 	void StartPulse();
 	void Open(const entry_ref *pref);
 
-	BFilePanel *fpopenPanel;
-	bool fbpulseStarted;
+	BFilePanel *fpOpenPanel;
+	bool fbPulseStarted;
 };
 
 #endif /* _ShowImageApp_h */

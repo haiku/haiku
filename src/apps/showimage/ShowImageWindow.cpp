@@ -51,24 +51,28 @@
 ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
-	fpsavePanel = NULL;
-	fpref = NULL;
+	fpSavePanel = NULL;
+	fpRef = NULL;
+	
+	// add shortcuts
+	AddShortcut(B_UP_ARROW, B_COMMAND_KEY, new BMessage(MSG_FILE_PREV));
+	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(MSG_FILE_NEXT));
 	
 	// create menu bar	
-	fpbar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
-	LoadMenus(fpbar);
-	AddChild(fpbar);
+	fpBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
+	LoadMenus(fpBar);
+	AddChild(fpBar);
 
 	BRect viewFrame = Bounds();
-	viewFrame.top		= fpbar->Bounds().bottom + 1;
+	viewFrame.top		= fpBar->Bounds().bottom + 1;
 	viewFrame.right		-= B_V_SCROLL_BAR_WIDTH;
 	viewFrame.bottom	-= B_H_SCROLL_BAR_HEIGHT;
 	
 	// create the image view	
-	fpimageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
-		B_WILL_DRAW | B_FRAME_EVENTS);	
+	fpImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED);	
 	// wrap a scroll view around the view
-	BScrollView *pscrollView = new BScrollView("image_scroller", fpimageView,
+	BScrollView *pscrollView = new BScrollView("image_scroller", fpImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
 	AddChild(pscrollView);
 	
@@ -79,23 +83,23 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	rect.left 	= viewFrame.left + kstatusWidth;
 	rect.right	= viewFrame.right;	
 	BScrollBar *phscroll;
-	phscroll = new BScrollBar(rect, "hscroll", fpimageView, 0, 150,
+	phscroll = new BScrollBar(rect, "hscroll", fpImageView, 0, 150,
 		B_HORIZONTAL);
 	AddChild(phscroll);
 
 	rect.left = 0;
 	rect.right = kstatusWidth - 1;	
-	fpstatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
+	fpStatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
 		B_WILL_DRAW);
-	fpstatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
-	AddChild(fpstatusView);
+	fpStatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	AddChild(fpStatusView);
 	
 	rect = Bounds();
 	rect.top    = viewFrame.top;
 	rect.left 	= viewFrame.right + 1;
 	rect.bottom	= viewFrame.bottom;
 	BScrollBar *pvscroll;
-	pvscroll = new BScrollBar(rect, "vscroll", fpimageView, 0, 150, B_VERTICAL);
+	pvscroll = new BScrollBar(rect, "vscroll", fpImageView, 0, 150, B_VERTICAL);
 	AddChild(pvscroll);
 	
 	SetSizeLimits(250, 100000, 100, 100000);
@@ -104,20 +108,22 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	SetRef(pref);
 	UpdateTitle();
 
-	fpimageView->SetImage(pref);
+	fpImageView->SetImage(pref);
+
+	SetPulseRate(100000); // every 1/10 second; ShowImageView needs it for marching ants
 
 	Show();
 }
 
 ShowImageWindow::~ShowImageWindow()
 {
-	delete fpref;
+	delete fpRef;
 }
 
 status_t
 ShowImageWindow::InitCheck()
 {
-	if (!fpref || !fpimageView)
+	if (!fpRef || !fpImageView)
 		return B_ERROR;
 	else
 		return B_OK;
@@ -126,16 +132,16 @@ ShowImageWindow::InitCheck()
 void
 ShowImageWindow::SetRef(const entry_ref *pref)
 {
-	if (!fpref)
-		fpref = new entry_ref(*pref);
+	if (!fpRef)
+		fpRef = new entry_ref(*pref);
 	else
-		*fpref = *pref;
+		*fpRef = *pref;
 }
 
 void
 ShowImageWindow::UpdateTitle()
 {
-	BEntry entry(fpref);
+	BEntry entry(fpRef);
 	if (entry.InitCheck() == B_OK) {
 		BPath path;
 		entry.GetPath(&path);
@@ -173,7 +179,7 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', false);
 	pbar->AddItem(pmenu);
 
-	pmenu = fppageMenu = new BMenu("Page");
+	pmenu = fpPageMenu = new BMenu("Page");
 	AddItemMenu(pmenu, "First", MSG_PAGE_FIRST, 'F', 0, 'W', true);
 	AddItemMenu(pmenu, "Last", MSG_PAGE_LAST, 'L', 0, 'W', true);
 	AddItemMenu(pmenu, "Next", MSG_PAGE_NEXT, 'N', 0, 'W', true);
@@ -182,6 +188,7 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
 	pbar->AddItem(pmenu);
 }
 
@@ -207,7 +214,7 @@ ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 	// set the window's min & max size limits
 	// based on document's data bounds
 	float maxWidth = pbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH;
-	float maxHeight = pbitmap->Bounds().Height() + fpbar->Frame().Height() +
+	float maxHeight = pbitmap->Bounds().Height() + fpBar->Frame().Height() +
 		B_H_SCROLL_BAR_HEIGHT + 1;
 	float minWidth = min(maxWidth, 100.0f);
 	float minHeight = min(maxHeight, 100.0f);
@@ -237,13 +244,26 @@ ShowImageWindow::FrameResized(float width, float height)
 {
 }
 
+bool
+ShowImageWindow::ToggleMenuItem(uint32 what)
+{
+	BMenuItem *item;
+	bool marked = false;
+	item = fpBar->FindItem(what);
+	if (item != NULL) {
+		marked = !item->IsMarked();
+		item->SetMarked(marked);
+	}
+	return marked;
+}
+
 void
 ShowImageWindow::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
 		case MSG_OUTPUT_TYPE:
 			// User clicked Save As then choose an output format
-			if (!fpsavePanel)
+			if (!fpSavePanel)
 				// If user doesn't already have a save panel open
 				SaveAs(pmsg);
 			break;
@@ -259,21 +279,27 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 			
 		case B_CANCEL:
-			delete fpsavePanel;
-			fpsavePanel = NULL;
+			delete fpSavePanel;
+			fpSavePanel = NULL;
 			break;
 			
 		case MSG_UPDATE_STATUS:
 		{
-			bool benable = (fpimageView->PageCount() > 1) ? true : false;
-			if (fppageMenu->IsEnabled() != benable)
+			bool benable = (fpImageView->PageCount() > 1) ? true : false;
+			if (fpPageMenu->IsEnabled() != benable)
 				// Only call this function if the state is changing
 				// to avoid flickering
-				fppageMenu->SetEnabled(benable);
+				fpPageMenu->SetEnabled(benable);
 				
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
-				fpstatusView->SetText(str);
+				fpStatusView->SetText(str);
+			
+			entry_ref ref;
+			if (pmsg->FindRef("ref", &ref) == B_OK) {
+				SetRef(&ref);
+				UpdateTitle();
+			}
 			break;
 		}
 
@@ -291,27 +317,41 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 			
 		case MSG_PAGE_FIRST:
-			fpimageView->FirstPage();
+			fpImageView->FirstPage();
 			break;
 			
 		case MSG_PAGE_LAST:
-			fpimageView->LastPage();
+			fpImageView->LastPage();
 			break;
 			
 		case MSG_PAGE_NEXT:
-			fpimageView->NextPage();
+			fpImageView->NextPage();
 			break;
 			
 		case MSG_PAGE_PREV:
-			fpimageView->PrevPage();
+			fpImageView->PrevPage();
 			break;
 
 		case MSG_DITHER_IMAGE:
-		     BMenuItem *pmenuDither;
-	    	 pmenuDither = fpbar->FindItem(pmsg->what);
-		     pmenuDither->SetMarked(!pmenuDither->IsMarked());
-		     break;
-		 
+			ToggleMenuItem(pmsg->what);
+			break;
+		
+		case MSG_FIT_TO_WINDOW_SIZE:
+			{
+				bool resize;
+				resize = ToggleMenuItem(pmsg->what);
+				fpImageView->ResizeToViewBounds(resize);
+			}
+			break;
+
+		case MSG_FILE_PREV:
+			fpImageView->PrevFile();
+			break;
+			
+		case MSG_FILE_NEXT:
+			fpImageView->NextFile();
+			break;
+					
 		default:
 			BWindow::MessageReceived(pmsg);
 			break;
@@ -338,12 +378,12 @@ ShowImageWindow::SaveAs(BMessage *pmsg)
 	ppanelMsg->AddInt32(TYPE_FLD, outType);
 
 	// Create save panel and show it
-	fpsavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
+	fpSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
 		false, ppanelMsg);
-	if (!fpsavePanel)
+	if (!fpSavePanel)
 		return;
-	fpsavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
-	fpsavePanel->Show();
+	fpSavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
+	fpSavePanel->Show();
 }
 
 void
@@ -375,7 +415,7 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 		return;
 	
 	// Translate the image and write it out to the output file
-	BBitmapStream stream(fpimageView->GetBitmap());	
+	BBitmapStream stream(fpImageView->GetBitmap());	
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (proster->Translate(outTranslator, &stream, NULL,
 		&file, outType) != B_OK) {
@@ -392,7 +432,7 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 bool
 ShowImageWindow::CanQuit()
 {
-	if (fpsavePanel)
+	if (fpSavePanel)
 		// Don't allow this window to be closed if a save panel is open
 		return false;
 	else

@@ -39,10 +39,10 @@ public:
 	
 	virtual void Draw(BRect updateRect);
 	
-	void SetText(BString &strText);
+	void SetText(BString &text);
 	
 private:
-    BString fstrText;
+    BString fText;
 };
 
 #endif /* _ShowImageStatusView_h */

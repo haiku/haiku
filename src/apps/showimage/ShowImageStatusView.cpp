@@ -37,12 +37,12 @@ ShowImageStatusView::ShowImageStatusView(BRect rect, const char* name,
 void
 ShowImageStatusView::Draw(BRect updateRect)
 {
-	DrawString(fstrText.String(), BPoint(3, 11));
+	DrawString(fText.String(), BPoint(3, 11));
 }
 
 void
-ShowImageStatusView::SetText(BString &strText)
+ShowImageStatusView::SetText(BString &text)
 {
-	fstrText = strText;
+	fText = text;
 	Invalidate();
 }
