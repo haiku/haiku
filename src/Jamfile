@@ -7,5 +7,5 @@ SubInclude OBOS_TOP src kits ;
 SubInclude OBOS_TOP src libs ;
 SubInclude OBOS_TOP src prefs ;
 SubInclude OBOS_TOP src servers ;
-#SubInclude OBOS_TOP src tests ;
+SubInclude OBOS_TOP src tests ;
 SubInclude OBOS_TOP src tools ;
