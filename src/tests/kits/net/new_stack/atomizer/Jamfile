@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tests kits net new_stack atomizer ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel generic atomizer ] ;
+
+Addon <userland>atomizer : userland generic :
+	atomizer.c
+;
+
+LinkSharedOSLibs <userland>atomizer : <installed>stack_tester ;
