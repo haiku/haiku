@@ -4,16 +4,21 @@ KernelLd boot_loader :
 	boot_platform_$(OBOS_BOOT_PLATFORM).o
 	boot_loader.a
 
-	# posix functions needed by the stage2 boot loader
+
+	# libroot functions needed by the stage2 boot loader
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strdup.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
 	:
