@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.16-2 running.\n"));
+	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.16-final running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -602,9 +602,6 @@ status_t g450_general_powerup()
 
 	/* log the PINS struct settings */
 	dump_pins();
-
-//test:
-//gx50_general_output_select();
 
 	/* check output connector setup */
 	if (si->ps.primary_dvi && si->ps.secondary_head &&
