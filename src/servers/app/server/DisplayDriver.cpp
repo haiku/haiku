@@ -1333,7 +1333,7 @@ void DisplayDriver::ObscureCursor(void)
 	
 	The driver does not take ownership of the given cursor. Subclasses should make
 	a copy of the cursor passed to it. The default version of this function hides the
-	cursory, replaces it, and shows the cursor if previously visible.
+	cursor, replaces it, and shows the cursor if previously visible.
 */
 void DisplayDriver::SetCursor(ServerCursor *cursor)
 {

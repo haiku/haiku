@@ -426,7 +426,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<port_id>( &looperPort );
 			msg->ReadString( &title );
 
-			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
+			STRACE(("ServerApp %s: Got 'New Window' message, trying to do something...\n",
 					_signature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port

@@ -283,7 +283,7 @@ BRegion::PrintToStream() const
 }
 
 
-/*!	\brief Offses all region's rects, and bounds by the given values.
+/*!	\brief Offsets all region's rects, and bounds by the given values.
 	\param dh The horizontal offset.
 	\param dv The vertical offset.
 */
