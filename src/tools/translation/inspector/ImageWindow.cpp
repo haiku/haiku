@@ -61,6 +61,26 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	pmnufile->AddItem(pitmquit);
 	pbar->AddItem(pmnufile);
 	
+	BMenu *pmnuview = new BMenu("View");
+	BMenuItem *pitmfirst = new BMenuItem("First Page",
+		new BMessage(M_VIEW_FIRST_PAGE), 'F', 0);
+		
+	BMenuItem *pitmlast = new BMenuItem("Last Page",
+		new BMessage(M_VIEW_LAST_PAGE), 'L', 0);
+		
+	BMenuItem *pitmnext = new BMenuItem("Next Page",
+		new BMessage(M_VIEW_NEXT_PAGE), 'N', 0);
+		
+	BMenuItem *pitmprev = new BMenuItem("Previous Page",
+		new BMessage(M_VIEW_PREV_PAGE), 'P', 0);
+		
+	pmnuview->AddItem(pitmfirst);
+	pmnuview->AddItem(pitmlast);
+	pmnuview->AddItem(pitmnext);
+	pmnuview->AddItem(pitmprev);
+	pbar->AddItem(pmnuview);
+	
+	
 	BMenu *pmnuwindow = new BMenu("Window");
 	BMenuItem *pitmactives = new BMenuItem("Active Translators",
 		new BMessage(M_ACTIVE_TRANSLATORS_WINDOW), 'T', 0);
@@ -126,6 +146,19 @@ ImageWindow::MessageReceived(BMessage *pmsg)
 			fpimageView->SetImage(pmsg);
 			break;
 			
+		case M_VIEW_FIRST_PAGE:
+			fpimageView->FirstPage();
+			break;
+		case M_VIEW_LAST_PAGE:
+			fpimageView->LastPage();
+			break;
+		case M_VIEW_NEXT_PAGE:
+			fpimageView->NextPage();
+			break;
+		case M_VIEW_PREV_PAGE:
+			fpimageView->PrevPage();
+			break;
+					
 		case B_CANCEL:
 			break;
 			

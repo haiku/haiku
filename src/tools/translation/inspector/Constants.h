@@ -40,7 +40,10 @@
 #define M_INFO_WINDOW						'infw'
 #define M_INFO_WINDOW_QUIT					'infq'
 #define M_INFO_WINDOW_TEXT					'inft'
-
+#define M_VIEW_FIRST_PAGE					'vwfp'
+#define M_VIEW_LAST_PAGE					'vwlp'
+#define M_VIEW_NEXT_PAGE					'vwnp'
+#define M_VIEW_PREV_PAGE					'vwpp'
 
 // String constants
 #define APP_SIG				"application/x-vnd.OBOS-Inspector"

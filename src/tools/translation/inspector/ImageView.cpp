@@ -63,6 +63,8 @@ ImageView::ImageView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	fpbitmap = NULL;
+	fdocumentIndex = 1;
+	fdocumentCount = 1;
 	
 	SetViewColor(192, 192, 192);
 	SetHighColor(0, 0, 0);
@@ -166,12 +168,12 @@ ImageView::SaveImageAtDropLocation(BMessage *pmsg)
 {
 	// Find the location and name of the drop and
 	// write the image file there
-	
 	BBitmapStream stream(fpbitmap);
 	
 	StatusCheck chk;
 		// throw an exception if this is assigned 
 		// anything other than B_OK
+
 	try {
 		entry_ref dirref;
 		chk = pmsg->FindRef("directory", &dirref);
@@ -320,8 +322,9 @@ char_format(uint32 num)
 // Send information about the currently open image to the
 // BApplication object so it can send it to the InfoWindow
 void
-ImageView::UpdateInfoWindow(const BPath &path, const translator_info &tinfo,
-	const char *tranname, const char *traninfo, int32 tranversion)
+ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
+	const translator_info &tinfo, const char *tranname, const char *traninfo,
+	int32 tranversion)
 {
 	BMessage msg(M_INFO_WINDOW_TEXT);
 	BString bstr;
@@ -347,6 +350,15 @@ ImageView::UpdateInfoWindow(const BPath &path, const translator_info &tinfo,
 		hex_format(tinfo.group) << ")\n";
 	bstr << "Quality: " << tinfo.quality << "\n";
 	bstr << "Capability: " << tinfo.capability << "\n";
+	
+	// Extension Info
+	bstr << "\nExtension Info:\n";
+	int32 document_count = 0, document_index = 0;
+	if (ioExtension.FindInt32("/documentCount", &document_count) == B_OK)
+		bstr << "Number of Documents: " << document_count << "\n";
+	if (ioExtension.FindInt32("/documentIndex", &document_index) == B_OK)
+		bstr << "Selected Document: " << document_index << "\n";
+		
 	
 	// Translator Info
 	bstr << "\nTranslator Used:\n";
@@ -391,12 +403,16 @@ ImageView::SetImage(BMessage *pmsg)
 	// Replace current image with the image
 	// specified in the given BMessage
 	
+	entry_ref ref;
+	if (!pmsg)
+		ref = fcurrentRef;
+	else if (pmsg->FindRef("refs", &ref) != B_OK)
+		// If refs not found, just ignore the message
+		return;
+	
 	StatusCheck chk;
 	
 	try {
-		entry_ref ref;
-		chk = pmsg->FindRef("refs", &ref);
-
 		BFile file(&ref, B_READ_ONLY);
 		chk = file.InitCheck();
 
@@ -408,7 +424,9 @@ ImageView::SetImage(BMessage *pmsg)
 		
 		// determine what type the image is
 		translator_info tinfo;
-		chk = proster->Identify(&file, NULL, &tinfo, 0, NULL,
+		BMessage ioExtension;
+		chk = ioExtension.AddInt32("/documentIndex", fdocumentIndex);
+		chk = proster->Identify(&file, &ioExtension, &tinfo, 0, NULL,
 			B_TRANSLATOR_BITMAP);
 			
 		// get the name and info about the translator
@@ -419,12 +437,20 @@ ImageView::SetImage(BMessage *pmsg)
 			
 		// perform the actual translation
 		BBitmapStream outstream;
-		chk = proster->Translate(&file, &tinfo, NULL, &outstream,
+		chk = proster->Translate(&file, &tinfo, &ioExtension, &outstream,
 			B_TRANSLATOR_BITMAP);
 		BBitmap *pbitmap = NULL;
 		chk = outstream.DetachBitmap(&pbitmap);
 		fpbitmap = pbitmap;
 		pbitmap = NULL;
+		fcurrentRef = ref;
+			// need to keep the ref around if user was to switch pages
+		int32 documentCount = 0;
+		if (ioExtension.FindInt32("/documentCount", &documentCount) ==
+			B_OK && documentCount > 0)
+			fdocumentCount = documentCount;
+		else
+			fdocumentCount = 1;
 		
 		// Set the name of the Window to reflect the file name
 		BWindow *pwin = Window();
@@ -438,7 +464,7 @@ ImageView::SetImage(BMessage *pmsg)
 		} else
 			pwin->SetTitle(IMAGEWINDOW_TITLE);
 			
-		UpdateInfoWindow(path, tinfo, tranname, traninfo, tranversion);
+		UpdateInfoWindow(path, ioExtension, tinfo, tranname, traninfo, tranversion);
 		
 		// Resize parent window and set size limits to 
 		// reflect the size of the new bitmap
@@ -476,6 +502,42 @@ ImageView::SetImage(BMessage *pmsg)
 		BAlert *palert = new BAlert(NULL,
 			"Sorry, unable to load the image.", "OK");
 		palert->Go();
+	}
+}
+
+void
+ImageView::FirstPage()
+{
+	if (fdocumentIndex != 1) {
+		fdocumentIndex = 1;
+		SetImage(NULL);
+	}
+}
+
+void
+ImageView::LastPage()
+{
+	if (fdocumentIndex != fdocumentCount) {
+		fdocumentIndex = fdocumentCount;
+		SetImage(NULL);
+	}
+}
+
+void
+ImageView::NextPage()
+{
+	if (fdocumentIndex < fdocumentCount) {
+		fdocumentIndex++;
+		SetImage(NULL);
+	}
+}
+
+void
+ImageView::PrevPage()
+{
+	if (fdocumentIndex > 1) {
+		fdocumentIndex--;
+		SetImage(NULL);
 	}
 }
 
