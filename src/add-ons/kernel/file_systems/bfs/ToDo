@@ -56,7 +56,7 @@ Indices
 
  - consider Index::UpdateLastModified() writing back the updated inode
  - clearing up Index::Update() and live query update (seems to be a bit confusing right now)
-
+ - investigate adding an index cache to improve performance
 
 Attributes
 
