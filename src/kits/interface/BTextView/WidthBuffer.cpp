@@ -39,6 +39,10 @@ struct hashed_escapement
 {
 	uint32 code;
 	float escapement;
+	hashed_escapement() {
+		code = (uint32)-1;
+		escapement = 0;
+	}
 };
 
 
@@ -217,11 +221,6 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 	table.tableCount = kTableCount;
 	table.widths = deltas;
 	
-	for (uint32 i = 0; i < kTableCount; i++) {
-		deltas[i].code = (uint32)-1;
-		deltas[i].escapement = 0;
-	}
-	
 	int32 position = fItemCount;
 	InsertItemsAt(1, position, &table);
 	
@@ -339,10 +338,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 					
 					// Create and initialize a new hash table
 					hashed_escapement *newWidths = new hashed_escapement[newSize];
-					for (int32 x = 0; x < newSize; x++) {
-						newWidths[x].code = (uint32)-1;
-						newWidths[x].escapement = 0;
-					}
+
 					// Rehash the values, and put them into the new table
 					for (int32 oldPos = 0; oldPos < table->tableCount; oldPos++) {
 						if (widths[oldPos].code != (uint32) -1) {
