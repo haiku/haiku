@@ -721,6 +721,19 @@ BTranslationUtils::WriteStyledEditFile(BTextView *fromView, BFile *intoFile)
 	result = intoFile->SetSize(textLength);
 	if (result != B_OK)
 		return result;
+
+	// get the BVolume that this file is on and
+	// check the volume for the attribute support
+	node_ref nref;
+	result = intoFile->GetNodeRef(&nref);
+	if (result != B_OK)
+		return result;
+	BVolume volume(nref.device);
+	result = volume.InitCheck();
+	if (result != B_OK)
+		return result;
+	if (!volume.KnowsAttr())
+		return B_OK;
 	
 	// Write attributes
 	// BEOS:TYPE
