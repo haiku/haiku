@@ -37,7 +37,7 @@
 #include <string.h>
 
 
-#define TRACE_BOOT
+//#define TRACE_BOOT
 #ifdef TRACE_BOOT
 #	define TRACE(x) dprintf x
 #else
@@ -87,41 +87,52 @@ _start(kernel_args *oldka, int cpu_num)
 		dprintf("Welcome to kernel debugger output!\n");
 
 		// init modules
+		TRACE(("init CPU\n"));
 		cpu_init(&ka);
+		TRACE(("init interrupts\n"));
 		int_init(&ka);
 
+		TRACE(("init VM\n"));
 		vm_init(&ka);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
-
-		TRACE(("vm up\n"));
 
 		// now we can use the heap and create areas
 		debug_init_post_vm(&ka);
 		int_init_post_vm(&ka);
 		cpu_init_post_vm(&ka);
 
+		TRACE(("init faults\n"));
 		faults_init(&ka);
+		TRACE(("init SMP\n"));
 		smp_init(&ka);
-		rtc_init(&ka);
+		TRACE(("init timer\n"));
 		timer_init(&ka);
+		TRACE(("init real time clock\n"));
+		rtc_init(&ka);
 
+		TRACE(("init semaphores\n"));
 		sem_init(&ka);
 
-		TRACE(("##################################################################\n"));
-		TRACE(("semaphores now available\n"));
-		TRACE(("##################################################################\n"));
-
 		// now we can create and use semaphores
+		TRACE(("init VM semaphores\n"));
 		vm_init_post_sem(&ka);
+		TRACE(("init cbuf\n"));
 		cbuf_init();
+		TRACE(("init VFS\n"));
 		vfs_init(&ka);
+		TRACE(("init teams\n"));
 		team_init(&ka);
+		TRACE(("init threads\n"));
 		thread_init(&ka);
+		TRACE(("init ports\n"));
 		port_init(&ka);
+		TRACE(("init kernel daemons\n"));
 		kernel_daemon_init();
 
+		TRACE(("init VM threads\n"));
 		vm_init_post_thread(&ka);
+		TRACE(("init ELF loader\n"));
 		elf_init(&ka);
 
 		// start a thread to finish initializing the rest of the system
@@ -135,10 +146,8 @@ _start(kernel_args *oldka, int cpu_num)
 		smp_per_cpu_init(&ka, cpu_num);
 		thread_per_cpu_init(cpu_num);
 	}
-	TRACE(("##################################################################\n"));
-	TRACE(("interrupts now enabled\n"));
-	TRACE(("##################################################################\n"));
 
+	TRACE(("enable interrupts, exit kernel startup\n"));
 	kernel_startup = false;
 	enable_interrupts();
 
