@@ -14,11 +14,17 @@
 
 #include <stdlib.h>
 
+//#define TRACE_TIME
+#ifdef TRACE_TIME
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x)
+#endif
 
 static struct real_time_data *sRealTimeData;
 static bool sIsGMT = false;
 static char sTzFilename[B_PATH_NAME_LENGTH] = "";
-static int32 sTimezoneOffset = 0;
+static bigtime_t sTimezoneOffset = 0;
 static bool sDaylightSavingTime = false;
 
 
@@ -29,8 +35,9 @@ rtc_system_to_hw(void)
 {
 	uint32 seconds;
 
-	seconds = (sRealTimeData->system_time_offset + system_time()) / 1000000
-					- (sIsGMT ? 0 : sTimezoneOffset);
+	seconds = (sRealTimeData->system_time_offset + system_time() 
+		- (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
+	
 	arch_rtc_set_hw_time(seconds);
 }
 
@@ -164,9 +171,13 @@ _user_set_tzspecs(int32 timezone_offset, bool dst_observed)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 	
-	sRealTimeData->system_time_offset += (sIsGMT ? 0 : sTimezoneOffset);
-	sTimezoneOffset = timezone_offset;
-	sRealTimeData->system_time_offset -= (sIsGMT ? 0 : sTimezoneOffset);
+	TRACE(("old system_time_offset %Ld\n", sRealTimeData->system_time_offset));
+	
+	sRealTimeData->system_time_offset += sIsGMT ? 0 : sTimezoneOffset;
+	sTimezoneOffset = (bigtime_t)timezone_offset * 1000000;
+	sRealTimeData->system_time_offset -= sIsGMT ? 0 : sTimezoneOffset;
+	
+	TRACE(("new system_time_offset %Ld\n", sRealTimeData->system_time_offset));
 	
 	sDaylightSavingTime = dst_observed;
 	return B_OK;
