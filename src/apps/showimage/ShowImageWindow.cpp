@@ -45,6 +45,7 @@
 #include <Screen.h>
 #include <Roster.h>
 #include <PrintJob.h>
+#include <Clipboard.h>
 
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
