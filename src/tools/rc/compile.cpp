@@ -119,7 +119,9 @@ void free_mem(void* ptr)
 static void clean_up_mem()
 {
 #ifdef DEBUG
-	printf("mem_list leaks %ld objects\n", mem_list.size());
+	if (mem_list.size() != 0) {
+		printf("mem_list leaks %ld objects\n", mem_list.size());
+	}
 	for (mem_iter_t i = mem_list.begin(); i != mem_list.end(); )
 	{
 		printf("%p allocated at %s:%ld\n", i->ptr, i->file, i->line);	
