@@ -220,8 +220,6 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
 	
-	ColorMenuItem *ColorItem; 
-	
 	fFontColorMenu->AddItem(fBlackItem= new BMenuItem("Black", new BMessage(FONT_COLOR)));
 	fBlackItem->SetMarked(true); 
 	fFontColorMenu->AddItem(fRedItem= new ColorMenuItem("Red", RED, new BMessage(FONT_COLOR)));
@@ -904,10 +902,8 @@ StyledEditWindow::SaveAs(BMessage *message)
 		menuBar->AddItem(fSavePanelEncodingMenu);
 		fSavePanelEncodingMenu->SetRadioMode(true);
 
-		status_t status = B_OK;
 		BCharacterSetRoster roster;
 		BCharacterSet charset;
-		int index = 0;
 		while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
 			BString name(charset.GetPrintName());
 			const char * mime = charset.GetMIMEName();
@@ -1147,7 +1143,6 @@ StyledEditWindow::Print(const char *documentname)
 		return;
 	}
 	// information from printJob
-	BRect paper_rect = printJob.PaperRect();
 	BRect printable_rect = printJob.PrintableRect();	
 	int32 firstPage = printJob.FirstPage();
 	int32 lastPage = printJob.LastPage();
@@ -1301,9 +1296,6 @@ StyledEditWindow::Replace(BString findthis, BString replaceWith,  bool casesens,
 void
 StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 {
-	int32	start;
-	int32	oldstart;
-	
 	BString viewText(fTextView->Text());
 	if (caseSens)
 		viewText.ReplaceAll(findIt.String(),replaceWith.String());

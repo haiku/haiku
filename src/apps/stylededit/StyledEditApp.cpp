@@ -60,7 +60,6 @@ StyledEditApp::StyledEditApp()
 	menuBar->AddItem(fOpenPanelEncodingMenu);
 	fOpenPanelEncodingMenu->SetRadioMode(true);
 
-	status_t status = B_OK;
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
