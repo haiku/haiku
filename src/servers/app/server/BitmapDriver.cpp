@@ -603,8 +603,8 @@ void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source,
 				memcpy(dest_bits,src_bits,line_length);
 		
 				// Increment offsets
-		   		src_bits += src_width;
-		   		dest_bits += dest_width;
+				src_bits += src_width;
+				dest_bits += dest_width;
 			}
 			break;
 		}
@@ -772,10 +772,114 @@ void BitmapDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
 }
 
-void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+
+/*!
+	\brief Copy a ServerBitmap to the BitmapDriver's internal ServerBitmap
+	\param bitmap The ServerBitmap source of the copy
+	\param sourcerect The source rectangle of the copy
+	\param dest The destination position of the copy (no scaling occurs)
+	\param d The DrawData (currently unused)
+*/
+
+// TODO: dest should really become a BPoint to avoid confusion
+// TODO: can we unify CopyBitmap and CopyToBitmap somehow, to avoid the
+//       near-total code duplication?
+
+void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, const BRect &dest, const DrawData *d)
 {
+	if(!bitmap)
+	{
+		printf("CopyBitmap returned - not init or NULL bitmap\n");
+		return;
+	}
+	
+	if(((uint32)bitmap->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	{
+		printf("CopyBitmap returned - unequal buffer pixel depth\n");
+		return;
+	}
+
+	// dest shows position only, not size (i.e. no scaling), so we
+	// emphasize that point by using the source rect and offsetting it
+	BRect destrect(sourcerect), source(sourcerect);
+	destrect.OffsetTo(dest.left, dest.top);
+	
+	uint8 colorspace_size=bitmap->BitsPerPixel()/8;
+	
+	// First, clip source rect to destination
+	if(source.Width() > destrect.Width())
+		source.right=source.left+destrect.Width();
+	
+	if(source.Height() > destrect.Height())
+		source.bottom=source.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect(_target->Bounds());
+	
+	if( !(work_rect.Contains(destrect)) )
+	{
+		// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+
+	if(!work_rect.Contains(sourcerect))
+		return;
+
+	if( !(work_rect.Contains(source)) )
+	{
+		// something in selection must be clipped
+		if(source.left < 0)
+			source.left = 0;
+		if(source.right > work_rect.right)
+			source.right = work_rect.right;
+		if(source.top < 0)
+			source.top = 0;
+		if(source.bottom > work_rect.bottom)
+			source.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *dest_bits  = (uint8*) _target->Bits();	
+	uint8 *src_bits = (uint8*) bitmap->Bits();
+
+	// Get row widths for offset looping
+	uint32 dest_width  = uint32 (_target->BytesPerRow());
+	uint32 src_width = uint32 (bitmap->BytesPerRow());
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+	
+	
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (source.bottom-source.top+1);
+
+	for (uint32 pos_y=0; pos_y<lines; pos_y++)
+	{
+		memcpy(dest_bits,src_bits,line_length);
+
+		// Increment offsets
+ 		src_bits += src_width;
+ 		dest_bits += dest_width;
+	}
 }
 
+
+/*!
+	\brief Copy from the BitmapDriver's internal ServerBitmap to a ServerBitmap
+	\param destbmp The ServerBitmap destination of the copy
+	\param sourcerect The source rectangle of the copy
+*/
 void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 {
 	if(!destbmp)
