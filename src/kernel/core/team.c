@@ -378,7 +378,7 @@ create_team_struct(const char *name, bool kernel)
 	p->state = TEAM_STATE_BIRTH;
 	p->pending_signals = SIG_NONE;
 	p->death_sem = -1;
-	p->user_env_base = NULL;
+	p->user_env_base = 0;
 
 	if (arch_team_init_team_struct(p, kernel) < 0)
 		goto error1;
