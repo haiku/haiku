@@ -798,6 +798,7 @@ const char *jambase[] = {
 "LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(SUBDIR) ;\n",
 "LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;\n",
 "SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) ] ;\n",
+"HDRGRIST = $(SOURCE_GRIST) ;\n",
 "SUBDIR$(SUBDIRRESET) = ;\n",
 "$(SUBDIRRULES) $(<) ;\n",
 "}\n",
