@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Handle.h"
@@ -132,7 +132,7 @@ status_t
 platform_get_boot_partition(struct stage2_args *args, Node *device,
 	NodeList *list, boot::Partition **_partition)
 {
-	NodeIterator iterator = list->Iterator();
+	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		// ToDo: just take the first partition for now
