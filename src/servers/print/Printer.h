@@ -110,8 +110,8 @@ private:
 	status_t LoadPrinterAddon(image_id& id);
 	void AddCurrentPrinter(BMessage* m);
 
+	SpoolFolder fPrinter;      // the printer spooling directory
 	Resource* fResource;       // the resource required for processing a print job
-	SpoolFolder fPrinter;           // the printer spooling directory
 	bool fSinglePrintThread;   // is printer add-on allowed to process multiple print job at once
 	Job* fJob;                 // the next job to process
 	vint32 fProcessing;        // the current nmber of processing threads
