@@ -43,11 +43,20 @@ class Inode {
 		bool IsDirectory() const { return true; }
 
 	private:
+		friend void dump_inode(Inode &inode);
+
 		Volume	*fVolume;
 		BFile	fFile;
 		off_t	fSize;
 		ReadWriteLock	fLock;
 		int32	fMode;
+		
+		// for dump_inode() only:
+		off_t	fOldSize;
+		off_t	fOldLastModified;
+		off_t	fBlockNumber;
+		void	*fTree;
+		void	*fAttributes;
 };
 
 #endif	/* INODE_H */
