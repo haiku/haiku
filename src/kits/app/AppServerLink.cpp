@@ -31,7 +31,6 @@
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
-#include <PortLink.h>
 
 // Project Includes ------------------------------------------------------------
 #include <AppServerLink.h>
@@ -44,23 +43,19 @@
 
 namespace BPrivate {
 
-//------------------------------------------------------------------------------
-BAppServerLink::BAppServerLink()
+BAppServerLink::BAppServerLink(void)
+ : PortLink(0L)
 {
 	be_app->Lock();
-	portlink=new PortLink(be_app->fServerFrom);
+	SetPort(be_app->fServerFrom);
 }
+
 //------------------------------------------------------------------------------
+
 BAppServerLink::~BAppServerLink()
 {
-	delete portlink;
 	be_app->Unlock();
 }
-//------------------------------------------------------------------------------
-void BAppServerLink::Init()
-{
-}
-//------------------------------------------------------------------------------
 
 }	// namespace BPrivate
 

@@ -66,12 +66,11 @@ BCursor::BCursor(const void *cursorData)
 
   // Send data directly to server
   BPrivate::BAppServerLink *serverlink = new BPrivate::BAppServerLink;
-  serverlink->Init();
-  serverlink->portlink->SetOpCode(AS_SET_CURSOR_BCURSOR);
-  serverlink->portlink->Attach((void *)cursorData,68);
+  serverlink->SetOpCode(AS_SET_CURSOR_BCURSOR);
+  serverlink->Attach((void *)cursorData,68);
 
   //Rumor has it that this API will be cleaned up later
-  buffer=serverlink->portlink->FlushWithReply(&returncode,&status,&buffersize);
+  buffer=serverlink->FlushWithReply(&returncode,&status,&buffersize);
   m_serverToken=*((int32*)buffer);
 
   delete serverlink;
