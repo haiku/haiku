@@ -12,9 +12,9 @@ R5KernelAddon modem : kernel network ppp :
 	modem.cpp
 	ModemDevice.cpp
 	ACFCHandler.cpp
+	
+	: libkernelppp.a
 ;
-
-LinkSharedOSLibs modem : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking

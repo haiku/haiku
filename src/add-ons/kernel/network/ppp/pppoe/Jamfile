@@ -12,9 +12,9 @@ R5KernelAddon pppoe : kernel network ppp :
 	pppoe.cpp
 	PPPoEDevice.cpp
 	DiscoveryPacket.cpp
+	
+	: libkernelppp.a
 ;
-
-LinkSharedOSLibs pppoe : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking

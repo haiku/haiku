@@ -527,5 +527,5 @@ ModemDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
 		return B_ERROR;
 	}
 	
-	Interface().ReceiveFromDevice(packet);
+	return Interface().ReceiveFromDevice(packet);
 }

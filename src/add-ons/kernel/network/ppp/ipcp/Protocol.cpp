@@ -356,7 +356,7 @@ IPCP::ParseSideRequests(driver_parameter *requests, ppp_side side)
 void
 IPCP::UpdateAddresses()
 {
-	if(!Interface().IsUp() && !Interface().DoesDialOnDemand())
+	if(State() != PPP_OPENED_STATE && !Interface().DoesDialOnDemand())
 		return;
 	
 	in_addr_t netmask;
@@ -388,12 +388,8 @@ IPCP::UpdateAddresses()
 		netmask = fLocalRequests.netmask;
 	else if(State() != PPP_OPENED_STATE)
 		netmask = INADDR_BROADCAST;
-	else if(IN_CLASSA(fLocalConfiguration.address))
-		netmask = IN_CLASSA_NET;
-	else if(IN_CLASSB(fLocalConfiguration.address))
-		netmask = IN_CLASSB_NET;
 	else
-		netmask = IN_CLASSC_NET;
+		netmask = 0x80000000;
 	inreq.ifra_mask.sin_addr.s_addr = netmask;
 	inreq.ifra_mask.sin_len = sizeof(sockaddr_in);
 	
@@ -403,9 +399,13 @@ IPCP::UpdateAddresses()
 	if(in_control(NULL, SIOCSIFDSTADDR, (caddr_t) &ifreqDestination,
 			Interface().Ifnet()) != B_OK)
 		printf("IPCP: UpdateAddress(): SIOCSIFDSTADDR returned error!\n");
-	if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq.ifra_mask,
-			Interface().Ifnet()) != B_OK)
-		printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
+	
+	// the netmask is optional for PPP interfaces
+	if(fLocalRequests.netmask != INADDR_ANY) {
+		if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq.ifra_mask,
+				Interface().Ifnet()) != B_OK)
+			printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
+	}
 }
 
 

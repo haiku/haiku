@@ -13,5 +13,6 @@ StaticLibrary ppp :
 	
 	_libppputils.cpp
 	PPPInterface.cpp
+	PPPInterfaceListener.cpp
 	PPPManager.cpp
 ;
