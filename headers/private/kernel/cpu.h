@@ -8,8 +8,7 @@
 
 #include <smp.h>
 #include <timer.h>
-
-struct kernel_args;
+#include <kernel_args.h>
 
 
 /* CPU local data structure */
