@@ -42,7 +42,6 @@ Filter::Filter(BBitmap* image, BMessenger listener, uint32 what)
 
 Filter::~Filter()
 {
-	Stop();
 	delete fDestImage;
 }
 

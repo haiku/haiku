@@ -226,12 +226,19 @@ ShowImageView::AddToRecentDocuments()
 }
 
 void
-ShowImageView::DeleteBitmap()
+ShowImageView::DeleteScaler()
 {
 	if (fScaler) {
-		delete fScaler; 
+		fScaler->Stop();
+		delete fScaler;
 		fScaler = NULL;
 	}
+}
+
+void
+ShowImageView::DeleteBitmap()
+{
+	DeleteScaler();
 	delete fpBitmap;
 	fpBitmap = NULL;
 }
@@ -535,7 +542,7 @@ Scaler*
 ShowImageView::GetScaler()
 {
 	if (fScaler == NULL || fScaler->Scale() != fZoom) {
-		delete fScaler;
+		DeleteScaler();
 		BMessenger msgr(this, Window());
 		fScaler = new Scaler(fpBitmap, fZoom, msgr, MSG_INVALIDATE);
 		fScaler->Start();
@@ -1334,7 +1341,7 @@ void
 ShowImageView::SetZoom(float zoom)
 {
 	if (fScaleBilinear && fZoom != zoom) {
-		delete fScaler; fScaler = NULL;
+		DeleteScaler();
 	}
 	fZoom = zoom;
 	FixupScrollBars();

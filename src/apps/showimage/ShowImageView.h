@@ -110,6 +110,7 @@ private:
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
 	void AddToRecentDocuments();
+	void DeleteScaler();
 	void DeleteBitmap();
 	int32 BytesPerPixel(color_space cs) const;
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
