@@ -494,10 +494,8 @@ mmu_init(void)
 		gKernelArgs.num_physical_allocated_ranges++;
 	}
 
-	// ToDo: move me to somewhere else (and fix me while you're at it)
-	gKernelArgs.arch_args.system_time_cv_factor = 1000000;//cv_factor;
 	gKernelArgs.str = NULL;
-	gKernelArgs.num_cpus = 1;
+		// ToDo: what was this intended for?
 
 	gKernelArgs.arch_args.page_hole = 0xffc00000;
 }
