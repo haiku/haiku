@@ -8,20 +8,21 @@
 #include <Message.h>
 #include <Screen.h>
 #include <TabView.h>
-
 #include <stdio.h>
 
-#include "TimeMessages.h"
-#include "TimeWindow.h"
-#include "TimeView.h"
-#include "Time.h"
 #include "BaseView.h"
+#include "Time.h"
+#include "TimeMessages.h"
+#include "TimeView.h"
+#include "TimeWindow.h"
 
 #define TIME_WINDOW_RIGHT	361 //332
 #define TIME_WINDOW_BOTTOM	227 //208
 
+
 TTimeWindow::TTimeWindow()
-	: BWindow(BRect(0,0,TIME_WINDOW_RIGHT,TIME_WINDOW_BOTTOM), "Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+	: BWindow(BRect(0,0,TIME_WINDOW_RIGHT,TIME_WINDOW_BOTTOM), 
+		"Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
 {
 	BScreen screen;
 
@@ -35,42 +36,59 @@ TTimeWindow::TTimeWindow()
 	SetPulseRate(500000);
 }
 
+
 TTimeWindow::~TTimeWindow()
-{ /* empty */ }
+{
+}
+
 
 void 
 TTimeWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
+		case OB_USER_CHANGE:
+		{
+			bool istime;
+			if (message->FindBool("time", &istime) == B_OK)
+				f_BaseView->ChangeTime(message);
+		}
+		break;
+		case OB_RTC_CHANGE:
+		{
+			f_BaseView->SetGMTime(f_TimeSettings->GMTime());
+		}
+		break;
+		
 		case REGION_CHANGED:
-			fTimeZones->ChangeRegion(message);
+			f_TimeZones->ChangeRegion(message);
 		break;
 		case SET_TIME_ZONE:
-			fTimeZones->SetTimeZone();
+			f_TimeZones->SetTimeZone();
 		break;
 		case TIME_ZONE_CHANGED:
-			fTimeZones->NewTimeZone();
+			f_TimeZones->NewTimeZone();
 		break;	
 		default:
 			BWindow::MessageReceived(message);
 		break;
 	}
-	
-}//TTimeWindow::MessageReceived(BMessage *message)
+}
+
 
 bool 
 TTimeWindow::QuitRequested()
 {
 	dynamic_cast<TimeApplication *>(be_app)->SetWindowCorner(BPoint(Frame().left,Frame().top));
 	
-	f_BaseView->StopWatchingAll(fTimeSettings);
-	f_BaseView->StopWatchingAll(fTimeZones);
+	f_BaseView->StopWatchingAll(f_TimeSettings);
+	f_BaseView->StopWatchingAll(f_TimeZones);
 	
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	
 	return(true);
 	
-} //TTimeWindow::QuitRequested()
+}
+
 
 void 
 TTimeWindow::InitWindow()
@@ -88,26 +106,24 @@ TTimeWindow::InitWindow()
 	bounds.InsetBy(4, 6);
 	bounds.bottom -= tabview->TabHeight();
 	
-	fTimeSettings = new TSettingsView(bounds);
-	if (f_BaseView->StartWatchingAll(fTimeSettings) != B_OK)
+	f_TimeSettings = new TSettingsView(bounds);
+	if (f_BaseView->StartWatchingAll(f_TimeSettings) != B_OK)
 		printf("StartWatchingAll(TimeSettings) failed!!!");
 
-	fTimeZones = new TZoneView(bounds);
-	if (f_BaseView->StartWatchingAll(fTimeZones) != B_OK)
-		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!");
-	
-	
+	f_TimeZones = new TZoneView(bounds);
+	if (f_BaseView->StartWatchingAll(f_TimeZones) != B_OK)
+		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!");	
 	// add tabs
 	BTab *tab;
 	tab = new BTab();
-	tabview->AddTab(fTimeSettings, tab);
+	tabview->AddTab(f_TimeSettings, tab);
 	tab->SetLabel("Settings");
 	
 	tab = new BTab();
-	tabview->AddTab(fTimeZones, tab);
+	tabview->AddTab(f_TimeZones, tab);
 	tab->SetLabel("Time Zone");
 	
 	f_BaseView->AddChild(tabview);
 	f_BaseView->Pulse();
 	
-}//TTimeWindow::BuildViews()
+}

@@ -16,6 +16,7 @@
 
 const char TimeSettings::kTimeSettingsFile[] = "Time_settings";
 
+
 TimeSettings::TimeSettings()
 {
 	BPath path;
@@ -29,15 +30,14 @@ TimeSettings::TimeSettings()
 					fCorner.x=50;
 					fCorner.y=50;
 				};
-		}
-		else {
+		} else {
 			fCorner.x=50;
 			fCorner.y=50;
 		}
-	}
-	else
+	} else
 		be_app->PostMessage(ERROR_DETECTED);	
 }
+
 
 TimeSettings::~TimeSettings()
 {	
@@ -55,6 +55,7 @@ TimeSettings::~TimeSettings()
 	
 		
 }
+
 
 void
 TimeSettings::SetWindowCorner(BPoint corner)

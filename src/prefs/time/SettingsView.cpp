@@ -1,32 +1,33 @@
 /*
 	SettingsView.cpp
 */
-#include <RadioButton.h>
-#include <StringView.h>
-#include <View.h>
-#include <Box.h>
-#include <String.h>
-#include <RadioButton.h>
-#include <AppDefs.h>
-#include <Handler.h>
-#include <stdio.h>
-#include <Path.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Path.h>
+#include <RadioButton.h>
+#include <String.h>
+#include <StringView.h>
 
 #include "SettingsView.h"
-#include "AnalogClock.h"
-#include "CalendarView.h"
 #include "TimeMessages.h"
 
-TSettingsView::TSettingsView(BRect frame):
-	BView(frame,"Settings", B_FOLLOW_ALL, 
-			B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP|B_PULSE_NEEDED)
+
+/*=====> TSettingsView <=====*/
+
+TSettingsView::TSettingsView(BRect frame)
+	: BView(frame,"Settings", B_FOLLOW_ALL, 
+		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP)
 {
 	InitView();
-} //SettingsView::SettingsView()
+}
 	
+
+TSettingsView::~TSettingsView()
+{
+}
+
+
 void
 TSettingsView::AttachedToWindow()
 {
@@ -34,24 +35,23 @@ TSettingsView::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 }
 
+
 void
 TSettingsView::MessageReceived(BMessage *message)
 {
 	int32 change;
-	switch(message->what)
-	{
+	switch(message->what) {
 		case B_OBSERVER_NOTICE_CHANGE:
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
-			switch (change)
+			switch(change)
 			{
-				case OB_TIME_UPDATE:
-				{
+				case OB_TM_CHANGED:
 					UpdateDateTime(message);
-					break;
-				}
+				break;
+				
 				default:
 					BView::MessageReceived(message);
-					break;
+				break;
 			}
 		break;
 		
@@ -60,6 +60,7 @@ TSettingsView::MessageReceived(BMessage *message)
 			break;
 	}
 }
+
 
 void
 TSettingsView::InitView()
@@ -116,27 +117,26 @@ TSettingsView::InitView()
 	frame.OffsetBy(frame.Width() +9, -1);
 	frame.right = bounds.right-2;
 	
-	f_local = new BRadioButton(frame, "local", "Local time", NULL);
+	f_local = new BRadioButton(frame, "local", "Local time", new BMessage(OB_RTC_CHANGE));
 	AddChild(f_local);
 	
 	frame.OffsetBy(0, text_height +4);
-	f_gmt = new BRadioButton(frame, "gmt", "GMT", NULL);
+	f_gmt = new BRadioButton(frame, "gmt", "GMT", new BMessage(OB_RTC_CHANGE));
 	AddChild(f_gmt);
 	
 	AddChild(text);	
 	AddChild(f_timeedit);
 	AddChild(f_clock);
 	
-	f_clock->SetViewColor(200, 20, 200);
 	if (f_islocal)
 		f_local->SetValue(1);
 	else
 		f_gmt->SetValue(1);
-		
-}//SettingsView::buildView()
+}
+
 
 void
-TSettingsView::Draw(BRect frame)
+TSettingsView::Draw(BRect updaterect)
 {
 	//draw a separator line
 	BRect bounds(Bounds());
@@ -154,19 +154,41 @@ TSettingsView::Draw(BRect frame)
 		end.x++;
 		AddLine(start, end, light);
 	EndLineArray();
-}//SettingsView::Draw(BRect frame)
+	
+	f_timeedit->Draw(bounds);
+	f_dateedit->Draw(bounds);
+}
+
+
+bool
+TSettingsView::GMTime()
+{
+	return f_gmt->Value() == 1;
+}
+
 
 void
 TSettingsView::UpdateDateTime(BMessage *message)
 {
-	struct tm *ltime;
-	message->FindPointer("_tm_", (void **)&ltime);
-	f_timeedit->Update(ltime);
-	f_clock->Update(ltime);
+	int32 month, day, year, hour, minute, second;
 
-	f_dateedit->Update(ltime);
-	f_calendar->Update(ltime);
+	if (message->FindInt32("month", &month) == B_OK
+		&& message->FindInt32("day", &day) == B_OK
+		&& message->FindInt32("year", &year) == B_OK)
+	{
+		f_dateedit->SetTo(year, month, day);
+		f_calendar->SetTo(year, month, day);
+	}
+	
+	if (message->FindInt32("hour", &hour) == B_OK
+		&& message->FindInt32("minute", &minute) == B_OK
+		&& message->FindInt32("second", &second) == B_OK)
+	{
+		f_timeedit->SetTo(hour, minute, second);
+		f_clock->SetTo(hour, minute, second);
+	}
 }
+
 
 void
 TSettingsView::ReadFiles()
@@ -176,8 +198,7 @@ TSettingsView::ReadFiles()
 	// read RTC_time_settings
 	
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-	{
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
 		return; // NO USER SETTINGS DIRECTORY!!!
 	}
 	path.Append("RTC_time_settings");
@@ -185,13 +206,11 @@ TSettingsView::ReadFiles()
 	BEntry entry(path.Path());
 	BFile file;
 	
-	if (entry.Exists())
-	{
+	if (entry.Exists()) {
 		//read file
 		file.SetTo(&entry, B_READ_ONLY);
 		status_t err = file.InitCheck();
-		if (err == B_OK)
-		{
+		if (err == B_OK) {
 			char buff[6];
 			file.Read(buff, 6);
 			BString	text;
@@ -200,11 +219,8 @@ TSettingsView::ReadFiles()
 				f_islocal = true;
 			else
 				f_islocal = false;
-			printf("f_islocal >> (BS)%s, (BF)%s\n", text.String(), buff);
 		}
-	}
-	else
-	{
+	} else {
 		// create set to local
 		f_islocal = true;
 		file.SetTo(&entry, B_CREATE_FILE|B_READ_WRITE);

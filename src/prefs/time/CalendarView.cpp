@@ -1,28 +1,25 @@
-#include <Debug.h>
-#include <Message.h>
 #include <String.h>
-
-#include <stdio.h>
+#include <Window.h>
 
 #include "CalendarView.h"
+#include "DateUtils.h"
+#include "TimeMessages.h"
+
 
 #define SEGMENT_CHANGE 'ostd'
 
-void
-
-__printrect(BRect rect)
-{
-	printf("%f, %f, %f, %f\n", rect.left, rect.top, rect.right, rect.bottom);
-}
 
 TDay::TDay(BRect frame, int day) 
-	: BView(frame, B_EMPTY_STRING, B_FOLLOW_NONE, B_WILL_DRAW)
+	: BControl(frame, B_EMPTY_STRING, NULL, NULL, B_FOLLOW_NONE, B_WILL_DRAW)
 	, f_day(day)
-	, f_isselected(false)
-{	}
+{
+}
+
 
 TDay::~TDay()
-{	}
+{
+}
+
 
 void
 TDay::AttachedToWindow()
@@ -31,15 +28,34 @@ TDay::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 }
 
+
 void
 TDay::MouseDown(BPoint where)
 {
-	if (f_day> 0)
-	{
-		f_isselected = !f_isselected;
+	if (f_day> 0) {
+		// only allow if not currently selected
+		if (Value() == B_CONTROL_ON)
+			return;
+		
+		SetValue(B_CONTROL_ON);
+		Invoke(); 
+
+		//update display
 		Draw(Bounds());	
 	}
 }
+
+
+void
+TDay::MakeFocus(bool focused)
+{
+	if (focused != IsFocus()) {
+		BView::MakeFocus(focused);
+		Draw(Bounds());
+		Flush();
+	}
+}
+
 
 void
 TDay::Stroke3dFrame(BRect frame, rgb_color light, rgb_color dark, bool inset)
@@ -47,13 +63,10 @@ TDay::Stroke3dFrame(BRect frame, rgb_color light, rgb_color dark, bool inset)
 	rgb_color color1;
 	rgb_color color2;
 	
-	if (inset)
-	{
+	if (inset) {
 		color1 = dark;
 		color2 = light;
-	}
-	else
-	{
+	} else {
 		color1 = light;
 		color2 = dark;
 	}
@@ -81,12 +94,9 @@ TDay::Draw(BRect updaterect)
 	
 	BString text;
 	
-	if (f_isselected)
-	{
+	if (Value() == 1) {
 		bgcolor = tint_color(ViewColor(), B_DARKEN_2_TINT);		
-	}
-	else
-	{
+	} else {
 		bgcolor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	}
 	text << f_day;
@@ -97,12 +107,8 @@ TDay::Draw(BRect updaterect)
 	SetHighColor(bgcolor);
 	FillRect(bounds);
 
-	if (f_isselected)
-		Stroke3dFrame(bounds, light, dark, true);
-	
-	if (f_day> 0)
-	{
-		if (!f_isselected)
+	if (f_day> 0) {
+		if (!(Value() == 1))
 			SetHighColor(0, 0, 0, 255);
 		else
 			SetHighColor(255, 255, 255, 255);
@@ -118,7 +124,34 @@ TDay::Draw(BRect updaterect)
 		BPoint drawpt((bounds.Width()/2.0) -(width/2.0) +1, (bounds.Height()/2.0) +(height/2.0) -2);
 		DrawString(text.String(), drawpt);
 	}
+	
+	if (IsFocus()) {
+		rgb_color nav_color = keyboard_navigation_color();
+		SetHighColor(nav_color);
+		StrokeRect(bounds);
+		
+	} else {
+		SetHighColor(bgcolor);
+		StrokeRect(bounds);
+		if (Value() == 1)
+			Stroke3dFrame(bounds, light, dark, true);
+	}
 }
+
+
+void
+TDay::SetValue(int32 value)
+{
+	BControl::SetValue(value);
+	
+	if (Value() == 1) {
+		SetFlags(Flags() & ~B_NAVIGABLE);
+	} else {
+		SetFlags(Flags()|B_NAVIGABLE); 
+	}
+	Draw(Bounds());
+}
+
 
 void 
 TDay::SetTo(BRect frame, int day)
@@ -128,19 +161,30 @@ TDay::SetTo(BRect frame, int day)
 	Draw(Bounds());
 }
 
+
 void
-TDay::SetDay(int day, bool selected = false)
+TDay::SetTo(int day, bool selected = false)
 {
 	f_day = day;
-	f_isselected = selected;
+	SetValue(selected);
+	if (Value() == 1) {
+		SetFlags(Flags()|B_NAVIGABLE);
+	} else {
+		SetFlags(Flags() & ~B_NAVIGABLE);
+	}
 	Draw(Bounds());
 }
 
 
 /*=====> TCalendarView <=====*/
 
-TCalendarView::TCalendarView(BRect frame, const char *name, uint32 resizingmode, uint32 flags)
+TCalendarView::TCalendarView(BRect frame, const char *name, 
+		uint32 resizingmode, uint32 flags)
 	: BView(frame, name, resizingmode, flags)
+	, f_firstday(0)
+	, f_month(0)
+	, f_day(0)
+	,f_year(0)
 {
 	InitView();
 }
@@ -150,6 +194,29 @@ TCalendarView::~TCalendarView()
 }
 
 void
+TCalendarView::MessageReceived(BMessage *message)
+{
+	switch(message->what) {
+		case OB_DAY_CHANGED:
+		{
+			TDay *day;
+			message->FindPointer("source", (void **)&day);
+			if (f_cday != NULL)
+				f_cday->SetValue(B_CONTROL_OFF);
+			f_cday = day;
+			
+			DispatchMessage();
+		}
+		break;
+		
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 TCalendarView::AttachedToWindow()
 {
 	if (Parent())
@@ -157,7 +224,7 @@ TCalendarView::AttachedToWindow()
 }
 
 
-const char days[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
+static const char days[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
 
 void
 TCalendarView::Draw(BRect updaterect)
@@ -170,8 +237,7 @@ TCalendarView::Draw(BRect updaterect)
 	BString day;
 	SetLowColor(ViewColor());
 	SetHighColor(0, 0, 0);
-	for (int i = 0; i < 7; i++)
-	{
+	for (int i = 0; i < 7; i++) {
 		day = days[i];
 		width = be_plain_font->StringWidth(day.String());
 		drawpt.x = bounds.left +(x -width/2.0 +2);
@@ -181,80 +247,6 @@ TCalendarView::Draw(BRect updaterect)
 	}
 }
 
-void
-TCalendarView::ClearDays()
-{
-	BView *child; 
-	if (CountChildren()> 0)
-	{
-		if ((child = ChildAt(0)) != NULL)
-		{
-				while (child)
-			{
-				RemoveChild(child);
-				child = child->NextSibling();
-			}
-		}
-	}
-}
-
-void
-TCalendarView::CalcFlags()
-{
-}
-
-static bool
-isLeapYear(const int year)
-{
-	if ((year % 400 == 0)||(year % 4 == 0 && year % 100 == 0))
-		return true;
-	else
-		return false;
-}
-
-static int
-GetDaysInMonth(const int month, const int year)
-{
-	if (month == 2 && isLeapYear(year))
-	{
-		return 29;
-	}
-	
-	static const int DaysinMonth[12] = 
-		{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	
-	return DaysinMonth[month];
-}
-
-static int
-GetFirstDay(const int month, const int year)
-{
-	int l_century = year/100;
-	int l_decade = year%100;
-	int l_month = (month +10)%12;
-	int l_day = 1;
-	
-	if (l_month == 1 || l_month == 2)
-	{
-		if (l_decade == 0)
-		{
-			l_decade = 99;
-			l_century -= 1;
-		}
-		else
-		 l_decade-= 1;
-	}
-	
-	float tmp = (l_day +(floor(((13 *l_month) -1)/5)) 
-		+l_decade +(floor(l_decade /4)) 
-		+(floor(l_century/4)) -(2 *l_century));
-	int result = static_cast<int>(tmp)%7;
-	
-	if (result < 0)
-		result += 7;
-		
-	return result;
-}
 
 void
 TCalendarView::InitView()
@@ -268,14 +260,10 @@ TCalendarView::InitView()
 	float height = ((bounds.Height() -(text_height +4)) -6)/6;
 	f_dayrect.Set(0.0, text_height +6, width, text_height +6 +height);
 
-	__printrect(f_dayrect);
-
 	BRect dayrect(f_dayrect);
 	TDay *day;
-	for (int row = 0; row < 6; row++)
-	{
-		for (int col = 0; col < 7; col++)
-		{
+	for (int row = 0; row < 6; row++) {
+		for (int col = 0; col < 7; col++) {
 			day = new TDay(dayrect.InsetByCopy(1, 1), 0);
 			AddChild(day);
 			dayrect.OffsetBy(width +1, 0);
@@ -283,6 +271,8 @@ TCalendarView::InitView()
 		dayrect.OffsetBy(0, height +1);
 		dayrect.OffsetTo(0, dayrect.top);
 	}
+	
+	f_cday = NULL;
 }
 
 void
@@ -290,41 +280,69 @@ TCalendarView::InitDates()
 {
 	TDay *day;
 	
-	int label = 0;
+	int32 label = 0;
 	int idx = 0;
-	int first = GetFirstDay(f_month+1, f_year);
-	int daycnt = GetDaysInMonth(f_month, f_year);
-	printf("%d, %d\n", first, daycnt);
-	for (int row = 0; row < 6; row++)
-	{
-		for (int col = 0; col < 7; col++)
-		{
+	f_firstday = getFirstDay(f_month+1, f_year);
+	int daycnt = getDaysInMonth(f_month, f_year);
+	bool cday = false;
+	for (int row = 0; row < 6; row++) {
+		for (int col = 0; col < 7; col++) {
 			day = dynamic_cast<TDay *>(ChildAt((row *7) +col));
 			
-			if (idx < first || idx > daycnt +first +1)
+			if (idx < f_firstday || idx > daycnt +f_firstday +1)
 				label = 0;
 			else
-				label = idx -(first +1);
+				label = idx -(f_firstday +1);
 			idx++;
-			day->SetDay(label, (label == f_day));
+			cday = label == f_day;
+			day->SetTo(label, cday);
+
+			if (label> 0) {
+				BMessage *message = new BMessage(OB_DAY_CHANGED);
+				message->AddInt32("Day", label);
+				
+				day->SetTarget(this);
+				day->SetMessage(message);
+			}
 			
+			if (cday) {
+				f_cday = day;
+			}
+			cday = false;		
 		}
 	}
 }
 
+
 void
-TCalendarView::Update(tm *atm)
+TCalendarView::SetTo(int32 year, int32 month, int32 day)
 {
-	if (f_month != atm->tm_mon
-	 ||f_day != atm->tm_mday
-	 ||f_year != atm->tm_year)
-	{
-		f_month = atm->tm_mon;
-		f_day = atm->tm_mday;
-		f_wday = atm->tm_wday;
-		f_year = atm->tm_year;
+	if (f_month != month||f_year != year) {
+		f_month = month;
+		f_day = day;
+		f_year = year;
 		InitDates();
+	} else if (f_day != day) {
+		f_day = day;
+		int idx = ((f_day/7)*7) + (f_day%7 +f_firstday +1);
+		TDay *day = dynamic_cast<TDay *>(ChildAt(idx));
+		f_cday->SetValue(B_CONTROL_OFF);
+		f_cday = day;
+		day->SetValue(B_CONTROL_ON);		
 	}
-	printf("M: %d %d D: %d %d Y: %d %d\n", 
-	f_month, atm->tm_mon, f_day, atm->tm_mday, f_year, atm->tm_year);
+}
+
+
+void
+TCalendarView::DispatchMessage()
+{
+	// send message to update timedate
+	BMessage *msg = new BMessage(OB_USER_CHANGE);
+	msg->AddBool("time", false);
+	msg->AddInt32("month", f_month);
+	if (f_cday != NULL)
+		msg->AddInt32("day", f_cday->Day());
+	msg->AddInt32("year", f_year);
+		
+	Window()->PostMessage(msg);
 }

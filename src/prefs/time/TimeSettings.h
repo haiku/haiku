@@ -3,17 +3,16 @@
 
 #include <SupportDefs.h>
 
-class TimeSettings{
-public :
-	TimeSettings();
-	~TimeSettings();
+class TimeSettings {
+	public :
+		TimeSettings();
+		~TimeSettings();
 	
-	BPoint WindowCorner() const { return fCorner; }
-	void SetWindowCorner(BPoint corner);
-	
-private:
-	static const char 	kTimeSettingsFile[];
-	BPoint				fCorner;
+		BPoint WindowCorner() const { return fCorner; }
+		void SetWindowCorner(BPoint corner);
+	private:
+		static const char kTimeSettingsFile[];
+		BPoint fCorner;
 
 };
 

@@ -2,6 +2,6 @@ SubDir OBOS_TOP src prefs time ;
 
 AddResources Time : Time.rsrc ;
 
-Preference Time : Bitmaps.cpp BaseView.cpp DateTimeEdit.cpp CalendarView.cpp AnalogClock.cpp SettingsView.cpp Time.cpp TimeSettings.cpp TimeView.cpp TimeWindow.cpp ZoneView.cpp ;
+Preference Time : Bitmaps.cpp BaseView.cpp DateTimeEdit.cpp CalendarView.cpp AnalogClock.cpp SettingsView.cpp Time.cpp TimeSettings.cpp TimeView.cpp TimeWindow.cpp ZoneView.cpp DateUtils.cpp TZDisplay.cpp ;
 
 LinkSharedOSLibs Time : be root ;

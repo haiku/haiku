@@ -10,14 +10,9 @@
 #include <String.h>
 #include <ListItem.h>
 
-enum OB_TIME_TARGET
-{
-	OB_CURRENT_TIME,
-	OB_SELECTION_TIME
-};
+#include "TZDisplay.h"
 
-class TZoneItem: public BStringItem
-{
+class TZoneItem: public BStringItem {
 	public:
 		TZoneItem(const char *text, const char *zonedata);
 		virtual ~TZoneItem();
@@ -27,44 +22,40 @@ class TZoneItem: public BStringItem
 		BPath *f_zonedata;
 };
 
-class TZoneView : public BView
-{
+class TZoneView : public BView {
 	public:
 		TZoneView(BRect frame);
+		~TZoneView();
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
+		virtual void Draw(BRect);
 		
 		void ChangeRegion(BMessage *region);
 		void SetTimeZone();
 		void NewTimeZone();
+	protected:
+		virtual void UpdateDateTime(BMessage *message);
 	private:
 		void InitView();
 		void GetCurrentTZ();
 		void GetCurrentRegion();
 
-		void FillZoneList(const char *area);
+		int FillZoneList(const char *area);
 		void CreateZoneMenu(float *widest);
 		
-		void Update();
-		
-		void UpdateTimeDisplay(OB_TIME_TARGET target);
-		void UpdateDateTime(BMessage *message);
 	private:
-		BPopUpMenu		*f_zonepopup;
-		BListView 		*f_citylist;
-		BButton 		*f_settimezone;
-		BStringView		*f_seltext;
-		BStringView		*f_seltime;
-		BStringView		*f_curtext;
-		BStringView		*f_curtime;
+		BPopUpMenu *f_zonepopup;
+		BListView *f_citylist;
+		BButton *f_settimezone;
+		TTZDisplay *f_currentzone;
+		TTZDisplay *f_timeinzone;
 	private:
-		BString 		f_CurrentTime;
-		BPath			f_ZoneStr;
-		BPath			f_RegionStr;
+		BPath f_ZoneStr;
+		BPath f_RegionStr;
 		
-		int 			f_hour;
-		int				f_minutes;
-		char			f_TimeStr[10];
-};									   				
+		int f_hour;
+		int f_minutes;
+		char f_TimeStr[10];
+};
 
 #endif

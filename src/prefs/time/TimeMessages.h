@@ -7,23 +7,33 @@
 #ifndef TIME_MESSAGES_H
 #define TIME_MESSAGES_H
 
-const uint32 BUTTON_DEFAULTS			= 'BTde';
-const uint32 BUTTON_REVERT				= 'BTre';
-const uint32 SLIDER_REPEAT_RATE			= 'SLrr';
-const uint32 SLIDER_DELAY_RATE			= 'SLdr';
+#define OBOS_APP_SIGNATURE "application/x-vnd.OpenBeOS-TIME"
 
-const uint32 ERROR_DETECTED				= 'ERor';
+const uint32 ERROR_DETECTED = 'ERor';
 
 //Timezonemessages
-const uint32 REGION_CHANGED				='REch';
-const uint32 TIME_ZONE_CHANGED			='TZch';
+const uint32 REGION_CHANGED = 'REch';
+const uint32 TIME_ZONE_CHANGED = 'TZch';
 
 //SetButton
-const uint32 SET_TIME_ZONE				='SEti';
+const uint32 SET_TIME_ZONE = 'SEti';
 
 //local and GMT settings
-const uint32 RTC_SETTINGS				='RTse';
+const uint32 RTC_SETTINGS = 'RTse';
 
-const uint32 OB_TIME_UPDATE 			='obTU';
+// clock tick message
+const uint32 OB_TIME_UPDATE ='obTU';
+
+// clicked on day in claendar
+const uint32 OB_DAY_CHANGED = 'obDC';
+
+//notice for clock ticks
+const uint32 OB_TM_CHANGED = 'obTC';
+
+//notice for user changes
+const uint32 OB_USER_CHANGE = 'obUC';
+
+// local/gmt radiobuttons
+const uint32 OB_RTC_CHANGE = 'obRC';
 
 #endif //TIME_MESSAGES_H

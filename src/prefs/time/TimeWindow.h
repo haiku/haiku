@@ -9,22 +9,19 @@
 #include "ZoneView.h"
 #include "BaseView.h"
 
-class TTimeWindow : public BWindow 
-{
+class TTimeWindow : public BWindow {
 	public:
 		TTimeWindow();
 		~TTimeWindow();
 	
 		bool QuitRequested();
 		void MessageReceived(BMessage *message);
-
 	private:
 		void InitWindow();
 
-	private:
-		TTimeBaseView	*f_BaseView;
-		TSettingsView 	*fTimeSettings;
-		TZoneView		*fTimeZones;
+		TTimeBaseView *f_BaseView;
+		TSettingsView *f_TimeSettings;
+		TZoneView *f_TimeZones;
 };
 
 #endif
