@@ -91,22 +91,6 @@ set_intr_gate(int n, void *addr)
 
 
 static void
-set_user_intr_gate(int n, void *addr)
-{
-	set_gate(&idt[n], (addr_t)addr, 14, DPL_USER);
-}
-
-
-/* XXX - currently unused and static...
-static void
-set_trap_gate(int n, void *addr)
-{
-	set_gate(&idt[n], (unsigned int)addr, 15, DPL_KERNEL);
-}
-*/
-
-
-static void
 set_system_gate(int n, void *addr)
 {
 	set_gate(&idt[n], (unsigned int)addr, 15, DPL_USER);
@@ -348,7 +332,7 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(0,  &trap0);
 	set_intr_gate(1,  &trap1);
 	set_intr_gate(2,  &trap2);
-	set_user_intr_gate(3,  &trap3);
+	set_system_gate(3,  &trap3);
 	set_intr_gate(4,  &trap4);
 	set_intr_gate(5,  &trap5);
 	set_intr_gate(6,  &trap6);
