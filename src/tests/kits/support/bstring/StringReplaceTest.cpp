@@ -70,6 +70,64 @@ StringReplaceTest::PerformTest(void)
 	str1->Replace('s' 't', 4, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "she tellt tea thells on the sea shore") == 0);
 	delete str1;
+
+	NextSubTest();
+	str1 = new BString();
+	str1->Replace('s', 'x', 12, 32);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "") == 0);
+	delete str1;
+
+	//&ReplaceFirst(const char*, const char*)
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceFirst("sea", "the");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells the shells on the seashore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceFirst("tex", "the");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the seashore") == 0);
+	delete str1;
+
+	//&ReplaceLast(const char*, const char*)
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceLast("sea", "the");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the theshore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceLast("tex", "the");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the seashore") == 0);
+	delete str1;
+
+	//&ReplaceAll(const char*, const char*, int32)
+	NextSubTest();
+	str1 = new BString("abc abc abc");
+	str1->ReplaceAll("ab", "abc");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"abcc abcc abcc") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceAll("tex", "the");
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the seashore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceAll("sea", "the", 11);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the theshore") == 0);
+	delete str1;
 }
 
 
