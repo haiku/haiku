@@ -187,6 +187,6 @@ status_t evaluate_object (const char *object, void *return_value, size_t buf_len
 	buffer.Pointer = return_value;
 	buffer.Length = buf_len;
 	
-	status = AcpiEvaluateObject(NULL,object,NULL,&buffer);
+	status = AcpiEvaluateObject(NULL,object,NULL,(return_value != NULL) ? &buffer : NULL);
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
