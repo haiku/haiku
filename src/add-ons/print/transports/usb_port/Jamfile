@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons print transports usb_port ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+
+UsePrivateHeaders interface print ;
+
+Addon USB\ Port : print transport : 
+	print_transport.cpp
+;
+
+LinkSharedOSLibs USB\ Port : be libtransportaddon.a ;
+
