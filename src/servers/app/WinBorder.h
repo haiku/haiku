@@ -125,9 +125,12 @@ protected:
 	bool fIsZooming;
 
 	bool fInUpdate;
-	int cnt;
+	bool fRequestSent;
+
 	float fMinWidth, fMaxWidth;
 	float fMinHeight, fMaxHeight;
+
+int cnt; // for debugging
 };
 
 #endif
