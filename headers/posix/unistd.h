@@ -109,9 +109,9 @@ extern off_t	lseek(int fd, off_t offset, int whence);
 #define B_MOUNT_READ_ONLY		1
 #define B_MOUNT_VIRTUAL_DEVICE	2
 
-//extern int		mount(const char *filesystem, const char *where, const char *device,
-//					ulong flags, void *parms, int len);
-//extern int		unmount(const char *path);
+extern int		mount(const char *filesystem, const char *where, const char *device,
+					ulong flags, void *parms, int len);
+extern int		unmount(const char *path);
 
 extern int      getdtablesize(void);
 extern long		sysconf(int name);

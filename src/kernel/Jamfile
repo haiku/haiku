@@ -361,6 +361,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
 	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
+	<$(SOURCE_GRIST)!libc!unistd>mount.o
 	<$(SOURCE_GRIST)!libc!unistd>conf.o
 	;
 
@@ -478,6 +479,7 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!unistd>sleep.o
 	<$(SOURCE_GRIST)!libc!unistd>usleep.o
 	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
+	<$(SOURCE_GRIST)!libc!unistd>mount.o
 	<$(SOURCE_GRIST)!libc!unistd>conf.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld

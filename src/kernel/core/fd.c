@@ -1,11 +1,11 @@
-/* fd.c
- *
- * Operations on file descriptors...
- * see fd.h for the definitions
- *
- */
+/* Operations on file descriptors
+** 
+** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
 
-#include <ktypes.h>
+
+//#include <ktypes.h>
 #include <OS.h>
 #include <fd.h>
 #include <vfs.h>
