@@ -1,37 +1,44 @@
 SubDir OBOS_TOP src kernel libroot posix math ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include arch $(OBOS_ARCH) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc math ] ;
+
 KernelMergeObject posix_math.o :
-	<$(SOURCE_GRIST)>acosh.c
-	<$(SOURCE_GRIST)>asincos.c
-	<$(SOURCE_GRIST)>asinh.c
-	<$(SOURCE_GRIST)>atan.c
-	<$(SOURCE_GRIST)>atan2.c
-	<$(SOURCE_GRIST)>atanh.c
-	<$(SOURCE_GRIST)>cabs.c
-	<$(SOURCE_GRIST)>cbrt.c
-	<$(SOURCE_GRIST)>cosh.c
-	<$(SOURCE_GRIST)>erf.c
-	<$(SOURCE_GRIST)>exp.c
-	<$(SOURCE_GRIST)>exp__E.c
-	<$(SOURCE_GRIST)>expm1.c
-	<$(SOURCE_GRIST)>floor.c
-	<$(SOURCE_GRIST)>fmod.c
-	<$(SOURCE_GRIST)>gamma.c
-	<$(SOURCE_GRIST)>ieee.c
-	<$(SOURCE_GRIST)>j0.c
-	<$(SOURCE_GRIST)>j1.c
-	<$(SOURCE_GRIST)>jn.c
-	<$(SOURCE_GRIST)>lgamma.c
-	<$(SOURCE_GRIST)>log.c
-	<$(SOURCE_GRIST)>log10.c
-	<$(SOURCE_GRIST)>log1p.c
-	<$(SOURCE_GRIST)>log__L.c
-	<$(SOURCE_GRIST)>math_globals.c
-	<$(SOURCE_GRIST)>pow.c
-	<$(SOURCE_GRIST)>sincos.c
-	<$(SOURCE_GRIST)>sinh.c
-	<$(SOURCE_GRIST)>tan.c 
-	<$(SOURCE_GRIST)>tanh.c
+	acosh.c
+	asincos.c
+	asinh.c
+	atan.c
+	atan2.c
+	atanh.c
+	cabs.c
+	cbrt.c
+	ceilf.c
+	cosh.c
+	erf.c
+	exp.c
+	exp__E.c
+	expm1.c
+	floor.c
+	floorf.c
+	fmod.c
+	gamma.c
+	ieee.c
+	j0.c
+	j1.c
+	jn.c
+	lgamma.c
+	log.c
+	log10.c
+	log1p.c
+	log__L.c
+	math_globals.c
+	pow.c
+	sincos.c
+	sinh.c
+	tan.c 
+	tanh.c
 	:
 	-fPIC -DPIC
 	;
