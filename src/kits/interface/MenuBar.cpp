@@ -32,8 +32,6 @@
 #include <MenuItem.h>
 #include <Window.h>
 
-#include <stdio.h>
-
 #include <AppMisc.h>
 #include <TokenSpace.h>
 
@@ -404,7 +402,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		ulong buttons;
 		do {
 			snooze(40000);
-			printf("BMenuBar: tracking...\n");	
 			GetMouse(&where, &buttons);
 			BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
 			if (menuItem) {
@@ -413,7 +410,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				// all BMenuBar's BMenuItems are BMenus.
 				BMenu *menu = menuItem->Submenu();
 				if (menu) {
-					printf("BMenuBar: showing menu %s\n", menu->Name());			
 					do {
 						snooze(40000);
 						GetMouse(&where, &buttons);
@@ -424,12 +420,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 							break;
 					
 						resultItem = menu->_track((int *)action, startIndex);
-						printf("BMenuBar: menu %s: action: %ld\n", menu->Name(), *action);					
 						
 						// "action" is "5" when the BMenu is closed.
 					} while (*action != 5);		
-					
-					printf("BMenuBar: hiding menu %s\n", menu->Name());
 				}
 				SelectItem(NULL);
 				Invalidate();	
@@ -439,10 +432,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		window->Unlock();
 	}
 	
-	if (resultItem != NULL) {
-		printf("BMenuBar: selected item %s\n", resultItem->Label());
+	if (resultItem != NULL)
 		resultItem->Invoke();
-	}
 	
 	return resultItem;
 }

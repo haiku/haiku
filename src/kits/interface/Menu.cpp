@@ -34,8 +34,6 @@
 
 #include <MenuWindow.h>
 
-#include <stdio.h>
-
 #ifndef COMPILE_FOR_R5
 menu_info BMenu::sMenuInfo;
 #endif
@@ -492,7 +490,7 @@ status_t
 BMenu::SetTargetForItems(BMessenger messenger)
 {
 	for (int32 i = 0; i < fItems.CountItems (); i++)
-		if (((BMenuItem*)fItems.ItemAt(i))->SetTarget(messenger) != B_OK)
+		if (ItemAt(i)->SetTarget(messenger) != B_OK)
 			return B_ERROR;
 
 	return B_OK;
@@ -1034,7 +1032,7 @@ BMenu::_show(bool selectFirstItem)
 		point.x + 20, point.y + 200), this);
 
 	window->Show();
-
+	
 	return true;
 }
 
@@ -1063,7 +1061,7 @@ BMenu::_track(int *action, long start)
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
 					
-			item = HitTestItems(location);
+			item = HitTestItems(location, B_ORIGIN);
 			if (item == NULL) {
 				UnlockLooper();
 				break;		
@@ -1150,6 +1148,13 @@ BMenu::LayoutItems(int32 index)
 	ComputeLayout(index, true, true, &width, &height);
 
 	ResizeTo(width, height);
+	
+	// TODO: Looks like this call is needed when the layout is
+	// B_ITEMS_IN_MATRIX, otherwise the view is placed in a wrong place
+	// (by the above call). See if we can avoid this by being
+	// smarter in other places.
+	if (fLayout == B_ITEMS_IN_MATRIX)
+		MoveTo(B_ORIGIN);
 }
 
 
@@ -1160,7 +1165,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	BRect frame;
 	float iWidth, iHeight;
 	BMenuItem *item;
-
+	
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 		{
@@ -1217,11 +1222,20 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		
 		case B_ITEMS_IN_MATRIX:
 		{
-			printf("BMenu: B_ITEMS_IN_MATRIX not yet implemented\n");
-			frame = Frame();
+			frame.Set(0, 0, 0, 0);
+
+			for (int32 i = 0; i < CountItems(); i++) {
+				BMenuItem *item = ItemAt(i);
+				if (item != NULL) {
+					frame.left = min_c(frame.left, item->Frame().left);
+					frame.right = max_c(frame.right, item->Frame().right);
+					frame.top = min_c(frame.top, item->Frame().top);
+					frame.bottom = max_c(frame.bottom, item->Frame().bottom);
+				}
+			}
 			break;
 		}
-		
+	
 		default:
 			break;
 	}
@@ -1278,9 +1292,8 @@ void
 BMenu::DrawItems(BRect updateRect)
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
-		if (ItemAt(i)->Frame().Intersects(updateRect)) {
+		if (ItemAt(i)->Frame().Intersects(updateRect))
 			ItemAt(i)->Draw();			
-		}
 	}
 	Sync();
 }
@@ -1350,7 +1363,7 @@ BMenu::HitTestItems(BPoint where, BPoint slop) const
 	int32 itemCount = CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem *item = ItemAt(i);
-		if (item->fBounds.Contains(where))
+		if (item->Frame().Contains(where))
 			return item;
 	}
 

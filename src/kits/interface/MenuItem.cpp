@@ -29,11 +29,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <Bitmap.h>
 #include <MenuItem.h>
 #include <String.h>
-#include <Message.h>
 #include <Window.h>
-#include <Bitmap.h>
 
 
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
@@ -107,10 +106,10 @@ BMenuItem::BMenuItem(BMessage *data)
 	if (data->FindMessage("_submenu", &subMessage) == B_OK) {
 		BArchivable *object = instantiate_object(&subMessage);
 
-		if (object) {
-			BMenu *menu = dynamic_cast<BMenu*>(object);
+		if (object != NULL) {
+			BMenu *menu = dynamic_cast<BMenu *>(object);
 
-			if (menu)
+			if (menu != NULL)
 				InitMenuData(menu);
 		}
 	}
@@ -171,15 +170,15 @@ BMenuItem::~BMenuItem()
 void
 BMenuItem::SetLabel(const char *string)
 {
-	if (fLabel) {
+	if (fLabel != NULL) {
 		free(fLabel);
 		fLabel = NULL;
 	}
 	
-	if (string)
+	if (string != NULL)
 		fLabel = strdup(string);
 
-	if (fSuper) {
+	if (fSuper != NULL) {
 		fSuper->InvalidateLayout();
 
 		if (fSuper->LockLooper()) {
@@ -193,13 +192,13 @@ BMenuItem::SetLabel(const char *string)
 void
 BMenuItem::SetEnabled(bool state)
 {
-	if (fSubmenu)
+	if (fSubmenu != NULL)
 		fSubmenu->SetEnabled(state);
 
 	fEnabled = state;
+	
 	BMenu *menu = Menu();
-
-	if (menu && menu->LockLooper()) {
+	if (menu != NULL && menu->LockLooper()) {
 		menu->Invalidate(fBounds);
 		menu->UnlockLooper();
 	}
@@ -211,7 +210,7 @@ BMenuItem::SetMarked(bool state)
 {
 	fMark = state;
 
-	if (state && Menu())
+	if (state && Menu() != NULL)
 		Menu()->ItemMarked(this);
 }
 
@@ -226,7 +225,7 @@ BMenuItem::SetTrigger(char ch)
 	else
 		fSysTrigger = -1;
 
-	if (fSuper)
+	if (fSuper != NULL)
 		fSuper->InvalidateLayout();
 }
 
@@ -544,11 +543,9 @@ BMenuItem::Uninstall()
 void
 BMenuItem::SetSuper(BMenu *super)
 {
-	if (fSuper != NULL && super != NULL) {
+	if (fSuper != NULL && super != NULL)
 		debugger("Error - can't add menu or menu item to more than 1 container (either menu or menubar).");
-		return;
-	}
-		
+				
 	fSuper = super;
 
 	if (fSubmenu)
