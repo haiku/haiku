@@ -38,6 +38,9 @@ public:
 	
 	virtual	void			MoveBy(float x, float y);
 	virtual	void			MoveBy(BPoint pt);
+	virtual	void			ResizeBy(float x, float y);
+	virtual	void			ResizeBy(BPoint pt);
+
 	virtual	void			Draw(BRect r);
 	virtual	void			Draw(void);
 	virtual	void			GetFootprint(BRegion *region);
