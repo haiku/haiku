@@ -4631,6 +4631,13 @@ _kern_next_device(int32 *_cookie)
 }
 
 
+dev_t
+next_dev(int32 *_cookie)
+{
+	return fs_next_device(_cookie);
+}
+
+
 int
 _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 {
