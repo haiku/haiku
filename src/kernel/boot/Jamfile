@@ -1,22 +1,22 @@
 SubDir OBOS_TOP src kernel boot ;
 
-SetupIncludes ; 
-oldccflags = $(CCFLAGS) ;
-{
-  CCFLAGS = ;
-  local x ;
-  for x in $(CCFLAGS) {
-    if $(x) != --nostdinc {
-      CCFLAGS += $(x) ;
-    }
-  }
-}
+#SetupIncludes ; 
+#oldccflags = $(CCFLAGS) ;
+#{
+#  CCFLAGS = ;
+#  local x ;
+#  for x in $(CCFLAGS) {
+#    if $(x) != --nostdinc {
+#      CCFLAGS += $(x) ;
+#    }
+#  }
+#}
 
-SystemMain bootmaker : bootmaker.c ;
-SystemMain bin2h : bin2h.c ;
-SystemMain bin2asm : bin2asm.c ;
-SystemMain makeflop : makeflop.c ;
+BuildPlatformMain bootmaker : bootmaker.c ;
+BuildPlatformMain bin2h : bin2h.c ;
+BuildPlatformMain bin2asm : bin2asm.c ;
+BuildPlatformMain makeflop : makeflop.c ;
 
-CCFLAGS = $(oldccflags) ;
+#CCFLAGS = $(oldccflags) ;
 
 SubInclude OBOS_TOP src kernel boot arch ;
