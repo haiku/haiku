@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <KernelExport.h>
 #include <OS.h>
@@ -124,6 +125,94 @@ move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *page)
 		remove_page_from_queue(from_q, page);
 		enqueue_page(to_q, page);
 	}
+}
+
+
+static status_t
+write_page(vm_page *page)
+{
+	vm_store *store = page->cache->store;
+	size_t length = B_PAGE_SIZE;
+	status_t status;
+	iovec vecs[1];
+
+	TRACE(("write_page(page = %p): offset = %Ld\n", page, page->offset));
+
+	vm_get_physical_page(page->ppn * B_PAGE_SIZE, (addr_t *)&vecs[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+	vecs->iov_len = B_PAGE_SIZE;
+
+	status = store->ops->write(store, page->offset, vecs, 1, &length);
+
+	vm_put_physical_page((addr_t)vecs[0].iov_base);
+
+	if (status < B_OK)
+		dprintf("write_page(page = %p): offset = %Ld, status = %ld\n", page, page->offset, status);
+	return status;
+}
+
+
+status_t
+vm_page_write_modified(vm_cache *cache)
+{
+	vm_page *page = cache->page_list;
+
+	// ToDo: join adjacent pages into one vec list
+
+	for (; page; page = page->cache_next) {
+		status_t status;
+		bool gotPage = false;
+
+		cpu_status state = disable_interrupts();
+		acquire_spinlock(&page_lock);
+
+		if (page->state == PAGE_STATE_MODIFIED) {
+			remove_page_from_queue(&page_modified_queue, page);
+			page->state = PAGE_STATE_BUSY;
+			gotPage = true;
+		}
+
+		release_spinlock(&page_lock);
+		restore_interrupts(state);
+
+		if (!gotPage)
+			continue;
+
+		// got modified page, let's write it back
+
+		status = write_page(page);
+		if (status == B_OK) {
+			vm_area *area;
+
+			// It's written back now, so we can clear the modified flag in all mappings
+			for (area = page->cache->ref->areas; area; area = area->cache_next) {
+				if (page->offset >= area->cache_offset
+					&& page->offset < area->cache_offset + area->size) {
+					vm_translation_map *map = &area->aspace->translation_map;
+					map->ops->lock(map);
+					map->ops->clear_flags(map, page->offset - area->cache_offset + area->base,
+						PAGE_MODIFIED);
+					map->ops->unlock(map);
+				}
+			}
+
+			// put it into the active queue
+
+			state = disable_interrupts();
+			acquire_spinlock(&page_lock);
+
+			if (page->ref_count > 0)
+				page->state = PAGE_STATE_ACTIVE;
+			else
+				page->state = PAGE_STATE_INACTIVE;
+
+			enqueue_page(&page_active_queue, page);
+
+			release_spinlock(&page_lock);
+			restore_interrupts(state);
+		}
+	}
+
+	return B_OK;
 }
 
 
