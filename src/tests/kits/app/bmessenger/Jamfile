@@ -1,10 +1,8 @@
 SubDir OBOS_TOP src tests kits app bmessenger ;
 
-CommonUnitTest BMessengerTester
-	: main.cpp
-	  LockTargetTester.cpp
-	  BMessengerTester.cpp
-	  TargetTester.cpp
+CommonUnitTest SMRemoteTargetApp
+	: SMRemoteTargetApp.cpp
+	  SMLooper.cpp
 	: kits app
 	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4

@@ -33,4 +33,4 @@ CommonTestLib libapptest.so
 SubInclude OBOS_TOP src tests kits app bhandler ;
 SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
-#SubInclude OBOS_TOP src tests kits app bmessenger ;
+SubInclude OBOS_TOP src tests kits app bmessenger ;
