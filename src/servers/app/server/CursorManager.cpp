@@ -180,7 +180,7 @@ void CursorManager::ShowCursor(void)
 	// TODO: Fix
 /*	Lock();
 
-	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
+	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
 	driver->ShowCursor();
 	Unlock();
 */
@@ -192,7 +192,7 @@ void CursorManager::HideCursor(void)
 	// TODO: Fix
 /*	Lock();
 
-	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
+	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
 	driver->HideCursor();
 	Unlock();
 */
@@ -204,7 +204,7 @@ void CursorManager::ObscureCursor(void)
 	// TODO: Fix
 /*	Lock();
 
-	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
+	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
 	driver->ObscureCursor();
 	Unlock();
 */
@@ -221,7 +221,7 @@ void CursorManager::SetCursor(int32 token)
 	ServerCursor *c=_FindCursor(token);
 	if(c)
 	{
-		DisplayDriver *driver=GetGfxDriver(ActiveScreen());
+		DisplayDriver *driver = desktop->CursorScreen()->DDriver();
 		driver->SetCursor(c);
 		_current_which=B_CURSOR_OTHER;
 	}
@@ -234,7 +234,7 @@ void CursorManager::SetCursor(cursor_which which)
 	// TODO: Fix
 /*	Lock();
 
-	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
+	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
 	switch(which)
 	{
 		case B_CURSOR_DEFAULT:
