@@ -263,12 +263,16 @@ ScreenWindow::SetStateByMode()
 	char str[256];
 	mode_to_string(mode,str);
 	marked = fResolutionMenu->FindItem(str);
-	marked->SetMarked(true);
+	if (marked) {
+		marked->SetMarked(true);
+	}
 	fInitialResolution = marked;
 	
 	colorspace_to_string(mode.space,str);
 	marked = fColorsMenu->FindItem(str);
-	marked->SetMarked(true);
+	if (marked) {
+		marked->SetMarked(true);
+	}
 	fInitialColors = marked;
 	
 	fInitialRefreshN = get_refresh_rate(mode);
