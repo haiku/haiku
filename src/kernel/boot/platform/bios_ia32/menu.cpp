@@ -33,7 +33,7 @@ static int32 sMenuOffset = 0;
 static int32
 menu_height()
 {
-	return console_height() - kFirstLine - kHelpLines;
+	return console_height() - kFirstLine - 1 - kHelpLines;
 }
 
 
@@ -46,7 +46,18 @@ print_spacing(int32 count)
 
 
 static void
-print_item_at(int32 line, MenuItem *item)
+print_centered(int32 line, const char *text)
+{
+	console_set_cursor(console_width() / 2 - strlen(text) / 2, line);
+	printf("%s", text);
+
+	console_set_cursor(0, 0);
+		// this avoids unwanted line feeds
+}
+
+
+static void
+print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 {
 	bool selected = item->IsSelected();
 
@@ -105,6 +116,70 @@ print_item_at(int32 line, MenuItem *item)
 	}
 
 	print_spacing(console_width() - length - 2*kOffsetX);
+
+	if (!selected)
+		return;
+
+	console_set_cursor(0, console_height() - kHelpLines);
+	console_set_color(WHITE, BLACK);
+
+	if (clearHelp) {
+		// clear help text area
+		for (int32 i = 0; i < console_width() * 2 - 1; i++)
+			putchar(' ');
+
+		console_set_cursor(0, console_height() - kHelpLines);
+	}
+
+	if (item->HelpText() != NULL) {
+		// show help text at the bottom of the screen,
+		// center it, and wrap it correctly
+
+		const char *text = item->HelpText();
+		int32 width = console_width() - 2 * kOffsetX;
+		int32 length = strlen(text);
+
+		if (length > width * 2)
+			width += 2 * kOffsetX - 1;
+
+		char buffer[width + 1];
+		buffer[width] = '\0';
+			// make sure the buffer is always terminated
+
+		int32 row = 0;
+
+		for (int32 i = 0; i < length && row < 2; i++) {
+			while (text[i] == ' ')
+				i++;
+
+			// copy as much bytes as possible
+			int32 bytes = width;
+			if (bytes > length - i)
+				bytes = length - i;
+
+			memcpy(buffer, text + i, bytes);
+			buffer[bytes] = '\0';
+
+			char *pos = strchr(buffer, '\n');
+			if (pos != NULL)
+				i = pos - buffer;
+			else if (bytes < length - i) {
+				// search for possible line breaks
+				pos = strrchr(buffer, ' ');
+				if (pos != NULL)
+					i = pos - buffer;
+				else {
+					// no wrapping possible
+					i += bytes;
+				}
+			} else
+				i += bytes;
+
+			buffer[i] = '\0';
+			print_centered(console_height() - kHelpLines + row, buffer);
+			row++;
+		}
+	}
 }
 
 
@@ -113,17 +188,14 @@ draw_menu(Menu *menu)
 {
 	console_clear_screen();
 
-	console_set_cursor(console_width()/2 - 7, 1);
 	console_set_color(WHITE, BLACK);
-	printf("Welcome To The");
+	print_centered(1, "Welcome To The");
 
-	console_set_cursor(console_width()/2 - 8, 2);
 	console_set_color(WHITE, BLACK);
-	printf("Haiku Boot Loader");
+	print_centered(2, "Haiku Boot Loader");
 
-	console_set_cursor(console_width()/2 - 12, 4);
 	console_set_color(GREEN, BLACK);
-	printf("Copyright 2004 Haiku Inc.");
+	print_centered(4, "Copyright 2004 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
@@ -137,8 +209,6 @@ draw_menu(Menu *menu)
 	MenuItem *item;
 	int32 i = 0;
 
-	console_set_cursor(kOffsetX, kFirstLine);
-
 	while ((item = iterator.Next()) != NULL) {
 		if (item->Type() == MENU_ITEM_SEPARATOR) {
 			putchar('\n');
@@ -146,7 +216,7 @@ draw_menu(Menu *menu)
 			continue;
 		}
 
-		print_item_at(i++, item);
+		print_item_at(i++, item, false);
 	}
 
 	int32 height = menu_height();
