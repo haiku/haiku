@@ -87,6 +87,7 @@ public:
 	RGBColor GetColor(const float &x, const float &y);
 	bool GetValue(const float &x, const float &y);
 	bool GetValue(const BPoint &pt);
+	pattern *GetR5Pattern(void) { return (pattern*)_pat.GetInt8(); }
 private:
 	Pattern _pat;
 	RGBColor *_high,*_low;
