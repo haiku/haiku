@@ -4,5 +4,5 @@ UsePrivateHeaders media_decoder ;
 
 SimpleTest media_decoder :
 	media_decoder.cpp
-	: media be root
+	: libmedia.so be root
 ;
