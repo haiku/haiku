@@ -30,6 +30,7 @@ class Partition : public Node, public partition_data {
 
 		Partition *Parent() const { return fParent; }
 		bool IsFileSystem() const { return fIsFileSystem; }
+		const char *ModuleName() const { return fModuleName; }
 
 	private:
 		void SetParent(Partition *parent) { fParent = parent; }
@@ -38,6 +39,7 @@ class Partition : public Node, public partition_data {
 		NodeList	fChildren;
 		Partition	*fParent;
 		bool		fIsFileSystem;
+		const char	*fModuleName;
 };
 
 }	// namespace boot
@@ -71,6 +73,7 @@ extern partition_module_info gApplePartitionModule;
 // and hence, don't need to follow the standard module specs.
 
 struct file_system_module_info {
+	const char	*module_name;
 	const char	*pretty_name;
 	status_t	(*get_file_system)(boot::Partition *device, Directory **_root);
 };
