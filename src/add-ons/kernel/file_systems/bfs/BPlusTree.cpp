@@ -437,7 +437,7 @@ BPlusTree::SetTo(Inode *stream)
 			|| (stream->Mode() & S_INDEX_DIR) && toMode[fHeader->DataType()] != mode
 			|| !stream->IsContainer()) {
 			D(	dump_bplustree_header(fHeader);
-				dump_inode(stream->Node());
+				dump_inode(&stream->Node());
 			);
 			RETURN_ERROR(fStatus = B_BAD_TYPE);
 		}
