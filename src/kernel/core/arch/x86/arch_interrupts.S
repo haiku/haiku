@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Copyright 2002, Michael Noisternig. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -105,8 +108,8 @@ int_bottom:
 
 	// custom stack -> copy registers to kernel stack and switch there
   custom_stack:
-	movl	%dr3,%edx  // get_current_thread
-	movl	%eax,%es
+	movl	%dr3,%edx		// get current struct thread
+	movl	%eax,%es		// the iframe is on the wrong stack
 	addl	_interrupt_stack_offset,%edx
 	lss		(%edx),%esp
 	movl	%ebx,%ds
@@ -116,10 +119,10 @@ int_bottom:
 	rep		movsl
 	movl	%eax,%ds
 	subl	$84,%esi
-	movl	%esi,(%edi)  // save custom stack address
+	movl	%esi,(%edi)		// save custom stack address
 	movl	%ebx,4(%edi)
 	call	i386_handle_trap
-	lss		84(%esp),%esp  // reload custom stack address
+	lss		84(%esp),%esp	// reload custom stack address
 	pop		%gs
 	pop		%fs
 	pop		%es
@@ -130,6 +133,7 @@ int_bottom:
 
 _interrupt_stack_offset:
 .long	0
+	// this value will be maintained by the function below
 
 // void	i386_stack_init(struct farcall *interrupt_stack_offset)
 	/* setup in arch_thread.c: arch_thread_init_thread_struct() */
@@ -160,12 +164,39 @@ FUNCTION(i386_stack_switch):
 	popf
 	jmp		*%edx
 
+
+/**	Is copied to the signal stack call to restore the original frame when
+ *	the signal handler exits.
+ *	The copying code (in arch_thread.c::arch_setup_signal_frame()) copies
+ *	everything between the i386_return_from_signal and i386_end_return_from_signal
+ *	symbols.
+ */
+
 FUNCTION(i386_return_from_signal):
 	addl	$12, %esp	// Flushes the 3 arguments to sa_handler
-	movl	$SYSCALL_RESTORE_SIGNAL_FRAME, %eax	// This syscall will restore the cpu context to the
-	movl	$0, %ecx	// one existing before calling the signal handler
+	movl	$SYSCALL_RESTORE_SIGNAL_FRAME, %eax
+		// This syscall will restore the cpu context to the
+		// one existing before calling the signal handler
+	movl	$0, %ecx	
 	lea		4(%esp), %edx
 	int		$99
 	ret
 FUNCTION(i386_end_return_from_signal):
-	
+
+
+/**	void i386_restore_frame_from_syscall(struct iframe iframe);
+ *	Pops the regs of the iframe from the stack to make it current and then
+ *	return to userland.
+ */
+
+FUNCTION(i386_restore_frame_from_syscall):
+	add		$4, %esp	// make the iframe our current stack position (we don't need the
+						// return address anymore, as we will use the one of the frame)
+	pop		%gs			// recreate the frame environment
+	pop		%fs
+	pop		%es
+	pop		%ds
+	popa
+	addl	$16,%esp	// ignore the vector, error code, and original eax/edx values
+						// (which contain the syscall number and argument pointer)
+	iret
