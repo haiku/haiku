@@ -12,6 +12,7 @@ StaticLibrary nvidia_engine :
 	nv_dac.c
 	nv_dac2.c
 	nv_general.c
+	nv_agp.c
 	nv_globals.c
 	nv_i2c.c
 	nv_info.c

@@ -466,7 +466,7 @@ status_t nv_configure_bes
 	if (((my_ov.v_start + my_ov.height) - 1) > (ob->height - 1))
 		my_ov.height = (((ob->height - 1) - my_ov.v_start) + 1);
 
-	LOG(6,("Overlay: inputbuffer view (zoom) left %d, top %d, width %d, height %d\n",
+	LOG(4,("Overlay: inputbuffer view (zoom) left %d, top %d, width %d, height %d\n",
 		my_ov.h_start, my_ov.v_start, my_ov.width, my_ov.height));
 
 	/* save for nv_bes_calc_move_overlay() */
@@ -478,9 +478,9 @@ status_t nv_configure_bes
 	/********************************
 	 *** setup horizontal scaling ***
 	 ********************************/
-	LOG(6,("Overlay: total input picture width = %d, height = %d\n",
+	LOG(4,("Overlay: total input picture width = %d, height = %d\n",
 			(ob->width - si->overlay.myBufInfo[offset].slopspace), ob->height));
-	LOG(6,("Overlay: output picture width = %d, height = %d\n", ow->width, ow->height));
+	LOG(4,("Overlay: output picture width = %d, height = %d\n", ow->width, ow->height));
 
 	/* determine interval representation value, taking zoom into account */
 	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
@@ -668,9 +668,9 @@ status_t nv_configure_bes
 	 *** log color keying info ***
 	 *****************************/
 
-	LOG(6,("Overlay: key_red %d, key_green %d, key_blue %d, key_alpha %d\n",
+	LOG(4,("Overlay: key_red %d, key_green %d, key_blue %d, key_alpha %d\n",
 		ow->red.value, ow->green.value, ow->blue.value, ow->alpha.value));
-	LOG(6,("Overlay: mask_red %d, mask_green %d, mask_blue %d, mask_alpha %d\n",
+	LOG(4,("Overlay: mask_red %d, mask_green %d, mask_blue %d, mask_alpha %d\n",
 		ow->red.mask, ow->green.mask, ow->blue.mask, ow->alpha.mask));
 
 
@@ -678,7 +678,7 @@ status_t nv_configure_bes
 	 *** log flags ***
 	 *****************/
 
-	LOG(6,("Overlay: ow->flags is $%08x\n",ow->flags));
+	LOG(4,("Overlay: ow->flags is $%08x\n",ow->flags));
 	/* BTW: horizontal and vertical filtering are fixed and turned on for GeForce overlay. */
 
 

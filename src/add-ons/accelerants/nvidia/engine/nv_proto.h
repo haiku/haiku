@@ -8,6 +8,9 @@ status_t nv_general_head_select(bool);
 status_t nv_general_wait_retrace(void);
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 
+/* AGP functions */
+status_t nv_agp_setup(void);
+
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
 	nv_log args; \
