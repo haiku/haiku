@@ -29,6 +29,7 @@ Shell::Shell()
 	, fSourceDirectory("")
 	, fOutputFile("")
 	, fUdfVolumeName("")
+	, fUdfRevision(0x0201)
 {
 }
 
@@ -38,9 +39,11 @@ Shell::Run(int argc, char *argv[])
 	DEBUG_INIT("Shell");
 	status_t error = _ProcessArguments(argc, argv);
 	if (!error) {
+		if (fUdfVolumeName == "")
+			fUdfVolumeName = "(Unnamed UDF Volume)";
 		ConsoleListener listener(fVerbosityLevel);
-		UdfBuilder builder(fOutputFile.c_str(), fBlockSize, fDoUdf, fDoIso,
-		                   fUdfVolumeName.c_str(), "ISO_VOLUME",
+		UdfBuilder builder(fOutputFile.c_str(), fBlockSize, fDoUdf, 
+		                   fUdfVolumeName.c_str(), fUdfRevision, fDoIso, "ISO_VOLUME",
 		                   fSourceDirectory.c_str(), listener);
 		error = builder.InitCheck();
 		if (!error) 
@@ -85,6 +88,18 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 			fVerbosityLevel = VERBOSITY_MEDIUM;
 		} else if (arg == "-v3") {
 			fVerbosityLevel = VERBOSITY_HIGH;
+		} else if (arg == "-r" || arg == "--revision") {
+			i++;
+			index++;
+			if (*i == "1.50") 
+				fUdfRevision = 0x0150;
+			else if (*i == "2.01")
+				fUdfRevision = 0x0201;
+			else {
+				printf("ERROR: invalid UDF revision `%s'; please specify `1.50' "
+				       "or `2.01'\n", i->c_str());
+				RETURN(B_ERROR);
+			}				
 		} else {
 			if (index == argumentCount-3) {
 				// Take this argument as the source dir
@@ -129,14 +144,18 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 
 void
 Shell::_PrintHelp() {
-	printf("usage: makeudfimage [options] <source-directory> <output-file> <udf-volume-name>\n");
+	printf("usage:   makeudfimage [options] <source-directory> <output-file> <udf-volume-name>\n");
+	printf("example: makeudfimage /boot/home/mail mail.udf \"Mail Backup\"\n");
 	printf("\n");
-	printf("VALID ARGUMENTS:\n");
-	printf("  --help:   Displays this help text\n");
-	printf("  --quiet:  Turns off console output\n");
+	printf("VALID OPTIONS:\n");
+	printf("  --help:                         Displays this help text.\n");
+	printf("  --quiet:                        Turns off console output.\n");
+	printf("  -r, --revision <udf-revision>:  Selects the UDF revision to use. Supported\n");
+	printf("                                  revisions are 1.50 and 2.01. Defaults to 2.01.\n");
 	printf("\n");
 }
 
+#define MAKEUDFIMAGE_VERSION "1.0.0 beta 1"
 #ifndef MAKEUDFIMAGE_VERSION
 #	define MAKEUDFIMAGE_VERSION ("development version " __DATE__ ", " __TIME__)
 #endif

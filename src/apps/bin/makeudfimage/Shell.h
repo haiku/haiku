@@ -33,6 +33,7 @@ private:
 	std::string fSourceDirectory;
 	std::string fOutputFile;
 	std::string fUdfVolumeName;
+	uint16 fUdfRevision;
 };
 
 
