@@ -54,6 +54,11 @@ void BSession::SetRecvPort( port_id port ){
 	fReceivePort	= port;
 }
 //------------------------------------------------------------------------------
+bool BSession::DropInputBuffer(void)
+{
+	// TODO: Implement
+}
+//------------------------------------------------------------------------------
 char *BSession::ReadString()
 {
 	int16		len = 0;
@@ -81,16 +86,32 @@ status_t BSession::ReadInt8( int8* i ){
 	return ReadData( i, sizeof(int8) );
 }
 //------------------------------------------------------------------------------
+status_t BSession::ReadUInt8( uint8* i ){
+	return ReadData( i, sizeof(uint8) );
+}
+//------------------------------------------------------------------------------
 status_t BSession::ReadInt16( int16* i ){
 	return ReadData( i, sizeof(int16) );
+}
+//------------------------------------------------------------------------------
+status_t BSession::ReadUInt16( uint16* i ){
+	return ReadData( i, sizeof(uint16) );
 }
 //------------------------------------------------------------------------------
 status_t BSession::ReadInt32( int32* i ){
 	return ReadData( i, sizeof(int32) );
 }
 //------------------------------------------------------------------------------
+status_t BSession::ReadUInt32( uint32* i ){
+	return ReadData( i, sizeof(uint32) );
+}
+//------------------------------------------------------------------------------
 status_t BSession::ReadInt64( int64* i ){
 	return ReadData( i, sizeof(int64) );
+}
+//------------------------------------------------------------------------------
+status_t BSession::ReadUInt64( uint64* i ){
+	return ReadData( i, sizeof(uint64) );
 }
 //------------------------------------------------------------------------------
 status_t BSession::ReadFloat(float *f)
