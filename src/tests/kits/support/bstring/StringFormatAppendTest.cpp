@@ -58,17 +58,51 @@ StringFormatAppendTest::PerformTest(void)
 	
 	//operator<<(unsigned int);
 	NextSubTest();
-	NextSubTest();
 	string = new BString("number ");
 	*string << (unsigned int)296;
 	CPPUNIT_ASSERT(strcmp(string->String(), "number 296") == 0);
 	delete string;
 	
 	//operator<<(uint32);
+	NextSubTest();
+	string = new BString;
+	*string << (uint32)102456;
+	CPPUNIT_ASSERT(strcmp(string->String(), "102456") == 0);
+	delete string;
+
 	//operator<<(int32);
+	NextSubTest();
+	string = new BString;
+	*string << (int32)112456;
+	CPPUNIT_ASSERT(strcmp(string->String(), "112456") == 0);
+	delete string;
+
+	NextSubTest();
+	string = new BString;
+	*string << (int32)-112475;
+	CPPUNIT_ASSERT(strcmp(string->String(), "-112475") == 0);
+	delete string;
+
 	//operator<<(uint64);
+	NextSubTest();
+	string = new BString;
+	*string << (uint64)1145267987;
+	CPPUNIT_ASSERT(strcmp(string->String(), "1145267987") == 0);
+	delete string;
+
 	//operator<<(int64);
-	
+	NextSubTest();
+	string = new BString;
+	*string << (int64)112456;
+	CPPUNIT_ASSERT(strcmp(string->String(), "112456") == 0);
+	delete string;
+
+	NextSubTest();
+	string = new BString;
+	*string << (int64)-112475;
+	CPPUNIT_ASSERT(strcmp(string->String(), "-112475") == 0);
+	delete string;
+
 	//operator<<(float);
 	NextSubTest();
 	string = new BString;
