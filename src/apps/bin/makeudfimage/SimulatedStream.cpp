@@ -20,6 +20,12 @@ SimulatedStream::SimulatedStream(DataStream &stream)
 {
 }
 
+status_t
+SimulatedStream::InitCheck() const
+{
+	return fStream.InitCheck();
+}
+
 ssize_t
 SimulatedStream::Read(void *_buffer, size_t size)
 {

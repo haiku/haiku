@@ -24,6 +24,7 @@
 class SimulatedStream : public DataStream {
 public:
 	SimulatedStream(DataStream &stream);
+	virtual status_t InitCheck() const;
 
 	virtual ssize_t Read(void *buffer, size_t size);
 	virtual	ssize_t ReadAt(off_t pos, void *buffer, size_t size);
