@@ -666,6 +666,19 @@ KDiskDeviceManager::NextDiskSystem(int32 *cookie)
 
 // LoadDiskSystem
 KDiskSystem *
+KDiskDeviceManager::LoadDiskSystem(const char *name)
+{
+	KDiskSystem *diskSystem = NULL;
+	if (ManagerLocker locker = this) {
+		diskSystem = FindDiskSystem(name);
+		if (diskSystem && diskSystem->Load() != B_OK)
+			diskSystem = NULL;
+	}
+	return diskSystem;
+}
+
+// LoadDiskSystem
+KDiskSystem *
 KDiskDeviceManager::LoadDiskSystem(disk_system_id id)
 {
 	KDiskSystem *diskSystem = NULL;

@@ -91,6 +91,7 @@ public:
 	int32 CountDiskSystems();
 	KDiskSystem *NextDiskSystem(int32 *cookie);
 
+	KDiskSystem *LoadDiskSystem(const char *name);
 	KDiskSystem *LoadDiskSystem(disk_system_id id);
 	KDiskSystem *LoadNextDiskSystem(int32 *cookie);
 
