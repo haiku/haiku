@@ -45,6 +45,8 @@ class Descriptor {
 		status_t Acquire();
 		status_t Release();
 
+		Node *GetNode() const { return fNode; }
+
 	private:
 		Node	*fNode;
 		void	*fCookie;
@@ -585,6 +587,22 @@ open_from(Directory *directory, const char *name, int mode)
 
 	node->Release();
 	return fd;
+}
+
+
+/** Since we don't have directory functions yet, this
+ *	function is needed to get the contents of a directory.
+ *	It should be removed once readdir() & co. are in place.
+ */
+
+Node *
+get_node_from(int fd)
+{
+	Descriptor *descriptor = get_descriptor(fd);
+	if (descriptor == NULL)
+		return NULL;
+
+	return descriptor->GetNode();
 }
 
 
