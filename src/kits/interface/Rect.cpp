@@ -39,6 +39,33 @@
 // Globals ---------------------------------------------------------------------
 
 
+void
+BRect::SetLeftTop(const BPoint p)
+{
+	left = p.x;
+	top = p.y;
+}
+//------------------------------------------------------------------------------
+void
+BRect::SetRightBottom(const BPoint p)
+{
+	right = p.x;
+	bottom = p.y;
+}
+//------------------------------------------------------------------------------
+void
+BRect::SetLeftBottom(const BPoint p)
+{
+	left = p.x;
+	bottom = p.y;
+}
+//------------------------------------------------------------------------------
+void
+BRect::SetRightTop(const BPoint p)
+{
+	right = p.x;
+	top = p.y;
+}
 //------------------------------------------------------------------------------
 void
 BRect::InsetBy(BPoint point)
