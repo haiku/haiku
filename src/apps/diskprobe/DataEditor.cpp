@@ -9,6 +9,8 @@
 #include <Autolock.h>
 #include <NodeMonitor.h>
 
+#include <string.h>
+
 
 class DataChange {
 	public:
@@ -170,7 +172,7 @@ status_t
 DataEditor::SetTo(const char *path, const char *attribute)
 {
 	BEntry entry(path);
-	SetTo(entry, attribute);
+	return SetTo(entry, attribute);
 }
 
 
@@ -178,7 +180,7 @@ status_t
 DataEditor::SetTo(entry_ref &ref, const char *attribute)
 {
 	BEntry entry(&ref);
-	SetTo(entry, attribute);
+	return SetTo(entry, attribute);
 }
 
 
@@ -195,18 +197,32 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fIsReadOnly = true;
 	}
 
+	struct stat stat;
+	stat.st_mode = 0;
+
+	fFile.GetStat(&stat);
+	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
+
+	// ToDo: add support for devices and attributes!
 	status = fFile.GetSize(&fSize);
 	if (status < B_OK) {
 		fFile.Unset();
 		return status;
 	}
 
+	if (attribute != NULL)
+		fAttribute = strdup(attribute);
+	else
+		fAttribute = NULL;
+
+	fView = NULL;
 	fBlockSize = 512;
-	fAttribute = attribute;
-	fRealViewOffset = -1;
+	fRealViewOffset = 0;
 	fViewOffset = 0;
 	fRealViewSize = fViewSize = fBlockSize;
 	fNeedsUpdate = true;
+
+	return B_OK;
 }
 
 
@@ -384,6 +400,7 @@ status_t
 DataEditor::SetFileSize(off_t size)
 {
 	fSize = size;
+	return B_OK;
 }
 
 
@@ -399,6 +416,8 @@ DataEditor::SetViewOffset(off_t offset)
 	fRealViewOffset = (offset / fBlockSize) * fBlockSize;
 	fViewOffset = offset;
 	fNeedsUpdate = true;
+
+	return B_OK;
 }
 
 
@@ -483,21 +502,75 @@ DataEditor::Unlock()
 }
 
 
+void 
+DataEditor::SendNotices(uint32 what, BMessage *message)
+{
+	if (fObservers.CountItems() == 0)
+		return;
+
+	BMessage *notice;
+	if (message) {
+		notice = new BMessage(*message);
+		notice->what = B_OBSERVER_NOTICE_CHANGE;
+		notice->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
+	} else
+		notice = new BMessage(B_OBSERVER_NOTICE_CHANGE);
+
+	notice->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+
+	for (int32 i = fObservers.CountItems(); i-- > 0;) {
+		BMessenger *messenger = fObservers.ItemAt(i);
+		messenger->SendMessage(notice);
+	}
+
+	delete notice;
+}
+
+
 status_t 
 DataEditor::StartWatching(BMessenger target)
 {
+	BAutolock locker(fLock);
+
 	node_ref node;
 	status_t status = fFile.GetNodeRef(&node);
 	if (status < B_OK)
 		return status;
 
+	fObservers.AddItem(new BMessenger(target));
+
 	return watch_node(&node, B_WATCH_STAT | B_WATCH_ATTR, target);
+}
+
+
+status_t
+DataEditor::StartWatching(BHandler *handler, BLooper *looper)
+{
+	return StartWatching(BMessenger(handler, looper));
 }
 
 
 void 
 DataEditor::StopWatching(BMessenger target)
 {
+	BAutolock locker(fLock);
+
+	for (int32 i = fObservers.CountItems(); i-- > 0;) {
+		BMessenger *messenger = fObservers.ItemAt(i);
+		if (*messenger == target) {
+			fObservers.RemoveItemAt(i);
+			delete messenger;
+			break;
+		}
+	}
+
 	stop_watching(target);
+}
+
+
+void 
+DataEditor::StopWatching(BHandler *handler, BLooper *looper)
+{
+	StopWatching(BMessenger(handler, looper));
 }
 

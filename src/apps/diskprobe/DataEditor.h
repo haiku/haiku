@@ -29,7 +29,10 @@ class DataEditor {
 
 		bool IsReadOnly() const { return fIsReadOnly; }
 		bool IsDevice() const { return fIsDevice; }
+		bool IsAttribute() const { return fAttribute != NULL; }
 		//bool IsModified() const { return fIsModified; }
+
+		const char *Attribute() const { return fAttribute; }
 
 		status_t InitCheck();
 
@@ -65,15 +68,20 @@ class DataEditor {
 		void Unlock();
 
 		status_t StartWatching(BMessenger target);
+		status_t StartWatching(BHandler *handler, BLooper *looper = NULL);
 		void StopWatching(BMessenger target);
+		void StopWatching(BHandler *handler, BLooper *looper = NULL);
 
 		BFile &File() { return fFile; }
 
 	private:
+		void SendNotices(uint32 what, BMessage *message = NULL);
 		status_t Update();
 		void AddChange(DataChange *change);
 		void ApplyChanges();
 		void RemoveRedos();
+
+		BObjectList<BMessenger> fObservers;
 
 		BFile		fFile;
 		const char	*fAttribute;
@@ -92,5 +100,10 @@ class DataEditor {
 
 		size_t		fBlockSize;
 };
+
+static const uint32 kMsgDataEditorUndoState = 'deUS';
+static const uint32 kMsgDataEditorRedoState = 'deRS';
+static const uint32 kMsgDataEditorModifiedState = 'deMS';
+static const uint32 kMsgDataEditorUpdate = 'deUp';
 
 #endif	/* DATA_EDITOR_H */
