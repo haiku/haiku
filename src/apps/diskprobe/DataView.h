@@ -14,8 +14,8 @@
 class DataEditor;
 
 enum base_type {
-	kHexBase,
-	kDecimalBase
+	kHexBase = 16,
+	kDecimalBase = 10
 };
 
 enum view_focus {
@@ -46,7 +46,9 @@ class DataView : public BView {
 		virtual void SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 		virtual void GetPreferredSize(float *_width, float *_height);
 
+		float FontSize() const;
 		void SetFontSize(float point);
+
 		void UpdateScroller();
 
 		void MakeVisible(int32 position);

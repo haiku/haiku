@@ -6,6 +6,7 @@
 
 #include "DiskProbe.h"
 #include "DataEditor.h"
+#include "DataView.h"
 #include "FileWindow.h"
 #include "AttributeWindow.h"
 #include "OpenWindow.h"
@@ -15,6 +16,7 @@
 #include <Alert.h>
 #include <TextView.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
@@ -26,6 +28,31 @@
 static const char *kSignature = "application/x-vnd.OpenBeOS-DiskProbe";
 
 static const uint32 kCascadeOffset = 20;
+
+static const uint32 kMsgDiskProbeSettings = 'DPst';
+
+struct disk_probe_settings {
+	BRect	window_frame;
+	int32	base_type;
+	int32	font_size;
+	int32	unknown;
+};
+
+
+class Settings {
+	public:
+		Settings();
+		~Settings();
+
+		const BMessage &Message() const { return fMessage; }
+		void UpdateFrom(BMessage *message);
+
+	private:
+		status_t Open(BFile *file, int32 mode);
+
+		BMessage	fMessage;
+		bool		fUpdated;
+};
 
 
 class DiskProbe : public BApplication {
@@ -45,25 +72,115 @@ class DiskProbe : public BApplication {
 	private:
 		status_t Probe(entry_ref &ref, const char *attribute = NULL);
 
+		Settings	fSettings;
 		BFilePanel	*fFilePanel;
 		BWindow		*fOpenWindow;
 		uint32		fWindowCount;
-		BRect		fWindowPosition;
+		BRect		fWindowFrame;
 };
 
 
 //-----------------
 
 
+Settings::Settings()
+	:
+	fMessage(kMsgDiskProbeSettings),
+	fUpdated(false)
+{
+	fMessage.AddRect("window_frame", BRect(50, 50, 550, 500));
+	fMessage.AddInt32("base_type", kHexBase);
+	fMessage.AddFloat("font_size", 12.0f);
+
+	BFile file;
+	if (Open(&file, B_READ_ONLY) != B_OK)
+		return;
+
+	// ToDo: load/save settings as flattened BMessage - but not yet,
+	//		since that will break compatibility with R5's DiskProbe
+
+	disk_probe_settings settings;
+	if (file.Read(&settings, sizeof(settings)) == sizeof(settings)) {
+#if B_HOST_IS_BENDIAN
+		// settings are saved in little endian
+		settings.window_frame.left = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.left);
+		settings.window_frame.top = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.top);
+		settings.window_frame.right = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.right);
+		settings.window_frame.bottom = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.bottom);
+		settings.base_type = B_LENDIAN_TO_HOST_INT32(settings.base_type);
+		settings.font_size = B_LENDIAN_TO_HOST_INT32(settings.font_size);
+#endif
+
+		fMessage.ReplaceRect("window_frame", settings.window_frame);
+		fMessage.ReplaceInt32("base_type", settings.base_type);
+		fMessage.ReplaceFloat("font_size", (float)settings.font_size);
+	}
+}
+
+
+Settings::~Settings()
+{
+	// only save the settings if something has changed
+	if (!fUpdated)
+		return;
+
+	BFile file;
+	if (Open(&file, B_CREATE_FILE | B_WRITE_ONLY) != B_OK)
+		return;
+
+	disk_probe_settings settings;
+	settings.window_frame = fMessage.FindRect("window_frame");
+	settings.base_type = fMessage.FindInt32("base_type");
+	settings.font_size = int32(fMessage.FindFloat("font_size") + 0.5f);
+	settings.unknown = 1;
+		// That's what DiskProbe R5 puts in there
+
+	file.Write(&settings, sizeof(settings));
+}
+
+
+status_t 
+Settings::Open(BFile *file, int32 mode)
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return B_ERROR;
+
+	path.Append("DiskProbe_data");
+
+	return file->SetTo(path.Path(), mode);
+}
+
+
+void 
+Settings::UpdateFrom(BMessage *message)
+{
+	BRect frame;
+	if (message->FindRect("window_frame", &frame) == B_OK)
+		fMessage.ReplaceRect("window_frame", frame);
+
+	int32 baseType;
+	if (message->FindInt32("base_type", &baseType) == B_OK)
+		fMessage.ReplaceInt32("base_type", baseType);
+
+	float fontSize;
+	if (message->FindFloat("font_size", &fontSize) == B_OK)
+		fMessage.ReplaceFloat("font_size", fontSize);
+
+	fUpdated = true;
+}
+
+
+//	#pragma mark -
+
+
 DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
-	fWindowCount(0),
-	fWindowPosition(50, 50, 550, 500)
+	fWindowCount(0)
 {
 	fFilePanel = new BFilePanel();
-
-	// ToDo: maintain the window position on disk
+	fWindowFrame = fSettings.Message().FindRect("window_frame");
 }
 
 
@@ -118,14 +235,14 @@ DiskProbe::Probe(entry_ref &ref, const char *attribute)
 		return status;
 
 	// cascade window
-	BRect rect = fWindowPosition;
+	BRect rect = fWindowFrame;
 	rect.OffsetBy(probeWindows * kCascadeOffset, probeWindows * kCascadeOffset);
 
 	BWindow *window;
 	if (attribute != NULL)
-		window = new AttributeWindow(rect, &ref, attribute);
+		window = new AttributeWindow(rect, &ref, attribute, &fSettings.Message());
 	else
-		window = new FileWindow(rect, &ref);
+		window = new FileWindow(rect, &ref, &fSettings.Message());
 
 	window->Show();
 	fWindowCount++;
@@ -200,6 +317,10 @@ DiskProbe::MessageReceived(BMessage *message)
 		case kMsgWindowClosed:
 			if (--fWindowCount == 0 && !fFilePanel->IsShowing())
 				PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		case kMsgSettingsChanged:
+			fSettings.UpdateFrom(message);
 			break;
 
 		case kMsgOpenFilePanel:

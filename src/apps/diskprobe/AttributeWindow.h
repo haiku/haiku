@@ -11,7 +11,8 @@
 
 class AttributeWindow : public ProbeWindow {
 	public:
-		AttributeWindow(BRect rect, entry_ref *ref, const char *attribute = NULL);
+		AttributeWindow(BRect rect, entry_ref *ref, const char *attribute = NULL,
+			const BMessage *settings = NULL);
 		virtual ~AttributeWindow();
 
 		bool Contains(const entry_ref &ref, const char *attribute);

@@ -13,5 +13,6 @@ static const uint32 kMsgOpenFilePanel = 'opFp';
 static const uint32 kMsgOpenOpenWindow = 'opOw';
 static const uint32 kMsgOpenWindowClosed = 'clOw';
 static const uint32 kMsgWindowClosed = 'WiCl';
+static const uint32 kMsgSettingsChanged = 'SeCh';
 
 #endif	/* DISK_PROBE_H */

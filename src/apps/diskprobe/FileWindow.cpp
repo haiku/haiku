@@ -15,7 +15,7 @@
 #include <Path.h>
 
 
-FileWindow::FileWindow(BRect rect, entry_ref *ref)
+FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	: ProbeWindow(rect, ref)
 {
 	// Set alternative window title for devices
@@ -59,7 +59,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref)
 
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
-	ProbeView *probeView = new ProbeView(rect, ref);
+	ProbeView *probeView = new ProbeView(rect, ref, NULL, settings);
 	probeView->AddFileMenuItems(menu, menu->CountItems() - 4);
 	AddChild(probeView);
 

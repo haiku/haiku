@@ -879,9 +879,23 @@ DataView::SetFont(const BFont *font, uint32 properties)
 }
 
 
+float 
+DataView::FontSize() const
+{
+	BFont font;
+	GetFont(&font);
+
+	return font.Size();
+}
+
+
 void 
 DataView::SetFontSize(float point)
 {
+	// ToDo: "fit" is not yet supported
+	if (point == 0.0f)
+		point = 12.0f;
+
 	BFont font = be_fixed_font;
 	font.SetSize(point);
 

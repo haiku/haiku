@@ -23,7 +23,8 @@ class UpdateLooper;
 
 class ProbeView : public BView {
 	public:
-		ProbeView(BRect rect, entry_ref *ref, const char *attribute = NULL);
+		ProbeView(BRect rect, entry_ref *ref, const char *attribute = NULL,
+			const BMessage *settings = NULL);
 		virtual ~ProbeView();
 
 		virtual void DetachedFromWindow();

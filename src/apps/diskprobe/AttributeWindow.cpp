@@ -13,7 +13,8 @@
 #include <stdio.h>
 
 
-AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribute)
+AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribute,
+	const BMessage *settings)
 	: ProbeWindow(rect, ref),
 	fAttribute(strdup(attribute))
 {
@@ -39,7 +40,7 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
-	ProbeView *probeView = new ProbeView(rect, ref, attribute);
+	ProbeView *probeView = new ProbeView(rect, ref, attribute, settings);
 	probeView->AddFileMenuItems(menu, 0);
 	AddChild(probeView);
 

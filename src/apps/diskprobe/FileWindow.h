@@ -11,7 +11,7 @@
 
 class FileWindow : public ProbeWindow {
 	public:
-		FileWindow(BRect rect, entry_ref *ref);
+		FileWindow(BRect rect, entry_ref *ref, const BMessage *settings = NULL);
 
 		virtual bool Contains(const entry_ref &ref, const char *attribute);
 };

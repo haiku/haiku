@@ -6,6 +6,7 @@
 
 #include "ProbeView.h"
 #include "DataView.h"
+#include "DiskProbe.h"
 
 #define BEOS_R5_COMPATIBLE
 	// for SetLimits()
@@ -430,7 +431,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 		rect.right += 100;
 		rect.OffsetBy(0, -2);
 			// BTextControl oddities
-		
+
 		char buffer[16];
 		get_type_string(buffer, sizeof(buffer), editor.Type());
 		fTypeControl = new BTextControl(rect, B_EMPTY_STRING, NULL, buffer, new BMessage(kMsgPositionUpdate));
@@ -832,14 +833,22 @@ UpdateLooper::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
-ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
+ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BMessage *settings)
 	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	fEditor.SetTo(*ref, attribute);
 
+	int32 baseType = kHexBase;
+	float fontSize = 12.0f;
+	if (settings != NULL) {
+		settings->FindInt32("base_type", &baseType);
+		settings->FindFloat("font_size", &fontSize);
+	}
+
 	rect = Bounds();
 	fHeaderView = new HeaderView(rect, ref, fEditor);
 	fHeaderView->ResizeToPreferred();
+	fHeaderView->SetBase((base_type)baseType);
 	AddChild(fHeaderView);
 
 	rect = fHeaderView->Frame();
@@ -847,6 +856,8 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	rect.bottom = Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	fDataView = new DataView(rect, fEditor);
+	fDataView->SetBase((base_type)baseType);
+	fDataView->SetFontSize(fontSize);
 
 	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(fScrollView);
@@ -1046,14 +1057,14 @@ ProbeView::AttachedToWindow()
 
 	subMenu = new BMenu("Base");
 	message = new BMessage(kMsgBaseType);
-	message->AddInt32("base", kDecimalBase);
+	message->AddInt32("base_type", kDecimalBase);
 	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D', B_COMMAND_KEY));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kDecimalBase)
 		item->SetMarked(true);
 
 	message = new BMessage(kMsgBaseType);
-	message->AddInt32("base", kHexBase);
+	message->AddInt32("base_type", kHexBase);
 	subMenu->AddItem(item = new BMenuItem("Hex", message, 'H', B_COMMAND_KEY));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kHexBase)
@@ -1073,15 +1084,22 @@ ProbeView::AttachedToWindow()
 
 	subMenu = new BMenu("Font Size");
 	const int32 fontSizes[] = {9, 10, 12, 14, 18, 24, 36, 48};
+	int32 fontSize = int32(fDataView->FontSize() + 0.5);
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		char buffer[16];
 		snprintf(buffer, sizeof(buffer), "%ld", fontSizes[i]);
-		subMenu->AddItem(new BMenuItem(buffer, NULL));
+		subMenu->AddItem(item = new BMenuItem(buffer, NULL));
+		if (fontSizes[i] == fontSize)
+			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(new BMenuItem("Fit", NULL));
+	subMenu->AddItem(item = new BMenuItem("Fit", NULL));
+	if (fontSize == 0)
+		item->SetMarked(true);
 
+	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
+
 	bar->AddItem(menu);
 }
 
@@ -1093,7 +1111,7 @@ ProbeView::AllAttached()
 }
 
 
-void 
+void
 ProbeView::WindowActivated(bool active)
 {
 	if (active)
@@ -1101,7 +1119,7 @@ ProbeView::WindowActivated(bool active)
 }
 
 
-void 
+void
 ProbeView::CheckClipboard()
 {
 	if (!be_clipboard->Lock())
@@ -1130,11 +1148,16 @@ ProbeView::MessageReceived(BMessage *message)
 		case kMsgBaseType:
 		{
 			int32 type;
-			if (message->FindInt32("base", &type) != B_OK)
+			if (message->FindInt32("base_type", &type) != B_OK)
 				break;
 
 			fHeaderView->SetBase((base_type)type);
 			fDataView->SetBase((base_type)type);
+
+			// update the applications settings
+			BMessage update(*message);
+			update.what = kMsgSettingsChanged;
+			be_app_messenger.SendMessage(&update);
 			break;
 		}
 

@@ -39,6 +39,10 @@ ProbeWindow::MessageReceived(BMessage *message)
 bool 
 ProbeWindow::QuitRequested()
 {
+	BMessage update(kMsgSettingsChanged);
+	update.AddRect("window_frame", Frame());
+	be_app_messenger.SendMessage(&update);
+
 	be_app_messenger.SendMessage(kMsgWindowClosed);
 	return true;
 }
