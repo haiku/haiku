@@ -14,7 +14,9 @@ BMPTranslatorTest::Suite()
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
 	typedef CppUnit::TestCaller<BMPTranslatorTest> TC;
 		
-	suite->addTest( new TC("BMPTranslator DummyTest1", &BMPTranslatorTest::DummyTest) );
+	suite->addTest(
+		new TC("BMPTranslator DummyTest1",
+			&BMPTranslatorTest::DummyTest));
 		
 	return suite;
 }		
