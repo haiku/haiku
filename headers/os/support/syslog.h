@@ -165,15 +165,15 @@ extern "C" {
 _IMPEXP_BE void	closelog (void);
 _IMPEXP_BE void	closelog_team (void);
 _IMPEXP_BE void	closelog_thread (void);
-_IMPEXP_BE void	openlog (char *, int, int);
-_IMPEXP_BE void	openlog_team (char *, int, int);
-_IMPEXP_BE void	openlog_thread (char *, int, int);
-_IMPEXP_BE void	syslog (int, char *, ...);
-_IMPEXP_BE void	log_team (int, char *, ...);
-_IMPEXP_BE void	log_thread (int, char *, ...);
-_IMPEXP_BE int		setlogmask (int);
-_IMPEXP_BE int		setlogmask_team (int);
-_IMPEXP_BE int		setlogmask_thread (int);
+_IMPEXP_BE void	openlog (char *ident, int logopt, int facility);
+_IMPEXP_BE void	openlog_team (char *ident, int logopt, int facility);
+_IMPEXP_BE void	openlog_thread (char *ident, int logopt, int facility);
+_IMPEXP_BE void	syslog (int priority, char *message, ...);
+_IMPEXP_BE void	log_team (int priority, char *message, ...);
+_IMPEXP_BE void	log_thread (int priority, char *message, ...);
+_IMPEXP_BE int		setlogmask (int maskpri);
+_IMPEXP_BE int		setlogmask_team (int maskpri);
+_IMPEXP_BE int		setlogmask_thread (int maskpri);
 
 #ifdef __cplusplus
 }
