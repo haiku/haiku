@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src kernel libroot posix glibc arch x86 ;
+
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdlib ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+
+KernelMergeObject posix_gnu_arch_$(OBOS_ARCH).o :
+	add_n.S
+	addmul_1.S
+	cmp.c
+	dbl2mpn.c
+	divrem.c
+	ldbl2mpn.c
+	mul.c
+	mul_1.S
+	mul_n.c
+	lshift.S
+	rshift.S
+	sub_n.S
+	submul_1.S
+	: -fPIC -DPIC
+	;
+
+SEARCH on [ FGristFiles
+	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c
+        ] = [ FDirName $(OBOS_TOP) src kernel libroot posix glibc arch ] ;
