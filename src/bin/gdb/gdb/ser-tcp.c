@@ -178,6 +178,7 @@ net_open (struct serial *scb, const char *name)
   tmp = 0;
   ioctl (scb->fd, FIONBIO, &tmp);
 
+#ifndef __BEOS__
   if (use_udp == 0)
     {
       /* Disable Nagle algorithm. Needed in some cases. */
@@ -185,6 +186,7 @@ net_open (struct serial *scb, const char *name)
       setsockopt (scb->fd, IPPROTO_TCP, TCP_NODELAY,
 		  (char *)&tmp, sizeof (tmp));
     }
+#endif
 
   /* If we don't do this, then GDB simply exits
      when the remote side dies.  */
