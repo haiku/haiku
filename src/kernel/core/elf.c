@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Contains the ELF loader */
 
@@ -1095,8 +1095,8 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
-			if (id < 0) {
-				dprintf("error allocating region: %s!\n", strerror(id));
+			if (id < B_OK) {
+				dprintf("error mapping file data: %s!\n", strerror(id));
 				err = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
@@ -1124,8 +1124,8 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				regionAddress += fileUpperBound;
 				id = create_area_etc(p, regionName, (void **)&regionAddress,
 					B_EXACT_ADDRESS, bss_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-				if (id < 0) {
-					dprintf("error allocating bss region: %s!\n", strerror(id));
+				if (id < B_OK) {
+					dprintf("error allocating bss area: %s!\n", strerror(id));
 					err = B_NOT_AN_EXECUTABLE;
 					goto error;
 				}
@@ -1142,8 +1142,8 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
-			if (id < 0) {
-				dprintf("error mapping text!\n");
+			if (id < B_OK) {
+				dprintf("error mapping file text: %s!\n", strerror(id));
 				err = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
@@ -1328,15 +1328,15 @@ load_kernel_add_on(const char *path)
 		region->size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
 			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (region->id < 0) {
-			dprintf("error allocating region!\n");
+		if (region->id < B_OK) {
+			dprintf("error allocating area: %s\n", strerror(region->id));
 			err = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
 		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
 		start += region->size;
 
-		TRACE(("elf_load_kspace: created a region \"%s\" at %p\n", regionName, (void *)region->start));
+		TRACE(("elf_load_kspace: created area \"%s\" at %p\n", regionName, (void *)region->start));
 
 		len = _kern_read(fd, pheaders[i].p_offset,
 			(void *)(region->start + (pheaders[i].p_vaddr % B_PAGE_SIZE)),
