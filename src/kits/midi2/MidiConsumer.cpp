@@ -1,3 +1,8 @@
+/**
+ * @file MidiConsumer.cpp
+ *
+ * @author Matthijs Hollemans
+ */
 
 #include "debug.h"
 #include "MidiConsumer.h"

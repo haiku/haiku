@@ -1,3 +1,8 @@
+/**
+ * @file MidiEndpoint.cpp
+ *
+ * @author Matthijs Hollemans
+ */
 
 #include "debug.h"
 #include "MidiEndpoint.h"

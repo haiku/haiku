@@ -1,3 +1,8 @@
+/**
+ * @file MidiLocalProducer.cpp
+ *
+ * @author Matthijs Hollemans
+ */
 
 #include "debug.h"
 #include "MidiProducer.h"

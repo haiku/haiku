@@ -1,3 +1,8 @@
+/**
+ * @file MidiRoster.cpp
+ *
+ * @author Matthijs Hollemans
+ */
 
 #include "debug.h"
 #include "MidiRoster.h"
