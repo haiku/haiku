@@ -39,8 +39,8 @@ if ! $(INVOCATION_SUBDIR_SET) {
 }
 
 # We do not include any local BeOS system headers by default
-CCFLAGS += " -nostdinc" ;
-C++FLAGS += " -nostdinc" ;
+CCFLAGS += -nostdinc ;
+C++FLAGS += -nostdinc ;
 
 # Determine if we're building on PPC or x86
 # Determine mimetype of executable
@@ -70,10 +70,10 @@ if $(WARNINGS) {
 	# -Wundef			(dito)
 	# -Wconversion		(gets you many warnings about implicit conversions)
 	# -W				(gets you even more warnigs)
-	CCFLAGS += "-Wall -Wno-multichar -Wmissing-prototypes" ;
-	CCFLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
-	C++FLAGS += "-Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual" ;
-	C++FLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
+	CCFLAGS += -Wall -Wno-multichar -Wmissing-prototypes ;
+	CCFLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
+	C++FLAGS += -Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual ;
+	C++FLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
 }
 
 # We might later want to introduce debug levels or handle the whole issue
@@ -91,9 +91,9 @@ if $(DEBUG) {
 # To disable for the tests OPTIM and DEBUG are overridden, set the environment
 # variable NO_TEST_DEBUG.
 
-KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
-KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
-KERNEL_CCFLAGS += "-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) " ;
+KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
+KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
+KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
 
 # Instructs the Library rule to not make its object files temporary.
 # This is need as some objects are used in a static library and for an
@@ -161,6 +161,12 @@ rule SetupIncludes
 
 	# Used as a fallback, the R5 header directories (we should remove this as soon as possible)
 	HDRS += /boot/develop/headers/posix /boot/develop/headers/cpp ;
+}
+
+rule SetupR5Includes
+{
+	# Unsets HDRS, so that the OBOS headers do not `shadow' the system headers.
+	HDRS = ;
 }
 
 #-------------------------------------------------------------------------------
@@ -290,8 +296,6 @@ rule TestLib
 	local headerDirs = $(5) ;
 	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	SetupIncludes ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
 	TestObjects $(sources) : $(headerDirs) ;
@@ -318,8 +322,6 @@ rule R5TestLib
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
-
-	SetupIncludes ;
 
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
@@ -369,8 +371,6 @@ rule UnitTest
 	local headerDirs = $(5) ;
 	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	SetupIncludes ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
 	TestObjects $(sources) : $(headerDirs) ;
@@ -397,8 +397,6 @@ rule R5UnitTest
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
 
-	SetupIncludes ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
 	TestObjects $(sources) : : true ;
@@ -421,8 +419,15 @@ rule R5ObjectNames
 rule R5Objects
 {
 	# R5Objects <sources>
-	# Similar to Objects, but appends "_r5" to the object file names.
+	# Similar to Objects, but appends "_r5" to the object file names and
+	# removes `-nostdinc' from the CC and C++ flags to enable system headers.
 	# <sources> The source files.
+
+	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
+	local oldCCFLAGS = $(CCFLAGS) ;
+	local oldC++FLAGS = $(C++FLAGS) ;
+	CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
+	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
 
 	local sources = $(1) ;
 	local source ;
@@ -432,6 +437,10 @@ rule R5Objects
 		Object $(object) : $(source) ;
 		LocalDepends obj : $(object) ;
 	}
+
+	# Reset CCFLAGS and C++FLAGS to original values.
+	CCFLAGS = $(oldCCFLAGS) ;
+	C++FLAGS = $(oldC++FLAGS) ;
 }
 
 rule TestObjects
@@ -456,14 +465,15 @@ rule TestObjects
 		OPTIM = ;
 	}
 
-	SetupIncludes ;
 	SetupObjectsDir ;
 
 	# compile
 	if $(r5) {
+		SetupR5Includes ;
 		objects = [ R5ObjectNames $(sources) ] ;
 		R5Objects $(sources) ;
 	} else {
+		SetupIncludes ;
 		objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 		Objects $(sources) ;
 	}
@@ -1123,7 +1133,7 @@ rule Filter
 			}
 		}
 		if ! $(skip) {
-			newList += item ;
+			newList += $(item) ;
 		}
 	}
 	return $(newList) ;
