@@ -31,7 +31,6 @@
  * SUCH DAMAGE.
  */
 
-#include <cdefs.h>
 #include <math.h>
 
 /* kahan's cube root (53 bits IEEE double precision)
