@@ -1,32 +1,13 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		iso9660.c
-//	Author:			Tyler Dauwalder (tyler@dauwalder.net)
-//	Description:	disk_scanner filesystem module for iso9660 CD-ROM filesystems
-//------------------------------------------------------------------------------
-
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
 /*!
 	\file iso9660.c
 	disk_scanner filesystem module for iso9660 CD-ROM filesystems
+
+	The standard to which this module is written is ECMA-119 second
+	edition, a freely available iso9660 equivalent.
 */
 
 
@@ -39,7 +20,7 @@
 #include <KernelExport.h>
 #include <disk_scanner/fs.h>
 
-#define TRACE(x)
+#define TRACE(x) ;
 //#define TRACE(x) dprintf x
 
 // misc constants
@@ -49,6 +30,9 @@ static const char *kISO9660Signature = "CD001";
 static const uint32 kVolumeDescriptorLength = 2048;
 #define ISO9660_VOLUME_IDENTIFIER_LENGTH 32
 
+/*! \brief The portion of the volume descriptor common to all
+    descriptor types.
+*/
 typedef struct iso9660_common_volume_descriptor {
 	uchar volume_descriptor_type;
 	uchar standard_identifier[5];	// should be 'CD001'
@@ -56,6 +40,8 @@ typedef struct iso9660_common_volume_descriptor {
 	// Remaining bytes are unused
 } iso9660_common_volume_descriptor;
 
+/*! \brief Primary volume descriptor
+*/
 typedef struct iso9660_primary_volume_descriptor {
 	iso9660_common_volume_descriptor info;
 	uchar volume_flags;
@@ -64,7 +50,7 @@ typedef struct iso9660_primary_volume_descriptor {
 	// Remaining bytes are disinteresting to us
 } iso9660_primary_volume_descriptor;
 
-// volume descriptor types
+//! Volume descriptor types
 typedef enum {
 	ISO9660VD_BOOT,
 	ISO9660VD_PRIMARY,
@@ -179,6 +165,8 @@ iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 	uchar *buffer = NULL;
 	uint32 blockSize = partitionInfo->info.logical_block_size;
 	bool exit = false;
+	// The first 16 blocks are for "system use" only, and thus are
+	// irrelevant to us and generally just zeros
 	off_t offset = partitionInfo->info.offset + 16*blockSize;
 	status_t error = B_OK;
 	

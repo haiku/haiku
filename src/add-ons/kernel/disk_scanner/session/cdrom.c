@@ -1,35 +1,19 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		cdrom.c
-//	Author:			Tyler Dauwalder (tyler@dauwalder.net)
-//	Description:	disk_scanner session module for SCSI/ATAPI cdrom drives
-//------------------------------------------------------------------------------
-
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
 /*!
 	\file cdrom.c
 	disk_scanner session module for SCSI/ATAPI cdrom drives 
 	
 	The protocols used in this module are based on information taken
 	from the "SCSI-3 Multimedia Commands" draft, revision 10A.
+	
+	The SCSI command of interest is "READ TOC/PMA/ATIP", command
+	number \c 0x43.
+	
+	The format of interest for said command is "Full TOC", format
+	number \c 0x2.
 */
 
 #include <errno.h>
@@ -465,7 +449,7 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 	}
 	
 	if (error)	
-		dprintf("%s: get_nth error 0x%lx\n", kModuleDebugName, error);
+		TRACE(("%s: get_nth error 0x%lx\n", kModuleDebugName, error));
 		
 	return error;
 }
