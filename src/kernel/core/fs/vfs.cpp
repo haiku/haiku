@@ -40,10 +40,8 @@
 #include <limits.h>
 #include <stddef.h>
 
-#ifndef TRACE_VFS
-#	define TRACE_VFS 0
-#endif
-#if TRACE_VFS
+//#define TRACE_VFS
+#ifdef TRACE_VFS
 #	define PRINT(x) dprintf x
 #	define FUNCTION(x) dprintf x
 #else
@@ -393,6 +391,8 @@ remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 static status_t
 create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 {
+	FUNCTION(("create_new_vnode()\n"));
+
 	struct vnode *vnode = (struct vnode *)malloc(sizeof(struct vnode));
 	if (vnode == NULL)
 		return B_NO_MEMORY;
@@ -678,6 +678,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		// If the new node is a symbolic link, resolve it (if we've been told to do it)
 		if (S_ISLNK(type) && !(!traverseLeafLink && nextPath[0] == '\0')) {
 			char *buffer;
+
+			PRINT(("traverse link\n"));
 
 			// it's not exactly nice style using goto in this way, but hey, it works :-/
 			if (count + 1 > MAX_SYM_LINKS) {
@@ -1109,6 +1111,8 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 extern "C" status_t
 new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 {
+	FUNCTION(("new_vnode()\n"));
+
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
 
@@ -1127,6 +1131,8 @@ new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 	status_t status = create_new_vnode(&vnode, mountID, vnodeID);
 	if (status == B_OK)
 		vnode->private_node = privateNode;
+
+	PRINT(("returns: %s\n", strerror(status)));
 
 	mutex_unlock(&sVnodeMutex);
 	return status;
@@ -1329,7 +1335,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 
 			return B_OK;
 		} else {
-			PRINT(("vfs_get_module_path(): something is strange here...\n"));
+			PRINT(("vfs_get_module_path(): something is strange here: %d...\n", type));
 			status = B_ERROR;
 			goto err;
 		}
@@ -1636,7 +1642,26 @@ vfs_bootstrap_file_systems(void)
 status_t
 vfs_mount_boot_file_system()
 {
-	// ToDo: mount real file system!
+	file_system_info *bootfs;
+	if ((bootfs = get_file_system("bootfs")) == NULL) {
+		// no bootfs there, yet
+
+		// ToDo: do this for real!
+		status_t status = sys_mount("/boot", "/dev/disk/scsi/0/0/0/raw", "bfs", NULL);
+		if (status < B_OK)
+			panic("could not get boot device: %s!\n", strerror(status));
+
+		DIR *dir = opendir("/boot");
+		if (dir != NULL) {
+			dprintf("Boot Directory Contents:\n");
+			struct dirent *dirent;
+			while ((dirent = readdir(dir)) != NULL) {
+				dprintf(":: %s\n", dirent->d_name);
+			}
+			closedir(dir);
+		}
+	} else
+		put_file_system(bootfs);
 
 	dev_t bootDevice = sNextMountID - 1;
 
@@ -3033,33 +3058,43 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		goto err2;
 	}
 
-	recursive_lock_init(&mount->rlock, "mount rlock");
+	err = recursive_lock_init(&mount->rlock, "mount rlock");
+	if (err < B_OK)
+		goto err3;
+
 	mount->id = sNextMountID++;
 	mount->unmounting = false;
+
+	mutex_lock(&sMountMutex);
+
+	// insert mount struct into list before we call fs mount()
+	hash_insert(sMountsTable, mount);
+
+	mutex_unlock(&sMountMutex);
 
 	if (!sRoot) {
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
 			err = B_ERROR;
-			goto err3;
+			goto err4;
 		}
 
 		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//err = ERR_VFS_GENERAL;
-			goto err3;
+			goto err4;
 		}
 
 		mount->covers_vnode = NULL; // this is the root mount
 	} else {
 		err = path_to_vnode(path, true, &covered_vnode, kernel);
 		if (err < 0)
-			goto err2;
+			goto err4;
 
 		if (!covered_vnode) {
 			err = B_ERROR;
-			goto err2;
+			goto err4;
 		}
 
 		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
@@ -3067,7 +3102,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		if (covered_vnode != sRoot
 			&& covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
-			goto err2;
+			goto err4;
 		}
 
 		mount->covers_vnode = covered_vnode;
@@ -3075,19 +3110,12 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		// mount it
 		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0)
-			goto err4;
+			goto err5;
 	}
-
-	mutex_lock(&sMountMutex);
-
-	// insert mount struct into list
-	hash_insert(sMountsTable, mount);
-
-	mutex_unlock(&sMountMutex);
 
 	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
 	if (err < 0)
-		goto err5;
+		goto err6;
 
 	// XXX may be a race here
 	if (mount->covers_vnode)
@@ -3100,13 +3128,18 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	return 0;
 
-err5:
+err6:
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
-err4:
+err5:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
-err3:
+err4:
+	mutex_lock(&sMountMutex);
+	hash_remove(sMountsTable, mount);
+	mutex_unlock(&sMountMutex);
+
 	recursive_lock_destroy(&mount->rlock);
+err3:
 	put_file_system(mount->fs);
 err2:
 	free(mount->mount_point);
