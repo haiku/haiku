@@ -1344,6 +1344,15 @@ BTranslatorRoster::LoadTranslator(const char *path)
 	} else {
 		// If the translator add-on is in the R4.0 / R4.5 format		
 		translator_data trandata;
+		trandata.translatorName = NULL;
+		trandata.translatorInfo = NULL;
+		trandata.translatorVersion = 0;
+		trandata.inputFormats = NULL;
+		trandata.outputFormats = NULL;
+		trandata.Identify = NULL;
+		trandata.Translate = NULL;
+		trandata.MakeConfig = NULL;
+		trandata.GetConfigMessage = NULL;
 		
 		//	find all the symbols
 		err = get_image_symbol(image, "translatorName", B_SYMBOL_TYPE_DATA,
