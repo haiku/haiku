@@ -347,16 +347,16 @@ KernelLd tls_test :
 	bin/tls_test
 	;
 
-KernelLd filetest :
+KernelLd pipe_test :
 	libglue2.o
-	<$(SOURCE_GRIST)!apps!filetest>main.o
+	<$(SOURCE_GRIST)!apps>pipe_test.o
 	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:
-	bin/filetest
+	bin/pipe_test
 	;
 
 KernelLd envtest :
