@@ -1,4 +1,7 @@
-// DiskDeviceRoster.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
 
 #ifndef _DISK_DEVICE_ROSTER_H
 #define _DISK_DEVICE_ROSTER_H
@@ -73,10 +76,13 @@ public:
 										 BPartition **partition = NULL);
 		// return true if terminated early
 
-	BDiskDevice *DeviceWithID(int32 id) const;
-	BSession *SessionWithID(int32 id, BDiskDevice *device) const;
+	
+	status_t GetDeviceWithID(int32 id, BDiskDevice *device) const;
+	status_t GetSessionWithID(int32 id, BDiskDevice *device,
+							  BSession **session) const;
 		// inits device to the device containing the session
-	BPartition *PartitionWithID(int32 id, BDiskDevice *device) const;
+	status_t GetPartitionWithID(int32 id, BDiskDevice *device,
+								BPartition **partition) const;
 		// inits device to the device containing the partition
 
 	status_t StartWatching(BMessenger target,

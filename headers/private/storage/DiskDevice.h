@@ -1,4 +1,7 @@
-// DiskDevice.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
 
 #ifndef _DISK_DEVICE_H
 #define _DISK_DEVICE_H

@@ -1,4 +1,7 @@
-// Session.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
 
 #ifndef _SESSION_H
 #define _SESSION_H
