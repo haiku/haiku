@@ -26,6 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/socket.h>
 #include <map>
 
 #include <E-mail.h>
@@ -40,8 +41,14 @@
 #include <MDRLanguage.h>
 
 #ifdef BONE
-	#include <sys/socket.h>
-	#include <bone_serial_ppp.h>
+	#define BONE_SERIAL_PPP_GET_STATUS 0xbe230501
+	#define BSPPP_CONNECTED 4
+	typedef struct {
+		char if_name[32];
+		int connection_status;
+		status_t last_error;
+		int connect_speed;
+	} bsppp_status_t;
 	#include <unistd.h>
 #endif
 	

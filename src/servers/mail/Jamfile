@@ -4,6 +4,12 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
+} else if $(TARGET_PLATFORM) = bone {
+	SubDirC++Flags -DBONE ;
+}
+
 AddResources mail_daemon : mail_daemon.rdef ;
 
 Server mail_daemon :
@@ -16,6 +22,7 @@ LinkSharedOSLibs mail_daemon :
 	be 
 	libmail.so
 	tracker
+	socket
 	stdc++.r4
 ;
 
