@@ -16,6 +16,7 @@ public:
 					FileTypeWindow(const BList * entryList);
 					~FileTypeWindow();
 	
+	virtual void	Quit();
 	virtual bool 	QuitRequested();
 	virtual void 	MessageReceived(BMessage * message);
 	

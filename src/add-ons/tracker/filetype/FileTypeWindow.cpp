@@ -1,14 +1,16 @@
 #include <Alert.h>
+#include <Autolock.h>
 #include <Debug.h>
 #include <Entry.h>
 #include <Node.h>
 #include <NodeInfo.h>
 
+#include <FileTypeApp.h>
 #include <FileTypeView.h>
 #include <FileTypeWindow.h>
 
 FileTypeWindow::FileTypeWindow(const BList * entryList)
-	: BWindow(BRect(250,150,350,400),"File Type",B_TITLED_WINDOW,
+	: BWindow(BRect(100,100,380,300),"File Type",B_TITLED_WINDOW,
 	          B_NOT_ZOOMABLE|B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS)
 {
 	initStatus = B_ERROR;
@@ -69,6 +71,18 @@ FileTypeWindow::MessageReceived(BMessage * message)
 	}
 }
 
+void
+FileTypeWindow::Quit()
+{
+	{
+		// This is in its own scope because it must be released
+		// before the call to BWindow::Quit()
+		BAutolock lock(file_type_app);
+		file_type_app->Quit();
+	}
+	BWindow::Quit();
+}
+
 bool
 FileTypeWindow::QuitRequested()
 {
@@ -96,7 +110,7 @@ FileTypeWindow::QuitRequested()
 	} else {
 		// save errors are ignored: there's usually no good way for the user to recover
 		return true;
-	}			
+	}
 }
 
 status_t
@@ -127,6 +141,9 @@ FileTypeWindow::SaveRequested()
 			}
 		}
 	}
+	
+	fView->SetFileType(fileType);
+	fView->SetPreferredApplication(preferredApplication);	
 	return result;
 }
 

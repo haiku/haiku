@@ -27,6 +27,6 @@ private:
 	bool			fArgvOkay;
 };
 
-extern FileTypeApp * file_types_app;
+extern FileTypeApp * file_type_app;
 
 #endif // FILE_TYPE_APP

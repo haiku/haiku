@@ -46,7 +46,13 @@ FileTypeApp::RefsReceived(BMessage * message)
 	int32 i;
 	entry_ref ref;
 	while (message->FindRef("refs",i++,&ref) == B_OK) {
-		entryList.AddItem(new BEntry(&ref,true));
+		BEntry * entry = new BEntry(&ref,true);
+		if (!entry || (entry->InitCheck() != B_OK) || (!entry->Exists())) {
+			// ignore bogus refs
+			delete entry;
+			continue;
+		}
+		entryList.AddItem(entry);
 	}
 	if (entryList.CountItems() == 0) {
 		return;
@@ -62,8 +68,10 @@ FileTypeApp::PrintUsage(const char * execname) {
 	if (execname == 0) {
 		execname = "FileType";
 	}
-	fprintf(stderr,"Usage: %s [FILES]\n",execname);
+	fprintf(stderr,"Usage: %s [OPTIONS] [FILES]\n",execname);
 	fprintf(stderr,"Open a FileType window for the given FILES.\n");
+	fprintf(stderr,"\n");
+	fprintf(stderr,"  -h, --help        print this help\n");
 	fprintf(stderr,"\n");
 	fprintf(stderr,"Report bugs to shatty@myrealbox.com\n");
 	fprintf(stderr,"\n");
@@ -92,15 +100,45 @@ FileTypeApp::ArgvReceived(int32 argc, const char * argv[], const char * cwd)
 			continue;
 		}
 		
-		entry_ref ref;
-		if (get_ref_for_path(path.Path(), &ref) != B_OK) {
-			printf("get_ref_for_path failed: \"");
-			printf("%s",path.Path());
+		BEntry * entry = new BEntry(path.Path(),true);
+		if (!entry || (entry->InitCheck() != B_OK)) {
+			printf("failed to allocate BEntry: \"");
+			if (argv[i][0] == '/') {
+				printf("%s",argv[i]);
+			} else {
+				printf("%s/%s",cwd,argv[i]);
+			}
 			printf("\".\n");
+			delete entry;
 			continue;
 		}
 		
-		entryList.AddItem(new BEntry(&ref,true));
+		if (!entry->Exists()) {
+			if ((strcmp(argv[i],"-h") == 0) ||
+			    (strcmp(argv[i],"-H") == 0) ||
+			    (strcmp(argv[i],"-help") == 0) ||
+			    (strcmp(argv[i],"--help") == 0)) {
+				void * item;
+				for (int32 i = 0 ; (i < entryList.CountItems()) ; i++) {
+					delete entryList.ItemAt(i);
+				}
+				entryList.MakeEmpty();
+				delete entry;
+				break;
+			} else {
+				printf("file does not exist: \"");
+				if (argv[i][0] == '/') {
+					printf("%s",argv[i]);
+				} else {
+					printf("%s/%s",cwd,argv[i]);
+				}
+				printf("\".\n");
+				delete entry;
+				continue;
+			}
+		}
+		
+		entryList.AddItem(entry);
 	}
 	if (entryList.CountItems() == 0) {
 		PrintUsage(argv[0]);
@@ -111,6 +149,7 @@ FileTypeApp::ArgvReceived(int32 argc, const char * argv[], const char * cwd)
 		printf("Failed to create FileTypeWindow\n");
 		return;
 	}
+	fWindow = window;
 	fArgvOkay = true;
 }
 

@@ -3,8 +3,9 @@
 
 #include <Box.h>
 #include <Button.h>
-#include <PopUpMenu.h>
+#include <MenuField.h>
 #include <String.h>
+#include <TextControl.h>
 #include <View.h>
 
 class FileTypeView : public BView {
@@ -20,16 +21,18 @@ public:
 	const char * GetPreferredApplication() const;
 private:
 	BString fFileType;
-	BString fPreferredApplication;
+	BString fPreferredApp;
 	
-	BBox		* fFileTypeBox;
-	BTextView	* fFileTypeTextView;
-	BButton		* fFileTypeSelectButton;
-	BButton		* fFileTypeSameAsButton;
-	BBox		* fPreferredApplicationBox;
-	BPopUpMenu	* fPreferredApplicationMenu;
-	BButton		* fPreferredApplicationSelectButton;
-	BButton		* fPreferredApplicationSameAsButton;
+	BBox			* fFileTypeBox;
+	BTextControl	* fFileTypeTextControl;
+	BButton			* fFileTypeSelectButton;
+	BButton			* fFileTypeSameAsButton;
+	BBox			* fPreferredAppBox;
+	BMenu			* fPreferredAppMenu;
+	BMenuItem		* fPreferredAppMenuItemNone;
+	BMenuField		* fPreferredAppMenuField;
+	BButton			* fPreferredAppSelectButton;
+	BButton			* fPreferredAppSameAsButton;
 };
 
 #endif // FILE_TYPE_VIEW_H
