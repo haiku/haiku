@@ -24,19 +24,17 @@ BinCommand unzip :
 
 LinkSharedOSLibs unzip : be ;
 
-# Gettng funzip to build is going to require quite a bit more work than the other two...
 
-#BinCommand funzip :
-#	funzip.c
-#	funzipdefs.c
-#	crc32.c
-#	crypt.c
-#	globals.c
-#	inflate.c
-#	ttyio.c
-#;
+BinCommand funzip :
+	funzip.c
+	crc32.c
+	cryptf.c
+	globalsf.c
+	inflatef.c
+	ttyio.c
+;
 
-#LinkSharedOSLibs funzip : be ;
+LinkSharedOSLibs funzip : be ;
 
 BinCommand unzipsfx :
 	unzip.c
