@@ -112,6 +112,8 @@ void AccLineCalc::Swap(AccLineCalc &from)
 
 float AccLineCalc::GetX(float y)
 {
+	if (start.x == end.x)
+		return start.x;
 	return ( (y-offset)/slope );
 }
 
@@ -845,7 +847,7 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	   all pairs of intersections.  Watch out for horizontal line segments.
 	*/
 	_Lock();
-	if ( !ptlist || (numpts < 3) || (sizeof(ptlist) < numpts*sizeof(BPoint)) )
+	if ( !ptlist || (numpts < 3) )
 	{
 		_Unlock();
 		return;
@@ -853,7 +855,7 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
-        BPoint *currentPoint, *nextPoint;
+	BPoint *currentPoint, *nextPoint;
 	BPoint tempNextPoint;
 	BPoint tempCurrentPoint;
 	int currentIndex, bestIndex, i, j, y;
@@ -861,26 +863,30 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	int numSegments = 0;
 
 	/* Generate the segment list */
-        currentPoint = ptlist;
+	currentPoint = ptlist;
 	currentIndex = 0;
 	nextPoint = &ptlist[1];
-        while (currentPoint)
+	while (currentPoint)
 	{
+		if ( numSegments >= 2*numpts )
+		{
+			printf("ERROR: Insufficient memory allocated to segment array\n");
+			delete[] segmentArray;
+			return;
+		}
+
 		for (i=0; i<numpts; i++)
 		{
 			if ( ((ptlist[i].y > currentPoint->y) && (ptlist[i].y < nextPoint->y)) ||
 				((ptlist[i].y < currentPoint->y) && (ptlist[i].y > nextPoint->y)) )
 			{
-				tempNextPoint.x = ptlist[i].x;
+				segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
+				tempNextPoint.x = segmentArray[numSegments].GetX(ptlist[i].y);
 				tempNextPoint.y = ptlist[i].y;
 				nextPoint = &tempNextPoint;
 			}
 		}
-		if ( numSegments >= 2*numpts )
-		{
-			printf("ERROR: Insufficient memory allocated to segment array\n");
-			return;
-		}
+
 		segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
 		numSegments++;
 		if ( nextPoint == &tempNextPoint )
@@ -907,9 +913,9 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 		bestIndex = i;
 		for (j=i+1; j<numSegments; j++)
 		{
-			if ( (segmentArray[j].MinY() < segmentArray[i].MinY()) ||
-				((segmentArray[j].MinY() == segmentArray[i].MinY()) &&
-				 (segmentArray[j].MinX() < segmentArray[i].MinX())) )
+			if ( (segmentArray[j].MinY() < segmentArray[bestIndex].MinY()) ||
+				((segmentArray[j].MinY() == segmentArray[bestIndex].MinY()) &&
+				 (segmentArray[j].MinX() < segmentArray[bestIndex].MinX())) )
 				bestIndex = j;
 		}
 		if (bestIndex != i)
@@ -952,7 +958,7 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 			}
 		}
 	}
-
+	delete[] segmentArray;
 	_Unlock();
 }
 
@@ -1091,8 +1097,9 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	// Sort points according to their y values
-	if(pts[0].y < pts[1].y)
+	// Sort points according to their y values and x values (y is primary)
+	if ( (pts[0].y < pts[1].y) ||
+		((pts[0].y == pts[1].y) && (pts[0].x <= pts[1].x)) )
 	{
 		first=pts[0];
 		second=pts[1];
@@ -1103,7 +1110,8 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		second=pts[0];
 	}
 	
-	if(second.y<pts[2].y)
+	if ( (second.y<pts[2].y) ||
+		((second.y == pts[2].y) && (second.x <= pts[2].x)) )
 	{
 		third=pts[2];
 	}
@@ -1112,7 +1120,8 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		// second is lower than "third", so we must ensure that this third point
 		// isn't higher than our first point
 		third=second;
-		if(first.y<pts[2].y)
+		if ( (first.y<pts[2].y) ||
+			((first.y == pts[2].y) && (first.x <= pts[2].x)) )
 			second=pts[2];
 		else
 		{
@@ -1146,7 +1155,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		
 		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
 			HLine(CLIP_X(first.x), CLIP_X(second.x), first.y, &pattern);
-		for(i=int32(first.y+1);i<third.y;i++)
+		for(i=(int32)first.y+1; i<=third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		_Unlock();
@@ -1161,30 +1170,23 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		
 		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
 			HLine(CLIP_X(second.x), CLIP_X(third.x), second.y, &pattern);
-		for(i=int32(first.y+1);i<third.y;i++)
+		for(i=(int32)first.y; i<third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		_Unlock();
 		return;
 	}
 	
-	// Normal case.
-	// Calculate the y deltas for the two lines and we set the maximum for the
-	// first loop to the lesser of the two so that we can change lines.
-	int32 dy1=int32(second.y-first.y),
-		dy2=int32(third.y-first.y),
-		max;
-	max=int32(first.y+MIN(dy1,dy2));
-	
+	// Normal case.	
 	AccLineCalc lineA(first, second);
 	AccLineCalc lineB(first, third);
 	AccLineCalc lineC(second, third);
 	
-	for(i=int32(first.y+1);i<max;i++)
+	for(i=(int32)first.y; i<(int32)second.y; i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 			HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 
-	for(i=max; i<third.y; i++)
+	for(i=(int32)second.y; i<=third.y; i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 			HLine(CLIP_X(lineC.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		
