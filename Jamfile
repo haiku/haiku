@@ -11,9 +11,9 @@ Depends NetworkingKit :
 	net_stack_driver net_server_driver
 	core
 	ethernet loopback ppp
-	raw ipv4 icmp udp tcp
+	raw route ipv4 icmp udp tcp
 	libnet.so libnetapi.so
-	ping ifconfig route traceroute arp pppconfig
+	ping ifconfig <bin>route traceroute arp pppconfig
 	
 	# network drivers:
 	sis900 rtl8139
