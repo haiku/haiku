@@ -1362,6 +1362,8 @@ rule OBOSInstall
 	installRule ?= Install ;
 	local targets = $(sources:G=$(installgrist)) ;
 
+	NotFile $(install) ;
+	NotFile $(uninstall) ;
 	Depends $(install) : $(targets) ;
 	Clean $(uninstall) : $(targets) ;
 
