@@ -7,6 +7,7 @@
 #include "load_driver_settings.h"
 
 #include <OS.h>
+#include <drivers/driver_settings.h>
 
 #include <boot/driver_settings.h>
 #include <boot/kernel_args.h>
@@ -82,3 +83,34 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 
 	return B_OK;
 }
+
+
+status_t
+add_safe_mode_settings(char *settings)
+{
+	if (settings == NULL || settings[0] == '\0')
+		return B_OK;
+
+	size_t length = strlen(settings);
+	char *buffer = (char *)kernel_args_malloc(length + 1);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	driver_settings_file *file = (driver_settings_file *)kernel_args_malloc(sizeof(driver_settings_file));
+	if (file == NULL) {
+		kernel_args_free(buffer);
+		return B_NO_MEMORY;
+	}
+
+	strlcpy(file->name, B_SAFEMODE_DRIVER_SETTINGS, sizeof(file->name));
+	memcpy(buffer, settings, length + 1);
+	file->buffer = buffer;
+	file->size = length;
+
+	// add it to the list
+	file->next = gKernelArgs.driver_settings;
+	gKernelArgs.driver_settings = file;
+
+	return B_OK;
+}
+

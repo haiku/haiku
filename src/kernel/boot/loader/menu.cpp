@@ -7,6 +7,7 @@
 #include "menu.h"
 #include "loader.h"
 #include "RootFileSystem.h"
+#include "load_driver_settings.h"
 
 #include <OS.h>
 
@@ -407,9 +408,15 @@ add_safe_mode_menu()
 	safeMenu->AddItem(item = new MenuItem("Safe mode"));
 	item->SetData(B_SAFEMODE_SAFE_MODE);
 	item->SetType(MENU_ITEM_MARKABLE);
+	item->SetHelpText("Puts the system into safe mode. This can be enabled independently "
+		"from the other options.");
+
 	safeMenu->AddItem(item = new MenuItem("Disable user add-ons"));
 	item->SetData(B_SAFEMODE_DISABLE_USER_ADD_ONS);
 	item->SetType(MENU_ITEM_MARKABLE);
+	item->SetHelpText("Prevent all user installed add-ons to be loaded. Only the add-ons "
+		"in the system directory will be used.");
+
 	safeMenu->AddItem(item = new MenuItem("Disable IDE DMA"));
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
@@ -420,6 +427,27 @@ add_safe_mode_menu()
 	safeMenu->AddItem(item = new MenuItem("Return to main menu"));
 
 	return safeMenu;
+}
+
+
+static void
+apply_safe_mode_options(Menu *menu)
+{
+	MenuItemIterator iterator = menu->ItemIterator();
+	MenuItem *item;
+	char buffer[2048];
+	int32 pos = 0;
+
+	buffer[0] = '\0';
+
+	while ((item = iterator.Next()) != NULL) {
+		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked() || (uint32)pos > sizeof(buffer))
+			continue;
+
+		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%s true\n", (const char *)item->Data());
+	}
+
+	add_safe_mode_settings(buffer);
 }
 
 
@@ -435,13 +463,14 @@ status_t
 user_menu(Directory **_bootVolume)
 {
 	Menu *menu = new Menu(MAIN_MENU);
+	Menu *safeModeMenu;
 	MenuItem *item;
 
 	// Add boot volume
 	menu->AddItem(item = new MenuItem("Select boot volume", add_boot_volume_menu(*_bootVolume)));
 
 	// Add safe mode
-	menu->AddItem(item = new MenuItem("Select safe mode options", add_safe_mode_menu()));
+	menu->AddItem(item = new MenuItem("Select safe mode options", safeModeMenu = add_safe_mode_menu()));
 
 	// Add platform dependent menus
 	platform_add_menus(menu);
@@ -463,6 +492,9 @@ user_menu(Directory **_bootVolume)
 	// See if a new boot device has been selected, and propagate that back
 	if (item->Data() != NULL)
 		*_bootVolume = (Directory *)item->Data();
+
+	apply_safe_mode_options(safeModeMenu);
+	delete menu;
 
 	return B_OK;
 }
