@@ -27,9 +27,14 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <stdio.h>
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
+#include <Cursor.h>
+#include <Locker.h>
+#include <RegistrarDefs.h>
+#include <Roster.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -46,12 +51,58 @@ BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 
 
 //------------------------------------------------------------------------------
-BApplication::BApplication(const char* signature)
+
+// debugging
+//#define DBG(x) x
+#define DBG(x)
+#define OUT	printf
+
+enum {
+	NOT_IMPLEMENTED	= B_ERROR,
+};
+
+
+// Returns the looper name for a given signature: Normally "AppLooperPort",
+// but in case of the registrar a special name.
+static
+const char*
+looper_name_for(const char *signature)
 {
+	if (signature && !strcmp(signature, kRegistrarSignature))
+		return kRosterPortName;
+	return "AppLooperPort";
+}
+//------------------------------------------------------------------------------
+BApplication::BApplication(const char* signature)
+			: BLooper(looper_name_for(signature)),
+			  fAppName(NULL),
+			  fServerFrom(-1),
+			  fServerTo(-1),
+			  fServerHeap(NULL),
+			  fPulseRate(500000),
+			  fInitialWorkspace(0),
+			  fDraggedMessage(NULL),
+			  fPulseRunner(NULL),
+			  fInitError(B_NO_INIT),
+			  fReadyToRunCalled(false)
+{
+	InitData(signature, NULL);
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(const char* signature, status_t* error)
+			: BLooper(looper_name_for(signature)),
+			  fAppName(NULL),
+			  fServerFrom(-1),
+			  fServerTo(-1),
+			  fServerHeap(NULL),
+			  fPulseRate(500000),
+			  fInitialWorkspace(0),
+			  fDraggedMessage(NULL),
+			  fPulseRunner(NULL),
+			  fInitError(B_NO_INIT),
+			  fReadyToRunCalled(false)
 {
+	InitData(signature, error);
 }
 //------------------------------------------------------------------------------
 BApplication::~BApplication()
@@ -59,6 +110,17 @@ BApplication::~BApplication()
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(BMessage* data)
+			: BLooper(looper_name_for(NULL)),
+			  fAppName(NULL),
+			  fServerFrom(-1),
+			  fServerTo(-1),
+			  fServerHeap(NULL),
+			  fPulseRate(500000),
+			  fInitialWorkspace(0),
+			  fDraggedMessage(NULL),
+			  fPulseRunner(NULL),
+			  fInitError(B_NO_INIT),
+			  fReadyToRunCalled(false)
 {
 }
 //------------------------------------------------------------------------------
@@ -74,6 +136,7 @@ BArchivable* BApplication::Instantiate(BMessage* data)
 //------------------------------------------------------------------------------
 status_t BApplication::Archive(BMessage* data, bool deep) const
 {
+	return NOT_IMPLEMENTED;
 }
 //------------------------------------------------------------------------------
 status_t BApplication::InitCheck() const
@@ -83,14 +146,54 @@ status_t BApplication::InitCheck() const
 //------------------------------------------------------------------------------
 thread_id BApplication::Run()
 {
+	AssertLocked();
+
+	if (fRunCalled)
+	{
+		// Not allowed to call Run() more than once
+		// TODO: test
+		// find out what message is actually here
+		debugger("");
+	}
+
+	fTaskID = find_thread(NULL);
+
+	if (fMsgPort == B_NO_MORE_PORTS || fMsgPort == B_BAD_VALUE)
+	{
+		return fMsgPort;
+	}
+
+	fRunCalled = true;
+
+	run_task();
+
+	return fTaskID;
 }
 //------------------------------------------------------------------------------
 void BApplication::Quit()
 {
+	if (!IsLocked()) {
+		const char* name = Name();
+		if (!name)
+			name = "no-name";
+		printf("ERROR - you must Lock a looper before calling Quit(), "
+			   "team=%ld, looper=%s", Team(), name);
+	}
+	// Set the termination flag. That's sufficient in some cases.
+	fTerminating = true;
+	// Delete the object, if not running only.
+	if (!fRunCalled)
+		delete this;
+	// In case another thread called Quit(), things are a bit more complicated.
+	// BLooper::Quit() handles that gracefully.
+	else if (find_thread(NULL) != fTaskID)
+		BLooper::Quit();
 }
 //------------------------------------------------------------------------------
 bool BApplication::QuitRequested()
 {
+	// No windows -- nothing to do.
+	return BLooper::QuitRequested();
 }
 //------------------------------------------------------------------------------
 void BApplication::Pulse()
@@ -103,6 +206,7 @@ void BApplication::ReadyToRun()
 //------------------------------------------------------------------------------
 void BApplication::MessageReceived(BMessage* msg)
 {
+	BLooper::MessageReceived(msg);
 }
 //------------------------------------------------------------------------------
 void BApplication::ArgvReceived(int32 argc, char** argv)
@@ -125,6 +229,7 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 										 BMessage* specifier, int32 form,
 										 const char* property)
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
@@ -145,6 +250,7 @@ void BApplication::ObscureCursor()
 bool BApplication::IsCursorHidden() const
 {
 	// TODO: talk to app_server
+	return false;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const void* cursor)
@@ -185,10 +291,12 @@ int32 BApplication::CountLoopers() const
 {
 	// Tough nut to crack; not documented *anywhere*.  Dug down into BLooper and
 	// found its private sLooperCount var
+	return 0;	// not implemented
 }
 //------------------------------------------------------------------------------
 BLooper* BApplication::LooperAt(int32 index) const
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsLaunching() const
@@ -203,10 +311,12 @@ status_t BApplication::GetAppInfo(app_info* info) const
 //------------------------------------------------------------------------------
 BResources* BApplication::AppResources()
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::DispatchMessage(BMessage* an_event, BHandler* handler)
 {
+	BLooper::DispatchMessage(an_event, handler);
 }
 //------------------------------------------------------------------------------
 void BApplication::SetPulseRate(bigtime_t rate)
@@ -216,10 +326,12 @@ void BApplication::SetPulseRate(bigtime_t rate)
 //------------------------------------------------------------------------------
 status_t BApplication::GetSupportedSuites(BMessage* data)
 {
+	return NOT_IMPLEMENTED;
 }
 //------------------------------------------------------------------------------
 status_t BApplication::Perform(perform_code d, void* arg)
 {
+	return NOT_IMPLEMENTED;
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(uint32 signature)
@@ -232,6 +344,7 @@ BApplication::BApplication(const BApplication& rhs)
 //------------------------------------------------------------------------------
 BApplication& BApplication::operator=(const BApplication& rhs)
 {
+	return *this;
 }
 //------------------------------------------------------------------------------
 void BApplication::_ReservedApplication1()
@@ -268,14 +381,25 @@ void BApplication::_ReservedApplication8()
 //------------------------------------------------------------------------------
 bool BApplication::ScriptReceived(BMessage* msg, int32 index, BMessage* specifier, int32 form, const char* property)
 {
+	return false;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::run_task()
 {
+	task_looper();
 }
 //------------------------------------------------------------------------------
 void BApplication::InitData(const char* signature, status_t* error)
 {
+	// check signature
+	fAppName = signature;
+	// ...
+	// check the looper
+	// ...
+	// everything went fine
+	fInitError = B_OK;
+	if (error)
+		*error = fInitError;
 }
 //------------------------------------------------------------------------------
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
@@ -296,14 +420,17 @@ void BApplication::setup_server_heaps()
 //------------------------------------------------------------------------------
 void* BApplication::rw_offs_to_ptr(uint32 offset)
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 void* BApplication::ro_offs_to_ptr(uint32 offset)
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 void* BApplication::global_ro_offs_to_ptr(uint32 offset)
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::connect_to_app_server()
@@ -324,10 +451,12 @@ void BApplication::write_drag(_BSession_* session, BMessage* a_message)
 //------------------------------------------------------------------------------
 bool BApplication::quit_all_windows(bool force)
 {
+	return false;	// not implemented
 }
 //------------------------------------------------------------------------------
 bool BApplication::window_quit_loop(bool, bool)
 {
+	return false;	// not implemented
 }
 //------------------------------------------------------------------------------
 void BApplication::do_argv(BMessage* msg)
@@ -336,22 +465,27 @@ void BApplication::do_argv(BMessage* msg)
 //------------------------------------------------------------------------------
 uint32 BApplication::InitialWorkspace()
 {
+	return 0;	// not implemented
 }
 //------------------------------------------------------------------------------
 int32 BApplication::count_windows(bool incl_menus) const
 {
+	return 0;	// not implemented
 }
 //------------------------------------------------------------------------------
 BWindow* BApplication::window_at(uint32 index, bool incl_menus) const
 {
+	return NULL;	// not implemented
 }
 //------------------------------------------------------------------------------
 status_t BApplication::get_window_list(BList* list, bool incl_menus) const
 {
+	return NOT_IMPLEMENTED;
 }
 //------------------------------------------------------------------------------
 int32 BApplication::async_quit_entry(void* data)
 {
+	return 0;	// not implemented
 }
 //------------------------------------------------------------------------------
 
