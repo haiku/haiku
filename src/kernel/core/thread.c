@@ -228,6 +228,28 @@ delete_thread_struct(struct thread *thread)
 }
 
 
+// this function gets run by a new thread before anything else
+
+static void
+thread_kthread_entry(void)
+{
+	// simulates the thread spinlock release that would occur if the thread had been
+	// rescheded from. The resched didn't happen because the thread is new.
+	RELEASE_THREAD_LOCK();
+	enable_interrupts(); // this essentially simulates a return-from-interrupt
+}
+
+
+static void
+thread_kthread_exit(void)
+{
+	struct thread *t = thread_get_current_thread();
+
+	t->return_flags = THREAD_RETURN_EXIT;
+	thread_exit();
+}
+
+
 /** Initializes the thread and jumps to its userspace entry point.
  *	This function is called at creation time of every user thread,
  *	but not for a team's main thread.
@@ -623,18 +645,6 @@ put_death_stack_and_reschedule(uint32 index)
 }
 
 
-// this function gets run by a new thread before anything else
-
-static void
-thread_kthread_entry(void)
-{
-	// simulates the thread spinlock release that would occur if the thread had been
-	// rescheded from. The resched didn't happen because the thread is new.
-	RELEASE_THREAD_LOCK();
-	enable_interrupts(); // this essentially simulates a return-from-interrupt
-}
-
-
 // used to pass messages between thread_exit and thread_exit2
 
 struct thread_exit_args {
@@ -809,16 +819,6 @@ thread_exit(void)
 	}
 
 	panic("never can get here\n");
-}
-
-
-static void
-thread_kthread_exit(void)
-{
-	struct thread *t = thread_get_current_thread();
-
-	t->return_flags = THREAD_RETURN_EXIT;
-	thread_exit();
 }
 
 
