@@ -10,7 +10,9 @@
 
 #include "MessageDriverSettingsUtils.h"
 
+// built-in add-ons
 #include "GeneralAddon.h"
+#include "PPPoEAddon.h"
 
 
 #include <PPPInterface.h>
@@ -107,12 +109,6 @@ DialUpView::DialUpView(BRect frame)
 	tabViewRect.bottom -= fTabView->TabHeight();
 	fAddons.AddRect("TabViewRect", tabViewRect);
 	
-//	BRect noInterfacesRect(rect);
-//	noInterfacesRect.top = rect.top + rect.Width() / 2;
-//	noInterfacesRect.bottom = noInterfacesRect.top + 15;
-//	fNoInterfacesStringView = new BStringView(noInterfacesRect, "NoInterfacesView",
-//		TEXT_NO_INTERFACE_SELECTED);
-	
 	rect.top = rect.bottom + 15;
 	rect.bottom = rect.top + 15;
 	rect.right = rect.left + 200;
@@ -162,10 +158,8 @@ DialUpView::AttachedToWindow()
 	fInterfaceMenu->SetTargetForItems(this);
 	fConnectButton->SetTarget(this);
 	
-	if(fListener.InitCheck() != B_OK) {
+	if(fListener.InitCheck() != B_OK)
 		(new BAlert(ERROR_TITLE, ERROR_NO_PPP_STACK, TEXT_OK))->Go();
-//		be_app->PostMessage(B_QUIT_REQUESTED);
-	}
 }
 
 
@@ -178,12 +172,15 @@ DialUpView::MessageReceived(BMessage *message)
 		break;
 		
 		case MSG_CREATE_NEW: {
+			// TODO: open dialog asking for name
 			AddInterface("New interface", true);
 			if(fCurrentItem)
 				fCurrentItem->SetMarked(true);
 		} break;
 		
 		case MSG_DELETE_CURRENT: {
+			// TODO: remove file from disk
+			
 			fInterfaceMenu->RemoveItem(fCurrentItem);
 			delete fCurrentItem;
 			fCurrentItem = NULL;
@@ -278,7 +275,6 @@ DialUpView::SaveSettings(BMessage& settings, BMessage& profile, bool saveModifie
 	if(!fCurrentItem)
 		return false;
 	
-	// create tabs for all registered and valid "Tab" add-ons
 	DialUpAddon *addon;
 	TemplateList<DialUpAddon*> addons;
 	for(int32 index = 0;
@@ -604,6 +600,10 @@ DialUpView::LoadAddons()
 	GeneralAddon *generalAddon = new GeneralAddon(&fAddons);
 	fAddons.AddPointer("Tab", generalAddon);
 	fAddons.AddPointer("DeleteMe", generalAddon);
+	// "PPPoE" device
+	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
+	fAddons.AddPointer("Device", pppoeAddon);
+	fAddons.AddPointer("DeleteMe", pppoeAddon);
 	// "PAP" authenticator
 	BMessage addon;
 	addon.AddString("KernelModuleName", "pap");
@@ -627,7 +627,10 @@ DialUpView::AddInterface(const char *name, bool isNew = false)
 	
 	BMenuItem *item = new BMenuItem(name, new BMessage(MSG_SELECT_INTERFACE));
 	item->SetTarget(this);
-	fInterfaceMenu->AddItem(item, CountInterfaces());
+	int32 index = FindNextMenuInsertionIndex(fInterfaceMenu, name);
+	if(index > CountInterfaces())
+		index = CountInterfaces();
+	fInterfaceMenu->AddItem(item, index);
 	if(CountInterfaces() == 1)
 		fInterfaceMenu->SetLabelFromMarked(true);
 	SelectInterface(CountInterfaces() - 1, isNew);
@@ -653,8 +656,6 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 	} else {
 		if(!fCurrentItem) {
 			fTabView->Show();
-//			fTabView->MoveBy(-Bounds().Width(), 0);
-//			fNoInterfacesStringView->MoveBy(Bounds().Width(), 0);
 			fConnectButton->SetEnabled(true);
 		}
 		
@@ -673,13 +674,8 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 			// tell modules to unload all settings
 		
 		fTabView->Hide();
-//		fTabView->MoveBy(Bounds().Width(), 0);
-//		fNoInterfacesStringView->MoveBy(-Bounds().Width(), 0);
 		fConnectButton->SetEnabled(false);
-	} else if(isNew && !LoadSettings(true)) {
-		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go();
-		LoadSettings(true);
-	} else if(!LoadSettings(false)) {
+	} else if(!isNew && !LoadSettings(false)) {
 		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go();
 		LoadSettings(true);
 	}
@@ -690,4 +686,19 @@ int32
 DialUpView::CountInterfaces() const
 {
 	return fInterfaceMenu->CountItems() - 3;
+}
+
+
+int32
+DialUpView::FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
+	int32 index = 0)
+{
+	BMenuItem *item;
+	for(; index < menu->CountItems(); index++) {
+		item = menu->ItemAt(index);
+		if(item && name.ICompare(item->Label()) <= 0)
+			return index;
+	}
+	
+	return index;
 }

@@ -45,6 +45,8 @@ class DialUpView : public BView {
 		void AddInterface(const char *name, bool isNew = false);
 		void SelectInterface(int32 index, bool isNew = false);
 		int32 CountInterfaces() const;
+		int32 FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
+			int32 index = 0);
 
 	private:
 		PPPInterfaceListener fListener;
@@ -62,7 +64,6 @@ class DialUpView : public BView {
 		BPopUpMenu *fInterfaceMenu;
 		BMenuField *fMenuField;
 		BTabView *fTabView;
-//		BStringView *fNoInterfacesStringView;
 };
 
 

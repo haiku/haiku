@@ -4,6 +4,9 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
+# additonal headers for built-in add-ons:
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
+
 SimpleTest DialUpPreflet :
 	DialUpApplication.cpp
 	DialUpView.cpp
@@ -13,6 +16,7 @@ SimpleTest DialUpPreflet :
 	
 	# built-in add-ons
 	GeneralAddon.cpp
+	PPPoEAddon.cpp
 ;
 
-LinkSharedOSLibs DialUpPreflet : be libppp.a ;
+LinkSharedOSLibs DialUpPreflet : libppp.a be ;

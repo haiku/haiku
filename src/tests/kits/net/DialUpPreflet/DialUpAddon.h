@@ -28,7 +28,7 @@ class DialUpAddon {
 		DialUpAddon(BMessage *addons) : fAddons(addons) {}
 		virtual ~DialUpAddon() {}
 		
-		const BMessage *Addons() const
+		BMessage *Addons() const
 			{ return fAddons; }
 		
 		virtual const char *FriendlyName() const
@@ -46,6 +46,8 @@ class DialUpAddon {
 				// allows to set order in which modules are asked to add the settings
 		
 		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+			{ return false; }
+		virtual bool HasTemporaryProfile() const
 			{ return false; }
 		virtual void IsModified(bool& settings, bool& profile) const
 			{ settings = profile = false; }

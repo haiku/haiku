@@ -56,6 +56,7 @@ class GeneralAddon : public DialUpAddon {
 		bool LoadDeviceSettings(BMessage *settings, BMessage *profile);
 		bool LoadAuthenticationSettings(BMessage *settings, BMessage *profile);
 		
+		virtual bool HasTemporaryProfile() const;
 		virtual void IsModified(bool& settings, bool& profile) const;
 		void IsDeviceModified(bool& settings, bool& profile) const;
 		void IsAuthenticationModified(bool& settings, bool& profile) const;
@@ -109,7 +110,7 @@ class GeneralView : public BView {
 		void AddDevices();
 		void AddAuthenticators();
 		void AddAddonsToMenu(BMenu *menu, const char *type, uint32 what);
-		int32 FindNextAddonInsertionIndex(BMenu *menu, const BString& name,
+		int32 FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
 			int32 index = 0);
 
 	private:

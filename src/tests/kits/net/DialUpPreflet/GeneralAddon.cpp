@@ -32,11 +32,9 @@ GeneralAddon::GeneralAddon(BMessage *addons)
 	fHasPassword(false),
 	fAuthenticatorsCount(0),
 	fSettings(NULL),
-	fProfile(NULL)
+	fProfile(NULL),
+	fGeneralView(NULL)
 {
-	BRect rect;
-	addons->FindRect("TabViewRect", &rect);
-	fGeneralView = new GeneralView(this, rect);
 }
 
 
@@ -50,7 +48,7 @@ GeneralAddon::FindDevice(const BString& moduleName) const
 {
 	DialUpAddon *addon;
 	for(int32 index = 0; Addons()->FindPointer("Device", index,
-			reinterpret_cast<void**>(addon)); index++)
+			reinterpret_cast<void**>(&addon)) == B_OK; index++)
 		if(addon && moduleName == addon->KernelModuleName())
 			return addon;
 	
@@ -68,6 +66,11 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fAuthenticatorsCount = 0;
 	fSettings = settings;
 	fProfile = profile;
+	
+	if(fGeneralView)
+		fGeneralView->Reload();
+			// reset all views (empty settings)
+	
 	if(!settings || !profile || isNew)
 		return true;
 	
@@ -76,6 +79,10 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	
 	if(!LoadAuthenticationSettings(settings, profile))
 		return false;
+	
+	if(fGeneralView)
+		fGeneralView->Reload();
+			// reload new settings
 	
 	return true;
 }
@@ -90,7 +97,7 @@ GeneralAddon::LoadDeviceSettings(BMessage *settings, BMessage *profile)
 		return false;
 			// TODO: tell user that device specification is missing
 	
-	if(!device.FindString("Values", &fDeviceName))
+	if(device.FindString("Values", &fDeviceName) != B_OK)
 		return false;
 			// TODO: tell user that device specification is missing
 	
@@ -161,6 +168,13 @@ GeneralAddon::LoadAuthenticationSettings(BMessage *settings, BMessage *profile)
 }
 
 
+bool
+GeneralAddon::HasTemporaryProfile() const
+{
+	return !fGeneralView->DoesSavePassword();
+}
+
+
 void
 GeneralAddon::IsModified(bool& settings, bool& profile) const
 {
@@ -216,7 +230,7 @@ GeneralAddon::IsAuthenticationModified(bool& settings, bool& profile) const
 			|| authenticator != fGeneralView->AuthenticatorName());
 	}
 	
-	profile = (fUsername != fGeneralView->Username()
+	profile = (settings || fUsername != fGeneralView->Username()
 		|| (fPassword != fGeneralView->Password() && fHasPassword)
 		|| fHasPassword != fGeneralView->DoesSavePassword());
 }
@@ -229,10 +243,14 @@ GeneralAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempo
 		return false;
 			// TODO: tell user that a device is needed (if we fail because of this)
 	
+	if(!fDeviceAddon || !fDeviceAddon->SaveSettings(settings, profile, saveTemporary))
+		return false;
+	
 	if(fGeneralView->AuthenticatorName()) {
 		BMessage authenticator;
 		authenticator.AddString("Name", PPP_AUTHENTICATOR_KEY);
 		authenticator.AddString("Values", fGeneralView->AuthenticatorName());
+		settings->AddMessage("Parameters", &authenticator);
 		
 		BMessage username;
 		username.AddString("Name", "User");
@@ -246,22 +264,21 @@ GeneralAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempo
 			password.AddString("Values", fGeneralView->Password());
 			authenticator.AddMessage("Parameters", &password);
 		}
+		
+		profile->AddMessage("Parameters", &authenticator);
 	}
 	
-	DialUpAddon *addon = FindDevice(fGeneralView->DeviceName());
-	if(!addon)
-		return false;
-	
-	return addon->SaveSettings(settings, profile, saveTemporary);
+	return true;
 }
 
 
 bool
 GeneralAddon::GetPreferredSize(float *width, float *height) const
 {
-	BRect rect(0, 0, 200, 300);
-		// set default values
-	Addons()->FindRect("TabViewRect", &rect);
+	BRect rect;
+	if(Addons()->FindRect("TabViewRect", &rect) != B_OK)
+		rect.Set(0, 0, 200, 300);
+			// set default values
 	
 	if(width)
 		*width = rect.Width();
@@ -275,10 +292,11 @@ GeneralAddon::GetPreferredSize(float *width, float *height) const
 BView*
 GeneralAddon::CreateView(BPoint leftTop)
 {
-	BRect rect;
-	if(Addons()->FindRect("TabViewRect", &rect) != B_OK);
-		rect.Set(0, 0, 200, 300);
-			// set default values
+	if(!fGeneralView) {
+		BRect rect;
+		Addons()->FindRect("TabViewRect", &rect);
+		fGeneralView = new GeneralView(this, rect);
+	}
 	
 	fGeneralView->MoveTo(leftTop);
 	fGeneralView->Reload();
@@ -326,13 +344,14 @@ GeneralAddon::MarkAuthenticatorAsValid(const BString& moduleName)
 
 
 GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
-	: BView(frame, "General", B_FOLLOW_NONE, 0),
+	: BView(frame, "GeneralView", B_FOLLOW_NONE, 0),
 	fAddon(addon)
 {
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
 	rect.bottom = 100;
 	fDeviceBox = new BBox(rect, "Device");
+	Addon()->Addons()->AddFloat("DeviceViewWidth", fDeviceBox->Bounds().Width() - 10);
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top
 		+ 25 // space for topmost control
@@ -340,17 +359,16 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 		+ 3 * 5; // space beween controls and bottom of box
 	fAuthenticationBox = new BBox(rect, "Authentication");
 	
-	fDeviceField = new BMenuField(BRect(5, 0, 250, 25), "Device",
+	fDeviceField = new BMenuField(BRect(5, 0, 250, 20), "Device",
 		"Device:", new BPopUpMenu("No Devices Found!"));
-	fDeviceField->SetDivider(fDeviceField->StringWidth(fDeviceField->Label()) + 10);
+	fDeviceField->SetDivider(StringWidth(fDeviceField->Label()) + 10);
 	fDeviceField->Menu()->SetRadioMode(true);
 	AddDevices();
 	fDeviceBox->SetLabel(fDeviceField);
 	
-	fAuthenticatorField = new BMenuField(BRect(5, 0, 250, 25), "Authenticator",
+	fAuthenticatorField = new BMenuField(BRect(5, 0, 250, 20), "Authenticator",
 		"Authenticator:", new BPopUpMenu("No Authenticators Found!"));
-	fAuthenticatorField->SetDivider(fAuthenticatorField->StringWidth(
-		fAuthenticatorField->Label()) + 10);
+	fAuthenticatorField->SetDivider(StringWidth(fAuthenticatorField->Label()) + 10);
 	fAuthenticatorField->Menu()->SetRadioMode(true);
 	AddAuthenticators();
 	fAuthenticationBox->SetLabel(fAuthenticatorField);
@@ -364,6 +382,15 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	rect.bottom = rect.top + 20;
 	fPassword = new BTextControl(rect, "password", "Password: ", NULL, NULL);
 	fPassword->TextView()->HideTyping(true);
+	float usernameWidth = StringWidth(fUsername->Label()) + 5;
+	float passwordWidth = StringWidth(fPassword->Label()) + 5;
+	if(usernameWidth > passwordWidth)
+		passwordWidth = usernameWidth;
+	else
+		usernameWidth = passwordWidth;
+	fUsername->SetDivider(usernameWidth);
+	fPassword->SetDivider(passwordWidth);
+	
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
 	fSavePassword = new BCheckBox(rect, "SavePassword", "Save Password", NULL);
@@ -379,18 +406,12 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 
 GeneralView::~GeneralView()
 {
-	// TODO: delete device add-on
 }
 
 
 void
 GeneralView::Reload()
 {
-	// TODO: reload settings:
-	// - select device and authenticator
-	// - add device view (and move authenticator view to fit)
-	// - set username, password, and checkbox
-	
 	fDeviceAddon = NULL;
 	
 	BMenuItem *item;
@@ -402,7 +423,7 @@ GeneralView::Reload()
 			break;
 	}
 	
-	if(fDeviceAddon == Addon()->DeviceAddon()) {
+	if(fDeviceAddon && fDeviceAddon == Addon()->DeviceAddon()) {
 		item->SetMarked(true);
 		ReloadDeviceView();
 	} else {
@@ -417,8 +438,9 @@ GeneralView::Reload()
 		BMessage authentication;
 		if(Addon()->Settings()->FindMessage("Authentication", &authentication) == B_OK)
 			authentication.FindString("Authenticators", &authenticator);
-		for(int32 index = 0; index < fDeviceField->Menu()->CountItems(); index++) {
-			item = fDeviceField->Menu()->ItemAt(index);
+		BMenu *menu = fAuthenticatorField->Menu();
+		for(int32 index = 0; index < menu->CountItems(); index++) {
+			item = menu->ItemAt(index);
 			if(item && item->Message()
 					&& item->Message()->FindString("KernelModuleName",
 						&kernelModule) == B_OK && kernelModule == authenticator) {
@@ -432,6 +454,8 @@ GeneralView::Reload()
 	fUsername->SetText(Addon()->Username());
 	fPassword->SetText(Addon()->Password());
 	fSavePassword->SetValue(Addon()->HasPassword());
+	
+	ReloadDeviceView();
 }
 
 
@@ -512,14 +536,16 @@ void
 GeneralView::ReloadDeviceView()
 {
 	// first remove existing device view(s)
-	while(fDeviceBox->CountChildren() > 0)
-		fDeviceBox->RemoveChild(fDeviceBox->ChildAt(0));
+	while(fDeviceBox->CountChildren() > 1)
+		fDeviceBox->RemoveChild(fDeviceBox->ChildAt(1));
+	
+	if(!fDeviceAddon)
+		return;
 	
 	BRect rect(fDeviceBox->Bounds());
-	rect.top = 25;
 	float width, height;
 	if(!fDeviceAddon->GetPreferredSize(&width, &height)) {
-		width = 50;
+		width = rect.Width();
 		height = 50;
 	}
 	
@@ -527,10 +553,16 @@ GeneralView::ReloadDeviceView()
 		width = rect.Width();
 	if(height < 10)
 		height = 10;
+			// set minimum height
+	else if(height > 200)
+		height = 200;
+			// set maximum height
 	
 	rect.InsetBy((rect.Width() - width) / 2, 0);
+		// center horizontally
+	rect.top = 25;
 	rect.bottom = rect.top + height;
-	float deltaY = rect.Height() - fDeviceBox->Bounds().Height();
+	float deltaY = height + 30 - fDeviceBox->Bounds().Height();
 	fDeviceBox->ResizeBy(0, deltaY);
 	fAuthenticationBox->MoveBy(0, deltaY);
 	
@@ -560,7 +592,7 @@ GeneralView::AddAuthenticators()
 			Addon()->Addons()->FindMessage("Authenticator", index, &addon) == B_OK;
 			index++) {
 		BMessage *message = new BMessage(MSG_SELECT_AUTHENTICATOR);
-		message->AddString("Authenticator", addon.FindString("KernelModuleName"));
+		message->AddString("KernelModuleName", addon.FindString("KernelModuleName"));
 		
 		BString name, technicalName, friendlyName;
 		bool hasTechnicalName
@@ -578,7 +610,7 @@ GeneralView::AddAuthenticators()
 				name << ")";
 		}
 		
-		int32 insertAt = FindNextAddonInsertionIndex(fAuthenticatorField->Menu(),
+		int32 insertAt = FindNextMenuInsertionIndex(fAuthenticatorField->Menu(),
 			name, 2);
 		fAuthenticatorField->Menu()->AddItem(new BMenuItem(name.String(), message),
 			insertAt);
@@ -610,14 +642,14 @@ GeneralView::AddAddonsToMenu(BMenu *menu, const char *type, uint32 what)
 				name << ")";
 		}
 		
-		int32 insertAt = FindNextAddonInsertionIndex(menu, name);
+		int32 insertAt = FindNextMenuInsertionIndex(menu, name);
 		menu->AddItem(new BMenuItem(name.String(), message), insertAt);
 	}
 }
 
 
 int32
-GeneralView::FindNextAddonInsertionIndex(BMenu *menu, const BString& name,
+GeneralView::FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
 	int32 index = 0)
 {
 	BMenuItem *item;

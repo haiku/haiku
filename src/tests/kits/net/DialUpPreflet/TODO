@@ -11,6 +11,7 @@ Short-term TODOs:
 - write PAP authenticator add-on
 - write PPPoE device add-on
 - move DEVNOTES into a doxygen file and document the rest of the API
+- remove static window positions
 
 Long-term TODOs:
 - allow selecting multiple authenticators
