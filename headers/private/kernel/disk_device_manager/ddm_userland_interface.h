@@ -189,13 +189,13 @@ status_t _kern_set_partition_content_parameters(partition_id partitionID,
 												const char *parameters);
 status_t _kern_initialize_partition(partition_id partitionID,
 									int32 changeCounter,
-									const char *diskSystem, const char *name,
-									const char *parameters);
+									const char *diskSystemName,
+									const char *name, const char *parameters);
 status_t _kern_create_child_partition(partition_id partitionID,
 									  int32 changeCounter, off_t offset,
 									  off_t size, const char *type,
 									  const char *parameters,
-									  partition_id *child);
+									  partition_id *childID);
 status_t _kern_delete_partition(partition_id partitionID, int32 changeCounter);
 
 #if 0
