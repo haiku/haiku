@@ -19,6 +19,7 @@ KernelStaticLibrary libx86 :
 	arch_vm_translation_map.c
 	arch_x86.S
 	arch_interrupts.S
+	arch_system_info.c
 	bios.cpp
 	:
 	-fno-pic -Wno-unused
