@@ -55,7 +55,11 @@
 #define B_SYSTEM_SHUTDOWN 0x12d
 #define B_SYSTEM_REBOOT 0x12e
 
+#ifdef __HAIKU__
+static const char *kRosterSignature = "application/x-vnd.haiku-registrar";
+#else
 static const char *kRosterSignature = "application/x-vnd.Be-ROST";
+#endif
 
 // globals
 const char kIconBits[] = {
