@@ -4,6 +4,12 @@ UsePrivateHeaders media ;
 
 Addon avi_reader : media plugins :
 	avi_reader.cpp
+	:
+	false
+	:
+	libopendml.a
 ;
 
 LinkSharedOSLibs avi_reader : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins avi_reader libOpenDML ;
