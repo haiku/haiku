@@ -62,7 +62,14 @@ BMessageBody& BMessageBody::operator=(const BMessageBody &rhs)
 {
 	if (this != &rhs)
 	{
-		fData = rhs.fData;
+		MakeEmpty();
+		for (TMsgDataMap::const_iterator i = rhs.fData.begin();
+			 i != rhs.fData.end();
+			 ++i)
+		{
+			BMessageField* BMF = i->second;
+			fData[BMF->Name()] = BMF->Clone();
+		}
 		fFlattenedSize = rhs.fFlattenedSize;
 	}
 
@@ -209,7 +216,8 @@ ssize_t BMessageBody::FlattenedSize() const
 
 	for (TMsgDataMap::const_iterator i = fData.begin(); i != fData.end(); ++i)
 	{
-		size += i->second->FlattenedSize();
+		BMessageField* BMF = i->second;
+		size += BMF->FlattenedSize();
 	}
 
 	return size;
@@ -223,7 +231,8 @@ status_t BMessageBody::Flatten(BDataIO* stream) const
 		 i != fData.end() && !err;
 		 ++i)
 	{
-		err = i->second->Flatten(*stream);
+		BMessageField* BMF = i->second;
+		err = BMF->Flatten(*stream);
 	}
 
 	if (!err)

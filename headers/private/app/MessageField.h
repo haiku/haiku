@@ -79,6 +79,8 @@ class BMessageField
 		virtual void				PrintToStream(const char* name) const;
 		virtual const void*			DataAt(int32 index, ssize_t* size) const = 0;
 
+		virtual BMessageField*		Clone() const = 0;
+
 	protected:
 		virtual void				PrintDataItem(int32 index) const = 0;
 
@@ -106,6 +108,7 @@ struct BMessageFieldStoragePolicy
 			inline const T& operator[](uint index) const { return fData[index]; }
 			inline void Add(const T& data) { fData.push_back(data); }
 			inline void Remove(uint index) { fData.erase(fData.begin() + index); }
+			inline void Copy(const Store& rhs) { fData = rhs.fData; }
 
 		private:
 			std::vector<T>	fData;
@@ -183,6 +186,9 @@ class BMessageFieldImpl : public BMessageField
 			{ fData.Remove(index); };
 
 		virtual const void*		DataAt(int32 index, ssize_t* size) const;
+
+		virtual BMessageField*	Clone() const;
+
 				StorageType&	Data() { return fData; }
 
 	protected:
@@ -396,6 +402,30 @@ template
 	class FlattenPolicy,
 	class GetDataPolicy
 >
+BMessageField*
+BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
+Clone() const
+{
+	BMessageFieldImpl<T1>* BMF =
+		new(nothrow) BMessageFieldImpl<T1>(Name(), Type());
+	if (BMF)
+	{
+		BMF->fMaxSize = fMaxSize;
+		BMF->fFlags = fFlags;
+		BMF->fData.Copy(fData);
+	}
+	return BMF;
+}
+//------------------------------------------------------------------------------
+template
+<
+	class T1,
+	class StoragePolicy,
+	class SizePolicy,
+	class PrintPolicy,
+	class FlattenPolicy,
+	class GetDataPolicy
+>
 void 
 BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 PrintDataItem(int32 index) const
@@ -489,17 +519,59 @@ struct BMessageFieldStoragePolicy<bool>
 				{ return fData[index].data; }
 			inline const bool& operator[](uint index) const
 				{ return fData[index].data; }
-			void Add(const bool& data)
+			inline void Add(const bool& data)
 			{
 				fData.push_back(data);
 			}
-			void Remove(uint index)
+			inline void Remove(uint index)
 			{
 				fData.erase(fData.begin() + index);
+			}
+			inline void Copy(const Store& rhs)
+			{
+				if (&fData != &rhs.fData)
+				{
+					fData = rhs.fData;
+				}
 			}
 
 		private:
 			std::vector<Boolean> fData;
+	};
+};
+//------------------------------------------------------------------------------
+template<>
+struct BMessageFieldStoragePolicy<BDataBuffer>
+{
+	class Store
+	{
+		public:
+			inline size_t Size() const
+				{ return fData.size(); }
+			inline BDataBuffer& operator[](uint index)
+				{ return fData[index]; }
+			inline const BDataBuffer& operator[](uint index) const
+				{ return fData[index]; }
+			inline void Add(const BDataBuffer& data)
+				{ fData.push_back(data); }
+			inline void Remove(uint index)
+				{ fData.erase(fData.begin() + index); }
+			void Copy(const Store& rhs)
+			{
+				if (&fData == &rhs.fData)
+				{
+					return;
+				}
+
+				fData.clear();
+				for (size_t i = 0; i < rhs.Size(); ++i)
+				{
+					Add(BDataBuffer(rhs[i], true));
+				}
+			}
+
+		private:
+			std::vector<BDataBuffer>	fData;
 	};
 };
 // Size policy specializations -------------------------------------------------
