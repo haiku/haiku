@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "console.h"
@@ -118,6 +118,15 @@ console_height(void)
 void 
 console_set_cursor(int32 x, int32 y)
 {
+	if (y >= (int32)sScreenHeight)
+		y = sScreenHeight - 1;
+	else if (y < 0)
+		y = 0;
+	if (x >= (int32)sScreenWidth)
+		x = sScreenWidth - 1;
+	else if (x < 0)
+		x = 0;
+
 	sScreenOffset = x + y * sScreenWidth;
 }
 
