@@ -52,7 +52,7 @@ bool OutputTeam( void * item_p )
 		std::cout << info.flags;
 		dec( std::cout );
 	
-		// Output a signture
+		// Output a signature
 		std::cout
 			<< " ("	<< info.signature << ')'
 			<< std::endl
@@ -69,17 +69,13 @@ int main( int argc, char ** argv )
 {
 	// Don't have an BApplication as it is a waste.
 	
-	// Access Roster
-	// - address automatically assigned to be_roster as it's a singleton
-	new BRoster();
-	
 	cout
 		<< "                               path thread team port flags\n"
 		   "-- -------------------------------- ------ ---- ---- -----"
 		<< std::endl
 	;
 
-	// Retriev the running list.
+	// Retrieve the running list.
 	BList applist( 0 );
 	be_roster->GetAppList( & applist );
 
