@@ -3,15 +3,15 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-/* this file has been superceded by the libc code now in place, but 
- * for one area, in kernel calls to dprintf/kprintf and sprintf.
- */
+
+#include <SupportDefs.h>
+#include <kernel.h>
 
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <sys/types.h>
+
 
 #if 0
 static unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base)
@@ -46,14 +46,19 @@ static long simple_strtol(const char *cp,char **endp,unsigned int base)
 	return simple_strtoul(cp,endp,base);
 }
 #endif
-static int skip_atoi(const char **s)
+
+
+static int
+skip_atoi(const char **s)
 {
-	int i=0;
+	int i = 0;
 
 	while (isdigit(**s))
 		i = i*10 + *((*s)++) - '0';
+
 	return i;
 }
+
 
 #define ZEROPAD	1		/* pad with zero */
 #define SIGN	2		/* unsigned/signed long */
@@ -64,15 +69,13 @@ static int skip_atoi(const char **s)
 #define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
 
-static unsigned long long 
-do_div(unsigned long long *n, unsigned base) 
+static uint64
+do_div(uint64 *_number, uint32 base) 
 { 
-	unsigned long long res;
-	res = (*n) %  (unsigned long long)base;
+	uint64 result = *_number % (uint64)base;
+	*_number = *_number / (uint64)base;
 
-	*n = (*n) / (unsigned long long)base;
-
-	return res;
+	return result;
 }
 
 
@@ -151,47 +154,131 @@ number(char *str, long long num, unsigned base, int size, int precision, int typ
 }
 
 
-/* Forward decl. needed for IP address printing stuff... */
-int sprintf(char *buf, const char *fmt, ...);
-
-
-int 
-vsprintf(char *buf, const char *fmt, va_list args)
+static bool
+put_padding(char **_buffer, size_t *_bytesLeft, int32 count)
 {
-	int len;
-	unsigned long long num;
-	int i, base;
-	char * str;
-	const char *s;
+	int32 left = (int32)*_bytesLeft;
+	char *string = *_buffer;
+	int32 written;
+	bool allWritten;
+
+	if (count <= 0)
+		return true;
+	if (left == 0)
+		return false;
+
+	if (left < count) {
+		count = left;
+		allWritten = false;
+	} else
+		allWritten = true;
+
+	written = count;
+
+	while (count-- > 0)
+		*string++ = ' ';
+
+	*_buffer = string;
+	*_bytesLeft = (size_t)(left - written);
+
+	return allWritten;
+}
+
+
+static inline bool
+put_string(char **_buffer, size_t *_bytesLeft, const char *source, size_t length)
+{
+	size_t left = *_bytesLeft;
+	char *target = *_buffer;
+	bool allWritten;
+
+	if (length == 0)
+		return true;
+	if (left == 0)
+		return false;
+
+	if (left < length) {
+		length = left;
+		allWritten = false;
+	} else
+		allWritten = true;
+
+#if 0
+	// take care of string arguments in user space
+	if (CHECK_USER_ADDRESS(source)) {
+		if (user_memcpy(target, source, length) < B_OK)
+			return put_string(_buffer, _bytesLeft, "<FAULT>", 7);
+	} else
+#endif
+		memcpy(target, source, length);
+
+	*_bytesLeft = left - length;
+	*_buffer = target + length;
+
+	return allWritten;
+}
+
+
+static inline bool
+put_character(char **_buffer, size_t *_bytesLeft, char c)
+{
+	size_t left = *_bytesLeft;
+	char *string = *_buffer;
+
+	if (left > 0) {
+		*string++ = c;
+		*_buffer = string;
+		*_bytesLeft = left - 1;
+		return true;
+	}
+
+	return false;
+}
+
+
+int
+vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
+{
+	uint64 num;
+	int base;
+	char *str;
 	int flags;			/* flags to number() */
 	int field_width;	/* width of output field */
 	int precision;		
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
-	for (str = buf; *fmt; ++fmt) {
-		if (*fmt != '%') {
-			*str++ = *fmt;
+	bytesLeft--;
+		// make space for the terminating '\0' byte
+
+	for (str = buffer; fmt[0] && bytesLeft > 0; fmt++) {
+		if (fmt[0] != '%') {
+			if (!put_character(&str, &bytesLeft, fmt[0]))
+				break;
+
 			continue;
 		}
 
 		/* process flags */
+
 		flags = 0;
+
 	repeat:
 		++fmt;		/* this also skips first '%' */
-		switch (*fmt) {
+		switch (fmt[0]) {
 			case '-': flags |= LEFT; goto repeat;
 			case '+': flags |= PLUS; goto repeat;
 			case ' ': flags |= SPACE; goto repeat;
 			case '#': flags |= SPECIAL; goto repeat;
 			case '0': flags |= ZEROPAD; goto repeat;
 		}
-		
+
 		/* get field width */
+
 		field_width = -1;
 		if (isdigit(*fmt))
 			field_width = skip_atoi(&fmt);
-		else if (*fmt == '*') {
+		else if (fmt[0] == '*') {
 			++fmt;
 			/* it's the next argument */
 			field_width = va_arg(args, int);
@@ -202,12 +289,13 @@ vsprintf(char *buf, const char *fmt, va_list args)
 		}
 
 		/* get the precision */
+
 		precision = -1;
-		if (*fmt == '.') {
+		if (fmt[0] == '.') {
 			++fmt;	
 			if (isdigit(*fmt))
 				precision = skip_atoi(&fmt);
-			else if (*fmt == '*') {
+			else if (fmt[0] == '*') {
 				++fmt;
 				/* it's the next argument */
 				precision = va_arg(args, int);
@@ -217,89 +305,97 @@ vsprintf(char *buf, const char *fmt, va_list args)
 		}
 
 		/* get the conversion qualifier */
+
 		qualifier = -1;
-		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
-			qualifier = *fmt;
+		if (fmt[0] == 'h' || fmt[0] == 'l' || fmt[0] == 'L') {
+			qualifier = fmt[0];
 			++fmt;
 		}
 
 		/* default base */
 		base = 10;
 
-		switch (*fmt) {
-		case 'c':
-			if (!(flags & LEFT))
-				while (--field_width > 0)
-					*str++ = ' ';
-			*str++ = (unsigned char) va_arg(args, int);
-			while (--field_width > 0)
-				*str++ = ' ';
-			continue;
+		switch (fmt[0]) {
+			case 'c':
+				if (!(flags & LEFT) && !put_padding(&str, &bytesLeft, field_width))
+					goto out;
 
-		case 's':
-			s = va_arg(args, char *);
-			if (!s)
-				s = "<NULL>";
+				put_character(&str, &bytesLeft, (char)va_arg(args, int));
 
-			len = strnlen(s, precision);
+				if ((flags & LEFT) != 0 && !put_padding(&str, &bytesLeft, field_width))
+					goto out;
+				continue;
 
-			if (!(flags & LEFT))
-				while (len < field_width--)
-					*str++ = ' ';
-			for (i = 0; i < len; ++i)
-				*str++ = *s++;
-			while (len < field_width--)
-				*str++ = ' ';
-			continue;
+			case 's':
+			{
+				const char *argument = va_arg(args, char *);
+				int32 length;
 
-		case 'p':
-			if (field_width == -1) {
-				field_width = 2*sizeof(void *);
-				flags |= ZEROPAD;
+				if (argument == NULL)
+					argument = "<NULL>";
+
+				length = strnlen(argument, precision);
+
+				if (!(flags & LEFT) && !put_padding(&str, &bytesLeft, field_width))
+					goto out;
+
+				if (!put_string(&str, &bytesLeft, argument, length))
+					goto out;
+
+				if ((flags & LEFT) != 0 && !put_padding(&str, &bytesLeft, field_width))
+					goto out;
+				continue;
 			}
-			str[0]= '0';
-			str[1]= 'x';
-			str = number(str+2,
-				(unsigned long) va_arg(args, void *), 16,
-				field_width, precision, flags);
-			continue;
 
+			case 'p':
+				if (field_width == -1) {
+					field_width = 2*sizeof(void *);
+					flags |= ZEROPAD;
+				}
 
-		case 'n':
-			if (qualifier == 'l') {
-				long * ip = va_arg(args, long *);
-				*ip = (str - buf);
-			} else {
-				int * ip = va_arg(args, int *);
-				*ip = (str - buf);
-			}
-			continue;
+				// ToDo: fix me!
+				str[0] = '0';
+				str[1] = 'x';
+				str = number(str + 2, (uint32)va_arg(args, void *), 16,
+						field_width, precision, flags);
+				continue;
 
-		/* integer number formats - set up the flags and "break" */
-		case 'o':
-			base = 8;
-			break;
+			case 'n':
+				if (qualifier == 'l') {
+					long *ip = va_arg(args, long *);
+					*ip = (str - buffer);
+				} else {
+					int *ip = va_arg(args, int *);
+					*ip = (str - buffer);
+				}
+				continue;
 
-		case 'X':
-			flags |= LARGE;
-		case 'x':
-			base = 16;
-			break;
+			/* integer number formats - set up the flags and "break" */
+			case 'o':
+				base = 8;
+				break;
 
-		case 'd':
-		case 'i':
-			flags |= SIGN;
-		case 'u':
-			break;
+			case 'X':
+				flags |= LARGE;
+			case 'x':
+				base = 16;
+				break;
 
-		default:
-			if (*fmt != '%')
-				*str++ = '%';
-			if (*fmt)
-				*str++ = *fmt;
-			else
-				--fmt;
-			continue;
+			case 'd':
+			case 'i':
+				flags |= SIGN;
+			case 'u':
+				break;
+
+			default:
+				if (fmt[0] != '%')
+					put_character(&str, &bytesLeft, '%');
+
+				if (!fmt[0])
+					goto out;
+
+				put_character(&str, &bytesLeft, fmt[0]);
+				continue;
 		}
 
 		if (qualifier == 'L')
@@ -317,11 +413,34 @@ vsprintf(char *buf, const char *fmt, va_list args)
 		else
 			num = va_arg(args, unsigned int);
 
+		// ToDo: fix me!
 		str = number(str, num, base, field_width, precision, flags);
 	}
 
+out:
 	*str = '\0';
-	return str - buf;
+	return str - buffer;
+}
+
+
+int
+vsprintf(char *buffer, const char *format, va_list args)
+{
+	return vsnprintf(buffer, ~0UL, format, args);
+}
+
+
+int
+snprintf(char *buffer, size_t bufferSize, const char *format, ...)
+{
+	va_list args;
+	int i;
+
+	va_start(args, format);
+	i = vsnprintf(buffer, bufferSize, format, args);
+	va_end(args);
+
+	return i;
 }
 
 
@@ -332,7 +451,7 @@ sprintf(char *buffer, const char *format, ...)
 	int i;
 
 	va_start(args, format);
-	i = vsprintf(buffer, format, args);
+	i = vsnprintf(buffer, ~0UL, format, args);
 	va_end(args);
 
 	return i;
