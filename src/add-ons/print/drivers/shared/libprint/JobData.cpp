@@ -15,13 +15,14 @@ const char *kJDCopies           = "copies";
 const char *kJDOrientation      = "orientation";
 const char *kJDScaling          = "scaling";
 const char *kJDPaperRect        = "paper_rect";
+const char *kJDPrintableRect    = "printable_rect";
 const char *kJDFirstPage        = "first_page";
 const char *kJDLastPage         = "last_page";
-const char *kJDPrintableRect    = "printable_rect";
 
 const char *kJDPaper            = "JJJJ_paper";
 const char *kJDNup              = "JJJJ_nup";
 const char *kJDGamma            = "JJJJ_gamma";
+const char *kJDInkDensity       = "JJJJ_ink_density";
 const char *kJDPaperSource      = "JJJJ_paper_source";
 const char *kJDCollate          = "JJJJ_collate";
 const char *kJDReverse          = "JJJJ_reverse";
@@ -29,10 +30,11 @@ const char *kJDPrintStyle       = "JJJJ_print_style";
 const char *kJDBindingLocation  = "JJJJ_binding_location";
 const char *kJDPageOrder        = "JJJJ_page_order";
 const char *kJDColor            = "JJJJ_color";
+const char *kJDDitherType       = "JJJJ_dither_type";
 
-JobData::JobData(BMessage *msg, const PrinterCap *cap)
+JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
-	load(msg, cap);
+	load(msg, cap, settings);
 }
 
 JobData::~JobData()
@@ -52,6 +54,7 @@ JobData::JobData(const JobData &job_data)
 	fFirstPage        = job_data.fFirstPage;
 	fLastPage         = job_data.fLastPage;
 	fGamma            = job_data.fGamma;
+	fInkDensity       = job_data.fInkDensity;
 	fPaperSource      = job_data.fPaperSource;
 	fCopies           = job_data.fCopies;
 	fCollate          = job_data.fCollate;
@@ -59,8 +62,10 @@ JobData::JobData(const JobData &job_data)
 	fPrintStyle       = job_data.fPrintStyle;
 	fBindingLocation  = job_data.fBindingLocation;
 	fPageOrder        = job_data.fPageOrder;
+	fSettings         = job_data.fSettings;
 	fMsg              = job_data.fMsg;
 	fColor            = job_data.fColor;
+	fDitherType       = job_data.fDitherType;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
@@ -76,6 +81,7 @@ JobData &JobData::operator = (const JobData &job_data)
 	fFirstPage        = job_data.fFirstPage;
 	fLastPage         = job_data.fLastPage;
 	fGamma            = job_data.fGamma;
+	fInkDensity       = job_data.fInkDensity;
 	fPaperSource      = job_data.fPaperSource;
 	fCopies           = job_data.fCopies;
 	fCollate          = job_data.fCollate;
@@ -83,14 +89,17 @@ JobData &JobData::operator = (const JobData &job_data)
 	fPrintStyle       = job_data.fPrintStyle;
 	fBindingLocation  = job_data.fBindingLocation;
 	fPageOrder        = job_data.fPageOrder;
+	fSettings         = job_data.fSettings;
 	fMsg              = job_data.fMsg;
 	fColor            = job_data.fColor;
+	fDitherType       = job_data.fDitherType;
 	return *this;
 }
 
-void JobData::load(BMessage *msg, const PrinterCap *cap)
+void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
 	fMsg = msg;
+	fSettings = settings;
 
 	if (msg->HasInt32(kJDPaper))
 		fPaper = (Paper)msg->FindInt32(kJDPaper);
@@ -157,7 +166,12 @@ void JobData::load(BMessage *msg, const PrinterCap *cap)
 	if (msg->HasFloat(kJDGamma))
 		fGamma = fMsg->FindFloat(kJDGamma);
 	else
-		fGamma = 1.4f;
+		fGamma = 0.25f;
+
+	if (msg->HasFloat(kJDInkDensity))
+		fInkDensity = fMsg->FindFloat(kJDInkDensity);
+	else
+		fInkDensity = 0.0f;
 
 	if (msg->HasInt32(kJDPaperSource))
 		fPaperSource = (PaperSource)fMsg->FindInt32(kJDPaperSource);
@@ -204,6 +218,11 @@ void JobData::load(BMessage *msg, const PrinterCap *cap)
 		fColor = msg->FindBool(kJDColor);
 	else
 		fColor = false;
+	
+	if (msg->HasInt32(kJDDitherType))
+		fDitherType = (Halftone::DitherType)msg->FindInt32(kJDDitherType);
+	else
+		fDitherType = Halftone::kTypeFloydSteinberg;
 }
 
 void JobData::save(BMessage *msg)
@@ -212,6 +231,7 @@ void JobData::save(BMessage *msg)
 		msg = fMsg;
 	}
 
+	// page settings
 	if (msg->HasInt32(kJDPaper))
 		msg->ReplaceInt32(kJDPaper, fPaper);
 	else
@@ -247,6 +267,10 @@ void JobData::save(BMessage *msg)
 	else
 		msg->AddRect(kJDPrintableRect, fPrintableRect);
 
+	// page settings end here; don't store job settings in message
+	if (fSettings == kPageSettings) return;
+	
+	// job settings
 	if (msg->HasInt32(kJDNup))
 		msg->ReplaceInt32(kJDNup, fNup);
 	else
@@ -266,6 +290,11 @@ void JobData::save(BMessage *msg)
 		msg->ReplaceFloat(kJDGamma, fGamma);
 	else
 		msg->AddFloat(kJDGamma, fGamma);
+
+	if (msg->HasFloat(kJDInkDensity))
+		msg->ReplaceFloat(kJDInkDensity, fInkDensity);
+	else
+		msg->AddFloat(kJDInkDensity, fInkDensity);
 
 	if (msg->HasInt32(kJDPaperSource))
 		msg->ReplaceInt32(kJDPaperSource, fPaperSource);
@@ -306,4 +335,9 @@ void JobData::save(BMessage *msg)
 		msg->ReplaceBool(kJDColor, fColor);
 	else
 		msg->AddBool(kJDColor, fColor);
+
+	if (msg->HasInt32(kJDDitherType))
+		msg->ReplaceInt32(kJDDitherType, fDitherType);
+	else
+		msg->AddInt32(kJDDitherType, fDitherType);
 }

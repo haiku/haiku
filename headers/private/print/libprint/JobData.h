@@ -10,6 +10,8 @@
 #include <GraphicsDefs.h>
 #include <Rect.h>
 
+#include "Halftone.h"
+
 class BMessage;
 class PrinterCap;
 
@@ -206,6 +208,10 @@ public:
 		kColor
 	};
 
+	enum Settings {
+		kPageSettings,
+		kJobSettings
+	};
 
 private:
 	Paper       fPaper;
@@ -218,7 +224,8 @@ private:
 	int32       fNup;
 	int32       fFirstPage;
 	int32       fLastPage;
-	float       fGamma;
+	float       fGamma;      // 1 identiy, < 1 brigther, > 1 darker
+	float       fInkDensity; // [0, 255] lower means higher density
 	PaperSource fPaperSource;
 	int32       fCopies;
 	bool        fCollate;
@@ -226,17 +233,19 @@ private:
 	PrintStyle  fPrintStyle;
 	BindingLocation fBindingLocation;
 	PageOrder   fPageOrder;
+	Settings    fSettings;
 	BMessage    *fMsg;
 	bool        fColor;
+	Halftone::DitherType fDitherType;
 
 public:
-	JobData(BMessage *msg, const PrinterCap *cap);
+	JobData(BMessage *msg, const PrinterCap *cap, Settings settings);
 	~JobData();
 
 	JobData(const JobData &job_data);
 	JobData &operator = (const JobData &job_data);
 
-	void load(BMessage *msg, const PrinterCap *cap);
+	void load(BMessage *msg, const PrinterCap *cap, Settings settings);
 	void save(BMessage *msg = NULL);
 
 	Paper getPaper() const { return fPaper; }
@@ -278,6 +287,9 @@ public:
 	float getGamma() const { return fGamma; }
 	void setGamma(float gamma) { fGamma = gamma; }
 
+	float getInkDensity() const { return fInkDensity; }
+	void setInkDensity(float inkDensity) { fInkDensity = inkDensity; }
+
 	PaperSource getPaperSource() const { return fPaperSource; }
 	void setPaperSource(PaperSource paper_source) { fPaperSource = paper_source; };
 
@@ -298,11 +310,9 @@ public:
 	
 	Color getColor() const { return fColor ? kColor : kMonochrome; }
 	void setColor(Color color) { fColor = color == kColor; }
-/*
-protected:
-	JobData(const JobData &job_data);
-	JobData &operator = (const JobData &job_data);
-*/
+	
+	Halftone::DitherType getDitherType() const { return fDitherType; }
+	void setDitherType(Halftone::DitherType dither_type) { fDitherType = dither_type; }
 };
 
 #endif	/* __JOBDATA_H */
