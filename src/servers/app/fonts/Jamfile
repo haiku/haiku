@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers app server fonts ;
+SubDir OBOS_TOP src servers app fonts ;
 
-SubInclude OBOS_TOP src servers app server fonts psfonts ;
-SubInclude OBOS_TOP src servers app server fonts ttfonts ;
+SubInclude OBOS_TOP src servers app fonts psfonts ;
+SubInclude OBOS_TOP src servers app fonts ttfonts ;

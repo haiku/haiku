@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers app server fonts psfonts ;
+SubDir OBOS_TOP src servers app fonts psfonts ;
 
 OBOSInstall install_fonts : [ FDirName $(OBOS_FONTS_DIR) psfonts ] :
 	bchbi.afm

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers app server fonts ttfonts ;
+SubDir OBOS_TOP src servers app fonts ttfonts ;
 
 OBOSInstall install_fonts : [ FDirName $(OBOS_FONTS_DIR) ttfonts ] :
 	Vera.ttf
