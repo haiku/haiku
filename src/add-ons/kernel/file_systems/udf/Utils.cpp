@@ -26,7 +26,7 @@ namespace Udf {
 udf_long_address
 to_long_address(vnode_id id, uint32 length)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC | CF_HELPER, NULL, ("vnode_id: %Ld, length: %ld", id, length));
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_HELPER, NULL, ("vnode_id: %Ld (0x%Lx), length: %ld", id, id, length));
 	udf_long_address result;
 	result.set_block((id >> 16) & 0xffffffff);
 	result.set_partition(id & 0xffff);
@@ -38,7 +38,15 @@ to_long_address(vnode_id id, uint32 length)
 vnode_id
 to_vnode_id(udf_long_address address)
 {
-	return (address.block() << 16) | (address.partition());
+	DEBUG_INIT(CF_PUBLIC | CF_HELPER, NULL);
+	vnode_id result = address.block();
+	result <<= 16;
+	result |= address.partition();
+	PRINT(("block:     %ld, 0x%lx\n", address.block(), address.block())); 
+	PRINT(("partition: %d, 0x%x\n", address.partition(), address.partition())); 
+	PRINT(("length:    %ld, 0x%lx\n", address.length(), address.length()));
+	PRINT(("vnode_id:  %Ld, 0x%Lx\n", result, result));
+	return result;
 }
 
 time_t
