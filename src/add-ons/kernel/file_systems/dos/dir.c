@@ -120,7 +120,7 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 					if (i == 0x18) i+=2;
 				}
 				*puni++ = 0;
-				filename_len = (uchar *)(puni+1) - uni;
+				filename_len = (uchar *)(puni) - uni;
 
 				continue;
 			} else {
