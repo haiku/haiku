@@ -228,6 +228,7 @@ enum {
 #define	B_FILE_TOO_LARGE	EFBIG
 #define B_RESULT_NOT_REPRESENTABLE	ERANGE
 #define	B_DEVICE_NOT_FOUND	ENODEV
+#define B_NOT_SUPPORTED		EOPNOTSUPP
 
 /*-------------------------------------------------------------*/
 /*----- Media Kit Errors --------------------------------------*/
