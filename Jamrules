@@ -71,10 +71,12 @@ switch $(TARGET_CPU) {
 			OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 		}
 		DEFINES += __POWERPC__ ;
+		OBOS_BOOT_LIB = openfirmware ;
 	}
 	case x86 :
 	{
 		# nothing special to do here...
+		OBOS_BOOT_LIB = bios_ia32 ;
 	}
 	case * :
 		Exit "Currently unsupported build platform:" $(TARGET_CPU) ;
@@ -105,12 +107,18 @@ if $(WARNINGS) {
 	CCFLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
 	C++FLAGS += -Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual ;
 	C++FLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
+} else {
+	CCFLAGS += -Wno-multichar ;
+	C++FLAGS += -Wno-multichar ;
 }
 
+# standard kernel C/C++ flags
 KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
 KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
 KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
-
+KERNEL_C++FLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
+KERNEL_C++FLAGS += -fno-builtin -fno-exceptions -fno-rtti -D$(OBOS_TARGET_DEFINE) ;
+KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
 
 # We might later want to introduce debug levels or handle the whole issue
 # differently. For now there's only on or off.
@@ -120,6 +128,7 @@ if $(DEBUG) {
 	CCFLAGS += -g -DDEBUG=$(DEBUG) ;
 	C++FLAGS += -g -DDEBUG=$(DEBUG)  ;
 	KERNEL_CCFLAGS += -g -DDEBUG=$(DEBUG) ;
+	KERNEL_C++FLAGS += -g -DDEBUG=$(DEBUG) ;
 	LINKFLAGS += -g ;
 } else {
 	OPTIM ?= -O2 ;
@@ -1409,7 +1418,7 @@ rule SetupKernel
 	SetupObjectsDir ;
 	
 	CCFLAGS on $(_objs) = $(KERNEL_CCFLAGS) $(2) ;
-	C++FLAGS on $(_objs) = $(KERNEL_CCFLAGS) $(2) ;
+	C++FLAGS on $(_objs) = $(KERNEL_C++FLAGS) $(2) ;
 }
 
 rule KernelObjects
