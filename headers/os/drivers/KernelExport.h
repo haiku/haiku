@@ -207,6 +207,11 @@ extern status_t		unregister_kernel_daemon(daemon_hook hook, void *arg);
 
 extern void			call_all_cpus(void (*f)(void *, int), void *cookie);
 
+/* safe methods to access user memory without having to lock it */
+extern status_t		user_memcpy(void *to, const void *from, size_t size);
+extern ssize_t		user_strlcpy(char *to, const char *from, size_t size);
+extern status_t		user_memset(void *start, char c, size_t count);
+
 #ifdef __cplusplus
 }
 #endif
