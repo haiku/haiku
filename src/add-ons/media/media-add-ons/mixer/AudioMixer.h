@@ -46,19 +46,19 @@ class AudioMixer :
 		BParameterWeb	*	BuildParameterWeb(); // used to create the initial 'master' web
 		void				MakeWebForInput(char *name, media_format format);
 		
-		void 				AllocateBuffers();
-		status_t			FillMixBuffer(void *outbuffer, size_t size);
-		
-		void				SendNewBuffer(bigtime_t event_time);
 		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
+		
+		BBufferGroup *		CreateBufferGroup();
 					
 	// BMediaNode methods
 
 		BMediaAddOn		*	AddOn(int32*) const;
 	//	void 			SetRunMode(run_mode);
 	//	void Preroll();
-	//	void SetTimeSource(BTimeSource* time_source);
-	//	status_t RequestCompleted(const media_request_info & info);
+		//	status_t RequestCompleted(const media_request_info & info);
+		void				NodeRegistered();
+		void 				Stop(bigtime_t performance_time, bool immediate);
+		void 				SetTimeSource(BTimeSource * time_source);
 	
 	protected:
 	
@@ -176,43 +176,20 @@ class AudioMixer :
 								
 	// BMediaEventLooper methods
 	
-		virtual	void 		NodeRegistered();
-
-		virtual	void Stop(bigtime_t performance_time,
-							bool immediate);
-	
 		void				HandleEvent( const media_timed_event *event, 
 								bigtime_t lateness,	
 								bool realTimeEvent = false);
 		
-		// handle mixing in separate thread
-		// not implemented (yet)
-		
-		static	int32		_mix_thread_(void *data);
-		int32				MixThread();
-															
+												
 	private:
-	
-
-
-		BMediaAddOn		*	fAddOn;
-		BParameterWeb	*	fWeb; // local pointer to parameterweb
-
-		bigtime_t 			fLatency, fInternalLatency; // latency (downstream and internal)
-		bigtime_t			fStartTime; // time node started
-		uint64 				fFramesSent; // audio frames sent
-		bool				fOutputEnabled;
-		
-		BBufferGroup	*	fBufferGroup;
-		
-		BList				fMixerInputs;
-		
-	
-		bool				fDisableStop;
-		
-		MixerCore			*fCore;
-		media_format		fDefaultFormat;
-		
+		BMediaAddOn		*fAddOn;
+		MixerCore		*fCore;
+		BParameterWeb	*fWeb; // local pointer to parameterweb
+		BBufferGroup	*fBufferGroup;
+		bigtime_t 		fDownstreamLatency;
+		bigtime_t		fInternalLatency;
+		bool			fDisableStop;
+		media_format	fDefaultFormat;
 };		
 			
 #endif

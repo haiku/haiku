@@ -4,7 +4,6 @@ UsePrivateHeaders media ;
 
 Addon mixer.media_addon : media :
 	AudioMixer.cpp
-	FillMixBuffer.cpp
 	MixerAddOn.cpp
 	MixerCore.cpp
 	MixerInput.cpp

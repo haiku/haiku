@@ -15,6 +15,7 @@ public:
 	
 private:
 	MixerCore *fCore;
+	media_input fInput;
 };
 
 #endif

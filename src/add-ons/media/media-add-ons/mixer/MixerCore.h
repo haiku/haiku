@@ -23,7 +23,7 @@ public:
 	
 	MixerInput *Input(int index); // index = 0 to count-1, NOT inputID
 	MixerOutput *Output();
-
+	
 	void Lock();
 	void Unlock();
 	
@@ -32,8 +32,22 @@ public:
 	void InputFormatChanged(int32 inputID, const media_format *format);
 	void OutputFormatChanged(const media_format *format);
 
+	void SetOutputBufferGroup(BBufferGroup *group);
+	void SetTimeSource(media_node_id id);
+	void EnableOutput(bool enabled);
+	void Start(bigtime_t time);
+	void Stop();
+
+	uint32 OutputBufferSize();
+	bool IsStarted();
+
 private:
 	void OutputBufferLengthChanged(bigtime_t length);
+		// handle mixing in separate thread
+		// not implemented (yet)
+		
+		static	int32		_mix_thread_(void *data);
+		int32				MixThread();
 	
 	
 private:

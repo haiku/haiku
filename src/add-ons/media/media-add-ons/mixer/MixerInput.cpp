@@ -16,3 +16,9 @@ void
 MixerInput::BufferReceived(BBuffer *buffer)
 {
 }
+
+media_input &
+MixerInput::MediaInput()
+{
+	return fInput;
+}

@@ -33,31 +33,93 @@ MixerCore::AddOutput(const media_output &output)
 }
 
 bool
-MixerCore::RemoveInput(const media_input &input)
+MixerCore::RemoveInput(int32 inputID)
 {
 	return true;
 }
 
 bool
-MixerCore::RemoveOutput(const media_output &output)
+MixerCore::RemoveOutput()
 {
 	return true;
 }
 
-void
-MixerCore::OutputBufferLengthChanged(bigtime_t length)
+int32
+MixerCore::CreateInputID()
 {
-	Lock();
-	
-	Unlock();
+	return 1;
 }
-
 
 MixerInput *
 MixerCore::Input(int i)
 {
 	return (MixerInput *)fInputs->ItemAt(i);
 }
+
+MixerOutput *
+MixerCore::Output()
+{
+	return fOutput;
+}
+
+void
+MixerCore::BufferReceived(BBuffer *buffer, bigtime_t lateness)
+{
+}
+	
+void
+MixerCore::InputFormatChanged(int32 inputID, const media_format *format)
+{
+}
+
+void
+MixerCore::OutputFormatChanged(const media_format *format)
+{
+}
+
+void
+MixerCore::SetOutputBufferGroup(BBufferGroup *group)
+{
+}
+
+void
+MixerCore::SetTimeSource(media_node_id id)
+{
+}
+
+void
+MixerCore::EnableOutput(bool enabled)
+{
+}
+
+void
+MixerCore::Start(bigtime_t time)
+{
+}
+
+void
+MixerCore::Stop()
+{
+}
+
+uint32
+MixerCore::OutputBufferSize()
+{
+	return 1;
+}
+
+bool
+MixerCore::IsStarted()
+{
+	return false;
+}
+
+void
+MixerCore::OutputBufferLengthChanged(bigtime_t length)
+{
+}
+
+
 
 /*
 	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
@@ -78,5 +140,24 @@ MixerCore::Input(int i)
 		
 		break;
 	}
+
+
+// use this later for separate threads
+
+int32
+AudioMixer::_mix_thread_(void *data)
+{
+	return ((AudioMixer *)data)->MixThread();
+}
+
+int32 
+AudioMixer::MixThread()
+{
+	while (1)
+	{
+		snooze(500000);
+	}
+	
+}
 
 */

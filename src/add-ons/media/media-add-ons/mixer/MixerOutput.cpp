@@ -12,4 +12,8 @@ MixerOutput::~MixerOutput()
 {
 }
 
-media_output MediaOutput();
+media_output &
+MixerOutput::MediaOutput()
+{
+	return fOutput;
+}
