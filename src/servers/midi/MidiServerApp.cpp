@@ -248,7 +248,7 @@ void MidiServerApp::OnChangeEndpoint(BMessage* msg)
 {
 	TRACE(("MidiServerApp::OnChangeEndpoint"))
 
-	endpoint_t* endp;
+	endpoint_t* endp = NULL;
 	status_t err;
 
 	app_t* app = WhichApp(msg);
@@ -325,8 +325,8 @@ void MidiServerApp::OnConnectDisconnect(BMessage* msg)
 	bool mustConnect = (msg->what == MSG_CONNECT_ENDPOINTS);
 
 	status_t err;
-	endpoint_t* prod;
-	endpoint_t* cons;
+	endpoint_t* prod = NULL;
+	endpoint_t* cons = NULL;
 
 	app_t* app = WhichApp(msg);
 	if (app == NULL) 
