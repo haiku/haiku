@@ -280,11 +280,11 @@ ContinuousMessageFilter::ContinuousMessageFilter(BControl *control, BContinuousP
 	}
 
 	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
-		slider->SetValue((int32)value[0]);
+		slider->SetValue((int32) (1000 * value[0]));
 		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
 	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
 		for (int32 i = 0; i < fParameter.CountChannels(); i++)
-			slider->SetValueFor(i, (int32)value[i]);
+			slider->SetValueFor(i, (int32) (1000 * value[i]));
 
 		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
 	} else
@@ -312,10 +312,10 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 	float value[fParameter.CountChannels()];
 
 	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
-		value[0] = (float)slider->Value();
+		value[0] = (float)(slider->Value() / 1000.0);
 	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
 		for (int32 i = 0; i < fParameter.CountChannels(); i++)
-			value[i] = (float)slider->ValueFor(i);
+			value[i] = (float)(slider->ValueFor(i) / 1000.0);
 	}
 
 	printf("update view %s, %ld channels\n", control->Name(), fParameter.CountChannels());
@@ -742,7 +742,7 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				// ToDo: take BContinuousParameter::GetResponse() & ValueStep() into account!
 
 				for (int32 i = 0; i < continuous.CountChannels(); i++)
-					slider->SetLimitsFor(i, continuous.MinValue(), continuous.MaxValue());
+					slider->SetLimitsFor(i, continuous.MinValue() * 1000, continuous.MaxValue() * 1000);
 
 				return slider;
 			}
