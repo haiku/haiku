@@ -106,7 +106,9 @@ enum {
 	SERVER_REMOVEREFFOR,
 	SERVER_REMOVEITEM,
 	SERVER_GET_FORMAT_FOR_DESCRIPTION,
-	SERVER_GET_META_DESCRIPTION_FOR_FORMAT,
+	SERVER_GET_DESCRIPTION_FOR_FORMAT,
+	SERVER_GET_READERS,
+	SERVER_GET_DECODER_FOR_FORMAT,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -206,7 +208,7 @@ public:
 private:
 	dev_t	device;
 	ino_t	directory;
-	char	name[B_FILE_NAME_LENGTH];
+	char	name[B_FILE_NAME_LENGTH]; // == 256 bytes
 };
 
 
@@ -241,6 +243,12 @@ enum
 enum
 {
 	MAX_NODE_ID = 4000,
+};
+
+// used by SERVER_GET_READERS
+enum
+{
+	MAX_READERS = 40,
 };
 
 struct addonserver_instantiate_dormant_node_request : public request_data
@@ -889,14 +897,35 @@ struct server_get_format_for_description_reply : public reply_data
 	media_format format;
 };
 
-struct server_get_meta_description_for_format_request : public request_data
+struct server_get_description_for_format_request : public request_data
+{
+	media_format format;
+	media_format_family family;
+};
+
+struct server_get_description_for_format_reply : public reply_data
+{
+	media_format_description description;
+};
+
+struct server_get_decoder_for_format_request : public request_data
 {
 	media_format format;
 };
 
-struct server_get_meta_description_for_format_reply : public reply_data
+struct server_get_decoder_for_format_reply : public reply_data
 {
-	media_format_description description;
+	xfer_entry_ref	ref; // a ref to the decoder
+};
+
+struct server_get_readers_request : public request_data
+{
+};
+
+struct server_get_readers_reply : public reply_data
+{
+	xfer_entry_ref	ref[MAX_READERS]; // a list of refs to the reader
+	int32			count;
 };
 
 struct node_request_completed_command : public command_data

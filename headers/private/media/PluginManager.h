@@ -24,11 +24,11 @@ public:
 					PluginManager();
 					~PluginManager();
 	
-	MediaPlugin *	GetPlugin(const char *name);
+	MediaPlugin *	GetPlugin(const entry_ref &ref);
 	void			PutPlugin(MediaPlugin *plugin);
 	
 private:
-	bool			LoadPlugin(const char *name, MediaPlugin **plugin, image_id *image);
+	bool			LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image);
 
 	struct plugin_info
 	{

@@ -172,8 +172,14 @@ BMediaFormats::GetCodeFor(const media_format & format,
 						  media_format_family family,
 						  media_format_description * out_description)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	server_get_description_for_format_request request;
+	server_get_description_for_format_reply reply;
+	request.format = format;
+	request.family = family;
+	if (B_OK != QueryServer(SERVER_GET_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
+		return B_ERROR;
+	*out_description = reply.description;
+	return B_OK;
 }
 
 
@@ -246,6 +252,8 @@ bool operator==(const media_format_description & a, const media_format_descripti
 			return a.u.aiff.codec == b.u.aiff.codec;
 		case B_AVR_FORMAT_FAMILY:
 			return a.u.avr.id == b.u.avr.id;
+		case B_OGG_FORMAT_FAMILY:
+			return false; // XXX fix this
 		case B_MISC_FORMAT_FAMILY:
 			return a.u.misc.file_format == b.u.misc.file_format && a.u.misc.codec == b.u.misc.codec;
 		case B_META_FORMAT_FAMILY:
@@ -276,6 +284,8 @@ bool operator<(const media_format_description & a, const media_format_descriptio
 			return a.u.aiff.codec < b.u.aiff.codec;
 		case B_AVR_FORMAT_FAMILY:
 			return a.u.avr.id < b.u.avr.id;
+		case B_OGG_FORMAT_FAMILY:
+			return false; // XXX fix this
 		case B_MISC_FORMAT_FAMILY:
 			return a.u.misc.file_format < b.u.misc.file_format || a.u.misc.codec < b.u.misc.codec;
 		case B_META_FORMAT_FAMILY:
@@ -303,14 +313,8 @@ _get_format_for_description(media_format *out_format, const media_format_descrip
 	
 	request.description = in_desc;
 	
-//	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
-//		return B_ERROR;
-
-	if (in_desc.family == B_BEOS_FORMAT_FAMILY && in_desc.u.beos.format == B_BEOS_FORMAT_RAW_AUDIO)
-		reply.format.type = B_MEDIA_RAW_AUDIO;
-	else
-		reply.format.type = B_MEDIA_ENCODED_AUDIO;
-	reply.format.u.encoded_audio.encoding = (enum media_encoded_audio_format::audio_encoding) 1;
+	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
+		return B_ERROR;
 
 	*out_format = reply.format;
 	return B_OK;
@@ -319,13 +323,14 @@ _get_format_for_description(media_format *out_format, const media_format_descrip
 status_t
 _get_meta_description_for_format(media_format_description *out_desc, const media_format &in_format)
 {
-	server_get_meta_description_for_format_request request;
-	server_get_meta_description_for_format_reply reply;
+	server_get_description_for_format_request request;
+	server_get_description_for_format_reply reply;
 	
 	request.format = in_format;
+	request.family = B_META_FORMAT_FAMILY;
 	
-//	if (B_OK != QueryServer(SERVER_GET_META_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
-//		return B_ERROR;
+	if (B_OK != QueryServer(SERVER_GET_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
+		return B_ERROR;
 		
 	*out_desc = reply.description;
 	return B_OK;

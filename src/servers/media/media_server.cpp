@@ -43,7 +43,9 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
 #include "DataExchange.h"
 #include "BufferManager.h"
 #include "NodeManager.h"
+#include "AddOnManager.h"
 #include "AppManager.h"
+#include "FormatManager.h"
 #include "MediaMisc.h"
 #include "media_server.h"
 #include "debug.h"
@@ -55,11 +57,13 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
  *
  */
 
-NotificationManager *gNotificationManager;
-BufferManager *gBufferManager;
-AppManager *gAppManager;
-NodeManager *gNodeManager;
-MMediaFilesManager *gMMediaFilesManager;
+AddOnManager *			gAddOnManager;
+AppManager *			gAppManager;
+BufferManager *			gBufferManager;
+FormatManager *			gFormatManager;
+MMediaFilesManager *	gMMediaFilesManager;
+NodeManager *			gNodeManager;
+NotificationManager *	gNotificationManager;
 
 namespace BPrivate { namespace media {
 	extern team_id team;
@@ -121,6 +125,8 @@ ServerApp::ServerApp()
 	gAppManager = new AppManager;
 	gNodeManager = new NodeManager;
 	gMMediaFilesManager = new MMediaFilesManager;
+	gFormatManager = new FormatManager;
+	gAddOnManager = new AddOnManager;
 
 	control_port = create_port(64, MEDIA_SERVER_PORT_NAME);
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
@@ -128,17 +134,21 @@ ServerApp::ServerApp()
 
 //	StartSystemTimeSource();
 	gNodeManager->LoadState();
+	gFormatManager->LoadState();
+	gAddOnManager->LoadState();
 	gAppManager->StartAddonServer();
 }
 
 ServerApp::~ServerApp()
 {
 	TRACE("ServerApp::~ServerApp()\n");
+	delete gAddOnManager;
 	delete gNotificationManager;
 	delete gBufferManager;
 	delete gAppManager;
 	delete gNodeManager;
 	delete gMMediaFilesManager;
+	delete gFormatManager;
 	delete fLocker;
 	delete_port(control_port);
 	status_t err;
@@ -173,6 +183,8 @@ ServerApp::QuitRequested()
 	TRACE("ServerApp::QuitRequested()\n");
 	gMMediaFilesManager->SaveState();
 	gNodeManager->SaveState();
+	gFormatManager->SaveState();
+	gAddOnManager->SaveState();
 	gAppManager->TerminateAddonServer();
 	return true;
 }
@@ -667,6 +679,42 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			server_removeitem_reply reply;
 
 			rv = gMMediaFilesManager->RemoveItem(request->type, request->item);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_GET_FORMAT_FOR_DESCRIPTION:
+		{
+			const server_get_format_for_description_request *request = reinterpret_cast<const server_get_format_for_description_request *>(data);
+			server_get_format_for_description_reply reply;
+			rv = gFormatManager->GetFormatForDescription(&reply.format, request->description);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_GET_DESCRIPTION_FOR_FORMAT:
+		{
+			const server_get_description_for_format_request *request = reinterpret_cast<const server_get_description_for_format_request *>(data);
+			server_get_description_for_format_reply reply;
+			rv = gFormatManager->GetDescriptionForFormat(&reply.description, request->format, request->family);						 
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_READERS:
+		{
+			const server_get_readers_request *request = reinterpret_cast<const server_get_readers_request *>(data);
+			server_get_readers_reply reply;
+			rv = gAddOnManager->GetReaders(reply.ref, &reply.count, MAX_READERS);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_DECODER_FOR_FORMAT:
+		{
+			const server_get_decoder_for_format_request *request = reinterpret_cast<const server_get_decoder_for_format_request *>(data);
+			server_get_decoder_for_format_reply reply;
+			rv = gAddOnManager->GetDecoderForFormat(&reply.ref, request->format);						 
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}

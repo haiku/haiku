@@ -154,7 +154,7 @@ mp3Reader::Sniff(int32 *streamCount)
 	TRACE("mp3Reader::Sniff: file size is %Ld bytes\n", fFileSize);
 	
 	if (!IsMp3File()) {
-		TRACE("mp3Reader::Sniff: non recognized as mp3 file\n");
+		TRACE("mp3Reader::Sniff: not recognized as mp3 file\n");
 		return B_ERROR;
 	}
 
@@ -903,7 +903,7 @@ mp3Reader::GetFrameLength(void *header)
 	int bitrate_index = (h[2] >> 4) & 0x0f;
 	int sampling_rate_index = (h[2] >> 2) & 0x03;
 	int padding = (h[2] >> 1) & 0x01;
-	/* no interested in the other bits */
+	/* not interested in the other bits */
 	
 	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
 	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];

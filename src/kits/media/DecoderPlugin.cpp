@@ -27,8 +27,11 @@ Decoder::Setup(MediaExtractor *extractor, int32 stream)
 }
 
 DecoderPlugin::DecoderPlugin()
+ :	fPublishHook(0)
 {
 }
+
+typedef status_t (*publish_func)(DecoderPlugin *, const char *, const char *, const char *, const char *);
 
 status_t
 DecoderPlugin::PublishDecoder(const char *meta_description,
@@ -36,5 +39,13 @@ DecoderPlugin::PublishDecoder(const char *meta_description,
 							  const char *pretty_name,
 							  const char *default_mapping /* = 0 */)
 {
-	return _PublishDecoder(this, meta_description, short_name, pretty_name, default_mapping);
+	if (fPublishHook)
+		return ((publish_func)fPublishHook)(this, meta_description, short_name, pretty_name, default_mapping);
+	return B_ERROR;
+}
+
+void
+DecoderPlugin::Setup(void *publish_hook)
+{
+	fPublishHook = publish_hook;
 }

@@ -6,6 +6,8 @@
 #include "MediaPlugin.h"
 #include "MediaExtractor.h"
 
+class AddOnManager;
+
 namespace BPrivate { namespace media {
 
 class Decoder
@@ -41,11 +43,19 @@ private:
 class DecoderPlugin : public MediaPlugin
 {
 public:
-	DecoderPlugin();
+						DecoderPlugin();
 
-	virtual Decoder *NewDecoder() = 0;
+	virtual Decoder *	NewDecoder() = 0;
 	
-	status_t PublishDecoder(const char *meta_description, const char *short_name, const char *pretty_name, const char *default_mapping = 0);
+	status_t 			PublishDecoder(const char *meta_description,
+									   const char *short_name,
+									   const char *pretty_name,
+									   const char *default_mapping = 0);
+
+private:
+	friend class AddOnManager;
+	void				Setup(void *publish_hook);
+	void *				fPublishHook;
 };
 
 } } // namespace BPrivate::media

@@ -118,7 +118,7 @@ MMediaFilesManager::LoadState()
 	        }
 	        /*if (file.Read(&vol, sizeof(uint32)) < (int32)sizeof(uint32))
 	                return B_ERROR;*/
-	        TRACE("        %s: %s, volume: %f\n", key, val, *(float *)&vol);
+	        //TRACE("        %s: %s, volume: %f\n", key, val, *(float *)&vol);
 	        
 	        entry_ref ref;
 	        if(len>1) {

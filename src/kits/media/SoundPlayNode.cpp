@@ -41,7 +41,7 @@ _SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format 
 	mFormat.u.raw_audio = *format;
 	
 	DPRINTF("Format Info:\n");
-	DPRINTF("  frame_rate:     %f\n",mFormat.u.raw_audio.frame_rate);
+	DPRINTF("  frame_rate:     %.1f (%ld)\n", mFormat.u.raw_audio.frame_rate, (int32)mFormat.u.raw_audio.frame_rate);
 	DPRINTF("  channel_count:  %ld\n",mFormat.u.raw_audio.channel_count);
 	DPRINTF("  byte_order:     %ld (",mFormat.u.raw_audio.byte_order);
 	switch (mFormat.u.raw_audio.byte_order) {
@@ -366,12 +366,11 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	TRACE("_SoundPlayNode::Connect: downstream latency = %Ld\n", mLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
-	bigtime_t duration = mOutput.format.u.raw_audio.buffer_size * 10000
-			/ ( (mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-				* mOutput.format.u.raw_audio.channel_count) 
-			/ ((int32)(mOutput.format.u.raw_audio.frame_rate / 100));
+	bigtime_t duration = ((mOutput.format.u.raw_audio.buffer_size * 1000000LL)
+		/ ((mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK) * mOutput.format.u.raw_audio.channel_count))
+		/ (int32)mOutput.format.u.raw_audio.frame_rate;
 	SetBufferDuration(duration);
-	TRACE("_SoundPlayNode::Connect: buffer duaration is %Ld\n", duration);
+	TRACE("_SoundPlayNode::Connect: buffer duration is %Ld\n", duration);
 
 	mInternalLatency = (3 * BufferDuration()) / 4;
 	TRACE("_SoundPlayNode::Connect: using %Ld as internal latency\n", mInternalLatency);
@@ -614,7 +613,7 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 
 	// The buffer is on its way; now schedule the next one to go
 	// nextEvent is the time at which the buffer should arrive at it's destination
-	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate);
+	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent) / (int32)mOutput.format.u.raw_audio.frame_rate);
 	media_timed_event nextBufferEvent(nextEvent, SEND_NEW_BUFFER_EVENT);
 	EventQueue()->AddEvent(nextBufferEvent);
 	
