@@ -56,6 +56,10 @@ typedef ino_t		vnode_id;
 
 #define		B_CUR_FS_API_VERSION	2
 
+#define		IOCTL_FILE_UNCACHED_IO	10000
+#define		IOCTL_CREATE_TIME		10002
+#define		IOCTL_MODIFIED_TIME		10003
+
 struct attr_info;
 struct index_info;
 
@@ -63,6 +67,8 @@ typedef int	op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
 typedef int	op_write_vnode(void *ns, void *node, char r);
 typedef int	op_remove_vnode(void *ns, void *node, char r);
 typedef int	op_secure_vnode(void *ns, void *node);
+typedef int op_wake_vnode(void *ns, void *node);
+typedef int op_suspend_vnode(void *ns, void *node);
 
 typedef int	op_walk(void *ns, void *base, const char *file, char **newpath,
 					vnode_id *vnid);
@@ -218,6 +224,9 @@ typedef struct vnode_ops {
 	op_close_query			(*close_query);
 	op_free_cookie			(*free_querycookie);
 	op_read_query			(*read_query);
+	// for Dano compatibility only
+	op_wake_vnode			(*wake_vnode);
+	op_suspend_vnode		(*suspend_vnode);
 } vnode_ops;
 
 extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
