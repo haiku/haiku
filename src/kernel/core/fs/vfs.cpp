@@ -3386,8 +3386,9 @@ fs_unmount(char *path, bool kernel)
 		goto err;
 	}
 
-	/* grab the vnode master mutex to keep someone from creating a vnode
-	while we're figuring out if we can continue */
+	/* grab the vnode master mutex to keep someone from creating
+	 * a vnode while we're figuring out if we can continue
+	 */
 	mutex_lock(&sVnodeMutex);
 
 	/* simulate the root vnode having it's refcount decremented */
@@ -3414,6 +3415,9 @@ fs_unmount(char *path, bool kernel)
 			vnode->busy = true;
 	}
 	mount->unmounting = true;
+
+	/* add 2 back to the root vnode's ref */
+	mount->root_vnode->ref_count += 2;
 
 	mutex_unlock(&sVnodeMutex);
 
