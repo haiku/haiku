@@ -6,13 +6,8 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders kernel ;
-	# This line must come before the "kernel arch $(OBOS_ARCH)" line, else
-	# the "arch/vm.h" file will be included instead of "vm.h"
-UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
-UseHeaders [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
 
 SharedLibrary disk_device_manager :
 	ddm_userland_interface.cpp
@@ -55,3 +50,13 @@ SharedLibrary disk_device_manager :
 
 LinkSharedOSLibs libdisk_device_manager.so
 	: <boot!home!config!lib>libkernelland_emu.so ;
+
+# Hack to enable ddm_userland_interface.cpp to include vm.h but not make
+# kernel/stdio.h shadow the real stdio.h
+ObjectHdrs [ FGristFiles ddm_userland_interface$(SUFOBJ) ]
+	: [ PrivateHeaders kernel [ FDirName kernel arch $(OBOS_ARCH) ] ] ;
+
+# KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
+# contaminate the include paths for the other files.
+ObjectHdrs [ FGristFiles KFileDiskDevice$(SUFOBJ) ]
+	: [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
