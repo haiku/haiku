@@ -24,7 +24,7 @@
  */
 void TIsWatchedTest::IsWatched1()
 {
-	assert(!fHandler.IsWatched());
+	CPPUNIT_ASSERT(!fHandler.IsWatched());
 }
 //------------------------------------------------------------------------------
 /**
@@ -39,11 +39,11 @@ void TIsWatchedTest::IsWatched2()
 {
 	BHandler Watcher;
 	fHandler.StartWatching(&Watcher, '1234');
-	assert(fHandler.IsWatched() == true);
+	CPPUNIT_ASSERT(fHandler.IsWatched() == true);
 
 	fHandler.StopWatching(&Watcher, '1234');
 #ifndef TEST_R5
-	assert(fHandler.IsWatched() == false);
+	CPPUNIT_ASSERT(fHandler.IsWatched() == false);
 #endif
 }
 //------------------------------------------------------------------------------

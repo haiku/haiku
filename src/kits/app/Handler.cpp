@@ -380,14 +380,6 @@ const char* BHandler::Name() const
 //------------------------------------------------------------------------------
 void BHandler::SetNextHandler(BHandler* handler)
 {
-	// NOTE:  This is called by BLooper::RemoveHandler() with NULL as the param,
-	// so we need to handle that possiblity.
-	if (!handler)
-	{
-		fNextHandler = NULL;
-		return;
-	}
-
 	if (!fLooper)
 	{
 		debugger("handler must belong to looper before setting NextHandler");
@@ -395,20 +387,16 @@ void BHandler::SetNextHandler(BHandler* handler)
 		return;
 	}
 
-	if (fLooper != handler->Looper())
+	if (!fLooper->IsLocked())
 	{
-		debugger("The handler and its NextHandler must have the same looper");
+		debugger("The handler's looper must be locked before setting NextHandler");
 		return;
 	}
 
-	if (!fLooper->IsLocked())
+	if (handler && fLooper != handler->Looper())
 	{
-		//debugger("Owning Looper must be locked before calling SetNextHandler");
-		// NOTE:  Original implementation allows setting the next handler here
-		// anyway.  The documentation *clearly* says otherwise.  Can we get away
-		// with being more strict?
-
-		// return;
+		debugger("The handler and its NextHandler must have the same looper");
+		return;
 	}
 
 	// NOTE:  I'm sure some sort of threading protection should happen here,

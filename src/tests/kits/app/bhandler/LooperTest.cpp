@@ -25,7 +25,7 @@
  */
 void TLooperTest::LooperTest1()
 {
-	assert(fHandler.Looper() == NULL);
+	CPPUNIT_ASSERT(fHandler.Looper() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -37,10 +37,10 @@ void TLooperTest::LooperTest2()
 {
 	BLooper Looper;
 	Looper.AddHandler(&fHandler);
-	assert(fHandler.Looper() == &Looper);
+	CPPUNIT_ASSERT(fHandler.Looper() == &Looper);
 
-	assert(Looper.RemoveHandler(&fHandler));
-	assert(fHandler.Looper() == NULL);
+	CPPUNIT_ASSERT(Looper.RemoveHandler(&fHandler));
+	CPPUNIT_ASSERT(fHandler.Looper() == NULL);
 }
 //------------------------------------------------------------------------------
 Test* TLooperTest::Suite()

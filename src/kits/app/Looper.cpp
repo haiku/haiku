@@ -55,7 +55,9 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "TokenSpace.h"
+#include <LooperList.h>
+#include <ObjectLocker.h>
+#include <TokenSpace.h>
 
 // Local Defines ---------------------------------------------------------------
 #define FILTER_LIST_BLOCK_SIZE	5
@@ -63,6 +65,9 @@
 
 // Globals ---------------------------------------------------------------------
 using BPrivate::gDefaultTokens;
+using BPrivate::gLooperList;
+using BPrivate::BObjectLocker;
+using BPrivate::BLooperList;
 
 typedef bool (*find_loop_pred)(_loop_data_* data, void* data);
 _loop_data_* find_loop_data(_loop_data_* begin, _loop_data_* end,
@@ -104,19 +109,23 @@ BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
 //------------------------------------------------------------------------------
 BLooper::~BLooper()
 {
+	Lock();
 	kill_thread(fTaskID);
 	delete fQueue;
 	delete_sem(fLockSem);
 	delete_port(fMsgPort);
 
-	UnlockFully();
-
 	// Clean up our filters
 	SetCommonFilterList(NULL);
 
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+#if 0
 	BAutolock ListLock(sLooperListLock);
+#endif
 	RemoveHandler(this);
 	RemoveLooper(this);
+
+	UnlockFully();
 }
 //------------------------------------------------------------------------------
 BLooper::BLooper(BMessage* data)
@@ -263,7 +272,8 @@ bool BLooper::IsMessageWaiting() const
 	if (!IsLocked())
 	{
 		// TODO: test
-		debugger("");
+		debugger("The Looper must be locked before calling IsMsgWaiting");
+		return false;
 	}
 
 	if (!fQueue->IsEmpty())
@@ -271,6 +281,14 @@ bool BLooper::IsMessageWaiting() const
 		return true;
 	}
 
+/**
+	@note:	What we're doing here differs slightly from the R5 implementation.
+			It appears that they probably return count != 0, which gives a false
+			true (!) result when port_buffer_size_etc() would block -- which
+			indicates that the port's buffer is empty, so we should return false.
+			Since we don't actually care about what the error is, we just return
+			count > 0.
+ */
 	int32 count;
 	do
 	{
@@ -302,9 +320,19 @@ void BLooper::AddHandler(BHandler* handler)
 //------------------------------------------------------------------------------
 bool BLooper::RemoveHandler(BHandler* handler)
 {
-// BeBook says looper must be locked for calls to this, but testing shows that
-// just ain't so.
-//	AssertLocked();
+	// R5 implementation didn't bother to check its params, thus NULL handlers
+	// will seg fault.  Bad form, you know.
+	if (!handler)
+	{
+		return false;
+	}
+
+	// Correction; testing shows the looper *does* need to be locked for this;
+	// it just doesn't use AssertLocked() for that.
+	if (!IsLocked())
+	{
+		debugger("Looper must be locked before calling RemoveHandler.");
+	}
 
 	// TODO: test
 	// Need to ensure this algo reflects what actually happens
@@ -516,7 +544,10 @@ bool BLooper::IsLocked() const
 {
 	// We have to lock the list for the call to IsLooperValid().  Has the side
 	// effect of not letting the looper get deleted while we're here.
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+#if 0
 	BAutolock ListLock(sLooperListLock);
+#endif
 
 	if (!ListLock.IsLocked())
 	{
@@ -551,6 +582,12 @@ team_id BLooper::Team() const
 //------------------------------------------------------------------------------
 BLooper* BLooper::LooperForThread(thread_id tid)
 {
+	BObjectLocker<BLooperList> ListLock (gLooperList);
+	if (ListLock.IsLocked())
+	{
+		return gLooperList.LooperForThread(tid);
+	}
+#if 0
 	BAutolock ListLock(sLooperListLock);
 	if (ListLock.IsLocked())
 	{
@@ -564,6 +601,7 @@ BLooper* BLooper::LooperForThread(thread_id tid)
 	}
 
 	return NULL;
+#endif
 }
 //------------------------------------------------------------------------------
 thread_id BLooper::LockingThread() const
@@ -715,7 +753,10 @@ BLooper::BLooper(int32 priority, port_id port, const char* name)
 status_t BLooper::_PostMessage(BMessage* msg, BHandler* handler,
 							   BHandler* reply_to)
 {
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+#if 0
 	BAutolock ListLock(sLooperListLock);
+#endif
 	if (!ListLock.IsLocked())
 	{
 		return B_BAD_VALUE;
@@ -788,7 +829,10 @@ DBG(OUT("BLooper::_Lock() done 1\n"));
 			well to remove itself).
  */
 	{
+		BObjectLocker<BLooperList> ListLock(gLooperList);
+#if 0
 		BAutolock ListLock(sLooperListLock);
+#endif
 		if (!ListLock.IsLocked())
 		{
 			// If we can't lock, the semaphore is probably
@@ -911,8 +955,11 @@ void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
 	fMsgPort = create_port(port_capacity, name ? name : "LooperPort");
 
 	fInitPriority = priority;
-	
+
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+#if 0
 	BAutolock ListLock(sLooperListLock);
+#endif
 	AddLooper(this);
 	AddHandler(this);
 }
@@ -1237,6 +1284,11 @@ void BLooper::UnlockFully()
 //------------------------------------------------------------------------------
 void BLooper::AddLooper(BLooper* loop)
 {
+	if (gLooperList.IsLocked())
+	{
+		gLooperList.AddLooper(loop);
+	}
+#if 0
 	if (sLooperListLock.IsLocked())
 	{
 #if defined(CHECK_ADD_LOOPER)
@@ -1293,10 +1345,16 @@ DBG(OUT("BLooper::AddLooper(): looper added at %ld\n", looperCount));
 	{
 		debugger("sLooperList is not locked!");
 	}
+#endif
 }
 //------------------------------------------------------------------------------
 bool BLooper::IsLooperValid(const BLooper* l)
 {
+	if (gLooperList.IsLocked())
+	{
+		return gLooperList.IsLooperValid(l);
+	}
+#if 0
 	if (sLooperListLock.IsLocked())
 	{
 		return find_loop_data(sLooperList, sLooperList + sLooperCount,
@@ -1304,10 +1362,16 @@ bool BLooper::IsLooperValid(const BLooper* l)
 	}
 
 	return false;
+#endif
 }
 //------------------------------------------------------------------------------
 void BLooper::RemoveLooper(BLooper* l)
 {
+	if (gLooperList.IsLocked())
+	{
+		gLooperList.RemoveLooper(l);
+	}
+#if 0
 	if (sLooperListLock.IsLocked())
 	{
 		_loop_data_* result = find_loop_data(sLooperList,
@@ -1327,20 +1391,33 @@ void BLooper::RemoveLooper(BLooper* l)
 			sLooperListSize = 0;
 		}
 	}
+#endif
 }
 //------------------------------------------------------------------------------
 void BLooper::GetLooperList(BList* list)
 {
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+	if (ListLock.IsLocked())
+	{
+		gLooperList.GetLooperList(list);
+	}
+#if 0
 	BAutolock ListLock(sLooperListLock);
 	if (ListLock.IsLocked())
 	{
 		find_loop_data(sLooperList, sLooperList + sLooperCount,
 					   copy_list_pred, (void*)list);
 	}
+#endif
 }
 //------------------------------------------------------------------------------
 BLooper* BLooper::LooperForName(const char* name)
 {
+	if (gLooperList.IsLocked())
+	{
+		return gLooperList.LooperForName(name);
+	}
+#if 0
 	if (sLooperListLock.IsLocked())
 	{
 		_loop_data_* result = find_loop_data(sLooperList,
@@ -1351,12 +1428,18 @@ BLooper* BLooper::LooperForName(const char* name)
 			return result->looper;
 		}
 	}
+#endif
 
 	return NULL;
 }
 //------------------------------------------------------------------------------
 BLooper* BLooper::LooperForPort(port_id port)
 {
+	if (gLooperList.IsLocked())
+	{
+		return gLooperList.LooperForPort(port);
+	}
+#if 0
 	if (sLooperListLock.IsLocked())
 	{
 		_loop_data_* result = find_loop_data(sLooperList,
@@ -1367,6 +1450,7 @@ BLooper* BLooper::LooperForPort(port_id port)
 			return result->looper;
 		}
 	}
+#endif
 
 	return NULL;
 }

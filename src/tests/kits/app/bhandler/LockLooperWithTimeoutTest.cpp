@@ -28,7 +28,7 @@
 void TLockLooperWithTimeoutTest::LockLooperWithTimeout1()
 {
 	BHandler Handler;
-	assert(Handler.LockLooperWithTimeout(10000) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Handler.LockLooperWithTimeout(10000) == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -47,7 +47,7 @@ void TLockLooperWithTimeoutTest::LockLooperWithTimeout2()
 		// Make sure the looper is unlocked
 		Looper.Unlock();
 	}
-	assert(Handler.LockLooperWithTimeout(10000) == B_OK);
+	CPPUNIT_ASSERT(Handler.LockLooperWithTimeout(10000) == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -62,7 +62,7 @@ void TLockLooperWithTimeoutTest::LockLooperWithTimeout3()
 	BHandler Handler;
 	Looper.AddHandler(&Handler);
 	Looper.Lock();
-	assert(Handler.LockLooperWithTimeout(10000) == B_OK);
+	CPPUNIT_ASSERT(Handler.LockLooperWithTimeout(10000) == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -87,7 +87,7 @@ void TLockLooperWithTimeoutTest::LockLooperWithTimeout4()
 	resume_thread(tid);
 	info.LockTest();
 
-	assert(Handler.LockLooperWithTimeout(10000) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(Handler.LockLooperWithTimeout(10000) == B_TIMED_OUT);
 	info.UnlockThread();
 }
 //------------------------------------------------------------------------------

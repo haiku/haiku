@@ -38,7 +38,7 @@
 void TBHandlerTester::BHandler1()
 {
 	BHandler Handler((const char*)NULL);
-	assert(Handler.Name() == NULL);
+	CPPUNIT_ASSERT(Handler.Name() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -50,7 +50,7 @@ void TBHandlerTester::BHandler1()
 void TBHandlerTester::BHandler2()
 {
 	BHandler Handler("name");
-	assert(string("name") == Handler.Name());
+	CPPUNIT_ASSERT(string("name") == Handler.Name());
 }
 //------------------------------------------------------------------------------
 /**
@@ -64,7 +64,7 @@ void TBHandlerTester::BHandler3()
 	BMessage Archive;
 	Archive.AddString("_name", "the name");
 	BHandler Handler(&Archive);
-	assert(string("the name") == Handler.Name());
+	CPPUNIT_ASSERT(string("the name") == Handler.Name());
 }
 //------------------------------------------------------------------------------
 /**
@@ -77,7 +77,7 @@ void TBHandlerTester::BHandler4()
 {
 	BMessage Archive;
 	BHandler Handler(&Archive);
-	assert(Handler.Name() == NULL);
+	CPPUNIT_ASSERT(Handler.Name() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -93,7 +93,7 @@ void TBHandlerTester::BHandler5()
 {
 #if !defined(TEST_R5)
 	BHandler Handler((BMessage*)NULL);
-	assert(Handler.Name() == NULL);
+	CPPUNIT_ASSERT(Handler.Name() == NULL);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void TBHandlerTester::Archive1()
 {
 #if !defined(TEST_R5)
 	BHandler Handler;
-	assert(Handler.Archive(NULL, false) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Handler.Archive(NULL, false) == B_BAD_VALUE);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void TBHandlerTester::Archive2()
 {
 #if !defined(TEST_R5)
 	BHandler Handler;
-	assert(Handler.Archive(NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Handler.Archive(NULL) == B_BAD_VALUE);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -146,13 +146,13 @@ void TBHandlerTester::Archive3()
 {
 	BMessage Archive;
 	BHandler Handler("a name");
-	assert(Handler.Archive(&Archive, false) == B_OK);
+	CPPUNIT_ASSERT(Handler.Archive(&Archive, false) == B_OK);
 
 	const char* data;
-	assert(Archive.FindString("_name", &data) == B_OK);
-	assert(string("a name") == data);
-	assert(Archive.FindString("class", &data) == B_OK);
-	assert(string("BHandler") == data);
+	CPPUNIT_ASSERT(Archive.FindString("_name", &data) == B_OK);
+	CPPUNIT_ASSERT(string("a name") == data);
+	CPPUNIT_ASSERT(Archive.FindString("class", &data) == B_OK);
+	CPPUNIT_ASSERT(string("BHandler") == data);
 }
 //------------------------------------------------------------------------------
 /**
@@ -170,13 +170,13 @@ void TBHandlerTester::Archive4()
 {
 	BMessage Archive;
 	BHandler Handler("another name");
-	assert(Handler.Archive(&Archive) == B_OK);
+	CPPUNIT_ASSERT(Handler.Archive(&Archive) == B_OK);
 
 	const char* data;
-	assert(Archive.FindString("_name", &data) == B_OK);
-	assert(string("another name") == data);
-	assert(Archive.FindString("class", &data) == B_OK);
-	assert(string("BHandler") == data);
+	CPPUNIT_ASSERT(Archive.FindString("_name", &data) == B_OK);
+	CPPUNIT_ASSERT(string("another name") == data);
+	CPPUNIT_ASSERT(Archive.FindString("class", &data) == B_OK);
+	CPPUNIT_ASSERT(string("BHandler") == data);
 }
 //------------------------------------------------------------------------------
 /**
@@ -190,8 +190,8 @@ void TBHandlerTester::Archive4()
 void TBHandlerTester::Instantiate1()
 {
 #if !defined(TEST_R5)
-	assert(BHandler::Instantiate(NULL) == NULL);
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(BHandler::Instantiate(NULL) == NULL);
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -211,9 +211,9 @@ void TBHandlerTester::Instantiate2()
 
 	BHandler* Handler =
 		dynamic_cast<BHandler*>(BHandler::Instantiate(&Archive));
-	assert(Handler != NULL);
-	assert(string("a name") == Handler->Name());
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Handler != NULL);
+	CPPUNIT_ASSERT(string("a name") == Handler->Name());
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -231,9 +231,9 @@ void TBHandlerTester::Instantiate3()
 
 	BHandler* Handler =
 		dynamic_cast<BHandler*>(BHandler::Instantiate(&Archive));
-	assert(Handler != NULL);
-	assert(Handler->Name() == NULL);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Handler != NULL);
+	CPPUNIT_ASSERT(Handler->Name() == NULL);
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -247,10 +247,10 @@ void TBHandlerTester::Instantiate3()
 void TBHandlerTester::SetName1()
 {
 	BHandler Handler("a name");
-	assert(string("a name") == Handler.Name());
+	CPPUNIT_ASSERT(string("a name") == Handler.Name());
 
 	Handler.SetName(NULL);
-	assert(Handler.Name() == NULL);
+	CPPUNIT_ASSERT(Handler.Name() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -263,10 +263,10 @@ void TBHandlerTester::SetName1()
 void TBHandlerTester::SetName2()
 {
 	BHandler Handler("a name");
-	assert(string("a name") == Handler.Name());
+	CPPUNIT_ASSERT(string("a name") == Handler.Name());
 
 	Handler.SetName("another name");
-	assert(string("another name") == Handler.Name());
+	CPPUNIT_ASSERT(string("another name") == Handler.Name());
 }
 //------------------------------------------------------------------------------
 /**
@@ -279,7 +279,7 @@ void TBHandlerTester::SetName2()
 void TBHandlerTester::Perform1()
 {
 	BHandler Handler;
-	assert(Handler.Perform(0, NULL) == B_ERROR);
+	CPPUNIT_ASSERT(Handler.Perform(0, NULL) == B_ERROR);
 }
 //------------------------------------------------------------------------------
 /**
@@ -290,7 +290,7 @@ void TBHandlerTester::Perform1()
 void TBHandlerTester::FilterList1()
 {
 	BHandler Handler;
-	assert(!Handler.FilterList());
+	CPPUNIT_ASSERT(!Handler.FilterList());
 }
 //------------------------------------------------------------------------------
 Test* TBHandlerTester::Suite()

@@ -3,6 +3,7 @@ APP_KIT_SOURCE =
 	Handler.cpp
 	Invoker.cpp
 	Looper.cpp
+	LooperList.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
 	Messenger.cpp

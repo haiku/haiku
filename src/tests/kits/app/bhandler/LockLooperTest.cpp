@@ -27,7 +27,7 @@
 void TLockLooperTest::LockLooper1()
 {
 	BHandler Handler;
-	assert(!Handler.LockLooper());
+	CPPUNIT_ASSERT(!Handler.LockLooper());
 }
 //------------------------------------------------------------------------------
 /**
@@ -45,7 +45,7 @@ void TLockLooperTest::LockLooper2()
 		// Make sure the looper is unlocked
 		Looper.Unlock();
 	}
-	assert(Handler.LockLooper());
+	CPPUNIT_ASSERT(Handler.LockLooper());
 }
 //------------------------------------------------------------------------------
 /**
@@ -59,7 +59,7 @@ void TLockLooperTest::LockLooper3()
 	BHandler Handler;
 	Looper.AddHandler(&Handler);
 	Looper.Lock();
-	assert(Handler.LockLooper());
+	CPPUNIT_ASSERT(Handler.LockLooper());
 }
 //------------------------------------------------------------------------------
 /**
@@ -83,7 +83,7 @@ void TLockLooperTest::LockLooper4()
 	resume_thread(tid);
 	info.LockTest();
 
-	assert(!Handler.LockLooper());
+	CPPUNIT_ASSERT(!Handler.LockLooper());
 	info.UnlockThread();
 }
 //------------------------------------------------------------------------------

@@ -39,6 +39,12 @@
 	cout << endl << "status_t == \"" << strerror((status__)) << "\" ("	\
 		 << (status__) << ") in " << __PRETTY_FUNCTION__ << endl
 
+#ifdef USE_DEBUGGER_TESTS
+#define DEBUGGER_ESCAPE
+#else
+#define DEBUGGER_ESCAPE	return
+#endif
+
 // Globals ---------------------------------------------------------------------
 
 using namespace CppUnit;

@@ -32,7 +32,7 @@
 void TRemoveFilterTest::RemoveFilter1()
 {
 	BHandler Handler;
-	assert(!Handler.RemoveFilter(NULL));
+	CPPUNIT_ASSERT(!Handler.RemoveFilter(NULL));
 }
 //------------------------------------------------------------------------------
 /**
@@ -48,7 +48,7 @@ void TRemoveFilterTest::RemoveFilter2()
 	BHandler Handler;
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Handler.AddFilter(Filter);
-	assert(Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 /**
@@ -66,7 +66,7 @@ void TRemoveFilterTest::RemoveFilter3()
 	Looper.AddHandler(&Handler);
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Handler.AddFilter(Filter);
-	assert(Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 /**
@@ -83,7 +83,7 @@ void TRemoveFilterTest::RemoveFilter4()
 	Looper.Lock();
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Handler.AddFilter(Filter);
-	assert(Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 /**
@@ -98,7 +98,7 @@ void TRemoveFilterTest::RemoveFilter5()
 {
 	BHandler Handler;
 	BMessageFilter* Filter = new BMessageFilter('1234');
-	assert(!Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(!Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 /**
@@ -116,7 +116,7 @@ void TRemoveFilterTest::RemoveFilter6()
 	BHandler Handler;
 	Looper.AddHandler(&Handler);
 	BMessageFilter* Filter = new BMessageFilter('1234');
-	assert(!Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(!Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 /**
@@ -133,7 +133,7 @@ void TRemoveFilterTest::RemoveFilter7()
 	Looper.AddHandler(&Handler);
 	Looper.Lock();
 	BMessageFilter* Filter = new BMessageFilter('1234');
-	assert(!Handler.RemoveFilter(Filter));
+	CPPUNIT_ASSERT(!Handler.RemoveFilter(Filter));
 }
 //------------------------------------------------------------------------------
 Test* TRemoveFilterTest::Suite()

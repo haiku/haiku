@@ -26,7 +26,7 @@
 void TNextHandlerTest::NextHandler1()
 {
 	BHandler Handler;
-	assert(Handler.NextHandler() == NULL);
+	CPPUNIT_ASSERT(Handler.NextHandler() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -39,7 +39,7 @@ void TNextHandlerTest::NextHandler2()
 	BHandler Handler;
 	BLooper Looper;
 	Looper.AddHandler(&Handler);
-	assert(Handler.NextHandler() == &Looper);
+	CPPUNIT_ASSERT(Handler.NextHandler() == &Looper);
 }
 //------------------------------------------------------------------------------
 Test* TNextHandlerTest::Suite()

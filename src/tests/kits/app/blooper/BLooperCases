@@ -8,4 +8,8 @@ case 5: looper is locked, message is posted, queue is emptied
 
 RemoveHandler(BHandler* handler)
 --------------
+case : handler is NULL
+case : handler doesn't belong to this looper
+case : handler is valid, looper is unlocked
+case : handler doesn't belong to this looper, looper is unlocked
 case : handler has filters; FilterList() should be NULL on remove

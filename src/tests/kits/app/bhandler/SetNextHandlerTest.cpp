@@ -35,10 +35,10 @@ void TSetNextHandlerTest::SetNextHandler0()
 	Looper.AddHandler(&Handler2);
 
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Handler2);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Handler2);
 
 	Handler1.SetNextHandler(NULL);
-	assert(!Handler1.NextHandler());
+	CPPUNIT_ASSERT(!Handler1.NextHandler());
 }
 //------------------------------------------------------------------------------
 /**
@@ -52,10 +52,12 @@ void TSetNextHandlerTest::SetNextHandler0()
  */
 void TSetNextHandlerTest::SetNextHandler1()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == NULL);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -64,17 +66,20 @@ void TSetNextHandlerTest::SetNextHandler1()
 	@case			Handler1 belongs to a unlocked BLooper, Handler2 does not
 	@param	handler	Valid BHandler pointer
 	@results		NextHandler() returns BLooper
-					debug message "The handler and its NextHandler must have
-					the same looper"
+					debug message "The handler's looper must be locked before
+					setting NextHandler"
  */
 void TSetNextHandlerTest::SetNextHandler2()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper;
 	Looper.AddHandler(&Handler1);
+	Looper.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper);
 }
 //------------------------------------------------------------------------------
 /**
@@ -88,13 +93,14 @@ void TSetNextHandlerTest::SetNextHandler2()
  */
 void TSetNextHandlerTest::SetNextHandler3()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper;
 	Looper.AddHandler(&Handler1);
-	Looper.Lock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper);
 }
 //------------------------------------------------------------------------------
 /**
@@ -108,12 +114,15 @@ void TSetNextHandlerTest::SetNextHandler3()
  */
 void TSetNextHandlerTest::SetNextHandler4()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper;
 	Looper.AddHandler(&Handler2);
+	Looper.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == NULL);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -127,13 +136,14 @@ void TSetNextHandlerTest::SetNextHandler4()
  */
 void TSetNextHandlerTest::SetNextHandler5()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper;
 	Looper.AddHandler(&Handler2);
-	Looper.Lock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == NULL);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -147,14 +157,18 @@ void TSetNextHandlerTest::SetNextHandler5()
  */
 void TSetNextHandlerTest::SetNextHandler6()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper1;
 	BLooper Looper2;
 	Looper1.AddHandler(&Handler1);
 	Looper2.AddHandler(&Handler2);
+	Looper1.Unlock();
+	Looper2.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper1);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper1);
 }
 //------------------------------------------------------------------------------
 /**
@@ -169,15 +183,17 @@ void TSetNextHandlerTest::SetNextHandler6()
  */
 void TSetNextHandlerTest::SetNextHandler7()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper1;
 	BLooper Looper2;
 	Looper1.AddHandler(&Handler1);
 	Looper2.AddHandler(&Handler2);
-	Looper1.Lock();
+	Looper2.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper1);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper1);
 }
 //------------------------------------------------------------------------------
 /**
@@ -192,15 +208,17 @@ void TSetNextHandlerTest::SetNextHandler7()
  */
 void TSetNextHandlerTest::SetNextHandler8()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper1;
 	BLooper Looper2;
 	Looper1.AddHandler(&Handler1);
 	Looper2.AddHandler(&Handler2);
-	Looper2.Lock();
+	Looper1.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper1);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper1);
 }
 //------------------------------------------------------------------------------
 /**
@@ -214,16 +232,16 @@ void TSetNextHandlerTest::SetNextHandler8()
  */
 void TSetNextHandlerTest::SetNextHandler9()
 {
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler1;
 	BHandler Handler2;
 	BLooper Looper1;
 	BLooper Looper2;
 	Looper1.AddHandler(&Handler1);
 	Looper2.AddHandler(&Handler2);
-	Looper1.Lock();
-	Looper2.Lock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Looper1);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper1);
 }
 //------------------------------------------------------------------------------
 /**
@@ -232,18 +250,23 @@ void TSetNextHandlerTest::SetNextHandler9()
 	@case			Handler1 and Handler2 belong to the same unlocked BLooper
 	@param	handler	Valid BHandler pointer
 	@results		Returns Handler2
-	@note			Docs say the looper must be locked, but the original
-					implementation allows the next handler to be set anyway.
+					debug message "The handler's looper must be locked before
+					setting NextHandler"
+	@note			R5 implementation allows the next handler to be set anyway;
+					we do the same.
  */
 void TSetNextHandlerTest::SetNextHandler10()
 {
+	DEBUGGER_ESCAPE;
+
 	BLooper Looper;
 	BHandler Handler1;
 	BHandler Handler2;
 	Looper.AddHandler(&Handler1);
 	Looper.AddHandler(&Handler2);
+	Looper.Unlock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Handler2);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Looper);
 }
 //------------------------------------------------------------------------------
 /**
@@ -260,9 +283,8 @@ void TSetNextHandlerTest::SetNextHandler11()
 	BHandler Handler2;
 	Looper.AddHandler(&Handler1);
 	Looper.AddHandler(&Handler2);
-	Looper.Lock();
 	Handler1.SetNextHandler(&Handler2);
-	assert(Handler1.NextHandler() == &Handler2);
+	CPPUNIT_ASSERT(Handler1.NextHandler() == &Handler2);
 }
 //------------------------------------------------------------------------------
 Test* TSetNextHandlerTest::Suite()
@@ -270,15 +292,15 @@ Test* TSetNextHandlerTest::Suite()
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::SetNextHandler");
 
 	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler0);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler1);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler2);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler3);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler4);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler5);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler6);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler7);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler8);
-//	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler9);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler1);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler2);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler3);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler4);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler5);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler6);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler7);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler8);
+	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler9);
 	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler10);
 	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler11);
 

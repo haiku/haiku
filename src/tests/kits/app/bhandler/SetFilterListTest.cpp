@@ -33,7 +33,7 @@ void TSetFilterListTest::SetFilterList1()
 {
 	BHandler Handler;
 	Handler.SetFilterList(NULL);
-	assert(!Handler.FilterList());
+	CPPUNIT_ASSERT(!Handler.FilterList());
 }
 //------------------------------------------------------------------------------
 /**
@@ -49,7 +49,7 @@ void TSetFilterListTest::SetFilterList2()
 	Filters->AddItem((void*)Filter);
 	BHandler Handler;
 	Handler.SetFilterList(Filters);
-	assert(Handler.FilterList() == Filters);
+	CPPUNIT_ASSERT(Handler.FilterList() == Filters);
 }
 //------------------------------------------------------------------------------
 /**
@@ -62,6 +62,8 @@ void TSetFilterListTest::SetFilterList2()
  */
 void TSetFilterListTest::SetFilterList3()
 {
+	DEBUGGER_ESCAPE;
+
 	BLooper Looper;
 	BHandler Handler;
 
@@ -76,7 +78,7 @@ void TSetFilterListTest::SetFilterList3()
 	}
 
 	Handler.SetFilterList(Filters);
-	assert(!Handler.FilterList());
+	CPPUNIT_ASSERT(!Handler.FilterList());
 }
 //------------------------------------------------------------------------------
 /**
@@ -95,7 +97,7 @@ void TSetFilterListTest::SetFilterList4()
 	Looper.Lock();
 	Looper.AddHandler(&Handler);
 	Handler.SetFilterList(Filters);
-	assert(Handler.FilterList() == Filters);
+	CPPUNIT_ASSERT(Handler.FilterList() == Filters);
 }
 //------------------------------------------------------------------------------
 /**
@@ -114,10 +116,10 @@ void TSetFilterListTest::SetFilterList5()
 	Looper.Lock();
 	Looper.AddHandler(&Handler);
 	Handler.SetFilterList(Filters);
-	assert(Handler.FilterList() == Filters);
+	CPPUNIT_ASSERT(Handler.FilterList() == Filters);
 
 	Handler.SetFilterList(NULL);
-	assert(!Handler.FilterList());
+	CPPUNIT_ASSERT(!Handler.FilterList());
 }
 //------------------------------------------------------------------------------
 Test* TSetFilterListTest::Suite()

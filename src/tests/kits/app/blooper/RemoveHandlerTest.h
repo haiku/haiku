@@ -26,6 +26,10 @@ class TRemoveHandlerTest : public TestCase
 		TRemoveHandlerTest(std::string name) : TestCase(name) {;}
 
 		void RemoveHandler1();
+		void RemoveHandler2();
+		void RemoveHandler3();
+		void RemoveHandler4();
+		void RemoveHandler5();
 
 		static Test* Suite();
 };

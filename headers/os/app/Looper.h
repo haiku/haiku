@@ -46,6 +46,9 @@
 
 class BMessage;
 class BMessageQueue;
+namespace BPrivate {
+	class BLooperList;
+}
 struct _loop_data_;
 
 // Port (Message Queue) Capacity -----------------------------------------------
@@ -138,6 +141,7 @@ private:
 	friend class BMessenger;
 	friend class BView;
 	friend class BHandler;
+	friend class BPrivate::BLooperList;
 	friend port_id _get_looper_port_(const BLooper* );
 	friend status_t _safe_get_server_token_(const BLooper* , int32* );
 	friend team_id	_find_cur_team_id_();

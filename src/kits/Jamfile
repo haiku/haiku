@@ -6,6 +6,7 @@ include $(SUBDIR)/support/support.src ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
+UsePrivateHeaders shared ;
 UsePrivateHeaders support ;
 
 UsePublicHeaders app ;

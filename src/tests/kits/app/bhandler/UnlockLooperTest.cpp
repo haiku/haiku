@@ -42,6 +42,8 @@ void TUnlockLooperTest::UnlockLooper1()
  */
 void TUnlockLooperTest::UnlockLooper2()
 {
+	DEBUGGER_ESCAPE;
+
 	BLooper Looper;
 	BHandler Handler;
 	Looper.AddHandler(&Handler);
