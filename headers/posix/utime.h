@@ -4,11 +4,11 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
+
 #include <sys/types.h>
 
 
-struct utimbuf
-{
+struct utimbuf {
 	time_t actime;		/* access time */
 	time_t modtime;		/* modification time */
 };
