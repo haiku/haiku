@@ -228,7 +228,7 @@ TGATranslator::TranslatorVersion() const
 //
 // Postconditions:
 //
-// Returns: the list of input formats and the number of input
+// Returns: the array of input formats and the number of input
 // formats through the out_count parameter
 // ---------------------------------------------------------------
 const translation_format *
@@ -254,7 +254,7 @@ TGATranslator::InputFormats(int32 *out_count) const
 //
 // Postconditions:
 //
-// Returns: the list of output formats and the number of output
+// Returns: the array of output formats and the number of output
 // formats through the out_count parameter
 // ---------------------------------------------------------------	
 const translation_format *
@@ -368,9 +368,9 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 // ---------------------------------------------------------------
 // identify_tga_header
 //
-// Determines if the data in inSource is in the MS or OS/2 TGA
-// format. If it is, it returns info about the data in inSource
-// to outInfo, pfileheader, pmsheader, pfrommsformat and os2skip.
+// Determines if the data in inSource is in the TGA format.
+// If it is, it returns info about the data in inSource
+// to outInfo, pfileheader, pmapspec and pimagespec.
 //
 // Preconditions:
 //
@@ -388,6 +388,13 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 //				pfileheader,	File header info for the TGA is
 //								copied here after it is read from
 //								the file.
+//
+//				pmapspec,	color map info for the TGA is copied
+//							here after it is read from the file
+//
+//				pimagespec,	Info about the image width/height etc.
+//							is copied here after it is read from
+//							the file
 //
 //
 // Postconditions:
@@ -653,6 +660,8 @@ TGATranslator::Identify(BPositionIO *inSource,
 		return identify_tga_header(inSource, outInfo, 4, ch);
 }
 
+// Convert width pixels from pbits to TGA format, storing the
+// result in ptga
 status_t
 pix_bits_to_tga(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	uint16 width, const color_map *pmap, int32 bitsBytesPerPixel)
@@ -858,6 +867,8 @@ pix_bits_to_tga(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	return bytescopied;
 }
 
+// create a TGA RLE packet for pixel and copy the
+// packet header and pixel data to ptga
 status_t
 copy_rle_packet(uint8 *ptga, uint32 pixel, uint8 count,
 	color_space fromspace, const color_map *pmap,
@@ -873,6 +884,8 @@ copy_rle_packet(uint8 *ptga, uint32 pixel, uint8 count,
 		ptga, fromspace, 1, pmap, bitsBytesPerPixel) + 1;
 }
 
+// create a TGA raw packet for pixel and copy the
+// packet header and pixel data to ptga
 status_t
 copy_raw_packet(uint8 *ptga, uint8 *praw, uint8 count,
 	color_space fromspace, const color_map *pmap,
@@ -888,6 +901,9 @@ copy_raw_packet(uint8 *ptga, uint8 *praw, uint8 count,
 		count, pmap, bitsBytesPerPixel) + 1;
 }
 
+// convert a row of pixel data from pbits to a
+// row of pixel data in the TGA format using 
+// Run Length Encoding
 status_t
 pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	uint16 width, const color_map *pmap, int32 bitsBytesPerPixel)
@@ -1007,7 +1023,7 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 // translate_from_bits_to_tgatc
 //
 // Converts various varieties of the Be Bitmap format ('bits') to
-// the TGA True Color format
+// the TGA True Color format (RLE or uncompressed)
 //
 // Preconditions:
 //
@@ -1016,6 +1032,12 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 //				outDestination,	where the TGA data will be written
 //
 //				fromspace,	the format of the data in inSource
+//
+//				imagespec,	info about width / height / etc. of
+//							the image
+//
+//				brle,	output using RLE if true, uncompressed
+//						if false
 //
 //
 // Postconditions:
@@ -1118,7 +1140,8 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 // ---------------------------------------------------------------
 // translate_from_bits1_to_tgabw
 //
-// Converts 1-bit Be Bitmaps ('bits') to the MS 1-bit TGA format
+// Converts 1-bit Be Bitmaps ('bits') to the 
+// black and white (8-bit grayscale) TGA format
 //
 // Preconditions:
 //
@@ -1129,8 +1152,12 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 //				bitsRowBytes,	number of bytes in one row of
 //								bits data
 //
-//				msheader,	contains information about the TGA
-//							dimensions and filesize
+//				imagespec,	info about width / height / etc. of
+//							the image
+//
+//				brle,	output using RLE if true, uncompressed
+//						if false
+//
 //
 // Postconditions:
 //
@@ -1221,12 +1248,17 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 // ---------------------------------------------------------------
 // write_tga_headers
 //
-// Writes the MS TGA headers (fileHeader and msheader)
-// to outDestination.
+// Writes the TGA headers to outDestination.
 //
 // Preconditions:
 //
 // Parameters:	outDestination,	where the headers are written to
+//
+//				fileheader, TGA file header
+//
+//				mapspec,	color map information
+//
+//				imagespec,	width / height / etc. info
 //
 //
 // Postconditions:
@@ -1289,8 +1321,9 @@ write_tga_headers(BPositionIO *outDestination, TGAFileHeader &fileheader,
 // ---------------------------------------------------------------
 // write_tga_footer
 //
-// Writes the MS TGA headers (fileHeader and msheader)
-// to outDestination.
+// Writes the TGA footer.  This information is contant in this
+// code because this translator does not output the developer
+// information section of the TGA format.
 //
 // Preconditions:
 //
@@ -1340,11 +1373,8 @@ write_tga_footer(BPositionIO *outDestination)
 //				read,		pointer to the data already read from
 //							inSource
 //
-//				bheaderonly,	true if only the header should be
-//								written out
-//
-//				bdataonly,	true if only the data should be
-//							written out
+//				settings,	settings object specifying whether
+//							RLE will be used, and so on
 //
 //				outType,	the type of data to convert to
 //
@@ -1601,6 +1631,8 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		return B_NO_TRANSLATOR;
 }
 
+// convert a row of uncompressed, non-color mapped 
+// TGA pixels from ptga to pbits
 status_t
 pix_tganm_to_bits(uint8 *pbits, uint8 *ptga,
 	uint16 width, uint8 depth, uint8 tgaBytesPerPixel,
@@ -1709,14 +1741,16 @@ pix_tganm_to_bits(uint8 *pbits, uint8 *ptga,
 // ---------------------------------------------------------------
 // translate_from_tganm_to_bits
 //
-// Translates a non-palette TGA from inSource to the B_RGB32
-// or B_RGBA32 bits format.
+// Translates a uncompressed, non-palette TGA from inSource
+// to the B_RGB32 or B_RGBA32 bits format.
 //
 // Preconditions:
 //
 // Parameters: inSource,	the TGA data to be translated
 //
 // outDestination,	where the bits data will be written to
+//
+// imagespec, width / height info
 //
 //
 // Postconditions:
@@ -1792,6 +1826,27 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 	return B_OK;
 }
 
+// ---------------------------------------------------------------
+// translate_from_tganmrle_to_bits
+//
+// Convert non color map, RLE TGA to Be bitmap format
+// and write results to outDestination
+//
+// Preconditions:
+//
+// Parameters: inSource,	the TGA data to be translated
+//
+// outDestination,	where the bits data will be written to
+//
+// imagespec, width / height info
+//
+//
+// Postconditions:
+//
+// Returns: B_ERROR, if there is an error allocating memory
+//
+// B_OK, if all went well
+// ---------------------------------------------------------------
 status_t
 translate_from_tganmrle_to_bits(BPositionIO *inSource,
 	BPositionIO *outDestination, TGAImageSpec &imagespec)
@@ -1898,6 +1953,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 	return result;
 }
 
+// convert a row of color mapped pixels to pbits
 status_t
 pix_tgam_to_bits(uint8 *pbits, uint8 *ptgaindices,
 	uint16 width, uint8 depth, uint8 *pmap)
@@ -1976,14 +2032,19 @@ pix_tgam_to_bits(uint8 *pbits, uint8 *ptgaindices,
 // ---------------------------------------------------------------
 // translate_from_tgam_to_bits
 //
-// Translates a non-palette TGA from inSource to the B_RGB32
-// bits format.
+// Translates a paletted TGA from inSource to the bits format.
 //
 // Preconditions:
 //
 // Parameters: inSource,	the TGA data to be translated
 //
 // outDestination,	where the bits data will be written to
+//
+// mapspec, info about the color map (palette)
+//
+// imagespec, width / height info
+//
+// pmap, color palette
 //
 //
 // Postconditions:
@@ -2058,6 +2119,31 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 	return B_OK;
 }
 
+// ---------------------------------------------------------------
+// translate_from_tgamrle_to_bits
+//
+// Translates a color mapped or non color mapped RLE TGA from
+// inSource to the bits format.
+//
+// Preconditions:
+//
+// Parameters: inSource,	the TGA data to be translated
+//
+// outDestination,	where the bits data will be written to
+//
+// mapspec, info about the color map (palette)
+//
+// imagespec, width / height info
+//
+// pmap, color palette
+//
+//
+// Postconditions:
+//
+// Returns: B_ERROR, if there is an error allocating memory
+//
+// B_OK, if all went well
+// ---------------------------------------------------------------
 status_t
 translate_from_tgamrle_to_bits(BPositionIO *inSource,
 	BPositionIO *outDestination, TGAColorMapSpec &mapspec,
@@ -2195,11 +2281,8 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 //				read,		pointer to the data already read from
 //							inSource
 //
-//				bheaderonly,	true if only the header should be
-//								written out
-//
-//				bdataonly,	true if only the data should be
-//							written out
+//				settings,	settings object specifying whether
+//							RLE will be used, and so on
 //
 //				outType,	the type of data to convert to
 //
@@ -2418,6 +2501,7 @@ TGATranslator::Translate(BPositionIO *inSource,
 			outType, outDestination);
 }
 
+// returns the current translator settings into ioExtension
 status_t
 TGATranslator::GetConfigurationMessage(BMessage *ioExtension)
 {

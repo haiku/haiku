@@ -6,10 +6,6 @@
 // This translator opens and writes TGA files.
 //
 //
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
 // Copyright (c) 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

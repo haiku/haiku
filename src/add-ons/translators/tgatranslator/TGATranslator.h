@@ -44,11 +44,11 @@
 #define TGA_IN_QUALITY 1.0
 	// high in quality becuase this code supports all TGA features
 #define TGA_IN_CAPABILITY 0.6
-	// high in capability because this code opens basically all TGAs
+	// high in capability because this code opens most TGAs
 #define TGA_OUT_QUALITY 1.0
 	// high out quality because this code outputs fully standard TGAs
-#define TGA_OUT_CAPABILITY 0.5
-	// medium out capability because RLE compression is not an option
+#define TGA_OUT_CAPABILITY 0.7
+	// high out capability because many TGA features are supported
 
 #define BBT_IN_QUALITY 0.6
 	// medium in quality because only most common features are supported
