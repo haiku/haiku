@@ -4,38 +4,43 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <user_runtime.h>
+#include <image.h>
 #include <syscalls.h>
+
 
 extern void sys_exit(int retcode);
 
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
 
-int _start(unsigned image_id, struct uspace_prog_args_t *);
+int _start(image_id image_id, struct uspace_program_args *);
 static void _call_ctors(void);
 
+
 int
-_start(unsigned imid, struct uspace_prog_args_t *uspa)
+_start(image_id imageID, struct uspace_program_args *args)
 {
 //	int i;
 //	int retcode;
-	void *ibc;
-	void *iac;
+	void *initBefore = NULL;
+	void *initAfter = NULL;
 
-	ibc= uspa->rld_export->dl_sym(imid, "INIT_BEFORE_CTORS", 0);
-	iac= uspa->rld_export->dl_sym(imid, "INIT_AFTER_CTORS", 0);
+	args->rld_export->get_image_symbol(imageID, B_INIT_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&initBefore);
+	args->rld_export->get_image_symbol(imageID, B_INIT_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&initAfter);
 
-	if(ibc) {
-		((libinit_f*)(ibc))(imid, uspa);
-	}
+	if (initBefore)
+		((libinit_f *)(initBefore))(imageID, args);
+
 	_call_ctors();
-	if(iac) {
-		((libinit_f*)(iac))(imid, uspa);
-	}
+
+	if (initAfter)
+		((libinit_f *)(initAfter))(imageID, args);
 
 	return 0;
 }
+
 
 static
 void _call_ctors(void)

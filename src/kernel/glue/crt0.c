@@ -17,7 +17,7 @@ extern void (*__ctor_end)(void);
 
 extern int main(int argc,char **argv);
 
-int _start(struct uspace_prog_args_t *);
+int _start(struct uspace_program_args *);
 void _call_ctors(void);
 
 static char empty[1];
@@ -25,7 +25,9 @@ char *__progname = empty;
 
 char **environ = NULL;
 
-int _start(struct uspace_prog_args_t *uspa)
+
+int
+_start(struct uspace_program_args *args)
 {
 	int retcode;
 	register char *ap;
@@ -33,27 +35,29 @@ int _start(struct uspace_prog_args_t *uspa)
 
 //	__stdio_init();
 
-	if ((ap = uspa->argv[0])) {
+	if ((ap = args->argv[0])) {
 		if ((__progname = strrchr(ap, '/')) == NULL)
 			__progname = ap;
 		else
 			++__progname;
 	}
-	
-	environ = uspa->envp;
-	
-	retcode = main(uspa->argc, uspa->argv);
+
+	environ = args->envp;
+	retcode = main(args->argc, args->argv);
 
 //	__stdio_deinit();
+
 	sys_exit(retcode);
 	return 0;
 }
 
-void _call_ctors(void)
+
+void
+_call_ctors(void)
 { 
 	void (**f)(void);
 
-	for(f = &__ctor_list; f < &__ctor_end; f++) {
+	for (f = &__ctor_list; f < &__ctor_end; f++) {
 		(**f)();
 	}
 }
