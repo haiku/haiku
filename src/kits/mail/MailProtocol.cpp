@@ -197,7 +197,7 @@ BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
 		fido.PushInt32(settings->FindInt32("chain"));
 		fido.PushOp(B_EQ);
 		fido.PushOp(B_OR);
-		if (!settings->FindBool("delete_remote_when_local")) {
+		if (!settings->FindBool("leave_mail_on_server")) {
 			fido.PushAttr("BEOS:type");
 			fido.PushString("text/x-partial-email");
 			fido.PushOp(B_EQ);
