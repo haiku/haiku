@@ -81,18 +81,24 @@ KPartitioningSystem::FreeIdentifyCookie(KPartition *partition, void *cookie)
 void
 KPartitioningSystem::FreeCookie(KPartition *partition)
 {
-	if (!partition || !fModule || !fModule->free_partition_cookie)
+	if (!partition || !fModule || !fModule->free_partition_cookie
+		|| partition->ParentDiskSystem() != this) {
 		return;
+	}
 	fModule->free_partition_cookie(partition->PartitionData());
+	partition->SetCookie(NULL);
 }
 
 // FreeContentCookie
 void
 KPartitioningSystem::FreeContentCookie(KPartition *partition)
 {
-	if (!partition || !fModule || !fModule->free_partition_content_cookie)
+	if (!partition || !fModule || !fModule->free_partition_content_cookie
+		|| partition->DiskSystem() != this) {
 		return;
+	}
 	fModule->free_partition_content_cookie(partition->PartitionData());
+	partition->SetContentCookie(NULL);
 }
 
 // SupportsRepairing
@@ -100,10 +106,17 @@ bool
 KPartitioningSystem::SupportsRepairing(KPartition *partition, bool checkOnly,
 									   bool *whileMounted)
 {
-	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_repairing) {
+		return (*whileMounted = false);
+	}
+	bool result = fModule->supports_repairing(partition->PartitionData(),
+											  checkOnly);
+	*whileMounted = result;
+	return result;
 }
 
 // SupportsResizing
@@ -111,42 +124,60 @@ bool
 KPartitioningSystem::SupportsResizing(KPartition *partition,
 									  bool *whileMounted)
 {
-	// to be implemented
-	if (whileMounted)
-		*whileMounted = false;
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule ||
+		!fModule->supports_resizing) {
+		return (*whileMounted = false);
+	}
+	bool result = fModule->supports_resizing(partition->PartitionData());
+	*whileMounted = result;
+	return result;
 }
 
 // SupportsResizingChild
 bool
 KPartitioningSystem::SupportsResizingChild(KPartition *child)
 {
-	// to be implemented
-	return false;
+	return (child && child->Parent() && child->ParentDiskSystem() == this
+			&& fModule && fModule->supports_resizing_child
+			&& fModule->supports_resizing_child(
+						child->Parent()->PartitionData(),
+						child->PartitionData()));
 }
 
 // SupportsMoving
 bool
 KPartitioningSystem::SupportsMoving(KPartition *partition, bool *isNoOp)
 {
-	// to be implemented
-	return false;
+	bool _isNoOp = false;
+	if (!isNoOp)
+		isNoOp = &_isNoOp;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_moving) {
+		return (*isNoOp = false);
+	}
+	return fModule->supports_moving(partition->PartitionData(), isNoOp);
 }
 
 // SupportsMovingChild
 bool
 KPartitioningSystem::SupportsMovingChild(KPartition *child)
 {
-	// to be implemented
-	return false;
+	return (child && child->Parent() && child->ParentDiskSystem() != this
+			&& fModule && fModule->supports_moving_child
+			&& fModule->supports_moving_child(child->Parent()->PartitionData(),
+											  child->PartitionData()));
 }
 
 // SupportsSettingName
 bool
 KPartitioningSystem::SupportsSettingName(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->ParentDiskSystem() == this
+			&& fModule && fModule->supports_setting_name
+			&& fModule->supports_setting_name(partition->PartitionData()));
 }
 
 // SupportsSettingContentName
@@ -154,24 +185,36 @@ bool
 KPartitioningSystem::SupportsSettingContentName(KPartition *partition,
 												bool *whileMounted)
 {
-	// to be implemented
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_setting_content_name) {
+		return (*whileMounted = false);
+	}
+	bool result = fModule->supports_setting_content_name(
+		partition->PartitionData());
+	*whileMounted = result;
+	return result;
 }
 
 // SupportsSettingType
 bool
 KPartitioningSystem::SupportsSettingType(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->ParentDiskSystem() == this
+			&& fModule && fModule->supports_setting_type
+			&& fModule->supports_setting_type(partition->PartitionData()));
 }
 
 // SupportsSettingParameters
 bool
 KPartitioningSystem::SupportsSettingParameters(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->ParentDiskSystem() == this
+			&& fModule && fModule->supports_setting_parameters
+			&& fModule->supports_setting_parameters(
+					partition->PartitionData()));
 }
 
 // SupportsSettingContentParameters
@@ -179,16 +222,25 @@ bool
 KPartitioningSystem::SupportsSettingContentParameters(KPartition *partition,
 													  bool *whileMounted)
 {
-	// to be implemented
-	return false;
+	bool _whileMounted = false;
+	if (!whileMounted)
+		whileMounted = &_whileMounted;
+	if (!partition || partition->DiskSystem() != this || !fModule
+		|| !fModule->supports_setting_content_parameters) {
+		return (*whileMounted = false);
+	}
+	bool result = fModule->supports_setting_content_parameters(
+		partition->PartitionData());
+	*whileMounted = result;
+	return result;
 }
 
 // SupportsInitializing
 bool
 KPartitioningSystem::SupportsInitializing(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && fModule && fModule->supports_initializing
+			&& fModule->supports_initializing(partition->PartitionData()));
 }
 
 // SupportsInitializingChild
@@ -196,88 +248,106 @@ bool
 KPartitioningSystem::SupportsInitializingChild(KPartition *child,
 											   const char *diskSystem)
 {
-	// to be implemented
-	return false;
+	return (child && child->ParentDiskSystem() == this && diskSystem
+			&& fModule && fModule->supports_initializing_child
+			&& fModule->supports_initializing_child(child->PartitionData(),
+													diskSystem));
 }
 
 // SupportsCreatingChild
 bool
 KPartitioningSystem::SupportsCreatingChild(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->DiskSystem() == this
+			&& fModule && fModule->supports_creating_child
+			&& fModule->supports_creating_child(partition->PartitionData()));
 }
 
 // SupportsDeletingChild
 bool
 KPartitioningSystem::SupportsDeletingChild(KPartition *child)
 {
-	// to be implemented
-	return false;
+	return (child && child->Parent() && child->ParentDiskSystem() == this
+			&& fModule && fModule->supports_deleting_child
+			&& fModule->supports_deleting_child(
+					child->Parent()->PartitionData(), child->PartitionData()));
 }
 
 // IsSubSystemFor
 bool
 KPartitioningSystem::IsSubSystemFor(KPartition *partition)
 {
-	// to be implemented
-	return false;
+	return (partition && fModule && fModule->is_sub_system_for
+			&& fModule->is_sub_system_for(partition->PartitionData()));
 }
 
 // ValidateResize
 bool
 KPartitioningSystem::ValidateResize(KPartition *partition, off_t *size)
 {
-	// to be implemented
-	return false;
+	return (partition && size && partition->DiskSystem() == this && fModule
+			&& fModule->validate_resize
+			&& fModule->validate_resize(partition->PartitionData(), size));
 }
 
 // ValidateResizeChild
 bool
-KPartitioningSystem::ValidateResizeChild(KPartition *partition, off_t *size)
+KPartitioningSystem::ValidateResizeChild(KPartition *child, off_t *size)
 {
-	// to be implemented
-	return false;
+	return (child && size && child->Parent()
+			&& child->ParentDiskSystem() == this && fModule
+			&& fModule->validate_resize_child
+			&& fModule->validate_resize_child(child->Parent()->PartitionData(),
+											  child->PartitionData(), size));
 }
 
 // ValidateMove
 bool
 KPartitioningSystem::ValidateMove(KPartition *partition, off_t *start)
 {
-	// to be implemented
-	return false;
+	return (partition && start && partition->DiskSystem() == this && fModule
+			&& fModule->validate_move
+			&& fModule->validate_move(partition->PartitionData(), start));
 }
 
 // ValidateMoveChild
 bool
-KPartitioningSystem::ValidateMoveChild(KPartition *partition, off_t *start)
+KPartitioningSystem::ValidateMoveChild(KPartition *child, off_t *start)
 {
-	// to be implemented
-	return false;
+	return (child && start && child->Parent()
+			&& child->ParentDiskSystem() == this && fModule
+			&& fModule->validate_move_child
+			&& fModule->validate_move_child(child->Parent()->PartitionData(),
+											child->PartitionData(), start));
 }
 
 // ValidateSetName
 bool
 KPartitioningSystem::ValidateSetName(KPartition *partition, char *name)
 {
-	// to be implemented
-	return false;
+	return (partition && name && partition->Parent()
+			&& partition->ParentDiskSystem() == this && fModule
+			&& fModule->validate_set_name
+			&& fModule->validate_set_name(partition->PartitionData(), name));
 }
 
 // ValidateSetContentName
 bool
 KPartitioningSystem::ValidateSetContentName(KPartition *partition, char *name)
 {
-	// to be implemented
-	return false;
+	return (partition && name && partition->DiskSystem() == this
+			&& fModule && fModule->validate_set_content_name
+			&& fModule->validate_set_content_name(partition->PartitionData(),
+												  name));
 }
 
 // ValidateSetType
 bool
 KPartitioningSystem::ValidateSetType(KPartition *partition, const char *type)
 {
-	// to be implemented
-	return false;
+	return (partition && type && partition->ParentDiskSystem() == this
+			&& fModule && fModule->validate_set_type
+			&& fModule->validate_set_type(partition->PartitionData(), type));
 }
 
 // ValidateSetParameters
@@ -285,17 +355,21 @@ bool
 KPartitioningSystem::ValidateSetParameters(KPartition *partition,
 										   const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->ParentDiskSystem() == this 
+			&& fModule && fModule->validate_set_parameters
+			&& fModule->validate_set_parameters(partition->PartitionData(),
+					parameters));
 }
 
 // ValidateSetContentParameters
 bool
-KPartitioningSystem::ValidateSetContentParameters(KPartition *child,
+KPartitioningSystem::ValidateSetContentParameters(KPartition *partition,
 												  const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && partition->DiskSystem() == this && fModule
+			&& fModule->validate_set_content_parameters
+			&& fModule->validate_set_content_parameters(
+					partition->PartitionData(), parameters));
 }
 
 // ValidateInitialize
@@ -303,8 +377,9 @@ bool
 KPartitioningSystem::ValidateInitialize(KPartition *partition, char *name,
 										const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && name && fModule && fModule->validate_initialize
+			&& fModule->validate_initialize(partition->PartitionData(), name,
+											parameters));
 }
 
 // ValidateCreateChild
@@ -313,26 +388,45 @@ KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
 										 off_t *size, const char *type,
 										 const char *parameters)
 {
-	// to be implemented
-	return false;
+	return (partition && start && size && type
+			&& partition->DiskSystem() == this && fModule
+			&& fModule->validate_create_child
+			&& fModule->validate_create_child(partition->PartitionData(),
+											  start, size, type, parameters));
 }
 
 // CountPartitionableSpaces
 int32
 KPartitioningSystem::CountPartitionableSpaces(KPartition *partition)
 {
-	// to be implemented
-	return 0;
+	if (!partition || partition->DiskSystem() != this || !fModule)
+		return 0;
+	if (!fModule->get_partitionable_spaces) {
+		// TODO: Fallback algorithm.
+		return 0;
+	}
+	int32 count = 0;
+	status_t error = fModule->get_partitionable_spaces(
+		partition->PartitionData(), NULL, 0, &count);
+	return (error == B_OK || error == B_BUFFER_OVERFLOW ? count : 0);
 }
 
 // GetPartitionableSpaces
-bool
+status_t
 KPartitioningSystem::GetPartitionableSpaces(KPartition *partition,
-											partitionable_space_data *spaces,
+											partitionable_space_data *buffer,
 											int32 count, int32 *actualCount)
 {
-	// to be implemented
-	return false;
+	if (!partition || partition->DiskSystem() != this || count > 0 && !buffer
+		|| !actualCount || !fModule) {
+		return B_BAD_VALUE;
+	}
+	if (!fModule->get_partitionable_spaces) {
+		// TODO: Fallback algorithm.
+		return B_ENTRY_NOT_FOUND;
+	}
+	return fModule->get_partitionable_spaces(partition->PartitionData(),
+											 buffer, count, actualCount);
 }
 
 // GetNextSupportedType
@@ -340,16 +434,25 @@ status_t
 KPartitioningSystem::GetNextSupportedType(KPartition *partition, int32 *cookie,
 										  char *type)
 {
-	// to be implemented
-	return B_ERROR;
+	if (!partition || partition->DiskSystem() != this || !cookie || !type
+		|| !fModule) {
+		return B_BAD_VALUE;
+	}
+	if (!fModule->get_next_supported_type)
+		return B_ENTRY_NOT_FOUND;
+	return fModule->get_next_supported_type(partition->PartitionData(), cookie,
+											type);
 }
 
 // GetTypeForContentType
 status_t
 KPartitioningSystem::GetTypeForContentType(const char *contentType, char *type)
 {
-	// to be implemented
-	return B_ERROR;
+	if (!contentType || !type || !fModule)
+		return B_BAD_VALUE;
+	if (!fModule->get_type_for_content_type)
+		return B_ENTRY_NOT_FOUND;
+	return fModule->get_type_for_content_type(contentType, type);
 }
 
 // Repair
