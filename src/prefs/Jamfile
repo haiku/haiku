@@ -18,6 +18,7 @@ SubInclude OBOS_TOP src prefs print ;
 SubInclude OBOS_TOP src prefs screen ;
 SubInclude OBOS_TOP src prefs screensaver ;
 SubInclude OBOS_TOP src prefs scrollbar ;
+SubInclude OBOS_TOP src prefs sounds ;
 SubInclude OBOS_TOP src prefs time ;
 #SubInclude OBOS_TOP src prefs translation ;
 SubInclude OBOS_TOP src prefs virtualmemory ;

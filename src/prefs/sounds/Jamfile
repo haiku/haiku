@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src prefs sounds ;
+
+AddResources Sounds : Sounds.rsrc ;
+
+Preference Sounds : 
+	HApp.cpp 
+	HEventItem.cpp 
+	HWindow.cpp 
+	HEventList.cpp ;
+
+LinkSharedOSLibs Sounds : be media game tracker ;
