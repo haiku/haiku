@@ -62,6 +62,10 @@ alloc_fd(void)
 }
 
 
+/** Searches a free slot in the FD table of the provided I/O context, and inserts
+ *	the specified descriptor into it.
+ */
+
 int
 new_fd_etc(struct io_context *context, struct file_descriptor *descriptor, int firstIndex)
 {
@@ -99,7 +103,7 @@ new_fd(struct io_context *context, struct file_descriptor *descriptor)
 
 
 /**	Reduces the descriptor's reference counter, and frees all resources
- *	if necessary.
+ *	when it's no longer used.
  */
 
 void
@@ -117,6 +121,10 @@ put_fd(struct file_descriptor *descriptor)
 	}
 }
 
+
+/**	Decrements the open counter of the file descriptor and invokes
+ *	its close hook when appropriate.
+ */
 
 void
 close_fd(struct file_descriptor *descriptor)
@@ -150,7 +158,7 @@ get_fd(struct io_context *context, int fd)
 }
 
 
-/**	Removes the file descriptor in the specified slot.
+/**	Removes the file descriptor from the specified slot.
  */
 
 static struct file_descriptor *
@@ -332,7 +340,7 @@ common_close(int fd, bool kernel)
 
 
 //	#pragma mark -
-/*** USER routines ***/ 
+//	User syscalls
 
 
 ssize_t
@@ -621,7 +629,7 @@ _user_rewind_dir(int fd)
 status_t
 _user_close(int fd)
 {
-	return common_close(fd, true);
+	return common_close(fd, false);
 }
 
 
@@ -640,7 +648,7 @@ _user_dup2(int ofd, int nfd)
 
 
 //	#pragma mark -
-/*** SYSTEM functions ***/
+//	Kernel calls
 
 
 ssize_t
