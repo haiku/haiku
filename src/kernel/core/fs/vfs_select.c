@@ -176,7 +176,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 {
 	status_t status = B_OK;
 	int count = 0;
-	int i;
+	uint32 i;
 
 	// allocate resources
 
@@ -233,7 +233,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 	switch (status) {
 		case B_OK:
-			for (count = 0, i = 0;i < numfds; i++) {
+			for (count = 0, i = 0; i < numfds; i++) {
 				if (fds[i].revents == POLLNVAL)
 					continue;
 
