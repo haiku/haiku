@@ -20,6 +20,9 @@ class BitmapBuffer : public RenderingBuffer {
 	virtual	uint32				Width() const;
 	virtual	uint32				Height() const;
 
+								// BitmapBuffer
+			const BBitmap*		Bitmap() const
+									{ return fBitmap; }
  private:
 
 			BBitmap*			fBitmap;
