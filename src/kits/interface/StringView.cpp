@@ -224,7 +224,7 @@ BHandler* BStringView::ResolveSpecifier(BMessage* msg, int32 index,
 	return NULL;
 }
 //------------------------------------------------------------------------------
-void BStringView::MakeFocus(bool state = true)
+void BStringView::MakeFocus(bool state)
 {
 	BView::MakeFocus(state);
 }

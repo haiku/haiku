@@ -129,7 +129,7 @@ BArchivable* BTextControl::Instantiate(BMessage* data)
 	return new BTextControl(data);
 }
 //------------------------------------------------------------------------------
-status_t BTextControl::Archive(BMessage* data, bool deep = true) const
+status_t BTextControl::Archive(BMessage* data, bool deep) const
 {
 	// TODO: compare against original version and finish
 	status_t err = BView::Archive(data, deep);
@@ -281,6 +281,7 @@ void BTextControl::MouseDown(BPoint where)
 		MakeFocus(true);
 	}
 }
+//------------------------------------------------------------------------------
 void BTextControl::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
@@ -295,7 +296,8 @@ void BTextControl::AttachedToWindow()
 	ResizeTo(Bounds().Width(), h);
 	fText->ResizeTo(fText->Bounds().Width(), h);
 }
-void BTextControl::MakeFocus(bool state = true)
+//------------------------------------------------------------------------------
+void BTextControl::MakeFocus(bool state)
 {
 	if (IsEnabled())
 	{

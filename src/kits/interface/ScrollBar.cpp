@@ -68,7 +68,7 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 	privatedata=new BScrollBarPrivateData;
 	privatedata->thumbframe=Bounds();
 
-	if(!fTarget)
+	if(fTarget)
 	{
 		fTargetName=new char[strlen(fTarget->Name()+1)];
 		strcpy(fTargetName,target->Name());
@@ -483,7 +483,7 @@ void BScrollBar::GetPreferredSize(float *width, float *height)
 {
 }
 
-void BScrollBar::MakeFocus(bool state = true)
+void BScrollBar::MakeFocus(bool state)
 {
 	if(fTarget)
 		fTarget->MakeFocus(state);
