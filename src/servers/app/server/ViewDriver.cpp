@@ -147,6 +147,7 @@ void VDView::Draw(BRect rect)
 
 void VDView::MouseDown(BPoint pt)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -154,17 +155,16 @@ void VDView::MouseDown(BPoint pt)
 	// 4) int32 - modifier keys down
 	// 5) int32 - buttons down
 	// 6) int32 - clicks
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	BPoint p;
-
-	uint32 buttons,
-		mod=modifiers(),
-		clicks=1;		// can't get the # of clicks without a *lot* of extra work :(
-
+	
+	uint32 buttons,	mod, clicks=1;
 	int64 time=(int64)real_time_clock();
-
-	GetMouse(&p,&buttons);
-
+	
+	BMessage *msg=Window()->CurrentMessage();
+	msg->FindPoint("where",&pt);
+	msg->FindInt32("modifiers",(int32*)&mod);	
+	msg->FindInt32("buttons",(int32*)&buttons);
+	msg->FindInt32("clicks",(int32*)&clicks);
+	
 	serverlink->StartMessage(B_MOUSE_DOWN);
 	serverlink->Attach(&time, sizeof(int64));
 	serverlink->Attach(&pt.x,sizeof(float));
@@ -283,19 +283,23 @@ void VDWindow::MessageReceived(BMessage *msg)
 			int8 utf8data[4];
 			BString string;
 			int8 keyarray[16];
-
+			
 			systime=(int64)real_time_clock();
 			msg->FindInt32("key",&scancode);
-			msg->FindInt32("be:key_repeat",&repeatcount);
+			if(msg->FindInt32("be:key_repeat",&repeatcount)!=B_OK)
+			{
+				// TODO: see if repeatcount should be 0 or 1 when not repeating in ViewDriver
+				repeatcount=1;
+			}
 			msg->FindInt32("modifiers",&modifiers);
 			msg->FindInt32("raw_char",&asciicode);
 			
 			msg->FindInt8("byte",0,utf8data);
 			if(msg->FindInt8("byte",1,utf8data+1)!=B_OK)
 				utf8data[1]=0;
-			if(msg->FindInt8("byte",1,utf8data+2)!=B_OK)
+			if(msg->FindInt8("byte",2,utf8data+2)!=B_OK)
 				utf8data[2]=0;
-			if(msg->FindInt8("byte",1,utf8data+3)!=B_OK)
+			if(msg->FindInt8("byte",3,utf8data+3)!=B_OK)
 				utf8data[3]=0;
 			msg->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
@@ -307,8 +311,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			view->serverlink->Attach(repeatcount);
 			view->serverlink->Attach(modifiers);
 			view->serverlink->Attach(utf8data,sizeof(int8)*3);
-			view->serverlink->Attach(string.Length()+1);
-			view->serverlink->Attach(string.String());
+			view->serverlink->AttachString(string.String());
 			view->serverlink->Attach(keyarray,sizeof(int8)*16);
 			view->serverlink->Flush();
 			break;
@@ -351,8 +354,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			view->serverlink->Attach(asciicode);
 			view->serverlink->Attach(modifiers);
 			view->serverlink->Attach(utf8data,sizeof(int8)*3);
-			view->serverlink->Attach(string.Length()+1);
-			view->serverlink->Attach(string.String());
+			view->serverlink->AttachString(string.String());
 			view->serverlink->Attach(keyarray,sizeof(int8)*16);
 			view->serverlink->Flush();
 			break;

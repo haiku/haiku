@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
-#include <View.h>	// for B_XXXXX_MOUSE_BUTTON defines
+#include <View.h>
 #include <Message.h>
 #include <GraphicsDefs.h>
 #include <PortLink.h>
@@ -192,7 +192,7 @@ ServerWindow::~ServerWindow(void)
 	STRACE(("*ServerWindow (%s):~ServerWindow()\n",fTitle.String()));
 	
 	desktop->RemoveWinBorder(fWinBorder);
-	STRACE(("SW(%s) Successfully removed from the desktop\n", fTitle.String()));
+	STRACE(("ServerWindow(%s) Successfully removed from the desktop\n", fTitle.String()));
 	
 	if(fMsgSender)
 	{
@@ -712,7 +712,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_CREATE_ROOT:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle.String()));
-			
+						
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
 			if (cl != NULL)
@@ -808,13 +808,11 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			patt = ld->patt.GetInt64();
 			
 			// TODO: Implement when ServerFont::SetfamilyAndStyle(int32) exists
+			// TODO: Implement *what*? SetFamilyAndStyle exists. :)
 			fMsgSender->StartMessage(SERVER_TRUE);
 			
 			// Attach font state
-			
-			// TODO: need a ServerFont::GetFamAndStyle
-//			fMsgSender->Attach<uint32>(0UL uint32 ld->font.GetFamAndStyle());
-			fMsgSender->Attach<uint32>(0UL);
+			fMsgSender->Attach<uint32>(ld->font.GetFamilyAndStyle());
 			fMsgSender->Attach<float>(ld->font.Size());
 			fMsgSender->Attach<float>(ld->font.Shear());
 			fMsgSender->Attach<float>(ld->font.Rotation());
@@ -2115,18 +2113,21 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAG_IMAGE:
 		{
+			// TODO: Implement AS_LAYER_DRAG_IMAGE
 			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fTitle.String()));
 			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_LAYER_DRAG_RECT:
 		{
+			// TODO: Implement AS_LAYER_DRAG_RECT
 			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fTitle.String()));
 			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_LAYER_GET_MOUSE_COORDS:
 		{
+			// TODO: Implement AS_LAYER_MOUSE_COORDS
 			STRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
 			// Attached Data:
