@@ -449,7 +449,7 @@ static status_t map_device(device_info *di)
 		rom_area = map_physical_memory(
 			buffer,
 			(void *)0x000c0000,
-			32768,
+			65536,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
 			(void **)&(rom_temp)
@@ -472,10 +472,10 @@ static status_t map_device(device_info *di)
 	}
 
 	/* dump ROM to file if selected in nm.settings
-	 * (ROM should always fit in 32Kb) */
-	if (current_settings.dumprom) dumprom (rom_temp, 32768);
+	 * (ROM should always fit in 64Kb) */
+	if (current_settings.dumprom) dumprom (rom_temp, 65536);
 	/* make a copy of ROM for future reference */
-	memcpy (si->rom_mirror, rom_temp, 32768);
+	memcpy (si->rom_mirror, rom_temp, 65536);
 
 	/* disable ROM decoding - this is defined in the PCI standard, and delete the area */
 	tmpUlong = get_pci(PCI_rom_base, 4);
