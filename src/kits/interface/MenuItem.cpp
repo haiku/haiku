@@ -39,7 +39,9 @@ BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 					 uint32 modifiers)
 {
 	InitData();
-	fLabel = strdup(label);
+	if (label != NULL)
+		fLabel = strdup(label);
+		
 	SetMessage(message);
 
 	fShortcutChar = shortcut;
@@ -161,7 +163,7 @@ BMenuItem::Archive(BMessage *data, bool deep) const
 
 
 BMenuItem::~BMenuItem()
-{
+{	
 	free(fLabel);
 	delete fSubmenu;
 }
@@ -460,7 +462,7 @@ void
 BMenuItem::InitData()
 {
 	fLabel = NULL;
-	fSubmenu = 0;
+	fSubmenu = NULL;
 	fWindow = NULL;
 	fSuper = NULL;
 	fModifiers = 0;

@@ -39,47 +39,73 @@
 menu_info BMenu::sMenuInfo;
 #endif
 
+class _ExtraMenuData_ {
+public:
+	menu_tracking_hook trackingHook;
+	void *trackingState;
+
+	_ExtraMenuData_(menu_tracking_hook func, void *state)
+	{
+		trackingHook = func;
+		trackingState = state;
+	};
+};
+
+
 static property_info
 sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
 		"otherwise." },
+	
 	{ "Enabled", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item." },
+	
 	{ "Label", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item." },
+	
 	{ "Label", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item." },
+	
 	{ "Mark", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
 		"is marked; false otherwise." },
+	
 	{ "Mark", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem." },
+	
 	{ "Menu", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
 		"sent by the item)." },
+	
 	{ "Menu", { B_DELETE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the selected menu or menus." },
+
 	{ "Menu", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack." },
+	
 	{ "MenuItem", { B_COUNT_PROPERTIES, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu." },
+	
 	{ "MenuItem", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
 		"sent by the item)." },
+	
 	{ "MenuItem", { B_DELETE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the specified menu item from its parent menu." },
+	
 	{ "MenuItem", { B_EXECUTE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Invokes the specified menu item." },
+	
 	{ "MenuItem", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
@@ -158,6 +184,10 @@ BMenu::BMenu(const char *name, float width, float height)
 BMenu::~BMenu()
 {
 	RemoveItems(0, CountItems(), true);
+	
+	delete fCachedMenuWindow;
+	delete fInitMatrixSize;
+	delete fExtraMenuData;
 }
 
 
@@ -250,13 +280,17 @@ BMenu::DetachedFromWindow()
 bool
 BMenu::AddItem(BMenuItem *item)
 {
-	return _AddItem(item, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
 bool
 BMenu::AddItem(BMenuItem *item, int32 index)
 {
+	if (fLayout == B_ITEMS_IN_MATRIX)
+		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only"
+				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
+
 	return _AddItem(item, index);
 }
 
@@ -291,6 +325,10 @@ BMenu::AddItem(BMenu *submenu)
 bool
 BMenu::AddItem(BMenu *submenu, int32 index)
 {
+	if (fLayout == B_ITEMS_IN_MATRIX)
+		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only"
+				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
+
 	BMenuItem *item = new BMenuItem(submenu);
 	if (!item)
 		return false;
@@ -924,8 +962,19 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 		UnlockLooper();
 	}
 	
+	if (clickToOpenRect != NULL && LockLooper()) {
+		fExtraRect = clickToOpenRect;
+		ConvertFromScreen(fExtraRect);
+		UnlockLooper();
+	}
+
 	int action;
-	return _track(&action, -1);
+	BMenuItem *menuItem = _track(&action, -1);
+	
+	SetStickyMode(false);
+	fExtraRect = NULL;
+	
+	return menuItem;
 }
 
 
@@ -953,6 +1002,8 @@ BMenu::DrawBackground(BRect update)
 void
 BMenu::SetTrackingHook(menu_tracking_hook func, void *state)
 {
+	delete fExtraMenuData;
+	fExtraMenuData = new _ExtraMenuData_(func, state);
 }
 
 
@@ -1004,6 +1055,12 @@ BMenu::_show(bool selectFirstItem)
 	fCachedMenuWindow = new BMenuWindow(Name());
 	
 	fCachedMenuWindow->ChildAt(0)->AddChild(this);
+	
+	// We're doing this here because ConvertToScreen() needs:
+	// 1. The BView to be attached (see the above line).
+	// 2. The looper locked or not running (the Show() call below starts the looper)
+	if (fSuper != NULL)
+		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 	fCachedMenuWindow->ResizeTo(Bounds().Width() + 4, Bounds().Height() + 4);
 	fCachedMenuWindow->MoveTo(ScreenLocation());
 	fCachedMenuWindow->Show();
@@ -1019,6 +1076,7 @@ BMenu::_hide()
 		fCachedMenuWindow->Lock();
 		fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
 		fCachedMenuWindow->Quit();
+		fCachedMenuWindow = NULL;
 	}
 	
 }
@@ -1034,21 +1092,21 @@ BMenu::_track(int *action, long start)
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
+			if (OverSuper(location)) {
+				UnlockLooper();
+				break;
+			}
 					
 			item = HitTestItems(location, B_ORIGIN);
-			if (item == NULL) {
-				UnlockLooper();
-				break;		
-			}
-			
+						
 			// TODO: Sometimes the menu flickers a bit.
 			// try to be smarter and suggest an update area, 
 			// instead of invalidating the whole view.
-			if (item != fSelected) {
+			if (item != NULL && item != fSelected) {
 				SelectItem(item);
 				Invalidate();
 			}
-															
+																	
 			UnlockLooper();
 		}
 		
@@ -1323,14 +1381,14 @@ BMenu::InvokeItem(BMenuItem *item, bool now)
 
 
 bool
-BMenu::OverSuper(BPoint loc)
+BMenu::OverSuper(BPoint location)
 {
-	ConvertToScreen(&loc);
-	
 	if (!Supermenu())
 		return false;
 	
-	return Supermenu()->Frame().Contains(loc);
+	ConvertToScreen(&location);
+	
+	return fSuperbounds.Contains(location);
 }
 
 
@@ -1378,10 +1436,7 @@ BMenu::HitTestItems(BPoint where, BPoint slop) const
 BRect
 BMenu::Superbounds() const
 {
-	if (fSuper)
-		return fSuper->Bounds();
-		
-	return BRect();
+	return fSuperbounds;
 }
 
 
