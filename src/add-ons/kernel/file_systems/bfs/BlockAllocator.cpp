@@ -454,7 +454,7 @@ BlockAllocator::Allocate(Transaction *transaction,const Inode *inode, off_t numB
 
 
 status_t 
-BlockAllocator::Free(Transaction *transaction,block_run &run)
+BlockAllocator::Free(Transaction *transaction, block_run run)
 {
 	Locker lock(fLock);
 

@@ -82,7 +82,7 @@ class Volume {
 		status_t			AllocateForInode(Transaction *transaction,const Inode *parent,mode_t type,block_run &run);
 		status_t			AllocateForInode(Transaction *transaction,const block_run *parent,mode_t type,block_run &run);
 		status_t			Allocate(Transaction *transaction,const Inode *inode,off_t numBlocks,block_run &run,uint16 minimum = 1);
-		status_t			Free(Transaction *transaction,block_run &run);
+		status_t			Free(Transaction *transaction, block_run run);
 
 #ifdef DEBUG
 		BlockAllocator		&Allocator() { return fBlockAllocator; }
@@ -144,9 +144,9 @@ Volume::Allocate(Transaction *transaction, const Inode *inode, off_t numBlocks, 
 
 
 inline status_t 
-Volume::Free(Transaction *transaction, block_run &run)
+Volume::Free(Transaction *transaction, block_run run)
 {
-	return fBlockAllocator.Free(transaction,run);
+	return fBlockAllocator.Free(transaction, run);
 }
 
 
