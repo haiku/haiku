@@ -11,7 +11,12 @@
 #include <string.h>
 
 
+extern int boot(stage2_args *args);
 void _start(void);
+
+
+int32 stdin, stdout;
+	// only needed for linking, must be derived from the (abstract) ConsoleNode class
 
 
 // dummy implementations
@@ -51,5 +56,6 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 void
 _start(void)
 {
+	boot(NULL);
 }
 
