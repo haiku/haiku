@@ -60,6 +60,7 @@ SimpleTest BootLoaderTest :
 	platform_devices.cpp
 	platform_heap.cpp
 	platform_misc.cpp
+	platform_mmu.cpp
 	Handle.cpp
 
 	# boot loader
@@ -67,7 +68,7 @@ SimpleTest BootLoaderTest :
 	vfs.cpp
 	partitions.cpp
 	RootFileSystem.cpp
-	#elf.cpp
+	elf.cpp
 	menu.cpp
 	loader.cpp
 
