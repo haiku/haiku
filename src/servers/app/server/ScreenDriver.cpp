@@ -908,7 +908,7 @@ float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 
 	FT_Face face;
 	FT_GlyphSlot slot;
-	FT_UInt glyph_index, previous=0;
+	FT_UInt glyph_index=0, previous=0;
 	FT_Vector pen,delta;
 	int16 error=0;
 	int32 strlength,i;
@@ -1025,7 +1025,7 @@ void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	FT_Face face;
 	FT_GlyphSlot slot;
 	FT_Matrix rmatrix,smatrix;
-	FT_UInt glyph_index, previous=0;
+	FT_UInt glyph_index=0, previous=0;
 	FT_Vector pen,delta,space,nonspace;
 	int16 error=0;
 	int32 strlength,i;
