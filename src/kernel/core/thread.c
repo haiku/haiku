@@ -34,6 +34,7 @@
 #include <atomic.h>
 #include <kerrors.h>
 #include <syscalls.h>
+#include <tls.h>
 
 #define TRACE_THREAD 0
 #if TRACE_THREAD
@@ -233,6 +234,8 @@ create_thread_struct(const char *name)
 	t->kernel_stack_base = 0;
 	t->user_stack_region_id = -1;
 	t->user_stack_base = 0;
+	t->user_local_storage = 0;
+	t->kernel_errno = 0;
 	t->team_next = NULL;
 	t->q_next = NULL;
 	t->priority = -1;
@@ -293,51 +296,56 @@ delete_thread_struct(struct thread *t)
 }
 
 
+/** Initializes the thread and jumps to its userspace entry point.
+ *	This function is called at creation time of every user thread,
+ *	but not for the team's main threads.
+ */
+
 static int
 _create_user_thread_kentry(void)
 {
-	struct thread *t;
-
-	t = thread_get_current_thread();
+	struct thread *thread = thread_get_current_thread();
 
 	// a signal may have been delivered here
 //	thread_atkernel_exit();
-	t->last_time = system_time();
-	t->in_kernel = false;
+	thread->last_time = system_time();
+	thread->in_kernel = false;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace((addr)t->entry, t->args, t->user_stack_base + STACK_SIZE);
+	arch_thread_enter_uspace(thread, (addr)thread->entry, thread->args);
 
 	// never get here
 	return 0;
 }
 
 
+/** Initializes the thread and calls it kernel space entry point.
+ */
+
 static int
 _create_kernel_thread_kentry(void)
 {
+	struct thread *thread = thread_get_current_thread();
 	int (*func)(void *args);
-	struct thread *t;
 
-	t = thread_get_current_thread();
-	
-	t->last_time = system_time();
-	
+	thread->last_time = system_time();
+
 	// call the entry function with the appropriate args
-	func = (void *)t->entry;
+	func = (void *)thread->entry;
 
-	return func(t->args);
+	return func(thread->args);
 }
 
 
 static thread_id
-_create_thread(const char *name, team_id pid, addr entry, void *args, int priority, bool kernel)
+_create_thread(const char *name, team_id teamID, addr entry, void *args, int priority, bool kernel)
 {
 	struct thread *t;
-	struct team *p;
+	struct team *team;
 	cpu_status state;
 	char stack_name[64];
 	bool abort = false;
+	addr mainThreadStackBase = USER_STACK_REGION + USER_STACK_REGION_SIZE;
 
 	t = create_thread_struct(name);
 	if (t == NULL)
@@ -358,11 +366,14 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
-	p = team_get_team_struct_locked(pid);
-	if (p != NULL && p->state != TEAM_STATE_DEATH)
-		insert_thread_into_team(p, t);
+	team = team_get_team_struct_locked(teamID);
+	if (team != NULL && team->state != TEAM_STATE_DEATH)
+		insert_thread_into_team(team, t);
 	else
 		abort = true;
+
+	if (!kernel && team->main_thread)
+		mainThreadStackBase = team->main_thread->user_stack_base;
 
 	RELEASE_TEAM_LOCK();
 	if (abort) {
@@ -388,33 +399,44 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
-		arch_thread_initialize_kthread_stack(t, &_create_kernel_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
+
+		// Note: whatever function wants to set up a user stack later for this thread
+		// must initialize the TLS for it
+		arch_thread_init_kthread_stack(t, &_create_kernel_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	} else {
 		// create user stack
 
 		// ToDo: make this better. For now just keep trying to create a stack
 		//		until we find a spot.
+		//		-> implement B_BASE_ADDRESS for create_area() and use that one!
+		//		(we can then also eliminate the mainThreadStackBase variable)
 
-		t->user_stack_base = (USER_STACK_REGION - STACK_SIZE - ENV_SIZE) + USER_STACK_REGION_SIZE;
-		while (t->user_stack_base > USER_STACK_REGION) {
-			sprintf(stack_name, "%s_stack%ld", p->name, t->id);
-			t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, stack_name,
+		// ToDo: should we move the stack creation to _create_user_thread_kentry()?
+
+		// the stack will be between USER_STACK_REGION and the main thread stack area
+		// (the user stack of the main thread is created in team_create_team())
+		t->user_stack_base = USER_STACK_REGION;
+
+		while (t->user_stack_base < mainThreadStackBase) {
+			sprintf(stack_name, "%s_stack%ld", team->name, t->id);
+			t->user_stack_region_id = vm_create_anonymous_region(team->_aspace_id, stack_name,
 				(void **)&t->user_stack_base,
-				REGION_ADDR_ANY_ADDRESS, STACK_SIZE, REGION_WIRING_LAZY, LOCK_RW);
-			if (t->user_stack_region_id < 0) {
-				t->user_stack_base -= STACK_SIZE;
-			} else {
-				// we created a region
+				REGION_ADDR_EXACT_ADDRESS, STACK_SIZE + TLS_SIZE, REGION_WIRING_LAZY, LOCK_RW);
+			if (t->user_stack_region_id >= 0)
 				break;
-			}
+
+			t->user_stack_base += STACK_SIZE + TLS_SIZE;
 		}
 		if (t->user_stack_region_id < 0)
 			panic("_create_thread: unable to create user stack!\n");
 
+		// now that the TLS area is allocated, initialize TLS
+		arch_thread_init_tls(t);
+
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
 		// user space.
-		arch_thread_initialize_kthread_stack(t, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
+		arch_thread_init_kthread_stack(t, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	}
 
 	t->state = B_THREAD_SUSPENDED;
@@ -424,9 +446,9 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 
 
 thread_id
-thread_create_user_thread(char *name, team_id pid, addr entry, void *args)
+thread_create_user_thread(char *name, team_id teamID, addr entry, void *args)
 {
-	return _create_thread(name, pid, entry, args, -1, false);
+	return _create_thread(name, teamID, entry, args, -1, false);
 }
 
 
@@ -438,9 +460,9 @@ thread_create_kernel_thread(const char *name, int (*func)(void *), void *args)
 
 
 thread_id
-thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
+thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *team)
 {
-	return _create_thread(name, p->id, (addr)func, args, -1, true);
+	return _create_thread(name, team->id, (addr)func, args, -1, true);
 }
 
 
@@ -743,7 +765,7 @@ thread_init(kernel_args *ka)
 		hash_insert(thread_hash, t);
 		insert_thread_into_team(t->team, t);
 		idle_threads[i] = t;
-		if(i == 0)
+		if (i == 0)
 			arch_thread_set_current_thread(t);
 		t->cpu = &cpu[i];
 	}
@@ -892,7 +914,7 @@ thread_exit(void)
 {
 	cpu_status state;
 	struct thread *t = thread_get_current_thread();
-	struct team *p = t->team;
+	struct team *team = t->team;
 	bool delete_team = false;
 	unsigned int death_stack;
 	sem_id cached_death_sem;
@@ -911,24 +933,24 @@ thread_exit(void)
 	cancel_timer(&t->alarm);
 	
 	// delete the user stack region first
-	if (p->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
+	if (team->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
 		t->user_stack_region_id = -1;
-		vm_delete_region(p->_aspace_id, rid);
+		vm_delete_region(team->_aspace_id, rid);
 	}
 
-	if (p != team_get_kernel_team()) {
+	if (team != team_get_kernel_team()) {
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
-		remove_thread_from_team(p, t);
+		remove_thread_from_team(team, t);
 		insert_thread_into_team(team_get_kernel_team(), t);
-		if (p->main_thread == t) {
+		if (team->main_thread == t) {
 			// this was main thread in this team
 			delete_team = true;
-			team_remove_team_from_hash(p);
-			p->state = TEAM_STATE_DEATH;
+			team_remove_team_from_hash(team);
+			team->state = TEAM_STATE_DEATH;
 		}
 		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
@@ -938,27 +960,27 @@ thread_exit(void)
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
 	}
 
-	cached_death_sem = p->death_sem;
+	cached_death_sem = team->death_sem;
 
 	// delete the team
 	if (delete_team) {
-		if (p->num_threads > 0) {
+		if (team->num_threads > 0) {
 			// there are other threads still in this team,
 			// cycle through and signal kill on each of the threads
 			// XXX this can be optimized. There's got to be a better solution.
 			struct thread *temp_thread;
 			char death_sem_name[SYS_MAX_OS_NAME_LEN];
 
-			sprintf(death_sem_name, "team %ld death sem", p->id);
-			p->death_sem = create_sem(0, death_sem_name);
-			if (p->death_sem < 0)
-				panic("thread_exit: cannot init death sem for team %ld\n", p->id);
+			sprintf(death_sem_name, "team %ld death sem", team->id);
+			team->death_sem = create_sem(0, death_sem_name);
+			if (team->death_sem < 0)
+				panic("thread_exit: cannot init death sem for team %ld\n", team->id);
 			
 			state = disable_interrupts();
 			GRAB_TEAM_LOCK();
 			// we can safely walk the list because of the lock. no new threads can be created
 			// because of the TEAM_STATE_DEATH flag on the team
-			temp_thread = p->thread_list;
+			temp_thread = team->thread_list;
 			while(temp_thread) {
 				struct thread *next = temp_thread->team_next;
 				thread_kill_thread_nowait(temp_thread->id);
@@ -967,16 +989,16 @@ thread_exit(void)
 			RELEASE_TEAM_LOCK();
 			restore_interrupts(state);
 			// wait until all threads in team are dead.
-			acquire_sem_etc(p->death_sem, p->num_threads, 0, 0);
-			delete_sem(p->death_sem);
+			acquire_sem_etc(team->death_sem, team->num_threads, 0, 0);
+			delete_sem(team->death_sem);
 		}
 		cached_death_sem = -1;
-		vm_put_aspace(p->aspace);
-		vm_delete_aspace(p->_aspace_id);
-		delete_owned_ports(p->id);
-		sem_delete_owned_sems(p->id);
-		vfs_free_io_context(p->io_context);
-		free(p);
+		vm_put_aspace(team->aspace);
+		vm_delete_aspace(team->_aspace_id);
+		delete_owned_ports(team->id);
+		sem_delete_owned_sems(team->id);
+		vfs_free_io_context(team->io_context);
+		free(team);
 	}
 
 	// delete the sem that others will use to wait on us and get the retcode
