@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -262,7 +262,7 @@ Partition::Scan(bool mountFileSystems)
 status_t
 add_partitions_for(int fd, bool mountFileSystems)
 {
-	TRACE(("add_partitions_for(fd = %ld, mountFS = %s)\n", fd, mountFileSystems ? "yes" : "no"));
+	TRACE(("add_partitions_for(fd = %d, mountFS = %s)\n", fd, mountFileSystems ? "yes" : "no"));
 
 	Partition *partition = new Partition(fd);
 
