@@ -182,9 +182,9 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
 
 		/* modify presets to reflect card capability */
+		si->ps.min_system_vco = fvco_min / 1000;
+		si->ps.max_system_vco = fvco_max / 1000;
 		//fixme: enable and modify PLL code...
-		//si->ps.min_system_vco = fvco_min / 1000;
-		//si->ps.max_system_vco = fvco_max / 1000;
 		//si->ps.min_pixel_vco = fvco_min / 1000;
 		//si->ps.max_pixel_vco = fvco_max / 1000;
 		//si->ps.min_video_vco = fvco_min / 1000;
@@ -412,13 +412,9 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				reg, ((float)data2)));
 			if (exec)
 			{
-				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
-				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
-				target.space = B_CMAP8;
-				target.timing.pixel_clock = (data2 * 1000);
-				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				nv_dac_sys_pll_find(((float)data2), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg);
@@ -718,13 +714,9 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (exec)
 			{
-				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
-				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
-				target.space = B_CMAP8;
-				target.timing.pixel_clock = (data * 10);
-				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg);
@@ -1035,13 +1027,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				reg2, (data2 / 100.0)));
 			if (*exec && reg2)
 			{
-				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
-				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
-				target.space = B_CMAP8;
-				target.timing.pixel_clock = (data2 * 10);
-				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				nv_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg2) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
@@ -1542,7 +1530,6 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			}
 
 			/* execute */
-			//fixme: setup new PLL routines that adhere to pins speeds for VCO, etc...
 			*adress += 1;
 			reg = *((uint32*)(&(rom[*adress])));
 			*adress += 4;
@@ -1551,13 +1538,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (*exec)
 			{
-				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
-				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
-				target.space = B_CMAP8;
-				target.timing.pixel_clock = (data * 10);
-				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */

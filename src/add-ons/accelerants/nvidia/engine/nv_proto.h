@@ -44,7 +44,7 @@ status_t nv_dac_mode(int,float);
 status_t nv_dac_palette(uint8*,uint8*,uint8*);
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac_set_pix_pll(display_mode target);
-status_t g400_dac_set_sys_pll(void);
+status_t nv_dac_sys_pll_find(float, float*, uint8*, uint8*, uint8*, uint8);
 
 /* DAC2 functions */
 bool nv_dac2_crt_connected(void);

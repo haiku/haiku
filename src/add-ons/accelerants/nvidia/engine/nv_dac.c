@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-9/2004
+   Rudolf Cornelissen 12/2003-10/2004
 */
 
 #define MODULE_BIT 0x00010000
@@ -9,8 +9,6 @@
 
 static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
-static status_t g100_g400max_dac_sys_pll_find(
-	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
 
 /* see if an analog VGA monitor is connected to connector #1 */
 bool nv_dac_crt_connected(void)
@@ -386,19 +384,19 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 }
 
 /* find nearest valid system PLL setting */
-static status_t g100_g400max_dac_sys_pll_find(
-	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+status_t nv_dac_sys_pll_find(
+	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result, uint8* p_result, uint8 test)
 {
-	int m = 0, n = 0, p = 0, m_max;
+	int m = 0, n = 0, p = 0/*, m_max*/;
 	float error, error_best = 999999999;
 	int best[3]; 
 	float f_vco;
 
 	/* determine the max. reference-frequency postscaler setting for the 
 	 * current card (see G100, G200 and G400 specs). */
-	switch(si->ps.card_type)
+/*	switch(si->ps.card_type)
 	{
-/*	case G100:
+	case G100:
 		LOG(4,("DAC: G100 restrictions apply\n"));
 		m_max = 7;
 		break;
@@ -406,30 +404,32 @@ static status_t g100_g400max_dac_sys_pll_find(
 		LOG(4,("DAC: G200 restrictions apply\n"));
 		m_max = 7;
 		break;
-*/	default:
+	default:
 		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
 	}
+*/
+	LOG(4,("DAC: NV4/NV10/NV20 restrictions apply\n"));
 
-	/* Make sure the requested systemclock is within the PLL's operational limits */
+	/* Make sure the requested clock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
-	if (req_sclk < (si->ps.min_system_vco / 8.0))
+	if (req_sclk < (si->ps.min_system_vco / 16.0))
 	{
 		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)(si->ps.min_system_vco / 8.0)));
-		req_sclk = (si->ps.min_system_vco / 8.0);
+			req_sclk, (float)(si->ps.min_system_vco / 16.0)));
+		req_sclk = (si->ps.min_system_vco / 16.0);
 	}
-	/* upper limit is max_system_vco */
+	/* upper limit is given by pins */
 	if (req_sclk > si->ps.max_system_vco)
 	{
 		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)si->ps.max_system_vco));
+			req_sclk, (float)si->ps.max_system_vco));
 		req_sclk = si->ps.max_system_vco;
 	}
 
 	/* iterate through all valid PLL postscaler settings */
-	for (p=0x01; p < 0x10; p = p<<1)
+	for (p=0x01; p < 0x20; p = p<<1)
 	{
 		/* calculate the needed VCO frequency for this postscaler setting */
 		f_vco = req_sclk * p;
@@ -437,16 +437,37 @@ static status_t g100_g400max_dac_sys_pll_find(
 		/* check if this is within range of the VCO specs */
 		if ((f_vco >= si->ps.min_system_vco) && (f_vco <= si->ps.max_system_vco))
 		{
+			/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
+			if (si->ps.ext_pll) f_vco /= 4;
+
 			/* iterate trough all valid reference-frequency postscaler settings */
-			for (m = 2; m <= m_max; m++)
+			for (m = 7; m <= 14; m++)
 			{
+				/* check if phase-discriminator will be within operational limits */
+				//fixme: PLL calcs will be resetup/splitup/updated...
+				if (si->ps.card_type == NV36)
+				{
+					if (((si->ps.f_ref / m) < 3.2) || ((si->ps.f_ref / m) > 6.4)) continue;
+				}
+				else
+				{
+					if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+				}
+
 				/* calculate VCO postscaler setting for current setup.. */
 				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
+
 				/* ..and check for validity */
-				if ((n < 8) || (n > 128))	continue;
+				if ((n < 1) || (n > 255))	continue;
 
 				/* find error in frequency this setting gives */
-				error = fabs(req_sclk - (((si->ps.f_ref / m) * n) / p));
+				if (si->ps.ext_pll)
+				{
+					/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
+					error = fabs((req_sclk / 4) - (((si->ps.f_ref / m) * n) / p));
+				}
+				else
+					error = fabs(req_sclk - (((si->ps.f_ref / m) * n) / p));
 
 				/* note the setting if best yet */
 				if (error < error_best)
@@ -461,87 +482,44 @@ static status_t g100_g400max_dac_sys_pll_find(
 	}
 
 	/* setup the scalers programming values for found optimum setting */
-	m=best[0] - 1;
-	n=best[1] - 1;
-	p=best[2] - 1;
+	m = best[0];
+	n = best[1];
+	p = best[2];
 
-	/* calc the needed PLL loopbackfilter setting belonging to current VCO speed, 
-	 * for the current card (see G100, G200 and G400 specs). */
-	f_vco = (si->ps.f_ref / (m + 1)) * (n + 1);
+	/* log the VCO frequency found */
+	f_vco = ((si->ps.f_ref / m) * n);
+	/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
+	if (si->ps.ext_pll) f_vco *= 4;
+
 	LOG(2,("DAC: sys VCO frequency found %fMhz\n", f_vco));
 
-	switch(si->ps.card_type)
-	{
-	default:
-		for(;;)
-		{
-			if (f_vco >= 240) {p |= (0x03 << 3); break;};
-			if (f_vco >= 170) {p |= (0x02 << 3); break;};
-			if (f_vco >= 110) {p |= (0x01 << 3); break;};
-			break;
-		}
-		break;
-	}
-
 	/* return the results */
-	*calc_sclk = f_vco / ((p & 0x07) + 1);
+	*calc_sclk = (f_vco / p);
 	*m_result = m;
 	*n_result = n;
+	switch(p)
+	{
+	case 1:
+		p = 0x00;
+		break;
+	case 2:
+		p = 0x01;
+		break;
+	case 4:
+		p = 0x02;
+		break;
+	case 8:
+		p = 0x03;
+		break;
+	case 16:
+		p = 0x04;
+		break;
+	}
 	*p_result = p;
 
 	/* display the found pixelclock values */
 	LOG(2,("DAC: sys PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_sclk, *calc_sclk, *m_result, *n_result, *p_result));
-
-	return B_OK;
-}
-
-/*set up system pll - NB mclk is memory clock */ 
-status_t g400_dac_set_sys_pll()
-{
-	/* values for DAC sys pll registers */
-	uint8 m, n, p;
-//	uint time = 0;
-	float calc_sclk;
-
-	LOG(1,("DAC: Setting up G400/G400MAX system clock\n"));
-	g100_g400max_dac_sys_pll_find((float)si->ps.std_engine_clock, &calc_sclk, &m, &n, &p);
-
-	/* reprogram the clock - set PCI/AGP, program, set to programmed */
-	/* clear, so don't o/clock addons */
-//	CFGW(OPTION2, 0);
-	/* disable the SYSPLL */
-//	CFGW(OPTION, CFGR(OPTION) | 0x04);
-	/* select the PCI/AGP clock */
-//	CFGW(OPTION3, 0);
-	/* enable the SYSPLL */
-//	CFGW(OPTION, CFGR(OPTION) & 0xfffffffb);
-
-	/* program the new clock */
-//	DXIW(SYSPLLM, m);
-//	DXIW(SYSPLLN, n);
-//	DXIW(SYSPLLP, p);
-
-	/* Wait for the SYSPLL frequency to lock until timeout occurs */
-/*	while((!(DXIR(SYSPLLSTAT)&0x40)) & (time <= 2000))
-	{
-		time++;
-		snooze(1);
-	}
-	
-	if (time > 2000)
-		LOG(2,("DAC: sys PLL frequency not locked!\n"));
-	else
-		LOG(2,("DAC: sys PLL frequency locked\n"));
-*/
-	/* disable the SYSPLL */
-//	CFGW(OPTION, CFGR(OPTION) | 0x04);
-	/* setup Gclk, Mclk and Wclk divs via PINS and select SYSPLL as system clock source */
-//	CFGW(OPTION3, si->ps.option3_reg);
-	/* make sure the PLLs are not swapped (set default config) */
-//	CFGW(OPTION, CFGR(OPTION) & 0xffffffbf);
-	/* enable the SYSPLL (and make sure the SYSPLL is indeed powered up) */
-//	CFGW(OPTION, (CFGR(OPTION) & 0xfffffffb) | 0x20);
 
 	return B_OK;
 }
