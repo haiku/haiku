@@ -14,6 +14,8 @@ class BBitmap;
 class BRegion;
 class PatternHandler;
 class RenderingBuffer;
+class ServerBitmap;
+class ServerFont;
 
 class Painter {
  public:
@@ -152,12 +154,18 @@ class Painter {
 												BRect bitmapRect,
 												BRect viewRect) const;
 
+			void				DrawBitmap(		const ServerBitmap* bitmap,
+												BRect bitmapRect,
+												BRect viewRect) const;
+
+								// some convenience stuff
+			void				FillRegion(		const BRegion* region,
+												const pattern& p = B_SOLID_HIGH) const;
+
+			void				InvertRect(		const BRect& r) const;
 
 			// MISSING:
-/*			void				FillRegion(		const BRegion* region,
-												const pattern& p = B_SOLID_HIGH);
-
-			void				InvertRect(		BRect r);
+/*
 
 
 								// "screen blits"
@@ -189,6 +197,7 @@ class Painter {
 										   bool centerOffset = true) const;
 			void				_Transform(float* width) const;
 			float				_Transform(const float& width) const;
+			void				_Transform(BRect* rect) const;
 
 			void				_RebuildClipping();
 
@@ -214,6 +223,18 @@ class Painter {
 											    bool  closed,
 												const pattern& p,
 												bool fill) const;
+
+			void				_DrawBitmap(	const agg::rendering_buffer& srcBuffer,
+												color_space format,
+												BRect actualBitmapRect,
+												BRect bitmapRect,
+												BRect viewRect) const;
+			void				_DrawBitmap32(	const agg::rendering_buffer& srcBuffer,
+												BRect actualBitmapRect,
+												BRect bitmapRect,
+												BRect viewRect) const;
+
+			void				_InvertRect32(BRect r) const;
 
 
 			template<class VertexSource>
