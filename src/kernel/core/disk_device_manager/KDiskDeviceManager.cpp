@@ -313,8 +313,6 @@ KDiskDeviceManager::FindDevice(partition_id id, bool deviceOnly)
 	return NULL;
 }
 
-//#include "AutoDeleter.h"
-
 // FindPartition
 KPartition *
 KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
@@ -354,8 +352,6 @@ KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
 KFileDiskDevice *
 KDiskDeviceManager::FindFileDevice(const char *filePath)
 {
-	// ToDo: this solution makes use of dynamic_cast!
-#if 0
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		KFileDiskDevice *fileDevice = dynamic_cast<KFileDiskDevice*>(device);
 		if (fileDevice && fileDevice->FilePath()
@@ -363,7 +359,6 @@ KDiskDeviceManager::FindFileDevice(const char *filePath)
 			return fileDevice;
 		}
 	}
-#endif
 	return NULL;
 }
 
@@ -595,8 +590,6 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 status_t
 KDiskDeviceManager::DeleteFileDevice(partition_id id)
 {
-	// ToDo: there is no dynamic_cast in the kernel!
-#if 0
 	if (KDiskDevice *device = RegisterDevice(id)) {
 		PartitionRegistrar _(device, true);
 		if (!dynamic_cast<KFileDiskDevice*>(device) || id != device->ID())
@@ -606,7 +599,6 @@ KDiskDeviceManager::DeleteFileDevice(partition_id id)
 				return B_OK;
 		}
 	}
-#endif
 	return B_ERROR;
 }
 

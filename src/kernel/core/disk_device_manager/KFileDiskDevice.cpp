@@ -75,7 +75,7 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 				return errno;
 		}
 		// make the directory
-		status_t error = _GetDirectoryPath(ID(), tmpDevicePath);
+		status_t error = _GetDirectoryPath(ID(), &tmpDevicePath);
 		if (error != B_OK)
 			return error;
 		if (mkdir(tmpDevicePath.Path(), 0777) != 0)
@@ -85,7 +85,7 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 			return B_BUFFER_OVERFLOW;
 		devicePath = tmpDevicePath.Path();
 		// register the file as virtual drive
-		status_t error = _RegisterDevice(filePath, devicePath);
+		error = _RegisterDevice(filePath, devicePath);
 		if (error != B_OK)
 			return error;
 	}
@@ -176,6 +176,8 @@ KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 status_t
 KFileDiskDevice::_UnregisterDevice(const char *_device)
 {
+return B_ERROR;
+#if 0
 	// read the symlink to get the path of the virtualdrive device
 	char device[B_PATH_NAME_LENGTH];
 	ssize_t bytesRead = readlink(_device, device, sizeof(device) - 1);
@@ -198,6 +200,7 @@ KFileDiskDevice::_UnregisterDevice(const char *_device)
 			error = errno;
 	}
 	return error;
+#endif
 }
 
 // _GetDirectoryPath
@@ -206,9 +209,9 @@ KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath *path)
 {
 	if (!path || path->InitCheck() != B_OK)
 		return path->InitCheck();
-	status_t error = path->SetString(kFileDevicesDir);
+	status_t error = path->SetPath(kFileDevicesDir);
 	if (error == B_OK) {
-		char idBuffer[12]
+		char idBuffer[12];
 		sprintf(idBuffer, "%ld", id);
 		error = path->Append(idBuffer);
 	}

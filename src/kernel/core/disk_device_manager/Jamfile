@@ -22,7 +22,7 @@ KernelMergeObject kernel_disk_device_manager.o :
 	KDiskDeviceJobGenerator.cpp
 	KDiskDeviceJobQueue.cpp
 	KDiskDeviceManager.cpp
-#	KFileDiskDevice.cpp
+	KFileDiskDevice.cpp
 	KDiskSystem.cpp
 	KFileSystem.cpp
 	KPartition.cpp
