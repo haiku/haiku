@@ -13,7 +13,6 @@
    http://www.opengroup.org/onlinepubs/007904975/basedefs/net/if.h.html
 */
 
-#include <Drivers.h>	/* FIXME */
 #include <OS.h>			/* FIXME */
 #include <net/if_types.h>
 #include <netinet/in.h>
@@ -25,16 +24,6 @@ extern "C" {
 
 /* Forward reference... */
 struct socket;
-
-enum {
-	IF_GETADDR = B_DEVICE_OP_CODES_END,
-	IF_INIT,
-	IF_NONBLOCK,
-	IF_ADDMULTI,
-	IF_REMMULTI,
-	IF_SETPROMISC,
-	IF_GETFRAMESIZE
-};
 
 /* Media types are now listed in net/if_types.h */
 
