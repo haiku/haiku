@@ -24,6 +24,7 @@
 //	Description:	Fallback decorator for the app_server
 //  
 //------------------------------------------------------------------------------
+#include <Rect.h>
 #include "DisplayDriver.h"
 #include <View.h>
 #include "LayerData.h"
@@ -168,6 +169,7 @@ else
 
 void DefaultDecorator::_DoLayout(void)
 {
+//debugger("");
 #ifdef DEBUG_DECORATOR
 printf("DefaultDecorator: Do Layout\n");
 #endif
@@ -195,9 +197,13 @@ printf("DefaultDecorator: Do Layout\n");
 	_resizerect.left=_resizerect.right-18;
 	
 	_tabrect.bottom=_tabrect.top+18;
-	if(GetTitle() && _driver)
+	if(strlen(GetTitle())>1)
 	{
-		titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+		if(_driver)
+			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+		else
+			titlepixelwidth=10;
+		
 		if(_closerect.right+textoffset+titlepixelwidth+35< _frame.Width()-1)
 			_tabrect.right=_tabrect.left+titlepixelwidth;
 	}
@@ -253,14 +259,19 @@ void DefaultDecorator::_DrawTitle(BRect r)
 {
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-	_layerdata.draw_mode=B_OP_OVER;
 	_layerdata.highcolor=_colors->window_tab_text;
-	
-	// closerect.bottom+1 because the driver subtracts one from the y coordinate
-	// for compatibility with the BeOS font system
-	_driver->DrawString(GetTitle(),_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset)),
+	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+
+	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset));
+	BString titlestr=GetTitle();
+	if(titlecount<titlestr.CountChars())
+	{
+		titlestr.Truncate(titlecount-1);
+		titlestr+="...";
+		titlecount+=2;
+	}
+	_driver->DrawString(titlestr.String(),titlecount,
 		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
-	_layerdata.draw_mode=B_OP_COPY;
 }
 
 void DefaultDecorator::_SetFocus(void)
@@ -270,23 +281,16 @@ void DefaultDecorator::_SetFocus(void)
 	
 	if(GetFocus())
 	{
-		tab_highcol=_colors->window_tab;
-		tab_lowcol=_colors->window_tab;
-
-		button_highcol.SetColor(255,255,0);
-		button_lowcol.SetColor(255,203,0);
+		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
+		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-//		tab_highcol.SetColor(235,235,235);
-//		tab_lowcol.SetColor(160,160,160);
-		tab_highcol=_colors->inactive_window_tab;
-		tab_lowcol=_colors->inactive_window_tab;
-
-		button_highcol.SetColor(229,229,229);
-		button_lowcol.SetColor(153,153,153);
+		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
+		textcol=_colors->inactive_window_tab_text;
 	}
-
 }
 
 void DefaultDecorator::Draw(BRect update)
@@ -300,9 +304,7 @@ printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,up
 	_DrawTab(update);
 
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
-
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
 
 	if(_borderrect.Intersects(update))
 		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
@@ -316,9 +318,7 @@ void DefaultDecorator::Draw(void)
 	// things
 
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
-
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
 
 	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	DrawFrame();
@@ -352,13 +352,11 @@ void DefaultDecorator::_DrawTab(BRect r)
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
+	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
 	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,(int8*)&solidhigh);
 
-	_layerdata.highcolor=tab_highcol;
-	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
-
-//	UpdateTitle(layer->name->String());
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
