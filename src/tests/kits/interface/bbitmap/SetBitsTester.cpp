@@ -376,7 +376,7 @@ set_bits_test_data gray1_test_data4_set = {
 
 set_bits_test_data &gray1_test_data4_final = gray1_test_data4_set;
 
-
+#if 0
 // dump_bitmap
 static
 void
@@ -395,6 +395,7 @@ dump_bitmap(const BBitmap *bitmap)
 		printf("\n");
 	}
 }
+#endif
 
 // test_set_bits
 static
