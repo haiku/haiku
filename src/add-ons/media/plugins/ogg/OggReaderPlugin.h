@@ -41,6 +41,7 @@ private:
 				        bool short_page = false);
 
 	ogg_sync_state	fSync;
+	ogg_packet_map	fInitialHeaderPackets;
 	ogg_stream_map	fStreams;
 	ogg_packet_map	fPackets;
 };

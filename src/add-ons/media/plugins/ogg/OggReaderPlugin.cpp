@@ -14,8 +14,6 @@
   #define TRACE(a...) ((void)0)
 #endif
 
-#define OGG_BUFFER_SIZE (B_PAGE_SIZE*8)
-
 oggReader::oggReader()
 {
 	TRACE("oggReader::oggReader\n");
@@ -138,6 +136,15 @@ oggReader::Sniff(int32 *streamCount)
 #endif STRICT_OGG
 
 	while (ogg_page_bos(&page) > 0) {
+		int serialno = ogg_page_serialno(&page);
+		ogg_stream_state * stream = &fStreams[serialno];
+		ogg_packet packet;
+		fInitialHeaderPackets[serialno] = packet;
+		if (ogg_stream_packetout(stream,&fInitialHeaderPackets[serialno]) != 1) {
+#ifdef STRICT_OGG
+			return B_ERROR;
+#endif STRICT_OGG
+		}
 		if (GetPage(&page,4096,short_page) != B_OK) {
 			return B_ERROR;
 		}
@@ -151,9 +158,10 @@ oggReader::GetFileFormatInfo(media_file_format *mff)
 {
 	TRACE("oggReader::GetFileFormatInfo\n");
 	mff->capabilities =   media_file_format::B_READABLE
+						| media_file_format::B_IMPERFECTLY_SEEKABLE
 						| media_file_format::B_KNOWS_ENCODED_VIDEO
 						| media_file_format::B_KNOWS_ENCODED_AUDIO
-						| media_file_format::B_IMPERFECTLY_SEEKABLE;
+						| media_file_format::B_KNOWS_OTHER;
 	mff->family = B_MISC_FORMAT_FAMILY;
 	mff->version = 100;
 	strcpy(mff->mime_type, "application/ogg");
@@ -196,13 +204,12 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 {
 	TRACE("oggReader::GetStreamInfo\n");
 	debugger("oggReader::GetStreamInfo");
-//	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
+	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
 	*frameCount = -1; // don't know
 	*duration = -1; // don't know
-	// no info
-	*infoBuffer = 0;
-	*infoSize = 0;
+	*infoBuffer = (void*)fInitialHeaderPackets[stream->serialno].packet;
+	*infoSize = (int32)fInitialHeaderPackets[stream->serialno].bytes;
 	return B_OK;
 }
 
