@@ -1327,7 +1327,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 	PRINT(4, "BMediaRoster::GetFreeInputsFor node %ld, max %ld, filter-type %ld\n", node.node, buf_num_inputs, filter_type);
 
 	int32 i;
-	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
+	for (i = 0, list.Rewind(); list.GetNext(&input);) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != input->format.type)
 			continue; // media_type used, but doesn't match
 		if (input->source != media_source::null)
@@ -1340,6 +1340,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 		#endif
 		if (buf_num_inputs == 0)
 			break;
+		i++;
 	}
 	
 	MediaRosterEx(this)->PublishInputs(node, &list);
@@ -1372,7 +1373,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 	PRINT(4, "BMediaRoster::GetConnectedInputsFor node %ld, max %ld\n", node.node, buf_num_inputs);
 
 	int32 i;
-	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
+	for (i = 0, list.Rewind(); list.GetNext(&input);) {
 		if (input->source == media_source::null)
 			continue; // consumer source not connected
 		out_active_inputs[i] = *input;
@@ -1383,6 +1384,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 		#endif
 		if (buf_num_inputs == 0)
 			break;
+		i++;
 	}
 	
 	MediaRosterEx(this)->PublishInputs(node, &list);
@@ -1457,7 +1459,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 	PRINT(4, "BMediaRoster::GetFreeOutputsFor node %ld, max %ld, filter-type %ld\n", node.node, buf_num_outputs, filter_type);
 
 	int32 i;
-	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
+	for (i = 0, list.Rewind(); list.GetNext(&output);) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != output->format.type)
 			continue; // media_type used, but doesn't match
 		if (output->destination != media_destination::null)
@@ -1470,6 +1472,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 		#endif
 		if (buf_num_outputs == 0)
 			break;
+		i++;
 	}
 
 	MediaRosterEx(this)->PublishOutputs(node, &list);
@@ -1502,7 +1505,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 	PRINT(4, "BMediaRoster::GetConnectedOutputsFor node %ld, max %ld\n", node.node, buf_num_outputs);
 
 	int32 i;
-	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
+	for (i = 0, list.Rewind(); list.GetNext(&output);) {
 		if (output->destination == media_destination::null)
 			continue; // producer destination not connected
 		out_active_outputs[i] = *output;
@@ -1513,6 +1516,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 		#endif
 		if (buf_num_outputs == 0)
 			break;
+		i++;
 	}
 	
 	MediaRosterEx(this)->PublishOutputs(node, &list);
@@ -2389,10 +2393,27 @@ BMediaRoster::GetInitialLatencyFor(const media_node & producer,
 								   bigtime_t * out_latency,
 								   uint32 * out_flags /* = NULL */)
 {
-	UNIMPLEMENTED();
-	*out_latency = 5000;
+	CALLED();
+	if (out_latency == NULL)
+		return B_BAD_VALUE;
+	if (IS_INVALID_NODE(producer))
+		return B_MEDIA_BAD_NODE;
+	if ((producer.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	
+	producer_get_initial_latency_request request;
+	producer_get_initial_latency_reply reply;
+	status_t rv;
+
+	rv = QueryPort(producer.port, PRODUCER_GET_INITIAL_LATENCY, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*out_latency = reply.initial_latency;
 	if (out_flags)
-		*out_flags = 0;
+		*out_flags = reply.flags;
+	
+	printf("BMediaRoster::GetInitialLatencyFor producer %ld has maximum initial latency %Ld\n", producer.node, *out_latency);
 	return B_OK;
 }
 
