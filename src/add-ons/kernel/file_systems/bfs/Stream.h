@@ -362,16 +362,15 @@ template<class Cache>
 status_t
 Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 {
-	// set/check boundaries for pos/length
+	size_t length = *_length;
 
+	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
-	if (pos >= Node()->data.Size()) {
+	if (pos >= Node()->data.Size() || length == 0) {
 		*_length = 0;
 		return B_NO_ERROR;
 	}
-
-	size_t length = *_length;
 
 	if (pos + length > Node()->data.Size())
 		length = Node()->data.Size() - pos;
@@ -477,7 +476,7 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	}
 
 	*_length = bytesRead;
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -490,6 +489,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
+
 	if (pos + length > Size()) {
 		off_t oldSize = Size();
 
@@ -516,6 +516,11 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 		// size with zeros.
 		FillGapWithZeros(oldSize, pos);
 	}
+
+	// If we don't want to write anything, we can now return (we may
+	// just have changed the file size using the position parameter)
+	if (length == 0)
+		return B_OK;
 
 	block_run run;
 	off_t offset;
@@ -626,6 +631,6 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 
 	*_length = bytesWritten;
 
-	return B_NO_ERROR;
+	return B_OK;
 }
 
