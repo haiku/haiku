@@ -29,6 +29,11 @@ THE SOFTWARE.
 
 #include "TestView.hpp"
 
+static int NextNum() {
+	static int n = 0;
+	return n ++;
+}
+
 static BPoint NextPoint() {
 	return BPoint(NextNum(), NextNum());
 }

@@ -44,9 +44,4 @@ public:
 	bool Test(int no, BString& name);
 };
 
-static int NextNum() {
-	static int n = 0;
-	return n ++;
-}
-
-#endif
+#endif	/* TESTVIEW_HPP */

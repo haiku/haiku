@@ -45,12 +45,12 @@ status_t dump_page(BFile* jobFile) {
 	int32 pictureCount;
 	status_t rc = B_OK;
 	jobFile->Read(&pictureCount, sizeof(pictureCount));
-	printf("Pictures %d\n", pictureCount);
+	printf("Pictures %ld\n", pictureCount);
 	for (int i = 0; rc == B_OK && i < pictureCount; i ++) {
 		BPoint p; BRect r;
 		off_t v;
 		jobFile->Read(&v, sizeof(v));
-		printf("next picture %lx %lx %lx\n", jobFile->Position(), v, v + jobFile->Position());
+		printf("next picture %Lx %Lx %Lx\n", jobFile->Position(), v, v + jobFile->Position());
 		jobFile->Seek(40, SEEK_CUR);
 
 		jobFile->Read(&p, sizeof(p));
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 						PrintJobPage pjp;
 						if (reader.GetPage(page, pjp) == B_OK) {
 							BPicture picture; BPoint p; BRect r;
-							printf("Number of pictures %d\n", pjp.NumberOfPictures());
+							printf("Number of pictures %ld\n", pjp.NumberOfPictures());
 							while (pjp.NextPicture(picture, p, r) == B_OK) {
 								printf("Picture point (%f, %f) rect [l: %f t: %f r: %f b: %f]\n",
 									p.x, p.y,
