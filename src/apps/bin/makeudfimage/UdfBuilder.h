@@ -61,6 +61,7 @@ private:
 	Statistics& _Stats() { return fStatistics; }
 	time_t _BuildTime() const { return fBuildTime; }
 	Udf::timestamp& _BuildTimeStamp() { return fBuildTimeStamp; }
+	uint64 _NextUniqueId() { return fNextUniqueId++; }
 
 	void _SetBuildTime(time_t time);
 
@@ -69,7 +70,8 @@ private:
 	void _PrintWarning(const char *formatString, ...) const;
 	void _PrintUpdate(VerbosityLevel level, const char *formatString, ...) const;
 	
-	status_t _ProcessDirectory(BEntry &_directory, const char *path, node_data &node);
+	status_t _ProcessDirectory(BEntry &_directory, const char *path, node_data &node,
+	                           bool isRootDirectory = false);
 	status_t _ProcessFile(BEntry &file);
 	status_t _ProcessSymlink(BEntry &symlink);
 	status_t _ProcessAttributes(BNode &node);
@@ -91,6 +93,7 @@ private:
 	Statistics fStatistics;
 	time_t fBuildTime;
 	Udf::timestamp fBuildTimeStamp;
+	uint64 fNextUniqueId;
 };
 
 
