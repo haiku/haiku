@@ -1034,6 +1034,7 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 {
 	struct team *team = thread_get_current_thread()->team;
 	struct team_arg *teamArgs;
+	const char *threadName;
 	status_t status;
 
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld)\n", args[0], argCount, envCount));
@@ -1065,6 +1066,14 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
+
+	// cut the path from the main thread name
+	threadName = strrchr(args[0], '/');
+	if (threadName != NULL)
+		threadName++;
+	else
+		threadName = args[0];
+	rename_thread(thread_get_current_thread_id(), threadName);
 
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
