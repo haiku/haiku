@@ -19,9 +19,11 @@ const char KeyboardSettings::kKeyboardSettingsFile[] = "Keyboard_settings";
 
 KeyboardSettings::KeyboardSettings()
 {
-	get_key_repeat_rate(&fSettings.key_repeat_rate);
-	get_key_repeat_delay(&fSettings.key_repeat_delay);
-	
+	if (get_key_repeat_rate(&fSettings.key_repeat_rate)!=B_OK)
+		fprintf(stderr, "error while get_key_repeat_rate!\n");
+	if (get_key_repeat_delay(&fSettings.key_repeat_delay)!=B_OK)
+		fprintf(stderr, "error while get_key_repeat_delay!\n");
+		
 	fCorner.x = 50;
 	fCorner.y = 50;
 	
@@ -70,7 +72,8 @@ KeyboardSettings::SetWindowCorner(BPoint corner)
 void
 KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 {
-	set_key_repeat_rate(rate);
+	if (set_key_repeat_rate(rate)!=B_OK)
+		fprintf(stderr, "error while set_key_repeat_rate!\n");
 	fSettings.key_repeat_rate = rate;
 }
 
@@ -78,7 +81,8 @@ KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 void
 KeyboardSettings::SetKeyboardRepeatDelay(bigtime_t delay)
 {
-	set_key_repeat_delay(delay);
+	if (set_key_repeat_delay(delay)!=B_OK)
+		fprintf(stderr, "error while set_key_repeat_delay!\n");
 	fSettings.key_repeat_delay = delay;
 }
 

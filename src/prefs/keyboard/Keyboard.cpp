@@ -11,7 +11,7 @@
 #include "KeyboardWindow.h"
 #include "KeyboardMessages.h"
 
-const char KeyboardApplication::kKeyboardApplicationSig[] = "application/x-vnd.OpenBeOS-KYBD";
+const char KeyboardApplication::kKeyboardApplicationSig[] = "application/x-vnd.Haiku-KeyboardPrefs";
 
 int main(int, char**)
 {
