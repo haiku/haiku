@@ -47,9 +47,6 @@ bfs_start:
 	push	%ds
 	pop		%es
 
-//	mov		$hello_string, %si
-//	call	printString
-
 	cli						// no interrupts please
 	call	enable_a20		// enable a20 gate
 
@@ -79,26 +76,6 @@ _protected_code_segment:
 	mov		%ebp, %esp
 
 	call	_start
-
-//--------------------------------------------------------------
-
-.code16
-printString:
-	// write a 0 terminated string from ds:si to screen
-	// si - string to be printed
-	// changes al, ah
-	push %bx
-_printstart:
-	lodsb
-	test %al, %al
-	jz _printdone
-	mov $0x0e, %ah
-	mov $0x0007, %bx
-	int $0x10
-	jmp _printstart
-_printdone:
-	pop %bx
-	ret
 
 //--------------------------------------------------------------
 
@@ -135,10 +112,6 @@ _a20_done:
 	ret
 
 //--------------------------------------------------------------
-
-hello_string:
-	.byte	10, 13
-	.string	"Welcome to the OpenBeOS Bootloader"
 
 /* global data table */
 
