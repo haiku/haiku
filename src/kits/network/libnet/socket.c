@@ -9,6 +9,7 @@
 #include <kernel/OS.h>
 #include <iovec.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <sys/socket.h>
 #include <sys/sockio.h>
@@ -25,9 +26,10 @@ struct beosr5_sockaddr_in {
 	char sin_zero[4];
 };
 
-static void convert_from_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
-static void convert_to_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
-static void	convert_from_beos_r5_sockopt(int *level, int *optnum);
+static char *	get_stack_driver_path();
+static void 	convert_from_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
+static void 	convert_to_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
+static void		convert_from_beos_r5_sockopt(int *level, int *optnum);
 
 _EXPORT int socket(int family, int type, int protocol)
 {
@@ -35,7 +37,7 @@ _EXPORT int socket(int family, int type, int protocol)
 	int rv;
 	struct socket_args args;
 
-	sock = open(NET_STACK_DRIVER_PATH, O_RDWR);
+	sock = open(get_stack_driver_path(), O_RDWR);
 	if (sock < 0)
 		return sock;
 
@@ -151,7 +153,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	int	new_sock;
 	void *cookie;
 
-	new_sock = open(NET_STACK_DRIVER_PATH, O_RDWR);
+	new_sock = open(get_stack_driver_path(), O_RDWR);
 	if (new_sock < 0)
 		return new_sock;
 	
@@ -387,6 +389,8 @@ _EXPORT int getsockname(int sock, struct sockaddr *addr, int *addrlen)
 	return rv;
 }
 
+// #pragma mark -
+
 
 _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp, 
             void *newp, size_t newlen)
@@ -413,10 +417,25 @@ _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp,
 	return rv;
 }
 	
+// #pragma mark -
+	
 /* 
  * Private routines
  * ----------------
  */
+
+static char * get_stack_driver_path() {
+  char * path;
+
+  // user-defined stack driver path?
+  path = getenv("NET_STACK_DRIVER_PATH");
+  if (path)
+    return path;
+
+  // use the default stack driver path
+  return NET_STACK_DRIVER_PATH;
+}
+
 
 static void convert_from_beos_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 {
