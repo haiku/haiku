@@ -176,7 +176,7 @@ printf("Initializing color settings to defaults\n");
 
 	// important, but not publically accessible GUI colors
 	window_tab_text.SetColor(0,0,0);
-	inactive_window_tab.SetColor(232,232,232);
+	inactive_window_tab.SetColor(216,216,216);
 	inactive_window_tab_text.SetColor(80,80,80);
 }
 
