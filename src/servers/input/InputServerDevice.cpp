@@ -167,8 +167,11 @@ BInputServerDevice::RegisterDevices(input_device_ref **devices)
 		}
 		
 		if (!found) {
+			PRINT(("RegisterDevices not found %s\n", device->name));
 			InputServer::gInputDeviceList.AddItem(new InputDeviceListItem(this, *device) );
 			Start(device->name, device->cookie);
+		} else {
+			PRINT(("RegisterDevices found %s\n", device->name));
 		}
 	}
 
