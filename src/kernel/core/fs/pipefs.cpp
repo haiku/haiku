@@ -1201,21 +1201,21 @@ pipefs_ioctl(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 
 static bool
-pipefs_can_page(fs_volume _volume, fs_vnode _v)
+pipefs_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
 {
 	return false;
 }
 
 
 static status_t
-pipefs_read_pages(fs_volume _volume, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+pipefs_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
 
 
 static status_t
-pipefs_write_pages(fs_volume _volume, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+pipefs_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }

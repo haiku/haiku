@@ -407,9 +407,9 @@ rootfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffe
 {
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
 
-	TRACE(("devfs_get_vnode_name: vnode = %p\n",vnode));
-	
-	strlcpy(buffer,vnode->name,bufferSize);
+	TRACE(("rootfs_get_vnode_name: vnode = %p (name = %s)\n", vnode, vnode->name));
+
+	strlcpy(buffer, vnode->name, bufferSize);
 	return B_OK;
 }
 
@@ -434,7 +434,7 @@ rootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 	if (*_vnode)
 		return B_NO_ERROR;
 
-	return ENOENT;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -446,7 +446,7 @@ rootfs_put_vnode(fs_volume _fs, fs_vnode _vnode, bool reenter)
 
 	TRACE(("rootfs_putvnode: entry on vnode 0x%Lx, r %d\n", vnode->id, reenter));
 #endif
-	return 0; // whatever
+	return B_OK; // whatever
 }
 
 
@@ -471,14 +471,14 @@ rootfs_remove_vnode(fs_volume _fs, fs_vnode _vnode, bool reenter)
 	if (!reenter)
 		mutex_unlock(&fs->lock);
 
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 rootfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *new_vnid)
 {
-	return EINVAL;
+	return B_BAD_VALUE;
 }
 
 
@@ -699,21 +699,21 @@ rootfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf,
 
 
 static bool
-rootfs_can_page(fs_volume _fs, fs_vnode _v)
+rootfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie cookie)
 {
 	return false;
 }
 
 
 static status_t
-rootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
 
 
 static status_t
-rootfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
