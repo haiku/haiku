@@ -318,8 +318,7 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 			
 			WinBorder	*target=NULL;
 			RootLayer	*rl=NULL;
-			Workspace	*ws=NULL
-			;
+			Workspace	*ws=NULL;
 			rl			= ActiveRootLayer();
 			ws			= rl->ActiveWorkspace();
 			target		= rl->WinBorderAt(evt.where);
@@ -335,6 +334,13 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 				WinBorder		*previousFocus=NULL;
 				WinBorder		*activeFocus=NULL;
 				BRegion			invalidRegion;
+				
+				BMessage downmsg(B_MOUSE_DOWN);
+				downmsg.AddInt64("when",evt.when);
+				downmsg.AddPoint("where",evt.where);
+				downmsg.AddInt32("modifiers",evt.modifiers);
+				downmsg.AddInt32("buttons",evt.buttons);
+				downmsg.AddInt32("clicks",evt.clicks);
 				
 				if (target!=ws->FrontLayer())
 				{
@@ -369,11 +375,12 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 					}
 
 					fMouseTarget = target;
-
+					
 					STRACE(("2Target: %s\n", target->GetName()));
 					STRACE(("2Front: %s\n", ws->FrontLayer()->GetName()));
 					STRACE(("2Focus: %s\n", ws->FocusLayer()->GetName()));
 
+					fMouseTarget->Window()->SendMessageToClient(&downmsg);
 					activeFocus->Window()->Unlock();
 				}
 				else // target == ws->FrontLayer()
@@ -383,6 +390,7 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 					{
 						target->Window()->Lock();
 						target->MouseDown(evt, true);
+						target->Window()->SendMessageToClient(&downmsg);
 						target->Window()->Unlock();
 					}
 					else
@@ -415,7 +423,8 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 							}
 						}
 						fMouseTarget = target;
-	
+						fMouseTarget->Window()->SendMessageToClient(&downmsg);
+						
 						activeFocus->Window()->Unlock();
 					}
 				}
@@ -443,24 +452,25 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
 
-			if (fMouseTarget)
+			if (!fMouseTarget)
 			{
-				fMouseTarget->Window()->Lock();
-				fMouseTarget->MouseUp(evt);
-				fMouseTarget->Window()->Unlock();
+				WinBorder *target = ActiveRootLayer()->WinBorderAt(BPoint(evt.where.x, evt.where.y));
+				if(!target)
+					break;
+				fMouseTarget=target;
+			}
 
-				fMouseTarget = NULL;				
-			}
-			else
-			{
-				WinBorder *target = ActiveRootLayer()->WinBorderAt(evt.where);
-				if(target){
-					target->Window()->Lock();
-					target->MouseUp(evt);
-					target->Window()->Unlock();
-				}
-			}
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->MouseUp(evt);
 			
+			BMessage upmsg(B_MOUSE_UP);
+			upmsg.AddInt64("when",evt.when);
+			upmsg.AddPoint("where",evt.where);
+			upmsg.AddInt32("modifiers",evt.modifiers);
+			
+			fMouseTarget->Window()->SendMessageToClient(&upmsg);
+			fMouseTarget->Window()->Unlock();
+
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
 
 			break;
@@ -480,43 +490,59 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.buttons);
 
-			if (fMouseTarget)
-			{
-				fActiveScreen->DDriver()->HideCursor();
-				fActiveScreen->DDriver()->MoveCursorTo(evt.where.x, evt.where.y);
-
-				fMouseTarget->Window()->Lock();
-				fMouseTarget->MouseMoved(evt);
-				fMouseTarget->Window()->Unlock();
-
-				fActiveScreen->DDriver()->ShowCursor();
-			}
-			else
+			fActiveScreen->DDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+			
+			if (!fMouseTarget)
 			{
 				WinBorder *target = ActiveRootLayer()->WinBorderAt(BPoint(evt.where.x, evt.where.y));
-				if(target){
-					target->Window()->Lock();
-					target->MouseMoved(evt);
-					target->Window()->Unlock();
-				}
-
-				fActiveScreen->DDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+				if(!target)
+					break;
+				fMouseTarget=target;
 			}
+			
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->MouseMoved(evt);
+			
+			BMessage movemsg(B_MOUSE_MOVED);
+			movemsg.AddInt64("when",evt.when);
+			movemsg.AddPoint("where",evt.where);
+			movemsg.AddInt32("buttons",evt.buttons);
+			
+			fMouseTarget->Window()->SendMessageToClient(&movemsg);
+			fMouseTarget->Window()->Unlock();
 
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
+			// FEATURE: This is a tentative change: mouse wheel messages are always sent to the window
+			// under the cursor. It's pretty stupid to send it to the active window unless a particular
+			// view has locked focus via SetMouseEventMask
+						
 			PointerEvent evt;	
 			evt.code = B_MOUSE_WHEEL_CHANGED;
 			msg.Read<int64>(&evt.when);
-			msg.Read<float>(&evt.where.x);
-			msg.Read<float>(&evt.where.y);
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
-			msg.Read<int32>(&evt.modifiers);
-
-			// TODO: B_MOUSE_WHEEL_CHANGED - Pass this on to the client ServerWindow
+			
+			BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
+			wheelmsg.AddInt64("when",evt.when);
+			wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
+			wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
+			
+			if(!fMouseTarget)
+			{
+				fMouseTarget = ActiveRootLayer()->WinBorderAt(GetDisplayDriver()->GetCursorPosition());
+				
+				// We do nothing because there ain't a window to receive the message
+				if(!fMouseTarget)
+					break;
+			}
+			
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->Window()->SendMessageToClient(&wheelmsg);
+			fMouseTarget->Window()->Unlock();
+			
 			break;
 		}
 		default:

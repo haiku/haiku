@@ -49,6 +49,7 @@ public:
 	ServerCursor *GetCursor(void) const { return fCursor; }
 	
 	void MoveTo(const BPoint &pt);
+	BPoint GetPosition(void) const { return fPosition.LeftTop(); }
 	
 	void Hide(void);
 	void Show(void);

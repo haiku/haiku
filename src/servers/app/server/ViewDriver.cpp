@@ -222,21 +222,6 @@ void VDView::MessageReceived(BMessage *msg)
 {
 	switch(msg->what)
 	{
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-		case B_MOUSE_WHEEL_CHANGED:
-		{
-			float x,y;
-			msg->FindFloat("be:wheel_delta_x",&x);
-			msg->FindFloat("be:wheel_delta_y",&y);
-			int64 time=real_time_clock();
-			serverlink->StartMessage(B_MOUSE_WHEEL_CHANGED);
-			serverlink->Attach(&time,sizeof(int64));
-			serverlink->Attach(x);
-			serverlink->Attach(y);
-			serverlink->Flush();
-			break;
-		}
-#endif
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -259,6 +244,21 @@ void VDWindow::MessageReceived(BMessage *msg)
 {
 	switch(msg->what)
 	{
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float x,y;
+			msg->FindFloat("be:wheel_delta_x",&x);
+			msg->FindFloat("be:wheel_delta_y",&y);
+			int64 time=real_time_clock();
+			view->serverlink->StartMessage(B_MOUSE_WHEEL_CHANGED);
+			view->serverlink->Attach(&time,sizeof(int64));
+			view->serverlink->Attach(x);
+			view->serverlink->Attach(y);
+			view->serverlink->Flush();
+			break;
+		}
+#endif
 		case B_KEY_DOWN:
 		{
 			// Attached Data:

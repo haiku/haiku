@@ -47,7 +47,8 @@ static Blitter blitter;
 	Subclasses should follow DisplayDriver's lead and use this function mostly
 	for initializing data members.
 */
-DisplayDriver::DisplayDriver(void)
+DisplayDriver::DisplayDriver(void) :
+ fCursorHandler(this)
 {
 	_locker=new BLocker();
 
@@ -55,7 +56,6 @@ DisplayDriver::DisplayDriver(void)
 //	_is_cursor_obscured=false;
 //	_cursor=NULL;
 //	_cursorsave=NULL;
-	fCursorHandler=new CursorHandler(this);
 	fDPMSCaps=B_DPMS_ON;
 	fDPMSState=B_DPMS_ON;
 }
@@ -69,7 +69,6 @@ DisplayDriver::DisplayDriver(void)
 DisplayDriver::~DisplayDriver(void)
 {
 	delete _locker;
-	delete fCursorHandler;
 }
 
 /*!
@@ -108,10 +107,10 @@ void DisplayDriver::CopyBits(const BRect &src, const BRect &dest, const DrawData
 	
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(dest))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(dest))
+		fCursorHandler.DriverHide();
 	Blit(src,dest,d);
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Unlock();
 }
 
@@ -150,8 +149,8 @@ void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRec
 		return;
 	}
 	
-	if(fCursorHandler->IntersectsCursor(dest))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(dest))
+		fCursorHandler.DriverHide();
 
 	uint8 colorspace_size = (bitmap->BitsPerPixel() + 7) / 8;
 	
@@ -262,7 +261,7 @@ void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRec
 		}
 	}
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	ReleaseBuffer();
 	Unlock();
 	Invalidate(destrect);
@@ -310,7 +309,7 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 		return;
 	}
 	
-	fCursorHandler->DriverHide();
+	fCursorHandler.DriverHide();
 	
 	
 	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Bounds().IntegerWidth();
@@ -419,7 +418,7 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 	}
 	rectList.MakeEmpty();
 
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	
 	BRect		inval(bmp->Bounds());
 	ReleaseBuffer();
@@ -464,8 +463,8 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	BRect intersection(pt.x,pt.x,pt.y,pt.y);
 	intersection.top-=d->font.Size()*1.5;
 	intersection.right+=d->font.Size()*1.5*length;
-	if(fCursorHandler->IntersectsCursor(intersection))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(intersection))
+		fCursorHandler.DriverHide();
 	
 	BPoint point(pt);
 	
@@ -607,7 +606,7 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	r.top=point.y-face->height;
 	r.bottom=point.y+face->height;
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	
 	// Update the caller's pen position
@@ -855,8 +854,8 @@ void DisplayDriver::Invalidate(const BRect &r)
 */
 void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
 {
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -882,7 +881,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	if ( (span >= 360) || (span <= -360) )
 	{
 		FillEllipse(r,color);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 
@@ -1206,7 +1205,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			}
 		}
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -1220,8 +1219,8 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 */
 void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d)
 {
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1248,7 +1247,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	if ( (span >= 360) || (span <= -360) )
 	{
 		FillEllipse(r,d);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 
@@ -1575,7 +1574,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			}
 		}
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -1586,12 +1585,12 @@ void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
 
 	BezierCurve curve(pts);
 	
-	if(fCursorHandler->IntersectsCursor(curve.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(curve.Frame()))
+		fCursorHandler.DriverHide();
 	
 	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), curve.Frame(), color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Unlock();
 }
 
@@ -1607,12 +1606,12 @@ void DisplayDriver::FillBezier(BPoint *pts, const DrawData *d)
 
 	BezierCurve curve(pts);
 	
-	if(fCursorHandler->IntersectsCursor(curve.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(curve.Frame()))
+		fCursorHandler.DriverHide();
 		
 	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), curve.Frame(), d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Unlock();
 }
 
@@ -1639,8 +1638,8 @@ void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
 	StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
@@ -1680,7 +1679,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
                	StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
                 StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -1709,8 +1708,8 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	data = *d;
 	data.pensize = 1;
@@ -1753,7 +1752,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
                	StrokeLine(BPoint(xc-x,yc-y),BPoint(xc+x,yc-y),&data);
                 StrokeLine(BPoint(xc-x,yc+y),BPoint(xc+x,yc+y),&data);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -1779,8 +1778,8 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	BPoint *currentPoint, *nextPoint;
 	BPoint tempNextPoint;
@@ -1898,7 +1897,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 	}
 
 	delete[] segmentArray;
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 
@@ -1925,8 +1924,8 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	BPoint *currentPoint, *nextPoint;
 	BPoint tempNextPoint;
@@ -1951,7 +1950,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 		{
 			printf("ERROR: Insufficient memory allocated to segment array\n");
 			delete[] segmentArray;
-			fCursorHandler->DriverShow();
+			fCursorHandler.DriverShow();
 			Unlock();
 			return;
 		}
@@ -2116,7 +2115,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 		}
 	}
 	delete[] segmentArray;
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 }
@@ -2129,11 +2128,11 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 void DisplayDriver::FillRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	FillSolidRect(r,color);
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Unlock();
 }
 
@@ -2150,8 +2149,8 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 		return;
 	
 	Lock();
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	if ( d->clipReg )
 	{
 		if ( d->clipReg->Intersects(r) )
@@ -2166,7 +2165,7 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 	}
 	else
 		FillPatternRect(r,d);
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -2180,8 +2179,8 @@ void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r.Frame()))
+		fCursorHandler.DriverHide();
 	
 	int numRects;
 
@@ -2189,7 +2188,7 @@ void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 	for(int32 i=0; i<numRects;i++)
 		FillSolidRect(r.RectAt(i),color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
 }
@@ -2208,8 +2207,8 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 	
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r.Frame()))
+		fCursorHandler.DriverHide();
 	
 	int numRects;
 
@@ -2230,7 +2229,7 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 		for(int32 i=0; i<numRects;i++)
 			FillPatternRect(r.RectAt(i),d);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
 }
@@ -2243,8 +2242,8 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 	
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	for (i=0; i<=(int)yrad; i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
@@ -2252,7 +2251,7 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 		StrokeSolidLine(ROUND(r.left+xrad-arc_x), ROUND(r.bottom-yrad+i), ROUND(r.right-xrad+arc_x), ROUND(r.bottom-yrad+i),color);
 	}
 	FillSolidRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),color);
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -2272,8 +2271,8 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	if ( d->clipReg )
 	{
@@ -2316,7 +2315,7 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 		}
 	}
 	FillPatternRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),d);
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -2334,8 +2333,8 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		return;
 
 	Lock();
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	BPoint first, second, third;
 
@@ -2382,7 +2381,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		StrokeSolidLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), color);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 
@@ -2397,7 +2396,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		StrokeSolidLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), color);
 		for(i=(int32)first.y+1; i<=third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 	
@@ -2410,7 +2409,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		StrokeSolidLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), color);
 		for(i=(int32)first.y; i<third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 	
@@ -2425,7 +2424,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 	for(i=(int32)second.y; i<=third.y; i++)
 		StrokeSolidLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	
 	Unlock();
@@ -2443,15 +2442,15 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	if ( d->clipReg )
 	{
 		// For now, cop out and use FillPolygon
 		// Need to investigate if Triangle specific code would save processing time
 		FillPolygon(pts,3,bounds,d);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 	}
 	else
 	{
@@ -2500,7 +2499,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			start.x=MIN(first.x,MIN(second.x,third.x));
 			end.x=MAX(first.x,MAX(second.x,third.x));
 			StrokePatternLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), d);
-			fCursorHandler->DriverShow();
+			fCursorHandler.DriverShow();
 			return;
 		}
 
@@ -2515,7 +2514,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			StrokePatternLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), d);
 			for(i=(int32)first.y+1; i<=third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
-			fCursorHandler->DriverShow();
+			fCursorHandler.DriverShow();
 			return;
 		}
 	
@@ -2528,7 +2527,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			StrokePatternLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), d);
 			for(i=(int32)first.y; i<third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
-			fCursorHandler->DriverShow();
+			fCursorHandler.DriverShow();
 			return;
 		}
 	
@@ -2544,7 +2543,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			StrokePatternLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 	}
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	
 	Unlock();
@@ -2561,7 +2560,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 void DisplayDriver::HideCursor(void)
 {
 	Lock();
-	fCursorHandler->Hide();	
+	fCursorHandler.Hide();	
 	Unlock();
 }
 
@@ -2573,7 +2572,7 @@ void DisplayDriver::HideCursor(void)
 bool DisplayDriver::IsCursorHidden(void)
 {
 	Lock();
-	bool value=fCursorHandler->IsHidden();
+	bool value=fCursorHandler.IsHidden();
 	Unlock();
 
 	return value;
@@ -2590,7 +2589,7 @@ bool DisplayDriver::IsCursorHidden(void)
 void DisplayDriver::MoveCursorTo(const float &x, const float &y)
 {
 	Lock();
-	fCursorHandler->MoveTo(BPoint(x,y));
+	fCursorHandler.MoveTo(BPoint(x,y));
 	Unlock();
 }
 
@@ -2601,6 +2600,17 @@ void DisplayDriver::MoveCursorTo(const float &x, const float &y)
 void DisplayDriver::InvertRect(const BRect &r)
 {
 }
+
+//! Returns the cursor's current position
+BPoint DisplayDriver::GetCursorPosition(void)
+{
+	Lock();
+	BPoint value=fCursorHandler.GetPosition();
+	Unlock();
+	
+	return value;
+}
+
 
 /*!
 	\brief Shows the cursor.
@@ -2613,7 +2623,7 @@ void DisplayDriver::InvertRect(const BRect &r)
 void DisplayDriver::ShowCursor(void)
 {
 	Lock();
-	fCursorHandler->Show();
+	fCursorHandler.Show();
 	Unlock();
 }
 
@@ -2628,7 +2638,7 @@ void DisplayDriver::ShowCursor(void)
 void DisplayDriver::ObscureCursor(void)
 {
 	Lock();
-	fCursorHandler->Obscure();	
+	fCursorHandler.Obscure();	
 	Unlock();
 
 }
@@ -2644,7 +2654,7 @@ void DisplayDriver::ObscureCursor(void)
 void DisplayDriver::SetCursor(ServerCursor *cursor)
 {
 	Lock();
-	fCursorHandler->SetCursor(cursor);
+	fCursorHandler.SetCursor(cursor);
 	Unlock();
 }
 
@@ -2679,14 +2689,14 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
 		StrokeEllipse(r,color);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 
@@ -2811,7 +2821,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			StrokePoint(BPoint(xc+x,yc+y),color);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -2847,14 +2857,14 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
 		StrokeEllipse(r,d);
-		fCursorHandler->DriverShow();
+		fCursorHandler.DriverShow();
 		return;
 	}
 
@@ -2979,7 +2989,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			StrokePoint(BPoint(xc+x,yc+y),d);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -2996,14 +3006,14 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
 	Lock();
 	BezierCurve curve(pts);
 
-	if(fCursorHandler->IntersectsCursor(curve.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(curve.Frame()))
+		fCursorHandler.DriverHide();
 	
 	numLines = curve.points.CountItems()-1;
 	for (i=0; i<numLines; i++)
 		StrokeLine(*((BPoint*)curve.points.ItemAt(i)),*((BPoint*)curve.points.ItemAt(i+1)),color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(curve.Frame());
 	Unlock();
 }
@@ -3020,14 +3030,14 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const DrawData *d)
 	Lock();
 	BezierCurve curve(pts);
 	
-	if(fCursorHandler->IntersectsCursor(curve.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(curve.Frame()))
+		fCursorHandler.DriverHide();
 	
 	numLines = curve.points.CountItems()-1;
 	for (i=0; i<numLines; i++)
 		StrokeLine(*((BPoint*)curve.points.ItemAt(i)),*((BPoint*)curve.points.ItemAt(i+1)),d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(curve.Frame());
 	Unlock();
 }
@@ -3056,8 +3066,8 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -3103,7 +3113,7 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),color);
 	}
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3132,8 +3142,8 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const DrawData *d)
 
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -3178,7 +3188,7 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const DrawData *d)
 		StrokeLine(BPoint(xc-lastx,yc+lasty),BPoint(xc-x,yc+y),d);
 		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),d);
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3192,11 +3202,11 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const DrawData *d)
 void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	Lock();
-	if(fCursorHandler->IntersectsCursor(BRect(start,end)))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(BRect(start,end)))
+		fCursorHandler.DriverHide();
 	StrokeSolidLine(ROUND(start.x),ROUND(start.y),ROUND(end.x),ROUND(end.y),color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(BRect(start,end));
 	Unlock();
 }
@@ -3211,8 +3221,8 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const Dra
 {
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(BRect(start,end)))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(BRect(start,end)))
+		fCursorHandler.DriverHide();
 	
 	if ( d->pensize == 1 )
 	{
@@ -3309,7 +3319,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const Dra
 			FillPolygon(corners,4,BRect(start,end),d);
 		}
 	}
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(BRect(start,end));
 	Unlock();
 }
@@ -3370,15 +3380,15 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bou
 		return;
 
 	Lock();
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	for(int32 i=0; i<(numpts-1); i++)
 		StrokeLine(ptlist[i],ptlist[i+1],color);
 	if(is_closed)
 		StrokeLine(ptlist[numpts-1],ptlist[0],color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 }
@@ -3395,15 +3405,15 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bou
 		return;
 
 	Lock();
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	for(int32 i=0; i<(numpts-1); i++)
 		StrokeLine(ptlist[i],ptlist[i+1],d);
 	if(is_closed)
 		StrokeLine(ptlist[numpts-1],ptlist[0],d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 }
@@ -3418,11 +3428,11 @@ void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	StrokeSolidRect(r,color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3430,14 +3440,14 @@ void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 {
 	Lock();
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	StrokeLine(r.LeftTop(),r.RightTop(),d);
 	StrokeLine(r.LeftTop(),r.LeftBottom(),d);
 	StrokeLine(r.RightTop(),r.RightBottom(),d);
 	StrokeLine(r.LeftBottom(),r.RightBottom(),d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3453,13 +3463,13 @@ void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
-	if(fCursorHandler->IntersectsCursor(r.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r.Frame()))
+		fCursorHandler.DriverHide();
 	
 	for(int32 i=0; i<r.CountRects();i++)
 		StrokeRect(r.RectAt(i),color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
 }
@@ -3468,13 +3478,13 @@ void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 {
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(r.Frame()))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r.Frame()))
+		fCursorHandler.DriverHide();
 	
 	for(int32 i=0; i<r.CountRects();i++)
 		StrokeRect(r.RectAt(i),d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
 }
@@ -3495,8 +3505,8 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	bBottom = vBottom - yrad;
 
 	Lock();
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, color);
 	StrokeLine(BPoint(hRight, r.top), BPoint(hLeft, r.top), color);
@@ -3510,7 +3520,7 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, color);
 	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3539,8 +3549,8 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 
 	Lock();
 	
-	if(fCursorHandler->IntersectsCursor(r))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(r))
+		fCursorHandler.DriverHide();
 	
 	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d);
 	StrokeLine(BPoint(hRight, r.top), BPoint(hLeft, r.top), d);
@@ -3554,7 +3564,7 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d);
 	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
 }
@@ -3574,14 +3584,14 @@ void DisplayDriver::StrokeShape(const BRect &bounds, const int32 &opcount, const
 void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
 {
 	Lock();
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 	
 	StrokeLine(pts[0],pts[1],color);
 	StrokeLine(pts[1],pts[2],color);
 	StrokeLine(pts[2],pts[0],color);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 }
@@ -3589,14 +3599,14 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBCo
 void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawData *d)
 {
 	Lock();
-	if(fCursorHandler->IntersectsCursor(bounds))
-		fCursorHandler->DriverHide();
+	if(fCursorHandler.IntersectsCursor(bounds))
+		fCursorHandler.DriverHide();
 
 	StrokeLine(pts[0],pts[1],d);
 	StrokeLine(pts[1],pts[2],d);
 	StrokeLine(pts[2],pts[0],d);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
 }
@@ -3618,7 +3628,7 @@ void DisplayDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *
 
 	Lock();
 	
-	fCursorHandler->DriverHide();
+	fCursorHandler.DriverHide();
 	
 	drawdata = *d;
 	
@@ -3653,7 +3663,7 @@ void DisplayDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *
 	
 	Invalidate(r);
 	
-	fCursorHandler->DriverShow();
+	fCursorHandler.DriverShow();
 	
 	Unlock();
 }
@@ -3941,7 +3951,7 @@ void DisplayDriver::GetTruncatedStrings(const char **instrings,const int32 &stri
 bool DisplayDriver::IsCursorObscured(bool state)
 {
 	Lock();
-	bool value=fCursorHandler->IsObscured();
+	bool value=fCursorHandler.IsObscured();
 	Unlock();
 	
 	return value;
@@ -4126,7 +4136,7 @@ status_t DisplayDriver::WaitForRetrace(bigtime_t timeout)
 ServerCursor *DisplayDriver::_GetCursor(void)
 {
 	Lock();
-	ServerCursor *c=fCursorHandler->GetCursor();
+	ServerCursor *c=fCursorHandler.GetCursor();
 	Unlock();
 	
 	return c;
