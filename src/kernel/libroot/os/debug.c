@@ -107,7 +107,7 @@ _sPrintf(const char *fmt, ...)
 	ret = vsnprintf(buffer, 256, fmt, ap);
 	va_end(ap);
 
-	if (!ret)
+	if (ret < 0)
 		return ret;
 
 	_kern_debug_output(buffer);	
