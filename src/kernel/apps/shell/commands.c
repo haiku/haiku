@@ -162,7 +162,7 @@ cmd_cd(int argc, char *argv[])
 int
 cmd_pwd(int argc, char *argv[])
 {
-	char buffer[SYS_MAX_PATH_LEN];
+	char buffer[B_PATH_NAME_LENGTH];
 
 	if (getcwd(buffer, sizeof(buffer)) == NULL) {
 		printf("cd: sys_getcwd() returned error: %s!\n", strerror(errno));
