@@ -3,18 +3,18 @@
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** Roughly based on 'btlib' written by Marcus J. Ranum
 **
-** Copyright (c) 2001-2002 pinc Software. All Rights Reserved.
+** Copyright (c) 2001-2004 pinc Software. All Rights Reserved.
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
 
 #include "Debug.h"
-#include "cpp.h"
 #include "BPlusTree.h"
 #include "Inode.h"
 #include "Utility.h"
 #include "Stack.h"
 
+#include <kernel_cpp.h>
 #include <TypeConstants.h>
 
 #include <string.h>
@@ -2052,14 +2052,25 @@ bplustree_node::CheckIntegrity(uint32 nodeSize)
 
 
 int32
-compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, int keyLength2)
+compareKeys(type_code type, const void *key1, int keyLength1, const void *key2, int keyLength2)
 {
 	// if one of the keys is NULL, bail out gracefully
-	if (key1 == NULL || key2 == NULL)
-		return -1;
+	if (key1 == NULL || key2 == NULL) {
+//#if USER
+//		// that's here to see if it's reasonable to handle this case nicely at all
+//		DEBUGGER(("compareKeys() got NULL key!"));
+//#endif
+		// even if it's most probably a bug in the calling code, we try to
+		// give a meaningful result
+		if (key1 == NULL && key2 != NULL)
+			return 1;
+		else if (key2 == NULL && key1 != NULL)
+			return -1;
 
-	switch (type)
-	{
+		return 0;
+	}
+
+	switch (type) {
 	    case B_STRING_TYPE:
     	{
 			int len = min_c(keyLength1, keyLength2);
@@ -2124,5 +2135,4 @@ compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, i
 	// if the type is unknown, the entries don't match...
 	return -1;
 }
-
 

@@ -5,7 +5,7 @@
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** Roughly based on 'btlib' written by Marcus J. Ranum
 ** 
-** Copyright (c) 2001-2002 pinc Software. All Rights Reserved.
+** Copyright (c) 2001-2004 pinc Software. All Rights Reserved.
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
@@ -40,7 +40,7 @@ struct bplustree_header {
 	uint32 MaxNumberOfLevels() const { return BFS_ENDIAN_TO_HOST_INT32(max_number_of_levels); }
 
 	inline bool IsValidLink(off_t link);
-};
+} _PACKED;
 
 #define BPLUSTREE_MAGIC 			0x69f6c2e8
 #define BPLUSTREE_NODE_SIZE 		1024
@@ -97,7 +97,7 @@ struct bplustree_node {
 #ifdef DEBUG
 	void CheckIntegrity(uint32 nodeSize);
 #endif
-};
+} _PACKED;
 
 //#define BPLUSTREE_NODE 0
 #define BPLUSTREE_DUPLICATE_NODE 2
