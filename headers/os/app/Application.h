@@ -56,6 +56,8 @@ class BResources;
 class BMessageRunner;
 struct _server_heap_;
 struct _drag_data_;
+namespace BPrivate { class BAppServerLink; }
+
 
 // BApplication class ----------------------------------------------------------
 class BApplication : public BLooper {
@@ -127,7 +129,7 @@ private:
 	friend class BBitmap;
 	friend class BScrollBar;
 	friend class BPrivateScreen;
-	friend class _BAppServerLink_;
+	friend BPrivate::BAppServerLink;
 	friend void _toggle_handles_(bool);
 
 							BApplication(uint32 signature);
