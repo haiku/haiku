@@ -1755,33 +1755,30 @@ void BWindow::MoveTo(float x, float y){
 
 void BWindow::ResizeBy(float dx, float dy){
 
+	float		dxNew;
+	float		dyNew;
+
 		// stay in minimum & maximum frame limits
-	(fFrame.Width() + dx) < fMinWindWidth ? fMinWindWidth : fFrame.Width() + dx;
-	(fFrame.Width() + dx) > fMaxWindWidth ? fMaxWindWidth : fFrame.Width() + dx;
+	dxNew		= (fFrame.Width() + dx) < fMinWindWidth ? fFrame.Width() - fMinWindWidth : dx;
+	if (dxNew == dx)
+		dxNew	= (fFrame.Width() + dx) > fMaxWindWidth ? fMaxWindWidth - fFrame.Width() : dx;
 
-	(fFrame.Height() + dy) < fMinWindHeight ? fMinWindHeight : fFrame.Height() + dy;
-	(fFrame.Height() + dy) > fMaxWindHeight ? fMaxWindHeight : fFrame.Height() + dy;
+	dyNew		= (fFrame.Height() + dy) < fMinWindHeight ? fFrame.Height() - fMinWindHeight : dy;
+	if (dyNew == dy)
+		dyNew	= (fFrame.Height() + dy) > fMaxWindHeight ? fMaxWindHeight - fFrame.Height() : dy;
 
-	ResizeTo( fFrame.Width() + dx, fFrame.Height() + dy );
+	Lock();
+	session->WriteInt32( AS_WINDOW_RESIZE );
+	session->WriteFloat( dxNew );
+	session->WriteFloat( dyNew );
+	session->Sync( );
+	Unlock();
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::ResizeTo(float width, float height){
-
-		// stay in minimum & maximum frame limits
-	width = (width < fMinWindWidth) ? fMinWindWidth : width;
-	width = (width > fMaxWindWidth) ? fMaxWindWidth : width;
-
-	height = (height < fMinWindHeight) ? fMinWindHeight : height;
-	height = (height > fMaxWindHeight) ? fMaxWindHeight : height;
-
-	Lock();
-	session->WriteInt32( AS_WINDOW_RESIZE );
-	session->WriteFloat( width );
-	session->WriteFloat( height );
-	session->Sync( );
-	Unlock();
+	ResizeBy(width - fFrame.Width(), height - fFrame.Height());
 }
 
 //------------------------------------------------------------------------------
