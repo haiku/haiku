@@ -43,6 +43,8 @@ const uint32 MENU_FILE_ABOUT_DEVICES = 'mfad';
 const uint32 MENU_FILE_QUIT = 'mfqt';
 const uint32 MENU_DEVICES_REMOVE_JUMPERED_DEVICE = 'mdrj';
 const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE = 'mdnj';
+const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM = 'mdcj';
+const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM = 'mdcm';
 const uint32 MENU_DEVICES_RESOURCE_USAGE = 'mdru';
 const uint32 BTN_CONFIGURE = 'bcfg';
 
@@ -99,6 +101,7 @@ void DevicesWindow::InitWindow(void)
 	
 	BMenu *FileMenu;
 	BMenu *DevicesMenu;
+	BMenu *JumperedDevicesMenu;
 	
 	// Add the menu bar
 	menubar = new BMenuBar(r, "menu_bar");
@@ -110,7 +113,13 @@ void DevicesWindow::InitWindow(void)
 	FileMenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
 	
 	DevicesMenu = new BMenu("Devices");
-	DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
+	JumperedDevicesMenu = new BMenu("New Jumpered Device");
+	JumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), NULL));
+	JumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), NULL));
+	
+	//DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
+	DevicesMenu->AddItem(JumperedDevicesMenu);
+	
 	DevicesMenu->AddItem(new BMenuItem("Remove Jumpered Device", new BMessage(MENU_DEVICES_REMOVE_JUMPERED_DEVICE), 'R'));
 	DevicesMenu->AddSeparatorItem();
 	DevicesMenu->AddItem(new BMenuItem("Resource Usage", new BMessage(MENU_DEVICES_RESOURCE_USAGE), 'U'));
