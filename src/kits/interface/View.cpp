@@ -1124,105 +1124,6 @@ void BView::MakeFocus(bool focusState = true){
 
 //---------------------------------------------------------------------------
 
-void BView::MessageReceived(BMessage* msg){
-	BMessage			specifier;
-	int32				what;
-	const char*			prop;
-	int32				index;
-	status_t			err;
-
-	if (msg->HasSpecifiers()){
-
-	err = msg->GetCurrentSpecifier(&index, &specifier, &what, &prop);
-	if (err == B_OK)
-	{
-		BMessage			replyMsg;
-
-		switch (msg->what)
-		{
-		case B_GET_PROPERTY:{
-				replyMsg.what		= B_NO_ERROR;
-				replyMsg.AddInt32( "error", B_OK );
-				
-				if (strcmp(prop, "Frame") == 0 )
-				{
-					replyMsg.AddRect( "result", Frame());
-				}
-				else if (strcmp(prop, "Hidden") == 0 )
-				{
-					replyMsg.AddInt32( "result", IsHidden());
-				}
-			}break;
-
-		case B_SET_PROPERTY:{
-				if (strcmp(prop, "Frame") == 0 )
-				{
-					BRect			newFrame;
-					if (msg->FindRect( "data", &newFrame ) == B_OK){
-						MoveTo( newFrame.LeftTop() );
-						ResizeTo( newFrame.right, newFrame.bottom);
-					
-						replyMsg.what		= B_NO_ERROR;
-						replyMsg.AddInt32( "error", B_OK );
-					}
-					else{
-						replyMsg.what		= B_MESSAGE_NOT_UNDERSTOOD;
-						replyMsg.AddInt32( "error", B_BAD_SCRIPT_SYNTAX );
-						replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
-					}
-				}
-				
-				else if (strcmp(prop, "Hidden") == 0 )
-				{
-					bool			newHiddenState;
-					if (msg->FindBool( "data", &newHiddenState ) == B_OK){
-						if ( newHiddenState == true ){
-							if ( !IsHidden() )
-								Hide();
-							
-							replyMsg.what		= B_NO_ERROR;
-							replyMsg.AddInt32( "error", B_OK );
-/* TODO: a test!!!
- * 	Hide a view through a program, let's say... 3 times,
- * 		then try to send a scripting message to unhide that view.
- * 	Does the view become visible after the first call or after the 3rd????
- */							
-						}
-						else if ( newHiddenState == false ){
-							if ( IsHidden() )
-								Show();
-							
-							replyMsg.what		= B_NO_ERROR;
-							replyMsg.AddInt32( "error", B_OK );
-						}
-					}
-					else{
-						replyMsg.what		= B_MESSAGE_NOT_UNDERSTOOD;
-						replyMsg.AddInt32( "error", B_BAD_SCRIPT_SYNTAX );
-						replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
-					}
-				}
-			
-			}break;
-		}
-		msg->SendReply( &replyMsg );
-	}
-	else{
-		BMessage		replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
-		replyMsg.AddInt32( "error" , B_BAD_SCRIPT_SYNTAX );
-		replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
-		
-		msg->SendReply( &replyMsg );
-	}
-
-	} // END: if (msg->HasSpecifiers())
-	else
-		BHandler::MessageReceived( msg );
-
-}
-
-//---------------------------------------------------------------------------
-
 BScrollBar* BView::ScrollBar(orientation posture) const{
 	switch (posture) {
 		case B_VERTICAL:
@@ -1424,7 +1325,7 @@ void BView::SetScale(float scale) const{
 }
 //---------------------------------------------------------------------------
 
-float BView::Scale(){
+float BView::Scale() const{
 	if (fState->flags & B_VIEW_SCALE_BIT)
 	if (owner)
 	{
@@ -3056,7 +2957,7 @@ int32 BView::CountChildren() const{
 //---------------------------------------------------------------------------
 
 BView* BView::ChildAt(int32 index) const{
-	uint32		noOfChildren 	= 0;
+	int32		noOfChildren 	= 0;
 	BView		*aChild			= first_child;
 	
 	while ( aChild != NULL && noOfChildren < index ) {
@@ -3129,6 +3030,224 @@ void BView::MoveTo(float x, float y){
 	originX		= x;
 	originY		= y;
 }
+
+//---------------------------------------------------------------------------
+
+// Inherited Methods (virtual)
+//---------------------------------------------------------------------------
+
+status_t BView::GetSupportedSuites(BMessage* data){
+	status_t err = B_OK;
+	if (!data)
+		err = B_BAD_VALUE;
+
+	if (!err){
+		err = data->AddString("Suites", "suite/vnd.Be-view");
+		if (!err){
+			BPropertyInfo propertyInfo(viewPropInfo);
+			err = data->AddFlat("message", &propertyInfo);
+			if (!err){
+				err = BHandler::GetSupportedSuites(data);
+			}
+		}
+	}
+	return err;
+}
+
+//------------------------------------------------------------------------------
+
+BHandler* BView::ResolveSpecifier(BMessage* msg, int32 index,	BMessage* specifier,
+									int32 what,	const char* property)
+{
+	if (msg->what == B_WINDOW_MOVE_BY)
+		return this;
+	if (msg->what == B_WINDOW_MOVE_TO)
+		return this;
+
+	BPropertyInfo propertyInfo(viewPropInfo);
+	switch (propertyInfo.FindMatch(msg, index, specifier, what, property))
+	{
+		case B_ERROR:
+			break;
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 5:
+			return this;
+			
+		case 4:
+			if (fShelf){
+				msg->PopSpecifier();
+				return fShelf;
+			}
+			else{
+				BMessage		replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+				replyMsg.AddInt32( "error", B_NAME_NOT_FOUND );
+				replyMsg.AddString( "message", "This window doesn't have a self");
+				msg->SendReply( &replyMsg );
+				return NULL;
+			}
+			break;
+		case 6:
+		case 7:
+		case 8:
+			if (first_child){
+				BView		*child;
+				switch( msg->what ){
+					case B_INDEX_SPECIFIER:
+						int32	index;
+						msg->FindInt32("data", &index);
+						child	= ChildAt( index );
+						break;
+						
+					case B_REVERSE_INDEX_SPECIFIER:
+						int32	rindex;
+						msg->FindInt32("data", &rindex);
+						child	= ChildAt( CountChildren() - rindex );
+						break;
+						
+					case B_NAME_SPECIFIER:
+						const char	*name;
+						msg->FindString("data", &name);
+						child	= FindView( name );
+						delete name;
+						break;
+						
+					default:
+						child	= NULL;
+						break;
+				}
+				if ( child != NULL ){
+					msg->PopSpecifier();
+					return child;
+				}
+				else{
+					BMessage		replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+					replyMsg.AddInt32( "error", B_BAD_INDEX );
+					replyMsg.AddString( "message", "Cannot find view at/with specified index/name.");
+					msg->SendReply( &replyMsg );
+					return NULL;
+				}
+			}
+			else{
+				BMessage		replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+				replyMsg.AddInt32( "error", B_NAME_NOT_FOUND );
+				replyMsg.AddString( "message", "This window doesn't have children.");
+				msg->SendReply( &replyMsg );
+				return NULL;
+			}
+			break;			
+	}
+
+	return BHandler::ResolveSpecifier(msg, index, specifier, what, property);
+}
+
+//---------------------------------------------------------------------------
+void BView::MessageReceived( BMessage *msg )
+{ 
+	BMessage			specifier;
+	int32				what;
+	const char*			prop;
+	int32				index;
+	status_t			err;
+
+	if (msg->HasSpecifiers()){
+
+	err = msg->GetCurrentSpecifier(&index, &specifier, &what, &prop);
+	if (err == B_OK)
+	{
+		BMessage			replyMsg;
+
+		switch (msg->what)
+		{
+		case B_GET_PROPERTY:{
+				replyMsg.what		= B_NO_ERROR;
+				replyMsg.AddInt32( "error", B_OK );
+				
+				if (strcmp(prop, "Frame") ==0 )
+				{
+					replyMsg.AddRect( "result", Frame());				
+				}
+				else if (strcmp(prop, "Hidden") ==0 )
+				{
+					replyMsg.AddBool( "result", IsHidden());				
+				}
+			}break;
+
+		case B_SET_PROPERTY:{
+				if (strcmp(prop, "Frame") ==0 )
+				{
+					BRect			newFrame;
+					if (msg->FindRect( "data", &newFrame ) == B_OK){
+						MoveTo( newFrame.LeftTop() );
+						ResizeTo( newFrame.right, newFrame.bottom);
+						
+						replyMsg.what		= B_NO_ERROR;
+						replyMsg.AddInt32( "error", B_OK );
+					}
+					else{
+						replyMsg.what		= B_MESSAGE_NOT_UNDERSTOOD;
+						replyMsg.AddInt32( "error", B_BAD_SCRIPT_SYNTAX );
+						replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
+					}
+				}
+				
+				else if (strcmp(prop, "Hidden") ==0 )
+				{
+					bool			newHiddenState;
+					if (msg->FindBool( "data", &newHiddenState ) == B_OK){
+						if ( !IsHidden() && newHiddenState == true ){
+							Hide();
+							
+							replyMsg.what		= B_NO_ERROR;
+							replyMsg.AddInt32( "error", B_OK );
+							
+						}
+						else if ( IsHidden() && newHiddenState == false ){
+							Show();
+							
+							replyMsg.what		= B_NO_ERROR;
+							replyMsg.AddInt32( "error", B_OK );
+						}
+						else{
+							replyMsg.what		= B_MESSAGE_NOT_UNDERSTOOD;
+							replyMsg.AddInt32( "error", B_BAD_SCRIPT_SYNTAX );
+							replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
+						}
+					}
+					else{
+						replyMsg.what		= B_MESSAGE_NOT_UNDERSTOOD;
+						replyMsg.AddInt32( "error", B_BAD_SCRIPT_SYNTAX );
+						replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
+					}
+				}
+			}break;
+			
+		case B_COUNT_PROPERTIES:{
+				if (strcmp(prop, "View") ==0 )
+				{
+					replyMsg.what		= B_NO_ERROR;
+					replyMsg.AddInt32( "error", B_OK );
+					replyMsg.AddInt32( "result", CountChildren());
+				}
+
+			}break;
+		}
+		msg->SendReply( &replyMsg );
+	}
+	else{
+		BMessage		replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+		replyMsg.AddInt32( "error" , B_BAD_SCRIPT_SYNTAX );
+		replyMsg.AddString( "message", "Didn't understand the specifier(s)" );
+		
+		msg->SendReply( &replyMsg );
+	}
+
+	} // END: if (msg->HasSpecifiers())
+	else
+		BHandler::MessageReceived( msg );
+} 
 
 //---------------------------------------------------------------------------
 
@@ -3298,7 +3417,6 @@ bool BView::callDetachHooks( BView *aView ){
 //---------------------------------------------------------------------------
 
 bool BView::removeFromList(){
-	BView		*current;
 
 	if (parent->first_child == this){
 		parent->first_child = next_sibling;
@@ -3414,9 +3532,9 @@ BView* BView::findView(const BView* aView, const char* viewName) const{
 		return const_cast<BView*>(aView);
 
 	BView			*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
-			BView*		view;
+			BView*		view = NULL;
 			if ( view == findView( child, viewName ) )
 				return view;
 			child 		= child->next_sibling; 
@@ -3694,7 +3812,7 @@ void BView::SetPattern(pattern pat){
 //---------------------------------------------------------------------------
 
 bool BView::do_owner_check() const{
-	uint32			serverToken = _get_object_token_(this);
+	int32			serverToken = _get_object_token_(this);
 
 	if (owner){
 		owner->AssertLocked();
@@ -3716,7 +3834,7 @@ bool BView::do_owner_check() const{
 //---------------------------------------------------------------------------
 
 void BView::check_lock() const{
-	uint32			serverToken = _get_object_token_(this);
+	int32			serverToken = _get_object_token_(this);
 
 	if (owner){
 		owner->AssertLocked();
