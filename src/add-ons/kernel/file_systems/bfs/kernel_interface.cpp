@@ -183,7 +183,7 @@ bfs_sync(void *_ns)
 static status_t
 bfs_read_vnode(void *_ns, vnode_id id, void **_node, bool reenter)
 {
-	FUNCTION_START(("vnode_id = %Ld\n", id));
+	//FUNCTION_START(("vnode_id = %Ld\n", id));
 	Volume *volume = (Volume *)_ns;
 
 	if (id < 0 || id > volume->NumBlocks()) {
@@ -348,10 +348,16 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-bfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos,
+bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	return EPERM;
+	Inode *inode = (Inode *)_node;
+
+	if (!inode->HasUserAccessableStream())
+		RETURN_ERROR(B_BAD_VALUE);
+
+	ReadLocked locked(inode->Lock());
+	return file_cache_write_pages(inode->FileCache(), pos, vecs, count, _numBytes);
 }
 
 
@@ -367,7 +373,7 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 	block_run run;
 	off_t fileOffset;
 
-	FUNCTION_START(("offset = %Ld, size = %lu\n", offset, size));
+	//FUNCTION_START(("offset = %Ld, size = %lu\n", offset, size));
 
 	while (true) {
 		status_t status = inode->FindBlockRun(offset, run, fileOffset);
@@ -760,7 +766,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 static status_t 
 bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *path, int mode)
 {
-	FUNCTION();
+	FUNCTION_START(("name = \"%s\", path = \"%s\"\n", name, path));
 
 	if (_ns == NULL || _directory == NULL || path == NULL
 		|| name == NULL || *name == '\0')
