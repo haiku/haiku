@@ -9,9 +9,13 @@ KernelObjects
 
 # kernel libroot os files
 
+# until the build system is fixed (and no longer uses kernel build rules
+# for libroot.so), the KERNEL_OS_MAIN is needed to differentiate between
+# kernel and userland builds here
+
 KernelMergeObject kernel_os_main.o :
 	driver_settings.c
-	: -fno-pic
+	: -fno-pic -DKERNEL_OS_MAIN
 	;
 
 SEARCH on [ FGristFiles
