@@ -35,7 +35,7 @@
 #include <StorageKit.h>
 #include <SupportKit.h>
 
-#include "TransportAddOn.h"
+#include "PrintTransportAddOn.h"
 
 class SerialPort : public BDataIO {
 	int fFile;
