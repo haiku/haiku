@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyFlattenTest.cpp,v 1.3 2002/08/22 03:15:35 jrand Exp $
+	$Id: PropertyFlattenTest.cpp,v 1.4 2002/09/28 00:19:49 shatty Exp $
 	
 	This file implements the flatten test for the OpenBeOS BPropertyInfo code.
 	This class tests the following usecases:
