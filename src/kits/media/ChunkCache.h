@@ -7,6 +7,17 @@ namespace BPrivate {
 namespace media {
 
 
+struct chunk_info
+{
+	chunk_info *	next;
+	void *			buffer;
+	int32			sizeUsed;
+	int32			sizeMax;
+	media_header	mediaHeader;
+	status_t		err;
+};
+
+
 class ChunkCache
 {
 public:
@@ -20,8 +31,20 @@ public:
 	void			PutNextChunk(void *chunkBuffer, int32 chunkSize, const media_header &mediaHeader, status_t err);
 	
 private:
-
+	enum { CHUNK_COUNT = 5 };
+	
+	chunk_info *	fNextPut;
+	chunk_info *	fNextGet;
+	chunk_info		fChunkInfos[CHUNK_COUNT];
+	
+	sem_id			fGetWaitSem;
+	int32			fEmptyChunkCount;
+	int32			fReadyChunkCount;
+	int32			fNeedsRefill;
+	
+	BLocker *		fLocker;
 };
+
 
 }; // namespace media
 }; // namespace BPrivate

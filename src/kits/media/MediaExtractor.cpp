@@ -63,7 +63,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	}
 	
 	// start extractor thread
-	fExtractorWaitSem = create_sem(0, "media extractor thread sem");
+	fExtractorWaitSem = create_sem(1, "media extractor thread sem");
 	fExtractorThread = spawn_thread(extractor_thread, "media extractor thread", 10, this);
 	resume_thread(fExtractorThread);  
 }
