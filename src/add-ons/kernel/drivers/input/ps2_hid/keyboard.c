@@ -80,6 +80,12 @@ handle_keyboard_interrupt(void *data)
 	scancode = read;
 	
 	TRACE(("scancode: %x\n", scancode));
+
+	// For now, F12 enters the kernel debugger
+	// ToDo: remove me later :-)
+	if (scancode == 88)
+		panic("keyboard requested halt.\n");
+
 	if (scancode & 0x80) {
 		keyInfo.is_keydown = false;
 		scancode -= 0x80;	

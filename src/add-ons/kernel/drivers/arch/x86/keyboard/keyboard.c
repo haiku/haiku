@@ -197,7 +197,7 @@ handle_keyboard_interrupt(void *data)
 		 * useful, and SYS_REQ does a screen dump in BeOS).
 		 * ToDo: remove these key functions some day...
 		 */
-		case ESCAPE:
+		case F12:
 		case SYS_REQ:
 			panic("Keyboard Requested Halt\n");
 			break;
@@ -206,9 +206,6 @@ handle_keyboard_interrupt(void *data)
 			dbg_set_serial_debug(dbg_get_serial_debug() ? false : true);
 			break;
 #endif
-		case F12:
-			shutdown(true);
-			break;
 
 		case HOME:
 		case END:
