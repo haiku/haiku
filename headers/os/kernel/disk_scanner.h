@@ -41,7 +41,7 @@ typedef struct extended_partition_info {
 	char	file_system_short_name[B_FILE_NAME_LENGTH];	/* "", if hidden */
 	char	file_system_long_name[B_FILE_NAME_LENGTH];	/* or unknown FS */
 	char	volume_name[B_FILE_NAME_LENGTH];			/* "", if hidden */
-	char	mounted_at[B_FILE_NAME_LENGTH];				/* "", if not mounted */
+//	char	mounted_at[B_FILE_NAME_LENGTH];				/* "", if not mounted */
 										//< better B_PATH_NAME_LENGTH?
 	uint32	partition_code;
 	uint32	file_system_flags;			/* same as fs_info::flags */
