@@ -1,0 +1,31 @@
+SubDir OBOS_TOP src tests kits net new_stack ;
+
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+
+SimpleTest stack_tester :
+	net_stack_server.cpp
+	userland_modules.cpp
+	: be
+;
+
+{
+	# symlink the userland add-ons dir to the dir where the net_stack_tester
+	# lives
+	local dir = [ on stack_tester return $(LOCATE) ] ;
+	MakeLocate <network-add-ons>userland : $(OBOS_ADDON_DIR) ;
+	MakeLocate <network-add-ons>add-ons : $(dir) ;
+	RelSymLink <network-add-ons>add-ons : <network-add-ons>userland : false ;
+	
+	# alias for the stack_tester the modules link against
+	LOCATE on <installed>stack_tester = $(dir) ;
+	Depends <installed>stack_tester
+		: stack_tester <network-add-ons>add-ons ;
+}
+
+SubInclude OBOS_TOP src tests kits net new_stack memory_pool ;
+SubInclude OBOS_TOP src tests kits net new_stack atomizer ;
+SubInclude OBOS_TOP src tests kits net new_stack stack ;
+SubInclude OBOS_TOP src tests kits net new_stack interfaces ;
+SubInclude OBOS_TOP src tests kits net new_stack protocols ;
+SubInclude OBOS_TOP src tests kits net new_stack framings ;
+# SubInclude OBOS_TOP src tests kits net new_stack ppp ;
