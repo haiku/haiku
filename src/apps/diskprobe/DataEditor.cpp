@@ -59,6 +59,21 @@ class ReplaceChange : public DataChange {
 //---------------------
 
 
+static int
+CompareOffsets(const off_t *a, const off_t *b)
+{
+	if (*a < *b)
+		return -1;
+	else if (*a > *b)
+		return 1;
+
+	return 0;
+}
+
+
+//	#pragma mark -
+
+
 StateWatcher::StateWatcher(DataEditor &editor)
 	:
 	fEditor(editor)
@@ -297,6 +312,7 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	}
 
 	fLastChange = fFirstChange = NULL;
+	fChangesFromSaved = 0;
 	fView = NULL;
 	fRealViewOffset = 0;
 	fViewOffset = 0;
@@ -327,6 +343,7 @@ DataEditor::AddChange(DataChange *change)
 
 	fChanges.AddItem(change);
 	fLastChange = change;
+	fChangesFromSaved++;
 
 	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
 	// ToDo: try to join changes
@@ -390,11 +407,25 @@ DataEditor::ApplyChanges()
 	if (fLastChange == NULL)
 		return;
 
-	int32 count = fChanges.IndexOf(fLastChange) + 1;
+	// ToDo: we need to support ascending *and* descending the list of changes
 
-	for (int32 i = 0; i < count; i++) {
-		DataChange *change = fChanges.ItemAt(i);
-		change->Apply(fRealViewOffset, fView, fRealViewSize);
+	int32 firstIndex = fFirstChange != NULL ? fChanges.IndexOf(fFirstChange) + 1 : 0;
+	int32 lastIndex = fChanges.IndexOf(fLastChange);
+
+	if (fChangesFromSaved >= 0) {
+		// ascend changes
+		
+		for (int32 i = firstIndex; i <= lastIndex; i++) {
+			DataChange *change = fChanges.ItemAt(i);
+			change->Apply(fRealViewOffset, fView, fRealViewSize);
+		}
+	} else {
+		// descend changes
+
+		for (int32 i = firstIndex; i >= lastIndex; i--) {
+			DataChange *change = fChanges.ItemAt(i);
+			change->Revert(fRealViewOffset, fView, fRealViewSize);
+		}
 	}
 }
 
@@ -402,9 +433,91 @@ DataEditor::ApplyChanges()
 status_t
 DataEditor::Save()
 {
-	// collect ranges of data we need to write
+	BAutolock locker(this);
+
+	if (!IsModified())
+		return B_OK;
+
+	StateWatcher watcher(*this);
+
+	// Do we need to ascend or descend the list of changes?
+
+	int32 firstIndex = fFirstChange != NULL ? fChanges.IndexOf(fFirstChange) + 1 : 0;
+	int32 lastIndex = fChanges.IndexOf(fLastChange);
+	if (fChangesFromSaved < 0 && firstIndex != lastIndex) {
+		// swap indices
+		ASSERT(firstIndex > lastIndex);
+
+		int32 temp = firstIndex - 1;
+		firstIndex = lastIndex;
+		lastIndex = temp;
+	}
+
+	// Collect ranges of data we need to write.
+
+	// ToDo: This is a very simple implementation and could be drastically
+	// improved by having items that save ranges, not just offsets. If Insert()
+	// and Remove() are going to be implemented, it should be improved that
+	// way to reduce the memory footprint to something acceptable.
+
+	BObjectList<off_t> list;
+	for (int32 i = firstIndex; i <= lastIndex; i++) {
+		DataChange *change = fChanges.ItemAt(i);
+
+		off_t offset, size;
+		change->GetRange(FileSize(), offset, size);
+		offset -= offset % BlockSize();
+
+		while (size > 0) {
+			list.BinaryInsertCopyUnique(offset, CompareOffsets);
+			offset += BlockSize();
+			size -= BlockSize();
+		}
+	}
 
 	// read in data and apply changes, write it back to disk
+
+	off_t oldOffset = fViewOffset;
+
+	for (int32 i = 0; i < list.CountItems(); i++) {
+		off_t offset = *list.ItemAt(i);
+
+		// load the data into our view
+		SetViewOffset(offset, false);
+
+		if (fNeedsUpdate) {
+			status_t status = Update();
+			if (status < B_OK)
+				return status;
+		}
+
+		// save back to disk
+
+		// don't try to change the file size
+		size_t size = fRealViewSize;
+		if (fRealViewOffset + fRealViewSize > fSize)
+			size = fSize - fRealViewOffset;
+
+		ssize_t bytesWritten;
+		if (IsAttribute())
+			bytesWritten = fFile.WriteAttr(fAttribute, fType, fRealViewOffset, fView, fRealViewSize);
+		else
+			bytesWritten = fFile.WriteAt(fRealViewOffset, fView, fRealViewSize);
+
+		if (bytesWritten < B_OK)
+			return bytesWritten;
+	}
+
+	// update state
+
+	SetViewOffset(oldOffset, false);
+	if (fNeedsUpdate)
+		Update();
+
+	fChangesFromSaved = 0;
+	fFirstChange = fLastChange;
+
+	return B_OK;
 }
 
 
@@ -443,6 +556,7 @@ DataEditor::Undo()
 	DataChange *undoChange = fLastChange;
 
 	int32 index = fChanges.IndexOf(undoChange);
+	fChangesFromSaved--;
 	undoChange->Revert(fRealViewOffset, fView, fRealViewSize);
 
 	if (index > 0)
@@ -470,6 +584,7 @@ DataEditor::Redo()
 
 	int32 index = fChanges.IndexOf(fLastChange);
 	fLastChange = fChanges.ItemAt(index + 1);
+	fChangesFromSaved++;
 
 	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
 
@@ -503,7 +618,7 @@ DataEditor::SetFileSize(off_t size)
 
 
 status_t
-DataEditor::SetViewOffset(off_t offset)
+DataEditor::SetViewOffset(off_t offset, bool sendNotices)
 {
 	if (fView == NULL) {
 		status_t status = SetViewSize(fViewSize);
@@ -514,12 +629,24 @@ DataEditor::SetViewOffset(off_t offset)
 	if (offset < 0 || offset > fSize)
 		return B_BAD_VALUE;
 
+	if (offset == fViewOffset)
+		return B_OK;
+
 	fRealViewOffset = (offset / fBlockSize) * fBlockSize;
 	fViewOffset = offset;
 	fNeedsUpdate = true;
 
-	SendNotices(kMsgDataEditorOffsetChange);
+	if (sendNotices)
+		SendNotices(kMsgDataEditorOffsetChange);
+
 	return B_OK;
+}
+
+
+status_t
+DataEditor::SetViewOffset(off_t offset)
+{
+	return SetViewOffset(offset, true);
 }
 
 

@@ -78,6 +78,7 @@ class DataEditor : public BLocker {
 	private:
 		friend class StateWatcher;
 
+		status_t SetViewOffset(off_t offset, bool sendNotices);
 		void SendNotices(uint32 what, BMessage *message = NULL);
 		void SendNotices(DataChange *change);
 		status_t Update();
@@ -97,6 +98,7 @@ class DataEditor : public BLocker {
 		BObjectList<DataChange>	fChanges;
 		DataChange				*fFirstChange;
 		DataChange				*fLastChange;
+		int32					fChangesFromSaved;
 
 		uint8		*fView;
 		off_t		fRealViewOffset, fViewOffset;
