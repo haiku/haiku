@@ -602,7 +602,8 @@ status_t CONFIGURE_OVERLAY
 				{
 				case DUALHEAD_ON:
 				case DUALHEAD_SWITCH:
-					if ((ow->h_start + (ow->width / 2)) < (si->dm.virtual_width / 2))
+					if ((ow->h_start + (ow->width / 2)) <
+							(si->dm.h_display_start + si->dm.timing.h_display))
 						nv_bes_to_crtc(0);
 					else
 						nv_bes_to_crtc(1);
