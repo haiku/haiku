@@ -118,7 +118,7 @@ public:
 	status_t StopWatching(BMessenger target) const;
 	status_t ActivateApp(team_id team) const;
 
-	status_t Launch(const char *mimeType, BMessage *initialMsgs = NULL,
+	status_t Launch(const char *mimeType, BMessage *initialMesssage = NULL,
 					team_id *appTeam = NULL) const;
 	status_t Launch(const char *mimeType, BList *messageList,
 					team_id *appTeam = NULL) const;
