@@ -7,14 +7,37 @@
 <p><h1>skel_driver 0.00, (Rudolf)</h1></p>
 <ul>
 	<li>based on nVidia driver 0.30;
-	<li>This driver does not do anything currently.
+	<li>Kerneldriver uses MTR-WC mapping where available;
+	<li>Accelerant uses AGP busmanager to enable AGP FW where available;
+	<li>This is all this driver really does currently.
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
-	<li>Clean up this driver and make it work as skeleton driver (in progress);
+	<li>Clean up this driver a bit;
 	<li>TVout support;
 	<li>Improve/extend various stuff when/if possible.
 </ul>
 </p>
+<hr><br>
+<strong>Welcome at the Haiku-OS skeleton graphicsdriver.</strong><br>
+<br>
+It contains a lot of non-working programming, almost all of which sits in the 'engine' folder of the accelerant. The main task to make this a working driver for any card outthere, is rewriting the engine. The code there is kept in place because in fact most of the time you only have to replace the actual card-register programming. And it's always handy to have an example of previous working code at hand when you do that: at least, that's my experience.<Br>
+<br>
+<strong>Using this driver as a starting point for development</strong><br>
+<br>
+You have to add your cardID and vendorID to both the kerneldriver (driver.c) and the accelerant (general.c). On top of that, you need to make the kerneldriver framebuffer mapping work. Probably the only thing you need to know is the correct area in which the buffer sits: probably the largest one available.<br>
+<br>
+Once you have this done in the driver, you should setup a VESA file for the resolution and depth you are going to work in (you will be developing the driver while you already work with it). Use the lowest resolution you can live with, and choose 8-bit colordepth.<br>
+Now bootup the system in vesa mode or failsafe video mode (Startup option). Select the vesa mode you will be using <strong>explicitly</strong> for <strong>all</strong> workspaces in the Screen preferences app.<br>
+<br>
+OK, you should be set now. Install the new driver and reboot... You should have a normal Vesa like screen, only you'll find you have the kerneldriver loaded, the accelerant is running, and you can set modes via the Screen prefs panel: although it will only mess-up your screen. (Luckily the app falls-back to the old mode if you don't confirm the new mode ;-).<br>
+<br>
+If your CPU supports MTRR, the kerneldriver will have activated that, and if your card is AGP and you have the busmanager installed, the accelerant will have activated that. This means you should already have optimum speed for framebuffer access: working with BeOS should be smoother already than it was before when you where using <strong>real</strong> Vesa mode (and nothing else).<br>
+<br>
+<hr>
+<br>
+OK, your first task is get to the point I am describing above. Once you have that going, it's time to really start development. Personally, I have a certain list I always run-down. My advice would be to follow it, as the order of doing things has a certain logic to it, making all steps as testable as can be using this development method.<br>
+<br>
+Todo: add list..<br>
 </body>
 </html>
