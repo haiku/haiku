@@ -121,7 +121,9 @@ static uint16 nvidia_device_list[] = {
 	0x00c0,	/* Nvidia unknown FX */
 	0x00c1,	/* Nvidia unknown FX */
 	0x00c2, /* Nvidia unknown FX */
+	0x00f0, /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
 	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
+	0x00f2, /* Nvidia GeForce FX 6600 GT AGP */
 	0x00f8,	/* Nvidia Quadro FX 3400 PCIe(?) */
 	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
 	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
@@ -129,6 +131,7 @@ static uint16 nvidia_device_list[] = {
 	0x00fc,	/* Nvidia GeForce PCX 5300 PCIe */
 	0x00fd,	/* Nvidia Quadro PCX PCIe */
 	0x00fe,	/* Nvidia Quadro FX 1300 PCIe(?) */
+	0x00ff, /* Nvidia GeForce PCX 4300 PCIe */
 	0x0100, /* Nvidia GeForce256 SDR */
 	0x0101, /* Nvidia GeForce256 DDR */
 	0x0102, /* Nvidia GeForce256 Ultra */
