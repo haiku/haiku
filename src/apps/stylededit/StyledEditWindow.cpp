@@ -286,6 +286,14 @@ StyledEditWindow::InitWindow(uint32 encoding)
 void
 StyledEditWindow::MessageReceived(BMessage *message)
 {
+	if(message->WasDropped()) {
+		entry_ref ref;
+		if(message->FindRef("refs",0,&ref)==B_OK) {
+			message->what=B_REFS_RECEIVED;
+			be_app->PostMessage(message);
+		}
+	}
+	
 	switch(message->what){
 /************file menu:***************/
 		case MENU_SAVE: {
