@@ -1,25 +1,26 @@
 SubDir OBOS_TOP src kernel libroot posix stdlib ;
 
 KernelMergeObject posix_stdlib.o :
-	<$(SOURCE_GRIST)>abs.c
-	<$(SOURCE_GRIST)>atof.c 
-	<$(SOURCE_GRIST)>atoi.c 
-	<$(SOURCE_GRIST)>bsearch.c
-	<$(SOURCE_GRIST)>div.c 
-	<$(SOURCE_GRIST)>env.c
-	<$(SOURCE_GRIST)>exit.c
-	<$(SOURCE_GRIST)>heapsort.c 
-	<$(SOURCE_GRIST)>merge.c
-	<$(SOURCE_GRIST)>multibyte.c 
-	<$(SOURCE_GRIST)>qsort.c 
-	<$(SOURCE_GRIST)>radixsort.c 
-	<$(SOURCE_GRIST)>rand.c 
-	<$(SOURCE_GRIST)>random.c
-	<$(SOURCE_GRIST)>realpath.c
-	<$(SOURCE_GRIST)>strtod.c
-	<$(SOURCE_GRIST)>strtol.c
-	<$(SOURCE_GRIST)>strtoll.c
-	<$(SOURCE_GRIST)>strtoul.c
-	<$(SOURCE_GRIST)>strtoull.c
+	abs.c
+	atof.c 
+	atoi.c 
+	bsearch.c
+	div.c 
+	env.c
+	exit.c
+	heapsort.c 
+	merge.c
+	mktemp.c
+	multibyte.c 
+	qsort.c 
+	radixsort.c 
+	rand.c 
+	random.c
+	realpath.c
+	strtod.c
+	strtol.c
+	strtoll.c
+	strtoul.c
+	strtoull.c
 	: -fPIC -DPIC
 	;
