@@ -54,7 +54,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-#define DEBUG_SERVERAPP
+//#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>
@@ -426,7 +426,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<port_id>( &looperPort );
 			msg->ReadString( &title );
 
-			STRACE(("ServerApp %s: Got 'New Window' message, trying to do something...\n",
+			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
 					_signature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
@@ -701,9 +701,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			cursormanager->AddCursor(_appcursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			BSession s(0,replyport);
-			s.WriteInt32(_appcursor->ID());
-			s.Sync();
+			PortLink link(replyport);
+			link.Attach<int32>(_appcursor->ID());
+			link.Flush();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
@@ -728,9 +728,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
-			BSession replysession(0,replyport);
-			replysession.WriteData(&sbi,sizeof(scroll_bar_info));
-			replysession.Sync();
+			PortLink link(replyport);
+			link.Attach<scroll_bar_info>(sbi);
+			link.Flush();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
@@ -750,9 +750,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 
-			BSession replysession(0,replyport);
-			replysession.WriteBool(GetFFMouse());
-			replysession.Sync();
+			PortLink link(replyport);
+			link.Attach<bool>(GetFFMouse());
+			link.Flush();
 			break;
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
@@ -782,9 +782,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
-			BSession replysession(0,replyport);
-			replysession.WriteData(&mmode,sizeof(mode_mouse));
-			replysession.Sync();
+			PortLink link(replyport);
+			link.Attach<mode_mouse>(mmode);
+			link.Flush();
 			break;
 		}
 		case AS_GET_UI_COLOR:
