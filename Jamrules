@@ -886,6 +886,7 @@ rule RelSymLink
 		: [ FRelPath $(targetDirComponents) : $(sourceComponents) ] ;
 	NOUPDATE $(target);
 	Depends $(target) : $(source) ;
+	LocalClean clean : $(target) ;
 }
 
 #-------------------------------------------------------------------------------
@@ -993,6 +994,12 @@ actions assemble
 actions Chmod1
 {
 	$(CHMOD) "$(MODE)" "$(1)"
+}
+
+# Overridden to allow spaces in file names.
+actions piecemeal together existing Clean
+{
+	$(RM) "$(>)"
 }
 
 rule ObjectReference
