@@ -395,6 +395,7 @@ BBufferConsumer::HandleMessage(int32 message,
 			buffer = fBufferCache->GetBuffer(command->buffer);
 			buffer->SetHeader(&command->header);
 			PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld at perf %Ld and TimeSource()->Now() is %Ld\n", buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now());
+			//printf("BBufferConsumer::BufferReceived node %2ld, buffer %2ld, start_time %12Ld with lateness %6Ld\n", ID(), buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
 			BufferReceived(buffer);
 			return B_OK;
 		}

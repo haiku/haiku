@@ -414,6 +414,8 @@ BBufferProducer::SendBuffer(BBuffer *buffer,
 	command.header.owner = 0; // XXX fill with "buffer owner info area"
 	command.header.start_time += fDelay; // time compensation as set by BMediaRoster::SetProducerRunModeDelay()
 
+	//printf("BBufferProducer::SendBuffer     node %2ld, buffer %2ld, start_time %12Ld with lateness %6Ld\n", ID(), buffer->Header()->buffer, command.header.start_time, TimeSource()->Now() - command.header.start_time);
+
 	return SendToPort(destination.port, CONSUMER_BUFFER_RECEIVED, &command, sizeof(command));
 }
 
