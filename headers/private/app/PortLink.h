@@ -15,6 +15,7 @@ class PortLink
 	{
 		public:
 			ReplyData(void) { code=0; buffersize=0; buffer=NULL; }
+			~ReplyData(void) { if(buffer) delete buffer; }
 		int32 code;
 		ssize_t buffersize;
 		int8 *buffer;
