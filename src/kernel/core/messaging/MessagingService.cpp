@@ -15,11 +15,19 @@
 
 #include "MessagingService.h"
 
+//#define TRACE_MESSAGING_SERVICE
+#ifdef TRACE_MESSAGING_SERVICE
+#	define PRINT(x) dprintf x
+#else
+#	define PRINT(x) ;
+#endif
+
 using namespace std;
 
 static MessagingService *sMessagingService = NULL;
 
-static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
+//static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
+static const int32 kMessagingAreaSize = B_PAGE_SIZE;
 
 // init_messaging_service
 status_t
@@ -463,6 +471,8 @@ status_t
 MessagingService::SendMessage(const void *message, int32 messageSize,
 	const messaging_target *targets, int32 targetCount)
 {
+PRINT(("MessagingService::SendMessage(%p, %ld, %p, %ld)\n", message,
+messageSize, targets, targetCount));
 	if (!message || messageSize <= 0 || !targets || targetCount <= 0)
 		return B_BAD_VALUE;
 
@@ -475,8 +485,13 @@ MessagingService::SendMessage(const void *message, int32 messageSize,
 	bool wasEmpty;
 	status_t error = _AllocateCommand(MESSAGING_COMMAND_SEND_MESSAGE, dataSize,
 		area, data, wasEmpty);
-	if (error != B_OK)
+	if (error != B_OK) {
+		PRINT(("MessagingService::SendMessage(): Failed to allocate space for "
+			"send message command.\n"));
 		return error;
+	}
+PRINT(("  Allocated space for send message command: area: %p, data: %p, "
+"wasEmpty: %d\n", area, data, wasEmpty));
 
 	// prepare the command
 	messaging_command_send_message *command
@@ -516,6 +531,9 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 			break;
 		}
 
+		PRINT(("MessagingService::_AllocateCommand(): Discarding area: %p\n",
+			area));
+
 		fFirstArea = area->NextArea();
 		area->SetNextArea(NULL);
 		discardedArea = area;
@@ -533,8 +551,13 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 		if (discardedArea) {
 			area = discardedAreaDeleter.Detach();
 			area->InitHeader();
-		} else
+			PRINT(("MessagingService::_AllocateCommand(): Not enough space "
+				"left in current area. Recycling discarded one: %p\n", area));
+		} else {
 			area = MessagingArea::Create(fLockSem, fCounterSem);
+			PRINT(("MessagingService::_AllocateCommand(): Not enough space "
+				"left in current area. Allocated new one: %p\n", area));
+		}
 		if (!area) {
 			fLastArea->Unlock();
 			return B_NO_MEMORY;
