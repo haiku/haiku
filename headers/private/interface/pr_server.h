@@ -66,6 +66,7 @@
 #define PSRV_JOB_STATUS_WAITING         "Waiting"
 #define PSRV_JOB_STATUS_PROCESSING      "Processing"
 #define PSRV_JOB_STATUS_FAILED          "Failed"
+#define PSRV_JOB_STATUS_COMPLETED "Completed"
 
 // printer attributes
 #define PSRV_PRINTER_ATTR_DRV_NAME			"Driver Name"
