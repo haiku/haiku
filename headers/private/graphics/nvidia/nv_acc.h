@@ -188,6 +188,19 @@ typedef struct {
 								 *  'ScanlineImageWriteRect' functions.)
 								 * Is this command actually usefull? */
 
+typedef struct {
+	uint32 reserved00[0x0004];
+	uint16 FifoFree;			/* little endian (FIFO internal register) */
+	uint16 Nop;					/* little endian (FIFO internal register) */
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ae];
+	uint32 Format;				/* buffer colorspace */
+	uint32 Pitch;				/* b0-15 is source pitch, b16-31 is dest pitch */
+	uint32 OffsetSource;		/* b0-31 is source bufferadress offset */
+	uint32 OffsetDest;			/* b0-31 is dest bufferadress offset */
+} cmd_nv4_surface;				/* nv10_context_surfaces_2d is identical as far as used */
 
 /************************
  * 3D specific commands *
@@ -275,5 +288,6 @@ typedef struct {
 #define NV_IMAGE_PATTERN_SETSHAPE			0x0308
 #define NV_IMAGE_PATTERN_SETCOLOR0			0x0310
 #define NV_IMAGE_BLIT_SOURCEORG				0x0300
+#define NV4_SURFACE_FORMAT					0x0300
 
 #endif

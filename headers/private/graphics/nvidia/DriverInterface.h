@@ -82,6 +82,8 @@ enum {
 #define NV3_SURFACE_3					0x00000006 /* 3D: old cmd */
 #define NV4_CONTEXT_SURFACES_ARGB_ZS	0x00000007 /* 3D: should replace the old cmd's */
 #define NV10_CONTEXT_SURFACES_ARGB_ZS	0x00000007 /* 3D: should replace the old cmd's */
+#define NV4_SURFACE						0x00000008 /* 2D */
+#define NV10_CONTEXT_SURFACES_2D		0x00000008 /* 2D */
 #define NV1_IMAGE_FROM_CPU				0x00000010 /* 2D: unused, remove? */
 #define NV_IMAGE_BLIT					0x00000011 /* 2D */
 #define NV3_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
