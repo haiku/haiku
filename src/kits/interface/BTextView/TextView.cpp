@@ -26,7 +26,6 @@
 
 // Standard Includes -----------------------------------------------------------
 
-
 // System Includes -------------------------------------------------------------
 #include <Application.h>
 #include <Clipboard.h>
@@ -42,6 +41,7 @@
 #include "TextGapBuffer.h"
 #include "LineBuffer.h"
 #include "StyleBuffer.h"
+#include "UndoBuffer.h"
 
 //#include <CRTDBG.H>
 
@@ -142,8 +142,8 @@ prop_list[] =
 	{ 0 }
 };
 
-sem_id BTextView::sWidthSem;
-int32 BTextView::sWidthAtom;
+sem_id BTextView::sWidthSem = B_BAD_SEM_ID; // Created/deleted by init/fini_interface_kit
+int32 BTextView::sWidthAtom = 0; 
 
 //------------------------------------------------------------------------------
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -285,6 +285,7 @@ BTextView::~BTextView()
 	delete fLines;
 	delete fStyles;
 	delete fDisallowedChars;
+	delete fUndo;
 }
 //------------------------------------------------------------------------------
 BArchivable *
@@ -668,7 +669,11 @@ BTextView::MessageReceived(BMessage *message)
 		case B_PASTE:
 			Paste(be_clipboard);
 			break;
-
+		
+		case B_UNDO:
+			Undo(be_clipboard);
+			break;
+			
 		case B_SET_PROPERTY:
 		case B_GET_PROPERTY:
 		case B_COUNT_PROPERTIES:
@@ -975,8 +980,7 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 	Refresh(startOffset, endOffset, true, true);
 	
 	// draw the caret
-	if (fActive) 
-	{
+	if (fActive) {
 		if (!fCaretVisible)
 			InvertCaret();
 	}
@@ -1039,8 +1043,12 @@ BTextView::GoToLine(int32 index)
 void
 BTextView::Cut(BClipboard *clipboard)
 {
+	delete fUndo;
+	fUndo = new _BCutUndoBuffer_(this);
 	Copy(clipboard);
 	DeleteText(fSelStart, fSelEnd);
+	
+	Refresh(0, LONG_MAX, true, false);
 }
 //------------------------------------------------------------------------------
 void
@@ -1068,18 +1076,27 @@ BTextView::Paste(BClipboard *clipboard)
 
 	if (clipboard->Lock()) { 
 		if ((clip = clipboard->Data()) != NULL) {
-			const char *text;
-			ssize_t len;
-
+			const char *text = NULL;
+			text_run_array * runArray = NULL;
+			ssize_t len = 0;
+			ssize_t runLen = 0;
+			
+			clip->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
+					(const void **)&runArray, &runLen);
 			if (clip->FindData("text/plain", B_MIME_TYPE,
 					(const void **)&text, &len) == B_OK) {
 				DeleteText(fSelStart, fSelEnd);
-				InsertText(text, len, fSelStart, NULL);
-			}
+				InsertText(text, len, fSelStart, runArray);
+				
+				delete fUndo;
+				fUndo = new _BPasteUndoBuffer_(this, text, len, runArray, runLen);
+			}		
 		}
 
 		clipboard->Unlock();
 	}
+	
+	Refresh(0, LONG_MAX, true, false);
 }
 //------------------------------------------------------------------------------
 void
@@ -1104,7 +1121,7 @@ BTextView::AcceptsPaste(BClipboard *clipboard)
 	
 	be_clipboard->Unlock();
 	
-	return (result);
+	return result;
 }
 //------------------------------------------------------------------------------
 bool
@@ -1941,13 +1958,18 @@ BTextView::IsResizable () const
 void
 BTextView::SetDoesUndo(bool undo)
 {
-	
+	if (undo && fUndo == NULL)
+		fUndo = new _BUndoBuffer_(this, B_UNDO_UNAVAILABLE);
+	else if (!undo && fUndo != NULL) {
+		delete fUndo;
+		fUndo = NULL;
+	}
 }
 //------------------------------------------------------------------------------
 bool
 BTextView::DoesUndo() const
 {
-	return false;
+	return fUndo != NULL;
 }
 //------------------------------------------------------------------------------
 void
@@ -2128,12 +2150,14 @@ BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 void
 BTextView::Undo(BClipboard *clipboard)
 {
+	if (fUndo)
+		fUndo->Undo(clipboard);
 }
 //------------------------------------------------------------------------------
 undo_state
 BTextView::UndoState(bool *isRedo) const
 {
-	return B_UNDO_UNAVAILABLE;
+	return fUndo == NULL ? B_UNDO_UNAVAILABLE : fUndo->State(isRedo);
 }
 //------------------------------------------------------------------------------
 void
@@ -3133,8 +3157,7 @@ BTextView::PreviousInitialByte(int32 offset) const
 	const char *text = Text();
 	int count = 6;
 	
-	for (--offset; (text + offset) > text && count; --offset, --count)
-	{
+	for (--offset; (text + offset) > text && count; --offset, --count) {
 		if ((*(text + offset) & 0xc0 ) != 0x80)
 			break;
 	}
@@ -3146,16 +3169,13 @@ bool
 BTextView::GetProperty(BMessage *specifier, int32 form,
 							const char *property, BMessage *reply)
 {
-	if (strcmp(property, "Selection") == 0)
-	{
+	if (strcmp(property, "Selection") == 0) {
 		reply->what = B_REPLY;
 		reply->AddInt32("result", fSelStart);
 		reply->AddInt32("result", fSelEnd);
 		reply->AddInt32("error", B_OK);
 		return true;
-	}
-	else if (strcmp(property, "Text") == 0)
-	{
+	} else if (strcmp(property, "Text") == 0) {
 		int32 index, range;
 		char *buffer;
 
@@ -3170,11 +3190,8 @@ BTextView::GetProperty(BMessage *specifier, int32 form,
 		delete buffer;
 		reply->AddInt32("error", B_OK);
 		return true;
-	}
-	else if (strcmp(property, "text_run_array") == 0)
-	{
+	} else if (strcmp(property, "text_run_array") == 0)
 		return false;
-	}
 	else
 		return false;
 }
@@ -3183,8 +3200,7 @@ bool
 BTextView::SetProperty(BMessage *specifier, int32 form,
 							const char *property, BMessage *reply)
 {
-	if (strcmp(property, "Selection") == 0)
-	{
+	if (strcmp(property, "Selection") == 0) {
 		int32 index, range;
 
 		specifier->FindInt32("index", &index);
@@ -3197,8 +3213,7 @@ BTextView::SetProperty(BMessage *specifier, int32 form,
 
 		return true;
 	}
-	else if (strcmp(property, "Text") == 0)
-	{
+	else if (strcmp(property, "Text") == 0) {
 		int32 index, range;
 		const char *buffer;
 
@@ -3216,9 +3231,8 @@ BTextView::SetProperty(BMessage *specifier, int32 form,
 		return true;
 	}
 	else if (strcmp(property, "text_run_array") == 0)
-	{
 		return false;
-	}
+
 	else
 		return false;
 }
@@ -3227,8 +3241,7 @@ bool
 BTextView::CountProperties(BMessage *specifier, int32 form,
 								const char *property, BMessage *reply)
 {
-	if (strcmp(property, "Text") == 0)
-	{
+	if (strcmp(property, "Text") == 0) {
 		reply->what = B_REPLY;
 		reply->AddInt32("result", TextLength());
 		reply->AddInt32("error", B_OK);
@@ -3257,14 +3270,14 @@ BTextView::CancelInputMethod()
 void
 BTextView::LockWidthBuffer()
 {
-	if (atomic_add(&sWidthAtom, -1) <= 0)
+	if (atomic_add(&sWidthAtom, 1) > 0)
 		acquire_sem(sWidthSem);
 }
 //------------------------------------------------------------------------------
 void
 BTextView::UnlockWidthBuffer()
 {
-	if (atomic_add(&sWidthAtom, 1) < 0)
+	if (atomic_add(&sWidthAtom, -1) > 1)
 		release_sem(sWidthSem);
 }
 //------------------------------------------------------------------------------
