@@ -352,18 +352,17 @@ TEnclosuresView::Focus(bool focus)
 }
 
 
-static void recursive_attachment_search(TEnclosuresView *us,BMailContainer *mail) {
+static void recursive_attachment_search(TEnclosuresView *us,BMailContainer *mail,BMailComponent *body) {
 	if (mail == NULL)
 		return;
 	for (int32 i = 0; i < mail->CountComponents(); i++)
 	{
 		BMailComponent *component = mail->GetComponent(i);
-		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
-			recursive_attachment_search(us,dynamic_cast<BMIMEMultipartMailContainer *>(component));			
-
-		BMailAttachment *attachment = dynamic_cast<BMailAttachment *>(component);
-		if (attachment == NULL)
+		if (component == body)
 			continue;
+			
+		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
+			recursive_attachment_search(us,dynamic_cast<BMIMEMultipartMailContainer *>(component),body);	
 
 		us->fList->AddItem(new TListItem(component));
 	}
@@ -379,11 +378,7 @@ TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 			continue;
 		
 		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
-			recursive_attachment_search(this,dynamic_cast<BMIMEMultipartMailContainer *>(component));
-		
-		BMailAttachment *attachment = dynamic_cast<BMailAttachment *>(component);
-		if (attachment == NULL)
-			continue;
+			recursive_attachment_search(this,dynamic_cast<BMIMEMultipartMailContainer *>(component),mail->Body());
 
 		fList->AddItem(new TListItem(component));
 	}
@@ -526,14 +521,14 @@ TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
 	if (fComponent) {
 		// if it's already a mail component, we don't have an icon to
 		// draw, and the entry_ref is invalid
-		BMailAttachment *attachment = static_cast<BMailAttachment *>(fComponent);
+		BMailAttachment *attachment = dynamic_cast<BMailAttachment *>(fComponent);
 
 		char name[B_FILE_NAME_LENGTH * 2];
-		if (attachment->FileName(name) < B_OK)
+		if ((attachment == NULL) || (attachment->FileName(name) < B_OK))
 			strcpy(name, "unnamed");
 
 		BMimeType type;
-		if (attachment->MIMEType(&type) == B_OK)
+		if (fComponent->MIMEType(&type) == B_OK)
 			sprintf(name + strlen(name), ", Type: %s", type.Type());
 
 		owner->DrawString(name);

@@ -562,9 +562,11 @@ BTextMailComponent::RenderToRFC822(BPositionIO *render_to)
 	status_t status = ParseRaw();
 	if (status < B_OK)
 		return status;
-
+	
+	BMimeType type;
+	MIMEType(&type);
 	BString content_type;
-	content_type << "text/plain";
+	content_type << type.Type(); // Preserve MIME type (e.g. text/html
 
 	for (uint32 i = 0; mail_charsets[i].charset != NULL; i++) {
 		if (mail_charsets[i].flavor == charset) {
