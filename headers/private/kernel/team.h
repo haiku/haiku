@@ -1,6 +1,6 @@
 /*
-** Copyright 2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef _TEAM_H
 #define _TEAM_H
@@ -32,6 +32,9 @@ struct team *team_get_team_struct_locked(team_id id);
 team_id _user_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 status_t _user_wait_for_team(team_id id, status_t *_returnCode);
 status_t _user_kill_team(thread_id thread);
+thread_id _user_wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode);
+status_t _user_exec(const char *path, int32 argc, char * const *argv, int32 envCount, char * const *environment);
+thread_id _user_fork(void);
 team_id _user_get_current_team(void);
 
 status_t _user_get_team_info(team_id id, team_info *info);

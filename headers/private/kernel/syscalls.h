@@ -57,10 +57,16 @@ int    sys_set_sem_owner(sem_id id, team_id proc);
 /* team & thread syscalls */
 
 extern void			_kern_exit(int returnCode);
-extern team_id		_kern_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
+extern team_id		_kern_create_team(const char *path, const char *name, char **args, int argc,
+						char **envp, int envc, int priority);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
+extern thread_id	_kern_wait_for_child(thread_id child, uint32 flags,
+						int32 *_reason, status_t *_returnCode);
+extern status_t		_kern_exec(const char *path, int32 argc, char * const *argv, int32 envCount,
+						char * const *environment);
+extern thread_id	_kern_fork(void);
 
 extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *),
 						const char *name, int32 priority, void *data1, void *data2);
