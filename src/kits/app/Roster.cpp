@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <List.h>
 #include <OS.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
@@ -126,54 +127,136 @@ BRoster::~BRoster()
 bool
 BRoster::IsRunning(const char *mimeSig) const
 {
-	return false; // not implemented
+	return (TeamFor(mimeSig) >= 0);
 }
 
 // IsRunning
 bool
 BRoster::IsRunning(entry_ref *ref) const
 {
-	return false; // not implemented
+	return (TeamFor(ref) >= 0);
 }
 
 // TeamFor
 team_id
 BRoster::TeamFor(const char *mimeSig) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	team_id team;
+	app_info info;
+	status_t error = GetAppInfo(mimeSig, &info);
+	if (error == B_OK)
+		team = info.team;
+	else
+		team = error;
+	return team;
 }
 
 // TeamFor
 team_id
 BRoster::TeamFor(entry_ref *ref) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	team_id team;
+	app_info info;
+	status_t error = GetAppInfo(ref, &info);
+	if (error == B_OK)
+		team = info.team;
+	else
+		team = error;
+	return team;
 }
 
 // GetAppList
 void
 BRoster::GetAppList(BList *teamIDList) const
 {
+	status_t error = (teamIDList ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_APP_LIST);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS) {
+			team_id team;
+			for (int32 i = 0; reply.FindInt32("teams", i, &team) == B_OK; i++)
+				teamIDList->AddItem((void*)team);
+		} else
+			reply.FindInt32("error", &error);
+	}
 }
 
 // GetAppList
+//
+// The list is not emptied.
 void
 BRoster::GetAppList(const char *sig, BList *teamIDList) const
 {
+	status_t error = (sig && teamIDList ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_APP_LIST);
+	if (error == B_OK)
+		error = request.AddString("signature", sig);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS) {
+			team_id team;
+			for (int32 i = 0; reply.FindInt32("teams", i, &team) == B_OK; i++)
+				teamIDList->AddItem((void*)team);
+		} else
+			reply.FindInt32("error", &error);
+	}
 }
 
 // GetAppInfo
 status_t
 BRoster::GetAppInfo(const char *sig, app_info *info) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (sig && info ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_APP_INFO);
+	if (error == B_OK)
+		error = request.AddString("signature", sig);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS)
+			error = find_message_app_info(&reply, info);
+		else
+			reply.FindInt32("error", &error);
+	}
+	return error;
 }
 
 // GetAppInfo
 status_t
 BRoster::GetAppInfo(entry_ref *ref, app_info *info) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref && info ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_GET_APP_INFO);
+	if (error == B_OK)
+		error = request.AddRef("ref", ref);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK) {
+		if (reply.what == B_REG_SUCCESS)
+			error = find_message_app_info(&reply, info);
+		else
+			reply.FindInt32("error", &error);
+	}
+	return error;
 }
 
 // GetRunningAppInfo
@@ -182,7 +265,7 @@ BRoster::GetRunningAppInfo(team_id team, app_info *info) const
 {
 	status_t error = (team >= 0 && info ? B_OK : B_BAD_VALUE);
 	// compose the request message
-	BMessage request(B_REG_GET_RUNNING_APP_INFO);
+	BMessage request(B_REG_GET_APP_INFO);
 	if (error == B_OK)
 		error = request.AddInt32("team", team);
 	// send the request
@@ -205,7 +288,7 @@ BRoster::GetActiveAppInfo(app_info *info) const
 {
 	status_t error = (info ? B_OK : B_BAD_VALUE);
 	// compose the request message
-	BMessage request(B_REG_GET_RUNNING_APP_INFO);
+	BMessage request(B_REG_GET_APP_INFO);
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
@@ -268,7 +351,19 @@ BRoster::StopWatching(BMessenger target) const
 status_t
 BRoster::ActivateApp(team_id team) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (team >= 0 ? B_OK : B_BAD_TEAM_ID);
+	// compose the request message
+	BMessage request(B_REG_ACTIVATE_APP);
+	if (error == B_OK)
+		error = request.AddInt32("team", team);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // Launch
@@ -496,7 +591,7 @@ BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
 {
 	status_t error = B_OK;
 	// compose the request message
-	BMessage request(B_REG_IS_PRE_REGISTERED);
+	BMessage request(B_REG_IS_APP_PRE_REGISTERED);
 	if (error == B_OK && ref)
 		error = request.AddRef("ref", ref);
 	if (error == B_OK && team >= 0)
