@@ -287,6 +287,27 @@ malloc(size_t size)
 }
 
 
+void *
+realloc(void *oldBuffer, size_t newSize)
+{
+	// ToDo: improve this implementation!
+
+	void *newBuffer = malloc(newSize);
+	if (newBuffer == NULL)
+		return NULL;
+
+	free_chunk *oldChunk = free_chunk::SetToAllocated(oldBuffer);
+
+	if (newSize > oldChunk->size)
+		newSize = oldChunk->size;
+
+	memcpy(newBuffer, oldBuffer, newSize);
+	free(oldBuffer);
+
+	return newBuffer;
+}
+
+
 void
 free(void *allocated)
 {
