@@ -14,6 +14,7 @@
 #include <NodeMonitor.h>
 
 #include <kdevice_manager.h>
+#include <KPath.h>
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
@@ -57,7 +58,8 @@ struct devfs_stream {
 			IOScheduler *scheduler;
 		} dev;
 		struct stream_symlink {
-			char *path;
+			const char *path;
+			size_t length;
 		} symlink;
 	} u;
 };
@@ -453,16 +455,18 @@ get_node_for_path(const char *path, struct devfs_vnode **_node)
 static status_t
 publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 {
-	status_t status = B_OK;
-	char temp[B_PATH_NAME_LENGTH + 1];
+	ASSERT_LOCKED_MUTEX(&fs->lock);
 
 	// copy the path over to a temp buffer so we can munge it
-	strlcpy(temp, path, B_PATH_NAME_LENGTH);
+	KPath tempPath(path);
+	char *temp = tempPath.LockBuffer();
 
 	// create the path leading to the device
 	// parse the path passed in, stripping out '/'
+
 	struct devfs_vnode *dir = fs->root_vnode;
 	struct devfs_vnode *vnode = NULL;
+	status_t status = B_OK;
 	int32 i = 0, last = 0;
 	bool atLeaf = false;
 
@@ -918,6 +922,22 @@ static status_t
 devfs_fsync(fs_volume _fs, fs_vnode _v)
 {
 	return 0;
+}
+
+
+static status_t
+devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
+{
+	struct devfs_vnode *link = (struct devfs_vnode *)_link;
+
+	if (!S_ISLNK(link->stream.type))
+		return B_BAD_VALUE;
+
+	if (bufferSize < link->stream.u.symlink.length)
+		return B_NAME_TOO_LONG;
+
+	memcpy(buffer, link->stream.u.symlink.path, link->stream.u.symlink.length + 1);
+	return link->stream.u.symlink.length;
 }
 
 
@@ -1380,7 +1400,7 @@ file_system_info gDeviceFileSystem = {
 	&devfs_set_flags,
 	&devfs_fsync,
 
-	NULL,	// read_link
+	&devfs_read_link,
 	NULL,	// write_link
 	NULL,	// symlink
 	NULL,	// link
@@ -1589,7 +1609,27 @@ devfs_unpublish_file_device(const char *path)
 extern "C" status_t
 devfs_publish_file_device(const char *path, const char *filePath)
 {
-	return B_ERROR;
+	struct devfs_vnode *node;
+	status_t status;
+
+	filePath = strdup(filePath);
+	if (filePath == NULL)
+		return B_NO_MEMORY;
+
+	mutex_lock(&sDeviceFileSystem->lock);
+
+	status = publish_node(sDeviceFileSystem, path, &node);
+	if (status != B_OK)
+		goto out;
+
+	// all went fine, let's initialize the node
+	node->stream.type = S_IFLNK | 0644;
+	node->stream.u.symlink.path = filePath;
+	node->stream.u.symlink.length = strlen(filePath);
+
+out:
+	mutex_unlock(&sDeviceFileSystem->lock);
+	return status;
 }
 
 
