@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Disk Driver
@@ -13,9 +13,11 @@
 	normal (floppy/hard/ZIP)-disk drives.
 */
 
+
 #include "scsi_dsk_int.h"
 #include <scsi.h>
 #include <string.h>
+
 
 extern blkdev_interface das_interface;
 
@@ -48,7 +50,7 @@ update_capacity(das_device_info *device)
 	scsi_ccb *ccb;
 	status_t res;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	ccb = device->scsi->alloc_ccb(device->scsi_device);
 	if (ccb == NULL)
@@ -69,7 +71,7 @@ get_geometry(das_handle_info *handle, void *buf, size_t len)
 	device_geometry *geometry = (device_geometry *)buf;
 	status_t res;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	res = update_capacity(device);
 
@@ -112,16 +114,16 @@ load_eject(das_device_info *device, bool load)
 {
 	scsi_ccb *ccb;
 	err_res res;
-	
-	SHOW_FLOW0( 0, "" );
-		
+
+	SHOW_FLOW0(0, "");
+
 	ccb = device->scsi->alloc_ccb(device->scsi_device);
 
 	res = scsi_periph->send_start_stop(device->scsi_periph_device, 
 		ccb, load, true);
-		
+
 	device->scsi->free_ccb(ccb);
-	
+
 	return res.error_code;
 }
 
@@ -172,9 +174,8 @@ das_media_changed(das_device_info *device, scsi_ccb *request)
 
 
 scsi_periph_callbacks callbacks = {
-	(void (*)( periph_device_cookie, 
-		uint64, uint32 ))							das_set_capacity,
-	(void (*)( periph_device_cookie, scsi_ccb *))	das_media_changed
+	(void (*)(periph_device_cookie, uint64, uint32))das_set_capacity,
+	(void (*)(periph_device_cookie, scsi_ccb *))das_media_changed
 };
 
 
@@ -183,40 +184,40 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 {
 	das_device_info *device = handle->device;
 	status_t res;
-	
-	SHOW_FLOW( 4, "%d", op );
-	
-	switch( op ) {
-	case B_GET_DEVICE_SIZE:
-		res = update_capacity( device );
-		if( res == B_OK )
-			(size_t *)buf = device->capacity * device->block_size;
-		break;
-		
-	case B_GET_GEOMETRY:
-		res = get_geometry( handle, buf, len );
-		break;
-		
-	case B_GET_ICON:
-		res = scsi_periph->get_icon( device->removable ? icon_type_floppy : icon_type_disk, 
-			(device_icon *)buf );
-		break;
-		
-	case B_EJECT_DEVICE:
-	case B_SCSI_EJECT:
-		res = load_eject( device, false );
-		break;
-		
-	case B_LOAD_MEDIA:
-		res = load_eject( device, true );
-		break;
-		
-	default:
-		res = scsi_periph->ioctl( handle->scsi_periph_handle, op, buf, len );
+
+	SHOW_FLOW(4, "%d", op);
+
+	switch (op) {
+		case B_GET_DEVICE_SIZE:
+			res = update_capacity(device);
+			if (res == B_OK)
+				(size_t *)buf = device->capacity * device->block_size;
+			break;
+
+		case B_GET_GEOMETRY:
+			res = get_geometry(handle, buf, len);
+			break;
+
+		case B_GET_ICON:
+			res = scsi_periph->get_icon(device->removable ? icon_type_floppy : icon_type_disk, 
+				(device_icon *)buf);
+			break;
+
+		case B_EJECT_DEVICE:
+		case B_SCSI_EJECT:
+			res = load_eject(device, false);
+			break;
+
+		case B_LOAD_MEDIA:
+			res = load_eject(device, true);
+			break;
+
+		default:
+			res = scsi_periph->ioctl(handle->scsi_periph_handle, op, buf, len);
 	}
-	
-	SHOW_FLOW( 4, "%s", strerror( res ));
-	
+
+	SHOW_FLOW(4, "%s", strerror(res));
+
 	return res;
 }
 
@@ -246,7 +247,7 @@ blkdev_interface scsi_dsk_module = {
 	{
 		{
 			SCSI_DSK_MODULE_NAME,
-			0,			
+			0,
 			std_ops
 		},
 
@@ -256,22 +257,21 @@ blkdev_interface scsi_dsk_module = {
 		NULL
 	},
 
-	(status_t (*)( blkdev_device_cookie, blkdev_handle_cookie * )) &das_open,
-	(status_t (*)( blkdev_handle_cookie ))						&das_close,
-	(status_t (*)( blkdev_handle_cookie ))						&das_free,
+	(status_t (*)(blkdev_device_cookie, blkdev_handle_cookie *)) &das_open,
+	(status_t (*)(blkdev_handle_cookie))						&das_close,
+	(status_t (*)(blkdev_handle_cookie))						&das_free,
 
-	(status_t (*)( blkdev_handle_cookie, const phys_vecs *, 
-		off_t, size_t, uint32, size_t * ))						&das_read,
-	(status_t (*)( blkdev_handle_cookie, const phys_vecs *,
-		off_t, size_t, uint32, size_t * ))						&das_write,
+	(status_t (*)(blkdev_handle_cookie, const phys_vecs *,
+		off_t, size_t, uint32, size_t *))						&das_read,
+	(status_t (*)(blkdev_handle_cookie, const phys_vecs *,
+		off_t, size_t, uint32, size_t *))						&das_write,
 
-	(status_t (*)( blkdev_handle_cookie, int, void *, size_t ))	&das_ioctl,
+	(status_t (*)(blkdev_handle_cookie, int, void *, size_t))	&das_ioctl,
 };
 
 #if !_BUILDING_kernel && !BOOT
 _EXPORT 
-module_info *modules[] =
-{
+module_info *modules[] = {
 	(module_info *)&scsi_dsk_module,
 	NULL
 };
