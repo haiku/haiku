@@ -81,7 +81,7 @@ MediaExtractor::~MediaExtractor()
 		_DestroyReader(fReader);
 
 	delete [] fStreamInfo;
-	delete fSource;
+	// fSource is owned by the BMediaFile
 }
 
 status_t
