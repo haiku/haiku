@@ -349,6 +349,8 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 #endif
 
 	// save the kernel args
+	ka->kernel_args_size = sizeof(kernel_args);
+	ka->version = CURRENT_KERNEL_ARGS_VERSION;
 	ka->arch_args.system_time_cv_factor = cv_factor;
 	ka->str = NULL;
 	ka->arch_args.page_hole = 0xffc00000;
