@@ -78,8 +78,12 @@ typedef enum {
 	B_PRE_SYSCALL_HIT,			// thread starts a syscall
 	B_POST_SYSCALL_HIT,			// thread finished a syscall
 	B_SINGLE_STEP,				// thread is being single stepped
+	B_EXCEPTION_OCCURRED,		// an exception (fault, trap,...) occurred
+} debug_why_stopped;
 
-	B_NMI,						// non-maskable interrupt
+// in case of a B_EXCEPTION_OCCURRED event: the type of the exception
+typedef enum {
+	B_NMI						= 0,	// non-maskable interrupt
 	B_MACHINE_CHECK_EXCEPTION,
 	B_SEGMENT_VIOLATION,
 	B_ALIGNMENT_EXCEPTION,
@@ -91,10 +95,12 @@ typedef enum {
 	B_STACK_FAULT,
 	B_GENERAL_PROTECTION_FAULT,
 	B_FLOATING_POINT_EXCEPTION,
-} debug_why_stopped;
+} debug_exception_type;
 
-extern void get_why_stopped_string(debug_why_stopped whyStopped, char *buffer,
-		int32 bufferSize);
+extern void get_debug_why_stopped_string(debug_why_stopped whyStopped,
+		char *buffer, int32 bufferSize);
+extern void get_debug_exception_string(debug_exception_type exception,
+		char *buffer, int32 bufferSize);
 
 // Value indicating how a stopped thread shall continue.
 enum {
@@ -112,6 +118,15 @@ enum {
 	B_DATA_WRITE_WATCHPOINT,
 	B_DATA_READ_WRITE_WATCHPOINT,
 };
+
+// how to apply signal ignore masks
+typedef enum {
+	B_DEBUG_SIGNAL_MASK_AND	= 0,
+	B_DEBUG_SIGNAL_MASK_OR,
+	B_DEBUG_SIGNAL_MASK_SET,
+} debug_signal_mask_op;
+
+#define B_DEBUG_SIGNAL_TO_MASK(signal) (1ULL << ((signal) - 1))
 
 
 // #pragma mark -
@@ -131,6 +146,10 @@ typedef enum {
 	B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,	// clear a breakpoint
 	B_DEBUG_MESSAGE_SET_WATCHPOINT,		// set a watchpoint
 	B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,	// clear a watchpoint
+	B_DEBUG_MESSAGE_SET_SIGNAL_MASKS,	// set/get a thread's masks of signals
+	B_DEBUG_MESSAGE_GET_SIGNAL_MASKS,	//  the debugger is interested in
+	B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER,	// set/get a thread's signal handler for
+	B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER,	//  a signal
 
 	B_DEBUG_MESSAGE_PREPARE_HANDOVER,	// prepares the debugged team for being
 										// handed over to another debugger;
@@ -254,6 +273,59 @@ typedef struct {
 	void		*address;		// watchpoint address
 } debug_nub_clear_watchpoint;
 
+// B_DEBUG_MESSAGE_SET_SIGNAL_MASKS
+
+typedef struct {
+	thread_id				thread;				// the thread
+	uint64					ignore_mask;		// the mask for signals the
+												// debugger wishes not to be
+												// notified of
+	uint64					ignore_once_mask;	// the mask for signals the
+												// debugger wishes not to be
+												// notified of when they next
+												// occur
+	debug_signal_mask_op	ignore_op;			// what to do with ignore_mask
+	debug_signal_mask_op	ignore_once_op;		// what to do with
+												// ignore_once_mask
+} debug_nub_set_signal_masks;
+
+// B_DEBUG_MESSAGE_GET_SIGNAL_MASKS
+
+typedef struct {
+	port_id		reply_port;			// port to send the reply to
+	thread_id	thread;				// the thread
+} debug_nub_get_signal_masks;
+
+typedef struct {
+	status_t	error;				// B_OK, if the thread exists
+	uint64		ignore_mask;		// the mask for signals the debugger wishes
+									// not to be notified of
+	uint64		ignore_once_mask;	// the mask for signals the debugger wishes
+									// not to be notified of when they next
+									// occur
+} debug_nub_get_signal_masks_reply;
+
+// B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER
+
+typedef struct {
+	thread_id			thread;		// the thread
+	int					signal;		// the signal
+	struct sigaction	handler;	// the new signal handler
+} debug_nub_set_signal_handler;
+
+// B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER
+
+typedef struct {
+	port_id				reply_port;	// port to send the reply to
+	thread_id			thread;		// the thread
+	int					signal;		// the signal
+} debug_nub_get_signal_handler;
+
+typedef struct {
+	status_t			error;		// B_OK, if the thread exists
+	struct sigaction	handler;	// the signal handler
+} debug_nub_get_signal_handler_reply;
+
 // B_DEBUG_MESSAGE_PREPARE_HANDOVER
 
 typedef struct {
@@ -262,18 +334,22 @@ typedef struct {
 
 // union of all messages structures sent to the debug nub thread
 typedef union {
-	debug_nub_read_memory		read_memory;
-	debug_nub_write_memory		write_memory;
-	debug_nub_set_team_flags	set_team_flags;
-	debug_nub_set_thread_flags	set_thread_flags;
-	debug_nub_run_thread		run_thread;
-	debug_nub_step_thread		step_thread;
-	debug_nub_get_why_stopped	get_why_stopped;
-	debug_nub_set_cpu_state		set_cpu_state;
-	debug_nub_set_breakpoint	set_breakpoint;
-	debug_nub_clear_breakpoint	clear_breakpoint;
-	debug_nub_set_watchpoint	set_watchpoint;
-	debug_nub_clear_watchpoint	clear_watchpoint;
+	debug_nub_read_memory			read_memory;
+	debug_nub_write_memory			write_memory;
+	debug_nub_set_team_flags		set_team_flags;
+	debug_nub_set_thread_flags		set_thread_flags;
+	debug_nub_run_thread			run_thread;
+	debug_nub_step_thread			step_thread;
+	debug_nub_get_why_stopped		get_why_stopped;
+	debug_nub_set_cpu_state			set_cpu_state;
+	debug_nub_set_breakpoint		set_breakpoint;
+	debug_nub_clear_breakpoint		clear_breakpoint;
+	debug_nub_set_watchpoint		set_watchpoint;
+	debug_nub_clear_watchpoint		clear_watchpoint;
+	debug_nub_set_signal_masks		set_signal_masks;
+	debug_nub_get_signal_masks		get_signal_masks;
+	debug_nub_set_signal_handler	set_signal_handler;
+	debug_nub_get_signal_handler	get_signal_handler;
 } debug_nub_message_data;
 
 
@@ -287,6 +363,7 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_PRE_SYSCALL,			// begin of a syscall
 	B_DEBUGGER_MESSAGE_POST_SYSCALL,		// end of a syscall
 	B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,		// thread received a signal
+	B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,	// an exception occurred
 	B_DEBUGGER_MESSAGE_TEAM_CREATED,		// the debugged team created a new
 											// one
 	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
@@ -342,6 +419,16 @@ typedef struct {
 									// the team
 } debug_signal_received;
 
+// B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED
+
+typedef struct {
+	debug_origin			origin;
+	debug_exception_type	exception;		// the exception
+	int						signal;			// the signal that will be sent,
+											// when the thread continues
+											// normally
+} debug_exception_occurred;
+
 // B_DEBUGGER_MESSAGE_TEAM_CREATED
 
 typedef struct {
@@ -389,6 +476,7 @@ typedef union {
 	debug_pre_syscall				pre_syscall;
 	debug_post_syscall				post_syscall;
 	debug_signal_received			signal_received;
+	debug_exception_occurred		exception_occurred;
 	debug_team_created				team_created;
 	debug_team_deleted				team_deleted;
 	debug_thread_created			thread_created;
