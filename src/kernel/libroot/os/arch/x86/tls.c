@@ -41,7 +41,7 @@ tls_get(int32 index)
 void **
 tls_address(int32 index)
 {
-	void *ret;
+	void **ret;
 	__asm__ __volatile__ ( 
 		"movl	%%fs:0, %%eax \n\t"
 		"leal	(%%eax, %%edx, 4), %%eax \n\t"
