@@ -17,40 +17,44 @@
 class ScreenSaver : public BScreenSaver
 {
 public:
-	ScreenSaver(BMessage *archive, image_id);
-	void Draw(BView *view, int32 frame);
-	void StartConfig(BView *view);
-	status_t StartSaver(BView *view, bool preview);
+				ScreenSaver(BMessage *archive, image_id);
+	void		Draw(BView *view, int32 frame);
+	void		StartConfig(BView *view);
+	status_t	StartSaver(BView *view, bool preview);
 	
 private:
 	const char *fText;
-	float fX;
-	float fY;
-	float fSizeX;
-	float fSizeY;
-	float fTextHeight;
-	float fTextWith;
-	bool fIsPreview;
+	float		fX;
+	float		fY;
+	float		fSizeX;
+	float		fSizeY;
+	float		fTextHeight;
+	float		fTextWith;
+	bool		fIsPreview;
 };
+
 
 BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image) 
 { 
 	return new ScreenSaver(msg, image);
 } 
 
-ScreenSaver::ScreenSaver(BMessage *archive, image_id id) :
-	BScreenSaver(archive, id),
-	fText("Haiku"),
-	fX(0),
-	fY(0)
+
+ScreenSaver::ScreenSaver(BMessage *archive, image_id id)
+ :	BScreenSaver(archive, id)
+ ,	fText("Haiku")
+ ,	fX(0)
+ ,	fY(0)
 {
 }
+
 
 void 
 ScreenSaver::StartConfig(BView *view) 
 { 
-	view->AddChild(new BStringView(BRect(20,10,200,35), "", "Haiku, by Marcus Overhagen"));
+	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "Haiku, by Marcus Overhagen"));
 } 
+
 
 status_t 
 ScreenSaver::StartSaver(BView *view, bool preview)
@@ -72,7 +76,7 @@ ScreenSaver::StartSaver(BView *view, bool preview)
 	escapement_delta delta;
 	delta.nonspace = 0;
 	delta.space = 0;
-	font.GetBoundingBoxesForStrings(&fText,1,B_SCREEN_METRIC,&delta,&rect);
+	font.GetBoundingBoxesForStrings(&fText, 1, B_SCREEN_METRIC, &delta, &rect);
 	fTextHeight = rect.Height();
 	fTextWith = rect.Width();
 	
@@ -81,6 +85,7 @@ ScreenSaver::StartSaver(BView *view, bool preview)
 	
 	return B_OK;
 }
+
 
 void 
 ScreenSaver::Draw(BView *view, int32 frame)
@@ -91,8 +96,8 @@ ScreenSaver::Draw(BView *view, int32 frame)
 		view->FillRect(view->Bounds(), B_SOLID_LOW); 
 	} else {
 		// erase old text on all other frames
-		view->SetHighColor(0,0,0);
-		view->DrawString(fText,BPoint(fX,fY));
+		view->SetHighColor(0, 0, 0);
+		view->DrawString(fText, BPoint(fX, fY));
 	}
 
 	// find some new text coordinates
@@ -100,10 +105,9 @@ ScreenSaver::Draw(BView *view, int32 frame)
 	fY = rand() % int(fSizeY - fTextHeight - (fIsPreview ? 2 : 20)) + fTextHeight;
 
 	// draw new text
-	view->SetHighColor(0,255,0);
-	view->DrawString(fText,BPoint(fX,fY));
+	view->SetHighColor(0, 255, 0);
+	view->DrawString(fText, BPoint(fX, fY));
 
 	// randomize time until next update (preview mode is faster)
 	SetTickSize(((rand() % 4) + 1) * (fIsPreview ? 300000 : 1000000));
 }
-
