@@ -70,15 +70,15 @@ struct fs_calls {
 
 	status_t (*link)(fs_volume fs, fs_vnode dir, const char *name, fs_vnode vnode);
 	status_t (*unlink)(fs_volume fs, fs_vnode dir, const char *name);
-	status_t (*rename)(fs_volume fs, fs_vnode olddir, const char *oldname, fs_vnode newdir, const char *newname);
+	status_t (*rename)(fs_volume fs, fs_vnode oldDir, const char *oldName, fs_vnode newDir, const char *newName);
 
 	status_t (*access)(fs_volume fs, fs_vnode vnode, int mode);
 	status_t (*read_stat)(fs_volume fs, fs_vnode vnode, struct stat *stat);
 	status_t (*write_stat)(fs_volume fs, fs_vnode vnode, const struct stat *stat, int statMask);
 
 	/* file operations */
-	status_t (*create)(fs_volume fs, fs_vnode dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *_newVnodeID);
-	status_t (*open)(fs_volume fs, fs_vnode v, int oflags, fs_cookie *_cookie);
+	status_t (*create)(fs_volume fs, fs_vnode dir, const char *name, int openMode, int perms, fs_cookie *_cookie, vnode_id *_newVnodeID);
+	status_t (*open)(fs_volume fs, fs_vnode v, int openMode, fs_cookie *_cookie);
 	status_t (*close)(fs_volume fs, fs_vnode v, fs_cookie cookie);
 	status_t (*free_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
 	ssize_t (*read)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, void *buffer, size_t *length);
@@ -102,18 +102,18 @@ struct fs_calls {
 	status_t (*rewind_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
 
 	/* attribute operations */
-	status_t (*create_attr)(fs_volume fs, fs_vnode file, const char *name);
-	status_t (*open_attr)(fs_volume fs, fs_vnode file, const char *name, int oflags, fs_cookie *_cookie, vnode_id *_attrID);
+	status_t (*create_attr)(fs_volume fs, fs_vnode file, const char *name, uint32 type, int openMode, fs_cookie *_cookie);
+	status_t (*open_attr)(fs_volume fs, fs_vnode file, const char *name, int openMode, fs_cookie *_cookie);
 	status_t (*close_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie);
 	status_t (*free_attr_cookie)(fs_volume fs, fs_vnode file, fs_cookie cookie);
-	ssize_t (*read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, void *buffer, off_t pos, size_t *len);
-	ssize_t (*write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, const void *buffer, off_t pos, size_t *len);
+	ssize_t (*read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, void *buffer, size_t *len);
+	ssize_t (*write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, const void *buffer, size_t *len);
 	status_t (*seek_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, int seekType);
 
+	status_t (*read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
+	status_t (*write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, const struct stat *stat, int statMask);
 	status_t (*rename_attr)(fs_volume fs, fs_vnode file, const char *oldName, const char *newName);
 	status_t (*remove_attr)(fs_volume fs, fs_vnode file, const char *name);
-	status_t (*read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
-	status_t (*write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat, int statMask);
 
 	/* index directory & index operations */
 	status_t (*open_index_dir)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);
@@ -127,11 +127,11 @@ struct fs_calls {
 	status_t (*read_index_stat)(fs_volume fs, const char *name, struct stat *stat);
 
 	/* query operations */
-	status_t (*open_query)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);
-	status_t (*close_query)(fs_volume fs, fs_vnode v, fs_cookie cookie);
-	status_t (*free_query_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
-	status_t (*read_query)(fs_volume fs, fs_vnode v, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_query)(fs_volume fs, fs_vnode v, fs_cookie cookie);
+	status_t (*open_query)(fs_volume fs, const char *query, uint32 flags, port_id port, uint32 token, fs_cookie *_cookie);
+	status_t (*close_query)(fs_volume fs, fs_cookie cookie);
+	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
+	status_t (*read_query)(fs_volume fs, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
 };
 
 #ifdef __cplusplus
