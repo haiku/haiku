@@ -60,6 +60,7 @@ public:
 	BPartition *Parent() const;
 	BPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
+	BPartition *FindDescendant(partition_id id) const;
 
 	status_t GetPartitioningInfo(BPartitioningInfo *info) const;
 	
@@ -131,6 +132,8 @@ private:
 	status_t _SetTo(BDiskDevice *device, BPartition *parent,
 					user_partition_data *data);
 	void _Unset();
+
+	bool _IsShadow() const;
 
 	int32 _Level() const;
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);

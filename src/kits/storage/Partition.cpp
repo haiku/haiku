@@ -8,6 +8,7 @@
 #include <Partition.h>
 
 #include <DiskDevice.h>
+#include <DiskDevicePrivate.h>
 #include <DiskDeviceVisitor.h>
 #include <Message.h>
 #include <Volume.h>
@@ -358,6 +359,14 @@ BPartition::CountChildren() const
 	return (fPartitionData ? fPartitionData->child_count : 0);
 }
 
+// FindDescendant
+BPartition *
+BPartition::FindDescendant(partition_id id) const
+{
+	IDFinderVisitor visitor(id);
+	return const_cast<BPartition*>(this)->VisitEachDescendant(&visitor);
+}
+
 // GetPartitioningInfo
 status_t
 BPartition::GetPartitioningInfo(BPartitioningInfo *info) const
@@ -433,6 +442,13 @@ BPartition::_Unset()
 	fDevice = NULL;
 	fParent = NULL;
 	fPartitionData = NULL;
+}
+
+// _IsShadow
+bool
+BPartition::_IsShadow() const
+{
+	return (fPartitionData && fPartitionData->shadow_id >= 0);
 }
 
 // _Level
