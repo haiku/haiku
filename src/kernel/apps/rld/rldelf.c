@@ -98,11 +98,11 @@ struct image_queue_t {
 } image_queue_t;
 
 
-static image_queue_t loaded_images= { 0, 0 };
-static image_queue_t loading_images= { 0, 0 };
-static image_queue_t disposable_images= { 0, 0 };
-static unsigned      loaded_image_count= 0;
-static unsigned      imageid_count= 0;
+static image_queue_t loaded_images = { 0, 0 };
+static image_queue_t loading_images = { 0, 0 };
+static image_queue_t disposable_images = { 0, 0 };
+static unsigned      loaded_image_count = 0;
+static unsigned      imageid_count = 0;
 
 static sem_id rld_sem;
 static struct uspace_prog_args_t const *uspa;
@@ -120,31 +120,29 @@ static struct uspace_prog_args_t const *uspa;
  * This macro is non ISO compliant, but a gcc extension
  */
 #define	FATAL(x,y...) \
-	if(x) { \
+	if (x) { \
 		printf("rld.so: " y); \
 		sys_exit(0); \
 	}
 
 
 
-static
-void
+static void
 enqueue_image(image_queue_t *queue, image_t *img)
 {
-	img->next= 0;
+	img->next = 0;
 
-	img->prev= queue->tail;
-	if(queue->tail) {
+	img->prev = queue->tail;
+	if (queue->tail)
 		queue->tail->next= img;
-	}
-	queue->tail= img;
-	if(!queue->head) {
+
+	queue->tail = img;
+	if (!queue->head)
 		queue->head= img;
-	}
 }
 
-static
-void
+
+static void
 dequeue_image(image_queue_t *queue, image_t *img)
 {
 	if(img->next) {
@@ -163,16 +161,16 @@ dequeue_image(image_queue_t *queue, image_t *img)
 	img->next= 0;
 }
 
-static
-unsigned long
+
+static unsigned long
 elf_hash(const unsigned char *name)
 {
 	unsigned long hash = 0;
 	unsigned long temp;
 
-	while(*name) {
+	while (*name) {
 		hash = (hash << 4) + *name++;
-		if((temp = hash & 0xf0000000)) {
+		if ((temp = hash & 0xf0000000)) {
 			hash ^= temp >> 24;
 		}
 		hash &= ~temp;
@@ -180,78 +178,70 @@ elf_hash(const unsigned char *name)
 	return hash;
 }
 
-static
-image_t *
+
+static image_t *
 find_image(char const *name)
 {
 	image_t *iter;
 
-	iter= loaded_images.head;
-	while(iter) {
-		if(strncmp(iter->name, name, sizeof(iter->name)) == 0) {
+	for (iter = loaded_images.head; iter; iter = iter->next) {
+		if (strncmp(iter->name, name, sizeof(iter->name)) == 0)
 			return iter;
-		}
-		iter= iter->next;
 	}
 
-	iter= loading_images.head;
-	while(iter) {
-		if(strncmp(iter->name, name, sizeof(iter->name)) == 0) {
+	for (iter = loading_images.head; iter; iter = iter->next) {
+		if (strncmp(iter->name, name, sizeof(iter->name)) == 0)
 			return iter;
-		}
-		iter= iter->next;
 	}
 
-	return 0;
+	return NULL;
 }
 
-static
-int
+
+static int
 parse_eheader(struct Elf32_Ehdr *eheader)
 {
-	if(memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_ident[4] != ELFCLASS32)
+	if (eheader->e_ident[4] != ELFCLASS32)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_phoff == 0)
+	if (eheader->e_phoff == 0)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_phentsize < sizeof(struct Elf32_Phdr))
+	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
 		return ERR_INVALID_BINARY;
 
 	return eheader->e_phentsize*eheader->e_phnum;
 }
 
-static
-int
+
+static int
 count_regions(char const *buff, int phnum, int phentsize)
 {
 	int i;
-	int retval;
+	int retval = 0;
 	struct Elf32_Phdr *pheaders;
 
-	retval= 0;
-	for(i= 0; i< phnum; i++) {
-		pheaders= (struct Elf32_Phdr *)(buff+i*phentsize);
+	for (i = 0; i < phnum; i++) {
+		pheaders = (struct Elf32_Phdr *)(buff + i * phentsize);
 
-		switch(pheaders->p_type) {
+		switch (pheaders->p_type) {
 			case PT_NULL:
 				/* NOP header */
 				break;
 			case PT_LOAD:
-				retval+= 1;
-				if(pheaders->p_memsz!= pheaders->p_filesz) {
-					unsigned A= pheaders->p_vaddr+pheaders->p_memsz;
-					unsigned B= pheaders->p_vaddr+pheaders->p_filesz;
+				retval += 1;
+				if (pheaders->p_memsz!= pheaders->p_filesz) {
+					unsigned A = pheaders->p_vaddr + pheaders->p_memsz;
+					unsigned B = pheaders->p_vaddr + pheaders->p_filesz - 1;
 
-					A= PAGE_BASE(A);
-					B= PAGE_BASE(B);
+					A = PAGE_BASE(A);
+					B = PAGE_BASE(B);
 
-					if(A!= B) {
-						retval+= 1;
-					}
+					if (A != B)
+						retval += 1;
 				}
 				break;
 			case PT_DYNAMIC:
@@ -279,43 +269,42 @@ count_regions(char const *buff, int phnum, int phentsize)
 }
 
 
-
 /*
  * create_image() & destroy_image()
  *
  * 	Create and destroy image_t structures. The destroyer makes sure that the
  * 	memory buffers are full of garbage before freeing.
  */
-static
-image_t *
+
+static image_t *
 create_image(char const *name, int num_regions)
 {
 	image_t *retval;
 	size_t   alloc_size;
 
-	alloc_size= sizeof(image_t)+(num_regions-1)*sizeof(elf_region_t);
+	alloc_size = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
 
-	retval= rldalloc(alloc_size);
+	retval = rldalloc(alloc_size);
 
 	memset(retval, 0, alloc_size);
 
 	strlcpy(retval->name, name, sizeof(retval->name));
-	retval->imageid= imageid_count;
-	retval->refcount= 1;
-	retval->num_regions= num_regions;
+	retval->imageid = imageid_count;
+	retval->refcount = 1;
+	retval->num_regions = num_regions;
 
-	imageid_count+= 1;
+	imageid_count += 1;
 
 	return retval;
 }
 
-static
-void
+
+static void
 destroy_image(image_t *image)
 {
 	size_t alloc_size;
 
-	alloc_size= sizeof(image_t)+(image->num_regions-1)*sizeof(elf_region_t);
+	alloc_size = sizeof(image_t) + (image->num_regions - 1) * sizeof(elf_region_t);
 
 	memset(image->needed, 0xa5, sizeof(image->needed[0])*image->num_needed);
 	rldfree(image->needed);
@@ -325,25 +314,23 @@ destroy_image(image_t *image)
 }
 
 
-
-static
-void
+static void
 parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 {
 	int i;
 	int regcount;
 	struct Elf32_Phdr *pheaders;
 
-	regcount= 0;
-	for(i= 0; i< phnum; i++) {
-		pheaders= (struct Elf32_Phdr *)(buff+i*phentsize);
+	regcount = 0;
+	for (i = 0; i < phnum; i++) {
+		pheaders = (struct Elf32_Phdr *)(buff + i * phentsize);
 
-		switch(pheaders->p_type) {
+		switch (pheaders->p_type) {
 			case PT_NULL:
 				/* NOP header */
 				break;
 			case PT_LOAD:
-				if(pheaders->p_memsz== pheaders->p_filesz) {
+				if (pheaders->p_memsz== pheaders->p_filesz) {
 					/*
 					 * everything in one area
 					 */
@@ -363,45 +350,45 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					/*
 					 * may require splitting
 					 */
-					unsigned A= pheaders->p_vaddr+pheaders->p_memsz;
-					unsigned B= pheaders->p_vaddr+pheaders->p_filesz;
+					unsigned A = pheaders->p_vaddr + pheaders->p_memsz;
+					unsigned B = pheaders->p_vaddr + pheaders->p_filesz - 1;
 
-					A= PAGE_BASE(A);
-					B= PAGE_BASE(B);
+					A = PAGE_BASE(A);
+					B = PAGE_BASE(B);
 
-					image->regions[regcount].start  = pheaders->p_vaddr;
-					image->regions[regcount].size   = pheaders->p_filesz;
-					image->regions[regcount].vmstart= _ROUNDOWN(pheaders->p_vaddr, PAGE_SIZE);
+					image->regions[regcount].start = pheaders->p_vaddr;
+					image->regions[regcount].size = pheaders->p_filesz;
+					image->regions[regcount].vmstart = _ROUNDOWN(pheaders->p_vaddr, PAGE_SIZE);
 					image->regions[regcount].vmsize = _ROUNDUP (pheaders->p_filesz + (pheaders->p_vaddr % PAGE_SIZE), PAGE_SIZE);
-					image->regions[regcount].fdstart= pheaders->p_offset;
+					image->regions[regcount].fdstart = pheaders->p_offset;
 					image->regions[regcount].fdsize = pheaders->p_filesz;
-					image->regions[regcount].delta= 0;
-					image->regions[regcount].flags= 0;
-					if(pheaders->p_flags & PF_W) {
+					image->regions[regcount].delta = 0;
+					image->regions[regcount].flags = 0;
+					if (pheaders->p_flags & PF_W) {
 						// this is a writable segment
 						image->regions[regcount].flags|= RFLAG_RW;
 					}
 
-					if(A!= B) {
+					if (A!= B) {
 						/*
 						 * yeah, it requires splitting
 						 */
-						regcount+= 1;
-						image->regions[regcount].start  = pheaders->p_vaddr;
-						image->regions[regcount].size   = pheaders->p_memsz - pheaders->p_filesz;
-						image->regions[regcount].vmstart= image->regions[regcount-1].vmstart + image->regions[regcount-1].vmsize;
+						regcount += 1;
+						image->regions[regcount].start = pheaders->p_vaddr;
+						image->regions[regcount].size = pheaders->p_memsz - pheaders->p_filesz;
+						image->regions[regcount].vmstart = image->regions[regcount-1].vmstart + image->regions[regcount-1].vmsize;
 						image->regions[regcount].vmsize = _ROUNDUP (pheaders->p_memsz + (pheaders->p_vaddr % PAGE_SIZE), PAGE_SIZE) - image->regions[regcount-1].vmsize;
-						image->regions[regcount].fdstart= 0;
+						image->regions[regcount].fdstart = 0;
 						image->regions[regcount].fdsize = 0;
-						image->regions[regcount].delta= 0;
-						image->regions[regcount].flags= RFLAG_ANON;
-						if(pheaders->p_flags & PF_W) {
+						image->regions[regcount].delta = 0;
+						image->regions[regcount].flags = RFLAG_ANON;
+						if (pheaders->p_flags & PF_W) {
 							// this is a writable segment
 							image->regions[regcount].flags|= RFLAG_RW;
 						}
 					}
 				}
-				regcount+= 1;
+				regcount += 1;
 				break;
 			case PT_DYNAMIC:
 				image->dynamic_ptr = pheaders->p_vaddr;
@@ -425,72 +412,64 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 	}
 }
 
-static
-bool
+
+static bool
 assert_dynamic_loadable(image_t *image)
 {
 	unsigned i;
 
-	if(!image->dynamic_ptr) {
+	if (!image->dynamic_ptr)
 		return true;
-	}
 
-	for(i= 0; i< image->num_regions; i++) {
-		if(image->dynamic_ptr>= image->regions[i].start) {
-			if(image->dynamic_ptr< image->regions[i].start+image->regions[i].size) {
-				return true;
-			}
-		}
+	for (i = 0; i < image->num_regions; i++) {
+		if (image->dynamic_ptr >= image->regions[i].start
+			&& image->dynamic_ptr < image->regions[i].start + image->regions[i].size)
+			return true;
 	}
 
 	return false;
 }
 
-static
-bool
+
+static bool
 map_image(int fd, char const *path, image_t *image, bool fixed)
 {
 	unsigned i;
 
 	(void)(fd);
 
-	for(i= 0; i< image->num_regions; i++) {
+	for (i = 0; i < image->num_regions; i++) {
 		char     region_name[256];
 		addr     load_address;
 		unsigned addr_specifier;
 
-		sprintf(
-			region_name,
-			"%s:seg_%d(%s)",
-			path,
-			i,
-			(image->regions[i].flags&RFLAG_RW)?"RW":"RO"
-		);
+		sprintf(region_name, "%s:seg_%d(%s)",
+			path, i, (image->regions[i].flags & RFLAG_RW) ? "RW" : "RO");
 
-		if(image->dynamic_ptr && !fixed) {
+		if (image->dynamic_ptr && !fixed) {
 			/*
 			 * relocatable image... we can afford to place wherever
 			 */
-			if(i== 0) {
+			if (i == 0) {
 				/*
 				 * but only the first segment gets a free ride
 				 */
-				load_address= 0;
-				addr_specifier= REGION_ADDR_ANY_ADDRESS;
+				load_address = 0;
+				addr_specifier = REGION_ADDR_ANY_ADDRESS;
 			} else {
-				load_address= image->regions[i].vmstart + image->regions[i-1].delta;
-				addr_specifier= REGION_ADDR_EXACT_ADDRESS;
+				load_address = image->regions[i].vmstart + image->regions[i-1].delta;
+				addr_specifier = REGION_ADDR_EXACT_ADDRESS;
 			}
 		} else {
 			/*
 			 * not relocatable, put it where it asks or die trying
 			 */
-			load_address= image->regions[i].vmstart;
-			addr_specifier= REGION_ADDR_EXACT_ADDRESS;
+			load_address = image->regions[i].vmstart;
+			addr_specifier = REGION_ADDR_EXACT_ADDRESS;
 		}
 
-		if(image->regions[i].flags & RFLAG_ANON) {
-			image->regions[i].id= sys_vm_create_anonymous_region(
+		if (image->regions[i].flags & RFLAG_ANON) {
+			image->regions[i].id = sys_vm_create_anonymous_region(
 				region_name,
 				(void **)&load_address,
 				addr_specifier,
@@ -499,13 +478,13 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				LOCK_RW
 			);
 
-			if(image->regions[i].id < 0) {
+			if (image->regions[i].id < 0)
 				goto error;
-			}
-			image->regions[i].delta  = load_address - image->regions[i].vmstart;
-			image->regions[i].vmstart= load_address;
+
+			image->regions[i].delta = load_address - image->regions[i].vmstart;
+			image->regions[i].vmstart = load_address;
 		} else {
-			image->regions[i].id= sys_vm_map_file(
+			image->regions[i].id = sys_vm_map_file(
 				region_name,
 				(void **)&load_address,
 				addr_specifier,
@@ -515,25 +494,23 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				path,
 				_ROUNDOWN(image->regions[i].fdstart, PAGE_SIZE)
 			);
-			if(image->regions[i].id < 0) {
+			if (image->regions[i].id < 0)
 				goto error;
-			}
-			image->regions[i].delta  = load_address - image->regions[i].vmstart;
-			image->regions[i].vmstart= load_address;
+
+			image->regions[i].delta = load_address - image->regions[i].vmstart;
+			image->regions[i].vmstart = load_address;
 
 			/*
 			 * handle trailer bits in data segment
 			 */
-			if(image->regions[i].flags & RFLAG_RW) {
+			if (image->regions[i].flags & RFLAG_RW) {
 				unsigned start_clearing;
 				unsigned to_clear;
 
-				start_clearing=
-					image->regions[i].vmstart
+				start_clearing = image->regions[i].vmstart
 					+ PAGE_OFFS(image->regions[i].start)
 					+ image->regions[i].size;
-				to_clear=
-					image->regions[i].vmsize
+				to_clear = image->regions[i].vmsize
 					- PAGE_OFFS(image->regions[i].start)
 					- image->regions[i].size;
 				memset((void*)start_clearing, 0, to_clear);
@@ -541,9 +518,8 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 		}
 	}
 
-	if(image->dynamic_ptr) {
-		image->dynamic_ptr+= image->regions[0].delta;
-	}
+	if (image->dynamic_ptr)
+		image->dynamic_ptr += image->regions[0].delta;
 
 	return true;
 
@@ -551,21 +527,21 @@ error:
 	return false;
 }
 
-static
-void
+
+static void
 unmap_image(image_t *image)
 {
 	unsigned i;
 
-	for(i= 0; i< image->num_regions; i++) {
+	for (i = 0; i < image->num_regions; i++) {
 		sys_vm_delete_region(image->regions[i].id);
 
-		image->regions[i].id= -1;
+		image->regions[i].id = -1;
 	}
 }
 
-static
-bool
+
+static bool
 parse_dynamic_segment(image_t *image)
 {
 	struct Elf32_Dyn *d;
@@ -576,14 +552,13 @@ parse_dynamic_segment(image_t *image)
 	image->strtab = 0;
 
 	d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	if(!d) {
+	if (!d)
 		return true;
-	}
 
-	for(i=0; d[i].d_tag != DT_NULL; i++) {
-		switch(d[i].d_tag) {
+	for (i = 0; d[i].d_tag != DT_NULL; i++) {
+		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				image->num_needed+= 1;
+				image->num_needed += 1;
 				break;
 			case DT_HASH:
 				image->symhash = (unsigned int *)(d[i].d_un.d_ptr + image->regions[0].delta);
@@ -619,108 +594,106 @@ parse_dynamic_segment(image_t *image)
 	}
 
 	// lets make sure we found all the required sections
-	if(!image->symhash || !image->syms || !image->strtab) {
+	if (!image->symhash || !image->syms || !image->strtab)
 		return false;
-	}
 
 	return true;
 }
 
-static
-struct Elf32_Sym *
+
+static struct Elf32_Sym *
 find_symbol_xxx(image_t *img, const char *name)
 {
 	unsigned int hash;
 	unsigned int i;
 
-	if(img->dynamic_ptr) {
-		hash = elf_hash(name) % HASHTABSIZE(img);
-		for(i = HASHBUCKETS(img)[hash]; i != STN_UNDEF; i = HASHCHAINS(img)[i]) {
-			if(img->syms[i].st_shndx!= SHN_UNDEF) {
-				if((ELF32_ST_BIND(img->syms[i].st_info)== STB_GLOBAL) || (ELF32_ST_BIND(img->syms[i].st_info)== STB_WEAK)) {
-					if(!strcmp(SYMNAME(img, &img->syms[i]), name)) {
-						return &img->syms[i];
-					}
-				}
-			}
-		}
+	if (img->dynamic_ptr == NULL)
+		return NULL;
+
+	hash = elf_hash(name) % HASHTABSIZE(img);
+
+	for (i = HASHBUCKETS(img)[hash]; i != STN_UNDEF; i = HASHCHAINS(img)[i]) {
+		if (img->syms[i].st_shndx != SHN_UNDEF
+			&& ((ELF32_ST_BIND(img->syms[i].st_info)== STB_GLOBAL) || (ELF32_ST_BIND(img->syms[i].st_info) == STB_WEAK))
+			&& !strcmp(SYMNAME(img, &img->syms[i]), name))
+			return &img->syms[i];
 	}
 
 	return NULL;
 }
 
-static
-struct Elf32_Sym *
+
+static struct Elf32_Sym *
 find_symbol(image_t **shimg, const char *name)
 {
 	image_t *iter;
 	unsigned int hash;
 	unsigned int i;
 
-	iter= loaded_images.head;
-	while(iter) {
-		if(iter->dynamic_ptr) {
-			hash = elf_hash(name) % HASHTABSIZE(iter);
-			for(i = HASHBUCKETS(iter)[hash]; i != STN_UNDEF; i = HASHCHAINS(iter)[i]) {
-				if(iter->syms[i].st_shndx!= SHN_UNDEF) {
-					if((ELF32_ST_BIND(iter->syms[i].st_info)== STB_GLOBAL) || (ELF32_ST_BIND(iter->syms[i].st_info)== STB_WEAK)) {
-						if(!strcmp(SYMNAME(iter, &iter->syms[i]), name)) {
-							*shimg= iter;
-							return &iter->syms[i];
-						}
-					}
-				}
+	for (iter = loaded_images.head; iter; iter = iter->next) {
+		if (iter->dynamic_ptr == NULL)
+			continue;
+
+		hash = elf_hash(name) % HASHTABSIZE(iter);
+
+		for(i = HASHBUCKETS(iter)[hash]; i != STN_UNDEF; i = HASHCHAINS(iter)[i]) {
+			if (iter->syms[i].st_shndx!= SHN_UNDEF
+				&& ((ELF32_ST_BIND(iter->syms[i].st_info)== STB_GLOBAL) || (ELF32_ST_BIND(iter->syms[i].st_info)== STB_WEAK))
+				&& !strcmp(SYMNAME(iter, &iter->syms[i]), name)) {
+				*shimg = iter;
+				return &iter->syms[i];
 			}
 		}
-
-		iter= iter->next;
 	}
 
 	return NULL;
 }
 
-static
-int
+
+static int
 resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr *sym_addr)
 {
 	struct Elf32_Sym *sym2;
 	char             *symname;
 	image_t          *shimg;
 
-	switch(sym->st_shndx) {
+	switch (sym->st_shndx) {
 		case SHN_UNDEF:
 			// patch the symbol name
 			symname= SYMNAME(image, sym);
 
 			// it's undefined, must be outside this image, try the other image
 			sym2 = find_symbol(&shimg, symname);
-			if(!sym2) {
+			if (!sym2) {
 				printf("elf_resolve_symbol: could not resolve symbol '%s'\n", symname);
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
 
 			// make sure they're the same type
-			if(ELF32_ST_TYPE(sym->st_info)!= STT_NOTYPE) {
-				if(ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
-					printf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", symname);
-					return ERR_ELF_RESOLVING_SYMBOL;
-				}
+			if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
+				&& ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
+				printf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", symname);
+				return ERR_ELF_RESOLVING_SYMBOL;
 			}
 
-			if(ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
+			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL
+				&& ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
 				printf("elf_resolve_symbol: found symbol '%s' but not exported\n", symname);
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
 
 			*sym_addr = sym2->st_value + shimg->regions[0].delta;
 			return B_NO_ERROR;
+
 		case SHN_ABS:
 			*sym_addr = sym->st_value + image->regions[0].delta;
 			return B_NO_ERROR;
+
 		case SHN_COMMON:
 			// XXX finish this
 			printf("elf_resolve_symbol: COMMON symbol, finish me!\n");
 			return ERR_NOT_IMPLEMENTED_YET;
+
 		default:
 			// standard symbol
 			*sym_addr = sym->st_value + image->regions[0].delta;
@@ -732,8 +705,7 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr *sym_addr)
 #include "arch/rldreloc.inc"
 
 
-static
-image_t *
+static image_t *
 load_container(char const *path, char const *name, bool fixed)
 {
 	int      fd;
@@ -792,8 +764,7 @@ load_container(char const *path, char const *name, bool fixed)
 }
 
 
-static
-void
+static void
 load_dependencies(image_t *img)
 {
 	unsigned i;
@@ -811,7 +782,7 @@ load_dependencies(image_t *img)
 	FATAL((!img->needed), "failed to allocate needed struct\n");
 	memset(img->needed, 0, img->num_needed*sizeof(image_t*));
 
-	for(i=0, j= 0; d[i].d_tag != DT_NULL; i++) {
+	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
 		switch(d[i].d_tag) {
 			case DT_NEEDED:
 				needed_offset = d[i].d_un.d_ptr;
@@ -833,8 +804,8 @@ load_dependencies(image_t *img)
 	return;
 }
 
-static
-unsigned
+
+static unsigned
 topological_sort(image_t *img, unsigned slot, image_t **init_list)
 {
 	unsigned i;
@@ -850,56 +821,53 @@ topological_sort(image_t *img, unsigned slot, image_t **init_list)
 	return slot+1;
 }
 
-static
-void
+
+static void
 init_dependencies(image_t *img, bool init_head)
 {
 	unsigned i;
 	unsigned slot;
 	image_t **init_list;
 
-	init_list= rldalloc(loaded_image_count*sizeof(image_t*));
+	init_list = rldalloc(loaded_image_count*sizeof(image_t*));
 	FATAL((!init_list), "memory shortage in init_dependencies()");
 	memset(init_list, 0, loaded_image_count*sizeof(image_t*));
 
-	img->flags|= RFLAG_SORTED; /* make sure we don't visit this one */
-	slot= 0;
-	for(i= 0; i< img->num_needed; i++) {
-		if(!(img->needed[i]->flags & RFLAG_SORTED)) {
-			slot= topological_sort(img->needed[i], slot, init_list);
-		}
+	img->flags |= RFLAG_SORTED; /* make sure we don't visit this one */
+	slot = 0;
+	for (i = 0; i < img->num_needed; i++) {
+		if (!(img->needed[i]->flags & RFLAG_SORTED))
+			slot = topological_sort(img->needed[i], slot, init_list);
 	}
 
-	if(init_head) {
-		init_list[slot]= img;
-		slot+= 1;
+	if (init_head) {
+		init_list[slot] = img;
+		slot += 1;
 	}
 
-	for(i= 0; i< slot; i++) {
-		addr _initf= init_list[i]->entry_point;
-		libinit_f *initf= (libinit_f *)(_initf);
+	for (i = 0; i < slot; i++) {
+		addr _initf = init_list[i]->entry_point;
+		libinit_f *initf = (libinit_f *)(_initf);
 
-		if(initf) {
+		if (initf)
 			initf(init_list[i]->imageid, uspa);
-		}
 	}
 
 	rldfree(init_list);
 }
 
 
-static
-void
+static void
 put_image(image_t *img)
 {
-	img->refcount-= 1;
-	if(img->refcount== 0) {
+	img->refcount -= 1;
+	if (img->refcount == 0) {
 		size_t i;
 
 		dequeue_image(&loaded_images, img);
 		enqueue_image(&disposable_images, img);
 
-		for(i= 0; i< img->num_needed; i++) {
+		for(i = 0; i < img->num_needed; i++) {
 			put_image(img->needed[i]);
 		}
 	}
@@ -917,37 +885,32 @@ put_image(image_t *img)
  *	+ unload_addon()
  *	+ dynamic_symbol()
  */
+
 dynmodule_id
 load_program(char const *path, void **entry)
 {
 	image_t *image;
 	image_t *iter;
 
-
 	image = load_container(path, NEWOS_MAGIC_APPNAME, true);
 
-	iter= loaded_images.head;
-	while(iter) {
+	for (iter = loaded_images.head; iter; iter = iter->next) {
 		load_dependencies(iter);
+	}
 
-		iter= iter->next;
-	};
-
-	iter= loaded_images.head;
-	while(iter) {
+	for (iter = loaded_images.head; iter; iter = iter->next) {
 		bool relocate_success;
 
-		relocate_success= relocate_image(iter);
+		relocate_success = relocate_image(iter);
 		FATAL(!relocate_success, "troubles relocating\n");
-
-		iter= iter->next;
-	};
+	}
 
 	init_dependencies(loaded_images.head, false);
 
-	*entry= (void*)(image->entry_point);
+	*entry = (void*)(image->entry_point);
 	return image->imageid;
 }
+
 
 dynmodule_id
 load_library(char const *path)
@@ -955,36 +918,30 @@ load_library(char const *path)
 	image_t *image;
 	image_t *iter;
 
-
 	image = find_image(path);
-	if(image) {
-		image->refcount+= 1;
+	if (image) {
+		image->refcount += 1;
 		return image->imageid;
 	}
 
 	image = load_container(path, path, false);
 
-	iter= loaded_images.head;
-	while(iter) {
+	for (iter = loaded_images.head; iter; iter = iter->next) {
 		load_dependencies(iter);
+	}
 
-		iter= iter->next;
-	};
-
-	iter= loaded_images.head;
-	while(iter) {
+	for (iter = loaded_images.head; iter; iter = iter->next) {
 		bool relocate_success;
 
-		relocate_success= relocate_image(iter);
+		relocate_success = relocate_image(iter);
 		FATAL(!relocate_success, "troubles relocating\n");
-
-		iter= iter->next;
-	};
+	}
 
 	init_dependencies(image, true);
 
 	return image->imageid;
 }
+
 
 dynmodule_id
 unload_library(dynmodule_id imid)
@@ -995,9 +952,9 @@ unload_library(dynmodule_id imid)
 	/*
 	 * we only check images that have been already initialized
 	 */
-	iter= loaded_images.head;
-	while(iter) {
-		if(iter->imageid== imid) {
+
+	for (iter = loaded_images.head; iter; iter = iter->next) {
+		if (iter->imageid == imid) {
 			/*
 			 * do the unloading
 			 */
@@ -1005,30 +962,22 @@ unload_library(dynmodule_id imid)
 
 			break;
 		}
-
-		iter= iter->next;
 	}
 
-	if(iter) {
-		retval= 0;
-	} else {
-		retval= -1;
-	}
+	retval = iter ? 0 : -1;
 
-	iter= disposable_images.head;
-	while(iter) {
+	while ((iter = disposable_images.head) != NULL) {
 		// call image fini here...
 
 		dequeue_image(&disposable_images, iter);
 		unmap_image(iter);
 
 		destroy_image(iter);
-		iter= disposable_images.head;
 	}
-
 
 	return retval;
 }
+
 
 void *
 dynamic_symbol(dynmodule_id imid, char const *symname)
@@ -1038,29 +987,30 @@ dynamic_symbol(dynmodule_id imid, char const *symname)
 	/*
 	 * we only check images that have been already initialized
 	 */
-	iter= loaded_images.head;
-	while(iter) {
-		if(iter->imageid== imid) {
-			struct Elf32_Sym *sym= find_symbol_xxx(iter, symname);
+	for (iter = loaded_images.head; iter; iter = iter->next) {
+		struct Elf32_Sym *sym;
 
-			if(sym) {
-				return (void*)(sym->st_value + iter->regions[0].delta);
-			}
-		}
+		if (iter->imageid != imid)
+			continue;
 
-		iter= iter->next;
+		sym = find_symbol_xxx(iter, symname);
+		if (sym)
+			return (void*)(sym->st_value + iter->regions[0].delta);
 	}
 
 	return NULL;
 }
 
+
 /*
  * init routine, just get hold of the uspa args
  */
+
 void
 rldelf_init(struct uspace_prog_args_t const *_uspa)
 {
-	uspa= _uspa;
+	uspa = _uspa;
 
-	rld_sem= create_sem(1, "rld_lock\n");
+	rld_sem = create_sem(1, "rld_lock\n");
 }
+
