@@ -19,7 +19,12 @@
 BMediaEventLooper::~BMediaEventLooper()
 {
 	CALLED();
-	// don't call Quit(); here
+
+	// don't call Quit(); here, except if the user was stupid
+	if (fControlThread != -1) {
+		printf("You MUST call BMediaEventLooper::Quit() in your destructor!\n");
+		Quit();
+	}
 }
 
 /* explicit */

@@ -98,7 +98,6 @@ live_node_info::~live_node_info()
 BMediaNode::~BMediaNode()
 {
 	CALLED();
-	
 	// BeBook: UnregisterNode() unregisters a node from the Media Server. It's called automatically 
 	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before 
 	// BeBook: you delete your node instance, depending on your implementation and circumstances.
@@ -503,6 +502,25 @@ BMediaNode::HandleMessage(int32 message,
 {
 	INFO("BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	switch (message) {
+		case NODE_FINAL_RELEASE:
+		{
+			const node_final_release_command *command = static_cast<const node_final_release_command *>(data);
+			// This is called by the media server to delete the object
+			// after is has been released by all nodes that are using it.
+			// We forward the function to the BMediaRoster, since the
+			// deletion must be done from a different thread, or the
+			// outermost destructor that will exit the thread that is
+			// reading messages from the port (this thread contex) will
+			// quit, and ~BMediaNode destructor won't be called ever.
+
+			TRACE("BMediaNode::HandleMessage NODE_FINAL_RELEASE, this %p\n", this);
+			BMessage msg(NODE_FINAL_RELEASE);
+			msg.AddPointer("node", this);
+			BMediaRoster::Roster()->PostMessage(&msg);
+			
+			return B_OK;
+		}
+	
 		case NODE_START:
 		{
 			const node_start_command *command = static_cast<const node_start_command *>(data);
@@ -736,7 +754,7 @@ BMediaNode::ApplyChangeTag(int32 previously_reserved)
 BMediaNode::DeleteHook(BMediaNode *node)
 {
 	CALLED();
-	delete this; // delete "this" or "node" ???
+	delete this; // delete "this" or "node", both are the same
 	return B_OK;
 }
 

@@ -417,11 +417,18 @@ BMediaRoster::ReleaseNode(const media_node & node)
 
 	server_release_node_request request;
 	server_release_node_reply reply;
+	status_t rv;
 	
 	request.node = node;
 	request.team = team;
 	
-	return QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply, sizeof(reply));
+	printf("BMediaRoster::ReleaseNode, node %ld, port %ld, team %ld\n", node.node, node.port, team);
+	
+	rv = QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::ReleaseNode FAILED, node %ld, port %ld, team %ld!\n", node.node, node.port, team);
+	}
+	return rv;
 }
 
 BTimeSource *
@@ -1312,6 +1319,7 @@ BMediaRoster::StopWatching(const BMessenger & where,
 status_t 
 BMediaRoster::RegisterNode(BMediaNode * node)
 {
+	printf("BMediaRoster::RegisterNode %p\n", node);
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
@@ -1392,6 +1400,7 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 status_t 
 BMediaRoster::UnregisterNode(BMediaNode * node)
 {
+	printf("BMediaRoster::UnregisterNode %p\n", node);
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
@@ -1422,7 +1431,11 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 	}
 	
 	if (reply.addon_id != -1) {
-		_DormantNodeManager->PutAddon(reply.addon_id);
+		// XXX This is a real big problem!
+		// XXX UnregisterNode is called by a dormant node itself, but UnregisterNode will
+		// XXX unload the dormant node image from memory when calling PutAddon
+//		_DormantNodeManager->PutAddon(reply.addon_id);
+
 		// XXX do "possible_count" increment in the server.
 	}
 
@@ -1660,6 +1673,9 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, m
 	// should be handled by RegisterNode() and UnregisterNode() now
 
 	*out_node = node->Node();
+
+	printf("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id %ld instanciated as node %ld, port %ld in team %ld\n", addonid, flavorid, out_node->node, out_node->port, team);
+
 	return B_OK;
 }
 
@@ -1716,12 +1732,14 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_GLOBAL, but dormant node has B_FLAVOR_IS_LOCAL\n");
 		return B_BAD_VALUE;
 	}
-
+#if 0
 	// If either the node, or the caller requested to make the instance global
 	// we will do it by forwarding this request into the media_addon_server, which
 	// in turn will call BMediaRosterEx::InstantiateDormantNode to create the node
 	// there and make it globally available.
 	if ((node_info.flavor_flags & B_FLAVOR_IS_GLOBAL) || (flags & B_FLAVOR_IS_GLOBAL)) {
+
+		printf("BMediaRoster::InstantiateDormantNode: creating global object in media_addon_server\n");
 
 		addonserver_instantiate_dormant_node_request request;
 		addonserver_instantiate_dormant_node_reply reply;
@@ -1740,6 +1758,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	
 		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
 	}
+#endif
+	return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
 }
 
 									 
@@ -2087,14 +2107,34 @@ BMediaRoster::MediaFlags(media_flags cap,
 /* virtual */ void 
 BMediaRoster::MessageReceived(BMessage * message)
 {
-	// media_server plays ping-pong with the BMediaRosters
-	// to detect dead teams. Normal communication uses ports.
-	static BMessage pong('PONG');
-	if (message->what == 'PING') {
-		message->SendReply(&pong, static_cast<BHandler *>(NULL), 2000000);
-		return;
-	}
+	switch (message->what) {
+		case 'PING':
+		{
+			// media_server plays ping-pong with the BMediaRosters
+			// to detect dead teams. Normal communication uses ports.
+			static BMessage pong('PONG');
+			message->SendReply(&pong, static_cast<BHandler *>(NULL), 2000000);
+			return;
+		}
 
+		case NODE_FINAL_RELEASE:
+		{
+			// this function is called by a BMediaNode to delete
+			// itself, as this needs to be done from another thread
+			// context, it is done here.
+			// XXX If a node is released using BMediaRoster::ReleaseNode()
+			// XXX instead of using BMediaNode::Release() / BMediaNode::Acquire()
+			// XXX fRefCount of the BMediaNode will not be correct.
+
+			BMediaNode *node;
+			message->FindPointer("node", reinterpret_cast<void **>(&node));
+
+			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing node %p\n", node);
+
+			node->DeleteHook(node); // we don't call Release(), see above!
+			return;
+		}
+	}
 	printf("BMediaRoster::MessageReceived: unknown message!\n");
 	message->PrintToStream();
 }

@@ -68,6 +68,7 @@ public:
 	status_t GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node);
 	status_t IncrementGlobalRefCount(media_node_id nodeid, team_id team);
 	status_t DecrementGlobalRefCount(media_node_id nodeid, team_id team);
+	void FinalReleaseNode(media_node_id nodeid);
 
 	/* Add media_node_id of all live nodes to the message
 	 * int32 "media_node_id" (multiple items)
@@ -95,8 +96,8 @@ public:
 	void CleanupTeam(team_id team);
 	
 private:
-	media_addon_id nextaddonid;
-	media_node_id nextnodeid;
+	media_addon_id fNextAddOnID;
+	media_node_id fNextNodeID;
 	
 	BLocker *fLocker;
 	List<dormant_flavor_info> *fDormantFlavorList;

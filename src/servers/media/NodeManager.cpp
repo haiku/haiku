@@ -17,14 +17,14 @@
 const char *get_node_type(node_type t);
 
 NodeManager::NodeManager() :
-	nextaddonid(1),
-	nextnodeid(1)
+	fNextAddOnID(1),
+	fNextNodeID(1),
+	fLocker(new BLocker("node manager locker")),
+	fDormantFlavorList(new List<dormant_flavor_info>),
+	fAddonPathMap(new Map<media_addon_id, entry_ref>),
+	fRegisteredNodeMap(new Map<media_node_id, registered_node>),
+	fDefaultManager(new DefaultManager)
 {
-	fLocker = new BLocker("node manager locker");
-	fDormantFlavorList = new List<dormant_flavor_info>;
-	fAddonPathMap = new Map<media_addon_id, entry_ref>;
-	fRegisteredNodeMap = new Map<media_node_id, registered_node>;
-	fDefaultManager = new DefaultManager;
 }
 
 
@@ -44,7 +44,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	BAutolock lock(fLocker);
 	bool b;
 	registered_node rn;
-	rn.nodeid = nextnodeid;
+	rn.nodeid = fNextNodeID;
 	rn.addon_id = addon_id;
 	rn.addon_flavor_id = addon_flavor_id;
 	strcpy(rn.name, name);
@@ -54,10 +54,10 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	rn.globalrefcount = 1;
 	rn.teamrefcount.Insert(team, 1);
 	
-	b = fRegisteredNodeMap->Insert(nextnodeid, rn);
+	b = fRegisteredNodeMap->Insert(fNextNodeID, rn);
 	ASSERT(b);
-	*nodeid = nextnodeid;
-	nextnodeid += 1;
+	*nodeid = fNextNodeID;
+	fNextNodeID += 1;
 	TRACE("NodeManager::RegisterNode: node %ld, addon_id %ld, flavor_id %ld, name \"%s\", kinds %#Lx, port %ld, team %ld\n", *nodeid, addon_id, addon_flavor_id, name, kinds, port, team);
 	return B_OK;
 }
@@ -145,8 +145,38 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 		ASSERT(b);
 	}
 	rn->globalrefcount -= 1;
+	
+	if (rn->globalrefcount == 0) {
+		printf("NodeManager::DecrementGlobalRefCount: detected released node is now unused, node %ld\n", nodeid);
+		FinalReleaseNode(nodeid);
+	}
+	
 	TRACE("NodeManager::DecrementGlobalRefCount leave: node %ld, team %ld, count %ld, globalcount %ld\n", nodeid, team, debug_count, rn->globalrefcount);
 	return B_OK;
+}
+
+
+void
+NodeManager::FinalReleaseNode(media_node_id nodeid)
+{
+	BAutolock lock(fLocker);
+	registered_node *rn;
+	bool b;
+	status_t rv;
+
+	TRACE("NodeManager::FinalReleaseNode enter: node %ld\n", nodeid);
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
+	if (!b) {
+		FATAL("NodeManager::FinalReleaseNode: Error: node %ld not found\n", nodeid);
+		return;
+	}
+
+	node_final_release_command cmd;
+	rv = SendToPort(rn->port, NODE_FINAL_RELEASE, &cmd, sizeof(cmd));
+	if (rv != B_OK) {
+		FATAL("NodeManager::FinalReleaseNode: Error: can't send command to node %ld\n", nodeid);
+		return;
+	}
 }
 
 
@@ -445,8 +475,8 @@ NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 {
 	BAutolock lock(fLocker);
 	media_addon_id id;
-	id = nextaddonid;
-	nextaddonid += 1;
+	id = fNextAddOnID;
+	fNextAddOnID += 1;
 	
 	printf("NodeManager::RegisterAddon: ref-name \"%s\", assigning id %ld\n", ref.name, id);
 	

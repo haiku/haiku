@@ -108,6 +108,7 @@ enum {
 	NODE_PREROLL,
 	NODE_SET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
+	NODE_FINAL_RELEASE,
 	
 	NODE_MESSAGE_END,
 	CONSUMER_MESSAGE_START = 0x300,
@@ -876,6 +877,10 @@ struct node_time_warp_command : public command_data
 struct node_set_timesource_command : public command_data
 {
 	media_node_id timesource_id;
+};
+
+struct node_final_release_command : public command_data
+{
 };
 
 struct timesource_add_slave_node_command : public command_data

@@ -222,9 +222,11 @@ void AppManager::Dump()
 	BAutolock lock(fLocker);
 	printf("\n");
 	printf("AppManager: list of applications follows:\n");
-	App *app;	
+	App *app;
+	app_info info;
 	for (fAppMap->Rewind(); fAppMap->GetNext(&app); ) {
-		printf(" team %ld, messenger %svalid\n", app->team, app->messenger.IsValid() ? "" : "NOT ");
+		be_roster->GetRunningAppInfo(app->team, &info);
+		printf(" team %ld \"%s\", messenger %svalid\n", app->team, info.ref.name, app->messenger.IsValid() ? "" : "NOT ");
 	}
 	printf("AppManager: list end\n");
 }
