@@ -89,6 +89,7 @@ protected:
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect);
+	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	void HLine(int32 x1, int32 x2, int32 y, RGBColor color);
