@@ -49,9 +49,9 @@ public:
 		// systems.
 
 	status_t ValidateResize(BPartition *partition, off_t *size) const;
-	status_t ValidateResizeChild(BPartition *partition, off_t *size) const;
+	status_t ValidateResizeChild(BPartition *child, off_t *size) const;
 	status_t ValidateMove(BPartition *partition, off_t *start) const;
-	status_t ValidateMoveChild(BPartition *partition, off_t *start) const;
+	status_t ValidateMoveChild(BPartition *child, off_t *start) const;
 	status_t ValidateSetName(BPartition *partition, char *name) const;
 	status_t ValidateSetContentName(BPartition *partition, char *name) const;
 	status_t ValidateSetType(BPartition *partition, const char *type) const;

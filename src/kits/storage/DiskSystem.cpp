@@ -191,56 +191,97 @@ BDiskSystem::SupportsInitializingChild(BPartition *child,
 status_t
 BDiskSystem::ValidateResize(BPartition *partition, off_t *size) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!size || !partition || !partition->_IsShadow()
+		|| partition->_DiskSystem() != fID) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_resize_partition(fID, partition->_ShadowID(), size);
 }
 
 // ValidateResizeChild
 status_t
-BDiskSystem::ValidateResizeChild(BPartition *partition, off_t *size) const
+BDiskSystem::ValidateResizeChild(BPartition *child, off_t *size) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!size || !child || !child->_IsShadow() || !child->Parent()
+		|| child->Parent()->_DiskSystem() != fID || !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_resize_child_partition(fID, child->_ShadowID(),
+												 size);
 }
 
 // ValidateMove
 status_t
 BDiskSystem::ValidateMove(BPartition *partition, off_t *start) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!start || !partition || !partition->_IsShadow()
+		|| partition->_DiskSystem() != fID) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_move_partition(fID, partition->_ShadowID(), start);
 }
 
 // ValidateMoveChild
 status_t
-BDiskSystem::ValidateMoveChild(BPartition *partition, off_t *start) const
+BDiskSystem::ValidateMoveChild(BPartition *child, off_t *start) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!start || !child || !child->_IsShadow() || !child->Parent()
+		|| child->Parent()->_DiskSystem() != fID || !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_move_child_partition(fID, child->_ShadowID(), start);
 }
 
 // ValidateSetName
 status_t
 BDiskSystem::ValidateSetName(BPartition *partition, char *name) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!name || !partition || !partition->_IsShadow() || !partition->Parent()
+		|| partition->Parent()->_DiskSystem() != fID
+		|| !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_set_partition_name(fID, partition->_ShadowID(),
+											 name);
 }
 
 // ValidateSetContentName
 status_t
 BDiskSystem::ValidateSetContentName(BPartition *partition, char *name) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!name || !partition || !partition->_IsShadow()
+		|| partition->_DiskSystem() != fID) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_set_partition_content_name(fID,
+				partition->_ShadowID(), name);
 }
 
 // ValidateSetType
 status_t
 BDiskSystem::ValidateSetType(BPartition *partition, const char *type) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!type || !partition || !partition->_IsShadow() || !partition->Parent()
+		|| partition->Parent()->_DiskSystem() != fID
+		|| !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_set_partition_type(fID, partition->_ShadowID(),
+											 type);
 }
 
 // ValidateCreateChild
@@ -249,8 +290,15 @@ BDiskSystem::ValidateCreateChild(BPartition *partition, off_t *start,
 								 off_t *size, const char *type,
 								 const char *parameters) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+// parameter may be NULL
+	if (!start || !size || !type || !partition || !partition->_IsShadow()
+		|| partition->_DiskSystem() != fID || !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_create_child_partition(fID, partition->_ShadowID(),
+				start, size, type, parameters);
 }
 
 // GetNextSupportedType
@@ -258,16 +306,26 @@ status_t
 BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
 								  char *type) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!cookie || !type || !partition || !partition->_IsShadow()
+		|| !partition->Parent() || partition->Parent()->_DiskSystem() != fID
+		|| !IsPartitioningSystem()) {
+		return B_BAD_VALUE;
+	}
+	return _kern_get_next_supported_partition_type(fID, partition->_ShadowID(),
+												   cookie, type);
 }
 
 // GetTypeForContentType
 status_t
 BDiskSystem::GetTypeForContentType(const char *contentType, char *type) const
 {
-	// not implemented
-	return B_ERROR;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (!contentType || !type || !IsPartitioningSystem())
+		return B_BAD_VALUE;
+	return _kern_get_partition_type_for_content_type(fID, contentType, type);
 }
 
 // IsPartitioningSystem
@@ -288,8 +346,9 @@ BDiskSystem::IsFileSystem() const
 bool
 BDiskSystem::IsSubSystemFor(BPartition *parent) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& parent && parent->_IsShadow()
+			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID()));
 }
 
 // _SetTo
