@@ -1,6 +1,7 @@
 APP_KIT_SOURCE =
 	Application.cpp
 	AppMisc.cpp
+	AppServerLink.cpp
 	Cursor.cpp
 	Clipboard.cpp
 	Handler.cpp
