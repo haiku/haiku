@@ -41,7 +41,7 @@ status_t
 Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
               uint32 flags, uint32 blockSize)
 {
-	DEBUG_INIT();
+	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS);
 	if (!deviceName)
 		RETURN_ERROR(B_BAD_VALUE);
 	if (_InitStatus() == B_INITIALIZED)
@@ -95,13 +95,13 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 status_t
 Volume::_Identify()
 {
-	DEBUG_INIT();
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
 	
 	status_t err = _InitStatus() == B_DEVICE_INITIALIZED ? B_OK : B_BAD_VALUE;
 
 	// Check for a valid volume recognition sequence
 	if (!err)
-		err = _WalkVolumeRecognitionSequence();	
+		err = _WalkVolumeRecognitionSequence();
 	
 	// Now hunt down a volume descriptor sequence from one of
 	// the anchor volume pointers (if there are any).
@@ -126,7 +126,7 @@ Volume::_Identify()
 status_t
 Volume::_WalkVolumeRecognitionSequence()
 {
-	DEBUG_INIT();
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
 	// should be one block long. We're expecting to find 0 or more iso9660
 	// vsd's followed by some ECMA-167 vsd's.
@@ -189,7 +189,7 @@ Volume::_WalkVolumeRecognitionSequence()
 status_t
 Volume::_WalkVolumeDescriptorSequence(off_t start)
 {
-	DEBUG_INIT();
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
 	
 	RETURN(B_ERROR);
 }
