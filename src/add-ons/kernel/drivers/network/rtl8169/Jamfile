@@ -1,0 +1,49 @@
+SubDir OBOS_TOP src add-ons kernel drivers network rtl8169 ;
+
+# set some additional flags
+SubDirCcFlags -Wall ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+R5KernelAddon rtl8169 : kernel drivers bin :
+	driver.c
+	device.c
+	util.c
+	;
+
+# Package openbeos-rtl8169-cvs :
+#	rtl8169 : 
+#	boot home config add-ons kernel drivers bin ;
+# Package openbeos-rtl8169-cvs :
+#	<kernel!drivers!dev!net>rtl8169 :
+#	boot home config add-ons kernel drivers dev net ;
+
+Package openbeos-networkingkit-cvs :
+	rtl8169 :
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-networkingkit-cvs :
+	<kernel!drivers!dev!net>rtl8169 :
+	boot home config add-ons kernel drivers dev net ;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>rtl8169 ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : rtl8169 ;
+}
+
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	rtl8169 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>rtl8169 : 
+	installed-symlink 
+;
+

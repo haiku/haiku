@@ -15,9 +15,9 @@
 #else
 
 // Public includes
-//#include <OS.h>
 #include <drivers/Drivers.h>
 #include <drivers/KernelExport.h>
+#include <driver_settings.h>
 
 // Posix includes
 #include <malloc.h>
@@ -26,6 +26,7 @@
 
 // Private includes
 #include <net_stack_driver.h>
+// #include <PPPControl.h>		// for NET_STACK_CONTROL_NET_MODULE PPP support...
 #include <userland_ipc.h>
 #include <sys/sockio.h>
 
@@ -681,6 +682,10 @@ set_command_areas(net_command *command)
 			get_area_from_address(&command->area[2], args->u.sysctl.oldp);
 			get_area_from_address(&command->area[3], args->u.sysctl.oldlenp);
 			get_area_from_address(&command->area[4], args->u.sysctl.newp);
+			break;
+
+		case NET_STACK_CONTROL_NET_MODULE:
+			// TODO!
 			break;
 
 		case OSIOCGIFCONF:

@@ -17,6 +17,8 @@ extern pci_info *gDevList[];
 
 static int32 gOpenMask = 0;
 
+extern void print_address(void *addr);
+
 static status_t
 wb840_open(const char *name, uint32 flags, void** cookie)
 {

@@ -1,0 +1,54 @@
+SubDir OBOS_TOP src add-ons kernel drivers network via-rhine ;
+
+# set some additional flags
+SubDirCcFlags -Wall ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+R5KernelAddon via-rhine : kernel drivers bin :
+	entry.c
+	hook.c
+	cmd.c
+	mdio.c
+	pci.c
+	res.c
+	ring.c
+	util.c
+	;
+
+# Package openbeos-via-rhine-cvs :
+# 	via-rhine : 
+# 	boot home config add-ons kernel drivers bin ;
+# Package openbeos-via-rhine-cvs :
+# 	<kernel!drivers!dev!net>via-rhine :
+#	boot home config add-ons kernel drivers dev net ;
+
+Package openbeos-networkingkit-cvs :
+	via-rhine :
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-networkingkit-cvs :
+	<kernel!drivers!dev!net>via-rhine :
+	boot home config add-ons kernel drivers dev net ;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>via-rhine ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : via-rhine ;
+}
+
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	via-rhine 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>via-rhine : 
+	installed-symlink 
+;
+

@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src add-ons kernel drivers network ;
 
+SubInclude OBOS_TOP src add-ons kernel drivers network stack ;
 SubInclude OBOS_TOP src add-ons kernel drivers network rtl8139 ;
 SubInclude OBOS_TOP src add-ons kernel drivers network sis900 ;
 SubInclude OBOS_TOP src add-ons kernel drivers network wb840 ;
-SubInclude OBOS_TOP src add-ons kernel drivers network stack ;
+SubInclude OBOS_TOP src add-ons kernel drivers network via-rhine ;
+SubInclude OBOS_TOP src add-ons kernel drivers network rtl8169 ;
+# SubInclude OBOS_TOP src add-ons kernel drivers network ipro1000 ;
