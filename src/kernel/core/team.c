@@ -598,11 +598,11 @@ team_id
 team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
 	struct team *team, *parent;
+	const char *threadName;
 	thread_id tid;
 	team_id pid;
 	int err;
-	unsigned int state;
-//	int sem_retcode;
+	cpu_status state;
 	struct team_arg *teamArgs;
 
 	TRACE(("team_create_team: entry '%s', name '%s' args = %p argc = %d\n",
@@ -643,7 +643,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
 	if (!team->io_context) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err3;
 	}
 
@@ -655,8 +655,15 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	}
 	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
+	// cut the path from the main thread name
+	threadName = strrchr(name, '/');
+	if (threadName != NULL)
+		threadName++;
+	else
+		threadName = name;
+
 	// create a kernel thread, but under the context of the new team
-	tid = spawn_kernel_thread_etc(team_create_team2, name, B_NORMAL_PRIORITY, teamArgs, team->id);
+	tid = spawn_kernel_thread_etc(team_create_team2, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
 	if (tid < 0) {
 		err = tid;
 		goto err5;
