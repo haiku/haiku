@@ -6,6 +6,9 @@ Test:
 
 * Bezier curve rendering
 
+* other color spaces (currently uses BBitmap::ImportBits(),
+	which is only available on Haiku)
+
 
 
 Implement:
