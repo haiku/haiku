@@ -26,4 +26,4 @@ ResourceUsageView::ResourceUsageView (BRect frame) : BView (frame, "ResourceUsag
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 // ------------------------------------------------------------------------------------------------- //
------------------------ //
+
