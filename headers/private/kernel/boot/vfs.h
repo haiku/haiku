@@ -51,6 +51,7 @@ class Directory : public Node {
 
 		virtual Node *Lookup(const char *name, bool traverseLinks) = 0;
 
+		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize) = 0;
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
 		virtual status_t Rewind(void *cookie) = 0;
 
