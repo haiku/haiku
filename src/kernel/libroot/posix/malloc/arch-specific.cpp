@@ -28,13 +28,16 @@
 
 using namespace BPrivate;
 
+// How many iterations we spin waiting for a lock.
+enum { SPIN_LIMIT = 50 };
+
+// The values of a user-level lock.
+enum { UNLOCKED = 0, LOCKED = 1 };
 
 struct free_chunk {
 	free_chunk	*next;
 	size_t		size;
 };
-
-typedef DoublyLinkedList<hoardLockType> LockList;
 
 
 static const size_t kInitialHeapSize = 50 * B_PAGE_SIZE;
@@ -46,20 +49,14 @@ static void *sHeapBase;
 static addr_t sFreeHeapBase;
 static size_t sFreeHeapSize, sHeapAreaSize;
 static free_chunk *sFreeChunks;
-static LockList sLockList;
-
-static void initialize_hoard_lock(hoardLockType &lock, const char *name);
-static void reinitialize_hoard_lock(hoardLockType &lock);
 
 
 static void
-init_after_fork()
+init_after_fork(void)
 {
-	// re-initialize all locks
-	for (LockList::Iterator it = sLockList.GetIterator(); it.HasNext();) {
-		hoardLockType *lock = it.Next();
-		reinitialize_hoard_lock(*lock);
-	}
+	sHeapLock = create_sem(1, "heap");
+	if (sHeapLock < B_OK)
+		exit(1);
 
 	// find the heap area
 	sHeapArea = area_for(sHeapBase);
@@ -86,20 +83,14 @@ __init_heap(void)
 
 	sHeapArea = create_area("heap", (void **)&sHeapBase, B_BASE_ADDRESS,
 		sHeapAreaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (sHeapArea < B_OK)
+		return sHeapArea;
+
 	sFreeHeapBase = (addr_t)sHeapBase;
 
-	// init the lock list, and the heap lock
-	// Thereafter all locks should be initialized with hoardLockInit(). They
-	// will be properly re-initialized after a fork(). Note, that also the
-	// heap lock is initialized with hoardLockInit() -- this works fine
-	// and has the advantage, that it is in the lock list itself and we won't
-	// need any special handling on fork().
-	new (&sLockList) LockList;
-
-	hoardLockInit(sHeapLock, "heap");
-
-	if (sHeapArea < 0)
-		return sHeapArea;
+	sHeapLock = create_sem(1, "heap");
+	if (sHeapLock < B_OK)
+		return sHeapLock;
 
 	atfork(&init_after_fork);
 		// Note: Needs malloc(). Hence we need to be fully initialized.
@@ -109,31 +100,6 @@ __init_heap(void)
 		// inconsistent state.
 
 	return B_OK;
-}
-
-
-static void
-initialize_hoard_lock(hoardLockType &lock, const char *name)
-{
-	lock.ben = 0;
-	lock.sem = create_sem(0, name);
-	if (lock.sem < 0) {
-		debug_printf("hoard: initialize_hoard_lock(): Failed to create "
-			"semaphore");
-	}
-}
-
-
-static void
-reinitialize_hoard_lock(hoardLockType &lock)
-{
-	// Get an info for the original semaphore, so we can name it just the same.
-	// This can fail e.g. in case the original team is already gone.
-	sem_info info;
-	if (get_sem_info(lock.sem, &info) == B_OK)
-		initialize_hoard_lock(lock, info.name);
-	else
-		initialize_hoard_lock(lock, "reinitialized hoard lock");
 }
 
 
@@ -147,7 +113,12 @@ hoardSbrk(long size)
 	// align size request
 	size = (size + hoardHeap::ALIGNMENT - 1) & ~(hoardHeap::ALIGNMENT - 1);
 
-	hoardLock(sHeapLock);
+	status_t status;
+	do {
+		status = acquire_sem(sHeapLock);
+	} while (status == B_INTERRUPTED);
+	if (status < B_OK)
+		return NULL;
 
 	// find chunk in free list
 	free_chunk *chunk = sFreeChunks, *last = NULL;
@@ -172,8 +143,7 @@ hoardSbrk(long size)
 		else
 			sFreeChunks = chunk;
 
-		hoardUnlock(sHeapLock);
-
+		release_sem(sHeapLock);
 		return address;
 	}
 
@@ -188,7 +158,7 @@ hoardSbrk(long size)
 	if (pageSize < sHeapAreaSize) {
 		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n", find_thread(NULL), size));
 		// the area is large enough already
-		hoardUnlock(sHeapLock);
+		release_sem(sHeapLock);
 		return (void *)(sFreeHeapBase + oldHeapSize);
 	}
 
@@ -199,14 +169,13 @@ hoardSbrk(long size)
 
 	if (resize_area(sHeapArea, pageSize) < B_OK) {
 		// out of memory - ToDo: as a fall back, we could try to allocate another area
-		hoardUnlock(sHeapLock);
+		release_sem(sHeapLock);
 		return NULL;
 	}
 
 	sHeapAreaSize = pageSize;
 
-	hoardUnlock(sHeapLock);
-
+	release_sem(sHeapLock);
 	return (void *)(sFreeHeapBase + oldHeapSize);
 }
 
@@ -221,37 +190,45 @@ hoardUnsbrk(void *ptr, long size)
 void
 hoardLockInit(hoardLockType &lock, const char *name)
 {
-	new (&lock) hoardLockType;
-		// init's the list link
-
-	initialize_hoard_lock(lock, name);
-
-	// add the lock to the lock list (the heap lock also protects the lock list)
-	hoardLock(sHeapLock);
-	sLockList.Add(&lock);
-	hoardUnlock(sHeapLock);
+	lock = UNLOCKED;
 }
 
 
 void
 hoardLock(hoardLockType &lock)
 {
-	if (atomic_add(&(lock.ben), 1) >= 1)
-		acquire_sem(lock.sem);
+	// A yielding lock (with an initial spin).
+	while (true) {
+		int32 i = 0;
+		while (i < SPIN_LIMIT) {
+			if (atomic_test_and_set(&lock, LOCKED, UNLOCKED) == UNLOCKED) {
+				// We got the lock.
+				return;
+			}
+			i++;
+		}
+
+		// The lock is still being held by someone else.
+		// Give up our quantum.
+		hoardYield();
+	}
 }
 
 
 void
 hoardUnlock(hoardLockType &lock)
 {
-	if (atomic_add(&(lock.ben), -1) > 1)
-		release_sem(lock.sem);
+	atomic_set(&lock, UNLOCKED);
 }
 
 
 void
 hoardYield(void)
 {
+	// A thread's quantum is definitely larger than this, so this is
+	// an expensive yield function.
+	// ToDo: we should have a real one in the kernel
+	snooze(5);
 }
 
 }	// namespace BPrivate

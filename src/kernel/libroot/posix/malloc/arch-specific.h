@@ -27,16 +27,8 @@
 #include <OS.h>
 #include <assert.h>
 
-#include <util/DoublyLinkedList.h>
 
-
-// Note: Since we're currently locks are never uninitialized, a singly linked
-// list would suffice. But we may change that some day, and the singly linked
-// list interface is ugly, anyway. ;-)
-struct hoardLockType : DoublyLinkedListLinkImpl<hoardLockType> {
-	int32	ben;
-	sem_id	sem;
-};
+typedef int32 hoardLockType;
 
 namespace BPrivate {
 
