@@ -195,8 +195,9 @@ status_t BMessageBody::Rename(const char* old_entry, const char* new_entry)
 	{
 		return B_NAME_NOT_FOUND;
 	}
-	fData.erase(new_entry);
-	fData[new_entry] = i->second;
+	BMessageField* BMF = i->second;
+	RemoveName(new_entry);
+	fData[new_entry] = BMF;
 	fData.erase(old_entry);
 
 	return B_OK;
