@@ -31,11 +31,11 @@
 #define NVCFG_CFG_14	0x6c //unknown if used
 #define NVCFG_CFG_15	0x70 //unknown if used
 #define NVCFG_CFG_16	0x74 //unknown if used
-#define NVCFG_CFG_17	0x78 //unknown if used
-#define NVCFG_CFG_18	0x7c //unknown if used
-#define NVCFG_CFG_19	0x80 //unknown if used
-#define NVCFG_CFG_20	0x84 //unknown if used
-#define NVCFG_CFG_21	0x88 //unknown if used
+#define NVCFG_PCIEREF	0x78
+#define NVCFG_PCIEDCAP	0x7c
+#define NVCFG_PCIEDCTST	0x80
+#define NVCFG_PCIELCAP	0x84
+#define NVCFG_PCIELCTST	0x88
 #define NVCFG_CFG_22	0x8c //unknown if used
 #define NVCFG_CFG_23	0x90 //unknown if used
 #define NVCFG_CFG_24	0x94 //unknown if used
