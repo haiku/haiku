@@ -88,18 +88,20 @@ class AutoLocker {
 private:
 	typedef AutoLocker<Lockable, Locking>	ThisClass;
 public:
-	inline AutoLocker(Lockable *lockable)
+	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false)
 		: fLockable(lockable),
-		  fLocked(false)
+		  fLocked(fLockable && alreadyLocked)
 	{
-		_Lock();
+		if (!fLocked)
+			_Lock();
 	}
 
-	inline AutoLocker(Lockable &lockable)
+	inline AutoLocker(Lockable &lockable, bool alreadyLocked = false)
 		: fLockable(&lockable),
-		  fLocked(false)
+		  fLocked(fLockable && alreadyLocked)
 	{
-		_Lock();
+		if (!fLocked)
+			_Lock();
 	}
 
 	inline ~AutoLocker()
@@ -149,12 +151,32 @@ private:
 // instantiations
 class KDiskDevice;
 class KDiskDeviceManager;
+class KPartition;
 
 typedef AutoLocker<KDiskDevice, AutoLockerReadLocking<KDiskDevice> >
 		DeviceReadLocker;
 typedef AutoLocker<KDiskDevice, AutoLockerWriteLocking<KDiskDevice> >
 		DeviceWriteLocker;
 typedef AutoLocker<KDiskDeviceManager > ManagerLocker;
+
+// AutoLockerPartitionRegistration
+template<const int dummy = 0>
+class AutoLockerPartitionRegistration {
+public:
+	inline bool Lock(KPartition *partition)
+	{
+		partition->Register();
+		return true;
+	}
+
+	inline void Unlock(KPartition *partition)
+	{
+		partition->Unregister();
+	}
+};
+
+typedef AutoLocker<KPartition, AutoLockerPartitionRegistration<> >
+	PartitionRegistrar;
 
 } // namespace DiskDevice
 } // namespace BPrivate
