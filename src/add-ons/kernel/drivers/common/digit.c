@@ -11,10 +11,11 @@
 /
 *******************************************************************************/
 
-#include <ktypes.h>
+#include <KernelExport.h>
 #include <Drivers.h>
 #include <debug.h>
-#include <memheap.h>
+
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -27,9 +28,13 @@
 
 /*********************************/
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
+
 struct digit_state {
 	uchar value;
 };
+
 
 static status_t
 digit_open(const char *name, uint32 mode, void **cookie)
@@ -40,7 +45,7 @@ digit_open(const char *name, uint32 mode, void **cookie)
 
 	DPRINTF(("open\n"));
 
-	s = (struct digit_state*) kmalloc(sizeof(*s));
+	s = (struct digit_state *)malloc(sizeof(*s));
 	if (!s)
 		return ENOMEM;
 
@@ -48,8 +53,9 @@ digit_open(const char *name, uint32 mode, void **cookie)
 
 	*cookie = s;
 
-	return 0;
+	return B_OK;
 }
+
 
 static status_t
 digit_close(void *cookie)
@@ -58,18 +64,20 @@ digit_close(void *cookie)
 
 	TOUCH(cookie);
 
-	return 0;
+	return B_OK;
 }
+
 
 static status_t
 digit_free(void *cookie)
 {
 	DPRINTF(("free\n"));
 
-	kfree(cookie);
+	free(cookie);
 
 	return 0;
 }
+
 
 static status_t
 digit_ioctl(void *cookie, uint32 op, void *data, size_t len)
@@ -82,13 +90,14 @@ digit_ioctl(void *cookie, uint32 op, void *data, size_t len)
 		struct digit_state *s = (struct digit_state *)cookie;
 		s->value = *(uchar *)data;
 		DPRINTF(("Set digit to %2.2x\n", s->value));
-		return 0;
+		return B_OK;
 	}
 
 	return ENOSYS;
 }
 
-static ssize_t
+
+static status_t
 digit_read(void *cookie, off_t pos, void *buffer, size_t *len)
 {
 	struct digit_state *s = (struct digit_state *)cookie;
@@ -104,10 +113,11 @@ digit_read(void *cookie, off_t pos, void *buffer, size_t *len)
 	if (*len)
 		memset(buffer, s->value, *len);
 
-	return 0;
+	return B_OK;
 }
 
-static ssize_t
+
+static status_t
 digit_write(void *cookie, off_t pos, const void *buffer, size_t *len)
 {
 	struct digit_state *s = (struct digit_state *)cookie;
@@ -118,18 +128,21 @@ digit_write(void *cookie, off_t pos, const void *buffer, size_t *len)
 
 	DPRINTF(("write: set digit to %2.2x\n", s->value));
 
-	return 0;
+	return B_OK;
 }
 
 /***************************/
 
-status_t init_hardware()
+status_t
+init_hardware()
 {
 	DPRINTF(("Do you digit?\n"));
-	return 0;
+	return B_OK;
 }
 
-const char **publish_devices(void)
+
+const char **
+publish_devices(void)
 {
 	static const char *devices[] = {
 		DEVICE_NAME, NULL
@@ -138,7 +151,9 @@ const char **publish_devices(void)
 	return devices;
 }
 
-device_hooks *find_device(const char *name)
+
+device_hooks *
+find_device(const char *name)
 {
 	static device_hooks hooks = {
 		&digit_open,
@@ -162,11 +177,15 @@ device_hooks *find_device(const char *name)
 	return NULL;
 }
 
-status_t init_driver()
+
+status_t
+init_driver()
 {
-	return 0;
+	return B_OK;
 }
 
-void uninit_driver()
+
+void
+uninit_driver()
 {
 }

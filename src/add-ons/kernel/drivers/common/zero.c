@@ -10,26 +10,28 @@
 
 #define DEVICE_NAME "zero"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 
 static status_t
 zero_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 zero_close(void *cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 zero_freecookie(void *cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -40,20 +42,20 @@ zero_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 }
 
 
-static ssize_t
+static status_t
 zero_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	if (user_memset(buffer, 0, *_length) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return 0;
+	return B_OK;
 }
 
 
-static ssize_t
+static status_t
 zero_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -63,7 +65,7 @@ zero_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 status_t
 init_hardware()
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -108,7 +110,7 @@ find_device(const char *name)
 status_t
 init_driver()
 {
-	return 0;
+	return B_OK;
 }
 
 

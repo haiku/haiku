@@ -13,8 +13,10 @@
 
 #include "config_driver.h"
 
-
 #define DEVICE_NAME "misc/config"
+
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 struct config_manager_for_driver_module_info *gConfigManager;
 
 
@@ -87,17 +89,19 @@ config_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 }
 
 
-static ssize_t
-config_read(void * cookie, off_t pos, void *buf, size_t *len)
+static status_t
+config_read(void * cookie, off_t pos, void *buf, size_t *_length)
 {
-	return 0;
+	*_length = 0;
+	return B_OK;
 }
 
 
-static ssize_t
-config_write(void * cookie, off_t pos, const void *buf, size_t *len)
+static status_t
+config_write(void * cookie, off_t pos, const void *buf, size_t *_length)
 {
-	return 0;
+	*_length = 0;
+	return B_OK;
 }
 
 

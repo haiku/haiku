@@ -9,26 +9,28 @@
 
 #define DEVICE_NAME "null"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 
 static status_t
 null_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 null_close(void *cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 null_freecookie(void *cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -39,17 +41,17 @@ null_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 }
 
 
-static ssize_t
+static status_t
 null_read(void *cookie, off_t pos, void *buffer, size_t *length)
 {
-	return 0;
+	return B_OK;
 }
 
 
-static ssize_t
+static status_t
 null_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -59,7 +61,7 @@ null_write(void * cookie, off_t pos, const void *buf, size_t *len)
 status_t
 init_hardware()
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -104,7 +106,7 @@ find_device(const char *name)
 status_t
 init_driver(void)
 {
-	return 0;
+	return B_OK;
 }
 
 
