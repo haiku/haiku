@@ -2304,6 +2304,8 @@ static void detect_panels()
 		si->ps.p1_timing.flags = 0;
 		if (DACR(FP_TG_CTRL) & 0x00000001) si->ps.p1_timing.flags |= B_POSITIVE_VSYNC;
 		if (DACR(FP_TG_CTRL) & 0x00000010) si->ps.p1_timing.flags |= B_POSITIVE_HSYNC;
+		/* display enable polarity (not an official flag) */
+		if (DACR(FP_TG_CTRL) & 0x10000000) si->ps.p1_timing.flags |= B_BLANK_PEDESTAL;
 		/* refreshrate:
 		 * fix a DVI or laptop flatpanel to 60Hz refresh! */
 		si->ps.p1_timing.pixel_clock =
@@ -2326,6 +2328,8 @@ static void detect_panels()
 		si->ps.p2_timing.flags = 0;
 		if (DAC2R(FP_TG_CTRL) & 0x00000001) si->ps.p2_timing.flags |= B_POSITIVE_VSYNC;
 		if (DAC2R(FP_TG_CTRL) & 0x00000010) si->ps.p2_timing.flags |= B_POSITIVE_HSYNC;
+		/* display enable polarity (not an official flag) */
+		if (DAC2R(FP_TG_CTRL) & 0x10000000) si->ps.p2_timing.flags |= B_BLANK_PEDESTAL;
 		/* refreshrate:
 		 * fix a DVI or laptop flatpanel to 60Hz refresh! */
 		si->ps.p2_timing.pixel_clock =

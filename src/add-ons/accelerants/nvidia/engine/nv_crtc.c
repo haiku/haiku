@@ -484,49 +484,61 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 	/* start synchronous reset: required before turning screen off! */
 	SEQW(RESET, 0x01);
 
-	/* turn screen off */
 	temp = SEQR(CLKMODE);
 	if (display)
 	{
+		/* turn screen on */
 		SEQW(CLKMODE, (temp & ~0x20));
 
-		/* end synchronous reset if display should be enabled */
+		/* end synchronous reset because display should be enabled */
 		SEQW(RESET, 0x03);
 
-		//'safe mode' test! feedback needed with this 'setting'!
-		if (0)//si->ps.tmds1_active)
+		if (si->ps.tmds1_active)
 		{
+			/* restore original panelsync and panel-enable */
+			uint32 panelsync = 0x00000000;
+			if(si->ps.p1_timing.flags & B_POSITIVE_VSYNC) panelsync |= 0x00000001;
+			if(si->ps.p1_timing.flags & B_POSITIVE_HSYNC) panelsync |= 0x00000010;
+			/* display enable polarity (not an official flag) */
+			if(si->ps.p1_timing.flags & B_BLANK_PEDESTAL) panelsync |= 0x10000000;
+			DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | panelsync));
+
+			//fixme?: looks like we don't need this after all:
 			/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
 			/* note:
 			 * the powerbits in this register are hardwired to the DVI connectors,
 			 * instead of to the DACs! (confirmed NV34) */
 			//fixme...
-			DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
+			//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
 			/* ... and powerup external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */
-			CRTCW(0x59, (CRTCR(0x59) | 0x01));
+			//CRTCW(0x59, (CRTCR(0x59) | 0x01));
 		}
 
 		LOG(4,("display on, "));
 	}
 	else
 	{
+		/* turn screen off */
 		SEQW(CLKMODE, (temp | 0x20));
 
-		//'safe mode' test! feedback needed with this 'setting'!
-		if (0)//si->ps.tmds1_active)
+		if (si->ps.tmds1_active)
 		{
+			/* shutoff panelsync and disable panel */
+			DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | 0x20000022));
+
+			//fixme?: looks like we don't need this after all:
 			/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
 			/* note:
 			 * the powerbits in this register are hardwired to the DVI connectors,
 			 * instead of to the DACs! (confirmed NV34) */
 			//fixme...
-			DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
+			//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
 			/* ... and powerdown external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */
-			CRTCW(0x59, (CRTCR(0x59) & 0xfe));
+			//CRTCW(0x59, (CRTCR(0x59) & 0xfe));
 		}
 
 		LOG(4,("display off, "));
