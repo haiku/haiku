@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 #include <fs_device.h>
+#include <fs_info.h>
 #include <KernelExport.h>
 #include <disk_scanner/fs.h>
 
@@ -219,6 +220,7 @@ iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 
 					if (priority)
 						*priority = 0;
+					partitionInfo->file_system_flags = B_FS_IS_PERSISTENT;
 					result = true;
 					break;
 				}

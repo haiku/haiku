@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <fs_device.h>
+#include <fs_info.h>
 #include <KernelExport.h>
 #include <disk_scanner/fs.h>
 
@@ -207,6 +208,8 @@ bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 					strcpy(partitionInfo->volume_name, superBlock->name);
 				if (priority)
 					*priority = 0;
+				partitionInfo->file_system_flags = B_FS_IS_PERSISTENT
+					| B_FS_HAS_ATTR | B_FS_HAS_MIME | B_FS_HAS_QUERY;
 				result = true;
 			}
 			free(buffer);
