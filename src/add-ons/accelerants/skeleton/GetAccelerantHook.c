@@ -70,9 +70,9 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		HOOK(SET_DPMS_MODE);
 
 		/* cursor managment */
-//		HRDC(SET_CURSOR_SHAPE);
-//		HRDC(MOVE_CURSOR);
-//		HRDC(SHOW_CURSOR);
+		HRDC(SET_CURSOR_SHAPE);
+		HRDC(MOVE_CURSOR);
+		HRDC(SHOW_CURSOR);
 
 		/* synchronization */
 		HOOK(ACCELERANT_ENGINE_COUNT);

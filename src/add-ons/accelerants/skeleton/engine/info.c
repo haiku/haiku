@@ -2068,7 +2068,7 @@ void fake_panel_start(void)
 	LOG(8,("INFO: faking panel startup\n"));
 
 	/* find out the BIOS preprogrammed panel use status... */
-	detect_panels();
+//	detect_panels();
 
 	/* determine and setup output devices and heads */
 	setup_output_matrix();

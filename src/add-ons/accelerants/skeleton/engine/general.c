@@ -80,7 +80,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku-OS skeleton Accelerant 0.00 running.\n"));
+	LOG(1,("POWERUP: Haiku-OS skeleton Accelerant 0.01 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -88,8 +88,8 @@ status_t eng_general_powerup()
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
-	/* Vendor Nvidia */
-	case 0x000010de: /* non-existing card */
+	/* Vendor Via */
+	case 0x31221106: /*  */
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
 		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
@@ -311,7 +311,7 @@ static status_t engxx_general_powerup()
 	}
 
 	/* get RAM size and fake panel startup (panel init code is still missing) */
-//	fake_panel_start();
+	fake_panel_start();
 
 	/* log the final card specifications */
 	dump_pins();
