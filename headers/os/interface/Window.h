@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Window.h
-//	Author:			Adrian Oanca (e2joseph@hotpop.com)
+//	Author:			Adrian Oanca (adioanca@mymail.ro)
 //	Description:	BWindow is the base class for all windows (graphic areas
 //					displayed on-screen).
 //
@@ -358,7 +358,6 @@ virtual	void		task_looper();							// thread function - it's here where app_serv
 		BMessage	*extract_drop(BMessage* an_event, BHandler* *target);
 		//void		movesize(uint32 opcode, float h, float v);
 		
-		BMessage* 	ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT);
 		//int32		MessagesWaiting();
 
 		void		handle_activate(BMessage* an_event);
@@ -370,7 +369,7 @@ virtual	void		task_looper();							// thread function - it's here where app_serv
 		//void		do_key_up(BMessage* an_event, BHandler* handler);
 		void		do_menu_event(BMessage* an_event);
 		//void		do_draw_views();
-virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function - it converts PortLink messages into BMessages
+virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		//_cmd_key_	*allocShortcut(uint32 key, uint32 modifiers);
 		//_cmd_key_	*FindShortcut(uint32 key, uint32 modifiers);
 		void		AddShortcut(uint32 key,										// !!! - and menu shortcuts to list when a menu is added
