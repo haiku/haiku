@@ -4,12 +4,16 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head 0.23, (Rudolf)</h1></p>
+<ul>
+	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver.
+</ul>
 <p><h1>nv_driver 0.22, (Rudolf)</h1></p>
 <ul>
 	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of unaccelerated graphics.
 	<ul>
  	<li>Tested Quake 2 in software rendering mode over here using timedemo1 with demo1.dm2: framerates jumped up to 140% of the 'original' in  AGP2.0 4X mode!
-	<li>Also tested video playback using bitmap output mode: CPU load drops considerably depending on desktop colordepth and resolution of the video played back.<br>
+	<li>Also tested video playback using bitmap output mode: CPU load drops considerably depending on desktop colordepth and size of the video output window.<br>
 	<li>2D acceleration will not speedup because it's working 'local', so within the graphics cards engine and it's RAM only.
 	</ul>
 <strong>Note please:</strong><br>

@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-5/2004
+	Rudolf Cornelissen 9/2002-7/2004
 */
 
 #define MODULE_BIT 0x00400000
@@ -355,10 +355,10 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	if (si->settings.hardcursor) pointer_reservation = 2048;
 	/* memory requirement for frame buffer */
 	if ((row_bytes * target->virtual_height) >
-		((si->ps.memory_size * 1024 * 1024) - pointer_reservation))
+		(si->ps.memory_size - pointer_reservation))
 	{
 		target->virtual_height = 
-			((si->ps.memory_size * 1024 * 1024) - pointer_reservation) / row_bytes;
+			(si->ps.memory_size - pointer_reservation) / row_bytes;
 	}
 	if (target->virtual_height < target->timing.v_display) 
 	{
@@ -425,7 +425,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-			if ((((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+			if (((si->ps.memory_size - pointer_reservation) >=
 					(row_bytes * target->virtual_height)) &&
 			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
 			{
@@ -433,14 +433,14 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			}
 			break;
 		case DUALHEAD_CLONE:
-			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+			if ((si->ps.memory_size - pointer_reservation) >=
 					(row_bytes * target->virtual_height))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
 			}
 			break;
 		case DUALHEAD_OFF:
-			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+			if ((si->ps.memory_size - pointer_reservation) >=
 					(row_bytes * target->virtual_height * 2))
 			{
 				target->flags |= DUALHEAD_CAPABLE;

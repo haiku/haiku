@@ -271,7 +271,7 @@ typedef struct {
 		bool tvout;
 		bool primary_dvi;
 		bool secondary_dvi;
-		uint32 memory_size;			/* memory (Mb) */
+		uint32 memory_size;			/* memory (in bytes) */
 	} ps;
 
 	/* mirror of the ROM (copied in driver, because may not be mapped permanently) */

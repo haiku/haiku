@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-12/2003.
+   Rudolf Cornelissen 8/2003-7/2004.
 
    This code was possible thanks to the Linux NV driver.
 */
@@ -314,25 +314,25 @@ status_t nv_acc_init()
 	ACCW(BBASE1, 0x00000000);
 	ACCW(BBASE2, 0x00000000);
 	ACCW(BBASE3, 0x00000000);
-	ACCW(BLIMIT0, ((si->ps.memory_size << 20) - 1));
-	ACCW(BLIMIT1, ((si->ps.memory_size << 20) - 1));
-	ACCW(BLIMIT2, ((si->ps.memory_size << 20) - 1));
-	ACCW(BLIMIT3, ((si->ps.memory_size << 20) - 1));
+	ACCW(BLIMIT0, (si->ps.memory_size - 1));
+	ACCW(BLIMIT1, (si->ps.memory_size - 1));
+	ACCW(BLIMIT2, (si->ps.memory_size - 1));
+	ACCW(BLIMIT3, (si->ps.memory_size - 1));
 	if (si->ps.card_arch >= NV10A)
 	{
 		ACCW(NV10_BBASE4, 0x00000000);
 		ACCW(NV10_BBASE5, 0x00000000);
-		ACCW(NV10_BLIMIT4, ((si->ps.memory_size << 20) - 1));
-		ACCW(NV10_BLIMIT5, ((si->ps.memory_size << 20) - 1));
+		ACCW(NV10_BLIMIT4, (si->ps.memory_size - 1));
+		ACCW(NV10_BLIMIT5, (si->ps.memory_size - 1));
 	}
 	if (si->ps.card_arch >= NV20A)
 	{
 		/* fixme(?): assuming more BLIMIT registers here: Then how about BBASE6-9?
 		 * (linux fixed value 'BLIMIT6-9' 0x01ffffff) */
-		ACCW(NV20_BLIMIT6, ((si->ps.memory_size << 20) - 1));
-		ACCW(NV20_BLIMIT7, ((si->ps.memory_size << 20) - 1));
-		ACCW(NV20_BLIMIT8, ((si->ps.memory_size << 20) - 1));
-		ACCW(NV20_BLIMIT9, ((si->ps.memory_size << 20) - 1));
+		ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
+		ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
+		ACCW(NV20_BLIMIT8, (si->ps.memory_size - 1));
+		ACCW(NV20_BLIMIT9, (si->ps.memory_size - 1));
 	}
 
 	/* disable all acceleration engine INT reguests */

@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-6/2004 */
+/* Written by Rudolf Cornelissen 05/2002-7/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -409,7 +409,7 @@ status_t nv_bes_init()
 		/* shut off GeForce4MX MPEG2 decoder */
 		BESW(DEC_GENCTRL, 0x00000000);
 		/* setup BES memory-range mask */
-		BESW(NV10_0MEMMASK, ((si->ps.memory_size << 20) - 1));
+		BESW(NV10_0MEMMASK, (si->ps.memory_size - 1));
 		/* unknown, but needed */
 		BESW(NV10_0OFFSET, 0x00000000);
 

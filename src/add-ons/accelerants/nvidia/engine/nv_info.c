@@ -232,6 +232,13 @@ void fake_pins(void)
 		break;
 	}
 
+	/* override memory detection if requested by user */
+	if (si->settings.memory != 0)
+	{
+		LOG(2,("INFO: forcing memory size (specified in settings file)\n"));
+		si->ps.memory_size = si->settings.memory * 1024 * 1024;
+	}
+
 	/* find out if the card has a tvout chip */
 	si->ps.tvout = false;
 	si->ps.tvout_chip_type = NONE;
@@ -1006,7 +1013,7 @@ static void getstrap_arch_nv4(void)
 	if (strapinfo & 0x00000100)
 	{
 		/* Unified memory architecture used */
-		si->ps.memory_size =
+		si->ps.memory_size = 1024 * 1024 *
 			((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
 
 		LOG(8,("INFO: NV4 architecture chip with UMA detected\n"));
@@ -1017,16 +1024,16 @@ static void getstrap_arch_nv4(void)
 		switch (strapinfo & 0x00000003)
 		{
 		case 0:
-			si->ps.memory_size = 32;
+			si->ps.memory_size = 32 * 1024 * 1024;
 			break;
 		case 1:
-			si->ps.memory_size = 4;
+			si->ps.memory_size = 4 * 1024 * 1024;
 			break;
 		case 2:
-			si->ps.memory_size = 8;
+			si->ps.memory_size = 8 * 1024 * 1024;
 			break;
 		case 3:
-			si->ps.memory_size = 16;
+			si->ps.memory_size = 16 * 1024 * 1024;
 			break;
 		}
 	}
@@ -1062,31 +1069,31 @@ static void getstrap_arch_nv10_20_30(void)
 		switch ((strapinfo & 0x1ff00000) >> 20)
 		{
 		case 2:
-			si->ps.memory_size = 2;
+			si->ps.memory_size = 2 * 1024 * 1024;
 			break;
 		case 4:
-			si->ps.memory_size = 4;
+			si->ps.memory_size = 4 * 1024 * 1024;
 			break;
 		case 8:
-			si->ps.memory_size = 8;
+			si->ps.memory_size = 8 * 1024 * 1024;
 			break;
 		case 16:
-			si->ps.memory_size = 16;
+			si->ps.memory_size = 16 * 1024 * 1024;
 			break;
 		case 32:
-			si->ps.memory_size = 32;
+			si->ps.memory_size = 32 * 1024 * 1024;
 			break;
 		case 64:
-			si->ps.memory_size = 64;
+			si->ps.memory_size = 64 * 1024 * 1024;
 			break;
 		case 128:
-			si->ps.memory_size = 128;
+			si->ps.memory_size = 128 * 1024 * 1024;
 			break;
 		case 256:
-			si->ps.memory_size = 256;
+			si->ps.memory_size = 256 * 1024 * 1024;
 			break;
 		default:
-			si->ps.memory_size = 16;
+			si->ps.memory_size = 16 * 1024 * 1024;
 
 			LOG(8,("INFO: NV10/20/30 architecture chip with unknown RAM amount detected;\n"));
 			LOG(8,("INFO: Setting 16Mb\n"));
@@ -1238,7 +1245,7 @@ void dump_pins(void)
 //	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
 //	LOG(2,("secondary_dvi: "));
 //	if (si->ps.secondary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
-	LOG(2,("card memory_size: %dMb\n", si->ps.memory_size));
+	LOG(2,("card memory_size: %3.3fMb\n", (si->ps.memory_size / (1024.0 * 1024.0))));
 	LOG(2,("laptop: "));
 	if (si->ps.laptop) LOG(2,("yes\n")); else LOG(2,("no\n"));
 	if (si->ps.tmds1_active)

@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.22 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.23 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -595,10 +595,6 @@ status_t nv_general_powerup()
 		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
 		return B_ERROR;
 	}
-
-	/* override memory detection if requested by user */
-	if (si->settings.memory != 0)
-		si->ps.memory_size = si->settings.memory;
 
 	return status;
 }

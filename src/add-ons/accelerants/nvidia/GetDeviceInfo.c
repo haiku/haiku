@@ -80,7 +80,7 @@ status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi)
 		break;
 	}
 	sprintf(adi->serial_no, "unknown");
-	adi->memory = si->ps.memory_size * 1024 * 1024;
+	adi->memory = si->ps.memory_size;
 	adi->dac_speed = si->ps.max_dac1_clock;
 
 	return B_OK;

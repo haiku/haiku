@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-6/2004 */
+/* Written by Rudolf Cornelissen 05/2002-7/2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -80,7 +80,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 	LOG(4,("Overlay: cardRAM_start = $%08x\n",(uint32)((uint8*)si->framebuffer)));
 	LOG(4,("Overlay: cardRAM_start_DMA = $%08x\n",(uint32)((uint8*)si->framebuffer_pci)));
-	LOG(4,("Overlay: cardRAM_size = %dMb\n",si->ps.memory_size));
+	LOG(4,("Overlay: cardRAM_size = %3.3fMb\n",(si->ps.memory_size / (1024.0 * 1024.0))));
 
 	/* find first empty slot (room for another buffer?) */
 	for (offset = 0; offset < MAXBUFFERS; offset++)
@@ -204,7 +204,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		 * If you switch now to settings: 1600x1200x32bit (single head) the app needs to fallback to
 		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
 
-		adress = (((uint32)((uint8*)si->framebuffer)) + (si->ps.memory_size * 1024 * 1024));
+		adress = (((uint32)((uint8*)si->framebuffer)) + si->ps.memory_size);
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;
@@ -288,7 +288,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		si->overlay.myBuffer[offset].buffer = (void *) adress;
 
 		/* calculate physical memory adress (for dma use) */
-		adress = (((uint32)((uint8*)si->framebuffer_pci)) + (si->ps.memory_size * 1024 * 1024));
+		adress = (((uint32)((uint8*)si->framebuffer_pci)) + si->ps.memory_size);
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;

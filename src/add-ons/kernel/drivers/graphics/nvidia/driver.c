@@ -789,13 +789,17 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	{
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x7C */
-		si->ps.memory_size =
-			((((*pci_bus->read_pci_config)(0, 0, 1, 0x7c, 4)) & 0x000007c0) >> 6) + 1;
+		si->ps.memory_size = 1024 * 1024 *
+			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x7c, 4)) & 0x000007c0) >> 6) + 1);
+		/* last 64kB RAM is used for the BIOS (or something else?) */
+		si->ps.memory_size -= (64 * 1024);
 		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x84 */
-		si->ps.memory_size =
-			((((*pci_bus->read_pci_config)(0, 0, 1, 0x84, 4)) & 0x000007f0) >> 4) + 1;
+		si->ps.memory_size = 1024 * 1024 *
+			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x84, 4)) & 0x000007f0) >> 4) + 1);
+		/* last 64kB RAM is used for the BIOS (or something else?) */
+		si->ps.memory_size -= (64 * 1024);
 		break;
 	default:
 		/* all other cards have own RAM: the amount of which is determined in the
