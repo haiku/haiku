@@ -524,6 +524,39 @@ main()
 		printf("  pretty name: `%s'\n", diskSystem.PrettyName());
 		printf("  file system: %d (!%d)\n", diskSystem.IsFileSystem(),
 			   diskSystem.IsPartitioningSystem());
+		// flags
+		printf("  flags:\n");
+		bool mounted = false;
+		bool supports = diskSystem.SupportsDefragmenting(&mounted);
+		printf("    defragmenting:          %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsRepairing(true, &mounted);
+		printf("    checking:               %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsRepairing(false, &mounted);
+		printf("    repairing:              %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsResizing(&mounted);
+		printf("    resizing:               %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsResizingChild();
+		printf("    resizing child:         %d\n", supports);
+		supports = diskSystem.SupportsMoving(&mounted);
+		printf("    moving:                 %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsMovingChild();
+		printf("    moving child:           %d\n", supports);
+		supports = diskSystem.SupportsSettingName();
+		printf("    setting name:           %d\n", supports);
+		supports = diskSystem.SupportsSettingContentName(&mounted);
+		printf("    setting content name:   %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsSettingType();
+		printf("    setting type:           %d\n", supports);
+		supports = diskSystem.SupportsSettingParameters();
+		printf("    setting params:         %d\n", supports);
+		supports = diskSystem.SupportsSettingContentParameters(&mounted);
+		printf("    setting content params: %d (%d)\n", supports, mounted);
+		supports = diskSystem.SupportsCreatingChild();
+		printf("    creating child:         %d\n", supports);
+		supports = diskSystem.SupportsDeletingChild();
+		printf("    deleting child:         %d\n", supports);
+		supports = diskSystem.SupportsInitializing();
+		printf("    initializing:           %d\n", supports);
 	}
 	// get the file device
 	BDiskDevice device;
