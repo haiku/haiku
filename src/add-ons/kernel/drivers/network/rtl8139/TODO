@@ -1,4 +1,4 @@
 - A major code cleanup
-- make sure all packets are received
 - Confirm to the Opentracker coding guidelines
 - Implement the free_hook
+- Support other card types

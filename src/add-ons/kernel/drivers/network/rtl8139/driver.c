@@ -423,14 +423,14 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	m_pcimodule->write_io_32( data->reg_base + TSAD0 , (int32)data->transmitbufferphy[0] );
 	data->transmitbuffer[1] = data->transmitbuffer[0];
 	data->transmitbufferlog[1] = data->transmitbufferlog[0] + 2048;
-	data->transmitbufferphy[1] = data->transmitbufferlog[0] + 2048;
+	data->transmitbufferphy[1] = data->transmitbufferphy[0] + 2048;
 	m_pcimodule->write_io_32( data->reg_base + TSAD1 , (int32)data->transmitbufferphy[1] );
 	
 	data->transmitbuffer[2] = alloc_mem( &(data->transmitbufferlog[2]) , &(data->transmitbufferphy[2]) , 4096 , "txbuffer23" );
 	m_pcimodule->write_io_32( data->reg_base + TSAD2 , (int32)data->transmitbufferphy[2] );
 	data->transmitbuffer[3] = data->transmitbuffer[2];
 	data->transmitbufferlog[3] = data->transmitbufferlog[2] + 2048;
-	data->transmitbufferphy[3] = data->transmitbufferlog[2] + 2048;
+	data->transmitbufferphy[3] = data->transmitbufferphy[2] + 2048;
 	m_pcimodule->write_io_32( data->reg_base + TSAD3 , (int32)data->transmitbufferphy[3] );
 	
 	if( data->transmitbuffer[0] == B_ERROR || data->transmitbuffer[2] == B_ERROR )
