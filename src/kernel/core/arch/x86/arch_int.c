@@ -90,7 +90,8 @@ dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
 
 void arch_int_disable_io_interrupt(int irq)
 {
-	if (irq < 0 || irq >= 0x10)
+	/* never disable slave pic line IRQ 2 */
+	if (irq < 0 || irq >= 0x10 || irq == 2)
 		return;
 	/* if this is a external interrupt via 8239, disable it here */
 	if (irq < 8)
@@ -268,7 +269,7 @@ int arch_int_init(kernel_args *ka)
 	out8(0x02, 0xa1);	// Set #2 to be the slave.
 	out8(0x01, 0x21);	// Set both to operate in 8086 mode.
 	out8(0x01, 0xa1);
-	out8(0xfb, 0x21);	// Mask off all interrupts (except slave pic line).
+	out8(0xfb, 0x21);	// Mask off all interrupts (except slave pic line IRQ 2).
 	out8(0xff, 0xa1); 	// Mask off interrupts on the slave.
 
 	set_intr_gate(0,  &trap0);
