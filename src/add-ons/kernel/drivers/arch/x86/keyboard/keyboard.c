@@ -3,16 +3,14 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
-#include <debug.h>
-#include <memheap.h>
-#include <int.h>
+
+#include <KernelExport.h>
+#include <Drivers.h>
 #include <OS.h>
+#include <drivers/ISA.h>
+
 #include <string.h>
 #include <lock.h>
-#include <devfs.h>
-#include <arch/cpu.h>
-#include <Errors.h>
 
 #define DEVICE_NAME "keyboard"
 
@@ -54,6 +52,7 @@ static sem_id keyboard_sem;
 static mutex keyboard_read_mutex;
 static char keyboard_buf[1024];
 static unsigned int head, tail;
+static isa_module_info *gISA;
 
 // stolen from nujeffos
 const char unshifted_keymap[128] = {
@@ -93,7 +92,7 @@ const char caps_keymap[128] = {
 static void
 wait_for_output(void)
 {
-	while (in8(0x64) & 0x2)
+	while (gISA->read_io_8(0x64) & 0x2)
 		;
 }
 
@@ -102,9 +101,9 @@ static void
 set_leds(void)
 {
 	wait_for_output();
-	out8(0xed, 0x60);
+	gISA->write_io_8(0xed, 0x60);
 	wait_for_output();
-	out8(leds, 0x60);
+	gISA->write_io_8(leds, 0x60);
 }
 
 
@@ -132,7 +131,7 @@ handle_keyboard_interrupt(void *data)
 	unsigned char key;
 	int32 retval = B_HANDLED_INTERRUPT;
 
-	key = in8(0x60);
+	key = gISA->read_io_8(0x60);
 	TRACE(("handle_keyboard_interrupt: key = 0x%x\n", key));
 
 	if (key & 0x80) {
@@ -213,6 +212,9 @@ handle_keyboard_interrupt(void *data)
 
 	return retval;
 }
+
+
+//	#pragma mark -
 
 
 static status_t 
@@ -330,31 +332,14 @@ device_hooks keyboard_hooks = {
 };
 
 
+//	#pragma mark -
 /***** driver hooks *****/
+
 
 status_t 
 init_hardware()
 {
-	keyboard_sem = create_sem(0, "keyboard_sem");
-	if (keyboard_sem < 0)
-		panic("could not create keyboard sem!\n");
-
-	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
-		panic("could not create keyboard read mutex!\n");
-
-	shift = 0;
-	leds = 0;
-
-	// have the scroll lock reflect the state of serial debugging
-	if (dbg_get_serial_debug())
-		leds |= LED_SCROLL;
-	set_leds();
-
-	head = tail = 0;
-
-	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
-
-	return 0;
+	return B_OK;
 }
 
 
@@ -383,11 +368,39 @@ find_device(const char *name)
 status_t 
 init_driver()
 {
-	return 0;
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&gISA) < B_OK)
+		panic("could not get ISA module\n");
+
+	keyboard_sem = create_sem(0, "keyboard_sem");
+	if (keyboard_sem < 0)
+		panic("could not create keyboard sem!\n");
+
+	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
+		panic("could not create keyboard read mutex!\n");
+
+	shift = 0;
+	leds = 0;
+
+	// have the scroll lock reflect the state of serial debugging
+	if (dbg_get_serial_debug())
+		leds |= LED_SCROLL;
+	set_leds();
+
+	head = tail = 0;
+
+	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
+	
+	return B_OK;
 }
 
 
 void 
 uninit_driver()
 {
+	remove_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL);
+
+	delete_sem(keyboard_sem);
+	mutex_destroy(&keyboard_read_mutex);
+
+	put_module(B_ISA_MODULE_NAME);
 }
