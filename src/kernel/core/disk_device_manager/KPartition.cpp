@@ -477,29 +477,27 @@ KPartition::GetPath(KPath *path) const
 	status_t error = Parent()->GetPath(path);
 	if (error != B_OK)
 		return error;
-	// check length for safety
-	int32 len = path->Length();
-	if (len >= path->BufferSize() - 10)
-		return B_NAME_TOO_LONG;
-	char* buffer = path->LockBuffer();
-	if (!buffer)
-		return B_ERROR;
 	if (Parent()->IsDevice()) {
 		// Our parent is a device, so we replace `raw' by our index.
-		int32 leafLen = strlen("/raw");
-		if (len <= leafLen || strcmp(path->Path() + len - leafLen, "/raw")) {
-			error = B_ERROR;
-		} else {
-// TODO: For the time being the name is "obos_*" to not interfere with R5's
-// names.
-//			sprintf(path + len - leafLen + 1, "%ld", Index());
-			sprintf(buffer + len - leafLen + 1, "obos_%ld", Index());
-		}
+		const char *leaf = path->Leaf();
+		if (!leaf || strcmp(leaf, "raw") != B_OK)
+			return B_ERROR;
+		#ifdef _KERNEL_MODE
+			char indexBuffer[12];
+			snprintf(indexBuffer, sizeof(indexBuffer), "%ld", Index());
+		#else
+			const char *prefix = "haiku_";
+			char indexBuffer[strlen(prefix) + 12];
+			snprintf(indexBuffer, sizeof(indexBuffer), "%s%ld", prefix,
+				Index());
+		#endif
+		error = path->ReplaceLeaf(indexBuffer);
 	} else {
 		// Our parent is a normal partition, no device: Append our index.
-		sprintf(buffer + len, "_%ld", Index());
+		char indexBuffer[13];
+		snprintf(indexBuffer, sizeof(indexBuffer), "_%ld", Index());
+		error = path->Append(indexBuffer, false);
 	}
-	path->UnlockBuffer();
 	return error;
 }
 
