@@ -113,19 +113,26 @@ public:
 	void MessageReceived(BMessage*); 
 
 	void HandleSetMethod(BMessage*);
-	void HandleGetSetMouseType(BMessage*, BMessage*);
-	void HandleGetSetMouseAcceleration(BMessage*, BMessage*);
-	void HandleGetSetKeyRepeatDelay(BMessage*, BMessage*);
+	void HandleGetMouseType(BMessage*, BMessage*);
+	void HandleSetMouseType(BMessage*, BMessage*);
+	void HandleGetMouseAcceleration(BMessage*, BMessage*);
+	void HandleSetMouseAcceleration(BMessage*, BMessage*);
+	void HandleGetKeyRepeatDelay(BMessage*, BMessage*);
+	void HandleSetKeyRepeatDelay(BMessage*, BMessage*);
 	void HandleGetKeyInfo(BMessage*, BMessage*);
 	void HandleGetModifiers(BMessage*, BMessage*);
 	void HandleSetModifierKey(BMessage*, BMessage*);
 	void HandleSetKeyboardLocks(BMessage*, BMessage*);
-	void HandleGetSetMouseSpeed(BMessage*, BMessage*);
+	void HandleGetMouseSpeed(BMessage*, BMessage*);
+	void HandleSetMouseSpeed(BMessage*, BMessage*);
 	void HandleSetMousePosition(BMessage*, BMessage*);
-	void HandleGetSetMouseMap(BMessage*, BMessage*);
+	void HandleGetMouseMap(BMessage*, BMessage*);
+	void HandleSetMouseMap(BMessage*, BMessage*);
 	void HandleGetKeyboardID(BMessage*, BMessage*);
-	void HandleGetSetClickSpeed(BMessage*, BMessage*);
-	void HandleGetSetKeyRepeatRate(BMessage*, BMessage*);
+	void HandleGetClickSpeed(BMessage*, BMessage*);
+	void HandleSetClickSpeed(BMessage*, BMessage*);
+	void HandleGetKeyRepeatRate(BMessage*, BMessage*);
+	void HandleSetKeyRepeatRate(BMessage*, BMessage*);
 	void HandleGetSetKeyMap(BMessage*, BMessage*);
 	void HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
 
@@ -172,6 +179,13 @@ private:
 	bool 			sSafeMode;
 	port_id 		sEventPort;
 	BPoint			sMousePos;
+	int32			sMouseType;
+	int32			sMouseSpeed;
+	int32			sMouseAcceleration;
+	bigtime_t		sMouseClickSpeed;
+	int32			sKeyRepeatRate;
+	bigtime_t       sKeyRepeatDelay;
+	mouse_map		sMouseMap;
 	
 	port_id			ISPort;
 	port_id      	EventLooperPort;
