@@ -8,12 +8,12 @@
 
 
 typedef struct dirent {
-	dev_t			d_dev;
-	dev_t			d_pdev;
-	ino_t			d_ino;
-	ino_t			d_pino;
-	unsigned short	d_reclen;
-	char			d_name[1];
+	dev_t			d_dev;		/* device */
+	dev_t			d_pdev;		/* parent device (only for queries) */
+	ino_t			d_ino;		/* inode number */
+	ino_t			d_pino;		/* parent inode (only for queries) */
+	unsigned short	d_reclen;	/* length of this record, not the name */
+	char			d_name[1];	/* name of the entry (null byte terminated) */
 } dirent_t;
 
 typedef struct {
