@@ -39,16 +39,16 @@ translation_format gInputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		BBT_QUALITY,
-		BBT_CAPABILITY,
+		BBT_IN_QUALITY,
+		BBT_IN_CAPABILITY,
 		"image/x-be-bitmap",
 		"Be Bitmap Format (BMPTranslator)"
 	},
 	{
 		B_BMP_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		BMP_QUALITY,
-		BMP_CAPABILITY,
+		BMP_IN_QUALITY,
+		BMP_IN_CAPABILITY,
 		"image/x-bmp",
 		"BMP image"
 	}
@@ -59,16 +59,16 @@ translation_format gOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		BBT_QUALITY,
-		BBT_CAPABILITY,
+		BBT_OUT_QUALITY,
+		BBT_OUT_CAPABILITY,
 		"image/x-be-bitmap",
 		"Be Bitmap Format (BMPTranslator)"
 	},
 	{
 		B_BMP_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		BMP_QUALITY,
-		BMP_CAPABILITY,
+		BMP_OUT_QUALITY,
+		BMP_OUT_CAPABILITY,
 		"image/x-bmp",
 		"BMP image (MS format)"
 	}
@@ -331,8 +331,8 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 	if (outInfo) {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->group = B_TRANSLATOR_BITMAP;
-		outInfo->quality = BBT_QUALITY;
-		outInfo->capability = BBT_CAPABILITY;
+		outInfo->quality = BBT_IN_QUALITY;
+		outInfo->capability = BBT_IN_CAPABILITY;
 		strcpy(outInfo->name, "Be Bitmap Format (BMPTranslator)");
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
@@ -469,8 +469,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		if (outInfo) {
 			outInfo->type = B_BMP_FORMAT;
 			outInfo->group = B_TRANSLATOR_BITMAP;
-			outInfo->quality = BMP_QUALITY;
-			outInfo->capability = BMP_CAPABILITY;
+			outInfo->quality = BMP_IN_QUALITY;
+			outInfo->capability = BMP_IN_CAPABILITY;
 			sprintf(outInfo->name, "BMP image (MS format, %d bits",
 				msheader.bitsperpixel);
 			if (msheader.compression)
@@ -530,8 +530,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		if (outInfo) {
 			outInfo->type = B_BMP_FORMAT;
 			outInfo->group = B_TRANSLATOR_BITMAP;
-			outInfo->quality = BMP_QUALITY;
-			outInfo->capability = BMP_CAPABILITY;
+			outInfo->quality = BMP_IN_QUALITY;
+			outInfo->capability = BMP_IN_CAPABILITY;
 			sprintf(outInfo->name, "BMP image (OS/2 format, %d bits)",
 				os2header.bitsperpixel);
 			strcpy(outInfo->MIME, "image/x-bmp");
