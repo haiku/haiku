@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin sed-4.0.9 sed ;
+SubDir OBOS_TOP src apps bin sed sed ;
 
 SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' -w ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
