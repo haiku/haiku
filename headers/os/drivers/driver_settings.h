@@ -1,11 +1,9 @@
 #ifndef _DRIVER_SETTINGS_H
 #define _DRIVER_SETTINGS_H
 
+
 #include <OS.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct driver_parameter {
 	char *name;
@@ -20,20 +18,26 @@ typedef struct driver_settings {
 	struct driver_parameter *parameters;
 } driver_settings;
 
-extern void			*load_driver_settings(const char *drivername);
-extern status_t		unload_driver_settings(void *handle);
-extern const char	*get_driver_parameter(
-							void *handle,
-							const char *keyname,
-							const char *unknownvalue,	/* key not present */
-							const char *noargvalue);	/* key has no value */
-extern bool			get_driver_boolean_parameter(
-							void *handle,
-							const char *keyname,
-							bool unknownvalue,
-							bool noargvalue);
 
-extern const driver_settings   *get_driver_settings(void *handle);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void			*load_driver_settings(const char *driverName);
+extern status_t		unload_driver_settings(void *handle);
+
+extern void			*parse_driver_settings_string(const char *settingsString);
+extern status_t		get_driver_settings_string(void *_handle, char *buffer,
+						size_t *_bufferSize, bool flat);
+extern status_t		delete_driver_settings(void *handle);
+
+extern const char	*get_driver_parameter(void *handle, const char *key,
+						const char *unknownValue,	/* key not present */
+						const char *noargValue);	/* key has no value */
+extern bool			get_driver_boolean_parameter(void *handle, const char *key,
+						bool unknownValue, bool noargValue);
+
+extern const driver_settings *get_driver_settings(void *handle);
 
 /* Pass this in as drivername to access safe mode settings */
 #define B_SAFEMODE_DRIVER_SETTINGS	"/safemode/"
