@@ -152,7 +152,10 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			TRACE("frame_count %Ld (using fallback)\n", cookie->frame_count);
 		}
 
-		if (stream_header->rate) {
+		if (stream_header->rate && stream_header->scale) {
+			cookie->duration = (1000000LL * (int64)stream_header->length * (int64)stream_header->scale) / stream_header->rate;
+			TRACE("duration %.6f (%Ld) (using scale & rate)\n", cookie->duration / 1E6, cookie->duration);
+		} else if (stream_header->rate) {
 			cookie->duration = (1000000LL * (int64)stream_header->length) / stream_header->rate;
 			TRACE("duration %.6f (%Ld) (using rate)\n", cookie->duration / 1E6, cookie->duration);
 		} else {
