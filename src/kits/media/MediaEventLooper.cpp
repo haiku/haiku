@@ -33,9 +33,6 @@
 #include <Buffer.h>
 #include "debug.h"
 
-// XXX The bebook says that the latency is always calculated in realtime
-// XXX This is not currently done in this code
-
 /*************************************************************
  * protected BMediaEventLooper
  *************************************************************/
@@ -74,7 +71,11 @@ BMediaEventLooper::BMediaEventLooper(uint32 apiVersion) :
 BMediaEventLooper::NodeRegistered()
 {
 	CALLED();
-	// don't call Run(); here, must be done by the derived class (yes, that's stupid)
+	// Calling Run() should be done by the derived class,
+	// at least that's how it is documented by the BeBook.
+	// It appears that BeOS R5 called it here. Calling Run()
+	// twice doesn't hurt, and some nodes need it to be called here.
+	Run();
 }
 
 
@@ -219,7 +220,7 @@ BMediaEventLooper::ControlLoop()
 			// BMediaEventLooper compensates your performance time by adding the event latency
 			// (see SetEventLatency()) and the scheduling latency (or, for real-time events, 
 			// only the scheduling latency). 
-			// XXX well, fix this later
+
 			latency = fEventLatency + fSchedulingLatency;
 //			printf("node %02d, latency %Ld\n", ID(), latency);
 
@@ -229,6 +230,7 @@ BMediaEventLooper::ControlLoop()
 				break;
 			}
 			if (fRealTimeQueue.HasEvents() && (TimeSource()->RealTimeFor(TimeSource()->Now(),fSchedulingLatency)) >= fRealTimeQueue.FirstEventTime()) {
+				latency = fSchedulingLatency;
 				is_realtime = true;
 				break;
 			}
@@ -240,10 +242,11 @@ BMediaEventLooper::ControlLoop()
 			}
 			if (fRealTimeQueue.HasEvents()) {
 				bigtime_t temp;
-				temp = TimeSource()->RealTimeFor(TimeSource()->PerformanceTimeFor(fRealTimeQueue.FirstEventTime()), fSchedulingLatency);
+				temp = fRealTimeQueue.FirstEventTime() - fSchedulingLatency;
 				if (temp < waituntil) {
 					waituntil = temp;
 					is_realtime = true;
+					latency = fSchedulingLatency;
 				}
 			}
 			err = WaitForMessage(waituntil);
@@ -264,7 +267,7 @@ BMediaEventLooper::ControlLoop()
 			if (is_realtime)
 				lateness = TimeSource()->RealTime() - event.event_time;
 			else
-				lateness = TimeSource()->Now() + fEventLatency - event.event_time;
+				lateness = TimeSource()->RealTime() - TimeSource()->RealTimeFor(event.event_time, 0) + fEventLatency;
 			DispatchEvent(&event, lateness, is_realtime);
 		}
 	}
@@ -413,6 +416,9 @@ BMediaEventLooper::Run()
 	
 	if (fControlThread != -1)
 		return; // thread already running
+	
+	// until now, the run state is B_UNREGISTERED, but we need to start in B_STOPPED state.
+	SetRunState(B_STOPPED);
 
 	char threadName[32];
 	sprintf(threadName, "%.20s control", Name());
@@ -452,7 +458,7 @@ BMediaEventLooper::DispatchEvent(const media_timed_event *event,
 {
 	PRINT(6, "CALLED BMediaEventLooper::DispatchEvent()\n");
 
-	HandleEvent(event,lateness,realTimeEvent);
+	HandleEvent(event, lateness, realTimeEvent);
 
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
