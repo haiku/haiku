@@ -53,17 +53,21 @@ BWindow::BWindow(BRect frame,
 {
 	Lock();
 	fFrame = frame;
-	SetTitle(title);
 	decompose_type(type,&fLook,&fFeel);
-	SetFlags(flags);
-	SetWorkspaces(workspace);
 
-	// MESSAGING STUFF - Adapted from DarkWyrms proto6 code
-	// Names changed to match <Window.h>
+	if(title)
+	{
+		fTitle=new char[strlen(title)];
+		strcpy(fTitle,title);
+	}
+	else
+		fTitle=NULL;
+	fFlags=flags;
+	
 	// Create a port on which to listen to messages
 	receive_port=create_port(50,"msgport");
-        if(receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS)
-                printf("BWindow: Couldn't create message port\n");
+	if(receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS)
+		printf("BWindow: Couldn't create message port\n");
 
 	// Notify app that we exist
 	BWindow *win=this;
@@ -72,52 +76,46 @@ BWindow::BWindow(BRect frame,
 	serverlink->Attach(&win,sizeof(BWindow*));
 	serverlink->Flush();
 	
-	 fUnused1 = true;	// Haven't been Show()n yet. Show() must UnLock().
-	 			// Knew I'd find a use for fUnused1 :)
-	 
-	 fShowLevel = 0;	// Hidden to start with.
+	fShowLevel=0;	// Hidden to start with.
 
 	// We create our serverlink utilizing our application's server port
-        // because the server's ServerApp will handle window creation
-	 serverlink->SetPort(be_app->fServerTo);
+	// because the server's ServerApp will handle window creation
+	serverlink->SetPort(be_app->fServerTo);
 
-	 // make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
-	 // OBApplication couldn't find the server
+	// make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
+	// OBApplication couldn't find the server
 	if(be_app->fServerTo!=B_NAME_NOT_FOUND)
-	 {
-	   // Notify server of window's existence
-	   serverlink->SetOpCode(AS_CREATE_WINDOW);
-	   serverlink->Attach(fFrame);
-	   serverlink->Attach((int32)fLook);
-	   serverlink->Attach((int32)fFeel);
-	   serverlink->Attach((int32)flags);
-	   serverlink->Attach(&receive_port,sizeof(port_id));
-	   serverlink->Attach((int32)workspace);
-	   serverlink->Attach(fTitle,sizeof(fTitle));
-	   
-         // Send and wait for ServerWindow port. Necessary here so we can respond to
-	 // messages as soon as Show() is called.
-	 
-	   int32 replycode;
-	   status_t replystat;
-	   ssize_t replysize;
-	   int8 *replybuffer;
-	   replybuffer=serverlink->FlushWithReply(&replycode,&replystat,&replysize);
-	   send_port=*((port_id*)replybuffer);
-	   serverlink->SetPort(send_port);
-	   delete replybuffer;
-	   serverlink->Flush();
-      
-	   top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
-	   top_view->owner=this;
-	   top_view->top_level_view=true;
-	   fFocus = top_view;		// top view gets the focus by default
-      
-	 }
-	 else
-	 {
-		//	Not sure what to do here
-	 }
+	{
+		// Notify server of window's existence
+		serverlink->SetOpCode(AS_CREATE_WINDOW);
+		serverlink->Attach(fFrame);
+		serverlink->Attach((int32)fLook);
+		serverlink->Attach((int32)fFeel);
+		serverlink->Attach((int32)flags);
+		serverlink->Attach(&receive_port,sizeof(port_id));
+		serverlink->Attach((int32)workspace);
+		if(fTitle)
+			serverlink->Attach(fTitle,sizeof(fTitle));
+		else
+			serverlink->Attach(0L);
+		
+		// Send and wait for ServerWindow port. Necessary here so we can respond to
+		// messages as soon as Show() is called.
+		PortLink::ReplyData replydata;
+		serverlink->FlushWithReply(&replydata);
+		send_port=*((port_id*)replydata.buffer);
+		serverlink->SetPort(send_port);
+		
+		top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
+		top_view->owner=this;
+		top_view->top_level_view=true;
+		fFocus = top_view;		// top view gets the focus by default
+	
+	}
+	else
+	{
+		// We've got some serious problems. uh-oh...
+	}
       
 }
 //--------------------------------------------------------------------------------
@@ -130,18 +128,21 @@ BWindow::BWindow(BRect frame,
 {
 	Lock();
 	fFrame = frame;
-	SetTitle(title);
-	SetLook(look);
-	SetFeel(feel);
-	SetFlags(flags);
-	SetWorkspaces(workspace);
+	if(title)
+	{
+		fTitle=new char[strlen(title)];
+		strcpy(fTitle,title);
+	}
+	else
+		fTitle=NULL;
+	fFlags=flags;
+	fLook=look;
+	fFeel=feel;
 
-	// MESSAGING STUFF - Adapted from DarkWyrms proto6 code
-	// Names changed to match <Window.h>
 	// Create a port on which to listen to messages
 	receive_port=create_port(50,"msgport");
-        if(receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS)
-                printf("BWindow: Couldn't create message port\n");
+	if(receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS)
+		printf("BWindow: Couldn't create message port\n");
 
 	// Notify app that we exist
 	BWindow *win=this;
@@ -150,52 +151,46 @@ BWindow::BWindow(BRect frame,
 	serverlink->Attach(&win,sizeof(BWindow*));
 	serverlink->Flush();
 	
-	 fUnused1 = true;	// Haven't been Show()n yet. Show() must UnLock().
-	 			// Knew I'd find a use for fUnused1 :)
-	 
-	 fShowLevel = 0;	// Hidden to start with.
+	fShowLevel = 0;	// Hidden to start with.
 
 	// We create our serverlink utilizing our application's server port
-        // because the server's ServerApp will handle window creation
-	 serverlink->SetPort(be_app->fServerTo);
+	// because the server's ServerApp will handle window creation
+	serverlink->SetPort(be_app->fServerTo);
 
-	 // make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
-	 // OBApplication couldn't find the server
-     if(be_app->fServerTo!=B_NAME_NOT_FOUND)
-	 {
-	   // Notify server of window's existence
-	   serverlink->SetOpCode(AS_CREATE_WINDOW);
-	   serverlink->Attach(fFrame);
-	   serverlink->Attach((int32)fLook);
-	   serverlink->Attach((int32)fFeel);
-	   serverlink->Attach((int32)flags);
-	   serverlink->Attach(&receive_port,sizeof(port_id));
-	   serverlink->Attach((int32)workspace);
-	   serverlink->Attach(fTitle,sizeof(fTitle));
+	// make sure that the server port is valid. It will == B_NAME_NOT_FOUND if the
+	// OBApplication couldn't find the server
+	if(be_app->fServerTo!=B_NAME_NOT_FOUND)
+	{
+		// Notify server of window's existence
+		serverlink->SetOpCode(AS_CREATE_WINDOW);
+		serverlink->Attach(fFrame);
+		serverlink->Attach((int32)fLook);
+		serverlink->Attach((int32)fFeel);
+		serverlink->Attach((int32)flags);
+		serverlink->Attach(&receive_port,sizeof(port_id));
+		serverlink->Attach((int32)workspace);
+		if(fTitle)
+			serverlink->Attach(fTitle,sizeof(fTitle));
+		else
+			serverlink->Attach(0L);
 	   
-         // Send and wait for ServerWindow port. Necessary here so we can respond to
-	 // messages as soon as Show() is called.
-	 
-	   int32 replycode;
-	   status_t replystat;
-	   ssize_t replysize;
-	   int8 *replybuffer;
-	   replybuffer=serverlink->FlushWithReply(&replycode,&replystat,&replysize);
-	   send_port=*((port_id*)replybuffer);
-	   serverlink->SetPort(send_port);
-	   delete replybuffer;
-	   serverlink->Flush();
-      
-	   top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
-	   top_view->owner=this;
-	   top_view->top_level_view=true;
-	   fFocus = top_view;		// top view gets the focus by default
-      
-	 }
-	 else
-	 {
-		//	Not sure what to do here
-	 }
+		// Send and wait for ServerWindow port. Necessary here so we can respond to
+		// messages as soon as Show() is called.
+		PortLink::ReplyData replydata;
+		serverlink->FlushWithReply(&replydata);
+		send_port=*((port_id*)replydata.buffer);
+		serverlink->SetPort(send_port);
+		
+		top_view=new BView(frame.OffsetToCopy(0,0),"top_view",B_FOLLOW_ALL, B_WILL_DRAW);
+		top_view->owner=this;
+		top_view->top_level_view=true;
+		fFocus = top_view;		// top view gets the focus by default
+		
+	}
+	else
+	{
+		// We've got some serious problems. uh-oh...
+	}
       
 }       
 //--------------------------------------------------------------------------------
