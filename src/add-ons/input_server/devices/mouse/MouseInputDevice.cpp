@@ -384,7 +384,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		
 		// TODO: add acceleration computing
 		int32 xdelta = movements.xdelta * dev->settings.accel.speed >> 15;
-		int32 ydelta = -movements.ydelta * (dev->settings.accel.speed >> 15);
+		int32 ydelta = movements.ydelta * dev->settings.accel.speed >> 15;
 
 		snprintf(log, 128, "%s: x: %ld, y: %ld, \n",
                                 dev->device_ref.name, xdelta, ydelta);
