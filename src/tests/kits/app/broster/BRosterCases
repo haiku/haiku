@@ -127,13 +127,15 @@ void GetRecentDocuments(BMessage *refList, int32 maxCount, const char *fileTypes
                         int32 fileTypesCount, const char *appSig)
 case 1:	refList is NULL; all other params are valid.
 		Should quietly do nothing.
-case 3:	refList is non-NULL, maxCount is zero, fileType and appSig are NULL.
+case 2:	refList is non-NULL, maxCount is zero, fileType and appSig are NULL.
 		R5: Returns one recent document.
 		OBOS: Returns an empty message
-case 4:	refList is non-NULL, maxCount is negative, fileType and appSig are NULL.
+case 3:	refList is non-NULL, maxCount is negative, fileType and appSig are NULL.
 		R5: Returns one recent document.
 		OBOS: Returns an empty message
-case 5:	Normal function.
+case 4:	Normal function.
+case 5: Duplicate entries with different app sigs are added. When requested,
+        only most recent instance among the duplicates is returned.
 
 void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
 case 1:	refList is NULL; maxCount is valid, appSig is NULL.
@@ -145,6 +147,8 @@ case 3:	refList is valid, maxCount is zero, appSig is NULL.
 		R5: Returns one recent document.
 		OBOS: Returns an empty message.
 case 4: Normal function
+case 5: Duplicate entries with different app sigs are added. When requested,
+        only most recent instance among the duplicates is returned.
 
 status_t FindApp() const: common cases
 case 1:	uninstalled type mimeType =>

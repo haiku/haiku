@@ -57,6 +57,9 @@ public:
 	// Normal function
 	void GetRecentDocumentsTest4();
 	
+	// Repititon filter tests
+	void GetRecentDocumentsTest5();
+	
 	//-----------------------------
 	// GetRecentFolders() 
 	//-----------------------------
@@ -69,6 +72,14 @@ public:
 	// Normal function
 	void GetRecentFoldersTest4();
 	
+	// Repititon filter tests
+	void GetRecentFoldersTest5();
+	
+	//-----------------------------
+	// Load/Save/Clear
+	//-----------------------------
+	void RecentListsLoadSaveClearTest();
+
 	//-----------------------------
 	// misc 
 	//-----------------------------
