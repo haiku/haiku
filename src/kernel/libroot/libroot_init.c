@@ -15,9 +15,11 @@ void initialize_before(image_id imageID, struct uspace_program_args const *args)
 
 char *__progname = NULL;
 
+char _single_threaded = true;
+	// determines if I/O locking needed; needed for BeOS compatibility
 thread_id __main_thread_id;
 char **argv_save;
-	// needed for BeOS compatibility - they get set in the original
+	// needed for BeOS compatibility - they are set in the original
 	// BeOS startup code, but they won't be initialized when the
 	// OpenBeOS startup code is used.
 
