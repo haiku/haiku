@@ -3,69 +3,51 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 9/2003-1/2005.
+	Rudolf Cornelissen 9/2003-2/2005.
 */
 
 /*
 	note:
-	attempting DMA on NV40 and higher because without it I can't get it going ATM.
-	Later on this can become a nv.settings switch, and maybe later we can even
-	forget about non-DMA completely (depends on 3D acceleration attempts).
+	moved DMA acceleration 'top-level' routines to be integrated in the engine:
+	it is costly to call the engine for every single function within a loop!!
+	(BeRoMeter 1.2.6 benchmarked: P4 3.2Ghz increased 15%, ...)
+	Leaving PIO acceleration as it is for now, for the purpose of benchmarking :-)
+
+	note also:
+	attempting DMA on NV40 and higher because without it I can't get them going ATM.
+	Maybe later we can forget about PIO mode acceleration totally (depends on 3D
+	acceleration attempts).
 */
 
 #define MODULE_BIT 0x40000000
 
 #include "acc_std.h"
 
-void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
+void SCREEN_TO_SCREEN_BLIT_PIO(engine_token *et, blit_params *list, uint32 count)
 {
 	int i;
 
-	if(!si->settings.dma_acc)
-	{
-		/* init acc engine for blit function */
-		nv_acc_setup_blit();
+	/* init acc engine for blit function */
+	nv_acc_setup_blit();
 
-		/* do each blit */
-		i=0;
-		while (count--)
-		{
-			nv_acc_blit
-			(
-				list[i].src_left,
-				list[i].src_top,
-				list[i].dest_left,
-				list[i].dest_top,
-				list[i].width,
-				list[i].height
-			);
-			i++;
-		}
-	}
-	else
+	/* do each blit */
+	i=0;
+	while (count--)
 	{
-		/* init acc engine for blit function */
-		nv_acc_setup_blit_dma();
-
-		/* do each blit */
-		i=0;
-		while (count--)
-		{
-			nv_acc_blit_dma
-			(
-				list[i].src_left,
-				list[i].src_top,
-				list[i].dest_left,
-				list[i].dest_top,
-				list[i].width,
-				list[i].height
-			);
-			i++;
-		}
+		nv_acc_blit
+		(
+			list[i].src_left,
+			list[i].src_top,
+			list[i].dest_left,
+			list[i].dest_top,
+			list[i].width,
+			list[i].height
+		);
+		i++;
 	}
 }
 
-void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count)
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_PIO(engine_token *et, scaled_blit_params *list, uint32 count)
 {
 	int i;
 
@@ -88,7 +70,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params 
 	}
 }
 
-void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count)
+void SCREEN_TO_SCREEN_TRANSPARENT_BLIT_PIO(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count)
 {
 	int i;
 
@@ -110,134 +92,68 @@ void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colo
 	}
 }
 
-void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count)
+void FILL_RECTANGLE_PIO(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count)
 {
 	int i;
 
-	if(!si->settings.dma_acc)
-	{
-		/* init acc engine for fill function */
-		nv_acc_setup_rectangle(colorIndex);
+	/* init acc engine for fill function */
+	nv_acc_setup_rectangle(colorIndex);
 
-		/* draw each rectangle */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle
-			(
-				list[i].left,
-				(list[i].right)+1,
-				list[i].top,
-				(list[i].bottom-list[i].top)+1
-			);
-			i++;
-		}
-	}
-	else
+	/* draw each rectangle */
+	i=0;
+	while (count--)
 	{
-		/* init acc engine for fill function */
-		nv_acc_setup_rectangle_dma(colorIndex);
-
-		/* draw each rectangle */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle_dma
-			(
-				list[i].left,
-				(list[i].right)+1,
-				list[i].top,
-				(list[i].bottom-list[i].top)+1
-			);
-			i++;
-		}
+		nv_acc_rectangle
+		(
+			list[i].left,
+			(list[i].right)+1,
+			list[i].top,
+			(list[i].bottom-list[i].top)+1
+		);
+		i++;
 	}
 }
 
-void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count)
+void INVERT_RECTANGLE_PIO(engine_token *et, fill_rect_params *list, uint32 count)
 {
 	int i;
 
-	if(!si->settings.dma_acc)
-	{
-		/* init acc engine for invert function */
-		nv_acc_setup_rect_invert();
+	/* init acc engine for invert function */
+	nv_acc_setup_rect_invert();
 
-		/* invert each rectangle */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle_invert
-			(
-				list[i].left,
-				(list[i].right)+1,
-				list[i].top,
-				(list[i].bottom-list[i].top)+1
-			);
-			i++;
-		}
-	}
-	else
+	/* invert each rectangle */
+	i=0;
+	while (count--)
 	{
-		/* init acc engine for invert function */
-		nv_acc_setup_rect_invert_dma();
-
-		/* invert each rectangle */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle_invert_dma
-			(
-				list[i].left,
-				(list[i].right)+1,
-				list[i].top,
-				(list[i].bottom-list[i].top)+1
-			);
-			i++;
-		}
+		nv_acc_rectangle_invert
+		(
+			list[i].left,
+			(list[i].right)+1,
+			list[i].top,
+			(list[i].bottom-list[i].top)+1
+		);
+		i++;
 	}
 }
 
-void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count)
+void FILL_SPAN_PIO(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count)
 {
 	int i;
 
-	if(!si->settings.dma_acc)
-	{
-		/* init acc engine for fill function */
-		nv_acc_setup_rectangle(colorIndex);
+	/* init acc engine for fill function */
+	nv_acc_setup_rectangle(colorIndex);
 
-		/* draw each span */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle
-			(
-				list[i+1],
-				list[i+2]+1,
-				list[i],
-				1
-			);
-			i+=3;
-		}
-	}
-	else
+	/* draw each span */
+	i=0;
+	while (count--)
 	{
-		/* init acc engine for fill function */
-		nv_acc_setup_rectangle_dma(colorIndex);
-
-		/* draw each span */
-		i=0;
-		while (count--)
-		{
-			nv_acc_rectangle_dma
-			(
-				list[i+1],
-				list[i+2]+1,
-				list[i],
-				1
-			);
-			i+=3;
-		}
+		nv_acc_rectangle
+		(
+			list[i+1],
+			list[i+2]+1,
+			list[i],
+			1
+		);
+		i+=3;
 	}
 }

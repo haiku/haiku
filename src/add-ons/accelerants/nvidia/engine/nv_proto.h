@@ -114,15 +114,15 @@ status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
 status_t nv_acc_wait_idle(void);
 /* DMA versions */
+status_t nv_acc_wait_idle_dma(void);
 status_t nv_acc_init_dma(void);
 void nv_acc_assert_fifo_dma(void);
-status_t nv_acc_setup_blit_dma(void);
-status_t nv_acc_blit_dma(uint16,uint16,uint16, uint16,uint16,uint16 );
-status_t nv_acc_setup_rectangle_dma(uint32 color);
-status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
-status_t nv_acc_setup_rect_invert_dma(void);
-status_t nv_acc_rectangle_invert_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
-status_t nv_acc_wait_idle_dma(void);
+void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_TRANSPARENT_BLIT_DMA(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count);
+void FILL_RECTANGLE_DMA(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
+void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count);
+void FILL_SPAN_DMA(engine_token *et, uint32 color, uint16 *list, uint32 count);
 
 /* backend scaler functions */
 status_t check_overlay_capability(uint32 feature);

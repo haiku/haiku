@@ -1,6 +1,8 @@
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
+
+	Modified by Rudolf Cornelissen 2/2005.
 */
 
 #if !defined(GENERIC_H)
@@ -39,18 +41,20 @@ void MOVE_CURSOR(uint16 x, uint16 y);
 void SHOW_CURSOR(bool is_visible);
 
 uint32 ACCELERANT_ENGINE_COUNT(void);
-status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et);
+status_t ACQUIRE_ENGINE_PIO(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et);
+status_t ACQUIRE_ENGINE_DMA(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et);
 status_t RELEASE_ENGINE(engine_token *et, sync_token *st);
 void WAIT_ENGINE_IDLE(void);
 status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st);
 status_t SYNC_TO_TOKEN(sync_token *st);
 
-void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
-void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
-void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count);
-void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
-void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
-void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
+/* PIO acceleration */
+void SCREEN_TO_SCREEN_BLIT_PIO(engine_token *et, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_TRANSPARENT_BLIT_PIO(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_PIO(engine_token *et, scaled_blit_params *list, uint32 count);
+void FILL_RECTANGLE_PIO(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
+void INVERT_RECTANGLE_PIO(engine_token *et, fill_rect_params *list, uint32 count);
+void FILL_SPAN_PIO(engine_token *et, uint32 color, uint16 *list, uint32 count);
 
 /* video_overlay */
 uint32 OVERLAY_COUNT(const display_mode *dm);

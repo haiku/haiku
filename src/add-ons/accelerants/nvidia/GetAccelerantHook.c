@@ -27,7 +27,11 @@ These definitions are out of pure lazyness.
 #define CHKO(x) case B_##x: \
 	if (check_overlay_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
 #define CHKA(x) case B_##x: \
-	if (check_acc_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
+	if (check_acc_capability(B_##x) == B_OK) \
+	{if(!si->settings.dma_acc) return (void *)x##_PIO; else return (void *)x##_DMA;} \
+	else return (void *)0
+#define CHKS(x) case B_##x: \
+	if(!si->settings.dma_acc) return (void *)x##_PIO; else return (void *)x##_DMA
 #define HOOK(x) case B_##x: return (void *)x
 #define ZERO(x) case B_##x: return (void *)0
 #define HRDC(x) case B_##x: return si->settings.hardcursor? (void *)x: (void *)0; // apsed
@@ -76,7 +80,7 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 
 		/* synchronization */
 		HOOK(ACCELERANT_ENGINE_COUNT);
-		HOOK(ACQUIRE_ENGINE);
+		CHKS(ACQUIRE_ENGINE);
 		HOOK(RELEASE_ENGINE);
 		HOOK(WAIT_ENGINE_IDLE);
 		HOOK(GET_SYNC_TOKEN);

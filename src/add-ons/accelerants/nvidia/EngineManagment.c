@@ -4,7 +4,7 @@
 
 	other authors:
 	Mark Watson
-	Rudolf Cornelissen 3/2004-1/2005
+	Rudolf Cornelissen 3/2004-2/2005
 */
 
 /*
@@ -27,7 +27,7 @@ uint32 ACCELERANT_ENGINE_COUNT(void)
 	return 1;
 }
 
-status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
+status_t ACQUIRE_ENGINE_PIO(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
 {
 	/* acquire the shared benaphore */
 	AQUIRE_BEN(si->engine.lock)
@@ -35,10 +35,22 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	if (st) SYNC_TO_TOKEN(st);
 
 	/* make sure all needed engine cmd's are mapped to the FIFO */
-	if (!si->settings.dma_acc)
-		nv_acc_assert_fifo();
-	else
-		nv_acc_assert_fifo_dma();
+	nv_acc_assert_fifo();
+
+	/* return an engine token */
+	*et = &nv_engine_token;
+	return B_OK;
+}
+
+status_t ACQUIRE_ENGINE_DMA(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
+{
+	/* acquire the shared benaphore */
+	AQUIRE_BEN(si->engine.lock)
+	/* sync if required */
+	if (st) SYNC_TO_TOKEN(st);
+
+	/* make sure all needed engine cmd's are mapped to the FIFO */
+	nv_acc_assert_fifo_dma();
 
 	/* return an engine token */
 	*et = &nv_engine_token;
