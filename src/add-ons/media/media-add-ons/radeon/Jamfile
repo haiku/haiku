@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src add-ons media media-add-ons radeon ;
+
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+
+Addon radeon.media_addon : media :
+	RadeonAddOn.cpp
+	RadeonProducer.cpp
+	CC.cpp
+	Capture.cpp
+	I2CPort.cpp
+	MSP3430.cpp
+	Radeon.cpp
+	Theater.cpp
+	Tuner.cpp
+	VIPPort.cpp
+	VideoIn.cpp
+;
+
+LinkSharedOSLibs radeon.media_addon : be media ;
