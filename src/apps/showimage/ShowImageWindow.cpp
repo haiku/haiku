@@ -128,6 +128,10 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 		// exit if file could not be opened
 		Quit();
 	}
+	
+	// Tell application object to query the clipboard
+	// and tell this window if it contains interesting data or not
+	be_app_messenger.SendMessage(B_CLIPBOARD_CHANGED);
 }
 
 ShowImageWindow::~ShowImageWindow()
@@ -533,6 +537,17 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 				EnableMenuItem(fpBar, B_COPY, benable);
 				EnableMenuItem(fpBar, MSG_CLEAR_SELECT, benable);
 			}
+			break;
+		}
+		
+		case MSG_CLIPBOARD_CHANGED:
+		{
+			// The app sends this message after it examines
+			// the clipboard in response to a B_CLIPBOARD_CHANGED
+			// message
+			bool bdata;
+			if (pmsg->FindBool("data_available", &bdata) == B_OK)
+				EnableMenuItem(fpBar, B_PASTE, bdata);
 			break;
 		}
 

@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include <Alert.h>
 #include <FilePanel.h>
+#include <String.h>
+#include <Clipboard.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageApp.h"
@@ -68,6 +70,9 @@ ShowImageApp::ReadyToRun()
 		// (paths supplied on the command line)
 		// start checking the number of open windows
 		StartPulse();
+
+	be_clipboard->StartWatching(be_app_messenger);
+		// tell the clipboard to notify this app when its contents change
 }
 
 void
@@ -131,6 +136,10 @@ ShowImageApp::MessageReceived(BMessage *pmsg)
 		case MSG_UPDATE_RECENT_DOCUMENTS:
 			BroadcastToWindows(MSG_UPDATE_RECENT_DOCUMENTS);
 			break;
+			
+		case B_CLIPBOARD_CHANGED:
+			CheckClipboard();
+			break;
 
 		default:
 			BApplication::MessageReceived(pmsg);
@@ -170,3 +179,52 @@ ShowImageApp::BroadcastToWindows(uint32 what)
 		msgr.SendMessage(what);
 	}
 }
+
+void
+ShowImageApp::BroadcastToWindows(BMessage *pmsg)
+{
+	const int32 n = CountWindows();
+	for (int32 i = 0; i < n ; i ++) {
+		// BMessenger checks for us if BWindow is still a valid object
+		BMessenger msgr(WindowAt(i));
+		msgr.SendMessage(pmsg);
+	}
+}
+
+void
+ShowImageApp::CheckClipboard()
+{
+	// Determines if the contents of the clipboard contain
+	// data that is useful to this application. 
+	// After checking the clipboard, a message is sent to
+	// all windows indicating that the clipboard has changed
+	// and whether or not the clipboard contains useful data.
+	bool bdata = false;
+ 
+	if (be_clipboard->Lock()) {	
+		BMessage *pclip;
+		if ((pclip = be_clipboard->Data()) != NULL) {
+			BString strClass;
+			if (pclip->FindString("class", &strClass) == B_OK) {
+				if (strClass == "BBitmap")
+					bdata = true;
+			}
+		}
+		
+		be_clipboard->Unlock(); 
+	}
+	
+	BMessage msg(MSG_CLIPBOARD_CHANGED);
+	msg.AddBool("data_available", bdata);
+	BroadcastToWindows(&msg);
+}
+
+void
+ShowImageApp::Quit()
+{
+	be_clipboard->StopWatching(be_app_messenger);
+		// tell clipboard we don't want anymore notification
+	
+	BApplication::Quit();
+}
+

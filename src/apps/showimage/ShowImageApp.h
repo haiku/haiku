@@ -42,11 +42,14 @@ public:
 	virtual void ReadyToRun();
 	virtual void Pulse();
 	virtual void RefsReceived(BMessage *pmsg);
+	virtual void Quit();
 
 private:
 	void StartPulse();
 	void Open(const entry_ref *pref);
 	void BroadcastToWindows(uint32 what);
+	void BroadcastToWindows(BMessage *pmsg);
+	void CheckClipboard();
 
 	BFilePanel *fpOpenPanel;
 	bool fbPulseStarted;
