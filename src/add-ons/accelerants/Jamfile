@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src add-ons accelerants ;
 
+SubInclude OBOS_TOP src add-ons accelerants matrox ;
 SubInclude OBOS_TOP src add-ons accelerants neomagic ;
 SubInclude OBOS_TOP src add-ons accelerants nvidia ;
