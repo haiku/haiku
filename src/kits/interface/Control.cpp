@@ -26,6 +26,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <string.h>
+#include <malloc.h>
 
 // System Includes -------------------------------------------------------------
 #include <Control.h>
@@ -101,10 +102,10 @@ BControl::BControl(BRect frame, const char *name, const char *label, BMessage *m
 	fLabel = strdup(label);
 }
 //------------------------------------------------------------------------------
-BControl::~BControl ()
+BControl::~BControl()
 {
-	if ( fLabel )
-		delete fLabel;
+	if (fLabel)
+		free(fLabel);
 }
 //------------------------------------------------------------------------------
 BControl::BControl(BMessage *archive) : BView(archive)
@@ -175,7 +176,13 @@ status_t BControl::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BControl::WindowActivated(bool active)
 {
-	// TODO: redraw if focus
+	// Should we check this?
+	if (Window())
+	{
+		Draw(Bounds());
+		Flush();
+	}
+
 	BView::WindowActivated(active);
 }
 //------------------------------------------------------------------------------
@@ -184,7 +191,7 @@ void BControl::AttachedToWindow()
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
 
-	if ( Target() == NULL)
+	if (Target() == NULL)
 		BInvoker::SetTarget(BMessenger(Window(), NULL));
 
 	BView::AttachedToWindow();
@@ -277,10 +284,13 @@ void BControl::MakeFocus(bool focused)
 {
 	BView::MakeFocus(focused);
 
-	fFocusChanging = true;
-	Draw(Bounds());
-	Flush();
-	fFocusChanging = false;
+ 	if(Window())
+	{
+		fFocusChanging = true;
+		Draw(Bounds());
+		Flush();
+		fFocusChanging = false;
+	}
 }
 //------------------------------------------------------------------------------
 void BControl::KeyDown(const char *bytes, int32 numBytes)
@@ -351,7 +361,7 @@ void BControl::DetachedFromWindow()
 void BControl::SetLabel(const char *string)
 {
 	if (fLabel)
-		delete fLabel;
+		free(fLabel);
 
 	fLabel = strdup(string);
 
@@ -370,7 +380,11 @@ void BControl::SetValue(int32 value)
 
 	fValue = value;
 
-	Invalidate();
+ 	if (Window())
+	{
+		Draw(Bounds());
+		Flush();
+	}
 }
 //------------------------------------------------------------------------------
 int32 BControl::Value() const
@@ -390,7 +404,11 @@ void BControl::SetEnabled(bool enabled)
 	else
 		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 
-	Invalidate();
+	if (Window())
+	{
+		Draw(Bounds());
+		Flush();
+	}
 }
 //------------------------------------------------------------------------------
 bool BControl::IsEnabled() const
