@@ -113,7 +113,7 @@ struct fs_mount {
 };
 
 struct advisory_locking {
-	struct mutex	mutex;
+	sem_id			lock;
 	sem_id			wait_sem;
 	struct list		locks;
 };
@@ -845,9 +845,11 @@ create_advisory_locking(struct vnode *vnode)
 		goto err1;
 	}
 
-	status = mutex_init(&locking->mutex, "advisory locking");
-	if (status < B_OK)
+	locking->lock = create_sem(1, "advisory locking");
+	if (locking->lock < B_OK) {
+		status = locking->lock;
 		goto err2;
+	}
 
 	list_init(&locking->locks);
 	vnode->advisory_locking = locking;
@@ -864,7 +866,7 @@ err1:
 static inline void
 put_advisory_locking(struct advisory_locking *locking)
 {
-	mutex_unlock(&locking->mutex);
+	release_sem(locking->lock);
 }
 
 
@@ -875,7 +877,7 @@ get_advisory_locking(struct vnode *vnode)
 
 	struct advisory_locking *locking = vnode->advisory_locking;
 	if (locking != NULL)
-		mutex_lock(&locking->mutex);
+		acquire_sem(locking->lock);
 
 	mutex_unlock(&sVnodeMutex);
 	return locking;
@@ -933,21 +935,21 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 		mutex_lock(&sVnodeMutex);
 		locking = vnode->advisory_locking;
 		if (locking != NULL)
-			mutex_lock(&locking->mutex);
+			acquire_sem(locking->lock);
 
 		// the locking could have been changed in the mean time
 		if (list_is_empty(&locking->locks))
 			vnode->advisory_locking = NULL;
 		else {
 			removeLocking = false;
-			mutex_unlock(&locking->mutex);
+			release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
 		}
 
 		mutex_unlock(&sVnodeMutex);
 	}
 	if (removeLocking) {
 		// we've detached the locking from the vnode, so we can safely delete it
-		mutex_destroy(&locking->mutex);
+		delete_sem(locking->lock);
 		delete_sem(locking->wait_sem);
 		free(locking);
 	}
@@ -986,7 +988,8 @@ restart:
 			}
 		}
 
-		put_advisory_locking(locking);
+		if (waitForLock < B_OK || !wait)
+			put_advisory_locking(locking);
 	}
 
 	// wait for the lock if we have to, or else return immediately
@@ -995,10 +998,7 @@ restart:
 		if (!wait)
 			status = B_PERMISSION_DENIED;
 		else {
-			// ToDo: this is the standard condvar problem; there is a big race
-			//	condition here: between here and the put_advisory_locking() call
-			//	above, a release could already have happened!
-			status = acquire_sem_etc(waitForLock, 1, B_CAN_INTERRUPT, 0);
+			status = switch_sem_etc(locking->lock, waitForLock, 1, B_CAN_INTERRUPT, 0);
 			if (status == B_OK) {
 				// see if we're still colliding
 				goto restart;
@@ -1020,7 +1020,7 @@ restart:
 	}
 
 	if (locking != NULL)
-		mutex_lock(&locking->mutex);
+		acquire_sem(locking->lock);
 
 	mutex_unlock(&sVnodeMutex);
 
@@ -1031,7 +1031,7 @@ restart:
 	if (lock == NULL) {
 		if (waitForLock >= B_OK)
 			release_sem_etc(waitForLock, 1, B_RELEASE_ALL);
-		mutex_unlock(&locking->mutex);
+		release_sem(locking->lock);
 		return B_NO_MEMORY;
 	}
 
@@ -1042,7 +1042,7 @@ restart:
 	lock->shared = shared;
 
 	list_add_item(&locking->locks, lock);
-	mutex_unlock(&locking->mutex);
+	release_sem(locking->lock);
 
 	return status;
 }
