@@ -475,25 +475,33 @@ _dump_thread_info(struct thread *t)
 static int
 dump_thread_info(int argc, char **argv)
 {
+	const char *name = NULL;
 	struct thread *t;
 	int id = -1;
 	struct hash_iterator i;
 
-	if (argc < 2) {
-		dprintf("thread: not enough arguments\n");
+	if (argc > 2) {
+		dprintf("usage: thread [id/name]\n");
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x')
-		id = strtoul(argv[1], NULL, 16);
-	else
-		id = atoi(argv[1]);
+	if (argc == 1) {
+		name = NULL;
+		id = thread_get_current_thread()->id;
+	} else {
+		name = argv[1];
+
+		// if the argument looks like a hex number, treat it as such
+		if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x')
+			id = strtoul(argv[1], NULL, 16);
+		else
+			id = atoi(argv[1]);
+	}
 
 	// walk through the thread list, trying to match name or id
 	hash_open(sThreadHash, &i);
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		if ((t->name && strcmp(argv[1], t->name) == 0) || t->id == id) {
+		if ((t->name && strcmp(name, t->name) == 0) || t->id == id) {
 			_dump_thread_info(t);
 			break;
 		}
