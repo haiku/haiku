@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src add-ons media plugins speex libspeex ;
 
-SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg libogg ] ;
-
 SubDirCcFlags -DVERSION=\\\"1.0.3\\\" ;
 
 StaticLibrary speex :
