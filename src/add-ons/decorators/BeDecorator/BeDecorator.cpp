@@ -519,9 +519,8 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	
 	// Data specifically for the StrokeLineArray call.
 	int32 numlines=0, maxlines=20;
-
-	BPoint points[maxlines*2];
-	RGBColor colors[maxlines];
+	
+	LineArrayData linedata[maxlines], *currentdata;
 	
 	// For quick calculation of gradients for each side. Top is same as left, right is same as
 	// bottom
@@ -609,9 +608,10 @@ void BeDecorator::_DrawFrame(BRect invalid)
 				end.y=MIN(end.y-borderwidth,invalid.bottom);
 							
 			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			colors[numlines]=framecolors[rightindices[colorindex]];
+			currentdata=&(linedata[numlines]);
+			currentdata->pt1=start;
+			currentdata->pt2=end;
+			currentdata->color=framecolors[rightindices[colorindex]].GetColor32();
 			colorindex+=step;
 			numlines++;
 		}
@@ -660,9 +660,10 @@ void BeDecorator::_DrawFrame(BRect invalid)
 				end.y=MIN(end.y-borderwidth,invalid.bottom);
 							
 			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			colors[numlines]=framecolors[leftindices[colorindex]];
+			currentdata=&(linedata[numlines]);
+			currentdata->pt1=start;
+			currentdata->pt2=end;
+			currentdata->color=framecolors[leftindices[colorindex]].GetColor32();
 			colorindex+=step;
 			numlines++;
 		}
@@ -714,11 +715,12 @@ void BeDecorator::_DrawFrame(BRect invalid)
 				end.x=MIN(end.x-borderwidth,invalid.right);
 							
 			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
+			currentdata=&(linedata[numlines]);
+			currentdata->pt1=start;
+			currentdata->pt2=end;
 			
 			// Top side uses the same color order as the left one
-			colors[numlines]=framecolors[leftindices[colorindex]];
+			currentdata->color=framecolors[leftindices[colorindex]].GetColor32();
 			colorindex+=step;
 			numlines++;
 		}
@@ -770,20 +772,21 @@ void BeDecorator::_DrawFrame(BRect invalid)
 				end.x=MIN(end.x-borderwidth,invalid.right);
 							
 			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
+			currentdata=&(linedata[numlines]);
+			currentdata->pt1=start;
+			currentdata->pt2=end;
 			
-			// Top side uses the same color order as the left one
-			colors[numlines]=framecolors[rightindices[colorindex]];
+			// Top side uses the same color order as the right one
+			currentdata->color=framecolors[rightindices[colorindex]].GetColor32();
 			colorindex+=step;
 			numlines++;
 		}
 	}
 
-	_driver->StrokeLineArray(points,numlines,&_drawdata,colors);
+	_driver->StrokeLineArray(numlines,linedata,&_drawdata);
 	
-	delete rightindices;
-	delete leftindices;
+	delete [] rightindices;
+	delete [] leftindices;
 	
 	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
