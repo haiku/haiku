@@ -32,6 +32,7 @@
 #include <View.h>
 #include <Bitmap.h>
 #include <Entry.h>
+#include <NodeInfo.h>
 #include <String.h>
 #include <TranslatorRoster.h>
 
@@ -46,6 +47,8 @@ public:
 	void Pulse();
 	
 	void SetImage(const entry_ref *pref);
+	void SetDither(bool dither);
+	bool GetDither() const { return fDither; }
 	void SetShowCaption(bool show);
 	void SetShrinkToBounds(bool enable);
 	bool GetShrinkToBounds() const { return fShrinkToBounds; }
@@ -105,13 +108,19 @@ public:
 	void Mirror(bool vertical);
 	void Invert();
 	
+	void SetIcon(bool clear);
+	
 private:
-	enum image_operation {
-		kRotateClockwise,
-		kRotateAntiClockwise,
-		kMirrorVertical,
-		kMirrorHorizontal,
-		kInvert
+	enum image_orientation {
+		k0,    // 0
+		k90,   // 1
+		k180,  // 2
+		k270,  // 3
+		k0V,   // 4
+		k90V,  // 5
+		k0H,   // 6
+		k270V, // 7
+		kNumberOfOrientations,
 	};
 	void InitPatterns();
 	void RotatePatterns();
@@ -128,7 +137,7 @@ private:
 	int32 BytesPerPixel(color_space cs) const;
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
-	void DoImageOperation(image_operation op);
+	void DoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
 	BRect AlignBitmap();
 	void Setup(BRect r);
 	BPoint ImageToView(BPoint p) const;
@@ -166,8 +175,10 @@ private:
 	void MouseWheelChanged(BMessage* msg);
 	void ShowPopUpMenu(BPoint screen);
 	void SettingsSetBool(const char* name, bool value);
+	void SetIcon(bool clear, icon_size which);
 	
 	entry_ref fCurrentRef; // of the image
+	bool fDither;          // dither the image
 	int32 fDocumentIndex;  // of the image in the file
 	int32 fDocumentCount;  // number of images in the file
 	BBitmap *fBitmap;      // to be displayed
@@ -201,6 +212,10 @@ private:
 	
 	bool fShowCaption; // display caption?
 	BString fCaption; // caption text
+
+	bool fInverted;
+	enum image_orientation fImageOrientation;
+	static enum image_orientation fTransformation[ImageProcessor::kNumberOfAffineTransformations][kNumberOfOrientations];
 };
 
 #endif /* _ShowImageView_h */

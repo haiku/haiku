@@ -53,6 +53,46 @@
 #include "ShowImageStatusView.h"
 #include "EntryMenuItem.h"
 
+
+// Implementation of RecentDocumentsMenu
+
+RecentDocumentsMenu::RecentDocumentsMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN)
+	: BMenu(title, layout)
+{
+}
+
+bool 
+RecentDocumentsMenu::AddDynamicItem(add_state s)
+{
+	if (s != B_INITIAL_ADD) return false;
+	
+	BMenuItem *item;
+	BMessage list, *msg;
+	entry_ref ref;
+	char name[B_FILE_NAME_LENGTH];
+
+	while ((item = RemoveItem((int32)0)) != NULL) {
+		delete item;
+	}
+
+	be_roster->GetRecentDocuments(&list, 20, NULL, APP_SIG);
+	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
+		BEntry entry(&ref);
+		if (entry.Exists() && entry.GetName(name) == B_OK) {
+			msg = new BMessage(B_REFS_RECEIVED);
+			msg->AddRef("refs", &ref);
+			item =  new EntryMenuItem(&ref, name, msg, 0, 0);
+			AddItem(item);
+			item->SetTarget(be_app, NULL);
+		}
+	}
+	
+	return false;
+}
+
+
+// Implementation of ShowImageWindow
+
 ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
@@ -119,7 +159,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 		BMenu* pmenu = new BMenu("View");
 		BuildViewMenu(pmenu);
 		fBar->AddItem(pmenu);		
-
+		MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
 		UpdateTitle();
 
 		SetPulseRate(100000); // every 1/10 second; ShowImageView needs it for marching ants
@@ -163,31 +203,6 @@ ShowImageWindow::UpdateTitle()
 	BString path;
 	fImageView->GetPath(&path);
 	SetTitle(path.String());
-}
-
-void
-ShowImageWindow::UpdateRecentDocumentsMenu()
-{
-	BMenuItem *item;
-	BMessage list, *msg;
-	entry_ref ref;
-	char name[B_FILE_NAME_LENGTH];
-
-	while ((item = fOpenMenu->RemoveItem((int32)0)) != NULL) {
-		delete item;
-	}
-
-	be_roster->GetRecentDocuments(&list, 20, NULL, APP_SIG);
-	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
-		BEntry entry(&ref);
-		if (entry.Exists() && entry.GetName(name) == B_OK) {
-			msg = new BMessage(B_REFS_RECEIVED);
-			msg->AddRef("refs", &ref);
-			item =  new EntryMenuItem(&ref, name, msg, 0, 0);
-			fOpenMenu->AddItem(item);
-			item->SetTarget(be_app, NULL);
-		}
-	}
 }
 
 void
@@ -247,7 +262,7 @@ void
 ShowImageWindow::LoadMenus(BMenuBar *pbar)
 {
 	BMenu *pmenu = new BMenu("File");
-	fOpenMenu = new BMenu("Open");
+	fOpenMenu = new RecentDocumentsMenu("Open");
 	pmenu->AddItem(fOpenMenu);
 	fOpenMenu->Superitem()->SetTrigger('O');
 	fOpenMenu->Superitem()->SetMessage(new BMessage(MSG_FILE_OPEN));
@@ -304,8 +319,6 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Invert", MSG_INVERT, 0, 0, 'W', true);	
 	pbar->AddItem(pmenu);
-
-	UpdateRecentDocumentsMenu();
 }
 
 BMenuItem *
@@ -350,6 +363,7 @@ ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 	BRect r(pbitmap->Bounds());
 	float width, height;
 	float maxWidth, maxHeight;
+	float minW, maxW, minH, maxH;
 	const float windowBorderWidth = 5;
 	const float windowBorderHeight = 5;
 	
@@ -364,8 +378,16 @@ ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 	maxWidth = screen.Frame().Width() + 1 - windowBorderWidth - Frame().left;
 	maxHeight = screen.Frame().Height() + 1 - windowBorderHeight - Frame().top;
 	
+	// We have to check size limits manually, otherwise
+	// menu bar will be too short for small images.
+	GetSizeLimits(&minW, &maxW, &minH, &maxH); 
+	if (maxWidth > maxW) maxWidth = maxW;
+	if (maxHeight > maxH) maxHeight = maxH;
+	if (width < minW) width = minW;
+	if (height < minH) height = minH;
+	
 	if (width > maxWidth) width = maxWidth;
-	if (height > maxHeight) height = maxHeight;
+	if (height > maxHeight) height = maxHeight;	
 	
 	ResizeTo(width, height);
 }
@@ -607,7 +629,7 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 
 		case MSG_DITHER_IMAGE:
-			ToggleMenuItem(pmsg->what);
+			fImageView->SetDither(ToggleMenuItem(pmsg->what));
 			break;
 		
 		case MSG_SHRINK_TO_WINDOW:
@@ -670,10 +692,6 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			if (fFullScreen) {
 				fImageView->SetShowCaption(fShowCaption);
 			}
-			break;
-		
-		case MSG_UPDATE_RECENT_DOCUMENTS:
-			UpdateRecentDocumentsMenu();
 			break;
 		
 		case MSG_PAGE_SETUP:

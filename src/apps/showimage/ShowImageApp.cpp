@@ -90,6 +90,8 @@ ShowImageApp::StartPulse()
 void
 ShowImageApp::Pulse()
 {
+	// Bug: The BFilePanel is automatically closed if the volume that
+	// is displayed is unmounted.
 	if (!IsLaunching() && CountWindows() <= WINDOWS_TO_IGNORE)
 		// If the application is not launching and
 		// all windows are closed except for the file open panel,
@@ -112,8 +114,10 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 			pmsg->AddRef("refs", &ref);
 		}
 	}
-	if (pmsg)
+	if (pmsg) {
 		RefsReceived(pmsg);
+		delete pmsg;
+	}
 }
 
 void
@@ -133,10 +137,6 @@ ShowImageApp::MessageReceived(BMessage *pmsg)
 			StartPulse();
 			break;
 		
-		case MSG_UPDATE_RECENT_DOCUMENTS:
-			BroadcastToWindows(MSG_UPDATE_RECENT_DOCUMENTS);
-			break;
-			
 		case B_CLIPBOARD_CHANGED:
 			CheckClipboard();
 			break;
@@ -167,17 +167,6 @@ void
 ShowImageApp::Open(const entry_ref *pref)
 {
 	new ShowImageWindow(pref);
-}
-
-void
-ShowImageApp::BroadcastToWindows(uint32 what)
-{
-	const int32 n = CountWindows();
-	for (int32 i = 0; i < n ; i ++) {
-		// BMessenger checks for us if BWindow is still a valid object
-		BMessenger msgr(WindowAt(i));
-		msgr.SendMessage(what);
-	}
 }
 
 void

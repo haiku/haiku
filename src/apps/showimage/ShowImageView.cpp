@@ -48,6 +48,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Region.h>
+#include <Screen.h>
 
 
 #include "ShowImageApp.h"
@@ -62,10 +63,25 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 #endif
 
+#define SHOW_IMAGE_ORIENTATION_ATTRIBUTE "ShowImage:orientation"
 #define BORDER_WIDTH 16
 #define BORDER_HEIGHT 16
 #define PEN_SIZE 1.0f
-const rgb_color kborderColor = { 0, 0, 0, 255 };
+const rgb_color kBorderColor = { 0, 0, 0, 255 };
+
+enum ShowImageView::image_orientation 
+ShowImageView::fTransformation[ImageProcessor::kNumberOfAffineTransformations][kNumberOfOrientations] =
+{
+	// rotate 90°
+	{k90, k180, k270, k0, k270V, k0V, k90V, k0H},
+	// rotate -90°
+	{k270, k0, k90, k180, k90V, k0H, k270V, k0V},
+	// mirror vertical
+	{k0H, k270V, k0V, k90V, k180, k270, k0, k90},
+	// mirror horizontal
+	{k0V, k90V, k0H, k270V, k0, k90, k180, k270}
+};
+
 
 // use patterns to simulate marching ants for selection
 void 
@@ -157,6 +173,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	settings = my_app->Settings();
 	
 	InitPatterns();
+	fDither = false;
 	fBitmap = NULL;
 	fSelBitmap = NULL;
 	fDocumentIndex = 1;
@@ -177,6 +194,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fScaler = NULL;
 
 	if (settings->Lock()) {
+		fDither = settings->GetBool("Dither", fDither);
 		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
 		fZoomToBounds = settings->GetBool("ZoomToBounds", fZoomToBounds);
 		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
@@ -185,7 +203,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	}
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
-	SetHighColor(kborderColor);
+	SetHighColor(kBorderColor);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetPenSize(PEN_SIZE);
 }
@@ -236,7 +254,6 @@ void
 ShowImageView::AddToRecentDocuments()
 {
 	be_roster->AddToRecentDocuments(&fCurrentRef, APP_SIG);
-	be_app_messenger.SendMessage(MSG_UPDATE_RECENT_DOCUMENTS);
 }
 
 void
@@ -302,6 +319,45 @@ ShowImageView::SetImage(const entry_ref *pref)
 		return;
 	fCurrentRef = ref;
 	
+	// restore orientation
+	int32 orientation;
+	fImageOrientation = k0;
+	fInverted = false;
+	if (file.ReadAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0, &orientation, sizeof(orientation)) == sizeof(orientation)) {
+		if (orientation & 256) {
+			DoImageOperation(ImageProcessor::ImageProcessor::kInvert, true);
+		}
+		orientation &= 255;
+		switch (orientation) {
+			case k0:
+				break;
+			case k90:
+				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				break;
+			case k180:
+				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				break;
+			case k270:
+				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
+				break;
+			case k0V:
+				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				break;
+			case k90V:
+				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				break;
+			case k0H:
+				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorVertical, true);
+				break;
+			case k270V:
+				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				break;
+		}
+	}
+	
 	// get the number of documents (pages) if it has been supplied
 	int32 documentCount = 0;
 	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK &&
@@ -319,6 +375,16 @@ ShowImageView::SetImage(const entry_ref *pref)
 	AddToRecentDocuments();
 		
 	Notify(info.name);
+}
+
+void
+ShowImageView::SetDither(bool dither)
+{
+	if (fDither != dither) {
+		SettingsSetBool("Dither", dither);
+		fDither = dither;
+		Invalidate();
+	}
 }
 
 void 
@@ -449,13 +515,13 @@ ShowImageView::AlignBitmap()
 			rect.right = width-1;
 			rect.bottom = static_cast<int>(s * (rect.Height()+1.0))-1;
 			// center vertically
-			rect.OffsetBy(0, (height - rect.Height()) / 2);
+			rect.OffsetBy(0, static_cast<int>((height - rect.Height()) / 2));
 		} else {
 			s = height / (rect.Height()+1.0);
 			rect.right = static_cast<int>(s * (rect.Width()+1.0))-1;
 			rect.bottom = height-1;
 			// center horizontally
-			rect.OffsetBy((width - rect.Width()) / 2, 0);
+			rect.OffsetBy(static_cast<int>((width - rect.Width()) / 2), 0);
 		}
 	} else {
 		// zoom image
@@ -611,10 +677,10 @@ ShowImageView::UpdateCaption()
 Scaler*
 ShowImageView::GetScaler(BRect rect)
 {
-	if (fScaler == NULL || !fScaler->Matches(rect)) {
+	if (fScaler == NULL || !fScaler->Matches(rect, fDither)) {
 		DeleteScaler();
 		BMessenger msgr(this, Window());
-		fScaler = new Scaler(fBitmap, rect, msgr, MSG_INVALIDATE);
+		fScaler = new Scaler(fBitmap, rect, msgr, MSG_INVALIDATE, fDither);
 		fScaler->Start();
 	}
 	return fScaler;
@@ -623,12 +689,14 @@ ShowImageView::GetScaler(BRect rect)
 void
 ShowImageView::DrawImage(BRect rect)
 {
-	if (fScaleBilinear) {
+	if (fScaleBilinear || fDither) {
 		Scaler* scaler = GetScaler(rect);
-		if (scaler != NULL && scaler->GetBitmap() != NULL && !scaler->IsRunning()) {
+		if (scaler != NULL && !scaler->IsRunning()) {
 			BBitmap* bitmap = scaler->GetBitmap();
-			DrawBitmap(bitmap, BPoint(rect.left, rect.top));
-			return;
+			if (bitmap) {
+				DrawBitmap(bitmap, BPoint(rect.left, rect.top));
+				return;
+			}
 		}
 	}
 	DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
@@ -1215,6 +1283,9 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 					BMessenger msgr(Window());
 					msgr.SendMessage(MSG_SLIDE_SHOW);
 				}
+			case 'T':
+			case 't':
+				SetIcon(*bytes == 't');
 				break;
 		}	
 	}
@@ -1594,7 +1665,7 @@ ShowImageView::FirstFile()
 void
 ShowImageView::SetZoom(float zoom)
 {
-	if (fScaleBilinear && fZoom != zoom) {
+	if ((fScaleBilinear || fDither) && fZoom != zoom) {
 		DeleteScaler();
 	}
 	fZoom = zoom;
@@ -1620,12 +1691,21 @@ void
 ShowImageView::SetSlideShowDelay(float seconds)
 {
 	ShowImageSettings* settings;
-	fSlideShowDelay = (int)(seconds * 10.0);
-	settings = my_app->Settings();
-	if (settings->Lock()) {
-		settings->SetInt32("SlideShowDelay", fSlideShowDelay);
-		settings->Unlock();
-	}
+	int32 delay = (int)(seconds * 10.0);
+	if (fSlideShowDelay != delay) {
+		// update counter
+		fSlideShowCountDown = delay - (fSlideShowDelay - fSlideShowCountDown);
+		if (fSlideShowCountDown <= 0) {
+			// show next image on next Pulse()
+			fSlideShowCountDown = 1;
+		}
+		fSlideShowDelay = delay;
+		settings = my_app->Settings();
+		if (settings->Lock()) {
+			settings->SetInt32("SlideShowDelay", fSlideShowDelay);
+			settings->Unlock();
+		}
+	}	
 }
 
 void
@@ -1640,152 +1720,56 @@ ShowImageView::StopSlideShow()
 	fSlideShow = false;
 }
 
-int32 
-ShowImageView::BytesPerPixel(color_space cs) const
-{
-	switch (cs) {
-		case B_RGB32:      // fall through
-		case B_RGB32_BIG:  // fall through
-		case B_RGBA32:     // fall through
-		case B_RGBA32_BIG: return 4;
-
-		case B_RGB24_BIG:  // fall through
-		case B_RGB24:      return 3;
-
-		case B_RGB16:      // fall through
-		case B_RGB16_BIG:  // fall through
-		case B_RGB15:      // fall through
-		case B_RGB15_BIG:  // fall through
-		case B_RGBA15:     // fall through
-		case B_RGBA15_BIG: return 2;
-
-		case B_GRAY8:      // fall through
-		case B_CMAP8:      return 1;
-		case B_GRAY1:      return 0;
-		default: return -1;
-	}
-}
-
 void
-ShowImageView::CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp)
+ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet) 
 {
-	dest += destBPR * destY + destX * bpp;
-	src += bpr * y + x * bpp;
-	memcpy(dest, src, bpp);
-}
-
-// FIXME: In color space with alpha channel the alpha value should not be inverted!
-// This could be a problem when image is saved and opened in another application.
-// Note: For B_CMAP8 InvertPixel inverts the color index not the color value!
-void
-ShowImageView::InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp)
-{
-	dest += destBPR * y + x * bpp;
-	src += bpr * y + x * bpp;
-	for (; bpp > 0; bpp --, dest ++, src ++) {
-		*dest = ~*src;
-	}	
-}
-
-// DoImageOperation supports only color spaces with bytes per pixel >= 1
-// See above for limitations about kInvert
-void
-ShowImageView::DoImageOperation(image_operation op) 
-{
-	color_space cs;
-	int32 bpp;
-	BBitmap* bm;
-	int32 width, height;
-	uchar* src;
-	uchar* dest;
-	int32 bpr, destBPR;
-	int32 x, y, destX, destY;
-	BRect rect;
+	BMessenger msgr;
+	ImageProcessor imageProcessor(op, fBitmap, msgr, 0);
+	imageProcessor.Start(false);
+	BBitmap* bm = imageProcessor.DetachBitmap();
 	
-	if (fBitmap == NULL) return;
-	
-	cs = fBitmap->ColorSpace();
-	bpp = BytesPerPixel(cs);	
-	if (bpp < 1) return;
-	
-	width = fBitmap->Bounds().IntegerWidth();
-	height = fBitmap->Bounds().IntegerHeight();
-	
-	if (op == kRotateClockwise || op == kRotateAntiClockwise) {
-		rect.Set(0, 0, height, width);
+	// update orientation state
+	if (op != ImageProcessor::kInvert) {
+		// Note: If one of these fails, check its definition in class ImageProcessor.
+		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kRotateAntiClockwise < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kMirrorVertical < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kMirrorHorizontal < ImageProcessor::kNumberOfAffineTransformations);
+		fImageOrientation = fTransformation[op][fImageOrientation];
 	} else {
-		rect.Set(0, 0, width, height);
+		fInverted = !fInverted;
 	}
 	
-	bm = new BBitmap(rect, cs);
-	if (bm == NULL) return;
-	
-	src = (uchar*)fBitmap->Bits();
-	dest = (uchar*)bm->Bits();
-	bpr = fBitmap->BytesPerRow();
-	destBPR = bm->BytesPerRow();
-	
-	switch (op) {
-		case kRotateClockwise:
-			for (y = 0; y <= height; y ++) {
-				for (x = 0; x <= width; x ++) {
-					destX = height - y;
-					destY = x;
-					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
-				}
-			}
-			break;
-		case kRotateAntiClockwise:
-			for (y = 0; y <= height; y ++) {
-				for (x = 0; x <= width; x ++) {
-					destX = y;
-					destY = width - x;
-					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
-				}
-			}
-			break;
-		case kMirrorHorizontal:
-			for (y = 0; y <= height; y ++) {
-				for (x = 0; x <= width; x ++) {
-					destX = x;
-					destY = height - y;
-					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
-				}
-			}
-			break;
-		case kMirrorVertical:
-			for (y = 0; y <= height; y ++) {
-				for (x = 0; x <= width; x ++) {
-					destX = width - x;
-					destY = y;
-					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
-				}
-			}
-			break;
-		case kInvert:
-			for (y = 0; y <= height; y ++) {
-				for (x = 0; x <= width; x ++) {
-					InvertPixel(x, y, dest, destBPR, src, bpr, bpp);
-				}
-			}
-			break;
+	if (!quiet) {
+		// write orientation state
+		BNode node(&fCurrentRef);
+		int32 orientation = fImageOrientation;
+		if (fInverted) orientation += 256;
+		if (orientation != k0) {
+			node.WriteAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0, &orientation, sizeof(orientation));
+		} else {
+			node.RemoveAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE);
+		}
 	}
 
 	// set new bitmap
 	DeleteBitmap();
 	fBitmap = bm; 
-	// remove selection
-	SetHasSelection(false);
-	Notify(NULL);	
+	
+	if (!quiet) {
+		// remove selection
+		SetHasSelection(false);
+		Notify(NULL);
+	}	
 }
 
 void
 ShowImageView::Rotate(int degree)
 {
 	if (degree == 90) {
-		DoImageOperation(kRotateClockwise);
+		DoImageOperation(ImageProcessor::kRotateClockwise);
 	} else if (degree == 270) {
-		DoImageOperation(kRotateAntiClockwise);
+		DoImageOperation(ImageProcessor::kRotateAntiClockwise);
 	}
 }
 
@@ -1793,14 +1777,83 @@ void
 ShowImageView::Mirror(bool vertical) 
 {
 	if (vertical) {
-		DoImageOperation(kMirrorVertical);
+		DoImageOperation(ImageProcessor::kMirrorVertical);
 	} else {
-		DoImageOperation(kMirrorHorizontal);
+		DoImageOperation(ImageProcessor::kMirrorHorizontal);
 	}
 }
 
 void
 ShowImageView::Invert()
 {
-	DoImageOperation(kInvert);
+	DoImageOperation(ImageProcessor::kInvert);
+}
+
+
+void
+ShowImageView::SetIcon(bool clear, icon_size which)
+{
+	int32 size;
+	switch (which) {
+		case B_MINI_ICON: size = 16;
+			break;
+		case B_LARGE_ICON: size = 32;
+			break;
+		default:
+			return;
+	}
+		
+	BRect rect(fBitmap->Bounds());
+	float s;
+	s = size / (rect.Width()+1.0);
+		
+	if (s * (rect.Height()+1.0) <= size) {
+		rect.right = size-1;
+		rect.bottom = static_cast<int>(s * (rect.Height()+1.0))-1;
+		// center vertically
+		rect.OffsetBy(0, (size - rect.IntegerHeight()) / 2);
+	} else {
+		s = size / (rect.Height()+1.0);
+		rect.right = static_cast<int>(s * (rect.Width()+1.0))-1;
+		rect.bottom = size-1;
+		// center horizontally
+		rect.OffsetBy((size - rect.IntegerWidth()) / 2, 0);
+	}
+	
+	// scale bitmap to thumbnail size
+	BMessenger msgr;
+	Scaler scaler(fBitmap, rect, msgr, 0, true);
+	BBitmap* thumbnail = scaler.GetBitmap();
+	scaler.Start(false);
+	ASSERT(thumbnail->ColorSpace() == B_CMAP8);
+	// create icon from thumbnail
+	BBitmap icon(BRect(0, 0, size-1, size-1), B_CMAP8);
+	memset(icon.Bits(), B_TRANSPARENT_MAGIC_CMAP8, icon.BitsLength());
+	BScreen screen;
+	const uchar* src = (uchar*)thumbnail->Bits();
+	uchar* dest = (uchar*)icon.Bits();
+	const int32 srcBPR = thumbnail->BytesPerRow();
+	const int32 destBPR = icon.BytesPerRow();
+	const int32 dx = (int32)rect.left;
+	const int32 dy = (int32)rect.top;
+	
+	for (int32 y = 0; y <= rect.IntegerHeight(); y ++) {
+		for (int32 x = 0; x <= rect.IntegerWidth(); x ++) {
+			const uchar* s = src + y * srcBPR + x;
+			uchar* d = dest + (y+dy) * destBPR + (x+dx);
+			*d = *s;
+		}
+	}
+	
+	// set icon	
+	BNode node(&fCurrentRef);
+	BNodeInfo info(&node);
+	info.SetIcon(clear ? NULL : &icon, which);
+}
+
+void
+ShowImageView::SetIcon(bool clear)
+{
+	SetIcon(clear, B_MINI_ICON);
+	SetIcon(clear, B_LARGE_ICON);
 }

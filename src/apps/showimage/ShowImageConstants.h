@@ -61,7 +61,6 @@ const uint32 MSG_INVERT             = 'mINV';
 const uint32 MSG_SLIDE_SHOW         = 'mSSW';
 const uint32 MSG_SLIDE_SHOW_DELAY   = 'mSSD';
 const uint32 MSG_FULL_SCREEN        = 'mFSC';
-const uint32 MSG_UPDATE_RECENT_DOCUMENTS = 'mURD';
 const uint32 MSG_SHOW_CAPTION       = 'mSCP';
 const uint32 MSG_PAGE_SETUP         = 'mPSU';
 const uint32 MSG_PREPARE_PRINT      = 'mPPT';

@@ -29,6 +29,7 @@
 #ifndef _ShowImageWindow_h
 #define _ShowImageWindow_h
 
+#include <Menu.h>
 #include <Window.h>
 #include <FilePanel.h>
 #include <TranslationDefs.h>
@@ -42,6 +43,16 @@ class ShowImageStatusView;
 // BMessage field names used in Save messages
 #define TRANSLATOR_FLD "be:translator"
 #define TYPE_FLD "be:type"
+
+class RecentDocumentsMenu : public BMenu
+{
+public:
+	RecentDocumentsMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN);	
+	bool AddDynamicItem(add_state s);
+
+private:
+	void UpdateRecentDocumentsMenu();
+};
 
 class ShowImageWindow : public BWindow {
 public:
@@ -67,7 +78,6 @@ private:
 		char target, bool enabled);
 
 	BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value);
-	void UpdateRecentDocumentsMenu();
 	
 	bool ToggleMenuItem(uint32 what);
 	void EnableMenuItem(BMenu *menu, uint32 what, bool enable);

@@ -63,15 +63,15 @@ const int32 kFPOne = to_fixed_point(1);
 // Used by class Filter 
 class FilterThread {
 public:
-	FilterThread(Filter* filter, int i);
+	FilterThread(Filter* filter, int32 i, int32 n, bool runInCurrentThread = false);
 	~FilterThread();
 	
 private:
 	status_t Run();
 	static status_t worker_thread(void* data);
-	thread_id fWorkerThread;
 	Filter* fFilter;
-	int fI;
+	int32 fI;
+	int32 fN;
 };
 
 class Filter {
@@ -80,53 +80,71 @@ public:
 	// for an operation executed in Run() method which 
 	// writes into the destination image, that can be 
 	// retrieve using GetBitmap() method.
-	// GetBitmap() can be called any time, but it
-	// may contain "invalid" pixels.
+	// GetBitmap() must be called either before Start(), 
+	// or after Start() and IsRunning() returns false.
 	// To start the operation Start() method has to
 	// be called. The operation is executed in as many
-	// threads as CPUs are active.
+	// threads as GetMaxNumberOfThreads() returns.
+	// The implementation of GetMaxNumberOfThreads()
+	// can use CPUCount() to retrieve the number of
+	// active CPUs at the time the Filter was created.
 	// IsRunning() is true as long as there are any
 	// threads running.
 	// The operation is complete when IsRunning() is false
 	// and Stop() has not been called.
 	// To abort an operation Stop() method has to
 	// be called. Stop() has to be called after Start().
-	// When the operation is done (and has not been aborted). 
-	// Then listener receives a message with the specified "what" value.
+	// When the operation is done Completed() is called.
+	// and only if it has not been aborted, then the listener
+	// receives a message with the specified "what" value.
 	Filter(BBitmap* image, BMessenger listener, uint32 what);
 	virtual ~Filter();
 	
 	// The bitmap the filter writes into
 	BBitmap* GetBitmap();
+	// Removes the destination image from Filter (caller is new owner of image)
+	BBitmap* DetachBitmap();
 	
-	// Starts one or more FilterThreads
-	void Start();
+	// Starts one or more FilterThreads. Returns immediately if async is true.
+	// Either Wait() or Stop() has to be called if async is true!
+	void Start(bool async = true);
+	// Wait for completion of operation
+	void Wait();
 	// Has to be called after Start() (even if IsRunning() is false)
 	void Stop();
 	// Are there any running FilterThreads?
 	bool IsRunning() const;
 
-	// To be implemented by inherited class
+	// To be implemented by inherited class (methods are called in this order):
 	virtual BBitmap* CreateDestImage(BBitmap* srcImage) = 0;
+	// The number of processing units
+	virtual int32 GetNumberOfUnits() = 0;
 	// Should calculate part i of n of the image. i starts with zero
-	virtual void Run(int i, int n) = 0;
+	virtual void Run(int32 i, int32 n) = 0;
+	// Completed() is called when the last FilterThread has completed its work.
+	virtual void Completed();
 
 	// Used by FilterThread only!
 	void Done();
-	int32 CPUCount() const { return fCPUCount; }
 
 protected:
+	// Number of threads to be used to perform the operation
+	int32 NumberOfThreads();
 	BBitmap* GetSrcImage();
 	BBitmap* GetDestImage();
 
 private:
+	// Returns the number of active CPUs
+	int32 CPUCount() const { return fCPUCount; }
+
 	BMessenger fListener;
 	uint32 fWhat;
-	int32 fCPUCount;
-	bool fStarted;
-	sem_id fWaitForThreads;
-	volatile int32 fNumberOfThreads;
-	volatile bool fIsRunning;
+	int32 fCPUCount; // the number of active CPUs
+	bool fStarted; // has Start() been called?
+	sem_id fWaitForThreads; // to exit
+	int32 fN; // the number of used filter threads
+	volatile int32 fNumberOfThreads; // the current number of FilterThreads
+	volatile bool fIsRunning; // FilterThreads should process data as long as it is true
 	BBitmap* fSrcImage;
 	BBitmap* fDestImage;		
 #if TIME_FILTER
@@ -134,22 +152,57 @@ private:
 #endif
 };
 
+// Scales and optionally dithers an image
 class Scaler : public Filter {
 public:
-	Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what);
+	Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what, bool dither);
 	~Scaler();
 
 	BBitmap* CreateDestImage(BBitmap* srcImage);
-	void Run(int i, int n);
-	bool Matches(BRect rect) const;
+	int32 GetNumberOfUnits();
+	void Run(int32 i, int32 n);
+	void Completed();
+	bool Matches(BRect rect, bool dither) const;
 	
 private:
 	void ScaleBilinear(int32 fromRow, int32 toRow);
 	void ScaleBilinearFP(int32 fromRow, int32 toRow);
-	inline void RowValues(float* sum, const uchar* srcData, intType srcW, intType fromX, intType toX, const float a0X, const float a1X, const float deltaX, const int32 kBPP);
+	inline void RowValues(float* sum, const uchar* srcData, intType srcW, intType fromX, intType toX, const float a0X, const float a1X, const int32 kBPP);
 	void DownScaleBilinear(int32 fromRow, int32 toRow);
-
+	static inline uchar Limit(intType value);
+	void Dither(int32 fromRow, int32 toRow);
+	
+	BBitmap* fScaledImage;
 	BRect fRect;
+	bool fDither;
+};
+
+// Rotates, mirrors or inverts an image
+class ImageProcessor : public Filter {
+public:
+	enum operation {
+		kRotateClockwise,
+		kRotateAntiClockwise,
+		kMirrorVertical,
+		kMirrorHorizontal,
+		kInvert,
+		kNumberOfAffineTransformations = 4
+	};
+
+	ImageProcessor(enum operation op, BBitmap* image, BMessenger listener, uint32 what);
+	BBitmap* CreateDestImage(BBitmap* srcImage);
+	int32 GetNumberOfUnits();
+	void Run(int32 i, int32 n);
+	
+private:	
+	int32 BytesPerPixel(color_space cs) const;
+	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, const uchar* src, int32 x, int32 y);
+	inline void InvertPixel(int32 x, int32 y, uchar* dest, const uchar* src);
+
+	enum operation fOp;
+	int32 fBPP;
+	int32 fWidth, fHeight;
+	int32 fSrcBPR, fDestBPR;
 };
 
 #endif

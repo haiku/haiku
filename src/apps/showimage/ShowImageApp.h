@@ -51,7 +51,6 @@ public:
 private:
 	void StartPulse();
 	void Open(const entry_ref *pref);
-	void BroadcastToWindows(uint32 what);
 	void BroadcastToWindows(BMessage *pmsg);
 	void CheckClipboard();
 
