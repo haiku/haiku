@@ -58,6 +58,7 @@ KernelLd kernel.so :
 	libvm.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
+	libkernel_util.a
 
 	linkhack.so
 
