@@ -158,7 +158,7 @@ POP3Protocol::Open(const char *server, int port, int)
 			#ifdef BONE
 				close(conn);
 			#else
-				closesocket(net);
+				closesocket(conn);
 			#endif
 			runner->Stop(true);
 			return B_ERROR;
