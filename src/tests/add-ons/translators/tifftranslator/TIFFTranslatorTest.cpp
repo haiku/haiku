@@ -69,20 +69,20 @@ CheckBits(translator_info *pti)
 }
 
 void
-CheckTiff(translator_info *pti)
+CheckTiff(translator_info *pti, const char *imageType)
 {
 	CPPUNIT_ASSERT(pti->type == B_TIFF_FORMAT);
 	CPPUNIT_ASSERT(pti->translator != 0);
 	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_BITMAP);
 	CPPUNIT_ASSERT(pti->quality > 0.09 && pti->quality < 0.11);
 	CPPUNIT_ASSERT(pti->capability > 0.09 && pti->capability < 0.11);
-	CPPUNIT_ASSERT(strcmp(pti->name, "TIFF Image") == 0);
+	CPPUNIT_ASSERT(strcmp(pti->name, imageType) == 0);
 	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/tiff") == 0);
 }
 
 void
 IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
-	const char **paths, int32 len, bool bbits)
+	const char **paths, const char **imageTypes, int32 len, bool bbits)
 {
 	translator_info ti;
 	printf(" [%d] ", (int) bbits);
@@ -100,7 +100,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti);
+			CheckTiff(&ti, imageTypes[i]);
 	
 		// Identify (output: B_TRANSLATOR_BITMAP)
 		ptest->NextSubTest();
@@ -110,7 +110,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti);
+			CheckTiff(&ti, imageTypes[i]);
 	
 		// Identify (output: B_TIFF_FORMAT)
 		ptest->NextSubTest();
@@ -120,7 +120,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti);
+			CheckTiff(&ti, imageTypes[i]);
 	}
 }
 
@@ -156,15 +156,74 @@ TIFFTranslatorTest::IdentifyTest()
 	
 	// Identify (successfully identify the following files)
 	const char *aBitsFiles[] = {
+		"/boot/home/resources/tiff/beer.bits",
 		"/boot/home/resources/tiff/blocks.bits"
 	};
 	const char *aTiffFiles[] = {
-		"/boot/home/resources/tiff/blocks.tif"
+		"/boot/home/resources/tiff/beer_rgb_nocomp.tif",
+		"/boot/home/resources/tiff/beer_rgb_nocomp_big.tif",
+		"/boot/home/resources/tiff/blocks_rgb_nocomp.tif",
+		"/boot/home/resources/tiff/hills_bw_huffman.tif",
+		"/boot/home/resources/tiff/hills_cmyk_nocomp.tif",
+		"/boot/home/resources/tiff/hills_cmyk_nocomp_big.tif",
+		"/boot/home/resources/tiff/hills_rgb_nocomp.tif",
+		"/boot/home/resources/tiff/hills_rgb_packbits.tif",
+		"/boot/home/resources/tiff/homes_bw_huffman.tif",
+		"/boot/home/resources/tiff/homes_bw_nocomp.tif",
+		"/boot/home/resources/tiff/homes_bw_nocomp_big.tif",
+		"/boot/home/resources/tiff/homes_bw_packbits.tif",
+		"/boot/home/resources/tiff/homes_cmap4_nocomp.tif",
+		"/boot/home/resources/tiff/homes_cmap4_nocomp_big.tif",
+		"/boot/home/resources/tiff/homes_cmap4_packbits.tif",
+		"/boot/home/resources/tiff/homes_gray8_nocomp.tif",
+		"/boot/home/resources/tiff/homes_gray8_nocomp_big.tif",
+		"/boot/home/resources/tiff/homes_gray8_packbits.tif",
+		"/boot/home/resources/tiff/logo_cmap4_nocomp.tif",
+		"/boot/home/resources/tiff/logo_cmap4_nocomp_big.tif",
+		"/boot/home/resources/tiff/logo_cmap4_packbits.tif",
+		"/boot/home/resources/tiff/logo_cmap8_nocomp.tif",
+		"/boot/home/resources/tiff/logo_cmap8_nocomp_big.tif",
+		"/boot/home/resources/tiff/logo_cmap8_packbits.tif",
+		"/boot/home/resources/tiff/logo_cmyk_nocomp.tif",
+		"/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
+		"/boot/home/resources/tiff/vsmall_rgb_nocomp.tif"
 	};
-	IdentifyTests(this, proster, aBitsFiles,
-		sizeof(aBitsFiles) / sizeof(const char *), true);
-	IdentifyTests(this, proster, aTiffFiles,
+	const char *aTiffTypes[] = {
+		"TIFF Image (Little, RGB, None)",
+		"TIFF Image (Big, RGB, None)",
+		"TIFF Image (Little, RGB, None)",
+		"TIFF Image (Little, Mono, Huffman)",
+		"TIFF Image (Little, CMYK, None)",
+		"TIFF Image (Big, CMYK, None)",
+		"TIFF Image (Little, RGB, None)",
+		"TIFF Image (Little, RGB, PackBits)",
+		"TIFF Image (Little, Mono, Huffman)",
+		"TIFF Image (Little, Mono, None)",
+		"TIFF Image (Big, Mono, None)",
+		"TIFF Image (Little, Mono, PackBits)",
+		"TIFF Image (Little, Palette, None)",
+		"TIFF Image (Big, Palette, None)",
+		"TIFF Image (Little, Palette, PackBits)",
+		"TIFF Image (Little, Gray, None)",
+		"TIFF Image (Big, Gray, None)",
+		"TIFF Image (Little, Gray, PackBits)",
+		"TIFF Image (Little, Palette, None)",
+		"TIFF Image (Big, Palette, None)",
+		"TIFF Image (Little, Palette, PackBits)",
+		"TIFF Image (Little, Palette, None)",
+		"TIFF Image (Big, Palette, None)",
+		"TIFF Image (Little, Palette, PackBits)",
+		"TIFF Image (Little, CMYK, None)",
+		"TIFF Image (Little, Palette, None)",
+		"TIFF Image (Little, RGB, None)",
+	};
+	CPPUNIT_ASSERT((sizeof(aTiffFiles) / sizeof(const char *)) ==
+		(sizeof(aTiffTypes) / sizeof(const char *)));
+
+	IdentifyTests(this, proster, aTiffFiles, aTiffTypes,
 		sizeof(aTiffFiles) / sizeof(const char *), false);
+	IdentifyTests(this, proster, aBitsFiles, NULL,
+		sizeof(aBitsFiles) / sizeof(const char *), true);
 	
 	delete proster;
 	proster = NULL;
@@ -320,8 +379,8 @@ TestBTranslator(TIFFTranslatorTest *ptest, BTranslator *ptran)
 				CPPUNIT_ASSERT(strcmp(pouts[i].name,
 					"Be Bitmap Format (TIFFTranslator)") == 0);
 			} else if (pouts[i].type == B_TIFF_FORMAT) {
-				CPPUNIT_ASSERT(pouts[i].quality < 0.1);
-				CPPUNIT_ASSERT(pouts[i].capability < 0.1);
+				CPPUNIT_ASSERT(pouts[i].quality > 0.59 && pouts[i].quality < 0.61);
+				CPPUNIT_ASSERT(pouts[i].capability > 0.19 && pouts[i].capability < 0.21);
 				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, TIFF_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pouts[i].name, "TIFF Image") == 0);
 			} else
