@@ -6,6 +6,7 @@ StaticLibrary
 	print
 	: 
 	BeUtils.cpp
+	BeUtilsTranslation.cpp
 	FolderWatcher.cpp
 	Jobs.cpp
 	;
