@@ -118,7 +118,7 @@ const char *Udf::tag_id_to_string(tag_id id)
 
 		case TAGID_FILE_SET_DESCRIPTOR:
 			return "file set descriptor";
-		case TAGID_FILE_IDENTIFIER_DESCRIPTOR:
+		case TAGID_FILE_ID_DESCRIPTOR:
 			return "file identifier descriptor";
 		case TAGID_ALLOCATION_EXTENT_DESCRIPTOR:
 			return "allocation extent descriptor";
@@ -836,10 +836,8 @@ file_id_descriptor::dump() const
 	PRINT(("icb:\n"));
 	DUMP(icb());
 	PRINT(("implementation_use_length: %d\n", is_parent()));
-	PRINT(("id: `"));
-	for (int i = 0; i < id_length(); i++)
-		SIMPLE_PRINT(("%c", id()[i]));
-	SIMPLE_PRINT(("'\n"));
+	String fileId(id());
+	PRINT(("id: `%s'", fileId.Utf8()));
 }
 
 void
@@ -934,6 +932,33 @@ file_icb_entry::dump() const
 	PRINT(("unique_id: %Ld\n", unique_id()));
 	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
 	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
+
+	PRINT(("allocation_descriptors:\n"));
+	switch (icb_tag().descriptor_flags()) {
+		case ICB_DESCRIPTOR_TYPE_SHORT:
+			PRINT(("  short descriptors...\n"));
+			break;
+		case ICB_DESCRIPTOR_TYPE_LONG:
+		{
+			const long_address *address = reinterpret_cast<const long_address*>(allocation_descriptors());
+			for (uint32 length = allocation_descriptors_length();
+				   length >= sizeof(long_address);
+				     length -= sizeof(long_address), address++)
+			{
+				PDUMP(address);
+			}		
+			break;
+		}
+		case ICB_DESCRIPTOR_TYPE_EXTENDED:
+			PRINT(("  extended descriptors...\n"));
+			break;
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED:
+			PRINT(("  embedded descriptors...\n"));
+			break;
+		default:
+			PRINT(("  invalid descriptors type\n"));
+			break;
+	}
 }
 
 void
@@ -975,4 +1000,31 @@ extended_file_icb_entry::dump() const
 	PRINT(("unique_id: %Ld\n", unique_id()));
 	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
 	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
+	
+	PRINT(("allocation_descriptors:\n"));
+	switch (icb_tag().descriptor_flags()) {
+		case ICB_DESCRIPTOR_TYPE_SHORT:
+			PRINT(("  short descriptors...\n"));
+			break;
+		case ICB_DESCRIPTOR_TYPE_LONG:
+		{
+			const long_address *address = reinterpret_cast<const long_address*>(allocation_descriptors());
+			for (uint32 length = allocation_descriptors_length();
+				   length >= sizeof(long_address);
+				     length -= sizeof(long_address), address++)
+			{
+				PDUMP(address);
+			}		
+			break;
+		}
+		case ICB_DESCRIPTOR_TYPE_EXTENDED:
+			PRINT(("  extended descriptors...\n"));
+			break;
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED:
+			PRINT(("  embedded descriptors...\n"));
+			break;
+		default:
+			PRINT(("  invalid descriptors type\n"));
+			break;
+	}
 }

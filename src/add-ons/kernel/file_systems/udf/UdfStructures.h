@@ -627,7 +627,7 @@ enum tag_id {
 	
 	// ECMA 167, PART 4
 	TAGID_FILE_SET_DESCRIPTOR = 256,
-	TAGID_FILE_IDENTIFIER_DESCRIPTOR,
+	TAGID_FILE_ID_DESCRIPTOR,
 	TAGID_ALLOCATION_EXTENT_DESCRIPTOR,
 	TAGID_INDIRECT_ENTRY,
 	TAGID_TERMINAL_ENTRY,
@@ -1494,11 +1494,11 @@ public:
 		the implementation that generated the rest of the data in the
 		implementation_use() field.
 	*/
-	uint8* implementation_use() { return ((uint8*)this)+38; }
-	char* id() { return ((char*)this)+38+implementation_use_length(); }	
-	const char* id() const { return ((const char*)this)+38+implementation_use_length(); }	
+	uint8* implementation_use() { return ((uint8*)this)+(38); }
+	char* id() { return ((char*)this)+(38)+implementation_use_length(); }	
+	const char* id() const { return ((const char*)this)+(38)+implementation_use_length(); }	
 	
-	uint16 structure_length() const { return 38 + id_length() + implementation_use_length(); }
+	uint16 structure_length() const { return (38) + id_length() + implementation_use_length(); }
 	uint16 padding_length() const { return ((structure_length()+3)/4)*4 - structure_length(); }
 	uint16 total_length() const { return structure_length() + padding_length(); }
 	
@@ -1817,8 +1817,8 @@ struct file_icb_entry {
 	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
 	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
-	uint8* extended_attributes() { return ((uint8*)(this))+sizeof(file_icb_entry); }
-	uint8* allocation_descriptors() { return ((uint8*)(this))+sizeof(file_icb_entry)+extended_attributes_length(); }
+	uint8* extended_attributes() const { return ((uint8*)(this))+sizeof(file_icb_entry); }
+	uint8* allocation_descriptors() const { return ((uint8*)(this))+sizeof(file_icb_entry)+extended_attributes_length(); }
 	
 	// set functions
 	void set_uid(uint32 uid) { _uid = B_HOST_TO_LENDIAN_INT32(uid); }
@@ -1933,8 +1933,8 @@ struct extended_file_icb_entry {
 	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
 	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
-	uint8* extended_attributes() { return (uint8*)(this+sizeof(*this)); }
-	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(*this)+extended_attributes_length()); }
+	uint8* extended_attributes() const { return (uint8*)(this+sizeof(extended_file_icb_entry)); }
+	uint8* allocation_descriptors() const { return (uint8*)(this+sizeof(sizeof(extended_file_icb_entry))+extended_attributes_length()); }
 	
 	// set functions
 	void set_uid(uint32 uid) { _uid = B_HOST_TO_LENDIAN_INT32(uid); }
