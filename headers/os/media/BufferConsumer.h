@@ -146,8 +146,6 @@ virtual	status_t SeekTagRequested(
 
 private:
 
-	friend class BMediaNode;
-
 		BBufferConsumer();	/* private unimplemented */
 		BBufferConsumer(
 				const BBufferConsumer & clone);
@@ -190,6 +188,8 @@ virtual		status_t _Reserved_BufferConsumer_14(void *);
 virtual		status_t _Reserved_BufferConsumer_15(void *);
 
 	friend class BMediaRoster;
+	friend class BMediaNode;
+	friend class BBufferProducer;
 
 		media_type fConsumerType;
 		_buffer_id_cache * fBufferCache;

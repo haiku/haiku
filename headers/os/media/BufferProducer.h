@@ -221,6 +221,7 @@ virtual		status_t _Reserved_BufferProducer_15(void *);
 		media_type	fProducerType;
 		bigtime_t	fInitialLatency;
 		uint32		fInitialFlags;
+		bigtime_t	fDelay;
 
 static	status_t clip_shorts_to_region(
 				const int16 * data,
@@ -232,7 +233,7 @@ static	status_t clip_region_to_shorts(
 				int max_count,
 				int * out_count);
 
-		uint32 _reserved_buffer_producer_[14];
+		uint32 _reserved_buffer_producer_[12];
 };
 
 #endif /* _BUFFER_PRODUCER_H */

@@ -145,7 +145,8 @@ enum {
 	PRODUCER_GET_INITIAL_LATENCY,
 	PRODUCER_FORMAT_SUGGESTION_REQUESTED,
 	PRODUCER_SET_PLAY_RATE,
-	PRODUCER_ENABLE_OUTPUT,	
+	PRODUCER_ENABLE_OUTPUT,
+	PRODUCER_SET_RUN_MODE_DELAY,
 	
 	PRODUCER_MESSAGE_END,
 	FILEINTERFACE_MESSAGE_START = 0x500,
@@ -419,6 +420,12 @@ struct producer_late_notice_received_command : public command_data
 	media_source source;
 	bigtime_t how_much;
 	bigtime_t performance_time;
+};
+
+struct producer_set_run_mode_delay_command : public command_data
+{
+	BMediaNode::run_mode mode;
+	bigtime_t delay;
 };
 
 struct consumer_accept_format_request : public request_data
