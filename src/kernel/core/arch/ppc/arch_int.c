@@ -33,6 +33,9 @@ arch_int_disable_io_interrupt(int irq)
 }
 
 
+/* arch_int_*_interrupts() and friends are in arch_asm.S */
+
+
 static void 
 print_iframe(struct iframe *frame)
 {
