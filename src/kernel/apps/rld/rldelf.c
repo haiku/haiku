@@ -57,12 +57,12 @@ enum {
 typedef
 struct elf_region_t {
 	region_id	id;
-	addr		start;
-	addr		size;
-	addr		vmstart;
-	addr		vmsize;
-	addr		fdstart;
-	addr		fdsize;
+	addr_t		start;
+	addr_t		size;
+	addr_t		vmstart;
+	addr_t		vmsize;
+	addr_t		fdstart;
+	addr_t		fdsize;
 	long		delta;
 	uint32		flags;
 } elf_region_t;
@@ -79,10 +79,10 @@ typedef struct image_t {
 	int32				ref_count;
 	uint32				flags;
 
-	addr 				entry_point;
-	addr				init_routine;
-	addr				term_routine;
-	addr 				dynamic_ptr; 	// pointer to the dynamic section
+	addr_t 				entry_point;
+	addr_t				init_routine;
+	addr_t				term_routine;
+	addr_t 				dynamic_ptr; 	// pointer to the dynamic section
 
 	// pointer to symbol participation data structures
 	uint32				*symhash;
@@ -492,8 +492,8 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 	(void)(fd);
 
 	for (i = 0; i < image->num_regions; i++) {
-		char     region_name[256];
-		addr     load_address;
+		char regionName[B_OS_NAME_LENGTH];
+		addr_t load_address;
 		unsigned addr_specifier;
 
 		// for BeOS compatibility: if we load an old BeOS executable, we
@@ -502,8 +502,8 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 		if (fixed && image->regions[i].vmstart == 0)
 			fixed = false;
 
-		sprintf(region_name, "%s:seg_%d(%s)",
-			path, i, (image->regions[i].flags & RFLAG_RW) ? "RW" : "RO");
+		snprintf(regionName, sizeof(regionName), "%s_seg%d%s",
+			path, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		if (image->dynamic_ptr && !fixed) {
 			/*
@@ -528,7 +528,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 		}
 
 		if (image->regions[i].flags & RFLAG_ANON) {
-			image->regions[i].id = _kern_create_area(region_name, (void **)&load_address,
+			image->regions[i].id = _kern_create_area(regionName, (void **)&load_address,
 				addr_specifier, image->regions[i].vmsize, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA);
 
@@ -538,14 +538,9 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			image->regions[i].delta = load_address - image->regions[i].vmstart;
 			image->regions[i].vmstart = load_address;
 		} else {
-			image->regions[i].id = sys_vm_map_file(
-				region_name,
-				(void **)&load_address,
-				addr_specifier,
-				image->regions[i].vmsize,
-				B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP,
-				path,
+			image->regions[i].id = sys_vm_map_file(regionName, (void **)&load_address,
+				addr_specifier, image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
+				REGION_PRIVATE_MAP, path,
 				_ROUNDOWN(image->regions[i].fdstart, B_PAGE_SIZE));
 
 			if (image->regions[i].id < 0)
@@ -717,7 +712,7 @@ find_symbol_in_loaded_images(image_t **_image, const char *name)
 
 
 static int
-resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr *sym_addr)
+resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 {
 	struct Elf32_Sym *sym2;
 	char             *symname;
@@ -862,7 +857,7 @@ static void
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	addr   needed_offset;
+	addr_t   needed_offset;
 	char   path[256];
 	uint32 i, j;
 
@@ -936,7 +931,7 @@ init_dependencies(image_t *image, bool initHead)
 	}
 
 	for (i = 0; i < slot; i++) {
-		addr _initf = initList[i]->init_routine;
+		addr_t _initf = initList[i]->init_routine;
 		libinit_f *initf = (libinit_f *)(_initf);
 
 		if (initf)
