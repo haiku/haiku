@@ -425,34 +425,35 @@ static int recurse_check_file(const char *filepath, const char *srcfile)
  */
 static int recurse_directory(const char *path, const char *match)
 {
+	/* ToDo: should just use opendir(), readdir(), ... */
 	struct stat stat;
-	int res = 0, file;
-	char *name;
+	int res = 0, dir;
+	int bufferSize = sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1;
+	struct dirent *dirent;
 	
-	if ((file = sys_open(path, STREAM_TYPE_DIR, 0)) < 0) {
+	if ((dir = sys_open(path, STREAM_TYPE_DIR, 0)) < 0)
 		return -1;
-	}
-	
-	name = (char*)kmalloc(SYS_MAX_NAME_LEN);
-	if (!name)
+
+	dirent = kmalloc(bufferSize);
+	if (!dirent)
 		return -1;
-	
+
 	/* loop until we have a match or we run out of entries */
 	while (res <= 0) {
 		char *newpath;
 		size_t slen = 0;
 		SHOW_FLOW(3, "scanning %s\n", path);
 
-		name[0] = '\0';
-		if ((res = sys_read(file, name, 0, SYS_MAX_NAME_LEN)) <= 0) {
+		if ((res = sys_read_dir(dir, dirent, bufferSize, 1)) <= 0)
 			break;
-		}
 
-		slen = strlen(path) + strlen(name) + 2;	
+		dirent->d_name[dirent->d_reclen] = '\0';
+
+		slen = strlen(path) + strlen(dirent->d_name) + 2;	
 		newpath = (char*)kmalloc(slen);
 		strlcpy(newpath, path, slen);
 		strlcat(newpath, "/", slen);
-		strlcat(newpath, name, slen);
+		strlcat(newpath, dirent->d_name, slen);
 
 		if ((res = sys_rstat(newpath, &stat)) != B_NO_ERROR) {
 			kfree(newpath);
@@ -481,9 +482,9 @@ static int recurse_directory(const char *path, const char *match)
 		kfree(newpath);
 	}
 
-	kfree(name);
-	sys_close(file);
-	
+	kfree(dirent);
+	sys_close(dir);
+
 	return res;
 }
 
