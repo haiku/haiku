@@ -125,6 +125,7 @@ struct my_stat {
     my_uid_t        uid;        /* user id of the owner of this file */
     my_gid_t        gid;        /* group id of the owner of this file */
     fs_off_t        size;       /* size in bytes of this file */
+	dev_t			rdev;		/* device type (not used) */
     size_t          blksize;    /* preferred block size for i/o */
     time_t          atime;      /* last access time */
     time_t          mtime;      /* last modification time */
