@@ -147,8 +147,8 @@ static int main2(void *unused)
 #endif
 	// start the init process
 	{
-		proc_id pid;
-		pid = proc_create_proc("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
+		team_id pid;
+		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
 		if(pid < 0)
 			kprintf("error starting 'init' error = %d \n",pid);
 	}

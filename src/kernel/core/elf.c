@@ -617,7 +617,7 @@ verify_eheader(struct Elf32_Ehdr *eheader)
 
 
 int
-elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
+elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
@@ -626,7 +626,7 @@ elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 	int i;
 	ssize_t len;
 
-	dprintf("elf_load: entry path '%s', proc %p\n", path, p);
+	dprintf("elf_load: entry path '%s', team %p\n", path, p);
 
 	fd = sys_open(path, 0);
 	if(fd < 0)

@@ -1440,7 +1440,7 @@ aspace_id vm_get_current_user_aspace_id(void)
 	struct thread *t = thread_get_current_thread();
 
 	if(t)
-		return t->proc->_aspace_id;
+		return t->team->_aspace_id;
 	else
 		return -1;
 }
@@ -1813,8 +1813,8 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 					address, fault_address);
 			}
 		} else {
-			dprintf("vm_page_fault: killing process 0x%x\n", thread_get_current_thread()->proc->id);
-			proc_kill_proc(thread_get_current_thread()->proc->id);
+			dprintf("vm_page_fault: killing team 0x%x\n", thread_get_current_thread()->team->id);
+			team_kill_team(thread_get_current_thread()->team->id);
 		}
 	}
 

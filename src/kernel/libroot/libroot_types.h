@@ -47,20 +47,6 @@ enum {
 #define B_SYSTEM_TIMEBASE  (0)
 #define	B_SYSTEM_TEAM		2
 
-typedef struct {
-	team_id			team;
-	int32			image_count;
-	int32			thread_count;
-	int32			area_count;
-	thread_id		debugger_nub_thread;
-	port_id			debugger_nub_port;
-
-	int32           argc;      /* number of args on the command line */
-	char            args[64];  /* abbreviated command line args */
-	uid_t        	uid;
-	gid_t        	gid;
-} team_info;
-
 #if __INTEL__
 #define		B_MAX_CPU_COUNT		8
 #endif

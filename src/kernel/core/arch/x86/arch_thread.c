@@ -12,7 +12,7 @@
 #include <int.h>
 #include <string.h>
 
-int arch_proc_init_proc_struct(struct proc *p, bool kernel)
+int arch_team_init_team_struct(struct team *p, bool kernel)
 {
 	return 0;
 }
@@ -87,7 +87,7 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 
 	dprintf("arch_thread_context_switch: cpu %d 0x%x -> 0x%x, aspace 0x%x -> 0x%x, old stack = 0x%x:0x%x, stack = 0x%x:0x%x\n",
 		smp_get_current_cpu(), t_from->id, t_to->id,
-		t_from->proc->aspace, t_to->proc->aspace,
+		t_from->team->aspace, t_to->team->aspace,
 		t_from->arch_info.current_stack.ss, t_from->arch_info.current_stack.esp,
 		t_to->arch_info.current_stack.ss, t_to->arch_info.current_stack.esp);
 #endif
@@ -103,23 +103,23 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 }
 #endif
 
-	if(t_from->proc->_aspace_id >= 0 && t_to->proc->_aspace_id >= 0) {
+	if(t_from->team->_aspace_id >= 0 && t_to->team->_aspace_id >= 0) {
 		// they are both uspace threads
-		if(t_from->proc->_aspace_id == t_to->proc->_aspace_id) {
+		if(t_from->team->_aspace_id == t_to->team->_aspace_id) {
 			// dont change the pgdir, same address space
 			new_pgdir = NULL;
 		} else {
 			// switching to a new address space
-			new_pgdir = vm_translation_map_get_pgdir(&t_to->proc->aspace->translation_map);
+			new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 		}
-	} else if(t_from->proc->_aspace_id < 0 && t_to->proc->_aspace_id < 0) {
+	} else if(t_from->team->_aspace_id < 0 && t_to->team->_aspace_id < 0) {
 		// they must both be kspace threads
 		new_pgdir = NULL;
-	} else if(t_to->proc->_aspace_id < 0) {
+	} else if(t_to->team->_aspace_id < 0) {
 		// the one we're switching to is kspace
-		new_pgdir = vm_translation_map_get_pgdir(&t_to->proc->kaspace->translation_map);
+		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
 	} else {
-		new_pgdir = vm_translation_map_get_pgdir(&t_to->proc->aspace->translation_map);
+		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 	}
 #if 0
 	dprintf("new_pgdir is 0x%x\n", new_pgdir);

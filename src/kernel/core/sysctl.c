@@ -46,7 +46,7 @@ int sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
 
 	switch (name[0]) {
 		case CTL_KERN:
-			fn = kern_sysctl;
+			fn = sys_sysctl;
 			break;
 		case CTL_HW:
 			fn = hw_sysctl;
@@ -61,7 +61,7 @@ int sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
 
 }
 
-int kern_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
+int sys_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
            void *newp, size_t newlen)
 {
 	int error = 0;

@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	sys_thread_wait_on_thread(t[THREADS - 1], NULL);
+	sys_wait_on_thread(t[THREADS - 1], NULL);
 	
 	printf("Test value = %d vs expected of %d\n", current_val, expected);
 	

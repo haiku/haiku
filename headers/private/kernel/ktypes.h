@@ -16,7 +16,7 @@ typedef int    pid_t;
 typedef int    thread_id;
 typedef int    region_id;
 typedef int    aspace_id;
-typedef int    proc_id;
+typedef int    team_id;
 typedef int    sem_id;
 typedef int    port_id;
 typedef int    image_id;

@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 		}
 
 		sys_snooze(5000000);
-		sys_proc_kill_proc(sys_get_current_proc_id());
+		sys_kill_team(sys_get_current_team_id());
 /*
 		sys_snooze(3000000);
 		for(i=0; i<10; i++) {
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 #if 0
 	{
 		for(;;)
-			sys_proc_create_proc("/boot/bin/true", "true", 32);
+			sys_create_team("/boot/bin/true", "true", 32);
 	}
 #endif
 #if 0
@@ -325,32 +325,32 @@ int main(int argc, char **argv)
 		printf("%d\n", *((int *)ptr + 3));
 	}
 #endif
-#if 0
+#if 1
 	{
 		int i;
 
-//		printf("spawning %d copies of true\n", 10000);
+		printf("spawning %d copies of true\n", 100);
 
-		for(i=0; ; i++) {
-			proc_id id;
+		for(i=0; i<100; i++) {
+			team_id id;
 			bigtime_t t;
 
 			printf("%d...", i);
 
 			t = sys_system_time();
 
-			id = sys_proc_create_proc("/boot/bin/true", "true", NULL, 0, 20);
+			id = sys_create_team("/boot/bin/true", "true", NULL, 0, NULL, 0, 20);
 			if(id <= 0x2) {
-				printf("new proc returned 0x%x!\n", id);
+				printf("new team returned 0x%x!\n", id);
 				return -1;
 			}
-			sys_proc_wait_on_proc(id, NULL);
+			sys_wait_on_team(id, NULL);
 
 			printf("done (%Ld usecs)\n", sys_system_time() - t);
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		int i;
 
@@ -359,9 +359,9 @@ int main(int argc, char **argv)
 //		resume_thread(spawn_thread("cpu eater 1", &cpu_eater_thread, 0));
 //		resume_thread(spawn_thread(&cpu_eater_thread, "cpu eater 2", &cpu_eater_thread, 0));
 
-		printf("spawning %d threads\n", 10000);
+		printf("spawning %d threads\n", 100);
 
-		for(i=0; i<10000; i++) {
+		for(i=0; i<100; i++) {
 			thread_id id;
 			bigtime_t t;
 
@@ -373,7 +373,7 @@ int main(int argc, char **argv)
 			if (id > 0)
 				resume_thread(id);
 
-			sys_thread_wait_on_thread(id, NULL);
+			sys_wait_on_thread(id, NULL);
 
 			printf("done (%Ld usecs)\n", sys_system_time() - t);
 		}
@@ -466,7 +466,7 @@ static void port_test(void)
 	sys_port_write(test_p1, 3, &testdata, sizeof(testdata));
 
 	printf("porttest: waiting on spawned thread\n");
-	sys_thread_wait_on_thread(t, NULL);
+	sys_wait_on_thread(t, NULL);
 
 	printf("porttest: close p1\n");
 	sys_port_close(test_p2);

@@ -25,7 +25,7 @@ struct port_msg {
 
 struct port_entry {
 	port_id 			id;
-	proc_id 			owner;
+	team_id 			owner;
 	int32 				capacity;
 	int     			lock;
 	char				*name;
@@ -163,7 +163,7 @@ create_port(int32 queue_length, const char *name)
 	port_id retval;
 	char 	*temp_name;
 	void 	*q;
-	proc_id	owner;
+	team_id	owner;
 	
 	if(ports_active == false)
 		return B_BAD_PORT_ID;
@@ -213,7 +213,7 @@ create_port(int32 queue_length, const char *name)
 		kfree(q);
 		return sem_w;
 	}
-	owner = proc_get_current_proc_id();
+	owner = team_get_current_team_id();
 
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
@@ -431,7 +431,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 }
 
 int
-_get_next_port_info(team_id proc, int32 *cookie, struct port_info *info,
+_get_next_port_info(team_id team, int32 *cookie, struct port_info *info,
                    size_t size)
 {
 	int state;
@@ -460,7 +460,7 @@ _get_next_port_info(team_id proc, int32 *cookie, struct port_info *info,
 	while (slot < MAX_PORTS) {
 		GRAB_PORT_LOCK(ports[slot]);
 		if (ports[slot].id != -1)
-			if (ports[slot].owner == proc) {
+			if (ports[slot].owner == team) {
 				// found one!
 				// copy the info
 				info->port			= ports[slot].id;
@@ -727,7 +727,7 @@ read_port_etc(port_id id,
 }
 
 int
-set_port_owner(port_id id, proc_id proc)
+set_port_owner(port_id id, team_id team)
 {
 	int slot;
 	int state;
@@ -749,8 +749,8 @@ set_port_owner(port_id id, proc_id proc)
 		return B_BAD_PORT_ID;
 	}
 
-	// transfer ownership to other process
-	ports[slot].owner = proc;
+	// transfer ownership to other team
+	ports[slot].owner = team;
 
 	// unlock port
 	RELEASE_PORT_LOCK(ports[slot]);
@@ -896,8 +896,8 @@ write_port_etc(port_id id,
 }
 
 /* this function cycles through the ports table, deleting all the ports that are owned by
-   the passed proc_id */
-int delete_owned_ports(proc_id owner)
+   the passed team_id */
+int delete_owned_ports(team_id owner)
 {
 	int state;
 	int i;
@@ -1099,7 +1099,7 @@ int	user_get_port_info(port_id id, struct port_info *uinfo)
 	return res;
 }
 
-int	user_get_next_port_info(proc_id uproc,
+int	user_get_next_port_info(team_id uteam,
 				uint32 *ucookie,
 				struct port_info *uinfo)
 {
@@ -1122,7 +1122,7 @@ int	user_get_next_port_info(proc_id uproc,
 	if(rc < 0)
 		return rc;
 	
-	res = get_next_port_info(uproc, &cookie, &info);
+	res = get_next_port_info(uteam, &cookie, &info);
 	// copy to userspace
 	rc = user_memcpy(ucookie, &info, sizeof(uint32));
 	if(rc < 0)
@@ -1170,9 +1170,9 @@ ssize_t	user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
 	return res;
 }
 
-int	user_set_port_owner(port_id port, proc_id proc)
+int	user_set_port_owner(port_id port, team_id team)
 {
-	return set_port_owner(port, proc);
+	return set_port_owner(port, team);
 }
 
 int	user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,

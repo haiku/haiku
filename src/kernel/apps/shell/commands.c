@@ -30,7 +30,7 @@ int cmd_exec(int argc, char *argv[])
 int cmd_create_proc(int argc,char *argv[])
 {
 	bool must_wait=true;
-	proc_id pid;
+	team_id pid;
 
 	int  arg_len;
 	char *tmp;
@@ -65,12 +65,12 @@ int cmd_create_proc(int argc,char *argv[])
 		}
 	}
 
-	pid = sys_proc_create_proc(filename,filename, argv, argc, NULL, 0, 5);
+	pid = sys_create_team(filename,filename, argv, argc, NULL, 0, 5);
 	if(pid >= 0) {
 		int retcode;
 
 		if(must_wait) {
-			sys_proc_wait_on_proc(pid, &retcode);
+			sys_wait_on_team(pid, &retcode);
 		}
 	} else {
 		printf("Error: cannot execute '%s'\n", filename);

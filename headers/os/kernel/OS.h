@@ -97,16 +97,11 @@ extern "C" {
  * @{
  */
 
-/** 
- * @typedef team_id 
- * id of an team (process) 
- */
 /**
  * @typedef area_id
  * id of an area
  */
 
-typedef int32   team_id;
 typedef int32   area_id;
 
 /** @} */
@@ -205,13 +200,13 @@ int     _get_next_port_info(team_id, int32 *, port_info *, size_t);
  */
 typedef struct sem_info {
 	sem_id		sem;
-	proc_id		proc;
+	team_id		team;
 	char		name[B_OS_NAME_LENGTH];
 	int32		count;
 	thread_id	latest_holder;
 } sem_info;
 
-sem_id create_sem_etc(int count, const char *name, proc_id owner);
+sem_id create_sem_etc(int count, const char *name, team_id owner);
 sem_id create_sem(int count, const char *name);
 int    delete_sem(sem_id id);
 int    delete_sem_etc(sem_id id, int return_code);
@@ -221,8 +216,8 @@ int    release_sem(sem_id id);
 int    release_sem_etc(sem_id id, int count, int flags);
 int    get_sem_count(sem_id id, int32* thread_count);
 int    _get_sem_info(sem_id id, struct sem_info *info, size_t);
-int    _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size_t);
-int    set_sem_owner(sem_id id, proc_id proc);
+int    _get_next_sem_info(team_id team, uint32 *cookie, struct sem_info *info, size_t);
+int    set_sem_owner(sem_id id, team_id team);
 
 #define get_sem_info(sem, info)                \
             _get_sem_info((sem), (info), sizeof(*(info)))
@@ -289,7 +284,7 @@ typedef enum {
 /** information on a thread
  * @note the thread can be in any state
  */
-typedef struct  {
+typedef struct {
 	thread_id		thread;
 	team_id			team;
 	char			name[B_OS_NAME_LENGTH];
@@ -301,6 +296,20 @@ typedef struct  {
 	void			*stack_base;
 	void			*stack_end;
 } thread_info;
+
+/** information on a team */
+typedef struct {
+	team_id			team;
+	int32			thread_count;
+	int32			image_count;
+	int32			area_count;
+	thread_id		debugger_nub_thread;
+	port_id			debugger_nub_port;
+	int32			argc;
+	char			args[64];
+	uid_t			uid;
+	gid_t			gid;
+} team_info;
 
 /** 
  * gives information on user and kernel time for a thread

@@ -56,9 +56,9 @@ enum {
 };
 
 enum {
-	PROC_STATE_NORMAL,	// normal state
-	PROC_STATE_BIRTH,	// being contructed
-	PROC_STATE_DEATH	// being killed
+	TEAM_STATE_NORMAL,	// normal state
+	TEAM_STATE_BIRTH,	// being contructed
+	TEAM_STATE_DEATH	// being killed
 };
 
 #define SIG_NONE 0
@@ -66,16 +66,14 @@ enum {
 #define SIG_KILL 2
 
 /**
- * The proc structure.
+ * The team structure; equivalent to a common process.
  * @note This is available only within the kernel.
  */
-struct proc {
-	/** Pointer to next proc structure */
-	struct proc *next;
-	/** The proc_id for this process.
-	 * @note This is equivalent to a team_id (???)
-	 */
-	proc_id      id;
+struct team {
+	/** Pointer to next team structure */
+	struct team *next;
+	/** The team_id for this process. */
+	team_id      id;
 	/** name of the process
 	 * @note The maximum length is current SYS_MAX_OS_NAME_LEN chars.
 	 */
@@ -101,12 +99,12 @@ struct proc {
 	addr         user_env_base;
 	struct thread *main_thread;
 	struct thread *thread_list;
-	struct arch_proc arch_info;
+	struct arch_team arch_info;
 };
 
 struct thread {
 	struct thread *all_next;
-	struct thread *proc_next;
+	struct thread *team_next;
 	struct thread *q_next;
 	thread_id id;
 	char name[SYS_MAX_OS_NAME_LEN];
@@ -125,7 +123,7 @@ struct thread {
 	addr fault_handler;
 	addr entry;
 	void *args;
-	struct proc *proc;
+	struct team *team;
 	sem_id return_code_sem;
 	region_id kernel_stack_region_id;
 	addr kernel_stack_base;
@@ -143,18 +141,6 @@ struct thread {
 struct thread_queue {
 	struct thread *head;
 	struct thread *tail;
-};
-
-/**
- * Process information structure
- * @note Seem to be a lot of duplicated fields with main
- *       proc structure???
- */
-struct proc_info {
-	proc_id id;
-	char    name[SYS_MAX_OS_NAME_LEN];
-	int     state;
-	int     num_threads;
 };
 
 #if 1

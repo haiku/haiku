@@ -31,26 +31,26 @@ int main()
 	printf("Welcome to OpenBeOS!\n");
 
 	if(1) {
-		proc_id pid;
+		team_id pid;
 
-		pid = sys_proc_create_proc("/boot/bin/fortune", "/boot/bin/fortune", NULL, 0, NULL, 0, 5);
+		pid = sys_create_team("/boot/bin/fortune", "/boot/bin/fortune", NULL, 0, NULL, 0, 5);
 		if (pid >= 0) {
 			int retcode;
-			sys_proc_wait_on_proc(pid, &retcode);
+			sys_wait_on_team(pid, &retcode);
 		} else {
-			printf("Failed to create a proc for fortune.\n");
+			printf("Failed to create a team for fortune.\n");
 		}
 	}
 
 		
 	while(1) {
-		proc_id pid;
+		team_id pid;
 
-		pid = sys_proc_create_proc("/boot/bin/shell", "/boot/bin/shell", NULL, 0, NULL, 0, 5);
+		pid = sys_create_team("/boot/bin/shell", "/boot/bin/shell", NULL, 0, NULL, 0, 5);
 		if(pid >= 0) {
 			int retcode;
 			printf("init: spawned shell, pid 0x%x\n", pid);
-			sys_proc_wait_on_proc(pid, &retcode);
+			sys_wait_on_team(pid, &retcode);
 			printf("init: shell exited with return code %d\n", retcode);
 		} else {
 			printf("Failed to start a shell :(\n");

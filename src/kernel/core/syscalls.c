@@ -157,14 +157,14 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			thread_exit((int)arg0);
 			*call_ret = 0;
 			break;
-		case SYSCALL_PROC_CREATE_PROC:
-			*call_ret = user_proc_create_proc((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
+		case SYSCALL_CREATE_TEAM:
+			*call_ret = user_team_create_team((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
 			break;
-		case SYSCALL_THREAD_WAIT_ON_THREAD:
+		case SYSCALL_WAIT_ON_THREAD:
 			*call_ret = user_thread_wait_on_thread((thread_id)arg0, (int *)arg1);
 			break;
-		case SYSCALL_PROC_WAIT_ON_PROC:
-			*call_ret = user_proc_wait_on_proc((proc_id)arg0, (int *)arg1);
+		case SYSCALL_WAIT_ON_TEAM:
+			*call_ret = user_team_wait_on_team((team_id)arg0, (int *)arg1);
 			break;
 		case SYSCALL_VM_CREATE_ANONYMOUS_REGION:
 			*call_ret = user_vm_create_anonymous_region(
@@ -192,7 +192,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_vm_get_region_info((region_id)arg0, (vm_region_info *)arg1);
 			break;
 		case SYSCALL_SPAWN_THREAD:
-			*call_ret = user_thread_create_user_thread((addr)arg0, thread_get_current_thread()->proc->id, 
+			*call_ret = user_thread_create_user_thread((addr)arg0, thread_get_current_thread()->team->id, 
 			                                           (const char*)arg1, (int)arg2, (void *)arg3);
 			break;
 		case SYSCALL_KILL_THREAD:
@@ -204,11 +204,11 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_RESUME_THREAD:
 			*call_ret = thread_resume_thread((thread_id)arg0);
 			break;
-		case SYSCALL_PROC_KILL_PROC:
-			*call_ret = proc_kill_proc((proc_id)arg0);
+		case SYSCALL_KILL_TEAM:
+			*call_ret = team_kill_team((team_id)arg0);
 			break;
-		case SYSCALL_GET_CURRENT_PROC_ID:
-			*call_ret = proc_get_current_proc_id();
+		case SYSCALL_GET_CURRENT_TEAM_ID:
+			*call_ret = team_get_current_team_id();
 			break;
 		case SYSCALL_GETCWD:
 			*call_ret = user_getcwd((char*)arg0, (size_t)arg1);
@@ -250,7 +250,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_read_port_etc((port_id)arg0, (int32*)arg1, (void*)arg2, (size_t)arg3, (uint32)arg4 | B_CAN_INTERRUPT, (bigtime_t)INT32TOINT64(arg5, arg6));
 			break;
 		case SYSCALL_PORT_SET_OWNER:
-			*call_ret = user_set_port_owner((port_id)arg0, (proc_id)arg1);
+			*call_ret = user_set_port_owner((port_id)arg0, (team_id)arg1);
 			break;
 		case SYSCALL_PORT_WRITE:
 			*call_ret = user_write_port_etc((port_id)arg0, (int32)arg1, (void *)arg2, (size_t)arg3, B_CAN_INTERRUPT, 0);
@@ -265,11 +265,11 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_get_sem_info((sem_id)arg0, (struct sem_info *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_SEM_GET_NEXT_SEM_INFO:
-			*call_ret = user_get_next_sem_info((proc_id)arg0, (uint32 *)arg1, (struct sem_info *)arg2,
+			*call_ret = user_get_next_sem_info((team_id)arg0, (uint32 *)arg1, (struct sem_info *)arg2,
 			                                   (size_t)arg3);
 			break;
 		case SYSCALL_SEM_SET_SEM_OWNER:
-			*call_ret = user_set_sem_owner((sem_id)arg0, (proc_id)arg1);
+			*call_ret = user_set_sem_owner((sem_id)arg0, (team_id)arg1);
 			break;
 		case SYSCALL_FDDUP:
 			*call_ret = user_dup(arg0);
@@ -278,7 +278,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_dup2(arg0, arg1);
 			break;
 		case SYSCALL_GET_PROC_TABLE:
-			*call_ret = user_proc_get_table((struct proc_info *)arg0, (size_t)arg1);
+			*call_ret = user_team_get_table((struct team_info *)arg0, (size_t)arg1);
 			break;
 		case SYSCALL_GETRLIMIT:
 			*call_ret = user_getrlimit((int)arg0, (struct rlimit *)arg1);

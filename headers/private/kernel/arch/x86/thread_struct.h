@@ -18,7 +18,7 @@ struct arch_thread {
 	uint8 fpu_state[512];
 };
 
-struct arch_proc {
+struct arch_team {
 	// nothing here
 };
 

@@ -35,7 +35,7 @@ void
 rldheap_init(void)
 {
 	rld_region= sys_vm_create_anonymous_region(
-		(char*)names[sys_get_current_proc_id()%(sizeof(names)/sizeof(names[0]))],
+		(char*)names[sys_get_current_team_id()%(sizeof(names)/sizeof(names[0]))],
 		(void**)&rld_base,
 		REGION_ADDR_ANY_ADDRESS,
 		RLD_SCRATCH_SIZE,

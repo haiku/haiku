@@ -51,33 +51,33 @@ bigtime_t sys_system_time();
 int     sys_snooze(bigtime_t time);
 
 /* sem functions */
-sem_id kern_create_sem(int count, const char *name);
-int    kern_delete_sem(sem_id id);
-int    kern_acquire_sem(sem_id id);
-int    kern_acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout);
-int    kern_release_sem(sem_id id);
-int    kern_release_sem_etc(sem_id id, int count, int flags);
+sem_id sys_create_sem(int count, const char *name);
+int    sys_delete_sem(sem_id id);
+int    sys_acquire_sem(sem_id id);
+int    sys_acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout);
+int    sys_release_sem(sem_id id);
+int    sys_release_sem_etc(sem_id id, int count, int flags);
 int    sys_sem_get_count(sem_id id, int32* thread_count);
-int    kern_get_sem_info(sem_id, struct sem_info *, size_t);
-int    kern_get_next_sem_info(proc_id, uint32 *, struct sem_info *, size_t);
-int    sys_set_sem_owner(sem_id id, proc_id proc);
+int    sys_get_sem_info(sem_id, struct sem_info *, size_t);
+int    sys_get_next_sem_info(team_id, uint32 *, struct sem_info *, size_t);
+int    sys_set_sem_owner(sem_id id, team_id proc);
 
 
-int sys_proc_get_table(struct proc_info *pi, size_t len);
+//int sys_team_get_table(struct proc_info *pi, size_t len);
 void sys_exit(int retcode);
-proc_id sys_proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
+team_id sys_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 
-thread_id kern_spawn_thread(int (*func)(void*), const char *, int, void *);
-thread_id kern_get_current_thread_id(void);
-int       kern_suspend_thread(thread_id tid);
-int       kern_resume_thread(thread_id tid);
-int       kern_kill_thread(thread_id tid);
+thread_id sys_spawn_thread(int (*func)(void*), const char *, int, void *);
+thread_id sys_get_current_thread_id(void);
+int       sys_suspend_thread(thread_id tid);
+int       sys_resume_thread(thread_id tid);
+int       sys_kill_thread(thread_id tid);
 
-int sys_thread_wait_on_thread(thread_id tid, int *retcode);
-int sys_proc_kill_proc(proc_id pid);
+int sys_wait_on_thread(thread_id tid, int *retcode);
+int sys_kill_team(team_id tid);
 
-proc_id sys_get_current_proc_id();
-int sys_proc_wait_on_proc(proc_id pid, int *retcode);
+team_id sys_get_current_team_id();
+int sys_wait_on_team(team_id tid, int *retcode);
 
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
@@ -94,13 +94,13 @@ int			sys_port_close(port_id id);
 int			sys_port_delete(port_id id);
 port_id		sys_port_find(const char *port_name);
 int			sys_port_get_info(port_id id, struct port_info *info);
-int		 	sys_port_get_next_port_info(proc_id proc, uint32 *cookie, struct port_info *info);
+int		 	sys_port_get_next_port_info(team_id team, uint32 *cookie, struct port_info *info);
 ssize_t		sys_port_buffer_size(port_id port);
 ssize_t		sys_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout);
 int32		sys_port_count(port_id port);
 ssize_t		sys_port_read(port_id port, int32 *msg_code, void *msg_buffer, size_t buffer_size);
 ssize_t		sys_port_read_etc(port_id port,	int32 *msg_code, void *msg_buffer, size_t buffer_size, uint32 flags, bigtime_t timeout);
-int			sys_port_set_owner(port_id port, team_id proc);
+int			sys_port_set_owner(port_id port, team_id team);
 int			sys_port_write(port_id port, int32 msg_code, const void *msg_buffer, size_t buffer_size);
 int			sys_port_write_etc(port_id port, int32 msg_code, const void *msg_buffer, size_t buffer_size, uint32 flags, bigtime_t timeout);
 
@@ -123,7 +123,7 @@ area_id sys_find_region_by_name(const char *);
 /* This is a real BSD'ism :) Basically it returns the size of the
  * descriptor table for the current process as an integer.
  */
-int kern_getdtablesize(void);
+int sys_getdtablesize(void);
 
 #ifdef __cplusplus
 }

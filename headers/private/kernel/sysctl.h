@@ -105,7 +105,7 @@ struct ctlname {
 #ifdef _KERNEL_MODE
   typedef int (sysctlfn)(int *, uint, void *, size_t *, void *, size_t);
 
-  int kern_sysctl(int *, uint, void *, size_t *, void *, size_t);
+  int sys_sysctl(int *, uint, void *, size_t *, void *, size_t);
   int hw_sysctl(int *, uint, void *, size_t *, void *, size_t);
   int sysctl_int (void *, size_t *, void *, size_t, int *);
   int sysctl_rdint (void *, size_t *, void *, int);

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if 0
 
 #define MAX_PROCESSES 1024
 
@@ -72,3 +73,11 @@ main(int argc, char ** argv)
 	return 0;
 }
 
+#else
+
+int main(int argc, char **argv)
+{
+	return 0;
+}
+
+#endif

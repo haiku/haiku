@@ -43,20 +43,20 @@ main(int argc, char *argv[])
 	if(num < 2) {
 		result= 1;
 	} else {
-		proc_id pid;
+		team_id pid;
 		int retcode;
 		char buffer[64];
 		char *aaargv[]= { "/boot/bin/fibo", "-s", buffer, NULL };
 		int  aaargc= 3;
 
 		sprintf(buffer, "%d", num-1);
-		pid= sys_proc_create_proc(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
-		sys_proc_wait_on_proc(pid, &retcode);
+		pid= sys_create_team(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
+		sys_wait_on_team(pid, &retcode);
 		result= retcode;
 
 		sprintf(buffer, "%d", num-2);
-		pid= sys_proc_create_proc(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
-		sys_proc_wait_on_proc(pid, &retcode);
+		pid= sys_create_team(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
+		sys_wait_on_team(pid, &retcode);
 		result+= retcode;
 	}
 

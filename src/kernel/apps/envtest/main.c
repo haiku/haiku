@@ -7,7 +7,7 @@
 int main(int argc, char **argv)
 {
 	int i, rc;
-	proc_id pid;
+	team_id pid;
 	char temp[16];
 	char *var;
 	
@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 		if (val > 0) {
 			printf("Spawning test (%d left)\n", val);
 			sprintf(buffer, "%d", val);
-			pid = sys_proc_create_proc(_argv[0], _argv[0], _argv, 2, NULL, 0, 5);
-			sys_proc_wait_on_proc(pid, &rc);
+			pid = sys_create_team(_argv[0], _argv[0], _argv, 2, NULL, 0, 5);
+			sys_wait_on_team(pid, &rc);
 		}
 	}
 	return 0;

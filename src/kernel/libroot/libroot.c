@@ -102,27 +102,27 @@ status_t _get_port_info(port_id port, port_info *info, size_t size) { return sys
 
 // OK
 sem_id		create_sem(int32 count, const char *name) 
-{ return kern_create_sem(count,name); }
+{ return sys_create_sem(count,name); }
 
 // OK
 status_t	delete_sem(sem_id sem) 
-{ return kern_delete_sem(sem); }
+{ return sys_delete_sem(sem); }
 
 // OK
 status_t	acquire_sem(sem_id sem) 
-{ return kern_acquire_sem(sem); }
+{ return sys_acquire_sem(sem); }
 
 // Have to modify flags ???
 int acquire_sem_etc(sem_id sem, int32 count, int32 flags, bigtime_t timeout)
-{ return kern_acquire_sem_etc(sem, count, flags, timeout); }
+{ return sys_acquire_sem_etc(sem, count, flags, timeout); }
 
 // OK
 status_t	release_sem(sem_id sem)
-{ return kern_release_sem(sem); }
+{ return sys_release_sem(sem); }
 
 // Have to modify flags ???
 status_t	release_sem_etc(sem_id sem, int32 count, int32 flags)
-{ return kern_release_sem_etc(sem, count, flags); }
+{ return sys_release_sem_etc(sem, count, flags); }
 
 // OK
 status_t	get_sem_count(sem_id sem, int32 *count)
@@ -134,32 +134,32 @@ status_t	set_sem_owner(sem_id sem, team_id team)
 
 // OK
 status_t	_get_sem_info(sem_id sem, sem_info *info, size_t size)
-{ return kern_get_sem_info(sem,info, size); }
+{ return sys_get_sem_info(sem,info, size); }
 
 // OK
-int _get_next_sem_info(proc_id team, uint32 *cookie, sem_info *info, size_t size)
-{ return kern_get_next_sem_info(team,cookie,info, size); }
+int _get_next_sem_info(team_id team, uint32 *cookie, sem_info *info, size_t size)
+{ return sys_get_next_sem_info(team,cookie,info, size); }
 
 // TO DO
 bigtime_t	set_alarm(bigtime_t when, uint32 flags);
 
 //		case SYSCALL_GET_CURRENT_THREAD_ID: *call_ret = thread_get_current_thread_id(); break;
-//		case SYSCALL_THREAD_CREATE_THREAD: *call_ret = user_thread_create_user_thread((char *)arg0, thread_get_current_thread()->proc->id, (addr)arg1, (void *)arg2); break;
+//		case SYSCALL_THREAD_CREATE_THREAD: *call_ret = user_thread_create_user_thread((char *)arg0, thread_get_current_thread()->team->id, (addr)arg1, (void *)arg2); break;
 //		case SYSCALL_PROC_CREATE_PROC: *call_ret = user_proc_create_proc((const char *)arg0, (const char *)arg1, (char **)arg2, (int )arg3, (int)arg4); break;
 //		case SYSCALL_GET_CURRENT_PROC_ID: *call_ret = proc_get_current_proc_id(); break;
 //		case SYSCALL_PROC_WAIT_ON_PROC: *call_ret = user_proc_wait_on_proc((proc_id)arg0, (int *)arg1); break;
 
 // OK
 status_t	kill_thread(thread_id thread)
-	{ return kern_kill_thread(thread); }
+	{ return sys_kill_thread(thread); }
 
 // OK
 status_t	resume_thread(thread_id thread)
-	{ return kern_resume_thread(thread); }
+	{ return sys_resume_thread(thread); }
 
 // OK
 status_t	suspend_thread(thread_id thread)
-	{ return kern_suspend_thread(thread); }
+	{ return sys_suspend_thread(thread); }
 
 // TO DO
 status_t	rename_thread(thread_id thread, const char *new_name);
@@ -172,7 +172,7 @@ void		exit_thread(status_t status)
 
 // OK
 status_t	wait_for_thread (thread_id thread, status_t *thread_return_value)
-	{ return sys_thread_wait_on_thread(thread,thread_return_value); }
+	{ return sys_wait_on_thread(thread,thread_return_value); }
 
 // TO DO
 status_t	on_exit_thread(void (*callback)(void *), void *data);
@@ -202,7 +202,7 @@ status_t	snooze_until(bigtime_t time, int timebase);
 
 // OK
 status_t	kill_team(team_id team)  
-	{ return sys_proc_kill_proc(team); }
+	{ return sys_kill_team(team); }
 
 // TO DO
 status_t	_get_team_info(team_id team, team_info *info, size_t size);

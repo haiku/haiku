@@ -1,4 +1,4 @@
-/* Threading and process information */
+/* Threading and team information */
 
 /*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -36,15 +36,15 @@
 #include <syscalls.h>
 
 
-struct proc_key {
-	proc_id id;
+struct team_key {
+	team_id id;
 };
 
 struct thread_key {
 	thread_id id;
 };
 
-struct proc_arg {
+struct team_arg {
 	char *path;
 	char **args;
 	char **envp;
@@ -52,22 +52,22 @@ struct proc_arg {
 	unsigned int envc;
 };
 
-static struct proc *create_proc_struct(const char *name, bool kernel);
-static int proc_struct_compare(void *_p, const void *_key);
-static unsigned int proc_struct_hash(void *_p, const void *_key, unsigned int range);
+static struct team *create_team_struct(const char *name, bool kernel);
+static int team_struct_compare(void *_p, const void *_key);
+static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range);
 
 // global
 spinlock_t thread_spinlock = 0;
 
-// proc list
-static void *proc_hash = NULL;
-static struct proc *kernel_proc = NULL;
-static proc_id next_proc_id = 0;
-static spinlock_t proc_spinlock = 0;
-	// NOTE: PROC lock can be held over a THREAD lock acquisition,
+// team list
+static void *team_hash = NULL;
+static struct team *kernel_team = NULL;
+static team_id next_team_id = 0;
+static spinlock_t team_spinlock = 0;
+	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
 	// but not the other way (to avoid deadlock)
-#define GRAB_PROC_LOCK() acquire_spinlock(&proc_spinlock)
-#define RELEASE_PROC_LOCK() release_spinlock(&proc_spinlock)
+#define GRAB_TEAM_LOCK() acquire_spinlock(&team_spinlock)
+#define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
 
 // thread list
 static struct thread *idle_threads[MAX_BOOT_CPUS];
@@ -95,9 +95,9 @@ static int _rand(void);
 static void thread_entry(void);
 static struct thread *thread_get_thread_struct_locked(thread_id id);
 /* XXX - not currently used, so commented out
-static struct proc *proc_get_proc_struct(proc_id id);
+static struct team *team_get_team_struct(team_id id);
  */
-static struct proc *proc_get_proc_struct_locked(proc_id id);
+static struct team *team_get_team_struct_locked(team_id id);
 static void thread_kthread_exit(void);
 static void deliver_signal(struct thread *t, int signal);
 
@@ -176,28 +176,28 @@ struct thread *thread_dequeue_run_q(int priority)
 	return thread_dequeue(&run_q[priority]);
 }
 
-static void insert_thread_into_proc(struct proc *p, struct thread *t)
+static void insert_thread_into_team(struct team *p, struct thread *t)
 {
-	t->proc_next = p->thread_list;
+	t->team_next = p->thread_list;
 	p->thread_list = t;
 	p->num_threads++;
 	if(p->num_threads == 1) {
 		// this was the first thread
 		p->main_thread = t;
 	}
-	t->proc = p;
+	t->team = p;
 }
 
-static void remove_thread_from_proc(struct proc *p, struct thread *t)
+static void remove_thread_from_team(struct team *p, struct thread *t)
 {
 	struct thread *temp, *last = NULL;
 
-	for(temp = p->thread_list; temp != NULL; temp = temp->proc_next) {
+	for(temp = p->thread_list; temp != NULL; temp = temp->team_next) {
 		if(temp == t) {
 			if(last == NULL) {
-				p->thread_list = temp->proc_next;
+				p->thread_list = temp->team_next;
 			} else {
-				last->proc_next = temp->proc_next;
+				last->team_next = temp->team_next;
 			}
 			p->num_threads--;
 			break;
@@ -322,7 +322,7 @@ static struct thread *create_thread_struct(const char *name)
 	t->name[SYS_MAX_OS_NAME_LEN-1] = 0;
 
 	t->id = atomic_add(&next_thread_id, 1);
-	t->proc = NULL;
+	t->team = NULL;
 	t->cpu = NULL;
 	t->sem_blocking = -1;
 	t->fault_handler = 0;
@@ -330,7 +330,7 @@ static struct thread *create_thread_struct(const char *name)
 	t->kernel_stack_base = 0;
 	t->user_stack_region_id = -1;
 	t->user_stack_base = 0;
-	t->proc_next = NULL;
+	t->team_next = NULL;
 	t->q_next = NULL;
 	t->priority = -1;
 	t->args = NULL;
@@ -397,11 +397,11 @@ static int _create_kernel_thread_kentry(void)
 	return func(t->args);
 }
 
-static thread_id _create_thread(const char *name, proc_id pid, addr entry, void *args, 
+static thread_id _create_thread(const char *name, team_id pid, addr entry, void *args, 
                                 int priority, bool kernel)
 {
 	struct thread *t;
-	struct proc *p;
+	struct team *p;
 	int state;
 	char stack_name[64];
 	bool abort = false;
@@ -421,15 +421,15 @@ static thread_id _create_thread(const char *name, proc_id pid, addr entry, void 
 	hash_insert(thread_hash, t);
 	RELEASE_THREAD_LOCK();
 
-	GRAB_PROC_LOCK();
-	// look at the proc, make sure it's not being deleted
-	p = proc_get_proc_struct_locked(pid);
-	if(p != NULL && p->state != PROC_STATE_DEATH) {
-		insert_thread_into_proc(p, t);
+	GRAB_TEAM_LOCK();
+	// look at the team, make sure it's not being deleted
+	p = team_get_team_struct_locked(pid);
+	if(p != NULL && p->state != TEAM_STATE_DEATH) {
+		insert_thread_into_team(p, t);
 	} else {
 		abort = true;
 	}
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	if(abort) {
 		GRAB_THREAD_LOCK();
 		hash_remove(thread_hash, t);
@@ -485,7 +485,7 @@ static thread_id _create_thread(const char *name, proc_id pid, addr entry, void 
 	return t->id;
 }
 
-thread_id user_thread_create_user_thread(addr entry, proc_id pid, const char *uname, int priority,
+thread_id user_thread_create_user_thread(addr entry, team_id pid, const char *uname, int priority,
                                          void *args)
 {
 	char name[SYS_MAX_OS_NAME_LEN];
@@ -504,17 +504,17 @@ thread_id user_thread_create_user_thread(addr entry, proc_id pid, const char *un
 	return _create_thread(name, pid, entry, args, priority, false);
 }
 
-thread_id thread_create_user_thread(char *name, proc_id pid, addr entry, void *args)
+thread_id thread_create_user_thread(char *name, team_id pid, addr entry, void *args)
 {
 	return _create_thread(name, pid, entry, args, -1, false);
 }
 
 thread_id thread_create_kernel_thread(const char *name, int (*func)(void *), void *args)
 {
-	return _create_thread(name, proc_get_kernel_proc()->id, (addr)func, args, -1, true);
+	return _create_thread(name, team_get_kernel_team()->id, (addr)func, args, -1, true);
 }
 
-static thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct proc *p)
+static thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
 {
 	return _create_thread(name, p->id, (addr)func, args, -1, true);
 }
@@ -535,7 +535,7 @@ int thread_suspend_thread(thread_id id)
 	}
 
 	if (t != NULL) {
-		if (t->proc == kernel_proc) {
+		if (t->team == kernel_team) {
 			// no way
 			retval = EPERM;
 		} else if (t->in_kernel == true) {
@@ -629,9 +629,9 @@ int thread_set_priority(thread_id id, int priority)
 	return retval;
 }
 
-static void _dump_proc_info(struct proc *p)
+static void _dump_team_info(struct team *p)
 {
-	dprintf("PROC: %p\n", p);
+	dprintf("TEAM: %p\n", p);
 	dprintf("id:          0x%x\n", p->id);
 	dprintf("name:        '%s'\n", p->name);
 	dprintf("next:        %p\n", p->next);
@@ -647,15 +647,15 @@ static void _dump_proc_info(struct proc *p)
 	dprintf("thread_list: %p\n", p->thread_list);
 }
 
-static int dump_proc_info(int argc, char **argv)
+static int dump_team_info(int argc, char **argv)
 {
-	struct proc *p;
+	struct team *p;
 	int id = -1;
 	unsigned long num;
 	struct hash_iterator i;
 
 	if(argc < 2) {
-		dprintf("proc: not enough arguments\n");
+		dprintf("team: not enough arguments\n");
 		return 0;
 	}
 
@@ -664,7 +664,7 @@ static int dump_proc_info(int argc, char **argv)
 		num = atoul(argv[1]);
 		if(num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
-			_dump_proc_info((struct proc*)num);
+			_dump_team_info((struct team*)num);
 			return 0;
 		} else {
 			id = num;
@@ -672,14 +672,14 @@ static int dump_proc_info(int argc, char **argv)
 	}
 
 	// walk through the thread list, trying to match name or id
-	hash_open(proc_hash, &i);
-	while((p = hash_next(proc_hash, &i)) != NULL) {
+	hash_open(team_hash, &i);
+	while((p = hash_next(team_hash, &i)) != NULL) {
 		if((p->name && strcmp(argv[1], p->name) == 0) || p->id == id) {
-			_dump_proc_info(p);
+			_dump_team_info(p);
 			break;
 		}
 	}
-	hash_close(proc_hash, &i, false);
+	hash_close(team_hash, &i, false);
 	return 0;
 }
 
@@ -711,8 +711,8 @@ static void _dump_thread_info(struct thread *t)
 	dprintf("THREAD: %p\n", t);
 	dprintf("id:          0x%x\n", t->id);
 	dprintf("name:        '%s'\n", t->name);
-	dprintf("all_next:    %p\nproc_next:  %p\nq_next:     %p\n",
-		t->all_next, t->proc_next, t->q_next);
+	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
+		t->all_next, t->team_next, t->q_next);
 	dprintf("priority:    0x%x\n", t->priority);
 	dprintf("state:       %s\n", state_to_text(t->state));
 	dprintf("next_state:  %s\n", state_to_text(t->next_state));
@@ -731,7 +731,7 @@ static void _dump_thread_info(struct thread *t)
 	dprintf("fault_handler: 0x%lx\n", t->fault_handler);
 	dprintf("args:        %p\n", t->args);
 	dprintf("entry:       0x%lx\n", t->entry);
-	dprintf("proc:        %p\n", t->proc);
+	dprintf("team:        %p\n", t->team);
 	dprintf("return_code_sem: 0x%x\n", t->return_code_sem);
 	dprintf("kernel_stack_region_id: 0x%x\n", t->kernel_stack_region_id);
 	dprintf("kernel_stack_base: 0x%lx\n", t->kernel_stack_base);
@@ -841,7 +841,7 @@ static int dump_next_thread_in_all_list(int argc, char **argv)
 	return 0;
 }
 
-static int dump_next_thread_in_proc(int argc, char **argv)
+static int dump_next_thread_in_team(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
@@ -850,9 +850,9 @@ static int dump_next_thread_in_proc(int argc, char **argv)
 		return 0;
 	}
 
-	dprintf("next thread in proc after thread @ %p\n", t);
-	if(t->proc_next != NULL) {
-		_dump_thread_info(t->proc_next);
+	dprintf("next thread in team after thread @ %p\n", t);
+	if(t->team_next != NULL) {
+		_dump_thread_info(t->team_next);
 	} else {
 		dprintf("NULL\n");
 	}
@@ -924,24 +924,24 @@ int thread_init(kernel_args *ka)
 
 //	dprintf("thread_init: entry\n");
 
-	// create the process hash table
-	proc_hash = hash_init(15, (addr)&kernel_proc->next - (addr)kernel_proc,
-		&proc_struct_compare, &proc_struct_hash);
+	// create the team hash table
+	team_hash = hash_init(15, (addr)&kernel_team->next - (addr)kernel_team,
+		&team_struct_compare, &team_struct_hash);
 
-	// create the kernel process
-	kernel_proc = create_proc_struct("kernel_proc", true);
-	if(kernel_proc == NULL)
-		panic("could not create kernel proc!\n");
-	kernel_proc->state = PROC_STATE_NORMAL;
+	// create the kernel team
+	kernel_team = create_team_struct("kernel_team", true);
+	if(kernel_team == NULL)
+		panic("could not create kernel team!\n");
+	kernel_team->state = TEAM_STATE_NORMAL;
 
-	kernel_proc->ioctx = vfs_new_io_context(NULL);
-	if(kernel_proc->ioctx == NULL)
-		panic("could not create ioctx for kernel proc!\n");
+	kernel_team->ioctx = vfs_new_io_context(NULL);
+	if(kernel_team->ioctx == NULL)
+		panic("could not create ioctx for kernel team!\n");
 
-	//XXX should initialize kernel_proc->path here. Set it to "/"?
+	//XXX should initialize kernel_team->path here. Set it to "/"?
 
-	// stick it in the process hash
-	hash_insert(proc_hash, kernel_proc);
+	// stick it in the team hash
+	hash_insert(team_hash, kernel_team);
 
 	// create the thread hash table
 	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
@@ -971,7 +971,7 @@ int thread_init(kernel_args *ka)
 			panic("error creating idle thread struct\n");
 			return ENOMEM;
 		}
-		t->proc = proc_get_kernel_proc();
+		t->team = team_get_kernel_team();
 		t->priority = THREAD_IDLE_PRIORITY;
 		t->state = THREAD_STATE_RUNNING;
 		t->next_state = THREAD_STATE_READY;
@@ -984,7 +984,7 @@ int thread_init(kernel_args *ka)
 		t->kernel_stack_base = region->base;
 		vm_put_region(region);
 		hash_insert(thread_hash, t);
-		insert_thread_into_proc(t->proc, t);
+		insert_thread_into_team(t->team, t);
 		idle_threads[i] = t;
 		if(i == 0)
 			arch_thread_set_current_thread(t);
@@ -1027,8 +1027,8 @@ int thread_init(kernel_args *ka)
 	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
-	add_debugger_command("next_proc", &dump_next_thread_in_proc, "dump the next thread in the process of the last thread viewed");
-	add_debugger_command("proc", &dump_proc_info, "list info about a particular process");
+	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
+	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 
 	return 0;
 }
@@ -1120,9 +1120,9 @@ static void thread_exit2(void *_args)
 
 	// remove this thread from all of the global lists
 	disable_interrupts();
-	GRAB_PROC_LOCK();
-	remove_thread_from_proc(kernel_proc, args.t);
-	RELEASE_PROC_LOCK();
+	GRAB_TEAM_LOCK();
+	remove_thread_from_team(kernel_team, args.t);
+	RELEASE_TEAM_LOCK();
 	GRAB_THREAD_LOCK();
 	hash_remove(thread_hash, args.t);
 	RELEASE_THREAD_LOCK();
@@ -1145,8 +1145,8 @@ void thread_exit(int retcode)
 {
 	int state;
 	struct thread *t = thread_get_current_thread();
-	struct proc *p = t->proc;
-	bool delete_proc = false;
+	struct team *p = t->team;
+	bool delete_team = false;
 	unsigned int death_stack;
 	sem_id cached_death_sem;
 
@@ -1162,22 +1162,22 @@ void thread_exit(int retcode)
 		vm_delete_region(p->_aspace_id, rid);
 	}
 
-	if(p != kernel_proc) {
-		// remove this thread from the current process and add it to the kernel
-		// put the thread into the kernel proc until it dies
+	if(p != kernel_team) {
+		// remove this thread from the current team and add it to the kernel
+		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
-		GRAB_PROC_LOCK();
-		remove_thread_from_proc(p, t);
-		insert_thread_into_proc(kernel_proc, t);
+		GRAB_TEAM_LOCK();
+		remove_thread_from_team(p, t);
+		insert_thread_into_team(kernel_team, t);
 		if(p->main_thread == t) {
-			// this was main thread in this process
-			delete_proc = true;
-			hash_remove(proc_hash, p);
-			p->state = PROC_STATE_DEATH;
+			// this was main thread in this team
+			delete_team = true;
+			hash_remove(team_hash, p);
+			p->state = TEAM_STATE_DEATH;
 		}
-		RELEASE_PROC_LOCK();
+		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
-		vm_aspace_swap(kernel_proc->kaspace);
+		vm_aspace_swap(kernel_team->kaspace);
 		restore_interrupts(state);
 
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
@@ -1185,10 +1185,10 @@ void thread_exit(int retcode)
 	
 	cached_death_sem = p->death_sem;
 
-	// delete the process
-	if(delete_proc) {
+	// delete the team
+	if(delete_team) {
 		if(p->num_threads > 0) {
-			// there are other threads still in this process,
+			// there are other threads still in this team,
 			// cycle through and signal kill on each of the threads
 			// XXX this can be optimized. There's got to be a better solution.
 			struct thread *temp_thread;
@@ -1200,16 +1200,16 @@ void thread_exit(int retcode)
 				panic("thread_exit: cannot init death sem for team %d\n", p->id);
 			
 			state = disable_interrupts();
-			GRAB_PROC_LOCK();
+			GRAB_TEAM_LOCK();
 			// we can safely walk the list because of the lock. no new threads can be created
-			// because of the PROC_STATE_DEATH flag on the process
+			// because of the TEAM_STATE_DEATH flag on the team
 			temp_thread = p->thread_list;
 			while(temp_thread) {
-				struct thread *next = temp_thread->proc_next;
+				struct thread *next = temp_thread->team_next;
 				thread_kill_thread_nowait(temp_thread->id);
 				temp_thread = next;
 			}
-			RELEASE_PROC_LOCK();
+			RELEASE_TEAM_LOCK();
 			restore_interrupts(state);
 #if 0
 			// Now wait for all of the threads to die
@@ -1276,7 +1276,7 @@ static int _thread_kill_thread(thread_id id, bool wait_on)
 
 	t = thread_get_thread_struct_locked(id);
 	if(t != NULL) {
-		if(t->proc == kernel_proc) {
+		if(t->team == kernel_team) {
 			// can't touch this
 			rc = EPERM;
 		} else {
@@ -1373,7 +1373,7 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	return rc;
 }
 
-int user_proc_wait_on_proc(proc_id id, int *uretcode)
+int user_team_wait_on_team(team_id id, int *uretcode)
 {
 	int retcode;
 	int rc, rc2;
@@ -1381,7 +1381,7 @@ int user_proc_wait_on_proc(proc_id id, int *uretcode)
 	if((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = proc_wait_on_proc(id, &retcode);
+	rc = team_wait_on_team(id, &retcode);
 	if(rc < 0)
 		return rc;
 
@@ -1392,21 +1392,21 @@ int user_proc_wait_on_proc(proc_id id, int *uretcode)
 	return rc;
 }
 
-int proc_wait_on_proc(proc_id id, int *retcode)
+int team_wait_on_team(team_id id, int *retcode)
 {
-	struct proc *p;
+	struct team *p;
 	thread_id tid;
 	int state;
 
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
-	p = proc_get_proc_struct_locked(id);
+	GRAB_TEAM_LOCK();
+	p = team_get_team_struct_locked(id);
 	if(p && p->main_thread) {
 		tid = p->main_thread->id;
 	} else {
 		tid = ERR_INVALID_HANDLE;
 	}
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	if(tid < 0)
@@ -1441,30 +1441,30 @@ static struct thread *thread_get_thread_struct_locked(thread_id id)
 }
 
 /* XXX - static but unused
-static struct proc *proc_get_proc_struct(proc_id id)
+static struct team *team_get_team_struct(team_id id)
 {
-	struct proc *p;
+	struct team *p;
 	int state;
 
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
+	GRAB_TEAM_LOCK();
 
-	p = proc_get_proc_struct_locked(id);
+	p = team_get_team_struct_locked(id);
 
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	return p;
 }
 */
 
-static struct proc *proc_get_proc_struct_locked(proc_id id)
+static struct team *team_get_team_struct_locked(team_id id)
 {
-	struct proc_key key;
+	struct team_key key;
 
 	key.id = id;
 
-	return hash_lookup(proc_hash, &key);
+	return hash_lookup(team_hash, &key);
 }
 
 static void thread_context_switch(struct thread *t_from, struct thread *t_to)
@@ -1602,19 +1602,19 @@ found_thread:
 #endif
 }
 
-static int proc_struct_compare(void *_p, const void *_key)
+static int team_struct_compare(void *_p, const void *_key)
 {
-	struct proc *p = _p;
-	const struct proc_key *key = _key;
+	struct team *p = _p;
+	const struct team_key *key = _key;
 
 	if(p->id == key->id) return 0;
 	else return 1;
 }
 
-static unsigned int proc_struct_hash(void *_p, const void *_key, unsigned int range)
+static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range)
 {
-	struct proc *p = _p;
-	const struct proc_key *key = _key;
+	struct team *p = _p;
+	const struct team_key *key = _key;
 
 	if(p != NULL)
 		return (p->id % range);
@@ -1622,32 +1622,32 @@ static unsigned int proc_struct_hash(void *_p, const void *_key, unsigned int ra
 		return (key->id % range);
 }
 
-struct proc *proc_get_kernel_proc(void)
+struct team *team_get_kernel_team(void)
 {
-	return kernel_proc;
+	return kernel_team;
 }
 
-proc_id proc_get_kernel_proc_id(void)
+team_id team_get_kernel_team_id(void)
 {
-	if(!kernel_proc)
+	if(!kernel_team)
 		return 0;
 	else
-		return kernel_proc->id;
+		return kernel_team->id;
 }
 
-proc_id proc_get_current_proc_id(void)
+team_id team_get_current_team_id(void)
 {
-	return thread_get_current_thread()->proc->id;
+	return thread_get_current_thread()->team->id;
 }
 
-static struct proc *create_proc_struct(const char *name, bool kernel)
+static struct team *create_team_struct(const char *name, bool kernel)
 {
-	struct proc *p;
+	struct team *p;
 
-	p = (struct proc *)kmalloc(sizeof(struct proc));
+	p = (struct team *)kmalloc(sizeof(struct team));
 	if(p == NULL)
 		goto error;
-	p->id = atomic_add(&next_proc_id, 1);
+	p->id = atomic_add(&next_team_id, 1);
 	strncpy(&p->name[0], name, SYS_MAX_OS_NAME_LEN-1);
 	p->name[SYS_MAX_OS_NAME_LEN-1] = 0;
 	p->num_threads = 0;
@@ -1659,12 +1659,12 @@ static struct proc *create_proc_struct(const char *name, bool kernel)
 	vm_put_aspace(p->kaspace);
 	p->thread_list = NULL;
 	p->main_thread = NULL;
-	p->state = PROC_STATE_BIRTH;
+	p->state = TEAM_STATE_BIRTH;
 	p->pending_signals = SIG_NONE;
 	p->death_sem = -1;
 	p->user_env_base = NULL;
 
-	if(arch_proc_init_proc_struct(p, kernel) < 0)
+	if(arch_team_init_team_struct(p, kernel) < 0)
 		goto error1;
 
 	return p;
@@ -1675,7 +1675,7 @@ error:
 	return NULL;
 }
 
-static void delete_proc_struct(struct proc *p)
+static void delete_team_struct(struct team *p)
 {
 	kfree(p);
 }
@@ -1692,12 +1692,12 @@ static int get_arguments_data_size(char **args,int argc)
 	return tot_size + sizeof(struct uspace_prog_args_t);
 }
 
-static int proc_create_proc2(void *args)
+static int team_create_team2(void *args)
 {
 	int err;
 	struct thread *t;
-	struct proc *p;
-	struct proc_arg *pargs = args;
+	struct team *p;
+	struct team_arg *pargs = args;
 	char *path;
 	addr entry;
 	char ustack_name[128];
@@ -1710,9 +1710,9 @@ static int proc_create_proc2(void *args)
 	unsigned int env_cnt;
 
 	t = thread_get_current_thread();
-	p = t->proc;
+	p = t->team;
 
-	dprintf("proc_create_proc2: entry thread %d\n", t->id);
+	dprintf("team_create_team2: entry thread %d\n", t->id);
 
 	// create an initial primary stack region
 
@@ -1722,7 +1722,7 @@ static int proc_create_proc2(void *args)
 	t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, ustack_name, (void **)&t->user_stack_base,
 		REGION_ADDR_EXACT_ADDRESS, tot_top_size, REGION_WIRING_LAZY, LOCK_RW);
 	if(t->user_stack_region_id < 0) {
-		panic("proc_create_proc2: could not create default user stack region\n");
+		panic("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;
 	}
 
@@ -1741,7 +1741,7 @@ static int proc_create_proc2(void *args)
 	p->user_env_base = t->user_stack_base + STACK_SIZE;
 	uenv  = (char **)p->user_env_base;
 	udest = (char *)p->user_env_base + ENV_SIZE - 1;
-//	dprintf("proc_create_proc2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
+//	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
 	for (env_cnt=0; env_cnt<pargs->envc; env_cnt++) {
 		udest -= (strlen(pargs->envp[env_cnt]) + 1);
 		uenv[env_cnt] = udest;
@@ -1762,11 +1762,11 @@ static int proc_create_proc2(void *args)
 		kfree_strings_array(pargs->envp, pargs->envc);
 
 	path = pargs->path;
-	dprintf("proc_create_proc2: loading elf binary '%s'\n", path);
+	dprintf("team_create_team2: loading elf binary '%s'\n", path);
 
 	err = elf_load_uspace("/boot/libexec/rld.so", p, 0, &entry);
 	if(err < 0){
-		// XXX clean up proc
+		// XXX clean up team
 		return err;
 	}
 
@@ -1774,9 +1774,9 @@ static int proc_create_proc2(void *args)
 	kfree(pargs->path);
 	kfree(pargs);
 
-	dprintf("proc_create_proc2: loaded elf. entry = 0x%lx\n", entry);
+	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
 
-	p->state = PROC_STATE_NORMAL;
+	p->state = TEAM_STATE_NORMAL;
 
 	// jump to the entry point in user space
 	arch_thread_enter_uspace(entry, uspa, t->user_stack_base + STACK_SIZE);
@@ -1785,32 +1785,32 @@ static int proc_create_proc2(void *args)
 	return 0;
 }
 
-proc_id proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
+team_id team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
-	struct proc *p;
+	struct team *p;
 	thread_id tid;
-	proc_id pid;
+	team_id pid;
 	int err;
 	unsigned int state;
 //	int sem_retcode;
-	struct proc_arg *pargs;
+	struct team_arg *pargs;
 
-	dprintf("proc_create_proc: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
+	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
 
-	p = create_proc_struct(name, false);
+	p = create_team_struct(name, false);
 	if(p == NULL)
 		return ENOMEM;
 
 	pid = p->id;
 
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
-	hash_insert(proc_hash, p);
-	RELEASE_PROC_LOCK();
+	GRAB_TEAM_LOCK();
+	hash_insert(team_hash, p);
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	// copy the args over
-	pargs = (struct proc_arg *)kmalloc(sizeof(struct proc_arg));
+	pargs = (struct team_arg *)kmalloc(sizeof(struct team_arg));
 	if(pargs == NULL){
 		err = ENOMEM;
 		goto err1;
@@ -1825,8 +1825,8 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 	pargs->envp = envp;
 	pargs->envc = envc;
 
-	// create a new ioctx for this process
-	p->ioctx = vfs_new_io_context(thread_get_current_thread()->proc->ioctx);
+	// create a new ioctx for this team
+	p->ioctx = vfs_new_io_context(thread_get_current_thread()->team->ioctx);
 	if(!p->ioctx) {
 		err = ENOMEM;
 		goto err3;
@@ -1834,7 +1834,7 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 
 	//XXX should set p->path to path(?) here.
 
-	// create an address space for this process
+	// create an address space for this team
 	p->_aspace_id = vm_create_aspace(p->name, USER_BASE, USER_SIZE, false);
 	if (p->_aspace_id < 0) {
 		err = p->_aspace_id;
@@ -1842,8 +1842,8 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 	}
 	p->aspace = vm_get_aspace_by_id(p->_aspace_id);
 
-	// create a kernel thread, but under the context of the new process
-	tid = thread_create_kernel_thread_etc(name, proc_create_proc2, pargs, p);
+	// create a kernel thread, but under the context of the new team
+	tid = thread_create_kernel_thread_etc(name, team_create_team2, pargs, p);
 	if (tid < 0) {
 		err = tid;
 		goto err5;
@@ -1863,18 +1863,18 @@ err3:
 err2:
 	kfree(pargs);
 err1:
-	// remove the proc structure from the proc hash table and delete the proc structure
+	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
-	hash_remove(proc_hash, p);
-	RELEASE_PROC_LOCK();
+	GRAB_TEAM_LOCK();
+	hash_remove(team_hash, p);
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	delete_proc_struct(p);
+	delete_team_struct(p);
 //err:
 	return err;
 }
 
-proc_id user_proc_create_proc(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
+team_id user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
 	char name[SYS_MAX_OS_NAME_LEN];
@@ -1882,7 +1882,7 @@ proc_id user_proc_create_proc(const char *upath, const char *uname, char **args,
 	char **kenv;
 	int rc;
 
-	dprintf("user_proc_create_proc : argc=%d \n",argc);
+	dprintf("user_team_create_team : argc=%d \n",argc);
 
 	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
@@ -1894,7 +1894,7 @@ proc_id user_proc_create_proc(const char *upath, const char *uname, char **args,
 		goto error;
 	
 	if (envp == NULL) {
-		envp = (char **)thread_get_current_thread()->proc->user_env_base;
+		envp = (char **)thread_get_current_thread()->team->user_env_base;
 		for (envc = 0; envp && (envp[envc]); envc++);
 	}
 	rc = user_copy_strings_array(envp, envc, &kenv);
@@ -1913,7 +1913,7 @@ proc_id user_proc_create_proc(const char *upath, const char *uname, char **args,
 
 	name[SYS_MAX_OS_NAME_LEN-1] = 0;
 
-	return proc_create_proc(path, name, kargs, argc, kenv, envc, priority);
+	return team_create_team(path, name, kargs, argc, kenv, envc, priority);
 error:
 	kfree_strings_array(kargs, argc);
 	kfree_strings_array(kenv, envc);
@@ -1921,69 +1921,72 @@ error:
 }
 
 
-// used by PS command and anything else interested in a process list
-int user_proc_get_table(struct proc_info *pbuf, size_t len)
+// used by PS command and anything else interested in a team list
+int user_team_get_table(team_info *pbuf, size_t len)
 {
-	struct proc *p;
+#if 0
+	struct team *p;
 	struct hash_iterator i;
-	struct proc_info pi;
+	struct team_info pi;
 	int state;
 	int count=0;
-	int max = (len / sizeof(struct proc_info));
+	int max = (len / sizeof(struct team_info));
 
 	if((addr)pbuf >= KERNEL_BASE && (addr)pbuf <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
+	GRAB_TEAM_LOCK();
 
-	hash_open(proc_hash, &i);
-	while(((p = hash_next(proc_hash, &i)) != NULL) && (count < max)) {
+	hash_open(team_hash, &i);
+	while(((p = hash_next(team_hash, &i)) != NULL) && (count < max)) {
 		pi.id = p->id;
 		strcpy(pi.name, p->name);
 		pi.state = p->state;
 		pi.num_threads = p->num_threads;
 		count++;
-		user_memcpy(pbuf, &pi, sizeof(struct proc_info));
-		pbuf=pbuf + sizeof(struct proc_info);
+		user_memcpy(pbuf, &pi, sizeof(struct team_info));
+		pbuf=pbuf + sizeof(struct team_info);
 	}
-	hash_close(proc_hash, &i, false);
+	hash_close(team_hash, &i, false);
 
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	if (count < max)
 		return count;
 	else
 		return ENOMEM;
+#endif
+	return 0;
 }
 
 
-int proc_kill_proc(proc_id id)
+int team_kill_team(team_id id)
 {
 	int state;
-	struct proc *p;
+	struct team *p;
 //	struct thread *t;
 	thread_id tid = -1;
 	int retval = 0;
 
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
+	GRAB_TEAM_LOCK();
 
-	p = proc_get_proc_struct_locked(id);
+	p = team_get_team_struct_locked(id);
 	if(p != NULL) {
 		tid = p->main_thread->id;
 	} else {
 		retval = ERR_INVALID_HANDLE;
 	}
 
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	if(retval < 0)
 		return retval;
 
-	// just kill the main thread in the process. The cleanup code there will
-	// take care of the process
+	// just kill the main thread in the team. The cleanup code there will
+	// take care of the team
 	return thread_kill_thread(tid);
 }
 
@@ -2217,14 +2220,14 @@ int sys_setenv(const char *name, const char *value, int overwrite)
 		return -1;
 	
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
+	GRAB_TEAM_LOCK();
 	
 	strcpy(var, name);
 	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
 	name_size = strlen(var);
 	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
 	
-	env_space = (addr)thread_get_current_thread()->proc->user_env_base;
+	env_space = (addr)thread_get_current_thread()->team->user_env_base;
 	envp = (char **)env_space;
 	for (envc=0; envp[envc]; envc++) {
 		if (!strncmp(envp[envc], var, name_size)) {
@@ -2273,7 +2276,7 @@ int sys_setenv(const char *name, const char *value, int overwrite)
 	}
 	dprintf("sys_setenv: variable set.\n");
 
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	
 	return rc;
@@ -2317,9 +2320,9 @@ int sys_getenv(const char *name, char **value)
 	int rc = -1;
 	
 	state = disable_interrupts();
-	GRAB_PROC_LOCK();
+	GRAB_TEAM_LOCK();
 
-	envp = (char **)thread_get_current_thread()->proc->user_env_base;
+	envp = (char **)thread_get_current_thread()->team->user_env_base;
 	for (i=0; envp[i]; i++) {
 		if (!strncmp(envp[i], name, len)) {
 			p = envp[i] + len;
@@ -2331,7 +2334,7 @@ int sys_getenv(const char *name, char **value)
 		}
 	}
 	
-	RELEASE_PROC_LOCK();
+	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	
 	return rc;

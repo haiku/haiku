@@ -79,9 +79,9 @@ static struct io_context *get_current_io_context(bool kernel);
 static __inline struct io_context *get_current_io_context(bool kernel)
 {
 	if (kernel)
-		return proc_get_kernel_proc()->ioctx;
+		return team_get_kernel_team()->ioctx;
 
-	return thread_get_current_thread()->proc->ioctx;
+	return thread_get_current_thread()->team->ioctx;
 }
 
 #endif /* _FILE_H */

@@ -28,7 +28,7 @@ struct sem_entry {
 	struct thread_queue q;
 	char      *name;
 	int       lock;
-	proc_id   owner;		 // if set to -1, means owned by a port
+	team_id   owner;		 // if set to -1, means owned by a port
 };
 
 #define MAX_SEMS 4096
@@ -142,7 +142,7 @@ int sem_init(kernel_args *ka)
 	return 0;
 }
 
-sem_id create_sem_etc(int count, const char *name, proc_id owner)
+sem_id create_sem_etc(int count, const char *name, team_id owner)
 {
 	int i;
 	int state;
@@ -208,7 +208,7 @@ out:
 
 sem_id create_sem(int count, const char *name)
 {
-	return create_sem_etc(count, name, proc_get_kernel_proc_id());
+	return create_sem_etc(count, name, team_get_kernel_team_id());
 }
 
 int delete_sem(sem_id id)
@@ -581,7 +581,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	}
 
 	info->sem			= sems[slot].id;
-	info->proc			= sems[slot].owner;
+	info->team			= sems[slot].owner;
 	strncpy(info->name, sems[slot].name, SYS_MAX_OS_NAME_LEN-1);
 	info->count			= sems[slot].count;
 	info->latest_holder	= sems[slot].q.head->id; // XXX not sure if this is correct
@@ -592,7 +592,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	return B_NO_ERROR;
 }
 
-int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size_t sz)
+int _get_next_sem_info(team_id team, uint32 *cookie, struct sem_info *info, size_t sz)
 {
 	int state;
 	int slot;
@@ -602,7 +602,7 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	if (cookie == NULL)
 		return EINVAL;
 	/* prevents sems[].owner == -1 >= means owned by a port */
-	if (proc < 0)
+	if (team < 0)
 		return EINVAL; 
 
 	if (*cookie == NULL) {
@@ -622,10 +622,10 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	while (slot < MAX_SEMS) {
 		GRAB_SEM_LOCK(sems[slot]);
 		if (sems[slot].id != -1)
-			if (sems[slot].owner == proc) {
+			if (sems[slot].owner == team) {
 				// found one!
 				info->sem			= sems[slot].id;
-				info->proc			= sems[slot].owner;
+				info->team			= sems[slot].owner;
 				strncpy(info->name, sems[slot].name, SYS_MAX_OS_NAME_LEN-1);
 				info->count			= sems[slot].count;
 				info->latest_holder	= sems[slot].q.head->id; // XXX not sure if this is the latest holder, or the next holder...
@@ -646,7 +646,7 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	return B_NO_ERROR;
 }
 
-int set_sem_owner(sem_id id, proc_id proc)
+int set_sem_owner(sem_id id, team_id team)
 {
 	int state;
 	int slot;
@@ -655,12 +655,12 @@ int set_sem_owner(sem_id id, proc_id proc)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (proc < 0)
+	if (team < 0)
 		return EINVAL;
 
-	// XXX: todo check if proc exists
-//	if (proc_get_proc_struct(proc) == NULL)
-//		return B_BAD_SEM_ID; // proc_id doesn't exist right now
+	// XXX: todo check if team exists
+//	if (team_get_team_struct(team) == NULL)
+//		return B_BAD_SEM_ID; // team_id doesn't exist right now
 
 	slot = id % MAX_SEMS;
 
@@ -674,7 +674,7 @@ int set_sem_owner(sem_id id, proc_id proc)
 		return B_BAD_SEM_ID;
 	}
 
-	sems[slot].owner = proc;
+	sems[slot].owner = team;
 
 	RELEASE_SEM_LOCK(sems[slot]);
 	restore_interrupts(state);
@@ -749,8 +749,8 @@ static int remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struc
 }
 
 /* this function cycles through the sem table, deleting all the sems that are owned by
-   the passed proc_id */
-int sem_delete_owned_sems(proc_id owner)
+   the passed team_id */
+int sem_delete_owned_sems(team_id owner)
 {
 	int state;
 	int i;
@@ -797,10 +797,10 @@ sem_id user_create_sem(int count, const char *uname)
 			return rc;
 		name[SYS_MAX_OS_NAME_LEN-1] = 0;
 
-		return create_sem_etc(count, name, proc_get_current_proc_id());
+		return create_sem_etc(count, name, team_get_current_team_id());
 	}
 	else {
-		return create_sem_etc(count, NULL, proc_get_current_proc_id());
+		return create_sem_etc(count, NULL, team_get_current_team_id());
 	}
 }
 
@@ -862,7 +862,7 @@ int user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
 	return rc;
 }
 
-int user_get_next_sem_info(proc_id uproc, uint32 *ucookie, struct sem_info *uinfo, size_t sz)
+int user_get_next_sem_info(team_id uteam, uint32 *ucookie, struct sem_info *uinfo, size_t sz)
 {
 	struct sem_info info;
 	uint32 cookie;
@@ -874,7 +874,7 @@ int user_get_next_sem_info(proc_id uproc, uint32 *ucookie, struct sem_info *uinf
 	rc2 = user_memcpy(&cookie, ucookie, sizeof(uint32));
 	if (rc2 < 0)
 		return rc2;
-	rc = _get_next_sem_info(uproc, &cookie, &info, sz);
+	rc = _get_next_sem_info(uteam, &cookie, &info, sz);
 	rc2 = user_memcpy(uinfo, &info, sz);
 	if (rc2 < 0)
 		return rc2;
@@ -884,7 +884,7 @@ int user_get_next_sem_info(proc_id uproc, uint32 *ucookie, struct sem_info *uinf
 	return rc;
 }
 
-int user_set_sem_owner(sem_id uid, proc_id uproc)
+int user_set_sem_owner(sem_id uid, team_id uteam)
 {
-	return set_sem_owner(uid, uproc);
+	return set_sem_owner(uid, uteam);
 }
