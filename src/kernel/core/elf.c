@@ -622,11 +622,8 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 				sprintf(regionName, "%s_bss%d", baseName, 'X');
 
 				regionAddress += fileUpperBound;
-				id = vm_create_anonymous_region(p->_aspace_id, regionName,
-					(void **)&regionAddress,
-					REGION_ADDR_EXACT_ADDRESS,
-					bss_size,
-					REGION_WIRING_LAZY, LOCK_RW);
+				id = create_area_etc(p, regionName, (void **)&regionAddress,
+					B_EXACT_ADDRESS, bss_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (id < 0) {
 					dprintf("error allocating bss region: %s!\n", strerror(id));
 					err = ERR_INVALID_BINARY;
@@ -963,7 +960,7 @@ error0:
 int
 elf_init(kernel_args *ka)
 {
-	vm_region_info rinfo;
+	area_info areaInfo;
 
 	mutex_init(&image_lock, "kimages_lock");
 	mutex_init(&image_load_lock, "kimages_load_lock");
@@ -974,20 +971,22 @@ elf_init(kernel_args *ka)
 	kernel_image->name = strdup("kernel");
 
 	// text segment
-	kernel_image->regions[0].id = vm_find_region_by_name(vm_get_kernel_aspace_id(), "kernel_ro");
-	if(kernel_image->regions[0].id < 0)
+	kernel_image->regions[0].id = find_area("kernel_ro");
+	if (kernel_image->regions[0].id < 0)
 		panic("elf_init: could not look up kernel text segment region\n");
-	vm_get_region_info(kernel_image->regions[0].id, &rinfo);
-	kernel_image->regions[0].start = rinfo.base;
-	kernel_image->regions[0].size = rinfo.size;
+
+	get_area_info(kernel_image->regions[0].id, &areaInfo);
+	kernel_image->regions[0].start = areaInfo.address;
+	kernel_image->regions[0].size = areaInfo.size;
 
 	// data segment
-	kernel_image->regions[1].id = vm_find_region_by_name(vm_get_kernel_aspace_id(), "kernel_rw");
-	if(kernel_image->regions[1].id < 0)
+	kernel_image->regions[1].id = find_area("kernel_rw");
+	if (kernel_image->regions[1].id < 0)
 		panic("elf_init: could not look up kernel data segment region\n");
-	vm_get_region_info(kernel_image->regions[1].id, &rinfo);
-	kernel_image->regions[1].start = rinfo.base;
-	kernel_image->regions[1].size = rinfo.size;
+
+	get_area_info(kernel_image->regions[1].id, &areaInfo);
+	kernel_image->regions[1].start = areaInfo.address;
+	kernel_image->regions[1].size = areaInfo.size;
 
 	// we know where the dynamic section is
 	kernel_image->dynamic_ptr = (addr)ka->kernel_dynamic_section_addr.start;

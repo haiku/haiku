@@ -1064,22 +1064,22 @@ static struct fs_ops bootfs_ops = {
 status_t
 bootstrap_bootfs(void)
 {
-	region_id rid;
-	vm_region_info rinfo;
+	area_id area;
+	area_info areaInfo;
 
-	dprintf("bootstrap_bootfs: entry\n");
+	TRACE(("bootstrap_bootfs: entry\n"));
 
 	// find the bootdir and set it up
-	rid = vm_find_region_by_name(vm_get_kernel_aspace_id(), "bootdir");
-	if (rid < 0)
+	area = find_area("bootdir");
+	if (area < 0)
 		panic("bootstrap_bootfs: no bootdir area found!\n");
 
-	vm_get_region_info(rid, &rinfo);
-	bootdir = (char *)rinfo.base;
-	bootdir_len = rinfo.size;
-	bootdir_region = rinfo.id;
+	get_area_info(area, &areaInfo);
+	bootdir = (char *)areaInfo.address;
+	bootdir_len = areaInfo.size;
+	bootdir_region = areaInfo.area;
 
-	dprintf("bootstrap_bootfs: found bootdir at %p\n", bootdir);
+	TRACE(("bootstrap_bootfs: found bootdir at %p\n", bootdir));
 
 	return vfs_register_filesystem("bootfs", &bootfs_ops);
 }

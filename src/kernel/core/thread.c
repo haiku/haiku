@@ -1059,7 +1059,7 @@ thread_init(kernel_args *ka)
 		t->state = B_THREAD_RUNNING;
 		t->next_state = B_THREAD_READY;
 		sprintf(temp, "idle_thread%d_kstack", i);
-		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
+		t->kernel_stack_region_id = find_area(temp);
 		region = vm_get_region_by_id(t->kernel_stack_region_id);
 		if (!region)
 			panic("error finding idle kstack region\n");
