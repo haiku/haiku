@@ -1,16 +1,15 @@
 SubDir OBOS_TOP src kernel core vm ;
 
 KernelMergeObject kernel_vm.o :
-	<$(SOURCE_GRIST)>cache.cpp
-	<$(SOURCE_GRIST)>vm.c
-	<$(SOURCE_GRIST)>vm_cache.c
-	<$(SOURCE_GRIST)>vm_daemons.c
-	<$(SOURCE_GRIST)>vm_page.c
-	<$(SOURCE_GRIST)>vm_store_anonymous_noswap.c
-	<$(SOURCE_GRIST)>vm_store_device.c
-	<$(SOURCE_GRIST)>vm_store_null.c
-	<$(SOURCE_GRIST)>vm_store_vnode.c
-	<$(SOURCE_GRIST)>vm_tests.c
-	:
-	-fno-pic -Wno-unused -D_KERNEL_
+	vm.c
+	vm_cache.c
+	vm_daemons.c
+	vm_page.c
+	vm_store_anonymous_noswap.c
+	vm_store_device.c
+	vm_store_null.c
+	vm_store_vnode.c
+	vm_tests.c
+
+	: -fno-pic -Wno-unused -D_KERNEL_MODE=1
 	;
