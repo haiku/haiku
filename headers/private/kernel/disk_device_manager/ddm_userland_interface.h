@@ -128,6 +128,41 @@ bool _kern_supports_initializing_partition(disk_system_id diskSystemID,
 bool _kern_supports_initializing_child_partition(disk_system_id diskSystemID,
 												 partition_id partitionID,
 												 const char *childSystem);
+bool _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
+								  partition_id partitionID);
+
+status_t _kern_validate_resize_partition(disk_system_id diskSystemID,
+										 partition_id partitionID,
+										 off_t *size);
+status_t _kern_validate_resize_child_partition(disk_system_id diskSystemID,
+											   partition_id partitionID,
+											   off_t *size);
+status_t _kern_validate_move_partition(disk_system_id diskSystemID,
+									   partition_id partitionID,
+									   off_t *offset);
+status_t _kern_validate_move_child_partition(disk_system_id diskSystemID,
+											 partition_id partitionID,
+											 off_t *offset);
+status_t _kern_validate_set_partition_name(disk_system_id diskSystemID,
+										   partition_id partitionID,
+										   char *name);
+status_t _kern_validate_set_partition_content_name(disk_system_id diskSystemID,
+												   partition_id partitionID,
+												   char *name);
+status_t _kern_validate_set_partition_type(disk_system_id diskSystemID,
+										   partition_id partitionID,
+										   const char *type);
+status_t _kern_validate_create_child_partition(disk_system_id diskSystemID,
+											   partition_id partitionID,
+											   off_t *offset, off_t *size,
+											   const char *type,
+											   const char *parameters);
+status_t _kern_get_next_supported_partition_type(disk_system_id diskSystemID,
+												 partition_id partitionID,
+												 int32 *cookie, char *type);
+status_t _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
+												   const char *contentType,
+												   char *type);
 
 // disk device modification
 status_t _kern_prepare_disk_device_modifications(partition_id deviceID);

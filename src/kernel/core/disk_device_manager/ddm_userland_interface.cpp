@@ -529,6 +529,304 @@ _kern_supports_initializing_child_partition(disk_system_id diskSystemID,
 	return diskSystem->SupportsInitializingChild(partition, childSystem);
 }
 
+// _kern_is_sub_disk_system_for
+bool
+_kern_is_sub_disk_system_for(disk_system_id diskSystemID,
+							 partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->IsSubSystemFor(partition);
+}
+
+// _kern_validate_resize_partition
+status_t
+_kern_validate_resize_partition(disk_system_id diskSystemID,
+								partition_id partitionID, off_t *size)
+{
+	if (!size)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateResize(partition, size))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_resize_child_partition
+status_t
+_kern_validate_resize_child_partition(disk_system_id diskSystemID,
+									  partition_id partitionID, off_t *size)
+{
+	if (!size)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	if (!partition->Parent())
+		return B_BAD_VALUE;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateResizeChild(partition, size))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_move_partition
+status_t
+_kern_validate_move_partition(disk_system_id diskSystemID,
+							  partition_id partitionID, off_t *offset)
+{
+	if (!offset)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateMove(partition, offset))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_move_child_partition
+status_t
+_kern_validate_move_child_partition(disk_system_id diskSystemID,
+									partition_id partitionID, off_t *offset)
+{
+	if (!offset)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	if (!partition->Parent())
+		return B_BAD_VALUE;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateMoveChild(partition, offset))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_set_partition_name
+status_t
+_kern_validate_set_partition_name(disk_system_id diskSystemID,
+								  partition_id partitionID, char *name)
+{
+	if (!name)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	if (!partition->Parent())
+		return B_BAD_VALUE;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateSetName(partition, name))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_set_partition_content_name
+status_t
+_kern_validate_set_partition_content_name(disk_system_id diskSystemID,
+										  partition_id partitionID, char *name)
+{
+	if (!name)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateSetContentName(partition, name))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_set_partition_type
+status_t
+_kern_validate_set_partition_type(disk_system_id diskSystemID,
+								  partition_id partitionID, const char *type)
+{
+	if (!type)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	if (!partition->Parent())
+		return B_BAD_VALUE;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateSetType(partition, type))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_validate_create_child_partition
+status_t
+_kern_validate_create_child_partition(disk_system_id diskSystemID,
+									  partition_id partitionID, off_t *offset,
+									  off_t *size, const char *type,
+									  const char *parameters)
+{
+	if (!offset || !size || !type)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->ValidateCreateChild(partition, offset, size, type,
+										parameters)) {
+		return B_OK;
+	}
+	return B_ERROR;
+}
+
+// _kern_get_next_supported_partition_type
+status_t
+_kern_get_next_supported_partition_type(disk_system_id diskSystemID,
+										partition_id partitionID,
+										int32 *cookie, char *type)
+{
+	if (!cookie || !type)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return B_ENTRY_NOT_FOUND;
+	// get the info
+	if (diskSystem->GetNextSupportedType(partition, cookie, type))
+		return B_OK;
+	return B_ERROR;
+}
+
+// _kern_get_partition_type_for_content_type
+status_t
+_kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
+										  const char *contentType, char *type)
+{
+	if (!contentType || !type)
+		return B_BAD_VALUE;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the disk system
+	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemID);
+	if (!diskSystem)
+		return false;
+	DiskSystemLoader loader(diskSystem, true);
+	// get the info
+	if (diskSystem->GetTypeForContentType(contentType, type))
+		return B_OK;
+	return B_ERROR;
+}
+
 // _kern_prepare_disk_device_modifications
 status_t
 _kern_prepare_disk_device_modifications(partition_id deviceID)
