@@ -165,7 +165,7 @@ TGATranslatorTest::IdentifyTest()
 	// Identify (successfully identify the following files)
 	const IdentifyInfo aBitsPaths[] = {
 		{ "/boot/home/resources/tga/screen1_16.bits", "" },
-		{ "/boot/home/resources/tga/ugly.bits", "" }
+		{ "/boot/home/resources/tga/ugly_24_none_true.bits", "" }
 	};
 	const IdentifyInfo aTgaPaths[] = {
 		{ "/boot/home/resources/tga/blocks_16_rle_true.tga",
@@ -392,13 +392,13 @@ TGATranslatorTest::TranslateTest()
 		{ "/boot/home/resources/tga/grayscreen1_8_rle_cmap.tga",
 			"/boot/home/resources/tga/screen1_8_gray.bits" },
 		{ "/boot/home/resources/tga/ugly_16_none_true.tga",
-			"/boot/home/resources/tga/ugly.bits" },
+			"/boot/home/resources/tga/ugly_16_none_true.bits" },
 		{ "/boot/home/resources/tga/ugly_24_none_true.tga",
-			"/boot/home/resources/tga/ugly.bits" },
+			"/boot/home/resources/tga/ugly_24_none_true.bits" },
 		{ "/boot/home/resources/tga/ugly_32_none_true.tga",
-			"/boot/home/resources/tga/ugly.bits" },
+			"/boot/home/resources/tga/ugly_32_none_true.bits" },
 		{ "/boot/home/resources/tga/ugly_8_none_cmap.tga",
-			"/boot/home/resources/tga/ugly.bits" }
+			"/boot/home/resources/tga/ugly_8_none_cmap.bits" }
 	};
 	
 	TranslateTests(this, proster, aPaths,
@@ -513,7 +513,7 @@ TestBTranslator(TGATranslatorTest *ptest, BTranslator *ptran)
 					"Be Bitmap Format (TGATranslator)") == 0);
 			} else if (pouts[i].type == B_TGA_FORMAT) {
 				CPPUNIT_ASSERT(pouts[i].quality > 0.99 && pouts[i].quality < 1.01);
-				CPPUNIT_ASSERT(pouts[i].capability > 0.59 && pouts[i].capability < 0.61);
+				CPPUNIT_ASSERT(pouts[i].capability > 0.69 && pouts[i].capability < 0.71);
 				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, TGA_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pouts[i].name, "Targa image") == 0);
 			} else
