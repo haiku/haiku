@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.34 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.35 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -315,6 +315,55 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV15;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro2 Pro (NV15)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016010de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016110de: /* Nvidia GeForce 6200 TurboCache */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 TurboCache (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016210de: /* Nvidia unknown FX */
+	case 0x016310de: /* Nvidia unknown FX */
+	case 0x016410de: /* Nvidia unknown FX */
+	case 0x016510de: /* Nvidia unknown FX */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016610de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016710de: /* Nvidia GeForce 6200 Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 Go (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016810de: /* Nvidia GeForce 6250 Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6250 Go (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016e10de: /* Nvidia unknown FX */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x017010de: /* Nvidia GeForce4 MX 460 */
