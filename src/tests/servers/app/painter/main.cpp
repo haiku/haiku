@@ -17,6 +17,70 @@ const pattern kStripes = (pattern){ { 0xc7, 0x8f, 0x1f, 0x3e, 0x7c, 0xf8, 0xf1, 
 const pattern kDotted = (pattern){ { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa } };
 const pattern kDottedBigger = (pattern){ { 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc } };
 
+
+template<class Surface>
+bigtime_t
+test_straight_lines(Surface& s, uint32 width, uint32 height,
+					float penSize, drawing_mode mode,
+					source_alpha alphaSrcMode, alpha_function alphaFncMode,
+					rgb_color highColor, rgb_color lowColor, pattern pat)
+{
+	bigtime_t now = system_time();
+
+	s.SetPenSize(penSize);
+	s.SetDrawingMode(mode);
+	s.SetBlendingMode(alphaSrcMode, alphaFncMode);
+
+	s.SetHighColor(highColor);
+	s.SetLowColor(lowColor);
+
+	for (uint32 y = 0; y <= height; y += 5) {
+		s.StrokeLine(BPoint(0, y), BPoint(width - 1, y), pat);
+	}
+	for (uint32 x = 0; x <= width; x += 5) {
+		s.StrokeLine(BPoint(x, 0), BPoint(x, height - 1), pat);
+	}
+
+	s.Sync();
+
+	return system_time() - now;	
+}
+
+
+template<class Surface>
+bigtime_t
+test_lines(Surface& s, uint32 width, uint32 height,
+		   float penSize, drawing_mode mode,
+		   source_alpha alphaSrcMode, alpha_function alphaFncMode,
+		   rgb_color highColor, rgb_color lowColor, pattern pat)
+{
+	bigtime_t now = system_time();
+
+	s.SetPenSize(penSize);
+	s.SetDrawingMode(mode);
+	s.SetBlendingMode(alphaSrcMode, alphaFncMode);
+
+	s.SetHighColor(highColor);
+	s.SetLowColor(lowColor);
+
+	for (uint32 y = 0; y <= height; y += 10) {
+		s.StrokeLine(BPoint(0, 0), BPoint(width, y), pat);
+		s.StrokeLine(BPoint(width - 1, 0), BPoint(0, y), pat);
+	}
+	for (uint32 x = 0; x <= width; x += 10) {
+		s.StrokeLine(BPoint(0, 0), BPoint(x, height), pat);
+		s.StrokeLine(BPoint(width - 1, 0), BPoint(x, height), pat);
+	}
+
+	s.Sync();
+
+	return system_time() - now;	
+}
+
+
+
+
+
 template<class Surface>
 bigtime_t
 test(Surface& s,
@@ -168,7 +232,7 @@ fprintf(stdout, "done\n");
 		b.InsetBy(-hInset, 0.0);
 		clip.Include(b);
 	}
-	float penSize = 3.0;
+	float penSize = 1.0;
 	float scale = 1.0;
 	rgb_color lineColor1 = (rgb_color){ 20, 20, 20, 255 };
 	rgb_color lineColor2 = (rgb_color){ 220, 120, 80, 255 };
@@ -244,6 +308,10 @@ fprintf(stdout, "done\n");
 
 	uint32 width = buffer->Width();
 	uint32 height = buffer->Height();
+	drawing_mode mode = B_OP_COPY;
+	source_alpha alphaSrcMode = B_PIXEL_ALPHA;
+	alpha_function alphaFncMode = B_ALPHA_OVERLAY;
+	pattern pat = B_SOLID_HIGH;
 
 //	painter.ConstrainClipping(clip);
 
@@ -257,7 +325,7 @@ fflush(stdout);
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-		painterNow += test(painter,
+/*		painterNow += test(painter,
 							width, height, origin, scale, penSize,
 							lineColor1, lineColor2,
 							rect, roundRect,
@@ -269,7 +337,13 @@ fflush(stdout);
 							&font, stringLocation1, stringLocation2,
 							string1, string2,
 							textColor1, textColor2, alphaColor,
-							testBitmap, testBitmapCrop, testBitmapDestRect);
+							testBitmap, testBitmapCrop, testBitmapDestRect);*/
+/*		painterNow += test_lines(painter, width, height,
+								 penSize, mode, alphaSrcMode, alphaFncMode,
+								 lineColor1, lineColor2, pat);*/
+		painterNow += test_straight_lines(painter, width, height,
+										  penSize, mode, alphaSrcMode, alphaFncMode,
+										  lineColor1, lineColor2, pat);
 	}
 
 fprintf(stdout, " %lld µsecs\n", painterNow / iterations);
@@ -292,7 +366,7 @@ fflush(stdout);
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-		viewNow += test(*view,
+/*		viewNow += test(*view,
 						 width, height, origin, scale, penSize,
 						 lineColor1, lineColor2,
 						 rect, roundRect,
@@ -304,7 +378,13 @@ fflush(stdout);
 						 &font, stringLocation1, stringLocation2,
 						 string1, string2,
 						 textColor1, textColor2, alphaColor,
-						 testBitmap, testBitmapCrop, testBitmapDestRect);
+						 testBitmap, testBitmapCrop, testBitmapDestRect);*/
+/*		viewNow += test_lines(*view, width, height,
+							  penSize, mode, alphaSrcMode, alphaFncMode,
+							  lineColor1, lineColor2, pat);*/
+		viewNow += test_straight_lines(*view, width, height,
+									   penSize, mode, alphaSrcMode, alphaFncMode,
+									   lineColor1, lineColor2, pat);
 	}
 
 fprintf(stdout, " %lld µsecs\n", viewNow / iterations);
