@@ -20,10 +20,9 @@ extern "C" {
 #define NO_RECOVERY 3
 #define NO_DATA 4
 
-#ifndef h_errno
+// Make h_errno thread-safe
 extern int *_h_errnop(void);
-#define h_errno (*_h_errnop())
-#endif /* h_errno */
+#define h_errno (*(_h_errnop()))
 
 struct hostent {
 	char *h_name;
