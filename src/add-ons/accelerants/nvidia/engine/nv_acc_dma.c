@@ -364,10 +364,8 @@ status_t nv_acc_init_dma()
 		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
 		/* pattern shape value = 8x8, 2 color */
-		//fixme: setting this here means that we don't need to provide the acc
-		//commands with it. But have other architectures this pre-programmed
-		//explicitly??? I don't think so!
-		ACCW(PAT_SHP, 0x00000000);
+		//fixme: not needed, unless the engine has a hardware fault (setting via cmd)!
+		//ACCW(PAT_SHP, 0x00000000);
 		/* Pgraph Beta AND value (fraction) b23-30 */
 		ACCW(BETA_AND_VAL, 0xffffffff);
 	}
@@ -413,10 +411,8 @@ status_t nv_acc_init_dma()
 		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
 		/* pattern shape value = 8x8, 2 color */
-		//fixme: setting this here means that we don't need to provide the acc
-		//commands with it. But have other architectures this pre-programmed
-		//explicitly??? I don't think so!
-		ACCW(PAT_SHP, 0x00000000);
+		//fixme: not needed, unless the engine has a hardware fault (setting via cmd)!
+		//ACCW(PAT_SHP, 0x00000000);
 		/* Pgraph Beta AND value (fraction) b23-30 */
 		ACCW(BETA_AND_VAL, 0xffffffff);
 	}
@@ -801,6 +797,18 @@ status_t nv_acc_init_dma()
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
+	/* Load our pattern into the engine: */
+	/* wait for room in fifo for pattern cmd if needed. */
+	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
+	/* now setup pattern (writing 7 32bit words) */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
+
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
 
@@ -1035,18 +1043,12 @@ void nv_acc_assert_fifo_dma(void)
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
 		/* Bitmap: */
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
-
-		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
-		nv_start_dma();
 	}
-}
 
-/* screen to screen blit - i.e. move windows around and scroll within them. */
-status_t nv_acc_setup_blit_dma()
-{
-	/* setup solid pattern:
-	 * wait for room in fifo for pattern cmd if needed. */
-	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
+	/* Make sure our pattern is loaded: */
+	//fixme: can be removed here if a 3D add-on isn't going to modify it..
+	/* wait for room in fifo for pattern cmd if needed. */
+	if (nv_acc_fifofree_dma(7) != B_OK) return;
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
@@ -1055,10 +1057,17 @@ status_t nv_acc_setup_blit_dma()
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
+
+	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
+	nv_start_dma();
+}
+
+/* screen to screen blit - i.e. move windows around and scroll within them. */
+status_t nv_acc_setup_blit_dma()
+{
 	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed. */
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
-
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
@@ -1068,7 +1077,8 @@ status_t nv_acc_setup_blit_dma()
 
 status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
-	/* Note: blit-copy direction is determined inside riva hardware: no setup needed */
+	/* Note:
+	 * blit-copy direction is determined inside nvidia hardware: no setup needed */
 
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed. */
@@ -1091,29 +1101,13 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 /* span fill - i.e. (selected) menuitem background color (Dano) */
 status_t nv_acc_setup_rectangle_dma(uint32 color)
 {
-	/* setup solid pattern:
-	 * wait for room in fifo for pattern cmd if needed. */
-	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
-	/* now setup pattern (writing 7 32bit words) */
-	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
-	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
-
 	/* ROP registers (Raster OPeration):
-	 * wait for room in fifo for ROP cmd if needed. */
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	 * wait for room in fifo for ROP and bitmap cmd if needed. */
+	if (nv_acc_fifofree_dma(4) != B_OK) return B_ERROR;
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
-
-	/* setup fill color:
-	 * wait for room in fifo for bitmap cmd if needed. */
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
-	/* now setup color (writing 2 32bit words) */
+	/* now setup fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
 
@@ -1143,29 +1137,13 @@ status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 /* rectangle invert - i.e. text cursor and text selection */
 status_t nv_acc_setup_rect_invert_dma()
 {
-	/* setup solid pattern:
-	 * wait for room in fifo for pattern cmd if needed. */
-	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
-	/* now setup pattern (writing 7 32bit words) */
-	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
-	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
-
 	/* ROP registers (Raster OPeration):
-	 * wait for room in fifo for ROP cmd if needed. */
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	 * wait for room in fifo for ROP and bitmap cmd if needed. */
+	if (nv_acc_fifofree_dma(4) != B_OK) return B_ERROR;
 	/* now setup ROP (writing 2 32bit words) for GXinvert */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x55; /* SetRop5 */
-
-	/* reset fill color:
-	 * wait for room in fifo for bitmap cmd if needed. */
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
-	/* now reset color (writing 2 32bit words) */
+	/* now reset fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* Color1A */
 
