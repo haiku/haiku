@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-3/2004
+   Rudolf Cornelissen 7/2003-4/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -250,145 +250,157 @@ void fake_pins(void)
 static void detect_panels()
 {
 	/* detect if the BIOS enabled LCD's (internal panels or DVI) or TVout */
+
+	/* both external TMDS transmitters (used for LCD/DVI) and external TVencoders
+	 * can use the CRTC's in slaved mode. */
+	/* Note:
+	 * Apparantly a panel on CRTC1 uses the CRTC in slaved mode, while a panel
+	 * on CRTC2 uses the CRTC in master mode. */
+	/* Note also:
+	 * DFP's are programmed with standard VESA modelines by the card's BIOS! */
+	bool slaved_for_dev1 = false, slaved_for_dev2 = false;
+	bool tvout1 = false, tvout2 = false;
+
+	/* check primary head: */
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
+	/* unlock CRTC1 */
+	CRTCW(LOCK, 0x57);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	/* detect active slave device (if any) */
+	slaved_for_dev1 = (CRTCR(PIXEL) & 0x80);
+	if (slaved_for_dev1)
 	{
-		/* both external TMDS transmitters (used for LCD/DVI) and external TVencoders
-		 * can use the CRTC's in slaved mode. */
-		/* Note:
-		 * Apparantly a panel on CRTC1 uses the CRTC in slaved mode, while a panel
-		 * on CRTC2 uses the CRTC in master mode. */
-		/* Note also:
-		 * DFP's are programmed with standard VESA modelines by the card's BIOS! */
-		bool slaved_for_dev1 = false, slaved_for_dev2 = false;
-		bool tvout1 = false, tvout2 = false;
+		/* if the panel isn't selected, tvout is.. */
+		tvout1 = !(CRTCR(LCD) & 0x01);
+	}
 
-		/* check primary head: */
-		/* enable access to CRTC1 on dualhead cards */
-		if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
-
-		/* unlock CRTC1 */
+	if (si->ps.secondary_head)
+	{
+		/* check secondary head: */
+		/* enable access to CRTC2 */
+		CRTCW(OWNER, 0x03);
+		/* unlock CRTC2 */
 		CRTCW(LOCK, 0x57);
 		CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 		/* detect active slave device (if any) */
-		slaved_for_dev1 = (CRTCR(PIXEL) & 0x80);
-		if (slaved_for_dev1)
+		slaved_for_dev2 = (CRTCR(PIXEL) & 0x80);
+		if (slaved_for_dev2)
 		{
 			/* if the panel isn't selected, tvout is.. */
-			tvout1 = !(CRTCR(LCD) & 0x01);
+			tvout2 = !(CRTCR(LCD) & 0x01);
 		}
+	}
 
-		if (si->ps.secondary_head)
+	/* do some presets */
+	si->ps.panel1_width = 0;
+	si->ps.panel1_height = 0;
+	si->ps.panel1_aspect = 0;
+	si->ps.panel2_width = 0;
+	si->ps.panel2_height = 0;
+	si->ps.panel2_aspect = 0;
+	si->ps.slaved_tmds1 = false;
+	si->ps.slaved_tmds2 = false;
+	si->ps.master_tmds1 = false;
+	si->ps.master_tmds2 = false;
+	si->ps.tmds1_active = false;
+	si->ps.tmds2_active = false;
+	/* determine the situation we are in... (regarding flatpanels) */
+	/* fixme: add VESA DDC EDID stuff one day... */
+	/* fixme: find out how to program those transmitters one day instead of
+	 * relying on the cards BIOS to do it. This adds TVout options where panels
+	 * are used!
+	 * Currently we'd loose the panel setup while not being able to restore it. */
+
+	/* note: (facts)
+	 * -> NV11 and NV17 laptops have LVDS panels, programmed in both sets registers;
+	 * -> NV34 laptops have TMDS panels, programmed in only one set of registers;
+	 * -> NV11, NV25 and NV34 DVI cards, so external panels (TMDS) are programmed
+	 *    in only one set of registers;
+	 * -> a register-set's FP_TG_CTRL register, bit 31 tells you if a LVDS panel is
+	 *    connected to the primary head (0), or to the secondary head (1);
+	 * -> for LVDS panels both registersets are programmed identically by the card's
+	 *    BIOSes;
+	 * -> the programmed set of registers tells you where a TMDS (DVI) panel is
+	 *    connected. */
+	if (slaved_for_dev1 && !tvout1)
+	{
+		uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+		uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+		if ((width >= 640) && (height >= 480))
 		{
-			/* check secondary head: */
-			/* enable access to CRTC2 */
-			CRTCW(OWNER, 0x03);
-			/* unlock CRTC2 */
-			CRTCW(LOCK, 0x57);
-			CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-			/* detect active slave device (if any) */
-			slaved_for_dev2 = (CRTCR(PIXEL) & 0x80);
-			if (slaved_for_dev2)
-			{
-				/* if the panel isn't selected, tvout is.. */
-				tvout2 = !(CRTCR(LCD) & 0x01);
-			}
+			si->ps.slaved_tmds1 = true;
+			si->ps.tmds1_active = true;
+			si->ps.panel1_width = width;
+			si->ps.panel1_height = height;
 		}
+	}
 
-		/* do some presets */
-		si->ps.panel1_width = 0;
-		si->ps.panel1_height = 0;
-		si->ps.panel1_aspect = 0;
-		si->ps.panel2_width = 0;
-		si->ps.panel2_height = 0;
-		si->ps.panel2_aspect = 0;
-		si->ps.slaved_tmds1 = false;
-		si->ps.slaved_tmds2 = false;
-		si->ps.master_tmds1 = false;
-		si->ps.master_tmds2 = false;
-		si->ps.tmds1_active = false;
-		si->ps.tmds2_active = false;
-		/* determine the situation we are in... (regarding flatpanels) */
-		/* fixme: add VESA DDC EDID stuff one day... */
-		/* fixme: find out how to program those transmitters one day instead of
-		 * relying on the cards BIOS to do it. This adds TVout options where panels
-		 * are used!
-		 * Currently we'd loose the panel setup while not being able to restore it. */
-
-		/* Note:
-		 * NV11 and NV17 cards can't distinquish between head 1 and head 2 except for
-		 * connected laptop panels via the FP_TG_CTRL register (the DAC and DAC2
-		 * flatpanel registers access the same single set on those cards!);
-		 * furthermore assuming that no DVI exist on non-laptop cards upto and
-		 * including NV17 (for now). */
-		//fixme: how about NV18?
-		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
-			(!(DACR(FP_TG_CTRL) & 0x80000000))) || (si->ps.card_type > NV17))
+	if (si->ps.secondary_head && slaved_for_dev2 && !tvout2)
+	{
+		uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+		uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+		if ((width >= 640) && (height >= 480))
 		{
-			if (slaved_for_dev1 && !tvout1)
-			{
-				uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
-				uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
-				if ((width >= 640) && (height >= 480))
-				{
-					si->ps.slaved_tmds1 = true;
-					si->ps.tmds1_active = true;
-					si->ps.panel1_width = width;
-					si->ps.panel1_height = height;
-				}
-			}
+			si->ps.slaved_tmds2 = true;
+			si->ps.tmds2_active = true;
+			si->ps.panel2_width = width;
+			si->ps.panel2_height = height;
 		}
+	}
 
-		//fixme: how about NV18?
-		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
-			(DAC2R(FP_TG_CTRL) & 0x80000000)) || (si->ps.card_type > NV17))
+	if (!si->ps.slaved_tmds1 && !tvout1)
+	{
+		uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+		uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+		if ((width >= 640) && (height >= 480))
 		{
-			if (si->ps.secondary_head && slaved_for_dev2 && !tvout2)
-			{
-				uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
-				uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
-				if ((width >= 640) && (height >= 480))
-				{
-					si->ps.slaved_tmds2 = true;
-					si->ps.tmds2_active = true;
-					si->ps.panel2_width = width;
-					si->ps.panel2_height = height;
-				}
-			}
+			si->ps.master_tmds1 = true;
+			si->ps.tmds1_active = true;
+			si->ps.panel1_width = width;
+			si->ps.panel1_height = height;
 		}
+	}
 
-		//fixme: how about NV18?
-		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
-			(!(DACR(FP_TG_CTRL) & 0x80000000))) || (si->ps.card_type > NV17))
+	if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
+	{
+		uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+		uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+		if ((width >= 640) && (height >= 480))
 		{
-			if (!si->ps.slaved_tmds1 && !tvout1)
-			{
-				uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
-				uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
-				if ((width >= 640) && (height >= 480))
-				{
-					si->ps.master_tmds1 = true;
-					si->ps.tmds1_active = true;
-					si->ps.panel1_width = width;
-					si->ps.panel1_height = height;
-				}
-			}
+			si->ps.master_tmds2 = true;
+			si->ps.tmds2_active = true;
+			si->ps.panel2_width = width;
+			si->ps.panel2_height = height;
 		}
+	}
 
-		//fixme: how about NV18?
-		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
-			(DAC2R(FP_TG_CTRL) & 0x80000000)) || (si->ps.card_type > NV17))
+	//fixme...:
+	//we are assuming that no DVI is used as external monitor on laptops;
+	//otherwise we probably get into trouble here if the checked specs match.
+	if (si->ps.laptop && si->ps.tmds1_active && si->ps.tmds2_active &&
+		(DACR(FP_TG_CTRL) == DAC2R(FP_TG_CTRL)) &&
+		(si->ps.panel1_width == si->ps.panel2_width) &&
+		(si->ps.panel1_height == si->ps.panel2_height))
+	{
+		if (DACR(FP_TG_CTRL) & 0x80000000)
 		{
-			if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
-			{
-				uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
-				uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
-				if ((width >= 640) && (height >= 480))
-				{
-					si->ps.master_tmds2 = true;
-					si->ps.tmds2_active = true;
-					si->ps.panel2_width = width;
-					si->ps.panel2_height = height;
-				}
-			}
+			/* LVDS panel is on CRTC2, so clear false primary detection */
+			si->ps.slaved_tmds1 = false;
+			si->ps.master_tmds1 = false;
+			si->ps.tmds1_active = false;
+			si->ps.panel1_width = 0;
+			si->ps.panel1_height = 0;
+		}
+		else
+		{
+			/* LVDS panel is on CRTC1, so clear false secondary detection */
+			si->ps.slaved_tmds2 = false;
+			si->ps.master_tmds2 = false;
+			si->ps.tmds2_active = false;
+			si->ps.panel2_width = 0;
+			si->ps.panel2_height = 0;
 		}
 	}
 
@@ -400,57 +412,57 @@ static void detect_panels()
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
-	LOG(2,("DAC1: FP_HDISPEND: $%08x = (dec) %d\n", DACR(FP_HDISPEND),DACR(FP_HDISPEND)));
-	LOG(2,("DAC1: FP_HTOTAL: $%08x = (dec) %d\n", DACR(FP_HTOTAL),DACR(FP_HTOTAL)));
-	LOG(2,("DAC1: FP_HCRTC: $%08x = (dec) %d\n", DACR(FP_HCRTC),DACR(FP_HCRTC)));
-	LOG(2,("DAC1: FP_HSYNC_S: $%08x = (dec) %d\n", DACR(FP_HSYNC_S),DACR(FP_HSYNC_S)));
-	LOG(2,("DAC1: FP_HSYNC_E: $%08x = (dec) %d\n", DACR(FP_HSYNC_E),DACR(FP_HSYNC_E)));
-	LOG(2,("DAC1: FP_HVALID_S: $%08x = (dec) %d\n", DACR(FP_HVALID_S),DACR(FP_HVALID_S)));
-	LOG(2,("DAC1: FP_HVALID_E: $%08x = (dec) %d\n", DACR(FP_HVALID_E),DACR(FP_HVALID_E)));
+	LOG(2,("DAC1: FP_HDISPEND: %d\n", DACR(FP_HDISPEND)));
+	LOG(2,("DAC1: FP_HTOTAL: %d\n", DACR(FP_HTOTAL)));
+	LOG(2,("DAC1: FP_HCRTC: %d\n", DACR(FP_HCRTC)));
+	LOG(2,("DAC1: FP_HSYNC_S: %d\n", DACR(FP_HSYNC_S)));
+	LOG(2,("DAC1: FP_HSYNC_E: %d\n", DACR(FP_HSYNC_E)));
+	LOG(2,("DAC1: FP_HVALID_S: %d\n", DACR(FP_HVALID_S)));
+	LOG(2,("DAC1: FP_HVALID_E: %d\n", DACR(FP_HVALID_E)));
 
-	LOG(2,("DAC1: FP_VDISPEND: $%08x = (dec) %d\n", DACR(FP_VDISPEND),DACR(FP_VDISPEND)));
-	LOG(2,("DAC1: FP_VTOTAL: $%08x = (dec) %d\n", DACR(FP_VTOTAL),DACR(FP_VTOTAL)));
-	LOG(2,("DAC1: FP_VCRTC: $%08x = (dec) %d\n", DACR(FP_VCRTC),DACR(FP_VCRTC)));
-	LOG(2,("DAC1: FP_VSYNC_S: $%08x = (dec) %d\n", DACR(FP_VSYNC_S),DACR(FP_VSYNC_S)));
-	LOG(2,("DAC1: FP_VSYNC_E: $%08x = (dec) %d\n", DACR(FP_VSYNC_E),DACR(FP_VSYNC_E)));
-	LOG(2,("DAC1: FP_VVALID_S: $%08x = (dec) %d\n", DACR(FP_VVALID_S),DACR(FP_VVALID_S)));
-	LOG(2,("DAC1: FP_VVALID_E: $%08x = (dec) %d\n", DACR(FP_VVALID_E),DACR(FP_VVALID_E)));
+	LOG(2,("DAC1: FP_VDISPEND: %d\n", DACR(FP_VDISPEND)));
+	LOG(2,("DAC1: FP_VTOTAL: %d\n", DACR(FP_VTOTAL)));
+	LOG(2,("DAC1: FP_VCRTC: %d\n", DACR(FP_VCRTC)));
+	LOG(2,("DAC1: FP_VSYNC_S: %d\n", DACR(FP_VSYNC_S)));
+	LOG(2,("DAC1: FP_VSYNC_E: %d\n", DACR(FP_VSYNC_E)));
+	LOG(2,("DAC1: FP_VVALID_S: %d\n", DACR(FP_VVALID_S)));
+	LOG(2,("DAC1: FP_VVALID_E: %d\n", DACR(FP_VVALID_E)));
 
 	LOG(2,("DAC1: FP_CHKSUM: $%08x = (dec) %d\n", DACR(FP_CHKSUM),DACR(FP_CHKSUM)));
-	LOG(2,("DAC1: FP_TST_CTRL: $%08x = (dec) %d\n", DACR(FP_TST_CTRL),DACR(FP_TST_CTRL)));
-	LOG(2,("DAC1: FP_TG_CTRL: $%08x = (dec) %d\n", DACR(FP_TG_CTRL),DACR(FP_TG_CTRL)));
-	LOG(2,("DAC1: FP_DEBUG0: $%08x = (dec) %d\n", DACR(FP_DEBUG0),DACR(FP_DEBUG0)));
-	LOG(2,("DAC1: FP_DEBUG1: $%08x = (dec) %d\n", DACR(FP_DEBUG1),DACR(FP_DEBUG1)));
-	LOG(2,("DAC1: FP_DEBUG2: $%08x = (dec) %d\n", DACR(FP_DEBUG2),DACR(FP_DEBUG2)));
-	LOG(2,("DAC1: FP_DEBUG3: $%08x = (dec) %d\n", DACR(FP_DEBUG3),DACR(FP_DEBUG3)));
+	LOG(2,("DAC1: FP_TST_CTRL: $%08x\n", DACR(FP_TST_CTRL)));
+	LOG(2,("DAC1: FP_TG_CTRL: $%08x\n", DACR(FP_TG_CTRL)));
+	LOG(2,("DAC1: FP_DEBUG0: $%08x\n", DACR(FP_DEBUG0)));
+	LOG(2,("DAC1: FP_DEBUG1: $%08x\n", DACR(FP_DEBUG1)));
+	LOG(2,("DAC1: FP_DEBUG2: $%08x\n", DACR(FP_DEBUG2)));
+	LOG(2,("DAC1: FP_DEBUG3: $%08x\n", DACR(FP_DEBUG3)));
 
 	LOG(2,("DAC1: FUNCSEL: $%08x\n", NV_REG32(NV32_FUNCSEL)));
 
 	if(si->ps.secondary_head)
 	{
-		LOG(2,("DAC2: FP_HDISPEND: $%08x = (dec) %d\n", DAC2R(FP_HDISPEND),DAC2R(FP_HDISPEND)));
-		LOG(2,("DAC2: FP_HTOTAL: $%08x = (dec) %d\n", DAC2R(FP_HTOTAL),DAC2R(FP_HTOTAL)));
-		LOG(2,("DAC2: FP_HCRTC: $%08x = (dec) %d\n", DAC2R(FP_HCRTC),DAC2R(FP_HCRTC)));
-		LOG(2,("DAC2: FP_HSYNC_S: $%08x = (dec) %d\n", DAC2R(FP_HSYNC_S),DAC2R(FP_HSYNC_S)));
-		LOG(2,("DAC2: FP_HSYNC_E: $%08x = (dec) %d\n", DAC2R(FP_HSYNC_E),DAC2R(FP_HSYNC_E)));
-		LOG(2,("DAC2: FP_HVALID_S: $%08x = (dec) %d\n", DAC2R(FP_HVALID_S),DAC2R(FP_HVALID_S)));
-		LOG(2,("DAC2: FP_HVALID_E: $%08x = (dec) %d\n", DAC2R(FP_HVALID_E),DAC2R(FP_HVALID_E)));
+		LOG(2,("DAC2: FP_HDISPEND: %d\n", DAC2R(FP_HDISPEND)));
+		LOG(2,("DAC2: FP_HTOTAL: %d\n", DAC2R(FP_HTOTAL)));
+		LOG(2,("DAC2: FP_HCRTC: %d\n", DAC2R(FP_HCRTC)));
+		LOG(2,("DAC2: FP_HSYNC_S: %d\n", DAC2R(FP_HSYNC_S)));
+		LOG(2,("DAC2: FP_HSYNC_E: %d\n", DAC2R(FP_HSYNC_E)));
+		LOG(2,("DAC2: FP_HVALID_S:%d\n", DAC2R(FP_HVALID_S)));
+		LOG(2,("DAC2: FP_HVALID_E: %d\n", DAC2R(FP_HVALID_E)));
 
-		LOG(2,("DAC2: FP_VDISPEND: $%08x = (dec) %d\n", DAC2R(FP_VDISPEND),DAC2R(FP_VDISPEND)));
-		LOG(2,("DAC2: FP_VTOTAL: $%08x = (dec) %d\n", DAC2R(FP_VTOTAL),DAC2R(FP_VTOTAL)));
-		LOG(2,("DAC2: FP_VCRTC: $%08x = (dec) %d\n", DAC2R(FP_VCRTC),DAC2R(FP_VCRTC)));
-		LOG(2,("DAC2: FP_VSYNC_S: $%08x = (dec) %d\n", DAC2R(FP_VSYNC_S),DAC2R(FP_VSYNC_S)));
-		LOG(2,("DAC2: FP_VSYNC_E: $%08x = (dec) %d\n", DAC2R(FP_VSYNC_E),DAC2R(FP_VSYNC_E)));
-		LOG(2,("DAC2: FP_VVALID_S: $%08x = (dec) %d\n", DAC2R(FP_VVALID_S),DAC2R(FP_VVALID_S)));
-		LOG(2,("DAC2: FP_VVALID_E: $%08x = (dec) %d\n", DAC2R(FP_VVALID_E),DAC2R(FP_VVALID_E)));
+		LOG(2,("DAC2: FP_VDISPEND: %d\n", DAC2R(FP_VDISPEND)));
+		LOG(2,("DAC2: FP_VTOTAL: %d\n", DAC2R(FP_VTOTAL)));
+		LOG(2,("DAC2: FP_VCRTC: %d\n", DAC2R(FP_VCRTC)));
+		LOG(2,("DAC2: FP_VSYNC_S: %d\n", DAC2R(FP_VSYNC_S)));
+		LOG(2,("DAC2: FP_VSYNC_E: %d\n", DAC2R(FP_VSYNC_E)));
+		LOG(2,("DAC2: FP_VVALID_S: %d\n", DAC2R(FP_VVALID_S)));
+		LOG(2,("DAC2: FP_VVALID_E: %d\n", DAC2R(FP_VVALID_E)));
 
 		LOG(2,("DAC2: FP_CHKSUM: $%08x = (dec) %d\n", DAC2R(FP_CHKSUM),DAC2R(FP_CHKSUM)));
-		LOG(2,("DAC2: FP_TST_CTRL: $%08x = (dec) %d\n", DAC2R(FP_TST_CTRL),DAC2R(FP_TST_CTRL)));
-		LOG(2,("DAC2: FP_TG_CTRL: $%08x = (dec) %d\n", DAC2R(FP_TG_CTRL),DAC2R(FP_TG_CTRL)));
-		LOG(2,("DAC2: FP_DEBUG0: $%08x = (dec) %d\n", DAC2R(FP_DEBUG0),DAC2R(FP_DEBUG0)));
-		LOG(2,("DAC2: FP_DEBUG1: $%08x = (dec) %d\n", DAC2R(FP_DEBUG1),DAC2R(FP_DEBUG1)));
-		LOG(2,("DAC2: FP_DEBUG2: $%08x = (dec) %d\n", DAC2R(FP_DEBUG2),DAC2R(FP_DEBUG2)));
-		LOG(2,("DAC2: FP_DEBUG3: $%08x = (dec) %d\n", DAC2R(FP_DEBUG3),DAC2R(FP_DEBUG3)));
+		LOG(2,("DAC2: FP_TST_CTRL: $%08x\n", DAC2R(FP_TST_CTRL)));
+		LOG(2,("DAC2: FP_TG_CTRL: $%08x\n", DAC2R(FP_TG_CTRL)));
+		LOG(2,("DAC2: FP_DEBUG0: $%08x\n", DAC2R(FP_DEBUG0)));
+		LOG(2,("DAC2: FP_DEBUG1: $%08x\n", DAC2R(FP_DEBUG1)));
+		LOG(2,("DAC2: FP_DEBUG2: $%08x\n", DAC2R(FP_DEBUG2)));
+		LOG(2,("DAC2: FP_DEBUG3: $%08x\n", DAC2R(FP_DEBUG3)));
 
 		LOG(2,("DAC2: FUNCSEL: $%08x\n", NV_REG32(NV32_2FUNCSEL)));
 	}

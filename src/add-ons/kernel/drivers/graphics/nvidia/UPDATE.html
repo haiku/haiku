@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-9), (Rudolf)</h1></p>
+<p><h1>head (0.10-10), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -15,7 +15,9 @@
 	<li>Added flatpanel LVDS and TMDS transmitters powerup if a panel is detected;
 	<li>Updated NV11 and NV17 panel detection code: head should be identified correctly now;
 	<li>Fixed acceleration engine management regarding sync_to_token: no more updating glitches should occur now;
-	<li>Added recognition for GeForce4 MX 4000, GeForceFX 5700LE and GeForceFX 5700VE cards; also modified a few others to be more correct.
+	<li>Added recognition for GeForce4 MX 4000, GeForceFX 5700LE and GeForceFX 5700VE cards; also modified a few others to be more correct;
+	<li>Updated panel detection code once more: pre NV18 DVI panels should be working again now;
+	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters.
 </ul>
 NOTE:<br>
 dualhead switch mode is not yet operational for flatpanels...

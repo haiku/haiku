@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-3/2004
+   Rudolf Cornelissen 11/2002-4/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -267,7 +267,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		uint32 iscale_x, iscale_y;
 
 		/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
-		DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
+//fixme: remove once DPMS confirmed OK!
+//		DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
 
 		/* calculate inverse scaling factors used by hardware in 20.12 format */
 		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel1_width);
@@ -286,8 +287,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		DACW(FP_VVALID_S, 0);
 		DACW(FP_VVALID_E, (si->ps.panel1_height - 1));
 
-		/* nVidia cards support upscaling except on NV11 */
-		//fixme? logfiles tell me this is nonsense...
+		/* nVidia cards support upscaling except on ??? */
+		/* NV11 cards can upscale after all! */
 		if (0)//si->ps.card_type == NV11)
 		{
 			/* disable last fetched line limiting */
@@ -442,11 +443,17 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 		/* end synchronous reset if display should be enabled */
 		SEQW(RESET, 0x03);
 
+		/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
+		if (si->ps.tmds1_active) DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
+
 		LOG(4,("display on, "));
 	}
 	else
 	{
 		SEQW(CLKMODE, (temp | 0x20));
+
+		/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
+		if (si->ps.tmds1_active) DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
 
 		LOG(4,("display off, "));
 	}
