@@ -99,6 +99,15 @@ struct ar_hdr		/* archive file member header - printable ascii */
 # include <ar.h>
 # endif	
 
+# ifdef OPT_STAT_CACHE_SERVER_EXT
+# include "beos_stat_cache.h"
+inline int stat(const char *filename, struct stat *st)
+	{ return beos_stat_cache_stat(filename, st); }
+# define opendir	beos_stat_cache_opendir
+# define readdir	beos_stat_cache_readdir
+# define closedir	beos_stat_cache_closedir
+# endif
+
 /*
  * file_dirscan() - scan a directory for files
  */

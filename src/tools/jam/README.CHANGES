@@ -130,3 +130,27 @@ adjusted more or less to work with 2.5rc3.
   file is not performed. Setting the SEARCH and LOCATE variables does work
   as expected.
 
+
+* Stat Data and Directory Caching Server (BeOS only)
+
+  Also an optimization for large build systems. Since the BeOS FS cache
+  is terrible, stat()ing targets to get their timestamp or see if they exist
+  at all, and reading directories usually happens on disk, since the data
+  from the previous run are already out of the cache, if the build system
+  is large enough.
+
+  This change externalizes all stat()ing and directory reading into a
+  dedicated server process which caches the data, so that they can be
+  served from memory the next time they are requested. The server uses
+  the BeOS node monitoring to keep the data up to date.
+
+  The feature particularly leverages the header and jamfile caching, since
+  after the first run the timestamps of the jamfiles and headers are
+  cached too, so that reading the jamfiles and performing the header
+  scanning doesn't require any disk accesses at all (besides reading the
+  cache files, of course).
+
+  Drawbacks are that the first run of jam will be slower, mainly due to
+  the communication overhead with the server, and that the server consumes
+  memory to store the cached data. The server's memory footprint is quite
+  reasonable, though.

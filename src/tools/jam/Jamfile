@@ -41,6 +41,7 @@ if $(PROFILE)
 if $(DEBUG)
 {
 	CCFLAGS += -g ;
+	C++FLAGS += -g ;
 	LINKFLAGS += -g ;
 	LOCATE_TARGET = $(LOCATE_TARGET)/g ;
 }
@@ -55,6 +56,16 @@ if $(OS) = NT 			{ CCFLAGS += /DNT ; }
 #
 DEFINES += OPT_HEADER_CACHE_EXT ;
 DEFINES += OPT_JAMFILE_CACHE_EXT ;
+#
+### LOCAL CHANGE
+
+### LOCAL CHANGE
+# 
+# Include stat cache server under BeOS.
+#
+if $(OS) = BEOS {
+	DEFINES += OPT_STAT_CACHE_SERVER_EXT ;
+}
 #
 ### LOCAL CHANGE
 
@@ -81,6 +92,16 @@ if $(YACC) && $(SUFEXE) = ""
 code += jcache.c ;
 # code primarily not written locally, but grabbed from the net
 code += hcache.c ;
+#
+### LOCAL CHANGE
+
+### LOCAL CHANGE
+# 
+# Include stat cache server under BeOS.
+#
+if $(OS) = BEOS {
+	code += beos_stat_cache.c ;
+}
 #
 ### LOCAL CHANGE
 
@@ -118,6 +139,19 @@ Library         libjam.a :
 
 
 if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
+
+### LOCAL CHANGE
+# 
+# Build stat cache server under BeOS.
+#
+if $(OS) = BEOS {
+	LINK on StatCacheServer = g++ ;
+	LINKLIBS on StatCacheServer
+		= [ on StatCacheServer return $(LINKLIBS) ] -lbe ;
+	Main StatCacheServer : StatCacheServer.cpp ;
+}
+#
+### LOCAL CHANGE
 
 #
 # Distribution making from here on out.
