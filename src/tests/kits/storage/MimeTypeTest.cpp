@@ -3645,6 +3645,10 @@ MimeTypeTest::UpdateMimeInfoTest()
 	}
 #endif	// TEST_OBOS
 
+//	cout << "begin..." << endl;
+//	CHK(RES(update_mime_info(NULL, true, true, false)) == B_OK);
+//	cout << "end..." << endl;
+	
 	// directory
 	NextSubTest();
 	// create
@@ -3690,11 +3694,11 @@ MimeTypeTest::UpdateMimeInfoTest()
 	BEntry entry(files[0].name.c_str());
 	CHK(entry.InitCheck() == B_OK);
 	CHK(entry.Exists() == false);
-#if TEST_R5
+//#if TEST_R5
 	CHK(update_mime_info(files[0].name.c_str(), false, true, false) == B_OK);
-#else
-	CHK(update_mime_info(files[0].name.c_str(), false, true, false) == B_ENTRY_NOT_FOUND);
-#endif
+//#else
+//	CHK(update_mime_info(files[0].name.c_str(), false, true, false) == B_ENTRY_NOT_FOUND);
+//#endif
 }
 
 // WriteStringAttr
@@ -3709,23 +3713,29 @@ WriteStringAttr(BNode &node, string name, string _value)
 }
 
 const uint32 MINI_ICON_TYPE = 'MICN';
+const uint32 LARGE_ICON_TYPE = 'ICON';
 
 // helper class for create_app_meta_mime() tests
 class AppMimeTestFile {
 public:
 	AppMimeTestFile(string name, string type, string signature,
-					const void *icon = NULL)
+					string snifferRule,
+					const void *miniIcon = NULL, const void *largeIcon = NULL)
 		: name(name),
 		  type(type),
 		  signature(signature),
-		  miniIcon(NULL)
+		  snifferRule(snifferRule),
+		  miniIcon(NULL),
+		  largeIcon(NULL)
 	{
-		SetMiniIcon(icon);
+		SetMiniIcon(miniIcon);
+		SetLargeIcon(largeIcon);
 	}
 
 	~AppMimeTestFile()
 	{
 		SetMiniIcon(NULL);
+		SetLargeIcon(NULL);
 	}
 
 	void SetMiniIcon(const void *icon)
@@ -3737,6 +3747,18 @@ public:
 		if (icon) {
 			miniIcon = new char[256];
 			memcpy(miniIcon, icon, 256);
+		}
+	}
+
+	void SetLargeIcon(const void *icon)
+	{
+		if (largeIcon) {
+			delete[] largeIcon;
+			largeIcon = NULL;
+		}
+		if (icon) {
+			largeIcon = new char[1024];
+			memcpy(largeIcon, icon, 1024);
 		}
 	}
 
@@ -3752,6 +3774,9 @@ public:
 			// signature
 			if (error == B_OK)
 				error = WriteStringAttr(file, "BEOS:APP_SIG", signature);
+			// sniffer rule
+			if (error == B_OK)
+				error = WriteStringAttr(file, "BEOS:SNIFF_RULE", snifferRule);
 			// mini icon
 			if (error == B_OK && miniIcon) {
 				ssize_t written = file.WriteAttr("BEOS:M:STD_ICON",
@@ -3762,30 +3787,40 @@ public:
 				else if (written != 256)
 					error = B_ERROR;
 			}
+			// large icon (ignored)
+			if (error == B_OK && largeIcon) {
+				ssize_t written = file.WriteAttr("META:L:STD_ICON",
+												 LARGE_ICON_TYPE, 0, largeIcon,
+												 1024);
+				if (written < 0)
+					error = written;
+				else if (written != 1024)
+					error = B_ERROR;
+			}
 		}
 		// resources
 		if (error == B_OK && setResources) {
 			BResources resources;
 			error = resources.SetTo(&file, true);
-			// type
+			// type (ignored)
 			if (error == B_OK && type.length() > 0) {
 				error = resources.AddResource(B_STRING_TYPE, 2, type.c_str(),
 											  type.length() + 1, "BEOS:TYPE");
 			}
-			// signature
+			// signature (ignored)
 			if (error == B_OK) {
 				error = resources.AddResource(B_STRING_TYPE, 1,
 											  signature.c_str(),
 											  signature.length() + 1,
 											  "BEOS:APP_SIG");
 			}
-			// mini icon
+			// mini icon (ignored)
 			if (error == B_OK && miniIcon) {
 				error = resources.AddResource(MINI_ICON_TYPE, 101, miniIcon,
 											  256, "BEOS:M:STD_ICON");
 			}
-			// file types
-/*			if (error == B_OK) {
+			// file types (ignored)
+			if (error == B_OK) {
 				BMessage msg;
 				char *buffer = NULL;
 				error = msg.AddString("types", "text/x-email");
@@ -3802,7 +3837,7 @@ public:
 					error = resources.AddResource(B_MESSAGE_TYPE, 1, buffer,
 													msg.FlattenedSize(), "BEOS:FILE_TYPES");
 				delete [] buffer;
-			}*/
+			}
 		}
 		return error;
 	}
@@ -3823,7 +3858,9 @@ public:
 	string	name;
 	string	type;
 	string	signature;
+	string	snifferRule;
 	char	*miniIcon;
+	char	*largeIcon;
 };
 
 // CheckAppMetaMime
@@ -3858,6 +3895,12 @@ CheckAppMetaMime(AppMimeTestFile &file)
 		CHK(type.GetIcon(&icon, B_MINI_ICON) == B_OK);
 		CHK(memcmp(icon.Bits(), file.miniIcon, 256) == 0);
 	}
+	// large icon
+/*	if (file.miniIcon) {
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(type.GetIcon(&icon, B_LARGE_ICON) == B_OK);
+		CHK(memcmp(icon.Bits(), file.largeIcon, 1024) == 0);
+	}*/
 }
 
 // CreateAppMetaMimeTest
@@ -3872,19 +3915,45 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	// * The recursive flag isn't tested -- the BeBook sais, it is unused.
 	// * Updating all apps is not tested as it takes too long.
 
+	// Create a couple of icons to play around with
+	char miniIcon1[256];
+	char miniIcon2[256];
+	for (int ch = 0; ch < 256; ch++) {
+		miniIcon1[ch] = ch;
+		miniIcon2[ch] = 255-ch;
+	}
+	char largeIcon1[1024];
+	char largeIcon2[1024];
+	for (int i = 0; i < 1024; i++) {
+		char ch = i % 256;
+		largeIcon1[i] = ch;
+		largeIcon2[i] = 255-ch;
+	}
+
 	// attributes and resources
 	NextSubTest();
 	execCommand(string("mkdir ") + testDir + "/subdir1 "
 				+ testDir + "/subdir2 "
 				+ testDir + "/subdir2/subsubdir1");
 	AppMimeTestFile files[] = {
-		AppMimeTestFile(string(testDir) + "/file1", "",
-						"application/x-vnd.obos.mime.test.test1"),
-		AppMimeTestFile(string(testDir) + "/file2", "text/x-source-code",
-						"application/x-vnd.obos.mime.test.test2"),
+		AppMimeTestFile(string(testDir) + "/file1",
+						"",
+						"application/x-vnd.obos.mime.test.test1",
+						"0.0 ('abc')",
+						miniIcon1,
+						NULL),
+		AppMimeTestFile(string(testDir) + "/file2",
+						"text/x-source-code",
+						"application/x-vnd.obos.mime.test.test2",
+						"0.0 ('xyz')",
+						miniIcon2,
+						largeIcon2),
 		AppMimeTestFile(string(testDir) + "/file3",
 						"application/x-vnd.Be-elfexecutable",
-						"application/x-vnd.obos.mime.test.test3"),
+						"application/x-vnd.obos.mime.test.test3",
+						"0.0 ('rst')",
+						NULL,
+						largeIcon1),
 	};
 	const int fileCount = sizeof(files) / sizeof(AppMimeTestFile);
 //------------------------------------------------------------------------------
@@ -3894,13 +3963,14 @@ MimeTypeTest::CreateAppMetaMimeTest()
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(true, true) == B_OK);
-		CHK(create_app_meta_mime(file.name.c_str(), false, true, false)
+		CHK(RES(create_app_meta_mime(file.name.c_str(), false, true, false))
 			== B_OK);
 		// check the MIME type
 		CheckAppMetaMime(file);
 		// clean up
-		CHK(file.Delete(true) == B_OK);
+//		CHK(file.Delete(true) == B_OK);
 	}
+//	snooze(999000000);
 
 	// attributes only
 	NextSubTest();
@@ -3924,6 +3994,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 		CHK(file.Create(false, true) == B_OK);
 		CHK(create_app_meta_mime(file.name.c_str(), false, true, false)
 			== B_OK);
+		// check the MIME type
 		BMimeType type;
 		CHK(type.SetTo(file.signature.c_str()) == B_OK);
 		CHK(type.IsInstalled() == false);
