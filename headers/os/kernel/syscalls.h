@@ -62,6 +62,7 @@ status_t sys_get_next_team_info(int32 *cookie, team_info *info);
 
 int sys_kill(pid_t pid, int sig);
 int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+bigtime_t sys_set_alarm(bigtime_t time, uint32 mode);
 
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);

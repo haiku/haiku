@@ -395,6 +395,12 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SIGACTION:
 			*call_ret = user_sigaction((int)arg0, (const struct sigaction *)arg1, (struct sigaction *)arg2);
 			break;
+		case SYSCALL_SEND_SIGNAL:
+			*call_ret = send_signal_etc((pid_t)arg0, (uint)arg1);
+			break;
+		case SYSCALL_SET_ALARM:
+			*call_ret = sys_set_alarm((bigtime_t)INT32TOINT64(arg0, arg1), (uint32)arg2);
+			break;
 		default:
 			*call_ret = -1;
 	}

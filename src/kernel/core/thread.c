@@ -971,6 +971,9 @@ thread_exit(int retcode)
 	// boost our priority to get this over with
 	thread_set_priority(t->id, B_FIRST_REAL_TIME_PRIORITY);
 
+	// Cancel previously installed alarm timer, if any
+	cancel_timer(&t->alarm);
+	
 	// delete the user stack region first
 	if (p->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;

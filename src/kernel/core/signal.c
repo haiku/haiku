@@ -4,6 +4,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
+#include <OS.h>
 #include <kernel.h>
 #include <debug.h>
 #include <thread.h>
@@ -183,9 +184,26 @@ has_signals_pending(struct thread *t)
 
 
 int
-sys_kill(pid_t tid, int sig)
+sys_kill(pid_t pid, int sig)
 {
-	return send_signal_etc(tid, sig, 0);
+	struct team *t;
+	int state;
+	thread_id tid = -1;
+	
+	// XXX check for permissions
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	t = team_get_team_struct_locked(pid);
+	if ((t) && (t->main_thread))
+		tid = t->main_thread->id;
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	if (sig)
+		return send_signal_etc(tid, sig, 0);
+	else
+		return 0;
 }
 
 
@@ -245,5 +263,38 @@ sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 	restore_interrupts(state);
 	
 	return 0;
+}
+
+
+// Triggers a SIGALRM to the thread that issued the timer and reschedules
+static int32
+alarm_event(timer *t)
+{
+	int tid = *((int *)((void *)t + sizeof(timer)));
+	
+	send_signal_etc(tid, SIGALRM, B_DO_NOT_RESCHEDULE);
+	
+	return B_INVOKE_SCHEDULER;
+}
+
+
+bigtime_t
+sys_set_alarm(bigtime_t time, uint32 mode)
+{
+	struct thread *t = thread_get_current_thread();
+	int state;
+	bigtime_t rv = 0;
+	
+	state = disable_interrupts();
+	
+	if (t->alarm.period)
+		rv = (bigtime_t)t->alarm.entry.key - system_time();
+	cancel_timer(&t->alarm);
+	if (time != B_INFINITE_TIMEOUT)
+		add_timer(&t->alarm, &alarm_event, time, mode);
+	
+	restore_interrupts(state);
+	
+	return rv;
 }
 

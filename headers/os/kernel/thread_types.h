@@ -22,6 +22,7 @@ extern "C" {
 #include <vm.h>
 #include <smp.h>
 #include <signal.h>
+#include <timer.h>
 #include <arch/thread_struct.h>
 
 extern spinlock_t thread_spinlock;
@@ -96,6 +97,7 @@ struct thread {
 	struct thread *all_next;
 	struct thread *team_next;
 	struct thread *q_next;
+	timer alarm;
 	thread_id id;
 	char name[SYS_MAX_OS_NAME_LEN];
 	int priority;
