@@ -144,7 +144,8 @@ String::SetTo(const char *utf8)
 	if (!fUtf8String){
 		PRINT(("new fUtf8String[%ld] allocation failed\n", length+1));
 		return;
-	}	
+	}
+	memcpy(fUtf8String, utf8, length+1);
 	// Next convert to raw 4-byte unicode. Then we'll do some
 	// analysis to figure out if we have any invalid characters,
 	// and whether we can get away with compressed 8-bit unicode,
