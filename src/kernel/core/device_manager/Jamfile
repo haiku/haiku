@@ -14,6 +14,7 @@ KernelMergeObject kernel_device_manager.o :
 	patterns.c
 	probe.c
 	registration.c
+	root_node.c
 	scan.c
 	:
 	-fno-pic -Wno-unused -D_KERNEL_MODE
