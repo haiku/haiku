@@ -18,6 +18,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) posix unistd ] ;
 KernelMergeObject kernel_posix.o :
 	# main
  	<$(SOURCE_GRIST)>kerrno.c
+ 	<$(SOURCE_GRIST)>dirent.c
  	<$(SOURCE_GRIST)>poll.c
  	<$(SOURCE_GRIST)>utime.c
  	# locale
