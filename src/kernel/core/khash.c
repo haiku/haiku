@@ -208,3 +208,146 @@ unsigned int hash_hash_str( const char *str )
 	
 	return hash;
 }
+
+#define MAX_INITIAL 15;
+
+/*
+static void nhash_this(hash_table_index *hi, const void **key, ssize_t *klen,
+                       void **val)
+{
+	if (key)	*key = hi->this->key;
+	if (klen)	*klen = hi->this->klen;
+	if (val)	*val = (void*)hi->this->val;
+}
+*/
+
+new_hash_table *hash_make(void)
+{
+	new_hash_table *nn;
+	
+	 nn = (new_hash_table *)kmalloc(sizeof(new_hash_table));
+
+	if (!nn)
+		return NULL;
+
+	nn->count = 0;
+	nn->max = MAX_INITIAL;
+
+	nn->array = (hash_entry **)kmalloc(sizeof(hash_entry) * (nn->max + 1));
+	memset(nn->array, 0, sizeof(hash_entry) * (nn->max +1));
+	pool_init(&nn->pool, sizeof(hash_entry));
+	if (!nn->pool)
+		return NULL;
+	return nn;
+}
+
+static hash_index *new_hash_next(hash_index *hi)
+{
+	hi->this_idx = hi->next;
+	while (!hi->this_idx) {
+		if (hi->index > hi->nh->max)
+			return NULL;
+		hi->this_idx = hi->nh->array[hi->index++];
+	}
+	hi->next = hi->this_idx->next;
+	return hi;
+}
+
+static hash_index *new_hash_first(new_hash_table *nh)
+{
+        hash_index *hi = &nh->iterator;
+        hi->nh = nh;
+        hi->index = 0;
+        hi->this_idx = hi->next = NULL;
+        return new_hash_next(hi);
+}
+
+static void expand_array(new_hash_table *nh)
+{
+	hash_index *hi;
+	hash_entry **new_array;
+	int new_max = nh->max * 2 +1;
+	int i;
+
+	new_array = (hash_entry **)kmalloc(sizeof(hash_entry) * new_max);
+	memset(new_array, 0, sizeof(hash_entry) * new_max);
+	for (hi = new_hash_first(nh); hi; hi = new_hash_next(hi)) {
+		i = hi->this_idx->hash & new_max;
+		hi->this_idx->next = new_array[i];
+		new_array[i] = hi->this_idx;
+	}
+	kfree(nh->array);
+	nh->array = new_array;
+	nh->max = new_max;
+}
+
+
+static hash_entry **find_entry(new_hash_table *nh, const void *key,
+                               ssize_t klen, const void *val)
+{
+	hash_entry **hep;
+	hash_entry *he;
+	const unsigned char *p;
+	int hash = 0;
+	ssize_t i;
+
+	if (!nh)
+		return NULL;
+
+	for (p=key, i=klen; i; i--, p++) 
+		hash = hash * 33 + *p;
+
+	for (hep = &nh->array[hash & nh->max], he = *hep; he; 
+				hep = &he->next, he = *hep) {
+		if (he->hash == hash && he->klen == klen
+			&& memcmp(he->key, key, klen) == 0) {
+				break;
+		}
+	}
+
+	if (he || !val)
+		return hep;
+
+	/* add a new linked-list entry */
+	he = (hash_entry *)pool_get(nh->pool);
+	he->next = NULL;
+	he->hash = hash;
+	he->key  = key;
+	he->klen = klen;
+	he->val = val;
+	*hep = he;
+	nh->count++;
+	return hep;
+}
+
+void *hash_get(new_hash_table *nh, const void *key, ssize_t klen)
+{
+	hash_entry *he;
+	he = *find_entry(nh, key, klen, NULL);
+	if (he)
+		return (void*)he->val;
+	else
+		return NULL;
+}
+
+void hash_set(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
+{
+	hash_entry **hep;
+	hash_entry *old;
+	hep = find_entry(nh, key, klen, val);
+
+	if (*hep) {
+		if (!val) {
+			/* delete it */
+			old = *hep;
+			*hep = (*hep)->next;
+			--nh->count;
+			pool_put(nh->pool, old);
+		} else {
+			/* replace it */
+			(*hep)->val = val;
+			if (nh->count > nh->max) 
+				expand_array(nh);
+		}
+	}
+}
