@@ -15,8 +15,6 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libc!stdlib>rand.o
 	<$(SOURCE_GRIST)!libc!stdlib>random.o
 
-	<$(SOURCE_GRIST)!libc!string>bcopy.o
-	<$(SOURCE_GRIST)!libc!string>bzero.o
 	<$(SOURCE_GRIST)!libc!string>memchr.o
 	<$(SOURCE_GRIST)!libc!string>memcmp.o
 	<$(SOURCE_GRIST)!libc!string>memcpy.o
@@ -321,8 +319,6 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
 
-	<$(SOURCE_GRIST)!libc!string>bcopy.o
-	<$(SOURCE_GRIST)!libc!string>bzero.o
 	<$(SOURCE_GRIST)!libc!string>memchr.o
 	<$(SOURCE_GRIST)!libc!string>memcmp.o
 	<$(SOURCE_GRIST)!libc!string>memcpy.o
@@ -451,8 +447,6 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
 	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
 
-	<$(SOURCE_GRIST)!libc!string>bcopy.o
-	<$(SOURCE_GRIST)!libc!string>bzero.o
 	<$(SOURCE_GRIST)!libc!string>memchr.o
 	<$(SOURCE_GRIST)!libc!string>memcmp.o
 	<$(SOURCE_GRIST)!libc!string>memcpy.o
