@@ -1,64 +1,25 @@
-/***********************************************************************
- * AUTHOR: Zousar Shaker
- *   FILE: ParameterWeb.cpp
- *  DESCR: BParameterWeb, BParameterGroup, BParameter, BNullParameter, 
- *         BContinuousParameter, BDiscreteParameter
- ***********************************************************************/
+/* ParameterWeb - implements the following classes:
+**		BParameterWeb, BParameterGroup, BParameter, BNullParameter,
+**		BContinuousParameter, BDiscreteParameter
+**
+** Author: Zousar Shaker
+**         Axel Dörfler, axeld@pinc-software.de
+**
+** This file may be used under the terms of the OpenBeOS License.
+*/
+
+
 #include <ParameterWeb.h>
+#include <string.h>
+
+// for now!
+#ifdef DEBUG
+#	undef DEBUG
+#endif
+#define DEBUG 3
+
 #include "debug.h"
 
-//--------BEGIN-ADDED-BY-ZS----------------------------------
-
-	//Comment keywords:
-	// FIXME: Something that should be fixed
-	// QUESTION: Something that needs clarification
-	// NOTICE: Explanation of what's going on
-	
-typedef unsigned char byte;
-
-/* by Marcus Overhagen: Sorry Zousar, but I really want the program
- * to be stopped when something is wrong!
- */
-#if 1 /* always use these */
-
-#define ASSERT_WRETURN_VALUE(CheckExpr,RetVal) \
-		ASSERT(CheckExpr)
-	
-#define ASSERT_RETURN(CheckExpr) \
-		ASSERT(CheckExpr)
-
-#else /* and disable the other macros */
-
-/*************************************************************
- * Used to check assertions, and if the assertions fail, a
- * value is returned.  It is used only to check
- * potentially erronious conditions INTERNAL to the code (ie:
- * if I have forgotten to change a variable from NULL to some
- * usable value) it is NOT used to check erronious input from
- * the outside world (ie: if the user of a class passes NULL for
- * some parameter). (ZS)
- *************************************************************/
-#define ASSERT_WRETURN_VALUE(CheckExpr,RetVal)\
-	if(!(CheckExpr))\
-	{\
-		return (RetVal);\
-	}
-/*************************************************************
- * Used to check assertions, and if the assertions fail, the
- * method returns (no return value).  It is used only to check
- * potentially erronious conditions INTERNAL to the code (ie:
- * if I have forgotten to change a variable from NULL to some
- * usable value) it is NOT used to check erronious input from
- * the outside world (ie: if the user of a class passes NULL for
- * some parameter). (ZS)
- *************************************************************/
-#define ASSERT_RETURN(CheckExpr)\
-	if(!(CheckExpr))\
-	{\
-		return;\
-	}
-
-#endif /* end of disabled macros */
 
 /*
 	The following is documentation on the flattened format
@@ -137,13 +98,6 @@ typedef unsigned char byte;
 	
 */
 
-//--------END-ADDED-BY-ZS-------------------------------------
-	
-	
-
-/*************************************************************
- * 
- *************************************************************/
 
 const char * const B_GENERIC			 = "";
 const char * const B_MASTER_GAIN		 = "Master";
@@ -181,51 +135,225 @@ const char * const B_WEB_BUFFER_INPUT	 = "DataInput";
 const char * const B_WEB_BUFFER_OUTPUT	 = "DataOutput";
 const char * const B_SIMPLE_TRANSPORT	 = "SimpleTransport";
 
+// Flattened data
+
+static const int32 kParameterWebMagic = 0x01030506;
+static const int32 kCurrentParameterWebVersion = 1;
+static const int32 kBufferGroupMagic = 0x03040509;
+static const int32 kBufferGroupMagicNoFlags = 0x03040507;
+static const int32 kParameterMagic = 0x02040607;
+
+static const ssize_t kAdditionalParameterGroupSize = 12;
+static const ssize_t kAdditionalParameterSize = 35;
+
+/* BContinuousParameter - FlattenedSize() fixed part
+ *	Min: 4 bytes (as float)
+ *	Max: 4 bytes (as float)
+ *	Stepping: 4 bytes (as float)
+ *	Response: 4 bytes (as int or enum)
+ *	Factor: 4 bytes (as float)
+ *	Offset: 4 bytes (as float)
+ */
+static const ssize_t kAdditionalContinuousParameterSize = 24;
+static const ssize_t kAdditionalDiscreteParameterSize = sizeof(ssize_t);
+
+
+// helper functions
+
+
+template<class Type> Type
+read_from_buffer(const void **_buffer)
+{
+	const Type *typedBuffer = static_cast<const Type *>(*_buffer);
+	Type value = *typedBuffer;
+
+	typedBuffer++;
+	*_buffer = static_cast<const void *>(typedBuffer);
+
+	return value;
+}
+
+
+static status_t
+read_string_from_buffer(const void **_buffer, char **_string, ssize_t size)
+{
+	if (size < 1)
+		return B_BAD_VALUE;
+	
+	const uint8 *buffer = static_cast<const uint8 *>(*_buffer);
+	uint8 length = *buffer++;
+	if (length > size - 1)
+		return B_BAD_VALUE;
+
+	char *string = (char *)malloc(length + 1);
+	if (string == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(string, buffer, length);
+	string[length] = '\0';
+
+	*_buffer = static_cast<const void *>(buffer + length);
+	*_string = string;
+	return B_OK;
+}
+
+
+// currently unused
+#if 0
+template<class Type> Type *
+reserve_in_buffer(void **_buffer)
+{
+	Type *typedBuffer = static_cast<Type *>(*_buffer);
+
+	*typedBuffer = 0;
+	typedBuffer++;
+
+	*_buffer = static_cast<void *>(typedBuffer);
+}
+#endif
+
+template<class Type> void
+write_to_buffer(void **_buffer, Type value)
+{
+	Type *typedBuffer = static_cast<Type *>(*_buffer);
+
+	*typedBuffer = value;
+	typedBuffer++;
+
+	*_buffer = static_cast<void *>(typedBuffer);
+}
+
+
+void
+write_string_to_buffer(void **_buffer, const char *string)
+{
+	uint8 *buffer = static_cast<uint8 *>(*_buffer);
+	uint32 length = string ? strlen(string) : 0;
+	if (length > 255)
+		length = 255;
+
+	*buffer++ = static_cast<uint8>(length);
+	if (length) {
+		memcpy(buffer, string, length);
+		buffer += length;
+	}
+
+	*_buffer = static_cast<void *>(buffer);
+}
+
+
+static void
+skip_in_buffer(const void **_buffer, uint32 bytes)
+{
+	const uint8 *buffer = static_cast<const uint8 *>(*_buffer);
+
+	buffer += bytes;
+
+	*_buffer = static_cast<const void *>(buffer);
+}
+
+
+static void inline
+skip_in_buffer(void **_buffer, uint32 bytes)
+{
+	// This actually shouldn't be necessary, but I believe it's a
+	// bug in Be's gcc - it complains about "adds cv-quals without intervening `const'"
+	// when passing a "const void **" pointer as the first argument.
+	// Maybe I am just stupid, though -- axeld.
+
+	skip_in_buffer((const void **)_buffer, bytes);
+}
+
+
+template<class Type> Type
+swap32(Type value, bool doSwap)
+{
+	ASSERT(sizeof(Type) == 4);
+
+	if (doSwap)
+		return (Type)B_SWAP_INT32((int32)value);
+
+	return value;
+}
+
+
+template<class Type> Type
+read_from_buffer_swap32(const void **_buffer, bool doSwap)
+{
+	return swap32<Type>(read_from_buffer<Type>(_buffer), doSwap);
+}
+
+
+static inline ssize_t
+size_left(ssize_t size, const void *bufferStart, const void *buffer)
+{
+	return size - static_cast<ssize_t>((const uint8 *)buffer - (const uint8 *)bufferStart);
+}
+
+
+/** Copies the source string into a new buffer with the specified
+ *	maximum size. This always includes a trailing zero byte.
+ *	Returns NULL if the source string is either NULL or empty, or
+ *	if there wasn't enough memory to allocate the buffer.
+ *	The buffer returned is to be freed by the caller using free().
+ */
+
+static char *
+strndup(const char *source, size_t maxBufferSize)
+{
+	if (source == NULL || source[0] == '\0')
+		return NULL;
+
+	uint32 size = strlen(source) + 1;
+	if (size > maxBufferSize)
+		size = maxBufferSize;
+
+	char *target = (char *)malloc(size);
+	if (target == NULL)
+		return NULL;
+	
+	memcpy(target, source, size - 1);
+	target[size - 1] = '\0';
+
+	return target;
+}
+
+
+//	#pragma mark -
+
 /*************************************************************
  * public BParameterWeb
  *************************************************************/
 
-BParameterWeb::BParameterWeb():mNode(media_node::null)
+
+BParameterWeb::BParameterWeb()
+	:	mNode(media_node::null)
 {
+	CALLED();
+
 	mGroups = new BList();
-	
+
 	mOldRefs = new BList();
 	mNewRefs = new BList();
+
+	ASSERT(mGroups != NULL && mOldRefs != NULL && mNewRefs != NULL);
 }
 
 
 BParameterWeb::~BParameterWeb()
 {
-	int i;
-	
-	if(mGroups != NULL)
-	{
-		for(i = 0;i < mGroups->CountItems(); i++)
-		{
-			BParameterGroup *CurrentGroup = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-			
-			if(CurrentGroup != NULL)
-			{
-				delete CurrentGroup;
-			}
+	CALLED();
+
+	if (mGroups != NULL) {
+		for(int32 i = mGroups->CountItems(); i-- > 0;) {
+			delete static_cast<BParameterGroup *>(mGroups->ItemAt(i));
 		}
-		mGroups->MakeEmpty();
+
 		delete mGroups;
-		mGroups = NULL;
 	}
-	
-	if(mOldRefs != NULL)
-	{
-		mOldRefs->MakeEmpty();
-		delete mOldRefs;
-	}
-	
-	if(mNewRefs != NULL)
-	{
-		mNewRefs->MakeEmpty();
-		delete mNewRefs;
-	}
-	
+
+	delete mOldRefs;
+	delete mNewRefs;
 }
 
 
@@ -239,21 +367,21 @@ BParameterWeb::Node()
 BParameterGroup *
 BParameterWeb::MakeGroup(const char *name)
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,NULL);
-	
-	BParameterGroup *NewGroup = new BParameterGroup(this,name);
-	
-	mGroups->AddItem(NewGroup);
-	
-	return NewGroup;
+	CALLED();
+	ASSERT(mGroups != NULL);
+
+	BParameterGroup *group = new BParameterGroup(this, name);
+	mGroups->AddItem(group);
+
+	return group;
 }
 
 
 int32
 BParameterWeb::CountGroups()
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,0);
-	
+	ASSERT(mGroups != NULL);
+
 	return mGroups->CountItems();
 }
 
@@ -261,8 +389,8 @@ BParameterWeb::CountGroups()
 BParameterGroup *
 BParameterWeb::GroupAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,NULL);
-	
+	ASSERT(mGroups != NULL);
+
 	return static_cast<BParameterGroup *>(mGroups->ItemAt(index));
 }
 
@@ -270,195 +398,54 @@ BParameterWeb::GroupAt(int32 index)
 int32
 BParameterWeb::CountParameters()
 {
-	//iterative traversal of the parameter web
-	//NOTE: This most definately should be tested and debugged.
-	
-	ASSERT_WRETURN_VALUE(mGroups != NULL,0);
-	
-	int32 RetVal = 0;
-	
-	int i;
-	int Limit = mGroups->CountItems();
-	for(i = 0; i < Limit; i++)
-	{
-		BList *GroupStack = new BList();
-		BList *IterStack = new BList();
-		BParameterGroup *CurrentGroup = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-		int *CurrentIter = new int(0);
-		
-		while(1)
-		{
-			if(CurrentGroup != NULL)
-			{
-				if((*CurrentIter) == 0)
-				//if this is the first time you're encountering this node, add the parameters within it.
-				{
-					RetVal += CurrentGroup->CountParameters();
-				}
-				
-				if((*CurrentIter) < CurrentGroup->CountGroups())
-				//if we've still got sub-groups within the current group to account for
-				{
-					IterStack->AddItem(CurrentIter);
-					GroupStack->AddItem(CurrentGroup);
-					
-					//update the current group
-					CurrentGroup = CurrentGroup->GroupAt(*CurrentIter);
-					//increment the current iter
-					(*CurrentIter)++;
-					
-					//create a new iter for the group you're descending into
-					CurrentIter = new int(0);
-				}
-				else if(GroupStack->CountItems())
-				//we've taken care of all the subgroups of the current group, and there's still something on the stack, clean up, and pop it
-				{
-					//toss out the iter associated with this group
-					if(CurrentIter != NULL)
-						delete CurrentIter;
-						
-					CurrentGroup = static_cast<BParameterGroup *>(GroupStack->RemoveItem(GroupStack->CountItems()-1));
-					CurrentIter = static_cast<int *>(IterStack->RemoveItem(IterStack->CountItems()-1));
-				}
-				else
-				//we've taken care of all the subgroups of the current group, and there's nothing on the stack, we're done.
-				{
-					break;
-				}
-				
-			}
-			else if(GroupStack->CountItems())
-			{
-				if(CurrentIter != NULL)
-					delete CurrentIter;
-					
-				CurrentGroup = static_cast<BParameterGroup *>(GroupStack->RemoveItem(GroupStack->CountItems()-1));
-				CurrentIter = static_cast<int *>(IterStack->RemoveItem(IterStack->CountItems()-1));
-			}
-			else
-			{
-				//NULL current group, and nothing on the stack, it's time to exit
-				break;
-			}
-		}
-		
-		if(CurrentIter != NULL)
-			delete CurrentIter;
-		
-		delete IterStack;
-		delete GroupStack;
+	CALLED();
+	ASSERT(mGroups != NULL);
+
+	// Counts over all groups (and sub-groups) in the web.
+	// The "groups" list is used as count stack
+
+	BList groups(*mGroups);
+	int32 count = 0;
+
+	for (int32 i = 0; i < groups.CountItems(); i++) {
+		BParameterGroup *group = static_cast<BParameterGroup *>(groups.ItemAt(i));
+
+		count += group->CountParameters();
+
+		if (group->mGroups != NULL)
+			groups.AddList(group->mGroups);
 	}
-	
-	return RetVal;
+
+	return count;
 }
 
 
 BParameter *
 BParameterWeb::ParameterAt(int32 index)
 {
-	//iterative traversal of the parameter web
-	//NOTE: This most definately should be tested and debugged.
+	CALLED();
+	ASSERT(mGroups != NULL);
 	
-	ASSERT_WRETURN_VALUE(mGroups != NULL,0);
-	
-	
-	int i;
-	int Limit = mGroups->CountItems();
-	for(i = 0; i < Limit; i++)
-	{
-		BList *GroupStack = new BList();
-		BList *IterStack = new BList();
-		BParameterGroup *CurrentGroup = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-		int *CurrentIter = new int(0);
-		
-		while(1)
-		{
-			if(CurrentGroup != NULL)
-			{
-				
-				if((*CurrentIter) == 0)
-				//if this is the first time you're encountering this node, add the parameters within it.
-				{
-					if(index < CurrentGroup->CountParameters())
-					{
-						//delete the current iter (it is not on the stack)
-						if(CurrentIter != NULL)
-							delete CurrentIter;
-						
-						//delete items in the IterStack	
-						for(int j = 0; j < IterStack->CountItems(); j++)
-						{
-							int *Temp = static_cast<int *>(IterStack->ItemAt(j));
-							if(Temp != NULL)
-								delete CurrentIter;
-						}
-						IterStack->MakeEmpty();
-						delete IterStack;
-						
-						GroupStack->MakeEmpty();
-						delete GroupStack;
-						
-						return CurrentGroup->ParameterAt(index);
-					}
-					else
-					{
-						index -= CurrentGroup->CountParameters();
-					}
-				}
-				
-				if((*CurrentIter) < CurrentGroup->CountGroups())
-				//if we've still got sub-groups within the current group to account for
-				{
-					IterStack->AddItem(CurrentIter);
-					GroupStack->AddItem(CurrentGroup);
-					
-					//update the current group
-					CurrentGroup = CurrentGroup->GroupAt(*CurrentIter);
-					//increment the current iter
-					(*CurrentIter)++;
-					
-					//create a new iter for the group you're descending into
-					CurrentIter = new int(0);
-				}
-				else if(GroupStack->CountItems())
-				//we've taken care of all the subgroups of the current group, and there's still something on the stack, clean up, and pop it
-				{
-					//toss out the iter associated with this group
-					if(CurrentIter != NULL)
-						delete CurrentIter;
-						
-					CurrentGroup = static_cast<BParameterGroup *>(GroupStack->RemoveItem(GroupStack->CountItems()-1));
-					CurrentIter = static_cast<int *>(IterStack->RemoveItem(IterStack->CountItems()-1));
-				}
-				else
-				//we've taken care of all the subgroups of the current group, and there's nothing on the stack, we're done.
-				{
-					break;
-				}
-				
-			}
-			else if(GroupStack->CountItems())
-			{
-				if(CurrentIter != NULL)
-					delete CurrentIter;
-					
-				CurrentGroup = static_cast<BParameterGroup *>(GroupStack->RemoveItem(GroupStack->CountItems()-1));
-				CurrentIter = static_cast<int *>(IterStack->RemoveItem(IterStack->CountItems()-1));
-			}
-			else
-			{
-				//NULL current group, and nothing on the stack, it's time to exit
-				break;
-			}
-		}
-		
-		if(CurrentIter != NULL)
-			delete CurrentIter;
-		
-		delete IterStack;
-		delete GroupStack;
+	// Iterates over all groups (and sub-groups) in the web.
+	// The "groups" list is used as iteration stack (breadth search style)
+	// Maintains the same order as the Be implementation
+
+	BList groups(*mGroups);
+
+	for (int32 i = 0; i < groups.CountItems(); i++) {
+		BParameterGroup *group = static_cast<BParameterGroup *>(groups.ItemAt(i));
+		int32 count = group->CountParameters();
+		if (index < count)
+			return group->ParameterAt(index);
+
+		index -= count;
+			// the index is always relative to the start of the current group
+
+		if (group->mGroups != NULL)
+			groups.AddList(group->mGroups);
 	}
-	
+
+	TRACE("*** could not find parameter at %ld (count = %ld)\n", index, CountParameters());
 	return NULL;
 }
 
@@ -477,12 +464,11 @@ BParameterWeb::TypeCode() const
 }
 
 
-#define PARAMETER_WEB_FLATTEN_MAGIC		0x01030506
-#define PARAMETER_WEB_FLATTEN_VERSION	0x1
-
 ssize_t
 BParameterWeb::FlattenedSize() const
 {
+	CALLED();
+
 /*
 	//--------BEGIN-CORE-BPARAMETERWEB-STRUCT-----------
 	?? 0x01030506: 4 bytes
@@ -499,91 +485,65 @@ BParameterWeb::FlattenedSize() const
 	//---------END-CORE-BPARAMETERWEB-STRUCT--------------
 */
 	//36 guaranteed bytes, variable after that.
-	ssize_t RetVal = sizeof(int32) + 2*sizeof(int32) + sizeof(media_node);
-	
-	int i;
-	int limit;
-	
-	limit = mGroups->CountItems();
-	for(i = 0; i < limit; i++)
-	{
-		BParameterGroup *CurrentGroup = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-		if(CurrentGroup != NULL)
-		{
-			//overhead for each parameter flattened
-			RetVal += 8; //4 bytes for the flattened size, and 4 in the 'mystery parameter'...
-			RetVal += CurrentGroup->FlattenedSize();
+	ssize_t size = sizeof(int32) + 2*sizeof(int32) + sizeof(media_node);
+
+	for (int32 i = mGroups->CountItems(); i-- > 0;) {
+		BParameterGroup *group = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
+		if (group != NULL) {
+			size += 4 + group->FlattenedSize();
+				// 4 bytes for the flattened size
 		}
 	}
-	
-	return RetVal;
+
+	return size;
 }
 
 
 status_t
-BParameterWeb::Flatten(void *buffer,
-					   ssize_t size) const
+BParameterWeb::Flatten(void *buffer, ssize_t size) const
 {
-	if(buffer == NULL)
+	CALLED();
+
+	if (buffer == NULL)
 		return B_NO_INIT;
-	
-	//NOTICE: It is important that this value is the size returned by BParameterGroup::FlattenedSize,
-	//		  not by a descendent's override of this method.
-	ssize_t ActualFSize = BParameterWeb::FlattenedSize();
-	
-	if(size < ActualFSize)
+
+	ssize_t actualSize = BParameterWeb::FlattenedSize();
+	if (size < actualSize)
 		return B_NO_MEMORY;
-	
-	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being written in the correct byte order.
-	*(reinterpret_cast<int32 *>(CurrentPos)) = PARAMETER_WEB_FLATTEN_MAGIC;
-	CurrentPos += sizeof(int32);
 
-	//QUESTION: Another unknown constant.  This one is different in style than the others though.
-	*(reinterpret_cast<int32 *>(CurrentPos)) = PARAMETER_WEB_FLATTEN_VERSION;
-	CurrentPos += sizeof(int32);
-	
+	void *bufferStart = buffer;
 
-	int i;
-	int NumItems;
-	void **Items;
+	write_to_buffer<int32>(&buffer, kParameterWebMagic);
+	write_to_buffer<int32>(&buffer, kCurrentParameterWebVersion);
 
-	
-	ssize_t *TotalWrittenSubGroupsCount = reinterpret_cast<ssize_t *>(CurrentPos);
-	(*TotalWrittenSubGroupsCount) = 0;
-	CurrentPos += sizeof(ssize_t);
-	
-	if(mGroups != NULL)
-	{
-		NumItems = mGroups->CountItems();
-		Items = static_cast<void **>(mGroups->Items());
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			BParameterGroup *CurrentSubGroup = static_cast<BParameterGroup *>(Items[i]);
-			if(CurrentSubGroup != NULL)
-			{
-				ssize_t FlattenedSubGroupSize = CurrentSubGroup->FlattenedSize();
-				
-				//write the flattened size value
-				*(reinterpret_cast<ssize_t *>(CurrentPos)) = FlattenedSubGroupSize;
-				CurrentPos += sizeof(ssize_t);
-				
-				//write the flattened sub group
-				status_t SubGroupFlattenStatus = CurrentSubGroup->Flatten(CurrentPos,FlattenedSubGroupSize);
-				
-				if(SubGroupFlattenStatus != B_OK)
-				{
-					return SubGroupFlattenStatus;
-				}
-				
-				CurrentPos += FlattenedSubGroupSize;
-				
-				(*TotalWrittenSubGroupsCount)++;
-			}
+	// flatten all groups into this buffer
+
+	int32 count = mGroups ? mGroups->CountItems() : 0;
+	write_to_buffer<int32>(&buffer, count);
+
+	write_to_buffer<media_node>(&buffer, mNode);
+
+	for (int32 i = 0; i < count; i++) {
+		BParameterGroup *group = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
+		if (group == NULL) {
+			FATAL("BParameterWeb::Flatten(): group is NULL\n");
+			continue;
 		}
+
+		ssize_t groupSize = group->FlattenedSize();
+		if (groupSize > size_left(size, bufferStart, buffer)) {
+			FATAL("BParameterWeb::Flatten(): buffer too small\n");
+			return B_BAD_VALUE;
+		}
+
+		write_to_buffer<ssize_t>(&buffer, groupSize);
+
+		// write the flattened sub group
+		status_t status = group->Flatten(buffer, groupSize);
+		if (status < B_OK)
+			return status;
+
+		skip_in_buffer(&buffer, groupSize);
 	}
 
 	return B_OK;
@@ -593,61 +553,57 @@ BParameterWeb::Flatten(void *buffer,
 bool
 BParameterWeb::AllowsTypeCode(type_code code) const
 {
-	return (code == this->TypeCode());
+	return code == TypeCode();
 }
 
 
 status_t
-BParameterWeb::Unflatten(type_code c,
-						 const void *buf,
-						 ssize_t size)
-{	
-	if(!this->AllowsTypeCode(c)) {
-		FATAL("BParameterWeb::Unflatten wrong type code\n");
+BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
+{
+	CALLED();
+
+	if (!AllowsTypeCode(code)) {
+		FATAL("BParameterWeb::Unflatten(): wrong type code\n");
 		return B_BAD_TYPE;
 	}
-	if(buf == NULL) {
-		FATAL("BParameterWeb::Unflatten NULL buffer pointer\n");
+
+	if (buffer == NULL) {
+		FATAL("BParameterWeb::Unflatten(): NULL buffer pointer\n");
 		return B_NO_INIT;
 	}
-	
-	//if the buffer is smaller than the size needed to read the
-	//signature field, the mystery field, the group count, and the Node, then there is a problem
-	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(int32) + sizeof(ssize_t) + sizeof(media_node)) )
+
+	// if the buffer is smaller than the size needed to read the
+	// signature field, the mystery field, the group count, and the Node, then there is a problem
+	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(int32) + sizeof(ssize_t) + sizeof(media_node)) )
 	{
-		FATAL("BParameterWeb::Unflatten size to small\n");
+		FATAL("BParameterWeb::Unflatten(): size to small\n");
 		return B_ERROR;
 	}
 
-	const byte *CurrentPos = static_cast<const byte *>(buf);
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_MAGIC)
-	{
-		FATAL("BParameterWeb::Unflatten PARAMETER_WEB_FLATTEN_MAGIC wrong\n");
-		return B_BAD_TYPE;
+	const void *bufferStart = buffer;
+
+	int32 magic = read_from_buffer<int32>(&buffer);
+	bool isSwapped = false;
+
+	if (magic == B_SWAP_INT32(kParameterWebMagic)) {
+		isSwapped = true;
+		magic = B_SWAP_INT32(magic);
 	}
-	CurrentPos += sizeof(int32);
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.  THIS SURELY HAS SOME MEANING I'M NOT AWARE OF.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_VERSION)
-	{
-		FATAL("BParameterWeb::Unflatten PARAMETER_WEB_FLATTEN_VERSION wrong\n");
+	if (magic != kParameterWebMagic)
+		return B_BAD_DATA;
+
+	// Note, it's not completely sure that this field is the version
+	// information - but it doesn't seem to have another purpose	
+	int32 version = read_from_buffer_swap32<int32>(&buffer, isSwapped);
+	if (version != kCurrentParameterWebVersion) {
+		FATAL("BParameterWeb::Unflatten(): wrong version %ld (%lx)?!\n", version, version);
 		return B_ERROR;
 	}
-	CurrentPos += sizeof(int32);
-	
-	
-	//this variable is used to cap lengths/sizes read from the flattened buffer
-	//to maximum reasonable sizes to ensure that we don't run off the buffer.
-	int MaxByteLength;
-	int i;
-	
+
+#if 0	
 	if(mGroups != NULL)
 	{
-		for(i = 0; i < mGroups->CountItems(); i++)
+		for (int32 i = 0; i < mGroups->CountItems(); i++)
 		{
 			BParameterGroup *CurrentItem = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
 			if(CurrentItem != NULL)
@@ -661,89 +617,57 @@ BParameterWeb::Unflatten(type_code c,
 	{
 		mGroups = new BList();
 	}
-	
-	
-	
-	//read NumGroups
-	int NumItems = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	//MaxByteLength = size - ((offset into struct) + (minimum bytes REQUIRED AFTER name string))
-	//In this case, the fields REQUIRED after the group list are:
-	//(none)
-	//TOTAL: 0 bytes
-	MaxByteLength = size - (((CurrentPos + sizeof(media_node)) - static_cast<const byte *>(buf)) + 0);
-	
-	ssize_t MinFlattenedItemSize = 8;
-	
-	//each item occupies a minimum of 8 bytes, so make sure that there is enough
-	//space remaining in the buffer for the specified NumItems (assuming each is minimum size)
-	NumItems = min_c(NumItems,MaxByteLength/MinFlattenedItemSize);
-	
-	
-	
-	//read Node
-	mNode = *(reinterpret_cast<const media_node *>(CurrentPos));
-	CurrentPos += sizeof(media_node);
-	
-	
-	status_t RetVal = B_OK;
-	
-	for(i = 0; i < NumItems; i++)
-	{
-		//read the flattened size of this item
-		ssize_t SubGroupSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-		CurrentPos += sizeof(ssize_t);
-		
-		//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-		//In this case, the fields REQUIRED after the group list are:
-		//NumGroups*(4 bytes)
-		//TOTAL: NumGroups*(4 bytes) bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + (NumItems*4));
-		
-		//make sure that the SubGroupSize cannot overflow the buffer we are reading out of
-		SubGroupSize = min_c(SubGroupSize,MaxByteLength);
-		
-		
-		BParameterGroup *NewSubGroup = new BParameterGroup(this,"New_UnNamed_SubGroup");
-		
-		RetVal = NewSubGroup->Unflatten(NewSubGroup->TypeCode(),CurrentPos,SubGroupSize);
-		
-		if(RetVal != B_OK)
-		{
-			FATAL("BParameterWeb::Unflatten sub-group failed\n");
-			delete NewSubGroup;
-			//don't return, because we should still fix references...
-			break;
-		}
-		
-		CurrentPos += SubGroupSize;
-		
-		//add the item to the list
-		mGroups->AddItem(NewSubGroup);
-		
-	}
-	
-	
-	//fix all references
-	if((mOldRefs != NULL) && (mNewRefs != NULL))
-	{
-		int limit = this->CountParameters();
-		for(i = 0; i < limit; i++)
-		{
-			BParameter *CurrentParam = this->ParameterAt(i);
-			if(CurrentParam != NULL)
-			{
-				CurrentParam->FixRefs(*mOldRefs,*mNewRefs);
-			}
-		}
-	
-		this->mOldRefs->MakeEmpty();
-		this->mNewRefs->MakeEmpty();
-	}
-	
+#endif
 
-	return RetVal;
+	int32 count = read_from_buffer_swap32<int32>(&buffer, isSwapped);
+
+	mNode = read_from_buffer<media_node>(&buffer);
+	if (isSwapped)
+		swap_data(B_INT32_TYPE, &mNode, sizeof(media_node), B_SWAP_ALWAYS);
+
+	for (int32 i = 0; i < count; i++) {
+		ssize_t groupSize = read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
+		if (groupSize > size_left(size, bufferStart, buffer)) {
+			FATAL("BParameterWeb::Unflatten(): buffer too small\n");
+			return B_BAD_DATA;
+		}
+
+		BParameterGroup *group = new BParameterGroup(this, "unnamed");
+		status_t status = group->Unflatten(group->TypeCode(), buffer, groupSize);
+		if (status < B_OK) {
+			FATAL("BParameterWeb::Unflatten(): unflatten group failed\n");
+			delete group;
+			return status;
+		}
+
+		skip_in_buffer(&buffer, groupSize);
+
+		mGroups->AddItem(group);
+	}
+
+	// fix all references (ParameterAt() style)
+
+	if ((mOldRefs != NULL) && (mNewRefs != NULL)) {
+		BList groups(*mGroups);
+		
+		for (int32 i = 0; i < groups.CountItems(); i++) {
+			BParameterGroup *group = static_cast<BParameterGroup *>(groups.ItemAt(i));
+			
+			for (int32 index = group->CountParameters(); index-- > 0;) {
+				BParameter *parameter = static_cast<BParameter *>(group->ParameterAt(index));
+
+				parameter->FixRefs(*mOldRefs, *mNewRefs);
+			}
+			
+			if (group->mGroups != NULL)
+				groups.AddList(group->mGroups);
+		}
+
+		mOldRefs->MakeEmpty();
+		mNewRefs->MakeEmpty();
+	}
+
+	return B_OK;
 }
 
 /*************************************************************
@@ -756,71 +680,60 @@ BParameterWeb::BParameterWeb(const BParameterWeb &clone)
 BParameterWeb &BParameterWeb::operator=(const BParameterWeb &clone)
 */
 
-status_t BParameterWeb::_Reserved_ControlWeb_0(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_1(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_2(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_3(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_4(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_5(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_6(void *) { return B_ERROR; }
-status_t BParameterWeb::_Reserved_ControlWeb_7(void *) { return B_ERROR; }
 
 void
-BParameterWeb::AddRefFix(void *oldItem,
-						 void *newItem)
+BParameterWeb::AddRefFix(void *oldItem, void *newItem)
 {
-	ASSERT_RETURN(mOldRefs != NULL);
-	ASSERT_RETURN(mNewRefs != NULL);
-	
+	ASSERT(mOldRefs != NULL);
+	ASSERT(mNewRefs != NULL);
+
 	mOldRefs->AddItem(oldItem);
 	mNewRefs->AddItem(newItem);
 }
+
+
+//	#pragma mark -
 
 /*************************************************************
  * private BParameterGroup
  *************************************************************/
 
-BParameterGroup::BParameterGroup(BParameterWeb *web,
-								 const char *name):mWeb(web)
+
+BParameterGroup::BParameterGroup(BParameterWeb *web, const char *name)
+	:	mWeb(web),
+	mFlags(0)
 {
+	CALLED();
+	TRACE("\tweb = %p, name = \"%s\"\n", web, name);
+
+	mName = strndup(name, 256);
+
 	mControls = new BList();
 	mGroups = new BList();
-	
-	int NameLength = 0;
-	if(name != NULL)
-	{
-		NameLength = strlen(name);
-	}
-	mName = new char[NameLength + 1];
-	memcpy(mName,name,NameLength);
-	mName[NameLength] = 0;
-	
-	mFlags = 0;
 }
 
 
 BParameterGroup::~BParameterGroup()
 {
+	CALLED();
+
 	if (mControls) {
-		int count = mControls->CountItems();
 		BParameter **items = reinterpret_cast<BParameter **>(mControls->Items());
-		for (int i = 0; i < count; i++)
+		for (int i = mControls->CountItems(); i-- > 0;)
 			delete items[i];
+
 		delete mControls;
-		DEBUG_ONLY(mControls = 0);
 	}
 
 	if (mGroups) {
-		int count = mGroups->CountItems();
 		BParameterGroup **items = reinterpret_cast<BParameterGroup **>(mGroups->Items());
-		for (int i = 0; i < count; i++)
+		for (int i = mGroups->CountItems(); i-- > 0;)
 			delete items[i];
+
 		delete mGroups;
-		DEBUG_ONLY(mGroups = 0);
 	}
 
-	delete [] mName;
-	DEBUG_ONLY(mName = 0);
+	free(mName);
 }
 
 /*************************************************************
@@ -856,81 +769,75 @@ BParameterGroup::Flags() const
 
 
 BNullParameter *
-BParameterGroup::MakeNullParameter(int32 id,
-								   media_type m_type,
-								   const char *name,
-								   const char *kind)
+BParameterGroup::MakeNullParameter(int32 id, media_type mediaType, const char *name,
+	const char *kind)
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,NULL);
-	
-	BNullParameter *NewParam = new BNullParameter(id,m_type,mWeb,name,kind);
-	
-	NewParam->mGroup = this;
-	
-	mControls->AddItem(NewParam);
-	
-	return NewParam;
+	CALLED();
+	ASSERT(mControls != NULL);
+
+	BNullParameter *parameter = new BNullParameter(id, mediaType, mWeb, name, kind);
+	parameter->mGroup = this;
+	mControls->AddItem(parameter);
+
+	return parameter;
 }
 
 
 BContinuousParameter *
-BParameterGroup::MakeContinuousParameter(int32 id,
-										 media_type m_type,
-										 const char *name,
-										 const char *kind,
-										 const char *unit,
-										 float minimum,
-										 float maximum,
-										 float stepping)
+BParameterGroup::MakeContinuousParameter(int32 id, media_type mediaType,
+	const char *name, const char *kind, const char *unit,
+	float minimum, float maximum, float stepping)
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,NULL);
-	
-	BContinuousParameter *NewParam = new BContinuousParameter(id,m_type,mWeb,name,kind,unit,minimum,maximum,stepping);
-	
-	NewParam->mGroup = this;
-	
-	mControls->AddItem(NewParam);
-	
-	return NewParam;
+	CALLED();
+	ASSERT(mControls != NULL);
+
+	BContinuousParameter *parameter = new BContinuousParameter(id, mediaType, mWeb,
+		name, kind, unit, minimum, maximum, stepping);
+
+	parameter->mGroup = this;
+	mControls->AddItem(parameter);
+
+	return parameter;
 }
 
 
 BDiscreteParameter *
-BParameterGroup::MakeDiscreteParameter(int32 id,
-									   media_type m_type,
-									   const char *name,
-									   const char *kind)
+BParameterGroup::MakeDiscreteParameter(int32 id, media_type mediaType,
+	const char *name, const char *kind)
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,NULL);
-	
-	BDiscreteParameter *NewParam = new BDiscreteParameter(id,m_type,mWeb,name,kind);
-	
-	NewParam->mGroup = this;
-	
-	mControls->AddItem(NewParam);
-	
-	return NewParam;
+	CALLED();
+	ASSERT(mControls != NULL);
+
+	BDiscreteParameter *parameter = new BDiscreteParameter(id, mediaType, mWeb, name, kind);
+	if (parameter == NULL)
+		return NULL;
+
+	parameter->mGroup = this;
+	mControls->AddItem(parameter);
+
+	return parameter;
 }
 
 
 BParameterGroup *
 BParameterGroup::MakeGroup(const char *name)
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,NULL);
-	
-	BParameterGroup *NewGroup = new BParameterGroup(mWeb,name);
-	
-	mGroups->AddItem(NewGroup);
-	
-	return NewGroup;
+	CALLED();
+	ASSERT(mGroups != NULL);
+
+	BParameterGroup *group = new BParameterGroup(mWeb, name);
+	if (group != NULL)
+		mGroups->AddItem(group);
+
+	return group;
 }
 
 
 int32
 BParameterGroup::CountParameters()
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,0);
-	
+	ASSERT(mControls != NULL);
+
 	return mControls->CountItems();
 }
 
@@ -938,8 +845,8 @@ BParameterGroup::CountParameters()
 BParameter *
 BParameterGroup::ParameterAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,NULL);
-	
+	ASSERT(mControls != NULL);
+
 	return static_cast<BParameter *>(mControls->ItemAt(index));
 }
 
@@ -947,8 +854,8 @@ BParameterGroup::ParameterAt(int32 index)
 int32
 BParameterGroup::CountGroups()
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,0);
-	
+	ASSERT(mGroups != NULL);
+
 	return mGroups->CountItems();
 }
 
@@ -956,8 +863,8 @@ BParameterGroup::CountGroups()
 BParameterGroup *
 BParameterGroup::GroupAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mGroups != NULL,NULL);
-	
+	ASSERT(mGroups != NULL);
+
 	return static_cast<BParameterGroup *>(mGroups->ItemAt(index));
 }
 
@@ -979,8 +886,10 @@ BParameterGroup::TypeCode() const
 ssize_t
 BParameterGroup::FlattenedSize() const
 {
-	ASSERT_WRETURN_VALUE(mControls != NULL,0);
-	ASSERT_WRETURN_VALUE(mGroups != NULL,0);
+	CALLED();
+	ASSERT(mControls != NULL);
+	ASSERT(mGroups != NULL);
+
 	/*
 		//--------BEGIN-CORE-BPARAMETERGROUP-STRUCT-----------
 		?? (0x03040507 OR 0x03040509 depending if the flags field is included or not???): 4 bytes
@@ -1005,16 +914,16 @@ BParameterGroup::FlattenedSize() const
 		//---------END-CORE-BPARAMETERGROUP-STRUCT--------------
 	*/
 	//13 guaranteed bytes, variable after that.
-	ssize_t RetVal = 13;
-	
+	ssize_t size = 13;
+
 	if(mFlags != 0)
 	{
-		RetVal += 4;
+		size += 4;
 	}
 	
 	if(mName != NULL)
 	{
-		RetVal += min_c(strlen(mName),255);
+		size += min_c(strlen(mName),255);
 	}
 	
 	int i;
@@ -1027,11 +936,10 @@ BParameterGroup::FlattenedSize() const
 		if(CurrentParameter != NULL)
 		{
 			//overhead for each parameter flattened
-			RetVal += 16;
-			RetVal += CurrentParameter->FlattenedSize();
+			size += 16 + CurrentParameter->FlattenedSize();
 		}
 	}
-	
+
 	limit = mGroups->CountItems();
 	for(i = 0; i < limit; i++)
 	{
@@ -1039,153 +947,93 @@ BParameterGroup::FlattenedSize() const
 		if(CurrentGroup != NULL)
 		{
 			//overhead for each group flattened
-			RetVal += 16;
-			RetVal += CurrentGroup->FlattenedSize();
+			size += 16 + CurrentGroup->FlattenedSize();
 		}
 	}
-	
 
-	return RetVal;
+	return size;
 }
 
 
 status_t
-BParameterGroup::Flatten(void *buffer,
-						 ssize_t size) const
+BParameterGroup::Flatten(void *buffer, ssize_t size) const
 {
-	if(buffer == NULL) {
+	CALLED();
+
+	if (buffer == NULL) {
 		FATAL("BParameterGroup::Flatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//NOTICE: It is important that this value is the size returned by BParameterGroup::FlattenedSize,
-	//		  not by a descendent's override of this method.
-	ssize_t ActualFSize = BParameterGroup::FlattenedSize();
-	
-	if(size < ActualFSize) {
+
+	void *bufferStart = buffer;
+		// used to compute the rest length of the buffer when needed
+
+	// NOTICE: It is important that this value is the size returned by
+	// BParameterGroup::FlattenedSize, not by a descendent's override of this method.
+	ssize_t actualSize = BParameterGroup::FlattenedSize();
+	if (size < actualSize) {
 		FATAL("BParameterGroup::Flatten size to small\n");
 		return B_NO_MEMORY;
 	}
-	
-	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being written in the correct byte order.
-	if(mFlags == 0)
-	{
-		*(reinterpret_cast<int32 *>(CurrentPos)) = 0x03040507;
-		CurrentPos += sizeof(int32);
-	}
-	else
-	{
-		*(reinterpret_cast<int32 *>(CurrentPos)) = 0x03040509;
-		CurrentPos += sizeof(int32);
-		
-		*(reinterpret_cast<uint32 *>(CurrentPos)) = mFlags;
-		CurrentPos += sizeof(uint32);
-	}
-	
-	//flatten and write the name string
-	byte NameStringLength = 0;
-	if(mName != NULL)
-	{
-		NameStringLength = min_c(strlen(mName),255);
-	}
-	*(reinterpret_cast<byte *>(CurrentPos)) = NameStringLength;
-	CurrentPos += sizeof(byte);
-	
-	memcpy(CurrentPos,mName,NameStringLength);
-	CurrentPos += NameStringLength;
-	
 
-	int i;
-	int NumItems;
-	void **Items;
+	if (mFlags != 0) {
+		write_to_buffer<int32>(&buffer, kBufferGroupMagic);
+		write_to_buffer<uint32>(&buffer, mFlags);
+	} else
+		write_to_buffer<int32>(&buffer, kBufferGroupMagicNoFlags);
 
-	ssize_t *TotalWrittenParamsCount = reinterpret_cast<ssize_t *>(CurrentPos);
-	(*TotalWrittenParamsCount) = 0;
-	CurrentPos += sizeof(ssize_t);
-	
-	if(mControls != NULL)
-	{
-		NumItems = mControls->CountItems();
-		Items = static_cast<void **>(mControls->Items());
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			BParameter *CurrentParam = static_cast<BParameter *>(Items[i]);
-			if(CurrentParam != NULL)
-			{
-				//write the pointer value
-				*(reinterpret_cast<BParameter **>(CurrentPos)) = CurrentParam;
-				CurrentPos += sizeof(BParameter *);
-				
-				//write the type value
-				*(reinterpret_cast<BParameter::media_parameter_type *>(CurrentPos)) = CurrentParam->Type();
-				CurrentPos += sizeof(BParameter::media_parameter_type);
-				
-				ssize_t FlattenedParamSize = CurrentParam->FlattenedSize();
-				
-				//write the flattened size value
-				*(reinterpret_cast<ssize_t *>(CurrentPos)) = FlattenedParamSize;
-				CurrentPos += sizeof(ssize_t);
-				
-				//write the flattened parameter
-				status_t ParamFlattenStatus = CurrentParam->Flatten(CurrentPos,FlattenedParamSize);
-				
-				if(ParamFlattenStatus != B_OK)
-				{
-					return ParamFlattenStatus;
-				}
-				
-				CurrentPos += FlattenedParamSize;
-				
-				(*TotalWrittenParamsCount)++;
-			}
+	write_string_to_buffer(&buffer, mName);
+
+	int32 count = mControls ? mControls->CountItems() : 0;
+	write_to_buffer<int32>(&buffer, count);
+
+	for (int32 i = 0; i < count; i++) {
+		BParameter *parameter = static_cast<BParameter *>(mControls->ItemAt(i));
+		if (parameter == NULL) {
+			FATAL("BParameterGroup::Flatten(): NULL parameter\n");
+			continue;
 		}
+
+		write_to_buffer<BParameter *>(&buffer, parameter);
+		write_to_buffer<BParameter::media_parameter_type>(&buffer, parameter->Type());
+
+		// flatten parameter into this buffer
+
+		ssize_t parameterSize = parameter->FlattenedSize();
+		write_to_buffer<ssize_t>(&buffer, parameterSize);
+
+		status_t status = parameter->Flatten(buffer, parameterSize);
+			// we have only that much bytes left to write in this buffer
+		if (status < B_OK)
+			return status;
+
+		skip_in_buffer(&buffer, parameterSize);
 	}
-	
-	ssize_t *TotalWrittenSubGroupsCount = reinterpret_cast<ssize_t *>(CurrentPos);
-	(*TotalWrittenSubGroupsCount) = 0;
-	CurrentPos += sizeof(ssize_t);
-	
-	if(mGroups != NULL)
-	{
-		NumItems = mGroups->CountItems();
-		Items = static_cast<void **>(mGroups->Items());
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			BParameterGroup *CurrentSubGroup = static_cast<BParameterGroup *>(Items[i]);
-			if(CurrentSubGroup != NULL)
-			{
-				//write the pointer value
-				*(reinterpret_cast<BParameterGroup **>(CurrentPos)) = CurrentSubGroup;
-				CurrentPos += sizeof(BParameterGroup *);
-				
-				//write the type code value
-				*(reinterpret_cast<type_code *>(CurrentPos)) = CurrentSubGroup->TypeCode();
-				CurrentPos += sizeof(type_code);
-				
-				ssize_t FlattenedSubGroupSize = CurrentSubGroup->FlattenedSize();
-				
-				//write the flattened size value
-				*(reinterpret_cast<ssize_t *>(CurrentPos)) = FlattenedSubGroupSize;
-				CurrentPos += sizeof(ssize_t);
-				
-				//write the flattened sub group
-				status_t SubGroupFlattenStatus = CurrentSubGroup->Flatten(CurrentPos,FlattenedSubGroupSize);
-				
-				if(SubGroupFlattenStatus != B_OK)
-				{
-					return SubGroupFlattenStatus;
-				}
-				
-				CurrentPos += FlattenedSubGroupSize;
-				
-				(*TotalWrittenSubGroupsCount)++;
-			}
+
+	count = mGroups ? mGroups->CountItems() : 0;
+	write_to_buffer<int32>(&buffer, count);
+
+	for (int32 i = 0; i < count; i++) {
+		BParameterGroup *group = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
+		if (group == NULL) {
+			FATAL("BParameterGroup::Flatten(): NULL group\n");
+			continue;
 		}
+
+		write_to_buffer<BParameterGroup *>(&buffer, group);
+		write_to_buffer<type_code>(&buffer, group->TypeCode());
+
+		// flatten sub group into this buffer
+
+		ssize_t groupSize = group->FlattenedSize();
+		write_to_buffer<ssize_t>(&buffer, groupSize);
+
+		status_t status = group->Flatten(buffer, groupSize);
+			// we have only that much bytes left to write in this buffer
+		if (status < B_OK)
+			return status;
+
+		skip_in_buffer(&buffer, groupSize);
 	}
 
 	return B_OK;
@@ -1195,98 +1043,57 @@ BParameterGroup::Flatten(void *buffer,
 bool
 BParameterGroup::AllowsTypeCode(type_code code) const
 {
-	return (code == this->TypeCode());
+	return code == TypeCode();
 }
 
 
 status_t
-BParameterGroup::Unflatten(type_code c,
-						   const void *buf,
-						   ssize_t size)
+BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 {
-	if(!this->AllowsTypeCode(c)) {
-		FATAL("BParameterGroup::Unflatten wrong type code\n");
+	CALLED();
+
+	if (!AllowsTypeCode(code)) {
+		FATAL("BParameterGroup::Unflatten() wrong type code\n");
 		return B_BAD_TYPE;
 	}
-	
-	if(buf == NULL) {
-		FATAL("BParameterGroup::Unflatten buffer is NULL\n");
+
+	if (buffer == NULL) {
+		FATAL("BParameterGroup::Unflatten() buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//if the buffer is smaller than the size needed to read the
-	//signature field, then there is a problem
-	if(size < static_cast<ssize_t>(sizeof(int32)) )
-	{
-		FATAL("BParameterGroup::Unflatten size to small\n");
+
+	// if the buffer is smaller than the size needed to read the
+	// signature field, then there is a problem
+	if (size < static_cast<ssize_t>(sizeof(int32))) {
+		FATAL("BParameterGroup::Unflatten() size to small\n");
 		return B_ERROR;
 	}
 
-	const byte *CurrentPos = static_cast<const byte *>(buf);
-	
-	uint32 Flags = 0;
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) == 0x03040507)
-	{
-		CurrentPos += sizeof(int32);
+	const void *bufferStart = buffer;
+		// used to compute the rest length of the buffer when needed
+
+	int32 magic = read_from_buffer<int32>(&buffer);
+	bool isSwapped = false;
+
+	if (magic == B_SWAP_INT32(kBufferGroupMagic)
+		|| magic == B_SWAP_INT32(kBufferGroupMagicNoFlags)) {
+		isSwapped = true;
+		magic = B_SWAP_INT32(magic);
 	}
-	else if( *(reinterpret_cast<const int32 *>(CurrentPos)) == 0x03040509)
-	{
-		CurrentPos += sizeof(int32);
-		
-		//check to make sure we've got room to read the flags field
-		if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(uint32)))
-		{
-			FATAL("BParameterGroup::Unflatten can't write flags\n");
-			return B_ERROR;
-		}
-		
-		Flags = *(reinterpret_cast<const uint32 *>(CurrentPos));
-		CurrentPos += sizeof(uint32);
-	}
+
+	if (magic == kBufferGroupMagic)
+		mFlags = read_from_buffer_swap32<int32>(&buffer, isSwapped);
+	else if (magic == kBufferGroupMagicNoFlags)
+		mFlags = 0;
 	else
-	{
-		FATAL("BParameterGroup::Unflatten bad magic\n");
 		return B_BAD_TYPE;
-	}
-	
-	this->mFlags = Flags;
-	
-	
-	
-	
-	//this variable is used to cap lengths/sizes read from the flattened buffer
-	//to maximum reasonable sizes to ensure that we don't run off the buffer.
-	int32 MaxByteLength;
-	
-	//read the name string
-	byte NameStringLength = *(reinterpret_cast<const byte *>(CurrentPos));
-	CurrentPos += sizeof(byte);
-	
-	//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-	//In this case, the fields REQUIRED after the name string are:
-	//Param Count (4 bytes)
-	//Subgroup Count (4 bytes)
-	//TOTAL: 8 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 8);
-	
-	NameStringLength = min_c(NameStringLength,MaxByteLength);
-	
-	if(mName != NULL)
-	{
-		delete[] mName;
-		mName = NULL;
-	}
-	mName = new char[NameStringLength + 1];
-	memcpy(mName,CurrentPos,NameStringLength);
-	mName[NameStringLength] = 0;
-	CurrentPos += NameStringLength;
-	
-	
-	
-	
+
+	if (read_string_from_buffer(&buffer, &mName,
+			size - static_cast<ssize_t>((uint8 *)buffer - (uint8 *)bufferStart)) < B_OK)
+		return B_BAD_VALUE;
+
+	// Currently disabled since it's not really used -- axeld.
+#if 0
 	//Clear all existing parameters/subgroups
 	int i;
 	if(mControls != NULL)
@@ -1322,156 +1129,90 @@ BParameterGroup::Unflatten(type_code c,
 	{
 		mGroups = new BList();
 	}
-	
-	
-	
-	//read NumParameters
-	ssize_t NumItems = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-	//In this case, the fields REQUIRED after the name string are:
-	//Subgroup Count (4 bytes)
-	//TOTAL: 4 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 4);
-	
-	ssize_t MinFlattenedItemSize(12);
-	
-	//each item occupies a minimum of 12 bytes, so make sure that there is enough
-	//space remaining in the buffer for the specified NumItems (assuming each is minimum size)
-	NumItems = min_c(NumItems,MaxByteLength/MinFlattenedItemSize);
-	
-	
-	for(i = 0; i < NumItems; i++)
-	{
-		//read the old pointer value of this item
-		BParameter *OldPointerVal = *(reinterpret_cast<BParameter *const*>(CurrentPos));
-		CurrentPos += sizeof(BParameter *);
-		
-		//read the media_parameter_type of this item
-		BParameter::media_parameter_type ParamType = *(reinterpret_cast<const BParameter::media_parameter_type *>(CurrentPos));
-		CurrentPos += sizeof(BParameter::media_parameter_type);
-		
-		//read the flattened size of this item
-		ssize_t ParamSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-		CurrentPos += sizeof(ssize_t);
-		
-		//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-		//In this case, the fields REQUIRED after the name string are:
-		//Subgroup Count (4 bytes)
-		//TOTAL: 4 bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 4);
-		
-		//make sure that the ParamSize cannot overflow the buffer we are reading out of
-		ParamSize = min_c(ParamSize,MaxByteLength);
-		
-		BParameter *NewParam = this->MakeControl(ParamType);
-		
-		//need to be careful because ParamType could be invalid
-		if(NewParam == NULL)
-		{
-			FATAL("BParameterGroup::Unflatten MakeControl failed\n");
+#endif
+
+	// unflatten parameter list
+
+	int32 count = read_from_buffer_swap32<int32>(&buffer, isSwapped);
+	if (count < 0 || count * kAdditionalParameterSize > size_left(size, bufferStart, buffer))
+		return B_BAD_VALUE;
+
+	for (int32 i = 0; i < count; i++) {
+		// make sure we can read as many bytes
+		if (size_left(size, bufferStart, buffer) < 12)
+			return B_BAD_VALUE;
+
+		BParameter *oldPointer = read_from_buffer_swap32<BParameter *>(&buffer, isSwapped);
+		BParameter::media_parameter_type mediaType =
+			read_from_buffer_swap32<BParameter::media_parameter_type>(&buffer, isSwapped);
+
+		ssize_t parameterSize = read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
+		if (parameterSize > size_left(size, bufferStart, buffer))
+			return B_BAD_VALUE;
+
+		BParameter *parameter = MakeControl(mediaType);
+		if (parameter == NULL) {
+			FATAL("BParameterGroup::Unflatten(): MakeControl() failed\n");
 			return B_ERROR;
 		}
-		
-		status_t RetVal = NewParam->Unflatten(NewParam->TypeCode(),CurrentPos,ParamSize);
-		
-		if(RetVal != B_OK)
-		{
-			FATAL("BParameterGroup::Unflatten NewParam->Unflatten failed\n");
-			delete NewParam;
-			return RetVal;
+
+		status_t status = parameter->Unflatten(parameter->TypeCode(), buffer, parameterSize);
+		if (status < B_OK) {
+			FATAL("BParameterGroup::Unflatten(): parameter->Unflatten() failed\n");
+			delete parameter;
+			return status;
 		}
-		
-		CurrentPos += ParamSize;
-		
-		//add the item to the list
-		mControls->AddItem(NewParam);
-		
-		//add it's old pointer value to the RefFix list kept by the owner web
-		if(mWeb != NULL)
-		{
-			mWeb->AddRefFix(OldPointerVal,NewParam);
-		}
+
+		skip_in_buffer(&buffer, parameterSize);
+
+		// add the item to the list
+		mControls->AddItem(parameter);
+
+		// add it's old pointer value to the RefFix list kept by the owner web
+		if (mWeb != NULL)
+			mWeb->AddRefFix(oldPointer, parameter);
 	}
 
-	
-	
-	
-	
-	//read NumSubGroups
-	NumItems = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-	//In this case, the fields REQUIRED after the name string are:
-	//(none)
-	//TOTAL: 0 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 0);
-	
-	MinFlattenedItemSize = 12;
-	
-	//each item occupies a minimum of 12 bytes, so make sure that there is enough
-	//space remaining in the buffer for the specified NumItems (assuming each is minimum size)
-	NumItems = min_c(NumItems,MaxByteLength/MinFlattenedItemSize);
-	
-	
-	for(i = 0; i < NumItems; i++)
-	{
-		//read the old pointer value of this item
-		BParameter *OldPointerVal = *(reinterpret_cast<BParameter *const*>(CurrentPos));
-		CurrentPos += sizeof(BParameter *);
-		
-		//read the type_code of this item
-		type_code BufTypeCode = *(reinterpret_cast<const type_code *>(CurrentPos));
-		CurrentPos += sizeof(type_code);
-		
-		//read the flattened size of this item
-		ssize_t SubGroupSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-		CurrentPos += sizeof(ssize_t);
-		
-		//MaxByteLength = size - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-		//In this case, the fields REQUIRED after the name string are:
-		//(none)
-		//TOTAL: 0 bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 0);
-		
-		//make sure that the SubGroupSize cannot overflow the buffer we are reading out of
-		SubGroupSize = min_c(SubGroupSize,MaxByteLength);
-		
-		
-		BParameterGroup *NewSubGroup = new BParameterGroup(mWeb,"New_UnNamed_SubGroup");
-		
-		status_t RetVal = NewSubGroup->Unflatten(BufTypeCode,CurrentPos,SubGroupSize);
-		
-		if(RetVal != B_OK)
-		{
-			FATAL("BParameterGroup::Unflatten NewSubGroup->Unflatten failed\n");
-			delete NewSubGroup;
-			return RetVal;
+	// unflatten sub groups
+
+	count = read_from_buffer_swap32<int32>(&buffer, isSwapped);
+	if (count < 0 || count * kAdditionalParameterGroupSize > size_left(size, bufferStart, buffer))
+		return B_BAD_VALUE;
+
+	for (int32 i = 0; i < count; i++) {
+		// make sure we can read as many bytes
+		if (size_left(size, bufferStart, buffer) < 12)
+			return B_BAD_VALUE;
+
+		BParameterGroup *oldPointer = read_from_buffer_swap32<BParameterGroup *>(&buffer, isSwapped);
+		type_code type = read_from_buffer_swap32<type_code>(&buffer, isSwapped);
+
+		ssize_t groupSize = read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
+		if (groupSize > size_left(size, bufferStart, buffer))
+			return B_BAD_VALUE;
+
+		BParameterGroup *group = new BParameterGroup(this, "sub-unnamed");
+		if (group == NULL) {
+			FATAL("BParameterGroup::Unflatten(): MakeGroup() failed\n");
+			return B_ERROR;
 		}
-		
-		CurrentPos += SubGroupSize;
-		
-		//add the item to the list
-		mGroups->AddItem(NewSubGroup);
-		
-		//add it's old pointer value to the RefFix list kept by the owner web
-		if(mWeb != NULL)
-		{
-			mWeb->AddRefFix(OldPointerVal,NewSubGroup);
+
+		status_t status = group->Unflatten(type, buffer, groupSize);
+		if (status != B_OK) {
+			FATAL("BParameterGroup::Unflatten(): group->Unflatten() failed\n");
+			delete group;
+			return status;
 		}
+
+		skip_in_buffer(&buffer, groupSize);
+
+		mGroups->AddItem(group);
+
+		// add it's old pointer value to the RefFix list kept by the owner web
+		if (mWeb != NULL)
+			mWeb->AddRefFix(oldPointer, group);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	return B_OK;
 }
 
@@ -1486,53 +1227,40 @@ BParameterGroup::BParameterGroup(const BParameterGroup &clone)
 BParameterGroup &BParameterGroup::operator=(const BParameterGroup &clone)
 */
 
-status_t BParameterGroup::_Reserved_ControlGroup_0(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_1(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_2(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_3(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_4(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_5(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_6(void *) { return B_ERROR; }
-status_t BParameterGroup::_Reserved_ControlGroup_7(void *) { return B_ERROR; }
-
 
 BParameter *
 BParameterGroup::MakeControl(int32 type)
 {
+	CALLED();
+
 	/*NOTE:
-	  Creates a new parameter for addition within this with a type defined by the passed 'type' parameter,
+	  Creates a new parameter for addition within this with a type defined by
+	  the passed 'type' parameter,
 	  BUT DOES NOT ADD THE CREATED PARAMETER TO THE INTERNAL LIST OF PARAMETERS
 	*/
-	switch(type)
-	{
-		case(BParameter::B_NULL_PARAMETER):
-		{
-			return new BNullParameter(-1,B_MEDIA_UNKNOWN_TYPE,mWeb,"New_UnNamed_NullParameter",B_GENERIC);
-		}
-		break;
-		case(BParameter::B_DISCRETE_PARAMETER):
-		{
-			return new BDiscreteParameter(-1,B_MEDIA_UNKNOWN_TYPE,mWeb,"New_UnNamed_DiscreteParameter",B_GENERIC);
-		}
-		break;
-		case(BParameter::B_CONTINUOUS_PARAMETER):
-		{
-			return new BContinuousParameter(-1,B_MEDIA_UNKNOWN_TYPE,mWeb,"New_UnNamed_ContinuousParameter",B_GENERIC,"",0,100,1);
-		}
-		break;
+	switch (type) {
+		case BParameter::B_NULL_PARAMETER:
+			return new BNullParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "nullParameter", B_GENERIC);
+
+		case BParameter::B_DISCRETE_PARAMETER:
+			return new BDiscreteParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "discreteParameter", B_GENERIC);
+
+		case BParameter::B_CONTINUOUS_PARAMETER:
+			return new BContinuousParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "continuousParameter", B_GENERIC,"",0,100,1);
+
 		default:
-		{
-			return NULL;
 			FATAL("BParameterGroup::MakeControl unknown type %ld\n", type);
-		}
-		break;
+			return NULL;
 	}
-	return NULL;
 }
+
+
+//	#pragma mark -
 
 /*************************************************************
  * public BParameter
  *************************************************************/
+
 
 BParameter::media_parameter_type
 BParameter::Type() const
@@ -1598,26 +1326,22 @@ BParameter::Flags() const
 
 
 status_t
-BParameter::GetValue(void *buffer,
-					 size_t *ioSize,
-					 bigtime_t *when)
+BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 {
 	UNIMPLEMENTED();
 	/*
-	 * XXX FIXME! call BControllable::GetControlValue() here.
+	 * XXX ToDo: call BControllable::GetControlValue() here.
 	 */
 	return B_BAD_VALUE;
 }
 
 
 status_t
-BParameter::SetValue(const void *buffer,
-					 size_t size,
-					 bigtime_t when)
+BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 {
 	UNIMPLEMENTED();
 	/*
-	 * XXX FIXME! call BControllable::SetControlValue() here.
+	 * XXX ToDo! call BControllable::SetControlValue() here.
 	 */
 	return B_BAD_VALUE;
 }
@@ -1654,7 +1378,7 @@ BParameter::SetMediaType(media_type m_type)
 int32
 BParameter::CountInputs()
 {
-	ASSERT_WRETURN_VALUE(mInputs != NULL,0);
+	ASSERT(mInputs != NULL);
 
 	return mInputs->CountItems();
 }
@@ -1663,7 +1387,7 @@ BParameter::CountInputs()
 BParameter *
 BParameter::InputAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mInputs != NULL,NULL);
+	ASSERT(mInputs != NULL);
 	
 	return static_cast<BParameter *>(mInputs->ItemAt(index));
 }
@@ -1672,21 +1396,20 @@ BParameter::InputAt(int32 index)
 void
 BParameter::AddInput(BParameter *input)
 {
+	CALLED();
+
 	// BeBook has this method returning a status value,
 	// but it should be updated
-	if(input == NULL)
-	{
+	if (input == NULL)
+		return;
+
+	ASSERT(mInputs != NULL);
+
+	if (mInputs->HasItem(input)) {
+		// if already in input list, don't duplicate.
 		return;
 	}
-	
-	ASSERT_RETURN(mInputs != NULL);
-	
-	if(mInputs->HasItem(input))
-	{
-		//if already in input list, don't duplicate.
-		return;
-	}
-	
+
 	mInputs->AddItem(input);
 	input->AddOutput(this);
 }
@@ -1695,7 +1418,7 @@ BParameter::AddInput(BParameter *input)
 int32
 BParameter::CountOutputs()
 {
-	ASSERT_WRETURN_VALUE(mOutputs != NULL,0);
+	ASSERT(mOutputs != NULL);
 
 	return mOutputs->CountItems();
 }
@@ -1704,8 +1427,8 @@ BParameter::CountOutputs()
 BParameter *
 BParameter::OutputAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mOutputs != NULL,NULL);
-	
+	ASSERT(mOutputs != NULL);
+
 	return static_cast<BParameter *>(mOutputs->ItemAt(index));
 }
 
@@ -1713,23 +1436,20 @@ BParameter::OutputAt(int32 index)
 void
 BParameter::AddOutput(BParameter *output)
 {
+	CALLED();
+
 	// BeBook has this method returning a status value,
 	// but it should be updated
-	if(output == NULL)
-	{
-		FATAL("BParameter::AddOutput output is NULL\n");
+	if (output == NULL)
+		return;
+
+	ASSERT(mOutputs != NULL);
+
+	if (mOutputs->HasItem(output)) {
+		// if already in output list, don't duplicate.
 		return;
 	}
-	
-	ASSERT_RETURN(mOutputs != NULL);
-	
-	if(mOutputs->HasItem(output))
-	{
-		//if already in output list, don't duplicate.
-		FATAL("BParameter::AddOutput output does already exist\n");
-		return;
-	}
-	
+
 	mOutputs->AddItem(output);
 	output->AddInput(this);
 }
@@ -1752,6 +1472,7 @@ BParameter::TypeCode() const
 ssize_t
 BParameter::FlattenedSize() const
 {
+	CALLED();
 	/*
 		?? (0x02040607): 4 bytes
 		BParameter Struct Size (in bytes): 4 bytes
@@ -1771,128 +1492,72 @@ BParameter::FlattenedSize() const
 		Flags: 4 bytes
 	*/
 	//35 bytes are guaranteed, after that, add the variable length parts.
-	ssize_t RetVal = 35;
-	
-	if(mName != NULL) RetVal += strlen(mName);
-	
-	if(mKind != NULL) RetVal += strlen(mKind);
-	
-	if(mUnit != NULL) RetVal += strlen(mUnit);
-	
-	if(mInputs != NULL) RetVal += mInputs->CountItems()*sizeof(BParameter *);
-	
-	if(mOutputs != NULL) RetVal += mOutputs->CountItems()*sizeof(BParameter *);
+	ssize_t size = 35;
 
-	return RetVal;
+	if (mName != NULL)
+		size += strlen(mName);
+	if (mKind != NULL)
+		size += strlen(mKind);
+	if (mUnit != NULL)
+		size += strlen(mUnit);
+
+	if (mInputs != NULL)
+		size += mInputs->CountItems() * sizeof(BParameter *);
+
+	if (mOutputs != NULL)
+		size += mOutputs->CountItems() * sizeof(BParameter *);
+
+	return size;
 }
 
 
 status_t
-BParameter::Flatten(void *buffer,
-					ssize_t size) const
+BParameter::Flatten(void *buffer, ssize_t size) const
 {
-	if(buffer == NULL) {
+	CALLED();
+
+	if (buffer == NULL) {
 		FATAL("BParameter::Flatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//NOTICE: It is important that this value is the size returned by BParameter::FlattenedSize,
-	//		  not by a descendent's override of this method.
-	ssize_t ActualFSize = BParameter::FlattenedSize();
-	
-	if(size < ActualFSize) {
-		FATAL("BParameter::Flatten size too small\n");
+
+	// NOTICE: It is important that this value is the size returned by
+	// BParameter::FlattenedSize(), not by a descendent's override of this method.
+	ssize_t actualSize = BParameter::FlattenedSize();
+	if (size < actualSize) {
+		FATAL("BParameter::Flatten(): size too small\n");
 		return B_NO_MEMORY;
 	}
-	
-	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being written in the correct byte order.
-	*(reinterpret_cast<int32 *>(CurrentPos)) = 0x02040607;
-	CurrentPos += sizeof(int32);
-	
-	//flatten and write the struct size
-	*(reinterpret_cast<ssize_t *>(CurrentPos)) = ActualFSize;
-	CurrentPos += sizeof(ssize_t);
-	
-	//flatten and write the ID
-	*(reinterpret_cast<int32 *>(CurrentPos)) = mID;
-	CurrentPos += sizeof(int32);
-	
-	//flatten and write the name string
-	byte NameStringLength = 0;
-	if(mName != NULL)
-	{
-		NameStringLength = min_c(strlen(mName),255);
-	}
-	*(reinterpret_cast<byte *>(CurrentPos)) = NameStringLength;
-	CurrentPos += sizeof(byte);
-	
-	memcpy(CurrentPos,mName,NameStringLength);
-	CurrentPos += NameStringLength;
-	
-	//flatten and write the kind string
-	byte KindStringLength = 0;
-	if(mKind != NULL)
-	{
-		KindStringLength = min_c(strlen(mKind),255);
-	}
-	*(reinterpret_cast<byte *>(CurrentPos)) = KindStringLength;
-	CurrentPos += sizeof(byte);
-	
-	memcpy(CurrentPos,mKind,KindStringLength);
-	CurrentPos += KindStringLength;
-	
-	//flatten and write the unit string
-	byte UnitStringLength = 0;
-	if(mUnit != NULL)
-	{
-		UnitStringLength = min_c(strlen(mUnit),255);
-	}
-	*(reinterpret_cast<byte *>(CurrentPos)) = UnitStringLength;
-	CurrentPos += sizeof(byte);
-	
-	memcpy(CurrentPos,mUnit,UnitStringLength);
-	CurrentPos += UnitStringLength;
-	
-	
-	//flatten and write the list of inputs
-	ssize_t NumInputs = 0;
-	if(mInputs != NULL)
-	{
-		NumInputs = mInputs->CountItems();
-	}
-	*(reinterpret_cast<ssize_t *>(CurrentPos)) = NumInputs;
-	CurrentPos += sizeof(ssize_t);
-	
-	memcpy(CurrentPos,mInputs->Items(),sizeof(BParameter *)*NumInputs);
-	
-	
-	//flatten and write the list of outputs
-	ssize_t NumOutputs = 0;
-	if(mOutputs != NULL)
-	{
-		NumOutputs = mOutputs->CountItems();
-	}
-	*(reinterpret_cast<ssize_t *>(CurrentPos)) = NumOutputs;
-	CurrentPos += sizeof(ssize_t);
-	
-	memcpy(CurrentPos,mOutputs->Items(),sizeof(BParameter *)*NumOutputs);
-	
 
-	//flatten and write the media type
-	*(reinterpret_cast<media_type *>(CurrentPos)) = mMediaType;
-	CurrentPos += sizeof(media_type);
-	
-	//flatten and write the channel count
-	*(reinterpret_cast<int32 *>(CurrentPos)) = mChannels;
-	CurrentPos += sizeof(int32);
-	
-	//flatten and write the flags
-	*(reinterpret_cast<uint32 *>(CurrentPos)) = mFlags;
-	CurrentPos += sizeof(uint32);
-	
+	write_to_buffer<uint32>(&buffer, kParameterMagic);
+	write_to_buffer<ssize_t>(&buffer, actualSize);
+	write_to_buffer<int32>(&buffer, mID);
+
+	write_string_to_buffer(&buffer, mName);
+	write_string_to_buffer(&buffer, mKind);
+	write_string_to_buffer(&buffer, mUnit);
+
+	// flatten and write the list of inputs
+	ssize_t count = mInputs ? mInputs->CountItems() : 0;
+	write_to_buffer<ssize_t>(&buffer, count);
+
+	if (count > 0) {
+		memcpy(buffer, mInputs->Items(), sizeof(BParameter *) * count);
+		skip_in_buffer(&buffer, sizeof(BParameter *) * count);
+	}
+
+	// flatten and write the list of outputs
+	count = mOutputs ? mOutputs->CountItems() : 0;
+	write_to_buffer<ssize_t>(&buffer, count);
+
+	if (count > 0) {
+		memcpy(buffer, mOutputs->Items(), sizeof(BParameter *) * count);
+		skip_in_buffer(&buffer, sizeof(BParameter *) * count);
+	}
+
+	write_to_buffer<media_type>(&buffer, mMediaType);
+	write_to_buffer<int32>(&buffer, mChannels);
+	write_to_buffer<uint32>(&buffer, mFlags);
 
 	return B_OK;
 }
@@ -1901,58 +1566,52 @@ BParameter::Flatten(void *buffer,
 bool
 BParameter::AllowsTypeCode(type_code code) const
 {
-	return (code == this->TypeCode());
+	return (code == TypeCode());
 }
 
 
 status_t
-BParameter::Unflatten(type_code c,
-					  const void *buf,
-					  ssize_t size)
+BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 {
+	CALLED();
 
-	if(!this->AllowsTypeCode(c)) {
-		FATAL("BParameter::Unflatten wrong type code\n");
+	if (!AllowsTypeCode(code)) {
+		FATAL("BParameter::Unflatten(): wrong type code\n");
 		return B_BAD_TYPE;
 	}
-	
-	if(buf == NULL) {
-		FATAL("BParameter::Unflatten buffer is NULL\n");
+
+	if (buffer == NULL) {
+		FATAL("BParameter::Unflatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//if the buffer is smaller than the size needed to read the
-	//signature and struct size fields, then there is a problem
-	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
-	{
-		FATAL("BParameter::Unflatten size too small\n");
-		return B_ERROR;
+
+	// if the buffer is smaller than the size needed to read the
+	// signature and struct size fields, then there is a problem
+	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
+		FATAL("BParameter::Unflatten() size too small\n");
+		return B_BAD_VALUE;
 	}
 
-	const byte *CurrentPos = static_cast<const byte *>(buf);
-	
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
-	{
-		FATAL("BParameter::Unflatten bad magic\n");
+	const void *bufferStart = buffer;
+
+	// check magic
+
+	int32 magic = read_from_buffer<int32>(&buffer);
+	if (magic == B_SWAP_INT32(kParameterMagic))
+		mSwapDetected = true;
+	else if (magic == kParameterMagic)
+		mSwapDetected = false;
+	else {
+		FATAL("BParameter::Unflatten(): bad magic\n");
 		return B_BAD_TYPE;
 	}
-	CurrentPos += sizeof(int32);
-	
-	//read the struct size
-	ssize_t ParamStructSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	if(ParamStructSize > size)
-	{
-		//if the struct size is larger than the size of the buffer we were given,
-		//there's a problem
-		FATAL("BParameter::Unflatten out of memory\n");
-		return B_MISMATCHED_VALUES;
+
+	ssize_t parameterSize = read_from_buffer_swap32<ssize_t>(&buffer, mSwapDetected);
+	if (parameterSize > size) {
+		FATAL("BParameter::Unflatten(): buffer too small (%ld > %ld)\n", parameterSize, size);
+		return B_BAD_VALUE;
 	}
-	
+
 	//if the struct doesn't meet the minimum size for
 	//a flattened BParameter, then return an error.
 	//MinFlattenedParamSize = 
@@ -1967,478 +1626,160 @@ BParameter::Unflatten(type_code c,
 	//Flags (4 bytes)
 	//TOTAL: 27 bytes
 	const ssize_t MinFlattenedParamSize(27);
-	if(ParamStructSize < MinFlattenedParamSize)
-	{
+	if (parameterSize < MinFlattenedParamSize) {
 		FATAL("BParameter::Unflatten out of memory (2)\n");
 		return B_ERROR;
 	}
 
-	//read the ID
-	this->mID = *(reinterpret_cast<const int32 *>(CurrentPos));
-	CurrentPos += sizeof(int32);
-	
-	//this variable is used to cap lengths/sizes read from the flattened buffer
-	//to maximum reasonable sizes to ensure that we don't run off the buffer.
-	int32 MaxByteLength;
-	
-	//read the name string
-	byte NameStringLength = *(reinterpret_cast<const byte *>(CurrentPos));
-	CurrentPos += sizeof(byte);
-	
-	//MaxByteLength = ParamStructSize - ((current offset into struct) + (minimum bytes REQUIRED AFTER name string))
-	//In this case, the fields REQUIRED after the name string are:
-	//Kind String Length (1 byte)
-	//Unit String Length (1 byte)
-	//Inputs Count (4 bytes)
-	//Outputs Count (4 bytes)
-	//Media Type (4 bytes)
-	//Channel Count (4 bytes)
-	//Flags (4 bytes)
-	//TOTAL: 22 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 22);
-	
-	NameStringLength = min_c(NameStringLength,MaxByteLength);
-	
-	if(mName != NULL)
-	{
-		delete[] mName;
-		mName = NULL;
-	}
-	mName = new char[NameStringLength + 1];
-	memcpy(mName,CurrentPos,NameStringLength);
-	mName[NameStringLength] = 0;
-	CurrentPos += NameStringLength;
-	
-	//read the kind string
-	byte KindStringLength = *(reinterpret_cast<const byte *>(CurrentPos));
-	CurrentPos += sizeof(byte);
-	
-	//MaxByteLength = ParamStructSize - ((current offset into struct) + (minimum bytes REQUIRED AFTER kind string))
-	//In this case, the fields REQUIRED after the kind string are:
-	//Unit String Length (1 byte)
-	//Inputs Count (4 bytes)
-	//Outputs Count (4 bytes)
-	//Media Type (4 bytes)
-	//Channel Count (4 bytes)
-	//Flags (4 bytes)
-	//TOTAL: 21 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 21);
-	
-	KindStringLength = min_c(KindStringLength,MaxByteLength);
-	
-	if(mKind != NULL)
-	{
-		delete[] mKind;
-		mKind = NULL;
-	}
-	mKind = new char[KindStringLength + 1];
-	memcpy(mKind,CurrentPos,KindStringLength);
-	mKind[KindStringLength] = 0;
-	CurrentPos += KindStringLength;
-	
-	//read the unit string
-	byte UnitStringLength = *(reinterpret_cast<const byte *>(CurrentPos));
-	CurrentPos += sizeof(byte);
-	
-	//MaxByteLength = ParamStructSize - ((current offset into struct) + (minimum bytes REQUIRED AFTER unit string))
-	//In this case, the fields REQUIRED after the unit string are:
-	//Inputs Count (4 bytes)
-	//Outputs Count (4 bytes)
-	//Media Type (4 bytes)
-	//Channel Count (4 bytes)
-	//Flags (4 bytes)
-	//TOTAL: 20 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 20);
-	
-	UnitStringLength = min_c(UnitStringLength,MaxByteLength);
-	
-	if(mUnit != NULL)
-	{
-		delete[] mUnit;
-		mUnit = NULL;
-	}
-	mUnit = new char[UnitStringLength + 1];
-	memcpy(mUnit,CurrentPos,UnitStringLength);
-	mUnit[UnitStringLength] = 0;
-	CurrentPos += UnitStringLength;
-	
-	//Set this flag to false to indicate that the pointer values in this parameter, have
-	//not been swapped.
-	mSwapDetected = false;
-	
-	//read the list of inputs
-	int i,j;
-	
-	ssize_t NumInputs = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	
-	//MaxByteLength = ParamStructSize - ((current offset into struct) + (minimum bytes REQUIRED AFTER inputs list))
-	//In this case, the fields REQUIRED after the inputs list are:
-	//Outputs Count (4 bytes)
-	//Media Type (4 bytes)
-	//Channel Count (4 bytes)
-	//Flags (4 bytes)
-	//TOTAL: 16 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 16);
-	
-	NumInputs = min_c(NumInputs,static_cast<ssize_t>(MaxByteLength/sizeof(BParameter *)));
-	
-	
-	if(this->mInputs == NULL)
-	{
-		this->mInputs = new BList();
-	}
-	else
-	{
-		//if this object has an existing list of (valid) inputs, go to each one, removing this object
-		//as an output for each of the objects in the input list, then clear the list
-		if(mSwapDetected)
-		{
-			ssize_t OldInputCount = mInputs->CountItems();
-			for(i = 0; i < OldInputCount; i++)
-			{
-				BParameter *CurrentParam = static_cast<BParameter *>(this->mInputs->ItemAt(i));
-				if((CurrentParam != NULL) && (CurrentParam->mOutputs != NULL))
-				{
-					//Remove ALL instances of this parameter from the other parameter's
-					//output list
-					j = 0;
-					ssize_t CurrentParamsOutputCount = CurrentParam->mOutputs->CountItems();
-					while(j < CurrentParamsOutputCount)
-					{
-						if(CurrentParam->mOutputs->ItemAt(j) == this)
-						{
-							//remove this item, update the CurrentParamsOutputCount,
-							//and DON'T increment j
-							CurrentParam->mOutputs->RemoveItem(j);
-							CurrentParamsOutputCount--;
-						}
-						else
-						{
-							//move on to the next one
-							j++;
-						}
-					}
-				}
-			}
-		}
-		this->mInputs->MakeEmpty();
-	}
-	
-	for(i = 0; i < NumInputs; i++)
-	{
-		this->AddInput(*(reinterpret_cast<BParameter * const *>(CurrentPos)));
-		CurrentPos += sizeof(BParameter *);
-	}
-	
-	
-	//read the list of outputs
-	ssize_t NumOutputs = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	
-	//MaxByteLength = ParamStructSize - ((current offset into struct) + (minimum bytes REQUIRED AFTER outputs list))
-	//In this case, the fields REQUIRED after the outputs list are:
-	//Media Type (4 bytes)
-	//Channel Count (4 bytes)
-	//Flags (4 bytes)
-	//TOTAL: 12 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 12);
-	
-	NumOutputs = min_c(NumOutputs,static_cast<ssize_t>(MaxByteLength/sizeof(BParameter *)));
-	
-	
-	if(this->mOutputs == NULL)
-	{
-		this->mOutputs = new BList();
-	}
-	else
-	{
-		//if this object has an existing list of (valid) outputs, go to each one, removing this object
-		//as an input for each of the objects in the output list, then clear the list
-		if(mSwapDetected)
-		{
-			ssize_t OldOutputCount = mOutputs->CountItems();
-			for(i = 0; i < OldOutputCount; i++)
-			{
-				BParameter *CurrentParam = static_cast<BParameter *>(this->mOutputs->ItemAt(i));
-				if((CurrentParam != NULL) && (CurrentParam->mInputs != NULL))
-				{
-					//Remove ALL instances of this parameter from the other parameter's
-					//input list
-					j = 0;
-					ssize_t CurrentParamsInputCount = CurrentParam->mInputs->CountItems();
-					while(j < CurrentParamsInputCount)
-					{
-						if(CurrentParam->mInputs->ItemAt(j) == this)
-						{
-							//remove this item, update the CurrentParamsInputCount,
-							//and DON'T increment j
-							CurrentParam->mInputs->RemoveItem(j);
-							CurrentParamsInputCount--;
-						}
-						else
-						{
-							//move on to the next one
-							j++;
-						}
-					}
-				}
-			}
-		}
-		this->mOutputs->MakeEmpty();
-	}
-	
-	for(i = 0; i < NumOutputs; i++)
-	{
-		this->AddOutput(*(reinterpret_cast<BParameter * const *>(CurrentPos)));
-		CurrentPos += sizeof(BParameter *);
-	}
-	
-	//read the media type
-	this->mMediaType = *(reinterpret_cast<const media_type *>(CurrentPos));
-	CurrentPos += sizeof(media_type);
-	
-	//read the channel count
-	this->mChannels = *(reinterpret_cast<const int32 *>(CurrentPos));
-	CurrentPos += sizeof(int32);
+	mID = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);
 
-	//read the flags
-	this->mFlags = *(reinterpret_cast<const uint32 *>(CurrentPos));
-	CurrentPos += sizeof(uint32);
+	if (read_string_from_buffer(&buffer, &mName, size_left(size, bufferStart, buffer)) < B_OK
+		|| read_string_from_buffer(&buffer, &mKind, size_left(size, bufferStart, buffer)) < B_OK	
+		|| read_string_from_buffer(&buffer, &mUnit, size_left(size, bufferStart, buffer)) < B_OK)	
+		return B_NO_MEMORY;
+
+	// read the list of inputs
+
+	int32 count = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);	
+
+	if (mInputs == NULL)
+		mInputs = new BList();
+	else
+		mInputs->MakeEmpty();
+
+	for (int32 i = 0; i < count; i++) {
+		AddInput(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
+	}
+
+	// read the list of outputs
+
+	count = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);
+
+	if (mOutputs == NULL)
+		mOutputs = new BList();
+	else
+		mOutputs->MakeEmpty();
+
+	for (int32 i = 0; i < count; i++) {
+		AddOutput(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
+	}
+
+	mMediaType = read_from_buffer_swap32<media_type>(&buffer, mSwapDetected);
+	mChannels = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);
+	mFlags = read_from_buffer_swap32<uint32>(&buffer, mSwapDetected);
 
 	return B_OK;
 }
+
 
 /*************************************************************
  * private BParameter
  *************************************************************/
 
 
-status_t BParameter::_Reserved_Control_0(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_1(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_2(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_3(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_4(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_5(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_6(void *) { return B_ERROR; }
-status_t BParameter::_Reserved_Control_7(void *) { return B_ERROR; }
-
-
-BParameter::BParameter(int32 id,
-					   media_type m_type,
-					   media_parameter_type type,
-					   BParameterWeb *web,
-					   const char *name,
-					   const char *kind,
-					   const char *unit):mID(id),mType(type),mWeb(web),
-					   					 mGroup(NULL),mSwapDetected(true),mMediaType(m_type),mChannels(1),mFlags(0)
+BParameter::BParameter(int32 id, media_type mediaType, media_parameter_type type,
+	BParameterWeb *web, const char *name, const char *kind, const char *unit)
+	:
+	mID(id),
+	mType(type),
+	mWeb(web),
+	mGroup(NULL),
+	mSwapDetected(true),
+	mMediaType(mediaType),
+	mChannels(1),
+	mFlags(0)
 {
-	mGroup = NULL;
-	
-	//copy the name string
-	if(name == NULL)
-	{
-		mName = new char[1];
-		mName[0] = 0;
-	}
-	else
-	{
-		ssize_t NewNameLength = strlen(name);
-		mName = new char[NewNameLength + 1];
-		mName[NewNameLength] = 0;
-	}
-	//copy the kind string
-	if(kind == NULL)
-	{
-		mKind = new char[1];
-		mKind[0] = 0;
-	}
-	else
-	{
-		ssize_t NewKindLength = strlen(kind);
-		mKind = new char[NewKindLength + 1];
-		mKind[NewKindLength] = 0;
-	}
-	//copy the unit string
-	if(unit == NULL)
-	{
-		mUnit = new char[1];
-		mUnit[0] = 0;
-	}
-	else
-	{
-		ssize_t NewUnitLength = strlen(unit);
-		mUnit = new char[NewUnitLength + 1];
-		mUnit[NewUnitLength] = 0;
-	}
-	
-	//create an empty input list
+	CALLED();
+
+	mName = strndup(name, 256);
+	mKind = strndup(kind, 256);
+	mUnit = strndup(unit, 256);
+
+	// create empty input/output lists
 	mInputs = new BList();
-	
-	//create an empty output list
 	mOutputs = new BList();
-	
 }
 
 
 BParameter::~BParameter()
 {
-	//don't worry about the mWeb/mGroup properties, you don't need
-	//to remove yourself from a web/group since the only way in which
-	//a parameter is destroyed is when the owner web/group destroys it
+	CALLED();
+
+	// don't worry about the mWeb/mGroup properties, you don't need
+	// to remove yourself from a web/group since the only way in which
+	// a parameter is destroyed is when the owner web/group destroys it
+
+	free(mName);
+	free(mKind);
+	free(mUnit);
+
+	delete mInputs;
+	delete mOutputs;
 	
-	if(mName != NULL)
-	{
-		delete[] mName;
-		mName = NULL;
-	}
-	if(mKind != NULL)
-	{
-		delete[] mKind;
-		mKind = NULL;
-	}
-	if(mUnit != NULL)
-	{
-		delete[] mUnit;
-		mUnit = NULL;
-	}
-	
-	int i,j;
-	
-	//clean up the inputs list
-	if(this->mInputs != NULL)
-	{
-		//if this object has an existing list of (valid)inputs, go to each one, removing this object
-		//as an output for each of the objects in the input list, then destroy the list
-		if(mSwapDetected)
-		{
-			ssize_t OldInputCount = mInputs->CountItems();
-			for(i = 0; i < OldInputCount; i++)
-			{
-				BParameter *CurrentParam = static_cast<BParameter *>(this->mInputs->ItemAt(i));
-				if((CurrentParam != NULL) && (CurrentParam->mOutputs != NULL))
-				{
-					//Remove ALL instances of this parameter from the other parameter's
-					//output list
-					j = 0;
-					ssize_t CurrentParamsOutputCount = CurrentParam->mOutputs->CountItems();
-					while(j < CurrentParamsOutputCount)
-					{
-						if(CurrentParam->mOutputs->ItemAt(j) == this)
-						{
-							//remove this item, update the CurrentParamsOutputCount,
-							//and DON'T increment j
-							CurrentParam->mOutputs->RemoveItem(j);
-							CurrentParamsOutputCount--;
-						}
-						else
-						{
-							//move on to the next one
-							j++;
-						}
-					}
-				}
-			}
-		}
-		this->mInputs->MakeEmpty();
-		delete mInputs;
-		mInputs = NULL;
-	}
-	
-	//clean up the outputs list
-	if(this->mOutputs != NULL)
-	{
-		//if this object has an existing list of (valid) outputs, go to each one, removing this object
-		//as an input for each of the objects in the output list, then clear the list
-		if(mSwapDetected)
-		{
-			ssize_t OldOutputCount = mOutputs->CountItems();
-			for(i = 0; i < OldOutputCount; i++)
-			{
-				BParameter *CurrentParam = static_cast<BParameter *>(this->mOutputs->ItemAt(i));
-				if((CurrentParam != NULL) && (CurrentParam->mInputs != NULL))
-				{
-					//Remove ALL instances of this parameter from the other parameter's
-					//input list
-					j = 0;
-					ssize_t CurrentParamsInputCount = CurrentParam->mInputs->CountItems();
-					while(j < CurrentParamsInputCount)
-					{
-						if(CurrentParam->mInputs->ItemAt(j) == this)
-						{
-							//remove this item, update the CurrentParamsInputCount,
-							//and DON'T increment j
-							CurrentParam->mInputs->RemoveItem(j);
-							CurrentParamsInputCount--;
-						}
-						else
-						{
-							//move on to the next one
-							j++;
-						}
-					}
-				}
-			}
-		}
-		this->mOutputs->MakeEmpty();
-		delete mOutputs;
-		mOutputs = NULL;
-	}
-	
+	mName = NULL; mKind = NULL; mUnit = NULL; mInputs = NULL; mOutputs = NULL;
 }
 
+
+/** Replaces references to items in the old list with the corresponding
+ *	items in the updated list. The references are replaced in the input
+ *	and output lists.
+ *	This is called by BParameterWeb::Unflatten().
+ */
 
 void
-BParameter::FixRefs(BList &old,
-					BList &updated)
+BParameter::FixRefs(BList &old, BList &updated)
 {
-	//Replaces references to (ie: pointers) items in the old list, with the
-	//coresponding items in the updated list.
-	//References are replaced in the mInputs and mOutputs lists.
+	CALLED();
+	ASSERT(mInputs != NULL);
+	ASSERT(mOutputs != NULL);
 
-	if(!mSwapDetected)
-	{
-		ASSERT_RETURN(mInputs);
-		ASSERT_RETURN(mOutputs);
-		
-		int i;
-		void **Items = static_cast<void **>(mInputs->Items());
-		int NumItems = mInputs->CountItems();
-		
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			void *CurrentItem = Items[i];
-			
-			int32 Index = old.IndexOf(CurrentItem);
-			
-			if(Index >= 0)
-			{
-				Items[i] = updated.ItemAt(Index);
-			}
+	// update inputs
+
+	void **items = static_cast<void **>(mInputs->Items());
+	int32 count = mInputs->CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		int32 index = old.IndexOf(items[i]);
+		if (index >= 0)
+			items[i] = updated.ItemAt(index);
+		else {
+			FATAL("BParameter::FixRefs(): No mapping found for input");
+			items[i] = NULL;
 		}
-		
-		Items = static_cast<void **>(mOutputs->Items());
-		NumItems = mOutputs->CountItems();
-		
-		for(i = 0; i < NumItems; i++)
-		{
-			void *CurrentItem = Items[i];
-			
-			int32 Index = old.IndexOf(CurrentItem);
-			
-			if(Index >= 0)
-			{
-				Items[i] = updated.ItemAt(Index);
-			}
-		}
-		
-		mSwapDetected = true;
 	}
+
+	// remove all NULL inputs (those which couldn't be mapped)
+
+	for (int32 i = count; i-- > 0;) {
+		if (items[i] == NULL)
+			mInputs->RemoveItem(i);
+	}
+
+	// update outputs
+
+	items = static_cast<void **>(mOutputs->Items());
+	count = mOutputs->CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		int32 index = old.IndexOf(items[i]);
+		if (index >= 0)
+			items[i] = updated.ItemAt(index);
+		else {
+			FATAL("BParameter::FixRefs(): No mapping found for output");
+			items[i] = NULL;
+		}
+	}
+
+	// remove all NULL outputs (those which couldn't be mapped)
 	
+	for (int32 i = count; i-- > 0;) {
+		if (items[i] == NULL)
+			mOutputs->RemoveItem(i);
+	}
 }
+
+
+//	#pragma mark -
 
 /*************************************************************
  * public BContinuousParameter
@@ -2474,9 +1815,7 @@ BContinuousParameter::ValueStep()
 
 
 void
-BContinuousParameter::SetResponse(int resp,
-								  float factor,
-								  float offset)
+BContinuousParameter::SetResponse(int resp, float factor, float offset)
 {
 	mResponse = static_cast<response>(resp);
 	mFactor = factor;
@@ -2485,221 +1824,142 @@ BContinuousParameter::SetResponse(int resp,
 
 
 void
-BContinuousParameter::GetResponse(int *resp,
-								  float *factor,
-								  float *offset)
+BContinuousParameter::GetResponse(int *resp, float *factor, float *offset)
 {
-	if(resp != NULL) *resp = mResponse;
-	if(factor != NULL) *factor = mFactor;
-	if(offset != NULL) *offset = mOffset;
+	if (resp != NULL)
+		*resp = mResponse;
+	if (factor != NULL)
+		*factor = mFactor;
+	if (offset != NULL)
+		*offset = mOffset;
 }
 
 
 ssize_t
 BContinuousParameter::FlattenedSize() const
 {
-	ssize_t RetVal = BParameter::FlattenedSize();
-	
-	/*
-		Min: 4 bytes (as float)
-		Max: 4 bytes (as float)
-		Stepping: 4 bytes (as float)
-		Response: 4 bytes (as int or enum)
-		Factor: 4 bytes (as float)
-		Offset: 4 bytes (as float)
-	*/
-	
-	RetVal += 24;
+	CALLED();
 
-	return RetVal;
+	// only adds a fixed amount of bytes
+	return BParameter::FlattenedSize() + kAdditionalContinuousParameterSize;
 }
 
 
 status_t
-BContinuousParameter::Flatten(void *buffer,
-							  ssize_t size) const
+BContinuousParameter::Flatten(void *buffer, ssize_t size) const
 {
-	if(buffer == NULL) {
-		FATAL("BContinuousParameter::Flatten buffer is NULL\n");
+	CALLED();
+
+	if (buffer == NULL) {
+		FATAL("BContinuousParameter::Flatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
-	ssize_t TotalBParameterFlatSize = BParameter::FlattenedSize();
-	//see BContinuousParameter::FlattenedSize() for a description of this value
-	const ssize_t AdditionalBContParamFlatSize = 24;
-	
-	if(size < (TotalBParameterFlatSize + AdditionalBContParamFlatSize))
-	{
-		FATAL("BContinuousParameter::Flatten size to small\n");
+	ssize_t parameterSize = BParameter::FlattenedSize();
+	if (size < (parameterSize + kAdditionalContinuousParameterSize)) {
+		FATAL("BContinuousParameter::Flatten(): size to small\n");
 		return B_NO_MEMORY;
 	}
 
-	status_t RetVal = BParameter::Flatten(buffer,size);
-	
-	if(RetVal != B_OK)
-	{
-		FATAL("BContinuousParameter::Flatten BParameter::Flatten failed\n");
-		return RetVal;
+	status_t status = BParameter::Flatten(buffer, size);
+	if (status != B_OK) {
+		FATAL("BContinuousParameter::Flatten(): BParameter::Flatten() failed\n");
+		return status;
 	}
-	
-	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
-	CurrentPos += TotalBParameterFlatSize;
-	
-	//write out the mMinimum property
-	*(reinterpret_cast<float *>(CurrentPos)) = mMinimum;
-	CurrentPos += sizeof(float);
-	//write out the mMaximum property
-	*(reinterpret_cast<float *>(CurrentPos)) = mMaximum;
-	CurrentPos += sizeof(float);
-	//write out the mStepping property
-	*(reinterpret_cast<float *>(CurrentPos)) = mStepping;
-	CurrentPos += sizeof(float);
-	//write out the mResponse property
-	*(reinterpret_cast<response *>(CurrentPos)) = mResponse;
-	CurrentPos += sizeof(response);
-	//write out the mFactor property
-	*(reinterpret_cast<float *>(CurrentPos)) = mFactor;
-	CurrentPos += sizeof(float);
-	//write out the mOffset property
-	*(reinterpret_cast<float *>(CurrentPos)) = mOffset;
-	CurrentPos += sizeof(float);
-	
+
+	// add our data to the general flattened BParameter
+
+	skip_in_buffer(&buffer, parameterSize);
+
+	write_to_buffer<float>(&buffer, mMinimum);
+	write_to_buffer<float>(&buffer, mMaximum);
+	write_to_buffer<float>(&buffer, mStepping);
+	write_to_buffer<response>(&buffer, mResponse);
+	write_to_buffer<float>(&buffer, mFactor);
+	write_to_buffer<float>(&buffer, mOffset);
 
 	return B_OK;
 }
 
 
 status_t
-BContinuousParameter::Unflatten(type_code c,
-								const void *buf,
-								ssize_t size)
+BContinuousParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 {
+	CALLED();
 
-	/*
-	 * NOTICE: This method tries to avoid corrupting an existing parameter
-	 *		   by only reading values out of the buffer after it has verified
-	 *		   that the size of the buffer is sufficient to read all needed
-	 *		   fields.  In this way, we avoid having to exit this method after
-	 *         the 'this' object has been modified by reading a part of the buffer.
-	 */
+	// we try to check if the buffer size is long enough to hold an object
+	// as early as possible.
 
-	if(!this->AllowsTypeCode(c)) {
+	if (!AllowsTypeCode(code)) {
 		FATAL("BContinuousParameter::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
 	}
-	
-	if(buf == NULL) {
+
+	if (buffer == NULL) {
 		FATAL("BContinuousParameter::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//if the buffer is smaller than the size needed to read the
-	//signature and struct size fields, then there is a problem
-	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
-	{
+
+	// if the buffer is smaller than the size needed to read the
+	// signature and struct size fields, then there is a problem
+	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
 		FATAL("BContinuousParameter::Unflatten size too small\n");
 		return B_ERROR;
 	}
 
-	const byte *CurrentPos = static_cast<const byte *>(buf);
-	
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
-	{
-		FATAL("BContinuousParameter::Unflatten bad magic\n");
-		return B_BAD_TYPE;
+	status_t status = BParameter::Unflatten(code, buffer, size);
+	if (status != B_OK) {
+		FATAL("BContinuousParameter::Unflatten(): BParameter::Unflatten failed\n");
+		return status;
 	}
-	CurrentPos += sizeof(int32);
-	
-	//read the struct size
-	ssize_t ParamStructSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	//see BContinuousParameter::FlattenedSize() for a description of this value
-	const ssize_t AdditionalBContParamFlatSize = 24;
-	
-	if((ParamStructSize + AdditionalBContParamFlatSize) > size)
-	{
-		//if the struct size is larger than the size of the buffer we were given,
-		//there's a problem
-		FATAL("BContinuousParameter::Unflatten out of memory\n");
-		return B_ERROR;
+
+	ssize_t parameterSize = BParameter::FlattenedSize();
+	skip_in_buffer(&buffer, parameterSize);
+
+	if (size < (parameterSize + kAdditionalContinuousParameterSize)) {
+		FATAL("BContinuousParameter::Unflatten(): buffer too small\n");
+		return B_BAD_VALUE;
 	}
-	
-	//read the base BParameter
-	status_t RetVal = BParameter::Unflatten(c,buf,size);
-	
-	if(RetVal != B_OK)
-	{
-		FATAL("BContinuousParameter::Unflatten BParameter::Unflatten failed\n");
-		return RetVal;
-	}
-	
-	CurrentPos = static_cast<const byte *>(buf);
-	CurrentPos += ParamStructSize;
-	
-	
-	//read the mMinimum property
-	mMinimum = *(reinterpret_cast<const float *>(CurrentPos));
-	CurrentPos += sizeof(float);
-	//read the mMaximum property
-	mMaximum = *(reinterpret_cast<const float *>(CurrentPos));
-	CurrentPos += sizeof(float);
-	//read the mStepping property
-	mStepping = *(reinterpret_cast<const float *>(CurrentPos));
-	CurrentPos += sizeof(float);
-	//read the mResponse property
-	mResponse = *(reinterpret_cast<const response *>(CurrentPos));
-	CurrentPos += sizeof(response);
-	//read the mFactor property
-	mFactor = *(reinterpret_cast<const float *>(CurrentPos));
-	CurrentPos += sizeof(float);
-	//read the mOffset property
-	mOffset = *(reinterpret_cast<const float *>(CurrentPos));
-	CurrentPos += sizeof(float);
-	
+
+	mMinimum = read_from_buffer_swap32<float>(&buffer, SwapOnUnflatten());
+	mMaximum = read_from_buffer_swap32<float>(&buffer, SwapOnUnflatten());
+	mStepping = read_from_buffer_swap32<float>(&buffer, SwapOnUnflatten());
+	mResponse = read_from_buffer_swap32<response>(&buffer, SwapOnUnflatten());
+	mFactor = read_from_buffer_swap32<float>(&buffer, SwapOnUnflatten());
+	mOffset = read_from_buffer_swap32<float>(&buffer, SwapOnUnflatten());
 
 	return B_OK;
 }
+
 
 /*************************************************************
  * private BContinuousParameter
  *************************************************************/
 
-status_t BContinuousParameter::_Reserved_ContinuousParameter_0(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_1(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_2(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_3(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_4(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_5(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_6(void *) { return B_ERROR; }
-status_t BContinuousParameter::_Reserved_ContinuousParameter_7(void *) { return B_ERROR; }
 
-
-BContinuousParameter::BContinuousParameter(int32 id,
-										   media_type m_type,
-										   BParameterWeb *web,
-										   const char *name,
-										   const char *kind,
-										   const char *unit,
-										   float minimum,
-										   float maximum,
-										   float stepping)
-	: BParameter(id,m_type,B_CONTINUOUS_PARAMETER,web,name,kind,unit),mMinimum(minimum),mMaximum(maximum),mStepping(stepping),
-	  mResponse(B_LINEAR),mFactor(1.0),mOffset(0.0)
+BContinuousParameter::BContinuousParameter(int32 id, media_type m_type,
+	BParameterWeb *web, const char *name, const char *kind, const char *unit,
+	float minimum, float maximum, float stepping)
+	:	BParameter(id, m_type, B_CONTINUOUS_PARAMETER, web, name, kind, unit),
+	mMinimum(minimum), mMaximum(maximum), mStepping(stepping),
+	mResponse(B_LINEAR), mFactor(1.0), mOffset(0.0)
 {
+	CALLED();
 }
 
 
 BContinuousParameter::~BContinuousParameter()
 {
+	CALLED();
 }
+
+
+//	#pragma mark -
 
 /*************************************************************
  * public BDiscreteParameter
  *************************************************************/
+
 
 type_code
 BDiscreteParameter::ValueType()
@@ -2711,7 +1971,7 @@ BDiscreteParameter::ValueType()
 int32
 BDiscreteParameter::CountItems()
 {
-	ASSERT_WRETURN_VALUE(mValues != NULL,0);
+	ASSERT(mValues != NULL);
 
 	return mValues->CountItems();
 }
@@ -2720,8 +1980,8 @@ BDiscreteParameter::CountItems()
 const char *
 BDiscreteParameter::ItemNameAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mSelections != NULL,NULL);
-	
+	ASSERT(mSelections != NULL);
+
 	return reinterpret_cast<const char *>(mSelections->ItemAt(index));
 }
 
@@ -2729,44 +1989,32 @@ BDiscreteParameter::ItemNameAt(int32 index)
 int32
 BDiscreteParameter::ItemValueAt(int32 index)
 {
-	ASSERT_WRETURN_VALUE(mValues != NULL,0);
-	
-	//check for out of range
-	if((index < 0) || (index >= mValues->CountItems()))
-	{
+	ASSERT(mValues != NULL);
+
+	int32 *item = static_cast<int32 *>(mValues->ItemAt(index));
+	if (item == NULL)
 		return 0;
-	}
-	
-	int32 *Item = static_cast<int32 *>(mValues->ItemAt(index));
-	if(Item == NULL)
-	{
-		return 0;
-	}
-	
-	return *Item;
+
+	return *item;
 }
 
 
 status_t
-BDiscreteParameter::AddItem(int32 value,
-							const char *name)
+BDiscreteParameter::AddItem(int32 value, const char *name)
 {
-	ASSERT_WRETURN_VALUE(mValues != NULL,B_ERROR);
-	ASSERT_WRETURN_VALUE(mSelections != NULL,B_ERROR);
-	
-	int32 *NewVal = new int32(value);
-	char *NewSel = NULL;
-	if(name != NULL)
-	{
-		ssize_t NameLength = strlen(name);
-		NewSel = new char[NameLength + 1];
-		memcpy(NewSel,name,NameLength);
-		NewSel[NameLength] = 0;
-	}
-	
-	//QUESTION: How do we watch for the B_NO_MEMORY case (Be Book refers to this)?
-	mValues->AddItem(NewVal);
-	mSelections->AddItem(NewSel);
+	CALLED();
+	TRACE("\tthis = %p, value = %ld, name = \"%s\"\n", this, value, name);
+	ASSERT(mValues != NULL);
+	ASSERT(mSelections != NULL);
+
+	int32 *valueCopy = new int32(value);
+	char *nameCopy = strndup(name, 256);
+	if (name != NULL && nameCopy == NULL)
+		return B_NO_MEMORY;
+
+	if (!mValues->AddItem(valueCopy)
+		|| !mSelections->AddItem(nameCopy))
+		return B_NO_MEMORY;
 
 	return B_OK;
 }
@@ -2775,16 +2023,15 @@ BDiscreteParameter::AddItem(int32 value,
 status_t
 BDiscreteParameter::MakeItemsFromInputs()
 {
-	ASSERT_WRETURN_VALUE(mValues != NULL,B_ERROR);
-	ASSERT_WRETURN_VALUE(mSelections != NULL,B_ERROR);
-	ASSERT_WRETURN_VALUE(mInputs != NULL,B_ERROR);
-	
-	int32 i;
-	ssize_t NumInputs = mInputs->CountItems();
-	for(i = 0; i < NumInputs; i++)
-	{
-		BParameter *CurrentParam = static_cast<BParameter *>(mInputs->ItemAt(i));
-		this->AddItem(i,CurrentParam->Name());
+	CALLED();
+	ASSERT(mValues != NULL);
+	ASSERT(mSelections != NULL);
+	ASSERT(mInputs != NULL);
+
+	int32 count = mInputs->CountItems();
+	for(int32 i = 0; i < count; i++) {
+		BParameter *parameter = static_cast<BParameter *>(mInputs->ItemAt(i));
+		AddItem(i, parameter->Name());
 	}
 
 	return B_OK;
@@ -2794,16 +2041,15 @@ BDiscreteParameter::MakeItemsFromInputs()
 status_t
 BDiscreteParameter::MakeItemsFromOutputs()
 {
-	ASSERT_WRETURN_VALUE(mValues != NULL,B_ERROR);
-	ASSERT_WRETURN_VALUE(mSelections != NULL,B_ERROR);
-	ASSERT_WRETURN_VALUE(mOutputs != NULL,B_ERROR);
-	
-	int32 i;
-	ssize_t NumOutputs = mOutputs->CountItems();
-	for(i = 0; i < NumOutputs; i++)
-	{
-		BParameter *CurrentParam = static_cast<BParameter *>(mOutputs->ItemAt(i));
-		this->AddItem(i,CurrentParam->Name());
+	CALLED();
+	ASSERT(mValues != NULL);
+	ASSERT(mSelections != NULL);
+	ASSERT(mOutputs != NULL);
+
+	int32 count = mOutputs->CountItems();
+	for(int32 i = 0; i < count; i++) {
+		BParameter *parameter = static_cast<BParameter *>(mOutputs->ItemAt(i));
+		AddItem(i, parameter->Name());
 	}
 
 	return B_OK;
@@ -2813,329 +2059,185 @@ BDiscreteParameter::MakeItemsFromOutputs()
 void
 BDiscreteParameter::MakeEmpty()
 {
-	ASSERT_RETURN(mValues != NULL);
-	ASSERT_RETURN(mSelections != NULL);
-	
-	int32 i;
-	ssize_t ListSize = mValues->CountItems();
-	for(i = 0; i < ListSize; i++)
-	{
-		int32 *CurrentValue = static_cast<int32 *>(mValues->ItemAt(i));
-		if(CurrentValue != NULL)
-		{
-			delete CurrentValue;
-		}
+	CALLED();
+	ASSERT(mValues != NULL);
+	ASSERT(mSelections != NULL);
+
+	for (int32 i = mValues->CountItems(); i-- > 0;) {
+		delete static_cast<int32 *>(mValues->ItemAt(i));
 	}
 	mValues->MakeEmpty();
-	
-	ListSize = mSelections->CountItems();
-	for(i = 0; i < ListSize; i++)
-	{
-		char *CurrentSelection = static_cast<char *>(mSelections->ItemAt(i));
-		if(CurrentSelection != NULL)
-		{
-			delete[] CurrentSelection;
-		}
+
+	for(int32 i = mSelections->CountItems(); i-- > 0;) {
+		free(static_cast<char *>(mSelections->ItemAt(i)));
 	}
 	mSelections->MakeEmpty();
-	
 }
 
 
 ssize_t
 BDiscreteParameter::FlattenedSize() const
 {
-	ssize_t RetVal = BParameter::FlattenedSize();
-	/*
-		//--------BEGIN-BDISCRETEPARAMETER-STRUCT----------------
-		NumItems: 4 bytes (as int)
-			//for each item BEGIN
-			Item Name String Length: 1 byte
-				Item Name String: 'Item Name String Length' bytes
-			Item Value: 4 bytes (as int)
-			//for each item END
-		//--------END-BDISCRETEPARAMETER-STRUCT-------------------
-	*/
-	RetVal += sizeof(ssize_t);
-	
-	ssize_t NumItems = mValues->CountItems();
-	int32 i;
-	for(i = 0; i < NumItems; i++)
-	{
-		char *CurrentSel = static_cast<char *>(mSelections->ItemAt(i));
-		
-		if(CurrentSel != NULL)
-		{
-			RetVal += min_c(strlen(CurrentSel),255);
-		}
-		
-		//regardless of string size, there is a cost of 5 bytes for each item (string length + value)
-		RetVal += 5;
+	CALLED();
+
+	ssize_t size = BParameter::FlattenedSize() + kAdditionalDiscreteParameterSize;
+
+	int32 count = mValues ? mValues->CountItems() : 0;
+	for (int32 i = 0; i < count; i++) {
+		char *selection = static_cast<char *>(mSelections->ItemAt(i));
+
+		if (selection != NULL)
+			size += min_c(strlen(selection), 255);
+
+		size += 5;
+			// string length + value
 	}
 
-	return RetVal;
+	return size;
 }
 
 
 status_t
-BDiscreteParameter::Flatten(void *buffer,
-							ssize_t size) const
+BDiscreteParameter::Flatten(void *buffer, ssize_t size) const
 {
-	if(buffer == NULL) {
-		FATAL("BDiscreteParameter::Flatten buffer is NULL\n");
+	CALLED();
+
+	if (buffer == NULL) {
+		FATAL("BDiscreteParameter::Flatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
-	ssize_t TotalBParameterFlatSize = BParameter::FlattenedSize();
-	
-	//see BDiscreteParameter::FlattenedSize() for a description of this value
-	ssize_t AdditionalBDiscParamFlatSize = sizeof(ssize_t);
-	
-	ssize_t NumItems = mValues->CountItems();
-	int32 i;
-	for(i = 0; i < NumItems; i++)
-	{
-		char *CurrentSel = static_cast<char *>(mSelections->ItemAt(i));
-		
-		if(CurrentSel != NULL)
-		{
-			AdditionalBDiscParamFlatSize += min_c(strlen(CurrentSel),255);
-		}
-		
-		//regardless of string size, there is a cost of 5 bytes for each item (string length + value)
-		AdditionalBDiscParamFlatSize += 5;
-	}
-	
-	
-	if(size < (TotalBParameterFlatSize + AdditionalBDiscParamFlatSize))
-	{
-		FATAL("BDiscreteParameter::Flatten size too small\n");
+	ssize_t parameterSize = BParameter::FlattenedSize();
+
+	if (size < FlattenedSize()) {
+		FATAL("BDiscreteParameter::Flatten(): size too small\n");
 		return B_NO_MEMORY;
 	}
 
-	status_t RetVal = BParameter::Flatten(buffer,size);
-	
-	if(RetVal != B_OK)
-	{
-		FATAL("BDiscreteParameter::Flatten BParameter::Flatten failed\n");
-		return RetVal;
+	status_t status = BParameter::Flatten(buffer, size);
+	if (status != B_OK) {
+		FATAL("BDiscreteParameter::Flatten(): BParameter::Flatten failed\n");
+		return status;
 	}
-	
-	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
-	CurrentPos += TotalBParameterFlatSize;
-	
-	//write out the number of value/name pairs
-	*(reinterpret_cast<ssize_t *>(CurrentPos)) = NumItems;
-	CurrentPos += sizeof(ssize_t);
-	
-	//write out all value/name pairs themselves
-	for(i = 0; i < NumItems; i++)
-	{
-		const char *CurrentSel = static_cast<char *>(mSelections->ItemAt(i));
-		const int32 *CurrentVal = static_cast<int32 *>(mValues->ItemAt(i));
-		
-		if(CurrentSel != NULL)
-		{
-			byte NameLength = min_c(strlen(CurrentSel),255);
-			
-			//write out the name length
-			*(reinterpret_cast<byte *>(CurrentPos)) = NameLength;
-			CurrentPos += sizeof(byte);
-			
-			memcpy(CurrentPos,CurrentSel,NameLength);
-			CurrentPos += NameLength;
-		}
-		else
-		{
-			//write out a zero name length
-			*(reinterpret_cast<byte *>(CurrentPos)) = 0;
-			CurrentPos += sizeof(byte);
-		}
-		
-		if(CurrentVal != NULL)
-		{
-			//write out the value
-			*(reinterpret_cast<int32 *>(CurrentPos)) = *CurrentVal;
-			CurrentPos += sizeof(int32);
-		}
-		else
-		{
-			//write out a zero value
-			*(reinterpret_cast<int32 *>(CurrentPos)) = 0;
-			CurrentPos += sizeof(int32);
-		}
+
+	skip_in_buffer(&buffer, parameterSize);
+
+	int32 count = mValues ? mValues->CountItems() : 0;
+	write_to_buffer<int32>(&buffer, count);
+
+	// write out all value/name pairs
+	for (int32 i = 0; i < count; i++) {
+		const char *selection = static_cast<char *>(mSelections->ItemAt(i));
+		const int32 *value = static_cast<int32 *>(mValues->ItemAt(i));
+
+		write_string_to_buffer(&buffer, selection);
+		write_to_buffer<int32>(&buffer, value ? *value : 0);
 	}
-	
 
 	return B_OK;
 }
 
 
 status_t
-BDiscreteParameter::Unflatten(type_code c,
-							  const void *buf,
-							  ssize_t size)
+BDiscreteParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 {
-	/*
-	 * NOTICE: This method tries to avoid corrupting an existing parameter
-	 *		   by only reading values out of the buffer after it has verified
-	 *		   that the size of the buffer is sufficient to read all needed
-	 *		   fields.  In this way, we avoid having to exit this method after
-	 *         the 'this' object has been modified by reading a part of the buffer.
-	 */
+	CALLED();
 
-	if(!this->AllowsTypeCode(c)) {
-		FATAL("BDiscreteParameter::Unflatten bad type code\n");
+	if (!AllowsTypeCode(code)) {
+		FATAL("BDiscreteParameter::Unflatten(): bad type code\n");
 		return B_BAD_TYPE;
 	}
-	
-	if(buf == NULL) {
-		FATAL("BDiscreteParameter::Unflatten buffer is NULL\n");
+
+	if (buffer == NULL) {
+		FATAL("BDiscreteParameter::Unflatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
-	
-	//if the buffer is smaller than the size needed to read the
-	//signature and struct size fields, then there is a problem
-	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
-	{
-		FATAL("BDiscreteParameter::Unflatten size too small\n");
+
+	// if the buffer is smaller than the size needed to read the
+	// signature and struct size fields, then there is a problem
+	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
+		FATAL("BDiscreteParameter::Unflatten(): size too small\n");
 		return B_ERROR;
 	}
 
-	const byte *CurrentPos = static_cast<const byte *>(buf);
-	
-	
-	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
-	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
-	{
-		FATAL("BDiscreteParameter::Unflatten bad magic\n");
-		return B_BAD_TYPE;
+	const void *bufferStart = buffer;
+
+	status_t status = BParameter::Unflatten(code, buffer, size);
+	if (status != B_OK) {
+		FATAL("BDiscreteParameter::Unflatten(): BParameter::Unflatten failed\n");
+		return status;
 	}
-	CurrentPos += sizeof(int32);
-	
-	//read the struct size
-	ssize_t ParamStructSize = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	//this is the minimum REQUIRED additional space for a BDiscreteParameter in a flattened buffer
-	const ssize_t AdditionalBDiscParamFlatSize = 1;
-	
-	if((ParamStructSize + AdditionalBDiscParamFlatSize) > size)
-	{
-		//if the struct size is larger than the size of the buffer we were given,
-		//there's a problem
-		FATAL("BDiscreteParameter::Unflatten out of memory\n");
-		return B_ERROR;
+
+	ssize_t parameterSize = BParameter::FlattenedSize();
+	skip_in_buffer(&buffer, parameterSize);
+
+	if (size < (parameterSize + kAdditionalDiscreteParameterSize)) {
+		FATAL("BDiscreteParameter::Unflatten(): buffer too small\n");
+		return B_BAD_VALUE;
 	}
-	
-	//read the base BParameter
-	status_t RetVal = BParameter::Unflatten(c,buf,size);
-	
-	if(RetVal != B_OK)
-	{
-		FATAL("BDiscreteParameter::Unflatten BParameter::Unflatten failed\n");
-		return RetVal;
+
+	int32 count = read_from_buffer_swap32<int32>(&buffer, SwapOnUnflatten());
+
+	// clear any existing name/value pairs
+	MakeEmpty();
+
+	for (int32 i = 0; i < count; i++) {
+		char *name;
+		if (read_string_from_buffer(&buffer, &name, size_left(size, bufferStart, buffer)) < B_OK)
+			return B_BAD_DATA;
+
+		if (size_left(size, bufferStart, buffer) < sizeof(int32))
+			return B_BAD_DATA;
+
+		int32 value = read_from_buffer_swap32<int32>(&buffer, SwapOnUnflatten());
+
+		AddItem(value, name);
 	}
-	
-	CurrentPos = static_cast<const byte *>(buf);
-	CurrentPos += ParamStructSize;
-	
-	//read NumItems
-	ssize_t NumItems = *(reinterpret_cast<const ssize_t *>(CurrentPos));
-	CurrentPos += sizeof(ssize_t);
-	
-	ssize_t MaxByteLength = size - (CurrentPos - static_cast<const byte *>(buf));
-	
-	const ssize_t MinFlattenedItemSize(5);
-	
-	//each item occupies a minimum of 5 bytes, so make sure that there is enough
-	//space remaining in the buffer for the specified NumItems (assuming each is minimum size)
-	NumItems = min_c(NumItems,MaxByteLength/MinFlattenedItemSize);
-	
-	//clear any existing name/value pairs
-	this->MakeEmpty();
-	
-	int i;
-	for(i = 0; i < NumItems; i++)
-	{
-		//read the string length for the name associated with this item
-		byte NameStringLength = *(reinterpret_cast<const byte *>(CurrentPos));
-		CurrentPos += sizeof(byte);
-		
-		//ensure that we don't read so much that we don't have enough buffer left for the minimum remainder
-		//of this item (4 byte int32 value), or for the minimum size of the remaining items (5bytes*(num remaining items))
-		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + (NumItems - (i+1))*MinFlattenedItemSize + sizeof(int32));
-		
-		NameStringLength = min_c(NameStringLength,MaxByteLength);
-		
-		//read the name string
-		char *ItemName = new char[NameStringLength + 1];
-		memcpy(ItemName,CurrentPos,NameStringLength);
-		ItemName[NameStringLength] = 0;
-		CurrentPos += NameStringLength;
-		
-		
-		//read the value of this item
-		int32 ItemValue = *(reinterpret_cast<const int32 *>(CurrentPos));
-		CurrentPos += sizeof(int32);
-		
-		//add the item and name to the list
-		this->AddItem(ItemValue,ItemName);
-	}
-	
 
 	return B_OK;
 }
+
 
 /*************************************************************
  * private BDiscreteParameter
  *************************************************************/
 
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_0(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_1(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_2(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_3(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_4(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_5(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_6(void *) { return B_ERROR; }
-status_t BDiscreteParameter::_Reserved_DiscreteParameter_7(void *) { return B_ERROR; }
 
-
-BDiscreteParameter::BDiscreteParameter(int32 id,
-									   media_type m_type,
-									   BParameterWeb *web,
-									   const char *name,
-									   const char *kind)
-: BParameter(id,m_type,B_DISCRETE_PARAMETER,web,name,kind,"")
+BDiscreteParameter::BDiscreteParameter(int32 id, media_type mediaType,
+	BParameterWeb *web, const char *name, const char *kind)
+	:	BParameter(id, mediaType, B_DISCRETE_PARAMETER, web, name, kind, NULL)
 {
-	this->mSelections = new BList();
-	this->mValues = new BList();
+	CALLED();
+
+	mSelections = new BList();
+	mValues = new BList();
 }
 
 
 BDiscreteParameter::~BDiscreteParameter()
 {
-	this->MakeEmpty();
-	
-	if(this->mSelections != NULL)
-	{
-		delete this->mSelections;
-	}
-	if(this->mValues != NULL)
-	{
-		delete this->mValues;
-	}
+	CALLED();
+
+	MakeEmpty();
+
+	delete mSelections;
+	delete mValues;
+
+	mSelections = NULL; mValues = NULL;
 }
+
+
+//	#pragma mark -
 
 /*************************************************************
  * public BNullParameter
  *************************************************************/
 
+
 type_code
 BNullParameter::ValueType()
 {
-	//NULL parameters have no value type
+	// NULL parameters have no value type
 	return 0;
 }
 
@@ -3148,24 +2250,84 @@ BNullParameter::FlattenedSize() const
 
 
 status_t
-BNullParameter::Flatten(void *buffer,
-						ssize_t size) const
+BNullParameter::Flatten(void *buffer, ssize_t size) const
 {
-	return BParameter::Flatten(buffer,size);
+	return BParameter::Flatten(buffer, size);
 }
 
 
 status_t
-BNullParameter::Unflatten(type_code c,
-						  const void *buf,
-						  ssize_t size)
+BNullParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 {
-	return BParameter::Unflatten(c,buf,size);
+	return BParameter::Unflatten(code, buffer, size);
 }
+
 
 /*************************************************************
  * private BNullParameter
  *************************************************************/
+
+
+BNullParameter::BNullParameter(int32 id, media_type mediaType, BParameterWeb *web,
+	const char *name, const char *kind)
+	: BParameter(id, mediaType, B_NULL_PARAMETER, web, name, kind, NULL)
+{
+}
+
+
+BNullParameter::~BNullParameter()
+{
+}
+
+
+//	#pragma mark -
+//	reserved functions
+
+
+status_t BParameterWeb::_Reserved_ControlWeb_0(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_1(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_2(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_3(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_4(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_5(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_6(void *) { return B_ERROR; }
+status_t BParameterWeb::_Reserved_ControlWeb_7(void *) { return B_ERROR; }
+
+status_t BParameterGroup::_Reserved_ControlGroup_0(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_1(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_2(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_3(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_4(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_5(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_6(void *) { return B_ERROR; }
+status_t BParameterGroup::_Reserved_ControlGroup_7(void *) { return B_ERROR; }
+
+status_t BParameter::_Reserved_Control_0(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_1(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_2(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_3(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_4(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_5(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_6(void *) { return B_ERROR; }
+status_t BParameter::_Reserved_Control_7(void *) { return B_ERROR; }
+
+status_t BContinuousParameter::_Reserved_ContinuousParameter_0(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_1(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_2(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_3(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_4(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_5(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_6(void *) { return B_ERROR; }
+status_t BContinuousParameter::_Reserved_ContinuousParameter_7(void *) { return B_ERROR; }
+
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_0(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_1(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_2(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_3(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_4(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_5(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_6(void *) { return B_ERROR; }
+status_t BDiscreteParameter::_Reserved_DiscreteParameter_7(void *) { return B_ERROR; }
 
 status_t BNullParameter::_Reserved_NullParameter_0(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_1(void *) { return B_ERROR; }
@@ -3175,20 +2337,5 @@ status_t BNullParameter::_Reserved_NullParameter_4(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_5(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_6(void *) { return B_ERROR; }
 status_t BNullParameter::_Reserved_NullParameter_7(void *) { return B_ERROR; }
-
-
-BNullParameter::BNullParameter(int32 id,
-							   media_type m_type,
-							   BParameterWeb *web,
-							   const char *name,
-							   const char *kind)
-	: BParameter(id,m_type,B_NULL_PARAMETER,web,name,kind,"")
-{
-}
-
-
-BNullParameter::~BNullParameter()
-{
-}
 
 
