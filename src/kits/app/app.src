@@ -2,6 +2,7 @@ APP_KIT_SOURCE =
 	Application.cpp
 	AppMisc.cpp
 	AppServerLink.cpp
+	AreaLink.cpp
 	Cursor.cpp
 	DataBuffer.cpp
 	Clipboard.cpp
