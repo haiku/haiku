@@ -57,6 +57,9 @@ public:
 	void SetSize(off_t size);
 	off_t Size() const;
 
+	void SetContentSize(off_t size);
+	off_t ContentSize() const;
+
 	void SetBlockSize(uint32 blockSize);
 	uint32 BlockSize() const;
 

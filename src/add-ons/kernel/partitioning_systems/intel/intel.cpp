@@ -533,6 +533,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 						| B_PARTITION_READ_ONLY
 						| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD;
 		// TODO: Update when write functionality is implemented.
+	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
 	partition->content_cookie = map;
@@ -722,6 +723,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
 						| B_PARTITION_READ_ONLY;
 		// TODO: Update when write functionality is implemented.
+	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
 	partition->content_cookie = primary;

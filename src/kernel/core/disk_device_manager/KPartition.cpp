@@ -41,6 +41,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.id = (id >= 0 ? id : _NextID());
 	fPartitionData.offset = 0;
 	fPartitionData.size = 0;
+	fPartitionData.content_size = 0;
 	fPartitionData.block_size = 0;
 	fPartitionData.child_count = 0;
 	fPartitionData.index = -1;
@@ -253,6 +254,20 @@ off_t
 KPartition::Size() const
 {
 	return fPartitionData.size;
+}
+
+// SetContentSize
+void
+KPartition::SetContentSize(off_t size)
+{
+	fPartitionData.content_size = size;
+}
+
+// ContentSize
+off_t
+KPartition::ContentSize() const
+{
+	return fPartitionData.content_size;
 }
 
 // SetBlockSize
@@ -785,6 +800,11 @@ KPartition::UninitializeContents(bool logChanges)
 			SetContentParameters(NULL);
 			flags |= B_PARTITION_CHANGED_CONTENT_PARAMETERS;
 		}
+		// content size
+		if (ContentSize() > 0) {
+			SetContentSize(0);
+			flags |= B_PARTITION_CHANGED_CONTENT_SIZE;
+		}
 		// block size
 		if (Parent() && Parent()->BlockSize() != BlockSize()) {
 			SetBlockSize(Parent()->BlockSize());
@@ -840,6 +860,7 @@ KPartition::WriteUserData(UserDataWriter &writer, user_partition_data *data)
 		data->shadow_id = -1;
 		data->offset = Offset();
 		data->size = Size();
+		data->content_size = ContentSize();
 		data->block_size = BlockSize();
 		data->status = Status();
 		data->flags = Flags();
@@ -879,6 +900,7 @@ KPartition::Dump(bool deep, int32 level)
 		OUT("%spartition %ld: %s\n", prefix, ID(), path);
 	OUT("%s  offset:            %lld\n", prefix, Offset());
 	OUT("%s  size:              %lld\n", prefix, Size());
+	OUT("%s  content size:      %lld\n", prefix, ContentSize());
 	OUT("%s  block size:        %lu\n", prefix, BlockSize());
 	OUT("%s  child count:       %ld\n", prefix, CountChildren());
 	OUT("%s  index:             %ld\n", prefix, Index());
