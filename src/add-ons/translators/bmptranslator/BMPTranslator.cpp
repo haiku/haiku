@@ -123,7 +123,7 @@ BMPTranslator::BMPTranslator()
 	:	BTranslator()
 {
 	strcpy(fName, "BMP Images");
-	sprintf(fInfo, "BMP image translator v%d.%d.%d %s\n",
+	sprintf(fInfo, "BMP image translator v%d.%d.%d %s",
 		BMP_TRANSLATOR_VERSION / 100, (BMP_TRANSLATOR_VERSION / 10) % 10,
 		BMP_TRANSLATOR_VERSION % 10, __DATE__);
 }
