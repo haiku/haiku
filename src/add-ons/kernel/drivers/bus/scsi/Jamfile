@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel drivers bus scsi ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon scsi_raw : kernel drivers bus scsi :
+	scsi_raw.c
+	;
+
