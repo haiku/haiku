@@ -19,7 +19,10 @@ public:
 protected:
 	virtual status_t GetNextChunk(const void **chunkData, size_t *chunkLen,
 		                              media_header *mh) {
-		return track->ReadChunk((char**)chunkData,(int32*)chunkLen,mh);
+		memset(mh,0,sizeof(media_header));
+		status_t result = track->ReadChunk((char**)chunkData,(int32*)chunkLen,mh);
+		const void * data = *chunkData;
+		return result;
 	}
 };
 
@@ -31,17 +34,32 @@ int main (int argc, const char ** argv) {
 		fprintf(stderr,"%s: invalid usage\n",argv[0]);
 		fprintf(stderr,"supply an input file and an output file:\n");
 		fprintf(stderr,"  media_decoder input.mp3 output.raw\n");
-		return 0;
+		return -1;
 	}
-	// open the file using BMediaFile/BMediaTrack
+	// open the file using BMediaFile
 	BFile * file = new BFile(argv[1],B_READ_ONLY);
 	BMediaFile * mf = new BMediaFile(file);
-	BMediaTrack * track = mf->TrackAt(0);
-
-	// create a BMediaDecoder and initialize it
+	if (mf->CountTracks() == 0) {
+		fprintf(stderr,"no tracks found in %s\n",argv[1]);
+		return -1;
+	}
 	media_format format;
 	memset(&format,0,sizeof(format));
-	track->EncodedFormat(&format);
+	// find an audio track
+	BMediaTrack * track = 0;
+	for (int i = 0; i < mf->CountTracks() ; i++) {
+		track = mf->TrackAt(i);
+		track->EncodedFormat(&format);
+		if (format.IsAudio()) {
+			break;
+		}
+		track = 0;
+	}
+	if (track == 0) {
+		fprintf(stderr,"no audio stream found in %s\n",argv[1]);
+		return -1;	
+	}
+	// create a BMediaDecoder and initialize it
 	FileDecoder * fd = new FileDecoder(track,&format);
 //	fd->SetInputFormat(&format);
 	memset(&format,0,sizeof(format));
@@ -50,10 +68,6 @@ int main (int argc, const char ** argv) {
 
 	// open the output file
 	BFile * file2 = new BFile(argv[2],B_WRITE_ONLY|B_CREATE_FILE|B_ERASE_FILE);
-
-	// be sure we are at the start
-	int64 frame = 0;
-	track->SeekToFrame(&frame,0);
 
 	// decode until we hit an error
 	uint8 * buffer = new uint8[format.u.raw_audio.buffer_size];
