@@ -69,15 +69,15 @@ BitmapStreamTest::Suite()
 		
 	suite->addTest(new TC("BitmapStreamTest::DetachBitmap Test",
 		&BitmapStreamTest::DetachBitmapTest));
-
-	suite->addTest(new TC("BitmapStreamTest::ReadWrite Test",
-		&BitmapStreamTest::ReadWriteTest));
 		
 	suite->addTest(new TC("BitmapStreamTest::Seek Test",
 		&BitmapStreamTest::SeekTest));
 		
 	suite->addTest(new TC("BitmapStreamTest::SetSize Test",
 		&BitmapStreamTest::SetSizeTest));
+		
+	suite->addTest(new TC("BitmapStreamTest::ReadWrite Test",
+		&BitmapStreamTest::ReadWriteTest));
 
 	return suite;
 }
@@ -302,7 +302,13 @@ BitmapStreamTest::ReadWriteTest()
 		 1) == B_ERROR);
 	CPPUNIT_ASSERT(stream.ReadAt(stream.Size() + 1,
 		&(chbuf[0]), 1) == B_ERROR);
-	CPPUNIT_ASSERT(stream.ReadAt(0, NULL, 1) == B_BAD_VALUE);	
+	#if !TEST_R5
+		// Be's version doesn't check for NULL
+		CPPUNIT_ASSERT(stream.ReadAt(0, NULL, 1) == B_BAD_VALUE);
+	#endif
+	
+	// There is a segment violation with Be's version when stream is destroyed.
+	// Don't yet know why.
 }
 
 /**
