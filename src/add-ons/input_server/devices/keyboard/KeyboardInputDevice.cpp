@@ -628,6 +628,22 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 			LOG(" %Ld, %02x, %02lx\n", timestamp, is_keydown, keycode);
 			
+			if (is_keydown
+				&& (keycode == 0x68) ) { // MENU KEY for OpenTracker 5.2.0+
+				bool nokey = true;
+				for (int32 i=0; i<16; i++)
+					if (states[i] != 0) {
+						nokey = false;
+						break;
+					}
+				
+				if (nokey) {		
+					BMessenger msger("application/x-vnd.Be-TSKB");
+					if (msger.IsValid())
+						msger.SendMessage('BeMn');
+				}
+			}
+			
 			if (is_keydown)
 				states[(keycode)>>3] |= (1 << (7 - (keycode & 0x7)));
 			else
@@ -644,12 +660,6 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				// cancel timer only for R5
 				if (ioctl(dev->fd, kCancelTimer, NULL) == B_OK)
 					LOG("kCancelTimer : OK\n");
-			}
-			
-			if (is_keydown
-				&& (keycode == 0x68)) { // MENU KEY for OpenTracker 5.2.0+
-				
-				BMessenger("application/x-vnd.Be-TSKB").SendMessage('BeMn');
 			}
 			
 			uint32 modifiers = keymap->Modifier(keycode);
