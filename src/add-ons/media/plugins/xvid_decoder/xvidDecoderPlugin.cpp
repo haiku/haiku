@@ -243,8 +243,8 @@ xvidDecoderPlugin::NewDecoder()
 			TRACE("xvidDecoder: xvid API_VERSION mismatch\n");
 			return NULL;
 		}
+		initdone = true;
 	}
-	initdone = true;
 	return new xvidDecoder;
 }
 

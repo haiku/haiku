@@ -16,22 +16,20 @@
 
 vorbisDecoder::vorbisDecoder()
 {
-	InitMP3(&fMpgLibPrivate);
+	vorbis_info_init(&fVorbisInfo);
+
 	fResidualBytes = 0;
 	fResidualBuffer = 0;
 	fDecodeBuffer = new uint8 [DECODE_BUFFER_SIZE];
 	fStartTime = 0;
 	fFrameSize = 0;
-	fFrameRate = 0;
 	fBitRate = 0;
-	fChannelCount = 0;
 	fOutputBufferSize = 0;
 }
 
 
 vorbisDecoder::~vorbisDecoder()
 {
-	ExitMP3(&fMpgLibPrivate);
 	delete [] fDecodeBuffer;
 }
 
@@ -40,23 +38,18 @@ status_t
 vorbisDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	// decode first chunk to initialize mpeg library
-	if (B_OK != DecodeNextChunk()) {
-		printf("vorbisDecoder::Setup failed, can't decode first chunk\n");
+	if (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO) {
+		TRACE("vorbisDecoder::Setup not called with encoded video");
 		return B_ERROR;
 	}
 
-	// initialize fBitRate, fFrameRate and fChannelCount from mpg decode library values of first header
-	extern int tabsel_123[2][3][16];
-	extern long freqs[9];
-	fBitRate = tabsel_123[fMpgLibPrivate.fr.lsf][fMpgLibPrivate.fr.lay-1][fMpgLibPrivate.fr.bitrate_index] * 1000;
-	fFrameRate = freqs[fMpgLibPrivate.fr.sampling_frequency];
-	fChannelCount = fMpgLibPrivate.fr.stereo;
+	// save the extractor information for future reference
+	fOutput = ioEncodedFormat->u.encoded_audio.output;
+	fBitRate = ioEncodedFormat->u.encoded_audio.bit_rate;
+	fFrameSize = ioEncodedFormat->u.encoded_audio.frame_size;
 	
-	printf("vorbisDecoder::Setup: channels %d, bitrate %d, framerate %d\n", fChannelCount, fBitRate, fFrameRate);
-	
-	// put some more useful info into the media_format describing our input format
-	ioEncodedFormat->u.encoded_audio.bit_rate = fBitRate;
+	printf("vorbisDecoder::Setup: bitrate %d\n", fBitRate);
+
 	
 	return B_OK;
 }
@@ -75,13 +68,15 @@ vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.channel_count = fChannelCount;
 	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT; // XXX should support other formats, too
 	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
-	if (ioDecodedFormat->u.raw_audio.buffer_size < 512 || ioDecodedFormat->u.raw_audio.buffer_size > 65536)
-		ioDecodedFormat->u.raw_audio.buffer_size = BMediaRoster::Roster()->AudioBufferSizeFor(
-														fChannelCount,
-														ioDecodedFormat->u.raw_audio.format,
-														fFrameRate);
+	if (ioDecodedFormat->u.raw_audio.buffer_size < 512
+     || ioDecodedFormat->u.raw_audio.buffer_size > 65536)
+		ioDecodedFormat->u.raw_audio.buffer_size
+	      = BMediaRoster::Roster()->AudioBufferSizeFor(fChannelCount,
+													   ioDecodedFormat->u.raw_audio.format,
+													   fFrameRate);
 	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
-		ioDecodedFormat->u.raw_audio.channel_mask = (fChannelCount == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+		ioDecodedFormat->u.raw_audio.channel_mask
+		  = (fChannelCount == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 
 	// setup rest of the needed variables
 	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * fChannelCount;
@@ -175,12 +170,10 @@ vorbisDecoderPlugin::NewDecoder()
 {
 	static BLocker locker;
 	static bool initdone = false;
-	locker.Lock();
+	BAutolock lock(locker);
 	if (!initdone) {
-		InitMpgLib();
 		initdone = true;
 	}
-	locker.Unlock();
 	return new vorbisDecoder;
 }
 
@@ -188,15 +181,7 @@ vorbisDecoderPlugin::NewDecoder()
 status_t
 vorbisDecoderPlugin::RegisterPlugin()
 {
-	PublishDecoder("audiocodec/mpeg1layer1", "mp3", "MPEG 1 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg1layer2", "mp3", "MPEG 1 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg1layer3", "mp3", "MPEG 1 audio layer 3 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer1", "mp3", "MPEG 2 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer2", "mp3", "MPEG 2 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer3", "mp3", "MPEG 2 audio layer 3 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer1", "mp3", "MPEG 2.5 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer2", "mp3", "MPEG 2.5 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer3", "mp3", "MPEG 2.5 audio layer 3 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/vorbis", "vorbis", "vorbis decoder, based on libvorbis");
 	return B_OK;
 }
 

@@ -24,15 +24,15 @@ public:
 	status_t	DecodeNextChunk();
 	
 private:
-	struct mpstr	fMpgLibPrivate;
+	struct vorbis_dsp_state fVorbisDspState;
+	struct vorbis_info fVorbisInfo;
+	struct media_raw_video_format fOutput;
 	int32			fResidualBytes;
 	uint8 *			fResidualBuffer;
 	uint8 *			fDecodeBuffer;
 	bigtime_t		fStartTime;
 	int				fFrameSize;
-	int				fFrameRate;
 	int				fBitRate;
-	int				fChannelCount;
 	int				fOutputBufferSize;
 };
 
