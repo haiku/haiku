@@ -22,12 +22,8 @@
 #include <MDRLanguage.h>
 
 
-#ifdef BONE
-	#include <sys/socket.h>
-	#include <arpa/inet.h>
-#else
-	#include <socket.h>
-#endif
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 #if USESSL
 	#include <openssl/ssl.h>
@@ -108,7 +104,11 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_NAME_NOT_FOUND;
 	}
 	
+#ifdef BONE
 	conn = socket(AF_INET, SOCK_STREAM, 0);
+#else
+	conn = socket(AF_INET, 2, 0);
+#endif
 	if (conn >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));

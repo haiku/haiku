@@ -19,14 +19,10 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#ifdef BONE
-	#include <sys/socket.h>
-	#include <arpa/inet.h>
-	#include <sys/time.h>
-	#include <sys/select.h>
-#else
-	#include <socket.h>
-#endif
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <sys/select.h>
 
 #ifdef USESSL
 	#include <openssl/ssl.h>
@@ -158,7 +154,11 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		return;
 	}
 	
+#ifdef BONE
 	net = socket(AF_INET, SOCK_STREAM, 0);
+#else
+	net = socket(AF_INET, 2, 0);
+#endif
 	if (net >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));

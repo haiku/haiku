@@ -3,14 +3,23 @@ SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-SubDirC++Flags -DBONE ;
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
+} else {
+	SubDirC++Flags -DBONE ;
+}
 
 Addon SMTP : mail_daemon outbound_protocols :
 	smtp.cpp
 	md5c.c ;
 
-LinkSharedOSLibs SMTP :
-	 be libmail.so socket bind ;
+if $(TARGET_PLATFORM) = r5 {
+	LinkSharedOSLibs SMTP :
+		 be libmail.so net ;
+} else {
+	LinkSharedOSLibs SMTP :
+		 be libmail.so socket bind ;
+}
 
 Package haiku-maildaemon-cvs :
 	SMTP : 

@@ -29,14 +29,10 @@
 
 #include <MDRLanguage.h>
 
-#ifdef BONE
-	#include <sys/socket.h>
-	#include <sys/time.h>
-	#include <sys/select.h>
-	#include <arpa/inet.h>
-#else
-	#include <socket.h>
-#endif
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/select.h>
+#include <arpa/inet.h>
 
 #define CRLF "\r\n"
 #define SMTP_RESPONSE_SIZE 8192
@@ -181,7 +177,11 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 	if (hostIP == 0)
 		return EHOSTUNREACH;
 		
+#ifdef BONE
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
+#else
+	_fd = socket(AF_INET, 2, 0);
+#endif
 	if (_fd >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));

@@ -4,10 +4,14 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-SubDirC++Flags -DBONE ;
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
+} else {
+	SubDirC++Flags -DBONE ;
+}
 
 if $(USESSL) {
-	SubDirC++Flags -DBONE -DUSESSL ;
+	SubDirC++Flags -DUSESSL ;
 	SubDirHdrs [ FDirName / boot home config include ] ;
 }
 
@@ -19,6 +23,9 @@ Addon IMAP : mail_daemon inbound_protocols :
 if $(USESSL) {
 	LinkSharedOSLibs IMAP :
 		be libmail.so socket bind ssl crypto ;
+} else if $(TARGET_PLATFORM) = r5 {
+	LinkSharedOSLibs IMAP :
+		 be libmail.so net ;
 } else {
 	LinkSharedOSLibs IMAP :
 		 be libmail.so socket bind ;
