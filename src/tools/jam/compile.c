@@ -380,6 +380,19 @@ compile_null(
 }
 
 /*
+ * compile_jumptoeof() - terminates parsing of the current file
+ */
+
+LIST *
+compile_jumptoeof(
+	PARSE	*parse,
+	LOL	*args )
+{
+	parse_jumptoeof();
+	return L0;
+}
+
+/*
  * compile_on() - run rule under influence of on-target variables
  *
  * 	parse->left	list of files to include (can only do 1)
@@ -541,9 +554,10 @@ compile_rules(
 	/* Optimize recursion on the right by looping. */
 
 	do list_free( (*parse->left->func)( parse->left, args ) );
-	while( (parse = parse->right)->func == compile_rules );
+	while( (parse = parse->right)->func == compile_rules
+		   && !parse_shall_skip() );
 
-	return (*parse->func)( parse, args );
+	return (parse_shall_skip() ? L0 :(*parse->func)( parse, args ));
 }
 
 /*

@@ -15,6 +15,7 @@ LIST *compile_foreach( PARSE *parse, LOL *args );
 LIST *compile_if( PARSE *parse, LOL *args );
 LIST *compile_eval( PARSE *parse, LOL *args );
 LIST *compile_include( PARSE *parse, LOL *args );
+LIST *compile_jumptoeof( PARSE *parse, LOL *args );
 LIST *compile_list( PARSE *parse, LOL *args );
 LIST *compile_local( PARSE *parse, LOL *args );
 LIST *compile_null( PARSE *parse, LOL *args );
