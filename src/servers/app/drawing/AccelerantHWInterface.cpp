@@ -20,6 +20,7 @@
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Region.h>
+#include <Screen.h>
 
 #include <Accelerant.h>
 #include <graphic_driver.h>
@@ -748,7 +749,7 @@ AccelerantHWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			// has a class that handles this, something so useful
 			// should be moved to a more public place.
 			// TODO: assumes BGR order again
-			/*BScreen screen;
+			BScreen screen;
 			for (; y <= bottom; y++) {
 				uint8* srcHandle = src;
 				uint8* dstHandle = dst;
@@ -762,7 +763,7 @@ AccelerantHWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 				}
 				dst += dstBPR;
 				src += srcBPR;
-			}*/
+			}
 			break;
 		}
 		case B_GRAY8: {
