@@ -31,12 +31,10 @@
 
 #include <OS.h>
 #include <MediaDefs.h>
+#include <strings.h>
 #include "multi_audio.h"
 #include "multi.h"
 #include "ac97.h"
-
-//#define DEBUG 1
-
 #include "debug.h"
 #include "emuxki.h"
 #include "util.h"
@@ -908,8 +906,7 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 
 	ASSERT(BUFFER_COUNT == 2);
 	
-	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; // XXX ???
-//	data->flags = 0;
+	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; 
 		
 	data->return_playback_buffers = BUFFER_COUNT;	/* playback_buffers[b][] */
 	data->return_playback_channels = pchannels + pchannels2;		/* playback_buffers[][c] */
@@ -1060,7 +1057,6 @@ emuxki_buffer_exchange(emuxki_dev *card, multi_buffer_info *data)
 static status_t 
 emuxki_buffer_force_stop(emuxki_dev *card)
 {
-	//emuxki_voice_halt(card->pvoice);
 	return B_OK;
 }
 
@@ -1211,7 +1207,6 @@ emuxki_open(const char *name, uint32 flags, void** cookie)
 	emuxki_stream_set_audioparms(card->rstream2, true, 2, true, 48000);
 	recparams.efx_voices[0] = 3; // channels 1,2
 	recparams.efx_voices[1] = 0;
-	//emuxki_voice_set_recparms(card->rvoice, EMU_RECSRC_FX, &recparams);
 	emuxki_stream_set_recparms(card->rstream, EMU_RECSRC_ADC, NULL);
 	emuxki_stream_set_recparms(card->rstream2, EMU_RECSRC_FX, &recparams);
 	

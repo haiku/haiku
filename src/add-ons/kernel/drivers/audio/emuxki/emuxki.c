@@ -337,8 +337,9 @@ emuxki_chanparms_set_defaults(emuxki_channel *chan)
 	chan->fxsend.c.level = chan->fxsend.d.level =
 	/* for audigy */
 	chan->fxsend.e.level = chan->fxsend.f.level =	
-	chan->fxsend.g.level = chan->fxsend.h.level = 0xc0;	/* not max */
-	
+	chan->fxsend.g.level = chan->fxsend.h.level = 
+		IS_AUDIGY(&chan->voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
+		
 	chan->fxsend.a.dest = 0x0;
 	chan->fxsend.b.dest = 0x1;
 	chan->fxsend.c.dest = 0x2;
@@ -454,10 +455,6 @@ static void
 emuxki_channel_set_bufparms(emuxki_channel *chan,
 			     uint32 start, uint32 end)
 {
-	//uint8        shift;
-	//emuxki_voice *voice = chan->voice;
-
-	//shift = voice->stereo + voice->b16;
 	chan->loop.start = start & EMU_CHAN_PSST_LOOPSTARTADDR_MASK;
 	chan->loop.end = end & EMU_CHAN_DSL_LOOPENDADDR_MASK;
 }
@@ -705,7 +702,7 @@ emuxki_voice_dataloc_create(emuxki_voice *voice)
 		if ((error = emuxki_voice_channel_create(voice)))
 			return (error);
 	} else {
-		//return B_ERROR;
+		
 	}
 	return B_OK;
 }
@@ -743,6 +740,9 @@ static void
 emuxki_voice_fxupdate(emuxki_voice *voice)
 {
 	emuxki_chanparms_fxsend fxsend;
+	
+	uint8 maxlevel = 
+		IS_AUDIGY(&voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
 
 	if (voice->use & EMU_USE_PLAY) {
 		fxsend.a.dest = 0x3f;
@@ -763,18 +763,18 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 2:
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum > 1 - 1)
 							fxsend.a.dest-=2;
 					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
 							fxsend.a.dest = 0x0;
-							fxsend.a.level = 0xc0 / 2;
+							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 2 badly managed\n"));
 					}
@@ -782,18 +782,18 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 4:
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 2;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 					} else if((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
 						fxsend.a.dest = 0x0;
-						fxsend.a.level = 0xc0 / 2;
+						fxsend.a.level = maxlevel / 2;
 						fxsend.b.dest = 0x1;
-						fxsend.b.level = 0xc0 / 2;
+						fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 4 badly managed\n"));
 					}
@@ -801,25 +801,25 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 6: // only on audigy
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 2;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 						fxsend.c.dest = 0x4;
-						fxsend.c.level = 0xc0 / 2;
+						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
-						fxsend.d.level = 0xc0 / 2;
+						fxsend.d.level = maxlevel / 2;
 					} else if(voice->stream->nstereo == 2) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum < 1) {
 							fxsend.b.dest = 0x4;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
-							fxsend.c.level = 0xc0 / 2;
+							fxsend.c.level = maxlevel / 2;
 						}
 					} else if(voice->stream->nstereo == 3) {
 						fxsend.a.dest = voice->voicenum * 2;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 6 badly managed\n"));
 					}
@@ -833,18 +833,18 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 2:
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum > 1 - 1)
 							fxsend.a.dest-=2;
 					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
 							fxsend.a.dest = 0x0;
-							fxsend.a.level = 0xc0 / 2;
+							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 2 badly managed\n"));
 					}
@@ -852,18 +852,18 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 4:
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 3;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 					} else if((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
 						fxsend.a.dest = 0x0;
-						fxsend.a.level = 0xc0 / 2;
+						fxsend.a.level = maxlevel / 2;
 						fxsend.b.dest = 0x1;
-						fxsend.b.level = 0xc0 / 2;
+						fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 4 badly managed\n"));
 					}
@@ -871,25 +871,25 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 6: // only on audigy
 					if(voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 3;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 						fxsend.c.dest = 0x4;
-						fxsend.c.level = 0xc0 / 2;
+						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
-						fxsend.d.level = 0xc0 / 2;
+						fxsend.d.level = maxlevel / 2;
 					} else if(voice->stream->nstereo == 2) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum < 1) {
 							fxsend.b.dest = 0x4;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
-							fxsend.c.level = 0xc0 / 2;
+							fxsend.c.level = maxlevel / 2;
 						}
 					} else if(voice->stream->nstereo == 3) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 6 badly managed\n"));
 					}
@@ -903,23 +903,23 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 2:
 					if(voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 					} else if(voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if((voice->stream->nmono == 4) || 
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum > 2 - 1)
 							fxsend.a.dest-=2;
 					} else if(voice->stream->nmono == 6 && voice->voicenum > 3) {
 							fxsend.a.dest = 0x0;
-							fxsend.a.level = 0xc0 / 2;
+							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 2 badly managed\n"));
 					}
@@ -927,27 +927,27 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 4:
 					if(voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 						fxsend.c.dest = voice->voicenum + 2;
-						fxsend.c.level = 0xc0;
+						fxsend.c.level = maxlevel;
 						fxsend.d.dest = voice->voicenum + 3;
-						fxsend.d.level = 0xc0;
+						fxsend.d.level = maxlevel;
 					} else if(voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 2;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 					} else if((voice->stream->nmono == 4) || 
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else if(voice->stream->nmono == 6 && voice->voicenum > 3) {
 							fxsend.a.dest = 0x0;
-							fxsend.a.level = 0xc0 / 2;
+							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 4 badly managed\n"));
 					}
@@ -955,38 +955,38 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 				case 6: // only on audigy
 					if(voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 						fxsend.c.dest = voice->voicenum + 2;
-						fxsend.c.level = 0xc0;
+						fxsend.c.level = maxlevel;
 						fxsend.d.dest = voice->voicenum + 3;
-						fxsend.d.level = 0xc0;
+						fxsend.d.level = maxlevel;
 						fxsend.e.dest = voice->voicenum + 4;
-						fxsend.e.level = 0xc0;
+						fxsend.e.level = maxlevel;
 						fxsend.f.dest = voice->voicenum + 5;
-						fxsend.f.level = 0xc0;
+						fxsend.f.level = maxlevel;
 					} else if(voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 2;
-						fxsend.b.level = 0xc0;
+						fxsend.b.level = maxlevel;
 						fxsend.c.dest = 0x4;
-						fxsend.c.level = 0xc0 / 2;
+						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
-						fxsend.d.level = 0xc0 / 2;
+						fxsend.d.level = maxlevel / 2;
 					} else if(voice->stream->nmono == 4) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 						if(voice->voicenum < 2) {
 							fxsend.b.dest = 0x4;
-							fxsend.b.level = 0xc0 / 2;
+							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
-							fxsend.c.level = 0xc0 / 2;
+							fxsend.c.level = maxlevel / 2;
 						}
 					} else if(voice->stream->nmono == 6) {
 						fxsend.a.dest = voice->voicenum;
-						fxsend.a.level = 0xc0;
+						fxsend.a.level = maxlevel;
 					} else {
 						LOG(("emuxki_voice_set_stereo case 6 badly managed\n"));
 					}
@@ -1331,13 +1331,6 @@ emuxki_voice_start(emuxki_voice *voice)
 	voice->state |= EMU_STATE_STARTED;
 	if (voice->use & EMU_USE_PLAY) {
 		emuxki_resched_timer(voice->stream->card);
-		
-		//emuxki_chan_write(&voice->stream->card->config, 0, 0x66, 1);
-		
-		//emuxki_chan_write(&voice->stream->card->config, 0, EMU_CLIEL, 1);
-		
-		/*emuxki_chan_write(&voice->stream->card->config, 0, EMU_MKSUBREG(1, 0,
-					       EMU_CLIEL + (0 >> 5)), 1);*/
 	}
 }
 
@@ -1375,8 +1368,6 @@ emuxki_voice_halt(emuxki_voice *voice)
 	voice->state &= ~EMU_STATE_STARTED;
 	if (voice->use & EMU_USE_PLAY) {
 		emuxki_resched_timer(voice->stream->card);
-		
-		//emuxki_chan_write(&voice->stream->card->config, 0, EMU_CLIEL, 0);
 	}
 }
 
@@ -1879,7 +1870,7 @@ int32 emuxki_int(void *arg)
 	while ((ipr = emuxki_reg_read_32(&card->config, EMU_IPR))) {
 		gotone = true;
 		if (ipr & EMU_IPR_INTERVALTIMER) {
-			TRACE(("EMU_IPR_INTERVALTIMER\n"));
+			//TRACE(("EMU_IPR_INTERVALTIMER\n"));
 			LIST_FOREACH(stream, &card->streams, next) {
 				if ((stream->use & EMU_USE_PLAY) == 0 ||
 					(stream->state & EMU_STATE_STARTED) == 0 ||
@@ -1887,7 +1878,7 @@ int32 emuxki_int(void *arg)
 						continue;
 				
 				voice = stream->first_voice;
-				TRACE(("voice %p\n", voice));
+				//TRACE(("voice %p\n", voice));
 				curblk = emuxki_voice_curaddr(voice) /
 				       voice->blksize;
 				//TRACE(("EMU_IPR_INTERVALTIMER at trigblk %lu\n", curblk));
@@ -1896,7 +1887,7 @@ int32 emuxki_int(void *arg)
 					//TRACE(("EMU_IPR_INTERVALTIMER at trigblk %lu\n", curblk));
 					//dump_voice(voice);
 					//trace_hardware_regs(&card->config);
-					TRACE(("voice pointer %p\n", voice));
+					//TRACE(("voice pointer %p\n", voice));
 														
 					if(stream->inth)
 						stream->inth(stream->inthparam);
@@ -1924,7 +1915,8 @@ int32 emuxki_int(void *arg)
 			LIST_FOREACH(stream, &card->streams, next) {
 				if ((stream->use & EMU_USE_RECORD) == 0 ||
 					(stream->state & EMU_STATE_STARTED) == 0 ||
-					(stream->inth == NULL))
+					(stream->inth == NULL) ||
+					(stream->first_voice == NULL))
 						continue;
 				voice = stream->first_voice;
 				curblk = emuxki_voice_curaddr(voice) /
@@ -2018,8 +2010,7 @@ static void
 make_device_names(
 	emuxki_dev * card)
 {
-	/*char * name = card->name;
-	sprintf(name, "emuxki/%ld", card-cards+1);*/
+
 #if MIDI	
 	sprintf(card->midi.name, "midi/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
@@ -2090,6 +2081,9 @@ emuxki_setup(emuxki_dev * card)
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_AC3ENABLE_CDSPDIF | EMU_HCFG_AC3ENABLE_GPSPDIF| 
 			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
+	} else if(IS_AUDIGY(&card->config)) {
+		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
+			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
 	} else {
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
@@ -2104,9 +2098,6 @@ emuxki_setup(emuxki_dev * card)
 	
 	dump_hardware_regs(&card->config);
 	
-	PRINT(("installing interrupt : %x\n", card->config.irq));
-	install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
-		
 	/*PRINT(("codec master output = %#04x\n",emuxki_codec_read(&card->config, 0x02)));
 	PRINT(("codec aux output    = %#04x\n",emuxki_codec_read(&card->config, 0x04)));
 	PRINT(("codec mono output   = %#04x\n",emuxki_codec_read(&card->config, 0x06)));
@@ -2168,6 +2159,9 @@ emuxki_setup(emuxki_dev * card)
 	} else {
 		card->play_mode = 4;	// mode 4.0
 	}
+	
+	PRINT(("installing interrupt : %x\n", card->config.irq));
+	install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
 	
 	PRINT(("init_driver done\n"));
 
@@ -2273,35 +2267,35 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_A_DSP_GPR(p_cd_in_gpr->gpr + 1));
 		
-		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_LEFT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
-				  EMU_DSP_FX(0), EMU_A_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(0), EMU_A_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
-				  EMU_DSP_FX(1), EMU_A_DSP_CST(0));
+				  EMU_DSP_FX(1), EMU_A_DSP_CST(4));
 		
-		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_LEFT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
-				  EMU_DSP_FX(2), EMU_A_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(2), EMU_A_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
-				  EMU_DSP_FX(3), EMU_A_DSP_CST(0));
+				  EMU_DSP_FX(3), EMU_A_DSP_CST(4));
 				  
-		/* Center/Sub GPR = 0 + FX(4/5) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Center/Sub GPR = 0 + FX(4/5) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_CENTER),
 				  EMU_A_DSP_CST(0),
-				  EMU_DSP_FX(4), EMU_A_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(4), EMU_A_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_SUB),
 				  EMU_A_DSP_CST(0),
-				  EMU_DSP_FX(5), EMU_A_DSP_CST(0));
+				  EMU_DSP_FX(5), EMU_A_DSP_CST(4));
 		
 		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */  
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
@@ -2422,35 +2416,35 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_DSP_GPR(p_cd_in_gpr->gpr + 1));
 	
-		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_LEFT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
-				  EMU_DSP_FX(0), EMU_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(0), EMU_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
-				  EMU_DSP_FX(1), EMU_DSP_CST(0));
+				  EMU_DSP_FX(1), EMU_DSP_CST(4));
 		
-		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_LEFT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
-				  EMU_DSP_FX(2), EMU_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(2), EMU_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
-				  EMU_DSP_FX(3), EMU_DSP_CST(0));
+				  EMU_DSP_FX(3), EMU_DSP_CST(4));
 				  
-		/* Center/Sub GPR = 0 + FX(4/5) + 0 */
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+		/* Center/Sub GPR = 0 + FX(4/5) * 4 */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_CENTER),
 				  EMU_DSP_CST(0),
-				  EMU_DSP_FX(4), EMU_DSP_CST(0));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
+				  EMU_DSP_FX(4), EMU_DSP_CST(4));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_SUB),
 				  EMU_DSP_CST(0),
-				  EMU_DSP_FX(5), EMU_DSP_CST(0));
+				  EMU_DSP_FX(5), EMU_DSP_CST(4));
 		
 		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */  
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
@@ -2579,6 +2573,7 @@ emuxki_init(emuxki_dev * card)
 	
 	if(IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_SPBYPASS, EMU_SPBYPASS_24_BITS);
+		emuxki_chan_write(&card->config, 0, EMU_AC97SLOT, EMU_AC97SLOT_CENTER | EMU_AC97SLOT_LFE);
 	}
 
 	/* Initialize all channels to stopped and no effects */
@@ -2740,17 +2735,12 @@ init_driver(void)
 		ix++;
 	}
 	if (!num_cards) {
-		PRINT(("no cards\n"));
 		put_module(mpu401_name);
 		put_module(pci_name);
 		PRINT(("emuxki: no suitable cards found\n"));
 		return ENODEV;
 	}
 
-	
-#if DEBUG
-	//add_debugger_command("emuxki", emuxki_debug, "emuxki [card# (1-n)]");
-#endif
 	return B_OK;
 }
 
@@ -2828,8 +2818,7 @@ uninit_driver(void)
 	num_cards = 0;
 
 	PRINT(("uninit_driver()\n"));
-	//remove_debugger_command("emuxki", emuxki_debug);
-
+	
 	for (ix=0; ix<cnt; ix++) {
 		emuxki_shutdown(&cards[ix]);
 	}
