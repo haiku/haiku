@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tools translation inspector ;
 AddResources Inspector : Inspector.rsrc ;
 
 App Inspector : 
+	TranslatorItem.cpp
 	StatusCheck.cpp
 	ActiveTranslatorsWindow.cpp
 	InfoWindow.cpp

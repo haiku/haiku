@@ -34,8 +34,11 @@
 #include "ImageView.h"
 #include "Constants.h"
 #include "StatusCheck.h"
+#include "InspectorApp.h"
+#include "TranslatorItem.h"
 #include <Application.h>
 #include <Message.h>
+#include <List.h>
 #include <String.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
@@ -52,12 +55,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#define BORDER_WIDTH 16
+#define BORDER_HEIGHT 16
+#define PEN_SIZE 1.0f
+
 ImageView::ImageView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	fpbitmap = NULL;
 	
-	SetViewColor(255, 255, 255);
+	SetViewColor(192, 192, 192);
+	SetHighColor(0, 0, 0);
+	SetPenSize(PEN_SIZE);
 }
 
 ImageView::~ImageView()
@@ -75,21 +84,30 @@ ImageView::AttachedToWindow()
 void
 ImageView::Draw(BRect rect)
 {
-	if (HasImage())
-		DrawBitmap(fpbitmap, BPoint(0, 0));
+	if (HasImage()) {
+		// Draw black rectangle around image
+		StrokeRect(
+			BRect(BORDER_WIDTH - PEN_SIZE,
+				BORDER_HEIGHT - PEN_SIZE,
+				fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
+				fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE));
+		
+		DrawBitmap(fpbitmap, BPoint(BORDER_WIDTH, BORDER_HEIGHT));
+	}
+}
+
+void
+ImageView::ReDraw()
+{
+	Draw(Bounds());
 }
 
 void
 ImageView::FrameResized(float width, float height)
 {
 	AdjustScrollBars();
-	
-	// If there is a bitmap, draw it.
-	// If not, invalidate the entire view so that
-	// the advice text will be displayed
-	if (HasImage())
-		ReDraw();
-	else
+
+	if (!HasImage())
 		Invalidate();
 }
 
@@ -186,9 +204,9 @@ ImageView::AdjustScrollBars()
 	float prop, range;
 	BScrollBar *psb = ScrollBar(B_HORIZONTAL);
 	if (psb) {
-		range = rctbitmap.Width() - rctview.Width();
+		range = rctbitmap.Width() + (BORDER_WIDTH * 2) - rctview.Width();
 		if (range < 0) range = 0;
-		prop = rctview.Width() / rctbitmap.Width();
+		prop = rctview.Width() / (rctbitmap.Width() + (BORDER_WIDTH * 2));
 		if (prop > 1.0f) prop = 1.0f;
 		psb->SetRange(0, range);
 		psb->SetProportion(prop);
@@ -197,9 +215,9 @@ ImageView::AdjustScrollBars()
 	
 	psb = ScrollBar(B_VERTICAL);
 	if (psb) {
-		range = rctbitmap.Height() - rctview.Height();
+		range = rctbitmap.Height() + (BORDER_HEIGHT * 2) - rctview.Height();
 		if (range < 0) range = 0;
-		prop = rctview.Height() / rctbitmap.Height();
+		prop = rctview.Height() / (rctbitmap.Height() + (BORDER_HEIGHT * 2));
 		if (prop > 1.0f) prop = 1.0f;
 		psb->SetRange(0, range);
 		psb->SetProportion(prop);
@@ -340,6 +358,33 @@ ImageView::UpdateInfoWindow(const BPath &path, const translator_info &tinfo,
 	be_app->PostMessage(&msg);
 }
 
+BTranslatorRoster *
+ImageView::SelectTranslatorRoster(BTranslatorRoster &roster)
+{
+	bool bNoneSelected = true;
+
+	InspectorApp *papp;
+	papp = static_cast<InspectorApp *>(be_app);
+	if (papp) {
+		BList *plist = papp->GetTranslatorsList();
+		if (plist) {
+			for (int32 i = 0; i < plist->CountItems(); i++) {
+				BTranslatorItem *pitem =
+					static_cast<BTranslatorItem *>(plist->ItemAt(i));
+				if (pitem->IsSelected()) {
+					bNoneSelected = false;
+					roster.AddTranslators(pitem->Path());
+				}
+			}
+		}
+	}
+	
+	if (bNoneSelected)
+		return BTranslatorRoster::Default();
+	else
+		return &roster;
+}
+
 void
 ImageView::SetImage(BMessage *pmsg)
 {
@@ -354,8 +399,9 @@ ImageView::SetImage(BMessage *pmsg)
 
 		BFile file(&ref, B_READ_ONLY);
 		chk = file.InitCheck();
-	
-		BTranslatorRoster *proster = BTranslatorRoster::Default();
+
+		BTranslatorRoster roster, *proster;
+		proster = SelectTranslatorRoster(roster);
 		if (!proster)
 			// throw exception
 			chk = B_ERROR;
@@ -398,9 +444,9 @@ ImageView::SetImage(BMessage *pmsg)
 		// reflect the size of the new bitmap
 		float width, height;
 		BMenuBar *pbar = pwin->KeyMenuBar();
-		width = fpbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH;
+		width = fpbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH + (BORDER_WIDTH * 2);
 		height = fpbitmap->Bounds().Height() +
-			pbar->Bounds().Height() + B_H_SCROLL_BAR_HEIGHT + 1;
+			pbar->Bounds().Height() + B_H_SCROLL_BAR_HEIGHT + (BORDER_HEIGHT * 2) + 1;
 			
 		BScreen *pscreen = new BScreen(pwin);
 		BRect rctscreen = pscreen->Frame();
@@ -424,8 +470,8 @@ ImageView::SetImage(BMessage *pmsg)
 			// for the current image
 		
 		// repaint view
-		FillRect(Bounds());
-		ReDraw();
+		Invalidate();
+
 	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
 			"Sorry, unable to load the image.", "OK");

@@ -34,21 +34,22 @@
 
 #include <Window.h>
 #include <OutlineListView.h>
+#include <List.h>
 
 class ActiveTranslatorsWindow : public BWindow {
 public:
-	ActiveTranslatorsWindow(BRect rect, const char *name);
+	ActiveTranslatorsWindow(BRect rect, const char *name, BList *plist);
 	~ActiveTranslatorsWindow();
 	void FrameResized(float width, float height);
 	void MessageReceived(BMessage *pmsg);
 	void Quit();
 	
 private:
-	void AddTranslatorsToList(const char *path, BStringItem *pparent);
+	void AddTranslatorsToList(BList *plist, int32 group, BStringItem *pparent);
 	
-	BOutlineListView *fplist;
-	BStringItem *fpuserItem;
-	BStringItem *fpsystemItem;
+	BOutlineListView *fpListView;
+	BStringItem *fpUserItem;
+	BStringItem *fpSystemItem;
 };
 
 #endif // #ifndef ACTIVETRANSLATORSWINDOW_H

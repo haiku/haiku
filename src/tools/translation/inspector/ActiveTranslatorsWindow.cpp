@@ -31,6 +31,7 @@
 
 #include "Constants.h"
 #include "ActiveTranslatorsWindow.h"
+#include "TranslatorItem.h"
 #include <Application.h>
 #include <ScrollView.h>
 #include <Message.h>
@@ -41,22 +42,25 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name)
-	: BWindow(rect, name, B_FLOATING_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name,
+	BList *plist)
+	: BWindow(rect, name, B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BRect rctframe = Bounds();
 	rctframe.InsetBy(5, 5);
 	rctframe.right -= B_V_SCROLL_BAR_WIDTH;
 	
-	fplist = new BOutlineListView(rctframe, "translators_list",
+	fpListView = new BOutlineListView(rctframe, "translators_list",
 		B_MULTIPLE_SELECTION_LIST);
 
-	fplist->AddItem(fpuserItem = new BStringItem("User Translators"));
-	fplist->AddItem(fpsystemItem = new BStringItem("System Translators"));
-	AddTranslatorsToList("/boot/home/config/add-ons/Translators", fpuserItem);
-	AddTranslatorsToList("/system/add-ons/Translators", fpsystemItem);
+	fpListView->AddItem(fpUserItem = new BStringItem("User Translators"));
+	fpUserItem->SetEnabled(false);
+	fpListView->AddItem(fpSystemItem = new BStringItem("System Translators"));
+	fpSystemItem->SetEnabled(false);
+	AddTranslatorsToList(plist, USER_TRANSLATOR, fpUserItem);
+	AddTranslatorsToList(plist, SYSTEM_TRANSLATOR, fpSystemItem);
 	
-	AddChild(new BScrollView("scroll_list", fplist, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	AddChild(new BScrollView("scroll_list", fpListView, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		0, false, true));
 	
 	SetSizeLimits(100, 10000, 100, 10000);
@@ -65,27 +69,15 @@ ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name)
 }
 
 void
-ActiveTranslatorsWindow::AddTranslatorsToList(const char *path,
+ActiveTranslatorsWindow::AddTranslatorsToList(BList *plist, int32 group,
 	BStringItem *pparent)
 {
-	DIR *dir = opendir(path);
-	if (!dir) {
-		return;
+	BTranslatorItem *pitem;
+	for (int32 i = 0; i < plist->CountItems(); i++) {
+		pitem = static_cast<BTranslatorItem *>(plist->ItemAt(i));
+		if (pitem->Group() == group)
+			fpListView->AddUnder(pitem, pparent);
 	}
-	struct dirent *dent;
-	struct stat stbuf;
-	char cwd[PATH_MAX] = "";
-	while (NULL != (dent = readdir(dir))) {
-		strcpy(cwd, path);
-		strcat(cwd, "/");
-		strcat(cwd, dent->d_name);
-		status_t err = stat(cwd, &stbuf);
-
-		if (!err && S_ISREG(stbuf.st_mode) &&
-			strcmp(dent->d_name, ".") && strcmp(dent->d_name, ".."))
-			fplist->AddUnder(new BStringItem(dent->d_name), pparent);
-	}
-	closedir(dir);
 }
 
 ActiveTranslatorsWindow::~ActiveTranslatorsWindow()

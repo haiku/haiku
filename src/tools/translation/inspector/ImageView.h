@@ -36,6 +36,7 @@
 #include <View.h>
 #include <Bitmap.h>
 #include <Path.h>
+#include <TranslatorRoster.h>
 
 class ImageView : public BView {
 public:
@@ -56,9 +57,11 @@ public:
 private:
 	void UpdateInfoWindow(const BPath &path, const translator_info &info,
 		const char *tranname, const char *traninfo, int32 tranversion);
-	void ReDraw() { Draw(Bounds()); };
+	void ReDraw();
 	void AdjustScrollBars();
 	void SaveImageAtDropLocation(BMessage *pmsg);
+	
+	BTranslatorRoster *SelectTranslatorRoster(BTranslatorRoster &roster);
 	
 	BBitmap *fpbitmap;
 };

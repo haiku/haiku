@@ -33,15 +33,22 @@
 #include "InspectorApp.h"
 #include "Constants.h"
 #include "ImageWindow.h"
+#include "TranslatorItem.h"
 #include <Window.h>
 #include <Message.h>
 #include <String.h>
+#include <Directory.h>
 
 InspectorApp::InspectorApp()
 	: BApplication(APP_SIG)
 {
-	fpactiveswin = NULL;
-	fpinfowin = NULL;
+	fpActivesWin = NULL;
+	fpInfoWin = NULL;
+	
+	AddToTranslatorsList("/system/add-ons/Translators",
+		SYSTEM_TRANSLATOR);
+	AddToTranslatorsList("/boot/home/config/add-ons/Translators",
+		USER_TRANSLATOR);
 	
 	// Show application window
 	BRect rect(100, 100, 500, 400);
@@ -50,32 +57,49 @@ InspectorApp::InspectorApp()
 }
 
 void
+InspectorApp::AddToTranslatorsList(const char *folder, int32 group)
+{
+	BDirectory dir;
+	if (dir.SetTo(folder) == B_OK) {
+	
+		BEntry ent;
+		while (dir.GetNextEntry(&ent) == B_OK) {
+			BPath path;
+			if (ent.GetPath(&path) == B_OK)
+				flstTranslators.AddItem(
+					new BTranslatorItem(path.Leaf(), path.Path(), group));
+		}	
+	}
+}
+
+void
 InspectorApp::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
 		case M_ACTIVE_TRANSLATORS_WINDOW:
-			if (!fpactiveswin)
-				fpactiveswin = new ActiveTranslatorsWindow(
-					BRect(625, 350, 800, 600), "Active Translators");
+			if (!fpActivesWin)
+				fpActivesWin = new ActiveTranslatorsWindow(
+					BRect(625, 350, 800, 600), "Active Translators",
+					GetTranslatorsList());
 			break;
 		case M_ACTIVE_TRANSLATORS_WINDOW_QUIT:
-			fpactiveswin = NULL;
+			fpActivesWin = NULL;
 			break;
 			
 		case M_INFO_WINDOW:
-			if (!fpinfowin)
-				fpinfowin = new InfoWindow(BRect(625, 50, 800, 300),
+			if (!fpInfoWin)
+				fpInfoWin = new InfoWindow(BRect(625, 50, 800, 300),
 					"Info Win", fbstrInfo.String());
 			break;
 		case M_INFO_WINDOW_QUIT:
-			fpinfowin = NULL;
+			fpInfoWin = NULL;
 			break;	
 		case M_INFO_WINDOW_TEXT:
 			// If image view is telling me to
 			// update the info window...
 			pmsg->FindString("text", &fbstrInfo);
-			if (fpinfowin)
-				fpinfowin->PostMessage(pmsg);
+			if (fpInfoWin)
+				fpInfoWin->PostMessage(pmsg);
 			break;
 			
 		default:
@@ -91,6 +115,12 @@ InspectorApp::RefsReceived(BMessage *pmsg)
 	BWindow *pwin = WindowAt(0);
 	if (pwin)
 		pwin->PostMessage(pmsg);
+}
+
+BList *
+InspectorApp::GetTranslatorsList()
+{
+	return &flstTranslators;
 }
 
 int main(int argc, char **argv)

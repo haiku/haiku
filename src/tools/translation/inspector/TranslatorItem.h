@@ -1,12 +1,10 @@
 /*****************************************************************************/
-// InspectorApp
+// BTranslatorItem
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// InspectorApp.h
+// BTranslatorItem.h
 //
-// BApplication object for the Inspector application.  The purpose of 
-// Inspector is to provide the user with as much relevant information as
-// possible about the currently open document.
+// BStringItem based class for using a list of Translators in a BListView 
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -30,30 +28,29 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef INSPECTORAPP_H
-#define INSPECTORAPP_H
+#ifndef TRANSLATOR_ITEM_H
+#define TRANSLATOR_ITEM_H
 
-#include "ActiveTranslatorsWindow.h"
-#include "InfoWindow.h"
-#include <Application.h>
+#include <ListItem.h>
 #include <String.h>
-#include <List.h>
 
-class InspectorApp : public BApplication {
-public:
-	InspectorApp();
-	void MessageReceived(BMessage *pmsg);
-	void RefsReceived(BMessage *pmsg);
-	
-	BList *GetTranslatorsList();
-	
-private:
-	void AddToTranslatorsList(const char *folder, int32 group);
-
-	BString fbstrInfo;
-	BList flstTranslators;
-	ActiveTranslatorsWindow *fpActivesWin;
-	InfoWindow *fpInfoWin;
+// Group Options
+enum {
+	UNKNOWN_GROUP = 0,
+	SYSTEM_TRANSLATOR = 1,
+	USER_TRANSLATOR = 2
 };
 
-#endif // #ifndef INSPECTORAPP_H
+class BTranslatorItem : public BStringItem {
+public:
+	BTranslatorItem(const char *text, const char *path, int32 group);
+	
+	const char *Path() const;
+	int32 Group() const;
+	
+private:
+	BString fpath;
+	int32 fgroup;
+};
+
+#endif // #ifndef TRANSLATOR_ITEM_H
