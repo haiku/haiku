@@ -15,8 +15,8 @@
 #include <PPPManager.h>
 
 
-static const char version[] = "0.1 pre-alpha";
-static const char ppp_interface_module_name[] = PPP_INTERFACE_MODULE_NAME;
+static const char sVersion[] = "0.1 pre-alpha";
+static const char sPPPInterfaceModuleName[] = PPP_INTERFACE_MODULE_NAME;
 
 
 // R5 only: strlcat is needed by driver_settings API
@@ -55,7 +55,7 @@ static
 status_t
 print_help()
 {
-	fprintf(stderr, "OpenBeOS Network Team: pppconfig: version %s\n", version);
+	fprintf(stderr, "OpenBeOS Network Team: pppconfig: sVersion %s\n", sVersion);
 	fprintf(stderr, "With pppconfig you can create and manage PPP connections.\n");
 	fprintf(stderr, "Usage:\n");
 	fprintf(stderr, "pppconfig show | -a\n");
@@ -122,8 +122,23 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 				printf("Unknown\n");
 			
 			// status
-			printf("\tStatus: %s\n",
-				info.info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
+			printf("\tStatus: ");
+			switch(info.info.phase) {
+				case PPP_ESTABLISHED_PHASE:
+					printf("Connected\n");
+				break;
+				
+				case PPP_DOWN_PHASE:
+					printf("Disconnected\n");
+				break;
+				
+				case PPP_TERMINATION_PHASE:
+					printf("Disconnecting\n");
+				break;
+				
+				default:
+					printf("Connecting\n");
+			}
 		}
 	}
 	
@@ -361,8 +376,23 @@ show_details(const char *name)
 		printf("Unknown\n");
 	
 	// status
-	printf("Status: %s\n",
-		info.info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
+	printf("\tStatus: ");
+	switch(info.info.phase) {
+		case PPP_ESTABLISHED_PHASE:
+			printf("Connected\n");
+		break;
+		
+		case PPP_DOWN_PHASE:
+			printf("Disconnected\n");
+		break;
+		
+		case PPP_TERMINATION_PHASE:
+			printf("Disconnecting\n");
+		break;
+		
+		default:
+			printf("Connecting\n");
+	}
 	
 	return 0;
 }
