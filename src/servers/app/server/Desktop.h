@@ -132,4 +132,4 @@ private:
 
 extern Desktop* desktop;
 
-#endif _DESKTOP_H_
+#endif // _DESKTOP_H_

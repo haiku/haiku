@@ -342,7 +342,7 @@ void DefaultDecorator::GetFootprint(BRegion *region)
 								_frame.right, _frame.bottom));
 }
 
-BRect DefaultDecorator::SlideTab(float dx, float dy=0)
+BRect DefaultDecorator::SlideTab(float dx, float dy)
 {
 	//return Decorator::SlideTab(dx,dy);
 	return _tabrect;
