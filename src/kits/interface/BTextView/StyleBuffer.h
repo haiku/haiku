@@ -122,6 +122,7 @@ STEStyleRecordPtr _BStyleRecordBuffer_::operator[](int32 index) const
 }
 //------------------------------------------------------------------------------
 
+class _BInlineInput_;
 // _BStyleBuffer_ class --------------------------------------------------------
 class _BStyleBuffer_ {
 
@@ -150,7 +151,7 @@ public:
 		void				RemoveStyleRange(int32 fromOffset, int32 toOffset);
 		void				RemoveStyles(int32 index, int32 count = 1);
 		
-		int32				Iterate(int32 fromOffset, int32 length, /*_BInlineInput_ *,*/
+		int32				Iterate(int32 fromOffset, int32 length, _BInlineInput_ *,
 								const BFont **outFont = NULL,
 								const rgb_color **outColor = NULL,
 								float *outAscent = NULL,

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -28,9 +28,9 @@
 
 // TODO: 
 // - Finish documenting this class
-// - Consider using _PointerList_/BObjectList instead of BList
+// - Consider using BObjectList instead of BList
 // for disallowed charachters (it would remove a lot of reinterpret_casts)
-
+// - Asynchronous mouse tracking
 
 // Standard Includes -----------------------------------------------------------
 #include <cstdlib>
@@ -41,6 +41,7 @@
 #include <Beep.h>
 #include <Bitmap.h>
 #include <Clipboard.h>
+#include <Debug.h>
 #include <Errors.h>
 #include <Input.h>
 #include <Message.h>
@@ -51,6 +52,7 @@
 #include <Window.h>
 
 // Local Includes --------------------------------------------------------------
+#include "InlineInput.h"
 #include "LineBuffer.h"
 #include "StyleBuffer.h"
 #include "TextGapBuffer.h"
@@ -430,6 +432,8 @@ BTextView::MouseDown(BPoint where)
 	// should we even bother?
 	if (!fEditable && !fSelectable)
 		return;
+	
+	CancelInputMethod();
 	
 	if (!IsFocus())
 		MakeFocus();
@@ -819,23 +823,27 @@ BTextView::MessageReceived(BMessage *message)
 				switch (opcode) {
 					case B_INPUT_METHOD_STARTED:
 					{
-						printf("B_INPUT_METHOD_STARTED\n");
+						BMessenger messenger;
+						if (message->FindMessenger("be:reply_to", &messenger) == B_OK) {
+							ASSERT(fInline == NULL);
+							fInline = new _BInlineInput_(messenger);
+						}
+						
 						break;
 					}	
 					
 					case B_INPUT_METHOD_STOPPED:
 					{
-						printf("B_INPUT_METHOD_STOPPED\n");
+						delete fInline;
+						fInline = NULL;
 						break;
 					}
 					
 					case B_INPUT_METHOD_CHANGED:
-						printf("B_INPUT_METHOD_CHANGED\n");
 						HandleInputMethodChanged(message);
 						break;
 		
 					case B_INPUT_METHOD_LOCATION_REQUEST:
-						printf("B_INPUT_METHOD_LOCATION_REQUEST\n");
 						HandleInputMethodLocationRequest();
 						break;
 					
@@ -969,6 +977,9 @@ void
 BTextView::SetText(const char *inText, const text_run_array *inRuns)
 {
 	CALLED();
+	
+	CancelInputMethod();
+	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd)
@@ -1005,6 +1016,9 @@ BTextView::SetText(const char *inText, int32 inLength,
 						const text_run_array *inRuns)
 {
 	CALLED();
+	
+	CancelInputMethod();
+	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd)
@@ -1039,7 +1053,11 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 						 const text_run_array *inRuns)
 {
 	CALLED();
-	//	TODO: Should probably call _DoDeleteText() here
+	
+	CancelInputMethod();
+	
+	// TODO: Should probably call _DoDeleteText() here, as the bebook
+	// says this function doesn't dall DeleteText()
 	if (fText->Length() > 0)
 		DeleteText(0, fText->Length());
 
@@ -1093,6 +1111,9 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 					   const text_run_array *inRuns)
 {
 	CALLED();
+	
+	CancelInputMethod();
+	
 	// do we really need to do anything?
 	if (inLength < 1)
 		return;
@@ -1139,6 +1160,9 @@ void
 BTextView::Delete()
 {
 	CALLED();
+	
+	CancelInputMethod();
+	
 	// anything to delete?
 	if (fSelStart == fSelEnd)
 		return;
@@ -1230,8 +1254,7 @@ BTextView::TextLength() const
 	CALLED();
 	return fText->Length();
 }
-
-
+//------------------------------------------------------------------------------
 void
 BTextView::GetText(int32 offset, int32 length, char *buffer) const
 {
@@ -1280,6 +1303,7 @@ void
 BTextView::GoToLine(int32 index)
 {
 	CALLED();
+	CancelInputMethod();
 	fSelStart = fSelEnd = OffsetAt(index);
 }
 
@@ -1291,6 +1315,7 @@ void
 BTextView::Cut(BClipboard *clipboard)
 {
 	CALLED();
+	CancelInputMethod();
 	if (fUndo) {
 		delete fUndo;
 		fUndo = new _BCutUndoBuffer_(this);
@@ -1307,6 +1332,9 @@ void
 BTextView::Copy(BClipboard *clipboard)
 {
 	CALLED();
+	
+	CancelInputMethod();
+
 	BMessage *clip = NULL;
 
 	if (clipboard->Lock()) {
@@ -1337,6 +1365,8 @@ void
 BTextView::Paste(BClipboard *clipboard)
 {
 	CALLED();
+	CancelInputMethod();
+	
 	BMessage *clip = NULL;
 
 	if (clipboard->Lock()) { 
@@ -1427,7 +1457,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 	// is the new selection any different from the current selection?
 	if (startOffset == fSelStart && endOffset == fSelEnd)
 		return;
-	
+		
 	fStyles->InvalidateNullStyle();
 	
 	// pin offsets at reasonable values
@@ -1513,6 +1543,8 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 								const rgb_color *inColor)
 {
 	CALLED();
+	CancelInputMethod();
+	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd)
@@ -1619,6 +1651,9 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 							const text_run_array *inRuns)
 {
 	CALLED();
+	
+	CancelInputMethod();
+	
 	// pin offsets at reasonable values
 	startOffset = (startOffset < 0) ? 0 : startOffset;
 	endOffset = (endOffset < 0) ? 0 : endOffset;
@@ -2187,11 +2222,12 @@ BTextView::MakeEditable(bool editable)
 		
 	fEditable = editable;
 	
-	if (Window() != NULL) {
-		if (fActive) {
-			if (!fEditable && fCaretVisible)
+	if (Window() != NULL && fActive) {	
+		if (!fEditable) {
+			if (fCaretVisible)
 				InvertCaret();
-		}
+			CancelInputMethod();
+		} 	
 	}
 }
 
@@ -3101,7 +3137,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 	if (fromOffset >= limit) {
 		// try to return valid height info anyway			
 		if (fStyles->NumRuns() > 0)
-			fStyles->Iterate(fromOffset, 1, NULL, NULL, outAscent, outDescent);
+			fStyles->Iterate(fromOffset, 1, fInline, NULL, NULL, outAscent, outDescent);
 		else {
 			if (fStyles->IsValidNullStyle()) {
 				const BFont *font = NULL;
@@ -3137,7 +3173,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 		int32 length = offset;
 		int32 startOffset = fromOffset;
 		int32 numChars;
-		while ((numChars = fStyles->Iterate(startOffset, length, NULL, NULL, &ascent, &descent)) != 0) {
+		while ((numChars = fStyles->Iterate(startOffset, length, fInline, NULL, NULL, &ascent, &descent)) != 0) {
 			*outAscent = max_c(ascent, *outAscent);
 			*outDescent = max_c(descent, *outDescent);
 			
@@ -3290,7 +3326,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 	// iterate through the style runs
 	const BFont *font = NULL;
 	int32 numChars;
-	while ((numChars = fStyles->Iterate(fromOffset, length, &font, NULL, &ascent, &descent)) != 0) {		
+	while ((numChars = fStyles->Iterate(fromOffset, length, fInline, &font, NULL, &ascent, &descent)) != 0) {		
 		maxAscent = max_c(ascent, maxAscent);
 		maxDescent = max_c(descent, maxDescent);
 		
@@ -3408,7 +3444,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			const BFont *font = NULL;
 			const rgb_color *color = NULL;
 			int32 numChars;
-			while ((numChars = fStyles->Iterate(offset, length, &font, &color)) != 0) {
+			while ((numChars = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
 				SetFont(font);
 				SetHighColor(*color);
 				
@@ -3795,6 +3831,8 @@ BTextView::Deactivate()
 	CALLED();
 	fActive = false;
 	
+	CancelInputMethod();
+	
 	if (fSelStart != fSelEnd) {
 		if (fSelectable)
 			Highlight(fSelStart, fSelEnd);
@@ -3837,7 +3875,7 @@ uint32
 BTextView::CharClassification(int32 offset) const
 {
 	CALLED();
-	// Should check against a list of character containing also
+	// Should check against a list of characters containing also
 	// japanese word breakers
 	switch (fText->RealCharAt(offset)) {
 		case B_SPACE:
@@ -4003,11 +4041,43 @@ void
 BTextView::HandleInputMethodChanged(BMessage *message)
 {
 	CALLED();
-	// TODO: Implement me
 	if (!fInline)
 		return;
+	
+	// TODO: Highlight in blue/red the various clauses
 		
-	message->PrintToStream();
+	const char *string = NULL;
+	if (message->FindString("be:string", &string) != B_OK || string == NULL)
+		return;
+	
+	be_app->ObscureCursor();
+	
+	// Delete the previously inserted text (if any)
+	if (fInline->IsActive()) {
+		int32 oldOffset = fInline->Offset();
+		DeleteText(oldOffset, oldOffset + fInline->Length());
+		Select(oldOffset, oldOffset);
+	}
+	
+	int32 stringLen = strlen(string);
+	
+	fInline->SetOffset(fSelStart);
+	fInline->SetLength(stringLen);
+	
+	// Insert the new text
+	InsertText(string, stringLen, fSelStart, NULL);
+	Select(fSelStart + stringLen, fSelStart + stringLen);
+	
+	Refresh(0, fLines->NumLines(), true, false);
+	
+	// If we find the "be:confirmed" boolean (and the boolean is true),
+	// it means it's over for now, so the current _BInlineInput_ object
+	// should become inactive
+	bool confirmed = false;
+	if (message->FindBool("be:confirmed", &confirmed) != B_OK || !confirmed)
+		fInline->SetActive(true);
+	else
+		fInline->SetActive(false);
 }
 
 
@@ -4019,15 +4089,45 @@ BTextView::HandleInputMethodLocationRequest()
 	CALLED();
 	if (!fInline)
 		return;
-	// TODO: Implement me
+	
+	int32 offset = fInline->Offset();
+	int32 limit = offset + fInline->Length();
+	
+	BMessage message(B_INPUT_METHOD_EVENT);
+	message.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
+	
+	// Add the location of the UTF8 charachters
+	float height = 0;
+	BPoint where;
+	while (offset < limit) {	
+		where = PointAt(offset, &height);
+		ConvertToScreen(&where);
+			
+		message.AddPoint("be:location_reply", where);
+		message.AddFloat("be:height_reply", height);
+		
+		offset = NextInitialByte(offset);
+	}
+	
+	fInline->Method()->SendMessage(&message);	
 }
 
 
+/*! \brief Tells the input server method addon to stop the current transaction.
+*/ 
 void
 BTextView::CancelInputMethod()
 {
-	// TODO: Implement me
 	CALLED();
+	if (!fInline)
+		return;
+	
+	BMessage message(B_INPUT_METHOD_EVENT);
+	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
+	fInline->Method()->SendMessage(&message);
+	
+	delete fInline;
+	fInline = NULL;
 }
 
 

@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kits interface BTextView ;
 UsePrivateHeaders interface ;
 
 StaticLibrary haiku :
+	InlineInput.cpp
 	LineBuffer.cpp
 	StyleBuffer.cpp
 	TextGapBuffer.cpp

@@ -27,6 +27,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include "InlineInput.h"
 #include "StyleBuffer.h"
 
 // Project Includes ------------------------------------------------------------
@@ -479,7 +480,7 @@ _BStyleBuffer_::RemoveStyles(int32 index, int32 count)
 }
 //------------------------------------------------------------------------------
 int32
-_BStyleBuffer_::Iterate(int32 fromOffset, int32 length, /*_BInlineInput_ *,*/
+_BStyleBuffer_::Iterate(int32 fromOffset, int32 length, _BInlineInput_ *input,
 							 const BFont **outFont, const rgb_color **outColor,
 							 float *outAscent, float *outDescent, uint32 *) const
 {
