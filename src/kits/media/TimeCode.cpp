@@ -1,10 +1,11 @@
 /***********************************************************************
- * AUTHOR: Marcus Overhagen
+ * AUTHOR: Marcus Overhagen, David McPaul 
  *   FILE: TimeCode.cpp
  *  DESCR: 
  ***********************************************************************/
 #include <TimeCode.h>
 #include "debug.h"
+#include <string.h>
 
 status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL)
 {
@@ -38,8 +39,8 @@ status_t get_timecode_description(timecode_type type, timecode_info * out_timeco
 
 status_t count_timecodes()
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	return 8;	// Is this right?
 }
 
 /*************************************************************
@@ -49,20 +50,26 @@ status_t count_timecodes()
 
 BTimeCode::BTimeCode()
 {
-	UNIMPLEMENTED();
+	CALLED();
 }
 
 
 BTimeCode::BTimeCode(bigtime_t us,
 					 timecode_type type)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (SetType(type) == B_OK) {
+		SetMicroseconds(us);
+	}
 }
 
 
 BTimeCode::BTimeCode(const BTimeCode &clone)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (SetType(clone.Type()) == B_OK) {
+		SetData(clone.Hours(),clone.Minutes(),clone.Seconds(),clone.Frames());
+	}
 }
 
 
@@ -72,13 +79,16 @@ BTimeCode::BTimeCode(int hours,
 					 int frames,
 					 timecode_type type)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (SetType(type) == B_OK) {
+		SetData(hours,minutes,seconds,frames);
+	}
 }
 
 
 BTimeCode::~BTimeCode()
 {
-	UNIMPLEMENTED();
+	CALLED();
 }
 
 
@@ -88,37 +98,115 @@ BTimeCode::SetData(int hours,
 				   int seconds,
 				   int frames)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	m_hours = hours;
+	m_minutes = minutes;
+	m_seconds = seconds;
+	m_frames = frames;
 }
 
 
 status_t
 BTimeCode::SetType(timecode_type type)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	m_info.type = type;
+	strncpy(m_info.format,"%.2i:%.2i:%.2i:%.2i",31);
+	m_info.every_nth = 0;
+	m_info.except_nth = 0;
 
-	return B_ERROR;
+	switch (type) {
+		case	B_TIMECODE_100:
+				strncpy(m_info.name,"TIMECODE 100",31);
+				m_info.fps_div = 100;
+				break;
+		case	B_TIMECODE_75:			// CD 
+				strncpy(m_info.name,"CD",31);
+				m_info.fps_div = 75;
+				break;
+		case	B_TIMECODE_30:			// MIDI
+				strncpy(m_info.name,"MIDI",31);
+				m_info.fps_div = 30;
+				break;
+		case	B_TIMECODE_30_DROP_2:	// NTSC
+				strncpy(m_info.name,"NTSC",31);
+				m_info.fps_div = 30;	// This is supposed to be 29.97fps
+				m_info.drop_frames = 2; // Drop 2 frames every minute except every 10 minutes
+				break;
+		case	B_TIMECODE_30_DROP_4:	// Brazil
+				strncpy(m_info.name,"NTSC Brazil",31);
+				m_info.fps_div = 30;
+				m_info.drop_frames = 4; // Drop 4 frames every minute except every 10 minutes
+				break;
+		case	B_TIMECODE_25:			// PAL
+				strncpy(m_info.name,"PAL",31);
+				m_info.fps_div = 25;
+				break;
+		case	B_TIMECODE_24:			// Film
+				strncpy(m_info.name,"FILM",31);
+				m_info.fps_div = 24;
+				break;
+		case	B_TIMECODE_18:			// Super8
+				strncpy(m_info.name,"Super 8",31);
+				m_info.fps_div = 18;
+				break;
+		default:
+				SetType(B_TIMECODE_25);	// PAL default :-)
+				break;
+	}
+
+	return B_OK;
 }
 
 
 void
 BTimeCode::SetMicroseconds(bigtime_t us)
 {
-	UNIMPLEMENTED();
+// Does not handle Drop formats correctly
+	CALLED();
+	
+	m_seconds = us / 1000;
+	m_frames = (us % 1000) / m_info.fps_div;
+
+	// Now normalise to Hours Minutes Seconds
+	m_minutes = m_seconds / 60;
+	m_seconds = m_seconds % 60;
+	
+	m_hours = m_minutes / 60;
+	m_minutes = m_minutes % 60;
 }
 
 
 void
 BTimeCode::SetLinearFrames(int32 linear_frames)
 {
-	UNIMPLEMENTED();
+// Does not handle Drop formats correctly
+
+	CALLED();
+	// First convert frames to seconds leaving the remainder as frames
+	
+	m_seconds = linear_frames / m_info.fps_div;		// DIV
+	m_frames = linear_frames % m_info.fps_div;		// MOD
+	
+	// Now normalise to Hours Minutes Seconds
+	m_minutes = m_seconds / 60;
+	m_seconds = m_seconds % 60;
+	
+	m_hours = m_minutes / 60;
+	m_minutes = m_minutes % 60;
 }
 
 
 BTimeCode &
 BTimeCode::operator=(const BTimeCode &clone)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	m_hours = clone.Hours();
+	m_minutes = clone.Minutes();
+	m_seconds = clone.Seconds();
+	m_frames = clone.Frames();
+	SetType(clone.Type());
+	
 	return *this;
 }
 
@@ -126,25 +214,28 @@ BTimeCode::operator=(const BTimeCode &clone)
 bool
 BTimeCode::operator==(const BTimeCode &other) const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return false;
+	return ((this->LinearFrames()) == (other.LinearFrames()));
 }
 
 
 bool
 BTimeCode::operator<(const BTimeCode &other) const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return false;
+	return ((this->LinearFrames()) < (other.LinearFrames()));
 }
 
 
 BTimeCode &
 BTimeCode::operator+=(const BTimeCode &other)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	
+	this->SetLinearFrames(this->LinearFrames() + other.LinearFrames());
+	
 	return *this;
 }
 
@@ -152,7 +243,10 @@ BTimeCode::operator+=(const BTimeCode &other)
 BTimeCode &
 BTimeCode::operator-=(const BTimeCode &other)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	
+	this->SetLinearFrames(this->LinearFrames() - other.LinearFrames());
+	
 	return *this;
 }
 
@@ -160,7 +254,7 @@ BTimeCode::operator-=(const BTimeCode &other)
 BTimeCode
 BTimeCode::operator+(const BTimeCode &other) const
 {
-	UNIMPLEMENTED();
+	CALLED();
 	BTimeCode tc(*this);
 	tc += other;
 	return tc;
@@ -170,7 +264,7 @@ BTimeCode::operator+(const BTimeCode &other) const
 BTimeCode
 BTimeCode::operator-(const BTimeCode &other) const
 {
-	UNIMPLEMENTED();
+	CALLED();
 	BTimeCode tc(*this);
 	tc -= other;
 	return tc;
@@ -180,45 +274,45 @@ BTimeCode::operator-(const BTimeCode &other) const
 int
 BTimeCode::Hours() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	return m_hours;
 }
 
 
 int
 BTimeCode::Minutes() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	return m_minutes;
 }
 
 
 int
 BTimeCode::Seconds() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	return m_seconds;
 }
 
 
 int
 BTimeCode::Frames() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	return m_frames;
 }
 
 
 timecode_type
 BTimeCode::Type() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return B_TIMECODE_DEFAULT;
+	return m_info.type;
 }
 
 
@@ -229,32 +323,50 @@ BTimeCode::GetData(int *out_hours,
 				   int *out_frames,
 				   timecode_type *out_type) const
 {
-	UNIMPLEMENTED();
+	CALLED();
+	*out_hours = m_hours;
+	*out_minutes = m_minutes;
+	*out_seconds = m_seconds;
+	*out_frames = m_frames;
+	*out_type = m_info.type;
 }
 
 
 bigtime_t
 BTimeCode::Microseconds() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	bigtime_t us;
+	
+	us = m_hours*60+m_minutes;
+	us = us*60+m_seconds;
+	us = us*1000+m_frames*m_info.fps_div;
+	
+	return us;
 }
 
 
 int32
 BTimeCode::LinearFrames() const
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return 0;
+	int32 linear_frames;
+	
+	linear_frames = (m_hours * 60) + m_minutes;
+	linear_frames = (linear_frames * 60) + m_seconds;
+	linear_frames = (linear_frames * m_info.fps_div) + m_frames;
+	
+	return linear_frames;
 }
 
 
 void
 BTimeCode::GetString(char *str) const
 {
-	UNIMPLEMENTED();
+	CALLED();
+	sprintf(str,m_info.format, m_hours, m_minutes, m_seconds, m_frames);
 }
 
 
