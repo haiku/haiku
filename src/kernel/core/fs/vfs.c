@@ -236,21 +236,6 @@ struct fd_ops gIndexDirectoryOps = {
 };
 
 
-static void
-check_wall(int32 line, void *address)
-{
-//	uint32 *wall = (uint32 *)((uint8 *)address - 12);
-//	uint32 size = wall[0];
-//
-//	if (wall[1] != 0xabadcafe || wall[2] != 0xabadcafe)
-//		panic("check_wall: line %ld, front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", line, address, size, wall[1], wall[2]);
-//
-//	wall = (uint32 *)((uint8 *)address + size);
-//	if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
-//		panic("check_wall: line %ld, back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", line, address, size, wall[0], wall[1]);
-}
-
-
 static int
 mount_compare(void *_m, const void *_key)
 {
@@ -523,8 +508,6 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	int err;
 	int old_ref;
 
-check_wall(__LINE__, vnode);
-
 	mutex_lock(&gVnodeMutex);
 
 	if (vnode->busy == true)
@@ -597,7 +580,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 	mutex_lock(&gVnodeMutex);
 
-	do {
+	while (true) {
 		vnode = lookup_vnode(mountID, vnodeID);
 		if (vnode) {
 			if (vnode->busy) {
@@ -607,7 +590,8 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 				continue;
 			}
 		}
-	} while (0);
+		break;
+	}
 
 	PRINT(("get_vnode: tried to lookup vnode, got 0x%p\n", vnode));
 
@@ -616,14 +600,12 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 	} else {
 		// we need to create a new vnode and read it in
 		vnode = create_new_vnode();
-check_wall(__LINE__, vnode);
 		if (!vnode) {
 			err = B_NO_MEMORY;
 			goto err;
 		}
 		vnode->mount_id = mountID;
 		vnode->id = vnodeID;
-check_wall(__LINE__, vnode);
 		
 		mutex_lock(&gMountMutex);	
 
@@ -633,7 +615,6 @@ check_wall(__LINE__, vnode);
 			err = ERR_INVALID_HANDLE;
 			goto err;
 		}
-check_wall(__LINE__, vnode);
 		vnode->busy = true;
 		hash_insert(gVnodeTable, vnode);
 		mutex_unlock(&gVnodeMutex);
@@ -641,7 +622,6 @@ check_wall(__LINE__, vnode);
 		add_vnode_to_mount_list(vnode, vnode->mount);
 		mutex_unlock(&gMountMutex);
 
-check_wall(__LINE__, vnode);
 		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
 		if (err < 0 && vnode->private_node == NULL) {
 			remove_vnode_from_mount_list(vnode, vnode->mount);
@@ -654,7 +634,6 @@ check_wall(__LINE__, vnode);
 
 		vnode->busy = false;
 		vnode->ref_count = 1;
-check_wall(__LINE__, vnode);
 	}
 
 	mutex_unlock(&gVnodeMutex);
@@ -767,7 +746,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 			put_vnode(vnode);
 			return status;
 		}
-check_wall(__LINE__, vnode);
 
 		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
@@ -879,7 +857,6 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 		inc_vnode_ref_count(start);
 		mutex_unlock(&context->io_mutex);
 	}
-check_wall(__LINE__, start);
 
 	return vnode_path_to_vnode(start, path, traverseLink, _vnode, 0);
 }
@@ -1406,9 +1383,8 @@ vfs_new_io_context(void *_parentContext)
 		return NULL;
 	}
 
-	/*
-	 * copy parent files
-	 */
+	// Copy all parent files which don't have the O_CLOEXEC flag set
+
 	if (parentContext) {
 		size_t i;
 
@@ -1419,7 +1395,7 @@ vfs_new_io_context(void *_parentContext)
 			inc_vnode_ref_count(context->cwd);
 
 		for (i = 0; i < table_size; i++) {
-			if (parentContext->fds[i]) {
+			if (parentContext->fds[i] && (parentContext->fds[i]->open_mode & O_CLOEXEC) == 0) {
 				context->fds[i] = parentContext->fds[i];
 				atomic_add(&context->fds[i]->ref_count, 1);
 			}
