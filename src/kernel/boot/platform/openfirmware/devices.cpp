@@ -15,6 +15,9 @@
 #include <string.h>
 
 
+char sBootPath[192];
+
+
 /** Gets all device types of the specified type by doing a 
  *	depth-first searchi of the OpenFirmware device tree.
  *
@@ -74,18 +77,18 @@ get_next_device(int *_cookie, const char *type, char *path, size_t pathSize)
 }
 
 
-status_t
-platform_get_boot_devices(stage2_args *args, list *devicesList)
-{
-	int node;
+//	#pragma mark -
 
+
+status_t 
+platform_get_boot_device(struct stage2_args *args, Node **_device)
+{
 	// print out the boot path (to be removed later?)
 
-	char bootPath[128];
-	of_getprop(gChosen, "bootpath", bootPath, sizeof(bootPath));
-	printf("boot path = \"%s\"\n", bootPath);
+	of_getprop(gChosen, "bootpath", sBootPath, sizeof(sBootPath));
+	printf("boot path = \"%s\"\n", sBootPath);
 
-	node = of_finddevice(bootPath);
+	int node = of_finddevice(sBootPath);
 	if (node != OF_FAILED) {
 		char type[16];
 		of_getprop(node, "device_type", type, sizeof(type));
@@ -93,19 +96,57 @@ platform_get_boot_devices(stage2_args *args, list *devicesList)
 	} else
 		printf("could not open boot path.\n");
 
+	int handle = of_open(sBootPath);
+	if (handle == OF_FAILED) {
+		puts("\t\t(open failed)");
+		return B_ERROR;
+	}
+
+	Handle *device = new Handle(handle);
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	*_device = device;
+	return B_OK;
+}
+
+
+status_t
+platform_get_boot_partition(struct stage2_args *args, struct list *list,
+	boot::Partition **_partition)
+{
+	boot::Partition *partition = NULL;
+	while ((partition = (boot::Partition *)list_get_next_item(list, partition)) != NULL) {
+		// ToDo: just take the first partition for now
+		*_partition = partition;
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+platform_add_block_devices(stage2_args *args, list *devicesList)
+{
 	// add all block devices to the list of possible boot devices
 
 	int cookie = 0;
 	char path[256];
 	status_t status;
 	while ((status = get_next_device(&cookie, "block", path, sizeof(path))) == B_OK) {
+		if (!strcmp(path, sBootPath)) {
+			// don't add the boot device twice
+			continue;
+		}
+
 		printf("\t%s\n", path);
 		int handle = of_open(path);
 		if (handle == OF_FAILED) {
 			puts("\t\t(failed)");
 			continue;
 		}
-		
+
 		printf("\t\t(could open device, handle = %p)\n", (void *)handle);
 		Handle *device = new Handle(handle);
 
