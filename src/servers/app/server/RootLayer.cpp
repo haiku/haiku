@@ -44,11 +44,13 @@ RootLayer::RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver
 	_driver=gfxdriver;
 	_invalid=new BRegion(Bounds());
 	_is_dirty=true;
+	_bgcolor=new RGBColor();
 }
 
 //! Frees all allocated heap memory (which happens to be none) ;)
 RootLayer::~RootLayer()
 {
+	delete _bgcolor;
 }
 
 /*!

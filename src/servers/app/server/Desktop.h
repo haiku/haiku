@@ -47,14 +47,14 @@ void SetWorkspace(int32 workspace);
 void SetScreen(screen_id id);
 int32 CountScreens(void);
 screen_id ActiveScreen(void);
-DisplayDriver *GetGfxDriver(screen_id screen=B_MAIN_SCREEN_ID);
-status_t SetSpace(int32 index, int32 res, bool stick=true, screen_id screen=B_MAIN_SCREEN_ID);
+DisplayDriver *GetGfxDriver(screen_id screen);
+status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick=true);
 
-void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID);
+void AddWindowToDesktop(ServerWindow *win, int32 workspace, screen_id screen);
 void RemoveWindowFromDesktop(ServerWindow *win);
 ServerWindow *GetActiveWindow(void);
 void SetActiveWindow(ServerWindow *win);
-Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID);
+Layer *GetRootLayer(int32 workspace, screen_id screen);
 
 void set_drag_message(int32 size, int8 *flattened);
 int8* get_drag_message(int32 *size);

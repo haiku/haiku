@@ -30,6 +30,16 @@
 #include "ServerWindow.h"
 #include "WinBorder.h"
 
+//#define DEBUG_WORKSPACE
+//#define DEBUG_SCREEN
+
+#ifdef DEBUG_WORKSPACE
+#include <stdio.h>
+#endif
+#ifdef DEBUG_SCREEN
+#include <stdio.h>
+#endif
+
 // Defined and initialized in AppServer.cpp
 extern RGBColor workspace_default_color;
 TokenHandler screen_id_handler;
@@ -49,6 +59,9 @@ Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &
 	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1),
 		"Workspace Root",_screen->GetGfxDriver());
 	_rootlayer->SetColor(workspace_default_color);
+#ifdef DEBUG_WORKSPACE
+printf("Workspace::Workspace(%s)\n",_rootlayer->GetName());
+#endif
 }
 
 /*!
@@ -56,6 +69,9 @@ Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &
 */
 Workspace::~Workspace(void)
 {
+#ifdef DEBUG_WORKSPACE
+printf("Workspace::~Workspace(%s)\n",_rootlayer->GetName());
+#endif
 	if(_rootlayer)
 	{
 		_rootlayer->PruneTree();
@@ -70,6 +86,9 @@ Workspace::~Workspace(void)
 */
 void Workspace::SetBGColor(const RGBColor &c)
 {
+#ifdef DEBUG_WORKSPACE
+printf("Workspace::SetBGColor(): "); c.PrintToStream();
+#endif
 	_rootlayer->SetColor(c);
 }
 
@@ -98,6 +117,9 @@ RootLayer *Workspace::GetRoot(void)
 */
 void Workspace::SetData(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo)
 {
+#ifdef DEBUG_WORKSPACE
+printf("Workspace::SetData(%s)\n",_rootlayer->GetName());
+#endif
 	if(_fbinfo.display_width!=fbinfo.display_width || 
 		_fbinfo.display_height!=fbinfo.display_height)
 	{
@@ -128,6 +150,9 @@ void Workspace::GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo)
 */
 void Workspace::SetSpace(int32 res)
 {
+#ifdef DEBUG_WORKSPACE
+printf("Workspace::SetSpace(%ld) unimplemented\n",res);
+#endif
 	// TODO: Implement
 }
 
@@ -138,6 +163,9 @@ void Workspace::SetSpace(int32 res)
 */
 Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces);
+#endif
 	_workspacelist=NULL;
 	_driver=gfxmodule;
 	_resolution=0;
@@ -189,6 +217,9 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 */
 Screen::~Screen(void)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::~Screen\n");
+#endif
 	if ( _workspacelist )
 	{
 		int i;
@@ -206,6 +237,9 @@ Screen::~Screen(void)
 */
 void Screen::AddWorkspace(int32 index)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::AddWorkspace(%ld)\n",index+1);
+#endif
 	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,this);
 	if ( (index == -1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
@@ -217,6 +251,9 @@ void Screen::AddWorkspace(int32 index)
 */
 void Screen::DeleteWorkspace(int32 index)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::DeleteWorkspace(%ld)\n",index+1);
+#endif
 	Workspace *workspace;
 	workspace = (Workspace *)_workspacelist->RemoveItem(index);
 	if ( workspace )
@@ -255,6 +292,10 @@ void Screen::SetWorkspaceCount(int32 count)
 	_workspacecount = count;
 	if ( _currentworkspace > count-1 )
 		SetWorkspace(count-1);
+
+#ifdef DEBUG_SCREEN
+printf("Screen::SetWorkspaceCount(%ld)\n",count);
+#endif
 }
 
 /*!
@@ -272,6 +313,9 @@ int32 Screen::CurrentWorkspace(void)
 */
 void Screen::SetWorkspace(int32 index)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::SetWorkspace(%ld)\n",index+1);
+#endif
 	if ( (index >= 0) && (index <= _workspacecount-1) )
 	{
 		_currentworkspace = index;
@@ -285,6 +329,9 @@ void Screen::SetWorkspace(int32 index)
 */
 void Screen::Activate(bool active)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::Activate(%s)\n",active?"active":"inactive");
+#endif
 	_active=active;
 }
 
@@ -306,6 +353,9 @@ DisplayDriver *Screen::GetGfxDriver(void)
 */
 status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::SetSpace(%ld,%ld,%s)\n",index,res,stick?"stick":"non-stick");
+#endif
 	// the specified workspace isn't active, so this should be easy...
 	Workspace *wkspc=(Workspace*)_workspacelist->ItemAt(index);
 	if(!wkspc)
@@ -332,6 +382,9 @@ status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 */
 void Screen::AddWindow(ServerWindow *win, int32 workspace)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::AddWindow(%s,%ld)\n",win?win->GetTitle():"NULL", workspace+1);
+#endif
 	if(!win || !win->_winborder)
 		return;
 	
@@ -349,6 +402,9 @@ void Screen::AddWindow(ServerWindow *win, int32 workspace)
 */
 void Screen::RemoveWindow(ServerWindow *win)
 {
+#ifdef DEBUG_SCREEN
+printf("Screen::RemoveWindow(%s)\n",win?win->GetTitle():"NULL");
+#endif
 	if(!win || !win->_winborder)
 		return;
 	

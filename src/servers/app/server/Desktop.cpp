@@ -41,6 +41,12 @@
 
 #include "ServerWindow.h"
 
+//#define DEBUG_DESKTOP
+
+#ifdef DEBUG_DESKTOP
+#include <stdio.h>
+#endif
+
 //! This namespace encapsulates all globals specifically for the desktop
 namespace desktop_private {
 	int8 *dragmessage=NULL;
@@ -73,12 +79,14 @@ void unlock_workspaces(void) { desktop_private::workspacelock.Unlock(); }
 */
 void InitDesktop(void)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: InitWorkspace\n");
+#endif
 	desktop_private::screenlist=new BList(0);
 	DisplayDriver *tdriver;
 	Screen *s=NULL;
 	
 #ifndef TEST_MODE
-
 	// If we're using the AccelerantDriver for rendering, eventually we will loop through
 	// drivers until one can't initialize in order to support multiple monitors. For now,
 	// we'll just load one and be done with it.
@@ -99,6 +107,9 @@ void InitDesktop(void)
 		tdriver->Shutdown();
 		delete tdriver;
 		tdriver=NULL;
+#ifdef DEBUG_DESKTOP
+printf("\t NULL display driver. OK. We crash now. :P\n");
+#endif
 	}
 #else
 
@@ -123,6 +134,9 @@ void InitDesktop(void)
 		tdriver->Shutdown();
 		delete tdriver;
 		tdriver=NULL;
+#ifdef DEBUG_DESKTOP
+printf("\t NULL display driver. OK. We crash now. :P\n");
+#endif
 	}
 #endif
 	
@@ -133,11 +147,18 @@ void InitDesktop(void)
 		desktop_private::activescreen=s;
 		s->SetSpace(0,B_32_BIT_640x480,true);
 	}
+#ifdef DEBUG_DESKTOP
+else
+printf("ERROR: NULL display driver\n");
+#endif
 }
 
 //! Shuts down the graphics subsystem
 void ShutdownDesktop(void)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: ShutdownDesktop\n");
+#endif
 	Screen *s;
 	
 	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
@@ -165,6 +186,9 @@ void ShutdownDesktop(void)
 */
 void AddWorkspace(int32 index=-1)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: AddWorkspace(%ld)\n",index+1);
+#endif
 	lock_workspaces();
 	lock_layers();
 	
@@ -192,6 +216,9 @@ void AddWorkspace(int32 index=-1)
 */
 void DeleteWorkspace(int32 index)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: DeleteWorkspace(%ld)\n",index+1);
+#endif
 	lock_workspaces();
 	lock_layers();
 	
@@ -214,7 +241,6 @@ void DeleteWorkspace(int32 index)
 */
 int32 CountWorkspaces(void)
 {
-	
 	lock_workspaces();
 	lock_layers();
 	
@@ -238,6 +264,9 @@ int32 CountWorkspaces(void)
 */
 void SetWorkspaceCount(int32 count)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: SetWorkspaceCount(%ld)\n",count);
+#endif
 	if(count<1 || count>32)
 		return;
 	lock_workspaces();
@@ -290,6 +319,9 @@ Workspace *WorkspaceAt(int32 index)
 */
 void SetWorkspace(int32 workspace)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: SetWorkspace(%ld)\n",workspace+1);
+#endif
 	lock_workspaces();
 	if(workspace<0 || workspace>(CountWorkspaces()-1))
 	{
@@ -314,6 +346,9 @@ void SetWorkspace(int32 workspace)
 */
 void SetScreen(screen_id id)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: SetScreen(%ld)\n",id.id);
+#endif
 	Screen *scr;
 	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
 	{
@@ -355,7 +390,7 @@ screen_id ActiveScreen(void)
 	Like the other multiscreen functions, this is unused. Because multiple screens are 
 	not utilized, specifying an ID other than B_MAIN_SCREEN_ID will return NULL 
 */
-DisplayDriver *GetGfxDriver(screen_id screen=B_MAIN_SCREEN_ID)
+DisplayDriver *GetGfxDriver(screen_id screen)
 {
 	return (desktop_private::activescreen)?desktop_private::activescreen->GetGfxDriver():NULL;
 }
@@ -370,8 +405,12 @@ DisplayDriver *GetGfxDriver(screen_id screen=B_MAIN_SCREEN_ID)
 	
 	Because of the lack of outside multimonitor support, the screen ID is ignored for now.
 */
-status_t SetSpace(int32 index, int32 res, bool stick=true, screen_id screen=B_MAIN_SCREEN_ID)
+status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick=true)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: SetSpace(%ld,%ld,%s,%ld)\n",index+1,res,
+	stick?"stick":"non-stick",screen.id);
+#endif
 	desktop_private::workspacelock.Lock();
 	status_t stat=desktop_private::activescreen->SetSpace(index,res,stick);
 	desktop_private::workspacelock.Unlock();
@@ -384,8 +423,12 @@ status_t SetSpace(int32 index, int32 res, bool stick=true, screen_id screen=B_MA
 	\param workspace index of the workspace to add the window to
 	\param screen Optional screen specifier. Currently unused.
 */
-void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID)
+void AddWindowToDesktop(ServerWindow *win, int32 workspace, screen_id screen)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: AddWindowToDesktop(%s,%ld,%ld)\n",win?win->GetTitle():"NULL",
+	workspace+1,screen.id);
+#endif
 	// Workspace() will be non-NULL if it has already been added to the desktop
 	if(!win || win->GetWorkspace())
 		return;
@@ -407,6 +450,9 @@ void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, 
 */
 void RemoveWindowFromDesktop(ServerWindow *win)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: RemoveWindowFromDesktop(%s)\n",win?win->GetTitle():"NULL");
+#endif
 	lock_workspaces();
 	lock_layers();
 	
@@ -438,6 +484,9 @@ ServerWindow *GetActiveWindow(void)
 */
 void SetActiveWindow(ServerWindow *win)
 {
+#ifdef DEBUG_DESKTOP
+printf("Desktop: SetActiveWindow(%s)\n",win?win->GetTitle():"NULL");
+#endif
 	lock_workspaces();
 	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
 	if(win->GetWorkspace()!=w)
@@ -458,7 +507,7 @@ void SetActiveWindow(ServerWindow *win)
 	\param screen Index of the screen to use. Currently ignored.
 	\return The root layer or NULL if there was an invalid parameter.
 */
-Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID)
+Layer *GetRootLayer(int32 workspace, screen_id screen)
 {
 	lock_workspaces();
 	lock_layers();

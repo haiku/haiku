@@ -49,7 +49,7 @@ public:
 	RGBColor(const RGBColor &col);
 	RGBColor(void);
 	
-	void PrintToStream(void);
+	void PrintToStream(void) const;
 	
 	uint8 GetColor8(void);
 	uint16 GetColor16(void);

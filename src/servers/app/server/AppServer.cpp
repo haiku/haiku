@@ -130,7 +130,7 @@ AppServer::AppServer(void)
 	_decor_lock=create_sem(1,"app_server_decor_sem");
 	
 	// Get the driver first - Poller thread utilizes the thing
-	_driver=GetGfxDriver();
+	_driver=GetGfxDriver(ActiveScreen());
 
 	// Spawn our input-polling thread
 	_poller_id=spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);

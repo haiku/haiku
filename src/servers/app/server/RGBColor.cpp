@@ -289,7 +289,7 @@ RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
 /*!
 	\brief Prints the 32-bit values of the color to standard out
 */
-void RGBColor::PrintToStream(void)
+void RGBColor::PrintToStream(void) const
 {
 	printf("RGBColor (%u,%u,%u,%u)\n", color32.red,color32.green,color32.blue,color32.alpha);
 }

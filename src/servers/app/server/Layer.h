@@ -65,6 +65,7 @@ public:
 	Layer *FindLayer(int32 token);
 	Layer *GetChildAt(BPoint pt, bool recursive=false);
 	PortLink *GetLink(void);
+	const char *GetName(void) { return (_name)?_name->String():NULL; }
 	
 	void Invalidate(BRect rect);
 	void Invalidate(BRegion region);

@@ -89,7 +89,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	_lock=create_sem(1,"ServerApp sem");
 
-	_driver=GetGfxDriver();
+	_driver=GetGfxDriver(ActiveScreen());
 	_cursorhidden=false;
 
 #ifdef DEBUG_SERVERAPP
@@ -534,7 +534,7 @@ printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
 #ifdef DEBUG_SERVERAPP
 printf("ServerApp %s: SetScreenMode: workspace %ld, mode %lu\n",_signature.String(), workspace, mode);
 #endif
-			SetSpace(workspace,mode,*((bool*)index));
+			SetSpace(workspace,mode,ActiveScreen(),*((bool*)index));
 
 			break;
 		}

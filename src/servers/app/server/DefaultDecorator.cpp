@@ -32,6 +32,8 @@
 #include "RGBColor.h"
 
 //#define DEBUG_DECORATOR
+
+
 #define USE_VIEW_FILL_HACK
 
 #ifdef DEBUG_DECORATOR
@@ -141,8 +143,8 @@ else
 	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
-		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-			return CLICK_MOVETOFRONT;
+//		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
+//			return CLICK_MOVETOFRONT;
 		if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			return CLICK_MOVETOBACK;
 		return CLICK_DRAG;

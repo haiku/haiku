@@ -92,7 +92,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 
 	_token=win_token_handler.GetToken();
 
-	AddWindowToDesktop(this,index);
+	AddWindowToDesktop(this,index,ActiveScreen());
 #ifdef DEBUG_SERVERWINDOW
 printf("ServerWindow %s:\n",_title->String());
 printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
@@ -658,16 +658,20 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 #ifdef DEBUG_SERVERWINDOW_MOUSE
 printf("ServerWindow::HandleMouseEvent unimplemented\n");
 #endif
-/*	ServerWindow *mousewin=NULL;
+	ServerWindow *mousewin=NULL;
 	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
-	Layer *root=GetRootLayer();
+	Layer *root=GetRootLayer(CurrentWorkspace(),ActiveScreen());
 	WinBorder *_winborder;
 	
 	// activeborder is used to remember windows when resizing/moving windows
 	// or sliding a tab
-	ASSERT(root!=NULL);
+	if(!root)
+	{
+		printf("ERROR: HandleMouseEvent has NULL root layer!!!\n");
+		return;
+	}
 
 	// Dispatch the mouse event to the proper window
 	switch(code)
@@ -684,14 +688,10 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 
 //			int64 time=*((int64*)index);
 			index+=sizeof(int64);
-			float x=*((float*)index);
-			index+=sizeof(float);
-			float y=*((float*)index);
-			index+=sizeof(float);
-			int32 modifiers=*((int32*)index);
-			index+=sizeof(uint32);
-			uint32 buttons=*((uint32*)index);
-			index+=sizeof(uint32);
+			float x=*((float*)index); index+=sizeof(float);
+			float y=*((float*)index); index+=sizeof(float);
+//			int32 modifiers=*((int32*)index); index+=sizeof(uint32);
+//			uint32 buttons=*((uint32*)index); index+=sizeof(uint32);
 //			int32 clicks=*((int32*)index);
 			BPoint pt(x,y);
 
@@ -700,7 +700,7 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
-				_winborder->MouseDown(pt,buttons,modifiers);
+				_winborder->MouseDown(buffer);
 			}
 			break;
 		}
@@ -714,10 +714,8 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 
 //			int64 time=*((int64*)index);
 			index+=sizeof(int64);
-			float x=*((float*)index);
-			index+=sizeof(float);
-			float y=*((float*)index);
-			index+=sizeof(float);
+			float x=*((float*)index); index+=sizeof(float);
+			float y=*((float*)index); index+=sizeof(float);
 //			int32 modifiers=*((int32*)index);
 			BPoint pt(x,y);
 			
@@ -729,8 +727,7 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
-//				_winborder->MouseUp(pt,0,0);
-				
+				_winborder->MouseUp(buffer);
 			}
 			break;
 		}
@@ -743,26 +740,25 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			// 4) int32 - buttons down
 //			int64 time=*((int64*)index);
 			index+=sizeof(int64);
-			float x=*((float*)index);
-			index+=sizeof(float);
-			float y=*((float*)index);
-			index+=sizeof(float);
-			uint32 buttons=*((uint32*)index);
+			float x=*((float*)index); index+=sizeof(float);
+			float y=*((float*)index); index+=sizeof(float);
+//			uint32 buttons=*((uint32*)index);
 			BPoint pt(x,y);
 
-			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
+			// TODO: Fix
+/*			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
 				mousewin=active_serverwindow;
 				mousewin->_winborder->MouseMoved(pt,buttons,0);
 			}
 			else
 			{
-				_winborder=(WinBorder*)root->GetChildAt(pt);
+*/				_winborder=(WinBorder*)root->GetChildAt(pt);
 				if(_winborder)
 				{
 					mousewin=_winborder->Window();
-					_winborder->MouseMoved(pt,buttons,0);
-				}
+					_winborder->MouseMoved(buffer);
+//				}
 			}				
 			break;
 		}
@@ -771,7 +767,6 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			break;
 		}
 	}
-*/
 }
 
 /*!

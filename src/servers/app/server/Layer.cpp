@@ -35,7 +35,7 @@
 #include "TokenHandler.h"
 #include "RectUtils.h"
 
-#define DEBUG_LAYER
+//#define DEBUG_LAYER
 
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
@@ -970,3 +970,14 @@ BRect Layer::ConvertFromTop(BRect rect)
 	else
 		return(rect);
 }
+
+// TODO: Implement and document
+void Layer::MakeTopChild(void)
+{
+}
+
+// TODO: Implement and document
+void Layer::MakeBottomChild(void)
+{
+}
+
