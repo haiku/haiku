@@ -9,25 +9,11 @@ R5KernelAddon net_server_driver : kernel drivers bin :
 	net_server_driver.c
 ;
 
-# For OpenBeOS we should be building the driver objects this way.
-#KernelObjects
-#	net_server_driver.c
-#	:
-#	-fno-pic -D_KERNEL_MODE
-#	;
-
 # b) Kernelland stack version:
 
 R5KernelAddon net_stack_driver : kernel drivers bin :
 	net_stack_driver.c
 ;
-
-# For OpenBeOS we should be building the kernel stack driver objects this way.
-#KernelObjects
-#	net_stack_driver.c
-#	:
-#	-fno-pic -D_KERNEL_MODE
-#	;
 
 # Link driver(s) to kernel/drivers/dev/net
 {
@@ -55,14 +41,14 @@ OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/driv
 	installed-symlink 
 ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	net_stack_driver net_server_driver :
 	boot home config add-ons kernel drivers bin ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>net_stack_driver :
 	boot home config add-ons kernel drivers dev net ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>net_server_driver :
 	boot home config add-ons kernel drivers dev net ;

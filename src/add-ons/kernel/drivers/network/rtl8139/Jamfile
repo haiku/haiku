@@ -11,14 +11,14 @@ R5KernelAddon rtl8139 : kernel drivers bin :
 	util.c
 	;
 
-Package openbeos-rtl8139-cvs :
+Package haiku-rtl8139-cvs :
 	rtl8139 : 
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-rtl8139-cvs :
+Package haiku-rtl8139-cvs :
 	<kernel!drivers!dev!net>rtl8139 :
 	boot home config add-ons kernel drivers dev net ;
 
-# Package openbeos-rtl8139-cvs :
+# Package haiku-rtl8139-cvs :
 #	rtl8139.settings :
 #	boot home config settings kernel drivers sample ;
 
@@ -58,13 +58,13 @@ OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/driv
 	installed-symlink 
 ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	rtl8139 :
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>rtl8139 :
 	boot home config add-ons kernel drivers dev net ;
-# Package openbeos-networkingkit-cvs :
+# Package haiku-networkingkit-cvs :
 #	rtl8139.settings :
 #	boot home config settings kernel drivers sample ;
 

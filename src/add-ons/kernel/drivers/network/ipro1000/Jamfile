@@ -18,23 +18,23 @@ R5KernelAddon ipro1000 : kernel drivers bin :
 	util.c
 	;
 
-# Package openbeos-ipro1000-cvs :
+# Package haiku-ipro1000-cvs :
 #	ipro1000 : 
 #	boot home config add-ons kernel drivers bin ;
-# Package openbeos-ipro1000-cvs :
+# Package haiku-ipro1000-cvs :
 #	<kernel!drivers!dev!net>ipro1000 :
 #	boot home config add-ons kernel drivers dev net ;
-# Package openbeos-ipro1000-cvs :
+# Package haiku-ipro1000-cvs :
 #	ipro1000.settings :
 #	boot home config settings kernel drivers sample ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ipro1000 :
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>ipro1000 :
 	boot home config add-ons kernel drivers dev net ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ipro1000.settings :
 	boot home config settings kernel drivers sample ;
 

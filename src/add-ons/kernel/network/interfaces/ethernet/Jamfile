@@ -11,6 +11,6 @@ OBOSInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/interfaces
 	: ethernet ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ethernet :
 	boot home config add-ons kernel obos_network interfaces ;

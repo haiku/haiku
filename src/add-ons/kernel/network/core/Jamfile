@@ -24,6 +24,6 @@ R5KernelAddon core : kernel obos_network :
 OBOSInstall install-networking : /boot/home/config/add-ons/kernel/obos_network
 	: core ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	core :
 	boot home config add-ons kernel obos_network ;

@@ -17,17 +17,17 @@ R5KernelAddon via-rhine : kernel drivers bin :
 	util.c
 	;
 
-# Package openbeos-via-rhine-cvs :
+# Package haiku-via-rhine-cvs :
 # 	via-rhine : 
 # 	boot home config add-ons kernel drivers bin ;
-# Package openbeos-via-rhine-cvs :
+# Package haiku-via-rhine-cvs :
 # 	<kernel!drivers!dev!net>via-rhine :
 #	boot home config add-ons kernel drivers dev net ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	via-rhine :
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>via-rhine :
 	boot home config add-ons kernel drivers dev net ;
 

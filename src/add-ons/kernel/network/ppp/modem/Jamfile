@@ -20,6 +20,6 @@ OBOSInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: modem ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	modem :
 	boot home config add-ons kernel obos_network ppp ;

@@ -24,6 +24,6 @@ OBOSInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: ipcp ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ipcp :
 	boot home config add-ons kernel obos_network ppp ;

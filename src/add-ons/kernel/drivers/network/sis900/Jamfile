@@ -13,23 +13,23 @@ R5KernelAddon sis900 : kernel drivers bin :
 	sis900.c
 	;
 
-Package openbeos-sis900-cvs :
+Package haiku-sis900-cvs :
 	sis900 : 
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-sis900-cvs :
+Package haiku-sis900-cvs :
 	<kernel!drivers!dev!net>sis900 :
 	boot home config add-ons kernel drivers dev net ;
-Package openbeos-sis900-cvs :
+Package haiku-sis900-cvs :
 	sis900.settings :
 	boot home config settings kernel drivers sample ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	sis900 :
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	<kernel!drivers!dev!net>sis900 :
 	boot home config add-ons kernel drivers dev net ;
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	sis900.settings :
 	boot home config settings kernel drivers sample ;
 
