@@ -83,6 +83,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 
 HPJetDirectPort::~HPJetDirectPort()
 {
+	fEndpoint->Close();
 	delete fEndpoint;
 }
 
