@@ -35,7 +35,7 @@ private:
 	void			InitWindow();
 	bool			Search(BString searchfor, bool casesens, bool wrap, bool backsearch);
 	void			FindSelection();
-	void			Replace(BString findthis, BString replacewith, bool casesens, bool wrap, bool backsearch);
+	bool			Replace(BString findthis, BString replacewith, bool casesens, bool wrap, bool backsearch);
 	void			ReplaceAll(BString find, BString replace, bool casesens);
 	void			SetFontSize(float fontSize);
 	void			SetFontColor(rgb_color *color);

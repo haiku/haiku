@@ -132,13 +132,13 @@ StyledEditWindow::InitWindow()
 	menu->AddItem(menuItem= new BMenuItem("Save As...", new BMessage(MENU_SAVEAS)));
 	menuItem->SetEnabled(true);				
 	
-	menu->AddItem(fRevertItem= new BMenuItem("Revert to Saved", new BMessage(MENU_REVERT))); 
+	menu->AddItem(fRevertItem= new BMenuItem("Revert to Saved...", new BMessage(MENU_REVERT))); 
 	fRevertItem->SetEnabled(false); 									
 	menu->AddItem(menuItem= new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
 	
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem= new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(menuItem= new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MENU_PRINT), 'P'));
+	menu->AddItem(menuItem= new BMenuItem("Page Setup...", new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(menuItem= new BMenuItem("Print...", new BMessage(MENU_PRINT), 'P'));
 	
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem= new BMenuItem("Quit", new BMessage(MENU_QUIT), 'Q'));
@@ -274,17 +274,7 @@ StyledEditWindow::InitWindow()
 	fWrapItem->SetMarked(true);
 	/***************************MENUS ADDED***********************/
 	
-	fSavePanel= new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false);
-	fSavePanelTextView = 
-	   dynamic_cast<BTextControl*>(fSavePanel->Window()->FindView("text view"));
-	BMenuBar * menuBar =
-	   dynamic_cast<BMenuBar*>(fSavePanel->Window()->FindView("MenuBar"));
-	   
-	fSavePanelEncodingMenu= new BMenu("Encoding");
-	menuBar->AddItem(fSavePanelEncodingMenu);
-	
-	// TODO: add encodings
-	
+	fSavePanel = 0; // build lazily
 }  /***StyledEditWindow::Initwindow()***/
 	
 void
@@ -669,8 +659,20 @@ StyledEditWindow::Save(BMessage *message)
 status_t
 StyledEditWindow::SaveAs()
 {
+	if (fSavePanel == 0) {
+		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false);
+		fSavePanelTextView = 
+		   dynamic_cast<BTextControl*>(fSavePanel->Window()->FindView("text view"));
+		BMenuBar * menuBar =
+		   dynamic_cast<BMenuBar*>(fSavePanel->Window()->FindView("MenuBar"));
+   
+		fSavePanelEncodingMenu= new BMenu("Encoding");
+		menuBar->AddItem(fSavePanelEncodingMenu);
+	}
+	
 	// it's own scope allows the lock to be released before Show()
 	{
+	// TODO: add encodings
 		BAutolock lock(fSavePanel->Window());
 		if (lock.IsLocked()) {
 			fSavePanelTextView->SetText(Title());
@@ -834,28 +836,46 @@ StyledEditWindow::Search(BString string, bool casesens, bool wrap, bool backsear
 	int32	finish;
 	int32	strlen;
 	
-	start= B_ERROR; 
+	start = B_ERROR; 
 	
-	strlen= string.Length();      
+	strlen = string.Length();      
 	if (strlen== 0)
 		return false;
 	
-	BString viewText;
-	viewText.SetTo(fTextView->Text());
+	BString viewText(fTextView->Text());
 	int32 textStart, textFinish;
 	fTextView->GetSelection(&textStart, &textFinish);
-	//case insensitive, non wrap seems to be default in SE...
-    if(casesens== true)
-       	start= viewText.FindFirst(string, textFinish);
-	else if(wrap== true)
-		start= viewText.IFindFirst(string); 
-	else if(backsearch== true)
-		start= viewText.IFindLast(string, textStart); 
-	else
-		start= viewText.IFindFirst(string, textFinish); //i.e this one...
-				
-	if(start!= B_ERROR) {
-		finish= start+ strlen;
+	if (backsearch == true) {
+		if (casesens == true) {
+			start = viewText.FindLast(string, textStart);
+		} else {
+			start = viewText.IFindLast(string, textStart);
+		}
+	} else {
+		if (casesens == true) {
+			start = viewText.FindFirst(string, textFinish);
+		} else {
+			start = viewText.IFindFirst(string, textFinish);
+		}
+	}
+	if ((start == B_ERROR) && (wrap == true)) {
+		if (backsearch == true) {
+			if (casesens == true) {
+				start = viewText.FindLast(string, viewText.Length());
+			} else {
+				start = viewText.IFindLast(string, viewText.Length());
+			}
+		} else {
+			if (casesens == true) {
+				start = viewText.FindFirst(string, 0);
+			} else {
+				start = viewText.IFindFirst(string, 0);
+			}
+		}
+	}
+	
+	if (start != B_ERROR) {
+		finish = start + strlen;
 		fTextView->Select(start, finish);
 		fTextView->ScrollToSelection();
 		return true;
@@ -877,51 +897,55 @@ StyledEditWindow::FindSelection()
 	viewText= fTextView->Text();
 				
 	viewText.CopyInto(fStringToFind, selectionStart, selectionLength);
-	Search(fStringToFind, false, false, false);
+	Search(fStringToFind, fCaseSens, fWrapAround, fBackSearch);
 
 }/***StyledEditWindow::FindSelection()***/
 	
-void
+bool
 StyledEditWindow::Replace(BString findthis, BString replaceWith,  bool casesens, bool wrap, bool backsearch)
 {
-	int32	start;
-	int32	replaceLength;
-	int32	findLength;
-	
-	start= B_ERROR; 
-	
-	findLength= findthis.Length();
-	replaceLength= replaceWith.Length();      
-	
-	BString viewText;
-	viewText.SetTo(fTextView->Text()); 
-	
-	int32 textStart, textFinish;
-	fTextView->GetSelection(&textStart, &textFinish);
-	
-    if(casesens== true)
-      	start= viewText.FindFirst(findthis, textFinish);
-	else if(wrap== true)
-		start= viewText.IFindFirst(findthis); 
-	else if(backsearch== true)
-		start= viewText.IFindLast(findthis, textStart);
-	else
-		start= viewText.IFindFirst(findthis, textFinish); 
-	
-	if (start!= B_ERROR) {
-		fTextView->Delete(start, start+ findLength);
-		fTextView->Insert(start, replaceWith.String(), replaceLength);
-		fTextView->Select(start, start+ replaceLength);
-	}	
+	if (Search(findthis, casesens, wrap, backsearch)) {
+		int32 start, finish;
+		fTextView->GetSelection(&start, &finish);
 		
+		fTextView->Delete(start, start + findthis.Length());
+		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		fTextView->Select(start, start + replaceWith.Length());
+		fTextView->ScrollToSelection();
+		return true;
+	} else {
+		return false;
+	}
 }/***StyledEditWindow::Replace()***/
 
 void
 StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 {
-	while(Search(findIt, caseSens, true, false)) 
-		Replace(findIt, replaceWith, caseSens, true, false);
+	int32	start;
+	int32	oldstart;
+	
+	BString viewText(fTextView->Text());
+	int32 textStart, textFinish;
+	fTextView->GetSelection(&textStart, &textFinish);
 
+	// we search backwards because we are disturbing everything after the point we insert
+	start = viewText.Length();
+	while (start > 0) {
+		oldstart = start;
+		if (caseSens)
+			start = viewText.FindLast(findIt.String(),start);
+		else
+			start = viewText.IFindLast(findIt.String(),start);
+		if (start == B_ERROR) 
+			break; // done
+		if (oldstart != start) {
+			fTextView->Delete(start, start + findIt.Length());
+			fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		} else {
+			start--; // we prefer not to get stuck
+		}
+	} 
+	
 }/***StyledEditWindow::ReplaceAll()***/
 
 void
