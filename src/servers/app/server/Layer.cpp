@@ -579,6 +579,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 				fDriver->ConstrainClippingRegion(&fUpdateReg);
 				fDriver->FillRect(fUpdateReg.Frame(), fLayerData->viewcolor);
 				fDriver->ConstrainClippingRegion(NULL);
+				SendUpdateMsg();
 			}
 		}
 		else

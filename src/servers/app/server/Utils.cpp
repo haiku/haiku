@@ -53,7 +53,7 @@ void SendMessage(port_id port, BMessage *message, int32 target)
 	if(message->Flatten(buffer,flatsize)==B_OK)
 		write_port(port, message->what, buffer,flatsize);
 	
-	delete buffer;
+	delete [] buffer;
 	delete message;
 }
 

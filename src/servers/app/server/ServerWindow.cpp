@@ -2295,7 +2295,7 @@ void ServerWindow::SendMessageToClient(const BMessage* msg) const
 	else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle.String());
 
-	delete buffer;
+	delete [] buffer;
 }
 //------------------------------------------------------------------------------
 

@@ -173,9 +173,28 @@ void ServerFont::Height(font_height *fh)
 
 /*!
 	\brief Sets the ServerFont instance to whatever font is specified
-	\param fontID the combination of family and style ID numbers
+	\param familyID ID number of the family to set
+	\param styleID ID number of the style to set
+	\return B_OK if successful, B_ERROR if not
 */
-void ServerFont::SetFamilyAndStyle(const uint32 &fontID)
+status_t ServerFont::SetFamilyAndStyle(const uint16 &familyID,const uint16 &styleID)
+{
+	fontserver->Lock();
+	FontStyle *sty=fontserver->GetStyle(familyID,styleID);
+	fontserver->Unlock();
+	if(!sty)
+		return B_ERROR;
+	
+	fStyle=sty;
+	return B_OK;
+}
+
+/*!
+	\brief Sets the ServerFont instance to whatever font is specified
+	\param fontID the combination of family and style ID numbers
+	\return B_OK if successful, B_ERROR if not
+*/
+status_t ServerFont::SetFamilyAndStyle(const uint32 &fontID)
 {
 	uint16 style = fontID & 0xFFFF;
 	uint16 family = (fontID & 0xFFFF0000) >> 16;
@@ -183,8 +202,11 @@ void ServerFont::SetFamilyAndStyle(const uint32 &fontID)
 	fontserver->Lock();
 	FontStyle *sty=fontserver->GetStyle(family,style);
 	fontserver->Unlock();
-	if(sty)
-		fStyle=sty;
+	if(!sty)
+		return B_ERROR;
+	
+	fStyle=sty;
+	return B_OK;
 }
 
 /*!
