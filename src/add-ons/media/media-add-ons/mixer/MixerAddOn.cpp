@@ -45,7 +45,7 @@ status_t AudioMixerAddon::GetFlavorAt(
 	flavor_info* fInfo = new flavor_info;
 	fInfo->internal_id = n;
 	fInfo->name = "AudioMixer";
-	fInfo->info = "AudioMixer media addon\n";
+	fInfo->info = "AudioMixer media addon";
 	fInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
 	fInfo->flavor_flags = 0;	// 0 = global or local instantiation allowed, no restrictions
 	fInfo->possible_count = 0;	// 0 = infinite
