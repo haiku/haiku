@@ -9,6 +9,7 @@
 #include <boot/vfs.h>
 
 #include "Volume.h"
+#include "Stream.h"
 
 
 namespace BFS {
@@ -29,8 +30,7 @@ class Directory : public ::Directory {
 		virtual status_t Rewind(void *cookie);
 
 	private:
-		Volume		&fVolume;
-		bfs_inode	fNode;
+		Stream		fStream;
 };
 
 }	// namespace BFS
