@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -9,6 +9,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+// ToDo: this should not really be build with the kernel build rules...
 #ifdef _KERNEL_MODE
 #	undef _KERNEL_MODE
 #endif
@@ -27,7 +28,8 @@
 
 #include "rld_priv.h"
 
-#define TRACE_RLD
+
+//#define TRACE_RLD
 #ifdef TRACE_RLD
 #	define TRACE(x) dprintf x
 #else
@@ -140,17 +142,14 @@ static struct uspace_program_args const *gProgramArgs;
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
-/*
- * This macro is non ISO compliant, but a gcc extension
- */
+#ifdef TRACE_RLD
+
 #define	FATAL(x,y...) \
 	if (x) { \
-		printf("rld.so: " y); \
+		dprintf("rld.so: " y); \
 		_kern_exit(0); \
 	}
 
-
-#ifdef TRACE_RLD
 void
 dprintf(const char *format, ...)
 {
@@ -164,6 +163,14 @@ dprintf(const char *format, ...)
 
 	va_end(list);
 }
+#else
+
+#define	FATAL(x,y...) \
+	if (x) { \
+		printf("rld.so: " y); \
+		_kern_exit(0); \
+	}
+
 #endif
 
 
@@ -817,75 +824,116 @@ register_image(image_t *image, int fd, const char *path)
 	info.data_size = image->regions[1].size;
 	image->id = _kern_register_image(&info, sizeof(image_info));
 }
-			
-static int
-search_container(char const *name, const char *paths)
+
+
+static const char *
+search_path_for_type(image_type type)
 {
-	char *leaf_name;
-	char search_paths[PATH_MAX + 1];
-	char *path;
-	char *next_path_token = NULL;
-	char buffer[PATH_MAX + 1];
-	int fd = -1;
+	switch (type) {
+#if 0
+		// ToDo: note, the getenv() call is not yet part of rld.so
+		case B_APP_IMAGE:
+			return getenv("PATH");
+		case B_LIBRARY_IMAGE:
+			return getenv("LIBRARY_PATH");
+		case B_ADD_ON_IMAGE:
+			return getenv("ADDON_PATH");
+#else
+		case B_APP_IMAGE:
+			return "/boot/home/config/bin:"
+					"/boot/apps:"
+					"/boot/preferences:"
+					"/boot/beos/apps:"
+					"/boot/beos/preferences:"
+					"/boot/develop/tools/gnupro/bin";
 
-	if (!name || !paths)
-		return B_ERROR;
+		case B_LIBRARY_IMAGE:
+			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
 
-	leaf_name = strrchr(name, '/');
-	if (leaf_name != NULL)
-		leaf_name++;
-	else
-		leaf_name = (char *) name;
-	
-	// duplicate environment variable before screw it!
-	strncpy(search_paths, paths, PATH_MAX);
-	
-	dprintf("rld.so: search_container(%s (%s), %s)\n", name, leaf_name, paths);
-	
-	// TODO: when available, switch to thread-aware strtok_r() version 
-	path = strtok_r(search_paths, ":", &next_path_token);
-	while (path) {
-		if (strncmp(path, "%A/", 3) == 0) {
-			// Replace %A with current app folder path
-			// Maybe using first image info is better suited than gProgamArgs->program_path here...			
-			char *end_slash;
-			end_slash = strrchr(gProgramArgs->program_path, '/');
-			if (end_slash != NULL) {
-				strncpy(buffer, gProgramArgs->program_path, PATH_MAX);
-				strncat(end_slash, path + 2, PATH_MAX);
-			} else {
-				// FIXME: does _kern_open() resolve relative path?
-				// If not, call getcwd() instead here...
-				strncpy(buffer, ".", PATH_MAX);
-				strncat(buffer, path + 2, PATH_MAX);
-			}
-		} else
-			// Take the path AS-IS
-			// TODO: remove any lasting / in path
-			strncpy(buffer, path, PATH_MAX); 
-
-		strncat(buffer, "/", PATH_MAX);
-		strncat(buffer, leaf_name, PATH_MAX);
-
-		dprintf("rld.so: search_container(%s): trying %s\n", leaf_name, buffer);
-
-		fd = _kern_open(-1, buffer, 0);
-		if (fd >= 0) {
-			dprintf("rld.so: search_container(%s): found at %s\n", leaf_name, buffer);
-			break;	// Found!
-		}
-			
-		// Try next search path
-		path = strtok_r(NULL, ":", &next_path_token);
+		case B_ADD_ON_IMAGE:
+			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
+#endif
+		default:
+			return NULL;
 	}
-	
-	return (fd < 0) ? B_NAME_NOT_FOUND : fd;
 }
 
+
+static int
+open_container(char *name, image_type type)
+{
+	char searchPath[PATH_MAX];
+	const char *paths;
+	char *path;
+	char *nextPathToken = NULL;
+
+	if (strchr(name, '/')) {
+		// the name already contains a path, we don't have to search for it
+		return _kern_open(-1, name, O_RDONLY);
+	}
+
+	// let's evaluate the system path variables to find the container
+
+	paths = search_path_for_type(type);
+	if (paths == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// duplicate environment variable before screw it!
+	strlcpy(searchPath, paths, PATH_MAX);
+
+	TRACE(("rld.so: open_container() %s in %s\n", name, searchPath));
+
+	path = strtok_r(searchPath, ":", &nextPathToken);
+	while (path != NULL) {
+		char buffer[PATH_MAX + 1];
+		int fd;
+
+		if (strncmp(path, "%A", 2) == 0) {
+			// Replace %A with current app folder path (of course,
+			// this must be the first part of the path)
+			// ToDo: Maybe using first image info is better suited than gProgamArgs->program_path here?
+			char *lastSlash = strrchr(gProgramArgs->program_path, '/');
+
+			// copy what's left (when the application name is removed)
+			if (lastSlash != NULL) {
+				strlcpy(buffer, gProgramArgs->program_path,
+					min(PATH_MAX, lastSlash + 1 - gProgramArgs->program_path));
+			} else
+				strlcpy(buffer, ".", PATH_MAX);
+
+			strlcat(buffer, path + 2, PATH_MAX);
+		} else {
+			// Take the path as-is
+			strlcpy(buffer, path, PATH_MAX);
+		}
+
+		strlcat(buffer, "/", PATH_MAX);
+			// Several slashes in sequence will be ignored, so we're playing safe and add one more
+		strlcat(buffer, name, PATH_MAX);
+
+		TRACE(("rld.so: open_container(%s): trying %s\n", name, buffer));
+
+		fd = _kern_open(-1, buffer, O_RDONLY);
+		if (fd >= B_OK) {
+			// we found it, copy path!
+			TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
+			strlcpy(name, buffer, PATH_MAX);
+			return fd;
+		}
+
+		// Try next search path
+		path = strtok_r(NULL, ":", &nextPathToken);
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 static image_t *
-load_container(char const *path, char const *name, image_type type)
+load_container(char const *containerPath, char const *name, image_type type)
 {
 	int32 pheaderSize, sheaderSize;
+	char path[PATH_MAX];
 	int fd;
 	int len;
 	char ph_buff[4096];
@@ -904,42 +952,10 @@ load_container(char const *path, char const *name, image_type type)
 		return found;
 	}
 
+	strlcpy(path, containerPath, sizeof(path));
+
 	// Try to load explicit image path first
-	fd = _kern_open(-1, path, 0);
-	if (fd < 0) {
-		const char *paths;
-
-		switch (type) {
-#if 0
-		case B_APP_IMAGE:		paths = getenv("PATH");	break;
-		case B_LIBRARY_IMAGE:	paths = getenv("LIBRARY_PATH"); break;
-		case B_ADD_ON_IMAGE:	paths = getenv("ADDON_PATH"); break;
-#else		
-		case B_APP_IMAGE:
-			paths = "/boot/home/config/bin:"
-					"/boot/apps:"
-					"/boot/preferences:"
-					"/boot/beos/apps:"
-					"/boot/beos/preferences:"
-					"/boot/develop/tools/gnupro/bin";
-			break;
-
-		case B_LIBRARY_IMAGE:
-			paths = "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
-			break;
-
-		case B_ADD_ON_IMAGE:
-			paths = "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
-			break;
-#endif			
-		default:
-			paths = NULL;
-		}
-		
-		if (paths)
-			// search container in these paths
-			fd = search_container(name, paths);
-	}
+	fd = open_container(path, type);
 	FATAL((fd < 0), "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
@@ -985,8 +1001,7 @@ static void
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	addr_t   needed_offset;
-	// char   path[256];
+	addr_t needed_offset;
 	uint32 i, j;
 
 	if (!d)
@@ -1000,9 +1015,6 @@ load_dependencies(image_t *image)
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
 				needed_offset = d[i].d_un.d_ptr;
-				// ToDo: ever heard of the LIBRARY_PATH env variable?
-				// sprintf(path, "/boot/beos/system/lib/%s", STRING(image, needed_offset));
-				// image->needed[j] = load_container(path, STRING(image, needed_offset), B_LIBRARY_IMAGE);
 				image->needed[j] = load_container(STRING(image, needed_offset),
 										STRING(image, needed_offset), B_LIBRARY_IMAGE);
 				j += 1;
