@@ -8,7 +8,6 @@
 
 #include <TypeConstants.h>
 #include <Mime.h>
-#include <Node.h>
 
 #include <fs_attr.h>
 
