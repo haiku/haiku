@@ -1099,7 +1099,7 @@ BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, c
 	for(;;) {
 		pos = strcspn(_privateData + offset, setOfCharsToEscape);
 		offset += pos;
-		if (offset > Length())
+		if (offset >= Length())
 			break;
 		_OpenAtBy(offset, 1);
 		memset(_privateData + offset, escapeWith, 1);
@@ -1121,7 +1121,7 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 	for(;;) {
 		pos = strcspn(_privateData + offset, setOfCharsToEscape);
 		offset += pos;
-		if (offset > Length())
+		if (offset >= Length())
 			break;
 		_OpenAtBy(offset, 1);
 		memset(_privateData + offset, escapeWith, 1);

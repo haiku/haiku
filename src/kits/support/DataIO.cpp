@@ -343,16 +343,13 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
 	
 	status_t error = B_OK;
-
+	
 	if (newSize > fMallocSize)
 		error = SetSize(newSize);
 			
-	if (error == B_OK) {
+	if (error == B_OK)
 		memcpy(fData + pos, buffer, size);
-		if (pos + size > fLength)
-				fLength = pos + size;
-	}
-	
+		
 	return error != B_OK ? error : size;
 }
 
@@ -395,23 +392,26 @@ BMallocIO::SetSize(off_t size)
 		// size == 0, free the memory
 		free(fData);
 		fData = NULL;
+		fMallocSize = 0;
 	} else {
 		// size != 0, see, if necessary to resize
-		size = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
+		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
 		if (size != fMallocSize) {
 			// we need to resize
-			if (char *newData = static_cast<char*>(realloc(fData, size))) {
+			if (char *newData = static_cast<char*>(realloc(fData, newSize))) {
 				// set the new area to 0
-				if (size > fMallocSize)
-					memset(newData + fMallocSize, 0, size - fMallocSize);				
+				if (newSize > fMallocSize)
+					memset(newData + fMallocSize, 0, newSize - fMallocSize);				
 				fData = newData;
-				fMallocSize = size;
+				fMallocSize = newSize;
 			} else	// couldn't alloc the memory
 				error = B_NO_MEMORY;
 		}
 	}
+	
 	if (error == B_OK)
-		fLength = size;	
+		fLength = size;
+	
 	return error;
 }
 
