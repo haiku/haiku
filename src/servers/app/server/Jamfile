@@ -22,6 +22,7 @@ Server app_server :
 
 	# Manager Classes
 	AppServer.cpp
+	BitmapDriver.cpp
 	BitmapManager.cpp
 	CursorManager.cpp
 	Desktop.cpp
