@@ -1,17 +1,16 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include "DoublyLinkedListTest.h"
-#include <cppunit/Test.h>
+
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
-#include <stdio.h>
 #include <TestUtils.h>
 
-#include "DoublyLinkedList.h"
+#include <util/DoublyLinkedList.h>
 
 
 // Class used for testing without offset

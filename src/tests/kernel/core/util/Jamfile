@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests kernel core util ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits app ] ;
 
 # Two versions of the test lib are not really needed until
