@@ -817,6 +817,12 @@ rule Translator
 	MakeLocate $(1) : $(targetdir) ;
 }
 
+rule ScreenSaver
+{
+	# ScreenSaver <name> : <sources> : <libraries> ;
+	Addon $(1) : screen_savers : $(2) : false : $(3) ;
+}
+
 rule MakeLocateObjects
 {
 	# MakeLocateObjects <sources_or_objects> ;
