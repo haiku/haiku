@@ -5,36 +5,27 @@
 //		Implementation file for EchoGals generic driver Layla DSP
 //		interface class.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -191,8 +182,6 @@ DWORD CLaylaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 ECHOSTATUS CLaylaDspCommObject::SetInputClock(WORD wClock)
 {
 	BOOL			bSetRate;
-	//BOOL			bWriteControlReg;
-	//DWORD			dwSampleRate;
 	WORD			wNewClock;
 
 	ECHO_DEBUGPRINTF( ( "CLaylaDspCommObject::SetInputClock:\n" ) );
@@ -237,7 +226,7 @@ ECHOSTATUS CLaylaDspCommObject::SetInputClock(WORD wClock)
 			break;
 
 		default :
-			ECHO_DEBUGPRINTF(("Input clock 0x%x not supported for Layla24\n", wClock));
+			ECHO_DEBUGPRINTF(("Input clock 0x%x not supported for Layla24\n",wClock));
 			ECHO_DEBUGBREAK();
 				return ECHOSTATUS_CLOCK_NOT_SUPPORTED;
 
@@ -270,6 +259,8 @@ ECHOSTATUS CLaylaDspCommObject::SetInputClock(WORD wClock)
 
 ECHOSTATUS CLaylaDspCommObject::SetOutputClock(WORD wClock)
 {
+	WORD wLaylaOutClock;
+
 	if (FALSE == m_bASICLoaded)
 		return ECHOSTATUS_ASIC_NOT_LOADED;
 		
@@ -278,7 +269,24 @@ ECHOSTATUS CLaylaDspCommObject::SetOutputClock(WORD wClock)
 
 	ECHO_DEBUGPRINTF( ("CDspCommObject::SetOutputClock:\n") );
 		
-	m_pDspCommPage->wOutputClock = SWAP(wClock);
+	//
+	// Translate generic driver clock constants to values for Layla20 firmware
+	//
+	switch (wClock)
+	{
+		case ECHO_CLOCK_SUPER :
+			wLaylaOutClock = LAYLA20_OUTPUT_CLOCK_SUPER;
+			break;
+	
+		case ECHO_CLOCK_WORD :
+			wLaylaOutClock = LAYLA20_OUTPUT_CLOCK_WORD;
+			break;
+													  		
+		default :
+			return ECHOSTATUS_INVALID_PARAM;
+	}
+
+	m_pDspCommPage->wOutputClock = SWAP(wLaylaOutClock);
 	m_wOutputClock = wClock;
 	
 	ClearHandshake();
@@ -290,27 +298,17 @@ ECHOSTATUS CLaylaDspCommObject::SetOutputClock(WORD wClock)
 
 //===========================================================================
 //
-// Detect MIDI output activity
-//
-//===========================================================================
-
-BOOL CLaylaDspCommObject::IsMidiOutActive()
-{
-	ULONGLONG	ullCurTime;
-
-	m_pOsSupport->OsGetSystemTime( &ullCurTime );
-	return( ( ( ullCurTime - m_ullMidiOutTime ) > MIDI_ACTIVITY_TIMEOUT_USEC ) ? FALSE : TRUE );
-}	// BOOL CLaylaDspCommObject::IsMidiOutActive()
-
-
-//===========================================================================
-//
 // Input bus gain - iGain is in units of .5 dB
 //
 //===========================================================================
 
-ECHOSTATUS CLaylaDspCommObject::SetBusInGain( WORD wBusIn, int iGain)
+ECHOSTATUS CLaylaDspCommObject::SetBusInGain( WORD wBusIn, INT32 iGain)
 {
+	ECHO_DEBUGPRINTF(("CLaylaDspCommObject::SetBusInGain\n"));
+	
+	if (wBusIn >= LAYLA20_INPUT_TRIMS)
+		return ECHOSTATUS_INVALID_CHANNEL;
+
 	//
 	// Store the gain for later use
 	//
@@ -335,14 +333,13 @@ ECHOSTATUS CLaylaDspCommObject::SetBusInGain( WORD wBusIn, int iGain)
 
 }	
 
-ECHOSTATUS CLaylaDspCommObject::GetBusInGain( WORD wBusIn, int &iGain)
+
+ECHOSTATUS CLaylaDspCommObject::GetBusInGain( WORD wBusIn, INT32 &iGain)
 {
-	//ECHOSTATUS Status;
-	
-	if (wBusIn > m_wNumBussesIn)
+	if (wBusIn >= LAYLA20_INPUT_TRIMS)
 		return ECHOSTATUS_INVALID_CHANNEL;
 	
-	iGain = (int) m_byInputTrims[wBusIn];	
+	iGain = (INT32) m_byInputTrims[wBusIn];	
 	
 	return ECHOSTATUS_OK;
 }	
@@ -365,6 +362,8 @@ ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
 	BOOL	bState
 )
 {
+	ECHO_DEBUGPRINTF(("CLaylaDspCommObject::SetNominalLevel\n"));
+
 	if (wBus < m_wNumBussesOut)
 	{
 		//
@@ -376,8 +375,10 @@ ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
 	//
 	// Check the bus number
 	//
-	if (wBus < (m_wNumBussesOut + m_wNumBussesIn))
+	ECHO_DEBUGPRINTF(("\tChecking the bus number\n"));
+	if (wBus < (m_wNumBussesOut + LAYLA20_INPUT_TRIMS))
 	{
+		ECHO_DEBUGPRINTF(("\twBus %d  m_pDspCommPage %p\n",wBus,m_pDspCommPage));
 		//
 		// Set the nominal bit in the comm page
 		//		
@@ -389,7 +390,10 @@ ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
 		//
 		// Set the input trim, using the current gain
 		//	
-		return SetBusInGain(wBus - m_wNumBussesOut,(int) m_byInputTrims[wBus]);
+		ECHO_DEBUGPRINTF(("\tCalling SetBusInGain\n"));
+		
+		wBus -= m_wNumBussesOut;
+		return SetBusInGain(	wBus, (INT32) m_byInputTrims[wBus]);
 	}
 
 	ECHO_DEBUGPRINTF( ("CLaylaDspCommObject::SetNominalOutLineLevel Invalid "
@@ -398,6 +402,45 @@ ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
 	return ECHOSTATUS_INVALID_CHANNEL;
 
 }	// ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
+
+
+//===========================================================================
+//
+// ASIC status check
+//
+// This test sometimes fails for Layla20; for Layla20, the loop runs 5 times
+// and succeeds if it wins on three of the loops.
+//
+//===========================================================================
+
+BOOL CLaylaDspCommObject::CheckAsicStatus()
+{
+	DWORD dwNumTests;
+	DWORD dwNumWins;
+	BOOL bLoaded;
+
+	dwNumTests = NUM_ASIC_ATTEMPTS;
+	dwNumWins = 0;
+	do
+	{
+		bLoaded = CDspCommObject::CheckAsicStatus();
+		if (FALSE != bLoaded)
+		{
+			dwNumWins++;
+			if (NUM_ASIC_WINS == dwNumWins)
+			{
+				m_bASICLoaded = TRUE;
+				break;
+			}
+		}
+	
+		m_bASICLoaded = FALSE;
+		dwNumTests--;
+	} while (dwNumTests != 0);
+
+	return m_bASICLoaded;
+
+}	// BOOL CLaylaDspCommObject::CheckAsicStatus()
 
 
 // **** LaylaDspCommObject.cpp ****

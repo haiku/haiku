@@ -5,41 +5,32 @@
 //		Implementation file for the CDaffyDuck class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
-// 
 //---------------------------------------------------------------------------
 //
 // The head pointer tracks the next free slot in the circular buffers
 // The tail pointer tracks the oldest mapping.
+//
+// Fixme add integrity checks for all functions
 //
 //****************************************************************************
 
@@ -85,11 +76,12 @@ PVOID CDaffyDuck::operator new( size_t Size )
 
 VOID  CDaffyDuck::operator delete( PVOID pVoid )
 {
+
 	if ( ECHOSTATUS_OK != OsFreeNonPaged( pVoid ) )
 	{
 		ECHO_DEBUGPRINTF(("CDaffyDuck::operator delete memory free failed\n"));
 	}
-	
+
 }	// VOID  CDaffyDuck::operator delete( PVOID pVoid )
 
 
@@ -101,35 +93,37 @@ VOID  CDaffyDuck::operator delete( PVOID pVoid )
 
 CDaffyDuck::CDaffyDuck
 (
-	PCOsSupport 	pOsSupport,
-	CDspCommObject	*pDspCommObject,
-	WORD				wPipeIndex
+	PCOsSupport 	pOsSupport
 )
 {
 	//
 	// Allocate the page for the duck entries
-	// 
-	if ( ECHOSTATUS_OK != pOsSupport->OsPageAllocate( 1,
-																	  (PVOID *) &m_DuckEntries,
-																	  &m_dwDuckEntriesPhys ) )
+	//
+	ECHOSTATUS Status;
+	DWORD dwSegmentSize;
+	
+	
+	Status = pOsSupport->AllocPhysPageBlock( PAGE_SIZE, m_pDuckPage);
+	if (ECHOSTATUS_OK != Status)
 	{
-		ECHO_DEBUGPRINTF( ("CDaffyDuck: memory allocation failed\n") );
+		ECHO_DEBUGPRINTF(("CDaffyDuck::CDaffyDuck - duck entry malloc failed\n"));
 		return;
 	}
 	
+	m_DuckEntries = (DUCKENTRY *) pOsSupport->GetPageBlockVirtAddress( m_pDuckPage );
+	pOsSupport->GetPageBlockPhysSegment(m_pDuckPage,
+													0,
+													m_dwDuckEntriesPhys,
+													dwSegmentSize);
 	//
 	//	Stash stuff
 	// 
 	m_pOsSupport = pOsSupport;
-	m_pDspCommObject = pDspCommObject;
-	m_wPipeIndex = wPipeIndex;
 	
 	//
-	// Put the physical address of the duck at the end of 
-	// the m_DuckEntries array so the DSP will wrap around
-	// to the start of the duck.  
-	//
-	m_DuckEntries[MAX_ENTRIES].PhysAddr = SWAP( m_dwDuckEntriesPhys );
+	// Other init
+	// 
+	Reset();
 	
 }	// CDaffyDuck::CDaffyDuck()
 
@@ -143,8 +137,8 @@ CDaffyDuck::CDaffyDuck
 CDaffyDuck::~CDaffyDuck()
 {
 
-	m_pOsSupport->OsPageFree(1,m_DuckEntries,m_dwDuckEntriesPhys);
-
+	m_pOsSupport->FreePhysPageBlock( PAGE_SIZE, m_pDuckPage);
+	
 }	// CDaffyDuck::~CDaffyDuck()
 
 
@@ -181,9 +175,8 @@ ECHOSTATUS CDaffyDuck::InitCheck()
 void CDaffyDuck::Reset()
 {
 	//
-	//	Zero everything
+	//	Zero stuff
 	// 
-	OsZeroMemory(m_DuckEntries,4096);
 	OsZeroMemory(m_Mappings,sizeof(m_Mappings));
 	
 	m_dwHead = 0;
@@ -192,12 +185,25 @@ void CDaffyDuck::Reset()
 	m_ullLastEndPos = 0;
 
 	//
+	// Set all duck entries to "end of list" except for the last one
+	//
+	DWORD i;
+	
+	for (i = 0; i < MAX_ENTRIES; i++)
+	{
+		m_DuckEntries[i].PhysAddr = 0;
+		m_DuckEntries[i].dwSize = 0xffffffff;
+	}
+
+	//
 	// Put the physical address of the duck at the end of 
 	// the m_DuckEntries array so the DSP will wrap around
 	// to the start of the duck.  
 	//
+													
 	m_DuckEntries[MAX_ENTRIES].PhysAddr = SWAP( m_dwDuckEntriesPhys );
-	
+	m_DuckEntries[MAX_ENTRIES].dwSize = 0;
+
 }	// Reset
 
 
@@ -210,38 +216,40 @@ void CDaffyDuck::Reset()
 
 void CDaffyDuck::ResetStartPos()
 {
-	DWORD dwRemaining,dwIndex,dwNumEntries;
+	DWORD dwRemaining,dwIndex;
 
 	m_ullLastEndPos = 0L;
 	
 	//
-	// See if the mapping at the buffer tail has been consumed
+	// Re-calculate the end positions
 	//
 	dwRemaining = m_dwCount;
 	dwIndex = m_dwTail;
 	while (0 != dwRemaining)
 	{
-		m_Mappings[dwIndex].ullEndPos = 
-			m_ullLastEndPos + SWAP( m_DuckEntries[dwIndex].dwSize );
-			
-		m_ullLastEndPos = m_Mappings[dwIndex].ullEndPos;
+		if (	( 0 != m_DuckEntries[ dwIndex ].dwSize) &&
+				( 0 != m_DuckEntries[ dwIndex ].PhysAddr ) )
+		{
+			m_Mappings[dwIndex].ullEndPos = 
+				m_ullLastEndPos + SWAP( m_DuckEntries[ dwIndex ].dwSize );
 	
-		dwNumEntries = m_Mappings[m_dwTail].dwNumEntries;
-		
-		ASSERT(dwRemaining >= dwNumEntries);
-
-		dwIndex += dwNumEntries;
-		if (dwIndex >= MAX_ENTRIES)
-			dwIndex -= MAX_ENTRIES;
+			m_ullLastEndPos = m_Mappings[ dwIndex ].ullEndPos;
+		}
+		else
+		{
+			m_Mappings[dwIndex].ullEndPos = m_ullLastEndPos;
+		}
 			
-		dwRemaining -= dwNumEntries;
+		dwIndex++;
+		dwIndex &= ENTRY_INDEX_MASK;
+			
+		dwRemaining--;
 	}
 	
 }	// ResetStartPos
 
 
-
-
+	
 /****************************************************************************
 
 	Mapping management
@@ -266,7 +274,7 @@ ECHOSTATUS CDaffyDuck::AddMapping
 (
 	DWORD			dwPhysAddr,
 	DWORD			dwBytes,
-	DWORD			dwTag,
+	NUINT 		Tag,
 	DWORD			dwInterrupt,
 	DWORD			&dwNumFreeEntries
 )
@@ -276,10 +284,15 @@ ECHOSTATUS CDaffyDuck::AddMapping
 #endif	
 
 	//
-	// The caller should only be trying to do this if 
-	// there are at least two free entries
+	// There must always be at least one free entry for the "end of list" 
+	// entry.  dwInterrupt may be non-zero, so make sure that there's enough
+	// room for two more entries
 	//
-	ASSERT((MAX_ENTRIES - m_dwCount) >= 2);
+	if ((MAX_ENTRIES - m_dwCount) < 3)
+	{
+		ECHO_DEBUGPRINTF(("AddMapping - duck is full\n"));
+		return ECHOSTATUS_DUCK_FULL;
+	}
 	
 	//
 	//	At least two slots are available in the circular 
@@ -289,16 +302,11 @@ ECHOSTATUS CDaffyDuck::AddMapping
 	m_DuckEntries[m_dwHead].PhysAddr = SWAP( dwPhysAddr );
 	m_DuckEntries[m_dwHead].dwSize 	= SWAP( dwBytes );
 	
-	m_Mappings[m_dwHead].dwTag			= dwTag;
+	m_Mappings[m_dwHead].Tag			= Tag;
 	m_Mappings[m_dwHead].ullEndPos	= m_ullLastEndPos + dwBytes;
 	
 	m_ullLastEndPos = m_Mappings[m_dwHead].ullEndPos;
 	
-	/*
-	ECHO_DEBUGPRINTF(("CDaffyDuck::AddMapping  m_dwCount %ld  pipe index %d  end pos %I64x\n",
-							m_dwCount,m_wPipeIndex,m_ullLastEndPos));	
-	*/
-		
 	//
 	// If the caller wants an interrupt after this mapping, then
 	// dwInterrupt will be non-zero
@@ -308,52 +316,36 @@ ECHOSTATUS CDaffyDuck::AddMapping
 		DWORD dwNext;
 
 		//
-		// Interrupt wanted - need to add an extra slot with the double zero
-		//
-		m_Mappings[m_dwHead].dwNumEntries = 2;
-
-		//
 		// Put in the double zero so the DSP will
 		// generate an interrupt
 		//
 		dwNext = m_dwHead + 1;
-		if (dwNext >= MAX_ENTRIES)
-			dwNext -= MAX_ENTRIES;	
+		dwNext &= ENTRY_INDEX_MASK;
 	
 		m_DuckEntries[dwNext].PhysAddr 	= 0;	// no need to swap zero!
 		m_DuckEntries[dwNext].dwSize 		= 0;
 		
-		m_dwCount += 2;				
+		m_Mappings[dwNext].ullEndPos = m_ullLastEndPos;
+
+		m_dwHead += 2;
+		m_dwCount += 2;
 	}
 	else
 	{
-		m_Mappings[m_dwHead].dwNumEntries = 1;
-
+		m_dwHead++;
 		m_dwCount++;
 	}
 	
 	//
-	// Move the head to point to the next empty slot
+	// Wrap the head index
 	//		
-	m_dwHead += m_Mappings[m_dwHead].dwNumEntries;
-	if (m_dwHead >= MAX_ENTRIES)
-		m_dwHead -= MAX_ENTRIES;	// circular buffer wrap
+	m_dwHead &=	ENTRY_INDEX_MASK;
 
 	//
 	// Return value to the caller
 	//	
 	dwNumFreeEntries = MAX_ENTRIES - m_dwCount;
 	
-	//
-	// Tell the DSP about the new buffer if the
-	// interrupt flag is set 
-	//
-	if (dwInterrupt != 0)
-	{
-		m_pDspCommObject->AddBuffer( m_wPipeIndex );
-	}
-
-
 //#ifdef _DEBUG
 #if 0
 	DWORD hi,lo;
@@ -361,7 +353,7 @@ ECHOSTATUS CDaffyDuck::AddMapping
 	hi = (DWORD) (m_ullLastEndPos >> 32);
 	lo = (DWORD) (m_ullLastEndPos & 0xffffffffL);
 	
-	ECHO_DEBUGPRINTF(("Added tag %ld, end pos 0x%08lx%08lx (int %ld)\n",dwTag,hi,lo,dwInterrupt));
+	ECHO_DEBUGPRINTF(("Added tag %ld, end pos 0x%08lx%08lx (int %ld)\n",Tag,hi,lo,dwInterrupt));
 
 #ifdef INTEGRITY_CHECK
 	CheckIntegrity();
@@ -370,7 +362,7 @@ ECHOSTATUS CDaffyDuck::AddMapping
 	ECHO_DEBUGPRINTF(("Daffy duck count is %ld\n",m_dwCount));
 	
 #endif
-	
+
 	return ECHOSTATUS_OK;
 	
 }	// AddMapping
@@ -381,87 +373,40 @@ ECHOSTATUS CDaffyDuck::AddMapping
 // AddDoubleZero
 //
 // Adds a double zero to the circular buffer to cause the DSP to generate an
-// IRQ.  If the buffer is full -or- the most recent entry already has a 
-// double zero, nothing happens.
+// IRQ. 
 // 
 //===========================================================================
 
-void CDaffyDuck::AddDoubleZero()
+ECHOSTATUS CDaffyDuck::AddDoubleZero()
 {
 	//
-	// Skip if the circular buffer is full or empty
+	// There must always be at least one free entry for the "end of list" 
+	// entry. 
 	//
-	if ((MAX_ENTRIES == m_dwCount) || (0 == m_dwCount))
-		return;
+	if ((MAX_ENTRIES - m_dwCount) < 2)
+	{
+		ECHO_DEBUGPRINTF(("AddDoubleZero - duck is full\n"));
+		return ECHOSTATUS_DUCK_FULL;
+	}
 	
 	//ECHO_DEBUGPRINTF(("CDaffyDuck::AddDoubleZero  m_dwCount %ld\n",m_dwCount));	
 
 	//
-	// Search back before the head and find the most recent entry
-	//
-	DWORD	dwEntry;
-#ifdef _DEBUG
-	DWORD dwCount = 0;
-#endif
-
-
-	do
-	{
-#ifdef _DEBUG
-		dwCount++;
-		if (dwCount > 2)
-		{
-			ECHO_DEBUGPRINTF(("CDaffyDuck::AddDoubleZero - shouldn't search back more "
-									"than two entries!\n"));
-			ECHO_DEBUGBREAK();
-		}
-#endif
-
-		dwEntry = m_dwHead - 1;
-		if (dwEntry >= 0x80000000)
-			dwEntry += MAX_ENTRIES;		// circular buffer wrap
-
-		if (m_Mappings[dwEntry].dwNumEntries != 0)
-			break;
-
-
-				
-	} while (dwEntry != m_dwTail);
-
-	//
-	// Quit if this entry already has a double zero
-	//
-	ASSERT(m_Mappings[dwEntry].dwNumEntries <= 2);
-
-	if (2 == m_Mappings[dwEntry].dwNumEntries)
-		return;
-		
-	//
 	// Add the double zero
 	//
-	DWORD	dwNext;
-	
-	dwNext = dwEntry + 1;
-	if (dwNext >= MAX_ENTRIES)
-		dwNext -= MAX_ENTRIES;
-
-	m_DuckEntries[dwNext].PhysAddr 	= 0;
-	m_DuckEntries[dwNext].dwSize 		= 0;
-
-	m_Mappings[dwEntry].dwNumEntries += 1;
-	
-	m_dwCount++;
-	
-	m_dwHead = dwEntry + m_Mappings[dwEntry].dwNumEntries;
-	if (m_dwHead >= MAX_ENTRIES)
-		m_dwHead -= MAX_ENTRIES;
+	m_DuckEntries[m_dwHead].PhysAddr 	= 0;
+	m_DuckEntries[m_dwHead].dwSize 		= 0;
+	m_Mappings[m_dwHead].ullEndPos		= m_ullLastEndPos;
 	
 	//
-	// Tell the DSP about it
-	//	
-	m_pDspCommObject->AddBuffer( m_wPipeIndex );	
+	// Housekeeping
+	//		
+	m_dwHead++;
+	m_dwHead &=	ENTRY_INDEX_MASK;
+
+	m_dwCount++;
 	
-	//ECHO_DEBUGPRINTF(("Added double zero\n"));
+	return ECHOSTATUS_OK;
 		
 }	// AddDoubleZero
 
@@ -487,11 +432,8 @@ void CDaffyDuck::Wrap()
 	m_DuckEntries[m_dwHead].PhysAddr		= SWAP( m_dwDuckEntriesPhys );
 	m_DuckEntries[m_dwHead].dwSize		= 0;
 
-	m_Mappings[m_dwHead].dwNumEntries 	= 1;
-	
 	m_dwHead++;
-	if (m_dwHead >= MAX_ENTRIES)
-		m_dwHead -= MAX_ENTRIES;
+	m_dwHead &= ENTRY_INDEX_MASK;
 	
 	m_dwCount++;
 	
@@ -500,74 +442,78 @@ void CDaffyDuck::Wrap()
 }	// Wrap
 
 
+
 //===========================================================================
 //
-// ReleaseUsedMapping
+// ReleaseUsedMappings
 //
-// Find a mapping that's been consumed and return it
+// Find all the mapping that've been consumed and return a list of tags
+//
+// Return value is the number of tags written to the array
 //
 //===========================================================================
 
-ECHOSTATUS CDaffyDuck::ReleaseUsedMapping
+DWORD CDaffyDuck::ReleaseUsedMappings
 (
 	ULONGLONG 	ullDmaPos,
-	DWORD			&dwTag
+	NUINT 		*Tags,		// an array of tags
+	DWORD			dwMaxTags	// the max number of tags in the array
 )
 {
-
-#ifdef INTERGRITY_CHECK
-	CheckIntegrity();	
-#endif
-
-	//
-	// See if there are any mappings and if the oldest mapping has
-	// been consumed by the DSP.
-	//
-	if ((0 != m_dwCount) && (ullDmaPos >= m_Mappings[m_dwTail].ullEndPos))
-	{
-		DWORD dwNumEntries;
+	DWORD dwTempAddr,dwTempSize;
+	NUINT Tag;
+	DWORD dwTagsFree;
 	
+	dwTagsFree = dwMaxTags;
+	while ( (0 != m_dwCount) && (0 != dwTagsFree) )
+	{
 		//
-		// Time to release the mapping at the tail
-		//
-		dwTag = m_Mappings[m_dwTail].dwTag;
+		// Get the data from the tail
+		//	
+		Tag = m_Mappings[m_dwTail].Tag;
+		dwTempAddr = SWAP( m_DuckEntries[m_dwTail].PhysAddr );
+		dwTempSize = SWAP( m_DuckEntries[m_dwTail].dwSize );
 		
 		//
-		// Remove the mapping from the circular buffer,
-		// taking dwNumEntries into consideration 
+		// Is this an audio data mapping?
 		//
-		dwNumEntries = m_Mappings[m_dwTail].dwNumEntries;
-		m_Mappings[m_dwTail].dwNumEntries = 0;
-		ASSERT(m_dwCount >= dwNumEntries);
-		
-		m_dwTail += dwNumEntries;
-		if (m_dwTail >= MAX_ENTRIES)
-			m_dwTail -= MAX_ENTRIES;
-			
-		m_dwCount -= dwNumEntries;
-
-#ifdef INTEGRITY_CHECK
-		CheckIntegrity();
-#endif	
-
-#if 0
-//#ifdef _DEBUG
-		ULONGLONG ullRemaining;
-		
-		ullRemaining = m_ullLastEndPos - ullDmaPos;
-
-		ECHO_DEBUGPRINTF(("Released mapping for pipe index %d - bytes remaining %I64x\n",
-								m_wPipeIndex,ullRemaining));
-#endif								
-
-		return ECHOSTATUS_OK;
+		if ( (0 != dwTempAddr) && (0 != dwTempSize) )
+		{
+			//
+			// Is this audio data mapping done?
+			//
+			if ( ullDmaPos < m_Mappings[m_dwTail].ullEndPos )
+				break;
+				
+			//
+			// This one's done
+			//
+			*Tags = Tag;
+			Tags++;
+			dwTagsFree--;
+				
+			EjectTail();
+		}
+		else
+		{
+			//
+			// Is this non-audio data mapping done?
+			//
+			if ( ullDmaPos <= m_Mappings[m_dwTail].ullEndPos )
+				break;
+				
+			//
+			// Pop it
+			// 
+			EjectTail();
+		}
 	}
+	
+	//
+	// Return the number written
+	//
+	return dwMaxTags - dwTagsFree;
 
-	//
-	// No bananas today, thanks.
-	//
-	return ECHOSTATUS_NO_DATA;
-		
 }	// ReleaseUsedMappings
 
 
@@ -579,177 +525,242 @@ ECHOSTATUS CDaffyDuck::ReleaseUsedMapping
 //
 //===========================================================================
 
-DWORD CDaffyDuck::RevokeMappings(DWORD dwFirstTag,DWORD dwLastTag)
+DWORD CDaffyDuck::RevokeMappings(NUINT FirstTag,NUINT LastTag)
 {
-	MAPPING 		*TempMappings = NULL;
-	DUCKENTRY	*TempEntries = NULL;
-	DWORD			dwNumTemp;
-	DWORD			dwOffset;
-	DWORD			dwNumRevoked = 0;
+	NUINT	Offset;
+	DWORD	dwNumRevoked;
 	
-	//
-	// Allocate the arrays
-	//
-	OsAllocateNonPaged(	sizeof(MAPPING) * MAX_ENTRIES,	// fixme make this part of the duck
-							  	(void **) &TempMappings );
-	OsAllocateNonPaged(	sizeof(DUCKENTRY) * MAX_ENTRIES,						  
-								(void **) &TempEntries );
-	if (	(NULL == TempMappings) ||
-			(NULL == TempEntries))
-	{
-		goto exit;		
-	}
-	
-	//
-	// Tweak the end position so it's set OK
-	// when the duck is rebuilt
-	//
-	SetLastEndPos(GetStartPos());
-	
+	dwNumRevoked = 0;
+
 
 	//----------------------------------------------------------------------
 	//
-	// The tags are 32 bit counters, so it is possible that they will
+	// The tags may be 32 bit counters, so it is possible that they will
 	// wrap around (that is, dwLastTag may be less than dwFirstTag).  If the
 	// tags have wrapped, use an offset so the compares work correctly.
 	//
 	//----------------------------------------------------------------------
 
-	dwOffset = 0;	
-	if (dwLastTag < dwFirstTag)
+	Offset = 0;	
+	if (LastTag < FirstTag)
 	{
-		dwOffset = 0x80000000;
+		Offset = LastTag;
 		
-		dwLastTag -= dwOffset;
-		dwFirstTag -= dwOffset;
+		LastTag -= Offset;
+		FirstTag -= Offset;
 	}
-	
-	//----------------------------------------------------------------------
-	//
-	// Empty out the duck into the temp arrays, throwing away
-	// the revoked mappings.
-	//
-	//----------------------------------------------------------------------
-	
-	ECHOSTATUS 	Status;
-	DWORD			dwAdjustedTag;
 
-	dwNumTemp = 0;	
-	do	
+
+	//----------------------------------------------------------------------
+	//
+	// Go through the list and revoke stuff
+	//
+	//----------------------------------------------------------------------
+	
+	DWORD dwCount;
+	DWORD dwCurrentIndex;
+	DWORD dwNextIndex;
+	NUINT AdjustedTag;
+	
+	dwCurrentIndex = m_dwTail;
+	dwCount = m_dwCount;
+	while (dwCount != 0)
 	{
-		Status = GetTail(	TempEntries + dwNumTemp,
-								TempMappings + dwNumTemp);
-		if (ECHOSTATUS_OK == Status)
+		//
+		// Get info for this mapping
+		//
+		AdjustedTag = m_Mappings[dwCurrentIndex].Tag - Offset;
+		
+		//
+		// Only check this mapping if it contains audio data
+		//
+		if (	(0 != m_DuckEntries[dwCurrentIndex].PhysAddr) &&
+				(0 != m_DuckEntries[dwCurrentIndex].dwSize) )
 		{
-			dwAdjustedTag = TempMappings[dwNumTemp].dwTag - dwOffset;
-
-			if ((dwFirstTag <= dwAdjustedTag) && 
-				 (dwAdjustedTag <= dwLastTag))
+			//
+			// See if the current mapping needs to be revoked
+			//
+			if ((FirstTag <= AdjustedTag) && 
+				 (AdjustedTag <= LastTag))
 			{
 				//
 				// Revoke this tag
 				//
 				dwNumRevoked++;
-			}
-			else
-			{
+				
 				//
-				// Save this tag
-				//
-				dwNumTemp++;						
-			}
-			
+				// Change this duck into a duck entry pointer; the DSP
+				// will see that the size is zero and re-fetch the duck entry
+				// from the address specified in PhysAddr.
+				//				
+				dwNextIndex = dwCurrentIndex + 1;
+				dwNextIndex &= ENTRY_INDEX_MASK;
+				
+				m_DuckEntries[dwCurrentIndex].PhysAddr = 
+					m_dwDuckEntriesPhys + (dwNextIndex * sizeof(DUCKENTRY) );
+				m_DuckEntries[dwCurrentIndex].dwSize = 0;
+				
+			}			
 		}
-	} while (ECHOSTATUS_OK == Status);
-	
-
-	//----------------------------------------------------------------------
-	//
-	// Add all the saved mappings back into this duck.
-	//
-	//----------------------------------------------------------------------
 		
-	DWORD i,dwDummy;
-	
-	//
-	// Partially reset this duck
-	//
-	m_dwHead = 0;
-	m_dwTail = 0;
-	m_dwCount = 0;
+		dwCurrentIndex++;
+		dwCurrentIndex &= ENTRY_INDEX_MASK;
 
+		dwCount--;
+	}	
+			
+
+	//----------------------------------------------------------------------
 	//
-	// Put all the non-revoked mappings back
-	//	
-	for (i = 0; i < dwNumTemp; i++)
+	// If any mappings were revoked, do various housekeeping tasks
+	//
+	//----------------------------------------------------------------------
+	
+	if (0 != dwNumRevoked)
 	{
-		AddMapping(	TempEntries[i].PhysAddr,
-						TempEntries[i].dwSize,
-						TempMappings[i].dwTag,
-						TempMappings[i].dwNumEntries - 1,
-						dwDummy);
+		CleanUpTail();
+		ResetStartPos();
 	}
-	
-	ECHO_DEBUGPRINTF(("CDaffyDuck::RevokeMappings for pipe index %d - m_dwHead %ld  m_dwTail %ld  m_dwCount %ld\n",
-							m_wPipeIndex,m_dwHead,m_dwTail,m_dwCount));
 
-exit:
-	if (TempEntries) OsFreeNonPaged(TempEntries);
-	if (TempMappings) OsFreeNonPaged(TempMappings);	
-	
-	return dwNumRevoked;	
+	return dwNumRevoked;
 
 }	// RevokeMappings
 
 
+
 //===========================================================================
 //
-// GetTail
+// CleanUpTail
 //
-// Unconditionally returns the mapping information from the tail of the 
-// circular buffer.
+// Removes any non-audio mappings from the tail of the list; stops
+// removing if it finds an audio mapping
 //
 //===========================================================================
 
-ECHOSTATUS CDaffyDuck::GetTail(DUCKENTRY *pDuckEntry,MAPPING *pMapping)
+void CDaffyDuck::CleanUpTail()
 {
-	//
-	// Punt if there are no entries in the circular buffer
-	//
-	if (0 == m_dwCount)
-		return ECHOSTATUS_NO_DATA;
-		
-	//
-	// Copy the data
-	//		
-	OsCopyMemory(	pDuckEntry,
-						m_DuckEntries + m_dwTail,
-						sizeof(DUCKENTRY));
-	OsCopyMemory(	pMapping,
-						m_Mappings + m_dwTail,
-						sizeof(MAPPING));
-	
-	//
-	// Buffer housekeeping
-	//
-	DWORD dwNumEntries = m_Mappings[m_dwTail].dwNumEntries;
-	m_Mappings[m_dwTail].dwNumEntries = 0;	
-	
-	ASSERT(m_dwCount >= dwNumEntries);
+	while (0 != m_dwCount)
+	{
+		//
+		// Quit the loop at the first audio data entry
+		//
+		if (	(0 != m_DuckEntries[ m_dwTail ].PhysAddr) &&
+				(0 != m_DuckEntries[ m_dwTail ].dwSize) )
+			break;
 
-	m_dwTail += dwNumEntries;
-	if (m_dwTail >= MAX_ENTRIES)
-		m_dwTail -= MAX_ENTRIES;
+		//
+		// Pop goes the weasel
+		//
+		EjectTail();
+	}
+
+}	// CleanUpTail
+
+
+
+
+//===========================================================================
+//
+// EjectTail
+//
+// Removes a single mapping from the tail of the list
+//
+//===========================================================================
+
+void CDaffyDuck::EjectTail()
+{
+#ifdef _DEBUG
+	if (0 == m_dwCount)
+	{
+		ECHO_DEBUGPRINTF(("EjectTail called with zero count!\n"));
+		ECHO_DEBUGBREAK();
+		return;
+	}
+#endif
+
+	//
+	//	Mark this entry with the "end of list" values
+	// 
+	m_DuckEntries[ m_dwTail ].PhysAddr = 0;
+	m_DuckEntries[ m_dwTail ].dwSize = 0xffffffff;
+
+	//
+	// Move the tail forward and decrement the count
+	//	
+	m_dwTail++;
+	m_dwTail &= ENTRY_INDEX_MASK;
+
+	m_dwCount--;
+	
+} // EjectTail
+
+
+
+//===========================================================================
+//
+// Adjusts the duck so that DMA will start from a given position; useful
+// when resuming from pause
+//
+//===========================================================================
+
+void CDaffyDuck::AdjustStartPos(ULONGLONG ullPos)
+{
+	DWORD dwCount,dwIndex;
+	ULONGLONG ullMapStartPos;
+	DWORD dwPhysAddr;
+	DWORD dwSize;
+			
+	
+	dwCount = m_dwCount;
+	dwIndex = m_dwTail;
+	while (0 != dwCount)
+	{
+		//
+		// Check DMA pos
+		//
+		if (ullPos >= m_Mappings[dwIndex].ullEndPos)
+			break;
 		
-	m_dwCount -= dwNumEntries;
-	
-#ifdef INTEGRITY_CHECK
-	CheckIntegrity();
-#endif	
-	
-	return ECHOSTATUS_OK;
-	
-}	// GetTail
+		dwSize = SWAP(m_DuckEntries[dwIndex].dwSize);
+		ullMapStartPos = m_Mappings[dwIndex].ullEndPos - dwSize;
+		if (ullPos >= ullMapStartPos)
+		{
+			dwPhysAddr = SWAP(m_DuckEntries[dwIndex].PhysAddr);
+			if ( (0 != dwPhysAddr) && (0 != dwSize) )
+			{
+				DWORD dwDelta;
+				
+				dwDelta = (DWORD) (m_Mappings[dwIndex].ullEndPos - ullPos);
+				dwPhysAddr += dwDelta;
+				dwSize -= dwDelta;
+				
+				m_DuckEntries[dwIndex].PhysAddr = SWAP(dwPhysAddr);						
+				m_DuckEntries[dwIndex].dwSize = SWAP(dwSize);
+				break;
+			}
+		}
+			
+		dwCount--;
+		dwIndex++;
+		dwIndex &= ENTRY_INDEX_MASK;	
+	}
+
+}
+
+
+//===========================================================================
+//
+// GetPhysStartAddr
+//
+// This returns the physical address of the start of the scatter-gather 
+// list; used to tell the DSP where to start looking for duck entries.
+//
+//===========================================================================
+
+DWORD CDaffyDuck::GetPhysStartAddr()
+{
+	return m_dwDuckEntriesPhys + (m_dwTail * sizeof(DUCKENTRY));
+}
 
 
 //===========================================================================
@@ -764,7 +775,7 @@ ECHOSTATUS CDaffyDuck::GetTail(DUCKENTRY *pDuckEntry,MAPPING *pMapping)
 
 void CDaffyDuck::CheckIntegrity()
 {
-	DWORD dwDiff;
+	DWORD dwDiff,dwCount,dwTemp,dwSum;
 	
 	dwDiff = m_dwHead - m_dwTail;
 	if (dwDiff > 0x80000000)
@@ -781,9 +792,29 @@ void CDaffyDuck::CheckIntegrity()
 		ECHO_DEBUGBREAK();		
 	}
 	
+	dwTemp = m_dwTail;
+	dwCount = m_dwCount;
+	dwSum = 0;
+	while (dwCount)
+	{
+		dwSum += m_Mappings[dwTemp].dwNumEntries;
+		
+		dwCount--;
+		dwTemp++;
+		dwTemp &= ENTRY_INDEX_MASK;
+	}
+	
+	if (dwSum != m_dwCount)
+	{
+		ECHO_DEBUGPRINTF(("CDaffyDuck integrity check fail!  dwSum %ld  m_dwCount %ld\n",
+								dwSum,m_dwCount));
+		ECHO_DEBUGBREAK();
+	}
+	
 }	// CheckIntegrity
 
 #endif // INTEGRITY_CHECK
 
 
 // *** CDaffyDuck.cpp ***
+

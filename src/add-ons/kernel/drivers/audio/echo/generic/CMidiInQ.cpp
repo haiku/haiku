@@ -9,36 +9,27 @@
 //
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -60,16 +51,13 @@
 CMidiInQ::CMidiInQ()
 {
 
-	Reset();
-	
 	m_pBuffer = NULL;
 	m_ullLastActivityTime = 0;
 	
-	m_wMtcState = MTC_STATE_NORMAL;
+	m_wMtcState = MIDI_IN_STATE_NORMAL;
 
 	m_pEG = NULL;	
-	
-	m_fArmed = FALSE;
+	m_pMtcSync = NULL;
 	
 }	// CMidiInQ::CMidiInQ()
 
@@ -90,19 +78,14 @@ CMidiInQ::~CMidiInQ()
 
 ECHOSTATUS CMidiInQ::Init( CEchoGals *pEG )
 {
-	ECHOSTATUS Status;
-
 	ECHO_DEBUGPRINTF(("CMidiInQ::Init\n"));
 
 	m_pEG = pEG;
-	
-	Status = OsAllocateNonPaged(	sizeof(MIDI_DATA) * ECHO_MIDI_QUEUE_SZ,
-											(PPVOID) &m_pBuffer);
+
+	m_dwFill = 0;
+	m_dwBufferSizeMask =  MIDI_IN_Q_SIZE - 1;	// MIDI_IN_Q_SIZE must be a power of 2
 									
-	if (ECHOSTATUS_OK == Status)
-		Reset();											
-									
-	return Status;											
+	return ECHOSTATUS_OK;
 									  	
 }	// Init
 
@@ -118,15 +101,20 @@ void CMidiInQ::Cleanup()
 	//
 	// Free the MIDI input buffer
 	//
-	if (NULL != m_pBuffer)
+	if (m_pBuffer)
 	{
-		if (ECHOSTATUS_OK != OsFreeNonPaged( m_pBuffer ))
-		{
-			ECHO_DEBUGPRINTF(("CMidiInQ::Cleanup - Failed to free MIDI input bufer\n"));
-		}
+		OsFreeNonPaged( m_pBuffer );
+		m_pBuffer = NULL;
 	}
 	
-	m_pBuffer = NULL;
+	//
+	// Free the MTC sync object if it exists
+	//
+	if (m_pMtcSync)
+	{
+		delete m_pMtcSync;
+		m_pMtcSync = NULL;
+	}
 }	
 
 
@@ -146,20 +134,28 @@ void CMidiInQ::Cleanup()
 
 ECHOSTATUS CMidiInQ::GetMidi
 (
-	MIDI_DATA &Midi
+	ECHOGALS_MIDI_IN_CONTEXT	*pContext,
+	DWORD								&dwMidiByte,
+	LONGLONG							&llTimestamp
 )
 {
+	DWORD dwDrain;
+
 	if (NULL == m_pBuffer)
 		return ECHOSTATUS_CHANNEL_NOT_OPEN;
+		
+	dwDrain = pContext->dwDrain;
+	if ( m_dwFill == dwDrain)
+		return ECHOSTATUS_NO_DATA;
+	
+	dwMidiByte = m_pBuffer[ dwDrain ].dwMidi;
+	llTimestamp = m_pBuffer[ dwDrain ].llTimestamp;
+	
+	//ECHO_DEBUGPRINTF( ("CMidiInQ::GetMidi 0x%lx\n", dwMidiByte) );
 
-	if ( m_pFill == m_pDrain )
-		return( ECHOSTATUS_NO_DATA );
-	
-	Midi = *m_pDrain;
-	
-	ECHO_DEBUGPRINTF( ("CMidiInQ::GetMidi 0x%x\n", Midi) );
-	
-	m_pDrain = ComputeNext( m_pDrain );
+	dwDrain++;
+	dwDrain &= m_dwBufferSizeMask;
+	pContext->dwDrain = dwDrain;
 	
 	return ECHOSTATUS_OK;
 	
@@ -174,20 +170,21 @@ ECHOSTATUS CMidiInQ::GetMidi
 
 ECHOSTATUS CMidiInQ::AddMidi
 (
-	MIDI_DATA Midi
+		DWORD		dwMidiByte,
+		LONGLONG	llTimestamp
 )
 {
-	if ( ComputeNext( m_pFill ) == m_pDrain )
-	{
-		ECHO_DEBUGPRINTF( ("CMidiInQ::AddMidi buffer overflow\n") );
-		ECHO_DEBUGBREAK();
-		return ECHOSTATUS_BUFFER_OVERFLOW;
-	}
+	DWORD dwFill;
 
-	ECHO_DEBUGPRINTF( ("CMidiInQ::AddMidi 0x%x\n", Midi) );
+	//ECHO_DEBUGPRINTF( ("CMidiInQ::AddMidi 0x%lx\n", dwMidiByte) );
+	
+	dwFill = m_dwFill;
+	m_pBuffer[ dwFill ].dwMidi = dwMidiByte;
+	m_pBuffer[ dwFill ].llTimestamp = llTimestamp;
 
-	*m_pFill = Midi;
-	m_pFill = ComputeNext( m_pFill );
+	dwFill++;
+	dwFill &= m_dwBufferSizeMask;
+	m_dwFill = dwFill;
 
 	return ECHOSTATUS_OK;
 
@@ -196,35 +193,13 @@ ECHOSTATUS CMidiInQ::AddMidi
 
 //============================================================================
 //
-// ComputeNext - protected routine used to wrap the read and write pointers
-// around the circular buffer
-//
-//============================================================================
-
-PMIDI_DATA CMidiInQ::ComputeNext( PMIDI_DATA pCur )
-{
-	if ( ++pCur >= m_pEnd )
-		pCur = m_pBuffer;
-		
-	return pCur;
-		
-}	// PMIDI_DATA CMidiInQ::ComputeNext( PMIDI_DATA pCur )
-
-
-//============================================================================
-//
 // Reset
 //
 //============================================================================
 
-void CMidiInQ::Reset()
+void CMidiInQ::Reset(ECHOGALS_MIDI_IN_CONTEXT *pContext)
 {
-	//
-	//	Midi buffer pointer initialization
-	//
-	m_pEnd = m_pBuffer + ECHO_MIDI_QUEUE_SZ;
-	m_pFill = m_pBuffer;
-	m_pDrain = m_pBuffer;
+	pContext->dwDrain = m_dwFill;
 	
 }	// void CMidiInQ::Reset()
 
@@ -244,31 +219,57 @@ void CMidiInQ::Reset()
 //
 //============================================================================
 
-ECHOSTATUS CMidiInQ::Arm()
+ECHOSTATUS CMidiInQ::Arm(ECHOGALS_MIDI_IN_CONTEXT *pContext)
 {
+	ECHOSTATUS Status;
+
+	pContext->fOpen = FALSE;
+
 	//
-	// Return if the MIDI input buffer is not allocated
+	// Return if there is no Echogals pointer
 	// 	
-	if ( 	(NULL == m_pBuffer) ||
-			(NULL == m_pEG)
-		)
+	if (NULL == m_pEG)
+	{
 		return ECHOSTATUS_CANT_OPEN;
+	}
+		
+	//-------------------------------------------------------------------------	
+	//
+	// Set up the MIDI input buffer
+	//
+	//-------------------------------------------------------------------------	
 	
-	//
-	// Reset the buffer pointers
-	//
-	Reset();
+	if (NULL == m_pBuffer)
+	{
+		//
+		// Reset the buffer pointers
+		//
+		m_dwFill = 0;
 
+		//
+		// Allocate
+		//
+		Status = OsAllocateNonPaged( MIDI_IN_Q_SIZE * sizeof(MIDI_DATA),
+												(PPVOID) &m_pBuffer);
+		if (Status != ECHOSTATUS_OK)
+		{
+			ECHO_DEBUGPRINTF(("CMidiInQ::Arm - Could not allocate MIDI input buffer\n"));
+			return Status;
+		}
+	}
+
+	Reset(pContext);
+	m_dwNumClients++;
+
+	//-------------------------------------------------------------------------	
 	//
-	// Tell the DSP to enable MIDI input
-	//		
+	// Enable MIDI input
+	//
+	//-------------------------------------------------------------------------	
+
 	m_pEG->GetDspCommObject()->SetMidiOn( TRUE );
-	
-	//
-	// Set the flag
-	//
-	m_fArmed = TRUE;
 
+	pContext->fOpen = TRUE;	
 	return ECHOSTATUS_OK;
 
 } // Arm
@@ -280,20 +281,113 @@ ECHOSTATUS CMidiInQ::Arm()
 //
 //============================================================================
 
-void CMidiInQ::Disarm()
+ECHOSTATUS CMidiInQ::Disarm(ECHOGALS_MIDI_IN_CONTEXT *pContext)
 {
+	//
+	// Did this client open the MIDI input?
+	//
+	if (FALSE == pContext->fOpen)
+	{
+		ECHO_DEBUGPRINTF(("CMidiInQ::Disarm - trying to disarm with client that isn't open\n"));
+		return ECHOSTATUS_CHANNEL_NOT_OPEN;
+	}
+	
+	pContext->fOpen = FALSE;
+	
+	//
+	// Last client?
+	//
+	if (0 == m_dwNumClients)
+		return ECHOSTATUS_OK;
+
+	m_dwNumClients--;
+
+	if (0 == m_dwNumClients)
+	{
+		//
+		// Tell the DSP to disable MIDI input
+		//
+		if (m_pEG)
+			m_pEG->GetDspCommObject()->SetMidiOn( FALSE );
+		
+		//
+		// Free the MIDI input buffer
+		//
+		if (m_pBuffer)
+		{
+			OsFreeNonPaged( m_pBuffer );
+			m_pBuffer = NULL;
+		}
+	}
+	
+	return ECHOSTATUS_OK;
+		
+}	// Disarm
+
+
+//============================================================================
+//
+// ArmMtcSync - turns on MIDI time code sync
+//
+//============================================================================
+
+ECHOSTATUS CMidiInQ::ArmMtcSync()
+{
+	if (NULL == m_pEG)
+		return ECHOSTATUS_DSP_DEAD;
+		
+	if (NULL != m_pMtcSync)
+		return ECHOSTATUS_OK;
+	
+	//
+	// Create the MTC sync object
+	//	
+	m_pMtcSync = new CMtcSync( m_pEG );
+	if (NULL == m_pMtcSync)
+		return ECHOSTATUS_NO_MEM;
+		
+	//
+	// Tell the DSP to enable MIDI input
+	//		
+	m_pEG->GetDspCommObject()->SetMidiOn( TRUE );
+		
+	return ECHOSTATUS_OK;
+		
+}	// ArmMtcSync
+
+
+//============================================================================
+//
+// DisarmMtcSync - turn off MIDI time code sync
+//
+//============================================================================
+
+ECHOSTATUS CMidiInQ::DisarmMtcSync()
+{
+	if (NULL == m_pMtcSync)
+		return ECHOSTATUS_OK;
+	
+	if (NULL == m_pEG)
+		return ECHOSTATUS_DSP_DEAD;
+		
 	//
 	// Tell the DSP to disable MIDI input
 	//
-	if (m_pEG)
-		m_pEG->GetDspCommObject()->SetMidiOn( FALSE );
+	m_pEG->GetDspCommObject()->SetMidiOn( FALSE );
 	
 	//
-	// Clear the flag
+	// Free m_pMtcSync
 	//
-	m_fArmed = FALSE;
-
-}	// Disarm
+	CMtcSync *pTemp;	// Use temp variable to avoid killing the object
+							// while the ISR is using it	
+							
+	pTemp = m_pMtcSync;
+	m_pMtcSync = NULL;
+	delete pTemp;
+	
+	return ECHOSTATUS_OK;
+		
+}	// DisarmMtcSync
 
 
 
@@ -331,46 +425,131 @@ BOOL CMidiInQ::IsActive()
 
  ****************************************************************************/
 
+//===========================================================================
+//
+// Get and set the base MTC sample rate
+//
+//===========================================================================
+
+
+ECHOSTATUS CMidiInQ::GetMtcBaseRate(DWORD *pdwBaseRate)
+{
+	ECHOSTATUS Status;
+
+	if (m_pMtcSync)
+	{
+		*pdwBaseRate = m_pMtcSync->m_dwBaseSampleRate;
+		Status = ECHOSTATUS_OK;
+	}
+	else
+	{
+		*pdwBaseRate = 0;
+		Status = ECHOSTATUS_NO_DATA;
+	}
+	
+	return Status;
+	
+}	// GetMtcBaseRate
+
+
+ECHOSTATUS CMidiInQ::SetMtcBaseRate(DWORD dwBaseRate)  
+{
+	ECHOSTATUS Status;
+	
+	if (m_pMtcSync)
+	{
+		m_pMtcSync->m_dwBaseSampleRate = dwBaseRate;
+		Status = ECHOSTATUS_OK;
+	}
+	else
+	{
+		Status = ECHOSTATUS_NO_DATA;
+	}
+	
+	return Status;
+	
+}	// SetMtcBaseRate
+
 
 //===========================================================================
 //
 // Run the state machine for MIDI input data
 //
-// MIDI time code sync isn't supported by this code right now,
-// but you still need this state machine to parse the incoming
+// You need this state machine to parse the incoming
 // MIDI data stream.  Every time the DSP sees a 0xF1 byte come in,
 // it adds the DSP sample position to the MIDI data stream.
 // The DSP sample position is represented as a 32 bit unsigned
 // value, with the high 16 bits first, followed by the low 16 bits.
 //
-// Since these aren't real MIDI bytes, the following logic is
-// needed to skip them.
+// The following logic parses the incoming MIDI data.
 //
 //===========================================================================
 
 DWORD CMidiInQ::MtcProcessData( DWORD dwMidiData )
 {
+	DWORD dwRval;
+
+	dwRval = 0;
+
 	switch ( m_wMtcState )
 	{
-		case MTC_STATE_NORMAL :
+
+		case MIDI_IN_STATE_NORMAL :
+
 			if ( dwMidiData == 0xF1L )
-				m_wMtcState = MTC_STATE_TS_HIGH;
+			{
+				m_wMtcState = MIDI_IN_STATE_TS_HIGH;
+			}
 			break;
-		case MTC_STATE_TS_HIGH :
-			m_wMtcState = MTC_STATE_TS_LOW;
-			return MTC_SKIP_DATA;
+
+
+		case MIDI_IN_STATE_TS_HIGH :
+		
+			if (m_pMtcSync)
+				m_pMtcSync->StoreTimestampHigh( dwMidiData );
+
+			m_wMtcState = MIDI_IN_STATE_TS_LOW;
+			dwRval = MIDI_IN_SKIP_DATA;
 			break;
-		case MTC_STATE_TS_LOW :
-			m_wMtcState = MTC_STATE_F1_DATA;
-			return MTC_SKIP_DATA;
+
+
+		case MIDI_IN_STATE_TS_LOW :
+
+			if (m_pMtcSync)
+				m_pMtcSync->StoreTimestampLow( dwMidiData );
+
+			m_wMtcState = MIDI_IN_STATE_F1_DATA;
+			dwRval = MIDI_IN_SKIP_DATA;
 			break;
-		case MTC_STATE_F1_DATA :
-			m_wMtcState = MTC_STATE_NORMAL;
+
+
+		case MIDI_IN_STATE_F1_DATA :
+		
+			if (m_pMtcSync)
+				m_pMtcSync->StoreMtcData( dwMidiData );
+
+			m_wMtcState = MIDI_IN_STATE_NORMAL;
 			break;
+
 	}
-	return 0;
+
+	return dwRval;
 	
 }	// DWORD CMidiInQ::MtcProcessData
+
+
+//===========================================================================
+// 
+// ServiceMtcSync
+//
+//===========================================================================
+
+void CMidiInQ::ServiceMtcSync()
+{
+	if (m_pMtcSync)
+		m_pMtcSync->Sync();
+	
+}	// ServiceMtcSync
 
 
 
@@ -387,11 +566,12 @@ ECHOSTATUS CMidiInQ::ServiceIrq()
 	WORD				wIndex;
 	ECHOSTATUS 		Status;
 	CDspCommObject	*pDCO;
+	LONGLONG			llTimestamp;
 
 	//
 	// Store the time for the activity detector
 	//	
-	m_pEG->m_pOsSupport->OsGetSystemTime( &m_ullLastActivityTime );	
+	m_pEG->m_pOsSupport->OsGetSystemTime( &m_ullLastActivityTime );
 
 	//
 	// Get the MIDI count
@@ -400,12 +580,17 @@ ECHOSTATUS CMidiInQ::ServiceIrq()
 	pDCO->ReadMidi( 0, dwMidiCount );	  // The count is at index 0
 
 #ifdef ECHO_DEBUG
-	ECHO_DEBUGPRINTF( ("\tMIDI interrupt (%ld MIDI bytes)\n", dwMidiCount) );
+	//ECHO_DEBUGPRINTF( ("\tMIDI interrupt (%ld MIDI bytes)\n", dwMidiCount) );
 	if ( dwMidiCount == 0 )
 	{
 		ECHO_DEBUGBREAK();
 	}
 #endif
+
+	//
+	// Get the timestamp
+	//
+	llTimestamp = m_pEG->m_pOsSupport->GetMidiInTimestamp();
 
 	//
 	// Get the MIDI data from the comm page
@@ -429,23 +614,24 @@ ECHOSTATUS CMidiInQ::ServiceIrq()
 		//
 		// Parse the incoming MIDI stream.  The incoming MIDI data consists
 		// of MIDI bytes and timestamps for the MIDI time code 0xF1 bytes.
-		// MtcProcessData is a little state machine that parses the strem.
+		// MtcProcessData is a little state machine that parses the stream.
 		//
-		// If you get MTC_SKIP_DATA back, then this is a timestamp byte,
+		// If you get MIDI_IN_SKIP_DATA back, then this is a timestamp byte,
 		// not a MIDI byte, so don't store it in the MIDI input buffer.
 		//
-		if ( MTC_SKIP_DATA == MtcProcessData( dwMidiByte ) )
+		if ( MIDI_IN_SKIP_DATA == MtcProcessData( dwMidiByte ) )
 			continue;
 			
 		//
-		// Only store the MIDI data if MIDI input is armed
+		// Only store the MIDI data if there is at least one 
+		// client
 		//
-		if (m_fArmed)
+		if (0 != m_dwNumClients)
 		{
 			//
-			// Stash the MIDI and timestamp data and check for overflow
+			// Stash the MIDI data and check for overflow
 			//
-			if ( ECHOSTATUS_BUFFER_OVERFLOW == AddMidi( (MIDI_DATA) dwMidiByte ) )
+			if ( ECHOSTATUS_BUFFER_OVERFLOW == AddMidi( dwMidiByte, llTimestamp ) )
 			{
 				break;
 			}

@@ -2,49 +2,31 @@
 //
 //		OsSupportBeOS.H
 //
-//		Include file for BeOS Support Services to the CEchoGals
-//		generic driver class
-//
 //		Set editor tabs to 3 for your viewing pleasure.
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
-//
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
-
-//#ifdef _DEBUG
-//#pragma optimize("",off)
-//#endif
 
 //	Prevent problems with multiple includes
 #ifndef _ECHOOSSUPPORTBEOS_
@@ -53,6 +35,7 @@
 #include <KernelExport.h>
 #include <SupportDefs.h>
 #include <ByteOrder.h>
+#include "queue.h"
 #include "debug.h"
 
 #include <stdio.h>
@@ -62,7 +45,7 @@
 #if DEBUG > 0
 // BeOS debug printf macro
 #define ECHO_DEBUGPRINTF( strings ) TRACE(strings)
-#define ECHO_DEBUGBREAK()			kernel_debugger("echo driver debug break");
+#define ECHO_DEBUGBREAK()                       kernel_debugger("echo driver debug break");
 #define ECHO_DEBUG
 
 #else
@@ -75,28 +58,44 @@
 //
 //	Specify OS specific types
 //
-typedef void **			PPVOID;
-typedef int8			INT8;
-typedef int32			INT32;
-typedef uint16			WORD;
-typedef uint16 *		PWORD;
-typedef uint32			DWORD;
-typedef uint32 *		PDWORD;
-typedef void *			PVOID;
-#define VOID			void
-typedef int8			BYTE;
-typedef int8 *			PBYTE;
-typedef unsigned long	ULONG;
-typedef signed long long		LONGLONG;
-typedef unsigned long long		ULONGLONG;
-typedef unsigned long long *	PULONGLONG;
-typedef char			CHAR;
-typedef char *			PCHAR;
-typedef	bool			BOOL;
-typedef bool			BOOLEAN;
-#define CONST			const
+typedef char 		*PCHAR ;
+typedef uint8	 	BYTE;
+typedef uint8 		*PBYTE;
+typedef uint16	 	WORD;
+typedef uint16	 	*PWORD;
+typedef uint32	 	DWORD;
+typedef unsigned long 	ULONG;
+typedef unsigned long 	NUINT;
+typedef long 		NINT;
+typedef void 		*PVOID;
+typedef DWORD 		*PDWORD;
+#define VOID 		void
+typedef bool 		BOOL;
+typedef bool 		BOOLEAN;
+typedef char 		*PTCHAR;
+typedef char		TCHAR;
+typedef char		CHAR;
+typedef char*		LPSTR;
+//typedef SInt32	INT;
+typedef int32		INT32;
+typedef int32	 	*PINT;
+typedef int8		INT8;
+typedef long		HANDLE;
+typedef long		LONG;
+typedef int64 		LONGLONG;
+typedef uint64 		ULONGLONG ;
+typedef uint64 		*PULONGLONG ;
+typedef long 		*PKEVENT ;
+//#define NULL 0
+#define CALLBACK
 
-#define PAGE_SIZE		B_PAGE_SIZE
+#define CONST const
+typedef	void **		PPVOID;
+
+#define PAGE_SIZE                B_PAGE_SIZE
+
+#define WideToSInt64(x)         (*((int64*)(&x)))
+#define WideToUInt64(x)         (*((uint64*)(&x)))
 
 //
 // Return Status Values
@@ -105,15 +104,41 @@ typedef unsigned long	ECHOSTATUS;
 
 
 //
+// Define our platform specific things here.
+//
+typedef struct _echo_mem {
+	LIST_ENTRY(_echo_mem) next;
+	void		*log_base;
+	void		*phy_base;
+	area_id 	area;
+	size_t		size;
+} echo_mem;
+
+//
 //	Define generic byte swapping functions
 //
-#define SWAP(x)	B_HOST_TO_LENDIAN_INT32(x)
+#define SWAP(x)B_HOST_TO_LENDIAN_INT32(x)
 
 //
 //	Define what a physical address is on this OS
 //
-typedef	uint32		PHYS_ADDR;			// Define physical addr type
-typedef	uint32 *	PPHYS_ADDR;		// Define physical addr pointer type
+typedef	unsigned long	PHYS_ADDR;			// Define physical addr type
+typedef	unsigned long*	PPHYS_ADDR;			// Define physical addr pointer type
+
+typedef echo_mem* PPAGE_BLOCK;
+
+
+//
+//	Version information.
+//	In NT, we want to get this from a resource
+//
+#define	APPVERSION			OsGetVersion()
+#define	APPREVISION			OsGetRevision()
+#define	APPRELEASE			OsGetRelease()
+
+BYTE OsGetVersion();
+BYTE OsGetRevision();
+BYTE OsGetRelease();
 
 //
 //	Global Memory Management Functions
@@ -157,12 +182,13 @@ ECHOSTATUS OsFreeNonPaged
 //
 // Copy memory
 //
-#define OsCopyMemory(pDest,pSrc,dwBytes) 	memcpy(pDest,pSrc,dwBytes)
+//!!! Anything faster we can use?
+#define OsCopyMemory(pDest, pSrc, dwBytes) 	memcpy(pDest, pSrc, dwBytes)
 
 //
 // Set memory to zero
 //
-#define OsZeroMemory(pDest,dwBytes)			memset(pDest,0,dwBytes)
+#define OsZeroMemory(pDest, dwBytes)			memset(pDest, 0, dwBytes)
 
 
 //
@@ -184,7 +210,8 @@ public:
 	//
 	COsSupport
 	(
-		DWORD				dwDeviceId		// PCI bus device id
+		WORD				wDeviceId,		// PCI bus device id
+		WORD				wCardRev			// Hardware revision number
 	);
 
 	~COsSupport();
@@ -204,12 +231,12 @@ public:
 
 
 	//
-	//	Stall execution for dwTime microseconds.
+	// Stall execution for dwTime microseconds.
 	// Return error status if the OS doesn't support this function.
 	//
 	ECHOSTATUS OsSnooze
 	(
-		DWORD	dwTime
+		DWORD	dwTime						// Duration in micro seconds
 	);
 
 
@@ -218,28 +245,42 @@ public:
 	//
 
 	//
-	// Allocate locked, non-pageable, physically contiguous memory pages
-	//	in the drivers address space.  Used to allocate memory for the DSP
-	//	communications area and Ducks.
+	// Allocate a block of physical memory pages
 	//
-	ECHOSTATUS OsPageAllocate
+	ECHOSTATUS AllocPhysPageBlock
 	(
-		DWORD			dwPageCt,				// How many pages to allocate
-		PPVOID		ppPageAddr,				// Where to return the memory ptr
-		PPHYS_ADDR	pPhysicalPageAddr		// Where to return the physical PCI addr
+		DWORD			dwBytes,
+		PPAGE_BLOCK	&pPageBlock
+	);
+	
+	//
+	// Free a block of physical memory
+	//
+	ECHOSTATUS FreePhysPageBlock
+	(
+		DWORD			dwBytes,
+		PPAGE_BLOCK	pPageBlock
+	);
+	
+	//
+	// Get the virtual address for a page block
+	//
+	PVOID GetPageBlockVirtAddress
+	(
+		PPAGE_BLOCK	pPageBlock
 	);
 
 	//
-	// Unlock and free non-pageable, physically contiguous memory pages
-	//	in the drivers address space.
-	// Used to free memory for the DSP communications area and Ducks.
+	// Get the physical address for a segment of a page block
 	//
-	ECHOSTATUS OsPageFree
+	ECHOSTATUS GetPageBlockPhysSegment
 	(
-		DWORD			dwPageCt,				// How many pages to free
-		PVOID			pPageAddr,				// Virtual memory ptr
-		PHYS_ADDR	PhysicalPageAddr		// Physical PCI addr
+		PPAGE_BLOCK	pPageBlock,			// pass in a previously allocated block
+		DWORD			dwOffset,			// pass in the offset into the block
+		PHYS_ADDR	&PhysAddr,			// returns the physical address
+		DWORD			&dwSegmentSize		// and the length of the segment
 	);
+
 
 	//
 	// Add additional methods here
@@ -257,30 +298,45 @@ public:
 	//
 	//	Return PCI card device ID
 	//
-	DWORD GetDeviceId()
-		{ return( m_dwDeviceId ); }
+	WORD GetDeviceId()
+		{ return( m_wDeviceId ); }
+		
+	//
+	// Return the hardware revision number
+	//
+	WORD GetCardRev()
+	{
+		return m_wCardRev;
+	}
+   
+	//
+	// Get the current timestamp for MIDI input data
+	//
+	LONGLONG GetMidiInTimestamp()
+	{
+		return system_time();
+	}
 		
 	//
 	//	Overload new & delete so memory for this object is allocated 
 	//	from non-paged memory.
 	//
-	PVOID	operator new( size_t Size );
-	VOID	operator delete( PVOID pVoid ); 
+	PVOID operator new( size_t Size );
+	VOID	operator delete( PVOID pVoid );
 
 protected:
 
 private:
-	DWORD					m_dwDeviceId;		// PCI Device ID
+	WORD					m_wDeviceId;		// PCI Device ID
+	WORD					m_wCardRev;			// Hardware revision
 
 	//
 	// Define data here.
 	//
-
-	//KIRQL					m_IrqlCurrent;		// Old IRQ level
-	bigtime_t			m_ullStartTime;	// All system time relative to this time
-	class CPtrQueue *	m_pPtrQue;			// Store read only ptrs so they
-													// can be unmapped
-													
+#ifdef _DEBUG
+	DWORD					m_dwPageBlockCount;
+#endif
+	
 };		// class COsSupport
 
 typedef COsSupport * PCOsSupport;

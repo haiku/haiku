@@ -2,39 +2,30 @@
 //
 //  	CMonaDspCommObject.cpp
 //
-//		Implementation file for EchoGals generic driver Darla 24 DSP
+//		Implementation file for EchoGals generic driver Mona DSP
 //		interface class.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -172,7 +163,9 @@ BOOL CMonaDspCommObject::LoadASIC()
 	if ( m_bASICLoaded )
 	{
 		dwControlReg = GML_CONVERTER_ENABLE | GML_48KHZ;
-		WriteControlReg( dwControlReg );	
+		ECHO_DEBUGPRINTF(("CMonaDspCommObject::LoadASIC - setting control reg for 0x%lx\n",
+								dwControlReg));
+		WriteControlReg( dwControlReg, TRUE );	
 	}
 		
 	return m_bASICLoaded;
@@ -230,6 +223,8 @@ BOOL CMonaDspCommObject::SwitchAsic( DWORD dwMask96 )
 			return FALSE;
 
 		m_pbyAsic = pbyAsicNeeded;	
+		
+		m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
 	}
 	
 	return TRUE;
@@ -249,7 +244,7 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 	BOOL			bWriteControlReg;
 	DWORD			dwControlReg, dwSampleRate;
 
-	ECHO_DEBUGPRINTF( ("CMonaDspCommObject::SetInputClock:\n") );
+	ECHO_DEBUGPRINTF( ("CMonaDspCommObject::SetInputClock: clock %d\n",wClock) );
 
 	dwControlReg = GetControlRegister();
 
@@ -360,7 +355,7 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 	//
 	if ( bWriteControlReg )
 	{
-		WriteControlReg( dwControlReg );
+		WriteControlReg( dwControlReg, TRUE );
 	}
 
 	// Set Mona sample rate to something sane if word or superword is
@@ -369,7 +364,7 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 	{
 		SetSampleRate( GetSampleRate() );
 	}
-
+		
 	return ECHOSTATUS_OK;
 	
 }	// ECHOSTATUS CMonaDspCommObject::SetInputClock
@@ -388,6 +383,11 @@ DWORD CMonaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 {
 	BYTE *pbyAsicNeeded;
 	DWORD	dwAsicSize, dwControlReg, dwNewClock;
+	BOOL	fForceControlReg;
+	
+	ECHO_DEBUGPRINTF(("CMonaDspCommObject::SetSampleRate to %ld\n",dwNewSampleRate));
+	
+	fForceControlReg = FALSE;
 	
 	//
 	// Only set the clock for internal mode.  If the clock is not set to
@@ -447,6 +447,7 @@ DWORD CMonaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 
 	if ( pbyAsicNeeded != m_pbyAsic )
 	{
+		ECHO_DEBUGPRINTF(("\tLoading a new ASIC\n"));
 		//
 		// Load the desired ASIC
 		//
@@ -457,6 +458,8 @@ DWORD CMonaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 			return( GetSampleRate() );
 
 		m_pbyAsic = pbyAsicNeeded;	
+		
+		fForceControlReg = TRUE;
 	}
 
 	//
@@ -519,7 +522,7 @@ DWORD CMonaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 	//
 	// Send the new value to the card
 	//
-	if ( ECHOSTATUS_OK == WriteControlReg( dwControlReg ) )
+	if ( ECHOSTATUS_OK == WriteControlReg( dwControlReg, fForceControlReg ) )
 	{
 		m_pDspCommPage->dwSampleRate = SWAP( dwNewSampleRate );
 
@@ -544,6 +547,8 @@ ECHOSTATUS CMonaDspCommObject::SetDigitalMode
 )
 {
 	DWORD		dwControlReg;
+	
+	ECHO_DEBUGPRINTF(("CMonaDspCommObject::SetDigitalMode %d\n",byNewMode));
 
 	dwControlReg = GetControlRegister();
 	//

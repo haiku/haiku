@@ -6,36 +6,27 @@
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -128,13 +119,13 @@
 //==================================================================================
 
 #define  DSP_FNC_SET_COMMPAGE_ADDR				0x02
-#define  DSP_FNC_SET_CACHELINE_SIZE				0x03
-#define	DSP_FNC_LOAD_LAYLA_ASIC					0xd8
-#define	DSP_FNC_LOAD_GINA24_ASIC				0xd8
-#define 	DSP_FNC_LOAD_MONA_PCI_CARD_ASIC		0xd8
-#define 	DSP_FNC_LOAD_LAYLA24_PCI_CARD_ASIC	0xd8
-#define 	DSP_FNC_LOAD_MONA_EXTERNAL_ASIC		0xd9
-#define 	DSP_FNC_LOAD_LAYLA24_EXTERNAL_ASIC	0xd9
+#define	DSP_FNC_LOAD_LAYLA_ASIC					0xa0
+#define	DSP_FNC_LOAD_GINA24_ASIC				0xa0
+#define 	DSP_FNC_LOAD_MONA_PCI_CARD_ASIC		0xa0
+#define 	DSP_FNC_LOAD_LAYLA24_PCI_CARD_ASIC	0xa0
+#define 	DSP_FNC_LOAD_MONA_EXTERNAL_ASIC		0xa1
+#define 	DSP_FNC_LOAD_LAYLA24_EXTERNAL_ASIC	0xa1
+#define  DSP_FNC_LOAD_3G_ASIC						0xa0
 
 
 //==================================================================================
@@ -144,12 +135,12 @@
 //
 //==================================================================================
 
-#define	MTC_STATE_NORMAL				0
-#define	MTC_STATE_TS_HIGH				1
-#define	MTC_STATE_TS_LOW				2
-#define	MTC_STATE_F1_DATA				3
+#define	MIDI_IN_STATE_NORMAL				0
+#define	MIDI_IN_STATE_TS_HIGH			1
+#define	MIDI_IN_STATE_TS_LOW				2
+#define	MIDI_IN_STATE_F1_DATA			3
 
-#define	MTC_SKIP_DATA					((DWORD)-1)
+#define	MIDI_IN_SKIP_DATA					((DWORD)-1)
 
 
 /*------------------------------------------------------------------------------------
@@ -262,7 +253,7 @@ SET_LAYLA24_FREQUENCY_REG command.
 //
 //==================================================================================
 
-#define HANDSHAKE_TIMEOUT		5000		//	SendVector command timeout (times 2 u.s.)
+#define HANDSHAKE_TIMEOUT		20000		//	SendVector command timeout in microseconds
 #define MIDI_OUT_DELAY_USEC	2000		// How long to wait after MIDI fills up
 
 
@@ -273,7 +264,11 @@ SET_LAYLA24_FREQUENCY_REG command.
 //==================================================================================
 
 #define	DSP_FLAG_MIDI_INPUT				0x0001	// Enable MIDI input
+#define	DSP_FLAG_SPDIF_NONAUDIO			0x0002	// Sets the "non-audio" bit in the S/PDIF out
+																// status bits.  Clear this flag for audio data;
+																// set it for AC3 or WMA or some such
 #define	DSP_FLAG_PROFESSIONAL_SPDIF	0x0008	// 1 Professional, 0 Consumer
+
 
 
 //==================================================================================
@@ -331,11 +326,21 @@ SET_LAYLA24_FREQUENCY_REG command.
 
 //==================================================================================
 //
+//	Layla20 output clocks
+//
+//==================================================================================
+
+#define LAYLA20_OUTPUT_CLOCK_SUPER	0
+#define LAYLA20_OUTPUT_CLOCK_WORD	1
+
+
+//==================================================================================
+//
 //	Return values from the DSP when ASIC is loaded
 //
 //==================================================================================
 
-#define ASIC_ALREADY_LOADED		0x1
+#define ASIC_LOADED					0x1
 #define ASIC_NOT_LOADED				0x0
 
 
@@ -359,6 +364,12 @@ SET_LAYLA24_FREQUENCY_REG command.
 //		16-bit signed little-endian mono samples.  Playback works
 //		like the previous code.
 //
+//	DSP_AUDIOFORM_MS_24LE
+//
+//		24-bit signed little-endian mono samples.  Data is packed
+//    three bytes per sample; if you had two samples 0x112233 and 0x445566
+//    they would be stored in memory like this: 33 22 11 66 55 44.
+//
 //	DSP_AUDIOFORM_MS_32LE
 //	
 //		24-bit signed little-endian mono samples in a 32-bit 
@@ -368,6 +379,7 @@ SET_LAYLA24_FREQUENCY_REG command.
 //
 //	DSP_AUDIOFORM_SS_8
 //	DSP_AUDIOFORM_SS_16LE
+// DSP_AUDIOFORM_SS_24LE
 //	DSP_AUDIOFORM_SS_32LE
 //
 //		Like the previous ones, except now with stereo interleaved
@@ -385,29 +397,19 @@ SET_LAYLA24_FREQUENCY_REG command.
 //		Just like DSP_AUDIOFORM_MM_32LE, but now the data is
 //		in big-endian format.
 //
-//	DSP_AUDIOFORM_MS_16LE_ND
-//
-// 	Just like DSP_AUDIOFORM_MS_16LE; the only difference is
-//		that when recording, the signal is not dithered.  This
-//		is useful when recording from digital inputs.
-//
-//	DSP_AUDIOFORM_SS_16LE_ND
-//
-//		Just like the last one, but for stereo interleaved data.
-//
 //==================================================================================
 
 #define DSP_AUDIOFORM_MS_8			0		// 8 bit mono
 #define DSP_AUDIOFORM_MS_16LE		1		// 16 bit mono
+#define DSP_AUDIOFORM_MS_24LE		2		// 24 bit mono
 #define DSP_AUDIOFORM_MS_32LE		3		// 32 bit mono
 #define DSP_AUDIOFORM_SS_8			4		// 8 bit stereo
 #define DSP_AUDIOFORM_SS_16LE		5		// 16 bit stereo
+#define DSP_AUDIOFORM_SS_24LE		6		// 24 bit stereo
 #define DSP_AUDIOFORM_SS_32LE		7		// 32 bit stereo
 #define DSP_AUDIOFORM_MM_32LE		8		// 32 bit mono->mono little-endian
 #define DSP_AUDIOFORM_MM_32BE		9		// 32 bit mono->mono big-endian
-#define DSP_AUDIOFORM_MS_16LE_ND	10		// 16 bit mono no dither s/pdif
-#define DSP_AUDIOFORM_SS_16LE_ND	11		// 16 bit stereo no dither s/pdif
-#define DSP_AUDIOFORM_SS_32BE		12		// 32 bit stereo big endian
+#define DSP_AUDIOFORM_SS_32BE		10		// 32 bit stereo big endian
 #define DSP_AUDIOFORM_INVALID		0xFF	// Invalid audio format
 
 
@@ -416,15 +418,18 @@ SET_LAYLA24_FREQUENCY_REG command.
 // Super-interleave is defined as interleaving by 4 or more.  Darla20 and Gina20
 // do not support super interleave.
 //
-// Only 32 bit little endian samples are supported for super interleave.  The
-// interleave factor must be even.  16 - way interleave is the current maximum, 
-// so you can interleave by 4, 6, 8, 10, 12, 14, and 16.
+// 16 bit, 24 bit, and 32 bit little endian samples are supported for super 
+// interleave.  The interleave factor must be even.  16 - way interleave is the 
+// current maximum, so you can interleave by 4, 6, 8, 10, 12, 14, and 16.
 //
 // The actual format code is derived by taking the define below and or-ing with
-// the interleave factor.  So, interleave by 6 is 0x86 and interleave by 16 is 0x90.
+// the interleave factor.  So, 32 bit interleave by 6 is 0x86 and 
+// 16 bit interleave by 16 is (0x40 | 0x10) = 0x50.
 //
 //==================================================================================
 
+#define DSP_AUDIOFORM_SUPER_INTERLEAVE_16LE	0x40
+#define DSP_AUDIOFORM_SUPER_INTERLEAVE_24LE	0xc0
 #define DSP_AUDIOFORM_SUPER_INTERLEAVE_32LE	0x80
 
 
@@ -472,18 +477,6 @@ SET_LAYLA24_FREQUENCY_REG command.
 
 //==================================================================================
 //
-//	MIA Sample rate conversion constants
-// 
-//==================================================================================
-
-#define MIA_1_TO_2	0x00010000  // Sample rate conversion ratio 1:2
-#define MIA_1_TO_4	0x00020000	// Sample rate conversion ratio 1:4
-
-#define MIA_SRC_MASK	0xffff0000
-
-
-//==================================================================================
-//
 //	Mia sample rate and clock setting constants
 // 
 //==================================================================================
@@ -494,15 +487,10 @@ SET_LAYLA24_FREQUENCY_REG command.
 #define MIA_88200		0x0142
 #define MIA_96000		0x0141
 
-#define MIA_8000		(MIA_1_TO_4 | MIA_32000)
-#define MIA_11025		(MIA_1_TO_4 | MIA_44100)
-#define MIA_12000		(MIA_1_TO_4 | MIA_48000)
-#define MIA_16000		(MIA_1_TO_2 | MIA_32000)
-#define MIA_22050		(MIA_1_TO_2 | MIA_44100)
-#define MIA_24000		(MIA_1_TO_2 | MIA_48000)
-
 #define MIA_SPDIF		0x00000044
 #define MIA_SPDIF96	0x00000144
+
+#define MIA_MIDI_REV	1				// Must be Mia rev 1 for MIDI support
 
 
 //==================================================================================
@@ -531,11 +519,14 @@ SET_LAYLA24_FREQUENCY_REG command.
 //
 //==================================================================================
 
-#define MONITOR_ARRAY_SIZE		0x180
-#define VMIXER_ARRAY_SIZE		0x40
-#define DSP_MIDI_BUFFER_SIZE 	256
-#define MAX_PLAY_TAPS			168
-#define MAX_REC_TAPS				192
+#define MONITOR_ARRAY_SIZE			0x180
+#define VMIXER_ARRAY_SIZE			0x40
+#define CP_MIDI_OUT_BUFFER_SIZE	32
+#define CP_MIDI_IN_BUFFER_SIZE 	256
+#define MAX_PLAY_TAPS				168
+#define MAX_REC_TAPS					192
+
+#define DSP_MIDI_OUT_FIFO_SIZE	64
 
 
 /****************************************************************************
@@ -563,11 +554,11 @@ typedef struct
 	CChMaskDsp		cmdReset;				// Chs. to reset mask							0x01c	4
 	WORD				wAudioFormat[ DSP_MAXPIPES ];
               									// Chs. audio format								0x020	16*2*2
-	DUCKENTRY		dwDuckListPhys[ DSP_MAXPIPES ];
+	DUCKENTRY		DuckListPhys[ DSP_MAXPIPES ];
      												// Chs. Physical duck addrs					0x060	16*2*8
 	DWORD				dwPosition[ DSP_MAXPIPES ];
 													// Positions for ea. ch.						0x160	16*2*4
-	BYTE				VULevel[ DSP_MAXPIPES ];
+	BYTE				VUMeter[ DSP_MAXPIPES ];
 													// VU meters										0x1e0	16*2*1
 	BYTE				PeakMeter[ DSP_MAXPIPES ];
 													// Peak meters										0x200	16*2*1
@@ -581,7 +572,7 @@ typedef struct
 													// Gina/Darla play filters - obsolete		0x3c0	168*4
 	DWORD				dwRecCoeff [ MAX_REC_TAPS ];
 													// Gina/Darla record filters - obsolete	0x660	192*4
-	WORD				wMidiInData[ DSP_MIDI_BUFFER_SIZE ];
+	WORD				wMidiInData[ CP_MIDI_IN_BUFFER_SIZE ];
 													// MIDI input data transfer buffer			0x960	256*2
 	BYTE				byGDClockState;		// Chg Gina/Darla clock state					0xb60	4
 	BYTE				byGDSpdifStatus;		// Chg. Gina/Darla S/PDIF state
@@ -593,14 +584,17 @@ typedef struct
 	WORD				wOutputClock; 			// Chg. Output clock state						0xb68
 	DWORD				dwStatusClocks;	 	// Current Input clock state					0xb6c	4
 
-	DWORD				dwMIDIOutData;			// Output MIDI bytes to DSP					0xb70
+	DWORD				dwExtBoxStatus;		// External box connected or not				0xb70 4
 	CChMaskDsp		cmdAddBuffer;			// Pipes. to add									0xb74	4
-	DWORD				dwMidiXmitStatus;		// MIDI transmit status							0xb78	4
-	CChMaskDsp		cmdCyclicBuffer;		// Cyclic pipes									0xb7c	4
-	DWORD				dwControlReg;			// Mona, Gina24 & Layla24 control reg		0xb80 4
-	BYTE				byFiller[28];			// filler											0xb84
+	DWORD				dwMidiOutFreeCount;	// # of bytes free in MIDI output FIFO		0xb78	4
+	DWORD 			dwUnused2;				//                                        0xb7c	4
+	DWORD				dwControlReg;			// Mona, Gina24, Layla24 and 3G control 	0xb80 4
+	DWORD				dw3gFreqReg;			// 3G frequency register						0xb84	4
+	BYTE				byFiller[24];			// filler											0xb88
 	BYTE				byVmixerLevel[ VMIXER_ARRAY_SIZE ];
 													// Vmixer levels									0xba0 64
+	BYTE				byMidiOutData[ CP_MIDI_OUT_BUFFER_SIZE ];
+													// MIDI output data								0xbe0	32
 } DspCommPage, *PDspCommPage;
 
 
@@ -620,6 +614,7 @@ class CDspCommObject
 {
 protected:
 	PDspCommPage	m_pDspCommPage;		// Physical memory seen by DSP
+	PPAGE_BLOCK		m_pDspCommPageBlock;	// Physical memory info for COsSupport
 
  	//
  	//	These members are not seen by the DSP; they are used internally by
@@ -696,13 +691,13 @@ protected :
 	//
 	//	Load code into ASIC
 	//
-	BOOL LoadASIC( DWORD dwCmd, PBYTE pCode, DWORD dwSize );
+	virtual BOOL LoadASIC( DWORD dwCmd, PBYTE pCode, DWORD dwSize );
 	virtual BOOL LoadASIC() { return TRUE; }
-	
+
 	//
 	//	Check status of ASIC - loaded or not loaded
 	//
-	BOOL CheckAsicStatus();
+	virtual BOOL CheckAsicStatus();
 
 	//
 	//	Write to DSP
@@ -840,9 +835,6 @@ public:
 	WORD GetNumMidiChannels()
 		{ return( m_wNumMidiIn + m_wNumMidiOut ); }
 
-	BOOL VerifySize( DWORD dwExpSize )
-		{ return( SWAP( dwExpSize ) == m_pDspCommPage->dwCommSize ); }
-
 	//
 	// Get, set, and clear comm page flags
 	//
@@ -904,12 +896,13 @@ public:
 	//
 	virtual ECHOSTATUS SetInputClock(WORD wClock);
 	virtual ECHOSTATUS SetOutputClock(WORD wClock);
-
+	
 	//
 	//	Set digital mode
 	//
 	virtual ECHOSTATUS SetDigitalMode( BYTE byNewMode )
 		{ return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED; }
+
 	//
 	//	Get digital mode
 	//
@@ -963,7 +956,7 @@ public:
 	//
 	// Get the current sample rate
 	//
-	DWORD GetSampleRate()
+	virtual DWORD GetSampleRate()
 	    { return( SWAP( m_pDspCommPage->dwSampleRate ) ); }
 
 	//
@@ -982,8 +975,7 @@ public:
 	//
 	ECHOSTATUS StartTransport
 	(
-		PCChannelMask	pChannelMask,		// Pipes to start
-		PCChannelMask	pCyclicMask			// Which pipes are cyclic buffers
+		PCChannelMask	pChannelMask		// Pipes to start
 	);
 
 	//
@@ -1001,6 +993,14 @@ public:
 	(
 		PCChannelMask	pChannelMask
 	);
+
+	//
+	//	See if any pipes are playing or recording
+	// 
+	BOOL IsTransportActive()
+	{
+		return (FALSE == m_cmActive.IsEmpty());
+	}
 
 	//
 	// Tell DSP we added a buffer to a channel
@@ -1051,7 +1051,7 @@ public:
 	}
 	
 	//
-	//	Get/Set Professional or consumer S/PDIF status
+	//	Get/Set professional or consumer S/PDIF status
 	//
 	virtual BOOL IsProfessionalSpdif()
 		{ 
@@ -1071,25 +1071,41 @@ public:
 			ECHO_DEBUGPRINTF(("CDspCommObject::SetProfessionalSpdif - flags are now 0x%lx\n",
 									GetFlags()));	
 		}
+		
+	//
+	// Get/Set S/PDIF out non-audio status bit
+	//
+	virtual BOOL IsSpdifOutNonAudio()
+	{
+			return( ( GetFlags() & DSP_FLAG_SPDIF_NONAUDIO ) ? TRUE : FALSE ); 
+	}
+	
+	virtual void SetSpdifOutNonAudio( BOOL bNonAudio)
+	{
+			if ( 0 != bNonAudio )
+				SetFlags( DSP_FLAG_SPDIF_NONAUDIO );
+			else
+				ClearFlags( DSP_FLAG_SPDIF_NONAUDIO );
+	}
 
 	//
 	// Mixer functions
 	//
 	virtual ECHOSTATUS SetNominalLevel( WORD wBus, BOOL bState );
-	ECHOSTATUS GetNominalLevel( WORD wBus, PBYTE pbyState );
+	virtual ECHOSTATUS GetNominalLevel( WORD wBus, PBYTE pbyState );
 
 	ECHOSTATUS SetAudioMonitor
 	(
 		WORD	wOutCh,
 		WORD	wInCh,
-		int	iGain,
+		INT32	iGain,
 		BOOL 	fImmediate = TRUE
 	);
 
 	//
 	// SetBusOutGain - empty function on non-vmixer cards
 	//
-	virtual ECHOSTATUS SetBusOutGain(WORD wBusOut,int iGain)
+	virtual ECHOSTATUS SetBusOutGain(WORD wBusOut,INT32 iGain)
 	{
 		return ECHOSTATUS_OK;
 	}
@@ -1104,7 +1120,7 @@ public:
 	( 
 		WORD 	wPipeOut, 
 		WORD 	wBusOut,
-		int 	iGain,
+		INT32	iGain,
 		BOOL 	fImmediate = TRUE
 	);
 	
@@ -1112,16 +1128,16 @@ public:
 	( 
 		WORD 	wPipeOut, 
 		WORD 	wBusOut,
-		int 	&iGain
+		INT32	&iGain
 	);
 	
 	virtual ECHOSTATUS SetBusInGain
 	( 
 		WORD 	wBusIn, 
-		int 	iGain
+		INT32 iGain
 	);
 
-	virtual ECHOSTATUS GetBusInGain( WORD wBusIn, int &iGain);
+	virtual ECHOSTATUS GetBusInGain( WORD wBusIn, INT32 &iGain);
 	
 	//
 	//	See description of ECHOGALS_METERS above for
@@ -1136,7 +1152,7 @@ public:
 	(
 		BOOL & bOn
 	)
-		{	bOn = ( 0 != m_wMeterOnCount ); return ECHOSTATUS_OK; }
+	{	bOn = ( 0 != m_wMeterOnCount ); return ECHOSTATUS_OK; }
 
 	ECHOSTATUS SetMetersOn( BOOL bOn );
 
@@ -1146,9 +1162,9 @@ public:
 	ECHOSTATUS SetAudioFormat
 	(
 		WORD 							wPipeIndex,
-		PECHOGALS_AUDIOFORMAT	pFormat,
-		BOOL							fDitherDigitalInputs
+		PECHOGALS_AUDIOFORMAT	pFormat
 	);
+
 	ECHOSTATUS GetAudioFormat
 	( 
 		WORD 							wPipeIndex,
@@ -1160,8 +1176,7 @@ public:
 	//
 	//	MIDI output activity
 	//
-	virtual BOOL IsMidiOutActive()
-		{ return FALSE; }
+	virtual BOOL IsMidiOutActive();
 		
 	//
 	// Set MIDI I/O on or off
@@ -1184,20 +1199,6 @@ public:
 		DWORD &	dwData				// Return data
 	);
 	
-	//
-	// Returns TRUE if no more MIDI data can be sent
-	// right now
-	//
-	virtual BOOL MidiOutFull()
-	{
-		if (0 == (GetDspRegister( CHI32_STATUS_REG) & CHI32_STATUS_REG_HF4))
-		{
-			return TRUE;
-		}
-		
-		return FALSE;
-	}
-
 #endif // MIDI_SUPPORT
 
 	//

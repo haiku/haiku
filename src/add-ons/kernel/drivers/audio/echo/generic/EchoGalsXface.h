@@ -8,36 +8,27 @@
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -46,17 +37,17 @@
 	
 	
 	Here's a block diagram of how most of the cards work:
-	
-						+-----------+
-			  record	|           |<-------------------- Inputs
-	       <-------|           |        |
-	  PCI				| Transport	|        |
-	  bus				|  engine 	|       \|/
-	       ------->|				|	  +-------+
-			   play	|				|--->|monitor|-------> Outputs
-						+-----------+	  | mixer |
-											  +-------+
-											  
+
+                  +-----------+
+         record   |           |<-------------------- Inputs
+          <-------|           |        |
+  PCI             | Transport |        |
+  bus             |  engine   |       \|/
+          ------->|           |    +-------+
+           play   |           |--->|monitor|-------> Outputs
+                  +-----------+    | mixer |
+                                   +-------+
+
 	The lines going to and from the PCI bus represent "pipes".  A pipe performs
 	audio transport - moving audio data to and from buffers on the host via
 	bus mastering.
@@ -70,21 +61,21 @@
 	and busses; that is, each individual pipe is hard-wired to a single bus.
 	
 	Cards that work this way are Darla20, Gina20, Layla20, Darla24, Gina24,
-	Layla24, Mona, and Indigo.
+	Layla24, Mona, Indigo, Indigo io, and Indigo dj.
 	
 
 	Mia has a feature called "virtual outputs." 
-					
 
-						+-----------+
-			  record	|           |<----------------------------- Inputs
-	       <-------|           |                  |
-	  PCI				| Transport	|                  |
-	  bus				|  engine 	|                 \|/
-	       ------->|				|	 +------+   +-------+
-			   play	|				|-->|vmixer|-->|monitor|-------> Outputs
-						+-----------+	 +------+   | mixer |
-											            +-------+
+
+                  +-----------+
+           record |           |<----------------------------- Inputs
+          <-------|           |                  |
+     PCI          | Transport |                  |
+     bus          |  engine   |                 \|/
+          ------->|           |   +------+   +-------+
+            play  |           |-->|vmixer|-->|monitor|-------> Outputs
+                  +-----------+   +------+   | mixer |
+                                             +-------+
 
 
 	Obviously, the difference here is the box labeled "vmixer."  Vmixer is 
@@ -161,8 +152,10 @@
 	to use.  
 	
 	The generic code takes care of all this for you.
-	
 
+   For hardware that supports 176.4 and 192 kHz, there is a corresponding quad speed 
+	mode.
+	
 */
 
 
@@ -198,6 +191,9 @@
 #define MONA							0x0070
 #define MIA								0x0080
 #define INDIGO							0x0090
+#define INDIGO_IO						0x00a0
+#define INDIGO_DJ						0x00b0
+#define ECHO3G							0x0100
 
 
 //***********************************************************************
@@ -214,9 +210,7 @@
 #define ECHO_MAXAUDIOINPUTS		32				// Max audio input channels
 #define ECHO_MAXAUDIOOUTPUTS		32				// Max audio output channels
 #define ECHO_MAXAUDIOPIPES			32				// Max number of input and output pipes
-															// channels
 #define ECHO_MAXMIDIJACKS			1				// Max MIDI ports
-#define ECHO_MIDI_QUEUE_SZ 		512			// Max MIDI input queue entries
 #define ECHO_MTC_QUEUE_SZ			32				// Max MIDI time code input queue entries
 
 //
@@ -241,6 +235,7 @@
 #define ECHO_CLOCK_ADAT						4
 #define ECHO_CLOCK_ESYNC					5
 #define ECHO_CLOCK_ESYNC96					6
+#define ECHO_CLOCK_MTC						7
 #define ECHO_CLOCK_NONE						0xffff
 
 //
@@ -254,6 +249,7 @@
 #define ECHO_CLOCK_BIT_ADAT				(1<<ECHO_CLOCK_ADAT)
 #define ECHO_CLOCK_BIT_ESYNC				(1<<ECHO_CLOCK_ESYNC)
 #define ECHO_CLOCK_BIT_ESYNC96			(1<<ECHO_CLOCK_ESYNC96)
+#define ECHO_CLOCK_BIT_MTC					(1<<ECHO_CLOCK_MTC)
 
 
 //*****************************************************************************
@@ -314,11 +310,6 @@
 #define ECHOGALS_FLAG_BADBOARD					0x0001	// Board could not be init or
 																		// stopped responding
 																		// (i.e. DSP crashed)
-
-#define ECHOGALS_FLAG_SPDIF_NODITHER			0x0002	// Used to disable digital input
-																		// dithering
-
-#define ECHOGALS_FLAG_DIGITAL_IN_NODITHER		0x0002
 
 #define ECHOGALS_FLAG_SYNCH_WAVE					0x0004	// Used to enable wave device
 																		// synchronization.  When set,
@@ -391,18 +382,14 @@ typedef unsigned long	ECHOSTATUS;
 #define ECHOSTATUS_MIXER_DISABLED					0x26
 #define ECHOSTATUS_NO_SUPER_INTERLEAVE				0x27
 #define ECHOSTATUS_DUCK_NOT_WRAPPED					0x28
-#define ECHOSTATUS_LAST									0x29
+#define ECHOSTATUS_NO_3G_BOX							0x29
+#define ECHOSTATUS_LAST									0x2a
 
 
 //*****************************************************************************
 //
-// ECHOSTATUS return type - most of the generic driver functions
-// return an ECHOSTATUS value
+// ECHOGALS_AUDIOFORMAT describes the audio buffer format for a pipe
 //
-//*****************************************************************************
-
-//
-//	ECHOGALS_AUDIOFORMAT describes the audio buffer format for a pipe
 //
 // byMonoToStereo is used to resolve an ambiguity when wDataInterleave is set
 // to one.  Say you're writing a Windows driver and someone tells you to play mono data;
@@ -414,6 +401,8 @@ typedef unsigned long	ECHOSTATUS;
 // this; if byMonoToStereo is non-zero, then the same signal is sent out both channels.
 // If byMonoToStereo is zero, then only one output channel is used.
 //
+//*****************************************************************************
+
 typedef struct tECHOGALS_AUDIOFORMAT
 {
 	WORD		wDataInterleave;				// How the data is arranged in memory
@@ -433,22 +422,22 @@ typedef struct tECHOGALS_AUDIOFORMAT
 //
 typedef struct tECHOGALS_METERS
 {
-	int	iNumPipesOut;	// These numbers only apply in the context of this structure;
-	int	iNumPipesIn;	// they indicate the number of entries in each of the arrays.
-	int	iNumBussesOut;
-	int	iNumBussesIn;
+	INT32	iNumPipesOut;	// These numbers only apply in the context of this structure;
+	INT32	iNumPipesIn;	// they indicate the number of entries in each of the arrays.
+	INT32	iNumBussesOut;
+	INT32	iNumBussesIn;
 
-	int	iPipeOutVU[ECHO_MAXAUDIOOUTPUTS];
-	int	iPipeOutPeak[ECHO_MAXAUDIOOUTPUTS];
+	INT32	iPipeOutVU[ECHO_MAXAUDIOOUTPUTS];
+	INT32	iPipeOutPeak[ECHO_MAXAUDIOOUTPUTS];
 
-	int	iPipeInVU[ECHO_MAXAUDIOINPUTS];
-	int	iPipeInPeak[ECHO_MAXAUDIOINPUTS];
+	INT32	iPipeInVU[ECHO_MAXAUDIOINPUTS];
+	INT32	iPipeInPeak[ECHO_MAXAUDIOINPUTS];
 
-	int	iBusOutVU[ECHO_MAXAUDIOOUTPUTS];
-	int	iBusOutPeak[ECHO_MAXAUDIOOUTPUTS];
+	INT32	iBusOutVU[ECHO_MAXAUDIOOUTPUTS];
+	INT32	iBusOutPeak[ECHO_MAXAUDIOOUTPUTS];
 	
-	int	iBusInVU[ECHO_MAXAUDIOINPUTS];
-	int	iBusInPeak[ECHO_MAXAUDIOINPUTS];
+	INT32	iBusInVU[ECHO_MAXAUDIOINPUTS];
+	INT32	iBusInPeak[ECHO_MAXAUDIOINPUTS];
 } ECHOGALS_METERS, * PECHOGALS_METERS;
 
 //
@@ -515,6 +504,14 @@ typedef struct tECHOGALS_CLOSEAUDIOPARAMETERS
 	WORD		wPipeIndex;
 } ECHOGALS_CLOSEAUDIOPARAMETERS, * PECHOGALS_CLOSEAUDIOPARAMETERS;
 
+//
+// Context info for MIDI input clients
+//
+typedef struct tECHOGALS_MIDI_IN_CONTEXT
+{
+	BOOL	fOpen;
+	DWORD dwDrain;
+} ECHOGALS_MIDI_IN_CONTEXT;
 
 //
 // One nifty feature is that the DSP is constantly writing the DMA position
@@ -618,6 +615,7 @@ enum
 	ECHOCAPS_PEAK_METER		= 0x00000020,
 	ECHOCAPS_VU_METER 		= 0x00000040,
 	ECHOCAPS_NOMINAL_LEVEL	= 0x00000080,	// aka +4/-10
+	ECHOCAPS_PHANTOM_POWER	= 0x20000000,
 	ECHOCAPS_DUMMY				= 0x40000000,	// Used for Indigo; indicates
 														// a dummy input or output
 	ECHOCAPS_DIGITAL			= 0x80000000 	// S/PDIF or ADAT connection
@@ -655,6 +653,20 @@ typedef struct tECHOGALS_CAPS
 	WORD		wNumMidiOut;					// Number of MIDI out jacks
 	WORD		wNumMidiIn;						// Number of MIDI in jacks
 } ECHOGALS_CAPS, *PECHOGALS_CAPS;
+
+
+/*
+
+	Echo3G box types
+
+*/
+
+//
+// 3G external box types
+//
+#define GINA3G									0x00
+#define LAYLA3G								0x10
+#define NO3GBOX								0xffff
 
 
 #endif // _ECHOGALSXFACE_

@@ -5,36 +5,27 @@
 //		Audio transport methods for the CEchoGals driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -55,16 +46,23 @@
 // will fail if someone else has already opened the pipes.  Calling OpenAudio
 // is the first step if you want to play or record.
 //
+// If the fCheckHardware flag is true, then the open will fail
+// if the DSP and ASIC firmware have not been loaded (usually means
+// your external box is turned off).
+//
 //===========================================================================
 
 ECHOSTATUS CEchoGals::OpenAudio
 (
 	PECHOGALS_OPENAUDIOPARAMETERS	pOpenParameters,	// Info on pipe
-	PWORD									pwPipeIndex			// Pipe index ptr
+	PWORD									pwPipeIndex,		// Pipe index ptr
+	BOOL									fCheckHardware,
+	CDaffyDuck							*pDuck
 )
 {
 	CChannelMask	cmMask;
 	WORD				wPipeMax, wPipe, wPipeIndex, i, wWidth;
+	ECHOSTATUS 		Status;
 
 	ECHO_DEBUGPRINTF( ("CEchoGals::OpenAudio: %s %u "
 							 "PipeWidth %d "
@@ -87,10 +85,15 @@ ECHOSTATUS CEchoGals::OpenAudio
 
 	//
 	// Make sure the DSP & ASIC are up and running
+	//	 - only if fCheckHardware is true
 	//
-	ECHOSTATUS Status = GetDspCommObject()->LoadFirmware();
-	if ( ECHOSTATUS_OK != Status )
-		return Status;
+	if (fCheckHardware)
+	{
+		Status = GetDspCommObject()->LoadFirmware();
+
+		if ( ECHOSTATUS_OK != Status )
+			return Status;
+	}
 
 	//
 	// Validate the pipe number
@@ -144,9 +147,16 @@ ECHOSTATUS CEchoGals::OpenAudio
 	//
 	// Make a daffy duck
 	//
-	Status = MakeDaffyDuck(wPipeIndex);
-	if (ECHOSTATUS_OK != Status)
-		return Status;
+	if (NULL == pDuck)
+	{
+		pDuck = MakeDaffyDuck();
+
+		if (NULL == pDuck)
+			return ECHOSTATUS_NO_MEM;
+	}
+
+	SetDaffyDuck( wPipeIndex, pDuck );	
+		
 	
 	//
 	// Reset the 64-bit DMA position
@@ -179,35 +189,47 @@ ECHOSTATUS CEchoGals::OpenAudio
 
 ECHOSTATUS CEchoGals::CloseAudio
 (
-	PECHOGALS_CLOSEAUDIOPARAMETERS	pCloseParameters
+	PECHOGALS_CLOSEAUDIOPARAMETERS	pCloseParameters,
+	BOOL										fFreeDuck
 )
 {
 	CChannelMask	cmMask;
 	ECHOSTATUS		Status;
 	WORD				i;
 	WORD				wPipeIndex;
+	
+	wPipeIndex = pCloseParameters->wPipeIndex;
 
 	ECHO_DEBUGPRINTF( ("CEchoGals::CloseAudio: Pipe %u  ",
-							 pCloseParameters->wPipeIndex) );
+							 wPipeIndex) );
 
-	Status = VerifyAudioOpen( pCloseParameters->wPipeIndex );
+	Status = VerifyAudioOpen( wPipeIndex );
 	if ( ECHOSTATUS_OK != Status )
 		return Status;
 
 	for ( i = 0;
-			i < m_Pipes[ pCloseParameters->wPipeIndex ].wInterleave;
+			i < m_Pipes[ wPipeIndex ].wInterleave;
 			i++ )
 	{
-		cmMask.SetIndexInMask( pCloseParameters->wPipeIndex + i );
+		cmMask.SetIndexInMask( wPipeIndex + i );
 	}
-	Reset( pCloseParameters->wPipeIndex );
+	Reset( wPipeIndex );
 	
-	KillDaffyDuck( pCloseParameters->wPipeIndex );
+	//
+	// Free the scatter-gather list
+	//
+	if (NULL != m_DaffyDucks[wPipeIndex])
+	{
+		if (fFreeDuck)
+			delete m_DaffyDucks[wPipeIndex];
+	
+		m_DaffyDucks[wPipeIndex] = NULL;
+	}
 
 	m_cmAudioOpen -= cmMask;
 	m_cmAudioCyclic -= cmMask;
 
-	wPipeIndex = pCloseParameters->wPipeIndex;
+	wPipeIndex = wPipeIndex;
 	m_ProcessId[ wPipeIndex ] = NULL;
 	m_Pipes[ wPipeIndex ].wInterleave = 0;
 	
@@ -348,15 +370,22 @@ ECHOSTATUS CEchoGals::QueryAudioFormat
 			return ECHOSTATUS_NO_SUPER_INTERLEAVE;
 	
 		//
-		// Allow super interleave for 32 bit little endian data;
-		// the interleave factor must be even.
+		// Interleave must be even & data must be little endian
 		//
-		if ( 	(32 != pAudioFormat->wBitsPerSample) ||
-				(0 != pAudioFormat->byDataAreBigEndian) ||
+		if (	(0 != pAudioFormat->byDataAreBigEndian) ||
 			  	(0 != (wInterleave & 1)	)
 			)
 			return ECHOSTATUS_BAD_FORMAT;
 		
+		//
+		// 16, 24, or 32 bit samples are required
+		//	
+		if ( 	(32 != pAudioFormat->wBitsPerSample) &&
+				(24 != pAudioFormat->wBitsPerSample) &&
+				(16 != pAudioFormat->wBitsPerSample) )
+			return ECHOSTATUS_BAD_FORMAT;
+		
+					
 		//
 		// Make sure that this interleave factor on this pipe
 		// does not exceed the number of pipes for the card
@@ -442,6 +471,7 @@ ECHOSTATUS CEchoGals::QueryAudioFormat
 	{
 		case 8 :
 		case 16 :
+		case 24 :
 		case 32 :
 			break;
 		
@@ -495,13 +525,7 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 	//
 	// Set the format
 	//
-	BOOL fDitherDigitalInputs;
-	
-	fDitherDigitalInputs = 0 != (m_wFlags & ECHOGALS_FLAG_SPDIF_NODITHER);
-	Status = 
-		GetDspCommObject()->SetAudioFormat( wPipeIndex,
-														pAudioFormat,
-														fDitherDigitalInputs );
+	Status = GetDspCommObject()->SetAudioFormat( wPipeIndex, pAudioFormat );
 	return Status;
 	
 }	// ECHOSTATUS CEchoGals::SetAudioFormat - single pipe
@@ -521,7 +545,6 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 {
 	WORD			wPipeIndex = 0xffff;
 	ECHOSTATUS	Status;
-	BOOL			fDitherDigitalInputs;
 
 	if ( NULL == GetDspCommObject() || GetDspCommObject()->IsBoardBad() )
 	{
@@ -529,7 +552,6 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 		return ECHOSTATUS_DSP_DEAD;
 	}
 
-	fDitherDigitalInputs = 0 != (m_wFlags & ECHOGALS_FLAG_SPDIF_NODITHER);
 	for ( ; ; )
 	{
 		wPipeIndex = pChannelMask->GetIndexFromMask( ++wPipeIndex );
@@ -560,10 +582,7 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 		//
 		// Set the format for this pipe
 		//
-		Status =
-			GetDspCommObject()->SetAudioFormat( wPipeIndex,
-															pAudioFormat,
-															fDitherDigitalInputs );
+		Status = GetDspCommObject()->SetAudioFormat( wPipeIndex, pAudioFormat );
 		if ( ECHOSTATUS_OK != Status )
 			return Status;
 
@@ -676,14 +695,15 @@ ECHOSTATUS CEchoGals::GetAudioSampleRate
 
 //===========================================================================
 //
-// This protected method is used to create a CDaffyDuck object to 
+// This method is used to create a CDaffyDuck object to 
 // manage a scatter-gather list for a newly opened pipe.
 //
 //===========================================================================
 
-ECHOSTATUS CEchoGals::MakeDaffyDuck(WORD wPipeIndex)
+CDaffyDuck * CEchoGals::MakeDaffyDuck()
 {
 	ECHOSTATUS 	Status = ECHOSTATUS_OK;
+	CDaffyDuck 	*pDuck;
 	
 	//---------------------------------------------------------
 	//
@@ -691,53 +711,43 @@ ECHOSTATUS CEchoGals::MakeDaffyDuck(WORD wPipeIndex)
 	//
 	//---------------------------------------------------------
 
-	m_DaffyDucks[wPipeIndex] = new CDaffyDuck(m_pOsSupport,
-															GetDspCommObject(),
-															wPipeIndex );
-	if (NULL == m_DaffyDucks[wPipeIndex])
-	{
-		return ECHOSTATUS_NO_MEM;
-	}
+	pDuck = new CDaffyDuck(	m_pOsSupport );
 		
 	//
 	// Check the daffy duck				 
 	//
-	Status = m_DaffyDucks[wPipeIndex]->InitCheck();
-	if (ECHOSTATUS_OK != Status)
+	if (pDuck)
 	{
-		return Status;
+		Status = pDuck->InitCheck();
+		if (ECHOSTATUS_OK != Status)
+		{
+			delete pDuck;
+			return NULL;
+		}
 	}
-
-	//
-	// Put the daffy duck in the comm page
-	//
-	GetDspCommObject()->
-		SetAudioDuckListPhys(wPipeIndex,
-					  				m_DaffyDucks[wPipeIndex]->GetPhysStartAddr() );
-							
-	ECHO_DEBUGPRINTF(("CEchoGals::MakeDaffyDuck - 0x%lx for pipe index %d\n",
-							(DWORD) m_DaffyDucks[wPipeIndex],wPipeIndex));									
-		
-	return Status;
 	
+	return pDuck;
+		
 }	// MakeDaffyDuck
 
 
+
+
 //===========================================================================
 //
-// Daffy duck cleanup
+// Use the given CDaffyDuck object as the scatter-gather list for this pipe
 //
 //===========================================================================
 
-void CEchoGals::KillDaffyDuck(WORD wPipeIndex)	
+ECHOSTATUS CEchoGals::SetDaffyDuck(WORD wPipeIndex, CDaffyDuck *pDuck)	
 {
-	if (NULL != m_DaffyDucks[wPipeIndex])
-	{
-		delete m_DaffyDucks[wPipeIndex];
-		m_DaffyDucks[wPipeIndex] = NULL;
-	}
+	m_DaffyDucks[wPipeIndex] = pDuck;
+	
+	return ECHOSTATUS_OK;
+							
+}	// SetDaffyDuck
 
-}	// KillDaffyDuck
+
 
 
 //===========================================================================
@@ -805,10 +815,13 @@ ECHOSTATUS CEchoGals::Start
 )
 {
 	WORD				wPipe;
+	DWORD				dwPhysStartAddr;
 	CChannelMask	cmStart;
 	PVOID				ProcessId = NULL;
-
-	if ( NULL == GetDspCommObject() || GetDspCommObject()->IsBoardBad() )
+	CDspCommObject *pDCO;
+	
+	pDCO = GetDspCommObject();
+	if ( NULL == pDCO || pDCO->IsBoardBad() )
 		return ECHOSTATUS_DSP_DEAD;
 	
 	//
@@ -860,7 +873,13 @@ ECHOSTATUS CEchoGals::Start
 			return ECHOSTATUS_DUCK_NOT_WRAPPED;
 		}
 
+		//
+		// Set the physical start address for the duck for this pipe
+		//
+		dwPhysStartAddr = m_DaffyDucks[wPipe]->GetPhysStartAddr();
+		pDCO->SetAudioDuckListPhys( wPipe, dwPhysStartAddr );		
 		
+				
 		//
 		// Do different things to this pipe depending on the 
 		// state
@@ -871,7 +890,7 @@ ECHOSTATUS CEchoGals::Start
 				//
 				// Clean up the DMA position stuff
 				//
-				pdwDspCommPositions = GetDspCommObject()->GetAudioPositionPtr();
+				pdwDspCommPositions = pDCO->GetAudioPositionPtr();
 				pdwDspCommPositions[ wPipe ] = 0;
 				
 				//
@@ -959,14 +978,15 @@ ECHOSTATUS CEchoGals::Start
 		}
 	}
 
-	//-----------------------------------------------------------------
-	// Send the result of all this to the DSP
-	//-----------------------------------------------------------------
-
 	if ( cmStart.IsEmpty() )
 		return ECHOSTATUS_OK;
 
-	return GetDspCommObject()->StartTransport( &cmStart, &m_cmAudioCyclic );
+
+	//-----------------------------------------------------------------
+	// Time to go
+	//-----------------------------------------------------------------
+	
+	return pDCO->StartTransport( &cmStart );
 	
 }	// ECHOSTATUS CEchoGals::Start
 
@@ -1002,7 +1022,7 @@ ECHOSTATUS CEchoGals::Stop
 	PCChannelMask	pChannelMask
 )
 {
-	int			i;
+	INT32			i;
 	ECHOSTATUS	Status;
 
 	if ( NULL == GetDspCommObject() || GetDspCommObject()->IsBoardBad() )
@@ -1080,9 +1100,6 @@ ECHOSTATUS CEchoGals::Reset
 	if ( ECHOSTATUS_OK != Status )
 		return Status;
 
-	PDWORD	pdwDspCommPositions =
-		GetDspCommObject()->GetAudioPositionPtr();
-
 	for ( i = 0; i < GetNumPipes(); i++ )
 	{
 		//
@@ -1100,8 +1117,6 @@ ECHOSTATUS CEchoGals::Reset
 		UpdateDmaPos( i );
 		m_dwLastDspPos[ i ] = 0;
 		GetDspCommObject()->ResetPipePosition(i);
-		
-		pdwDspCommPositions[ i ] = 0;
 		
 		m_byPipeState[ i ] = PIPE_STATE_RESET;
 	}
@@ -1220,6 +1235,4 @@ ECHOSTATUS CEchoGals::GetAudioPositionPtr
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CEchoGals::GetAudioPositionPtr
-
-
 

@@ -5,47 +5,37 @@
 //		Implementation file for EchoGals generic driver Layla24 DSP
 //		interface class.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
 #include "CEchoGals.h"
 #include "CLayla24DspCommObject.h"
 
-#include "Layla24DSP.c"		// regular DSP code
-
+#include LAYLA24_DSP_FILENAME
 #include "Layla24_1ASIC.c"
 #include "Layla24_2A_ASIC.c"
-#include "Layla24_2S_ASIC.c"
+#include LAYLA24_2ASIC_FILENAME
 
 //
 // The ASIC files for Layla24 are always this size
@@ -72,7 +62,8 @@ CLayla24DspCommObject::CLayla24DspCommObject
 ) : CGMLDspCommObject( pdwRegBase, pOsSupport )
 {
 
-	strcpy( m_szCardName, "Layla24" );
+	strcpy( m_szCardName, LAYLA24_CARD_NAME);
+
 	m_pdwDspRegBase = pdwRegBase;		// Virtual addr DSP's register base
 	
 	m_wNumPipesOut = 16;
@@ -81,17 +72,20 @@ CLayla24DspCommObject::CLayla24DspCommObject
 	m_wNumBussesIn = 16;
 	m_wFirstDigitalBusOut = 8;
 	m_wFirstDigitalBusIn = 8;
-	m_fHasVmixer = FALSE;
+
+	m_fHasVmixer = LAYLA24_HAS_VMIXER;
 
 	m_wNumMidiOut = 1;					// # MIDI out channels
 	m_wNumMidiIn = 1;						// # MIDI in  channels
 	m_bHasASIC = TRUE;
 	
-	m_pwDspCodeToLoad = pwLayla24DSP;
+	m_pwDspCodeToLoad = LAYLA24_DSP_CODE;
 
 	m_byDigitalMode = DIGITAL_MODE_SPDIF_RCA;
 	m_bProfessionalSpdif = FALSE;
-	m_wMtcState = MTC_STATE_NORMAL;
+	m_wMtcState = MIDI_IN_STATE_NORMAL;
+	
+	m_dwSampleRate = 48000;
 	
 }	// CLayla24DspCommObject::CLayla24DspCommObject( DWORD dwPhysRegBase )
 
@@ -179,7 +173,9 @@ BOOL CLayla24DspCommObject::LoadASIC()
 	if ( m_bASICLoaded )
 	{
 		dwControlReg = GML_CONVERTER_ENABLE | GML_48KHZ;
-		WriteControlReg( dwControlReg );	
+		WriteControlReg( dwControlReg, TRUE );	
+		
+		m_dwSampleRate = 48000;
 	}
 
 	ECHO_DEBUGPRINTF(("\tFinished\n"));
@@ -204,7 +200,7 @@ DWORD CLayla24DspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 {
 	DWORD		dwControlReg, dwNewClock, dwBaseRate;
 	BOOL		bSetFreqReg = FALSE;
-
+	
 	//
 	// Only set the clock for internal mode.  If the clock is not set to
 	// internal, try and re-set the input clock; this more transparently
@@ -218,14 +214,14 @@ DWORD CLayla24DspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 		//
 		// Save the rate anyhow
 		//
-		m_pDspCommPage->dwSampleRate = SWAP( dwNewSampleRate );
+		m_dwSampleRate = SWAP( dwNewSampleRate );
 		
 		//
 		// Set the input clock to the current value
 		//
 		SetInputClock( m_wInputClock );
 		
-		return GetSampleRate();
+		return dwNewSampleRate;
 	}
 
 	//
@@ -339,10 +335,12 @@ DWORD CLayla24DspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 		m_pDspCommPage->dwSampleRate = SWAP( dwNewSampleRate );
 
 		ECHO_DEBUGPRINTF( ("CLayla24DspCommObject::SetSampleRate: %ld "
-								 "clock %ld\n", dwNewSampleRate, dwControlReg) );
+								 "clock %lx\n", dwNewSampleRate, dwControlReg) );
 	}
+	
+	m_dwSampleRate = dwNewSampleRate;
 
-	return GetSampleRate();
+	return dwNewSampleRate;
 
 }	// DWORD CLayla24DspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 
@@ -361,6 +359,7 @@ ECHOSTATUS CLayla24DspCommObject::SetDigitalMode
 	DWORD		dwControlReg;
 
 	dwControlReg = GetControlRegister();
+	
 	//
 	// Clear the current digital mode
 	//
@@ -424,7 +423,7 @@ ECHOSTATUS CLayla24DspCommObject::SetDigitalMode
 	//
 	// Write the control reg
 	//
-	WriteControlReg( dwControlReg );
+	WriteControlReg( dwControlReg, TRUE );
 
 	m_byDigitalMode = byNewMode;
 
@@ -473,6 +472,7 @@ BOOL CLayla24DspCommObject::SwitchAsic
 		}
 		m_pbyAsic = pbyAsicNeeded;	
 		memmove( m_pDspCommPage->byMonitors, byMonitors, MONITOR_ARRAY_SIZE );
+		
 	}
 	
 	return TRUE;
@@ -519,6 +519,7 @@ ECHOSTATUS CLayla24DspCommObject::SetInputClock(WORD wClock)
 			     ( GetSampleRate() > 100000 ) )
 			{
 				m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
+				m_dwSampleRate = 48000;
 			}
 
 			bSetRate = TRUE;
@@ -593,7 +594,7 @@ ECHOSTATUS CLayla24DspCommObject::SetInputClock(WORD wClock)
 	//
 	if ( bWriteControlReg )
 	{
-		WriteControlReg( dwControlReg );
+		WriteControlReg( dwControlReg, TRUE );
 	}
 	
 	//
@@ -601,27 +602,11 @@ ECHOSTATUS CLayla24DspCommObject::SetInputClock(WORD wClock)
 	// set the sample rate
 	//
 	if ( bSetRate )
-		SetSampleRate();
+		SetSampleRate( m_dwSampleRate );
 
 	return ECHOSTATUS_OK;
 
 }		// ECHOSTATUS CLayla24DspCommObject::SetInputClock()
 
-
-
-//===========================================================================
-//
-// Detect MIDI output activity
-//
-//===========================================================================
-
-BOOL CLayla24DspCommObject::IsMidiOutActive()
-{
-	ULONGLONG	ullCurTime;
-
-	m_pOsSupport->OsGetSystemTime( &ullCurTime );
-	return( ( ( ullCurTime - m_ullMidiOutTime ) > MIDI_ACTIVITY_TIMEOUT_USEC ) ? FALSE : TRUE );
-	
-}	// BOOL CLayla24DspCommObject::IsMidiOutActive()
 
 // **** Layla24DspCommObject.cpp ****

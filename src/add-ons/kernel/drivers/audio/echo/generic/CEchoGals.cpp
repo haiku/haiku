@@ -5,36 +5,27 @@
 //		Implementation file for the CEchoGals driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -97,14 +88,13 @@ CEchoGals::CEchoGals
 	PCOsSupport pOsSupport
 )
 {
-	int	i;
+	INT32	i;
 
 	ASSERT( pOsSupport );
 
 	m_pOsSupport = pOsSupport;		// Ptr to OS Support methods & data
 
-	m_wFlags = ECHOGALS_FLAG_BADBOARD |
-				  ECHOGALS_FLAG_SPDIF_NODITHER;
+	m_wFlags = ECHOGALS_FLAG_BADBOARD;
 				  
 	for ( i = 0; i < ECHO_MAXAUDIOPIPES; i++ )
 		m_wBytesPerSample[ i ] = 1;
@@ -127,9 +117,6 @@ CEchoGals::~CEchoGals()
 	//
 	delete m_pDspCommObject;	// This powers down the DSP 
 
-	m_PipeOutCtrl.Cleanup();	// fixme put this in the destructors for these guy
-	m_MonitorCtrl.Cleanup();
-	
 	//
 	// Clean up the ducks
 	//
@@ -138,7 +125,7 @@ CEchoGals::~CEchoGals()
 	for (i = 0; i < ECHO_MAXAUDIOPIPES; i++)
 	{
 		if (NULL != m_DaffyDucks[i])
-			KillDaffyDuck(i);
+			delete m_DaffyDucks[i];
 	}
 	
 	//
@@ -412,3 +399,9 @@ char *	pStatusStrs[ECHOSTATUS_LAST] =
 
 
 // *** CEchoGals.cpp ***
+
+ 
+ 
+ 
+ 
+ 

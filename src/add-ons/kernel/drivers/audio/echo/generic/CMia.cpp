@@ -5,40 +5,35 @@
 //		Implementation file for the CMia driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
 #include "CMia.h"
+
+#define MIA_ANALOG_OUTPUT_LATENCY	63
+#define MIA_ANALOG_INPUT_LATENCY		62
+
 
 
 /****************************************************************************
@@ -93,9 +88,17 @@ VOID  CMia::operator delete( PVOID pVoid )
 //===========================================================================
 
 CMia::CMia( PCOsSupport pOsSupport )
-	  : CEchoGals( pOsSupport )
+	  : CEchoGalsVmixer( pOsSupport )
 {
 	ECHO_DEBUGPRINTF( ( "CMia::CMia() is born!\n" ) );
+	
+	//
+	// Mia's virtual outputs make things tricky, since a pipe can
+	// go to either bus.  
+	//
+	m_wAnalogOutputLatency = MIA_ANALOG_OUTPUT_LATENCY;
+	m_wAnalogInputLatency = MIA_ANALOG_INPUT_LATENCY;
+	
 }
 
 CMia::~CMia()
@@ -187,6 +190,15 @@ ECHOSTATUS CMia::InitHw()
 	//
 	m_dwSampleRate = GetDspCommObject()->GetSampleRate();
 	
+	//
+	// Is this a Mia MIDI card?
+	//
+	if (MIA_MIDI_REV == m_pOsSupport->GetCardRev())
+	{
+		Status = m_MidiIn.Init( this );
+	}
+		
+	
 	ECHO_DEBUGPRINTF( ( "CMia::InitHw()\n" ) );
 	return Status;
 
@@ -220,15 +232,6 @@ ECHOSTATUS CMia::GetCapabilities
 		return Status;
 		
 	//
-	// Add meters & pans to output pipes
-	//
-	for (i = 0 ; i < GetNumPipesOut(); i++)
-	{
-		pCapabilities->dwPipeOutCaps[i] |= ECHOCAPS_PEAK_METER |	
-														ECHOCAPS_PAN;
-	}
-	
-	//
 	// Add nominal level control to analog ins & outs
 	//
 	for (i = 0 ; i < GetFirstDigitalBusOut(); i++)
@@ -243,7 +246,7 @@ ECHOSTATUS CMia::GetCapabilities
 
 	pCapabilities->dwInClockTypes |= ECHO_CLOCK_BIT_SPDIF;
 	pCapabilities->dwOutClockTypes = 0;
-
+	
 	return Status;
 
 }	// ECHOSTATUS CMia::GetCapabilities
@@ -261,23 +264,14 @@ ECHOSTATUS CMia::QueryAudioSampleRate
 	DWORD		dwSampleRate
 )
 {
-	if ( dwSampleRate !=  8000 &&
-		  dwSampleRate != 11025 &&
-		  dwSampleRate != 12000 &&
-		  dwSampleRate != 16000 &&
-		  dwSampleRate != 22050 &&
-		  dwSampleRate != 24000 &&
-		  dwSampleRate != 32000 &&
+	if ( dwSampleRate != 32000 &&
 		  dwSampleRate != 44100 &&
 		  dwSampleRate != 48000 &&
 		  dwSampleRate != 88200 &&
 		  dwSampleRate != 96000 )
 	{
 		ECHO_DEBUGPRINTF(
-			("CMia::QueryAudioSampleRate() Sample rate must be "
-			 " 8,000 Hz, 11,025 Hz, 12,000 Hz, 16,000 Hz, 22,050 Hz, "
-			 "24,000 Hz, 32,000 Hz, 44,100 Hz, 48,000 Hz, 88,200 Hz "
-			 "or 96,000 Hz\n") );
+			("CMia::QueryAudioSampleRate() - rate %ld invalid\n",dwSampleRate) );
 		return ECHOSTATUS_BAD_FORMAT;
 	}
 
@@ -302,11 +296,11 @@ ECHOSTATUS CMia::QueryAudioSampleRate
 
 ECHOSTATUS CMia::GetInputClockDetect(DWORD &dwClockDetectBits)
 {
-	ECHO_DEBUGPRINTF(("CMia::GetInputClockDetect\n"));
+	//ECHO_DEBUGPRINTF(("CMia::GetInputClockDetect\n"));
 
 	if ( NULL == GetDspCommObject() || GetDspCommObject()->IsBoardBad() )
 	{
-		ECHO_DEBUGPRINTF( ("CMia::GetInputClockDetect: DSP Dead!\n") );
+		//ECHO_DEBUGPRINTF( ("CMia::GetInputClockDetect: DSP Dead!\n") );
 		return ECHOSTATUS_DSP_DEAD;
 	}
 					 
@@ -324,25 +318,6 @@ ECHOSTATUS CMia::GetInputClockDetect(DWORD &dwClockDetectBits)
 	
 }	// GetInputClockDetect
 
-
-//===========================================================================
-//
-// Most of the cards don't have an actual output bus gain; they only
-// have gain controls for output pipes; the output bus gain is implemented
-// as a logical control.  Mia (and any other card with a vmixer) works
-// differently; it does have a physical output bus gain control, so 
-// just pass the gain down to the DSP comm object.
-//
-//===========================================================================
-
-ECHOSTATUS CMia::AdjustPipesOutForBusOut(WORD wBusOut,int iBusOutGain)
-{
-
-	GetDspCommObject()->SetBusOutGain(wBusOut,iBusOutGain);
-	
-	return ECHOSTATUS_OK;
-	
-}	// AdjustPipesOutForBusOut
 
 
 // *** Mia.cpp ***

@@ -4,36 +4,27 @@
 //
 //		Class to control output pipes on cards with or without vmixers.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -41,6 +32,19 @@
 #include "CPipeOutCtrl.h"
 
 extern INT32 PanToDb( INT32 iPan );
+
+
+//*****************************************************************************
+//
+// Destructor (this class uses the default constructor)
+//
+//*****************************************************************************
+
+CPipeOutCtrl::~CPipeOutCtrl()
+{
+	Cleanup();	
+}	
+
 
 //*****************************************************************************
 //
@@ -233,10 +237,11 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 (
 	WORD 	wPipeOut, 
 	WORD 	wBusOut, 
-	INT32 	iGain,
+	INT32 iGain,
 	BOOL 	fImmediate
 )
 {
+	INT32 iBusOutGain;
 	ECHOSTATUS Status;
 
 	if ( NULL == m_pEG)
@@ -247,6 +252,13 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 	
 	if ((NULL == m_Gains) || (NULL == m_Mutes))
 		return ECHOSTATUS_NO_MEM;
+	
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::SetGain - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
 	
 	WORD wIndex = GetIndex(wPipeOut,wBusOut);
 
@@ -286,9 +298,20 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 		// so no need to account for it here.  Vmixer output pipes
 		// do have to handle panning.
 		//
-		int iLeft = iGain + DSP_TO_GENERIC( m_PanDbs[wIndex].iLeft );
-		int iRight = iGain + DSP_TO_GENERIC( m_PanDbs[wIndex].iRight );
+		INT32 iLeft = iGain + DSP_TO_GENERIC( m_PanDbs[wIndex].iLeft );
+		INT32 iRight = iGain + DSP_TO_GENERIC( m_PanDbs[wIndex].iRight );
 		
+		//
+		// Add master gain values
+		//
+		iBusOutGain = m_pEG->m_BusOutLineLevels[wBusOut].GetGain();
+		iLeft += iBusOutGain;
+		iBusOutGain = m_pEG->m_BusOutLineLevels[wBusOut+1].GetGain();
+		iRight += iBusOutGain;
+		
+		//
+		// Muting and clamping
+		//		
 		if (m_Mutes[wIndex])
 		{
 			iLeft = ECHOGAIN_MUTED;
@@ -296,15 +319,25 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 		}
 		else
 		{
-			if (iLeft < ECHOGAIN_MUTED)
+			if (  (m_pEG->m_BusOutLineLevels[wBusOut].IsMuteOn()) ||
+					(iLeft < ECHOGAIN_MUTED))
+			{
 				iLeft = ECHOGAIN_MUTED;
+			}
 			else if (iLeft > ECHOGAIN_MAXOUT)
-				iLeft = ECHOGAIN_MAXOUT;
+			{
+				iLeft = ECHOGAIN_MAXOUT;				
+			}
 
-			if (iRight < ECHOGAIN_MUTED)
+			if (  (m_pEG->m_BusOutLineLevels[wBusOut + 1].IsMuteOn()) ||
+					(iRight < ECHOGAIN_MUTED))
+			{
 				iRight = ECHOGAIN_MUTED;
+			}
 			else if (iRight > ECHOGAIN_MAXOUT)
-				iRight = ECHOGAIN_MAXOUT;
+			{
+				iRight = ECHOGAIN_MAXOUT;				
+			}
 		}
 		
 		//
@@ -316,6 +349,9 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 																			FALSE);
 		if (ECHOSTATUS_OK == Status)
 		{
+			//
+			// And the right channel
+			//
 			Status = m_pEG->GetDspCommObject()->SetPipeOutGain(wPipeOut,
 																				wBusOut + 1,
 																				iRight,
@@ -325,8 +361,6 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 	}
 	else
 	{
-		int iBusOutGain;
-
 		//
 		// Add this output pipe gain to the output bus gain
 		// Since these gains are in decibels, it's OK to just add them
@@ -375,6 +409,13 @@ ECHOSTATUS CPipeOutCtrl::GetGain(WORD wPipeOut, WORD wBusOut, INT32 &iGain)
 	if (NULL == m_Gains)
 		return ECHOSTATUS_NO_MEM;
 
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::GetGain - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
+
 	iGain = DSP_TO_GENERIC( m_Gains[wIndex] );
 
 	/*
@@ -405,6 +446,13 @@ ECHOSTATUS CPipeOutCtrl::SetMute
 
 	if (NULL == m_Mutes)
 		return ECHOSTATUS_NO_MEM;
+
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::SetMute - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
 
 	WORD wIndex = GetIndex(wPipeOut,wBusOut);
 	
@@ -439,6 +487,13 @@ ECHOSTATUS CPipeOutCtrl::GetMute(WORD wPipeOut, WORD wBusOut, BOOL &bMute)
 	if (NULL == m_Mutes)
 		return ECHOSTATUS_NO_MEM;
 
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::GetMute - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
+
 	bMute = (BOOL) m_Mutes[ wIndex ];
 
 	/*
@@ -463,6 +518,14 @@ ECHOSTATUS CPipeOutCtrl::SetPan(WORD wPipeOut, WORD wBusOut, INT32 iPan)
 		
 	if (NULL == m_Pans)
 		return ECHOSTATUS_NO_MEM;
+	
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::SetPan - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
+		
 
 	WORD	wIndex = GetIndex(wPipeOut,wBusOut);		
 
@@ -500,6 +563,13 @@ ECHOSTATUS CPipeOutCtrl::GetPan(WORD wPipeOut, WORD wBusOut, INT32 &iPan)
 	
 	if (NULL == m_Pans)
 		return ECHOSTATUS_NO_MEM;
+
+	if ((wPipeOut >= m_wNumPipesOut) || (wBusOut >= m_wNumBussesOut))
+	{
+		ECHO_DEBUGPRINTF(("CPipeOutCtrl::GetPan - out of range pipe %d bus %d\n",
+								wPipeOut,wBusOut));
+		return ECHOSTATUS_INVALID_PARAM;		
+	}
 
 	iPan = m_Pans[ wIndex ];
 

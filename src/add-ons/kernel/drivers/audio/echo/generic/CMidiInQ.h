@@ -13,36 +13,27 @@
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -50,8 +41,35 @@
 #ifndef _MIDIQUEUEOBJECT_
 #define _MIDIQUEUEOBJECT_
 
-typedef BYTE MIDI_DATA;
+#include "CMtcSync.h"
+
+typedef struct tMIDI_DATA
+{
+	DWORD		dwMidi;	
+	LONGLONG	llTimestamp;
+}	
+MIDI_DATA;
+
 typedef MIDI_DATA *PMIDI_DATA;
+
+// 
+// Default to one MIDI input client
+//
+#ifndef MAX_MIDI_IN_CLIENTS
+#define MAX_MIDI_IN_CLIENTS		1
+#endif
+
+//
+// MIDI in queue size
+//
+// Total buffer size in bytes will be MIDI_IN_Q_SIZE * sizeof(MIDI_DATA)
+//
+// Buffer size must be a power of 2.  This is the default size; to change it,
+// add #define MIDI_IN_Q_SIZE to your OsSupport??.h file
+//
+#ifndef MIDI_IN_Q_SIZE
+#define MIDI_IN_Q_SIZE	128
+#endif
 
 //
 //	Class used for simple MIDI byte queue
@@ -75,14 +93,30 @@ public:
 	//
 	ECHOSTATUS GetMidi
 	(
-		MIDI_DATA &Midi
+		ECHOGALS_MIDI_IN_CONTEXT	*pContext,
+		DWORD 							&dwMidiByte,
+		LONGLONG							&llTimestamp
 	);
 
 	//
-	// Enable and disable MIDI input
+	// Enable and disable MIDI input and MTC sync
 	//
-	ECHOSTATUS Arm();
-	void Disarm();
+	ECHOSTATUS Arm(ECHOGALS_MIDI_IN_CONTEXT *pContext);
+	ECHOSTATUS Disarm(ECHOGALS_MIDI_IN_CONTEXT *pContext);
+	ECHOSTATUS ArmMtcSync();	
+	ECHOSTATUS DisarmMtcSync();
+	
+	//
+	// Get and set MTC base rate
+	//
+	ECHOSTATUS GetMtcBaseRate(DWORD *pdwBaseRate);
+	ECHOSTATUS SetMtcBaseRate(DWORD dwBaseRate);
+	
+	//
+	// If MTC sync is turned on, process received MTC data
+	// and update the sample rate
+	//
+	void ServiceMtcSync();
 
 	//
 	// See if there has been any recent MIDI input activity
@@ -92,7 +126,7 @@ public:
 	//
 	//	Reset the in/out ptrs
 	//
-	void Reset();
+	void Reset(ECHOGALS_MIDI_IN_CONTEXT *pContext);
 	
 	//
 	// Service a MIDI input interrupt
@@ -103,16 +137,12 @@ public:
 protected:
 
 	//
-	//	Find the next offset into the circular buffer
-	// 
-	PMIDI_DATA ComputeNext( PMIDI_DATA pCur );
-
-	//
 	// Add a MIDI byte to the circular buffer
 	//
 	inline ECHOSTATUS AddMidi
 	(
-		MIDI_DATA Midi
+		DWORD		dwMidiByte,
+		LONGLONG	llTimestamp
 	);
 	
 	//
@@ -129,11 +159,9 @@ protected:
 	//	Midi buffer management
 	//
 	PMIDI_DATA 	m_pBuffer;
-	PMIDI_DATA	m_pEnd;
-	PMIDI_DATA	m_pFill;
-	PMIDI_DATA	m_pDrain;
-	
-	BOOL			m_fArmed;
+	DWORD			m_dwFill;
+	DWORD			m_dwBufferSizeMask;
+	DWORD			m_dwNumClients;
 
 	//
 	// Most recent MIDI input time - used for activity detector
@@ -144,6 +172,7 @@ protected:
 	// MIDI time code
 	//
 	WORD			m_wMtcState;
+	CMtcSync		*m_pMtcSync;
 	
 	//
 	// Other objects

@@ -14,18 +14,23 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 }
 
 local echo_files =
+	C3g.cpp
+	C3gDco.cpp
 	CChannelMask.cpp
 	CDaffyDuck.cpp
 	CDspCommObject.cpp
+	CDspCommObjectVmixer.cpp
 	CEchoGals.cpp
 	CEchoGals_info.cpp
 	CEchoGals_midi.cpp
 	CEchoGals_mixer.cpp
 	CEchoGals_power.cpp
 	CEchoGals_transport.cpp
-#	CEchoGals_WDM.cpp
+	CEchoGalsMTC.cpp
+	CEchoGalsVmixer.cpp
 	CGina24.cpp
 	CGina24DspCommObject.cpp
+	CGMLDspCommObject.cpp
 	CLayla24.cpp
 	CLayla24DspCommObject.cpp
 	CLineLevel.cpp
@@ -35,6 +40,7 @@ local echo_files =
 	CMona.cpp
 	CMonaDspCommObject.cpp
 	CMonitorCtrl.cpp
+	CMtcSync.cpp
 	CPipeOutCtrl.cpp
 	;
 

@@ -1,78 +1,68 @@
 // ****************************************************************************
 //
-//		OsSupportWDM.cpp
+//		OsSupportBeOS.cpp
 //
-//		Implementation file for WDM support services to the CEchoGals
-//		generic driver class.
-//
-//		This will need to be rewritten for each new target OS.
-//
+//		Implementation file for BeOS support services to the CEchoGals
+//		generic driver class
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
+// ----------------------------------------------------------------------------
 //
-//		Modifications for OpenBeOS Copyright Andrew Bachmann (c) 2002
-//		All rights reserved
-//		www.openbeos.org
-//
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
-//
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
-#include "CEchoGals.h"
+#include "OsSupportBeOS.h"
+
+#include "EchoGalsXface.h"
+
 #include <KernelExport.h>
-#include "queue.h"
 #include "util.h"
 
-/****************************************************************************
-
-	Memory management - not part of COsSupport
-
- ****************************************************************************/
-
-//===========================================================================
 //
-// Init the memory tracking counter; right now, this just uses a simple
-// scheme that tracks the number of allocations
+//	Version information.
+//	In NT, we want to get this from a resource
 //
-//===========================================================================
+BYTE OsGetVersion()
+{
+	// Use EngFindResource, for now hard code
+	return( 1 );	
+}	// BYTE OsGetVersion()
 
-DWORD gdwAllocNonPagedCount = 0;
+BYTE OsGetRevision()
+{
+	// Use EngFindResource, for now hard code
+	return( 0 );	
+}	// BYTE OsGetRevision()
 
-typedef struct _echo_mem {
-	LIST_ENTRY(_echo_mem) next;
-	void	*log_base;
-	void	*phy_base;
-	area_id area;
-	size_t	size;
-} echo_mem;
+BYTE OsGetRelease()
+{
+	// Use EngFindResource, for now hard code
+	return( 0 );	
+}	// BYTE OsGetRelease()
+
+//
+//	Global Memory Management Functions
+//
+DWORD gAllocNonPagedCount = 0;
 
 LIST_HEAD(, _echo_mem) mems;
 
@@ -106,7 +96,7 @@ echo_mem *
 echo_mem_alloc(size_t size)
 {
 	echo_mem *mem = NULL;
-	
+
 	mem = echo_mem_new(size);
 	if (mem == NULL)
 		return (NULL);
@@ -119,47 +109,33 @@ echo_mem_alloc(size_t size)
 void
 echo_mem_free(void *ptr)
 {
-	echo_mem 		*mem = NULL;
-	
+	echo_mem *mem = NULL;
+
 	LIST_FOREACH(mem, &mems, next) {
 		if (mem->log_base != ptr)
 			continue;
 		LIST_REMOVE(mem, next);
-		
+
 		echo_mem_delete(mem);
 		break;
 	}
 }
 
-
 void OsAllocateInit()
 {
-	gdwAllocNonPagedCount = 0;
+	gAllocNonPagedCount = 0;
+
 	/* Init mems list */
 	LIST_INIT(&mems);
+}
 
-}	// OsAllocateInit
-
-
-//===========================================================================
+// ***********************************************************************
 //
-// OsAllocateNonPaged is used to allocate a block of memory that will always
-// be resident; that is, this particular block of memory won't be swapped
-// out as virtual memory and can always be accessed at interrupt time.
+//  Allocate locked, non-pageable block of memory.  Does not have to be
+//	physically contiguous.  Primarily used to implement the overloaded
+//	new operator.
 //
-// gdwAllocNonPagedCount tracks the number of times this has been
-// successfully called.
-//
-// This is primarily used for overloading the new operator for the various
-// generic classes.
-//
-//===========================================================================
-
-// OsAllocateNonPaged is used to (surprise!) allocate non-paged memory.  Non-paged 
-// memory is defined as memory that is always physically resident - that is, the virtual 
-// memory manager won't swap this memory to disk.  Nonpaged memory can be accessed 
-// from the interrupt handler. 
-// Nonpaged memory has no particular requirements on address alignment. 
+// ***********************************************************************
 
 ECHOSTATUS OsAllocateNonPaged
 (
@@ -183,23 +159,19 @@ ECHOSTATUS OsAllocateNonPaged
 	
 	OsZeroMemory( *ppMemAddr, dwByteCt );
 	
-	gdwAllocNonPagedCount++;
-	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %ld\n",gdwAllocNonPagedCount));
+	gAllocNonPagedCount++;
+	ECHO_DEBUGPRINTF(("gAllocNonPagedCount %ld\n",gAllocNonPagedCount));
 	
 	return ECHOSTATUS_OK;
 	
 }	// ECHOSTATUS OsAllocateNonPaged
 
 
-//===========================================================================
+// ***********************************************************************
 //
-// OsFreeNonPaged is used to free memory allocated by OsAllocateNonPaged.
+// Unlock and free, non-pageable block of memory.
 //
-// gdwAllocNonPagedCount tracks the number of times this has been
-// successfully called.
-//
-//===========================================================================
-
+// ***********************************************************************
 ECHOSTATUS OsFreeNonPaged
 (
     PVOID	pMemAddr
@@ -207,65 +179,49 @@ ECHOSTATUS OsFreeNonPaged
 {
 	echo_mem_free( pMemAddr );
 
-	gdwAllocNonPagedCount--;
-	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %ld\n",gdwAllocNonPagedCount));
+	gAllocNonPagedCount--;
+	ECHO_DEBUGPRINTF(("gAllocNonPagedCount %ld\n",gAllocNonPagedCount));
 
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS OsFreeNonPaged
 
 
-//***********************************************************************
 
+// ***********************************************************************
 //
-// This class is uniquely defined for each OS.  It provides
+// This class is optional and uniquely defined for each OS.  It provides
 //	information that other components may require.
-//
 // For example, in Windows NT it contains a device object used by various
 //	memory management methods.
-//
-// An instance of this class must be constructed and initialized prior to
+// Since static variables are used in place of globals, an instance must
+//	be constructed and initialized by the OS Interface object prior to
 //	constructing the CEchoGals derived object.  The CEchoGals and
 //	CDspCommObject classes must have access to it during their respective 
 // construction times.
 //
-//***********************************************************************
-
-//===========================================================================
-//
-//	Construction/destruction
-//
-//===========================================================================
+// ***********************************************************************
 
 COsSupport::COsSupport
 (
-	DWORD				dwDeviceId		// PCI bus subsystem ID
+	WORD				wDeviceId,		// PCI bus device ID
+	WORD				wCardRev			// Card revision number
 )
 {
-	m_ullStartTime = system_time(); // All system time calls relative to this
+   ECHO_DEBUGPRINTF(("COsSupport::COsSupport born, device id = 0x%x.\n", wDeviceId));
 
-	m_dwDeviceId = dwDeviceId;
-
-}	// COsSupport::COsSupport()
-
+	m_wDeviceId = wDeviceId;
+	m_wCardRev = wCardRev;
+}
 
 COsSupport::~COsSupport()
 {
-}	// COsSupport::~COsSupport()
+	ECHO_DEBUGPRINTF(("COsSupport is all gone - m_dwPageBlockCount %ld\n",m_dwPageBlockCount));
+}
 
-
-//===========================================================================
 //
-//	Timer methods
+//	Timer Methods
 //
-//===========================================================================
-
-//---------------------------------------------------------------------------
-//
-// Return the system time in microseconds.
-// Return error status if the OS doesn't support this function.
-//
-//---------------------------------------------------------------------------
 
 ECHOSTATUS COsSupport::OsGetSystemTime
 (
@@ -278,14 +234,6 @@ ECHOSTATUS COsSupport::OsGetSystemTime
 
 }	// ECHOSTATUS COsSupport::OsGetSystemTime
 
-
-//---------------------------------------------------------------------------
-//
-// Stall execution for dwTime microseconds.
-// Return error status if the OS doesn't support this 
-// function.
-//
-//---------------------------------------------------------------------------
 
 ECHOSTATUS COsSupport::OsSnooze
 (
@@ -305,115 +253,137 @@ ECHOSTATUS COsSupport::OsSnooze
 			return ECHOSTATUS_NOT_SUPPORTED; // no generic error?
 			break;
 	}
-}		
+}
 
 
-//===========================================================================
 //
-//	More memory management
+//	Memory Management Methods
 //
-//===========================================================================
 
 //---------------------------------------------------------------------------
 //
-// Allocate locked, non-pageable, physically contiguous memory pages
-//	in the drivers address space.  Used to allocate memory for the DSP
-//	communications area.
-//
-// Currently, none of the generic code ever sets dwPageCt to higher than
-// one.  On the platforms we've developed for so far, a page is 4096
-// bytes and is aligned on a 4096 byte boundary.  None of the structures
-// allocated by OsPageAllocate are more than 4096 bytes; memory
-// allocated by this routine should be at least aligned on a 32 byte
-// boundary and be physically contiguous.
-//
-// Note that this code is not 64 bit ready, since it's only using
-// the low 32 bits of the physical address.
+//	Allocate a physical page block that can be used for DSP bus mastering.
 //
 //---------------------------------------------------------------------------
 
-// COsSupport::OsPageAllocate is used for allocating memory that is read and written by 
-// the DSP.  This means that any memory allocated by OsPageAllocate must be nonpaged 
-// and should be aligned on at least a 32 byte address boundary.  It must be aligned on at 
-// least a 4 byte boundary. 
-
-ECHOSTATUS COsSupport::OsPageAllocate
+ECHOSTATUS COsSupport::AllocPhysPageBlock
 (
-	DWORD			dwPageCt,				// How many pages to allocate
-	PPVOID		ppPageAddr,				// Where to return the memory ptr
-	PPHYS_ADDR	pPhysicalPageAddr		// Where to return the physical PCI address
+	DWORD			dwBytes,
+	PPAGE_BLOCK	&pPageBlock
 )
 {
+	DWORD	dwRoundedBytes;
 	
-	echo_mem *mem = echo_mem_alloc ( dwPageCt * B_PAGE_SIZE );
-	if(mem)
-		*ppPageAddr = mem->log_base;
+	//
+	// Allocate
+	//
+	dwRoundedBytes = (dwBytes + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+	ECHO_DEBUGPRINTF(("COsSupport::AllocPhysPageBlock - dwBytes %ld  dwRoundedBytes %ld\n",
+							dwBytes,dwRoundedBytes));
 	
-	if (NULL != *ppPageAddr)
+	pPageBlock = echo_mem_alloc ( dwRoundedBytes );
+
+	if (NULL == pPageBlock)
 	{
-		*pPhysicalPageAddr = (PHYS_ADDR) mem->phy_base;
+		ECHO_DEBUGPRINTF(("AllocPhysPageBlock failed for %ld bytes\n",dwBytes));
+
+		pPageBlock = NULL;
+		return ECHOSTATUS_NO_MEM;
 	}
+	
+	ECHO_DEBUGPRINTF(("\tIOBufferMemoryDescriptor is OK\n"));
 
-	OsZeroMemory( *ppPageAddr, dwPageCt * B_PAGE_SIZE );
+	OsZeroMemory( pPageBlock->log_base, dwRoundedBytes );
+	
+#ifdef _DEBUG
+	m_dwPageBlockCount++;
+	ECHO_DEBUGPRINTF(("\tm_dwPageBlockCount %ld\n",m_dwPageBlockCount));
+#endif
 	
 	return ECHOSTATUS_OK;
 
-}	// ECHOSTATUS COsSupport::OsPageAllocate
+}	// AllocPageBlock
 
 
 //---------------------------------------------------------------------------
 //
-// Unlock and free non-pageable, physically contiguous memory pages in 
-//	the drivers address space; the inverse of OsPageAllocate
+//	Free a physical page block
 //
 //---------------------------------------------------------------------------
 
-ECHOSTATUS COsSupport::OsPageFree
+ECHOSTATUS COsSupport::FreePhysPageBlock
 (
-		DWORD			dwPageCt,				// How many pages to free
-		PVOID			pPageAddr,				// Virtual memory ptr
-		PHYS_ADDR	PhysicalPageAddr		// Physical PCI addr
+	DWORD			dwBytes,
+	PPAGE_BLOCK	pPageBlock
 )
 {
-	if (NULL == pPageAddr)
-		return ECHOSTATUS_OK;
+	echo_mem_free(pPageBlock->log_base);
 	
-	echo_mem_free (pPageAddr);	
+#ifdef _DEBUG
+	m_dwPageBlockCount--;
+	ECHO_DEBUGPRINTF(("\tm_dwPageBlockCount %ld\n",m_dwPageBlockCount));
+#endif
+	
+	return ECHOSTATUS_OK;
+	
+}	// FreePageBlock
 
+
+//---------------------------------------------------------------------------
+//
+//	Get the virtual address for the buffer corresponding to the MDL
+//
+//---------------------------------------------------------------------------
+
+PVOID COsSupport::GetPageBlockVirtAddress
+(
+	PPAGE_BLOCK	pPageBlock
+)
+{
+
+	return pPageBlock->log_base;
+		
+}	// GetPageBlockVirtAddress
+
+
+//---------------------------------------------------------------------------
+//
+//	Get the physical address for part of the buffer corresponding to the MDL
+//
+//---------------------------------------------------------------------------
+
+ECHOSTATUS COsSupport::GetPageBlockPhysSegment
+(
+	PPAGE_BLOCK	pPageBlock,			// pass in a previously allocated block
+	DWORD			dwOffset,			// pass in the offset into the block
+	PHYS_ADDR	&PhysAddr,			// returns the physical address
+	DWORD			&dwSegmentSize		// and the length of the segment
+)
+{
+
+	PhysAddr = ((PHYS_ADDR)pPageBlock->phy_base + dwOffset);
+	
 	return ECHOSTATUS_OK;
 
-}	// ECHOSTATUS COsSupport::OsPageFree
+} // GetPageBlockPhysSegment
 
 
-//---------------------------------------------------------------------------
 //
-//	Display an error message w/title; currently not supported under WDM.
+// Add additional methods here
 //
-//---------------------------------------------------------------------------
 
-void COsSupport::EchoErrorMsg
-(
-	PCHAR pszMsg,
-	PCHAR pszTitle
-)
+//
+//	Display an error message w/title
+//
+void COsSupport::EchoErrorMsg(PCHAR pszMsg, PCHAR pszTitle)
 {
-	//BAlert alert(pszTitle,pszMsg,"Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_STOP_ALERT);
-	//alert.Go();
-}	// void COsSupport::EchoErrorMsg( PCHAR )
+}
 
-
-//---------------------------------------------------------------------------
-//
-// Overload new & delete so memory for this object is allocated from 
-//	non-paged memory.
-//
-//---------------------------------------------------------------------------
-
-PVOID COsSupport::operator new( size_t Size )
+PVOID COsSupport::operator new(size_t size)
 {
 	PVOID 		pMemory;
 
-	pMemory = malloc(Size);
+	pMemory = malloc(size);
 	
 	if ( NULL == pMemory )
 	{
@@ -423,16 +393,14 @@ PVOID COsSupport::operator new( size_t Size )
 	}
 	else
 	{
-		memset( pMemory, 0, Size );
+		memset( pMemory, 0, size );
 	}
-
+		
 	return pMemory;
-	
-}	// PVOID COsSupport::operator new( size_t Size )
+}
 
-
-VOID COsSupport::operator delete( PVOID pVoid )
+VOID COsSupport::operator delete(PVOID memory)
 {
-	free(pVoid);	
-}	// VOID COsSupport::operator delete( PVOID pVoid )
+	free(memory);
+}
 

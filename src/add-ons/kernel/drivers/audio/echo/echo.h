@@ -39,15 +39,6 @@
 #define	ECHO_USE_RECORD	(1 << 1)
 #define ECHO_STATE_STARTED	(1 << 0)
 
-
-typedef struct _echo_mem {
-	LIST_ENTRY(_echo_mem) next;
-	void	*log_base;
-	void	*phy_base;
-	area_id area;
-	size_t	size;
-} echo_mem;
-
 /*
  * Streams
  */

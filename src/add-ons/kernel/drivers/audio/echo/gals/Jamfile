@@ -27,7 +27,7 @@ local echo_files =
 	CEchoGals_mixer.cpp
 	CEchoGals_power.cpp
 	CEchoGals_transport.cpp
-#	CEchoGals_WDM.cpp
+	CEchoGalsMTC.cpp
 	CGdDspCommObject.cpp
 	CGina.cpp
 	CGinaDspCommObject.cpp
@@ -36,6 +36,7 @@ local echo_files =
 	CLineLevel.cpp
 	CMidiInQ.cpp
 	CMonitorCtrl.cpp
+	CMtcSync.cpp
 	CPipeOutCtrl.cpp
 	;
 

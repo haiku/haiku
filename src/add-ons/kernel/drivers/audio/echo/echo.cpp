@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include "OsSupportBeOS.h"
 #include "EchoGalsXface.h"
+#include "C3g.h"
 #include "CDarla24.h"
 #include "CDarla.h"
 #include "CGina.h"
@@ -428,6 +429,9 @@ init_hardware(void)
 			|| (card_type == MONA)
 			|| (card_type == MIA)
 			|| (card_type == INDIGO)
+			|| (card_type == INDIGO_IO)
+			|| (card_type == INDIGO_DJ)
+			|| (card_type == ECHO3G)
 #endif
 			 )) {
 			err = B_OK;
@@ -479,6 +483,9 @@ init_driver(void)
 			|| (card_type == MONA)
 			|| (card_type == MIA)
 			|| (card_type == INDIGO)
+			|| (card_type == INDIGO_IO)
+			|| (card_type == INDIGO_DJ)
+			|| (card_type == ECHO3G)
 #endif
 			)) {			
 			
@@ -536,7 +543,7 @@ echo_setup(echo_dev * card)
 	card->bmbar = card->info.u.h0.base_registers[0];
 	card->irq = card->info.u.h0.interrupt_line;
 
-	card->pOSS = new COsSupport(card->info.device_id);
+	card->pOSS = new COsSupport(card->info.device_id, card->info.revision);
 	if(card->pOSS == NULL)
 		return B_ERROR;
 
@@ -567,6 +574,9 @@ echo_setup(echo_dev * card)
 			break;
 		case MIA:
 			card->pEG = new CMia(card->pOSS);
+			break;
+		case ECHO3G:
+			card->pEG = new C3g(card->pOSS);
 			break;
 #endif
 		default:

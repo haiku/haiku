@@ -4,36 +4,27 @@
 //
 //		Implementation file for Gina24 DSP interface class.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -175,7 +166,7 @@ BOOL CGina24DspCommObject::LoadASIC()
 	if ( m_bASICLoaded )
 	{
 		dwControlReg = GML_CONVERTER_ENABLE | GML_48KHZ;
-		WriteControlReg( dwControlReg );	
+		WriteControlReg( dwControlReg, TRUE );	
 	}
 		
 	return m_bASICLoaded;
@@ -297,7 +288,7 @@ ECHOSTATUS CGina24DspCommObject::SetInputClock(WORD wClock)
 	//
 	if ( bWriteControlReg )
 	{
-		WriteControlReg( dwControlReg );
+		WriteControlReg( dwControlReg, TRUE );
 	}
 	
 	// Set Gina24 sample rate to something sane if word or superword is
@@ -315,8 +306,7 @@ ECHOSTATUS CGina24DspCommObject::SetInputClock(WORD wClock)
 //
 // SetSampleRate
 // 
-// Set the audio sample rate for Gina24 - fixme make this common for
-// Gina24 & Mona
+// Set the audio sample rate for Gina24
 //
 //===========================================================================
 
@@ -507,7 +497,7 @@ ChkClk:
 	//
 	// Write the control reg
 	//
-	WriteControlReg( dwControlReg );
+	WriteControlReg( dwControlReg, TRUE );
 
 	m_byDigitalMode = byNewMode;
 
@@ -515,144 +505,8 @@ ChkClk:
 							(DWORD) m_byDigitalMode) );
 
 	return ECHOSTATUS_OK;
+	
 }	// ECHOSTATUS CGina24DspCommObject::SetDigitalMode
 
-
-
-
-/****************************************************************************
-
-	Common for Gina24, Layla24, and Mona.  These methods are from
-	CGMLDspCommObject, not CGina24DspCommObject; this is to avoid code
-	duplication.
-
- ****************************************************************************/
-
-//===========================================================================
-//
-// Set the S/PDIF output format
-// 
-//===========================================================================
-
-void CGMLDspCommObject::SetProfessionalSpdif
-(
-	BOOL bNewStatus
-)
-{
-	DWORD		dwControlReg;
-
-	dwControlReg = GetControlRegister();
-	//
-	// Clear the current S/PDIF flags
-	//
-	dwControlReg &= GML_SPDIF_FORMAT_CLEAR_MASK;
-
-	//
-	// Set the new S/PDIF flags depending on the mode
-	//	
-	dwControlReg |= 	GML_SPDIF_TWO_CHANNEL | 
-							GML_SPDIF_24_BIT |
-							GML_SPDIF_COPY_PERMIT;
-	if ( bNewStatus )
-	{
-		//
-		// Professional mode
-		//
-		dwControlReg |= GML_SPDIF_PRO_MODE;
-		
-		switch ( GetSampleRate() )
-		{
-			case 32000 : 
-				dwControlReg |= GML_SPDIF_SAMPLE_RATE0 |
-									 GML_SPDIF_SAMPLE_RATE1;
-				break;
-				
-			case 44100 :
-				dwControlReg |= GML_SPDIF_SAMPLE_RATE0;
-				break;
-			
-			case 48000 :
-				dwControlReg |= GML_SPDIF_SAMPLE_RATE1;
-				break;
-		}
-	}
-	else
-	{
-		//
-		// Consumer mode
-		//
-		switch ( GetSampleRate() )
-		{
-			case 32000 : 
-				dwControlReg |= GML_SPDIF_SAMPLE_RATE0 |
-									 GML_SPDIF_SAMPLE_RATE1;
-				break;
-				
-			case 48000 :
-				dwControlReg |= GML_SPDIF_SAMPLE_RATE1;
-				break;
-		}
-	}
-	
-	//
-	// Write the control reg
-	//
-	WriteControlReg( dwControlReg );
-
-	m_bProfessionalSpdif = bNewStatus;
-	
-	ECHO_DEBUGPRINTF( ("CGMLDspCommObject::SetProfessionalSpdif to %s\n",
-							( bNewStatus ) ? "Professional" : "Consumer") );
-
-}	// void CGina24DspCommObject::SetProfessionalSpdif( ... )
-
-
-
-
-//===========================================================================
-//
-// WriteControlReg
-//
-// Most configuration of Gina24, Layla24, or Mona is
-// accomplished by writing the control register.  WriteControlReg 
-// sends the new control register value to the DSP.
-// 
-//===========================================================================
-
-ECHOSTATUS CGMLDspCommObject::WriteControlReg( DWORD dwControlReg )
-{
-	if ( !m_bASICLoaded )
-		return( ECHOSTATUS_ASIC_NOT_LOADED );
-
-	if ( !WaitForHandshake() )
-		return ECHOSTATUS_DSP_DEAD;
-
-#ifdef DIGITAL_INPUT_AUTO_MUTE_SUPPORT	
-	//
-	// Handle the digital input auto-mute
-	//	
-	if (TRUE == m_fDigitalInAutoMute)
-		dwControlReg |= GML_DIGITAL_IN_AUTO_MUTE;
-	else
-		dwControlReg &= ~GML_DIGITAL_IN_AUTO_MUTE;
-#endif
-
-	//
-	// Write the control register
-	//
-	if (dwControlReg != GetControlRegister() )
-	{
-		SetControlRegister( dwControlReg );
-
-		ECHO_DEBUGPRINTF( ("CGMLDspCommObject::WriteControlReg: 0x%lx\n",
-								 dwControlReg) );
-								 
-		ClearHandshake();							 
-		return SendVector( DSP_VC_WRITE_CONTROL_REG );
-	}
-	
-	return ECHOSTATUS_OK;
-	
-} // ECHOSTATUS CGMLDspCommObject::WriteControlReg( DWORD dwControlReg )
 
 // **** CGina24DspCommObject.cpp ****

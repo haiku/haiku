@@ -8,36 +8,27 @@
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -89,49 +80,14 @@ enum ECHO_CHANNEL_TYPES
 typedef struct tMIXER_AUDIO_CHANNEL
 {
 	WORD			wCardId;				// This field is obsolete
-	WORD			wChannel;			// channel index
+	WORD			wChannel;			// Depends on dwType:
+											// ECHO_BUS_OUT	wChannel = output bus #
+											// ECHO_BUS_IN		wChannel = input bus #
+											// ECHO_PIPE_OUT	wChannel = output pipe #
+											// ECHO_PIPE_IN	wChannel = input pipe #
+											// ECHO_MONITOR	wChannel = input bus #
 	DWORD			dwType;				// One of the above enums
 } MIXER_AUDIO_CHANNEL, *PMIXER_AUDIO_CHANNEL;
-
-
-//
-// Output pipe control change
-//
-typedef struct
-{
-	WORD	wBusOut;	  				// For cards without vmixer, should
-						  				// be the same as wChannel in MIXER_AUDIO_CHANNEL
-	union
-	{
-		INT32	iLevel;				// New gain in dB X 256
-		INT32	iPan;					// 0 <= new pan <= MAX_MIXER_PAN,
-										// 0 = full left MAX_MIXER_PAN = full right
-		BOOL	bMuteOn;				// To mute or not to mute
-										// MXF_GET_MONITOR_MUTE &
-										// MXF_SET_MONITOR_MUTE
-
-	} Data;
-}	MIXER_PIPE_OUT, PMIXER_PIPE_OUT;
-
-
-//
-//	The MIXER_AUDIO_CHANNEL header has the card and input channel.
-//	This structure has the output channel and the gain, mute or pan
-//	state for one monitor.
-//
-typedef struct tMIXER_MONITOR
-{
-	WORD		wBusOut;
-	union
-	{
-		INT32	iLevel;				// New gain in dB X 256
-		INT32	iPan;					// 0 <= new pan <= MAX_MIXER_PAN,
-										// 0 = full left MAX_MIXER_PAN = full right
-		BOOL	bMuteOn;				// To mute or not to mute
-										// MXF_GET_MONITOR_MUTE &
-										// MXF_SET_MONITOR_MUTE
-	} Data;
-} MIXER_MONITOR, *PMIXER_MONITOR;
 
 
 //
@@ -165,12 +121,9 @@ typedef struct tMIXER_MONITOR
 #define	MXF_SET_MONITOR_MUTE			20		// Set monitor mute state for one channel
 #define	MXF_GET_MONITOR_PAN			23		// Get monitor pan value for one stereo channel
 #define	MXF_SET_MONITOR_PAN			24		// Set monitor pan value for one stereo channel
-#define	MXF_GET_FLAGS					27		// Get driver flags. i.e. S/PDIF no 
-												   	//	dither mode
-#define	MXF_SET_FLAGS					28		// Set driver flag. i.e. S/PDIF no 
-														//	dither mode
-#define	MXF_CLEAR_FLAGS				29		// Clear driver flag. i.e. S/PDIF no 
-														//	dither mode for one card
+#define	MXF_GET_FLAGS					27		// Get driver flags
+#define	MXF_SET_FLAGS					28		// Set driver flag
+#define	MXF_CLEAR_FLAGS				29		// Clear driver flags
 #define	MXF_GET_SAMPLERATE_LOCK		30		// Get locked sample rate for one card
 #define	MXF_SET_SAMPLERATE_LOCK		31		// Set locked sample rate for one card
 #define	MXF_GET_SAMPLERATE			32		// Get actual sample rate for one card
@@ -186,6 +139,68 @@ typedef struct tMIXER_MONITOR
 #define 	MXF_GET_CLOCK_DETECT			43		// Get the currently detected clocks
 #define 	MXF_GET_DIG_IN_AUTO_MUTE	44		// Get the state of the digital input auto-mute
 #define 	MXF_SET_DIG_IN_AUTO_MUTE	45		// Set the state of the digital input auto-mute
+#define	MXF_GET_AUDIO_LATENCY		46		// Get the latency for a single pipe
+
+#define	MXF_GET_PHANTOM_POWER		47		// Get phantom power state
+#define  MXF_SET_PHANTOM_POWER		48		// Set phantom power state
+
+
+//
+// Output pipe control change - only used if you specify 
+// ECHO_PIPE_OUT in the dwType field for MIXER_AUDIO_CHANNEL
+//
+typedef struct
+{
+	WORD	wBusOut;	  				// For cards without vmixer, should
+						  				// be the same as wChannel in MIXER_AUDIO_CHANNEL
+	union
+	{
+		INT32	iLevel;				// New gain in dB X 256
+		INT32	iPan;					// 0 <= new pan <= MAX_MIXER_PAN,
+										// 0 = full left MAX_MIXER_PAN = full right
+		BOOL	bMuteOn;				// To mute or not to mute
+										// MXF_GET_MONITOR_MUTE &
+										// MXF_SET_MONITOR_MUTE
+
+	} Data;
+}	MIXER_PIPE_OUT, PMIXER_PIPE_OUT;
+
+
+//
+//	The MIXER_AUDIO_CHANNEL header has the card and input channel.
+//	This structure has the output channel and the gain, mute or pan
+//	state for one monitor.
+// 
+// Only used if you specify ECHO_MONITOR in the dwType field 
+// for MIXER_AUDIO_CHANNEL.
+//
+typedef struct tMIXER_MONITOR
+{
+	WORD		wBusOut;
+	union
+	{
+		INT32	iLevel;				// New gain in dB X 256
+		INT32	iPan;					// 0 <= new pan <= MAX_MIXER_PAN,
+										// 0 = full left MAX_MIXER_PAN = full right
+		BOOL	bMuteOn;				// To mute or not to mute
+										// MXF_GET_MONITOR_MUTE &
+										// MXF_SET_MONITOR_MUTE
+	} Data;
+} MIXER_MONITOR, *PMIXER_MONITOR;
+
+
+//
+// If you specify MXF_GET_AUDIO_LATENCY, then you get the following
+// structure back
+//
+typedef struct tECHO_AUDIO_LATENCY
+{
+	WORD		wPipe;
+	WORD		wIsInput;
+	DWORD		dwLatency;
+}	ECHO_AUDIO_LATENCY;
+
+
 
 //
 //	Mixer Function Data Structure
@@ -234,6 +249,9 @@ typedef struct tMIXER_FUNCTION
 
 		BOOL						fDigitalInAutoMute;	// MXF_GET_DIG_IN_AUTO_MUTE
 																// MXF_SET_DIG_IN_AUTO_MUTE
+		ECHO_AUDIO_LATENCY	Latency;			// MXF_GET_AUDIO_LATENCY
+		
+		BOOL						fPhantomPower;	// Phantom power state (true == on, false == off)
 	} Data;
 } MIXER_FUNCTION, *PMIXER_FUNCTION;
 
@@ -273,8 +291,8 @@ typedef struct tMIXER_MULTI_FUNCTION
 #define	MXN_MUTE					4	// Mute state changed
 #define 	MXN_PAN					6  // Pan value changed
 
-#define	MXN_FLAGS				12	// A driver flag changed.  I.E.
-											//	S/PDIF no dither state changed
+#define	MXN_FLAGS				12	// A driver flag changed
+
 #define	MXN_DIGITAL_MODE		14	// Digital mode changed
 #define 	MXN_OUTPUT_CLOCK		15 // Output clock changed
 #define	MXN_MAX					15	// Max notify parameters
@@ -292,13 +310,13 @@ typedef struct tMIXER_NOTIFY
 
 	WORD			wBusOut;			// For monitor & output pipe notifies only
 	WORD			wParameter;		// One of the above MXN_*
-
+	
 } MIXER_NOTIFY, *PMIXER_NOTIFY;
 
 
 typedef struct tMIXER_MULTI_NOTIFY
 {
-	DWORD				dwCookie;
+	NUINT				Cookie;
 	DWORD				dwCount;			// When passed to the generic driver,
 											// dwCount holds the size of the Notifies array.
 											// On returning from the driver, dwCount
@@ -319,7 +337,7 @@ typedef struct tMIXER_MULTI_NOTIFY
 // learned that it's useful to be able to get all the following stuff at
 // once.  Typically the console will run a timer that fetchs this periodically.
 //
-//	dwCookie is the unique ID for the mixer client; this is obtained by calling
+//	Cookie is the unique ID for the mixer client; this is obtained by calling
 // CEchoGals::OpenMixer.  The generic driver will maintain a separate notify
 // queue for each client.
 //
@@ -335,12 +353,11 @@ typedef struct tMIXER_MULTI_NOTIFY
 
 typedef struct tECHO_POLLED_STUFF
 {
-	DWORD					dwCookie; 	
+	NUINT					Cookie; 	
 	ECHOGALS_METERS	Meters;
 	DWORD					dwClockDetectBits;
 	DWORD					dwNumPendingNotifies;
 } ECHO_POLLED_STUFF;
-
 
 #endif
 

@@ -27,36 +27,27 @@
 //
 //---------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -66,7 +57,7 @@
 #define _DAFFYDUCKOBJECT_
 
 #ifdef _DEBUG
-#define INTEGRITY_CHECK
+//#define INTEGRITY_CHECK
 #endif
 
 //
@@ -88,10 +79,7 @@ typedef struct
 //
 typedef struct
 {
-	DWORD			dwNumEntries;	// How many slots in the array are used
-										// = 1 for an audio mapping
-										// = 2 for an audio mapping + double zero
-	DWORD			dwTag;			// Unique ID for this mapping
+	NUINT			Tag;				// Unique ID for this mapping
 	ULONGLONG	ullEndPos;		// The cumulative 64-bit end position for this mapping
 										// = (previous ullEndPos) + (# of bytes mapped)
 }	MAPPING;
@@ -111,55 +99,47 @@ public:
 	//
 	enum
 	{
-		MAX_ENTRIES = 64
+		MAX_ENTRIES 		= 64,					// Note this must be a power of 2
+		ENTRY_INDEX_MASK 	= MAX_ENTRIES-1
 	};
 	
 	//
 	//	Construction/destruction
 	//
-	CDaffyDuck
-	(
-		PCOsSupport 	pOsSupport,
-		CDspCommObject *pDspCommObject,
-		WORD				wPipeIndex
-	);
-
+	CDaffyDuck(PCOsSupport 	pOsSupport);
 	~CDaffyDuck();
 
 protected:
 
-	WORD			m_wPipeIndex;
+	DWORD			m_dwPipeIndex;
+	
+	PPAGE_BLOCK	m_pDuckPage;
 
 	DUCKENTRY	*m_DuckEntries;			// Points to a locked physical page (4096 bytes)
 													// These are for the benefit of the DSP
 	MAPPING		m_Mappings[MAX_ENTRIES];// Parallel circular buffer to m_DuckEntries;
 													// these are for the benefit of port class
 	
-	DWORD			m_dwHead;					// Index for most recently adding mapping
+	DWORD			m_dwHead;					// Index where next mapping will be added;
+													// points to an empty slot
 	DWORD			m_dwTail;					// Next mapping to discard (read index)
 	DWORD			m_dwCount;					// Number of entries in the circular buffer
 	
 	DWORD			m_dwDuckEntriesPhys;		// The DSP needs this - physical address
 													// of page pointed to by m_DuckEntries
 													
-	ULONGLONG	m_ullLastEndPos;													
+	ULONGLONG	m_ullLastEndPos;			// Used to calculate ullEndPos for new entries
 													
 	PCOsSupport	m_pOsSupport;
 	
-	CDspCommObject *m_pDspCommObject;
-	
 	BOOL			m_fWrapped;
-
+	
 #ifdef INTEGRITY_CHECK
 	void CheckIntegrity();
 #endif
-	
-	ECHOSTATUS GetTail
-	(
-		DUCKENTRY	*pDuckEntry,
-		MAPPING		*pMapping
-	);
 
+	void EjectTail();
+	
 public:
 
 	//
@@ -180,7 +160,7 @@ public:
 	//
 	// The buffer must be physically contiguous.
 	//
-	// The dwTag parameter is a unique ID for this mapping that is used by 
+	// The Tag parameter is a unique ID for this mapping that is used by 
 	// ReleaseUsedMapping and RevokeMappings; if you are building a circular 
 	// buffer, the tag isn't important.
 	//
@@ -194,7 +174,7 @@ public:
 	(
 		DWORD			dwPhysAddr,
 		DWORD			dwBytes,
-		DWORD			dwTag,					// Unique ID for this mapping
+		NUINT			Tag,						// Unique ID for this mapping
 		DWORD			dwInterrupt,			// Set TRUE if you want an IRQ after this mapping
 		DWORD			&dwNumFreeEntries		// Return value - number of slots left in the list
 	);
@@ -204,7 +184,7 @@ public:
 	// calling AddDoubleZero will cause the DSP to interrupt after it finishes the
 	// previous duck entry.
 	//
-	void AddDoubleZero();
+	ECHOSTATUS AddDoubleZero();
 
 	//
 	// Call Wrap if you are creating a circular DMA buffer; to make a circular
@@ -221,25 +201,28 @@ public:
 	void Wrap();
 
 	//
-	// Call ReleaseUsedMapping to conditionally remove the oldest duck entry.  
-	// ReleaseUsedMapping looks at the DMA position you pass in; if the DMA position
-	// is past the end of the oldest mapping, the oldest mapping is removed
-	// from the list and the tag number is returned in the dwTag parameter. 
+	// Call ReleaseUsedMapping to conditionally remove the oldest duck entries.  
+	//
+	// The return value is the number of tags written to the Tags array.
 	//	
-	ECHOSTATUS ReleaseUsedMapping
+	DWORD ReleaseUsedMappings
 	(
 		ULONGLONG	ullDmaPos,
-		DWORD			&dwTag
+		NUINT		 	*Tags,
+		DWORD			dwMaxTags
 	);
-	
+
+	//
+	// Adjusts the duck so that DMA will start from a given position; useful
+	// when resuming from pause
+	//
+	void AdjustStartPos(ULONGLONG ullPos);
+
 	//
 	// This returns the physical address of the start of the scatter-gather 
 	// list; used to tell the DSP where to start looking for duck entries.
 	//
-	DWORD GetPhysStartAddr()
-	{
-		return m_dwDuckEntriesPhys + (m_dwTail * sizeof(DUCKENTRY));
-	}
+	DWORD GetPhysStartAddr();
 	
 	//
 	// Any more room in the s.g. list?
@@ -250,31 +233,13 @@ public:
 	}
 	
 	//
-	// Used to reset the end pos for rebuilding the duck; this
-	// is used by the WDM driver to handle revoking.
-	//
-	void SetLastEndPos(ULONGLONG ullPos)
-	{
-		m_ullLastEndPos = ullPos;
-	}
-	
-	//
-	// Returns the 64 bit DMA position of the start of the oldest entry
-	//
-	ULONGLONG GetStartPos()
-	{
-		return m_Mappings[ m_dwTail ].ullEndPos - 
-					(ULONGLONG) (m_DuckEntries[ m_dwTail ].dwSize);
-	}
-	
-	//
 	// RevokeMappings is here specifically to support WDM; it removes
 	// any entries from the list if their tag is >= dwFirstTag and <= dwLastTag.
 	//
 	DWORD RevokeMappings
 	(
-		DWORD dwFirstTag,
-		DWORD dwLastTag
+		NUINT		 FirstTag,
+		NUINT		 LastTag
 	);
 	
 	//
@@ -285,6 +250,11 @@ public:
 		return m_fWrapped;
 	}
 		
+	//
+	// CleanUpTail is used to clean out any non-audio entries from the tail 
+	// of the list that might be left over from earlier
+	//	
+	void CleanUpTail();
 	
 	//
 	//	Overload new & delete to make sure these objects are allocated from

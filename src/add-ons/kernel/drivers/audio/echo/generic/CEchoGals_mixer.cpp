@@ -5,36 +5,27 @@
 //		Implementation file for the CEchoGals driver class (mixer functions).
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -61,10 +52,65 @@
 //
 //===========================================================================
 
-ECHOSTATUS CEchoGals::OpenMixer(DWORD &dwCookie)
+ECHOSTATUS CEchoGals::OpenMixer(NUINT &Cookie)
 {
+	ECHO_MIXER_CLIENT *pTemp;
+
 	if (m_fMixerDisabled)
 		return ECHOSTATUS_MIXER_DISABLED;
+
+	//
+	// If the cookie is non-zero, then use the specified value
+	//
+	if (0 != Cookie)
+	{
+		pTemp = m_pMixerClients;
+		while (pTemp != NULL)
+		{
+			if (Cookie == pTemp->Cookie)
+			{
+				ECHO_DEBUGPRINTF(("CEchoGals::OpenMixer - cookie 0x%lx already in use\n",
+										Cookie));
+				return ECHOSTATUS_BAD_COOKIE;
+			}
+			
+			pTemp = pTemp->pNext;
+		}
+	}
+	else
+	{
+		//
+		// Make a new cookie
+		//
+		ULONGLONG ullTime;
+
+		m_pOsSupport->OsGetSystemTime(&ullTime);
+		Cookie = (NUINT) ullTime;
+		if (0 == Cookie)
+			Cookie = 1;
+		
+		//
+		// Look through the existing mixer client list to ensure that this
+		// cookie is unique.
+		//
+		pTemp = m_pMixerClients;
+		while (pTemp != NULL)
+		{
+			if (Cookie == pTemp->Cookie)
+			{
+				//
+				// Oops, someone is already using this cookie.  Increment 
+				// the new cookie and try again.
+				//
+				Cookie++;
+				pTemp = m_pMixerClients;			
+			}
+		
+			pTemp = pTemp->pNext;
+		}
+		
+	}
+	
 
 	//
 	// Allocate the mixer client structure
@@ -75,47 +121,15 @@ ECHOSTATUS CEchoGals::OpenMixer(DWORD &dwCookie)
 	Status = OsAllocateNonPaged(sizeof(ECHO_MIXER_CLIENT),(void **) &pClient);
 	if (NULL == pClient)
 	{
-		dwCookie = 0;
+		Cookie = 0;
 		return Status;		
 	}
 
 	
 	//
-	// Make the cookie
-	//
-	ULONGLONG ullTime;
-
-	m_pOsSupport->OsGetSystemTime(&ullTime);
-	dwCookie = (DWORD) ullTime;
-	if (0 == dwCookie)
-		dwCookie = 1;
-	
-	//
-	// Look through the existing mixer client list to ensure that this
-	// cookie is unique.
-	//
-	ECHO_MIXER_CLIENT *pTemp;
-	
-	pTemp = m_pMixerClients;
-	while (pTemp != NULL)
-	{
-		if (dwCookie == pTemp->dwCookie)
-		{
-			//
-			// Oops, someone is already using this cookie.  Increment 
-			// the new cookie and try again.
-			//
-			dwCookie++;
-			pTemp = m_pMixerClients;			
-		}
-	
-		pTemp = pTemp->pNext;
-	}
-	
-	//
 	// Store the new cookie and the new mixer client
 	//
-	pClient->dwCookie = dwCookie;
+	pClient->Cookie = Cookie;
 	pClient->pNext = m_pMixerClients;
 	m_pMixerClients = pClient;
 	
@@ -130,14 +144,14 @@ ECHOSTATUS CEchoGals::OpenMixer(DWORD &dwCookie)
 //
 //===========================================================================
 
-ECHO_MIXER_CLIENT *CEchoGals::GetMixerClient(DWORD dwCookie)
+ECHO_MIXER_CLIENT *CEchoGals::GetMixerClient(NUINT Cookie)
 {
 	ECHO_MIXER_CLIENT *pTemp;
 	
 	pTemp = m_pMixerClients;
 	while (NULL != pTemp)
 	{
-		if (dwCookie == pTemp->dwCookie)
+		if (Cookie == pTemp->Cookie)
 			break;
 			
 		pTemp = pTemp->pNext;
@@ -154,7 +168,7 @@ ECHO_MIXER_CLIENT *CEchoGals::GetMixerClient(DWORD dwCookie)
 //
 //===========================================================================
 
-ECHOSTATUS CEchoGals::CloseMixer(DWORD dwCookie)
+ECHOSTATUS CEchoGals::CloseMixer(NUINT Cookie)
 {
 	//
 	//	Search the linked list and remove the client that matches the cookie
@@ -168,7 +182,7 @@ ECHOSTATUS CEchoGals::CloseMixer(DWORD dwCookie)
 	//
 	// Head of the list?
 	//		
-	if (pTemp->dwCookie == dwCookie)
+	if (pTemp->Cookie == Cookie)
 	{
 		m_pMixerClients = pTemp->pNext;
 		OsFreeNonPaged(pTemp);
@@ -181,7 +195,7 @@ ECHOSTATUS CEchoGals::CloseMixer(DWORD dwCookie)
 	//
 	while (NULL != pTemp->pNext)
 	{
-		if (dwCookie == pTemp->pNext->dwCookie)
+		if (Cookie == pTemp->pNext->Cookie)
 		{
 			ECHO_MIXER_CLIENT *pDeadClient;
 			
@@ -336,7 +350,7 @@ ECHOSTATUS CEchoGals::GetControlChanges
 	//
 	// Match the cookie
 	//
-	ECHO_MIXER_CLIENT *pClient = GetMixerClient(pNotifies->dwCookie);
+	ECHO_MIXER_CLIENT *pClient = GetMixerClient(pNotifies->Cookie);
 	
 	if (NULL == pClient)
 	{
@@ -714,7 +728,7 @@ ECHOSTATUS CEchoGals::ProcessMixerFunction
 #ifdef DIGITAL_INPUT_AUTO_MUTE_SUPPORT
 
 		case MXF_GET_DIG_IN_AUTO_MUTE	:
-			Status = GetDigitalInAutoMute( pMixerFunction );
+			Status =  GetDigitalInAutoMute( pMixerFunction );
 			ECHO_DEBUGPRINTF( ("CEchoGals::ProcessMixerFunction: "
 									 "MXF_GET_DIG_IN_AUTO_MUTE  Status %ld\n", Status) );
 			break;
@@ -728,6 +742,21 @@ ECHOSTATUS CEchoGals::ProcessMixerFunction
 
 #endif // DIGITAL_INPUT_AUTO_MUTE_SUPPORT
 
+		case MXF_GET_AUDIO_LATENCY :
+			GetAudioLatency( &(pMixerFunction->Data.Latency) );
+			break;
+			
+#ifdef PHANTOM_POWER_CONTROL
+		
+		case MXF_GET_PHANTOM_POWER :
+			GetPhantomPower( &(pMixerFunction->Data.fPhantomPower) );
+			break;
+			
+		case MXF_SET_PHANTOM_POWER :
+			SetPhantomPower( pMixerFunction->Data.fPhantomPower );
+			break;
+			
+#endif
 
 		default :
 			iRtnDataSz = 0;
@@ -804,6 +833,7 @@ ECHOSTATUS CEchoGals::ProcessMixerMultiFunction
 
 ECHOSTATUS CEchoGals::GetPolledStuff(ECHO_POLLED_STUFF *pPolledStuff)
 {
+	ECHO_MIXER_CLIENT *pClient;
 	CDspCommObject *pDCO = GetDspCommObject();
 	
 	if (m_fMixerDisabled)
@@ -813,19 +843,20 @@ ECHOSTATUS CEchoGals::GetPolledStuff(ECHO_POLLED_STUFF *pPolledStuff)
 		return ECHOSTATUS_DSP_DEAD;
 		
 	//
-	// Match the client to the cookie
-	//
-	ECHO_MIXER_CLIENT *pClient = GetMixerClient(pPolledStuff->dwCookie);
-	
-	if (NULL == pClient)
-		return ECHOSTATUS_BAD_COOKIE;		
-	
-	//
-	// Fill out the struct
+	// Fill out the non-client-specific portions of the struct
 	//
 	pDCO->GetAudioMeters(&(pPolledStuff->Meters));
 	GetInputClockDetect(pPolledStuff->dwClockDetectBits);
-	pPolledStuff->dwNumPendingNotifies = pClient->dwCount;
+	
+	//
+	// If there is a matching client, fill out the number
+	// of notifies
+	//
+	pClient = GetMixerClient(pPolledStuff->Cookie);
+	if (NULL == pClient)
+		pPolledStuff->dwNumPendingNotifies = 0;
+	else	
+		pPolledStuff->dwNumPendingNotifies = pClient->dwCount;
 	
 	return ECHOSTATUS_OK;
 	
@@ -1018,6 +1049,7 @@ ECHOSTATUS CEchoGals::SetAudioLockedSampleRate
 	if (0 != (ECHOGALS_FLAG_SAMPLE_RATE_LOCKED & GetFlags()))
 	{
 		GetDspCommObject()->SetSampleRate( dwSampleRate );
+		m_dwSampleRate = dwSampleRate;
 	}
 
 	m_dwLockedSampleRate = dwSampleRate;
@@ -1307,7 +1339,7 @@ ECHOSTATUS CEchoGals::SetAudioNominal
 {
 	ECHOSTATUS	Status;
 	WORD			wCh;
-	int			iNominal;
+	INT32			iNominal;
 
 	if ( NULL == GetDspCommObject() || GetDspCommObject()->IsBoardBad() )
 		return ECHOSTATUS_DSP_DEAD;
@@ -1541,28 +1573,28 @@ ECHOSTATUS CEchoGals::SetAudioMonitor
 //===========================================================================
 
 #define FIXED_BASE		16							// 16 bits of fraction
-#define FIXED_ONE_HALF	((int) 0x00008000)	// 0.5 in 16.16 format
-#define COEFF_A2			((int) 0xffffa9ac)	// -.3372223
-#define COEFF_A1			((int) 0x0000ff8a)	//  .9981958
-#define COEFF_A0			((int) 0xffff5661)	// -.6626105
+#define FIXED_ONE_HALF	((INT32) 0x00008000)	// 0.5 in 16.16 format
+#define COEFF_A2			((INT32) 0xffffa9ac)	// -.3372223
+#define COEFF_A1			((INT32) 0x0000ff8a)	//  .9981958
+#define COEFF_A0			((INT32) 0xffff5661)	// -.6626105
 
 #define DB_CONVERT		0x60546		// 6.02... in 16.16
 
 // Note use of double precision here to prevent overflow
-static int FixedMult( int iNum1, int iNum2 )
+static INT32 FixedMult( INT32 iNum1, INT32 iNum2 )
 {
 	LONGLONG llNum;
 
 	llNum = (LONGLONG) iNum1 * (LONGLONG) iNum2;
 
-	return (int) (llNum >> FIXED_BASE);
-}	// int FixedMult( int iNum1, int iNum2 )
+	return (INT32) (llNum >> FIXED_BASE);
+}	// INT32 FixedMult( INT32 iNum1, INT32 iNum2 )
 
 
-static int log2( int iNum )
+static INT32 log2( INT32 iNum )
 {
-	int iNumShifts;
-	int iTemp;
+	INT32 iNumShifts;
+	INT32 iTemp;
 
 	// log2 is undefined for zero, so return -infinity (or close enough)
 	if ( 0 == iNum )
@@ -1597,7 +1629,7 @@ static int log2( int iNum )
 	iTemp -= ( iNumShifts << FIXED_BASE );
 
 	return( iTemp );
-}	// int log2( int iNum )
+}	// INT32 log2( INT32 iNum )
 
 
 //
@@ -1860,17 +1892,19 @@ ECHOSTATUS CEchoGals::SetDigitalMode
 	if ( 0 == GetDspCommObject()->GetDigitalModes() )
 		return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
 
-	if ( !m_cmAudioOpen.IsEmpty() )
+	if ( TRUE == GetDspCommObject()->IsTransportActive() ) 
 	{
-		ECHO_DEBUGPRINTF( ( "CEchoGals::SetDigitalMode()  All audio channels "
-								  "must be closed before changing the digital "
-								  "mode\n" ) );
-		return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
+		ECHO_DEBUGPRINTF( ( 	"CEchoGals::SetDigitalMode()  Cannot set the digital "
+									"mode while transport is running\n"));
+		return ECHOSTATUS_BUSY;
 	}
 	byPreviousDigitalMode = GetDspCommObject()->GetDigitalMode();
 	Status = GetDspCommObject()->SetDigitalMode( byDigitalMode );
 	MixerControlChanged( ECHO_NO_CHANNEL_TYPE,
 								MXN_DIGITAL_MODE );
+	MixerControlChanged( ECHO_NO_CHANNEL_TYPE, 
+								MXN_INPUT_CLOCK );
+
 	//
 	//	If we successfully changed the digital mode from or to ADAT, then 
 	//	make sure all output, input and monitor levels are updated by the
@@ -1962,11 +1996,6 @@ ECHOSTATUS CEchoGals::AdjustMonitorsForBusOut(WORD wBusOut)
 	WORD wBusIn;
 	
 	//
-	// Round down to the nearest even bus so the pans work right
-	//
-	wBusOut &= 0xfffe;
-
-	//
 	// Poke the monitors
 	//
 	for (wBusIn = 0; wBusIn < GetNumBussesIn(); wBusIn++)
@@ -1981,7 +2010,7 @@ ECHOSTATUS CEchoGals::AdjustMonitorsForBusOut(WORD wBusOut)
 	
 //===========================================================================
 //
-// Adjust all the monitor levels for a particular output bus
+// Adjust all the pipe out levels for a particular output bus
 //
 // For efficiency, fImmediate is set to FALSE in the call
 // to SetGain; all the monitor and pipe out gains are
@@ -1989,9 +2018,9 @@ ECHOSTATUS CEchoGals::AdjustMonitorsForBusOut(WORD wBusOut)
 //
 //===========================================================================
 
-ECHOSTATUS CEchoGals::AdjustPipesOutForBusOut(WORD wBusOut,int iBusOutGain)
+ECHOSTATUS CEchoGals::AdjustPipesOutForBusOut(WORD wBusOut,INT32 iBusOutGain)
 {
-	ECHO_DEBUGPRINTF(("CEchoGals::AdjustPipesOutForBusOut wBusOut %d  iBusOutGain %d\n",
+	ECHO_DEBUGPRINTF(("CEchoGals::AdjustPipesOutForBusOut wBusOut %d  iBusOutGain %ld\n",
 							wBusOut,
 							iBusOutGain));
 					
@@ -2009,3 +2038,32 @@ ECHOSTATUS CEchoGals::AdjustPipesOutForBusOut(WORD wBusOut,int iBusOutGain)
 }	// AdjustPipesOutForBusOut
 
 
+
+//===========================================================================
+//
+// GetAudioLatency - returns the latency for a single pipe
+//
+//===========================================================================
+
+void CEchoGals::GetAudioLatency(ECHO_AUDIO_LATENCY *pLatency)
+{
+	DWORD dwLatency;
+
+	if (FALSE == pLatency->wIsInput)
+	{
+		if (pLatency->wPipe >= GetFirstDigitalBusOut())
+			dwLatency = m_wDigitalOutputLatency;
+		else
+			dwLatency = m_wAnalogOutputLatency;	
+	}
+	else
+	{
+		if (pLatency->wPipe >= GetFirstDigitalBusIn())
+			dwLatency = m_wDigitalInputLatency;
+		else
+			dwLatency = m_wAnalogInputLatency;	
+	}
+	
+	pLatency->dwLatency = dwLatency;
+
+}	// GetAudioLatency

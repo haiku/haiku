@@ -5,40 +5,37 @@
 //		Implementation file for the CLayla24 driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
 #include "CLayla24.h"
+
+#define LAYLA24_ANALOG_OUTPUT_LATENCY		59
+#define LAYLA24_ANALOG_INPUT_LATENCY		71
+#define LAYLA24_DIGITAL_OUTPUT_LATENCY		32
+#define LAYLA24_DIGITAL_INPUT_LATENCY		32
+
 
 
 /****************************************************************************
@@ -93,9 +90,15 @@ VOID  CLayla24::operator delete( PVOID pVoid )
 //===========================================================================
 
 CLayla24::CLayla24( PCOsSupport pOsSupport )
-		  : CEchoGals( pOsSupport )
+		  : CEchoGalsMTC( pOsSupport )
 {
 	ECHO_DEBUGPRINTF( ( "CLayla24::CLayla24() is born!\n" ) );
+
+	m_wAnalogOutputLatency = LAYLA24_ANALOG_OUTPUT_LATENCY;
+	m_wAnalogInputLatency = LAYLA24_ANALOG_INPUT_LATENCY;
+	m_wDigitalOutputLatency = LAYLA24_DIGITAL_OUTPUT_LATENCY;
+	m_wDigitalInputLatency = LAYLA24_DIGITAL_INPUT_LATENCY;
+
 }	// CLayla24::CLayla24()
 
 
@@ -183,11 +186,12 @@ ECHOSTATUS CLayla24::InitHw()
 			SetNominalLevel( i, FALSE );	// FALSE is +4 here
 	}
 
-	for ( i = 0; i < GetFirstDigitalBusIn(); i++ )
+	for ( i = 0; i < GetNumBussesIn(); i++ )
 	{
 		GetDspCommObject()->
 			SetNominalLevel( GetNumBussesOut() + i, FALSE );
 	}
+
 	//
 	// Set the digital mode to S/PDIF RCA
 	//
@@ -244,14 +248,15 @@ ECHOSTATUS CLayla24::GetCapabilities
 		pCapabilities->dwBusOutCaps[i] |= ECHOCAPS_NOMINAL_LEVEL;
 	}
 
-	for (i = 0 ; i < GetFirstDigitalBusIn(); i++)
+	for (i = 0 ; i < GetNumBussesIn(); i++)
 	{
 		pCapabilities->dwBusInCaps[i] |= ECHOCAPS_NOMINAL_LEVEL;
 	}
 
 	pCapabilities->dwInClockTypes |= ECHO_CLOCK_BIT_WORD		|
 												ECHO_CLOCK_BIT_SPDIF		|
-												ECHO_CLOCK_BIT_ADAT;
+												ECHO_CLOCK_BIT_ADAT		|
+												ECHO_CLOCK_BIT_MTC;
 
 	return Status;
 	
@@ -316,8 +321,7 @@ ECHOSTATUS CLayla24::QueryAudioSampleRate
 		goto qasr_ex;
 
 	ECHO_DEBUGPRINTF(
-		("CLayla24::QueryAudioSampleRate() Sample rate must be >= 50,000 Hz"
-		 " and <= 100,000 Hz and NOT in ADAT mode\n") );
+		("CLayla24::QueryAudioSampleRate() - rate %ld invalid\n",dwSampleRate) );
 	return ECHOSTATUS_BAD_FORMAT;
 
 qasr_ex:
@@ -353,7 +357,7 @@ ECHOSTATUS CLayla24::GetInputClockDetect(DWORD &dwClockDetectBits)
 	//	
 	DWORD dwClocksFromDsp = GetDspCommObject()->GetInputClockDetect();	
 
-	dwClockDetectBits = ECHO_CLOCK_BIT_INTERNAL;	
+	dwClockDetectBits = ECHO_CLOCK_BIT_INTERNAL | ECHO_CLOCK_BIT_MTC;
 	
 	if (0 != (dwClocksFromDsp & GML_CLOCK_DETECT_BIT_SPDIF))
 		dwClockDetectBits |= ECHO_CLOCK_BIT_SPDIF;

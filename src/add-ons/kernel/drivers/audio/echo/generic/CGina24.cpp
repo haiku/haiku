@@ -5,40 +5,37 @@
 //		Implementation file for the CGina24 driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
 #include "CGina24.h"
+
+#define GINA24_ANALOG_OUTPUT_LATENCY		59
+#define GINA24_ANALOG_INPUT_LATENCY			71
+#define GINA24_DIGITAL_OUTPUT_LATENCY		32
+#define GINA24_DIGITAL_INPUT_LATENCY		32
+
 
 
 /****************************************************************************
@@ -96,6 +93,12 @@ CGina24::CGina24( PCOsSupport pOsSupport )
 		 : CEchoGals( pOsSupport )
 {
 	ECHO_DEBUGPRINTF( ( "CGina24::CGina24() is born!\n" ) );
+
+	m_wAnalogOutputLatency = GINA24_ANALOG_OUTPUT_LATENCY;
+	m_wAnalogInputLatency = GINA24_ANALOG_INPUT_LATENCY;
+	m_wDigitalOutputLatency = GINA24_DIGITAL_OUTPUT_LATENCY;
+	m_wDigitalInputLatency = GINA24_DIGITAL_INPUT_LATENCY;
+
 }
 
 CGina24::~CGina24()
@@ -275,9 +278,7 @@ ECHOSTATUS CGina24::QueryAudioSampleRate
 		  dwSampleRate != 96000 )
 	{
 		ECHO_DEBUGPRINTF(
-			("CGina24::QueryAudioSampleRate() Sample rate must be "
-			 " 8,000 Hz, 11,025 Hz, 16,000 Hz, 22,050 Hz, 32,000 Hz, "
-			 "44,100 Hz, 48,000 Hz, 88,200 Hz or 96,000 Hz\n") );
+			("CGina24::QueryAudioSampleRate() - rate %ld invalid\n",dwSampleRate) );
 		return ECHOSTATUS_BAD_FORMAT;
 	}
 	if ( dwSampleRate >= 88200 && DIGITAL_MODE_ADAT == GetDigitalMode() )

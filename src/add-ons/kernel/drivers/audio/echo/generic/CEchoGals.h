@@ -14,43 +14,29 @@
 //
 // ----------------------------------------------------------------------------
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
-
-/*
-
-	
-*/
 
 //	Prevent problems with multiple includes
 #ifndef _ECHOGALSOBJECT_
@@ -187,8 +173,8 @@ public:
 	//
 	// Open and close the mixer
 	//
-	ECHOSTATUS OpenMixer(DWORD &dwCookie);
-	ECHOSTATUS CloseMixer(DWORD dwCookie);
+	ECHOSTATUS OpenMixer(NUINT &Cookie);
+	ECHOSTATUS CloseMixer(NUINT Cookie);
 	
 	//
 	// Is the mixer open by one or more clients?
@@ -248,6 +234,7 @@ public:
 	virtual ECHOSTATUS SetFlags(WORD wFlags);
 	virtual ECHOSTATUS ClearFlags(WORD	wFlags);
 
+
 	//
 	// Get/set the locked sample rate - if the sample rate is locked,
 	// the card will be fixed at the locked rate.  Only applies if 
@@ -283,6 +270,20 @@ public:
 						? FALSE
 						: GetDspCommObject()->IsProfessionalSpdif() ); }
 	virtual void SetProfessionalSpdif( BOOL bNewStatus );
+	
+	//
+	// Get/Set S/PDIF out non-audio status bit
+	//
+	virtual BOOL IsSpdifOutNonAudio()
+		{ return( ( NULL == GetDspCommObject() )
+						? FALSE
+						: GetDspCommObject()->IsSpdifOutNonAudio() ); }
+	virtual void SetSpdifOutNonAudio(BOOL bNonAudio )
+	{
+		if (GetDspCommObject())
+			GetDspCommObject()->SetSpdifOutNonAudio(bNonAudio);
+	}
+	
 	
 
 	//
@@ -397,6 +398,15 @@ public:
 	virtual ECHOSTATUS GetInputClockDetect(DWORD &dwClockDetectBits);
 	
 
+#ifdef PHANTOM_POWER_CONTROL
+	//
+	// Phantom power on/off for Gina3G
+	//
+	virtual void GetPhantomPower(BOOL *pfPhantom) { *pfPhantom = 0; }
+	virtual void SetPhantomPower(BOOL fPhantom) {}
+#endif
+	
+	
 	//***********************************************************************
 	//
 	//	Audio transport (public) - playing and recording audio
@@ -404,13 +414,33 @@ public:
 	//***********************************************************************	
 
 	//
+	// Make a Daffy Duck object (scatter-gather list)
+	//
+	CDaffyDuck * MakeDaffyDuck();
+
+	//
+	// Set the scatter-gather list for a pipe
+	//	
+	ECHOSTATUS SetDaffyDuck( WORD wPipeIndex, CDaffyDuck *pDuck);
+	
+	//
 	//	Reserve a pipe.  Please refer to the definition of 
 	// ECHOGALS_OPENAUDIOPARAMETERS.
+	//
+	// If the fCheckHardware flag is true, then the open will fail
+	// if the DSP and ASIC firmware have not been loaded (usually means
+	// your external box is turned off).
+	//
+	// If you want to manage your own CDaffyDuck object for this pipe, 
+	// then pass a pointer to a CDaffyDuck object.  If you pass NULL,
+	// one will be created for you.
 	//
 	virtual ECHOSTATUS OpenAudio
 	(
 		PECHOGALS_OPENAUDIOPARAMETERS	pOpenParameters,	// Info on channel
-		PWORD									pwPipeIndex			// Ptr to pipe index
+		PWORD									pwPipeIndex,		// Ptr to pipe index
+		BOOL									fCheckHardware = TRUE,
+		CDaffyDuck							*pDuck = NULL
 	);
 
 	//
@@ -418,7 +448,8 @@ public:
 	//
 	virtual ECHOSTATUS CloseAudio
 	(
-		PECHOGALS_CLOSEAUDIOPARAMETERS	pCloseParameters
+		PECHOGALS_CLOSEAUDIOPARAMETERS	pCloseParameters,
+		BOOL										fFreeDuck = TRUE
 	);
 
 	//
@@ -598,6 +629,7 @@ public:
 	);
 	
 	
+
 	//***********************************************************************
 	//
 	//	MIDI (public)
@@ -605,14 +637,15 @@ public:
 	//***********************************************************************	
 
 #ifdef MIDI_SUPPORT
-
-	virtual ECHOSTATUS OpenMidiInput();
-	virtual ECHOSTATUS CloseMidiInput();
+	
+	// The context struct should be set to zero before calling OpenMidiInput
+	virtual ECHOSTATUS OpenMidiInput(ECHOGALS_MIDI_IN_CONTEXT *pContext);
+	virtual ECHOSTATUS CloseMidiInput(ECHOGALS_MIDI_IN_CONTEXT *pContext);
 
 	//
 	// Reset the MIDI input buffer; MIDI input remains enabled and open
 	//
-	virtual ECHOSTATUS ResetMidiInput();
+	virtual ECHOSTATUS ResetMidiInput(ECHOGALS_MIDI_IN_CONTEXT *pContext);
 
 	virtual ECHOSTATUS WriteMidi
 	(
@@ -621,11 +654,12 @@ public:
 		PDWORD	pdwActualCt
 	);
 	
-	virtual ECHOSTATUS ReadMidiByte(BYTE &Midi);
+	virtual ECHOSTATUS ReadMidiByte(	ECHOGALS_MIDI_IN_CONTEXT	*pContext,
+												DWORD								&dwMidiData,
+												LONGLONG							&llTimestamp);
 	
-	virtual BOOL MidiOutFull()
+	virtual void ServiceMtcSync()
 	{
-		return GetDspCommObject()->MidiOutFull();
 	}
 
 #endif // MIDI_SUPPORT
@@ -709,6 +743,11 @@ protected:
 	DWORD				m_dwMidiOutOpen; 	// Midi out channels open mask
 	
 	BOOL				m_fMixerDisabled;
+	
+	WORD				m_wAnalogOutputLatency;	// Latency in samples
+	WORD				m_wAnalogInputLatency;
+	WORD				m_wDigitalOutputLatency;
+	WORD				m_wDigitalInputLatency;
 		
 														
 	
@@ -768,6 +807,7 @@ protected:
 	friend class CPipeOutCtrl;
 	friend class CMonitorCtrl;
 	friend class CMidiInQ;
+	friend class CMtcSync;
 
 
 	//***********************************************************************
@@ -790,7 +830,7 @@ protected:
 	//
 	//***********************************************************************	
 
-	ECHOSTATUS GetBaseCapabilities(PECHOGALS_CAPS pCapabilities);
+	virtual ECHOSTATUS GetBaseCapabilities(PECHOGALS_CAPS pCapabilities);
 
 	WORD GetNumPipesOut();
 	WORD GetNumPipesIn();
@@ -814,8 +854,6 @@ protected:
 	//
 	//***********************************************************************	
 
-	ECHOSTATUS MakeDaffyDuck(WORD wPipeIndex);
-	void KillDaffyDuck(WORD wPipeIndex);
 
 
 	//***********************************************************************
@@ -827,19 +865,19 @@ protected:
 	//
 	// Match a mixer cookie to a mixer client
 	//
-	ECHO_MIXER_CLIENT *GetMixerClient(DWORD dwCookie);
+	ECHO_MIXER_CLIENT *GetMixerClient(NUINT Cookie);
 	
 	// 
 	// Adjust all the monitor levels for a particular output bus; this is
 	// used to implement the master output level.
 	//
-	ECHOSTATUS AdjustMonitorsForBusOut(WORD wBusOut);
+	virtual ECHOSTATUS AdjustMonitorsForBusOut(WORD wBusOut);
 	
 	//
 	// Adjust all the output pipe levels for a particular output bus; this is
 	// also used to implement the master output level.
 	//
-	virtual ECHOSTATUS AdjustPipesOutForBusOut(WORD wBusOut,int iBusOutGain);
+	virtual ECHOSTATUS AdjustPipesOutForBusOut(WORD wBusOut,INT32 iBusOutGain);
 	
 	//
 	// A mixer control has changed; store the notify
@@ -859,6 +897,11 @@ protected:
 	virtual ECHOSTATUS GetDigitalInAutoMute(PMIXER_FUNCTION pMixerFunction);
 	virtual ECHOSTATUS SetDigitalInAutoMute(PMIXER_FUNCTION pMixerFunction);
 #endif
+
+	//
+	// Get the audio latency for a single pipe
+	//
+	virtual void GetAudioLatency(ECHO_AUDIO_LATENCY *pLatency);
 
 };		// class CEchoGals
 

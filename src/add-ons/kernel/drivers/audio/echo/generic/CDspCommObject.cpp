@@ -4,36 +4,27 @@
 //
 //		Implementation file for EchoGals generic driver DSP interface class.
 //
-//		Copyright Echo Digital Audio Corporation (c) 1998 - 2002
-//		All rights reserved
-//		www.echoaudio.com
-//		
-//		Permission is hereby granted, free of charge, to any person obtaining a
-//		copy of this software and associated documentation files (the
-//		"Software"), to deal with the Software without restriction, including
-//		without limitation the rights to use, copy, modify, merge, publish,
-//		distribute, sublicense, and/or sell copies of the Software, and to
-//		permit persons to whom the Software is furnished to do so, subject to
-//		the following conditions:
-//		
-//		- Redistributions of source code must retain the above copyright
-//		notice, this list of conditions and the following disclaimers.
-//		
-//		- Redistributions in binary form must reproduce the above copyright
-//		notice, this list of conditions and the following disclaimers in the
-//		documentation and/or other materials provided with the distribution.
-//		
-//		- Neither the name of Echo Digital Audio, nor the names of its
-//		contributors may be used to endorse or promote products derived from
-//		this Software without specific prior written permission.
+// ----------------------------------------------------------------------------
 //
-//		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-//		IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-//		ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-//		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+//   All rights reserved
+//   www.echoaudio.com
+//   
+//   This file is part of Echo Digital Audio's generic driver library.
+//   
+//   Echo Digital Audio's generic driver library is free software; 
+//   you can redistribute it and/or modify it under the terms of 
+//   the GNU General Public License as published by the Free Software Foundation.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program; if not, write to the Free Software
+//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//   MA  02111-1307, USA.
 //
 // ****************************************************************************
 
@@ -102,7 +93,7 @@ CDspCommObject::CDspCommObject
 	PCOsSupport	pOsSupport
 )
 {
-	int	i;
+	INT32	i;
 
 	ASSERT( pOsSupport );
 	
@@ -127,21 +118,26 @@ CDspCommObject::CDspCommObject
 	// Create the DSP comm page - this is the area of memory read and written by
 	// the DSP via bus mastering
 	//
-	if ( ECHOSTATUS_OK != 
-				pOsSupport->OsPageAllocate( sizeof( DspCommPage ) / PAGE_SIZE + 1,
-													 (VOID ** )&m_pDspCommPage,
-													 &m_dwCommPagePhys ) ||
-		  m_pDspCommPage == NULL )
+	ECHOSTATUS Status;
+	DWORD dwSegmentSize;
+	
+	Status = pOsSupport->AllocPhysPageBlock(sizeof( DspCommPage ) / PAGE_SIZE + 1, 
+													m_pDspCommPageBlock);
+	if (ECHOSTATUS_OK != Status)
 	{
 		ECHO_DEBUGPRINTF( ("CDspCommObject::CDspCommObject DSP comm page "
 								 "memory allocation failed\n") );
-		pOsSupport->EchoErrorMsg(
-			"CDspCommObject::CDspCommObject DSP comm page "
-			"memory allocation failed",
-			"Critical Failure" );
 		return;
 	}
-
+	
+	m_pDspCommPage = (PDspCommPage) pOsSupport->
+													GetPageBlockVirtAddress( m_pDspCommPageBlock );
+	
+	pOsSupport->GetPageBlockPhysSegment(m_pDspCommPageBlock,
+													0,
+													m_dwCommPagePhys,
+													dwSegmentSize);
+	
 	//
 	// Init the comm page
 	//
@@ -149,7 +145,7 @@ CDspCommObject::CDspCommObject
 													// Size of DSP comm page
 	
 	m_pDspCommPage->dwHandshake = 0xffffffff;
-	m_pDspCommPage->dwMidiXmitStatus = 0xffffffff;
+	m_pDspCommPage->dwMidiOutFreeCount = SWAP( (DWORD) DSP_MIDI_OUT_FIFO_SIZE );
 
 	for ( i = 0; i < DSP_MAXAUDIOINPUTS; i++ )
 		m_pDspCommPage->InLineLevel[ i ] = 0x00;
@@ -181,28 +177,6 @@ CDspCommObject::CDspCommObject
 CDspCommObject::~CDspCommObject()
 {
 	//
-	// Reset transport
-	//
-	CChannelMask cmActive = m_cmActive;
-	ResetTransport( &cmActive );
-	
-	//
-	// Meters off
-	//
-	m_wMeterOnCount = 1;
-	SetMetersOn( FALSE );
-
-#ifdef MIDI_SUPPORT
-
-	//
-	// MIDI input off
-	//
-	m_wMidiOnCount	= 1;
-	SetMidiOn( FALSE );
-
-#endif // MIDI_SUPPORT
-
-	//
 	// Go to sleep
 	//
 	GoComatose();
@@ -210,16 +184,10 @@ CDspCommObject::~CDspCommObject()
 	//
 	// Free the comm page
 	//
-	if ( NULL != m_pDspCommPage )
+	if ( NULL != m_pDspCommPageBlock )
 	{
-		if ( ECHOSTATUS_OK != m_pOsSupport->OsPageFree(
-													sizeof( DspCommPage ) / PAGE_SIZE + 1,
-													m_pDspCommPage,
-													m_dwCommPagePhys ) )
-		{
-			ECHO_DEBUGPRINTF(("CDspCommObject::~CDspCommObject "
-									"DSP comm page memory free failed\n"));
-		}
+		m_pOsSupport->FreePhysPageBlock( sizeof( DspCommPage ) / PAGE_SIZE + 1,
+											m_pDspCommPageBlock);
 	}
 
 	ECHO_DEBUGPRINTF( ( "CDspCommObject::~CDspCommObject() is toast!\n" ) );
@@ -244,75 +212,45 @@ CDspCommObject::~CDspCommObject()
 // If this load fails, it does not necessarily mean that the hardware is
 // defective - the external box may be disconnected or turned off.
 //
-// This routine sometimes fails for Layla20; for Layla20, the loop runs 5 times
-// and succeeds if it wins on three of the loops.
-//
 //===========================================================================
 
 BOOL CDspCommObject::CheckAsicStatus()
 {
-#if NUM_ASIC_TESTS!=1
-	DWORD	dwGoodCt = 0;
-#endif
-
 	DWORD	dwAsicStatus;
 	DWORD	dwReturn;
-	int 	iNumTests;
 
+	//
+	// Always succeed if this card doesn't have an ASIC
+	//
 	if ( !m_bHasASIC )
 	{
 		m_bASICLoaded = TRUE;
 		return TRUE;
 	}
 			
-	iNumTests = NUM_ASIC_TESTS;	
-		
-	for ( int i = 0; i < iNumTests; i++ )
-	{
-		// Send the vector command
-		SendVector( DSP_VC_TEST_ASIC );	
+	// Send the vector command
+	m_bASICLoaded = FALSE;
+	SendVector( DSP_VC_TEST_ASIC );	
 
-		// Since this is a Layla, the DSP will return a value to
-		// indicate whether or not the ASIC is currently loaded
-		dwReturn = Read_DSP( &dwAsicStatus);
-		if ( ECHOSTATUS_OK != dwReturn )
-		{
-			ECHO_DEBUGPRINTF(("CDspCommObject::CheckAsicStatus - failed on Read_DSP\n"));
-			ECHO_DEBUGBREAK();
-			m_bASICLoaded = FALSE;
-			return FALSE;
-		}
+	// The DSP will return a value to indicate whether or not the 
+	// ASIC is currently loaded
+	dwReturn = Read_DSP( &dwAsicStatus );
+	if ( ECHOSTATUS_OK != dwReturn )
+	{
+		ECHO_DEBUGPRINTF(("CDspCommObject::CheckAsicStatus - failed on Read_DSP\n"));
+		ECHO_DEBUGBREAK();
+		return FALSE;
+	}
 
 #ifdef ECHO_DEBUG
-		if ( dwAsicStatus != ASIC_ALREADY_LOADED &&
-			  dwAsicStatus != ASIC_NOT_LOADED )
-		{
-			ECHO_DEBUGBREAK(); 
-		}
+	if ( (dwAsicStatus != ASIC_LOADED) && (dwAsicStatus != ASIC_NOT_LOADED) )
+	{
+		ECHO_DEBUGBREAK(); 
+	}
 #endif
 	
-		if ( dwAsicStatus == ASIC_ALREADY_LOADED )
-		{
-		
-#if NUM_ASIC_TESTS==1
-			m_bASICLoaded = TRUE;
-			break;
-#else
-			//
-			// For Layla20
-			//
-			if ( ++dwGoodCt == 3 )
-			{
-				m_bASICLoaded = TRUE;
-				break;
-			}
-#endif
-		}
-		else
-		{
-			m_bASICLoaded = FALSE;
-		}
-	}
+	if ( dwAsicStatus == ASIC_LOADED )
+		m_bASICLoaded = TRUE;
 
 	return m_bASICLoaded;
 
@@ -396,8 +334,8 @@ ECHOSTATUS CDspCommObject::InstallResidentLoader()
 {
 	DWORD			dwAddress;
 	DWORD			dwIndex;
-	int			iNum;
-	int			i;
+	INT32			iNum;
+	INT32			i;
 	DWORD			dwReturn;
 	PWORD			pCode;
 
@@ -556,8 +494,8 @@ ECHOSTATUS CDspCommObject::LoadDSP
 {
 	DWORD			dwAddress;
 	DWORD			dwIndex;
-	int			iNum;
-	int			i;
+	INT32			iNum;
+	INT32			i;
 	DWORD			dwReturn;
 	ULONGLONG	ullTimeout, ullCurTime;
 	ECHOSTATUS	Status;
@@ -625,8 +563,8 @@ ECHOSTATUS CDspCommObject::LoadDSP
 
 	for (;;)
 	{
-		int	iBlockType;
-		int	iMemType;
+		INT32	iBlockType;
+		INT32	iMemType;
 
 		// Total Block Size
 		dwIndex++;
@@ -771,7 +709,7 @@ ECHOSTATUS CDspCommObject::LoadFirmware()
 	ECHOSTATUS	dwReturn;
 	ULONGLONG	ullRightNow;
 
-	// Try to load the DSP
+	// Sanity check
 	if ( NULL == m_pwDspCodeToLoad || NULL == m_pDspCommPage )
 	{
 		ECHO_DEBUGBREAK();
@@ -859,7 +797,7 @@ ECHOSTATUS CDspCommObject::LoadFirmware()
 
 ECHOSTATUS CDspCommObject::ReadSn()
 {
-	int			j;
+	INT32			j;
 	DWORD			dwSn[ 6 ];
 	ECHOSTATUS	Status;
 
@@ -869,7 +807,7 @@ ECHOSTATUS CDspCommObject::ReadSn()
 		Status = Read_DSP( &dwSn[ j ] );
 		if ( Status != 0 )
 		{
-			ECHO_DEBUGPRINTF( ("\tFailed to read serial number word %d\n",
+			ECHO_DEBUGPRINTF( ("\tFailed to read serial number word %ld\n",
 									 j) );
 			return ECHOSTATUS_DSP_DEAD;
 		}
@@ -893,6 +831,7 @@ ECHOSTATUS CDspCommObject::ReadSn()
 void CDspCommObject::RestoreDspSettings()
 {
 	ECHO_DEBUGPRINTF(("RestoreDspSettings\n"));
+	ECHO_DEBUGPRINTF(("\tControl reg is 0x%lx\n",SWAP(m_pDspCommPage->dwControlReg) ));
 
 	if ( !CheckAsicStatus() )
 		return;
@@ -908,14 +847,14 @@ void CDspCommObject::RestoreDspSettings()
 	{
 		SendVector( DSP_VC_METERS_ON );
 	}
-	if ( !WaitForHandshake() )
-		return;
 
 	SetInputClock( m_wInputClock );
 	SetOutputClock( m_wOutputClock );
 		
 	if ( !WaitForHandshake() )
+	{
 		return;
+	}
 	UpdateAudioOutLineLevel();
 
 	if ( !WaitForHandshake() )
@@ -1122,9 +1061,13 @@ ECHOSTATUS CDspCommObject::SendVector
 	//
 	while ( ullCurTime <= ullTimeout) 
 	{
-		if ( 0 == ( GetDspRegister( CHI32_VECTOR_REG ) & CHI32_VECTOR_BUSY ) )
+		DWORD dwReg;
+
+		dwReg = GetDspRegister( CHI32_VECTOR_REG );
+		if ( 0 == (dwReg & CHI32_VECTOR_BUSY) )
 		{
 			SetDspRegister( CHI32_VECTOR_REG, dwCommand );
+			
 			return ECHOSTATUS_OK;
 		}
 		m_pOsSupport->OsGetSystemTime( &ullCurTime );
@@ -1149,30 +1092,34 @@ ECHOSTATUS CDspCommObject::SendVector
 
 BOOL CDspCommObject::WaitForHandshake()
 {
-	int	i;
-
+	INT32	i;
+	DWORD dwDelta;
+	ULONGLONG ullStartTime,ullTime;
+	
 	//
 	// Wait up to three milliseconds for the handshake from the DSP 
 	//
-	for ( i = 0; i < HANDSHAKE_TIMEOUT; i++ )
+	dwDelta = 0;
+	m_pOsSupport->OsGetSystemTime( &ullStartTime );
+	do
 	{
 		// Look for the handshake value
 		if ( 0 != GetHandshakeFlag() )
-			break;
+		{
+			return TRUE;
+		}
 
 		// Give the DSP time to access the comm page
 		m_pOsSupport->OsSnooze( 2 );
-	}
+		
+		m_pOsSupport->OsGetSystemTime(&ullTime);
+		dwDelta = (DWORD) (ullTime - ullStartTime);
+	} while (dwDelta < HANDSHAKE_TIMEOUT);
 
-	if ( HANDSHAKE_TIMEOUT == i )
-	{
-		ECHO_DEBUGPRINTF( ("CDspCommObject::WaitForHandshake: Timeout waiting "
-								 "for DSP\n") );
-		ECHO_DEBUGBREAK();
-		return FALSE;
-	}
-
-	return TRUE;
+	ECHO_DEBUGPRINTF( ("CDspCommObject::WaitForHandshake: Timeout waiting "
+								"for DSP\n") );
+	ECHO_DEBUGBREAK();
+	return FALSE;
 	
 }		// DWORD	CDspCommObject::WaitForHandshake()
 
@@ -1193,8 +1140,7 @@ BOOL CDspCommObject::WaitForHandshake()
 
 ECHOSTATUS CDspCommObject::StartTransport
 (
-	PCChannelMask	pChannelMask,			// Pipes to start
-	PCChannelMask	pCyclicMask				// Which pipes are cyclic buffers
+	PCChannelMask	pChannelMask			// Pipes to start
 )
 {
 	ECHO_DEBUGPRINTF( ("StartTransport\n") );
@@ -1208,8 +1154,8 @@ ECHOSTATUS CDspCommObject::StartTransport
 	//
 	// Write the appropriate fields in the comm page
 	//
-	m_pDspCommPage->cmdStart += *pChannelMask;
-	m_pDspCommPage->cmdCyclicBuffer += *pCyclicMask;
+	m_pDspCommPage->cmdStart.Clear();
+	m_pDspCommPage->cmdStart = *pChannelMask;
 	if ( !m_pDspCommPage->cmdStart.IsEmpty() )
 	{
 		//
@@ -1219,16 +1165,9 @@ ECHOSTATUS CDspCommObject::StartTransport
 		SendVector( DSP_VC_START_TRANSFER );
 
 		//
-		// Wait for transport to start
-		//
-		if ( !WaitForHandshake() )
-			return ECHOSTATUS_DSP_DEAD;
-
-		//
 		// Keep track of which pipes are transporting
 		//
 		m_cmActive += *pChannelMask;
-		m_pDspCommPage->cmdStart.Clear();
 
 		return ECHOSTATUS_OK;
 	}		// if this monkey is being started
@@ -1261,7 +1200,8 @@ ECHOSTATUS CDspCommObject::StopTransport
 	//
 	// Write to the comm page
 	//
-	m_pDspCommPage->cmdStop += *pChannelMask;
+	m_pDspCommPage->cmdStop.Clear();
+	m_pDspCommPage->cmdStop = *pChannelMask;
 	m_pDspCommPage->cmdReset.Clear();
 	if ( !m_pDspCommPage->cmdStop.IsEmpty() )
 	{
@@ -1272,17 +1212,9 @@ ECHOSTATUS CDspCommObject::StopTransport
 		SendVector( DSP_VC_STOP_TRANSFER );
 
 		//
-		// Wait for transport to stop
-		//
-		if ( !WaitForHandshake() )
-			return ECHOSTATUS_DSP_DEAD;
-
-		//
 		// Keep track of which pipes are transporting
 		//
 		m_cmActive -= *pChannelMask;
-		m_pDspCommPage->cmdStop.Clear();
-		m_pDspCommPage->cmdReset.Clear();
 
 		return ECHOSTATUS_OK;
 	}		// if this monkey is being started
@@ -1315,8 +1247,10 @@ ECHOSTATUS CDspCommObject::ResetTransport
 	//
 	// Write to the comm page
 	//
-	m_pDspCommPage->cmdStop += *pChannelMask;
-	m_pDspCommPage->cmdReset += *pChannelMask;
+	m_pDspCommPage->cmdStop.Clear();
+	m_pDspCommPage->cmdReset.Clear();
+	m_pDspCommPage->cmdStop = *pChannelMask;
+	m_pDspCommPage->cmdReset = *pChannelMask;
 	if ( !m_pDspCommPage->cmdReset.IsEmpty() )
 	{
 		//
@@ -1326,17 +1260,9 @@ ECHOSTATUS CDspCommObject::ResetTransport
 		SendVector( DSP_VC_STOP_TRANSFER );
 
 		//
-		// Wait for transport to stop
-		//
-		if ( !WaitForHandshake() )
-			return ECHOSTATUS_DSP_DEAD;
-
-		//
 		// Keep track of which pipes are transporting
 		//
 		m_cmActive -= *pChannelMask;
-		m_pDspCommPage->cmdStop.Clear();
-		m_pDspCommPage->cmdReset.Clear();
 
 		return ECHOSTATUS_OK;
 	}		// if this monkey is being started
@@ -1402,7 +1328,7 @@ void CDspCommObject::SetAudioDuckListPhys
 {
 	if (wPipeIndex < GetNumPipes() )
 	{
-		m_pDspCommPage->dwDuckListPhys[ wPipeIndex ].PhysAddr = 
+		m_pDspCommPage->DuckListPhys[ wPipeIndex ].PhysAddr = 
 																		SWAP( dwNewPhysAdr );
 	}
 }	// void CDspCommObject::SetAudioDuckListPhys
@@ -1434,11 +1360,13 @@ void CDspCommObject::GetActivePipes
 ECHOSTATUS CDspCommObject::SetAudioFormat
 (
 	WORD 							wPipeIndex,
-	PECHOGALS_AUDIOFORMAT	pFormat,
-	BOOL							fDitherDigitalInputs
+	PECHOGALS_AUDIOFORMAT	pFormat
 )
 {
 	WORD wDspFormat = DSP_AUDIOFORM_SS_16LE;
+	
+	ECHO_DEBUGPRINTF(("CDspCommObject::SetAudioFormat - pipe %d  bps %d  channels %d\n",
+							wPipeIndex,pFormat->wBitsPerSample,pFormat->wDataInterleave));
 
 	//
 	// Check the pipe number
@@ -1456,8 +1384,22 @@ ECHOSTATUS CDspCommObject::SetAudioFormat
 	//
 	if (pFormat->wDataInterleave > 2)
 	{
-		wDspFormat = DSP_AUDIOFORM_SUPER_INTERLEAVE_32LE
-						 | pFormat->wDataInterleave;
+		switch (pFormat->wBitsPerSample)
+		{
+			case 16 :
+				wDspFormat = DSP_AUDIOFORM_SUPER_INTERLEAVE_16LE;
+				break;
+				
+			case 24 :
+				wDspFormat = DSP_AUDIOFORM_SUPER_INTERLEAVE_24LE;
+				break;
+				
+			case 32 :
+				wDspFormat = DSP_AUDIOFORM_SUPER_INTERLEAVE_32LE;
+				break;
+		}
+		
+		wDspFormat |= pFormat->wDataInterleave;
 	}
 	else
 	{
@@ -1510,35 +1452,18 @@ ECHOSTATUS CDspCommObject::SetAudioFormat
 				
 					default :		
 					case 16 :
-					
-						//
-						// If this is a digital input and 
-						// the no dither flag is set, use the no-dither format
-						//
-						if (	fDitherDigitalInputs &&
-								(wPipeIndex >= (m_wNumPipesOut + m_wFirstDigitalBusIn)) )
-								
-						{
-							//
-							// 16 bit, no dither
-							//
-							if (2 == pFormat->wDataInterleave)
-								wDspFormat = DSP_AUDIOFORM_SS_16LE_ND;
-							else
-								wDspFormat = DSP_AUDIOFORM_MS_16LE_ND;
-						}
+						if (2 == pFormat->wDataInterleave)
+							wDspFormat = DSP_AUDIOFORM_SS_16LE;
 						else
-						{
-							//
-							// 16 bit with dither
-							//
-							if (2 == pFormat->wDataInterleave)
-								wDspFormat = DSP_AUDIOFORM_SS_16LE;
-							else
-								wDspFormat = DSP_AUDIOFORM_MS_16LE;
-						}
-						
+							wDspFormat = DSP_AUDIOFORM_MS_16LE;
 						break;	
+					
+					case 24 :
+						if (2 == pFormat->wDataInterleave)
+							wDspFormat = DSP_AUDIOFORM_SS_24LE;
+						else
+							wDspFormat = DSP_AUDIOFORM_MS_24LE;
+						break;					
 					
 					case 32 :
 						if (2 == pFormat->wDataInterleave)
@@ -1592,7 +1517,6 @@ ECHOSTATUS CDspCommObject::GetAudioFormat
 			pFormat->byMonoToStereo = 1;
 			break;
 			
-		case DSP_AUDIOFORM_MS_16LE_ND :
 		case DSP_AUDIOFORM_MS_16LE :
 			pFormat->wDataInterleave = 1;
 			pFormat->wBitsPerSample = 16;
@@ -1604,7 +1528,6 @@ ECHOSTATUS CDspCommObject::GetAudioFormat
 			pFormat->wBitsPerSample = 8;
 			break;
 
-		case DSP_AUDIOFORM_SS_16LE_ND :
 		case DSP_AUDIOFORM_SS_16LE :
 			pFormat->wDataInterleave = 2;
 			pFormat->wBitsPerSample = 16;
@@ -1643,6 +1566,8 @@ ECHOSTATUS CDspCommObject::GetAudioFormat
 }	// void CDspCommObject::GetAudioFormat
 
 
+
+
 /****************************************************************************
 
 	Mixer methods
@@ -1659,7 +1584,7 @@ ECHOSTATUS CDspCommObject::SetPipeOutGain
 ( 
 	WORD 	wPipeOut, 
 	WORD	wBusOut,
-	int 	iGain,
+	INT32	iGain,
 	BOOL 	fImmediate
 )
 {
@@ -1677,10 +1602,12 @@ ECHOSTATUS CDspCommObject::SetPipeOutGain
 		iGain = GENERIC_TO_DSP(iGain);
 		m_pDspCommPage->OutLineLevel[ wPipeOut ] = (BYTE) iGain;
 
+		/*
 		ECHO_DEBUGPRINTF( ("CDspCommObject::SetPipeOutGain: Out pipe %d "
-								 "= 0x%x\n",
+								 "= 0x%lx\n",
 								 wPipeOut,
 								 iGain) );
+		*/
 
 		//
 		// If fImmediate is true, then do the gain setting right now.
@@ -1718,14 +1645,14 @@ ECHOSTATUS CDspCommObject::SetPipeOutGain
 
 ECHOSTATUS CDspCommObject::GetPipeOutGain
 ( 
-	WORD wPipeOut, 
-	WORD wBusOut,
-	int &iGain
+	WORD 	wPipeOut, 
+	WORD 	wBusOut,
+	INT32 &iGain
 )
 {
 	if (wPipeOut < m_wNumPipesOut)
 	{
-		iGain = (int) (char) m_pDspCommPage->OutLineLevel[ wPipeOut ];
+		iGain = (INT32) (char) m_pDspCommPage->OutLineLevel[ wPipeOut ];
 		iGain = DSP_TO_GENERIC(8);
 		return ECHOSTATUS_OK;		
 	}
@@ -1746,7 +1673,7 @@ ECHOSTATUS CDspCommObject::GetPipeOutGain
 //
 //===========================================================================
 
-ECHOSTATUS CDspCommObject::SetBusInGain( WORD wBusIn, int iGain)
+ECHOSTATUS CDspCommObject::SetBusInGain( WORD wBusIn, INT32 iGain)
 {
 	if (wBusIn > m_wNumBussesIn)
 		return ECHOSTATUS_INVALID_CHANNEL;
@@ -1777,7 +1704,7 @@ ECHOSTATUS CDspCommObject::SetBusInGain( WORD wBusIn, int iGain)
 //
 //===========================================================================
 
-ECHOSTATUS CDspCommObject::GetBusInGain( WORD wBusIn, int &iGain)
+ECHOSTATUS CDspCommObject::GetBusInGain( WORD wBusIn, INT32 &iGain)
 {
 	if (wBusIn > m_wNumBussesIn)
 		return ECHOSTATUS_INVALID_CHANNEL;
@@ -1874,7 +1801,7 @@ ECHOSTATUS CDspCommObject::SetAudioMonitor
 (
 	WORD	wBusOut,	// output bus
 	WORD	wBusIn,	// input bus
-	int	iGain,
+	INT32	iGain,
 	BOOL 	fImmediate
 )
 {
@@ -1907,7 +1834,7 @@ ECHOSTATUS CDspCommObject::SetAudioMonitor
 	//
 	if (fImmediate)
 	{
-		return  UpdateAudioOutLineLevel();
+		return UpdateAudioOutLineLevel();
 	}
 	
 	return ECHOSTATUS_OK;
@@ -1938,7 +1865,7 @@ ECHOSTATUS CDspCommObject::SetMetersOn
 	}
 	else
 	{
-		int	iDevice;
+		INT32	iDevice;
 	
 		if ( m_wMeterOnCount == 0 )
 			return ECHOSTATUS_OK;
@@ -1949,7 +1876,7 @@ ECHOSTATUS CDspCommObject::SetMetersOn
 			
 			for ( iDevice = 0; iDevice < DSP_MAXPIPES; iDevice++ )
 			{
-				m_pDspCommPage->VULevel[ iDevice ]   = GENERIC_TO_DSP(ECHOGAIN_MUTED);
+				m_pDspCommPage->VUMeter[ iDevice ]   = GENERIC_TO_DSP(ECHOGAIN_MUTED);
 				m_pDspCommPage->PeakMeter[ iDevice ] = GENERIC_TO_DSP(ECHOGAIN_MUTED);
 			}
 		}
@@ -1968,13 +1895,14 @@ ECHOSTATUS CDspCommObject::SetMetersOn
 
 ECHOSTATUS CDspCommObject::UpdateAudioOutLineLevel()
 {
-	ECHO_DEBUGPRINTF( ( "CDspCommObject::UpdateAudioOutLineLevel:\n" ) );
+	//ECHO_DEBUGPRINTF( ( "CDspCommObject::UpdateAudioOutLineLevel:\n" ) );
 	
 	if (FALSE == m_bASICLoaded)
 		return ECHOSTATUS_ASIC_NOT_LOADED;
 	
 	ClearHandshake();
 	return( SendVector( DSP_VC_UPDATE_OUTVOL ) );
+	
 }	// ECHOSTATUS CDspCommObject::UpdateAudioOutLineLevel()
 
 
@@ -2078,25 +2006,25 @@ ECHOSTATUS CDspCommObject::GetAudioMeters
 	DWORD dwCh = 0;
 	WORD 	i;
 
-	pMeters->iNumBussesOut = (int) m_wNumBussesOut;
+	pMeters->iNumBussesOut = (INT32) m_wNumBussesOut;
 	for (i = 0; i < m_wNumBussesOut; i++)
 	{
 		pMeters->iBusOutVU[i] = 
-			DSP_TO_GENERIC( ((int) (char) m_pDspCommPage->VULevel[ dwCh ]) );
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->VUMeter[ dwCh ]) );
 
 		pMeters->iBusOutPeak[i] = 
-			DSP_TO_GENERIC( ((int) (char) m_pDspCommPage->PeakMeter[ dwCh ]) );
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->PeakMeter[ dwCh ]) );
 		
 		dwCh++;
 	}
 
-	pMeters->iNumBussesIn = (int) m_wNumBussesIn;	
+	pMeters->iNumBussesIn = (INT32) m_wNumBussesIn;	
 	for (i = 0; i < m_wNumBussesIn; i++)
 	{
 		pMeters->iBusInVU[i] = 
-			DSP_TO_GENERIC( ((int) (char) m_pDspCommPage->VULevel[ dwCh ]) );
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->VUMeter[ dwCh ]) );
 		pMeters->iBusInPeak[i] = 
-			DSP_TO_GENERIC( ((int) (char) m_pDspCommPage->PeakMeter[ dwCh ]) );
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->PeakMeter[ dwCh ]) );
 		
 		dwCh++;
 	}
@@ -2170,6 +2098,12 @@ ECHOSTATUS CDspCommObject::GoComatose()
 		m_pwDspCode = NULL;
 		
 		//
+		// Make sure that the sample rate get re-set on wakeup
+		// (really only for Indigo and Mia)
+		//
+		m_pDspCommPage->dwControlReg = 0;
+		
+		//
 		// Put the DSP to sleep
 		//
 		return SendVector(DSP_VC_GO_COMATOSE);
@@ -2202,92 +2136,71 @@ ECHOSTATUS CDspCommObject::WriteMidi
 	PDWORD	pdwActualCt					// Return how many actually written
 )
 {
-	ECHOSTATUS	Status;
-	DWORD			dwLengthTemp, dwShift, dwPacked, i;
-#ifdef ECHO_DEBUG
-	DWORD			dwOrgLgth = dwLength;
-#endif
-
+	DWORD 		dwWriteCount,dwHandshake,dwStatus;
+	BYTE			*pOutBuffer;
+	
+	
 	//
-	// Send all the MIDI data
+	// Return immediately if the handshake flag is clar
 	//
-	*pdwActualCt = 0;
-	Status = ECHOSTATUS_OK;
-		
-	while ( dwLength > 0 )
+	dwHandshake = GetHandshakeFlag();
+	if (0 == dwHandshake)
 	{
-		//
-		// Wait for the last command to complete
-		//
-		if (FALSE == WaitForHandshake())
-		{
-			ECHO_DEBUGPRINTF(("CDspCommObject::WriteMidi - Timed out waiting for handshake\n"));
-			
-			Status = ECHOSTATUS_DSP_DEAD;
-			break;
-		}
-	
-		//
-		// See if the DSP is ready to go
-		//
-		if (0 == (GetDspRegister( CHI32_STATUS_REG) & CHI32_STATUS_REG_HF4))
-		{
-			//
-			// MIDI output is full
-			//
-			break;
-		}
-	
-		//
-		// Pack the MIDI data three bytes at a time
-		//
-		if ( dwLength > 3 )
-			dwLengthTemp = 3;
-		else
-			dwLengthTemp = dwLength;
+		ECHO_DEBUGPRINTF(("CDCO::WriteMidi - can't write - handshake %ld\n",dwHandshake));
 		
-		dwShift = 16;
-		dwPacked = 0;
-		for ( i = 0; i < dwLengthTemp; i++ )
-		{
-			dwPacked |= (DWORD) *pData++ << dwShift;
-			dwShift -= 8;
-		}
-
-		dwPacked |= dwLengthTemp << 24;		
-		dwLength -= dwLengthTemp;
-
-		//
-		// Write the data to the DSP
-		//
-		m_pDspCommPage->dwMIDIOutData = SWAP( dwPacked );
-		ClearHandshake();
-		SendVector( DSP_VC_MIDI_WRITE );
-		
-		ECHO_DEBUGPRINTF(("CDspCommObject::WriteMidi - wrote 0x%08lx\n",dwPacked));
-
-		//
-		// Update the count
-		//
-		*pdwActualCt += dwLengthTemp;
+		*pdwActualCt = 0;
+		return ECHOSTATUS_BUSY;
+	}
 	
-	}			// while( dwLength )
-
-	if ( 0 != *pdwActualCt )
+	//
+	// Return immediately if HF4 is clear - HF4 indicates that it is safe
+	// to write MIDI output data
+	//
+	dwStatus = GetDspRegister( CHI32_STATUS_REG );
+	if ( 0 == (dwStatus & CHI32_STATUS_REG_HF4 ) )
 	{
-		//
-		// Save the current time - used to detect if MIDI out is currently busy
-		//
-		m_pOsSupport->OsGetSystemTime( &m_ullMidiOutTime );
-															// Last time MIDI out occured
+		ECHO_DEBUGPRINTF(("CDCO::WriteMidi - can't write - dwStatus 0x%lx\n",dwStatus));
+		
+		*pdwActualCt = 0;
+		return ECHOSTATUS_BUSY;
+	}
+	
+	
+	//
+	// Copy data to the comm page; limit to the amount of space in the DSP output
+	// FIFO and in the comm page
+	//
+	dwWriteCount = dwLength;
+	if (dwWriteCount > (CP_MIDI_OUT_BUFFER_SIZE - 1))
+	{
+		dwWriteCount = CP_MIDI_OUT_BUFFER_SIZE - 1;
 	}
 
-	ECHO_DEBUGPRINTF( ("CDspCommObject::WriteMidi: Actual %ld "
-							 "Expected %ld OK\n",
-							 *pdwActualCt,
-							 dwOrgLgth) );
-							 
-	return Status;
+	ECHO_DEBUGPRINTF(("WriteMidi - dwWriteCount %ld\n",dwWriteCount));
+			
+	*pdwActualCt = dwWriteCount;	// Save the # of bytes written for the caller
+
+	pOutBuffer = m_pDspCommPage->byMidiOutData;
+	*pOutBuffer = (BYTE) dwWriteCount;
+	
+	pOutBuffer++;
+	
+	OsCopyMemory(pOutBuffer,pData,dwWriteCount);
+
+	//
+	// Send the command to the DSP
+	//	 
+	ClearHandshake();
+	m_pDspCommPage->dwMidiOutFreeCount = 0;
+	SendVector( DSP_VC_MIDI_WRITE );
+	
+	//
+	// Save the current time - used to detect if MIDI out is currently busy
+	//
+	m_pOsSupport->OsGetSystemTime( &m_ullMidiOutTime );
+														// Last time MIDI out occured
+
+	return ECHOSTATUS_OK;
 	
 }		// ECHOSTATUS CDspCommObject::WriteMidi
 
@@ -2304,7 +2217,7 @@ ECHOSTATUS CDspCommObject::ReadMidi
 	DWORD &	dwData				// Return data
 )
 {
-	if ( wIndex >= DSP_MIDI_BUFFER_SIZE - 1 )
+	if ( wIndex >= CP_MIDI_IN_BUFFER_SIZE - 1 )
 		return ECHOSTATUS_INVALID_INDEX;
 
 	//
@@ -2358,6 +2271,22 @@ ECHOSTATUS CDspCommObject::SetMidiOn( BOOL bOn )
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CDspCommObject::SetMidiOn
+
+
+//===========================================================================
+//
+// Detect MIDI output activity
+//
+//===========================================================================
+
+BOOL CDspCommObject::IsMidiOutActive()
+{
+	ULONGLONG	ullCurTime;
+
+	m_pOsSupport->OsGetSystemTime( &ullCurTime );
+	return( ( ( ullCurTime - m_ullMidiOutTime ) > MIDI_ACTIVITY_TIMEOUT_USEC ) ? FALSE : TRUE );
+	
+}	// BOOL CDspCommObject::IsMidiOutActive()
 
 
 #endif // MIDI_SUPPORT
