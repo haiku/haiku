@@ -42,6 +42,6 @@ private:
 	GraphicsDriver* fGraphicsDriver;
 };
 
-PrinterDriver* instantiate_printer_driver(BNode* printerFolder = NULL);
+_IMPEXP_BE PrinterDriver* instantiate_printer_driver(BNode* printerFolder = NULL);
 
 #endif
