@@ -200,6 +200,103 @@ STXTTranslatorTest::IdentifyTest()
 		sizeof(aStyledFiles) / sizeof(const char *), false);
 }
 
+bool
+CompareStreams(BPositionIO &a, BPositionIO &b)
+{
+	off_t alen = 0, blen = 0;
+	uint8 *abuf = NULL, *bbuf = NULL;
+	
+	a.Seek(0, SEEK_END);
+	alen = a.Position();
+	b.Seek(0, SEEK_END);
+	blen = b.Position();
+	
+	if (alen != blen)
+		return false;
+
+	bool bresult = false;		
+	abuf = new uint8[alen];
+	bbuf = new uint8[blen];
+	if (a.ReadAt(0, abuf, alen) == B_OK) {
+		if (b.ReadAt(0, bbuf, blen) == B_OK) {
+			if (memcmp(abuf, bbuf, alen) == 0)
+				bresult = true;
+			else
+				bresult = false;
+		}
+	}
+		
+	delete[] abuf;
+	abuf = NULL;
+	delete[] bbuf;
+	bbuf = NULL;
+	
+	return bresult;
+}
+
+void
+TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
+	const char **paths, int32 len, bool bplain)
+{
+	int32 nlongest = 0, ncurrent = 0;
+	// find the length of the longest string
+	for (int32 i = 0; i < len; i++) {
+		ncurrent = strlen(paths[i]);
+		if (ncurrent > nlongest)
+			nlongest = ncurrent;
+	}
+	
+	char *styled_path = NULL, *plain_path = NULL;
+	styled_path = new char[nlongest + 6];
+	plain_path = new char[nlongest + 6];
+	
+	// Perform translations on every file in the array
+	for (int32 i = 0; i < len; i++) {
+		strcpy(styled_path, paths[i]);
+		strcat(styled_path, ".stxt");
+		strcpy(plain_path, paths[i]);
+		strcat(plain_path, ".txt");
+		
+		// Setup input files	
+		ptest->NextSubTest();
+		BFile styled_file, plain_file, *pinput_file;
+		CPPUNIT_ASSERT(styled_file.SetTo(styled_path, B_READ_ONLY) == B_OK);
+		CPPUNIT_ASSERT(plain_file.SetTo(plain_path, B_READ_ONLY) == B_OK);
+		if (bplain)
+			pinput_file = &plain_file;
+		else
+			pinput_file = &styled_file;
+		
+		BMallocIO mallio;
+		
+		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_TEXT)
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
+			B_TRANSLATOR_ANY_TYPE) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, plain_file) == true);
+		
+		// Convert to B_TRANSLATOR_TEXT
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
+			B_TRANSLATOR_TEXT) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, plain_file) == true);
+		
+		// Convert to B_STYLED_TEXT_FORMAT
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
+			B_STYLED_TEXT_FORMAT) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, styled_file) == true);
+	}
+	
+	delete[] styled_path;
+	styled_path = NULL;
+	delete[] plain_path;
+	plain_path = NULL;
+}
+
 void
 STXTTranslatorTest::TranslateTest()
 {
@@ -241,6 +338,39 @@ STXTTranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
 	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
 	CPPUNIT_ASSERT(filesize == 0);
+	
+	// Identify (wrong magic)
+	NextSubTest();
+	BFile wrongmagic("../src/tests/kits/translation/data/text/wrong_magic.stxt",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wrongmagic.InitCheck() == B_OK);
+	result = proster->Translate(&wrongmagic, NULL, NULL, &output,
+		B_TRANSLATOR_ANY_TYPE);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	
+	// Identify (wrong version)
+	NextSubTest();
+	BFile wrongversion("../src/tests/kits/translation/data/text/wrong_version.stxt",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wrongversion.InitCheck() == B_OK);
+	result = proster->Translate(&wrongversion, NULL, NULL, &output,
+		B_TRANSLATOR_ANY_TYPE);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	
+	// Translate various data
+	const char *aTextFiles[] = {
+		"../src/tests/kits/translation/data/text/ascii",
+		"../src/tests/kits/translation/data/text/japanese",
+		"../src/tests/kits/translation/data/text/multi_byte",
+		"../src/tests/kits/translation/data/text/one_length",
+		"../src/tests/kits/translation/data/text/sentence",
+		"../src/tests/kits/translation/data/text/symbols",
+		"../src/tests/kits/translation/data/text/zero_length"
+	};
+	TranslateTests(this, proster, aTextFiles,
+		sizeof(aTextFiles) / sizeof(const char *), true);
+	TranslateTests(this, proster, aTextFiles,
+		sizeof(aTextFiles) / sizeof(const char *), false);
 }
 
 void
