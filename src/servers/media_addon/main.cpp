@@ -15,6 +15,7 @@
 #include "debug.h"
 #include "TMap.h"
 #include "ServerInterface.h"
+#include "DormantNodeManager.h"
 
 void DumpFlavorInfo(const flavor_info *info);
 
@@ -35,7 +36,6 @@ public:
 	void ScanAddOnFlavors(BMediaAddOn *addon);
 
 	Map<ino_t,media_addon_id> *filemap;
-	Map<media_addon_id,BMediaAddOn *> *addonmap;
 
 	BMediaRoster *mediaroster;
 	ino_t		DirNodeSystem;
@@ -49,7 +49,6 @@ Application::Application(const char *sig) :
 {
 	mediaroster = BMediaRoster::Roster();
 	filemap = new Map<ino_t,media_addon_id>;
-	addonmap = new Map<media_addon_id,BMediaAddOn *>;
 	control_port = create_port(64,"media_addon_server port");
 	control_thread = spawn_thread(controlthread,"media_addon_server control",12,this);
 	resume_thread(control_thread);
@@ -61,12 +60,11 @@ Application::~Application()
 	status_t err;
 	wait_for_thread(control_thread,&err);
 
-	// delete all BMediaAddOn objects
-	BMediaAddOn *addon;
-	for (int32 index = 0; addonmap->GetAt(index,&addon); index++)
-		delete addon;
+	// unregister all media add-ons
+	media_addon_id id;
+	for (int32 index = 0; filemap->GetAt(index,&id); index++)
+		_DormantNodeManager->UnregisterAddon(id);
 	
-	delete addonmap;
 	delete filemap;
 }
 
@@ -87,12 +85,13 @@ Application::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const xfer_addonserver_rescan_mediaaddon_flavors *msg = (const xfer_addonserver_rescan_mediaaddon_flavors *)data;
 			BMediaAddOn *addon;
-			if (addonmap->Get(msg->addonid, &addon)) {
-				ASSERT(msg->addonid == addon->AddonID());
-				ScanAddOnFlavors(addon);		
-			} else {
+			addon = _DormantNodeManager->GetAddon(msg->addonid);
+			if (!addon) {
 				printf("Can't find a addon object for id %d\n",(int)msg->addonid);
-			} 
+				break;
+			}
+			ScanAddOnFlavors(addon);
+			_DormantNodeManager->PutAddon(msg->addonid);
 			break;
 		}
 
@@ -141,6 +140,9 @@ Application::ScanAddOnFlavors(BMediaAddOn *addon)
 	status_t rv;
 	
 	ASSERT(addon);
+	ASSERT(addon->AddonID() > 0);
+	
+	printf("scanning media add-on flavors for id %d\n",addon->AddonID());
 	
 	port = find_port("media_server port");
 	if (port <= B_OK) {
@@ -148,8 +150,6 @@ Application::ScanAddOnFlavors(BMediaAddOn *addon)
 		return;
 	}
 	
-	ASSERT(addon->AddonID() > 0);
-
 	// the server should remove previously registered "dormant_flavor_info"s
 	purge_id = addon->AddonID();
 
@@ -204,39 +204,25 @@ Application::AddOnAdded(const char *path, ino_t file_node)
 {
 	printf("\n\nloading BMediaAddOn from %s\n",path);
 
-	BMediaAddOn *(*make_addon)(image_id you);
-	BMediaAddOn *addon = 0;
+	BMediaAddOn *addon;
 	media_addon_id id;
-	image_id image;
 	status_t rv;
 	
-	image = load_add_on(path);
-	if (image < B_OK) {
-		printf("loading failed %lx %s\n", image, strerror(image));
+	id = _DormantNodeManager->RegisterAddon(path);
+	if (id <= 0) {
+		printf("failed to register add-on\n");
 		return;
 	}
 	
-	rv = get_image_symbol(image, "make_media_addon", B_SYMBOL_TYPE_TEXT, (void**)&make_addon);
-	if (rv < B_OK) {
-		printf("loading failed, function not found %lx %s\n", rv, strerror(rv));
-		unload_add_on(image);
+	addon = _DormantNodeManager->GetAddon(id);
+	if (addon == NULL) {
+		printf("failed to get add-on\n");
 		return;
 	}
-	
-	addon = make_addon(image);
-	if (addon == 0) {
-		printf("creating BMediaAddOn failed\n");
-		unload_add_on(image);
-		return;
-	}
-	
-	id = addon->AddonID();
-	ASSERT(id > 0);
 
 	printf("adding media add-on %d\n",(int)id);
 
 	filemap->Insert(file_node, id);
-	addonmap->Insert(id, addon);
 
 	ScanAddOnFlavors(addon);
 	
@@ -287,6 +273,7 @@ flavor 0:
 		return;
 	}
 */
+	_DormantNodeManager->PutAddon(id);
 }
 
 
@@ -294,19 +281,12 @@ void
 Application::AddOnRemoved(ino_t file_node)
 {	
 	media_addon_id id;
-	BMediaAddOn *addon;
 	if (!filemap->Get(file_node,&id)) {
 		printf("inode %Ld removed, but no media add-on found\n",file_node);
 		return;
 	}
 	filemap->Remove(file_node);
-	printf("removing media add-on %d\n",(int)id);
-	if (!addonmap->Get(id,&addon)) {
-		printf("no BMediaAddon object found\n");
-		return;
-	}
-	delete addon;
-	addonmap->Remove(id);
+	_DormantNodeManager->UnregisterAddon(id);
 }
 
 void 
