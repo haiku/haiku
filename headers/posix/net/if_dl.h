@@ -5,7 +5,11 @@
 #ifndef OBOS_IF_DL_H
 #define OBOS_IF_DL_H
 
-#include "net/if.h"
+#include <net/if.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* link level sockaddr structure */
 struct sockaddr_dl {
@@ -25,6 +29,10 @@ struct sockaddr_dl {
 
 void    link_addr (const char *, struct sockaddr_dl *);
 char    *link_ntoa (const struct sockaddr_dl *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OBOS_IF_DL_H */
 

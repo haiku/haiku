@@ -89,6 +89,10 @@
 #include <sys/types.h>
 #include <endian.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * revision information.  this is the release date in YYYYMMDD format.
  * it can change every day so the right thing to do with it is use it
@@ -358,5 +362,9 @@ extern	uint32	_getlong  (const u_char *);
 	*t_cp   = t_l; \
 	(cp) += INT32SZ; \
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_NAMESER_H_ */

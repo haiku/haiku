@@ -6,16 +6,16 @@
 #define _NET_IF_H
 
 #include <OS.h>
-//#include <Drivers.h>
+#include <Drivers.h>
 #include <sys/socketvar.h>
 #include <net/if_types.h>
 #include <netinet/in.h>
 #include <net/route.h>
 
-/* XXX - hack to get this file building 
- *       taken from be/drivers/Drivers.h
- */
-#define B_DEVICE_OP_CODES_END 9999
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
 	IF_GETADDR = B_DEVICE_OP_CODES_END,
 	IF_INIT,
@@ -271,6 +271,10 @@ struct ifa_msghdr {
   int     ifioctl(struct socket *so, ulong cmd, char *data);
   int     ifconf(int cmd, char *data);
   void    if_init(void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* _NET_IF_H */

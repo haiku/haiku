@@ -10,6 +10,10 @@
 #include <netinet/in.h>
 #include <ByteOrder.h> /* htonl, htons, ntohl, ntohs */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 in_addr_t        inet_addr (const char *);
 int              inet_aton (const char *, struct in_addr *);
 in_addr_t        inet_lnaof (struct in_addr);
@@ -24,5 +28,9 @@ int              inet_pton (int, const char *, void *);
 const char      *inet_ntop (int, const void *, char *, size_t);
 u_int            inet_nsap_addr (const char *, u_char *, int);
 char            *inet_nsap_ntoa (int, const u_char *, char *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _INET_H */
