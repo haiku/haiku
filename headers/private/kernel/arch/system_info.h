@@ -7,6 +7,8 @@
 
 
 #include <OS.h>
+#include <arch_system_info.h>
+
 
 struct kernel_args;
 

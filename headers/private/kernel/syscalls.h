@@ -252,6 +252,11 @@ extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
 void _kern_debug_output(const char *message);
 
+#ifdef __INTEL__
+// our only x86 only syscall
+status_t _kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
+#endif
+
 /* This is a real BSD'ism :) Basically it returns the size of the
  * descriptor table for the current process as an integer.
  */
