@@ -287,6 +287,7 @@ static void
 tab(void)
 {
 	int i = console.x;
+	int target_line;
 
 	console.x = (console.x + TAB_SIZE) & ~TAB_MASK;
 	if (console.x >= console.columns) {
@@ -296,9 +297,10 @@ tab(void)
 	}
 
 	// We need to insert spaces, or else the whole line is going to be ignored.
-	for (; i < console.x; i++)
-		console.lines[console.first_line + console.y][i] = ' ';
-
+	target_line = WRAP(console.first_line + console.y, console.num_lines); 
+	for (; i < console.x; i++) {
+		console.lines[target_line][i] = ' ';
+	}
 	// There is no need to mark the line dirty
 }
 
