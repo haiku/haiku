@@ -1,7 +1,7 @@
 /*
  * BeOS Driver for Intel ICH AC'97 Link interface
  *
- * Copyright (c) 2002, Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (c) 2002 - 2004, Marcus Overhagen <marcus@overhagen.de>
  *
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -31,7 +31,7 @@
 #include "debug.h"
 #include "hardware.h"
 
-#define VERSION_NUMBER "1.6c"
+#define VERSION_NUMBER "1.6d"
 
 #if DEBUG
 	#define VERSION_DEBUG " (DEBUG)"
@@ -39,7 +39,7 @@
 	#define VERSION_DEBUG ""
 #endif
 
-#define VERSION "Version " VERSION_NUMBER VERSION_DEBUG ", Copyright (c) 2002, 2003 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version " VERSION_NUMBER VERSION_DEBUG ", Copyright (c) 2002 - 2004 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "ich_ac97"
 
 #define BUFFER_SIZE		2048
