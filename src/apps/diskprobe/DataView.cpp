@@ -172,6 +172,7 @@ DataView::MessageReceived(BMessage *message)
 				fDataSize = viewSize;
 				fData = (uint8 *)realloc(fData, fDataSize);
 				UpdateScroller();
+				SendNotices(kDataViewPreferredSize);
 			}
 			if (message->FindInt64("file_size", &offset) == B_OK)
 				UpdateFromEditor();
