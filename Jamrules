@@ -137,10 +137,10 @@ if $(WARNINGS) = 1 {
 # standard kernel C/C++ flags
 KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
 KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
-KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
+KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 KERNEL_C++FLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
 KERNEL_C++FLAGS += -fno-builtin -fno-exceptions -fno-rtti -D$(OBOS_TARGET_DEFINE) ;
-KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
+KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 if $(GCC_VERSION[1]) >= 3 {
 	KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
