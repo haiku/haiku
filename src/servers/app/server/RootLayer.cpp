@@ -53,34 +53,35 @@
 
 //#define DISPLAYDRIVER_TEST_HACK
 
-//---------------------------------------------------------------------------
-RootLayer::RootLayer(const char *name, int32 workspaceCount,
-					Desktop *desktop, DisplayDriver *driver)
-	: Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
+
+RootLayer::RootLayer(const char *name, int32 workspaceCount, 
+		Desktop *desktop, DisplayDriver *driver)
+ : Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
 {
-	fDesktop			= desktop;
-//NOTE: be careful about this one.
-	fRootLayer			= this;
-	fActiveWorkspace	= NULL;
-	fRows				= 0;
-	fColumns			= 0;
+	fDesktop = desktop;
+	
+	//NOTE: be careful about this one.
+	fRootLayer = this;
+	fActiveWorkspace = NULL;
+	fRows = 0;
+	fColumns = 0;
 	
 	// TODO: read these 3 from a configuration file.
-	fScreenXResolution	= 0;
-	fScreenYResolution	= 0;
-	fColorSpace			= B_RGB32;
-
-	_view_token			= 0; // is this used for WinBorders?
-	_hidden				= false;
+	fScreenXResolution = 0;
+	fScreenYResolution = 0;
+	fColorSpace = B_RGB32;
+	
+	_view_token = 0; // is this used for WinBorders?
+	_hidden	= false;
 	
 	SetWorkspaceCount(workspaceCount);
 }
-//---------------------------------------------------------------------------
+
 RootLayer::~RootLayer()
 {
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::Draw(const BRect &r)
 {
 	// REMOVEME: This method is here because of DisplayDriver testing ONLY. 
@@ -90,9 +91,9 @@ void RootLayer::Draw(const BRect &r)
 	
 	RGBColor		c(51,102,152);
 	fDriver->FillRect(r, c);
-
+	
 	STRACE(("#RootLayer(%s)::Draw(r) END\n", GetName()));
-
+	
 #ifdef DISPLAYDRIVER_TEST_HACK
 	DisplayDriver	*_driver = fDriver;
 	int8 pattern[8];
@@ -131,14 +132,14 @@ void RootLayer::Draw(const BRect &r)
 	polygon[4].y = 100;
 	polygon[5].x = 200;
 	polygon[5].y = 200;
-
+	
 	_layerdata->highcolor.SetColor(255,0,0,255);
 	_layerdata->lowcolor.SetColor(255,255,255,255);
 	_driver->FillRect(r1,_layerdata,pattern);
-
+	
 	_layerdata->highcolor.SetColor(255,255,0,255);
 	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),_layerdata,pattern);
-
+	
 	_layerdata->highcolor.SetColor(0,0,255,255);
 	_driver->StrokeBezier(pts,_layerdata,pattern);
 	_driver->StrokeArc(BRect(200,300,400,600),30,270,_layerdata,pattern);
@@ -154,39 +155,40 @@ void RootLayer::Draw(const BRect &r)
 	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,_layerdata,pattern2);
 	_driver->FillPolygon(polygon,6,polygonRect,_layerdata,pattern);
 //	_driver->FillTriangle(triangle,triangleRect,_layerdata,pattern);
-#endif
+	
+#endif // end DISPLAYDRIVER_TEST_HACK
 
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::MoveBy(float x, float y)
 {
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::ResizeBy(float x, float y)
 {
 	// TODO: implement
 }
-//---------------------------------------------------------------------------
+
 Layer* RootLayer::VirtualTopChild() const
 {
 	return fActiveWorkspace->GoToTopItem();
 }
-//---------------------------------------------------------------------------
+
 Layer* RootLayer::VirtualLowerSibling() const
 {
 	return fActiveWorkspace->GoToLowerItem();
 }
-//---------------------------------------------------------------------------
+
 Layer* RootLayer::VirtualUpperSibling() const
 {
 	return fActiveWorkspace->GoToUpperItem();
 }
-//---------------------------------------------------------------------------
+
 Layer* RootLayer::VirtualBottomChild() const
 {
 	return fActiveWorkspace->GoToBottomItem();
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
 {
 	if (!(fMainLock.IsLocked()))
@@ -197,14 +199,14 @@ void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
 		ActiveWorkspace()->AddLayerPtr(winBorder);
 		return;
 	}
-
+	
 	for( int32 i=0; i < 32; i++)
 	{
 		if( wks & (0x00000001 << i) && i < WorkspaceCount())
 			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
 	}
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::AddWinBorder(WinBorder* winBorder)
 {
 	// The main job of this function, besides adding winBorder as a child, is to determine
@@ -221,10 +223,10 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	// in case we want to be added to the current workspace
 	if (winBorder->Window()->Workspaces() == 0)
 		winBorder->Window()->QuietlySetWorkspaces(0x00000001 << (ActiveWorkspaceIndex()-1));
-
+	
 	// add winBorder to the known list of WinBorders so we can keep track of it.
 	AddChild(winBorder, this);
-
+	
 	// add winBorder to the desired workspaces
 	switch(winBorder->Window()->Feel())
 	{
@@ -235,7 +237,6 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 			//	will be called.
 			break;
 		}
-			
 		case B_MODAL_APP_WINDOW_FEEL:
 		{
 			// add to app's list of Floating/Modal windows (as opposed to the system's)
@@ -317,7 +318,6 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 			AddWinBorderToWorkspaces(winBorder, winBorder->Window()->Workspaces());
 			break;
 		}
-		
 		case B_SYSTEM_LAST:
 		case B_SYSTEM_FIRST:
 		{
@@ -331,103 +331,107 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	
 	fMainLock.Unlock();
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName()));
-
+	
 	desktop->fGeneralLock.Unlock();
 	STRACE(("*RootLayer::AddWinBorder(%s) - General lock released\n", winBorder->GetName()));
-
+	
 	STRACE(("#RootLayer::AddWinBorder(%s)\n", winBorder->GetName()));
 }
 
-//---------------------------------------------------------------------------
 void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 {
-// This method does 3 things:
-// 1) Removes MODAL/SUBSET windows from system/app/window subset list.
-// 2) Removes this window from any workspace it appears in.
-// 3) Removes this window from RootLayer's list of chilren.
-
+	// This method does 3 things:
+	// 1) Removes MODAL/SUBSET windows from system/app/window subset list.
+	// 2) Removes this window from any workspace it appears in.
+	// 3) Removes this window from RootLayer's list of children.
 
 	desktop->fGeneralLock.Lock();
 	fMainLock.Lock();
 	
-	int32		feel = winBorder->Window()->Feel();
+	int32 feel = winBorder->Window()->Feel();
 	if(feel == B_MODAL_SUBSET_WINDOW_FEEL || feel == B_FLOATING_SUBSET_WINDOW_FEEL)
 	{
 		desktop->RemoveSubsetWindow(winBorder);
 	}
-	else if (feel == B_MODAL_APP_WINDOW_FEEL || feel == B_FLOATING_APP_WINDOW_FEEL)
+	else
+	if (feel == B_MODAL_APP_WINDOW_FEEL || feel == B_FLOATING_APP_WINDOW_FEEL)
 	{
 		RemoveAppWindow(winBorder);
 	}
-	else if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL
+	else
+	if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL
 			|| feel == B_SYSTEM_FIRST || feel == B_SYSTEM_LAST)
 	{
 		if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL)
 			fMainFMWList.RemoveItem(winBorder);
 
-		int32		count = WorkspaceCount();
+		int32 count = WorkspaceCount();
 		for(int32 i=0; i < count; i++)
 			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
 	}
 	else
 	{	// for B_NORMAL_WINDOW_FEEL
-		uint32		workspaces	= winBorder->Window()->Workspaces();
-		int32		count		= WorkspaceCount();
+		uint32 workspaces = winBorder->Window()->Workspaces();
+		int32 count = WorkspaceCount();
 		for( int32 i=0; i < 32 && i < count; i++)
+		{
 			if( workspaces & (0x00000001UL << i))
 				WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
+		}
 	}
-
+	
 	RemoveChild(winBorder);
-
+	
 	fMainLock.Unlock();
 	desktop->fGeneralLock.Unlock();
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
 {
 	// only normal windows are affected by this change
 	if(!winBorder->_level != B_NORMAL_FEEL)
 		return;
 
-	uint32		oldWorkspaces = winBorder->Window()->Workspaces();
+	uint32 oldWorkspaces = winBorder->Window()->Workspaces();
 	for(int32 i=0; i < WorkspaceCount(); i++)
 	{
 		if ((oldWorkspaces & (0x00000001 << i)) && (newWorkspaces & (0x00000001 << i)))
 		{
 			// do nothing.
 		}
-		else if(oldWorkspaces & (0x00000001 << i))
+		else
+		if(oldWorkspaces & (0x00000001 << i))
 		{
 			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
 		}
-		else if (newWorkspaces & (0x00000001 << i))
+		else
+		if (newWorkspaces & (0x00000001 << i))
 		{
 			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
 		}
 	}
 }
-//---------------------------------------------------------------------------
+
 bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
 {
 	if(!winBorder)
 		return false;
-
+	
 	STRACE(("*RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
-
+	
 	fMainLock.Lock();
 	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? winBorder->GetName():"NULL"));
-
+	
 	if (!winBorder)
 	{
 		ActiveWorkspace()->SetFrontLayer(NULL);
 		return true;
 	}
-
+	
 	uint32 workspaces	= winBorder->Window()->Workspaces();
 	int32 count		= WorkspaceCount();
 	int32 newWorkspace= 0;
-
+	
 	if (workspaces & (0x00000001UL << (ActiveWorkspaceIndex()-1)) )
 	{
 		newWorkspace = ActiveWorkspaceIndex();
@@ -436,12 +440,14 @@ bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
 	{
 		int32	i;
 		for( i = 0; i < 32 && i < count; i++)
+		{
 			if( workspaces & (0x00000001UL << i))
 			{
 				newWorkspace	= i+1;
 				break;
 			}
-
+		}
+		
 		if (i == count || i == 32)
 			newWorkspace = ActiveWorkspaceIndex();
 	}
@@ -451,16 +457,17 @@ bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
 		WorkspaceAt(newWorkspace)->SetFrontLayer(winBorder);
 		SetActiveWorkspaceByIndex(newWorkspace);
 	}
-	else{
+	else
+	{
 		ActiveWorkspace()->SetFrontLayer(winBorder);
 	}
-
+	
 	fMainLock.Unlock();
 	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock released\n", winBorder? winBorder->GetName():"NULL"));
 	STRACE(("#RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
 	return true;
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 {
 	// NOTE: All screens *must* have the same resolution
@@ -469,39 +476,42 @@ void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 	for (int32 i=0; i < rows; i++)
 	{
 		if (i==0)
+		{
 			for(int32 j=0; j < columns; j++)
 			{
 				fScreenPtrList.AddItem(screen[i*rows + j]);
-				newFrame.right		+= screen[i*rows + j]->Resolution().x;
+				newFrame.right += screen[i*rows + j]->Resolution().x;
 			}
+		}
 		newFrame.bottom		+= screen[i*rows]->Resolution().y;
 	}
-
+	
 	newFrame.right	-= 1;
 	newFrame.bottom	-= 1;
+	
+	_frame = newFrame;
+	fRows = rows;
+	fColumns = columns;
+	fScreenXResolution = (int32)(screen[0]->Resolution().x);
+	fScreenYResolution = (int32)(screen[0]->Resolution().y);
 
-	_frame		= newFrame;
-	fRows		= rows;
-	fColumns	= columns;
-	fScreenXResolution	= (int32)(screen[0]->Resolution().x);
-	fScreenYResolution	= (int32)(screen[0]->Resolution().y);
-
-// NOTE: a RebuildFullRegion() followed by FullInvalidate() are required after calling this method!
+	// NOTE: a RebuildFullRegion() followed by FullInvalidate() are required after calling 
+	// this method!
 }
-//---------------------------------------------------------------------------
-Screen** RootLayer::Screens()
+
+Screen **RootLayer::Screens()
 {
 	return (Screen**)fScreenPtrList.Items();
 }
-//---------------------------------------------------------------------------
+
 bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace)
 {
 	if (fScreenXResolution == width && fScreenYResolution == height &&
 		fColorSpace == colorspace)
 		return false;
-
+	
 	bool accepted = true;
-
+	
 	for (int i=0; i < fScreenPtrList.CountItems(); i++)
 	{
 		Screen *screen;
@@ -517,19 +527,19 @@ bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace
 		{
 			Screen *screen;
 			screen = static_cast<Screen*>(fScreenPtrList.ItemAt(i));
-
+			
 			screen->SetResolution(BPoint(width, height), colorspace);
 		}
-
-		Screen		**screens = (Screen**)fScreenPtrList.Items();
+		
+		Screen **screens = (Screen**)fScreenPtrList.Items();
 		SetScreens(screens, fRows, fColumns);
-
+		
 		return true;
 	}
 	
 	return false;
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::SetWorkspaceCount(const int32 count)
 {
 	STRACE(("*RootLayer::SetWorkspaceCount(%ld)\n", count));
@@ -538,10 +548,10 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 		return;
 	
 	int32 	exActiveWorkspaceIndex = ActiveWorkspaceIndex();
-
+	
 	BList newWSPtrList;
 	void *workspacePtr;
-
+	
 	fMainLock.Lock();
 	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock acquired\n", count));
 	
@@ -579,27 +589,27 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 	
 	if (exActiveWorkspaceIndex > count)
 		SetActiveWorkspaceByIndex(count); 
-
+	
 	// if true, this is the first time this method is called.
 	if (exActiveWorkspaceIndex == -1)
 		SetActiveWorkspaceByIndex(1); 		
-
+	
 	STRACE(("#RootLayer::SetWorkspaceCount(%ld)\n", count));
 }
-//---------------------------------------------------------------------------
+
 int32 RootLayer::WorkspaceCount() const
 {
 	return fWSPtrList.CountItems();
 }
-//---------------------------------------------------------------------------
+
 Workspace* RootLayer::WorkspaceAt(const int32 index) const
 {
 	Workspace *ws = NULL;
 	ws = static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
-
+	
 	return ws;
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::SetActiveWorkspaceByIndex(const int32 index)
 {
 	Workspace *ws = NULL;
@@ -607,53 +617,53 @@ void RootLayer::SetActiveWorkspaceByIndex(const int32 index)
 	if (ws)
 		SetActiveWorkspace(ws);
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::SetActiveWorkspace(Workspace *ws)
 {
 	if (fActiveWorkspace == ws || !ws)
 		return;
-
+	
 	fActiveWorkspace	= ws;
-
+	
 //	RebuildRegions(Frame());
 //	Invalidate(Frame());
 }
-//---------------------------------------------------------------------------
+
 int32 RootLayer::ActiveWorkspaceIndex() const{
 	if (fActiveWorkspace)
 		return fActiveWorkspace->ID();
 	else
 		return -1;
 }
-//---------------------------------------------------------------------------
+
 Workspace* RootLayer::ActiveWorkspace() const
 {
 	return fActiveWorkspace;
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::SetBGColor(const RGBColor &col)
 {
 	ActiveWorkspace()->SetBGColor(col);
 	
 	_layerdata->viewcolor	= col;
-
+	
 //	Invalidate(Frame());
 }
-//---------------------------------------------------------------------------
+
 RGBColor RootLayer::BGColor(void) const
 {
 	return _layerdata->viewcolor;
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::RemoveAppWindow(WinBorder *wb)
 {
 	wb->Window()->App()->fAppFMWList.RemoveItem(wb);
 
-	int32		count = WorkspaceCount();
+	int32 count = WorkspaceCount();
 	for(int32 i=0; i < count; i++)
 		WorkspaceAt(i+1)->RemoveLayerPtr(wb);
 }
-//---------------------------------------------------------------------------
+
 void RootLayer::PrintToStream()
 {
 	printf("\nRootLayer '%s' internals:\n", GetName());
@@ -671,5 +681,4 @@ void RootLayer::PrintToStream()
 		printf("~~~~~~~~\n");
 	}
 	printf("Active Workspace: %ld\n", fActiveWorkspace? fActiveWorkspace->ID(): -1);
-
 }

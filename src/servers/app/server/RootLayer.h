@@ -52,63 +52,64 @@ class DisplayDriver;
 class RootLayer : public Layer
 {
 public:
-								RootLayer(const char *name,
-									int32 workspaceCount, Desktop *desktop, DisplayDriver *driver);
-	virtual						~RootLayer();
+	RootLayer(const char *name, int32 workspaceCount, Desktop *desktop, 
+			DisplayDriver *driver);
+	virtual	~RootLayer(void);
+	
+	virtual	void Draw(const BRect &r);
+	virtual	void MoveBy(float x, float y);
+	virtual	void ResizeBy(float x, float y);
+	
+	// For the active workspaces
+	virtual	Layer *VirtualTopChild(void) const;
+	virtual	Layer *VirtualLowerSibling(void) const;
+	virtual	Layer *VirtualUpperSibling(void) const;
+	virtual	Layer *VirtualBottomChild(void) const;
+	
+	void AddWinBorder(WinBorder *winBorder);
+	void RemoveWinBorder(WinBorder *winBorder);
+	void ChangeWorkspacesFor(WinBorder *winBorder, uint32 newWorkspaces);
+	bool SetFrontWinBorder(WinBorder *winBorder);
+	
+	void SetScreens(Screen *screen[], int32 rows, int32 columns);
+	Screen **Screens(void);
+	bool SetScreenResolution(int32 width, int32 height, uint32 colorspace);
+	int32 ScreenRows(void) const { return fRows; }
+	int32 ScreenColumns(void) const { return fColumns; }
+	
+	void SetWorkspaceCount(const int32 count);
+	int32 WorkspaceCount(void) const;
+	Workspace *WorkspaceAt(const int32 index) const;
+	void SetActiveWorkspaceByIndex(const int32 index);
+	void SetActiveWorkspace(Workspace *ws);
+	int32 ActiveWorkspaceIndex(void) const;
+	Workspace *ActiveWorkspace(void) const;
+	
+	void SetBGColor(const RGBColor &col);
+	RGBColor BGColor(void) const;
+	
+	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
+	
+	void PrintToStream(void);
+	
+	// "Private" to app_server :-) - they should not be used
+	void RemoveAppWindow(WinBorder *wb);
+	
+	FMWList fMainFMWList;
+	BLocker fMainLock;
 
-	virtual	void				Draw(const BRect &r);
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				ResizeBy(float x, float y);
-
-	virtual	Layer*				VirtualTopChild() const;		//
-	virtual	Layer*				VirtualLowerSibling() const;	//	... for the active workspace
-	virtual	Layer*				VirtualUpperSibling() const;	//
-	virtual	Layer*				VirtualBottomChild() const;	//
- 
- 			void				AddWinBorder(WinBorder* winBorder);
- 			void				RemoveWinBorder(WinBorder* winBorder);
- 			void				ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces);
- 			bool				SetFrontWinBorder(WinBorder* winBorder);
- 
-			void				SetScreens(Screen *screen[], int32 rows, int32 columns);
-			Screen**			Screens();
-			bool				SetScreenResolution(int32 width, int32 height, uint32 colorspace);
-			int32				ScreenRows() const { return fRows; }
-			int32				ScreenColumns() const { return fColumns; }
-			
-			void				SetWorkspaceCount(const int32 count);
-			int32				WorkspaceCount(void) const;
-			Workspace*			WorkspaceAt(const int32 index) const;
-			void				SetActiveWorkspaceByIndex(const int32 index);
-			void				SetActiveWorkspace(Workspace *ws);
-			int32				ActiveWorkspaceIndex(void) const;
-			Workspace*			ActiveWorkspace(void) const;
-
-			void				SetBGColor(const RGBColor &col);
-			RGBColor			BGColor(void) const;
-			
-			void				AddWinBorderToWorkspaces(WinBorder* winBorder,
-														 uint32 wks);
-
-// ------- debugging methods -------
-			void				PrintToStream();
-// "Private" to app_server :-) - they should not be used
-			void				RemoveAppWindow(WinBorder *wb);
-
-			FMWList				fMainFMWList;
-			BLocker				fMainLock;
 private:
-			Desktop				*fDesktop;
-
-			BList				fScreenPtrList;
-			int32				fRows;
-			int32				fColumns;
-			int32				fScreenXResolution;
-			int32				fScreenYResolution;
-			uint32				fColorSpace;
-			
-			BList				fWSPtrList;
-			Workspace			*fActiveWorkspace;
+	Desktop *fDesktop;
+	
+	BList fScreenPtrList;
+	int32 fRows;
+	int32 fColumns;
+	int32 fScreenXResolution;
+	int32 fScreenYResolution;
+	uint32 fColorSpace;
+	
+	BList fWSPtrList;
+	Workspace *fActiveWorkspace;
 };
 
 #endif
