@@ -1,11 +1,9 @@
 
-#define _FS_INTERFACE_H
-	// don't include that file
+#include "compat.h"
 
 #include <stdio.h>
 #include <StorageDefs.h>
 
-#include "compat.h"
 #include "fsproto.h"
 #include "kprotos.h"
 #include "bfs_control.h"
@@ -17,7 +15,7 @@ static int
 do_chkbfs(int argc, char **argv)
 {
 	struct check_control result;
-	off_t files = 0, directories = 0, indices = 0, attributeDirectories = 0, attributes = 0;
+	fs_off_t files = 0, directories = 0, indices = 0, attributeDirectories = 0, attributes = 0;
 	int counter = 0;
 
 	int fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0);
@@ -40,7 +38,7 @@ do_chkbfs(int argc, char **argv)
 	}
 
 	// check all files and report errors
-	while (sys_ioctl(1, fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == B_OK) {
+	while (sys_ioctl(1, fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == FS_OK) {
 		if (++counter % 50 == 0)
 			printf("  %7d nodes processed\x1b[1A\n", counter);
 
@@ -60,18 +58,18 @@ do_chkbfs(int argc, char **argv)
 				printf(", names don't match");
 			putchar('\n');
 		}
-		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
+		if ((result.mode & (MY_S_INDEX_DIR | 0777)) == MY_S_INDEX_DIR)
 			indices++;
-		else if (result.mode & S_ATTR_DIR)
+		else if (result.mode & MY_S_ATTR_DIR)
 			attributeDirectories++;
-		else if (result.mode & S_ATTR)
+		else if (result.mode & MY_S_ATTR)
 			attributes++;
-		else if (result.mode & S_IFDIR)
+		else if (result.mode & MY_S_IFDIR)
 			directories++;
 		else
 			files++;
 	}
-	if (result.status != B_ENTRY_NOT_FOUND)
+	if (result.status != FS_ENTRY_NOT_FOUND)
 		printf("chkbfs: error occured during scan: %s\n", strerror(result.status));
 
 	// stop checking

@@ -9,7 +9,7 @@
 
 #include <KernelExport.h>
 #ifdef USER
-#	include "myfs.h"
+//#	include "myfs.h"
 #	include <stdio.h>
 #endif
 
@@ -186,8 +186,8 @@ class Inode : public CachedBlock {
 			// no implementation
 
 		friend void dump_inode(Inode &inode);
-		friend AttributeIterator;
-		friend InodeAllocator;
+		friend class AttributeIterator;
+		friend class InodeAllocator;
 
 		void Initialize();
 
@@ -283,8 +283,8 @@ class AttributeIterator {
 		void		*fBuffer;
 
 	private:
-		friend Chain<AttributeIterator>;
-		friend Inode;
+		friend class Chain<AttributeIterator>;
+		friend class Inode;
 
 		void Update(uint16 index, int8 change);
 		AttributeIterator *fNext;

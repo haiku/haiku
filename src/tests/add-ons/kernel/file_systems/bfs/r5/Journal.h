@@ -10,7 +10,7 @@
 #include <KernelExport.h>
 
 #ifdef USER
-#	include "myfs.h"
+//#	include "myfs.h"
 #	include <stdio.h>
 #endif
 
@@ -68,7 +68,7 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		friend log_entry;
+		friend struct log_entry;
 
 		static void blockNotify(off_t blockNumber, size_t numBlocks, void *arg);
 		status_t TransactionDone(bool success);

@@ -242,8 +242,8 @@ class BPlusTree {
 		void		RemoveIterator(TreeIterator *iterator);
 
 	private:
-		friend TreeIterator;
-		friend CachedNode;
+		friend struct TreeIterator;
+		friend class CachedNode;
 
 		Inode		*fStream;
 		bplustree_header *fHeader;
@@ -292,8 +292,8 @@ class TreeIterator {
 		bool		fIsFragment;
 
 	private:
-		friend Chain<TreeIterator>;
-		friend BPlusTree;
+		friend class Chain<TreeIterator>;
+		friend class BPlusTree;
 
 		void Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt, int8 change);
 		void Stop();

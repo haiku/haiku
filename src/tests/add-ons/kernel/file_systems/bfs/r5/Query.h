@@ -70,7 +70,7 @@ class Query {
 		int32			fToken;
 
 	private:
-		friend Chain<Query>;
+		friend class Chain<Query>;
 		Query			*fNext;
 };
 
