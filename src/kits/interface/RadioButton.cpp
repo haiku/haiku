@@ -240,6 +240,11 @@ void BRadioButton::MouseDown(BPoint point)
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
 	{
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	}
+	else
+	{
 		BRect bounds = Bounds();
 		uint32 buttons;
 
@@ -273,11 +278,7 @@ void BRadioButton::MouseDown(BPoint point)
 			Flush();
 		}
 	}
-	else
-	{
-		SetTracking(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-	}
+
 }
 //------------------------------------------------------------------------------
 void BRadioButton::AttachedToWindow()
