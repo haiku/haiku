@@ -10,6 +10,11 @@
 #include <arch/x86/descriptors.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 struct tss {
 	uint16 prev_task;
 	uint16 unused0;
@@ -59,7 +64,6 @@ typedef struct pdentry {		// page directory entry
 	unsigned int addr:20;
 } pdentry;
 
-// NOTE: Keep in sync with <os/arch/x86/arch_debugger.h>!
 struct iframe {
 	unsigned int gs;
 	unsigned int fs;
@@ -96,10 +100,10 @@ void i386_switch_stack_and_call(addr_t stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr_t new_pgdir);
 void i386_fsave(void *fpu_state);
 void i386_fxsave(void *fpu_state);
-void i386_frstor(void *fpu_state);
-void i386_fxrstor(void *fpu_state);
-void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state);
-void i386_fxsave_swap(void *old_fpu_state, void *new_fpu_state);
+void i386_frstor(const void *fpu_state);
+void i386_fxrstor(const void *fpu_state);
+void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state);
+void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
 void x86_set_task_gate(int32 n, int32 segment);
 
 #define read_ebp(value) \
@@ -160,5 +164,11 @@ _v; \
 })
 
 extern segment_descriptor *gGDT;
+
+
+#ifdef __cplusplus
+}	// extern "C" {
+#endif
+
 
 #endif	/* _KERNEL_ARCH_x86_CPU_H */

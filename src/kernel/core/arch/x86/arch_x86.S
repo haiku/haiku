@@ -30,19 +30,19 @@ FUNCTION(i386_fxsave):
 	fxsave	(%eax)
 	ret
 
-/* void i386_frstor(void *fpu_state); */
+/* void i386_frstor(const void *fpu_state); */
 FUNCTION(i386_frstor):
 	movl	4(%esp), %eax
 	frstor	(%eax)
 	ret
 
-/* void i386_fxrstor(void *fpu_state); */
+/* void i386_fxrstor(const void *fpu_state); */
 FUNCTION(i386_fxrstor):
 	movl	4(%esp), %eax
 	fxrstor	(%eax)
 	ret
 
-/* void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state); */
+/* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
 FUNCTION(i386_fsave_swap):
 	movl	4(%esp),%eax
 	fsave	(%eax)
@@ -50,7 +50,7 @@ FUNCTION(i386_fsave_swap):
 	frstor	(%eax)
 	ret
 
-/* void i386_fxsave_swap(void *old_fpu_state, void *new_fpu_state); */
+/* void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
 FUNCTION(i386_fxsave_swap):
 	movl	4(%esp),%eax
 	fxsave	(%eax)
