@@ -989,6 +989,7 @@ status_t nv_general_head_select(bool cross)
 static status_t nv_general_bios_to_powergraphics()
 {
 	uint32 agp_ident, agp_stat, agp_cmd;
+	bool agp_1x, agp_2x, agp_4x, agp3_4x, agp3_8x;
 
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
@@ -1130,37 +1131,121 @@ static status_t nv_general_bios_to_powergraphics()
 	/* check for card's AGP capabilities... */
 	agp_ident = CFGR(AGPREF);
 
-	if (agp_ident & 0x00ff0000)
+	if ((agp_ident & 0x00ff0000) && ((agp_ident & 0x000000ff) == 0x02))
 	{
 		LOG(4,("INIT: card is AGP type, supporting specification %d.%d\n",
 			((agp_ident & 0x00f00000) >> 20), ((agp_ident & 0x000f0000) >> 16)));
 
 		/*  ... list them... */
+		agp_1x = agp_2x = agp_4x = agp3_4x = agp3_8x = false;
+		/* try to select AGP 2.0 setup */
+		CFGW(AGPSTAT, (CFGR(AGPSTAT) & 0xfffffff7));
 		agp_stat = CFGR(AGPSTAT);
-		if (agp_stat & 0x00000001) LOG(4,("INIT: AGP 1x mode is supported\n"));
-		if (agp_stat & 0x00000002) LOG(4,("INIT: AGP 2x mode is supported\n"));
-		if (agp_stat & 0x00000004) LOG(4,("INIT: AGP 4x mode is supported\n"));
-		if (agp_stat & 0x00000008) LOG(4,("INIT: AGP 8x mode is supported\n"));
+		if (!(agp_stat & 0x00000008))
+		{
+			/* AGP 2.0 scheme applies */
+			if (agp_stat & 0x00000001)
+			{
+				LOG(4,("INIT: AGP 2.0 1x mode is supported\n"));
+				agp_1x = true;
+			}
+			if (agp_stat & 0x00000002)
+			{
+				LOG(4,("INIT: AGP 2.0 2x mode is supported\n"));
+				agp_2x = true;
+			}
+			if (agp_stat & 0x00000004)
+			{
+				LOG(4,("INIT: AGP 2.0 4x mode is supported\n"));
+				agp_4x = true;
+			}
+		}
+		/* try to select AGP 3.0 setup */
+		CFGW(AGPSTAT, (CFGR(AGPSTAT) | 0x00000008));
+		agp_stat = CFGR(AGPSTAT);
+		if (agp_stat & 0x00000008)
+		{
+			/* AGP 3.0 scheme applies */
+			if (agp_stat & 0x00000001)
+			{
+				LOG(4,("INIT: AGP 3.0 4x mode is supported\n"));
+				agp3_4x = true;
+			}
+			if (agp_stat & 0x00000002)
+			{
+				LOG(4,("INIT: AGP 3.0 8x mode is supported\n"));
+				agp3_8x = true;
+			}
+		}
 		if (agp_stat & 0x00000010) LOG(4,("INIT: fastwrite transfers are supported\n"));
 		if (agp_stat & 0x00000200) LOG(4,("INIT: sideband adressing is supported\n"));
 		LOG(4,("INIT: %d outstanding AGP requests can be handled.\n", ((agp_stat & 0xff000000) >> 24)));
 
 		/* ... and activate them. */
-		if (agp_stat & 0x0000000f)
+		//fixme: only if specified by user in nv.settings!?!
+		//fixme: probably won't work if the MB glue chipset wasn't inited also
+		if (0)
 		{
 			LOG(4,("INIT: enabling AGP\n"));
 
 			/* select highest AGP mode */
-			if (agp_stat & 0x00000008) agp_cmd = 0x00000008;
-			else
-				if (agp_stat & 0x00000004) agp_cmd = 0x00000004;
-				else
-					if (agp_stat & 0x00000002) agp_cmd = 0x00000002;
-					else
-						agp_cmd = 0x00000001;
+			//fixme: from nv.settings !?! for now: testing 2x
+			switch (2)
+			{
+			case 8:
+				if (agp3_8x)
+				{
+					LOG(4,("INIT: using AGP 3.0 8x mode\n"));
+					/* select AGP 3.0 */
+					agp_stat |= 0x00000008;
+					/* select 8x mode */
+					agp_cmd = 0x00000002;
+					break;
+				}
+			case 4:
+				if (agp3_4x)
+				{
+					LOG(4,("INIT: using AGP 3.0 4x mode\n"));
+					/* select AGP 3.0 */
+					agp_stat |= 0x00000008;
+					/* select 4x mode */
+					agp_cmd = 0x00000001;
+					break;
+				}
+				if (agp_4x)
+				{
+					LOG(4,("INIT: using AGP 2.0 4x mode\n"));
+					/* select AGP 2.0 */
+					agp_stat &= 0xfffffff7;
+					/* select 4x mode */
+					agp_cmd = 0x00000004;
+					break;
+				}
+			case 2:
+				if (agp_2x)
+				{
+					LOG(4,("INIT: using AGP 2.0 2x mode\n"));
+					/* select AGP 2.0 */
+					agp_stat &= 0xfffffff7;
+					/* select 2x mode */
+					agp_cmd = 0x00000002;
+					break;
+				}
+			case 1:
+				LOG(4,("INIT: using AGP 2.0 1x mode\n"));
+				/* select AGP 2.0 */
+				agp_stat &= 0xfffffff7;
+				/* select 1x mode */
+				agp_cmd = 0x00000001;
+				break;
+			}
+			CFGW(AGPSTAT, agp_stat);
 
-			/* acticate sideband adressing if supported */
+			/* activate sideband adressing if supported */
 			if (agp_stat & 0x00000200) agp_cmd |= 0x00000200;
+
+			/* activate fast writes if supported */
+			if (agp_stat & 0x00000010) agp_cmd |= 0x00000010;
 
 			/* set request depth: using maximum */
 			agp_cmd |= (agp_stat & 0xff000000);
@@ -1170,7 +1255,7 @@ static status_t nv_general_bios_to_powergraphics()
 		}
 		else
 		{
-			LOG(1,("INIT: AGP status register has illegal content, aborting AGP setup!\n"));
+			LOG(1,("INIT: using card in PCI mode\n"));
 			/* make sure AGP is disabled */
 			agp_cmd = 0;
 		}
