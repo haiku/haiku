@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src kits midi2 ;
+
+UsePrivateHeaders midi ;
+
+UsePublicHeaders midi2 ;
+
+SharedLibrary midi2 :
+	MidiRoster.cpp
+	MidiEndpoint.cpp
+	MidiConsumer.cpp
+	MidiLocalConsumer.cpp
+	MidiProducer.cpp
+	MidiLocalProducer.cpp
+;
+
+LinkSharedOSLibs libmidi2.so :
+	be root
+;
+
