@@ -57,7 +57,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-#define DEBUG_SERVERAPP
+//#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>
@@ -517,7 +517,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<port_id>(&looperPort);
 			msg->ReadString(&title);
 			msg->Read<port_id>(&replyport);
-
+			
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port

@@ -394,7 +394,7 @@ void Layer::MouseTransit(uint32 transit)
 
 void Layer::DoInvalidate(const BRegion &reg, Layer *start){
 //TODO: REMOVE this! For Test purposes only!
-printf("**********Layer::DoInvalidate()\n");
+	STRACE(("**********Layer::DoInvalidate()\n"));
 	if (GetRootLayer())
 		GetRootLayer()->Draw(GetRootLayer()->Bounds());
 	else{
@@ -568,7 +568,7 @@ void Layer::Show(void)
 	_hidden		= false;
 
 //TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-printf("**********Layer::Show()\n");
+STRACE(("**********Layer::Show()\n"));
 		DoInvalidate(BRegion(Bounds()), NULL);
 	return;
 //----------------
@@ -596,7 +596,7 @@ void Layer::Hide(void)
 	_hidden			= true;
 
 //TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-printf("**********Layer::Hide()\n");
+STRACE(("**********Layer::Hide()\n"));
 		DoInvalidate(BRegion(Bounds()), NULL);
 	return;
 //----------------

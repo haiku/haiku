@@ -49,7 +49,7 @@
 
 // toggle
 //#define DEBUG_WINBORDER_MOUSE
-//#define DEBUG_WINBORDER_CLICK
+#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
 #	include <stdio.h>
@@ -95,31 +95,33 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fMainWinBorder	= NULL;
 	_decorator		= NULL;
 
-	if (feel == B_NO_BORDER_WINDOW_LOOK){
+	if (feel == B_NO_BORDER_WINDOW_LOOK)
+	{
 		_full			= _win->fTopLayer->_full;
 		fDecFull		= NULL;
 		fDecFullVisible	= NULL;
 		fDecVisible		= NULL;
 	}
-	else{
+	else
+	{
 		_decorator		= new_decorator(r, name, look, feel, flags, fDriver);
 		fDecFull		= new BRegion();
 		fDecVisible		= new BRegion();
 		fDecFullVisible	= fDecVisible;
 
 		_decorator->GetFootprint( fDecFull );
-
-			// our full region is the union between decorator's region and fTopLayer's region
+		
+		// our full region is the union between decorator's region and fTopLayer's region
 		_full			= _win->fTopLayer->_full;
 		_full.Include( fDecFull );
 	}
 
-		// get a token
-	_view_token		= border_token_handler.GetToken();
+	// get a token
+	_view_token	= border_token_handler.GetToken();
 
-STRACE(("WinBorder %s:\n",GetName()));
-STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
-STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
+	STRACE(("WinBorder %s:\n",GetName()));
+	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
+	STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
 
 WinBorder::~WinBorder(void)
@@ -138,30 +140,37 @@ STRACE(("WinBorder %s:~WinBorder()\n",GetName()));
 	}
 }
 
-void WinBorder::MouseDown(int8 *buffer)
+void WinBorder::MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers)
 {
-	// Buffer data:
-	// 1) int64 - time of mouse click
-	// 2) float - x coordinate of mouse click
-	// 3) float - y coordinate of mouse click
-	// 4) int32 - modifier keys down
-	// 5) int32 - buttons down
-	// 6) int32 - clicks
-	int8	*index		= buffer;			index+=sizeof(int64);
-	float	x			= *((float*)index);	index+=sizeof(float);
-	float	y			= *((float*)index);	index+=sizeof(float);
-	int32	modifiers	= *((int32*)index);	index+=sizeof(int32);
-	int32	buttons		= *((int32*)index);
-
-	BPoint	pt(x,y);
-
-		// user clicked on decorator
-	if (fDecFullVisible->Contains(pt)){
+	// user clicked on decorator
+	if (fDecFullVisible->Contains(pt))
+	{
 		click_type	click;
-// TODO: modify this!!! _decorator->MouseDown(...);
-		click		= _decorator->Clicked(pt, buttons, modifiers);
+		click = _decorator->Clicked(pt, buttons, modifiers);
 		
-		switch(click){
+		switch(click)
+		{
+			case DEC_CLOSE:
+			{
+				STRACE_CLICK(("WinBorder: Push Close Button\n"));
+				_decorator->SetClose(true);
+				_decorator->DrawClose();
+				break;
+			}
+			case DEC_ZOOM:
+			{
+				STRACE_CLICK(("WinBorder: Push Zoom Button\n"));
+				_decorator->SetZoom(true);
+				_decorator->DrawZoom();
+				break;
+			}
+			case DEC_MINIMIZE:
+			{
+				STRACE_CLICK(("WinBorder: Push Close Button\n"));
+				_decorator->SetMinimize(true);
+				_decorator->DrawMinimize();
+				break;
+			}
 			case DEC_MOVETOBACK:
 			{
 				STRACE_CLICK(("WinBorder: MoveToBack\n"));
@@ -175,53 +184,75 @@ void WinBorder::MouseDown(int8 *buffer)
 			}
 		}
 	}
-		// user clicked in window's area
-	else{
+	// user clicked in window's area
+	else
+	{
 		STRACE_CLICK(("WinBorder: MoveToFront 2\n"));
 		bool		sendMessage = true;
 
-		if (1 /* TODO: uncomment: ActiveLayer() != this*/){
+		if (1 /* TODO: uncomment: ActiveLayer() != this*/)
+		{
 			MoveToFront();
 			if (0 /* B_FIRST_CLICK? what's the name of that flaaaag ??? */){
 				sendMessage = false;
 			}
 		}
 
-		if (sendMessage){
-			BMessage		msg;
-								// a tweak for converting a point into local coords. :-)
-			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
-			msg.what		= B_MOUSE_DOWN;
-			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->fTopLayer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
-			msg.AddInt32("modifiers", modifiers);
-			msg.AddInt32("buttons", buttons);
-			msg.AddInt32("clicks", 1);
-			
-			_win->SendMessageToClient( &msg );
+		if (sendMessage)
+		{
+			Layer *targetLayer=_win->fTopLayer->LayerAt(pt);
+			if(targetLayer)
+			{
+				BMessage		msg;
+
+				// a tweak for converting a point into local coords. :-)
+				BRect helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
+				msg.what = B_MOUSE_DOWN;
+				msg.AddInt64("when", real_time_clock_usecs());
+				msg.AddPoint("where", (targetLayer->ConvertFromTop(helpRect)).LeftTop() );
+				msg.AddInt32("modifiers", modifiers);
+				msg.AddInt32("buttons", buttons);
+				msg.AddInt32("clicks", 1);
+				
+				_win->SendMessageToClient( &msg );
+			}
 		}
 	}
 		// this is important to determine how much we should resize or move the Layer(WinBorder)(window)	
 	fLastMousePosition		= pt;
 }
 
-void WinBorder::MouseMoved(int8 *buffer)
+void WinBorder::MouseMoved(const BPoint &pt, const int32 &buttons)
 {
 	// Buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - buttons down
-	int8	*index		= buffer; 			index+=sizeof(int64);
-	float	x			= *((float*)index);	index+=sizeof(float);
-	float	y			= *((float*)index);	index+=sizeof(float);
-	int32	buttons		= *((int32*)index);
-
-	BPoint pt(x,y);
-// TODO: modify this!!! _decorator->MouseMoved(...);
-	click_type action	= _decorator->Clicked(pt, _mbuttons, _kmodifiers);
-
-	switch (action){
+	
+	click_type action = _decorator->Clicked(pt, _mbuttons, _kmodifiers);
+	
+	
+	// If the user clicked a button and then moused away without lifting the button,
+	// we don't want to trigger the button. Instead, we reset it to its original up state
+	if(_decorator->GetClose() && action!=DEC_CLOSE)
+	{
+		_decorator->SetClose(false);
+		_decorator->DrawClose();
+	}
+	if(_decorator->GetZoom() && action!=DEC_ZOOM)
+	{
+		_decorator->SetZoom(false);
+		_decorator->DrawZoom();
+	}
+	if(_decorator->GetMinimize() && action!=DEC_MINIMIZE)
+	{
+		_decorator->SetMinimize(false);
+		_decorator->DrawMinimize();
+	}
+	
+	switch (action)
+	{
 		case DEC_DRAG:
 		{
 			STRACE_CLICK(("WinBorder: Drag\n"));
@@ -240,11 +271,13 @@ void WinBorder::MouseMoved(int8 *buffer)
 			ResizeBy( difference.x, difference.y );
 			break;
 		}
-		default:{
-			BMessage		msg;
-											// a tweak for converting a point into local coords. :-)
-			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
-			msg.what		= B_MOUSE_MOVED;
+		default:
+		{
+			BMessage msg;
+			
+			// a tweak for converting a point into local coords. :-)
+			BRect helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
+			msg.what = B_MOUSE_MOVED;
 			msg.AddInt64("when", real_time_clock_usecs());
 			msg.AddPoint("where", (_win->fTopLayer->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("buttons", buttons);
@@ -252,69 +285,82 @@ void WinBorder::MouseMoved(int8 *buffer)
 			_win->SendMessageToClient( &msg );
 		}
 	}
-		// this is important to determine how much we should resize or move the Layer(WinBorder)(window)
+	// this is important to determine how much we should resize or move the 
+	// Layer(WinBorder)(window)
 	fLastMousePosition		= pt;
 }
 
-void WinBorder::MouseUp(int8 *buffer)
+void WinBorder::MouseUp(const BPoint &pt, const int32 &modifiers)
 {
-STRACE_MOUSE(("WinBorder %s: MouseUp() \n",GetName()));
+	STRACE_MOUSE(("WinBorder %s: MouseUp() \n",GetName()));
+	
 	// buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - modifier keys down
-	int8	*index		= buffer;			index+=sizeof(int64);
-	float	x			= *((float*)index);	index+=sizeof(float);
-	float	y			= *((float*)index);	index+=sizeof(float);
-	int32	modifiers	= *((int32*)index);
-	
-	BPoint pt(x,y);
-// TODO: modify this!!! _decorator->MouseUp(...);
+
 	click_type action	=_decorator->Clicked(pt, _mbuttons, _kmodifiers);
 
-	switch (action){
+	switch (action)
+	{
 		case DEC_CLOSE:
 		{
 			STRACE_CLICK(("WinBorder: Close\n"));
-			/* NOTE: I think you better put this code in... ServerWindow::Close()
-			 *	and call that here!!!
-			 *	SW::Close() must send B_QUIT_REQUESTED and wait for an answer first.
-			 */
-
-			RemoveSelf();
-			delete this;
+			
+			if(_decorator->GetClose())
+			{
+				_decorator->SetClose(false);
+				_decorator->DrawClose();
+				
+				BMessage msg(B_QUIT_REQUESTED);
+				_win->SendMessageToClient(&msg);
+			}
 			break;
 		}
 		case DEC_ZOOM:
 		{
 			STRACE_CLICK(("WinBorder: Zoom\n"));
-			/* NOTE: I think you better put this code in... ServerWindow::Zoom()
-			 *	and call that here!!!
-			 */
-			// TODO: implement
-			// if (actual_coods != max_zoom_coords)
-			// MoveBy(X, Y);
-			// ResizeBy(X, Y);
-			// TODO: send B_ZOOM to client;
+
+			if(_decorator->GetZoom())
+			{
+				_decorator->SetZoom(false);
+				_decorator->DrawZoom();
+				
+				BMessage msg(B_ZOOM);
+				_win->SendMessageToClient(&msg);
+			}
 			break;
 		}
 		case DEC_MINIMIZE:
 		{
 			STRACE_CLICK(("WinBoder: Minimize\n"));
-			_win->Minimize(true);
+			if(_decorator->GetMinimize())
+			{
+				_decorator->SetMinimize(false);
+				_decorator->DrawMinimize();
+				
+				BMessage msg(B_MINIMIZE);
+				_win->SendMessageToClient(&msg);
+			}
 			break;
 		}
-		default:{
-			BMessage		msg;
-								// a tweak for converting a point into local coords. :-)
-			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
-			msg.what		= B_MOUSE_UP;
-			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->fTopLayer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
-			msg.AddInt32("modifiers", modifiers);
-			
-			_win->SendMessageToClient( &msg );
+		default:
+		{
+			Layer *targetLayer=_win->fTopLayer->LayerAt(pt);
+			if(targetLayer)
+			{
+				BMessage msg;
+				
+				// a tweak for converting a point into local coords. :-)
+				BRect helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
+				msg.what = B_MOUSE_UP;
+				msg.AddInt64("when", real_time_clock_usecs());
+				msg.AddPoint("where", (targetLayer->ConvertFromTop(helpRect)).LeftTop() );
+				msg.AddInt32("modifiers", modifiers);
+				
+				_win->SendMessageToClient( &msg );
+			}
 		}
 	}
 }
@@ -414,9 +460,9 @@ void WinBorder::RebuildRegions( const BRect& r ){
 void WinBorder::Draw(const BRect &r)
 {
 //TODO: REMOVE this! For Test purposes only!
-printf("*WinBorder(%s)::Draw()\n", GetName());
-		_decorator->Draw();
-printf("#WinBorder(%s)::Draw() ENDED\n", GetName());
+	STRACE(("*WinBorder(%s)::Draw()\n", GetName()));
+	_decorator->Draw();
+	STRACE(("#WinBorder(%s)::Draw() ENDED\n", GetName()));
 	return;
 //----------------
 
@@ -736,9 +782,9 @@ void WinBorder::AddToSubsetOf(WinBorder* main){
 			RootLayer		*rl = main->GetRootLayer();
 
 			desktop->fGeneralLock.Lock();
-printf("WinBorder(%s)::AddToSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName());
+			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
 			rl->fMainLock.Lock();
-printf("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName());
+			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
 
 			for(int32 i = 0; i < rl->WorkspaceCount(); i++){
 				Workspace	*ws = rl->WorkspaceAt(i+1);
@@ -747,9 +793,9 @@ printf("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), mai
 			}
 
 			rl->fMainLock.Unlock();
-printf("WinBorder(%s)::AddToSubsetOf(%s) - Main lock released\n", GetName(), main->GetName());
+			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
 			desktop->fGeneralLock.Unlock();
-printf("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), main->GetName());
+			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
 		}
 	}
 }
@@ -758,9 +804,9 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main){
 	RootLayer		*rl = main->GetRootLayer();
 
 	desktop->fGeneralLock.Lock();
-printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName());
+	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
 	rl->fMainLock.Lock();
-printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName());
+	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
 		// remove from main window's subset list.
 	if(main->Window()->fWinFMWList.RemoveItem(this)){
 		int32	count = main->GetRootLayer()->WorkspaceCount();
@@ -776,9 +822,9 @@ printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName()
 	fMainWinBorder	= NULL;
 
 	rl->fMainLock.Unlock();
-printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName());
+	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
 	desktop->fGeneralLock.Unlock();
-printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName());
+	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
 }
 //---------------------------------------------------------------------------
 void WinBorder::PrintToStream(){

@@ -38,7 +38,7 @@
 #include "RootLayer.h"
 #include "Desktop.h"
 
-#define DEBUG_WORKSPACE
+//#define DEBUG_WORKSPACE
 
 #ifdef DEBUG_WORKSPACE
 #	include <stdio.h>
@@ -167,14 +167,14 @@ STRACESTREAM();
 		
 		RemoveItem(item);
 		delete item;
-STRACESTREAM();		
+		STRACESTREAM();		
 		opLock.Unlock();
 
 			// reset some internal variables
 		layer->SetMainWinBorder(NULL);
 		// its RootLayer is set to NULL by Layer::RemoveChild(layer);
 
-printf("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID());
+		STRACE(("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID()));
 
 		if (wasFocus)
 			SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
@@ -184,7 +184,7 @@ printf("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), I
 		return true;
 	}
 	else{
-printf("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID());
+		STRACE(("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID()));
 		opLock.Unlock();
 		return false;
 	}
@@ -337,11 +337,11 @@ WinBorder* Workspace::SearchLayerUnderPoint(BPoint pt){
 // For the moment, take windows from front to back and see in witch one 'pt' falls
 	WinBorder		*target = NULL;
 	opLock.Lock();
-printf("Searching (%f,%f) in...\n", pt.x, pt.y);
+	STRACE(("Searching (%f,%f) in...\n", pt.x, pt.y));
 	for( WinBorder *wb = GoToBottomItem(); wb; wb = GoToUpperItem()){
-wb->PrintToStream();
+//		wb->PrintToStream();
 		if (!wb->IsHidden() && wb->HasPoint(pt)){
-printf("%s - SELECTED!\n", wb->GetName());
+			STRACE(("%s - SELECTED!\n", wb->GetName()));
 			target	= wb;
 			break;
 		}
@@ -461,7 +461,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 	while(pref && item->lowerItem != pref && (pref->upperItem || pref->lowerItem)){
 		if ( !(item->layerPtr->Window()->Flags() & B_AVOID_FRONT) && !(item->layerPtr->IsHidden()) )
 			break;
-printf("item: %s - pref: %s\n", item->layerPtr->GetName(), pref->layerPtr->GetName());
+		STRACE(("item: %s - pref: %s\n", item->layerPtr->GetName(), pref->layerPtr->GetName()));
 		if (item == fTopItem)
 			item = fBottomItem;
 		else
@@ -612,10 +612,10 @@ STRACE(("#WS(%ld)::SASNF(%s) ENDED 2\n", ID(), preferred? preferred->GetName(): 
 	}
 
 if(!lastInserted){
-	printf("PAAAAANIC: Workspace::SASNF(): 'lastInserted' IS NULL\n");	
+	STRACE(("PAAAAANIC: Workspace::SASNF(): 'lastInserted' IS NULL\n"));	
 }
 else{
-	printf("\n&&&&Processing for: %s\n", lastInserted->layerPtr->GetName());
+	STRACE(("\n&&&&Processing for: %s\n", lastInserted->layerPtr->GetName()));
 }
 
 	if (lastInserted && !(lastInserted->layerPtr->IsHidden())){
@@ -987,7 +987,7 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 		}
 		else{
 			// We ***should NOT*** reach this point!
-			printf("SERVER: PANIC: \"%s\": What kind of window is this???\n", preferred? preferred->GetName(): "NULL");
+			STRACE(("SERVER: PANIC: \"%s\": What kind of window is this???\n", preferred? preferred->GetName(): "NULL"));
 		}
 	}
 	else

@@ -322,9 +322,14 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 
 			BPoint		pt;
 			int64		dummy;
+			int32 mod;
+			int32 buttons;
+			
 			msg->Read<int64>(&dummy);
 			msg->Read<float>(&pt.x);
 			msg->Read<float>(&pt.y);
+			msg->Read<int32>(&mod);
+			msg->Read<int32>(&buttons);
 
 //			printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
 			
@@ -340,7 +345,9 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 
 				ws->SearchAndSetNewFront(target);
 				ws->SetFocusLayer(target);
-
+				
+				target->MouseDown(pt,buttons,mod);
+				
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();
 			}
@@ -353,12 +360,19 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - modifier keys down
 
-			BPoint		pt;
-			int64		dummy;
+			BPoint pt;
+			int64 dummy;
+			int32 mod;
+			
 			msg->Read<int64>(&dummy);
 			msg->Read<float>(&pt.x);
 			msg->Read<float>(&pt.y);
-
+			msg->Read<int32>(&mod);
+			
+			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchLayerUnderPoint(pt);
+			if(target)
+				target->MouseUp(pt,mod);
+			
 //			printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
 
 			break;
@@ -371,16 +385,25 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			// 4) int32 - buttons down
 			int64 dummy;
 			float x,y;
+			int32 buttons;
+			
 			msg->Read<int64>(&dummy);
 			msg->Read<float>(&x);
 			msg->Read<float>(&y);
+			msg->Read<int32>(&buttons);
 			
 			// We need this so that we can see the cursor on the screen
 			if(fActiveScreen)
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
+			
+			BPoint pt;
+			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchLayerUnderPoint(pt);
+			if(target)
+				target->MouseMoved(pt,buttons);
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:{
+			// TODO: Later on, this will need to be passed onto the client ServerWindow
 			break;
 		}
 		default:{

@@ -48,7 +48,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
