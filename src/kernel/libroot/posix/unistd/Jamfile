@@ -25,6 +25,7 @@ KernelMergeObject posix_unistd.o :
 	sbrk.c
 	sleep.c
 	sync.c
+	system.cpp
 	terminal.c
 	truncate.c
 	ttyname.c
