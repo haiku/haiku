@@ -6,6 +6,9 @@
 #include <TestCase.h>
 #include <TestShell.h>
 
+#define TEXT_MIME_STRING "text/plain"
+#define STXT_MIME_STRING "text/x-vnd.Be-stxt"
+
 class CppUnit::Test;
 
 class STXTTranslatorTest : public BTestCase {
@@ -22,10 +25,10 @@ public:
 	// Test functions
 	//------------------------------------------------------------
 #if !TEST_R5
-
+	void LoadAddOnTest();
 #endif
-
-	void DummyTest();
+	void IdentifyTest();
+	void TranslateTest();
 };
 
 #endif	// STXT_TRANSLATOR_TEST_H
