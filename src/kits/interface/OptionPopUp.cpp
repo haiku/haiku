@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//	Copyright (c) 2003 Stefano Ceccherini
+//	Copyright (c) 2003-2004 Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,6 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		OptionPopUp.cpp
+//	Author:			Stefano Ceccherini (burton666@libero.it)
 //	Description:	An option like control.  
 //------------------------------------------------------------------------------
 #include <MenuField.h>
@@ -173,9 +174,13 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 		
 		BMessage *message = MakeValueMessage(value);
 		if (message == NULL)
-			return B_ERROR;	
+			return B_ERROR;	// TODO: Should return B_NO_MEMORY instead ?
 		
 		BMenuItem *newItem = new BMenuItem(name, message);
+		if (newItem == NULL) {
+			delete message;
+			return B_ERROR; // TODO: same as above
+		}
 		menu->AddItem(newItem, index);
 		
 		// We didnt' have any items before, so select the newly added one
@@ -233,6 +238,7 @@ BOptionPopUp::SetValue(int32 value)
 {
 	BControl::SetValue(value);
 	BMenu *menu = _mField->Menu();
+
 	int32 numItems = menu->CountItems();
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = menu->ItemAt(i);
@@ -272,6 +278,7 @@ BOptionPopUp::SetEnabled(bool state)
 void
 BOptionPopUp::GetPreferredSize(float *width, float *height)
 {
+	// Calculate control's height, looking at the BMenuField font's height
 	font_height fontHeight;
 	_mField->GetFontHeight(&fontHeight);		
 	
@@ -283,7 +290,9 @@ BOptionPopUp::GetPreferredSize(float *width, float *height)
 	BMenu *menu = _mField->Menu();
 	if (menu == NULL)
 		return;
-		
+	
+	// Iterate over all the entries in the control,
+	// and take the maximum width.
 	int32 numItems = menu->CountItems();	
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = menu->ItemAt(i);
@@ -305,7 +314,8 @@ void
 BOptionPopUp::ResizeToPreferred()
 {
 	// TODO: Some more work is needed either here or in GetPreferredSize(),
-	// since the control doesnt' always resize as it should.
+	// since the control doesn't always resize as it should.
+	// It looks like if the font height is too big, the control gets "cut".
 	float width, height;
 	GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
@@ -330,7 +340,7 @@ BOptionPopUp::SelectedOption(const char **outName, int32 *outValue) const
 			if (outName != NULL)
 				*outName = marked->Label();
 			if (outValue != NULL)
-				*outValue = marked->Message()->FindInt32("be:value", outValue);
+				marked->Message()->FindInt32("be:value", outValue);
 			
 			return menu->IndexOf(marked);
 		}
