@@ -813,7 +813,7 @@ rule ResComp
 
 actions ResComp1
 {
-	$(2[1]) -o $(1:S=) $(2[2-])
+	$(2[1]) -o $(1) $(2[2-])
 }
 
 rule SourceHdrs
