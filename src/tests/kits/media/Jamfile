@@ -13,4 +13,6 @@ SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
 SubInclude OBOS_TOP src tests kits media notificationtest ;
 SubInclude OBOS_TOP src tests kits media nodetest ;
 SubInclude OBOS_TOP src tests kits media playwav ;
+SubInclude OBOS_TOP src tests kits media mp3_reader_test ;
+SubInclude OBOS_TOP src tests kits media wav_reader_test ;
 

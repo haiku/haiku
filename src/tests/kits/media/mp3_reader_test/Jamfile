@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src tests kits media mp3_reader_test ;
+
+UsePrivateHeaders media ;
+
+SimpleTest mp3_reader_test
+	: main.cpp
+	FileDataIO.cpp
+	MediaPlugin.cpp
+	ReaderPlugin.cpp
+	MP3ReaderPlugin.cpp
+	: media be root
+;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles MP3ReaderPlugin.cpp ]
+	= [ FDirName $(OBOS_TOP) src add-ons media plugins mp3_reader ] ;
+
+SEARCH on [ FGristFiles MediaPlugin.cpp ReaderPlugin.cpp ]
+	= [ FDirName $(OBOS_TOP) src kits media ] ;
