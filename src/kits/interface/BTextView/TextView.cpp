@@ -29,7 +29,7 @@
 // TODOs: 
 // - Finish documenting this class
 // - Consider using BObjectList instead of BList
-// 	 for disallowed charachters (it would remove a lot of reinterpret_casts)
+// 	 for disallowed characters (it would remove a lot of reinterpret_casts)
 // - Asynchronous mouse tracking
 // - Check for correctness and possible optimizations the calls to Refresh(),
 // 	 to refresh only changed parts of text (currently we often redraw the whole text)
@@ -40,7 +40,8 @@
 //	 Could be a different handling of Lock/UnlockWidthBuffer() between R5 and us; if it's
 //	 the case, it should disappear as soon as we use our libraries for everything.	
 // - Double buffering doesn't work well (disabled by default too)
-// - Text inputted using the inline input method isn't highlighted if it spans over multiple lines
+// - Text inputted using the inline input method isn't highlighted correctly
+// 	if it spans over multiple lines
 
 #include <cstdlib>
 #include <cstdio>
@@ -130,7 +131,7 @@ sem_id BTextView::sWidthSem = B_BAD_SEM_ID;
 int32 BTextView::sWidthAtom = 0;
 #endif
 
-const static rgb_color kBlackColor = { 0, 0, 0, 255 };
+const static rgb_color kBlackColor = { 0, 0, 0 };
 const static rgb_color kBlueInputColor = { 152, 203, 255 };			
 const static rgb_color kRedInputColor = { 255, 152, 152 };	
 															
@@ -310,6 +311,7 @@ BTextView::BTextView(BMessage *archive)
 BTextView::~BTextView()
 {
 	CancelInputMethod();
+	StopMouseTracking();
 	DeleteOffscreen();
 
 	delete fText;
@@ -435,16 +437,6 @@ BTextView::Draw(BRect updateRect)
 	int32 endLine = LineAt(BPoint(0.0f, updateRect.bottom));
 
 	DrawLines(startLine, endLine);
-	
-	// draw the caret/hilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (fCaretVisible)
-				DrawCaret(fSelStart);
-		}
-	}
 }
 
 
@@ -635,6 +627,11 @@ BTextView::MouseUp(BPoint where)
 void
 BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
+	// Check if it's a "click'n'move
+	// TODO: Currently always returns false
+	if (PerformMouseMoved(where, code))
+		return;
+		
 	bool sync = false;
 	switch (code) {
 		// We force a sync when the mouse enters the view
@@ -699,7 +696,7 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 	
 	const char keyPressed = bytes[0];
 
-	// if the charachter is not allowed, bail out.
+	// if the character is not allowed, bail out.
 	if (fDisallowedChars
 		&& fDisallowedChars->HasItem(reinterpret_cast<void *>((uint32)keyPressed))) {
 		beep();
@@ -814,11 +811,11 @@ BTextView::MessageReceived(BMessage *message)
 	CALLED();
 	// was this message dropped?
 	if (message->WasDropped()) {	
-		BPoint offset;	
-		BPoint dropLocation = message->DropPoint(&offset);
-		ConvertFromScreen(&dropLocation);
-		ConvertFromScreen(&offset);
-		if (!MessageDropped(message, dropLocation, offset))
+		BPoint dropOffset;	
+		BPoint dropPoint = message->DropPoint(&dropOffset);
+		ConvertFromScreen(&dropPoint);
+		ConvertFromScreen(&dropOffset);
+		if (!MessageDropped(message, dropPoint, dropOffset))
 			BView::MessageReceived(message);
 		
 		return;
@@ -889,48 +886,41 @@ BTextView::MessageReceived(BMessage *message)
 			BMessage specifier;
 			const char *property;
 
-			if (message->GetCurrentSpecifier(NULL, &specifier) != B_OK ||
-				specifier.FindString("property", &property) != B_OK)
+			if (message->GetCurrentSpecifier(NULL, &specifier) < B_OK ||
+				specifier.FindString("property", &property) < B_OK)
 				return;
 
 			if (propInfo.FindMatch(message, 0, &specifier, specifier.what,
-				property) == B_ERROR) {
+				property) < B_OK) {
 				BView::MessageReceived(message);
 				break;
 			}
 
-			switch(message->what) {
-			
+			switch(message->what) {		
 				case B_GET_PROPERTY:
 				{
 					BMessage reply;
-
 					GetProperty(&specifier, specifier.what, property, &reply);
-
 					message->SendReply(&reply);
-
 					break;
 				}
+				
 				case B_SET_PROPERTY:
 				{
 					BMessage reply;
-
 					SetProperty(&specifier, specifier.what, property, &reply);
-
 					message->SendReply(&reply);
-
 					break;
 				}
+				
 				case B_COUNT_PROPERTIES:
 				{
 					BMessage reply;
-
-					CountProperties(&specifier, specifier.what, property, &reply);
-					
+					CountProperties(&specifier, specifier.what, property, &reply);	
 					message->SendReply(&reply);
-
 					break;
 				}
+				
 				default:
 					break;
 			}
@@ -1156,13 +1146,10 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 {
 	CALLED();
 	
-	if (!fEditable)
-		return;
-
 	CancelInputMethod();
 	
 	// do we really need to do anything?
-	if (inLength < 1)
+	if (!fEditable || inLength < 1)
 		return;
 	
 	// hide the caret/unhilite the selection
@@ -1201,7 +1188,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 }
 
 
-/*! \brief Deletes the selected text.
+/*! \brief Deletes the text within the current selection.
 */
 void
 BTextView::Delete()
@@ -1289,9 +1276,9 @@ BTextView::GetText(int32 offset, int32 length, char *buffer) const
 }
 
 
-/*! \brief Returns the charachter at the given offset.
-	\param offset The offset of the wanted charachter.
-	\return The charachter at the given offset.
+/*! \brief Returns the character at the given offset.
+	\param offset The offset of the wanted character.
+	\return The character at the given offset.
 */
 uchar
 BTextView::ByteAt(int32 offset) const
@@ -1592,16 +1579,6 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 
 	CancelInputMethod();
 	
-	// hide the caret/unhilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (fCaretVisible)
-				InvertCaret();
-		}
-	}
-	
 	BFont newFont = *inFont;
 	NormalizeFont(&newFont);
 	
@@ -1615,16 +1592,6 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 	else
 		// the line breaks wont change, simply redraw
 		DrawLines(LineAt(fSelStart), LineAt(fSelEnd), fSelStart, true);
-	
-	// draw the caret/hilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (!fCaretVisible)
-				InvertCaret();
-		}
-	}
 }
 
 
@@ -1638,16 +1605,6 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 	if (!fEditable)
 		return;
 
-	// hide the caret/unhilite the selection
-	if (fActive) {
-		if (startOffset != endOffset)
-			Highlight(startOffset, endOffset);
-		else {
-			if (fCaretVisible)
-				InvertCaret();
-		}
-	}
-	
 	BFont newFont = *inFont;
 	NormalizeFont(&newFont);
 	
@@ -1662,15 +1619,6 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 		// the line breaks wont change, simply redraw
 		DrawLines(LineAt(startOffset), LineAt(endOffset), startOffset, true);
 	
-	// draw the caret/hilite the selection
-	if (fActive) {
-		if (startOffset != endOffset)
-			Highlight(startOffset, endOffset);
-		else {
-			if (!fCaretVisible)
-				InvertCaret();
-		}
-	}
 }
 
 
@@ -1776,8 +1724,8 @@ BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 }
 
 
-/*! \brief Returns the line number for the charachter at the given offset.
-	\param offset The offset of the wanted charachter.
+/*! \brief Returns the line number for the character at the given offset.
+	\param offset The offset of the wanted character.
 	\return A line number.
 */
 int32
@@ -1798,11 +1746,11 @@ BTextView::LineAt(BPoint point) const
 }
 
 
-/*! \brief Returns the location of the charachter at the given offset.
-	\param inOffset The offset of the charachter.
-	\param outHeight Here the function will put the height of the charachter at the
+/*! \brief Returns the location of the character at the given offset.
+	\param inOffset The offset of the character.
+	\param outHeight Here the function will put the height of the character at the
 	given offset.
-	\return A BPoint which is the location of the charachter.
+	\return A BPoint which is the location of the character.
 */
 BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
@@ -1923,7 +1871,7 @@ BTextView::OffsetAt(BPoint point) const
 
 	// TODO: The following code chokes on TABs.
 	// we should do something like the part after the #else, but
-	// multi-byte charachters safe.
+	// multi-byte characters safe.
 #if 1
 	int32 offset = line->offset;
 	int32 limit = (line + 1)->offset;
@@ -2212,8 +2160,8 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 }
 
 
-/*! \brief Scrolls the text so that the charachter at "inOffset" is within the visible range.
-	\param inOffset The offset of the charachter.
+/*! \brief Scrolls the text so that the character at "inOffset" is within the visible range.
+	\param inOffset The offset of the character.
 */
 void
 BTextView::ScrollToOffset(int32 inOffset)
@@ -2234,9 +2182,9 @@ BTextView::ScrollToOffset(int32 inOffset)
 }
 
 
-/*! \brief Scrolls the text so that the charachter which begins the current selection
+/*! \brief Scrolls the text so that the character which begins the current selection
 		is within the visible range.
-	\param inOffset The offset of the charachter.
+	\param inOffset The offset of the character.
 */
 void
 BTextView::ScrollToSelection()
@@ -2291,7 +2239,7 @@ BTextView::TextRect() const
 }
 
 
-/*! \brief Sets whether the BTextView accepts multiple charachter styles.
+/*! \brief Sets whether the BTextView accepts multiple character styles.
 */
 void
 BTextView::SetStylable(bool stylable)
@@ -2477,9 +2425,9 @@ BTextView::MaxBytes() const
 
 
 /*! \brief Adds the given char to the disallowed chars list.
-	\param aChar The charachter to add to the list.
+	\param aChar The character to add to the list.
 
-	After this function returns, the given charachter won't be accepted
+	After this function returns, the given character won't be accepted
 	by the textview anymore.
 */
 void
@@ -2493,8 +2441,8 @@ BTextView::DisallowChar(uint32 aChar)
 }
 
 
-/*! \brief Removes the given charachter from the disallowed list.
-	\param aChar The charachter to remove from the list.
+/*! \brief Removes the given character from the disallowed list.
+	\param aChar The character to remove from the list.
 */
 void
 BTextView::AllowChar(uint32 aChar)
@@ -2804,6 +2752,7 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	if (!fEditable || inLength < 1)
 		return;
 	
+	// TODO: Pin offset/lenght
 	// add the text to the buffer
 	fText->InsertText(inText, inLength, inOffset);
 	
@@ -3173,8 +3122,8 @@ BTextView::HandlePageKey(uint32 inPageKey)
 
 		case B_END:
 			// If we are on the last line, just go to the last
-			// charachter in the buffer, otherwise get the starting
-			// offset of the next line, and go to the previous charachter
+			// character in the buffer, otherwise get the starting
+			// offset of the next line, and go to the previous character
 			if (CurrentLine() + 1 < fLines->NumLines()) {
 				line = (*fLines)[CurrentLine() + 1];
 				fClickOffset = PreviousInitialByte(line->offset);
@@ -3251,7 +3200,7 @@ BTextView::HandlePageKey(uint32 inPageKey)
 
 
 /*! \brief Called when an alphanumeric key is pressed.
-	\param bytes The string or charachter associated with the key.
+	\param bytes The string or character associated with the key.
 	\param numBytes The amount of bytes containes in "bytes".
 */
 void
@@ -3314,7 +3263,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	ASSERT(Window() != NULL);
 	if (!Window())
 		return;
-		
+	
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
 	int32 toLine = LineAt(toOffset);
@@ -3373,7 +3322,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	if (scroll)
 		ScrollToOffset(fSelEnd);
 
-	Flush(); ////
+	Flush();
 }
 
 
@@ -3760,7 +3709,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
 		
 		view->FillRect(eraseRect, B_SOLID_LOW);
-
+					
 		eraseRect = clipRect;
 	}
 	
@@ -3818,14 +3767,19 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 					if (fInline && fInline->IsActive()) {
 						int32 inlineOffset = fInline->Offset();
 						int32 inlineLength = fInline->Length();
-						if (inlineOffset >= offset &&
-								inlineOffset + inlineLength <= offset + length) {
+						if (offset <= inlineOffset + inlineLength &&
+								offset + length >= inlineOffset + inlineLength) {		
+							BPoint leftTop;
+							if (offset > inlineOffset)
+								leftTop = PointAt(offset);
+							else
+								leftTop = PointAt(inlineOffset);
 							
 							float height;
 							BPoint rightBottom = PointAt(inlineOffset + inlineLength, &height);
 							rightBottom.y += height;
-							BRect rect(PointAt(inlineOffset), rightBottom);
-															
+							BRect rect(leftTop, rightBottom);
+							
 							view->PushState();	
 							
 							// Highlight in blue the inputted text
@@ -3871,8 +3825,15 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	}
 
 	// TODO: Maybe this fits better into "BTextView::Refresh()"
-	if (fSelStart != fSelEnd && fSelectable)
-		Highlight(fSelStart, fSelEnd);
+	// draw the caret/hilite the selection
+	if (fActive) {
+		if (fSelStart != fSelEnd && fSelectable)
+			Highlight(fSelStart, fSelEnd);
+		else {
+			if (fCaretVisible)
+				DrawCaret(fSelStart);
+		}
+	}
 		
 	if (view == this)
 		ConstrainClippingRegion(NULL);
@@ -3897,8 +3858,6 @@ BTextView::DrawCaret(int32 offset)
 	caretRect.bottom = caretPoint.y + lineHeight;
 	
 	InvertRect(caretRect);
-
-	Flush(); ////
 }
 
 
@@ -3950,6 +3909,8 @@ void
 BTextView::StopMouseTracking()
 {
 	CALLED();
+	delete fTrackingMouse;
+	fTrackingMouse = NULL;
 }
 
 
@@ -4255,10 +4216,10 @@ BTextView::NormalizeFont(BFont *font)
 }
 
 
-/*! \brief Returns a value which tells if the given charachter is a separator
-	charachter or not.
-	\param offset The offset where the wanted charachter can be found.
-	\return A value which represents the charachter's classification.
+/*! \brief Returns a value which tells if the given character is a separator
+	character or not.
+	\param offset The offset where the wanted character can be found.
+	\return A value which represents the character's classification.
 */
 uint32
 BTextView::CharClassification(int32 offset) const
@@ -4266,7 +4227,7 @@ BTextView::CharClassification(int32 offset) const
 	// TODO:Should check against a list of characters containing also
 	// japanese word breakers.
 	// And what about other languages ? Isn't there a better way to check
-	// for separator charachters ?
+	// for separator characters ?
 	switch (fText->RealCharAt(offset)) {
 		case B_SPACE:
 		case '_':
@@ -4292,9 +4253,9 @@ BTextView::CharClassification(int32 offset) const
 }
 
 
-/*! \brief Returns the offset of the next UTF8 charachter within the BTextView's text.
+/*! \brief Returns the offset of the next UTF8 character within the BTextView's text.
 	\param offset The offset where to start looking.
-	\return The offset of the next UTF8 charachter.
+	\return The offset of the next UTF8 character.
 */
 int32
 BTextView::NextInitialByte(int32 offset) const
@@ -4306,9 +4267,9 @@ BTextView::NextInitialByte(int32 offset) const
 }
 
 
-/*! \brief Returns the offset of the previous UTF8 charachter within the BTextView's text.
+/*! \brief Returns the offset of the previous UTF8 character within the BTextView's text.
 	\param offset The offset where to start looking.
-	\return The offset of the previous UTF8 charachter.
+	\return The offset of the previous UTF8 character.
 */
 int32
 BTextView::PreviousInitialByte(int32 offset) const
@@ -4441,7 +4402,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	bool confirmed = false;
 	if (message->FindBool("be:confirmed", &confirmed) == B_OK && confirmed) {
 		fInline->SetActive(false);
-		Refresh(0, fInline->Offset(), true, false);
+		Refresh(0, fInline->Offset() + fInline->Length(), true, false);
 		return;
 	}
 	
@@ -4487,7 +4448,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	if (!fInline->IsActive())
 		fInline->SetActive(true);
 
-	Refresh(0, fSelEnd, true, false);
+	Refresh(fInline->Offset(), fSelEnd, true, false);
 }
 
 
@@ -4505,7 +4466,7 @@ BTextView::HandleInputMethodLocationRequest()
 	BMessage message(B_INPUT_METHOD_EVENT);
 	message.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
 	
-	// Add the location of the UTF8 charachters
+	// Add the location of the UTF8 characters
 	float height = 0;
 	BPoint where;
 	while (offset < limit) {	
