@@ -9,6 +9,7 @@
 #include <kernel.h>
 #include <lock.h>
 
+
 struct kernel_args;
 
 
@@ -19,6 +20,7 @@ typedef struct vm_translation_map_struct {
 	int map_count;
 	struct vm_translation_map_arch_info_struct *arch_data;
 } vm_translation_map;
+
 
 // table of operations the vm may want to do to this mapping
 typedef struct vm_translation_map_ops_struct {
@@ -45,8 +47,7 @@ void vm_translation_map_module_init_post_sem(struct kernel_args *ka);
 int vm_translation_map_quick_map(struct kernel_args *ka, addr va, addr pa,
 	unsigned int attributes, addr (*get_free_page)(kernel_args *));
 
-// quick function to return the physical pgdir of a mapping, needed for a context switch
-addr vm_translation_map_get_pgdir(vm_translation_map *map);
+#include <arch_vm_translation_map.h>
 
 #endif	/* KERNEL_VM_TRANSLATION_MAP_H */
 
