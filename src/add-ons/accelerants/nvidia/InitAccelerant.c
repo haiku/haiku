@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-12/2003.
+	Rudolf Cornelissen 10/2002-1/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -240,7 +240,18 @@ status_t CLONE_ACCELERANT(void *data) {
 	strcat(path, (const char *)data);
 	/* open the device, the permissions aren't important */
 	fd = open(path, B_READ_WRITE);
-	if (fd < 0) {
+	if (fd < 0)
+	{
+		/* we can't use LOG because we didn't get the shared_info struct.. */
+		char     fname[64];
+		FILE    *myhand = NULL;
+
+		sprintf (fname, "/boot/home/" DRIVER_PREFIX ".accelerant.0.log");
+		myhand=fopen(fname,"a+");
+		fprintf(myhand, "CLONE_ACCELERANT: couldn't open kerneldriver %s! Aborting.\n", path);
+		fclose(myhand);
+
+		/* abort with resultcode from open attempt on kerneldriver */
 		result = fd;
 		goto error0;
 	}

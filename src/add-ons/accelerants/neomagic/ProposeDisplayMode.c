@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors for nm driver:
-	Rudolf Cornelissen 4/2003-6/2003
+	Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x00400000
