@@ -1198,7 +1198,7 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 
 	if (inode->Flags() & INODE_NO_CACHE) {
 		volume->Pool().ReleaseBuffers();
-		inode->Node().flags &= ~INODE_NO_CACHE;
+		inode->Node()->flags &= ~INODE_NO_CACHE;
 	}
 
 	return B_OK;
