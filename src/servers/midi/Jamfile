@@ -3,10 +3,15 @@ SubDir OBOS_TOP src servers midi ;
 UsePrivateHeaders midi ;
 
 AddResources midi_server :
-	midi_server.rsrc ;
+	midi_server.rsrc 
+;
 
 Server midi_server :
-	MidiServerApp.cpp ;
+	MidiServerApp.cpp 
+;
 
-LinkSharedOSLibs midi_server : be root ;
+LinkSharedOSLibs midi_server : 
+	be 
+	root 
+;
 

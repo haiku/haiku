@@ -1,3 +1,8 @@
+/**
+ * @file MidiServerApp.h
+ *
+ * @author Matthijs Hollemans
+ */
 
 #ifndef MIDI_SERVER_APP_H
 #define MIDI_SERVER_APP_H

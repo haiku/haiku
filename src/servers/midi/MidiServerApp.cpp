@@ -1,3 +1,8 @@
+/**
+ * @file MidiServerApp.cpp
+ *
+ * @author Matthijs Hollemans
+ */
 
 #include <Alert.h>
 
