@@ -43,7 +43,7 @@ public:
 										const char *parameters);
 	KDiskDeviceJob *CreateUninitializeJob(partition_id partitionID);
 	KDiskDeviceJob *CreateCreateChildJob(partition_id partitionID,
-										 partition_id child, off_t offset,
+										 partition_id childID, off_t offset,
 										 off_t size, const char *type,
 										 const char *parameters);
 	KDiskDeviceJob *CreateDeleteChildJob(partition_id parentID,

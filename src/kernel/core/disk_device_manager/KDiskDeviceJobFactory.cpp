@@ -126,7 +126,7 @@ KDiskDeviceJobFactory::CreateUninitializeJob(partition_id partitionID)
 // CreateCreateChildJob
 KDiskDeviceJob *
 KDiskDeviceJobFactory::CreateCreateChildJob(partition_id partitionID,
-											partition_id child, off_t offset,
+											partition_id childID, off_t offset,
 											off_t size, const char *type,
 											const char *parameters)
 {
