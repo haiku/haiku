@@ -102,7 +102,7 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 	if ((context->mask & LOG_MASK(priority)) == 0)
 		return;
 
-	port_id port = find_port("syslog_daemon");
+	port_id port = find_port(SYSLOG_PORT_NAME);
 	if (port < B_OK) {
 		// apparently, there is no syslog daemon running; if asked
 		// for, print out the (simplified) message on stderr
