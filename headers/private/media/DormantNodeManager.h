@@ -36,6 +36,9 @@ public:
 	// For use by media_addon_server only
 	media_addon_id RegisterAddon(const char *path);
 	void UnregisterAddon(media_addon_id id);
+	
+	// query the server for the path
+	status_t FindAddonPath(BPath *path, media_addon_id id);
 
 private:
 	struct loaded_addon_info
@@ -51,9 +54,6 @@ private:
 	// manage loading and unloading add-ons from images
 	status_t LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const char *path, media_addon_id id);
 	void UnloadAddon(BMediaAddOn *addon, image_id image);
-
-	// query the server for the path
-	status_t FindAddonPath(BPath *path, media_addon_id id);
 	
 private:
 
