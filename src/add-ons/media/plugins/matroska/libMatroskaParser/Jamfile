@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons media plugins matroska libMatroskaParser ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) $(DOTDOT) $(DOTDOT) libs zlib ] ;
+
+StaticLibrary MatroskaParser :
+	MatroskaParser.c
+;
