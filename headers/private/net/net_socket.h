@@ -37,48 +37,40 @@ int socket_set_event_callback(struct socket *so, socket_event_callback, void *, 
  * other network modules.
  */
 
-int     sosend(struct socket *so, struct mbuf *addr, struct uio *uio, 
-               struct mbuf *top, struct mbuf *control, int flags);
 
 struct socket *sonewconn(struct socket *head, int connstatus);
 int	soreserve (struct socket *so, uint32 sndcc, uint32 rcvcc);
 
-void    sbrelease (struct sockbuf *sb);
-int     sbreserve (struct sockbuf *sb, uint32 cc);
-void	sbdrop (struct sockbuf *sb, int len);
-void    sbdroprecord (struct sockbuf *sb);
-void    sbflush (struct sockbuf *sb);
-int     sbwait (struct sockbuf *sb);
-void	sbappend (struct sockbuf *sb, struct mbuf *m);
-int     sbappendaddr (struct sockbuf *sb, struct sockaddr *asa,
+void	sockbuf_release(struct sockbuf *sb);
+int     sockbuf_reserve(struct sockbuf *sb, uint32 cc);
+void	sockbuf_drop(struct sockbuf *sb, int len);
+void    sockbuf_droprecord(struct sockbuf *sb);
+void    sockbuf_flush(struct sockbuf *sb);
+int     sockbuf_wait(struct sockbuf *sb);
+void	sockbuf_append(struct sockbuf *sb, struct mbuf *m);
+int     sockbuf_appendaddr(struct sockbuf *sb, struct sockaddr *asa,
             struct mbuf *m0, struct mbuf *control);
-int     sbappendcontrol (struct sockbuf *sb, struct mbuf *m0,
+int     sockbuf_appendcontrol(struct sockbuf *sb, struct mbuf *m0,
             struct mbuf *control);
-void    sbappendrecord (struct sockbuf *sb, struct mbuf *m0);
-void    sbcheck (struct sockbuf *sb);
-void    sbcompress (struct sockbuf *sb, struct mbuf *m, struct mbuf *n);
-void    sbinsertoob(struct sockbuf *, struct mbuf *);
+void    sockbuf_appendrecord(struct sockbuf *sb, struct mbuf *m0);
+void    sockbuf_compress(struct sockbuf *sb, struct mbuf *m, struct mbuf *n);
+void    sockbuf_insertoob(struct sockbuf *, struct mbuf *);
 
-int     soreceive (struct socket *so, struct mbuf **paddr, struct uio *uio,
-            struct mbuf **mp0, struct mbuf **controlp, int *flagsp);
 void    sowakeup(struct socket *so, struct sockbuf *sb);
-int     sbwait(struct sockbuf *sb);
 
 int     sodisconnect(struct socket *);
-void    sofree(struct socket *);
 
-void    sohasoutofband(struct socket *so);
-void    socantsendmore(struct socket *so);
-void    socantrcvmore(struct socket *so);
-void    soisconnected (struct socket *so);
-void    soisconnecting (struct socket *so);
-void    soisdisconnected (struct socket *so);
-void    soisdisconnecting (struct socket *so);
-void    soqinsque (struct socket *head, struct socket *so, int q);
-int     soqremque (struct socket *so, int q);
+void    socket_set_hasoutofband(struct socket *so);
+void    socket_set_cantsendmore(struct socket *so);
+void    socket_set_cantrcvmore(struct socket *so);
+void    socket_set_connected(struct socket *so);
+void    socket_set_connecting(struct socket *so);
+void    socket_set_disconnected(struct socket *so);
+void    socket_set_disconnecting(struct socket *so);
+
 int     sorflush(struct socket *so);
 
-int     sb_lock(struct sockbuf *sb);
+int     sockbuf_lock(struct sockbuf *sb);
 int     nsleep(sem_id chan, char *msg, int timeo);
 void    wakeup(sem_id chan);
 

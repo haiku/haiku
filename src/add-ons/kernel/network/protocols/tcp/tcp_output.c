@@ -122,7 +122,7 @@ else
 			bufsize = roundup(bufsize, mss);
 			if (bufsize > sb_max)
 				bufsize = sb_max;
-			sbreserve(&so->so_snd, bufsize);
+			sockbuf_reserve(&so->so_snd, bufsize);
 		}
 		tp->t_maxseg = mss;
 		
@@ -132,7 +132,7 @@ else
 			bufsize = roundup(bufsize, mss);
 			if (bufsize > sb_max)
 				bufsize = sb_max;
-			sbreserve(&so->so_rcv, bufsize);
+			sockbuf_reserve(&so->so_rcv, bufsize);
 		}
 	}
 	tp->snd_cwnd = mss;

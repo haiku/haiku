@@ -44,20 +44,20 @@ struct core_module_info {
 	/* socket functions - called "internally" */
 	struct socket *(*sonewconn)(struct socket *, int);
 	int  (*soreserve)(struct socket *, uint32, uint32);
-	int  (*sbreserve)(struct sockbuf *, uint32);
-	void (*sbappend)(struct sockbuf *, struct mbuf *);
-	int  (*sbappendaddr)(struct sockbuf *, struct sockaddr *, 
+	int  (*sockbuf_reserve)(struct sockbuf *, uint32);
+	void (*sockbuf_append)(struct sockbuf *, struct mbuf *);
+	int  (*sockbuf_appendaddr)(struct sockbuf *, struct sockaddr *, 
 		 				struct mbuf *, struct mbuf *);
-	void (*sbdrop)(struct sockbuf *, int);
-	void (*sbflush)(struct sockbuf *sb);
+	void (*sockbuf_drop)(struct sockbuf *, int);
+	void (*sockbuf_flush)(struct sockbuf *sb);
 	void (*sowakeup)(struct socket *, struct sockbuf *);
-	void (*soisconnected)(struct socket *);
-	void (*soisconnecting)(struct socket*);
-	void (*soisdisconnected)(struct socket *);
-	void (*soisdisconnecting)(struct socket *);
-	void (*sohasoutofband)(struct socket *so);
-	void (*socantrcvmore)(struct socket*);
-	void (*socantsendmore)(struct socket *);
+	void (*socket_set_connected)(struct socket *so);
+	void (*socket_set_connecting)(struct socket *so);
+	void (*socket_set_disconnected)(struct socket *so);
+	void (*socket_set_disconnecting)(struct socket *so);
+	void (*socket_set_hasoutofband)(struct socket *so);
+	void (*socket_set_cantrcvmore)(struct socket *so);
+	void (*socket_set_cantsendmore)(struct socket *so);
 	
 	/* pcb options */
 	int  (*in_pcballoc)(struct socket *, struct inpcb *);

@@ -21,7 +21,7 @@ uint32 sb_max = SB_MAX; /* hard value, recompile needed to alter :( */
  * Attempt to scale mbmax so that mbcnt doesn't become limiting
  * if buffering efficiency is near the normal case.
  */
-int sbreserve(struct sockbuf *sb, uint32 cc)
+int sockbuf_reserve(struct sockbuf *sb, uint32 cc)
 {
 	uint64 dd = (uint64)cc;
 	uint64 ee = (sb_max * MCLBYTES) / ((MSIZE) + (MCLBYTES));
@@ -38,7 +38,7 @@ int sbreserve(struct sockbuf *sb, uint32 cc)
         return (1);
 }
 
-void sbdrop(struct sockbuf *sb, int len)
+void sockbuf_drop(struct sockbuf *sb, int len)
 {
 	struct mbuf *m, *mn;
 	struct mbuf *next;
@@ -80,13 +80,13 @@ void sbdrop(struct sockbuf *sb, int len)
  * Free all mbufs in a sockbuf.
  * Check that all resources are reclaimed.
  */
-void sbflush(struct sockbuf *sb)
+void sockbuf_flush(struct sockbuf *sb)
 {
 	if (sb->sb_flags & SB_LOCK) {
 		return;
 	}
 	while (sb->sb_mbcnt)
-		sbdrop(sb, (int)sb->sb_cc);
+		sockbuf_drop(sb, (int)sb->sb_cc);
 	if (sb->sb_cc || sb->sb_mb)
 		return;
 }
@@ -94,13 +94,13 @@ void sbflush(struct sockbuf *sb)
 /*
  * Free mbufs held by a socket, and reserved mbuf space.
  */
-void sbrelease(struct sockbuf *sb)
+void sockbuf_release(struct sockbuf *sb)
 {
-        sbflush(sb);
+        sockbuf_flush(sb);
         sb->sb_hiwat = sb->sb_mbmax = 0;
 }
 
-void sbappend(struct sockbuf *sb, struct mbuf *m)
+void sockbuf_append(struct sockbuf *sb, struct mbuf *m)
 {
         struct mbuf *n;
 
@@ -111,15 +111,15 @@ void sbappend(struct sockbuf *sb, struct mbuf *m)
                         n = n->m_nextpkt;
                 do {
                         if (n->m_flags & M_EOR) {
-                                sbappendrecord(sb, m); /* XXXXXX!!!! */
+                                sockbuf_appendrecord(sb, m); /* XXXXXX!!!! */
                                 return;
                         }
                 } while (n->m_next && (n = n->m_next));
         }
-        sbcompress(sb, m, n);
+        sockbuf_compress(sb, m, n);
 }
 
-void sbappendrecord(struct sockbuf *sb, struct mbuf *m0)
+void sockbuf_appendrecord(struct sockbuf *sb, struct mbuf *m0)
 {
         struct mbuf *m;
 
@@ -143,10 +143,10 @@ void sbappendrecord(struct sockbuf *sb, struct mbuf *m0)
                 m0->m_flags &= ~M_EOR;
                 m->m_flags |= M_EOR;
         }
-        sbcompress(sb, m, m0);
+        sockbuf_compress(sb, m, m0);
 }
 
-int sbappendaddr(struct sockbuf *sb, struct sockaddr *asa, 
+int sockbuf_appendaddr(struct sockbuf *sb, struct sockaddr *asa, 
 		 struct mbuf *m0, struct mbuf *control)
 {
 	struct mbuf *m, *n;
@@ -188,7 +188,7 @@ int sbappendaddr(struct sockbuf *sb, struct sockaddr *asa,
 	return (1);
 }
 
-void sbcompress(struct sockbuf *sb, struct mbuf *m, struct mbuf *n)
+void sockbuf_compress(struct sockbuf *sb, struct mbuf *m, struct mbuf *n)
 {
         int eor = 0;
         struct mbuf *o;
@@ -226,11 +226,11 @@ void sbcompress(struct sockbuf *sb, struct mbuf *m, struct mbuf *n)
                 if (n)
                         n->m_flags |= eor;
                 else
-                        printf("semi-panic: sbcompress\n");
+                        printf("semi-panic: sockbuf_compress\n");
         }
 }
 
-void sbdroprecord(struct sockbuf *sb)
+void sockbuf_droprecord(struct sockbuf *sb)
 {
         struct mbuf *m, *mn;
 
@@ -244,15 +244,15 @@ void sbdroprecord(struct sockbuf *sb)
         }
 }
 
-int sbwait(struct sockbuf *sb)
+int sockbuf_wait(struct sockbuf *sb)
 {
 	if (sb->sb_cc > 0)
 		return 0;
 	sb->sb_flags |= SB_WAIT;
-	return nsleep(sb->sb_pop, "sbwait", sb->sb_timeo);
+	return nsleep(sb->sb_pop, "sockbuf_wait", sb->sb_timeo);
 }
 
-void sbinsertoob(struct sockbuf *sb, struct mbuf *m0)
+void sockbuf_insertoob(struct sockbuf *sb, struct mbuf *m0)
 {
 	struct mbuf *m;
 	struct mbuf **mp;
@@ -284,20 +284,20 @@ again:
 		m0->m_flags &= ~M_EOR;
 		m->m_flags |= M_EOR;
 	}
-	sbcompress(sb, m, m0);
+	sockbuf_compress(sb, m, m0);
 }
 
 /*
  * Lock a sockbuf already known to be locked;
  * return any error returned from sleep (EINTR).
  */
-int sb_lock(struct sockbuf *sb)
+int sockbuf_lock(struct sockbuf *sb) // XXX never called at all
 {
 	int error;
 
 	while (sb->sb_flags & SB_LOCK) {
 		sb->sb_flags |= SB_WANT;
-		error = nsleep(sb->sb_sleep, "sb_lock", 0);
+		error = nsleep(sb->sb_sleep, "sockbuf_lock", 0);
 		if (error)
 			return (error);
 	}

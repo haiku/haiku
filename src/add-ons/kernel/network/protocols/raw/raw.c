@@ -62,7 +62,7 @@ void rip_input(struct mbuf *m, int hdrlen)
 		if (last) {
 			struct mbuf *n;
 			if ((n = m_copym(m, 0, (int)M_COPYALL))) {
-				if (sbappendaddr(&last->so_rcv, (struct sockaddr*)&ripsrc, 
+				if (sockbuf_appendaddr(&last->so_rcv, (struct sockaddr*)&ripsrc, 
 				                 n, NULL) == 0)
 					m_freem(n);
 				else
@@ -72,7 +72,7 @@ void rip_input(struct mbuf *m, int hdrlen)
 		last = inp->inp_socket;
 	}
 	if (last) {
-		if (sbappendaddr(&last->so_rcv, (struct sockaddr*)&ripsrc, 
+		if (sockbuf_appendaddr(&last->so_rcv, (struct sockaddr*)&ripsrc, 
 		                 m, NULL) == 0)
 			m_freem(m);
 		else
@@ -150,7 +150,7 @@ int rip_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
 				break;
 			}
 		case PRU_ABORT:
-			soisdisconnected(so);
+			socket_set_disconnected(so);
 		case PRU_DETACH:
 			if (inp == NULL) {
 				printf("Can't detach from NULL protocol block!\n");
@@ -212,14 +212,14 @@ int rip_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
 				break;
 			}
 			inp->faddr = addr->sin_addr;
-			soisconnected(so);
+			socket_set_connected(so);
 			break;
 		}
 		case PRU_CONNECT2:
 			error = EOPNOTSUPP;
 			break;
 		case PRU_SHUTDOWN:
-			socantsendmore(so);
+			socket_set_cantsendmore(so);
 			break;
 		case PRU_RCVOOB:
 		case PRU_RCVD:

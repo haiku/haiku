@@ -202,7 +202,7 @@ struct tcpcb *tcp_close(struct tcpcb *tp)
 
 	pool_put(tcppool, tp);
 	inp->inp_ppcb = NULL;
-	soisdisconnected(so);
+	socket_set_disconnected(so);
 	if (inp == tcp_last_inpcb)
 		tcp_last_inpcb = &tcb;
 	in_pcbdetach(inp);
@@ -301,7 +301,7 @@ struct tcpcb *tcp_usrclosed(struct tcpcb *tp)
 			break;
 	}
 	if (tp && tp->t_state >= TCPS_FIN_WAIT_2)
-		soisdisconnected(tp->t_inpcb->inp_socket);
+		socket_set_disconnected(tp->t_inpcb->inp_socket);
 	return tp;
 }
 
@@ -314,8 +314,8 @@ static struct tcpcb *tcp_disconnect(struct tcpcb *tp)
 	else if ((so->so_options & SO_LINGER) && so->so_linger == 0)
 		tp = tcp_drop(tp, 0);
 	else {
-		soisdisconnecting(so);
-		sbflush(&so->so_rcv);
+		socket_set_disconnecting(so);
+		sockbuf_flush(&so->so_rcv);
 		tp = tcp_usrclosed(tp);
 		if (tp)
 			tcp_output(tp);
@@ -455,7 +455,7 @@ int tcp_userreq(struct socket *so, int req, struct mbuf *m,
 			while (tp->request_r_scale < TCP_MAX_WINSHIFT &&
 			       (TCP_MAXWIN << tp->request_r_scale) < so->so_rcv.sb_hiwat)
 				tp->request_r_scale++;
-			soisconnecting(so);
+			socket_set_connecting(so);
 			tcpstat.tcps_connattempt++;
 			tp->t_state = TCPS_SYN_SENT;
 			tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT;
@@ -479,14 +479,14 @@ int tcp_userreq(struct socket *so, int req, struct mbuf *m,
 			req |= (int)nam << 8;
 			break;
 		case PRU_SEND:
-			sbappend(&so->so_snd, m);
+			sockbuf_append(&so->so_snd, m);
 			error = tcp_output(tp);
 			break;
 		case PRU_RCVD:
 			(void) tcp_output(tp);
 			break;
 		case PRU_SHUTDOWN:
-			socantsendmore(so);
+			socket_set_cantsendmore(so);
 			tp = tcp_usrclosed(tp);
 			if (tp)
 				error = tcp_output(tp);

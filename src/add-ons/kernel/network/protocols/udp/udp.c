@@ -193,7 +193,7 @@ int udp_userreq(struct socket *so, int req,
 			}
 			error = in_pcbconnect(inp, addr);
 			if (error == 0)
-				soisconnected(so);
+				socket_set_connected(so);
 			break;
 		case PRU_CONNECT2:
 			error = EINVAL;//EOPNOTSUPP;
@@ -304,7 +304,7 @@ void udp_input(struct mbuf *buf, int hdrlen)
 	buf->m_pkthdr.len -= hdrlen;
 	buf->m_data += hdrlen;
 	
-	if (sbappendaddr(&inp->inp_socket->so_rcv, (struct sockaddr*)&udp_in,
+	if (sockbuf_appendaddr(&inp->inp_socket->so_rcv, (struct sockaddr*)&udp_in,
 			buf, opts) == 0) {
 		goto bad;
 	}

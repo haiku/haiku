@@ -131,7 +131,7 @@ extern uint32 sb_max;
 		(flags) = (ti)->ti_flags & TH_FIN; \
 		tcpstat.tcps_rcvpack++; \
 		tcpstat.tcps_rcvbyte += (ti)->ti_len; \
-		sbappend(&(so)->so_rcv, (m)); \
+		sockbuf_append(&(so)->so_rcv, (m)); \
 		sorwakeup(so); \
 	} else { \
 		(flags) = tcp_reass((tp), (ti), (m)); \
@@ -247,7 +247,7 @@ present:
 		 * So, reverse the logic and only append data if we can.
 		 */
 		if ((so->so_state & SS_CANTRCVMORE) == 0)
-			sbappend(&so->so_rcv, m);
+			sockbuf_append(&so->so_rcv, m);
 	} while (ti != (struct tcpiphdr*)tp && ti->ti_seq == tp->rcv_nxt);
 	sorwakeup(so);
 	return (flags);
@@ -554,7 +554,7 @@ findpcb:
 				acked = ti->ti_ack - tp->snd_una;
 				tcpstat.tcps_rcvackpack++;
 				tcpstat.tcps_rcvackbyte += acked;
-				sbdrop(&so->so_snd, acked);
+				sockbuf_drop(&so->so_snd, acked);
 				tp->snd_una = ti->ti_ack;
 				m_freem(m);
 
@@ -597,7 +597,7 @@ findpcb:
 			 */
 			m->m_data += sizeof(struct tcpiphdr) + off - sizeof(struct tcphdr);
 			m->m_len -= sizeof(struct tcpiphdr) + off - sizeof(struct tcphdr);
-			sbappend(&so->so_rcv, m);
+			sockbuf_append(&so->so_rcv, m);
 			sorwakeup(so);
 			tp->t_flags |= TF_DELACK;
 			return;
@@ -777,7 +777,7 @@ findpcb:
 			tp->t_flags |= TF_ACKNOW;
 			if (tiflags & TH_ACK && SEQ_GT(tp->snd_una, tp->iss)) {
 				tcpstat.tcps_connects++;
-				soisconnected(so);
+				socket_set_connected(so);
 				tp->t_state = TCPS_ESTABLISHED;
 				/* Do window scaling on this connection? */
 				if ((tp->t_flags & (TF_RCVD_SCALE|TF_REQ_SCALE)) ==
@@ -1028,7 +1028,7 @@ close:
 				goto dropwithreset;
 			}
 			tcpstat.tcps_connects++;
-			soisconnected(so);
+			socket_set_connected(so);
 			tp->t_state = TCPS_ESTABLISHED;
 			/* Do window scaling? */
 			if ((tp->t_flags & (TF_RCVD_SCALE|TF_REQ_SCALE)) ==
@@ -1168,10 +1168,10 @@ close:
 		}
 		if (acked > so->so_snd.sb_cc) {
 			tp->snd_wnd -= so->so_snd.sb_cc;
-			sbdrop(&so->so_snd, (int)so->so_snd.sb_cc);
+			sockbuf_drop(&so->so_snd, (int)so->so_snd.sb_cc);
 			ourfinisacked = 1;
 		} else {
-			sbdrop(&so->so_snd, acked);
+			sockbuf_drop(&so->so_snd, acked);
 			tp->snd_wnd -= acked;
 			ourfinisacked = 0;
 		}
@@ -1198,7 +1198,7 @@ close:
 					 * we'll hang forever.
 					 */
 					if (so->so_state & SS_CANTRCVMORE) {
-						soisdisconnected(so);
+						socket_set_disconnected(so);
 						tp->t_timer[TCPT_2MSL] = tcp_maxidle;
 					}
 					tp->t_state = TCPS_FIN_WAIT_2;
@@ -1216,7 +1216,7 @@ close:
 					tp->t_state = TCPS_TIME_WAIT;
 					tcp_canceltimers(tp);
 					tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
-					soisdisconnected(so);
+					socket_set_disconnected(so);
 				}
 				break;
 
@@ -1300,7 +1300,7 @@ step6:
 			    (tp->rcv_up - tp->rcv_nxt) - 1;
 			if (so->so_oobmark == 0)
 				so->so_state |= SS_RCVATMARK;
-			sohasoutofband(so);
+			socket_set_hasoutofband(so);
 			tp->t_oobflags &= ~(TCPOOB_HAVEDATA | TCPOOB_HADDATA);
 		}
 		/*
@@ -1351,7 +1351,7 @@ dodata:							/* XXX */
 	 */
 	if ((tiflags & TH_FIN)) {
 		if (TCPS_HAVERCVDFIN(tp->t_state) == 0) {
-			socantrcvmore(so);
+			socket_set_cantrcvmore(so);
 			tp->t_flags |= TF_ACKNOW;
 			tp->rcv_nxt++;
 		}
@@ -1381,7 +1381,7 @@ dodata:							/* XXX */
 				tp->t_state = TCPS_TIME_WAIT;
 				tcp_canceltimers(tp);
 				tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
-				soisdisconnected(so);
+				socket_set_disconnected(so);
 				break;
 
 			/*
@@ -1691,7 +1691,7 @@ void tcp_mss_update(struct tcpcb *tp)
 		bufsize = roundup(bufsize, mss);
 		if (bufsize > sb_max)
 			bufsize = sb_max;
-		(void)sbreserve(&so->so_snd, bufsize);
+		(void)sockbuf_reserve(&so->so_snd, bufsize);
 	}
 
 #ifdef RTV_RPIPE
@@ -1702,7 +1702,7 @@ void tcp_mss_update(struct tcpcb *tp)
 		bufsize = roundup(bufsize, mss);
 		if (bufsize > sb_max)
 			bufsize = sb_max;
-		(void)sbreserve(&so->so_rcv, bufsize);
+		(void)sockbuf_reserve(&so->so_rcv, bufsize);
 #ifdef RTV_RPIPE
 		if (rt->rt_rmx.rmx_recvpipe > 0) {
 			tp->request_r_scale = 0;

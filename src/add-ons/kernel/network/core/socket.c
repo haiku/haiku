@@ -27,7 +27,15 @@
 #define   SBLOCKWAIT(f)   (((f) & MSG_DONTWAIT) ? M_NOWAIT : M_WAITOK)
 
 /* Private prototypes */
-static int checkevent(struct socket *so);
+static int 	checkevent(struct socket *so);
+static void	sofree(struct socket *);
+static void	soqinsque (struct socket *head, struct socket *so, int q);
+static int	soqremque (struct socket *so, int q);
+static int	sosend(struct socket *so, struct mbuf *addr, struct uio *uio, 
+				   struct mbuf *top, struct mbuf *control, int flags);
+static int	soreceive (struct socket *so, struct mbuf **paddr, struct uio *uio,
+				   struct mbuf **mp0, struct mbuf **controlp, int *flagsp);
+
 
 /* Static global objects... */
 static pool_ctl *spool;
@@ -162,8 +170,15 @@ int socket_create(struct socket *so, int dom, int type, int proto)
 	    so->so_rcv.sb_sleep < 0 ||
 	    so->so_snd.sb_pop < 0 ||
 	    so->so_snd.sb_sleep < 0 ||
-	    so->so_timeo < 0)
+	    so->so_timeo < 0) {
+		printf("socket_create: ENOMEM\n");
+		delete_sem(so->so_rcv.sb_pop);
+		delete_sem(so->so_rcv.sb_sleep);
+		delete_sem(so->so_snd.sb_pop);
+		delete_sem(so->so_snd.sb_sleep);
+		delete_sem(so->so_timeo);
 		return ENOMEM;
+	}
 	    
 #ifdef _KERNEL_MODE
 	set_sem_owner(so->so_rcv.sb_pop,   B_SYSTEM_TEAM);
@@ -186,9 +201,9 @@ int socket_create(struct socket *so, int dom, int type, int proto)
 
 int soreserve(struct socket *so, uint32 sndcc, uint32 rcvcc)
 {
-	if (sbreserve(&so->so_snd, sndcc) == 0)
+	if (sockbuf_reserve(&so->so_snd, sndcc) == 0)
 		goto bad;
-	if (sbreserve(&so->so_rcv, rcvcc) == 0)
+	if (sockbuf_reserve(&so->so_rcv, rcvcc) == 0)
 		goto bad2;
 
 	if (so->so_rcv.sb_lowat == 0)
@@ -201,7 +216,7 @@ int soreserve(struct socket *so, uint32 sndcc, uint32 rcvcc)
 	return (0);
 
 bad2:
-	sbrelease(&so->so_snd);
+	sockbuf_release(&so->so_snd);
 bad:
 	printf("soreserve: ENOBUFS\n");
 	return (ENOBUFS);
@@ -432,7 +447,7 @@ int socket_writev(struct socket *so, struct iovec *iov, int flags)
 	return (len - auio.uio_resid);
 }
 
-int sosend(struct socket *so, struct mbuf *addr, struct uio *uio, struct mbuf *top,
+static int sosend(struct socket *so, struct mbuf *addr, struct uio *uio, struct mbuf *top,
 	   struct mbuf *control, int flags)
 {
 	struct mbuf **mp;
@@ -508,7 +523,7 @@ restart:
 			}
 			/* free lock - we're waiting on send buffer space */
 			sbunlock(&so->so_snd);
-			error = sbwait(&so->so_snd);
+			error = sockbuf_wait(&so->so_snd);
 			if (error)
 				goto out;
 			goto restart;
@@ -680,7 +695,7 @@ out:
 }
 
 
-int soreceive(struct socket *so, struct mbuf **paddr, struct uio *uio, struct mbuf**mp0,
+static int soreceive(struct socket *so, struct mbuf **paddr, struct uio *uio, struct mbuf**mp0,
 		struct mbuf **controlp, int *flagsp)
 {
 	struct mbuf *m, **mp;
@@ -772,7 +787,7 @@ restart:
 			goto release;
 		}
 		sbunlock(&so->so_rcv);
-		error = sbwait(&so->so_rcv);
+		error = sockbuf_wait(&so->so_rcv);
 		if (error)
 			return error;
 		goto restart;
@@ -901,7 +916,7 @@ dontblock:
 		       !sosendallatonce(so) && !nextrecord) {
 			if (so->so_error || so->so_state & SS_CANTRCVMORE)
 				break;
-			error = sbwait(&so->so_rcv);
+			error = sockbuf_wait(&so->so_rcv);
 			if (error) {
 				sbunlock(&so->so_rcv);
 				return 0;
@@ -914,7 +929,7 @@ dontblock:
 	if (m && pr->pr_flags & PR_ATOMIC) {
 		flags |= MSG_TRUNC;
 		if ((flags & MSG_PEEK) == 0) 
-			sbdroprecord(&so->so_rcv);
+			sockbuf_droprecord(&so->so_rcv);
 	}
 	if ((flags & MSG_PEEK) == 0) {
 		if (!m)
@@ -1020,12 +1035,12 @@ int sorflush(struct socket *so)
 
 	sb->sb_flags |= SB_NOINTR;
 	sblock(sb, M_WAITOK);
-	socantrcvmore(so);
+	socket_set_cantrcvmore(so);
 	sbunlock(sb);
 	asb = *sb;
 	memset(sb, 0, sizeof(*sb));
 	
-	sbrelease(&asb);
+	sockbuf_release(&asb);
 	return 0;
 }
 
@@ -1048,7 +1063,7 @@ bad:
 	return error;
 }
 
-void sofree(struct socket *so)
+static void sofree(struct socket *so)
 {
 	if (so->so_pcb || (so->so_state & SS_NOFDREF) == 0)
 		return;
@@ -1060,7 +1075,7 @@ void sofree(struct socket *so)
 		}
 		so->so_head = NULL;
 	}
-	sbrelease(&so->so_snd);
+	sockbuf_release(&so->so_snd);
 	sorflush(so);
 
 	delete_sem(so->so_rcv.sb_pop);
@@ -1128,7 +1143,7 @@ int socket_setsockopt(struct socket *so, int level, int optnum, const void *data
 				switch (optnum) {
 					case SO_SNDBUF:
 					case SO_RCVBUF:
-						if (sbreserve(optnum == SO_SNDBUF ? &so->so_snd : &so->so_rcv,
+						if (sockbuf_reserve(optnum == SO_SNDBUF ? &so->so_snd : &so->so_rcv,
 						              (uint32)*mtod(m, int32*)) == 0) {
 							error = ENOBUFS;
 							goto bad;
@@ -1320,9 +1335,9 @@ void sowakeup(struct socket *so, struct sockbuf *sb)
 		release_sem_etc(sb->sb_pop, 1, B_CAN_INTERRUPT);
 	}
 	checkevent(so);
-}	
+}
 
-void soqinsque(struct socket *head, struct socket *so, int q)
+static void soqinsque(struct socket *head, struct socket *so, int q)
 {
 	struct socket **prev;
 	so->so_head = head;
@@ -1340,7 +1355,7 @@ void soqinsque(struct socket *head, struct socket *so, int q)
 	*prev = so;
 }
 
-int soqremque(struct socket *so, int q)
+static int soqremque(struct socket *so, int q)
 {
 	struct socket *head, *prev, *next;
 
@@ -1366,31 +1381,31 @@ int soqremque(struct socket *so, int q)
 	return 1;
 }
 
-void sohasoutofband(struct socket *so)
+void socket_set_hasoutofband(struct socket *so)
 {
 	/* Should we signal the process with SIGURG??? */
 	checkevent(so);
 }
 
-void socantsendmore(struct socket *so)
+void socket_set_cantsendmore(struct socket *so)
 {
 	so->so_state |= SS_CANTSENDMORE;
 	sowwakeup(so);
 }
 
-void socantrcvmore(struct socket *so)
+void socket_set_cantrcvmore(struct socket *so)
 {
 	so->so_state |= SS_CANTRCVMORE;
 	sorwakeup(so);
 }
 
-void soisconnecting(struct socket *so)
+void socket_set_connecting(struct socket *so)
 {
 	so->so_state &= ~(SS_ISCONNECTED|SS_ISDISCONNECTING);
 	so->so_state |= SS_ISCONNECTING;
 }
 
-void soisconnected(struct socket *so)
+void socket_set_connected(struct socket *so)
 {
 	struct socket *head = so->so_head;
 
@@ -1407,7 +1422,7 @@ void soisconnected(struct socket *so)
 	}
 }
 
-void soisdisconnecting(struct socket *so)
+void socket_set_disconnecting(struct socket *so)
 {
         so->so_state &= ~SS_ISCONNECTING;
         so->so_state |= (SS_ISDISCONNECTING|SS_CANTRCVMORE|SS_CANTSENDMORE);
@@ -1416,7 +1431,7 @@ void soisdisconnecting(struct socket *so)
         sorwakeup(so);
 }
 
-void soisdisconnected(struct socket *so)
+void socket_set_disconnected(struct socket *so)
 {
 	so->so_state &= ~(SS_ISCONNECTING|SS_ISCONNECTED|SS_ISDISCONNECTING);
 	so->so_state |= (SS_CANTRCVMORE|SS_CANTSENDMORE|SS_ISDISCONNECTED);

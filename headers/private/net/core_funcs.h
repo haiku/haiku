@@ -67,22 +67,23 @@
 #	define ifaof_ifpforaddr    core->ifaof_ifpforaddr
 #	define ifafree             core->ifafree
 
-#	define sbappend            core->sbappend
-#	define sbappendaddr        core->sbappendaddr
-#	define sbdrop              core->sbdrop
-#	define sbflush             core->sbflush
-#	define sbreserve           core->sbreserve
+#	define sockbuf_append		core->sockbuf_append
+#	define sockbuf_appendaddr	core->sockbuf_appendaddr
+#	define sockbuf_drop			core->sockbuf_drop
+#	define sockbuf_flush		core->sockbuf_flush
+#	define sockbuf_reserve		core->sockbuf_reserve
 
 #	define soreserve           core->soreserve
 #	define sowakeup            core->sowakeup
 #	define sonewconn           core->sonewconn
-#	define soisconnected       core->soisconnected
-#	define soisconnecting      core->soisconnecting
-#	define soisdisconnected    core->soisdisconnected
-#	define soisdisconnecting   core->soisdisconnecting
-#	define sohasoutofband      core->sohasoutofband
-#	define socantsendmore      core->socantsendmore
-#	define socantrcvmore       core->socantrcvmore
+
+#	define socket_set_connected		core->socket_set_connected
+#	define socket_set_connecting	core->socket_set_connecting
+#	define socket_set_disconnected	core->socket_set_disconnected
+#	define socket_set_disconnecting	core->socket_set_disconnecting
+#	define socket_set_hasoutofband	core->socket_set_hasoutofband
+#	define socket_set_cantsendmore	core->socket_set_cantsendmore
+#	define socket_set_cantrcvmore	core->socket_set_cantrcvmore
 
 #	define rtfree              core->rtfree
 #	define rtalloc             core->rtalloc
