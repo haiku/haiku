@@ -494,14 +494,7 @@ MediaWindow::MessageReceived (BMessage *message)
 					mContentView->RemoveChild(mContentView->ChildAt(0));
 					
 				mTitleView->SetText(item->GetLabel());
-				//if(item->OutlineLevel() == 0 || item->IsAudioMixer()) {
-					// Display the 3D Look Divider Bar
-					if(mBar->IsHidden())
-						mBar->Show();
-				//} else
-				//	if(!mBar->IsHidden())
-				//		mBar->Hide();
-				
+								
 				if(item->OutlineLevel() == 0) {
 					if(item->IsVideo())
 						mContentView->AddChild(mVideoView);
@@ -525,6 +518,7 @@ MediaWindow::MessageReceived (BMessage *message)
 						BView* paramView = theme->ViewFor(mParamWeb);
 						mContentView->AddChild(paramView);
 						paramView->ResizeTo(mContentView->Bounds().Width(), mContentView->Bounds().Height());
+						
 					} else {
 						mParamWeb = NULL;
 						BRect bounds = mContentView->Bounds();
@@ -534,11 +528,16 @@ MediaWindow::MessageReceived (BMessage *message)
 						mContentView->AddChild(stringView);
 						stringView->MoveBy((bounds.Width()-stringView->Bounds().Width())/2, 
 							(bounds.Height()-stringView->Bounds().Height())/2);
-						if(mBar->IsHidden())
-							mBar->Show();
 					}
 				}
-			
+				
+				if(item->OutlineLevel() == 0 || mParamWeb == NULL || mParamWeb->CountGroups()<2) {
+					// Display the 3D Look Divider Bar
+					if(mBar->IsHidden())
+						mBar->Show();
+				} else if(!mBar->IsHidden())
+					mBar->Hide();
+	
 			}
 			break;
 		default:
