@@ -98,7 +98,8 @@ arch_int_enable_io_interrupt(int irq)
 	if (irq < 0 || irq >= 0x10)
 		return;
 
-	dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
+	//dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
+
 	/* if this is a external interrupt via 8239, enable it here */
 	if (irq < 8)
 		out8(in8(0x21) & ~(1 << irq), 0x21);
@@ -113,6 +114,7 @@ arch_int_disable_io_interrupt(int irq)
 	/* never disable slave pic line IRQ 2 */
 	if (irq < 0 || irq >= 0x10 || irq == 2)
 		return;
+
 	/* if this is a external interrupt via 8239, disable it here */
 	if (irq < 8)
 		out8(in8(0x21) | (1 << irq), 0x21);
