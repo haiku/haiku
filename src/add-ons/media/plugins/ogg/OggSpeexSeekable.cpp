@@ -179,18 +179,3 @@ OggSpeexSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 	return B_OK;
 }
-
-
-status_t
-OggSpeexSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
-                             media_header *mediaHeader)
-{
-	status_t result = inherited::GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
-	if (result != B_OK) {
-		TRACE("OggSpeexSeekable::GetNextChunk failed: GetNextChunk = %s\n", strerror(result));
-		return result;
-	}
-	*chunkSize = ((ogg_packet*)*chunkBuffer)->bytes;
-	*chunkBuffer = ((ogg_packet*)*chunkBuffer)->packet;
-	return B_OK;
-}

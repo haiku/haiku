@@ -184,13 +184,13 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 			status_t status = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 			if (status == B_LAST_BUFFER_ERROR) {
 				goto done;
-			}			
+			}
 			if (status != B_OK) {
 				TRACE("VorbisDecoder::Decode: GetNextChunk failed\n");
 				return status;
 			}
-			if (chunkSize != sizeof(ogg_packet)) {
-				TRACE("VorbisDecoder::Decode: chunk not ogg_packet-sized\n");
+			if (mh.user_data_type != OGG_PACKET_DATA_TYPE) {
+				TRACE("VorbisDecoder::Decode: chunk missing ogg_packet data");
 				return B_ERROR;
 			}
 			if (!synced) {
@@ -199,8 +199,9 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 					synced = true;
 				}
 			}
-			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
-			if (vorbis_synthesis(&fBlock,packet)==0) {
+			ogg_packet * packet = reinterpret_cast<ogg_packet*>(mh.user_data);
+			packet->packet = static_cast<unsigned char *>(chunkBuffer);
+			if (vorbis_synthesis(&fBlock, packet)==0) {
 				vorbis_synthesis_blockin(&fDspState,&fBlock);
 			}
 		}

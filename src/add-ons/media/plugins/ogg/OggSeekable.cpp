@@ -2,6 +2,7 @@
 #include "OggSpeexSeekable.h"
 #include "OggTobiasSeekable.h"
 #include "OggVorbisSeekable.h"
+#include "OggFormats.h"
 #include <Autolock.h>
 #include <stdio.h>
 
@@ -247,7 +248,7 @@ OggSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	// get the format for the description
 	media_format_description description;
 	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
+	description.u.misc.file_format = OGG_FILE_FORMAT;
 	description.u.misc.codec = four_bytes;
 	BMediaFormats formats;
 	result = formats.InitCheck();
@@ -448,21 +449,25 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 			return B_OK;
 		}*/
 
-
 status_t
 OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
                              media_header *mediaHeader)
 {
+	ogg_packet packet;
 	BAutolock autolock(fPositionLock);
-	status_t result = GetPacket(&fChunkPacket);
+	status_t result = GetPacket(&packet);
+	*chunkBuffer = packet.packet;
+	*chunkSize = packet.bytes;
+	packet.packet = NULL;
+	assert(sizeof(ogg_packet) <= sizeof(mediaHeader->user_data));
+	mediaHeader->user_data_type = OGG_PACKET_DATA_TYPE;
+	memcpy(mediaHeader->user_data, &packet, sizeof(ogg_packet));
 	if (result != B_OK) {
 		TRACE("OggSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
 		return result;
 	}
-	*chunkBuffer = &fChunkPacket;
-	*chunkSize = sizeof(fChunkPacket);
-	if (fChunkPacket.granulepos > 0) {
-		fCurrentFrame = fChunkPacket.granulepos - fFirstGranulepos;
+	if (packet.granulepos > 0) {
+		fCurrentFrame = packet.granulepos - fFirstGranulepos;
 		fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
 		mediaHeader->start_time = fCurrentTime;
 	} else {

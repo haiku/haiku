@@ -3,6 +3,7 @@
 #include "OggTheoraStream.h"
 #include "OggTobiasStream.h"
 #include "OggVorbisStream.h"
+#include "OggFormats.h"
 #include <Autolock.h>
 #include <stdio.h>
 
@@ -107,7 +108,7 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	// get the format for the description
 	media_format_description description;
 	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
+	description.u.misc.file_format = OGG_FILE_FORMAT;
 	description.u.misc.codec = four_bytes;
 	BMediaFormats formats;
 	result = formats.InitCheck();

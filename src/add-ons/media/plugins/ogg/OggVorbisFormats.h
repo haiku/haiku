@@ -4,6 +4,7 @@
 #include <MediaFormats.h>
 #include <ogg/ogg.h>
 #include <string.h>
+#include "OggFormats.h"
 
 /*
  * vorbis descriptions/formats
@@ -15,7 +16,7 @@ vorbis_description()
 {
 	media_format_description description;
 	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
+	description.u.misc.file_format = OGG_FILE_FORMAT;
 	description.u.misc.codec = 'vorb';
 	return description;
 }

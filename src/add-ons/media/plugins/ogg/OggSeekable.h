@@ -40,7 +40,6 @@ protected:
 
 	// subclass pull input function
 	status_t	GetPacket(ogg_packet * packet);
-	ogg_packet			fChunkPacket;
 
 protected:
 	int64				fCurrentFrame;

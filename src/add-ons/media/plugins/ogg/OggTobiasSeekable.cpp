@@ -266,8 +266,6 @@ OggTobiasSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 		TRACE("OggTobiasSeekable::GetNextChunk failed: GetNextChunk = %s\n", strerror(result));
 		return result;
 	}
-	*chunkSize = ((ogg_packet*)*chunkBuffer)->bytes;
-	*chunkBuffer = ((ogg_packet*)*chunkBuffer)->packet;
 	bool keyframe = ((uint*)chunkBuffer)[0] & (1 << 3); // ??
 	if (fMediaFormat.type == B_MEDIA_ENCODED_VIDEO) {
 		mediaHeader->type = fMediaFormat.type;
