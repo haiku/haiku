@@ -92,10 +92,11 @@ switch $(TARGET_CPU) {
 	OBOS_TARGET_DEFINE ?= "ARCH_"$(TARGET_CPU) ;
 }
 
-# Enable warnings only if WARNINGS is defined
+# Disable warnings only if WARNINGS is set to 0
 # Should be enabled by default later
 #
-if $(WARNINGS) {
+WARNINGS ?= 1 ;
+if $(WARNINGS) = 1 {
 	# For an explanation of the different warning options, see:
 	# http://gcc.gnu.org/onlinedocs/gcc-2.95.3/gcc_2.html
 	# to get even more warnings, add:
@@ -123,12 +124,13 @@ KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
 # We might later want to introduce debug levels or handle the whole issue
 # differently. For now there's only on or off.
 #
-if $(DEBUG) {
+DEBUG ?= 0 ;
+if $(DEBUG) != 0 {
 	OPTIM ?= -O0 ;
-	CCFLAGS += -g -DDEBUG=$(DEBUG) ;
-	C++FLAGS += -g -DDEBUG=$(DEBUG)  ;
-	KERNEL_CCFLAGS += -g -DDEBUG=$(DEBUG) ;
-	KERNEL_C++FLAGS += -g -DDEBUG=$(DEBUG) ;
+	CCFLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
+	C++FLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
+	KERNEL_CCFLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
+	KERNEL_C++FLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
 	LINKFLAGS += -g ;
 } else {
 	OPTIM ?= -O2 ;
