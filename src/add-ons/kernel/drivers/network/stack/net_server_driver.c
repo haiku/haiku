@@ -1,6 +1,6 @@
-/* net_userstack_driver - This file implements a very simple socket driver
+/* net_server_driver - This file implements a very simple socket driver
 **		that is intended to act as an interface to the networking stack when
-**		it is loaded in userland.
+**		it is loaded in userland, hosted by a net_server-like app.
 **		The communication is slow, and could probably be much better, but it's
 **		working, and that should be enough for now.
 **
@@ -71,7 +71,7 @@ extern void notify_select_event(selectsync * sync, uint32 ref);
 //*****************************************************/
 
 #ifndef DRIVER_NAME
-#	define DRIVER_NAME 		"net_stack_driver"
+#	define DRIVER_NAME 		"net_server_driver"
 #endif
 
 /* wait one second when waiting on the stack */
