@@ -11,11 +11,15 @@ StaticLibrary
 	PrintTransport.cpp
 	;
 
-StaticLibrary
-	printtransportaddon
-	:
-	PrintTransportAddOn.cpp
-	;
+# StaticLibrary
+#	printtransportaddon
+#	:
+#	PrintTransportAddOn.cpp
+#	;
+
+Objects
+	PrintTransportAddOn.cpp 
+;
 
 
 #StaticLibrary
