@@ -14,6 +14,9 @@ public:
 
 	virtual	status_t	GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 						              media_format *format);
+private:
+	int64		fFrameCount;
+	bigtime_t	fDuration;
 };
 
 } } // namespace BPrivate::media

@@ -87,6 +87,8 @@ OggVorbisStream::OggVorbisStream(long serialno)
 	: OggStream(serialno)
 {
 	TRACE("OggVorbisStream::OggVorbisStream\n");
+	fFrameCount = -1;
+	fDuration = -1;
 }
 
 OggVorbisStream::~OggVorbisStream()
@@ -182,29 +184,47 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
 
-	// compute duration/frameCount
+	// use cached frame count and duration for now
+	if (fDuration >= 0) {
+		*frameCount = fFrameCount;
+		*duration = fDuration;
+		return B_OK;
+	}
 
-#ifdef STREAMING_COMPATIBLE_HARDCODED_DURATION
-	*duration = 100000000;
-	*frameCount = 60000;
-#else
-	int64 frame = 0;
-	bigtime_t time = 0;
 	void *chunkBuffer = 0;
 	int32 chunkSize = 0;
 	media_header mediaHeader;
-	off_t bytes = 0;
-	while (GetNextChunk(&chunkBuffer, &chunkSize, &mediaHeader) == B_OK) {
-		ogg_packet * packet = static_cast<ogg_packet *>(chunkBuffer);
-		bytes += packet->bytes;
-		frame++;
+	if (GetNextChunk(&chunkBuffer, &chunkSize, &mediaHeader) != B_OK) {
+		*frameCount = 0;
+		*duration = 0;
+		return B_OK;
 	}
-	time += (8000000 * bytes) / format->u.encoded_audio.bit_rate;
-	*frameCount = frame;
-	*duration = time;
+	ogg_packet * chunk_packet = static_cast<ogg_packet *>(chunkBuffer);
+	ogg_int64_t first_packet_granulepos = chunk_packet->granulepos;
+	ogg_int64_t last_packet_granulepos = chunk_packet->granulepos;
+	ogg_int64_t next_packet = chunk_packet->packetno + 1;
+	int64 samples = 0;
+	while (GetNextChunk(&chunkBuffer, &chunkSize, &mediaHeader) == B_OK) {
+		chunk_packet = static_cast<ogg_packet *>(chunkBuffer);
+		if (chunk_packet->packetno != next_packet) {
+			// there's a hole in the data, add samples so far, and start counting again
+			TRACE("OggVorbisStream::GetStreamInfo: substream end\n");
+			samples += last_packet_granulepos - first_packet_granulepos;
+			first_packet_granulepos = chunk_packet->granulepos;
+		}
+		last_packet_granulepos = chunk_packet->granulepos;
+		next_packet = chunk_packet->packetno + 1;
+	}
+	samples += last_packet_granulepos - first_packet_granulepos;
+
+	// compute frame count and duration from sample count
+	*frameCount = fFrameCount = samples;
+	*duration = fDuration = (1000000LL * samples) / (long long)format->u.encoded_audio.output.frame_rate;
+
+	// restore our position to the start
 	int64 start_frame = 0;
 	bigtime_t start_time = 0;
 	Seek(B_MEDIA_SEEK_TO_FRAME, &start_frame, &start_time);
-#endif
+
 	return B_OK;
 }
