@@ -22,7 +22,7 @@
 //	File Name:		EventQueue.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
 //					YellowBites (http://www.yellowbites.com)
-//	Description:	A class featuring providing a mechanism to do events at
+//	Description:	A class providing a mechanism for executing events at
 //					specified times.
 //------------------------------------------------------------------------------
 
@@ -50,7 +50,10 @@ public:
 
  private:
 	bool _AddEvent(Event *event);
+	bool _RemoveEvent(Event *event);
 	Event *_EventAt(int32 index) const;
+	int32 _IndexOfEvent(Event *event) const;
+	int32 _FindInsertionIndex(bigtime_t time) const;
 
 	static	int32 _EventLooperEntry(void *data);
 	int32 _EventLooper();
@@ -61,6 +64,7 @@ public:
 	sem_id				fLooperControl;
 	volatile bigtime_t	fNextEventTime;
 	status_t			fStatus;
+	volatile bool		fTerminating;
 };
 
 #endif	// EVENT_QUEUE_H
