@@ -303,8 +303,8 @@ class DisplayDriver {
 
 	// These two will rarely be implemented by subclasses,
 	// but it still needs to be possible
-	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	virtual void				Unlock();
+	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
+	virtual void				Unlock() = 0;
 
 	// display mode access
 	virtual void				SetMode(const display_mode &mode);
@@ -358,8 +358,6 @@ class DisplayDriver {
 	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
  protected:
-			BLocker				fLocker;
-
 			CursorHandler		fCursorHandler;
 
 			display_mode		fDisplayMode;

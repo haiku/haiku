@@ -282,8 +282,8 @@ class DisplayDriverImpl : public DisplayDriver {
 		
 	// These two will rarely be implemented by subclasses,
 	// but it still needs to be possible
-//	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
-//	virtual void				Unlock();
+	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual void				Unlock();
 
 	virtual bool				DumpToFile(const char *path);
 	virtual ServerBitmap*		DumpToBitmap();
@@ -406,15 +406,8 @@ friend class WinBorder;
 	virtual void				StrokeSolidRect(const BRect &rect,
 												const RGBColor &color);
 
-
-//	PatternHandler fDrawPattern;
-//	RGBColor fDrawColor;
-//	int fLineThickness;
-	
-//	accelerant_device_info fAccDeviceInfo;
-	
-	
-//	DrawData fDrawData;
+ protected:
+			BLocker				fLocker;
 };
 
 #endif
