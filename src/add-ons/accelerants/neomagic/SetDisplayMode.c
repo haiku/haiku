@@ -63,18 +63,18 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* See BOUNDS WARNING above... */
 	if (PROPOSE_DISPLAY_MODE(&target, &target, &target) == B_ERROR)	return B_ERROR;
 
+	/* disable interrupts using the kernel driver */
+	interrupt_enable(false);
+
+	/* make sure the card's registers are unlocked (KB output select may lock!) */
+	nm_unlock();
+
 	/* if we have the flatpanel turned on modify visible part of mode if nessesary */
 	if (nm_general_output_read() & 0x02)
 	{
 		LOG(4,("SETMODE: internal flatpanel enabled, skipping CRTC/pixelPLL setup\n"));
 		crt_only = false;
 	}
-
-	/* disable interrupts using the kernel driver */
-	interrupt_enable(false);
-
-	/* make sure the card's registers are unlocked (KB output select may lock!) */
-	nm_unlock();
 
 	/* find current DPMS state, then turn off screen(s) */
 	nm_crtc_dpms_fetch(&display, &h, &v);
