@@ -34,6 +34,8 @@ enum write_stat_mask {
 	FS_WRITE_STAT_ATIME		= 0x0010,
 	FS_WRITE_STAT_MTIME		= 0x0020,
 	FS_WRITE_STAT_CRTIME	= 0x0040
+	// NOTE: Changing these constants will break
+	// src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
 };
 
 /* passed to write_fs_info() */
