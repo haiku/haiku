@@ -67,7 +67,7 @@ static struct {
 	{"/bin", "/boot/beos/bin"},
 	{"/etc", "/boot/beos/etc"},
 	{"/var", "/boot/var"},
-	{"/tmp", "/boot/tmp"},
+	{"/tmp", "/boot/var/tmp"},
 	{NULL}
 };
 
