@@ -14,16 +14,34 @@ struct kernel_args;
 /* adds the handler but don't change whether or not the interrupt is currently enabled */
 #define B_NO_ENABLE_COUNTER	1
 
+/* during kernel startup, interrupts are disabled */
+extern bool kernel_startup;
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int  int_init(struct kernel_args *ka);
 int  int_init2(struct kernel_args *ka);
 int  int_io_interrupt_handler(int vector);
 long install_interrupt_handler(long, interrupt_handler,	void *);
 long remove_interrupt_handler (long, interrupt_handler,	void *);
 
-#define enable_interrupts		  arch_int_enable_interrupts
-#define are_interrupts_enabled    arch_int_is_interrupts_enabled
+static inline void
+enable_interrupts(void)
+{
+	arch_int_enable_interrupts();
+}
 
-/* during kernel startup, interrupts are disabled */
-extern bool kernel_startup;
+static inline bool
+are_interrupts_enabled(void)
+{
+	return arch_int_are_interrupts_enabled();
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _KERNEL_INT_H */
