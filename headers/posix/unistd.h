@@ -114,9 +114,9 @@ extern off_t	lseek(int fd, off_t offset, int whence);
 //extern int		unmount(const char *path);
 
 extern int      getdtablesize(void);
-//extern long		sysconf(int name);
-//extern long		fpathconf(int fd, int name);
-//extern long		pathconf(const char *path, int name);
+extern long		sysconf(int name);
+extern long		fpathconf(int fd, int name);
+extern long		pathconf(const char *path, int name);
 
 /* process functions */
 //extern pid_t	fork(void);
