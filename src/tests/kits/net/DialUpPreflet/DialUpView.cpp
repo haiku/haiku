@@ -51,7 +51,7 @@ static const uint32 kMsgConnectButton = 'CONI';
 #ifdef LANG_GERMAN
 static const char *kLabelInterface = "Verbindung: ";
 static const char *kLabelInterfaceName = "Verbindungs-Name: ";
-static const char *kLabelNewInterface = "Neue Verbindung Erstellen";
+static const char *kLabelCreateNewInterface = "Neue Verbindung Erstellen";
 static const char *kLabelCreateNew = "Neu...";
 static const char *kLabelDeleteCurrent = "Auswahl Löschen";
 static const char *kLabelConnect = "Verbinden";
@@ -60,7 +60,7 @@ static const char *kLabelOK = "OK";
 #else
 static const char *kLabelInterface = "Interface: ";
 static const char *kLabelInterfaceName = "Interface Name: ";
-static const char *kLabelNewInterface = "Create New Interface";
+static const char *kLabelCreateNewInterface = "Create New Interface";
 static const char *kLabelCreateNew = "Create New...";
 static const char *kLabelDeleteCurrent = "Delete Current";
 static const char *kLabelConnect = "Connect";
@@ -160,13 +160,21 @@ DialUpView::DialUpView(BRect frame)
 	tabViewRect.bottom -= fTabView->TabHeight();
 	fAddons.AddRect(DUN_TAB_VIEW_RECT, tabViewRect);
 	
-	BRect stringRect(rect);
-	stringRect.top += (stringRect.Height() - 15) / 2;
-	stringRect.bottom = stringRect.top + 15;
-	fStringView = new BStringView(stringRect, "NoInterfacesFound",
+	BRect tmpRect(rect);
+	tmpRect.top += (tmpRect.Height() - 15) / 2;
+	tmpRect.bottom = tmpRect.top + 15;
+	fStringView = new BStringView(tmpRect, "NoInterfacesFound",
 		kTextNoInterfacesFound);
 	fStringView->SetAlignment(B_ALIGN_CENTER);
 	fStringView->Hide();
+	tmpRect.top = tmpRect.bottom + 10;
+	tmpRect.bottom = tmpRect.top + 25;
+	fCreateNewButton = new BButton(tmpRect, "CreateNewButton",
+		kLabelCreateNewInterface, new BMessage(kMsgCreateNew));
+	fCreateNewButton->ResizeToPreferred();
+	tmpRect.left = (rect.Width() - fCreateNewButton->Bounds().Width()) / 2 + rect.left;
+	fCreateNewButton->MoveTo(tmpRect.left, tmpRect.top);
+	fCreateNewButton->Hide();
 	
 	rect.top = rect.bottom + 15;
 	rect.bottom = rect.top + 15;
@@ -182,6 +190,7 @@ DialUpView::DialUpView(BRect frame)
 	AddChild(fMenuField);
 	AddChild(fTabView);
 	AddChild(fStringView);
+	AddChild(fCreateNewButton);
 	AddChild(fStatusView);
 	AddChild(fConnectButton);
 	
@@ -217,6 +226,7 @@ void
 DialUpView::AttachedToWindow()
 {
 	fInterfaceMenu->SetTargetForItems(this);
+	fCreateNewButton->SetTarget(this);
 	fConnectButton->SetTarget(this);
 	
 	if(fListener.InitCheck() != B_OK) {
@@ -237,7 +247,7 @@ DialUpView::MessageReceived(BMessage *message)
 		
 		// -------------------------------------------------
 		case kMsgCreateNew: {
-			(new TextRequestDialog(kLabelNewInterface, kTextChooseInterfaceName,
+			(new TextRequestDialog(kLabelCreateNewInterface, kTextChooseInterfaceName,
 					kLabelInterfaceName))->Go(
 				new BInvoker(new BMessage(kMsgFinishCreateNew), this));
 		} break;
@@ -722,7 +732,7 @@ void
 DialUpView::LoadInterfaces()
 {
 	fInterfaceMenu->AddSeparatorItem();
-	fInterfaceMenu->AddItem(new BMenuItem(kLabelNewInterface,
+	fInterfaceMenu->AddItem(new BMenuItem(kLabelCreateNewInterface,
 		new BMessage(kMsgCreateNew)));
 	fDeleterItem = new BMenuItem(kLabelDeleteCurrent,
 		new BMessage(kMsgDeleteCurrent));
@@ -858,6 +868,7 @@ DialUpView::UpdateControls()
 	if(fTabView->IsHidden() && CountInterfaces() > 0) {
 		fInterfaceMenu->SetLabelFromMarked(true);
 		fStringView->Hide();
+		fCreateNewButton->Hide();
 		fTabView->Show();
 		fConnectButton->SetEnabled(true);
 	} else if(!fTabView->IsHidden() && CountInterfaces() == 0) {
@@ -866,6 +877,7 @@ DialUpView::UpdateControls()
 		fInterfaceMenu->Superitem()->SetLabel(kLabelCreateNew);
 		fTabView->Hide();
 		fStringView->Show();
+		fCreateNewButton->Show();
 		fConnectButton->SetEnabled(false);
 	}
 }

@@ -65,7 +65,7 @@ class GeneralAddon : public DialUpAddon {
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
 		
-		// used by ppp_server
+		// used by ppp_up application
 		BView *AuthenticationView() const;
 
 	private:
@@ -112,7 +112,7 @@ class GeneralView : public BView {
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
 		
-		// used by ppp_server
+		// used by ppp_up application
 		BView *AuthenticationView() const
 			{ return fAuthenticationView; }
 

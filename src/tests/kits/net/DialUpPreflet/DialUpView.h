@@ -26,7 +26,7 @@ class DialUpView : public BView {
 		
 		void UpDownThread();
 		
-		// used by ppp_server
+		// used by ppp_up application
 		bool SelectInterfaceNamed(const char *name);
 		BView *AuthenticationView() const;
 		BView *StatusView() const;
@@ -69,7 +69,7 @@ class DialUpView : public BView {
 		GeneralAddon *fGeneralAddon;
 		bool fKeepLabel;
 		BStringView *fStatusView;
-		BButton *fConnectButton;
+		BButton *fConnectButton, *fCreateNewButton;
 		BPopUpMenu *fInterfaceMenu;
 		BMenuField *fMenuField;
 		BStringView *fStringView;
