@@ -1,5 +1,5 @@
 #include "CharacterSet.h"
-#include "UTF8.h"
+#include "Font.h"
 #include <strings.h>
 
 CharacterSet::CharacterSet()
@@ -16,12 +16,21 @@ CharacterSet::CharacterSet()
 CharacterSetRoster::CharacterSetRoster()
 {
 	// this information should be loaded from a file
-	character_sets_count = 10;
+	character_sets_count = 11;
 	character_sets = new (CharacterSet*)[character_sets_count];
 	CharacterSet * cs;
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO1_CONVERSION; // a.k.a. 0
+		cs->id = B_UNICODE_UTF8; // a.k.a. 0
+		cs->MIBenum = 106;
+		strcpy(cs->print_name,"Unicode");
+		strcpy(cs->iana_name,"UTF-8");
+		cs->mime_name = cs->iana_name;
+		character_sets[cs->id] = cs;
+	}
+	{
+		cs = new CharacterSet();
+		cs->id = B_ISO_8859_1;
 		cs->MIBenum = 4;
 		strcpy(cs->print_name,"Latin 1");
 		strcpy(cs->iana_name,"ISO_8859-1:1987");
@@ -39,7 +48,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO2_CONVERSION;
+		cs->id = B_ISO_8859_2;
 		cs->MIBenum = 5;
 		strcpy(cs->print_name,"Latin 2");
 		strcpy(cs->iana_name,"ISO_8859-2:1987");
@@ -55,7 +64,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO3_CONVERSION;
+		cs->id = B_ISO_8859_3;
 		cs->MIBenum = 6;
 		strcpy(cs->print_name,"Latin 3");
 		strcpy(cs->iana_name,"ISO_8859-3:1988");
@@ -72,7 +81,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO4_CONVERSION;
+		cs->id = B_ISO_8859_4;
 		cs->MIBenum = 7;
 		strcpy(cs->print_name,"Latin 4");
 		strcpy(cs->iana_name,"ISO_8859-4:1988");
@@ -88,7 +97,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO5_CONVERSION;
+		cs->id = B_ISO_8859_5;
 		cs->MIBenum = 8;
 		strcpy(cs->print_name,"Cyrillic");
 		strcpy(cs->iana_name,"ISO_8859-5:1988");
@@ -103,7 +112,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO6_CONVERSION;
+		cs->id = B_ISO_8859_6;
 		cs->MIBenum = 9;
 		strcpy(cs->print_name,"Arabic");
 		strcpy(cs->iana_name,"ISO_8859-6:1987");
@@ -120,7 +129,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO7_CONVERSION;
+		cs->id = B_ISO_8859_7;
 		cs->MIBenum = 10;
 		strcpy(cs->print_name,"Greek");
 		strcpy(cs->iana_name,"ISO_8859-7:1987");
@@ -138,7 +147,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO8_CONVERSION;
+		cs->id = B_ISO_8859_8;
 		cs->MIBenum = 11;
 		strcpy(cs->print_name,"Hebrew");
 		strcpy(cs->iana_name,"ISO_8859-8:1988");
@@ -153,7 +162,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO9_CONVERSION;
+		cs->id = B_ISO_8859_9;
 		cs->MIBenum = 12;
 		strcpy(cs->print_name,"Latin 5");
 		strcpy(cs->iana_name,"ISO_8859-9:1989");
@@ -169,7 +178,7 @@ CharacterSetRoster::CharacterSetRoster()
 	}
 	{
 		cs = new CharacterSet();
-		cs->id = B_ISO10_CONVERSION;
+		cs->id = B_ISO_8859_10;
 		cs->MIBenum = 12;
 		strcpy(cs->print_name,"Latin 6");
 		strcpy(cs->iana_name,"ISO_8859-10");
@@ -209,13 +218,13 @@ CharacterSetRoster::CurrentRoster()
 const CharacterSet * 
 CharacterSetRoster::FindCharacterSetByFontID(uint32 id)
 {
-	return character_sets[id - 1];
+	return character_sets[id];
 }
 
 const CharacterSet * 
 CharacterSetRoster::FindCharacterSetByConversionID(uint32 id)
 {
-	return character_sets[id];
+	return character_sets[id+1];
 }
 
 const CharacterSet * 

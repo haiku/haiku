@@ -278,6 +278,8 @@ StyledEditWindow::InitWindow()
 	/***************************MENUS ADDED***********************/
 	
 	fSavePanel = 0; // build lazily
+	fSavePanelEncodingMenu = 0; // build lazily
+	fSaveAsEncoding = 0; // default UTF-8
 }  /***StyledEditWindow::Initwindow()***/
 
 void
@@ -605,6 +607,15 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			// clear flags
 		}
 		break;
+/*********"Document"-menu*************/
+		case SAVE_AS_ENCODING:
+			void * ptr;
+			if (message->FindPointer("source",&ptr) == B_OK) {
+				if (fSavePanelEncodingMenu != 0) {
+					fSaveAsEncoding = (uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr);
+				}
+			}
+		break;
 		default:
 		BWindow::MessageReceived(message);
 		break;
@@ -858,8 +869,8 @@ StyledEditWindow::SaveAs()
 		status_t status = B_OK;
 		CharacterSetRoster * roster = CharacterSetRoster::Roster(&status);
 		if (status == B_OK) {
-			for (int id = 0; (id < roster->GetCharacterSetCount()) ; id++) {
-				const CharacterSet * cs = roster->FindCharacterSetByConversionID(id);
+			for (int index = 0; (index < roster->GetCharacterSetCount()) ; index++) {
+				const CharacterSet * cs = roster->GetCharacterSet(index);
 				BString name(cs->GetPrintName());
 				name.Append(" (");
 				name.Append(cs->GetMIMEName());
@@ -867,6 +878,9 @@ StyledEditWindow::SaveAs()
 				BMenuItem * item = new BMenuItem(name.String(),new BMessage(SAVE_AS_ENCODING));
 				item->SetTarget(this);
 				fSavePanelEncodingMenu->AddItem(item);
+				if (index == fSaveAsEncoding) {
+					item->SetMarked(true);
+				}
 			}
 		}
 	}

@@ -97,6 +97,8 @@ private:
 	BFilePanel		*fSavePanel;
 	BTextControl	*fSavePanelTextView;
 	BMenu			*fSavePanelEncodingMenu;
+	
+	uint32			fSaveAsEncoding;
 		
 };
 

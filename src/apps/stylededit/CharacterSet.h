@@ -16,10 +16,10 @@ class CharacterSetRoster;
 class CharacterSet {
 public:
 	//! returns an id suitable for use in BFont::SetEncoding
-	uint32 GetFontID() const { return id + 1; }
+	uint32 GetFontID() const { return id; }
 	
 	//! returns an id suitable for use in convert_to_utf8/convert_from_utf8
-	uint32 GetConversionID() const { return id; }
+	uint32 GetConversionID() const { return id - 1; }
 	
 	//! returns an id for use in MIBs to identify coded character sets
 	uint32 GetMIBenum() const { return MIBenum; }
@@ -70,6 +70,7 @@ public:
 	const CharacterSet * FindCharacterSetByMIBenum(uint32 MIBenum);
 	const CharacterSet * FindCharacterSetByPrintName(char * name);
 	const CharacterSet * FindCharacterSetByName(char * name);
+	const CharacterSet * GetCharacterSet(uint32 index) { return character_sets[index]; }
 	uint32 GetCharacterSetCount() const { return character_sets_count; }
 private:
 	CharacterSet ** character_sets;
