@@ -15,7 +15,7 @@
 */
 
 #include "UdfDebug.h"
-#include "Volume.h"
+#include "Recognition.h"
 
 struct partition_data {
 	char partition_name[B_FILE_NAME_LENGTH];
@@ -50,7 +50,7 @@ ds_fs_id(partition_data *data, int32 device, uint64 sessionOffset,
 		// Udf volume names are at most 63 2-byte unicode chars, so 256 UTF-8
 		// chars should cover us.
 
-	status_t err = Udf::Volume::Identify(device, (data->offset + sessionOffset), data->blocks, blockSize, name);
+	status_t err = Udf::udf_recognize(device, (data->offset + sessionOffset), data->blocks, blockSize, name);
 	if (!err) {
 		strcpy(data->file_system_short_name, "udf");
 		strcpy(data->file_system_long_name, "Universal Disk Format");
