@@ -26,6 +26,10 @@ public:
 
 //	virtual void Dump(bool deep = true, int32 level = 0);
 
+protected:
+	virtual status_t GetMediaStatus(status_t *mediaStatus);
+	virtual status_t GetGeometry(device_geometry *geometry);
+
 private:
 	static status_t _GetDirectoryPath(partition_id id, KPath *path);
 
