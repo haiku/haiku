@@ -302,7 +302,7 @@ atomize(const void * at, const char *string, int create) {
 			if (test < 0)
 				high = index;
 			else if (test > 0)
-				low = index + 1;
+				low = ++index;	// if we exit the while loop here, use index + 1					
 			else
 				break;
 		}
