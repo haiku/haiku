@@ -98,4 +98,8 @@ BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP);
 // returns NULL if bitmap is NULL
 BPicture *BitmapToPicture(BView* view, BBitmap *bitmap);
 BPicture *BitmapToGrayedPicture(BView* view, BBitmap *bitmap);
+
+// scalar multiplication
+BRect ScaleRect(BRect rect, float scale); 
+
 #endif
