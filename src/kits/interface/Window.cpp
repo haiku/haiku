@@ -58,6 +58,12 @@
 
 // Local Defines ---------------------------------------------------------------
 #define DEBUG_WIN
+#ifdef DEBUG_WIN
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 
 // Globals ---------------------------------------------------------------------
 static property_info windowPropInfo[] =
@@ -1930,6 +1936,7 @@ void BWindow::InitData(	BRect frame,
 	fMaxWindHeight	= 32768.0;
 	fMaxWindWidth	= 32768.0;
 
+	fLastViewToken	= B_NULL_TOKEN;
 // TODO: other initializations!
 
 /*
@@ -1980,6 +1987,7 @@ void BWindow::InitData(	BRect frame,
 
 		// build and register top_view with app_server
 	BuildTopView();
+//	top_view->PrintToStream();
 }
 
 //------------------------------------------------------------------------------
@@ -2215,7 +2223,7 @@ void BWindow::BuildTopView(){
 	top_view		= new BView( fFrame.OffsetToCopy(0,0), "top_view",
 								 B_FOLLOW_ALL, B_WILL_DRAW);
 	top_view->top_level_view	= true;
-	top_view->fShowLevel		= 1;
+	//top_view->fShowLevel		= 1;
 
 		// set top_view's owner, add it to window's eligible handler list
 		// and also set its next handler to be this window.
@@ -2230,6 +2238,8 @@ void BWindow::BuildTopView(){
 	session->WriteString( top_view->Name() );
 		// we DO NOT send our current state; the server knows the default values!
 	session->Sync();
+
+	fLastViewToken		= _get_object_token_( top_view );
 }
 
 //------------------------------------------------------------------------------
@@ -3275,6 +3285,7 @@ void BWindow::_ReservedWindow8() { }
 void BWindow::PrintToStream() const{
 	printf("BWindow '%s' data:
 		Title			= %s
+		Token			= %ld
 		InTransaction 	= %s
 		Active 			= %s
 		fShowLevel		= %d
@@ -3290,6 +3301,7 @@ void BWindow::PrintToStream() const{
 		# of shortcuts	= %ld",
 		Name(),
 		fTitle!=NULL? fTitle:"NULL",
+		_get_object_token_(this),		
 		fInTransaction==true? "yes":"no",
 		fActive==true? "yes":"no",
 		fShowLevel,
@@ -3361,4 +3373,10 @@ TODO list:
 	*) test arguments for SetWindowAligment
 	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
 
+*/
+
+/*
+ @log
+	* made fLastViewToken member equal with top_view's token. This avoids an unnecessary message to be sent to app_server.
+	* added some debugging code?
 */
