@@ -185,6 +185,7 @@ BMPTranslatorTest::IdentifyTest()
 	NextSubTest();
 	fheader.magic = 'MB';
 	fheader.fileSize = 53; // bad value, too small to contain all of MS header data
+		// bad values in this field can be, and are ignored by some Windows image viewers
 	fheader.reserved = 0;
 	fheader.dataOffset = 54;
 	MSInfoHeader msheader;
@@ -205,7 +206,7 @@ BMPTranslatorTest::IdentifyTest()
 	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbadfs.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(proster->Identify(&mallbadfs, NULL, &ti) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbadfs, NULL, &ti) == B_OK);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -279,6 +280,9 @@ BMPTranslatorTest::IdentifyTest()
 	fheader.fileSize = 1028;
 	fheader.reserved = 0;
 	fheader.dataOffset = 1029; // bad value, larger than the fileSize
+		// Ignore the fileSize: if it is the case that the actual file size is
+		// less than the dataOffset field, the translation will error out appropriately.
+		// Assume the fileSize has nothing to do with the actual size of the file
 	os2header.size = 12;
 	os2header.width = 5;
 	os2header.height = 5;
@@ -290,7 +294,7 @@ BMPTranslatorTest::IdentifyTest()
 	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo3.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(proster->Identify(&mallbaddo3, NULL, &ti) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbaddo3, NULL, &ti) == B_OK);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
