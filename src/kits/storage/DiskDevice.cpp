@@ -3,12 +3,21 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <new.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
+#include <Drivers.h>
 #include <Message.h>
 #include <Partition.h>
+#include <RegistrarDefs.h>
 #include <Session.h>
 
 /*!	\class BDiskDevice
@@ -44,6 +53,7 @@ BDiskDevice::~BDiskDevice()
 void
 BDiskDevice::Unset()
 {
+printf("BDiskDevice::Unset()\n");
 	fSessions.MakeEmpty();
 	fUniqueID = -1;
 	fChangeCounter = 0;
@@ -122,6 +132,20 @@ BDiskDevice::Path() const
 	return (fPath[0] != '\0' ? fPath : NULL);
 }
 
+// skip_string_component
+static
+const char *
+skip_string_component(const char *str, const char *component)
+{
+	const char *remainder = NULL;
+	if (str && component) {
+		size_t len = strlen(component);
+		if (!strncmp(str, component, len))
+			remainder = str + len;
+	}
+	return remainder;
+}
+
 // GetName
 /*!	\brief Returns a human readable name for the device.
 
@@ -131,15 +155,79 @@ BDiskDevice::Path() const
 	\param name Pointer to a pre-allocated BString to be set to the device
 		   name.
 	\param includeBusID \c true, if the bus ID shall be included in the name
-		   to be returned.
+		   to be returned (of interest for SCSI devices).
 	\param includeLUN \c true, if the LUN shall be included in the name
-		   to be returned.
-	\return A human readable name for the device.
+		   to be returned (of interest for SCSI devices).
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a name.
+	- \c B_NO_INIT: The device is not properly initialized.
 */
-void
+status_t
 BDiskDevice::GetName(BString *name, bool includeBusID, bool includeLUN) const
 {
-	// not implemented
+	// check params and initialization
+	status_t error = (name ? B_OK : B_BAD_VALUE);
+	const char *path = Path();
+	if (error == B_OK && !path)
+		error = B_BAD_VALUE;
+	// analyze the device path
+	if (error == B_OK) {
+		bool recognized = false;
+		const char *prefix = "/dev/disk/";
+		size_t prefixLen = strlen(prefix);
+		if (!strncmp(path, prefix, prefixLen)) {
+			path = path + prefixLen;
+			// check first component
+			const char *tail = NULL;
+			// floppy
+			if (skip_string_component(path, "floppy/")) {
+				name->SetTo("floppy");
+				recognized = true;
+			// ide
+			} else if ((tail = skip_string_component(path, "ide/"))) {
+				int controller = 0;
+				bool master = false;
+				const char *_tail = tail;
+				if ((((tail = skip_string_component(_tail, "atapi/")))
+					 || ((tail = skip_string_component(_tail, "ata/"))))
+					&& isdigit(*tail)) {
+					controller = atoi(tail);
+					master = false;
+					if ((tail = strchr(tail, '/'))) {
+						tail++;
+						if (skip_string_component(tail, "master/")) {
+							master = true;
+							recognized = true;
+						} else if (skip_string_component(tail, "slave/"))
+							recognized = true;
+					}
+				}
+				if (recognized) {
+					name->SetTo("IDE ");
+					*name << (master ? "master" : "slave") << " bus:"
+						<< controller;
+				}
+			// scsi
+			} else if ((tail = skip_string_component(path, "scsi/"))) {
+				int bus = 0;
+				int id = 0;
+				int lun = 0;
+				if (sscanf(tail, "%d/%d/%d/raw", &bus, &id, &lun) == 3) {
+					recognized = true;
+					name->SetTo("SCSI");
+					if (includeBusID)
+						*name << " bus:" << bus;
+					*name << " id:" << id;
+					if (includeLUN)
+						*name << " lun:" << lun;
+				}
+			}
+		}
+		if (!recognized)
+			name->SetTo(path);
+	}
+	return error;
 }
 
 // GetName
@@ -151,15 +239,24 @@ BDiskDevice::GetName(BString *name, bool includeBusID, bool includeLUN) const
 	\param name Pointer to a pre-allocated char buffer into which the device
 		   name shall be copied.
 	\param includeBusID \c true, if the bus ID shall be included in the name
-		   to be returned.
+		   to be returned (of interest for SCSI devices).
 	\param includeLUN \c true, if the LUN shall be included in the name
-		   to be returned.
-	\return A human readable name for the device.
+		   to be returned (of interest for SCSI devices).
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a name.
+	- \c B_NO_INIT: The device is not properly initialized.
 */
-void
+status_t
 BDiskDevice::GetName(char *name, bool includeBusID, bool includeLUN) const
 {
-	// not implemented
+	status_t error = (name ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		BString _name;
+		error = GetName(&_name, includeBusID, includeLUN);
+		if (error == B_OK)
+			strcpy(name, _name.String());
+	}
+	return error;
 }
 
 // IsReadOnly
@@ -247,13 +344,33 @@ BDiskDevice::UniqueID() const
 	The device media must, of course, be removable, and the device must
 	support ejecting the media.
 
-	\return \c B_OK, if the media are ejected successfully, another error code
-		    otherwise.
+	\param update If \c true, Update() is invoked after successful ejection.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The device is not properly initialized.
+	- \c B_BAD_VALUE: The device media is not removable.
+	- other error codes
 */
 status_t
-BDiskDevice::Eject()
+BDiskDevice::Eject(bool update)
 {
-	return B_ERROR;	// not implemented
+	// get path
+	const char *path = Path();
+	status_t error = (path ? B_OK : B_NO_INIT);
+	// check whether the device media is removable
+	if (error == B_OK && !IsRemovable())
+		error = B_BAD_VALUE;
+	// open, eject and close the device
+	if (error == B_OK) {
+		int fd = open(path, O_RDONLY);
+		if (fd < 0 || ioctl(fd, B_EJECT_DEVICE) != 0)
+			error = errno;
+		if (fd >= 0)
+			close(fd);
+	}
+	if (error == B_OK && update)
+		error = Update();
+	return error;
 }
 
 // LowLevelFormat
@@ -274,12 +391,55 @@ BDiskDevice::LowLevelFormat()
 	e.g. if it is hot-pluggable. Then an error is returned and the object is
 	uninitialized.
 
+	\param updated Pointer to a bool variable which shall be set to \c true,
+		   if the object needed to be updated and to \c false otherwise.
+		   May be \c NULL. Is not touched, if the method fails.
 	\return \c B_OK, if the update went fine, another error code otherwise.
 */
 status_t
-BDiskDevice::Update()
+BDiskDevice::Update(bool *updated)
 {
-	return B_ERROR;	// not implemented
+	// get a messenger for the disk device manager
+// TODO: Cache the messenger? Maybe add a global variable?
+	BMessenger manager;
+	status_t error = get_disk_device_messenger(&manager);
+	// compose request message
+	BMessage request(B_REG_UPDATE_DISK_DEVICE);
+	if (error == B_OK)
+		error = request.AddInt32("device_id", fUniqueID);
+	if (error == B_OK)
+		error = request.AddInt32("change_counter", fChangeCounter);
+	if (error == B_OK)
+		error = request.AddInt32("update_policy", B_REG_DEVICE_UPDATE_CHANGED);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = manager.SendMessage(&request, &reply);
+	// analyze reply
+	bool upToDate = true;
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+		if (error == B_OK)
+			error = reply.FindBool("up_to_date", &upToDate);
+	}
+	// get the archived device, if not up to date
+	if (error == B_OK && !upToDate) {
+		BMessage archive;
+		error = reply.FindMessage("device", &archive);
+		if (error == B_OK)
+			error = _Update(&archive);
+	}
+	// set result / cleanup on error
+	if (error == B_OK) {
+		if (updated)
+			*updated = !upToDate;
+	} else
+		Unset();
+	return error;
 }
 
 // VisitEachSession
@@ -427,32 +587,22 @@ BDiskDevice::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("id", &fUniqueID);
 		if (error == B_OK)
 			error = archive->FindInt32("change_counter", &fChangeCounter);
-//printf("  check: %s\n", strerror(error));
 		// geometry
 		if (error == B_OK)
 			error = archive->FindInt64("size", &fSize);
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt32("block_size", &fBlockSize);
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt8("type", (int8*)&fType);
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindBool("removable", &fRemovable);
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindBool("read_only", &fReadOnly);
-//		if (error == B_OK)
-//			error = archive->FindBool("write_once", fGeometry.write_once);
 		// other data
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = find_string(archive, "path", fPath);
-//printf("  check: %s\n", strerror(error));
 		if (error == B_OK)
 			error = archive->FindInt32("media_status", &fMediaStatus);
-//printf("  check: %s\n", strerror(error));
 		// sessions
 		type_code fieldType;
 		int32 count = 0;
@@ -460,13 +610,10 @@ BDiskDevice::_Unarchive(BMessage *archive)
 			if (archive->GetInfo("sessions", &fieldType, &count) != B_OK)
 				count = 0;
 		}
-//printf("  check: %s\n", strerror(error));
 		for (int32 i = 0; error == B_OK && i < count; i++) {
-//printf("  check1: %s\n", strerror(error));
 			// get the archived session
 			BMessage sessionArchive;
 			error = archive->FindMessage("sessions", i, &sessionArchive);
-//printf("  check1.1: %s\n", strerror(error));
 			// allocate a session object
 			BSession *session = NULL;
 			if (error == B_OK) {
@@ -474,15 +621,12 @@ BDiskDevice::_Unarchive(BMessage *archive)
 				if (!session)
 					error = B_NO_MEMORY;
 			}
-//printf("  check1.1: %s\n", strerror(error));
 			// unarchive the session
 			if (error == B_OK)
 				error = session->_Unarchive(&sessionArchive);
-//printf("  check1.1: %s\n", strerror(error));
 			// add the session
 			if (error == B_OK && !_AddSession(session))
 				error = B_NO_MEMORY;
-//printf("  check1.1: %s\n", strerror(error));
 			// cleanup on error
 			if (error != B_OK && session)
 				delete session;
@@ -492,6 +636,104 @@ BDiskDevice::_Unarchive(BMessage *archive)
 	if (error != B_OK)
 		Unset();
 //printf("BDiskDevice::_Unarchive() done: %s\n", strerror(error));
+	return error;
+}
+
+// _Update
+status_t
+BDiskDevice::_Update(BMessage *archive)
+{
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	bool upToDate = false;
+	if (error == B_OK) {
+		// ID and change counter
+		int32 id;
+		if (error == B_OK)
+			error = archive->FindInt32("id", &id);
+		if (error == B_OK && id != fUniqueID)
+			error = B_ERROR;
+		int32 changeCounter;
+		if (error == B_OK)
+			error = archive->FindInt32("change_counter", &changeCounter);
+		upToDate = (fChangeCounter == changeCounter);
+		fChangeCounter = changeCounter;
+	}
+	if (error == B_OK && !upToDate) {
+		// geometry
+		if (error == B_OK)
+			error = archive->FindInt64("size", &fSize);
+		if (error == B_OK)
+			error = archive->FindInt32("block_size", &fBlockSize);
+		if (error == B_OK)
+			error = archive->FindInt8("type", (int8*)&fType);
+		if (error == B_OK)
+			error = archive->FindBool("removable", &fRemovable);
+		if (error == B_OK)
+			error = archive->FindBool("read_only", &fReadOnly);
+		// other data
+		if (error == B_OK)
+			error = find_string(archive, "path", fPath);
+		if (error == B_OK)
+			error = archive->FindInt32("media_status", &fMediaStatus);
+		// sessions
+		// copy old session list and empty it
+		BObjectList<BSession> sessions;
+		for (int32 i = 0; BSession *session = fSessions.ItemAt(i); i++)
+			sessions.AddItem(session);
+		for (int32 i = fSessions.CountItems() - 1; i >= 0; i--)
+			fSessions.RemoveItemAt(i);
+		// get the session count
+		type_code fieldType;
+		int32 count = 0;
+		if (error == B_OK) {
+			if (archive->GetInfo("sessions", &fieldType, &count) != B_OK)
+				count = 0;
+		}
+		for (int32 i = 0; error == B_OK && i < count; i++) {
+			// get the archived session
+			BMessage sessionArchive;
+			error = archive->FindMessage("sessions", i, &sessionArchive);
+			// check, whether we do already know that session
+			int32 sessionID;
+			if (error == B_OK)
+				error = sessionArchive.FindInt32("id", &sessionID);
+			BSession *session = NULL;
+			for (int32 k = 0; k < sessions.CountItems(); k++) {
+				BSession *oldSession = sessions.ItemAt(i);
+				if (oldSession->UniqueID() == sessionID) {
+					session = oldSession;
+					break;
+				}
+			}
+			if (error == B_OK) {
+				if (session) {
+					// the session is known: just update it
+					error = session->_Update(&sessionArchive);
+				} else {
+					// the session is unknown
+					// allocate a session object
+					session = new(nothrow) BSession;
+					if (!session)
+						error = B_NO_MEMORY;
+					// unarchive the session
+					if (error == B_OK)
+						error = session->_Unarchive(&sessionArchive);
+				}
+			}
+			// add the session
+			if (error == B_OK && !_AddSession(session))
+				error = B_NO_MEMORY;
+			// cleanup on error
+			if (error != B_OK && session)
+				delete session;
+		}
+		// delete all obsolete sessions
+		for (int32 i = sessions.CountItems() - 1; i >= 0; i--)
+			delete sessions.RemoveItemAt(i);
+	}
+	// cleanup on error
+	if (error != B_OK)
+		Unset();
 	return error;
 }
 

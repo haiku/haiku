@@ -387,7 +387,6 @@ BSession::_Unarchive(BMessage *archive)
 			error = archive->FindInt32("change_counter", &fChangeCounter);
 		if (error == B_OK)
 			error = archive->FindInt32("index", &fIndex);
-//printf("  check: %s\n", strerror(error));
 		// fInfo.*
 		if (error == B_OK)
 			error = archive->FindInt64("offset", &fInfo.offset);
@@ -395,11 +394,9 @@ BSession::_Unarchive(BMessage *archive)
 			error = archive->FindInt64("size", &fInfo.size);
 		if (error == B_OK)
 			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
-//printf("  check: %s\n", strerror(error));
 		// other data
 		if (error == B_OK)
 			error = archive->FindString("partitioning", &fPartitioningSystem);
-//printf("  check: %s\n", strerror(error));
 		// partitions
 		type_code fieldType;
 		int32 count = 0;
@@ -433,6 +430,101 @@ BSession::_Unarchive(BMessage *archive)
 	if (error != B_OK)
 		_Unset();
 //printf("BSession::_Unarchive() done: %s\n", strerror(error));
+	return error;
+}
+
+// _Update
+status_t
+BSession::_Update(BMessage *archive)
+{
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	bool upToDate = false;
+	if (error == B_OK) {
+		// ID and change counter
+		int32 id;
+		if (error == B_OK)
+			error = archive->FindInt32("id", &id);
+		if (error == B_OK && id != fUniqueID)
+			error = B_ERROR;
+		int32 changeCounter;
+		if (error == B_OK)
+			error = archive->FindInt32("change_counter", &changeCounter);
+		upToDate = (fChangeCounter == changeCounter);
+		fChangeCounter = changeCounter;
+	}
+	if (error == B_OK && !upToDate) {
+		if (error == B_OK)
+			error = archive->FindInt32("index", &fIndex);
+		// fInfo.*
+		if (error == B_OK)
+			error = archive->FindInt64("offset", &fInfo.offset);
+		if (error == B_OK)
+			error = archive->FindInt64("size", &fInfo.size);
+		if (error == B_OK)
+			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
+		// other data
+		if (error == B_OK)
+			error = archive->FindString("partitioning", &fPartitioningSystem);
+		// partitions
+		// copy old partition list and empty it
+		BObjectList<BPartition> partitions;
+		for (int32 i = 0; BPartition *partition = fPartitions.ItemAt(i); i++)
+			partitions.AddItem(partition);
+		for (int32 i = fPartitions.CountItems() - 1; i >= 0; i--)
+			fPartitions.RemoveItemAt(i);
+		// get the partition count
+		type_code fieldType;
+		int32 count = 0;
+		if (error == B_OK) {
+			if (archive->GetInfo("partitions", &fieldType, &count) != B_OK)
+				count = 0;
+		}
+		for (int32 i = 0; error == B_OK && i < count; i++) {
+			// get the archived partitions
+			BMessage partitionArchive;
+			error = archive->FindMessage("partitions", i, &partitionArchive);
+			// check, whether we do already know that partition
+			int32 partitionID;
+			if (error == B_OK)
+				error = partitionArchive.FindInt32("id", &partitionID);
+			BPartition *partition = NULL;
+			for (int32 k = 0; k < partitions.CountItems(); k++) {
+				BPartition *oldPartition = partitions.ItemAt(i);
+				if (oldPartition->UniqueID() == partitionID) {
+					partition = oldPartition;
+					break;
+				}
+			}
+			if (error == B_OK) {
+				if (partition) {
+					// the partition is known: just update it
+					error = partition->_Unarchive(&partitionArchive);
+				} else {
+					// the partition is unknown
+					// allocate a partition object
+					partition = new(nothrow) BPartition;
+					if (!partition)
+						error = B_NO_MEMORY;
+					// unarchive the partition
+					if (error == B_OK)
+						error = partition->_Unarchive(&partitionArchive);
+
+				}
+			}
+			// add the partition
+			if (error == B_OK && !_AddPartition(partition))
+				error = B_NO_MEMORY;
+			// cleanup on error
+			if (error != B_OK && partition)
+				delete partition;
+		}
+		// delete all obsolete partitions
+		for (int32 i = partitions.CountItems() - 1; i >= 0; i--)
+			delete partitions.RemoveItemAt(i);
+	}
+	// cleanup on error
+	if (error != B_OK)
+		_Unset();
 	return error;
 }
 
