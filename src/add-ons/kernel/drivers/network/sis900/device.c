@@ -412,10 +412,8 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	uint32 check;
 	int16 current;
 
-	if (checkDeviceInfo(info = data) != B_OK) {
-		*_length = 0;
-		return EINVAL;
-	}
+	if (checkDeviceInfo(info = data) != B_OK)
+		return B_BAD_VALUE;
 
 	//dprintf("read: rx: isr = %d, free = %d, current = %d\n",
 	//		info->rxInterruptIndex, info->rxFree, info->rxCurrent);
@@ -423,10 +421,8 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	blockFlag = info->blockFlag;
 
 	// read is not reentrant
-	if (atomic_or(&info->rxLock, 1)) {
-		*_length = 0;
+	if (atomic_or(&info->rxLock, 1))
 		return B_ERROR;
-	}
 
 	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32((uint32)info->registers + SiS900_MAC_Rx_DESCR), (info->rxLast+1) % NUM_Rx_DESCR));
 
@@ -434,7 +430,6 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
 		TRACE(("cannot acquire read sem: %x, %s\n", status, strerror(status)));
 		atomic_and(&info->rxLock, 0);
-		*_length = 0;
 		return status;
 	}
 
@@ -445,7 +440,6 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	if (!(check & SiS900_DESCR_OWN)) {	// the buffer is still in use!
 		TRACE(("ERROR: read: buffer %d still in use: %x\n", current, status));
 		atomic_and(&info->rxLock, 0);
-		*_length = 0;
 		return B_BUSY;
 	}
 
@@ -461,7 +455,9 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 		if (size > MAX_FRAME_SIZE || size > *_length) {
 			TRACE(("ERROR read: bad frame size %d\n", size));
 			size = *_length;
-		}
+		} else if (size < *_length)
+			*_length = size;
+
 		memcpy(buffer, (void *)info->rxBuffer[current], size);
 	}
 	info->rxCurrent = (current + 1) & NUM_Rx_MASK;
@@ -514,7 +510,6 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 		write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
 		TRACE(("write: acquiring sem failed: %x, %s\n", status, strerror(status)));
 		atomic_add(&info->txLock, -1);
-		*_length = 0;
 		return status;
 	}
 
@@ -523,7 +518,6 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 		// descriptor is still in use
 		dprintf(DEVICE_NAME ": card owns buffer %d\n", current);
 		atomic_add(&info->txLock, -1);
-		*_length = 0;
 		return B_ERROR;
 	}
 
@@ -549,8 +543,7 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 
 			for (that = 0;that < NUM_Tx_DESCR && (void *)physicalAddress(&info->txDescriptor[that],sizeof(struct buffer_desc)) != b;that++);
 
-			if (that == NUM_Tx_DESCR)
-			{
+			if (that == NUM_Tx_DESCR) {
 				//dprintf("not in ring!\n");
 				that = 0;
 			}
