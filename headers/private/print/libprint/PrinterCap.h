@@ -63,6 +63,12 @@ struct BindingLocationCap : public BaseCap {
 		: BaseCap(n, d), binding_location(b) {}
 };
 
+struct ColorCap : public BaseCap {
+	JobData::COLOR color;
+	ColorCap(const string &n, bool d, JobData::COLOR c)
+		: BaseCap(n, d), color(c) {}
+};
+
 class PrinterData;
 
 class PrinterCap {
@@ -79,7 +85,8 @@ public:
 		RESOLUTION,
 		ORIENTATION,
 		PRINTSTYLE,
-		BINDINGLOCATION
+		BINDINGLOCATION,
+		COLOR
 	};
 
 	virtual int countCap(CAPID) const = 0;

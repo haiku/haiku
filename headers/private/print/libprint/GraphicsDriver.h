@@ -8,6 +8,7 @@
 
 #include "JobData.h"
 #include "PrintProcess.h"
+#include "SpoolMetaData.h"
 #include "Transport.h"
 
 class BView;
@@ -35,9 +36,13 @@ protected:
 	void writeSpoolString(const char *buffer, ...) throw(TransportException);
 	void writeSpoolChar(char c) throw(TransportException);
 
+	static void convert_to_rgb24(void* src, void* dst, int width, color_space cs);
+	static void convert_to_gray(void* src, void* dst, int width, color_space cs);
+
 	const JobData *getJobData() const;
 	const PrinterData *getPrinterData() const;
 	const PrinterCap *getPrinterCap() const;
+	const SpoolMetaData *getSpoolMetaData() const;
 
 	int getPageWidth()  const;
 	int getPageHeight() const;
@@ -56,6 +61,11 @@ private:
 	bool printPage(PageDataList *pages);
 	bool printDocument(SpoolData *spool_data);
 	bool printJob(BFile *file);
+	static void rgb32_to_rgb24(void* src, void* dst, int width);
+	static void cmap8_to_rgb24(void* src, void* dst, int width);
+	static uint8 gray(uint8 r, uint8 g, uint8 b);
+	static void rgb32_to_gray(void* src, void* dst, int width);
+	static void cmap8_to_gray(void* src, void* dst, int width);
 
 	uint32           __flags;
 	BMessage         *__msg;
@@ -66,6 +76,7 @@ private:
 	JobData          *__real_job_data;
 	PrinterData      *__printer_data;
 	const PrinterCap *__printer_cap;
+	SpoolMetaData    *__spool_meta_data;
 
 	int __page_width;
 	int __page_height;
@@ -89,6 +100,11 @@ inline const PrinterData *GraphicsDriver::getPrinterData() const
 inline const PrinterCap *GraphicsDriver::getPrinterCap() const
 {
 	return __printer_cap;
+}
+
+inline const SpoolMetaData *GraphicsDriver::getSpoolMetaData() const
+{
+	return __spool_meta_data;
 }
 
 inline int GraphicsDriver::getPageWidth() const

@@ -37,7 +37,7 @@ private:
 	BRadioButton     *__all;
 	BCheckBox        *__collate;
 	BCheckBox        *__reverse;
-	BPopUpMenu       *__surface_type;
+	BPopUpMenu       *__color_type;
 	BPopUpMenu       *__paper_feed;
 	BCheckBox        *__duplex;
 	BPopUpMenu       *__nup;
