@@ -20,11 +20,11 @@ public:
 	static speex_mode PreferredBand(void);
 	static speex_channels PreferredChannels(void);
 	// if non-zero, specifies a sampling rate in Hertz
-	static float SamplingRate(void);
+	static int SamplingRate(void);
 
 private:
 	static bool perceptual_post_filter;
 	static speex_mode preferred_band;
 	static speex_channels preferred_channels;
-	static float sampling_rate;
+	static int sampling_rate;
 };

@@ -31,8 +31,9 @@ speexDecoder::speexDecoder()
 	speex_bits_init(&fBits);
 	fDecoderState = 0;
 	fHeader = 0;
+	fStereoState = 0;
 	fSpeexFrameSize = 0;
-	fSpeexBytesRemaining = 0;
+	fSpeexBuffer = 0;
 	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
@@ -42,6 +43,8 @@ speexDecoder::speexDecoder()
 speexDecoder::~speexDecoder()
 {
 	TRACE("speexDecoder::~speexDecoder\n");
+	delete fStereoState;
+	delete fSpeexBuffer;
 	speex_bits_destroy(&fBits);
 	speex_decoder_destroy(fDecoderState);
 }
@@ -51,6 +54,7 @@ status_t
 speexDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
+	debugger("speexDecoder::Setup");
 	if (inputFormat->type != B_MEDIA_ENCODED_AUDIO) {
 		TRACE("speexDecoder::Setup not called with audio stream: not speex\n");
 		return B_ERROR;
@@ -81,37 +85,54 @@ speexDecoder::Setup(media_format *inputFormat,
 		fHeader = 0;
 		return B_ERROR;
 	}
-	if (fHeader->mode >= SPEEX_NB_MODES) {
-		TRACE("speexDecoder::Setup failed: unknown speex mode\n");
-		return B_ERROR;
-	}
-	// setup mode
-	SpeexMode * mode;
+	// modify header to reflect settings
 	switch (SpeexSettings::PreferredBand()) {
 	case narrow_band:
-		mode = &speex_nb_mode;
+		fHeader->mode = 0; 
 		break;
 	case wide_band:
-		mode = &speex_wb_mode;
+		fHeader->mode = 1;
 		break;
 	case ultra_wide_band:
-		mode = &speex_uwb_mode;
+		fHeader->mode = 2;
 		break;
 	case automatic_band:
 	default:
-		mode = speex_mode_list[fHeader->mode];
 		break;
 	}
+	switch (SpeexSettings::PreferredChannels()) {
+	case mono_channels:
+		fHeader->nb_channels = 1;
+		break;
+	case stereo_channels:
+		fHeader->nb_channels = 2;
+		break;
+	case automatic_channels:
+	default:
+		break;
+	}
+	if (SpeexSettings::SamplingRate() != 0) {
+		fHeader->rate = SpeexSettings::SamplingRate();
+	}
+	// sanity checks
 #ifdef STRICT_SPEEX
 	if (header->speex_version_id > 1) {
 		TRACE("speexDecoder::Setup failed: version id too new");
 		return B_ERROR;
 	}
+#endif
+	if (fHeader->mode >= SPEEX_NB_MODES) {
+		TRACE("speexDecoder::Setup failed: unknown speex mode\n");
+		return B_ERROR;
+	}
+	// setup from header
+	SpeexMode * mode = speex_mode_list[fHeader->mode];
+#ifdef STRICT_SPEEX
 	if (mode->bitstream_version != fHeader->mode_bitstream_version) {
 		TRACE("speexDecoder::Setup failed: bitstream version mismatch");
 		return B_ERROR;
 	}
-#endif // STRICT_SPEEX
+#endif
 	fDecoderState = speex_decoder_init(mode);
 	if (fDecoderState == NULL) {
 		TRACE("speexDecoder::Setup failed to initialize the decoder state");
@@ -119,11 +140,22 @@ speexDecoder::Setup(media_format *inputFormat,
 	}
 	if (SpeexSettings::PerceptualPostFilter()) {
 		int enabled = 1;
-		speex_decoder_ctl(fDecoderState,SPEEX_SET_ENH,&enabled);
+		speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &enabled);
 	}
-	speex_decoder_ctl(fDecoderState,SPEEX_GET_FRAME_SIZE,&fSpeexFrameSize);
+	speex_decoder_ctl(fDecoderState, SPEEX_GET_FRAME_SIZE, &fSpeexFrameSize);
+	if (fHeader->nb_channels == 2) {
+		SpeexCallback callback;
+		SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
+		callback.callback_id = SPEEX_INBAND_STEREO;
+		callback.func = speex_std_stereo_request_handler;
+		fStereoState = new SpeexStereoState(stereo);
+		callback.data = fStereoState;
+		speex_decoder_ctl(fDecoderState, SPEEX_SET_HANDLER, &callback);
+		fSpeexFrameSize *= 2;
+	}
+	delete fSpeexBuffer;
 	fSpeexBuffer = new float[fSpeexFrameSize];
-
+	speex_decoder_ctl(fDecoderState, SPEEX_SET_SAMPLING_RATE, &fHeader->rate);
 	// fill out the encoding format
 	CopyInfoToEncodedFormat(inputFormat);
 	return B_OK;
@@ -136,6 +168,9 @@ void speexDecoder::CopyInfoToEncodedFormat(media_format * format) {
 	format->u.encoded_audio.encoding
 	 = (media_encoded_audio_format::audio_encoding)'Spee';
 	if (fHeader->bitrate > 0) {
+		format->u.encoded_audio.bit_rate = fHeader->bitrate;
+	} else {
+		speex_decoder_ctl(fDecoderState, SPEEX_GET_BITRATE, &fHeader->bitrate);
 		format->u.encoded_audio.bit_rate = fHeader->bitrate;
 	}
 	if (fHeader->nb_channels == 1) {
@@ -154,6 +189,7 @@ void speexDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
 	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
 	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
 		raf->buffer_size = AudioBufferSize(raf);
+		raf->buffer_size = (1 + raf->buffer_size / fSpeexFrameSize) * fSpeexFrameSize;
 	}
 	// setup output variables
 	fFrameSize = (raf->format & 0xf) * raf->channel_count;
@@ -205,21 +241,7 @@ speexDecoder::Decode(void *buffer, int64 *frameCount,
 	//TRACE("speexDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 
 //	debugger("speexDecoder::Decode");
-	while (out_bytes_needed > 0) {
-		if (fSpeexBytesRemaining > 0) {
-			if (fSpeexBytesRemaining < out_bytes_needed) {
-				memcpy(out_buffer,fSpeexBuffer,fSpeexBytesRemaining);
-				out_buffer += fSpeexBytesRemaining;
-				out_bytes_needed -= fSpeexBytesRemaining;
-			} else {
-				memcpy(out_buffer,fSpeexBuffer,out_bytes_needed);
-				memcpy(fSpeexBuffer,&fSpeexBuffer[fSpeexBytesRemaining],
-				       fSpeexBytesRemaining-out_bytes_needed);
-				out_buffer += out_bytes_needed;
-				out_bytes_needed = 0;
-				break;
-			}
-		}
+	while (out_bytes_needed >= fSpeexFrameSize) {
 		// get a new packet
 		void *chunkBuffer;
 		int32 chunkSize;
@@ -238,8 +260,12 @@ speexDecoder::Decode(void *buffer, int64 *frameCount,
 		}
 		ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
 		speex_bits_read_from(&fBits, (char*)packet->packet, packet->bytes);
-		speex_decode(fDecoderState, &fBits, fSpeexBuffer);
-		fSpeexBytesRemaining = fSpeexFrameSize;
+		speex_decode(fDecoderState, &fBits, (float*)out_buffer);
+		if (fHeader->nb_channels == 2) {
+			speex_decode_stereo((float*)out_buffer, fSpeexFrameSize, fStereoState);
+		}
+		out_buffer += fSpeexFrameSize;
+		out_bytes_needed -= fSpeexFrameSize;
 	}
 
 done:	

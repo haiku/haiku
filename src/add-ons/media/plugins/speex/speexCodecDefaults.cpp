@@ -3,7 +3,7 @@
 bool SpeexSettings::perceptual_post_filter = true;
 speex_mode SpeexSettings::preferred_band = automatic_band;
 speex_channels SpeexSettings::preferred_channels = automatic_channels;
-float SpeexSettings::sampling_rate = 0;
+int SpeexSettings::sampling_rate = 0;
 
 SpeexSettings::SpeexSettings()
 {
@@ -28,7 +28,7 @@ SpeexSettings::PreferredChannels(void)
 }
 
 // if non-zero, specifies a sampling rate in Hertz
-/* static */ float
+/* static */ int
 SpeexSettings::SamplingRate(void)
 {
 	return sampling_rate;

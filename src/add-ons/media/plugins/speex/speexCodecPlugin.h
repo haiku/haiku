@@ -1,6 +1,7 @@
 #include "DecoderPlugin.h"
 #include "speex.h"
 #include "speex_header.h"
+#include "speex_stereo.h"
 #include "speex_callbacks.h"
 
 class speexDecoder : public Decoder
@@ -29,10 +30,10 @@ private:
 	SpeexBits		fBits;
 	void *			fDecoderState;
 	SpeexHeader	*	fHeader;
+	SpeexStereoState * fStereoState;
 
 	int				fSpeexFrameSize;
 	float *			fSpeexBuffer;
-	int				fSpeexBytesRemaining;
 
 	bigtime_t		fStartTime;
 	int				fFrameSize;
