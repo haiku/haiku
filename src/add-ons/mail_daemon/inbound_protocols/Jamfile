@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols ;
+
+SubInclude OBOS_TOP src add-ons mail_daemon inbound_protocols imap ;
+SubInclude OBOS_TOP src add-ons mail_daemon inbound_protocols pop3 ;
+

@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons mail_daemon system_filters ;
+
+SubInclude OBOS_TOP src add-ons mail_daemon system_filters inbox ;
+SubInclude OBOS_TOP src add-ons mail_daemon system_filters notifier ;
+SubInclude OBOS_TOP src add-ons mail_daemon system_filters outbox ;
+SubInclude OBOS_TOP src add-ons mail_daemon system_filters parser ;
+

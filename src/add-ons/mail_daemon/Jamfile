@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons mail_daemon ;
+
+SubInclude OBOS_TOP src add-ons mail_daemon inbound_protocols ;
+SubInclude OBOS_TOP src add-ons mail_daemon inbound_filters ;
+SubInclude OBOS_TOP src add-ons mail_daemon outbound_protocols ;
+SubInclude OBOS_TOP src add-ons mail_daemon outbound_filters ;
+SubInclude OBOS_TOP src add-ons mail_daemon system_filters ;
+

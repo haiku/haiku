@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols ;
+
+SubInclude OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
+
