@@ -11,6 +11,10 @@
 
 #include "BasicTest.h"
 
+class BStatable;
+class BEntry;
+class BNode;
+
 // TestEntries
 
 template <typename C>
