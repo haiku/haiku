@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "vnode_store.h"
@@ -122,8 +122,6 @@ vm_create_vnode_store(void *vnode)
 	store->vm.committed_size = 0;
 
 	store->vnode = vnode;
-	store->size = 0;
-		// the file system will maintain this field through the file cache API
 
 	return &store->vm;
 }
