@@ -5,6 +5,7 @@ SubInclude OBOS_TOP src add-ons kernel busses ;
 SubInclude OBOS_TOP src add-ons kernel console ;
 SubInclude OBOS_TOP src add-ons kernel disk_scanner ;
 SubInclude OBOS_TOP src add-ons kernel drivers ;
+SubInclude OBOS_TOP src add-ons kernel file_cache ;
 SubInclude OBOS_TOP src add-ons kernel file_systems ;
 SubInclude OBOS_TOP src add-ons kernel network ;
 SubInclude OBOS_TOP src add-ons kernel media ;
