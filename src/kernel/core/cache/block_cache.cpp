@@ -436,7 +436,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 
 
 static status_t
-write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true)
+write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction)
 {
 	cache_transaction *previous = block->previous_transaction;
 	int32 blockSize = cache->block_size;
