@@ -378,7 +378,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 		}
 		media_output *output;
 		for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
-			if (output->source.port == port || output->destination.port == port) {
+			if (output->source.port == port) {
 				*nodeid = rn->nodeid;
 				TRACE("NodeManager::FindNodeId found output port %ld, node %ld\n", port, *nodeid);
 				return B_OK;
@@ -386,7 +386,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 		}
 		media_input *input;
 		for (rn->inputlist.Rewind(); rn->inputlist.GetNext(&input); ) {
-			if (input->source.port == port || input->destination.port == port) {
+			if (input->destination.port == port) {
 				*nodeid = rn->nodeid;
 				TRACE("NodeManager::FindNodeId found input port %ld, node %ld\n", port, *nodeid);
 				return B_OK;
