@@ -4,6 +4,12 @@ StdBinCommands
 		alert.cpp
 		clipboard.cpp
 		shutdown.cpp
+		beep.cpp
+		clipboard.cpp
+		df.cpp
+		isvolume.cpp
+		lsindex.cpp
+		yes.cpp
 	: be ;
 
 StdBinCommands
@@ -26,6 +32,7 @@ StdBinCommands
 	rescan.c
 	unchop.c
 	waitfor.c
+	whoami.c
 ;
 
 #SubInclude OBOS_TOP src apps bin gnu ;
@@ -42,5 +49,3 @@ SubInclude OBOS_TOP src apps bin route ;
 SubInclude OBOS_TOP src apps bin traceroute ;
 SubInclude OBOS_TOP src apps bin unzip ;
 SubInclude OBOS_TOP src apps bin zip ;
-
-
