@@ -677,7 +677,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 					|| (is_keydown && !(dev->modifiers & modifiers)))
 					dev->modifiers |= modifiers;
 				else
-					dev->modifiers ^= modifiers;
+					dev->modifiers &= ~modifiers;
 					
 				msg->AddInt32("modifiers", dev->modifiers);
 				msg->AddData("states", B_UINT8_TYPE, states, 16);
