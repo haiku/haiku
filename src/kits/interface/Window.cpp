@@ -1727,10 +1727,12 @@ BView* BWindow::LastMouseMovedView() const{
 //------------------------------------------------------------------------------
 
 void BWindow::MoveBy(float dx, float dy){
-
-	BPoint			offset( dx, dy );
-
-	MoveTo( fFrame.LeftTop() + offset );
+	Lock();
+	session->WriteInt32( AS_WINDOW_MOVE );
+	session->WriteFloat( dx );
+	session->WriteFloat( dy );
+	session->Sync();
+	Unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -1742,13 +1744,7 @@ void BWindow::MoveTo( BPoint point ){
 //------------------------------------------------------------------------------
 
 void BWindow::MoveTo(float x, float y){
-
-	Lock();
-	session->WriteInt32( AS_WINDOW_MOVE );
-	session->WriteFloat( x );
-	session->WriteFloat( y );
-	session->Sync();
-	Unlock();
+	MoveBy(x - fFrame.left, y - fFrame.top);
 }
 
 //------------------------------------------------------------------------------
