@@ -182,7 +182,7 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 
 	// is this a proposal for our one output?
 	if (output != mOutput.source) {
-		fprintf(stderr, "_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_SOURCE\n");
+		TRACE("_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -191,7 +191,7 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 	media_type requestedType = format->type;
 	*format = mFormat;
 	if ((requestedType != B_MEDIA_UNKNOWN_TYPE) && (requestedType != B_MEDIA_RAW_AUDIO)) {
-		fprintf(stderr, "_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_FORMAT\n");
+		TRACE("_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
 	else
@@ -235,7 +235,7 @@ _SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* new
 
 	// is this our output?
 	if (for_source != mOutput.source) {
-		fprintf(stderr, "_SoundPlayNode::SetBufferGroup returning B_MEDIA_BAD_SOURCE\n");
+		TRACE("_SoundPlayNode::SetBufferGroup returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -292,7 +292,7 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	// is this our output?
 	if (what != mOutput.source)
 	{
-		fprintf(stderr, "_SoundPlayNode::PrepareToConnect returning B_MEDIA_BAD_SOURCE\n");
+		TRACE("_SoundPlayNode::PrepareToConnect returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -305,7 +305,7 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	// error if we don't support the requested format.
 	if (format->type != B_MEDIA_RAW_AUDIO)
 	{
-		fprintf(stderr, "\tnon-raw-audio format?!\n");
+		TRACE("\tnon-raw-audio format?!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
 	// !!! validate all other fields except for buffer_size here, because the consumer might have
@@ -315,11 +315,11 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	if (format->u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
 	{
 		format->u.raw_audio.buffer_size = 2048;		// pick something comfortable to suggest
-		fprintf(stderr, "\tno buffer size provided, suggesting %lu\n", format->u.raw_audio.buffer_size);
+		TRACE("\tno buffer size provided, suggesting %lu\n", format->u.raw_audio.buffer_size);
 	}
 	else
 	{
-		fprintf(stderr, "\tconsumer suggested buffer_size %lu\n", format->u.raw_audio.buffer_size);
+		TRACE("\tconsumer suggested buffer_size %lu\n", format->u.raw_audio.buffer_size);
 	}
 
 	// Now reserve the connection, and return information about it
@@ -338,7 +338,7 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	// is this our output?
 	if (source != mOutput.source)
 	{
-		fprintf(stderr, "_SoundPlayNode::Connect returning\n");
+		TRACE("_SoundPlayNode::Connect returning\n");
 		return;
 	}
 	
@@ -357,24 +357,25 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	mOutput.destination = destination;
 	mOutput.format = format;
 	strncpy(io_name, mOutput.name, B_MEDIA_NAME_LENGTH);
+	io_name[B_MEDIA_NAME_LENGTH -1] = 0;
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(mOutput.destination, &mLatency, &id);
-	fprintf(stderr, "\tdownstream latency = %Ld\n", mLatency);
-
-	mInternalLatency = 10000LL;
-	fprintf(stderr, "\tbuffer-filling took %Ld usec on this machine\n", mInternalLatency);
-	SetEventLatency(mLatency + mInternalLatency);
+	TRACE("_SoundPlayNode::Connect: downstream latency = %Ld\n", mLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = mOutput.format.u.raw_audio.buffer_size * 10000
 			/ ( (mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 				* mOutput.format.u.raw_audio.channel_count) 
 			/ ((int32)(mOutput.format.u.raw_audio.frame_rate / 100));
-	//bigtime_t duration = bigtime_t(1000000) * samplesPerBuffer / bigtime_t(mOutput.format.u.raw_audio.frame_rate);
 	SetBufferDuration(duration);
+	TRACE("_SoundPlayNode::Connect: buffer duaration is %Ld\n", duration);
+
+	mInternalLatency = (3 * BufferDuration()) / 4;
+	TRACE("_SoundPlayNode::Connect: using %Ld as internal latency\n", mInternalLatency);
+	SetEventLatency(mLatency + mInternalLatency);
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
@@ -392,7 +393,7 @@ _SoundPlayNode::Disconnect(const media_source& what, const media_destination& wh
 	// is this our output?
 	if (what != mOutput.source)
 	{
-		fprintf(stderr, "_SoundPlayNode::Disconnect returning\n");
+		TRACE("_SoundPlayNode::Disconnect returning\n");
 		return;
 	}
 
@@ -421,7 +422,7 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 	// is this our output?
 	if (what != mOutput.source)
 	{
-		fprintf(stderr, "_SoundPlayNode::LateNoticeReceived returning\n");
+		TRACE("_SoundPlayNode::LateNoticeReceived returning\n");
 		return;
 	}
 
@@ -439,7 +440,7 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 			mInternalLatency = 30000;
 
 		SetEventLatency(mLatency + mInternalLatency);
-		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
+		TRACE("_SoundPlayNode::LateNoticeReceived: increasing latency to %Ld\n", mLatency + mInternalLatency);
 	}
 	else
 	{
@@ -453,7 +454,7 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 
 		mFramesSent += nFrames;
 
-		fprintf(stderr, "\tskipping a buffer to try to catch up\n");
+		TRACE("_SoundPlayNode::LateNoticeReceived: skipping a buffer to try to catch up\n");
 	}
 }
 
@@ -599,7 +600,7 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 			if (B_OK != SendBuffer(buffer, mOutput.destination)) {
 				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
-				printf("Buffer sending failed\n");
+				printf("_SoundPlayNode::SendNewBuffer: Buffer sending failed\n");
 				buffer->Recycle();
 			}
 		}
@@ -725,6 +726,9 @@ _SoundPlayNode::AllocateBuffers()
 	
 	if (count < 3)
 		count = 3;
+
+	if (count < 5)
+		count = 5;
 	
 	mBufferGroup = new BBufferGroup(size, count);
 }
