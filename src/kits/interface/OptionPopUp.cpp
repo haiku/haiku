@@ -29,10 +29,16 @@
 
 #include <cstdio>
 
+// If enabled, behaves like in BeOS R5, in that when you call
+// SelectOptionFor() or SetValue(), the selected item isn't marked, and
+// so SelectedOption() will return -1. This is broken, IMHO.
+#define BEHAVE_LIKE_R5 0
+
 const float kLabelSpace = 8.0;
 const float kWidthModifier = 25.0;
 const float kHeightModifier = 10.0;
 	
+
 /*! \brief Creates and initializes a BOptionPopUp.
 	\param frame The frame of the control.
 	\param name The name of the control.
@@ -57,7 +63,8 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 	\param name The name of the control.
 	\param label The label which will be displayed by the control.
 	\param message The message which the control will send when operated.
-	\param fixed ?
+	\param fixed It's passed to the BMenuField constructor. If it's true, 
+		the BMenuField size will never change.
 	\param resize Resizing flags. They will be passed to the base class.
 	\param flags View flags. They will be passed to the base class.
 */
@@ -146,6 +153,7 @@ BOptionPopUp::CountOptions() const
 	return (menu != NULL) ? menu->CountItems() : 0;
 }
 
+
 /*! \brief Adds an option to the control, at the given position.
 	\param name The name of the option to add.
 	\param value The value of the option.
@@ -232,11 +240,12 @@ BOptionPopUp::SetValue(int32 value)
 			int32 val;
 			item->Message()->FindInt32("be:value", &val);
 			if (val == value) {
-				// TODO: This double call is needed because SetValue() doesn't mark
-				// items which are selected. Is there a better way to select
-				// an item without marking it ? 
 				item->SetMarked(true);
+
+#if BEHAVE_LIKE_R5
 				item->SetMarked(false);
+#endif
+
 				break;
 			}
 		}
@@ -296,7 +305,7 @@ void
 BOptionPopUp::ResizeToPreferred()
 {
 	// TODO: Some more work is needed either here or in GetPreferredSize(),
-	// since the control doesnt' always resize as it should.	
+	// since the control doesnt' always resize as it should.
 	float width, height;
 	GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
@@ -331,6 +340,29 @@ BOptionPopUp::SelectedOption(const char **outName, int32 *outValue) const
 }
 
 
+// Private Unimplemented
+BOptionPopUp::BOptionPopUp()
+	:
+	BOptionControl(BRect(), "", "", NULL)
+{
+}
+
+
+BOptionPopUp::BOptionPopUp(const BOptionPopUp &clone)
+	:
+	BOptionControl(clone.Frame(), "", "", clone.Message())
+{
+}
+
+
+BOptionPopUp &
+BOptionPopUp::operator=(const BOptionPopUp & clone)
+{
+		return *this;
+}
+
+
+// FBC Stuff
 status_t BOptionPopUp::_Reserved_OptionControl_0(void *, ...) { return B_ERROR; }
 status_t BOptionPopUp::_Reserved_OptionControl_1(void *, ...) { return B_ERROR; }
 status_t BOptionPopUp::_Reserved_OptionControl_2(void *, ...) { return B_ERROR; }

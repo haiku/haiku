@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-//	Copyright (c) 2003 Stefano Ceccherini
+//	Copyright (c) 2003-2004 Stefano Ceccherini
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -42,11 +42,19 @@ BOptionControl::BOptionControl(BRect frame, const char *name, const char *label,
 }
 
 
+/*! \brief Destructor
+	It does nothing.
+*/
 BOptionControl::~BOptionControl()
 {
 }
 
 
+/*! \brief Overrides the base version to take special actions.
+	\param message The received message.
+	Calls SetValue() if receives a B_OPTION_CONTROL_VALUE message
+	which contains a "be:value" int32
+*/
 void
 BOptionControl::MessageReceived(BMessage *message)
 {
@@ -83,7 +91,7 @@ BOptionControl::AddOption(const char *name, int32 value)
 	\param value The value of the option.
 	\return \c B_OK if there was an option with that value,
 		and it was correctly selected, an error code otherwise.
-	It works exactly as SetValue(value);
+	It works like SetValue(value);
 */
 status_t
 BOptionControl::SelectOptionFor(int32 value)
@@ -91,10 +99,10 @@ BOptionControl::SelectOptionFor(int32 value)
 	// XXX: I wonder why this method was created in the first place,
 	// since you can obtain the same result simply by calling SetValue().
 	// The only difference I can see is that this method iterates over 
-	// all the options contained in the contrl, and thens elects the right one.
+	// all the options contained in the control, and then selects the right one.
 	int32 numOptions = CountOptions();
 	for (int32 c = 0; c < numOptions; c++) {
-		const char *name;
+		const char *name = NULL;
 		int32 optionValue;
 		if (GetOptionAt(c, &name, &optionValue) && optionValue == value) {
 			SetValue(optionValue);
@@ -143,6 +151,28 @@ BOptionControl::MakeValueMessage(int32 value)
 	}		
 	
 	return message;
+}
+
+
+// Private unimplemented
+BOptionControl::BOptionControl()
+	:
+	BControl(BRect(), "", "", NULL, 0, 0)
+{
+}
+
+
+BOptionControl::BOptionControl(const BOptionControl & clone)
+	:
+	BControl(BRect(), "", "", NULL, 0, 0)
+{
+}
+
+
+BOptionControl &
+BOptionControl::operator=(const BOptionControl & clone)
+{
+	return *this;
 }
 
 
