@@ -38,7 +38,7 @@ get_nth_session_info(int deviceFD, int32 index, session_info *sessionInfo)
 }
 
 // get_nth_partition_info
-/*!	\brief Retrieves information about a partion on a device.
+/*!	\brief Retrieves information about a partition on a device.
 
 	The fields \c device and \c mounted_at of \a partitionInfo are not set.
 
@@ -58,14 +58,15 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 {
 	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
 	session_info sessionInfo;
-	disk_scanner_module_info *disk_scanner = NULL;
+	disk_scanner_module_info *diskScanner = NULL;
 	// get the partition scanner module
 	if (error == B_OK)
-		error = get_module(DISK_SCANNER_MODULE_NAME, (module_info**)&disk_scanner);
+		error = get_module(DISK_SCANNER_MODULE_NAME,
+						   (module_info**)&diskScanner);
 	// get the session info
 	if (error == B_OK) {
-		error = disk_scanner->get_nth_session_info(deviceFD, sessionIndex,
-											   &sessionInfo);
+		error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
+												  &sessionInfo);
 	}
 	// get the partition info
 	if (error == B_OK) {
@@ -78,15 +79,15 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 // of the raw device and construct the partition device name with session and
 // partition ID.
 partitionInfo->info.device[0] = '\0';
-		error = disk_scanner->get_nth_partition_info(deviceFD, sessionInfo.offset,
-			sessionInfo.size, partitionInfo);
+		error = diskScanner->get_nth_partition_info(deviceFD, &sessionInfo,
+			partitionIndex, partitionInfo);
 	}
 	// get the FS info
 	if (error == B_OK) {
 		bool hidden = (partitionInfo->flags & B_HIDDEN_PARTITION);
 		if (!hidden) {
-			error = disk_scanner->get_partition_fs_info(deviceFD,
-														partitionInfo);
+			error = diskScanner->get_partition_fs_info(deviceFD,
+													   partitionInfo);
 		}
 		// in case the partition is no data partition or the FS is unknown,
 		// we fill in the respective fields
@@ -100,8 +101,8 @@ partitionInfo->info.device[0] = '\0';
 // NOTE: Where do we get mounted_at from?
 	}
 	// put the partition scanner module
-	if (disk_scanner)
-		put_module(disk_scanner->module.name);
+	if (diskScanner)
+		put_module(diskScanner->module.name);
 	return error;
 }
 
