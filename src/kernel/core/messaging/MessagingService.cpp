@@ -15,6 +15,8 @@
 
 #include "MessagingService.h"
 
+using namespace std;
+
 static MessagingService *sMessagingService = NULL;
 
 static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
