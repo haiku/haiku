@@ -27,6 +27,10 @@ vorbisDecoder::vorbisDecoder()
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
 
+	fHeaderPacketParsed = false;
+	fCommentPacketParsed = false;
+	fCodebookPacketParsed = false;
+
 	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
@@ -40,51 +44,82 @@ vorbisDecoder::~vorbisDecoder()
 
 
 status_t
-vorbisDecoder::Setup(media_format *ioEncodedFormat,
+vorbisDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	if ((ioEncodedFormat->type != B_MEDIA_UNKNOWN_TYPE)
-	    && (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO)) {
+	if ((inputFormat->type != B_MEDIA_UNKNOWN_TYPE)
+	    && (inputFormat->type != B_MEDIA_ENCODED_AUDIO)) {
 		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis");
 		return B_ERROR;
 	}
-	if (infoSize != sizeof(ogg_packet)) {
-		TRACE("vorbisDecoder::Setup not called with ogg_packet info: not vorbis");
+	if (inputFormat->MetaDataSize() == sizeof(ogg_packet)) {
+	 	if (!fHeaderPacketParsed) {
+			// header packet passed in meta data
+			ogg_packet * packet = (ogg_packet*)inputFormat->MetaData();
+			// parse header packet
+			if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
+				TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
+				return B_ERROR;
+			}
+			fHeaderPacketParsed = true;
+		}
+ 	} else if (inputFormat->MetaDataSize() != 0) {
+		// unexpected meta data
 		return B_ERROR;
-	}
-	ogg_packet * packet = (ogg_packet*)infoBuffer;
-	// parse header packet
-	if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-		TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
-		return B_ERROR;
-	}
-	// get comment packet
+ 	}
+	return InitializeInput(inputFormat);
+}
+
+status_t
+vorbisDecoder::InitializeInput(media_format *ioEncodedFormat)
+{
+	ogg_packet * packet;
 	int32 size;
 	media_header mh;
-	if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
-		TRACE("vorbisDecoder::Setup: GetNextChunk failed to get comment\n");
-		return B_ERROR;
+ 	if (!fHeaderPacketParsed) {
+		// get header packet
+		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
+			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get comment\n");
+			return B_ERROR;
+		}
+		// parse header packet
+		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
+			TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
+			return B_ERROR;
+		}
+		fHeaderPacketParsed = true;
 	}
-	// parse comment packet
-	if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment");
-		return B_ERROR;
+	if (!fCommentPacketParsed) {
+		// get comment packet
+		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
+			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get comment\n");
+			return B_ERROR;
+		}
+		// parse comment packet
+		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
+			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment");
+			return B_ERROR;
+		}
+		fCommentPacketParsed = true;
 	}
-	// get codebook packet
-	if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
-		TRACE("vorbisDecoder::Setup: GetNextChunk failed to get codebook\n");
-		return B_ERROR;
+	if (!fCodebookPacketParsed) {
+		// get codebook packet
+		if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
+			TRACE("vorbisDecoder::Setup: GetNextChunk failed to get codebook\n");
+			return B_ERROR;
+		}
+		// parse codebook packet
+		if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
+			TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook");
+			return B_ERROR;
+		}
+		// initialize decoder
+		vorbis_synthesis_init(&fDspState,&fInfo);
+		vorbis_block_init(&fDspState,&fBlock);
 	}
-	// parse codebook packet
-	if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
-		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook");
-		return B_ERROR;
-	}
-	// initialize decoder
-	vorbis_synthesis_init(&fDspState,&fInfo);
-	vorbis_block_init(&fDspState,&fBlock);
 	// fill out the encoding format
 	CopyInfoToEncodedFormat(ioEncodedFormat);
+
 	return B_OK;
 }
 
