@@ -340,9 +340,9 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 					}
 
 					case 24:
-						outRowData[x].red = ((rgba32_color *)line)[x].red;
-						outRowData[x].green = ((rgba32_color *)line)[x].green;
-						outRowData[x].blue = ((rgba32_color *)line)[x].blue;
+						outRowData[x].blue = line[x * 3 + 0];
+						outRowData[x].green = line[x * 3 + 1];
+						outRowData[x].red = line[x * 3 + 2];
 						break;
 
 					case 32:
