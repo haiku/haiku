@@ -38,6 +38,7 @@ extern "C" {
 #define KEY_Power       0x6b
 #define KEY_SysRq       0x7e
 #define KEY_Break       0x7f
+#define KEY_Spacebar	0x5e
 
 #define KB_DEFAULT_CONTROL_ALT_DEL_TIMEOUT 4000000
 
