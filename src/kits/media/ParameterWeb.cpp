@@ -16,11 +16,6 @@
 #include "DataExchange.h"
 #include "MediaMisc.h"
 
-// for now!
-#ifdef DEBUG
-#	undef DEBUG
-#endif
-//#define DEBUG 3
 
 #include "debug.h"
 
@@ -1171,6 +1166,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 		// add the item to the list
 		parameter->mGroup = this;
+		parameter->mWeb = mWeb;
 		mControls->AddItem(parameter);
 
 		// add it's old pointer value to the RefFix list kept by the owner web
@@ -1331,38 +1327,39 @@ BParameter::Flags() const
 
 
 status_t
-BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
+BParameter::GetValue(void *buffer, size_t *_ioSize, bigtime_t *_when)
 {
 	CALLED();
 
-	controllable_get_parameter_data_request request;
-	controllable_get_parameter_data_reply reply;
-	media_node node;
-	area_id area;
-	status_t rv;
-	void *data;
-
-	if (buffer == 0 || ioSize == 0)
+	if (buffer == NULL || _ioSize == NULL)
 		return B_BAD_VALUE;
-	if (*ioSize <= 0)
+
+	size_t ioSize = *_ioSize;
+	if (ioSize <= 0)
 		return B_NO_MEMORY;
-		
-	if (mWeb == 0) {
+
+	if (mWeb == NULL) {
 		ERROR("BParameter::GetValue: no parent BParameterWeb\n");
 		return B_NO_INIT;
 	}
-	
-	node = mWeb->Node();
+
+	media_node node = mWeb->Node();
 	if (IS_INVALID_NODE(node)) {
 		ERROR("BParameter::GetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
 		return B_NO_INIT;
 	}
-	
-	if (*ioSize > MAX_PARAMETER_DATA) {
+
+	controllable_get_parameter_data_request request;
+	controllable_get_parameter_data_reply reply;
+
+	area_id area;
+	void *data;
+	if (ioSize > MAX_PARAMETER_DATA) {
 		// create an area if large data needs to be transfered
-		area = create_area("get parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(*ioSize), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		area = create_area("get parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(ioSize),
+			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (area < B_OK) {
-			ERROR("BParameter::GetValue can't create area of %ld bytes\n", *ioSize);
+			ERROR("BParameter::GetValue can't create area of %ld bytes\n", ioSize);
 			return B_NO_MEMORY;
 		}
 	} else {
@@ -1371,26 +1368,30 @@ BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 	}
 
 	request.parameter_id = mID;
-	request.requestsize = *ioSize;
+	request.requestsize = ioSize;
 	request.area = area;
-	
-	rv = QueryPort(node.port, CONTROLLABLE_GET_PARAMETER_DATA, &request, sizeof(request), &reply, sizeof(reply));
-	
-	if (rv == B_OK) {
-		// we don't care about the reported data size and copy the full buffer
-		memcpy(buffer, data, *ioSize);
-		// store reported data size
-		*ioSize = reply.size;
-		// store last update time if when != NULL
-		if (when != 0)
-			*when = reply.last_change;
-	} else
-		ERROR("BParameter::GetValue querying node failed\n");
 
-	if (area != -1)
+	status_t status = QueryPort(node.port, CONTROLLABLE_GET_PARAMETER_DATA, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status == B_OK) {
+		// we don't want to copy more than the buffer provides
+		if (reply.size < ioSize)
+			ioSize = reply.size;
+
+		memcpy(buffer, data, ioSize);
+
+		// store reported values
+
+		*_ioSize = reply.size;
+		if (_when != NULL)
+			*_when = reply.last_change;
+	} else
+		ERROR("BParameter::GetValue querying node failed: %s\n", strerror(status));
+
+	if (area >= B_OK)
 		delete_area(area);
-	
-	return rv;
+
+	return status;
 }
 
 
