@@ -3,12 +3,14 @@
 #include <PCI.h>
 #include "pci_priv.h"
 
+bool gIrqRouterAvailable = false;
+
 void pci_scan_bus(uint8 bus);
 long get_nth_pci_info(long index, pci_info *outInfo);
 status_t pci_module_init(void);
 status_t pci_module_uninit(void);
 int32 std_ops(int32 op, ...);
-status_t pci_module_rescan();
+status_t pci_module_rescan(void);
 
 
 void
@@ -38,6 +40,12 @@ pci_module_init(void)
 		dprintf("PCI: pci_config_init failed\n");
 		return B_ERROR;
 	}
+	
+	if (B_OK != pci_irq_init()) {
+		dprintf("PCI: IRQ router not available\n");
+	} else {
+		gIrqRouterAvailable = true;
+	}
 
 	pci_scan_bus(0);
 	return B_OK;
@@ -53,7 +61,7 @@ pci_module_uninit(void)
 
 
 status_t
-pci_module_rescan()
+pci_module_rescan(void)
 {
 	return B_OK;
 }
@@ -83,16 +91,16 @@ struct pci_module_info pci_module = {
 		},
 		pci_module_rescan
 	},
-	&read_io_8,
-	&write_io_8,
-	&read_io_16,
-	&write_io_16,
-	&read_io_32,
-	&write_io_32,
+	&pci_read_io_8,
+	&pci_write_io_8,
+	&pci_read_io_16,
+	&pci_write_io_16,
+	&pci_read_io_32,
+	&pci_write_io_32,
 	&get_nth_pci_info,
-	&read_pci_config,
-	&write_pci_config,
-	&ram_address
+	&pci_read_config,
+	&pci_write_config,
+	&pci_ram_address
 };
 
 
