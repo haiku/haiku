@@ -16,7 +16,7 @@ SimpleTest udf_shell
 	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
 	sysdep.c hexdump.c argv.c 
 
-	cpp.cpp vfs_interface.cpp
+	cpp.cpp udf.cpp
 	CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
 	PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
 	:
@@ -24,7 +24,7 @@ SimpleTest udf_shell
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
-		cpp.cpp vfs_interface.cpp 
+		cpp.cpp udf.cpp 
 		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
 		PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
