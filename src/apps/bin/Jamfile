@@ -11,6 +11,7 @@ StdBinCommands
 		lsindex.cpp
 		yes.cpp
 		version.cpp
+		listattr.cpp
 	: be ;
 
 StdBinCommands
