@@ -16,6 +16,13 @@ TextTestResult::TextTestResult()
 
 
 void 
+TextTestResult::addFailure( Test *test, Exception *e )
+{
+	TestResult::addFailure( test, e );
+}
+
+
+void 
 TextTestResult::addFailure( const TestFailure &failure )
 {
   TestResultCollector::addFailure( failure );

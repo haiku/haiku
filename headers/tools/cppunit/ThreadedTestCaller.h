@@ -26,6 +26,7 @@ public:
 	BThreadedTestCaller(std::string name, TestClass *object);	
 	virtual ~BThreadedTestCaller();
 	
+    virtual CppUnit::TestResult *run();
     virtual void run(CppUnit::TestResult *result);
 
 	//! Adds a thread to the test. \c threadName must be unique to this BThreadedTestCaller.
@@ -95,6 +96,14 @@ BThreadedTestCaller<TestClass, ExpectedException>::addThread(std::string threadN
 		throw CppUnit::Exception("BThreadedTestCaller::addThread() - Attempt to add thread under duplicated name ('"
 			+ threadName + "')");
 	}
+}
+
+template <class TestClass, class ExpectedException>
+CppUnit::TestResult *
+BThreadedTestCaller<TestClass, ExpectedException>::run() {
+	CppUnit::TestResult *result = new CppUnit::TestResult;
+	run(result);
+	return result;
 }
 
 template <class TestClass, class ExpectedException>
