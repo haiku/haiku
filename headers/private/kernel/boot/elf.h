@@ -7,6 +7,7 @@
 
 
 #include <boot/addr_range.h>
+#include <sys/stat.h>
 #include <elf_priv.h>
 
 
@@ -22,6 +23,7 @@ struct preloaded_image {
 	const char	*debug_string_table;
 	uint32		num_debug_symbols, debug_string_table_size;
 
+	ino_t		inode;
 	image_id	id;
 		// the ID field will be filled out in the kernel
 };
