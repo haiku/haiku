@@ -156,6 +156,7 @@ private:
 private:
 	int32		fDeviceCookie;
 	int32		fDiskSystemCookie;
+	int32		fJobCookie;
 //	BDirectory	*fPartitionAddOnDir;
 //	BDirectory	*fFSAddOnDir;
 //	int32		fPartitionAddOnDirIndex;

@@ -3,15 +3,13 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <DiskDeviceRoster.h>
-
 #include <new>
 
 #include <Directory.h>
 #include <DiskDevice.h>
+#include <DiskDeviceJob.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceRoster.h>
-//#include <DiskScannerAddOn.h>
 #include <DiskSystem.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -46,7 +44,8 @@ static const int32 kAddOnDirCount
 */
 BDiskDeviceRoster::BDiskDeviceRoster()
 	: fDeviceCookie(0),
-	  fDiskSystemCookie(0)
+	  fDiskSystemCookie(0),
+	  fJobCookie(0)
 //	  fPartitionAddOnDir(NULL),
 //	  fFSAddOnDir(NULL),
 //	  fPartitionAddOnDirIndex(0),
@@ -125,16 +124,21 @@ BDiskDeviceRoster::RewindDiskSystems()
 status_t
 BDiskDeviceRoster::GetNextActiveJob(BDiskDeviceJob *job)
 {
-	// not implemented
-	return B_ERROR;
+	if (!job)
+		return B_BAD_VALUE;
+	user_disk_device_job_info info;
+	status_t error = _kern_get_next_disk_device_job_info(&fJobCookie, &info);
+	if (error == B_OK)
+		error = job->_SetTo(&info);
+	return error;
 }
 
 // RewindActiveJobs
 status_t
 BDiskDeviceRoster::RewindActiveJobs()
 {
-	// not implemented
-	return B_ERROR;
+	fJobCookie = 0;
+	return B_OK;
 }
 
 // RegisterFileDevice
