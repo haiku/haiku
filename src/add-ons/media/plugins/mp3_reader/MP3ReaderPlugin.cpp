@@ -13,6 +13,45 @@
   #define TRACE ((void)0)
 #endif
 
+// bit_rate_table[mpeg_version_index][layer_index][bitrate_index]
+static const int bit_rate_table[4][4][16] =
+{
+	{ // mpeg version 2.5
+		{ }, // undefined layer
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 }, // layer 3
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 }, // layer 2
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0 } // layer 1
+	},
+	{ // undefined version
+		{ },
+		{ },
+		{ },
+		{ }
+	},
+	{ // mpeg version 2
+		{ },
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }
+	},
+	{ // mpeg version 1
+		{ },
+		{ 0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0 },
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },
+		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0}
+	}
+};
+
+// sampling_rate_table[mpeg_version_index][sampling_rate_index]
+static const int sampling_rate_table[4][4] =
+{
+	{ 11025, 12000, 8000, 0},	// mpeg version 2.5
+	{ 0, 0, 0, 0 },
+	{ 22050, 24000, 16000, 0},	// mpeg version 2
+	{ 44100, 48000, 32000, 0}	// mpeg version 1
+};
+
+
 struct mp3data
 {
 	int64	position;
@@ -23,7 +62,6 @@ struct mp3data
 mp3Reader::mp3Reader()
 {
 	TRACE("mp3Reader::mp3Reader\n");
-	fSource = dynamic_cast<BPositionIO *>(Reader::Source());
 }
 
 mp3Reader::~mp3Reader()
@@ -41,11 +79,27 @@ status_t
 mp3Reader::Sniff(int32 *streamCount)
 {
 	TRACE("mp3Reader::Sniff\n");
+	
+	fSeekableSource = dynamic_cast<BPositionIO *>(Reader::Source());
+	if (!fSeekableSource) {
+		TRACE("mp3Reader::Sniff: non seekable sources not supported\n");
+		return B_ERROR;
+	}
+
+	fFileSize = Source()->Seek(0, SEEK_END);
+
+	TRACE("mp3Reader::Sniff: file size is %Ld bytes\n", fFileSize);
+	
+	if (!IsMp3File()) {
+		TRACE("mp3Reader::Sniff: non recognized as mp3 file\n");
+		return B_ERROR;
+	}
+
+	TRACE("mp3Reader::Sniff: looks like an mp3 file\n");
+	
 
 	//fDataSize = Source()->Seek(0, SEEK_END);
 	//if (sizeof(fRawHeader) != Source()->ReadAt(0, &fRawHeader, sizeof(fRawHeader))) {
-
-	TRACE("mp3Reader::Sniff: data size is %Ld bytes\n", fDataSize);
 
 	*streamCount = 1;
 	return B_OK;
@@ -123,6 +177,9 @@ mp3Reader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
+	if (!fSeekableSource)
+		return B_ERROR;
+
 //	mp3data *data = reinterpret_cast<mp3data *>(cookie);
 /*
 	uint64 pos;
@@ -184,6 +241,85 @@ mp3Reader::GetNextChunk(void *cookie,
 	return result;
 }
 
+bool
+mp3Reader::IsMp3File()
+{
+	// To detect an mp3 file, we seek into the middle,
+	// and search for a valid sequence of 3 frame headers.
+	// A mp3 frame has a maximum length of 2881 bytes, we
+	// load a block of 16kB and use it to search.
+
+	const int32 search_size = 16384;
+	int64	offset;
+	int32	size;
+	uint8	buf[search_size];
+
+	size = search_size;
+	offset = fFileSize / 2 - search_size / 2;
+	if (size > fFileSize) {
+		size = fFileSize;
+		offset = 0;
+	}
+
+	TRACE("searching for mp3 frame headers at %Ld in %ld bytes\n", offset, size);
+	
+	if (size != Source()->ReadAt(offset, buf, size)) {
+		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
+		return false;
+	}
+	
+	for (int32 pos = 0; pos < (size - 8); pos++) {
+		int length1, length2, length3;
+		length1 = GetFrameLength(&buf[pos]);
+		if (length1 < 0 || (pos + length1 + 4) > size)
+			continue;
+		TRACE("    found a valid frame header at file position %Ld\n", offset + pos);
+		length2 = GetFrameLength(&buf[pos + length1]);
+		if (length2 < 0 || (pos + length1 + length2 + 4) > size)
+			continue;
+		TRACE("##  found second valid frame header at file position %Ld\n", offset + pos + length1);
+		length3 = GetFrameLength(&buf[pos + length1 + length2]);
+		if (length3 < 0)
+			continue;
+		TRACE("### found third valid frame header at file position %Ld\n", offset + pos + length1 + length2);
+		return true;	
+	}
+	return false;
+}
+
+int
+mp3Reader::GetFrameLength(void *header)
+{
+	if (((uint8 *)header)[0] != 0xff)
+		return -1;
+	if (((uint8 *)header)[1] & 0xe0 != 0xe)
+		return -1;
+	
+	int mpeg_version_index = (((uint8 *)header)[1] >> 3) & 0x03;
+	int layer_index = (((uint8 *)header)[1] >> 1) & 0x03;
+	int bitrate_index = (((uint8 *)header)[2] >> 4) & 0x0f;
+	int sampling_rate_index = (((uint8 *)header)[2] >> 2) & 0x03;
+	int padding = (((uint8 *)header)[2] >> 1) & 0x01;
+	
+	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
+	int samplingrate = sampling_rate_table[mpeg_version_index][sampling_rate_index];
+
+	if (!bitrate || !samplingrate)
+		return -1;	
+
+	int length;	
+	if (layer_index == 3) // layer 1
+		length = ((144 * 1000 * bitrate) / samplingrate) + (padding * 4);
+	else // layer 2 & 3
+		length = ((144 * 1000 * bitrate) / samplingrate) + padding;
+	
+	TRACE("%s %s, bit rate %d, sampling rate %d, padding %d, frame length %d\n",
+		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
+		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
+		bitrate, samplingrate, padding, length);
+	
+	return length;
+}
 
 Reader *
 mp3ReaderPlugin::NewReader()

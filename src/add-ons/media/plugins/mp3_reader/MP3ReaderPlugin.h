@@ -29,11 +29,18 @@ public:
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader);
 									 
-	BPositionIO *Source() { return fSource; }
+	BPositionIO *Source() { return fSeekableSource; }
+
+private:
+	bool 		IsMp3File();
+	int			GetFrameLength(void *header);
+	
+	bool		FindData();
+	
 	
 private:
-	BPositionIO *	fSource;
-	uint64			fDataSize;
+	BPositionIO *	fSeekableSource;
+	int64			fFileSize;
 };
 
 
