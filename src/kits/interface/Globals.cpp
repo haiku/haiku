@@ -670,3 +670,13 @@ void __set_window_decor(int32 theme)
 	link.Attach<int32>(theme);
 	link.Flush();
 }
+
+
+status_t
+_restore_key_map_()
+{
+	BMessage message('Iskm');
+	BMessage reply;
+
+	return _control_input_server_(&message, &reply);	
+}
