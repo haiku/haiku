@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-3/2004
+	Rudolf Cornelissen 4/2003-4/2004
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -99,6 +99,9 @@ typedef struct {
 	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
 	uint32 * clone_bugfix_regs;
 	uint32 * clone_bugfix_regs2;
+
+	/* old cards have their registers mapped inside the framebuffer area */
+	bool regs_in_fb;
 
   /*memory mappings*/
 	area_id	regs_area, regs2_area;	/* Kernel's area_id for the memory mapped registers.
