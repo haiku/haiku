@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-8/2004
+	Rudolf Cornelissen 4/2003-11/2004
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -202,7 +202,7 @@ typedef struct {
 	} ps;
 
   /*mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb)*/
-	uint8 rom_mirror[32768];
+	uint8 rom_mirror[65536];
 
   /* apsed: some configuration settings from ~/config/settings/kernel/drivers/nm.settings if exists */
 	settings settings;
