@@ -9,10 +9,9 @@ OggFrameInfo::OggFrameInfo(uint page, uint packetonpage, uint packet)
 }
 
 void
-OggFrameInfo::SetNext(uint page, uint packetonpage, uint packet)
+OggFrameInfo::SetNextIsNewPage(bool newpage)
 {
-	nextpage = page;
-	nextpacketonpage = packetonpage;
+	this->newpage = newpage;
 }
 
 /* virtual */
@@ -41,17 +40,18 @@ OggFrameInfo::GetPacket() const
 uint
 OggFrameInfo::GetNextPage() const
 {
-	return nextpage;
+	return (newpage ? page + 1 : page);
 }
 
 uint
 OggFrameInfo::GetNextPacketOnPage() const
 {
-	return nextpacketonpage;
+	return (newpage ? 0 : packetonpage + 1);
 }
 
 uint
 OggFrameInfo::GetNextPacket() const
 {
-	return packet+1;
+	return packet + 1;
 }
+

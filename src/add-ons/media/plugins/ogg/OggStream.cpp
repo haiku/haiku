@@ -97,18 +97,20 @@ OggStream::GetSerial() const
 status_t
 OggStream::AddPage(off_t position, ogg_page * page)
 {
-	TRACE("OggStream::AddPage %llu\n",position);
+	TRACE("OggStream::AddPage");
 	if (position >= 0) {
+		TRACE(" %lld", position);
 		fPagePositions.push_back(position);
 	}
+	TRACE("\n");
 	BAutolock autolock(fSyncLock);
 	char * buffer;
-	buffer = ogg_sync_buffer(&fSync,page->header_len);
-	memcpy(buffer,page->header,page->header_len);
-	ogg_sync_wrote(&fSync,page->header_len);
-	buffer = ogg_sync_buffer(&fSync,page->body_len);
-	memcpy(buffer,page->body,page->body_len);
-	ogg_sync_wrote(&fSync,page->body_len);
+	buffer = ogg_sync_buffer(&fSync, page->header_len);
+	memcpy(buffer,page->header, page->header_len);
+	ogg_sync_wrote(&fSync, page->header_len);
+	buffer = ogg_sync_buffer(&fSync, page->body_len);
+	memcpy(buffer,page->body, page->body_len);
+	ogg_sync_wrote(&fSync, page->body_len);
 	return B_OK;
 }
 
@@ -202,7 +204,7 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		// instead we just let it go out of scope
 		fCurrentPage = fOggFrameInfos[*frame].GetNextPage();
 		fPacketOnCurrentPage = fOggFrameInfos[*frame].GetNextPacketOnPage();
-		fCurrentPacket = fOggFrameInfos[*frame].GetNextPacket();
+		fCurrentPacket = fOggFrameInfos[*frame].GetPacket()+1;
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		*frame = *time/50000;
 		return Seek(B_MEDIA_SEEK_TO_FRAME,frame,time);
@@ -216,13 +218,15 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
              media_header *mediaHeader)
 {
 	static ogg_packet packet;
+	uint page = fEndPage;
 	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
 		OggFrameInfo info(fEndPage,fPacketOnEndPage,fEndPacket);
 		fOggFrameInfos.push_back(info);
 	}
 	status_t result = GetPacket(&packet);
 	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
-		fOggFrameInfos[fOggFrameInfos.size()-1].SetNext(fEndPage,fPacketOnEndPage,fEndPacket);
+		if (page != fEndPage) {
+		}
 	}
 	if (result != B_OK) {
 		TRACE("OggStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
@@ -268,6 +272,12 @@ OggStream::GetPacket(ogg_packet * packet)
 		}
 		fEndPacket++;
 		if (pageno != fEndPage) {
+			size_t last_info = fOggFrameInfos.size();
+			if (last_info > 0) {
+				if (fOggFrameInfos[last_info-1].GetNextPacket() == fEndPacket) {
+					fOggFrameInfos[last_info-1].SetNextIsNewPage();
+				}
+			}
 			fPacketOnEndPage = 0;
 		} else {
 			fPacketOnEndPage++;

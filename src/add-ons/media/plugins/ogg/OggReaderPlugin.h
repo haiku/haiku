@@ -51,6 +51,8 @@ protected:
 	BPositionIO *			fSeekable;
 
 private:
+	off_t		fNextPosition;
+
 	class GetPageInterface {
 	public:
 		virtual status_t	GetNextPage() = 0;

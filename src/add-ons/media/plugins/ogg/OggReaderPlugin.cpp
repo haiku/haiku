@@ -33,6 +33,7 @@ OggReader::~OggReader()
 		delete j->second;
 	}
 	ogg_sync_clear(&fSync);
+	fNextPosition = -1;
 }
 
       
@@ -48,8 +49,7 @@ OggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 {
 //	TRACE("OggReader::GetPage\n");
 retry:
-	static off_t next_position = (fSeekable ? fSeekable->Position() : -1);
-	off_t position = next_position;
+	off_t position = fNextPosition;
 	int result = ogg_sync_pageout(&fSync,page); // first read leftovers
 	while (result == 0) {
 		char * buffer = ogg_sync_buffer(&fSync,read_size);
@@ -82,7 +82,7 @@ retry:
 		return B_ERROR;
 	}
 #endif
-	next_position += page->header_len + page->body_len;
+	fNextPosition += (fSeekable ? page->header_len + page->body_len : 0);
 	long serialno = ogg_page_serialno(page);
 	if (fStreams.find(serialno) == fStreams.end()) {
 		// this is an unknown serialno
@@ -233,6 +233,8 @@ OggReader::Sniff(int32 *streamCount)
 #endif
 	fSeekable = get_seekable(Source());
 
+	fNextPosition = (fSeekable ? fSeekable->Position() : -1);
+	
 	ogg_page page;
 	if (GetPage(&page,4096,short_page) != B_OK) {
 		return B_ERROR;
