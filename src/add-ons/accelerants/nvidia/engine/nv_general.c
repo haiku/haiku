@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-final running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.09-1 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -891,8 +891,15 @@ status_t nv_general_bios_to_powergraphics()
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
-	/* don't doublebuffer CRTC access: set programmed values immediately;
-	 * keep fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
+	/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
+	 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
+	 * behave normally.
+	 * Also readback is not nessesarily what was written before!
+	 *
+	 * Double-write action needed on those strange NV11 cards: */
+	/* RESET: don't doublebuffer CRTC access: set programmed values immediately... */
+	CRTCW(BUFFER, 0xff);
+	/* ... and keep fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
 	CRTCW(BUFFER, 0xfb);
 	/* select VGA mode (old VGA register) */
 	CRTCW(MODECTL, 0xc3);
@@ -917,8 +924,15 @@ status_t nv_general_bios_to_powergraphics()
 		CRTC2W(OWNER, 0x03);
 		/* select colormode CRTC2 registers base adresses */
 		NV_REG8(NV8_MISCW) = 0xcb;
-		/* don't doublebuffer CRTC2 access: set programmed values immediately;
-		 * keep fine pitched CRTC2 granularity (b2 = 0) */
+		/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
+		 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
+		 * behave normally.
+		 * Also readback is not nessesarily what was written before!
+		 *
+		 * Double-write action needed on those strange NV11 cards: */
+		/* RESET: don't doublebuffer CRTC2 access: set programmed values immediately... */
+		CRTC2W(BUFFER, 0xff);
+		/* ... and keep fine pitched CRTC2 granularity (b2 = 0) */
 		CRTC2W(BUFFER, 0xfb);
 		/* select VGA mode (old VGA register) */
 		CRTC2W(MODECTL, 0xc3);
