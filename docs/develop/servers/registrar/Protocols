@@ -1,0 +1,301 @@
+Protocols
+=========
+
+Standard Replies
+----------------
+
+standard success reply message
+
+reply:		- B_REG_SUCCESS
+			  [ <additional fields> ]
+
+fields:
+- <additional fields>: Request-specific fields.
+
+-----------------------------------------------------------------------
+
+standard error reply message
+
+reply:		- B_REG_ERROR
+			  "error": B_INT32_TYPE
+			  [ "error_description": B_STRING_TYPE ]
+			  [ <additional fields> ]
+
+fields:
+- "error": The error code (a status_t).
+- "error_description": Optional human readable description.
+- <additional fields>: Request-specific fields.
+
+-----------------------------------------------------------------------
+
+
+General Requests
+----------------
+
+getting the messengers for MIME and clipboard management respectively
+
+target:		registrar app looper (preferred handler)
+message:	B_REG_GET_MIME_MESSENGER/B_REG_GET_CLIPBOARD_MESSENGER
+reply:		standard success
+			"messenger": B_MESSENGER_TYPE
+on error:	- B_NO_REPLY (fatal)
+			- standard error (fatal)
+
+reply fields:
+- "messenger": The requested messenger.
+
+-----------------------------------------------------------------------
+
+
+Roster Requests
+---------------
+
+app registration (BRoster::AddApplication())
+BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
+						uint32 flags, team_id team, thread_id thread,
+						port_id port, bool fullReg, uint32 *_token,
+						team_id *otherTeam) const
+
+target:		roster
+message:	B_REG_ADD_APP
+			"signature":			B_MIME_STRING_TYPE
+			"ref":					B_REF_TYPE
+			"flags":				B_UINT32_TYPE
+			"team":					B_INT32_TYPE
+			"thread":				B_INT32_TYPE
+			"port":					B_INT32_TYPE
+			"full_registration":	B_BOOL_TYPE
+reply:		standard success
+			[ "token":				B_INT32_TYPE ]
+			[ "other_team":			B_INT32_TYPE ]
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "signature": The application signature.
+- "ref": An entry_ref to the application executable.
+- "flags": The application flags.
+- "team": The application team (team_id).
+- "port": The app looper port (port_id).
+- "full_registration": Whether full or pre-registration is requested.
+
+reply fields:
+- "token": If pre-registration was requested (uint32). Unique token to be
+  passed to BRoster::SetThreadAndTeam().
+- "other_team": For single/exclusive launch applications that are launched
+  the second time. The team ID of the already running instance (team_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_ENTRY_NOT_FOUND: The entry_ref doesn't refer to a file.
+  - B_ALREADY_RUNNING: For single/exclusive launch applications
+    that are launched the second time.
+  - B_REG_ALREADY_REGISTERED: The team is already registered.
+  - ...
+
+-----------------------------------------------------------------------
+
+app registration (BRoster::CompleteRegistration())
+
+target:		roster
+message:	B_REG_COMPLETE_REGISTRATION
+			"team":		B_INT32_TYPE
+			"thread":	B_INT32_TYPE
+			"port":		B_INT32_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The application team (team_id).
+- "thread": The application looper thread (thread_id).
+- "port": The app looper port (port_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_REG_APP_NOT_REGISTERED: The team is unknown to the roster.
+  - ...
+
+-----------------------------------------------------------------------
+
+app pre-registration check (BRoster::IsAppPreRegistered())
+
+target:		roster
+message:	B_REG_IS_APP_PRE_REGISTERED
+			"ref":	B_REF_TYPE
+			"team":	B_INT32_TYPE
+reply:		standard success
+			"pre-registered":	B_BOOL_TYPE
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "ref": An entry_ref to the application executable.
+- "team": The application team (team_id).
+
+reply fields:
+- "pre-registered": true, if the app is pre-registered, false otherwise.
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_ENTRY_NOT_FOUND: The entry_ref doesn't refer to a file.
+  - ...
+
+-----------------------------------------------------------------------
+
+pre-registrated app unregistration (BRoster::RemovePreRegApp())
+
+target:		roster
+message:	B_REG_REMOVE_PRE_REGISTERED_APP
+			"token":	B_INT32_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "token": The token BRoster::AddApplication() returned (uint32).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_REG_APP_NOT_PRE_REGISTERED: The token does not identify a pre-registered
+    application.
+  - ...
+
+-----------------------------------------------------------------------
+
+app unregistration (BRoster::RemoveApp())
+
+target:		roster
+message:	B_REG_REMOVE_APP
+			"team":	B_INT32_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The application team (team_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_REG_APP_NOT_REGISTERED: The team is unknown to the roster.
+  - ...
+
+-----------------------------------------------------------------------
+
+app pre-registration, set thread/team (BRoster::SetThreadAndTeam())
+
+target:		roster
+message:	B_REG_SET_THREAD_AND_TEAM
+			"token":	B_INT32_TYPE
+			"team":		B_INT32_TYPE
+			"thread":	B_INT32_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "token": The token BRoster::AddApplication() returned (uint32).
+- "team": The application team (team_id).
+- "thread": The application looper thread (thread_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_REG_APP_NOT_PRE_REGISTERED: The token does not identify a pre-registered
+    application.
+  - ...
+
+-----------------------------------------------------------------------
+
+get an app info (BRoster::Get{Running,Active,}AppInfo())
+
+target:		roster
+message:	B_REG_GET_APP_INFO
+			[ "team":			B_INT32_TYPE
+			  | "ref":			B_REF_TYPE
+			  | "signature":	B_STRING_TYPE ]
+reply:		standard success
+			"app_info":	B_REG_APP_INFO_TYPE
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The application team (team_id).
+- "ref": An entry_ref to the application executable.
+- "signature": The application signature.
+- If both are omitted the active application is referred to.
+
+reply fields:
+- "app_info": The requested app_info (flat_app_info).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_BAD_TEAM_ID: The supplied team ID does not identify a registered
+    application.
+  - B_ERROR:
+    - An entry_ref or a signature has been supplied and no such application
+      is currently running.
+    - No team ID has been supplied and currently there is no active
+      application.
+  - ...
+
+-----------------------------------------------------------------------
+
+get an app list (BRoster::GetAppList())
+
+target:		roster
+message:	B_REG_GET_APP_LIST
+			[ "signature":	B_STRING_TYPE ]
+reply:		standard success
+			"teams":	B_INT32_TYPE[]
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "signature": The application signature.
+
+reply fields:
+- "teams": The requested list of team IDs (team_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - ...
+
+-----------------------------------------------------------------------
+
+activate an app (BRoster::ActivateApp())
+
+target:		roster
+message:	B_REG_ACTIVATE_APP
+			"team":	B_INT32_TYPE ]
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The application team (team_id).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_BAD_TEAM_ID: The supplied team ID does not identify a registered
+    application.
+  - ...
+
+-----------------------------------------------------------------------
