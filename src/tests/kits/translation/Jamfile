@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests kits translation ;
 CommonTestLib libtranslationtest.so
 	: TranslationKitTestAddon.cpp
 		TranslatorRosterTest.cpp
+		BitmapStreamTest.cpp
 	: libtranslation.so be stdc++.r4
 	: translation be stdc++.r4
 	:
