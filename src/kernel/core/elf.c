@@ -56,7 +56,8 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 	struct elf_image_info *found_image;
 	struct Elf32_Sym *found_sym;
 	long found_delta;
-	int i,j,rv;
+	uint32 i;
+	int j,rv;
 
 	PRINT(("looking up %p\n",(void *)address));
 
@@ -579,7 +580,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 		sprintf(regionName, "%s_seg%d", baseName, i);
 
 		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
-		if (pheaders[i].p_flags & PF_W) {
+		if (pheaders[i].p_flags & PF_WRITE) {
 			/*
 			 * rw segment
 			 */
@@ -767,7 +768,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		}
 
 		// we're here, so it must be a PT_LOAD segment
-		if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_W)) {
+		if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_WRITE)) {
 			// this is the writable segment
 			if (rw_segment_handled) {
 				// we've already created this segment
@@ -777,7 +778,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 			image_region = 1;
 			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 			sprintf(region_name, "%s_rw", path);
-		} else if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_X)) {
+		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
 			// this is the non-writable segment
 			if (ro_segment_handled) {
 				// we've already created this segment
@@ -976,7 +977,7 @@ elf_init(kernel_args *ka)
 		panic("elf_init: could not look up kernel text segment region\n");
 
 	get_area_info(kernel_image->regions[0].id, &areaInfo);
-	kernel_image->regions[0].start = areaInfo.address;
+	kernel_image->regions[0].start = (addr)areaInfo.address;
 	kernel_image->regions[0].size = areaInfo.size;
 
 	// data segment
@@ -985,7 +986,7 @@ elf_init(kernel_args *ka)
 		panic("elf_init: could not look up kernel data segment region\n");
 
 	get_area_info(kernel_image->regions[1].id, &areaInfo);
-	kernel_image->regions[1].start = areaInfo.address;
+	kernel_image->regions[1].start = (addr)areaInfo.address;
 	kernel_image->regions[1].size = areaInfo.size;
 
 	// we know where the dynamic section is
