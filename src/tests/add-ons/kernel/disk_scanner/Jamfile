@@ -1,48 +1,48 @@
 SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
 
-UsePrivateHeaders $(DOT) ;
-
+#UsePrivateHeaders $(DOT) ;
+#
 # the test app
-
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
-SimpleTest DiskScannerTest : DiskScannerTest.cpp
-	: <boot!home!config!lib>libkernelland_emu.so be stdc++.r4 ;
-LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;
-Depends <installed>DiskScannerTest : DiskScannerTest ;
-
+#
+#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+#SimpleTest DiskScannerTest : DiskScannerTest.cpp
+#	: <boot!home!config!lib>libkernelland_emu.so be stdc++.r4 ;
+#LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;
+#Depends <installed>DiskScannerTest : DiskScannerTest ;
+#
 # the add-on
-
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner ] ;
-
-{
-	local defines = [ FDefines USERLAND ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-}
-
-Addon <userland>disk_scanner : userland disk_scanner :
-	disk_scanner.c
-;
-LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
-
+#
+#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner ] ;
+#
+#{
+#	local defines = [ FDefines USERLAND ] ;
+#	SubDirCcFlags $(defines) ;
+#	SubDirC++Flags $(defines) ;
+#}
+#
+#Addon <userland>disk_scanner : userland disk_scanner :
+#	disk_scanner.c
+#;
+#LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
+#
 # for convenience: this target builds all userland modules
 #
-NotFile userland_disk_scanner_modules ;
-Depends userland_disk_scanner_modules :
-	# the main module
-	<userland>disk_scanner
-
-	# FS modules
-	<userland>bfs
-	<userland>iso9660
-
-	# partition modules
-	<userland>intel
-
-	# session modules
-	<userland>cdrom
-;
-
-SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
-SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
-SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
+#NotFile userland_disk_scanner_modules ;
+#Depends userland_disk_scanner_modules :
+#	# the main module
+#	<userland>disk_scanner
+#
+#	# FS modules
+#	<userland>bfs
+#	<userland>iso9660
+#
+#	# partition modules
+#	<userland>intel
+#
+#	# session modules
+#	<userland>cdrom
+#;
+#
+#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
+#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
+#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
