@@ -134,9 +134,9 @@ int sys_socket(int, int, int);
 
 int sys_setenv(const char *, const char *, int);
 int sys_getenv(const char *, char **);
- 
-/* region prototypes */
-area_id sys_find_region_by_name(const char *);
+
+/* System informations */
+extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
 void _kern_debug_output(const char *message);
 

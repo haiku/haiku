@@ -12,6 +12,8 @@
 
 status_t port_init(kernel_args *ka);
 int delete_owned_ports(team_id owner);
+int32 port_max_ports(void);
+int32 port_used_ports(void);
 
 // temp: test
 void port_test(void);
