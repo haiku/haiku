@@ -19,10 +19,12 @@ disk_device_data *
 write_lock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KDiskDevice *device = manager->RegisterDevice(partitionID);
-	if (device && device->WriteLock()) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+		if (device->WriteLock())
+			return device->DeviceData();
+		// Only unregister, when the locking fails. The guarantees, that the
+		// lock owner also has a reference.
 		device->Unregister();
-		return device->DeviceData();
 	}
 	return NULL;
 }
@@ -32,9 +34,12 @@ void
 write_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KDiskDevice *device = manager->RegisterDevice(partitionID);
-	if (device) {
-		device->WriteUnlock();
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+		bool isLocked = device->IsWriteLocked();
+		if (isLocked) {
+			device->WriteUnlock();
+			device->Unregister();
+		}
 		device->Unregister();
 	}
 }
@@ -44,10 +49,12 @@ disk_device_data *
 read_lock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KDiskDevice *device = manager->RegisterDevice(partitionID);
-	if (device && device->ReadLock()) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+		if (device->ReadLock())
+			return device->DeviceData();
+		// Only unregister, when the locking fails. The guarantees, that the
+		// lock owner also has a reference.
 		device->Unregister();
-		return device->DeviceData();
 	}
 	return NULL;
 }
@@ -57,9 +64,12 @@ void
 read_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KDiskDevice *device = manager->RegisterDevice(partitionID);
-	if (device) {
-		device->ReadUnlock();
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+		bool isLocked = device->IsReadLocked(false);
+		if (isLocked) {
+			device->ReadUnlock();
+			device->Unregister();
+		}
 		device->Unregister();
 	}
 }
@@ -71,7 +81,7 @@ find_disk_device(const char *path)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	partition_id id = -1;
 	if (KDiskDevice *device = manager->RegisterDevice(path)) {
-		device->ID();
+		id = device->ID();
 		device->Unregister();
 	}
 	return id;
@@ -84,7 +94,7 @@ find_partition(const char *path)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	partition_id id = -1;
 	if (KPartition *partition = manager->RegisterPartition(path)) {
-		partition->ID();
+		id = partition->ID();
 		partition->Unregister();
 	}
 	return id;
@@ -153,7 +163,11 @@ DBG(OUT("  partition %ld not found\n", partitionID));
 bool
 delete_partition(partition_id partitionID)
 {
-	// not implemented
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (KPartition *partition = manager->FindPartition(partitionID)) {
+		if (KPartition *parent = partition->Parent())
+			return parent->RemoveChild(partition);
+	}
 	return false;
 }
 
