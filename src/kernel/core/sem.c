@@ -21,7 +21,6 @@
 #include <malloc.h>
 #include <thread.h>
 #include <Errors.h>
-#include <kerrors.h>
 
 #include <boot/kernel_args.h>
 
