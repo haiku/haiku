@@ -11,11 +11,14 @@
 #include "net_stack.h"
 #include "memory_pool.h"
 
+#include "attribute.h"
 #include "layers_manager.h"
 #include "buffer.h"
 #include "timer.h"
+#include "dump.h"
 
-struct memory_pool_module_info *g_memory_pool = NULL;
+memory_pool_module_info *g_memory_pool = NULL;
+
 static bool g_started = false;
 
 status_t 		std_ops(int32 op, ...);
@@ -29,14 +32,14 @@ static status_t start(void)
 	if (g_started)
 		return B_OK;
 
-	puts("stack: starting...");
+	dprintf("stack: starting...\n");
 
 	start_buffers_service();
 	start_timers_service();
 
 	start_layers_manager();
 
-	puts("stack: started.");
+	dprintf("stack: started.\n");
 	g_started = true;
 
 	return B_OK;
@@ -44,7 +47,7 @@ static status_t start(void)
 
 static status_t stop(void)
 {
-	puts("stack: stopping...");
+	dprintf("stack: stopping...\n");
 
 	stop_layers_manager();
 
@@ -52,11 +55,12 @@ static status_t stop(void)
 	stop_buffers_service();
 
 
-	puts("stack: stopped.");
+	dprintf("stack: stopped.\n");
 	g_started = false;
 			
 	return 0;
 }
+
 
 // #pragma mark -
 
@@ -67,19 +71,23 @@ struct net_stack_module_info nsmi = {
 		std_ops
 	},
 
+	// Global stack control
 	start,
 	stop,
+
+	// Attributs IDs
+	register_attribute_id,
 	
 	// Layers handling
 	register_layer,
 	unregister_layer,
 	find_layer,
-	add_layer_attribut,
-	remove_layer_attribut,
-	find_layer_attribut,
+	add_layer_attribute,
+	remove_layer_attribute,
+	find_layer_attribute,
 	
-	push_buffer_up,
-	push_buffer_down,
+	send_up,
+	send_down,
 	
 	// net_buffer support
 	new_buffer,
@@ -96,9 +104,9 @@ struct net_stack_module_info nsmi = {
 	read_buffer,
 	write_buffer,
 	
-	add_buffer_attribut,
-	remove_buffer_attribut,
-	find_buffer_attribut,
+	add_buffer_attribute,
+	remove_buffer_attribute,
+	find_buffer_attribute,
 
 	dump_buffer,
 	
@@ -114,7 +122,10 @@ struct net_stack_module_info nsmi = {
 	delete_net_timer,
 	start_net_timer,
 	cancel_net_timer,
-	net_timer_appointment
+	net_timer_appointment,
+	
+	// Misc.
+	dump_memory
 };
 
 status_t std_ops(int32 op, ...) 
@@ -123,11 +134,13 @@ status_t std_ops(int32 op, ...)
 
 	switch(op) {
 		case B_MODULE_INIT:
-			printf("stack: B_MODULE_INIT\n");
+			dprintf("stack: B_MODULE_INIT\n");
 			load_driver_symbols("stack");
 			status = get_module(MEMORY_POOL_MODULE_NAME, (module_info **) &g_memory_pool);
-			if (status != B_OK)
+			if (status != B_OK) {
+				dprintf("stack: Can't load " MEMORY_POOL_MODULE_NAME " module!\n");
 				return status;
+			};
 				
 			// Re-publish memory_pool module api thru our
 			nsmi.new_pool 			= g_memory_pool->new_pool;
@@ -138,8 +151,7 @@ status_t std_ops(int32 op, ...)
 			break;
 
 		case B_MODULE_UNINIT:
-			// the stack is keeping loaded, so don't stop it
-			printf("stack: B_MODULE_UNINIT\n");
+			dprintf("stack: B_MODULE_UNINIT\n");
 			put_module(MEMORY_POOL_MODULE_NAME);
 			break;
 

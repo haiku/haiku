@@ -24,10 +24,13 @@ static struct layers_list g_layers;
 static memory_pool *	g_layers_pool = NULL;
 #define LAYERS_PER_POOL		(64)
 
-static net_layer * 	new_layer(const char *name, net_layer_module_info *module, void *cookie);
+static net_layer * 	new_layer(const char *name, const char *type, int priority,
+	net_layer_module_info *module, void *cookie);
 static status_t		delete_layer(net_layer *layer);
 
-extern struct memory_pool_module_info *g_memory_pool;
+extern memory_pool_module_info *g_memory_pool;
+
+char joker_type[] = "*";
 
 
 //	#pragma mark [Start/Stop functions]
@@ -63,7 +66,7 @@ status_t start_layers_manager()
 			if (!strlen(module_name))
 				continue;
 
-			printf("layers_manager: loading %s layer(s) module\n", module_name);
+			dprintf("layers_manager: loading %s layer(s) module\n", module_name);
 			if (get_module(module_name, (module_info **) &nlmi) != B_OK)
 				continue;
 				
@@ -104,14 +107,14 @@ status_t stop_layers_manager()
 	while (layer) {
 		next = layer->next;
 		module_name = layer->module->info.name;
-		printf("layers_manager: uniniting '%s' layer\n", layer->name);
+		dprintf("layers_manager: uniniting '%s' layer\n", layer->name);
 		// down the layer if currently up
 		layer->module->enable(layer, false);
 		layer->module->uninit(layer);
 
 		delete_layer(layer);
 
-		printf("layers_manager: unloading %s layer(s) module\n", module_name);
+		dprintf("layers_manager: unloading %s layer(s) module\n", module_name);
 		put_module(module_name);
 
 		layer = next;
@@ -127,7 +130,8 @@ status_t stop_layers_manager()
 // #pragma mark [Public functions]
 
 // --------------------------------------------------
-status_t register_layer(const char *name, net_layer_module_info *module, void *cookie, net_layer **_layer)
+status_t register_layer(const char *name, const char *type, int priority,
+	net_layer_module_info *module, void *cookie, net_layer **_layer)
 {
 	status_t status;
 	module_info *dummy;
@@ -138,7 +142,7 @@ status_t register_layer(const char *name, net_layer_module_info *module, void *c
 		module == NULL)
 		return B_ERROR;
 	
-	layer = new_layer(name, module, cookie);
+	layer = new_layer(name, type, priority, module, cookie);
 	if (!layer)
 		return B_NO_MEMORY;
 	
@@ -156,7 +160,7 @@ status_t register_layer(const char *name, net_layer_module_info *module, void *c
 	
 	release_sem(g_layers.lock);
 		
-	printf("layers_manager: '%s' layer registered\n", layer->name);
+	dprintf("layers_manager: '%s' layer, registering %s/%s type\n", layer->name, layer->type, layer->sub_type);
 	
 	if (_layer)
 		*_layer = layer;
@@ -191,7 +195,7 @@ status_t unregister_layer(net_layer *layer)
 			
 		if (!p) {
 			// Oh oh... :-(
-			printf("layers_manager: unregister_layer(): %p layer not found in list!\n", layer);
+			dprintf("layers_manager: unregister_layer(): %p layer not found in list!\n", layer);
 			release_sem(g_layers.lock);
 			return B_ERROR;
 		};
@@ -202,7 +206,7 @@ status_t unregister_layer(net_layer *layer)
 
 	layer->module->uninit(layer);
 
-	printf("layers_manager: '%s' layer unregistered\n", layer->name);
+	dprintf("layers_manager: '%s' layer unregistered\n", layer->name);
 
 	put_module(layer->module->info.name);
 
@@ -235,14 +239,14 @@ net_layer * find_layer(const char *name)
 
 
 // --------------------------------------------------
-status_t add_layer_attribut(net_layer *layer, const char *name, int type, ...)
+status_t add_layer_attribute(net_layer *layer, const void *id, int type, ...)
 {
 	va_list args;
 	
 	va_start(args, type);
 
 	switch(type) {
-	case NET_ATTRIBUT_POINTER:
+	case NET_ATTRIBUTE_DATA:
 		// hack
 		layer->cookie = va_arg(args, void *);
 		break;
@@ -255,53 +259,77 @@ status_t add_layer_attribut(net_layer *layer, const char *name, int type, ...)
 
 
 // --------------------------------------------------
-status_t remove_layer_attribut(net_layer *layer, const char *name)
+status_t remove_layer_attribute(net_layer *layer, const void *id)
 {
 	return B_ERROR;
 }
 
 
-status_t find_layer_attribut(net_layer *layer, const char *name, int *type, void **attribut, size_t *size)
+status_t find_layer_attribute(net_layer *layer, const void *id, int *type,
+	void **attribute, size_t *size)
 {
-	*attribut = &layer->cookie;
+	*attribute = &layer->cookie;
 	return B_OK;
 }
 
 
 // --------------------------------------------------
-status_t push_buffer_up(net_layer *layer, net_buffer *buffer)
+status_t send_up(net_layer *layer, net_buffer *buffer)
 {
 	net_layer *above;
 	status_t status;
-	int i;
+	// int i;
 
 	if (!layer)
 		return B_ERROR;
 
-	// #### TODO: lock the layer(s) above & below hierarchy
-	if (!layer->layers_above)
-		// no layers above this one
-		return B_ERROR;
-	
-	status = B_ERROR;
-	i = 0;
-	while (layer->layers_above[i]) {
-		above = layer->layers_above[i++];
-		if (!above->module->input_buffer)
-			// this layer don't input buffer
-			continue;
-			
-		status = above->module->input_buffer(above, buffer);
-		if (status == B_OK)
-			return status;
-	};
+	status = acquire_sem(g_layers.lock);
+	if (status != B_OK)
+		return status;
 
+	status = B_ERROR;
+	// TODO: lookup thru a previoulsy (at each layer [un]registration time) built list of
+	// "above" layers of caller layer.
+
+	// dprintf("layers_manager: send_up(): layer %s (%s/%s), searching a matching upper layer...\n",
+	//	layer->name, layer->type, layer->sub_type);
+
+	// HACK: today, we lookup thru ALL :-( registered layers.
+	// In the future, such layers (de)assembly should be done at layer (un)resgistration time, as
+	// it never change until layers list change herself...
+	above = g_layers.first;
+	while (above) {
+		// dprintf("layers_manager: send_up: Matching against layer %s (%s/%s) ?\n",
+		// 	above->name, above->type, above->sub_type);
+		
+		if ( above->module->process_input &&
+			 (strcmp(above->type, joker_type) == 0 ||
+			 (strcmp(above->type, layer->sub_type) == 0)) ) {
+/*
+			dprintf("layers_manager: send_up: handing buffer from %s/%s (%s) to %s/%s (%s)...\n",
+					layer->type, layer->sub_type, layer->name,
+					above->type, above->sub_type, above->name);
+*/		
+			release_sem(g_layers.lock);
+			status = above->module->process_input(above, buffer);
+			if (status == B_OK) {
+				atomic_add(&above->use_count, 1);								
+				return status;
+			};
+
+			status = acquire_sem(g_layers.lock);
+			if (status != B_OK)
+				return status;
+		};  
+		above = above->next;
+	}
+	release_sem(g_layers.lock);
 	return status;
 }
 
 
 // --------------------------------------------------
-status_t push_buffer_down(net_layer *layer, net_buffer *buffer)
+status_t send_down(net_layer *layer, net_buffer *buffer)
 {
 	net_layer *below;
 	status_t status;
@@ -319,11 +347,11 @@ status_t push_buffer_down(net_layer *layer, net_buffer *buffer)
 	i = 0;
 	while (layer->layers_below[i]) {
 		below = layer->layers_below[i++];
-		if (!below->module->output_buffer)
-			// this layer don't output buffer
+		if (!below->module->process_output)
+			// this layer don't process output buffer
 			continue;
 			
-		status = below->module->output_buffer(below, buffer);
+		status = below->module->process_output(below, buffer);
 		if (status == B_OK)
 			return status;
 	};
@@ -335,7 +363,8 @@ status_t push_buffer_down(net_layer *layer, net_buffer *buffer)
 
 
 // --------------------------------------------------
-static net_layer * new_layer(const char *name, net_layer_module_info *module, void *cookie)
+static net_layer * new_layer(const char *name, const char *type, int priority,
+	net_layer_module_info *module, void *cookie)
 {
 	net_layer *layer;
 
@@ -349,9 +378,24 @@ static net_layer * new_layer(const char *name, net_layer_module_info *module, vo
 	if (! layer)
 		return NULL;
 
-	layer->name = strdup(name);
-	layer->module = module;
-	layer->cookie = cookie;
+	layer->name 	= strdup(name);
+
+	if (type) {
+		char *tmp, *t, *n;
+		
+		tmp = strdup(type);
+		t = strtok_r(tmp, "/", &n);
+		layer->type = (t ? strdup(t) : joker_type);
+		t =  strtok_r(NULL, " ", &n);
+		layer->sub_type = (t ? strdup(t) : joker_type);
+		free(tmp);
+	} else
+		layer->type = layer->sub_type = NULL;
+
+
+	layer->priority = priority; 
+	layer->module 	= module;
+	layer->cookie 	= cookie;
 
 	layer->layers_above = NULL;
 	layer->layers_below = NULL;
@@ -372,6 +416,11 @@ static status_t delete_layer(net_layer *layer)
 		
 	if (layer->name)
 		free(layer->name);
+	if (layer->type && layer->type != joker_type)
+		free(layer->type);
+	if (layer->sub_type && layer->type != joker_type)
+		free(layer->sub_type);
+
 	if (layer->layers_above)
 		free(layer->layers_above);
 	if (layer->layers_below)

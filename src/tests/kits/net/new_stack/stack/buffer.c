@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iovec.h>
+#include <stdarg.h>
+
 #include <KernelExport.h>
 #include <OS.h>
 
 #include "memory_pool.h"
 #include "net_stack.h"
+#include "dump.h"
 #include "buffer.h"
-
+#include "attribute.h"
 
 typedef struct net_buffer_chunk
 {
@@ -28,8 +32,7 @@ struct net_buffer {
 	uint32					flags;
 		#define BUFFER_TO_FREE (1)
 		#define BUFFER_IS_URGENT (2)
-// TODO: handle buffer attributs storage and lookup
-//  struct attribut 		*attributs;  // buffer attributs
+	net_attribute 			*attributes;  // buffer attributes
 };
 
 struct net_buffer_queue
@@ -62,7 +65,7 @@ static volatile sem_id	g_buffers_purgatory_sync = -1;		// use to notify buffers 
 
 static memory_pool *	g_buffer_queues_pool = NULL;
 
-extern struct memory_pool_module_info *g_memory_pool;
+extern memory_pool_module_info *g_memory_pool;
 
 // Privates prototypes
 // -------------------
@@ -121,7 +124,7 @@ status_t stop_buffers_service()
 	wait_for_thread(g_buffers_purgatory_thread, &status);
 	
 	// As the purgatory thread stop, some net_buffer(s) still could be flagged
-	// BUFFER_TO_FREE, but not deleted... yet.
+	// PACKET_TO_FREE, but not deleted... yet.
 	g_memory_pool->for_each_pool_node(g_buffers_pool, buffer_killer, NULL);
 
 	// free buffers-related pools
@@ -158,6 +161,7 @@ net_buffer * new_buffer(void)
 	buffer->next 		= NULL;
 	buffer->data_chunks = NULL;
 	buffer->all_chunks	= NULL;
+	buffer->attributes 	= NULL;
 	buffer->len			= 0;
 	buffer->flags		= 0;
 	
@@ -169,9 +173,6 @@ net_buffer * new_buffer(void)
 // --------------------------------------------------
 status_t delete_buffer(net_buffer *buffer, bool interrupt_safe)
 {
-	net_buffer_chunk *chunk;
-	net_buffer_chunk *next_chunk;
-	
 	if (! buffer)
 		return B_BAD_VALUE;
 
@@ -190,31 +191,51 @@ status_t delete_buffer(net_buffer *buffer, bool interrupt_safe)
       return release_sem_etc(g_buffers_purgatory_sync, 1, B_DO_NOT_RESCHEDULE); 
 	};
 
-	// Okay, we can free each buffer chunk(s) right now!
-	chunk = buffer->all_chunks;
-	while (chunk) {
-		// okay, one net_buffer_chunk less referencing this data
-		chunk->ref_count--;
-		next_chunk = chunk->next;
-		
-		if (chunk->ref_count == 0) {
-			// it was the last net_buffer_chunk to reference this data, 
-			// so free it now!
+	if (buffer->all_chunks) {
+		// Okay, we can (try to) free each buffer chunk(s) right now!
 
-			// do we have to call the free_func() on this data?
-			if (chunk->free_func) {
-				// yes, please!!!
-				// call the right free_func kind on this data
-				if (chunk->free_cookie)
-					chunk->free_func(chunk->free_cookie, (void *) chunk->data);
-				else
-					chunk->free_func((void *) chunk->data);
+		net_buffer_chunk *chunk;
+		net_buffer_chunk *next_chunk;
+	
+		chunk = buffer->all_chunks;
+		while (chunk) {
+			// okay, one net_buffer_chunk less referencing this data
+			atomic_add(&chunk->ref_count, -1);
+			next_chunk = chunk->next;
+		
+			if (chunk->ref_count == 0) {
+				// it was the last net_buffer_chunk to reference this data, 
+				// so free it now!
+
+				// do we have to call the free_func() on this data?
+				if (chunk->free_func) {
+					// yes, please!!!
+					// call the right free_func kind on this data
+					if (chunk->free_cookie)
+						chunk->free_func(chunk->free_cookie, (void *) chunk->data);
+					else
+						chunk->free_func((void *) chunk->data);
+				};
+				// delete this net_buffer_chunk
+				g_memory_pool->delete_pool_node(g_buffer_chunks_pool, chunk);
 			};
-		};
-		// delete this net_buffer_chunk
-		g_memory_pool->delete_pool_node(g_buffer_chunks_pool, chunk);
 			
-		chunk = next_chunk;
+			chunk = next_chunk;
+		};
+	};
+	
+	if (buffer->attributes) {
+		// Free buffer attributes
+
+		net_attribute *attr;
+		net_attribute *next_attr;
+
+		attr = buffer->attributes;
+		while (attr) {
+			next_attr = attr->next;
+			delete_attribute(attr, NULL);
+			attr = next_attr;
+		};
 	};
 	
 	// Last, delete the net_buffer itself
@@ -232,7 +253,34 @@ net_buffer * duplicate_buffer(net_buffer *buffer)
 // --------------------------------------------------
 net_buffer * clone_buffer(net_buffer *buffer)
 {
-	return NULL; // B_UNSUPPORTED;
+	net_buffer *clone;
+	net_buffer_chunk *chunk;
+	
+	if (! g_buffers_pool)
+		g_buffers_pool = g_memory_pool->new_pool(sizeof(*buffer), BUFFERS_PER_POOL);
+			
+	if (! g_buffers_pool)
+		return NULL;
+	
+	clone = (net_buffer *) g_memory_pool->new_pool_node(g_buffers_pool);
+	if (! clone)
+		return NULL;
+	
+	clone->next = NULL;
+	clone->data_chunks 	= buffer->data_chunks;
+	clone->all_chunks 	= buffer->all_chunks;
+	clone->len 			= buffer->len;
+	clone->flags		= buffer->flags;
+
+	// Okay, increase all chunks ref count, as we have another buffer referencing them
+	chunk = buffer->all_chunks;
+	while (chunk) {
+		// okay, one net_buffer_chunk less referencing this data
+		atomic_add(&chunk->ref_count, 1);
+		chunk = chunk->next;
+	};
+
+	return clone;
 }
 
 
@@ -243,7 +291,7 @@ net_buffer * split_buffer(net_buffer *buffer, uint32 offset)
 }
 
 // --------------------------------------------------
-status_t merge_buffers(net_buffer *begin_buffer, net_buffer *end_buffer)
+status_t concatenate_buffers(net_buffer *begin_buffer, net_buffer *end_buffer)
 {
 	return B_ERROR;
 }
@@ -501,22 +549,112 @@ uint32 write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 
 
 
 // --------------------------------------------------
-status_t add_buffer_attribut(net_buffer *buffer, const char *name, int type, ...)
+status_t add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...)
 {
-	return B_ERROR;
+	net_attribute *attr;
+	
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	attr = new_attribute(&buffer->attributes, id);
+	if (! attr)
+		return B_NO_MEMORY;
+
+	if (type & FROM_BUFFER) {
+		va_list args;
+		net_buffer_chunk *chunk;
+		int offset;
+		uint32	offset_in_chunk;
+		int size;
+		uint8 *ptr;
+			
+		type = (type & NET_ATTRIBUTE_FLAGS_MASK);
+		
+		va_start(args, type);
+		offset 	= va_arg(args, int);
+		size 	= va_arg(args, int);
+		va_end(args);
+		
+		chunk = find_buffer_chunk(buffer, offset, &offset_in_chunk, NULL);
+		if (chunk == NULL) {
+			delete_attribute(attr, &buffer->attributes);
+			return B_BAD_VALUE;
+		};
+
+		attr->size = size;
+		
+		if (size < chunk->len - offset_in_chunk) {
+			ptr  = (uint8 *) chunk->data;
+			ptr += offset_in_chunk;
+
+			attr->type = type | NET_ATTRIBUTE_POINTER;
+			attr->u.ptr = ptr;	
+		} else {
+			// data overlap this chunk, use iovec attribute type
+			int i;
+			uint32 len;
+			uint32 chunk_len;
+		
+			i = 0;
+			len = 0;
+			while (chunk) {
+				ptr  = (uint8 *) chunk->data;
+				ptr += offset_in_chunk;
+				chunk_len = min((chunk->len - offset_in_chunk), (size - len));
+	
+				attr->u.vec[i].iov_base = ptr;
+				attr->u.vec[i].iov_len = chunk_len;
+	
+				len += chunk_len;
+				i++;
+				if (len >= size || i > 16)
+					break;
+	
+				offset_in_chunk = 0; // only the first chunk
+			
+				chunk = chunk->next_data;	// next chunk
+			};
+	
+			attr->type = type | NET_ATTRIBUTE_IOVEC;
+		}
+
+	} else {
+		// Not implemented
+		return B_ERROR;	
+	}
+
+	return B_OK;
 }
 
 
 // --------------------------------------------------
-status_t remove_buffer_attribut(net_buffer *buffer, const char *name)
+status_t remove_buffer_attribute(net_buffer *buffer, const void *id)
 {
-	return B_ERROR;
+	net_attribute *attr;
+
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	attr = find_attribute(buffer->attributes, id, NULL, NULL, NULL);
+	if (! attr)
+		return B_NAME_NOT_FOUND;
+
+	return delete_attribute(attr, &buffer->attributes);
 }
 
 
-status_t find_buffer_attribut(net_buffer *buffer, const char *name, int *type, void **attribut, size_t *size)
+status_t find_buffer_attribute(net_buffer *buffer, const void *id, int *type, void **value, size_t *size)
 {
-	return B_ERROR;
+	net_attribute *attr;
+
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	attr = find_attribute(buffer->attributes, id, type, value, size);
+	if (! attr)
+		return B_NAME_NOT_FOUND;
+
+	return B_OK;
 }
 
 
@@ -811,56 +949,6 @@ static status_t append_buffer(net_buffer *buffer, const void *data, uint32 bytes
 
 
 // --------------------------------------------------
-void dump_memory
-	(
-	const char *	prefix,
-	const void *	data,
-	uint32			len
-	)
-{
-	uint32	i,j;
-  	char	text[96];	// only 3*16 + 16 max by line needed
-	uint8 *	byte;
-	char *	ptr;
-
-	byte = (uint8 *) data;
-
-	for ( i = 0; i < len; i += 16 )
-		{
-		ptr = text;
-
-      	for ( j = i; j < i+16 ; j++ )
-			{
-			if ( j < len )
-				sprintf(ptr, "%02x ", byte[j]);
-			else
-				sprintf(ptr, "   ");
-			ptr += 3;
-			};
-			
-		for (j = i; j < len && j < i+16;j++)
-			{
-			if ( byte[j] >= 0x20 && byte[j] < 0x7e )
-				*ptr = byte[j];
-			else
-				*ptr = '.';
-				
-			ptr++;
-			};
-		*ptr = '\n';
-		ptr++;
-		*ptr = '\0';
-		
-		if (prefix)
-			DPRINTF(prefix);
-		DPRINTF(text);
-
-		// next line
-		};
-}
-
-
-// --------------------------------------------------
 void dump_buffer(net_buffer *buffer)
 {
 	net_buffer_chunk *chunk;
@@ -893,7 +981,7 @@ void dump_buffer(net_buffer *buffer)
 
 }
 
-// #pragma mark [Buffers Purgatory functions]
+// #pragma mark [Packets Purgatory functions]
 
 // --------------------------------------------------
 static int32 buffers_purgatory_thread(void *data)

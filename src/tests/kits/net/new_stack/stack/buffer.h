@@ -33,9 +33,9 @@ extern	status_t 		attach_buffer_free_element(net_buffer *buffer, void *arg1, voi
 extern uint32 			read_buffer(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
 extern uint32 			write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
 
-extern status_t			add_buffer_attribut(net_buffer *buffer, const char *name, int type, ...);
-extern status_t			remove_buffer_attribut(net_buffer *buffer, const char *name);
-extern status_t			find_buffer_attribut(net_buffer *buffer, const char *name, int *type, void **attribut, size_t *size);
+extern status_t			add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...);
+extern status_t			remove_buffer_attribute(net_buffer *buffer, const void *id);
+extern status_t			find_buffer_attribute(net_buffer *buffer, const void *id, int *type, void **value, size_t *size);
 
 extern void				dump_buffer(net_buffer *buffer);
 
