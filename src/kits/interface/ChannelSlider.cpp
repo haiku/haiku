@@ -48,7 +48,11 @@ BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
 BChannelSlider::BChannelSlider(BMessage *archive)
 	: BChannelControl(archive)
 {
-	// TODO: Implement
+	InitData();
+
+	orientation orient;
+	if (archive->FindInt32("_orient", (int32 *)&orient) == B_OK)
+		SetOrientation(orient);
 }
 
 
@@ -71,8 +75,11 @@ BChannelSlider::Instantiate(BMessage *archive)
 status_t
 BChannelSlider::Archive(BMessage *into, bool deep) const
 {
-	// TODO: Implement
-	return B_ERROR;
+	status_t status = BChannelControl::Archive(into, deep);
+	if (status == B_OK)
+		status = into->AddInt32("_orient", (int32)Orientation());
+
+	return status;
 }
 
 
@@ -166,7 +173,6 @@ BChannelSlider::Draw(BRect updateRect)
 void
 BChannelSlider::MouseDown(BPoint where)
 {
-	// TODO: Implement
 }
 
 
@@ -281,7 +287,9 @@ BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed
 void
 BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint topLeft, BPoint bottomRight)
 {
-	// TODO: Implement
+	// TODO: Draw the real thing
+	ASSERT(into != NULL);
+	into->StrokeRect(BRect(topLeft, bottomRight), B_SOLID_HIGH); 
 }
 
 
@@ -289,7 +297,7 @@ void
 BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed)
 {
 	ASSERT(into != NULL);
-		
+	
 	const BBitmap *thumb = ThumbFor(channel, pressed);
 	if (thumb == NULL)
 		return;
@@ -318,7 +326,6 @@ BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed
 const BBitmap *
 BChannelSlider::ThumbFor(int32 channel, bool pressed)
 {
-	// TODO: Implement
 	return NULL;
 }
 
@@ -438,7 +445,8 @@ BChannelSlider::UpdateFontDimens()
 
 void
 BChannelSlider::DrawThumbs()
-{	
+{
+	
 }
 
 
@@ -464,7 +472,7 @@ BChannelSlider::Redraw()
 
 
 void
-BChannelSlider::MouseMovedCommon(BPoint , BPoint )
+BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 {
 	// TODO: Implement
 }

@@ -9,7 +9,7 @@
 
 
 static property_info // TODO: Finish this
-sPropertyInfo[] = {	
+sPropertyInfo[] = {
 	{0}
 };
 
@@ -227,7 +227,7 @@ BChannelControl::SetChannelCount(int32 channel_count)
 {
 	if (channel_count < 0 || channel_count >= MaxChannelCount())
 		return B_BAD_VALUE;
-	
+
 	// TODO: Currently we only grow the buffer. Test what BeOS does
 	if (channel_count > fChannelCount) {
 		int32 *newMin = new int32[channel_count];
@@ -316,7 +316,6 @@ status_t
 BChannelControl::SetLimitsFor(int32 fromChannel, int32 channelCount,
 	const int32 *minimum, const int32 *maximum)
 {
-	
 	return B_ERROR;
 }
 
@@ -348,7 +347,7 @@ BChannelControl::SetLimitLabels(const char *minLabel, const char *maxLabel)
 {
 	if (minLabel != fMinLabel)
 		fMinLabel = minLabel;
-	
+		
 	if (maxLabel != fMaxLabel)
 		fMaxLabel = maxLabel;
 
@@ -411,8 +410,8 @@ BChannelControl::StuffValues(int32 fromChannel, int32 channelCount,
 						|| fromChannel + channelCount >= fChannelCount)
 		return B_BAD_INDEX;
 
-	for (int32 i = 0; i < channelCount; i++) {	
-		if (inValues[i] <= fChannelMax[fromChannel + i] 
+	for (int32 i = 0; i < channelCount; i++) {
+		if (inValues[i] <= fChannelMax[fromChannel + i]
 						&& inValues[i] >= fChannelMin[fromChannel + i])
 			fChannelValues[fromChannel + i] = inValues[i];
 		
