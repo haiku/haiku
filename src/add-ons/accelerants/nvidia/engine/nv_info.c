@@ -44,6 +44,7 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
 static void write_RMA(uint32 reg, uint32 data);
 static uint32 read_RMA(uint32 reg);
+static status_t translate_ISA_PCI(uint32* reg);
 static status_t	nv_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
@@ -929,10 +930,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
 			if (*exec && reg2)
 			{
-				safe = ISARB(reg);
-				ISAWB(reg, index);
-				byte = ISARB(reg + 1);
-				ISAWB(reg, safe);
+//				safe = ISARB(reg);
+//				ISAWB(reg, index);
+//				byte = ISARB(reg + 1);
+//				ISAWB(reg, safe);
+//test:
+				translate_ISA_PCI(&reg);
+				NV_REG8(reg) = index;
+				byte = NV_REG8(reg + 1);
+//end test
 				byte &= (uint8)and_out;
 				byte >>= byte2;
 				offset32 = (byte << 2);
@@ -1079,13 +1085,21 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 					data <<= (0x0100 - byte2);
 				}
 				data &= and_out;
-				safe = ISARB(reg2);
-				ISAWB(reg2, index);
-				byte = ISARB(reg2 + 1);
+//				safe = ISARB(reg2);
+//				ISAWB(reg2, index);
+//				byte = ISARB(reg2 + 1);
+//test:
+				translate_ISA_PCI(&reg2);
+				NV_REG8(reg2) = index;
+				byte = NV_REG8(reg2 + 1);
+//end test
 				byte &= (uint8)and_out2;
 				byte |= (uint8)data;
-				ISAWB((reg2 + 1), byte);
-				ISAWB(reg2, safe);
+//				ISAWB((reg2 + 1), byte);
+//				ISAWB(reg2, safe);
+//test:
+				NV_REG8(reg2 + 1) = byte;
+//end test
 			}
 			break;
 		case 0x38: /* new */
@@ -1200,9 +1214,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'WR idx ISA reg $%02x via $%04x = $%02x'\n", index, reg, byte));
 			if (*exec)
 			{
-				safe = ISARB(reg);
-				ISAWW(reg, ((((uint16)byte) << 8) | index));
-				ISAWB(reg, safe);
+//				safe = ISARB(reg);
+//				ISAWW(reg, ((((uint16)byte) << 8) | index));
+//				ISAWB(reg, safe);
+//test:
+				translate_ISA_PCI(&reg);
+				NV_REG16(reg) = ((((uint16)byte) << 8) | index);
+//end test
 			}
 			break;
 		case 0x63: /* new setup compared to pre-NV10 version */
@@ -1271,10 +1289,17 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				reg, and_out, or_in));
 			if (*exec)
 			{
-				byte = ISARB(reg);
+//				byte = ISARB(reg);
+//test:
+				translate_ISA_PCI(&reg);
+				byte = NV_REG8(reg);
+//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				ISAWB(reg, byte);
+//				ISAWB(reg, byte);
+//test:
+				NV_REG8(reg) = byte;
+//end test
 			}
 			break;
 		case 0x6b: /* new */
@@ -1469,10 +1494,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			index = *((uint8*)(&(rom[(data + 2)])));
 			and_out = *((uint8*)(&(rom[(data + 3)])));
 			byte2 = *((uint8*)(&(rom[(data + 4)])));
-			safe = ISARB(reg);
-			ISAWB(reg, index);
-			byte = ISARB(reg + 1);
-			ISAWB(reg, safe);
+//			safe = ISARB(reg);
+//			ISAWB(reg, index);
+//			byte = ISARB(reg + 1);
+//			ISAWB(reg, safe);
+//test:
+				translate_ISA_PCI(&reg);
+				NV_REG8(reg) = index;
+				byte = NV_REG8(reg + 1);
+//end test
 			byte &= (uint8)and_out;
 			LOG(8,("cmd 'CHK bits AND-out $%02x idx ISA reg $%02x via $%04x for $%02x'\n",
 				and_out, index, reg, byte2));
@@ -1510,13 +1540,21 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				index, reg, and_out, or_in));
 			if (*exec)
 			{
-				safe = ISARB(reg);
-				ISAWB(reg, index);
-				byte = ISARB(reg + 1);
+//				safe = ISARB(reg);
+//				ISAWB(reg, index);
+//				byte = ISARB(reg + 1);
+//test:
+				translate_ISA_PCI(&reg);
+				NV_REG8(reg) = index;
+				byte = NV_REG8(reg + 1);
+//end test
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				ISAWB((reg + 1), byte);
-				ISAWB(reg, safe);
+//				ISAWB((reg + 1), byte);
+//				ISAWB(reg, safe);
+//test:
+				NV_REG8(reg + 1) = byte;
+//end test
 			}
 			break;
 		case 0x79:
@@ -1593,10 +1631,15 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	offset32 = *((uint16*)(&(rom[data + 5])));
 	and_out2 = *((uint8*)(&(rom[(data + 7)])));
 	byte2 = *((uint8*)(&(rom[(data + 8)])));
-	safe = ISARB(reg);
-	ISAWB(reg, index);
-	byte = ISARB(reg + 1);
-	ISAWB(reg, safe);
+//	safe = ISARB(reg);
+//	ISAWB(reg, index);
+//	byte = ISARB(reg + 1);
+//	ISAWB(reg, safe);
+//test:
+	translate_ISA_PCI(&reg);
+	NV_REG8(reg) = index;
+	byte = NV_REG8(reg + 1);
+//end test
 	byte &= (uint8)and_out;
 	offset32 += (byte >> shift);
 	safe = byte = *((uint8*)(&(rom[offset32])));
@@ -1743,6 +1786,25 @@ static uint32 read_RMA(uint32 reg)
 	ISAWW(0x03d4, 0x0338);
 	/* restore old CRTC index register */
 	ISAWB(0x03d4, safe);
+}
+
+static status_t translate_ISA_PCI(uint32* reg)
+{
+	switch (*reg)
+	{
+	case 0x03c4:
+		*reg = NV8_SEQIND;
+		break;
+	case 0x03d4:
+		*reg = NV8_CRTCIND;
+		break;
+	default:
+		LOG(8,("\n\n 'INFO: WARNING: ISA->PCI register adress translation failed!\n\n"));
+		return B_ERROR;
+		break;
+	}
+
+	return B_OK;
 }
 
 //fixme: move to crtc sourcefile, also setup for crtc2(?)
