@@ -89,7 +89,7 @@ public:
 		uchar channel, uchar lsb, uchar msb, bigtime_t time = 0) const;
 
 	void SpraySystemExclusive(
-		void* data, size_t dataLength, bigtime_t time = 0) const;
+		void* data, size_t length, bigtime_t time = 0) const;
 
 	void SpraySystemCommon(
 		uchar status, uchar data1, uchar data2, bigtime_t time = 0) const;
@@ -106,7 +106,9 @@ protected:
 	
 private:
 
-	//void SprayEvent(BMidiEvent* event, size_t length) const;
+	void SprayEvent(
+		const void* data, size_t length, bool atomic, bigtime_t time,
+		bool sysex = false) const;
 	
 	virtual void _Reserved1();
 	virtual void _Reserved2();

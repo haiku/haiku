@@ -4,8 +4,6 @@
 
 #include <MidiEndpoint.h>
 
-class BMidiDispatcher;
-
 class BMidiConsumer : public BMidiEndpoint
 {
 public:
@@ -75,7 +73,7 @@ public:
 		uchar channel, uchar lsb, uchar msb, bigtime_t time);
 
 	virtual	void SystemExclusive(
-		void* data, size_t dataLength, bigtime_t time);
+		void* data, size_t length, bigtime_t time);
 
 	virtual	void SystemCommon(
 		uchar status, uchar data1, uchar data2, bigtime_t time);
@@ -92,8 +90,8 @@ protected:
  
 private:
 
-	friend class BMidiDispatcher;
 	friend class BMidiRoster;
+	friend int32 _midi_event_thread(void*);
 	
 	virtual void _Reserved1();
 	virtual void _Reserved2();
@@ -103,12 +101,14 @@ private:
 	virtual void _Reserved6();
 	virtual void _Reserved7();
 	virtual void _Reserved8();
-		
-	BMidiDispatcher* fDispatcher;
-	bigtime_t fTimeout;
-	void* fTimeoutData;
-	
-	int32 fCurrentProducer;
+
+	int32 EventThread();
+
+	bigtime_t timeout;
+	void* timeoutData;
+	int32 currentProducer;
+	thread_id thread;
+
 	uint32 _reserved[1];
 };
 

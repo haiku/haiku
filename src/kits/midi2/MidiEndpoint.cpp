@@ -14,10 +14,9 @@ const char* BMidiEndpoint::Name() const
 {
 	const char* str = NULL;
 
-	// It seems reasonable to assume that the pointer 
-	// returned by BString::String() can change when the 
-	// string is modified, e.g. to allocate more space. 
-	// That's why we need to lock here too.
+	// It seems reasonable to assume that the pointer returned by
+	// BString::String() can change when the string is modified,
+	// e.g. to allocate more space. That's why we lock here too.
 
 	if (LockLooper())
 	{
