@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src tests kits app common ;
+
+TestObjects CommonTestApp.cpp : app support ;
+TestObjects CommonTestApp.cpp : : true ;
+

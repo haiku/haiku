@@ -16,19 +16,22 @@
 static const char *kAppRunnerTeamPort = "app runner team port";
 
 // constructor
-AppRunner::AppRunner()
+AppRunner::AppRunner(bool requestQuitOnDestruction)
 		 : fOutputLock(),
 		   fRemotePort(-1),
 		   fOutput(),
 		   fReader(-1),
 		   fTeam(-1),
-		   fMessenger()
+		   fMessenger(),
+		   fRequestQuitOnDestruction(requestQuitOnDestruction)
 {
 }
 
 // destructor
 AppRunner::~AppRunner()
 {
+	if (fRequestQuitOnDestruction)
+		WaitFor(true);
 	if (fReader >= 0) {
 		int32 result;
 		wait_for_thread(fReader, &result);

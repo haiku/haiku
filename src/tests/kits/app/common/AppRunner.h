@@ -10,7 +10,7 @@
 
 class AppRunner {
 public:
-	AppRunner();
+	AppRunner(bool requestQuitOnDestruction = false);
 	~AppRunner();
 
 	status_t Run(const char *command, const char *args = NULL,
@@ -39,6 +39,7 @@ private:
 	thread_id	fReader;
 	team_id		fTeam;
 	BMessenger	fMessenger;
+	bool		fRequestQuitOnDestruction;
 
 	static port_id	fTeamPort;
 	static BLocker	fTeamPortLock;
