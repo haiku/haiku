@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <OS.h>
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
