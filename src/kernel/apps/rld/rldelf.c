@@ -384,7 +384,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
 					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_W) {
+					if (pheader->p_flags & PF_WRITE) {
 						// this is a writable segment
 						image->regions[regcount].flags |= RFLAG_RW;
 					}
@@ -407,7 +407,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
 					image->regions[regcount].flags = 0;
-					if (pheader->p_flags & PF_W) {
+					if (pheader->p_flags & PF_WRITE) {
 						// this is a writable segment
 						image->regions[regcount].flags |= RFLAG_RW;
 					}
@@ -425,7 +425,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 						image->regions[regcount].fdsize = 0;
 						image->regions[regcount].delta = 0;
 						image->regions[regcount].flags = RFLAG_ANON;
-						if (pheader->p_flags & PF_W) {
+						if (pheader->p_flags & PF_WRITE) {
 							// this is a writable segment
 							image->regions[regcount].flags |= RFLAG_RW;
 						}
