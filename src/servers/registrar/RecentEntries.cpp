@@ -260,6 +260,7 @@ RecentEntries::Print()
 		       counter++, (*item)->ref.device, (*item)->ref.directory, (*item)->ref.name,
 		       (*item)->sig.c_str(), (*item)->index);
 	}
+	return B_OK;
 }
 
 // Save

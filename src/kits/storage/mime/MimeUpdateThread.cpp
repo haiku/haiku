@@ -111,6 +111,7 @@ MimeUpdateThread::ThreadFunction()
 	}
 	DBG(OUT("(id: %ld) exiting mime update thread with result 0x%lx\n",
 		find_thread(NULL), err));
+	return err;
 }
 
 // DeviceSupportsAttributes
