@@ -32,7 +32,7 @@
 
 area_id alloc_mem(void **phy, void **log, size_t size, const char *name);
 
-cpu_status lock();
+cpu_status lock(void);
 void unlock(cpu_status status);
 
 extern spinlock	slock;

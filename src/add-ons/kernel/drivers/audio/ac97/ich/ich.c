@@ -49,12 +49,15 @@ ich_chan *		chan_pi = 0;
 ich_chan *		chan_po = 0;
 ich_chan *		chan_mc = 0;
 
-int32 		ihc_int(void *data);
-int32 		ihc_test_int(void *check);
-bool 		interrupt_test();
+int32 		ich_int(void *data);
+int32 		ich_test_int(void *check);
+bool 		interrupt_test(void);
 void 		init_chan(ich_chan *chan);
-void 		start_chan(ich_chan *chan);
 void 		reset_chan(ich_chan *chan);
+void 		chan_free_resources(void);
+status_t 	map_io_memory(void);
+status_t 	unmap_io_memory(void);
+int32 		int_thread(void *data);
 
 #if DEBUG > 2
 void dump_chan(ich_chan *chan)
@@ -155,7 +158,7 @@ void reset_chan(ich_chan *chan)
 	TRACE(("channel reset failed after 10ms\n"));
 }
 
-bool interrupt_test()
+bool interrupt_test(void)
 {
 	bool *testresult;
 	bool result;
@@ -169,7 +172,7 @@ bool interrupt_test()
 	testresult = malloc(sizeof(bool)); 
 	*testresult = false; // assume it's not working
 	
-	install_io_interrupt_handler(config->irq, ihc_test_int, testresult, 0);
+	install_io_interrupt_handler(config->irq, ich_test_int, testresult, 0);
 
 	// clear status bits
 	ich_reg_write_16(chan_po->regbase + ICH_REG_X_SR, SR_FIFOE | SR_BCIS | SR_LVBCI); 
@@ -193,7 +196,7 @@ bool interrupt_test()
 
 	snooze(25000);
 
-	remove_io_interrupt_handler(config->irq, ihc_test_int, testresult);
+	remove_io_interrupt_handler(config->irq, ich_test_int, testresult);
 	result = *testresult;
 	free(testresult);
 
@@ -207,7 +210,7 @@ bool interrupt_test()
 	return result;
 }
 
-void chan_free_resources()
+void chan_free_resources(void)
 {
 	if (chan_po) {
 		if (chan_po->buffer_ready_sem > B_OK)
@@ -244,7 +247,7 @@ void chan_free_resources()
 	}
 }
 
-status_t map_io_memory()
+status_t map_io_memory(void)
 {
 	if ((config->type & TYPE_ICH4) == 0)
 		return B_OK;
@@ -268,7 +271,7 @@ status_t map_io_memory()
 	}
 }
 
-status_t unmap_io_memory()
+status_t unmap_io_memory(void)
 {
 	status_t rv;
 	if ((config->type & TYPE_ICH4) == 0)
@@ -283,7 +286,7 @@ int32 int_thread(void *data)
 	cpu_status status;
 	while (!int_thread_exit) {
 		status = disable_interrupts();
-		ihc_int(data);
+		ich_int(data);
 		restore_interrupts(status);
 		snooze(1500);
 	}
@@ -319,7 +322,7 @@ init_driver(void)
 	}
 
 	dprintf("ich-ac97: " VERSION "\n");
-	dprintf("ich-ac97: found %s, IRQ = %d, NAMBAR = %#X, NABMBAR = %#X, MMBAR = %#X, MBBAR = %#X\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar);
+	dprintf("ich-ac97: found %s, IRQ = %ld, NAMBAR = %#lX, NABMBAR = %#lX, MMBAR = %#lX, MBBAR = %#lX\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar);
 
 	/* before doing anything else, map the IO memory */
 	rv = map_io_memory();
@@ -367,7 +370,7 @@ init_driver(void)
 	} else {
 		TRACE(("secondary codec not ready after %Ld us\n",(system_time() - start)));
 	}
-	if ((rv & STA_PCR | STA_SCR) == 0) {
+	if ((rv & (STA_PCR | STA_SCR)) == 0) {
 		dprintf("ich-ac97: compatible chipset found, but no codec ready!\n");
 		unmap_io_memory();
 		return B_ERROR;
@@ -454,7 +457,7 @@ init_driver(void)
 
 	/* install interrupt or polling thread */
 	if (config->irq != 0) {
-		install_io_interrupt_handler(config->irq,ihc_int,0,0);
+		install_io_interrupt_handler(config->irq,ich_int,0,0);
 	} else {
 		int_thread_id = spawn_kernel_thread(int_thread, "ich_ac97 interrupt poller", B_REAL_TIME_PRIORITY, 0);
 		resume_thread(int_thread_id);
@@ -508,7 +511,7 @@ uninit_driver(void)
 	
 	/* remove the interrupt handler or thread */
 	if (config->irq != 0) {
-		remove_io_interrupt_handler(config->irq,ihc_int,0);
+		remove_io_interrupt_handler(config->irq,ich_int,0);
 	} else if (int_thread_id != -1) {
 		status_t exit_value;
 		int_thread_exit = true;
@@ -529,7 +532,7 @@ uninit_driver(void)
 	TRACE(("uninit_driver() finished\n"));
 }
 
-int32 ihc_test_int(void *check)
+int32 ich_test_int(void *check)
 {
 	/*
 	 * This interrupt handler is used once to test if interrupt handling is working.
@@ -551,7 +554,7 @@ int32 ihc_test_int(void *check)
 	return B_HANDLED_INTERRUPT;
 }
 
-int32 ihc_int(void *unused)
+int32 ich_int(void *unused)
 {
 	uint32 sta;
 	sta = ich_reg_read_32(ICH_REG_GLOB_STA);
@@ -583,7 +586,7 @@ int32 ihc_int(void *unused)
 				count = civ - chan_po->lastindex;
 			
 			if (count != 1)
-				dprintf(DRIVER_NAME ": lost %d po interrupts\n",count - 1);
+				dprintf(DRIVER_NAME ": lost %ld po interrupts\n",count - 1);
 			
 			acquire_spinlock(&slock);
 			chan_po->played_real_time = system_time();
@@ -619,7 +622,7 @@ int32 ihc_int(void *unused)
 				count = civ - chan_pi->lastindex;
 			
 			if (count != 1)
-				dprintf(DRIVER_NAME ": lost %d pi interrupts\n",count - 1);
+				dprintf(DRIVER_NAME ": lost %ld pi interrupts\n",count - 1);
 			
 			acquire_spinlock(&slock);
 			chan_pi->played_real_time = system_time();
@@ -648,40 +651,40 @@ int32 ihc_int(void *unused)
 }
 
 static status_t
-ihc_open(const char *name, uint32 flags, void** cookie)
+ich_open(const char *name, uint32 flags, void** cookie)
 {
 	TRACE(("open()\n"));
 	return B_OK;
 }
 
 static status_t
-ihc_close(void* cookie)
+ich_close(void* cookie)
 {
 	TRACE(("close()\n"));
 	return B_OK;
 }
 
 static status_t
-ihc_free(void* cookie)
+ich_free(void* cookie)
 {
 	return B_OK;
 }
 
 static status_t
-ihc_control(void* cookie, uint32 op, void* arg, size_t len)
+ich_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	return multi_control(cookie,op,arg,len);
 }
 
 static status_t
-ihc_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
+ich_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	*num_bytes = 0;				/* tell caller nothing was read */
 	return B_IO_ERROR;
 }
 
 static status_t
-ihc_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+ich_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	*num_bytes = 0;				/* tell caller nothing was written */
 	return B_IO_ERROR;
@@ -692,7 +695,7 @@ ihc_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	null-terminated array of device names supported by this driver
 ----- */
 
-static const char *ihc_name[] = {
+static const char *ich_name[] = {
 	"audio/multi/ich_ac97/1",
 	NULL
 };
@@ -701,13 +704,13 @@ static const char *ihc_name[] = {
 	function pointers for the device hooks entry points
 ----- */
 
-device_hooks ihc_hooks = {
-	ihc_open, 			/* -> open entry point */
-	ihc_close, 			/* -> close entry point */
-	ihc_free,			/* -> free cookie */
-	ihc_control, 		/* -> control entry point */
-	ihc_read,			/* -> read entry point */
-	ihc_write,			/* -> write entry point */
+device_hooks ich_hooks = {
+	ich_open, 			/* -> open entry point */
+	ich_close, 			/* -> close entry point */
+	ich_free,			/* -> free cookie */
+	ich_control, 		/* -> control entry point */
+	ich_read,			/* -> read entry point */
+	ich_write,			/* -> write entry point */
 	NULL,				/* start select */
 	NULL,				/* stop select */
 	NULL,				/* scatter-gather read from the device */
@@ -722,7 +725,7 @@ device_hooks ihc_hooks = {
 const char**
 publish_devices()
 {
-	return ihc_name;
+	return ich_name;
 }
 
 /* ----------
@@ -733,5 +736,5 @@ publish_devices()
 device_hooks*
 find_device(const char* name)
 {
-	return &ihc_hooks;
+	return &ich_hooks;
 }

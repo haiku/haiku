@@ -29,6 +29,7 @@
 #include <config_manager.h>
 #include <PCI.h>
 #include <OS.h>
+#include <malloc.h>
 
 //#define DEBUG 2
 
@@ -46,7 +47,7 @@ status_t find_pci_pin_irq(uint8 pin, uint8 *irq);
  * XXX multiple controllers not supported
  */
 
-status_t probe_device()
+status_t probe_device(void)
 {
 	pci_module_info *pcimodule;
 	config_manager_for_driver_module_info *configmodule;

@@ -69,4 +69,6 @@ extern ich_chan * chan_pi;
 extern ich_chan * chan_po;
 extern ich_chan * chan_mc;
 
+void start_chan(ich_chan *chan);
+
 #endif

@@ -47,7 +47,7 @@ typedef struct
 
 extern device_config *config;
 
-status_t probe_device();
+status_t probe_device(void);
 
 #define TYPE_ICH4			0x01
 

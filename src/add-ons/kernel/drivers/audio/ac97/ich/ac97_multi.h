@@ -29,5 +29,5 @@
 #define _AC97_MULTI_H_
 
 status_t multi_control(void *cookie, uint32 op, void *data, size_t length);
-
+	
 #endif

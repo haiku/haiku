@@ -25,10 +25,13 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include <KernelExport.h>
 #include <stdio.h>
 #include <OS.h>
 #include "debug.h"
 #include "ich.h"
+
+void debug_printf(const char *text,...);
 
 void debug_printf(const char *text,...)
 {

@@ -36,7 +36,9 @@
 
 spinlock slock = 0;
 
-cpu_status lock()
+uint32 round_to_pagesize(uint32 size);
+
+cpu_status lock(void)
 {
 	cpu_status status = disable_interrupts();
 	acquire_spinlock(&slock);

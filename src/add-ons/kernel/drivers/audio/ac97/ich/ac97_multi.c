@@ -28,6 +28,7 @@
 #include <OS.h>
 #include <MediaDefs.h>
 #include "multi_audio.h"
+#include "ac97_multi.h"
 
 //#define DEBUG 1
 
@@ -43,10 +44,15 @@
  *
  */
 
-static status_t get_control(multi_mix_control * control)
-{
-	return B_ERROR;
-}
+static status_t list_mix_controls(multi_mix_control_info *data);
+static status_t list_mix_connections(multi_mix_connection_info *data);
+static status_t list_mix_channels(multi_mix_channel_info *data);
+static status_t get_description(multi_description *data);
+static status_t get_enabled_channels(multi_channel_enable *data);
+static status_t get_global_format(multi_format_info *data);
+static status_t get_buffers(multi_buffer_list *data);
+static status_t buffer_exchange(multi_buffer_info *data);
+static status_t buffer_force_stop();
 
 static status_t list_mix_controls(multi_mix_control_info * data)
 {
@@ -74,7 +80,7 @@ multi_channel_info chans[] = {
 {  7, B_MULTI_INPUT_BUS, 		B_CHANNEL_RIGHT | B_CHANNEL_STEREO_BUS, B_CHANNEL_MINI_JACK_STEREO },
 };
 
-status_t get_description(multi_description *data)
+static status_t get_description(multi_description *data)
 {
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
@@ -116,7 +122,7 @@ status_t get_description(multi_description *data)
 	return B_OK;
 }
 
-status_t get_enabled_channels(multi_channel_enable *data)
+static status_t get_enabled_channels(multi_channel_enable *data)
 {
 	B_SET_CHANNEL(data->enable_bits, 0, true);
 	B_SET_CHANNEL(data->enable_bits, 1, true);
@@ -132,7 +138,7 @@ status_t get_enabled_channels(multi_channel_enable *data)
 	return B_OK;
 }
 
-status_t get_global_format(multi_format_info *data)
+static status_t get_global_format(multi_format_info *data)
 {
 	data->output_latency = 0;
 	data->input_latency = 0;
@@ -146,7 +152,7 @@ status_t get_global_format(multi_format_info *data)
 	return B_OK;
 }
 
-status_t get_buffers(multi_buffer_list *data)
+static status_t get_buffers(multi_buffer_list *data)
 {
 	TRACE(("flags = %#x\n",data->flags));
 	TRACE(("request_playback_buffers = %#x\n",data->request_playback_buffers));
@@ -193,19 +199,19 @@ status_t get_buffers(multi_buffer_list *data)
 	data->record_buffers[0][0].base = chan_pi->userbuffer[0]; /* pointer to first sample for channel for buffer */
 	data->record_buffers[0][0].stride = 4; /* offset to next sample */
 	/* buffer 0, right channel */
-	data->record_buffers[0][1].base = chan_pi->userbuffer[0] + 2; /* pointer to first sample for channel for buffer */
+	data->record_buffers[0][1].base = ((char*)chan_pi->userbuffer[0]) + 2; /* pointer to first sample for channel for buffer */
 	data->record_buffers[0][1].stride = 4; /* offset to next sample */
 	/* buffer 1, left channel */
 	data->record_buffers[1][0].base = chan_pi->userbuffer[1]; /* pointer to first sample for channel for buffer */
 	data->record_buffers[1][0].stride = 4; /* offset to next sample */
 	/* buffer 1, right channel */
-	data->record_buffers[1][1].base = chan_pi->userbuffer[1] + 2; /* pointer to first sample for channel for buffer */
+	data->record_buffers[1][1].base = ((char*)chan_pi->userbuffer[1]) + 2; /* pointer to first sample for channel for buffer */
 	data->record_buffers[1][1].stride = 4; /* offset to next sample */
 
 	return B_OK;
 }
 
-status_t buffer_exchange(multi_buffer_info *data)
+static status_t buffer_exchange(multi_buffer_info *data)
 {
 	cpu_status status;
 	void *backbuffer;
@@ -283,7 +289,7 @@ status_t buffer_exchange(multi_buffer_info *data)
 */
 }
 
-status_t buffer_force_stop()
+static status_t buffer_force_stop()
 {
 	return B_OK;
 }

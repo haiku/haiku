@@ -32,7 +32,19 @@
 #include "ich.h"
 #include "config.h"
 
-status_t ich_codec_wait();
+/* 
+ * from BeOS R3 KernelExport.h 
+ * should be replaced by PCI bus manager functions
+ */
+uint8         read_io_8(int mapped_io_addr); 
+void          write_io_8(int mapped_io_addr, uint8 value); 
+uint16        read_io_16(int mapped_io_addr); 
+void          write_io_16(int mapped_io_addr, uint16 value); 
+uint32        read_io_32(int mapped_io_addr); 
+void          write_io_32(int mapped_io_addr, uint32 value);
+
+
+status_t ich_codec_wait(void);
 
 uint8
 ich_reg_read_8(int regno)
@@ -101,7 +113,7 @@ ich_reg_write_32(int regno, uint32 value)
 }
 
 status_t
-ich_codec_wait()
+ich_codec_wait(void)
 {
 	int i;
 	for (i = 0; i < 1100; i++) {
