@@ -26,6 +26,8 @@ public:
 	RGBColor MakeBlendColor(RGBColor color, float position);
 	RGBColor & operator=(const RGBColor &col);
 	RGBColor & operator=(rgb_color col);
+	bool operator==(const rgb_color &col);
+	bool operator==(const RGBColor &col);
 protected:
 	rgb_color color32;
 	uint16 color16;

@@ -66,7 +66,7 @@ public:
 	virtual void Shutdown(void);
 	virtual void CopyBits(BRect src, BRect dest);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
-	virtual void DrawChar(char c, BPoint pt);
+	virtual void DrawChar(char c, BPoint pt, LayerData *d);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
@@ -85,7 +85,7 @@ public:
 	virtual void InvertRect(BRect r);
 	virtual void ShowCursor(void);
 	virtual void ObscureCursor(void);
-	virtual void SetCursor(ServerCursor *cursor);
+	virtual void SetCursor(ServerBitmap *cursor, const BPoint &hotspot);
 
 	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
 	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
@@ -104,6 +104,8 @@ public:
 	uint16 GetHeight(void);
 	uint16 GetWidth(void);
 	int32 GetMode(void);
+	void SetHotSpot(const BPoint &pt);
+	BPoint GetHotSpot(void);
 
 protected:
 	void Lock(void);
@@ -126,6 +128,7 @@ private:
 	drawing_mode drawmode;
 	int32 is_cursor_hidden;
 	bool is_cursor_obscured, cursor_state_changed;
+	BPoint cursor_hotspot;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include <View.h>
 #include "LayerData.h"
 #include "ColorUtils.h"
+#include "ColorSet.h"
 #include "BeDecorator.h"
 #include "RGBColor.h"
 #include "Desktop.h"

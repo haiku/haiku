@@ -5,8 +5,9 @@
 #include <List.h>
 #include <SupportDefs.h>
 #include <Font.h>
-#include <freetype.h>
-#include <ftcache.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_CACHE_H
 
 class FontFamily;
 class FontStyle;

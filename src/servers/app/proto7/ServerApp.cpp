@@ -411,8 +411,8 @@ printf("ServerApp: ActivateWorkspace(%ld)\n",*((int32*)index));
 			memcpy(cdata, buffer, 68);
 			if(cursor)
 				delete cursor;
-			cursor=new ServerCursor(cdata);
-			driver->SetCursor(cursor);
+			cursor=new ServerBitmap(cdata);
+			driver->SetCursor(cursor,BPoint(cdata[2],cdata[3]));
 #ifdef DEBUG_SERVERAPP_CURSOR
 printf("ServerApp: SetCursor(%d,%d,%d,%d)\n",r,g,b,a);
 #endif

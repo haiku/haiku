@@ -732,7 +732,7 @@ void ViewDriver::MoveCursorTo(float x, float y)
 	screenwin->Unlock();
 }
 
-void ViewDriver::SetCursor(ServerCursor *cursor)
+void ViewDriver::SetCursor(ServerBitmap *cursor, const BPoint &spot)
 {
 #ifdef DEBUG_DRIVER_MODULE
 printf("ViewDriver:: SetCursor(%p)\n",cursor);
@@ -743,14 +743,19 @@ printf("ViewDriver:: SetCursor(%p)\n",cursor);
 		BBitmap *bmp=new BBitmap(cursor->Bounds(),B_RGBA32);
 	
 		// Copy the server bitmap in the cursor to a BBitmap
-		uint8	*sbmppos=(uint8*)cursor->Buffer(),
+		uint8	*sbmppos=(uint8*)cursor->Bits(),
 				*bbmppos=(uint8*)bmp->Bits();
 	
-		int32 bytes=cursor->BytesPerLine(),
+		int32 bytes=cursor->BytesPerRow(),
 			bbytes=bmp->BytesPerRow();
 	
-		for(int i=0;i<cursor->Height();i++)
+		for(int i=0;i<=cursor->Bounds().IntegerHeight();i++)
 			memcpy(bbmppos+(i*bbytes), sbmppos+(i*bytes), bytes);
+
+		if(cursor->Bounds().Contains(spot))
+			SetHotSpot(spot);
+		else
+			SetHotSpot(BPoint(0,0));
 	
 		// Replace the bitmap
 		delete screenwin->view->cursor;

@@ -4,14 +4,15 @@
 		kept on the client side.
 */
 
+#include "ClientFontList.h"
 #include <File.h>
 #include <Message.h>
 #include <String.h>
 #include <stdio.h>
 #include <string.h>
+#include <String.h>
 #include "PortLink.h"
 #include "ServerProtocol.h"
-#include "ClientFontList.h"
 
 #define DEBUG_CLIENT_FONT_LIST
 

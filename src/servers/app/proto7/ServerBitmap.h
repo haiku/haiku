@@ -14,6 +14,9 @@ public:
 	ServerBitmap(int32 w,int32 h,color_space space,int32 BytesPerLine=0);
 	ServerBitmap(const char *path);
 	ServerBitmap(ServerBitmap *bitmap);
+	ServerBitmap(uint32 type, int32 id);
+	ServerBitmap(int8 *data);
+	ServerBitmap(uint32 type, const char *name);
 	~ServerBitmap(void);
 	void UpdateSettings(void);
 	void SetBuffer(void *ptr) { buffer=(uint8*)ptr; }
@@ -26,6 +29,7 @@ public:
 	int32 BytesPerRow(void) { return bytesperline; };
 	uint8 BitsPerPixel(void) { return bpp; } 
 	color_space ColorSpace(void) { return cspace; }
+	const bool &InitCheck(void) { return is_initialized; }
 	
 	int32 width,height;
 	int32 bytesperline;
@@ -33,6 +37,7 @@ public:
 	int bpp;
 
 protected:
+	bool is_initialized;
 	void HandleSpace(color_space space, int32 BytesPerLine);
 	DisplayDriver *driver;
 	area_id areaid;

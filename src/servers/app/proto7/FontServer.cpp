@@ -366,6 +366,9 @@ void FontServer::SaveList(void)
 				
 				// Check to see if it has prerendered strikes (has "tuned" fonts)
 				sty=fam->GetStyle(styname.String());
+				if(!sty)
+					continue;
+				
 				if(sty->HasTuned() && sty->IsScalable())
 					tuned=true;
 

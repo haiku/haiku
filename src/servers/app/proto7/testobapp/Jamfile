@@ -10,4 +10,4 @@ App proto7_test_app :
 	<$(SOURCE_GRIST)>OBWindow.cpp
 	<$(SOURCE_GRIST)>PortLink.cpp
 ;
-LinkSharedOSLibs OBApplication : be stdc++.r4 ;
+LinkSharedOSLibs proto7_test_app : be stdc++.r4 ;

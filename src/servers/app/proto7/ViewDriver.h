@@ -84,7 +84,7 @@ public:
 	void ObscureCursor(void);
 //	BPoint PenPosition(void);
 //	float PenSize(void);
-	void SetCursor(ServerCursor *cursor);
+	void SetCursor(ServerBitmap *cursor, const BPoint &spot);
 //	drawing_mode GetDrawingMode(void);
 //	void SetDrawingMode(drawing_mode mode);
 	void ShowCursor(void);

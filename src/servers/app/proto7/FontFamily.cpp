@@ -17,11 +17,14 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	has_kerning=(face->face_flags & FT_FACE_FLAG_KERNING)?true:false;
 	glyphcount=face->num_glyphs;
 	charmapcount=face->num_charmaps;
+	path=new BString(filepath);
+	fbounds.Set(0,0,0,0);
 }
 
 FontStyle::~FontStyle(void)
 {
 	delete name;
+	delete path;
 	delete cachedface;
 	
 	// Mark all instances as Free here
@@ -42,13 +45,18 @@ FontStyle::~FontStyle(void)
 
 const char *FontStyle::Style(void)
 {
-	return name->String();
+	return path->String();
 }
 
 FT_Face FontStyle::GetFace(void)
 {
 	FT_Face f;
 	return (FTC_Manager_Lookup_Face(ftmanager,cachedface,&f)!=0)?f:NULL;
+}
+
+const char *FontStyle::GetPath(void)
+{
+	return path->String();
 }
 
 int16 FontStyle::ConvertToUnicode(uint16 c)

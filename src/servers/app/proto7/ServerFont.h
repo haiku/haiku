@@ -35,16 +35,17 @@ public:
 	void SetRotation(const float &value) { frotation=value; }
 	void SetFace(const uint16 &value) { fface=value; }
 	
-//	BRect BoundingBox(void);
+	const BRect &BoundingBox(void);
+	BRect StringBounds(const char *string);
 //	escapement_delta Escapements(char c);
 	void Height(font_height *fh);
 protected:
 	friend FontStyle;
 	FontStyle *fstyle;
 	font_height fheight;
-	escapement_delta fescapements;
 	edge_info fedges;
 	float fsize, frotation, fshear;
+	BRect fbounds;
 	uint32 fflags;
 	uint8 fspacing;
 	uint16 fface;

@@ -4,8 +4,10 @@ UseFreeTypeHeaders ;
 
 Server OBAppServer :
 	# Misc. Sources
+	Angle.cpp
 	BeDecorator.cpp
 	ColorUtils.cc
+	ColorSet.cpp
 	DebugTools.cpp
 	Decorator.cpp
 	PortLink.cpp
@@ -18,7 +20,6 @@ Server OBAppServer :
 	Layer.cpp
 	ServerApp.cpp
 	ServerBitmap.cpp
-	ServerCursor.cpp
 	ServerWindow.cpp
 	WindowBorder.cpp
 

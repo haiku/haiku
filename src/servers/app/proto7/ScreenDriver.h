@@ -11,6 +11,9 @@
 #include <Region.h>	// for clipping_rect definition
 #include <Bitmap.h>
 #include "DisplayDriver.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 class VDWindow;
 class ServerCursor;
@@ -49,9 +52,9 @@ public:
 	// Settings functions
 //	virtual void CopyBits(BRect src, BRect dest);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
-//	virtual void DrawChar(char c, BPoint pt);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
-//	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
+	virtual void DrawChar(char c, BPoint pt, LayerData *d);
+	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
 //	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
 //	virtual void FillBezier(BPoint *pts, LayerData *d, int8 *pat);
@@ -67,7 +70,7 @@ public:
 	virtual void InvertRect(BRect r);
 	virtual void ShowCursor(void);
 	virtual void ObscureCursor(void);
-//	virtual void SetCursor(ServerBitmap *cursor);
+	virtual void SetCursor(ServerBitmap *cursor, const BPoint &spot);
 
 //	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
 //	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
@@ -82,10 +85,13 @@ public:
 	virtual void SetMode(int32 mode);
 //	virtual bool DumpToFile(const char *path);
 protected:
+	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
+	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	void HLine(int32 x1, int32 x2, int32 y, RGBColor color);
+	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	void SetPixel(int x, int y, RGBColor col);
 	void SetPixel32(int x, int y, rgb_color col);
 	void SetPixel16(int x, int y, uint16 col);

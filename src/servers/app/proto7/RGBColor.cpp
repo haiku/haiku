@@ -174,3 +174,15 @@ void RGBColor::PrintToStream(void)
 {
 	printf("RGBColor (%u,%u,%u,%u)\n", color32.red,color32.green,color32.blue,color32.alpha);
 }
+
+bool RGBColor::operator==(const rgb_color &col)
+{
+	return (color32.red==col.red && color32.green==col.green
+		&& color32.blue==col.blue)?true:false;
+}
+
+bool RGBColor::operator==(const RGBColor &col)
+{
+	return (color32.red==col.color32.red && color32.green==col.color32.green
+		&& color32.blue==col.color32.blue)?true:false;
+}

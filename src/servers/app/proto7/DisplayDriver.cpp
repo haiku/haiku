@@ -5,7 +5,6 @@
 */
 #include "DisplayDriver.h"
 #include "LayerData.h"
-#include "ServerCursor.h"
 
 DisplayDriver::DisplayDriver(void)
 {
@@ -71,8 +70,19 @@ void DisplayDriver::ObscureCursor(void)
 	SetCursorObscured(true);
 }
 
-void DisplayDriver::SetCursor(ServerCursor *cursor)
+void DisplayDriver::SetCursor(ServerBitmap *cursor, const BPoint &hotspot)
 {
+	SetHotSpot(hotspot);
+}
+
+void DisplayDriver::SetHotSpot(const BPoint &pt)
+{
+	cursor_hotspot=pt;
+}
+
+BPoint DisplayDriver::GetHotSpot(void)
+{
+	return cursor_hotspot;
 }
 
 //---------------------------------------------------------
@@ -147,7 +157,7 @@ void DisplayDriver::SetCursorObscured(bool state)
 void DisplayDriver::Shutdown(void) {}
 void DisplayDriver::CopyBits(BRect src, BRect dest) {}
 void DisplayDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest) {}
-void DisplayDriver::DrawChar(char c, BPoint pt) {}
+void DisplayDriver::DrawChar(char c, BPoint pt, LayerData *d) {}
 //void DisplayDriver::DrawPicture(SPicture *pic, BPoint pt) {}
 void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL) {}
 

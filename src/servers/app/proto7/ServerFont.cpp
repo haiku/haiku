@@ -21,6 +21,7 @@ ServerFont::ServerFont(FontStyle *style, float size=12.0, float rotation=0.0, fl
 	fface=B_REGULAR_FACE;
 	ftruncate=B_TRUNCATE_END;
 	fencoding=B_UNICODE_UTF8;
+	fbounds.Set(0,0,0,0);
 	if(fstyle)
 		fstyle->AddDependent();
 }
@@ -37,6 +38,7 @@ ServerFont::ServerFont(const ServerFont &font)
 	fface=font.fface;
 	ftruncate=font.ftruncate;
 	fencoding=font.fencoding;
+	fbounds.Set(0,0,0,0);
 	if(fstyle)
 		fstyle->AddDependent();
 }
@@ -56,6 +58,17 @@ escapement_delta Escapements(char c)
 {
 }
 */
+
+const BRect &ServerFont::BoundingBox(void)
+{
+	return fbounds;
+}
+
+BRect ServerFont::StringBounds(const char *string)
+{
+	return BRect(0,0,0,0);
+}
+
 void ServerFont::Height(font_height *fh)
 {
 	fh->ascent=fheight.ascent;

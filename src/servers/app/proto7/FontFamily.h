@@ -2,6 +2,7 @@
 #define FONT_FAMILY_H_
 
 #include <String.h>
+#include <Rect.h>
 #include <Font.h>
 #include <List.h>
 #include <ft2build.h>
@@ -49,6 +50,7 @@ public:
 	const char *Style(void);
 	FontFamily *Family(void) { return family; }
 	FT_Face GetFace(void);
+	const char *GetPath(void);
 	int16 ConvertToUnicode(uint16 c);
 protected:
 	friend FontFamily;
@@ -59,6 +61,7 @@ protected:
 	bool is_fixedwidth, is_scalable, has_kerning, has_bitmaps;
 	CachedFace cachedface;
 	uint8 format;
+	BRect fbounds;
 };
 
 class FontFamily : public SharedObject

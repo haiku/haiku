@@ -28,7 +28,7 @@ public:
 	thread_id monitor_thread;
 	PortLink *applink;
 	BList *winlist, *bmplist;
-	ServerCursor *cursor;
+	ServerBitmap *cursor;
 	DisplayDriver *driver;
 	rgb_color high, low;	// just for testing until layers are implemented
 

@@ -48,7 +48,7 @@ int8 default_cursor[]={
 //--------------------GLOBALS-------------------------
 uint32 workspace_count, active_workspace;
 BList *desktop;
-ServerCursor *startup_cursor;
+ServerBitmap *startup_cursor;
 Workspace *pactive_workspace;
 DisplayDriver *gfxdriver;
 int32 token_count=-1;
@@ -145,9 +145,9 @@ printf("init_desktop(%d)\n",workspaces);
 		workspace_count++;
 
 	// Instantiate and initialize display driver
-//	gfxdriver=new ViewDriver();
+	gfxdriver=new ViewDriver();
 //	gfxdriver=new SecondDriver();
-	gfxdriver=new ScreenDriver();
+//	gfxdriver=new ScreenDriver();
 	gfxdriver->Initialize();
 
 	workspacelock=new BLocker();
@@ -194,8 +194,17 @@ printf("Driver %s\n", (gfxdriver->IsInitialized()==true)?"initialized":"NOT init
 	// Clear the screen
 	pactive_workspace->toplayer->SetColor(RGBColor(80,85,152));
 //	gfxdriver->Clear(pactive_workspace->toplayer->GetColor());
-	startup_cursor=new ServerCursor(default_cursor);
-	gfxdriver->SetCursor(startup_cursor);
+
+	// CURSOR_ARROW
+	startup_cursor=new ServerBitmap('CURS',"CURSOR_DEFAULT");
+	if(!startup_cursor->InitCheck())
+	{
+		// Apparently, something is screwed up beyond recognition in loading the cursor,
+		// so we'll put in one just so we have something usable.
+		delete startup_cursor;
+		startup_cursor=new ServerBitmap(default_cursor);
+	}
+	gfxdriver->SetCursor(startup_cursor, BPoint(0,0));
 	gfxdriver->ShowCursor();
 
 	pactive_workspace->toplayer->SetVisible(true);
