@@ -86,6 +86,7 @@ static bigtime_t sLastClickTime;
 static bigtime_t sClickSpeed;
 static int32 sClickCount;
 static int sButtonsState;
+static int32 sOpenMask;
 
 /////////////////////////////////////////////////////////////////////////
 // ps2 protocol stuff
@@ -360,6 +361,9 @@ mouse_open(const char *name, uint32 flags, void **cookie)
 	status_t status;	
 	TRACE(("mouse_open()\n"));	
 	
+	if (atomic_or(&sOpenMask, 1) != 0)
+		return B_BUSY;
+		
 	*cookie = NULL;
 		
 	write_command_byte(PS2_CMD_DEV_INIT);	
@@ -385,6 +389,8 @@ mouse_close(void * cookie)
 	ps2_enable_mouse(false);
 	
 	remove_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL);
+	
+	atomic_and(&sOpenMask, 0);
 	
 	return B_OK;
 }
@@ -525,6 +531,8 @@ init_driver()
 	}
 	
 	set_sem_owner(sMouseSem, B_SYSTEM_TEAM);
+	
+	sOpenMask = 0;
 	
 	return B_OK;
 }
