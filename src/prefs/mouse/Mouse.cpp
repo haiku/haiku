@@ -20,23 +20,16 @@
 #include "Mouse.h"
 #include "MouseWindow.h"
 
+
 const char kMouseApplicationSig[] = "application/x-vnd.OpenBeOS-MOUS";
 
-int main(int, char**)
-{
-	MouseApplication	myApplication;
-
-	myApplication.Run();
-
-	return(0);
-}
 
 MouseApplication::MouseApplication()
-					:BApplication(kMouseApplicationSig)					
+	: BApplication(kMouseApplicationSig)					
 {
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
-	window->MoveTo(window->fSettings.WindowCorner());
+	window->MoveTo(window->fSettings.WindowPosition());
 
 	window->Show();
 }
@@ -46,4 +39,17 @@ void
 MouseApplication::AboutRequested(void)
 {
 	(new BAlert("about", "...by Andrew Edward McCall", "Dig Deal"))->Go();
+}
+
+
+//	#pragma mark -
+
+
+int
+main(int /*argc*/, char **/*argv*/)
+{
+	MouseApplication app;
+	app.Run();
+
+	return 0;
 }

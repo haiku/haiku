@@ -13,19 +13,19 @@
 //	Modified : December 10, 2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
 #ifndef MOUSE_H
 #define MOUSE_H
 
+
 #include <Application.h>
-#include "MouseWindow.h"
+
 
 class MouseApplication : public BApplication 
 {
-public:
-	MouseApplication();
-	
-	void AboutRequested(void);
+	public:
+		MouseApplication();
+
+		virtual void AboutRequested(void);
 };
 
-#endif
+#endif	/* MOUSE_H */
