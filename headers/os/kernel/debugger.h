@@ -92,6 +92,9 @@ typedef enum {
 	B_FLOATING_POINT_EXCEPTION,
 } debug_why_stopped;
 
+extern void get_why_stopped_string(debug_why_stopped whyStopped, char *buffer,
+		int32 bufferSize);
+
 // Value indicating how a stopped thread shall continue.
 enum {
 	B_THREAD_DEBUG_HANDLE_EVENT = 0,	// handle the event normally
@@ -211,6 +214,8 @@ typedef enum {
 typedef struct {
 	thread_id	thread;			// the thread being the event origin
 	team_id		team;			// the thread's team
+	port_id		nub_port;		// port to debug nub for this team (only set
+								// for synchronous messages)
 } debug_origin;
 
 // B_DEBUGGER_MESSAGE_THREAD_STOPPED
@@ -218,7 +223,6 @@ typedef struct {
 typedef struct {
 	debug_origin		origin;
 	debug_why_stopped	why;		// reason for contacting debugger
-	port_id				nub_port;	// port to debug nub for this team
 	debug_cpu_state		cpu_state;	// cpu state
 	void				*data;		// additional data
 } debug_thread_stopped;
