@@ -2,7 +2,7 @@
 %define rel 1
 Summary: The GNU versions of grep pattern matching utilities.
 Name: grep
-Version: 2.5
+Version: 2.5.1
 %if "%{beta}" != ""
 Release: 0.%{beta}.%{rel}
 %else
@@ -70,6 +70,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Mar 26 2002 Bernhard Rosenkraenzer <bero@redhat.com> 2.5.1-1
+- 2.5.1
+
 * Wed Mar 13 2002 Bernhard Rosenkraenzer <bero@redhat.com> 2.5-1
 - 2.5 final
 

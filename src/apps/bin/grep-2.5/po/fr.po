@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GNU grep 2.5g\n"
 "POT-Creation-Date: 2002-01-22 14:39+0100\n"
-"PO-Revision-Date: 2002-03-10 08:00-0500\n"
+"PO-Revision-Date: 2002-03-17 20:00-0500\n"
 "Last-Translator: Michel Robitaille <robitail@IRO.UMontreal.CA>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -95,7 +95,7 @@ msgstr "Usage: %s [OPTION]... PATRON [FICHIER]...\n"
 #: src/grep.c:1040
 #, c-format
 msgid "Try `%s --help' for more information.\n"
-msgstr "Pour en savoir davantage, faites: «%s --help».\n"
+msgstr "Pour en savoir davantage, faites: « %s --help ».\n"
 
 #: src/grep.c:1045
 #, c-format
@@ -209,12 +209,12 @@ msgstr ""
 "  -o, --only-matching       afficher la partie d'une ligne concordant avec le PATRON\n"
 "  -q, --quiet, --silent     supprimer tout affichage en sortie\n"
 "      --binary-files=TYPE   assumer que les fichiers binaires sont de\n"
-"                            TYPE soit «binary», «text», ou «without-match»,\n"
+"                            TYPE soit « binary », « text », ou « without-match »,\n"
 "  -a, --text                ne pas supprimer la sortie binaire\n"
 "  -I                        équivalent à --binary-files=without-match\n"
 "  -d, --directories=ACTION  traiter les répertoires selon l'ACTION\n"
-"                            «read» (lecture), «recurse» (récursivité),\n"
-"                            ou «skip» (escamotage).\n"
+"                            « read » (lecture), « recurse » (récursivité),\n"
+"                            ou « skip » (escamotage).\n"
 "  -R, -r, --recursive       équivalent à --directories=recurse\n"
 "      --include=PATRON      fichiers concordant au PATRON seront examinés\n"
 "      --exclude=PATRON      fichiers concordant au PATRON ne seront pas examinés\n"
@@ -261,7 +261,7 @@ msgstr ""
 "  -u, --unix-byte-offsets   afficher les adresses relatives comme si\n"
 "                            aucun CR n'était présent (MS-DOS)\n"
 "\n"
-"«egrep» est équivalent à «grep -E». «fgrep» est équivalent à «grep -F».\n"
+"« egrep » est équivalent à « grep -E ». « fgrep » est équivalent à « grep -F ».\n"
 "Sans FICHIER, ou si - est utilisé comme nom de FICHIER, la lecture\n"
 "se fait de l'entrée standard. S'il y a moins de 2 FICHIERS, l'option -h\n"
 "est implicite. Termine avec 0 s'il y a concordance avec 1 si aucune.\n"
@@ -330,34 +330,34 @@ msgstr "Erreur système inconnue"
 #: lib/getopt.c:675
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: l'option «%s» est ambiguë.\n"
+msgstr "%s: l'option « %s » est ambiguë.\n"
 
 #: lib/getopt.c:700
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: l'option «--%s» ne permet pas de paramètre.\n"
+msgstr "%s: l'option « --%s » ne permet pas de paramètre.\n"
 
 #: lib/getopt.c:705
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: l'option «%c%s» ne permet pas de paramètre.\n"
+msgstr "%s: l'option « %c%s » ne permet pas de paramètre.\n"
 
 #: lib/getopt.c:723 lib/getopt.c:896
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: l'option «%s» requiert un paramètre.\n"
+msgstr "%s: l'option « %s » requiert un paramètre.\n"
 
 #. --option
 #: lib/getopt.c:752
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: l'option «--%s» n'est pas reconnue.\n"
+msgstr "%s: l'option « --%s » n'est pas reconnue.\n"
 
 #. +option or -option
 #: lib/getopt.c:756
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: l'option «%c%s» n'est pas reconnue.\n"
+msgstr "%s: l'option « %c%s » n'est pas reconnue.\n"
 
 #. 1003.2 specifies the format of this message.
 #: lib/getopt.c:782
@@ -379,12 +379,12 @@ msgstr "%s: l'option  -- %c requiert un paramètre.\n"
 #: lib/getopt.c:862
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: l'option «-W %s» est ambiguë.\n"
+msgstr "%s: l'option « -W %s » est ambiguë.\n"
 
 #: lib/getopt.c:880
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: l'option «-W %s» ne permet pas de paramètre.\n"
+msgstr "%s: l'option « -W %s » ne permet pas de paramètre.\n"
 
 #. Get translations for open and closing quotation marks.
 #.

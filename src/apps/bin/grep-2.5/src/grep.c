@@ -262,10 +262,10 @@ reset (int fd, char const *file, struct stats *stats)
     }
   if (directories == SKIP_DIRECTORIES && S_ISDIR (stats->stat.st_mode))
     return 0;
-#if defined (DJGPP) || defined (__BEOS__)
-  if (devices == SKIP_DEVICES && (S_ISCHR(stats->stat.st_mode) || S_ISBLK(stats->stat.st_mode)))
+#ifndef DJGPP
+  if (devices == SKIP_DEVICES && (S_ISCHR(stats->stat.st_mode) || S_ISBLK(stats->stat.st_mode) /*|| S_ISSOCK(stats->stat.st_mode)*/))
 #else
-  if (devices == SKIP_DEVICES && (S_ISCHR(stats->stat.st_mode) || S_ISBLK(stats->stat.st_mode) || S_ISSOCK(stats->stat.st_mode)))
+  if (devices == SKIP_DEVICES && (S_ISCHR(stats->stat.st_mode) || S_ISBLK(stats->stat.st_mode)))
 #endif
     return 0;
   if (S_ISREG (stats->stat.st_mode))
@@ -539,6 +539,8 @@ prline (char const *beg, char const *lim, int sep)
 	  char const *b = beg + match_offset;
 	  if (b == lim)
 	    break;
+	  if (match_size == 0)
+	    break;
 	  if(color_option)
 	    printf("\33[%sm", grep_color);
 	  fwrite(b, sizeof (char), match_size, stdout);
@@ -583,12 +585,15 @@ prline (char const *beg, char const *lim, int sep)
 	  lastout = lim;
 	  return;
 	}
-      while ((match_offset = (*execute) (beg, lim - beg, &match_size, 1))
+      while (lim-beg && (match_offset = (*execute) (beg, lim - beg, &match_size, 1))
 	     != (size_t) -1)
 	{
 	  char const *b = beg + match_offset;
 	  /* Avoid matching the empty line at the end of the buffer. */
 	  if (b == lim)
+	    break;
+	  /* Avoid hanging on grep --color "" foo */
+	  if (match_size == 0)
 	    break;
 	  fwrite (beg, sizeof (char), match_offset, stdout);
 	  printf ("\33[%sm", grep_color);
@@ -1519,6 +1524,7 @@ main (int argc, char **argv)
 
       case 'q':
 	exit_on_match = 1;
+	close_stdout_set_status(0);
 	break;
 
       case 'R':

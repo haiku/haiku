@@ -1,3 +1,22 @@
+2002-03-26  Bernhard Rosenkraenzer <bero@redhat.com>
+	* src/grep.c: Don't fail if we don't have an stdout fd and -q
+	  is used (happens e.g. on calls from hotplug scripts)
+	* src/grep.c: Don't hang forever if fed with an empty string to
+	  grep for and --color enabled
+	* src/grep.c: Fix infinite loop on
+	  echo "1 one" | grep -E "[0-9]*" -o
+	  echo "1 one" | grep -E "[0-9]*" --color
+	* po/*: Sync wiith translation project
+	* src/grep.c, src/Makefile.am, configure.in: Add patch from
+	  Paul Eggert <eggert@twinsun.com> to comply with ridiculous
+	  guidelines (don't act differently if invoked as egrep or fgrep)
+	* configure.in: Bump version number, require a recent autoconf
+
+2002-03-14  Bernhard Rosenkraenzer <bero@redhat.com>
+	* src/Makefile.am, po/Makefile.in.in: Support DESTDIR properly
+	* tests/bre.tests: Add fix from
+	  Peter Breitenlohner <peb@mppmu.mpg.de>
+
 2002-03-13  Bernhard Rosenkraenzer <bero@redhat.com>
 	* configure.in, m4/regex.m4, m4/malloc.m4, m4/realloc.m4:
 	  Don't set LIBOBJS directly, autoconf 2.53 doesn't like it

@@ -37,10 +37,10 @@ pkglibdir = $(libdir)/grep
 pkgincludedir = $(includedir)/grep
 top_builddir = ..
 
-ACLOCAL = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run aclocal
-AUTOCONF = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run autoconf
-AUTOMAKE = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run automake
-AUTOHEADER = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run autoheader
+ACLOCAL = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run aclocal
+AUTOCONF = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run autoconf
+AUTOMAKE = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run automake
+AUTOHEADER = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run autoheader
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -56,7 +56,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = 
 host_triplet = i586-pc-beos
-AMTAR = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run tar
+AMTAR = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run tar
 AWK = gawk
 BUILD_INCLUDED_LIBINTL = yes
 CATALOGS =  cs.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fr.gmo gl.gmo hr.gmo id.gmo it.gmo ja.gmo ko.gmo nl.gmo no.gmo pl.gmo pt_BR.gmo ru.gmo sl.gmo sv.gmo
@@ -86,15 +86,13 @@ POFILES =  cs.po de.po el.po eo.po es.po et.po fr.po gl.po hr.po id.po it.po ja.
 POSUB = po
 RANLIB = ranlib
 SEP = :
-SYMLINK = ln -s
-SYMLINKFROM = grep
 U = 
 USE_INCLUDED_LIBINTL = yes
 USE_NLS = yes
-VERSION = 2.5
+VERSION = 2.5.1
 am__include = include
 am__quote = 
-install_sh = /boot/home/Development/current/src/apps/bin/grep-2.5/install-sh
+install_sh = /boot/home/obosf/current/src/apps/bin/grep-2.5/install-sh
 datadir = $(prefix)/share
 
 AUTOMAKE_OPTIONS = ansi2knr no-dependencies
@@ -102,6 +100,7 @@ AUTOMAKE_OPTIONS = ansi2knr no-dependencies
 LN = ln
 
 bin_PROGRAMS = grep
+bin_SCRIPTS = egrep fgrep
 grep_SOURCES = grep.c dfa.c kwset.c search.c \
                grepmat.c
 
@@ -128,6 +127,8 @@ grep_OBJECTS = $(am_grep_OBJECTS)
 grep_LDADD = $(LDADD)
 grep_DEPENDENCIES = ../lib/libgreputils.a
 grep_LDFLAGS =
+SCRIPTS = $(bin_SCRIPTS)
+
 
 DEFS = -DHAVE_CONFIG_H
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -184,6 +185,27 @@ clean-binPROGRAMS:
 grep$(EXEEXT): $(grep_OBJECTS) $(grep_DEPENDENCIES) 
 	@rm -f grep$(EXEEXT)
 	$(LINK) $(grep_LDFLAGS) $(grep_OBJECTS) $(grep_LDADD) $(LIBS)
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  f="`echo $$p|sed '$(transform)'`"; \
+	  if test -f $$p; then \
+	    echo " $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/$$f"; \
+	    $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/$$f; \
+	  elif test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/$$f"; \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/$$f; \
+	  else :; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  f="`echo $$p|sed '$(transform)'`"; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -276,10 +298,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(ANSI2KNR) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(ANSI2KNR) $(PROGRAMS) $(SCRIPTS) $(HEADERS)
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	$(mkinstalldirs) $(DESTDIR)$(bindir) $(DESTDIR)$(bindir)
 
 install: install-am
 install-exec: install-exec-am
@@ -323,7 +345,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-binPROGRAMS install-exec-local
+install-exec-am: install-binPROGRAMS install-binSCRIPTS
 
 install-info: install-info-am
 
@@ -339,23 +361,31 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic mostlyclean-kr
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
+	uninstall-info-am
 
 .PHONY: GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-krextra distclean distclean-compile \
 	distclean-generic distclean-tags distdir dvi dvi-am info \
-	info-am install install-am install-binPROGRAMS install-data \
-	install-data-am install-exec install-exec-am install-exec-local \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-kr tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-info-am
+	info-am install install-am install-binPROGRAMS \
+	install-binSCRIPTS install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-kr tags \
+	uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-binSCRIPTS uninstall-info-am
 
 
-install-exec-local:
-	ln -s grep $(bindir)/egrep
-	ln -s grep $(bindir)/fgrep
+egrep:
+	echo '#!/bin/sh' >$@
+	echo 'exec grep -E $${1+"$$@"}' >>$@
+	chmod a+x $@
+
+fgrep:
+	echo '#!/bin/sh' >$@
+	echo 'exec grep -F $${1+"$$@"}' >>$@
+	chmod a+x $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

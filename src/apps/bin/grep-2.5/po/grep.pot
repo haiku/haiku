@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-13 15:14+0100\n"
+"POT-Creation-Date: 2002-03-26 16:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,44 +71,44 @@ msgstr ""
 msgid "input is too large to count"
 msgstr ""
 
-#: src/grep.c:601
+#: src/grep.c:605
 msgid "writing output"
 msgstr ""
 
-#: src/grep.c:874
+#: src/grep.c:878
 #, c-format
 msgid "Binary file %s matches\n"
 msgstr ""
 
-#: src/grep.c:888
+#: src/grep.c:892
 msgid "(standard input)"
 msgstr ""
 
-#: src/grep.c:993
+#: src/grep.c:997
 #, c-format
 msgid "warning: %s: %s\n"
 msgstr ""
 
-#: src/grep.c:994
+#: src/grep.c:998
 msgid "recursive directory loop"
 msgstr ""
 
-#: src/grep.c:1042
+#: src/grep.c:1046
 #, c-format
 msgid "Usage: %s [OPTION]... PATTERN [FILE]...\n"
 msgstr ""
 
-#: src/grep.c:1044
+#: src/grep.c:1048
 #, c-format
 msgid "Try `%s --help' for more information.\n"
 msgstr ""
 
-#: src/grep.c:1049
+#: src/grep.c:1053
 #, c-format
 msgid "Usage: %s [OPTION]... PATTERN [FILE] ...\n"
 msgstr ""
 
-#: src/grep.c:1050
+#: src/grep.c:1054
 #, c-format
 msgid ""
 "Search for PATTERN in each FILE or standard input.\n"
@@ -117,7 +117,7 @@ msgid ""
 "Regexp selection and interpretation:\n"
 msgstr ""
 
-#: src/grep.c:1055
+#: src/grep.c:1059
 msgid ""
 "  -E, --extended-regexp     PATTERN is an extended regular expression\n"
 "  -F, --fixed-strings       PATTERN is a set of newline-separated strings\n"
@@ -125,7 +125,7 @@ msgid ""
 "  -P, --perl-regexp         PATTERN is a Perl regular expression\n"
 msgstr ""
 
-#: src/grep.c:1060
+#: src/grep.c:1064
 msgid ""
 "  -e, --regexp=PATTERN      use PATTERN as a regular expression\n"
 "  -f, --file=FILE           obtain PATTERN from FILE\n"
@@ -135,7 +135,7 @@ msgid ""
 "  -z, --null-data           a data line ends in 0 byte, not newline\n"
 msgstr ""
 
-#: src/grep.c:1067
+#: src/grep.c:1071
 msgid ""
 "\n"
 "Miscellaneous:\n"
@@ -146,7 +146,7 @@ msgid ""
 "      --mmap                use memory-mapped input if possible\n"
 msgstr ""
 
-#: src/grep.c:1075
+#: src/grep.c:1079
 msgid ""
 "\n"
 "Output control:\n"
@@ -178,7 +178,7 @@ msgid ""
 "  -Z, --null                print 0 byte after FILE name\n"
 msgstr ""
 
-#: src/grep.c:1103
+#: src/grep.c:1107
 msgid ""
 "\n"
 "Context control:\n"
@@ -198,42 +198,42 @@ msgid ""
 "and 2 if trouble.\n"
 msgstr ""
 
-#: src/grep.c:1120
+#: src/grep.c:1124
 msgid ""
 "\n"
 "Report bugs to <bug-gnu-utils@gnu.org>.\n"
 msgstr ""
 
-#: src/grep.c:1130
+#: src/grep.c:1134
 msgid "conflicting matchers specified"
 msgstr ""
 
-#: src/grep.c:1367
+#: src/grep.c:1376
 msgid "unknown devices method"
 msgstr ""
 
-#: src/grep.c:1434
+#: src/grep.c:1443
 msgid "unknown directories method"
 msgstr ""
 
-#: src/grep.c:1501
+#: src/grep.c:1510
 msgid "invalid max count"
 msgstr ""
 
-#: src/grep.c:1555
+#: src/grep.c:1565
 msgid "unknown binary-files type"
 msgstr ""
 
-#: src/grep.c:1650
+#: src/grep.c:1660
 #, c-format
 msgid "%s (GNU grep) %s\n"
 msgstr ""
 
-#: src/grep.c:1652
+#: src/grep.c:1662
 msgid "Copyright 1988, 1992-1999, 2000, 2001 Free Software Foundation, Inc.\n"
 msgstr ""
 
-#: src/grep.c:1654
+#: src/grep.c:1664
 msgid ""
 "This is free software; see the source for copying conditions. There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"

@@ -1,13 +1,13 @@
 # German messages for GNU grep
 # Copyright (C) 1997-99, 2000, 2001, 2002 Free Software Foundation, Inc.
-# Martin von LÃ¶wis <martin@mira.isdn.cs.tu-berlin.de>, 1997-99, 2000, 2001, 2002
+# Martin von Löwis <martin@mira.isdn.cs.tu-berlin.de>, 1997-99, 2000, 2001, 2002
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: GNU grep 2.5g\n"
 "POT-Creation-Date: 2002-01-22 14:39+0100\n"
 "PO-Revision-Date: 2002-03-09 01:27+0100\n"
-"Last-Translator: Martin von LÃ¶wis <martin@v.loewis.de>\n"
+"Last-Translator: Martin von Löwis <martin@v.loewis.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -15,13 +15,13 @@ msgstr ""
 
 #: src/dfa.c:136 src/dfa.c:147 src/dfa.c:158 src/search.c:689
 msgid "Memory exhausted"
-msgstr "Virtueller Speicher erschÃ¶pft."
+msgstr "Virtueller Speicher erschöpft."
 
 # Is this message used only for [ without matching ],
 # or for ] without [ as well?
 #: src/dfa.c:489 src/dfa.c:492 src/dfa.c:510 src/dfa.c:521 src/dfa.c:545 src/dfa.c:604 src/dfa.c:609 src/dfa.c:622 src/dfa.c:623 src/dfa.c:1001 src/dfa.c:1004 src/dfa.c:1028 src/dfa.c:1032 src/dfa.c:1033 src/dfa.c:1036 src/dfa.c:1048 src/dfa.c:1049
 msgid "Unbalanced ["
-msgstr "Ã–ffnende [ ohne schlieÃŸende."
+msgstr "Öffnende [ ohne schließende."
 
 #: src/dfa.c:741
 msgid "Unfinished \\ escape"
@@ -33,15 +33,15 @@ msgstr "Unbeendete \\-Escape-Sequenz."
 #. {M,N} - M through N
 #: src/dfa.c:874 src/dfa.c:880 src/dfa.c:890 src/dfa.c:898 src/dfa.c:913
 msgid "unfinished repeat count"
-msgstr "Unbeendeter WiederholungszÃ¤hler."
+msgstr "Unbeendeter Wiederholungszähler."
 
 #: src/dfa.c:887 src/dfa.c:904 src/dfa.c:912 src/dfa.c:916
 msgid "malformed repeat count"
-msgstr "UnfÃ¶rmiger WiederholungszÃ¤hler."
+msgstr "Unförmiger Wiederholungszähler."
 
 #: src/dfa.c:1253
 msgid "Unbalanced ("
-msgstr "Ã–ffnende ( ohne schlieÃŸende."
+msgstr "Öffnende ( ohne schließende."
 
 #: src/dfa.c:1378
 msgid "No syntax specified"
@@ -49,7 +49,7 @@ msgstr "Keine Syntax angegeben."
 
 #: src/dfa.c:1386
 msgid "Unbalanced )"
-msgstr "SchlieÃŸende ) ohne Ã¶ffnende."
+msgstr "Schließende ) ohne öffnende."
 
 #: src/dfa.c:2956
 msgid "out of memory"
@@ -57,15 +57,15 @@ msgstr "Speicher ist alle."
 
 #: lib/obstack.c:471 src/kwset.c:171 src/kwset.c:177 src/search.c:103 src/search.c:209 src/search.c:293
 msgid "memory exhausted"
-msgstr "Virtueller Speicher erschÃ¶pft."
+msgstr "Virtueller Speicher erschöpft."
 
 #: src/grep.c:205
 msgid "invalid context length argument"
-msgstr "UngÃ¼ltige KontextlÃ¤nge."
+msgstr "Ungültige Kontextlänge."
 
 #: src/grep.c:475
 msgid "input is too large to count"
-msgstr "Eingabe ist zu groÃŸ, um gezÃ¤hlt zu werden."
+msgstr "Eingabe ist zu groß, um gezählt zu werden."
 
 #: src/grep.c:597
 msgid "writing output"
@@ -74,7 +74,7 @@ msgstr "Politik, "
 #: src/grep.c:870
 #, c-format
 msgid "Binary file %s matches\n"
-msgstr "Ãœbereinstimmungen in BinÃ¤rdatei %s.\n"
+msgstr "Übereinstimmungen in Binärdatei %s.\n"
 
 #: src/grep.c:884
 msgid "(standard input)"
@@ -97,7 +97,7 @@ msgstr "Aufruf: %s [OPTION]... MUSTER [DATEI]...\n"
 #: src/grep.c:1040
 #, c-format
 msgid "Try `%s --help' for more information.\n"
-msgstr "Â»%s --helpÂ« gibt Ihnen mehr Informationen.\n"
+msgstr "»%s --help« gibt Ihnen mehr Informationen.\n"
 
 #: src/grep.c:1045
 #, c-format
@@ -115,7 +115,7 @@ msgstr ""
 "Suche nach MUSTER in jeder DATEI oder der Standardeingabe.\n"
 "Beispiel: %s -i 'Hallo Welt' menu.h main.c\n"
 "\n"
-"Auswahl und Interpretation regulÃ¤rer AusdrÃ¼cke:\n"
+"Auswahl und Interpretation regulärer Ausdrücke:\n"
 
 #: src/grep.c:1051
 msgid ""
@@ -124,11 +124,11 @@ msgid ""
 "  -G, --basic-regexp        PATTERN is a basic regular expression\n"
 "  -P, --perl-regexp         PATTERN is a Perl regular expression\n"
 msgstr ""
-"  -E, --extended-regexp     MUSTER ist ein erweiterter regulÃ¤rer Ausdruck.\n"
+"  -E, --extended-regexp     MUSTER ist ein erweiterter regulärer Ausdruck.\n"
 "  -F, --fixed-strings       MUSTER ist eine Menge Newline-getrennter \n"
 "                            Zeichenketten.\n"
-"  -G, --basic-regexp        MUSTER ist ein regulÃ¤rer Standardausdruck.\n"
-"  -P, --perl-regexp         MUSTER ist ein regulÃ¤rer Ausdruck, \n"
+"  -G, --basic-regexp        MUSTER ist ein regulärer Standardausdruck.\n"
+"  -P, --perl-regexp         MUSTER ist ein regulärer Ausdruck, \n"
 "                            wie Perl ihn akzeptiert.\n"
 
 #: src/grep.c:1056
@@ -140,12 +140,12 @@ msgid ""
 "  -x, --line-regexp         force PATTERN to match only whole lines\n"
 "  -z, --null-data           a data line ends in 0 byte, not newline\n"
 msgstr ""
-"  -e, --regexp=MUSTER       MUSTER als regulÃ¤ren Ausdruck verwenden.\n"
+"  -e, --regexp=MUSTER       MUSTER als regulären Ausdruck verwenden.\n"
 "  -f, --file=FILE           MUSTER aus DATEI lesen.\n"
-"  -i, --ignore-case         Unterschied zwischen GroÃŸ- und Kleinschreibung\n"
+"  -i, --ignore-case         Unterschied zwischen Groß- und Kleinschreibung\n"
 "                            ignorieren.\n"
-"  -w, --word-regexp         MUSTER paÃŸt nur auf ganze WÃ¶rter.\n"
-"  -x, --line-regexp         MUSTER paÃŸt nur auf ganze Zeilen.\n"
+"  -w, --word-regexp         MUSTER paßt nur auf ganze Wörter.\n"
+"  -x, --line-regexp         MUSTER paßt nur auf ganze Zeilen.\n"
 "  -z, --null-data           Eine Zeile endet mit Nullbyte, nicht Newline.\n"
 
 #: src/grep.c:1063
@@ -160,11 +160,11 @@ msgid ""
 msgstr ""
 "\n"
 "Verschiedenes:\n"
-"  -s, --no-messages         Fehlermeldungen unterdrÃ¼cken.\n"
+"  -s, --no-messages         Fehlermeldungen unterdrücken.\n"
 "  -v, --revert-match        Nicht-passende Zeilen anzeigen.\n"
 "  -V, --version             Versionsnummer ausgeben und beenden.\n"
 "      --help                Diese Hilfe ausgeben und beenden.\n"
-"      --mmap                Wenn mÃ¶glich, Eingabe in den Speicher mappen.\n"
+"      --mmap                Wenn möglich, Eingabe in den Speicher mappen.\n"
 
 #: src/grep.c:1071
 msgid ""
@@ -198,32 +198,32 @@ msgid ""
 msgstr ""
 "\n"
 "Ausgabekontrolle:\n"
-"  -m, --max-count=ZAHL      Nach ZAHL Ãœbereinstimmungen abbrechen.\n"
+"  -m, --max-count=ZAHL      Nach ZAHL Übereinstimmungen abbrechen.\n"
 "  -b, --byte-offset         Byte-Offset anzeigen.\n"
 "  -n, --line-number         Zeilennummer anzeigen.\n"
 "      --line-buffered       Jede Zeile einzeln (ungepuffert) ausgeben.\n"
-"  -H, --with-filename       Dateinamen bei jeder Ãœbereinstimmung anzeigen.\n"
+"  -H, --with-filename       Dateinamen bei jeder Übereinstimmung anzeigen.\n"
 "  -h, --no-filename         Dateinamen nicht anzeigen.\n"
-"      --label=TEXT          TEXT als Dateiname fÃ¼r Standardeingabe ausgeben.\n"
+"      --label=TEXT          TEXT als Dateiname für Standardeingabe ausgeben.\n"
 "  -o, --only-matching       Nur den Teil der Zeile anzeigen, die mit MUSTER\n"
-"                            Ã¼bereinstimmt.\n"
-"  -q, --quiet, --silent     Alle normalen Ausgaben unterdrÃ¼cken.\n"
-"      --binary-files=TYP    BinÃ¤rdateien als TYP annehmen. TYP kann \n"
-"                            Â»binaryÂ«, Â»textÂ« oder Â»without-matchÂ« sein.\n"
+"                            übereinstimmt.\n"
+"  -q, --quiet, --silent     Alle normalen Ausgaben unterdrücken.\n"
+"      --binary-files=TYP    Binärdateien als TYP annehmen. TYP kann \n"
+"                            »binary«, »text« oder »without-match« sein.\n"
 "  -a, --text                Entspricht --binary-files=text.\n"
 "  -I                        Entspricht --binary-files=without-match.\n"
 "  -d, --directories=AKTION  Verarbeitung von Verzeichnissen festlegen.\n"
 "                            AKTION ist 'read', 'recurse', oder 'skip'.\n"
-"  -D, --devices=AKTION      Verarbeitung von GerÃ¤tedateien, FIFOs und\n"
-"                            Sockets festlegt. AKTION ist Â»readÂ« oder Â»writeÂ«.\n"
-"  -R, -r, --recursive       Ã„quivalent zu --directories=recurse.\n"
+"  -D, --devices=AKTION      Verarbeitung von Gerätedateien, FIFOs und\n"
+"                            Sockets festlegt. AKTION ist »read« oder »write«.\n"
+"  -R, -r, --recursive       Äquivalent zu --directories=recurse.\n"
 "      --include=MUSTER      Dateien untersuchen, die auf MUSTER passen.\n"
-"      --exclude=MUSTER      Dateien Ã¼berspringen, die auf MUSTER passen.\n"
-"      --exclude-from=DATEI  Dateien Ã¼berspringen, die auf ein Muster \n"
+"      --exclude=MUSTER      Dateien überspringen, die auf MUSTER passen.\n"
+"      --exclude-from=DATEI  Dateien überspringen, die auf ein Muster \n"
 "                            in DATEI passen.\n"
 "  -L, --files-without-match Nur Namen von Dateien ausgeben, die keine\n"
-"                            Ãœbereinstimmung enthalten.\n"
-"  -l, --files-with-matches  Nur Dateinamen mit Ãœbereinstimmungen ausgeben.\n"
+"                            Übereinstimmung enthalten.\n"
+"  -l, --files-with-matches  Nur Dateinamen mit Übereinstimmungen ausgeben.\n"
 "  -c, --count               Nur Zahl der passenden Zeilen pro Datei ausgeben.\n"
 "  -Z, --null                Null-Byte nach jedem Dateinamen ausgeben.\n"
 
@@ -254,14 +254,14 @@ msgstr ""
 "  -ZAHL                     Wie --context=ZAHL.\n"
 "      --color[=WENN], \n"
 "      --colour=[WENN]       Passende Textfragmente markieren.\n"
-"                            WENN kann Â»alwaysÂ«, Â»neverÂ« oder Â»autoÂ« sein.\n"
+"                            WENN kann »always«, »never« oder »auto« sein.\n"
 "  -U, --binary              CR-Zeichen am Zeilenende belassen (MSDOS).\n"
 "  -u, --unix-byte-offsets   Offsets ausgeben, als fehlten CR-Zeichen (MSDOS).\n"
 "\n"
-"Â»egrepÂ« bedeutet Â»grep -EÂ«. Â»fgrepÂ« bedeutet Â»grep -FÂ«.\n"
-"Wenn DATEI fehlt oder Â»-Â« ist, wird die Standardeingabe gelesen.\n"
+"»egrep« bedeutet »grep -E«. »fgrep« bedeutet »grep -F«.\n"
+"Wenn DATEI fehlt oder »-« ist, wird die Standardeingabe gelesen.\n"
 "Weniger als zwei DATEIen implizieren -h. Status ist 0 bei \n"
-"Ãœbereinstimmungen, 1 ohne, 2 bei Problemen.\n"
+"Übereinstimmungen, 1 ohne, 2 bei Problemen.\n"
 
 #: src/grep.c:1116
 msgid ""
@@ -277,19 +277,19 @@ msgstr "Festgelegte Vergleicher widersprechen einander."
 
 #: src/grep.c:1363
 msgid "unknown devices method"
-msgstr "Unbekannte Methode fÃ¼r GerÃ¤tedateien."
+msgstr "Unbekannte Methode für Gerätedateien."
 
 #: src/grep.c:1430
 msgid "unknown directories method"
-msgstr "Unbekannte Methode fÃ¼r Verzeichnisse."
+msgstr "Unbekannte Methode für Verzeichnisse."
 
 #: src/grep.c:1497
 msgid "invalid max count"
-msgstr "Unbeendeter MaximalzÃ¤hler."
+msgstr "Unbeendeter Maximalzähler."
 
 #: src/grep.c:1551
 msgid "unknown binary-files type"
-msgstr "Unbekannter Typ fÃ¼r Â»--binary-filesÂ«."
+msgstr "Unbekannter Typ für »--binary-files«."
 
 #: src/grep.c:1646
 #, c-format
@@ -306,16 +306,16 @@ msgid ""
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 msgstr ""
 "Dies ist freie Software; in den Quellen befinden sich die Lizenzbedingungen.\n"
-"Es gibt KEINERLEI Garantie; nicht einmal fÃ¼r die TAUGLICHKEIT oder\n"
-"VERWENDBARKEIT FÃœR EINEN BESTIMMTEN ZWECK.\n"
+"Es gibt KEINERLEI Garantie; nicht einmal für die TAUGLICHKEIT oder\n"
+"VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK.\n"
 
 #: src/search.c:606
 msgid "The -P option is not supported"
-msgstr "Die Option -P ist nicht unterstÃ¼tzt."
+msgstr "Die Option -P ist nicht unterstützt."
 
 #: src/search.c:619
 msgid "The -P and -z options cannot be combined"
-msgstr "Die Optionen -P und -z kÃ¶nnen nicht kombiniert werden."
+msgstr "Die Optionen -P und -z können nicht kombiniert werden."
 
 #: lib/error.c:117
 msgid "Unknown system error"
@@ -324,45 +324,45 @@ msgstr "Unbekannter Systemfehler."
 #: lib/getopt.c:675
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: Die Option Â»%sÂ« ist mehrdeutig.\n"
+msgstr "%s: Die Option »%s« ist mehrdeutig.\n"
 
 #: lib/getopt.c:700
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: Die Option Â»%sÂ« erlaubt keinen Parameter.\n"
+msgstr "%s: Die Option »%s« erlaubt keinen Parameter.\n"
 
 #: lib/getopt.c:705
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: Die Option Â»%c%sÂ« erlaubt keinen Parameter.\n"
+msgstr "%s: Die Option »%c%s« erlaubt keinen Parameter.\n"
 
 #: lib/getopt.c:723 lib/getopt.c:896
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: Die Option Â»%sÂ« verlangt einen Parameter.\n"
+msgstr "%s: Die Option »%s« verlangt einen Parameter.\n"
 
 #. --option
 #: lib/getopt.c:752
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: Nicht erkannte Option Â»--%sÂ«\n"
+msgstr "%s: Nicht erkannte Option »--%s«\n"
 
 #. +option or -option
 #: lib/getopt.c:756
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: Nicht erkannte Option Â»%c%sÂ«.\n"
+msgstr "%s: Nicht erkannte Option »%c%s«.\n"
 
 #. 1003.2 specifies the format of this message.
 #: lib/getopt.c:782
 #, c-format
 msgid "%s: illegal option -- %c\n"
-msgstr "%s: UngÃ¼ltige Option -- %c.\n"
+msgstr "%s: Ungültige Option -- %c.\n"
 
 #: lib/getopt.c:785
 #, c-format
 msgid "%s: invalid option -- %c\n"
-msgstr "%s: UngÃ¼ltige Option -- %c.\n"
+msgstr "%s: Ungültige Option -- %c.\n"
 
 #. 1003.2 specifies the format of this message.
 #: lib/getopt.c:815 lib/getopt.c:945
@@ -373,12 +373,12 @@ msgstr "%s: Option verlangt einen Parameter -- %c.\n"
 #: lib/getopt.c:862
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: Option Â»-W %sÂ« ist zweideutig.\n"
+msgstr "%s: Option »-W %s« ist zweideutig.\n"
 
 #: lib/getopt.c:880
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: Option Â»-W %sÂ« erlaubt keinen Parameter.\n"
+msgstr "%s: Option »-W %s« erlaubt keinen Parameter.\n"
 
 #. Get translations for open and closing quotation marks.
 #.
@@ -396,8 +396,8 @@ msgstr "%s: Option Â»-W %sÂ« erlaubt keinen Parameter.\n"
 #. U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
 #: lib/quotearg.c:259
 msgid "`"
-msgstr "Â»"
+msgstr "»"
 
 #: lib/quotearg.c:260
 msgid "'"
-msgstr "Â«"
+msgstr "«"

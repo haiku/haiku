@@ -38,10 +38,10 @@ pkglibdir = $(libdir)/grep
 pkgincludedir = $(includedir)/grep
 top_builddir = ..
 
-ACLOCAL = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run aclocal
-AUTOCONF = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run autoconf
-AUTOMAKE = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run automake
-AUTOHEADER = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run autoheader
+ACLOCAL = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run aclocal
+AUTOCONF = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run autoconf
+AUTOMAKE = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run automake
+AUTOHEADER = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run autoheader
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -57,7 +57,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = 
 host_triplet = i586-pc-beos
-AMTAR = ${SHELL} /boot/home/Development/current/src/apps/bin/grep-2.5/missing --run tar
+AMTAR = ${SHELL} /boot/home/obosf/current/src/apps/bin/grep-2.5/missing --run tar
 BUILD_INCLUDED_LIBINTL = yes
 CATALOGS =  cs.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fr.gmo gl.gmo hr.gmo id.gmo it.gmo ja.gmo ko.gmo nl.gmo no.gmo pl.gmo pt_BR.gmo ru.gmo sl.gmo sv.gmo
 CATOBJEXT = .gmo
@@ -86,15 +86,13 @@ POFILES =  cs.po de.po el.po eo.po es.po et.po fr.po gl.po hr.po id.po it.po ja.
 POSUB = po
 RANLIB = ranlib
 SEP = :
-SYMLINK = ln -s
-SYMLINKFROM = grep
 U = 
 USE_INCLUDED_LIBINTL = yes
 USE_NLS = yes
-VERSION = 2.5
+VERSION = 2.5.1
 am__include = include
 am__quote = 
-install_sh = /boot/home/Development/current/src/apps/bin/grep-2.5/install-sh
+install_sh = /boot/home/obosf/current/src/apps/bin/grep-2.5/install-sh
 
 AWK = gawk
 

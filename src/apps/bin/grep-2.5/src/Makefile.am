@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = ansi2knr no-dependencies
 LN = ln
 
 bin_PROGRAMS = grep
+bin_SCRIPTS = egrep fgrep
 grep_SOURCES = grep.c dfa.c kwset.c search.c \
                grepmat.c
 noinst_HEADERS = grep.h dfa.h kwset.h getpagesize.h system.h
@@ -17,6 +18,13 @@ EXTRA_DIST = \
              dosbuf.c \
              vms_fab.c vms_fab.h
 
-install-exec-local:
-	@SYMLINK@ @SYMLINKFROM@ $(bindir)/egrep
-	@SYMLINK@ @SYMLINKFROM@ $(bindir)/fgrep
+egrep:
+	echo '#!/bin/sh' >$@
+	echo 'exec grep -E $${1+"$$@"}' >>$@
+	chmod a+x $@
+
+fgrep:
+	echo '#!/bin/sh' >$@
+	echo 'exec grep -F $${1+"$$@"}' >>$@
+	chmod a+x $@
+

@@ -6,10 +6,10 @@
 dnl Process this file with autoconf to produce a configure script
 AC_INIT(src/grep.c)
 AC_DEFINE(GREP, 1, [We are building grep])
-AC_PREREQ(2.13)
+AC_PREREQ(2.53)
 
 dnl Automake stuff.
-AM_INIT_AUTOMAKE(grep, 2.5)
+AM_INIT_AUTOMAKE(grep, 2.5.1)
 AM_CONFIG_HEADER(config.h:config.hin)
 
 dnl Check for arguments
@@ -140,29 +140,5 @@ if test x"$testpcre" = x"yes"; then
 	fi
 	AC_CHECK_LIB(pcre, pcre_exec)
 fi
-
-dnl Check how to create the {e,f}grep links
-AC_MSG_CHECKING([How to create links])
-rm -f test00 test01
-touch test00
-ln -s test00 test01 || :
-SYMLINK=""
-SYMLINKFROM="grep"
-if test -L test01; then
-	SYMLINK="ln -s"
-else
-	SYMLINKFROM="${bindir}/grep"
-	rm -f test01
-	ln test00 test01 || :
-	if test -e test01; then
-		SYMLINK="ln"
-	else
-		SYMLINK="cp"
-	fi
-fi
-AC_MSG_RESULT($SYMLINK)
-AC_SUBST(SYMLINK)
-AC_SUBST(SYMLINKFROM)
-rm -f test00 test01
 
 AC_OUTPUT(Makefile lib/Makefile lib/posix/Makefile src/Makefile tests/Makefile po/Makefile.in intl/Makefile doc/Makefile m4/Makefile vms/Makefile bootstrap/Makefile, [sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile; echo timestamp > stamp-h])

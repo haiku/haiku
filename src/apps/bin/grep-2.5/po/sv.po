@@ -2,7 +2,7 @@
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Thomas Olsson <cid95tho@student1.lu.se>, 1996.
 # Daniel Resare <daniel@resare.com>, 1998, 1999, 2000, 2001
-# $Id: sv.po,v 1.1 2004/03/02 02:37:05 michaelphipps Exp $
+# $Id: sv.po,v 1.2 2004/06/30 20:42:54 korli Exp $
 #
 msgid ""
 msgstr ""

@@ -1,8 +1,0 @@
-#
-
-If your system is lacking the necessary tools to build the configuration,
-Makefile.try is provided for bootstraping.  Move Makefile.try to
-../src/Makefile, edit the Makefile and type make. Good luck !
-
-cp Makefile.try ../src/Makefile
-make

@@ -1498,7 +1498,7 @@ fi
 
 # Define the identity of the package.
 PACKAGE=grep
-VERSION=2.5
+VERSION=2.5.1
 
 cat >>confdefs.h <<_ACEOF
 #define PACKAGE "$PACKAGE"
@@ -8842,31 +8842,6 @@ fi
 
 fi
 
-echo "$as_me:$LINENO: checking How to create links" >&5
-echo $ECHO_N "checking How to create links... $ECHO_C" >&6
-rm -f test00 test01
-touch test00
-ln -s test00 test01 || :
-SYMLINK=""
-SYMLINKFROM="grep"
-if test -L test01; then
-	SYMLINK="ln -s"
-else
-	SYMLINKFROM="${bindir}/grep"
-	rm -f test01
-	ln test00 test01 || :
-	if test -e test01; then
-		SYMLINK="ln"
-	else
-		SYMLINK="cp"
-	fi
-fi
-echo "$as_me:$LINENO: result: $SYMLINK" >&5
-echo "${ECHO_T}$SYMLINK" >&6
-
-
-rm -f test00 test01
-
 ac_config_files="$ac_config_files Makefile lib/Makefile lib/posix/Makefile src/Makefile tests/Makefile po/Makefile.in intl/Makefile doc/Makefile m4/Makefile vms/Makefile bootstrap/Makefile"
 ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
@@ -9517,8 +9492,6 @@ s,@GENCAT@,$GENCAT,;t t
 s,@MKINSTALLDIRS@,$MKINSTALLDIRS,;t t
 s,@INTL_LIBTOOL_SUFFIX_PREFIX@,$INTL_LIBTOOL_SUFFIX_PREFIX,;t t
 s,@SEP@,$SEP,;t t
-s,@SYMLINK@,$SYMLINK,;t t
-s,@SYMLINKFROM@,$SYMLINKFROM,;t t
 CEOF
 
 _ACEOF

@@ -1,3 +1,6 @@
+Version 2.5.1
+  - This is a bugfix release. No new features.
+
 Version 2.5
   - The new option --label allows to specify a different name for input
     from stdin. See the man or info pages for details.
