@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyConstructionTest1.cpp,v 1.1 2002/08/07 05:12:53 jrand Exp $
+	$Id: PropertyConstructionTest1.cpp,v 1.2 2002/08/08 04:31:43 jrand Exp $
 	
 	This file implements the first test for the OpenBeOS BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:
@@ -11,6 +11,7 @@
 #include <PropertyInfo.h>
 #include <AppDefs.h>
 #include <Message.h>
+#include <TypeConstants.h>
 
 
 /*
@@ -85,6 +86,10 @@
 	assert(propTest->Values() == NULL);
 	assert(propTest->CountProperties() == 0);
 	assert(propTest->CountValues() == 0);
+	assert(!propTest->IsFixedSize());
+	assert(propTest->TypeCode() == B_PROPERTY_INFO_TYPE);
+	assert(propTest->AllowsTypeCode(B_PROPERTY_INFO_TYPE));
+	assert(!propTest->AllowsTypeCode(B_TIME_TYPE));
 	delete propTest;
 	
 	int i, j;
@@ -95,6 +100,10 @@
 		assert(propTest->Values() == NULL);
 		assert(propTest->CountProperties() == prop_counts[i]);
 		assert(propTest->CountValues() == 0);
+		assert(!propTest->IsFixedSize());
+		assert(propTest->TypeCode() == B_PROPERTY_INFO_TYPE);
+		assert(propTest->AllowsTypeCode(B_PROPERTY_INFO_TYPE));
+		assert(!propTest->AllowsTypeCode(B_TIME_TYPE));
 		delete propTest;
 	
 		for (j=0; j < sizeof(value_counts) / sizeof(int); j++) {
@@ -103,6 +112,10 @@
 			assert(propTest->Values() == value_lists[j]);
 			assert(propTest->CountProperties() == prop_counts[i]);
 			assert(propTest->CountValues() == value_counts[j]);
+			assert(!propTest->IsFixedSize());
+			assert(propTest->TypeCode() == B_PROPERTY_INFO_TYPE);
+			assert(propTest->AllowsTypeCode(B_PROPERTY_INFO_TYPE));
+			assert(!propTest->AllowsTypeCode(B_TIME_TYPE));
 			delete propTest;
 			
 			propTest = new BPropertyInfo(prop_lists[i], value_lists[j], false);
@@ -110,6 +123,10 @@
 			assert(propTest->Values() == value_lists[j]);
 			assert(propTest->CountProperties() == prop_counts[i]);
 			assert(propTest->CountValues() == value_counts[j]);
+			assert(!propTest->IsFixedSize());
+			assert(propTest->TypeCode() == B_PROPERTY_INFO_TYPE);
+			assert(propTest->AllowsTypeCode(B_PROPERTY_INFO_TYPE));
+			assert(!propTest->AllowsTypeCode(B_TIME_TYPE));
 			delete propTest;
 		}
 	}
