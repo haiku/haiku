@@ -277,8 +277,9 @@ void ServerWindow::Show(void)
 
 		rl->fMainLock.Lock();
 		STRACE(("ServerWindow(%s)::Show() - Main lock acquired\n", fWinBorder->GetName()));
-		
-		fWinBorder->Show();
+
+		// manualy set fWinBorder->_hidden to false because Layer's version also calls FullInvalidate.
+		fWinBorder->_hidden = false;
 		
 		if ((fFeel == B_FLOATING_SUBSET_WINDOW_FEEL || fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
 			 && fWinBorder->MainWinBorder() == NULL)
@@ -305,8 +306,6 @@ void ServerWindow::Show(void)
 		desktop->fGeneralLock.Unlock();
 		STRACE(("ServerWindow(%s)::Show() - General lock released\n", fWinBorder->GetName()));
 	}
-	snooze(1000000);
-	fWinBorder->MoveBy(100,100);
 }
 
 //! Hides the window's WinBorder
