@@ -37,14 +37,15 @@ private:
 	
 	status_t ShowConfigView(int32 id);
 		
-	int WriteTrans();
-	void BuildView();
+	status_t PopulateListView();
+	void SetupViews();
 	
 	DataTranslationsView *fTranListView;
 		// List of Translators (left pane of window)
 	
-	BBox *fConfigBox;
-		// Box hosting Config View
+	BBox *fRightBox;
+		// Box hosting fConfigView, fIconView,
+		// fTranNameView and the Info button
 		
 	BView *fConfigView;
 		// the translator config view

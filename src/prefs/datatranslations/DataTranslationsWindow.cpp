@@ -39,7 +39,7 @@ DataTranslationsWindow::DataTranslationsWindow()
 	if (x != winf.left || y != winf.top)
 		MoveTo(x, y);
 	
-	BuildView();
+	SetupViews();
 	Show();
 }
 
@@ -48,8 +48,8 @@ DataTranslationsWindow::~DataTranslationsWindow()
 }
 
 // Reads the installed translators and adds them to our BListView
-int
-DataTranslationsWindow::WriteTrans()
+status_t
+DataTranslationsWindow::PopulateListView()
 {
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 
@@ -70,7 +70,7 @@ DataTranslationsWindow::WriteTrans()
 	delete[] translators;
 	translators = NULL;
 	
-	return 0;
+	return B_OK;
 }
 
 status_t
@@ -124,30 +124,30 @@ DataTranslationsWindow::ShowConfigView(int32 id)
 	if (id >= num_translators)
 		return B_BAD_VALUE;
 	
-	fConfigBox->RemoveChild(fConfigView);
+	fRightBox->RemoveChild(fConfigView);
 	BMessage emptyMsg;
 	BRect rect(0, 0, 200, 233);
 	status_t ret = roster->MakeConfigurationView(tid, &emptyMsg, &fConfigView, &rect);
 	if (ret != B_OK) {
-		fConfigBox->RemoveChild(fConfigView);
+		fRightBox->RemoveChild(fConfigView);
 		return ret;
 	}
 
-	BRect konfRect(fConfigBox->Bounds());
-	konfRect.InsetBy(3, 3);
-	konfRect.bottom -= 45;
+	BRect configRect(fRightBox->Bounds());
+	configRect.InsetBy(3, 3);
+	configRect.bottom -= 45;
 	float width = 0, height = 0;
 	fConfigView->GetPreferredSize(&width, &height);
-	float widen = max_c(0, width - konfRect.Width());
-	float heighten = max_c(0, height - konfRect.Height());
+	float widen = max_c(0, width - configRect.Width());
+	float heighten = max_c(0, height - configRect.Height());
 	if (widen > 0 || heighten > 0) {
 		ResizeBy(widen, heighten);
-		konfRect.right += widen;
-		konfRect.bottom += heighten;
+		configRect.right += widen;
+		configRect.bottom += heighten;
 	}
-	fConfigView->MoveTo(konfRect.left, konfRect.top);
-	fConfigView->ResizeTo(konfRect.Width(), konfRect.Height());
-	fConfigBox->AddChild(fConfigView);
+	fConfigView->MoveTo(configRect.left, configRect.top);
+	fConfigView->ResizeTo(configRect.Width(), configRect.Height());
+	fRightBox->AddChild(fConfigView);
 	
 	UpdateIfNeeded();
 	
@@ -155,59 +155,62 @@ DataTranslationsWindow::ShowConfigView(int32 id)
 }
 
 void
-DataTranslationsWindow::BuildView()
+DataTranslationsWindow::SetupViews()
 {
-	BRect all(0, 0, 400, 300);       		// Fenster-Groesse
-	BBox *mainBox = new BBox(all, "All_Window", B_FOLLOW_ALL_SIDES,
-						B_WILL_DRAW | B_FRAME_EVENTS,
-						B_PLAIN_BORDER);
+	// Window box
+	BBox *mainBox = new BBox(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
+		"All_Window", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	AddChild(mainBox);
 	
-	BRect  configView( 150, 10, 390, 290);
-	fConfigBox = new BBox(configView, "Right_Side", B_FOLLOW_ALL_SIDES);
-	mainBox->AddChild(fConfigBox);
+	// Box around the config and info panels
+	fRightBox = new BBox(BRect(150, 10, 390, 290), "Right_Side",
+		B_FOLLOW_ALL_SIDES);
+	mainBox->AddChild(fRightBox);
 
-	BRect innerRect(fConfigBox->Bounds());
-	innerRect.InsetBy(8,8);
-
-	BRect iconRect(0,0,31,31);
-	iconRect.OffsetTo(innerRect.left,innerRect.bottom-iconRect.Height());
-	fIconView = new IconView(iconRect, "Ikon", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
-                     B_WILL_DRAW | B_FRAME_EVENTS);
-	fConfigBox->AddChild(fIconView);
+	// Add the translator icon view
+	BRect rightRect(fRightBox->Bounds()), iconRect(0, 0, 31, 31);
+	rightRect.InsetBy(8, 8);
+	iconRect.OffsetTo(rightRect.left, rightRect.bottom - iconRect.Height());
+	fIconView = new IconView(iconRect, "Icon",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS);
+	fRightBox->AddChild(fIconView);
 	
-	BRect infoRect(0,0,80,20);
-	infoRect.OffsetTo(innerRect.right-infoRect.Width(),innerRect.bottom-10-infoRect.Height());
-	BButton *button = new BButton(infoRect, "STD", "Info...", new BMessage(BUTTON_MSG),
-	                      B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
-                          B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-	fConfigBox->AddChild(button);
+	// Add the translator info button
+	BRect infoRect(0, 0, 80, 20);
+	infoRect.OffsetTo(rightRect.right - infoRect.Width(),
+		rightRect.bottom - 10 - infoRect.Height());
+	BButton *button = new BButton(infoRect, "STD", "Info...",
+		new BMessage(BUTTON_MSG), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+	fRightBox->AddChild(button);
     
-	BRect dataNameRect( iconRect.right+5 , iconRect.top,
-                        infoRect.left-5 , iconRect.bottom);
-    fTranNameView = new BStringView(dataNameRect, "DataName", "Test", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-    // fTranNameView->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	fConfigBox->AddChild(fTranNameView);
+    // Add the translator name view
+	BRect tranNameRect(iconRect.right + 5, iconRect.top,
+		infoRect.left - 5, iconRect.bottom);
+    fTranNameView = new BStringView(tranNameRect, "TranName", "None",
+    	B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fRightBox->AddChild(fTranNameView);
     
-	BRect konfRect(innerRect);
-    konfRect.bottom = iconRect.top;
-	fConfigView = new BView(konfRect, "KONF", B_FOLLOW_ALL_SIDES,
-                     B_WILL_DRAW | B_FRAME_EVENTS );
-	// fConfigView->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	fConfigBox->AddChild(fConfigView);
+    // Add the translator config panel
+	BRect configRect(rightRect);
+    configRect.bottom = iconRect.top;
+	fConfigView = new BView(configRect, "ConfigPanel", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS);
+	fRightBox->AddChild(fConfigView);
 
-    BRect listRect(10, 10, 120, 288);  // List View
-	fTranListView = new DataTranslationsView(listRect, "Transen", B_SINGLE_SELECTION_LIST); 
+	// Add the translators list view
+	fTranListView = new DataTranslationsView(BRect(10, 10, 120, 288),
+		"TransList", B_SINGLE_SELECTION_LIST); 
 	fTranListView->SetSelectionMessage(new BMessage(SEL_CHANGE));
-
-	// Put list into a BScrollView, to get that nice srcollbar  
+	
     BScrollView *scrollView = new BScrollView("scroll_trans", fTranListView,
     	B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
     	false, true, B_FANCY_BORDER);
 	mainBox->AddChild(scrollView);
 
-    // Here we add the names of all installed translators    
-    WriteTrans();
+    // Populate the translators list view   
+    PopulateListView();
     
 	// Set the focus
 	fTranListView->MakeFocus();
@@ -277,7 +280,7 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 				// If none selected, clear the old one
 				fIconView->DrawIcon(false);
 				fTranNameView->SetText("");
-				fConfigBox->RemoveChild(fConfigView);
+				fRightBox->RemoveChild(fConfigView);
 				break;
 			}
 			
