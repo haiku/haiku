@@ -1629,8 +1629,8 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 	info->thread_count = team->num_threads;
 	info->image_count = count_images(team);
 	//info->area_count = 
-	//info->debugger_nub_thread = 
-	//info->debugger_nub_port = 
+	info->debugger_nub_thread = team->debug_info.nub_thread;
+	info->debugger_nub_port = team->debug_info.nub_port;
 	//info->argc = 
 	//info->args[64] = 
 	//info->uid = 
