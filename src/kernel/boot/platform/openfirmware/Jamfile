@@ -6,6 +6,7 @@ KernelMergeObject boot_platform_openfirmware.o :
 	<$(SOURCE_GRIST)>openfirmware.c
 	<$(SOURCE_GRIST)>debug.c
 	<$(SOURCE_GRIST)>misc.c
+	<$(SOURCE_GRIST)>mmu.cpp
 	<$(SOURCE_GRIST)>Handle.cpp
 	<$(SOURCE_GRIST)>devices.cpp
 	<$(SOURCE_GRIST)>console.cpp
