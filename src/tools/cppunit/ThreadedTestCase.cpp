@@ -7,6 +7,7 @@
 _EXPORT
 BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 	: BTestCase(name)
+	, fInUse(false)
 	, fProgressSeparator(progressSeparator)
 	, fUpdateLock(new BLocker())
 {
