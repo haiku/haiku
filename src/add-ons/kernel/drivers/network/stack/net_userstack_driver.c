@@ -854,3 +854,5 @@ shutdown_connection(net_stack_cookie *nsc)
 	free(nsc);
 }
 
+#endif	// #ifndef _KERNEL_MODE
+
