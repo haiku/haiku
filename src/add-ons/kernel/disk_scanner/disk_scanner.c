@@ -82,6 +82,8 @@ disk_scanner_get_session_module(int deviceFD, off_t deviceSize, int32 blockSize,
 	void *list = NULL;
 	TRACE(("disk_scanner: get_session_module(%d, %lld, %ld)\n", deviceFD,
 		   deviceSize, blockSize));
+	if (error == B_OK)
+		*sessionModule = NULL;
 	if (error == B_OK && ((list = open_module_list(kSessionModulePrefix)))) {
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
@@ -138,6 +140,8 @@ get_partition_module_block(int deviceFD, const session_info *sessionInfo,
 	// that thinks, it is the right one.
 	status_t error = (partitionModule && block ? B_OK : B_BAD_VALUE);
 	void *list = NULL;
+	if (error == B_OK)
+		*partitionModule = NULL;
 	if (error == B_OK && ((list = open_module_list(kPartitionModulePrefix)))) {
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
@@ -161,6 +165,40 @@ get_partition_module_block(int deviceFD, const session_info *sessionInfo,
 		error = B_ENTRY_NOT_FOUND;
 	return error;
 }
+
+// get_partition_module_for_identifier
+static
+status_t
+get_partition_module_for_identifier(const char *identifier,
+									partition_module_info **partitionModule)
+{
+	// find the partition module that knows the supplied identifier
+	status_t error = (identifier ? B_OK : B_BAD_VALUE);
+	void *list = NULL;
+	if (error == B_OK)
+		*partitionModule = NULL;
+	if (error == B_OK && ((list = open_module_list(kPartitionModulePrefix)))) {
+		char moduleName[B_PATH_NAME_LENGTH];
+		size_t bufferSize = sizeof(moduleName);
+		for (; read_next_module_name(list, moduleName, &bufferSize) == B_OK;
+			 bufferSize = sizeof(moduleName)) {
+			partition_module_info *module = NULL;
+			if (get_module(moduleName, (module_info**)&module) == B_OK) {
+				if (module->identify_module(identifier)) {
+					// found module
+					*partitionModule = module;
+					break;
+				}
+				put_module(moduleName);
+			}
+		}
+		close_module_list(list);
+	}
+	if (error == B_OK && !*partitionModule)
+		error = B_ENTRY_NOT_FOUND;
+	return error;
+}
+
 
 // get_partition_module
 static
@@ -380,6 +418,52 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 	return error;
 }
 
+// get_partitioning_params
+static
+status_t
+disk_scanner_get_partitioning_params(int deviceFD,
+									 const struct session_info *sessionInfo,
+									 const char *identifier, char *buffer,
+									 size_t bufferSize, size_t *actualSize)
+{
+	// find the partition module that knows the supplied identifier
+	status_t error = (sessionInfo && identifier && buffer && actualSize
+					  ? B_OK : B_BAD_VALUE);
+	partition_module_info *partitionModule = NULL;
+	if (error == B_OK)
+		get_partition_module_for_identifier(identifier, &partitionModule);
+	// get the parameters from the module
+	if (error == B_OK) {
+		error = partitionModule->get_partitioning_params(deviceFD, sessionInfo,
+			buffer, bufferSize, actualSize);
+	}
+	// cleanup
+	if (partitionModule)
+		put_module(partitionModule->module.name);
+	return error;
+}
+
+// partition
+static
+status_t
+disk_scanner_partition(int deviceFD, const struct session_info *sessionInfo,
+					   const char *identifier, const char *parameters)
+{
+	// find the partition module that knows the supplied identifier
+	status_t error = (sessionInfo && identifier ? B_OK : B_BAD_VALUE);
+	partition_module_info *partitionModule = NULL;
+	if (error == B_OK)
+		get_partition_module_for_identifier(identifier, &partitionModule);
+	// let the module do the actual partitioning
+	if (error == B_OK)
+		error = partitionModule->partition(deviceFD, sessionInfo, parameters);
+	// cleanup
+	if (partitionModule)
+		put_module(partitionModule->module.name);
+	return error;
+}
+
+
 // new_fs_block
 static
 status_t
@@ -458,11 +542,12 @@ get_buffer(struct fs_buffer_cache *cache, off_t offset, size_t size,
 		   void **_buffer, size_t *actualSize)
 {
 	status_t error = (cache && _buffer && actualSize
-					  && offset >= cache->offset && size > 0
+					  && offset >= 0 && size > 0
 					  ? B_OK : B_BAD_VALUE);
 	uint8 *buffer = NULL;
 	// check the bounds
 	if (error == B_OK) {
+		offset += cache->offset;	// make relative to beginning of device
 		if (offset >= cache->offset + cache->size)
 			size = 0;
 		else if (offset + size > cache->offset + cache->size)
@@ -535,7 +620,6 @@ get_buffer(struct fs_buffer_cache *cache, off_t offset, size_t size,
 }
 
 
-
 static disk_scanner_module_info disk_scanner_module = 
 {
 	// module_info
@@ -548,7 +632,9 @@ static disk_scanner_module_info disk_scanner_module =
 	disk_scanner_get_partition_module,
 	disk_scanner_get_nth_session_info,
 	disk_scanner_get_nth_partition_info,
-	disk_scanner_get_partition_fs_info
+	disk_scanner_get_partition_fs_info,
+	disk_scanner_get_partitioning_params,
+	disk_scanner_partition
 };
 
 _EXPORT disk_scanner_module_info *modules[] =
