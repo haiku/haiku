@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src libs pdflib ;
+
+SubInclude OBOS_TOP src libs pdflib libs ;
