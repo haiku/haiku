@@ -33,7 +33,8 @@ enum ICH_GLOBAL_REGISTER
 {
 	ICH_REG_GLOB_CNT	= 0x2C,
 	ICH_REG_GLOB_STA	= 0x30,
-	ICH_REG_ACC_SEMA	= 0x34
+	ICH_REG_ACC_SEMA	= 0x34,
+	ICH_REG_SDM			= 0x80
 };
 
 enum ICH_X_REGISTER_BASE /* base addresses for the following offsets */
@@ -94,10 +95,10 @@ enum REG_GLOB_STA_BITS
 	STA_PIINT			= 0x00000020, /* PCM In Interrupt */
 	STA_POINT			= 0x00000040, /* PCM Out Interrupt */
 	STA_MINT			= 0x00000080, /* Mic In Interrupt */
-	STA_PCR				= 0x00000100, /* AC_SDIN0 Codec Ready */
-	STA_SCR				= 0x00000200, /* AC_SDIN1 Codec Ready */
-	STA_PRI				= 0x00000400, /* AC_SDIN0 Resume Interrupt */
-	STA_SRI				= 0x00000800, /* AC_SDIN1 Resume Interrupt */
+	STA_S0CR			= 0x00000100, /* AC_SDIN0 Codec Ready */
+	STA_S1CR			= 0x00000200, /* AC_SDIN1 Codec Ready */
+	STA_S0RI			= 0x00000400, /* AC_SDIN0 Resume Interrupt */
+	STA_S1RI			= 0x00000800, /* AC_SDIN1 Resume Interrupt */
 	STA_RCS				= 0x00008000, /* Read Completition Status */
 	STA_AD3				= 0x00010000,
 	STA_MD3				= 0x00020000,
@@ -107,7 +108,7 @@ enum REG_GLOB_STA_BITS
 	STA_BCS				= 0x08000000,	/* Bit Clock Stopped */
 	STA_S2CR			= 0x10000000,	/* AC_SDIN2 Codec Ready */
 	STA_S2RI			= 0x20000000,	/* AC_SDIN2 Resume Interrupt */
-	STA_INTMASK			= (STA_MIINT | STA_MOINT | STA_PIINT | STA_POINT | STA_MINT | STA_PRI | STA_SRI | STA_M2INT | STA_P2INT | STA_SPINT | STA_S2RI)
+	STA_INTMASK			= (STA_MIINT | STA_MOINT | STA_PIINT | STA_POINT | STA_MINT | STA_S0RI | STA_S1RI | STA_M2INT | STA_P2INT | STA_SPINT | STA_S2RI)
 };
 
 #define ICH_BD_COUNT	32

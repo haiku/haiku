@@ -337,6 +337,7 @@ init_driver(void)
 {
 	status_t rv;
 	bigtime_t start;
+	bool s0cr, s1cr, s2cr;
 
 	LOG_CREATE();
 	
@@ -374,57 +375,87 @@ init_driver(void)
 		LOG(("cold reset failed\n"));
 	}
 
-	/* wait until a codec is ready */
+	/* detect which codecs are ready */
+	s0cr = s1cr = s2cr = false;
 	start = system_time();
-	while ((system_time() - start) < 1000000) {
+	do {
 		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
-		if ((rv & STA_PCR) != 0)
-			break;
+		if (!s0cr && (rv & STA_S0CR)) {
+			s0cr = true;
+			LOG(("AC_SDIN0 codec ready after %Ld us\n",(system_time() - start)));
+		}
+		if (!s1cr && (rv & STA_S1CR)) {
+			s1cr = true;
+			LOG(("AC_SDIN1 codec ready after %Ld us\n",(system_time() - start)));
+		}
+		if (!s2cr && (rv & STA_S2CR)) {
+			s2cr = true;
+			LOG(("AC_SDIN2 codec ready after %Ld us\n",(system_time() - start)));
+		}
 		snooze(50000);
+	} while ((system_time() - start) < 1000000);
+
+	if (!s0cr) {
+		LOG(("AC_SDIN0 codec not ready\n"));
 	}
-	if ((rv & STA_PCR)) {
-		LOG(("primary codec ready after %Ld us\n",(system_time() - start)));
-	} else {
-		LOG(("primary codec not ready after %Ld us\n",(system_time() - start)));
+	if (!s1cr) {
+		LOG(("AC_SDIN1 codec not ready\n"));
 	}
-	while ((system_time() - start) < 1000000) {
-		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
-		if ((rv & STA_SCR) != 0)
-			break;
-		snooze(50000);
-	}
-	if ((rv & STA_SCR)) {
-		LOG(("secondary codec ready after %Ld us\n",(system_time() - start)));
-	} else {
-		LOG(("secondary codec not ready after %Ld us\n",(system_time() - start)));
-	}
-	while ((system_time() - start) < 1000000) {
-		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
-		if ((rv & STA_S2CR) != 0)
-			break;
-		snooze(50000);
-	}
-	if ((rv & STA_S2CR)) {
-		LOG(("tertiary codec ready after %Ld us\n",(system_time() - start)));
-	} else {
-		LOG(("tertiary codec not ready after %Ld us\n",(system_time() - start)));
+	if (!s2cr) {
+		LOG(("AC_SDIN2 codec not ready\n"));
 	}
 
 	dump_hardware_regs();
 
-	if ((rv & (STA_PCR | STA_SCR | STA_S2CR)) == 0) {
+	if (!s0cr && !s1cr && !s2cr) {
 		PRINT(("compatible chipset found, but no codec ready!\n"));
 		unmap_io_memory();
 		return B_ERROR;
 	}
-	if ((rv & STA_PCR) == 0 && (rv & STA_S2CR) != 0) {
-		LOG(("using tertiary codec!\n"));
-		config->nambar += 0x100;
-		config->log_mmbar += 0x100; /* ICH 4 */
-	} else if ((rv & STA_PCR) == 0 && (rv & STA_SCR) != 0) {
-		LOG(("using secondary codec!\n"));
-		config->nambar += 0x80;
-		config->log_mmbar += 0x80; /* ICH 4 */
+
+	if (config->type & TYPE_ICH4) {
+		/* we are using a ICH4 chipset, and assume that the codec beeing ready
+		 * is the primary one.
+		 */
+		uint8 sdin;
+		uint16 reset;
+		uint8 id;
+		reset = ich_codec_read(0x00);	/* access the primary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("primary codec not present\n"));
+		} //else {
+			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(0x00 + 0x28) >> 14);
+			LOG(("primary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		//}
+		reset = ich_codec_read(0x80);	/* access the secondary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("secondary codec not present\n"));
+		} //else {
+			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(0x80 + 0x28) >> 14);
+			LOG(("secondary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		//}
+		reset = ich_codec_read(0x100);	/* access the tertiary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("tertiary codec not present\n"));
+		} //else {
+			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(0x100 + 0x28) >> 14);
+			LOG(("tertiary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		//}
+		
+		/* XXX this may be wrong */
+		ich_reg_write_8(ICH_REG_SDM, (ich_reg_read_8(ICH_REG_SDM) & 0x0F) | 0x08 | 0x90);
+	} else {
+		/* we are using a pre-ICH4 chipset, that has a fixed mapping of
+		 * AC_SDIN0 = primary, AC_SDIN1 = secondary codec.
+		 */
+		if (!s0cr && s2cr) {
+			// is is unknown if this really works, perhaps we should better abort here
+			LOG(("primary codec doesn't seem to be available, using secondary!\n"));
+			config->codecoffset = 0x80;
+		}
 	}
 
 	dump_hardware_regs();
@@ -480,9 +511,9 @@ init_driver(void)
 	chan_po->regbase = ICH_REG_PO_BASE;
 	chan_mc->regbase = ICH_REG_MC_BASE;
 
-	/* reset the (primary?) codec */	
+	/* reset the codec */	
 	LOG(("codec reset\n"));
-	ich_codec_write(0x00, 0x0000);
+	ich_codec_write(config->codecoffset + 0x00, 0x0000);
 	snooze(50000); // 50 ms
 
 	ac97_init();
@@ -517,24 +548,24 @@ init_driver(void)
 	}
 
 	/* enable master output */
-	ich_codec_write(0x02, 0x0000);
+	ich_codec_write(config->codecoffset + 0x02, 0x0000);
 	/* enable pcm output */
-	ich_codec_write(0x18, 0x0404);
+	ich_codec_write(config->codecoffset + 0x18, 0x0404);
 
 #if 0
 	/* enable pcm input */
-	ich_codec_write(0x10, 0x0000);
+	ich_codec_write(config->codecoffset + 0x10, 0x0000);
 
 	/* enable mic input */
-	/* ich_codec_write(0x0E, 0x0000); */
+	/* ich_codec_write(config->codecoffset + 0x0E, 0x0000); */
 
 	/* select pcm input record */
-	ich_codec_write(0x1A, 4 | (4 << 8));
+	ich_codec_write(config->codecoffset + 0x1A, 4 | (4 << 8));
 	/* enable PCM record */
-	ich_codec_write(0x1C, 0x0000);
+	ich_codec_write(config->codecoffset + 0x1C, 0x0000);
 
 	/* enable mic record */
-	/* ich_codec_write(0x1E, 0x0000); */
+	/* ich_codec_write(config->codecoffset + 0x1E, 0x0000); */
 #endif
 
 	LOG(("init_driver finished!\n"));
@@ -615,9 +646,9 @@ int32 ich_int(void *unused)
 	if ((sta & STA_INTMASK) == 0)
 		return B_UNHANDLED_INTERRUPT;
 	
-	if (sta & (STA_PRI | STA_SRI)) {
+	if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
 		/* ignore and clear resume interrupt(s) */
-		ich_reg_write_32(ICH_REG_GLOB_STA, sta & (STA_PRI | STA_SRI));
+		ich_reg_write_32(ICH_REG_GLOB_STA, sta & (STA_S0RI | STA_S1RI | STA_S2RI));
 	}
 	
 	if (sta & STA_POINT) { // pcm-out

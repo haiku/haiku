@@ -43,6 +43,7 @@ typedef struct
 	void *	log_mbbar; // ich4
 	area_id area_mmbar; // ich4
 	area_id area_mbbar; // ich4
+	uint32	codecoffset;
 } device_config;
 
 extern device_config *config;

@@ -82,6 +82,7 @@ status_t probe_device(void)
 	config->log_mbbar = 0;
 	config->area_mmbar = -1;
 	config->area_mbbar = -1;
+	config->codecoffset = 0;
 
 	result = B_ERROR;
 	cookie = 0;

@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <MediaDefs.h>
 #include "ac97.h"
+#include "config.h"
 
 //#define DEBUG 1
 
@@ -114,20 +115,20 @@ ac97_amp_enable(bool yesno)
 		{
 			LOG(("using Cirrus enable"));
 			if (yesno)
-				ich_codec_write(0x68, 0x8004);
+				ich_codec_write(config->codecoffset + 0x68, 0x8004);
 			else
-				ich_codec_write(0x68, 0);
+				ich_codec_write(config->codecoffset + 0x68, 0);
 			break;
 		}
 
 		default:
 		{
-			LOG(("powerdown register was = %#04x\n",ich_codec_read(AC97_POWERDOWN)));
+			LOG(("powerdown register was = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
 			if (yesno)
-				ich_codec_write(AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
+				ich_codec_write(config->codecoffset + AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
 			else
-				ich_codec_write(AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) | 0x8000); /* switch off */
-			LOG(("powerdown register is = %#04x\n",ich_codec_read(AC97_POWERDOWN)));
+				ich_codec_write(config->codecoffset + AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) | 0x8000); /* switch off */
+			LOG(("powerdown register is = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
 			break;
 		}
 	}
@@ -140,7 +141,7 @@ ac97_init()
 	{
 		case 0x41445461: /* Analog Devices AD1886 */
 			LOG(("using AD1886 init"));
-			ich_codec_write(0x72, 0x0010);
+			ich_codec_write(config->codecoffset + 0x72, 0x0010);
 			break;
 		default:
 			break;

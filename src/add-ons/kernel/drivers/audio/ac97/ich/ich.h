@@ -30,7 +30,7 @@
 
 #include "hardware.h"
 
-#define VERSION "Version 1.3, Copyright (c) 2002 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version 1.4, Copyright (c) 2002 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "ich_ac97"
 
 #define BUFFER_SIZE		2048
