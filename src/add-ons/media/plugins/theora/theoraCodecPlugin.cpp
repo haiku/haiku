@@ -55,7 +55,7 @@ void
 TheoraDecoder::GetCodecInfo(media_codec_info *info)
 {
 	strncpy(info->short_name, "theora-libtheora", sizeof(info->short_name));
-	strncpy(info->pretty_name, "theora decoder[libtheora], by Andrew Bachmann", sizeof(info->pretty_name));
+	strncpy(info->pretty_name, "theora decoder[libtheora] by AndrewBachmann", sizeof(info->pretty_name));
 }
 
 
@@ -158,7 +158,6 @@ TheoraDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
 	TRACE("TheoraDecoder::Decode\n");
-	debugger("in");
 	status_t status = B_OK;
 
 	bool synced = false;
