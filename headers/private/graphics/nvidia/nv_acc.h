@@ -37,9 +37,11 @@ typedef struct {
 	uint32 reserved01[0x000b];
 	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
 	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
-	uint32 reserved02[0x00b0];
-	uint32 SetShape;			/* b0-1: %00 = 8X_8Y; %01 = 64X_1Y; %10 = 1X_64Y */
+	uint32 reserved02[0x00ae];
+	uint32 SetColorFormat;		/* colorspace */
 	uint32 reserved03[0x0001];
+	uint32 SetShape;			/* b0-1: %00 = 8X_8Y; %01 = 64X_1Y; %10 = 1X_64Y */
+	uint32 reserved04[0x0001];
 	uint32 SetColor0;			/* b0-31 is color */
 	uint32 SetColor1;			/* b0-31 is color */
 	uint32 SetPattern[0x0002];	/* b0-31 is bitmap */
@@ -294,6 +296,7 @@ typedef struct {
 #define NV_GENERAL_DMAGET					0x0044
 #define NV_ROP5_SOLID_SETROP5				0x0300
 #define NV_IMAGE_BLACK_RECTANGLE_TOPLEFT	0x0300
+#define NV_IMAGE_PATTERN_SETCOLORFORMAT		0x0300
 #define NV_IMAGE_PATTERN_SETSHAPE			0x0308
 #define NV_IMAGE_PATTERN_SETCOLOR0			0x0310
 #define NV_IMAGE_BLIT_SOURCEORG				0x0300
