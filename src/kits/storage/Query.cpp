@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file Query.cpp
@@ -516,16 +516,17 @@ BQuery::Fetch()
 {
 	if (_HasFetched())
 		return B_NOT_ALLOWED;
+
 	_EvaluateStack();
+
 	if (!fPredicate || fDevice < 0)
 		return B_NO_INIT;
-	if (fLive) {
-		fQueryFd = _kern_open_query(fDevice, fPredicate, B_LIVE_QUERY,
-			fPort, fToken);
-	} else
-		fQueryFd = _kern_open_query(fDevice, fPredicate, 0, -1, -1);
+
+	fQueryFd = _kern_open_query(fDevice, fPredicate, strlen(fPredicate),
+		fLive ? B_LIVE_QUERY : 0, fPort, fToken);
 	if (fQueryFd < 0)
 		return fQueryFd;
+
 	return B_OK;
 }
 
@@ -627,13 +628,15 @@ BQuery::GetNextDirents(struct dirent *buf, size_t length, int32 count)
 }
 
 // Rewind
-/*!	\brief Unimplemented method of the BEntryList interface.
-	\return \c B_ERROR.
+/*!	\brief Rewinds the entry list back to the first entry.
+	\return
+	- \c B_OK on success,
+	- \c B_FILE_ERROR if Fetch() has not yet been called
 */
 status_t
 BQuery::Rewind()
 {
-	return B_ERROR;
+	return _kern_rewind_dir(fQueryFd);
 }
 
 // CountEntries
