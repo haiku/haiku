@@ -13,4 +13,5 @@ App MidiPlayer :
 LinkSharedOSLibs MidiPlayer : 
 	be 
 	midi
+	midi2
 ;

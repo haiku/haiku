@@ -4,23 +4,37 @@
 </head>
 <body>
 
-<h1>Haiku MIDI Player</h1>
+<h1>Haiku MIDI Player 1.0.0 beta</h1>
 
 <p>This is a simple application to play MIDI songs.</p>
 
-<p>Differences with the BeOS R5 MidiPlayer:</p>
+<p>To play a MIDI song, you can:</p>
+
+<ul>
+<li>double-click it, or</li>
+<li>drag it on the MidiPlayer icon, or</li>
+<li>drag it into the MidiPlayer window, or</li>
+<li>type "MidiPlayer song.mid" in Terminal.</li>
+</ul>
+
+<p>Hopefully, most of the options will be obvious, although Live Input may require a few lines of explanation.</p>
+
+<p>The <b>Live Input</b> feature enables you to attach other applications to the Haiku software synthesizer, for example a virtual MIDI keyboard. MidiPlayer looks at the MIDI roster for compatible producer endpoints. If none are found, Live Input is not available.</p>
+
+<h3>Differences with the BeOS R5 MidiPlayer:</h3>
 
 <ul>
 <li>User interface looks slightly different (better?)</li>
 <li>Play and Stop are now one and the same button.</li>
-<li>There is no Open File... button. You open MIDI songs by dragging them into the window.</li>
-<li>There is no Live Input feature.</li>
+<li>There is no Open File... function.</li>
 <li>You cannot set the Quality of the sound (always 44100 Hz).</li>
 </ul>
 
 <p>If people really <i>really</i> want these missing features, then feel free to add them :-)</p>
 
-<p>Note: The code can be a little tricky at times, since it uses fire-and-forget threads to load new songs and to stop playback. The reason for this is the scope: we want to keep repainting the scope view even when fading out a song (because this looks cool), but fading blocks the calling thread. If we were to block the window's looper, then the scope wouldn't repaint during the fade-out. So we fade using a separate thread instead. Unfortunately, this makes the code much less clean as it introduces several race conditions. Yech. See the source for more details.</p>
+<h3>Implementation notes</h3>
+
+<p>The code can be a little tricky at times, since it uses fire-and-forget threads to load new songs and to stop playback. The reason for this is the scope: we want to keep repainting the ScopeView even when fading out a song (because this looks cool), but fading blocks the calling thread. If we were to block the window's looper, then the scope wouldn't repaint during the fade-out. So we fade using a separate thread instead. Unfortunately, this makes the code much less clean as it introduces several race conditions. Yech. See the source for more details.</p>
 
 </body>
 </html>

@@ -32,6 +32,7 @@ enum
 {
 	MSG_PLAY_STOP = 1000,
 	MSG_SHOW_SCOPE,
+	MSG_INPUT_CHANGED,
 	MSG_REVERB_NONE,
 	MSG_REVERB_CLOSET,
 	MSG_REVERB_GARAGE,
@@ -53,11 +54,13 @@ public:
 	virtual bool QuitRequested();
 	virtual void MessageReceived(BMessage* msg);
 	virtual void FrameMoved(BPoint origin);
+	virtual void MenusBeginning();
 
 private:
 
 	typedef BWindow super;
 	
+	void CreateInputMenu();
 	void CreateReverbMenu();
 	void CreateViews();
 	void CenterOnScreen();
@@ -76,12 +79,16 @@ private:
 
 	void OnPlayStop();
 	void OnShowScope();
+	void OnInputChanged(BMessage* msg);
 	void OnReverb(reverb_mode mode);
 	void OnVolume();
 	void OnDrop(BMessage* msg);
 
 	ScopeView* scopeView;
 	BCheckBox* showScope;
+	BMenuField* inputMenu;
+	BPopUpMenu* inputPopUp; 
+	BMenuItem* inputOff;
 	BMenuField* reverbMenu;
 	BMenuItem* reverbNone;
 	BMenuItem* reverbCloset;
@@ -101,6 +108,7 @@ private:
 	BMidiSynthFile synth;
 	entry_ref ref;
 	thread_id threadId;
+	int32 inputId;
 };
 
 #endif // MIDI_PLAYER_WINDOW_H

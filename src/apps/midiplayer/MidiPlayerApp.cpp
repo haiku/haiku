@@ -47,7 +47,7 @@ void MidiPlayerApp::AboutRequested()
 {
 	(new BAlert(
 		NULL,
-		"Haiku MIDI Player\n\n"
+		"Haiku MIDI Player 1.0.0 beta\n\n"
 		"This tiny program\n"
 		"Knows how to play thousands of\n"
 		"Cheesy sounding songs",

@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <MidiRoster.h>
 #include <StorageKit.h>
 
 #include "MidiPlayerApp.h"
@@ -42,6 +43,7 @@ MidiPlayerWindow::MidiPlayerWindow()
 	windowX = -1;
 	windowY = -1;
 	threadId = -1;
+	inputId = -1;
 
 	be_synth->SetSamplingRate(44100);
 
@@ -85,6 +87,10 @@ void MidiPlayerWindow::MessageReceived(BMessage* msg)
 
 		case MSG_SHOW_SCOPE:
 			OnShowScope();
+			break;
+
+		case MSG_INPUT_CHANGED:
+			OnInputChanged(msg);
 			break;
 			
 		case MSG_REVERB_NONE:
@@ -137,9 +143,77 @@ void MidiPlayerWindow::FrameMoved(BPoint origin)
 
 //------------------------------------------------------------------------------
 
+void MidiPlayerWindow::MenusBeginning()
+{
+	for (int32 t = inputPopUp->CountItems() - 1; t > 0; --t)
+	{
+		delete inputPopUp->RemoveItem(t);
+	}
+
+	bool seenInput = false;
+
+	if (inputId == -1)
+	{
+		inputOff->SetMarked(true);
+		seenInput = true;
+	}
+	
+	int32 id = 0;
+	BMidiEndpoint* endp;
+	while ((endp = BMidiRoster::NextEndpoint(&id)) != NULL)
+	{
+		if (endp->IsProducer())
+		{
+			BMessage* msg = new BMessage;
+			msg->what = MSG_INPUT_CHANGED;
+			msg->AddInt32("id", id);
+
+			BMenuItem* item = new BMenuItem(endp->Name(), msg);
+			inputPopUp->AddItem(item);
+			
+			if (inputId == id)
+			{
+				item->SetMarked(true);
+				seenInput = true;
+			}
+		}
+		
+		endp->Release();
+	}
+	
+	if (!seenInput)  // endpoint no longer exists
+	{
+		inputOff->SetMarked(true);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+void MidiPlayerWindow::CreateInputMenu()
+{
+	inputPopUp = new BPopUpMenu("inputPopUp");
+
+	BMessage* msg = new BMessage;
+	msg->what = MSG_INPUT_CHANGED;
+	msg->AddInt32("id", -1);
+
+	inputOff = new BMenuItem("Off", msg);
+
+	inputPopUp->AddItem(inputOff);
+
+	inputMenu = new BMenuField(
+		BRect(0, 0, 128, 17), "inputMenu", "Live Input:", inputPopUp,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
+	inputMenu->SetDivider(55);
+	inputMenu->ResizeToPreferred();
+}
+
+//------------------------------------------------------------------------------
+
 void MidiPlayerWindow::CreateReverbMenu()
 {
-	BPopUpMenu* menu = new BPopUpMenu("reverbPopUp");
+	BPopUpMenu* reverbPopUp = new BPopUpMenu("reverbPopUp");
 
 	reverbNone = new BMenuItem(
 		"None", new BMessage(MSG_REVERB_NONE));
@@ -159,18 +233,18 @@ void MidiPlayerWindow::CreateReverbMenu()
 	reverbDungeon = new BMenuItem(
 		"Dungeon", new BMessage(MSG_REVERB_DUNGEON));
 
-	menu->AddItem(reverbNone);
-	menu->AddItem(reverbCloset);
-	menu->AddItem(reverbGarage);
-	menu->AddItem(reverbIgor);
-	menu->AddItem(reverbCavern);
-	menu->AddItem(reverbDungeon);
+	reverbPopUp->AddItem(reverbNone);
+	reverbPopUp->AddItem(reverbCloset);
+	reverbPopUp->AddItem(reverbGarage);
+	reverbPopUp->AddItem(reverbIgor);
+	reverbPopUp->AddItem(reverbCavern);
+	reverbPopUp->AddItem(reverbDungeon);
 
 	reverbMenu = new BMenuField(
-		BRect(0, 0, 128, 17), "reverbMenu", "Reverb:", menu,
+		BRect(0, 0, 128, 17), "reverbMenu", "Reverb:", reverbPopUp,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP);
 
-	reverbMenu->SetDivider(50);
+	reverbMenu->SetDivider(55);
 	reverbMenu->ResizeToPreferred();
 }
 
@@ -187,6 +261,7 @@ void MidiPlayerWindow::CreateViews()
 	showScope->SetValue(B_CONTROL_ON);
 	showScope->ResizeToPreferred();
 
+	CreateInputMenu();
 	CreateReverbMenu();
 	
 	volumeSlider = new BSlider(
@@ -197,7 +272,7 @@ void MidiPlayerWindow::CreateViews()
 	volumeSlider->UseFillColor(true, &col);
 	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
 	volumeSlider->ResizeToPreferred();
-	volumeSlider->ResizeTo(_W(scopeView) - 37, _H(volumeSlider));
+	volumeSlider->ResizeTo(_W(scopeView) - 42, _H(volumeSlider));
 
 	playButton = new BButton(
 		BRect(0, 1, 80, 1), "playButton", "Play", new BMessage(MSG_PLAY_STOP),
@@ -226,13 +301,14 @@ void MidiPlayerWindow::CreateViews()
 	float width = 8 + _W(scopeView) + 8;
 
 	float height =
-		+ 8  + _H(scopeView) 
+		  8  + _H(scopeView) 
 		+ 8  + _H(showScope) 
-		+ 4  + _H(reverbMenu)
+		+ 4  + _H(inputMenu)
+		     + _H(reverbMenu)
 		+ 2  + _H(volumeSlider) 
 		+ 10 + _H(divider) 
 		+ 6  + _H(playButton)
-		+ 10;
+		+ 16;
 
 	ResizeTo(width, height);  
 
@@ -241,6 +317,7 @@ void MidiPlayerWindow::CreateViews()
 	background->AddChild(scopeView);
 	background->AddChild(showScope);
 	background->AddChild(reverbMenu);
+	background->AddChild(inputMenu);
 	background->AddChild(volumeLabel);
 	background->AddChild(volumeSlider);
 	background->AddChild(divider);
@@ -250,14 +327,17 @@ void MidiPlayerWindow::CreateViews()
 	scopeView->MoveTo(8, y);
 
 	y += _H(scopeView) + 8;
-	showScope->MoveTo(8 + 50, y);
+	showScope->MoveTo(8 + 55, y);
 
 	y += _H(showScope) + 4;
+	inputMenu->MoveTo(8, y);
+
+	y += _H(inputMenu);
 	reverbMenu->MoveTo(8, y);
 
 	y += _H(reverbMenu) + 2;
 	volumeLabel->MoveTo(8, y);
-	volumeSlider->MoveTo(8 + 44, y);
+	volumeSlider->MoveTo(8 + 49, y);
 
 	y += _H(volumeSlider) + 10;
 	divider->MoveTo(8, y);
@@ -286,6 +366,8 @@ void MidiPlayerWindow::InitControls()
 
 	showScope->SetValue(scopeEnabled ? B_CONTROL_ON : B_CONTROL_OFF);
 	scopeView->SetEnabled(scopeEnabled);
+
+	inputOff->SetMarked(true);
 
 	reverbNone->SetMarked(reverb == B_REVERB_NONE);
 	reverbCloset->SetMarked(reverb == B_REVERB_CLOSET);
@@ -482,6 +564,29 @@ void MidiPlayerWindow::OnShowScope()
 	scopeView->SetEnabled(scopeEnabled);
 	scopeView->Invalidate();
 	SaveSettings();
+}
+
+//------------------------------------------------------------------------------
+
+void MidiPlayerWindow::OnInputChanged(BMessage* msg)
+{
+	int32 newId;
+	if (msg->FindInt32("id", &newId) == B_OK)
+	{
+		inputId = newId;
+
+		// if (!instrLoaded)
+		//   be_synth->LoadInstruments(all)
+	
+		// if id != -1
+		//   if playing -> Stop()  // AARGH, need thread!
+		//   connect SynthBridge (from MidiUtil) to producer endpoint
+		// else if SynthBridge still connected
+		//   disconnect SynthBridge
+		
+		// NOTE: we should also disconnect SynthBridge when launching
+		// a MIDI file!!! (successfull or not)
+	}
 }
 
 //------------------------------------------------------------------------------
