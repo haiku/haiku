@@ -29,7 +29,10 @@
 /* check if freed pointers are already freed */  
 #define PARANOID_KFREE 1
 /* use a back and front wall around each allocation */
-#define USE_WALL 1
+/* does currently not work correctly, because the VM malloc()s a PAGE_SIZE and
+ * later checks if the returned address is aligned...
+ */
+#define USE_WALL 0
 
 
 // heap stuff
