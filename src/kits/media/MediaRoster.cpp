@@ -2607,16 +2607,16 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 							  int32 * io_count)
 {
 	CALLED();
-	if (out_id == NULL || io_count == NULL)
+	if (out_id == NULL)
 		return B_BAD_VALUE;
-	if (*io_count <= 0)
+	if (io_count && *io_count <= 0)
 		return B_BAD_VALUE;
 
 	server_get_instances_for_request request;
 	server_get_instances_for_reply reply;
 	status_t rv;
 
-	request.maxcount = *io_count;
+	request.maxcount = (io_count ? *io_count : 1);
 	request.addon_id = addon;
 	request.addon_flavor_id = flavor;
 
@@ -2626,7 +2626,8 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 		return rv;
 	}
 
-	*io_count = reply.count;
+	if(io_count)
+		*io_count = reply.count;
 	if (reply.count > 0)
 		memcpy(out_id, reply.node_id, sizeof(media_node_id) * reply.count);
 
