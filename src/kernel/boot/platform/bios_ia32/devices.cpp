@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "bios.h"
@@ -9,6 +9,7 @@
 #include <boot/platform.h>
 #include <boot/partitions.h>
 #include <boot/stdio.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 
@@ -37,8 +38,14 @@ struct disk_address_packet {
 	uint64		flat_buffer;
 };
 
+static const uint16 kParametersSizeVersion1 = 0x1a;
+static const uint16 kParametersSizeVersion2 = 0x1e;
+static const uint16 kParametersSizeVersion3 = 0x42;
+
+static const uint16 kDevicePathSignature = 0xbedd;
+
 struct drive_parameters {
-	uint16		size;
+	uint16		parameters_size;
 	uint16		flags;
 	uint32		cylinders;
 	uint32		heads;
@@ -89,6 +96,14 @@ struct drive_parameters {
 	uint8		checksum;
 } _PACKED;
 
+struct device_table {
+	uint16	base_address;
+	uint16	control_port_address;
+	uint8	_reserved1 : 4;
+	uint8	is_slave : 1;
+	uint8	_reserved2 : 1;
+	uint8	lba_enabled : 1;
+} _PACKED;
 
 class BIOSDrive : public Node {
 	public:
@@ -104,11 +119,15 @@ class BIOSDrive : public Node {
 
 		uint32 BlockSize() const { return fBlockSize; }
 
+		bool HasParameters() const { return fHasParameters; }
+		const drive_parameters &Parameters() const { return fParameters; }
+
 	protected:
 		uint8	fDriveID;
 		bool	fLBA;
 		uint64	fSize;
 		uint32	fBlockSize;
+		bool	fHasParameters;
 		drive_parameters fParameters;
 };
 
@@ -117,7 +136,7 @@ static status_t
 get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 {
 	drive_parameters *parameter = (drive_parameters *)kDataSegmentScratch;
-	parameter->size = sizeof(drive_parameters);
+	parameter->parameters_size = sizeof(drive_parameters);
 
 	struct bios_regs regs;
 	regs.eax = BIOS_GET_EXT_DRIVE_PARAMETERS;
@@ -147,6 +166,84 @@ get_number_of_drives(uint8 *_count)
 		return B_ERROR;
 
 	*_count = regs.edx & 0xff;
+	return B_OK;
+}
+
+
+/** parse EDD 3.0 drive path information */
+
+static status_t
+fill_disk_identifier_v3(disk_identifier &disk, const drive_parameters &parameters)
+{
+	if (parameters.parameters_size < kParametersSizeVersion3
+		|| parameters.device_path_signature != kDevicePathSignature)
+		return B_BAD_TYPE;
+
+	// parse host bus
+
+	if (!strncmp(parameters.host_bus, "PCI", 3)) {
+		disk.bus_type = PCI_BUS;
+
+		disk.bus.pci.bus = parameters.interface.pci.bus;
+		disk.bus.pci.slot = parameters.interface.pci.slot;
+		disk.bus.pci.function = parameters.interface.pci.function;
+	} else if (!strncmp(parameters.host_bus, "ISA", 3)) {
+		disk.bus_type = LEGACY_BUS;
+
+		disk.bus.legacy.base_address = parameters.interface.legacy.base_address;
+	} else {
+		dprintf("unknown host bus \"%s\"\n", parameters.host_bus);
+		return B_BAD_DATA;
+	}
+
+	// parse interface
+
+	if (!strncmp(parameters.interface_type, "ATA", 3)) {
+		disk.device_type = ATA_DEVICE;
+		disk.device.ata.master = !parameters.device.ata.slave;
+	} else if (!strncmp(parameters.interface_type, "ATAPI", 3)) {
+		disk.device_type = ATAPI_DEVICE;
+		disk.device.atapi.master = !parameters.device.ata.slave;
+		disk.device.atapi.logical_unit = parameters.device.atapi.logical_unit;
+	} else if (!strncmp(parameters.interface_type, "SCSI", 3)) {
+		disk.device_type = SCSI_DEVICE;
+		disk.device.scsi.logical_unit = parameters.device.scsi.logical_unit;
+	} else if (!strncmp(parameters.interface_type, "USB", 3)) {
+		disk.device_type = USB_DEVICE;
+		disk.device.usb.tbd = parameters.device.usb.tbd;
+	} else if (!strncmp(parameters.interface_type, "1394", 3)) {
+		disk.device_type = FIREWIRE_DEVICE;
+		disk.device.firewire.guid = parameters.device.firewire.guid;
+	} else if (!strncmp(parameters.interface_type, "FIBRE", 3)) {
+		disk.device_type = FIBRE_DEVICE;
+		disk.device.fibre.wwd = parameters.device.fibre.wwd;
+	} else {
+		dprintf("unknown interface type \"%s\"\n", parameters.interface_type);
+		return B_BAD_DATA;
+	}
+
+	return B_OK;
+}
+
+
+/** EDD 2.0 drive table information */
+
+static status_t
+fill_disk_identifier_v2(disk_identifier &disk, const drive_parameters &parameters)
+{
+	if (parameters.device_table.segment == 0xffff
+		&& parameters.device_table.offset == 0xffff)
+		return B_BAD_TYPE;
+
+	device_table *table = (device_table *)LINEAR_ADDRESS(parameters.device_table.segment,
+		parameters.device_table.offset);
+
+	disk.bus_type = LEGACY_BUS;
+	disk.bus.legacy.base_address = table->base_address;
+
+	disk.device_type = ATA_DEVICE;
+	disk.device.ata.master = !table->is_slave;
+
 	return B_OK;
 }
 
@@ -202,8 +299,11 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		fBlockSize = 512;
 		fSize = 0;
 		fLBA = false;
+		fHasParameters = false;
 	} else {
-		dprintf("host bus: %4s, interface: %8s\n", fParameters.host_bus, fParameters.interface_type);
+		dprintf("size: %x\n", fParameters.parameters_size);
+		dprintf("drive_path_signature: %x\n", fParameters.device_path_signature);
+		dprintf("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus, fParameters.interface_type);
 		dprintf("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector);
@@ -212,6 +312,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
 		fLBA = true;
+		fHasParameters = true;
 	}
 }
 
@@ -366,6 +467,43 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 		dprintf("number of drives: %d\n", driveCount);
 
 	return B_OK; 
+}
+
+
+status_t 
+platform_register_boot_device(Node *device)
+{
+	disk_identifier &disk = gKernelArgs.boot_disk.identifier;
+	BIOSDrive *drive = (BIOSDrive *)device;
+
+	gKernelArgs.platform_args.boot_drive_number = gBootDriveID;
+
+	if (drive->HasParameters()) {
+		const drive_parameters &parameters = drive->Parameters();
+
+		// try all drive_parameters versions, beginning from the most informative
+
+		if (fill_disk_identifier_v3(disk, parameters) == B_OK)
+			return B_OK;
+
+		if (fill_disk_identifier_v2(disk, parameters) == B_OK)
+			return B_OK;
+
+		// no interesting information, we have to fall back to the default
+		// unknown interface/device type identifier
+	}
+
+	// ToDo: register all other BIOS drives as well!
+
+	// not yet implemented correctly!!!
+
+	dprintf("legacy drive identification\n");
+
+	disk.bus_type = UNKNOWN_BUS;
+	disk.device_type = UNKNOWN_DEVICE;
+	disk.device.unknown.size = drive->Size();
+
+	return B_OK;
 }
 
 
