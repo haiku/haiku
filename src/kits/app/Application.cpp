@@ -904,11 +904,24 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		case B_PULSE:
 			Pulse();
 			break;
-
-		// TODO: Handle these as well
-
-		case _SHOW_DRAG_HANDLES_:
+		
 		case B_APP_ACTIVATED:
+		{
+			bool active = false;
+			message->FindBool("active", &active);
+			AppActivated(active);
+			break;
+		}
+		
+		case _SHOW_DRAG_HANDLES_:
+		{
+			bool visible = false;
+			message->FindBool("visible", &visible);
+			// TODO: Call the registrar or whoever is responsible for this
+			break;
+		}
+		
+		// TODO: Handle these as well
 		// These two are handled by BTextView classes, so
 		// BApplication probably forwards these messages to them.
 		case _DISPOSE_DRAG_: 
