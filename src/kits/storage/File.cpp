@@ -7,11 +7,11 @@
 	BFile implementation.
 */
 
-#include <fsproto.h>
 
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <fs_interface.h>
 
 #include <syscalls.h>
 
@@ -429,7 +429,7 @@ BFile::SetSize(off_t size)
 		return B_BAD_VALUE;
 	struct stat statData;
 	statData.st_size = size;
-	return set_stat(statData, WSTAT_SIZE);
+	return set_stat(statData, FS_WRITE_STAT_SIZE);
 }
 
 // =
