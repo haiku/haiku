@@ -32,9 +32,9 @@
 #include <string.h>
 #include <OS.h>
 #include <Window.h>
-#include "ScrollBar.h"
+#include <ScrollBar.h>
 
-#define TEST_MODE
+//#define TEST_MODE
 
 typedef enum
 {
@@ -60,6 +60,8 @@ typedef enum
 #define ARROW4 3
 #define NOARROW -1
 
+// Because the R5 version kept a lot of data on server-side, we need to kludge our way
+// into binary compatibility
 class BScrollBarPrivateData
 {
 public:
@@ -110,6 +112,8 @@ public:
 	int8 buttondown;
 };
 
+// This thread is spawned when a button is initially pushed and repeatedly scrolls
+// the scrollbar by a little bit after a short delay
 int32 BScrollBarPrivateData::ButtonRepeaterThread(void *data)
 {
 	BScrollBar *sb=(BScrollBar *)data;
@@ -184,7 +188,7 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 		fTargetName=new char[strlen(fTarget->Name()+1)];
 		strcpy(fTargetName,target->Name());
 
-		// theoretically, we should also set the target BView's scrollbar
+		// TODO: theoretically, we should also set the target BView's scrollbar
 		// pointer here
 	}
 	else
@@ -212,7 +216,8 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 		else
 			privatedata->thumbframe.OffsetBy(B_V_SCROLL_BAR_WIDTH+1,0);
 	}
-
+	
+	
 	SetResizingMode( (direction==B_VERTICAL)?
 		B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT : 
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
@@ -229,26 +234,46 @@ BScrollBar::~BScrollBar()
 	delete privatedata;
 	if(fTargetName)
 		delete fTargetName;
+
+	// TODO: Disconnect from target
 }
 
 BArchivable *BScrollBar::Instantiate(BMessage *data)
 {
+	// TODO: Implement
 	return NULL;
 }
 
 status_t BScrollBar::Archive(BMessage *data, bool deep) const
 {
-	return B_ERROR;
+	BView::Archive(data,deep);
+	data->AddFloat("_range",fMin);
+	data->AddFloat("_range",fMax);
+	data->AddFloat("_steps",fSmallStep);
+	data->AddFloat("_steps",fLargeStep);
+	data->AddFloat("_val",fValue);
+	data->AddInt32("_orient",(int32)fOrientation);
+	data->AddInt32("_prop",fProportion);
+	
+	return B_OK;
 }
 
 void BScrollBar::AttachedToWindow()
 {
-	// if fValue!=0, BScrollbars tell the server its value
+	// R5's SB contacts the server if fValue!=0. I *think* we don't need to do anything here...
 }
 
 void BScrollBar::SetValue(float value)
 {
+	if(value>fMax)
+		value=fMax;
+	if(value<fMin)
+		value=fMin;
+	
 	fValue=value;
+	if(Window())
+		Draw(Bounds());
+	
 	ValueChanged(fValue);
 }
 
@@ -269,6 +294,37 @@ float BScrollBar::Proportion() const
 
 void BScrollBar::ValueChanged(float newValue)
 {
+	// TODO: Implement
+/*
+	From the BeBook:
+	
+Responds to a notification that the value of the scroll bar has changed to 
+newValue. For a horizontal scroll bar, this function interprets newValue 
+as the coordinate value that should be at the left side of the target 
+view's bounds rectangle. For a vertical scroll bar, it interprets 
+newValue as the coordinate value that should be at the top of the rectangle. 
+It calls ScrollTo() to scroll the target's contents into position, unless 
+they have already been scrolled. 
+
+ValueChanged() is called as the result both of user actions 
+(B_VALUE_CHANGED messages received from the Application Server) and of 
+programmatic ones. Programmatically, scrolling can be initiated by the 
+target view (calling ScrollTo()) or by the BScrollBar 
+(calling SetValue() or SetRange()). 
+
+In all these cases, the target view and the scroll bars need to be kept 
+in synch. This is done by a chain of function calls: ValueChanged() calls 
+ScrollTo(), which in turn calls SetValue(), which then calls 
+ValueChanged() again. It's up to ValueChanged() to get off this 
+merry-go-round, which it does by checking the target view's bounds 
+rectangle. If newValue already matches the left or top side of the 
+bounds rectangle, if forgoes calling ScrollTo(). 
+
+ValueChanged() does nothing if a target BView hasn't been set—or 
+if the target has been set by name, but the name doesn't correspond to 
+an actual BView within the scroll bar's window. 
+
+*/
 }
 
 void BScrollBar::SetRange(float min, float max)
@@ -297,11 +353,15 @@ void BScrollBar::GetRange(float *min, float *max) const
 
 void BScrollBar::SetSteps(float smallStep, float largeStep)
 {
-	// Under R5, steps can be set only after being attached to a window
-	// We'll just remove that limitation... :P
+	// Under R5, steps can be set only after being attached to a window, probably because
+	// the data is kept server-side. We'll just remove that limitation... :P
 	
-	fSmallStep=smallStep;
-	fLargeStep=largeStep;
+	// The BeBook also says that we need to specify an integer value even though the step
+	// values are floats. For the moment, we'll just make sure that they are integers
+	fSmallStep=(int32)smallStep;
+	fLargeStep=(int32)largeStep;
+
+	// TODO: test use of fractional values and make them work properly if they don't
 }
 
 void BScrollBar::GetSteps(float *smallStep, float *largeStep) const
@@ -320,7 +380,7 @@ void BScrollBar::SetTarget(BView *target)
 		fTargetName=new char[strlen(target->Name())+1];
 		strcpy(fTargetName,target->Name());
 		
-		// theoretically, we should also set the target BView's scrollbar
+		// TODO: theoretically, we should also set the target BView's scrollbar
 		// pointer here
 	}
 	else
@@ -329,6 +389,15 @@ void BScrollBar::SetTarget(BView *target)
 
 void BScrollBar::SetTarget(const char *targetName)
 {
+	if(!targetName)
+		return;
+	
+	if(!Window())
+		debugger("Method requires window and doesn't have one");
+	
+	BView *tgt=Window()->FindView(targetName);
+	if(tgt)
+		SetTarget(tgt);
 }
 
 BView *BScrollBar::Target() const
