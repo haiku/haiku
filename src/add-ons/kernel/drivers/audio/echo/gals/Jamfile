@@ -5,7 +5,7 @@ SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic DSP ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
-UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 
 # set some additional defines
 {
