@@ -217,7 +217,7 @@ uint32 MarginView::GetUnits(void) {
 void MarginView::UpdateView(uint32 msg)
 {
 	Window()->Lock();
-	CalculateViewSize(msg);
+	CalculateViewSize(msg);								// nur Preview in Margins BBox!
 	Invalidate();
 	Window()->Unlock();
 }
@@ -371,54 +371,69 @@ void MarginView::ConstructGUI()
 			Y_OFFSET, Frame().Width() - X_OFFSET, _WIDTH);
 	
 	// top	
-	msg = new BMessage(TOP_MARGIN_CHANGED);
 	str << fMargins.top/fUnitValue;
-	fTop = new BTextControl( r, "top", "Top", str.String(), msg,
+	fTop = new BTextControl( r, "top", "Top", str.String(), NULL,
 				B_FOLLOW_RIGHT);
+	
+	fTop->SetModificationMessage(new BMessage(TOP_MARGIN_CHANGED));
 	fTop->SetDivider(be_plain_font->StringWidth("Top#"));
 	fTop->SetTarget(this);
 	AllowOnlyNumbers(fTop, NUM_COUNT);
 	AddChild(fTop);
+
+
+
 	
 	//left
 	r.OffsetBy(0, Y_OFFSET);
 	r.left = Frame().Width() - be_plain_font->StringWidth("Left#") - _WIDTH;
     str = "";	
 	str << fMargins.left/fUnitValue;
-	msg = new BMessage(LEFT_MARGIN_CHANGED);
-	fLeft = new BTextControl( r, "left", "Left", str.String(), msg,
+	fLeft = new BTextControl( r, "left", "Left", str.String(), NULL,
 				B_FOLLOW_RIGHT);	
+
+	fLeft->SetModificationMessage(new BMessage(LEFT_MARGIN_CHANGED));
 	fLeft->SetDivider(be_plain_font->StringWidth("Left#"));
 	fLeft->SetTarget(this);
 	AllowOnlyNumbers(fLeft, NUM_COUNT);
 	AddChild(fLeft);
+	
+	
+	
 	
 	//bottom
 	r.OffsetBy(0, Y_OFFSET);
 	r.left = Frame().Width() - be_plain_font->StringWidth("Bottom#") - _WIDTH;
     str = "";	
 	str << fMargins.bottom/fUnitValue;
-	msg = new BMessage(BOTTOM_MARGIN_CHANGED);
-	fBottom = new BTextControl( r, "bottom", "Bottom", str.String(), msg,
+	fBottom = new BTextControl( r, "bottom", "Bottom", str.String(), NULL,
 				B_FOLLOW_RIGHT);
+	
+	fBottom->SetModificationMessage(new BMessage(BOTTOM_MARGIN_CHANGED));
 	fBottom->SetDivider(be_plain_font->StringWidth("Bottom#"));
 	fBottom->SetTarget(this);
 	
 	AllowOnlyNumbers(fBottom, NUM_COUNT);
 	AddChild(fBottom);
 	
+	
+	
+	
 	//right
 	r.OffsetBy(0, Y_OFFSET);
 	r.left = Frame().Width() - be_plain_font->StringWidth("Right#") - _WIDTH;
     str = "";	
 	str << fMargins.right/fUnitValue;
-	msg = new BMessage(RIGHT_MARGIN_CHANGED);
-	fRight = new BTextControl( r, "right", "Right", str.String(), msg,
+	fRight = new BTextControl( r, "right", "Right", str.String(), NULL,
 				B_FOLLOW_RIGHT);
+	
+	fRight->SetModificationMessage(new BMessage(RIGHT_MARGIN_CHANGED));
 	fRight->SetDivider(be_plain_font->StringWidth("Right#"));
 	fRight->SetTarget(this);
 	AllowOnlyNumbers(fRight, NUM_COUNT);
 	AddChild(fRight);
+
+
 
 // Create Units popup
 	r.OffsetBy(-X_OFFSET,Y_OFFSET);
