@@ -3,10 +3,11 @@ SubDir OBOS_TOP src kernel core fs ;
 UsePublicHeaders storage ;
 
 KernelStaticLibrary libfs : 
-	<$(SOURCE_GRIST)>bootfs.c 
-	<$(SOURCE_GRIST)>devfs.c 
-	<$(SOURCE_GRIST)>rootfs.c 
-	<$(SOURCE_GRIST)>vfs.c 
+	<$(SOURCE_GRIST)>bootfs.c
+	<$(SOURCE_GRIST)>devfs.c
+	<$(SOURCE_GRIST)>rootfs.c
+	<$(SOURCE_GRIST)>vfs.c
+	<$(SOURCE_GRIST)>vfs_select.c
 	:
 	-fno-pic -Wno-unused -D_KERNEL_
 	;

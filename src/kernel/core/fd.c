@@ -240,7 +240,7 @@ select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("select_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
+	TRACE(("select_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
 
 	descriptor = get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
@@ -251,7 +251,7 @@ select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel
 	} else {
 		// if the I/O subsystem doesn't support select(), we will
 		// immediately notify the select call
-		status = notify_select_event((void *)sync, ref);
+		status = notify_select_event((void *)sync, ref, event);
 	}
 
 	put_fd(descriptor);
@@ -265,7 +265,7 @@ deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel)
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("deselect_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
+	TRACE(("deselect_fd(fd = %d, event = %u, selectsync = %p)\n", fd, event, sync));
 
 	descriptor = get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
@@ -405,7 +405,7 @@ user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 
 	CHECK_USER_ADDR(buffer)
 
-	PRINT(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %d)\n", fd, buffer, bufferSize, maxCount));
+	PRINT(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -635,7 +635,7 @@ sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	PRINT(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %u)\n",fd, buffer, bufferSize, maxCount));
+	PRINT(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n",fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)

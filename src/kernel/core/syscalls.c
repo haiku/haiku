@@ -145,6 +145,12 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_ACCESS:
 			*call_ret = user_access((const char *)arg0, (int)arg1);
 			break;
+		case SYSCALL_SELECT:
+			*call_ret = user_select((int)arg0, (fd_set *)arg1, (fd_set *)arg2, (fd_set *)arg3, (bigtime_t)INT32TOINT64(arg4, arg5), (sigset_t *)arg6);
+			break;
+		case SYSCALL_POLL:
+			*call_ret = user_poll((struct pollfd *)arg0, (int)arg1, (bigtime_t)INT32TOINT64(arg2, arg3));
+			break;
 		case SYSCALL_OPEN_ATTR_DIR:
 			*call_ret = user_open_attr_dir((int)arg0, (const char *)arg1);
 			break;

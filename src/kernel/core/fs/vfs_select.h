@@ -6,6 +6,7 @@
 #define VFS_SELECT_H
 
 typedef struct select_info {
+	uint16	selected_events;
 	uint16	events;
 } select_info;
 
@@ -30,9 +31,5 @@ enum select_events {
 };
 
 #define SELECT_FLAG(type) (1L << (type - 1))
-#define MAKE_SELECT_REF(index, type) ((SELECT_FLAG(type) << 16L) | ((index) & 0xffffUL))
-
-#define INDEX_FROM_REF(ref) ((ref) & 0xffffUL)
-#define SELECT_FLAG_FROM_REF(ref) ((ref) >> 16L)
 
 #endif	/* VFS_SELECT_H */
