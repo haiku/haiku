@@ -15,6 +15,7 @@ INTERFACE_KIT_SOURCE =
 	Polygon.cpp
 	RadioButton.cpp
 	Rect.cpp
+	Region.cpp
 	ScrollBar.cpp
 	StatusBar.cpp
 	StringView.cpp
