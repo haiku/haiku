@@ -68,7 +68,13 @@ class Painter {
 
 			void				StrokeLine(		BPoint b,
 												const pattern& p = B_SOLID_HIGH);
-			
+
+			// return true if the line was either vertical or horizontal
+			// draws a solid one pixel wide line of color c, no blending
+			bool				StraightLine(	BPoint a,
+												BPoint b,
+												const rgb_color& c) const;
+
 								// triangles
 			void				StrokeTriangle(	BPoint pt1,
 												BPoint pt2,
@@ -110,8 +116,16 @@ class Painter {
 			void				StrokeRect(		const BRect& r,
 												const pattern& p = B_SOLID_HIGH) const;
 
+			// strokes a one pixel wide solid rect, no blending
+			void				StrokeRect(		const BRect& r,
+												const rgb_color& c) const;
+
 			void				FillRect(		const BRect& r,
 												const pattern& p = B_SOLID_HIGH) const;
+
+			// fills a solid rect with color c, no blending
+			void				FillRect(		const BRect& r,
+												const rgb_color& c) const;
 
 								// round rects
 			void				StrokeRoundRect(const BRect& r,
