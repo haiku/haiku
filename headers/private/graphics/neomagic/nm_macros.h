@@ -297,7 +297,5 @@
 #define PCISEQR(A)  (NM_2REG8(NM2PCI8_SEQIND) = (NMSEQX_##A), NM_2REG8(NM2PCI8_SEQDAT))
 
 /* read and write from ISA ATTRIBUTE indexed registers */
-/* define DUMMY to prevent compiler warnings */
-#define static uint8 DUMMY;
-#define ISAATBW(A,B)(DUMMY = ISARB(INSTAT1), ISAWB(ATTRINDW, ((NMATBX_##A) | 0x20)), ISAWB(ATTRDATW, (B)))
-#define ISAATBR(A)  (DUMMY = ISARB(INSTAT1), ISAWB(ATTRINDW, ((NMATBX_##A) | 0x20)), ISARB(ATTRDATR))
+#define ISAATBW(A,B)((void)ISARB(INSTAT1), ISAWB(ATTRINDW, ((NMATBX_##A) | 0x20)), ISAWB(ATTRDATW, (B)))
+#define ISAATBR(A)  ((void)ISARB(INSTAT1), ISAWB(ATTRINDW, ((NMATBX_##A) | 0x20)), ISARB(ATTRDATR))
