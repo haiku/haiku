@@ -105,7 +105,7 @@ oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 #endif
 	}
 	if (ogg_stream_pagein(fStreams[serialno],page) != 0) {
-		TRACE("oggReader::Sniff: ogg_stream_pagein: failed: error\n");
+		TRACE("oggReader::GetPage: ogg_stream_pagein: failed: error\n");
 		return B_ERROR;
 	}
 	return B_OK;
