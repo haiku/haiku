@@ -42,8 +42,9 @@
 #include <View.h>
 #include <Window.h>
 
-#define PULSE_RATE 50000
-#define PULSE_MODULO 20
+// timer should be handled better (with system_time())
+#define PULSE_RATE 100000
+#define PULSE_MODULO 10
 
 //from bdb-ing /bin/shutdown:
 #define B_SYSTEM_SHUTDOWN 0x12d
@@ -271,7 +272,8 @@ SView::Draw(BRect updateRect)
 	BRect bounds = Bounds();
 
 	// left margin background
-	SetHighColor(tint_color(ViewColor(), B_HIGHLIGHT_BACKGROUND_TINT));
+//	SetHighColor(tint_color(ViewColor(), B_HIGHLIGHT_BACKGROUND_TINT));
+	SetHighColor(0xB8, 0xB8, 0xB8); // same color as the registrar shutdown dialog
 	FillRect(BRect(0, 0, B_LARGE_ICON, bounds.bottom));
 	
 	if(fIcon != NULL)
