@@ -12,6 +12,7 @@ APP_KIT_SOURCE =
 	Messenger.cpp
 	PropertyInfo.cpp
 	RegistrarDefs.cpp
+	RegistrarThread.cpp
 	Roster.cpp
 	TokenSpace.cpp
 ;
