@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "DataView.h"
@@ -544,7 +544,7 @@ DataView::DrawSelectionFrame(view_focus which)
 
 
 void
-DataView::DrawSelectionBlock(view_focus which)
+DataView::DrawSelectionBlock(view_focus which, int32 blockStart, int32 blockEnd)
 {
 	if (fFileSize == 0)
 		return;
@@ -553,10 +553,10 @@ DataView::DrawSelectionBlock(view_focus which)
 
 	SetDrawingMode(B_OP_INVERT);
 
-	int32 start = fStart % kBlockSize;
-	int32 first = (fStart / kBlockSize) * kBlockSize;
+	int32 start = blockStart % kBlockSize;
+	int32 first = (blockStart / kBlockSize) * kBlockSize;
 
-	int32 end = fEnd;
+	int32 end = blockEnd;
 	if (end > first + (int32)kBlockSize - 1)
 		end = first + kBlockSize - 1;
 
@@ -565,8 +565,8 @@ DataView::DrawSelectionBlock(view_focus which)
 
 	// draw block (and last line) if necessary
 
-	end = fEnd % kBlockSize;
-	int32 last = (fEnd / kBlockSize) * kBlockSize;
+	end = blockEnd % kBlockSize;
+	int32 last = (blockEnd / kBlockSize) * kBlockSize;
 
 	if (last >= first) {
 		if (end == kBlockSize - 1)
@@ -583,10 +583,18 @@ DataView::DrawSelectionBlock(view_focus which)
 
 
 void
-DataView::DrawSelection()
+DataView::DrawSelectionBlock(view_focus which)
+{
+	DrawSelectionBlock(which, fStart, fEnd);
+}
+
+
+void
+DataView::DrawSelection(bool frameOnly)
 {
 	if (IsFocus() && fIsActive) {
-		DrawSelectionBlock(fFocus);
+		if (!frameOnly)
+			DrawSelectionBlock(fFocus);
 		DrawSelectionFrame(fFocus == kHexFocus ? kAsciiFocus : kHexFocus);
 	} else {
 		DrawSelectionFrame(kHexFocus);
@@ -633,18 +641,39 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 	update.AddInt64("end", end);
 	SendNotices(kDataViewSelection, &update);
 
-	// remove old selection
-	// ToDo: this could be drastically improved if only the changed
-	//	parts are drawn! Of course, this would only work for the
-	//	selection block, not the frame.
-	DrawSelection();
+	// Update selection - first, we need to remove the old selection, then
+	// we redraw the selection with the current values.
+
+	DrawSelection(focus == kNoFocus);
+		// From the block selection, only the parts that need updating are
+		// actually updated, if there is no focus change.
+
+	if (IsFocus() && fIsActive && focus == kNoFocus) {
+		// Update the selection block incrementally
+
+		if (start > fStart) {
+			// remove from the top
+			DrawSelectionBlock(fFocus, fStart, start - 1);
+		} else if (start < fStart) {
+			// add to the top
+			DrawSelectionBlock(fFocus, start, fStart - 1);
+		}
+
+		if (end < fEnd) {
+			// remove from bottom
+			DrawSelectionBlock(fFocus, end + 1, fEnd);
+		} else if (end > fEnd) {
+			// add to the bottom
+			DrawSelectionBlock(fFocus, fEnd + 1, end);
+		}
+	}
 
 	if (focus != kNoFocus)
 		fFocus = focus;
 	fStart = start;
 	fEnd = end;
 
-	DrawSelection();
+	DrawSelection(focus == kNoFocus);
 
 	fBitPosition = 0;
 }

@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef DATA_VIEW_H
 #define DATA_VIEW_H
 
@@ -68,8 +68,9 @@ class DataView : public BView {
 		int32 PositionAt(view_focus focus, BPoint point, view_focus *_newFocus = NULL);
 
 		void DrawSelectionFrame(view_focus which);
+		void DrawSelectionBlock(view_focus which, int32 start, int32 end);
 		void DrawSelectionBlock(view_focus which);
-		void DrawSelection();
+		void DrawSelection(bool frameOnly = false);
 		void SetActive(bool active);
 		void SetFocus(view_focus which);
 
