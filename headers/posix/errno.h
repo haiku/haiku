@@ -13,14 +13,7 @@ extern "C"
 {
 #endif  
 
-/* XXX - this really belongs in limits.h, but as we don't have one
- * yet it's here so we can build.
- * XXX - move me!
- */
-/* Minimum's */
-#ifndef LONG_MIN
-#define LONG_MIN          (-2147483647L-1)
-#endif
+#include <limits.h>
 
 /* XXX - Fix this once TLS works */
 extern int errno;
@@ -32,7 +25,7 @@ extern int errno;
 
 /* The basic error codes that don't have a B_ equivalent
  *
- * NB when adding codes make sure that the Be Errors.h didn't
+ * NB when adding codes make sure that support/Errors.h didn't
  *    define a value or it needs to go in the bottom section and
  *    have an identical value assigned.
  * NB new values just go on the bottom.
@@ -99,7 +92,8 @@ enum {
 	EPROTO,
 	EPROTOOPT,
 	ETIME,
-	EFTYPE
+	EFTYPE,              /* +60 */
+	ETOOMANYREFS
 };
 
 /*
@@ -140,6 +134,7 @@ enum {
 	EPIPE
 };
 
+/* An odd ball! */
 #define ENOEXEC   LONG_MIN + 0x1302
 
 #ifdef __cplusplus
