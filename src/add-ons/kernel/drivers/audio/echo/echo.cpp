@@ -120,6 +120,8 @@ echo_mem_free(echo_dev *card, void *ptr)
 
 /*	Echo stream functions */
 
+extern char *      pStatusStrs[ECHOSTATUS_LAST];
+
 status_t
 echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
      uint8 b16, uint32 sample_rate)
@@ -129,18 +131,29 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	ECHOGALS_OPENAUDIOPARAMETERS	open_params;
 	ECHOGALS_CLOSEAUDIOPARAMETERS  close_params;
 	ECHOGALS_AUDIOFORMAT			format_params;
+	ECHOSTATUS status;
 	
 	LOG(("echo_stream_set_audioparms\n"));
 	
 	close_params.wPipeIndex = stream->pipe;	
-	stream->card->pEG->CloseAudio(&close_params);
+	status = stream->card->pEG->CloseAudio(&close_params);
+	if(status!=ECHOSTATUS_OK) {
+		PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
+		return B_ERROR;
+	}
 	
 	open_params.bIsCyclic = TRUE;
 	open_params.Pipe.nPipe = 0;
 	open_params.Pipe.bIsInput = stream->use == ECHO_USE_RECORD ? TRUE : FALSE;
 	open_params.Pipe.wInterleave = stream->channels;
 	
-	stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
+	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
+	if(status!=ECHOSTATUS_OK) {
+		PRINT(("echo_stream_set_audioparms : OpenAudio failed\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
+		return B_ERROR;
+	}
 	
 	if ((stream->channels == channels) &&
 		(stream->b16 == b16) && 
@@ -152,25 +165,33 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	format_params.byMonoToStereo = 0;
 	format_params.wDataInterleave = channels == 1 ? 1 : 2;
 
-	if(stream->card->pEG->QueryAudioFormat(stream->pipe, &format_params)!=ECHOSTATUS_OK) {
+	status = stream->card->pEG->QueryAudioFormat(stream->pipe, &format_params);
+	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when querying\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
 	/* XXXX : setting sample rate is global in this driver */
-	if(stream->card->pEG->QueryAudioSampleRate(sample_rate)!=ECHOSTATUS_OK) {
+	status = stream->card->pEG->QueryAudioSampleRate(sample_rate);
+	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad sample rate when querying\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 		
-	if(stream->card->pEG->SetAudioFormat(stream->pipe, &format_params)!=ECHOSTATUS_OK) {
+	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
+	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
 	/* XXXX : setting sample rate is global in this driver */
-	if(stream->card->pEG->SetAudioSampleRate(sample_rate)!=ECHOSTATUS_OK) {
+	status = stream->card->pEG->SetAudioSampleRate(sample_rate);
+	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad sample rate when setting\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
