@@ -33,3 +33,8 @@ LinkSharedOSLibs
 	translation
 	libprint.a
 	;
+
+Package haiku-printingkit-cvs :
+	print_server :
+#	boot beos system servers ;
+	boot home Desktop haiku-printingkit ;

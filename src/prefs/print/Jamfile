@@ -21,3 +21,8 @@ LinkSharedOSLibs
 	translation 
 	libprint.a 
 	;
+
+Package haiku-printingkit-cvs :
+	Printers :
+#	boot beos preferences ;
+	boot home Desktop haiku-printingkit ;
