@@ -45,7 +45,7 @@ ObjectsDefines
 	#	SubDirC++Flags -include /usr/include/stdio.h ;
 	} else {
 	#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
-		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fno-builtins -fcheck-memory-usage -D_NO_INLINE_ASM ;
+		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 ;
 	}
 }
 
@@ -76,14 +76,20 @@ SimpleTest BootLoaderTest :
 	Stream.cpp
 	BPlusTree.cpp
 
+	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
 	list.c
+	strlcpy.c
 	:
 	: -fno-builtin
 	;
 
 # Tell Jam where to find the utility sources
+
 SEARCH on [ FGristFiles list.c ]
 	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
+SEARCH on [ FGristFiles strlcpy.c ]
+	= [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 
 SEARCH on [ FGristFiles 
 		main.cpp vfs.cpp partitions.cpp
