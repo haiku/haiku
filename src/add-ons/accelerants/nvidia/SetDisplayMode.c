@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-1/2005
+	Rudolf Cornelissen 11/2002-2/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -332,8 +332,25 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	si->mem_high = si->ps.memory_size - 1;
 	/* don't touch the DMA acceleration engine command buffer if it exists */
 	/* note:
-	 * the buffer is 32kB in size. Keep a distance of another 32kB for safety. */
-	if (si->settings.dma_acc) si->mem_high -= (64 * 1024);
+	 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
+	if (si->settings.dma_acc)
+	{
+		if (si->ps.card_arch < NV40A)
+		{
+			/* keeping 32kB distance from the DMA buffer */
+			si->mem_high -= (64 * 1024);
+		}
+		else
+		{
+			/* 416kB distance is just OK: keeping another 64kB distance for safety;
+			 * confirmed for NV43. */
+			/* note:
+			 * if you get too close to the DMA command buffer on NV40 and NV43 at
+			 * least (both confirmed), the source DMA instance will mess-up for
+			 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
+			si->mem_high -= (512 * 1024);
+		}
+	}
 	si->mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
