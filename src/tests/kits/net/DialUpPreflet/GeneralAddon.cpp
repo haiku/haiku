@@ -458,7 +458,7 @@ GeneralView::Reload()
 {
 	fDeviceAddon = NULL;
 	
-	BMenuItem *item;
+	BMenuItem *item = NULL;
 	for(int32 index = 0; index < fDeviceField->Menu()->CountItems(); index++) {
 		item = fDeviceField->Menu()->ItemAt(index);
 		if(item && item->Message() && item->Message()->FindPointer("Addon",
