@@ -35,23 +35,6 @@ const struct screen_id _B_MAIN_SCREEN_ID = {0};
 template<class T> void compare(T a, T b);
 
 
-/*
-template<>
-void
-compare<uint16>(const char *prefix, uint16 value)
-{
-	printf("%s: uint16: %x\n", prefix, value);
-}
-
-
-template<>
-void
-compare<uint32>(const char *prefix, uint32 value)
-{
-	printf("%s: uint32: %lx\n", prefix, value);
-}
-*/
-
 template<>
 void
 compare<pattern>(const pattern &a, const pattern &b)
@@ -87,7 +70,7 @@ class ConstantsTest : public BTestCase {
 		static Test *suite(void);
 		void test(void);
 };
-	
+
 
 ConstantsTest::ConstantsTest(std::string name)
 	: BTestCase(name)
