@@ -414,68 +414,65 @@ mode_bits_to_str(int mode, char *str)
 static void
 do_dir(int argc, char **argv)
 {
-    int               dirfd, err, max_err = 10;
-    char              dirname[128], buff[512], time_buf[64] = { '\0', };
-    size_t            len,count = 0;
-    struct my_dirent *dent;
-    struct my_stat    st;
-    struct tm        *tm;
-    char              mode_str[16];
-    
-    dent = (struct my_dirent *)buff;
-    strcpy(dirname, "/myfs/");
-    if (argc > 1)
-        strcat(dirname, &argv[1][0]);
+	int dirfd, err, max_err = 10;
+	char dirname[128], buff[512], time_buf[64] = { '\0', };
+	size_t len, count = 0;
+	struct my_dirent *dent;
+	struct my_stat st;
+	struct tm *tm;
+	char mode_str[16];
 
-    if ((dirfd = sys_opendir(1, -1, dirname, 0)) < 0) {
-        printf("dir: error opening: %s\n", dirname);
-        return;
-    }
+	dent = (struct my_dirent *)buff;
+	strcpy(dirname, "/myfs/");
+	if (argc > 1)
+		strcat(dirname, &argv[1][0]);
 
-    printf("Directory listing for: %s\n", dirname);
-    printf("      inode#  mode bits     uid    gid        size    "
-           "Date      Name\n");
-                  
-    while (1) {
-        len = 1;
-        err = sys_readdir(1, dirfd, dent, sizeof(buff), len);
-        if (err < 0) {
-            printf("readdir failed for: %s\n", dent->d_name);
-            if (max_err-- <= 0)
-                break;
-            
-            continue;
-        }
-        
-        if (err == 0)
-            break;
+	if ((dirfd = sys_opendir(1, -1, dirname, 0)) < 0) {
+		printf("dir: error opening: %s\n", dirname);
+		return;
+	}
 
+	printf("Directory listing for: %s\n", dirname);
+	printf("      inode#  mode bits     uid    gid        size    "
+		"Date      Name\n");
 
-        err = sys_rstat(1, dirfd, dent->d_name, &st, 1);
-        if (err != 0) {
-            printf("stat failed for: %s (%Ld)\n", dent->d_name, dent->d_ino);
-            if (max_err-- <= 0)
-                break;
-            
-            continue;
-        }
+	while (1) {
+		len = 1;
+		err = sys_readdir(1, dirfd, dent, sizeof(buff), len);
+		if (err < 0) {
+			printf("readdir failed for: %s\n", dent->d_name);
+			if (max_err-- <= 0)
+				break;
+			
+			continue;
+		}
 
-        tm = localtime(&st.st_mtime);
-        strftime(time_buf, sizeof(time_buf), "%b %d %I:%M", tm);
+		if (err == 0)
+			break;
 
-        mode_bits_to_str(st.st_mode, mode_str);
+		err = sys_rstat(1, dirfd, dent->d_name, &st, 1);
+		if (err != 0) {
+			// may happen for unresolvable links
+			printf("stat failed for: %s (%Ld)\n", dent->d_name, dent->d_ino);
+			continue;
+		}
 
-        printf("%12Ld %s %6d %6d %12Ld %s %s\n", st.st_ino, mode_str,
-               st.st_uid, st.st_gid, st.st_size, time_buf, dent->d_name);
+		tm = localtime(&st.st_mtime);
+		strftime(time_buf, sizeof(time_buf), "%b %d %I:%M", tm);
+
+		mode_bits_to_str(st.st_mode, mode_str);
+
+		printf("%12Ld %s %6d %6d %12Ld %s %s\n", st.st_ino, mode_str,
+			st.st_uid, st.st_gid, st.st_size, time_buf, dent->d_name);
 		count++;
-    }
+	}
 
-    if (err != 0) {
-        printf("readdir failed on: %s\n", dent->d_name);
-    }
-    printf("%ld files in directory!\n",count);
+	if (err != 0)
+		printf("readdir failed on: %s\n", dent->d_name);
 
-    sys_closedir(1, dirfd);
+	printf("%ld files in directory!\n",count);
+
+	sys_closedir(1, dirfd);
 }
 
 
