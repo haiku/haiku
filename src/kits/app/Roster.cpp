@@ -1740,7 +1740,8 @@ DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error)
 	is notified, that it is active now, and all watchers are notified, too.
 
 	\param team The app's team ID.
-	\return \c true, if everything went fine, \c false, if an error occured.
+	\return \c true, if everything went fine, \c false, if an error occured
+			(the team ID is unknown or an communication error occured).
 */
 bool
 BRoster::UpdateActiveApp(team_id team) const
