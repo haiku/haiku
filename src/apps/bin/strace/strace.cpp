@@ -290,37 +290,6 @@ init_syscalls()
 // print_syscall
 static
 void
-print_syscall(debug_pre_syscall &message, MemoryReader &memoryReader,
-	bool printArguments, bool getContents, bool printReturnValue,
-	bool colorize)
-{
-	int32 syscallNumber = message.syscall;
-	Syscall *syscall = sSyscallVector[syscallNumber];
-
-	// print syscall name
-	printf("[%6ld] %s(", message.thread, syscall->Name().c_str());
-
-	// print arguments
-	if (printArguments) {
-		int32 count = syscall->CountParameters();
-		for (int32 i = 0; i < count; i++) {
-			// get the value
-			Parameter *parameter = syscall->ParameterAt(i);
-			TypeHandler *handler = parameter->Handler();
-			string value = handler->GetParameterValue(
-				(char*)message.args + parameter->Offset(), getContents,
-				memoryReader);
-
-			printf((i > 0 ? ", %s" : "%s"), value.c_str());
-		}
-	}
-
-	printf(") pre\n");
-}
-
-// print_syscall
-static
-void
 print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 	bool printArguments, bool getContents, bool printReturnValue,
 	bool colorize)
@@ -330,10 +299,10 @@ print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 
 	// print syscall name
 	if (colorize) {
-		printf("[%6ld] %s%s%s(", message.thread, kTerminalTextRed,
+		printf("[%6ld] %s%s%s(", message.origin.thread, kTerminalTextRed,
 			syscall->Name().c_str(), kTerminalTextNormal);
 	} else {
-		printf("[%6ld] %s(", message.thread, syscall->Name().c_str());
+		printf("[%6ld] %s(", message.origin.thread, syscall->Name().c_str());
 	}
 
 	// print arguments
@@ -523,37 +492,32 @@ main(int argc, const char *const *argv)
 
 		thread_id concernedThread = -1;
 		switch (code) {
-			case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
-				concernedThread = message.thread_stopped.thread;
-printf("B_DEBUGGER_MESSAGE_THREAD_STOPPED: thread: %ld\n", concernedThread);
-				break;
-			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
-			{
-				concernedThread = message.pre_syscall.thread;
-//printf("B_DEBUGGER_MESSAGE_PRE_SYSCALL: thread: %ld\n", concernedThread);
-print_syscall(message.pre_syscall, memoryReader,
-	printArguments, !fastMode, printReturnValues, colorize);
-
-				break;
-			}
-			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
-				concernedThread = message.signal_received.thread;
-printf("B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED: thread: %ld\n", concernedThread);
-				break;
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
-				concernedThread = message.post_syscall.thread;
+				concernedThread = message.origin.thread;
 				print_syscall(message.post_syscall, memoryReader,
 					printArguments, !fastMode, printReturnValues, colorize);
 
 				break;
 			}
+
+			case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
+			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
+			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
+			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
+			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
+				concernedThread = message.origin.thread;
+				break;
+
+			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
+				// nothing to do: a thread was deleted
+				break;
+
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-			{
-				printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n",
-					message.team_deleted.team);
+				// the debugged team is gone
 				exit(0);
-			}
 		}
 
 		// tell the thread to continue
