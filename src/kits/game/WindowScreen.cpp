@@ -370,6 +370,7 @@ BWindowScreen::Disconnect()
 	}
 }
 
+
 void
 BWindowScreen::WindowActivated(bool active)
 {
@@ -377,6 +378,7 @@ BWindowScreen::WindowActivated(bool active)
 	if(active && lock_state == 0 && work_state)
 		SetActiveState(1);
 }
+
 
 void
 BWindowScreen::WorkspaceActivated(int32 ws,
@@ -486,11 +488,7 @@ BWindowScreen::SetSpace(uint32 space)
 bool
 BWindowScreen::CanControlFrameBuffer()
 {
-	bool retval = false;
-	if (addon_state <= 1 && (card_info.flags & B_FRAME_BUFFER_CONTROL))
-		retval = true;
-	
-	return retval;
+	return (addon_state <= 1 && (card_info.flags & B_FRAME_BUFFER_CONTROL));
 }
 
 
@@ -506,6 +504,7 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 	display_mode mode = highMode;
 
 	// equivalent to BScreen::ProposeMode()
+	// TODO: So why don't we just use it instead?
 	_BAppServerLink_ link;	
 	link.fSession->swrite_l(WS_DISPLAY_UTILS);
 	link.fSession->swrite_l(screen_index);
@@ -678,35 +677,17 @@ BWindowScreen::Suspend(char *label)
 
 
 status_t
-BWindowScreen::Perform(perform_code d,
-					   void *arg)
+BWindowScreen::Perform(perform_code d, void *arg)
 {
 	return inherited::Perform(d, arg);
 }
 
 
-void
-BWindowScreen::_ReservedWindowScreen1()
-{
-}
-
-
-void
-BWindowScreen::_ReservedWindowScreen2()
-{
-}
-
-
-void
-BWindowScreen::_ReservedWindowScreen3()
-{
-}
-
-
-void
-BWindowScreen::_ReservedWindowScreen4()
-{
-}
+// Reserved for future binary compatibility
+void BWindowScreen::_ReservedWindowScreen1() {}
+void BWindowScreen::_ReservedWindowScreen2() {}
+void BWindowScreen::_ReservedWindowScreen3() {}
+void BWindowScreen::_ReservedWindowScreen4() {}
 
 
 /* unimplemented for protection of the user:
@@ -785,8 +766,7 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	GetCardInfo();
 	activate_sem = create_sem(0, "WindowScreen start lock");
 	activate_state = 0;
-	
-	
+		
 	return B_OK;
 }
 
@@ -1034,6 +1014,8 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 status_t
 BWindowScreen::InitClone()
 {
+	// TODO: Using BScreen::GetDeviceInfo() could do the job, I think,
+	// but it always returns B_ERROR on my system (Rudolf's Nvidia driver)
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_ACCELERANT_NAME);
 	link.fSession->swrite_l(screen_index);
@@ -1071,7 +1053,7 @@ BWindowScreen::InitClone()
 	
 	free(addonName);
 	
-	if(addon_image < 0)
+	if (addon_image < 0)
 		return B_ERROR;
 	
 	// now get the symbol for GetAccelerantHook m_gah
@@ -1104,6 +1086,7 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	status_t result;
 	_BAppServerLink_ link;
 	
+	// TODO: Why not BScreen::SetMode() ?
 	link.fSession->swrite_l(WS_GET_DISPLAY_MODE); // check display_mode valid command
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite(sizeof(display_mode), (void *)dmode);
