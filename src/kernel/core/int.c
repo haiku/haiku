@@ -31,7 +31,6 @@ struct io_vector {
 
 static struct io_vector *io_vectors = NULL;
 
-
 cpu_status
 disable_interrupts()
 {
@@ -58,11 +57,17 @@ int_init(kernel_args *ka)
 int
 int_init2(kernel_args *ka)
 {
+	int i;
+	
 	io_vectors = (struct io_vector *)malloc(sizeof(struct io_vector) * NUM_IO_VECTORS);
 	if (io_vectors == NULL)
 		panic("int_init2: could not create io vector table!\n");
 
-	memset(io_vectors, 0, sizeof(struct io_vector) * NUM_IO_VECTORS);
+	/* initialize the vector list */
+	for (i = 0; i < NUM_IO_VECTORS; i++) {
+		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
+		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
+	}
 
 	return arch_int_init2(ka);
 }
@@ -99,10 +104,6 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	 * and then insert the handler */
 	state = disable_interrupts();
 	acquire_spinlock(&io_vectors[vector].vector_lock);
-
-	/* The list must be inited before the first item is inserted */
-	if (io_vectors[vector].handler_list.next == NULL)
-		initque(&io_vectors[vector].handler_list);
 
 	insque(io, &io_vectors[vector].handler_list);
 
@@ -215,9 +216,8 @@ int_io_interrupt_handler(int vector)
 
 	acquire_spinlock(&io_vectors[vector].vector_lock);
 
-	// The list can be empty, or not initialized at this place
-	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list
-		|| io_vectors[vector].handler_list.next == NULL) {
+	// The list can be empty at this place
+	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list) {
 		dprintf("unhandled io interrupt %d\n", vector);
 		release_spinlock(&io_vectors[vector].vector_lock);
 		return B_UNHANDLED_INTERRUPT;
