@@ -16,4 +16,8 @@ enum {
 	MSG_READY_TO_RUN		= 'redy',	//
 };
 
+// Argh, a macro! But that way, we avoid a compiler warning.
+#define kDefaultTestAppSignature \
+	"application/x-vnd.obos-roster-launch-app-default"
+
 #endif	// ROSTER_TEST_APP_DEF_H

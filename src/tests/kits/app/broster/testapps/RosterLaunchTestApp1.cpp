@@ -142,15 +142,14 @@ main(int argc, char **argv)
 		error = file.SetTo(path, B_READ_ONLY);
 		// get signature
 		BString signatureString;
-		if (error == B_OK)
-			error = file.ReadAttrString("signature", &signatureString);
-		else
+		if (error == B_OK) {
+			if (file.ReadAttrString("signature", &signatureString) == B_OK
+				&& signatureString.Length() > 0) {
+				strcpy(signature, signatureString.String());
+			} else
+				strcpy(signature, kDefaultTestAppSignature);
+		} else
 			printf("ERROR: Couldn't init app file: %s\n", strerror(error));
-		// copy signature
-		if (error == B_OK)
-			strcpy(signature, signatureString.String());
-		else
-			printf("ERROR: Couldn't get signature: %s\n", strerror(error));
 	} else
 		printf("ERROR: Couldn't get app ref: %s\n", strerror(error));
 	// create the app
