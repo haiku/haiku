@@ -9,8 +9,9 @@ UsePrivateHeaders [ FDirName storage ] ;
 	local defines =
 		_BOOT_MODE
 		BOOT_SUPPORT_PARTITION_AMIGA
+		BOOT_SUPPORT_PARTITION_APPLE
 		;
-	
+
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
@@ -25,6 +26,7 @@ KernelStaticLibrary boot_loader :
 	list.c
 
 	amiga_rdb.cpp
+	apple.cpp
 
 	kernel_cpp.cpp
 	:
@@ -50,6 +52,9 @@ SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
 
 SEARCH on [ FGristFiles amiga_rdb.cpp ]
     = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+SEARCH on [ FGristFiles apple.cpp ]
+    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
 
 SEARCH on [ FGristFiles stage2_crt0.S ]
     = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
