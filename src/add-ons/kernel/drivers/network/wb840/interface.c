@@ -50,8 +50,7 @@
 		read32(device->reg_base + WB_SIO) & ~x)
 
 #define MII_DELAY(x)	read32(x->reg_base + WB_SIO)
-	
-				
+			
 static void
 mii_sync(struct wb_device *device)
 {
@@ -212,7 +211,6 @@ wb_mii_writereg(wb_device *device, wb_mii_frame	*frame)
 	SIO_CLR(WB_SIO_MII_CLK);
 	MII_DELAY(device);
 	
-
 	/*
 	 * Turn off xmit.
 	 */

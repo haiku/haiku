@@ -324,11 +324,11 @@ struct wb_mii_frame {
 typedef struct wb_device wb_device;
 
 struct wb_device {
+	timer		timer;
 	int32		devId;
 	pci_info*	pciInfo;
 	uint16		irq;		/* IRQ line */
 	volatile uint32 reg_base;	/* hardware register base address */
-	timer		timer;
 	
 	// rx data
 	volatile wb_desc rxDescriptor[WB_RX_LIST_CNT];
@@ -370,10 +370,7 @@ struct wb_device {
 };
 
 
-
-
 /* MII Interface */
-
 struct mii_phy {
 	struct mii_phy *next;
 	uint16	id0, id1;
@@ -391,13 +388,6 @@ enum MII_address {
 	MII_AUTONEG_ADV				= 0x04,
 	MII_AUTONEG_LINK_PARTNER	= 0x05,
 	MII_AUTONEG_EXT				= 0x06
-
-	// SiS900 specific registers
-	/*MII_CONFIG1		= 0x10,
-	MII_CONFIG2		= 0x11,
-	MII_LINK_STATUS	= 0x12,
-	MII_MASK		= 0x13,
-	MII_RESERVED	= 0x14*/
 };
 
 enum MII_control {
@@ -498,7 +488,7 @@ extern void wb_set_mode(wb_device *device, int mode);
 extern int32 wb_read_mode(wb_device *device);
 
 extern int32 wb_tick(timer *arg);
-extern void wb_free_rx_descriptor(wb_desc *desc);
+extern void wb_put_rx_descriptor(wb_desc *desc);
 
 extern void print_address(ether_address_t *addr);
 

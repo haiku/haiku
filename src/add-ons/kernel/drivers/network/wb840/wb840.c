@@ -20,8 +20,8 @@
 
 // MII chip info table
 
-#define PHY_ID0_WB840_INTERNAL 	0x0181
-#define PHY_ID1_WB840_INTERNAL	0xb800
+#define PHY_ID0_DAVICOM_DM9101 	0x0181
+#define PHY_ID1_DAVICOM_DM9101	0xb800
 #define	MII_HOME	0x0001
 #define MII_LAN		0x0002
 
@@ -30,10 +30,9 @@ const static struct mii_chip_info
 	const char *name;
 	uint16 id0, id1;
 	uint8  types;
-}
-
+} 
 gMIIChips[] = {
-	{"WB840 Internal MII PHY", PHY_ID0_WB840_INTERNAL, PHY_ID1_WB840_INTERNAL, MII_LAN},
+	{"DAVICOM_DM9101 MII PHY", PHY_ID0_DAVICOM_DM9101, PHY_ID1_DAVICOM_DM9101, MII_LAN},
 	{NULL,0,0,0}
 };
 
@@ -95,7 +94,7 @@ dump_registers(wb_device *device)
 
 // Prepares a RX descriptor to be used by the chip
 void
-wb_free_rx_descriptor(wb_desc *descriptor)
+wb_put_rx_descriptor(wb_desc *descriptor)
 {
 	descriptor->wb_status = WB_RXSTAT_OWN;
 	descriptor->wb_ctl = WB_MAX_FRAMELEN | WB_RXCTL_RLINK;
@@ -130,17 +129,8 @@ wb_selectPHY(wb_device *device)
 	status &= ~MII_CONTROL_ISOLATE;
 
 	wb_miibus_writereg(device, device->phy, MII_CONTROL, status);
-}
-
-
-uint16
-wb_resetPHY(wb_device *device)
-{
-	uint16 status = mii_readstatus(device);
-	dprintf("wb_resetPHY: %d\n", status);
-	wb_miibus_writereg(device, device->phy, MII_CONTROL, MII_CONTROL_RESET);
 	
-	return status;
+	wb_read_mode(device);
 }
 
 
@@ -190,32 +180,6 @@ wb_initPHYs(wb_device *device)
 	}
 	
 	wb_selectPHY(device);
-
-	// if the internal PHY is selected, reset it
-	if (device->currentPHY->id0 == PHY_ID0_WB840_INTERNAL
-			&& (device->currentPHY->id1 & 0xfff0) == PHY_ID1_WB840_INTERNAL) {
-		if (wb_resetPHY(device) & MII_STATUS_LINK) {
-			uint16 poll = MII_STATUS_LINK;
-			while (poll) {
-				poll ^= wb_miibus_readreg(device, device->phy, MII_STATUS) & poll;
-			}
-		}
-	}
-/*
-	// workaround for ICS1893 PHY
-	if (info->currentPHY->id0 == PHY_ID0_ICS_1893
-		&& (info->currentPHY->id1 & 0xfff0) == PHY_ID1_ICS_1893)
-		mdio_write(info, 0x0018, 0xD200);
-
-	// SiS 630E has some bugs on default value of PHY registers
-	if (info->pciInfo->revision == SiS900_REVISION_SiS630E) {
-		mdio_write(info, MII_AUTONEG_ADV, 0x05e1);
-		mdio_write(info, MII_CONFIG1, 0x22);
-		mdio_write(info, MII_CONFIG2, 0xff00);
-		mdio_write(info, MII_MASK, 0xffc0);
-	}
-	*/
-	
 	device->link = mii_readstatus(device) & MII_STATUS_LINK;
 
 	return B_OK;
@@ -252,14 +216,14 @@ wb_init(wb_device *device)
 	
 	write32(device->reg_base + WB_BUSCTL_SKIPLEN, WB_SKIPLEN_4LONG);
 	
-	/* Early TX interrupt; doesn't tend to work too well at 100Mbps */
+	// Early TX interrupt
 	WB_SETBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
 	
 	// fullduplex
-	WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_FULLDUPLEX);
+	//WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_FULLDUPLEX);
 	
 	//100 MBits
-	WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_100MBPS);
+	//WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_100MBPS);
 	
 	/* Program the multicast filter, if necessary */
 	//wb_setmulti(device);
@@ -276,12 +240,8 @@ void
 wb_reset(wb_device *device)
 {
 	int i = 0;
-	cpu_status status;
 	
 	LOG((DEVICE_NAME": reset()\n"));
-	
-	status = disable_interrupts();
-	// XXX: What about a spinlock here ?
 	
 	write32(device->reg_base + WB_NETCFG, 0L);
 	write32(device->reg_base + WB_BUSCTL, 0L);
@@ -299,12 +259,8 @@ wb_reset(wb_device *device)
 	if (i == WB_TIMEOUT)
 		LOG(("reset hasn't completed!!!"));
 					
-	restore_interrupts(status);
-	
 	/* Wait a bit while the chip reorders his toughts */
 	snooze(1000);
-	
-	//XXX Initialize MII interface
 }
 
 
@@ -315,33 +271,24 @@ wb_updateLink(struct wb_device *device)
 		int32 mode = wb_read_mode(device);
 		if (mode)
 			wb_set_mode(device, mode);
-
+		
 		return;
 	}
 
-	if (device->link)	{	// link lost
+	if (device->link) {	// link lost
 		uint16 status = mii_readstatus(device);
 
-		if ((status & MII_STATUS_LINK) == 0) {
+		if ((status & MII_STATUS_LINK) == 0)
 			device->link = false;
-			dprintf(DEVICE_NAME ": link lost\n");
-
-			// if it's the internal SiS900 MII PHY, reset it
-			//if (device->currentPHY->id0 == PHY_ID0_SiS900_INTERNAL
-			//	&& (device->currentPHY->id1 & 0xfff0) == PHY_ID1_SiS900_INTERNAL)
-			//	sis900_resetPHY(device);
-		}
 	}
-	if (!device->link) {	// new link established
+	
+	if (!device->link) { // new link established
 		uint16 status;
-
 		wb_selectPHY(device);
 
 		status = mii_readstatus(device);
-		if (status & MII_STATUS_LINK) {
-			//sis900_checkMode(device);
+		if (status & MII_STATUS_LINK)		
 			device->link = true;
-		}
 	}
 }
 
@@ -368,7 +315,6 @@ wb_rxok(struct wb_device *device)
 	
 	for (limit = device->rxFree; limit > 0; limit--) {
 		if (device->rxDescriptor[device->rxInterruptIndex].wb_status & WB_RXSTAT_OWN) {
-			//LOG((DEVICE_NAME ": RX_STAT_OWN\n"));
 			break;
 		}
 		
@@ -377,12 +323,11 @@ wb_rxok(struct wb_device *device)
 		device->rxFree--;
 	}
 	
-	//Re-enable receive queue
+	// Re-enable receive queue
 	write32(device->reg_base + WB_RXSTART, 0xFFFFFFFF);
 	
 	release_spinlock(&device->rxSpinlock);
 	
-	//LOG((DEVICE_NAME": RxCurrent = %d\n", device->rxInterruptIndex));
 	
 	if (releaseRxSem > 0) {
 		//dprintf("releasing read sem %d times\n", releaseRxSem);
@@ -404,7 +349,7 @@ wb_tx_nobuf(struct wb_device *info)
 	acquire_spinlock(&info->txSpinlock);
 
 	for (limit = info->txSent; limit > 0; limit--) {
-		status =info->txDescriptor[info->txInterruptIndex].wb_status;
+		status = info->txDescriptor[info->txInterruptIndex].wb_status;
 
 		if (status & WB_TXSTAT_TXERR) {
 			LOG(("TX_STAT_ERR\n"));
@@ -413,7 +358,6 @@ wb_tx_nobuf(struct wb_device *info)
 			LOG(("TX_STAT_UNSENT\n"));
 			break;
 		} else {
-			//dprintf("releasing TX descriptor to the ring\n");
 			info->txDescriptor[info->txInterruptIndex].wb_status = 0;
 		}
 		releaseTxSem++;	// this many buffers are free
@@ -580,7 +524,7 @@ wb_create_rings(struct wb_device *device)
 		device->rxBuffer[i] = (void *)(((uint32)device->rxBuffer[0]) + (i * WB_BUFBYTES));
 
 	for (i = 0; i < WB_RX_LIST_CNT; i++) {
-		wb_free_rx_descriptor(&device->rxDescriptor[i]);
+		wb_put_rx_descriptor(&device->rxDescriptor[i]);
 		device->rxDescriptor[i].wb_data = physicalAddress(device->rxBuffer[i], WB_BUFBYTES);
 		device->rxDescriptor[i].wb_next = physicalAddress(&device->rxDescriptor[(i + 1)
 											& WB_RX_CNT_MASK], sizeof(struct wb_desc));
@@ -639,7 +583,7 @@ wb_read_mode(wb_device *info)
 
 	uint16 status = mii_readstatus(info);
 	if (!(status & MII_STATUS_LINK)) {
-		//dprintf(DEVICE_NAME ": no link detected (status = %x)\n", status);
+		dprintf(DEVICE_NAME ": no link detected (status = %x)\n", status);
 		return 0;
 	}
 
@@ -651,20 +595,11 @@ wb_read_mode(wb_device *info)
 	speed = status & (MII_NWAY_TX | MII_NWAY_TX_FDX) ? LINK_SPEED_100_MBIT : LINK_SPEED_10_MBIT;
 	duplex = status & (MII_NWAY_TX_FDX | MII_NWAY_T_FDX) ? LINK_FULL_DUPLEX : LINK_HALF_DUPLEX;
 	
-	dprintf("status: 0x%x\n", status);
 	info->autoNegotiationComplete = true;
 
-	// workaround for Realtek RTL8201 PHY issue
-	/*if (phy->id0 == PHY_ID0_REALTEK_8201 && (phy->id1 & 0xFFF0) == PHY_ID1_REALTEK_8201) {
-		if (mdio_read(info, MII_CONTROL) & MII_CONTROL_FULL_DUPLEX)
-			duplex = LINK_FULL_DUPLEX;
-		if (mdio_read(info, 0x0019) & 0x01)
-			speed = LINK_SPEED_100_MBIT;
-	}
-*/
-	//dprintf(DEVICE_NAME ": linked, 10%s MBit, %s duplex\n",
-		//		speed == LINK_SPEED_100_MBIT ? "0" : "",
-		//		duplex == LINK_FULL_DUPLEX ? "full" : "half");
+	dprintf(DEVICE_NAME ": linked, 10%s MBit, %s duplex\n",
+				speed == LINK_SPEED_100_MBIT ? "0" : "",
+				duplex == LINK_FULL_DUPLEX ? "full" : "half");
 
 	return speed | duplex;
 }
@@ -673,35 +608,37 @@ wb_read_mode(wb_device *info)
 void
 wb_set_mode(wb_device *info, int mode)
 {
-	/*uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
-	uint32 txFlags = SiS900_Tx_AUTO_PADDING | SiS900_Tx_FILL_THRES;
-	uint32 rxFlags = 0;
+	uint32 cfgAddress = (uint32)info->reg_base + WB_NETCFG;
 	int32 speed = mode & LINK_SPEED_MASK;
+	uint32 configFlags = 0;
+	
+	bool restart = false;
+	int32 i = 0;
+	
+	// Stop TX and RX queue.
+	if (read32(cfgAddress) & (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON)) {
+		restart = 1;
+		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON));
 
-	if (read32(address) & SiS900_MAC_CONFIG_EDB_MASTER) {
-		TRACE((DEVICE_NAME ": EDB master is set!\n"));
-		txFlags |= 5 << SiS900_DMA_SHIFT;
-		rxFlags = 5 << SiS900_DMA_SHIFT;
+		for (i = 0; i < WB_TIMEOUT; i++) {
+			//delay(10)
+			if ((read32(info->reg_base + WB_ISR) & WB_ISR_TX_IDLE) &&
+				(read32(info->reg_base + WB_ISR) & WB_ISR_RX_IDLE))
+				break;
+		}
+
+		if (i == WB_TIMEOUT)
+			dprintf(DEVICE_NAME" Failed to put RX and TX in idle state\n");			
 	}
+	
+	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX)
+		configFlags |= WB_NETCFG_FULLDUPLEX;			
+	
+	if (speed == LINK_SPEED_100_MBIT)
+		configFlags |= WB_NETCFG_100MBPS;
 
-	// link speed FIFO thresholds
-
-	if (speed == LINK_SPEED_HOME || speed == LINK_SPEED_10_MBIT) {
-		rxFlags |= SiS900_Rx_10_MBIT_DRAIN_THRES;
-		txFlags |= SiS900_Tx_10_MBIT_DRAIN_THRES;
-	} else {
-		rxFlags |= SiS900_Rx_100_MBIT_DRAIN_THRES;
-		txFlags |= SiS900_Tx_100_MBIT_DRAIN_THRES;
-	}
-
-	// duplex mode
-
-	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX) {
-		txFlags |= SiS900_Tx_CS_IGNORE | SiS900_Tx_HB_IGNORE;
-		rxFlags |= SiS900_Rx_ACCEPT_Tx_PACKETS;
-	}
-
-	write32((uint32)info->registers + SiS900_MAC_Tx_CONFIG, txFlags);
-	write32((uint32)info->registers + SiS900_MAC_Rx_CONFIG, rxFlags);
-*/
+	write32(cfgAddress, configFlags);
+	
+	if (restart)
+		WB_SETBIT(cfgAddress, WB_NETCFG_TX_ON|WB_NETCFG_RX_ON);	
 }

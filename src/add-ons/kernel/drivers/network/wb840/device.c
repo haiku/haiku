@@ -159,7 +159,7 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 		acquire_spinlock(&device->rxSpinlock);
 
 		// release buffer to ring
-		wb_free_rx_descriptor(&device->rxDescriptor[current]);
+		wb_put_rx_descriptor(&device->rxDescriptor[current]);
 		device->rxFree++;
 
 		release_spinlock(&device->rxSpinlock);
