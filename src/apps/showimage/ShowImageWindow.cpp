@@ -138,9 +138,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, const BMessenger& tracke
 
 	rect.left = 0;
 	rect.right = kstatusWidth - 1;	
+	rect.bottom -= 1;
 	fStatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
 		B_WILL_DRAW);
-	fStatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	AddChild(fStatusView);
 	
 	rect = Bounds();
@@ -559,9 +559,18 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			pmsg->FindInt32("colors", reinterpret_cast<int32 *>(&colors));
 			EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
 				
+			BString status;
+			int32 width, height;
+			if (pmsg->FindInt32("width", &width) >= B_OK
+				&& pmsg->FindInt32("height", &height) >= B_OK) {
+				status << width << "x" << height << ", ";
+			}
+			
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
-				fStatusView->SetText(str);
+				status << str;
+			
+			fStatusView->SetText(status);
 			
 			UpdateTitle();
 			break;
