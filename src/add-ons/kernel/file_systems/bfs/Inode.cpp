@@ -886,6 +886,7 @@ Inode::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_l
 
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
+	// ToDo: should update the internal last modified time only at this point!
 	Node()->last_modified_time = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
 
 	if (Flags() & INODE_NO_CACHE)
@@ -1460,7 +1461,9 @@ Inode::ShrinkStream(Transaction *transaction, off_t size)
 status_t 
 Inode::SetFileSize(Transaction *transaction, off_t size)
 {
-	if (size < 0)
+	if (size < 0
+		// uncached files can't be resized
+		|| Flags() & INODE_NO_CACHE)
 		return B_BAD_VALUE;
 
 	off_t oldSize = Node()->data.size;

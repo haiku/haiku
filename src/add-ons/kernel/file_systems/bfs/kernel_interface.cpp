@@ -205,7 +205,10 @@ vnode_ops fs_entry =  {
 	&bfs_read_query				// read query
 };
 
-#define BFS_IO_SIZE 65536
+#define BFS_IO_SIZE	65536
+#define BFS_NAME	"obfs"
+	// ToDo: has to change to "bfs" later
+
 int32	api_version = B_CUR_FS_API_VERSION;
 
 
@@ -222,7 +225,7 @@ bfs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
 	// to your KernelExport.h include (since it's missing there in some releases
 	// of BeOS R5), or just comment out the line, it won't do any harm and is
 	// used only for debugging purposes.
-	load_driver_symbols("obfs");
+	load_driver_symbols(BFS_NAME);
 #endif
 
 	Volume *volume = new Volume(nsid);
@@ -282,8 +285,8 @@ bfs_read_fs_stat(void *_ns, struct fs_info *info)
 	strncpy(info->volume_name, volume->Name(), sizeof(info->volume_name) - 1);
 	info->volume_name[sizeof(info->volume_name) - 1] = '\0';
 
-	// File system name (ToDo: has to change to "bfs" later)
-	strcpy(info->fsh_name,"obfs");
+	// File system name
+	strcpy(info->fsh_name,BFS_NAME);
 
 	return B_NO_ERROR;
 }
@@ -683,9 +686,32 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 	Transaction transaction(volume,inode->BlockNumber());
 
 	bfs_inode *node = inode->Node();
-	
+
+	if (mask & WSTAT_SIZE) {
+		// Since WSTAT_SIZE is the only thing that can fail directly, we
+		// do it first, so that the inode state will still be consistent
+		// with the on-disk version
+		if (inode->IsDirectory())
+			return B_IS_A_DIRECTORY;
+
+		if (inode->Size() != stat->st_size) {
+			status = inode->SetFileSize(&transaction, stat->st_size);
+			if (status < B_OK)
+				return status;
+
+			// fill the new blocks (if any) with zeros
+			inode->FillGapWithZeros(inode->OldSize(), inode->Size());
+
+			Index index(volume);
+			index.UpdateSize(&transaction, inode);
+
+			if ((mask & WSTAT_MTIME) == 0)
+				index.UpdateLastModified(&transaction, inode);
+		}
+	}
+
 	if (mask & WSTAT_MODE) {
-		PRINT(("original mode = %ld, stat->st_mode = %ld\n",node->mode,stat->st_mode));
+		PRINT(("original mode = %ld, stat->st_mode = %ld\n", node->mode, stat->st_mode));
 		node->mode = node->mode & ~S_IUMSK | stat->st_mode & S_IUMSK;
 	}
 
@@ -693,24 +719,6 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 		node->uid = stat->st_uid;
 	if (mask & WSTAT_GID)
 		node->gid = stat->st_gid;
-
-	if (mask & WSTAT_SIZE) {
-		if (inode->IsDirectory())
-			return B_IS_A_DIRECTORY;
-
-		if (inode->Size() != stat->st_size) {
-			status = inode->SetFileSize(&transaction,stat->st_size);
-
-			// fill the new blocks (if any) with zeros
-			inode->FillGapWithZeros(inode->OldSize(),inode->Size());
-
-			Index index(volume);
-			index.UpdateSize(&transaction,inode);
-
-			if ((mask & WSTAT_MTIME) == 0)
-				index.UpdateLastModified(&transaction,inode);
-		}
-	}
 
 	if (mask & WSTAT_MTIME) {
 		// Index::UpdateLastModified() will set the new time in the inode

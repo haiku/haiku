@@ -477,7 +477,7 @@ Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
 
 template<class Cache>
 status_t
-Stream<Cache>::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_length)
+Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer, size_t *_length)
 {
 	size_t length = *_length;
 
@@ -487,16 +487,18 @@ Stream<Cache>::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,si
 	else if (pos + length > Node()->data.size) {
 		off_t oldSize = Size();
 
-		// uncached files can't be resized
+		// uncached files can't be resized (Inode::SetFileSize() also
+		// doesn't allow this, but this way we don't have to start a
+		// transaction to find out).
 		if (Flags() & INODE_NO_CACHE)
 			return B_BAD_VALUE;
 
 		// the transaction doesn't have to be started already
 		if ((Flags() & INODE_NO_TRANSACTION) == 0)
-			transaction->Start(fVolume,BlockNumber());
+			transaction->Start(fVolume, BlockNumber());
 
 		// let's grow the data stream to the size needed
-		status_t status = SetFileSize(transaction,pos + length);
+		status_t status = SetFileSize(transaction, pos + length);
 		if (status < B_OK) {
 			*_length = 0;
 			RETURN_ERROR(status);
