@@ -43,6 +43,7 @@ SharedLibrary storage :
 	Resources.cpp
 	ResourceStrings.cpp
 	Parser.cpp		# Hack-o-rama
+	Range.cpp		# Hack-o-rama
 	Rule.cpp		# Hack-o-rama
 	Statable.cpp
 	SymLink.cpp
