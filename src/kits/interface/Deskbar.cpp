@@ -34,6 +34,7 @@
 #include <Message.h>
 #include <View.h>
 #include <Rect.h>
+#include <InterfaceDefs.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -53,6 +54,29 @@ static const uint32 gLocationWhat = 'gloc';
 static const uint32 gIsExpandedWhat = 'gexp';
 static const uint32 gSetLocationWhat = 'sloc';
 static const uint32 gExpandWhat = 'sexp';
+
+
+status_t get_deskbar_frame(BRect *frame)
+{
+	BMessenger deskbarMessenger(gDeskbarSignature);
+	BMessage requestMessage(B_GET_PROPERTY);
+	BMessage replyMessage;
+	status_t result;
+	
+	result = requestMessage.AddSpecifier("Frame");
+	if (result == B_OK) {
+		result = requestMessage.AddSpecifier("Window", "Deskbar");
+		if (result == B_OK) {
+			result = deskbarMessenger.SendMessage(&requestMessage, &replyMessage);
+			if ((result == B_OK) &&
+	            (replyMessage.what == B_REPLY)) {
+	    		result = replyMessage.FindRect("result", frame);
+	    	}
+	    }
+	}
+	return(result);
+}
+
 
 //------------------------------------------------------------------------------
 BDeskbar::BDeskbar()

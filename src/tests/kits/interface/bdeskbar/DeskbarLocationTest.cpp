@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarLocationTest.cpp,v 1.1 2002/09/13 03:51:09 jrand Exp $
+	$Id: DeskbarLocationTest.cpp,v 1.2 2002/09/26 03:27:26 jrand Exp $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Frame
@@ -13,6 +13,7 @@
 
 #include "DeskbarLocationTest.h"
 #include <Deskbar.h>
+#include <InterfaceDefs.h>
 
 
 /*
@@ -69,6 +70,24 @@
 	}
 	
 	BRect myRect(myDeskbar->Frame());
+	switch (currLocation) {
+		case B_DESKBAR_TOP:
+		case B_DESKBAR_LEFT_TOP:
+			assert(myRect.top == 0.0);
+			assert(myRect.left == 0.0);
+			break;
+		case B_DESKBAR_BOTTOM:
+		case B_DESKBAR_LEFT_BOTTOM:
+			assert(myRect.left == 0.0);
+			break;
+		case B_DESKBAR_RIGHT_TOP:
+		case B_DESKBAR_RIGHT_BOTTOM:
+			break;
+		default:
+			assert(false);
+			break;
+	}
+	assert(get_deskbar_frame(&myRect) == B_OK);
 	switch (currLocation) {
 		case B_DESKBAR_TOP:
 		case B_DESKBAR_LEFT_TOP:
