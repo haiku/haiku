@@ -3,47 +3,33 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
 #include <OS.h>
-#include <Errors.h>
 
-#include <kernel.h>
-#include <debug.h>
-#include <console.h>
 #include <thread.h>
-#include <arch/thread.h>
+#include <team.h>
 #include <khash.h>
 #include <int.h>
 #include <smp.h>
-#include <timer.h>
 #include <cpu.h>
-#include <arch/int.h>
-#include <arch/cpu.h>
 #include <arch/vm.h>
-#include <sem.h>
-#include <port.h>
-#include <vfs.h>
-#include <elf.h>
-#include <malloc.h>
 #include <user_runtime.h>
 #include <boot/kernel_args.h>
-#include <string.h>
 #include <kimage.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/resource.h>
-#include <kerrors.h>
-#include <syscalls.h>
 #include <ksignal.h>
+#include <syscalls.h>
 #include <tls.h>
 
-#define TRACE_THREAD 0
+#include <sys/resource.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//#define TRACE_THREAD
 #if TRACE_THREAD
 #	define TRACE(x) dprintf x
 #else
@@ -335,13 +321,13 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	restore_interrupts(state);
 	if (abort) {
 		delete_thread_struct(t);
-		return ERR_TASK_PROC_DELETED;
+		return B_BAD_TEAM_ID;
 	}
 
 	sprintf(stack_name, "%s_kstack", name);
 	t->kernel_stack_region_id = create_area(stack_name, (void **)&t->kernel_stack_base,
 		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		
+
 	if (t->kernel_stack_region_id < 0)
 		panic("_create_thread: error creating kernel stack!\n");
 
@@ -714,6 +700,7 @@ thread_exit(void)
 	cpu_status state;
 	struct thread *t = thread_get_current_thread();
 	struct team *team = t->team;
+	thread_id mainParentThread = -1;
 	bool delete_team = false;
 	unsigned int death_stack;
 	sem_id cached_death_sem;
@@ -762,13 +749,18 @@ thread_exit(void)
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
+
 		remove_thread_from_team(team, t);
 		insert_thread_into_team(team_get_kernel_team(), t);
+
 		if (team->main_thread == t) {
 			// this was main thread in this team
 			delete_team = true;
-			team_remove_team_from_hash(team);
-			team->state = TEAM_STATE_DEATH;
+
+			// remember who our parent was so we can send a signal
+			mainParentThread = team->parent->main_thread->id;
+
+			team_remove_team(team);
 		}
 		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
@@ -778,50 +770,14 @@ thread_exit(void)
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
 	}
 
-	cached_death_sem = team->death_sem;
-
-	// delete the team
+	// delete the team if we're its main thread
 	if (delete_team) {
-		if (team->num_threads > 0) {
-			// there are other threads still in this team,
-			// cycle through and signal kill on each of the threads
-			// XXX this can be optimized. There's got to be a better solution.
-			struct thread *temp_thread;
-			char death_sem_name[B_OS_NAME_LENGTH];
+		team_delete_team(team);
 
-			sprintf(death_sem_name, "team %ld death sem", team->id);
-			team->death_sem = create_sem(0, death_sem_name);
-			if (team->death_sem < 0)
-				panic("thread_exit: cannot init death sem for team %ld\n", team->id);
-			
-			state = disable_interrupts();
-			GRAB_TEAM_LOCK();
-			// we can safely walk the list because of the lock. no new threads can be created
-			// because of the TEAM_STATE_DEATH flag on the team
-			temp_thread = team->thread_list;
-			while(temp_thread) {
-				struct thread *next = temp_thread->team_next;
-				thread_kill_thread_nowait(temp_thread->id);
-				temp_thread = next;
-			}
-			RELEASE_TEAM_LOCK();
-			restore_interrupts(state);
-			// wait until all threads in team are dead.
-			acquire_sem_etc(team->death_sem, team->num_threads, 0, 0);
-			delete_sem(team->death_sem);
-		}
+		send_signal_etc(mainParentThread, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cached_death_sem = -1;
-
-		// free team resources
-		vm_put_aspace(team->aspace);
-		vm_delete_aspace(team->_aspace_id);
-		delete_owned_ports(team->id);
-		sem_delete_owned_sems(team->id);
-		remove_images(team);
-		vfs_free_io_context(team->io_context);
-
-		free(team);
-	}
+	} else
+		cached_death_sem = team->death_sem;
 
 	// delete the sem that others will use to wait on us and get the retcode
 	{
