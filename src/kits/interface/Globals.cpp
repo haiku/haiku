@@ -32,6 +32,7 @@
 #include <PortMessage.h>
 #include <ServerProtocol.h>
 #include <Screen.h>
+#include <Roster.h>
 
 
 // Private definitions not placed in public headers
@@ -65,30 +66,16 @@ set_screen_space(int32 index, uint32 res, bool stick)
 
 
 _IMPEXP_BE status_t
-get_scroll_bar_info(scroll_bar_info *info)
-{
-	PortMessage pmsg;
-
-	BAppServerLink link;
-	link.SetOpCode(AS_GET_SCROLLBAR_INFO);
-	link.FlushWithReply(&pmsg);
-	
-	pmsg.Read(info, sizeof(scroll_bar_info));
-	
-	//TODO: Read back the status from the app_server's reply
-	return B_OK;
-}
-
-
-_IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
 {
 	BAppServerLink link;
+	PortMessage msg;
 	link.SetOpCode(AS_SET_SCROLLBAR_INFO);
 	link.Attach(info, sizeof(scroll_bar_info));
-	link.Flush();
+	link.FlushWithReply(&msg);
 	
 	//TODO: Read back the status from the app_server's reply
+	msg.Read(info,sizeof(scroll_bar_info));
 	return B_OK;
 }
 
@@ -334,7 +321,7 @@ _IMPEXP_BE void
 run_select_printer_panel()
 {
 	// Launches the Printer prefs app via the Roster
-	// TODO: Implement
+	be_roster->Launch("application/x-vnd.Be-PRNT");
 }
 
 
