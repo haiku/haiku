@@ -108,6 +108,7 @@ status_t BShapeIterator::Iterate(BShape *shape)
 				break;
 			}
 			case OP_CLOSE:
+			case OP_CLOSE | OP_LINETO | OP_BEZIERTO:
 			{
 				IterateClose();
 				break;
@@ -170,9 +171,10 @@ BShape::BShape(BMessage *archive)
 
 	while (archive->FindData("ops", B_INT32_TYPE, i++, (const void**)&opPtr, &size) == B_OK)
 	{
-		if (data->opCount + 1 < data->opSize)
+		if (data->opSize < data->opCount + 1)
 		{
-			int32 new_size = ((data->opCount + 1) / data->opBlockSize) * data->opBlockSize;
+			int32 new_size = ((data->opCount + data->opBlockSize) /
+				data->opBlockSize) * data->opBlockSize;
 			data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 			data->opSize = new_size;
 		}
@@ -184,10 +186,12 @@ BShape::BShape(BMessage *archive)
 
 	while (archive->FindData("pts", B_POINT_TYPE, i++, (const void**)&ptPtr, &size) == B_OK)
 	{
-		if (data->ptCount + 1 < data->ptSize)
+		if (data->ptSize < data->ptCount + 1)
 		{
-			int32 new_size = ((data->ptCount + 1) / data->ptBlockSize) * data->ptBlockSize;
-			data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(BPoint));
+			int32 new_size = ((data->ptCount + data->ptBlockSize) /
+				data->ptBlockSize) * data->ptBlockSize;
+			data->ptList = (BPoint*)realloc(data->ptList,
+				new_size * sizeof(BPoint));
 			data->ptSize = new_size;
 		}
 
@@ -301,9 +305,10 @@ status_t BShape::AddShape(const BShape *otherShape)
 	shape_data *data = (shape_data*)fPrivateData;
 	shape_data *otherData = (shape_data*)otherShape->fPrivateData;
 
-	if (data->opCount + otherData->opCount < data->opSize)
+	if (data->opSize < data->opCount + otherData->opCount)
 	{
-		int32 new_size = ((data->opCount + otherData->opCount) / data->opBlockSize) * data->opBlockSize;
+		int32 new_size = ((data->opCount + otherData->opBlockSize) /
+			data->opBlockSize) * data->opBlockSize;
 		data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 		data->opSize = new_size;
 	}
@@ -312,9 +317,10 @@ status_t BShape::AddShape(const BShape *otherShape)
 		otherData->opCount * sizeof(uint32));
 	data->opCount += otherData->opCount;
 
-	if (data->ptCount + otherData->ptCount < data->ptSize)
+	if (data->ptSize < data->ptCount + otherData->ptCount)
 	{
-		int32 new_size = ((data->ptCount + otherData->ptCount) / data->ptBlockSize) * data->ptBlockSize;
+		int32 new_size = ((data->ptCount + otherData->ptBlockSize) /
+			data->ptBlockSize) * data->ptBlockSize;
 		data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(uint32));
 		data->ptSize = new_size;
 	}
@@ -342,9 +348,10 @@ status_t BShape::MoveTo(BPoint point)
 	}
 	else if (fBuildingOp != 0)
 	{
-		if (data->opCount + 1 < data->opSize)
+		if (data->opSize < data->opCount + 1)
 		{
-			int32 new_size = ((data->opCount + 1) / data->opBlockSize) * data->opBlockSize;
+			int32 new_size = ((data->opCount + data->opBlockSize) /
+				data->opBlockSize) * data->opBlockSize;
 			data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 			data->opSize = new_size;
 		}
@@ -356,9 +363,10 @@ status_t BShape::MoveTo(BPoint point)
 	fBuildingOp = OP_MOVETO;
 
 	// Add point
-	if (data->ptCount + 1 < data->ptSize)
+	if (data->ptSize < data->ptCount + 1)
 	{
-		int32 new_size = ((data->ptCount + 1) / data->ptBlockSize) * data->ptBlockSize;
+		int32 new_size = ((data->ptCount + data->ptBlockSize) /
+			data->ptBlockSize) * data->ptBlockSize;
 		data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(BPoint));
 		data->ptSize = new_size;
 	}
@@ -387,9 +395,10 @@ status_t BShape::LineTo(BPoint point)
 	{
 		if (fBuildingOp != 0)
 		{
-			if (data->opCount + 1 < data->opSize)
+			if (data->opSize < data->opCount + 1)
 			{
-				int32 new_size = ((data->opCount + 1) / data->opBlockSize) * data->opBlockSize;
+				int32 new_size = ((data->opCount + data->opBlockSize) /
+					data->opBlockSize) * data->opBlockSize;
 				data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 				data->opSize = new_size;
 			}
@@ -401,9 +410,10 @@ status_t BShape::LineTo(BPoint point)
 	}
 
 	// Add point
-	if (data->ptCount + 1 < data->ptSize)
+	if (data->ptSize < data->ptCount + 1)
 	{
-		int32 new_size = ((data->ptCount + 1) / data->ptBlockSize) * data->ptBlockSize;
+		int32 new_size = ((data->ptCount + data->ptBlockSize) /
+			data->ptBlockSize) * data->ptBlockSize;
 		data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(BPoint));
 		data->ptSize = new_size;
 	}
@@ -432,9 +442,10 @@ status_t BShape::BezierTo(BPoint controlPoints[3])
 	{
 		if (fBuildingOp != 0)
 		{
-			if (data->opCount + 1 < data->opSize)
+			if (data->opSize < data->opCount + 1)
 			{
-				int32 new_size = ((data->opCount + 1) / data->opBlockSize) * data->opBlockSize;
+				int32 new_size = ((data->opCount + data->opBlockSize) /
+					data->opBlockSize) * data->opBlockSize;
 				data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 				data->opSize = new_size;
 			}
@@ -446,9 +457,10 @@ status_t BShape::BezierTo(BPoint controlPoints[3])
 	}
 
 	// Add points
-	if (data->ptCount + 3 < data->ptSize)
+	if (data->ptSize < data->ptCount + 3)
 	{
-		int32 new_size = ((data->ptCount + 3) / data->ptBlockSize) * data->ptBlockSize;
+		int32 new_size = ((data->ptCount + data->ptBlockSize) /
+			data->ptBlockSize) * data->ptBlockSize;
 		data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(BPoint));
 		data->ptSize = new_size;
 	}
@@ -467,9 +479,10 @@ status_t BShape::Close()
 	// If there was a previous line/bezier op, add the op
 	if (fBuildingOp & (OP_LINETO | OP_BEZIERTO))
 	{
-		if (data->opCount + 1 < data->opSize)
+		if (data->opSize < data->opCount + 1)
 		{
-			int32 new_size = ((data->opCount + 1) / data->opBlockSize) * data->opBlockSize;
+			int32 new_size = ((data->opCount + data->opBlockSize) /
+				data->opBlockSize) * data->opBlockSize;
 			data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 			data->opSize = new_size;
 		}
@@ -507,9 +520,10 @@ void BShape::SetData(int32 opCount, int32 ptCount, uint32 *opList,
 {
 	shape_data *data = (shape_data*)fPrivateData;
 
-	if (opCount > data->opSize)
+	if (data->opSize < opCount)
 	{
-		int32 new_size = (opCount / data->opBlockSize) * data->opBlockSize;
+		int32 new_size = ((opCount + data->opBlockSize) /
+			data->opBlockSize) * data->opBlockSize;
 
 		data->opList = (uint32*)realloc(data->opList, new_size * sizeof(uint32));
 		data->opSize = new_size;
@@ -518,9 +532,10 @@ void BShape::SetData(int32 opCount, int32 ptCount, uint32 *opList,
 	memcpy(data->opList, opList, opCount * sizeof(uint32));
 	data->opCount = opCount;
 
-	if (ptCount > data->ptSize)
+	if (data->ptSize < ptCount)
 	{
-		int32 new_size = (ptCount / data->ptBlockSize) * data->ptBlockSize;
+		int32 new_size = ((ptCount + data->ptBlockSize) /
+			data->ptBlockSize) * data->ptBlockSize;
 
 		data->ptList = (BPoint*)realloc(data->ptList, new_size * sizeof(BPoint));
 		data->ptSize = new_size;
