@@ -157,8 +157,7 @@ apple_scan_partition(int fd, partition_data *partition, void *_cookie)
 		TRACE(("apple: found partition: name = \"%s\", type = \"%s\"\n",
 			partitionMap.name, partitionMap.type));
 
-		if ((uint64)partition->offset + partitionMap.Start(descriptor)
-			+ partitionMap.Size(descriptor) > (uint64)partition->size) {
+		if (partitionMap.Start(descriptor) + partitionMap.Size(descriptor) > (uint64)partition->size) {
 			TRACE(("apple: child partition exceeds existing space (%Ld bytes)\n",
 				partitionMap.Size(descriptor)));
 			continue;

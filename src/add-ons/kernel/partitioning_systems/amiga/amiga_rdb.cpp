@@ -180,8 +180,7 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 		disk_environment &environment = *(disk_environment *)&partitionBlock.environment[0];
 		TRACE(("amiga_rdb: file system: %s\n", get_tupel(B_BENDIAN_TO_HOST_INT32(environment.dos_type))));
 
-		if ((uint64)partition->offset + environment.Start()
-			+ environment.Size() > (uint64)partition->size) {
+		if (environment.Start() + environment.Size() > (uint64)partition->size) {
 			TRACE(("amiga_rdb: child partition exceeds existing space (%Ld bytes)\n", environment.Size()));
 			continue;
 		}
