@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 R5KernelAddon ethernet : kernel network interfaces :
 	ethernet.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/interfaces
+	: ethernet ;

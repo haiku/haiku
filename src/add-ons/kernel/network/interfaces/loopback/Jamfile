@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 R5KernelAddon loopback : kernel network interfaces :
 	loopback.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/interfaces
+	: loopback ;

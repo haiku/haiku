@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 BinCommand traceroute :
 	traceroute.c
 :  libnet.so ;
+
+# Installation -- in the test directory for the time being
+OBOSInstall install-networking
+	: [ FDirName $(OBOS_TEST_DIR) kits net ]
+	: traceroute ;

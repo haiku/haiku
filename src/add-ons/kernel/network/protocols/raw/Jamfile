@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 R5KernelAddon raw : kernel network protocols :
 	raw.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/protocols
+	: raw ;

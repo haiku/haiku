@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 R5KernelAddon udp : kernel network protocols :
 	udp.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/protocols
+	: udp ;

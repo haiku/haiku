@@ -5,3 +5,8 @@ UsePrivateHeaders net ;
 R5KernelAddon icmp : kernel network protocols :
 	icmp.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/protocols
+	: icmp ;

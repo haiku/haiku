@@ -10,3 +10,8 @@ R5KernelAddon tcp : kernel network protocols :
 	tcp_output.c
 	tcp_timer.c
 ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/protocols
+	: tcp ;

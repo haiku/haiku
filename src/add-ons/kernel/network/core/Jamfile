@@ -19,3 +19,7 @@ R5KernelAddon core : kernel network :
 	sockbuf.c
 	socket.c
 ;
+
+# Installation
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/network
+	: core ;
