@@ -6,7 +6,7 @@ R5KernelAddon bfs : kernel disk_scanner fs :
 	bfs.c
 ;
 
-R5KernelAddon iso9660 : kernel disk_scanner fs :
-	iso9660.cpp
-;
+#R5KernelAddon iso9660 : kernel disk_scanner fs :
+#	iso9660.cpp
+#;
 
