@@ -38,3 +38,5 @@
 #define IS_UPDATE_ICON					'MRui'
 #define IS_UPDATE_MENU					'MRum'
 #define IS_UPDATE_METHOD				'MRu!'
+#define IS_ADD_METHOD					'MRa!'
+#define IS_REMOVE_METHOD				'MRr!'
