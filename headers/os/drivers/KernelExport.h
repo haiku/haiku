@@ -180,7 +180,7 @@ extern bool			set_dprintf_enabled(bool new_state);	/* returns old state */
 extern void			panic(const char *format, ...);
 
 extern void			kernel_debugger(const char *message);	/* enter kernel debugger */
-extern ulong		parse_expression(char *str);			/* utility for debugger cmds */
+extern uint32		parse_expression(const char *string);	/* utility for debugger cmds */
 
 /* special return codes for kernel debugger */
 #define  B_KDEBUG_CONT   2
