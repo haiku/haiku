@@ -6,7 +6,7 @@
 #define VFS_SELECT_H
 
 typedef struct select_info {
-	uint8	events;
+	uint16	events;
 } select_info;
 
 typedef struct select_sync {

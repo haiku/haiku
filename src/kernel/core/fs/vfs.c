@@ -2708,6 +2708,8 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 			fds[i].revents = POLLNVAL;
 			continue;
 		}
+		// clear reported events mask
+		fds[i].revents = 0;
 
 		if ((fds[i].events & POLLIN)
 			&& select_fd(fd, B_SELECT_READ, MAKE_SELECT_REF(fd, B_SELECT_READ), &sync, kernel) == B_OK)
@@ -2774,6 +2776,9 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 	switch (status) {
 		case B_OK:
 			for (count = 0, i = 0;i < numfds; i++) {
+				if (fds[i].revents == POLLNVAL)
+					continue;
+
 				// POLLxxx flags and B_SELECT_xxx flags are compatible
 				fds[i].revents = sync.set[i].events;
 				if (fds[i].revents != 0)
